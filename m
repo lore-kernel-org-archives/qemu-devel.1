@@ -2,58 +2,56 @@ Return-Path: <SRS0=PUPy=YH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.8 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 64BD1ECE58C
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 19:31:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 56CC6ECE58C
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 19:32:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3E8B82089C
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 19:31:55 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3E8B82089C
+	by mail.kernel.org (Postfix) with ESMTPS id 2F7722089C
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 19:32:53 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2F7722089C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56324 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56326 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iK64Q-0007PD-19
-	for qemu-devel@archiver.kernel.org; Mon, 14 Oct 2019 15:31:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40215)
+	id 1iK65L-0007qY-Uv
+	for qemu-devel@archiver.kernel.org; Mon, 14 Oct 2019 15:32:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40178)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jsnow@redhat.com>) id 1iK627-0005Nw-CN
- for qemu-devel@nongnu.org; Mon, 14 Oct 2019 15:29:33 -0400
+ (envelope-from <jsnow@redhat.com>) id 1iK623-0005NR-Gj
+ for qemu-devel@nongnu.org; Mon, 14 Oct 2019 15:29:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1iK625-0002Ec-Eh
- for qemu-devel@nongnu.org; Mon, 14 Oct 2019 15:29:31 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47260)
+ (envelope-from <jsnow@redhat.com>) id 1iK621-0001st-IF
+ for qemu-devel@nongnu.org; Mon, 14 Oct 2019 15:29:27 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:38710)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <jsnow@redhat.com>)
- id 1iK620-0001l2-4n; Mon, 14 Oct 2019 15:29:24 -0400
+ id 1iK61w-0001Vp-AQ; Mon, 14 Oct 2019 15:29:20 -0400
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
  [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 582F218C8919;
- Mon, 14 Oct 2019 19:29:23 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id CFDAB10C0938;
+ Mon, 14 Oct 2019 19:29:18 +0000 (UTC)
 Received: from probe.bos.redhat.com (dhcp-17-152.bos.redhat.com [10.18.17.152])
- by smtp.corp.redhat.com (Postfix) with ESMTP id F1E7A60BE2;
- Mon, 14 Oct 2019 19:29:21 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 8BEC860BE2;
+ Mon, 14 Oct 2019 19:29:09 +0000 (UTC)
 From: John Snow <jsnow@redhat.com>
 To: Peter Maydell <peter.maydell@linaro.org>,
 	qemu-devel@nongnu.org
-Subject: [PULL v2 03/19] block/dirty-bitmap: return int from
- bdrv_remove_persistent_dirty_bitmap
-Date: Mon, 14 Oct 2019 15:28:53 -0400
-Message-Id: <20191014192909.16044-4-jsnow@redhat.com>
-In-Reply-To: <20191014192909.16044-1-jsnow@redhat.com>
-References: <20191014192909.16044-1-jsnow@redhat.com>
+Subject: [PULL v2 00/19] Bitmaps patches
+Date: Mon, 14 Oct 2019 15:28:50 -0400
+Message-Id: <20191014192909.16044-1-jsnow@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.70]); Mon, 14 Oct 2019 19:29:23 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.66]); Mon, 14 Oct 2019 19:29:18 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
@@ -79,193 +77,79 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+The following changes since commit c760cb77e511eb05094df67c1b30029a952efa=
+35:
 
-It's more comfortable to not deal with local_err.
+  Merge remote-tracking branch 'remotes/dgilbert/tags/pull-migration-2019=
+1011a' into staging (2019-10-14 16:09:52 +0100)
 
-Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Reviewed-by: John Snow <jsnow@redhat.com>
-Message-id: 20190920082543.23444-3-vsementsov@virtuozzo.com
-Signed-off-by: John Snow <jsnow@redhat.com>
----
- block/qcow2.h                |  5 ++---
- include/block/block_int.h    |  6 +++---
- include/block/dirty-bitmap.h |  5 ++---
- block/dirty-bitmap.c         |  9 +++++----
- block/qcow2-bitmap.c         | 18 ++++++++++--------
- blockdev.c                   |  7 +++----
- 6 files changed, 25 insertions(+), 25 deletions(-)
+are available in the Git repository at:
 
-diff --git a/block/qcow2.h b/block/qcow2.h
-index f51f478e34..08b4c15dc4 100644
---- a/block/qcow2.h
-+++ b/block/qcow2.h
-@@ -750,9 +750,8 @@ bool qcow2_can_store_new_dirty_bitmap(BlockDriverStat=
-e *bs,
-                                       const char *name,
-                                       uint32_t granularity,
-                                       Error **errp);
--void qcow2_remove_persistent_dirty_bitmap(BlockDriverState *bs,
--                                          const char *name,
--                                          Error **errp);
-+int qcow2_remove_persistent_dirty_bitmap(BlockDriverState *bs, const cha=
-r *name,
-+                                         Error **errp);
-=20
- ssize_t coroutine_fn
- qcow2_co_compress(BlockDriverState *bs, void *dest, size_t dest_size,
-diff --git a/include/block/block_int.h b/include/block/block_int.h
-index 05056b308a..6b511dd889 100644
---- a/include/block/block_int.h
-+++ b/include/block/block_int.h
-@@ -557,9 +557,9 @@ struct BlockDriver {
-                                             const char *name,
-                                             uint32_t granularity,
-                                             Error **errp);
--    void (*bdrv_remove_persistent_dirty_bitmap)(BlockDriverState *bs,
--                                                const char *name,
--                                                Error **errp);
-+    int (*bdrv_remove_persistent_dirty_bitmap)(BlockDriverState *bs,
-+                                               const char *name,
-+                                               Error **errp);
-=20
-     /**
-      * Register/unregister a buffer for I/O. For example, when the drive=
-r is
-diff --git a/include/block/dirty-bitmap.h b/include/block/dirty-bitmap.h
-index 4b4b731b46..07503b03b5 100644
---- a/include/block/dirty-bitmap.h
-+++ b/include/block/dirty-bitmap.h
-@@ -37,9 +37,8 @@ int bdrv_dirty_bitmap_check(const BdrvDirtyBitmap *bitm=
-ap, uint32_t flags,
-                             Error **errp);
- void bdrv_release_dirty_bitmap(BlockDriverState *bs, BdrvDirtyBitmap *bi=
-tmap);
- void bdrv_release_named_dirty_bitmaps(BlockDriverState *bs);
--void bdrv_remove_persistent_dirty_bitmap(BlockDriverState *bs,
--                                         const char *name,
--                                         Error **errp);
-+int bdrv_remove_persistent_dirty_bitmap(BlockDriverState *bs, const char=
- *name,
-+                                        Error **errp);
- void bdrv_disable_dirty_bitmap(BdrvDirtyBitmap *bitmap);
- void bdrv_enable_dirty_bitmap(BdrvDirtyBitmap *bitmap);
- void bdrv_enable_dirty_bitmap_locked(BdrvDirtyBitmap *bitmap);
-diff --git a/block/dirty-bitmap.c b/block/dirty-bitmap.c
-index 8f42015db9..d1ae2e1922 100644
---- a/block/dirty-bitmap.c
-+++ b/block/dirty-bitmap.c
-@@ -455,13 +455,14 @@ void bdrv_release_named_dirty_bitmaps(BlockDriverSt=
-ate *bs)
-  * not fail.
-  * This function doesn't release corresponding BdrvDirtyBitmap.
-  */
--void bdrv_remove_persistent_dirty_bitmap(BlockDriverState *bs,
--                                         const char *name,
--                                         Error **errp)
-+int bdrv_remove_persistent_dirty_bitmap(BlockDriverState *bs, const char=
- *name,
-+                                        Error **errp)
- {
-     if (bs->drv && bs->drv->bdrv_remove_persistent_dirty_bitmap) {
--        bs->drv->bdrv_remove_persistent_dirty_bitmap(bs, name, errp);
-+        return bs->drv->bdrv_remove_persistent_dirty_bitmap(bs, name, er=
-rp);
-     }
-+
-+    return 0;
- }
-=20
- bool bdrv_can_store_new_dirty_bitmap(BlockDriverState *bs, const char *n=
-ame,
-diff --git a/block/qcow2-bitmap.c b/block/qcow2-bitmap.c
-index b2487101ed..9821c1628f 100644
---- a/block/qcow2-bitmap.c
-+++ b/block/qcow2-bitmap.c
-@@ -1404,9 +1404,8 @@ static Qcow2Bitmap *find_bitmap_by_name(Qcow2Bitmap=
-List *bm_list,
-     return NULL;
- }
-=20
--void qcow2_remove_persistent_dirty_bitmap(BlockDriverState *bs,
--                                          const char *name,
--                                          Error **errp)
-+int qcow2_remove_persistent_dirty_bitmap(BlockDriverState *bs, const cha=
-r *name,
-+                                         Error **errp)
- {
-     int ret;
-     BDRVQcow2State *s =3D bs->opaque;
-@@ -1416,18 +1415,19 @@ void qcow2_remove_persistent_dirty_bitmap(BlockDr=
-iverState *bs,
-     if (s->nb_bitmaps =3D=3D 0) {
-         /* Absence of the bitmap is not an error: see explanation above
-          * bdrv_remove_persistent_dirty_bitmap() definition. */
--        return;
-+        return 0;
-     }
-=20
-     bm_list =3D bitmap_list_load(bs, s->bitmap_directory_offset,
-                                s->bitmap_directory_size, errp);
-     if (bm_list =3D=3D NULL) {
--        return;
-+        return -EIO;
-     }
-=20
-     bm =3D find_bitmap_by_name(bm_list, name);
-     if (bm =3D=3D NULL) {
--        goto fail;
-+        ret =3D -EINVAL;
-+        goto out;
-     }
-=20
-     QSIMPLEQ_REMOVE(bm_list, bm, Qcow2Bitmap, entry);
-@@ -1435,14 +1435,16 @@ void qcow2_remove_persistent_dirty_bitmap(BlockDr=
-iverState *bs,
-     ret =3D update_ext_header_and_dir(bs, bm_list);
-     if (ret < 0) {
-         error_setg_errno(errp, -ret, "Failed to update bitmap extension"=
-);
--        goto fail;
-+        goto out;
-     }
-=20
-     free_bitmap_clusters(bs, &bm->table);
-=20
--fail:
-+out:
-     bitmap_free(bm);
-     bitmap_list_free(bm_list);
-+
-+    return ret;
- }
-=20
- void qcow2_store_persistent_dirty_bitmaps(BlockDriverState *bs, Error **=
-errp)
-diff --git a/blockdev.c b/blockdev.c
-index f89e48fc79..a45458a60a 100644
---- a/blockdev.c
-+++ b/blockdev.c
-@@ -2940,15 +2940,14 @@ static BdrvDirtyBitmap *do_block_dirty_bitmap_rem=
-ove(
-     }
-=20
-     if (bdrv_dirty_bitmap_get_persistence(bitmap)) {
-+        int ret;
-         AioContext *aio_context =3D bdrv_get_aio_context(bs);
--        Error *local_err =3D NULL;
-=20
-         aio_context_acquire(aio_context);
--        bdrv_remove_persistent_dirty_bitmap(bs, name, &local_err);
-+        ret =3D bdrv_remove_persistent_dirty_bitmap(bs, name, errp);
-         aio_context_release(aio_context);
-=20
--        if (local_err !=3D NULL) {
--            error_propagate(errp, local_err);
-+        if (ret < 0) {
-             return NULL;
-         }
-     }
+  https://github.com/jnsnow/qemu.git tags/bitmaps-pull-request
+
+for you to fetch changes up to b2ca29ee390743c42a6062d44ee3b10fb51f9fa6:
+
+  dirty-bitmaps: remove deprecated autoload parameter (2019-10-14 15:28:1=
+7 -0400)
+
+----------------------------------------------------------------
+Pull request
+
+----------------------------------------------------------------
+
+John Snow (2):
+  MAINTAINERS: Add Vladimir as a reviewer for bitmaps
+  dirty-bitmaps: remove deprecated autoload parameter
+
+Vladimir Sementsov-Ogievskiy (17):
+  util/hbitmap: strict hbitmap_reset
+  block: move bdrv_can_store_new_dirty_bitmap to block/dirty-bitmap.c
+  block/dirty-bitmap: return int from
+    bdrv_remove_persistent_dirty_bitmap
+  block/qcow2: proper locking on bitmap add/remove paths
+  block/dirty-bitmap: drop meta
+  block/dirty-bitmap: add bs link
+  block/dirty-bitmap: drop BdrvDirtyBitmap.mutex
+  block/dirty-bitmap: refactor bdrv_dirty_bitmap_next
+  block: switch reopen queue from QSIMPLEQ to QTAILQ
+  block: reverse order for reopen commits
+  iotests: add test-case to 165 to test reopening qcow2 bitmaps to RW
+  block/qcow2-bitmap: get rid of bdrv_has_changed_persistent_bitmaps
+  block/qcow2-bitmap: drop qcow2_reopen_bitmaps_rw_hint()
+  block/qcow2-bitmap: do not remove bitmaps on reopen-ro
+  iotests: add test 260 to check bitmap life after snapshot + commit
+  block/qcow2-bitmap: fix and improve qcow2_reopen_bitmaps_rw
+  qcow2-bitmap: move bitmap reopen-rw code to qcow2_reopen_commit
+
+ qemu-deprecated.texi           |  20 ++-
+ qapi/block-core.json           |   6 +-
+ block/qcow2.h                  |  19 +--
+ include/block/block.h          |   2 +-
+ include/block/block_int.h      |  20 +--
+ include/block/dirty-bitmap.h   |  34 ++--
+ include/qemu/hbitmap.h         |   5 +
+ block.c                        |  79 +++------
+ block/backup.c                 |   8 +-
+ block/block-copy.c             |   2 +-
+ block/dirty-bitmap.c           | 290 +++++++++++++++++++--------------
+ block/mirror.c                 |   4 +-
+ block/qcow2-bitmap.c           | 212 +++++++++++++++---------
+ block/qcow2.c                  |  22 ++-
+ blockdev.c                     |  40 ++---
+ migration/block-dirty-bitmap.c |  11 +-
+ migration/block.c              |   4 +-
+ tests/test-hbitmap.c           |   2 +-
+ util/hbitmap.c                 |   4 +
+ MAINTAINERS                    |   3 +-
+ tests/qemu-iotests/165         |  57 ++++++-
+ tests/qemu-iotests/165.out     |   4 +-
+ tests/qemu-iotests/260         |  89 ++++++++++
+ tests/qemu-iotests/260.out     |  52 ++++++
+ tests/qemu-iotests/group       |   1 +
+ 25 files changed, 623 insertions(+), 367 deletions(-)
+ create mode 100755 tests/qemu-iotests/260
+ create mode 100644 tests/qemu-iotests/260.out
+
 --=20
 2.21.0
 
