@@ -2,69 +2,86 @@ Return-Path: <SRS0=PUPy=YH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 44855C4CECE
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 13:55:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8C114C4CECE
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 14:01:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 193BC2133F
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 13:55:00 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 193BC2133F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 57964207FF
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 14:01:38 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="TbLSs1Bs"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 57964207FF
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49930 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50006 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iK0oN-0001LV-A0
-	for qemu-devel@archiver.kernel.org; Mon, 14 Oct 2019 09:54:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42822)
+	id 1iK0un-00045r-63
+	for qemu-devel@archiver.kernel.org; Mon, 14 Oct 2019 10:01:37 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44235)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eblake@redhat.com>) id 1iK0nS-0000Sa-9d
- for qemu-devel@nongnu.org; Mon, 14 Oct 2019 09:54:03 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1iK0sQ-0002V4-Ld
+ for qemu-devel@nongnu.org; Mon, 14 Oct 2019 09:59:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eblake@redhat.com>) id 1iK0nQ-0003kJ-Px
- for qemu-devel@nongnu.org; Mon, 14 Oct 2019 09:54:02 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:38324)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eblake@redhat.com>)
- id 1iK0nH-0003W2-5k; Mon, 14 Oct 2019 09:53:52 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id E2DCB10DCC8F;
- Mon, 14 Oct 2019 13:53:43 +0000 (UTC)
-Received: from [10.3.116.168] (ovpn-116-168.phx2.redhat.com [10.3.116.168])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 8ED185D6A7;
- Mon, 14 Oct 2019 13:53:43 +0000 (UTC)
-Subject: Re: [PATCH v3 07/16] qcow2: Write v3-compliant snapshot list on
- upgrade
-To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
-References: <20191011152814.14791-1-mreitz@redhat.com>
- <20191011152814.14791-8-mreitz@redhat.com>
- <a9263c74-f958-5859-9db3-a67aefe73ff5@redhat.com>
- <085c7aec-edd7-79bd-136f-5a3785a5d430@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Organization: Red Hat, Inc.
-Message-ID: <582dc245-8a09-f88e-d67c-9435200c327d@redhat.com>
-Date: Mon, 14 Oct 2019 08:53:42 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.0
+ (envelope-from <alex.bennee@linaro.org>) id 1iK0sP-0007Bg-Da
+ for qemu-devel@nongnu.org; Mon, 14 Oct 2019 09:59:10 -0400
+Received: from mail-wr1-x42b.google.com ([2a00:1450:4864:20::42b]:36465)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1iK0sO-0007B6-IK
+ for qemu-devel@nongnu.org; Mon, 14 Oct 2019 09:59:08 -0400
+Received: by mail-wr1-x42b.google.com with SMTP id y19so19897755wrd.3
+ for <qemu-devel@nongnu.org>; Mon, 14 Oct 2019 06:59:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=UEXCjAhdu0FKHjjtnW1230km7QIS6Nvx34ZHiSKDVCA=;
+ b=TbLSs1BsHYuLOGnWPf/dhEtyADR1Rgj8OzmXIHp3Q0m3HBFcsmlD6Dc1trBT8H/Eg/
+ fChdJo0lVt7g7GG69VJYvi6YvsfMD7ej5PDqycKOAQLhyc6zRkUfbG0OWM6fixLeObnA
+ cYPYtTme7aL5oURaX4YvhU40hM4OTWvWA1ivS8jpxfDexL2PKbEJ5WkZpRZXV3jnvS/4
+ fj/CsGQPEi8B7K+nYuO5E2SrvTM29imZ1iUyJvREMS67dbn856y9Pqx24xqndJzCPacB
+ TvVNN94xteR3SzV77pQED0OSuDzsbamoJVOLXAtowvvaeaCTfnUHJYGi7ZRcbhqqpi5i
+ B96Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=UEXCjAhdu0FKHjjtnW1230km7QIS6Nvx34ZHiSKDVCA=;
+ b=X6JmbNPcDL4cs9Y8c7w/BG/ryuugTdYe4WnpZvAd+pKEJF50B9YbXlBzhgucaeizC0
+ MztA09O9mELzb733Wl0HJKwLTEmBmlptGJJZg5DRDZV0hxjOyJHOSaaDEmcpQjJaRTpv
+ TykagZiEAHDxmkJe5EdkS+NRDSHkvHnr+eBhedanUI1KdXn/c2NnLsFQ1RS+fOTT5X9x
+ BOwolBVz8RfnFPagvBgbYdhZSv/26N+Ns7a21vZmjUjVwgcvgaSoPkdCfIBbbe1InCWM
+ 9tuc106B6khGSifid1gQHEXG5GEleSzfToTsvoeSxGaOiFpEsaa1Uv2c1+qYk5KuZzsl
+ MveA==
+X-Gm-Message-State: APjAAAXj7BTPGjZHo+LrgBCM97XePR5LSoK0p1XVnq+zk0v5LomWUPa2
+ Q3vPdI4pUuZrPfal2i5hPSL6JGc7Qe4=
+X-Google-Smtp-Source: APXvYqxqtM0MkyHgd4ABntnSN0B0P89V8XgUbo8EwDnVZdSZhGLpk5j2IYu5Rew+53rRtoZrAptSPw==
+X-Received: by 2002:a5d:4b4c:: with SMTP id w12mr7476242wrs.107.1571061547243; 
+ Mon, 14 Oct 2019 06:59:07 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id w5sm17391076wrs.34.2019.10.14.06.59.05
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 14 Oct 2019 06:59:05 -0700 (PDT)
+Received: from zen.lan (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 31B7D1FF87;
+ Mon, 14 Oct 2019 14:59:05 +0100 (BST)
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: qemu-devel@nongnu.org
+Subject: [PATCH for 4.2 v1 0/5] gitdm updates
+Date: Mon, 14 Oct 2019 14:59:00 +0100
+Message-Id: <20191014135905.24364-1-alex.bennee@linaro.org>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-In-Reply-To: <085c7aec-edd7-79bd-136f-5a3785a5d430@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.64]); Mon, 14 Oct 2019 13:53:43 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.132.183.28
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::42b
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -76,52 +93,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
+Cc: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ dirty.ice.hu@gmail.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 10/14/19 3:45 AM, Max Reitz wrote:
+Hi,
 
->>> +=C2=A0=C2=A0=C2=A0 need_snapshot_update =3D false;
->>> +=C2=A0=C2=A0=C2=A0 for (i =3D 0; i < s->nb_snapshots; i++) {
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (s->snapshots[i].extra=
-_data_size <
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 s=
-izeof_field(QCowSnapshotExtraData, vm_state_size_large) +
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 s=
-izeof_field(QCowSnapshotExtraData, disk_size))
->>
->> Shorter as:
->> if (s->snapshots[i].extra_data_size < sizeof(QCowSnapshotExtraData))
->>
->> but that's stylistic, so R-b still stands.
->=20
-> Yes, but if we ever add fields to QCowSnapshotExtraData, we shouldn=E2=80=
-=99t
-> count them here.  Therefore, I think we need to count exactly the field=
-s
-> that the standard says are mandatory in v3.
+With these changes I get a reasonably clean set of stats going back
+two years and to the top 20. However most of the individuals are pure
+guess work so I won't submit them in a PR without positive feedback to
+it being correct. If you want the numbers to be correct by the time of
+the KVM Forum QEMU keynote now is the time to let me know ;-)
 
-If we ever add more fields, I'd prefer that we did something like:
 
-struct QCowSnapshotExtraV3Minimum {
-     uint64_t vm_state_size_large;
-     uint64_t disk_size;
-};
-struct QCow3SnapshotExtraFull {
-     struct QCowSnapshotExtraV3Minimum base;
-     new fields...;
-};
+Alex Bennée (5):
+  contrib/gitdm: add more entries individuals and academics
+  contrib/gitdm: add MontaVista to the domain map
+  contrib/gitdm: add Andrey to the individual group
+  contrib/gitdm: add Bin Meng to the individual group
+  contrib/gitdm: add China Mobile to the domain map
 
-and use sane naming to get at extra members based on the expected types,=20
-rather than trying to piecemeal portions of a type based on size.
+ contrib/gitdm/domain-map            | 2 ++
+ contrib/gitdm/group-map-academics   | 3 +++
+ contrib/gitdm/group-map-individuals | 6 ++++++
+ 3 files changed, 11 insertions(+)
 
-Until we actually DO add more fields, why do we have to complicate the=20
-current code?
+-- 
+2.20.1
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
 
