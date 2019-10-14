@@ -6,54 +6,54 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BA6C7C4CECE
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 14:34:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3B696ECE587
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 14:34:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 90C6A20854
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 14:34:17 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 90C6A20854
+	by mail.kernel.org (Postfix) with ESMTPS id 10C9D2133F
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 14:34:27 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 10C9D2133F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50640 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50644 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iK1QO-0007u2-0q
-	for qemu-devel@archiver.kernel.org; Mon, 14 Oct 2019 10:34:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48482)
+	id 1iK1QX-000874-RR
+	for qemu-devel@archiver.kernel.org; Mon, 14 Oct 2019 10:34:25 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49131)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1iK1Gg-0006DD-JG
- for qemu-devel@nongnu.org; Mon, 14 Oct 2019 10:24:15 -0400
+ (envelope-from <philmd@redhat.com>) id 1iK1JN-00010o-7X
+ for qemu-devel@nongnu.org; Mon, 14 Oct 2019 10:27:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1iK1Gf-0000BP-Eb
- for qemu-devel@nongnu.org; Mon, 14 Oct 2019 10:24:14 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:55832)
+ (envelope-from <philmd@redhat.com>) id 1iK1JM-000191-5J
+ for qemu-devel@nongnu.org; Mon, 14 Oct 2019 10:27:01 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:39382)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <philmd@redhat.com>)
- id 1iK1Gb-00009x-29; Mon, 14 Oct 2019 10:24:09 -0400
+ id 1iK1JC-00015l-Ci; Mon, 14 Oct 2019 10:26:50 -0400
 Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
  [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 112BA3086228;
- Mon, 14 Oct 2019 14:24:08 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id CB60176521;
+ Mon, 14 Oct 2019 14:26:48 +0000 (UTC)
 Received: from x1w.redhat.com (unknown [10.40.206.0])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id B130D600CD;
- Mon, 14 Oct 2019 14:23:43 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 48B6261379;
+ Mon, 14 Oct 2019 14:26:00 +0000 (UTC)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 To: Markus Armbruster <armbru@redhat.com>,
 	qemu-devel@nongnu.org
-Subject: [PATCH 02/20] hw/southbridge/ich9: Removed unused headers
-Date: Mon, 14 Oct 2019 16:22:28 +0200
-Message-Id: <20191014142246.4538-3-philmd@redhat.com>
+Subject: [PATCH 07/20] hw/i386/intel_iommu: Remove unused includes
+Date: Mon, 14 Oct 2019 16:22:33 +0200
+Message-Id: <20191014142246.4538-8-philmd@redhat.com>
 In-Reply-To: <20191014142246.4538-1-philmd@redhat.com>
 References: <20191014142246.4538-1-philmd@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.42]); Mon, 14 Oct 2019 14:24:08 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.26]); Mon, 14 Oct 2019 14:26:49 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
@@ -89,57 +89,30 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The ICH9 chipset is not X86/PC specific.
-
-These files don't use anything declared by the "hw/i386/pc.h"
-or "hw/i386/ioapic.h" headers. Remove them.
+intel_iommu.h does not use any of these includes, remove them.
 
 Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 ---
- hw/acpi/ich9.c         | 1 -
- hw/isa/lpc_ich9.c      | 2 --
- include/hw/i386/ich9.h | 1 -
- 3 files changed, 4 deletions(-)
+ include/hw/i386/intel_iommu.h | 4 ----
+ 1 file changed, 4 deletions(-)
 
-diff --git a/hw/acpi/ich9.c b/hw/acpi/ich9.c
-index 2034dd749e..fdd0a6c79e 100644
---- a/hw/acpi/ich9.c
-+++ b/hw/acpi/ich9.c
-@@ -27,7 +27,6 @@
- #include "qemu/osdep.h"
- #include "qapi/error.h"
- #include "qapi/visitor.h"
--#include "hw/i386/pc.h"
- #include "hw/pci/pci.h"
- #include "migration/vmstate.h"
- #include "qemu/timer.h"
-diff --git a/hw/isa/lpc_ich9.c b/hw/isa/lpc_ich9.c
-index 17c292e306..61cee2ae3a 100644
---- a/hw/isa/lpc_ich9.c
-+++ b/hw/isa/lpc_ich9.c
-@@ -35,10 +35,8 @@
- #include "hw/isa/isa.h"
- #include "hw/sysbus.h"
- #include "migration/vmstate.h"
--#include "hw/i386/pc.h"
- #include "hw/irq.h"
- #include "hw/isa/apm.h"
+diff --git a/include/hw/i386/intel_iommu.h b/include/hw/i386/intel_iommu.=
+h
+index 66b931e526..a1c4afcda5 100644
+--- a/include/hw/i386/intel_iommu.h
++++ b/include/hw/i386/intel_iommu.h
+@@ -22,11 +22,7 @@
+ #ifndef INTEL_IOMMU_H
+ #define INTEL_IOMMU_H
+=20
+-#include "sysemu/dma.h"
+ #include "hw/i386/x86-iommu.h"
 -#include "hw/i386/ioapic.h"
- #include "hw/pci/pci.h"
- #include "hw/pci/pci_bridge.h"
- #include "hw/i386/ich9.h"
-diff --git a/include/hw/i386/ich9.h b/include/hw/i386/ich9.h
-index 72e803f6e2..a98d10b252 100644
---- a/include/hw/i386/ich9.h
-+++ b/include/hw/i386/ich9.h
-@@ -5,7 +5,6 @@
- #include "hw/sysbus.h"
- #include "hw/i386/pc.h"
- #include "hw/isa/apm.h"
--#include "hw/i386/ioapic.h"
- #include "hw/pci/pci.h"
- #include "hw/pci/pcie_host.h"
- #include "hw/pci/pci_bridge.h"
+-#include "hw/pci/msi.h"
+-#include "hw/sysbus.h"
+ #include "qemu/iova-tree.h"
+=20
+ #define TYPE_INTEL_IOMMU_DEVICE "intel-iommu"
 --=20
 2.21.0
 
