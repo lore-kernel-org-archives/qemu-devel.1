@@ -6,70 +6,63 @@ X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A690C4CECE
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 15:06:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 16207C4CECE
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 15:07:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 53D4B217D9
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 15:06:52 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 53D4B217D9
+	by mail.kernel.org (Postfix) with ESMTPS id DF9732133F
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 15:07:04 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DF9732133F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51214 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51216 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iK1vv-0006gf-FP
-	for qemu-devel@archiver.kernel.org; Mon, 14 Oct 2019 11:06:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55777)
+	id 1iK1w7-0006zP-T3
+	for qemu-devel@archiver.kernel.org; Mon, 14 Oct 2019 11:07:03 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55817)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1iK1ur-0005X0-88
- for qemu-devel@nongnu.org; Mon, 14 Oct 2019 11:05:46 -0400
+ (envelope-from <ehabkost@redhat.com>) id 1iK1v3-0005o5-Vr
+ for qemu-devel@nongnu.org; Mon, 14 Oct 2019 11:05:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1iK1up-00086E-Tj
- for qemu-devel@nongnu.org; Mon, 14 Oct 2019 11:05:45 -0400
-Received: from indium.canonical.com ([91.189.90.7]:43900)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1iK1up-00085P-O4
- for qemu-devel@nongnu.org; Mon, 14 Oct 2019 11:05:43 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1iK1uo-0004MT-D7
- for <qemu-devel@nongnu.org>; Mon, 14 Oct 2019 15:05:42 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 5D3DD2E80C7
- for <qemu-devel@nongnu.org>; Mon, 14 Oct 2019 15:05:42 +0000 (UTC)
+ (envelope-from <ehabkost@redhat.com>) id 1iK1v2-0008Ol-1z
+ for qemu-devel@nongnu.org; Mon, 14 Oct 2019 11:05:57 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:23991)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1iK1v1-0008NQ-SR
+ for qemu-devel@nongnu.org; Mon, 14 Oct 2019 11:05:56 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 86D2018C8929;
+ Mon, 14 Oct 2019 15:05:54 +0000 (UTC)
+Received: from localhost (ovpn-116-20.phx2.redhat.com [10.3.116.20])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 21E8A5C231;
+ Mon, 14 Oct 2019 15:05:48 +0000 (UTC)
+Date: Mon, 14 Oct 2019 12:05:47 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+To: Wei Yang <richardw.yang@linux.intel.com>
+Subject: Re: [Qemu-devel] [PATCH v2 0/2] refine memory_device_get_free_addr
+Message-ID: <20191014150547.GR4084@habkost.net>
+References: <20190730003740.20694-1-richardw.yang@linux.intel.com>
+ <20190913234746.jb5a5vlwl6cebudz@master>
+ <20190914154026-mutt-send-email-mst@kernel.org>
+ <20191012090209.GA6047@richard>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 14 Oct 2019 14:51:49 -0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: c-paetow dgilbert-h
-X-Launchpad-Bug-Reporter: Claus Paetow (c-paetow)
-X-Launchpad-Bug-Modifier: Dr. David Alan Gilbert (dgilbert-h)
-References: <157080798335.681.12255731732435282400.malonedeb@chaenomeles.canonical.com>
-Message-Id: <157106471015.10249.15100502043225333868.malone@chaenomeles.canonical.com>
-Subject: [Bug 1847793] Re: qemu 4.1.0 - Corrupt guest filesystem after new vm
- install
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="af2eefe214bd95389a09b7c956720881bab16807";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: cdef2966ac078012f8319bda5a3355c1b1fce285
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20191012090209.GA6047@richard>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.70]); Mon, 14 Oct 2019 15:05:54 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 91.189.90.7
+X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -78,89 +71,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1847793 <1847793@bugs.launchpad.net>
+Cc: imammedo@redhat.com, Wei Yang <richard.weiyang@gmail.com>, david@redhat.com,
+ qemu-devel@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Claus,
-  Some things to try:
+On Sat, Oct 12, 2019 at 05:02:09PM +0800, Wei Yang wrote:
+> On Sat, Sep 14, 2019 at 03:40:41PM -0400, Michael S. Tsirkin wrote:
+> >On Fri, Sep 13, 2019 at 11:47:46PM +0000, Wei Yang wrote:
+> >> On Tue, Jul 30, 2019 at 08:37:38AM +0800, Wei Yang wrote:
+> >> >When we iterate the memory-device list to get the available range, it is not
+> >> >necessary to iterate the whole list.
+> >> >
+> >> >1) no more overlap for hinted range if tmp exceed it
+> >> >
+> >> >v2:
+> >> >   * remove #2 as suggested by Igor and David
+> >> >   * add some comment to inform address assignment stay the same as before
+> >> >     this change 
+> >> >
+> >> >Wei Yang (2):
+> >> >  memory-device: not necessary to use goto for the last check
+> >> >  memory-device: break the loop if tmp exceed the hinted range
+> >> >
+> >> > hw/mem/memory-device.c | 3 ++-
+> >> > 1 file changed, 2 insertions(+), 1 deletion(-)
+> >> >
+> >> 
+> >> Would someone take this patch set?
+> >
+> >yes looks good to me too.
+> >Eduardo?
+> >
+> 
+> Hmm... I don't see this any where. May I ask the status?
 
-  a) after you quit qemu can you try qemu-img check on the qcow2 file to se=
-e if it's happy?
-  b) If you repeat your test using a raw image file rather than a qcow2 is =
-it any happier?
-  c) How repeatable is it? If it's very repeatable it would be great if you=
- could perform a git bisect to find which commit breaks it;  we can walk yo=
-u through it if you've not done it before.
+Sorry, I hadn't seen Michael's message.  Queued on machine-next.
+Thanks!
 
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1847793
-
-Title:
-  qemu 4.1.0 - Corrupt guest filesystem after new vm install
-
-Status in QEMU:
-  New
-
-Bug description:
-  When I install a new vm with qemu 4.1.0 all the guest filesystems are
-  corrupt. The first boot from the install dvd iso is ok and the
-  installer work fine. But the guest system hangs after the installer
-  finishes and I reboot the guest. I can see the grub boot menue but the
-  system cannot load the initramfs.
-
-  Testet with:
-  - RedHat Enterprise Linux 7.5, 7.6 and 7.7 (RedHat uses xfs for the /boot=
- and / partition)
-  Guided install with the graphical installer, no lvm selected.
-  - Debian Stable/Buster (Debian uses ext4 for / and /home partition)
-  Guidet install with the graphical installer and default options.
-
-  Used commandline to create the vm disk image:
-  qemu-img create -f qcow2 /volumes/disk2-part2/vmdisks/vmtest10-1.qcow2 20G
-
-  Used qemu commandline for vm installation:
-  #!/bin/sh
-  # vmtest10 Installation
-  #
-  /usr/bin/qemu-system-x86_64  -cpu SandyBridge-IBRS \
-      -soundhw hda \
-      -M q35 \
-      -k de \
-      -vga qxl \
-      -machine accel=3Dkvm \
-      -m 4096 \
-      -display gtk \
-      -drive file=3D/volumes/disk2-part2/images/debian-10.0.0-amd64-DVD-1.i=
-so,if=3Dide,media=3Dcdrom \
-      -drive file=3D/volumes/disk2-part2/images/vmtest10-1.qcow2,if=3Dvirti=
-o,media=3Ddisk,cache=3Dwriteback \
-      -boot once=3Dd,menu=3Doff \
-      -device virtio-net-pci,mac=3D52:54:00:2c:02:6c,netdev=3Dvlan0 \
-      -netdev bridge,br=3Dbr0,id=3Dvlan0 \
-      -rtc base=3Dlocaltime \
-      -name "vmtest10" \
-      -usb -device usb-tablet \
-      -spice disable-ticketing \
-      -device virtio-serial-pci \
-      -device virtserialport,chardev=3Dspicechannel0,name=3Dcom.redhat.spic=
-e.0 \
-      -chardev spicevmc,id=3Dspicechannel0,name=3Dvdagent $*
-
-  Host OS:
-  Archlinux (last updated at 10.10.2019)
-  Linux testing 5.3.5-arch1-1-ARCH #1 SMP PREEMPT Mon Oct 7 19:03:08 UTC 20=
-19 x86_64 GNU/Linux
-  No libvirt in use.
-
-  =
-
-  With qemu 4.0.0 it works fine without any errors.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1847793/+subscriptions
+-- 
+Eduardo
 
