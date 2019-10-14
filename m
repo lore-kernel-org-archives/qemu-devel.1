@@ -2,96 +2,89 @@ Return-Path: <SRS0=PUPy=YH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 12800C4CECE
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 18:40:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6995CC4CECE
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 18:47:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C9DF320873
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 18:40:53 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C9DF320873
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id 35F2A2067B
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 18:47:05 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Rd7c7uT9"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 35F2A2067B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55464 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55530 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iK5H2-0003hC-Uu
-	for qemu-devel@archiver.kernel.org; Mon, 14 Oct 2019 14:40:52 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59297)
+	id 1iK5N2-0006Zu-Bu
+	for qemu-devel@archiver.kernel.org; Mon, 14 Oct 2019 14:47:04 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60449)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <sbhat@linux.ibm.com>) id 1iK5FJ-0001pU-1T
- for qemu-devel@nongnu.org; Mon, 14 Oct 2019 14:39:06 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1iK5MH-000636-BM
+ for qemu-devel@nongnu.org; Mon, 14 Oct 2019 14:46:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <sbhat@linux.ibm.com>) id 1iK5FH-0003tu-66
- for qemu-devel@nongnu.org; Mon, 14 Oct 2019 14:39:04 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:35058
- helo=mx0a-001b2d01.pphosted.com)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <sbhat@linux.ibm.com>) id 1iK5FH-0003tl-1R
- for qemu-devel@nongnu.org; Mon, 14 Oct 2019 14:39:03 -0400
-Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
- by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
- x9EIcvf0052790
- for <qemu-devel@nongnu.org>; Mon, 14 Oct 2019 14:39:02 -0400
-Received: from e06smtp05.uk.ibm.com (e06smtp05.uk.ibm.com [195.75.94.101])
- by mx0b-001b2d01.pphosted.com with ESMTP id 2vmupspds0-1
- (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
- for <qemu-devel@nongnu.org>; Mon, 14 Oct 2019 14:39:00 -0400
-Received: from localhost
- by e06smtp05.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
- Violators will be prosecuted
- for <qemu-devel@nongnu.org> from <sbhat@linux.ibm.com>;
- Mon, 14 Oct 2019 19:38:23 +0100
-Received: from b06cxnps4074.portsmouth.uk.ibm.com (9.149.109.196)
- by e06smtp05.uk.ibm.com (192.168.101.135) with IBM ESMTP SMTP Gateway:
- Authorized Use Only! Violators will be prosecuted; 
- (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
- Mon, 14 Oct 2019 19:38:19 +0100
-Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com
- [9.149.105.58])
- by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- x9EIcITO49217646
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Mon, 14 Oct 2019 18:38:18 GMT
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id B3DC24C046;
- Mon, 14 Oct 2019 18:38:18 +0000 (GMT)
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 9F6A94C040;
- Mon, 14 Oct 2019 18:38:17 +0000 (GMT)
-Received: from lep8c.aus.stglabs.ibm.com (unknown [9.40.192.207])
- by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
- Mon, 14 Oct 2019 18:38:17 +0000 (GMT)
-Subject: [PATCH v3 3/3] spapr: Add Hcalls to support PAPR NVDIMM device
-From: Shivaprasad G Bhat <sbhat@linux.ibm.com>
-To: imammedo@redhat.com, david@gibson.dropbear.id.au, qemu-ppc@nongnu.org,
- xiaoguangrong.eric@gmail.com, mst@redhat.com
-Date: Mon, 14 Oct 2019 13:38:16 -0500
-In-Reply-To: <157107820388.27733.3565652855304038259.stgit@lep8c.aus.stglabs.ibm.com>
-References: <157107820388.27733.3565652855304038259.stgit@lep8c.aus.stglabs.ibm.com>
-User-Agent: StGit/0.17.1-dirty
+ (envelope-from <alex.bennee@linaro.org>) id 1iK5MF-0006An-Ua
+ for qemu-devel@nongnu.org; Mon, 14 Oct 2019 14:46:17 -0400
+Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:38915)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1iK5MF-0006AL-Md
+ for qemu-devel@nongnu.org; Mon, 14 Oct 2019 14:46:15 -0400
+Received: by mail-wm1-x342.google.com with SMTP id v17so17741345wml.4
+ for <qemu-devel@nongnu.org>; Mon, 14 Oct 2019 11:46:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=odsP/mevxCYmCQ+LVx2B/ZsHYtvK2GFG9QaLomsz51Q=;
+ b=Rd7c7uT90utxC1zNjqn0WsViNmbVzr9r6mT54hdfK83zbBcGtoS/KHu5bN7JCc1JXq
+ v2m+Yw6Ku3sTXi16xnxqplfu99uMQ1bnuHcahvFUbMnieTVNHpEveA69ShrHUCrmsBN2
+ 4JgsxxF4a0pECl2+K4VGnrafG5RNEFWHSgVzpMKOgIOoqT3eF46xyjOx3+5apT4KvTGo
+ +GY0rE31q93YttPmt/JF9WNB+Rr00lvjfYx9Her4xMK3nUCKkBJfwkVETYdetK4DVis4
+ MuFWWrxzHgMLO84RESIPCiQaNJ3WRg2QWShsCONWNIg95fQP8+aGoS4KGFOQLuECyIKp
+ Qmzw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=odsP/mevxCYmCQ+LVx2B/ZsHYtvK2GFG9QaLomsz51Q=;
+ b=APujvOT3U+QQKhXFb4w5p+JFdtHVAV2Ni/ijq3Of2PYL0m0Y3YS6/2tMUvXzMVrCE5
+ /aLZA3PkvC6FfYclLkXl6NBHsmas9LzSlr4QdYsPt8WeLLbTpmoPhTZieZ7IsdWnoWEg
+ v3VMNQg3SQXBXi+ggUyV7si9fa+tTrJBf9Kg/wK9CjurSe0TTaNJmj88b3TdXCzEgle3
+ O0fqEWxXrVO623MPr8jNxUUxzGpDSvNlaGCVjLjpd+J6QK7oEFs9k4yR3QyH65Z2RWfW
+ rPiUKOmPAz8zifp0KBcE4gLtMnMLTBg2fagv1raYCr9ZQbIU+Quvct5EPML8zyNDMcvP
+ KAng==
+X-Gm-Message-State: APjAAAW3S5Ii3ObW/UzU6i21A8YBpkTl17/O4sZS8Mk6EuaxlCRRgz+F
+ /EBr7gGR3/edGEN6S+ROcYNFoQ==
+X-Google-Smtp-Source: APXvYqwPoKGEiu1Fke5gwD6dTEibJLBjM9/a4ZmbCUoap1gW2reaqmq3sTxXEF9b+gi5+sgv7ImNEQ==
+X-Received: by 2002:a1c:2604:: with SMTP id m4mr17278131wmm.112.1571078774123; 
+ Mon, 14 Oct 2019 11:46:14 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id a2sm21291230wrp.11.2019.10.14.11.46.13
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 14 Oct 2019 11:46:13 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id D09351FF87;
+ Mon, 14 Oct 2019 19:46:12 +0100 (BST)
+References: <20191011155546.14342-1-richard.henderson@linaro.org>
+ <20191011155546.14342-12-richard.henderson@linaro.org>
+User-agent: mu4e 1.3.5; emacs 27.0.50
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: qemu-arm@nongnu.org
+Subject: Re: [PATCH v6 11/20] target/arm: Hoist computation of TBFLAG_A32.VFPEN
+In-reply-to: <20191011155546.14342-12-richard.henderson@linaro.org>
+Date: Mon, 14 Oct 2019 19:46:12 +0100
+Message-ID: <87ftjvmah7.fsf@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-x-cbid: 19101418-0020-0000-0000-0000037901B7
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19101418-0021-0000-0000-000021CF1BC8
-Message-Id: <157107827730.27733.6442960086351627702.stgit@lep8c.aus.stglabs.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
- definitions=2019-10-14_09:, , signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- priorityscore=1501
- malwarescore=0 suspectscore=2 phishscore=0 bulkscore=0 spamscore=0
- clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1908290000 definitions=main-1910140151
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
-X-Received-From: 148.163.158.5
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::342
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -103,393 +96,94 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: sbhat@linux.vnet.ibm.com, qemu-devel@nongnu.org
+Cc: laurent.desnogues@gmail.com, peter.maydell@linaro.org,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This patch implements few of the necessary hcalls for the nvdimm support.
 
-PAPR semantics is such that each NVDIMM device is comprising of multiple
-SCM(Storage Class Memory) blocks. The guest requests the hypervisor to
-bind each of the SCM blocks of the NVDIMM device using hcalls. There can
-be SCM block unbind requests in case of driver errors or unplug(not
-supported now) use cases. The NVDIMM label read/writes are done through
-hcalls.
+Richard Henderson <richard.henderson@linaro.org> writes:
 
-Since each virtual NVDIMM device is divided into multiple SCM blocks,
-the bind, unbind, and queries using hcalls on those blocks can come
-independently. This doesn't fit well into the qemu device semantics,
-where the map/unmap are done at the (whole)device/object level granularity.
-The patch doesnt actually bind/unbind on hcalls but let it happen at the
-device_add/del phase itself instead.
+> There are 3 conditions that each enable this flag.  M-profile always
+> enables; A-profile with EL1 as AA64 always enables.  Both of these
+> conditions can easily be cached.  The final condition relies on the
+> FPEXC register which we are not prepared to cache.
+>
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> ---
+>  target/arm/cpu.h    |  2 +-
+>  target/arm/helper.c | 14 ++++++++++----
+>  2 files changed, 11 insertions(+), 5 deletions(-)
+>
+> diff --git a/target/arm/cpu.h b/target/arm/cpu.h
+> index 4d961474ce..9909ff89d4 100644
+> --- a/target/arm/cpu.h
+> +++ b/target/arm/cpu.h
+> @@ -3192,7 +3192,7 @@ FIELD(TBFLAG_A32, XSCALE_CPAR, 4, 2)
+>   * the same thing as the current security state of the processor!
+>   */
+>  FIELD(TBFLAG_A32, NS, 6, 1)
+> -FIELD(TBFLAG_A32, VFPEN, 7, 1)          /* Not cached. */
+> +FIELD(TBFLAG_A32, VFPEN, 7, 1)          /* Partially cached, minus FPEXC=
+. */
+>  FIELD(TBFLAG_A32, CONDEXEC, 8, 8)       /* Not cached. */
+>  FIELD(TBFLAG_A32, SCTLR_B, 16, 1)
+>  /* For M profile only, set if FPCCR.LSPACT is set */
+> diff --git a/target/arm/helper.c b/target/arm/helper.c
+> index 398e5f5d6d..89aa6fd933 100644
+> --- a/target/arm/helper.c
+> +++ b/target/arm/helper.c
+> @@ -11088,6 +11088,9 @@ static uint32_t rebuild_hflags_m32(CPUARMState *e=
+nv, int fp_el,
+>  {
+>      uint32_t flags =3D 0;
+>
+> +    /* v8M always enables the fpu.  */
+> +    flags =3D FIELD_DP32(flags, TBFLAG_A32, VFPEN, 1);
+> +
+>      if (arm_v7m_is_handler_mode(env)) {
+>          flags =3D FIELD_DP32(flags, TBFLAG_A32, HANDLER, 1);
+>      }
+> @@ -11119,6 +11122,10 @@ static uint32_t rebuild_hflags_a32(CPUARMState *=
+env, int fp_el,
+>                                     ARMMMUIdx mmu_idx)
+>  {
+>      uint32_t flags =3D rebuild_hflags_aprofile(env);
+> +
+> +    if (arm_el_is_aa64(env, 1)) {
+> +        flags =3D FIELD_DP32(flags, TBFLAG_A32, VFPEN, 1);
+> +    }
+>      return rebuild_hflags_common_32(env, fp_el, mmu_idx, flags);
+>  }
+>
+> @@ -11250,14 +11257,13 @@ void cpu_get_tb_cpu_state(CPUARMState *env, tar=
+get_ulong *pc,
+>                  flags =3D FIELD_DP32(flags, TBFLAG_A32, VECSTRIDE,
+>                                     env->vfp.vec_stride);
+>              }
+> +            if (env->vfp.xregs[ARM_VFP_FPEXC] & (1 << 30)) {
+> +                flags =3D FIELD_DP32(flags, TBFLAG_A32, VFPEN, 1);
+> +            }
 
-The guest kernel makes bind/unbind requests for the virtual NVDIMM device
-at the region level granularity. Without interleaving, each virtual NVDIMM
-device is presented as separate region. There is no way to configure the
-virtual NVDIMM interleaving for the guests today. So, there is no way a
-partial bind/unbind request can come for the vNVDIMM in a hcall for a
-subset of SCM blocks of a virtual NVDIMM. Hence it is safe to do
-bind/unbind everything during the device_add/del.
+We seem to be short of symbolic definitions for this bit but whatever:
 
-Signed-off-by: Shivaprasad G Bhat <sbhat@linux.ibm.com>
----
----
- hw/ppc/spapr_hcall.c   |  300 ++++++++++++++++++++++++++++++++++++++++++++++++
- include/hw/ppc/spapr.h |    8 +
- 2 files changed, 307 insertions(+), 1 deletion(-)
+Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
 
-diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
-index 23e4bdb829..4e9ad96f7c 100644
---- a/hw/ppc/spapr_hcall.c
-+++ b/hw/ppc/spapr_hcall.c
-@@ -18,6 +18,10 @@
- #include "hw/ppc/spapr_ovec.h"
- #include "mmu-book3s-v3.h"
- #include "hw/mem/memory-device.h"
-+#include "hw/ppc/spapr_drc.h"
-+#include "hw/mem/nvdimm.h"
-+#include "qemu/range.h"
-+#include "qemu/nvdimm-utils.h"
- 
- static bool has_spr(PowerPCCPU *cpu, int spr)
- {
-@@ -1961,6 +1965,295 @@ static target_ulong h_update_dt(PowerPCCPU *cpu, SpaprMachineState *spapr,
-     return H_SUCCESS;
- }
- 
-+static target_ulong h_scm_read_metadata(PowerPCCPU *cpu,
-+                                        SpaprMachineState *spapr,
-+                                        target_ulong opcode,
-+                                        target_ulong *args)
-+{
-+    uint32_t drc_index = args[0];
-+    uint64_t offset = args[1];
-+    uint64_t numBytesToRead = args[2];
-+    SpaprDrc *drc = spapr_drc_by_index(drc_index);
-+    NVDIMMDevice *nvdimm;
-+    NVDIMMClass *ddc;
-+    __be64 data_be = 0;
-+    uint64_t data = 0;
-+
-+    if (drc && spapr_drc_type(drc) != SPAPR_DR_CONNECTOR_TYPE_PMEM) {
-+        return H_PARAMETER;
-+    }
-+
-+    if (numBytesToRead != 1 && numBytesToRead != 2 &&
-+        numBytesToRead != 4 && numBytesToRead != 8) {
-+        return H_P3;
-+    }
-+
-+    nvdimm = NVDIMM(drc->dev);
-+    if ((offset + numBytesToRead < offset) ||
-+        (nvdimm->label_size < numBytesToRead + offset)) {
-+        return H_P2;
-+    }
-+
-+    ddc = NVDIMM_GET_CLASS(nvdimm);
-+    ddc->read_label_data(nvdimm, &data_be, numBytesToRead, offset);
-+
-+    switch (numBytesToRead) {
-+    case 1:
-+        data = data_be & 0xff;
-+        break;
-+    case 2:
-+        data = be16_to_cpu(data_be & 0xffff);
-+        break;
-+    case 4:
-+        data = be32_to_cpu(data_be & 0xffffffff);
-+        break;
-+    case 8:
-+        data = be64_to_cpu(data_be);
-+        break;
-+    default:
-+        break;
-+    }
-+
-+    args[0] = data;
-+
-+    return H_SUCCESS;
-+}
-+
-+static target_ulong h_scm_write_metadata(PowerPCCPU *cpu,
-+                                         SpaprMachineState *spapr,
-+                                         target_ulong opcode,
-+                                         target_ulong *args)
-+{
-+    uint32_t drc_index = args[0];
-+    uint64_t offset = args[1];
-+    uint64_t data = args[2];
-+    uint64_t numBytesToWrite = args[3];
-+    SpaprDrc *drc = spapr_drc_by_index(drc_index);
-+    NVDIMMDevice *nvdimm;
-+    DeviceState *dev;
-+    NVDIMMClass *ddc;
-+    __be64 data_be = 0;
-+
-+    if (drc && spapr_drc_type(drc) != SPAPR_DR_CONNECTOR_TYPE_PMEM) {
-+        return H_PARAMETER;
-+    }
-+
-+    if (numBytesToWrite != 1 && numBytesToWrite != 2 &&
-+        numBytesToWrite != 4 && numBytesToWrite != 8) {
-+        return H_P4;
-+    }
-+
-+    dev = drc->dev;
-+    nvdimm = NVDIMM(dev);
-+
-+    switch (numBytesToWrite) {
-+    case 1:
-+        if (data & 0xffffffffffffff00) {
-+            return H_P2;
-+        }
-+        data_be = data & 0xff;
-+        break;
-+    case 2:
-+        if (data & 0xffffffffffff0000) {
-+            return H_P2;
-+        }
-+        data_be = cpu_to_be16(data & 0xffff);
-+        break;
-+    case 4:
-+        if (data & 0xffffffff00000000) {
-+            return H_P2;
-+        }
-+        data_be = cpu_to_be32(data & 0xffffffff);
-+        break;
-+    case 8:
-+        data_be = cpu_to_be64(data);
-+        break;
-+    default: /* lint */
-+            break;
-+    }
-+
-+    ddc = NVDIMM_GET_CLASS(nvdimm);
-+    ddc->write_label_data(nvdimm, &data_be, numBytesToWrite, offset);
-+
-+    return H_SUCCESS;
-+}
-+
-+static target_ulong h_scm_bind_mem(PowerPCCPU *cpu, SpaprMachineState *spapr,
-+                                   target_ulong opcode, target_ulong *args)
-+{
-+    uint32_t drc_index = args[0];
-+    uint64_t starting_idx = args[1];
-+    uint64_t no_of_scm_blocks_to_bind = args[2];
-+    uint64_t target_logical_mem_addr = args[3];
-+    uint64_t continue_token = args[4];
-+    uint64_t size;
-+    uint64_t total_no_of_scm_blocks;
-+    SpaprDrc *drc = spapr_drc_by_index(drc_index);
-+    hwaddr addr;
-+    DeviceState *dev;
-+    PCDIMMDevice *dimm;
-+    Error *local_err = NULL;
-+
-+    if (drc && spapr_drc_type(drc) != SPAPR_DR_CONNECTOR_TYPE_PMEM) {
-+        return H_PARAMETER;
-+    }
-+
-+    dev = drc->dev;
-+    dimm = PC_DIMM(dev);
-+
-+    size = object_property_get_uint(OBJECT(dimm),
-+                                    PC_DIMM_SIZE_PROP, &local_err);
-+    if (local_err) {
-+        error_report_err(local_err);
-+        return H_PARAMETER;
-+    }
-+
-+    total_no_of_scm_blocks = size / SPAPR_MINIMUM_SCM_BLOCK_SIZE;
-+
-+    if ((starting_idx > total_no_of_scm_blocks) ||
-+        (no_of_scm_blocks_to_bind > total_no_of_scm_blocks)) {
-+        return H_P2;
-+    }
-+
-+    if (((starting_idx + no_of_scm_blocks_to_bind) < starting_idx) ||
-+        ((starting_idx + no_of_scm_blocks_to_bind) > total_no_of_scm_blocks)) {
-+        return H_P3;
-+    }
-+
-+    /* Currently qemu assigns the address. */
-+    if (target_logical_mem_addr != 0xffffffffffffffff) {
-+        return H_OVERLAP;
-+    }
-+
-+    /*
-+     * Currently continue token should be zero qemu has already bound
-+     * everything and this hcall doesnt return H_BUSY.
-+     */
-+    if (continue_token > 0) {
-+        return H_P5;
-+    }
-+
-+    addr = object_property_get_uint(OBJECT(dimm),
-+                                    PC_DIMM_ADDR_PROP, &local_err);
-+    if (local_err) {
-+        error_report_err(local_err);
-+        return H_PARAMETER;
-+    }
-+
-+    addr += starting_idx * SPAPR_MINIMUM_SCM_BLOCK_SIZE;
-+
-+    /* Already bound, Return target logical address in R4 */
-+    args[1] = addr;
-+    args[2] = no_of_scm_blocks_to_bind;
-+
-+    return H_SUCCESS;
-+}
-+
-+static target_ulong h_scm_unbind_mem(PowerPCCPU *cpu, SpaprMachineState *spapr,
-+                                     target_ulong opcode, target_ulong *args)
-+{
-+    uint32_t drc_index = args[0];
-+    uint64_t starting_scm_logical_addr = args[1];
-+    uint64_t no_of_scm_blocks_to_unbind = args[2];
-+    uint64_t continue_token = args[3];
-+    uint64_t size_to_unbind;
-+    Range blockrange = range_empty;
-+    Range nvdimmrange = range_empty;
-+    SpaprDrc *drc = spapr_drc_by_index(drc_index);
-+    DeviceState *dev;
-+    PCDIMMDevice *dimm;
-+    uint64_t size, addr;
-+
-+    if (drc && spapr_drc_type(drc) != SPAPR_DR_CONNECTOR_TYPE_PMEM) {
-+        return H_PARAMETER;
-+    }
-+
-+    /* Check if starting_scm_logical_addr is block aligned */
-+    if (!QEMU_IS_ALIGNED(starting_scm_logical_addr,
-+                         SPAPR_MINIMUM_SCM_BLOCK_SIZE)) {
-+        return H_P2;
-+    }
-+
-+    dev = drc->dev;
-+    dimm = PC_DIMM(dev);
-+    size = object_property_get_int(OBJECT(dimm), PC_DIMM_SIZE_PROP, NULL);
-+    addr = object_property_get_int(OBJECT(dimm), PC_DIMM_ADDR_PROP, NULL);
-+
-+    range_init_nofail(&nvdimmrange, addr, size);
-+
-+    size_to_unbind = no_of_scm_blocks_to_unbind * SPAPR_MINIMUM_SCM_BLOCK_SIZE;
-+
-+
-+    range_init_nofail(&blockrange, starting_scm_logical_addr, size_to_unbind);
-+
-+    if (!range_contains_range(&nvdimmrange, &blockrange)) {
-+        return H_P3;
-+    }
-+
-+    /* continue_token should be zero as this hcall doesn't return H_BUSY. */
-+    if (continue_token > 0) {
-+        return H_P3;
-+    }
-+
-+    args[1] = no_of_scm_blocks_to_unbind;
-+
-+    /* let unplug take care of actual unbind */
-+    return H_SUCCESS;
-+}
-+
-+#define H_UNBIND_SCOPE_ALL 0x1
-+#define H_UNBIND_SCOPE_DRC 0x2
-+
-+static target_ulong h_scm_unbind_all(PowerPCCPU *cpu, SpaprMachineState *spapr,
-+                                     target_ulong opcode, target_ulong *args)
-+{
-+    uint64_t target_scope = args[0];
-+    uint32_t drc_index = args[1];
-+    uint64_t continue_token = args[2];
-+    NVDIMMDevice *nvdimm;
-+    uint64_t size;
-+    uint64_t no_of_scm_blocks_unbound = 0;
-+
-+    if (target_scope == H_UNBIND_SCOPE_DRC) {
-+        DeviceState *dev;
-+        SpaprDrc *drc = spapr_drc_by_index(drc_index);
-+
-+        if (drc && spapr_drc_type(drc) != SPAPR_DR_CONNECTOR_TYPE_PMEM) {
-+            return H_P2;
-+        }
-+
-+        dev = drc->dev;
-+        nvdimm = NVDIMM(dev);
-+        size = object_property_get_int(OBJECT(nvdimm), PC_DIMM_SIZE_PROP, NULL);
-+
-+        no_of_scm_blocks_unbound = size / SPAPR_MINIMUM_SCM_BLOCK_SIZE;
-+    } else if (target_scope ==  H_UNBIND_SCOPE_ALL) {
-+        GSList *list, *dimms;
-+
-+        dimms = nvdimm_get_device_list();
-+        for (list = dimms; list; list = list->next) {
-+            nvdimm = list->data;
-+            size = object_property_get_int(OBJECT(nvdimm), PC_DIMM_SIZE_PROP,
-+                                           NULL);
-+
-+            no_of_scm_blocks_unbound += size / SPAPR_MINIMUM_SCM_BLOCK_SIZE;
-+        }
-+        g_slist_free(dimms);
-+    } else {
-+        return H_PARAMETER;
-+    }
-+
-+    /* continue_token should be zero as this hcall doesn't return H_BUSY. */
-+    if (continue_token > 0) {
-+        return H_P4;
-+    }
-+
-+    args[1] = no_of_scm_blocks_unbound;
-+
-+    /* let unplug take care of actual unbind */
-+    return H_SUCCESS;
-+}
-+
- static spapr_hcall_fn papr_hypercall_table[(MAX_HCALL_OPCODE / 4) + 1];
- static spapr_hcall_fn kvmppc_hypercall_table[KVMPPC_HCALL_MAX - KVMPPC_HCALL_BASE + 1];
- static spapr_hcall_fn svm_hypercall_table[(SVM_HCALL_MAX - SVM_HCALL_BASE) / 4 + 1];
-@@ -2079,6 +2372,13 @@ static void hypercall_register_types(void)
-     /* qemu/KVM-PPC specific hcalls */
-     spapr_register_hypercall(KVMPPC_H_RTAS, h_rtas);
- 
-+    /* qemu/scm specific hcalls */
-+    spapr_register_hypercall(H_SCM_READ_METADATA, h_scm_read_metadata);
-+    spapr_register_hypercall(H_SCM_WRITE_METADATA, h_scm_write_metadata);
-+    spapr_register_hypercall(H_SCM_BIND_MEM, h_scm_bind_mem);
-+    spapr_register_hypercall(H_SCM_UNBIND_MEM, h_scm_unbind_mem);
-+    spapr_register_hypercall(H_SCM_UNBIND_ALL, h_scm_unbind_all);
-+
-     /* ibm,client-architecture-support support */
-     spapr_register_hypercall(KVMPPC_H_CAS, h_client_architecture_support);
- 
-diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
-index a8cb3513d0..e1933e877d 100644
---- a/include/hw/ppc/spapr.h
-+++ b/include/hw/ppc/spapr.h
-@@ -286,6 +286,7 @@ struct SpaprMachineState {
- #define H_P7              -60
- #define H_P8              -61
- #define H_P9              -62
-+#define H_OVERLAP         -68
- #define H_UNSUPPORTED_FLAG -256
- #define H_MULTI_THREADS_ACTIVE -9005
- 
-@@ -493,8 +494,13 @@ struct SpaprMachineState {
- #define H_INT_ESB               0x3C8
- #define H_INT_SYNC              0x3CC
- #define H_INT_RESET             0x3D0
-+#define H_SCM_READ_METADATA     0x3E4
-+#define H_SCM_WRITE_METADATA    0x3E8
-+#define H_SCM_BIND_MEM          0x3EC
-+#define H_SCM_UNBIND_MEM        0x3F0
-+#define H_SCM_UNBIND_ALL        0x3FC
- 
--#define MAX_HCALL_OPCODE        H_INT_RESET
-+#define MAX_HCALL_OPCODE        H_SCM_UNBIND_ALL
- 
- /* The hcalls above are standardized in PAPR and implemented by pHyp
-  * as well.
+>          }
+>
+>          flags =3D FIELD_DP32(flags, TBFLAG_A32, THUMB, env->thumb);
+>          flags =3D FIELD_DP32(flags, TBFLAG_A32, CONDEXEC, env->condexec_=
+bits);
+> -        if (env->vfp.xregs[ARM_VFP_FPEXC] & (1 << 30)
+> -            || arm_el_is_aa64(env, 1) || arm_feature(env, ARM_FEATURE_M)=
+) {
+> -            flags =3D FIELD_DP32(flags, TBFLAG_A32, VFPEN, 1);
+> -        }
+>          pstate_for_ss =3D env->uncached_cpsr;
+>      }
 
+
+--
+Alex Benn=C3=A9e
 
