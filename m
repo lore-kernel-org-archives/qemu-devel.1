@@ -2,84 +2,84 @@ Return-Path: <SRS0=PUPy=YH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 39BE5C4CECE
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 16:33:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 226E5C4CECE
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 16:35:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0672821927
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 16:33:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id DFF292089C
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 16:35:03 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Vd2i8GUB"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0672821927
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="YJKnFce9"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DFF292089C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53342 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53394 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iK3HM-0005d8-56
-	for qemu-devel@archiver.kernel.org; Mon, 14 Oct 2019 12:33:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36860)
+	id 1iK3JG-00081L-G6
+	for qemu-devel@archiver.kernel.org; Mon, 14 Oct 2019 12:35:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37127)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1iK2px-0003zI-02
- for qemu-devel@nongnu.org; Mon, 14 Oct 2019 12:04:46 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1iK2qI-0004X4-WD
+ for qemu-devel@nongnu.org; Mon, 14 Oct 2019 12:05:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1iK2pv-0007IN-MI
- for qemu-devel@nongnu.org; Mon, 14 Oct 2019 12:04:44 -0400
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:42353)
+ (envelope-from <peter.maydell@linaro.org>) id 1iK2qG-0007fx-P0
+ for qemu-devel@nongnu.org; Mon, 14 Oct 2019 12:05:06 -0400
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:45255)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1iK2pv-0007Hg-GL
- for qemu-devel@nongnu.org; Mon, 14 Oct 2019 12:04:43 -0400
-Received: by mail-wr1-x443.google.com with SMTP id n14so20339059wrw.9
- for <qemu-devel@nongnu.org>; Mon, 14 Oct 2019 09:04:43 -0700 (PDT)
+ id 1iK2qG-0007eK-IR
+ for qemu-devel@nongnu.org; Mon, 14 Oct 2019 12:05:04 -0400
+Received: by mail-wr1-x443.google.com with SMTP id r5so20331761wrm.12
+ for <qemu-devel@nongnu.org>; Mon, 14 Oct 2019 09:05:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:subject:date:message-id:in-reply-to:references:mime-version
  :content-transfer-encoding;
- bh=KbaUdY7MQ5XrBad74VXqOTDTlb/EY4vaz3/Ky7Y2Hgo=;
- b=Vd2i8GUBxFhC+4NfhltmxgtjAdoElHrALt7v0/7MMsR2b3BmuTaMiyoogVn5sDK90l
- Uu2V7Us9xkGw/+K4ATN3V/MyIAbCansAP0abwS1lj4rwud0p3+bY7D5sbhzK/AWhXRPA
- +BZK5SU1btKwDjNEgS1LS1CBSWH4OnNpFhye+uXB8XsSu5AuIXWFRgCRXjfz5CJSFheo
- kUm+f7iKK3XESPtJZ4fnFKy4lu9wnSJu8+Y7KlHUa5aFjEvjtgTVjShmbvjlZQDqpNlH
- xSe6t1YhCOsN2QCPD/hzq9Cg7eSjVMl1bxvPOXmuSKsLzwQK40I4TN63OhL/WXVpyT50
- dEPw==
+ bh=5ohawpNw7FOSifxHQ0WSHjghmndfNAKI8xtNIQ3mnWg=;
+ b=YJKnFce974WKIM12C9wR5UhHOBZhyv2LukU2+KABcQHbJhEFpB8e2X5BXiYtwQUQ+h
+ KJaNFsF1u7vPteoYZoNWe7oK1VmTtMLun5tKgR+Gy288lzu/sx9iXh+b7VMu25qTpGmM
+ qMmMAL/HJq+9Faasbrcomgc6Wsfz8sPWa4ylm0aareltHOyzRduWVXOMENVZ1HsZO6lk
+ JC30xs2uF14oIYtcqQ5yRviW4W5vgELW1m3vw92hthoeQhtDEy49dLK/HNTFoS2BYMU8
+ ETZH9E5PLLcVGxPrfDoozxqU+Ec7daKEz0NryMLA4xryGe3Ena52uPX55meZ9UjsWpZX
+ OIqw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=KbaUdY7MQ5XrBad74VXqOTDTlb/EY4vaz3/Ky7Y2Hgo=;
- b=eVGJlBabu4vvW3opFPrDs/nd6A2xvOIbVcnRVGnkHzs/FeA+7MwpI3TQOcnm3jag4T
- MnQlrbYp7GBQ5CJv+eKopLU19fZDuqejIxgH9AeeveKvOQ3oWYGI8JwfitQvUcjISnfv
- aGsDkD1EdpCF1xivOIK2uztURoHwSwzzKKUivt2ScbKF/ePK2hW0DOATQzjHNXmlhq7u
- ij1HvsbSneOeGlTsIfAKeMYCv7ZcwvvQQHf9QGq1kb+my6OSqVMOQdNWzqwatgqY6XLr
- fUhmSD0VCESeRsbKBV523tJ/tO6txTtOOZeit3bYtqCV3WNHhqmKdfDMUzpSsNyCzJ0r
- CfdA==
-X-Gm-Message-State: APjAAAVLUZi5h9hKXc5bD1DUUaorVV3iWDnsaA2T6tFBzHsACXUVCOqH
- ADzVcaiENK/P+6dvj3UCckUC9Qbfr9gekQ==
-X-Google-Smtp-Source: APXvYqw7eBvPvPLvweNLsHcQ3lYy7PBO+3O6VIm7w+FIwj3elOakrZg1yN2Nh24Zi3v8B53HKj0zyg==
-X-Received: by 2002:a05:6000:1252:: with SMTP id
- j18mr26644236wrx.160.1571069082138; 
- Mon, 14 Oct 2019 09:04:42 -0700 (PDT)
+ bh=5ohawpNw7FOSifxHQ0WSHjghmndfNAKI8xtNIQ3mnWg=;
+ b=XPPwb73L/TrxB4ngGs/SAKjMIP1VWWph9fLBaczgL5OyDC6pKHpBysiWg9P/32Knjk
+ DJnIzyoZt66VsLChmWRV/5OsBO4CJi9jOtAbdfA1EwazibMPxI1jFAj3NmP0NYiqPtz2
+ aJkRmJpcYybXWJbQ/Fycj2WggPCPwBsU3wByMka2ZXpiIUSb9G2Dw7X/mCQeqmUckhCz
+ D1y4I8IQxTBqxEc+dJZbwkgdnUGLuS+zYyx3oyKpfS5xrORyZ7E6jiU+car1+AV4wYc0
+ /gloZ+iua9sNEp1BCDCyAY9iw2Y+dgcjdJvBh8yz2bbZlWMh5LIaZIWiD9TTiUJC/4Ac
+ kN+w==
+X-Gm-Message-State: APjAAAXhibkfAj+cnQyCDrnp3kEaWaXB16CGtysOXHM1pv8E9WagdFH8
+ EMMFuBkRdLUE4u2GzOcZ+I9bpqItStUx+w==
+X-Google-Smtp-Source: APXvYqzYTDvziKNxNi/sQHQiCmbaGjekSusYEYmrS1WNA0w24s4b/+G3jMGzOyyakxMJzcPN8TtWig==
+X-Received: by 2002:a5d:558b:: with SMTP id i11mr14749983wrv.166.1571069102405; 
+ Mon, 14 Oct 2019 09:05:02 -0700 (PDT)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id 5sm18029779wrk.86.2019.10.14.09.04.40
+ by smtp.gmail.com with ESMTPSA id 5sm18029779wrk.86.2019.10.14.09.05.01
  for <qemu-devel@nongnu.org>
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 14 Oct 2019 09:04:41 -0700 (PDT)
+ Mon, 14 Oct 2019 09:05:01 -0700 (PDT)
 From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PULL 17/68] hw/timer/exynos4210_pwm.c: Switch to transaction-based
- ptimer API
-Date: Mon, 14 Oct 2019 17:03:13 +0100
-Message-Id: <20191014160404.19553-18-peter.maydell@linaro.org>
+Subject: [PULL 31/68] target/arm/arm-semi: Factor out implementation of
+ SYS_CLOSE
+Date: Mon, 14 Oct 2019 17:03:27 +0100
+Message-Id: <20191014160404.19553-32-peter.maydell@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20191014160404.19553-1-peter.maydell@linaro.org>
 References: <20191014160404.19553-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
@@ -99,92 +99,110 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Switch the exynos4210_pwm code away from bottom-half based ptimers to
-the new transaction-based ptimer API.  This just requires adding
-begin/commit calls around the various places that modify the ptimer
-state, and using the new ptimer_init() function to create the timer.
+Currently for the semihosting calls which take a file descriptor
+(SYS_CLOSE, SYS_WRITE, SYS_READ, SYS_ISTTY, SYS_SEEK, SYS_FLEN)
+we have effectively two implementations, one for real host files
+and one for when we indirect via the gdbstub. We want to add a
+third one to deal with the magic :semihosting-features file.
+
+Instead of having a three-way if statement in each of these
+cases, factor out the implementation of the calls to separate
+functions which we dispatch to via function pointers selected
+via the GuestFDType for the guest fd.
+
+In this commit, we set up the framework for the dispatch,
+and convert the SYS_CLOSE call to use it.
 
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Message-id: 20191008171740.9679-15-peter.maydell@linaro.org
+Message-id: 20190916141544.17540-8-peter.maydell@linaro.org
 ---
- hw/timer/exynos4210_pwm.c | 17 ++++++++++++-----
- 1 file changed, 12 insertions(+), 5 deletions(-)
+ target/arm/arm-semi.c | 44 ++++++++++++++++++++++++++++++++++++-------
+ 1 file changed, 37 insertions(+), 7 deletions(-)
 
-diff --git a/hw/timer/exynos4210_pwm.c b/hw/timer/exynos4210_pwm.c
-index aa5dca68ef7..59a8c08db0f 100644
---- a/hw/timer/exynos4210_pwm.c
-+++ b/hw/timer/exynos4210_pwm.c
-@@ -25,7 +25,6 @@
- #include "hw/sysbus.h"
- #include "migration/vmstate.h"
- #include "qemu/timer.h"
--#include "qemu/main-loop.h"
- #include "qemu/module.h"
- #include "hw/ptimer.h"
- 
-@@ -150,7 +149,9 @@ static const VMStateDescription vmstate_exynos4210_pwm_state = {
- };
+diff --git a/target/arm/arm-semi.c b/target/arm/arm-semi.c
+index 02cd673d47d..e5f1e2aaaf2 100644
+--- a/target/arm/arm-semi.c
++++ b/target/arm/arm-semi.c
+@@ -109,6 +109,7 @@ static int open_modeflags[12] = {
+ typedef enum GuestFDType {
+     GuestFDUnused = 0,
+     GuestFDHost = 1,
++    GuestFDGDB = 2,
+ } GuestFDType;
  
  /*
-- * PWM update frequency
-+ * PWM update frequency.
-+ * Must be called within a ptimer_transaction_begin/commit block
-+ * for s->timer[id].ptimer.
+@@ -172,14 +173,14 @@ static GuestFD *do_get_guestfd(int guestfd)
+ /*
+  * Associate the specified guest fd (which must have been
+  * allocated via alloc_fd() and not previously used) with
+- * the specified host fd.
++ * the specified host/gdb fd.
   */
- static void exynos4210_pwm_update_freq(Exynos4210PWMState *s, uint32_t id)
+ static void associate_guestfd(int guestfd, int hostfd)
  {
-@@ -281,12 +282,15 @@ static void exynos4210_pwm_write(void *opaque, hwaddr offset,
+     GuestFD *gf = do_get_guestfd(guestfd);
  
-         /* update timers frequencies */
-         for (i = 0; i < EXYNOS4210_PWM_TIMERS_NUM; i++) {
-+            ptimer_transaction_begin(s->timer[i].ptimer);
-             exynos4210_pwm_update_freq(s, s->timer[i].id);
-+            ptimer_transaction_commit(s->timer[i].ptimer);
-         }
-         break;
- 
-     case TCON:
-         for (i = 0; i < EXYNOS4210_PWM_TIMERS_NUM; i++) {
-+            ptimer_transaction_begin(s->timer[i].ptimer);
-             if ((value & TCON_TIMER_MANUAL_UPD(i)) >
-             (s->reg_tcon & TCON_TIMER_MANUAL_UPD(i))) {
-                 /*
-@@ -315,6 +319,7 @@ static void exynos4210_pwm_write(void *opaque, hwaddr offset,
-                 ptimer_stop(s->timer[i].ptimer);
-                 DPRINTF("stop timer %d\n", i);
-             }
-+            ptimer_transaction_commit(s->timer[i].ptimer);
-         }
-         s->reg_tcon = value;
-         break;
-@@ -369,8 +374,10 @@ static void exynos4210_pwm_reset(DeviceState *d)
-         s->timer[i].reg_tcmpb = 0;
-         s->timer[i].reg_tcntb = 0;
- 
-+        ptimer_transaction_begin(s->timer[i].ptimer);
-         exynos4210_pwm_update_freq(s, s->timer[i].id);
-         ptimer_stop(s->timer[i].ptimer);
-+        ptimer_transaction_commit(s->timer[i].ptimer);
-     }
+     assert(gf);
+-    gf->type = GuestFDHost;
++    gf->type = use_gdb_syscalls() ? GuestFDGDB : GuestFDHost;
+     gf->hostfd = hostfd;
  }
  
-@@ -388,12 +395,12 @@ static void exynos4210_pwm_init(Object *obj)
-     Exynos4210PWMState *s = EXYNOS4210_PWM(obj);
-     SysBusDevice *dev = SYS_BUS_DEVICE(obj);
-     int i;
--    QEMUBH *bh;
+@@ -376,6 +377,39 @@ static target_ulong arm_gdb_syscall(ARMCPU *cpu, gdb_syscall_complete_cb cb,
+     return is_a64(env) ? env->xregs[0] : env->regs[0];
+ }
  
-     for (i = 0; i < EXYNOS4210_PWM_TIMERS_NUM; i++) {
--        bh = qemu_bh_new(exynos4210_pwm_tick, &s->timer[i]);
-         sysbus_init_irq(dev, &s->timer[i].irq);
--        s->timer[i].ptimer = ptimer_init_with_bh(bh, PTIMER_POLICY_DEFAULT);
-+        s->timer[i].ptimer = ptimer_init(exynos4210_pwm_tick,
-+                                         &s->timer[i],
-+                                         PTIMER_POLICY_DEFAULT);
-         s->timer[i].id = i;
-         s->timer[i].parent = s;
-     }
++/*
++ * Types for functions implementing various semihosting calls
++ * for specific types of guest file descriptor. These must all
++ * do the work and return the required return value for the guest,
++ * setting the guest errno if appropriate.
++ */
++typedef uint32_t sys_closefn(ARMCPU *cpu, GuestFD *gf);
++
++static uint32_t host_closefn(ARMCPU *cpu, GuestFD *gf)
++{
++    CPUARMState *env = &cpu->env;
++
++    return set_swi_errno(env, close(gf->hostfd));
++}
++
++static uint32_t gdb_closefn(ARMCPU *cpu, GuestFD *gf)
++{
++    return arm_gdb_syscall(cpu, arm_semi_cb, "close,%x", gf->hostfd);
++}
++
++typedef struct GuestFDFunctions {
++    sys_closefn *closefn;
++} GuestFDFunctions;
++
++static const GuestFDFunctions guestfd_fns[] = {
++    [GuestFDHost] = {
++        .closefn = host_closefn,
++    },
++    [GuestFDGDB] = {
++        .closefn = gdb_closefn,
++    },
++};
++
+ /* Read the input value from the argument block; fail the semihosting
+  * call if the memory read fails.
+  */
+@@ -485,11 +519,7 @@ target_ulong do_arm_semihosting(CPUARMState *env)
+             return set_swi_errno(env, -1);
+         }
+ 
+-        if (use_gdb_syscalls()) {
+-            ret = arm_gdb_syscall(cpu, arm_semi_cb, "close,%x", gf->hostfd);
+-        } else {
+-            ret = set_swi_errno(env, close(gf->hostfd));
+-        }
++        ret = guestfd_fns[gf->type].closefn(cpu, gf);
+         dealloc_guestfd(arg0);
+         return ret;
+     case TARGET_SYS_WRITEC:
 -- 
 2.20.1
 
