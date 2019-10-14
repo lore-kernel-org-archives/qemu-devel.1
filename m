@@ -7,74 +7,74 @@ X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E9C3C4CECE
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 16:21:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D81FC4CECE
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 16:22:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 55CB52133F
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 16:21:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 240BC2133F
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 16:22:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ha5CJmjv"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 55CB52133F
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="y+s8HoN5"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 240BC2133F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53136 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53158 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iK36X-0000SE-4c
-	for qemu-devel@archiver.kernel.org; Mon, 14 Oct 2019 12:21:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36760)
+	id 1iK37P-0001t3-RD
+	for qemu-devel@archiver.kernel.org; Mon, 14 Oct 2019 12:22:47 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36746)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1iK2pn-0003k3-5R
- for qemu-devel@nongnu.org; Mon, 14 Oct 2019 12:04:36 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1iK2pk-0003gl-To
+ for qemu-devel@nongnu.org; Mon, 14 Oct 2019 12:04:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1iK2pl-00076U-UU
- for qemu-devel@nongnu.org; Mon, 14 Oct 2019 12:04:35 -0400
-Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:38101)
+ (envelope-from <peter.maydell@linaro.org>) id 1iK2pj-00074E-M4
+ for qemu-devel@nongnu.org; Mon, 14 Oct 2019 12:04:32 -0400
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:45246)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1iK2pl-00075g-Nx
- for qemu-devel@nongnu.org; Mon, 14 Oct 2019 12:04:33 -0400
-Received: by mail-wm1-x344.google.com with SMTP id 3so17310653wmi.3
- for <qemu-devel@nongnu.org>; Mon, 14 Oct 2019 09:04:33 -0700 (PDT)
+ id 1iK2pj-00073Q-Fl
+ for qemu-devel@nongnu.org; Mon, 14 Oct 2019 12:04:31 -0400
+Received: by mail-wr1-x441.google.com with SMTP id r5so20329595wrm.12
+ for <qemu-devel@nongnu.org>; Mon, 14 Oct 2019 09:04:31 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:subject:date:message-id:in-reply-to:references:mime-version
  :content-transfer-encoding;
- bh=Qb5xdshPqTBNbT/caOSYJnbTFPssgwP8+ogGepQjKkY=;
- b=ha5CJmjvMEcCpSYdMWBgm5q2GfikSstR15itZ8EH6UFOuiGIST1y9qr7VqTKiQgOYT
- ZwLsRwxDhGHYq7Z2UblWzY0cOR/X00Ea2sqo0fYmhrcjS2DRAN75w/q4et0dcckvjBf6
- bz1er8o7WvgBiyTPEwlSwncF55qNNu0pUXe8y3SNqKYQLt5uc6c/34X8x5BblZxGnR67
- YVWtfeYHMIBCFXZ8cJVNZMTQRLs2+CWZBS43TD/75e/IPpNinrhDrcRhP52NJKpB7Ia1
- 3LfcN+Jn3f52ZHh2Vpji17j86p3fqJ7TXRoSVkzWVhaH7nb+TI4rxtl/jVZAdePqdy/Y
- riRw==
+ bh=/9+N4KRIkIC7AplGQHDw+bqwPBeiJl0AKn35kS9i8E4=;
+ b=y+s8HoN5IHuYd1Fha2waiFu7ngg0IG3H+wRp8GL8llYmUDbfyEqWlkXez+9/t2/9VI
+ SbKdpl/ziPT9jsXcEvJJ84u6Ifz+snDuPAErIqMqAbAOVhX6DHL6k1Aqx5vJq5oUWd8Q
+ Us/BsPSaGC44GkMeEiCt7CIPjRj8Hm9y/19qcF6eTmP6XoQ6emGU3twsiNv/nVXXlgTu
+ DD1P6TSJ+clOJf4NwZAsTmBgNYxY8TJyVG1ZabFMuXcppIf7Bu0bzgvbVMn1P13MYLLZ
+ WzuEcYUElApUU96Nq41WpTp3bG5t+Y7zmofYP7jLxdUssumx1ZG80e5AK5uN0vpNmFdf
+ qHtQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=Qb5xdshPqTBNbT/caOSYJnbTFPssgwP8+ogGepQjKkY=;
- b=ANhlCJqgOLnXGqmBShG+3sSqIXZH9FTKj0MZ28WiUeXDBgwJiVMjCBOx8LbYgTBn9a
- B2uWKZ4e5jurC8rpOsgAHwvtyMzLjp9VZvsDCAPhNiM49wanHvmdnBiOLEWcddlkj/M3
- SAclFQJqLpRBxyRjseBbFFrbX1gxp8PvPiRzc0crO9CmhcSGdHkDfnKZm4a1lwUIx1gz
- 1BMqLD3F7jamGRMSS9PoxnFCMK/OIarRwQeEBsJUKf1oajZdmte8vqi0IceB3BGaZbA1
- a9rCYyYwpJ+5Lox9WIomeeRMl9iGhbo+QS54TiOXj3X3t4rJu4o2vUmanf6/TC8rH4G4
- Sk1g==
-X-Gm-Message-State: APjAAAWKERVDyvDVA+8MZUz17OnPtziUqZktm4lwkwm+iEUXzb5RWoa4
- +nJ6NPO0Lyj3HeZpGm0AMJv7fAU+Ox9Vqw==
-X-Google-Smtp-Source: APXvYqwpDdZhF27yRk9vkKj9xgSLCgu3QyucHmJ90efhfihNajyQy0ae/GjJnbElEFiTPIBGSE2GeA==
-X-Received: by 2002:a7b:c1d2:: with SMTP id a18mr15846708wmj.7.1571069072159; 
- Mon, 14 Oct 2019 09:04:32 -0700 (PDT)
+ bh=/9+N4KRIkIC7AplGQHDw+bqwPBeiJl0AKn35kS9i8E4=;
+ b=Qjluhcl7AHzEKZBv4A0QSODuxCoWK5EZYHLkYMStEP/aGylYb3jSy0cNDURngkVb4j
+ VZM1zhGWWOLVkFrlKfWylw6HzxCmtZ3nLFeV/KOTgNatBNT+/KyqqUjSjMUT9CSVQMOh
+ zXG3Kt1sWqe4d2bZUNMrkGhnevKJtJePr9AC/9DC6TTVtjZbyBbKlqIa8jOV5G348ePm
+ Shz1qPNggJ+A7u+v5F4TBSkLOKKaHYWPnZW5PP+ANSz8kMVEAVZEbsMi/TUBP6ffiY3g
+ Ye9DkjKefnZk6FTkGyWssNk6MdZa1/3Y9yQNVt8CIz86R258POE6oipK761KjBCjpLQd
+ 4bHA==
+X-Gm-Message-State: APjAAAVPUcEMrWfnfJ2M4UGUMzpVqX4jSf1aIddgufL6ncTB22ZGZ3iS
+ WZsx3yh3Po0ACA5if7pxtzmJFwZu7NlqSA==
+X-Google-Smtp-Source: APXvYqyBkUcpHnWWKrk4oESQ45nFTt+VhFESwe3aiv51fb9U3IONQFqLSbLS+z0KqPIypjBhusODSQ==
+X-Received: by 2002:a5d:6709:: with SMTP id o9mr26271482wru.116.1571069069952; 
+ Mon, 14 Oct 2019 09:04:29 -0700 (PDT)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id 5sm18029779wrk.86.2019.10.14.09.04.30
+ by smtp.gmail.com with ESMTPSA id 5sm18029779wrk.86.2019.10.14.09.04.28
  for <qemu-devel@nongnu.org>
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 14 Oct 2019 09:04:30 -0700 (PDT)
+ Mon, 14 Oct 2019 09:04:29 -0700 (PDT)
 From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PULL 11/68] hw/timer/cmsdk-apb-dualtimer.c: Switch to
- transaction-based ptimer API
-Date: Mon, 14 Oct 2019 17:03:07 +0100
-Message-Id: <20191014160404.19553-12-peter.maydell@linaro.org>
+Subject: [PULL 10/68] hw/timer/arm_mptimer.c: Switch to transaction-based
+ ptimer API
+Date: Mon, 14 Oct 2019 17:03:06 +0100
+Message-Id: <20191014160404.19553-11-peter.maydell@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20191014160404.19553-1-peter.maydell@linaro.org>
 References: <20191014160404.19553-1-peter.maydell@linaro.org>
@@ -82,7 +82,7 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::344
+X-Received-From: 2a00:1450:4864:20::441
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,103 +98,106 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Switch the cmsdk-apb-dualtimer code away from bottom-half based
-ptimers to the new transaction-based ptimer API.  This just requires
-adding begin/commit calls around the various places that modify the
-ptimer state, and using the new ptimer_init() function to create the
-timer.
+Switch the arm_mptimer.c code away from bottom-half based ptimers to
+the new transaction-based ptimer API.  This just requires adding
+begin/commit calls around the various places that modify the ptimer
+state, and using the new ptimer_init() function to create the timer.
 
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Message-id: 20191008171740.9679-9-peter.maydell@linaro.org
+Message-id: 20191008171740.9679-8-peter.maydell@linaro.org
 ---
- hw/timer/cmsdk-apb-dualtimer.c | 14 +++++++++++---
+ hw/timer/arm_mptimer.c | 14 +++++++++++---
  1 file changed, 11 insertions(+), 3 deletions(-)
 
-diff --git a/hw/timer/cmsdk-apb-dualtimer.c b/hw/timer/cmsdk-apb-dualtimer.c
-index 44d23c80364..e28ba9c90a8 100644
---- a/hw/timer/cmsdk-apb-dualtimer.c
-+++ b/hw/timer/cmsdk-apb-dualtimer.c
-@@ -20,7 +20,6 @@
- #include "qemu/log.h"
- #include "trace.h"
+diff --git a/hw/timer/arm_mptimer.c b/hw/timer/arm_mptimer.c
+index 2a54a011431..fdf97d1800f 100644
+--- a/hw/timer/arm_mptimer.c
++++ b/hw/timer/arm_mptimer.c
+@@ -27,7 +27,6 @@
+ #include "hw/timer/arm_mptimer.h"
+ #include "migration/vmstate.h"
  #include "qapi/error.h"
 -#include "qemu/main-loop.h"
  #include "qemu/module.h"
- #include "hw/sysbus.h"
- #include "hw/irq.h"
-@@ -112,6 +111,8 @@ static void cmsdk_dualtimermod_write_control(CMSDKAPBDualTimerModule *m,
-     /* Handle a write to the CONTROL register */
-     uint32_t changed;
+ #include "hw/core/cpu.h"
  
-+    ptimer_transaction_begin(m->timer);
-+
-     newctrl &= R_CONTROL_VALID_MASK;
+@@ -65,6 +64,7 @@ static inline uint32_t timerblock_scale(uint32_t control)
+     return (((control >> 8) & 0xff) + 1) * 10;
+ }
  
-     changed = m->control ^ newctrl;
-@@ -213,6 +214,8 @@ static void cmsdk_dualtimermod_write_control(CMSDKAPBDualTimerModule *m,
++/* Must be called within a ptimer transaction block */
+ static inline void timerblock_set_count(struct ptimer_state *timer,
+                                         uint32_t control, uint64_t *count)
+ {
+@@ -77,6 +77,7 @@ static inline void timerblock_set_count(struct ptimer_state *timer,
+     ptimer_set_count(timer, *count);
+ }
+ 
++/* Must be called within a ptimer transaction block */
+ static inline void timerblock_run(struct ptimer_state *timer,
+                                   uint32_t control, uint32_t load)
+ {
+@@ -124,6 +125,7 @@ static void timerblock_write(void *opaque, hwaddr addr,
+     uint32_t control = tb->control;
+     switch (addr) {
+     case 0: /* Load */
++        ptimer_transaction_begin(tb->timer);
+         /* Setting load to 0 stops the timer without doing the tick if
+          * prescaler = 0.
+          */
+@@ -132,8 +134,10 @@ static void timerblock_write(void *opaque, hwaddr addr,
+         }
+         ptimer_set_limit(tb->timer, value, 1);
+         timerblock_run(tb->timer, control, value);
++        ptimer_transaction_commit(tb->timer);
+         break;
+     case 4: /* Counter.  */
++        ptimer_transaction_begin(tb->timer);
+         /* Setting counter to 0 stops the one-shot timer, or periodic with
+          * load = 0, without doing the tick if prescaler = 0.
+          */
+@@ -143,8 +147,10 @@ static void timerblock_write(void *opaque, hwaddr addr,
+         }
+         timerblock_set_count(tb->timer, control, &value);
+         timerblock_run(tb->timer, control, value);
++        ptimer_transaction_commit(tb->timer);
+         break;
+     case 8: /* Control.  */
++        ptimer_transaction_begin(tb->timer);
+         if ((control & 3) != (value & 3)) {
+             ptimer_stop(tb->timer);
+         }
+@@ -160,6 +166,7 @@ static void timerblock_write(void *opaque, hwaddr addr,
+             timerblock_run(tb->timer, value, count);
+         }
+         tb->control = value;
++        ptimer_transaction_commit(tb->timer);
+         break;
+     case 12: /* Interrupt status.  */
+         tb->status &= ~value;
+@@ -212,9 +219,11 @@ static void timerblock_reset(TimerBlock *tb)
+     tb->control = 0;
+     tb->status = 0;
+     if (tb->timer) {
++        ptimer_transaction_begin(tb->timer);
+         ptimer_stop(tb->timer);
+         ptimer_set_limit(tb->timer, 0, 1);
+         ptimer_set_period(tb->timer, timerblock_scale(0));
++        ptimer_transaction_commit(tb->timer);
      }
- 
-     m->control = newctrl;
-+
-+    ptimer_transaction_commit(m->timer);
  }
  
- static uint64_t cmsdk_apb_dualtimer_read(void *opaque, hwaddr offset,
-@@ -330,6 +333,7 @@ static void cmsdk_apb_dualtimer_write(void *opaque, hwaddr offset,
-             if (!(m->control & R_CONTROL_SIZE_MASK)) {
-                 value &= 0xffff;
-             }
-+            ptimer_transaction_begin(m->timer);
-             if (!(m->control & R_CONTROL_MODE_MASK)) {
-                 /*
-                  * In free-running mode this won't set the limit but will
-@@ -346,6 +350,7 @@ static void cmsdk_apb_dualtimer_write(void *opaque, hwaddr offset,
-                     ptimer_run(m->timer, 1);
-                 }
-             }
-+            ptimer_transaction_commit(m->timer);
-             break;
-         case A_TIMER1BGLOAD:
-             /* Set the limit, but not the current count */
-@@ -357,7 +362,9 @@ static void cmsdk_apb_dualtimer_write(void *opaque, hwaddr offset,
-             if (!(m->control & R_CONTROL_SIZE_MASK)) {
-                 value &= 0xffff;
-             }
-+            ptimer_transaction_begin(m->timer);
-             ptimer_set_limit(m->timer, value, 0);
-+            ptimer_transaction_commit(m->timer);
-             break;
-         case A_TIMER1CONTROL:
-             cmsdk_dualtimermod_write_control(m, value);
-@@ -398,6 +405,7 @@ static void cmsdk_dualtimermod_reset(CMSDKAPBDualTimerModule *m)
-     m->intstatus = 0;
-     m->load = 0;
-     m->value = 0xffffffff;
-+    ptimer_transaction_begin(m->timer);
-     ptimer_stop(m->timer);
-     /*
-      * We start in free-running mode, with VALUE at 0xffffffff, and
-@@ -406,6 +414,7 @@ static void cmsdk_dualtimermod_reset(CMSDKAPBDualTimerModule *m)
+@@ -260,8 +269,7 @@ static void arm_mptimer_realize(DeviceState *dev, Error **errp)
       */
-     ptimer_set_limit(m->timer, 0xffff, 1);
-     ptimer_set_freq(m->timer, m->parent->pclk_frq);
-+    ptimer_transaction_commit(m->timer);
- }
- 
- static void cmsdk_apb_dualtimer_reset(DeviceState *dev)
-@@ -450,10 +459,9 @@ static void cmsdk_apb_dualtimer_realize(DeviceState *dev, Error **errp)
- 
-     for (i = 0; i < ARRAY_SIZE(s->timermod); i++) {
-         CMSDKAPBDualTimerModule *m = &s->timermod[i];
--        QEMUBH *bh = qemu_bh_new(cmsdk_dualtimermod_tick, m);
- 
-         m->parent = s;
--        m->timer = ptimer_init_with_bh(bh,
-+        m->timer = ptimer_init(cmsdk_dualtimermod_tick, m,
-                                PTIMER_POLICY_WRAP_AFTER_ONE_PERIOD |
-                                PTIMER_POLICY_TRIGGER_ONLY_ON_DECREMENT |
-                                PTIMER_POLICY_NO_IMMEDIATE_RELOAD |
+     for (i = 0; i < s->num_cpu; i++) {
+         TimerBlock *tb = &s->timerblock[i];
+-        QEMUBH *bh = qemu_bh_new(timerblock_tick, tb);
+-        tb->timer = ptimer_init_with_bh(bh, PTIMER_POLICY);
++        tb->timer = ptimer_init(timerblock_tick, tb, PTIMER_POLICY);
+         sysbus_init_irq(sbd, &tb->irq);
+         memory_region_init_io(&tb->iomem, OBJECT(s), &timerblock_ops, tb,
+                               "arm_mptimer_timerblock", 0x20);
 -- 
 2.20.1
 
