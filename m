@@ -2,79 +2,90 @@ Return-Path: <SRS0=PUPy=YH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B66EC4CECE
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 17:27:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8B01BECE587
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 17:28:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 29F3220663
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 17:27:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5A14D20663
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 17:28:15 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="nc9A2T9x"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 29F3220663
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="dlSA/mR7"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5A14D20663
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54527 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54530 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iK48E-0001Qj-UN
-	for qemu-devel@archiver.kernel.org; Mon, 14 Oct 2019 13:27:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38507)
+	id 1iK48k-0001yj-61
+	for qemu-devel@archiver.kernel.org; Mon, 14 Oct 2019 13:28:14 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46995)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1iK2x1-0005nK-CS
- for qemu-devel@nongnu.org; Mon, 14 Oct 2019 12:12:04 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1iK3vR-0001a9-EX
+ for qemu-devel@nongnu.org; Mon, 14 Oct 2019 13:14:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1iK2x0-0002vn-88
- for qemu-devel@nongnu.org; Mon, 14 Oct 2019 12:12:03 -0400
-Received: from mail-ot1-x329.google.com ([2607:f8b0:4864:20::329]:35090)
+ (envelope-from <alex.bennee@linaro.org>) id 1iK3vQ-0002sR-76
+ for qemu-devel@nongnu.org; Mon, 14 Oct 2019 13:14:29 -0400
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:41223)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1iK2x0-0002vc-25
- for qemu-devel@nongnu.org; Mon, 14 Oct 2019 12:12:02 -0400
-Received: by mail-ot1-x329.google.com with SMTP id z6so14283408otb.2
- for <qemu-devel@nongnu.org>; Mon, 14 Oct 2019 09:12:01 -0700 (PDT)
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1iK3vP-0002ql-9J
+ for qemu-devel@nongnu.org; Mon, 14 Oct 2019 13:14:27 -0400
+Received: by mail-wr1-x444.google.com with SMTP id p4so4741900wrm.8
+ for <qemu-devel@nongnu.org>; Mon, 14 Oct 2019 10:14:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=PPx9wOFTY5bJVo7Que9niwAVqXrZsqQ2yIApFOHBdqA=;
- b=nc9A2T9xjXLCPK5RO5hpMEIYeUwUQR+ES+tlHw4m2AnrzCObSIUcc3ic4BOW7KBN8/
- wm1bnh8sTLYY38VCArSzmHuiEgETIAO8q2KqEngzSNWsjiPfY8doxkIA1PHQfLP4/0fr
- +HIQklAj73SmDjtEeJYhAqapfuGAK0C3ftFQFfs14sC2f3cUB2WKdXl2W6fy8DZCNoy2
- eOq8EOd0VbAviOJyteS3G+UCV6S7PSpSs/SmJJz4Yd+DSkNvzaJFump1w4/n0fKYAqMn
- HKBRUW3d+aV75WWvuaQsTMjODR71Ph1lt4hB2b+SWsZlGM/dtnAWdC4dQDNrscDGPUJO
- VmDQ==
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=kUFWXjDlIa2AsuNlyv5PMkdLD32nVesp9Vu/NCqpmaA=;
+ b=dlSA/mR7Mf0vNZcx0tnJcmGKWRwfiT2MrVoe1dohXjGQ799cZst05+Il9m8Yeyi8XN
+ kXgPxqKyvqXf11GkuY1As7ZHuH/bBlJcNfbk9Gw5PeIVontKYMsHeVObpfwlIChP7Dd6
+ NE9B64NdVx/C5XkYpIOxK17zFtz6s3uY1xpoIvGmUkE+Y+hM+0WhA4F77mZi0bxB5MVW
+ YIj4ppIZl8cXwdDaCo1jUS3y+Nff/JLhqMS87gkKS+EOIHMaACsqtTcmxIVM2uQ/acjI
+ 4jfPPOXh0sfBQMrgSV5eaDttFg+y8zhsQkdBqAM3w+p0McQfWfQrHQtOH1+a/LqifCMX
+ 48eQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=PPx9wOFTY5bJVo7Que9niwAVqXrZsqQ2yIApFOHBdqA=;
- b=ERaL1fc3ckD+Vnv9WC1Dq/Ohjw1i0QoKUTcHDmyIuqmFJGo8OkbcsNlq74l4/r607T
- N0+6LhUR2f0qFs2GJiIE6KIGvqNyzjCVb2+ccs24doqRC7Ft/x5GtzXZbydLHrG7AKWt
- WKJAOFD4IK40wizrjF4axVwcMeJ7aVcbbtccVOFQM1IdRX8NCFZ2O/25r39shGE2xgl6
- XjDY5rle+ot6hLT9qgUblpyxlyyeezpBXnQCcq3tzF1W4p+P00xzzIMnGNp4V2v16Cer
- SEd0KSA4cDvKXUJQVR/aRp7Syctk+KAivHhsSoihcX1E1wYuLHPeN3hKClwsLmnCSuma
- Lx9A==
-X-Gm-Message-State: APjAAAWiX6Bq7l5fikODSAXx0Rzwgkn9GT2Ns0070/HQP/Ly7lovAH7r
- Xhk18FmuNkI567IF46gdH29W1tI088e7qYi34FXslA==
-X-Google-Smtp-Source: APXvYqxLehv93Su3YEgEsC3aQr+AFDxm30dlqqiiR6atrtJ+iZOS+IdEK3AmVyiNAp5o44R/HtRL0rSU+qBYOEr9GlI=
-X-Received: by 2002:a9d:708e:: with SMTP id l14mr25326890otj.135.1571069521157; 
- Mon, 14 Oct 2019 09:12:01 -0700 (PDT)
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=kUFWXjDlIa2AsuNlyv5PMkdLD32nVesp9Vu/NCqpmaA=;
+ b=f/fhGoQZ2pQcluigX74VT+QQt0y5AVLdBiuy4uVjiQnAaUenODLoY0YLFgirK+dtNI
+ tf4YhRJKG6hNgUh9jOTFFc1L6qbmZb0qft+bF9Qp8SKwlUE8bbqCwV8t2GU4XRaUaqTd
+ QRJ86cDz/urJWb9ube5QqWi8WxF3/H3jbqIN54Ni7h/4DCjUtmfibeD7+qqbCuO9tSF1
+ 3tSM9QnEBtQVF7o5H3daHJpBjgeLUWq75HeOSMDcCH3WDyulVra6Z8QZuQiLMJIv4xKq
+ MkIGlaZw+nfDYIWHAThVGdBZ0HbOkzmLpbaTg0vIb/65H7h/YGh1BWJgBXbT+u+VRyRj
+ ktBw==
+X-Gm-Message-State: APjAAAW5dJCXUJCYy4PHDcvnTXm/WnT4rGrwefMLo9hXNgSm9Vytj25y
+ YrVzSuaEYrMCro2zY0SBhuMCew==
+X-Google-Smtp-Source: APXvYqwdX/fX4Xbd49pzcnvmdUZOjtgaoLjRwQe20qmEoBGaGYx9skOlUV1/d70y8rLQ5Btc5iCADA==
+X-Received: by 2002:adf:92a5:: with SMTP id 34mr25377414wrn.337.1571073265336; 
+ Mon, 14 Oct 2019 10:14:25 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id v20sm18110993wml.26.2019.10.14.10.14.24
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 14 Oct 2019 10:14:24 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 05FFC1FF87;
+ Mon, 14 Oct 2019 18:14:24 +0100 (BST)
+References: <20191014104948.4291-1-alex.bennee@linaro.org>
+ <20191014104948.4291-53-alex.bennee@linaro.org>
+ <a05f8601-7c93-8861-4935-6806f5ae3ec3@linaro.org>
+User-agent: mu4e 1.3.5; emacs 27.0.50
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Richard Henderson <richard.henderson@linaro.org>
+Subject: Re: [PATCH v5 52/55] plugins: make howvec plugin more generic
+In-reply-to: <a05f8601-7c93-8861-4935-6806f5ae3ec3@linaro.org>
+Date: Mon, 14 Oct 2019 18:14:23 +0100
+Message-ID: <87imormeq8.fsf@linaro.org>
 MIME-Version: 1.0
-References: <20191011212550.27269-1-jsnow@redhat.com>
-In-Reply-To: <20191011212550.27269-1-jsnow@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 14 Oct 2019 17:11:49 +0100
-Message-ID: <CAFEAcA9SRYsn10rTGsHM4hCPYbSxY=kuAnoiqbDBkCOYFzg8YQ@mail.gmail.com>
-Subject: Re: [PULL 00/19] Bitmaps patches
-To: John Snow <jsnow@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::329
+X-Received-From: 2a00:1450:4864:20::444
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,40 +97,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>,
- Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- Qemu-block <qemu-block@nongnu.org>, Juan Quintela <quintela@redhat.com>,
- Libvirt <libvir-list@redhat.com>, Markus Armbruster <armbru@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>,
- Stefan Hajnoczi <stefanha@redhat.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: aaron@os.amperecomputing.com, cota@braap.org, qemu-devel@nongnu.org,
+ peter.puhov@futurewei.com, robert.foley@futurewei.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, 11 Oct 2019 at 22:26, John Snow <jsnow@redhat.com> wrote:
->
-> The following changes since commit 98b2e3c9ab3abfe476a2b02f8f51813edb90e72d:
->
->   Merge remote-tracking branch 'remotes/stefanha/tags/block-pull-request' into staging (2019-10-08 16:08:35 +0100)
->
-> are available in the Git repository at:
->
->   https://github.com/jnsnow/qemu.git tags/bitmaps-pull-request
->
-> for you to fetch changes up to b97d9a1014b61dd0980e7f4a0c9ca1e3b0aaa761:
->
->   dirty-bitmaps: remove deprecated autoload parameter (2019-10-09 17:02:45 -0400)
->
-> ----------------------------------------------------------------
-> Pull request
->
-> ----------------------------------------------------------------
->
 
-Hi -- this has a conflict in block/backup.c -- could you fix up
-and resend, please ?
+Richard Henderson <richard.henderson@linaro.org> writes:
 
-thanks
--- PMM
+> On 10/14/19 3:49 AM, Alex Benn=C3=A9e wrote:
+>> @@ -190,14 +211,18 @@ static uint64_t * find_counter(struct qemu_plugin_=
+insn *insn)
+>>      uint32_t opcode;
+>>      InsnClassExecCount *class =3D NULL;
+>>
+>> -    /* we expect all instructions to by 32 bits for ARM */
+>> -    g_assert(qemu_plugin_insn_size(insn) =3D=3D 4);
+>> +    /*
+>> +     * We only match the first 32 bits of the instruction which is
+>> +     * fine for most RISCs but a bit limiting for CISC architectures.
+>> +     * They would probably benefit from a more tailored plugin.
+>> +     * However we can fall back to individual instruction counting.
+>> +     */
+>>      opcode =3D *((uint32_t *)qemu_plugin_insn_data(insn));
+>
+> This totally ignores the endianness of the host.
+> I'm not keen on reading more than the number of
+> bytes in the insn either...
+
+I guess we can strncpy the data and ensure it is NULL terminated and use
+the "string" hash function instead. It depends if there are many opcode
+strings with NULL's in them.
+
+>
+>
+> r~
+
+
+--
+Alex Benn=C3=A9e
 
