@@ -2,83 +2,88 @@ Return-Path: <SRS0=PUPy=YH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 66D6AECE587
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 17:04:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 434C9ECE587
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 17:04:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 200C12133F
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 17:04:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0520C217D9
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 17:04:38 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PWLxPQWP"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 200C12133F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ho/6xePR"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0520C217D9
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54011 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54018 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iK3lM-0004LP-Dh
-	for qemu-devel@archiver.kernel.org; Mon, 14 Oct 2019 13:04:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39774)
+	id 1iK3ls-00052T-AB
+	for qemu-devel@archiver.kernel.org; Mon, 14 Oct 2019 13:04:36 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37197)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mrolnik@gmail.com>) id 1iK33y-00062l-8w
- for qemu-devel@nongnu.org; Mon, 14 Oct 2019 12:19:16 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1iK2qP-0004de-Px
+ for qemu-devel@nongnu.org; Mon, 14 Oct 2019 12:05:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mrolnik@gmail.com>) id 1iK33w-0007Ma-2I
- for qemu-devel@nongnu.org; Mon, 14 Oct 2019 12:19:14 -0400
-Received: from mail-wm1-x334.google.com ([2a00:1450:4864:20::334]:51435)
+ (envelope-from <peter.maydell@linaro.org>) id 1iK2qO-0007s2-Lk
+ for qemu-devel@nongnu.org; Mon, 14 Oct 2019 12:05:13 -0400
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:45258)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <mrolnik@gmail.com>) id 1iK33v-0007Lz-Rg
- for qemu-devel@nongnu.org; Mon, 14 Oct 2019 12:19:12 -0400
-Received: by mail-wm1-x334.google.com with SMTP id 7so17925411wme.1
- for <qemu-devel@nongnu.org>; Mon, 14 Oct 2019 09:19:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=Wrb/eh//pKqC5sqQg+JmF7gLP8TvTzApdrnvwmESS9w=;
- b=PWLxPQWPyUXqhQ7kOzg0kfalcfAGxqK1SdRf9jtdX8fv7eSrPPckmNQPj0k7APVYnb
- jlURwEWZNESImEkhI0Ydjp3CvDDNfOG/zsJ86CBauVsQfSaRstZVhwDbRJQGyfhRYrJq
- P2CSiMCeTf0cmZ6az1f78+I4R4P6oa862rvpmKj9LpPfINVSoWQABgTAxeYO5QHz15TR
- dNE8VOrAc9EosUBWPnp1Un7g/qy6UQu+slRs2OV7mVbrHQCkRvvZLqiHaCK9UZ+xSlvL
- eJ6PrJCoA1EuHZimOct8HUbEn7JRGLn36InqM9ALBXkjdmFrJyHoc6+wNm/n6fg+iVK+
- euVQ==
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1iK2qO-0007rM-FO
+ for qemu-devel@nongnu.org; Mon, 14 Oct 2019 12:05:12 -0400
+Received: by mail-wr1-x443.google.com with SMTP id r5so20332412wrm.12
+ for <qemu-devel@nongnu.org>; Mon, 14 Oct 2019 09:05:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:subject:date:message-id:in-reply-to:references:mime-version
+ :content-transfer-encoding;
+ bh=w2zTSs9Y2lp9+9zNL0MEH+1G0Ie/vtJdarrnfCIzakc=;
+ b=ho/6xePRn1FeY6q/S4khg/RQpBlK1kXybYjdO3jKVUIXTrAWY5PluZndoSY5sci+Bs
+ M5/nsr57Lm/KYm6nzWsX2NATUwOK4gSEuE4Frs5OncfHGvYwrx1osp671uK/hGlIFiLj
+ hVp499ZsuQSDoUEYJ+52otFfAI03ujLK97RX0TTVcjlINbiZ5Zo9aa9NSvKvN/oLXCVI
+ J9kWmc+kGUF9up28o+GFqCEbp5wKC8NgehEkfkZweKWMvuRm7/LLI8exzGx2nau0Ukwe
+ OoPluLUn1xhskKNLuWndIVMbvEUGDjIU040mEWi/VmWiXHX6fw2tl6Hnto4Ld7BqekFz
+ 3hfA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references;
- bh=Wrb/eh//pKqC5sqQg+JmF7gLP8TvTzApdrnvwmESS9w=;
- b=qOkd5HtY8RRbKkxLEnJnCuWKx6VXnlsZseFGwIVZQXkeXacFEX7HjLt+2enDGTBtsy
- 3QLk592zjKn+/hnwA5bcIafWO5WscX4kWVULdwJmYmWyQdXJliduu/kVmcdCBrI6EA9U
- eNfOmjm0ky3pTQCMYsCE63dBgfwJZsaruBdhEFnBRtZCL+JcSOhc5Xy31WF1kZHZN+f6
- 629p41aTuL1OXFTs7IHHiR9Diwo7L8pcbP+wkX70R2NBaqB2nzGVJ0cQd+e72dlVXij6
- UYTmANjFF2+cSPb3Tig9NIcQQ9an202rk1nrszo5FHyd4vR2qLTikkdMzu7qURd37Moo
- yMJA==
-X-Gm-Message-State: APjAAAWaCMDLmtfq9noBIPegHW2F/3QgF1oFkkJF0Mr67Q+bs3CoozNc
- lVpO1L2l5XBTuzRWOpWnV5VAR9V3BRA=
-X-Google-Smtp-Source: APXvYqwqeaXZX/lj1Caj17CgLDVTnrHQcFlyEBXf8eN6ge1jyA1eGpi08IZZndTX/k+qq6xSC5q4KA==
-X-Received: by 2002:a7b:c936:: with SMTP id h22mr15289414wml.1.1571069950348; 
- Mon, 14 Oct 2019 09:19:10 -0700 (PDT)
-Received: from 8c859074c0ff.ant.amazon.com.com
- (bzq-79-178-11-117.red.bezeqint.net. [79.178.11.117])
- by smtp.gmail.com with ESMTPSA id c132sm28050861wme.27.2019.10.14.09.19.08
- (version=TLS1_2 cipher=ECDHE-RSA-AES128-SHA bits=128/128);
- Mon, 14 Oct 2019 09:19:09 -0700 (PDT)
-From: Michael Rolnik <mrolnik@gmail.com>
+ h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=w2zTSs9Y2lp9+9zNL0MEH+1G0Ie/vtJdarrnfCIzakc=;
+ b=jCTFVlb5htwh7oiB+dMTyWprTK0zVK9+BvgvCeJ86fOVKY1PDCYCSe428goYLKBmLO
+ hDOpfHybxsU1K9553qelMux2gCABjQ5wb1Y39OUNULpu8QHYYcGaDM6AbhtebckQ5Q+b
+ woytGqi3cD2vNroacn+LHGpUpE0q/3VPMAWQAVMLFc2ogQRuJXAqygIJ/aC9zcHr5zt6
+ SMpkVHvsBMuFN2Jl1vi2tSgczf+4YV17ujBXhHnMvEC2pdyqFRyjkYl5i96+qWXfD69x
+ ghFzSH0KE8RidNCZc2wfeavfDTDS7g3ITJ2VydF56i+h2nAQZMcjabqVm1O2O8QXh3YE
+ XH4g==
+X-Gm-Message-State: APjAAAUVjiAhOLOMePMimrNKwbQZkI0An4dAPjmJGiKDwiY+MoVu21bA
+ F3yq5DtZOrzlXVcX36GWVjArAnwUb7FjBg==
+X-Google-Smtp-Source: APXvYqzcjy/gX9vD0C32TEnJZW+rGCHtCZmYKyuaLddR3+Zty1TrRwyYxhBAgjRo2Ylp5+4RRDNqSg==
+X-Received: by 2002:a5d:55d0:: with SMTP id i16mr27672099wrw.150.1571069111200; 
+ Mon, 14 Oct 2019 09:05:11 -0700 (PDT)
+Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
+ by smtp.gmail.com with ESMTPSA id 5sm18029779wrk.86.2019.10.14.09.05.10
+ for <qemu-devel@nongnu.org>
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 14 Oct 2019 09:05:10 -0700 (PDT)
+From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v32 02/13] target/avr: Add instruction helpers
-Date: Mon, 14 Oct 2019 19:18:32 +0300
-Message-Id: <20191014161843.84845-3-mrolnik@gmail.com>
-X-Mailer: git-send-email 2.17.2 (Apple Git-113)
-In-Reply-To: <20191014161843.84845-1-mrolnik@gmail.com>
-References: <20191014161843.84845-1-mrolnik@gmail.com>
+Subject: [PULL 38/68] target/arm/arm-semi: Implement SH_EXT_EXIT_EXTENDED
+ extension
+Date: Mon, 14 Oct 2019 17:03:34 +0100
+Message-Id: <20191014160404.19553-39-peter.maydell@linaro.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20191014160404.19553-1-peter.maydell@linaro.org>
+References: <20191014160404.19553-1-peter.maydell@linaro.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::334
+X-Received-From: 2a00:1450:4864:20::443
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,422 +95,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: thuth@redhat.com, Michael Rolnik <mrolnik@gmail.com>,
- richard.henderson@linaro.org, dovgaluk@ispras.ru, imammedo@redhat.com,
- philmd@redhat.com, aleksandar.m.mail@gmail.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Stubs for unimplemented instructions and helpers for instructions that need to interact with QEMU.
-SPM and WDR are unimplemented because they require emulation of complex peripherals.
-The implementation of SLEEP is very limited due to the lack of peripherals to generate wake interrupts.
-Memory access instructions are implemented here because some address ranges actually refer to CPU registers.
+SH_EXT_EXIT_EXTENDED is a v2.0 semihosting extension: it
+indicates that the implementation supports the SYS_EXIT_EXTENDED
+function. This function allows both A64 and A32/T32 guests to
+exit with a specified exit status, unlike the older SYS_EXIT
+function which only allowed this for A64 guests. Implement
+this extension.
 
-Signed-off-by: Michael Rolnik <mrolnik@gmail.com>
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
+Message-id: 20190916141544.17540-15-peter.maydell@linaro.org
 ---
- target/avr/helper.c | 354 ++++++++++++++++++++++++++++++++++++++++++++
- target/avr/helper.h |  29 ++++
- 2 files changed, 383 insertions(+)
- create mode 100644 target/avr/helper.c
- create mode 100644 target/avr/helper.h
+ target/arm/arm-semi.c | 19 ++++++++++++++-----
+ 1 file changed, 14 insertions(+), 5 deletions(-)
 
-diff --git a/target/avr/helper.c b/target/avr/helper.c
-new file mode 100644
-index 0000000000..f0f0d4f15a
---- /dev/null
-+++ b/target/avr/helper.c
-@@ -0,0 +1,354 @@
-+/*
-+ * QEMU AVR CPU
-+ *
-+ * Copyright (c) 2019 Michael Rolnik
-+ *
-+ * This library is free software; you can redistribute it and/or
-+ * modify it under the terms of the GNU Lesser General Public
-+ * License as published by the Free Software Foundation; either
-+ * version 2.1 of the License, or (at your option) any later version.
-+ *
-+ * This library is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+ * Lesser General Public License for more details.
-+ *
-+ * You should have received a copy of the GNU Lesser General Public
-+ * License along with this library; if not, see
-+ * <http://www.gnu.org/licenses/lgpl-2.1.html>
-+ */
+diff --git a/target/arm/arm-semi.c b/target/arm/arm-semi.c
+index 57491740d73..f65d8c907e8 100644
+--- a/target/arm/arm-semi.c
++++ b/target/arm/arm-semi.c
+@@ -59,6 +59,7 @@
+ #define TARGET_SYS_HEAPINFO    0x16
+ #define TARGET_SYS_EXIT        0x18
+ #define TARGET_SYS_SYNCCACHE   0x19
++#define TARGET_SYS_EXIT_EXTENDED 0x20
+ 
+ /* ADP_Stopped_ApplicationExit is used for exit(0),
+  * anything else is implemented as exit(1) */
+@@ -513,12 +514,15 @@ static uint32_t gdb_flenfn(ARMCPU *cpu, GuestFD *gf)
+ #define SHFB_MAGIC_2 0x46
+ #define SHFB_MAGIC_3 0x42
+ 
++/* Feature bits reportable in feature byte 0 */
++#define SH_EXT_EXIT_EXTENDED (1 << 0)
 +
-+#include "qemu/osdep.h"
-+
-+#include "cpu.h"
-+#include "hw/irq.h"
-+#include "hw/sysbus.h"
-+#include "sysemu/sysemu.h"
-+#include "exec/exec-all.h"
-+#include "exec/cpu_ldst.h"
-+#include "exec/helper-proto.h"
-+#include "exec/ioport.h"
-+#include "qemu/host-utils.h"
-+#include "qemu/error-report.h"
-+
-+bool avr_cpu_exec_interrupt(CPUState *cs, int interrupt_request)
-+{
-+    bool ret = false;
-+    CPUClass *cc = CPU_GET_CLASS(cs);
-+    AVRCPU *cpu = AVR_CPU(cs);
-+    CPUAVRState *env = &cpu->env;
-+
-+    if (interrupt_request & CPU_INTERRUPT_RESET) {
-+        if (cpu_interrupts_enabled(env)) {
-+            cs->exception_index = EXCP_RESET;
-+            cc->do_interrupt(cs);
-+
-+            cs->interrupt_request &= ~CPU_INTERRUPT_RESET;
-+
-+            ret = true;
-+        }
-+    }
-+    if (interrupt_request & CPU_INTERRUPT_HARD) {
-+        if (cpu_interrupts_enabled(env) && env->intsrc != 0) {
-+            int index = ctz32(env->intsrc);
-+            cs->exception_index = EXCP_INT(index);
-+            cc->do_interrupt(cs);
-+
-+            env->intsrc &= env->intsrc - 1; /* clear the interrupt */
-+            cs->interrupt_request &= ~CPU_INTERRUPT_HARD;
-+
-+            ret = true;
-+        }
-+    }
-+    return ret;
-+}
-+
-+void avr_cpu_do_interrupt(CPUState *cs)
-+{
-+    AVRCPU *cpu = AVR_CPU(cs);
-+    CPUAVRState *env = &cpu->env;
-+
-+    uint32_t ret = env->pc_w;
-+    int vector = 0;
-+    int size = avr_feature(env, AVR_FEATURE_JMP_CALL) ? 2 : 1;
-+    int base = 0;
-+
-+    if (cs->exception_index == EXCP_RESET) {
-+        vector = 0;
-+    } else if (env->intsrc != 0) {
-+        vector = ctz32(env->intsrc) + 1;
-+    }
-+
-+    if (avr_feature(env, AVR_FEATURE_3_BYTE_PC)) {
-+        cpu_stb_data(env, env->sp--, (ret & 0x0000ff));
-+        cpu_stb_data(env, env->sp--, (ret & 0x00ff00) >> 8);
-+        cpu_stb_data(env, env->sp--, (ret & 0xff0000) >> 16);
-+    } else if (avr_feature(env, AVR_FEATURE_2_BYTE_PC)) {
-+        cpu_stb_data(env, env->sp--, (ret & 0x0000ff));
-+        cpu_stb_data(env, env->sp--, (ret & 0x00ff00) >> 8);
-+    } else {
-+        cpu_stb_data(env, env->sp--, (ret & 0x0000ff));
-+    }
-+
-+    env->pc_w = base + vector * size;
-+    env->sregI = 0; /* clear Global Interrupt Flag */
-+
-+    cs->exception_index = -1;
-+}
-+
-+int avr_cpu_memory_rw_debug(CPUState *cs, vaddr addr, uint8_t *buf,
-+                                int len, bool is_write)
-+{
-+    return cpu_memory_rw_debug(cs, addr, buf, len, is_write);
-+}
-+
-+hwaddr avr_cpu_get_phys_page_debug(CPUState *cs, vaddr addr)
-+{
-+    return addr; /* I assume 1:1 address correspondance */
-+}
-+
-+int avr_cpu_handle_mmu_fault(
-+    CPUState *cs, vaddr address, int size, int rw, int mmu_idx)
-+{
-+    /* currently it's assumed that this will never happen */
-+    cs->exception_index = EXCP_DEBUG;
-+    cpu_dump_state(cs, stderr, 0);
-+    return 1;
-+}
-+
-+bool avr_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
-+                        MMUAccessType access_type, int mmu_idx,
-+                        bool probe, uintptr_t retaddr)
-+{
-+    int prot = 0;
-+    MemTxAttrs attrs = {};
-+    uint32_t paddr;
-+
-+    address &= TARGET_PAGE_MASK;
-+
-+    if (mmu_idx == MMU_CODE_IDX) {
-+        /* access to code in flash */
-+        paddr = OFFSET_CODE + address;
-+        prot = PAGE_READ | PAGE_EXEC;
-+        if (paddr + TARGET_PAGE_SIZE > OFFSET_DATA) {
-+            error_report("execution left flash memory");
-+            exit(1);
-+        }
-+    } else if (address < NO_CPU_REGISTERS + NO_IO_REGISTERS) {
-+        /*
-+         * access to CPU registers, exit and rebuilt this TB to use full access
-+         * incase it touches specially handled registers like SREG or SP
-+         */
-+        AVRCPU *cpu = AVR_CPU(cs);
-+        CPUAVRState *env = &cpu->env;
-+        env->fullacc = 1;
-+        cpu_loop_exit_restore(cs, retaddr);
-+    } else {
-+        /* access to memory. nothing special */
-+        paddr = OFFSET_DATA + address;
-+        prot = PAGE_READ | PAGE_WRITE;
-+    }
-+
-+    tlb_set_page_with_attrs(
-+        cs, address, paddr, attrs, prot, mmu_idx, TARGET_PAGE_SIZE);
-+
-+    return true;
-+}
-+
-+void helper_sleep(CPUAVRState *env)
-+{
-+    CPUState *cs = env_cpu(env);
-+
-+    cs->exception_index = EXCP_HLT;
-+    cpu_loop_exit(cs);
-+}
-+
-+void helper_unsupported(CPUAVRState *env)
-+{
-+    CPUState *cs = env_cpu(env);
-+
-+    /*
-+     *  I count not find what happens on the real platform, so
-+     *  it's EXCP_DEBUG for meanwhile
-+     */
-+    cs->exception_index = EXCP_DEBUG;
-+    if (qemu_loglevel_mask(LOG_UNIMP)) {
-+        qemu_log("UNSUPPORTED\n");
-+        cpu_dump_state(cs, qemu_logfile, 0);
-+    }
-+    cpu_loop_exit(cs);
-+}
-+
-+void helper_debug(CPUAVRState *env)
-+{
-+    CPUState *cs = env_cpu(env);
-+
-+    cs->exception_index = EXCP_DEBUG;
-+    cpu_loop_exit(cs);
-+}
-+
-+void helper_break(CPUAVRState *env)
-+{
-+    CPUState *cs = env_cpu(env);
-+
-+    cs->exception_index = EXCP_DEBUG;
-+    cpu_loop_exit(cs);
-+}
-+
-+void helper_wdr(CPUAVRState *env)
-+{
-+    CPUState *cs = env_cpu(env);
-+
-+    /* WD is not implemented yet, placeholder */
-+    cs->exception_index = EXCP_DEBUG;
-+    cpu_loop_exit(cs);
-+}
-+
-+/*
-+ * This function implements IN instruction
-+ *
-+ * It does the following
-+ * a.  if an IO register belongs to CPU, its value is read and returned
-+ * b.  otherwise io address is translated to mem address and physical memory
-+ *     is read.
-+ * c.  it caches the value for sake of SBI, SBIC, SBIS & CBI implementation
-+ *
-+ */
-+target_ulong helper_inb(CPUAVRState *env, uint32_t port)
-+{
-+    target_ulong data = 0;
-+
-+    switch (port) {
-+    case 0x38: /* RAMPD */
-+        data = 0xff & (env->rampD >> 16);
-+        break;
-+    case 0x39: /* RAMPX */
-+        data = 0xff & (env->rampX >> 16);
-+        break;
-+    case 0x3a: /* RAMPY */
-+        data = 0xff & (env->rampY >> 16);
-+        break;
-+    case 0x3b: /* RAMPZ */
-+        data = 0xff & (env->rampZ >> 16);
-+        break;
-+    case 0x3c: /* EIND */
-+        data = 0xff & (env->eind >> 16);
-+        break;
-+    case 0x3d: /* SPL */
-+        data = env->sp & 0x00ff;
-+        break;
-+    case 0x3e: /* SPH */
-+        data = env->sp >> 8;
-+        break;
-+    case 0x3f: /* SREG */
-+        data = cpu_get_sreg(env);
-+        break;
-+    default:
-+        /* not a special register, pass to normal memory access */
-+        cpu_physical_memory_read(OFFSET_IO_REGISTERS + port, &data, 1);
-+    }
-+
-+    return data;
-+}
-+
-+/*
-+ *  This function implements OUT instruction
-+ *
-+ *  It does the following
-+ *  a.  if an IO register belongs to CPU, its value is written into the register
-+ *  b.  otherwise io address is translated to mem address and physical memory
-+ *      is written.
-+ *  c.  it caches the value for sake of SBI, SBIC, SBIS & CBI implementation
-+ *
-+ */
-+void helper_outb(CPUAVRState *env, uint32_t port, uint32_t data)
-+{
-+    data &= 0x000000ff;
-+
-+    switch (port) {
-+    case 0x38: /* RAMPD */
-+        if (avr_feature(env, AVR_FEATURE_RAMPD)) {
-+            env->rampD = (data & 0xff) << 16;
-+        }
-+        break;
-+    case 0x39: /* RAMPX */
-+        if (avr_feature(env, AVR_FEATURE_RAMPX)) {
-+            env->rampX = (data & 0xff) << 16;
-+        }
-+        break;
-+    case 0x3a: /* RAMPY */
-+        if (avr_feature(env, AVR_FEATURE_RAMPY)) {
-+            env->rampY = (data & 0xff) << 16;
-+        }
-+        break;
-+    case 0x3b: /* RAMPZ */
-+        if (avr_feature(env, AVR_FEATURE_RAMPZ)) {
-+            env->rampZ = (data & 0xff) << 16;
-+        }
-+        break;
-+    case 0x3c: /* EIDN */
-+        env->eind = (data & 0xff) << 16;
-+        break;
-+    case 0x3d: /* SPL */
-+        env->sp = (env->sp & 0xff00) | (data);
-+        break;
-+    case 0x3e: /* SPH */
-+        if (avr_feature(env, AVR_FEATURE_2_BYTE_SP)) {
-+            env->sp = (env->sp & 0x00ff) | (data << 8);
-+        }
-+        break;
-+    case 0x3f: /* SREG */
-+        cpu_set_sreg(env, data);
-+        break;
-+    default:
-+        /* not a special register, pass to normal memory access */
-+        cpu_physical_memory_write(OFFSET_IO_REGISTERS + port, &data, 1);
-+    }
-+}
-+
-+/*
-+ *  this function implements LD instruction when there is a posibility to read
-+ *  from a CPU register
-+ */
-+target_ulong helper_fullrd(CPUAVRState *env, uint32_t addr)
-+{
-+    uint8_t data;
-+
-+    env->fullacc = false;
-+
-+    if (addr < NO_CPU_REGISTERS) {
-+        /* CPU registers */
-+        data = env->r[addr];
-+    } else if (addr < NO_CPU_REGISTERS + NO_IO_REGISTERS) {
-+        /* IO registers */
-+        data = helper_inb(env, addr - NO_CPU_REGISTERS);
-+    } else {
-+        /* memory */
-+        cpu_physical_memory_read(OFFSET_DATA + addr, &data, 1);
-+    }
-+    return data;
-+}
-+
-+/*
-+ *  this function implements ST instruction when there is a posibility to write
-+ *  into a CPU register
-+ */
-+void helper_fullwr(CPUAVRState *env, uint32_t data, uint32_t addr)
-+{
-+    env->fullacc = false;
-+
-+    /* Following logic assumes this: */
-+    assert(OFFSET_CPU_REGISTERS == OFFSET_DATA);
-+    assert(OFFSET_IO_REGISTERS == OFFSET_CPU_REGISTERS + NO_CPU_REGISTERS);
-+
-+    if (addr < NO_CPU_REGISTERS) {
-+        /* CPU registers */
-+        env->r[addr] = data;
-+    } else if (addr < NO_CPU_REGISTERS + NO_IO_REGISTERS) {
-+        /* IO registers */
-+        helper_outb(env, addr - NO_CPU_REGISTERS, data);
-+    } else {
-+        /* memory */
-+        cpu_physical_memory_write(OFFSET_DATA + addr, &data, 1);
-+    }
-+}
-diff --git a/target/avr/helper.h b/target/avr/helper.h
-new file mode 100644
-index 0000000000..bf087504a8
---- /dev/null
-+++ b/target/avr/helper.h
-@@ -0,0 +1,29 @@
-+/*
-+ * QEMU AVR CPU
-+ *
-+ * Copyright (c) 2019 Michael Rolnik
-+ *
-+ * This library is free software; you can redistribute it and/or
-+ * modify it under the terms of the GNU Lesser General Public
-+ * License as published by the Free Software Foundation; either
-+ * version 2.1 of the License, or (at your option) any later version.
-+ *
-+ * This library is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+ * Lesser General Public License for more details.
-+ *
-+ * You should have received a copy of the GNU Lesser General Public
-+ * License along with this library; if not, see
-+ * <http://www.gnu.org/licenses/lgpl-2.1.html>
-+ */
-+
-+DEF_HELPER_1(wdr, void, env)
-+DEF_HELPER_1(debug, void, env)
-+DEF_HELPER_1(break, void, env)
-+DEF_HELPER_1(sleep, void, env)
-+DEF_HELPER_1(unsupported, void, env)
-+DEF_HELPER_3(outb, void, env, i32, i32)
-+DEF_HELPER_2(inb, tl, env, i32)
-+DEF_HELPER_3(fullwr, void, env, i32, i32)
-+DEF_HELPER_2(fullrd, tl, env, i32)
+ static const uint8_t featurefile_data[] = {
+     SHFB_MAGIC_0,
+     SHFB_MAGIC_1,
+     SHFB_MAGIC_2,
+     SHFB_MAGIC_3,
+-    0, /* Feature byte 0 */
++    SH_EXT_EXIT_EXTENDED, /* Feature byte 0 */
+ };
+ 
+ static void init_featurefile_guestfd(int guestfd)
+@@ -1042,11 +1046,14 @@ target_ulong do_arm_semihosting(CPUARMState *env)
+             return 0;
+         }
+     case TARGET_SYS_EXIT:
+-        if (is_a64(env)) {
++    case TARGET_SYS_EXIT_EXTENDED:
++        if (nr == TARGET_SYS_EXIT_EXTENDED || is_a64(env)) {
+             /*
+-             * The A64 version of this call takes a parameter block,
++             * The A64 version of SYS_EXIT takes a parameter block,
+              * so the application-exit type can return a subcode which
+              * is the exit status code from the application.
++             * SYS_EXIT_EXTENDED is an a new-in-v2.0 optional function
++             * which allows A32/T32 guests to also provide a status code.
+              */
+             GET_ARG(0);
+             GET_ARG(1);
+@@ -1058,8 +1065,10 @@ target_ulong do_arm_semihosting(CPUARMState *env)
+             }
+         } else {
+             /*
+-             * ARM specifies only Stopped_ApplicationExit as normal
+-             * exit, everything else is considered an error
++             * The A32/T32 version of SYS_EXIT specifies only
++             * Stopped_ApplicationExit as normal exit, but does not
++             * allow the guest to specify the exit status code.
++             * Everything else is considered an error.
+              */
+             ret = (args == ADP_Stopped_ApplicationExit) ? 0 : 1;
+         }
 -- 
-2.17.2 (Apple Git-113)
+2.20.1
 
 
