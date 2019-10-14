@@ -2,92 +2,87 @@ Return-Path: <SRS0=PUPy=YH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.3 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 79F87C4CECE
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 16:53:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CF6BCC4CECE
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 16:54:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 51FAD2067B
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 16:53:22 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 51FAD2067B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 9E13720854
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 16:54:04 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="jWB+94uj"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9E13720854
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53758 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53770 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iK3ay-0007DV-Ro
-	for qemu-devel@archiver.kernel.org; Mon, 14 Oct 2019 12:53:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37579)
+	id 1iK3bf-0008Us-BQ
+	for qemu-devel@archiver.kernel.org; Mon, 14 Oct 2019 12:54:03 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37476)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1iK2r1-0005i1-TD
- for qemu-devel@nongnu.org; Mon, 14 Oct 2019 12:05:54 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1iK2qr-0005SI-FA
+ for qemu-devel@nongnu.org; Mon, 14 Oct 2019 12:05:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1iK2r0-0008LR-Pt
- for qemu-devel@nongnu.org; Mon, 14 Oct 2019 12:05:51 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:52574)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iK2r0-0008KK-9h
- for qemu-devel@nongnu.org; Mon, 14 Oct 2019 12:05:50 -0400
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69])
- (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 6C6E844BCF
- for <qemu-devel@nongnu.org>; Mon, 14 Oct 2019 16:05:49 +0000 (UTC)
-Received: by mail-wm1-f69.google.com with SMTP id p6so4317219wmc.3
- for <qemu-devel@nongnu.org>; Mon, 14 Oct 2019 09:05:49 -0700 (PDT)
+ (envelope-from <peter.maydell@linaro.org>) id 1iK2qq-0008Em-1d
+ for qemu-devel@nongnu.org; Mon, 14 Oct 2019 12:05:41 -0400
+Received: from mail-wm1-x32c.google.com ([2a00:1450:4864:20::32c]:56000)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1iK2qp-0008EF-RA
+ for qemu-devel@nongnu.org; Mon, 14 Oct 2019 12:05:39 -0400
+Received: by mail-wm1-x32c.google.com with SMTP id a6so17835739wma.5
+ for <qemu-devel@nongnu.org>; Mon, 14 Oct 2019 09:05:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:subject:date:message-id:in-reply-to:references:mime-version
+ :content-transfer-encoding;
+ bh=KXSQWrkgVKujQgWAmEV6JwKVKd1aFY1WSRQmmAz+nVY=;
+ b=jWB+94ujTc439fKVKwSIrrowL/39fs3zOhGyba2gJcdpgiVi1rY3pOYxhnTo2BoZKM
+ mNPiFP76lMQUW40yviUDrbdSRKbbc/2BL29u3Xp0fTfTl3xqwYncLnpzAEQQOdpYvPCe
+ bmvg8y9TscUZOcUdRRmh7Rgt0ZII+4bBgbdCdyKBqv60O1WDk2sbpNMXp7D9XAxfEtqY
+ QKY1/7VFWaSu2XGWqzStqd9SqlKG/69oxGdJYt4bJXn+Ub1bGmFrfXQoKkLdgEV9IP+C
+ Umvx574AYRPRRJIwT8ziK4FfwP2drWhjCWdFGy8dFcqeApmntoR+FUPpmtpJxN9CTb4r
+ KlRQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=HdJ94zX4oy8GaxZqeQPCzhPobj+nrIWTF4qRdELQvNo=;
- b=pjhIqEQEBXLj0BM/X7v17+JWwUKD328/hzWhm3I/zwItd8XpUSYIGnRHR1g5AaONg5
- azRKiy/3kZaiR/zmOrdg+hnCKlMzcCaAvP5b0pa+kzuh5W2o0Xx78MKaJTDvmCpD6BX2
- 9nJJFJLUgIsTkRa+E5QZDc1+3opMJBN/fjaqn6nsh2jI++4kBuwxLzX6xCrRzHKnEA8k
- IfuzafQIImmiXKelH9YsSYEm6Kjp5w3QoJBHeinxkaLuP47IwDBxwjFEbfykJAyGzDNW
- VGHiKASqj/I8UkTaQu3ohY8FWayU59Im/mRle4KCZ4ySGfxCkpIA31yJGmMB0KNOZMIc
- ZBKQ==
-X-Gm-Message-State: APjAAAW5Ep95Umk/yjtdG2l6cLJMiy18lvRaJcwGSSJq9kcfW+AYY9NX
- OtFoy+fLomCQJbD5K3cQjLDwT2W9eoN83I750zFRIb1JOdYoTgduxoIwJDZPBk0BmxlOBwzUxl9
- /1zohLuMSKzCmWgI=
-X-Received: by 2002:a05:600c:34b:: with SMTP id
- u11mr15140204wmd.172.1571069148150; 
- Mon, 14 Oct 2019 09:05:48 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqwHinBJX5bl0nkJ6gJ5Xer/2lcmhcuCkCqNTk+fV6coc85MPVDkBBCRe03OMOJMDYmehrnrSg==
-X-Received: by 2002:a05:600c:34b:: with SMTP id
- u11mr15140180wmd.172.1571069147963; 
- Mon, 14 Oct 2019 09:05:47 -0700 (PDT)
-Received: from [192.168.1.35] (46.red-83-42-66.dynamicip.rima-tde.net.
- [83.42.66.46])
- by smtp.gmail.com with ESMTPSA id n3sm9218434wrr.50.2019.10.14.09.05.46
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Mon, 14 Oct 2019 09:05:47 -0700 (PDT)
-Subject: Re: [PATCH 08/19] hw/misc/bcm2835_thermal: Add a dummy BCM2835
- thermal sensor
-To: Peter Maydell <peter.maydell@linaro.org>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-References: <20190926173428.10713-1-f4bug@amsat.org>
- <20190926173428.10713-9-f4bug@amsat.org>
- <CAFEAcA-2SCsRepsERqGWD-4AYy=uxb7Y2eW2F_z45tyo0Yx-fw@mail.gmail.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <c76bdafa-c00c-af72-549d-dd3706200401@redhat.com>
-Date: Mon, 14 Oct 2019 18:05:46 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.0
+ h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=KXSQWrkgVKujQgWAmEV6JwKVKd1aFY1WSRQmmAz+nVY=;
+ b=Q7ESrBrrW6G1yS+98NwMJECx3VaRlpKdSKp/kLRYIUSMeUlIkm5QHJZjcSvaQ/Polv
+ OQEPaR5jlj77PR3dSK6cOmFA1Zx+VFFKlwpYa7WPNlZcynT8bFpILBOzYH9OCgFtap5m
+ tmEsNbxng/HiNjFKCuv6rX66m5vhcawuv3TJNn4p3DIJ+Zs/BTX119nPqYs87XUY3Nu5
+ qN0KkqurjI7xQkw7djETIjGyErm/+w6a78Uc2iA3Fjg9oseU50kvVtRaWKT2AKWrdY5q
+ FiZGTFqOw/OQmk/aLYU4rGAMHKPplDqEp8+meTnqvRjKHk2vs3grgtxlwci7OHxFY1mO
+ E1Og==
+X-Gm-Message-State: APjAAAWeAqmfLBMQQh9kiqdmmwWZXqYzAS4F8EAO+FEMfkhR4D4BZ7hb
+ a9EY+YgIB0CNA3LhUrOyiMF2TxQZfAOJfw==
+X-Google-Smtp-Source: APXvYqyN3qLuRVLFt5DH26dgz0LAFbgQbK0iAo+6frXhRnmGkjrVcrX+5giQawTTybn7lcV5nm1BZA==
+X-Received: by 2002:a1c:4456:: with SMTP id r83mr15561509wma.44.1571069138442; 
+ Mon, 14 Oct 2019 09:05:38 -0700 (PDT)
+Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
+ by smtp.gmail.com with ESMTPSA id 5sm18029779wrk.86.2019.10.14.09.05.37
+ for <qemu-devel@nongnu.org>
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 14 Oct 2019 09:05:37 -0700 (PDT)
+From: Peter Maydell <peter.maydell@linaro.org>
+To: qemu-devel@nongnu.org
+Subject: [PULL 60/68] aspeed: Parameterise number of MACs
+Date: Mon, 14 Oct 2019 17:03:56 +0100
+Message-Id: <20191014160404.19553-61-peter.maydell@linaro.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20191014160404.19553-1-peter.maydell@linaro.org>
+References: <20191014160404.19553-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA-2SCsRepsERqGWD-4AYy=uxb7Y2eW2F_z45tyo0Yx-fw@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.132.183.28
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::32c
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,58 +94,147 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?Q?Zolt=c3=a1n_Baldaszti?= <bztemail@gmail.com>,
- Laurent Bonnans <laurent.bonnans@here.com>,
- Esteban Bosse <estebanbosse@gmail.com>,
- Alistair Francis <alistair@alistair23.me>,
- QEMU Developers <qemu-devel@nongnu.org>,
- Andrew Baumann <Andrew.Baumann@microsoft.com>,
- =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
- qemu-arm <qemu-arm@nongnu.org>,
- Clement Deschamps <clement.deschamps@antfield.fr>,
- Cleber Rosa <crosa@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Cheng Xiang <ext-cheng.xiang@here.com>, Pekka Enberg <penberg@iki.fi>,
- Guenter Roeck <linux@roeck-us.net>, Eduardo Habkost <ehabkost@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 10/14/19 5:37 PM, Peter Maydell wrote:
-> On Thu, 26 Sep 2019 at 18:34, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.=
-org> wrote:
->>
->> We will soon implement the SYS_timer. This timer is used by Linux
->> in the thermal subsystem, so once available, the subsystem will be
->> enabled and poll the temperature sensors. We need to provide the
->> minimum required to keep Linux booting.
->>
->> Add a dummy thermal sensor returning ~25=C2=B0C based on:
->> https://github.com/raspberrypi/linux/blob/rpi-5.3.y/drivers/thermal/br=
-oadcom/bcm2835_thermal.c
->>
->> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
->> ---
->> checkpatch warning:
->> WARNING: added, moved or deleted file(s), does MAINTAINERS need updati=
-ng?
->> This is OK because the regex are:
->>
->>    F: hw/*/bcm283*
->>    F: include/hw/*/bcm283*
->=20
->> +static void bcm2835_thermal_class_init(ObjectClass *klass, void *data=
-)
->> +{
->> +    DeviceClass *dc =3D DEVICE_CLASS(klass);
->> +
->> +    dc->realize =3D bcm2835_thermal_realize;
->> +}
->=20
-> This is missing the vmsd and reset function.
+From: Joel Stanley <joel@jms.id.au>
 
-Ah correct, I forgot about the Bcm2835ThermalState::ctl field.
+To support the ast2600's four MACs allow SoCs to specify the number
+they have, and create that many.
 
-Thanks!
+Signed-off-by: Joel Stanley <joel@jms.id.au>
+Signed-off-by: Cédric Le Goater <clg@kaod.org>
+Message-id: 20190925143248.10000-22-clg@kaod.org
+[clg: - included a check on sc->macs_num when realizing the macs
+      - included interrupt definitions for the AST2600 ]
+Signed-off-by: Cédric Le Goater <clg@kaod.org>
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+---
+ include/hw/arm/aspeed_soc.h |  5 ++++-
+ hw/arm/aspeed_ast2600.c     | 10 ++++++++--
+ hw/arm/aspeed_soc.c         |  6 ++++--
+ 3 files changed, 16 insertions(+), 5 deletions(-)
 
-Phil.
+diff --git a/include/hw/arm/aspeed_soc.h b/include/hw/arm/aspeed_soc.h
+index 67c59956f83..088a5d10818 100644
+--- a/include/hw/arm/aspeed_soc.h
++++ b/include/hw/arm/aspeed_soc.h
+@@ -30,7 +30,7 @@
+ #define ASPEED_SPIS_NUM  2
+ #define ASPEED_WDTS_NUM  4
+ #define ASPEED_CPUS_NUM  2
+-#define ASPEED_MACS_NUM  2
++#define ASPEED_MACS_NUM  4
+ 
+ typedef struct AspeedSoCState {
+     /*< private >*/
+@@ -69,6 +69,7 @@ typedef struct AspeedSoCClass {
+     uint64_t sram_size;
+     int spis_num;
+     int wdts_num;
++    int macs_num;
+     const int *irqmap;
+     const hwaddr *memmap;
+     uint32_t num_cpus;
+@@ -114,6 +115,8 @@ enum {
+     ASPEED_I2C,
+     ASPEED_ETH1,
+     ASPEED_ETH2,
++    ASPEED_ETH3,
++    ASPEED_ETH4,
+     ASPEED_SDRAM,
+     ASPEED_XDMA,
+ };
+diff --git a/hw/arm/aspeed_ast2600.c b/hw/arm/aspeed_ast2600.c
+index a4f0fafab7c..25d2c2d05d6 100644
+--- a/hw/arm/aspeed_ast2600.c
++++ b/hw/arm/aspeed_ast2600.c
+@@ -32,7 +32,9 @@ static const hwaddr aspeed_soc_ast2600_memmap[] = {
+     [ASPEED_SPI1]      = 0x1E630000,
+     [ASPEED_SPI2]      = 0x1E641000,
+     [ASPEED_ETH1]      = 0x1E660000,
++    [ASPEED_ETH3]      = 0x1E670000,
+     [ASPEED_ETH2]      = 0x1E680000,
++    [ASPEED_ETH4]      = 0x1E690000,
+     [ASPEED_VIC]       = 0x1E6C0000,
+     [ASPEED_SDMC]      = 0x1E6E0000,
+     [ASPEED_SCU]       = 0x1E6E2000,
+@@ -88,6 +90,9 @@ static const int aspeed_soc_ast2600_irqmap[] = {
+     [ASPEED_I2C]       = 110,   /* 110 -> 125 */
+     [ASPEED_ETH1]      = 2,
+     [ASPEED_ETH2]      = 3,
++    [ASPEED_ETH3]      = 32,
++    [ASPEED_ETH4]      = 33,
++
+ };
+ 
+ static qemu_irq aspeed_soc_get_irq(AspeedSoCState *s, int ctrl)
+@@ -173,7 +178,7 @@ static void aspeed_soc_ast2600_init(Object *obj)
+                                        OBJECT(&s->scu), &error_abort);
+     }
+ 
+-    for (i = 0; i < ASPEED_MACS_NUM; i++) {
++    for (i = 0; i < sc->macs_num; i++) {
+         sysbus_init_child_obj(obj, "ftgmac100[*]", OBJECT(&s->ftgmac100[i]),
+                               sizeof(s->ftgmac100[i]), TYPE_FTGMAC100);
+     }
+@@ -397,7 +402,7 @@ static void aspeed_soc_ast2600_realize(DeviceState *dev, Error **errp)
+     }
+ 
+     /* Net */
+-    for (i = 0; i < nb_nics; i++) {
++    for (i = 0; i < nb_nics && i < sc->macs_num; i++) {
+         qdev_set_nic_properties(DEVICE(&s->ftgmac100[i]), &nd_table[i]);
+         object_property_set_bool(OBJECT(&s->ftgmac100[i]), true, "aspeed",
+                                  &err);
+@@ -470,6 +475,7 @@ static void aspeed_soc_ast2600_class_init(ObjectClass *oc, void *data)
+     sc->sram_size    = 0x10000;
+     sc->spis_num     = 2;
+     sc->wdts_num     = 4;
++    sc->macs_num     = 4;
+     sc->irqmap       = aspeed_soc_ast2600_irqmap;
+     sc->memmap       = aspeed_soc_ast2600_memmap;
+     sc->num_cpus     = 2;
+diff --git a/hw/arm/aspeed_soc.c b/hw/arm/aspeed_soc.c
+index a063be9fd79..6defb143acd 100644
+--- a/hw/arm/aspeed_soc.c
++++ b/hw/arm/aspeed_soc.c
+@@ -198,7 +198,7 @@ static void aspeed_soc_init(Object *obj)
+                                        OBJECT(&s->scu), &error_abort);
+     }
+ 
+-    for (i = 0; i < ASPEED_MACS_NUM; i++) {
++    for (i = 0; i < sc->macs_num; i++) {
+         sysbus_init_child_obj(obj, "ftgmac100[*]", OBJECT(&s->ftgmac100[i]),
+                               sizeof(s->ftgmac100[i]), TYPE_FTGMAC100);
+     }
+@@ -372,7 +372,7 @@ static void aspeed_soc_realize(DeviceState *dev, Error **errp)
+     }
+ 
+     /* Net */
+-    for (i = 0; i < nb_nics; i++) {
++    for (i = 0; i < nb_nics && i < sc->macs_num; i++) {
+         qdev_set_nic_properties(DEVICE(&s->ftgmac100[i]), &nd_table[i]);
+         object_property_set_bool(OBJECT(&s->ftgmac100[i]), true, "aspeed",
+                                  &err);
+@@ -455,6 +455,7 @@ static void aspeed_soc_ast2400_class_init(ObjectClass *oc, void *data)
+     sc->sram_size    = 0x8000;
+     sc->spis_num     = 1;
+     sc->wdts_num     = 2;
++    sc->macs_num     = 2;
+     sc->irqmap       = aspeed_soc_ast2400_irqmap;
+     sc->memmap       = aspeed_soc_ast2400_memmap;
+     sc->num_cpus     = 1;
+@@ -478,6 +479,7 @@ static void aspeed_soc_ast2500_class_init(ObjectClass *oc, void *data)
+     sc->sram_size    = 0x9000;
+     sc->spis_num     = 2;
+     sc->wdts_num     = 3;
++    sc->macs_num     = 2;
+     sc->irqmap       = aspeed_soc_ast2500_irqmap;
+     sc->memmap       = aspeed_soc_ast2500_memmap;
+     sc->num_cpus     = 1;
+-- 
+2.20.1
+
 
