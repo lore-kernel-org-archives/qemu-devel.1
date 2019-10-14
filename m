@@ -6,45 +6,45 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 012D2C4CECE
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 12:20:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4585FC4CECE
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 12:22:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BE13D2084B
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 12:20:52 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BE13D2084B
+	by mail.kernel.org (Postfix) with ESMTPS id 0F2CF217D9
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 12:22:38 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0F2CF217D9
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=users.sourceforge.jp
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48802 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48842 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iJzLH-000393-Ss
-	for qemu-devel@archiver.kernel.org; Mon, 14 Oct 2019 08:20:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53501)
+	id 1iJzMz-0005Ez-9n
+	for qemu-devel@archiver.kernel.org; Mon, 14 Oct 2019 08:22:37 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53511)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <ysato@users.sourceforge.jp>) id 1iJyzN-0005Sy-5t
+ (envelope-from <ysato@users.sourceforge.jp>) id 1iJyzN-0005Tg-Mw
  for qemu-devel@nongnu.org; Mon, 14 Oct 2019 07:58:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <ysato@users.sourceforge.jp>) id 1iJyzI-0003Ul-Io
+ (envelope-from <ysato@users.sourceforge.jp>) id 1iJyzI-0003Uq-JE
  for qemu-devel@nongnu.org; Mon, 14 Oct 2019 07:58:13 -0400
-Received: from mail03.asahi-net.or.jp ([202.224.55.15]:35687)
+Received: from mail03.asahi-net.or.jp ([202.224.55.15]:35683)
  by eggs.gnu.org with esmtp (Exim 4.71)
- (envelope-from <ysato@users.sourceforge.jp>) id 1iJyzI-0003SD-4w
+ (envelope-from <ysato@users.sourceforge.jp>) id 1iJyzI-0003RR-5b
  for qemu-devel@nongnu.org; Mon, 14 Oct 2019 07:58:08 -0400
 Received: from h61-195-96-97.vps.ablenet.jp (h61-195-96-97.ablenetvps.ne.jp
  [61.195.96.97]) (Authenticated sender: PQ4Y-STU)
- by mail03.asahi-net.or.jp (Postfix) with ESMTPA id 3E82E6DCF8;
- Mon, 14 Oct 2019 20:58:06 +0900 (JST)
+ by mail03.asahi-net.or.jp (Postfix) with ESMTPA id CB82A75C9A;
+ Mon, 14 Oct 2019 20:58:05 +0900 (JST)
 Received: from yo-satoh-debian.localdomain (ZM005235.ppp.dion.ne.jp
  [222.8.5.235])
- by h61-195-96-97.vps.ablenet.jp (Postfix) with ESMTPSA id C99AD24008F;
+ by h61-195-96-97.vps.ablenet.jp (Postfix) with ESMTPSA id 630F224008E;
  Mon, 14 Oct 2019 20:58:05 +0900 (JST)
 From: Yoshinori Sato <ysato@users.sourceforge.jp>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v26 06/21] target/rx: CPU definition
-Date: Mon, 14 Oct 2019 20:57:42 +0900
-Message-Id: <20191014115757.51866-7-ysato@users.sourceforge.jp>
+Subject: [PATCH v26 05/21] target/rx: TCG helper
+Date: Mon, 14 Oct 2019 20:57:41 +0900
+Message-Id: <20191014115757.51866-6-ysato@users.sourceforge.jp>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20191014115757.51866-1-ysato@users.sourceforge.jp>
 References: <20191014115757.51866-1-ysato@users.sourceforge.jp>
@@ -66,330 +66,78 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Richard Henderson <richard.henderson@linaro.org>, philmd@redhat.com,
- Yoshinori Sato <ysato@users.sourceforge.jp>,
- Igor Mammedov <imammedo@redhat.com>
+ Yoshinori Sato <ysato@users.sourceforge.jp>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 Signed-off-by: Yoshinori Sato <ysato@users.sourceforge.jp>
 
-Message-Id: <20190616142836.10614-4-ysato@users.sourceforge.jp>
+Message-Id: <20190616142836.10614-3-ysato@users.sourceforge.jp>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Message-Id: <20190607091116.49044-4-ysato@users.sourceforge.jp>
+Message-Id: <20190607091116.49044-3-ysato@users.sourceforge.jp>
+Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-[PMD: Use newer QOM style, split cpu-qom.h, restrict access to
- extable array, use rx_cpu_tlb_fill() extracted from patch of
- Yoshinori Sato 'Convert to CPUClass::tlb_fill']
+[PMD: Removed tlb_fill, extracted from patch of Yoshinori Sato
+ 'Convert to CPUClass::tlb_fill']
 Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-Acked-by: Igor Mammedov <imammedo@redhat.com>
 Signed-off-by: Yoshinori Sato <ysato@users.sourceforge.jp>
 ---
- target/rx/cpu-param.h   |  31 ++++++
- target/rx/cpu-qom.h     |  42 ++++++++
- target/rx/cpu.h         | 181 +++++++++++++++++++++++++++++++++
- target/rx/cpu.c         | 217 ++++++++++++++++++++++++++++++++++++++++
- target/rx/gdbstub.c     | 112 +++++++++++++++++++++
- target/rx/Makefile.objs |   1 -
- 6 files changed, 583 insertions(+), 1 deletion(-)
- create mode 100644 target/rx/cpu-param.h
- create mode 100644 target/rx/cpu-qom.h
- create mode 100644 target/rx/cpu.h
- create mode 100644 target/rx/cpu.c
- create mode 100644 target/rx/gdbstub.c
+ target/rx/helper.h    |  31 +++
+ target/rx/helper.c    | 149 +++++++++++++
+ target/rx/op_helper.c | 470 ++++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 650 insertions(+)
+ create mode 100644 target/rx/helper.h
+ create mode 100644 target/rx/helper.c
+ create mode 100644 target/rx/op_helper.c
 
-diff --git a/target/rx/cpu-param.h b/target/rx/cpu-param.h
+diff --git a/target/rx/helper.h b/target/rx/helper.h
 new file mode 100644
-index 0000000000..5da87fbebe
+index 0000000000..f0b7ebbbf7
 --- /dev/null
-+++ b/target/rx/cpu-param.h
++++ b/target/rx/helper.h
 @@ -0,0 +1,31 @@
++DEF_HELPER_1(raise_illegal_instruction, noreturn, env)
++DEF_HELPER_1(raise_access_fault, noreturn, env)
++DEF_HELPER_1(raise_privilege_violation, noreturn, env)
++DEF_HELPER_1(wait, noreturn, env)
++DEF_HELPER_1(debug, noreturn, env)
++DEF_HELPER_2(rxint, noreturn, env, i32)
++DEF_HELPER_1(rxbrk, noreturn, env)
++DEF_HELPER_FLAGS_3(fadd, TCG_CALL_NO_WG, f32, env, f32, f32)
++DEF_HELPER_FLAGS_3(fsub, TCG_CALL_NO_WG, f32, env, f32, f32)
++DEF_HELPER_FLAGS_3(fmul, TCG_CALL_NO_WG, f32, env, f32, f32)
++DEF_HELPER_FLAGS_3(fdiv, TCG_CALL_NO_WG, f32, env, f32, f32)
++DEF_HELPER_FLAGS_3(fcmp, TCG_CALL_NO_WG, void, env, f32, f32)
++DEF_HELPER_FLAGS_2(ftoi, TCG_CALL_NO_WG, i32, env, f32)
++DEF_HELPER_FLAGS_2(round, TCG_CALL_NO_WG, i32, env, f32)
++DEF_HELPER_FLAGS_2(itof, TCG_CALL_NO_WG, f32, env, i32)
++DEF_HELPER_2(set_fpsw, void, env, i32)
++DEF_HELPER_FLAGS_2(racw, TCG_CALL_NO_WG, void, env, i32)
++DEF_HELPER_FLAGS_2(set_psw_rte, TCG_CALL_NO_WG, void, env, i32)
++DEF_HELPER_FLAGS_2(set_psw, TCG_CALL_NO_WG, void, env, i32)
++DEF_HELPER_1(pack_psw, i32, env)
++DEF_HELPER_FLAGS_3(div, TCG_CALL_NO_WG, i32, env, i32, i32)
++DEF_HELPER_FLAGS_3(divu, TCG_CALL_NO_WG, i32, env, i32, i32)
++DEF_HELPER_FLAGS_1(scmpu, TCG_CALL_NO_WG, void, env)
++DEF_HELPER_1(smovu, void, env)
++DEF_HELPER_1(smovf, void, env)
++DEF_HELPER_1(smovb, void, env)
++DEF_HELPER_2(sstr, void, env, i32)
++DEF_HELPER_FLAGS_2(swhile, TCG_CALL_NO_WG, void, env, i32)
++DEF_HELPER_FLAGS_2(suntil, TCG_CALL_NO_WG, void, env, i32)
++DEF_HELPER_FLAGS_2(rmpa, TCG_CALL_NO_WG, void, env, i32)
++DEF_HELPER_1(satr, void, env)
+diff --git a/target/rx/helper.c b/target/rx/helper.c
+new file mode 100644
+index 0000000000..a34a40af83
+--- /dev/null
++++ b/target/rx/helper.c
+@@ -0,0 +1,149 @@
 +/*
-+ *  RX cpu parameters
++ *  RX emulation
 + *
 + *  Copyright (c) 2019 Yoshinori Sato
-+ *
-+ * This program is free software; you can redistribute it and/or modify =
-it
-+ * under the terms and conditions of the GNU General Public License,
-+ * version 2 or later, as published by the Free Software Foundation.
-+ *
-+ * This program is distributed in the hope it will be useful, but WITHOU=
-T
-+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-+ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License=
- for
-+ * more details.
-+ *
-+ * You should have received a copy of the GNU General Public License alo=
-ng with
-+ * this program.  If not, see <http://www.gnu.org/licenses/>.
-+ */
-+
-+#ifndef RX_CPU_PARAM_H
-+#define RX_CPU_PARAM_H
-+
-+#define TARGET_LONG_BITS 32
-+#define TARGET_PAGE_BITS 12
-+
-+#define TARGET_PHYS_ADDR_SPACE_BITS 32
-+#define TARGET_VIRT_ADDR_SPACE_BITS 32
-+
-+#define NB_MMU_MODES 1
-+#define MMU_MODE0_SUFFIX _all
-+
-+#endif
-diff --git a/target/rx/cpu-qom.h b/target/rx/cpu-qom.h
-new file mode 100644
-index 0000000000..8328900f3f
---- /dev/null
-+++ b/target/rx/cpu-qom.h
-@@ -0,0 +1,42 @@
-+#ifndef QEMU_RX_CPU_QOM_H
-+#define QEMU_RX_CPU_QOM_H
-+
-+#include "hw/core/cpu.h"
-+/*
-+ * RX CPU
-+ *
-+ * Copyright (c) 2019 Yoshinori Sato
-+ * SPDX-License-Identifier: LGPL-2.0+
-+ */
-+
-+#define TYPE_RX_CPU "rx-cpu"
-+
-+#define TYPE_RX62N_CPU RX_CPU_TYPE_NAME("rx62n")
-+
-+#define RXCPU_CLASS(klass) \
-+    OBJECT_CLASS_CHECK(RXCPUClass, (klass), TYPE_RX_CPU)
-+#define RXCPU(obj) \
-+    OBJECT_CHECK(RXCPU, (obj), TYPE_RX_CPU)
-+#define RXCPU_GET_CLASS(obj) \
-+    OBJECT_GET_CLASS(RXCPUClass, (obj), TYPE_RX_CPU)
-+
-+/*
-+ * RXCPUClass:
-+ * @parent_realize: The parent class' realize handler.
-+ * @parent_reset: The parent class' reset handler.
-+ *
-+ * A RX CPU model.
-+ */
-+typedef struct RXCPUClass {
-+    /*< private >*/
-+    CPUClass parent_class;
-+    /*< public >*/
-+
-+    DeviceRealize parent_realize;
-+    void (*parent_reset)(CPUState *cpu);
-+
-+} RXCPUClass;
-+
-+#define CPUArchState struct CPURXState
-+
-+#endif
-diff --git a/target/rx/cpu.h b/target/rx/cpu.h
-new file mode 100644
-index 0000000000..2d1eb7665c
---- /dev/null
-+++ b/target/rx/cpu.h
-@@ -0,0 +1,181 @@
-+/*
-+ *  RX emulation definition
-+ *
-+ *  Copyright (c) 2019 Yoshinori Sato
-+ *
-+ * This program is free software; you can redistribute it and/or modify =
-it
-+ * under the terms and conditions of the GNU General Public License,
-+ * version 2 or later, as published by the Free Software Foundation.
-+ *
-+ * This program is distributed in the hope it will be useful, but WITHOU=
-T
-+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-+ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License=
- for
-+ * more details.
-+ *
-+ * You should have received a copy of the GNU General Public License alo=
-ng with
-+ * this program.  If not, see <http://www.gnu.org/licenses/>.
-+ */
-+
-+#ifndef RX_CPU_H
-+#define RX_CPU_H
-+
-+#include "qemu/bitops.h"
-+#include "qemu-common.h"
-+#include "hw/registerfields.h"
-+#include "cpu-qom.h"
-+
-+#include "exec/cpu-defs.h"
-+
-+/* PSW define */
-+REG32(PSW, 0)
-+FIELD(PSW, C, 0, 1)
-+FIELD(PSW, Z, 1, 1)
-+FIELD(PSW, S, 2, 1)
-+FIELD(PSW, O, 3, 1)
-+FIELD(PSW, I, 16, 1)
-+FIELD(PSW, U, 17, 1)
-+FIELD(PSW, PM, 20, 1)
-+FIELD(PSW, IPL, 24, 4)
-+
-+/* FPSW define */
-+REG32(FPSW, 0)
-+FIELD(FPSW, RM, 0, 2)
-+FIELD(FPSW, CV, 2, 1)
-+FIELD(FPSW, CO, 3, 1)
-+FIELD(FPSW, CZ, 4, 1)
-+FIELD(FPSW, CU, 5, 1)
-+FIELD(FPSW, CX, 6, 1)
-+FIELD(FPSW, CE, 7, 1)
-+FIELD(FPSW, CAUSE, 2, 6)
-+FIELD(FPSW, DN, 8, 1)
-+FIELD(FPSW, EV, 10, 1)
-+FIELD(FPSW, EO, 11, 1)
-+FIELD(FPSW, EZ, 12, 1)
-+FIELD(FPSW, EU, 13, 1)
-+FIELD(FPSW, EX, 14, 1)
-+FIELD(FPSW, ENABLE, 10, 5)
-+FIELD(FPSW, FV, 26, 1)
-+FIELD(FPSW, FO, 27, 1)
-+FIELD(FPSW, FZ, 28, 1)
-+FIELD(FPSW, FU, 29, 1)
-+FIELD(FPSW, FX, 30, 1)
-+FIELD(FPSW, FLAGS, 26, 4)
-+FIELD(FPSW, FS, 31, 1)
-+
-+enum {
-+    NUM_REGS =3D 16,
-+};
-+
-+typedef struct CPURXState {
-+    /* CPU registers */
-+    uint32_t regs[NUM_REGS];    /* general registers */
-+    uint32_t psw_o;             /* O bit of status register */
-+    uint32_t psw_s;             /* S bit of status register */
-+    uint32_t psw_z;             /* Z bit of status register */
-+    uint32_t psw_c;             /* C bit of status register */
-+    uint32_t psw_u;
-+    uint32_t psw_i;
-+    uint32_t psw_pm;
-+    uint32_t psw_ipl;
-+    uint32_t bpsw;              /* backup status */
-+    uint32_t bpc;               /* backup pc */
-+    uint32_t isp;               /* global base register */
-+    uint32_t usp;               /* vector base register */
-+    uint32_t pc;                /* program counter */
-+    uint32_t intb;              /* interrupt vector */
-+    uint32_t fintv;
-+    uint32_t fpsw;
-+    uint64_t acc;
-+
-+    /* Fields up to this point are cleared by a CPU reset */
-+    struct {} end_reset_fields;
-+
-+    /* Internal use */
-+    uint32_t in_sleep;
-+    uint32_t req_irq;           /* Requested interrupt no (hard) */
-+    uint32_t req_ipl;           /* Requested interrupt level */
-+    uint32_t ack_irq;           /* execute irq */
-+    uint32_t ack_ipl;           /* execute ipl */
-+    float_status fp_status;
-+    qemu_irq ack;               /* Interrupt acknowledge */
-+} CPURXState;
-+
-+/*
-+ * RXCPU:
-+ * @env: #CPURXState
-+ *
-+ * A RX CPU
-+ */
-+struct RXCPU {
-+    /*< private >*/
-+    CPUState parent_obj;
-+    /*< public >*/
-+
-+    CPUNegativeOffsetState neg;
-+    CPURXState env;
-+};
-+
-+typedef struct RXCPU RXCPU;
-+typedef RXCPU ArchCPU;
-+
-+#define ENV_OFFSET offsetof(RXCPU, env)
-+
-+#define RX_CPU_TYPE_SUFFIX "-" TYPE_RX_CPU
-+#define RX_CPU_TYPE_NAME(model) model RX_CPU_TYPE_SUFFIX
-+#define CPU_RESOLVING_TYPE TYPE_RX_CPU
-+
-+extern const char rx_crname[][6];
-+
-+void rx_cpu_do_interrupt(CPUState *cpu);
-+bool rx_cpu_exec_interrupt(CPUState *cpu, int int_req);
-+void rx_cpu_dump_state(CPUState *cpu, FILE *f, int flags);
-+int rx_cpu_gdb_read_register(CPUState *cpu, uint8_t *buf, int reg);
-+int rx_cpu_gdb_write_register(CPUState *cpu, uint8_t *buf, int reg);
-+hwaddr rx_cpu_get_phys_page_debug(CPUState *cpu, vaddr addr);
-+
-+void rx_translate_init(void);
-+int cpu_rx_signal_handler(int host_signum, void *pinfo,
-+                           void *puc);
-+
-+void rx_cpu_list(void);
-+void rx_cpu_unpack_psw(CPURXState *env, uint32_t psw, int rte);
-+
-+#define cpu_signal_handler cpu_rx_signal_handler
-+#define cpu_list rx_cpu_list
-+
-+#include "exec/cpu-all.h"
-+
-+#define CPU_INTERRUPT_SOFT CPU_INTERRUPT_TGT_INT_0
-+#define CPU_INTERRUPT_FIR  CPU_INTERRUPT_TGT_INT_1
-+
-+#define RX_CPU_IRQ 0
-+#define RX_CPU_FIR 1
-+
-+static inline void cpu_get_tb_cpu_state(CPURXState *env, target_ulong *p=
-c,
-+                                        target_ulong *cs_base, uint32_t =
-*flags)
-+{
-+    *pc =3D env->pc;
-+    *cs_base =3D 0;
-+    *flags =3D FIELD_DP32(0, PSW, PM, env->psw_pm);
-+}
-+
-+static inline int cpu_mmu_index(CPURXState *env, bool ifetch)
-+{
-+    return 0;
-+}
-+
-+static inline uint32_t rx_cpu_pack_psw(CPURXState *env)
-+{
-+    uint32_t psw =3D 0;
-+    psw =3D FIELD_DP32(psw, PSW, IPL, env->psw_ipl);
-+    psw =3D FIELD_DP32(psw, PSW, PM,  env->psw_pm);
-+    psw =3D FIELD_DP32(psw, PSW, U,   env->psw_u);
-+    psw =3D FIELD_DP32(psw, PSW, I,   env->psw_i);
-+    psw =3D FIELD_DP32(psw, PSW, O,   env->psw_o >> 31);
-+    psw =3D FIELD_DP32(psw, PSW, S,   env->psw_s >> 31);
-+    psw =3D FIELD_DP32(psw, PSW, Z,   env->psw_z =3D=3D 0);
-+    psw =3D FIELD_DP32(psw, PSW, C,   env->psw_c);
-+    return psw;
-+}
-+
-+#endif /* RX_CPU_H */
-diff --git a/target/rx/cpu.c b/target/rx/cpu.c
-new file mode 100644
-index 0000000000..ea38639f47
---- /dev/null
-+++ b/target/rx/cpu.c
-@@ -0,0 +1,217 @@
-+/*
-+ * QEMU RX CPU
-+ *
-+ * Copyright (c) 2019 Yoshinori Sato
 + *
 + * This program is free software; you can redistribute it and/or modify =
 it
@@ -409,341 +157,618 @@ ng with
 + */
 +
 +#include "qemu/osdep.h"
-+#include "qemu/qemu-print.h"
-+#include "qapi/error.h"
++#include "qemu/bitops.h"
 +#include "cpu.h"
-+#include "qemu-common.h"
-+#include "migration/vmstate.h"
++#include "exec/log.h"
++#include "exec/cpu_ldst.h"
++#include "sysemu/sysemu.h"
++#include "hw/irq.h"
++
++void rx_cpu_unpack_psw(CPURXState *env, uint32_t psw, int rte)
++{
++    if (env->psw_pm =3D=3D 0) {
++        env->psw_ipl =3D FIELD_EX32(psw, PSW, IPL);
++        if (rte) {
++            /* PSW.PM can write RTE and RTFI */
++            env->psw_pm =3D FIELD_EX32(psw, PSW, PM);
++        }
++        env->psw_u =3D FIELD_EX32(psw, PSW, U);
++        env->psw_i =3D FIELD_EX32(psw, PSW, I);
++    }
++    env->psw_o =3D FIELD_EX32(psw, PSW, O) << 31;
++    env->psw_s =3D FIELD_EX32(psw, PSW, S) << 31;
++    env->psw_z =3D 1 - FIELD_EX32(psw, PSW, Z);
++    env->psw_c =3D FIELD_EX32(psw, PSW, C);
++}
++
++#define INT_FLAGS (CPU_INTERRUPT_HARD | CPU_INTERRUPT_FIR)
++void rx_cpu_do_interrupt(CPUState *cs)
++{
++    RXCPU *cpu =3D RXCPU(cs);
++    CPURXState *env =3D &cpu->env;
++    int do_irq =3D cs->interrupt_request & INT_FLAGS;
++    uint32_t save_psw;
++
++    env->in_sleep =3D 0;
++
++    if (env->psw_u) {
++        env->usp =3D env->regs[0];
++    } else {
++        env->isp =3D env->regs[0];
++    }
++    save_psw =3D rx_cpu_pack_psw(env);
++    env->psw_pm =3D env->psw_i =3D env->psw_u =3D 0;
++
++    if (do_irq) {
++        if (do_irq & CPU_INTERRUPT_FIR) {
++            env->bpc =3D env->pc;
++            env->bpsw =3D save_psw;
++            env->pc =3D env->fintv;
++            env->psw_ipl =3D 15;
++            cs->interrupt_request &=3D ~CPU_INTERRUPT_FIR;
++            qemu_set_irq(env->ack, env->ack_irq);
++            qemu_log_mask(CPU_LOG_INT, "fast interrupt raised\n");
++        } else if (do_irq & CPU_INTERRUPT_HARD) {
++            env->isp -=3D 4;
++            cpu_stl_all(env, env->isp, save_psw);
++            env->isp -=3D 4;
++            cpu_stl_all(env, env->isp, env->pc);
++            env->pc =3D cpu_ldl_all(env, env->intb + env->ack_irq * 4);
++            env->psw_ipl =3D env->ack_ipl;
++            cs->interrupt_request &=3D ~CPU_INTERRUPT_HARD;
++            qemu_set_irq(env->ack, env->ack_irq);
++            qemu_log_mask(CPU_LOG_INT,
++                          "interrupt 0x%02x raised\n", env->ack_irq);
++        }
++    } else {
++        uint32_t vec =3D cs->exception_index;
++        const char *expname =3D "unknown exception";
++
++        env->isp -=3D 4;
++        cpu_stl_all(env, env->isp, save_psw);
++        env->isp -=3D 4;
++        cpu_stl_all(env, env->isp, env->pc);
++
++        if (vec < 0x100) {
++            env->pc =3D cpu_ldl_all(env, 0xffffffc0 + vec * 4);
++        } else {
++            env->pc =3D cpu_ldl_all(env, env->intb + (vec & 0xff) * 4);
++        }
++        switch (vec) {
++        case 20:
++            expname =3D "privilege violation";
++            break;
++        case 21:
++            expname =3D "access exception";
++            break;
++        case 23:
++            expname =3D "illegal instruction";
++            break;
++        case 25:
++            expname =3D "fpu exception";
++            break;
++        case 30:
++            expname =3D "non-maskable interrupt";
++            break;
++        case 0x100 ... 0x1ff:
++            expname =3D "unconditional trap";
++        }
++        qemu_log_mask(CPU_LOG_INT, "exception 0x%02x [%s] raised\n",
++                      (vec & 0xff), expname);
++    }
++    env->regs[0] =3D env->isp;
++}
++
++bool rx_cpu_exec_interrupt(CPUState *cs, int interrupt_request)
++{
++    RXCPU *cpu =3D RXCPU(cs);
++    CPURXState *env =3D &cpu->env;
++    int accept =3D 0;
++    /* hardware interrupt (Normal) */
++    if ((interrupt_request & CPU_INTERRUPT_HARD) &&
++        env->psw_i && (env->psw_ipl < env->req_ipl)) {
++        env->ack_irq =3D env->req_irq;
++        env->ack_ipl =3D env->req_ipl;
++        accept =3D 1;
++    }
++    /* hardware interrupt (FIR) */
++    if ((interrupt_request & CPU_INTERRUPT_FIR) &&
++        env->psw_i && (env->psw_ipl < 15)) {
++        accept =3D 1;
++    }
++    if (accept) {
++        rx_cpu_do_interrupt(cs);
++        return true;
++    }
++    return false;
++}
++
++hwaddr rx_cpu_get_phys_page_debug(CPUState *cs, vaddr addr)
++{
++    return addr;
++}
+diff --git a/target/rx/op_helper.c b/target/rx/op_helper.c
+new file mode 100644
+index 0000000000..f89d294f2b
+--- /dev/null
++++ b/target/rx/op_helper.c
+@@ -0,0 +1,470 @@
++/*
++ *  RX helper functions
++ *
++ *  Copyright (c) 2019 Yoshinori Sato
++ *
++ * This program is free software; you can redistribute it and/or modify =
+it
++ * under the terms and conditions of the GNU General Public License,
++ * version 2 or later, as published by the Free Software Foundation.
++ *
++ * This program is distributed in the hope it will be useful, but WITHOU=
+T
++ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
++ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License=
+ for
++ * more details.
++ *
++ * You should have received a copy of the GNU General Public License alo=
+ng with
++ * this program.  If not, see <http://www.gnu.org/licenses/>.
++ */
++
++#include "qemu/osdep.h"
++#include "qemu/bitops.h"
++#include "cpu.h"
 +#include "exec/exec-all.h"
-+#include "hw/loader.h"
++#include "exec/helper-proto.h"
++#include "exec/cpu_ldst.h"
 +#include "fpu/softfloat.h"
 +
-+static void rx_cpu_set_pc(CPUState *cs, vaddr value)
++static inline void QEMU_NORETURN raise_exception(CPURXState *env, int in=
+dex,
++                                                 uintptr_t retaddr);
++
++static void _set_psw(CPURXState *env, uint32_t psw, uint32_t rte)
 +{
-+    RXCPU *cpu =3D RXCPU(cs);
-+
-+    cpu->env.pc =3D value;
-+}
-+
-+static void rx_cpu_synchronize_from_tb(CPUState *cs, TranslationBlock *t=
-b)
-+{
-+    RXCPU *cpu =3D RXCPU(cs);
-+
-+    cpu->env.pc =3D tb->pc;
-+}
-+
-+static bool rx_cpu_has_work(CPUState *cs)
-+{
-+    return cs->interrupt_request &
-+        (CPU_INTERRUPT_HARD | CPU_INTERRUPT_FIR);
-+}
-+
-+static void rx_cpu_reset(CPUState *s)
-+{
-+    RXCPU *cpu =3D RXCPU(s);
-+    RXCPUClass *rcc =3D RXCPU_GET_CLASS(cpu);
-+    CPURXState *env =3D &cpu->env;
-+    uint32_t *resetvec;
-+
-+    rcc->parent_reset(s);
-+
-+    memset(env, 0, offsetof(CPURXState, end_reset_fields));
-+
-+    resetvec =3D rom_ptr(0xfffffffc, 4);
-+    if (resetvec) {
-+        /* In the case of kernel, it is ignored because it is not set. *=
-/
-+        env->pc =3D ldl_p(resetvec);
++    uint32_t prev_u;
++    prev_u =3D env->psw_u;
++    rx_cpu_unpack_psw(env, psw, rte);
++    if (prev_u !=3D env->psw_u) {
++        /* switch r0  */
++        if (env->psw_u) {
++            env->isp =3D env->regs[0];
++            env->regs[0] =3D env->usp;
++        } else {
++            env->usp =3D env->regs[0];
++            env->regs[0] =3D env->isp;
++        }
 +    }
-+    rx_cpu_unpack_psw(env, 0, 1);
-+    env->regs[0] =3D env->isp =3D env->usp =3D 0;
-+    env->fpsw =3D 0;
-+    set_flush_to_zero(1, &env->fp_status);
-+    set_flush_inputs_to_zero(1, &env->fp_status);
 +}
 +
-+static void rx_cpu_list_entry(gpointer data, gpointer user_data)
++void helper_set_psw(CPURXState *env, uint32_t psw)
 +{
-+    const char *typename =3D object_class_get_name(OBJECT_CLASS(data));
-+
-+    qemu_printf("%s\n", typename);
++    _set_psw(env, psw, 0);
 +}
 +
-+void rx_cpu_list(void)
++void helper_set_psw_rte(CPURXState *env, uint32_t psw)
 +{
-+    GSList *list;
-+    list =3D object_class_get_list_sorted(TYPE_RX_CPU, false);
-+    g_slist_foreach(list, rx_cpu_list_entry, NULL);
-+    g_slist_free(list);
++    _set_psw(env, psw, 1);
 +}
 +
-+static ObjectClass *rx_cpu_class_by_name(const char *cpu_model)
++uint32_t helper_pack_psw(CPURXState *env)
 +{
-+    ObjectClass *oc;
++    return rx_cpu_pack_psw(env);
++}
 +
-+    oc =3D object_class_by_name(cpu_model);
-+    if (object_class_dynamic_cast(oc, TYPE_RX_CPU) =3D=3D NULL ||
-+        object_class_is_abstract(oc)) {
-+        oc =3D NULL;
++#define SET_FPSW(b)                                             \
++    do {                                                        \
++        env->fpsw =3D FIELD_DP32(env->fpsw, FPSW, C ## b, 1);     \
++        if (!FIELD_EX32(env->fpsw, FPSW, E ## b)) {             \
++            env->fpsw =3D FIELD_DP32(env->fpsw, FPSW, F ## b, 1); \
++        }                                                       \
++    } while (0)
++
++/* fp operations */
++static void update_fpsw(CPURXState *env, float32 ret, uintptr_t retaddr)
++{
++    int xcpt, cause, enable;
++
++    env->psw_z =3D ret & ~(1 << 31); /* mask sign bit */
++    env->psw_s =3D ret;
++
++    xcpt =3D get_float_exception_flags(&env->fp_status);
++
++    /* Clear the cause entries */
++    env->fpsw =3D FIELD_DP32(env->fpsw, FPSW, CAUSE, 0);
++
++    /* set FPSW */
++    if (unlikely(xcpt)) {
++        if (xcpt & float_flag_invalid) {
++            SET_FPSW(V);
++        }
++        if (xcpt & float_flag_divbyzero) {
++            SET_FPSW(Z);
++        }
++        if (xcpt & float_flag_overflow) {
++            SET_FPSW(O);
++        }
++        if (xcpt & float_flag_underflow) {
++            SET_FPSW(U);
++        }
++        if (xcpt & float_flag_inexact) {
++            SET_FPSW(X);
++        }
++        if ((xcpt & (float_flag_input_denormal
++                     | float_flag_output_denormal))
++            && !FIELD_EX32(env->fpsw, FPSW, DN)) {
++            env->fpsw =3D FIELD_DP32(env->fpsw, FPSW, CE, 1);
++        }
++
++        /* update FPSW_FLAG_S */
++        if (FIELD_EX32(env->fpsw, FPSW, FLAGS) !=3D 0) {
++            env->fpsw =3D FIELD_DP32(env->fpsw, FPSW, FS, 1);
++        }
++
++        /* Generate an exception if enabled */
++        cause =3D FIELD_EX32(env->fpsw, FPSW, CAUSE);
++        enable =3D FIELD_EX32(env->fpsw, FPSW, ENABLE);
++        enable |=3D 1 << 5; /* CE always enabled */
++        if (cause & enable) {
++            raise_exception(env, 21, retaddr);
++        }
++    }
++}
++
++void helper_set_fpsw(CPURXState *env, uint32_t val)
++{
++    static const int roundmode[] =3D {
++        float_round_nearest_even,
++        float_round_to_zero,
++        float_round_up,
++        float_round_down,
++    };
++    uint32_t fpsw =3D env->fpsw;
++    fpsw |=3D 0x7fffff03;
++    val &=3D ~0x80000000;
++    fpsw &=3D val;
++    FIELD_DP32(fpsw, FPSW, FS, FIELD_EX32(fpsw, FPSW, FLAGS) !=3D 0);
++    env->fpsw =3D fpsw;
++    set_float_rounding_mode(roundmode[FIELD_EX32(env->fpsw, FPSW, RM)],
++                            &env->fp_status);
++}
++
++#define FLOATOP(op, func)                                           \
++    float32 helper_##op(CPURXState *env, float32 t0, float32 t1)    \
++    {                                                               \
++        float32 ret;                                                \
++        ret =3D func(t0, t1, &env->fp_status);                        \
++        update_fpsw(env, *(uint32_t *)&ret, GETPC());               \
++        return ret;                                                 \
 +    }
 +
-+    return oc;
++FLOATOP(fadd, float32_add)
++FLOATOP(fsub, float32_sub)
++FLOATOP(fmul, float32_mul)
++FLOATOP(fdiv, float32_div)
++
++void helper_fcmp(CPURXState *env, float32 t0, float32 t1)
++{
++    int st;
++    st =3D float32_compare(t0, t1, &env->fp_status);
++    update_fpsw(env, 0, GETPC());
++    env->psw_z =3D 1;
++    env->psw_s =3D env->psw_o =3D 0;
++    switch (st) {
++    case float_relation_equal:
++        env->psw_z =3D 0;
++        break;
++    case float_relation_less:
++        env->psw_s =3D -1;
++        break;
++    case float_relation_unordered:
++        env->psw_o =3D -1;
++        break;
++    }
 +}
 +
-+static void rx_cpu_realize(DeviceState *dev, Error **errp)
++uint32_t helper_ftoi(CPURXState *env, float32 t0)
 +{
-+    CPUState *cs =3D CPU(dev);
-+    RXCPUClass *rcc =3D RXCPU_GET_CLASS(dev);
-+    Error *local_err =3D NULL;
++    uint32_t ret;
++    ret =3D float32_to_int32_round_to_zero(t0, &env->fp_status);
++    update_fpsw(env, ret, GETPC());
++    return ret;
++}
 +
-+    cpu_exec_realizefn(cs, &local_err);
-+    if (local_err !=3D NULL) {
-+        error_propagate(errp, local_err);
++uint32_t helper_round(CPURXState *env, float32 t0)
++{
++    uint32_t ret;
++    ret =3D float32_to_int32(t0, &env->fp_status);
++    update_fpsw(env, ret, GETPC());
++    return ret;
++}
++
++float32 helper_itof(CPURXState *env, uint32_t t0)
++{
++    float32 ret;
++    ret =3D int32_to_float32(t0, &env->fp_status);
++    update_fpsw(env, ret, GETPC());
++    return ret;
++}
++
++/* string operations */
++void helper_scmpu(CPURXState *env)
++{
++    uint8_t tmp0, tmp1;
++    if (env->regs[3] =3D=3D 0) {
 +        return;
 +    }
-+
-+    cpu_reset(cs);
-+    qemu_init_vcpu(cs);
-+
-+    rcc->parent_realize(dev, errp);
++    while (env->regs[3] !=3D 0) {
++        tmp0 =3D cpu_ldub_data_ra(env, env->regs[1]++, GETPC());
++        tmp1 =3D cpu_ldub_data_ra(env, env->regs[2]++, GETPC());
++        env->regs[3]--;
++        if (tmp0 !=3D tmp1 || tmp0 =3D=3D '\0') {
++            break;
++        }
++    }
++    env->psw_z =3D tmp0 - tmp1;
++    env->psw_c =3D (tmp0 >=3D tmp1);
 +}
 +
-+static void rx_cpu_set_irq(void *opaque, int no, int request)
-+{
-+    RXCPU *cpu =3D opaque;
-+    CPUState *cs =3D CPU(cpu);
-+    int irq =3D request & 0xff;
++static uint32_t (* const cpu_ldufn[])(CPUArchState *env,
++                                     target_ulong ptr,
++                                     uintptr_t retaddr) =3D {
++    cpu_ldub_data_ra, cpu_lduw_data_ra, cpu_ldl_data_ra,
++};
 +
-+    static const int mask[] =3D {
-+        [RX_CPU_IRQ] =3D CPU_INTERRUPT_HARD,
-+        [RX_CPU_FIR] =3D CPU_INTERRUPT_FIR,
-+    };
-+    if (irq) {
-+        cpu->env.req_irq =3D irq;
-+        cpu->env.req_ipl =3D (request >> 8) & 0x0f;
-+        cpu_interrupt(cs, mask[no]);
-+    } else {
-+        cpu_reset_interrupt(cs, mask[no]);
++static uint32_t (* const cpu_ldfn[])(CPUArchState *env,
++                                     target_ulong ptr,
++                                     uintptr_t retaddr) =3D {
++    cpu_ldub_data_ra, cpu_lduw_data_ra, cpu_ldl_data_ra,
++};
++
++static void (* const cpu_stfn[])(CPUArchState *env,
++                                 target_ulong ptr,
++                                 uint32_t val,
++                                 uintptr_t retaddr) =3D {
++    cpu_stb_data_ra, cpu_stw_data_ra, cpu_stl_data_ra,
++};
++
++void helper_sstr(CPURXState *env, uint32_t sz)
++{
++    tcg_debug_assert(sz < 3);
++    while (env->regs[3] !=3D 0) {
++        cpu_stfn[sz](env, env->regs[1], env->regs[2], GETPC());
++        env->regs[1] +=3D 1 << sz;
++        env->regs[3]--;
 +    }
 +}
 +
-+static void rx_cpu_disas_set_info(CPUState *cpu, disassemble_info *info)
++#define OP_SMOVU 1
++#define OP_SMOVF 0
++#define OP_SMOVB 2
++
++static void smov(uint32_t mode, CPURXState *env)
 +{
-+    info->mach =3D bfd_mach_rx;
-+    info->print_insn =3D print_insn_rx;
-+}
++    uint8_t tmp;
++    int dir;
 +
-+static bool rx_cpu_tlb_fill(CPUState *cs, vaddr addr, int size,
-+                            MMUAccessType access_type, int mmu_idx,
-+                            bool probe, uintptr_t retaddr)
-+{
-+    uint32_t address, physical, prot;
-+
-+    /* Linear mapping */
-+    address =3D physical =3D addr & TARGET_PAGE_MASK;
-+    prot =3D PAGE_READ | PAGE_WRITE | PAGE_EXEC;
-+    tlb_set_page(cs, address, physical, prot, mmu_idx, TARGET_PAGE_SIZE)=
-;
-+    return true;
-+}
-+
-+static void rx_cpu_init(Object *obj)
-+{
-+    CPUState *cs =3D CPU(obj);
-+    RXCPU *cpu =3D RXCPU(obj);
-+    CPURXState *env =3D &cpu->env;
-+
-+    cpu_set_cpustate_pointers(cpu);
-+    cs->env_ptr =3D env;
-+    qdev_init_gpio_in(DEVICE(cpu), rx_cpu_set_irq, 2);
-+}
-+
-+static void rx_cpu_class_init(ObjectClass *klass, void *data)
-+{
-+    DeviceClass *dc =3D DEVICE_CLASS(klass);
-+    CPUClass *cc =3D CPU_CLASS(klass);
-+    RXCPUClass *rcc =3D RXCPU_CLASS(klass);
-+
-+    device_class_set_parent_realize(dc, rx_cpu_realize,
-+                                    &rcc->parent_realize);
-+
-+    rcc->parent_reset =3D cc->reset;
-+    cc->reset =3D rx_cpu_reset;
-+
-+    cc->class_by_name =3D rx_cpu_class_by_name;
-+    cc->has_work =3D rx_cpu_has_work;
-+    cc->do_interrupt =3D rx_cpu_do_interrupt;
-+    cc->cpu_exec_interrupt =3D rx_cpu_exec_interrupt;
-+    cc->dump_state =3D rx_cpu_dump_state;
-+    cc->set_pc =3D rx_cpu_set_pc;
-+    cc->synchronize_from_tb =3D rx_cpu_synchronize_from_tb;
-+    cc->gdb_read_register =3D rx_cpu_gdb_read_register;
-+    cc->gdb_write_register =3D rx_cpu_gdb_write_register;
-+    cc->get_phys_page_debug =3D rx_cpu_get_phys_page_debug;
-+    cc->disas_set_info =3D rx_cpu_disas_set_info;
-+    cc->tcg_initialize =3D rx_translate_init;
-+    cc->tlb_fill =3D rx_cpu_tlb_fill;
-+
-+    cc->gdb_num_core_regs =3D 26;
-+}
-+
-+static const TypeInfo rx_cpu_info =3D {
-+    .name =3D TYPE_RX_CPU,
-+    .parent =3D TYPE_CPU,
-+    .instance_size =3D sizeof(RXCPU),
-+    .instance_init =3D rx_cpu_init,
-+    .abstract =3D true,
-+    .class_size =3D sizeof(RXCPUClass),
-+    .class_init =3D rx_cpu_class_init,
-+};
-+
-+static const TypeInfo rx62n_rx_cpu_info =3D {
-+    .name =3D TYPE_RX62N_CPU,
-+    .parent =3D TYPE_RX_CPU,
-+};
-+
-+static void rx_cpu_register_types(void)
-+{
-+    type_register_static(&rx_cpu_info);
-+    type_register_static(&rx62n_rx_cpu_info);
-+}
-+
-+type_init(rx_cpu_register_types)
-diff --git a/target/rx/gdbstub.c b/target/rx/gdbstub.c
-new file mode 100644
-index 0000000000..d76ca52e82
---- /dev/null
-+++ b/target/rx/gdbstub.c
-@@ -0,0 +1,112 @@
-+/*
-+ * RX gdb server stub
-+ *
-+ * Copyright (c) 2019 Yoshinori Sato
-+ *
-+ * This program is free software; you can redistribute it and/or modify =
-it
-+ * under the terms and conditions of the GNU General Public License,
-+ * version 2 or later, as published by the Free Software Foundation.
-+ *
-+ * This program is distributed in the hope it will be useful, but WITHOU=
-T
-+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-+ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License=
- for
-+ * more details.
-+ *
-+ * You should have received a copy of the GNU General Public License alo=
-ng with
-+ * this program.  If not, see <http://www.gnu.org/licenses/>.
-+ */
-+#include "qemu/osdep.h"
-+#include "qemu-common.h"
-+#include "cpu.h"
-+#include "exec/gdbstub.h"
-+
-+int rx_cpu_gdb_read_register(CPUState *cs, uint8_t *mem_buf, int n)
-+{
-+    RXCPU *cpu =3D RXCPU(cs);
-+    CPURXState *env =3D &cpu->env;
-+
-+    switch (n) {
-+    case 0 ... 15:
-+        return gdb_get_regl(mem_buf, env->regs[n]);
-+    case 16:
-+        return gdb_get_regl(mem_buf, (env->psw_u) ? env->regs[0] : env->=
-usp);
-+    case 17:
-+        return gdb_get_regl(mem_buf, (!env->psw_u) ? env->regs[0] : env-=
->isp);
-+    case 18:
-+        return gdb_get_regl(mem_buf, rx_cpu_pack_psw(env));
-+    case 19:
-+        return gdb_get_regl(mem_buf, env->pc);
-+    case 20:
-+        return gdb_get_regl(mem_buf, env->intb);
-+    case 21:
-+        return gdb_get_regl(mem_buf, env->bpsw);
-+    case 22:
-+        return gdb_get_regl(mem_buf, env->bpc);
-+    case 23:
-+        return gdb_get_regl(mem_buf, env->fintv);
-+    case 24:
-+        return gdb_get_regl(mem_buf, env->fpsw);
-+    case 25:
-+        return 0;
++    dir =3D (mode & OP_SMOVB) ? -1 : 1;
++    while (env->regs[3] !=3D 0) {
++        tmp =3D cpu_ldub_data_ra(env, env->regs[2], GETPC());
++        cpu_stb_data_ra(env, env->regs[1], tmp, GETPC());
++        env->regs[1] +=3D dir;
++        env->regs[2] +=3D dir;
++        env->regs[3]--;
++        if ((mode & OP_SMOVU) && tmp =3D=3D 0) {
++            break;
++        }
 +    }
-+    return 0;
 +}
 +
-+int rx_cpu_gdb_write_register(CPUState *cs, uint8_t *mem_buf, int n)
++void helper_smovu(CPURXState *env)
 +{
-+    RXCPU *cpu =3D RXCPU(cs);
-+    CPURXState *env =3D &cpu->env;
-+    uint32_t psw;
-+    switch (n) {
-+    case 0 ... 15:
-+        env->regs[n] =3D ldl_p(mem_buf);
-+        if (n =3D=3D 0) {
-+            if (env->psw_u) {
-+                env->usp =3D env->regs[0];
-+            } else {
-+                env->isp =3D env->regs[0];
++    smov(OP_SMOVU, env);
++}
++
++void helper_smovf(CPURXState *env)
++{
++    smov(OP_SMOVF, env);
++}
++
++void helper_smovb(CPURXState *env)
++{
++    smov(OP_SMOVB, env);
++}
++
++
++void helper_suntil(CPURXState *env, uint32_t sz)
++{
++    uint32_t tmp;
++    tcg_debug_assert(sz < 3);
++    if (env->regs[3] =3D=3D 0) {
++        return ;
++    }
++    while (env->regs[3] !=3D 0) {
++        tmp =3D cpu_ldufn[sz](env, env->regs[1], GETPC());
++        env->regs[1] +=3D 1 << sz;
++        env->regs[3]--;
++        if (tmp =3D=3D env->regs[2]) {
++            break;
++        }
++    }
++    env->psw_z =3D tmp - env->regs[2];
++    env->psw_c =3D (tmp <=3D env->regs[2]);
++}
++
++void helper_swhile(CPURXState *env, uint32_t sz)
++{
++    uint32_t tmp;
++    tcg_debug_assert(sz < 3);
++    if (env->regs[3] =3D=3D 0) {
++        return ;
++    }
++    while (env->regs[3] !=3D 0) {
++        tmp =3D cpu_ldufn[sz](env, env->regs[1], GETPC());
++        env->regs[1] +=3D 1 << sz;
++        env->regs[3]--;
++        if (tmp !=3D env->regs[2]) {
++            break;
++        }
++    }
++    env->psw_z =3D env->regs[3];
++    env->psw_c =3D (tmp <=3D env->regs[2]);
++}
++
++/* accumlator operations */
++void helper_rmpa(CPURXState *env, uint32_t sz)
++{
++    uint64_t result_l, prev;
++    int32_t result_h;
++    int64_t tmp0, tmp1;
++
++    if (env->regs[3] =3D=3D 0) {
++        return;
++    }
++    result_l =3D env->regs[5];
++    result_l <<=3D 32;
++    result_l |=3D env->regs[4];
++    result_h =3D env->regs[6];
++    env->psw_o =3D 0;
++
++    while (env->regs[3] !=3D 0) {
++        tmp0 =3D cpu_ldfn[sz](env, env->regs[1], GETPC());
++        tmp1 =3D cpu_ldfn[sz](env, env->regs[2], GETPC());
++        tmp0 *=3D tmp1;
++        prev =3D result_l;
++        result_l +=3D tmp0;
++        /* carry / bollow */
++        if (tmp0 < 0) {
++            if (prev > result_l) {
++                result_h--;
++            }
++        } else {
++            if (prev < result_l) {
++                result_h++;
 +            }
 +        }
-+        break;
-+    case 16:
-+        env->usp =3D ldl_p(mem_buf);
-+        if (env->psw_u) {
-+            env->regs[0] =3D ldl_p(mem_buf);
-+        }
-+        break;
-+    case 17:
-+        env->isp =3D ldl_p(mem_buf);
-+        if (!env->psw_u) {
-+            env->regs[0] =3D ldl_p(mem_buf);
-+        }
-+        break;
-+    case 18:
-+        psw =3D ldl_p(mem_buf);
-+        rx_cpu_unpack_psw(env, psw, 1);
-+        break;
-+    case 19:
-+        env->pc =3D ldl_p(mem_buf);
-+        break;
-+    case 20:
-+        env->intb =3D ldl_p(mem_buf);
-+        break;
-+    case 21:
-+        env->bpsw =3D ldl_p(mem_buf);
-+        break;
-+    case 22:
-+        env->bpc =3D ldl_p(mem_buf);
-+        break;
-+    case 23:
-+        env->fintv =3D ldl_p(mem_buf);
-+        break;
-+    case 24:
-+        env->fpsw =3D ldl_p(mem_buf);
-+        break;
-+    case 25:
-+        return 8;
-+    default:
-+        return 0;
-+    }
 +
-+    return 4;
++        env->regs[1] +=3D 1 << sz;
++        env->regs[2] +=3D 1 << sz;
++    }
++    env->psw_s =3D result_h;
++    env->psw_o =3D (result_h !=3D 0 && result_h !=3D -1) << 31;
++    env->regs[6] =3D result_h;
++    env->regs[5] =3D result_l >> 32;
++    env->regs[4] =3D result_l & 0xffffffff;
 +}
-diff --git a/target/rx/Makefile.objs b/target/rx/Makefile.objs
-index aa6f2d2d6c..a0018d5bc5 100644
---- a/target/rx/Makefile.objs
-+++ b/target/rx/Makefile.objs
-@@ -1,5 +1,4 @@
- obj-y +=3D translate.o op_helper.o helper.o cpu.o gdbstub.o disas.o
--obj-$(CONFIG_SOFTMMU) +=3D monitor.o
-=20
- DECODETREE =3D $(SRC_PATH)/scripts/decodetree.py
-=20
++
++void helper_racw(CPURXState *env, uint32_t imm)
++{
++    int64_t acc;
++    acc =3D env->acc;
++    acc <<=3D (imm + 1);
++    acc +=3D 0x0000000080000000LL;
++    if (acc > 0x00007fff00000000LL) {
++        acc =3D 0x00007fff00000000LL;
++    } else if (acc < -0x800000000000LL) {
++        acc =3D -0x800000000000LL;
++    } else {
++        acc &=3D 0xffffffff00000000LL;
++    }
++    env->acc =3D acc;
++}
++
++void helper_satr(CPURXState *env)
++{
++    if (env->psw_o >> 31) {
++        if ((int)env->psw_s < 0) {
++            env->regs[6] =3D 0x00000000;
++            env->regs[5] =3D 0x7fffffff;
++            env->regs[4] =3D 0xffffffff;
++        } else {
++            env->regs[6] =3D 0xffffffff;
++            env->regs[5] =3D 0x80000000;
++            env->regs[4] =3D 0x00000000;
++        }
++    }
++}
++
++/* div */
++uint32_t helper_div(CPURXState *env, uint32_t num, uint32_t den)
++{
++    uint32_t ret =3D num;
++    if (!((num =3D=3D INT_MIN && den =3D=3D -1) || den =3D=3D 0)) {
++        ret =3D (int32_t)num / (int32_t)den;
++        env->psw_o =3D 0;
++    } else {
++        env->psw_o =3D -1;
++    }
++    return ret;
++}
++
++uint32_t helper_divu(CPURXState *env, uint32_t num, uint32_t den)
++{
++    uint32_t ret =3D num;
++    if (den !=3D 0) {
++        ret =3D num / den;
++        env->psw_o =3D 0;
++    } else {
++        env->psw_o =3D -1;
++    }
++    return ret;
++}
++
++/* exception */
++static inline void QEMU_NORETURN raise_exception(CPURXState *env, int in=
+dex,
++                                                 uintptr_t retaddr)
++{
++    CPUState *cs =3D env_cpu(env);
++
++    cs->exception_index =3D index;
++    cpu_loop_exit_restore(cs, retaddr);
++}
++
++void QEMU_NORETURN helper_raise_privilege_violation(CPURXState *env)
++{
++    raise_exception(env, 20, GETPC());
++}
++
++void QEMU_NORETURN helper_raise_access_fault(CPURXState *env)
++{
++    raise_exception(env, 21, GETPC());
++}
++
++void QEMU_NORETURN helper_raise_illegal_instruction(CPURXState *env)
++{
++    raise_exception(env, 23, GETPC());
++}
++
++void QEMU_NORETURN helper_wait(CPURXState *env)
++{
++    CPUState *cs =3D env_cpu(env);
++
++    cs->halted =3D 1;
++    env->in_sleep =3D 1;
++    raise_exception(env, EXCP_HLT, 0);
++}
++
++void QEMU_NORETURN helper_debug(CPURXState *env)
++{
++    CPUState *cs =3D env_cpu(env);
++
++    cs->exception_index =3D EXCP_DEBUG;
++    cpu_loop_exit(cs);
++}
++
++void QEMU_NORETURN helper_rxint(CPURXState *env, uint32_t vec)
++{
++    raise_exception(env, 0x100 + vec, 0);
++}
++
++void QEMU_NORETURN helper_rxbrk(CPURXState *env)
++{
++    raise_exception(env, 0x100, 0);
++}
 --=20
 2.20.1
 
