@@ -2,90 +2,92 @@ Return-Path: <SRS0=PUPy=YH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 35ABBECE58C
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 19:09:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 809FFC4CECE
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 19:16:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 03ED5206A3
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 19:09:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 33E77217F9
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 19:16:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Km5iUE+F"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 03ED5206A3
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ipMxbr77"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 33E77217F9
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55996 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56076 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iK5j1-0005IR-W0
-	for qemu-devel@archiver.kernel.org; Mon, 14 Oct 2019 15:09:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36066)
+	id 1iK5pT-0008IY-9X
+	for qemu-devel@archiver.kernel.org; Mon, 14 Oct 2019 15:16:27 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37284)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1iK5i1-0004Lz-1x
- for qemu-devel@nongnu.org; Mon, 14 Oct 2019 15:08:46 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1iK5oC-0007PF-5T
+ for qemu-devel@nongnu.org; Mon, 14 Oct 2019 15:15:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1iK5hz-00068V-W3
- for qemu-devel@nongnu.org; Mon, 14 Oct 2019 15:08:44 -0400
-Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:39107)
+ (envelope-from <richard.henderson@linaro.org>) id 1iK5oB-0001xL-4E
+ for qemu-devel@nongnu.org; Mon, 14 Oct 2019 15:15:07 -0400
+Received: from mail-pf1-x442.google.com ([2607:f8b0:4864:20::442]:34621)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1iK5hz-00068F-P6
- for qemu-devel@nongnu.org; Mon, 14 Oct 2019 15:08:43 -0400
-Received: by mail-wm1-x344.google.com with SMTP id v17so17800260wml.4
- for <qemu-devel@nongnu.org>; Mon, 14 Oct 2019 12:08:43 -0700 (PDT)
+ (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+ id 1iK5oA-0001wV-VO
+ for qemu-devel@nongnu.org; Mon, 14 Oct 2019 15:15:07 -0400
+Received: by mail-pf1-x442.google.com with SMTP id b128so10932630pfa.1
+ for <qemu-devel@nongnu.org>; Mon, 14 Oct 2019 12:15:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=IsxFNjNTjkAErm8eA+1ngUEPz0N+TCkVu3/ewdhXkag=;
- b=Km5iUE+FS5nVVZ0+/xWxGE8rZkdn371fgiebJBqpB+JO5UIXp8gV6NUKOTdJz82rLS
- YoyKJFqK1fhgMi3kJn4Fn/Xv8jfv/bJ7xHy7RTwnzAEzfoV9cRz4QGUrDI1UgoOXtUeV
- lUs4rMtA1OmSVPIZ3CjQfzHPNx0ji0Yn0KLo9LxexY2pacd1LNAdUSofKsr5Vj7SRnP3
- tHFDL9h050AXCywxdUVAxyrW9+z1DBsHb0VJfe4LZs6NKbU42sEpBt/8lm2pOgLOCM1u
- Ta5rGf53Q35SP2+Y01u2qh2uqImgRjot6Y65iJkuKFX3fmSeOXy1E2wyqWqC9dKj592h
- DXZw==
+ h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=e93wkwG0HkPCKwmBCpkvboT2RX+XxELhxVuTIwX89fE=;
+ b=ipMxbr77UHJDHLXy2/ZqWR0VIOI3+L+t+WrpfGR4Jel1pivi7afMuZCdSHM2SlBg2F
+ gwWdI502lZ7kFCKJfksMn7WSisazDmpBrWgXbNb+L/EW/oT4bbv8fAlH4rigBfnWFgju
+ 7yrYyKLPiYI0YNucblC/z2KN99r9suT9XJuC5g3n3x138Su+6q4FkBd4+7sde07I/H9L
+ EYV5Njo2YzAoWleEiff4vueaCpFKPqIEpPWH/d7BrHMDsw+nNgqNFWLeHw4X06NFJ/8N
+ aDzRqicPdC+a16PVmJYAARFEW64wRWdacjKoWOHXwNxBgVT8P5tX6cHOwot+4mGmV2vK
+ VqaA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=IsxFNjNTjkAErm8eA+1ngUEPz0N+TCkVu3/ewdhXkag=;
- b=dPPFDZR5Kgd6JIMC5C72EFF2PV7A8sUYF7e1mBu1luXya+6/bHXlp2WYlbKyqdBPbt
- EgI6R1H519Mjtln3d8LW5lBfoKe8QHkkJhFeWgWB2jESiJyH6kFoqL4okBbeMH1MxTje
- 87twWbVlq9ixpCeTRDRhX50Hj9pTNvfZwmLUH1WLT4X5grVhorr4296+tZJh77dbRlc4
- iLPwwB0XSxA6aExxWRVGonqd0y8f/lHyTLuy2Da1+43NMYvefiEB6acThEYnpgYHVbSX
- 1SmzgXkgsuk123X6Um5t/2rj1x8I7kQBgD4nhbzTRhCt3LOUEZ9yw4wKGshpQ5w8F7Ia
- iMMA==
-X-Gm-Message-State: APjAAAU6VTrTcjiokk2HwHSxgLsKVuJEXcYAQZBYzfXzUwqTHnRmUekF
- x7NkextRmKun0D3kDI7VAL5vuw==
-X-Google-Smtp-Source: APXvYqyBcTYNlyCcip0hHFxjKCoy/k3w9Q6XBtAmZOHYWb0lD2ytMgjx+EPnN3NC/W3Rwbv6t3LLBw==
-X-Received: by 2002:a7b:c206:: with SMTP id x6mr8806695wmi.147.1571080122438; 
- Mon, 14 Oct 2019 12:08:42 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id d193sm33594091wmd.0.2019.10.14.12.08.41
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 14 Oct 2019 12:08:41 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 46CFC1FF87;
- Mon, 14 Oct 2019 20:08:41 +0100 (BST)
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=e93wkwG0HkPCKwmBCpkvboT2RX+XxELhxVuTIwX89fE=;
+ b=PNCbZXpA/0Yzn/aDOdTR0q7t7cxLgAABNLM5tmPbK21/UbmjwA++RNImCcO4WWNg5v
+ r3/g5VFEfwXlkA54xz1wBGGqA1Z5l9vJCCG/XX0lO5BtqZRXnZgloKiubx8CiH/CMnyI
+ w1bmc36+Ch+AMDJNg5FyMeNSI75bBeYwEfyqCUVmz58LRT4pW4oURnHqaiFOaZUAjZyt
+ OHH/fc3RQjfurBXSal7ajAEjHyYFR27Nx8wxWG8f6P5JmheyvzAfklG+X+7i5csGj1Cc
+ bO1ZDsdGxqY0vKYdtdfuFkAaOArysKjhvJ2Pcqpxnr2otPd3h7rJFAzQ4Jtx/dU4Wezz
+ +Oeg==
+X-Gm-Message-State: APjAAAXjuB+mQDPChRkIZ6Z3z7Yon+OdLoTF2r4UrqNfIU8DwTHk/8Qe
+ cvRVia2B4QgLvPdvaiRxy8TR6iHRZ0U=
+X-Google-Smtp-Source: APXvYqygZJydYDmTMun8JMuX9GYEqcz2fjHLLuzygYA1CANWOV3veLqdNokKHvZB9EImAaWBoE+N/g==
+X-Received: by 2002:a65:434c:: with SMTP id k12mr35412626pgq.141.1571080505338; 
+ Mon, 14 Oct 2019 12:15:05 -0700 (PDT)
+Received: from [192.168.1.11] (97-113-7-119.tukw.qwest.net. [97.113.7.119])
+ by smtp.gmail.com with ESMTPSA id d19sm16638408pjz.5.2019.10.14.12.15.04
+ (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+ Mon, 14 Oct 2019 12:15:04 -0700 (PDT)
+Subject: Re: [PATCH v6 18/20] target/arm: Rebuild hflags at CPSR writes
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, qemu-arm@nongnu.org
 References: <20191011155546.14342-1-richard.henderson@linaro.org>
- <20191011155546.14342-20-richard.henderson@linaro.org>
-User-agent: mu4e 1.3.5; emacs 27.0.50
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: qemu-devel@nongnu.org
-Subject: Re: [PATCH v6 19/20] target/arm: Rebuild hflags for M-profile.
-In-reply-to: <20191011155546.14342-20-richard.henderson@linaro.org>
-Date: Mon, 14 Oct 2019 20:08:41 +0100
-Message-ID: <874l0bm9fq.fsf@linaro.org>
+ <20191011155546.14342-19-richard.henderson@linaro.org>
+ <875zkrm9gg.fsf@linaro.org>
+From: Richard Henderson <richard.henderson@linaro.org>
+Openpgp: preference=signencrypt
+Message-ID: <1aa62e90-6915-c0e6-7a8e-22308ee48f0d@linaro.org>
+Date: Mon, 14 Oct 2019 12:15:02 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
+In-Reply-To: <875zkrm9gg.fsf@linaro.org>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::344
+X-Received-From: 2607:f8b0:4864:20::442
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,81 +99,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: laurent.desnogues@gmail.com, peter.maydell@linaro.org, qemu-arm@nongnu.org
+Cc: laurent.desnogues@gmail.com, peter.maydell@linaro.org,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On 10/14/19 12:08 PM, Alex Bennée wrote:
+> 
+> Richard Henderson <richard.henderson@linaro.org> writes:
+> 
+>> Continue setting, but not relying upon, env->hflags.
+>>
+>> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+>> ---
+>>  target/arm/op_helper.c | 3 +++
+>>  1 file changed, 3 insertions(+)
+>>
+>> diff --git a/target/arm/op_helper.c b/target/arm/op_helper.c
+>> index ccc2cecb46..b529d6c1bf 100644
+>> --- a/target/arm/op_helper.c
+>> +++ b/target/arm/op_helper.c
+>> @@ -224,6 +224,7 @@ uint32_t HELPER(usat16)(CPUARMState *env, uint32_t x, uint32_t shift)
+>>  void HELPER(setend)(CPUARMState *env)
+>>  {
+>>      env->uncached_cpsr ^= CPSR_E;
+>> +    arm_rebuild_hflags(env);
+>>  }
+>>
+>>  /* Function checks whether WFx (WFI/WFE) instructions are set up to be trapped.
+>> @@ -387,6 +388,8 @@ uint32_t HELPER(cpsr_read)(CPUARMState *env)
+>>  void HELPER(cpsr_write)(CPUARMState *env, uint32_t val, uint32_t mask)
+>>  {
+>>      cpsr_write(env, val, mask, CPSRWriteByInstr);
+>> +    /* TODO: Not all cpsr bits are relevant to hflags.  */
+> 
+> Do you mean by this we could check which bits changed and avoid a
+> re-compute if we wanted to? Is it likely to be anything other than the
+> SS_ACTIVE bit?
 
-Richard Henderson <richard.henderson@linaro.org> writes:
-
-> Continue setting, but not relying upon, env->hflags.
->
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-
-Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-
-> ---
->  target/arm/m_helper.c | 6 ++++++
->  1 file changed, 6 insertions(+)
->
-> diff --git a/target/arm/m_helper.c b/target/arm/m_helper.c
-> index 27cd2f3f96..f2512e448e 100644
-> --- a/target/arm/m_helper.c
-> +++ b/target/arm/m_helper.c
-> @@ -494,6 +494,7 @@ void HELPER(v7m_bxns)(CPUARMState *env, uint32_t dest)
->      switch_v7m_security_state(env, dest & 1);
->      env->thumb =3D 1;
->      env->regs[15] =3D dest & ~1;
-> +    arm_rebuild_hflags(env);
->  }
->
->  void HELPER(v7m_blxns)(CPUARMState *env, uint32_t dest)
-> @@ -555,6 +556,7 @@ void HELPER(v7m_blxns)(CPUARMState *env, uint32_t des=
-t)
->      switch_v7m_security_state(env, 0);
->      env->thumb =3D 1;
->      env->regs[15] =3D dest;
-> +    arm_rebuild_hflags(env);
->  }
->
->  static uint32_t *get_v7m_sp_ptr(CPUARMState *env, bool secure, bool thre=
-admode,
-> @@ -895,6 +897,7 @@ static void v7m_exception_taken(ARMCPU *cpu, uint32_t=
- lr, bool dotailchain,
->      env->regs[14] =3D lr;
->      env->regs[15] =3D addr & 0xfffffffe;
->      env->thumb =3D addr & 1;
-> +    arm_rebuild_hflags(env);
->  }
->
->  static void v7m_update_fpccr(CPUARMState *env, uint32_t frameptr,
-> @@ -1765,6 +1768,7 @@ static void do_v7m_exception_exit(ARMCPU *cpu)
->
->      /* Otherwise, we have a successful exception exit. */
->      arm_clear_exclusive(env);
-> +    arm_rebuild_hflags(env);
->      qemu_log_mask(CPU_LOG_INT, "...successful exception return\n");
->  }
->
-> @@ -1837,6 +1841,7 @@ static bool do_v7m_function_return(ARMCPU *cpu)
->      xpsr_write(env, 0, XPSR_IT);
->      env->thumb =3D newpc & 1;
->      env->regs[15] =3D newpc & ~1;
-> +    arm_rebuild_hflags(env);
->
->      qemu_log_mask(CPU_LOG_INT, "...function return successful\n");
->      return true;
-> @@ -1959,6 +1964,7 @@ static bool v7m_handle_execute_nsc(ARMCPU *cpu)
->      switch_v7m_security_state(env, true);
->      xpsr_write(env, 0, XPSR_IT);
->      env->regs[15] +=3D 4;
-> +    arm_rebuild_hflags(env);
->      return true;
->
->  gen_invep:
+Yes.  Well, there's also NZCV.  But neither case happens particularly often, so
+it's probably not worth worrying about.
 
 
---
-Alex Benn=C3=A9e
+r~
 
