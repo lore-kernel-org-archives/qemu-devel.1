@@ -7,82 +7,82 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EF14FC4CECE
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 16:52:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 17CC9ECE587
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 16:53:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A2B232067B
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 16:52:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C5E572067B
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 16:53:18 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="g/aSnlmn"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A2B232067B
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="iikDosOQ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C5E572067B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53742 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53754 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iK3aH-00063g-Cv
-	for qemu-devel@archiver.kernel.org; Mon, 14 Oct 2019 12:52:37 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37340)
+	id 1iK3av-00071I-KO
+	for qemu-devel@archiver.kernel.org; Mon, 14 Oct 2019 12:53:17 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37065)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1iK2qe-00055s-6X
- for qemu-devel@nongnu.org; Mon, 14 Oct 2019 12:05:29 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1iK2qD-0004S0-Rt
+ for qemu-devel@nongnu.org; Mon, 14 Oct 2019 12:05:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1iK2qc-00085f-Fg
- for qemu-devel@nongnu.org; Mon, 14 Oct 2019 12:05:28 -0400
-Received: from mail-wm1-x330.google.com ([2a00:1450:4864:20::330]:52242)
+ (envelope-from <peter.maydell@linaro.org>) id 1iK2qB-0007aD-Q6
+ for qemu-devel@nongnu.org; Mon, 14 Oct 2019 12:05:01 -0400
+Received: from mail-wr1-x42f.google.com ([2a00:1450:4864:20::42f]:35800)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1iK2qc-000857-8K
- for qemu-devel@nongnu.org; Mon, 14 Oct 2019 12:05:26 -0400
-Received: by mail-wm1-x330.google.com with SMTP id r19so17863723wmh.2
- for <qemu-devel@nongnu.org>; Mon, 14 Oct 2019 09:05:26 -0700 (PDT)
+ id 1iK2qB-0007ZU-HS
+ for qemu-devel@nongnu.org; Mon, 14 Oct 2019 12:04:59 -0400
+Received: by mail-wr1-x42f.google.com with SMTP id v8so20391790wrt.2
+ for <qemu-devel@nongnu.org>; Mon, 14 Oct 2019 09:04:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:subject:date:message-id:in-reply-to:references:mime-version
  :content-transfer-encoding;
- bh=BA0Hr4fMEwRvskAIrNFkdzykZF5LEWAtuXwTcCbqLfo=;
- b=g/aSnlmnaont5N0WjMGmBGVkQdCmEVr/GEjuF2ib9qwpnZnT2NSo1cRVeoZ1Oq0eFY
- XXem418o8W5vEH2BNt6qrpOw3MvOTz6yydir7YZkG9rKfzfwJf8b0DRuBp6lOhU4DqmM
- BKuNrBhGuEvT18qwYLdY9QxSnaZl8qoF1V1PYu5yxhhmQuGNlSYFhjl4f3KecvJlS5gt
- dWWDtbMoKOt6LCDcjaXkI1P5m92igrgPhS5dLIKOW3hSvnyLXP72K9BpW/nSVNLqm1EO
- Bs+3IT29mu/5p12WUEhqlAGxqVLt4/F2/Rrf6CJf26IC3LkI6eww+N16N5cpjUm5ki6a
- 6W2A==
+ bh=KPCJs01lqTl1BmtrsrtRz/4IBpZgWn0Ozwdl4HTNvE4=;
+ b=iikDosOQVfwtL9MvFQbpxrPTsbckIK+mlISVRo/X/zXwxrOh6yNg9whsRg6ZA0QSIg
+ Xrvnj3ojdzwXjnQVQeYgXm5kFeqxW2VsPi4o3li7EK3eqYiePJ6yuIA2oC1s7IHqTJv2
+ bN6AT/OMHjQVaZcm//LjtwHDC3xzraWayxhgV1B75uDH6koswa9d2wzfpGCVjbbPlhUG
+ wUm24KznsDtvUzgI9Zg3KeZuKod4dxFCX6zXnpGEVNwktGTFAh6lBsynoX4w+uHjgGuG
+ uuKHrlrPMsKq8W5wptITY5xAV/jOwZNjyib8eV+KlvkybVD5a/RJhOiHyOTykiadUb+M
+ A7kw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=BA0Hr4fMEwRvskAIrNFkdzykZF5LEWAtuXwTcCbqLfo=;
- b=p6vkSpCecW3pu73maJSpeWJ3TgBLXEMn13/FTsviUINLMsYBLaEc4tdlM8Ve8XEKIZ
- wgE4P95AQY/leYwvbD8YHsyYsY68V32WVcSoXsO6T9UvGCor4gyWGn/YlHH+dcMqqn2y
- 1vA9qBtMy2yg2rfzvePlZ+z/c/b20IGvZk/J14XKpA8e4kEPOUVMhWY2wIdE1iqbAxH6
- pqhlyzcPJHJEEjw7/h1mGO18Ndv6I2HlwRCCYaInKrikXBlNaYOeiqVqpIuLYkgeBd+4
- 9i9If+wvGgc3D7EmJUnP9aPsWbRdSzk4JbBraPizgX8h3Jal9eN3L/yBK4Ys8OPOqcWg
- jYSA==
-X-Gm-Message-State: APjAAAXxKyjUEBX8lk1FwQGKfgFnnHeZAqlgsdzZfZbjE5CzbmLLI2vV
- VJEW/+B0DjLkAMP75a5qa1mpQBAixJYbHA==
-X-Google-Smtp-Source: APXvYqzJu+VGLZPd7ifopp1aEyb0g5LHD6KrEqyjfGpJl5kwc6SSrr54wa4HSZOGZRwKtWYA7r0FNA==
-X-Received: by 2002:a7b:cb54:: with SMTP id v20mr7973934wmj.119.1571069124902; 
- Mon, 14 Oct 2019 09:05:24 -0700 (PDT)
+ bh=KPCJs01lqTl1BmtrsrtRz/4IBpZgWn0Ozwdl4HTNvE4=;
+ b=B/1olhU5RvWt565OQOirif5UJjvPKqMl8WqH0QS3Q4AIrwGBLqfWXuN+TZLfjwkF3W
+ c9TIySVbRPjQxFkWucWVF71waLU87SIHdYfghTdlSxbPzW25+fEFsQuFRnuEa4XIgBUx
+ xWG1ZwV7yyUT8cg1LaJ4xWtqvQ+gbSbX/+O6JKDWfyWNc3FhLFzWfD4KFggGumxnaouI
+ HgvPiAXoxq79MlfzjZ+aVB+Dj8HrU7enRbM+47M4bQcOzJGjyKLqriIGsK2LPbsj6sMT
+ NGps+gDTFL6Glqji2d8lGzBgMHGsyiWiWd4CUDa5/o8EOuHTpa4TeSHWeNBDQ4RSBSCu
+ QWIw==
+X-Gm-Message-State: APjAAAXp65/m3IhYXheNY5rgixr29vEo52zLh/MucQJDIwWtzPLN0a8i
+ o3Bi3gTm4094Yytw0r3gUh+jqu1DfCaQSw==
+X-Google-Smtp-Source: APXvYqxkXMihaK5WidxJ8gfi36TshpIw8zc4pZJYv46xRxLzrw7xvQOHo0sqa0xfC2LgZ2+wzik/Kw==
+X-Received: by 2002:adf:f2c7:: with SMTP id d7mr10803086wrp.318.1571069098004; 
+ Mon, 14 Oct 2019 09:04:58 -0700 (PDT)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id 5sm18029779wrk.86.2019.10.14.09.05.23
+ by smtp.gmail.com with ESMTPSA id 5sm18029779wrk.86.2019.10.14.09.04.56
  for <qemu-devel@nongnu.org>
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 14 Oct 2019 09:05:24 -0700 (PDT)
+ Mon, 14 Oct 2019 09:04:57 -0700 (PDT)
 From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PULL 49/68] watchdog/aspeed: Introduce an object class per SoC
-Date: Mon, 14 Oct 2019 17:03:45 +0100
-Message-Id: <20191014160404.19553-50-peter.maydell@linaro.org>
+Subject: [PULL 28/68] target/arm/arm-semi: Make semihosting code hand out its
+ own file descriptors
+Date: Mon, 14 Oct 2019 17:03:24 +0100
+Message-Id: <20191014160404.19553-29-peter.maydell@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20191014160404.19553-1-peter.maydell@linaro.org>
 References: <20191014160404.19553-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::330
+X-Received-From: 2a00:1450:4864:20::42f
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,284 +98,385 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Cédric Le Goater <clg@kaod.org>
+Currently the Arm semihosting code returns the guest file descriptors
+(handles) which are simply the fd values from the host OS or the
+remote gdbstub. Part of the semihosting 2.0 specification requires
+that we implement special handling of opening a ":semihosting-features"
+filename. Guest fds which result from opening the special file
+won't correspond to host fds, so to ensure that we don't end up
+with duplicate fds we need to have QEMU code control the allocation
+of the fd values we give the guest.
 
-It cleanups the current models for the Aspeed AST2400 and AST2500 SoCs
-and prepares ground for future SoCs.
+Add in an abstraction layer which lets us allocate new guest FD
+values, and translate from a guest FD value back to the host one.
+This also fixes an odd hole where a semihosting guest could
+use the semihosting API to read, write or close file descriptors
+that it had never allocated but which were being used by QEMU itself.
+(This isn't a security hole, because enabling semihosting permits
+the guest to do arbitrary file access to the whole host filesystem,
+and so should only be done if the guest is completely trusted.)
 
-Signed-off-by: Cédric Le Goater <clg@kaod.org>
-Reviewed-by: Joel Stanley <joel@jms.id.au>
-Message-id: 20190925143248.10000-11-clg@kaod.org
+Currently the only kind of guest fd is one which maps to a
+host fd, but in a following commit we will add one which maps
+to the :semihosting-features magic data.
+
+If the guest is migrated with an open semihosting file descriptor
+then subsequent attempts to use the fd will all fail; this is
+not a change from the previous situation (where the host fd
+being used on the source end would not be re-opened on the
+destination end).
+
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Message-id: 20190916141544.17540-5-peter.maydell@linaro.org
 ---
- include/hw/watchdog/wdt_aspeed.h |  18 ++++-
- hw/arm/aspeed_soc.c              |   9 ++-
- hw/watchdog/wdt_aspeed.c         | 122 ++++++++++++++++---------------
- 3 files changed, 86 insertions(+), 63 deletions(-)
+ target/arm/arm-semi.c | 232 +++++++++++++++++++++++++++++++++++++++---
+ 1 file changed, 216 insertions(+), 16 deletions(-)
 
-diff --git a/include/hw/watchdog/wdt_aspeed.h b/include/hw/watchdog/wdt_aspeed.h
-index 8c5691ce204..796342764e2 100644
---- a/include/hw/watchdog/wdt_aspeed.h
-+++ b/include/hw/watchdog/wdt_aspeed.h
-@@ -16,6 +16,8 @@
- #define TYPE_ASPEED_WDT "aspeed.wdt"
- #define ASPEED_WDT(obj) \
-     OBJECT_CHECK(AspeedWDTState, (obj), TYPE_ASPEED_WDT)
-+#define TYPE_ASPEED_2400_WDT TYPE_ASPEED_WDT "-ast2400"
-+#define TYPE_ASPEED_2500_WDT TYPE_ASPEED_WDT "-ast2500"
+diff --git a/target/arm/arm-semi.c b/target/arm/arm-semi.c
+index 302529f2278..a4741d7e11b 100644
+--- a/target/arm/arm-semi.c
++++ b/target/arm/arm-semi.c
+@@ -106,6 +106,113 @@ static int open_modeflags[12] = {
+     O_RDWR | O_CREAT | O_APPEND | O_BINARY
+ };
  
- #define ASPEED_WDT_REGS_MAX        (0x20 / 4)
- 
-@@ -30,8 +32,20 @@ typedef struct AspeedWDTState {
- 
-     AspeedSCUState *scu;
-     uint32_t pclk_freq;
--    uint32_t silicon_rev;
--    uint32_t ext_pulse_width_mask;
- } AspeedWDTState;
- 
-+#define ASPEED_WDT_CLASS(klass) \
-+     OBJECT_CLASS_CHECK(AspeedWDTClass, (klass), TYPE_ASPEED_WDT)
-+#define ASPEED_WDT_GET_CLASS(obj) \
-+     OBJECT_GET_CLASS(AspeedWDTClass, (obj), TYPE_ASPEED_WDT)
++typedef enum GuestFDType {
++    GuestFDUnused = 0,
++    GuestFDHost = 1,
++} GuestFDType;
 +
-+typedef struct AspeedWDTClass {
-+    SysBusDeviceClass parent_class;
++/*
++ * Guest file descriptors are integer indexes into an array of
++ * these structures (we will dynamically resize as necessary).
++ */
++typedef struct GuestFD {
++    GuestFDType type;
++    int hostfd;
++} GuestFD;
 +
-+    uint32_t offset;
-+    uint32_t ext_pulse_width_mask;
-+    uint32_t reset_ctrl_reg;
-+    void (*reset_pulse)(AspeedWDTState *s, uint32_t property);
-+}  AspeedWDTClass;
++static GArray *guestfd_array;
 +
- #endif /* WDT_ASPEED_H */
-diff --git a/hw/arm/aspeed_soc.c b/hw/arm/aspeed_soc.c
-index aaf18d3e42f..5c5fcb81094 100644
---- a/hw/arm/aspeed_soc.c
-+++ b/hw/arm/aspeed_soc.c
-@@ -214,10 +214,9 @@ static void aspeed_soc_init(Object *obj)
-                               "max-ram-size", &error_abort);
- 
-     for (i = 0; i < sc->info->wdts_num; i++) {
-+        snprintf(typename, sizeof(typename), "aspeed.wdt-%s", socname);
-         sysbus_init_child_obj(obj, "wdt[*]", OBJECT(&s->wdt[i]),
--                              sizeof(s->wdt[i]), TYPE_ASPEED_WDT);
--        qdev_prop_set_uint32(DEVICE(&s->wdt[i]), "silicon-rev",
--                                    sc->info->silicon_rev);
-+                              sizeof(s->wdt[i]), typename);
-         object_property_add_const_link(OBJECT(&s->wdt[i]), "scu",
-                                        OBJECT(&s->scu), &error_abort);
-     }
-@@ -384,13 +383,15 @@ static void aspeed_soc_realize(DeviceState *dev, Error **errp)
- 
-     /* Watch dog */
-     for (i = 0; i < sc->info->wdts_num; i++) {
-+        AspeedWDTClass *awc = ASPEED_WDT_GET_CLASS(&s->wdt[i]);
-+
-         object_property_set_bool(OBJECT(&s->wdt[i]), true, "realized", &err);
-         if (err) {
-             error_propagate(errp, err);
-             return;
-         }
-         sysbus_mmio_map(SYS_BUS_DEVICE(&s->wdt[i]), 0,
--                        sc->info->memmap[ASPEED_WDT] + i * 0x20);
-+                        sc->info->memmap[ASPEED_WDT] + i * awc->offset);
-     }
- 
-     /* Net */
-diff --git a/hw/watchdog/wdt_aspeed.c b/hw/watchdog/wdt_aspeed.c
-index f710036535d..fc0e6c486a7 100644
---- a/hw/watchdog/wdt_aspeed.c
-+++ b/hw/watchdog/wdt_aspeed.c
-@@ -54,21 +54,6 @@ static bool aspeed_wdt_is_enabled(const AspeedWDTState *s)
-     return s->regs[WDT_CTRL] & WDT_CTRL_ENABLE;
- }
- 
--static bool is_ast2500(const AspeedWDTState *s)
--{
--    switch (s->silicon_rev) {
--    case AST2500_A0_SILICON_REV:
--    case AST2500_A1_SILICON_REV:
--        return true;
--    case AST2400_A0_SILICON_REV:
--    case AST2400_A1_SILICON_REV:
--    default:
--        break;
--    }
--
--    return false;
--}
--
- static uint64_t aspeed_wdt_read(void *opaque, hwaddr offset, unsigned size)
- {
-     AspeedWDTState *s = ASPEED_WDT(opaque);
-@@ -124,6 +109,7 @@ static void aspeed_wdt_write(void *opaque, hwaddr offset, uint64_t data,
-                              unsigned size)
- {
-     AspeedWDTState *s = ASPEED_WDT(opaque);
-+    AspeedWDTClass *awc = ASPEED_WDT_GET_CLASS(s);
-     bool enable = data & WDT_CTRL_ENABLE;
- 
-     offset >>= 2;
-@@ -153,24 +139,13 @@ static void aspeed_wdt_write(void *opaque, hwaddr offset, uint64_t data,
-         }
-         break;
-     case WDT_RESET_WIDTH:
--    {
--        uint32_t property = data & WDT_POLARITY_MASK;
--
--        if (property && is_ast2500(s)) {
--            if (property == WDT_ACTIVE_HIGH_MAGIC) {
--                s->regs[WDT_RESET_WIDTH] |= WDT_RESET_WIDTH_ACTIVE_HIGH;
--            } else if (property == WDT_ACTIVE_LOW_MAGIC) {
--                s->regs[WDT_RESET_WIDTH] &= ~WDT_RESET_WIDTH_ACTIVE_HIGH;
--            } else if (property == WDT_PUSH_PULL_MAGIC) {
--                s->regs[WDT_RESET_WIDTH] |= WDT_RESET_WIDTH_PUSH_PULL;
--            } else if (property == WDT_OPEN_DRAIN_MAGIC) {
--                s->regs[WDT_RESET_WIDTH] &= ~WDT_RESET_WIDTH_PUSH_PULL;
--            }
-+        if (awc->reset_pulse) {
-+            awc->reset_pulse(s, data & WDT_POLARITY_MASK);
-         }
--        s->regs[WDT_RESET_WIDTH] &= ~s->ext_pulse_width_mask;
--        s->regs[WDT_RESET_WIDTH] |= data & s->ext_pulse_width_mask;
-+        s->regs[WDT_RESET_WIDTH] &= ~awc->ext_pulse_width_mask;
-+        s->regs[WDT_RESET_WIDTH] |= data & awc->ext_pulse_width_mask;
-         break;
--    }
-+
-     case WDT_TIMEOUT_STATUS:
-     case WDT_TIMEOUT_CLEAR:
-         qemu_log_mask(LOG_UNIMP,
-@@ -226,9 +201,10 @@ static void aspeed_wdt_reset(DeviceState *dev)
- static void aspeed_wdt_timer_expired(void *dev)
- {
-     AspeedWDTState *s = ASPEED_WDT(dev);
-+    uint32_t reset_ctrl_reg = ASPEED_WDT_GET_CLASS(s)->reset_ctrl_reg;
- 
-     /* Do not reset on SDRAM controller reset */
--    if (s->scu->regs[SCU_RESET_CONTROL1] & SCU_RESET_SDRAM) {
-+    if (s->scu->regs[reset_ctrl_reg] & SCU_RESET_SDRAM) {
-         timer_del(s->timer);
-         s->regs[WDT_CTRL] = 0;
-         return;
-@@ -256,25 +232,6 @@ static void aspeed_wdt_realize(DeviceState *dev, Error **errp)
-     }
-     s->scu = ASPEED_SCU(obj);
- 
--    if (!is_supported_silicon_rev(s->silicon_rev)) {
--        error_setg(errp, "Unknown silicon revision: 0x%" PRIx32,
--                s->silicon_rev);
--        return;
--    }
--
--    switch (s->silicon_rev) {
--    case AST2400_A0_SILICON_REV:
--    case AST2400_A1_SILICON_REV:
--        s->ext_pulse_width_mask = 0xff;
--        break;
--    case AST2500_A0_SILICON_REV:
--    case AST2500_A1_SILICON_REV:
--        s->ext_pulse_width_mask = 0xfffff;
--        break;
--    default:
--        g_assert_not_reached();
--    }
--
-     s->timer = timer_new_ns(QEMU_CLOCK_VIRTUAL, aspeed_wdt_timer_expired, dev);
- 
-     /* FIXME: This setting should be derived from the SCU hw strapping
-@@ -287,20 +244,15 @@ static void aspeed_wdt_realize(DeviceState *dev, Error **errp)
-     sysbus_init_mmio(sbd, &s->iomem);
- }
- 
--static Property aspeed_wdt_properties[] = {
--    DEFINE_PROP_UINT32("silicon-rev", AspeedWDTState, silicon_rev, 0),
--    DEFINE_PROP_END_OF_LIST(),
--};
--
- static void aspeed_wdt_class_init(ObjectClass *klass, void *data)
- {
-     DeviceClass *dc = DEVICE_CLASS(klass);
- 
-+    dc->desc = "ASPEED Watchdog Controller";
-     dc->realize = aspeed_wdt_realize;
-     dc->reset = aspeed_wdt_reset;
-     set_bit(DEVICE_CATEGORY_MISC, dc->categories);
-     dc->vmsd = &vmstate_aspeed_wdt;
--    dc->props = aspeed_wdt_properties;
- }
- 
- static const TypeInfo aspeed_wdt_info = {
-@@ -308,12 +260,68 @@ static const TypeInfo aspeed_wdt_info = {
-     .name  = TYPE_ASPEED_WDT,
-     .instance_size  = sizeof(AspeedWDTState),
-     .class_init = aspeed_wdt_class_init,
-+    .class_size    = sizeof(AspeedWDTClass),
-+    .abstract      = true,
-+};
-+
-+static void aspeed_2400_wdt_class_init(ObjectClass *klass, void *data)
++/*
++ * Allocate a new guest file descriptor and return it; if we
++ * couldn't allocate a new fd then return -1.
++ * This is a fairly simplistic implementation because we don't
++ * expect that most semihosting guest programs will make very
++ * heavy use of opening and closing fds.
++ */
++static int alloc_guestfd(void)
 +{
-+    DeviceClass *dc = DEVICE_CLASS(klass);
-+    AspeedWDTClass *awc = ASPEED_WDT_CLASS(klass);
++    guint i;
 +
-+    dc->desc = "ASPEED 2400 Watchdog Controller";
-+    awc->offset = 0x20;
-+    awc->ext_pulse_width_mask = 0xff;
-+    awc->reset_ctrl_reg = SCU_RESET_CONTROL1;
++    if (!guestfd_array) {
++        /* New entries zero-initialized, i.e. type GuestFDUnused */
++        guestfd_array = g_array_new(FALSE, TRUE, sizeof(GuestFD));
++    }
++
++    for (i = 0; i < guestfd_array->len; i++) {
++        GuestFD *gf = &g_array_index(guestfd_array, GuestFD, i);
++
++        if (gf->type == GuestFDUnused) {
++            return i;
++        }
++    }
++
++    /* All elements already in use: expand the array */
++    g_array_set_size(guestfd_array, i + 1);
++    return i;
 +}
 +
-+static const TypeInfo aspeed_2400_wdt_info = {
-+    .name = TYPE_ASPEED_2400_WDT,
-+    .parent = TYPE_ASPEED_WDT,
-+    .instance_size = sizeof(AspeedWDTState),
-+    .class_init = aspeed_2400_wdt_class_init,
-+};
-+
-+static void aspeed_2500_wdt_reset_pulse(AspeedWDTState *s, uint32_t property)
++/*
++ * Look up the guestfd in the data structure; return NULL
++ * for out of bounds, but don't check whether the slot is unused.
++ * This is used internally by the other guestfd functions.
++ */
++static GuestFD *do_get_guestfd(int guestfd)
 +{
-+    if (property) {
-+        if (property == WDT_ACTIVE_HIGH_MAGIC) {
-+            s->regs[WDT_RESET_WIDTH] |= WDT_RESET_WIDTH_ACTIVE_HIGH;
-+        } else if (property == WDT_ACTIVE_LOW_MAGIC) {
-+            s->regs[WDT_RESET_WIDTH] &= ~WDT_RESET_WIDTH_ACTIVE_HIGH;
-+        } else if (property == WDT_PUSH_PULL_MAGIC) {
-+            s->regs[WDT_RESET_WIDTH] |= WDT_RESET_WIDTH_PUSH_PULL;
-+        } else if (property == WDT_OPEN_DRAIN_MAGIC) {
-+            s->regs[WDT_RESET_WIDTH] &= ~WDT_RESET_WIDTH_PUSH_PULL;
-+        }
++    if (!guestfd_array) {
++        return NULL;
++    }
++
++    if (guestfd < 0 || guestfd >= guestfd_array->len) {
++        return NULL;
++    }
++
++    return &g_array_index(guestfd_array, GuestFD, guestfd);
++}
++
++/*
++ * Associate the specified guest fd (which must have been
++ * allocated via alloc_fd() and not previously used) with
++ * the specified host fd.
++ */
++static void associate_guestfd(int guestfd, int hostfd)
++{
++    GuestFD *gf = do_get_guestfd(guestfd);
++
++    assert(gf);
++    gf->type = GuestFDHost;
++    gf->hostfd = hostfd;
++}
++
++/*
++ * Deallocate the specified guest file descriptor. This doesn't
++ * close the host fd, it merely undoes the work of alloc_fd().
++ */
++static void dealloc_guestfd(int guestfd)
++{
++    GuestFD *gf = do_get_guestfd(guestfd);
++
++    assert(gf);
++    gf->type = GuestFDUnused;
++}
++
++/*
++ * Given a guest file descriptor, get the associated struct.
++ * If the fd is not valid, return NULL. This is the function
++ * used by the various semihosting calls to validate a handle
++ * from the guest.
++ * Note: calling alloc_guestfd() or dealloc_guestfd() will
++ * invalidate any GuestFD* obtained by calling this function.
++ */
++static GuestFD *get_guestfd(int guestfd)
++{
++    GuestFD *gf = do_get_guestfd(guestfd);
++
++    if (!gf || gf->type == GuestFDUnused) {
++        return NULL;
++    }
++    return gf;
++}
++
+ #ifdef CONFIG_USER_ONLY
+ static inline uint32_t set_swi_errno(TaskState *ts, uint32_t code)
+ {
+@@ -207,6 +314,34 @@ static void arm_semi_flen_cb(CPUState *cs, target_ulong ret, target_ulong err)
+ #endif
+ }
+ 
++static int arm_semi_open_guestfd;
++
++static void arm_semi_open_cb(CPUState *cs, target_ulong ret, target_ulong err)
++{
++    ARMCPU *cpu = ARM_CPU(cs);
++    CPUARMState *env = &cpu->env;
++#ifdef CONFIG_USER_ONLY
++    TaskState *ts = cs->opaque;
++#endif
++    if (ret == (target_ulong)-1) {
++#ifdef CONFIG_USER_ONLY
++        ts->swi_errno = err;
++#else
++        syscall_err = err;
++#endif
++        dealloc_guestfd(arm_semi_open_guestfd);
++    } else {
++        associate_guestfd(arm_semi_open_guestfd, ret);
++        ret = arm_semi_open_guestfd;
++    }
++
++    if (is_a64(env)) {
++        env->xregs[0] = ret;
++    } else {
++        env->regs[0] = ret;
 +    }
 +}
 +
-+static void aspeed_2500_wdt_class_init(ObjectClass *klass, void *data)
-+{
-+    DeviceClass *dc = DEVICE_CLASS(klass);
-+    AspeedWDTClass *awc = ASPEED_WDT_CLASS(klass);
-+
-+    dc->desc = "ASPEED 2500 Watchdog Controller";
-+    awc->offset = 0x20;
-+    awc->ext_pulse_width_mask = 0xfffff;
-+    awc->reset_ctrl_reg = SCU_RESET_CONTROL1;
-+    awc->reset_pulse = aspeed_2500_wdt_reset_pulse;
-+}
-+
-+static const TypeInfo aspeed_2500_wdt_info = {
-+    .name = TYPE_ASPEED_2500_WDT,
-+    .parent = TYPE_ASPEED_WDT,
-+    .instance_size = sizeof(AspeedWDTState),
-+    .class_init = aspeed_2500_wdt_class_init,
- };
- 
- static void wdt_aspeed_register_types(void)
+ static target_ulong arm_gdb_syscall(ARMCPU *cpu, gdb_syscall_complete_cb cb,
+                                     const char *fmt, ...)
  {
-     watchdog_add_model(&model);
-     type_register_static(&aspeed_wdt_info);
-+    type_register_static(&aspeed_2400_wdt_info);
-+    type_register_static(&aspeed_2500_wdt_info);
- }
+@@ -283,6 +418,7 @@ target_ulong do_arm_semihosting(CPUARMState *env)
+ #else
+     CPUARMState *ts = env;
+ #endif
++    GuestFD *gf;
  
- type_init(wdt_aspeed_register_types)
+     if (is_a64(env)) {
+         /* Note that the syscall number is in W0, not X0 */
+@@ -295,6 +431,9 @@ target_ulong do_arm_semihosting(CPUARMState *env)
+ 
+     switch (nr) {
+     case TARGET_SYS_OPEN:
++    {
++        int guestfd;
++
+         GET_ARG(0);
+         GET_ARG(1);
+         GET_ARG(2);
+@@ -308,26 +447,52 @@ target_ulong do_arm_semihosting(CPUARMState *env)
+             errno = EINVAL;
+             return set_swi_errno(ts, -1);
+         }
++
++        guestfd = alloc_guestfd();
++        if (guestfd < 0) {
++            unlock_user(s, arg0, 0);
++            errno = EMFILE;
++            return set_swi_errno(ts, -1);
++        }
++
+         if (strcmp(s, ":tt") == 0) {
+             int result_fileno = arg1 < 4 ? STDIN_FILENO : STDOUT_FILENO;
++            associate_guestfd(guestfd, result_fileno);
+             unlock_user(s, arg0, 0);
+-            return result_fileno;
++            return guestfd;
+         }
+         if (use_gdb_syscalls()) {
+-            ret = arm_gdb_syscall(cpu, arm_semi_cb, "open,%s,%x,1a4", arg0,
++            arm_semi_open_guestfd = guestfd;
++            ret = arm_gdb_syscall(cpu, arm_semi_open_cb, "open,%s,%x,1a4", arg0,
+                                   (int)arg2+1, gdb_open_modeflags[arg1]);
+         } else {
+             ret = set_swi_errno(ts, open(s, open_modeflags[arg1], 0644));
++            if (ret == (uint32_t)-1) {
++                dealloc_guestfd(guestfd);
++            } else {
++                associate_guestfd(guestfd, ret);
++                ret = guestfd;
++            }
+         }
+         unlock_user(s, arg0, 0);
+         return ret;
++    }
+     case TARGET_SYS_CLOSE:
+         GET_ARG(0);
+-        if (use_gdb_syscalls()) {
+-            return arm_gdb_syscall(cpu, arm_semi_cb, "close,%x", arg0);
+-        } else {
+-            return set_swi_errno(ts, close(arg0));
++
++        gf = get_guestfd(arg0);
++        if (!gf) {
++            errno = EBADF;
++            return set_swi_errno(ts, -1);
+         }
++
++        if (use_gdb_syscalls()) {
++            ret = arm_gdb_syscall(cpu, arm_semi_cb, "close,%x", gf->hostfd);
++        } else {
++            ret = set_swi_errno(ts, close(gf->hostfd));
++        }
++        dealloc_guestfd(arg0);
++        return ret;
+     case TARGET_SYS_WRITEC:
+         qemu_semihosting_console_outc(env, args);
+         return 0xdeadbeef;
+@@ -338,17 +503,24 @@ target_ulong do_arm_semihosting(CPUARMState *env)
+         GET_ARG(1);
+         GET_ARG(2);
+         len = arg2;
++
++        gf = get_guestfd(arg0);
++        if (!gf) {
++            errno = EBADF;
++            return set_swi_errno(ts, -1);
++        }
++
+         if (use_gdb_syscalls()) {
+             arm_semi_syscall_len = len;
+             return arm_gdb_syscall(cpu, arm_semi_cb, "write,%x,%x,%x",
+-                                   arg0, arg1, len);
++                                   gf->hostfd, arg1, len);
+         } else {
+             s = lock_user(VERIFY_READ, arg1, len, 1);
+             if (!s) {
+                 /* Return bytes not written on error */
+                 return len;
+             }
+-            ret = set_swi_errno(ts, write(arg0, s, len));
++            ret = set_swi_errno(ts, write(gf->hostfd, s, len));
+             unlock_user(s, arg1, 0);
+             if (ret == (uint32_t)-1) {
+                 ret = 0;
+@@ -361,10 +533,17 @@ target_ulong do_arm_semihosting(CPUARMState *env)
+         GET_ARG(1);
+         GET_ARG(2);
+         len = arg2;
++
++        gf = get_guestfd(arg0);
++        if (!gf) {
++            errno = EBADF;
++            return set_swi_errno(ts, -1);
++        }
++
+         if (use_gdb_syscalls()) {
+             arm_semi_syscall_len = len;
+             return arm_gdb_syscall(cpu, arm_semi_cb, "read,%x,%x,%x",
+-                                   arg0, arg1, len);
++                                   gf->hostfd, arg1, len);
+         } else {
+             s = lock_user(VERIFY_WRITE, arg1, len, 0);
+             if (!s) {
+@@ -372,7 +551,7 @@ target_ulong do_arm_semihosting(CPUARMState *env)
+                 return len;
+             }
+             do {
+-                ret = set_swi_errno(ts, read(arg0, s, len));
++                ret = set_swi_errno(ts, read(gf->hostfd, s, len));
+             } while (ret == -1 && errno == EINTR);
+             unlock_user(s, arg1, len);
+             if (ret == (uint32_t)-1) {
+@@ -386,31 +565,52 @@ target_ulong do_arm_semihosting(CPUARMState *env)
+         return 0;
+     case TARGET_SYS_ISTTY:
+         GET_ARG(0);
++
++        gf = get_guestfd(arg0);
++        if (!gf) {
++            errno = EBADF;
++            return set_swi_errno(ts, -1);
++        }
++
+         if (use_gdb_syscalls()) {
+-            return arm_gdb_syscall(cpu, arm_semi_cb, "isatty,%x", arg0);
++            return arm_gdb_syscall(cpu, arm_semi_cb, "isatty,%x", gf->hostfd);
+         } else {
+-            return isatty(arg0);
++            return isatty(gf->hostfd);
+         }
+     case TARGET_SYS_SEEK:
+         GET_ARG(0);
+         GET_ARG(1);
++
++        gf = get_guestfd(arg0);
++        if (!gf) {
++            errno = EBADF;
++            return set_swi_errno(ts, -1);
++        }
++
+         if (use_gdb_syscalls()) {
+             return arm_gdb_syscall(cpu, arm_semi_cb, "lseek,%x,%x,0",
+-                                   arg0, arg1);
++                                   gf->hostfd, arg1);
+         } else {
+-            ret = set_swi_errno(ts, lseek(arg0, arg1, SEEK_SET));
++            ret = set_swi_errno(ts, lseek(gf->hostfd, arg1, SEEK_SET));
+             if (ret == (uint32_t)-1)
+               return -1;
+             return 0;
+         }
+     case TARGET_SYS_FLEN:
+         GET_ARG(0);
++
++        gf = get_guestfd(arg0);
++        if (!gf) {
++            errno = EBADF;
++            return set_swi_errno(ts, -1);
++        }
++
+         if (use_gdb_syscalls()) {
+             return arm_gdb_syscall(cpu, arm_semi_flen_cb, "fstat,%x,%x",
+-                                   arg0, arm_flen_buf(cpu));
++                                   gf->hostfd, arm_flen_buf(cpu));
+         } else {
+             struct stat buf;
+-            ret = set_swi_errno(ts, fstat(arg0, &buf));
++            ret = set_swi_errno(ts, fstat(gf->hostfd, &buf));
+             if (ret == (uint32_t)-1)
+                 return -1;
+             return buf.st_size;
 -- 
 2.20.1
 
