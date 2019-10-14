@@ -7,75 +7,76 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E843FC4CECE
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 11:36:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A7F46ECE587
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 11:36:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B1EE2206A3
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 11:36:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6F7B6206A3
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 11:36:36 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="RtERnifm"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B1EE2206A3
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Lns6ajTc"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6F7B6206A3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47930 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47934 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iJye2-0007Pb-I7
-	for qemu-devel@archiver.kernel.org; Mon, 14 Oct 2019 07:36:10 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46891)
+	id 1iJyeR-00081r-CP
+	for qemu-devel@archiver.kernel.org; Mon, 14 Oct 2019 07:36:35 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45555)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1iJyCD-00087r-NG
- for qemu-devel@nongnu.org; Mon, 14 Oct 2019 07:07:27 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1iJy2E-0006n1-Rb
+ for qemu-devel@nongnu.org; Mon, 14 Oct 2019 06:57:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1iJyCB-0007jp-3x
- for qemu-devel@nongnu.org; Mon, 14 Oct 2019 07:07:24 -0400
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:34884)
+ (envelope-from <alex.bennee@linaro.org>) id 1iJy2D-0005FB-EU
+ for qemu-devel@nongnu.org; Mon, 14 Oct 2019 06:57:06 -0400
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:43070)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1iJyCA-0007iR-TN
- for qemu-devel@nongnu.org; Mon, 14 Oct 2019 07:07:23 -0400
-Received: by mail-wr1-x443.google.com with SMTP id v8so19217345wrt.2
- for <qemu-devel@nongnu.org>; Mon, 14 Oct 2019 04:07:22 -0700 (PDT)
+ id 1iJy2C-0005DK-SV
+ for qemu-devel@nongnu.org; Mon, 14 Oct 2019 06:57:05 -0400
+Received: by mail-wr1-x441.google.com with SMTP id j18so19147263wrq.10
+ for <qemu-devel@nongnu.org>; Mon, 14 Oct 2019 03:57:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=crw16Ubz+md1UknF7Ek+z0EbuUyNC3Q+RBvq7bGGoJI=;
- b=RtERnifmGf+4oL7gLvdC4pomT5jrlctM+a9lrLPq6Spl9IkDmtbnTLafU6jvwHkAx4
- ZWmbK5DZcarmOwOORIY6CfJmwqMT3GYaLy6zdPq40wh2UITggfRbz7b3NHKCf6aYu9bf
- 5zJrCy8fydA3/hilxO+qNklczdLqZR/crrGkoUtDZHTWvV5i0+GMswNsc70Nr185lgHr
- dc/yawqyDHDV6gO20nM9Oo4ypxQpv0h3Yt0jrEnG3sye93YAF6BNb3vivMSOQKJuhc6d
- uuQrVVGKO3Q0fRE2sDTMjjk0mQ2MmJvViGnQf5F7buhIryi+xDQsS63QugqyhukoZ0CK
- B8Bg==
+ bh=ye+x/1nnHia5cN2gZpTEgLE2DtA5hK08gljlzreXCM8=;
+ b=Lns6ajTccNlQWQJkH+x1Ht04T+FIXEVgxdMYSH7Wbuc8WU56z/9PAWkFtK3Pto6FDv
+ YYmiPeIZ5Z5qv9/P6bAiBpzT2YEf1jAYSLRu7PL/0B2mt3DoJhc0Yu6mcV74QdERKQF5
+ Y91EHWMnLv6AKRtbUIsQuy8lbSaovC//fdq9D0VBQGUAvjxqo7eyxA/Okq/QxuH9McPD
+ 0KerWVd7JKmCzsX2XmfW5bHtLrKPJNTomxzMBjcEvOMF8pBE5braLPdI0KJU0LDEu/pr
+ +fGbmog8T8XS58Wcq1Q4amABYazSBNQRm7OEKSdb6GB/ss9TakdvOFgJuambHy64W3SE
+ 7X8A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=crw16Ubz+md1UknF7Ek+z0EbuUyNC3Q+RBvq7bGGoJI=;
- b=qaloYDvGl9abbYzf51fVRBdkzgxwyx34IlKArDv1Ay7yeckefNeeGIhEUR988wr89x
- vSN3hkToKiCMZnWLej2XOpSiWAZZ5ul/3GIWptmE4B0kcqvHMw9YWyiqCKCyH6NoDpxl
- prC+cQV2Cs0UgxYt5xxYsR+VTKnOEUDSVQjDggT5Nulnvy9r37LeoKhAvwkA88pNfmFJ
- v/YRFXYXp1NHUYRk2M9B4TwLGG++2gWgmFWSFGP4VMSsI5WoGXQjukkfJWW4NRjFK6R/
- Xw7P95Y6kJecXlH6qwBexRF6KMD/yOUe2RDgPEJfjGFMAz7IAUJ0iXL+bNw3XujaSj1D
- ionA==
-X-Gm-Message-State: APjAAAXb2FP+jJTwZSNbvaetAHl7ktIR4/81UC8jJtAocOXha6dp1RTV
- ZLubaWpGW6Nfs5r353iVDPpYLg==
-X-Google-Smtp-Source: APXvYqy/qljgz+DBH40+WeJON/kblishfmEahw8/enp+plEYXxqNtsFLtFKSQ4C1vQB1D4cyRtTF7Q==
-X-Received: by 2002:a5d:6189:: with SMTP id j9mr15899899wru.21.1571051241757; 
- Mon, 14 Oct 2019 04:07:21 -0700 (PDT)
+ bh=ye+x/1nnHia5cN2gZpTEgLE2DtA5hK08gljlzreXCM8=;
+ b=Hbo/LZkZZ5EpaygYAim2ZWpeJeJKgV5OqzTkx3dpzjXsovMuEeF+cZKWrL7iCp90fx
+ japHUaIs2gGOQh36l02ne3jhJtRSuOA0Rv4uYk4egTtHTnryOPab2VWUn0o0+9+l9UnD
+ +EzudjnUWQOBeYHzsbqkdkEZ+HC9CYrCs+355/owspmn808VgFMDnfs8b8FyIIMxMJyM
+ PthZZsYUjvAfv3QmSmb6yQ2mFL/aAupNu8HMNRd1yHRAmum04OkQN/kFZBz/8qyuNOOR
+ oucUXgkE+D3AqYJ99+TQb+zSavMx0vpZwtXr9Fep91hQcCc7K3gzJe9QLYvEhpPEZ79c
+ SIlw==
+X-Gm-Message-State: APjAAAXaJpuVNxtbI8PdP2M+/QWBXEKD9JsZKVic/om2TbtnvAxNgKOX
+ 4JPLNJ7mzLafebfD4Dx8i6SbjzaiCL0=
+X-Google-Smtp-Source: APXvYqzZqCHuG42EdrYTaDC2cR3avfNgkYtzmHyO9KM6VgqvryFAWiBSJi0g1dgKeeLvoIcmPlATBw==
+X-Received: by 2002:a5d:43c1:: with SMTP id v1mr25996208wrr.91.1571050623389; 
+ Mon, 14 Oct 2019 03:57:03 -0700 (PDT)
 Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id c9sm16764103wrt.7.2019.10.14.04.07.18
+ by smtp.gmail.com with ESMTPSA id c21sm13133247wmb.46.2019.10.14.03.56.56
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 14 Oct 2019 04:07:20 -0700 (PDT)
+ Mon, 14 Oct 2019 03:57:01 -0700 (PDT)
 Received: from zen.lan (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 2B4041FFC3;
- Mon, 14 Oct 2019 11:49:57 +0100 (BST)
+ by zen.linaroharston (Postfix) with ESMTP id B7E301FFD3;
+ Mon, 14 Oct 2019 11:49:59 +0100 (BST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH  v5 36/55] plugin: add API symbols to qemu-plugins.symbols
-Date: Mon, 14 Oct 2019 11:49:29 +0100
-Message-Id: <20191014104948.4291-37-alex.bennee@linaro.org>
+Subject: [PATCH v5 48/55] tests/plugin: add hotpages plugin to breakdown
+ memory access patterns
+Date: Mon, 14 Oct 2019 11:49:41 +0100
+Message-Id: <20191014104948.4291-49-alex.bennee@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20191014104948.4291-1-alex.bennee@linaro.org>
 References: <20191014104948.4291-1-alex.bennee@linaro.org>
@@ -84,7 +85,7 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::443
+X-Received-From: 2a00:1450:4864:20::441
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -103,225 +104,217 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: "Emilio G. Cota" <cota@braap.org>
+This plugin gives a break down of access patterns grouped into pages.
 
-Signed-off-by: Emilio G. Cota <cota@braap.org>
-[AJB: moved into plugins]
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 
 ---
-v3
-  - moved to plugins/
-  - include qemu_plugin_reset
-v5
-  - re-trigger configure if symbols are updated
-  - wrap ld checks inside if static = no
+v4
+   - tweaks for new hwaddr api
+   - add sorting and pagesize selection args
 ---
- Makefile                     |  7 ++++
- configure                    | 72 ++++++++++++++++++++++++++++++++++++
- plugins/.gitignore           |  2 +
- plugins/Makefile.objs        | 14 +++++++
- plugins/qemu-plugins.symbols | 38 +++++++++++++++++++
- 5 files changed, 133 insertions(+)
- create mode 100644 plugins/.gitignore
- create mode 100644 plugins/qemu-plugins.symbols
+ tests/plugin/Makefile   |   1 +
+ tests/plugin/hotpages.c | 179 ++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 180 insertions(+)
+ create mode 100644 tests/plugin/hotpages.c
 
-diff --git a/Makefile b/Makefile
-index 15f4745cf3..370eb9ad8d 100644
---- a/Makefile
-+++ b/Makefile
-@@ -74,6 +74,12 @@ CONFIG_ALL=y
- config-host.mak: $(SRC_PATH)/configure $(SRC_PATH)/pc-bios $(SRC_PATH)/VERSION
- 	@echo $@ is out-of-date, running configure
- 	@./config.status
-+
-+# Force configure to re-run if the API symbols are updated
-+ifeq ($(CONFIG_PLUGIN),y)
-+config-host.mak: $(SRC_PATH)/plugins/qemu-plugins.symbols
-+endif
-+
- else
- config-host.mak:
- ifneq ($(filter-out $(UNCHECKED_GOALS),$(MAKECMDGOALS)),$(if $(MAKECMDGOALS),,fail))
-@@ -730,6 +736,7 @@ distclean: clean
- 	rm -f qemu-doc.fn qemu-doc.fns qemu-doc.info qemu-doc.ky qemu-doc.kys
- 	rm -f qemu-doc.log qemu-doc.pdf qemu-doc.pg qemu-doc.toc qemu-doc.tp
- 	rm -f qemu-doc.vr qemu-doc.txt
-+	rm -f qemu-plugins-ld.symbols qemu-plugins-ld64.symbols
- 	rm -f config.log
- 	rm -f linux-headers/asm
- 	rm -f docs/version.texi
-diff --git a/configure b/configure
-index 485a9837c9..75632b1df1 100755
---- a/configure
-+++ b/configure
-@@ -30,6 +30,7 @@ TMPO="${TMPDIR1}/${TMPB}.o"
- TMPCXX="${TMPDIR1}/${TMPB}.cxx"
- TMPE="${TMPDIR1}/${TMPB}.exe"
- TMPMO="${TMPDIR1}/${TMPB}.mo"
-+TMPTXT="${TMPDIR1}/${TMPB}.txt"
+diff --git a/tests/plugin/Makefile b/tests/plugin/Makefile
+index 3656429d46..75467b6db8 100644
+--- a/tests/plugin/Makefile
++++ b/tests/plugin/Makefile
+@@ -12,6 +12,7 @@ NAMES += insn
+ NAMES += mem
+ NAMES += hotblocks
+ NAMES += howvec
++NAMES += hotpages
  
- rm -f config.log
+ SONAMES := $(addsuffix .so,$(addprefix lib,$(NAMES)))
  
-@@ -5464,6 +5465,61 @@ if compile_prog "" "" ; then
-   atomic64=yes
- fi
- 
-+#########################################
-+# See if --dynamic-list is supported by the linker
-+ld_dynamic_list="no"
-+if test "$static" = "no" ; then
-+    cat > $TMPTXT <<EOF
-+{
-+  foo;
-+};
-+EOF
+diff --git a/tests/plugin/hotpages.c b/tests/plugin/hotpages.c
+new file mode 100644
+index 0000000000..13ce8ffeb8
+--- /dev/null
++++ b/tests/plugin/hotpages.c
+@@ -0,0 +1,179 @@
++/*
++ * Copyright (C) 2019, Alex Bennée <alex.bennee@linaro.org>
++ *
++ * Hot Pages - show which pages saw the most memory accesses.
++ *
++ * License: GNU GPL, version 2 or later.
++ *   See the COPYING file in the top-level directory.
++ */
 +
-+    cat > $TMPC <<EOF
++#include <inttypes.h>
++#include <assert.h>
++#include <stdlib.h>
++#include <inttypes.h>
++#include <string.h>
++#include <unistd.h>
 +#include <stdio.h>
-+void foo(void);
++#include <glib.h>
 +
-+void foo(void)
-+{
-+  printf("foo\n");
-+}
++#include <qemu-plugin.h>
 +
-+int main(void)
-+{
-+  foo();
-+  return 0;
-+}
-+EOF
++#define ARRAY_SIZE(x) (sizeof(x) / sizeof((x)[0]))
 +
-+    if compile_prog "" "-Wl,--dynamic-list=$TMPTXT" ; then
-+        ld_dynamic_list="yes"
-+    fi
-+fi
++static uint64_t page_size = 4096;
++static uint64_t page_mask;
++static int stdout_fd;
++static int limit = 50;
++static enum qemu_plugin_mem_rw rw = QEMU_PLUGIN_MEM_RW;
 +
-+#########################################
-+# See if -exported_symbols_list is supported by the linker
-+
-+ld_exported_symbols_list="no"
-+if test "$static" = "no" ; then
-+    cat > $TMPTXT <<EOF
-+  _foo
-+EOF
-+
-+    if compile_prog "" "-Wl,-exported_symbols_list,$TMPTXT" ; then
-+        ld_exported_symbols_list="yes"
-+    fi
-+fi
-+
-+if  test "$plugins" = "yes" &&
-+    test "$ld_dynamic_list" = "no" &&
-+    test "$ld_exported_symbols_list" = "no" ; then
-+  error_exit \
-+      "Plugin support requires dynamic linking and specifying a set of symbols " \
-+      "that are exported to plugins. Unfortunately your linker doesn't " \
-+      "support the flag (--dynamic-list or -exported_symbols_list) used " \
-+      "for this purpose. You can't build with --static."
-+fi
-+
- ########################################
- # See if 16-byte vector operations are supported.
- # Even without a vector unit the compiler may expand these.
-@@ -7267,6 +7323,22 @@ fi
- if test "$plugins" = "yes" ; then
-     echo "CONFIG_PLUGIN=y" >> $config_host_mak
-     LIBS="-ldl $LIBS"
-+    # Copy the export object list to the build dir
-+    if test "$ld_dynamic_list" = "yes" ; then
-+	echo "CONFIG_HAS_LD_DYNAMIC_LIST=yes" >> $config_host_mak
-+	ld_symbols=qemu-plugins-ld.symbols
-+	cp "$source_path/plugins/qemu-plugins.symbols" $ld_symbols
-+    elif test "$ld_exported_symbols_list" = "yes" ; then
-+	echo "CONFIG_HAS_LD_EXPORTED_SYMBOLS_LIST=yes" >> $config_host_mak
-+	ld64_symbols=qemu-plugins-ld64.symbols
-+	echo "# Automatically generated by configure - do not modify" > $ld64_symbols
-+	grep 'qemu_' "$source_path/plugins/qemu-plugins.symbols" | sed 's/;//g' | \
-+	    sed -E 's/^[[:space:]]*(.*)/_\1/' >> $ld64_symbols
-+    else
-+	error_exit \
-+	    "If \$plugins=yes, either \$ld_dynamic_list or " \
-+	    "\$ld_exported_symbols_list should have been set to 'yes'."
-+    fi
- fi
- 
- if test "$tcg_interpreter" = "yes"; then
-diff --git a/plugins/.gitignore b/plugins/.gitignore
-new file mode 100644
-index 0000000000..7b8aaa1f10
---- /dev/null
-+++ b/plugins/.gitignore
-@@ -0,0 +1,2 @@
-+qemu-plugins-ld.symbols
-+qemu-plugins-ld64.symbols
-diff --git a/plugins/Makefile.objs b/plugins/Makefile.objs
-index 95baabf3d2..6f14d91ccb 100644
---- a/plugins/Makefile.objs
-+++ b/plugins/Makefile.objs
-@@ -5,3 +5,17 @@
- obj-y += loader.o
- obj-y += core.o
- obj-y += api.o
-+
-+# Abuse -libs suffix to only link with --dynamic-list/-exported_symbols_list
-+# when the final binary includes the plugin object.
-+#
-+# Note that simply setting LDFLAGS is not enough: we build binaries that
-+# never link plugin.o, and the linker might fail (at least ld64 does)
-+# if the symbols in the list are not in the output binary.
-+ifdef CONFIG_HAS_LD_DYNAMIC_LIST
-+api.o-libs := -Wl,--dynamic-list=$(BUILD_DIR)/qemu-plugins-ld.symbols
-+else
-+ifdef CONFIG_HAS_LD_EXPORTED_SYMBOLS_LIST
-+api.o-libs := -Wl,-exported_symbols_list,$(BUILD_DIR)/qemu-plugins-ld64.symbols
-+endif
-+endif
-diff --git a/plugins/qemu-plugins.symbols b/plugins/qemu-plugins.symbols
-new file mode 100644
-index 0000000000..40c0d1abd2
---- /dev/null
-+++ b/plugins/qemu-plugins.symbols
-@@ -0,0 +1,38 @@
-+{
-+  qemu_plugin_uninstall;
-+  qemu_plugin_reset;
-+  qemu_plugin_register_vcpu_init_cb;
-+  qemu_plugin_register_vcpu_exit_cb;
-+  qemu_plugin_register_vcpu_idle_cb;
-+  qemu_plugin_register_vcpu_resume_cb;
-+  qemu_plugin_register_vcpu_insn_exec_cb;
-+  qemu_plugin_register_vcpu_insn_exec_inline;
-+  qemu_plugin_register_vcpu_mem_cb;
-+  qemu_plugin_register_vcpu_mem_haddr_cb;
-+  qemu_plugin_register_vcpu_mem_inline;
-+  qemu_plugin_ram_addr_from_host;
-+  qemu_plugin_register_vcpu_tb_trans_cb;
-+  qemu_plugin_register_vcpu_tb_exec_cb;
-+  qemu_plugin_register_vcpu_tb_exec_inline;
-+  qemu_plugin_register_flush_cb;
-+  qemu_plugin_register_vcpu_syscall_cb;
-+  qemu_plugin_register_vcpu_syscall_ret_cb;
-+  qemu_plugin_register_atexit_cb;
-+  qemu_plugin_tb_n_insns;
-+  qemu_plugin_tb_get_insn;
-+  qemu_plugin_tb_vaddr;
-+  qemu_plugin_insn_data;
-+  qemu_plugin_insn_size;
-+  qemu_plugin_insn_vaddr;
-+  qemu_plugin_insn_haddr;
-+  qemu_plugin_mem_size_shift;
-+  qemu_plugin_mem_is_sign_extended;
-+  qemu_plugin_mem_is_big_endian;
-+  qemu_plugin_mem_is_store;
-+  qemu_plugin_get_hwaddr;
-+  qemu_plugin_hwaddr_is_io;
-+  qemu_plugin_hwaddr_to_raddr;
-+  qemu_plugin_vcpu_for_each;
-+  qemu_plugin_n_vcpus;
-+  qemu_plugin_n_max_vcpus;
++enum sort_type {
++    SORT_RW = 0,
++    SORT_R,
++    SORT_W
 +};
++
++static int sort_by = SORT_RW;
++
++typedef struct {
++    uint64_t page_address;
++    int cpu_read;
++    int cpu_write;
++    uint64_t reads;
++    uint64_t writes;
++} PageCounters;
++
++static GMutex lock;
++static GHashTable *pages;
++
++static gint cmp_access_count(gconstpointer a, gconstpointer b)
++{
++    PageCounters *ea = (PageCounters *) a;
++    PageCounters *eb = (PageCounters *) b;
++    int r;
++    switch (sort_by) {
++    case SORT_RW:
++        r = (ea->reads + ea->writes) > (eb->reads + eb->writes) ? -1 : 1;
++        break;
++    case SORT_R:
++        r = ea->reads > eb->reads ? -1 : 1;
++        break;
++    case SORT_W:
++        r = ea->writes > eb->writes ? -1 : 1;
++        break;
++    default:
++        g_assert_not_reached();
++    }
++    return r;
++}
++
++
++static void plugin_exit(qemu_plugin_id_t id, void *p)
++{
++    GString *report = g_string_new("Addr, RCPUs, Reads, WCPUs, Writes\n");
++    int i;
++    GList *counts;
++
++    counts = g_hash_table_get_values(pages);
++    if (counts && g_list_next(counts)) {
++        GList *it;
++
++        it = g_list_sort(counts, cmp_access_count);
++
++        for (i = 0; i < limit && it->next; i++, it = it->next) {
++            PageCounters *rec = (PageCounters *) it->data;
++            g_string_append_printf(report,
++                                   "%#016"PRIx64", 0x%04x, %"PRId64
++                                   ", 0x%04x, %"PRId64"\n",
++                                   rec->page_address,
++                                   rec->cpu_read, rec->reads,
++                                   rec->cpu_write, rec->writes);
++        }
++        g_list_free(it);
++    }
++
++    dprintf(stdout_fd, "%s", report->str);
++    g_string_free(report, true);
++}
++
++static void plugin_init(void)
++{
++    page_mask = (page_size - 1);
++    pages = g_hash_table_new(NULL, g_direct_equal);
++}
++
++static void vcpu_haddr(unsigned int cpu_index, qemu_plugin_meminfo_t meminfo,
++                       uint64_t vaddr, void *udata)
++{
++    struct qemu_plugin_hwaddr *hwaddr = qemu_plugin_get_hwaddr(meminfo, vaddr);
++    uint64_t page;
++    PageCounters *count;
++
++    /* We only get a hwaddr for system emulation */
++    if (hwaddr) {
++        page = (uint64_t) qemu_plugin_hwaddr_to_raddr(hwaddr);
++    } else {
++        page = vaddr;
++    }
++    page &= ~page_mask;
++
++    g_mutex_lock(&lock);
++    count = (PageCounters *) g_hash_table_lookup(pages, GUINT_TO_POINTER(page));
++
++    if (!count) {
++        count = g_new0(PageCounters, 1);
++        count->page_address = page;
++        g_hash_table_insert(pages, GUINT_TO_POINTER(page), (gpointer) count);
++    }
++    if (qemu_plugin_mem_is_store(meminfo)) {
++        count->writes++;
++        count->cpu_write |= (1 << cpu_index);
++    } else {
++        count->reads++;
++        count->cpu_read |= (1 << cpu_index);
++    }
++
++    g_mutex_unlock(&lock);
++}
++
++static void vcpu_tb_trans(qemu_plugin_id_t id, struct qemu_plugin_tb *tb)
++{
++    size_t n = qemu_plugin_tb_n_insns(tb);
++    size_t i;
++
++    for (i = 0; i < n; i++) {
++        struct qemu_plugin_insn *insn = qemu_plugin_tb_get_insn(tb, i);
++        qemu_plugin_register_vcpu_mem_cb(insn, vcpu_haddr,
++                                         QEMU_PLUGIN_CB_NO_REGS,
++                                         rw, NULL);
++    }
++}
++
++QEMU_PLUGIN_EXPORT int qemu_plugin_install(qemu_plugin_id_t id, int argc,
++                                           char **argv)
++{
++    int i;
++
++    /* to be used when in the exit hook */
++    stdout_fd = dup(STDOUT_FILENO);
++    assert(stdout_fd);
++
++    for (i = 0; i < argc; i++) {
++        char *opt = argv[i];
++        if (g_strcmp0(opt, "reads") == 0) {
++            sort_by = SORT_R;
++        } else if (g_strcmp0(opt, "writes") == 0) {
++            sort_by = SORT_W;
++        } else if (g_str_has_prefix(opt, "pagesize=")) {
++            page_size = g_ascii_strtoull(opt + 9, NULL, 10);
++        } else {
++            dprintf(stdout_fd, "option parsing failed: %s\n", opt);
++            return -1;
++        }
++    }
++
++    plugin_init();
++
++    qemu_plugin_register_vcpu_tb_trans_cb(id, vcpu_tb_trans);
++    qemu_plugin_register_atexit_cb(id, plugin_exit, NULL);
++    return 0;
++}
 -- 
 2.20.1
 
