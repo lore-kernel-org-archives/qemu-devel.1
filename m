@@ -7,83 +7,83 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F3D6C4CECE
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 16:43:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EE9A1C4CECE
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 16:44:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2BC5A20663
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 16:43:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B7AC920663
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 16:44:10 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Lt7IfiW1"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2BC5A20663
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="cRXmWSLR"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B7AC920663
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53554 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53566 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iK3R2-00035I-SL
-	for qemu-devel@archiver.kernel.org; Mon, 14 Oct 2019 12:43:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37301)
+	id 1iK3S5-0004Fn-Or
+	for qemu-devel@archiver.kernel.org; Mon, 14 Oct 2019 12:44:09 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36950)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1iK2qa-0004zM-CH
- for qemu-devel@nongnu.org; Mon, 14 Oct 2019 12:05:25 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1iK2q4-0004Bx-9A
+ for qemu-devel@nongnu.org; Mon, 14 Oct 2019 12:04:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1iK2qZ-00082u-04
- for qemu-devel@nongnu.org; Mon, 14 Oct 2019 12:05:24 -0400
-Received: from mail-wm1-x335.google.com ([2a00:1450:4864:20::335]:56007)
+ (envelope-from <peter.maydell@linaro.org>) id 1iK2q2-0007QF-U5
+ for qemu-devel@nongnu.org; Mon, 14 Oct 2019 12:04:51 -0400
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:36894)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1iK2qY-00082I-Pm
- for qemu-devel@nongnu.org; Mon, 14 Oct 2019 12:05:22 -0400
-Received: by mail-wm1-x335.google.com with SMTP id a6so17834860wma.5
- for <qemu-devel@nongnu.org>; Mon, 14 Oct 2019 09:05:22 -0700 (PDT)
+ id 1iK2q2-0007PI-NK
+ for qemu-devel@nongnu.org; Mon, 14 Oct 2019 12:04:50 -0400
+Received: by mail-wr1-x442.google.com with SMTP id p14so20379797wro.4
+ for <qemu-devel@nongnu.org>; Mon, 14 Oct 2019 09:04:50 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:subject:date:message-id:in-reply-to:references:mime-version
  :content-transfer-encoding;
- bh=Cv6HZ91yGk0xGYbUoTFw/+DdSIijp5QJpKDphiE70KU=;
- b=Lt7IfiW1JftmiClW5f/IVDVxaZCGPpBT+TjimKispERn50D9DGW8HS9oMaJg6EFP/p
- W/w+x3BVs7TNcrgS4PFQcDSfS2Nl3DoWRncRox9oE4zSV665M+4s7+IbCAax6yujG47K
- t0A9EQcN1AsM5n6Jp71ND43gdbRdbVovNnAhKRbT80NYuAiZEztH0uROggnmiFu2/C7V
- FmHeIeLI/oRU5g7wZL2T1QDK2n5BcoGK1bOZfFSsZATNWv4jslhND6cDg3KCjVwZ3DS2
- uldEJeWGthtApdxnsNtL+XzOC+IUcZX/JkZ93zG8UlSJzLz8Zq4LOQx5lgEXnfHuKrL/
- gGXw==
+ bh=AqfOX9DanbrHqfYl2VtcpfIOP77gIYhu/52gPlZVV/I=;
+ b=cRXmWSLRSUUl2Uag/YMbiBTHxMpURXzmrUSZgQyDLliu45CbNKdzC5LGr3MpfTvwxL
+ GQZQwYrOiT5nMWvWYR6hVRe49JR/6udbg1vgsFoEGTrojCM2yz5cwo4LzbKOnbaziAsA
+ 1kGYuMeJi/ggB7jexRD1X6rLsbMjTKROiajf8xPwhv/Q0ztRp+buE4KzGn5dW0onsKei
+ MLDvAt03ettAgI90YyIl01cCPXLNsLbysfqTHkngbwo7OwmfgXVckq8tR7HLSi39fKmx
+ tPDUdcTA2z8PPsNeFfRBC/hWECNazkYESIHMaqFxRugkNrRCwMj7FRXyKFno2XWup/SF
+ W64Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=Cv6HZ91yGk0xGYbUoTFw/+DdSIijp5QJpKDphiE70KU=;
- b=m6CcoNgriEaQHoXaZfX7Bfumd9yUiUIGEw9LwBnELYeTGhL1LObo7ctjH1SUlTXxrB
- 8BXox+FIs72g1U15M1aICXNziMb2XBY6XmPuRvVHpuf8zuwMLdM26Ph8YgSON7tAqOED
- 1q0PdHidmjLVqvJAABrZRZ5M8NqYQBes+QK4swdvFNLxCBou/Duo/DV7oFKkKerx49nI
- elh9Qr3NOySmN/1xKVWFICpyRFYXde2PXZaySIcz2Diw2X0LxsobzJMJUTml9ZG8K2/a
- 7dedqF9iILpdUbhKzYjNX3th6NuWTPvruYuhFF6tYYpBm5ijsBMSIASIHT69WJRwTH6p
- QO5Q==
-X-Gm-Message-State: APjAAAWyMQ6Sz0vXGGkqx5bPu6jx7JvbpLkdaGBOOIpmLwxpPCl32Tfw
- 65m0ZlzxyxRB90Vx6telY5X7sfHGqVsyag==
-X-Google-Smtp-Source: APXvYqxJ+XwYzDMsFn6f2lVGb4+0y2wJfScFy752LgQ84DBlDnN3pn8CdrpEXCs7r+LNxhbrfQ2HYw==
-X-Received: by 2002:a7b:c011:: with SMTP id c17mr16026485wmb.95.1571069121590; 
- Mon, 14 Oct 2019 09:05:21 -0700 (PDT)
+ bh=AqfOX9DanbrHqfYl2VtcpfIOP77gIYhu/52gPlZVV/I=;
+ b=iSFl+cS8QihyBIDAB7W3rdN1mKVsnwfI0r/KZ98VFPP5cMSvWIwkrF2XYEXBstLqoD
+ BxwXKsyjzAkImRkjD3cu278IFyqvpP8PHmjZofxl9KR1MR8ETGRXA2lJht1thErNIjAD
+ aMyCWXwxac7r+dEjQV7WmYmeHs2/Qs03k7QKGXZQR6+HyUHzlipRvyegvTVP4EjRwz50
+ pYxj4ysDelPc6juVaCi8jD9At6xso1GrMKTvuBNrunNdfwHUN+x1DzVbbHKPg5E8phVv
+ R6+HZgHtWhB8Vg7o7i/OWdTA8jfMkpnDuEBUTrVxyihoOd25Ml0NOJXPjRUMYafsdvc1
+ WYxw==
+X-Gm-Message-State: APjAAAXc1ZTN06pPRnN9hfOpB8ZN4x6gPnSUxNgmYNuMdfTkgmDkoiQP
+ drCV4K0Odyd5cIegKqOxvsJj8gFRf8vf2Q==
+X-Google-Smtp-Source: APXvYqw2U5QtnatkDf6k2+QKRrhQKFX5pOgMsmBUClRjDTsEjd54QhgJD/75rEcG3yoKTdne/fkwmg==
+X-Received: by 2002:a05:6000:103:: with SMTP id
+ o3mr2574464wrx.357.1571069089237; 
+ Mon, 14 Oct 2019 09:04:49 -0700 (PDT)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id 5sm18029779wrk.86.2019.10.14.09.05.20
+ by smtp.gmail.com with ESMTPSA id 5sm18029779wrk.86.2019.10.14.09.04.47
  for <qemu-devel@nongnu.org>
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 14 Oct 2019 09:05:20 -0700 (PDT)
+ Mon, 14 Oct 2019 09:04:48 -0700 (PDT)
 From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PULL 46/68] aspeed/timer: Add support for IRQ status register on the
- AST2600
-Date: Mon, 14 Oct 2019 17:03:42 +0100
-Message-Id: <20191014160404.19553-47-peter.maydell@linaro.org>
+Subject: [PULL 22/68] hw/timer/mss-timerc: Switch to transaction-based ptimer
+ API
+Date: Mon, 14 Oct 2019 17:03:18 +0100
+Message-Id: <20191014160404.19553-23-peter.maydell@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20191014160404.19553-1-peter.maydell@linaro.org>
 References: <20191014160404.19553-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::335
+X-Received-From: 2a00:1450:4864:20::442
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,168 +99,84 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Cédric Le Goater <clg@kaod.org>
+Switch the mss-timer code away from bottom-half based ptimers to
+the new transaction-based ptimer API.  This just requires adding
+begin/commit calls around the various places that modify the ptimer
+state, and using the new ptimer_init() function to create the timer.
 
-The AST2600 timer replaces control register 2 with a interrupt status
-register. It is set by hardware when an IRQ occurs and cleared by
-software.
-
-Modify the vmstate version to take into account the new fields.
-
-Based on previous work from Joel Stanley.
-
-Signed-off-by: Cédric Le Goater <clg@kaod.org>
-Reviewed-by: Joel Stanley <joel@jms.id.au>
-Message-id: 20190925143248.10000-8-clg@kaod.org
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Message-id: 20191008171740.9679-20-peter.maydell@linaro.org
 ---
- include/hw/timer/aspeed_timer.h |  1 +
- hw/timer/aspeed_timer.c         | 36 +++++++++++++++++++++++++--------
- 2 files changed, 29 insertions(+), 8 deletions(-)
+ include/hw/timer/mss-timer.h |  1 -
+ hw/timer/mss-timer.c         | 11 ++++++++---
+ 2 files changed, 8 insertions(+), 4 deletions(-)
 
-diff --git a/include/hw/timer/aspeed_timer.h b/include/hw/timer/aspeed_timer.h
-index 69b1377af01..948329893c0 100644
---- a/include/hw/timer/aspeed_timer.h
-+++ b/include/hw/timer/aspeed_timer.h
-@@ -60,6 +60,7 @@ typedef struct AspeedTimerCtrlState {
-     uint32_t ctrl;
-     uint32_t ctrl2;
-     uint32_t ctrl3;
-+    uint32_t irq_sts;
-     AspeedTimer timers[ASPEED_TIMER_NR_TIMERS];
+diff --git a/include/hw/timer/mss-timer.h b/include/hw/timer/mss-timer.h
+index d15d1732f81..e5a784b27e4 100644
+--- a/include/hw/timer/mss-timer.h
++++ b/include/hw/timer/mss-timer.h
+@@ -46,7 +46,6 @@
+ #define R_TIM1_MAX        6
  
-     AspeedSCUState *scu;
-diff --git a/hw/timer/aspeed_timer.c b/hw/timer/aspeed_timer.c
-index 7f73d0c7533..bcce2192a92 100644
---- a/hw/timer/aspeed_timer.c
-+++ b/hw/timer/aspeed_timer.c
-@@ -160,7 +160,9 @@ static uint64_t calculate_next(struct AspeedTimer *t)
-     timer_del(&t->timer);
+ struct Msf2Timer {
+-    QEMUBH *bh;
+     ptimer_state *ptimer;
  
-     if (timer_overflow_interrupt(t)) {
-+        AspeedTimerCtrlState *s = timer_to_ctrl(t);
-         t->level = !t->level;
-+        s->irq_sts |= BIT(t->id);
-         qemu_set_irq(t->irq, t->level);
-     }
+     uint32_t regs[R_TIM1_MAX];
+diff --git a/hw/timer/mss-timer.c b/hw/timer/mss-timer.c
+index a34c2402b00..b1c9a805011 100644
+--- a/hw/timer/mss-timer.c
++++ b/hw/timer/mss-timer.c
+@@ -24,7 +24,6 @@
+  */
  
-@@ -199,7 +201,9 @@ static void aspeed_timer_expire(void *opaque)
-     }
- 
-     if (interrupt) {
-+        AspeedTimerCtrlState *s = timer_to_ctrl(t);
-         t->level = !t->level;
-+        s->irq_sts |= BIT(t->id);
-         qemu_set_irq(t->irq, t->level);
-     }
- 
-@@ -244,9 +248,6 @@ static uint64_t aspeed_timer_read(void *opaque, hwaddr offset, unsigned size)
-     case 0x30: /* Control Register */
-         value = s->ctrl;
-         break;
--    case 0x34: /* Control Register 2 */
--        value = s->ctrl2;
--        break;
-     case 0x00 ... 0x2c: /* Timers 1 - 4 */
-         value = aspeed_timer_get_value(&s->timers[(offset >> 4)], reg);
-         break;
-@@ -438,9 +439,6 @@ static void aspeed_timer_write(void *opaque, hwaddr offset, uint64_t value,
-     case 0x30:
-         aspeed_timer_set_ctrl(s, tv);
-         break;
--    case 0x34:
--        aspeed_timer_set_ctrl2(s, tv);
--        break;
-     /* Timer Registers */
-     case 0x00 ... 0x2c:
-         aspeed_timer_set_value(s, (offset >> TIMER_NR_REGS), reg, tv);
-@@ -468,6 +466,9 @@ static uint64_t aspeed_2400_timer_read(AspeedTimerCtrlState *s, hwaddr offset)
-     uint64_t value;
- 
-     switch (offset) {
-+    case 0x34:
-+        value = s->ctrl2;
-+        break;
-     case 0x38:
-     case 0x3C:
-     default:
-@@ -482,7 +483,12 @@ static uint64_t aspeed_2400_timer_read(AspeedTimerCtrlState *s, hwaddr offset)
- static void aspeed_2400_timer_write(AspeedTimerCtrlState *s, hwaddr offset,
-                                     uint64_t value)
- {
-+    const uint32_t tv = (uint32_t)(value & 0xFFFFFFFF);
-+
-     switch (offset) {
-+    case 0x34:
-+        aspeed_timer_set_ctrl2(s, tv);
-+        break;
-     case 0x38:
-     case 0x3C:
-     default:
-@@ -497,6 +503,9 @@ static uint64_t aspeed_2500_timer_read(AspeedTimerCtrlState *s, hwaddr offset)
-     uint64_t value;
- 
-     switch (offset) {
-+    case 0x34:
-+        value = s->ctrl2;
-+        break;
-     case 0x38:
-         value = s->ctrl3 & BIT(0);
-         break;
-@@ -517,6 +526,9 @@ static void aspeed_2500_timer_write(AspeedTimerCtrlState *s, hwaddr offset,
-     uint8_t command;
- 
-     switch (offset) {
-+    case 0x34:
-+        aspeed_timer_set_ctrl2(s, tv);
-+        break;
-     case 0x38:
-         command = (value >> 1) & 0xFF;
-         if (command == 0xAE) {
-@@ -543,6 +555,9 @@ static uint64_t aspeed_2600_timer_read(AspeedTimerCtrlState *s, hwaddr offset)
-     uint64_t value;
- 
-     switch (offset) {
-+    case 0x34:
-+        value = s->irq_sts;
-+        break;
-     case 0x38:
-     case 0x3C:
-     default:
-@@ -560,6 +575,9 @@ static void aspeed_2600_timer_write(AspeedTimerCtrlState *s, hwaddr offset,
-     const uint32_t tv = (uint32_t)(value & 0xFFFFFFFF);
- 
-     switch (offset) {
-+    case 0x34:
-+        s->irq_sts &= tv;
-+        break;
-     case 0x3C:
-         aspeed_timer_set_ctrl(s, s->ctrl & ~tv);
-         break;
-@@ -626,6 +644,7 @@ static void aspeed_timer_reset(DeviceState *dev)
-     s->ctrl = 0;
-     s->ctrl2 = 0;
-     s->ctrl3 = 0;
-+    s->irq_sts = 0;
+ #include "qemu/osdep.h"
+-#include "qemu/main-loop.h"
+ #include "qemu/module.h"
+ #include "qemu/log.h"
+ #include "hw/irq.h"
+@@ -67,6 +66,7 @@ static void timer_update_irq(struct Msf2Timer *st)
+     qemu_set_irq(st->irq, (ier && isr));
  }
  
- static const VMStateDescription vmstate_aspeed_timer = {
-@@ -644,12 +663,13 @@ static const VMStateDescription vmstate_aspeed_timer = {
++/* Must be called from within a ptimer_transaction_begin/commit block */
+ static void timer_update(struct Msf2Timer *st)
+ {
+     uint64_t count;
+@@ -159,7 +159,9 @@ timer_write(void *opaque, hwaddr offset,
+     switch (addr) {
+     case R_TIM_CTRL:
+         st->regs[R_TIM_CTRL] = value;
++        ptimer_transaction_begin(st->ptimer);
+         timer_update(st);
++        ptimer_transaction_commit(st->ptimer);
+         break;
  
- static const VMStateDescription vmstate_aspeed_timer_state = {
-     .name = "aspeed.timerctrl",
--    .version_id = 1,
--    .minimum_version_id = 1,
-+    .version_id = 2,
-+    .minimum_version_id = 2,
-     .fields = (VMStateField[]) {
-         VMSTATE_UINT32(ctrl, AspeedTimerCtrlState),
-         VMSTATE_UINT32(ctrl2, AspeedTimerCtrlState),
-         VMSTATE_UINT32(ctrl3, AspeedTimerCtrlState),
-+        VMSTATE_UINT32(irq_sts, AspeedTimerCtrlState),
-         VMSTATE_STRUCT_ARRAY(timers, AspeedTimerCtrlState,
-                              ASPEED_TIMER_NR_TIMERS, 1, vmstate_aspeed_timer,
-                              AspeedTimer),
+     case R_TIM_RIS:
+@@ -171,7 +173,9 @@ timer_write(void *opaque, hwaddr offset,
+     case R_TIM_LOADVAL:
+         st->regs[R_TIM_LOADVAL] = value;
+         if (st->regs[R_TIM_CTRL] & TIMER_CTRL_ENBL) {
++            ptimer_transaction_begin(st->ptimer);
+             timer_update(st);
++            ptimer_transaction_commit(st->ptimer);
+         }
+         break;
+ 
+@@ -228,9 +232,10 @@ static void mss_timer_init(Object *obj)
+     for (i = 0; i < NUM_TIMERS; i++) {
+         struct Msf2Timer *st = &t->timers[i];
+ 
+-        st->bh = qemu_bh_new(timer_hit, st);
+-        st->ptimer = ptimer_init_with_bh(st->bh, PTIMER_POLICY_DEFAULT);
++        st->ptimer = ptimer_init(timer_hit, st, PTIMER_POLICY_DEFAULT);
++        ptimer_transaction_begin(st->ptimer);
+         ptimer_set_freq(st->ptimer, t->freq_hz);
++        ptimer_transaction_commit(st->ptimer);
+         sysbus_init_irq(SYS_BUS_DEVICE(obj), &st->irq);
+     }
+ 
 -- 
 2.20.1
 
