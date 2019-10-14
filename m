@@ -2,75 +2,77 @@ Return-Path: <SRS0=PUPy=YH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BE471ECE587
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 15:37:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EBA87C4CECE
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 15:38:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8A1DA2067B
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 15:37:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B62202067B
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 15:38:26 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="QPr80sNj"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8A1DA2067B
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="LTJhyt+/"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B62202067B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51562 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51598 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iK2P8-0003gt-Kk
-	for qemu-devel@archiver.kernel.org; Mon, 14 Oct 2019 11:37:02 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60440)
+	id 1iK2QT-00050p-TG
+	for qemu-devel@archiver.kernel.org; Mon, 14 Oct 2019 11:38:25 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60631)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1iK2OP-0003Bf-14
- for qemu-devel@nongnu.org; Mon, 14 Oct 2019 11:36:17 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1iK2PP-0004HF-CX
+ for qemu-devel@nongnu.org; Mon, 14 Oct 2019 11:37:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1iK2ON-0001ve-R7
- for qemu-devel@nongnu.org; Mon, 14 Oct 2019 11:36:16 -0400
-Received: from mail-oi1-x244.google.com ([2607:f8b0:4864:20::244]:42903)
+ (envelope-from <peter.maydell@linaro.org>) id 1iK2PO-0002WJ-57
+ for qemu-devel@nongnu.org; Mon, 14 Oct 2019 11:37:19 -0400
+Received: from mail-oi1-x244.google.com ([2607:f8b0:4864:20::244]:35884)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1iK2ON-0001vL-LJ
- for qemu-devel@nongnu.org; Mon, 14 Oct 2019 11:36:15 -0400
-Received: by mail-oi1-x244.google.com with SMTP id i185so14067494oif.9
- for <qemu-devel@nongnu.org>; Mon, 14 Oct 2019 08:36:15 -0700 (PDT)
+ id 1iK2PN-0002Vz-Ve
+ for qemu-devel@nongnu.org; Mon, 14 Oct 2019 11:37:18 -0400
+Received: by mail-oi1-x244.google.com with SMTP id k20so14107226oih.3
+ for <qemu-devel@nongnu.org>; Mon, 14 Oct 2019 08:37:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
  :cc:content-transfer-encoding;
- bh=aon3RehBDE2fWEQvWFNGKmlKtZuPKRHzLBFzBefocu4=;
- b=QPr80sNjdoNP3bzzbitYefaMoSWseR/mI/x9enTwKMYw6m0ioxtpjZPLIKCllr+yOW
- UhR/pJxHhZ1aVtnFKxdpXIM1q92kbXXSDplG/fB6gTO5H2Z2QmPawIcYDXsJHoevcHzQ
- tzwxUKkK8lmXoyh7KlorAKULmYnLGhWSys84aQq5qyZ1GWWdfs5lfCPIAHogFqOrpLh1
- 2Di5dj8hYduToLriyf1xNEDB00soKPcB1cbX4Kb2+8p+xpks1S/G4+Wi2bFG8R7MoFxQ
- wUOTarqzqZEmdh9ryS3kE+9/Hz/E7WtLAi6WudUG37VMqeumcUhO5sx+WmqJEqhRbE5+
- y7qg==
+ bh=y32A3HJkq/d3cuV4YZtMh4nWb24oTgdNXB+M2DCNMHA=;
+ b=LTJhyt+/lQvd7U7ZHETZkyBgut7BBmZ3qzIQDz337HWsmR7AZuwUx2zsaRy0O/EZuH
+ x/Ib5QIcFp7UK4iHVmsxnB8S0NatTl3Caa1imNVRq2egRaurjlXvjXYZsUvi7+NYBuVT
+ gN8psICUfFSeuLEh1kPZ2AORhzMwLXPl82TTXAG2Y2iWD8LnVx9eLQhgUEkur7R8L8Nf
+ qNupytVd4P3RUX+Xqwj/Wv04ZLd5zrPGWyWqnyflR0ArB3tFiSmvvqLrrGCYCEbRLPy3
+ OkKZQhiF/BC2cAHzekHuZ5DTNUCruLhGAvtdAttHeFbxJEter/cuWIB6eW/PXrrpaw9A
+ b/DQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc:content-transfer-encoding;
- bh=aon3RehBDE2fWEQvWFNGKmlKtZuPKRHzLBFzBefocu4=;
- b=UBq5FsWDY3hQnZjD7jJTw/ZPvYCdzQFFfx+JrLPg59mLWHQosuV/ZGROn52IqkqEkU
- grPZNprT4ppQvw9/WDwurSlFGXTpopGc3O6g5/RdnvLnn8XGms+WJRcldSMU7rNTtfjB
- ZoL93zLWKr5eM58fOIfsSucnCOqqJX0UJDXCY623b5mk2qC8MNyZ5i4zrMQUQ9/VZjqM
- 94WkKC7m4GD2AwXSxyxALwKJHectVKC6QxmJ9ohLimO1hhBZx3qSy865IQ5CfWSqfKxp
- 7t1oqCjtFWm5mXnOMDck5Xb5ef5m/viyjFm86nPbRQFwlK5fJ/H9FwQ3Rpj6UT2zGpLp
- TDpA==
-X-Gm-Message-State: APjAAAUupWyqcr8fhG5Ka/N2E/9r8BiL+3cPiD4t8RvNg/eFR673rOkl
- z23PI42y0fv8s4xTlqmM/MvQviC8zYnqqPirBgXNGQ==
-X-Google-Smtp-Source: APXvYqy2D/G39aB1GnSiqwrIK4W3tLfK9yKU+UrcvAl3MJ7edbzAIkfs/Zk0bolZu6PUe6TNfOeKtlJwKLtXcRZLKU0=
-X-Received: by 2002:aca:3b41:: with SMTP id i62mr23694683oia.48.1571067374864; 
- Mon, 14 Oct 2019 08:36:14 -0700 (PDT)
+ bh=y32A3HJkq/d3cuV4YZtMh4nWb24oTgdNXB+M2DCNMHA=;
+ b=KM/SYlv2ASZPMMfzSWOJpIJBlB7j3SkiUX7tNF9jPIu69dDUsF8ly+PQ/Mj4cZJbPR
+ TEQMVhOjNpAtBBzQGyP3cZihcoAD6dKJ5fS3oi7RlNlV9z3ZlbzK/GAnntPaSj8HangK
+ bGH2fo08efumYJ3PbhDa4eVy1faLSJAzcs3nEOAI18qK/r53vcCJO/IEeOOEaSrjYO7K
+ /7oIBhYpUgesANwlOTNFlwHkCzeUUx5mr60tJ953R+4uwGZWSpQIJRV4lnHxNjUvXNU5
+ rEcd+qFOLlKhAFgaRqXuZB+M7DmVYAAQEpByN5SXbwotQaV9794qqfHFBTMhMEycFFis
+ sMtg==
+X-Gm-Message-State: APjAAAWvpo1KgQdWDCwYOeC7ImRx7z+cniYr7p2/e9hZUXxRmyGqKIDr
+ wYrQSuufmNC/fVMJTAjUVYT4n+8aewE465X9SjR5VQ==
+X-Google-Smtp-Source: APXvYqzsqMLVHaUqTw/k7KQXu8gLg85xxAUvyXsS2iO3z5pibwI6ceo7aQCRSk4IYoMsc9LTfq+q7+C9DxnSRRKZ0kk=
+X-Received: by 2002:aca:2b08:: with SMTP id i8mr23689243oik.146.1571067437188; 
+ Mon, 14 Oct 2019 08:37:17 -0700 (PDT)
 MIME-Version: 1.0
 References: <20190926173428.10713-1-f4bug@amsat.org>
- <20190926173428.10713-7-f4bug@amsat.org>
-In-Reply-To: <20190926173428.10713-7-f4bug@amsat.org>
+ <20190926173428.10713-9-f4bug@amsat.org>
+In-Reply-To: <20190926173428.10713-9-f4bug@amsat.org>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 14 Oct 2019 16:36:03 +0100
-Message-ID: <CAFEAcA-cbTqYaRr8epJVgUV+tkGgCuf__aM3GxRzbKuqgWfPYQ@mail.gmail.com>
-Subject: Re: [PATCH 06/19] hw/char/bcm2835_aux: Add trace events
+Date: Mon, 14 Oct 2019 16:37:05 +0100
+Message-ID: <CAFEAcA-2SCsRepsERqGWD-4AYy=uxb7Y2eW2F_z45tyo0Yx-fw@mail.gmail.com>
+Subject: Re: [PATCH 08/19] hw/misc/bcm2835_thermal: Add a dummy BCM2835
+ thermal sensor
 To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
@@ -109,25 +111,32 @@ Sender: "Qemu-devel"
 On Thu, 26 Sep 2019 at 18:34, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>=
  wrote:
 >
-> The BCM2835 AUX UART is compatible with the 16650 model, when
-> the registers belong the the 16650 block, use its trace events,
-> else use bcm2835_aux_read/write.
+> We will soon implement the SYS_timer. This timer is used by Linux
+> in the thermal subsystem, so once available, the subsystem will be
+> enabled and poll the temperature sensors. We need to provide the
+> minimum required to keep Linux booting.
+>
+> Add a dummy thermal sensor returning ~25=C2=B0C based on:
+> https://github.com/raspberrypi/linux/blob/rpi-5.3.y/drivers/thermal/broad=
+com/bcm2835_thermal.c
 >
 > Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 > ---
+> checkpatch warning:
+> WARNING: added, moved or deleted file(s), does MAINTAINERS need updating?
+> This is OK because the regex are:
+>
+>   F: hw/*/bcm283*
+>   F: include/hw/*/bcm283*
 
-> +    if (is_16650(offset)) {
-> +        trace_serial_ioport_read((offset & 0x1f) >> 2, res);
-> +    } else {
-> +        trace_bcm2835_aux_read(offset, res);
-> +    }
+> +static void bcm2835_thermal_class_init(ObjectClass *klass, void *data)
+> +{
+> +    DeviceClass *dc =3D DEVICE_CLASS(klass);
+> +
+> +    dc->realize =3D bcm2835_thermal_realize;
+> +}
 
-I'm not really a fan of this. I would expect that if I turn
-on the trace point for reads from the device that I see all
-the reads, not just a subset of them. The device may be
-minimally software-compatible with a 16650, but it isn't actually
-a 16650, and there doesn't seem to be much point in sharing
-the serial_ioport_read() tracepoint.
+This is missing the vmsd and reset function.
 
 thanks
 -- PMM
