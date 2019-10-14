@@ -2,89 +2,111 @@ Return-Path: <SRS0=PUPy=YH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A044ECE587
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 11:41:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C668EC4CECE
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 11:41:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 31EDC206A3
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 11:41:01 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Dck61wv7"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 31EDC206A3
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 9B75C206A3
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 11:41:15 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9B75C206A3
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48030 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48034 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iJyii-0005dY-5E
-	for qemu-devel@archiver.kernel.org; Mon, 14 Oct 2019 07:41:00 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46859)
+	id 1iJyiw-0005to-7t
+	for qemu-devel@archiver.kernel.org; Mon, 14 Oct 2019 07:41:14 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49865)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1iJyCA-00083v-5h
- for qemu-devel@nongnu.org; Mon, 14 Oct 2019 07:07:23 -0400
+ (envelope-from <thuth@redhat.com>) id 1iJyW8-0007Es-I5
+ for qemu-devel@nongnu.org; Mon, 14 Oct 2019 07:28:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1iJyC9-0007gu-3P
- for qemu-devel@nongnu.org; Mon, 14 Oct 2019 07:07:22 -0400
-Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:36583)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1iJyC8-0007f9-TE
- for qemu-devel@nongnu.org; Mon, 14 Oct 2019 07:07:21 -0400
-Received: by mail-wm1-x342.google.com with SMTP id m18so16323032wmc.1
- for <qemu-devel@nongnu.org>; Mon, 14 Oct 2019 04:07:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=cgnURW7On79/62ZfWFlo3wt05KKxTsvmAfQT2MMGb8A=;
- b=Dck61wv71VwOMiZLUxd0YHY7tTYvalyf3JAyksmOOjIUgLRsClbtcGX342W/8PDYV7
- OsoBHzJwDnw8cpuYgukbVUiOQPXquqo38Z63FnbcZI/+Z3MkCnQM1cIwOxUbKO/lNuqs
- x1VJt9HUJvV6Ytnd8OwibfOx91IQFTlgtSzgO1UCoIE+s8uqxYd5UB2zOSwzJEpYDC8q
- srmk3pH9Q0lyAGugQITSRLpQiUITSbs+6zSNfqjLwVh7IbMhCt6cvST6csFIkUBcZ/cq
- Njg6aZFt7W2hHY0GajCsY10EQW2hFzhPZy1236vfXA8G90v9+zyCY5H0de3zlJj3nXx+
- 7wHQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=cgnURW7On79/62ZfWFlo3wt05KKxTsvmAfQT2MMGb8A=;
- b=IXxhpwh1kWVrKINg3iq2lwvMy/0gFuWhHHIC0k0PK27bwHDoWt+6c1gk/xshXysFnq
- ksMRr/H0avzY5wksjSN9YjEEy9UD1XVojB+SC6HdOwLCcaZUsBn8pBM4vO32DhMkHhre
- OmcgfMRoXUTgy4cxbz3zp12k6O8tfBcGI/aVFye2hoCB3yn0ihJ9CRzwORx0CCYmQKi3
- JIMHmsNsLSFrZhwCZz+HxvkJx1nCNZhSDGwuojobIyagyTFLtGxgCnUFr+XOxaF74pEO
- pM68Pe4sqc07zcNnz9EN6WKy+Hyfxu2+I2CSpkPibXFc971iXdelklS+D0w8TJLGYXy4
- Sp6A==
-X-Gm-Message-State: APjAAAU5vDlXI65W0IJwhSryw0AUs8Cce6jGwpZOm9Zgyc6sX0fwm2yK
- DY9Mcg/iiuyE6+jKWV2/d/KISw==
-X-Google-Smtp-Source: APXvYqwW7lP66UHLDfLRxC1gwO9lwr6zPy/wvo9x/FjTrR6uzbbpFaWGT7NDYA3DLg/4QXLhR5No/A==
-X-Received: by 2002:a7b:cd19:: with SMTP id f25mr15120161wmj.154.1571051239230; 
- Mon, 14 Oct 2019 04:07:19 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id q19sm36321550wra.89.2019.10.14.04.07.17
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 14 Oct 2019 04:07:17 -0700 (PDT)
-Received: from zen.lan (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 816461FFDE;
- Mon, 14 Oct 2019 11:50:01 +0100 (BST)
-From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: qemu-devel@nongnu.org
-Subject: [PATCH  v5 55/55] .travis.yml: add --enable-plugins tests
-Date: Mon, 14 Oct 2019 11:49:48 +0100
-Message-Id: <20191014104948.4291-56-alex.bennee@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20191014104948.4291-1-alex.bennee@linaro.org>
-References: <20191014104948.4291-1-alex.bennee@linaro.org>
+ (envelope-from <thuth@redhat.com>) id 1iJyW7-0005rG-B3
+ for qemu-devel@nongnu.org; Mon, 14 Oct 2019 07:28:00 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55402)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <thuth@redhat.com>)
+ id 1iJyW1-0005ie-US; Mon, 14 Oct 2019 07:27:55 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 69B4418C891F;
+ Mon, 14 Oct 2019 11:27:51 +0000 (UTC)
+Received: from thuth.remote.csb (dhcp-200-228.str.redhat.com [10.33.200.228])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 5E6A45C1D4;
+ Mon, 14 Oct 2019 11:27:47 +0000 (UTC)
+Subject: Re: [PATCH 4/5] iotests: Skip "make check-block" if QEMU does not
+ support virtio-blk
+To: Kevin Wolf <kwolf@redhat.com>
+References: <20191011145047.19051-1-thuth@redhat.com>
+ <20191011145047.19051-5-thuth@redhat.com>
+ <20191014112126.GF7173@localhost.localdomain>
+From: Thomas Huth <thuth@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=thuth@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+Organization: Red Hat
+Message-ID: <d82aa777-e193-a484-980a-d0152989e920@redhat.com>
+Date: Mon, 14 Oct 2019 13:27:47 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::342
+In-Reply-To: <20191014112126.GF7173@localhost.localdomain>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.70]); Mon, 14 Oct 2019 11:27:51 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,55 +118,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- robert.foley@futurewei.com, Richard Henderson <richard.henderson@linaro.org>,
- peter.puhov@futurewei.com, aaron@os.amperecomputing.com, cota@braap.org,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Cc: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org,
+ Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-check-tcg will automatically run the plugins against most TCG tests if
-it is enabled in the build. We exclude sparc64-linux-user for now as
-there are pending patches that need to be merged fixing it's fork
-implementation.
+On 14/10/2019 13.21, Kevin Wolf wrote:
+> Am 11.10.2019 um 16:50 hat Thomas Huth geschrieben:
+>> The next patch is going to add some python-based tests to the "auto"
+>> group, and these tests require virtio-blk to work properly. Running
+>> iotests without virtio-blk likely does not make too much sense anyway,
+>> so instead of adding a check for the availability of virtio-blk to each
+>> and every test (which does not sound very appealing), let's rather add
+>> a check for this at the top level in the check-block.sh script instead
+>> (so that it is possible to run "make check" without the "check-block"
+>> part for qemu-system-tricore for example).
+>>
+>> Signed-off-by: Thomas Huth <thuth@redhat.com>
+>> ---
+>>  tests/check-block.sh | 16 +++++++++++++++-
+>>  1 file changed, 15 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/tests/check-block.sh b/tests/check-block.sh
+>> index 679aedec50..7582347ec2 100755
+>> --- a/tests/check-block.sh
+>> +++ b/tests/check-block.sh
+>> @@ -26,10 +26,24 @@ if grep -q "CFLAGS.*-fsanitize" config-host.mak 2>/dev/null ; then
+>>      exit 0
+>>  fi
+>>  
+>> -if [ -z "$(find . -name 'qemu-system-*' -print)" ]; then
+>> +if [ -n "$QEMU_PROG" ]; then
+>> +    qemu_prog="$QEMU_PROG"
+>> +else
+>> +    for binary in *-softmmu/qemu-system-* ; do
+>> +        if [ -x "$binary" ]; then
+>> +            qemu_prog="$binary"
+>> +            break
+>> +        fi
+> 
+> Wouldn't it be better to check the availability of virtio-blk here, so
+> that if the current binary doesn't support it, we keep searching and
+> maybe pick up a different binary that supports it?
 
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-Cc: Richard Henderson <richard.henderson@linaro.org>
----
- .travis.yml | 15 +++++++++++++++
- 1 file changed, 15 insertions(+)
+That's a good idea, indeed, but then I also need to adjust the code in
+the "check" script accordingly.
 
-diff --git a/.travis.yml b/.travis.yml
-index d0b9e099b9..37bca1ca1c 100644
---- a/.travis.yml
-+++ b/.travis.yml
-@@ -334,8 +334,23 @@ matrix:
-         - CACHE_NAME="${TRAVIS_BRANCH}-linux-gcc-default"
- 
- 
-+    # Run check-tcg against linux-user (with plugins)
-+    # we skip sparc64-linux-user until it has been fixed somewhat
-+    - env:
-+        - CONFIG="--disable-system --enable-plugins --target-list-exclude=sparc64-linux-user"
-+        - TEST_CMD="make -j3 check-tcg V=1"
-+        - CACHE_NAME="${TRAVIS_BRANCH}-linux-gcc-default"
-+
-+
-     # Run check-tcg against softmmu targets
-     - env:
-         - CONFIG="--target-list=xtensa-softmmu,arm-softmmu,aarch64-softmmu,alpha-softmmu"
-         - TEST_CMD="make -j3 check-tcg V=1"
-         - CACHE_NAME="${TRAVIS_BRANCH}-linux-gcc-default"
-+
-+
-+    # Run check-tcg against softmmu targets (with plugins)
-+    - env:
-+        - CONFIG="--enable-plugins --target-list=xtensa-softmmu,arm-softmmu,aarch64-softmmu,alpha-softmmu"
-+        - TEST_CMD="make -j3 check-tcg V=1"
-+        - CACHE_NAME="${TRAVIS_BRANCH}-linux-gcc-default"
--- 
-2.20.1
+> Or actually, should we work with a whitelist?
 
+I don't think that a hard-coded list will work well: Since we introduced
+the Kconfig build system, it's now possible for example to also build an
+qemu-system-aarch64 binary that does not contain any of the boards that
+support virtio. So while virtio-blk is available by default in
+qemu-system-aarch64, some builds might not contain it.
+
+ Thomas
 
