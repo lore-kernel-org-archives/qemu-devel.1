@@ -2,64 +2,90 @@ Return-Path: <SRS0=PUPy=YH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E7ECC4360C
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 03:20:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A8B7C4360C
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 03:24:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D6A5D20815
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 03:20:29 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D6A5D20815
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id 63F0320815
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 03:24:15 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="FAtFj9DG"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 63F0320815
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44126 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44164 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iJquK-0006cF-W7
-	for qemu-devel@archiver.kernel.org; Sun, 13 Oct 2019 23:20:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47408)
+	id 1iJqxy-00089h-G8
+	for qemu-devel@archiver.kernel.org; Sun, 13 Oct 2019 23:24:14 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47897)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richardw.yang@linux.intel.com>) id 1iJqtP-0005yu-T1
- for qemu-devel@nongnu.org; Sun, 13 Oct 2019 23:19:32 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1iJqxA-0007ek-LC
+ for qemu-devel@nongnu.org; Sun, 13 Oct 2019 23:23:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richardw.yang@linux.intel.com>) id 1iJqtO-0003Dl-Iy
- for qemu-devel@nongnu.org; Sun, 13 Oct 2019 23:19:31 -0400
-Received: from mga05.intel.com ([192.55.52.43]:24703)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <richardw.yang@linux.intel.com>)
- id 1iJqtO-0003DC-4a; Sun, 13 Oct 2019 23:19:30 -0400
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
-X-Amp-File-Uploaded: False
-Received: from orsmga001.jf.intel.com ([10.7.209.18])
- by fmsmga105.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
- 13 Oct 2019 20:19:27 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.67,294,1566889200"; d="scan'208";a="278741008"
-Received: from richard.sh.intel.com (HELO localhost) ([10.239.159.54])
- by orsmga001.jf.intel.com with ESMTP; 13 Oct 2019 20:19:21 -0700
-Date: Mon, 14 Oct 2019 11:19:06 +0800
-From: Wei Yang <richardw.yang@linux.intel.com>
-To: Richard Henderson <richard.henderson@linaro.org>
-Subject: Re: [PATCH 1/2] cpu: use ROUND_UP() to define xxx_PAGE_ALIGN
-Message-ID: <20191014031906.GA10129@richard>
-References: <20191013021145.16011-1-richardw.yang@linux.intel.com>
- <20191013021145.16011-2-richardw.yang@linux.intel.com>
- <41a924dc-f91b-c03b-4f82-570757105798@linaro.org>
- <20191014010142.GA29752@richard>
- <4036820a-f357-9e67-7e58-cbb9186d0ef4@linaro.org>
+ (envelope-from <richard.henderson@linaro.org>) id 1iJqx6-0004vR-Gg
+ for qemu-devel@nongnu.org; Sun, 13 Oct 2019 23:23:24 -0400
+Received: from mail-pf1-x42a.google.com ([2607:f8b0:4864:20::42a]:36042)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+ id 1iJqx6-0004uy-8i
+ for qemu-devel@nongnu.org; Sun, 13 Oct 2019 23:23:20 -0400
+Received: by mail-pf1-x42a.google.com with SMTP id y22so9557400pfr.3
+ for <qemu-devel@nongnu.org>; Sun, 13 Oct 2019 20:23:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=VCTIlSt6DyaJyZSOCNqyZtt1V4lgNOBBMY8Dlhz4lMg=;
+ b=FAtFj9DGvzPfzTTvDDGScnfkjxD0KEuTvVGqqza995IOobWitXBoY3iKxst3YSO3WJ
+ k3i2tqlEGOtyOkX9StYKhHmGCLwYe+af8hFTNxw6Kgd/CFRx77ArLI+vQxNQ9uDCQZ2a
+ Cdi1sn3HciAMjsvydMrtWQn8KkiND0KeJ49B3cBhwuYbxSB1etqxvapxXpNldOO/BWL/
+ yi3j8fuCv+hJi62pF9cyrCuyQrFJk1vVU3t8Y6FVcA7kG5SnpDPbMr8XLz2QjmIwP6jx
+ 7VlCLN8XA0tNa4ve2SAVhG9v+8Jwqi/Hi7bmp0JBDZSZSxbZBfPvd1l46yb+VnK/fC/z
+ 5/Aw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=VCTIlSt6DyaJyZSOCNqyZtt1V4lgNOBBMY8Dlhz4lMg=;
+ b=nPC8R7Gz6w93FleRCm3PLLGQjANBMStRhWrI/7U4NAx/ZP0EgEPVgASeYR2x52hceY
+ fVKWDDeh1YCB18zS+Ba+eO1hMzx5KPsuRxcn7AmKvOsBfDrjhAULZ5ot5K6MB43Kc7F6
+ 5z1eSZjRLblmozHPJPXwaOB0umpDzutnAUbZvbPJPc17ZLuhi5WvGgInNAbEFOnzFYMD
+ PJEhmB/qb3QCnfTJnhCPnkL4ag+jg2FXi4e6cWyYY98FrPrNeld0JclOgNByY4Fz3sEi
+ HtR2J277eE/OsNbMWw2AGCxwDmsEOMYVypKSbhssKhmMhRrgUejNdU8Awn6iRU9YYtPJ
+ wT2w==
+X-Gm-Message-State: APjAAAWJrfPwWct4lUjbjE0WRPhCPEA8pTLG9H2qrDNbEuyl5ngWOMo4
+ 03u0wDu7qkFCoVKuAJMfCLSsrg==
+X-Google-Smtp-Source: APXvYqye6u/jep5HzZEzDXM9wyiNJdL3KbEpuMzqB9sjv7tGW5xW1FKtSMf/+9T92Xm1A2tO2OO7tw==
+X-Received: by 2002:aa7:86cb:: with SMTP id h11mr31173180pfo.59.1571023398919; 
+ Sun, 13 Oct 2019 20:23:18 -0700 (PDT)
+Received: from [192.168.1.11] (97-113-7-119.tukw.qwest.net. [97.113.7.119])
+ by smtp.gmail.com with ESMTPSA id h66sm19751916pjb.0.2019.10.13.20.23.17
+ (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+ Sun, 13 Oct 2019 20:23:18 -0700 (PDT)
+Subject: Re: [PULL 00/23] tcg patch queue
+To: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+References: <20191013222544.3679-1-richard.henderson@linaro.org>
+ <CAL1e-=ioCkAxyjdDvBTeQPMWpUy0W=ej-WiUmZkyTVJYUsd-_A@mail.gmail.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Openpgp: preference=signencrypt
+Message-ID: <35cb0bfc-fc91-8555-9725-0c3fc420d93c@linaro.org>
+Date: Sun, 13 Oct 2019 20:23:16 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <4036820a-f357-9e67-7e58-cbb9186d0ef4@linaro.org>
-User-Agent: Mutt/1.9.4 (2018-02-28)
+In-Reply-To: <CAL1e-=ioCkAxyjdDvBTeQPMWpUy0W=ej-WiUmZkyTVJYUsd-_A@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 192.55.52.43
+X-Received-From: 2607:f8b0:4864:20::42a
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -71,69 +97,23 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Wei Yang <richardw.yang@linux.intel.com>
-Cc: fam@euphon.net, mst@redhat.com, mark.cave-ayland@ilande.co.uk,
- qemu-devel@nongnu.org, kraxel@redhat.com, den@openvz.org,
- qemu-block@nongnu.org, quintela@redhat.com, armbru@redhat.com,
- pasic@linux.ibm.com, borntraeger@de.ibm.com, marcandre.lureau@redhat.com,
- ehabkost@redhat.com, sw@weilnetz.de, dgilbert@redhat.com,
- yuval.shaia@oracle.com, alex.williamson@redhat.com, stefanha@redhat.com,
- imammedo@redhat.com, david@gibson.dropbear.id.au, kwolf@redhat.com,
- cohuck@redhat.com, qemu-s390x@nongnu.org, mreitz@redhat.com,
- qemu-ppc@nongnu.org, Wei Yang <richardw.yang@linux.intel.com>,
- pbonzini@redhat.com
+Cc: "peter.maydell@linaro.org" <peter.maydell@linaro.org>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Sun, Oct 13, 2019 at 07:38:04PM -0700, Richard Henderson wrote:
->On 10/13/19 6:01 PM, Wei Yang wrote:
->>> No, please.
->>>
->>> (1) The compiler does not know that qemu_*host_page_size is a power of 2, and
->>> will generate a real division at runtime.  The same is true for
->>> TARGET_PAGE_SIZE when TARGET_PAGE_BITS_VARY.
->>>
->> 
->> Confused
->> 
->> The definition of ROUND_UP is:
->> 
->> #define ROUND_UP(n, d) (((n) + (d) - 1) & -(0 ? (n) : (d)))
->
->Ah, my bad, I did confuse this with QEMU_ALIGN_UP.
->
->Hmm.
->
->	lea	-1(n, size), t
->	neg	size
->	and	size, t
->
->vs
->
->	mov	mask, t
->	not	t
->	add	n, t
->	and	mask, t
->
->which is what I proposed here
->
->>> https://lists.gnu.org/archive/html/qemu-devel/2019-09/msg04526.html
->
->I'm ok with your version.
->
->Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
->
+On 10/13/19 4:53 PM, Aleksandar Markovic wrote:
+> Just for the sake of being punctual, may I ask you to add "Tested-by:" for Mark
+> Cave-Ayland, and "Reviewed-by:" for myself to all 22 ppc host patches, as it
+> was indicated in the responses to the last version of the ppc host series?
 
-Thanks for your clarification.
+I did add your r-b to those patches that didn't already have your s-o-b.
 
-Have a nice day
+I added Mark's T-b to patch 15, which is the one that enables basic altivec.
+Mark said that he was testing ppc32 and I know that he's got a G4.  He would
+not have tested the later patches with that hardware.
 
->
->r~
->
 
--- 
-Wei Yang
-Help you, Help me
+r~
 
