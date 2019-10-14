@@ -6,54 +6,54 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7578EC4CECE
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 14:36:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 769FCECE58E
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 14:36:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4504920854
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 14:36:54 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4504920854
+	by mail.kernel.org (Postfix) with ESMTPS id 514E720854
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 14:36:55 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 514E720854
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50696 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50694 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iK1Sv-0002T4-96
+	id 1iK1Sv-0002QJ-V1
 	for qemu-devel@archiver.kernel.org; Mon, 14 Oct 2019 10:36:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49229)
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49886)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1iK1Jg-0001P4-6m
- for qemu-devel@nongnu.org; Mon, 14 Oct 2019 10:27:21 -0400
+ (envelope-from <philmd@redhat.com>) id 1iK1Mv-0004cL-4D
+ for qemu-devel@nongnu.org; Mon, 14 Oct 2019 10:30:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1iK1Jf-0001Dx-6y
- for qemu-devel@nongnu.org; Mon, 14 Oct 2019 10:27:20 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:32804)
+ (envelope-from <philmd@redhat.com>) id 1iK1Mu-0002KM-24
+ for qemu-devel@nongnu.org; Mon, 14 Oct 2019 10:30:40 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:38336)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <philmd@redhat.com>)
- id 1iK1Ja-0001D2-QZ; Mon, 14 Oct 2019 10:27:14 -0400
+ id 1iK1Mo-0002Hn-KB; Mon, 14 Oct 2019 10:30:34 -0400
 Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
  [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id C82C969061;
- Mon, 14 Oct 2019 14:27:13 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 478AE3CA06;
+ Mon, 14 Oct 2019 14:30:33 +0000 (UTC)
 Received: from x1w.redhat.com (unknown [10.40.206.0])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 70211600CD;
- Mon, 14 Oct 2019 14:26:49 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id BDDF3600CD;
+ Mon, 14 Oct 2019 14:30:09 +0000 (UTC)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 To: Markus Armbruster <armbru@redhat.com>,
 	qemu-devel@nongnu.org
-Subject: [PATCH 08/20] hw/xen/xen_pt_load_rom: Remove unused includes
-Date: Mon, 14 Oct 2019 16:22:34 +0200
-Message-Id: <20191014142246.4538-9-philmd@redhat.com>
+Subject: [PATCH 15/20] hw/i2c/smbus_ich9: Include "qemu/range.h"
+Date: Mon, 14 Oct 2019 16:22:41 +0200
+Message-Id: <20191014142246.4538-16-philmd@redhat.com>
 In-Reply-To: <20191014142246.4538-1-philmd@redhat.com>
 References: <20191014142246.4538-1-philmd@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.28]); Mon, 14 Oct 2019 14:27:14 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.39]); Mon, 14 Oct 2019 14:30:33 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
@@ -89,30 +89,34 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-xen_pt_load_rom.c does not use any of these includes, remove them.
+hw/i2c/smbus_ich9.c calls range_covers_byte(). Include "qemu/range.h"
+which declares it.
+
+This fixes (when modifying unrelated headers):
+
+  hw/i2c/smbus_ich9.c:66:9: error: implicit declaration of function 'rang=
+e_covers_byte' is invalid in C99 [-Werror,-Wimplicit-function-declaration=
+]
+      if (range_covers_byte(address, len, ICH9_SMB_HOSTC)) {
+          ^
 
 Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 ---
- hw/xen/xen_pt_load_rom.c | 4 ----
- 1 file changed, 4 deletions(-)
+ hw/i2c/smbus_ich9.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/hw/xen/xen_pt_load_rom.c b/hw/xen/xen_pt_load_rom.c
-index 307a5c93e2..a50a80837e 100644
---- a/hw/xen/xen_pt_load_rom.c
-+++ b/hw/xen/xen_pt_load_rom.c
-@@ -3,12 +3,8 @@
+diff --git a/hw/i2c/smbus_ich9.c b/hw/i2c/smbus_ich9.c
+index fd50fb851a..48f1ff4191 100644
+--- a/hw/i2c/smbus_ich9.c
++++ b/hw/i2c/smbus_ich9.c
+@@ -21,6 +21,7 @@
   */
- #include "qemu/osdep.h"
- #include "qapi/error.h"
--#include "hw/i386/pc.h"
- #include "qemu/error-report.h"
--#include "ui/console.h"
- #include "hw/loader.h"
--#include "monitor/monitor.h"
--#include "qemu/range.h"
- #include "hw/pci/pci.h"
- #include "xen_pt.h"
 =20
+ #include "qemu/osdep.h"
++#include "qemu/range.h"
+ #include "hw/i2c/pm_smbus.h"
+ #include "hw/pci/pci.h"
+ #include "migration/vmstate.h"
 --=20
 2.21.0
 
