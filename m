@@ -6,54 +6,54 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D3C58C4CECE
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 14:28:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B25EBECE587
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 14:30:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A44E62089C
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 14:28:41 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A44E62089C
+	by mail.kernel.org (Postfix) with ESMTPS id 88DD42133F
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 14:30:09 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 88DD42133F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50492 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50512 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iK1Ky-0002KR-9E
-	for qemu-devel@archiver.kernel.org; Mon, 14 Oct 2019 10:28:40 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48914)
+	id 1iK1MN-0003Uv-Qf
+	for qemu-devel@archiver.kernel.org; Mon, 14 Oct 2019 10:30:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48560)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1iK1IU-00006J-Q4
- for qemu-devel@nongnu.org; Mon, 14 Oct 2019 10:26:07 -0400
+ (envelope-from <philmd@redhat.com>) id 1iK1H3-0006ey-KM
+ for qemu-devel@nongnu.org; Mon, 14 Oct 2019 10:24:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1iK1IT-0000v4-Pb
- for qemu-devel@nongnu.org; Mon, 14 Oct 2019 10:26:06 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46678)
+ (envelope-from <philmd@redhat.com>) id 1iK1H2-0000JY-Kj
+ for qemu-devel@nongnu.org; Mon, 14 Oct 2019 10:24:37 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:56127)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <philmd@redhat.com>)
- id 1iK1IP-0000sh-EU; Mon, 14 Oct 2019 10:26:01 -0400
+ id 1iK1Gy-0000Hs-Hn; Mon, 14 Oct 2019 10:24:32 -0400
 Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
  [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 7A91418C4274;
- Mon, 14 Oct 2019 14:26:00 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 992A210B78;
+ Mon, 14 Oct 2019 14:24:31 +0000 (UTC)
 Received: from x1w.redhat.com (unknown [10.40.206.0])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 28E6D60126;
- Mon, 14 Oct 2019 14:25:23 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id CE463600CD;
+ Mon, 14 Oct 2019 14:24:08 +0000 (UTC)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 To: Markus Armbruster <armbru@redhat.com>,
 	qemu-devel@nongnu.org
-Subject: [PATCH 06/20] hw/usb/dev-storage: Remove unused "ui/console.h" header
-Date: Mon, 14 Oct 2019 16:22:32 +0200
-Message-Id: <20191014142246.4538-7-philmd@redhat.com>
+Subject: [PATCH 03/20] hw/input/pckbd: Remove unused "hw/i386/pc.h" header
+Date: Mon, 14 Oct 2019 16:22:29 +0200
+Message-Id: <20191014142246.4538-4-philmd@redhat.com>
 In-Reply-To: <20191014142246.4538-1-philmd@redhat.com>
 References: <20191014142246.4538-1-philmd@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.62]); Mon, 14 Oct 2019 14:26:00 +0000 (UTC)
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.39]); Mon, 14 Oct 2019 14:24:31 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
@@ -89,26 +89,26 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The USB models related to storage don't need anything from
-"ui/console.h". Remove it.
+The keyboard controller model don't need anything from
+"hw/i386/pc.h". Remove it.
 
 Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 ---
- hw/usb/dev-storage.c | 1 -
+ hw/input/pckbd.c | 1 -
  1 file changed, 1 deletion(-)
 
-diff --git a/hw/usb/dev-storage.c b/hw/usb/dev-storage.c
-index 8545193488..a2ff52d3e5 100644
---- a/hw/usb/dev-storage.c
-+++ b/hw/usb/dev-storage.c
-@@ -17,7 +17,6 @@
- #include "desc.h"
- #include "hw/qdev-properties.h"
- #include "hw/scsi/scsi.h"
--#include "ui/console.h"
+diff --git a/hw/input/pckbd.c b/hw/input/pckbd.c
+index f0acfd86f7..2f09f780ba 100644
+--- a/hw/input/pckbd.c
++++ b/hw/input/pckbd.c
+@@ -26,7 +26,6 @@
+ #include "qemu/log.h"
+ #include "hw/isa/isa.h"
  #include "migration/vmstate.h"
- #include "monitor/monitor.h"
- #include "sysemu/sysemu.h"
+-#include "hw/i386/pc.h"
+ #include "hw/input/ps2.h"
+ #include "hw/irq.h"
+ #include "hw/input/i8042.h"
 --=20
 2.21.0
 
