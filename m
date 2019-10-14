@@ -2,92 +2,62 @@ Return-Path: <SRS0=PUPy=YH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 809FFC4CECE
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 19:16:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 51AECC4CECE
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 19:31:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 33E77217F9
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 19:16:28 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ipMxbr77"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 33E77217F9
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 27A302089C
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 19:31:53 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 27A302089C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56076 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56322 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iK5pT-0008IY-9X
-	for qemu-devel@archiver.kernel.org; Mon, 14 Oct 2019 15:16:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37284)
+	id 1iK64N-0007Lx-HI
+	for qemu-devel@archiver.kernel.org; Mon, 14 Oct 2019 15:31:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40181)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1iK5oC-0007PF-5T
- for qemu-devel@nongnu.org; Mon, 14 Oct 2019 15:15:09 -0400
+ (envelope-from <jsnow@redhat.com>) id 1iK623-0005NT-HV
+ for qemu-devel@nongnu.org; Mon, 14 Oct 2019 15:29:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1iK5oB-0001xL-4E
- for qemu-devel@nongnu.org; Mon, 14 Oct 2019 15:15:07 -0400
-Received: from mail-pf1-x442.google.com ([2607:f8b0:4864:20::442]:34621)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1iK5oA-0001wV-VO
- for qemu-devel@nongnu.org; Mon, 14 Oct 2019 15:15:07 -0400
-Received: by mail-pf1-x442.google.com with SMTP id b128so10932630pfa.1
- for <qemu-devel@nongnu.org>; Mon, 14 Oct 2019 12:15:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=e93wkwG0HkPCKwmBCpkvboT2RX+XxELhxVuTIwX89fE=;
- b=ipMxbr77UHJDHLXy2/ZqWR0VIOI3+L+t+WrpfGR4Jel1pivi7afMuZCdSHM2SlBg2F
- gwWdI502lZ7kFCKJfksMn7WSisazDmpBrWgXbNb+L/EW/oT4bbv8fAlH4rigBfnWFgju
- 7yrYyKLPiYI0YNucblC/z2KN99r9suT9XJuC5g3n3x138Su+6q4FkBd4+7sde07I/H9L
- EYV5Njo2YzAoWleEiff4vueaCpFKPqIEpPWH/d7BrHMDsw+nNgqNFWLeHw4X06NFJ/8N
- aDzRqicPdC+a16PVmJYAARFEW64wRWdacjKoWOHXwNxBgVT8P5tX6cHOwot+4mGmV2vK
- VqaA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=e93wkwG0HkPCKwmBCpkvboT2RX+XxELhxVuTIwX89fE=;
- b=PNCbZXpA/0Yzn/aDOdTR0q7t7cxLgAABNLM5tmPbK21/UbmjwA++RNImCcO4WWNg5v
- r3/g5VFEfwXlkA54xz1wBGGqA1Z5l9vJCCG/XX0lO5BtqZRXnZgloKiubx8CiH/CMnyI
- w1bmc36+Ch+AMDJNg5FyMeNSI75bBeYwEfyqCUVmz58LRT4pW4oURnHqaiFOaZUAjZyt
- OHH/fc3RQjfurBXSal7ajAEjHyYFR27Nx8wxWG8f6P5JmheyvzAfklG+X+7i5csGj1Cc
- bO1ZDsdGxqY0vKYdtdfuFkAaOArysKjhvJ2Pcqpxnr2otPd3h7rJFAzQ4Jtx/dU4Wezz
- +Oeg==
-X-Gm-Message-State: APjAAAXjuB+mQDPChRkIZ6Z3z7Yon+OdLoTF2r4UrqNfIU8DwTHk/8Qe
- cvRVia2B4QgLvPdvaiRxy8TR6iHRZ0U=
-X-Google-Smtp-Source: APXvYqygZJydYDmTMun8JMuX9GYEqcz2fjHLLuzygYA1CANWOV3veLqdNokKHvZB9EImAaWBoE+N/g==
-X-Received: by 2002:a65:434c:: with SMTP id k12mr35412626pgq.141.1571080505338; 
- Mon, 14 Oct 2019 12:15:05 -0700 (PDT)
-Received: from [192.168.1.11] (97-113-7-119.tukw.qwest.net. [97.113.7.119])
- by smtp.gmail.com with ESMTPSA id d19sm16638408pjz.5.2019.10.14.12.15.04
- (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Mon, 14 Oct 2019 12:15:04 -0700 (PDT)
-Subject: Re: [PATCH v6 18/20] target/arm: Rebuild hflags at CPSR writes
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, qemu-arm@nongnu.org
-References: <20191011155546.14342-1-richard.henderson@linaro.org>
- <20191011155546.14342-19-richard.henderson@linaro.org>
- <875zkrm9gg.fsf@linaro.org>
-From: Richard Henderson <richard.henderson@linaro.org>
-Openpgp: preference=signencrypt
-Message-ID: <1aa62e90-6915-c0e6-7a8e-22308ee48f0d@linaro.org>
-Date: Mon, 14 Oct 2019 12:15:02 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+ (envelope-from <jsnow@redhat.com>) id 1iK621-0001t8-Iu
+ for qemu-devel@nongnu.org; Mon, 14 Oct 2019 15:29:27 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42596)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <jsnow@redhat.com>)
+ id 1iK61y-0001j6-Jn; Mon, 14 Oct 2019 15:29:22 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id CDC05308FB9A;
+ Mon, 14 Oct 2019 19:29:21 +0000 (UTC)
+Received: from probe.bos.redhat.com (dhcp-17-152.bos.redhat.com [10.18.17.152])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 724DC60BE2;
+ Mon, 14 Oct 2019 19:29:20 +0000 (UTC)
+From: John Snow <jsnow@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>,
+	qemu-devel@nongnu.org
+Subject: [PULL v2 02/19] block: move bdrv_can_store_new_dirty_bitmap to
+ block/dirty-bitmap.c
+Date: Mon, 14 Oct 2019 15:28:52 -0400
+Message-Id: <20191014192909.16044-3-jsnow@redhat.com>
+In-Reply-To: <20191014192909.16044-1-jsnow@redhat.com>
+References: <20191014192909.16044-1-jsnow@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <875zkrm9gg.fsf@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::442
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.43]); Mon, 14 Oct 2019 19:29:21 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,48 +69,100 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: laurent.desnogues@gmail.com, peter.maydell@linaro.org,
- qemu-devel@nongnu.org
+Cc: Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>,
+ Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org,
+ Juan Quintela <quintela@redhat.com>, libvir-list@redhat.com,
+ John Snow <jsnow@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
+ Markus Armbruster <armbru@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 10/14/19 12:08 PM, Alex Bennée wrote:
-> 
-> Richard Henderson <richard.henderson@linaro.org> writes:
-> 
->> Continue setting, but not relying upon, env->hflags.
->>
->> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
->> ---
->>  target/arm/op_helper.c | 3 +++
->>  1 file changed, 3 insertions(+)
->>
->> diff --git a/target/arm/op_helper.c b/target/arm/op_helper.c
->> index ccc2cecb46..b529d6c1bf 100644
->> --- a/target/arm/op_helper.c
->> +++ b/target/arm/op_helper.c
->> @@ -224,6 +224,7 @@ uint32_t HELPER(usat16)(CPUARMState *env, uint32_t x, uint32_t shift)
->>  void HELPER(setend)(CPUARMState *env)
->>  {
->>      env->uncached_cpsr ^= CPSR_E;
->> +    arm_rebuild_hflags(env);
->>  }
->>
->>  /* Function checks whether WFx (WFI/WFE) instructions are set up to be trapped.
->> @@ -387,6 +388,8 @@ uint32_t HELPER(cpsr_read)(CPUARMState *env)
->>  void HELPER(cpsr_write)(CPUARMState *env, uint32_t val, uint32_t mask)
->>  {
->>      cpsr_write(env, val, mask, CPSRWriteByInstr);
->> +    /* TODO: Not all cpsr bits are relevant to hflags.  */
-> 
-> Do you mean by this we could check which bits changed and avoid a
-> re-compute if we wanted to? Is it likely to be anything other than the
-> SS_ACTIVE bit?
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
-Yes.  Well, there's also NZCV.  But neither case happens particularly often, so
-it's probably not worth worrying about.
+block/dirty-bitmap.c seems to be more appropriate for it and
+bdrv_remove_persistent_dirty_bitmap already in it.
 
+Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Reviewed-by: John Snow <jsnow@redhat.com>
+Message-id: 20190920082543.23444-2-vsementsov@virtuozzo.com
+Signed-off-by: John Snow <jsnow@redhat.com>
+---
+ block.c              | 22 ----------------------
+ block/dirty-bitmap.c | 22 ++++++++++++++++++++++
+ 2 files changed, 22 insertions(+), 22 deletions(-)
 
-r~
+diff --git a/block.c b/block.c
+index 1946fc6f57..d19a4781a3 100644
+--- a/block.c
++++ b/block.c
+@@ -6582,25 +6582,3 @@ void bdrv_del_child(BlockDriverState *parent_bs, B=
+drvChild *child, Error **errp)
+=20
+     parent_bs->drv->bdrv_del_child(parent_bs, child, errp);
+ }
+-
+-bool bdrv_can_store_new_dirty_bitmap(BlockDriverState *bs, const char *n=
+ame,
+-                                     uint32_t granularity, Error **errp)
+-{
+-    BlockDriver *drv =3D bs->drv;
+-
+-    if (!drv) {
+-        error_setg_errno(errp, ENOMEDIUM,
+-                         "Can't store persistent bitmaps to %s",
+-                         bdrv_get_device_or_node_name(bs));
+-        return false;
+-    }
+-
+-    if (!drv->bdrv_can_store_new_dirty_bitmap) {
+-        error_setg_errno(errp, ENOTSUP,
+-                         "Can't store persistent bitmaps to %s",
+-                         bdrv_get_device_or_node_name(bs));
+-        return false;
+-    }
+-
+-    return drv->bdrv_can_store_new_dirty_bitmap(bs, name, granularity, e=
+rrp);
+-}
+diff --git a/block/dirty-bitmap.c b/block/dirty-bitmap.c
+index 134e0c9a0c..8f42015db9 100644
+--- a/block/dirty-bitmap.c
++++ b/block/dirty-bitmap.c
+@@ -464,6 +464,28 @@ void bdrv_remove_persistent_dirty_bitmap(BlockDriver=
+State *bs,
+     }
+ }
+=20
++bool bdrv_can_store_new_dirty_bitmap(BlockDriverState *bs, const char *n=
+ame,
++                                     uint32_t granularity, Error **errp)
++{
++    BlockDriver *drv =3D bs->drv;
++
++    if (!drv) {
++        error_setg_errno(errp, ENOMEDIUM,
++                         "Can't store persistent bitmaps to %s",
++                         bdrv_get_device_or_node_name(bs));
++        return false;
++    }
++
++    if (!drv->bdrv_can_store_new_dirty_bitmap) {
++        error_setg_errno(errp, ENOTSUP,
++                         "Can't store persistent bitmaps to %s",
++                         bdrv_get_device_or_node_name(bs));
++        return false;
++    }
++
++    return drv->bdrv_can_store_new_dirty_bitmap(bs, name, granularity, e=
+rrp);
++}
++
+ void bdrv_disable_dirty_bitmap(BdrvDirtyBitmap *bitmap)
+ {
+     bdrv_dirty_bitmap_lock(bitmap);
+--=20
+2.21.0
+
 
