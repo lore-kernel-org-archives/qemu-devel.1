@@ -2,77 +2,103 @@ Return-Path: <SRS0=PUPy=YH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C77CC4CECE
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 10:02:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BC055C4CECE
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 10:06:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2FBF5207FF
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 10:02:47 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2FBF5207FF
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 87670207FF
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 10:06:36 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="X6R/J6u8"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 87670207FF
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46390 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46412 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iJxBe-0007ib-4k
-	for qemu-devel@archiver.kernel.org; Mon, 14 Oct 2019 06:02:46 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38161)
+	id 1iJxFK-0000js-MU
+	for qemu-devel@archiver.kernel.org; Mon, 14 Oct 2019 06:06:35 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38785)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1iJxAJ-0006zi-6f
- for qemu-devel@nongnu.org; Mon, 14 Oct 2019 06:01:25 -0400
+ (envelope-from <philmd@redhat.com>) id 1iJxEU-0008Pw-92
+ for qemu-devel@nongnu.org; Mon, 14 Oct 2019 06:05:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1iJxAD-0008L4-Sh
- for qemu-devel@nongnu.org; Mon, 14 Oct 2019 06:01:23 -0400
-Received: from indium.canonical.com ([91.189.90.7]:39970)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1iJxAB-00088R-6M
- for qemu-devel@nongnu.org; Mon, 14 Oct 2019 06:01:17 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1iJxA6-0002P2-E1
- for <qemu-devel@nongnu.org>; Mon, 14 Oct 2019 10:01:10 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 675892E802D
- for <qemu-devel@nongnu.org>; Mon, 14 Oct 2019 10:01:10 +0000 (UTC)
+ (envelope-from <philmd@redhat.com>) id 1iJxER-0006N2-PR
+ for qemu-devel@nongnu.org; Mon, 14 Oct 2019 06:05:41 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:31572
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iJxER-0006Lj-JB
+ for qemu-devel@nongnu.org; Mon, 14 Oct 2019 06:05:39 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1571047538;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=zYiyjB90EFhyVEeLiyjJfajkx0USdiw9mLJLrZUwibA=;
+ b=X6R/J6u8Wj8i/lrVAZvPzKppBHFXBFsEnOriTim0/1m8ZJdaAzgHJbqPP3JwKNilWRdCl5
+ 13XMw5VUYwEVTInBzhmgsexdQ9tDhoeWH2W3vWpZ6xQeJ82IleTBOZVgMCQXtFYxl9ADOR
+ v3wPDETYwbgkFDlpqnG6reCcwuaP31Q=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-231-GHiJyXI7O7qqyho5LtP4rA-1; Mon, 14 Oct 2019 06:05:37 -0400
+Received: by mail-wm1-f72.google.com with SMTP id o8so6933318wmc.2
+ for <qemu-devel@nongnu.org>; Mon, 14 Oct 2019 03:05:36 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=pC3cSmcnoWKyXlGRsk3ueLpNVUF54rZFWQTL78engXQ=;
+ b=ncvETBhggYXLc9B8PTZR9/zZLagmAHzVMcp0UIRNgmELQDg+5Md5Q61PILj98DY/wv
+ svAD+F8e3sTcKRT0x367y5JOqIvBVl7wCDOemYx3HeFtALYsXZCChOp8b3Rw3gCQKVxH
+ qDVyhN0x9VJydKQpSHrky67Z3mXJMqrbge+rodqmqVu990zH6hzITflGEfPkpskX0B3n
+ U/zVOc3M9JT/9EhKSso18r8IkSX0ENViA724IVtmalQve0djs4o3EQiJ3tZheAZ/K9Rk
+ NWZJmtcmN/aS2iU/YVHxfzLLL+Yrb6ljyvpR3HDMfNIMW70poCFLzKOdp222j0MZEr7H
+ SZMA==
+X-Gm-Message-State: APjAAAUwYiDii4ZkVJrRZULkmGVeY5+5HhFME4l/+K3gMIROVcQUEWkN
+ mnJ8uT89BgiLh3ykHK2LGEHiNQnGTS7paD27DCeUitDty2N4UqNJ8t1dDtnFrAwherQR/g8uk/W
+ r/+Ct8Bvdp6EFd5Q=
+X-Received: by 2002:a5d:46ca:: with SMTP id g10mr10512887wrs.193.1571047536125; 
+ Mon, 14 Oct 2019 03:05:36 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqzxe7mgJVQL9a3UTgigKc7dlaonA0I4EjKkIeSkvZqC8MLuSVsYJJ4IbWrPntO6VHxhrLAnqA==
+X-Received: by 2002:a5d:46ca:: with SMTP id g10mr10512868wrs.193.1571047535932; 
+ Mon, 14 Oct 2019 03:05:35 -0700 (PDT)
+Received: from [192.168.50.32] (243.red-88-26-246.staticip.rima-tde.net.
+ [88.26.246.243])
+ by smtp.gmail.com with ESMTPSA id a9sm26791349wmf.14.2019.10.14.03.05.35
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Mon, 14 Oct 2019 03:05:35 -0700 (PDT)
+Subject: Re: [PATCH v4 3/8] MAINTAINERS: Update mail address of Aleksandar
+ Rikalo
+To: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>, qemu-devel@nongnu.org
+References: <1570991178-5511-1-git-send-email-aleksandar.markovic@rt-rk.com>
+ <1570991178-5511-4-git-send-email-aleksandar.markovic@rt-rk.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <b06c22ef-5ab9-85b4-e9f6-9fc5300a6a15@redhat.com>
+Date: Mon, 14 Oct 2019 12:05:34 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <1570991178-5511-4-git-send-email-aleksandar.markovic@rt-rk.com>
+Content-Language: en-US
+X-MC-Unique: GHiJyXI7O7qqyho5LtP4rA-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: quoted-printable
-Date: Mon, 14 Oct 2019 09:53:08 -0000
-From: David Hildenbrand <1847232@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Tags: s390x
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: davidhildenbrand ivmn
-X-Launchpad-Bug-Reporter: Ivan Warren (ivmn)
-X-Launchpad-Bug-Modifier: David Hildenbrand (davidhildenbrand)
-References: <157053356610.22354.6751604707489617887.malonedeb@gac.canonical.com>
- <61ce859f-0817-0eba-7eb8-2c16b3e73889@redhat.com>
- <7a661e58-72df-94bc-4712-f306ce5ee7c6@vmfacility.fr>
-Message-Id: <8ada8acb-d2ce-a09d-6c9a-b758360edcb2@redhat.com>
-Subject: Re: [Bug 1847232] [NEW] qemu TCG in s390x mode issue with calculating
- HASH
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="af2eefe214bd95389a09b7c956720881bab16807";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: f565de9d72854df3614f36e595dccc25f3694365
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 91.189.90.7
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -81,143 +107,133 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1847232 <1847232@bugs.launchpad.net>
+Cc: aleksandar.rikalo@rt-rk.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20191014095308.LpuohJsGmdUEe-7qYFiI9hKIu7Cc3xFmf4NEu6Y4Fks@z>
 
-On 08.10.19 16:11, Ivan Warren wrote:
-> =
+On 10/13/19 8:26 PM, Aleksandar Markovic wrote:
+> From: Aleksandar Markovic <amarkovic@wavecomp.com>
+>=20
+> Aleksandar Rikalo wishes to change his primary mail address for QEMU.
+> Some minor line order is corrected in .mailmap to be alphabetical,
+> too.
+>=20
+> Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+> ---
+>   .mailmap    |  5 +++--
+>   MAINTAINERS | 18 +++++++++---------
+>   2 files changed, 12 insertions(+), 11 deletions(-)
+>=20
+> diff --git a/.mailmap b/.mailmap
+> index 0756a0b..3816e4e 100644
+> --- a/.mailmap
+> +++ b/.mailmap
+> @@ -39,10 +39,11 @@ Julia Suvorova <jusual@mail.ru> Julia Suvorova via Qe=
+mu-devel <qemu-devel@nongnu
+>   Justin Terry (VM) <juterry@microsoft.com> Justin Terry (VM) via Qemu-de=
+vel <qemu-devel@nongnu.org>
+>  =20
+>   # Next, replace old addresses by a more recent one.
+> -Anthony Liguori <anthony@codemonkey.ws> Anthony Liguori <aliguori@us.ibm=
+.com>
+> -James Hogan <jhogan@kernel.org> <james.hogan@imgtec.com>
+>   Aleksandar Markovic <amarkovic@wavecomp.com> <aleksandar.markovic@mips.=
+com>
+>   Aleksandar Markovic <amarkovic@wavecomp.com> <aleksandar.markovic@imgte=
+c.com>
+> +Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com> <arikalo@wavecomp.com>
+> +Anthony Liguori <anthony@codemonkey.ws> Anthony Liguori <aliguori@us.ibm=
+.com>
+> +James Hogan <jhogan@kernel.org> <james.hogan@imgtec.com>
+>   Paul Burton <pburton@wavecomp.com> <paul.burton@mips.com>
+>   Paul Burton <pburton@wavecomp.com> <paul.burton@imgtec.com>
+>   Paul Burton <pburton@wavecomp.com> <paul@archlinuxmips.org>
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index 3ca8148..4964fbb 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -208,7 +208,7 @@ F: disas/microblaze.c
+>   MIPS TCG CPUs
+>   M: Aurelien Jarno <aurelien@aurel32.net>
+>   M: Aleksandar Markovic <amarkovic@wavecomp.com>
+> -R: Aleksandar Rikalo <arikalo@wavecomp.com>
+> +R: Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>
+>   S: Maintained
+>   F: target/mips/
+>   F: default-configs/*mips*
+> @@ -363,7 +363,7 @@ F: target/arm/kvm.c
+>  =20
+>   MIPS KVM CPUs
+>   M: James Hogan <jhogan@kernel.org>
+> -R: Aleksandar Rikalo <arikalo@wavecomp.com>
+> +R: Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>
+>   S: Maintained
+>   F: target/mips/kvm.c
+>  =20
+> @@ -934,7 +934,7 @@ MIPS Machines
+>   -------------
+>   Jazz
+>   M: Herv=C3=A9 Poussineau <hpoussin@reactos.org>
+> -R: Aleksandar Rikalo <arikalo@wavecomp.com>
+> +R: Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>
+>   S: Maintained
+>   F: hw/mips/mips_jazz.c
+>   F: hw/display/jazz_led.c
+> @@ -942,7 +942,7 @@ F: hw/dma/rc4030.c
+>  =20
+>   Malta
+>   M: Aurelien Jarno <aurelien@aurel32.net>
+> -R: Aleksandar Rikalo <arikalo@wavecomp.com>
+> +R: Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>
+>   S: Maintained
+>   F: hw/mips/mips_malta.c
+>   F: hw/mips/gt64xxx_pci.c
+> @@ -950,20 +950,20 @@ F: tests/acceptance/linux_ssh_mips_malta.py
+>  =20
+>   Mipssim
+>   M: Aleksandar Markovic <amarkovic@wavecomp.com>
+> -R: Aleksandar Rikalo <arikalo@wavecomp.com>
+> +R: Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>
+>   S: Odd Fixes
+>   F: hw/mips/mips_mipssim.c
+>   F: hw/net/mipsnet.c
+>  =20
+>   R4000
+>   M: Aurelien Jarno <aurelien@aurel32.net>
+> -R: Aleksandar Rikalo <arikalo@wavecomp.com>
+> +R: Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>
+>   S: Maintained
+>   F: hw/mips/mips_r4k.c
+>  =20
+>   Fulong 2E
+>   M: Aleksandar Markovic <amarkovic@wavecomp.com>
+> -R: Aleksandar Rikalo <arikalo@wavecomp.com>
+> +R: Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>
+>   S: Odd Fixes
+>   F: hw/mips/mips_fulong2e.c
+>   F: hw/isa/vt82c686.c
+> @@ -972,7 +972,7 @@ F: include/hw/isa/vt82c686.h
+>  =20
+>   Boston
+>   M: Paul Burton <pburton@wavecomp.com>
+> -R: Aleksandar Rikalo <arikalo@wavecomp.com>
+> +R: Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>
+>   S: Maintained
+>   F: hw/core/loader-fit.c
+>   F: hw/mips/boston.c
+> @@ -2348,7 +2348,7 @@ F: disas/i386.c
+>  =20
+>   MIPS TCG target
+>   M: Aurelien Jarno <aurelien@aurel32.net>
+> -R: Aleksandar Rikalo <arikalo@wavecomp.com>
+> +R: Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>
+>   S: Maintained
+>   F: tcg/mips/
+>  =20
+>=20
 
-> On 10/8/2019 3:35 PM, David Hildenbrand wrote:
->> On 08.10.19 14:11, Cornelia Huck wrote:
->>> On Tue, 08 Oct 2019 11:19:25 -0000
->>> Ivan Warren via <qemu-devel@nongnu.org> wrote:
->>>
->>>> Public bug reported:
->>>>
->>>> When using go on s390x on Debian x64 (buster) (host) and debian s390x
->>>> (sid) (guest) I run into the following problem :
->>>>
->>>> The following occurs while trying to build a custom project :
->>>>
->>>> go: github.com/FactomProject/basen@v0.0.0-20150613233007-fe3947df716e:
->>>> Get
->>>> https://proxy.golang.org/github.com/%21factom%21project/basen/@v/v0.0.=
-0-20150613233007-fe3947df716e.mod:
->>>> local error: tls: bad record MAC
->>>>
->>>> Doing a git bisect I find that this problem only occurs on and after
->>>> commit 08ef92d556c584c7faf594ff3af46df456276e1b
->>>>
->>>> Before that commit, all works fine. Past this commit, build always
->>>> fails.
->>> What version are you using? Current master?
->>>
->>> Can you please share your command line?
->>>
->>>> Without any proof, It looks like a hash calculation bug related to usi=
-ng
->>>> z/Arch vector facilities...
->>> Not an unreasonable guess, cc:ing David in case he has seen that before.
->>>
->> Can you reproduce with "-cpu qemu,vx=3Doff" added to the QEMU command
->> line? Could be some fallout from vector instruction support. Currently
->> ill, will have a look when I'm feeling better.
-> =
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 
-> Reposted with a reply all... (sorry for the duplicates)
-> =
-
-> So it does !
-> =
-
-> =
-
-> My qemu command line is now (forget the odd funny networking things..)
-> =
-
-> qemu-system-s390x \
->   =C2=A0=C2=A0=C2=A0 -drive
-> file=3DDEB002.IMG.NEW,discard=3Dunmap,cache=3Dwriteback,id=3Ddrive-0,if=
-=3Dnone \
->   =C2=A0=C2=A0=C2=A0 -device virtio-scsi-ccw,id=3Dvirtio-scsi-0 \
->   =C2=A0=C2=A0=C2=A0 -device scsi-hd,id=3Dscsi-hd-0,drive=3Ddrive-0 \
->   =C2=A0=C2=A0=C2=A0 -m 8G \
->   =C2=A0=C2=A0=C2=A0 -net nic,macaddr=3D52:54:00:00:00:02 \
->   =C2=A0=C2=A0=C2=A0 -net tap,ifname=3Dtaparm,script=3Dno \
->   =C2=A0=C2=A0=C2=A0 -nographic -accel tcg,thread=3Dmulti \
->   =C2=A0=C2=A0=C2=A0 -monitor unix:ms,server,nowait \
->   =C2=A0=C2=A0=C2=A0 -cpu qemu,vx=3Doff \=C2=A0 ##### THAT WAS ADDED as i=
-nstructed - without it
-> everything goes kaput !
->   =C2=A0=C2=A0=C2=A0 -smp 12
-> =
-
-> And using the latest bleeding edge qemu from github, my build works (the
-> problem goes away).
-> =
-
-> So the z/Arch vector instructions may have a glitch is a venue to
-> consider.. Probably one that couldn't be screened through conventional
-> methods.
-> =
-
-> I'm not that versed into z/Arch vector instruction, but if there
-> anything I can help with, I will !
-
-I'll have to reproduce, can you outline the steps needed to trigger =
-
-this? (never had to build a go project before #luckyme ( ;) )). It looks =
-
-like https://github.com/FactomProject/basen is getting pulled in from =
-
-some other project?
-
-Thanks!
-
-
--- =
-
-
-Thanks,
-
-David / dhildenb
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1847232
-
-Title:
-  qemu TCG in s390x mode issue with calculating HASH
-
-Status in QEMU:
-  New
-
-Bug description:
-  When using go on s390x on Debian x64 (buster) (host) and debian s390x
-  (sid) (guest) I run into the following problem :
-
-  The following occurs while trying to build a custom project :
-
-  go: github.com/FactomProject/basen@v0.0.0-20150613233007-fe3947df716e:
-  Get
-  https://proxy.golang.org/github.com/%21factom%21project/basen/@v/v0.0.0-2=
-0150613233007-fe3947df716e.mod:
-  local error: tls: bad record MAC
-
-  Doing a git bisect I find that this problem only occurs on and after
-  commit 08ef92d556c584c7faf594ff3af46df456276e1b
-
-  Before that commit, all works fine. Past this commit, build always
-  fails.
-
-  Without any proof, It looks like a hash calculation bug related to
-  using z/Arch vector facilities...
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1847232/+subscriptions
 
