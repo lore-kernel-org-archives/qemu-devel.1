@@ -6,54 +6,53 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AD89AECE58E
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 19:39:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E07BECE58C
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 19:39:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 891702089C
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 19:39:48 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 891702089C
+	by mail.kernel.org (Postfix) with ESMTPS id 393B52089C
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 19:39:49 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 393B52089C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56410 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56408 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iK6C3-0007wN-7Z
-	for qemu-devel@archiver.kernel.org; Mon, 14 Oct 2019 15:39:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40660)
+	id 1iK6C4-0007w6-6Q
+	for qemu-devel@archiver.kernel.org; Mon, 14 Oct 2019 15:39:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40359)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jsnow@redhat.com>) id 1iK634-0006qq-2a
- for qemu-devel@nongnu.org; Mon, 14 Oct 2019 15:30:31 -0400
+ (envelope-from <jsnow@redhat.com>) id 1iK62U-0005yD-IP
+ for qemu-devel@nongnu.org; Mon, 14 Oct 2019 15:29:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1iK632-0003BE-B9
- for qemu-devel@nongnu.org; Mon, 14 Oct 2019 15:30:29 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:48466)
+ (envelope-from <jsnow@redhat.com>) id 1iK62S-0002jT-Kz
+ for qemu-devel@nongnu.org; Mon, 14 Oct 2019 15:29:54 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:51790)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <jsnow@redhat.com>)
- id 1iK62y-000395-Gt; Mon, 14 Oct 2019 15:30:24 -0400
+ id 1iK62P-0002gZ-1m; Mon, 14 Oct 2019 15:29:49 -0400
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
  [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id ADE6730A5686;
- Mon, 14 Oct 2019 19:30:23 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 4AFA7A3CD82;
+ Mon, 14 Oct 2019 19:29:48 +0000 (UTC)
 Received: from probe.bos.redhat.com (dhcp-17-152.bos.redhat.com [10.18.17.152])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 54A7860BE2;
- Mon, 14 Oct 2019 19:30:22 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id E610A60C18;
+ Mon, 14 Oct 2019 19:29:46 +0000 (UTC)
 From: John Snow <jsnow@redhat.com>
 To: Peter Maydell <peter.maydell@linaro.org>,
 	qemu-devel@nongnu.org
-Subject: [PULL v2 15/19] iotests: add test 260 to check bitmap life after
- snapshot + commit
-Date: Mon, 14 Oct 2019 15:29:05 -0400
-Message-Id: <20191014192909.16044-16-jsnow@redhat.com>
+Subject: [PULL v2 07/19] block/dirty-bitmap: drop BdrvDirtyBitmap.mutex
+Date: Mon, 14 Oct 2019 15:28:57 -0400
+Message-Id: <20191014192909.16044-8-jsnow@redhat.com>
 In-Reply-To: <20191014192909.16044-1-jsnow@redhat.com>
 References: <20191014192909.16044-1-jsnow@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.47]); Mon, 14 Oct 2019 19:30:23 +0000 (UTC)
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.68]); Mon, 14 Oct 2019 19:29:48 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
@@ -81,208 +80,285 @@ Sender: "Qemu-devel"
 
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
+mutex field is just a pointer to bs->dirty_bitmap_mutex, so no needs
+to store it in BdrvDirtyBitmap when we have bs pointer in it (since
+previous patch).
+
+Drop mutex field. Constantly use bdrv_dirty_bitmaps_lock/unlock in
+block/dirty-bitmap.c to make it more obvious that it's not per-bitmap
+lock. Still, for simplicity, leave bdrv_dirty_bitmap_lock/unlock
+functions as an external API.
+
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-id: 20190927122355.7344-8-vsementsov@virtuozzo.com
+Reviewed-by: John Snow <jsnow@redhat.com>
+Message-id: 20190916141911.5255-4-vsementsov@virtuozzo.com
 Signed-off-by: John Snow <jsnow@redhat.com>
 ---
- tests/qemu-iotests/260     | 89 ++++++++++++++++++++++++++++++++++++++
- tests/qemu-iotests/260.out | 52 ++++++++++++++++++++++
- tests/qemu-iotests/group   |  1 +
- 3 files changed, 142 insertions(+)
- create mode 100755 tests/qemu-iotests/260
- create mode 100644 tests/qemu-iotests/260.out
+ block/dirty-bitmap.c | 84 +++++++++++++++++++++-----------------------
+ 1 file changed, 41 insertions(+), 43 deletions(-)
 
-diff --git a/tests/qemu-iotests/260 b/tests/qemu-iotests/260
-new file mode 100755
-index 0000000000..4f6082c9d2
---- /dev/null
-+++ b/tests/qemu-iotests/260
-@@ -0,0 +1,89 @@
-+#!/usr/bin/env python
-+#
-+# Tests for temporary external snapshot when we have bitmaps.
-+#
-+# Copyright (c) 2019 Virtuozzo International GmbH. All rights reserved.
-+#
-+# This program is free software; you can redistribute it and/or modify
-+# it under the terms of the GNU General Public License as published by
-+# the Free Software Foundation; either version 2 of the License, or
-+# (at your option) any later version.
-+#
-+# This program is distributed in the hope that it will be useful,
-+# but WITHOUT ANY WARRANTY; without even the implied warranty of
-+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+# GNU General Public License for more details.
-+#
-+# You should have received a copy of the GNU General Public License
-+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-+#
-+
-+import iotests
-+from iotests import qemu_img_create, file_path, log, filter_qmp_event
-+
-+iotests.verify_image_format(supported_fmts=3D['qcow2'])
-+
-+base, top =3D file_path('base', 'top')
-+size =3D 64 * 1024 * 3
-+
-+
-+def print_bitmap(msg, vm):
-+    result =3D vm.qmp('query-block')['return'][0]
-+    if 'dirty-bitmaps' in result:
-+        bitmap =3D result['dirty-bitmaps'][0]
-+        log('{}: name=3D{} dirty-clusters=3D{}'.format(msg, bitmap['name=
-'],
-+            bitmap['count'] // 64 // 1024))
-+    else:
-+        log(msg + ': not found')
-+
-+
-+def test(persistent, restart):
-+    assert persistent or not restart
-+    log("\nTestcase {}persistent {} restart\n".format(
-+            '' if persistent else 'non-', 'with' if restart else 'withou=
-t'))
-+
-+    qemu_img_create('-f', iotests.imgfmt, base, str(size))
-+
-+    vm =3D iotests.VM().add_drive(base)
-+    vm.launch()
-+
-+    vm.qmp_log('block-dirty-bitmap-add', node=3D'drive0', name=3D'bitmap=
-0',
-+               persistent=3Dpersistent)
-+    vm.hmp_qemu_io('drive0', 'write 0 64K')
-+    print_bitmap('initial bitmap', vm)
-+
-+    vm.qmp_log('blockdev-snapshot-sync', device=3D'drive0', snapshot_fil=
-e=3Dtop,
-+               format=3Diotests.imgfmt, filters=3D[iotests.filter_qmp_te=
-stfiles])
-+    vm.hmp_qemu_io('drive0', 'write 64K 512')
-+    print_bitmap('check that no bitmaps are in snapshot', vm)
-+
-+    if restart:
-+        log("... Restart ...")
-+        vm.shutdown()
-+        vm =3D iotests.VM().add_drive(top)
-+        vm.launch()
-+
-+    vm.qmp_log('block-commit', device=3D'drive0', top=3Dtop,
-+               filters=3D[iotests.filter_qmp_testfiles])
-+    ev =3D vm.events_wait((('BLOCK_JOB_READY', None),
-+                         ('BLOCK_JOB_COMPLETED', None)))
-+    log(filter_qmp_event(ev))
-+    if (ev['event'] =3D=3D 'BLOCK_JOB_COMPLETED'):
-+        vm.shutdown()
-+        log(vm.get_log())
-+        exit()
-+
-+    vm.qmp_log('block-job-complete', device=3D'drive0')
-+    ev =3D vm.event_wait('BLOCK_JOB_COMPLETED')
-+    log(filter_qmp_event(ev))
-+    print_bitmap('check bitmap after commit', vm)
-+
-+    vm.hmp_qemu_io('drive0', 'write 128K 64K')
-+    print_bitmap('check updated bitmap', vm)
-+
-+    vm.shutdown()
-+
-+
-+test(persistent=3DFalse, restart=3DFalse)
-+test(persistent=3DTrue, restart=3DFalse)
-+test(persistent=3DTrue, restart=3DTrue)
-diff --git a/tests/qemu-iotests/260.out b/tests/qemu-iotests/260.out
-new file mode 100644
-index 0000000000..2f0d98d036
---- /dev/null
-+++ b/tests/qemu-iotests/260.out
-@@ -0,0 +1,52 @@
-+
-+Testcase non-persistent without restart
-+
-+{"execute": "block-dirty-bitmap-add", "arguments": {"name": "bitmap0", "=
-node": "drive0", "persistent": false}}
-+{"return": {}}
-+initial bitmap: name=3Dbitmap0 dirty-clusters=3D1
-+{"execute": "blockdev-snapshot-sync", "arguments": {"device": "drive0", =
-"format": "qcow2", "snapshot-file": "TEST_DIR/PID-top"}}
-+{"return": {}}
-+check that no bitmaps are in snapshot: not found
-+{"execute": "block-commit", "arguments": {"device": "drive0", "top": "TE=
-ST_DIR/PID-top"}}
-+{"return": {}}
-+{"data": {"device": "drive0", "len": 65536, "offset": 65536, "speed": 0,=
- "type": "commit"}, "event": "BLOCK_JOB_READY", "timestamp": {"microsecon=
-ds": "USECS", "seconds": "SECS"}}
-+{"execute": "block-job-complete", "arguments": {"device": "drive0"}}
-+{"return": {}}
-+{"data": {"device": "drive0", "len": 65536, "offset": 65536, "speed": 0,=
- "type": "commit"}, "event": "BLOCK_JOB_COMPLETED", "timestamp": {"micros=
-econds": "USECS", "seconds": "SECS"}}
-+check bitmap after commit: name=3Dbitmap0 dirty-clusters=3D2
-+check updated bitmap: name=3Dbitmap0 dirty-clusters=3D3
-+
-+Testcase persistent without restart
-+
-+{"execute": "block-dirty-bitmap-add", "arguments": {"name": "bitmap0", "=
-node": "drive0", "persistent": true}}
-+{"return": {}}
-+initial bitmap: name=3Dbitmap0 dirty-clusters=3D1
-+{"execute": "blockdev-snapshot-sync", "arguments": {"device": "drive0", =
-"format": "qcow2", "snapshot-file": "TEST_DIR/PID-top"}}
-+{"return": {}}
-+check that no bitmaps are in snapshot: not found
-+{"execute": "block-commit", "arguments": {"device": "drive0", "top": "TE=
-ST_DIR/PID-top"}}
-+{"return": {}}
-+{"data": {"device": "drive0", "len": 65536, "offset": 65536, "speed": 0,=
- "type": "commit"}, "event": "BLOCK_JOB_READY", "timestamp": {"microsecon=
-ds": "USECS", "seconds": "SECS"}}
-+{"execute": "block-job-complete", "arguments": {"device": "drive0"}}
-+{"return": {}}
-+{"data": {"device": "drive0", "len": 65536, "offset": 65536, "speed": 0,=
- "type": "commit"}, "event": "BLOCK_JOB_COMPLETED", "timestamp": {"micros=
-econds": "USECS", "seconds": "SECS"}}
-+check bitmap after commit: name=3Dbitmap0 dirty-clusters=3D2
-+check updated bitmap: name=3Dbitmap0 dirty-clusters=3D3
-+
-+Testcase persistent with restart
-+
-+{"execute": "block-dirty-bitmap-add", "arguments": {"name": "bitmap0", "=
-node": "drive0", "persistent": true}}
-+{"return": {}}
-+initial bitmap: name=3Dbitmap0 dirty-clusters=3D1
-+{"execute": "blockdev-snapshot-sync", "arguments": {"device": "drive0", =
-"format": "qcow2", "snapshot-file": "TEST_DIR/PID-top"}}
-+{"return": {}}
-+check that no bitmaps are in snapshot: not found
-+... Restart ...
-+{"execute": "block-commit", "arguments": {"device": "drive0", "top": "TE=
-ST_DIR/PID-top"}}
-+{"return": {}}
-+{"data": {"device": "drive0", "len": 65536, "offset": 65536, "speed": 0,=
- "type": "commit"}, "event": "BLOCK_JOB_READY", "timestamp": {"microsecon=
-ds": "USECS", "seconds": "SECS"}}
-+{"execute": "block-job-complete", "arguments": {"device": "drive0"}}
-+{"return": {}}
-+{"data": {"device": "drive0", "len": 65536, "offset": 65536, "speed": 0,=
- "type": "commit"}, "event": "BLOCK_JOB_COMPLETED", "timestamp": {"micros=
-econds": "USECS", "seconds": "SECS"}}
-+check bitmap after commit: name=3Dbitmap0 dirty-clusters=3D2
-+check updated bitmap: name=3Dbitmap0 dirty-clusters=3D3
-diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
-index 5805a79d9e..0c1e5ef414 100644
---- a/tests/qemu-iotests/group
-+++ b/tests/qemu-iotests/group
-@@ -273,6 +273,7 @@
- 256 rw quick
- 257 rw
- 258 rw quick
-+260 rw auto quick
- 262 rw quick migration
- 263 rw quick
- 265 rw auto quick
+diff --git a/block/dirty-bitmap.c b/block/dirty-bitmap.c
+index 44453ff824..4e5c87a907 100644
+--- a/block/dirty-bitmap.c
++++ b/block/dirty-bitmap.c
+@@ -29,7 +29,6 @@
+ #include "qemu/main-loop.h"
+=20
+ struct BdrvDirtyBitmap {
+-    QemuMutex *mutex;
+     BlockDriverState *bs;
+     HBitmap *bitmap;            /* Dirty bitmap implementation */
+     bool busy;                  /* Bitmap is busy, it can't be used via =
+QMP */
+@@ -72,12 +71,12 @@ static inline void bdrv_dirty_bitmaps_unlock(BlockDri=
+verState *bs)
+=20
+ void bdrv_dirty_bitmap_lock(BdrvDirtyBitmap *bitmap)
+ {
+-    qemu_mutex_lock(bitmap->mutex);
++    bdrv_dirty_bitmaps_lock(bitmap->bs);
+ }
+=20
+ void bdrv_dirty_bitmap_unlock(BdrvDirtyBitmap *bitmap)
+ {
+-    qemu_mutex_unlock(bitmap->mutex);
++    bdrv_dirty_bitmaps_unlock(bitmap->bs);
+ }
+=20
+ /* Called with BQL or dirty_bitmap lock taken.  */
+@@ -117,7 +116,6 @@ BdrvDirtyBitmap *bdrv_create_dirty_bitmap(BlockDriver=
+State *bs,
+     }
+     bitmap =3D g_new0(BdrvDirtyBitmap, 1);
+     bitmap->bs =3D bs;
+-    bitmap->mutex =3D &bs->dirty_bitmap_mutex;
+     bitmap->bitmap =3D hbitmap_alloc(bitmap_size, ctz32(granularity));
+     bitmap->size =3D bitmap_size;
+     bitmap->name =3D g_strdup(name);
+@@ -151,9 +149,9 @@ static bool bdrv_dirty_bitmap_busy(const BdrvDirtyBit=
+map *bitmap)
+=20
+ void bdrv_dirty_bitmap_set_busy(BdrvDirtyBitmap *bitmap, bool busy)
+ {
+-    qemu_mutex_lock(bitmap->mutex);
++    bdrv_dirty_bitmaps_lock(bitmap->bs);
+     bitmap->busy =3D busy;
+-    qemu_mutex_unlock(bitmap->mutex);
++    bdrv_dirty_bitmaps_unlock(bitmap->bs);
+ }
+=20
+ /* Called with BQL taken.  */
+@@ -278,10 +276,10 @@ void bdrv_enable_dirty_bitmap_locked(BdrvDirtyBitma=
+p *bitmap)
+ /* Called with BQL taken. */
+ void bdrv_dirty_bitmap_enable_successor(BdrvDirtyBitmap *bitmap)
+ {
+-    assert(bitmap->mutex =3D=3D bitmap->successor->mutex);
+-    qemu_mutex_lock(bitmap->mutex);
++    assert(bitmap->bs =3D=3D bitmap->successor->bs);
++    bdrv_dirty_bitmaps_lock(bitmap->bs);
+     bdrv_enable_dirty_bitmap_locked(bitmap->successor);
+-    qemu_mutex_unlock(bitmap->mutex);
++    bdrv_dirty_bitmaps_unlock(bitmap->bs);
+ }
+=20
+ /* Called within bdrv_dirty_bitmap_lock..unlock and with BQL taken.  */
+@@ -361,9 +359,9 @@ BdrvDirtyBitmap *bdrv_reclaim_dirty_bitmap(BdrvDirtyB=
+itmap *parent,
+ {
+     BdrvDirtyBitmap *ret;
+=20
+-    qemu_mutex_lock(parent->mutex);
++    bdrv_dirty_bitmaps_lock(parent->bs);
+     ret =3D bdrv_reclaim_dirty_bitmap_locked(parent, errp);
+-    qemu_mutex_unlock(parent->mutex);
++    bdrv_dirty_bitmaps_unlock(parent->bs);
+=20
+     return ret;
+ }
+@@ -543,16 +541,16 @@ bool bdrv_can_store_new_dirty_bitmap(BlockDriverSta=
+te *bs, const char *name,
+=20
+ void bdrv_disable_dirty_bitmap(BdrvDirtyBitmap *bitmap)
+ {
+-    bdrv_dirty_bitmap_lock(bitmap);
++    bdrv_dirty_bitmaps_lock(bitmap->bs);
+     bitmap->disabled =3D true;
+-    bdrv_dirty_bitmap_unlock(bitmap);
++    bdrv_dirty_bitmaps_unlock(bitmap->bs);
+ }
+=20
+ void bdrv_enable_dirty_bitmap(BdrvDirtyBitmap *bitmap)
+ {
+-    bdrv_dirty_bitmap_lock(bitmap);
++    bdrv_dirty_bitmaps_lock(bitmap->bs);
+     bdrv_enable_dirty_bitmap_locked(bitmap);
+-    bdrv_dirty_bitmap_unlock(bitmap);
++    bdrv_dirty_bitmaps_unlock(bitmap->bs);
+ }
+=20
+ BlockDirtyInfoList *bdrv_query_dirty_bitmaps(BlockDriverState *bs)
+@@ -593,9 +591,9 @@ bool bdrv_dirty_bitmap_get_locked(BdrvDirtyBitmap *bi=
+tmap, int64_t offset)
+ bool bdrv_dirty_bitmap_get(BdrvDirtyBitmap *bitmap, int64_t offset)
+ {
+     bool ret;
+-    bdrv_dirty_bitmap_lock(bitmap);
++    bdrv_dirty_bitmaps_lock(bitmap->bs);
+     ret =3D bdrv_dirty_bitmap_get_locked(bitmap, offset);
+-    bdrv_dirty_bitmap_unlock(bitmap);
++    bdrv_dirty_bitmaps_unlock(bitmap->bs);
+=20
+     return ret;
+ }
+@@ -660,9 +658,9 @@ void bdrv_set_dirty_bitmap_locked(BdrvDirtyBitmap *bi=
+tmap,
+ void bdrv_set_dirty_bitmap(BdrvDirtyBitmap *bitmap,
+                            int64_t offset, int64_t bytes)
+ {
+-    bdrv_dirty_bitmap_lock(bitmap);
++    bdrv_dirty_bitmaps_lock(bitmap->bs);
+     bdrv_set_dirty_bitmap_locked(bitmap, offset, bytes);
+-    bdrv_dirty_bitmap_unlock(bitmap);
++    bdrv_dirty_bitmaps_unlock(bitmap->bs);
+ }
+=20
+ /* Called within bdrv_dirty_bitmap_lock..unlock */
+@@ -676,15 +674,15 @@ void bdrv_reset_dirty_bitmap_locked(BdrvDirtyBitmap=
+ *bitmap,
+ void bdrv_reset_dirty_bitmap(BdrvDirtyBitmap *bitmap,
+                              int64_t offset, int64_t bytes)
+ {
+-    bdrv_dirty_bitmap_lock(bitmap);
++    bdrv_dirty_bitmaps_lock(bitmap->bs);
+     bdrv_reset_dirty_bitmap_locked(bitmap, offset, bytes);
+-    bdrv_dirty_bitmap_unlock(bitmap);
++    bdrv_dirty_bitmaps_unlock(bitmap->bs);
+ }
+=20
+ void bdrv_clear_dirty_bitmap(BdrvDirtyBitmap *bitmap, HBitmap **out)
+ {
+     assert(!bdrv_dirty_bitmap_readonly(bitmap));
+-    bdrv_dirty_bitmap_lock(bitmap);
++    bdrv_dirty_bitmaps_lock(bitmap->bs);
+     if (!out) {
+         hbitmap_reset_all(bitmap->bitmap);
+     } else {
+@@ -693,7 +691,7 @@ void bdrv_clear_dirty_bitmap(BdrvDirtyBitmap *bitmap,=
+ HBitmap **out)
+                                        hbitmap_granularity(backup));
+         *out =3D backup;
+     }
+-    bdrv_dirty_bitmap_unlock(bitmap);
++    bdrv_dirty_bitmaps_unlock(bitmap->bs);
+ }
+=20
+ void bdrv_restore_dirty_bitmap(BdrvDirtyBitmap *bitmap, HBitmap *backup)
+@@ -788,9 +786,9 @@ bool bdrv_dirty_bitmap_readonly(const BdrvDirtyBitmap=
+ *bitmap)
+ /* Called with BQL taken. */
+ void bdrv_dirty_bitmap_set_readonly(BdrvDirtyBitmap *bitmap, bool value)
+ {
+-    qemu_mutex_lock(bitmap->mutex);
++    bdrv_dirty_bitmaps_lock(bitmap->bs);
+     bitmap->readonly =3D value;
+-    qemu_mutex_unlock(bitmap->mutex);
++    bdrv_dirty_bitmaps_unlock(bitmap->bs);
+ }
+=20
+ bool bdrv_has_readonly_bitmaps(BlockDriverState *bs)
+@@ -808,27 +806,27 @@ bool bdrv_has_readonly_bitmaps(BlockDriverState *bs=
+)
+ /* Called with BQL taken. */
+ void bdrv_dirty_bitmap_set_persistence(BdrvDirtyBitmap *bitmap, bool per=
+sistent)
+ {
+-    qemu_mutex_lock(bitmap->mutex);
++    bdrv_dirty_bitmaps_lock(bitmap->bs);
+     bitmap->persistent =3D persistent;
+-    qemu_mutex_unlock(bitmap->mutex);
++    bdrv_dirty_bitmaps_unlock(bitmap->bs);
+ }
+=20
+ /* Called with BQL taken. */
+ void bdrv_dirty_bitmap_set_inconsistent(BdrvDirtyBitmap *bitmap)
+ {
+-    qemu_mutex_lock(bitmap->mutex);
++    bdrv_dirty_bitmaps_lock(bitmap->bs);
+     assert(bitmap->persistent =3D=3D true);
+     bitmap->inconsistent =3D true;
+     bitmap->disabled =3D true;
+-    qemu_mutex_unlock(bitmap->mutex);
++    bdrv_dirty_bitmaps_unlock(bitmap->bs);
+ }
+=20
+ /* Called with BQL taken. */
+ void bdrv_dirty_bitmap_skip_store(BdrvDirtyBitmap *bitmap, bool skip)
+ {
+-    qemu_mutex_lock(bitmap->mutex);
++    bdrv_dirty_bitmaps_lock(bitmap->bs);
+     bitmap->skip_store =3D skip;
+-    qemu_mutex_unlock(bitmap->mutex);
++    bdrv_dirty_bitmaps_unlock(bitmap->bs);
+ }
+=20
+ bool bdrv_dirty_bitmap_get_persistence(BdrvDirtyBitmap *bitmap)
+@@ -888,9 +886,9 @@ void bdrv_merge_dirty_bitmap(BdrvDirtyBitmap *dest, c=
+onst BdrvDirtyBitmap *src,
+ {
+     bool ret;
+=20
+-    qemu_mutex_lock(dest->mutex);
+-    if (src->mutex !=3D dest->mutex) {
+-        qemu_mutex_lock(src->mutex);
++    bdrv_dirty_bitmaps_lock(dest->bs);
++    if (src->bs !=3D dest->bs) {
++        bdrv_dirty_bitmaps_lock(src->bs);
+     }
+=20
+     if (bdrv_dirty_bitmap_check(dest, BDRV_BITMAP_DEFAULT, errp)) {
+@@ -910,9 +908,9 @@ void bdrv_merge_dirty_bitmap(BdrvDirtyBitmap *dest, c=
+onst BdrvDirtyBitmap *src,
+     assert(ret);
+=20
+ out:
+-    qemu_mutex_unlock(dest->mutex);
+-    if (src->mutex !=3D dest->mutex) {
+-        qemu_mutex_unlock(src->mutex);
++    bdrv_dirty_bitmaps_unlock(dest->bs);
++    if (src->bs !=3D dest->bs) {
++        bdrv_dirty_bitmaps_unlock(src->bs);
+     }
+ }
+=20
+@@ -936,9 +934,9 @@ bool bdrv_dirty_bitmap_merge_internal(BdrvDirtyBitmap=
+ *dest,
+     assert(!bdrv_dirty_bitmap_inconsistent(src));
+=20
+     if (lock) {
+-        qemu_mutex_lock(dest->mutex);
+-        if (src->mutex !=3D dest->mutex) {
+-            qemu_mutex_lock(src->mutex);
++        bdrv_dirty_bitmaps_lock(dest->bs);
++        if (src->bs !=3D dest->bs) {
++            bdrv_dirty_bitmaps_lock(src->bs);
+         }
+     }
+=20
+@@ -951,9 +949,9 @@ bool bdrv_dirty_bitmap_merge_internal(BdrvDirtyBitmap=
+ *dest,
+     }
+=20
+     if (lock) {
+-        qemu_mutex_unlock(dest->mutex);
+-        if (src->mutex !=3D dest->mutex) {
+-            qemu_mutex_unlock(src->mutex);
++        bdrv_dirty_bitmaps_unlock(dest->bs);
++        if (src->bs !=3D dest->bs) {
++            bdrv_dirty_bitmaps_unlock(src->bs);
+         }
+     }
+=20
 --=20
 2.21.0
 
