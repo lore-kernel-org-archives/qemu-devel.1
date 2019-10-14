@@ -7,75 +7,75 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 42426ECE587
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 11:12:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9C5D8ECE587
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 11:13:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0DFBC2084B
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 11:12:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 66AEB2084B
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 11:13:26 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="bjm7HNau"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0DFBC2084B
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ib8GIKxG"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 66AEB2084B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47498 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47502 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iJyHD-0005l6-1i
-	for qemu-devel@archiver.kernel.org; Mon, 14 Oct 2019 07:12:35 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44694)
+	id 1iJyI1-0006Pi-D8
+	for qemu-devel@archiver.kernel.org; Mon, 14 Oct 2019 07:13:25 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44651)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1iJxvU-0007XH-MH
- for qemu-devel@nongnu.org; Mon, 14 Oct 2019 06:50:09 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1iJxvT-0006Hm-E5
+ (envelope-from <alex.bennee@linaro.org>) id 1iJxvT-0007UN-3L
  for qemu-devel@nongnu.org; Mon, 14 Oct 2019 06:50:08 -0400
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:50315)
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+ (envelope-from <alex.bennee@linaro.org>) id 1iJxvR-0006Ea-M3
+ for qemu-devel@nongnu.org; Mon, 14 Oct 2019 06:50:06 -0400
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:38546)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1iJxvT-0006GK-7v
- for qemu-devel@nongnu.org; Mon, 14 Oct 2019 06:50:07 -0400
-Received: by mail-wm1-x343.google.com with SMTP id 5so16761805wmg.0
- for <qemu-devel@nongnu.org>; Mon, 14 Oct 2019 03:50:07 -0700 (PDT)
+ id 1iJxvR-0006DR-E1
+ for qemu-devel@nongnu.org; Mon, 14 Oct 2019 06:50:05 -0400
+Received: by mail-wr1-x443.google.com with SMTP id y18so9677410wrn.5
+ for <qemu-devel@nongnu.org>; Mon, 14 Oct 2019 03:50:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=bN4XmGTG9/FatEh/7FtZa/B9CvFqCRZ6R/2X2ZutnFU=;
- b=bjm7HNaujfIiQwunUt3Oir/dBUL78Uo1Fh7DuPuLOMBoUNax9PKvxw0PU/STqGvvaI
- gjct/iBy2Z8XQ63InA2K+iYUOk4jiVf46oC4mxEDgP7u4vnp89GJ4VrIyqWaLVwgSVk5
- UOvXb6gRJfQPAU/H9a9RHsCsDenU0jA2kSqCDbvycij+ek/PMYgaIFk+ebkI6diLe6xL
- 9aOighsAaFOBGWtnWPjPGMTs4+T/xVBGCeajQVIvg+xDpavrSe/B23gMMumjAmr1LzgZ
- AetesW3SU3XbUSgwNSZLo2BPScPx7CIuuyYYLQm6HBZLTGIwzqTy4vwsxeYmEIYhIhag
- oD1A==
+ bh=wkKvV4m59QNrxbn2cShYQVtK2L5V4Z2RfTcq3RzCI+A=;
+ b=ib8GIKxGCj/S/SDhI+albNwezZ2VxDgbviecKDonjK3TkO1GR/t65pLI9WNFa3n7aO
+ /0N+ZK24IsVFGDYLo3EXrkeTCygZVlW3bLbkIOu2nzCGs+U06mErsezjOIByskWrCyMq
+ FgRbU0pWgesd7nxf+kTNuAlKuI8dE8+qG5HXcoWn7ubrrEym0NI5vVT5EMVc+KbJzMn1
+ ab+f+uO/cYlP+TH/YWL5OLwhgRF8hPzZvceGLU1+78O5CnNZULH1o+R1BCpmaRbtvuAX
+ 8WxE8ttrQINMRWjOgeFUY5TFm1Pp0+Jvocgbq5YZ0XySOObe97ntalfAhiN36lEU4A1T
+ U/Xw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=bN4XmGTG9/FatEh/7FtZa/B9CvFqCRZ6R/2X2ZutnFU=;
- b=eA+k5U3m51UfonygSCHeRQ49IdCqhnjnom4AlvUfkKhtzTCUTn5yR26NBOUPDbw5ow
- Tbailo0kzEp7NcX0Jv9fzh/RzCi65Ry8blMhNq/k9C0tEtVczUaXUG/y8oE2WCde3d7a
- BjEoeDqmmU5Lc4n66Rrnn0FEOrFITlq+KU9Chd+CzgPOX7IiSbwx01DqtQXcq3cQbDE9
- lhUS5Hhf2QCjQ/LXencIs5QGM4Y8frG8NclyBuEAPSRjf9ofq0wV5e776tDCq0NjRNyH
- pAZzHlx7fkgCcDMaoAHahePMEUBFAAE8xwKw4V9oHNhRqeoyNhETxujHJUqrGc9OPzLf
- CeSg==
-X-Gm-Message-State: APjAAAVw+/pdHzLgmTVTSrrVwOGhiIUvuCcMZZS5hXAs/qI9xTrkp97P
- 2BZVP6kLDKq2PbS4jrqDNORJnSFGP/o=
-X-Google-Smtp-Source: APXvYqzXCqUmQshn3QNmxHDOkfkz/8/4unnaDwzc95iC10JJsf3plnByOD0LJWlLr5Kwmw28T0VmwQ==
-X-Received: by 2002:a1c:5f09:: with SMTP id t9mr15395842wmb.124.1571050206167; 
- Mon, 14 Oct 2019 03:50:06 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id b7sm19111097wrx.56.2019.10.14.03.50.00
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ bh=wkKvV4m59QNrxbn2cShYQVtK2L5V4Z2RfTcq3RzCI+A=;
+ b=j0M91AYWHN2vl7GYZa6MWeA1pdQ8QllxTkN8So86VK8fxz3g+ZjZlfCdJoH1TprVAQ
+ VNXI1yChHsgeOydE0Z6O8bhNif6cjTVG6VW+aaZoC+EgoJhyREqiKgZmISDW0uJu9n39
+ zzEu+4x8cZhMV1ZDFW0Cg2l+F1HahohKFLuSFNLFg+lcW9C0a/m6ueBaN5p1mdBcpGxi
+ XqRRiPJc9X8vPLv9htb4pznmqdxRfTA156PNYlcdaCkC4qf1s23mwYscURrrKJsU5/hQ
+ DjBd+meWv/uje2Sa3UxaqcskzDM5stnxtqXuHKL57nLghWNKx7YqC2UKhrrdXBmJ5kLU
+ pMLQ==
+X-Gm-Message-State: APjAAAWTmgAf0GoIZwl9Lzrsj8I0nMI9TMEsxTtiJIyB/6h+Cyae5993
+ zkgSBH1ZZAWS0LEi6V8cFFqGcQ==
+X-Google-Smtp-Source: APXvYqwIEn/JXkY8vnoSMTzOTt5/DN6WbchrHU5v+yXYfCqmbdJeJZ6hbFnzD/s0E9/DTS+ZiILl/A==
+X-Received: by 2002:adf:f547:: with SMTP id j7mr26755221wrp.26.1571050204391; 
  Mon, 14 Oct 2019 03:50:04 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id f9sm21372680wre.74.2019.10.14.03.49.55
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 14 Oct 2019 03:50:00 -0700 (PDT)
 Received: from zen.lan (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 1BCA91FFD6;
- Mon, 14 Oct 2019 11:50:00 +0100 (BST)
+ by zen.linaroharston (Postfix) with ESMTP id 1A73E1FFAE;
+ Mon, 14 Oct 2019 11:49:55 +0100 (BST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH  v5 50/55] include/exec: wrap cpu_ldst.h in CONFIG_TCG
-Date: Mon, 14 Oct 2019 11:49:43 +0100
-Message-Id: <20191014104948.4291-51-alex.bennee@linaro.org>
+Subject: [PATCH  v5 25/55] target/ppc: fetch code with translator_ld
+Date: Mon, 14 Oct 2019 11:49:18 +0100
+Message-Id: <20191014104948.4291-26-alex.bennee@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20191014104948.4291-1-alex.bennee@linaro.org>
 References: <20191014104948.4291-1-alex.bennee@linaro.org>
@@ -84,7 +84,7 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::343
+X-Received-From: 2a00:1450:4864:20::443
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,35 +99,42 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 Cc: robert.foley@futurewei.com,
  Richard Henderson <richard.henderson@linaro.org>, peter.puhov@futurewei.com,
  aaron@os.amperecomputing.com, cota@braap.org,
- Paolo Bonzini <pbonzini@redhat.com>,
+ "open list:PowerPC TCG CPUs" <qemu-ppc@nongnu.org>,
  =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
- Richard Henderson <rth@twiddle.net>
+ David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This gets around a build problem with --disable-tcg.
+From: "Emilio G. Cota" <cota@braap.org>
 
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+Signed-off-by: Emilio G. Cota <cota@braap.org>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Acked-by: David Gibson <david@gibson.dropbear.id.au>
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 ---
- include/exec/exec-all.h | 2 ++
- 1 file changed, 2 insertions(+)
+ target/ppc/translate.c | 8 +++-----
+ 1 file changed, 3 insertions(+), 5 deletions(-)
 
-diff --git a/include/exec/exec-all.h b/include/exec/exec-all.h
-index 47a071fee0..e74cf980e9 100644
---- a/include/exec/exec-all.h
-+++ b/include/exec/exec-all.h
-@@ -22,7 +22,9 @@
+diff --git a/target/ppc/translate.c b/target/ppc/translate.c
+index adb8fd516f..f5fe5d0611 100644
+--- a/target/ppc/translate.c
++++ b/target/ppc/translate.c
+@@ -7853,11 +7853,9 @@ static void ppc_tr_translate_insn(DisasContextBase *dcbase, CPUState *cs)
+     LOG_DISAS("nip=" TARGET_FMT_lx " super=%d ir=%d\n",
+               ctx->base.pc_next, ctx->mem_idx, (int)msr_ir);
  
- #include "cpu.h"
- #include "exec/tb-context.h"
-+#ifdef CONFIG_TCG
- #include "exec/cpu_ldst.h"
-+#endif
- #include "sysemu/cpus.h"
- 
- /* allow to see translation results - the slowdown should be negligible, so we leave it */
+-    if (unlikely(need_byteswap(ctx))) {
+-        ctx->opcode = bswap32(cpu_ldl_code(env, ctx->base.pc_next));
+-    } else {
+-        ctx->opcode = cpu_ldl_code(env, ctx->base.pc_next);
+-    }
++    ctx->opcode = translator_ldl_swap(env, ctx->base.pc_next,
++                                      need_byteswap(ctx));
++
+     LOG_DISAS("translate opcode %08x (%02x %02x %02x %02x) (%s)\n",
+               ctx->opcode, opc1(ctx->opcode), opc2(ctx->opcode),
+               opc3(ctx->opcode), opc4(ctx->opcode),
 -- 
 2.20.1
 
