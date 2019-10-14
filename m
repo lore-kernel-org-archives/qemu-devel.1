@@ -2,86 +2,86 @@ Return-Path: <SRS0=PUPy=YH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 318E3ECE587
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 12:54:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6278CC4CECE
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 13:11:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F0E6D20673
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 12:54:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2B63A20659
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 13:11:15 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jLUCMp7U"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F0E6D20673
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="hxuXuR4g"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2B63A20659
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49390 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49558 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iJzs6-00044V-3T
-	for qemu-devel@archiver.kernel.org; Mon, 14 Oct 2019 08:54:46 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33160)
+	id 1iK082-0000tG-AW
+	for qemu-devel@archiver.kernel.org; Mon, 14 Oct 2019 09:11:14 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35281)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <hikarupsp@gmail.com>) id 1iJzrK-0003c9-5l
- for qemu-devel@nongnu.org; Mon, 14 Oct 2019 08:53:59 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1iK06m-0008TL-FC
+ for qemu-devel@nongnu.org; Mon, 14 Oct 2019 09:09:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <hikarupsp@gmail.com>) id 1iJzrI-0002Ua-Vm
- for qemu-devel@nongnu.org; Mon, 14 Oct 2019 08:53:58 -0400
-Received: from mail-pl1-x642.google.com ([2607:f8b0:4864:20::642]:37988)
+ (envelope-from <alex.bennee@linaro.org>) id 1iK06h-0000K5-9p
+ for qemu-devel@nongnu.org; Mon, 14 Oct 2019 09:09:56 -0400
+Received: from mail-wm1-x336.google.com ([2a00:1450:4864:20::336]:40392)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <hikarupsp@gmail.com>) id 1iJzrI-0002TX-QC
- for qemu-devel@nongnu.org; Mon, 14 Oct 2019 08:53:56 -0400
-Received: by mail-pl1-x642.google.com with SMTP id w8so7982593plq.5
- for <qemu-devel@nongnu.org>; Mon, 14 Oct 2019 05:53:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1iK06h-0000JG-3V
+ for qemu-devel@nongnu.org; Mon, 14 Oct 2019 09:09:51 -0400
+Received: by mail-wm1-x336.google.com with SMTP id b24so16695714wmj.5
+ for <qemu-devel@nongnu.org>; Mon, 14 Oct 2019 06:09:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:mime-version
  :content-transfer-encoding;
- bh=Vc2c5WMfkiOfguRP8cbAU26pLvXspd7bpIyEPOg1kuA=;
- b=jLUCMp7Un0LU+LEi5WeDxcreNafdeQZGSvqpQu791pksiqIgFY9cO+9eKY7+2o0PJJ
- 3GZJz2hkehBwWizOnQJtlH+d+HEUe3QcZ8PLpNKtFLQMBwOjljqE03rFZyY4Ul35fRHj
- J72lscNJj/yOokJqVC2zRp/SaWCigNbHEv1srsVe05FA2YYc19HGnQdw2ZUdqGiNltHF
- 4R1kScf+ZfDNhKKPrhEVfTz07LBPluh54qoAsCntvzAyTBJRGA39V6F0zUKp/2jlyzzx
- v13CiBghMIMZU+gXXJUQI+2NEELCoFbktcST4MLy6v3TyA8ZcDD3BUsEolnTK/yTtnFE
- w9Tg==
+ bh=UEXCjAhdu0FKHjjtnW1230km7QIS6Nvx34ZHiSKDVCA=;
+ b=hxuXuR4g2shL08WUvxaxnshWH4ZEC/LUpYo0ZYhUGKU2xOfwImBSabs2JJe4Rr1awE
+ T6YpA6M4ywmZV5YIDRwxoj3p7SNgb40U4YINadi8jG7pvb9SSmmbKIz8jn58jY3Fw9iI
+ ixg9iRXfIC14WrGE/y+lZB8hcb4nySgQtAoUzIt2nM+t0JwM4M8MRLCyqKsZs6Wv/af/
+ AzURbapq/IfeIs4A+/u+kzPaZLmigwtlX6egOu2/XEiEs7eGZMBB+AouiK+ypqpn5+bX
+ 7LMLbwnhBtS2wi3jRpEZT+Q0U37fLIwjoqRl2SBKBnov5gVGNx2dN3foecpPjD6OR560
+ 44ew==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
  :content-transfer-encoding;
- bh=Vc2c5WMfkiOfguRP8cbAU26pLvXspd7bpIyEPOg1kuA=;
- b=GjQ4GY8GGVAkjJONxS6M57JeRENlmyCU52VEWLaetvu1bkwWX9TqZXOQyMkHmggl9Y
- yfSzPRHlS9LeQI/5qI3U22hb9pEhby0v6XLWO+gP5klHHErWOG0DJdZR1+NU6LCasOn8
- eo26UFttgWfaBGnS03xT/BUKQqKZUfklK46JX6EmRwtbNdF3jyy1c3//AqY8ZFBdbM7q
- YAA016othpD4GNLU9S8448pIIOrS0Gs1K/OKHK63TdifXqGFWWNwNnvbBcKSVXqSihmC
- 2KOeBDhSNHAyDY8MN6Xmxp4C41YbGC5R+uadoCbFjyBPRp+7XdxeAW1CvU5xT+ag1/Db
- lr3A==
-X-Gm-Message-State: APjAAAWekqdNbR2tWUXF8XqumDg/1SuebAG/OWj1Gs7ectOyIrkyqB6S
- PBo9UWRGxvvhb3/18RP/0i7bghi9wd8=
-X-Google-Smtp-Source: APXvYqzCNytAIfQ3RvIOwzMAqhJ1KLYwbZ1pgDVvp4X08gTswtoAxE5xvN6gxa4UxE8KGLMh9xjGzw==
-X-Received: by 2002:a17:902:8bc4:: with SMTP id
- r4mr28750810plo.341.1571057634923; 
- Mon, 14 Oct 2019 05:53:54 -0700 (PDT)
-Received: from t03.z01.hikalium.com.com (113x36x63x49.ap113.ftth.ucom.ne.jp.
- [113.36.63.49])
- by smtp.gmail.com with ESMTPSA id l184sm1208431pfl.76.2019.10.14.05.53.52
- (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Mon, 14 Oct 2019 05:53:53 -0700 (PDT)
-From: hikarupsp@gmail.com
+ bh=UEXCjAhdu0FKHjjtnW1230km7QIS6Nvx34ZHiSKDVCA=;
+ b=op1buO3nXfVnRx4vrP7zmdAqU9JqMDotLf42BWB4CnSr6Kp/fVB8i5MMUPFRJ/1dYw
+ C3JYKKhX+AtrhnQBfQMokzmske9UjfvgIfSMWsWB48+oCU6FSEHDGVk74q9UPaT2nd9+
+ eDEI0ms5nrUwkcQUVMkVLnCvJCHLvT54BJe3AYaInyLkquJrFB4J55Brh8Wldw8c8fzU
+ XZRLxGgn8q6mZgRuZobgtVgXx5WsScocKi5w4Zb/jLubMp4iMqFJtnv5ewiyV26IciEL
+ An7CfISba4+rPWRcE/+/hFj+ZnIeBl+k8hHE+FRnP1jCUnCaS0DaRDZ3v3etUMljScNQ
+ eU3w==
+X-Gm-Message-State: APjAAAV6vMtFYZkQONz5PbwA1v0rBfKFpfmje4MxsrioQ4dupaB5fIQM
+ a0hQqclMgKJs0SEPKSIzlpwrrA==
+X-Google-Smtp-Source: APXvYqyiyzYxFv/UvSllsB1S7FbUYAvnWQ2rTy2WR+F3oilmLcaIaczT+zjpdZjI767+oetrB2iAHw==
+X-Received: by 2002:a1c:cc18:: with SMTP id h24mr15744271wmb.40.1571058589683; 
+ Mon, 14 Oct 2019 06:09:49 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id u68sm32105274wmu.12.2019.10.14.06.09.48
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 14 Oct 2019 06:09:48 -0700 (PDT)
+Received: from zen.lan (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 243091FF87;
+ Mon, 14 Oct 2019 14:09:48 +0100 (BST)
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH] This patch fixes hanging up Cocoa display on macOS 10.15
- (Catalina)
-Date: Mon, 14 Oct 2019 21:52:54 +0900
-Message-Id: <20191014125254.74913-1-hikarupsp@gmail.com>
-X-Mailer: git-send-email 2.21.0 (Apple Git-122)
+Subject: [PATCH for 4.2 v1 0/5] gitdm updates
+Date: Mon, 14 Oct 2019 14:09:43 +0100
+Message-Id: <20191014130948.18400-1-alex.bennee@linaro.org>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::642
+X-Received-From: 2a00:1450:4864:20::336
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -93,57 +93,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Hikaru Nishida <hikarupsp@gmail.com>, Gerd Hoffmann <kraxel@redhat.com>
+Cc: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Hikaru Nishida <hikarupsp@gmail.com>
+Hi,
 
-An NSEvent is fired before applicationDidFinishLaunching on macOS
-Catalina. This causes deadlock of iothread_lock by calling
-bool_with_iothread_lock in handleEvent while its already locked.
-This patch prevents to call bool_with_iothread_lock until the
-app_started_sem is released to prevent this deadlock.
+With these changes I get a reasonably clean set of stats going back
+two years and to the top 20. However most of the individuals are pure
+guess work so I won't submit them in a PR without positive feedback to
+it being correct. If you want the numbers to be correct by the time of
+the KVM Forum QEMU keynote now is the time to let me know ;-)
 
-Buglink: https://bugs.launchpad.net/qemu/+bug/1847906
-Signed-off-by: Hikaru Nishida <hikarupsp@gmail.com>
----
- ui/cocoa.m | 5 +++++
- 1 file changed, 5 insertions(+)
 
-diff --git a/ui/cocoa.m b/ui/cocoa.m
-index f12e21df6e..f16d341a0a 100644
---- a/ui/cocoa.m
-+++ b/ui/cocoa.m
-@@ -134,6 +134,7 @@
- 
- static QemuSemaphore display_init_sem;
- static QemuSemaphore app_started_sem;
-+volatile sig_atomic_t allow_events;
- 
- // Utility functions to run specified code block with iothread lock held
- typedef void (^CodeBlock)(void);
-@@ -729,6 +730,9 @@ - (void) handleMonitorInput:(NSEvent *)event
- 
- - (bool) handleEvent:(NSEvent *)event
- {
-+    if(!allow_events) {
-+        return false;
-+    }
-     return bool_with_iothread_lock(^{
-         return [self handleEventLocked:event];
-     });
-@@ -1897,6 +1901,7 @@ static void cocoa_display_init(DisplayState *ds, DisplayOptions *opts)
-     /* Tell main thread to go ahead and create the app and enter the run loop */
-     qemu_sem_post(&display_init_sem);
-     qemu_sem_wait(&app_started_sem);
-+    allow_events = true;
-     COCOA_DEBUG("cocoa_display_init: app start completed\n");
- 
-     /* if fullscreen mode is to be used */
+Alex Bennée (5):
+  contrib/gitdm: add more entries individuals and academics
+  contrib/gitdm: add MontaVista to the domain map
+  contrib/gitdm: add Andrey to the individual group
+  contrib/gitdm: add Bin Meng to the individual group
+  contrib/gitdm: add China Mobile to the domain map
+
+ contrib/gitdm/domain-map            | 2 ++
+ contrib/gitdm/group-map-academics   | 3 +++
+ contrib/gitdm/group-map-individuals | 6 ++++++
+ 3 files changed, 11 insertions(+)
+
 -- 
-2.21.0 (Apple Git-122)
+2.20.1
 
 
