@@ -6,54 +6,54 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A776C4CECE
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 14:43:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0EF4FECE58E
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 14:44:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4BCEE20854
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 14:43:03 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4BCEE20854
+	by mail.kernel.org (Postfix) with ESMTPS id DBAFC21721
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 14:44:28 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DBAFC21721
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50846 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50876 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iK1Ys-0001tg-DX
-	for qemu-devel@archiver.kernel.org; Mon, 14 Oct 2019 10:43:02 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49693)
+	id 1iK1aG-0003LP-2o
+	for qemu-devel@archiver.kernel.org; Mon, 14 Oct 2019 10:44:28 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49801)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1iK1ML-00046b-2w
- for qemu-devel@nongnu.org; Mon, 14 Oct 2019 10:30:07 -0400
+ (envelope-from <philmd@redhat.com>) id 1iK1MV-0004Im-Ox
+ for qemu-devel@nongnu.org; Mon, 14 Oct 2019 10:30:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1iK1MG-00022o-Ow
- for qemu-devel@nongnu.org; Mon, 14 Oct 2019 10:30:04 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:40244)
+ (envelope-from <philmd@redhat.com>) id 1iK1MU-0002DJ-Mz
+ for qemu-devel@nongnu.org; Mon, 14 Oct 2019 10:30:15 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:45148)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <philmd@redhat.com>)
- id 1iK1M0-00020O-VR; Mon, 14 Oct 2019 10:29:45 -0400
+ id 1iK1MQ-00028r-FI; Mon, 14 Oct 2019 10:30:10 -0400
 Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
  [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 168D7300BEAF;
- Mon, 14 Oct 2019 14:29:42 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 546E62108;
+ Mon, 14 Oct 2019 14:30:09 +0000 (UTC)
 Received: from x1w.redhat.com (unknown [10.40.206.0])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 28912600CD;
- Mon, 14 Oct 2019 14:29:17 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id D59E0600CD;
+ Mon, 14 Oct 2019 14:29:42 +0000 (UTC)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 To: Markus Armbruster <armbru@redhat.com>,
 	qemu-devel@nongnu.org
-Subject: [PATCH 13/20] hw/timer/hpet: Include "exec/address-spaces.h"
-Date: Mon, 14 Oct 2019 16:22:39 +0200
-Message-Id: <20191014142246.4538-14-philmd@redhat.com>
+Subject: [PATCH 14/20] hw/pci-host/q35: Include "qemu/range.h"
+Date: Mon, 14 Oct 2019 16:22:40 +0200
+Message-Id: <20191014142246.4538-15-philmd@redhat.com>
 In-Reply-To: <20191014142246.4538-1-philmd@redhat.com>
 References: <20191014142246.4538-1-philmd@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.40]); Mon, 14 Oct 2019 14:29:42 +0000 (UTC)
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.71]); Mon, 14 Oct 2019 14:30:09 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
@@ -89,33 +89,38 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-hw/timer/hpet.c calls address_space_stl_le() declared in
-"exec/address-spaces.h". Include it.
+The MCHPCIState structure uses the Range type which is declared in
+"qemu/range.h". Include it.
 
 This fixes (when modifying unrelated headers):
 
-  hw/timer/hpet.c:210:31: error: use of undeclared identifier 'address_sp=
-ace_memory'
-          address_space_stl_le(&address_space_memory, timer->fsb >> 32,
-                               ^~~~~~~~~~~~~~~~~~~~
+  In file included from hw/pci-host/q35.c:32:
+  include/hw/pci-host/q35.h:57:11: error: field has incomplete type 'Rang=
+e' (aka 'struct Range')
+      Range pci_hole;
+            ^
+  include/qemu/typedefs.h:116:16: note: forward declaration of 'struct Ra=
+nge'
+  typedef struct Range Range;
+                 ^
 
 Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 ---
- hw/timer/hpet.c | 1 +
+ include/hw/pci-host/q35.h | 1 +
  1 file changed, 1 insertion(+)
 
-diff --git a/hw/timer/hpet.c b/hw/timer/hpet.c
-index 4772cccfe3..6589d63ebb 100644
---- a/hw/timer/hpet.c
-+++ b/hw/timer/hpet.c
-@@ -35,6 +35,7 @@
- #include "hw/timer/mc146818rtc.h"
- #include "migration/vmstate.h"
- #include "hw/timer/i8254.h"
-+#include "exec/address-spaces.h"
+diff --git a/include/hw/pci-host/q35.h b/include/hw/pci-host/q35.h
+index b3bcf2e632..79a88d67b1 100644
+--- a/include/hw/pci-host/q35.h
++++ b/include/hw/pci-host/q35.h
+@@ -32,6 +32,7 @@
+ #include "hw/acpi/ich9.h"
+ #include "hw/pci-host/pam.h"
+ #include "hw/i386/intel_iommu.h"
++#include "qemu/range.h"
 =20
- //#define HPET_DEBUG
- #ifdef HPET_DEBUG
+ #define TYPE_Q35_HOST_DEVICE "q35-pcihost"
+ #define Q35_HOST_DEVICE(obj) \
 --=20
 2.21.0
 
