@@ -3,66 +3,93 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D2824C4CECE
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 18:35:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E2982C4CECE
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 18:38:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9A37120873
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 18:35:47 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9A37120873
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id BC5AD20873
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 18:38:25 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BC5AD20873
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55396 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55430 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iK5C6-0007B1-QO
-	for qemu-devel@archiver.kernel.org; Mon, 14 Oct 2019 14:35:46 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58626)
+	id 1iK5Ee-0000lA-U6
+	for qemu-devel@archiver.kernel.org; Mon, 14 Oct 2019 14:38:24 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59104)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <no-reply@patchew.org>) id 1iK5BF-0006VC-Vl
- for qemu-devel@nongnu.org; Mon, 14 Oct 2019 14:34:55 -0400
+ (envelope-from <sbhat@linux.ibm.com>) id 1iK5Dt-00005o-Dz
+ for qemu-devel@nongnu.org; Mon, 14 Oct 2019 14:37:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <no-reply@patchew.org>) id 1iK5BC-0002oa-Sr
- for qemu-devel@nongnu.org; Mon, 14 Oct 2019 14:34:52 -0400
-Resent-Date: Mon, 14 Oct 2019 14:34:52 -0400
-Resent-Message-Id: <E1iK5BC-0002oa-Sr@eggs.gnu.org>
-Received: from sender4-of-o54.zoho.com ([136.143.188.54]:21496)
+ (envelope-from <sbhat@linux.ibm.com>) id 1iK5Ds-0003aZ-0v
+ for qemu-devel@nongnu.org; Mon, 14 Oct 2019 14:37:37 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:52954
+ helo=mx0a-001b2d01.pphosted.com)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <no-reply@patchew.org>)
- id 1iK5BC-0002nd-LK
- for qemu-devel@nongnu.org; Mon, 14 Oct 2019 14:34:50 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1571078069; cv=none; d=zoho.com; s=zohoarc; 
- b=SO/3jyzMHv9qtdoa17VtC5qElQCmmUt4gvrnnAey01uLxNAnHvdjo1m99IKx3DUkuTY/u8mnzruLXvsQOYyIGbip1ipHmuZQphFn9GI55sibS4aC4alnOgaU0lQDIEPSk8NmagvOyQRWTz+ZRuHkX1ywoVUccWlrJ3ADYIhuUQA=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zoho.com;
- s=zohoarc; t=1571078069;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
- bh=lahIPKGHGbDBTMCA7RF68ypBpRx1AXlOdpm9LPfiqZ0=; 
- b=Gfs2rTjRCfCxpDPFtjPZl4VMilEf8li8Tk5StBFtgqSAWeJhUNaagnceULXFDbRy2iEfCGa8lvMqMUSF/jKYR+Fc3ZYlv4jzJQBwnyIWq19mQ90xr/jVd3f8Oh4dLGMJ8AN+b9G9/Tp8dvHUBtsckNls6fuUEYRvnX1jxb5M7tU=
-ARC-Authentication-Results: i=1; mx.zoho.com; dkim=pass  header.i=patchew.org;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1571078067669281.94055130886613;
- Mon, 14 Oct 2019 11:34:27 -0700 (PDT)
-In-Reply-To: <20191014115757.51866-1-ysato@users.sourceforge.jp>
-Subject: Re: [PATCH v26 00/21] Add RX archtecture support
-Message-ID: <157107806648.1055.12469845496019358261@37313f22b938>
+ (Exim 4.71) (envelope-from <sbhat@linux.ibm.com>) id 1iK5Dr-0003a3-Sy
+ for qemu-devel@nongnu.org; Mon, 14 Oct 2019 14:37:35 -0400
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
+ x9EIHu1X052190
+ for <qemu-devel@nongnu.org>; Mon, 14 Oct 2019 14:37:32 -0400
+Received: from e06smtp05.uk.ibm.com (e06smtp05.uk.ibm.com [195.75.94.101])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 2vmvajms6u-1
+ (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+ for <qemu-devel@nongnu.org>; Mon, 14 Oct 2019 14:37:31 -0400
+Received: from localhost
+ by e06smtp05.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+ Violators will be prosecuted
+ for <qemu-devel@nongnu.org> from <sbhat@linux.ibm.com>;
+ Mon, 14 Oct 2019 19:37:30 +0100
+Received: from b06cxnps4074.portsmouth.uk.ibm.com (9.149.109.196)
+ by e06smtp05.uk.ibm.com (192.168.101.135) with IBM ESMTP SMTP Gateway:
+ Authorized Use Only! Violators will be prosecuted; 
+ (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+ Mon, 14 Oct 2019 19:37:27 +0100
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com
+ (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
+ by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ x9EIbQHe48562418
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Mon, 14 Oct 2019 18:37:26 GMT
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 542A1A405F;
+ Mon, 14 Oct 2019 18:37:26 +0000 (GMT)
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 4F8BDA4054;
+ Mon, 14 Oct 2019 18:37:25 +0000 (GMT)
+Received: from lep8c.aus.stglabs.ibm.com (unknown [9.40.192.207])
+ by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+ Mon, 14 Oct 2019 18:37:25 +0000 (GMT)
+Subject: [PATCH v3 0/3] ppc: spapr: virtual NVDIMM support
+From: Shivaprasad G Bhat <sbhat@linux.ibm.com>
+To: imammedo@redhat.com, david@gibson.dropbear.id.au, qemu-ppc@nongnu.org,
+ xiaoguangrong.eric@gmail.com, mst@redhat.com
+Date: Mon, 14 Oct 2019 13:37:24 -0500
+User-Agent: StGit/0.17.1-dirty
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: ysato@users.sourceforge.jp
-Date: Mon, 14 Oct 2019 11:34:27 -0700 (PDT)
-X-ZohoMailClient: External
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 136.143.188.54
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+x-cbid: 19101418-0020-0000-0000-0000037901AF
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19101418-0021-0000-0000-000021CF1BBF
+Message-Id: <157107820388.27733.3565652855304038259.stgit@lep8c.aus.stglabs.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
+ definitions=2019-10-14_09:, , signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ priorityscore=1501
+ malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
+ clxscore=1011 lowpriorityscore=0 mlxscore=0 impostorscore=0
+ mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.0.1-1908290000 definitions=main-1910140150
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
+X-Received-From: 148.163.158.5
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -74,149 +101,113 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: philmd@redhat.com, qemu-devel@nongnu.org, ysato@users.sourceforge.jp
+Cc: sbhat@linux.vnet.ibm.com, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MTAxNDExNTc1Ny41MTg2
-Ni0xLXlzYXRvQHVzZXJzLnNvdXJjZWZvcmdlLmpwLwoKCgpIaSwKClRoaXMgc2VyaWVzIHNlZW1z
-IHRvIGhhdmUgc29tZSBjb2Rpbmcgc3R5bGUgcHJvYmxlbXMuIFNlZSBvdXRwdXQgYmVsb3cgZm9y
-Cm1vcmUgaW5mb3JtYXRpb246CgpTdWJqZWN0OiBbUEFUQ0ggdjI2IDAwLzIxXSBBZGQgUlggYXJj
-aHRlY3R1cmUgc3VwcG9ydApUeXBlOiBzZXJpZXMKTWVzc2FnZS1pZDogMjAxOTEwMTQxMTU3NTcu
-NTE4NjYtMS15c2F0b0B1c2Vycy5zb3VyY2Vmb3JnZS5qcAoKPT09IFRFU1QgU0NSSVBUIEJFR0lO
-ID09PQojIS9iaW4vYmFzaApnaXQgcmV2LXBhcnNlIGJhc2UgPiAvZGV2L251bGwgfHwgZXhpdCAw
-CmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2Fs
-IGRpZmYucmVuYW1lcyBUcnVlCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLmFsZ29yaXRobSBoaXN0
-b2dyYW0KLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFjayBiYXNlLi4KPT09IFRFU1Qg
-U0NSSVBUIEVORCA9PT0KClVwZGF0aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4
-ODg3MTMzODQKRnJvbSBodHRwczovL2dpdGh1Yi5jb20vcGF0Y2hldy1wcm9qZWN0L3FlbXUKIC0g
-W3RhZyB1cGRhdGVdICAgICAgcGF0Y2hldy8yMDE5MTAxMTE1NTU0Ni4xNDM0Mi0xLXJpY2hhcmQu
-aGVuZGVyc29uQGxpbmFyby5vcmcgLT4gcGF0Y2hldy8yMDE5MTAxMTE1NTU0Ni4xNDM0Mi0xLXJp
-Y2hhcmQuaGVuZGVyc29uQGxpbmFyby5vcmcKIC0gW3RhZyB1cGRhdGVdICAgICAgcGF0Y2hldy8y
-MDE5MTAxNDEwNDk0OC40MjkxLTEtYWxleC5iZW5uZWVAbGluYXJvLm9yZyAtPiBwYXRjaGV3LzIw
-MTkxMDE0MTA0OTQ4LjQyOTEtMS1hbGV4LmJlbm5lZUBsaW5hcm8ub3JnCiAtIFt0YWcgdXBkYXRl
-XSAgICAgIHBhdGNoZXcvMjAxOTEwMTQxNTQ1MjkuMjg3MDQ4LTEtam9uYXRoYW5AZmludGVsaWEu
-aW8gLT4gcGF0Y2hldy8yMDE5MTAxNDE1NDUyOS4yODcwNDgtMS1qb25hdGhhbkBmaW50ZWxpYS5p
-bwogKiBbbmV3IHRhZ10gICAgICAgICBwYXRjaGV3LzIwMTkxMDE0MTc1NDQwLjE1MjYwOS0xLWRn
-aWxiZXJ0QHJlZGhhdC5jb20gLT4gcGF0Y2hldy8yMDE5MTAxNDE3NTQ0MC4xNTI2MDktMS1kZ2ls
-YmVydEByZWRoYXQuY29tClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKNGMzZGFkMSBC
-b290TGludXhDb25zb2xlVGVzdDogVGVzdCB0aGUgUlgtVmlydCBtYWNoaW5lCmMxNDI5OTAgQWRk
-IHJ4LXNvZnRtbXUKMzM5OTQ3NSBody9yeDogUmVzdHJpY3QgdGhlIFJYNjJOIG1pY3JvY29udHJv
-bGxlciB0byB0aGUgUlg2Mk4gQ1BVIGNvcmUKOWJlZTM3MyBody9yeDogSG9ub3IgLWFjY2VsIHF0
-ZXN0CjVkNDZkZDggaHcvcng6IFJYIFRhcmdldCBoYXJkd2FyZSBkZWZpbml0aW9uCjA0NWRkZTIg
-aHcvY2hhcjogUlg2Mk4gc2VyaWFsIGNvbW11bmljYXRpb24gaW50ZXJmYWNlIChTQ0kpCmUwODNm
-ZGIgaHcvdGltZXI6IFJYNjJOIGludGVybmFsIHRpbWVyIG1vZHVsZXMKNzAwNzM0MiBody9pbnRj
-OiBSWDYyTiBpbnRlcnJ1cHQgY29udHJvbGxlciAoSUNVYSkKYWJhZWZmZiB0YXJnZXQvcng6IER1
-bXAgYnl0ZXMgZm9yIGVhY2ggaW5zbiBkdXJpbmcgZGlzYXNzZW1ibHkKYzQ3ZDFiNSB0YXJnZXQv
-cng6IENvbGxlY3QgYWxsIGJ5dGVzIGR1cmluZyBkaXNhc3NlbWJseQpjYWYxMjdiIHRhcmdldC9y
-eDogRW1pdCBhbGwgZGlzYXNzZW1ibHkgaW4gb25lIHBydCgpCmIzODRhMzUgdGFyZ2V0L3J4OiBV
-c2UgcHJ0X2xkbWkgZm9yIFhDSEdfbXIgZGlzYXNzZW1ibHkKNGYxYTQyOSB0YXJnZXQvcng6IFJl
-cGxhY2Ugb3BlcmFuZCB3aXRoIHBydF9sZG1pIGluIGRpc2Fzc2VtYmxlcgowNDk3NTE2IHRhcmdl
-dC9yeDogRGlzYXNzZW1ibGUgcnhfaW5kZXhfYWRkciBpbnRvIGEgc3RyaW5nCmU1NTdkNzAgdGFy
-Z2V0L3J4OiBSWCBkaXNhc3NlbWJsZXIKODdhNjVkMCB0YXJnZXQvcng6IENQVSBkZWZpbml0aW9u
-CmI3ZjU0OWYgdGFyZ2V0L3J4OiBUQ0cgaGVscGVyCmNiMDViZTUgdGFyZ2V0L3J4OiBUQ0cgdHJh
-bnNsYXRpb24KNDBiMzc0YyBody9yZWdpc3RlcmZpZWxkcy5oOiBBZGQgOGJpdCBhbmQgMTZiaXQg
-cmVnaXN0ZXIgbWFjcm9zCjFkMGZmOWMgcWVtdS9iaXRvcHMuaDogQWRkIGV4dHJhY3Q4IGFuZCBl
-eHRyYWN0MTYKNmVhZWI1MCBNQUlOVEFJTkVSUzogQWRkIFJYCgo9PT0gT1VUUFVUIEJFR0lOID09
-PQoxLzIxIENoZWNraW5nIGNvbW1pdCA2ZWFlYjUwYjRjZWUgKE1BSU5UQUlORVJTOiBBZGQgUlgp
-CjIvMjEgQ2hlY2tpbmcgY29tbWl0IDFkMGZmOWNhMjYxNCAocWVtdS9iaXRvcHMuaDogQWRkIGV4
-dHJhY3Q4IGFuZCBleHRyYWN0MTYpCjMvMjEgQ2hlY2tpbmcgY29tbWl0IDQwYjM3NGNmNmE2NCAo
-aHcvcmVnaXN0ZXJmaWVsZHMuaDogQWRkIDhiaXQgYW5kIDE2Yml0IHJlZ2lzdGVyIG1hY3JvcykK
-VXNlIG9mIHVuaW5pdGlhbGl6ZWQgdmFsdWUgaW4gY29uY2F0ZW5hdGlvbiAoLikgb3Igc3RyaW5n
-IGF0IC4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIGxpbmUgMjQ4NC4KRVJST1I6IE1hY3JvcyB3aXRo
-IG11bHRpcGxlIHN0YXRlbWVudHMgc2hvdWxkIGJlIGVuY2xvc2VkIGluIGEgZG8gLSB3aGlsZSBs
-b29wCiMyNzogRklMRTogaW5jbHVkZS9ody9yZWdpc3RlcmZpZWxkcy5oOjI1OgorI2RlZmluZSBS
-RUc4KHJlZywgYWRkcikgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgIFwKKyAgICBlbnVtIHsgQV8gIyMgcmVnID0gKGFkZHIpIH07ICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgXAorICAgIGVudW0geyBSXyAjIyByZWcgPSAoYWRk
-cikgfTsKCkVSUk9SOiBNYWNyb3Mgd2l0aCBtdWx0aXBsZSBzdGF0ZW1lbnRzIHNob3VsZCBiZSBl
-bmNsb3NlZCBpbiBhIGRvIC0gd2hpbGUgbG9vcAojMzE6IEZJTEU6IGluY2x1ZGUvaHcvcmVnaXN0
-ZXJmaWVsZHMuaDoyOToKKyNkZWZpbmUgUkVHMTYocmVnLCBhZGRyKSAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXAorICAgIGVudW0geyBBXyAjIyByZWcg
-PSAoYWRkcikgfTsgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBcCisg
-ICAgZW51bSB7IFJfICMjIHJlZyA9IChhZGRyKSAvIDIgfTsKCnRvdGFsOiAyIGVycm9ycywgMCB3
-YXJuaW5ncywgNTYgbGluZXMgY2hlY2tlZAoKUGF0Y2ggMy8yMSBoYXMgc3R5bGUgcHJvYmxlbXMs
-IHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2
-ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5U
-QUlORVJTLgoKNC8yMSBDaGVja2luZyBjb21taXQgY2IwNWJlNWFlODQ1ICh0YXJnZXQvcng6IFRD
-RyB0cmFuc2xhdGlvbikKV0FSTklORzogYWRkZWQsIG1vdmVkIG9yIGRlbGV0ZWQgZmlsZShzKSwg
-ZG9lcyBNQUlOVEFJTkVSUyBuZWVkIHVwZGF0aW5nPwojMjA6IApuZXcgZmlsZSBtb2RlIDEwMDY0
-NAoKdG90YWw6IDAgZXJyb3JzLCAxIHdhcm5pbmdzLCAzMDY1IGxpbmVzIGNoZWNrZWQKClBhdGNo
-IDQvMjEgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNl
-IGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVy
-LCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KNS8yMSBDaGVja2luZyBjb21taXQgYjdm
-NTQ5ZmZkNjNhICh0YXJnZXQvcng6IFRDRyBoZWxwZXIpCldBUk5JTkc6IGFkZGVkLCBtb3ZlZCBv
-ciBkZWxldGVkIGZpbGUocyksIGRvZXMgTUFJTlRBSU5FUlMgbmVlZCB1cGRhdGluZz8KIzIxOiAK
-bmV3IGZpbGUgbW9kZSAxMDA2NDQKCnRvdGFsOiAwIGVycm9ycywgMSB3YXJuaW5ncywgNjUwIGxp
-bmVzIGNoZWNrZWQKClBhdGNoIDUvMjEgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3
-LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVt
-IHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KNi8yMSBD
-aGVja2luZyBjb21taXQgODdhNjVkMDdjNDkzICh0YXJnZXQvcng6IENQVSBkZWZpbml0aW9uKQpX
-QVJOSU5HOiBhZGRlZCwgbW92ZWQgb3IgZGVsZXRlZCBmaWxlKHMpLCBkb2VzIE1BSU5UQUlORVJT
-IG5lZWQgdXBkYXRpbmc/CiMzMjogCm5ldyBmaWxlIG1vZGUgMTAwNjQ0Cgp0b3RhbDogMCBlcnJv
-cnMsIDEgd2FybmluZ3MsIDU4OCBsaW5lcyBjaGVja2VkCgpQYXRjaCA2LzIxIGhhcyBzdHlsZSBw
-cm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNl
-IHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0gg
-aW4gTUFJTlRBSU5FUlMuCjcvMjEgQ2hlY2tpbmcgY29tbWl0IGU1NTdkNzAyNWVjZiAodGFyZ2V0
-L3J4OiBSWCBkaXNhc3NlbWJsZXIpCldBUk5JTkc6IGFkZGVkLCBtb3ZlZCBvciBkZWxldGVkIGZp
-bGUocyksIGRvZXMgTUFJTlRBSU5FUlMgbmVlZCB1cGRhdGluZz8KIzM4OiAKbmV3IGZpbGUgbW9k
-ZSAxMDA2NDQKCnRvdGFsOiAwIGVycm9ycywgMSB3YXJuaW5ncywgMTQ5NyBsaW5lcyBjaGVja2Vk
-CgpQYXRjaCA3LzIxIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBv
-ZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFp
-bnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCjgvMjEgQ2hlY2tpbmcgY29t
-bWl0IDA0OTc1MTZhMjUxOCAodGFyZ2V0L3J4OiBEaXNhc3NlbWJsZSByeF9pbmRleF9hZGRyIGlu
-dG8gYSBzdHJpbmcpCjkvMjEgQ2hlY2tpbmcgY29tbWl0IDRmMWE0Mjk5ZTIwNCAodGFyZ2V0L3J4
-OiBSZXBsYWNlIG9wZXJhbmQgd2l0aCBwcnRfbGRtaSBpbiBkaXNhc3NlbWJsZXIpCjEwLzIxIENo
-ZWNraW5nIGNvbW1pdCBiMzg0YTM1ZmRhZTQgKHRhcmdldC9yeDogVXNlIHBydF9sZG1pIGZvciBY
-Q0hHX21yIGRpc2Fzc2VtYmx5KQoxMS8yMSBDaGVja2luZyBjb21taXQgY2FmMTI3YjcyMjcyICh0
-YXJnZXQvcng6IEVtaXQgYWxsIGRpc2Fzc2VtYmx5IGluIG9uZSBwcnQoKSkKMTIvMjEgQ2hlY2tp
-bmcgY29tbWl0IGM0N2QxYjVkY2MzNSAodGFyZ2V0L3J4OiBDb2xsZWN0IGFsbCBieXRlcyBkdXJp
-bmcgZGlzYXNzZW1ibHkpCjEzLzIxIENoZWNraW5nIGNvbW1pdCBhYmFlZmZmYTM0MWUgKHRhcmdl
-dC9yeDogRHVtcCBieXRlcyBmb3IgZWFjaCBpbnNuIGR1cmluZyBkaXNhc3NlbWJseSkKMTQvMjEg
-Q2hlY2tpbmcgY29tbWl0IDcwMDczNDI2M2FlZiAoaHcvaW50YzogUlg2Mk4gaW50ZXJydXB0IGNv
-bnRyb2xsZXIgKElDVWEpKQpXQVJOSU5HOiBhZGRlZCwgbW92ZWQgb3IgZGVsZXRlZCBmaWxlKHMp
-LCBkb2VzIE1BSU5UQUlORVJTIG5lZWQgdXBkYXRpbmc/CiM0MDogCm5ldyBmaWxlIG1vZGUgMTAw
-NjQ0Cgp0b3RhbDogMCBlcnJvcnMsIDEgd2FybmluZ3MsIDQ0NSBsaW5lcyBjaGVja2VkCgpQYXRj
-aCAxNC8yMSBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhl
-c2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWlu
-ZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoxNS8yMSBDaGVja2luZyBjb21taXQg
-ZTA4M2ZkYjBjNzE2IChody90aW1lcjogUlg2Mk4gaW50ZXJuYWwgdGltZXIgbW9kdWxlcykKV0FS
-TklORzogYWRkZWQsIG1vdmVkIG9yIGRlbGV0ZWQgZmlsZShzKSwgZG9lcyBNQUlOVEFJTkVSUyBu
-ZWVkIHVwZGF0aW5nPwojNTA6IApuZXcgZmlsZSBtb2RlIDEwMDY0NAoKdG90YWw6IDAgZXJyb3Jz
-LCAxIHdhcm5pbmdzLCA4NDUgbGluZXMgY2hlY2tlZAoKUGF0Y2ggMTUvMjEgaGFzIHN0eWxlIHBy
-b2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2Ug
-cG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBp
-biBNQUlOVEFJTkVSUy4KMTYvMjEgQ2hlY2tpbmcgY29tbWl0IDA0NWRkZTI4ZTAzYSAoaHcvY2hh
-cjogUlg2Mk4gc2VyaWFsIGNvbW11bmljYXRpb24gaW50ZXJmYWNlIChTQ0kpKQpXQVJOSU5HOiBh
-ZGRlZCwgbW92ZWQgb3IgZGVsZXRlZCBmaWxlKHMpLCBkb2VzIE1BSU5UQUlORVJTIG5lZWQgdXBk
-YXRpbmc/CiM0MzogCm5ldyBmaWxlIG1vZGUgMTAwNjQ0Cgp0b3RhbDogMCBlcnJvcnMsIDEgd2Fy
-bmluZ3MsIDQwMSBsaW5lcyBjaGVja2VkCgpQYXRjaCAxNi8yMSBoYXMgc3R5bGUgcHJvYmxlbXMs
-IHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2
-ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5U
-QUlORVJTLgoxNy8yMSBDaGVja2luZyBjb21taXQgNWQ0NmRkODcxZTFiIChody9yeDogUlggVGFy
-Z2V0IGhhcmR3YXJlIGRlZmluaXRpb24pCldBUk5JTkc6IGFkZGVkLCBtb3ZlZCBvciBkZWxldGVk
-IGZpbGUocyksIGRvZXMgTUFJTlRBSU5FUlMgbmVlZCB1cGRhdGluZz8KIzI5OiAKbmV3IGZpbGUg
-bW9kZSAxMDA2NDQKCnRvdGFsOiAwIGVycm9ycywgMSB3YXJuaW5ncywgNDgwIGxpbmVzIGNoZWNr
-ZWQKClBhdGNoIDE3LzIxIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFu
-eSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUg
-bWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCjE4LzIxIENoZWNraW5n
-IGNvbW1pdCA5YmVlMzczYjBlYTggKGh3L3J4OiBIb25vciAtYWNjZWwgcXRlc3QpCjE5LzIxIENo
-ZWNraW5nIGNvbW1pdCAzMzk5NDc1OTc4OGMgKGh3L3J4OiBSZXN0cmljdCB0aGUgUlg2Mk4gbWlj
-cm9jb250cm9sbGVyIHRvIHRoZSBSWDYyTiBDUFUgY29yZSkKMjAvMjEgQ2hlY2tpbmcgY29tbWl0
-IGMxNDI5OTBjMmZmMSAoQWRkIHJ4LXNvZnRtbXUpCldBUk5JTkc6IGFkZGVkLCBtb3ZlZCBvciBk
-ZWxldGVkIGZpbGUocyksIGRvZXMgTUFJTlRBSU5FUlMgbmVlZCB1cGRhdGluZz8KIzU5OiAKbmV3
-IGZpbGUgbW9kZSAxMDA2NDQKCnRvdGFsOiAwIGVycm9ycywgMSB3YXJuaW5ncywgNzQgbGluZXMg
-Y2hlY2tlZAoKUGF0Y2ggMjAvMjEgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAg
-SWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRv
-IHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KMjEvMjEgQ2hl
-Y2tpbmcgY29tbWl0IDRjM2RhZDExMDNiOCAoQm9vdExpbnV4Q29uc29sZVRlc3Q6IFRlc3QgdGhl
-IFJYLVZpcnQgbWFjaGluZSkKPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVk
-IHdpdGggY29kZTogMQoKClRoZSBmdWxsIGxvZyBpcyBhdmFpbGFibGUgYXQKaHR0cDovL3BhdGNo
-ZXcub3JnL2xvZ3MvMjAxOTEwMTQxMTU3NTcuNTE4NjYtMS15c2F0b0B1c2Vycy5zb3VyY2Vmb3Jn
-ZS5qcC90ZXN0aW5nLmNoZWNrcGF0Y2gvP3R5cGU9bWVzc2FnZS4KLS0tCkVtYWlsIGdlbmVyYXRl
-ZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHBzOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNl
-IHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
+The patchset attempts to implement the virtual NVDIMM for pseries.
+
+PAPR semantics is such that each NVDIMM device is comprising of
+multiple SCM(Storage Class Memory) blocks. The hypervisor is expected
+to prepare the FDT for the NVDIMM device and send guest a hotplug
+interrupt with new type RTAS_LOG_V6_HP_TYPE_PMEM currently handled by
+the upstream kernel. In response to that interrupt, the guest requests
+the hypervisor to bind each of the SCM blocks of the NVDIMM device
+using hcalls. There can be SCM block unbind requests in case of driver
+errors or unplug(not supported now) use cases. The NVDIMM label
+read/writes are done through hcalls.
+
+Since each virtual NVDIMM device is divided into multiple SCM blocks,
+the bind, unbind, and queries using hcalls on those blocks can come
+independently. This doesnt fit well into the qemu device semantics,
+where the map/unmap are done at the (whole)device/object level
+granularity. The patchset uses the existing NVDIMM class structures
+for the implementation. The bind/unbind is left to happen at the
+device_add/del phase itself instead of at hcalls on-demand.
+
+The guest kernel makes bind/unbind requests for the virtual NVDIMM
+device at the region level granularity. Without interleaving, each
+virtual NVDIMM device is presented as separate region. There is no
+way to configure the virtual NVDIMM interleaving for the guests today.
+So, there is no way a partial bind/unbind request can come for the
+vNVDIMM in a hcall for a subset of SCM blocks of a virtual NVDIMM.
+Hence it is safe to do bind/unbind everything during the object_add/del.
+
+The free device-memory region which is used for memory hotplug are
+done using multiple LMBs of size(256MiB) and are expected to be
+aligned to 256 MiB. As the SCM blocks are mapped to the same region,
+the SCM blocks also need to be aligned to this size for the subsequent
+memory hotplug to work. The minimum SCM block size is set to this size
+for that reason and can be made user configurable in future if required.
+
+The first patch moves around the existing static function to common
+area for using it in the subsequent patches. Second patch adds the
+FDT entries and basic device support, the third patch adds the hcalls
+implementation.
+
+The patches are also available at
+https://github.com/ShivaprasadGBhat/qemu.git - pseries-nvdimm-v3 branch
+and can be used with the upstream kernel. ndctl can be used for
+configuring the nvdimms inside the guest.
+This is how it can be used ..
+Ex :
+For coldplug, the device to be added in qemu command line as shown below
+-object memory-backend-file,id=memnvdimm0,prealloc=yes,mem-path=/tmp/nvdimm0,share=yes,size=1073872896
+-device nvdimm,label-size=128k,uuid=75a3cdd7-6a2f-4791-8d15-fe0a920e8e9e,memdev=memnvdimm0,id=nvdimm0,slot=0
+
+For hotplug, the device to be added from monitor as below
+object_add memory-backend-file,id=memnvdimm0,prealloc=yes,mem-path=/tmp/nvdimm0,share=yes,size=1073872896
+device_add nvdimm,label-size=128k,uuid=75a3cdd7-6a2f-4791-8d15-fe0a920e8e9e,memdev=memnvdimm0,id=nvdimm0,slot=0
+
+---
+v2: https://lists.gnu.org/archive/html/qemu-devel/2019-05/msg02785.html
+Changes from v2:
+     - Creating the drc indices for the nvdimm devices in advance as
+       suggested based on the number of user specified max slots property.
+     - Removed the hard dependency on -machine nvdimm=on, enabled by
+       default on the current latest pseries machine version.
+     - Renamed the functions to spapr_dt_X as suggested.
+     - Metadata is byteswapped before read/write to take care of endianness
+       semantics during the hcall.
+v1 : http://lists.nongnu.org/archive/html/qemu-devel/2019-02/msg01545.html
+Changes from v1:
+     - Rebased to upstream, this required required dt_populate implementation
+       for nvdimm hotplug support
+     - Added uuid option to nvdimm device
+     - Removed the memory region sizing down code as suggested by Igor,
+       now erroring out if NVDIMM size excluding the label area is not
+       aligned to 256MB, so patch 2 from previous series no longer needed.
+     - Removed un-implemented hcalls
+     - Changed the hcalls to different kinds of checks and return
+       different values.
+     - Addressed comments for v1
+
+Shivaprasad G Bhat (3):
+      mem: move nvdimm_device_list to utilities
+      spapr: Add NVDIMM device support
+      spapr: Add Hcalls to support PAPR NVDIMM device
+
+
+ default-configs/ppc64-softmmu.mak |    1 
+ hw/acpi/nvdimm.c                  |   28 ---
+ hw/mem/Kconfig                    |    2 
+ hw/mem/nvdimm.c                   |   40 +++++
+ hw/ppc/spapr.c                    |  218 +++++++++++++++++++++++++--
+ hw/ppc/spapr_drc.c                |   18 ++
+ hw/ppc/spapr_events.c             |    4 
+ hw/ppc/spapr_hcall.c              |  300 +++++++++++++++++++++++++++++++++++++
+ include/hw/mem/nvdimm.h           |    7 +
+ include/hw/ppc/spapr.h            |   19 ++
+ include/hw/ppc/spapr_drc.h        |    9 +
+ include/qemu/nvdimm-utils.h       |    7 +
+ util/Makefile.objs                |    1 
+ util/nvdimm-utils.c               |   29 ++++
+ 14 files changed, 638 insertions(+), 45 deletions(-)
+ create mode 100644 include/qemu/nvdimm-utils.h
+ create mode 100644 util/nvdimm-utils.c
+
+--
+Signature
 
 
