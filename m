@@ -6,54 +6,54 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 835DAC4CECE
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 14:49:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F12FC4CECE
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 14:51:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5A79E20873
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 14:49:06 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5A79E20873
+	by mail.kernel.org (Postfix) with ESMTPS id 45A7E20873
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 14:51:07 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 45A7E20873
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50958 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50982 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iK1ej-0008Vd-Ig
-	for qemu-devel@archiver.kernel.org; Mon, 14 Oct 2019 10:49:05 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50352)
+	id 1iK1gg-0001yX-HW
+	for qemu-devel@archiver.kernel.org; Mon, 14 Oct 2019 10:51:06 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50444)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1iK1OY-0006Ai-Md
- for qemu-devel@nongnu.org; Mon, 14 Oct 2019 10:32:23 -0400
+ (envelope-from <philmd@redhat.com>) id 1iK1Oz-0006VN-2c
+ for qemu-devel@nongnu.org; Mon, 14 Oct 2019 10:32:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1iK1OX-0002tn-E5
- for qemu-devel@nongnu.org; Mon, 14 Oct 2019 10:32:22 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58912)
+ (envelope-from <philmd@redhat.com>) id 1iK1Ox-00036z-VC
+ for qemu-devel@nongnu.org; Mon, 14 Oct 2019 10:32:48 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:50722)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <philmd@redhat.com>)
- id 1iK1OS-0002rK-OT; Mon, 14 Oct 2019 10:32:16 -0400
+ id 1iK1Or-00033y-NI; Mon, 14 Oct 2019 10:32:41 -0400
 Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
  [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id A9DD7308FBB4;
- Mon, 14 Oct 2019 14:32:15 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 1372C18C891B;
+ Mon, 14 Oct 2019 14:32:40 +0000 (UTC)
 Received: from x1w.redhat.com (unknown [10.40.206.0])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id A8E70600CD;
- Mon, 14 Oct 2019 14:31:48 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 545AE600CD;
+ Mon, 14 Oct 2019 14:32:16 +0000 (UTC)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 To: Markus Armbruster <armbru@redhat.com>,
 	qemu-devel@nongnu.org
-Subject: [PATCH 19/20] hw/pci-host/q35: Remove unused includes
-Date: Mon, 14 Oct 2019 16:22:45 +0200
-Message-Id: <20191014142246.4538-20-philmd@redhat.com>
+Subject: [PATCH 20/20] hw/i386/pc: Clean up includes
+Date: Mon, 14 Oct 2019 16:22:46 +0200
+Message-Id: <20191014142246.4538-21-philmd@redhat.com>
 In-Reply-To: <20191014142246.4538-1-philmd@redhat.com>
 References: <20191014142246.4538-1-philmd@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.43]); Mon, 14 Oct 2019 14:32:15 +0000 (UTC)
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.70]); Mon, 14 Oct 2019 14:32:40 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
@@ -89,48 +89,67 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Only q35.c requires declarations from "hw/i386/pc.h", move it there.
-Remove all the includes not used by "q35.h".
+Various headers are not required by hw/i386/pc.h:
+
+ - "qemu/range.h"
+ - "qemu/bitmap.h"
+ - "qemu/module.h"
+ - "exec/memory.h"
+ - "hw/pci/pci.h"
+ - "hw/mem/pc-dimm.h"
+ - "hw/mem/nvdimm.h"
+ - "net/net.h"
+
+Remove them.
+
+Add 3 headers that were missing:
+
+ - "hw/hotplug.h"
+
+   PCMachineState::acpi_dev is of type HotplugHandler
+
+ - "qemu/notify.h"
+
+   PCMachineState::machine_done is of type Notifier
+
+ - "qapi/qapi-types-common.h"
+
+   PCMachineState::vmport/smm is of type OnOffAuto
 
 Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 ---
- hw/pci-host/q35.c         | 1 +
- include/hw/pci-host/q35.h | 7 -------
- 2 files changed, 1 insertion(+), 7 deletions(-)
+ include/hw/i386/pc.h | 12 +++---------
+ 1 file changed, 3 insertions(+), 9 deletions(-)
 
-diff --git a/hw/pci-host/q35.c b/hw/pci-host/q35.c
-index 158d270b9f..918843d373 100644
---- a/hw/pci-host/q35.c
-+++ b/hw/pci-host/q35.c
-@@ -29,6 +29,7 @@
-  */
+diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
+index 6df4f4b6fb..e5c2dc9081 100644
+--- a/include/hw/i386/pc.h
++++ b/include/hw/i386/pc.h
+@@ -1,21 +1,15 @@
+ #ifndef HW_PC_H
+ #define HW_PC_H
 =20
- #include "qemu/osdep.h"
-+#include "hw/i386/pc.h"
- #include "hw/pci-host/q35.h"
- #include "hw/qdev-properties.h"
- #include "migration/vmstate.h"
-diff --git a/include/hw/pci-host/q35.h b/include/hw/pci-host/q35.h
-index 79a88d67b1..534d90dbaf 100644
---- a/include/hw/pci-host/q35.h
-+++ b/include/hw/pci-host/q35.h
-@@ -22,16 +22,9 @@
- #ifndef HW_Q35_H
- #define HW_Q35_H
+-#include "exec/memory.h"
++#include "qemu/notify.h"
++#include "qapi/qapi-types-common.h"
+ #include "hw/boards.h"
+ #include "hw/isa/isa.h"
+ #include "hw/block/fdc.h"
+ #include "hw/block/flash.h"
+-#include "net/net.h"
+ #include "hw/i386/ioapic.h"
+-
+-#include "qemu/range.h"
+-#include "qemu/bitmap.h"
+-#include "qemu/module.h"
+-#include "hw/pci/pci.h"
+-#include "hw/mem/pc-dimm.h"
+-#include "hw/mem/nvdimm.h"
+ #include "hw/acpi/acpi_dev_interface.h"
++#include "hw/hotplug.h"
 =20
--#include "hw/isa/isa.h"
--#include "hw/sysbus.h"
--#include "hw/i386/pc.h"
--#include "hw/isa/apm.h"
- #include "hw/pci/pci.h"
- #include "hw/pci/pcie_host.h"
--#include "hw/acpi/acpi.h"
--#include "hw/acpi/ich9.h"
- #include "hw/pci-host/pam.h"
--#include "hw/i386/intel_iommu.h"
- #include "qemu/range.h"
+ #define HPET_INTCAP "hpet-intcap"
 =20
- #define TYPE_Q35_HOST_DEVICE "q35-pcihost"
 --=20
 2.21.0
 
