@@ -2,58 +2,65 @@ Return-Path: <SRS0=PUPy=YH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 34296C4CECE
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 12:15:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3D732C4CECE
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 12:15:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 074BE20673
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 12:15:11 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 074BE20673
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=users.sourceforge.jp
+	by mail.kernel.org (Postfix) with ESMTPS id 138C1206A3
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 12:15:58 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 138C1206A3
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48710 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48720 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iJzFm-0006wU-4X
-	for qemu-devel@archiver.kernel.org; Mon, 14 Oct 2019 08:15:10 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53456)
+	id 1iJzGW-0007Rs-WB
+	for qemu-devel@archiver.kernel.org; Mon, 14 Oct 2019 08:15:57 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54284)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <ysato@users.sourceforge.jp>) id 1iJyzM-0005Ru-29
- for qemu-devel@nongnu.org; Mon, 14 Oct 2019 07:58:14 -0400
+ (envelope-from <jfreimann@redhat.com>) id 1iJz4D-0001qe-99
+ for qemu-devel@nongnu.org; Mon, 14 Oct 2019 08:03:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <ysato@users.sourceforge.jp>) id 1iJyzJ-0003Vu-5F
- for qemu-devel@nongnu.org; Mon, 14 Oct 2019 07:58:11 -0400
-Received: from mail01.asahi-net.or.jp ([202.224.55.13]:50100)
- by eggs.gnu.org with esmtp (Exim 4.71)
- (envelope-from <ysato@users.sourceforge.jp>) id 1iJyzI-0003T8-Sh
- for qemu-devel@nongnu.org; Mon, 14 Oct 2019 07:58:09 -0400
-Received: from h61-195-96-97.vps.ablenet.jp (h61-195-96-97.ablenetvps.ne.jp
- [61.195.96.97]) (Authenticated sender: PQ4Y-STU)
- by mail01.asahi-net.or.jp (Postfix) with ESMTPA id 174AA88CA1;
- Mon, 14 Oct 2019 20:58:07 +0900 (JST)
-Received: from yo-satoh-debian.localdomain (ZM005235.ppp.dion.ne.jp
- [222.8.5.235])
- by h61-195-96-97.vps.ablenet.jp (Postfix) with ESMTPSA id B15FB24008F;
- Mon, 14 Oct 2019 20:58:06 +0900 (JST)
-From: Yoshinori Sato <ysato@users.sourceforge.jp>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v26 08/21] target/rx: Disassemble rx_index_addr into a string
-Date: Mon, 14 Oct 2019 20:57:44 +0900
-Message-Id: <20191014115757.51866-9-ysato@users.sourceforge.jp>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20191014115757.51866-1-ysato@users.sourceforge.jp>
-References: <20191014115757.51866-1-ysato@users.sourceforge.jp>
+ (envelope-from <jfreimann@redhat.com>) id 1iJz4A-0000QM-35
+ for qemu-devel@nongnu.org; Mon, 14 Oct 2019 08:03:11 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:33640)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <jfreimann@redhat.com>)
+ id 1iJz49-0000Nd-Qa
+ for qemu-devel@nongnu.org; Mon, 14 Oct 2019 08:03:10 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id BB85130842B0;
+ Mon, 14 Oct 2019 12:03:07 +0000 (UTC)
+Received: from localhost (dhcp-192-238.str.redhat.com [10.33.192.238])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 18F535DAAE;
+ Mon, 14 Oct 2019 12:02:59 +0000 (UTC)
+Date: Mon, 14 Oct 2019 14:02:58 +0200
+From: Jens Freimann <jfreimann@redhat.com>
+To: Cornelia Huck <cohuck@redhat.com>
+Subject: Re: [PATCH v3 01/10] qdev/qbus: add hidden device support
+Message-ID: <20191014120258.sjpe4tfhueag72f6@jenstp.localdomain>
+References: <20191011112015.11785-1-jfreimann@redhat.com>
+ <20191011112015.11785-2-jfreimann@redhat.com>
+ <20191014114622.6dcd9f90.cohuck@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 202.224.55.13
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <20191014114622.6dcd9f90.cohuck@redhat.com>
+User-Agent: NeoMutt/20180716-1376-5d6ed1
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.40]); Mon, 14 Oct 2019 12:03:07 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -65,285 +72,191 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: philmd@redhat.com, Richard Henderson <richard.henderson@linaro.org>,
- Yoshinori Sato <ysato@users.sourceforge.jp>
+Cc: parav@mellanox.com, mst@redhat.com, aadam@redhat.com, qemu-devel@nongnu.org,
+ dgilbert@redhat.com, alex.williamson@redhat.com, laine@redhat.com,
+ ailan@redhat.com, ehabkost@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Richard Henderson <richard.henderson@linaro.org>
+On Mon, Oct 14, 2019 at 11:46:22AM +0200, Cornelia Huck wrote:
+>On Fri, 11 Oct 2019 13:20:06 +0200
+>Jens Freimann <jfreimann@redhat.com> wrote:
+>
+>> This adds support for hiding a device to the qbus and qdev APIs.  The
+>> first user of this will be the virtio-net failover feature but the API
+>> introduced with this patch could be used to implement other features as
+>> well, for example hiding pci devices when a pci bus is powered off.
+>>
+>> qdev_device_add() is modified to check for a net_failover_pair_id
+>> argument in the option string. A DeviceListener callback
+>> should_be_hidden() is added. It can be used by a standby device to
+>> inform qdev that this device should not be added now. The standby device
+>> handler can store the device options to plug the device in at a later
+>> point in time.
+>>
+>> One reason for hiding the device is that we don't want to expose both
+>> devices to the guest kernel until the respective virtio feature bit
+>> VIRTIO_NET_F_STANDBY was negotiated and we know that the devices will be
+>> handled correctly by the guest.
+>>
+>> More information on the kernel feature this is using:
+>>  https://www.kernel.org/doc/html/latest/networking/net_failover.html
+>>
+>> An example where the primary device is a vfio-pci device and the standby
+>> device is a virtio-net device:
+>>
+>> A device is hidden when it has an "net_failover_pair_id" option, e.g.
+>>
+>>  -device virtio-net-pci,...,failover=on,...
+>>  -device vfio-pci,...,net_failover_pair_id=net1,...
+>>
+>> Signed-off-by: Jens Freimann <jfreimann@redhat.com>
+>> ---
+>>  hw/core/qdev.c         | 19 +++++++++++++++++++
+>>  include/hw/qdev-core.h |  9 +++++++++
+>>  qdev-monitor.c         | 43 ++++++++++++++++++++++++++++++++++++++----
+>>  vl.c                   |  6 ++++--
+>>  4 files changed, 71 insertions(+), 6 deletions(-)
+>>
+>
+>(...)
+>
+>> diff --git a/include/hw/qdev-core.h b/include/hw/qdev-core.h
+>> index aa123f88cb..b61cf82ded 100644
+>> --- a/include/hw/qdev-core.h
+>> +++ b/include/hw/qdev-core.h
+>> @@ -154,6 +154,13 @@ struct DeviceState {
+>>  struct DeviceListener {
+>>      void (*realize)(DeviceListener *listener, DeviceState *dev);
+>>      void (*unrealize)(DeviceListener *listener, DeviceState *dev);
+>> +    /*
+>> +     * This callback is called just upon init of the DeviceState
+>> +     * and can be used by a standby device for informing qdev if this
+>> +     * device should be hidden by checking the device opts
+>> +     */
+>
+>Maybe tweak this comment a bit:
+>
+>/*
+> * This callback is called upon init of the DeviceState and allows to
+> * inform qdev that a device should be hidden, depending on the device
+> * opts, for example, to hide a standby device.
+> */
+>
+>This makes it clearer that this interface could be reused for other
+>purposes.
 
-We were eliding all zero indexes.  It is only ld=3D=3D0 that does
-not have an index in the instruction.  This also allows us to
-avoid breaking the final print into multiple pieces.
+Sounds good. 
+>
+>> +    void (*should_be_hidden)(DeviceListener *listener, QemuOpts *device_opts,
+>> +            bool *match_found, bool *res);
+>>      QTAILQ_ENTRY(DeviceListener) link;
+>>  };
+>>
+>> @@ -451,4 +458,6 @@ static inline bool qbus_is_hotpluggable(BusState *bus)
+>>  void device_listener_register(DeviceListener *listener);
+>>  void device_listener_unregister(DeviceListener *listener);
+>>
+>> +bool qdev_should_hide_device(QemuOpts *opts, Error **errp);
+>> +
+>>  #endif
+>> diff --git a/qdev-monitor.c b/qdev-monitor.c
+>> index 148df9cacf..9fc8331157 100644
+>> --- a/qdev-monitor.c
+>> +++ b/qdev-monitor.c
+>> @@ -32,9 +32,11 @@
+>>  #include "qemu/help_option.h"
+>>  #include "qemu/option.h"
+>>  #include "qemu/qemu-print.h"
+>> +#include "qemu/option_int.h"
+>>  #include "sysemu/block-backend.h"
+>>  #include "sysemu/sysemu.h"
+>>  #include "migration/misc.h"
+>> +#include "migration/migration.h"
+>>
+>>  /*
+>>   * Aliases were a bad idea from the start.  Let's keep them
+>> @@ -562,14 +564,45 @@ void qdev_set_id(DeviceState *dev, const char *id)
+>>      }
+>>  }
+>>
+>> +static int is_failover_device(void *opaque, const char *name, const char *value,
+>> +                        Error **errp)
+>> +{
+>> +    if (strcmp(name, "net_failover_pair_id") == 0) {
+>> +        QemuOpts *opts = (QemuOpts *)opaque;
+>> +
+>> +        if (qdev_should_hide_device(opts, errp) && errp && !*errp) {
+>> +            return 1;
+>> +        } else if (errp && *errp) {
+>> +            return -1;
+>> +        }
+>> +    }
+>> +
+>> +    return 0;
+>> +}
+>> +
+>> +static bool should_hide_device(QemuOpts *opts, Error **err)
+>> +{
+>> +    if (qemu_opt_foreach(opts, is_failover_device, opts, err) == 0) {
+>> +        return false;
+>
+>Maybe turn that check around? I.e. return true if the failover property
+>is present, else return false. Makes it easier to add checks for other
+>properties in the future.
 
-Reviewed-by: Yoshinori Sato <ysato@users.sourceforge.jp>
-Signed-off-by: Yoshinori Sato <ysato@users.sourceforge.jp>
-Message-Id: <20190607091116.49044-19-ysato@users.sourceforge.jp>
-Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
----
- target/rx/disas.c | 154 +++++++++++++++++-----------------------------
- 1 file changed, 55 insertions(+), 99 deletions(-)
+Done.
 
-diff --git a/target/rx/disas.c b/target/rx/disas.c
-index 8cada4825d..64342537ee 100644
---- a/target/rx/disas.c
-+++ b/target/rx/disas.c
-@@ -107,49 +107,42 @@ static const char psw[] =3D {
-     'i', 'u', 0, 0, 0, 0, 0, 0,
- };
-=20
--static uint32_t rx_index_addr(int ld, int size, DisasContext *ctx)
-+static void rx_index_addr(DisasContext *ctx, char out[8], int ld, int mi=
-)
- {
--    bfd_byte buf[2];
-+    uint32_t addr =3D ctx->addr;
-+    uint8_t buf[2];
-+    uint16_t dsp;
-+
-     switch (ld) {
-     case 0:
--        return 0;
-+        /* No index; return empty string.  */
-+        out[0] =3D '\0';
-+        return;
-     case 1:
--        ctx->dis->read_memory_func(ctx->addr, buf, 1, ctx->dis);
-         ctx->addr +=3D 1;
--        return ((uint8_t)buf[0]) << size;
-+        ctx->dis->read_memory_func(addr, buf, 1, ctx->dis);
-+        dsp =3D buf[0];
-+        break;
-     case 2:
--        ctx->dis->read_memory_func(ctx->addr, buf, 2, ctx->dis);
-         ctx->addr +=3D 2;
--        return lduw_le_p(buf) << size;
-+        ctx->dis->read_memory_func(addr, buf, 2, ctx->dis);
-+        dsp =3D lduw_le_p(buf);
-+        break;
-+    default:
-+        g_assert_not_reached();
-     }
--    g_assert_not_reached();
-+
-+    sprintf(out, "%u", dsp << (mi < 3 ? mi : 4 - mi));
- }
-=20
- static void operand(DisasContext *ctx, int ld, int mi, int rs, int rd)
- {
--    int dsp;
-     static const char sizes[][4] =3D {".b", ".w", ".l", ".uw", ".ub"};
-+    char dsp[8];
-+
-     if (ld < 3) {
--        switch (mi) {
--        case 4:
--            /* dsp[rs].ub */
--            dsp =3D rx_index_addr(ld, RX_MEMORY_BYTE, ctx);
--            break;
--        case 3:
--            /* dsp[rs].uw */
--            dsp =3D rx_index_addr(ld, RX_MEMORY_WORD, ctx);
--            break;
--        default:
--            /* dsp[rs].b */
--            /* dsp[rs].w */
--            /* dsp[rs].l */
--            dsp =3D rx_index_addr(ld, mi, ctx);
--            break;
--        }
--        if (dsp > 0) {
--            prt("%d", dsp);
--        }
--        prt("[r%d]%s", rs, sizes[mi]);
-+        rx_index_addr(ctx, dsp, ld, mi);
-+        prt("%s[r%d]%s", dsp, rs, sizes[mi]);
-     } else {
-         prt("r%d", rs);
-     }
-@@ -235,7 +228,7 @@ static bool trans_MOV_ra(DisasContext *ctx, arg_MOV_r=
-a *a)
- /* mov.[bwl] rs,rd */
- static bool trans_MOV_mm(DisasContext *ctx, arg_MOV_mm *a)
- {
--    int dsp;
-+    char dspd[8], dsps[8];
-=20
-     prt("mov.%c\t", size[a->sz]);
-     if (a->lds =3D=3D 3 && a->ldd =3D=3D 3) {
-@@ -244,29 +237,15 @@ static bool trans_MOV_mm(DisasContext *ctx, arg_MOV=
-_mm *a)
-         return true;
-     }
-     if (a->lds =3D=3D 3) {
--        prt("r%d, ", a->rd);
--        dsp =3D rx_index_addr(a->ldd, a->sz, ctx);
--        if (dsp > 0) {
--            prt("%d", dsp);
--        }
--        prt("[r%d]", a->rs);
-+        rx_index_addr(ctx, dspd, a->ldd, a->sz);
-+        prt("r%d, %s[r%d]", a->rs, dspd, a->rd);
-     } else if (a->ldd =3D=3D 3) {
--        dsp =3D rx_index_addr(a->lds, a->sz, ctx);
--        if (dsp > 0) {
--            prt("%d", dsp);
--        }
--        prt("[r%d], r%d", a->rs, a->rd);
-+        rx_index_addr(ctx, dsps, a->lds, a->sz);
-+        prt("%s[r%d], r%d", dsps, a->rs, a->rd);
-     } else {
--        dsp =3D rx_index_addr(a->lds, a->sz, ctx);
--        if (dsp > 0) {
--            prt("%d", dsp);
--        }
--        prt("[r%d], ", a->rs);
--        dsp =3D rx_index_addr(a->ldd, a->sz, ctx);
--        if (dsp > 0) {
--            prt("%d", dsp);
--        }
--        prt("[r%d]", a->rd);
-+        rx_index_addr(ctx, dsps, a->lds, a->sz);
-+        rx_index_addr(ctx, dspd, a->ldd, a->sz);
-+        prt("%s[r%d], %s[r%d]", dsps, a->rs, dspd, a->rd);
-     }
-     return true;
- }
-@@ -357,12 +336,10 @@ static bool trans_PUSH_r(DisasContext *ctx, arg_PUS=
-H_r *a)
- /* push dsp[rs] */
- static bool trans_PUSH_m(DisasContext *ctx, arg_PUSH_m *a)
- {
--    prt("push\t");
--    int dsp =3D rx_index_addr(a->ld, a->sz, ctx);
--    if (dsp > 0) {
--        prt("%d", dsp);
--    }
--    prt("[r%d]", a->rs);
-+    char dsp[8];
-+
-+    rx_index_addr(ctx, dsp, a->ld, a->sz);
-+    prt("push\t%s[r%d]", dsp, a->rs);
-     return true;
- }
-=20
-@@ -389,17 +366,13 @@ static bool trans_XCHG_rr(DisasContext *ctx, arg_XC=
-HG_rr *a)
- /* xchg dsp[rs].<mi>,rd */
- static bool trans_XCHG_mr(DisasContext *ctx, arg_XCHG_mr *a)
- {
--    int dsp;
-     static const char msize[][4] =3D {
-         "b", "w", "l", "ub", "uw",
-     };
-+    char dsp[8];
-=20
--    prt("xchg\t");
--    dsp =3D rx_index_addr(a->ld, a->mi, ctx);
--    if (dsp > 0) {
--        prt("%d", dsp);
--    }
--    prt("[r%d].%s, r%d", a->rs, msize[a->mi], a->rd);
-+    rx_index_addr(ctx, dsp, a->ld, a->mi);
-+    prt("xchg\t%s[r%d].%s, r%d", dsp, a->rs, msize[a->mi], a->rd);
-     return true;
- }
-=20
-@@ -552,13 +525,10 @@ static bool trans_ADC_rr(DisasContext *ctx, arg_ADC=
-_rr *a)
- /* adc dsp[rs], rd */
- static bool trans_ADC_mr(DisasContext *ctx, arg_ADC_mr *a)
- {
--    int dsp;
--    prt("adc\t");
--    dsp =3D rx_index_addr(a->ld, 2, ctx);
--    if (dsp > 0) {
--        prt("%d", dsp);
--    }
--    prt("[r%d], r%d", a->rs, a->rd);
-+    char dsp[8];
-+
-+    rx_index_addr(ctx, dsp, a->ld, 2);
-+    prt("adc\t%s[r%d], r%d", dsp, a->rs, a->rd);
-     return true;
- }
-=20
-@@ -1217,25 +1187,17 @@ static bool trans_ITOF(DisasContext *ctx, arg_ITO=
-F *a)
-=20
- #define BOP_IM(name, reg)                                       \
-     do {                                                        \
--        int dsp;                                                \
--        prt("b%s\t#%d, ", #name, a->imm);                       \
--        dsp =3D rx_index_addr(a->ld, RX_MEMORY_BYTE, ctx);        \
--        if (dsp > 0) {                                          \
--            prt("%d", dsp);                                     \
--        }                                                       \
--        prt("[r%d]", reg);                                      \
-+        char dsp[8];                                            \
-+        rx_index_addr(ctx, dsp, a->ld, RX_MEMORY_BYTE);         \
-+        prt("b%s\t#%d, %s[r%d]", #name, a->imm, dsp, reg);      \
-         return true;                                            \
-     } while (0)
-=20
- #define BOP_RM(name)                                            \
-     do {                                                        \
--        int dsp;                                                \
--        prt("b%s\tr%d, ", #name, a->rd);                        \
--        dsp =3D rx_index_addr(a->ld, RX_MEMORY_BYTE, ctx);        \
--        if (dsp > 0) {                                          \
--            prt("%d", dsp);                                     \
--        }                                                       \
--        prt("[r%d]", a->rs);                                    \
-+        char dsp[8];                                            \
-+        rx_index_addr(ctx, dsp, a->ld, RX_MEMORY_BYTE);         \
-+        prt("b%s\tr%d, %s[r%d]", #name, a->rd, dsp, a->rs);     \
-         return true;                                            \
-     } while (0)
-=20
-@@ -1346,12 +1308,10 @@ static bool trans_BNOT_ir(DisasContext *ctx, arg_=
-BNOT_ir *a)
- /* bmcond #imm, dsp[rd] */
- static bool trans_BMCnd_im(DisasContext *ctx, arg_BMCnd_im *a)
- {
--    int dsp =3D rx_index_addr(a->ld, RX_MEMORY_BYTE, ctx);
--    prt("bm%s\t#%d, ", cond[a->cd], a->imm);
--    if (dsp > 0) {
--        prt("%d", dsp);
--    }
--    prt("[%d]", a->rd);
-+    char dsp[8];
-+
-+    rx_index_addr(ctx, dsp, a->ld, RX_MEMORY_BYTE);
-+    prt("bm%s\t#%d, %s[r%d]", cond[a->cd], a->imm, dsp, a->rd);
-     return true;
- }
-=20
-@@ -1443,16 +1403,12 @@ static bool trans_WAIT(DisasContext *ctx, arg_WAI=
-T *a)
- /* sccnd.[bwl] dsp:[rd] */
- static bool trans_SCCnd(DisasContext *ctx, arg_SCCnd *a)
- {
--    int dsp;
--    prt("sc%s.%c\t", cond[a->cd], size[a->sz]);
-     if (a->ld < 3) {
--        dsp =3D rx_index_addr(a->sz, a->ld, ctx);
--        if (dsp > 0) {
--            prt("%d", dsp);
--        }
--        prt("[r%d]", a->rd);
-+        char dsp[8];
-+        rx_index_addr(ctx, dsp, a->sz, a->ld);
-+        prt("sc%s.%c\t%s[r%d]", cond[a->cd], size[a->sz], dsp, a->rd);
-     } else {
--        prt("r%d", a->rd);
-+        prt("sc%s.%c\tr%d", cond[a->cd], size[a->sz], a->rd);
-     }
-     return true;
- }
---=20
-2.20.1
+>> +    }
+>> +    return true;
+>> +}
+>> +
+>>  DeviceState *qdev_device_add(QemuOpts *opts, Error **errp)
+>>  {
+>>      DeviceClass *dc;
+>>      const char *driver, *path;
+>> -    DeviceState *dev;
+>> +    DeviceState *dev = NULL;
+>>      BusState *bus = NULL;
+>>      Error *err = NULL;
+>>
+>> +    if (opts && should_hide_device(opts, &err)) {
+>> +        if (err) {
+>> +            goto err_del_dev;
+>> +        }
+>> +        return NULL;
+>> +    }
+>> +
+>>      driver = qemu_opt_get(opts, "driver");
+>>      if (!driver) {
+>>          error_setg(errp, QERR_MISSING_PARAMETER, "driver");
+>> @@ -648,8 +681,10 @@ DeviceState *qdev_device_add(QemuOpts *opts, Error **errp)
+>>
+>>  err_del_dev:
+>>      error_propagate(errp, err);
+>> -    object_unparent(OBJECT(dev));
+>> -    object_unref(OBJECT(dev));
+>> +    if (dev) {
+>> +        object_unparent(OBJECT(dev));
+>> +        object_unref(OBJECT(dev));
+>> +    }
+>>      return NULL;
+>>  }
+>>
+>> @@ -818,7 +853,7 @@ void qdev_unplug(DeviceState *dev, Error **errp)
+>>          return;
+>>      }
+>>
+>> -    if (!migration_is_idle()) {
+>> +    if (!migration_is_idle() && !migration_in_setup(migrate_get_current())) {
+>
+>Hm, should that hunk go into another patch?
 
+Yes it should :)
+
+Thanks for the review!
+
+regards,
+Jens 
 
