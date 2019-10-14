@@ -6,52 +6,52 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E4BAECE587
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 16:10:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C87FECE587
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 16:11:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 34DD420659
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 16:10:59 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 34DD420659
+	by mail.kernel.org (Postfix) with ESMTPS id 12CFA20854
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 16:11:32 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 12CFA20854
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52886 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52888 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iK2vx-0003fu-RS
-	for qemu-devel@archiver.kernel.org; Mon, 14 Oct 2019 12:10:57 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36413)
+	id 1iK2wU-0004RB-O0
+	for qemu-devel@archiver.kernel.org; Mon, 14 Oct 2019 12:11:30 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36379)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <kwolf@redhat.com>) id 1iK2pF-0002v1-2s
- for qemu-devel@nongnu.org; Mon, 14 Oct 2019 12:04:02 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kwolf@redhat.com>) id 1iK2pD-0006Wt-VU
+ (envelope-from <kwolf@redhat.com>) id 1iK2pC-0002rR-TB
  for qemu-devel@nongnu.org; Mon, 14 Oct 2019 12:04:00 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34920)
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+ (envelope-from <kwolf@redhat.com>) id 1iK2pB-0006Sp-Kq
+ for qemu-devel@nongnu.org; Mon, 14 Oct 2019 12:03:58 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53316)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <kwolf@redhat.com>)
- id 1iK2pB-0006SA-Pb; Mon, 14 Oct 2019 12:03:57 -0400
+ id 1iK2p9-0006OL-3c; Mon, 14 Oct 2019 12:03:55 -0400
 Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
  [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 020724E4E6;
- Mon, 14 Oct 2019 16:03:57 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 542212102;
+ Mon, 14 Oct 2019 16:03:54 +0000 (UTC)
 Received: from localhost.localdomain.com (unknown [10.36.118.40])
- by smtp.corp.redhat.com (Postfix) with ESMTP id F02F95C1D4;
- Mon, 14 Oct 2019 16:03:55 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 496CA5C1D4;
+ Mon, 14 Oct 2019 16:03:53 +0000 (UTC)
 From: Kevin Wolf <kwolf@redhat.com>
 To: qemu-block@nongnu.org
-Subject: [PULL 06/15] replay: finish record/replay before closing the disks
-Date: Mon, 14 Oct 2019 18:03:40 +0200
-Message-Id: <20191014160343.8211-7-kwolf@redhat.com>
+Subject: [PULL 04/15] replay: update docs for record/replay with block devices
+Date: Mon, 14 Oct 2019 18:03:38 +0200
+Message-Id: <20191014160343.8211-5-kwolf@redhat.com>
 In-Reply-To: <20191014160343.8211-1-kwolf@redhat.com>
 References: <20191014160343.8211-1-kwolf@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.38]); Mon, 14 Oct 2019 16:03:57 +0000 (UTC)
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.71]); Mon, 14 Oct 2019 16:03:54 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
@@ -74,44 +74,68 @@ Sender: "Qemu-devel"
 
 From: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
 
-After recent updates block devices cannot be closed on qemu exit.
-This happens due to the block request polling when replay is not finished=
-.
-Therefore now we stop execution recording before closing the block device=
-s.
+This patch updates the description of the command lines for using
+record/replay with attached block devices.
 
-Signed-off-by: Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
+Signed-off-by: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- replay/replay.c | 2 ++
- vl.c            | 1 +
- 2 files changed, 3 insertions(+)
+ docs/replay.txt | 12 +++++++++---
+ 1 file changed, 9 insertions(+), 3 deletions(-)
 
-diff --git a/replay/replay.c b/replay/replay.c
-index 713395b33d..5cc25bd2f8 100644
---- a/replay/replay.c
-+++ b/replay/replay.c
-@@ -385,6 +385,8 @@ void replay_finish(void)
-     g_free(replay_snapshot);
-     replay_snapshot =3D NULL;
+diff --git a/docs/replay.txt b/docs/replay.txt
+index ee6aee9861..ce97c3f72f 100644
+--- a/docs/replay.txt
++++ b/docs/replay.txt
+@@ -27,7 +27,7 @@ Usage of the record/replay:
+  * First, record the execution with the following command line:
+     qemu-system-i386 \
+      -icount shift=3D7,rr=3Drecord,rrfile=3Dreplay.bin \
+-     -drive file=3Ddisk.qcow2,if=3Dnone,id=3Dimg-direct \
++     -drive file=3Ddisk.qcow2,if=3Dnone,snapshot,id=3Dimg-direct \
+      -drive driver=3Dblkreplay,if=3Dnone,image=3Dimg-direct,id=3Dimg-blk=
+replay \
+      -device ide-hd,drive=3Dimg-blkreplay \
+      -netdev user,id=3Dnet1 -device rtl8139,netdev=3Dnet1 \
+@@ -35,7 +35,7 @@ Usage of the record/replay:
+  * After recording, you can replay it by using another command line:
+     qemu-system-i386 \
+      -icount shift=3D7,rr=3Dreplay,rrfile=3Dreplay.bin \
+-     -drive file=3Ddisk.qcow2,if=3Dnone,id=3Dimg-direct \
++     -drive file=3Ddisk.qcow2,if=3Dnone,snapshot,id=3Dimg-direct \
+      -drive driver=3Dblkreplay,if=3Dnone,image=3Dimg-direct,id=3Dimg-blk=
+replay \
+      -device ide-hd,drive=3Dimg-blkreplay \
+      -netdev user,id=3Dnet1 -device rtl8139,netdev=3Dnet1 \
+@@ -223,7 +223,7 @@ Block devices record/replay module intercepts calls o=
+f
+ bdrv coroutine functions at the top of block drivers stack.
+ To record and replay block operations the drive must be configured
+ as following:
+- -drive file=3Ddisk.qcow2,if=3Dnone,id=3Dimg-direct
++ -drive file=3Ddisk.qcow2,if=3Dnone,snapshot,id=3Dimg-direct
+  -drive driver=3Dblkreplay,if=3Dnone,image=3Dimg-direct,id=3Dimg-blkrepl=
+ay
+  -device ide-hd,drive=3Dimg-blkreplay
 =20
-+    replay_mode =3D REPLAY_MODE_NONE;
+@@ -252,6 +252,12 @@ This snapshot is created at start of recording and r=
+estored at start
+ of replaying. It also can be loaded while replaying to roll back
+ the execution.
+=20
++'snapshot' flag of the disk image must be removed to save the snapshots
++in the overlay (or original image) instead of using the temporary overla=
+y.
++ -drive file=3Ddisk.ovl,if=3Dnone,id=3Dimg-direct
++ -drive driver=3Dblkreplay,if=3Dnone,image=3Dimg-direct,id=3Dimg-blkrepl=
+ay
++ -device ide-hd,drive=3Dimg-blkreplay
 +
-     replay_finish_events();
- }
-=20
-diff --git a/vl.c b/vl.c
-index fce9ce2364..57d4fd726f 100644
---- a/vl.c
-+++ b/vl.c
-@@ -4524,6 +4524,7 @@ int main(int argc, char **argv, char **envp)
-=20
-     /* No more vcpu or device emulation activity beyond this point */
-     vm_shutdown();
-+    replay_finish();
-=20
-     job_cancel_sync_all();
-     bdrv_close_all();
+ Use QEMU monitor to create additional snapshots. 'savevm <name>' command
+ created the snapshot and 'loadvm <name>' restores it. To prevent corrupt=
+ion
+ of the original disk image, use overlay files linked to the original ima=
+ges.
 --=20
 2.20.1
 
