@@ -7,75 +7,75 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 802CFC4CECE
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 11:48:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C0D2C4CECE
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 11:49:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4B4AB207FF
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 11:48:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 46D5A207FF
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 11:49:36 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="oecO6g/3"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4B4AB207FF
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="FwSIXiWv"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 46D5A207FF
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48126 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48152 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iJyq2-0004In-CM
-	for qemu-devel@archiver.kernel.org; Mon, 14 Oct 2019 07:48:34 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46862)
+	id 1iJyr0-0005bl-RO
+	for qemu-devel@archiver.kernel.org; Mon, 14 Oct 2019 07:49:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46935)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1iJyCA-000842-CN
- for qemu-devel@nongnu.org; Mon, 14 Oct 2019 07:07:23 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1iJyCH-0008FD-CZ
+ for qemu-devel@nongnu.org; Mon, 14 Oct 2019 07:07:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1iJyC9-0007gk-2k
- for qemu-devel@nongnu.org; Mon, 14 Oct 2019 07:07:22 -0400
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:37598)
+ (envelope-from <alex.bennee@linaro.org>) id 1iJyCF-0007od-QZ
+ for qemu-devel@nongnu.org; Mon, 14 Oct 2019 07:07:29 -0400
+Received: from mail-wr1-x433.google.com ([2a00:1450:4864:20::433]:36614)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1iJyC8-0007fZ-Sr
- for qemu-devel@nongnu.org; Mon, 14 Oct 2019 07:07:21 -0400
-Received: by mail-wr1-x444.google.com with SMTP id p14so19204004wro.4
- for <qemu-devel@nongnu.org>; Mon, 14 Oct 2019 04:07:20 -0700 (PDT)
+ id 1iJyCF-0007ne-JY
+ for qemu-devel@nongnu.org; Mon, 14 Oct 2019 07:07:27 -0400
+Received: by mail-wr1-x433.google.com with SMTP id y19so19225909wrd.3
+ for <qemu-devel@nongnu.org>; Mon, 14 Oct 2019 04:07:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=j9VLj7yufnPKaz6aaA2SbuwWsfLmWj3MLD1Awwtmne8=;
- b=oecO6g/3JdU/4TFoiyt63qfh/TjovK1lLUNBurXi88JoRRRNlCJR+waZSAZ6ypma9Y
- cIMvk/4JZciOdKM4dv9ThBtpNNltPafWLDaoH/OjkZOv8prhs71wseAL1TyDas083Qpw
- FlADygF/xNXa1g8GzCtjyOuAUwN3ezTyHiC27NhL78W6NbgItdjI8xlHpyrt4zot7y9j
- lIz9wOD7FbtjKNvxJmn8I6Y4OwQKtbDpqFSTBd7YKChZ4omA/FpG7PI2ruvxmE+mzNZk
- NWr/RStHsuBFMiwHpH+zChnZY7XFsRAa0jyFgIyvzpwtVZNKv6bHCCDm0FC261RN/c+I
- Yb4w==
+ bh=KpM3SyJDkKhcUHIVLFnItn5R6+AXIYS7UFfmeyEbac8=;
+ b=FwSIXiWvVyQXV3tamVT+RpTc7tE0bBsHri7uBVqqmLoCewIeqP+Ou7C4gwYIjnTS8M
+ liPqcIHDajnEfNa+9vQ0PsyFM/OyckztfqB4DfbxEXMurPy8TIfwNUimu35RzYWGlPtJ
+ BkdSGx3Z3beXamcCCYwWiKbCwc0fVxKBCtBMdWNT90mNbsPGRpieuxh/tmym24ttcqBk
+ osJnT/HHFA1azlp0kzmDRL7hRciGvHokgUADRExU1aRrbneFUF+Bm0VrhnNPxEm6TsBY
+ Rl/S3G9Fg3iZ8tqPnur29k74iG0l60N2OODczgMP30szumALwbjO6zlcS0PUCuwTolJH
+ /I0w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=j9VLj7yufnPKaz6aaA2SbuwWsfLmWj3MLD1Awwtmne8=;
- b=HHDS2Ljt4bI3v4XCkF1OCgfDczXV4v5YieFDmqwFGhlNUaBTEHc1DXNZFePvJOPKUZ
- axBoyjvisEdQxCtLWv5jaGGzXjTiPXB3WPFXGwG8muvs1a/jCFoBmiPvDJbX89Nxn6jZ
- mQUR4N4a2iW1/Al64xRtnkwm0dd+s++IU5kNxtnvJcJky33UtktycEzcix5MzaBai8P2
- ICxlCKhRcP7+/CQhDpu2f6ze13UISMzqT6/5almVNH5rc43EAGTjYSgYgPVqh0S8LGo5
- K5gwhwEQFWuzMaQvzLIEIVdzq9AhEcpKhGVkRUJs5JBDa4olbbnR0uoY9cR+KKTdhIQ9
- APXQ==
-X-Gm-Message-State: APjAAAXadql5YK3ynerJfIzbvvgM3tpNtSvCGDCjTM2Xa4fRvvgmN+7Y
- 1t+w22x8H5PUcZQK3g8Fe2yeRA==
-X-Google-Smtp-Source: APXvYqxwHJTVoQziLkkZn3+KLPbsvkPi4yRS63ATtZ9fu3t8gVBcS2o9AXHNuJjhiX71Y6PwmmVmPA==
-X-Received: by 2002:adf:f4c2:: with SMTP id h2mr25955533wrp.69.1571051239774; 
- Mon, 14 Oct 2019 04:07:19 -0700 (PDT)
+ bh=KpM3SyJDkKhcUHIVLFnItn5R6+AXIYS7UFfmeyEbac8=;
+ b=fyhIuM42O8cT6+Z9nUsE2b1G4nTh6P9Ej+mOUw2X+S/PAGQyjp11SGTuRL472kTYdM
+ +hBtATzek+rEmmWRXbj2l4B3/8EvwrvlHozDdDOoFaTHRfBrGq1W21skaFT0aTofzQUk
+ 5iqss3rFvjt9MDtnF6uvZzCsDnzBDwkhECVA7OFiKhfboQ3OOZpQ7ljXv/0LOAYSuDng
+ agdxgZ59+dEKGPDPtWBx+nHb2MaXpevDL0N6eNQBo5J7fJezOdUfdmIPVy2/H+X7Mt5s
+ 5wor2/zVKnW1tlXH6HEeADK3B2Lgb858g753r8j8NbSuSb7LGBpEYGkZRV7OUXomKO6T
+ 68yw==
+X-Gm-Message-State: APjAAAUE6MSa3zCg20bgOThZ8sjsdzzcYvTXMCVhZ8GpI0Wq9cMqthYO
+ 9Lv0bbfY26czRhs222aYQSIIgQ==
+X-Google-Smtp-Source: APXvYqyvHUc/aKs1fh2rDWLa727EcxfsK7kAYDwv+W1o1azDnrnZ0b0pyoY6t8V6nFoxuyDOEf/JEw==
+X-Received: by 2002:adf:ee4f:: with SMTP id w15mr6582038wro.378.1571051246196; 
+ Mon, 14 Oct 2019 04:07:26 -0700 (PDT)
 Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id f18sm16911737wrv.38.2019.10.14.04.07.17
+ by smtp.gmail.com with ESMTPSA id r27sm52393613wrc.55.2019.10.14.04.06.53
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 14 Oct 2019 04:07:17 -0700 (PDT)
+ Mon, 14 Oct 2019 04:07:25 -0700 (PDT)
 Received: from zen.lan (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 8C54B1FFC7;
- Mon, 14 Oct 2019 11:49:57 +0100 (BST)
+ by zen.linaroharston (Postfix) with ESMTP id C50081FFCF;
+ Mon, 14 Oct 2019 11:49:58 +0100 (BST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH  v5 38/55] linux-user: support -plugin option
-Date: Mon, 14 Oct 2019 11:49:31 +0100
-Message-Id: <20191014104948.4291-39-alex.bennee@linaro.org>
+Subject: [PATCH  v5 44/55] tests/tcg: enable plugin testing
+Date: Mon, 14 Oct 2019 11:49:37 +0100
+Message-Id: <20191014104948.4291-45-alex.bennee@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20191014104948.4291-1-alex.bennee@linaro.org>
 References: <20191014104948.4291-1-alex.bennee@linaro.org>
@@ -84,7 +84,7 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::444
+X-Received-From: 2a00:1450:4864:20::433
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,84 +96,172 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: robert.foley@futurewei.com, Riku Voipio <riku.voipio@iki.fi>,
- Richard Henderson <richard.henderson@linaro.org>,
- Laurent Vivier <laurent@vivier.eu>, peter.puhov@futurewei.com,
- aaron@os.amperecomputing.com, cota@braap.org,
+Cc: Peter Maydell <peter.maydell@linaro.org>,
  =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
- =?UTF-8?q?Llu=C3=ADs=20Vilanova?= <vilanova@ac.upc.edu>
+ robert.foley@futurewei.com, peter.puhov@futurewei.com,
+ aaron@os.amperecomputing.com, cota@braap.org,
+ "open list:ARM TCG CPUs" <qemu-arm@nongnu.org>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Lluís Vilanova <vilanova@ac.upc.edu>
+If CONFIG_PLUGINS is enabled then lets enable testing for all our TCG
+targets. This is a simple smoke test that ensure we don't crash or
+otherwise barf out by running each plugin against each test.
 
-Signed-off-by: Lluís Vilanova <vilanova@ac.upc.edu>
-[ cota: s/instrument/plugin ]
-Signed-off-by: Emilio G. Cota <cota@braap.org>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+There is a minor knock on effect for additional runners which need
+specialised QEMU_OPTS which will also need to declare a plugin version
+of the runner. If this gets onerous we might need to add another
+helper.
+
+Checking the results of the plugins is left for a later exercise.
+
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
----
- linux-user/main.c | 18 ++++++++++++++++++
- 1 file changed, 18 insertions(+)
 
-diff --git a/linux-user/main.c b/linux-user/main.c
-index 560d053f72..6ff7851e86 100644
---- a/linux-user/main.c
-+++ b/linux-user/main.c
-@@ -34,6 +34,7 @@
- #include "qemu/error-report.h"
- #include "qemu/help_option.h"
- #include "qemu/module.h"
-+#include "qemu/plugin.h"
- #include "cpu.h"
- #include "exec/exec-all.h"
- #include "tcg.h"
-@@ -398,6 +399,15 @@ static void handle_arg_abi_call0(const char *arg)
- }
- #endif
+---
+v5
+  - fix for the latest changes to check-tcg
+  - extend timeout for plugin tests
+  - add special runner for semihosting with plugin
+  - fix naming of test in call output
+  - add special plugin aware runners for semihosting
+---
+ tests/Makefile.include                | 11 ++++++++-
+ tests/tcg/Makefile.target             | 35 +++++++++++++++++++++++++++
+ tests/tcg/aarch64/Makefile.target     |  6 +++++
+ tests/tcg/arm/Makefile.softmmu-target |  1 +
+ tests/tcg/arm/Makefile.target         |  6 +++++
+ 5 files changed, 58 insertions(+), 1 deletion(-)
+
+diff --git a/tests/Makefile.include b/tests/Makefile.include
+index 3543451ed3..646a704e65 100644
+--- a/tests/Makefile.include
++++ b/tests/Makefile.include
+@@ -1052,6 +1052,15 @@ check-softfloat:
+ 		"SKIPPED for non-TCG builds")
+ endif
  
-+static QemuPluginList plugins = QTAILQ_HEAD_INITIALIZER(plugins);
++# Plugins
++ifeq ($(CONFIG_PLUGIN),y)
++.PHONY: plugins
++plugins:
++	$(call quiet-command,\
++		$(MAKE) $(SUBDIR_MAKEFLAGS) -C tests/plugin V="$(V)", \
++		"BUILD", "plugins")
++endif
 +
-+#ifdef CONFIG_PLUGIN
-+static void handle_arg_plugin(const char *arg)
-+{
-+    qemu_plugin_opt_parse(arg, &plugins);
-+}
-+#endif
+ # Per guest TCG tests
+ 
+ BUILD_TCG_TARGET_RULES=$(patsubst %,build-tcg-tests-%, $(TARGET_DIRS))
+@@ -1062,7 +1071,7 @@ RUN_TCG_TARGET_RULES=$(patsubst %,run-tcg-tests-%, $(TARGET_DIRS))
+ $(foreach PROBE_TARGET,$(TARGET_DIRS), 				\
+ 	$(eval -include $(SRC_PATH)/tests/tcg/Makefile.prereqs))
+ 
+-build-tcg-tests-%:
++build-tcg-tests-%: $(if $(CONFIG_PLUGIN),plugins)
+ 	$(call quiet-command,$(MAKE) $(SUBDIR_MAKEFLAGS) \
+ 		-f $(SRC_PATH)/tests/tcg/Makefile.qemu \
+ 		SRC_PATH=$(SRC_PATH) \
+diff --git a/tests/tcg/Makefile.target b/tests/tcg/Makefile.target
+index 9664613002..d25fc64300 100644
+--- a/tests/tcg/Makefile.target
++++ b/tests/tcg/Makefile.target
+@@ -123,11 +123,38 @@ all: $(TESTS) $(EXTRA_TESTS)
+ #
+ 
+ RUN_TESTS=$(patsubst %,run-%, $(TESTS))
 +
- struct qemu_argument {
-     const char *argv;
-     const char *env;
-@@ -449,6 +459,10 @@ static const struct qemu_argument arg_table[] = {
-      "",           "Seed for pseudo-random number generator"},
-     {"trace",      "QEMU_TRACE",       true,  handle_arg_trace,
-      "",           "[[enable=]<pattern>][,events=<file>][,file=<file>]"},
-+#ifdef CONFIG_PLUGIN
-+    {"plugin",     "QEMU_PLUGIN",      true,  handle_arg_plugin,
-+     "",           "[file=]<file>[,arg=<string>]"},
-+#endif
-     {"version",    "QEMU_VERSION",     false, handle_arg_version,
-      "",           "display version information and exit"},
- #if defined(TARGET_XTENSA)
-@@ -643,6 +657,7 @@ int main(int argc, char **argv, char **envp)
-     cpu_model = NULL;
++# If plugins exist also include those in the tests
++ifeq ($(CONFIG_PLUGIN),y)
++PLUGIN_DIR=../../plugin
++VPATH+=$(PLUGIN_DIR)
++PLUGINS=$(notdir $(wildcard $(PLUGIN_DIR)/*.so))
++
++# We need to ensure expand the run-plugin-TEST-with-PLUGIN
++# pre-requistes manually here as we can't use stems to handle it. We
++# also add some special helpers the run-plugin- rules can use bellow.
++
++$(foreach p,$(PLUGINS), \
++	$(foreach t,$(TESTS),\
++		$(eval run-plugin-$(t)-with-$(p): $t $p) \
++		$(eval run-plugin-$(t)-with-$(p): TIMEOUT=30) \
++		$(eval RUN_TESTS+=run-plugin-$(t)-with-$(p))))
++endif
++
++strip-plugin = $(wordlist 1, 1, $(subst -with-, ,$1))
++extract-plugin = $(wordlist 2, 2, $(subst -with-, ,$1))
++
+ RUN_TESTS+=$(EXTRA_RUNS)
  
-     qemu_add_opts(&qemu_trace_opts);
-+    qemu_plugin_add_opts();
+ ifdef CONFIG_USER_ONLY
+ run-%: %
+ 	$(call run-test, $<, $(QEMU) $(QEMU_OPTS) $<, "$< on $(TARGET_NAME)")
++
++run-plugin-%:
++	$(call run-test, $@, $(QEMU) $(QEMU_OPTS) \
++		-plugin $(PLUGIN_DIR)/$(call extract-plugin,$@) \
++		 $(call strip-plugin,$<), \
++	"$* on $(TARGET_NAME)")
+ else
+ run-%: %
+ 	$(call run-test, $<, \
+@@ -135,6 +162,14 @@ run-%: %
+ 		  -chardev file$(COMMA)path=$<.out$(COMMA)id=output \
+ 	   	  $(QEMU_OPTS) $<, \
+ 	  "$< on $(TARGET_NAME)")
++
++run-plugin-%:
++	$(call run-test, $@, \
++	  $(QEMU) -monitor none -display none \
++		  -chardev file$(COMMA)path=$@.out$(COMMA)id=output \
++	   	  -plugin $(PLUGIN_DIR)/$(call extract-plugin,$@) \
++	   	  $(QEMU_OPTS) $(call strip-plugin,$<), \
++	  "$* on $(TARGET_NAME)")
+ endif
  
-     optind = parse_args(argc, argv);
+ gdb-%: %
+diff --git a/tests/tcg/aarch64/Makefile.target b/tests/tcg/aarch64/Makefile.target
+index 509f1afa93..96d2321045 100644
+--- a/tests/tcg/aarch64/Makefile.target
++++ b/tests/tcg/aarch64/Makefile.target
+@@ -26,4 +26,10 @@ AARCH64_TESTS += semihosting
+ run-semihosting: semihosting
+ 	$(call run-test,$<,$(QEMU) $< 2> $<.err, "$< on $(TARGET_NAME)")
  
-@@ -650,6 +665,9 @@ int main(int argc, char **argv, char **envp)
-         exit(1);
-     }
-     trace_init_file(trace_file);
-+    if (qemu_plugin_load_list(&plugins)) {
-+        exit(1);
-+    }
++run-plugin-semihosting-with-%:
++	$(call run-test, $@, $(QEMU) $(QEMU_OPTS) \
++		-plugin $(PLUGIN_DIR)/$(call extract-plugin,$@) \
++		 $(call strip-plugin,$<) 2> $<.err, \
++		"$< on $(TARGET_NAME) with $*")
++
+ TESTS += $(AARCH64_TESTS)
+diff --git a/tests/tcg/arm/Makefile.softmmu-target b/tests/tcg/arm/Makefile.softmmu-target
+index 231e9a57b4..3fe237ba39 100644
+--- a/tests/tcg/arm/Makefile.softmmu-target
++++ b/tests/tcg/arm/Makefile.softmmu-target
+@@ -23,3 +23,4 @@ LDFLAGS+=-nostdlib -N -static
+ test-armv6m-undef: EXTRA_CFLAGS+=-mcpu=cortex-m0
  
-     /* Zero out regs */
-     memset(regs, 0, sizeof(struct target_pt_regs));
+ run-test-armv6m-undef: QEMU_OPTS+=-semihosting -M microbit -kernel
++run-plugin-test-armv6m-undef-%: QEMU_OPTS+=-semihosting -M microbit -kernel
+diff --git a/tests/tcg/arm/Makefile.target b/tests/tcg/arm/Makefile.target
+index 3ddff85240..0765f37ff0 100644
+--- a/tests/tcg/arm/Makefile.target
++++ b/tests/tcg/arm/Makefile.target
+@@ -34,6 +34,12 @@ ARM_TESTS += semihosting
+ run-semihosting: semihosting
+ 	$(call run-test,$<,$(QEMU) $< 2> $<.err, "$< on $(TARGET_NAME)")
+ 
++run-plugin-semihosting-with-%:
++	$(call run-test, $@, $(QEMU) $(QEMU_OPTS) \
++		-plugin $(PLUGIN_DIR)/$(call extract-plugin,$@) \
++		 $(call strip-plugin,$<) 2> $<.err, \
++		"$< on $(TARGET_NAME) with $*")
++
+ TESTS += $(ARM_TESTS)
+ 
+ # On ARM Linux only supports 4k pages
 -- 
 2.20.1
 
