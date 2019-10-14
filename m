@@ -2,88 +2,61 @@ Return-Path: <SRS0=PUPy=YH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 15E62C4CECE
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 16:15:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 695C4ECE587
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 16:15:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CABEE20854
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 16:15:03 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="cRVbvWRz"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CABEE20854
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 379D320854
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 16:15:32 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 379D320854
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52964 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52972 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iK2zl-0001GR-7g
-	for qemu-devel@archiver.kernel.org; Mon, 14 Oct 2019 12:14:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36595)
+	id 1iK30M-0001nG-RR
+	for qemu-devel@archiver.kernel.org; Mon, 14 Oct 2019 12:15:30 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36498)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1iK2pU-0003JA-BD
- for qemu-devel@nongnu.org; Mon, 14 Oct 2019 12:04:18 -0400
+ (envelope-from <kwolf@redhat.com>) id 1iK2pL-00036m-3z
+ for qemu-devel@nongnu.org; Mon, 14 Oct 2019 12:04:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1iK2pT-0006ns-5O
- for qemu-devel@nongnu.org; Mon, 14 Oct 2019 12:04:16 -0400
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:46859)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1iK2pS-0006mq-QL
- for qemu-devel@nongnu.org; Mon, 14 Oct 2019 12:04:15 -0400
-Received: by mail-wr1-x443.google.com with SMTP id o18so20326772wrv.13
- for <qemu-devel@nongnu.org>; Mon, 14 Oct 2019 09:04:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:subject:date:message-id:in-reply-to:references:mime-version
- :content-transfer-encoding;
- bh=mUu/crkcybfRwlc27TBLyKHlAqm7Yf19HYM5Zi4VawI=;
- b=cRVbvWRzpP/t9q006tIEyolsGUNF2FY1DqySFPOGmDnfrTco8kNvk7QUeTcd4WTTR1
- jpoZLILBUwa8xYzcPWAgsa3ElXYU8tc/TWzrecF/EKnf/nMw5nsB1koGJDtUfL2yMEmF
- hc1qhcVXIBujzThAr6CDO9fFGKpJ+M0If1o83Q+7mJrgms9NGBQf0KkZBV8jE4gJfZU1
- nhUkrfRBPG6JwILq5kWY9CgrBtGo9TKl1Vu/AXRJAkLOdTCq0a9EXQSrIlKF38tR62te
- yDgEIsgNgD1htANQsnhKMPxbq8DyYf+w/SS3Ef9gElZsZCeX93n9c5Sji5f/jGFD5THy
- uzZQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=mUu/crkcybfRwlc27TBLyKHlAqm7Yf19HYM5Zi4VawI=;
- b=pdZlbqLNHFmXHw7tLJQVM394NoEf2sqGPyarTCYJp3Ji17TlWwmxtmI0lOUfJ1y/ot
- PcRsjfF0lFAbKi4TrQ9tmE6XRd87dDTduD6GTok9AYg2+obNJcjnfxfvb4k5gjHMy4Td
- CuNi00BxM2/oyLDOE6wTencL6siHfFH1gHMiwV5XEjODPQ/Gkn5ODYkfhhBrimQx5vFl
- 55OM7aECV79Xbb2dt9X3b3AIothsW21iD6TYKL4Md5p4spDgwOvA3cl0uAtNzEoYcXfc
- QuuD/D95oGf4oDUtzGQHpsoqymm21fsOt+VXUl0z7H/WJmLO5Me3zE55AfH4zYW3DXPk
- 2uoQ==
-X-Gm-Message-State: APjAAAXjXQ7Phnotm+wK2htocpCP4kHkWnQEiqiKLwcj9WEqv1NQmmg6
- t/aIif6N3NLE+SZuj6zewvkqcNcU3QLARA==
-X-Google-Smtp-Source: APXvYqzTtWuwrQpkW5CHvUZ0baiGO5wUSdFoGL3DyrIJdXpQnuzj1YZc2uABKj5rrrxaB+ebZhVuZQ==
-X-Received: by 2002:a05:6000:103:: with SMTP id
- o3mr2571323wrx.357.1571069053252; 
- Mon, 14 Oct 2019 09:04:13 -0700 (PDT)
-Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id 5sm18029779wrk.86.2019.10.14.09.04.12
- for <qemu-devel@nongnu.org>
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 14 Oct 2019 09:04:12 -0700 (PDT)
-From: Peter Maydell <peter.maydell@linaro.org>
-To: qemu-devel@nongnu.org
-Subject: [PULL 03/68] ARM: KVM: Check KVM_CAP_ARM_IRQ_LINE_LAYOUT_2 for
- smp_cpus > 256
-Date: Mon, 14 Oct 2019 17:02:59 +0100
-Message-Id: <20191014160404.19553-4-peter.maydell@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20191014160404.19553-1-peter.maydell@linaro.org>
-References: <20191014160404.19553-1-peter.maydell@linaro.org>
+ (envelope-from <kwolf@redhat.com>) id 1iK2pJ-0006dK-J6
+ for qemu-devel@nongnu.org; Mon, 14 Oct 2019 12:04:07 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49006)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <kwolf@redhat.com>)
+ id 1iK2pE-0006Wp-Gt; Mon, 14 Oct 2019 12:04:00 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id ABE188980E0;
+ Mon, 14 Oct 2019 16:03:59 +0000 (UTC)
+Received: from localhost.localdomain.com (unknown [10.36.118.40])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id A47885C1D4;
+ Mon, 14 Oct 2019 16:03:58 +0000 (UTC)
+From: Kevin Wolf <kwolf@redhat.com>
+To: qemu-block@nongnu.org
+Subject: [PULL 08/15] block: Reject misaligned write requests with
+ BDRV_REQ_NO_FALLBACK
+Date: Mon, 14 Oct 2019 18:03:42 +0200
+Message-Id: <20191014160343.8211-9-kwolf@redhat.com>
+In-Reply-To: <20191014160343.8211-1-kwolf@redhat.com>
+References: <20191014160343.8211-1-kwolf@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::443
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.67]); Mon, 14 Oct 2019 16:03:59 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -95,60 +68,150 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: kwolf@redhat.com, peter.maydell@linaro.org, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Eric Auger <eric.auger@redhat.com>
+From: Alberto Garcia <berto@igalia.com>
 
-Host kernel within [4.18, 5.3] report an erroneous KVM_MAX_VCPUS=512
-for ARM. The actual capability to instantiate more than 256 vcpus
-was fixed in 5.4 with the upgrade of the KVM_IRQ_LINE ABI to support
-vcpu id encoded on 12 bits instead of 8 and a redistributor consuming
-a single KVM IO device instead of 2.
+The BDRV_REQ_NO_FALLBACK flag means that an operation should only be
+performed if it can be offloaded or otherwise performed efficiently.
 
-So let's check this capability when attempting to use more than 256
-vcpus within any ARM kvm accelerated machine.
+However a misaligned write request requires a RMW so we should return
+an error and let the caller decide how to proceed.
 
-Signed-off-by: Eric Auger <eric.auger@redhat.com>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Reviewed-by: Andrew Jones <drjones@redhat.com>
-Acked-by: Marc Zyngier <maz@kernel.org>
-Message-id: 20191003154640.22451-4-eric.auger@redhat.com
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+This hits an assertion since commit c8bb23cbdb if the required
+alignment is larger than the cluster size:
+
+qemu-img create -f qcow2 -o cluster_size=3D2k img.qcow2 4G
+qemu-io -c "open -o driver=3Dqcow2,file.align=3D4k blkdebug::img.qcow2" \
+        -c 'write 0 512'
+qemu-io: block/io.c:1127: bdrv_driver_pwritev: Assertion `!(flags & BDRV_=
+REQ_NO_FALLBACK)' failed.
+Aborted
+
+The reason is that when writing to an unallocated cluster we try to
+skip the copy-on-write part and zeroize it using BDRV_REQ_NO_FALLBACK
+instead, resulting in a write request that is too small (2KB cluster
+size vs 4KB required alignment).
+
+Signed-off-by: Alberto Garcia <berto@igalia.com>
+Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- target/arm/kvm.c | 10 +++++++++-
- 1 file changed, 9 insertions(+), 1 deletion(-)
+ block/io.c                 |  7 +++++
+ tests/qemu-iotests/268     | 55 ++++++++++++++++++++++++++++++++++++++
+ tests/qemu-iotests/268.out |  7 +++++
+ tests/qemu-iotests/group   |  1 +
+ 4 files changed, 70 insertions(+)
+ create mode 100755 tests/qemu-iotests/268
+ create mode 100644 tests/qemu-iotests/268.out
 
-diff --git a/target/arm/kvm.c b/target/arm/kvm.c
-index b10581fa066..b473c63edb1 100644
---- a/target/arm/kvm.c
-+++ b/target/arm/kvm.c
-@@ -182,6 +182,7 @@ int kvm_arm_get_max_vm_ipa_size(MachineState *ms)
- 
- int kvm_arch_init(MachineState *ms, KVMState *s)
- {
-+    int ret = 0;
-     /* For ARM interrupt delivery is always asynchronous,
-      * whether we are using an in-kernel VGIC or not.
-      */
-@@ -195,7 +196,14 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
- 
-     cap_has_mp_state = kvm_check_extension(s, KVM_CAP_MP_STATE);
- 
--    return 0;
-+    if (ms->smp.cpus > 256 &&
-+        !kvm_check_extension(s, KVM_CAP_ARM_IRQ_LINE_LAYOUT_2)) {
-+        error_report("Using more than 256 vcpus requires a host kernel "
-+                     "with KVM_CAP_ARM_IRQ_LINE_LAYOUT_2");
-+        ret = -EINVAL;
+diff --git a/block/io.c b/block/io.c
+index 8b6dace056..f0b86c1d19 100644
+--- a/block/io.c
++++ b/block/io.c
+@@ -2090,6 +2090,13 @@ int coroutine_fn bdrv_co_pwritev_part(BdrvChild *c=
+hild,
+         return ret;
+     }
+=20
++    /* If the request is misaligned then we can't make it efficient */
++    if ((flags & BDRV_REQ_NO_FALLBACK) &&
++        !QEMU_IS_ALIGNED(offset | bytes, align))
++    {
++        return -ENOTSUP;
 +    }
 +
-+    return ret;
- }
- 
- unsigned long kvm_arch_vcpu_id(CPUState *cpu)
--- 
+     bdrv_inc_in_flight(bs);
+     /*
+      * Align write if necessary by performing a read-modify-write cycle.
+diff --git a/tests/qemu-iotests/268 b/tests/qemu-iotests/268
+new file mode 100755
+index 0000000000..78c3f4db3a
+--- /dev/null
++++ b/tests/qemu-iotests/268
+@@ -0,0 +1,55 @@
++#!/usr/bin/env bash
++#
++# Test write request with required alignment larger than the cluster siz=
+e
++#
++# Copyright (C) 2019 Igalia, S.L.
++# Author: Alberto Garcia <berto@igalia.com>
++#
++# This program is free software; you can redistribute it and/or modify
++# it under the terms of the GNU General Public License as published by
++# the Free Software Foundation; either version 2 of the License, or
++# (at your option) any later version.
++#
++# This program is distributed in the hope that it will be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++# GNU General Public License for more details.
++#
++# You should have received a copy of the GNU General Public License
++# along with this program.  If not, see <http://www.gnu.org/licenses/>.
++#
++
++# creator
++owner=3Dberto@igalia.com
++
++seq=3D`basename $0`
++echo "QA output created by $seq"
++
++status=3D1	# failure is the default!
++
++_cleanup()
++{
++    _cleanup_test_img
++}
++trap "_cleanup; exit \$status" 0 1 2 3 15
++
++# get standard environment, filters and checks
++. ./common.rc
++. ./common.filter
++
++_supported_fmt qcow2
++_supported_proto file
++
++echo
++echo "=3D=3D Required alignment larger than cluster size =3D=3D"
++
++CLUSTER_SIZE=3D2k _make_test_img 1M
++# Since commit c8bb23cbdb writing to an unallocated cluster fills the
++# empty COW areas with bdrv_write_zeroes(flags=3DBDRV_REQ_NO_FALLBACK)
++$QEMU_IO -c "open -o driver=3D$IMGFMT,file.align=3D4k blkdebug::$TEST_IM=
+G" \
++         -c "write 0 512" | _filter_qemu_io
++
++# success, all done
++echo "*** done"
++rm -f $seq.full
++status=3D0
+diff --git a/tests/qemu-iotests/268.out b/tests/qemu-iotests/268.out
+new file mode 100644
+index 0000000000..2ed6c68529
+--- /dev/null
++++ b/tests/qemu-iotests/268.out
+@@ -0,0 +1,7 @@
++QA output created by 268
++
++=3D=3D Required alignment larger than cluster size =3D=3D
++Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D1048576
++wrote 512/512 bytes at offset 0
++512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++*** done
+diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
+index 5805a79d9e..4c861f7eed 100644
+--- a/tests/qemu-iotests/group
++++ b/tests/qemu-iotests/group
+@@ -278,3 +278,4 @@
+ 265 rw auto quick
+ 266 rw quick
+ 267 rw auto quick snapshot
++268 rw auto quick
+--=20
 2.20.1
 
 
