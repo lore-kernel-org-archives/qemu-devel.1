@@ -2,89 +2,63 @@ Return-Path: <SRS0=PUPy=YH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_2 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A96C6ECE587
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 11:43:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8C070ECE587
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 11:43:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 636ED206A3
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 11:43:40 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Rg5GYxxq"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 636ED206A3
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 61A45207FF
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 11:43:55 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 61A45207FF
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48068 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48072 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iJylH-0000I0-C5
-	for qemu-devel@archiver.kernel.org; Mon, 14 Oct 2019 07:43:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46887)
+	id 1iJylW-0000iN-EI
+	for qemu-devel@archiver.kernel.org; Mon, 14 Oct 2019 07:43:54 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50305)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1iJyCC-00087A-5q
- for qemu-devel@nongnu.org; Mon, 14 Oct 2019 07:07:25 -0400
+ (envelope-from <groug@kaod.org>) id 1iJyaD-0003Wh-Tl
+ for qemu-devel@nongnu.org; Mon, 14 Oct 2019 07:32:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1iJyC9-0007hu-QU
- for qemu-devel@nongnu.org; Mon, 14 Oct 2019 07:07:24 -0400
-Received: from mail-wr1-x42b.google.com ([2a00:1450:4864:20::42b]:44288)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1iJyC9-0007gW-Jf
- for qemu-devel@nongnu.org; Mon, 14 Oct 2019 07:07:21 -0400
-Received: by mail-wr1-x42b.google.com with SMTP id z9so19189819wrl.11
- for <qemu-devel@nongnu.org>; Mon, 14 Oct 2019 04:07:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=NcM2OW8hOZLGEmTgGaT1ah5hV9uWmpQOgbN08Bz7RB0=;
- b=Rg5GYxxqSGji7CEHQVpbwf7H3UlExM6gUkQqFW3zFtORmZLLNYzx/s2WBKDPLD3y44
- RdTmXK9UjafVaRYzdFNWG35avRoJQj5mbzswOTj+BZ4HHOo2pQ4hZlfxsO/SKcwDmfKT
- 411x7KNfLXL+PAkfomCj+dINSaHybW1A+U5b1S0tx6KjP0Q1Nz1DRwap0NpeTUcmiIr1
- hZMQgaSPPsJVdnZrYD0b/dI5Jj54KI8pOJhAhOeHsdU5KWwgeKx0/c4EtoQzIXyCCfmt
- l6dYLgh75yZJ8V191V6lvaYhiSjB+P/Q7Tall6/a6yBuS7FqXRHWaHZ9Ie4bnH2TTfRj
- LMYQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=NcM2OW8hOZLGEmTgGaT1ah5hV9uWmpQOgbN08Bz7RB0=;
- b=Rp2CdLhXgFg/VzfyR7TDUgLCRMb5ZdM+dO0R6YXs83Y8FbR4PqTVwn+Y64CsVelLm4
- xYmAj6FsrGqUIg0GFw+SL3UpwpERj25j0YwnNIo31iUVqaTFX8W2reQwQZwlzM2b7+xL
- do6RQQ+tYi4n0U4RQSd9WgWJ7MnJbLqLeuvLYhp3fxxUKy5jyVj75HB9vNjoxpbXilw4
- dJqsBDCwzicq2ctkBhuiCk9OsSr403gUyJOdcj27LMTu5biM4HaU8pZDN37ywN1MsOrl
- 3Z0i7FHx9b2mHTWvOnV2f+6RuSbLeKT+NlIQzJmTF8p89vR1y1rY9gqttBd30EIvvDXw
- s4pg==
-X-Gm-Message-State: APjAAAWPOrDnF4nXcoIrsZB1ymtM9NmcfhQNHyQwsCxNbnIY3QNB/ijT
- je2Kvgpi3obhAZmggq9tOUm6kTrIBhs=
-X-Google-Smtp-Source: APXvYqwzeXjN2sdR4AU15dAmAgUTaP7I8X6aDAOl/fVP/gvdgZAwhD6xCYhj6CRV9fXHaRZiLbJShA==
-X-Received: by 2002:adf:e401:: with SMTP id g1mr23688737wrm.211.1571051240373; 
- Mon, 14 Oct 2019 04:07:20 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id q22sm15585251wmj.5.2019.10.14.04.07.17
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 14 Oct 2019 04:07:17 -0700 (PDT)
-Received: from zen.lan (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 89A2E1FFD2;
- Mon, 14 Oct 2019 11:49:59 +0100 (BST)
-From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: qemu-devel@nongnu.org
-Subject: [PATCH  v5 47/55] tests/plugin: add instruction execution breakdown
-Date: Mon, 14 Oct 2019 11:49:40 +0100
-Message-Id: <20191014104948.4291-48-alex.bennee@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20191014104948.4291-1-alex.bennee@linaro.org>
-References: <20191014104948.4291-1-alex.bennee@linaro.org>
+ (envelope-from <groug@kaod.org>) id 1iJya8-0002gZ-Cr
+ for qemu-devel@nongnu.org; Mon, 14 Oct 2019 07:32:10 -0400
+Received: from 3.mo179.mail-out.ovh.net ([178.33.251.175]:49410)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <groug@kaod.org>) id 1iJya4-0002WY-DL
+ for qemu-devel@nongnu.org; Mon, 14 Oct 2019 07:32:05 -0400
+Received: from player793.ha.ovh.net (unknown [10.108.35.124])
+ by mo179.mail-out.ovh.net (Postfix) with ESMTP id 09DE01454B4
+ for <qemu-devel@nongnu.org>; Mon, 14 Oct 2019 13:31:56 +0200 (CEST)
+Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
+ [82.253.208.248]) (Authenticated sender: groug@kaod.org)
+ by player793.ha.ovh.net (Postfix) with ESMTPSA id DCCD5AEA73CF;
+ Mon, 14 Oct 2019 11:31:51 +0000 (UTC)
+Date: Mon, 14 Oct 2019 13:31:49 +0200
+From: Greg Kurz <groug@kaod.org>
+To: David Gibson <david@gibson.dropbear.id.au>
+Subject: Re: [PATCH 7/7] spapr: Set VSMT to smp_threads by default
+Message-ID: <20191014133149.686b681e@bahia.lan>
+In-Reply-To: <20191014061247.GZ4080@umbus.fritz.box>
+References: <157010404888.246126.9768030542733152637.stgit@bahia.lan>
+ <157010411885.246126.12610015369068227139.stgit@bahia.lan>
+ <20191014061247.GZ4080@umbus.fritz.box>
+X-Mailer: Claws Mail 3.17.4 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::42b
+Content-Type: multipart/signed; boundary="Sig_/I47mP63z5TeIBN61Vqkk7q3";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
+X-Ovh-Tracer-Id: 6677712348298713574
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrjedugdegvdcutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 178.33.251.175
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,349 +70,135 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: aaron@os.amperecomputing.com, cota@braap.org,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
- robert.foley@futurewei.com, peter.puhov@futurewei.com
+Cc: qemu-ppc@nongnu.org, =?UTF-8?B?Q8OpZHJpYw==?= Le Goater <clg@kaod.org>,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This gives a break down of instruction classes and individual
-instruction types.
+--Sig_/I47mP63z5TeIBN61Vqkk7q3
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+On Mon, 14 Oct 2019 17:12:47 +1100
+David Gibson <david@gibson.dropbear.id.au> wrote:
 
----
-v5
-  - add a bitmap guide to the comment ;-)
----
- tests/plugin/Makefile |   1 +
- tests/plugin/howvec.c | 303 ++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 304 insertions(+)
- create mode 100644 tests/plugin/howvec.c
+> On Thu, Oct 03, 2019 at 02:02:00PM +0200, Greg Kurz wrote:
+> > Support for setting VSMT is available in KVM since linux-4.13. Most dis=
+tros
+> > that support KVM on POWER already have it. It thus seem reasonable enou=
+gh
+> > to have the default machine to set VSMT to smp_threads.
+> >=20
+> > This brings contiguous VCPU ids and thus brings their upper bound down =
+to
+> > the machine's max_cpus. This is especially useful for XIVE KVM devices,
+> > which may thus allocate only one VP descriptor per VCPU.
+> >=20
 
-diff --git a/tests/plugin/Makefile b/tests/plugin/Makefile
-index e74940eaac..3656429d46 100644
---- a/tests/plugin/Makefile
-+++ b/tests/plugin/Makefile
-@@ -11,6 +11,7 @@ NAMES += empty
- NAMES += insn
- NAMES += mem
- NAMES += hotblocks
-+NAMES += howvec
- 
- SONAMES := $(addsuffix .so,$(addprefix lib,$(NAMES)))
- 
-diff --git a/tests/plugin/howvec.c b/tests/plugin/howvec.c
-new file mode 100644
-index 0000000000..b435c6b64d
---- /dev/null
-+++ b/tests/plugin/howvec.c
-@@ -0,0 +1,303 @@
-+/*
-+ * Copyright (C) 2019, Alex Bennée <alex.bennee@linaro.org>
-+ *
-+ * How vectorised is this code?
-+ *
-+ * Attempt to measure the amount of vectorisation that has been done
-+ * on some code by counting classes of instruction. This is very much
-+ * ARM specific.
-+ *
-+ * License: GNU GPL, version 2 or later.
-+ *   See the COPYING file in the top-level directory.
-+ */
-+#include <inttypes.h>
-+#include <assert.h>
-+#include <stdlib.h>
-+#include <inttypes.h>
-+#include <string.h>
-+#include <unistd.h>
-+#include <stdio.h>
-+#include <glib.h>
-+
-+#include <qemu-plugin.h>
-+
-+#define ARRAY_SIZE(x) (sizeof(x) / sizeof((x)[0]))
-+
-+typedef enum {
-+    COUNT_CLASS,
-+    COUNT_INDIVIDUAL,
-+    COUNT_NONE
-+} CountType;
-+
-+static int limit = 50;
-+static int stdout_fd;
-+static bool do_inline;
-+static bool verbose;
-+
-+static GMutex lock;
-+static GHashTable *insns;
-+
-+typedef struct {
-+    const char *class;
-+    const char *opt;
-+    uint32_t mask;
-+    uint32_t pattern;
-+    CountType what;
-+    uint64_t count;
-+} InsnClassExecCount;
-+
-+typedef struct {
-+    char *insn;
-+    uint32_t opcode;
-+    uint64_t count;
-+    InsnClassExecCount *class;
-+} InsnExecCount;
-+
-+/*
-+ * Matchers for classes of instructions, order is important.
-+ *
-+ * Your most precise match must be before looser matches. If no match
-+ * is found in the table we can create an individual entry.
-+ *
-+ * 31..28 27..24 23..20 19..16 15..12 11..8 7..4 3..0
-+ */
-+InsnClassExecCount insn_classes[] = {
-+    /* "Reserved"" */
-+    { "  UDEF",              "udef",   0xffff0000, 0x00000000, COUNT_NONE},
-+    { "  SVE",               "sve",    0x1e000000, 0x04000000, COUNT_CLASS},
-+    { "Reserved",            "res",    0x1e000000, 0x00000000, COUNT_CLASS},
-+    /* Data Processing Immediate */
-+    { "  PCrel addr",        "pcrel",  0x1f000000, 0x10000000, COUNT_CLASS},
-+    { "  Add/Sub (imm,tags)","asit",   0x1f800000, 0x11800000, COUNT_CLASS},
-+    { "  Add/Sub (imm)",     "asi",    0x1f000000, 0x11000000, COUNT_CLASS},
-+    { "  Logical (imm)",     "logi",   0x1f800000, 0x12000000, COUNT_CLASS},
-+    { "  Move Wide (imm)",   "movwi",  0x1f800000, 0x12800000, COUNT_CLASS},
-+    { "  Bitfield",          "bitf",   0x1f800000, 0x13000000, COUNT_CLASS},
-+    { "  Extract",           "extr",   0x1f800000, 0x13800000, COUNT_CLASS},
-+    { "Data Proc Imm",       "dpri",   0x1c000000, 0x10000000, COUNT_CLASS},
-+    /* Branches */
-+    { "  Cond Branch (imm)", "cndb",   0xfe000000, 0x54000000, COUNT_CLASS},
-+    { "  Exception Gen",     "excp",   0xff000000, 0xd4000000, COUNT_CLASS},
-+    { "    NOP",             "nop",    0xffffffff, 0xd503201f, COUNT_NONE},
-+    { "  Hints",             "hint",   0xfffff000, 0xd5032000, COUNT_CLASS},
-+    { "  Barriers",          "barr",   0xfffff000, 0xd5033000, COUNT_CLASS},
-+    { "  PSTATE",            "psta",   0xfff8f000, 0xd5004000, COUNT_CLASS},
-+    { "  System Insn",       "sins",   0xffd80000, 0xd5080000, COUNT_CLASS},
-+    { "  System Reg",        "sreg",   0xffd00000, 0xd5100000, COUNT_CLASS},
-+    { "  Branch (reg)",      "breg",   0xfe000000, 0xd6000000, COUNT_CLASS},
-+    { "  Branch (imm)",      "bimm",   0x7c000000, 0x14000000, COUNT_CLASS},
-+    { "  Cmp & Branch",      "cmpb",   0x7e000000, 0x34000000, COUNT_CLASS},
-+    { "  Tst & Branch",      "tstb",   0x7e000000, 0x36000000, COUNT_CLASS},
-+    { "Branches",            "branch", 0x1c000000, 0x14000000, COUNT_CLASS},
-+    /* Loads and Stores */
-+    { "  AdvSimd ldstmult",  "advlsm", 0xbfbf0000, 0x0c000000, COUNT_CLASS},
-+    { "  AdvSimd ldstmult++","advlsmp",0xbfb00000, 0x0c800000, COUNT_CLASS},
-+    { "  AdvSimd ldst",      "advlss", 0xbf9f0000, 0x0d000000, COUNT_CLASS},
-+    { "  AdvSimd ldst++",    "advlssp",0xbf800000, 0x0d800000, COUNT_CLASS},
-+    { "  ldst excl",         "ldstx",  0x3f000000, 0x08000000, COUNT_CLASS},
-+    { "    Prefetch",        "prfm",   0xff000000, 0xd8000000, COUNT_CLASS},
-+    { "  Load Reg (lit)",    "ldlit",  0x1b000000, 0x18000000, COUNT_CLASS},
-+    { "  ldst noalloc pair", "ldstnap",0x3b800000, 0x28000000, COUNT_CLASS},
-+    { "  ldst pair",         "ldstp",  0x38000000, 0x28000000, COUNT_CLASS},
-+    { "  ldst reg",          "ldstr",  0x3b200000, 0x38000000, COUNT_CLASS},
-+    { "  Atomic ldst",       "atomic", 0x3b200c00, 0x38200000, COUNT_CLASS},
-+    { "  ldst reg (reg off)","ldstro", 0x3b200b00, 0x38200800, COUNT_CLASS},
-+    { "  ldst reg (pac)",    "ldstpa", 0x3b200200, 0x38200800, COUNT_CLASS},
-+    { "  ldst reg (imm)",    "ldsti",  0x3b000000, 0x39000000, COUNT_CLASS},
-+    { "Loads & Stores",      "ldst",   0x0a000000, 0x08000000, COUNT_CLASS},
-+    /* Data Processing Register */
-+    { "Data Proc Reg",       "dprr",   0x0e000000, 0x0a000000, COUNT_CLASS},
-+    /* Scalar FP */
-+    { "Scalar FP ",          "fpsimd", 0x0e000000, 0x0e000000, COUNT_CLASS},
-+    /* Unclassified */
-+    { "Unclassified",        "unclas", 0x00000000, 0x00000000, COUNT_CLASS}
-+};
-+
-+static gint cmp_exec_count(gconstpointer a, gconstpointer b)
-+{
-+    InsnExecCount *ea = (InsnExecCount *) a;
-+    InsnExecCount *eb = (InsnExecCount *) b;
-+    return ea->count > eb->count ? -1 : 1;
-+}
-+
-+static void plugin_exit(qemu_plugin_id_t id, void *p)
-+{
-+    GString *report = g_string_new("Instruction Classes:\n");
-+    int i;
-+    GList *counts;
-+
-+    for (i = 0; i < ARRAY_SIZE(insn_classes); i++) {
-+        switch (insn_classes[i].what) {
-+        case COUNT_CLASS:
-+            if (insn_classes[i].count || verbose) {
-+                g_string_append_printf(report, "Class: %-24s\t(%ld hits)\n",
-+                                       insn_classes[i].class,
-+                                       insn_classes[i].count);
-+            }
-+            break;
-+        case COUNT_INDIVIDUAL:
-+            g_string_append_printf(report, "Class: %-24s\tcounted individually\n",
-+                                   insn_classes[i].class);
-+            break;
-+        case COUNT_NONE:
-+            g_string_append_printf(report, "Class: %-24s\tnot counted\n",
-+                                   insn_classes[i].class);
-+            break;
-+        default:
-+            break;
-+        }
-+    }
-+
-+    counts = g_hash_table_get_values(insns);
-+    if (counts && g_list_next(counts)) {
-+        GList *it;
-+
-+        g_string_append_printf(report,"Individual Instructions:\n");
-+
-+        it = g_list_sort(counts, cmp_exec_count);
-+
-+        for (i = 0; i < limit && it->next; i++, it = it->next) {
-+            InsnExecCount *rec = (InsnExecCount *) it->data;
-+            g_string_append_printf(report, "Instr: %-24s\t(%ld hits)\t(op=%#08x/%s)\n",
-+                                   rec->insn,
-+                                   rec->count,
-+                                   rec->opcode,
-+                                   rec->class ?
-+                                   rec->class->class : "un-categorised");
-+        }
-+        g_list_free(it);
-+    }
-+
-+    dprintf(stdout_fd, "%s", report->str);
-+    g_string_free(report, true);
-+}
-+
-+static void plugin_init(void)
-+{
-+    insns = g_hash_table_new(NULL, g_direct_equal);
-+}
-+
-+static void vcpu_insn_exec_before(unsigned int cpu_index, void *udata)
-+{
-+    uint64_t *count = (uint64_t *) udata;
-+    (*count)++;
-+}
-+
-+static uint64_t * find_counter(struct qemu_plugin_insn *insn)
-+{
-+    int i;
-+    uint64_t *cnt = NULL;
-+    uint32_t opcode;
-+    InsnClassExecCount *class = NULL;
-+
-+    /* we expect all instructions to by 32 bits for ARM */
-+    g_assert(qemu_plugin_insn_size(insn) == 4);
-+    opcode = *((uint32_t *)qemu_plugin_insn_data(insn));
-+
-+    for (i = 0; !cnt && i < ARRAY_SIZE(insn_classes); i++) {
-+        uint32_t masked_bits = opcode & insn_classes[i].mask;
-+        if (masked_bits == insn_classes[i].pattern) {
-+            class = &insn_classes[i];
-+            break;
-+        }
-+    }
-+
-+    g_assert(class);
-+
-+    switch (class->what) {
-+    case COUNT_NONE:
-+        return NULL;
-+    case COUNT_CLASS:
-+        return &class->count;
-+    case COUNT_INDIVIDUAL:
-+    {
-+        InsnExecCount *icount;
-+
-+        g_mutex_lock(&lock);
-+        icount = (InsnExecCount *) g_hash_table_lookup(insns,
-+                                                       GUINT_TO_POINTER(opcode));
-+
-+        if (!icount) {
-+            icount = g_new0(InsnExecCount, 1);
-+            icount->opcode = opcode;
-+            icount->insn = qemu_plugin_insn_disas(insn);
-+            icount->class = class;
-+
-+            if (verbose) {
-+                dprintf(stdout_fd, "adding for %s (%#08x @ %#20lx from %s)\n",
-+                        icount->insn, opcode, qemu_plugin_insn_vaddr(insn),
-+                        class->class);
-+            }
-+            g_hash_table_insert(insns, GUINT_TO_POINTER(opcode),
-+                                (gpointer) icount);
-+        }
-+        g_mutex_unlock(&lock);
-+
-+        return &icount->count;
-+    }
-+    default:
-+        g_assert_not_reached();
-+    }
-+
-+    return NULL;
-+}
-+
-+static void vcpu_tb_trans(qemu_plugin_id_t id, struct qemu_plugin_tb *tb)
-+{
-+    size_t n = qemu_plugin_tb_n_insns(tb);
-+    size_t i;
-+
-+    for (i = 0; i < n; i++) {
-+        uint64_t *cnt;
-+        struct qemu_plugin_insn *insn = qemu_plugin_tb_get_insn(tb, i);
-+        cnt = find_counter(insn);
-+
-+        if (cnt) {
-+            if (do_inline) {
-+                qemu_plugin_register_vcpu_insn_exec_inline(
-+                    insn, QEMU_PLUGIN_INLINE_ADD_U64, cnt, 1);
-+            } else {
-+                qemu_plugin_register_vcpu_insn_exec_cb(
-+                    insn, vcpu_insn_exec_before, QEMU_PLUGIN_CB_NO_REGS, cnt);
-+            }
-+        }
-+    }
-+}
-+
-+QEMU_PLUGIN_EXPORT int qemu_plugin_install(qemu_plugin_id_t id, int argc,
-+                                           char **argv)
-+{
-+    int i;
-+
-+    for (i = 0; i < argc; i++) {
-+        char *p = argv[i];
-+        if (strcmp(p, "inline") == 0) {
-+            do_inline = true;
-+        } else if (strcmp(p, "verbose") == 0) {
-+            verbose = true;
-+        } else {
-+            int j;
-+            CountType type = COUNT_INDIVIDUAL;
-+            if (*p == '!') {
-+                type = COUNT_NONE;
-+                p++;
-+            }
-+            for (j = 0; j < ARRAY_SIZE(insn_classes); j++) {
-+                if (strcmp(p, insn_classes[j].opt) == 0) {
-+                    insn_classes[j].what = type;
-+                    break;
-+                }
-+            }
-+        }
-+    }
-+
-+    /* to be used when in the exit hook */
-+    stdout_fd = dup(STDOUT_FILENO);
-+    assert(stdout_fd);
-+
-+    plugin_init();
-+
-+    qemu_plugin_register_vcpu_tb_trans_cb(id, vcpu_tb_trans);
-+    qemu_plugin_register_atexit_cb(id, plugin_exit, NULL);
-+    return 0;
-+}
--- 
-2.20.1
+Just to clarify that without the other patches in this series, XIVE
+KVM devices still allocate a fixed block of 2048 VPs, no matter what.
+ie, the last sentence in the changelog may be slightly misleading.
 
+> > Signed-off-by: Greg Kurz <groug@kaod.org>
+>=20
+> Applied to ppc-for-4.2, thanks.
+>=20
+> > ---
+> >  hw/ppc/spapr.c         |    7 ++++++-
+> >  include/hw/ppc/spapr.h |    1 +
+> >  2 files changed, 7 insertions(+), 1 deletion(-)
+> >=20
+> > diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> > index 8f59f08c102e..473ce1d04775 100644
+> > --- a/hw/ppc/spapr.c
+> > +++ b/hw/ppc/spapr.c
+> > @@ -2503,6 +2503,7 @@ static CPUArchId *spapr_find_cpu_slot(MachineStat=
+e *ms, uint32_t id, int *idx)
+> >  static void spapr_set_vsmt_mode(SpaprMachineState *spapr, Error **errp)
+> >  {
+> >      MachineState *ms =3D MACHINE(spapr);
+> > +    SpaprMachineClass *smc =3D SPAPR_MACHINE_GET_CLASS(spapr);
+> >      Error *local_err =3D NULL;
+> >      bool vsmt_user =3D !!spapr->vsmt;
+> >      int kvm_smt =3D kvmppc_smt_threads();
+> > @@ -2529,7 +2530,7 @@ static void spapr_set_vsmt_mode(SpaprMachineState=
+ *spapr, Error **errp)
+> >              goto out;
+> >          }
+> >          /* In this case, spapr->vsmt has been set by the command line =
+*/
+> > -    } else {
+> > +    } else if (!smc->smp_threads_vsmt) {
+> >          /*
+> >           * Default VSMT value is tricky, because we need it to be as
+> >           * consistent as possible (for migration), but this requires
+> > @@ -2538,6 +2539,8 @@ static void spapr_set_vsmt_mode(SpaprMachineState=
+ *spapr, Error **errp)
+> >           * overwhelmingly common case in production systems.
+> >           */
+> >          spapr->vsmt =3D MAX(8, smp_threads);
+> > +    } else {
+> > +        spapr->vsmt =3D smp_threads;
+> >      }
+> > =20
+> >      /* KVM: If necessary, set the SMT mode: */
+> > @@ -4452,6 +4455,7 @@ static void spapr_machine_class_init(ObjectClass =
+*oc, void *data)
+> >      smc->irq =3D &spapr_irq_dual;
+> >      smc->dr_phb_enabled =3D true;
+> >      smc->linux_pci_probe =3D true;
+> > +    smc->smp_threads_vsmt =3D true;
+> >  }
+> > =20
+> >  static const TypeInfo spapr_machine_info =3D {
+> > @@ -4519,6 +4523,7 @@ static void spapr_machine_4_1_class_options(Machi=
+neClass *mc)
+> > =20
+> >      spapr_machine_4_2_class_options(mc);
+> >      smc->linux_pci_probe =3D false;
+> > +    smc->smp_threads_vsmt =3D false;
+> >      compat_props_add(mc->compat_props, hw_compat_4_1, hw_compat_4_1_le=
+n);
+> >      compat_props_add(mc->compat_props, compat, G_N_ELEMENTS(compat));
+> >  }
+> > diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
+> > index cbd1a4c9f390..2009eb64f9cb 100644
+> > --- a/include/hw/ppc/spapr.h
+> > +++ b/include/hw/ppc/spapr.h
+> > @@ -122,6 +122,7 @@ struct SpaprMachineClass {
+> >      bool broken_host_serial_model; /* present real host info to the gu=
+est */
+> >      bool pre_4_1_migration; /* don't migrate hpt-max-page-size */
+> >      bool linux_pci_probe;
+> > +    bool smp_threads_vsmt; /* set VSMT to smp_threads by default */
+> > =20
+> >      void (*phb_placement)(SpaprMachineState *spapr, uint32_t index,
+> >                            uint64_t *buid, hwaddr *pio,=20
+> >=20
+>=20
+
+
+--Sig_/I47mP63z5TeIBN61Vqkk7q3
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEtIKLr5QxQM7yo0kQcdTV5YIvc9YFAl2kXKUACgkQcdTV5YIv
+c9Z0gxAAyO+CLPJjJZomJKzLD8W9rnh4j9DkSJuvmjK7nEmMayiUwEE+3F+Le4tQ
+9sMB3H1nk8TJKrG0A3WZhlLKdxW6cUnrj8hGiwteI5I0DsJn/A/34v+28FGLBoRo
+tzG7FaPc+c3cwzgphIOFunB5XcRwdF+pTJ8Aao5iJUqOrOHmkBlGhLkc7KhyKUCN
+YeR6SzW26ABXWqBwhXGRP93Q5dtavAOp6LW1ZabTaru+x15i39E/RS7nJRuKdtjX
+cRayqwrQ5u34u5GpF/jYRwXDGVIijhzIL3ZLJHM5Lv6VDPXPcs9ZsYqYRi6U3Nt4
+d22RQndB2DHEkm/ej6UULvUyzq6M9N9CUf2iulxBswcw1x7uUxdvXjDEksgCnMVn
+V2VDN2NNTD+iz2hXt+3v9SMlU/Or/IxMDVfjdCia4Fi51TjCCltmXSchxkRITGeB
+jlbT84EKTLCL/Fo+rn6raVDA0jDeRNXO1JZPSxmSTGWJ+uAK/J/BVzesjn2VJIz3
+DBSERZSmB9QwytibRLwjo4WsTUhlBagJqeVMNtAV7CAaZDGS1K96SqXgQlar69sY
+pb/en8DIeA3ytAuUUmaJWPSajFHwpuOy+w847QIFRr+OMTvBm09OU1vpvP4oCMUD
+n/FovFTSIXIBg6HaKYM5zVhg5yCGZJ75sVq20t8zaVsgIoC6X1k=
+=DFqS
+-----END PGP SIGNATURE-----
+
+--Sig_/I47mP63z5TeIBN61Vqkk7q3--
 
