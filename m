@@ -2,67 +2,91 @@ Return-Path: <SRS0=PUPy=YH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A89FC4CECE
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 14:08:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D2201C4CECE
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 14:11:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D52752083B
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 14:08:14 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D52752083B
+	by mail.kernel.org (Postfix) with ESMTPS id A57B22083B
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 14:11:08 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A57B22083B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50134 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50204 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iK11B-0002TF-Oi
-	for qemu-devel@archiver.kernel.org; Mon, 14 Oct 2019 10:08:13 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44575)
+	id 1iK13z-0005z4-RJ
+	for qemu-devel@archiver.kernel.org; Mon, 14 Oct 2019 10:11:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46171)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eblake@redhat.com>) id 1iK0uM-0004NG-DJ
- for qemu-devel@nongnu.org; Mon, 14 Oct 2019 10:01:11 -0400
+ (envelope-from <mreitz@redhat.com>) id 1iK12Z-0004lz-Rs
+ for qemu-devel@nongnu.org; Mon, 14 Oct 2019 10:09:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eblake@redhat.com>) id 1iK0uL-00089l-2Y
- for qemu-devel@nongnu.org; Mon, 14 Oct 2019 10:01:10 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:9908)
+ (envelope-from <mreitz@redhat.com>) id 1iK12Y-000379-H7
+ for qemu-devel@nongnu.org; Mon, 14 Oct 2019 10:09:39 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:39714)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eblake@redhat.com>)
- id 1iK0uC-000828-91; Mon, 14 Oct 2019 10:01:02 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>)
+ id 1iK12T-000361-UN; Mon, 14 Oct 2019 10:09:34 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 62DE020FD;
- Mon, 14 Oct 2019 14:00:56 +0000 (UTC)
-Received: from [10.3.116.168] (ovpn-116-168.phx2.redhat.com [10.3.116.168])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id EDD0E5C541;
- Mon, 14 Oct 2019 14:00:19 +0000 (UTC)
-Subject: Re: [RFC v5 025/126] scripts: add coccinelle script to use auto
- propagated errp
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-References: <20191011160552.22907-1-vsementsov@virtuozzo.com>
- <20191011160552.22907-26-vsementsov@virtuozzo.com>
- <5dd4d642-7ea6-42a2-66fc-6d6710b77b8d@redhat.com>
- <6856bd09-65fc-30d7-2a3c-c85334a024e9@virtuozzo.com>
-From: Eric Blake <eblake@redhat.com>
-Organization: Red Hat, Inc.
-Message-ID: <e8fa1e71-5f48-e1f0-80f3-ef438c117693@redhat.com>
-Date: Mon, 14 Oct 2019 09:00:19 -0500
+ by mx1.redhat.com (Postfix) with ESMTPS id D596918C4278;
+ Mon, 14 Oct 2019 14:09:32 +0000 (UTC)
+Received: from dresden.str.redhat.com (ovpn-117-165.ams2.redhat.com
+ [10.36.117.165])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 9813A196AE;
+ Mon, 14 Oct 2019 14:09:31 +0000 (UTC)
+Subject: Re: [PATCH v3 07/16] qcow2: Write v3-compliant snapshot list on
+ upgrade
+To: Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org
+References: <20191011152814.14791-1-mreitz@redhat.com>
+ <20191011152814.14791-8-mreitz@redhat.com>
+ <a9263c74-f958-5859-9db3-a67aefe73ff5@redhat.com>
+ <085c7aec-edd7-79bd-136f-5a3785a5d430@redhat.com>
+ <582dc245-8a09-f88e-d67c-9435200c327d@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <61015d9f-7a85-c23f-aa3e-b6d85e7dfbcf@redhat.com>
+Date: Mon, 14 Oct 2019 16:09:30 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.1.0
 MIME-Version: 1.0
-In-Reply-To: <6856bd09-65fc-30d7-2a3c-c85334a024e9@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+In-Reply-To: <582dc245-8a09-f88e-d67c-9435200c327d@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="RbCgoV33OIBSBLZARMq1jmQ0AFveH59BF"
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.71]); Mon, 14 Oct 2019 14:00:57 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
+ (mx1.redhat.com [10.5.110.62]); Mon, 14 Oct 2019 14:09:32 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 209.132.183.28
@@ -77,111 +101,109 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Stefan Hajnoczi <stefanha@redhat.com>, Jeff Cody <codyprime@gmail.com>,
- Jan Kiszka <jan.kiszka@siemens.com>, Alberto Garcia <berto@igalia.com>,
- Hailiang Zhang <zhang.zhanghailiang@huawei.com>,
- "qemu-block@nongnu.org" <qemu-block@nongnu.org>,
- Aleksandar Rikalo <arikalo@wavecomp.com>, Halil Pasic <pasic@linux.ibm.com>,
- =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>,
- Anthony Perard <anthony.perard@citrix.com>,
- Samuel Thibault <samuel.thibault@ens-lyon.org>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- Anthony Green <green@moxielogic.com>, Laurent Vivier <lvivier@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>,
- Xie Changlong <xiechanglong.d@gmail.com>, Peter Lieven <pl@kamp.de>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Beniamino Galvani <b.galvani@gmail.com>, Eric Auger <eric.auger@redhat.com>,
- Alex Williamson <alex.williamson@redhat.com>,
- Ronnie Sahlberg <ronniesahlberg@gmail.com>, John Snow <jsnow@redhat.com>,
- Richard Henderson <rth@twiddle.net>, Kevin Wolf <kwolf@redhat.com>,
- Andrew Jeffery <andrew@aj.id.au>, Chris Wulff <crwulff@gmail.com>,
- Subbaraya Sundeep <sundeep.lkml@gmail.com>, Michael Walle <michael@walle.cc>,
- "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>,
- Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
- Igor Mammedov <imammedo@redhat.com>, Fam Zheng <fam@euphon.net>,
- Peter Maydell <peter.maydell@linaro.org>,
- "sheepdog@lists.wpkg.org" <sheepdog@lists.wpkg.org>,
- Matthew Rosato <mjrosato@linux.ibm.com>, David Hildenbrand <david@redhat.com>,
- Palmer Dabbelt <palmer@sifive.com>, Thomas Huth <thuth@redhat.com>,
- Max Filippov <jcmvbkbc@gmail.com>, Hannes Reinecke <hare@suse.com>,
- Stefano Stabellini <sstabellini@kernel.org>,
- "Gonglei \(Arei\)" <arei.gonglei@huawei.com>, Liu Yuan <namei.unix@gmail.com>,
- Artyom Tarasenko <atar4qemu@gmail.com>, Eric Farman <farman@linux.ibm.com>,
- Amit Shah <amit@kernel.org>, Stefan Weil <sw@weilnetz.de>,
- Greg Kurz <groug@kaod.org>, Yuval Shaia <yuval.shaia@oracle.com>,
- "qemu-s390x@nongnu.org" <qemu-s390x@nongnu.org>,
- "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>,
- Peter Chubb <peter.chubb@nicta.com.au>,
- =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>,
- Stafford Horne <shorne@gmail.com>,
- "qemu-riscv@nongnu.org" <qemu-riscv@nongnu.org>,
- Cornelia Huck <cohuck@redhat.com>,
- Aleksandar Markovic <amarkovic@wavecomp.com>,
- Aurelien Jarno <aurelien@aurel32.net>, Paul Burton <pburton@wavecomp.com>,
- Sagar Karandikar <sagark@eecs.berkeley.edu>, Paul Durrant <paul@xen.org>,
- Jason Wang <jasowang@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>,
- "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
- Guan Xuetao <gxt@mprc.pku.edu.cn>, Ari Sundholm <ari@tuxera.com>,
- Juan Quintela <quintela@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>,
- Christian Borntraeger <borntraeger@de.ibm.com>, Joel Stanley <joel@jms.id.au>,
- Jason Dillaman <dillaman@redhat.com>, Antony Pavlov <antonynpavlov@gmail.com>,
- "xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>,
- "integration@gluster.org" <integration@gluster.org>,
- Laszlo Ersek <lersek@redhat.com>, "Richard W.M. Jones" <rjones@redhat.com>,
- Andrew Baumann <Andrew.Baumann@microsoft.com>, Max Reitz <mreitz@redhat.com>,
- Denis Lunev <den@virtuozzo.com>, "Michael S. Tsirkin" <mst@redhat.com>,
- Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
- Vincenzo Maffione <v.maffione@gmail.com>, Marek Vasut <marex@denx.de>,
- "armbru@redhat.com" <armbru@redhat.com>,
- =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
- Alistair Francis <alistair@alistair23.me>,
- Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>,
- Giuseppe Lettieri <g.lettieri@iet.unipi.it>, Luigi Rizzo <rizzo@iet.unipi.it>,
- David Gibson <david@gibson.dropbear.id.au>,
- Tony Krowiak <akrowiak@linux.ibm.com>,
- =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
- Xiao Guangrong <xiaoguangrong.eric@gmail.com>,
- Pierre Morel <pmorel@linux.ibm.com>, Wen Congyang <wencongyang2@huawei.com>,
- Jean-Christophe Dubois <jcd@tribudubois.net>,
- Paolo Bonzini <pbonzini@redhat.com>, Stefan Berger <stefanb@linux.ibm.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 10/14/19 3:19 AM, Vladimir Sementsov-Ogievskiy wrote:
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--RbCgoV33OIBSBLZARMq1jmQ0AFveH59BF
+Content-Type: multipart/mixed; boundary="BrwmBGeNUGeMwByUk4nWuRKHMlYd47ZXR"
 
->>> +|
->>> +-=C2=A0=C2=A0=C2=A0 error_propagate(errp, local_err);
->>> +)
->>> +=C2=A0=C2=A0=C2=A0=C2=A0 ...>
->>> + }
->>> +
+--BrwmBGeNUGeMwByUk4nWuRKHMlYd47ZXR
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+
+On 14.10.19 15:53, Eric Blake wrote:
+> On 10/14/19 3:45 AM, Max Reitz wrote:
+>=20
+>>>> +=C2=A0=C2=A0=C2=A0 need_snapshot_update =3D false;
+>>>> +=C2=A0=C2=A0=C2=A0 for (i =3D 0; i < s->nb_snapshots; i++) {
+>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (s->snapshots[i].extr=
+a_data_size <
+>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 =
+sizeof_field(QCowSnapshotExtraData, vm_state_size_large) +
+>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 =
+sizeof_field(QCowSnapshotExtraData, disk_size))
+>>>
+>>> Shorter as:
+>>> if (s->snapshots[i].extra_data_size < sizeof(QCowSnapshotExtraData))
+>>>
+>>> but that's stylistic, so R-b still stands.
 >>
->> It looks like once this script is run, error_propagate_prepend() will =
-have no clients.
+>> Yes, but if we ever add fields to QCowSnapshotExtraData, we shouldn=E2=
+=80=99t
+>> count them here.=C2=A0 Therefore, I think we need to count exactly the=
+ fields
+>> that the standard says are mandatory in v3.
 >=20
-> No, it still have a bit, when working with error_copy, and/or moving er=
-rors from/to structures.
-
-No public clients. So can we turn it into a static function only used by=20
-error.c?
-
+> If we ever add more fields, I'd prefer that we did something like:
 >=20
->> Is there a non-generated cleanup patch that removes it (and once it is=
- removed, it can also be removed from the .cocci script as no further cli=
-ents will reappear later)?
+> struct QCowSnapshotExtraV3Minimum {
+> =C2=A0=C2=A0=C2=A0 uint64_t vm_state_size_large;
+> =C2=A0=C2=A0=C2=A0 uint64_t disk_size;
+> };
+> struct QCow3SnapshotExtraFull {
+> =C2=A0=C2=A0=C2=A0 struct QCowSnapshotExtraV3Minimum base;
+> =C2=A0=C2=A0=C2=A0 new fields...;
+> };
 >=20
-> Maybe.
+> and use sane naming to get at extra members based on the expected types=
+,
+> rather than trying to piecemeal portions of a type based on size.
 >=20
+> Until we actually DO add more fields, why do we have to complicate the
+> current code?
 
-Basically, if we can get error_propagate out of error.h, that's a good=20
-sign.  But it's not a show-stopper if we can't do it for some legitimate=20
-reason (such a reason might include that the definition of the=20
-ERRP_AUTO_PROPAGATE macro is easier to write if error_propagate remains=20
-in the .h), so we'll just have to see what is possible.
+I don=E2=80=99t think it=E2=80=99s complicated, I find it very expressive=
+=2E  There are
+two fields, we check whether they are present; why, that=E2=80=99s obviou=
+s,
+because those are the ones mandated by the standard.
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
+If we just checked against sizeof(QCowSnapshotExtraData), I=E2=80=99d (as=
+ a
+na=C3=AFve reader) ask myself what that has to do with the standard.  I=E2=
+=80=99d
+need to look into the structure definition and see that it currently
+contains exactly the fields that are mandated by the standard, and then
+I=E2=80=99d think =E2=80=9CBut what if we ever add fields to this structu=
+re?=E2=80=9D  The more
+verbose version avoids this problem.
+
+And I=E2=80=99m not really inclined to take your proposal above right now=
+,
+because that would mean having to touch a lot of code.  I prefer this
+more verbose code over that.
+
+
+Also, you explicitly agreed that the code in this patch is preferable to
+a plain sizeof(extra) in v2:
+
+https://lists.nongnu.org/archive/html/qemu-block/2019-08/msg00942.html
+
+Max
+
+
+--BrwmBGeNUGeMwByUk4nWuRKHMlYd47ZXR--
+
+--RbCgoV33OIBSBLZARMq1jmQ0AFveH59BF
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl2kgZoACgkQ9AfbAGHV
+z0CW3wf/ZcjrU+7eBDutKstONW5u++u1okfmH7IYwagjUR3doFMfOEKDOs0Le/Ow
+i5X9X454vuBjuM5V4rQ0MvJHP/fBVNb2NU+UqB/pNJMx3iTXUXMMyAO4cZIocoWX
+wuwP0bp8777Mh6VCgbLzOrIj0M32tB83kFj47WnnmNjsZg4+lBaB9eC0VvZ5Nhyl
+Lw5L+I2BIySGPasuMamdd26rmVQPfJoby5AaM5O/4RYKtZE4+cEkVpPKCIHqeMQr
+svx+y4VAfYK6b+0b90b7nxaPRmZJ5/FeRrr9jUP42CATEyjVb5Tf1q8nzKXmMLW0
+oOB9vAw5XF43VH1wFWIYj0LCd8uf6g==
+=wtc/
+-----END PGP SIGNATURE-----
+
+--RbCgoV33OIBSBLZARMq1jmQ0AFveH59BF--
 
