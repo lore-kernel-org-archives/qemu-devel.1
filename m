@@ -2,52 +2,64 @@ Return-Path: <SRS0=PUPy=YH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 54F21C4CECE
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 11:53:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2BDD3C4CECE
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 11:54:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2E48E2084B
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 11:53:14 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2E48E2084B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	by mail.kernel.org (Postfix) with ESMTPS id F0B4F207FF
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 11:54:03 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F0B4F207FF
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48196 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48252 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iJyuW-0000j9-Vv
-	for qemu-devel@archiver.kernel.org; Mon, 14 Oct 2019 07:53:13 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52477)
+	id 1iJyvL-000252-5U
+	for qemu-devel@archiver.kernel.org; Mon, 14 Oct 2019 07:54:03 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49037)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iJysx-0008AQ-I5
- for qemu-devel@nongnu.org; Mon, 14 Oct 2019 07:51:36 -0400
+ (envelope-from <kwolf@redhat.com>) id 1iJyPw-00085K-GM
+ for qemu-devel@nongnu.org; Mon, 14 Oct 2019 07:21:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iJysw-0005lE-AZ
- for qemu-devel@nongnu.org; Mon, 14 Oct 2019 07:51:35 -0400
-Received: from relay.sw.ru ([185.231.240.75]:57684)
+ (envelope-from <kwolf@redhat.com>) id 1iJyPv-0006bl-AS
+ for qemu-devel@nongnu.org; Mon, 14 Oct 2019 07:21:36 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34102)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1iJyst-0005eV-Oo; Mon, 14 Oct 2019 07:51:31 -0400
-Received: from [10.94.3.0] (helo=kvm.qa.sw.ru)
- by relay.sw.ru with esmtp (Exim 4.92.2)
- (envelope-from <vsementsov@virtuozzo.com>)
- id 1iJysp-0002Oa-Tn; Mon, 14 Oct 2019 14:51:28 +0300
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-To: qemu-block@nongnu.org
-Subject: [PATCH v2 1/2] qcow2-bitmaps: fix qcow2_can_store_new_dirty_bitmap
-Date: Mon, 14 Oct 2019 14:51:25 +0300
-Message-Id: <20191014115126.15360-2-vsementsov@virtuozzo.com>
-X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20191014115126.15360-1-vsementsov@virtuozzo.com>
-References: <20191014115126.15360-1-vsementsov@virtuozzo.com>
+ (Exim 4.71) (envelope-from <kwolf@redhat.com>)
+ id 1iJyPs-0006XU-Eo; Mon, 14 Oct 2019 07:21:32 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id ADEDF308FC23;
+ Mon, 14 Oct 2019 11:21:31 +0000 (UTC)
+Received: from localhost.localdomain (unknown [10.36.118.40])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id E8096608A5;
+ Mon, 14 Oct 2019 11:21:27 +0000 (UTC)
+Date: Mon, 14 Oct 2019 13:21:26 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+To: Thomas Huth <thuth@redhat.com>
+Subject: Re: [PATCH 4/5] iotests: Skip "make check-block" if QEMU does not
+ support virtio-blk
+Message-ID: <20191014112126.GF7173@localhost.localdomain>
+References: <20191011145047.19051-1-thuth@redhat.com>
+ <20191011145047.19051-5-thuth@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [fuzzy]
-X-Received-From: 185.231.240.75
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20191011145047.19051-5-thuth@redhat.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.43]); Mon, 14 Oct 2019 11:21:31 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -59,98 +71,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, vsementsov@virtuozzo.com, qemu-devel@nongnu.org,
- mreitz@redhat.com, den@openvz.org, jsnow@redhat.com
+Cc: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org,
+ Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-qcow2_can_store_new_dirty_bitmap works wrong, as it considers only
-bitmaps already stored in the qcow2 image and ignores persistent
-BdrvDirtyBitmap objects.
+Am 11.10.2019 um 16:50 hat Thomas Huth geschrieben:
+> The next patch is going to add some python-based tests to the "auto"
+> group, and these tests require virtio-blk to work properly. Running
+> iotests without virtio-blk likely does not make too much sense anyway,
+> so instead of adding a check for the availability of virtio-blk to each
+> and every test (which does not sound very appealing), let's rather add
+> a check for this at the top level in the check-block.sh script instead
+> (so that it is possible to run "make check" without the "check-block"
+> part for qemu-system-tricore for example).
+> 
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> ---
+>  tests/check-block.sh | 16 +++++++++++++++-
+>  1 file changed, 15 insertions(+), 1 deletion(-)
+> 
+> diff --git a/tests/check-block.sh b/tests/check-block.sh
+> index 679aedec50..7582347ec2 100755
+> --- a/tests/check-block.sh
+> +++ b/tests/check-block.sh
+> @@ -26,10 +26,24 @@ if grep -q "CFLAGS.*-fsanitize" config-host.mak 2>/dev/null ; then
+>      exit 0
+>  fi
+>  
+> -if [ -z "$(find . -name 'qemu-system-*' -print)" ]; then
+> +if [ -n "$QEMU_PROG" ]; then
+> +    qemu_prog="$QEMU_PROG"
+> +else
+> +    for binary in *-softmmu/qemu-system-* ; do
+> +        if [ -x "$binary" ]; then
+> +            qemu_prog="$binary"
+> +            break
+> +        fi
 
-So, let's instead count persistent BdrvDirtyBitmaps. We load all qcow2
-bitmaps on open, so there should not be any bitmap in the image for
-which we don't have BdrvDirtyBitmaps version. If it is - it's a kind of
-corruption, and no reason to check for corruptions here (open() and
-close() are better places for it).
+Wouldn't it be better to check the availability of virtio-blk here, so
+that if the current binary doesn't support it, we keep searching and
+maybe pick up a different binary that supports it?
 
-Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
----
- block/qcow2-bitmap.c | 41 ++++++++++++++++++-----------------------
- 1 file changed, 18 insertions(+), 23 deletions(-)
+Or actually, should we work with a whitelist? We already need separate
+code for s390 and x86_64 in some places to choose between -pci and -ccw,
+and the presence of some virtio-blk doesn't mean that we know the
+specifics of how to add a virtio-blk device for this target. This
+suggests that blindly using a random binary might not be possible, but
+tests may have to be adapted before the target can be whitelisted.
 
-diff --git a/block/qcow2-bitmap.c b/block/qcow2-bitmap.c
-index 98294a7696..d5131181a3 100644
---- a/block/qcow2-bitmap.c
-+++ b/block/qcow2-bitmap.c
-@@ -1671,8 +1671,14 @@ bool coroutine_fn qcow2_co_can_store_new_dirty_bitmap(BlockDriverState *bs,
-                                                       Error **errp)
- {
-     BDRVQcow2State *s = bs->opaque;
--    bool found;
--    Qcow2BitmapList *bm_list;
-+    BdrvDirtyBitmap *bitmap;
-+    uint64_t bitmap_directory_size = 0;
-+    uint32_t nb_bitmaps = 0;
-+
-+    if (bdrv_find_dirty_bitmap(bs, name)) {
-+        error_setg(errp, "Bitmap already exists: %s", name);
-+        return false;
-+    }
- 
-     if (s->qcow_version < 3) {
-         /* Without autoclear_features, we would always have to assume
-@@ -1688,38 +1694,27 @@ bool coroutine_fn qcow2_co_can_store_new_dirty_bitmap(BlockDriverState *bs,
-         goto fail;
-     }
- 
--    if (s->nb_bitmaps == 0) {
--        return true;
-+    FOR_EACH_DIRTY_BITMAP(bs, bitmap) {
-+        if (bdrv_dirty_bitmap_get_persistence(bitmap)) {
-+            nb_bitmaps++;
-+            bitmap_directory_size +=
-+                calc_dir_entry_size(strlen(bdrv_dirty_bitmap_name(bitmap)), 0);
-+        }
-     }
-+    nb_bitmaps++;
-+    bitmap_directory_size += calc_dir_entry_size(strlen(name), 0);
- 
--    if (s->nb_bitmaps >= QCOW2_MAX_BITMAPS) {
-+    if (nb_bitmaps > QCOW2_MAX_BITMAPS) {
-         error_setg(errp,
-                    "Maximum number of persistent bitmaps is already reached");
-         goto fail;
-     }
- 
--    if (s->bitmap_directory_size + calc_dir_entry_size(strlen(name), 0) >
--        QCOW2_MAX_BITMAP_DIRECTORY_SIZE)
--    {
-+    if (bitmap_directory_size > QCOW2_MAX_BITMAP_DIRECTORY_SIZE) {
-         error_setg(errp, "Not enough space in the bitmap directory");
-         goto fail;
-     }
- 
--    qemu_co_mutex_lock(&s->lock);
--    bm_list = bitmap_list_load(bs, s->bitmap_directory_offset,
--                               s->bitmap_directory_size, errp);
--    qemu_co_mutex_unlock(&s->lock);
--    if (bm_list == NULL) {
--        goto fail;
--    }
--
--    found = find_bitmap_by_name(bm_list, name);
--    bitmap_list_free(bm_list);
--    if (found) {
--        error_setg(errp, "Bitmap with the same name is already stored");
--        goto fail;
--    }
--
-     return true;
- 
- fail:
--- 
-2.21.0
+Kevin
 
+> +    done
+> +fi
+> +if [ -z "$qemu_prog" ]; then
+>      echo "No qemu-system binary available ==> Not running the qemu-iotests."
+>      exit 0
+>  fi
+> +if ! "$qemu_prog" -M none -device help | grep virtio-blk >/dev/null 2>&1 ; then
+> +    echo "$qemu_prog does not support virtio-blk ==> Not running the qemu-iotests."
+> +    exit 0
+> +fi
+>  
+>  if ! command -v bash >/dev/null 2>&1 ; then
+>      echo "bash not available ==> Not running the qemu-iotests."
+> -- 
+> 2.18.1
+> 
 
