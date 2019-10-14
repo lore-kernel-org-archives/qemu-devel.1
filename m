@@ -2,65 +2,77 @@ Return-Path: <SRS0=PUPy=YH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 94C18C4CECE
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 09:59:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C77CC4CECE
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 10:02:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6A01220663
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 09:59:33 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6A01220663
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 2FBF5207FF
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 10:02:47 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2FBF5207FF
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46366 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46390 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iJx8W-0006CA-L5
-	for qemu-devel@archiver.kernel.org; Mon, 14 Oct 2019 05:59:32 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37777)
+	id 1iJxBe-0007ib-4k
+	for qemu-devel@archiver.kernel.org; Mon, 14 Oct 2019 06:02:46 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38161)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <kwolf@redhat.com>) id 1iJx7T-0005ge-Qw
- for qemu-devel@nongnu.org; Mon, 14 Oct 2019 05:58:29 -0400
+ (envelope-from <bounces@canonical.com>) id 1iJxAJ-0006zi-6f
+ for qemu-devel@nongnu.org; Mon, 14 Oct 2019 06:01:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kwolf@redhat.com>) id 1iJx7S-000509-TF
- for qemu-devel@nongnu.org; Mon, 14 Oct 2019 05:58:27 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:39939)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <kwolf@redhat.com>)
- id 1iJx7Q-0004xO-OD; Mon, 14 Oct 2019 05:58:24 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id ED29610DCCA4;
- Mon, 14 Oct 2019 09:58:23 +0000 (UTC)
-Received: from localhost.localdomain (unknown [10.36.118.40])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id CECB65DA2C;
- Mon, 14 Oct 2019 09:58:22 +0000 (UTC)
-Date: Mon, 14 Oct 2019 11:58:21 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-To: Max Reitz <mreitz@redhat.com>
-Subject: Re: [PATCH v2] iotests/028: Fix for long $TEST_DIRs
-Message-ID: <20191014095821.GD7173@localhost.localdomain>
-References: <20191011121808.3243-1-mreitz@redhat.com>
+ (envelope-from <bounces@canonical.com>) id 1iJxAD-0008L4-Sh
+ for qemu-devel@nongnu.org; Mon, 14 Oct 2019 06:01:23 -0400
+Received: from indium.canonical.com ([91.189.90.7]:39970)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <bounces@canonical.com>)
+ id 1iJxAB-00088R-6M
+ for qemu-devel@nongnu.org; Mon, 14 Oct 2019 06:01:17 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1iJxA6-0002P2-E1
+ for <qemu-devel@nongnu.org>; Mon, 14 Oct 2019 10:01:10 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 675892E802D
+ for <qemu-devel@nongnu.org>; Mon, 14 Oct 2019 10:01:10 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20191011121808.3243-1-mreitz@redhat.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.64]); Mon, 14 Oct 2019 09:58:23 +0000 (UTC)
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 14 Oct 2019 09:53:08 -0000
+From: David Hildenbrand <1847232@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Tags: s390x
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: davidhildenbrand ivmn
+X-Launchpad-Bug-Reporter: Ivan Warren (ivmn)
+X-Launchpad-Bug-Modifier: David Hildenbrand (davidhildenbrand)
+References: <157053356610.22354.6751604707489617887.malonedeb@gac.canonical.com>
+ <61ce859f-0817-0eba-7eb8-2c16b3e73889@redhat.com>
+ <7a661e58-72df-94bc-4712-f306ce5ee7c6@vmfacility.fr>
+Message-Id: <8ada8acb-d2ce-a09d-6c9a-b758360edcb2@redhat.com>
+Subject: Re: [Bug 1847232] [NEW] qemu TCG in s390x mode issue with calculating
+ HASH
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="af2eefe214bd95389a09b7c956720881bab16807";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: f565de9d72854df3614f36e595dccc25f3694365
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 209.132.183.28
+X-Received-From: 91.189.90.7
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -69,27 +81,143 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org,
- qemu-block@nongnu.org
+Reply-To: Bug 1847232 <1847232@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
+Message-ID: <20191014095308.LpuohJsGmdUEe-7qYFiI9hKIu7Cc3xFmf4NEu6Y4Fks@z>
 
-Am 11.10.2019 um 14:18 hat Max Reitz geschrieben:
-> For long test image paths, the order of the "Formatting" line and the
-> "(qemu)" prompt after a drive_backup HMP command may be reversed.  In
-> fact, the interaction between the prompt and the line may lead to the
-> "Formatting" to being greppable at all after "read"-ing it (if the
-> prompt injects an IFS character into the "Formatting" string).
-> 
-> So just wait until we get a prompt.  At that point, the block job must
-> have been started, so "info block-jobs" will only return "No active
-> jobs" once it is done.
-> 
-> Reported-by: Thomas Huth <thuth@redhat.com>
-> Signed-off-by: Max Reitz <mreitz@redhat.com>
+On 08.10.19 16:11, Ivan Warren wrote:
+> =
 
-Thanks, applied to the block branch.
+> On 10/8/2019 3:35 PM, David Hildenbrand wrote:
+>> On 08.10.19 14:11, Cornelia Huck wrote:
+>>> On Tue, 08 Oct 2019 11:19:25 -0000
+>>> Ivan Warren via <qemu-devel@nongnu.org> wrote:
+>>>
+>>>> Public bug reported:
+>>>>
+>>>> When using go on s390x on Debian x64 (buster) (host) and debian s390x
+>>>> (sid) (guest) I run into the following problem :
+>>>>
+>>>> The following occurs while trying to build a custom project :
+>>>>
+>>>> go: github.com/FactomProject/basen@v0.0.0-20150613233007-fe3947df716e:
+>>>> Get
+>>>> https://proxy.golang.org/github.com/%21factom%21project/basen/@v/v0.0.=
+0-20150613233007-fe3947df716e.mod:
+>>>> local error: tls: bad record MAC
+>>>>
+>>>> Doing a git bisect I find that this problem only occurs on and after
+>>>> commit 08ef92d556c584c7faf594ff3af46df456276e1b
+>>>>
+>>>> Before that commit, all works fine. Past this commit, build always
+>>>> fails.
+>>> What version are you using? Current master?
+>>>
+>>> Can you please share your command line?
+>>>
+>>>> Without any proof, It looks like a hash calculation bug related to usi=
+ng
+>>>> z/Arch vector facilities...
+>>> Not an unreasonable guess, cc:ing David in case he has seen that before.
+>>>
+>> Can you reproduce with "-cpu qemu,vx=3Doff" added to the QEMU command
+>> line? Could be some fallout from vector instruction support. Currently
+>> ill, will have a look when I'm feeling better.
+> =
 
-Kevin
+> Reposted with a reply all... (sorry for the duplicates)
+> =
+
+> So it does !
+> =
+
+> =
+
+> My qemu command line is now (forget the odd funny networking things..)
+> =
+
+> qemu-system-s390x \
+>   =C2=A0=C2=A0=C2=A0 -drive
+> file=3DDEB002.IMG.NEW,discard=3Dunmap,cache=3Dwriteback,id=3Ddrive-0,if=
+=3Dnone \
+>   =C2=A0=C2=A0=C2=A0 -device virtio-scsi-ccw,id=3Dvirtio-scsi-0 \
+>   =C2=A0=C2=A0=C2=A0 -device scsi-hd,id=3Dscsi-hd-0,drive=3Ddrive-0 \
+>   =C2=A0=C2=A0=C2=A0 -m 8G \
+>   =C2=A0=C2=A0=C2=A0 -net nic,macaddr=3D52:54:00:00:00:02 \
+>   =C2=A0=C2=A0=C2=A0 -net tap,ifname=3Dtaparm,script=3Dno \
+>   =C2=A0=C2=A0=C2=A0 -nographic -accel tcg,thread=3Dmulti \
+>   =C2=A0=C2=A0=C2=A0 -monitor unix:ms,server,nowait \
+>   =C2=A0=C2=A0=C2=A0 -cpu qemu,vx=3Doff \=C2=A0 ##### THAT WAS ADDED as i=
+nstructed - without it
+> everything goes kaput !
+>   =C2=A0=C2=A0=C2=A0 -smp 12
+> =
+
+> And using the latest bleeding edge qemu from github, my build works (the
+> problem goes away).
+> =
+
+> So the z/Arch vector instructions may have a glitch is a venue to
+> consider.. Probably one that couldn't be screened through conventional
+> methods.
+> =
+
+> I'm not that versed into z/Arch vector instruction, but if there
+> anything I can help with, I will !
+
+I'll have to reproduce, can you outline the steps needed to trigger =
+
+this? (never had to build a go project before #luckyme ( ;) )). It looks =
+
+like https://github.com/FactomProject/basen is getting pulled in from =
+
+some other project?
+
+Thanks!
+
+
+-- =
+
+
+Thanks,
+
+David / dhildenb
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1847232
+
+Title:
+  qemu TCG in s390x mode issue with calculating HASH
+
+Status in QEMU:
+  New
+
+Bug description:
+  When using go on s390x on Debian x64 (buster) (host) and debian s390x
+  (sid) (guest) I run into the following problem :
+
+  The following occurs while trying to build a custom project :
+
+  go: github.com/FactomProject/basen@v0.0.0-20150613233007-fe3947df716e:
+  Get
+  https://proxy.golang.org/github.com/%21factom%21project/basen/@v/v0.0.0-2=
+0150613233007-fe3947df716e.mod:
+  local error: tls: bad record MAC
+
+  Doing a git bisect I find that this problem only occurs on and after
+  commit 08ef92d556c584c7faf594ff3af46df456276e1b
+
+  Before that commit, all works fine. Past this commit, build always
+  fails.
+
+  Without any proof, It looks like a hash calculation bug related to
+  using z/Arch vector facilities...
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1847232/+subscriptions
 
