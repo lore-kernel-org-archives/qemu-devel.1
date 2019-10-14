@@ -6,46 +6,45 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 62C11C4CECE
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 12:04:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A28BC4CECE
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 12:04:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 384802084B
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 12:04:24 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 384802084B
+	by mail.kernel.org (Postfix) with ESMTPS id 7063520673
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 12:04:44 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7063520673
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=users.sourceforge.jp
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48422 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48424 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iJz5K-0002EJ-Hp
-	for qemu-devel@archiver.kernel.org; Mon, 14 Oct 2019 08:04:22 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53396)
+	id 1iJz5e-0002W3-Tf
+	for qemu-devel@archiver.kernel.org; Mon, 14 Oct 2019 08:04:42 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53508)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <ysato@users.sourceforge.jp>) id 1iJyzJ-0005Pw-V8
- for qemu-devel@nongnu.org; Mon, 14 Oct 2019 07:58:11 -0400
+ (envelope-from <ysato@users.sourceforge.jp>) id 1iJyzN-0005TN-He
+ for qemu-devel@nongnu.org; Mon, 14 Oct 2019 07:58:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <ysato@users.sourceforge.jp>) id 1iJyzI-0003UQ-F6
- for qemu-devel@nongnu.org; Mon, 14 Oct 2019 07:58:09 -0400
-Received: from mail02.asahi-net.or.jp ([202.224.55.14]:35672)
+ (envelope-from <ysato@users.sourceforge.jp>) id 1iJyzL-0003az-JO
+ for qemu-devel@nongnu.org; Mon, 14 Oct 2019 07:58:13 -0400
+Received: from mail03.asahi-net.or.jp ([202.224.55.15]:35705)
  by eggs.gnu.org with esmtp (Exim 4.71)
- (envelope-from <ysato@users.sourceforge.jp>) id 1iJyzI-0003Qh-6d
- for qemu-devel@nongnu.org; Mon, 14 Oct 2019 07:58:08 -0400
+ (envelope-from <ysato@users.sourceforge.jp>) id 1iJyzL-0003ZX-9a
+ for qemu-devel@nongnu.org; Mon, 14 Oct 2019 07:58:11 -0400
 Received: from h61-195-96-97.vps.ablenet.jp (h61-195-96-97.ablenetvps.ne.jp
  [61.195.96.97]) (Authenticated sender: PQ4Y-STU)
- by mail02.asahi-net.or.jp (Postfix) with ESMTPA id 9EE9D6DF52;
- Mon, 14 Oct 2019 20:58:04 +0900 (JST)
+ by mail03.asahi-net.or.jp (Postfix) with ESMTPA id 836D175D3B;
+ Mon, 14 Oct 2019 20:58:10 +0900 (JST)
 Received: from yo-satoh-debian.localdomain (ZM005235.ppp.dion.ne.jp
  [222.8.5.235])
- by h61-195-96-97.vps.ablenet.jp (Postfix) with ESMTPSA id 21EAF240091;
- Mon, 14 Oct 2019 20:58:04 +0900 (JST)
+ by h61-195-96-97.vps.ablenet.jp (Postfix) with ESMTPSA id 45D6824008E;
+ Mon, 14 Oct 2019 20:58:10 +0900 (JST)
 From: Yoshinori Sato <ysato@users.sourceforge.jp>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v26 03/21] hw/registerfields.h: Add 8bit and 16bit register
- macros
-Date: Mon, 14 Oct 2019 20:57:39 +0900
-Message-Id: <20191014115757.51866-4-ysato@users.sourceforge.jp>
+Subject: [PATCH v26 18/21] hw/rx: Honor -accel qtest
+Date: Mon, 14 Oct 2019 20:57:54 +0900
+Message-Id: <20191014115757.51866-19-ysato@users.sourceforge.jp>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20191014115757.51866-1-ysato@users.sourceforge.jp>
 References: <20191014115757.51866-1-ysato@users.sourceforge.jp>
@@ -54,7 +53,7 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 202.224.55.14
+X-Received-From: 202.224.55.15
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -66,131 +65,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Richard Henderson <richard.henderson@linaro.org>,
- Alistair Francis <alistair.francis@wdc.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+Cc: philmd@redhat.com, Richard Henderson <richard.henderson@linaro.org>,
  Yoshinori Sato <ysato@users.sourceforge.jp>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+From: Richard Henderson <richard.henderson@linaro.org>
 
-Some RX peripheral using 8bit and 16bit registers.
-Added 8bit and 16bit APIs.
+Issue an error if no kernel, no bios, and not qtest'ing.
+Fixes make check-qtest-rx: test/qom-test.
 
-Signed-off-by: Yoshinori Sato <ysato@users.sourceforge.jp>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-Message-Id: <20190607091116.49044-11-ysato@users.sourceforge.jp>
+Signed-off-by: Yoshinori Sato <ysato@users.sourceforge.jp>
+Message-Id: <20190607091116.49044-16-ysato@users.sourceforge.jp>
 Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- include/hw/registerfields.h | 32 +++++++++++++++++++++++++++++++-
- 1 file changed, 31 insertions(+), 1 deletion(-)
+We could squash this with the previous patch
+---
+ hw/rx/rx62n.c | 10 +++++++++-
+ 1 file changed, 9 insertions(+), 1 deletion(-)
 
-diff --git a/include/hw/registerfields.h b/include/hw/registerfields.h
-index 2659a58737..a0bb0654d6 100644
---- a/include/hw/registerfields.h
-+++ b/include/hw/registerfields.h
-@@ -22,6 +22,14 @@
-     enum { A_ ## reg =3D (addr) };                                      =
-    \
-     enum { R_ ## reg =3D (addr) / 4 };
+diff --git a/hw/rx/rx62n.c b/hw/rx/rx62n.c
+index ac47f2a397..a0986fd15e 100644
+--- a/hw/rx/rx62n.c
++++ b/hw/rx/rx62n.c
+@@ -21,12 +21,14 @@
 =20
-+#define REG8(reg, addr)                                                 =
- \
-+    enum { A_ ## reg =3D (addr) };                                      =
-    \
-+    enum { R_ ## reg =3D (addr) };
+ #include "qemu/osdep.h"
+ #include "qapi/error.h"
++#include "qemu/error-report.h"
+ #include "hw/hw.h"
+ #include "hw/rx/rx62n.h"
+ #include "hw/loader.h"
+ #include "hw/sysbus.h"
+ #include "hw/qdev-properties.h"
+ #include "sysemu/sysemu.h"
++#include "sysemu/qtest.h"
+ #include "cpu.h"
+=20
+ /*
+@@ -191,8 +193,14 @@ static void rx62n_realize(DeviceState *dev, Error **=
+errp)
+     memory_region_init_rom(&s->c_flash, NULL, "codeflash",
+                            RX62N_CFLASH_SIZE, errp);
+     memory_region_add_subregion(s->sysmem, RX62N_CFLASH_BASE, &s->c_flas=
+h);
 +
-+#define REG16(reg, addr)                                                =
-  \
-+    enum { A_ ## reg =3D (addr) };                                      =
-    \
-+    enum { R_ ## reg =3D (addr) / 2 };
-+
- /* Define SHIFT, LENGTH and MASK constants for a field within a register=
- */
+     if (!s->kernel) {
+-        rom_add_file_fixed(bios_name, RX62N_CFLASH_BASE, 0);
++        if (bios_name) {
++            rom_add_file_fixed(bios_name, RX62N_CFLASH_BASE, 0);
++        }  else if (!qtest_enabled()) {
++            error_report("No bios or kernel specified");
++            exit(1);
++        }
+     }
 =20
- /* This macro will define R_FOO_BAR_MASK, R_FOO_BAR_SHIFT and R_FOO_BAR_=
-LENGTH
-@@ -34,6 +42,12 @@
-                                         MAKE_64BIT_MASK(shift, length)};
-=20
- /* Extract a field from a register */
-+#define FIELD_EX8(storage, reg, field)                                  =
-  \
-+    extract8((storage), R_ ## reg ## _ ## field ## _SHIFT,              =
-  \
-+              R_ ## reg ## _ ## field ## _LENGTH)
-+#define FIELD_EX16(storage, reg, field)                                 =
-  \
-+    extract16((storage), R_ ## reg ## _ ## field ## _SHIFT,             =
-  \
-+              R_ ## reg ## _ ## field ## _LENGTH)
- #define FIELD_EX32(storage, reg, field)                                 =
-  \
-     extract32((storage), R_ ## reg ## _ ## field ## _SHIFT,             =
-  \
-               R_ ## reg ## _ ## field ## _LENGTH)
-@@ -49,6 +63,22 @@
-  * Assigning values larger then the target field will result in
-  * compilation warnings.
-  */
-+#define FIELD_DP8(storage, reg, field, val) ({                          =
-  \
-+    struct {                                                            =
-  \
-+        unsigned int v:R_ ## reg ## _ ## field ## _LENGTH;              =
-  \
-+    } v =3D { .v =3D val };                                             =
-      \
-+    uint8_t d;                                                          =
-  \
-+    d =3D deposit32((storage), R_ ## reg ## _ ## field ## _SHIFT,       =
-    \
-+                  R_ ## reg ## _ ## field ## _LENGTH, v.v);             =
-  \
-+    d; })
-+#define FIELD_DP16(storage, reg, field, val) ({                         =
-  \
-+    struct {                                                            =
-  \
-+        unsigned int v:R_ ## reg ## _ ## field ## _LENGTH;              =
-  \
-+    } v =3D { .v =3D val };                                             =
-      \
-+    uint16_t d;                                                         =
-  \
-+    d =3D deposit32((storage), R_ ## reg ## _ ## field ## _SHIFT,       =
-    \
-+                  R_ ## reg ## _ ## field ## _LENGTH, v.v);             =
-  \
-+    d; })
- #define FIELD_DP32(storage, reg, field, val) ({                         =
-  \
-     struct {                                                            =
-  \
-         unsigned int v:R_ ## reg ## _ ## field ## _LENGTH;              =
-  \
-@@ -57,7 +87,7 @@
-     d =3D deposit32((storage), R_ ## reg ## _ ## field ## _SHIFT,       =
-    \
-                   R_ ## reg ## _ ## field ## _LENGTH, v.v);             =
-  \
-     d; })
--#define FIELD_DP64(storage, reg, field, val) ({                         =
-  \
-+#define FIELD_DP64(storage, reg, field, val) ({                         =
-\
-     struct {                                                            =
-  \
-         unsigned int v:R_ ## reg ## _ ## field ## _LENGTH;              =
-  \
-     } v =3D { .v =3D val };                                             =
-      \
+     /* Initialize CPU */
 --=20
 2.20.1
 
