@@ -2,85 +2,74 @@ Return-Path: <SRS0=PUPy=YH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.7 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5919EC4CECE
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 18:06:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 15EBCC4CECE
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 18:07:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 212922067B
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 18:06:27 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QLQ7i4Gf"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 212922067B
+	by mail.kernel.org (Postfix) with ESMTPS id E0DF52067B
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 18:07:02 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E0DF52067B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55186 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55188 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iK4ji-0002CC-8s
-	for qemu-devel@archiver.kernel.org; Mon, 14 Oct 2019 14:06:26 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54503)
+	id 1iK4kI-0002xz-2F
+	for qemu-devel@archiver.kernel.org; Mon, 14 Oct 2019 14:07:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48968)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alistair23@gmail.com>) id 1iK4hf-0000ZO-Lg
- for qemu-devel@nongnu.org; Mon, 14 Oct 2019 14:04:23 -0400
+ (envelope-from <bounces@canonical.com>) id 1iK4BS-0005iX-S0
+ for qemu-devel@nongnu.org; Mon, 14 Oct 2019 13:31:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alistair23@gmail.com>) id 1iK4hd-00021Z-QK
- for qemu-devel@nongnu.org; Mon, 14 Oct 2019 14:04:19 -0400
-Received: from mail-lj1-x243.google.com ([2a00:1450:4864:20::243]:41770)
+ (envelope-from <bounces@canonical.com>) id 1iK4BR-0001zt-OW
+ for qemu-devel@nongnu.org; Mon, 14 Oct 2019 13:31:02 -0400
+Received: from indium.canonical.com ([91.189.90.7]:57340)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alistair23@gmail.com>)
- id 1iK4hd-00020G-JB; Mon, 14 Oct 2019 14:04:17 -0400
-Received: by mail-lj1-x243.google.com with SMTP id f5so17538027ljg.8;
- Mon, 14 Oct 2019 11:04:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=rhdrg81D3zFb/5jPiNttaG5jl5przVJq6yYoJEQEoZQ=;
- b=QLQ7i4Gf0Yeoxl7HlMx2eq7/1Hqi8jnLcvhxkFugP2X/0ea4utTCL3cCmvSy9ryNc2
- 9dNMgGlNz9mmmPllGkOTkiWvoYDTszjKloWTBd0ROBiVFcpT8A0jIfboTnT5JtgCuu0y
- Ckkk5+6LOLyEYCESu/NyBOS/kNtwy3k+Liyhqt0EAszE6wQt/s2qaDxfgrXuj9CAcyl1
- IlijkljTuIuN1re+meWkEMQJkleoZKAnGJZ5ngihzPRYGGeomTw2nst5SXlheDTQRFPq
- 8et2MQDOzNkWhNgpx+J3y98kOXgpwZpFLmH8Dw1FDMpIsGwWAfrT67YacTdKfa+SOp3y
- 5PCA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=rhdrg81D3zFb/5jPiNttaG5jl5przVJq6yYoJEQEoZQ=;
- b=W4+3VX6poNlj2whrgS1EE0qnARcdsbBgBo23wj1eNuuj2TXhTNNZ11A+LRL4I4n1Rm
- LLxygbC+vPuNt7zWmDVUZxO5Ol8RER/fst6SKvLZynLUq3iIjsHUe2jJdhuynIE1HKBh
- S1KMGobL4Ps7d1WhQF9ordwzIgNm8PgTYuW2CQXTOXc0jYQy7fV0pNkqNSKf38xTEwaj
- yvDdAWRYZwvVHe7s8T6pGWqzMEsRTT24Rxo5tr9G2XIeREZRvwd75FKPkW5dTO266zzP
- xoZrxoj7VSGUBPyQr3njkEZBRRIdSTHXZnWBAqoL2cB3vP1XDxG4NvZ5eHMSYuSeozJs
- rBDg==
-X-Gm-Message-State: APjAAAUFqPGpLlt9hbyxHpdecMJlU1jKVbKr6QWCJx0cah8e3YTuJ85w
- e3H09jAv+v9qVs9x6ZgNfCVGxK1z9gwLReilCWo=
-X-Google-Smtp-Source: APXvYqxBHIMMYSmafcCHSzgVK7CAZ9NnrhSYQXsHXRyzzILtza+boqtIAtQVbdU+YZrK0TCf5GQLixnyKz50cMhXXxY=
-X-Received: by 2002:a2e:82cd:: with SMTP id n13mr19661355ljh.156.1571076254296; 
- Mon, 14 Oct 2019 11:04:14 -0700 (PDT)
+ (Exim 4.71) (envelope-from <bounces@canonical.com>)
+ id 1iK4BR-0001zV-Iq
+ for qemu-devel@nongnu.org; Mon, 14 Oct 2019 13:31:01 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1iK4BP-000524-Mg
+ for <qemu-devel@nongnu.org>; Mon, 14 Oct 2019 17:30:59 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id AA3412E80C9
+ for <qemu-devel@nongnu.org>; Mon, 14 Oct 2019 17:30:59 +0000 (UTC)
 MIME-Version: 1.0
-References: <20191014104948.4291-1-alex.bennee@linaro.org>
- <20191014104948.4291-32-alex.bennee@linaro.org>
-In-Reply-To: <20191014104948.4291-32-alex.bennee@linaro.org>
-From: Alistair Francis <alistair23@gmail.com>
-Date: Mon, 14 Oct 2019 10:59:07 -0700
-Message-ID: <CAKmqyKPCYwYvD3hqJ1OW0KH3SjGpG7cypJw9V5sCg6bZ9ueUfw@mail.gmail.com>
-Subject: Re: [PATCH v5 31/55] target/riscv: fetch code with translator_ld
-To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::243
+Date: Mon, 14 Oct 2019 17:23:57 -0000
+From: Shachar Itzhaky <corwin.amber@gmail.com>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: corwin-amber pmaydell zenojevski
+X-Launchpad-Bug-Reporter: Shachar Itzhaky (corwin-amber)
+X-Launchpad-Bug-Modifier: Shachar Itzhaky (corwin-amber)
+References: <157097450557.5820.4200729468686724078.malonedeb@gac.canonical.com>
+Message-Id: <157107383710.5928.6877894875959962008.malone@gac.canonical.com>
+Subject: [Bug 1847906] Re: Cocoa display hangs on macOS 10.15 (Catalina)
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="af2eefe214bd95389a09b7c956720881bab16807";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: 4a2787527d57c24bdfc26e58075a56d3afb071a1
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 91.189.90.7
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -89,51 +78,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "open list:RISC-V TCG CPUs" <qemu-riscv@nongnu.org>,
- Sagar Karandikar <sagark@eecs.berkeley.edu>,
- Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
- robert.foley@futurewei.com, Palmer Dabbelt <palmer@sifive.com>,
- Richard Henderson <richard.henderson@linaro.org>,
- "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
- peter.puhov@futurewei.com, aaron@os.amperecomputing.com,
- "Emilio G. Cota" <cota@braap.org>, Alistair Francis <Alistair.Francis@wdc.com>
+Reply-To: Bug 1847906 <1847906@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, Oct 14, 2019 at 4:20 AM Alex Benn=C3=A9e <alex.bennee@linaro.org> w=
-rote:
->
-> From: "Emilio G. Cota" <cota@braap.org>
->
-> Signed-off-by: Emilio G. Cota <cota@braap.org>
-> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+This is wonderful! Thank you Peter and Hikaru for this patch. I will try
+it ASAP and confirm.
 
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+-- =
 
-Alistair
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1847906
 
-> ---
->  target/riscv/translate.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/target/riscv/translate.c b/target/riscv/translate.c
-> index adeddb85f6..b26533d4fd 100644
-> --- a/target/riscv/translate.c
-> +++ b/target/riscv/translate.c
-> @@ -779,7 +779,7 @@ static void riscv_tr_translate_insn(DisasContextBase =
-*dcbase, CPUState *cpu)
->      DisasContext *ctx =3D container_of(dcbase, DisasContext, base);
->      CPURISCVState *env =3D cpu->env_ptr;
->
-> -    ctx->opcode =3D cpu_ldl_code(env, ctx->base.pc_next);
-> +    ctx->opcode =3D translator_ldl(env, ctx->base.pc_next);
->      decode_opc(ctx);
->      ctx->base.pc_next =3D ctx->pc_succ_insn;
->
-> --
-> 2.20.1
->
->
+Title:
+  Cocoa display hangs on macOS 10.15 (Catalina)
+
+Status in QEMU:
+  New
+
+Bug description:
+  I have downloaded the latest stable source tarball 4.1.0 and compiled
+  it (i386-softmmu target).
+
+  After opening a black window, QEMU hangs (spinning beach ball).
+  When building with `--disable-cocoa --enable-sdl`, display seems to work =
+fine.
+
+  The same happened when I tried to build QEMU through HomeBrew and
+  MacPorts.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1847906/+subscriptions
 
