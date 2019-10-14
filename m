@@ -6,53 +6,54 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E72BECE58C
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 19:36:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 72DA1ECE58C
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 19:36:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id ECEA9217F9
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 19:36:16 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ECEA9217F9
+	by mail.kernel.org (Postfix) with ESMTPS id 48D192089C
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 19:36:47 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 48D192089C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56376 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56378 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iK68d-0003Y0-Kl
-	for qemu-devel@archiver.kernel.org; Mon, 14 Oct 2019 15:36:15 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40305)
+	id 1iK698-00048C-05
+	for qemu-devel@archiver.kernel.org; Mon, 14 Oct 2019 15:36:46 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40666)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jsnow@redhat.com>) id 1iK62Q-0005rE-7t
- for qemu-devel@nongnu.org; Mon, 14 Oct 2019 15:29:51 -0400
+ (envelope-from <jsnow@redhat.com>) id 1iK634-0006rI-CN
+ for qemu-devel@nongnu.org; Mon, 14 Oct 2019 15:30:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1iK62O-0002h1-U3
- for qemu-devel@nongnu.org; Mon, 14 Oct 2019 15:29:50 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:52244)
+ (envelope-from <jsnow@redhat.com>) id 1iK633-0003BS-09
+ for qemu-devel@nongnu.org; Mon, 14 Oct 2019 15:30:30 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:4766)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <jsnow@redhat.com>)
- id 1iK62M-0002Zh-2U; Mon, 14 Oct 2019 15:29:46 -0400
+ id 1iK630-00039q-0j; Mon, 14 Oct 2019 15:30:26 -0400
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
  [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 4D27410CC1FC;
- Mon, 14 Oct 2019 19:29:45 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 3398DC053B34;
+ Mon, 14 Oct 2019 19:30:25 +0000 (UTC)
 Received: from probe.bos.redhat.com (dhcp-17-152.bos.redhat.com [10.18.17.152])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 01CB960BE2;
- Mon, 14 Oct 2019 19:29:29 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id D0D3360BE2;
+ Mon, 14 Oct 2019 19:30:23 +0000 (UTC)
 From: John Snow <jsnow@redhat.com>
 To: Peter Maydell <peter.maydell@linaro.org>,
 	qemu-devel@nongnu.org
-Subject: [PULL v2 05/19] block/dirty-bitmap: drop meta
-Date: Mon, 14 Oct 2019 15:28:55 -0400
-Message-Id: <20191014192909.16044-6-jsnow@redhat.com>
+Subject: [PULL v2 16/19] block/qcow2-bitmap: fix and improve
+ qcow2_reopen_bitmaps_rw
+Date: Mon, 14 Oct 2019 15:29:06 -0400
+Message-Id: <20191014192909.16044-17-jsnow@redhat.com>
 In-Reply-To: <20191014192909.16044-1-jsnow@redhat.com>
 References: <20191014192909.16044-1-jsnow@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.65]); Mon, 14 Oct 2019 19:29:45 +0000 (UTC)
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.31]); Mon, 14 Oct 2019 19:30:25 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
@@ -80,144 +81,155 @@ Sender: "Qemu-devel"
 
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
-Drop meta bitmaps, as they are unused.
+- Correct check for write access to file child, and in correct place
+  (only if we want to write).
+- Support reopen rw -> rw (which will be used in following commit),
+  for example, !bdrv_dirty_bitmap_readonly() is not a corruption if
+  bitmap is marked IN_USE in the image.
+- Consider unexpected bitmap as a corruption and check other
+  combinations of in-image and in-RAM bitmaps.
 
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Reviewed-by: John Snow <jsnow@redhat.com>
-Message-id: 20190916141911.5255-2-vsementsov@virtuozzo.com
+Message-id: 20190927122355.7344-9-vsementsov@virtuozzo.com
 Signed-off-by: John Snow <jsnow@redhat.com>
 ---
- include/block/dirty-bitmap.h |  5 ----
- block/dirty-bitmap.c         | 46 ------------------------------------
- 2 files changed, 51 deletions(-)
+ block/qcow2-bitmap.c | 77 +++++++++++++++++++++++++++++++++-----------
+ 1 file changed, 58 insertions(+), 19 deletions(-)
 
-diff --git a/include/block/dirty-bitmap.h b/include/block/dirty-bitmap.h
-index 07503b03b5..973056778a 100644
---- a/include/block/dirty-bitmap.h
-+++ b/include/block/dirty-bitmap.h
-@@ -18,9 +18,6 @@ BdrvDirtyBitmap *bdrv_create_dirty_bitmap(BlockDriverSt=
-ate *bs,
-                                           uint32_t granularity,
-                                           const char *name,
-                                           Error **errp);
--void bdrv_create_meta_dirty_bitmap(BdrvDirtyBitmap *bitmap,
--                                   int chunk_size);
--void bdrv_release_meta_dirty_bitmap(BdrvDirtyBitmap *bitmap);
- int bdrv_dirty_bitmap_create_successor(BlockDriverState *bs,
-                                        BdrvDirtyBitmap *bitmap,
-                                        Error **errp);
-@@ -54,7 +51,6 @@ void bdrv_set_dirty_bitmap(BdrvDirtyBitmap *bitmap,
-                            int64_t offset, int64_t bytes);
- void bdrv_reset_dirty_bitmap(BdrvDirtyBitmap *bitmap,
-                              int64_t offset, int64_t bytes);
--BdrvDirtyBitmapIter *bdrv_dirty_meta_iter_new(BdrvDirtyBitmap *bitmap);
- BdrvDirtyBitmapIter *bdrv_dirty_iter_new(BdrvDirtyBitmap *bitmap);
- void bdrv_dirty_iter_free(BdrvDirtyBitmapIter *iter);
+diff --git a/block/qcow2-bitmap.c b/block/qcow2-bitmap.c
+index f7dfb40256..98294a7696 100644
+--- a/block/qcow2-bitmap.c
++++ b/block/qcow2-bitmap.c
+@@ -1108,18 +1108,14 @@ int qcow2_reopen_bitmaps_rw(BlockDriverState *bs,=
+ Error **errp)
+     Qcow2BitmapList *bm_list;
+     Qcow2Bitmap *bm;
+     GSList *ro_dirty_bitmaps =3D NULL;
+-    int ret =3D 0;
++    int ret =3D -EINVAL;
++    bool need_header_update =3D false;
 =20
-@@ -96,7 +92,6 @@ void bdrv_reset_dirty_bitmap_locked(BdrvDirtyBitmap *bi=
-tmap,
- int64_t bdrv_dirty_iter_next(BdrvDirtyBitmapIter *iter);
- void bdrv_set_dirty_iter(BdrvDirtyBitmapIter *hbi, int64_t offset);
- int64_t bdrv_get_dirty_count(BdrvDirtyBitmap *bitmap);
--int64_t bdrv_get_meta_dirty_count(BdrvDirtyBitmap *bitmap);
- void bdrv_dirty_bitmap_truncate(BlockDriverState *bs, int64_t bytes);
- bool bdrv_dirty_bitmap_readonly(const BdrvDirtyBitmap *bitmap);
- bool bdrv_has_readonly_bitmaps(BlockDriverState *bs);
-diff --git a/block/dirty-bitmap.c b/block/dirty-bitmap.c
-index 03e0872b97..4ecf18d5df 100644
---- a/block/dirty-bitmap.c
-+++ b/block/dirty-bitmap.c
-@@ -31,7 +31,6 @@
- struct BdrvDirtyBitmap {
-     QemuMutex *mutex;
-     HBitmap *bitmap;            /* Dirty bitmap implementation */
--    HBitmap *meta;              /* Meta dirty bitmap */
-     bool busy;                  /* Bitmap is busy, it can't be used via =
-QMP */
-     BdrvDirtyBitmap *successor; /* Anonymous child, if any. */
-     char *name;                 /* Optional non-empty unique ID */
-@@ -127,36 +126,6 @@ BdrvDirtyBitmap *bdrv_create_dirty_bitmap(BlockDrive=
-rState *bs,
-     return bitmap;
- }
+     if (s->nb_bitmaps =3D=3D 0) {
+         /* No bitmaps - nothing to do */
+         return 0;
+     }
 =20
--/* bdrv_create_meta_dirty_bitmap
-- *
-- * Create a meta dirty bitmap that tracks the changes of bits in @bitmap=
-. I.e.
-- * when a dirty status bit in @bitmap is changed (either from reset to s=
-et or
-- * the other way around), its respective meta dirty bitmap bit will be m=
-arked
-- * dirty as well.
-- *
-- * @bitmap: the block dirty bitmap for which to create a meta dirty bitm=
-ap.
-- * @chunk_size: how many bytes of bitmap data does each bit in the meta =
-bitmap
-- * track.
-- */
--void bdrv_create_meta_dirty_bitmap(BdrvDirtyBitmap *bitmap,
--                                   int chunk_size)
--{
--    assert(!bitmap->meta);
--    qemu_mutex_lock(bitmap->mutex);
--    bitmap->meta =3D hbitmap_create_meta(bitmap->bitmap,
--                                       chunk_size * BITS_PER_BYTE);
--    qemu_mutex_unlock(bitmap->mutex);
--}
+-    if (!can_write(bs)) {
+-        error_setg(errp, "Can't write to the image on reopening bitmaps =
+rw");
+-        return -EINVAL;
+-    }
 -
--void bdrv_release_meta_dirty_bitmap(BdrvDirtyBitmap *bitmap)
--{
--    assert(bitmap->meta);
--    qemu_mutex_lock(bitmap->mutex);
--    hbitmap_free_meta(bitmap->bitmap);
--    bitmap->meta =3D NULL;
--    qemu_mutex_unlock(bitmap->mutex);
--}
--
- int64_t bdrv_dirty_bitmap_size(const BdrvDirtyBitmap *bitmap)
- {
-     return bitmap->size;
-@@ -320,7 +289,6 @@ static void bdrv_release_dirty_bitmap_locked(BdrvDirt=
-yBitmap *bitmap)
-     assert(!bitmap->active_iterators);
-     assert(!bdrv_dirty_bitmap_busy(bitmap));
-     assert(!bdrv_dirty_bitmap_has_successor(bitmap));
--    assert(!bitmap->meta);
-     QLIST_REMOVE(bitmap, list);
-     hbitmap_free(bitmap->bitmap);
-     g_free(bitmap->name);
-@@ -666,15 +634,6 @@ BdrvDirtyBitmapIter *bdrv_dirty_iter_new(BdrvDirtyBi=
-tmap *bitmap)
-     return iter;
- }
+     bm_list =3D bitmap_list_load(bs, s->bitmap_directory_offset,
+                                s->bitmap_directory_size, errp);
+     if (bm_list =3D=3D NULL) {
+@@ -1128,32 +1124,75 @@ int qcow2_reopen_bitmaps_rw(BlockDriverState *bs,=
+ Error **errp)
 =20
--BdrvDirtyBitmapIter *bdrv_dirty_meta_iter_new(BdrvDirtyBitmap *bitmap)
--{
--    BdrvDirtyBitmapIter *iter =3D g_new(BdrvDirtyBitmapIter, 1);
--    hbitmap_iter_init(&iter->hbi, bitmap->meta, 0);
--    iter->bitmap =3D bitmap;
--    bitmap->active_iterators++;
--    return iter;
--}
--
- void bdrv_dirty_iter_free(BdrvDirtyBitmapIter *iter)
- {
-     if (!iter) {
-@@ -821,11 +780,6 @@ int64_t bdrv_get_dirty_count(BdrvDirtyBitmap *bitmap=
-)
-     return hbitmap_count(bitmap->bitmap);
- }
+     QSIMPLEQ_FOREACH(bm, bm_list, entry) {
+         BdrvDirtyBitmap *bitmap =3D bdrv_find_dirty_bitmap(bs, bm->name)=
+;
+-        if (bitmap =3D=3D NULL) {
+-            continue;
+-        }
 =20
--int64_t bdrv_get_meta_dirty_count(BdrvDirtyBitmap *bitmap)
--{
--    return hbitmap_count(bitmap->meta);
--}
--
- bool bdrv_dirty_bitmap_readonly(const BdrvDirtyBitmap *bitmap)
- {
-     return bitmap->readonly;
+-        if (!bdrv_dirty_bitmap_readonly(bitmap)) {
+-            error_setg(errp, "Bitmap %s was loaded prior to rw-reopen, b=
+ut was "
+-                       "not marked as readonly. This is a bug, something=
+ went "
+-                       "wrong. All of the bitmaps may be corrupted", bm-=
+>name);
+-            ret =3D -EINVAL;
++        if (!bitmap) {
++            error_setg(errp, "Unexpected bitmap '%s' in image '%s'",
++                       bm->name, bs->filename);
+             goto out;
+         }
+=20
+-        bm->flags |=3D BME_FLAG_IN_USE;
+-        ro_dirty_bitmaps =3D g_slist_append(ro_dirty_bitmaps, bitmap);
++        if (!(bm->flags & BME_FLAG_IN_USE)) {
++            if (!bdrv_dirty_bitmap_readonly(bitmap)) {
++                error_setg(errp, "Corruption: bitmap '%s' is not marked =
+IN_USE "
++                           "in the image '%s' and not marked readonly in=
+ RAM",
++                           bm->name, bs->filename);
++                goto out;
++            }
++            if (bdrv_dirty_bitmap_inconsistent(bitmap)) {
++                error_setg(errp, "Corruption: bitmap '%s' is inconsisten=
+t but "
++                           "is not marked IN_USE in the image '%s'", bm-=
+>name,
++                           bs->filename);
++                goto out;
++            }
++
++            bm->flags |=3D BME_FLAG_IN_USE;
++            need_header_update =3D true;
++        } else {
++            /*
++             * What if flags already has BME_FLAG_IN_USE ?
++             *
++             * 1. if we are reopening RW -> RW it's OK, of course.
++             * 2. if we are reopening RO -> RW:
++             *   2.1 if @bitmap is inconsistent, it's OK. It means that =
+it was
++             *       inconsistent (IN_USE) when we loaded it
++             *   2.2 if @bitmap is not inconsistent. This seems to be im=
+possible
++             *       and implies third party interaction. Let's error-ou=
+t for
++             *       safety.
++             */
++            if (bdrv_dirty_bitmap_readonly(bitmap) &&
++                !bdrv_dirty_bitmap_inconsistent(bitmap))
++            {
++                error_setg(errp, "Corruption: bitmap '%s' is marked IN_U=
+SE "
++                           "in the image '%s' but it is readonly and "
++                           "consistent in RAM",
++                           bm->name, bs->filename);
++                goto out;
++            }
++        }
++
++        if (bdrv_dirty_bitmap_readonly(bitmap)) {
++            ro_dirty_bitmaps =3D g_slist_append(ro_dirty_bitmaps, bitmap=
+);
++        }
+     }
+=20
+-    if (ro_dirty_bitmaps !=3D NULL) {
++    if (need_header_update) {
++        if (!can_write(bs->file->bs) || !(bs->file->perm & BLK_PERM_WRIT=
+E)) {
++            error_setg(errp, "Failed to reopen bitmaps rw: no write acce=
+ss "
++                       "the protocol file");
++            goto out;
++        }
++
+         /* in_use flags must be updated */
+         ret =3D update_ext_header_and_dir_in_place(bs, bm_list);
+         if (ret < 0) {
+-            error_setg_errno(errp, -ret, "Can't update bitmap directory"=
+);
++            error_setg_errno(errp, -ret, "Cannot update bitmap directory=
+");
+             goto out;
+         }
+-        g_slist_foreach(ro_dirty_bitmaps, set_readonly_helper, false);
+     }
+=20
++    g_slist_foreach(ro_dirty_bitmaps, set_readonly_helper, false);
++    ret =3D 0;
++
+ out:
+     g_slist_free(ro_dirty_bitmaps);
+     bitmap_list_free(bm_list);
 --=20
 2.21.0
 
