@@ -6,54 +6,53 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 72DA1ECE58C
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 19:36:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E34FC4CECE
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 19:38:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 48D192089C
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 19:36:47 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 48D192089C
+	by mail.kernel.org (Postfix) with ESMTPS id 55CD22089C
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 19:38:50 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 55CD22089C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56378 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56404 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iK698-00048C-05
-	for qemu-devel@archiver.kernel.org; Mon, 14 Oct 2019 15:36:46 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40666)
+	id 1iK6B6-000718-TK
+	for qemu-devel@archiver.kernel.org; Mon, 14 Oct 2019 15:38:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40402)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jsnow@redhat.com>) id 1iK634-0006rI-CN
- for qemu-devel@nongnu.org; Mon, 14 Oct 2019 15:30:31 -0400
+ (envelope-from <jsnow@redhat.com>) id 1iK62W-00061y-NL
+ for qemu-devel@nongnu.org; Mon, 14 Oct 2019 15:29:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1iK633-0003BS-09
- for qemu-devel@nongnu.org; Mon, 14 Oct 2019 15:30:30 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:4766)
+ (envelope-from <jsnow@redhat.com>) id 1iK62V-0002m8-7o
+ for qemu-devel@nongnu.org; Mon, 14 Oct 2019 15:29:56 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:38952)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <jsnow@redhat.com>)
- id 1iK630-00039q-0j; Mon, 14 Oct 2019 15:30:26 -0400
+ id 1iK62S-0002ip-3a; Mon, 14 Oct 2019 15:29:52 -0400
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
  [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 3398DC053B34;
- Mon, 14 Oct 2019 19:30:25 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 4F62410C093C;
+ Mon, 14 Oct 2019 19:29:51 +0000 (UTC)
 Received: from probe.bos.redhat.com (dhcp-17-152.bos.redhat.com [10.18.17.152])
- by smtp.corp.redhat.com (Postfix) with ESMTP id D0D3360BE2;
- Mon, 14 Oct 2019 19:30:23 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id E7F2360BE2;
+ Mon, 14 Oct 2019 19:29:49 +0000 (UTC)
 From: John Snow <jsnow@redhat.com>
 To: Peter Maydell <peter.maydell@linaro.org>,
 	qemu-devel@nongnu.org
-Subject: [PULL v2 16/19] block/qcow2-bitmap: fix and improve
- qcow2_reopen_bitmaps_rw
-Date: Mon, 14 Oct 2019 15:29:06 -0400
-Message-Id: <20191014192909.16044-17-jsnow@redhat.com>
+Subject: [PULL v2 09/19] block: switch reopen queue from QSIMPLEQ to QTAILQ
+Date: Mon, 14 Oct 2019 15:28:59 -0400
+Message-Id: <20191014192909.16044-10-jsnow@redhat.com>
 In-Reply-To: <20191014192909.16044-1-jsnow@redhat.com>
 References: <20191014192909.16044-1-jsnow@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.31]); Mon, 14 Oct 2019 19:30:25 +0000 (UTC)
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.66]); Mon, 14 Oct 2019 19:29:51 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
@@ -81,155 +80,159 @@ Sender: "Qemu-devel"
 
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
-- Correct check for write access to file child, and in correct place
-  (only if we want to write).
-- Support reopen rw -> rw (which will be used in following commit),
-  for example, !bdrv_dirty_bitmap_readonly() is not a corruption if
-  bitmap is marked IN_USE in the image.
-- Consider unexpected bitmap as a corruption and check other
-  combinations of in-image and in-RAM bitmaps.
+We'll need reverse-foreach in the following commit, QTAILQ support it,
+so move to QTAILQ.
 
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-id: 20190927122355.7344-9-vsementsov@virtuozzo.com
+Reviewed-by: Max Reitz <mreitz@redhat.com>
+Message-id: 20190927122355.7344-2-vsementsov@virtuozzo.com
 Signed-off-by: John Snow <jsnow@redhat.com>
 ---
- block/qcow2-bitmap.c | 77 +++++++++++++++++++++++++++++++++-----------
- 1 file changed, 58 insertions(+), 19 deletions(-)
+ include/block/block.h |  2 +-
+ block.c               | 24 ++++++++++++------------
+ 2 files changed, 13 insertions(+), 13 deletions(-)
 
-diff --git a/block/qcow2-bitmap.c b/block/qcow2-bitmap.c
-index f7dfb40256..98294a7696 100644
---- a/block/qcow2-bitmap.c
-+++ b/block/qcow2-bitmap.c
-@@ -1108,18 +1108,14 @@ int qcow2_reopen_bitmaps_rw(BlockDriverState *bs,=
- Error **errp)
-     Qcow2BitmapList *bm_list;
-     Qcow2Bitmap *bm;
-     GSList *ro_dirty_bitmaps =3D NULL;
--    int ret =3D 0;
-+    int ret =3D -EINVAL;
-+    bool need_header_update =3D false;
+diff --git a/include/block/block.h b/include/block/block.h
+index 792bb826db..89606bd9f8 100644
+--- a/include/block/block.h
++++ b/include/block/block.h
+@@ -195,7 +195,7 @@ typedef struct HDGeometry {
+ #define BDRV_BLOCK_EOF          0x20
+ #define BDRV_BLOCK_RECURSE      0x40
 =20
-     if (s->nb_bitmaps =3D=3D 0) {
-         /* No bitmaps - nothing to do */
-         return 0;
+-typedef QSIMPLEQ_HEAD(BlockReopenQueue, BlockReopenQueueEntry) BlockReop=
+enQueue;
++typedef QTAILQ_HEAD(BlockReopenQueue, BlockReopenQueueEntry) BlockReopen=
+Queue;
+=20
+ typedef struct BDRVReopenState {
+     BlockDriverState *bs;
+diff --git a/block.c b/block.c
+index 5721441697..0347632c6c 100644
+--- a/block.c
++++ b/block.c
+@@ -1719,7 +1719,7 @@ typedef struct BlockReopenQueueEntry {
+      bool prepared;
+      bool perms_checked;
+      BDRVReopenState state;
+-     QSIMPLEQ_ENTRY(BlockReopenQueueEntry) entry;
++     QTAILQ_ENTRY(BlockReopenQueueEntry) entry;
+ } BlockReopenQueueEntry;
+=20
+ /*
+@@ -1732,7 +1732,7 @@ static int bdrv_reopen_get_flags(BlockReopenQueue *=
+q, BlockDriverState *bs)
+     BlockReopenQueueEntry *entry;
+=20
+     if (q !=3D NULL) {
+-        QSIMPLEQ_FOREACH(entry, q, entry) {
++        QTAILQ_FOREACH(entry, q, entry) {
+             if (entry->state.bs =3D=3D bs) {
+                 return entry->state.flags;
+             }
+@@ -3249,7 +3249,7 @@ static bool bdrv_recurse_has_child(BlockDriverState=
+ *bs,
+  * Adds a BlockDriverState to a simple queue for an atomic, transactiona=
+l
+  * reopen of multiple devices.
+  *
+- * bs_queue can either be an existing BlockReopenQueue that has had QSIM=
+PLE_INIT
++ * bs_queue can either be an existing BlockReopenQueue that has had QTAI=
+LQ_INIT
+  * already performed, or alternatively may be NULL a new BlockReopenQueu=
+e will
+  * be created and initialized. This newly created BlockReopenQueue shoul=
+d be
+  * passed back in for subsequent calls that are intended to be of the sa=
+me
+@@ -3290,7 +3290,7 @@ static BlockReopenQueue *bdrv_reopen_queue_child(Bl=
+ockReopenQueue *bs_queue,
+=20
+     if (bs_queue =3D=3D NULL) {
+         bs_queue =3D g_new0(BlockReopenQueue, 1);
+-        QSIMPLEQ_INIT(bs_queue);
++        QTAILQ_INIT(bs_queue);
      }
 =20
--    if (!can_write(bs)) {
--        error_setg(errp, "Can't write to the image on reopening bitmaps =
-rw");
--        return -EINVAL;
--    }
--
-     bm_list =3D bitmap_list_load(bs, s->bitmap_directory_offset,
-                                s->bitmap_directory_size, errp);
-     if (bm_list =3D=3D NULL) {
-@@ -1128,32 +1124,75 @@ int qcow2_reopen_bitmaps_rw(BlockDriverState *bs,=
- Error **errp)
+     if (!options) {
+@@ -3298,7 +3298,7 @@ static BlockReopenQueue *bdrv_reopen_queue_child(Bl=
+ockReopenQueue *bs_queue,
+     }
 =20
-     QSIMPLEQ_FOREACH(bm, bm_list, entry) {
-         BdrvDirtyBitmap *bitmap =3D bdrv_find_dirty_bitmap(bs, bm->name)=
-;
--        if (bitmap =3D=3D NULL) {
--            continue;
--        }
-=20
--        if (!bdrv_dirty_bitmap_readonly(bitmap)) {
--            error_setg(errp, "Bitmap %s was loaded prior to rw-reopen, b=
-ut was "
--                       "not marked as readonly. This is a bug, something=
- went "
--                       "wrong. All of the bitmaps may be corrupted", bm-=
->name);
--            ret =3D -EINVAL;
-+        if (!bitmap) {
-+            error_setg(errp, "Unexpected bitmap '%s' in image '%s'",
-+                       bm->name, bs->filename);
-             goto out;
+     /* Check if this BlockDriverState is already in the queue */
+-    QSIMPLEQ_FOREACH(bs_entry, bs_queue, entry) {
++    QTAILQ_FOREACH(bs_entry, bs_queue, entry) {
+         if (bs =3D=3D bs_entry->state.bs) {
+             break;
          }
+@@ -3354,7 +3354,7 @@ static BlockReopenQueue *bdrv_reopen_queue_child(Bl=
+ockReopenQueue *bs_queue,
 =20
--        bm->flags |=3D BME_FLAG_IN_USE;
--        ro_dirty_bitmaps =3D g_slist_append(ro_dirty_bitmaps, bitmap);
-+        if (!(bm->flags & BME_FLAG_IN_USE)) {
-+            if (!bdrv_dirty_bitmap_readonly(bitmap)) {
-+                error_setg(errp, "Corruption: bitmap '%s' is not marked =
-IN_USE "
-+                           "in the image '%s' and not marked readonly in=
- RAM",
-+                           bm->name, bs->filename);
-+                goto out;
-+            }
-+            if (bdrv_dirty_bitmap_inconsistent(bitmap)) {
-+                error_setg(errp, "Corruption: bitmap '%s' is inconsisten=
-t but "
-+                           "is not marked IN_USE in the image '%s'", bm-=
->name,
-+                           bs->filename);
-+                goto out;
-+            }
-+
-+            bm->flags |=3D BME_FLAG_IN_USE;
-+            need_header_update =3D true;
-+        } else {
-+            /*
-+             * What if flags already has BME_FLAG_IN_USE ?
-+             *
-+             * 1. if we are reopening RW -> RW it's OK, of course.
-+             * 2. if we are reopening RO -> RW:
-+             *   2.1 if @bitmap is inconsistent, it's OK. It means that =
-it was
-+             *       inconsistent (IN_USE) when we loaded it
-+             *   2.2 if @bitmap is not inconsistent. This seems to be im=
-possible
-+             *       and implies third party interaction. Let's error-ou=
-t for
-+             *       safety.
-+             */
-+            if (bdrv_dirty_bitmap_readonly(bitmap) &&
-+                !bdrv_dirty_bitmap_inconsistent(bitmap))
-+            {
-+                error_setg(errp, "Corruption: bitmap '%s' is marked IN_U=
-SE "
-+                           "in the image '%s' but it is readonly and "
-+                           "consistent in RAM",
-+                           bm->name, bs->filename);
-+                goto out;
-+            }
-+        }
-+
-+        if (bdrv_dirty_bitmap_readonly(bitmap)) {
-+            ro_dirty_bitmaps =3D g_slist_append(ro_dirty_bitmaps, bitmap=
-);
-+        }
+     if (!bs_entry) {
+         bs_entry =3D g_new0(BlockReopenQueueEntry, 1);
+-        QSIMPLEQ_INSERT_TAIL(bs_queue, bs_entry, entry);
++        QTAILQ_INSERT_TAIL(bs_queue, bs_entry, entry);
+     } else {
+         qobject_unref(bs_entry->state.options);
+         qobject_unref(bs_entry->state.explicit_options);
+@@ -3455,7 +3455,7 @@ int bdrv_reopen_multiple(BlockReopenQueue *bs_queue=
+, Error **errp)
+=20
+     assert(bs_queue !=3D NULL);
+=20
+-    QSIMPLEQ_FOREACH(bs_entry, bs_queue, entry) {
++    QTAILQ_FOREACH(bs_entry, bs_queue, entry) {
+         assert(bs_entry->state.bs->quiesce_counter > 0);
+         if (bdrv_reopen_prepare(&bs_entry->state, bs_queue, errp)) {
+             goto cleanup;
+@@ -3463,7 +3463,7 @@ int bdrv_reopen_multiple(BlockReopenQueue *bs_queue=
+, Error **errp)
+         bs_entry->prepared =3D true;
      }
 =20
--    if (ro_dirty_bitmaps !=3D NULL) {
-+    if (need_header_update) {
-+        if (!can_write(bs->file->bs) || !(bs->file->perm & BLK_PERM_WRIT=
-E)) {
-+            error_setg(errp, "Failed to reopen bitmaps rw: no write acce=
-ss "
-+                       "the protocol file");
-+            goto out;
-+        }
-+
-         /* in_use flags must be updated */
-         ret =3D update_ext_header_and_dir_in_place(bs, bm_list);
-         if (ret < 0) {
--            error_setg_errno(errp, -ret, "Can't update bitmap directory"=
-);
-+            error_setg_errno(errp, -ret, "Cannot update bitmap directory=
-");
-             goto out;
+-    QSIMPLEQ_FOREACH(bs_entry, bs_queue, entry) {
++    QTAILQ_FOREACH(bs_entry, bs_queue, entry) {
+         BDRVReopenState *state =3D &bs_entry->state;
+         ret =3D bdrv_check_perm(state->bs, bs_queue, state->perm,
+                               state->shared_perm, NULL, NULL, errp);
+@@ -3489,13 +3489,13 @@ int bdrv_reopen_multiple(BlockReopenQueue *bs_que=
+ue, Error **errp)
+     /* If we reach this point, we have success and just need to apply th=
+e
+      * changes
+      */
+-    QSIMPLEQ_FOREACH(bs_entry, bs_queue, entry) {
++    QTAILQ_FOREACH(bs_entry, bs_queue, entry) {
+         bdrv_reopen_commit(&bs_entry->state);
+     }
+=20
+     ret =3D 0;
+ cleanup_perm:
+-    QSIMPLEQ_FOREACH_SAFE(bs_entry, bs_queue, entry, next) {
++    QTAILQ_FOREACH_SAFE(bs_entry, bs_queue, entry, next) {
+         BDRVReopenState *state =3D &bs_entry->state;
+=20
+         if (!bs_entry->perms_checked) {
+@@ -3512,7 +3512,7 @@ cleanup_perm:
          }
--        g_slist_foreach(ro_dirty_bitmaps, set_readonly_helper, false);
      }
+ cleanup:
+-    QSIMPLEQ_FOREACH_SAFE(bs_entry, bs_queue, entry, next) {
++    QTAILQ_FOREACH_SAFE(bs_entry, bs_queue, entry, next) {
+         if (ret) {
+             if (bs_entry->prepared) {
+                 bdrv_reopen_abort(&bs_entry->state);
+@@ -3552,7 +3552,7 @@ static BlockReopenQueueEntry *find_parent_in_reopen=
+_queue(BlockReopenQueue *q,
+ {
+     BlockReopenQueueEntry *entry;
 =20
-+    g_slist_foreach(ro_dirty_bitmaps, set_readonly_helper, false);
-+    ret =3D 0;
-+
- out:
-     g_slist_free(ro_dirty_bitmaps);
-     bitmap_list_free(bm_list);
+-    QSIMPLEQ_FOREACH(entry, q, entry) {
++    QTAILQ_FOREACH(entry, q, entry) {
+         BlockDriverState *bs =3D entry->state.bs;
+         BdrvChild *child;
+=20
 --=20
 2.21.0
 
