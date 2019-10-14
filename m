@@ -7,73 +7,74 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E831CC4CECE
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 16:41:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F3D6C4CECE
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 16:43:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B20C320663
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 16:41:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2BC5A20663
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 16:43:06 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="y/6VbhgK"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B20C320663
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Lt7IfiW1"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2BC5A20663
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53530 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53554 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iK3Pi-0001cc-G6
-	for qemu-devel@archiver.kernel.org; Mon, 14 Oct 2019 12:41:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37323)
+	id 1iK3R2-00035I-SL
+	for qemu-devel@archiver.kernel.org; Mon, 14 Oct 2019 12:43:04 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37301)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1iK2qc-00053N-OA
- for qemu-devel@nongnu.org; Mon, 14 Oct 2019 12:05:28 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1iK2qa-0004zM-CH
+ for qemu-devel@nongnu.org; Mon, 14 Oct 2019 12:05:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1iK2qb-00084n-9G
- for qemu-devel@nongnu.org; Mon, 14 Oct 2019 12:05:26 -0400
-Received: from mail-wr1-x42e.google.com ([2a00:1450:4864:20::42e]:38063)
+ (envelope-from <peter.maydell@linaro.org>) id 1iK2qZ-00082u-04
+ for qemu-devel@nongnu.org; Mon, 14 Oct 2019 12:05:24 -0400
+Received: from mail-wm1-x335.google.com ([2a00:1450:4864:20::335]:56007)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1iK2qb-00084D-2V
- for qemu-devel@nongnu.org; Mon, 14 Oct 2019 12:05:25 -0400
-Received: by mail-wr1-x42e.google.com with SMTP id y18so10928108wrn.5
- for <qemu-devel@nongnu.org>; Mon, 14 Oct 2019 09:05:25 -0700 (PDT)
+ id 1iK2qY-00082I-Pm
+ for qemu-devel@nongnu.org; Mon, 14 Oct 2019 12:05:22 -0400
+Received: by mail-wm1-x335.google.com with SMTP id a6so17834860wma.5
+ for <qemu-devel@nongnu.org>; Mon, 14 Oct 2019 09:05:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:subject:date:message-id:in-reply-to:references:mime-version
  :content-transfer-encoding;
- bh=dxXU4mpzkxcQwcn/SZR487jhjpUk6sYg7UJhmpV7TT4=;
- b=y/6VbhgKZ+kBx3TdLojOW9FX/0guzq9J6n+8Fg6D7e5VxhV1/VFuRTETHfM9sDmPcr
- gortuSkRJCflkrZck3fI5P4aOMiCHm8CS0Ant3UMen/vSmeaH6e6Y169B3BCne2qJc+D
- AsAG9EDE6kquOGPYLxa1a1a0AmxZfQ+PP8ZVqWYlPytzOf8rPr2P5i3q66hl+mY/rRPJ
- /2dZRRJzvnKsvf2R1JHgTZuO3w40BIOALMDcp6RFLRWuwSIJPue8o5vdwrEU82rbfnA/
- yQ7hpkCWGC7uwBEXZlTbLx3c6khKKGgWjwlTOkTe2ZuDtm3fgk3liumqUAtNQUPjvQZ9
- m0Yg==
+ bh=Cv6HZ91yGk0xGYbUoTFw/+DdSIijp5QJpKDphiE70KU=;
+ b=Lt7IfiW1JftmiClW5f/IVDVxaZCGPpBT+TjimKispERn50D9DGW8HS9oMaJg6EFP/p
+ W/w+x3BVs7TNcrgS4PFQcDSfS2Nl3DoWRncRox9oE4zSV665M+4s7+IbCAax6yujG47K
+ t0A9EQcN1AsM5n6Jp71ND43gdbRdbVovNnAhKRbT80NYuAiZEztH0uROggnmiFu2/C7V
+ FmHeIeLI/oRU5g7wZL2T1QDK2n5BcoGK1bOZfFSsZATNWv4jslhND6cDg3KCjVwZ3DS2
+ uldEJeWGthtApdxnsNtL+XzOC+IUcZX/JkZ93zG8UlSJzLz8Zq4LOQx5lgEXnfHuKrL/
+ gGXw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=dxXU4mpzkxcQwcn/SZR487jhjpUk6sYg7UJhmpV7TT4=;
- b=ZnjClMT28UzSEKdxpDjscs1eqtnk13fnvP/SnkNs2/frPynU0K+cMPNBzOLL8GHK7c
- 17GiW7VFNhh7D8d1j3IWDnPz6pU4w/cny8kxBSbgigHz9mCa82tLNCRGNUr1lizvlcuz
- Wl4f+R7cLiYE7t/NL9U2jnsVBIw6l/k49UnXPCrAmg0TRoA5bl46draI9htL+U7UyK7Y
- effMUsRu6tGg/Kn6NddyhHyYm/D5oDY0FWr6htHGsk8xH3OHjNXj7AjteDVn6F3xLUum
- kQrraccSkhny6ZRYGaxyUW5aSHhDRwPGvdMBPmGqvM/KcizDb5m57oT755j6m4n28F2K
- IFpA==
-X-Gm-Message-State: APjAAAUp86/RkiVeJe3EBi91UKUJ8SPUIrl7KZbQ77leCzjf/4xfAJ0U
- 89K3sMb5yZSkzuq1UwIbGtViV6F+onvJ0A==
-X-Google-Smtp-Source: APXvYqyGeDJOSMc9iyVs1Sk3lnGG0oWTLW0nKnTLwHATtL0+uh5xgeXb9tI8Wa6U/98Pmu6/Df0ifw==
-X-Received: by 2002:adf:f188:: with SMTP id h8mr26235574wro.38.1571069123766; 
- Mon, 14 Oct 2019 09:05:23 -0700 (PDT)
+ bh=Cv6HZ91yGk0xGYbUoTFw/+DdSIijp5QJpKDphiE70KU=;
+ b=m6CcoNgriEaQHoXaZfX7Bfumd9yUiUIGEw9LwBnELYeTGhL1LObo7ctjH1SUlTXxrB
+ 8BXox+FIs72g1U15M1aICXNziMb2XBY6XmPuRvVHpuf8zuwMLdM26Ph8YgSON7tAqOED
+ 1q0PdHidmjLVqvJAABrZRZ5M8NqYQBes+QK4swdvFNLxCBou/Duo/DV7oFKkKerx49nI
+ elh9Qr3NOySmN/1xKVWFICpyRFYXde2PXZaySIcz2Diw2X0LxsobzJMJUTml9ZG8K2/a
+ 7dedqF9iILpdUbhKzYjNX3th6NuWTPvruYuhFF6tYYpBm5ijsBMSIASIHT69WJRwTH6p
+ QO5Q==
+X-Gm-Message-State: APjAAAWyMQ6Sz0vXGGkqx5bPu6jx7JvbpLkdaGBOOIpmLwxpPCl32Tfw
+ 65m0ZlzxyxRB90Vx6telY5X7sfHGqVsyag==
+X-Google-Smtp-Source: APXvYqxJ+XwYzDMsFn6f2lVGb4+0y2wJfScFy752LgQ84DBlDnN3pn8CdrpEXCs7r+LNxhbrfQ2HYw==
+X-Received: by 2002:a7b:c011:: with SMTP id c17mr16026485wmb.95.1571069121590; 
+ Mon, 14 Oct 2019 09:05:21 -0700 (PDT)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id 5sm18029779wrk.86.2019.10.14.09.05.22
+ by smtp.gmail.com with ESMTPSA id 5sm18029779wrk.86.2019.10.14.09.05.20
  for <qemu-devel@nongnu.org>
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 14 Oct 2019 09:05:23 -0700 (PDT)
+ Mon, 14 Oct 2019 09:05:20 -0700 (PDT)
 From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PULL 48/68] aspeed/sdmc: Add AST2600 support
-Date: Mon, 14 Oct 2019 17:03:44 +0100
-Message-Id: <20191014160404.19553-49-peter.maydell@linaro.org>
+Subject: [PULL 46/68] aspeed/timer: Add support for IRQ status register on the
+ AST2600
+Date: Mon, 14 Oct 2019 17:03:42 +0100
+Message-Id: <20191014160404.19553-47-peter.maydell@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20191014160404.19553-1-peter.maydell@linaro.org>
 References: <20191014160404.19553-1-peter.maydell@linaro.org>
@@ -82,7 +83,7 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::42e
+X-Received-From: 2a00:1450:4864:20::335
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,175 +99,168 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Joel Stanley <joel@jms.id.au>
+From: Cédric Le Goater <clg@kaod.org>
 
-The AST2600 SDMC controller is slightly different from its predecessor
-(DRAM training). Max memory is now 2G on the AST2600.
+The AST2600 timer replaces control register 2 with a interrupt status
+register. It is set by hardware when an IRQ occurs and cleared by
+software.
 
-Signed-off-by: Joel Stanley <joel@jms.id.au>
+Modify the vmstate version to take into account the new fields.
+
+Based on previous work from Joel Stanley.
+
 Signed-off-by: Cédric Le Goater <clg@kaod.org>
-Message-id: 20190925143248.10000-10-clg@kaod.org
-[clg: - improved commit log
-      - reworked model integration into new object class ]
-Signed-off-by: Cédric Le Goater <clg@kaod.org>
+Reviewed-by: Joel Stanley <joel@jms.id.au>
+Message-id: 20190925143248.10000-8-clg@kaod.org
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- include/hw/misc/aspeed_sdmc.h |  1 +
- hw/misc/aspeed_scu.c          |  2 +
- hw/misc/aspeed_sdmc.c         | 82 +++++++++++++++++++++++++++++++++++
- 3 files changed, 85 insertions(+)
+ include/hw/timer/aspeed_timer.h |  1 +
+ hw/timer/aspeed_timer.c         | 36 +++++++++++++++++++++++++--------
+ 2 files changed, 29 insertions(+), 8 deletions(-)
 
-diff --git a/include/hw/misc/aspeed_sdmc.h b/include/hw/misc/aspeed_sdmc.h
-index 81156320c49..5dbde59fe77 100644
---- a/include/hw/misc/aspeed_sdmc.h
-+++ b/include/hw/misc/aspeed_sdmc.h
-@@ -15,6 +15,7 @@
- #define ASPEED_SDMC(obj) OBJECT_CHECK(AspeedSDMCState, (obj), TYPE_ASPEED_SDMC)
- #define TYPE_ASPEED_2400_SDMC TYPE_ASPEED_SDMC "-ast2400"
- #define TYPE_ASPEED_2500_SDMC TYPE_ASPEED_SDMC "-ast2500"
-+#define TYPE_ASPEED_2600_SDMC TYPE_ASPEED_SDMC "-ast2600"
+diff --git a/include/hw/timer/aspeed_timer.h b/include/hw/timer/aspeed_timer.h
+index 69b1377af01..948329893c0 100644
+--- a/include/hw/timer/aspeed_timer.h
++++ b/include/hw/timer/aspeed_timer.h
+@@ -60,6 +60,7 @@ typedef struct AspeedTimerCtrlState {
+     uint32_t ctrl;
+     uint32_t ctrl2;
+     uint32_t ctrl3;
++    uint32_t irq_sts;
+     AspeedTimer timers[ASPEED_TIMER_NR_TIMERS];
  
- #define ASPEED_SDMC_NR_REGS (0x174 >> 2)
+     AspeedSCUState *scu;
+diff --git a/hw/timer/aspeed_timer.c b/hw/timer/aspeed_timer.c
+index 7f73d0c7533..bcce2192a92 100644
+--- a/hw/timer/aspeed_timer.c
++++ b/hw/timer/aspeed_timer.c
+@@ -160,7 +160,9 @@ static uint64_t calculate_next(struct AspeedTimer *t)
+     timer_del(&t->timer);
  
-diff --git a/hw/misc/aspeed_scu.c b/hw/misc/aspeed_scu.c
-index 84699b78d4c..717509bc546 100644
---- a/hw/misc/aspeed_scu.c
-+++ b/hw/misc/aspeed_scu.c
-@@ -99,6 +99,7 @@
- #define AST2600_CLK_STOP_CTRL_CLR TO_REG(0x84)
- #define AST2600_CLK_STOP_CTRL2     TO_REG(0x90)
- #define AST2600_CLK_STOP_CTR2L_CLR TO_REG(0x94)
-+#define AST2600_SDRAM_HANDSHAKE   TO_REG(0x100)
- #define AST2600_HPLL_PARAM        TO_REG(0x200)
- #define AST2600_HPLL_EXT          TO_REG(0x204)
- #define AST2600_MPLL_EXT          TO_REG(0x224)
-@@ -602,6 +603,7 @@ static const uint32_t ast2600_a0_resets[ASPEED_AST2600_SCU_NR_REGS] = {
-     [AST2600_SYS_RST_CTRL2]     = 0xFFFFFFFC,
-     [AST2600_CLK_STOP_CTRL]     = 0xEFF43E8B,
-     [AST2600_CLK_STOP_CTRL2]    = 0xFFF0FFF0,
-+    [AST2600_SDRAM_HANDSHAKE]   = 0x00000040,  /* SoC completed DRAM init */
-     [AST2600_HPLL_PARAM]        = 0x1000405F,
- };
+     if (timer_overflow_interrupt(t)) {
++        AspeedTimerCtrlState *s = timer_to_ctrl(t);
+         t->level = !t->level;
++        s->irq_sts |= BIT(t->id);
+         qemu_set_irq(t->irq, t->level);
+     }
  
-diff --git a/hw/misc/aspeed_sdmc.c b/hw/misc/aspeed_sdmc.c
-index 60c99e77348..f3a63a2e01d 100644
---- a/hw/misc/aspeed_sdmc.c
-+++ b/hw/misc/aspeed_sdmc.c
-@@ -28,6 +28,7 @@
- /* Control/Status Register #1 (ast2500) */
- #define R_STATUS1         (0x60 / 4)
- #define   PHY_BUSY_STATE      BIT(0)
-+#define   PHY_PLL_LOCK_STATUS BIT(4)
+@@ -199,7 +201,9 @@ static void aspeed_timer_expire(void *opaque)
+     }
  
- #define R_ECC_TEST_CTRL   (0x70 / 4)
- #define   ECC_TEST_FINISHED   BIT(12)
-@@ -85,6 +86,11 @@
- #define     ASPEED_SDMC_AST2500_512MB       0x2
- #define     ASPEED_SDMC_AST2500_1024MB      0x3
+     if (interrupt) {
++        AspeedTimerCtrlState *s = timer_to_ctrl(t);
+         t->level = !t->level;
++        s->irq_sts |= BIT(t->id);
+         qemu_set_irq(t->irq, t->level);
+     }
  
-+#define     ASPEED_SDMC_AST2600_256MB       0x0
-+#define     ASPEED_SDMC_AST2600_512MB       0x1
-+#define     ASPEED_SDMC_AST2600_1024MB      0x2
-+#define     ASPEED_SDMC_AST2600_2048MB      0x3
+@@ -244,9 +248,6 @@ static uint64_t aspeed_timer_read(void *opaque, hwaddr offset, unsigned size)
+     case 0x30: /* Control Register */
+         value = s->ctrl;
+         break;
+-    case 0x34: /* Control Register 2 */
+-        value = s->ctrl2;
+-        break;
+     case 0x00 ... 0x2c: /* Timers 1 - 4 */
+         value = aspeed_timer_get_value(&s->timers[(offset >> 4)], reg);
+         break;
+@@ -438,9 +439,6 @@ static void aspeed_timer_write(void *opaque, hwaddr offset, uint64_t value,
+     case 0x30:
+         aspeed_timer_set_ctrl(s, tv);
+         break;
+-    case 0x34:
+-        aspeed_timer_set_ctrl2(s, tv);
+-        break;
+     /* Timer Registers */
+     case 0x00 ... 0x2c:
+         aspeed_timer_set_value(s, (offset >> TIMER_NR_REGS), reg, tv);
+@@ -468,6 +466,9 @@ static uint64_t aspeed_2400_timer_read(AspeedTimerCtrlState *s, hwaddr offset)
+     uint64_t value;
+ 
+     switch (offset) {
++    case 0x34:
++        value = s->ctrl2;
++        break;
+     case 0x38:
+     case 0x3C:
+     default:
+@@ -482,7 +483,12 @@ static uint64_t aspeed_2400_timer_read(AspeedTimerCtrlState *s, hwaddr offset)
+ static void aspeed_2400_timer_write(AspeedTimerCtrlState *s, hwaddr offset,
+                                     uint64_t value)
+ {
++    const uint32_t tv = (uint32_t)(value & 0xFFFFFFFF);
 +
- #define ASPEED_SDMC_AST2500_READONLY_MASK                               \
-     (ASPEED_SDMC_HW_VERSION(0xf) | ASPEED_SDMC_CACHE_INITIAL_DONE |     \
-      ASPEED_SDMC_AST2500_RESERVED | ASPEED_SDMC_VGA_COMPAT |            \
-@@ -186,6 +192,28 @@ static int ast2500_rambits(AspeedSDMCState *s)
-     return ASPEED_SDMC_AST2500_512MB;
+     switch (offset) {
++    case 0x34:
++        aspeed_timer_set_ctrl2(s, tv);
++        break;
+     case 0x38:
+     case 0x3C:
+     default:
+@@ -497,6 +503,9 @@ static uint64_t aspeed_2500_timer_read(AspeedTimerCtrlState *s, hwaddr offset)
+     uint64_t value;
+ 
+     switch (offset) {
++    case 0x34:
++        value = s->ctrl2;
++        break;
+     case 0x38:
+         value = s->ctrl3 & BIT(0);
+         break;
+@@ -517,6 +526,9 @@ static void aspeed_2500_timer_write(AspeedTimerCtrlState *s, hwaddr offset,
+     uint8_t command;
+ 
+     switch (offset) {
++    case 0x34:
++        aspeed_timer_set_ctrl2(s, tv);
++        break;
+     case 0x38:
+         command = (value >> 1) & 0xFF;
+         if (command == 0xAE) {
+@@ -543,6 +555,9 @@ static uint64_t aspeed_2600_timer_read(AspeedTimerCtrlState *s, hwaddr offset)
+     uint64_t value;
+ 
+     switch (offset) {
++    case 0x34:
++        value = s->irq_sts;
++        break;
+     case 0x38:
+     case 0x3C:
+     default:
+@@ -560,6 +575,9 @@ static void aspeed_2600_timer_write(AspeedTimerCtrlState *s, hwaddr offset,
+     const uint32_t tv = (uint32_t)(value & 0xFFFFFFFF);
+ 
+     switch (offset) {
++    case 0x34:
++        s->irq_sts &= tv;
++        break;
+     case 0x3C:
+         aspeed_timer_set_ctrl(s, s->ctrl & ~tv);
+         break;
+@@ -626,6 +644,7 @@ static void aspeed_timer_reset(DeviceState *dev)
+     s->ctrl = 0;
+     s->ctrl2 = 0;
+     s->ctrl3 = 0;
++    s->irq_sts = 0;
  }
  
-+static int ast2600_rambits(AspeedSDMCState *s)
-+{
-+    switch (s->ram_size >> 20) {
-+    case 256:
-+        return ASPEED_SDMC_AST2600_256MB;
-+    case 512:
-+        return ASPEED_SDMC_AST2600_512MB;
-+    case 1024:
-+        return ASPEED_SDMC_AST2600_1024MB;
-+    case 2048:
-+        return ASPEED_SDMC_AST2600_2048MB;
-+    default:
-+        break;
-+    }
-+
-+    /* use a common default */
-+    warn_report("Invalid RAM size 0x%" PRIx64 ". Using default 512M",
-+                s->ram_size);
-+    s->ram_size = 512 << 20;
-+    return ASPEED_SDMC_AST2600_512MB;
-+}
-+
- static void aspeed_sdmc_reset(DeviceState *dev)
- {
-     AspeedSDMCState *s = ASPEED_SDMC(dev);
-@@ -340,11 +368,65 @@ static const TypeInfo aspeed_2500_sdmc_info = {
-     .class_init = aspeed_2500_sdmc_class_init,
- };
+ static const VMStateDescription vmstate_aspeed_timer = {
+@@ -644,12 +663,13 @@ static const VMStateDescription vmstate_aspeed_timer = {
  
-+static uint32_t aspeed_2600_sdmc_compute_conf(AspeedSDMCState *s, uint32_t data)
-+{
-+    uint32_t fixed_conf = ASPEED_SDMC_HW_VERSION(3) |
-+        ASPEED_SDMC_VGA_APERTURE(ASPEED_SDMC_VGA_64MB) |
-+        ASPEED_SDMC_DRAM_SIZE(ast2600_rambits(s));
-+
-+    /* Make sure readonly bits are kept (use ast2500 mask) */
-+    data &= ~ASPEED_SDMC_AST2500_READONLY_MASK;
-+
-+    return data | fixed_conf;
-+}
-+
-+static void aspeed_2600_sdmc_write(AspeedSDMCState *s, uint32_t reg,
-+                                   uint32_t data)
-+{
-+    switch (reg) {
-+    case R_CONF:
-+        data = aspeed_2600_sdmc_compute_conf(s, data);
-+        break;
-+    case R_STATUS1:
-+        /* Will never return 'busy'. 'lock status' is always set */
-+        data &= ~PHY_BUSY_STATE;
-+        data |= PHY_PLL_LOCK_STATUS;
-+        break;
-+    case R_ECC_TEST_CTRL:
-+        /* Always done, always happy */
-+        data |= ECC_TEST_FINISHED;
-+        data &= ~ECC_TEST_FAIL;
-+        break;
-+    default:
-+        break;
-+    }
-+
-+    s->regs[reg] = data;
-+}
-+
-+static void aspeed_2600_sdmc_class_init(ObjectClass *klass, void *data)
-+{
-+    DeviceClass *dc = DEVICE_CLASS(klass);
-+    AspeedSDMCClass *asc = ASPEED_SDMC_CLASS(klass);
-+
-+    dc->desc = "ASPEED 2600 SDRAM Memory Controller";
-+    asc->max_ram_size = 2048 << 20;
-+    asc->compute_conf = aspeed_2600_sdmc_compute_conf;
-+    asc->write = aspeed_2600_sdmc_write;
-+}
-+
-+static const TypeInfo aspeed_2600_sdmc_info = {
-+    .name = TYPE_ASPEED_2600_SDMC,
-+    .parent = TYPE_ASPEED_SDMC,
-+    .class_init = aspeed_2600_sdmc_class_init,
-+};
-+
- static void aspeed_sdmc_register_types(void)
- {
-     type_register_static(&aspeed_sdmc_info);
-     type_register_static(&aspeed_2400_sdmc_info);
-     type_register_static(&aspeed_2500_sdmc_info);
-+    type_register_static(&aspeed_2600_sdmc_info);
- }
- 
- type_init(aspeed_sdmc_register_types);
+ static const VMStateDescription vmstate_aspeed_timer_state = {
+     .name = "aspeed.timerctrl",
+-    .version_id = 1,
+-    .minimum_version_id = 1,
++    .version_id = 2,
++    .minimum_version_id = 2,
+     .fields = (VMStateField[]) {
+         VMSTATE_UINT32(ctrl, AspeedTimerCtrlState),
+         VMSTATE_UINT32(ctrl2, AspeedTimerCtrlState),
+         VMSTATE_UINT32(ctrl3, AspeedTimerCtrlState),
++        VMSTATE_UINT32(irq_sts, AspeedTimerCtrlState),
+         VMSTATE_STRUCT_ARRAY(timers, AspeedTimerCtrlState,
+                              ASPEED_TIMER_NR_TIMERS, 1, vmstate_aspeed_timer,
+                              AspeedTimer),
 -- 
 2.20.1
 
