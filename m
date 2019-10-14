@@ -6,54 +6,54 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E20ACECE58E
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 14:44:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6B0E0C4CECE
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 14:46:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BC68B21835
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 14:44:47 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BC68B21835
+	by mail.kernel.org (Postfix) with ESMTPS id 4080B21835
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 14:46:56 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4080B21835
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50878 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50932 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iK1aY-0003m3-V4
-	for qemu-devel@archiver.kernel.org; Mon, 14 Oct 2019 10:44:46 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49993)
+	id 1iK1cc-00068g-Uy
+	for qemu-devel@archiver.kernel.org; Mon, 14 Oct 2019 10:46:54 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50099)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1iK1NH-00055X-KV
- for qemu-devel@nongnu.org; Mon, 14 Oct 2019 10:31:05 -0400
+ (envelope-from <philmd@redhat.com>) id 1iK1Ng-0005KK-LV
+ for qemu-devel@nongnu.org; Mon, 14 Oct 2019 10:31:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1iK1NG-0002U8-Hw
- for qemu-devel@nongnu.org; Mon, 14 Oct 2019 10:31:03 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:41694)
+ (envelope-from <philmd@redhat.com>) id 1iK1Nf-0002Z6-DU
+ for qemu-devel@nongnu.org; Mon, 14 Oct 2019 10:31:28 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:41698)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <philmd@redhat.com>)
- id 1iK1NB-0002RB-QH; Mon, 14 Oct 2019 10:30:58 -0400
+ id 1iK1Na-0002Xl-Kz; Mon, 14 Oct 2019 10:31:22 -0400
 Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
  [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id C908C80166C;
- Mon, 14 Oct 2019 14:30:56 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id AA45476525;
+ Mon, 14 Oct 2019 14:31:20 +0000 (UTC)
 Received: from x1w.redhat.com (unknown [10.40.206.0])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 5A245600CD;
- Mon, 14 Oct 2019 14:30:33 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 995CB60126;
+ Mon, 14 Oct 2019 14:30:57 +0000 (UTC)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 To: Markus Armbruster <armbru@redhat.com>,
 	qemu-devel@nongnu.org
-Subject: [PATCH 16/20] hw/pci-host/piix: Include "qemu/range.h"
-Date: Mon, 14 Oct 2019 16:22:42 +0200
-Message-Id: <20191014142246.4538-17-philmd@redhat.com>
+Subject: [PATCH 17/20] hw/acpi: Include "hw/mem/nvdimm.h"
+Date: Mon, 14 Oct 2019 16:22:43 +0200
+Message-Id: <20191014142246.4538-18-philmd@redhat.com>
 In-Reply-To: <20191014142246.4538-1-philmd@redhat.com>
 References: <20191014142246.4538-1-philmd@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.67]); Mon, 14 Oct 2019 14:30:57 +0000 (UTC)
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.26]); Mon, 14 Oct 2019 14:31:20 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
@@ -89,56 +89,59 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-hw/pci-host/piix.c calls various functions from the Range API.
-Include "qemu/range.h" which declares them.
+Both ich9.c and piix4.c use methods/definitions declared in the
+NVDIMM device header. Include it.
 
 This fixes (when modifying unrelated headers):
 
-  hw/pci-host/i440fx.c:54:11: error: field has incomplete type 'Range' (a=
-ka 'struct Range')
-      Range pci_hole;
-           ^
-  include/qemu/typedefs.h:116:16: note: forward declaration of 'struct Ra=
-nge'
-  typedef struct Range Range;
-                 ^
-  hw/pci-host/i440fx.c:126:9: error: implicit declaration of function 'ra=
-nges_overlap' is invalid in C99 [-Werror,-Wimplicit-function-declaration]
-      if (ranges_overlap(address, len, I440FX_PAM, I440FX_PAM_SIZE) ||
-          ^
-  hw/pci-host/i440fx.c:126:9: error: this function declaration is not a p=
-rototype [-Werror,-Wstrict-prototypes]
-  hw/pci-host/i440fx.c:127:9: error: implicit declaration of function 'ra=
-nge_covers_byte' is invalid in C99 [-Werror,-Wimplicit-function-declarati=
-on]
-          range_covers_byte(address, len, I440FX_SMRAM)) {
-          ^
-  hw/pci-host/i440fx.c:127:9: error: this function declaration is not a p=
-rototype [-Werror,-Wstrict-prototypes]
-  hw/pci-host/i440fx.c:189:13: error: implicit declaration of function 'r=
-ange_is_empty' is invalid in C99 [-Werror,-Wimplicit-function-declaration=
+  hw/acpi/ich9.c:507:46: error: use of undeclared identifier 'TYPE_NVDIMM=
+'
+        if (object_dynamic_cast(OBJECT(dev), TYPE_NVDIMM)) {
+                                             ^
+  hw/acpi/ich9.c:508:13: error: implicit declaration of function 'nvdimm_=
+acpi_plug_cb' is invalid in C99 [-Werror,-Wimplicit-function-declaration]
+            nvdimm_acpi_plug_cb(hotplug_dev, dev);
+            ^
+  hw/acpi/piix4.c:403:46: error: use of undeclared identifier 'TYPE_NVDIM=
+M'
+        if (object_dynamic_cast(OBJECT(dev), TYPE_NVDIMM)) {
+                                             ^
+  hw/acpi/piix4.c:404:13: error: implicit declaration of function 'nvdimm=
+_acpi_plug_cb' is invalid in C99 [-Werror,-Wimplicit-function-declaration=
 ]
-      val64 =3D range_is_empty(&s->pci_hole) ? 0 : range_lob(&s->pci_hole=
-);
-              ^
+            nvdimm_acpi_plug_cb(hotplug_dev, dev);
+            ^
 
 Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 ---
- hw/pci-host/piix.c | 1 +
- 1 file changed, 1 insertion(+)
+ hw/acpi/ich9.c  | 1 +
+ hw/acpi/piix4.c | 1 +
+ 2 files changed, 2 insertions(+)
 
-diff --git a/hw/pci-host/piix.c b/hw/pci-host/piix.c
-index 135c645535..76ed252a60 100644
---- a/hw/pci-host/piix.c
-+++ b/hw/pci-host/piix.c
-@@ -23,6 +23,7 @@
-  */
+diff --git a/hw/acpi/ich9.c b/hw/acpi/ich9.c
+index fdd0a6c79e..4e74284b65 100644
+--- a/hw/acpi/ich9.c
++++ b/hw/acpi/ich9.c
+@@ -39,6 +39,7 @@
 =20
- #include "qemu/osdep.h"
-+#include "qemu/range.h"
- #include "hw/i386/pc.h"
- #include "hw/irq.h"
- #include "hw/pci/pci.h"
+ #include "hw/i386/ich9.h"
+ #include "hw/mem/pc-dimm.h"
++#include "hw/mem/nvdimm.h"
+=20
+ //#define DEBUG
+=20
+diff --git a/hw/acpi/piix4.c b/hw/acpi/piix4.c
+index 5742c3df87..11a3e33e5b 100644
+--- a/hw/acpi/piix4.c
++++ b/hw/acpi/piix4.c
+@@ -39,6 +39,7 @@
+ #include "hw/acpi/cpu.h"
+ #include "hw/hotplug.h"
+ #include "hw/mem/pc-dimm.h"
++#include "hw/mem/nvdimm.h"
+ #include "hw/acpi/memory_hotplug.h"
+ #include "hw/acpi/acpi_dev_interface.h"
+ #include "hw/xen/xen.h"
 --=20
 2.21.0
 
