@@ -2,92 +2,83 @@ Return-Path: <SRS0=PUPy=YH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 95A60ECE587
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 14:56:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DA2B0ECE587
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 14:58:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6231921835
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 14:56:06 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="dEPJWEO3"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6231921835
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id AF2DD20873
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 14:58:07 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AF2DD20873
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51098 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51116 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iK1lV-00061e-Iu
-	for qemu-devel@archiver.kernel.org; Mon, 14 Oct 2019 10:56:05 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54271)
+	id 1iK1nS-0007LB-TE
+	for qemu-devel@archiver.kernel.org; Mon, 14 Oct 2019 10:58:06 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54556)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1iK1kY-0004sZ-5W
- for qemu-devel@nongnu.org; Mon, 14 Oct 2019 10:55:07 -0400
+ (envelope-from <vkuznets@redhat.com>) id 1iK1mk-0006bo-Ov
+ for qemu-devel@nongnu.org; Mon, 14 Oct 2019 10:57:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1iK1kW-0000wN-Tp
- for qemu-devel@nongnu.org; Mon, 14 Oct 2019 10:55:06 -0400
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:39531)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1iK1kW-0000vZ-NC
- for qemu-devel@nongnu.org; Mon, 14 Oct 2019 10:55:04 -0400
-Received: by mail-wr1-x443.google.com with SMTP id r3so20116770wrj.6
- for <qemu-devel@nongnu.org>; Mon, 14 Oct 2019 07:55:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=aRWxH1JfTTiqvlLzFjhP7nbm/gPTTuUWJYa2sB0USI4=;
- b=dEPJWEO3Q0PDlJP/5TdVvfVsBZHuVReYuCmwPHiXQMrRiPNU66j20zikzcHypwRYy/
- IH0hilwo21juA2xUWy1Ivf3Wmj6/e2gCzcj8YOUnLy3WmXyVC2iftcpchPDzrQ9czndK
- nMSxxenzZnNkz+q8UgMb84Py4W/b0p5L/JYgwskj7IV91Tl1C2zHHjQR+2lPJcs+cWEN
- robDWYDBuNk2XzQxnsBVvkjTZVNKeGUaDHuC61+/pPDSbcLWoR3EJy+pIzGLnKg/GiF+
- moiCCI4tR+yawI0OQEnd7kr/uASeKdqxTukuBsdoNKeUHO93f6BQObOGkBqCNGoMSE4L
- qU4g==
+ (envelope-from <vkuznets@redhat.com>) id 1iK1mi-0002XS-9D
+ for qemu-devel@nongnu.org; Mon, 14 Oct 2019 10:57:21 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46280)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <vkuznets@redhat.com>) id 1iK1mi-0002VC-3s
+ for qemu-devel@nongnu.org; Mon, 14 Oct 2019 10:57:20 -0400
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id EB33F811DE
+ for <qemu-devel@nongnu.org>; Mon, 14 Oct 2019 14:57:17 +0000 (UTC)
+Received: by mail-wm1-f71.google.com with SMTP id q9so7255397wmj.9
+ for <qemu-devel@nongnu.org>; Mon, 14 Oct 2019 07:57:17 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=aRWxH1JfTTiqvlLzFjhP7nbm/gPTTuUWJYa2sB0USI4=;
- b=Z0QXslGiPCFBVRNt4l3WCT9w6RvPBqSbacsASvMld+z5niHwVytq3jBUSZxT1An/pG
- IUBWCBYTSzegWIGF24WOqwY9Ec0AXUXAwo76xINmwWQx2u3/ViTrCk2FTOd2/LBcPuWl
- M8YcTKY7E2FU2/np0MJ+VNGDfwgNqXooRCVM/ZU4Bs2AniUAOS3d12QRuz0VTuH6vR2g
- Z0ywQVxOwYwQ00/jlS4fn6j/lowAmTljUf3AEuQx5wvQ0tjffem6QNiXV5cekR6JWGdL
- pumbBw3q96XYq4lvkW7hp/xhmEL1WbQmQFsh2CRslzk0B5N1P+ZgW6FrsD3t2S6y9mk0
- 2OUg==
-X-Gm-Message-State: APjAAAU7k6M5oaww0vRHsd2qcykoSSfUFYe1JMyMfAcWDV0Ej0D9aWFm
- aPUMNtzpecg5crVjaJopwI2/Lg==
-X-Google-Smtp-Source: APXvYqyAE9X8SgoCGLKpTikFFYl80/dpidfhYKm4nr/UovEsSu2jBdQ9KQbQLR1XkI+uUBW71ouhJQ==
-X-Received: by 2002:a5d:46ca:: with SMTP id g10mr11709579wrs.193.1571064903368; 
- Mon, 14 Oct 2019 07:55:03 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id y5sm18544704wma.14.2019.10.14.07.55.02
+ h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
+ :message-id:mime-version;
+ bh=DkYmESCvkqzPI8cu0bSgZGf7oLIsgWwrCSCE1AMG5A0=;
+ b=q+rpf9OGkZ69RsxBSzSDYqWHCIgBJ+2dwGra/TDdBrkiQMmMTJknlFSotidyDGQCoH
+ IBbLkKJBeH/jjVIiVXEGxmQHKjIP/tMy7qk/Fr7My1Um1vafZnvSqUHX+STbLoB1R7mn
+ OG5exi5drG64i/3Ec0JyUHFMLimBXtjGpFMgLxfENs0jCNpY9QvX6TQTnbN4/mET8lPc
+ aYBdp2XVB7Jrbcmmq/MU0+ecONQCN3JvNs9XDnxUNlJ80wolR03YkZWEfGj5nrCHQU9j
+ eXWm2fNAQ2Yikg7CVtvyO7e6T7bQdc94ee3xnelfIHsTav2SLajdkjjbVwq8HY0pCf22
+ SYbw==
+X-Gm-Message-State: APjAAAWY3LhSD4GTudZkPQKeM5DdOs6HvVBFkOd5hAdCkjNDpfpPgwMV
+ y+cmGoEitKtbIrDEFilXUpzMuY4dsg4bnqgbXUEQNEr0Os9nTrpY4hElRWLhfmVmLEoNSLKzJXa
+ e1hniVWE2DRp63Ng=
+X-Received: by 2002:a7b:cb8a:: with SMTP id m10mr14371405wmi.132.1571065036697; 
+ Mon, 14 Oct 2019 07:57:16 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqw4xINcheBC8vgbQy7E0ixh7c7nKSa/MD6EfRy6mNcx99/7Gzvtdv8Al1WAYd/C2tuPgoMoNg==
+X-Received: by 2002:a7b:cb8a:: with SMTP id m10mr14371386wmi.132.1571065036468; 
+ Mon, 14 Oct 2019 07:57:16 -0700 (PDT)
+Received: from vitty.brq.redhat.com (nat-pool-brq-t.redhat.com.
+ [213.175.37.10])
+ by smtp.gmail.com with ESMTPSA id 59sm40931491wrc.23.2019.10.14.07.57.15
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 14 Oct 2019 07:55:02 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 169B61FF87;
- Mon, 14 Oct 2019 15:55:02 +0100 (BST)
-References: <20191014135905.24364-1-alex.bennee@linaro.org>
- <20191014135905.24364-2-alex.bennee@linaro.org>
- <a18c0078-dcb2-f55e-55eb-8328bc465bca@gmail.com>
-User-agent: mu4e 1.3.5; emacs 27.0.50
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>
-Subject: Re: [PATCH v1 1/5] contrib/gitdm: add more entries individuals and
- academics
-In-reply-to: <a18c0078-dcb2-f55e-55eb-8328bc465bca@gmail.com>
-Date: Mon, 14 Oct 2019 15:55:01 +0100
-Message-ID: <87wod7ml6i.fsf@linaro.org>
+ Mon, 14 Oct 2019 07:57:15 -0700 (PDT)
+From: Vitaly Kuznetsov <vkuznets@redhat.com>
+To: Tianyu Lan <Tianyu.Lan@microsoft.com>,
+ "lantianyu1986\@gmail.com" <lantianyu1986@gmail.com>
+Subject: Re: [PATCH] target/i386/kvm: Add Hyper-V direct tlb flush support
+In-Reply-To: <KL1P15301MB02611D1F7C54C4A599766B8D92900@KL1P15301MB0261.APCP153.PROD.OUTLOOK.COM>
+References: <20191012034153.31817-1-Tianyu.Lan@microsoft.com>
+ <87r23h58th.fsf@vitty.brq.redhat.com>
+ <KL1P15301MB02611D1F7C54C4A599766B8D92900@KL1P15301MB0261.APCP153.PROD.OUTLOOK.COM>
+Date: Mon, 14 Oct 2019 16:57:14 +0200
+Message-ID: <875zkr5q9h.fsf@vitty.brq.redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::443
+Content-Type: text/plain
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,66 +90,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org
+Cc: "mtosatti@redhat.com" <mtosatti@redhat.com>,
+ "ehabkost@redhat.com" <ehabkost@redhat.com>,
+ "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "mst@redhat.com" <mst@redhat.com>,
+ "cohuck@redhat.com" <cohuck@redhat.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ Roman Kagan <rkagan@virtuozzo.com>,
+ "pbonzini@redhat.com" <pbonzini@redhat.com>,
+ "rth@twiddle.net" <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Tianyu Lan <Tianyu.Lan@microsoft.com> writes:
 
-Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com> writes:
-
-> Hello Alex,
->
-> I confirm my email address, I worked on qemu during the 2018 Google
-> Summer of Code.
-
-Is that an Acked-by: then?
-
->
-> Thanks,
-> Emanuele
->
-> On 14/10/2019 15:59, Alex Benn=C3=A9e wrote:
->> Again this is guess work based on public websites. Please confirm.
+>> > --- a/linux-headers/linux/kvm.h
+>> > +++ b/linux-headers/linux/kvm.h
+>> > @@ -995,6 +995,7 @@ struct kvm_ppc_resize_hpt {
+>> >  #define KVM_CAP_ARM_SVE 170
+>> >  #define KVM_CAP_ARM_PTRAUTH_ADDRESS 171
+>> >  #define KVM_CAP_ARM_PTRAUTH_GENERIC 172
+>> > +#define KVM_CAP_HYPERV_DIRECT_TLBFLUSH 174
 >>
->> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
->> Cc: Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>
->> Cc: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
->> Cc: "K=C5=91v=C3=A1g=C3=B3, Zolt=C3=A1n" <dirty.ice.hu@gmail.com>
->> Cc: Li Qiang <liq3ea@gmail.com>
->> Cc: Li Qiang <liq3ea@163.com>
->> ---
->>   contrib/gitdm/group-map-academics   | 3 +++
->>   contrib/gitdm/group-map-individuals | 4 ++++
->>   2 files changed, 7 insertions(+)
+>> I was once told that scripts/update-linux-headers.sh script is supposed
+>> to be used instead of cherry-picking stuff you need (adn this would be a
+>> separate patch - update linux headers to smth).
 >>
->> diff --git a/contrib/gitdm/group-map-academics b/contrib/gitdm/group-map=
--academics
->> index 08f9d81d13..5cbb9d84c8 100644
->> --- a/contrib/gitdm/group-map-academics
->> +++ b/contrib/gitdm/group-map-academics
->> @@ -12,3 +12,6 @@ ispras.ru
->>   # Columbia University
->>   cs.columbia.edu
->>   cota@braap.org
->> +
->> +# University of Paderborn
->> +uni-paderborn.de
->> diff --git a/contrib/gitdm/group-map-individuals b/contrib/gitdm/group-m=
-ap-individuals
->> index 1c84717438..301071b98b 100644
->> --- a/contrib/gitdm/group-map-individuals
->> +++ b/contrib/gitdm/group-map-individuals
->> @@ -14,3 +14,7 @@ noring@nocrew.org
->>   samuel.thibault@ens-lyon.org
->>   aurelien@aurel32.net
->>   balaton@eik.bme.hu
->> +e.emanuelegiuseppe@gmail.com
->> +dirty.ice.hu@gmail.com
->> +liq3ea@163.com
->> +liq3ea@gmail.com
+>
+> Thanks for suggestion. I just try the update-linux-headers.sh and there are a lot
+> of changes which are not related with my patch. I also include these
+> changes in my patch, right?
+>
 
+Yes, see e.g.
 
---
-Alex Benn=C3=A9e
+commit d9cb4336159a00bd0d9c81b93f02874ef3626057
+Author: Cornelia Huck <cohuck@redhat.com>
+Date:   Thu May 16 19:10:36 2019 +0200
+
+    linux headers: update against Linux 5.2-rc1
+
+as an example.
+
+-- 
+Vitaly
 
