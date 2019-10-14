@@ -7,82 +7,83 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3706EC4CECE
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 16:38:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9AA4FC4CECE
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 16:38:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 004D620663
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 16:38:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2570A20663
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 16:38:40 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Oey6RFtF"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 004D620663
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="l2X4mcWi"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2570A20663
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53456 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53460 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iK3Mg-0005O8-Nl
-	for qemu-devel@archiver.kernel.org; Mon, 14 Oct 2019 12:38:34 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36928)
+	id 1iK3Mk-0005Vi-K7
+	for qemu-devel@archiver.kernel.org; Mon, 14 Oct 2019 12:38:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37226)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1iK2q1-00047i-Pt
- for qemu-devel@nongnu.org; Mon, 14 Oct 2019 12:04:50 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1iK2qS-0004j7-Vs
+ for qemu-devel@nongnu.org; Mon, 14 Oct 2019 12:05:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1iK2q0-0007NL-5y
- for qemu-devel@nongnu.org; Mon, 14 Oct 2019 12:04:49 -0400
-Received: from mail-wr1-x431.google.com ([2a00:1450:4864:20::431]:34722)
+ (envelope-from <peter.maydell@linaro.org>) id 1iK2qR-0007vc-SH
+ for qemu-devel@nongnu.org; Mon, 14 Oct 2019 12:05:16 -0400
+Received: from mail-wm1-x330.google.com ([2a00:1450:4864:20::330]:54977)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1iK2pz-0007MO-VW
- for qemu-devel@nongnu.org; Mon, 14 Oct 2019 12:04:48 -0400
-Received: by mail-wr1-x431.google.com with SMTP id j11so20404588wrp.1
- for <qemu-devel@nongnu.org>; Mon, 14 Oct 2019 09:04:47 -0700 (PDT)
+ id 1iK2qR-0007ub-MA
+ for qemu-devel@nongnu.org; Mon, 14 Oct 2019 12:05:15 -0400
+Received: by mail-wm1-x330.google.com with SMTP id p7so17868212wmp.4
+ for <qemu-devel@nongnu.org>; Mon, 14 Oct 2019 09:05:15 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:subject:date:message-id:in-reply-to:references:mime-version
  :content-transfer-encoding;
- bh=jAF6ZWfldn5/rZTsepRanmp6npkmWuRVFTomDvB6zXk=;
- b=Oey6RFtF1vGMOFR475kY0RlBieEGnYM9bWbVRKkaXyMv2OpzNBttxNITHy5doifK2z
- LeYWJPFZbrSmUAeBIkXQYvXMEARGbeUsPZYyq3Lu7hba/ZDNC6V7LNcrCbRhBcV71j4x
- hkaYlTVtaeD46amfEAdQlzo9IddGRmy+ygpamsSaNeKCz5Qm7Iiww82ggg3qC/PLQSMO
- 9UPcCfO87M3BevUk4MrqnUPXMr7Nhja/s5hdnp1NLlF9yndBh24CBdaudR31lPda+CzZ
- Vh+qD7zxxQQ13ezketa6sxd5J1bvzDR27rU0T7bdvoaoLbzze/isyizzJ18YBKGun1nE
- CkCQ==
+ bh=IPPpRDvS1khlTKhQXpsP8betxpNnecGFCTfAvZZmBYI=;
+ b=l2X4mcWiQwjJTESJQHgOwNf2zaN90pCzSndilgEohpgxa8rRca0IFuTfQqHaXl9+k0
+ pVFWTBB+5JQGE/5GckgitcniQsWk3aJ/3nghEXWqVXxEyQ8qUi5kSuUg1/hwRqejiE3Q
+ pYmtauaLMr2FhPsxdSzdkGwI+XQ7Fl26Jt0vajhQTS9KIN3O2LoqMGw8xMXWxPpwmOmL
+ aPuVcuNVw9fAUWz9gVrafzH6XXbdqwYff3tyuheboIarr5lYMfjQBxjNvcmIr1jCW3I0
+ oX6DN1UPYnw1W3B0vtW2UcTXjvA22Yw6jP7xDHKVQwir/g2VNSnClAEQC4rGq0iqIvMJ
+ ks+A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=jAF6ZWfldn5/rZTsepRanmp6npkmWuRVFTomDvB6zXk=;
- b=rZXXcwhXhDxjkABstqBEAKj8vmxKeqEcvpr0znaSFeFdt4HVZqAoxP2LzqN+cs/njK
- zKdURmsQLvoFaklXvP6vT+8bUHF88w1/d7EaGv95eIizQ060kLUqmknoIxV6nQsDm8V/
- WiYHFJRLNkRNAOq54H9l/Bp5Z9hxdrausirhzlzqCj8bMVdhJ8cVnYcb+0zO+6gSFh7O
- 4bnQsZ6BpgCalC6dnk6Tu0rxNmcPvyWwGaVLcy0CIsuu0z+rW3I5nk9ps5JC9RbubWdJ
- zanDa0L7CzBAdiL8VCzlmKz6yRVIKN9bYZ6m7ngoulh+icIjlAZvQYwF6w6SS+iEtZXb
- 6Fxw==
-X-Gm-Message-State: APjAAAV2wekLvs91wvsWJGYd0GgtxufJJ5/K1Qh8yYrQF0RIXgI1vSh1
- 4xZuk0ECxcAzg703gsg3+m0LObFHDqv1Eg==
-X-Google-Smtp-Source: APXvYqzngEPBdf6PmMaSnqmKBuJRHrFriMu3S2q9HVcu4MuI7fV1YCVX2iKZ3vBfGvkfsrzrtZAPZg==
-X-Received: by 2002:a5d:540d:: with SMTP id g13mr22580481wrv.8.1571069086489; 
- Mon, 14 Oct 2019 09:04:46 -0700 (PDT)
+ bh=IPPpRDvS1khlTKhQXpsP8betxpNnecGFCTfAvZZmBYI=;
+ b=UHP73vbtKKlEaQlVLGK7YjW0mtUjldAWSE0jbqwKL78mYg8S5xpXiJX7YfcyusYxpn
+ CD1t7Zw8r2x8fqxF2easiK922tsi0W/BN5pb58de5CopCoe5DdZrWquPw+xjaR0vnWz3
+ nV6P28SnSs6sqP7OLQg7Mz+/xDVO4xLzHbVFfEKbJI0QnrsKSP9WPM8EY6vAsnSPzZiG
+ OyXDk7g+o4bcsQ2/EHe6xuTviBVrEqW0JpN9GdW/hZlwOgPejpPgRemrb64am21QAXlc
+ OFBrQ9UXxehx9AjsqEPjwi8GGSm+VVdOQRDpy+77eSFBYiVD3ZAfT6CdSwwelojsPvFE
+ 037g==
+X-Gm-Message-State: APjAAAVWnt1QD4Nk2RzFt2hUYazZT2Wv69dPPgipJKDbPfM7BmcuI4u8
+ Ey8fRexogEVzr7y/wyeHKHACNLR2x+UGig==
+X-Google-Smtp-Source: APXvYqyFgIVgUen3cre5YfGrNB1JbNo4c5P/EkNvmxC/nlIpJdYR/+H0TMbpwCXCwfy2H9c1Dre1PA==
+X-Received: by 2002:a05:600c:2201:: with SMTP id
+ z1mr16076270wml.169.1571069113709; 
+ Mon, 14 Oct 2019 09:05:13 -0700 (PDT)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id 5sm18029779wrk.86.2019.10.14.09.04.44
+ by smtp.gmail.com with ESMTPSA id 5sm18029779wrk.86.2019.10.14.09.05.12
  for <qemu-devel@nongnu.org>
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 14 Oct 2019 09:04:45 -0700 (PDT)
+ Mon, 14 Oct 2019 09:05:12 -0700 (PDT)
 From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PULL 20/68] hw/timer/imx_epit.c: Switch to transaction-based ptimer
- API
-Date: Mon, 14 Oct 2019 17:03:16 +0100
-Message-Id: <20191014160404.19553-21-peter.maydell@linaro.org>
+Subject: [PULL 40/68] aspeed/wdt: Check correct register for clock source
+Date: Mon, 14 Oct 2019 17:03:36 +0100
+Message-Id: <20191014160404.19553-41-peter.maydell@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20191014160404.19553-1-peter.maydell@linaro.org>
 References: <20191014160404.19553-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::431
+X-Received-From: 2a00:1450:4864:20::330
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,145 +99,38 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Switch the imx_epit.c code away from bottom-half based ptimers to
-the new transaction-based ptimer API.  This just requires adding
-begin/commit calls around the various places that modify the ptimer
-state, and using the new ptimer_init() function to create the timer.
+From: Amithash Prasad <amithash@fb.com>
 
+When WDT_RESTART is written, the data is not the contents
+of the WDT_CTRL register. Hence ensure we are looking at
+WDT_CTRL to check if bit WDT_CTRL_1MHZ_CLK is set or not.
+
+Signed-off-by: Amithash Prasad <amithash@fb.com>
+Reviewed-by: Joel Stanley <joel@jms.id.au>
+Signed-off-by: Cédric Le Goater <clg@kaod.org>
+Message-id: 20190925143248.10000-2-clg@kaod.org
+[clg: improved Suject prefix ]
+Signed-off-by: Cédric Le Goater <clg@kaod.org>
+Reviewed-by: Joel Stanley <joel@jms.id.au>
+Signed-off-by: Cédric Le Goater <clg@kaod.org>
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Message-id: 20191008171740.9679-18-peter.maydell@linaro.org
 ---
- hw/timer/imx_epit.c | 32 +++++++++++++++++++++++++++-----
- 1 file changed, 27 insertions(+), 5 deletions(-)
+ hw/watchdog/wdt_aspeed.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/hw/timer/imx_epit.c b/hw/timer/imx_epit.c
-index 39810ac8b03..baf6338e1a6 100644
---- a/hw/timer/imx_epit.c
-+++ b/hw/timer/imx_epit.c
-@@ -17,7 +17,6 @@
- #include "migration/vmstate.h"
- #include "hw/irq.h"
- #include "hw/misc/imx_ccm.h"
--#include "qemu/main-loop.h"
- #include "qemu/module.h"
- #include "qemu/log.h"
- 
-@@ -74,6 +73,10 @@ static void imx_epit_update_int(IMXEPITState *s)
-     }
- }
- 
-+/*
-+ * Must be called from within a ptimer_transaction_begin/commit block
-+ * for both s->timer_cmp and s->timer_reload.
-+ */
- static void imx_epit_set_freq(IMXEPITState *s)
- {
-     uint32_t clksrc;
-@@ -105,6 +108,8 @@ static void imx_epit_reset(DeviceState *dev)
-     s->lr = EPIT_TIMER_MAX;
-     s->cmp = 0;
-     s->cnt = 0;
-+    ptimer_transaction_begin(s->timer_cmp);
-+    ptimer_transaction_begin(s->timer_reload);
-     /* stop both timers */
-     ptimer_stop(s->timer_cmp);
-     ptimer_stop(s->timer_reload);
-@@ -117,6 +122,8 @@ static void imx_epit_reset(DeviceState *dev)
-         /* if the timer is still enabled, restart it */
-         ptimer_run(s->timer_reload, 0);
-     }
-+    ptimer_transaction_commit(s->timer_cmp);
-+    ptimer_transaction_commit(s->timer_reload);
- }
- 
- static uint32_t imx_epit_update_count(IMXEPITState *s)
-@@ -164,6 +171,7 @@ static uint64_t imx_epit_read(void *opaque, hwaddr offset, unsigned size)
-     return reg_value;
- }
- 
-+/* Must be called from ptimer_transaction_begin/commit block for s->timer_cmp */
- static void imx_epit_reload_compare_timer(IMXEPITState *s)
- {
-     if ((s->cr & (CR_EN | CR_OCIEN)) == (CR_EN | CR_OCIEN))  {
-@@ -191,6 +199,8 @@ static void imx_epit_write(void *opaque, hwaddr offset, uint64_t value,
- 
-     switch (offset >> 2) {
-     case 0: /* CR */
-+        ptimer_transaction_begin(s->timer_cmp);
-+        ptimer_transaction_begin(s->timer_reload);
- 
-         oldcr = s->cr;
-         s->cr = value & 0x03ffffff;
-@@ -231,6 +241,9 @@ static void imx_epit_write(void *opaque, hwaddr offset, uint64_t value,
-         } else {
-             ptimer_stop(s->timer_cmp);
+diff --git a/hw/watchdog/wdt_aspeed.c b/hw/watchdog/wdt_aspeed.c
+index 9b932134172..f710036535d 100644
+--- a/hw/watchdog/wdt_aspeed.c
++++ b/hw/watchdog/wdt_aspeed.c
+@@ -140,7 +140,7 @@ static void aspeed_wdt_write(void *opaque, hwaddr offset, uint64_t data,
+     case WDT_RESTART:
+         if ((data & 0xFFFF) == WDT_RESTART_MAGIC) {
+             s->regs[WDT_STATUS] = s->regs[WDT_RELOAD_VALUE];
+-            aspeed_wdt_reload(s, !(data & WDT_CTRL_1MHZ_CLK));
++            aspeed_wdt_reload(s, !(s->regs[WDT_CTRL] & WDT_CTRL_1MHZ_CLK));
          }
-+
-+        ptimer_transaction_commit(s->timer_cmp);
-+        ptimer_transaction_commit(s->timer_reload);
          break;
- 
-     case 1: /* SR - ACK*/
-@@ -244,6 +257,8 @@ static void imx_epit_write(void *opaque, hwaddr offset, uint64_t value,
-     case 2: /* LR - set ticks */
-         s->lr = value;
- 
-+        ptimer_transaction_begin(s->timer_cmp);
-+        ptimer_transaction_begin(s->timer_reload);
-         if (s->cr & CR_RLD) {
-             /* Also set the limit if the LRD bit is set */
-             /* If IOVW bit is set then set the timer value */
-@@ -255,12 +270,16 @@ static void imx_epit_write(void *opaque, hwaddr offset, uint64_t value,
-         }
- 
-         imx_epit_reload_compare_timer(s);
-+        ptimer_transaction_commit(s->timer_cmp);
-+        ptimer_transaction_commit(s->timer_reload);
-         break;
- 
-     case 3: /* CMP */
-         s->cmp = value;
- 
-+        ptimer_transaction_begin(s->timer_cmp);
-         imx_epit_reload_compare_timer(s);
-+        ptimer_transaction_commit(s->timer_cmp);
- 
-         break;
- 
-@@ -281,6 +300,11 @@ static void imx_epit_cmp(void *opaque)
-     imx_epit_update_int(s);
- }
- 
-+static void imx_epit_reload(void *opaque)
-+{
-+    /* No action required on rollover of timer_reload */
-+}
-+
- static const MemoryRegionOps imx_epit_ops = {
-     .read = imx_epit_read,
-     .write = imx_epit_write,
-@@ -308,7 +332,6 @@ static void imx_epit_realize(DeviceState *dev, Error **errp)
- {
-     IMXEPITState *s = IMX_EPIT(dev);
-     SysBusDevice *sbd = SYS_BUS_DEVICE(dev);
--    QEMUBH *bh;
- 
-     DPRINTF("\n");
- 
-@@ -317,10 +340,9 @@ static void imx_epit_realize(DeviceState *dev, Error **errp)
-                           0x00001000);
-     sysbus_init_mmio(sbd, &s->iomem);
- 
--    s->timer_reload = ptimer_init_with_bh(NULL, PTIMER_POLICY_DEFAULT);
-+    s->timer_reload = ptimer_init(imx_epit_reload, s, PTIMER_POLICY_DEFAULT);
- 
--    bh = qemu_bh_new(imx_epit_cmp, s);
--    s->timer_cmp = ptimer_init_with_bh(bh, PTIMER_POLICY_DEFAULT);
-+    s->timer_cmp = ptimer_init(imx_epit_cmp, s, PTIMER_POLICY_DEFAULT);
- }
- 
- static void imx_epit_class_init(ObjectClass *klass, void *data)
+     case WDT_CTRL:
 -- 
 2.20.1
 
