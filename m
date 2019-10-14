@@ -2,84 +2,64 @@ Return-Path: <SRS0=PUPy=YH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 20EA8C4CECE
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 08:11:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EA8D9C4CECE
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 08:18:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CE1A72054F
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 08:11:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B4A9120663
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 08:18:07 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="i3v6nwnk"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CE1A72054F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b="KygllYyT"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B4A9120663
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=igalia.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45526 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45564 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iJvRd-0005Th-HG
-	for qemu-devel@archiver.kernel.org; Mon, 14 Oct 2019 04:11:10 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51367)
+	id 1iJvYM-0007AF-Th
+	for qemu-devel@archiver.kernel.org; Mon, 14 Oct 2019 04:18:06 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52097)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <aleksandar.m.mail@gmail.com>) id 1iJvQd-0004xh-4z
- for qemu-devel@nongnu.org; Mon, 14 Oct 2019 04:10:08 -0400
+ (envelope-from <berto@igalia.com>) id 1iJvX9-0006aK-3b
+ for qemu-devel@nongnu.org; Mon, 14 Oct 2019 04:16:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aleksandar.m.mail@gmail.com>) id 1iJvQa-0003tY-TX
- for qemu-devel@nongnu.org; Mon, 14 Oct 2019 04:10:06 -0400
-Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:43705)
+ (envelope-from <berto@igalia.com>) id 1iJvX7-0001ii-8y
+ for qemu-devel@nongnu.org; Mon, 14 Oct 2019 04:16:50 -0400
+Received: from 6.130.60.178.static.reverse-mundo-r.com ([178.60.130.6]:41212
+ helo=fanzine.igalia.com)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
- id 1iJvQa-0003rt-NR
- for qemu-devel@nongnu.org; Mon, 14 Oct 2019 04:10:04 -0400
-Received: by mail-oi1-x243.google.com with SMTP id t84so13020412oih.10
- for <qemu-devel@nongnu.org>; Mon, 14 Oct 2019 01:10:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:in-reply-to:references:from:date:message-id:subject:to
- :cc; bh=UWhMEtb8QXln0RTdqREfA2kOqvTC70sU7b8OgzgNbYo=;
- b=i3v6nwnkBxR+Ex2f8ff3wbBiB/E1JO2LPwMJbdN2x4kqw51TyCwBn6r+3jzC6Sy4gT
- POEo6DYzgplCDDlx8qcdoY+P2otcBsDNOk/PKMwrZgZ+kAYQtVjR1qKoCCzcjEWUN4Wg
- QQZPtLONA2mzU+uSOjkm633hT+lgsQdvxKulDoWRLVVzyRTrrOAjEkoGBqOUrci0YMS/
- XFRXgpbqI50JR8N9b9xVEkILXMe0PJkVUhaKiz+v1JbxZA67zmct0E8OVXVy6xVbt7ez
- urw1a0JReFPHJwno2lf7tbkzew7mefTfk+3BgWDJM6i3p0Y5LFBsqpFPnNviiZ1IivMu
- 0zWw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:in-reply-to:references:from:date
- :message-id:subject:to:cc;
- bh=UWhMEtb8QXln0RTdqREfA2kOqvTC70sU7b8OgzgNbYo=;
- b=DUuKyN6IrU54l2BCGGkgTtmZzEQBGrsJCt8ElxMjlWK8g4jniLnkAyfQAQbgE88t5W
- 5fe/aHcVZJ+eZQQFfxKITYcpJ0hbWyoXcshD/pF4PZD5WrNU9ticQXXTw3siuR75K3XA
- 8Ao0D1uwSs8ililvf65RrBDPuxXd8LQc/C/GzxwvXvRE+RsNlQnPKBu/kXSX7Ud5Gp88
- tEu5p6lLCvufKcbbkmutVTQc8yUU2XoAK2uHysYBV/PpCzgEJ0abTZN5z7slgMTSSELd
- 2R9T+oCNtCtw+3zYmcEMsqFSR9XM8sI+MvZcRXaEXxxVJ1w1l+kHv5WUTDYKwVyw25fg
- TajA==
-X-Gm-Message-State: APjAAAWbwoEV65vrinqVZ/ZUhIPNhLiurJRAlQjmF3zk4m1fpreGxZts
- jxdx4+b5MrAxdv5CxjSf35d4AmCLCvZUh8zKbwQ=
-X-Google-Smtp-Source: APXvYqw1aq9J1jBc5cHWy/SqGgf7yiYlwSEqzlEJkvWQ8TpQvU6v5tkZE4vgmiiRs6SsCYakDu5xlL54VFf23fPT96E=
-X-Received: by 2002:a54:460c:: with SMTP id p12mr23695625oip.62.1571040602353; 
- Mon, 14 Oct 2019 01:10:02 -0700 (PDT)
+ (Exim 4.71) (envelope-from <berto@igalia.com>)
+ id 1iJvX5-0001fd-KX; Mon, 14 Oct 2019 04:16:49 -0400
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=igalia.com;
+ s=20170329; 
+ h=Content-Transfer-Encoding:MIME-Version:Message-Id:Date:Subject:Cc:To:From;
+ bh=R6RtrLZxxY2s1eviN2GmfYidifpvl3pH/rBLZpH6kg4=; 
+ b=KygllYyT0DkUCYHcuHJ2pbakIgrHb0f688aGd/wZC38i7ijbNGjSzb0adfEgZoWHd5Iv1sBkWgO+sRTWubUeh4nvJulgZSr6xG85v9XWQzjavBeid589KJkAcrHb2qUbCMwEX91J3gFcgcuRz6FULxMuv4mbxdKITr2DcDg9JmvPqDsS4UhxA6abCdq9oRdotRqQGe/B8MhFMJa8JIhHMfcHlCt2tor8fLFcPCVaAb7wqte2FHNQvjBgCLHtYg3nzKbdqlT0LkJUixcQGg2o1JHsZKS3VNgipDlANiREY57F8XZxTaGTQixQp4l4XS14IYdRq+/MN3f3vuxXyAxeJA==;
+Received: from 87-100-137-117.bb.dnainternet.fi ([87.100.137.117]
+ helo=perseus.local) by fanzine.igalia.com with esmtpsa 
+ (Cipher TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim)
+ id 1iJvX0-0003Tk-6d; Mon, 14 Oct 2019 10:16:42 +0200
+Received: from berto by perseus.local with local (Exim 4.92)
+ (envelope-from <berto@igalia.com>)
+ id 1iJvW7-0007ji-1v; Mon, 14 Oct 2019 11:15:47 +0300
+From: Alberto Garcia <berto@igalia.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v2] block: Reject misaligned write requests with
+ BDRV_REQ_NO_FALLBACK
+Date: Mon, 14 Oct 2019 11:15:45 +0300
+Message-Id: <20191014081545.29694-1-berto@igalia.com>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-Received: by 2002:a9d:340a:0:0:0:0:0 with HTTP; Mon, 14 Oct 2019 01:10:01
- -0700 (PDT)
-In-Reply-To: <87a7a36awg.fsf@dusky.pond.sub.org>
-References: <1570991178-5511-1-git-send-email-aleksandar.markovic@rt-rk.com>
- <1570991178-5511-2-git-send-email-aleksandar.markovic@rt-rk.com>
- <87a7a36awg.fsf@dusky.pond.sub.org>
-From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
-Date: Mon, 14 Oct 2019 10:10:01 +0200
-Message-ID: <CAL1e-=gD629LfDPokJ6XAnR_xxE-vHw3RZqg=JDai-xAcJC0Dg@mail.gmail.com>
-Subject: Re: [PATCH v4 1/8] target/mips: Clean up helper.c
-To: Markus Armbruster <armbru@redhat.com>
-Content-Type: multipart/alternative; boundary="00000000000007f6800594da656e"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::243
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x (no
+ timestamps) [generic] [fuzzy]
+X-Received-From: 178.60.130.6
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,315 +71,152 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>,
- "aleksandar.rikalo@rt-rk.com" <aleksandar.rikalo@rt-rk.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: Kevin Wolf <kwolf@redhat.com>, Anton Nefedov <anton.nefedov@virtuozzo.com>,
+ Alberto Garcia <berto@igalia.com>, qemu-block@nongnu.org,
+ Max Reitz <mreitz@redhat.com>, Nir Soffer <nsoffer@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---00000000000007f6800594da656e
-Content-Type: text/plain; charset="UTF-8"
+The BDRV_REQ_NO_FALLBACK flag means that an operation should only be
+performed if it can be offloaded or otherwise performed efficiently.
 
-On Monday, October 14, 2019, Markus Armbruster <armbru@redhat.com> wrote:
+However a misaligned write request requires a RMW so we should return
+an error and let the caller decide how to proceed.
 
-> Aleksandar Markovic <aleksandar.markovic@rt-rk.com> writes:
->
-> > From: Aleksandar Markovic <amarkovic@wavecomp.com>
-> >
-> > Mostly fix errors and warnings reported by 'checkpatch.pl -f'.
-> >
-> > Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
-> > ---
-> >  target/mips/helper.c | 128 ++++++++++++++++++++++++++++++
-> +--------------------
-> >  1 file changed, 78 insertions(+), 50 deletions(-)
-> >
-> > diff --git a/target/mips/helper.c b/target/mips/helper.c
-> > index a2b6459..2411a2c 100644
-> > --- a/target/mips/helper.c
-> > +++ b/target/mips/helper.c
-> > @@ -39,8 +39,8 @@ enum {
-> >  #if !defined(CONFIG_USER_ONLY)
-> >
-> >  /* no MMU emulation */
-> > -int no_mmu_map_address (CPUMIPSState *env, hwaddr *physical, int *prot,
-> > -                        target_ulong address, int rw, int access_type)
-> > +int no_mmu_map_address(CPUMIPSState *env, hwaddr *physical, int *prot,
-> > +                       target_ulong address, int rw, int access_type)
-> >  {
-> >      *physical = address;
-> >      *prot = PAGE_READ | PAGE_WRITE | PAGE_EXEC;
-> > @@ -48,26 +48,28 @@ int no_mmu_map_address (CPUMIPSState *env, hwaddr
-> *physical, int *prot,
-> >  }
-> >
-> >  /* fixed mapping MMU emulation */
-> > -int fixed_mmu_map_address (CPUMIPSState *env, hwaddr *physical, int
-> *prot,
-> > -                           target_ulong address, int rw, int
-> access_type)
-> > +int fixed_mmu_map_address(CPUMIPSState *env, hwaddr *physical, int
-> *prot,
-> > +                          target_ulong address, int rw, int access_type)
-> >  {
-> >      if (address <= (int32_t)0x7FFFFFFFUL) {
-> > -        if (!(env->CP0_Status & (1 << CP0St_ERL)))
-> > +        if (!(env->CP0_Status & (1 << CP0St_ERL))) {
-> >              *physical = address + 0x40000000UL;
-> > -        else
-> > +        } else {
-> >              *physical = address;
-> > -    } else if (address <= (int32_t)0xBFFFFFFFUL)
-> > +        }
-> > +    } else if (address <= (int32_t)0xBFFFFFFFUL) {
-> >          *physical = address & 0x1FFFFFFF;
-> > -    else
-> > +    } else {
-> >          *physical = address;
-> > +    }
-> >
-> >      *prot = PAGE_READ | PAGE_WRITE | PAGE_EXEC;
-> >      return TLBRET_MATCH;
-> >  }
-> >
-> >  /* MIPS32/MIPS64 R4000-style MMU emulation */
-> > -int r4k_map_address (CPUMIPSState *env, hwaddr *physical, int *prot,
-> > -                     target_ulong address, int rw, int access_type)
-> > +int r4k_map_address(CPUMIPSState *env, hwaddr *physical, int *prot,
-> > +                    target_ulong address, int rw, int access_type)
-> >  {
-> >      uint16_t ASID = env->CP0_EntryHi & env->CP0_EntryHi_ASID_mask;
-> >      int i;
-> > @@ -99,8 +101,9 @@ int r4k_map_address (CPUMIPSState *env, hwaddr
-> *physical, int *prot,
-> >              if (rw != MMU_DATA_STORE || (n ? tlb->D1 : tlb->D0)) {
-> >                  *physical = tlb->PFN[n] | (address & (mask >> 1));
-> >                  *prot = PAGE_READ;
-> > -                if (n ? tlb->D1 : tlb->D0)
-> > +                if (n ? tlb->D1 : tlb->D0) {
-> >                      *prot |= PAGE_WRITE;
-> > +                }
-> >                  if (!(n ? tlb->XI1 : tlb->XI0)) {
-> >                      *prot |= PAGE_EXEC;
-> >                  }
-> > @@ -130,8 +133,11 @@ static int is_seg_am_mapped(unsigned int am, bool
-> eu, int mmu_idx)
-> >      int32_t adetlb_mask;
-> >
-> >      switch (mmu_idx) {
-> > -    case 3 /* ERL */:
-> > -        /* If EU is set, always unmapped */
-> > +    case 3:
-> > +        /*
-> > +         * ERL
-> > +         * If EU is set, always unmapped
-> > +         */
-> >          if (eu) {
-> >              return 0;
-> >          }
->
-> This changes from the usual way we format switch case comments to an
-> unusual way.
->
-> If you want to pursue this change, please put it in a separate patch,
-> so this one is really about fixing "errors and warnings reported by
-> 'checkpatch.pl -f'", as your commit message promises.
->
->
+This hits an assertion since commit c8bb23cbdb if the required
+alignment is larger than the cluster size:
 
-Hi, Markus. Thank you for your response.
+qemu-img create -f qcow2 -o cluster_size=2k img.qcow2 4G
+qemu-io -c "open -o driver=qcow2,file.align=4k blkdebug::img.qcow2" \
+        -c 'write 0 512'
+qemu-io: block/io.c:1127: bdrv_driver_pwritev: Assertion `!(flags & BDRV_REQ_NO_FALLBACK)' failed.
+Aborted
 
-There must be some misunderstanding here:
+The reason is that when writing to an unallocated cluster we try to
+skip the copy-on-write part and zeroize it using BDRV_REQ_NO_FALLBACK
+instead, resulting in a write request that is too small (2KB cluster
+size vs 4KB required alignment).
 
-The line:
+Signed-off-by: Alberto Garcia <berto@igalia.com>
+---
+v2:
+- Use QEMU_IS_ALIGNED and (offset | bytes) [Nir]
+- Fix typo in comment in iotest
+- Expand commit message
 
-   case 3 /* ERL */:
+v1:
+- Initial version
 
-generates a checkpatch warning. I don't know why I would put it in a
-separate patch, if this patch is about fixing checkpatch warnings. Please
-explain.
+ block/io.c                 |  6 +++++
+ tests/qemu-iotests/268     | 55 ++++++++++++++++++++++++++++++++++++++
+ tests/qemu-iotests/268.out |  7 +++++
+ tests/qemu-iotests/group   |  1 +
+ 4 files changed, 69 insertions(+)
+ create mode 100755 tests/qemu-iotests/268
+ create mode 100644 tests/qemu-iotests/268.out
 
-Secondly, I don't see that this is a usual way we format switch statement.
-I found just several cases in the whole QEMU code base (and you claimed in
-previous comments that there are thousands).
+diff --git a/block/io.c b/block/io.c
+index 4f9ee97c2b..18d842382a 100644
+--- a/block/io.c
++++ b/block/io.c
+@@ -2071,6 +2071,12 @@ int coroutine_fn bdrv_co_pwritev_part(BdrvChild *child,
+         return ret;
+     }
+ 
++    /* If the request is misaligned then we can't make it efficient */
++    if (!QEMU_IS_ALIGNED(offset | bytes, align) &&
++        (flags & BDRV_REQ_NO_FALLBACK)) {
++        return -ENOTSUP;
++    }
++
+     bdrv_inc_in_flight(bs);
+     /*
+      * Align write if necessary by performing a read-modify-write cycle.
+diff --git a/tests/qemu-iotests/268 b/tests/qemu-iotests/268
+new file mode 100755
+index 0000000000..78c3f4db3a
+--- /dev/null
++++ b/tests/qemu-iotests/268
+@@ -0,0 +1,55 @@
++#!/usr/bin/env bash
++#
++# Test write request with required alignment larger than the cluster size
++#
++# Copyright (C) 2019 Igalia, S.L.
++# Author: Alberto Garcia <berto@igalia.com>
++#
++# This program is free software; you can redistribute it and/or modify
++# it under the terms of the GNU General Public License as published by
++# the Free Software Foundation; either version 2 of the License, or
++# (at your option) any later version.
++#
++# This program is distributed in the hope that it will be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++# GNU General Public License for more details.
++#
++# You should have received a copy of the GNU General Public License
++# along with this program.  If not, see <http://www.gnu.org/licenses/>.
++#
++
++# creator
++owner=berto@igalia.com
++
++seq=`basename $0`
++echo "QA output created by $seq"
++
++status=1	# failure is the default!
++
++_cleanup()
++{
++    _cleanup_test_img
++}
++trap "_cleanup; exit \$status" 0 1 2 3 15
++
++# get standard environment, filters and checks
++. ./common.rc
++. ./common.filter
++
++_supported_fmt qcow2
++_supported_proto file
++
++echo
++echo "== Required alignment larger than cluster size =="
++
++CLUSTER_SIZE=2k _make_test_img 1M
++# Since commit c8bb23cbdb writing to an unallocated cluster fills the
++# empty COW areas with bdrv_write_zeroes(flags=BDRV_REQ_NO_FALLBACK)
++$QEMU_IO -c "open -o driver=$IMGFMT,file.align=4k blkdebug::$TEST_IMG" \
++         -c "write 0 512" | _filter_qemu_io
++
++# success, all done
++echo "*** done"
++rm -f $seq.full
++status=0
+diff --git a/tests/qemu-iotests/268.out b/tests/qemu-iotests/268.out
+new file mode 100644
+index 0000000000..2ed6c68529
+--- /dev/null
++++ b/tests/qemu-iotests/268.out
+@@ -0,0 +1,7 @@
++QA output created by 268
++
++== Required alignment larger than cluster size ==
++Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1048576
++wrote 512/512 bytes at offset 0
++512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++*** done
+diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
+index 5805a79d9e..4c861f7eed 100644
+--- a/tests/qemu-iotests/group
++++ b/tests/qemu-iotests/group
+@@ -278,3 +278,4 @@
+ 265 rw auto quick
+ 266 rw quick
+ 267 rw auto quick snapshot
++268 rw auto quick
+-- 
+2.20.1
 
-I am just guessing that you somehow mixed this line with the line:
-
-   case 3: /* ERL */
-
-that would have not generated checkpatch warning.
-
-I don't see any reason to change this patch. Please let me know it you
-still think I should do something else. And you are welcome to analyse any
-patches of mine.
-
-Aleksandar
-
-
-> [...]
->
->
-
---00000000000007f6800594da656e
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-<br><br>On Monday, October 14, 2019, Markus Armbruster &lt;<a href=3D"mailt=
-o:armbru@redhat.com">armbru@redhat.com</a>&gt; wrote:<br><blockquote class=
-=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;border-left:1px #ccc solid;padd=
-ing-left:1ex">Aleksandar Markovic &lt;<a href=3D"mailto:aleksandar.markovic=
-@rt-rk.com">aleksandar.markovic@rt-rk.com</a>&gt; writes:<br>
-<br>
-&gt; From: Aleksandar Markovic &lt;<a href=3D"mailto:amarkovic@wavecomp.com=
-">amarkovic@wavecomp.com</a>&gt;<br>
-&gt;<br>
-&gt; Mostly fix errors and warnings reported by &#39;<a href=3D"http://chec=
-kpatch.pl" target=3D"_blank">checkpatch.pl</a> -f&#39;.<br>
-&gt;<br>
-&gt; Signed-off-by: Aleksandar Markovic &lt;<a href=3D"mailto:amarkovic@wav=
-ecomp.com">amarkovic@wavecomp.com</a>&gt;<br>
-&gt; ---<br>
-&gt;=C2=A0 target/mips/helper.c | 128 ++++++++++++++++++++++++++++++<wbr>+-=
--------------------<br>
-&gt;=C2=A0 1 file changed, 78 insertions(+), 50 deletions(-)<br>
-&gt;<br>
-&gt; diff --git a/target/mips/helper.c b/target/mips/helper.c<br>
-&gt; index a2b6459..2411a2c 100644<br>
-&gt; --- a/target/mips/helper.c<br>
-&gt; +++ b/target/mips/helper.c<br>
-&gt; @@ -39,8 +39,8 @@ enum {<br>
-&gt;=C2=A0 #if !defined(CONFIG_USER_ONLY)<br>
-&gt;=C2=A0 <br>
-&gt;=C2=A0 /* no MMU emulation */<br>
-&gt; -int no_mmu_map_address (CPUMIPSState *env, hwaddr *physical, int *pro=
-t,<br>
-&gt; -=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0 =C2=A0 target_ulong address, int rw, int access_type)<br>
-&gt; +int no_mmu_map_address(<wbr>CPUMIPSState *env, hwaddr *physical, int =
-*prot,<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0 =C2=A0target_ulong address, int rw, int access_type)<br>
-&gt;=C2=A0 {<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 *physical =3D address;<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 *prot =3D PAGE_READ | PAGE_WRITE | PAGE_EXEC;<br>
-&gt; @@ -48,26 +48,28 @@ int no_mmu_map_address (CPUMIPSState *env, hwaddr =
-*physical, int *prot,<br>
-&gt;=C2=A0 }<br>
-&gt;=C2=A0 <br>
-&gt;=C2=A0 /* fixed mapping MMU emulation */<br>
-&gt; -int fixed_mmu_map_address (CPUMIPSState *env, hwaddr *physical, int *=
-prot,<br>
-&gt; -=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0 =C2=A0 =C2=A0 =C2=A0target_ulong address, int rw, int access_type)<=
-br>
-&gt; +int fixed_mmu_map_address(<wbr>CPUMIPSState *env, hwaddr *physical, i=
-nt *prot,<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0 =C2=A0 =C2=A0 target_ulong address, int rw, int access_type)<br>
-&gt;=C2=A0 {<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 if (address &lt;=3D (int32_t)0x7FFFFFFFUL) {<br>
-&gt; -=C2=A0 =C2=A0 =C2=A0 =C2=A0 if (!(env-&gt;CP0_Status &amp; (1 &lt;&lt=
-; CP0St_ERL)))<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 if (!(env-&gt;CP0_Status &amp; (1 &lt;&lt=
-; CP0St_ERL))) {<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 *physical =3D address =
-+ 0x40000000UL;<br>
-&gt; -=C2=A0 =C2=A0 =C2=A0 =C2=A0 else<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 } else {<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 *physical =3D address;=
-<br>
-&gt; -=C2=A0 =C2=A0 } else if (address &lt;=3D (int32_t)0xBFFFFFFFUL)<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 }<br>
-&gt; +=C2=A0 =C2=A0 } else if (address &lt;=3D (int32_t)0xBFFFFFFFUL) {<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 *physical =3D address &amp; 0x1FFFFF=
-FF;<br>
-&gt; -=C2=A0 =C2=A0 else<br>
-&gt; +=C2=A0 =C2=A0 } else {<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 *physical =3D address;<br>
-&gt; +=C2=A0 =C2=A0 }<br>
-&gt;=C2=A0 <br>
-&gt;=C2=A0 =C2=A0 =C2=A0 *prot =3D PAGE_READ | PAGE_WRITE | PAGE_EXEC;<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 return TLBRET_MATCH;<br>
-&gt;=C2=A0 }<br>
-&gt;=C2=A0 <br>
-&gt;=C2=A0 /* MIPS32/MIPS64 R4000-style MMU emulation */<br>
-&gt; -int r4k_map_address (CPUMIPSState *env, hwaddr *physical, int *prot,<=
-br>
-&gt; -=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0target_ulong address, int rw, int access_type)<br>
-&gt; +int r4k_map_address(CPUMIPSState *env, hwaddr *physical, int *prot,<b=
-r>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- target_ulong address, int rw, int access_type)<br>
-&gt;=C2=A0 {<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 uint16_t ASID =3D env-&gt;CP0_EntryHi &amp; env-&g=
-t;CP0_EntryHi_ASID_mask;<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 int i;<br>
-&gt; @@ -99,8 +101,9 @@ int r4k_map_address (CPUMIPSState *env, hwaddr *phy=
-sical, int *prot,<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 if (rw !=3D MMU_DATA_S=
-TORE || (n ? tlb-&gt;D1 : tlb-&gt;D0)) {<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 *physica=
-l =3D tlb-&gt;PFN[n] | (address &amp; (mask &gt;&gt; 1));<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 *prot =
-=3D PAGE_READ;<br>
-&gt; -=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 if (n ? tlb-&=
-gt;D1 : tlb-&gt;D0)<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 if (n ? tlb-&=
-gt;D1 : tlb-&gt;D0) {<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 *prot |=3D PAGE_WRITE;<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 }<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 if (!(n =
-? tlb-&gt;XI1 : tlb-&gt;XI0)) {<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 *prot |=3D PAGE_EXEC;<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 }<br>
-&gt; @@ -130,8 +133,11 @@ static int is_seg_am_mapped(unsigned int am, bool=
- eu, int mmu_idx)<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 int32_t adetlb_mask;<br>
-&gt;=C2=A0 <br>
-&gt;=C2=A0 =C2=A0 =C2=A0 switch (mmu_idx) {<br>
-&gt; -=C2=A0 =C2=A0 case 3 /* ERL */:<br>
-&gt; -=C2=A0 =C2=A0 =C2=A0 =C2=A0 /* If EU is set, always unmapped */<br>
-&gt; +=C2=A0 =C2=A0 case 3:<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 /*<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0* ERL<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0* If EU is set, always unmapped<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0*/<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 if (eu) {<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 return 0;<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 }<br>
-<br>
-This changes from the usual way we format switch case comments to an<br>
-unusual way.<br>
-<br>
-If you want to pursue this change, please put it in a separate patch,<br>
-so this one is really about fixing &quot;errors and warnings reported by<br=
->
-&#39;<a href=3D"http://checkpatch.pl" target=3D"_blank">checkpatch.pl</a> -=
-f&#39;&quot;, as your commit message promises.<br>
-<br></blockquote><div><br></div><div><br></div><div>Hi, Markus. Thank you f=
-or your response.</div><div><br></div><div>There must be some misunderstand=
-ing here:</div><div><br></div><div>The line:</div><div><br></div><div>=C2=
-=A0=C2=A0 case 3 /* ERL */:<br></div><div><br></div><div>generates a checkp=
-atch warning. I don&#39;t know why I would put it in a separate patch, if t=
-his patch is about fixing checkpatch warnings. Please explain.</div><div><b=
-r></div><div>Secondly, I don&#39;t see that this is a usual way we format s=
-witch statement. I found just several cases in the whole QEMU code base (an=
-d you claimed in previous comments that there are thousands).</div><div><br=
-></div><div>I am just guessing that you somehow mixed this line with the li=
-ne:</div><div><br></div><div>=C2=A0 =C2=A0case 3: /* ERL */<br></div><div><=
-br></div><div>that would have not generated checkpatch warning.</div><div><=
-br></div><div>I don&#39;t see any reason to change this patch. Please let m=
-e know it you still think I should do something else. And you are welcome t=
-o analyse any patches of mine.</div><div><br></div><div>Aleksandar</div><di=
-v>=C2=A0</div><blockquote class=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;=
-border-left:1px #ccc solid;padding-left:1ex">
-[...]<br>
-<br>
-</blockquote>
-
---00000000000007f6800594da656e--
 
