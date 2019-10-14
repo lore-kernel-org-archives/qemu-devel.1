@@ -2,68 +2,84 @@ Return-Path: <SRS0=PUPy=YH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A05EAC4CECE
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 14:20:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B00B6C4CECE
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 14:22:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7602F2089C
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 14:20:06 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7602F2089C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 33B2C2067B
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 14:22:08 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="pOstV9Vd"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 33B2C2067B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50303 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50316 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iK1Cf-0002Nr-K5
-	for qemu-devel@archiver.kernel.org; Mon, 14 Oct 2019 10:20:05 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47605)
+	id 1iK1Ed-0003sY-4d
+	for qemu-devel@archiver.kernel.org; Mon, 14 Oct 2019 10:22:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47923)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eblake@redhat.com>) id 1iK1Au-0001Ma-BZ
- for qemu-devel@nongnu.org; Mon, 14 Oct 2019 10:18:17 -0400
+ (envelope-from <hikarupsp@gmail.com>) id 1iK1D4-0003Dz-Jj
+ for qemu-devel@nongnu.org; Mon, 14 Oct 2019 10:20:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eblake@redhat.com>) id 1iK1At-0006or-9k
- for qemu-devel@nongnu.org; Mon, 14 Oct 2019 10:18:16 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:50186)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eblake@redhat.com>)
- id 1iK1Ar-0006oL-3l; Mon, 14 Oct 2019 10:18:13 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 5A1B9308624A;
- Mon, 14 Oct 2019 14:18:12 +0000 (UTC)
-Received: from [10.3.116.168] (ovpn-116-168.phx2.redhat.com [10.3.116.168])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 02E2960126;
- Mon, 14 Oct 2019 14:18:11 +0000 (UTC)
-Subject: Re: [PATCH 1/4] vl: Split off user_creatable_print_help()
-To: Kevin Wolf <kwolf@redhat.com>
-References: <20191011205551.32149-1-kwolf@redhat.com>
- <20191011205551.32149-2-kwolf@redhat.com>
- <f1b7efeb-6ce5-2943-76fc-12b6d0f09215@redhat.com>
- <20191014095525.GC7173@localhost.localdomain>
-From: Eric Blake <eblake@redhat.com>
-Organization: Red Hat, Inc.
-Message-ID: <c3961096-5d67-7762-7294-b91e40ea5f74@redhat.com>
-Date: Mon, 14 Oct 2019 09:18:11 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.0
+ (envelope-from <hikarupsp@gmail.com>) id 1iK1D3-0007gV-Hm
+ for qemu-devel@nongnu.org; Mon, 14 Oct 2019 10:20:30 -0400
+Received: from mail-lj1-x241.google.com ([2a00:1450:4864:20::241]:36791)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <hikarupsp@gmail.com>) id 1iK1D3-0007g3-AS
+ for qemu-devel@nongnu.org; Mon, 14 Oct 2019 10:20:29 -0400
+Received: by mail-lj1-x241.google.com with SMTP id v24so16837528ljj.3
+ for <qemu-devel@nongnu.org>; Mon, 14 Oct 2019 07:20:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=/oSs9bzWNDcojG3c62bX2yqN7zDbrCBfvSMeBczDsDc=;
+ b=pOstV9VdBizz1jaeWPchALeLEKI8T2o7DXv4qgYVTjzb9PtaOvELMlReoSOsMrLoTl
+ WKJSpYhe+k6M+vsSFhM4mYEDiuzhYgpluLhXO+KYdus21iQ1HVAcfp8PJHDsR3Zvf6yD
+ Nf9D4+j+e3zaP4NnZDSvc6esrkjrLodA6t90hv/GWD/rSllO23iWs+rRbw5bSlW53jBW
+ PwwL3Vd5t9W7Y0P0XIMZxJCY2Nli/f70OBvrOeH/HnRXI3ZiM9C6wVOdB3MXNOk/slOn
+ 24oE+hsItSeomOnRTUVvY39FX96MnoLrluZJwJP9C9+vVz4YhWgYaS/Fm6Z+Hqvo8/YA
+ lowQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=/oSs9bzWNDcojG3c62bX2yqN7zDbrCBfvSMeBczDsDc=;
+ b=Wn9Z/cZLkwR9VV8poJ25BHsf1RFbV18X4xT5yZSR9V5TyR1d9Hd94w3xEPzXJrwTdU
+ sktsgTmGgXldOmlZvLQW0pQjfC2pyo/0S51ILvGethhfpsplPIF68+oNlvTFVJR1I93H
+ p2l5IPrBcsBROY6uxHaW/oPxx7akOxtY+MjP6LkAwi/Hi9I/+BjNQt2fs7PW8E70yeP3
+ ligiEoA+icWDixrlgOYmzdB3IhI2X+oVrXueflQIttNZtLQVCZaJGHUwqXcYQkHhwxsc
+ JNJUG3c7hF5+mDr6T0INY3lhN50UNUOT+P/ctxFDp7SdHS5EifVGkgJbVMsR6HR9UVTW
+ +Idg==
+X-Gm-Message-State: APjAAAU1kDYhoISxoPUunn+HLZbGEID6BXxstcG7nll5SH69i39zGHpq
+ YUVKEf6975m5PqKuaw/A75GciiAWgxpg2bY7VsRf7IHX
+X-Google-Smtp-Source: APXvYqyPsyhA+Yikm5Yet3Oe9UZ48iR9BqwmV/xQKW4aTGtH42QhQSn7IUNCu6RP5f+xbH2nYPg2L7AhLz+/iIR4jo4=
+X-Received: by 2002:a2e:286:: with SMTP id y6mr18326745lje.233.1571062827118; 
+ Mon, 14 Oct 2019 07:20:27 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20191014095525.GC7173@localhost.localdomain>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.49]); Mon, 14 Oct 2019 14:18:12 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.132.183.28
+References: <20191014125254.74913-1-hikarupsp@gmail.com>
+ <CAFEAcA-iaUraj+AZuGcXw6pNy2aBQ2J0Cm9900COsY+quJc2tA@mail.gmail.com>
+ <CAD-w0GAzUvF_ckFviFa+Am2Wph2xGH2ywUAN15hunofaM2OBDw@mail.gmail.com>
+ <CAFEAcA8LFC=swx8EXDRT0+PC=HJ3Qx1hVUszDyEYdKzA2aexmg@mail.gmail.com>
+In-Reply-To: <CAFEAcA8LFC=swx8EXDRT0+PC=HJ3Qx1hVUszDyEYdKzA2aexmg@mail.gmail.com>
+From: Hikaru Nishida <hikarupsp@gmail.com>
+Date: Mon, 14 Oct 2019 23:20:15 +0900
+Message-ID: <CAD-w0GC3TOgFTotH-mW-BVnq0qDoestRzT_=i-WYfdyf0M3BsQ@mail.gmail.com>
+Subject: Re: [PATCH] This patch fixes hanging up Cocoa display on macOS 10.15
+ (Catalina)
+To: Peter Maydell <peter.maydell@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::241
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -75,45 +91,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, mreitz@redhat.com
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Gerd Hoffmann <kraxel@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 10/14/19 4:55 AM, Kevin Wolf wrote:
-> Am 11.10.2019 um 23:35 hat Eric Blake geschrieben:
->> On 10/11/19 3:55 PM, Kevin Wolf wrote:
->>> Printing help for --object is something that we don't only want in the
->>
->> s/don't/not/
-> 
-> Can someone send a fix for the English grammar? It's obviously broken
-> and doesn't know what it wants. Actually, maybe do-support was a bad
-> idea and we should just revert it and restore consistent use of proper
-> verb-second word order?
+I resent the patch. Thank you for your assistance!
 
-Lol
+Hikaru Nishida
 
-> 
-> (Hm, actually, since this seems to negate "only" rather than the verb,
-> does "...that we want not only in..." work without patching the
-> grammar?)
-
-Yes, that formulation also works.
-
-> 
-> (Thanks for the correction.)
-> 
-> Kevin
-> 
->>> system emulator, but also in tools that support --object. Move it into a
->>> separate function in qom/object_interfaces.c to make the code accessible
->>> for tools.
->>>
->>> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
+2019=E5=B9=B410=E6=9C=8814=E6=97=A5(=E6=9C=88) 22:50 Peter Maydell <peter.m=
+aydell@linaro.org>:
+>
+> On Mon, 14 Oct 2019 at 14:41, Hikaru Nishida <hikarupsp@gmail.com> wrote:
+> >
+> > Thank you for your reply.
+> >
+> > The event gets fired before applicationDidFinishLaunching is: (output
+> > of  NSLog(@"event: %@", event);)
+> > event: NSEvent: type=3DKitdefined loc=3D(0,1440) time=3D164310.0 flags=
+=3D0x40
+> > win=3D0x0 winNum=3D0 ctxt=3D0x0 subtype=3D1 data1=3D834 data2=3D0
+> >
+> > I moved allow_events =3D true just before
+> > qemu_sem_post(&app_started_sem) and it also works.
+>
+> OK, great. I think we should go with that, then.
+> I think a brief comment explaining the purpose of the flag
+> would also be useful in the handleEvent function; something
+> like this:
+>
+> /*
+>  * Just let OSX have all events that arrive before
+> applicationDidFinishLaunching.
+>  * This avoids a deadlock on the iothread lock, which cocoa_display_init(=
+)
+>  * will not drop until after the app_started_sem is posted. (In theory
+>  * there should not be any such events, but OSX Catalina now emits some.)
+>  */
+>
+> Could you send a v2 of the patch with 'allow_events =3D true' in the
+> applicationDidFinishLaunching function, and that comment
+> in handleEvent please, and we'll get that into the tree?
+>
+> thanks
+> -- PMM
 
