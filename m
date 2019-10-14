@@ -2,84 +2,64 @@ Return-Path: <SRS0=PUPy=YH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 58A16C47404
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 04:43:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A5DCDC47404
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 05:28:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1FB642067B
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 04:43:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6C181206A3
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 05:28:42 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="b5z6qe/V"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1FB642067B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="Adp+E2Cv"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6C181206A3
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44410 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44620 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iJsCI-0004Ea-7A
-	for qemu-devel@archiver.kernel.org; Mon, 14 Oct 2019 00:43:06 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54663)
+	id 1iJsuP-0002w0-L5
+	for qemu-devel@archiver.kernel.org; Mon, 14 Oct 2019 01:28:41 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60206)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <aleksandar.m.mail@gmail.com>) id 1iJsAz-0003mR-GG
- for qemu-devel@nongnu.org; Mon, 14 Oct 2019 00:41:46 -0400
+ (envelope-from <dgibson@ozlabs.org>) id 1iJstE-0002Lw-JG
+ for qemu-devel@nongnu.org; Mon, 14 Oct 2019 01:27:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aleksandar.m.mail@gmail.com>) id 1iJsAy-0007Vz-9U
- for qemu-devel@nongnu.org; Mon, 14 Oct 2019 00:41:45 -0400
-Received: from mail-oi1-x229.google.com ([2607:f8b0:4864:20::229]:36665)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
- id 1iJsAy-0007Vk-4L
- for qemu-devel@nongnu.org; Mon, 14 Oct 2019 00:41:44 -0400
-Received: by mail-oi1-x229.google.com with SMTP id k20so12692348oih.3
- for <qemu-devel@nongnu.org>; Sun, 13 Oct 2019 21:41:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:in-reply-to:references:from:date:message-id:subject:to
- :cc; bh=akTTEmks7V47Xz9wwUCSzj6PJzW0A/M74cxRPrqJC24=;
- b=b5z6qe/VU+qgIvmbVg/j+CmVqll2TlcoLOLKYF8AzesDe/1oQaijPIi3KvFIhf0n34
- fWxIBU//zfJos0NO/yUoBGVSEYHbY1DnLjebPuOaxl8mLS7OQg895WE3I3kQJ7j4lCL9
- l610Xelk4s7iNelFWei0tAR7e/QefpBhn2DHx+UM6TdqqSixQfu8ngcAOxeVQaxP7YL0
- eJvAnog/Z6njwWpMhsHq5Ddhf1U1/Vg84Hd+QgeGtfpjKrLb7nZomTMEmHGzC2D9X9tb
- A5V4AoO/om6+kWQk8l7xEJuDO+gI/7x5ofLEdabG+SJkOlLks0/rw7gvycc1hgWu5UER
- w2mg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:in-reply-to:references:from:date
- :message-id:subject:to:cc;
- bh=akTTEmks7V47Xz9wwUCSzj6PJzW0A/M74cxRPrqJC24=;
- b=cVvY4qCc3rBLyXBl66ETSZFosrPTtU/cYIikqUZvxOq3l2G24agfoNAC8s17M8lN9D
- DFQ8eaU5cvUL/lu3MrzJxDWRlvKWUXbDCrt6ByVcc8kI9ildngJTJFtWWibcWGKDHDBo
- fovo6LV9t5a9Q2pNkd8iUDdM+JdoUXj+aZfZ7sPTjQzfA0Y+bPlANV4FvcvRsZ3DO/rm
- Yrez4NpaF8y7QKe5O3bLHVYLRdL6DoKaVOeNUV/sRvm8S0CFEI/DsbZcwn8LUfx4k/5Y
- eRU45kvrk2xfw01gLiTFMmFBQNBk7qTKk3IxSbucpMYBBCG8Jeo8Rm6i0QoysHTSMbpD
- i0Fw==
-X-Gm-Message-State: APjAAAXEicVRO02PvlWeweMes8wUppQZLPlZ7UC75eWd1A1wXn7tJK2H
- 46abxWuh2pWPGHoHmOsj84gi5IeBnbiF8XUEcZw=
-X-Google-Smtp-Source: APXvYqx2FHlgwv0/aQXwmJv90wL1a5cThS36zrerVkIChAE2uURPfMLaKHnnkRNinFj0wrMXzLvA/0NHb7F1mCDnUsA=
-X-Received: by 2002:aca:62d5:: with SMTP id
- w204mr23050748oib.136.1571028103262; 
- Sun, 13 Oct 2019 21:41:43 -0700 (PDT)
+ (envelope-from <dgibson@ozlabs.org>) id 1iJstB-0004gk-I1
+ for qemu-devel@nongnu.org; Mon, 14 Oct 2019 01:27:28 -0400
+Received: from ozlabs.org ([203.11.71.1]:47893)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
+ id 1iJstA-0004fT-Iq; Mon, 14 Oct 2019 01:27:25 -0400
+Received: by ozlabs.org (Postfix, from userid 1007)
+ id 46s6WV6gcXz9sPj; Mon, 14 Oct 2019 16:27:18 +1100 (AEDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+ d=gibson.dropbear.id.au; s=201602; t=1571030838;
+ bh=XbUzoF2pCmQP+TnRyVcf7qaPkAzS0GFvLbd/5AtQMJM=;
+ h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+ b=Adp+E2CvI0nuMSVdLAhQ8sqsCgxZfspWlQ696cM57PLxqD/IeORhE3rEKo8T9thOS
+ dtDPA3QOjAu0jriCwcNooa7ksdIsEvPh0fCICxdeDUzbJMhN9HczU3flef2G2b6xde
+ UJ7kk1pOw4NF5V9Df6vNWJIsKjv++uGJf9i5bdgQ=
+Date: Mon, 14 Oct 2019 16:27:13 +1100
+From: David Gibson <david@gibson.dropbear.id.au>
+To: Ganesh Goudar <ganeshgr@linux.ibm.com>
+Subject: Re: [PATCH v16 2/7] ppc: spapr: Introduce FWNMI capability
+Message-ID: <20191014052713.GR4080@umbus.fritz.box>
+References: <20191010065950.23169-1-ganeshgr@linux.ibm.com>
+ <20191010065950.23169-3-ganeshgr@linux.ibm.com>
 MIME-Version: 1.0
-Received: by 2002:a9d:340a:0:0:0:0:0 with HTTP; Sun, 13 Oct 2019 21:41:42
- -0700 (PDT)
-In-Reply-To: <35cb0bfc-fc91-8555-9725-0c3fc420d93c@linaro.org>
-References: <20191013222544.3679-1-richard.henderson@linaro.org>
- <CAL1e-=ioCkAxyjdDvBTeQPMWpUy0W=ej-WiUmZkyTVJYUsd-_A@mail.gmail.com>
- <35cb0bfc-fc91-8555-9725-0c3fc420d93c@linaro.org>
-From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
-Date: Mon, 14 Oct 2019 06:41:42 +0200
-Message-ID: <CAL1e-=giZhYZMykWiyZW-x-yj+c_s9akUU-ONHvrvL+NdA4XsA@mail.gmail.com>
-Subject: Re: [PULL 00/23] tcg patch queue
-To: Richard Henderson <richard.henderson@linaro.org>
-Content-Type: multipart/alternative; boundary="00000000000006f4900594d77cb8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::229
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="Uw+RRa3pmtkgiNaD"
+Content-Disposition: inline
+In-Reply-To: <20191010065950.23169-3-ganeshgr@linux.ibm.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 203.11.71.1
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,86 +71,222 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "peter.maydell@linaro.org" <peter.maydell@linaro.org>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: arawinda.p@gmail.com, aik@ozlabs.ru, qemu-devel@nongnu.org, groug@kaod.org,
+ paulus@ozlabs.org, qemu-ppc@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---00000000000006f4900594d77cb8
-Content-Type: text/plain; charset="UTF-8"
 
-On Monday, October 14, 2019, Richard Henderson <richard.henderson@linaro.org>
-wrote:
-
-> On 10/13/19 4:53 PM, Aleksandar Markovic wrote:
-> > Just for the sake of being punctual, may I ask you to add "Tested-by:"
-> for Mark
-> > Cave-Ayland, and "Reviewed-by:" for myself to all 22 ppc host patches,
-> as it
-> > was indicated in the responses to the last version of the ppc host
-> series?
->
-> I did add your r-b to those patches that didn't already have your s-o-b.
->
-> I added Mark's T-b to patch 15, which is the one that enables basic
-> altivec.
-> Mark said that he was testing ppc32 and I know that he's got a G4.  He
-> would
-> not have tested the later patches with that hardware.
->
->
->
-Mark tested the whole series, applied to his test bed. This means that all
-patches are tested for a particular setup - for example, among other
-things, he established that the patches that are supposed to directly
-impact different setups do not cause regressions on his setup.
-
-I responded to the cover letter with "r-b for all patches", and would like
-that to be recorded.
-
-Aleksandar
-
-
-> r~
->
-
---00000000000006f4900594d77cb8
-Content-Type: text/html; charset="UTF-8"
+--Uw+RRa3pmtkgiNaD
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-<br><br>On Monday, October 14, 2019, Richard Henderson &lt;<a href=3D"mailt=
-o:richard.henderson@linaro.org">richard.henderson@linaro.org</a>&gt; wrote:=
-<br><blockquote class=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;border-lef=
-t:1px #ccc solid;padding-left:1ex">On 10/13/19 4:53 PM, Aleksandar Markovic=
- wrote:<br>
-&gt; Just for the sake of being punctual, may I ask you to add &quot;Tested=
--by:&quot; for Mark<br>
-&gt; Cave-Ayland, and &quot;Reviewed-by:&quot; for myself to all 22 ppc hos=
-t patches, as it<br>
-&gt; was indicated in the responses to the last version of the ppc host ser=
-ies?<br>
-<br>
-I did add your r-b to those patches that didn&#39;t already have your s-o-b=
-.<br>
-<br>
-I added Mark&#39;s T-b to patch 15, which is the one that enables basic alt=
-ivec.<br>
-Mark said that he was testing ppc32 and I know that he&#39;s got a G4.=C2=
-=A0 He would<br>
-not have tested the later patches with that hardware.<br>
-<br>
-<br></blockquote><div><br></div><div>Mark tested the whole series, applied =
-to his test bed. This means that all patches are tested for a particular se=
-tup - for example, among other things, he established that the patches that=
- are supposed to directly impact different setups do not cause regressions =
-on his setup.</div><div><br></div><div>I responded to the cover letter with=
- &quot;r-b for all patches&quot;, and would like that to be recorded.</div>=
-<div><br></div><div>Aleksandar</div><div>=C2=A0<br></div><blockquote class=
-=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;border-left:1px #ccc solid;padd=
-ing-left:1ex">
-r~<br>
-</blockquote>
+On Thu, Oct 10, 2019 at 12:29:45PM +0530, Ganesh Goudar wrote:
+> From: Aravinda Prasad <arawinda.p@gmail.com>
+>=20
+> Introduce the KVM capability KVM_CAP_PPC_FWNMI so that
+> the KVM causes guest exit with NMI as exit reason
+> when it encounters a machine check exception on the
+> address belonging to a guest. Without this capability
+> enabled, KVM redirects machine check exceptions to
+> guest's 0x200 vector.
+>=20
+> This patch also introduces fwnmi-mce capability to
+> deal with the case when a guest with the
+> KVM_CAP_PPC_FWNMI capability enabled is attempted
+> to migrate to a host that does not support this
+> capability.
 
---00000000000006f4900594d77cb8--
+I think the commit message needs some updating.  This doesn't really
+introduce the KVM cap.  It introduces the spapr capability, and
+validates it against the kernel's exising capability.
+
+>=20
+> [eliminate cap_ppc_fwnmi]
+> Signed-off-by: Ganesh Goudar <ganeshgr@linux.ibm.com>
+> Signed-off-by: Aravinda Prasad <arawinda.p@gmail.com>
+> ---
+>  hw/ppc/spapr.c         |  1 +
+>  hw/ppc/spapr_caps.c    | 29 +++++++++++++++++++++++++++++
+>  include/hw/ppc/spapr.h |  4 +++-
+>  target/ppc/kvm.c       |  8 ++++++++
+>  target/ppc/kvm_ppc.h   |  6 ++++++
+>  5 files changed, 47 insertions(+), 1 deletion(-)
+>=20
+> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> index 514a17ae74..7e6a15c9b4 100644
+> --- a/hw/ppc/spapr.c
+> +++ b/hw/ppc/spapr.c
+> @@ -4441,6 +4441,7 @@ static void spapr_machine_class_init(ObjectClass *o=
+c, void *data)
+>      smc->default_caps.caps[SPAPR_CAP_NESTED_KVM_HV] =3D SPAPR_CAP_OFF;
+>      smc->default_caps.caps[SPAPR_CAP_LARGE_DECREMENTER] =3D SPAPR_CAP_ON;
+>      smc->default_caps.caps[SPAPR_CAP_CCF_ASSIST] =3D SPAPR_CAP_OFF;
+> +    smc->default_caps.caps[SPAPR_CAP_FWNMI_MCE] =3D SPAPR_CAP_OFF;
+>      spapr_caps_add_properties(smc, &error_abort);
+>      smc->irq =3D &spapr_irq_dual;
+>      smc->dr_phb_enabled =3D true;
+
+To have migration work correctly, you also need to add
+&vmstate_spapr_cap_fwnmi_mce  to the list in vmstate_spapr.  (Yes,
+that makes three places you have to put things to get migration
+right, which is really easy to mess up - I've done it more than once
+myself - unfortunately, I haven't come up with a better way yet).
+
+> diff --git a/hw/ppc/spapr_caps.c b/hw/ppc/spapr_caps.c
+> index 481dfd2a27..778bf32181 100644
+> --- a/hw/ppc/spapr_caps.c
+> +++ b/hw/ppc/spapr_caps.c
+> @@ -496,6 +496,25 @@ static void cap_ccf_assist_apply(SpaprMachineState *=
+spapr, uint8_t val,
+>      }
+>  }
+> =20
+> +static void cap_fwnmi_mce_apply(SpaprMachineState *spapr, uint8_t val,
+> +                                Error **errp)
+> +{
+> +    if (!val) {
+> +        return; /* Disabled by default */
+> +    }
+> +
+> +    if (tcg_enabled()) {
+> +        /*
+> +         * TCG support may not be correct in some conditions (e.g., in c=
+ase
+> +         * of software injected faults like duplicate SLBs).
+> +         */
+> +        warn_report("Firmware Assisted Non-Maskable Interrupts not suppo=
+rted in TCG");
+> +    } else if (kvm_enabled() && kvmppc_set_fwnmi()) {
+
+When checking integer error code return values (like
+kvmppc_set_fwnmi()) please include an explicit !=3D 0, to make it
+clearer that's what's happening, rather than a function returning a bool.
+
+> +        error_setg(errp,
+> +"Firmware Assisted Non-Maskable Interrupts not supported by KVM, try cap=
+-fwnmi-mce=3Doff");
+> +    }
+> +}
+> +
+>  SpaprCapabilityInfo capability_table[SPAPR_CAP_NUM] =3D {
+>      [SPAPR_CAP_HTM] =3D {
+>          .name =3D "htm",
+> @@ -595,6 +614,15 @@ SpaprCapabilityInfo capability_table[SPAPR_CAP_NUM] =
+=3D {
+>          .type =3D "bool",
+>          .apply =3D cap_ccf_assist_apply,
+>      },
+> +    [SPAPR_CAP_FWNMI_MCE] =3D {
+> +        .name =3D "fwnmi-mce",
+> +        .description =3D "Handle fwnmi machine check exceptions",
+> +        .index =3D SPAPR_CAP_FWNMI_MCE,
+> +        .get =3D spapr_cap_get_bool,
+> +        .set =3D spapr_cap_set_bool,
+> +        .type =3D "bool",
+> +        .apply =3D cap_fwnmi_mce_apply,
+> +    },
+>  };
+> =20
+>  static SpaprCapabilities default_caps_with_cpu(SpaprMachineState *spapr,
+> @@ -734,6 +762,7 @@ SPAPR_CAP_MIG_STATE(hpt_maxpagesize, SPAPR_CAP_HPT_MA=
+XPAGESIZE);
+>  SPAPR_CAP_MIG_STATE(nested_kvm_hv, SPAPR_CAP_NESTED_KVM_HV);
+>  SPAPR_CAP_MIG_STATE(large_decr, SPAPR_CAP_LARGE_DECREMENTER);
+>  SPAPR_CAP_MIG_STATE(ccf_assist, SPAPR_CAP_CCF_ASSIST);
+> +SPAPR_CAP_MIG_STATE(fwnmi, SPAPR_CAP_FWNMI_MCE);
+> =20
+>  void spapr_caps_init(SpaprMachineState *spapr)
+>  {
+> diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
+> index cbd1a4c9f3..dcd2e7d0cc 100644
+> --- a/include/hw/ppc/spapr.h
+> +++ b/include/hw/ppc/spapr.h
+> @@ -79,8 +79,10 @@ typedef enum {
+>  #define SPAPR_CAP_LARGE_DECREMENTER     0x08
+>  /* Count Cache Flush Assist HW Instruction */
+>  #define SPAPR_CAP_CCF_ASSIST            0x09
+> +/* FWNMI machine check handling */
+> +#define SPAPR_CAP_FWNMI_MCE             0x0A
+>  /* Num Caps */
+> -#define SPAPR_CAP_NUM                   (SPAPR_CAP_CCF_ASSIST + 1)
+> +#define SPAPR_CAP_NUM                   (SPAPR_CAP_FWNMI_MCE + 1)
+> =20
+>  /*
+>   * Capability Values
+> diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
+> index 820724cc7d..d56f11a883 100644
+> --- a/target/ppc/kvm.c
+> +++ b/target/ppc/kvm.c
+> @@ -2060,6 +2060,14 @@ void kvmppc_set_mpic_proxy(PowerPCCPU *cpu, int mp=
+ic_proxy)
+>      }
+>  }
+> =20
+> +int kvmppc_set_fwnmi(void)
+> +{
+> +    PowerPCCPU *cpu =3D POWERPC_CPU(first_cpu);
+> +    CPUState *cs =3D CPU(cpu);
+> +
+> +    return kvm_vcpu_enable_cap(cs, KVM_CAP_PPC_FWNMI, 0);
+> +}
+> +
+>  int kvmppc_smt_threads(void)
+>  {
+>      return cap_ppc_smt ? cap_ppc_smt : 1;
+> diff --git a/target/ppc/kvm_ppc.h b/target/ppc/kvm_ppc.h
+> index 98bd7d5da6..5727a5025f 100644
+> --- a/target/ppc/kvm_ppc.h
+> +++ b/target/ppc/kvm_ppc.h
+> @@ -27,6 +27,7 @@ void kvmppc_enable_h_page_init(void);
+>  void kvmppc_set_papr(PowerPCCPU *cpu);
+>  int kvmppc_set_compat(PowerPCCPU *cpu, uint32_t compat_pvr);
+>  void kvmppc_set_mpic_proxy(PowerPCCPU *cpu, int mpic_proxy);
+> +int kvmppc_set_fwnmi(void);
+>  int kvmppc_smt_threads(void);
+>  void kvmppc_hint_smt_possible(Error **errp);
+>  int kvmppc_set_smt_threads(int smt);
+> @@ -159,6 +160,11 @@ static inline void kvmppc_set_mpic_proxy(PowerPCCPU =
+*cpu, int mpic_proxy)
+>  {
+>  }
+> =20
+> +static inline int kvmppc_set_fwnmi(void)
+> +{
+> +    return -1;
+> +}
+> +
+>  static inline int kvmppc_smt_threads(void)
+>  {
+>      return 1;
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--Uw+RRa3pmtkgiNaD
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl2kBzEACgkQbDjKyiDZ
+s5I4Hw/+OTpzjoduUkzHXn0khwiNAsjVAa2DMQQUTpnKknzPUNLb5wgxLHwZYsah
+whTgjvCq2BW/4KhPeBhGvHA3aSKgKgsYOKZO8AH4u8HDLpRRBGbSrdwyOPayd4v/
+hSwO/SK0IETZGVApg1xUr9jsrshK2Gb7PtIePnrFVLJjDY13WnWkNEedy8mo/iLp
+EUdrWYUzlQP5h2yHnFCI5pYwkEMKJI0JHv3laZF/9kGq2cXRY+VKBX3iV4avWC71
+Ep8qkGzUkwwalHnzR7VHGxu1xRyGqTqByxXUYzwbJxGUBjFUv4kp9Ha1z+ZTBfip
+hh8vHrGkCkAx3cDu6M5zVjEvMzdJleXCjsl0xOBNRQThk4MuAdKh/iHA0hRMSEd3
+XUmYU9i1mAqDXtAl7oPvwhKOaXmAfm6xy0u3oxwBSqJHuyMPvYeavR8J0EDTkXdA
+RkrPiokUEBgMTwKZKfeLBa60dhc+faz06gtw8CiMRO4LNmGhDxRxYDrZnlSLRu4u
+K9x5SEr/osu9YCIOFVAaLGTjaf9n+dV11J4b5YQp0+bMgZ10syThHyR1uymATmbr
+LAIfgR3DukJri/ZgGGsogjx0m3ExmQnsiiytmIyFmc78+u025xQ0b5nWe5BqVDhY
+YqWaRVOsLzuDKUP5fe2APIJtXIiBtWLP6hm3Br7IDX4xSlAoGBc=
+=ZbZ8
+-----END PGP SIGNATURE-----
+
+--Uw+RRa3pmtkgiNaD--
 
