@@ -2,81 +2,60 @@ Return-Path: <SRS0=PUPy=YH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.8 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 88604C4CECE
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 15:55:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 00EA6C4CECE
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 16:05:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5313120873
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 15:55:33 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="hhcgIYul"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5313120873
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id CACF420873
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 16:05:46 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CACF420873
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51988 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52598 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iK2h2-00068i-Ge
-	for qemu-devel@archiver.kernel.org; Mon, 14 Oct 2019 11:55:32 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35115)
+	id 1iK2qv-0004qk-CH
+	for qemu-devel@archiver.kernel.org; Mon, 14 Oct 2019 12:05:45 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36288)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1iK2g3-0005Fu-NU
- for qemu-devel@nongnu.org; Mon, 14 Oct 2019 11:54:32 -0400
+ (envelope-from <kwolf@redhat.com>) id 1iK2p9-0002mR-H1
+ for qemu-devel@nongnu.org; Mon, 14 Oct 2019 12:03:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1iK2g2-0004KU-KT
- for qemu-devel@nongnu.org; Mon, 14 Oct 2019 11:54:31 -0400
-Received: from mail-oi1-x241.google.com ([2607:f8b0:4864:20::241]:33995)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1iK2g2-0004KE-Ei
- for qemu-devel@nongnu.org; Mon, 14 Oct 2019 11:54:30 -0400
-Received: by mail-oi1-x241.google.com with SMTP id 83so14167757oii.1
- for <qemu-devel@nongnu.org>; Mon, 14 Oct 2019 08:54:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=H6UahA8Qmqx5X6+4KairbPWKfNTmCAAiwutW2GNS0RY=;
- b=hhcgIYulXiMjHzMDxoG46K1Q1uZns5X+8jgFXjziAxy0AZ+eWjczBfNORU5BeGveWT
- I5em1Xt1mizThh/fn3eH3HmnrEX3F8mHNVEPeO5YYSrleiYpHKzDALTPn7+PudymFm4S
- +bpoTts7yoX676/Eb7T+CXMaJKDeDNG5uVfG7YGjgdtBDJ2e1ggPH3tES+N8K3RulFDS
- aVjRG2pO0KOW6GH1cPwcjIcUdM9z6yRRNmQlwH5trp529SpQCnXVb7Wnqb+Dimcnm4uY
- FU0ZQEALyVcN0rdQqBgc3z6nyTRDCX6W2YhlOgEi9Oo6yfcgs0H1MKMtxGKWi8gRrGpv
- TnJg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=H6UahA8Qmqx5X6+4KairbPWKfNTmCAAiwutW2GNS0RY=;
- b=cQQ7F62pvaPY6sv/wkIe81y3xIZ2keZxheHDIdGc2WZAhiymdjbxPRY3FE2h7XaMSB
- Hjz+CP31VZ8BFTHaoevrHDHHGVsB1+jmVtJcJuqTArdGcwA9HeX8f/DXhYc9MIXyieB5
- GSssmlsat6wvfSUwg0owt4jmXaPgj2I0pfEy6WtZfmu4E33oNimq1G3m0cMOSSie8vwl
- Gx+wGHTjjNa/dwrX6j9BB5qyPmwtG4NlROjZT5D8qrjR8ZKs5FlLA9o40v8XJdWjf0lW
- hisBitxggLENFRNo8OogFw13FpStuA3Pi4gs57n4OUz1AsUX5v87HQUCHA+EUZHi4WhZ
- 9+mA==
-X-Gm-Message-State: APjAAAUKIxU57o8xBw1qqtU/UmPUUkDTOt/BxSDg+2I1b907B0/3raHs
- Akvh9luikEuljy5JrzSg1ceRZpm9RmsExmlMjTCJHg==
-X-Google-Smtp-Source: APXvYqzN7rIkm8AJEu8Ndl9rrS+7fLdy/HgGgE2he4IFufXx35DftZ2n8WKoNFpr9Qf+yRR0A0FA4RelqIJ4bcZRDm8=
-X-Received: by 2002:a54:4e83:: with SMTP id c3mr25274855oiy.170.1571068469603; 
- Mon, 14 Oct 2019 08:54:29 -0700 (PDT)
+ (envelope-from <kwolf@redhat.com>) id 1iK2p8-0006Nt-8Z
+ for qemu-devel@nongnu.org; Mon, 14 Oct 2019 12:03:55 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43699)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <kwolf@redhat.com>)
+ id 1iK2p4-0006Hc-CV; Mon, 14 Oct 2019 12:03:50 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id E9E3118CB8FB;
+ Mon, 14 Oct 2019 16:03:48 +0000 (UTC)
+Received: from localhost.localdomain.com (unknown [10.36.118.40])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id E2F285C1D4;
+ Mon, 14 Oct 2019 16:03:47 +0000 (UTC)
+From: Kevin Wolf <kwolf@redhat.com>
+To: qemu-block@nongnu.org
+Subject: [PULL 00/15] Block layer patches
+Date: Mon, 14 Oct 2019 18:03:34 +0200
+Message-Id: <20191014160343.8211-1-kwolf@redhat.com>
 MIME-Version: 1.0
-References: <20191014104948.4291-1-alex.bennee@linaro.org>
- <20191014104948.4291-18-alex.bennee@linaro.org>
-In-Reply-To: <20191014104948.4291-18-alex.bennee@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 14 Oct 2019 16:54:18 +0100
-Message-ID: <CAFEAcA8u3Srp_Lsucxh0-EaXW5UbETLOPA_KdpzONCaTob0GVA@mail.gmail.com>
-Subject: Re: [PATCH v5 17/55] plugins: implement helpers for resolving hwaddr
-To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=UTF-8
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.63]); Mon, 14 Oct 2019 16:03:48 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::241
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,70 +67,101 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: robert.foley@futurewei.com, QEMU Developers <qemu-devel@nongnu.org>,
- peter.puhov@futurewei.com, Aaron Lindsay <aaron@os.amperecomputing.com>,
- "Emilio G. Cota" <cota@braap.org>, Paolo Bonzini <pbonzini@redhat.com>,
- Richard Henderson <rth@twiddle.net>
+Cc: kwolf@redhat.com, peter.maydell@linaro.org, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, 14 Oct 2019 at 12:25, Alex Benn=C3=A9e <alex.bennee@linaro.org> wro=
-te:
->
-> We need to keep a local per-cpu copy of the data as other threads may
-> be running. We use a automatically growing array and re-use the space
-> for subsequent queries.
->
+The following changes since commit 22dbfdecc3c52228d3489da3fe81da92b21197=
+bf:
 
+  Merge remote-tracking branch 'remotes/awilliam/tags/vfio-update-2019101=
+0.0' into staging (2019-10-14 15:09:08 +0100)
 
-> +#ifdef CONFIG_SOFTMMU
-> +static __thread struct qemu_plugin_hwaddr hwaddr_info;
-> +
-> +struct qemu_plugin_hwaddr *qemu_plugin_get_hwaddr(qemu_plugin_meminfo_t =
-info,
-> +                                                  uint64_t vaddr)
-> +{
-> +    CPUState *cpu =3D current_cpu;
-> +    unsigned int mmu_idx =3D info >> TRACE_MEM_MMU_SHIFT;
-> +
-> +    if (!tlb_plugin_lookup(cpu, vaddr, mmu_idx,
-> +                           info & TRACE_MEM_ST, &hwaddr_info)) {
-> +        error_report("invalid use of qemu_plugin_get_hwaddr");
-> +        return NULL;
-> +    }
-> +
-> +    return &hwaddr_info;
-> +}
+are available in the Git repository at:
 
-Apologies for dropping into the middle of this patchset, but
-this API looks a bit odd. A hwaddr alone isn't a complete
-definition of an access -- you need an (AddressSpace, hwaddr)
-tuple for that. So this API looks like it doesn't really cope
-with things like TrustZone ?
+  git://repo.or.cz/qemu/kevin.git tags/for-upstream
 
->  uint64_t qemu_plugin_hwaddr_to_raddr(const struct qemu_plugin_hwaddr *ha=
-ddr)
->  {
-> +#ifdef CONFIG_SOFTMMU
-> +    ram_addr_t ram_addr =3D 0;
-> +
-> +    if (haddr && !haddr->is_io) {
-> +        ram_addr =3D qemu_ram_addr_from_host((void *) haddr->hostaddr);
-> +        if (ram_addr =3D=3D RAM_ADDR_INVALID) {
-> +            error_report("Bad ram pointer %"PRIx64"", haddr->hostaddr);
-> +            abort();
-> +        }
-> +    }
-> +    return ram_addr;
-> +#else
->      return 0;
-> +#endif
->  }
+for you to fetch changes up to a1406a9262a087d9ec9627b88da13c4590b61dae:
 
-This looks odd to see in the plugin API -- ramaddrs should
-be a QEMU internal concept, shouldn't they?
+  iotests: Test large write request to qcow2 file (2019-10-14 17:12:48 +0=
+200)
 
-thanks
--- PMM
+----------------------------------------------------------------
+Block layer patches:
+
+- block: Fix crash with qcow2 partial cluster COW with small cluster
+  sizes (misaligned write requests with BDRV_REQ_NO_FALLBACK)
+- qcow2: Fix integer overflow potentially causing corruption with huge
+  requests
+- vhdx: Detect truncated image files
+- tools: Support help options for --object
+- Various block-related replay improvements
+- iotests/028: Fix for long $TEST_DIRs
+
+----------------------------------------------------------------
+Alberto Garcia (1):
+      block: Reject misaligned write requests with BDRV_REQ_NO_FALLBACK
+
+Kevin Wolf (4):
+      vl: Split off user_creatable_print_help()
+      qemu-io: Support help options for --object
+      qemu-img: Support help options for --object
+      qemu-nbd: Support help options for --object
+
+Max Reitz (3):
+      iotests/028: Fix for long $TEST_DIRs
+      qcow2: Limit total allocation range to INT_MAX
+      iotests: Test large write request to qcow2 file
+
+Pavel Dovgaluk (6):
+      block: implement bdrv_snapshot_goto for blkreplay
+      replay: disable default snapshot for record/replay
+      replay: update docs for record/replay with block devices
+      replay: don't drain/flush bdrv queue while RR is working
+      replay: finish record/replay before closing the disks
+      replay: add BH oneshot event for block layer
+
+Peter Lieven (1):
+      block/vhdx: add check for truncated image files
+
+ docs/replay.txt                 |  12 +++-
+ include/qom/object_interfaces.h |  12 ++++
+ include/sysemu/replay.h         |   4 ++
+ replay/replay-internal.h        |   1 +
+ block/blkreplay.c               |   8 +++
+ block/block-backend.c           |   9 ++-
+ block/io.c                      |  39 ++++++++++++-
+ block/iscsi.c                   |   5 +-
+ block/nfs.c                     |   6 +-
+ block/null.c                    |   4 +-
+ block/nvme.c                    |   6 +-
+ block/qcow2-cluster.c           |   5 +-
+ block/rbd.c                     |   5 +-
+ block/vhdx.c                    | 120 ++++++++++++++++++++++++++++++++++=
+------
+ block/vxhs.c                    |   5 +-
+ cpus.c                          |   2 -
+ qemu-img.c                      |  34 +++++++-----
+ qemu-io.c                       |   9 ++-
+ qemu-nbd.c                      |   9 ++-
+ qom/object_interfaces.c         |  61 ++++++++++++++++++++
+ replay/replay-events.c          |  16 ++++++
+ replay/replay.c                 |   2 +
+ stubs/replay-user.c             |   9 +++
+ vl.c                            |  63 ++++-----------------
+ stubs/Makefile.objs             |   1 +
+ tests/qemu-iotests/028          |  11 +++-
+ tests/qemu-iotests/028.out      |   1 -
+ tests/qemu-iotests/268          |  55 ++++++++++++++++++
+ tests/qemu-iotests/268.out      |   7 +++
+ tests/qemu-iotests/270          |  83 +++++++++++++++++++++++++++
+ tests/qemu-iotests/270.out      |   9 +++
+ tests/qemu-iotests/group        |   2 +
+ 32 files changed, 504 insertions(+), 111 deletions(-)
+ create mode 100644 stubs/replay-user.c
+ create mode 100755 tests/qemu-iotests/268
+ create mode 100644 tests/qemu-iotests/268.out
+ create mode 100755 tests/qemu-iotests/270
+ create mode 100644 tests/qemu-iotests/270.out
 
