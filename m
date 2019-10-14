@@ -2,90 +2,83 @@ Return-Path: <SRS0=PUPy=YH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8B01BECE587
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 17:28:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BA8EEC4CECE
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 17:28:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5A14D20663
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 17:28:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 87EDE20663
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 17:28:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="dlSA/mR7"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5A14D20663
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SPJy60QK"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 87EDE20663
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54530 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54534 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iK48k-0001yj-61
-	for qemu-devel@archiver.kernel.org; Mon, 14 Oct 2019 13:28:14 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46995)
+	id 1iK48r-0002At-9T
+	for qemu-devel@archiver.kernel.org; Mon, 14 Oct 2019 13:28:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39782)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1iK3vR-0001a9-EX
- for qemu-devel@nongnu.org; Mon, 14 Oct 2019 13:14:30 -0400
+ (envelope-from <mrolnik@gmail.com>) id 1iK33z-00064S-Cu
+ for qemu-devel@nongnu.org; Mon, 14 Oct 2019 12:19:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1iK3vQ-0002sR-76
- for qemu-devel@nongnu.org; Mon, 14 Oct 2019 13:14:29 -0400
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:41223)
+ (envelope-from <mrolnik@gmail.com>) id 1iK33x-0007N7-Ve
+ for qemu-devel@nongnu.org; Mon, 14 Oct 2019 12:19:15 -0400
+Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:39943)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1iK3vP-0002ql-9J
- for qemu-devel@nongnu.org; Mon, 14 Oct 2019 13:14:27 -0400
-Received: by mail-wr1-x444.google.com with SMTP id p4so4741900wrm.8
- for <qemu-devel@nongnu.org>; Mon, 14 Oct 2019 10:14:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=kUFWXjDlIa2AsuNlyv5PMkdLD32nVesp9Vu/NCqpmaA=;
- b=dlSA/mR7Mf0vNZcx0tnJcmGKWRwfiT2MrVoe1dohXjGQ799cZst05+Il9m8Yeyi8XN
- kXgPxqKyvqXf11GkuY1As7ZHuH/bBlJcNfbk9Gw5PeIVontKYMsHeVObpfwlIChP7Dd6
- NE9B64NdVx/C5XkYpIOxK17zFtz6s3uY1xpoIvGmUkE+Y+hM+0WhA4F77mZi0bxB5MVW
- YIj4ppIZl8cXwdDaCo1jUS3y+Nff/JLhqMS87gkKS+EOIHMaACsqtTcmxIVM2uQ/acjI
- 4jfPPOXh0sfBQMrgSV5eaDttFg+y8zhsQkdBqAM3w+p0McQfWfQrHQtOH1+a/LqifCMX
- 48eQ==
+ (Exim 4.71) (envelope-from <mrolnik@gmail.com>) id 1iK33x-0007My-Ou
+ for qemu-devel@nongnu.org; Mon, 14 Oct 2019 12:19:13 -0400
+Received: by mail-wm1-x343.google.com with SMTP id b24so17343304wmj.5
+ for <qemu-devel@nongnu.org>; Mon, 14 Oct 2019 09:19:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=from:to:cc:subject:date:message-id:in-reply-to:references;
+ bh=oElsIV9jGIkcznG1hjJ8A0RR90Xk82sVn+s7o2gFZVw=;
+ b=SPJy60QKyOu/5wWK/bzMAAKGhfXFW5PXCgksozOY58WD+nsCZf9zFxU9zGN+/x9OZl
+ TQ7Z499SOYsNpmTDVcanP+BVQAr3pcOV72JvWtO+yd6Kzj7D9Tq0SEyjSYcX99fXM24k
+ w0junZJBS5Rk8yHYXHggup42I/jDgZpYQ2p59xGZFnvggDNwwfYrNPXAC2fB7bSQzAt4
+ mEDtDe14SV4ljE1UCfGAbhpCv4NCuTG8UAUH7dxvR5hXsto1AoFGS+x3OydawTH6UdhD
+ zn78ELpP7CiVyHYB+W3nsXixcIpySmOAYAwDlTe8z5BDVklXnolfbIKhAWUHhQh+m/Kr
+ hTSA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=kUFWXjDlIa2AsuNlyv5PMkdLD32nVesp9Vu/NCqpmaA=;
- b=f/fhGoQZ2pQcluigX74VT+QQt0y5AVLdBiuy4uVjiQnAaUenODLoY0YLFgirK+dtNI
- tf4YhRJKG6hNgUh9jOTFFc1L6qbmZb0qft+bF9Qp8SKwlUE8bbqCwV8t2GU4XRaUaqTd
- QRJ86cDz/urJWb9ube5QqWi8WxF3/H3jbqIN54Ni7h/4DCjUtmfibeD7+qqbCuO9tSF1
- 3tSM9QnEBtQVF7o5H3daHJpBjgeLUWq75HeOSMDcCH3WDyulVra6Z8QZuQiLMJIv4xKq
- MkIGlaZw+nfDYIWHAThVGdBZ0HbOkzmLpbaTg0vIb/65H7h/YGh1BWJgBXbT+u+VRyRj
- ktBw==
-X-Gm-Message-State: APjAAAW5dJCXUJCYy4PHDcvnTXm/WnT4rGrwefMLo9hXNgSm9Vytj25y
- YrVzSuaEYrMCro2zY0SBhuMCew==
-X-Google-Smtp-Source: APXvYqwdX/fX4Xbd49pzcnvmdUZOjtgaoLjRwQe20qmEoBGaGYx9skOlUV1/d70y8rLQ5Btc5iCADA==
-X-Received: by 2002:adf:92a5:: with SMTP id 34mr25377414wrn.337.1571073265336; 
- Mon, 14 Oct 2019 10:14:25 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id v20sm18110993wml.26.2019.10.14.10.14.24
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 14 Oct 2019 10:14:24 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 05FFC1FF87;
- Mon, 14 Oct 2019 18:14:24 +0100 (BST)
-References: <20191014104948.4291-1-alex.bennee@linaro.org>
- <20191014104948.4291-53-alex.bennee@linaro.org>
- <a05f8601-7c93-8861-4935-6806f5ae3ec3@linaro.org>
-User-agent: mu4e 1.3.5; emacs 27.0.50
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: Richard Henderson <richard.henderson@linaro.org>
-Subject: Re: [PATCH v5 52/55] plugins: make howvec plugin more generic
-In-reply-to: <a05f8601-7c93-8861-4935-6806f5ae3ec3@linaro.org>
-Date: Mon, 14 Oct 2019 18:14:23 +0100
-Message-ID: <87imormeq8.fsf@linaro.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references;
+ bh=oElsIV9jGIkcznG1hjJ8A0RR90Xk82sVn+s7o2gFZVw=;
+ b=sIHDK8SjQG/jbaHsXmgdf91LOhclAIVbxQU2EyELt2t64db/Y/8kFMC59A+Ix6Q63g
+ ZX4/PW8pgwFzz4mB2Mq2371kzQ089qst5h2FNRcXQwT6UMm8kwAYBNGu0A3jefFP1Xvq
+ 23arNso3fUYu9NAp9S80Du/lDjYQA5Q43/kFm2pDi4A1psHi+1V6FUXOWsoUOzrKtqq2
+ WQjONW+/0VKzX60wtscJc+4OpQfJ1UOsRVGfGHN3rAQTcaXs5OH9Rn6hCxzcBkXR3ycR
+ HaRxOolS8NRsU4hPDyegqPTQtmo9A0Oy5NxwycGAKLXx+qi6qnNfriDcSLEkaCNU3cou
+ imtQ==
+X-Gm-Message-State: APjAAAUuEWzNaLXUfcVOTottDuQVTgGvulxxYuOvKbJB9CrKgHNbaovq
+ uKv0UMldcxgL2pCj3d/VJcWaePhr+VY=
+X-Google-Smtp-Source: APXvYqzZc1qNS4ADPXr2kLNmntPdFMVWE5KempNv1Fs9aL+miKN75Z6jQqKegsbG07dPJmAUYqR14Q==
+X-Received: by 2002:a1c:1dc9:: with SMTP id d192mr16538135wmd.51.1571069952318; 
+ Mon, 14 Oct 2019 09:19:12 -0700 (PDT)
+Received: from 8c859074c0ff.ant.amazon.com.com
+ (bzq-79-178-11-117.red.bezeqint.net. [79.178.11.117])
+ by smtp.gmail.com with ESMTPSA id c132sm28050861wme.27.2019.10.14.09.19.10
+ (version=TLS1_2 cipher=ECDHE-RSA-AES128-SHA bits=128/128);
+ Mon, 14 Oct 2019 09:19:11 -0700 (PDT)
+From: Michael Rolnik <mrolnik@gmail.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v32 03/13] target/avr: Add instruction decoding
+Date: Mon, 14 Oct 2019 19:18:33 +0300
+Message-Id: <20191014161843.84845-4-mrolnik@gmail.com>
+X-Mailer: git-send-email 2.17.2 (Apple Git-113)
+In-Reply-To: <20191014161843.84845-1-mrolnik@gmail.com>
+References: <20191014161843.84845-1-mrolnik@gmail.com>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::444
+X-Received-From: 2a00:1450:4864:20::343
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,44 +90,205 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: aaron@os.amperecomputing.com, cota@braap.org, qemu-devel@nongnu.org,
- peter.puhov@futurewei.com, robert.foley@futurewei.com
+Cc: thuth@redhat.com, Michael Rolnik <mrolnik@gmail.com>,
+ richard.henderson@linaro.org, dovgaluk@ispras.ru, imammedo@redhat.com,
+ philmd@redhat.com, aleksandar.m.mail@gmail.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+This includes:
+- encoding of all 16 bit instructions
+- encoding of all 32 bit instructions
 
-Richard Henderson <richard.henderson@linaro.org> writes:
+Signed-off-by: Michael Rolnik <mrolnik@gmail.com>
+---
+ target/avr/insn.decode | 175 +++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 175 insertions(+)
+ create mode 100644 target/avr/insn.decode
 
-> On 10/14/19 3:49 AM, Alex Benn=C3=A9e wrote:
->> @@ -190,14 +211,18 @@ static uint64_t * find_counter(struct qemu_plugin_=
-insn *insn)
->>      uint32_t opcode;
->>      InsnClassExecCount *class =3D NULL;
->>
->> -    /* we expect all instructions to by 32 bits for ARM */
->> -    g_assert(qemu_plugin_insn_size(insn) =3D=3D 4);
->> +    /*
->> +     * We only match the first 32 bits of the instruction which is
->> +     * fine for most RISCs but a bit limiting for CISC architectures.
->> +     * They would probably benefit from a more tailored plugin.
->> +     * However we can fall back to individual instruction counting.
->> +     */
->>      opcode =3D *((uint32_t *)qemu_plugin_insn_data(insn));
->
-> This totally ignores the endianness of the host.
-> I'm not keen on reading more than the number of
-> bytes in the insn either...
+diff --git a/target/avr/insn.decode b/target/avr/insn.decode
+new file mode 100644
+index 0000000000..6b387762c6
+--- /dev/null
++++ b/target/avr/insn.decode
+@@ -0,0 +1,175 @@
++#
++#   A = [16 .. 31]
++#   B = [16 .. 23]
++#   C = [24, 26, 28, 30]
++#   D = [0, 2, 4, 6, 8, .. 30]
++
++%rd             4:5
++%rr             9:1 0:4
++
++&rd_rr          rd rr
++&rd_imm         rd imm
++
++@op_rd_rr       .... .. . ..... ....        &rd_rr      rd=%rd rr=%rr
++ADD             0000 11 . ..... ....        @op_rd_rr
++ADC             0001 11 . ..... ....        @op_rd_rr
++AND             0010 00 . ..... ....        @op_rd_rr
++CP              0001 01 . ..... ....        @op_rd_rr
++CPC             0000 01 . ..... ....        @op_rd_rr
++CPSE            0001 00 . ..... ....        @op_rd_rr
++EOR             0010 01 . ..... ....        @op_rd_rr
++MOV             0010 11 . ..... ....        @op_rd_rr
++MUL             1001 11 . ..... ....        @op_rd_rr
++OR              0010 10 . ..... ....        @op_rd_rr
++SBC             0000 10 . ..... ....        @op_rd_rr
++SUB             0001 10 . ..... ....        @op_rd_rr
++
++
++%rd_c           4:2                         !function=to_C
++%imm6           6:2 0:4
++
++@op_rd_imm6     .... .... .. .. ....        &rd_imm     rd=%rd_c imm=%imm6
++ADIW            1001 0110 .. .. ....        @op_rd_imm6
++SBIW            1001 0111 .. .. ....        @op_rd_imm6
++
++
++%rd_a           4:4                         !function=to_A
++%rr_a           0:4                         !function=to_A
++%rd_d           4:4                         !function=to_D
++%rr_d           0:4                         !function=to_D
++%imm8           8:4 0:4
++
++@op_rd_imm8     .... .... .... ....         &rd_imm     rd=%rd_a imm=%imm8
++ANDI            0111 .... .... ....         @op_rd_imm8
++CPI             0011 .... .... ....         @op_rd_imm8
++LDI             1110 .... .... ....         @op_rd_imm8
++ORI             0110 .... .... ....         @op_rd_imm8
++SBCI            0100 .... .... ....         @op_rd_imm8
++SUBI            0101 .... .... ....         @op_rd_imm8
++
++
++@op_rd          .... ... rd:5 ....
++ASR             1001 010 ..... 0101         @op_rd
++COM             1001 010 ..... 0000         @op_rd
++DEC             1001 010 ..... 1010         @op_rd
++ELPM2           1001 000 ..... 0110         @op_rd
++ELPMX           1001 000 ..... 0111         @op_rd
++INC             1001 010 ..... 0011         @op_rd
++LDX1            1001 000 ..... 1100         @op_rd
++LDX2            1001 000 ..... 1101         @op_rd
++LDX3            1001 000 ..... 1110         @op_rd
++LDY2            1001 000 ..... 1001         @op_rd
++LDY3            1001 000 ..... 1010         @op_rd
++LDZ2            1001 000 ..... 0001         @op_rd
++LDZ3            1001 000 ..... 0010         @op_rd
++LPM2            1001 000 ..... 0100         @op_rd
++LPMX            1001 000 ..... 0101         @op_rd
++LSR             1001 010 ..... 0110         @op_rd
++NEG             1001 010 ..... 0001         @op_rd
++POP             1001 000 ..... 1111         @op_rd
++PUSH            1001 001 ..... 1111         @op_rd
++ROR             1001 010 ..... 0111         @op_rd
++STY2            1001 001 ..... 1001         @op_rd
++STY3            1001 001 ..... 1010         @op_rd
++STZ2            1001 001 ..... 0001         @op_rd
++STZ3            1001 001 ..... 0010         @op_rd
++SWAP            1001 010 ..... 0010         @op_rd
++
++
++@op_bit         .... .... . bit:3 ....
++BCLR            1001 0100 1 ... 1000        @op_bit
++BSET            1001 0100 0 ... 1000        @op_bit
++
++
++@op_rd_bit      .... ... rd:5 . bit:3
++BLD             1111 100 ..... 0 ...        @op_rd_bit
++BST             1111 101 ..... 0 ...        @op_rd_bit
++
++
++@op_bit_imm     .... .. imm:s7 bit:3
++BRBC            1111 01 ....... ...         @op_bit_imm
++BRBS            1111 00 ....... ...         @op_bit_imm
++
++
++BREAK           1001 0101 1001 1000
++EICALL          1001 0101 0001 1001
++EIJMP           1001 0100 0001 1001
++ELPM1           1001 0101 1101 1000
++ICALL           1001 0101 0000 1001
++IJMP            1001 0100 0000 1001
++LPM1            1001 0101 1100 1000
++NOP             0000 0000 0000 0000
++RET             1001 0101 0000 1000
++RETI            1001 0101 0001 1000
++SLEEP           1001 0101 1000 1000
++SPM             1001 0101 1110 1000
++SPMX            1001 0101 1111 1000
++WDR             1001 0101 1010 1000
++
++
++@op_reg_bit     .... .... reg:5 bit:3
++CBI             1001 1000 ..... ...         @op_reg_bit
++SBI             1001 1010 ..... ...         @op_reg_bit
++SBIC            1001 1001 ..... ...         @op_reg_bit
++SBIS            1001 1011 ..... ...         @op_reg_bit
++
++
++DES             1001 0100 imm:4 1011
++
++
++%rd_b           4:3                         !function=to_B
++%rr_b           0:3                         !function=to_B
++@fmul           .... .... . ... . ...       &rd_rr      rd=%rd_b rr=%rr_b
++FMUL            0000 0011 0 ... 1 ...       @fmul
++FMULS           0000 0011 1 ... 0 ...       @fmul
++FMULSU          0000 0011 1 ... 1 ...       @fmul
++MULSU           0000 0011 0 ... 0 ...       @fmul
++
++
++%io_imm         9:2 0:4
++@io_rd_imm      .... . .. ..... ....        &rd_imm     rd=%rd imm=%io_imm
++IN              1011 0 .. ..... ....        @io_rd_imm
++OUT             1011 1 .. ..... ....        @io_rd_imm
++
++
++XCH             1001 001 rd:5 0100
++LAC             1001 001 rd:5 0110
++LAS             1001 001 rd:5 0101
++LAT             1001 001 rd:5 0111
++STX1            1001 001 rr:5 1100
++STX2            1001 001 rr:5 1101
++STX3            1001 001 rr:5 1110
++
++
++%ldst_d_imm     13:1 10:2 0:3
++@ldst_d         .. . . .. . rd:5  . ...     &rd_imm     imm=%ldst_d_imm
++LDDY            10 . 0 .. 0 ..... 1 ...     @ldst_d
++LDDZ            10 . 0 .. 0 ..... 0 ...     @ldst_d
++STDY            10 . 0 .. 1 ..... 1 ...     @ldst_d
++STDZ            10 . 0 .. 1 ..... 0 ...     @ldst_d
++
++
++MOVW            0000 0001 .... ....         &rd_rr      rd=%rd_d rr=%rr_d
++MULS            0000 0010 .... ....         &rd_rr      rd=%rd_a rr=%rr_a
++
++RCALL           1101 imm:s12
++RJMP            1100 imm:s12
++
++SBRC            1111 110 rr:5 0 bit:3
++SBRS            1111 111 rr:5 0 bit:3
++
++# The 22-bit immediate is partially in the opcode word,
++# and partially in the next.  Use append_16 to build the
++# complete 22-bit value.
++%imm_call       4:5 0:1                     !function=append_16
++CALL            1001 010 ..... 111 .        imm=%imm_call
++JMP             1001 010 ..... 110 .        imm=%imm_call
++
++
++# The 16-bit immediate is completely in the next word.
++# Fields cannot be defined with no bits, so we cannot play
++# the same trick and append to a zero-bit value.
++# Defer reading the immediate until trans_{LDS,STS}.
++@ldst_s         .... ... rd:5 ....          imm=0
++LDS             1001 000 ..... 0000         @ldst_s
++STS             1001 001 ..... 0000         @ldst_s
+-- 
+2.17.2 (Apple Git-113)
 
-I guess we can strncpy the data and ensure it is NULL terminated and use
-the "string" hash function instead. It depends if there are many opcode
-strings with NULL's in them.
-
->
->
-> r~
-
-
---
-Alex Benn=C3=A9e
 
