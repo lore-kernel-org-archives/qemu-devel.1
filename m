@@ -2,87 +2,84 @@ Return-Path: <SRS0=PUPy=YH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 064AFECE587
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 17:11:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CF2BEC4CECE
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 17:12:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C665A21835
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 17:11:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9C2BB21835
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 17:12:50 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="W7fAjvDw"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C665A21835
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="C8Yaxs1l"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9C2BB21835
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54134 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54170 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iK3s7-0004nK-NM
-	for qemu-devel@archiver.kernel.org; Mon, 14 Oct 2019 13:11:03 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37607)
+	id 1iK3tp-0007KT-Du
+	for qemu-devel@archiver.kernel.org; Mon, 14 Oct 2019 13:12:49 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39854)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1iK2r4-0005j5-7z
- for qemu-devel@nongnu.org; Mon, 14 Oct 2019 12:05:55 -0400
+ (envelope-from <mrolnik@gmail.com>) id 1iK34B-0006LA-1L
+ for qemu-devel@nongnu.org; Mon, 14 Oct 2019 12:19:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1iK2r1-0008Ln-4H
- for qemu-devel@nongnu.org; Mon, 14 Oct 2019 12:05:53 -0400
-Received: from mail-wr1-x429.google.com ([2a00:1450:4864:20::429]:43769)
+ (envelope-from <mrolnik@gmail.com>) id 1iK349-0007W7-64
+ for qemu-devel@nongnu.org; Mon, 14 Oct 2019 12:19:26 -0400
+Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:33966)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1iK2r0-0008KZ-Qp
- for qemu-devel@nongnu.org; Mon, 14 Oct 2019 12:05:51 -0400
-Received: by mail-wr1-x429.google.com with SMTP id j18so20372995wrq.10
- for <qemu-devel@nongnu.org>; Mon, 14 Oct 2019 09:05:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:subject:date:message-id:in-reply-to:references:mime-version
- :content-transfer-encoding;
- bh=UraMZutU1VvKULhAxA6XaJqHAyKCSSxGQ8DBYDAxU98=;
- b=W7fAjvDw5a59pjKmCUZajLiwM+sEP+VROJbIH5cO20crzM6FG7DXmVAg9j/DH0hO4D
- 7XasxdqHRYMQN3t4vwWnupSS3B+8j30bilA9ShFx8JjnMsq9fqSfRGg6auJaq/J0FuVC
- /IK5LzjNU3u6gxZ4MhYup0PPhohWdRKMJTrH94nOicSwFGEF/sewCIgjP1LpQ+JHGMYp
- C4OBEtfka26bvuAMgAIEwg8t3U38r4m3pLY3grrCmiBQAqnPYMzBTWtupTg5hVPnuypY
- 2afyU81ARlTuHLtfGmFhmkyANS7BJGP9X4ybVjzb7D3oAj+V0o200X5tI87HdjoQACGS
- tG2w==
+ (Exim 4.71) (envelope-from <mrolnik@gmail.com>) id 1iK348-0007Vy-VH
+ for qemu-devel@nongnu.org; Mon, 14 Oct 2019 12:19:25 -0400
+Received: by mail-wm1-x343.google.com with SMTP id y135so360493wmc.1
+ for <qemu-devel@nongnu.org>; Mon, 14 Oct 2019 09:19:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=from:to:cc:subject:date:message-id:in-reply-to:references;
+ bh=EnvztjGlFmT9NSv8f9UKg3YpZOQWR8+pk98JNeLeHzo=;
+ b=C8Yaxs1lpSWTw8Xk/QN/S/gGuleQOw1Bruf5kKVIQNTXZMEyyGo8JXBzylNXBjGELd
+ zKFbSFSrhqsNJOGyaC4FCyHg+EenITii6aMll4EhNpreyo9N0zcLdoRGU7/5eGUc0fLI
+ CpxVaPWOjjphm6jc2Ut4VKqDRKVV7PvQrvXZTJKJL3ZnW9io+Uf3/cb65B/tj7QqIey1
+ r3YJMbfQW8TBfZW24gd7Wg+hTdzU3jwiYtcFdUuEKXumHuo+6cZyOY4kRvCS2OSDz3dj
+ 4cIQlRseyKsAmOPZS1/ZSO9b2IojJnRcMTV6f/Cz+PqdjxgF2fXFnMKGqRx5uQdX8HFT
+ xuwA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=UraMZutU1VvKULhAxA6XaJqHAyKCSSxGQ8DBYDAxU98=;
- b=o89i43ZZGx/rc3/2nNUWekMDuuAJPJb/fK7uoGZ9v+jbH4MZ3jvg7eoVy7Ervt83P9
- IAxVDN0jB0pzdN3YxbikHt9AQGUFOeNFBJT8l8FRVfcQ5eZ1FtpKchF5epVJSfsAbnsK
- TyyJQLFQmDfq0V1AhdadB6FIy5gcwSx0O4rPWzZdKNnS4f6OhPC/RnMqGqYJ6FcTI8ma
- ZXeU5wuFOR85I3pxaUuYRVDQbsD0b8Q4WGbqMGSOydAUEIN8b/B41siLrDDTxw5dwtq+
- Haw8PpUx9dVzQwt6J4D7u5g+TyWmRfDmL0n60eXDrtyF5v5RAPC59PUcxxPWNcTlMWhC
- YveQ==
-X-Gm-Message-State: APjAAAXkEx1USwC4X2xc9FCTWvXK3PSQ4WJIz1MDEoK/Kme2A4brQRe5
- GkYvY0E+FFmEwNgncgDxmt4dE+jELQM7fA==
-X-Google-Smtp-Source: APXvYqwW2dMN1WAKDEEJ5yDKUjXgOq/zsrJ7L8KQriFmeK6UmMKQ4PaAr0qJ7vYEio02HyB7WskRwg==
-X-Received: by 2002:adf:de85:: with SMTP id w5mr25899176wrl.278.1571069149430; 
- Mon, 14 Oct 2019 09:05:49 -0700 (PDT)
-Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id 5sm18029779wrk.86.2019.10.14.09.05.48
- for <qemu-devel@nongnu.org>
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 14 Oct 2019 09:05:48 -0700 (PDT)
-From: Peter Maydell <peter.maydell@linaro.org>
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references;
+ bh=EnvztjGlFmT9NSv8f9UKg3YpZOQWR8+pk98JNeLeHzo=;
+ b=YBGNuJ+dPH6jdkVwk2Eq5CyHU5WA+sbJzEufnR5ehp8Bdf7VXF+mbEg9Af8rP/taiG
+ hq9mu9ISkOe7URFBIrPCOMFCYQZy7Ls2Y/Ej/FG0mx4QmVd75FGgYA/7nS2Parl3Zw+7
+ 4JT9j8lSwEbnQGgZ8fHcXoRJXBWdWzi7DqSuFJKKcHQ9hlfrhIHVQRVltNwSNZW2MaSe
+ KGDju9EgnJ4+pGcUWbG8BRQ9E0szfQH76TPrfjSAw45y38l+qHgPnu3BAOW4/Wl/P/a+
+ RwMyNxsjHkTbeJz96sba3IGAXzxrfKdsYTwYS6IbYTR2GaHbRzJRcJWR6uUEvFO/fIpG
+ 0lcw==
+X-Gm-Message-State: APjAAAUQwcDPUOuhR/1KpVXT0xPLKbO9sH9h8APwj4BVJ+x0HWJj3n4L
+ Pl/Y/I4r8PKDupjS7080+20wGM38Jck=
+X-Google-Smtp-Source: APXvYqzeWv0oVB3j+Wq6qh3cKXIZgIpNw9YvSSrSNRDEv2h/NG2fRgwkmlhjuyR1xoVFdrIObmgbTQ==
+X-Received: by 2002:a1c:8157:: with SMTP id c84mr15298023wmd.56.1571069963595; 
+ Mon, 14 Oct 2019 09:19:23 -0700 (PDT)
+Received: from 8c859074c0ff.ant.amazon.com.com
+ (bzq-79-178-11-117.red.bezeqint.net. [79.178.11.117])
+ by smtp.gmail.com with ESMTPSA id c132sm28050861wme.27.2019.10.14.09.19.21
+ (version=TLS1_2 cipher=ECDHE-RSA-AES128-SHA bits=128/128);
+ Mon, 14 Oct 2019 09:19:23 -0700 (PDT)
+From: Michael Rolnik <mrolnik@gmail.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 67/68] hw/arm/bcm2835: Add various unimplemented peripherals
-Date: Mon, 14 Oct 2019 17:04:03 +0100
-Message-Id: <20191014160404.19553-68-peter.maydell@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20191014160404.19553-1-peter.maydell@linaro.org>
-References: <20191014160404.19553-1-peter.maydell@linaro.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Subject: [PATCH v32 09/13] target/avr: Add instruction translation - CPU main
+ translation function
+Date: Mon, 14 Oct 2019 19:18:39 +0300
+Message-Id: <20191014161843.84845-10-mrolnik@gmail.com>
+X-Mailer: git-send-email 2.17.2 (Apple Git-113)
+In-Reply-To: <20191014161843.84845-1-mrolnik@gmail.com>
+References: <20191014161843.84845-1-mrolnik@gmail.com>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::429
+X-Received-From: 2a00:1450:4864:20::343
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,149 +91,264 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: thuth@redhat.com, Michael Rolnik <mrolnik@gmail.com>,
+ richard.henderson@linaro.org, dovgaluk@ispras.ru, imammedo@redhat.com,
+ philmd@redhat.com, aleksandar.m.mail@gmail.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Co-developed-by: Richard Henderson <richard.henderson@linaro.org>
+Co-developed-by: Michael Rolnik <mrolnik@gmail.com>
 
-Base addresses and sizes taken from the "BCM2835 ARM Peripherals"
-datasheet from February 06 2012:
-https://www.raspberrypi.org/app/uploads/2012/02/BCM2835-ARM-Peripherals.pdf
-
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
-Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
-Message-id: 20190926173428.10713-6-f4bug@amsat.org
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+Signed-off-by: Michael Rolnik <mrolnik@gmail.com>
 ---
- include/hw/arm/bcm2835_peripherals.h | 15 ++++++++++++++
- include/hw/arm/raspi_platform.h      |  8 +++++++
- hw/arm/bcm2835_peripherals.c         | 31 ++++++++++++++++++++++++++++
- 3 files changed, 54 insertions(+)
+ target/avr/translate.c | 234 +++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 234 insertions(+)
 
-diff --git a/include/hw/arm/bcm2835_peripherals.h b/include/hw/arm/bcm2835_peripherals.h
-index 6b17f6a3827..62a4c7b559d 100644
---- a/include/hw/arm/bcm2835_peripherals.h
-+++ b/include/hw/arm/bcm2835_peripherals.h
-@@ -23,6 +23,7 @@
- #include "hw/sd/sdhci.h"
- #include "hw/sd/bcm2835_sdhost.h"
- #include "hw/gpio/bcm2835_gpio.h"
-+#include "hw/misc/unimp.h"
+diff --git a/target/avr/translate.c b/target/avr/translate.c
+index 21ba6004ee..6d4a023ff9 100644
+--- a/target/avr/translate.c
++++ b/target/avr/translate.c
+@@ -2780,3 +2780,237 @@ static bool trans_WDR(DisasContext *ctx, arg_WDR *a)
  
- #define TYPE_BCM2835_PERIPHERALS "bcm2835-peripherals"
- #define BCM2835_PERIPHERALS(obj) \
-@@ -37,6 +38,10 @@ typedef struct BCM2835PeripheralState {
-     MemoryRegion ram_alias[4];
-     qemu_irq irq, fiq;
- 
-+    UnimplementedDeviceState systmr;
-+    UnimplementedDeviceState armtmr;
-+    UnimplementedDeviceState cprman;
-+    UnimplementedDeviceState a2w;
-     PL011State uart0;
-     BCM2835AuxState aux;
-     BCM2835FBState fb;
-@@ -48,6 +53,16 @@ typedef struct BCM2835PeripheralState {
-     SDHCIState sdhci;
-     BCM2835SDHostState sdhost;
-     BCM2835GpioState gpio;
-+    UnimplementedDeviceState i2s;
-+    UnimplementedDeviceState spi[1];
-+    UnimplementedDeviceState i2c[3];
-+    UnimplementedDeviceState otp;
-+    UnimplementedDeviceState dbus;
-+    UnimplementedDeviceState ave0;
-+    UnimplementedDeviceState bscsl;
-+    UnimplementedDeviceState smi;
-+    UnimplementedDeviceState dwc2;
-+    UnimplementedDeviceState sdramc;
- } BCM2835PeripheralState;
- 
- #endif /* BCM2835_PERIPHERALS_H */
-diff --git a/include/hw/arm/raspi_platform.h b/include/hw/arm/raspi_platform.h
-index 66969fac5d2..cdcbca943fb 100644
---- a/include/hw/arm/raspi_platform.h
-+++ b/include/hw/arm/raspi_platform.h
-@@ -38,6 +38,8 @@
-                                                       * Doorbells & Mailboxes */
- #define CPRMAN_OFFSET           0x100000 /* Power Management, Watchdog */
- #define CM_OFFSET               0x101000 /* Clock Management */
-+#define A2W_OFFSET              0x102000 /* Reset controller */
-+#define AVS_OFFSET              0x103000 /* Audio Video Standard */
- #define RNG_OFFSET              0x104000
- #define GPIO_OFFSET             0x200000
- #define UART0_OFFSET            0x201000
-@@ -45,11 +47,17 @@
- #define I2S_OFFSET              0x203000
- #define SPI0_OFFSET             0x204000
- #define BSC0_OFFSET             0x205000 /* BSC0 I2C/TWI */
-+#define OTP_OFFSET              0x20f000
-+#define BSC_SL_OFFSET           0x214000 /* SPI slave */
- #define AUX_OFFSET              0x215000 /* AUX: UART1/SPI1/SPI2 */
- #define EMMC1_OFFSET            0x300000
- #define SMI_OFFSET              0x600000
- #define BSC1_OFFSET             0x804000 /* BSC1 I2C/TWI */
-+#define BSC2_OFFSET             0x805000 /* BSC2 I2C/TWI */
-+#define DBUS_OFFSET             0x900000
-+#define AVE0_OFFSET             0x910000
- #define USB_OTG_OFFSET          0x980000 /* DTC_OTG USB controller */
-+#define SDRAMC_OFFSET           0xe00000
- #define DMA15_OFFSET            0xE05000 /* DMA controller, channel 15 */
- 
- /* GPU interrupts */
-diff --git a/hw/arm/bcm2835_peripherals.c b/hw/arm/bcm2835_peripherals.c
-index 1bd2ff41d52..fdcf616c56a 100644
---- a/hw/arm/bcm2835_peripherals.c
-+++ b/hw/arm/bcm2835_peripherals.c
-@@ -22,6 +22,20 @@
- /* Capabilities for SD controller: no DMA, high-speed, default clocks etc. */
- #define BCM2835_SDHC_CAPAREG 0x52134b4
- 
-+static void create_unimp(BCM2835PeripheralState *ps,
-+                         UnimplementedDeviceState *uds,
-+                         const char *name, hwaddr ofs, hwaddr size)
+     return true;
+ }
++
++
++void avr_cpu_tcg_init(void)
 +{
-+    sysbus_init_child_obj(OBJECT(ps), name, uds,
-+                          sizeof(UnimplementedDeviceState),
-+                          TYPE_UNIMPLEMENTED_DEVICE);
-+    qdev_prop_set_string(DEVICE(uds), "name", name);
-+    qdev_prop_set_uint64(DEVICE(uds), "size", size);
-+    object_property_set_bool(OBJECT(uds), true, "realized", &error_fatal);
-+    memory_region_add_subregion_overlap(&ps->peri_mr, ofs,
-+                    sysbus_mmio_get_region(SYS_BUS_DEVICE(uds), 0), -1000);
++    int i;
++
++#define AVR_REG_OFFS(x) offsetof(CPUAVRState, x)
++    cpu_pc = tcg_global_mem_new_i32(cpu_env, AVR_REG_OFFS(pc_w), "pc");
++    cpu_Cf = tcg_global_mem_new_i32(cpu_env, AVR_REG_OFFS(sregC), "Cf");
++    cpu_Zf = tcg_global_mem_new_i32(cpu_env, AVR_REG_OFFS(sregZ), "Zf");
++    cpu_Nf = tcg_global_mem_new_i32(cpu_env, AVR_REG_OFFS(sregN), "Nf");
++    cpu_Vf = tcg_global_mem_new_i32(cpu_env, AVR_REG_OFFS(sregV), "Vf");
++    cpu_Sf = tcg_global_mem_new_i32(cpu_env, AVR_REG_OFFS(sregS), "Sf");
++    cpu_Hf = tcg_global_mem_new_i32(cpu_env, AVR_REG_OFFS(sregH), "Hf");
++    cpu_Tf = tcg_global_mem_new_i32(cpu_env, AVR_REG_OFFS(sregT), "Tf");
++    cpu_If = tcg_global_mem_new_i32(cpu_env, AVR_REG_OFFS(sregI), "If");
++    cpu_rampD = tcg_global_mem_new_i32(cpu_env, AVR_REG_OFFS(rampD), "rampD");
++    cpu_rampX = tcg_global_mem_new_i32(cpu_env, AVR_REG_OFFS(rampX), "rampX");
++    cpu_rampY = tcg_global_mem_new_i32(cpu_env, AVR_REG_OFFS(rampY), "rampY");
++    cpu_rampZ = tcg_global_mem_new_i32(cpu_env, AVR_REG_OFFS(rampZ), "rampZ");
++    cpu_eind = tcg_global_mem_new_i32(cpu_env, AVR_REG_OFFS(eind), "eind");
++    cpu_sp = tcg_global_mem_new_i32(cpu_env, AVR_REG_OFFS(sp), "sp");
++    cpu_skip = tcg_global_mem_new_i32(cpu_env, AVR_REG_OFFS(skip), "skip");
++
++    for (i = 0; i < NO_CPU_REGISTERS; i++) {
++        cpu_r[i] = tcg_global_mem_new_i32(cpu_env, AVR_REG_OFFS(r[i]),
++                                          reg_names[i]);
++    }
++#undef AVR_REG_OFFS
 +}
 +
- static void bcm2835_peripherals_init(Object *obj)
- {
-     BCM2835PeripheralState *s = BCM2835_PERIPHERALS(obj);
-@@ -323,6 +337,23 @@ static void bcm2835_peripherals_realize(DeviceState *dev, Error **errp)
-         error_propagate(errp, err);
-         return;
-     }
++static void translate(DisasContext *ctx)
++{
++    uint32_t opcode = next_word(ctx);
 +
-+    create_unimp(s, &s->armtmr, "bcm2835-sp804", ARMCTRL_TIMER0_1_OFFSET, 0x40);
-+    create_unimp(s, &s->systmr, "bcm2835-systimer", ST_OFFSET, 0x20);
-+    create_unimp(s, &s->cprman, "bcm2835-cprman", CPRMAN_OFFSET, 0x1000);
-+    create_unimp(s, &s->a2w, "bcm2835-a2w", A2W_OFFSET, 0x1000);
-+    create_unimp(s, &s->i2s, "bcm2835-i2s", I2S_OFFSET, 0x100);
-+    create_unimp(s, &s->smi, "bcm2835-smi", SMI_OFFSET, 0x100);
-+    create_unimp(s, &s->spi[0], "bcm2835-spi0", SPI0_OFFSET, 0x20);
-+    create_unimp(s, &s->bscsl, "bcm2835-spis", BSC_SL_OFFSET, 0x100);
-+    create_unimp(s, &s->i2c[0], "bcm2835-i2c0", BSC0_OFFSET, 0x20);
-+    create_unimp(s, &s->i2c[1], "bcm2835-i2c1", BSC1_OFFSET, 0x20);
-+    create_unimp(s, &s->i2c[2], "bcm2835-i2c2", BSC2_OFFSET, 0x20);
-+    create_unimp(s, &s->otp, "bcm2835-otp", OTP_OFFSET, 0x80);
-+    create_unimp(s, &s->dbus, "bcm2835-dbus", DBUS_OFFSET, 0x8000);
-+    create_unimp(s, &s->ave0, "bcm2835-ave0", AVE0_OFFSET, 0x8000);
-+    create_unimp(s, &s->dwc2, "dwc-usb2", USB_OTG_OFFSET, 0x1000);
-+    create_unimp(s, &s->sdramc, "bcm2835-sdramc", SDRAMC_OFFSET, 0x100);
- }
- 
- static void bcm2835_peripherals_class_init(ObjectClass *oc, void *data)
++    if (!decode_insn(ctx, opcode)) {
++        gen_helper_unsupported(cpu_env);
++        ctx->bstate = DISAS_NORETURN;
++    }
++}
++
++/* Standardize the cpu_skip condition to NE.  */
++static bool canonicalize_skip(DisasContext *ctx)
++{
++    switch (ctx->skip_cond) {
++    case TCG_COND_NEVER:
++        /* Normal case: cpu_skip is known to be false.  */
++        return false;
++
++    case TCG_COND_ALWAYS:
++        /*
++         * Breakpoint case: cpu_skip is known to be true, via TB_FLAGS_SKIP.
++         * The breakpoint is on the instruction being skipped, at the start
++         * of the TranslationBlock.  No need to update.
++         */
++        return false;
++
++    case TCG_COND_NE:
++        if (ctx->skip_var1 == NULL) {
++            tcg_gen_mov_tl(cpu_skip, ctx->skip_var0);
++        } else {
++            tcg_gen_xor_tl(cpu_skip, ctx->skip_var0, ctx->skip_var1);
++            ctx->skip_var1 = NULL;
++        }
++        break;
++
++    default:
++        /* Convert to a NE condition vs 0. */
++        if (ctx->skip_var1 == NULL) {
++            tcg_gen_setcondi_tl(ctx->skip_cond, cpu_skip, ctx->skip_var0, 0);
++        } else {
++            tcg_gen_setcond_tl(ctx->skip_cond, cpu_skip,
++                               ctx->skip_var0, ctx->skip_var1);
++            ctx->skip_var1 = NULL;
++        }
++        ctx->skip_cond = TCG_COND_NE;
++        break;
++    }
++    if (ctx->free_skip_var0) {
++        tcg_temp_free(ctx->skip_var0);
++        ctx->free_skip_var0 = false;
++    }
++    ctx->skip_var0 = cpu_skip;
++    return true;
++}
++
++void gen_intermediate_code(CPUState *cs, TranslationBlock *tb, int max_insns)
++{
++    CPUAVRState *env = cs->env_ptr;
++    DisasContext ctx = {
++        .tb = tb,
++        .cs = cs,
++        .env = env,
++        .memidx = 0,
++        .bstate = DISAS_NEXT,
++        .skip_cond = TCG_COND_NEVER,
++        .singlestep = cs->singlestep_enabled,
++    };
++    target_ulong pc_start = tb->pc / 2;
++    int num_insns = 0;
++
++    if (tb->flags & TB_FLAGS_FULL_ACCESS) {
++        /*
++         * This flag is set by ST/LD instruction we will regenerate it ONLY
++         * with mem/cpu memory access instead of mem access
++         */
++        max_insns = 1;
++    }
++    if (ctx.singlestep) {
++        max_insns = 1;
++    }
++
++    gen_tb_start(tb);
++
++    ctx.npc = pc_start;
++    if (tb->flags & TB_FLAGS_SKIP) {
++        ctx.skip_cond = TCG_COND_ALWAYS;
++        ctx.skip_var0 = cpu_skip;
++    }
++
++    do {
++        TCGLabel *skip_label = NULL;
++
++        /* translate current instruction */
++        tcg_gen_insn_start(ctx.npc);
++        num_insns++;
++
++        /*
++         * this is due to some strange GDB behavior
++         * let's assume main has address 0x100
++         * b main   - sets breakpoint at address 0x00000100 (code)
++         * b *0x100 - sets breakpoint at address 0x00800100 (data)
++         */
++        if (unlikely(!ctx.singlestep &&
++                (cpu_breakpoint_test(cs, OFFSET_CODE + ctx.npc * 2, BP_ANY) ||
++                 cpu_breakpoint_test(cs, OFFSET_DATA + ctx.npc * 2, BP_ANY)))) {
++            canonicalize_skip(&ctx);
++            tcg_gen_movi_tl(cpu_pc, ctx.npc);
++            gen_helper_debug(cpu_env);
++            goto done_generating;
++        }
++
++        /* Conditionally skip the next instruction, if indicated.  */
++        if (ctx.skip_cond != TCG_COND_NEVER) {
++            skip_label = gen_new_label();
++            if (ctx.skip_var0 == cpu_skip) {
++                /*
++                 * Copy cpu_skip so that we may zero it before the branch.
++                 * This ensures that cpu_skip is non-zero after the label
++                 * if and only if the skipped insn itself sets a skip.
++                 */
++                ctx.free_skip_var0 = true;
++                ctx.skip_var0 = tcg_temp_new();
++                tcg_gen_mov_tl(ctx.skip_var0, cpu_skip);
++                tcg_gen_movi_tl(cpu_skip, 0);
++            }
++            if (ctx.skip_var1 == NULL) {
++                tcg_gen_brcondi_tl(ctx.skip_cond, ctx.skip_var0, 0, skip_label);
++            } else {
++                tcg_gen_brcond_tl(ctx.skip_cond, ctx.skip_var0,
++                                  ctx.skip_var1, skip_label);
++                ctx.skip_var1 = NULL;
++            }
++            if (ctx.free_skip_var0) {
++                tcg_temp_free(ctx.skip_var0);
++                ctx.free_skip_var0 = false;
++            }
++            ctx.skip_cond = TCG_COND_NEVER;
++            ctx.skip_var0 = NULL;
++        }
++
++        translate(&ctx);
++
++        if (skip_label) {
++            canonicalize_skip(&ctx);
++            gen_set_label(skip_label);
++            if (ctx.bstate == DISAS_NORETURN) {
++                ctx.bstate = DISAS_CHAIN;
++            }
++        }
++    } while (ctx.bstate == DISAS_NEXT
++             && num_insns < max_insns
++             && (ctx.npc - pc_start) * 2 < TARGET_PAGE_SIZE - 4
++             && !tcg_op_buf_full());
++
++    if (tb->cflags & CF_LAST_IO) {
++        gen_io_end();
++    }
++
++    bool nonconst_skip = canonicalize_skip(&ctx);
++
++    switch (ctx.bstate) {
++    case DISAS_NORETURN:
++        assert(!nonconst_skip);
++        break;
++    case DISAS_NEXT:
++    case DISAS_TOO_MANY:
++    case DISAS_CHAIN:
++        if (!nonconst_skip) {
++            /* Note gen_goto_tb checks singlestep.  */
++            gen_goto_tb(&ctx, 1, ctx.npc);
++            break;
++        }
++        tcg_gen_movi_tl(cpu_pc, ctx.npc);
++        /* fall through */
++    case DISAS_LOOKUP:
++        if (!ctx.singlestep) {
++            tcg_gen_lookup_and_goto_ptr();
++            break;
++        }
++        /* fall through */
++    case DISAS_EXIT:
++        if (ctx.singlestep) {
++            gen_helper_debug(cpu_env);
++        } else {
++            tcg_gen_exit_tb(NULL, 0);
++        }
++        break;
++    default:
++        g_assert_not_reached();
++    }
++
++done_generating:
++    gen_tb_end(tb, num_insns);
++
++    tb->size = (ctx.npc - pc_start) * 2;
++    tb->icount = num_insns;
++}
++
++void restore_state_to_opc(CPUAVRState *env, TranslationBlock *tb,
++                            target_ulong *data)
++{
++    env->pc_w = data[0];
++}
 -- 
-2.20.1
+2.17.2 (Apple Git-113)
 
 
