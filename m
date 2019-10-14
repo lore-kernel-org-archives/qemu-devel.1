@@ -2,93 +2,63 @@ Return-Path: <SRS0=PUPy=YH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-12.2 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_2
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9FBEAC4CECE
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 15:46:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B8799C4CECE
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 15:49:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6ABD9217D9
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 15:46:58 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="VbQ6MckY"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6ABD9217D9
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 8AF532133F
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 15:49:35 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8AF532133F
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51776 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51828 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iK2Yj-0004vr-7o
-	for qemu-devel@archiver.kernel.org; Mon, 14 Oct 2019 11:46:57 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33554)
+	id 1iK2bF-0006xc-8B
+	for qemu-devel@archiver.kernel.org; Mon, 14 Oct 2019 11:49:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33773)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1iK2XV-0004BG-L7
- for qemu-devel@nongnu.org; Mon, 14 Oct 2019 11:45:42 -0400
+ (envelope-from <groug@kaod.org>) id 1iK2Yd-0005E3-GN
+ for qemu-devel@nongnu.org; Mon, 14 Oct 2019 11:46:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1iK2XT-0007WF-HX
- for qemu-devel@nongnu.org; Mon, 14 Oct 2019 11:45:41 -0400
-Received: from mail-pl1-x644.google.com ([2607:f8b0:4864:20::644]:38105)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1iK2XT-0007Ul-BY
- for qemu-devel@nongnu.org; Mon, 14 Oct 2019 11:45:39 -0400
-Received: by mail-pl1-x644.google.com with SMTP id w8so8177522plq.5
- for <qemu-devel@nongnu.org>; Mon, 14 Oct 2019 08:45:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=IrS3xE40X23O9deChjT+7WzHLLNBRoS5UfnL3rbcn5o=;
- b=VbQ6MckY0sCSl775PO/fJqQK24WneI9Ul1s1wKbKzjKs43Y5cEIVQmVUZTgFLWZOJM
- AzufDBLrlTMQuC8H9xvtwewsEPIblNZqGfn4/QJPMF7UjpJE0JUdtROLzWpzM0lAiOKQ
- rJRITg+YR5oX0NATYVRp4YeNA0RIb6uLCbi8ybA7Nljc8hWbbZ/yYwt0/YyNOKoGWXtJ
- BYVrE3fovuapWvCDpKqAAcWPhG8yc2rwG7RcVxEkAdDJeWPjg6vYXmmrAh8yYdUvfGWC
- zNmATINkfNg0C30w0CjmjHVOz4rTeqlfVb2Aq1kIUK039ZORUS/3C2IJ3oskxKKS8Fgv
- Xh+A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=IrS3xE40X23O9deChjT+7WzHLLNBRoS5UfnL3rbcn5o=;
- b=WU2yZ1uVffIT+vj9ooend6wqPzw/hn+coAVXCAXOUM6Nu3zrg/e1I+NRXl6JWFHURj
- op+aEFYT2Nz397VjzTLB3tH1/qtYvYDP2pu84YplAy8SzQZboqgzUGDHu8YqLCVZYe0+
- XiaauNENVOuYiDGEXMwHXxMomQqrZ17r6airuJXB7lfJgCRuRTcoQKNSrPgPjp6z7RSV
- j79ynPOxx9FYfVAl+0r6+M9GPvpJCHD+hyFsKk6Po+nVP+ncdHUdtNJiWovwSE7gISed
- 7p9peuJxAlyq00pkIXYbGmCiCa49aA/4MomcsPtZXmwVL5S+yE+hdI/VVcYT734GqBIN
- KufQ==
-X-Gm-Message-State: APjAAAXWr09hAYVbQEI/7V4aOJ4a2AqFrxOhEf8xDIjk/oMKYZG2ol2u
- wOMwBODK2lsNyaAC9ilJw3r/kQ==
-X-Google-Smtp-Source: APXvYqz/fIakr9druKHafpW2juOYKTLItnWIgaal/NgUbHoFVttDM198bHN03W60/NsW0OWR+BPGFg==
-X-Received: by 2002:a17:902:6905:: with SMTP id
- j5mr31752275plk.323.1571067937847; 
- Mon, 14 Oct 2019 08:45:37 -0700 (PDT)
-Received: from [192.168.1.11] (97-113-7-119.tukw.qwest.net. [97.113.7.119])
- by smtp.gmail.com with ESMTPSA id y8sm15029589pgs.34.2019.10.14.08.45.36
- (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Mon, 14 Oct 2019 08:45:36 -0700 (PDT)
-Subject: Re: [PATCH v5 17/55] plugins: implement helpers for resolving hwaddr
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
- qemu-devel@nongnu.org
-References: <20191014104948.4291-1-alex.bennee@linaro.org>
- <20191014104948.4291-18-alex.bennee@linaro.org>
-From: Richard Henderson <richard.henderson@linaro.org>
-Openpgp: preference=signencrypt
-Message-ID: <1dbbc6b6-0898-ea5c-ea2a-cd29614cd615@linaro.org>
-Date: Mon, 14 Oct 2019 08:45:34 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+ (envelope-from <groug@kaod.org>) id 1iK2YZ-00081p-A1
+ for qemu-devel@nongnu.org; Mon, 14 Oct 2019 11:46:49 -0400
+Received: from 9.mo173.mail-out.ovh.net ([46.105.72.44]:42965)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <groug@kaod.org>) id 1iK2YR-0007up-3h
+ for qemu-devel@nongnu.org; Mon, 14 Oct 2019 11:46:45 -0400
+Received: from player786.ha.ovh.net (unknown [10.109.146.137])
+ by mo173.mail-out.ovh.net (Postfix) with ESMTP id 6672411C927
+ for <qemu-devel@nongnu.org>; Mon, 14 Oct 2019 17:46:34 +0200 (CEST)
+Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
+ [82.253.208.248]) (Authenticated sender: groug@kaod.org)
+ by player786.ha.ovh.net (Postfix) with ESMTPSA id 2AA7BB07D0FA;
+ Mon, 14 Oct 2019 15:46:28 +0000 (UTC)
+Date: Mon, 14 Oct 2019 17:46:26 +0200
+From: Greg Kurz <groug@kaod.org>
+To: Peter Maydell <peter.maydell@linaro.org>
+Subject: Re: [PULL v2 0/8] 9p patches 2019-10-10
+Message-ID: <20191014174626.76dc4e5c@bahia.lan>
+In-Reply-To: <CAFEAcA8tdhYm0EuVGx5OiPv7NuZvrtrPLnK+tz=xoJ0Gn4DCmw@mail.gmail.com>
+References: <20191010131809.1284004-1-groug@kaod.org>
+ <CAFEAcA8tdhYm0EuVGx5OiPv7NuZvrtrPLnK+tz=xoJ0Gn4DCmw@mail.gmail.com>
+X-Mailer: Claws Mail 3.17.4 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-In-Reply-To: <20191014104948.4291-18-alex.bennee@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::644
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Ovh-Tracer-Id: 10977805568754620689
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrjedugdelgecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 46.105.72.44
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -100,55 +70,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: robert.foley@futurewei.com, peter.puhov@futurewei.com,
- aaron@os.amperecomputing.com, cota@braap.org,
- Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 10/14/19 3:49 AM, Alex Bennée wrote:
-> +bool tlb_plugin_lookup(CPUState *cpu, target_ulong addr, int mmu_idx,
-> +                       bool is_store, struct qemu_plugin_hwaddr *data)
-> +{
-> +    CPUArchState *env = cpu->env_ptr;
-> +    CPUTLBEntry *tlbe = tlb_entry(env, mmu_idx, addr);
-> +    target_ulong tlb_addr = is_store ? tlb_addr_write(tlbe) : tlbe->addr_read;
-> +
-> +    if (likely(tlb_hit(tlb_addr, addr))) {
-> +        if (tlb_addr & TLB_MMIO) {
-> +            data->hostaddr = 0;
-> +            data->is_io = true;
-> +            /* XXX: lookup device */
-> +        } else {
-> +            data->hostaddr = addr + tlbe->addend;
-> +            data->is_io = false;
+On Mon, 14 Oct 2019 15:08:52 +0100
+Peter Maydell <peter.maydell@linaro.org> wrote:
 
-...
+> On Thu, 10 Oct 2019 at 14:18, Greg Kurz <groug@kaod.org> wrote:
+> >
+> > The following changes since commit 98b2e3c9ab3abfe476a2b02f8f51813edb90e72d:
+> >
+> >   Merge remote-tracking branch 'remotes/stefanha/tags/block-pull-request' into staging (2019-10-08 16:08:35 +0100)
+> >
+> > are available in the Git repository at:
+> >
+> >   https://github.com/gkurz/qemu.git tags/9p-next-2019-10-10
+> >
+> > for you to fetch changes up to e410bbc52a7a246858af54ce1842fadf26f39ff7:
+> >
+> >   MAINTAINERS: Downgrade status of virtio-9p to "Odd Fixes" (2019-10-10 12:36:28 +0200)
+> >
+> > ----------------------------------------------------------------
+> > The most notable change is that we now detect cross-device setups in the
+> > host since it may cause inode number collision and mayhem in the guest.
+> > A new fsdev property is added for the user to choose the appropriate
+> > policy to handle that: either remap all inode numbers or fail I/Os to
+> > another host device or just print out a warning (default behaviour).
+> >
+> > This is also my last PR as _active_ maintainer of 9pfs.
+> >
+> > ----------------------------------------------------------------
+> 
+> 
+> Applied, thanks.
+> 
+> Please update the changelog at https://wiki.qemu.org/ChangeLog/4.2
+> for any user-visible changes.
+> 
+> Thanks for all your work on the 9pfs code!
+> 
 
->  uint64_t qemu_plugin_hwaddr_to_raddr(const struct qemu_plugin_hwaddr *haddr)
->  {
-> +#ifdef CONFIG_SOFTMMU
-> +    ram_addr_t ram_addr = 0;
-> +
-> +    if (haddr && !haddr->is_io) {
-> +        ram_addr = qemu_ram_addr_from_host((void *) haddr->hostaddr);
-> +        if (ram_addr == RAM_ADDR_INVALID) {
+Thanks Peter, and many others, for your valuable help.
 
-So, did you want the host address or the ram_addr?
+As now indicated in MAINTAINERS, I'll stay around for odd fixes, one
+of which that comes to mind is to deprecate the "proxy" backend and
+its companion virtfs-proxy-helper binary at some point since it isn't
+supported by libvirt and will be superseded soon by "virtio-fs".
 
-If you really only want the ram_addr then you can get
-that directly from the (io)tlb:
+Cheers,
 
-    uintptr_t index = tlb_index(env, mmu_idx, addr);
-    CPUTLB *tlb = &cpu_neg(cpu)->tlb;
-    CPUIOTLBEntry *iotlbentry = &tlb->d[mmu_idx].iotlb[index];
+--
+Greg
 
-    data->raddr = addr + iotlbentry->addr;
+> -- PMM
 
-That said, what you have works.
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-
-
-r~
 
