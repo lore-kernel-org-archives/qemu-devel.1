@@ -2,79 +2,85 @@ Return-Path: <SRS0=PUPy=YH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 949C6ECE587
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 14:14:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AFC8EC4CECE
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 14:17:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5FA5020854
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 14:14:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 75BB22067B
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 14:17:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="A5IDf6Q2"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5FA5020854
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VTnz/Zbv"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 75BB22067B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50242 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50274 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iK17b-0007ps-JU
-	for qemu-devel@archiver.kernel.org; Mon, 14 Oct 2019 10:14:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46072)
+	id 1iK1A1-0000Zr-JG
+	for qemu-devel@archiver.kernel.org; Mon, 14 Oct 2019 10:17:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47199)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1iK121-0003z4-Th
- for qemu-devel@nongnu.org; Mon, 14 Oct 2019 10:09:10 -0400
+ (envelope-from <hikarupsp@gmail.com>) id 1iK19J-0008W2-K3
+ for qemu-devel@nongnu.org; Mon, 14 Oct 2019 10:16:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1iK120-0002xl-Jx
- for qemu-devel@nongnu.org; Mon, 14 Oct 2019 10:09:05 -0400
-Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:36986)
+ (envelope-from <hikarupsp@gmail.com>) id 1iK19G-0005cF-VH
+ for qemu-devel@nongnu.org; Mon, 14 Oct 2019 10:16:36 -0400
+Received: from mail-pg1-x544.google.com ([2607:f8b0:4864:20::544]:34501)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1iK120-0002xR-Do
- for qemu-devel@nongnu.org; Mon, 14 Oct 2019 10:09:04 -0400
-Received: by mail-ot1-x342.google.com with SMTP id k32so13895363otc.4
- for <qemu-devel@nongnu.org>; Mon, 14 Oct 2019 07:09:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=xq5PnMBpf3Bmds+3iSe4apB/7mn77O6MbCBikiQoLLk=;
- b=A5IDf6Q2l5J2xI37TGU4sZjcsKVZCcRYPl21kYhLwK520y1IMzP9nrgYJ6rJooYWqw
- JfHuqLWI74Ndh+xsA0SDP/qIMM6jKTkzGnOws9AyGig6A/v7LCGUMIqpMYtzjolbRDSq
- ZKhcqV88eMOuwp/SGEUCKWzs1BiavOakouvgLMnAybZGETzV1I4GL/0hNHBimBaNk7AW
- PUQXsWJU0fDJbX7Ql52MqZYaweX/+EQKT2M9GxQpfAFMcWCB6uxnq98+Qs9MbPJmvlVl
- 8wIXgeCfDjtbMv6+rsWrKo3kIxPP7M5fqgJkP4/XQCDo2AlfIz0GgchJEZSDKRixDuKx
- thwQ==
+ (Exim 4.71) (envelope-from <hikarupsp@gmail.com>) id 1iK19E-0005WG-UI
+ for qemu-devel@nongnu.org; Mon, 14 Oct 2019 10:16:34 -0400
+Received: by mail-pg1-x544.google.com with SMTP id k20so2858099pgi.1
+ for <qemu-devel@nongnu.org>; Mon, 14 Oct 2019 07:16:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=VvzTHTPEJXjxLzWTP5iUofPpBYVSl/nZaLqu/Soms0k=;
+ b=VTnz/Zbv5t0M2hPyiXomhTVAuTTK1fykglwGI9FlpxJESFsSNwT0qV/h70PgT0aPgE
+ oHsjS5tGPawbJANboRARQENBmU60KXTL+puez4PH8WKOK7aOIFofTt00Nrld35tmuMae
+ Dfa1qldIGbFQ8Li1TYHJWJp5gmEVEEEL4sVpTX2TRo3XctqzbJ05hNDvZba7NA48vwDp
+ QmRuNiuM8vu28XfBLB4BXWz+vtgjIILxa5cRLEpYTyLwq6n7DmFJXAz0LwxHSiOyWfXk
+ jMVmPYK9HQ7e2Nqu8/oR+dw8BVZlvGmdhNIsePAT/LFjSIqHAM8gsBJwAVqVwZ5AYuDh
+ n/kg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=xq5PnMBpf3Bmds+3iSe4apB/7mn77O6MbCBikiQoLLk=;
- b=TP4LUdHQzSlZpZMUKG4PDcs8B1zcIoudCF2Wn1/iVetDzs1Ysu4jdLCrd4CGWUlPW2
- OQ1uxfWCFt+Km/a5Gf4sPWxil5/NsZBWTEBfKawHQeD7FEYUQ/tnKfVXXIOZIFjobKsS
- lEKjUC9v/c4QqrjNU6MCXIMMZ+tqJltWHTdA2DQDPklSCw7czBncww6DVljzux2lrF+d
- V0V5wQPZm8HvZRQjGQayBMv1MfEXuMVg29Nh43A2inhlnWIEmecMFWLCKm/ma75Ffdz0
- JPWQj3wZT5U/qFC9gA3uyPzVC/LcYZNgI1nVrF5eVuELAiik+1vD+inhpfVWgRDguNOw
- ABUg==
-X-Gm-Message-State: APjAAAX/taP85zPq8ZFEDxo/nYVBc3cJYj6RqQQj7iYfS67f1lMcGFyS
- j4wvrKxhGI5JX2uR6ul6iai1RMSaqRwKJ6nFjxyisITdnjA=
-X-Google-Smtp-Source: APXvYqxvFE9WyGayTpakAiv+kX5MjwYVxQaG4G5fXuKMEoIK98Fo9RVlnPL96kVG1586rw2cjSM6Q7DO95GrMkt4grE=
-X-Received: by 2002:a9d:30c1:: with SMTP id r1mr24894236otg.91.1571062143222; 
- Mon, 14 Oct 2019 07:09:03 -0700 (PDT)
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=VvzTHTPEJXjxLzWTP5iUofPpBYVSl/nZaLqu/Soms0k=;
+ b=D+NFa7FdiliSCAcgqmzM17W+GNG/Ko0PDJpIZBwdFDJqNzL5kyu9jTujWdiMWaqbGC
+ FxH5HKXKml+R8hvJnzNMk5LuVoWHsZtVnRh7h0CruNSQyP8tsNyutot3x5uAwbKtrnSJ
+ vJAEL4GCU4s+7wXyOv0UUNWLHmb/kiRWR8pyrN7Mthvo5te+DWxfMCsP9IF8p9RP7QfE
+ Yq18jqVY7zJvfmwD66dxWY8qJEathw1t6FLJPapp4I5epUkif4IRbuFCKNRFLw0agr80
+ v+PTrfXdPjDCPBX4dAFht5yzjsGL5GxxJQUwCr37vIiTL4WWVqLHSS+a+o0FErBCIgOP
+ m3cg==
+X-Gm-Message-State: APjAAAUR9mjz3+Mp1vQpkNMfHF31KEnKv57HkSidEUpokV8LAGdQYg30
+ Fvlmg2FH8abooey63FanN3aSKydomWk=
+X-Google-Smtp-Source: APXvYqyyzL8V+kJtf96Kd9np8zoznExIAJUVo6/JTGkqDB6lkbpFb1PV5NnJMGFLmQzCls6p1MsOsA==
+X-Received: by 2002:a63:4383:: with SMTP id
+ q125mr33156593pga.373.1571062587966; 
+ Mon, 14 Oct 2019 07:16:27 -0700 (PDT)
+Received: from t03.z01.hikalium.com.com (113x36x63x49.ap113.ftth.ucom.ne.jp.
+ [113.36.63.49])
+ by smtp.gmail.com with ESMTPSA id d10sm20950446pfh.8.2019.10.14.07.16.25
+ (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+ Mon, 14 Oct 2019 07:16:27 -0700 (PDT)
+From: hikarupsp@gmail.com
+To: qemu-devel@nongnu.org
+Subject: [PATCH v2] ui: Fix hanging up Cocoa display on macOS 10.15 (Catalina)
+Date: Mon, 14 Oct 2019 23:16:08 +0900
+Message-Id: <20191014141608.80923-1-hikarupsp@gmail.com>
+X-Mailer: git-send-email 2.21.0 (Apple Git-122)
 MIME-Version: 1.0
-References: <20191010131809.1284004-1-groug@kaod.org>
-In-Reply-To: <20191010131809.1284004-1-groug@kaod.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 14 Oct 2019 15:08:52 +0100
-Message-ID: <CAFEAcA8tdhYm0EuVGx5OiPv7NuZvrtrPLnK+tz=xoJ0Gn4DCmw@mail.gmail.com>
-Subject: Re: [PULL v2 0/8] 9p patches 2019-10-10
-To: Greg Kurz <groug@kaod.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::342
+X-Received-From: 2607:f8b0:4864:20::544
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,43 +92,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Hikaru Nishida <hikarupsp@gmail.com>, Gerd Hoffmann <kraxel@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, 10 Oct 2019 at 14:18, Greg Kurz <groug@kaod.org> wrote:
->
-> The following changes since commit 98b2e3c9ab3abfe476a2b02f8f51813edb90e72d:
->
->   Merge remote-tracking branch 'remotes/stefanha/tags/block-pull-request' into staging (2019-10-08 16:08:35 +0100)
->
-> are available in the Git repository at:
->
->   https://github.com/gkurz/qemu.git tags/9p-next-2019-10-10
->
-> for you to fetch changes up to e410bbc52a7a246858af54ce1842fadf26f39ff7:
->
->   MAINTAINERS: Downgrade status of virtio-9p to "Odd Fixes" (2019-10-10 12:36:28 +0200)
->
-> ----------------------------------------------------------------
-> The most notable change is that we now detect cross-device setups in the
-> host since it may cause inode number collision and mayhem in the guest.
-> A new fsdev property is added for the user to choose the appropriate
-> policy to handle that: either remap all inode numbers or fail I/Os to
-> another host device or just print out a warning (default behaviour).
->
-> This is also my last PR as _active_ maintainer of 9pfs.
->
-> ----------------------------------------------------------------
+From: Hikaru Nishida <hikarupsp@gmail.com>
 
+macOS API documentation says that before applicationDidFinishLaunching
+is called, any events will not be processed. However, some events are
+fired before it is called in macOS Catalina. This causes deadlock of
+iothread_lock in handleEvent while it will be released after the
+app_started_sem is posted.
+This patch avoids processing events before the app_started_sem is
+posted to prevent this deadlock.
 
-Applied, thanks.
+Buglink: https://bugs.launchpad.net/qemu/+bug/1847906
+Signed-off-by: Hikaru Nishida <hikarupsp@gmail.com>
+---
+ ui/cocoa.m | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
 
-Please update the changelog at https://wiki.qemu.org/ChangeLog/4.2
-for any user-visible changes.
+diff --git a/ui/cocoa.m b/ui/cocoa.m
+index f12e21df6e..bccd861d16 100644
+--- a/ui/cocoa.m
++++ b/ui/cocoa.m
+@@ -134,6 +134,7 @@
+ 
+ static QemuSemaphore display_init_sem;
+ static QemuSemaphore app_started_sem;
++volatile sig_atomic_t allow_events;
+ 
+ // Utility functions to run specified code block with iothread lock held
+ typedef void (^CodeBlock)(void);
+@@ -729,6 +730,16 @@ - (void) handleMonitorInput:(NSEvent *)event
+ 
+ - (bool) handleEvent:(NSEvent *)event
+ {
++    if(!allow_events) {
++        /*
++         * Just let OSX have all events that arrive before
++         * applicationDidFinishLaunching.
++         * This avoids a deadlock on the iothread lock, which cocoa_display_init()
++         * will not drop until after the app_started_sem is posted. (In theory
++         * there should not be any such events, but OSX Catalina now emits some.)
++         */
++        return false;
++    }
+     return bool_with_iothread_lock(^{
+         return [self handleEventLocked:event];
+     });
+@@ -1156,6 +1167,7 @@ - (void) dealloc
+ - (void)applicationDidFinishLaunching: (NSNotification *) note
+ {
+     COCOA_DEBUG("QemuCocoaAppController: applicationDidFinishLaunching\n");
++    allow_events = true;
+     /* Tell cocoa_display_init to proceed */
+     qemu_sem_post(&app_started_sem);
+ }
+-- 
+2.21.0 (Apple Git-122)
 
-Thanks for all your work on the 9pfs code!
-
--- PMM
 
