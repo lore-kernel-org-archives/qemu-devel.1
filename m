@@ -2,61 +2,61 @@ Return-Path: <SRS0=PUPy=YH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 58D32C4CECE
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 10:07:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E371ECE587
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 10:07:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2B20A207FF
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 10:07:50 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2B20A207FF
+	by mail.kernel.org (Postfix) with ESMTPS id 3148C207FF
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 10:07:51 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3148C207FF
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46422 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46424 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iJxGX-00023J-9N
-	for qemu-devel@archiver.kernel.org; Mon, 14 Oct 2019 06:07:49 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38818)
+	id 1iJxGY-000259-8v
+	for qemu-devel@archiver.kernel.org; Mon, 14 Oct 2019 06:07:50 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38895)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <cohuck@redhat.com>) id 1iJxEr-0000Sc-SC
- for qemu-devel@nongnu.org; Mon, 14 Oct 2019 06:06:06 -0400
+ (envelope-from <kwolf@redhat.com>) id 1iJxFh-00018v-SX
+ for qemu-devel@nongnu.org; Mon, 14 Oct 2019 06:06:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <cohuck@redhat.com>) id 1iJxEq-0006u8-J3
- for qemu-devel@nongnu.org; Mon, 14 Oct 2019 06:06:05 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:30166)
+ (envelope-from <kwolf@redhat.com>) id 1iJxFg-0007gq-O0
+ for qemu-devel@nongnu.org; Mon, 14 Oct 2019 06:06:57 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:35942)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1iJxEq-0006s9-9Q
- for qemu-devel@nongnu.org; Mon, 14 Oct 2019 06:06:04 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ (Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1iJxFg-0007gC-IY
+ for qemu-devel@nongnu.org; Mon, 14 Oct 2019 06:06:56 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id D02578AC700;
- Mon, 14 Oct 2019 10:06:02 +0000 (UTC)
-Received: from gondolin (dhcp-192-233.str.redhat.com [10.33.192.233])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 2D63417ADC;
- Mon, 14 Oct 2019 10:05:29 +0000 (UTC)
-Date: Mon, 14 Oct 2019 12:05:27 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-To: Jens Freimann <jfreimann@redhat.com>
-Subject: Re: [PATCH v3 10/10] vfio: unplug failover primary device before
- migration
-Message-ID: <20191014120527.30bca7e1.cohuck@redhat.com>
-In-Reply-To: <20191011112015.11785-11-jfreimann@redhat.com>
-References: <20191011112015.11785-1-jfreimann@redhat.com>
- <20191011112015.11785-11-jfreimann@redhat.com>
-Organization: Red Hat GmbH
+ by mx1.redhat.com (Postfix) with ESMTPS id D04A8301D671
+ for <qemu-devel@nongnu.org>; Mon, 14 Oct 2019 10:06:55 +0000 (UTC)
+Received: from localhost.localdomain (unknown [10.36.118.40])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id C50E260A35;
+ Mon, 14 Oct 2019 10:06:54 +0000 (UTC)
+Date: Mon, 14 Oct 2019 12:06:53 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>
+Subject: Re: [PATCH v4 4/4] qapi: Allow introspecting fix for savevm's
+ cooperation with blockdev
+Message-ID: <20191014100653.GE7173@localhost.localdomain>
+References: <20191011085027.28606-1-armbru@redhat.com>
+ <20191011085027.28606-5-armbru@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.69]); Mon, 14 Oct 2019 10:06:02 +0000 (UTC)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20191011085027.28606-5-armbru@redhat.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.47]); Mon, 14 Oct 2019 10:06:55 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 209.132.183.28
@@ -71,118 +71,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: parav@mellanox.com, mst@redhat.com, aadam@redhat.com, qemu-devel@nongnu.org,
- dgilbert@redhat.com, alex.williamson@redhat.com, laine@redhat.com,
- ailan@redhat.com, ehabkost@redhat.com
+Cc: pkrempa@redhat.com, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, 11 Oct 2019 13:20:15 +0200
-Jens Freimann <jfreimann@redhat.com> wrote:
-
-> As usual block all vfio-pci devices from being migrated, but make an
-> exception for failover primary devices. This is achieved by setting
-> unmigratable to 0 but also add a migration blocker for all vfio-pci
-> devices except failover primary devices. These will be unplugged before
-> migration happens by the migration handler of the corresponding
-> virtio-net standby device.
+Am 11.10.2019 um 10:50 hat Markus Armbruster geschrieben:
+> From: Peter Krempa <pkrempa@redhat.com>
 > 
-> Signed-off-by: Jens Freimann <jfreimann@redhat.com>
+> 'savevm' was buggy as it considered all monitor-owned block device
+> nodes for snapshot. With the introduction of -blockdev, the common
+> usage made all nodes including protocol and backing file nodes be
+> monitor-owned and thus considered for snapshot.
+> 
+> This is a problem since the 'file' protocol nodes can't have internal
+> snapshots and it does not make sense to take snapshot of nodes
+> representing backing files.
+> 
+> This was fixed by commit 05f4aced658a02b02. Clients need to be able to
+> detect whether this fix is present.
+> 
+> Since savevm does not have an QMP alternative, add the feature for the
+> 'human-monitor-command' backdoor which is used to call this command in
+> modern use.
+> 
+> Signed-off-by: Peter Krempa <pkrempa@redhat.com>
+> Reviewed-by: Markus Armbruster <armbru@redhat.com>
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
 > ---
->  hw/vfio/pci.c | 35 ++++++++++++++++++++++++++++++++++-
->  hw/vfio/pci.h |  2 ++
->  2 files changed, 36 insertions(+), 1 deletion(-)
+>  qapi/misc.json | 10 +++++++++-
+>  1 file changed, 9 insertions(+), 1 deletion(-)
 > 
-> diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
-> index c5e6fe61cb..64cf8e07d9 100644
-> --- a/hw/vfio/pci.c
-> +++ b/hw/vfio/pci.c
-> @@ -40,6 +40,9 @@
->  #include "pci.h"
->  #include "trace.h"
->  #include "qapi/error.h"
-> +#include "migration/blocker.h"
-> +#include "qemu/option.h"
-> +#include "qemu/option_int.h"
->  
->  #define TYPE_VFIO_PCI "vfio-pci"
->  #define PCI_VFIO(obj)    OBJECT_CHECK(VFIOPCIDevice, obj, TYPE_VFIO_PCI)
-> @@ -2698,6 +2701,12 @@ static void vfio_unregister_req_notifier(VFIOPCIDevice *vdev)
->      vdev->req_enabled = false;
->  }
->  
-> +static int has_net_failover_arg(void *opaque, const char *name,
-> +                           const char *value, Error **errp)
-> +{
-> +    return (strcmp(name, "net_failover_pair_id") == 0);
-> +}
+> diff --git a/qapi/misc.json b/qapi/misc.json
+> index 6bd11f50e6..35dca86ce7 100644
+> --- a/qapi/misc.json
+> +++ b/qapi/misc.json
+> @@ -1020,6 +1020,13 @@
+>  #
+>  # @cpu-index: The CPU to use for commands that require an implicit CPU
+>  #
+> +# Features:
 > +
->  static void vfio_realize(PCIDevice *pdev, Error **errp)
->  {
->      VFIOPCIDevice *vdev = PCI_VFIO(pdev);
-> @@ -2710,6 +2719,20 @@ static void vfio_realize(PCIDevice *pdev, Error **errp)
->      int groupid;
->      int i, ret;
->      bool is_mdev;
-> +    uint16_t class_id;
-> +
-> +    if (qemu_opt_foreach(pdev->qdev.opts, has_net_failover_arg,
-> +                         (void *) pdev->qdev.opts, &err) == 0) {
-> +        error_setg(&vdev->migration_blocker,
-> +                "VFIO device doesn't support migration");
-> +        ret = migrate_add_blocker(vdev->migration_blocker, &err);
-> +        if (err) {
-> +            error_propagate(errp, err);
-> +            error_free(vdev->migration_blocker);
-> +        }
 
-Do we really want to continue here if adding the migration blocker
-failed? Previously, adding the vmsd with unmigratable=1 would have
-prevented realization of the device if --only-migratable was specified;
-I guess we should keep that behaviour and just bail out here?
+I think you want a # in this empty line.
 
-> +    } else {
-> +        pdev->qdev.allow_unplug_during_migration = true;
-> +    }
->  
->      if (!vdev->vbasedev.sysfsdev) {
->          if (!(~vdev->host.domain || ~vdev->host.bus ||
-> @@ -2812,6 +2835,14 @@ static void vfio_realize(PCIDevice *pdev, Error **errp)
->          goto error;
->      }
->  
-> +    if (vdev->net_failover_pair_id != NULL) {
-> +        class_id = pci_get_word(pdev->config + PCI_CLASS_DEVICE);
-> +        if (class_id != PCI_CLASS_NETWORK_ETHERNET) {
-> +            error_setg(errp, "failover device is not an Ethernet device");
-> +            goto error;
-> +        }
-> +    }
-> +
->      /* vfio emulates a lot for us, but some bits need extra love */
->      vdev->emulated_config_bits = g_malloc0(vdev->config_size);
->  
-> @@ -3110,6 +3141,8 @@ static Property vfio_pci_dev_properties[] = {
->                              display, ON_OFF_AUTO_OFF),
->      DEFINE_PROP_UINT32("xres", VFIOPCIDevice, display_xres, 0),
->      DEFINE_PROP_UINT32("yres", VFIOPCIDevice, display_yres, 0),
-> +    DEFINE_PROP_STRING("net_failover_pair_id", VFIOPCIDevice,
-> +            net_failover_pair_id),
->      DEFINE_PROP_UINT32("x-intx-mmap-timeout-ms", VFIOPCIDevice,
->                         intx.mmap_timeout, 1100),
->      DEFINE_PROP_BIT("x-vga", VFIOPCIDevice, features,
-> @@ -3152,7 +3185,7 @@ static Property vfio_pci_dev_properties[] = {
->  
->  static const VMStateDescription vfio_pci_vmstate = {
->      .name = "vfio-pci",
-> -    .unmigratable = 1,
-> +    .unmigratable = 0,
+> +# @savevm-monitor-nodes: If present, HMP command savevm only snapshots
+> +#                        monitor-owned nodes if they have no parents.
+> +#                        This allows the use of 'savevm' with
+> +#                        -blockdev. (since 4.2)
+> +#
+>  # Returns: the output of the command as a string
+>  #
+>  # Since: 0.14.0
+> @@ -1047,7 +1054,8 @@
+>  ##
+>  { 'command': 'human-monitor-command',
+>    'data': {'command-line': 'str', '*cpu-index': 'int'},
+> -  'returns': 'str' }
+> +  'returns': 'str',
+> +  'features': [ 'savevm-monitor-nodes' ] }
 
-Is this vmsd useful in any way with that change anymore?
+With this fixed:
 
->  };
->  
-
-(...)
+Reviewed-by: Kevin Wolf <kwolf@redhat.com>
 
