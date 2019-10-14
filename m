@@ -2,61 +2,87 @@ Return-Path: <SRS0=PUPy=YH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 695C4ECE587
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 16:15:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F13DC4CECE
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 16:17:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 379D320854
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 16:15:32 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 379D320854
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 0AD932133F
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 16:17:59 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="cqPscYcX"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0AD932133F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52972 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53036 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iK30M-0001nG-RR
-	for qemu-devel@archiver.kernel.org; Mon, 14 Oct 2019 12:15:30 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36498)
+	id 1iK32j-0003oz-Jy
+	for qemu-devel@archiver.kernel.org; Mon, 14 Oct 2019 12:17:57 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36683)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <kwolf@redhat.com>) id 1iK2pL-00036m-3z
- for qemu-devel@nongnu.org; Mon, 14 Oct 2019 12:04:08 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1iK2pe-0003Xl-QN
+ for qemu-devel@nongnu.org; Mon, 14 Oct 2019 12:04:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kwolf@redhat.com>) id 1iK2pJ-0006dK-J6
- for qemu-devel@nongnu.org; Mon, 14 Oct 2019 12:04:07 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:49006)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <kwolf@redhat.com>)
- id 1iK2pE-0006Wp-Gt; Mon, 14 Oct 2019 12:04:00 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id ABE188980E0;
- Mon, 14 Oct 2019 16:03:59 +0000 (UTC)
-Received: from localhost.localdomain.com (unknown [10.36.118.40])
- by smtp.corp.redhat.com (Postfix) with ESMTP id A47885C1D4;
- Mon, 14 Oct 2019 16:03:58 +0000 (UTC)
-From: Kevin Wolf <kwolf@redhat.com>
-To: qemu-block@nongnu.org
-Subject: [PULL 08/15] block: Reject misaligned write requests with
- BDRV_REQ_NO_FALLBACK
-Date: Mon, 14 Oct 2019 18:03:42 +0200
-Message-Id: <20191014160343.8211-9-kwolf@redhat.com>
-In-Reply-To: <20191014160343.8211-1-kwolf@redhat.com>
-References: <20191014160343.8211-1-kwolf@redhat.com>
+ (envelope-from <peter.maydell@linaro.org>) id 1iK2pd-0006xr-D6
+ for qemu-devel@nongnu.org; Mon, 14 Oct 2019 12:04:26 -0400
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:41595)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1iK2pd-0006xB-70
+ for qemu-devel@nongnu.org; Mon, 14 Oct 2019 12:04:25 -0400
+Received: by mail-wr1-x444.google.com with SMTP id p4so4500507wrm.8
+ for <qemu-devel@nongnu.org>; Mon, 14 Oct 2019 09:04:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:subject:date:message-id:in-reply-to:references:mime-version
+ :content-transfer-encoding;
+ bh=ppKekkdyvFhkeosiKomCQMOUGLuIDXn9EHr3PuXEGrU=;
+ b=cqPscYcXcr/F9vM26ijL4lnVAZnLcPxHrPbgchirfvMO3y4UOrUNvlhOVjTvHRpxRj
+ POhN0zhsSu9qVYHrqHWeNHXBTGe2DygHq1diqC7lA9C2SYoYi2RfhVxaB6SXSkey4ap9
+ j3HD11hM3kWVFZ6zbM0JL4rNZsq8FmPcrpj2GWh7zETq+9j83WnyQ69Bw9NdOc9a7+Jx
+ POPpIaE3O0tfkkLHpHzza4Xw+KWlSkSBCLt+lR3oBeZQvjtdpWZHZB5XLrFFHcQMBzhf
+ IMfeLtMsTTYbrHBx3ZTjzGBk1pKWmSW719O8jLYn4uv2fgQC523UFTX3ULnyFo4d3HVd
+ DYEw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=ppKekkdyvFhkeosiKomCQMOUGLuIDXn9EHr3PuXEGrU=;
+ b=WUe3oAOhy9wiPK9OMFyUX8eVZvRMmCBvYMwAXEIcrQJ4xXQ+SQEi82bZNPLv0Bn8EN
+ dMZ06bKshYfpf5GfhdVgv8I4NRJ0lONgx1lrBIniXNAPrzvIlE4jyhpxaH8aFLXymR3N
+ 6Io8pZo/r/7jj9rL2Q7F3yNElt6jxouvF3Gyu64VgWrtf16yXpWEUiBaBF0IV+H1YXg1
+ AnAJ8VuEWmwQKtb+3PVyAyR4hA6G36s6vt2zizWhf2xBfqFnpTsC12LZMJ0Z+Y9Lzd3n
+ BpcuyzTuN3BFvG8CeXA3MNbfXRbkYMeQkZEdIEHW/3pqd6SjFHNoVNlvIISZNQM4PLDX
+ EW6g==
+X-Gm-Message-State: APjAAAWau1D5bMSlFx9DAG1UaBG6Wcup/WtTM7hdF7XbH3EZQ5w9I+XC
+ 3/lZh4wbJ4DjnLBpe1ZOE7nK3NBvUZEhmg==
+X-Google-Smtp-Source: APXvYqwt2x+5DvCRaJgIa6yssiO8pyb5NsSL6ZP2HjJFZ8thii8V0+HJlVXHQwk4Mnyf40R/6ms0mA==
+X-Received: by 2002:adf:e2c5:: with SMTP id d5mr12600853wrj.283.1571069063689; 
+ Mon, 14 Oct 2019 09:04:23 -0700 (PDT)
+Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
+ by smtp.gmail.com with ESMTPSA id 5sm18029779wrk.86.2019.10.14.09.04.21
+ for <qemu-devel@nongnu.org>
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 14 Oct 2019 09:04:22 -0700 (PDT)
+From: Peter Maydell <peter.maydell@linaro.org>
+To: qemu-devel@nongnu.org
+Subject: [PULL 07/68] hw/timer/arm_timer.c: Switch to transaction-based ptimer
+ API
+Date: Mon, 14 Oct 2019 17:03:03 +0100
+Message-Id: <20191014160404.19553-8-peter.maydell@linaro.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20191014160404.19553-1-peter.maydell@linaro.org>
+References: <20191014160404.19553-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.67]); Mon, 14 Oct 2019 16:03:59 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.132.183.28
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::444
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -68,150 +94,99 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, peter.maydell@linaro.org, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Alberto Garcia <berto@igalia.com>
+Switch the arm_timer.c code away from bottom-half based ptimers
+to the new transaction-based ptimer API. This just requires
+adding begin/commit calls around the various arms of
+arm_timer_write() that modify the ptimer state, and using the
+new ptimer_init() function to create the timer.
 
-The BDRV_REQ_NO_FALLBACK flag means that an operation should only be
-performed if it can be offloaded or otherwise performed efficiently.
-
-However a misaligned write request requires a RMW so we should return
-an error and let the caller decide how to proceed.
-
-This hits an assertion since commit c8bb23cbdb if the required
-alignment is larger than the cluster size:
-
-qemu-img create -f qcow2 -o cluster_size=3D2k img.qcow2 4G
-qemu-io -c "open -o driver=3Dqcow2,file.align=3D4k blkdebug::img.qcow2" \
-        -c 'write 0 512'
-qemu-io: block/io.c:1127: bdrv_driver_pwritev: Assertion `!(flags & BDRV_=
-REQ_NO_FALLBACK)' failed.
-Aborted
-
-The reason is that when writing to an unallocated cluster we try to
-skip the copy-on-write part and zeroize it using BDRV_REQ_NO_FALLBACK
-instead, resulting in a write request that is too small (2KB cluster
-size vs 4KB required alignment).
-
-Signed-off-by: Alberto Garcia <berto@igalia.com>
-Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+Fixes: https://bugs.launchpad.net/qemu/+bug/1777777
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Message-id: 20191008171740.9679-5-peter.maydell@linaro.org
 ---
- block/io.c                 |  7 +++++
- tests/qemu-iotests/268     | 55 ++++++++++++++++++++++++++++++++++++++
- tests/qemu-iotests/268.out |  7 +++++
- tests/qemu-iotests/group   |  1 +
- 4 files changed, 70 insertions(+)
- create mode 100755 tests/qemu-iotests/268
- create mode 100644 tests/qemu-iotests/268.out
+ hw/timer/arm_timer.c | 16 +++++++++++-----
+ 1 file changed, 11 insertions(+), 5 deletions(-)
 
-diff --git a/block/io.c b/block/io.c
-index 8b6dace056..f0b86c1d19 100644
---- a/block/io.c
-+++ b/block/io.c
-@@ -2090,6 +2090,13 @@ int coroutine_fn bdrv_co_pwritev_part(BdrvChild *c=
-hild,
-         return ret;
+diff --git a/hw/timer/arm_timer.c b/hw/timer/arm_timer.c
+index dc33ab31050..af524fabf75 100644
+--- a/hw/timer/arm_timer.c
++++ b/hw/timer/arm_timer.c
+@@ -14,7 +14,6 @@
+ #include "hw/irq.h"
+ #include "hw/ptimer.h"
+ #include "hw/qdev-properties.h"
+-#include "qemu/main-loop.h"
+ #include "qemu/module.h"
+ #include "qemu/log.h"
+ 
+@@ -75,7 +74,10 @@ static uint32_t arm_timer_read(void *opaque, hwaddr offset)
      }
-=20
-+    /* If the request is misaligned then we can't make it efficient */
-+    if ((flags & BDRV_REQ_NO_FALLBACK) &&
-+        !QEMU_IS_ALIGNED(offset | bytes, align))
-+    {
-+        return -ENOTSUP;
-+    }
-+
-     bdrv_inc_in_flight(bs);
-     /*
-      * Align write if necessary by performing a read-modify-write cycle.
-diff --git a/tests/qemu-iotests/268 b/tests/qemu-iotests/268
-new file mode 100755
-index 0000000000..78c3f4db3a
---- /dev/null
-+++ b/tests/qemu-iotests/268
-@@ -0,0 +1,55 @@
-+#!/usr/bin/env bash
-+#
-+# Test write request with required alignment larger than the cluster siz=
-e
-+#
-+# Copyright (C) 2019 Igalia, S.L.
-+# Author: Alberto Garcia <berto@igalia.com>
-+#
-+# This program is free software; you can redistribute it and/or modify
-+# it under the terms of the GNU General Public License as published by
-+# the Free Software Foundation; either version 2 of the License, or
-+# (at your option) any later version.
-+#
-+# This program is distributed in the hope that it will be useful,
-+# but WITHOUT ANY WARRANTY; without even the implied warranty of
-+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+# GNU General Public License for more details.
-+#
-+# You should have received a copy of the GNU General Public License
-+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-+#
-+
-+# creator
-+owner=3Dberto@igalia.com
-+
-+seq=3D`basename $0`
-+echo "QA output created by $seq"
-+
-+status=3D1	# failure is the default!
-+
-+_cleanup()
-+{
-+    _cleanup_test_img
-+}
-+trap "_cleanup; exit \$status" 0 1 2 3 15
-+
-+# get standard environment, filters and checks
-+. ./common.rc
-+. ./common.filter
-+
-+_supported_fmt qcow2
-+_supported_proto file
-+
-+echo
-+echo "=3D=3D Required alignment larger than cluster size =3D=3D"
-+
-+CLUSTER_SIZE=3D2k _make_test_img 1M
-+# Since commit c8bb23cbdb writing to an unallocated cluster fills the
-+# empty COW areas with bdrv_write_zeroes(flags=3DBDRV_REQ_NO_FALLBACK)
-+$QEMU_IO -c "open -o driver=3D$IMGFMT,file.align=3D4k blkdebug::$TEST_IM=
-G" \
-+         -c "write 0 512" | _filter_qemu_io
-+
-+# success, all done
-+echo "*** done"
-+rm -f $seq.full
-+status=3D0
-diff --git a/tests/qemu-iotests/268.out b/tests/qemu-iotests/268.out
-new file mode 100644
-index 0000000000..2ed6c68529
---- /dev/null
-+++ b/tests/qemu-iotests/268.out
-@@ -0,0 +1,7 @@
-+QA output created by 268
-+
-+=3D=3D Required alignment larger than cluster size =3D=3D
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D1048576
-+wrote 512/512 bytes at offset 0
-+512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+*** done
-diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
-index 5805a79d9e..4c861f7eed 100644
---- a/tests/qemu-iotests/group
-+++ b/tests/qemu-iotests/group
-@@ -278,3 +278,4 @@
- 265 rw auto quick
- 266 rw quick
- 267 rw auto quick snapshot
-+268 rw auto quick
---=20
+ }
+ 
+-/* Reset the timer limit after settings have changed.  */
++/*
++ * Reset the timer limit after settings have changed.
++ * May only be called from inside a ptimer transaction block.
++ */
+ static void arm_timer_recalibrate(arm_timer_state *s, int reload)
+ {
+     uint32_t limit;
+@@ -102,13 +104,16 @@ static void arm_timer_write(void *opaque, hwaddr offset,
+     switch (offset >> 2) {
+     case 0: /* TimerLoad */
+         s->limit = value;
++        ptimer_transaction_begin(s->timer);
+         arm_timer_recalibrate(s, 1);
++        ptimer_transaction_commit(s->timer);
+         break;
+     case 1: /* TimerValue */
+         /* ??? Linux seems to want to write to this readonly register.
+            Ignore it.  */
+         break;
+     case 2: /* TimerControl */
++        ptimer_transaction_begin(s->timer);
+         if (s->control & TIMER_CTRL_ENABLE) {
+             /* Pause the timer if it is running.  This may cause some
+                inaccuracy dure to rounding, but avoids a whole lot of other
+@@ -128,13 +133,16 @@ static void arm_timer_write(void *opaque, hwaddr offset,
+             /* Restart the timer if still enabled.  */
+             ptimer_run(s->timer, (s->control & TIMER_CTRL_ONESHOT) != 0);
+         }
++        ptimer_transaction_commit(s->timer);
+         break;
+     case 3: /* TimerIntClr */
+         s->int_level = 0;
+         break;
+     case 6: /* TimerBGLoad */
+         s->limit = value;
++        ptimer_transaction_begin(s->timer);
+         arm_timer_recalibrate(s, 0);
++        ptimer_transaction_commit(s->timer);
+         break;
+     default:
+         qemu_log_mask(LOG_GUEST_ERROR,
+@@ -166,14 +174,12 @@ static const VMStateDescription vmstate_arm_timer = {
+ static arm_timer_state *arm_timer_init(uint32_t freq)
+ {
+     arm_timer_state *s;
+-    QEMUBH *bh;
+ 
+     s = (arm_timer_state *)g_malloc0(sizeof(arm_timer_state));
+     s->freq = freq;
+     s->control = TIMER_CTRL_IE;
+ 
+-    bh = qemu_bh_new(arm_timer_tick, s);
+-    s->timer = ptimer_init_with_bh(bh, PTIMER_POLICY_DEFAULT);
++    s->timer = ptimer_init(arm_timer_tick, s, PTIMER_POLICY_DEFAULT);
+     vmstate_register(NULL, -1, &vmstate_arm_timer, s);
+     return s;
+ }
+-- 
 2.20.1
 
 
