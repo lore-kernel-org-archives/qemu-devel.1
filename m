@@ -2,74 +2,84 @@ Return-Path: <SRS0=PUPy=YH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 15EBCC4CECE
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 18:07:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BBB8CECE58E
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 18:13:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E0DF52067B
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 18:07:02 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E0DF52067B
+	by mail.kernel.org (Postfix) with ESMTPS id 8FC9D217D9
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 18:13:01 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Vv6vKvjo"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8FC9D217D9
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55188 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55226 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iK4kI-0002xz-2F
-	for qemu-devel@archiver.kernel.org; Mon, 14 Oct 2019 14:07:02 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48968)
+	id 1iK4q3-0005tK-PU
+	for qemu-devel@archiver.kernel.org; Mon, 14 Oct 2019 14:12:59 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54642)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1iK4BS-0005iX-S0
- for qemu-devel@nongnu.org; Mon, 14 Oct 2019 13:31:03 -0400
+ (envelope-from <alistair23@gmail.com>) id 1iK4iq-0001mF-Tx
+ for qemu-devel@nongnu.org; Mon, 14 Oct 2019 14:05:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1iK4BR-0001zt-OW
- for qemu-devel@nongnu.org; Mon, 14 Oct 2019 13:31:02 -0400
-Received: from indium.canonical.com ([91.189.90.7]:57340)
+ (envelope-from <alistair23@gmail.com>) id 1iK4io-0002RK-KM
+ for qemu-devel@nongnu.org; Mon, 14 Oct 2019 14:05:32 -0400
+Received: from mail-lj1-x241.google.com ([2a00:1450:4864:20::241]:46005)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1iK4BR-0001zV-Iq
- for qemu-devel@nongnu.org; Mon, 14 Oct 2019 13:31:01 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1iK4BP-000524-Mg
- for <qemu-devel@nongnu.org>; Mon, 14 Oct 2019 17:30:59 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id AA3412E80C9
- for <qemu-devel@nongnu.org>; Mon, 14 Oct 2019 17:30:59 +0000 (UTC)
+ (Exim 4.71) (envelope-from <alistair23@gmail.com>)
+ id 1iK4io-0002QX-B4; Mon, 14 Oct 2019 14:05:30 -0400
+Received: by mail-lj1-x241.google.com with SMTP id q64so17516944ljb.12;
+ Mon, 14 Oct 2019 11:05:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=jMvhxdWzNtdIXTeuZyyU9CkWelT0B+uy8QsZVEjSeOg=;
+ b=Vv6vKvjomKgXj7xXSdOAD8IL9nth69qRE0YWYCZ7Nrt6ZgEsLLm9gz3XT/5COVTpYp
+ NnXKcZuC4763dw9mZvPPKh+2kFmKwvDJCVcDsSTTzmt7TpxuTzOSbqp2TCOPrFJBKyCY
+ MvXUByaxiqfLIq208uLwavLlm9gKd99ZapniOnz7B1nOnrd1XNlhRFZBM7u154ArKT0G
+ Jad8OTYhXRrtW+/gDF06olZ+xlEvMweQ8xUEKahwtuxCwb2yCg5HHoUbJEgO2Gi96qaV
+ RGTJqnwWADpcAk8EMmr3b2yPjWU/iC2HmkfbVY9mEtyBVxj2EfJXNr0BVpWD28Kj38b2
+ sgxA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=jMvhxdWzNtdIXTeuZyyU9CkWelT0B+uy8QsZVEjSeOg=;
+ b=FwG0BtQHIfuRItgghYi/RymuGKfYXnk5H6VMtGA44GTgSWTI50XDJRKT7nctIkafAl
+ nIlck3AoTFYOtRHME+MsTNoqoSFSCxNC38Rmml6HQh95IiJlC1m6F75doUs9EmJv5qvW
+ TdvTCFbDTO618tb7v5Erc9u+E00jwa/ok7yz+D4/k5f6veUMbgF6I7VUyUUDwJgNB/8U
+ vWY9naD3r1tl0rYRLa3tmKbNbwZS5YWAA4fyKFvGzL8ey3hLEUYdTxlKgQawuf3ibjZ9
+ cazvS1ad/ZjM5eV7NKB8e/9IjIZ2lgvKyVm50K96SaAfdewzOu2bkKBqfNNC3vzU4FhC
+ ShEw==
+X-Gm-Message-State: APjAAAVtUuZjx6iR0qnCch0zzDTPsluFsx7YOhqwryOrZIQZ6SV4feRI
+ Zi5IlXAsP0RsKWjZHJy2KLww5PACyGPTisjWgzc=
+X-Google-Smtp-Source: APXvYqyIoDeTn3P2wfE+yvHWILp6fNb4uvucDQ4uGMiL5W9qfO+mOQ58T/S8g4CvMnVtoAL/x1uGDAoBolapmJjwRyI=
+X-Received: by 2002:a2e:b010:: with SMTP id y16mr7530523ljk.147.1571076327873; 
+ Mon, 14 Oct 2019 11:05:27 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 14 Oct 2019 17:23:57 -0000
-From: Shachar Itzhaky <corwin.amber@gmail.com>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: corwin-amber pmaydell zenojevski
-X-Launchpad-Bug-Reporter: Shachar Itzhaky (corwin-amber)
-X-Launchpad-Bug-Modifier: Shachar Itzhaky (corwin-amber)
-References: <157097450557.5820.4200729468686724078.malonedeb@gac.canonical.com>
-Message-Id: <157107383710.5928.6877894875959962008.malone@gac.canonical.com>
-Subject: [Bug 1847906] Re: Cocoa display hangs on macOS 10.15 (Catalina)
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="af2eefe214bd95389a09b7c956720881bab16807";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 4a2787527d57c24bdfc26e58075a56d3afb071a1
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 91.189.90.7
+References: <20191014154529.287048-1-jonathan@fintelia.io>
+ <20191014154529.287048-3-jonathan@fintelia.io>
+In-Reply-To: <20191014154529.287048-3-jonathan@fintelia.io>
+From: Alistair Francis <alistair23@gmail.com>
+Date: Mon, 14 Oct 2019 11:00:22 -0700
+Message-ID: <CAKmqyKOGWMDDm1-VRcQZJB3La3=2tcDw3oHpWjJBCirMrcGX8g@mail.gmail.com>
+Subject: Re: [PATCH v4 2/3] target/riscv: Expose "priv" register for GDB for
+ reads
+To: Jonathan Behrens <jonathan@fintelia.io>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::241
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -78,37 +88,141 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1847906 <1847906@bugs.launchpad.net>
+Cc: "open list:RISC-V" <qemu-riscv@nongnu.org>,
+ Sagar Karandikar <sagark@eecs.berkeley.edu>,
+ Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
+ Palmer Dabbelt <palmer@sifive.com>,
+ "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
+ =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
+ Alistair Francis <Alistair.Francis@wdc.com>,
+ =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is wonderful! Thank you Peter and Hikaru for this patch. I will try
-it ASAP and confirm.
+On Mon, Oct 14, 2019 at 8:50 AM Jonathan Behrens <jonathan@fintelia.io> wrote:
+>
+> This patch enables a debugger to read the current privilege level via a virtual
+> "priv" register. When compiled with CONFIG_USER_ONLY the register is still
+> visible but always reports the value zero.
+>
+> Signed-off-by: Jonathan Behrens <jonathan@fintelia.io>
 
--- =
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1847906
+Alistair
 
-Title:
-  Cocoa display hangs on macOS 10.15 (Catalina)
-
-Status in QEMU:
-  New
-
-Bug description:
-  I have downloaded the latest stable source tarball 4.1.0 and compiled
-  it (i386-softmmu target).
-
-  After opening a black window, QEMU hangs (spinning beach ball).
-  When building with `--disable-cocoa --enable-sdl`, display seems to work =
-fine.
-
-  The same happened when I tried to build QEMU through HomeBrew and
-  MacPorts.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1847906/+subscriptions
+> ---
+>  configure                       |  4 ++--
+>  gdb-xml/riscv-32bit-virtual.xml | 11 +++++++++++
+>  gdb-xml/riscv-64bit-virtual.xml | 11 +++++++++++
+>  target/riscv/gdbstub.c          | 23 +++++++++++++++++++++++
+>  4 files changed, 47 insertions(+), 2 deletions(-)
+>  create mode 100644 gdb-xml/riscv-32bit-virtual.xml
+>  create mode 100644 gdb-xml/riscv-64bit-virtual.xml
+>
+> diff --git a/configure b/configure
+> index 30544f52e6..6118a6a045 100755
+> --- a/configure
+> +++ b/configure
+> @@ -7520,13 +7520,13 @@ case "$target_name" in
+>      TARGET_BASE_ARCH=riscv
+>      TARGET_ABI_DIR=riscv
+>      mttcg=yes
+> -    gdb_xml_files="riscv-32bit-cpu.xml riscv-32bit-fpu.xml riscv-32bit-csr.xml"
+> +    gdb_xml_files="riscv-32bit-cpu.xml riscv-32bit-fpu.xml riscv-32bit-csr.xml riscv-32bit-virtual.xml"
+>    ;;
+>    riscv64)
+>      TARGET_BASE_ARCH=riscv
+>      TARGET_ABI_DIR=riscv
+>      mttcg=yes
+> -    gdb_xml_files="riscv-64bit-cpu.xml riscv-64bit-fpu.xml riscv-64bit-csr.xml"
+> +    gdb_xml_files="riscv-64bit-cpu.xml riscv-64bit-fpu.xml riscv-64bit-csr.xml riscv-64bit-virtual.xml"
+>    ;;
+>    sh4|sh4eb)
+>      TARGET_ARCH=sh4
+> diff --git a/gdb-xml/riscv-32bit-virtual.xml b/gdb-xml/riscv-32bit-virtual.xml
+> new file mode 100644
+> index 0000000000..905f1c555d
+> --- /dev/null
+> +++ b/gdb-xml/riscv-32bit-virtual.xml
+> @@ -0,0 +1,11 @@
+> +<?xml version="1.0"?>
+> +<!-- Copyright (C) 2018-2019 Free Software Foundation, Inc.
+> +
+> +     Copying and distribution of this file, with or without modification,
+> +     are permitted in any medium without royalty provided the copyright
+> +     notice and this notice are preserved.  -->
+> +
+> +<!DOCTYPE feature SYSTEM "gdb-target.dtd">
+> +<feature name="org.gnu.gdb.riscv.virtual">
+> +  <reg name="priv" bitsize="32"/>
+> +</feature>
+> diff --git a/gdb-xml/riscv-64bit-virtual.xml b/gdb-xml/riscv-64bit-virtual.xml
+> new file mode 100644
+> index 0000000000..62d86c237b
+> --- /dev/null
+> +++ b/gdb-xml/riscv-64bit-virtual.xml
+> @@ -0,0 +1,11 @@
+> +<?xml version="1.0"?>
+> +<!-- Copyright (C) 2018-2019 Free Software Foundation, Inc.
+> +
+> +     Copying and distribution of this file, with or without modification,
+> +     are permitted in any medium without royalty provided the copyright
+> +     notice and this notice are preserved.  -->
+> +
+> +<!DOCTYPE feature SYSTEM "gdb-target.dtd">
+> +<feature name="org.gnu.gdb.riscv.virtual">
+> +  <reg name="priv" bitsize="64"/>
+> +</feature>
+> diff --git a/target/riscv/gdbstub.c b/target/riscv/gdbstub.c
+> index cb5bfd3d50..1f71604b78 100644
+> --- a/target/riscv/gdbstub.c
+> +++ b/target/riscv/gdbstub.c
+> @@ -373,6 +373,23 @@ static int riscv_gdb_set_csr(CPURISCVState *env, uint8_t *mem_buf, int n)
+>      return 0;
+>  }
+>
+> +static int riscv_gdb_get_virtual(CPURISCVState *cs, uint8_t *mem_buf, int n)
+> +{
+> +    if (n == 0) {
+> +#ifdef CONFIG_USER_ONLY
+> +        return gdb_get_regl(mem_buf, 0);
+> +#else
+> +        return gdb_get_regl(mem_buf, cs->priv);
+> +#endif
+> +    }
+> +    return 0;
+> +}
+> +
+> +static int riscv_gdb_set_virtual(CPURISCVState *cs, uint8_t *mem_buf, int n)
+> +{
+> +    return 0;
+> +}
+> +
+>  void riscv_cpu_register_gdb_regs_for_features(CPUState *cs)
+>  {
+>      RISCVCPU *cpu = RISCV_CPU(cs);
+> @@ -385,6 +402,9 @@ void riscv_cpu_register_gdb_regs_for_features(CPUState *cs)
+>
+>      gdb_register_coprocessor(cs, riscv_gdb_get_csr, riscv_gdb_set_csr,
+>                               240, "riscv-32bit-csr.xml", 0);
+> +
+> +    gdb_register_coprocessor(cs, riscv_gdb_get_virtual, riscv_gdb_set_virtual,
+> +                             1, "riscv-32bit-virtual.xml", 0);
+>  #elif defined(TARGET_RISCV64)
+>      if (env->misa & RVF) {
+>          gdb_register_coprocessor(cs, riscv_gdb_get_fpu, riscv_gdb_set_fpu,
+> @@ -393,5 +413,8 @@ void riscv_cpu_register_gdb_regs_for_features(CPUState *cs)
+>
+>      gdb_register_coprocessor(cs, riscv_gdb_get_csr, riscv_gdb_set_csr,
+>                               240, "riscv-64bit-csr.xml", 0);
+> +
+> +    gdb_register_coprocessor(cs, riscv_gdb_get_virtual, riscv_gdb_set_virtual,
+> +                             1, "riscv-64bit-virtual.xml", 0);
+>  #endif
+>  }
+> --
+> 2.23.0
+>
 
