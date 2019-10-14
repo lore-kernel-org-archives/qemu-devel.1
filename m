@@ -2,86 +2,80 @@ Return-Path: <SRS0=PUPy=YH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6278CC4CECE
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 13:11:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 31D6BC4CECE
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 13:14:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2B63A20659
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 13:11:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id EF9B120659
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 13:14:13 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="hxuXuR4g"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2B63A20659
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="aRAFAiRO"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EF9B120659
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49558 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49580 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iK082-0000tG-AW
-	for qemu-devel@archiver.kernel.org; Mon, 14 Oct 2019 09:11:14 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35281)
+	id 1iK0Av-0001zu-6D
+	for qemu-devel@archiver.kernel.org; Mon, 14 Oct 2019 09:14:13 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35758)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1iK06m-0008TL-FC
- for qemu-devel@nongnu.org; Mon, 14 Oct 2019 09:09:57 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1iK0AE-0001bT-SO
+ for qemu-devel@nongnu.org; Mon, 14 Oct 2019 09:13:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1iK06h-0000K5-9p
- for qemu-devel@nongnu.org; Mon, 14 Oct 2019 09:09:56 -0400
-Received: from mail-wm1-x336.google.com ([2a00:1450:4864:20::336]:40392)
+ (envelope-from <peter.maydell@linaro.org>) id 1iK0AD-000409-ME
+ for qemu-devel@nongnu.org; Mon, 14 Oct 2019 09:13:30 -0400
+Received: from mail-oi1-x242.google.com ([2607:f8b0:4864:20::242]:34937)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1iK06h-0000JG-3V
- for qemu-devel@nongnu.org; Mon, 14 Oct 2019 09:09:51 -0400
-Received: by mail-wm1-x336.google.com with SMTP id b24so16695714wmj.5
- for <qemu-devel@nongnu.org>; Mon, 14 Oct 2019 06:09:50 -0700 (PDT)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1iK0AD-0003xV-G5
+ for qemu-devel@nongnu.org; Mon, 14 Oct 2019 09:13:29 -0400
+Received: by mail-oi1-x242.google.com with SMTP id x3so13701330oig.2
+ for <qemu-devel@nongnu.org>; Mon, 14 Oct 2019 06:13:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=UEXCjAhdu0FKHjjtnW1230km7QIS6Nvx34ZHiSKDVCA=;
- b=hxuXuR4g2shL08WUvxaxnshWH4ZEC/LUpYo0ZYhUGKU2xOfwImBSabs2JJe4Rr1awE
- T6YpA6M4ywmZV5YIDRwxoj3p7SNgb40U4YINadi8jG7pvb9SSmmbKIz8jn58jY3Fw9iI
- ixg9iRXfIC14WrGE/y+lZB8hcb4nySgQtAoUzIt2nM+t0JwM4M8MRLCyqKsZs6Wv/af/
- AzURbapq/IfeIs4A+/u+kzPaZLmigwtlX6egOu2/XEiEs7eGZMBB+AouiK+ypqpn5+bX
- 7LMLbwnhBtS2wi3jRpEZT+Q0U37fLIwjoqRl2SBKBnov5gVGNx2dN3foecpPjD6OR560
- 44ew==
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=2ZDxZrj8i3dlKeHEuNZk9hTc0Cc0Sxh7KqDs3VbBc5M=;
+ b=aRAFAiROJv4F5Cgmww4DqojOW6jv3j6nfO/7tO5LT37HEduunsObyUG+QTkLY9WvGp
+ cQvkMSKArVmQczjBBvVL5NyS8HcC4+sfZ7sfjUUc1UQ9ZW1t7OBYUok0F2hZEhSOTlkU
+ M75bwO50N0y75EJKA0KzntWpwL25KcvZaKiIdKzeir7T3uhtX7lk/ix7c3/LhNWSDLzZ
+ +fbsNAhpoovyMwA0t8Hg1aDLEIhyQ/49n4U5xZ4iRcyw06x9FZR6dKqZwLUzEqgzQRk9
+ SmfdxsaBPrjeLxX+GW+kyDlJXcwbKwDpn4e99Js+H2jU2xIEdmqsBBS1jnEe0x9FO1iU
+ Rz8Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=UEXCjAhdu0FKHjjtnW1230km7QIS6Nvx34ZHiSKDVCA=;
- b=op1buO3nXfVnRx4vrP7zmdAqU9JqMDotLf42BWB4CnSr6Kp/fVB8i5MMUPFRJ/1dYw
- C3JYKKhX+AtrhnQBfQMokzmske9UjfvgIfSMWsWB48+oCU6FSEHDGVk74q9UPaT2nd9+
- eDEI0ms5nrUwkcQUVMkVLnCvJCHLvT54BJe3AYaInyLkquJrFB4J55Brh8Wldw8c8fzU
- XZRLxGgn8q6mZgRuZobgtVgXx5WsScocKi5w4Zb/jLubMp4iMqFJtnv5ewiyV26IciEL
- An7CfISba4+rPWRcE/+/hFj+ZnIeBl+k8hHE+FRnP1jCUnCaS0DaRDZ3v3etUMljScNQ
- eU3w==
-X-Gm-Message-State: APjAAAV6vMtFYZkQONz5PbwA1v0rBfKFpfmje4MxsrioQ4dupaB5fIQM
- a0hQqclMgKJs0SEPKSIzlpwrrA==
-X-Google-Smtp-Source: APXvYqyiyzYxFv/UvSllsB1S7FbUYAvnWQ2rTy2WR+F3oilmLcaIaczT+zjpdZjI767+oetrB2iAHw==
-X-Received: by 2002:a1c:cc18:: with SMTP id h24mr15744271wmb.40.1571058589683; 
- Mon, 14 Oct 2019 06:09:49 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id u68sm32105274wmu.12.2019.10.14.06.09.48
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 14 Oct 2019 06:09:48 -0700 (PDT)
-Received: from zen.lan (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 243091FF87;
- Mon, 14 Oct 2019 14:09:48 +0100 (BST)
-From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: qemu-devel@nongnu.org
-Subject: [PATCH for 4.2 v1 0/5] gitdm updates
-Date: Mon, 14 Oct 2019 14:09:43 +0100
-Message-Id: <20191014130948.18400-1-alex.bennee@linaro.org>
-X-Mailer: git-send-email 2.20.1
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=2ZDxZrj8i3dlKeHEuNZk9hTc0Cc0Sxh7KqDs3VbBc5M=;
+ b=spPdDlrYgEcAnc+5R6drG98QCeMhqyDphBnOlKSEn8uxMsf7on3zPOtpTxj1taEhQh
+ +l/4BsjAM4ELrb1OjVAHnCS4tbZ3mHVvcsAvlKl/KpcXYElF5Nd8XJ0SjCaATwpbEonz
+ kcCrfjPznYVZXk9tHV9OZSXXKKlea0N8IG9eI1GAl9JmubdTTxKP1z2qr4VB0O4Alif9
+ 1Mpazh+6eAkTIyJ6uzecOHRVqKqc2VlsNfl8kN34h6GjTqnnnYjm/emPdq6Z9ODbYF4Z
+ ppDsKWb+shhIohRf94RF8347gYRKlUYXbKMo8J3YsGMHTxVZnqOKXDoJvkwUK494AJCs
+ 6kng==
+X-Gm-Message-State: APjAAAWgnVy5g2Iy3kDvQEABUpEZXvOMPP6hb0lluBLEawPYzzURkr/L
+ TGxGDOfT7KUAwyw9v+obY35o1EOCk4UWnTa3xQiILw==
+X-Google-Smtp-Source: APXvYqyZU1fKprBS2eEBvK2IJuAoAHJz/GSVxXzmSNanhjSck8Rjrl+1vWn2y0HjLOoXLIMPpzUK64P6II5Trf46hzs=
+X-Received: by 2002:aca:49c2:: with SMTP id
+ w185mr24731115oia.163.1571058808283; 
+ Mon, 14 Oct 2019 06:13:28 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+References: <20191014125254.74913-1-hikarupsp@gmail.com>
+In-Reply-To: <20191014125254.74913-1-hikarupsp@gmail.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 14 Oct 2019 14:13:16 +0100
+Message-ID: <CAFEAcA-ffWN10fPT-LEO+bpLB8kgORSg3Lkvj9zF31RyV1+sww@mail.gmail.com>
+Subject: Re: [PATCH] This patch fixes hanging up Cocoa display on macOS 10.15
+ (Catalina)
+To: hikarupsp@gmail.com
+Content-Type: text/plain; charset="UTF-8"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::336
+X-Received-From: 2607:f8b0:4864:20::242
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -93,33 +87,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Gerd Hoffmann <kraxel@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi,
+On Mon, 14 Oct 2019 at 13:53, <hikarupsp@gmail.com> wrote:
+>
+> From: Hikaru Nishida <hikarupsp@gmail.com>
+>
+> An NSEvent is fired before applicationDidFinishLaunching on macOS
+> Catalina. This causes deadlock of iothread_lock by calling
+> bool_with_iothread_lock in handleEvent while its already locked.
+> This patch prevents to call bool_with_iothread_lock until the
+> app_started_sem is released to prevent this deadlock.
 
-With these changes I get a reasonably clean set of stats going back
-two years and to the top 20. However most of the individuals are pure
-guess work so I won't submit them in a PR without positive feedback to
-it being correct. If you want the numbers to be correct by the time of
-the KVM Forum QEMU keynote now is the time to let me know ;-)
+Thanks for this analysis and patch.
 
+Do you know what the event that gets fired is?
+I'm wondering if it's something we need to handle
+(or if other events might in future fire in this window
+that matter to us).
 
-Alex Bennée (5):
-  contrib/gitdm: add more entries individuals and academics
-  contrib/gitdm: add MontaVista to the domain map
-  contrib/gitdm: add Andrey to the individual group
-  contrib/gitdm: add Bin Meng to the individual group
-  contrib/gitdm: add China Mobile to the domain map
+Incidentally, getting an NSEvent before applicationDidFinishLaunching
+seems to contradict the OSX API docs:
 
- contrib/gitdm/domain-map            | 2 ++
- contrib/gitdm/group-map-academics   | 3 +++
- contrib/gitdm/group-map-individuals | 6 ++++++
- 3 files changed, 11 insertions(+)
+https://developer.apple.com/documentation/appkit/nsapplicationdelegate/1428385-applicationdidfinishlaunching
 
--- 
-2.20.1
+which say "This method is called after the application's main
+run loop has been started but before it has processed any events."
 
+thanks
+-- PMM
 
