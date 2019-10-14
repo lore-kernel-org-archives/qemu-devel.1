@@ -2,91 +2,81 @@ Return-Path: <SRS0=PUPy=YH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B59A4ECE587
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 15:54:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 88604C4CECE
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 15:55:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 80B3820873
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 15:54:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5313120873
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 15:55:33 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Yicwb6J7"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 80B3820873
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="hhcgIYul"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5313120873
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51974 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51988 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iK2gF-0005GE-Kn
-	for qemu-devel@archiver.kernel.org; Mon, 14 Oct 2019 11:54:43 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34954)
+	id 1iK2h2-00068i-Ge
+	for qemu-devel@archiver.kernel.org; Mon, 14 Oct 2019 11:55:32 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35115)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1iK2fQ-0004QK-Fw
- for qemu-devel@nongnu.org; Mon, 14 Oct 2019 11:53:53 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1iK2g3-0005Fu-NU
+ for qemu-devel@nongnu.org; Mon, 14 Oct 2019 11:54:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1iK2fP-0003uY-6k
- for qemu-devel@nongnu.org; Mon, 14 Oct 2019 11:53:52 -0400
-Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:34831)
+ (envelope-from <peter.maydell@linaro.org>) id 1iK2g2-0004KU-KT
+ for qemu-devel@nongnu.org; Mon, 14 Oct 2019 11:54:31 -0400
+Received: from mail-oi1-x241.google.com ([2607:f8b0:4864:20::241]:33995)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1iK2fO-0003t1-Vw
- for qemu-devel@nongnu.org; Mon, 14 Oct 2019 11:53:51 -0400
-Received: by mail-wm1-x342.google.com with SMTP id y21so17275046wmi.0
- for <qemu-devel@nongnu.org>; Mon, 14 Oct 2019 08:53:50 -0700 (PDT)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1iK2g2-0004KE-Ei
+ for qemu-devel@nongnu.org; Mon, 14 Oct 2019 11:54:30 -0400
+Received: by mail-oi1-x241.google.com with SMTP id 83so14167757oii.1
+ for <qemu-devel@nongnu.org>; Mon, 14 Oct 2019 08:54:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=RhUZn+IBGVca8nwr1WO4zWXivDlJk8sWGgmEvbv5Jqg=;
- b=Yicwb6J7DjiCyCgZ6Ah52BDr17Nn3zX90aRzppSGDog6FOrRztRRpT5WXtSzLtQMf4
- ikaQRpy1wAsWWGGEdF9iyldophxwPNFPqS5jkl+kbLO1T0a4VQrJxd91bXxx/JSlGZZL
- SeY4ujypnbmraJw3fRF08zW1PF1nAT95r5FIRfBlNb/M8BhnE6MwjengvouR22jHX60Z
- D2/lODkugHc76NAtWmX7JYwdFvg1aNh3Q32Oq68rMvnnuGTfxUUyZBIutWpZLk7N+ZRp
- BUkeug+E7wP5ICUzyF1chMvWfnMoDmCXKrNYTeYm4LUSh4fezTPyRZaDdO3g24TurvFO
- HijA==
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=H6UahA8Qmqx5X6+4KairbPWKfNTmCAAiwutW2GNS0RY=;
+ b=hhcgIYulXiMjHzMDxoG46K1Q1uZns5X+8jgFXjziAxy0AZ+eWjczBfNORU5BeGveWT
+ I5em1Xt1mizThh/fn3eH3HmnrEX3F8mHNVEPeO5YYSrleiYpHKzDALTPn7+PudymFm4S
+ +bpoTts7yoX676/Eb7T+CXMaJKDeDNG5uVfG7YGjgdtBDJ2e1ggPH3tES+N8K3RulFDS
+ aVjRG2pO0KOW6GH1cPwcjIcUdM9z6yRRNmQlwH5trp529SpQCnXVb7Wnqb+Dimcnm4uY
+ FU0ZQEALyVcN0rdQqBgc3z6nyTRDCX6W2YhlOgEi9Oo6yfcgs0H1MKMtxGKWi8gRrGpv
+ TnJg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=RhUZn+IBGVca8nwr1WO4zWXivDlJk8sWGgmEvbv5Jqg=;
- b=WRcyl/3WqF8Z+Q7UFTUbYxmjH4Za7RaXJyhGku0bPMlcr/DRkcPTiflebl76QNaP6p
- cEwpxqSNURiQ5trJxLZj0RBhf9MPiE0xYEwngqQyuLtOGMKc/ad3wTZ26DCZ7uwxTmGb
- /Sw+kiYhcmx/43VRIAH6JBio7xhxI56qf/2J8nV2SFTNkiDepkfACyKolJd28wivR+6f
- fdsJPQexAlmVPNp4/b9D7Hf4GjpAsdLlVKdeKPCwPB3ZKHjhwRUd6zvlK8JYssbTN7OY
- EyDLD6u9jsQeZNLmEVPd3fOowVsu81+2mWcF8pch2KWdbA8fmUiPa+jvzYWZNo7kLZbY
- fNsw==
-X-Gm-Message-State: APjAAAXi8vRNW3z+O7iGzniFovGB6FEBCKVaqjof4rXSJndk8RbS1bWg
- pdF96S5j5tsHi06s7XJCS7CL1Q==
-X-Google-Smtp-Source: APXvYqyU8eeAaTVxB+Dy8CWURxBX+OrZ2Xd0td0PqaFDxwkfLdOEQ4oGxjHJPOPlx5SexIaYD0t2iA==
-X-Received: by 2002:a05:600c:34b:: with SMTP id
- u11mr15749191wmd.176.1571068429479; 
- Mon, 14 Oct 2019 08:53:49 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id 3sm19810780wmo.22.2019.10.14.08.53.48
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 14 Oct 2019 08:53:48 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 2A2CA1FF87;
- Mon, 14 Oct 2019 16:53:48 +0100 (BST)
-References: <20191011155546.14342-1-richard.henderson@linaro.org>
- <20191011155546.14342-4-richard.henderson@linaro.org>
-User-agent: mu4e 1.3.5; emacs 27.0.50
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: qemu-arm@nongnu.org
-Subject: Re: [PATCH v6 03/20] target/arm: Split out rebuild_hflags_common_32
-In-reply-to: <20191011155546.14342-4-richard.henderson@linaro.org>
-Date: Mon, 14 Oct 2019 16:53:48 +0100
-Message-ID: <87tv8bmigj.fsf@linaro.org>
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=H6UahA8Qmqx5X6+4KairbPWKfNTmCAAiwutW2GNS0RY=;
+ b=cQQ7F62pvaPY6sv/wkIe81y3xIZ2keZxheHDIdGc2WZAhiymdjbxPRY3FE2h7XaMSB
+ Hjz+CP31VZ8BFTHaoevrHDHHGVsB1+jmVtJcJuqTArdGcwA9HeX8f/DXhYc9MIXyieB5
+ GSssmlsat6wvfSUwg0owt4jmXaPgj2I0pfEy6WtZfmu4E33oNimq1G3m0cMOSSie8vwl
+ Gx+wGHTjjNa/dwrX6j9BB5qyPmwtG4NlROjZT5D8qrjR8ZKs5FlLA9o40v8XJdWjf0lW
+ hisBitxggLENFRNo8OogFw13FpStuA3Pi4gs57n4OUz1AsUX5v87HQUCHA+EUZHi4WhZ
+ 9+mA==
+X-Gm-Message-State: APjAAAUKIxU57o8xBw1qqtU/UmPUUkDTOt/BxSDg+2I1b907B0/3raHs
+ Akvh9luikEuljy5JrzSg1ceRZpm9RmsExmlMjTCJHg==
+X-Google-Smtp-Source: APXvYqzN7rIkm8AJEu8Ndl9rrS+7fLdy/HgGgE2he4IFufXx35DftZ2n8WKoNFpr9Qf+yRR0A0FA4RelqIJ4bcZRDm8=
+X-Received: by 2002:a54:4e83:: with SMTP id c3mr25274855oiy.170.1571068469603; 
+ Mon, 14 Oct 2019 08:54:29 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+References: <20191014104948.4291-1-alex.bennee@linaro.org>
+ <20191014104948.4291-18-alex.bennee@linaro.org>
+In-Reply-To: <20191014104948.4291-18-alex.bennee@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 14 Oct 2019 16:54:18 +0100
+Message-ID: <CAFEAcA8u3Srp_Lsucxh0-EaXW5UbETLOPA_KdpzONCaTob0GVA@mail.gmail.com>
+Subject: Re: [PATCH v5 17/55] plugins: implement helpers for resolving hwaddr
+To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::342
+X-Received-From: 2607:f8b0:4864:20::241
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,91 +88,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: laurent.desnogues@gmail.com, peter.maydell@linaro.org,
- qemu-devel@nongnu.org
+Cc: robert.foley@futurewei.com, QEMU Developers <qemu-devel@nongnu.org>,
+ peter.puhov@futurewei.com, Aaron Lindsay <aaron@os.amperecomputing.com>,
+ "Emilio G. Cota" <cota@braap.org>, Paolo Bonzini <pbonzini@redhat.com>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-
-Richard Henderson <richard.henderson@linaro.org> writes:
-
-> Create a function to compute the values of the TBFLAG_A32 bits
-> that will be cached, and are used by all profiles.
+On Mon, 14 Oct 2019 at 12:25, Alex Benn=C3=A9e <alex.bennee@linaro.org> wro=
+te:
 >
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-
-Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-
-> ---
->  target/arm/helper.c | 16 +++++++++++-----
->  1 file changed, 11 insertions(+), 5 deletions(-)
+> We need to keep a local per-cpu copy of the data as other threads may
+> be running. We use a automatically growing array and re-use the space
+> for subsequent queries.
 >
-> diff --git a/target/arm/helper.c b/target/arm/helper.c
-> index 69da04786e..f05d042474 100644
-> --- a/target/arm/helper.c
-> +++ b/target/arm/helper.c
-> @@ -11070,6 +11070,15 @@ static uint32_t rebuild_hflags_common(CPUARMStat=
-e *env, int fp_el,
->      return flags;
->  }
->
-> +static uint32_t rebuild_hflags_common_32(CPUARMState *env, int fp_el,
-> +                                         ARMMMUIdx mmu_idx, uint32_t fla=
-gs)
+
+
+> +#ifdef CONFIG_SOFTMMU
+> +static __thread struct qemu_plugin_hwaddr hwaddr_info;
+> +
+> +struct qemu_plugin_hwaddr *qemu_plugin_get_hwaddr(qemu_plugin_meminfo_t =
+info,
+> +                                                  uint64_t vaddr)
 > +{
-> +    flags =3D FIELD_DP32(flags, TBFLAG_A32, SCTLR_B, arm_sctlr_b(env));
-> +    flags =3D FIELD_DP32(flags, TBFLAG_A32, NS, !access_secure_reg(env));
+> +    CPUState *cpu =3D current_cpu;
+> +    unsigned int mmu_idx =3D info >> TRACE_MEM_MMU_SHIFT;
 > +
-> +    return rebuild_hflags_common(env, fp_el, mmu_idx, flags);
+> +    if (!tlb_plugin_lookup(cpu, vaddr, mmu_idx,
+> +                           info & TRACE_MEM_ST, &hwaddr_info)) {
+> +        error_report("invalid use of qemu_plugin_get_hwaddr");
+> +        return NULL;
+> +    }
+> +
+> +    return &hwaddr_info;
 > +}
-> +
->  static uint32_t rebuild_hflags_a64(CPUARMState *env, int el, int fp_el,
->                                     ARMMMUIdx mmu_idx)
+
+Apologies for dropping into the middle of this patchset, but
+this API looks a bit odd. A hwaddr alone isn't a complete
+definition of an access -- you need an (AddressSpace, hwaddr)
+tuple for that. So this API looks like it doesn't really cope
+with things like TrustZone ?
+
+>  uint64_t qemu_plugin_hwaddr_to_raddr(const struct qemu_plugin_hwaddr *ha=
+ddr)
 >  {
-> @@ -11141,7 +11150,7 @@ void cpu_get_tb_cpu_state(CPUARMState *env, targe=
-t_ulong *pc,
->      ARMMMUIdx mmu_idx =3D arm_mmu_idx(env);
->      int current_el =3D arm_current_el(env);
->      int fp_el =3D fp_exception_el(env, current_el);
-> -    uint32_t flags =3D 0;
-> +    uint32_t flags;
->
->      if (is_a64(env)) {
->          *pc =3D env->pc;
-> @@ -11151,12 +11160,11 @@ void cpu_get_tb_cpu_state(CPUARMState *env, tar=
-get_ulong *pc,
->          }
->      } else {
->          *pc =3D env->regs[15];
-> +        flags =3D rebuild_hflags_common_32(env, fp_el, mmu_idx, 0);
->          flags =3D FIELD_DP32(flags, TBFLAG_A32, THUMB, env->thumb);
->          flags =3D FIELD_DP32(flags, TBFLAG_A32, VECLEN, env->vfp.vec_len=
-);
->          flags =3D FIELD_DP32(flags, TBFLAG_A32, VECSTRIDE, env->vfp.vec_=
-stride);
->          flags =3D FIELD_DP32(flags, TBFLAG_A32, CONDEXEC, env->condexec_=
-bits);
-> -        flags =3D FIELD_DP32(flags, TBFLAG_A32, SCTLR_B, arm_sctlr_b(env=
-));
-> -        flags =3D FIELD_DP32(flags, TBFLAG_A32, NS, !access_secure_reg(e=
-nv));
->          if (env->vfp.xregs[ARM_VFP_FPEXC] & (1 << 30)
->              || arm_el_is_aa64(env, 1) || arm_feature(env, ARM_FEATURE_M)=
-) {
->              flags =3D FIELD_DP32(flags, TBFLAG_A32, VFPEN, 1);
-> @@ -11166,8 +11174,6 @@ void cpu_get_tb_cpu_state(CPUARMState *env, targe=
-t_ulong *pc,
->              flags =3D FIELD_DP32(flags, TBFLAG_A32,
->                                 XSCALE_CPAR, env->cp15.c15_cpar);
->          }
-> -
-> -        flags =3D rebuild_hflags_common(env, fp_el, mmu_idx, flags);
->      }
->
->      /* The SS_ACTIVE and PSTATE_SS bits correspond to the state machine
+> +#ifdef CONFIG_SOFTMMU
+> +    ram_addr_t ram_addr =3D 0;
+> +
+> +    if (haddr && !haddr->is_io) {
+> +        ram_addr =3D qemu_ram_addr_from_host((void *) haddr->hostaddr);
+> +        if (ram_addr =3D=3D RAM_ADDR_INVALID) {
+> +            error_report("Bad ram pointer %"PRIx64"", haddr->hostaddr);
+> +            abort();
+> +        }
+> +    }
+> +    return ram_addr;
+> +#else
+>      return 0;
+> +#endif
+>  }
 
+This looks odd to see in the plugin API -- ramaddrs should
+be a QEMU internal concept, shouldn't they?
 
---
-Alex Benn=C3=A9e
+thanks
+-- PMM
 
