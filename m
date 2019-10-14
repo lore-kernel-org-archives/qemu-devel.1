@@ -2,63 +2,90 @@ Return-Path: <SRS0=PUPy=YH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_2 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8C070ECE587
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 11:43:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6EB32ECE587
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 11:45:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 61A45207FF
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 11:43:55 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 61A45207FF
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id 382BC206A3
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 11:45:07 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ImaDVd7L"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 382BC206A3
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48072 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48076 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iJylW-0000iN-EI
-	for qemu-devel@archiver.kernel.org; Mon, 14 Oct 2019 07:43:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50305)
+	id 1iJyme-0001Ik-RO
+	for qemu-devel@archiver.kernel.org; Mon, 14 Oct 2019 07:45:04 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46830)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <groug@kaod.org>) id 1iJyaD-0003Wh-Tl
- for qemu-devel@nongnu.org; Mon, 14 Oct 2019 07:32:15 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1iJyC8-00081p-WB
+ for qemu-devel@nongnu.org; Mon, 14 Oct 2019 07:07:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <groug@kaod.org>) id 1iJya8-0002gZ-Cr
- for qemu-devel@nongnu.org; Mon, 14 Oct 2019 07:32:10 -0400
-Received: from 3.mo179.mail-out.ovh.net ([178.33.251.175]:49410)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <groug@kaod.org>) id 1iJya4-0002WY-DL
- for qemu-devel@nongnu.org; Mon, 14 Oct 2019 07:32:05 -0400
-Received: from player793.ha.ovh.net (unknown [10.108.35.124])
- by mo179.mail-out.ovh.net (Postfix) with ESMTP id 09DE01454B4
- for <qemu-devel@nongnu.org>; Mon, 14 Oct 2019 13:31:56 +0200 (CEST)
-Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
- [82.253.208.248]) (Authenticated sender: groug@kaod.org)
- by player793.ha.ovh.net (Postfix) with ESMTPSA id DCCD5AEA73CF;
- Mon, 14 Oct 2019 11:31:51 +0000 (UTC)
-Date: Mon, 14 Oct 2019 13:31:49 +0200
-From: Greg Kurz <groug@kaod.org>
-To: David Gibson <david@gibson.dropbear.id.au>
-Subject: Re: [PATCH 7/7] spapr: Set VSMT to smp_threads by default
-Message-ID: <20191014133149.686b681e@bahia.lan>
-In-Reply-To: <20191014061247.GZ4080@umbus.fritz.box>
-References: <157010404888.246126.9768030542733152637.stgit@bahia.lan>
- <157010411885.246126.12610015369068227139.stgit@bahia.lan>
- <20191014061247.GZ4080@umbus.fritz.box>
-X-Mailer: Claws Mail 3.17.4 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+ (envelope-from <alex.bennee@linaro.org>) id 1iJyC7-0007eJ-0w
+ for qemu-devel@nongnu.org; Mon, 14 Oct 2019 07:07:20 -0400
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:34882)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1iJyC6-0007dM-Q4
+ for qemu-devel@nongnu.org; Mon, 14 Oct 2019 07:07:18 -0400
+Received: by mail-wr1-x441.google.com with SMTP id v8so19217095wrt.2
+ for <qemu-devel@nongnu.org>; Mon, 14 Oct 2019 04:07:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=3DpqzaOrNntDkFAtLNgfVGSPKEwLzzpzG6mkI3f5/AE=;
+ b=ImaDVd7LxXydpl7pcYiPgZ1vdyAVAgbO8Q7HnjywLiP1LCYREfdymKJKMBmr9msY+c
+ sRDEuYHTtX18uefWeBvbQuD69iy9bP15FsASA+XryJLC6jkj1J6FYr5HVNOytqTcMzkQ
+ 5viDbwswTo2RbXye7hWN/Xuz95LEOfkETPAri+iSoxW9JNkt021K3C6uVWgHzqqUBjRu
+ ySkxJXtU2CbGa4AjV74Jt+KRSRdicnT+1Rpxz8J42j87clXXX2ilDPgy0aWz2L81WjTv
+ +9rxZmBX1BmgMIAm4dRAaIqi63dM3oPA/6D876ELkiH8p05Vp3/mvAWVVN/bWkAR9awR
+ WAeQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=3DpqzaOrNntDkFAtLNgfVGSPKEwLzzpzG6mkI3f5/AE=;
+ b=G9ZjyZDL1NPtVeGhveG4fGKgFvFUZvFPJg+iyOYIfyFu4oPimfY9Ug7gXBhDa7dFoV
+ Fj6n88nSbS/Ge9QmgOdTlnTBu3lfsJH5qkTDmBagNTjQoan6dZCoZgjzxW19QkT5zoy2
+ i0/NiOuVwCaTl2b6eV5iAd5mYETibdYCZVYZnM6OiFbDln4KWHCMtC5bIZrTMF2zVAZV
+ OXO9JxcCraCRtVyEZGBIz4WBzXgBi1miDkE3f5AZrAQTQ8QVCOE/SK6+NVNeunJfavEZ
+ R1mfIgU0DDbSM/gSkO6UWG7vcyXJM4urlpbXMOYxcVsghzX9rWkGwy/eq2b9i+vXM0c9
+ KflQ==
+X-Gm-Message-State: APjAAAVxuLsWwo6YD8J+4hb5ahaBYoHru+w1R7NK60nMxOdJE8Okhw22
+ wuQW0z3ocrAIgGfpNVswXHt3+g==
+X-Google-Smtp-Source: APXvYqxMlONgYQY22I4g+e3D6trvZYDaQbeijXv3izPRzbL7LgRgKrfchx37nFsbPjPa+zLJGIojLw==
+X-Received: by 2002:adf:ba12:: with SMTP id o18mr15204429wrg.147.1571051237648; 
+ Mon, 14 Oct 2019 04:07:17 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id h63sm31448934wmf.15.2019.10.14.04.07.16
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 14 Oct 2019 04:07:16 -0700 (PDT)
+Received: from zen.lan (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 741E51FFAC;
+ Mon, 14 Oct 2019 11:50:00 +0100 (BST)
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v5 51/55] plugins: expand the plugin_init function to include
+ an info block
+Date: Mon, 14 Oct 2019 11:49:44 +0100
+Message-Id: <20191014104948.4291-52-alex.bennee@linaro.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20191014104948.4291-1-alex.bennee@linaro.org>
+References: <20191014104948.4291-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/I47mP63z5TeIBN61Vqkk7q3";
- protocol="application/pgp-signature"; micalg=pgp-sha256
-X-Ovh-Tracer-Id: 6677712348298713574
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrjedugdegvdcutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 178.33.251.175
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::441
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -70,135 +97,257 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-ppc@nongnu.org, =?UTF-8?B?Q8OpZHJpYw==?= Le Goater <clg@kaod.org>,
- qemu-devel@nongnu.org
+Cc: aaron@os.amperecomputing.com, cota@braap.org,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ robert.foley@futurewei.com, peter.puhov@futurewei.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---Sig_/I47mP63z5TeIBN61Vqkk7q3
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+This provides a limited amount of info to plugins about the guest
+system that will allow them to make some additional decisions on
+setup.
 
-On Mon, 14 Oct 2019 17:12:47 +1100
-David Gibson <david@gibson.dropbear.id.au> wrote:
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+---
+ include/qemu/qemu-plugin.h | 26 ++++++++++++++++++++++++--
+ plugins/loader.c           | 22 ++++++++++++++++++----
+ tests/plugin/bb.c          |  5 +++--
+ tests/plugin/empty.c       |  5 +++--
+ tests/plugin/hotblocks.c   |  5 +++--
+ tests/plugin/hotpages.c    |  5 +++--
+ tests/plugin/howvec.c      |  5 +++--
+ tests/plugin/insn.c        |  5 +++--
+ tests/plugin/mem.c         |  5 +++--
+ 9 files changed, 63 insertions(+), 20 deletions(-)
 
-> On Thu, Oct 03, 2019 at 02:02:00PM +0200, Greg Kurz wrote:
-> > Support for setting VSMT is available in KVM since linux-4.13. Most dis=
-tros
-> > that support KVM on POWER already have it. It thus seem reasonable enou=
-gh
-> > to have the default machine to set VSMT to smp_threads.
-> >=20
-> > This brings contiguous VCPU ids and thus brings their upper bound down =
-to
-> > the machine's max_cpus. This is especially useful for XIVE KVM devices,
-> > which may thus allocate only one VP descriptor per VCPU.
-> >=20
+diff --git a/include/qemu/qemu-plugin.h b/include/qemu/qemu-plugin.h
+index 8b403dd615..719d7054a1 100644
+--- a/include/qemu/qemu-plugin.h
++++ b/include/qemu/qemu-plugin.h
+@@ -38,9 +38,27 @@
+ 
+ typedef uint64_t qemu_plugin_id_t;
+ 
++typedef struct {
++    /* string describing architecture */
++    const char *target_name;
++    /* is this a full system emulation? */
++    bool system_emulation;
++    union {
++        /*
++         * smp_vcpus may change if vCPUs can be hot-plugged, max_vcpus
++         * is the system-wide limit.
++         */
++        struct {
++            int smp_vcpus;
++            int max_vcpus;
++        } system;
++    };
++} qemu_info_t;
++
+ /**
+  * qemu_plugin_install() - Install a plugin
+  * @id: this plugin's opaque ID
++ * @info: a block describing some details about the guest
+  * @argc: number of arguments
+  * @argv: array of arguments (@argc elements)
+  *
+@@ -49,10 +67,14 @@ typedef uint64_t qemu_plugin_id_t;
+  * Note: Calling qemu_plugin_uninstall() from this function is a bug. To raise
+  * an error during install, return !0.
+  *
++ * Note: @info is only live during the call. Copy any information we
++ * want to keep.
++ *
+  * Note: @argv remains valid throughout the lifetime of the loaded plugin.
+  */
+-QEMU_PLUGIN_EXPORT int qemu_plugin_install(qemu_plugin_id_t id, int argc,
+-                                           char **argv);
++QEMU_PLUGIN_EXPORT int qemu_plugin_install(qemu_plugin_id_t id,
++                                           const qemu_info_t *info,
++                                           int argc, char **argv);
+ 
+ /*
+  * Prototypes for the various callback styles we will be registering
+diff --git a/plugins/loader.c b/plugins/loader.c
+index 5de5cff8e3..a136a71d35 100644
+--- a/plugins/loader.c
++++ b/plugins/loader.c
+@@ -29,6 +29,9 @@
+ #include "hw/core/cpu.h"
+ #include "cpu.h"
+ #include "exec/exec-all.h"
++#ifndef CONFIG_USER_ONLY
++#include "hw/boards.h"
++#endif
+ 
+ #include "plugin.h"
+ 
+@@ -60,7 +63,7 @@ QemuOptsList qemu_plugin_opts = {
+     },
+ };
+ 
+-typedef int (*qemu_plugin_install_func_t)(qemu_plugin_id_t, int, char **);
++typedef int (*qemu_plugin_install_func_t)(qemu_plugin_id_t, const qemu_info_t *, int, char **);
+ 
+ extern struct qemu_plugin_state plugin;
+ 
+@@ -147,7 +150,7 @@ static uint64_t xorshift64star(uint64_t x)
+     return x * UINT64_C(2685821657736338717);
+ }
+ 
+-static int plugin_load(struct qemu_plugin_desc *desc)
++static int plugin_load(struct qemu_plugin_desc *desc, const qemu_info_t *info)
+ {
+     qemu_plugin_install_func_t install;
+     struct qemu_plugin_ctx *ctx;
+@@ -198,7 +201,7 @@ static int plugin_load(struct qemu_plugin_desc *desc)
+     }
+     QTAILQ_INSERT_TAIL(&plugin.ctxs, ctx, entry);
+     ctx->installing = true;
+-    rc = install(ctx->id, desc->argc, desc->argv);
++    rc = install(ctx->id, info, desc->argc, desc->argv);
+     ctx->installing = false;
+     if (rc) {
+         error_report("%s: qemu_plugin_install returned error code %d",
+@@ -249,11 +252,22 @@ static void plugin_desc_free(struct qemu_plugin_desc *desc)
+ int qemu_plugin_load_list(QemuPluginList *head)
+ {
+     struct qemu_plugin_desc *desc, *next;
++    g_autofree qemu_info_t *info = g_new0(qemu_info_t, 1);
++
++    info->target_name = TARGET_NAME;
++#ifndef CONFIG_USER_ONLY
++    MachineState * ms = MACHINE(qdev_get_machine());
++    info->system_emulation = true;
++    info->system.smp_vcpus = ms->smp.cpus;
++    info->system.max_vcpus = ms->smp.max_cpus;
++#else
++    info->system_emulation = false;
++#endif
+ 
+     QTAILQ_FOREACH_SAFE(desc, head, entry, next) {
+         int err;
+ 
+-        err = plugin_load(desc);
++        err = plugin_load(desc, info);
+         if (err) {
+             return err;
+         }
+diff --git a/tests/plugin/bb.c b/tests/plugin/bb.c
+index 93d25de363..4a6d6ca0bc 100644
+--- a/tests/plugin/bb.c
++++ b/tests/plugin/bb.c
+@@ -48,8 +48,9 @@ static void vcpu_tb_trans(qemu_plugin_id_t id, struct qemu_plugin_tb *tb)
+     }
+ }
+ 
+-QEMU_PLUGIN_EXPORT int qemu_plugin_install(qemu_plugin_id_t id, int argc,
+-                                           char **argv)
++QEMU_PLUGIN_EXPORT int qemu_plugin_install(qemu_plugin_id_t id,
++                                           const qemu_info_t *info,
++                                           int argc, char **argv)
+ {
+     if (argc && strcmp(argv[0], "inline") == 0) {
+         do_inline = true;
+diff --git a/tests/plugin/empty.c b/tests/plugin/empty.c
+index b141ddd0df..3f60f69027 100644
+--- a/tests/plugin/empty.c
++++ b/tests/plugin/empty.c
+@@ -21,8 +21,9 @@
+ static void vcpu_tb_trans(qemu_plugin_id_t id, struct qemu_plugin_tb *tb)
+ { }
+ 
+-QEMU_PLUGIN_EXPORT int qemu_plugin_install(qemu_plugin_id_t id, int argc,
+-                                           char **argv)
++QEMU_PLUGIN_EXPORT int qemu_plugin_install(qemu_plugin_id_t id,
++                                           const qemu_info_t *info,
++                                           int argc, char **argv)
+ {
+     qemu_plugin_register_vcpu_tb_trans_cb(id, vcpu_tb_trans);
+     return 0;
+diff --git a/tests/plugin/hotblocks.c b/tests/plugin/hotblocks.c
+index a150179a5c..57bea765b3 100644
+--- a/tests/plugin/hotblocks.c
++++ b/tests/plugin/hotblocks.c
+@@ -129,8 +129,9 @@ static void vcpu_tb_trans(qemu_plugin_id_t id, struct qemu_plugin_tb *tb)
+     }
+ }
+ 
+-QEMU_PLUGIN_EXPORT int qemu_plugin_install(qemu_plugin_id_t id, int argc,
+-                                           char **argv)
++QEMU_PLUGIN_EXPORT
++int qemu_plugin_install(qemu_plugin_id_t id, const qemu_info_t *info,
++                        int argc, char **argv)
+ {
+     if (argc && strcmp(argv[0], "inline") == 0) {
+         do_inline = true;
+diff --git a/tests/plugin/hotpages.c b/tests/plugin/hotpages.c
+index 13ce8ffeb8..99bb4be07c 100644
+--- a/tests/plugin/hotpages.c
++++ b/tests/plugin/hotpages.c
+@@ -148,8 +148,9 @@ static void vcpu_tb_trans(qemu_plugin_id_t id, struct qemu_plugin_tb *tb)
+     }
+ }
+ 
+-QEMU_PLUGIN_EXPORT int qemu_plugin_install(qemu_plugin_id_t id, int argc,
+-                                           char **argv)
++QEMU_PLUGIN_EXPORT
++int qemu_plugin_install(qemu_plugin_id_t id, const qemu_info_t *info,
++                        int argc, char **argv)
+ {
+     int i;
+ 
+diff --git a/tests/plugin/howvec.c b/tests/plugin/howvec.c
+index b435c6b64d..3b1d177ef3 100644
+--- a/tests/plugin/howvec.c
++++ b/tests/plugin/howvec.c
+@@ -264,8 +264,9 @@ static void vcpu_tb_trans(qemu_plugin_id_t id, struct qemu_plugin_tb *tb)
+     }
+ }
+ 
+-QEMU_PLUGIN_EXPORT int qemu_plugin_install(qemu_plugin_id_t id, int argc,
+-                                           char **argv)
++QEMU_PLUGIN_EXPORT int qemu_plugin_install(qemu_plugin_id_t id,
++                                           const qemu_info_t *info,
++                                           int argc, char **argv)
+ {
+     int i;
+ 
+diff --git a/tests/plugin/insn.c b/tests/plugin/insn.c
+index 3000ab4b73..9cfa7d0e53 100644
+--- a/tests/plugin/insn.c
++++ b/tests/plugin/insn.c
+@@ -45,8 +45,9 @@ static void plugin_exit(qemu_plugin_id_t id, void *p)
+     dprintf(stdout_fd, "insns: %" PRIu64 "\n", insn_count);
+ }
+ 
+-QEMU_PLUGIN_EXPORT int qemu_plugin_install(qemu_plugin_id_t id, int argc,
+-                                           char **argv)
++QEMU_PLUGIN_EXPORT int qemu_plugin_install(qemu_plugin_id_t id,
++                                           const qemu_info_t *info,
++                                           int argc, char **argv)
+ {
+     if (argc && !strcmp(argv[0], "inline")) {
+         do_inline = true;
+diff --git a/tests/plugin/mem.c b/tests/plugin/mem.c
+index e5490f4a99..fdf4347c5e 100644
+--- a/tests/plugin/mem.c
++++ b/tests/plugin/mem.c
+@@ -64,8 +64,9 @@ static void vcpu_tb_trans(qemu_plugin_id_t id, struct qemu_plugin_tb *tb)
+     }
+ }
+ 
+-QEMU_PLUGIN_EXPORT int qemu_plugin_install(qemu_plugin_id_t id, int argc,
+-                                           char **argv)
++QEMU_PLUGIN_EXPORT int qemu_plugin_install(qemu_plugin_id_t id,
++                                           const qemu_info_t *info,
++                                           int argc, char **argv)
+ {
+     if (argc) {
+         if (argc >= 3) {
+-- 
+2.20.1
 
-Just to clarify that without the other patches in this series, XIVE
-KVM devices still allocate a fixed block of 2048 VPs, no matter what.
-ie, the last sentence in the changelog may be slightly misleading.
-
-> > Signed-off-by: Greg Kurz <groug@kaod.org>
->=20
-> Applied to ppc-for-4.2, thanks.
->=20
-> > ---
-> >  hw/ppc/spapr.c         |    7 ++++++-
-> >  include/hw/ppc/spapr.h |    1 +
-> >  2 files changed, 7 insertions(+), 1 deletion(-)
-> >=20
-> > diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> > index 8f59f08c102e..473ce1d04775 100644
-> > --- a/hw/ppc/spapr.c
-> > +++ b/hw/ppc/spapr.c
-> > @@ -2503,6 +2503,7 @@ static CPUArchId *spapr_find_cpu_slot(MachineStat=
-e *ms, uint32_t id, int *idx)
-> >  static void spapr_set_vsmt_mode(SpaprMachineState *spapr, Error **errp)
-> >  {
-> >      MachineState *ms =3D MACHINE(spapr);
-> > +    SpaprMachineClass *smc =3D SPAPR_MACHINE_GET_CLASS(spapr);
-> >      Error *local_err =3D NULL;
-> >      bool vsmt_user =3D !!spapr->vsmt;
-> >      int kvm_smt =3D kvmppc_smt_threads();
-> > @@ -2529,7 +2530,7 @@ static void spapr_set_vsmt_mode(SpaprMachineState=
- *spapr, Error **errp)
-> >              goto out;
-> >          }
-> >          /* In this case, spapr->vsmt has been set by the command line =
-*/
-> > -    } else {
-> > +    } else if (!smc->smp_threads_vsmt) {
-> >          /*
-> >           * Default VSMT value is tricky, because we need it to be as
-> >           * consistent as possible (for migration), but this requires
-> > @@ -2538,6 +2539,8 @@ static void spapr_set_vsmt_mode(SpaprMachineState=
- *spapr, Error **errp)
-> >           * overwhelmingly common case in production systems.
-> >           */
-> >          spapr->vsmt =3D MAX(8, smp_threads);
-> > +    } else {
-> > +        spapr->vsmt =3D smp_threads;
-> >      }
-> > =20
-> >      /* KVM: If necessary, set the SMT mode: */
-> > @@ -4452,6 +4455,7 @@ static void spapr_machine_class_init(ObjectClass =
-*oc, void *data)
-> >      smc->irq =3D &spapr_irq_dual;
-> >      smc->dr_phb_enabled =3D true;
-> >      smc->linux_pci_probe =3D true;
-> > +    smc->smp_threads_vsmt =3D true;
-> >  }
-> > =20
-> >  static const TypeInfo spapr_machine_info =3D {
-> > @@ -4519,6 +4523,7 @@ static void spapr_machine_4_1_class_options(Machi=
-neClass *mc)
-> > =20
-> >      spapr_machine_4_2_class_options(mc);
-> >      smc->linux_pci_probe =3D false;
-> > +    smc->smp_threads_vsmt =3D false;
-> >      compat_props_add(mc->compat_props, hw_compat_4_1, hw_compat_4_1_le=
-n);
-> >      compat_props_add(mc->compat_props, compat, G_N_ELEMENTS(compat));
-> >  }
-> > diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
-> > index cbd1a4c9f390..2009eb64f9cb 100644
-> > --- a/include/hw/ppc/spapr.h
-> > +++ b/include/hw/ppc/spapr.h
-> > @@ -122,6 +122,7 @@ struct SpaprMachineClass {
-> >      bool broken_host_serial_model; /* present real host info to the gu=
-est */
-> >      bool pre_4_1_migration; /* don't migrate hpt-max-page-size */
-> >      bool linux_pci_probe;
-> > +    bool smp_threads_vsmt; /* set VSMT to smp_threads by default */
-> > =20
-> >      void (*phb_placement)(SpaprMachineState *spapr, uint32_t index,
-> >                            uint64_t *buid, hwaddr *pio,=20
-> >=20
->=20
-
-
---Sig_/I47mP63z5TeIBN61Vqkk7q3
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEtIKLr5QxQM7yo0kQcdTV5YIvc9YFAl2kXKUACgkQcdTV5YIv
-c9Z0gxAAyO+CLPJjJZomJKzLD8W9rnh4j9DkSJuvmjK7nEmMayiUwEE+3F+Le4tQ
-9sMB3H1nk8TJKrG0A3WZhlLKdxW6cUnrj8hGiwteI5I0DsJn/A/34v+28FGLBoRo
-tzG7FaPc+c3cwzgphIOFunB5XcRwdF+pTJ8Aao5iJUqOrOHmkBlGhLkc7KhyKUCN
-YeR6SzW26ABXWqBwhXGRP93Q5dtavAOp6LW1ZabTaru+x15i39E/RS7nJRuKdtjX
-cRayqwrQ5u34u5GpF/jYRwXDGVIijhzIL3ZLJHM5Lv6VDPXPcs9ZsYqYRi6U3Nt4
-d22RQndB2DHEkm/ej6UULvUyzq6M9N9CUf2iulxBswcw1x7uUxdvXjDEksgCnMVn
-V2VDN2NNTD+iz2hXt+3v9SMlU/Or/IxMDVfjdCia4Fi51TjCCltmXSchxkRITGeB
-jlbT84EKTLCL/Fo+rn6raVDA0jDeRNXO1JZPSxmSTGWJ+uAK/J/BVzesjn2VJIz3
-DBSERZSmB9QwytibRLwjo4WsTUhlBagJqeVMNtAV7CAaZDGS1K96SqXgQlar69sY
-pb/en8DIeA3ytAuUUmaJWPSajFHwpuOy+w847QIFRr+OMTvBm09OU1vpvP4oCMUD
-n/FovFTSIXIBg6HaKYM5zVhg5yCGZJ75sVq20t8zaVsgIoC6X1k=
-=DFqS
------END PGP SIGNATURE-----
-
---Sig_/I47mP63z5TeIBN61Vqkk7q3--
 
