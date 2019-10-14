@@ -7,75 +7,75 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 59626ECE587
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 11:36:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E843FC4CECE
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 11:36:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2307020854
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 11:36:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B1EE2206A3
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 11:36:11 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="vBeicO2H"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2307020854
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="RtERnifm"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B1EE2206A3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47926 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47930 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iJydz-0007J0-8P
-	for qemu-devel@archiver.kernel.org; Mon, 14 Oct 2019 07:36:07 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46763)
+	id 1iJye2-0007Pb-I7
+	for qemu-devel@archiver.kernel.org; Mon, 14 Oct 2019 07:36:10 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46891)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1iJyBk-0007h1-Mm
- for qemu-devel@nongnu.org; Mon, 14 Oct 2019 07:06:57 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1iJyCD-00087r-NG
+ for qemu-devel@nongnu.org; Mon, 14 Oct 2019 07:07:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1iJyBj-0007Bs-HR
- for qemu-devel@nongnu.org; Mon, 14 Oct 2019 07:06:56 -0400
-Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:40379)
+ (envelope-from <alex.bennee@linaro.org>) id 1iJyCB-0007jp-3x
+ for qemu-devel@nongnu.org; Mon, 14 Oct 2019 07:07:24 -0400
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:34884)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1iJyBj-0007AL-BY
- for qemu-devel@nongnu.org; Mon, 14 Oct 2019 07:06:55 -0400
-Received: by mail-wr1-x441.google.com with SMTP id h4so19227380wrv.7
- for <qemu-devel@nongnu.org>; Mon, 14 Oct 2019 04:06:55 -0700 (PDT)
+ id 1iJyCA-0007iR-TN
+ for qemu-devel@nongnu.org; Mon, 14 Oct 2019 07:07:23 -0400
+Received: by mail-wr1-x443.google.com with SMTP id v8so19217345wrt.2
+ for <qemu-devel@nongnu.org>; Mon, 14 Oct 2019 04:07:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=ZiZ/jjbBIoVwkmOcALd/5dVI1/K7ovHMSAFhO/Jn2Ls=;
- b=vBeicO2HOdNu2/iT9QsLjmbnAvfBHkrpDoaaAxu/31tuneH0ono5KWCMuq4qx50R/z
- nkTgcUQK+b9+x9nVHJoXSUoXfY7bfBhNMOTVj4/kZBq0d2YHPgeZ7Pe5VnXd4bEhM9Zd
- NMeP1cHHNThFvtBk/UnTD+rpqCcvUDDNbYVygYbF051z4ccE2mLBdR+ZBkgHZFoV2i5r
- YRVDcadHIVE/+oBKaX9OMDEAH4NYazO+GVpVpUV1q5hBhVSKHh3v7oeVVn5APhGCdhzp
- vdEdVoOh+pZ2Bo0uk9dJV0/j780PAdsP4+x6+AoxvdI0hfOtbFiSv5HsYZYWjGL3BWDB
- M5SQ==
+ bh=crw16Ubz+md1UknF7Ek+z0EbuUyNC3Q+RBvq7bGGoJI=;
+ b=RtERnifmGf+4oL7gLvdC4pomT5jrlctM+a9lrLPq6Spl9IkDmtbnTLafU6jvwHkAx4
+ ZWmbK5DZcarmOwOORIY6CfJmwqMT3GYaLy6zdPq40wh2UITggfRbz7b3NHKCf6aYu9bf
+ 5zJrCy8fydA3/hilxO+qNklczdLqZR/crrGkoUtDZHTWvV5i0+GMswNsc70Nr185lgHr
+ dc/yawqyDHDV6gO20nM9Oo4ypxQpv0h3Yt0jrEnG3sye93YAF6BNb3vivMSOQKJuhc6d
+ uuQrVVGKO3Q0fRE2sDTMjjk0mQ2MmJvViGnQf5F7buhIryi+xDQsS63QugqyhukoZ0CK
+ B8Bg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=ZiZ/jjbBIoVwkmOcALd/5dVI1/K7ovHMSAFhO/Jn2Ls=;
- b=YKL0sNyJWF7kVahu5ReJD4HIDSkzFDaLvVUWMnxWRbIEd0SKx4vjJOLuSarT7W/4ze
- XmnO/wc5ZQpWNax26MGTsu7PgmeDU12gNYcsHfj3tggnA1XgOCoYl6nyUYHRG19IOION
- 6dPYYNSSlqElq2J+MHESQ0RcTlJjTF+ueZ9eikQLETaky5wMLB+SqENKNjMwGWq5m9EO
- 3tTdyhmCqU1wxjCDyu0DHSWBudrgs42C+wt81d2QC+QrQCOr0vcb0/fDTWXkgNVAHULI
- RGwFNGNkWGtXbY8K5TDFAFKYCPwAyLFmJ7boOWYnsJgPrt7lCHXyHWicwy/hd5+Gj4nL
- h5nQ==
-X-Gm-Message-State: APjAAAVa3yIsjagdgjl30ulZg/pUOq1azogSiCTzMeWtzNgBqK1PR1+4
- odswjZuv5t0bUGNe20jaRpsppw==
-X-Google-Smtp-Source: APXvYqwyGN21oO1I7skQ98Q9RbI5qTxdln36JPgU8rU2IOoZ7pQ+6wDQ+LoZcMzxBRnVjJ2alTFKGw==
-X-Received: by 2002:adf:f90f:: with SMTP id b15mr25344553wrr.76.1571051214031; 
- Mon, 14 Oct 2019 04:06:54 -0700 (PDT)
+ bh=crw16Ubz+md1UknF7Ek+z0EbuUyNC3Q+RBvq7bGGoJI=;
+ b=qaloYDvGl9abbYzf51fVRBdkzgxwyx34IlKArDv1Ay7yeckefNeeGIhEUR988wr89x
+ vSN3hkToKiCMZnWLej2XOpSiWAZZ5ul/3GIWptmE4B0kcqvHMw9YWyiqCKCyH6NoDpxl
+ prC+cQV2Cs0UgxYt5xxYsR+VTKnOEUDSVQjDggT5Nulnvy9r37LeoKhAvwkA88pNfmFJ
+ v/YRFXYXp1NHUYRk2M9B4TwLGG++2gWgmFWSFGP4VMSsI5WoGXQjukkfJWW4NRjFK6R/
+ Xw7P95Y6kJecXlH6qwBexRF6KMD/yOUe2RDgPEJfjGFMAz7IAUJ0iXL+bNw3XujaSj1D
+ ionA==
+X-Gm-Message-State: APjAAAXb2FP+jJTwZSNbvaetAHl7ktIR4/81UC8jJtAocOXha6dp1RTV
+ ZLubaWpGW6Nfs5r353iVDPpYLg==
+X-Google-Smtp-Source: APXvYqy/qljgz+DBH40+WeJON/kblishfmEahw8/enp+plEYXxqNtsFLtFKSQ4C1vQB1D4cyRtTF7Q==
+X-Received: by 2002:a5d:6189:: with SMTP id j9mr15899899wru.21.1571051241757; 
+ Mon, 14 Oct 2019 04:07:21 -0700 (PDT)
 Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id p5sm24188293wmi.4.2019.10.14.04.06.52
+ by smtp.gmail.com with ESMTPSA id c9sm16764103wrt.7.2019.10.14.04.07.18
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 14 Oct 2019 04:06:52 -0700 (PDT)
+ Mon, 14 Oct 2019 04:07:20 -0700 (PDT)
 Received: from zen.lan (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id B105D1FFBF;
- Mon, 14 Oct 2019 11:49:56 +0100 (BST)
+ by zen.linaroharston (Postfix) with ESMTP id 2B4041FFC3;
+ Mon, 14 Oct 2019 11:49:57 +0100 (BST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH  v5 34/55] target/openrisc: fetch code with translator_ld
-Date: Mon, 14 Oct 2019 11:49:27 +0100
-Message-Id: <20191014104948.4291-35-alex.bennee@linaro.org>
+Subject: [PATCH  v5 36/55] plugin: add API symbols to qemu-plugins.symbols
+Date: Mon, 14 Oct 2019 11:49:29 +0100
+Message-Id: <20191014104948.4291-37-alex.bennee@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20191014104948.4291-1-alex.bennee@linaro.org>
 References: <20191014104948.4291-1-alex.bennee@linaro.org>
@@ -84,7 +84,7 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::441
+X-Received-From: 2a00:1450:4864:20::443
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,11 +96,9 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: robert.foley@futurewei.com,
- Richard Henderson <richard.henderson@linaro.org>, peter.puhov@futurewei.com,
- aaron@os.amperecomputing.com, cota@braap.org,
- Stafford Horne <shorne@gmail.com>,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Cc: aaron@os.amperecomputing.com, cota@braap.org,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ robert.foley@futurewei.com, peter.puhov@futurewei.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
@@ -108,25 +106,222 @@ Sender: "Qemu-devel"
 From: "Emilio G. Cota" <cota@braap.org>
 
 Signed-off-by: Emilio G. Cota <cota@braap.org>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+[AJB: moved into plugins]
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
----
- target/openrisc/translate.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/target/openrisc/translate.c b/target/openrisc/translate.c
-index 6addbac8d6..8dd28d6cf1 100644
---- a/target/openrisc/translate.c
-+++ b/target/openrisc/translate.c
-@@ -1645,7 +1645,7 @@ static void openrisc_tr_translate_insn(DisasContextBase *dcbase, CPUState *cs)
- {
-     DisasContext *dc = container_of(dcbase, DisasContext, base);
-     OpenRISCCPU *cpu = OPENRISC_CPU(cs);
--    uint32_t insn = cpu_ldl_code(&cpu->env, dc->base.pc_next);
-+    uint32_t insn = translator_ldl(&cpu->env, dc->base.pc_next);
+---
+v3
+  - moved to plugins/
+  - include qemu_plugin_reset
+v5
+  - re-trigger configure if symbols are updated
+  - wrap ld checks inside if static = no
+---
+ Makefile                     |  7 ++++
+ configure                    | 72 ++++++++++++++++++++++++++++++++++++
+ plugins/.gitignore           |  2 +
+ plugins/Makefile.objs        | 14 +++++++
+ plugins/qemu-plugins.symbols | 38 +++++++++++++++++++
+ 5 files changed, 133 insertions(+)
+ create mode 100644 plugins/.gitignore
+ create mode 100644 plugins/qemu-plugins.symbols
+
+diff --git a/Makefile b/Makefile
+index 15f4745cf3..370eb9ad8d 100644
+--- a/Makefile
++++ b/Makefile
+@@ -74,6 +74,12 @@ CONFIG_ALL=y
+ config-host.mak: $(SRC_PATH)/configure $(SRC_PATH)/pc-bios $(SRC_PATH)/VERSION
+ 	@echo $@ is out-of-date, running configure
+ 	@./config.status
++
++# Force configure to re-run if the API symbols are updated
++ifeq ($(CONFIG_PLUGIN),y)
++config-host.mak: $(SRC_PATH)/plugins/qemu-plugins.symbols
++endif
++
+ else
+ config-host.mak:
+ ifneq ($(filter-out $(UNCHECKED_GOALS),$(MAKECMDGOALS)),$(if $(MAKECMDGOALS),,fail))
+@@ -730,6 +736,7 @@ distclean: clean
+ 	rm -f qemu-doc.fn qemu-doc.fns qemu-doc.info qemu-doc.ky qemu-doc.kys
+ 	rm -f qemu-doc.log qemu-doc.pdf qemu-doc.pg qemu-doc.toc qemu-doc.tp
+ 	rm -f qemu-doc.vr qemu-doc.txt
++	rm -f qemu-plugins-ld.symbols qemu-plugins-ld64.symbols
+ 	rm -f config.log
+ 	rm -f linux-headers/asm
+ 	rm -f docs/version.texi
+diff --git a/configure b/configure
+index 485a9837c9..75632b1df1 100755
+--- a/configure
++++ b/configure
+@@ -30,6 +30,7 @@ TMPO="${TMPDIR1}/${TMPB}.o"
+ TMPCXX="${TMPDIR1}/${TMPB}.cxx"
+ TMPE="${TMPDIR1}/${TMPB}.exe"
+ TMPMO="${TMPDIR1}/${TMPB}.mo"
++TMPTXT="${TMPDIR1}/${TMPB}.txt"
  
-     if (!decode(dc, insn)) {
-         gen_illegal_exception(dc);
+ rm -f config.log
+ 
+@@ -5464,6 +5465,61 @@ if compile_prog "" "" ; then
+   atomic64=yes
+ fi
+ 
++#########################################
++# See if --dynamic-list is supported by the linker
++ld_dynamic_list="no"
++if test "$static" = "no" ; then
++    cat > $TMPTXT <<EOF
++{
++  foo;
++};
++EOF
++
++    cat > $TMPC <<EOF
++#include <stdio.h>
++void foo(void);
++
++void foo(void)
++{
++  printf("foo\n");
++}
++
++int main(void)
++{
++  foo();
++  return 0;
++}
++EOF
++
++    if compile_prog "" "-Wl,--dynamic-list=$TMPTXT" ; then
++        ld_dynamic_list="yes"
++    fi
++fi
++
++#########################################
++# See if -exported_symbols_list is supported by the linker
++
++ld_exported_symbols_list="no"
++if test "$static" = "no" ; then
++    cat > $TMPTXT <<EOF
++  _foo
++EOF
++
++    if compile_prog "" "-Wl,-exported_symbols_list,$TMPTXT" ; then
++        ld_exported_symbols_list="yes"
++    fi
++fi
++
++if  test "$plugins" = "yes" &&
++    test "$ld_dynamic_list" = "no" &&
++    test "$ld_exported_symbols_list" = "no" ; then
++  error_exit \
++      "Plugin support requires dynamic linking and specifying a set of symbols " \
++      "that are exported to plugins. Unfortunately your linker doesn't " \
++      "support the flag (--dynamic-list or -exported_symbols_list) used " \
++      "for this purpose. You can't build with --static."
++fi
++
+ ########################################
+ # See if 16-byte vector operations are supported.
+ # Even without a vector unit the compiler may expand these.
+@@ -7267,6 +7323,22 @@ fi
+ if test "$plugins" = "yes" ; then
+     echo "CONFIG_PLUGIN=y" >> $config_host_mak
+     LIBS="-ldl $LIBS"
++    # Copy the export object list to the build dir
++    if test "$ld_dynamic_list" = "yes" ; then
++	echo "CONFIG_HAS_LD_DYNAMIC_LIST=yes" >> $config_host_mak
++	ld_symbols=qemu-plugins-ld.symbols
++	cp "$source_path/plugins/qemu-plugins.symbols" $ld_symbols
++    elif test "$ld_exported_symbols_list" = "yes" ; then
++	echo "CONFIG_HAS_LD_EXPORTED_SYMBOLS_LIST=yes" >> $config_host_mak
++	ld64_symbols=qemu-plugins-ld64.symbols
++	echo "# Automatically generated by configure - do not modify" > $ld64_symbols
++	grep 'qemu_' "$source_path/plugins/qemu-plugins.symbols" | sed 's/;//g' | \
++	    sed -E 's/^[[:space:]]*(.*)/_\1/' >> $ld64_symbols
++    else
++	error_exit \
++	    "If \$plugins=yes, either \$ld_dynamic_list or " \
++	    "\$ld_exported_symbols_list should have been set to 'yes'."
++    fi
+ fi
+ 
+ if test "$tcg_interpreter" = "yes"; then
+diff --git a/plugins/.gitignore b/plugins/.gitignore
+new file mode 100644
+index 0000000000..7b8aaa1f10
+--- /dev/null
++++ b/plugins/.gitignore
+@@ -0,0 +1,2 @@
++qemu-plugins-ld.symbols
++qemu-plugins-ld64.symbols
+diff --git a/plugins/Makefile.objs b/plugins/Makefile.objs
+index 95baabf3d2..6f14d91ccb 100644
+--- a/plugins/Makefile.objs
++++ b/plugins/Makefile.objs
+@@ -5,3 +5,17 @@
+ obj-y += loader.o
+ obj-y += core.o
+ obj-y += api.o
++
++# Abuse -libs suffix to only link with --dynamic-list/-exported_symbols_list
++# when the final binary includes the plugin object.
++#
++# Note that simply setting LDFLAGS is not enough: we build binaries that
++# never link plugin.o, and the linker might fail (at least ld64 does)
++# if the symbols in the list are not in the output binary.
++ifdef CONFIG_HAS_LD_DYNAMIC_LIST
++api.o-libs := -Wl,--dynamic-list=$(BUILD_DIR)/qemu-plugins-ld.symbols
++else
++ifdef CONFIG_HAS_LD_EXPORTED_SYMBOLS_LIST
++api.o-libs := -Wl,-exported_symbols_list,$(BUILD_DIR)/qemu-plugins-ld64.symbols
++endif
++endif
+diff --git a/plugins/qemu-plugins.symbols b/plugins/qemu-plugins.symbols
+new file mode 100644
+index 0000000000..40c0d1abd2
+--- /dev/null
++++ b/plugins/qemu-plugins.symbols
+@@ -0,0 +1,38 @@
++{
++  qemu_plugin_uninstall;
++  qemu_plugin_reset;
++  qemu_plugin_register_vcpu_init_cb;
++  qemu_plugin_register_vcpu_exit_cb;
++  qemu_plugin_register_vcpu_idle_cb;
++  qemu_plugin_register_vcpu_resume_cb;
++  qemu_plugin_register_vcpu_insn_exec_cb;
++  qemu_plugin_register_vcpu_insn_exec_inline;
++  qemu_plugin_register_vcpu_mem_cb;
++  qemu_plugin_register_vcpu_mem_haddr_cb;
++  qemu_plugin_register_vcpu_mem_inline;
++  qemu_plugin_ram_addr_from_host;
++  qemu_plugin_register_vcpu_tb_trans_cb;
++  qemu_plugin_register_vcpu_tb_exec_cb;
++  qemu_plugin_register_vcpu_tb_exec_inline;
++  qemu_plugin_register_flush_cb;
++  qemu_plugin_register_vcpu_syscall_cb;
++  qemu_plugin_register_vcpu_syscall_ret_cb;
++  qemu_plugin_register_atexit_cb;
++  qemu_plugin_tb_n_insns;
++  qemu_plugin_tb_get_insn;
++  qemu_plugin_tb_vaddr;
++  qemu_plugin_insn_data;
++  qemu_plugin_insn_size;
++  qemu_plugin_insn_vaddr;
++  qemu_plugin_insn_haddr;
++  qemu_plugin_mem_size_shift;
++  qemu_plugin_mem_is_sign_extended;
++  qemu_plugin_mem_is_big_endian;
++  qemu_plugin_mem_is_store;
++  qemu_plugin_get_hwaddr;
++  qemu_plugin_hwaddr_is_io;
++  qemu_plugin_hwaddr_to_raddr;
++  qemu_plugin_vcpu_for_each;
++  qemu_plugin_n_vcpus;
++  qemu_plugin_n_max_vcpus;
++};
 -- 
 2.20.1
 
