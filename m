@@ -2,59 +2,80 @@ Return-Path: <SRS0=PUPy=YH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 60554C4CECE
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 17:56:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 07406C4CECE
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 17:58:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3C70220873
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 17:56:08 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3C70220873
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id CC53620873
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 17:58:04 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="WrR+6ZZS"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CC53620873
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55086 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55110 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iK4Zh-00014b-DB
-	for qemu-devel@archiver.kernel.org; Mon, 14 Oct 2019 13:56:05 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52566)
+	id 1iK4ba-0002py-Re
+	for qemu-devel@archiver.kernel.org; Mon, 14 Oct 2019 13:58:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47314)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgilbert@redhat.com>) id 1iK4YW-0008R8-Sq
- for qemu-devel@nongnu.org; Mon, 14 Oct 2019 13:54:54 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1iK3xq-00048a-Tl
+ for qemu-devel@nongnu.org; Mon, 14 Oct 2019 13:17:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgilbert@redhat.com>) id 1iK4YU-0006ct-B7
- for qemu-devel@nongnu.org; Mon, 14 Oct 2019 13:54:51 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:51074)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1iK4YU-0006cW-3D
- for qemu-devel@nongnu.org; Mon, 14 Oct 2019 13:54:50 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id BC8D610CC203
- for <qemu-devel@nongnu.org>; Mon, 14 Oct 2019 17:54:48 +0000 (UTC)
-Received: from dgilbert-t580.localhost (unknown [10.36.118.31])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 1FF72608C2;
- Mon, 14 Oct 2019 17:54:42 +0000 (UTC)
-From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-To: qemu-devel@nongnu.org,
-	mst@redhat.com
-Subject: [PATCH] virito: Use auto rcu_read macros
-Date: Mon, 14 Oct 2019 18:54:40 +0100
-Message-Id: <20191014175440.152609-1-dgilbert@redhat.com>
+ (envelope-from <peter.maydell@linaro.org>) id 1iK3xp-0003zg-Pi
+ for qemu-devel@nongnu.org; Mon, 14 Oct 2019 13:16:58 -0400
+Received: from mail-oi1-x242.google.com ([2607:f8b0:4864:20::242]:35958)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1iK3xp-0003z1-Jw
+ for qemu-devel@nongnu.org; Mon, 14 Oct 2019 13:16:57 -0400
+Received: by mail-oi1-x242.google.com with SMTP id k20so14380947oih.3
+ for <qemu-devel@nongnu.org>; Mon, 14 Oct 2019 10:16:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=2im1edU0mZbhUh9AOBW8hzpbDNHdOPOP0ikRcICpz34=;
+ b=WrR+6ZZSvuvq6msblEYhhO+U7GRmmmIQiUgVZ3N0+snGp92gkjO/GSVDPhiXzjzWL1
+ kna3fsqsVCH9vVkL/+sUOHNbW6im+kBvXASSfAE7Dv8NPJNo7GSkCxb/4n1tLB0C8eZl
+ jwqpIa+BSMzP0U9jN8bTFc258aoP9wjIMq8SEMoul5frzn8E5BAHVP0DbyS0Q4BogEet
+ mcf5xb41RtVYE/SJjU9byKoLv7BMEf2ioE3V2Xd1u7AAJOwsXL18oeQ9Mc2CmoJn83zW
+ 8mHtuOvs5Bh8IpnGSfH/gzC4TxXVbI5frmyIJJ01eO6osS+eksUcmXYGDfXtAKSkdBqD
+ s/pg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=2im1edU0mZbhUh9AOBW8hzpbDNHdOPOP0ikRcICpz34=;
+ b=EAIHooQw++ueY3RTFwMmRxZkA2zcAckCgM0Em9btdsP2omsXFOvSU/imY15sKQT4cu
+ c3tgqpq/NiPCZJBOT5y6ZFj+VvTqFgdXQ1h78FK0Oz1udjHufrPZpbmVf3psrgC6vgAP
+ RYHB+8qBdBjSgv0dazErXZYOAiddWS4MBMhuiQdPih2liVHYFYRaEcLI3oqX9cHMa0Qp
+ TUrxIjEKR/z0TMn0mWJiAkWoyQrr7qKVMj4Y1xJgBlWSUJUimnUOSjufw1F9D9V/4DLD
+ FRWFtT8Ix6Z4a0mPUM1M+6xP7CXjBKBEadw9HiKR/6akJH3+M465vOqNXCnaPVl71eiB
+ /Fdw==
+X-Gm-Message-State: APjAAAXZZU+VTl9Ydz6PtrosNN5HNsD9p4T7qMVDpkvXk6rjtGfL+N09
+ eN61HKWE1if/BFlN8mup4F0WSogPbsmSWYqyztnMgg==
+X-Google-Smtp-Source: APXvYqyugRlwVHLFFKzhyNDFflLTXXklZ2qAfRan2Q3v9bmdVxjY2iC1dfRCTtoBmROo7mUIUJUSjqppbZ7Ebo3Un2A=
+X-Received: by 2002:aca:2b08:: with SMTP id i8mr24025585oik.146.1571073416735; 
+ Mon, 14 Oct 2019 10:16:56 -0700 (PDT)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.65]); Mon, 14 Oct 2019 17:54:48 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.132.183.28
+References: <20191014141608.80923-1-hikarupsp@gmail.com>
+In-Reply-To: <20191014141608.80923-1-hikarupsp@gmail.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 14 Oct 2019 18:16:44 +0100
+Message-ID: <CAFEAcA8nG9gLd3-mgpy6eTPfYPcpJDGS8EV-aRQPRTq=NuHYvA@mail.gmail.com>
+Subject: Re: [PATCH v2] ui: Fix hanging up Cocoa display on macOS 10.15
+ (Catalina)
+To: Hikaru Nishida <hikarupsp@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::242
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -66,190 +87,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: stefanha@redhat.com
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Gerd Hoffmann <kraxel@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+On Mon, 14 Oct 2019 at 15:16, <hikarupsp@gmail.com> wrote:
+>
+> From: Hikaru Nishida <hikarupsp@gmail.com>
+>
+> macOS API documentation says that before applicationDidFinishLaunching
+> is called, any events will not be processed. However, some events are
+> fired before it is called in macOS Catalina. This causes deadlock of
+> iothread_lock in handleEvent while it will be released after the
+> app_started_sem is posted.
+> This patch avoids processing events before the app_started_sem is
+> posted to prevent this deadlock.
+>
+> Buglink: https://bugs.launchpad.net/qemu/+bug/1847906
+> Signed-off-by: Hikaru Nishida <hikarupsp@gmail.com>
+> ---
+>  ui/cocoa.m | 12 ++++++++++++
+>  1 file changed, 12 insertions(+)
+>
+> diff --git a/ui/cocoa.m b/ui/cocoa.m
+> index f12e21df6e..bccd861d16 100644
+> --- a/ui/cocoa.m
+> +++ b/ui/cocoa.m
+> @@ -134,6 +134,7 @@
+>
+>  static QemuSemaphore display_init_sem;
+>  static QemuSemaphore app_started_sem;
+> +volatile sig_atomic_t allow_events;
 
-Use RCU_READ_LOCK_GUARD and WITH_RCU_READ_LOCK_GUARD
-to replace the manual rcu_read_(un)lock calls.
+Sorry, I failed to spot this on version 1 of the patch...
+I think we don't need to mark this 'volatile sig_atomic_t',
+but could use a simple 'bool', because both applicationDidFinishLaunching()
+and handleEvent() are called from the same thread (the OSX run loop
+thread).  Could you test that it still works with plain 'bool',
+please?
 
-I think the only change is virtio_load which was missing unlocks
-in error paths; those end up being fatal errors so it's not
-that important anyway.
+(If we did need to handle multiple thread accesses we should
+probably prefer one of the QEMU atomic primitives described
+in docs/devel/atomics.txt, since 'volatile' isn't really sufficient.)
 
-Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
----
- hw/virtio/virtio.c | 46 ++++++++++++++++------------------------------
- 1 file changed, 16 insertions(+), 30 deletions(-)
-
-diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
-index 527df03bfd..15ae9da60b 100644
---- a/hw/virtio/virtio.c
-+++ b/hw/virtio/virtio.c
-@@ -337,7 +337,7 @@ void virtio_queue_set_notification(VirtQueue *vq, int=
- enable)
-         return;
-     }
-=20
--    rcu_read_lock();
-+    RCU_READ_LOCK_GUARD();
-     if (virtio_vdev_has_feature(vq->vdev, VIRTIO_RING_F_EVENT_IDX)) {
-         vring_set_avail_event(vq, vring_avail_idx(vq));
-     } else if (enable) {
-@@ -349,7 +349,6 @@ void virtio_queue_set_notification(VirtQueue *vq, int=
- enable)
-         /* Expose avail event/used flags before caller checks the avail =
-idx. */
-         smp_mb();
-     }
--    rcu_read_unlock();
- }
-=20
- int virtio_queue_ready(VirtQueue *vq)
-@@ -393,9 +392,8 @@ int virtio_queue_empty(VirtQueue *vq)
-         return 0;
-     }
-=20
--    rcu_read_lock();
-+    RCU_READ_LOCK_GUARD();
-     empty =3D vring_avail_idx(vq) =3D=3D vq->last_avail_idx;
--    rcu_read_unlock();
-     return empty;
- }
-=20
-@@ -530,10 +528,9 @@ void virtqueue_flush(VirtQueue *vq, unsigned int cou=
-nt)
- void virtqueue_push(VirtQueue *vq, const VirtQueueElement *elem,
-                     unsigned int len)
- {
--    rcu_read_lock();
-+    RCU_READ_LOCK_GUARD();
-     virtqueue_fill(vq, elem, len, 0);
-     virtqueue_flush(vq, 1);
--    rcu_read_unlock();
- }
-=20
- /* Called within rcu_read_lock().  */
-@@ -624,7 +621,7 @@ void virtqueue_get_avail_bytes(VirtQueue *vq, unsigne=
-d int *in_bytes,
-         return;
-     }
-=20
--    rcu_read_lock();
-+    RCU_READ_LOCK_GUARD();
-     idx =3D vq->last_avail_idx;
-     total_bufs =3D in_total =3D out_total =3D 0;
-=20
-@@ -719,7 +716,6 @@ done:
-     if (out_bytes) {
-         *out_bytes =3D out_total;
-     }
--    rcu_read_unlock();
-     return;
-=20
- err:
-@@ -869,7 +865,7 @@ void *virtqueue_pop(VirtQueue *vq, size_t sz)
-     if (unlikely(vdev->broken)) {
-         return NULL;
-     }
--    rcu_read_lock();
-+    RCU_READ_LOCK_GUARD();
-     if (virtio_queue_empty_rcu(vq)) {
-         goto done;
-     }
-@@ -977,7 +973,6 @@ void *virtqueue_pop(VirtQueue *vq, size_t sz)
-     trace_virtqueue_pop(vq, elem, elem->in_num, elem->out_num);
- done:
-     address_space_cache_destroy(&indirect_desc_cache);
--    rcu_read_unlock();
-=20
-     return elem;
-=20
-@@ -1680,13 +1675,10 @@ static bool virtio_should_notify(VirtIODevice *vd=
-ev, VirtQueue *vq)
-=20
- void virtio_notify_irqfd(VirtIODevice *vdev, VirtQueue *vq)
- {
--    bool should_notify;
--    rcu_read_lock();
--    should_notify =3D virtio_should_notify(vdev, vq);
--    rcu_read_unlock();
--
--    if (!should_notify) {
--        return;
-+    WITH_RCU_READ_LOCK_GUARD() {
-+        if (!virtio_should_notify(vdev, vq)) {
-+            return;
-+        }
-     }
-=20
-     trace_virtio_notify_irqfd(vdev, vq);
-@@ -1718,13 +1710,10 @@ static void virtio_irq(VirtQueue *vq)
-=20
- void virtio_notify(VirtIODevice *vdev, VirtQueue *vq)
- {
--    bool should_notify;
--    rcu_read_lock();
--    should_notify =3D virtio_should_notify(vdev, vq);
--    rcu_read_unlock();
--
--    if (!should_notify) {
--        return;
-+    WITH_RCU_READ_LOCK_GUARD() {
-+        if (!virtio_should_notify(vdev, vq)) {
-+            return;
-+        }
-     }
-=20
-     trace_virtio_notify(vdev, vq);
-@@ -2241,7 +2230,7 @@ int virtio_load(VirtIODevice *vdev, QEMUFile *f, in=
-t version_id)
-         vdev->start_on_kick =3D true;
-     }
-=20
--    rcu_read_lock();
-+    RCU_READ_LOCK_GUARD();
-     for (i =3D 0; i < num; i++) {
-         if (vdev->vq[i].vring.desc) {
-             uint16_t nheads;
-@@ -2289,7 +2278,6 @@ int virtio_load(VirtIODevice *vdev, QEMUFile *f, in=
-t version_id)
-             }
-         }
-     }
--    rcu_read_unlock();
-=20
-     return 0;
- }
-@@ -2422,21 +2410,19 @@ void virtio_queue_set_last_avail_idx(VirtIODevice=
- *vdev, int n, uint16_t idx)
-=20
- void virtio_queue_restore_last_avail_idx(VirtIODevice *vdev, int n)
- {
--    rcu_read_lock();
-+    RCU_READ_LOCK_GUARD();
-     if (vdev->vq[n].vring.desc) {
-         vdev->vq[n].last_avail_idx =3D vring_used_idx(&vdev->vq[n]);
-         vdev->vq[n].shadow_avail_idx =3D vdev->vq[n].last_avail_idx;
-     }
--    rcu_read_unlock();
- }
-=20
- void virtio_queue_update_used_idx(VirtIODevice *vdev, int n)
- {
--    rcu_read_lock();
-+    RCU_READ_LOCK_GUARD();
-     if (vdev->vq[n].vring.desc) {
-         vdev->vq[n].used_idx =3D vring_used_idx(&vdev->vq[n]);
-     }
--    rcu_read_unlock();
- }
-=20
- void virtio_queue_invalidate_signalled_used(VirtIODevice *vdev, int n)
---=20
-2.23.0
-
+thanks
+-- PMM
 
