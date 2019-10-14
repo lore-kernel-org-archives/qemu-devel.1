@@ -6,48 +6,47 @@ X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4A6C7ECE587
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 08:47:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 41EB0ECE587
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 08:49:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1FA162054F
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 08:47:57 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1FA162054F
+	by mail.kernel.org (Postfix) with ESMTPS id 15DFE2054F
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 08:49:15 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 15DFE2054F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45790 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45800 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iJw1E-0003lc-7F
-	for qemu-devel@archiver.kernel.org; Mon, 14 Oct 2019 04:47:56 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55864)
+	id 1iJw2U-0004iL-9O
+	for qemu-devel@archiver.kernel.org; Mon, 14 Oct 2019 04:49:14 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55965)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1iJvzG-000389-DZ
- for qemu-devel@nongnu.org; Mon, 14 Oct 2019 04:45:55 -0400
+ (envelope-from <mreitz@redhat.com>) id 1iJw08-0003Re-Fl
+ for qemu-devel@nongnu.org; Mon, 14 Oct 2019 04:46:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1iJvzD-0008EN-0f
- for qemu-devel@nongnu.org; Mon, 14 Oct 2019 04:45:52 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46634)
+ (envelope-from <mreitz@redhat.com>) id 1iJw06-0000La-H3
+ for qemu-devel@nongnu.org; Mon, 14 Oct 2019 04:46:48 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:52660)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <mreitz@redhat.com>)
- id 1iJvz6-00084e-EB; Mon, 14 Oct 2019 04:45:44 -0400
+ id 1iJvzq-000089-KK; Mon, 14 Oct 2019 04:46:32 -0400
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
  [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 441133082145;
- Mon, 14 Oct 2019 08:45:42 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id B4A6F73A60;
+ Mon, 14 Oct 2019 08:46:27 +0000 (UTC)
 Received: from dresden.str.redhat.com (ovpn-117-165.ams2.redhat.com
  [10.36.117.165])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 08A295D6A7;
- Mon, 14 Oct 2019 08:45:40 +0000 (UTC)
-Subject: Re: [PATCH v3 07/16] qcow2: Write v3-compliant snapshot list on
- upgrade
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 77EE25D6A3;
+ Mon, 14 Oct 2019 08:46:26 +0000 (UTC)
+Subject: Re: [PATCH v3 04/16] qcow2: Keep unknown extra snapshot data
 To: Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org
 References: <20191011152814.14791-1-mreitz@redhat.com>
- <20191011152814.14791-8-mreitz@redhat.com>
- <a9263c74-f958-5859-9db3-a67aefe73ff5@redhat.com>
+ <20191011152814.14791-5-mreitz@redhat.com>
+ <8ecf3ce6-51e4-63ee-8fdc-945ca3e1f397@redhat.com>
 From: Max Reitz <mreitz@redhat.com>
 Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
  mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
@@ -73,18 +72,18 @@ Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
  /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
  bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
  R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <085c7aec-edd7-79bd-136f-5a3785a5d430@redhat.com>
-Date: Mon, 14 Oct 2019 10:45:39 +0200
+Message-ID: <2831d94c-eb4f-00c8-a462-029a3403d79a@redhat.com>
+Date: Mon, 14 Oct 2019 10:46:24 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.1.0
 MIME-Version: 1.0
-In-Reply-To: <a9263c74-f958-5859-9db3-a67aefe73ff5@redhat.com>
+In-Reply-To: <8ecf3ce6-51e4-63ee-8fdc-945ca3e1f397@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
  protocol="application/pgp-signature";
- boundary="D1fQ9ySsE0UKa7gZMEVjONSHmYPtQz3WM"
+ boundary="80XB02Yt97pbqeLeHdnDUOhEyyEbGhmOg"
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.42]); Mon, 14 Oct 2019 08:45:42 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.26]); Mon, 14 Oct 2019 08:46:27 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 209.132.183.28
@@ -105,74 +104,75 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---D1fQ9ySsE0UKa7gZMEVjONSHmYPtQz3WM
-Content-Type: multipart/mixed; boundary="I1YuivWm28i89R4YYbgp2TwXGOd6mvkPq"
+--80XB02Yt97pbqeLeHdnDUOhEyyEbGhmOg
+Content-Type: multipart/mixed; boundary="rrfdYa9YyO9DpYuJ39xTnO08K9ByfQf02"
 
---I1YuivWm28i89R4YYbgp2TwXGOd6mvkPq
+--rrfdYa9YyO9DpYuJ39xTnO08K9ByfQf02
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
-On 11.10.19 18:23, Eric Blake wrote:
+On 11.10.19 18:20, Eric Blake wrote:
 > On 10/11/19 10:28 AM, Max Reitz wrote:
->> qcow2 v3 requires every snapshot table entry to have two extra data
->> fields: The 64-bit VM state size, and the virtual disk size.=C2=A0 Bot=
-h are
->> optional for v2 images, so they may not be present.
+>> The qcow2 specification says to ignore unknown extra data fields in
+>> snapshot table entries.=C2=A0 Currently, we discard it whenever we upd=
+ate the
+>> image, which is a bit different from "ignore".
 >>
->> qcow2_upgrade() therefore should update the snapshot table to ensure a=
-ll
->> entries have these extra data fields.
+>> This patch makes the qcow2 driver keep all unknown extra data fields
+>> when updating an image's snapshot table.
 >>
->> Buglink: https://bugzilla.redhat.com/show_bug.cgi?id=3D1727347
->> Reported-by: Eric Blake <eblake@redhat.com>
 >> Signed-off-by: Max Reitz <mreitz@redhat.com>
 >> Reviewed-by: Eric Blake <eblake@redhat.com>
 >> ---
->> =C2=A0 block/qcow2.c | 32 ++++++++++++++++++++++++++++++--
->> =C2=A0 1 file changed, 30 insertions(+), 2 deletions(-)
->>
 >=20
->> +=C2=A0=C2=A0=C2=A0 need_snapshot_update =3D false;
->> +=C2=A0=C2=A0=C2=A0 for (i =3D 0; i < s->nb_snapshots; i++) {
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (s->snapshots[i].extra_=
-data_size <
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 si=
-zeof_field(QCowSnapshotExtraData, vm_state_size_large) +
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 si=
-zeof_field(QCowSnapshotExtraData, disk_size))
+>> =C2=A0 /* Bitmap header extension constraints */
+>> =C2=A0 #define QCOW2_MAX_BITMAPS 65535
+>> =C2=A0 #define QCOW2_MAX_BITMAP_DIRECTORY_SIZE (1024 * QCOW2_MAX_BITMA=
+PS)
+>> @@ -181,6 +184,8 @@ typedef struct QCowSnapshot {
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 uint32_t date_sec;
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 uint32_t date_nsec;
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 uint64_t vm_clock_nsec;
+>> +=C2=A0=C2=A0=C2=A0 uint32_t extra_data_size;
+>> +=C2=A0=C2=A0=C2=A0 void *unknown_extra_data; /* Extra data past
+>> QCowSnapshotExtraData */
 >=20
-> Shorter as:
-> if (s->snapshots[i].extra_data_size < sizeof(QCowSnapshotExtraData))
+> Would it be worth a comment change:
 >=20
-> but that's stylistic, so R-b still stands.
+> uint32_t extra_data_size; /* Size of all extra data, including
+> QCowSnapshotExtraData */
+> void *unknown_extra_data; /* Data beyond QCowSnapshotExtraData, if any =
+*/
+>=20
+> Either way, R-b stands.
 
-Yes, but if we ever add fields to QCowSnapshotExtraData, we shouldn=E2=80=
-=99t
-count them here.  Therefore, I think we need to count exactly the fields
-that the standard says are mandatory in v3.
+Can=E2=80=99t hurt.  Well, except that extra_data_size may or may not inc=
+lude
+QCowSnapshotExtraData, because maybe it isn=E2=80=99t fully present in th=
+e image.
 
 Max
 
 
---I1YuivWm28i89R4YYbgp2TwXGOd6mvkPq--
+--rrfdYa9YyO9DpYuJ39xTnO08K9ByfQf02--
 
---D1fQ9ySsE0UKa7gZMEVjONSHmYPtQz3WM
+--80XB02Yt97pbqeLeHdnDUOhEyyEbGhmOg
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl2kNbMACgkQ9AfbAGHV
-z0CZzQgAqbxjYpPmOpwWDEUQ9nsArRtKDXRdT1iV+Yr+1BO/c1iaVb87dcn4EFhL
-W2lAaTTRjaIs7Bu06/pJtacAvtWR/clCKZHKl1sa9ok+F5HFVxe3GR+nSsysatgs
-6jkz3yx+pWZ7443yaV1nzYCe9gzpFLfVVUgiwxNb43FQ6fiWnQh23FYSxDLnW/eb
-G0qHq+tFQSvcuKyync5XA38jDOqbH3bugMdQ42NKZX7i5/Y3xM1YVJpOLZB+TdS0
-CGtj3ubM0gshl6TTu37ugYDKQlebrM1Gy0p2MYqqr5Kek8StneHooSdH4TjFHKWV
-Xz5D6wni0FMwuxKuM7WnukwrNgdZqg==
-=Npe/
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl2kNeEACgkQ9AfbAGHV
+z0AhVwf/aRILN31uxs7BAqNTeNGwca+Cgymm5OlqgyOAT5jfYKghYAkZH9PWwrjQ
+Urxg/nJd1v0zmem7uLd2DKKY2J5i90mEdcwwq2DBN/bMvNBbSQHUOAyRzlRCwmwX
+WWdGB0CLUK3U/se73dftIKNIQnOvm06MnqV0KVo5XeDFYlWU9T181tnjPuSC8aH2
+/9OMYbLg5CqBg8bk7A0qDIK/whMksT23/pQrSxMVD73IUEIeQBcJ9VpxBbjLPC7l
+it0EcASjGUHpyNFQ288r2QrIAre4PLijCoq7rRjrgfGVRJRhfJ0f8x/2y8A5S76M
+Wt5+KiYhnudcjfpqUbLfmthKR/Wi/w==
+=cU0z
 -----END PGP SIGNATURE-----
 
---D1fQ9ySsE0UKa7gZMEVjONSHmYPtQz3WM--
+--80XB02Yt97pbqeLeHdnDUOhEyyEbGhmOg--
 
