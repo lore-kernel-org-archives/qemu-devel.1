@@ -2,63 +2,73 @@ Return-Path: <SRS0=PUPy=YH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.2 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_2
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B8799C4CECE
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 15:49:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D8E7DC4CECE
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 15:49:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8AF532133F
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 15:49:35 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8AF532133F
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id A55EA2133F
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 15:49:41 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=fintelia.io header.i=@fintelia.io header.b="XGRwGyV3"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A55EA2133F
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=fintelia.io
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51828 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51830 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iK2bF-0006xc-8B
-	for qemu-devel@archiver.kernel.org; Mon, 14 Oct 2019 11:49:33 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33773)
+	id 1iK2bM-00071g-86
+	for qemu-devel@archiver.kernel.org; Mon, 14 Oct 2019 11:49:40 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33748)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <groug@kaod.org>) id 1iK2Yd-0005E3-GN
- for qemu-devel@nongnu.org; Mon, 14 Oct 2019 11:46:53 -0400
+ (envelope-from <bounce+cf442f.9b4e76-qemu-devel=nongnu.org@fintelia.io>)
+ id 1iK2YX-0005DS-HO
+ for qemu-devel@nongnu.org; Mon, 14 Oct 2019 11:46:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <groug@kaod.org>) id 1iK2YZ-00081p-A1
- for qemu-devel@nongnu.org; Mon, 14 Oct 2019 11:46:49 -0400
-Received: from 9.mo173.mail-out.ovh.net ([46.105.72.44]:42965)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <groug@kaod.org>) id 1iK2YR-0007up-3h
+ (envelope-from <bounce+cf442f.9b4e76-qemu-devel=nongnu.org@fintelia.io>)
+ id 1iK2YV-00080b-3P
  for qemu-devel@nongnu.org; Mon, 14 Oct 2019 11:46:45 -0400
-Received: from player786.ha.ovh.net (unknown [10.109.146.137])
- by mo173.mail-out.ovh.net (Postfix) with ESMTP id 6672411C927
- for <qemu-devel@nongnu.org>; Mon, 14 Oct 2019 17:46:34 +0200 (CEST)
-Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
- [82.253.208.248]) (Authenticated sender: groug@kaod.org)
- by player786.ha.ovh.net (Postfix) with ESMTPSA id 2AA7BB07D0FA;
- Mon, 14 Oct 2019 15:46:28 +0000 (UTC)
-Date: Mon, 14 Oct 2019 17:46:26 +0200
-From: Greg Kurz <groug@kaod.org>
-To: Peter Maydell <peter.maydell@linaro.org>
-Subject: Re: [PULL v2 0/8] 9p patches 2019-10-10
-Message-ID: <20191014174626.76dc4e5c@bahia.lan>
-In-Reply-To: <CAFEAcA8tdhYm0EuVGx5OiPv7NuZvrtrPLnK+tz=xoJ0Gn4DCmw@mail.gmail.com>
-References: <20191010131809.1284004-1-groug@kaod.org>
- <CAFEAcA8tdhYm0EuVGx5OiPv7NuZvrtrPLnK+tz=xoJ0Gn4DCmw@mail.gmail.com>
-X-Mailer: Claws Mail 3.17.4 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+Received: from rs224.mailgun.us ([209.61.151.224]:22930)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71)
+ (envelope-from <bounce+cf442f.9b4e76-qemu-devel=nongnu.org@fintelia.io>)
+ id 1iK2YP-0007ma-Di
+ for qemu-devel@nongnu.org; Mon, 14 Oct 2019 11:46:42 -0400
+DKIM-Signature: a=rsa-sha256; v=1; c=relaxed/relaxed; d=fintelia.io; q=dns/txt;
+ s=pic; 
+ t=1571067998; h=Content-Transfer-Encoding: MIME-Version: References:
+ In-Reply-To: Message-Id: Date: Subject: Cc: To: From: Sender;
+ bh=us11dJP4tYiWCt+M3OJ3tptc3yO5a5+8OevvcFXza3A=;
+ b=XGRwGyV3YhA8N1XDkNkIG5iwcjbuHMtD2FP1CeGFEDauoAKinVupJ52dt1ZasSsHvmB+EzNw
+ AxWDK1XxEEsF/5+gD4h+ZMsF+fkQ+tWLNm4mm7fsLSPOT542sfzAT+acBThTrNtJsvxlt6B4
+ aClgMOuDMTP/wgNUNJmccFuHCvyH8viTwaPZ4i848Xv3n9zuhjfJko/dsyfjybDS03J2yPAP
+ xaRdFFkIqQwd+EkR/v5iAQtTlJ36MomTvUMHc2vwQ9HD4tYBmumeWXky/T3OWmYFiPX5KqrD
+ B4cenLfMXd5mXeFQ4hJWvWFzJFCweJArg0Zn8/0MXpuuQiQ3a3jQhw==
+X-Mailgun-Sending-Ip: 209.61.151.224
+X-Mailgun-Sid: WyJlMGM5NSIsICJxZW11LWRldmVsQG5vbmdudS5vcmciLCAiOWI0ZTc2Il0=
+Received: from jonathan-ThinkPad-X1-Carbon.pdos.lcs.mit.edu
+ (26-5-211.dynamic.csail.mit.edu [18.26.5.211])
+ by mxa.mailgun.org with ESMTP id 5da49856.7f705dace450-smtp-out-n01;
+ Mon, 14 Oct 2019 15:46:30 -0000 (UTC)
+From: Jonathan Behrens <jonathan@fintelia.io>
+To: qemu-devel@nongnu.org,
+	qemu-riscv@nongnu.org
+Subject: [PATCH v4 3/3] target/riscv: Make the priv register writable by GDB
+Date: Mon, 14 Oct 2019 11:45:29 -0400
+Message-Id: <20191014154529.287048-4-jonathan@fintelia.io>
+X-Mailer: git-send-email 2.23.0
+In-Reply-To: <20191014154529.287048-1-jonathan@fintelia.io>
+References: <20191014154529.287048-1-jonathan@fintelia.io>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Ovh-Tracer-Id: 10977805568754620689
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrjedugdelgecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 46.105.72.44
+X-Received-From: 209.61.151.224
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -70,60 +80,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+Cc: Sagar Karandikar <sagark@eecs.berkeley.edu>,
+ Jonathan Behrens <jonathan@fintelia.io>, Palmer Dabbelt <palmer@sifive.com>,
+ Alistair Francis <Alistair.Francis@wdc.com>,
+ Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
+ Bin Meng <bmeng.cn@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, 14 Oct 2019 15:08:52 +0100
-Peter Maydell <peter.maydell@linaro.org> wrote:
+Currently only PRV_U, PRV_S and PRV_M are supported, so this patch ensures that
+the privilege mode is set to one of them. Once support for the H-extension is
+added, this code will also need to properly update the virtualization status
+when switching between VU/VS-modes and M-mode.
 
-> On Thu, 10 Oct 2019 at 14:18, Greg Kurz <groug@kaod.org> wrote:
-> >
-> > The following changes since commit 98b2e3c9ab3abfe476a2b02f8f51813edb90e72d:
-> >
-> >   Merge remote-tracking branch 'remotes/stefanha/tags/block-pull-request' into staging (2019-10-08 16:08:35 +0100)
-> >
-> > are available in the Git repository at:
-> >
-> >   https://github.com/gkurz/qemu.git tags/9p-next-2019-10-10
-> >
-> > for you to fetch changes up to e410bbc52a7a246858af54ce1842fadf26f39ff7:
-> >
-> >   MAINTAINERS: Downgrade status of virtio-9p to "Odd Fixes" (2019-10-10 12:36:28 +0200)
-> >
-> > ----------------------------------------------------------------
-> > The most notable change is that we now detect cross-device setups in the
-> > host since it may cause inode number collision and mayhem in the guest.
-> > A new fsdev property is added for the user to choose the appropriate
-> > policy to handle that: either remap all inode numbers or fail I/Os to
-> > another host device or just print out a warning (default behaviour).
-> >
-> > This is also my last PR as _active_ maintainer of 9pfs.
-> >
-> > ----------------------------------------------------------------
-> 
-> 
-> Applied, thanks.
-> 
-> Please update the changelog at https://wiki.qemu.org/ChangeLog/4.2
-> for any user-visible changes.
-> 
-> Thanks for all your work on the 9pfs code!
-> 
+Signed-off-by: Jonathan Behrens <jonathan@fintelia.io>
+Reviewed-by: Bin Meng <bmeng.cn@gmail.com>
+Tested-by: Bin Meng <bmeng.cn@gmail.com>
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 
-Thanks Peter, and many others, for your valuable help.
+---
+ target/riscv/gdbstub.c | 9 +++++++++
+ 1 file changed, 9 insertions(+)
 
-As now indicated in MAINTAINERS, I'll stay around for odd fixes, one
-of which that comes to mind is to deprecate the "proxy" backend and
-its companion virtfs-proxy-helper binary at some point since it isn't
-supported by libvirt and will be superseded soon by "virtio-fs".
-
-Cheers,
-
---
-Greg
-
-> -- PMM
-
+diff --git a/target/riscv/gdbstub.c b/target/riscv/gdbstub.c
+index 1f71604b78..1a7947e019 100644
+--- a/target/riscv/gdbstub.c
++++ b/target/riscv/gdbstub.c
+@@ -387,6 +387,15 @@ static int riscv_gdb_get_virtual(CPURISCVState *cs, uint8_t *mem_buf, int n)
+ 
+ static int riscv_gdb_set_virtual(CPURISCVState *cs, uint8_t *mem_buf, int n)
+ {
++    if (n == 0) {
++#ifndef CONFIG_USER_ONLY
++        cs->priv = ldtul_p(mem_buf) & 0x3;
++        if (cs->priv == PRV_H) {
++            cs->priv = PRV_S;
++        }
++#endif
++        return sizeof(target_ulong);
++    }
+     return 0;
+ }
+ 
+-- 
+2.23.0
 
