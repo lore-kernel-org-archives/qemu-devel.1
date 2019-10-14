@@ -7,83 +7,82 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EE9A1C4CECE
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 16:44:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E686ECE587
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 16:44:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B7AC920663
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 16:44:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id CEFE320663
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 16:44:29 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="cRXmWSLR"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B7AC920663
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="IawZ/1jH"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CEFE320663
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53566 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53570 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iK3S5-0004Fn-Or
-	for qemu-devel@archiver.kernel.org; Mon, 14 Oct 2019 12:44:09 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36950)
+	id 1iK3SO-0004T8-GA
+	for qemu-devel@archiver.kernel.org; Mon, 14 Oct 2019 12:44:28 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37418)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1iK2q4-0004Bx-9A
- for qemu-devel@nongnu.org; Mon, 14 Oct 2019 12:04:53 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1iK2ql-0005Id-WB
+ for qemu-devel@nongnu.org; Mon, 14 Oct 2019 12:05:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1iK2q2-0007QF-U5
- for qemu-devel@nongnu.org; Mon, 14 Oct 2019 12:04:51 -0400
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:36894)
+ (envelope-from <peter.maydell@linaro.org>) id 1iK2qj-00089a-Do
+ for qemu-devel@nongnu.org; Mon, 14 Oct 2019 12:05:35 -0400
+Received: from mail-wr1-x42c.google.com ([2a00:1450:4864:20::42c]:37682)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1iK2q2-0007PI-NK
- for qemu-devel@nongnu.org; Mon, 14 Oct 2019 12:04:50 -0400
-Received: by mail-wr1-x442.google.com with SMTP id p14so20379797wro.4
- for <qemu-devel@nongnu.org>; Mon, 14 Oct 2019 09:04:50 -0700 (PDT)
+ id 1iK2qj-00088Z-6h
+ for qemu-devel@nongnu.org; Mon, 14 Oct 2019 12:05:33 -0400
+Received: by mail-wr1-x42c.google.com with SMTP id p14so20382536wro.4
+ for <qemu-devel@nongnu.org>; Mon, 14 Oct 2019 09:05:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:subject:date:message-id:in-reply-to:references:mime-version
  :content-transfer-encoding;
- bh=AqfOX9DanbrHqfYl2VtcpfIOP77gIYhu/52gPlZVV/I=;
- b=cRXmWSLRSUUl2Uag/YMbiBTHxMpURXzmrUSZgQyDLliu45CbNKdzC5LGr3MpfTvwxL
- GQZQwYrOiT5nMWvWYR6hVRe49JR/6udbg1vgsFoEGTrojCM2yz5cwo4LzbKOnbaziAsA
- 1kGYuMeJi/ggB7jexRD1X6rLsbMjTKROiajf8xPwhv/Q0ztRp+buE4KzGn5dW0onsKei
- MLDvAt03ettAgI90YyIl01cCPXLNsLbysfqTHkngbwo7OwmfgXVckq8tR7HLSi39fKmx
- tPDUdcTA2z8PPsNeFfRBC/hWECNazkYESIHMaqFxRugkNrRCwMj7FRXyKFno2XWup/SF
- W64Q==
+ bh=vP5GcYuUE/pjFlJ1lHMM9Tj7/XDRmZl7iSdxbfoBULU=;
+ b=IawZ/1jHhf+PIor81+rbQZyJRuxezJJesef1df1fpTP7BLt/iaIYC+BXJy3ya2enzj
+ Qy8JrHQy5HnhcQJYos0ltNW76TT1xV7tdhMjw6UuYg3JooYfiL736fsH35xl3uyROUdc
+ afT4bWOMqrhRh9ubNgHvZg/BC/SjbLpXTmmGUZcW2MWOxYFw0a1pkJW76J0rPqT4heoN
+ lucnDFIIPDN0nuPK7KflJWEzyhvfzBVvvGAki7nbVjFQ/Ss+SxMApXJ8AiOS31A5+ncS
+ WTxBe80yuOn7E1W1Ljm4N7ug8z/QOVF+4TM1s95l+TbEzS+asr2Q3r7rAMTxo1uAEazy
+ y2+g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=AqfOX9DanbrHqfYl2VtcpfIOP77gIYhu/52gPlZVV/I=;
- b=iSFl+cS8QihyBIDAB7W3rdN1mKVsnwfI0r/KZ98VFPP5cMSvWIwkrF2XYEXBstLqoD
- BxwXKsyjzAkImRkjD3cu278IFyqvpP8PHmjZofxl9KR1MR8ETGRXA2lJht1thErNIjAD
- aMyCWXwxac7r+dEjQV7WmYmeHs2/Qs03k7QKGXZQR6+HyUHzlipRvyegvTVP4EjRwz50
- pYxj4ysDelPc6juVaCi8jD9At6xso1GrMKTvuBNrunNdfwHUN+x1DzVbbHKPg5E8phVv
- R6+HZgHtWhB8Vg7o7i/OWdTA8jfMkpnDuEBUTrVxyihoOd25Ml0NOJXPjRUMYafsdvc1
- WYxw==
-X-Gm-Message-State: APjAAAXc1ZTN06pPRnN9hfOpB8ZN4x6gPnSUxNgmYNuMdfTkgmDkoiQP
- drCV4K0Odyd5cIegKqOxvsJj8gFRf8vf2Q==
-X-Google-Smtp-Source: APXvYqw2U5QtnatkDf6k2+QKRrhQKFX5pOgMsmBUClRjDTsEjd54QhgJD/75rEcG3yoKTdne/fkwmg==
-X-Received: by 2002:a05:6000:103:: with SMTP id
- o3mr2574464wrx.357.1571069089237; 
- Mon, 14 Oct 2019 09:04:49 -0700 (PDT)
+ bh=vP5GcYuUE/pjFlJ1lHMM9Tj7/XDRmZl7iSdxbfoBULU=;
+ b=dtLg+cQpJ13lMJpSoVxXwQIilZfGtbA2Lu0K6ZO+EJN/2P/RQO8U8Das1wVVmfCcB+
+ XV+al9yCHjUIU5jpB2G0puioFL4UxclzhiaCYPCnvCzVsmlEbQ8dPzvy5h4MWi2p157n
+ RfUek0KATbzYdOgN0dzIERF/Dq2JsvnnCMxD3qHe8KMupAtx3WIzebX+7ut8WDr9hFZ7
+ A1veYeus1SQ0MDuWplT8uMn8AfuoNiM4g2E1xQ5sXOWsFx7RrxnuujaMtcW7Tsw7RSpf
+ eIVNvSupmDV4Lm5eF1/OxA5uaUDFBXG0N4ggAqe7Z5Q5YE8onW1yhymheKpTDRYdkORW
+ wpPg==
+X-Gm-Message-State: APjAAAVNZRGuwjkuUp37g/teibkMRilW9V1pI2aqhL+KXaAomUTOsUvm
+ CptPQGLSK64lMfPc2xMtpJDkNqsgoyyxPA==
+X-Google-Smtp-Source: APXvYqx2qtoS0H9K5lmCVcCnLYweqQpflsTuary7rKQ7g1S6+Br6/uEMC3hDbpKKy6nMt1MotLDCrg==
+X-Received: by 2002:adf:e2c5:: with SMTP id d5mr12606072wrj.283.1571069130845; 
+ Mon, 14 Oct 2019 09:05:30 -0700 (PDT)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id 5sm18029779wrk.86.2019.10.14.09.04.47
+ by smtp.gmail.com with ESMTPSA id 5sm18029779wrk.86.2019.10.14.09.05.29
  for <qemu-devel@nongnu.org>
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 14 Oct 2019 09:04:48 -0700 (PDT)
+ Mon, 14 Oct 2019 09:05:30 -0700 (PDT)
 From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PULL 22/68] hw/timer/mss-timerc: Switch to transaction-based ptimer
- API
-Date: Mon, 14 Oct 2019 17:03:18 +0100
-Message-Id: <20191014160404.19553-23-peter.maydell@linaro.org>
+Subject: [PULL 54/68] aspeed/i2c: Introduce an object class per SoC
+Date: Mon, 14 Oct 2019 17:03:50 +0100
+Message-Id: <20191014160404.19553-55-peter.maydell@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20191014160404.19553-1-peter.maydell@linaro.org>
 References: <20191014160404.19553-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::442
+X-Received-From: 2a00:1450:4864:20::42c
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,82 +98,186 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Switch the mss-timer code away from bottom-half based ptimers to
-the new transaction-based ptimer API.  This just requires adding
-begin/commit calls around the various places that modify the ptimer
-state, and using the new ptimer_init() function to create the timer.
+From: Cédric Le Goater <clg@kaod.org>
 
+It prepares ground for register differences between SoCs.
+
+Signed-off-by: Cédric Le Goater <clg@kaod.org>
+Reviewed-by: Joel Stanley <joel@jms.id.au>
+Message-id: 20190925143248.10000-16-clg@kaod.org
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Message-id: 20191008171740.9679-20-peter.maydell@linaro.org
 ---
- include/hw/timer/mss-timer.h |  1 -
- hw/timer/mss-timer.c         | 11 ++++++++---
- 2 files changed, 8 insertions(+), 4 deletions(-)
+ include/hw/i2c/aspeed_i2c.h | 15 ++++++++++
+ hw/arm/aspeed_soc.c         |  3 +-
+ hw/i2c/aspeed_i2c.c         | 60 ++++++++++++++++++++++++++++++++-----
+ 3 files changed, 69 insertions(+), 9 deletions(-)
 
-diff --git a/include/hw/timer/mss-timer.h b/include/hw/timer/mss-timer.h
-index d15d1732f81..e5a784b27e4 100644
---- a/include/hw/timer/mss-timer.h
-+++ b/include/hw/timer/mss-timer.h
-@@ -46,7 +46,6 @@
- #define R_TIM1_MAX        6
+diff --git a/include/hw/i2c/aspeed_i2c.h b/include/hw/i2c/aspeed_i2c.h
+index a2753f0bbba..6e2dae7db81 100644
+--- a/include/hw/i2c/aspeed_i2c.h
++++ b/include/hw/i2c/aspeed_i2c.h
+@@ -25,6 +25,8 @@
+ #include "hw/sysbus.h"
  
- struct Msf2Timer {
--    QEMUBH *bh;
-     ptimer_state *ptimer;
+ #define TYPE_ASPEED_I2C "aspeed.i2c"
++#define TYPE_ASPEED_2400_I2C TYPE_ASPEED_I2C "-ast2400"
++#define TYPE_ASPEED_2500_I2C TYPE_ASPEED_I2C "-ast2500"
+ #define ASPEED_I2C(obj) \
+     OBJECT_CHECK(AspeedI2CState, (obj), TYPE_ASPEED_I2C)
  
-     uint32_t regs[R_TIM1_MAX];
-diff --git a/hw/timer/mss-timer.c b/hw/timer/mss-timer.c
-index a34c2402b00..b1c9a805011 100644
---- a/hw/timer/mss-timer.c
-+++ b/hw/timer/mss-timer.c
-@@ -24,7 +24,6 @@
-  */
+@@ -59,6 +61,19 @@ typedef struct AspeedI2CState {
+     AspeedI2CBus busses[ASPEED_I2C_NR_BUSSES];
+ } AspeedI2CState;
  
- #include "qemu/osdep.h"
--#include "qemu/main-loop.h"
- #include "qemu/module.h"
- #include "qemu/log.h"
- #include "hw/irq.h"
-@@ -67,6 +66,7 @@ static void timer_update_irq(struct Msf2Timer *st)
-     qemu_set_irq(st->irq, (ier && isr));
++#define ASPEED_I2C_CLASS(klass) \
++     OBJECT_CLASS_CHECK(AspeedI2CClass, (klass), TYPE_ASPEED_I2C)
++#define ASPEED_I2C_GET_CLASS(obj) \
++     OBJECT_GET_CLASS(AspeedI2CClass, (obj), TYPE_ASPEED_I2C)
++
++typedef struct AspeedI2CClass {
++    SysBusDeviceClass parent_class;
++
++    uint8_t num_busses;
++    uint8_t reg_size;
++    uint8_t gap;
++} AspeedI2CClass;
++
+ I2CBus *aspeed_i2c_get_bus(DeviceState *dev, int busnr);
+ 
+ #endif /* ASPEED_I2C_H */
+diff --git a/hw/arm/aspeed_soc.c b/hw/arm/aspeed_soc.c
+index 5c5fcb81094..e60f198d92c 100644
+--- a/hw/arm/aspeed_soc.c
++++ b/hw/arm/aspeed_soc.c
+@@ -188,8 +188,9 @@ static void aspeed_soc_init(Object *obj)
+     object_property_add_const_link(OBJECT(&s->timerctrl), "scu",
+                                    OBJECT(&s->scu), &error_abort);
+ 
++    snprintf(typename, sizeof(typename), "aspeed.i2c-%s", socname);
+     sysbus_init_child_obj(obj, "i2c", OBJECT(&s->i2c), sizeof(s->i2c),
+-                          TYPE_ASPEED_I2C);
++                          typename);
+ 
+     snprintf(typename, sizeof(typename), "aspeed.fmc-%s", socname);
+     sysbus_init_child_obj(obj, "fmc", OBJECT(&s->fmc), sizeof(s->fmc),
+diff --git a/hw/i2c/aspeed_i2c.c b/hw/i2c/aspeed_i2c.c
+index a956eb38492..fabdb01e974 100644
+--- a/hw/i2c/aspeed_i2c.c
++++ b/hw/i2c/aspeed_i2c.c
+@@ -408,10 +408,11 @@ static void aspeed_i2c_reset(DeviceState *dev)
+ {
+     int i;
+     AspeedI2CState *s = ASPEED_I2C(dev);
++    AspeedI2CClass *aic = ASPEED_I2C_GET_CLASS(s);
+ 
+     s->intr_status = 0;
+ 
+-    for (i = 0; i < ASPEED_I2C_NR_BUSSES; i++) {
++    for (i = 0; i < aic->num_busses; i++) {
+         s->busses[i].intr_ctrl = 0;
+         s->busses[i].intr_status = 0;
+         s->busses[i].cmd = 0;
+@@ -421,7 +422,7 @@ static void aspeed_i2c_reset(DeviceState *dev)
  }
  
-+/* Must be called from within a ptimer_transaction_begin/commit block */
- static void timer_update(struct Msf2Timer *st)
+ /*
+- * Address Definitions
++ * Address Definitions (AST2400 and AST2500)
+  *
+  *   0x000 ... 0x03F: Global Register
+  *   0x040 ... 0x07F: Device 1
+@@ -446,22 +447,24 @@ static void aspeed_i2c_realize(DeviceState *dev, Error **errp)
+     int i;
+     SysBusDevice *sbd = SYS_BUS_DEVICE(dev);
+     AspeedI2CState *s = ASPEED_I2C(dev);
++    AspeedI2CClass *aic = ASPEED_I2C_GET_CLASS(s);
+ 
+     sysbus_init_irq(sbd, &s->irq);
+     memory_region_init_io(&s->iomem, OBJECT(s), &aspeed_i2c_ctrl_ops, s,
+                           "aspeed.i2c", 0x1000);
+     sysbus_init_mmio(sbd, &s->iomem);
+ 
+-    for (i = 0; i < ASPEED_I2C_NR_BUSSES; i++) {
+-        char name[16];
+-        int offset = i < 7 ? 1 : 5;
++    for (i = 0; i < aic->num_busses; i++) {
++        char name[32];
++        int offset = i < aic->gap ? 1 : 5;
+         snprintf(name, sizeof(name), "aspeed.i2c.%d", i);
+         s->busses[i].controller = s;
+         s->busses[i].id = i;
+         s->busses[i].bus = i2c_init_bus(dev, name);
+         memory_region_init_io(&s->busses[i].mr, OBJECT(dev),
+-                              &aspeed_i2c_bus_ops, &s->busses[i], name, 0x40);
+-        memory_region_add_subregion(&s->iomem, 0x40 * (i + offset),
++                              &aspeed_i2c_bus_ops, &s->busses[i], name,
++                              aic->reg_size);
++        memory_region_add_subregion(&s->iomem, aic->reg_size * (i + offset),
+                                     &s->busses[i].mr);
+     }
+ }
+@@ -481,11 +484,51 @@ static const TypeInfo aspeed_i2c_info = {
+     .parent        = TYPE_SYS_BUS_DEVICE,
+     .instance_size = sizeof(AspeedI2CState),
+     .class_init    = aspeed_i2c_class_init,
++    .class_size = sizeof(AspeedI2CClass),
++    .abstract   = true,
++};
++
++static void aspeed_2400_i2c_class_init(ObjectClass *klass, void *data)
++{
++    DeviceClass *dc = DEVICE_CLASS(klass);
++    AspeedI2CClass *aic = ASPEED_I2C_CLASS(klass);
++
++    dc->desc = "ASPEED 2400 I2C Controller";
++
++    aic->num_busses = 14;
++    aic->reg_size = 0x40;
++    aic->gap = 7;
++}
++
++static const TypeInfo aspeed_2400_i2c_info = {
++    .name = TYPE_ASPEED_2400_I2C,
++    .parent = TYPE_ASPEED_I2C,
++    .class_init = aspeed_2400_i2c_class_init,
++};
++
++static void aspeed_2500_i2c_class_init(ObjectClass *klass, void *data)
++{
++    DeviceClass *dc = DEVICE_CLASS(klass);
++    AspeedI2CClass *aic = ASPEED_I2C_CLASS(klass);
++
++    dc->desc = "ASPEED 2500 I2C Controller";
++
++    aic->num_busses = 14;
++    aic->reg_size = 0x40;
++    aic->gap = 7;
++}
++
++static const TypeInfo aspeed_2500_i2c_info = {
++    .name = TYPE_ASPEED_2500_I2C,
++    .parent = TYPE_ASPEED_I2C,
++    .class_init = aspeed_2500_i2c_class_init,
+ };
+ 
+ static void aspeed_i2c_register_types(void)
  {
-     uint64_t count;
-@@ -159,7 +159,9 @@ timer_write(void *opaque, hwaddr offset,
-     switch (addr) {
-     case R_TIM_CTRL:
-         st->regs[R_TIM_CTRL] = value;
-+        ptimer_transaction_begin(st->ptimer);
-         timer_update(st);
-+        ptimer_transaction_commit(st->ptimer);
-         break;
+     type_register_static(&aspeed_i2c_info);
++    type_register_static(&aspeed_2400_i2c_info);
++    type_register_static(&aspeed_2500_i2c_info);
+ }
  
-     case R_TIM_RIS:
-@@ -171,7 +173,9 @@ timer_write(void *opaque, hwaddr offset,
-     case R_TIM_LOADVAL:
-         st->regs[R_TIM_LOADVAL] = value;
-         if (st->regs[R_TIM_CTRL] & TIMER_CTRL_ENBL) {
-+            ptimer_transaction_begin(st->ptimer);
-             timer_update(st);
-+            ptimer_transaction_commit(st->ptimer);
-         }
-         break;
+ type_init(aspeed_i2c_register_types)
+@@ -494,9 +537,10 @@ type_init(aspeed_i2c_register_types)
+ I2CBus *aspeed_i2c_get_bus(DeviceState *dev, int busnr)
+ {
+     AspeedI2CState *s = ASPEED_I2C(dev);
++    AspeedI2CClass *aic = ASPEED_I2C_GET_CLASS(s);
+     I2CBus *bus = NULL;
  
-@@ -228,9 +232,10 @@ static void mss_timer_init(Object *obj)
-     for (i = 0; i < NUM_TIMERS; i++) {
-         struct Msf2Timer *st = &t->timers[i];
- 
--        st->bh = qemu_bh_new(timer_hit, st);
--        st->ptimer = ptimer_init_with_bh(st->bh, PTIMER_POLICY_DEFAULT);
-+        st->ptimer = ptimer_init(timer_hit, st, PTIMER_POLICY_DEFAULT);
-+        ptimer_transaction_begin(st->ptimer);
-         ptimer_set_freq(st->ptimer, t->freq_hz);
-+        ptimer_transaction_commit(st->ptimer);
-         sysbus_init_irq(SYS_BUS_DEVICE(obj), &st->irq);
+-    if (busnr >= 0 && busnr < ASPEED_I2C_NR_BUSSES) {
++    if (busnr >= 0 && busnr < aic->num_busses) {
+         bus = s->busses[busnr].bus;
      }
  
 -- 
