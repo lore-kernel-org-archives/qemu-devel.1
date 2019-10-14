@@ -2,67 +2,119 @@ Return-Path: <SRS0=PUPy=YH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B03AC4CECE
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 09:02:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 041E4C4CECE
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 09:08:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 30255207FF
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 09:02:11 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 30255207FF
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id AFAB9207FF
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 09:08:14 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="g8TswlMB"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AFAB9207FF
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45944 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45972 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iJwF0-00071a-79
-	for qemu-devel@archiver.kernel.org; Mon, 14 Oct 2019 05:02:10 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57809)
+	id 1iJwKr-00008w-T0
+	for qemu-devel@archiver.kernel.org; Mon, 14 Oct 2019 05:08:13 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58398)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <imammedo@redhat.com>) id 1iJwDp-0006L6-UU
- for qemu-devel@nongnu.org; Mon, 14 Oct 2019 05:00:59 -0400
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iJwK7-00089L-ID
+ for qemu-devel@nongnu.org; Mon, 14 Oct 2019 05:07:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <imammedo@redhat.com>) id 1iJwDn-0005SU-RS
- for qemu-devel@nongnu.org; Mon, 14 Oct 2019 05:00:57 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:49006)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1iJwDd-00056C-Gh
- for qemu-devel@nongnu.org; Mon, 14 Oct 2019 05:00:49 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 90090308FBA0;
- Mon, 14 Oct 2019 09:00:33 +0000 (UTC)
-Received: from localhost (unknown [10.43.2.182])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 1CA9460A97;
- Mon, 14 Oct 2019 09:00:31 +0000 (UTC)
-Date: Mon, 14 Oct 2019 11:00:30 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-To: Tao Xu <tao3.xu@intel.com>
-Subject: Re: [PATCH v12 09/11] hmat acpi: Build System Locality Latency and
- Bandwidth Information Structure(s)
-Message-ID: <20191014110030.79fd2e18@redhat.com>
-In-Reply-To: <7f431c7c-b745-3001-d0ba-d94f7230b426@intel.com>
-References: <20190920074349.2616-1-tao3.xu@intel.com>
- <20190920074349.2616-10-tao3.xu@intel.com>
- <20191003164111.078fdce4@redhat.com>
- <24a4842c-4ce4-3a7f-5032-8e74458de44c@intel.com>
- <20191011160855.6d13eb69@redhat.com>
- <7f431c7c-b745-3001-d0ba-d94f7230b426@intel.com>
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iJwK6-0003BA-35
+ for qemu-devel@nongnu.org; Mon, 14 Oct 2019 05:07:27 -0400
+Received: from mail-eopbgr10131.outbound.protection.outlook.com
+ ([40.107.1.131]:54020 helo=EUR02-HE1-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1iJwK5-00039D-9x
+ for qemu-devel@nongnu.org; Mon, 14 Oct 2019 05:07:26 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=jFTuely1hTTOdIoWKRS5ouHE+NWDHSs0Fs31k7JjD9+iuUPI1gDnBPoN7bHjaF0UkXm4b8v+7SmD3w1jChU+gVqTNemru9EUcMIgTawQOHm0SCkHGRjpw7C+c07we20Gclzr4KA8A+3SYjyKMCpMOs1CekkRMx7ypoij6Gg4jaqlWI0tYHoS9Sg2SjLLTJ8KGauqIQ2fTHU4t1Qf3Fo9/wRtML7JFeShp8RjWYlpr8EHAmkEMWMqfDrmv0r3Z7Exl0W+0J4b429cdhjhtTBzWJIBQJZFXiihAPrRovLpSWzyTSk3s5cBk+OEXDeWxHUNy+5TVqMpM/WJp0jBNEkCmQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=bOivhlhLBeZs6yoOW2sM/PMkeAwWXadp4Dew1RR8WGg=;
+ b=dV3ViQTz8guDN58EB8htL1CWs0k413HzUg1StafN+imYb+ezCpQH7cTjkBO4Rabe+lHM1zWmml0S9lBdr4Abv2uNorcRiv6YIHXFzLjD3Eo6lgpHiI2rj1o19xeGNYaeNM5Uoo5l96QKLetlbINbqZ0jJFDngyc85G8UIVWZZXvWe3oEomup/5RROJL1733k+3XKlq+K0tcrx9c7U0/NenpCxfbknwfGKQObPh/D5/IYGc/O6pXtJiM4Xcg5NTZCXmmvxoVURe0iU8Y3f/1tUeAXZibJMI5XWHGtHHX/77X0X10MY/yGzSYcq79BS1khL0uj2MwCb/chmBMga9GwqA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=bOivhlhLBeZs6yoOW2sM/PMkeAwWXadp4Dew1RR8WGg=;
+ b=g8TswlMBtAI2iR6bUBfRnafvPR2OZTFhiE5bkxWiZ81YboJ50jF/NoyH//+ekw8uAMwwUfJA0pEmN9oPxe0eFk8Z1IIo4oP2KLHANN/Tmn+/b+5NOmazkbg6C7Kzft4XMN71hX3+Jy5LDx7Kekq8cvJQ02GsDa1sCeEyxihc6dE=
+Received: from DB8PR08MB5498.eurprd08.prod.outlook.com (52.133.242.216) by
+ DB8PR08MB5275.eurprd08.prod.outlook.com (10.255.19.24) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2347.22; Mon, 14 Oct 2019 09:07:22 +0000
+Received: from DB8PR08MB5498.eurprd08.prod.outlook.com
+ ([fe80::2856:990a:197a:288f]) by DB8PR08MB5498.eurprd08.prod.outlook.com
+ ([fe80::2856:990a:197a:288f%2]) with mapi id 15.20.2347.021; Mon, 14 Oct 2019
+ 09:07:22 +0000
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+To: =?utf-8?B?UGhpbGlwcGUgTWF0aGlldS1EYXVkw6k=?= <philmd@redhat.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Subject: Re: [RFC v5 121/126] hw/sd/ssi-sd.c: introduce ERRP_AUTO_PROPAGATE
+Thread-Topic: [RFC v5 121/126] hw/sd/ssi-sd.c: introduce ERRP_AUTO_PROPAGATE
+Thread-Index: AQHVgFAeU/NDl8/6KE+3Ou+1v7KVfqdWjTeAgANPtwA=
+Date: Mon, 14 Oct 2019 09:07:22 +0000
+Message-ID: <8af36e08-26ce-4a49-00f8-a50affe0132f@virtuozzo.com>
+References: <20191011160552.22907-1-vsementsov@virtuozzo.com>
+ <20191011160552.22907-122-vsementsov@virtuozzo.com>
+ <fe720ff6-0949-fced-8d33-2e8dcb5d568a@redhat.com>
+In-Reply-To: <fe720ff6-0949-fced-8d33-2e8dcb5d568a@redhat.com>
+Accept-Language: ru-RU, en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-clientproxiedby: HE1PR0402CA0016.eurprd04.prod.outlook.com
+ (2603:10a6:3:d0::26) To DB8PR08MB5498.eurprd08.prod.outlook.com
+ (2603:10a6:10:11c::24)
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=vsementsov@virtuozzo.com; 
+x-ms-exchange-messagesentrepresentingtype: 1
+x-tagtoolbar-keys: D20191014120718607
+x-originating-ip: [185.231.240.5]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 6dd3ae1f-3da2-4e92-2dbc-08d75085ec23
+x-ms-traffictypediagnostic: DB8PR08MB5275:
+x-microsoft-antispam-prvs: <DB8PR08MB5275538B149F7B83134A2503C1900@DB8PR08MB5275.eurprd08.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:5797;
+x-forefront-prvs: 01901B3451
+x-forefront-antispam-report: SFV:NSPM;
+ SFS:(10019020)(396003)(376002)(346002)(39840400004)(136003)(366004)(189003)(199004)(186003)(2906002)(316002)(6246003)(66066001)(5660300002)(110136005)(3846002)(54906003)(36756003)(8936002)(6512007)(6116002)(2616005)(476003)(14444005)(26005)(81156014)(81166006)(11346002)(66446008)(64756008)(66946007)(66476007)(66556008)(446003)(256004)(4326008)(52116002)(71200400001)(99286004)(71190400001)(305945005)(8676002)(7736002)(76176011)(102836004)(386003)(486006)(53546011)(6486002)(6506007)(6436002)(2501003)(478600001)(86362001)(31696002)(229853002)(31686004)(25786009)(14454004);
+ DIR:OUT; SFP:1102; SCL:1; SRVR:DB8PR08MB5275;
+ H:DB8PR08MB5498.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
+ PTR:InfoNoRecords; MX:1; A:1; 
+received-spf: None (protection.outlook.com: virtuozzo.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: GTHv1c0oYTVMbPDMjfIR0O/uOvfdMkH1bHkiG8yRnqPRCIpGPGfHbDfGpiAaFuUbLAH2Gr6ZjokdbPWjoOhwePFcd6okPoFJDebaX20dhwtZ1La+LsSEpuzBhy7OZNZ6BeodWNdtZOOjR+61nU91mtuQRwt7AygacWRU/CmJAJE+revMvLZDcELl0VW9il06hgLrcjFBZaHMG/W7ncCNM9hSp6WIjGJnoR3i7PEya7jZjfZ2BpjWadWL6Zf9dwCvt3aJIOM5og/erLtyIQkgiXcvKYgw7SwaAzFgaX/0zCa1nB+xRgOHW/AkxXscuISRFrJJph1oG0eYYKHZKIU2Y6+SISw02W7xMC4wuk7cjUv7jNnqQbQ4ngcUjJm8Ih7xqnpo7NYgr/mLvZ+MngCEPz2mEX1qiB61VKZ+MiBNGtU=
+x-ms-exchange-transport-forked: True
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <E531E926FF039A4E86C195989B1B5567@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.43]); Mon, 14 Oct 2019 09:00:33 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.132.183.28
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 6dd3ae1f-3da2-4e92-2dbc-08d75085ec23
+X-MS-Exchange-CrossTenant-originalarrivaltime: 14 Oct 2019 09:07:22.0937 (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: 2P45UkeZ/a0xaSbTWtyKhnSonospQ/KIIkF/95VzgliCOqAcXZj48VggWHmdFr64onXL4a0k9QidYwjB5k6pHf6EuX1bIvLZKTWBL6I0PhI=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB8PR08MB5275
+X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
+X-Received-From: 40.107.1.131
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -74,177 +126,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "ehabkost@redhat.com" <ehabkost@redhat.com>, "Liu,
- Jingqi" <jingqi.liu@intel.com>, "Du, Fan" <fan.du@intel.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "jonathan.cameron@huawei.com" <jonathan.cameron@huawei.com>, "Williams, Dan
- J" <dan.j.williams@intel.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, "armbru@redhat.com" <armbru@redhat.com>,
+ Greg Kurz <groug@kaod.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Sat, 12 Oct 2019 11:04:03 +0800
-Tao Xu <tao3.xu@intel.com> wrote:
-
-> On 10/11/2019 10:08 PM, Igor Mammedov wrote:
-> > On Thu, 10 Oct 2019 14:53:56 +0800
-> > Tao Xu <tao3.xu@intel.com> wrote:
-> >   
-> >> On 10/3/2019 10:41 PM, Igor Mammedov wrote:  
-> >>> On Fri, 20 Sep 2019 15:43:47 +0800
-> >>> Tao Xu <tao3.xu@intel.com> wrote:
-> >>>      
-> >>>> From: Liu Jingqi <jingqi.liu@intel.com>
-> >>>>
-> >>>> This structure describes the memory access latency and bandwidth
-> >>>> information from various memory access initiator proximity domains.
-> >>>> The latency and bandwidth numbers represented in this structure
-> >>>> correspond to rated latency and bandwidth for the platform.
-> >>>> The software could use this information as hint for optimization.
-> >>>>
-> >>>> Signed-off-by: Liu Jingqi <jingqi.liu@intel.com>
-> >>>> Signed-off-by: Tao Xu <tao3.xu@intel.com>
-> >>>> ---
-> >>>>
-> >>>> Changes in v12:
-> >>>>       - Fix a bug that if HMAT is enabled and without hmat-lb setting,
-> >>>>         QEMU will crash. (reported by Danmei Wei)
-> >>>>
-> >>>> Changes in v11:
-> >>>>       - Calculate base in build_hmat_lb().
-> >>>> ---
-> >>>>    hw/acpi/hmat.c | 126 ++++++++++++++++++++++++++++++++++++++++++++++++-
-> >>>>    hw/acpi/hmat.h |   2 +
-> >>>>    2 files changed, 127 insertions(+), 1 deletion(-)
-> >>>>
-> >>>> diff --git a/hw/acpi/hmat.c b/hw/acpi/hmat.c
-> >>>> index 1368fce7ee..e7be849581 100644
-> >>>> --- a/hw/acpi/hmat.c
-> >>>> +++ b/hw/acpi/hmat.c
-> >>>> @@ -27,6 +27,7 @@
-> >>>>    #include "qemu/osdep.h"
-> >>>>    #include "sysemu/numa.h"
-> >>>>    #include "hw/acpi/hmat.h"
-> >>>> +#include "qemu/error-report.h"
-> >>>>    
-> >>>>    /*
-> >>>>     * ACPI 6.3:
-> >>>> @@ -67,11 +68,105 @@ static void build_hmat_mpda(GArray *table_data, uint16_t flags, int initiator,
-> >>>>        build_append_int_noprefix(table_data, 0, 8);
-> >>>>    }
-> >>>>    
-> >>>> +static bool entry_overflow(uint64_t *lb_data, uint64_t base, int len)
-> >>>> +{
-> >>>> +    int i;
-> >>>> +
-> >>>> +    for (i = 0; i < len; i++) {
-> >>>> +        if (lb_data[i] / base >= UINT16_MAX) {
-> >>>> +            return true;
-> >>>> +        }
-> >>>> +    }
-> >>>> +
-> >>>> +    return false;
-> >>>> +}  
-> >>> I suggest to do this check at CLI parsing time
-> >>>      
-> >>>> +/*
-> >>>> + * ACPI 6.3: 5.2.27.4 System Locality Latency and Bandwidth Information
-> >>>> + * Structure: Table 5-146
-> >>>> + */
-> >>>> +static void build_hmat_lb(GArray *table_data, HMAT_LB_Info *hmat_lb,
-> >>>> +                          uint32_t num_initiator, uint32_t num_target,
-> >>>> +                          uint32_t *initiator_list, int type)
-> >>>> +{
-> >>>> +    uint8_t mask = 0x0f;
-> >>>> +    uint32_t s = num_initiator;
-> >>>> +    uint32_t t = num_target;  
-> >>> drop this locals and use arguments directly
-> >>>      
-> >>>> +    uint64_t base = 1;
-> >>>> +    uint64_t *lb_data;
-> >>>> +    int i, unit;
-> >>>> +
-> >>>> +    /* Type */
-> >>>> +    build_append_int_noprefix(table_data, 1, 2);
-> >>>> +    /* Reserved */
-> >>>> +    build_append_int_noprefix(table_data, 0, 2);
-> >>>> +    /* Length */
-> >>>> +    build_append_int_noprefix(table_data, 32 + 4 * s + 4 * t + 2 * s * t, 4);  
-> >>>                                                ^^^^
-> >>> to me above looks like /dev/random output, absolutely unreadable.
-> >>> Suggest to use local var (like: lb_length) for expression with comments
-> >>> beside magic numbers.
-> >>>      
-> >>>> +    /* Flags: Bits [3:0] Memory Hierarchy, Bits[7:4] Reserved */
-> >>>> +    build_append_int_noprefix(table_data, hmat_lb->hierarchy & mask, 1);  
-> >>>
-> >>> why do you need to use mask here?
-> >>>      
-> >> Because Bits[7:4] Reserved, so I use mask to keep it reserved.  
-> > 
-> > these bits are not user provided and set to 0, if they get set it's
-> > programming error and instead of masking problem out QEMU should abort,
-> > I suggest replace masking with assert(!foo>>x).
-> >   
-> >>  
-> >>>> +    /* Data Type */
-> >>>> +    build_append_int_noprefix(table_data, hmat_lb->data_type, 1);  
-> >>>
-> >>> Isn't hmat_lb->data_type and passed argument 'type' the same?
-> >>>      
-> >> Yes, I will drop 'type'.  
-> >>>      
-> >>>> +    /* Reserved */
-> >>>> +    build_append_int_noprefix(table_data, 0, 2);
-> >>>> +    /* Number of Initiator Proximity Domains (s) */
-> >>>> +    build_append_int_noprefix(table_data, s, 4);
-> >>>> +    /* Number of Target Proximity Domains (t) */
-> >>>> +    build_append_int_noprefix(table_data, t, 4);
-> >>>> +    /* Reserved */
-> >>>> +    build_append_int_noprefix(table_data, 0, 4);
-> >>>> +
-> >>>> +    if (HMAT_IS_LATENCY(type)) {
-> >>>> +        unit = 1000;
-> >>>> +        lb_data = hmat_lb->latency;
-> >>>> +    } else {
-> >>>> +        unit = 1024;
-> >>>> +        lb_data = hmat_lb->bandwidth;
-> >>>> +    }
-> >>>> +
-> >>>> +    while (entry_overflow(lb_data, base, s * t)) {
-> >>>> +        for (i = 0; i < s * t; i++) {
-> >>>> +            if (!QEMU_IS_ALIGNED(lb_data[i], unit * base)) {
-> >>>> +                error_report("Invalid latency/bandwidth input, all "
-> >>>> +                "latencies/bandwidths should be specified in the same units.");
-> >>>> +                exit(1);
-> >>>> +            }
-> >>>> +        }
-> >>>> +        base *= unit;
-> >>>> +    }  
-> >>> Can you clarify what you are trying to check here?
-> >>>      
-> >> This part I use entry_overflow() to check if uint16 can store entry. If
-> >> can't store and the entries matrix can be divisible by unit * base, then
-> >> base will be unit * base.
-> >>
-> >> For example, if lb_data[i] are 1048576(1TB/s) and 1024(1GB/s), unit is
-> >> 1024, so 1048576 is bigger than UINT16_MAX, and can be divisible by 1024
-> >> * 1, so base is 1024 and entries are 1024 and 1 (see entry =
-> >> hmat_lb->latency[i] / base;). The benefit is even user input different
-> >> unit(TB/s vs GB/s), we can still store the data as far as possible.  
-> > 
-> > Is it possible instead of doing multiple iterations over lb_data
-> > until it finds valid base, just go over lb_data once to find MIN/MAX
-> > and then calculate base using it. Error out with max/min offending
-> > values if it's not possible to compress the range into uint16_t?
-> >   
-> 
-> Although we tell user input same unit data, such as use 1GB/s 3GB/s. If 
-> user input data such as 1048575, 1048576(1TB/s) and 1024(1GB/s), then we 
-> will get 1024 * (1023 1024 1). I am wondering if it is appropriate 
-> because we lose a float number(0.999020). But in our codes, it will 
-> raise error. 
-I do not understand what you are trying to say here, could you rephrase
-it, so the problem would be more clear, please?
-
+MTIuMTAuMjAxOSA5OjMzLCBQaGlsaXBwZSBNYXRoaWV1LURhdWTDqSB3cm90ZToNCj4gT24gMTAv
+MTEvMTkgNjowNSBQTSwgVmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSB3cm90ZToNCj4+IElm
+IHdlIHdhbnQgdG8gYWRkIHNvbWUgaW5mbyB0byBlcnJwIChieSBlcnJvcl9wcmVwZW5kKCkgb3IN
+Cj4+IGVycm9yX2FwcGVuZF9oaW50KCkpLCB3ZSBtdXN0IHVzZSB0aGUgRVJSUF9BVVRPX1BST1BB
+R0FURSBtYWNyby4NCj4+IE90aGVyd2lzZSwgdGhpcyBpbmZvIHdpbGwgbm90IGJlIGFkZGVkIHdo
+ZW4gZXJycCA9PSAmZmF0YWxfZXJyDQo+PiAodGhlIHByb2dyYW0gd2lsbCBleGl0IHByaW9yIHRv
+IHRoZSBlcnJvcl9hcHBlbmRfaGludCgpIG9yDQo+PiBlcnJvcl9wcmVwZW5kKCkgY2FsbCkuwqAg
+Rml4IHN1Y2ggY2FzZXMuDQo+Pg0KPj4gSWYgd2Ugd2FudCB0byBjaGVjayBlcnJvciBhZnRlciBl
+cnJwLWZ1bmN0aW9uIGNhbGwsIHdlIG5lZWQgdG8NCj4+IGludHJvZHVjZSBsb2NhbF9lcnIgYW5k
+IHRoYW4gcHJvcGFnYXRlIGl0IHRvIGVycnAuIEluc3RlYWQsIHVzZQ0KPj4gRVJSUF9BVVRPX1BS
+T1BBR0FURSBtYWNybywgYmVuZWZpdHMgYXJlOg0KPj4gMS4gTm8gbmVlZCBvZiBleHBsaWNpdCBl
+cnJvcl9wcm9wYWdhdGUgY2FsbA0KPj4gMi4gTm8gbmVlZCBvZiBleHBsaWNpdCBsb2NhbF9lcnIg
+dmFyaWFibGU6IHVzZSBlcnJwIGRpcmVjdGx5DQo+PiAzLiBFUlJQX0FVVE9fUFJPUEFHQVRFIGxl
+YXZlcyBlcnJwIGFzIGlzIGlmIGl0J3Mgbm90IE5VTEwgb3INCj4+IMKgwqDCoCAmZXJyb3JfZmF0
+ZWwsIHRoaXMgbWVhbnMgdGhhdCB3ZSBkb24ndCBicmVhayBlcnJvcl9hYm9ydA0KPj4gwqDCoMKg
+ICh3ZSdsbCBhYm9ydCBvbiBlcnJvcl9zZXQsIG5vdCBvbiBlcnJvcl9wcm9wYWdhdGUpDQo+Pg0K
+Pj4gVGhpcyBjb21taXQgKHRvZ2V0aGVyIHdpdGggaXRzIG5laWdoYm9ycykgd2FzIGdlbmVyYXRl
+ZCBieQ0KPj4NCj4+IGZvciBmIGluICQoZ2l0IGdyZXAgLWwgZXJycCBcKi5bY2hdKTsgZG8gXA0K
+Pj4gwqDCoMKgwqAgc3BhdGNoIC0tc3AtZmlsZSBzY3JpcHRzL2NvY2NpbmVsbGUvYXV0by1wcm9w
+YWdhdGVkLWVycnAuY29jY2kgXA0KPj4gwqDCoMKgwqAgLS1tYWNyby1maWxlIHNjcmlwdHMvY29j
+Y2ktbWFjcm8tZmlsZS5oIC0taW4tcGxhY2UgLS1uby1zaG93LWRpZmYgJGY7IFwNCj4+IGRvbmU7
+DQo+Pg0KPj4gdGhlbiBmaXggYSBiaXQgb2YgY29tcGlsYXRpb24gcHJvYmxlbXM6IGNvY2NpbmVs
+bGUgZm9yIHNvbWUgcmVhc29uDQo+PiBsZWF2ZXMgc2V2ZXJhbA0KPj4gZigpIHsNCj4+IMKgwqDC
+oMKgIC4uLg0KPj4gwqDCoMKgwqAgZ290byBvdXQ7DQo+PiDCoMKgwqDCoCAuLi4NCj4+IMKgwqDC
+oMKgIG91dDoNCj4+IH0NCj4+IHBhdHRlcm5zLCB3aXRoICJvdXQ6IiBhdCBmdW5jdGlvbiBlbmQu
+DQo+Pg0KPj4gdGhlbg0KPj4gLi9weXRob24vY29tbWl0LXBlci1zdWJzeXN0ZW0ucHkgTUFJTlRB
+SU5FUlMgIiQoPCBhdXRvLW1zZykiDQo+Pg0KPj4gKGF1dG8tbXNnIHdhcyBhIGZpbGUgd2l0aCB0
+aGlzIGNvbW1pdCBtZXNzYWdlKQ0KPj4NCj4+IFN0aWxsLCBmb3IgYmFja3BvcnRpbmcgaXQgbWF5
+IGJlIG1vcmUgY29tZm9ydGFibGUgdG8gdXNlIG9ubHkgdGhlIGZpcnN0DQo+PiBjb21tYW5kIGFu
+ZCB0aGVuIGRvIG9uZSBodWdlIGNvbW1pdC4NCj4+DQo+PiBSZXBvcnRlZC1ieTogS2V2aW4gV29s
+ZiA8a3dvbGZAcmVkaGF0LmNvbT4NCj4+IFJlcG9ydGVkLWJ5OiBHcmVnIEt1cnogPGdyb3VnQGth
+b2Qub3JnPg0KPj4gU2lnbmVkLW9mZi1ieTogVmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSA8
+dnNlbWVudHNvdkB2aXJ0dW96em8uY29tPg0KPj4gLS0tDQo+PiDCoCBody9zZC9zc2ktc2QuYyB8
+IDE0ICsrKysrKysrLS0tLS0tDQo+PiDCoCAxIGZpbGUgY2hhbmdlZCwgOCBpbnNlcnRpb25zKCsp
+LCA2IGRlbGV0aW9ucygtKQ0KPj4NCj4+IGRpZmYgLS1naXQgYS9ody9zZC9zc2ktc2QuYyBiL2h3
+L3NkL3NzaS1zZC5jDQo+PiBpbmRleCA5MWRiMDY5MjEyLi5mNDIyMDRkNjQ5IDEwMDY0NA0KPj4g
+LS0tIGEvaHcvc2Qvc3NpLXNkLmMNCj4+ICsrKyBiL2h3L3NkL3NzaS1zZC5jDQo+PiBAQCAtMjQx
+LDEwICsyNDEsMTAgQEAgc3RhdGljIGNvbnN0IFZNU3RhdGVEZXNjcmlwdGlvbiB2bXN0YXRlX3Nz
+aV9zZCA9IHsNCj4+IMKgIHN0YXRpYyB2b2lkIHNzaV9zZF9yZWFsaXplKFNTSVNsYXZlICpkLCBF
+cnJvciAqKmVycnApDQo+PiDCoCB7DQo+PiArwqDCoMKgIEVSUlBfQVVUT19QUk9QQUdBVEUoKTsN
+Cj4+IMKgwqDCoMKgwqAgc3NpX3NkX3N0YXRlICpzID0gRlJPTV9TU0lfU0xBVkUoc3NpX3NkX3N0
+YXRlLCBkKTsNCj4+IMKgwqDCoMKgwqAgRGV2aWNlU3RhdGUgKmNhcmRkZXY7DQo+PiDCoMKgwqDC
+oMKgIERyaXZlSW5mbyAqZGluZm87DQo+PiAtwqDCoMKgIEVycm9yICplcnIgPSBOVUxMOw0KPj4g
+wqDCoMKgwqDCoCBxYnVzX2NyZWF0ZV9pbnBsYWNlKCZzLT5zZGJ1cywgc2l6ZW9mKHMtPnNkYnVz
+KSwgVFlQRV9TRF9CVVMsDQo+PiDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgwqDCoMKgwqDCoCBERVZJQ0UoZCksICJzZC1idXMiKTsNCj4+IEBAIC0yNTQsMTIgKzI1NCwx
+NCBAQCBzdGF0aWMgdm9pZCBzc2lfc2RfcmVhbGl6ZShTU0lTbGF2ZSAqZCwgRXJyb3IgKiplcnJw
+KQ0KPj4gwqDCoMKgwqDCoCBkaW5mbyA9IGRyaXZlX2dldF9uZXh0KElGX1NEKTsNCj4+IMKgwqDC
+oMKgwqAgY2FyZGRldiA9IHFkZXZfY3JlYXRlKEJVUygmcy0+c2RidXMpLCBUWVBFX1NEX0NBUkQp
+Ow0KPj4gwqDCoMKgwqDCoCBpZiAoZGluZm8pIHsNCj4+IC3CoMKgwqDCoMKgwqDCoCBxZGV2X3By
+b3Bfc2V0X2RyaXZlKGNhcmRkZXYsICJkcml2ZSIsIGJsa19ieV9sZWdhY3lfZGluZm8oZGluZm8p
+LCAmZXJyKTsNCj4+ICvCoMKgwqDCoMKgwqDCoCBxZGV2X3Byb3Bfc2V0X2RyaXZlKGNhcmRkZXYs
+ICJkcml2ZSIsIGJsa19ieV9sZWdhY3lfZGluZm8oZGluZm8pLA0KPj4gK8KgwqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBlcnJwKTsNCj4gDQo+IFRo
+aXMgZml0cyA3MiBjaGFycywgY2FuIHlvdSBrZWVwIGl0IGluIHRoZSBzYW1lIGxpbmU/DQoNCkhv
+bmVzdGx5LCBJJ2QgcHJlZmVyIG5vdCBmaXhpbmcgY29kZSBzdHlsZSBpbiB0aGVzZSAxMDAgYXV0
+by1nZW5lcmF0ZWQgY29tbWl0cy4uLg0KQnV0IGlmIG9ubHkgeW91IHJlcXVlc3QgdGhpcywgaXQn
+cyBub3QgYSBwcm9ibGVtLg0KDQo+IA0KPj4gwqDCoMKgwqDCoCB9DQo+PiAtwqDCoMKgIG9iamVj
+dF9wcm9wZXJ0eV9zZXRfYm9vbChPQkpFQ1QoY2FyZGRldiksIHRydWUsICJzcGkiLCAmZXJyKTsN
+Cj4+IC3CoMKgwqAgb2JqZWN0X3Byb3BlcnR5X3NldF9ib29sKE9CSkVDVChjYXJkZGV2KSwgdHJ1
+ZSwgInJlYWxpemVkIiwgJmVycik7DQo+PiAtwqDCoMKgIGlmIChlcnIpIHsNCj4+IC3CoMKgwqDC
+oMKgwqDCoCBlcnJvcl9zZXRnKGVycnAsICJmYWlsZWQgdG8gaW5pdCBTRCBjYXJkOiAlcyIsIGVy
+cm9yX2dldF9wcmV0dHkoZXJyKSk7DQo+PiArwqDCoMKgIG9iamVjdF9wcm9wZXJ0eV9zZXRfYm9v
+bChPQkpFQ1QoY2FyZGRldiksIHRydWUsICJzcGkiLCBlcnJwKTsNCj4+ICvCoMKgwqAgb2JqZWN0
+X3Byb3BlcnR5X3NldF9ib29sKE9CSkVDVChjYXJkZGV2KSwgdHJ1ZSwgInJlYWxpemVkIiwgZXJy
+cCk7DQo+PiArwqDCoMKgIGlmICgqZXJycCkgew0KPj4gK8KgwqDCoMKgwqDCoMKgIGVycm9yX3Nl
+dGcoZXJycCwgImZhaWxlZCB0byBpbml0IFNEIGNhcmQ6ICVzIiwNCj4+ICvCoMKgwqDCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgZXJyb3JfZ2V0X3ByZXR0eSgqZXJycCkpOw0KPiANCj4g
+RGl0dG8uLi4NCj4gDQo+PiDCoMKgwqDCoMKgwqDCoMKgwqAgcmV0dXJuOw0KPj4gwqDCoMKgwqDC
+oCB9DQo+PiDCoCB9DQo+Pg0KPiANCj4gSWYgcG9zc2libGUgcGxlYXNlIHNxdWFzaCB3aXRoICI0
+Ny8xMjYgU0QgKFNlY3VyZSBDYXJkKSINCg0KSG1tIHRoaXMgaXMgaW4gc2VwYXJhdGUsIGFzIGl0
+J3MgdW5tYWludGFpbmVkIGFjY29yZGluZ2x5IHRvIE1BSU5UQUlORVJTLiBJJ2xsIHJlYmFzZQ0K
+dGhlIG5leHQgdmVyc2lvbiBvbiB5b3VyIE1BSU5UQUlORVJTLWZpeGVzIGFuZCBpdCBzaG91bGQg
+d29yay4NCg0KPiANCj4gUmV2aWV3ZWQtYnk6IFBoaWxpcHBlIE1hdGhpZXUtRGF1ZMOpIDxwaGls
+bWRAcmVkaGF0LmNvbT4NCg0KVGhhbmtzIQ0KDQotLSANCkJlc3QgcmVnYXJkcywNClZsYWRpbWly
+DQo=
 
