@@ -2,81 +2,142 @@ Return-Path: <SRS0=PUPy=YH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BBB8CECE58E
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 18:13:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AE4D1C4CECE
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 18:15:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8FC9D217D9
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 18:13:01 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Vv6vKvjo"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8FC9D217D9
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 888302067B
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 18:15:14 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 888302067B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55226 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55238 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iK4q3-0005tK-PU
-	for qemu-devel@archiver.kernel.org; Mon, 14 Oct 2019 14:12:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54642)
+	id 1iK4sD-0007Oq-Lu
+	for qemu-devel@archiver.kernel.org; Mon, 14 Oct 2019 14:15:13 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55266)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alistair23@gmail.com>) id 1iK4iq-0001mF-Tx
- for qemu-devel@nongnu.org; Mon, 14 Oct 2019 14:05:34 -0400
+ (envelope-from <jsnow@redhat.com>) id 1iK4nb-0004rP-9b
+ for qemu-devel@nongnu.org; Mon, 14 Oct 2019 14:10:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alistair23@gmail.com>) id 1iK4io-0002RK-KM
- for qemu-devel@nongnu.org; Mon, 14 Oct 2019 14:05:32 -0400
-Received: from mail-lj1-x241.google.com ([2a00:1450:4864:20::241]:46005)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alistair23@gmail.com>)
- id 1iK4io-0002QX-B4; Mon, 14 Oct 2019 14:05:30 -0400
-Received: by mail-lj1-x241.google.com with SMTP id q64so17516944ljb.12;
- Mon, 14 Oct 2019 11:05:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=jMvhxdWzNtdIXTeuZyyU9CkWelT0B+uy8QsZVEjSeOg=;
- b=Vv6vKvjomKgXj7xXSdOAD8IL9nth69qRE0YWYCZ7Nrt6ZgEsLLm9gz3XT/5COVTpYp
- NnXKcZuC4763dw9mZvPPKh+2kFmKwvDJCVcDsSTTzmt7TpxuTzOSbqp2TCOPrFJBKyCY
- MvXUByaxiqfLIq208uLwavLlm9gKd99ZapniOnz7B1nOnrd1XNlhRFZBM7u154ArKT0G
- Jad8OTYhXRrtW+/gDF06olZ+xlEvMweQ8xUEKahwtuxCwb2yCg5HHoUbJEgO2Gi96qaV
- RGTJqnwWADpcAk8EMmr3b2yPjWU/iC2HmkfbVY9mEtyBVxj2EfJXNr0BVpWD28Kj38b2
- sgxA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=jMvhxdWzNtdIXTeuZyyU9CkWelT0B+uy8QsZVEjSeOg=;
- b=FwG0BtQHIfuRItgghYi/RymuGKfYXnk5H6VMtGA44GTgSWTI50XDJRKT7nctIkafAl
- nIlck3AoTFYOtRHME+MsTNoqoSFSCxNC38Rmml6HQh95IiJlC1m6F75doUs9EmJv5qvW
- TdvTCFbDTO618tb7v5Erc9u+E00jwa/ok7yz+D4/k5f6veUMbgF6I7VUyUUDwJgNB/8U
- vWY9naD3r1tl0rYRLa3tmKbNbwZS5YWAA4fyKFvGzL8ey3hLEUYdTxlKgQawuf3ibjZ9
- cazvS1ad/ZjM5eV7NKB8e/9IjIZ2lgvKyVm50K96SaAfdewzOu2bkKBqfNNC3vzU4FhC
- ShEw==
-X-Gm-Message-State: APjAAAVtUuZjx6iR0qnCch0zzDTPsluFsx7YOhqwryOrZIQZ6SV4feRI
- Zi5IlXAsP0RsKWjZHJy2KLww5PACyGPTisjWgzc=
-X-Google-Smtp-Source: APXvYqyIoDeTn3P2wfE+yvHWILp6fNb4uvucDQ4uGMiL5W9qfO+mOQ58T/S8g4CvMnVtoAL/x1uGDAoBolapmJjwRyI=
-X-Received: by 2002:a2e:b010:: with SMTP id y16mr7530523ljk.147.1571076327873; 
- Mon, 14 Oct 2019 11:05:27 -0700 (PDT)
+ (envelope-from <jsnow@redhat.com>) id 1iK4nY-0003d2-0C
+ for qemu-devel@nongnu.org; Mon, 14 Oct 2019 14:10:27 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:57292)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <jsnow@redhat.com>)
+ id 1iK4nS-0003bu-Kk; Mon, 14 Oct 2019 14:10:18 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 505ED3082A8D;
+ Mon, 14 Oct 2019 18:10:16 +0000 (UTC)
+Received: from [10.18.17.152] (dhcp-17-152.bos.redhat.com [10.18.17.152])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 6D7D95D6A3;
+ Mon, 14 Oct 2019 18:10:10 +0000 (UTC)
+Subject: Re: [PULL 01/19] util/hbitmap: strict hbitmap_reset
+From: John Snow <jsnow@redhat.com>
+To: Eric Blake <eblake@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, 
+ qemu-devel@nongnu.org
+References: <20191011212550.27269-1-jsnow@redhat.com>
+ <20191011212550.27269-2-jsnow@redhat.com>
+ <15c20480-0240-bdd2-2cc2-60c388022e86@redhat.com>
+ <e403b26e-5775-a134-b23f-2fbc698dca25@redhat.com>
+Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+Message-ID: <0642e0a5-4304-6e7a-318e-0251c9642f46@redhat.com>
+Date: Mon, 14 Oct 2019 14:10:09 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.0
 MIME-Version: 1.0
-References: <20191014154529.287048-1-jonathan@fintelia.io>
- <20191014154529.287048-3-jonathan@fintelia.io>
-In-Reply-To: <20191014154529.287048-3-jonathan@fintelia.io>
-From: Alistair Francis <alistair23@gmail.com>
-Date: Mon, 14 Oct 2019 11:00:22 -0700
-Message-ID: <CAKmqyKOGWMDDm1-VRcQZJB3La3=2tcDw3oHpWjJBCirMrcGX8g@mail.gmail.com>
-Subject: Re: [PATCH v4 2/3] target/riscv: Expose "priv" register for GDB for
- reads
-To: Jonathan Behrens <jonathan@fintelia.io>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::241
+In-Reply-To: <e403b26e-5775-a134-b23f-2fbc698dca25@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.45]); Mon, 14 Oct 2019 18:10:16 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,141 +149,96 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "open list:RISC-V" <qemu-riscv@nongnu.org>,
- Sagar Karandikar <sagark@eecs.berkeley.edu>,
- Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
- Palmer Dabbelt <palmer@sifive.com>,
- "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
- =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
- Alistair Francis <Alistair.Francis@wdc.com>,
- =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
+Cc: Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>,
+ Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org,
+ Juan Quintela <quintela@redhat.com>, libvir-list@redhat.com,
+ Markus Armbruster <armbru@redhat.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Max Reitz <mreitz@redhat.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, Oct 14, 2019 at 8:50 AM Jonathan Behrens <jonathan@fintelia.io> wrote:
->
-> This patch enables a debugger to read the current privilege level via a virtual
-> "priv" register. When compiled with CONFIG_USER_ONLY the register is still
-> visible but always reports the value zero.
->
-> Signed-off-by: Jonathan Behrens <jonathan@fintelia.io>
 
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 
-Alistair
+On 10/11/19 7:18 PM, John Snow wrote:
+>=20
+>=20
+> On 10/11/19 5:48 PM, Eric Blake wrote:
+>> On 10/11/19 4:25 PM, John Snow wrote:
+>>> From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+>>>
+>>> hbitmap_reset has an unobvious property: it rounds requested region u=
+p.
+>>> It may provoke bugs, like in recently fixed write-blocking mode of
+>>> mirror: user calls reset on unaligned region, not keeping in mind tha=
+t
+>>> there are possible unrelated dirty bytes, covered by rounded-up regio=
+n
+>>> and information of this unrelated "dirtiness" will be lost.
+>>>
+>>> Make hbitmap_reset strict: assert that arguments are aligned, allowin=
+g
+>>> only one exception when @start + @count =3D=3D hb->orig_size. It's ne=
+eded
+>>> to comfort users of hbitmap_next_dirty_area, which cares about
+>>> hb->orig_size.
+>>>
+>>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com=
+>
+>>> Reviewed-by: Max Reitz <mreitz@redhat.com>
+>>> Message-Id: <20190806152611.280389-1-vsementsov@virtuozzo.com>
+>>> [Maintainer edit: Max's suggestions from on-list. --js]
+>>> Signed-off-by: John Snow <jsnow@redhat.com>
+>>> ---
+>>> =C2=A0 include/qemu/hbitmap.h | 5 +++++
+>>> =C2=A0 tests/test-hbitmap.c=C2=A0=C2=A0 | 2 +-
+>>> =C2=A0 util/hbitmap.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+ | 4 ++++
+>>> =C2=A0 3 files changed, 10 insertions(+), 1 deletion(-)
+>>>
+>>
+>>> +++ b/util/hbitmap.c
+>>> @@ -476,6 +476,10 @@ void hbitmap_reset(HBitmap *hb, uint64_t start,
+>>> uint64_t count)
+>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 /* Compute range in the last layer.=C2=
+=A0 */
+>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 uint64_t first;
+>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 uint64_t last =3D start + count - 1;
+>>> +=C2=A0=C2=A0=C2=A0 uint64_t gran =3D 1ULL << hb->granularity;
+>>> +
+>>> +=C2=A0=C2=A0=C2=A0 assert(!(start & (gran - 1)));
+>>> +=C2=A0=C2=A0=C2=A0 assert(!(count & (gran - 1)) || (start + count =3D=
+=3D hb->orig_size));
+>>
+>> I know I'm replying a bit late (since this is now a pull request), but
+>> would it be worth using the dedicated macro:
+>>
+>> assert(QEMU_IS_ALIGNED(start, gran));
+>> assert(QEMU_IS_ALIGNED(count, gran) || start + count =3D=3D hb->orig_s=
+ize);
+>>
+>> instead of open-coding it?=C2=A0 (I would also drop the extra () aroun=
+d the
+>> right half of ||). If we want it, that would now be a followup patch.
 
-> ---
->  configure                       |  4 ++--
->  gdb-xml/riscv-32bit-virtual.xml | 11 +++++++++++
->  gdb-xml/riscv-64bit-virtual.xml | 11 +++++++++++
->  target/riscv/gdbstub.c          | 23 +++++++++++++++++++++++
->  4 files changed, 47 insertions(+), 2 deletions(-)
->  create mode 100644 gdb-xml/riscv-32bit-virtual.xml
->  create mode 100644 gdb-xml/riscv-64bit-virtual.xml
->
-> diff --git a/configure b/configure
-> index 30544f52e6..6118a6a045 100755
-> --- a/configure
-> +++ b/configure
-> @@ -7520,13 +7520,13 @@ case "$target_name" in
->      TARGET_BASE_ARCH=riscv
->      TARGET_ABI_DIR=riscv
->      mttcg=yes
-> -    gdb_xml_files="riscv-32bit-cpu.xml riscv-32bit-fpu.xml riscv-32bit-csr.xml"
-> +    gdb_xml_files="riscv-32bit-cpu.xml riscv-32bit-fpu.xml riscv-32bit-csr.xml riscv-32bit-virtual.xml"
->    ;;
->    riscv64)
->      TARGET_BASE_ARCH=riscv
->      TARGET_ABI_DIR=riscv
->      mttcg=yes
-> -    gdb_xml_files="riscv-64bit-cpu.xml riscv-64bit-fpu.xml riscv-64bit-csr.xml"
-> +    gdb_xml_files="riscv-64bit-cpu.xml riscv-64bit-fpu.xml riscv-64bit-csr.xml riscv-64bit-virtual.xml"
->    ;;
->    sh4|sh4eb)
->      TARGET_ARCH=sh4
-> diff --git a/gdb-xml/riscv-32bit-virtual.xml b/gdb-xml/riscv-32bit-virtual.xml
-> new file mode 100644
-> index 0000000000..905f1c555d
-> --- /dev/null
-> +++ b/gdb-xml/riscv-32bit-virtual.xml
-> @@ -0,0 +1,11 @@
-> +<?xml version="1.0"?>
-> +<!-- Copyright (C) 2018-2019 Free Software Foundation, Inc.
-> +
-> +     Copying and distribution of this file, with or without modification,
-> +     are permitted in any medium without royalty provided the copyright
-> +     notice and this notice are preserved.  -->
-> +
-> +<!DOCTYPE feature SYSTEM "gdb-target.dtd">
-> +<feature name="org.gnu.gdb.riscv.virtual">
-> +  <reg name="priv" bitsize="32"/>
-> +</feature>
-> diff --git a/gdb-xml/riscv-64bit-virtual.xml b/gdb-xml/riscv-64bit-virtual.xml
-> new file mode 100644
-> index 0000000000..62d86c237b
-> --- /dev/null
-> +++ b/gdb-xml/riscv-64bit-virtual.xml
-> @@ -0,0 +1,11 @@
-> +<?xml version="1.0"?>
-> +<!-- Copyright (C) 2018-2019 Free Software Foundation, Inc.
-> +
-> +     Copying and distribution of this file, with or without modification,
-> +     are permitted in any medium without royalty provided the copyright
-> +     notice and this notice are preserved.  -->
-> +
-> +<!DOCTYPE feature SYSTEM "gdb-target.dtd">
-> +<feature name="org.gnu.gdb.riscv.virtual">
-> +  <reg name="priv" bitsize="64"/>
-> +</feature>
-> diff --git a/target/riscv/gdbstub.c b/target/riscv/gdbstub.c
-> index cb5bfd3d50..1f71604b78 100644
-> --- a/target/riscv/gdbstub.c
-> +++ b/target/riscv/gdbstub.c
-> @@ -373,6 +373,23 @@ static int riscv_gdb_set_csr(CPURISCVState *env, uint8_t *mem_buf, int n)
->      return 0;
->  }
->
-> +static int riscv_gdb_get_virtual(CPURISCVState *cs, uint8_t *mem_buf, int n)
-> +{
-> +    if (n == 0) {
-> +#ifdef CONFIG_USER_ONLY
-> +        return gdb_get_regl(mem_buf, 0);
-> +#else
-> +        return gdb_get_regl(mem_buf, cs->priv);
-> +#endif
-> +    }
-> +    return 0;
-> +}
-> +
-> +static int riscv_gdb_set_virtual(CPURISCVState *cs, uint8_t *mem_buf, int n)
-> +{
-> +    return 0;
-> +}
-> +
->  void riscv_cpu_register_gdb_regs_for_features(CPUState *cs)
->  {
->      RISCVCPU *cpu = RISCV_CPU(cs);
-> @@ -385,6 +402,9 @@ void riscv_cpu_register_gdb_regs_for_features(CPUState *cs)
->
->      gdb_register_coprocessor(cs, riscv_gdb_get_csr, riscv_gdb_set_csr,
->                               240, "riscv-32bit-csr.xml", 0);
-> +
-> +    gdb_register_coprocessor(cs, riscv_gdb_get_virtual, riscv_gdb_set_virtual,
-> +                             1, "riscv-32bit-virtual.xml", 0);
->  #elif defined(TARGET_RISCV64)
->      if (env->misa & RVF) {
->          gdb_register_coprocessor(cs, riscv_gdb_get_fpu, riscv_gdb_set_fpu,
-> @@ -393,5 +413,8 @@ void riscv_cpu_register_gdb_regs_for_features(CPUState *cs)
->
->      gdb_register_coprocessor(cs, riscv_gdb_get_csr, riscv_gdb_set_csr,
->                               240, "riscv-64bit-csr.xml", 0);
-> +
-> +    gdb_register_coprocessor(cs, riscv_gdb_get_virtual, riscv_gdb_set_virtual,
-> +                             1, "riscv-64bit-virtual.xml", 0);
->  #endif
->  }
-> --
-> 2.23.0
->
+I've noticed that seasoned C programmers hate extra parentheses a lot.
+I've noticed that I cannot remember operator precedence enough to ever
+feel like this is actually an improvement.
+
+Something about a nice weighted tree of ((expr1) || (expr2)) feels
+soothing to my weary eyes. So, if it's not terribly important, I'd
+prefer to leave it as-is.
+
+(You may feel free to counter-educate me as desired.)
+
+>>
+>=20
+> If the PR doesn't make it for some reason, I can amend a cleanup patch
+> for the next PR.
+>=20
+
+by the way: GOOD NEWS! ...
+
+--js
 
