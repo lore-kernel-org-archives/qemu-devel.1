@@ -7,59 +7,59 @@ X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D85B8C4CECE
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 06:03:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 047E0C4CECE
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 06:14:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9D09F20650
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 06:03:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C38EF20650
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 06:14:13 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="AIfE6FJt"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9D09F20650
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="ispLL6kR"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C38EF20650
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44830 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44902 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iJtSR-0004Oh-PX
-	for qemu-devel@archiver.kernel.org; Mon, 14 Oct 2019 02:03:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34671)
+	id 1iJtcS-0008G9-UV
+	for qemu-devel@archiver.kernel.org; Mon, 14 Oct 2019 02:14:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37169)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgibson@ozlabs.org>) id 1iJtNx-0000Dc-Nb
- for qemu-devel@nongnu.org; Mon, 14 Oct 2019 01:59:15 -0400
+ (envelope-from <dgibson@ozlabs.org>) id 1iJtbj-0007l6-GW
+ for qemu-devel@nongnu.org; Mon, 14 Oct 2019 02:13:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1iJtNw-0004Lj-3s
- for qemu-devel@nongnu.org; Mon, 14 Oct 2019 01:59:13 -0400
-Received: from bilbo.ozlabs.org ([2401:3900:2:1::2]:59023 helo=ozlabs.org)
+ (envelope-from <dgibson@ozlabs.org>) id 1iJtbi-0002Kb-4a
+ for qemu-devel@nongnu.org; Mon, 14 Oct 2019 02:13:27 -0400
+Received: from ozlabs.org ([203.11.71.1]:60739)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1iJtNv-0004KY-9x; Mon, 14 Oct 2019 01:59:12 -0400
+ id 1iJtbh-0002Jc-P3; Mon, 14 Oct 2019 02:13:26 -0400
 Received: by ozlabs.org (Postfix, from userid 1007)
- id 46s7D85k3Vz9sPh; Mon, 14 Oct 2019 16:59:04 +1100 (AEDT)
+ id 46s7Xd0Jgkz9sPj; Mon, 14 Oct 2019 17:13:20 +1100 (AEDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1571032744;
- bh=vX0AubCGIwk3bW9+Qwp20WoFFx7C4/mznICav8Fa1ic=;
+ d=gibson.dropbear.id.au; s=201602; t=1571033601;
+ bh=bbr38Vy+6E26aimSStDAkf3wkCQ+2u2N7Kpmu0BuaVw=;
  h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=AIfE6FJtEt5qJZUWraPZONhdWwckhUStKzuGCY4BaAh7Tk5T3sr4ev93rSusKZElJ
- R5Qc+RynGdCH1oCka5zYc0r0oQBN72FD22PqMJs3IqHbgKD8NwDtik5Zv8YQZxIoGc
- bSOayG9ET8JIvYauPNlumM8CdE2tFjpNm82nHjDE=
-Date: Mon, 14 Oct 2019 16:28:24 +1100
+ b=ispLL6kR6wDJlqfAf78o8mJmBx5HHYy6gwqFhPJqH5UXBEamXBu8r4kzPGA9A1o1G
+ e9OTAPCwuK7H3E16u3z1kgaMu4wcWCGqugbaDb0TjAuA//oYxPwa9HuITG2xdAk1yc
+ cCjbUuN285Y4Bcgki9sW3ezu4Uhdgzo+z0iXsc6U=
+Date: Mon, 14 Oct 2019 17:12:47 +1100
 From: David Gibson <david@gibson.dropbear.id.au>
-To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
-Subject: Re: [PATCH 1/9] ppc/pnv: Improve trigger data definition
-Message-ID: <20191014052824.GS4080@umbus.fritz.box>
-References: <20191007084102.29776-1-clg@kaod.org>
- <20191007084102.29776-2-clg@kaod.org>
+To: Greg Kurz <groug@kaod.org>
+Subject: Re: [PATCH 7/7] spapr: Set VSMT to smp_threads by default
+Message-ID: <20191014061247.GZ4080@umbus.fritz.box>
+References: <157010404888.246126.9768030542733152637.stgit@bahia.lan>
+ <157010411885.246126.12610015369068227139.stgit@bahia.lan>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="cjNiBkmi8s9yAE0W"
+ protocol="application/pgp-signature"; boundary="KLINyTCByxgMLuN/"
 Content-Disposition: inline
-In-Reply-To: <20191007084102.29776-2-clg@kaod.org>
+In-Reply-To: <157010411885.246126.12610015369068227139.stgit@bahia.lan>
 User-Agent: Mutt/1.12.1 (2019-06-15)
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2401:3900:2:1::2
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 203.11.71.1
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -71,187 +71,102 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Greg Kurz <groug@kaod.org>
+Cc: qemu-ppc@nongnu.org, =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
---cjNiBkmi8s9yAE0W
-Content-Type: text/plain; charset=utf-8
+--KLINyTCByxgMLuN/
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Oct 07, 2019 at 10:40:54AM +0200, C=C3=A9dric Le Goater wrote:
-> The trigger data is used for both triggers of a HW source interrupts,
-> PHB, PSI, and triggers for rerouting interrupts between interrupt
-> controllers.
+On Thu, Oct 03, 2019 at 02:02:00PM +0200, Greg Kurz wrote:
+> Support for setting VSMT is available in KVM since linux-4.13. Most distr=
+os
+> that support KVM on POWER already have it. It thus seem reasonable enough
+> to have the default machine to set VSMT to smp_threads.
 >=20
-> When an interrupt is rerouted, the trigger data follows an "END
-> trigger" format. In that case, the remote IC needs EAS containing an
-> END index to perform a lookup of an END.
+> This brings contiguous VCPU ids and thus brings their upper bound down to
+> the machine's max_cpus. This is especially useful for XIVE KVM devices,
+> which may thus allocate only one VP descriptor per VCPU.
 >=20
-> An END trigger, bit0 of word0 set to '1', is defined as :
->=20
->              |0123|4567|0123|4567|0123|4567|0123|4567|
->     W0 E=3D1   |1P--|BLOC|          END IDX            |
->     W1 E=3D1   |M   |           END DATA               |
->=20
-> An EAS is defined as :
->=20
->              |0123|4567|0123|4567|0123|4567|0123|4567|
->     W0       |V---|BLOC|          END IDX            |
->     W1       |M   |          END DATA                |
->=20
-> The END trigger adds an extra 'PQ' bit, bit1 of word0 set to '1',
-> signaling that the PQ bits have been checked. That bit is unused in
-> the initial EAS definition.
->=20
-> When a HW device performs the trigger, the trigger data follows an
-> "EAS trigger" format because the trigger data in that case contains an
-> EAS index which the IC needs to look for.
->=20
-> An EAS trigger, bit0 of word0 set to '0', is defined as :
->=20
->              |0123|4567|0123|4567|0123|4567|0123|4567|
->     W0 E=3D0   |0P--|---- ---- ---- ---- ---- ---- ----|
->     W1 E=3D0   |BLOC|            EAS INDEX             |
->=20
-> There is also a 'PQ' bit, bit1 of word0 to '1', signaling that the
-> PQ bits have been checked.
->=20
-> Introduce these new trigger bits and rename the XIVE_SRCNO macros in
-> XIVE_EAS to reflect better the nature of the data.
->=20
-> Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
+> Signed-off-by: Greg Kurz <groug@kaod.org>
 
 Applied to ppc-for-4.2, thanks.
 
 > ---
->  include/hw/ppc/xive_regs.h | 26 +++++++++++++++++++++++---
->  hw/intc/pnv_xive.c         | 20 ++++++++++++++++----
->  hw/intc/xive.c             |  4 ++--
->  3 files changed, 41 insertions(+), 9 deletions(-)
+>  hw/ppc/spapr.c         |    7 ++++++-
+>  include/hw/ppc/spapr.h |    1 +
+>  2 files changed, 7 insertions(+), 1 deletion(-)
 >=20
-> diff --git a/include/hw/ppc/xive_regs.h b/include/hw/ppc/xive_regs.h
-> index 08c8bf7172e2..55307cd1533c 100644
-> --- a/include/hw/ppc/xive_regs.h
-> +++ b/include/hw/ppc/xive_regs.h
-> @@ -22,9 +22,29 @@
->  /*
->   * Interrupt source number encoding on PowerBUS
->   */
-> -#define XIVE_SRCNO_BLOCK(srcno) (((srcno) >> 28) & 0xf)
-> -#define XIVE_SRCNO_INDEX(srcno) ((srcno) & 0x0fffffff)
-> -#define XIVE_SRCNO(blk, idx)    ((uint32_t)(blk) << 28 | (idx))
-> +/*
-> + * Trigger data definition
-> + *
-> + * The trigger definition is used for triggers both for HW source
-> + * interrupts (PHB, PSI), as well as for rerouting interrupts between
-> + * Interrupt Controller.
-> + *
-> + * HW source controllers set bit0 of word0 to =E2=80=980=E2=80=99 as the=
-y provide EAS
-> + * information (EAS block + EAS index) in the 8 byte data and not END
-> + * information, which is use for rerouting interrupts.
-> + *
-> + * bit1 of word0 to =E2=80=981=E2=80=99 signals that the state bit check=
- has been
-> + * performed.
-> + */
-> +#define XIVE_TRIGGER_END        PPC_BIT(0)
-> +#define XIVE_TRIGGER_PQ         PPC_BIT(1)
-> +
-> +/*
-> + * QEMU macros to manipulate the trigger payload in native endian
-> + */
-> +#define XIVE_EAS_BLOCK(n)       (((n) >> 28) & 0xf)
-> +#define XIVE_EAS_INDEX(n)       ((n) & 0x0fffffff)
-> +#define XIVE_EAS(blk, idx)      ((uint32_t)(blk) << 28 | (idx))
-> =20
->  #define TM_SHIFT                16
-> =20
-> diff --git a/hw/intc/pnv_xive.c b/hw/intc/pnv_xive.c
-> index ed6e9d71bbfa..348f2fdd263d 100644
-> --- a/hw/intc/pnv_xive.c
-> +++ b/hw/intc/pnv_xive.c
-> @@ -385,7 +385,7 @@ static int pnv_xive_get_eas(XiveRouter *xrtr, uint8_t=
- blk, uint32_t idx,
->      PnvXive *xive =3D PNV_XIVE(xrtr);
-> =20
->      if (pnv_xive_get_ic(blk) !=3D xive) {
-> -        xive_error(xive, "VST: EAS %x is remote !?", XIVE_SRCNO(blk, idx=
-));
-> +        xive_error(xive, "VST: EAS %x is remote !?", XIVE_EAS(blk, idx));
->          return -1;
+> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> index 8f59f08c102e..473ce1d04775 100644
+> --- a/hw/ppc/spapr.c
+> +++ b/hw/ppc/spapr.c
+> @@ -2503,6 +2503,7 @@ static CPUArchId *spapr_find_cpu_slot(MachineState =
+*ms, uint32_t id, int *idx)
+>  static void spapr_set_vsmt_mode(SpaprMachineState *spapr, Error **errp)
+>  {
+>      MachineState *ms =3D MACHINE(spapr);
+> +    SpaprMachineClass *smc =3D SPAPR_MACHINE_GET_CLASS(spapr);
+>      Error *local_err =3D NULL;
+>      bool vsmt_user =3D !!spapr->vsmt;
+>      int kvm_smt =3D kvmppc_smt_threads();
+> @@ -2529,7 +2530,7 @@ static void spapr_set_vsmt_mode(SpaprMachineState *=
+spapr, Error **errp)
+>              goto out;
+>          }
+>          /* In this case, spapr->vsmt has been set by the command line */
+> -    } else {
+> +    } else if (!smc->smp_threads_vsmt) {
+>          /*
+>           * Default VSMT value is tricky, because we need it to be as
+>           * consistent as possible (for migration), but this requires
+> @@ -2538,6 +2539,8 @@ static void spapr_set_vsmt_mode(SpaprMachineState *=
+spapr, Error **errp)
+>           * overwhelmingly common case in production systems.
+>           */
+>          spapr->vsmt =3D MAX(8, smp_threads);
+> +    } else {
+> +        spapr->vsmt =3D smp_threads;
 >      }
 > =20
-> @@ -431,7 +431,7 @@ static void pnv_xive_notify(XiveNotifier *xn, uint32_=
-t srcno)
->      PnvXive *xive =3D PNV_XIVE(xn);
->      uint8_t blk =3D xive->chip->chip_id;
-> =20
-> -    xive_router_notify(xn, XIVE_SRCNO(blk, srcno));
-> +    xive_router_notify(xn, XIVE_EAS(blk, srcno));
+>      /* KVM: If necessary, set the SMT mode: */
+> @@ -4452,6 +4455,7 @@ static void spapr_machine_class_init(ObjectClass *o=
+c, void *data)
+>      smc->irq =3D &spapr_irq_dual;
+>      smc->dr_phb_enabled =3D true;
+>      smc->linux_pci_probe =3D true;
+> +    smc->smp_threads_vsmt =3D true;
 >  }
 > =20
->  /*
-> @@ -1225,12 +1225,24 @@ static const MemoryRegionOps pnv_xive_ic_reg_ops =
-=3D {
+>  static const TypeInfo spapr_machine_info =3D {
+> @@ -4519,6 +4523,7 @@ static void spapr_machine_4_1_class_options(Machine=
+Class *mc)
 > =20
->  static void pnv_xive_ic_hw_trigger(PnvXive *xive, hwaddr addr, uint64_t =
-val)
->  {
-> +    uint8_t blk;
-> +    uint32_t idx;
-> +
-> +    if (val & XIVE_TRIGGER_END) {
-> +        xive_error(xive, "IC: END trigger at @0x%"HWADDR_PRIx" data 0x%"=
-PRIx64,
-> +                   addr, val);
-> +        return;
-> +    }
-> +
->      /*
->       * Forward the source event notification directly to the Router.
->       * The source interrupt number should already be correctly encoded
->       * with the chip block id by the sending device (PHB, PSI).
->       */
-> -    xive_router_notify(XIVE_NOTIFIER(xive), val);
-> +    blk =3D XIVE_EAS_BLOCK(val);
-> +    idx =3D XIVE_EAS_INDEX(val);
-> +
-> +    xive_router_notify(XIVE_NOTIFIER(xive), XIVE_EAS(blk, idx));
+>      spapr_machine_4_2_class_options(mc);
+>      smc->linux_pci_probe =3D false;
+> +    smc->smp_threads_vsmt =3D false;
+>      compat_props_add(mc->compat_props, hw_compat_4_1, hw_compat_4_1_len);
+>      compat_props_add(mc->compat_props, compat, G_N_ELEMENTS(compat));
 >  }
+> diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
+> index cbd1a4c9f390..2009eb64f9cb 100644
+> --- a/include/hw/ppc/spapr.h
+> +++ b/include/hw/ppc/spapr.h
+> @@ -122,6 +122,7 @@ struct SpaprMachineClass {
+>      bool broken_host_serial_model; /* present real host info to the gues=
+t */
+>      bool pre_4_1_migration; /* don't migrate hpt-max-page-size */
+>      bool linux_pci_probe;
+> +    bool smp_threads_vsmt; /* set VSMT to smp_threads by default */
 > =20
->  static void pnv_xive_ic_notify_write(void *opaque, hwaddr addr, uint64_t=
- val,
-> @@ -1566,7 +1578,7 @@ void pnv_xive_pic_print_info(PnvXive *xive, Monitor=
- *mon)
->  {
->      XiveRouter *xrtr =3D XIVE_ROUTER(xive);
->      uint8_t blk =3D xive->chip->chip_id;
-> -    uint32_t srcno0 =3D XIVE_SRCNO(blk, 0);
-> +    uint32_t srcno0 =3D XIVE_EAS(blk, 0);
->      uint32_t nr_ipis =3D pnv_xive_nr_ipis(xive);
->      uint32_t nr_ends =3D pnv_xive_nr_ends(xive);
->      XiveEAS eas;
-> diff --git a/hw/intc/xive.c b/hw/intc/xive.c
-> index 29df06df1136..cbe4ae6c294d 100644
-> --- a/hw/intc/xive.c
-> +++ b/hw/intc/xive.c
-> @@ -1648,8 +1648,8 @@ do_escalation:
->  void xive_router_notify(XiveNotifier *xn, uint32_t lisn)
->  {
->      XiveRouter *xrtr =3D XIVE_ROUTER(xn);
-> -    uint8_t eas_blk =3D XIVE_SRCNO_BLOCK(lisn);
-> -    uint32_t eas_idx =3D XIVE_SRCNO_INDEX(lisn);
-> +    uint8_t eas_blk =3D XIVE_EAS_BLOCK(lisn);
-> +    uint32_t eas_idx =3D XIVE_EAS_INDEX(lisn);
->      XiveEAS eas;
-> =20
->      /* EAS cache lookup */
+>      void (*phb_placement)(SpaprMachineState *spapr, uint32_t index,
+>                            uint64_t *buid, hwaddr *pio,=20
+>=20
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -259,25 +174,25 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---cjNiBkmi8s9yAE0W
+--KLINyTCByxgMLuN/
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl2kB3gACgkQbDjKyiDZ
-s5LyqBAAlf+/rTwuRZs0IAPuBHNbJ6wPZt6ZvabPddvumLILGloLUJ49Lx5ujD/H
-DTx2C3SZKhRxxboy8+6xAyzrHJ7JN0FxGD/u7ogdO4eP8Z9Md50DA65NjYMHDHCX
-LUhwXp2zMUbgvbI7G9BaHMrzmF9FXj5l2TauiQh26SJmlCgGWPUESnY17gMG+CHC
-ge4VnzHj16k1tvs80nHiMZsepDeKy9ESrHRJx5SwfiaxmRs15HUHlYLM5C+LesAr
-qn1AizwKjpVvuTsKHbUccRvPWf4HWfIJVKNweji+AkdgZU3b/wrAj0HUB11edRYt
-B9of7mVXgPilMKZumTfvrr9626OEOqpyi6j+xtC6K75u2zqlhzNGWuKnmODF0Twf
-PXt77sdNkW0kDI+zdGmkjtl6ZU22stE7qQC//9RFntGXKX1ODd6reBXR3jQPFhTz
-PI6/rkSvE+YBUywuZwmjZFsKc9igHkB4qWdYfIK6Lv9Bg2LRYYzjOEvgkn0k0pyS
-QP+WsnjTWkbNI+YNQxGp1N8xDUJ7oOnsyOhH7DbEfYj/b3iKQleR6PsKFb5JIuR5
-efB8mBsqUXhkdLbgODfdtAxTprc54TwOhEDm/Hb8/sGd2ABs1d8UA0zSEi8GRLpI
-dRK+2QlP6EAt/kaGn5g3CfrvsH0I3p4kXHz9xGC4fka+X7d1esk=
-=M5lc
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl2kEd8ACgkQbDjKyiDZ
+s5JVAw/9HM8d+gpCy83C6nv7Ir+2lO4pVGdCro3z8T9bmjHEv/SrQfZRuqy9Bmtz
+aktGpQownsy88z2IPldN1VCwIKtkJNoBoeKYqMXHEzisEi9S68fDUw2cZIF4tOZe
+zTHTIijvpCiuZ2sS4NTBPod8Lyva4uUzR7tdT5X3TwKi0NdfNC/ayktaOmWeusMw
+oBlrfynuBLXTGRDLDshYhsNCmrZDq7ifrb094mXnXIOo+oqeDe9gByn7I/1d32xt
+6uYW+2SHskagtBQmgYlKzJP0Hu1b1dqkx8zq3OyzpzMxV0OTNeSc8vsqGUrMgFcv
+mTlb7z68tMLo2zcK+GK/nPkyafLQRiFlnJecSCQWDBljwX0tI2GmxD821NV074Si
+2aRcuUrOFmji+vw7+xyqgJASk0HQD03UHi3KD6AIMqQyWw8HqxuiPoO4vtlpJr/e
+2nYeFP8yjI/aSMq3Me4T5RlxJv8tWhQxmMCL2WeetBtl/Atg3Mlm07g8tSY5nwTI
+u9AdRlngqOe0jfV9D8t/bAwKI3+dvpXskewb1WY13xaCasVgn5sREd96evj2yrni
+w8xExJXjBAoXXjizBXQuZxaLQgKcjh3iOheLK9RuH1y5GoE8k0i+A69/FLiCctCy
+/FxDch7LNB2KhA4xF+7Ve64Vq4juNRAbk9ft9Mdj0s416/LJuX0=
+=X7Jd
 -----END PGP SIGNATURE-----
 
---cjNiBkmi8s9yAE0W--
+--KLINyTCByxgMLuN/--
 
