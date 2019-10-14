@@ -4,79 +4,78 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6744DC4CECE
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 11:23:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 81DE1ECE587
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 11:24:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 31A2D2084B
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 11:23:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4C61120673
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 11:24:14 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="KptkjTR4"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 31A2D2084B
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="R4IJOT1o"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4C61120673
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47686 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47696 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iJyRx-00020Y-0j
-	for qemu-devel@archiver.kernel.org; Mon, 14 Oct 2019 07:23:41 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45448)
+	id 1iJyST-0002kn-2C
+	for qemu-devel@archiver.kernel.org; Mon, 14 Oct 2019 07:24:13 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45502)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1iJy28-0006ZW-Mo
- for qemu-devel@nongnu.org; Mon, 14 Oct 2019 06:57:03 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1iJy2B-0006fB-E6
+ for qemu-devel@nongnu.org; Mon, 14 Oct 2019 06:57:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1iJy26-00055p-ND
- for qemu-devel@nongnu.org; Mon, 14 Oct 2019 06:57:00 -0400
-Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:34512)
+ (envelope-from <alex.bennee@linaro.org>) id 1iJy29-0005Ac-Pp
+ for qemu-devel@nongnu.org; Mon, 14 Oct 2019 06:57:03 -0400
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:39866)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1iJy26-00054S-Gt
- for qemu-devel@nongnu.org; Mon, 14 Oct 2019 06:56:58 -0400
-Received: by mail-wm1-x341.google.com with SMTP id y135so14227029wmc.1
- for <qemu-devel@nongnu.org>; Mon, 14 Oct 2019 03:56:58 -0700 (PDT)
+ id 1iJy29-00059f-Im
+ for qemu-devel@nongnu.org; Mon, 14 Oct 2019 06:57:01 -0400
+Received: by mail-wr1-x441.google.com with SMTP id r3so19173554wrj.6
+ for <qemu-devel@nongnu.org>; Mon, 14 Oct 2019 03:57:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=P3Npp9kH1WEA99RC652KClnJyNjkx/khNWALo0be13M=;
- b=KptkjTR4iho6sjULn/JZnjxZXcKwj6eDc9kROudfYuqhS96mo39RmT9VWreX20ymBD
- shMtkC8HQ4MrAcrn+CubmT2aYnjkknv7PdWNsgne95NpR3rkRztygnBKRgz2n73BcEZT
- J79Za0ytM23d8sefg7erpOsNpUuHNUCdSUnbXW8h+Ak4Fk6ujAjrE2+4LQQ+qYAWV5x5
- DWS85o3lNHDCMzhadotqaJVRat4ti/0ft0Yz205vLIAmZVVWc9YGY8/blQh1ZgG/ybNe
- K/6I1e/MyPS8BLgxKhu2aZ2XCM6IURn1xXnY2pausRtLZISTE4o+T0AHWe77uMJtCBgF
- YlLQ==
+ bh=mpf3Fhzk3B9PbwCFqYApvOLgEupxrJceH9hSjq15/sI=;
+ b=R4IJOT1o1jOjjGhkIgF9MHKi0M+Qx5IEuXP79ISbqzcuKGRRc7Id8uLJFUnbk6IiRn
+ Rl5lG+CJsE0JpeOFc5WTDXc4k5WfDYSPbQfE6XepuGcOkEnTOrFS1P0AqJypA7dTcTuv
+ 8eQkDsvP6uMCnyukSIMdQAopgjWJa+1tzzdF5IDtGt6jv4jCFSG8AATpRvmLdM+VLFrq
+ 4/uR7vLdD/Y7YBIpn9yZYiJGevzJLacX5AE5avUL4IjJuaawZOUmSkm2BI7GXpPz/Fq2
+ ZPN8+ddRV7m1D5jcVqqoWfKD2Byoc37TDCfdwSF1ZT7eCpYpbY5R9gYiTsHwvr33SyR9
+ 7nhA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=P3Npp9kH1WEA99RC652KClnJyNjkx/khNWALo0be13M=;
- b=OTNngGbqBB/kASGPd8Ww1rlbdG7j630c3KrllOqydndJLsrJ/5cgRb18q/2a6/Cbbl
- K4TqTEr3I2KEh8zUFFgtB8P3NC5gb1IJtZMOs1T+hjZ9XYhdXZuaboALEhCjt6FFit5S
- ehLB4UGI1A7M/zwUA9HfEVqbIDcf9TKKMITycg2TQ0KO/FcoTnm2dfr1BGkMhkQ2FRvG
- C1YLu0hJJlRnLXPAF4IJnwPVyEbiDNHBowifesD2Ej1I/bxmjQ5WMHd3cww25llq60fR
- UW9lVj+aOzhtLKvbHY5KL9dQ/s00NuZ8NiBPXqT8mLAtCA1zKu1tWhluzZ373R56Pfy4
- DN2Q==
-X-Gm-Message-State: APjAAAXR3467aV/u2rAdPtXp+bYlXXHOpEKm6GYLy0tHt84BEr7RLDjf
- LhUavk27IDTqse4u0+cGR3sfnQ==
-X-Google-Smtp-Source: APXvYqwa6lV25ptagITy/JdAXkHXN00IKoPnMJxNReOybCN/kaV1b29NLfr6qJTZ9NKD2j6a5PRqOg==
-X-Received: by 2002:a05:600c:20c4:: with SMTP id
- y4mr13169870wmm.87.1571050617284; 
- Mon, 14 Oct 2019 03:56:57 -0700 (PDT)
+ bh=mpf3Fhzk3B9PbwCFqYApvOLgEupxrJceH9hSjq15/sI=;
+ b=qMIdLZaiKhfI1KQznDUhMpn6CJ48MFe9hre8cDp9eurj03/NqqS6dUSVZZfG1xPa34
+ qFF6wyw2tXvrf7AnKlRRqDLHpvLZxKnqNt8jACWTqhTuvIe3ev+KsQ9QqRbuKOGMQx3F
+ Tt1AFrmASsD5Gps8q+lV3j3dTWcwKOYFe9cQCqKSVaij+39pKQWnR9lDmTHsAoaizZU4
+ wMLs/z1em5XM2Iaz0dkTiXD70xy+zGrvFC0WVINCUbt8XZGCXa00n+sIIfq+6MQLX3vt
+ C25wVDzkSGWrKCXoPe80VzpN0legWEkwUq0RxoWpQe38tJVrp+VmMNDtK4GnL43uF16g
+ 75tw==
+X-Gm-Message-State: APjAAAVRVvN1vP7j8cVlueRlT9A4A6ZZk9JJsyFIccv7baz4YAVE5235
+ K6n0286rVw8w4ZTmvfXkuYd85Q==
+X-Google-Smtp-Source: APXvYqynKJGaKkwnnpic5+zwXjqcPQv/BUIPXWJYkarNMRFy1yQcHD6ZlsmliQiA7+QWhJNNsGA+rQ==
+X-Received: by 2002:adf:bd8f:: with SMTP id l15mr24807414wrh.362.1571050620522; 
+ Mon, 14 Oct 2019 03:57:00 -0700 (PDT)
 Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id 26sm13814874wmf.20.2019.10.14.03.56.53
+ by smtp.gmail.com with ESMTPSA id u2sm9583732wml.44.2019.10.14.03.56.55
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 14 Oct 2019 03:56:55 -0700 (PDT)
+ Mon, 14 Oct 2019 03:56:56 -0700 (PDT)
 Received: from zen.lan (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 684391FF9D;
- Mon, 14 Oct 2019 11:49:53 +0100 (BST)
+ by zen.linaroharston (Postfix) with ESMTP id 067D91FFB8;
+ Mon, 14 Oct 2019 11:49:56 +0100 (BST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH  v5 18/55] translate-all: notify plugin code of tb_flush
-Date: Mon, 14 Oct 2019 11:49:11 +0100
-Message-Id: <20191014104948.4291-19-alex.bennee@linaro.org>
+Subject: [PATCH  v5 30/55] target/alpha: fetch code with translator_ld
+Date: Mon, 14 Oct 2019 11:49:23 +0100
+Message-Id: <20191014104948.4291-31-alex.bennee@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20191014104948.4291-1-alex.bennee@linaro.org>
 References: <20191014104948.4291-1-alex.bennee@linaro.org>
@@ -85,7 +84,7 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::341
+X-Received-From: 2a00:1450:4864:20::441
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -100,7 +99,6 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 Cc: robert.foley@futurewei.com,
  Richard Henderson <richard.henderson@linaro.org>, peter.puhov@futurewei.com,
  aaron@os.amperecomputing.com, cota@braap.org,
- Paolo Bonzini <pbonzini@redhat.com>,
  =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
  Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
@@ -109,51 +107,26 @@ Sender: "Qemu-devel"
 
 From: "Emilio G. Cota" <cota@braap.org>
 
-Plugins might allocate per-TB data that then they get passed each
-time a TB is executed (via the *userdata pointer).
-
-Notify plugin code every time a code cache flush occurs, so
-that plugins can then reclaim the memory of the per-TB data.
-
-Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
 Signed-off-by: Emilio G. Cota <cota@braap.org>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 ---
- accel/tcg/translate-all.c | 6 ++++++
- 1 file changed, 6 insertions(+)
+ target/alpha/translate.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/accel/tcg/translate-all.c b/accel/tcg/translate-all.c
-index 0a08fcda3e..6d1b0ecd69 100644
---- a/accel/tcg/translate-all.c
-+++ b/accel/tcg/translate-all.c
-@@ -1231,6 +1231,8 @@ static gboolean tb_host_size_iter(gpointer key, gpointer value, gpointer data)
- /* flush all the translation blocks */
- static void do_tb_flush(CPUState *cpu, run_on_cpu_data tb_flush_count)
+diff --git a/target/alpha/translate.c b/target/alpha/translate.c
+index a69f58bf65..f7f1ed0f41 100644
+--- a/target/alpha/translate.c
++++ b/target/alpha/translate.c
+@@ -2987,7 +2987,7 @@ static void alpha_tr_translate_insn(DisasContextBase *dcbase, CPUState *cpu)
  {
-+    bool did_flush = false;
-+
-     mmap_lock();
-     /* If it is already been done on request of another CPU,
-      * just retry.
-@@ -1238,6 +1240,7 @@ static void do_tb_flush(CPUState *cpu, run_on_cpu_data tb_flush_count)
-     if (tb_ctx.tb_flush_count != tb_flush_count.host_int) {
-         goto done;
-     }
-+    did_flush = true;
+     DisasContext *ctx = container_of(dcbase, DisasContext, base);
+     CPUAlphaState *env = cpu->env_ptr;
+-    uint32_t insn = cpu_ldl_code(env, ctx->base.pc_next);
++    uint32_t insn = translator_ldl(env, ctx->base.pc_next);
  
-     if (DEBUG_TB_FLUSH_GATE) {
-         size_t nb_tbs = tcg_nb_tbs();
-@@ -1262,6 +1265,9 @@ static void do_tb_flush(CPUState *cpu, run_on_cpu_data tb_flush_count)
- 
- done:
-     mmap_unlock();
-+    if (did_flush) {
-+        qemu_plugin_flush_cb();
-+    }
- }
- 
- void tb_flush(CPUState *cpu)
+     ctx->base.pc_next += 4;
+     ctx->base.is_jmp = translate_one(ctx, insn);
 -- 
 2.20.1
 
