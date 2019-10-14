@@ -7,75 +7,75 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 23023ECE587
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 16:19:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 04359ECE587
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 16:20:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CF5CC2133F
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 16:19:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id BE4C52133F
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 16:20:56 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="i9A+AkOH"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CF5CC2133F
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Ui60dvwJ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BE4C52133F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53074 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53122 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iK342-0005Ts-1g
-	for qemu-devel@archiver.kernel.org; Mon, 14 Oct 2019 12:19:18 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36580)
+	id 1iK35b-0007bL-A8
+	for qemu-devel@archiver.kernel.org; Mon, 14 Oct 2019 12:20:55 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36733)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1iK2pT-0003Hc-56
- for qemu-devel@nongnu.org; Mon, 14 Oct 2019 12:04:16 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1iK2pj-0003eJ-Bm
+ for qemu-devel@nongnu.org; Mon, 14 Oct 2019 12:04:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1iK2pR-0006mN-NA
- for qemu-devel@nongnu.org; Mon, 14 Oct 2019 12:04:14 -0400
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:36781)
+ (envelope-from <peter.maydell@linaro.org>) id 1iK2ph-00072a-Sa
+ for qemu-devel@nongnu.org; Mon, 14 Oct 2019 12:04:31 -0400
+Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:55324)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1iK2pR-0006lK-Eh
- for qemu-devel@nongnu.org; Mon, 14 Oct 2019 12:04:13 -0400
-Received: by mail-wr1-x443.google.com with SMTP id y19so20397884wrd.3
- for <qemu-devel@nongnu.org>; Mon, 14 Oct 2019 09:04:13 -0700 (PDT)
+ id 1iK2ph-00071e-M4
+ for qemu-devel@nongnu.org; Mon, 14 Oct 2019 12:04:29 -0400
+Received: by mail-wm1-x344.google.com with SMTP id a6so17832028wma.5
+ for <qemu-devel@nongnu.org>; Mon, 14 Oct 2019 09:04:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:subject:date:message-id:in-reply-to:references:mime-version
  :content-transfer-encoding;
- bh=opthv//THjiTY86axVJKAgqEwMO2rqSzwEywRLHPL0U=;
- b=i9A+AkOHyo24fZBiVUZtW42FgBvFDU0u3qUs+PbiV1pStqGr2pbEgNYPe/jbjfKbcv
- vtSt6yyOMIq2HxDzlVGXn5ssmMwYHUxmaQnkdbczaJllzLNsI9yucPk5JBLdvqG/su9L
- 9gfTJ3/eRf6jElTprl9avJ5E/KawwIVTsEfftItoEmSIzPkFb4T+VS2xujCBgsXp3Ba5
- OLJa//ml7m5jwWXH2xoNUIx4ww+D/QQGWG9A9Pi09c6fRtzcrIvge/CrM315MXr/tVQe
- j3IHM8P7lN1TroGTfiLHlqXH/UlpnZ8YrjqIv1NIfsIjswY0/9OA8GskOOx+GCDII9EF
- oKeQ==
+ bh=WoP+uct2VOIlOQ3JIHwSGsCYzFXX99DfA0ZtmFs+mDo=;
+ b=Ui60dvwJWEZFIAUqNHJnSKgTUH/hiDPH3XC4lOP1zcyMzxTC1lHVXlH5zHcFgtZ98e
+ LEn0i9z1kFcjf0OZOFlAeeaKuPnvYOyhWv4aldLGV/zyCXoR8omy+a6xBPx0h1pblDmX
+ XM9Y8dnGlFrwplaPD8F5qerPO3+EJaAqcHlJOk4KqkMnkSWHYJ1kcknwbYoWr/xWC+FQ
+ IY7mqV2/f1zAP5g8DU5BpQKWnhqW4kRhK0ADcjTYE4HtiKSih5rtGoPaIWDZt001BHQn
+ IVJq1VrIdT/RzVsLnd43fy9JVdTbT4mcrHcidWYmXmjpMo/LEtP+BcSiiDC3QcBMrstO
+ owjw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=opthv//THjiTY86axVJKAgqEwMO2rqSzwEywRLHPL0U=;
- b=tYJ2u6c2Aw2Ee/XRrJvFam8MJrAc4VChceGknuyVruxG2/HvUtRljXb0ULwMsbxdAH
- qE2Ljl/RLoPdHwex5rsoe7hEOfV63h4fpvQsPMR3uXqXyZx2lM2L9U1YVRHEV8crDPav
- 3uAiAlXPiT8B4kS4Lj7HheW4RmcHsN2WYoT/01nwyTG8OSGp4ZmH/vBHXQkb/2vfc0zn
- FpwkxSyFYBRVWW/ZkzhvZoyexv4IcRKBB0HBu+q9XVvk28GVEC5iIKIA5EUjqOSfxp8u
- pZLtC3UQCF/tr8Fqb10AXgUlbN55NgovT0jUhuXYVTdPv5/YTx/+pB5qbMLFNvsTAfSN
- 54Cg==
-X-Gm-Message-State: APjAAAVeFf0sr2SD/GAKc6/j/+weiQNanfmW4sz5eBMMQDqRPwX4eImc
- fpFQ58D4/D1QkqZny4Lhqa/VDd0D6B5zKw==
-X-Google-Smtp-Source: APXvYqyBiefvJVuJ1CCNQThXAI/rjnXtyKU6Ua1PFCe0pMhA3BiSHSZ49w/c81pGkrwvVYMOU69jGw==
-X-Received: by 2002:a05:6000:1252:: with SMTP id
- j18mr26641719wrx.160.1571069051957; 
- Mon, 14 Oct 2019 09:04:11 -0700 (PDT)
+ bh=WoP+uct2VOIlOQ3JIHwSGsCYzFXX99DfA0ZtmFs+mDo=;
+ b=i7B3Wg1VsVxOI2f3QZOPaYqirNwhq8iq83h3ziz4xSILm6Jz5mqadJ0OXIvzuny1oR
+ PbxV+G+A7i5t4Rq0xkyidbCE2K2wbBVLr1ztXp+o6TqzoIjF6BAnStFbD37JjyLcTnUr
+ svoTzC4QO2CraNl6BLeHTSRHGB6J0ojwy6Ivx/ivCZLZ9kvWG473vNVazC+JxD52DDWF
+ zaPTJXLo953W4ExIv07SMhrnVVNPKb91FvSOSQgiNPfGmQ29baVYPhag07huTX5LP2RS
+ jzcu7mFTb4UNQqhsKDk0kQVQzZ5FMQ5UcvbFghGUci3bPYIeM8MrMUh0Z+j+eat46MER
+ tRtw==
+X-Gm-Message-State: APjAAAXksqswhZa18vbRkc0Vg5AFU/iAGkcHGVo7Wo0LMCmiWtNqGAsZ
+ LkPQzznzc75lK8QSy4BJQYNQKDp+idLAAQ==
+X-Google-Smtp-Source: APXvYqyGlaEDIOmYt07EA5DxQ1WVBM01cB8ojp+i4KF3aQ0k80udQC5aKEfDdY5t251skj6UWcgQAQ==
+X-Received: by 2002:a1c:99cd:: with SMTP id
+ b196mr15746182wme.105.1571069068238; 
+ Mon, 14 Oct 2019 09:04:28 -0700 (PDT)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id 5sm18029779wrk.86.2019.10.14.09.04.10
+ by smtp.gmail.com with ESMTPSA id 5sm18029779wrk.86.2019.10.14.09.04.26
  for <qemu-devel@nongnu.org>
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 14 Oct 2019 09:04:11 -0700 (PDT)
+ Mon, 14 Oct 2019 09:04:26 -0700 (PDT)
 From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PULL 02/68] intc/arm_gic: Support IRQ injection for more than 256
- vpus
-Date: Mon, 14 Oct 2019 17:02:58 +0100
-Message-Id: <20191014160404.19553-3-peter.maydell@linaro.org>
+Subject: [PULL 09/68] hw/timer/allwinner-a10-pit.c: Switch to
+ transaction-based ptimer API
+Date: Mon, 14 Oct 2019 17:03:05 +0100
+Message-Id: <20191014160404.19553-10-peter.maydell@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20191014160404.19553-1-peter.maydell@linaro.org>
 References: <20191014160404.19553-1-peter.maydell@linaro.org>
@@ -83,7 +83,7 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::443
+X-Received-From: 2a00:1450:4864:20::344
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,129 +99,89 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Eric Auger <eric.auger@redhat.com>
+Switch the allwinner-a10-pit code away from bottom-half based ptimers to
+the new transaction-based ptimer API.  This just requires adding
+begin/commit calls around the various places that modify the ptimer
+state, and using the new ptimer_init() function to create the timer.
 
-Host kernels that expose the KVM_CAP_ARM_IRQ_LINE_LAYOUT_2 capability
-allow injection of interrupts along with vcpu ids larger than 255.
-Let's encode the vpcu id on 12 bits according to the upgraded KVM_IRQ_LINE
-ABI when needed.
-
-Given that we have two callsites that need to assemble
-the value for kvm_set_irq(), a new helper routine, kvm_arm_set_irq
-is introduced.
-
-Without that patch qemu exits with "kvm_set_irq: Invalid argument"
-message.
-
-Signed-off-by: Eric Auger <eric.auger@redhat.com>
-Reported-by: Zenghui Yu <yuzenghui@huawei.com>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Reviewed-by: Andrew Jones <drjones@redhat.com>
-Acked-by: Marc Zyngier <maz@kernel.org>
-Message-id: 20191003154640.22451-3-eric.auger@redhat.com
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Message-id: 20191008171740.9679-7-peter.maydell@linaro.org
 ---
- target/arm/kvm_arm.h  |  1 +
- hw/intc/arm_gic_kvm.c |  7 ++-----
- target/arm/cpu.c      | 10 ++++------
- target/arm/kvm.c      | 12 ++++++++++++
- 4 files changed, 19 insertions(+), 11 deletions(-)
+ hw/timer/allwinner-a10-pit.c | 12 ++++++++----
+ 1 file changed, 8 insertions(+), 4 deletions(-)
 
-diff --git a/target/arm/kvm_arm.h b/target/arm/kvm_arm.h
-index b3106c8600a..b4e19457a09 100644
---- a/target/arm/kvm_arm.h
-+++ b/target/arm/kvm_arm.h
-@@ -253,6 +253,7 @@ int kvm_arm_vgic_probe(void);
+diff --git a/hw/timer/allwinner-a10-pit.c b/hw/timer/allwinner-a10-pit.c
+index 28d055e42f3..aae880f5b35 100644
+--- a/hw/timer/allwinner-a10-pit.c
++++ b/hw/timer/allwinner-a10-pit.c
+@@ -22,7 +22,6 @@
+ #include "hw/timer/allwinner-a10-pit.h"
+ #include "migration/vmstate.h"
+ #include "qemu/log.h"
+-#include "qemu/main-loop.h"
+ #include "qemu/module.h"
  
- void kvm_arm_pmu_set_irq(CPUState *cs, int irq);
- void kvm_arm_pmu_init(CPUState *cs);
-+int kvm_arm_set_irq(int cpu, int irqtype, int irq, int level);
- 
- #else
- 
-diff --git a/hw/intc/arm_gic_kvm.c b/hw/intc/arm_gic_kvm.c
-index b56fda144f9..9deb15e7e69 100644
---- a/hw/intc/arm_gic_kvm.c
-+++ b/hw/intc/arm_gic_kvm.c
-@@ -55,7 +55,7 @@ void kvm_arm_gic_set_irq(uint32_t num_irq, int irq, int level)
-      * has separate fields in the irq number for type,
-      * CPU number and interrupt number.
-      */
--    int kvm_irq, irqtype, cpu;
-+    int irqtype, cpu;
- 
-     if (irq < (num_irq - GIC_INTERNAL)) {
-         /* External interrupt. The kernel numbers these like the GIC
-@@ -72,10 +72,7 @@ void kvm_arm_gic_set_irq(uint32_t num_irq, int irq, int level)
-         cpu = irq / GIC_INTERNAL;
-         irq %= GIC_INTERNAL;
-     }
--    kvm_irq = (irqtype << KVM_ARM_IRQ_TYPE_SHIFT)
--        | (cpu << KVM_ARM_IRQ_VCPU_SHIFT) | irq;
--
--    kvm_set_irq(kvm_state, kvm_irq, !!level);
-+    kvm_arm_set_irq(cpu, irqtype, irq, !!level);
+ static void a10_pit_update_irq(AwA10PITState *s)
+@@ -80,6 +79,7 @@ static uint64_t a10_pit_read(void *opaque, hwaddr offset, unsigned size)
+     return 0;
  }
  
- static void kvm_arm_gicv2_set_irq(void *opaque, int irq, int level)
-diff --git a/target/arm/cpu.c b/target/arm/cpu.c
-index 2399c144718..13813fb2135 100644
---- a/target/arm/cpu.c
-+++ b/target/arm/cpu.c
-@@ -576,16 +576,16 @@ static void arm_cpu_kvm_set_irq(void *opaque, int irq, int level)
-     ARMCPU *cpu = opaque;
-     CPUARMState *env = &cpu->env;
-     CPUState *cs = CPU(cpu);
--    int kvm_irq = KVM_ARM_IRQ_TYPE_CPU << KVM_ARM_IRQ_TYPE_SHIFT;
-     uint32_t linestate_bit;
-+    int irq_id;
- 
-     switch (irq) {
-     case ARM_CPU_IRQ:
--        kvm_irq |= KVM_ARM_IRQ_CPU_IRQ;
-+        irq_id = KVM_ARM_IRQ_CPU_IRQ;
-         linestate_bit = CPU_INTERRUPT_HARD;
-         break;
-     case ARM_CPU_FIQ:
--        kvm_irq |= KVM_ARM_IRQ_CPU_FIQ;
-+        irq_id = KVM_ARM_IRQ_CPU_FIQ;
-         linestate_bit = CPU_INTERRUPT_FIQ;
-         break;
-     default:
-@@ -597,9 +597,7 @@ static void arm_cpu_kvm_set_irq(void *opaque, int irq, int level)
-     } else {
-         env->irq_line_state &= ~linestate_bit;
-     }
--
--    kvm_irq |= cs->cpu_index << KVM_ARM_IRQ_VCPU_SHIFT;
--    kvm_set_irq(kvm_state, kvm_irq, level ? 1 : 0);
-+    kvm_arm_set_irq(cs->cpu_index, KVM_ARM_IRQ_TYPE_CPU, irq_id, !!level);
- #endif
- }
- 
-diff --git a/target/arm/kvm.c b/target/arm/kvm.c
-index b2eaa50b8df..b10581fa066 100644
---- a/target/arm/kvm.c
-+++ b/target/arm/kvm.c
-@@ -744,6 +744,18 @@ int kvm_arm_vgic_probe(void)
-     }
- }
- 
-+int kvm_arm_set_irq(int cpu, int irqtype, int irq, int level)
-+{
-+    int kvm_irq = (irqtype << KVM_ARM_IRQ_TYPE_SHIFT) | irq;
-+    int cpu_idx1 = cpu % 256;
-+    int cpu_idx2 = cpu / 256;
-+
-+    kvm_irq |= (cpu_idx1 << KVM_ARM_IRQ_VCPU_SHIFT) |
-+               (cpu_idx2 << KVM_ARM_IRQ_VCPU2_SHIFT);
-+
-+    return kvm_set_irq(kvm_state, kvm_irq, !!level);
-+}
-+
- int kvm_arch_fixup_msi_route(struct kvm_irq_routing_entry *route,
-                              uint64_t address, uint32_t data, PCIDevice *dev)
++/* Must be called inside a ptimer transaction block for s->timer[index] */
+ static void a10_pit_set_freq(AwA10PITState *s, int index)
  {
+     uint32_t prescaler, source, source_freq;
+@@ -118,6 +118,7 @@ static void a10_pit_write(void *opaque, hwaddr offset, uint64_t value,
+         switch (offset & 0x0f) {
+         case AW_A10_PIT_TIMER_CONTROL:
+             s->control[index] = value;
++            ptimer_transaction_begin(s->timer[index]);
+             a10_pit_set_freq(s, index);
+             if (s->control[index] & AW_A10_PIT_TIMER_RELOAD) {
+                 ptimer_set_count(s->timer[index], s->interval[index]);
+@@ -131,10 +132,13 @@ static void a10_pit_write(void *opaque, hwaddr offset, uint64_t value,
+             } else {
+                 ptimer_stop(s->timer[index]);
+             }
++            ptimer_transaction_commit(s->timer[index]);
+             break;
+         case AW_A10_PIT_TIMER_INTERVAL:
+             s->interval[index] = value;
++            ptimer_transaction_begin(s->timer[index]);
+             ptimer_set_limit(s->timer[index], s->interval[index], 1);
++            ptimer_transaction_commit(s->timer[index]);
+             break;
+         case AW_A10_PIT_TIMER_COUNT:
+             s->count[index] = value;
+@@ -225,8 +229,10 @@ static void a10_pit_reset(DeviceState *dev)
+         s->control[i] = AW_A10_PIT_DEFAULT_CLOCK;
+         s->interval[i] = 0;
+         s->count[i] = 0;
++        ptimer_transaction_begin(s->timer[i]);
+         ptimer_stop(s->timer[i]);
+         a10_pit_set_freq(s, i);
++        ptimer_transaction_commit(s->timer[i]);
+     }
+     s->watch_dog_mode = 0;
+     s->watch_dog_control = 0;
+@@ -255,7 +261,6 @@ static void a10_pit_init(Object *obj)
+ {
+     AwA10PITState *s = AW_A10_PIT(obj);
+     SysBusDevice *sbd = SYS_BUS_DEVICE(obj);
+-    QEMUBH * bh[AW_A10_PIT_TIMER_NR];
+     uint8_t i;
+ 
+     for (i = 0; i < AW_A10_PIT_TIMER_NR; i++) {
+@@ -270,8 +275,7 @@ static void a10_pit_init(Object *obj)
+ 
+         tc->container = s;
+         tc->index = i;
+-        bh[i] = qemu_bh_new(a10_pit_timer_cb, tc);
+-        s->timer[i] = ptimer_init_with_bh(bh[i], PTIMER_POLICY_DEFAULT);
++        s->timer[i] = ptimer_init(a10_pit_timer_cb, tc, PTIMER_POLICY_DEFAULT);
+     }
+ }
+ 
 -- 
 2.20.1
 
