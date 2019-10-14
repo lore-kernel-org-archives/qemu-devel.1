@@ -2,132 +2,102 @@ Return-Path: <SRS0=PUPy=YH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AC585C4CECE
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 06:51:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1B584C47404
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 07:04:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 75E7B20673
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 06:51:48 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=xilinx.onmicrosoft.com header.i=@xilinx.onmicrosoft.com header.b="LPvgbCyu"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 75E7B20673
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=xilinx.com
+	by mail.kernel.org (Postfix) with ESMTPS id E6593207FF
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 07:04:22 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E6593207FF
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45072 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45132 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iJuCp-0008KY-Ku
-	for qemu-devel@archiver.kernel.org; Mon, 14 Oct 2019 02:51:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41658)
+	id 1iJuOz-0003A8-VC
+	for qemu-devel@archiver.kernel.org; Mon, 14 Oct 2019 03:04:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43025)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <saipava@xilinx.com>) id 1iJuC0-0007sn-TT
- for qemu-devel@nongnu.org; Mon, 14 Oct 2019 02:50:58 -0400
+ (envelope-from <clg@kaod.org>) id 1iJuNc-0002IY-74
+ for qemu-devel@nongnu.org; Mon, 14 Oct 2019 03:02:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <saipava@xilinx.com>) id 1iJuBz-00024Q-MD
- for qemu-devel@nongnu.org; Mon, 14 Oct 2019 02:50:56 -0400
-Received: from mail-eopbgr760040.outbound.protection.outlook.com
- ([40.107.76.40]:56116 helo=NAM02-CY1-obe.outbound.protection.outlook.com)
+ (envelope-from <clg@kaod.org>) id 1iJuNa-0008SR-Nt
+ for qemu-devel@nongnu.org; Mon, 14 Oct 2019 03:02:55 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:3554)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <saipava@xilinx.com>) id 1iJuBy-0001zL-RS
- for qemu-devel@nongnu.org; Mon, 14 Oct 2019 02:50:55 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=aQQOi4UzfuKvzJQ8lei+8LPNsLlvFC3fcqfqIk5swdzmmFJAMxmPLAYJ+75htF9DxsQAlQm2NcwQMmDQhTEy5DNmwfcD/Kq/LxsBpn8htIUCCi3X2LiTRJoeWwc69OwGPnVuurMzTFOBpmXwNSRVjam9jcQxrC55nLoBA+JEtCG2HFRlKy24KAwi/c0RrlF3FSq7NPYMR/LgjEeKblIYCh/frq/Ysc6565NGHDxArHnxMkH+CdIyyBeyaiXiSoOhMYMaXp+b+Hl0H3AFSJ5+vBMIcvhU1MQYE2kUipdOwhw1Vh/uSrslSQJX+GS22ohR0cd1F+NTQ3ipfZFzqAPu3A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=eJM24XW3/z8694uRR/KBWJy+oL/9o/v5uPNWOlVK76M=;
- b=RpuHsHNX/Rji8Sp2jObPLD+hx8MwfVePV3cUlqY2PZJrxZvrQLGvgpLrbgjzCxM8iofVis9cEY18nR7zzC8dzGcWobInhvfZfPKDpZlCDZSu/cYGAF6j85BJU8mv3KAKIx+STgx+Y/GjMBItoWRWaAB2Vpb9lRAgWnQkPMvY1xyHGQ3+FCjHbl9RKV2WIcBI5iQXm/xY0RoTfIdhiBX7lmkpNS+rw8sE6xpbFc+skOYC5WM6FUY2f6CZeeAzKTO2mae6AUVVy5WtyXzZ0hcHGRBT5Q8hjtk5da/oj8DdYWBqLVvlbpe3QIIU4/uuHAEBBrlV0xI3UcweSRS/8pq05A==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 149.199.60.83) smtp.rcpttodomain=nongnu.org smtp.mailfrom=xilinx.com;
- dmarc=bestguesspass action=none header.from=xilinx.com; dkim=none (message
- not signed); arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=xilinx.onmicrosoft.com; s=selector2-xilinx-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=eJM24XW3/z8694uRR/KBWJy+oL/9o/v5uPNWOlVK76M=;
- b=LPvgbCyu6X1Ye5PSM0g5H422IKJb7r4yb4m9lkCFgSgbokqLczVFSzJI8WLYM7oEZKW3sQOeiaeV+kT0miuGVDAm6L4B4H6oDnebEHzgCCYs+DsKb9WXqydKGP5kRkX53yUOLr4kxXeyf0F4ZMhha6AE2d/zjwPonlqFg0VLB1Q=
-Received: from MWHPR0201CA0101.namprd02.prod.outlook.com
- (2603:10b6:301:75::42) by DM5PR0201MB3462.namprd02.prod.outlook.com
- (2603:10b6:4:76::28) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2347.21; Mon, 14 Oct
- 2019 06:50:51 +0000
-Received: from SN1NAM02FT016.eop-nam02.prod.protection.outlook.com
- (2a01:111:f400:7e44::200) by MWHPR0201CA0101.outlook.office365.com
- (2603:10b6:301:75::42) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2347.16 via Frontend
- Transport; Mon, 14 Oct 2019 06:50:50 +0000
-Authentication-Results: spf=pass (sender IP is 149.199.60.83)
- smtp.mailfrom=xilinx.com; nongnu.org; dkim=none (message not signed)
- header.d=none;nongnu.org; dmarc=bestguesspass action=none
- header.from=xilinx.com;
-Received-SPF: Pass (protection.outlook.com: domain of xilinx.com designates
- 149.199.60.83 as permitted sender) receiver=protection.outlook.com;
- client-ip=149.199.60.83; helo=xsj-pvapsmtpgw01;
-Received: from xsj-pvapsmtpgw01 (149.199.60.83) by
- SN1NAM02FT016.mail.protection.outlook.com (10.152.72.113) with Microsoft SMTP
- Server (version=TLS1_0, cipher=TLS_RSA_WITH_AES_256_CBC_SHA) id 15.20.2347.16
- via Frontend Transport; Mon, 14 Oct 2019 06:50:50 +0000
-Received: from unknown-38-66.xilinx.com ([149.199.38.66] helo=xsj-pvapsmtp01)
- by xsj-pvapsmtpgw01 with esmtp (Exim 4.63)
- (envelope-from <sai.pavan.boddu@xilinx.com>)
- id 1iJuBt-0000zI-Td; Sun, 13 Oct 2019 23:50:49 -0700
-Received: from [127.0.0.1] (helo=xsj-smtp-dlp2.xlnx.xilinx.com)
- by xsj-pvapsmtp01 with esmtp (Exim 4.63)
- (envelope-from <sai.pavan.boddu@xilinx.com>)
- id 1iJuBo-0002wz-L0; Sun, 13 Oct 2019 23:50:44 -0700
-Received: from xsj-pvapsmtp01 (mailhub.xilinx.com [149.199.38.66])
- by xsj-smtp-dlp2.xlnx.xilinx.com (8.13.8/8.13.1) with ESMTP id x9E6oi5X002221; 
- Sun, 13 Oct 2019 23:50:44 -0700
-Received: from [10.140.6.35] (helo=xhdsaipava40.xilinx.com)
- by xsj-pvapsmtp01 with esmtp (Exim 4.63)
- (envelope-from <saipava@xhdsaipava40.xilinx.com>)
- id 1iJuBn-0002wN-Kc; Sun, 13 Oct 2019 23:50:43 -0700
-Received: by xhdsaipava40.xilinx.com (Postfix, from userid 14131)
- id 7491413C2031; Mon, 14 Oct 2019 12:21:53 +0530 (IST)
-From: Sai Pavan Boddu <sai.pavan.boddu@xilinx.com>
-To: Alistair Francis <alistair@alistair23.me>
-Subject: [PATCH] ssi: xilinx_spips: Filter the non spi registers transactions
-Date: Mon, 14 Oct 2019 12:21:39 +0530
-Message-Id: <1571035899-9692-1-git-send-email-sai.pavan.boddu@xilinx.com>
-X-Mailer: git-send-email 2.7.4
-X-RCIS-Action: ALLOW
-X-TM-AS-Product-Ver: IMSS-7.1.0.1224-8.2.0.1013-23620.005
-X-TM-AS-User-Approved-Sender: Yes;Yes
-X-EOPAttributedMessage: 0
-X-MS-Office365-Filtering-HT: Tenant
-X-Forefront-Antispam-Report: CIP:149.199.60.83; IPV:NLI; CTRY:US; EFV:NLI;
- SFV:NSPM;
- SFS:(10009020)(4636009)(346002)(376002)(396003)(136003)(39860400002)(199004)(189003)(6266002)(126002)(186003)(2616005)(476003)(336012)(103686004)(426003)(316002)(16586007)(42186006)(478600001)(106002)(305945005)(486006)(50466002)(8936002)(356004)(2906002)(70586007)(50226002)(6916009)(70206006)(6666004)(36756003)(48376002)(8676002)(5660300002)(81156014)(81166006)(47776003)(51416003)(4326008)(26005);
- DIR:OUT; SFP:1101; SCL:1; SRVR:DM5PR0201MB3462; H:xsj-pvapsmtpgw01; FPR:;
- SPF:Pass; LANG:en; PTR:unknown-60-83.xilinx.com; A:1; MX:1; 
+ (Exim 4.71) (envelope-from <clg@kaod.org>) id 1iJuNa-0008OJ-G2
+ for qemu-devel@nongnu.org; Mon, 14 Oct 2019 03:02:54 -0400
+Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
+ x9E72gah041378
+ for <qemu-devel@nongnu.org>; Mon, 14 Oct 2019 03:02:44 -0400
+Received: from e06smtp01.uk.ibm.com (e06smtp01.uk.ibm.com [195.75.94.97])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 2vmc7nb1tq-1
+ (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+ for <qemu-devel@nongnu.org>; Mon, 14 Oct 2019 03:02:43 -0400
+Received: from localhost
+ by e06smtp01.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+ Violators will be prosecuted
+ for <qemu-devel@nongnu.org> from <clg@kaod.org>;
+ Mon, 14 Oct 2019 08:02:34 +0100
+Received: from b06avi18878370.portsmouth.uk.ibm.com (9.149.26.194)
+ by e06smtp01.uk.ibm.com (192.168.101.131) with IBM ESMTP SMTP Gateway:
+ Authorized Use Only! Violators will be prosecuted; 
+ (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+ Mon, 14 Oct 2019 08:02:31 +0100
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com
+ (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
+ by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP
+ id x9E72UJa46334284
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Mon, 14 Oct 2019 07:02:30 GMT
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 96ED5A40A6;
+ Mon, 14 Oct 2019 07:02:30 +0000 (GMT)
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 8A286A408D;
+ Mon, 14 Oct 2019 07:02:30 +0000 (GMT)
+Received: from smtp.tls.ibm.com (unknown [9.101.4.1])
+ by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+ Mon, 14 Oct 2019 07:02:30 +0000 (GMT)
+Received: from yukon.kaod.org (sig-9-145-30-87.uk.ibm.com [9.145.30.87])
+ by smtp.tls.ibm.com (Postfix) with ESMTP id 0E7E022010B;
+ Mon, 14 Oct 2019 09:02:29 +0200 (CEST)
+Subject: Re: [PATCH 3/9] ppc/xive: Record the IPB in the associated NVT
+To: David Gibson <david@gibson.dropbear.id.au>
+References: <20191007084102.29776-1-clg@kaod.org>
+ <20191007084102.29776-4-clg@kaod.org> <20191014053257.GU4080@umbus.fritz.box>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Date: Mon, 14 Oct 2019 09:02:29 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.0
 MIME-Version: 1.0
-Content-Type: text/plain
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 33a6316b-7bd7-472b-59de-08d75072d9a2
-X-MS-TrafficTypeDiagnostic: DM5PR0201MB3462:
-X-Microsoft-Antispam-PRVS: <DM5PR0201MB3462E16AA76B9FD906C20B2ECA900@DM5PR0201MB3462.namprd02.prod.outlook.com>
-X-Auto-Response-Suppress: DR, RN, NRN, OOF, AutoReply
-X-MS-Oob-TLC-OOBClassifiers: OLM:161;
-X-Forefront-PRVS: 01901B3451
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: Yt043/BjT88NbHyzd9nF+bD71sgfkk0TIKV26BU6qiYPRrKEJKYwLtXDGXBnXNh7zKayxrELKkM+eelV64y2fDN2Y6G30iZHbRmMPpXo9k0vPDH3qdHuNwGuU6PX/xTYt3+yUD5dIaocdloQp0ZX74AII9h7L0RyAYAqfH8AJdDdUlNuPLMjVtWcxxivCcYpneUmsnm1L2f8S3p7M4vJOjpbPbBUeLH2WZhDO74X/e/5tBTsqGcqYVlhwgXUbPgn+/ED0bSni9NeTaAE2BysQEHtSdm4fwYM1s8AjoJcC60Fbb11S7fbDpiMod+MdiYEctE7UYlhr0IESyGe1OCJSVNkynkLITFIOkTsrVz7rTlE5YBDXdza2900QYCiAJlujvwMc2R/ka+zRkfy9ammCTy1gGYgR19XZUYV61mNGcc=
-X-OriginatorOrg: xilinx.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Oct 2019 06:50:50.2883 (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 33a6316b-7bd7-472b-59de-08d75072d9a2
-X-MS-Exchange-CrossTenant-Id: 657af505-d5df-48d0-8300-c31994686c5c
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=657af505-d5df-48d0-8300-c31994686c5c; Ip=[149.199.60.83];
- Helo=[xsj-pvapsmtpgw01]
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM5PR0201MB3462
-X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
-X-Received-From: 40.107.76.40
+In-Reply-To: <20191014053257.GU4080@umbus.fritz.box>
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
+X-TM-AS-GCONF: 00
+x-cbid: 19101407-4275-0000-0000-00000371D4DC
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19101407-4276-0000-0000-00003884E285
+Message-Id: <4eb20acc-f1c8-08a2-f519-3728c9693dab@kaod.org>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
+ definitions=2019-10-14_05:, , signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ priorityscore=1501
+ malwarescore=0 suspectscore=2 phishscore=0 bulkscore=0 spamscore=0
+ clxscore=1034 lowpriorityscore=0 mlxscore=0 impostorscore=0
+ mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.0.1-1908290000 definitions=main-1910140068
+Content-Transfer-Encoding: quoted-printable
+X-MIME-Autoconverted: from 8bit to quoted-printable by
+ mx0a-001b2d01.pphosted.com id x9E72gah041378
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
+X-Received-From: 148.163.156.1
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -139,79 +109,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Greg Kurz <groug@kaod.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-ZynqMP/Versal specific qspi registers should be handled inside
-zynqmp_qspi_read/write calls. When few of these transactions are handled by
-spi hooks we see state change in spi bus unexpectedly.
+On 14/10/2019 07:32, David Gibson wrote:
+> On Mon, Oct 07, 2019 at 10:40:56AM +0200, C=E9dric Le Goater wrote:
+>> When an interrupt can not be presented to a vCPU, the XIVE presenter
+>> updates the Interrupt Pending Buffer of the XIVE NVT if backlog is
+>> activated in the END.
+>>
+>> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
+>=20
+> This commit message doesn't really make it clear what was happening
+> before, which certainly looks like an update to the IPB field in the
+> NVT, via a different method.
+>=20
+> Is this just a cleanup, or a fix?
 
-Signed-off-by: Sai Pavan Boddu <sai.pavan.boddu@xilinx.com>
----
- hw/ssi/xilinx_spips.c | 26 ++++++++++++++++++++++++--
- 1 file changed, 24 insertions(+), 2 deletions(-)
+This is a small fix. Here is an update changelog :
 
-diff --git a/hw/ssi/xilinx_spips.c b/hw/ssi/xilinx_spips.c
-index a309c71..4f9f8e0 100644
---- a/hw/ssi/xilinx_spips.c
-+++ b/hw/ssi/xilinx_spips.c
-@@ -109,6 +109,7 @@
- #define R_GPIO              (0x30 / 4)
- #define R_LPBK_DLY_ADJ      (0x38 / 4)
- #define R_LPBK_DLY_ADJ_RESET (0x33)
-+#define R_IOU_TAPDLY_BYPASS (0x3C / 4)
- #define R_TXD1              (0x80 / 4)
- #define R_TXD2              (0x84 / 4)
- #define R_TXD3              (0x88 / 4)
-@@ -139,6 +140,8 @@
- #define R_LQSPI_STS         (0xA4 / 4)
- #define LQSPI_STS_WR_RECVD      (1 << 1)
- 
-+#define R_DUMMY_CYCLE_EN    (0xC8 / 4)
-+#define R_ECO               (0xF8 / 4)
- #define R_MOD_ID            (0xFC / 4)
- 
- #define R_GQSPI_SELECT          (0x144 / 4)
-@@ -938,7 +941,16 @@ static uint64_t xlnx_zynqmp_qspips_read(void *opaque,
-     int shortfall;
- 
-     if (reg <= R_MOD_ID) {
--        return xilinx_spips_read(opaque, addr, size);
-+        switch (addr) {
-+        case R_GPIO:
-+        case R_LPBK_DLY_ADJ:
-+        case R_IOU_TAPDLY_BYPASS:
-+        case R_DUMMY_CYCLE_EN:
-+        case R_ECO:
-+            return s->regs[addr / 4];
-+        default:
-+            return xilinx_spips_read(opaque, addr, size);
-+        }
-     } else {
-         switch (reg) {
-         case R_GQSPI_RXD:
-@@ -1063,7 +1075,17 @@ static void xlnx_zynqmp_qspips_write(void *opaque, hwaddr addr,
-     uint32_t reg = addr / 4;
- 
-     if (reg <= R_MOD_ID) {
--        xilinx_qspips_write(opaque, addr, value, size);
-+        switch (reg) {
-+        case R_GPIO:
-+        case R_LPBK_DLY_ADJ:
-+        case R_IOU_TAPDLY_BYPASS:
-+        case R_DUMMY_CYCLE_EN:
-+        case R_ECO:
-+            s->regs[addr] = value;
-+            break;
-+        default:
-+            xilinx_qspips_write(opaque, addr, value, size);
-+        }
-     } else {
-         switch (reg) {
-         case R_GQSPI_CNFG:
--- 
-2.7.4
+"
+When an interrupt can not be presented to a vCPU, the XIVE presenter
+updates the Interrupt Pending Buffer of the XIVE NVT if backlog is
+activated in the END.
+
+Fix the current model that also updates the PIPR which is not how HW=20
+operates and use the XIVE field structure routines to get/set the=20
+IPB register backup value in the XIVE NVT structure.
+"
+
+=20
+>> ---
+>>  include/hw/ppc/xive_regs.h |  1 +
+>>  hw/intc/xive.c             | 11 +++++++++--
+>>  2 files changed, 10 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/include/hw/ppc/xive_regs.h b/include/hw/ppc/xive_regs.h
+>> index 55307cd1533c..530f232b04f8 100644
+>> --- a/include/hw/ppc/xive_regs.h
+>> +++ b/include/hw/ppc/xive_regs.h
+>> @@ -255,6 +255,7 @@ typedef struct XiveNVT {
+>>          uint32_t        w2;
+>>          uint32_t        w3;
+>>          uint32_t        w4;
+>> +#define NVT_W4_IPB               PPC_BITMASK32(16, 23)
+>>          uint32_t        w5;
+>>          uint32_t        w6;
+>>          uint32_t        w7;
+>> diff --git a/hw/intc/xive.c b/hw/intc/xive.c
+>> index cbe4ae6c294d..2bf7b4ad7006 100644
+>> --- a/hw/intc/xive.c
+>> +++ b/hw/intc/xive.c
+>> @@ -1600,14 +1600,21 @@ static void xive_router_end_notify(XiveRouter =
+*xrtr, uint8_t end_blk,
+>>       * - logical server : forward request to IVPE (not supported)
+>>       */
+>>      if (xive_end_is_backlog(&end)) {
+>> +        uint8_t ipb;
+>> +
+>>          if (format =3D=3D 1) {
+>>              qemu_log_mask(LOG_GUEST_ERROR,
+>>                            "XIVE: END %x/%x invalid config: F1 & backl=
+og\n",
+>>                            end_blk, end_idx);
+>>              return;
+>>          }
+>> -        /* Record the IPB in the associated NVT structure */
+>> -        ipb_update((uint8_t *) &nvt.w4, priority);
+>> +        /*
+>> +         * Record the IPB in the associated NVT structure for later
+>> +         * use. The presenter will resend the interrupt when the vCPU
+>> +         * is dispatched again on a HW thread.
+>> +         */
+>> +        ipb =3D xive_get_field32(NVT_W4_IPB, nvt.w4) | priority_to_ip=
+b(priority);
+>> +        nvt.w4 =3D xive_set_field32(NVT_W4_IPB, nvt.w4, ipb);
+>>          xive_router_write_nvt(xrtr, nvt_blk, nvt_idx, &nvt, 4);
+>> =20
+>>          /*
+>=20
 
 
