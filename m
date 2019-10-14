@@ -2,80 +2,86 @@ Return-Path: <SRS0=PUPy=YH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DA2B0ECE587
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 14:58:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C043FC4CECE
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 15:00:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AF2DD20873
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 14:58:07 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AF2DD20873
+	by mail.kernel.org (Postfix) with ESMTPS id 9604E20873
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 15:00:40 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9604E20873
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51116 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51138 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iK1nS-0007LB-TE
-	for qemu-devel@archiver.kernel.org; Mon, 14 Oct 2019 10:58:06 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54556)
+	id 1iK1pu-0000V8-MZ
+	for qemu-devel@archiver.kernel.org; Mon, 14 Oct 2019 11:00:39 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54957)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vkuznets@redhat.com>) id 1iK1mk-0006bo-Ov
- for qemu-devel@nongnu.org; Mon, 14 Oct 2019 10:57:23 -0400
+ (envelope-from <mreitz@redhat.com>) id 1iK1or-0008La-L3
+ for qemu-devel@nongnu.org; Mon, 14 Oct 2019 10:59:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vkuznets@redhat.com>) id 1iK1mi-0002XS-9D
- for qemu-devel@nongnu.org; Mon, 14 Oct 2019 10:57:21 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46280)
+ (envelope-from <mreitz@redhat.com>) id 1iK1oq-0003yD-G3
+ for qemu-devel@nongnu.org; Mon, 14 Oct 2019 10:59:33 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:56934)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <vkuznets@redhat.com>) id 1iK1mi-0002VC-3s
- for qemu-devel@nongnu.org; Mon, 14 Oct 2019 10:57:20 -0400
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71])
- (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>)
+ id 1iK1on-0003wD-Ql; Mon, 14 Oct 2019 10:59:30 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id EB33F811DE
- for <qemu-devel@nongnu.org>; Mon, 14 Oct 2019 14:57:17 +0000 (UTC)
-Received: by mail-wm1-f71.google.com with SMTP id q9so7255397wmj.9
- for <qemu-devel@nongnu.org>; Mon, 14 Oct 2019 07:57:17 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
- :message-id:mime-version;
- bh=DkYmESCvkqzPI8cu0bSgZGf7oLIsgWwrCSCE1AMG5A0=;
- b=q+rpf9OGkZ69RsxBSzSDYqWHCIgBJ+2dwGra/TDdBrkiQMmMTJknlFSotidyDGQCoH
- IBbLkKJBeH/jjVIiVXEGxmQHKjIP/tMy7qk/Fr7My1Um1vafZnvSqUHX+STbLoB1R7mn
- OG5exi5drG64i/3Ec0JyUHFMLimBXtjGpFMgLxfENs0jCNpY9QvX6TQTnbN4/mET8lPc
- aYBdp2XVB7Jrbcmmq/MU0+ecONQCN3JvNs9XDnxUNlJ80wolR03YkZWEfGj5nrCHQU9j
- eXWm2fNAQ2Yikg7CVtvyO7e6T7bQdc94ee3xnelfIHsTav2SLajdkjjbVwq8HY0pCf22
- SYbw==
-X-Gm-Message-State: APjAAAWY3LhSD4GTudZkPQKeM5DdOs6HvVBFkOd5hAdCkjNDpfpPgwMV
- y+cmGoEitKtbIrDEFilXUpzMuY4dsg4bnqgbXUEQNEr0Os9nTrpY4hElRWLhfmVmLEoNSLKzJXa
- e1hniVWE2DRp63Ng=
-X-Received: by 2002:a7b:cb8a:: with SMTP id m10mr14371405wmi.132.1571065036697; 
- Mon, 14 Oct 2019 07:57:16 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqw4xINcheBC8vgbQy7E0ixh7c7nKSa/MD6EfRy6mNcx99/7Gzvtdv8Al1WAYd/C2tuPgoMoNg==
-X-Received: by 2002:a7b:cb8a:: with SMTP id m10mr14371386wmi.132.1571065036468; 
- Mon, 14 Oct 2019 07:57:16 -0700 (PDT)
-Received: from vitty.brq.redhat.com (nat-pool-brq-t.redhat.com.
- [213.175.37.10])
- by smtp.gmail.com with ESMTPSA id 59sm40931491wrc.23.2019.10.14.07.57.15
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 14 Oct 2019 07:57:15 -0700 (PDT)
-From: Vitaly Kuznetsov <vkuznets@redhat.com>
-To: Tianyu Lan <Tianyu.Lan@microsoft.com>,
- "lantianyu1986\@gmail.com" <lantianyu1986@gmail.com>
-Subject: Re: [PATCH] target/i386/kvm: Add Hyper-V direct tlb flush support
-In-Reply-To: <KL1P15301MB02611D1F7C54C4A599766B8D92900@KL1P15301MB0261.APCP153.PROD.OUTLOOK.COM>
-References: <20191012034153.31817-1-Tianyu.Lan@microsoft.com>
- <87r23h58th.fsf@vitty.brq.redhat.com>
- <KL1P15301MB02611D1F7C54C4A599766B8D92900@KL1P15301MB0261.APCP153.PROD.OUTLOOK.COM>
-Date: Mon, 14 Oct 2019 16:57:14 +0200
-Message-ID: <875zkr5q9h.fsf@vitty.brq.redhat.com>
+ by mx1.redhat.com (Postfix) with ESMTPS id 0B67220FE;
+ Mon, 14 Oct 2019 14:59:29 +0000 (UTC)
+Received: from dresden.str.redhat.com (ovpn-117-165.ams2.redhat.com
+ [10.36.117.165])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 88BA1608C2;
+ Mon, 14 Oct 2019 14:59:25 +0000 (UTC)
+Subject: Re: [PATCH v4 0/7] iotests: Selfish patches
+To: qemu-block@nongnu.org
+References: <20190917092004.999-1-mreitz@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <80224b65-9741-befb-7a3e-fbc44746efee@redhat.com>
+Date: Mon, 14 Oct 2019 16:59:24 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.0
 MIME-Version: 1.0
-Content-Type: text/plain
+In-Reply-To: <20190917092004.999-1-mreitz@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="nclFDyk8y4bBIBS2mG2w6CBbsQmUuB9qr"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.71]); Mon, 14 Oct 2019 14:59:29 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 209.132.183.28
@@ -90,48 +96,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "mtosatti@redhat.com" <mtosatti@redhat.com>,
- "ehabkost@redhat.com" <ehabkost@redhat.com>,
- "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "mst@redhat.com" <mst@redhat.com>,
- "cohuck@redhat.com" <cohuck@redhat.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- Roman Kagan <rkagan@virtuozzo.com>,
- "pbonzini@redhat.com" <pbonzini@redhat.com>,
- "rth@twiddle.net" <rth@twiddle.net>
+Cc: Kevin Wolf <kwolf@redhat.com>,
+ Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>,
+ Thomas Huth <thuth@redhat.com>, John Snow <jsnow@redhat.com>,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Tianyu Lan <Tianyu.Lan@microsoft.com> writes:
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--nclFDyk8y4bBIBS2mG2w6CBbsQmUuB9qr
+Content-Type: multipart/mixed; boundary="oUBiBolW6xLPsL4S6R79XUzPf4qqpBYol"
 
->> > --- a/linux-headers/linux/kvm.h
->> > +++ b/linux-headers/linux/kvm.h
->> > @@ -995,6 +995,7 @@ struct kvm_ppc_resize_hpt {
->> >  #define KVM_CAP_ARM_SVE 170
->> >  #define KVM_CAP_ARM_PTRAUTH_ADDRESS 171
->> >  #define KVM_CAP_ARM_PTRAUTH_GENERIC 172
->> > +#define KVM_CAP_HYPERV_DIRECT_TLBFLUSH 174
->>
->> I was once told that scripts/update-linux-headers.sh script is supposed
->> to be used instead of cherry-picking stuff you need (adn this would be a
->> separate patch - update linux headers to smth).
->>
->
-> Thanks for suggestion. I just try the update-linux-headers.sh and there are a lot
-> of changes which are not related with my patch. I also include these
-> changes in my patch, right?
->
+--oUBiBolW6xLPsL4S6R79XUzPf4qqpBYol
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
-Yes, see e.g.
+On 17.09.19 11:19, Max Reitz wrote:
+> Hi,
+>=20
+> Again, let me start with a link to an actually explanatory cover letter=
+:
+> https://lists.nongnu.org/archive/html/qemu-block/2019-06/msg01102.html
+>=20
+> v3:
+> https://lists.nongnu.org/archive/html/qemu-block/2019-08/msg00950.html
+>=20
+> v4:
+> - I merged the old patch 1 in the meantime
+>=20
+> - Patch 2: Adjusted the comment to make it more clear that it is
+>            case_notrun() itself that will not skip the test case, as
+>            requested by Andrey (I hope it fits what he had in mind, mor=
+e
+>            or less); kept the R-bs, because I somehow feel like that=E2=
+=80=99s
+>            the right thing to do here.
+>=20
+> - Patch 3: The func_wrapper returned by the skip_test_decorator has a
+>            mandatory argument; make that and its required type explicit=
 
-commit d9cb4336159a00bd0d9c81b93f02874ef3626057
-Author: Cornelia Huck <cohuck@redhat.com>
-Date:   Thu May 16 19:10:36 2019 +0200
+>            (with an annotation), as suggested by John
+>            (Kevin made me aware of the fact that annotations exist sinc=
+e
+>            Python 3.0, it=E2=80=99s just that they didn=E2=80=99t mean =
+anything back
+>            then (neither do they really now, but whatever, it=E2=80=99s=
+ better
+>            than a comment))
+>=20
+> - Patch 4: Resolved a conflict because of the change to patch 3
 
-    linux headers: update against Linux 5.2-rc1
+Thanks for the reviews, applied to my block branch:
 
-as an example.
+https://git.xanclic.moe/XanClic/qemu/commits/branch/block
 
--- 
-Vitaly
+Max
+
+
+--oUBiBolW6xLPsL4S6R79XUzPf4qqpBYol--
+
+--nclFDyk8y4bBIBS2mG2w6CBbsQmUuB9qr
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl2kjUwACgkQ9AfbAGHV
+z0DCnQf/cIFkvjDzHE/mB+ahrV+R8syJ/eptVVp1DleoA41YwoEr4DAXrNstr/3N
+7tzeTElTsdpzbSgKoxWrva95bpU8P7waytK+DkSa9B2kWSTf3oZ8cHpzU3Zm7bII
+UKwMJCpnx/6x4RFvUZVJcuA16aSsD+PD1NOc/4JNJYlYNbJOU0x7Lb95sFD37tLq
+7AbnRpQdnS8DkJ/1MhqbBVFDhdQSmID7F0OCCCEbwW4qYrZAL2+fmmMwrbbKmDJJ
+RKgBPbpNImAN9+1I56Wz4k6q4qc7Wcs9veLJOHp8udjfB7ofgt+8zWaLzxgD/xPc
+uVcDpEaalobo6mWLuusAGRzEwnJqAw==
+=93fY
+-----END PGP SIGNATURE-----
+
+--nclFDyk8y4bBIBS2mG2w6CBbsQmUuB9qr--
 
