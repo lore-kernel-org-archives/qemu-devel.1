@@ -2,64 +2,79 @@ Return-Path: <SRS0=PUPy=YH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-10.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 16207C4CECE
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 15:07:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CB4DDECE587
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 15:10:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DF9732133F
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 15:07:04 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DF9732133F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 90DDC2133F
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 15:10:43 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="bq/72Uqp"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 90DDC2133F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51216 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51284 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iK1w7-0006zP-T3
-	for qemu-devel@archiver.kernel.org; Mon, 14 Oct 2019 11:07:03 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55817)
+	id 1iK1ze-00016o-NP
+	for qemu-devel@archiver.kernel.org; Mon, 14 Oct 2019 11:10:42 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56329)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <ehabkost@redhat.com>) id 1iK1v3-0005o5-Vr
- for qemu-devel@nongnu.org; Mon, 14 Oct 2019 11:05:59 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1iK1yt-0000bv-Gt
+ for qemu-devel@nongnu.org; Mon, 14 Oct 2019 11:09:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <ehabkost@redhat.com>) id 1iK1v2-0008Ol-1z
- for qemu-devel@nongnu.org; Mon, 14 Oct 2019 11:05:57 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:23991)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1iK1v1-0008NQ-SR
- for qemu-devel@nongnu.org; Mon, 14 Oct 2019 11:05:56 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 86D2018C8929;
- Mon, 14 Oct 2019 15:05:54 +0000 (UTC)
-Received: from localhost (ovpn-116-20.phx2.redhat.com [10.3.116.20])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 21E8A5C231;
- Mon, 14 Oct 2019 15:05:48 +0000 (UTC)
-Date: Mon, 14 Oct 2019 12:05:47 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-To: Wei Yang <richardw.yang@linux.intel.com>
-Subject: Re: [Qemu-devel] [PATCH v2 0/2] refine memory_device_get_free_addr
-Message-ID: <20191014150547.GR4084@habkost.net>
-References: <20190730003740.20694-1-richardw.yang@linux.intel.com>
- <20190913234746.jb5a5vlwl6cebudz@master>
- <20190914154026-mutt-send-email-mst@kernel.org>
- <20191012090209.GA6047@richard>
+ (envelope-from <peter.maydell@linaro.org>) id 1iK1ys-0001xO-2o
+ for qemu-devel@nongnu.org; Mon, 14 Oct 2019 11:09:55 -0400
+Received: from mail-ot1-x334.google.com ([2607:f8b0:4864:20::334]:34692)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1iK1yr-0001xB-To
+ for qemu-devel@nongnu.org; Mon, 14 Oct 2019 11:09:54 -0400
+Received: by mail-ot1-x334.google.com with SMTP id m19so14105939otp.1
+ for <qemu-devel@nongnu.org>; Mon, 14 Oct 2019 08:09:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=9oYzgHekzk9qCymt7fHW69btA1putZ30A5v64sw7n6Y=;
+ b=bq/72Uqp1lP7dLH8iUjjlm8MKeH0F8xS4Uf0PJ4Ai+dh6xuEDs3n/jRPqPFVrB/8sT
+ QqssrQ2D5TcawJZ9bb0wl8aDUnGYuQ0d3thtkfQsJgvXqe7WLiiJL9zDPL4XutibnbOU
+ PjbAhL/CjujdnQ0aCc/m92VKcJC3VE3WVffdETnczitoUEPlXarsugr0YqLXtB4DfF18
+ zauh0I1nO7k2VWjxc2Dd7uyQRVAZJUwchMheqjII7ZK89sK79WE2/MRPnvqB6gbjrtlL
+ c3/Qrkl5ZFVAzLx890Gxw3hlJk6CmKxGZfYBDrSZHel4arDEReK6B+VErnRkxlHoaZfp
+ o9Mg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=9oYzgHekzk9qCymt7fHW69btA1putZ30A5v64sw7n6Y=;
+ b=DgPCJyx0f4v2D1Sca1/+7HPlZ0pUPVWGbAiE2JhzIxf42H52BwcRPhCV5k280ug9yT
+ KRIR8o8sHgm9u9lBruNAe6nBBkFSLw0P+dF9eIoTUBmRfQifbZqSlvtqayAYPO5ndSp/
+ kmODb8SQvCP6ByuQBugXHJwKrtxD5gfDJ1LzZwDCNG5pAeoO0jbKziybPAj/QtPQG2KF
+ uU3eXjZ+Soait+h92cEsJr6cR8lk29qP7WX8qLHnu64ZD8Bl2DzUQi3ZQLS75T1GWrGN
+ 7ic2uoGsOftm0aUsTWmMedU+BAmuoc1q1FmmiY3vgbW0YgfrLcFHEqvh2GsUNAIRiqet
+ 8o8g==
+X-Gm-Message-State: APjAAAU3KtoyjZOdEjUeOoIOIgDZ9R39AECJ0xB90bRwajImuM9t90qR
+ xsrDQbpNs812qg8ltNA9ERKl8IZabX3csWEw+6dMkQ==
+X-Google-Smtp-Source: APXvYqy/H0xqj8pdHCoiZruc+5LTYSV1NISaJ0TxbDKwktSuQTm5T+tvC62AIdgy99s5gGz/0RD3PSv1dFbxmfrxXXM=
+X-Received: by 2002:a9d:30c1:: with SMTP id r1mr25132732otg.91.1571065792844; 
+ Mon, 14 Oct 2019 08:09:52 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20191012090209.GA6047@richard>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.70]); Mon, 14 Oct 2019 15:05:54 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.132.183.28
+References: <157073476983.23153.13333563650903948665.stgit@gimli.home>
+In-Reply-To: <157073476983.23153.13333563650903948665.stgit@gimli.home>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 14 Oct 2019 16:09:40 +0100
+Message-ID: <CAFEAcA-u0zK1p4t0N7uj39q7KAYTYZt88K_-egsDjBJfX9RxeA@mail.gmail.com>
+Subject: Re: [PULL 0/1] vfio update 2019-10-10
+To: Alex Williamson <alex.williamson@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::334
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -71,45 +86,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: imammedo@redhat.com, Wei Yang <richard.weiyang@gmail.com>, david@redhat.com,
- qemu-devel@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Sat, Oct 12, 2019 at 05:02:09PM +0800, Wei Yang wrote:
-> On Sat, Sep 14, 2019 at 03:40:41PM -0400, Michael S. Tsirkin wrote:
-> >On Fri, Sep 13, 2019 at 11:47:46PM +0000, Wei Yang wrote:
-> >> On Tue, Jul 30, 2019 at 08:37:38AM +0800, Wei Yang wrote:
-> >> >When we iterate the memory-device list to get the available range, it is not
-> >> >necessary to iterate the whole list.
-> >> >
-> >> >1) no more overlap for hinted range if tmp exceed it
-> >> >
-> >> >v2:
-> >> >   * remove #2 as suggested by Igor and David
-> >> >   * add some comment to inform address assignment stay the same as before
-> >> >     this change 
-> >> >
-> >> >Wei Yang (2):
-> >> >  memory-device: not necessary to use goto for the last check
-> >> >  memory-device: break the loop if tmp exceed the hinted range
-> >> >
-> >> > hw/mem/memory-device.c | 3 ++-
-> >> > 1 file changed, 2 insertions(+), 1 deletion(-)
-> >> >
-> >> 
-> >> Would someone take this patch set?
-> >
-> >yes looks good to me too.
-> >Eduardo?
-> >
-> 
-> Hmm... I don't see this any where. May I ask the status?
+On Thu, 10 Oct 2019 at 20:15, Alex Williamson
+<alex.williamson@redhat.com> wrote:
+>
+> The following changes since commit 98b2e3c9ab3abfe476a2b02f8f51813edb90e72d:
+>
+>   Merge remote-tracking branch 'remotes/stefanha/tags/block-pull-request' into
+> staging (2019-10-08 16:08:35 +0100)
+>
+> are available in the Git repository at:
+>
+>   git://github.com/awilliam/qemu-vfio.git tags/vfio-update-20191010.0
+>
+> for you to fetch changes up to d964d3b5abb5242591a088dacb1dc01e608b5158:
+>
+>   hw/vfio/pci: fix double free in vfio_msi_disable (2019-10-10 11:07:28 -0600)
+>
+> ----------------------------------------------------------------
+> VFIO update 2019-10-10
+>
+>  - Fix MSI error path double free (Evgeny Yakovlev)
+>
 
-Sorry, I hadn't seen Michael's message.  Queued on machine-next.
-Thanks!
+Applied, thanks.
 
--- 
-Eduardo
+Please update the changelog at https://wiki.qemu.org/ChangeLog/4.2
+for any user-visible changes.
+
+-- PMM
 
