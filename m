@@ -2,93 +2,79 @@ Return-Path: <SRS0=PUPy=YH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DE2ABC4CECE
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 17:25:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B66EC4CECE
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 17:27:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AD05520663
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 17:25:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 29F3220663
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 17:27:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="VOCFqXGJ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AD05520663
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="nc9A2T9x"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 29F3220663
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54469 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54527 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iK46I-00079h-Ed
-	for qemu-devel@archiver.kernel.org; Mon, 14 Oct 2019 13:25:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45423)
+	id 1iK48E-0001Qj-UN
+	for qemu-devel@archiver.kernel.org; Mon, 14 Oct 2019 13:27:42 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38507)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1iK3j2-0002Iy-41
- for qemu-devel@nongnu.org; Mon, 14 Oct 2019 13:01:40 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1iK2x1-0005nK-CS
+ for qemu-devel@nongnu.org; Mon, 14 Oct 2019 12:12:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1iK3j1-0005qu-0p
- for qemu-devel@nongnu.org; Mon, 14 Oct 2019 13:01:40 -0400
-Received: from mail-pl1-x635.google.com ([2607:f8b0:4864:20::635]:34656)
+ (envelope-from <peter.maydell@linaro.org>) id 1iK2x0-0002vn-88
+ for qemu-devel@nongnu.org; Mon, 14 Oct 2019 12:12:03 -0400
+Received: from mail-ot1-x329.google.com ([2607:f8b0:4864:20::329]:35090)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1iK3j0-0005ph-RK
- for qemu-devel@nongnu.org; Mon, 14 Oct 2019 13:01:38 -0400
-Received: by mail-pl1-x635.google.com with SMTP id k7so8287076pll.1
- for <qemu-devel@nongnu.org>; Mon, 14 Oct 2019 10:01:38 -0700 (PDT)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1iK2x0-0002vc-25
+ for qemu-devel@nongnu.org; Mon, 14 Oct 2019 12:12:02 -0400
+Received: by mail-ot1-x329.google.com with SMTP id z6so14283408otb.2
+ for <qemu-devel@nongnu.org>; Mon, 14 Oct 2019 09:12:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=eblkwcZW3JEeU+VtoWSF8yuiTYILJ+fT8OPZ3vIl3yk=;
- b=VOCFqXGJC2C59aQTk7reoS8VnQL4LFzuB1kyqLHkX6AK2mhPoezEaTizMJjIVZkKED
- i+mr9VMy7lV5sZ3HaopzJDEMkgaUvnC7EHxJHCOwLAeAXrUviELuj1HR/qfjeC1qnKFi
- CknFRP+nfxm1f1NnbtFuTJG531CD4ruWJS4+19g3UfO0UhEUoUgYlqNP+pJch3X0AiCn
- Nn50ji5hmE4nNEkE63lrR6KuBiv5bxllB5UJM3hsXZm/XnnXePgChE6d9iKPMzitUoWu
- 6mJSlm5ESxBlxMK2WRbRYfS/yRSna7xHHTLuenOG3S04ZqKc2lc7mV9LQIQU0ZeLJ73h
- iZdA==
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=PPx9wOFTY5bJVo7Que9niwAVqXrZsqQ2yIApFOHBdqA=;
+ b=nc9A2T9xjXLCPK5RO5hpMEIYeUwUQR+ES+tlHw4m2AnrzCObSIUcc3ic4BOW7KBN8/
+ wm1bnh8sTLYY38VCArSzmHuiEgETIAO8q2KqEngzSNWsjiPfY8doxkIA1PHQfLP4/0fr
+ +HIQklAj73SmDjtEeJYhAqapfuGAK0C3ftFQFfs14sC2f3cUB2WKdXl2W6fy8DZCNoy2
+ eOq8EOd0VbAviOJyteS3G+UCV6S7PSpSs/SmJJz4Yd+DSkNvzaJFump1w4/n0fKYAqMn
+ HKBRUW3d+aV75WWvuaQsTMjODR71Ph1lt4hB2b+SWsZlGM/dtnAWdC4dQDNrscDGPUJO
+ VmDQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=eblkwcZW3JEeU+VtoWSF8yuiTYILJ+fT8OPZ3vIl3yk=;
- b=jbmCKgu5A8+Uit4WPuDO872bD6sSjY//wq0NfhkOii23oTaV/ORioyhLGfQ7HOCUSo
- omQROnUBDDv/c6tAb0y5ytCoopfdxzWykZpeycuo77GB+Du95bbZ22iiiY6dwHEs67XQ
- NQwQJ7i2JOXYJ1Q/ruCflbIdivU6U6W7GWjdyuxGGJRIOcCc8Q8/DIcrzz9H4C9yMZoB
- 2Dt0TE0FRy9GyGse28fGnvusk7UIqZlr03UoEyu01m80ZcRgr5eQALi2HhGW2Yt6Mpbx
- wthnqyHVbJ+EPCi3SXZH7kPRIrfCz9s1tdACFPm57uSt+oqlDUu6KBwPw7TuuHlq5w07
- qDTQ==
-X-Gm-Message-State: APjAAAUY+0t0W5aSq2tXs8am4gJXHqk3lapkv+jB8qlNYwPko09ZRRfi
- 2boVGU0g4GPLme9wMcrgR39saw==
-X-Google-Smtp-Source: APXvYqxS6u+EcFQS7m1a5j/gCNyckmd8bzRHeJgOwfKJelreytalp5hwjRNEwJA4HNv37bUlSRZ5qQ==
-X-Received: by 2002:a17:902:a712:: with SMTP id
- w18mr31555947plq.304.1571072497480; 
- Mon, 14 Oct 2019 10:01:37 -0700 (PDT)
-Received: from [192.168.1.11] (97-113-7-119.tukw.qwest.net. [97.113.7.119])
- by smtp.gmail.com with ESMTPSA id 20sm19603285pfp.153.2019.10.14.10.01.36
- (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Mon, 14 Oct 2019 10:01:36 -0700 (PDT)
-Subject: Re: [PATCH v5 53/55] plugins: add sparc64 instruction classification
- table
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
- qemu-devel@nongnu.org
-References: <20191014104948.4291-1-alex.bennee@linaro.org>
- <20191014104948.4291-54-alex.bennee@linaro.org>
-From: Richard Henderson <richard.henderson@linaro.org>
-Openpgp: preference=signencrypt
-Message-ID: <3ce497fe-9dc1-5fa3-acf6-155ae16e0793@linaro.org>
-Date: Mon, 14 Oct 2019 10:01:34 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=PPx9wOFTY5bJVo7Que9niwAVqXrZsqQ2yIApFOHBdqA=;
+ b=ERaL1fc3ckD+Vnv9WC1Dq/Ohjw1i0QoKUTcHDmyIuqmFJGo8OkbcsNlq74l4/r607T
+ N0+6LhUR2f0qFs2GJiIE6KIGvqNyzjCVb2+ccs24doqRC7Ft/x5GtzXZbydLHrG7AKWt
+ WKJAOFD4IK40wizrjF4axVwcMeJ7aVcbbtccVOFQM1IdRX8NCFZ2O/25r39shGE2xgl6
+ XjDY5rle+ot6hLT9qgUblpyxlyyeezpBXnQCcq3tzF1W4p+P00xzzIMnGNp4V2v16Cer
+ SEd0KSA4cDvKXUJQVR/aRp7Syctk+KAivHhsSoihcX1E1wYuLHPeN3hKClwsLmnCSuma
+ Lx9A==
+X-Gm-Message-State: APjAAAWiX6Bq7l5fikODSAXx0Rzwgkn9GT2Ns0070/HQP/Ly7lovAH7r
+ Xhk18FmuNkI567IF46gdH29W1tI088e7qYi34FXslA==
+X-Google-Smtp-Source: APXvYqxLehv93Su3YEgEsC3aQr+AFDxm30dlqqiiR6atrtJ+iZOS+IdEK3AmVyiNAp5o44R/HtRL0rSU+qBYOEr9GlI=
+X-Received: by 2002:a9d:708e:: with SMTP id l14mr25326890otj.135.1571069521157; 
+ Mon, 14 Oct 2019 09:12:01 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20191014104948.4291-54-alex.bennee@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+References: <20191011212550.27269-1-jsnow@redhat.com>
+In-Reply-To: <20191011212550.27269-1-jsnow@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 14 Oct 2019 17:11:49 +0100
+Message-ID: <CAFEAcA9SRYsn10rTGsHM4hCPYbSxY=kuAnoiqbDBkCOYFzg8YQ@mail.gmail.com>
+Subject: Re: [PULL 00/19] Bitmaps patches
+To: John Snow <jsnow@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::635
+X-Received-From: 2607:f8b0:4864:20::329
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -100,28 +86,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: aaron@os.amperecomputing.com, cota@braap.org, robert.foley@futurewei.com,
- peter.puhov@futurewei.com
+Cc: Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>,
+ Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ Qemu-block <qemu-block@nongnu.org>, Juan Quintela <quintela@redhat.com>,
+ Libvirt <libvir-list@redhat.com>, Markus Armbruster <armbru@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 10/14/19 3:49 AM, Alex Bennée wrote:
-> +InsnClassExecCount sparc32_insn_classes[] = {
-> +    { "Call",                "call",   0xc0000000, 0x40000000, COUNT_CLASS},
-> +    { "Branch ICond",        "bcc",    0xc1c00000, 0x00800000, COUNT_CLASS},
-> +    { "Branch Fcond",        "fbcc",   0xc1c00000, 0x01800000, COUNT_CLASS},
-> +    { "SetHi",               "sethi",  0xc1c00000, 0x01000000, COUNT_CLASS},
-> +    { "FPU ALU",             "fpu",    0xc1f00000, 0x81a00000, COUNT_CLASS},
-> +    { "ALU",                 "alu",    0xc0000000, 0x80000000, COUNT_CLASS},
-> +    { "Load/Store",          "ldst",   0xc0000000, 0xc0000000, COUNT_CLASS},
-> +    /* Unclassified */
-> +    { "Unclassified",        "unclas", 0x00000000, 0x00000000, COUNT_INDIVIDUAL},
-> +};
-> +
+On Fri, 11 Oct 2019 at 22:26, John Snow <jsnow@redhat.com> wrote:
+>
+> The following changes since commit 98b2e3c9ab3abfe476a2b02f8f51813edb90e72d:
+>
+>   Merge remote-tracking branch 'remotes/stefanha/tags/block-pull-request' into staging (2019-10-08 16:08:35 +0100)
+>
+> are available in the Git repository at:
+>
+>   https://github.com/jnsnow/qemu.git tags/bitmaps-pull-request
+>
+> for you to fetch changes up to b97d9a1014b61dd0980e7f4a0c9ca1e3b0aaa761:
+>
+>   dirty-bitmaps: remove deprecated autoload parameter (2019-10-09 17:02:45 -0400)
+>
+> ----------------------------------------------------------------
+> Pull request
+>
+> ----------------------------------------------------------------
+>
 
-Unused.  You'd see this if they were static.
+Hi -- this has a conflict in block/backup.c -- could you fix up
+and resend, please ?
 
-
-r~
+thanks
+-- PMM
 
