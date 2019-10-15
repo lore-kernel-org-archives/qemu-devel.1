@@ -2,82 +2,85 @@ Return-Path: <SRS0=6OCO=YI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,SPF_HELO_NONE,
 	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C9B4C10F14
-	for <qemu-devel@archiver.kernel.org>; Tue, 15 Oct 2019 11:57:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EA7AEC10F14
+	for <qemu-devel@archiver.kernel.org>; Tue, 15 Oct 2019 12:19:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 460DB2067B
-	for <qemu-devel@archiver.kernel.org>; Tue, 15 Oct 2019 11:57:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B4BDC21848
+	for <qemu-devel@archiver.kernel.org>; Tue, 15 Oct 2019 12:19:46 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="BCIoVq1T"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 460DB2067B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="uGd5rkPw"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B4BDC21848
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42320 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43174 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iKLS7-0001tB-Fe
-	for qemu-devel@archiver.kernel.org; Tue, 15 Oct 2019 07:57:23 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33718)
+	id 1iKLnl-0000CS-Pz
+	for qemu-devel@archiver.kernel.org; Tue, 15 Oct 2019 08:19:45 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37240)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <beata.michalska@linaro.org>) id 1iKLRM-0001Pp-OL
- for qemu-devel@nongnu.org; Tue, 15 Oct 2019 07:56:37 -0400
+ (envelope-from <aleksandar.m.mail@gmail.com>) id 1iKLlQ-0007tW-DJ
+ for qemu-devel@nongnu.org; Tue, 15 Oct 2019 08:17:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <beata.michalska@linaro.org>) id 1iKLRK-0002PD-JW
- for qemu-devel@nongnu.org; Tue, 15 Oct 2019 07:56:36 -0400
-Received: from mail-io1-xd41.google.com ([2607:f8b0:4864:20::d41]:45019)
+ (envelope-from <aleksandar.m.mail@gmail.com>) id 1iKLlO-0002rx-VW
+ for qemu-devel@nongnu.org; Tue, 15 Oct 2019 08:17:20 -0400
+Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:39644)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <beata.michalska@linaro.org>)
- id 1iKLRI-0002OF-Lh
- for qemu-devel@nongnu.org; Tue, 15 Oct 2019 07:56:33 -0400
-Received: by mail-io1-xd41.google.com with SMTP id w12so45100005iol.11
- for <qemu-devel@nongnu.org>; Tue, 15 Oct 2019 04:56:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=IL5FBdAvXUA93jNHA93fQEkKBO6jrOksRZy3o133Nw0=;
- b=BCIoVq1TFJ8Sa5mrARu8UDRZotgXpHaEZamYmzIEi7QiOsgD3HJYqXfSdachcVgC4j
- 3IJUvJiqmHu/MFsy0WvPF/CrsxvzLGC5j/b9umU+xnNNdU/WCHorK5LSSZ7DDK/C3EnW
- uoWYTN4wUyXr1oB6pAQS7A0w2N4n6/DTviOSwpKOybtuXmBCEo+Bl/JxWKJfs++x2Q24
- LtPj4WUtR/fr6Ik4rVU5AHkh2WAEuRyWQN9uM35jgeETGOIKacQ3RQinmS2qypTgYAsD
- gPT7kRxiosrymbJRQuXtXIWKduc22Ad7dcEB9alpKysTNRmz6HYY5NWoFSG15WoHhPf3
- uDIQ==
+ (Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
+ id 1iKLlO-0002qj-Ql
+ for qemu-devel@nongnu.org; Tue, 15 Oct 2019 08:17:18 -0400
+Received: by mail-oi1-x243.google.com with SMTP id w144so16571633oia.6
+ for <qemu-devel@nongnu.org>; Tue, 15 Oct 2019 05:17:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:in-reply-to:references:from:date:message-id:subject:to
+ :cc; bh=DW+pwd5ccaEqPqdb1U2F0RHM5IB3TG9RH0PzgM6eKP0=;
+ b=uGd5rkPw0g+Llgq5VG6wuDkCIJC5ewqQmgvbz5nOOmPThr3OkFa05Ubys2wcL30HU3
+ kAWmAZwyCmS8UwgmPjtESfT63vJK7MXcFxQdhoAfufJVaKQrMjQTU1w1quvuS/ZGtnT1
+ 1ai1rjzKFUCxiuejXQ9XCfYu1x9hU2kDJM//WjEz2D01MFF6xI/DoTsd3K/ojZ23m9U4
+ FWv59h850W2N2NoEFppavA2+Fjz6PV+cWwD3e6pAP5DbfFtQhTPPah+LUZNphcOPdbnw
+ wISLuyUOS8sDJsHYPZjaDOO7xfRS0ENPjdbKevNz054pUjxztf/HodU7XLsahiPGsLNq
+ St1Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ h=x-gm-message-state:mime-version:in-reply-to:references:from:date
  :message-id:subject:to:cc;
- bh=IL5FBdAvXUA93jNHA93fQEkKBO6jrOksRZy3o133Nw0=;
- b=EQXO59JwILVpqCUyzB58BX+2GfhsRF55BPaI5WS1CjrtWUd7R2o9GUjjgh5HusW0nZ
- 5K5IVHTh8x2IsHur/pvsidGzSwBxnbkzoe0byRWABhxqd/vpD87Pzn8HhajY+JOLupYY
- MCNfQILd2Gv9xq7QhhW54c64ftk4NrD59JYPeNbkodLf8FiCLovlhbP/iyrhskOUlAD9
- V06MtySpzdtCweOgFHRKItpkvblNun0QgqMrEXI1/vEdme2QlfocHT6D2DWktQGv3qMU
- Yj0lhvZyDUyKsbEajTm8wnfWALze/+z1M3nWHNRAADw7jz3bpSgeymE77gpuxQ5Yk/ch
- 6CnQ==
-X-Gm-Message-State: APjAAAVHKbKZKy/8RkwJOKFw+SNfpLph7Z3jCgH4vai22y+BTBNC8ft8
- Cb0+lEtNgmtehxbj/dAYOXyY1U5k4jIeGPrDLcfZ5g==
-X-Google-Smtp-Source: APXvYqyYgQidGLqzHV6Y6+n58u1HA0fwWVReIOM4oVeN0kQEK05y4hrnykdfGwDbuN03e55qt/4fM1Mso6DEU3XMiT0=
-X-Received: by 2002:a5e:9741:: with SMTP id h1mr7061223ioq.143.1571140590103; 
- Tue, 15 Oct 2019 04:56:30 -0700 (PDT)
+ bh=DW+pwd5ccaEqPqdb1U2F0RHM5IB3TG9RH0PzgM6eKP0=;
+ b=YerkI04b/rnVE8UmaYrTmXoV06AAMgmdGYcMMv2oFaxIGxE59yvKVuOIdy4z3ougVJ
+ 4eQDG1PZxQmqZA9jRoxvelnRW2B30BCgMRJSLvZfBCA2JeZ+hbcK8MlsoJms81bC4NOK
+ L4dbUpswWB5QIn74o+rXRFCWTtOCiR8o+062ZQ8ALxwAouywZslMvXP9YZ2XtnBtkzK1
+ JbZfKVvH9ouLdHQ4OtxrH9xLDSkSwHedmmg2sx/LsnYDFMI60iybSYW0JV4WU8ZM551K
+ nPI/jj9VFW/qDlMAavCyVYbjUcK6MTLsmYw3XdPLmX7m6hJrNxJdfHJW3NJNqD6dgSyU
+ z+lg==
+X-Gm-Message-State: APjAAAU78TOq1dGri2XpC8VJfVLs6c6aZkhWzX2HtyBPhbNoMQSmhT0e
+ MqHm19BJFLPvq/d/axRAHQf1d5AWMpfKBTqY/gQ=
+X-Google-Smtp-Source: APXvYqxdTQNPj0atazn4u+WeHUNxL+8JfRonBIU9W5OuZz75/suHsAZFdLBo2T92PqoSd0anPN9F/5otocxMaGifne8=
+X-Received: by 2002:a54:460c:: with SMTP id p12mr28962919oip.62.1571141837642; 
+ Tue, 15 Oct 2019 05:17:17 -0700 (PDT)
 MIME-Version: 1.0
-References: <20191001125845.8793-1-drjones@redhat.com>
- <20191001125845.8793-2-drjones@redhat.com>
- <CADSWDztJDUEd+_7XnBPWL1bk5Xh=V_aLc1+VrP97_Ycbe3489A@mail.gmail.com>
- <20191015105628.7ln6ph5s3vpsyfuw@kamzik.brq.redhat.com>
-In-Reply-To: <20191015105628.7ln6ph5s3vpsyfuw@kamzik.brq.redhat.com>
-From: Beata Michalska <beata.michalska@linaro.org>
-Date: Tue, 15 Oct 2019 12:56:19 +0100
-Message-ID: <CADSWDzsKx7+4mR4pmsqi0+rddUv47q=UKwVt509B8g68UoRiMA@mail.gmail.com>
-Subject: Re: [PATCH v5 1/9] target/arm/monitor: Introduce
- qmp_query_cpu_model_expansion
-To: Andrew Jones <drjones@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
+Received: by 2002:a9d:340a:0:0:0:0:0 with HTTP; Tue, 15 Oct 2019 05:17:17
+ -0700 (PDT)
+In-Reply-To: <87mue2xy3l.fsf@dusky.pond.sub.org>
+References: <1570991178-5511-1-git-send-email-aleksandar.markovic@rt-rk.com>
+ <1570991178-5511-2-git-send-email-aleksandar.markovic@rt-rk.com>
+ <87a7a36awg.fsf@dusky.pond.sub.org>
+ <CAL1e-=gD629LfDPokJ6XAnR_xxE-vHw3RZqg=JDai-xAcJC0Dg@mail.gmail.com>
+ <87mue2xy3l.fsf@dusky.pond.sub.org>
+From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+Date: Tue, 15 Oct 2019 14:17:17 +0200
+Message-ID: <CAL1e-=gBkZEg-o7uy6wEW1M4eyf+OYbvWjxUAB7zwmvAPUahdw@mail.gmail.com>
+Subject: Re: [PATCH v4 1/8] target/mips: Clean up helper.c
+To: Markus Armbruster <armbru@redhat.com>
+Content-Type: multipart/alternative; boundary="0000000000001fde310594f1f7f7"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::d41
+X-Received-From: 2607:f8b0:4864:20::243
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,53 +92,142 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org,
- armbru@redhat.com, eric.auger@redhat.com, qemu-arm@nongnu.org,
- imammedo@redhat.com, Dave.Martin@arm.com
+Cc: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>,
+ "aleksandar.rikalo@rt-rk.com" <aleksandar.rikalo@rt-rk.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 15 Oct 2019 at 11:56, Andrew Jones <drjones@redhat.com> wrote:
+--0000000000001fde310594f1f7f7
+Content-Type: text/plain; charset="UTF-8"
+
 >
-> On Tue, Oct 15, 2019 at 10:59:16AM +0100, Beata Michalska wrote:
-> > On Tue, 1 Oct 2019 at 14:04, Andrew Jones <drjones@redhat.com> wrote:
-> > > +
-> > > +    obj = object_new(object_class_get_name(oc));
-> > > +
-> > > +    if (qdict_in) {
-> > > +        Visitor *visitor;
-> > > +        Error *err = NULL;
-> > > +
-> > > +        visitor = qobject_input_visitor_new(model->props);
-> > > +        visit_start_struct(visitor, NULL, NULL, 0, &err);
-> > > +        if (err) {
-> > > +            object_unref(obj);
-> >
-> > Shouldn't we free the 'visitor' here as well ?
 >
-> Yes. Good catch. So we also need to fix
-> target/s390x/cpu_models.c:cpu_model_from_info(), which has the same
-> construction (the construction from which I derived this)
 >
-> >
-> > > +            error_propagate(errp, err);
-> > > +            return NULL;
-> > > +        }
-> > > +
+Markus wrote:
+
+
+> However, I find the common pattern applied here
 >
-> What about the rest of the patch? With that fixed for v6 can I
-> add your r-b?
+>     case 3: /* ERL */
+>         /* If EU is set, always unmapped */
+>         if (eu) {
+>             return 0;
+>         }
+>
+> more readable ...
+
+
+>
+>
+ I am going to do it this way in v5.
+
+Thanks,
+Aleksandar
+
+
+
+> ... than the unusual (to my eyes)
+>
+>     case 3:
+>         /*
+>          * ERL
+>          * If EU is set, always unmapped
+>          */
+>         if (eu) {
+>             return 0;
+>         }
+>
+> The first line of the comment applies to the value preceding it, the
+> second to the code following it.  Making these connections doesn't
+> exactly take genius, but neither is it effortless.
+>
+> Nice and consistent coding style is all about reducing the effort of
+> reading code.
+>
+> For what it's worth, the pattern
+>
+>     case VALUE: /* comment on VALUE */
+>         /* comment on CODE */
+>         CODE
+>
+> occurs almost 300 times.
+>
+> > I don't see any reason to change this patch. Please let me know it you
+> > still think I should do something else. And you are welcome to analyse
+> any
+> > patches of mine.
+>
+> Please consider keeping two separate comments, i.e. just move the colon
+> to its usual place.
+>
+> Thanks!
 >
 
-I still got this feeling that we could optimize that a bit - which I'm
-currently on, so hopefully I'll be able to add more comments soon if
-that proves to be the case.
+--0000000000001fde310594f1f7f7
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-BR
-Beata
+<blockquote class=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;border-left:1p=
+x #ccc solid;padding-left:1ex"><br></blockquote><div>=C2=A0</div><div>Marku=
+s wrote:</div><div>=C2=A0</div><blockquote class=3D"gmail_quote" style=3D"m=
+argin:0 0 0 .8ex;border-left:1px #ccc solid;padding-left:1ex">
+However, I find the common pattern applied here<br>
+<br>
+=C2=A0 =C2=A0 case 3: /* ERL */<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 /* If EU is set, always unmapped */<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 if (eu) {<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 return 0;<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 }<br>
+<br>
+more readable ...</blockquote><blockquote class=3D"gmail_quote" style=3D"ma=
+rgin:0 0 0 .8ex;border-left:1px #ccc solid;padding-left:1ex"><br></blockquo=
+te><blockquote class=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;border-left=
+:1px #ccc solid;padding-left:1ex"><br></blockquote><div>=C2=A0</div><div>=
+=C2=A0I am going to do it this way in v5.</div><div><br></div><div>Thanks,<=
+/div><div>Aleksandar</div><div><br></div><div><br></div><blockquote class=
+=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;border-left:1px #ccc solid;padd=
+ing-left:1ex"><br></blockquote><blockquote class=3D"gmail_quote" style=3D"m=
+argin:0 0 0 .8ex;border-left:1px #ccc solid;padding-left:1ex">... than the =
+unusual (to my eyes)<br>
+<br>
+=C2=A0 =C2=A0 case 3:<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 /*<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0* ERL<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0* If EU is set, always unmapped<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0*/<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 if (eu) {<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 return 0;<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 }<br>
+<br>
+The first line of the comment applies to the value preceding it, the<br>
+second to the code following it.=C2=A0 Making these connections doesn&#39;t=
+<br>
+exactly take genius, but neither is it effortless.<br>
+<br>
+Nice and consistent coding style is all about reducing the effort of<br>
+reading code.<br>
+<br>
+For what it&#39;s worth, the pattern<br>
+<br>
+=C2=A0 =C2=A0 case VALUE: /* comment on VALUE */<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 /* comment on CODE */<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 CODE<br>
+<br>
+occurs almost 300 times.<br>
+<br>
+&gt; I don&#39;t see any reason to change this patch. Please let me know it=
+ you<br>
+&gt; still think I should do something else. And you are welcome to analyse=
+ any<br>
+&gt; patches of mine.<br>
+<br>
+Please consider keeping two separate comments, i.e. just move the colon<br>
+to its usual place.<br>
+<br>
+Thanks!<br>
+</blockquote>
 
-> Thanks,
-> drew
+--0000000000001fde310594f1f7f7--
 
