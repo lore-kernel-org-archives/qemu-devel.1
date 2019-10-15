@@ -2,91 +2,67 @@ Return-Path: <SRS0=6OCO=YI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8B416ECE58F
-	for <qemu-devel@archiver.kernel.org>; Tue, 15 Oct 2019 22:05:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BE56AECE59D
+	for <qemu-devel@archiver.kernel.org>; Tue, 15 Oct 2019 23:29:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5787120873
-	for <qemu-devel@archiver.kernel.org>; Tue, 15 Oct 2019 22:05:03 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="e+o7Flo/"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5787120873
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 915D62083B
+	for <qemu-devel@archiver.kernel.org>; Tue, 15 Oct 2019 23:29:30 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 915D62083B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60434 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33232 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iKUwA-0006kS-CH
-	for qemu-devel@archiver.kernel.org; Tue, 15 Oct 2019 18:05:02 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35237)
+	id 1iKWFt-0000qU-Mf
+	for qemu-devel@archiver.kernel.org; Tue, 15 Oct 2019 19:29:29 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44659)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1iKUvQ-0006EI-IK
- for qemu-devel@nongnu.org; Tue, 15 Oct 2019 18:04:17 -0400
+ (envelope-from <no-reply@patchew.org>) id 1iKWEy-0000M8-ED
+ for qemu-devel@nongnu.org; Tue, 15 Oct 2019 19:28:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1iKUvP-00008E-7I
- for qemu-devel@nongnu.org; Tue, 15 Oct 2019 18:04:16 -0400
-Received: from mail-pl1-x641.google.com ([2607:f8b0:4864:20::641]:47010)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1iKUvO-00007y-W2
- for qemu-devel@nongnu.org; Tue, 15 Oct 2019 18:04:15 -0400
-Received: by mail-pl1-x641.google.com with SMTP id q24so10217234plr.13
- for <qemu-devel@nongnu.org>; Tue, 15 Oct 2019 15:04:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=WlM9qJ26FVCtq2jMelepxWIYCn2U4CiSRTZw+YpUCb8=;
- b=e+o7Flo/RQIdkm3zHprASXlgV+xKalpnNuUy66Cg4pWH2jsaB12eTKbyOX1XHcS2RW
- aglfuAnOOkt2Izir/zLe5YrkGtMeLQd0K6LjUBMnwW2lWDPOwtyOhXStbVpJInUVHubz
- UzRH8F/z3uL6Ml1nqWUAe5sSYdk8qwr3gY3fSkGCmYFx/LzlTI4KskfJzgWOZ7QxHbx+
- pyBIrziISb8v/QfN8zTxKdxtNYH563nJkGhDr9N8HAeHV/dCotuNcsQ51vEi6BDkIBvQ
- 5/e9+arnYRUOGoXS89fvKEqcF0caGde7VzBbMwA2JsP9O1KpBdn4nFW3P59zv1KZg6E3
- VXdw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=WlM9qJ26FVCtq2jMelepxWIYCn2U4CiSRTZw+YpUCb8=;
- b=c0vCG6OmozeukhAgjrdJ4eQOjdwbBLqBXrVz+LGWpHj6/5IBhUH5CRes+b0tYBG77j
- HuIfBXXs9dhFbfK4lUcPnXmDzZiV4tr9KTeVH21xV34T5o+j/Yc8rL4XUH5le1Xb0W0Z
- oG4braQ8cO0dLcvDP5lflcB+zct0+nUqUnb9HIFVii5Tb8Me/mY4pTfXSne2kmwFCZeh
- KDWdwuARHHITl2VjVHoOaS2qgIJJ3USoFfHMR0uqpkzoidD+G3ArMfmqT3mIlmQvVDM5
- j4z1Q2vNxMa5kiSJnvyf70Xx/YU7M1Ky7IoPUPt3zdXVfU2ei4MseETZifMEizK/oqC6
- ZmgQ==
-X-Gm-Message-State: APjAAAW5gsS97GRD91e6ekdtq/CDATBDkkOKELO69IvujlpcuEFPB4DV
- yzFfBjAjEXFy7+kXCXd0uXao8g==
-X-Google-Smtp-Source: APXvYqxC6LVo6IFjID5M2Or1B3+YgMiYotmEW1topciVqqIoIlkKxMgd+YuiU72TbGBuJIy1kLlreA==
-X-Received: by 2002:a17:902:bd47:: with SMTP id
- b7mr3491572plx.124.1571177053361; 
- Tue, 15 Oct 2019 15:04:13 -0700 (PDT)
-Received: from [192.168.1.11] (97-113-7-119.tukw.qwest.net. [97.113.7.119])
- by smtp.gmail.com with ESMTPSA id a13sm33727661pfg.10.2019.10.15.15.04.11
- (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Tue, 15 Oct 2019 15:04:12 -0700 (PDT)
-Subject: Re: [PATCH v5 00/22] target/arm: Implement ARMv8.5-MemTag, system mode
-To: Evgenii Stepanov <eugeni.stepanov@gmail.com>
-References: <20191011134744.2477-1-richard.henderson@linaro.org>
- <CABMLtrhb2n3WbpROs0Qa9hFBObom0Qm60t2nioOyWTtgbpu7HA@mail.gmail.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Openpgp: preference=signencrypt
-Message-ID: <3d53c538-9725-18a8-079f-de490ed586a5@linaro.org>
-Date: Tue, 15 Oct 2019 15:04:10 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+ (envelope-from <no-reply@patchew.org>) id 1iKWEw-0001Bv-RC
+ for qemu-devel@nongnu.org; Tue, 15 Oct 2019 19:28:32 -0400
+Resent-Date: Tue, 15 Oct 2019 19:28:32 -0400
+Resent-Message-Id: <E1iKWEw-0001Bv-RC@eggs.gnu.org>
+Received: from sender4-of-o54.zoho.com ([136.143.188.54]:21401)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <no-reply@patchew.org>)
+ id 1iKWEw-0001BK-Jf
+ for qemu-devel@nongnu.org; Tue, 15 Oct 2019 19:28:30 -0400
+ARC-Seal: i=1; a=rsa-sha256; t=1571182079; cv=none; d=zoho.com; s=zohoarc; 
+ b=F9lLo4l6DYZjDaKnp65MpjHOJ448CRPtcHFPJZ/N4AnB+MuSDK9gRfOuoZLSBmVTAHiG3+KgISzfwuEmB1tpsX/O1AQtsIimrRyfJqcxoKvrYmK4/EDAQ1ww9iKr+UcLkg7PWeJJiJC9FbNf9ZO+uWR/hC0mqSVkMGNqLnbyEZQ=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zoho.com;
+ s=zohoarc; t=1571182079;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
+ bh=NquMdh5cqrg+w/TM1tlktRlQRtwUKUgGaymy3L81CUg=; 
+ b=oJKALsYjx2vub/ii+CYC37H8/IaMIhDUoOQ7IUZh/SIlrTbzldZkjIH18x1lcgD/9OqpbOFCakx/BVGDrQoqb1XRaQAAtYPJ/UCtKVOsT4hRK2tOby52b5Yw3177+QWfYuL8fL5KF6yY5f5zDppP+GLOpW38myZPAJb+H9gJaE8=
+ARC-Authentication-Results: i=1; mx.zoho.com; dkim=pass  header.i=patchew.org;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 1571182076549352.5095287510885;
+ Tue, 15 Oct 2019 16:27:56 -0700 (PDT)
+In-Reply-To: <20191015140140.34748-1-zhengxiang9@huawei.com>
+Subject: Re: [PATCH v19 0/5] Add ARMv8 RAS virtualization support in QEMU
+Message-ID: <157118207403.5946.11773682662828159447@37313f22b938>
 MIME-Version: 1.0
-In-Reply-To: <CABMLtrhb2n3WbpROs0Qa9hFBObom0Qm60t2nioOyWTtgbpu7HA@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::641
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: zhengxiang9@huawei.com
+Date: Tue, 15 Oct 2019 16:27:56 -0700 (PDT)
+X-ZohoMailClient: External
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 136.143.188.54
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,84 +74,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org,
- qemu-devel@nongnu.org
+Reply-To: qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, ehabkost@redhat.com, kvm@vger.kernel.org,
+ mst@redhat.com, wanghaibin.wang@huawei.com, mtosatti@redhat.com,
+ linuxarm@huawei.com, qemu-devel@nongnu.org, gengdongjiu@huawei.com,
+ shannon.zhaosl@gmail.com, zhengxiang9@huawei.com, qemu-arm@nongnu.org,
+ james.morse@arm.com, jonathan.cameron@huawei.com, imammedo@redhat.com,
+ pbonzini@redhat.com, xuwei5@huawei.com, lersek@redhat.com, rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 10/15/19 1:39 PM, Evgenii Stepanov wrote:
-> Hi,
-> 
-> please find attached three random fixes for instruction translation
-> and one for syscall emulation.
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MTAxNTE0MDE0MC4zNDc0
+OC0xLXpoZW5neGlhbmc5QGh1YXdlaS5jb20vCgoKCkhpLAoKVGhpcyBzZXJpZXMgZmFpbGVkIHRo
+ZSBkb2NrZXItbWluZ3dAZmVkb3JhIGJ1aWxkIHRlc3QuIFBsZWFzZSBmaW5kIHRoZSB0ZXN0aW5n
+IGNvbW1hbmRzIGFuZAp0aGVpciBvdXRwdXQgYmVsb3cuIElmIHlvdSBoYXZlIERvY2tlciBpbnN0
+YWxsZWQsIHlvdSBjYW4gcHJvYmFibHkgcmVwcm9kdWNlIGl0CmxvY2FsbHkuCgo9PT0gVEVTVCBT
+Q1JJUFQgQkVHSU4gPT09CiMhIC9iaW4vYmFzaApleHBvcnQgQVJDSD14ODZfNjQKbWFrZSBkb2Nr
+ZXItaW1hZ2UtZmVkb3JhIFY9MSBORVRXT1JLPTEKdGltZSBtYWtlIGRvY2tlci10ZXN0LW1pbmd3
+QGZlZG9yYSBKPTE0IE5FVFdPUks9MQo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKICBDQyAgICAg
+IHFhcGkvcWFwaS1ldmVudHMtdHJhY2UubwogIENDICAgICAgcWFwaS9xYXBpLWV2ZW50cy10cmFu
+c2FjdGlvbi5vCgpXYXJuaW5nLCB0cmVhdGVkIGFzIGVycm9yOgovdG1wL3FlbXUtdGVzdC9zcmMv
+ZG9jcy9zcGVjcy9hY3BpX2hlc3RfZ2hlcy5yc3Q6OTM6RW51bWVyYXRlZCBsaXN0IGVuZHMgd2l0
+aG91dCBhIGJsYW5rIGxpbmU7IHVuZXhwZWN0ZWQgdW5pbmRlbnQuCiAgQ0MgICAgICBxb2JqZWN0
+L3FudW0ubwogIENDICAgICAgcW9iamVjdC9xbnVsbC5vCi0tLQogIENDICAgICAgcW9iamVjdC9q
+c29uLXN0cmVhbWVyLm8KICBDQyAgICAgIHFvYmplY3QvYmxvY2stcWRpY3QubwogIENDICAgICAg
+dHJhY2Uvc2ltcGxlLm8KbWFrZTogKioqIFtNYWtlZmlsZTo5OTc6IGRvY3Mvc3BlY3MvaW5kZXgu
+aHRtbF0gRXJyb3IgMgptYWtlOiAqKiogV2FpdGluZyBmb3IgdW5maW5pc2hlZCBqb2JzLi4uLgpU
+cmFjZWJhY2sgKG1vc3QgcmVjZW50IGNhbGwgbGFzdCk6CiAgRmlsZSAiLi90ZXN0cy9kb2NrZXIv
+ZG9ja2VyLnB5IiwgbGluZSA2NjIsIGluIDxtb2R1bGU+Ci0tLQogICAgcmFpc2UgQ2FsbGVkUHJv
+Y2Vzc0Vycm9yKHJldGNvZGUsIGNtZCkKc3VicHJvY2Vzcy5DYWxsZWRQcm9jZXNzRXJyb3I6IENv
+bW1hbmQgJ1snc3VkbycsICctbicsICdkb2NrZXInLCAncnVuJywgJy0tbGFiZWwnLCAnY29tLnFl
+bXUuaW5zdGFuY2UudXVpZD1mMDUyMGZmYTliZDM0MGU3YWRmOTc1YWYwMTAxNmI2ZicsICctdScs
+ICcxMDAxJywgJy0tc2VjdXJpdHktb3B0JywgJ3NlY2NvbXA9dW5jb25maW5lZCcsICctLXJtJywg
+Jy1lJywgJ1RBUkdFVF9MSVNUPScsICctZScsICdFWFRSQV9DT05GSUdVUkVfT1BUUz0nLCAnLWUn
+LCAnVj0nLCAnLWUnLCAnSj0xNCcsICctZScsICdERUJVRz0nLCAnLWUnLCAnU0hPV19FTlY9Jywg
+Jy1lJywgJ0NDQUNIRV9ESVI9L3Zhci90bXAvY2NhY2hlJywgJy12JywgJy9ob21lL3BhdGNoZXcv
+LmNhY2hlL3FlbXUtZG9ja2VyLWNjYWNoZTovdmFyL3RtcC9jY2FjaGU6eicsICctdicsICcvdmFy
+L3RtcC9wYXRjaGV3LXRlc3Rlci10bXAtXzkwbmFydWsvc3JjL2RvY2tlci1zcmMuMjAxOS0xMC0x
+NS0xOS4yNi4wNy4yNDQyOTovdmFyL3RtcC9xZW11Onoscm8nLCAncWVtdTpmZWRvcmEnLCAnL3Zh
+ci90bXAvcWVtdS9ydW4nLCAndGVzdC1taW5ndyddJyByZXR1cm5lZCBub24temVybyBleGl0IHN0
+YXR1cyAyLgpmaWx0ZXI9LS1maWx0ZXI9bGFiZWw9Y29tLnFlbXUuaW5zdGFuY2UudXVpZD1mMDUy
+MGZmYTliZDM0MGU3YWRmOTc1YWYwMTAxNmI2ZgptYWtlWzFdOiAqKiogW2RvY2tlci1ydW5dIEVy
+cm9yIDEKbWFrZVsxXTogTGVhdmluZyBkaXJlY3RvcnkgYC92YXIvdG1wL3BhdGNoZXctdGVzdGVy
+LXRtcC1fOTBuYXJ1ay9zcmMnCm1ha2U6ICoqKiBbZG9ja2VyLXJ1bi10ZXN0LW1pbmd3QGZlZG9y
+YV0gRXJyb3IgMgoKcmVhbCAgICAxbTQ3LjkzMXMKdXNlciAgICAwbTguMjM1cwoKClRoZSBmdWxs
+IGxvZyBpcyBhdmFpbGFibGUgYXQKaHR0cDovL3BhdGNoZXcub3JnL2xvZ3MvMjAxOTEwMTUxNDAx
+NDAuMzQ3NDgtMS16aGVuZ3hpYW5nOUBodWF3ZWkuY29tL3Rlc3RpbmcuZG9ja2VyLW1pbmd3QGZl
+ZG9yYS8/dHlwZT1tZXNzYWdlLgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkg
+UGF0Y2hldyBbaHR0cHM6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNr
+IHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
 
-Thanks for the patches.
-
-> @@ -2763,7 +2763,8 @@ static void disas_ldst_pair
->          return;
->      }
->  
-> -    offset <<= size;
-> +    // STGP offset is 16-scaled.
-> +    offset <<= (size + set_tag);
-
-Right.  I'll fix this with
-
-    offset <<= (set_tag ? LOG2_TAG_GRANULE : size);
-
-which I think is a bit clearer.
-
-> @@ -3611,7 +3611,7 @@ static void disas_ldst_tag
->      int rt = extract32(insn, 0, 5);
->      int rn = extract32(insn, 5, 5);
->      uint64_t offset = sextract64(insn, 12, 9) << LOG2_TAG_GRANULE;
-> -    int op2 = extract32(insn, 10, 3);
-> +    int op2 = extract32(insn, 10, 2);
-
-Yep.
-
-> @@ -3679,7 +3679,7 @@ static void disas_ldst_tag(DisasContext *s, uint32_t insn)
->      }
->  
->      dirty_addr = read_cpu_reg_sp(s, rn, true);
-> -    if (index <= 0) {
-> +    if (index >= 0) {
->          /* pre-index or signed offset */
->          tcg_gen_addi_i64(dirty_addr, dirty_addr, offset);
->      }
-> @@ -3726,7 +3726,7 @@ static void disas_ldst_tag(DisasContext *s, uint32_t insn)
->  
->      if (index != 0) {
->          /* pre-index or post-index */
-> -        if (index > 0) {
-> +        if (index < 0) {
->              /* post-index */
->              tcg_gen_addi_i64(dirty_addr, dirty_addr, offset);
->          }
-
-Yep.
-
-Ideally there'd be a kernel patch for MTE that works well enough to run RISU on
-the fast model, and I'd be able to compare results.  I suppose in the meantime
-more unit testing will have to do.
-
-> +++ b/linux-user/qemu.h
-> @@ -456,8 +456,16 @@ extern unsigned long guest_stack_size;
->  #define VERIFY_READ 0
->  #define VERIFY_WRITE 1 /* implies read access */
->  
-> +static inline abi_ulong untagged_addr(abi_ulong addr) {
-> +#if TARGET_ABI_BITS == 64
-> +    addr &= (((abi_ulong)-1) >> 8);
-> +#endif
-> +    return addr;
-> +}
-
-At minimum this needs TARGET_AARCH64, because this kernel feature doesn't apply
-to other targets.  But I'll see if I can do this such that it doesn't put
-target-specific stuff in linux-user/qemu.h.
-
-
-r~
 
