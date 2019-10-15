@@ -2,61 +2,61 @@ Return-Path: <SRS0=6OCO=YI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	UNWANTED_LANGUAGE_BODY autolearn=ham autolearn_force=no version=3.4.0
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4896FECE58F
-	for <qemu-devel@archiver.kernel.org>; Tue, 15 Oct 2019 21:44:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EB282ECE59D
+	for <qemu-devel@archiver.kernel.org>; Tue, 15 Oct 2019 21:47:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 186D62064B
-	for <qemu-devel@archiver.kernel.org>; Tue, 15 Oct 2019 21:44:42 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 186D62064B
+	by mail.kernel.org (Postfix) with ESMTPS id BC3472064A
+	for <qemu-devel@archiver.kernel.org>; Tue, 15 Oct 2019 21:47:38 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BC3472064A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60050 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60092 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iKUcS-0005m6-Ub
-	for qemu-devel@archiver.kernel.org; Tue, 15 Oct 2019 17:44:40 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59949)
+	id 1iKUfJ-0000jN-AN
+	for qemu-devel@archiver.kernel.org; Tue, 15 Oct 2019 17:47:37 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59993)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <ehabkost@redhat.com>) id 1iKUWN-0005fr-KU
- for qemu-devel@nongnu.org; Tue, 15 Oct 2019 17:38:24 -0400
+ (envelope-from <ehabkost@redhat.com>) id 1iKUWU-0005tX-Du
+ for qemu-devel@nongnu.org; Tue, 15 Oct 2019 17:38:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <ehabkost@redhat.com>) id 1iKUWM-0006lf-E3
- for qemu-devel@nongnu.org; Tue, 15 Oct 2019 17:38:23 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:50991)
+ (envelope-from <ehabkost@redhat.com>) id 1iKUWT-0006oL-6I
+ for qemu-devel@nongnu.org; Tue, 15 Oct 2019 17:38:30 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43852)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1iKUWM-0006lA-8Y
- for qemu-devel@nongnu.org; Tue, 15 Oct 2019 17:38:22 -0400
+ (Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1iKUWT-0006oA-0U
+ for qemu-devel@nongnu.org; Tue, 15 Oct 2019 17:38:29 -0400
 Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
  [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 7B5F61017C10;
- Tue, 15 Oct 2019 21:38:21 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 41B2CA3CD8B;
+ Tue, 15 Oct 2019 21:38:28 +0000 (UTC)
 Received: from localhost (ovpn-116-20.phx2.redhat.com [10.3.116.20])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 8A0495C28F;
- Tue, 15 Oct 2019 21:38:18 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id CE5EB5C28F;
+ Tue, 15 Oct 2019 21:38:27 +0000 (UTC)
 From: Eduardo Habkost <ehabkost@redhat.com>
 To: Paolo Bonzini <pbonzini@redhat.com>,
  Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
  Peter Maydell <peter.maydell@linaro.org>,
  Igor Mammedov <imammedo@redhat.com>, Richard Henderson <rth@twiddle.net>,
  qemu-devel@nongnu.org
-Subject: [PULL 08/18] hw/ide/via82c: Convert reset handler to DeviceReset
-Date: Tue, 15 Oct 2019 18:37:35 -0300
-Message-Id: <20191015213745.22174-9-ehabkost@redhat.com>
+Subject: [PULL 10/18] hw/input/lm832x: Convert reset handler to DeviceReset
+Date: Tue, 15 Oct 2019 18:37:37 -0300
+Message-Id: <20191015213745.22174-11-ehabkost@redhat.com>
 In-Reply-To: <20191015213745.22174-1-ehabkost@redhat.com>
 References: <20191015213745.22174-1-ehabkost@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.64]); Tue, 15 Oct 2019 21:38:21 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.68]); Tue, 15 Oct 2019 21:38:28 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
@@ -80,67 +80,76 @@ Sender: "Qemu-devel"
 
 From: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 
-The VIA82C686B IDE controller is a PCI device, it will be reset
-when the PCI bus it stands on is reset.
+The LM8323 key-scan controller is a I2C device, it will be reset
+when the I2C bus it stands on is reset.
 
 Convert its reset handler into a proper Device reset method.
 
 Reviewed-by: Li Qiang <liq3ea@gmail.com>
 Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-Message-Id: <20191010131527.32513-6-philmd@redhat.com>
+Message-Id: <20191010131527.32513-8-philmd@redhat.com>
 Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 ---
- hw/ide/via.c | 10 ++++------
- 1 file changed, 4 insertions(+), 6 deletions(-)
+ hw/input/lm832x.c | 12 +++++-------
+ 1 file changed, 5 insertions(+), 7 deletions(-)
 
-diff --git a/hw/ide/via.c b/hw/ide/via.c
-index 7087dc676e..053622bd82 100644
---- a/hw/ide/via.c
-+++ b/hw/ide/via.c
-@@ -29,7 +29,6 @@
+diff --git a/hw/input/lm832x.c b/hw/input/lm832x.c
+index a37eb854b9..aa629ddbf1 100644
+--- a/hw/input/lm832x.c
++++ b/hw/input/lm832x.c
+@@ -24,7 +24,6 @@
  #include "migration/vmstate.h"
  #include "qemu/module.h"
- #include "sysemu/dma.h"
+ #include "qemu/timer.h"
 -#include "sysemu/reset.h"
+ #include "ui/console.h"
 =20
- #include "hw/ide/pci.h"
- #include "trace.h"
-@@ -120,10 +119,10 @@ static void via_ide_set_irq(void *opaque, int n, in=
-t level)
-     }
+ #define TYPE_LM8323 "lm8323"
+@@ -94,8 +93,10 @@ static void lm_kbd_gpio_update(LM823KbdState *s)
+ {
  }
 =20
--static void via_ide_reset(void *opaque)
-+static void via_ide_reset(DeviceState *dev)
+-static void lm_kbd_reset(LM823KbdState *s)
++static void lm_kbd_reset(DeviceState *dev)
  {
--    PCIIDEState *d =3D opaque;
--    PCIDevice *pd =3D PCI_DEVICE(d);
-+    PCIIDEState *d =3D PCI_IDE(dev);
-+    PCIDevice *pd =3D PCI_DEVICE(dev);
-     uint8_t *pci_conf =3D pd->config;
-     int i;
++    LM823KbdState *s =3D LM8323(dev);
++
+     s->config =3D 0x80;
+     s->status =3D INT_NOINIT;
+     s->acttime =3D 125;
+@@ -273,7 +274,7 @@ static void lm_kbd_write(LM823KbdState *s, int reg, i=
+nt byte, uint8_t value)
 =20
-@@ -172,8 +171,6 @@ static void via_ide_realize(PCIDevice *dev, Error **e=
-rrp)
-     pci_set_long(pci_conf + PCI_CAPABILITY_LIST, 0x000000c0);
-     dev->wmask[PCI_INTERRUPT_LINE] =3D 0xf;
-=20
--    qemu_register_reset(via_ide_reset, d);
+     case LM832x_CMD_RESET:
+         if (value =3D=3D 0xaa)
+-            lm_kbd_reset(s);
++            lm_kbd_reset(DEVICE(s));
+         else
+             lm_kbd_error(s, ERR_BADPAR);
+         s->reg =3D LM832x_GENERAL_ERROR;
+@@ -476,10 +477,6 @@ static void lm8323_realize(DeviceState *dev, Error *=
+*errp)
+     s->pwm.tm[1] =3D timer_new_ns(QEMU_CLOCK_VIRTUAL, lm_kbd_pwm1_tick, =
+s);
+     s->pwm.tm[2] =3D timer_new_ns(QEMU_CLOCK_VIRTUAL, lm_kbd_pwm2_tick, =
+s);
+     qdev_init_gpio_out(dev, &s->nirq, 1);
 -
-     memory_region_init_io(&d->data_bar[0], OBJECT(d), &pci_ide_data_le_o=
-ps,
-                           &d->bus[0], "via-ide0-data", 8);
-     pci_register_bar(dev, 0, PCI_BASE_ADDRESS_SPACE_IO, &d->data_bar[0])=
-;
-@@ -229,6 +226,7 @@ static void via_ide_class_init(ObjectClass *klass, vo=
-id *data)
-     DeviceClass *dc =3D DEVICE_CLASS(klass);
-     PCIDeviceClass *k =3D PCI_DEVICE_CLASS(klass);
+-    lm_kbd_reset(s);
+-
+-    qemu_register_reset((void *) lm_kbd_reset, s);
+ }
 =20
-+    dc->reset =3D via_ide_reset;
-     k->realize =3D via_ide_realize;
-     k->exit =3D via_ide_exitfn;
-     k->vendor_id =3D PCI_VENDOR_ID_VIA;
+ void lm832x_key_event(DeviceState *dev, int key, int state)
+@@ -507,6 +504,7 @@ static void lm8323_class_init(ObjectClass *klass, voi=
+d *data)
+     DeviceClass *dc =3D DEVICE_CLASS(klass);
+     I2CSlaveClass *k =3D I2C_SLAVE_CLASS(klass);
+=20
++    dc->reset =3D lm_kbd_reset;
+     dc->realize =3D lm8323_realize;
+     k->event =3D lm_i2c_event;
+     k->recv =3D lm_i2c_rx;
 --=20
 2.21.0
 
