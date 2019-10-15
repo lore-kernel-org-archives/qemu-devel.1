@@ -7,51 +7,51 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B5C32ECE588
-	for <qemu-devel@archiver.kernel.org>; Tue, 15 Oct 2019 15:30:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BFC87C10F14
+	for <qemu-devel@archiver.kernel.org>; Tue, 15 Oct 2019 15:30:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8290B20640
-	for <qemu-devel@archiver.kernel.org>; Tue, 15 Oct 2019 15:30:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 872B320640
+	for <qemu-devel@archiver.kernel.org>; Tue, 15 Oct 2019 15:30:33 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b="NmCcZq0c"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8290B20640
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b="GM8lRN7G"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 872B320640
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=igalia.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48744 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48750 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iKOmM-0000Yc-P8
-	for qemu-devel@archiver.kernel.org; Tue, 15 Oct 2019 11:30:30 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48080)
+	id 1iKOmN-0000dN-GJ
+	for qemu-devel@archiver.kernel.org; Tue, 15 Oct 2019 11:30:31 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48147)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <berto@igalia.com>) id 1iKOgy-0002kt-6t
- for qemu-devel@nongnu.org; Tue, 15 Oct 2019 11:24:57 -0400
+ (envelope-from <berto@igalia.com>) id 1iKOgz-0002lP-Q7
+ for qemu-devel@nongnu.org; Tue, 15 Oct 2019 11:24:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <berto@igalia.com>) id 1iKOgw-0003g3-Vd
- for qemu-devel@nongnu.org; Tue, 15 Oct 2019 11:24:55 -0400
-Received: from fanzine.igalia.com ([178.60.130.6]:47111)
+ (envelope-from <berto@igalia.com>) id 1iKOgw-0003gR-WB
+ for qemu-devel@nongnu.org; Tue, 15 Oct 2019 11:24:57 -0400
+Received: from fanzine.igalia.com ([178.60.130.6]:47110)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <berto@igalia.com>)
- id 1iKOgw-0003ZJ-4z; Tue, 15 Oct 2019 11:24:54 -0400
+ id 1iKOgw-0003ZK-55; Tue, 15 Oct 2019 11:24:54 -0400
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=igalia.com;
  s=20170329; 
  h=Content-Transfer-Encoding:MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From;
- bh=qmKlb9gHAF5qikvg/hwissybNRQvWCJ71g22MpPxHjc=; 
- b=NmCcZq0crz+5FjZf34+YAiQRwllhnm/Fs+JDtxiYL2iP8X/Igcw3/Y5kOLJr0PCvAphezFbuke2WkGRSE+qVB038T90IxgJ65fTzmEAfqo1wp3HlYJnzGTOdLU1Aog1kMv/pz8PTIZ6xUUKNeLDfUhJP/7YDwckHRQ3CTC+FgTsph/Evl+gUx4KHIa6Tre7n1jF1J1LPL4l8b9crb91RBNhXzcLQuSbXlKm30gTgbciR2zoJ26d5Dej5K96MKvXjgJ97r0cM6nvGmv5Pwa8Uz9bQ+v8hHIkFsXMrnnh/ZAxU88EEYaz1rQoOr0Eo2OLXI2pn4CEsM1NY/2abeq+XQA==;
+ bh=HiUDYygHbreOJ4VpTqnZuGeG1uwk96nU2SwXCxyXjEw=; 
+ b=GM8lRN7GlBcjwR0bAORQ/FSQrrl06UyeaGjA8qRVVXkZHf8LWYYhnj9g4Vsfvs9tdUF1kQ509zhmB75Yl8kNR3NAUsmLt0TqvJM85n4NBWAOJXUFUev3bmsRlPcgJ5mNrcn8C2SS3a2wXZmmHqpHj1jWyVelSVLp3kGNc4eCx+yXPdHpqdUP24M7nZBdll+xxAWDF8IBvS5Td98apySozRlTCI7iTmTUgq9mQ2Tghb2biEkx7ULNxQCfLlIvyXD5Q9XPbnmiGD+tE2MPnQAV8gBl+2eDUMto9NPnpIM3ZPicCLmGaQBYqKh/r6mjiCxXM7/OMBjlpOHaZbhjCbtRDg==;
 Received: from 82-181-115-92.bb.dnainternet.fi ([82.181.115.92]
  helo=perseus.local) by fanzine.igalia.com with esmtpsa 
  (Cipher TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim)
- id 1iKOge-0003aT-0P; Tue, 15 Oct 2019 17:24:36 +0200
+ id 1iKOge-0003aS-0M; Tue, 15 Oct 2019 17:24:36 +0200
 Received: from berto by perseus.local with local (Exim 4.92)
  (envelope-from <berto@igalia.com>)
- id 1iKOfm-00061H-MH; Tue, 15 Oct 2019 18:23:42 +0300
+ id 1iKOfm-00061D-LK; Tue, 15 Oct 2019 18:23:42 +0300
 From: Alberto Garcia <berto@igalia.com>
 To: qemu-devel@nongnu.org
-Subject: [RFC PATCH 06/23] qcow2: Add dummy has_subclusters() function
-Date: Tue, 15 Oct 2019 18:23:17 +0300
-Message-Id: <8acb804dd496964d07460f59ef39bdc63156c809.1571152571.git.berto@igalia.com>
+Subject: [RFC PATCH 05/23] qcow2: Document the Extended L2 Entries feature
+Date: Tue, 15 Oct 2019 18:23:16 +0300
+Message-Id: <819a808e5a238208d3d86a5bd1ac20e99cde9e20.1571152571.git.berto@igalia.com>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <cover.1571152571.git.berto@igalia.com>
 References: <cover.1571152571.git.berto@igalia.com>
@@ -78,36 +78,166 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This function will be used by the qcow2 code to check if an image has
-subclusters or not.
+Subcluster allocation in qcow2 is implemented by extending the
+existing L2 table entries and adding additional information to
+indicate the allocation status of each subcluster.
 
-At the moment this simply returns false. Once all patches needed for
-subcluster support are ready then QEMU will be able to create and
-read images with subclusters and this function will return the actual
-value.
+This patch documents the changes to the qcow2 format and how they
+affect the calculation of the L2 cache size.
 
 Signed-off-by: Alberto Garcia <berto@igalia.com>
 ---
- block/qcow2.h | 6 ++++++
- 1 file changed, 6 insertions(+)
+ docs/interop/qcow2.txt | 68 ++++++++++++++++++++++++++++++++++++++++--
+ docs/qcow2-cache.txt   | 19 +++++++++++-
+ 2 files changed, 83 insertions(+), 4 deletions(-)
 
-diff --git a/block/qcow2.h b/block/qcow2.h
-index 0b68c55c01..6d6fc57f41 100644
---- a/block/qcow2.h
-+++ b/block/qcow2.h
-@@ -485,6 +485,12 @@ typedef enum QCow2MetadataOverlap {
+diff --git a/docs/interop/qcow2.txt b/docs/interop/qcow2.txt
+index af5711e533..d34261f955 100644
+--- a/docs/interop/qcow2.txt
++++ b/docs/interop/qcow2.txt
+@@ -39,6 +39,9 @@ The first cluster of a qcow2 image contains the file header:
+                     as the maximum cluster size and won't be able to open images
+                     with larger cluster sizes.
  
- #define INV_OFFSET (-1ULL)
- 
-+static inline bool has_subclusters(BDRVQcow2State *s)
-+{
-+    /* FIXME: Return false until this feature is complete */
-+    return false;
-+}
++                    Note: if the image has Extended L2 Entries then cluster_bits
++                    must be at least 14 (i.e. 16384 byte clusters).
 +
- static inline uint64_t get_l2_entry(BDRVQcow2State *s, uint64_t *l2_slice,
-                                     int idx)
- {
+          24 - 31:   size
+                     Virtual disk size in bytes.
+ 
+@@ -109,7 +112,12 @@ in the description of a field.
+                                 An External Data File Name header extension may
+                                 be present if this bit is set.
+ 
+-                    Bits 3-63:  Reserved (set to 0)
++                    Bit 3:      Extended L2 Entries.  If this bit is set then
++                                L2 table entries use an extended format that
++                                allows subcluster-based allocation. See the
++                                Extended L2 Entries section for more details.
++
++                    Bits 4-63:  Reserved (set to 0)
+ 
+          80 -  87:  compatible_features
+                     Bitmask of compatible features. An implementation can
+@@ -437,7 +445,7 @@ cannot be relaxed without an incompatible layout change).
+ Given an offset into the virtual disk, the offset into the image file can be
+ obtained as follows:
+ 
+-    l2_entries = (cluster_size / sizeof(uint64_t))
++    l2_entries = (cluster_size / sizeof(uint64_t))        [*]
+ 
+     l2_index = (offset / cluster_size) % l2_entries
+     l1_index = (offset / cluster_size) / l2_entries
+@@ -447,6 +455,8 @@ obtained as follows:
+ 
+     return cluster_offset + (offset % cluster_size)
+ 
++    [*] this changes if Extended L2 Entries are enabled, see next section
++
+ L1 table entry:
+ 
+     Bit  0 -  8:    Reserved (set to 0)
+@@ -487,7 +497,8 @@ Standard Cluster Descriptor:
+                     nor is data read from the backing file if the cluster is
+                     unallocated.
+ 
+-                    With version 2, this is always 0.
++                    With version 2 or with extended L2 entries (see the next
++                    section), this is always 0.
+ 
+          1 -  8:    Reserved (set to 0)
+ 
+@@ -524,6 +535,57 @@ file (except if bit 0 in the Standard Cluster Descriptor is set). If there is
+ no backing file or the backing file is smaller than the image, they shall read
+ zeros for all parts that are not covered by the backing file.
+ 
++== Extended L2 Entries ==
++
++An image uses Extended L2 Entries if bit 3 is set on the incompatible_features
++field of the header.
++
++In these images standard data clusters are divided into 32 subclusters of the
++same size. They are contiguous and start from the beginning of the cluster.
++Subclusters can be allocated independently and the L2 entry contains information
++indicating the status of each one of them. Compressed data clusters don't have
++subclusters so they are treated like in images without this feature.
++
++The size of an extended L2 entry is 128 bits so the number of entries per table
++is calculated using this formula:
++
++    l2_entries = (cluster_size / (2 * sizeof(uint64_t)))
++
++The first 64 bits have the same format as the standard L2 table entry described
++in the previous section, with the exception of bit 0 of the standard cluster
++descriptor.
++
++The last 64 bits contain a subcluster allocation bitmap with this format:
++
++Subcluster Allocation Bitmap (for standard clusters):
++
++    Bit  0 -  31:   Allocation status (one bit per subcluster)
++
++                    1: the subcluster is allocated. In this case the
++                       host cluster offset field must contain a valid
++                       offset.
++                    0: the subcluster is not allocated. In this case
++                       read requests shall go to the backing file or
++                       return zeros if there is no backing file data.
++
++                    Bits are assigned starting from the most significant one.
++                    (i.e. bit x is used for subcluster 31 - x)
++
++        32 -  63    Subcluster reads as zeros (one bit per subcluster)
++
++                    1: the subcluster reads as zeros. In this case the
++                       allocation status bit must be unset. The host
++                       cluster offset field may or may not be set.
++                    0: no effect.
++
++                    Bits are assigned starting from the most significant one.
++                    (i.e. bit x is used for subcluster 63 - x)
++
++Subcluster Allocation Bitmap (for compressed clusters):
++
++    Bit  0 -  63:   Reserved (set to 0)
++                    Compressed clusters don't have subclusters,
++                    so this field is not used.
+ 
+ == Snapshots ==
+ 
+diff --git a/docs/qcow2-cache.txt b/docs/qcow2-cache.txt
+index d57f409861..04eb4ce2f1 100644
+--- a/docs/qcow2-cache.txt
++++ b/docs/qcow2-cache.txt
+@@ -1,6 +1,6 @@
+ qcow2 L2/refcount cache configuration
+ =====================================
+-Copyright (C) 2015, 2018 Igalia, S.L.
++Copyright (C) 2015, 2018-2019 Igalia, S.L.
+ Author: Alberto Garcia <berto@igalia.com>
+ 
+ This work is licensed under the terms of the GNU GPL, version 2 or
+@@ -222,3 +222,20 @@ support this functionality, and is 0 (disabled) on other platforms.
+ This functionality currently relies on the MADV_DONTNEED argument for
+ madvise() to actually free the memory. This is a Linux-specific feature,
+ so cache-clean-interval is not supported on other systems.
++
++
++Extended L2 Entries
++-------------------
++All numbers shown in this document are valid for qcow2 images with normal
++64-bit L2 entries.
++
++Images with extended L2 entries need twice as much L2 metadata, so the L2
++cache size must be twice as large for the same disk space.
++
++   disk_size = l2_cache_size * cluster_size / 16
++
++i.e.
++
++   l2_cache_size = disk_size * 16 / cluster_size
++
++Refcount blocks are not affected by this.
 -- 
 2.20.1
 
