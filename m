@@ -2,68 +2,82 @@ Return-Path: <SRS0=6OCO=YI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 67EEAC10F14
-	for <qemu-devel@archiver.kernel.org>; Tue, 15 Oct 2019 15:10:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B381ECE588
+	for <qemu-devel@archiver.kernel.org>; Tue, 15 Oct 2019 15:10:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3BF4A20650
-	for <qemu-devel@archiver.kernel.org>; Tue, 15 Oct 2019 15:10:11 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3BF4A20650
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id E25FC20650
+	for <qemu-devel@archiver.kernel.org>; Tue, 15 Oct 2019 15:10:46 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="NYclxQmT"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E25FC20650
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47978 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47982 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iKOSf-00082N-VY
-	for qemu-devel@archiver.kernel.org; Tue, 15 Oct 2019 11:10:10 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44335)
+	id 1iKOTF-0000Pg-Oq
+	for qemu-devel@archiver.kernel.org; Tue, 15 Oct 2019 11:10:45 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44462)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eblake@redhat.com>) id 1iKOQd-0006FU-N5
- for qemu-devel@nongnu.org; Tue, 15 Oct 2019 11:08:05 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1iKORA-0006yY-Qf
+ for qemu-devel@nongnu.org; Tue, 15 Oct 2019 11:08:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eblake@redhat.com>) id 1iKOQc-0005pf-AS
- for qemu-devel@nongnu.org; Tue, 15 Oct 2019 11:08:03 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:49408)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eblake@redhat.com>)
- id 1iKOQY-0005oY-2J; Tue, 15 Oct 2019 11:07:58 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 3301E7BDAC;
- Tue, 15 Oct 2019 15:07:57 +0000 (UTC)
-Received: from [10.3.116.168] (ovpn-116-168.phx2.redhat.com [10.3.116.168])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 88AC960C63;
- Tue, 15 Oct 2019 15:07:56 +0000 (UTC)
-Subject: Re: [PATCH v2 1/2] nbd: Don't send oversize strings
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-References: <20191010210018.22000-1-eblake@redhat.com>
- <20191010210018.22000-2-eblake@redhat.com>
- <e777bd6b-525d-99e1-2584-a31f3609d5cd@virtuozzo.com>
-From: Eric Blake <eblake@redhat.com>
-Organization: Red Hat, Inc.
-Message-ID: <c7ed4149-8cef-7897-ae95-9b24a3d4f378@redhat.com>
-Date: Tue, 15 Oct 2019 10:07:55 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.0
+ (envelope-from <peter.maydell@linaro.org>) id 1iKOR7-0005xs-ET
+ for qemu-devel@nongnu.org; Tue, 15 Oct 2019 11:08:35 -0400
+Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:42679)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1iKOR7-0005xe-7n
+ for qemu-devel@nongnu.org; Tue, 15 Oct 2019 11:08:33 -0400
+Received: by mail-ot1-x344.google.com with SMTP id c10so17222417otd.9
+ for <qemu-devel@nongnu.org>; Tue, 15 Oct 2019 08:08:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=MzYo/CIcGV3aU6Kf1OQCSICiwmWdTBweMCA+KcylprU=;
+ b=NYclxQmTl1IyDoZqqXfMdmVihjwEkpPVJw+gY/ha8app0F850AxAqAFEFB2Q0HkAoT
+ 4xdsNeoHL8NToAr3OUHXENRbXmvmuTKozC1dRXHLI3galc1LeXmavfHM6YqUoXqj1VGy
+ F08vnxs2vfLOzJQuea82ynGOCSJfrK0OXQ8Ywd0omOSy0kie6f2lvE20hFC0WuRR7wyI
+ 1bghDEh2897zChqA5MH81TvbFsa2eW6bvJJt83MUS3ebjYx1HOg3ShOkvqOLEPo2YNrl
+ CDgNlh01JXX5CnwgHG0OL6ngGEL/sco+pfH4xvAB7DdzOXfG+2i/myJD/wKTDgV0d88C
+ YH/g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=MzYo/CIcGV3aU6Kf1OQCSICiwmWdTBweMCA+KcylprU=;
+ b=DYE1DSwSS9n6GNTez0ZPwimEnfKY0VaahxXIviHMQdB8OMxbCtrrf8sE9f+JU+icLm
+ JSbOKr6euUQJ6U31wv2CIWPKfSLvQtWIw91zE+dOOGbUL3yLknai4lnN1zBlwjXDDWnT
+ 88he1jz4NWiGIRK6LmAIZkkkfc21TbhY/I6WxmKjLUnHMDNH4vEFm3ixQ6WOGnEcSGpA
+ ZuGxUag96yFOuXF00CNv1CwF2SJYz5zJBvUIRjRTJ8xFyfJFzs4a82u8Sm/4iZaFc0sA
+ 5Ff15aFnfi0oNiHWYAF4i0RZpLjLG+BHm6aijs/Qbl7Jl7bRyCFIT6u29AYDg2RUwfnH
+ CaIg==
+X-Gm-Message-State: APjAAAU46s1UBOhPwoV4VYz838J+tqr+UB5R0sjuluXp/vY5SFvKhdLe
+ 9A2pFQFOl0gcOOncL4sHL7jLUz91oM/3/mvljdndKQ==
+X-Google-Smtp-Source: APXvYqwMw8LqqyVcS5Jthlks2YJacOieatWyOomMlayWCEnto6yDAIpFp6+NmpvSMUs8yHlDHhYG8Cxp/2/m2OnKFto=
+X-Received: by 2002:a05:6830:ca:: with SMTP id
+ x10mr2434112oto.221.1571152112080; 
+ Tue, 15 Oct 2019 08:08:32 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <e777bd6b-525d-99e1-2584-a31f3609d5cd@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.26]); Tue, 15 Oct 2019 15:07:57 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.132.183.28
+References: <20191015140140.34748-1-zhengxiang9@huawei.com>
+ <20191015140140.34748-3-zhengxiang9@huawei.com>
+In-Reply-To: <20191015140140.34748-3-zhengxiang9@huawei.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 15 Oct 2019 16:08:20 +0100
+Message-ID: <CAFEAcA85gZUXnL+Qy=Wdg-MVbb1PqiKWCi72XvRnX8pZsgVr_A@mail.gmail.com>
+Subject: Re: [PATCH v19 2/5] docs: APEI GHES generation and CPER record
+ description
+To: Xiang Zheng <zhengxiang9@huawei.com>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::344
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -75,140 +89,103 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "kwolf@redhat.com" <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>,
- "qemu-block@nongnu.org" <qemu-block@nongnu.org>,
- "mlevitsk@redhat.com" <mlevitsk@redhat.com>
+Cc: Eduardo Habkost <ehabkost@redhat.com>, kvm-devel <kvm@vger.kernel.org>,
+ "Michael S. Tsirkin" <mst@redhat.com>, wanghaibin.wang@huawei.com,
+ Marcelo Tosatti <mtosatti@redhat.com>, Linuxarm <linuxarm@huawei.com>,
+ QEMU Developers <qemu-devel@nongnu.org>, gengdongjiu <gengdongjiu@huawei.com>,
+ Shannon Zhao <shannon.zhaosl@gmail.com>, qemu-arm <qemu-arm@nongnu.org>,
+ James Morse <james.morse@arm.com>,
+ Jonathan Cameron <jonathan.cameron@huawei.com>,
+ Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ "xuwei \(O\)" <xuwei5@huawei.com>, Laszlo Ersek <lersek@redhat.com>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 10/11/19 2:32 AM, Vladimir Sementsov-Ogievskiy wrote:
-> 11.10.2019 0:00, Eric Blake wrote:
->> Qemu as server currently won't accept export names larger than 256
->> bytes, nor create dirty bitmap names longer than 1023 bytes, so most
->> uses of qemu as client or server have no reason to get anywhere near
->> the NBD spec maximum of a 4k limit per string.
->>
->> However, we weren't actually enforcing things, ignoring when the
->> remote side violates the protocol on input, and also having several
->> code paths where we send oversize strings on output (for example,
->> qemu-nbd --description could easily send more than 4k).  Tighten
->> things up as follows:
->>
->> client:
->> - Perform bounds check on export name and dirty bitmap request prior
->>     to handing it to server
->> - Validate that copied server replies are not too long (ignoring
->>     NBD_INFO_* replies that are not copied is not too bad)
->> server:
->> - Perform bounds check on export name and description prior to
->>     advertising it to client
->> - Reject client name or metadata query that is too long
->>
->> Signed-off-by: Eric Blake <eblake@redhat.com>
->> ---
+On Tue, 15 Oct 2019 at 15:02, Xiang Zheng <zhengxiang9@huawei.com> wrote:
+>
+> From: Dongjiu Geng <gengdongjiu@huawei.com>
+>
+> Add APEI/GHES detailed design document
+>
+> Signed-off-by: Dongjiu Geng <gengdongjiu@huawei.com>
+> Signed-off-by: Xiang Zheng <zhengxiang9@huawei.com>
+> ---
+>  docs/specs/acpi_hest_ghes.rst | 94 +++++++++++++++++++++++++++++++++++++++++++
+>  docs/specs/index.rst          |  1 +
+>  2 files changed, 95 insertions(+)
+>  create mode 100644 docs/specs/acpi_hest_ghes.rst
+>
+> diff --git a/docs/specs/acpi_hest_ghes.rst b/docs/specs/acpi_hest_ghes.rst
+> new file mode 100644
+> index 0000000..905b6d1
+> --- /dev/null
+> +++ b/docs/specs/acpi_hest_ghes.rst
+> @@ -0,0 +1,94 @@
+> +APEI tables generating and CPER record
+> +======================================
+> +
+> +Copyright (c) 2019 HUAWEI TECHNOLOGIES CO., LTD.
+> +
+> +This work is licensed under the terms of the GNU GPL, version 2 or later.
+> +See the COPYING file in the top-level directory.
 
->> +++ b/include/block/nbd.h
->> @@ -232,6 +232,7 @@ enum {
->>     * going larger would require an audit of more code to make sure we
->>     * aren't overflowing some other buffer. */
-> 
-> This comment says, that we restrict export name to 256...
+This puts the copyright/license statement into the HTML rendered
+docs seen by the user. We generally put them into an RST comment,
+so they're in the source .rst but not the rendered views, like this:
 
-Yes, because we still stack-allocate the name in places, but 4k is too 
-large for stack allocation.  But we're inconsistent on where we use the 
-smaller 256-limit; the server won't serve an image that large, but 
-doesn't prevent a client from requesting a 4k name export (even though 
-that export will not be present).
+diff --git a/docs/specs/acpi_hest_ghes.rst b/docs/specs/acpi_hest_ghes.rst
+index 5b43e4b0da2..348825f9d3e 100644
+--- a/docs/specs/acpi_hest_ghes.rst
++++ b/docs/specs/acpi_hest_ghes.rst
+@@ -1,10 +1,11 @@
+ APEI tables generating and CPER record
+ ======================================
 
+-Copyright (c) 2019 HUAWEI TECHNOLOGIES CO., LTD.
++..
++   Copyright (c) 2019 HUAWEI TECHNOLOGIES CO., LTD.
 
->> +++ b/blockdev-nbd.c
->> @@ -162,6 +162,11 @@ void qmp_nbd_server_add(const char *device, bool has_name, const char *name,
->>            name = device;
->>        }
->>
->> +    if (strlen(name) > NBD_MAX_STRING_SIZE) {
->> +        error_setg(errp, "export name '%s' too long", name);
->> +        return;
->> +    }
-> 
-> Hmmm, no, so here we restrict to 4096, but, we will not allow client to request more than
-> 256. Seems, to correctly update server-part, we should drop NBD_MAX_NAME_SIZE and do the
-> audit mentioned in the comment above its definition.
-
-Yeah, I guess it's time to just get rid of NBD_MAX_NAME_SIZE, and move 
-away from stack allocations.  Should I do that as a followup to this 
-patch, or spin a v3?
-
->> +++ b/nbd/client.c
->> @@ -289,8 +289,8 @@ static int nbd_receive_list(QIOChannel *ioc, char **name, char **description,
->>            return -1;
->>        }
->>        len -= sizeof(namelen);
->> -    if (len < namelen) {
->> -        error_setg(errp, "incorrect option name length");
->> +    if (len < namelen || namelen > NBD_MAX_STRING_SIZE) {
->> +        error_setg(errp, "incorrect list name length");
-> 
-> New wording made me go above and read the comment, what functions does. Comment is good, but without
-> it, it sounds like name of the list for me...
-
-Maybe:
-
-incorrect name length in server's list response
-
-> 
->>            nbd_send_opt_abort(ioc);
->>            return -1;
->>        }
->> @@ -303,6 +303,11 @@ static int nbd_receive_list(QIOChannel *ioc, char **name, char **description,
->>        local_name[namelen] = '\0';
->>        len -= namelen;
->>        if (len) {
->> +        if (len > NBD_MAX_STRING_SIZE) {
->> +            error_setg(errp, "incorrect list description length");
-
-and
-
-incorrect description length in server's list response
+-This work is licensed under the terms of the GNU GPL, version 2 or later.
+-See the COPYING file in the top-level directory.
++   This work is licensed under the terms of the GNU GPL, version 2 or later.
++   See the COPYING file in the top-level directory.
 
 
->> @@ -648,6 +657,7 @@ static int nbd_send_meta_query(QIOChannel *ioc, uint32_t opt,
->>        if (query) {
->>            query_len = strlen(query);
->>            data_len += sizeof(query_len) + query_len;
->> +        assert(query_len <= NBD_MAX_STRING_SIZE);
->>        } else {
->>            assert(opt == NBD_OPT_LIST_META_CONTEXT);
->>        }
-> 
-> you may assert export_len as well..
+> +(9) When QEMU gets a SIGBUS from the kernel, QEMU formats the CPER right into
+> +    guest memory, and then injects platform specific interrupt (in case of
+> +    arm/virt machine it's Synchronous External Abort) as a notification which
+> +    is necessary for notifying the guest.
+> +
+> +(10) This notification (in virtual hardware) will be handled by the guest
+> +    kernel, guest APEI driver will read the CPER which is recorded by QEMU and
+> +    do the recovery.
 
-It was asserted earlier, but doing it again might not hurt, especially 
-if I do the followup patch getting rid of NBD_MAX_NAME_SIZE
+Sphinx thinks the indentation here is not syntactically valid:
 
+  SPHINX  docs/specs
 
->> @@ -1561,6 +1569,8 @@ NBDExport *nbd_export_new(BlockDriverState *bs, uint64_t dev_offset,
->>            exp->export_bitmap = bm;
->>            exp->export_bitmap_context = g_strdup_printf("qemu:dirty-bitmap:%s",
->>                                                         bitmap);
->> +        /* See BME_MAX_NAME_SIZE in block/qcow2-bitmap.c */
-> 
-> Hmm. BME_MAX_NAME_SIZE is checked only when creating persistent bitmaps. But for non-persistent
-> name length is actually unlimited. So, we should either limit all bitmap names to 1023 (hope,
-> this will not break existing scenarios) or error out here (or earlier) instead of assertion.
+Warning, treated as error:
+/home/petmay01/linaro/qemu-from-laptop/qemu/docs/specs/acpi_hest_ghes.rst:93:Enumerated
+list ends without a blank line; unexpected unindent.
+Makefile:997: recipe for target 'docs/specs/index.html' failed
 
-I'm leaning towards limiting ALL bitmaps to the same length (as we've 
-already debated the idea of being able to convert an existing bitmap 
-from transient to persistent).
+That's because for an enumerated list all the lines in the paragraph need to
+start at the same column. Moving in the two following lines in the (10) item
+fixes this:
 
-> 
-> We also may want QEMU_BUILD_BUG_ON(NBD_MAX_STRING_SIZE < BME_MAX_NAME_SIZE + sizeof("qemu:dirty-bitmap:") - 1)
+--- a/docs/specs/acpi_hest_ghes.rst
++++ b/docs/specs/acpi_hest_ghes.rst
+@@ -90,5 +90,5 @@ Design Details
+     is necessary for notifying the guest.
 
-Except that BME_MAX_NAME_SIZE is not (currently) in a public .h file.
+ (10) This notification (in virtual hardware) will be handled by the guest
+-    kernel, guest APEI driver will read the CPER which is recorded by QEMU and
+-    do the recovery.
++     kernel, guest APEI driver will read the CPER which is recorded by QEMU and
++     do the recovery.
 
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
+thanks
+-- PMM
 
