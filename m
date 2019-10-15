@@ -2,63 +2,63 @@ Return-Path: <SRS0=6OCO=YI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_2 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E1CF0ECE58E
-	for <qemu-devel@archiver.kernel.org>; Tue, 15 Oct 2019 09:21:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AF717ECE58E
+	for <qemu-devel@archiver.kernel.org>; Tue, 15 Oct 2019 09:23:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B04272064B
-	for <qemu-devel@archiver.kernel.org>; Tue, 15 Oct 2019 09:21:40 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B04272064B
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id 8122C2064B
+	for <qemu-devel@archiver.kernel.org>; Tue, 15 Oct 2019 09:23:15 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8122C2064B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38416 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38460 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iKJ1P-00085Y-QK
-	for qemu-devel@archiver.kernel.org; Tue, 15 Oct 2019 05:21:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36610)
+	id 1iKJ2w-0000ji-N0
+	for qemu-devel@archiver.kernel.org; Tue, 15 Oct 2019 05:23:14 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36845)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <groug@kaod.org>) id 1iKJ0l-0007W2-N5
- for qemu-devel@nongnu.org; Tue, 15 Oct 2019 05:21:01 -0400
+ (envelope-from <dgilbert@redhat.com>) id 1iKJ2H-0000Fs-Ea
+ for qemu-devel@nongnu.org; Tue, 15 Oct 2019 05:22:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <groug@kaod.org>) id 1iKJ0k-0000sk-6a
- for qemu-devel@nongnu.org; Tue, 15 Oct 2019 05:20:59 -0400
-Received: from 6.mo69.mail-out.ovh.net ([46.105.50.107]:50063)
+ (envelope-from <dgilbert@redhat.com>) id 1iKJ2F-0001DK-S1
+ for qemu-devel@nongnu.org; Tue, 15 Oct 2019 05:22:32 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42564)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <groug@kaod.org>) id 1iKJ0j-0000qU-Uh
- for qemu-devel@nongnu.org; Tue, 15 Oct 2019 05:20:58 -0400
-Received: from player698.ha.ovh.net (unknown [10.109.146.168])
- by mo69.mail-out.ovh.net (Postfix) with ESMTP id 202296C058
- for <qemu-devel@nongnu.org>; Tue, 15 Oct 2019 11:20:48 +0200 (CEST)
-Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
- [82.253.208.248]) (Authenticated sender: groug@kaod.org)
- by player698.ha.ovh.net (Postfix) with ESMTPSA id 26D5DAF72600;
- Tue, 15 Oct 2019 09:20:43 +0000 (UTC)
-Date: Tue, 15 Oct 2019 11:20:39 +0200
-From: Greg Kurz <groug@kaod.org>
-To: Christian Schoenebeck <qemu_oss@crudebyte.com>
-Subject: Re: [Qemu-devel] [PATCH v7 0/3] 9p: Fix file ID collisions
-Message-ID: <20191015112039.620997e3@bahia.lan>
-In-Reply-To: <2456208.kOTvEbKLdM@silver>
-References: <cover.1567680121.git.qemu_oss@crudebyte.com>
- <1590425.yRI6RxI3rl@silver> <20191008111459.048e659f@bahia.lan>
- <2456208.kOTvEbKLdM@silver>
-X-Mailer: Claws Mail 3.17.4 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+ (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1iKJ2F-0001CZ-MU
+ for qemu-devel@nongnu.org; Tue, 15 Oct 2019 05:22:31 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id F042918C4280
+ for <qemu-devel@nongnu.org>; Tue, 15 Oct 2019 09:22:27 +0000 (UTC)
+Received: from work-vm (ovpn-117-145.ams2.redhat.com [10.36.117.145])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id A315B61341;
+ Tue, 15 Oct 2019 09:22:20 +0000 (UTC)
+Date: Tue, 15 Oct 2019 10:22:18 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Peter Xu <peterx@redhat.com>
+Subject: Re: [PATCH 2/2] apic: Use 32bit APIC ID for migration instance ID
+Message-ID: <20191015092218.GC3073@work-vm>
+References: <20191015075444.10955-1-peterx@redhat.com>
+ <20191015075444.10955-3-peterx@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Ovh-Tracer-Id: 10335761147260934464
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrjeefgdduhecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20191015075444.10955-3-peterx@redhat.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.62]); Tue, 15 Oct 2019 09:22:27 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 46.105.50.107
+X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -70,106 +70,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Stefan Hajnoczi <stefanha@gmail.com>, "Daniel P.
- =?UTF-8?B?QmVycmFuZ8Op?=" <berrange@redhat.com>, qemu-devel@nongnu.org,
- Antonios Motakis <antonios.motakis@huawei.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Juan Quintela <quintela@redhat.com>,
+ qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>,
+ Igor Mammedov <imammedo@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 08 Oct 2019 14:05:28 +0200
-Christian Schoenebeck <qemu_oss@crudebyte.com> wrote:
+* Peter Xu (peterx@redhat.com) wrote:
+> Migration is silently broken now with x2apic config like this:
+> 
+>      -smp 200,maxcpus=288,sockets=2,cores=72,threads=2 \
+>      -device intel-iommu,intremap=on,eim=on
+> 
+> After migration, the guest kernel could hang at anything, due to
+> x2apic bit not migrated correctly in IA32_APIC_BASE on some vcpus, so
+> any operations related to x2apic could be broken then (e.g., RDMSR on
+> x2apic MSRs could fail because KVM would think that the vcpu hasn't
+> enabled x2apic at all).
+> 
+> The issue is that the x2apic bit was never applied correctly for vcpus
+> whose ID > 255 when migrate completes, and that's because when we
+> migrate APIC we use the APICCommonState.id as instance ID of the
+> migration stream, while that's too short for x2apic.
+> 
+> Let's use the newly introduced initial_apic_id for that.
+
+I'd like to understand a few things:
+   a) Does this change the instance ID of existing APICs on the
+migration stream? 
+     a1) Ever for <256 CPUs?
+     a2) For >=256 CPUs?
+
+    [Because changing the ID breaks migration]
+
+  b) Is the instance ID constant - I can see it's a property on the
+     APIC, but I cna't see who sets it
+
+  c) In the case where it fails, did we end up registering two
+     devices with the same name and instance ID?  If so, is it worth
+     adding a check that would error if we tried?
+
+Dave
 
 > 
-> I wonder though whether virtio-fs suffers from the same file ID collisions 
-> problem when sharing multiple file systems.
+> Signed-off-by: Peter Xu <peterx@redhat.com>
+> ---
+>  hw/intc/apic_common.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 > 
-
-I gave a try and it seems that virtio-fs might expose the inode numbers from
-different devices in the host, unvirtualized AND with the same device in the
-guest:
-
-# mkdir -p /var/tmp/virtio-fs/proc
-# mount --bind /proc /var/tmp/virtio-fs/proc
-# virtiofsd -o vhost_user_socket=/tmp/vhostqemu -o source=/var/tmp/virtio-fs -o cache=always
-
-and then started QEMU with:
-
--chardev socket,id=char0,path=/tmp/vhostqemu \
--device vhost-user-fs-pci,queue-size=1024,chardev=char0,tag=myfs \
--m 4G -object memory-backend-file,id=mem,size=4G,mem-path=/dev/shm,share=on \
--numa node,memdev=mem
-
-In the host:
-
-$ stat /var/tmp/virtio-fs
-  File: /var/tmp/virtio-fs
-  Size: 4096            Blocks: 8          IO Block: 4096   directory
-Device: fd00h/64768d    Inode: 787796      Links: 4
-Access: (0775/drwxrwxr-x)  Uid: ( 1000/    greg)   Gid: ( 1000/    greg)
-Context: unconfined_u:object_r:user_tmp_t:s0
-Access: 2019-10-15 11:08:52.070080922 +0200
-Modify: 2019-10-15 11:02:09.887404446 +0200
-Change: 2019-10-15 11:02:09.887404446 +0200
- Birth: 2019-10-13 19:13:04.009699354 +0200
-[greg@bahia ~]$ stat /var/tmp/virtio-fs/FOO
-  File: /var/tmp/virtio-fs/FOO
-  Size: 0               Blocks: 0          IO Block: 4096   regular empty file
-Device: fd00h/64768d    Inode: 790740      Links: 1
-Access: (0664/-rw-rw-r--)  Uid: ( 1000/    greg)   Gid: ( 1000/    greg)
-Context: unconfined_u:object_r:user_tmp_t:s0
-Access: 2019-10-15 11:02:09.888404448 +0200
-Modify: 2019-10-15 11:02:09.888404448 +0200
-Change: 2019-10-15 11:02:09.888404448 +0200
- Birth: 2019-10-15 11:02:09.887404446 +0200
-[greg@bahia ~]$ stat /var/tmp/virtio-fs/proc/fs
-  File: /var/tmp/virtio-fs/proc/fs
-  Size: 0               Blocks: 0          IO Block: 1024   directory
-Device: 4h/4d   Inode: 4026531845  Links: 5
-Access: (0555/dr-xr-xr-x)  Uid: (    0/    root)   Gid: (    0/    root)
-Context: system_u:object_r:proc_t:s0
-Access: 2019-10-01 14:50:09.223233901 +0200
-Modify: 2019-10-01 14:50:09.223233901 +0200
-Change: 2019-10-01 14:50:09.223233901 +0200
- Birth: -
-
-In the guest:
-
-[greg@localhost ~]$ stat /mnt
-  File: /mnt
-  Size: 4096            Blocks: 8          IO Block: 4096   directory
-Device: 2dh/45d Inode: 787796      Links: 4
-Access: (0775/drwxrwxr-x)  Uid: ( 1000/    greg)   Gid: ( 1000/    greg)
-Context: system_u:object_r:unlabeled_t:s0
-Access: 2019-10-15 11:08:52.070080922 +0200
-Modify: 2019-10-15 11:02:09.887404446 +0200
-Change: 2019-10-15 11:02:09.887404446 +0200
- Birth: -
-[greg@localhost ~]$ stat /mnt/FOO
-  File: /mnt/FOO
-  Size: 0               Blocks: 0          IO Block: 4096   regular empty file
-Device: 2dh/45d Inode: 790740      Links: 1
-Access: (0664/-rw-rw-r--)  Uid: ( 1000/    greg)   Gid: ( 1000/    greg)
-Context: system_u:object_r:unlabeled_t:s0
-Access: 2019-10-15 11:02:09.888404448 +0200
-Modify: 2019-10-15 11:02:09.888404448 +0200
-Change: 2019-10-15 11:02:09.888404448 +0200
- Birth: -
-[greg@localhost ~]$ stat /mnt/proc/fs
-  File: /mnt/proc/fs
-  Size: 0               Blocks: 0          IO Block: 1024   directory
-Device: 2dh/45d Inode: 4026531845  Links: 5
-Access: (0555/dr-xr-xr-x)  Uid: (    0/    root)   Gid: (    0/    root)
-Context: system_u:object_r:unlabeled_t:s0
-Access: 2019-10-01 14:50:09.223233901 +0200
-Modify: 2019-10-01 14:50:09.223233901 +0200
-Change: 2019-10-01 14:50:09.223233901 +0200
- Birth: -
-
-Unless I'm missing something, it seems that "virtio-fs" has the same
-issue we had on 9pfs before Christian's patches... :-\
-
+> diff --git a/hw/intc/apic_common.c b/hw/intc/apic_common.c
+> index aafd8e0e33..6024a3e06a 100644
+> --- a/hw/intc/apic_common.c
+> +++ b/hw/intc/apic_common.c
+> @@ -315,7 +315,7 @@ static void apic_common_realize(DeviceState *dev, Error **errp)
+>      APICCommonState *s = APIC_COMMON(dev);
+>      APICCommonClass *info;
+>      static DeviceState *vapic;
+> -    int instance_id = s->id;
+> +    int64_t instance_id = s->initial_apic_id;
+>  
+>      info = APIC_COMMON_GET_CLASS(s);
+>      info->realize(dev, errp);
+> -- 
+> 2.21.0
+> 
 --
-Greg
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
