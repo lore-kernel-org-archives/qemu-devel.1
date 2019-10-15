@@ -3,63 +3,66 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 03524C10F14
-	for <qemu-devel@archiver.kernel.org>; Tue, 15 Oct 2019 19:50:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D2723C10F14
+	for <qemu-devel@archiver.kernel.org>; Tue, 15 Oct 2019 20:29:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C5FAA20663
-	for <qemu-devel@archiver.kernel.org>; Tue, 15 Oct 2019 19:50:41 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C5FAA20663
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id A307F20663
+	for <qemu-devel@archiver.kernel.org>; Tue, 15 Oct 2019 20:29:28 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A307F20663
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57844 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58814 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iKSq8-0002oJ-Q4
-	for qemu-devel@archiver.kernel.org; Tue, 15 Oct 2019 15:50:40 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43204)
+	id 1iKTRf-0006HS-Qs
+	for qemu-devel@archiver.kernel.org; Tue, 15 Oct 2019 16:29:27 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49131)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <ehabkost@redhat.com>) id 1iKSop-0001UP-DV
- for qemu-devel@nongnu.org; Tue, 15 Oct 2019 15:49:20 -0400
+ (envelope-from <no-reply@patchew.org>) id 1iKTQr-0005g2-CH
+ for qemu-devel@nongnu.org; Tue, 15 Oct 2019 16:28:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <ehabkost@redhat.com>) id 1iKSom-0002jc-DD
- for qemu-devel@nongnu.org; Tue, 15 Oct 2019 15:49:17 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:48158)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1iKSom-0002iL-4e
- for qemu-devel@nongnu.org; Tue, 15 Oct 2019 15:49:16 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id BBAC710C093C
- for <qemu-devel@nongnu.org>; Tue, 15 Oct 2019 19:49:12 +0000 (UTC)
-Received: from localhost (ovpn-116-20.phx2.redhat.com [10.3.116.20])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 85FCB6012E;
- Tue, 15 Oct 2019 19:49:09 +0000 (UTC)
-Date: Tue, 15 Oct 2019 16:49:07 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Subject: Re: [PATCH 2/2] apic: Use 32bit APIC ID for migration instance ID
-Message-ID: <20191015194907.GA4084@habkost.net>
-References: <20191015075444.10955-1-peterx@redhat.com>
- <20191015075444.10955-3-peterx@redhat.com>
- <20191015092218.GC3073@work-vm> <20191015101641.GD8666@xz-x1>
- <20191015110253.GF3073@work-vm>
+ (envelope-from <no-reply@patchew.org>) id 1iKTQp-0004yy-A5
+ for qemu-devel@nongnu.org; Tue, 15 Oct 2019 16:28:37 -0400
+Resent-Date: Tue, 15 Oct 2019 16:28:37 -0400
+Resent-Message-Id: <E1iKTQp-0004yy-A5@eggs.gnu.org>
+Received: from sender4-of-o54.zoho.com ([136.143.188.54]:21437)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <no-reply@patchew.org>)
+ id 1iKTQp-0004yF-4k
+ for qemu-devel@nongnu.org; Tue, 15 Oct 2019 16:28:35 -0400
+ARC-Seal: i=1; a=rsa-sha256; t=1571171288; cv=none; d=zoho.com; s=zohoarc; 
+ b=E6oJubJvm7Xu7ZfxakXomXYngbwH3RcQktlZ5TEQAjmjJ4LMiUOSAEXOGxVO5sL8vKSRU9NHVY+IpNK5s730vSDaMpV3Rolj6Mf6DF1FcsLqe5p7neqOlXJBWmOZcEPwZNtk8qPFlxP4nQrr7i71HEooYzFDqQ4jkkbMF8SXyUk=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zoho.com;
+ s=zohoarc; t=1571171288;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
+ bh=oPb3/FkYlq9Y+fS0kJ4cwcU5mItSQ8Bk7HyepdCgSNQ=; 
+ b=OEv1eTCUup4OHy1BABLA49LQKCu0kt6Pri4wY7GATAmx1YtRXVI6eiEg51V6KtVv3euhmo814SAy71g5fFcrFSt019rY/VfyYVab4Gqs/tbdnymEKrYfXed/H5riT/Cs+gCUxcmS9UKOxtYA7r8D7pFV0zSE7YGH1Xh0Hc6L1fM=
+ARC-Authentication-Results: i=1; mx.zoho.com; dkim=pass  header.i=patchew.org;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 1571171285399708.8985305404098;
+ Tue, 15 Oct 2019 13:28:05 -0700 (PDT)
+In-Reply-To: <20191014115757.51866-1-ysato@users.sourceforge.jp>
+Subject: Re: [PATCH v26 00/21] Add RX archtecture support
+Message-ID: <157117128422.5946.3735656740054177447@37313f22b938>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20191015110253.GF3073@work-vm>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.66]); Tue, 15 Oct 2019 19:49:12 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: ysato@users.sourceforge.jp
+Date: Tue, 15 Oct 2019 13:28:05 -0700 (PDT)
+X-ZohoMailClient: External
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 209.132.183.28
+X-Received-From: 136.143.188.54
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -71,87 +74,138 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Juan Quintela <quintela@redhat.com>,
- qemu-devel@nongnu.org, Peter Xu <peterx@redhat.com>,
- Igor Mammedov <imammedo@redhat.com>
+Reply-To: qemu-devel@nongnu.org
+Cc: philmd@redhat.com, qemu-devel@nongnu.org, ysato@users.sourceforge.jp
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, Oct 15, 2019 at 12:02:53PM +0100, Dr. David Alan Gilbert wrote:
-> * Peter Xu (peterx@redhat.com) wrote:
-> > On Tue, Oct 15, 2019 at 10:22:18AM +0100, Dr. David Alan Gilbert wrote:
-> > > * Peter Xu (peterx@redhat.com) wrote:
-> > > > Migration is silently broken now with x2apic config like this:
-> > > > 
-> > > >      -smp 200,maxcpus=288,sockets=2,cores=72,threads=2 \
-> > > >      -device intel-iommu,intremap=on,eim=on
-> > > > 
-> > > > After migration, the guest kernel could hang at anything, due to
-> > > > x2apic bit not migrated correctly in IA32_APIC_BASE on some vcpus, so
-> > > > any operations related to x2apic could be broken then (e.g., RDMSR on
-> > > > x2apic MSRs could fail because KVM would think that the vcpu hasn't
-> > > > enabled x2apic at all).
-> > > > 
-> > > > The issue is that the x2apic bit was never applied correctly for vcpus
-> > > > whose ID > 255 when migrate completes, and that's because when we
-> > > > migrate APIC we use the APICCommonState.id as instance ID of the
-> > > > migration stream, while that's too short for x2apic.
-> > > > 
-> > > > Let's use the newly introduced initial_apic_id for that.
-> > > 
-> > > I'd like to understand a few things:
-> > >    a) Does this change the instance ID of existing APICs on the
-> > > migration stream? 
-> > >      a1) Ever for <256 CPUs?
-> > 
-> > No.
-> > 
-> > >      a2) For >=256 CPUs?
-> > 
-> > Yes.
-> > 
-> > > 
-> > >     [Because changing the ID breaks migration]
-> > 
-> > But if we don't change it, the stream is broken too. :)
-> > 
-> > Then the destination VM will receive e.g. two apic_id==0 instances (I
-> > think the apic_id==256 instance will wrongly overwrite the apic_id==0
-> > one), while the vcpu with apic_id==256 will use the initial apic
-> > values.
-> > 
-> > So IMHO we should still fix this, even if it changes the migration
-> > stream.  At least we start to make it right.
-> 
-> Yes, that makes sense.
-> It deserves a doc mention somewhere.
-> 
-> > > 
-> > >   b) Is the instance ID constant - I can see it's a property on the
-> > >      APIC, but I cna't see who sets it
-> > 
-> > For each vcpu, I think yes it should be a constant as long as the
-> > topology is the same.  This is how I understand it to be set:
-> > 
-> > (1) In pc_cpus_init(), we init these:
-> > 
-> >     possible_cpus = mc->possible_cpu_arch_ids(ms);
-> >     for (i = 0; i < ms->smp.cpus; i++) {
-> >         pc_new_cpu(pcms, possible_cpus->cpus[i].arch_id, &error_fatal);
-> >     }
-> > 
-> > (2) In x86_cpu_apic_create(), we apply the apic_id to "id" property:
-> > 
-> >     qdev_prop_set_uint32(cpu->apic_state, "id", cpu->apic_id);
-> 
-> OK, that's fine - as long as it's constaatn and not guest influenced.
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MTAxNDExNTc1Ny41MTg2
+Ni0xLXlzYXRvQHVzZXJzLnNvdXJjZWZvcmdlLmpwLwoKCgpIaSwKClRoaXMgc2VyaWVzIHNlZW1z
+IHRvIGhhdmUgc29tZSBjb2Rpbmcgc3R5bGUgcHJvYmxlbXMuIFNlZSBvdXRwdXQgYmVsb3cgZm9y
+Cm1vcmUgaW5mb3JtYXRpb246CgpTdWJqZWN0OiBbUEFUQ0ggdjI2IDAwLzIxXSBBZGQgUlggYXJj
+aHRlY3R1cmUgc3VwcG9ydApUeXBlOiBzZXJpZXMKTWVzc2FnZS1pZDogMjAxOTEwMTQxMTU3NTcu
+NTE4NjYtMS15c2F0b0B1c2Vycy5zb3VyY2Vmb3JnZS5qcAoKPT09IFRFU1QgU0NSSVBUIEJFR0lO
+ID09PQojIS9iaW4vYmFzaApnaXQgcmV2LXBhcnNlIGJhc2UgPiAvZGV2L251bGwgfHwgZXhpdCAw
+CmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2Fs
+IGRpZmYucmVuYW1lcyBUcnVlCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLmFsZ29yaXRobSBoaXN0
+b2dyYW0KLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFjayBiYXNlLi4KPT09IFRFU1Qg
+U0NSSVBUIEVORCA9PT0KClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKNTA1ZmYzYyBC
+b290TGludXhDb25zb2xlVGVzdDogVGVzdCB0aGUgUlgtVmlydCBtYWNoaW5lCjg3MGRhNjUgQWRk
+IHJ4LXNvZnRtbXUKZmQ2ZDBkNyBody9yeDogUmVzdHJpY3QgdGhlIFJYNjJOIG1pY3JvY29udHJv
+bGxlciB0byB0aGUgUlg2Mk4gQ1BVIGNvcmUKNTMzODNjMSBody9yeDogSG9ub3IgLWFjY2VsIHF0
+ZXN0CjIyZTliNDYgaHcvcng6IFJYIFRhcmdldCBoYXJkd2FyZSBkZWZpbml0aW9uCjU0ODI2YTkg
+aHcvY2hhcjogUlg2Mk4gc2VyaWFsIGNvbW11bmljYXRpb24gaW50ZXJmYWNlIChTQ0kpCjUwM2Rk
+YWIgaHcvdGltZXI6IFJYNjJOIGludGVybmFsIHRpbWVyIG1vZHVsZXMKM2E4ODM2NSBody9pbnRj
+OiBSWDYyTiBpbnRlcnJ1cHQgY29udHJvbGxlciAoSUNVYSkKMWU3NWQwMSB0YXJnZXQvcng6IER1
+bXAgYnl0ZXMgZm9yIGVhY2ggaW5zbiBkdXJpbmcgZGlzYXNzZW1ibHkKMzJhNTA3MyB0YXJnZXQv
+cng6IENvbGxlY3QgYWxsIGJ5dGVzIGR1cmluZyBkaXNhc3NlbWJseQplZjg3MzlkIHRhcmdldC9y
+eDogRW1pdCBhbGwgZGlzYXNzZW1ibHkgaW4gb25lIHBydCgpCmQxMzk0OTEgdGFyZ2V0L3J4OiBV
+c2UgcHJ0X2xkbWkgZm9yIFhDSEdfbXIgZGlzYXNzZW1ibHkKZmM0MmVhNiB0YXJnZXQvcng6IFJl
+cGxhY2Ugb3BlcmFuZCB3aXRoIHBydF9sZG1pIGluIGRpc2Fzc2VtYmxlcgpmNjljMjZhIHRhcmdl
+dC9yeDogRGlzYXNzZW1ibGUgcnhfaW5kZXhfYWRkciBpbnRvIGEgc3RyaW5nCjBmNzgyNmUgdGFy
+Z2V0L3J4OiBSWCBkaXNhc3NlbWJsZXIKYThjZTAzMCB0YXJnZXQvcng6IENQVSBkZWZpbml0aW9u
+Cjk1ODkxNmMgdGFyZ2V0L3J4OiBUQ0cgaGVscGVyCjEwMDA2OWQgdGFyZ2V0L3J4OiBUQ0cgdHJh
+bnNsYXRpb24KZWY1MDY5YiBody9yZWdpc3RlcmZpZWxkcy5oOiBBZGQgOGJpdCBhbmQgMTZiaXQg
+cmVnaXN0ZXIgbWFjcm9zCmQ0YWMxNjcgcWVtdS9iaXRvcHMuaDogQWRkIGV4dHJhY3Q4IGFuZCBl
+eHRyYWN0MTYKMjA2MjEzNSBNQUlOVEFJTkVSUzogQWRkIFJYCgo9PT0gT1VUUFVUIEJFR0lOID09
+PQoxLzIxIENoZWNraW5nIGNvbW1pdCAyMDYyMTM1NDg1ODcgKE1BSU5UQUlORVJTOiBBZGQgUlgp
+CjIvMjEgQ2hlY2tpbmcgY29tbWl0IGQ0YWMxNjcxYmIzNSAocWVtdS9iaXRvcHMuaDogQWRkIGV4
+dHJhY3Q4IGFuZCBleHRyYWN0MTYpCjMvMjEgQ2hlY2tpbmcgY29tbWl0IGVmNTA2OWI2MjRiNCAo
+aHcvcmVnaXN0ZXJmaWVsZHMuaDogQWRkIDhiaXQgYW5kIDE2Yml0IHJlZ2lzdGVyIG1hY3JvcykK
+VXNlIG9mIHVuaW5pdGlhbGl6ZWQgdmFsdWUgaW4gY29uY2F0ZW5hdGlvbiAoLikgb3Igc3RyaW5n
+IGF0IC4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIGxpbmUgMjQ4NC4KRVJST1I6IE1hY3JvcyB3aXRo
+IG11bHRpcGxlIHN0YXRlbWVudHMgc2hvdWxkIGJlIGVuY2xvc2VkIGluIGEgZG8gLSB3aGlsZSBs
+b29wCiMyNzogRklMRTogaW5jbHVkZS9ody9yZWdpc3RlcmZpZWxkcy5oOjI1OgorI2RlZmluZSBS
+RUc4KHJlZywgYWRkcikgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgIFwKKyAgICBlbnVtIHsgQV8gIyMgcmVnID0gKGFkZHIpIH07ICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgXAorICAgIGVudW0geyBSXyAjIyByZWcgPSAoYWRk
+cikgfTsKCkVSUk9SOiBNYWNyb3Mgd2l0aCBtdWx0aXBsZSBzdGF0ZW1lbnRzIHNob3VsZCBiZSBl
+bmNsb3NlZCBpbiBhIGRvIC0gd2hpbGUgbG9vcAojMzE6IEZJTEU6IGluY2x1ZGUvaHcvcmVnaXN0
+ZXJmaWVsZHMuaDoyOToKKyNkZWZpbmUgUkVHMTYocmVnLCBhZGRyKSAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXAorICAgIGVudW0geyBBXyAjIyByZWcg
+PSAoYWRkcikgfTsgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBcCisg
+ICAgZW51bSB7IFJfICMjIHJlZyA9IChhZGRyKSAvIDIgfTsKCnRvdGFsOiAyIGVycm9ycywgMCB3
+YXJuaW5ncywgNTYgbGluZXMgY2hlY2tlZAoKUGF0Y2ggMy8yMSBoYXMgc3R5bGUgcHJvYmxlbXMs
+IHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2
+ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5U
+QUlORVJTLgoKNC8yMSBDaGVja2luZyBjb21taXQgMTAwMDY5ZDgxYzY5ICh0YXJnZXQvcng6IFRD
+RyB0cmFuc2xhdGlvbikKV0FSTklORzogYWRkZWQsIG1vdmVkIG9yIGRlbGV0ZWQgZmlsZShzKSwg
+ZG9lcyBNQUlOVEFJTkVSUyBuZWVkIHVwZGF0aW5nPwojMjA6IApuZXcgZmlsZSBtb2RlIDEwMDY0
+NAoKdG90YWw6IDAgZXJyb3JzLCAxIHdhcm5pbmdzLCAzMDY1IGxpbmVzIGNoZWNrZWQKClBhdGNo
+IDQvMjEgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNl
+IGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVy
+LCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KNS8yMSBDaGVja2luZyBjb21taXQgOTU4
+OTE2Y2NlZmZkICh0YXJnZXQvcng6IFRDRyBoZWxwZXIpCldBUk5JTkc6IGFkZGVkLCBtb3ZlZCBv
+ciBkZWxldGVkIGZpbGUocyksIGRvZXMgTUFJTlRBSU5FUlMgbmVlZCB1cGRhdGluZz8KIzIxOiAK
+bmV3IGZpbGUgbW9kZSAxMDA2NDQKCnRvdGFsOiAwIGVycm9ycywgMSB3YXJuaW5ncywgNjUwIGxp
+bmVzIGNoZWNrZWQKClBhdGNoIDUvMjEgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3
+LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVt
+IHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KNi8yMSBD
+aGVja2luZyBjb21taXQgYThjZTAzMDE3OTAwICh0YXJnZXQvcng6IENQVSBkZWZpbml0aW9uKQpX
+QVJOSU5HOiBhZGRlZCwgbW92ZWQgb3IgZGVsZXRlZCBmaWxlKHMpLCBkb2VzIE1BSU5UQUlORVJT
+IG5lZWQgdXBkYXRpbmc/CiMzMjogCm5ldyBmaWxlIG1vZGUgMTAwNjQ0Cgp0b3RhbDogMCBlcnJv
+cnMsIDEgd2FybmluZ3MsIDU4OCBsaW5lcyBjaGVja2VkCgpQYXRjaCA2LzIxIGhhcyBzdHlsZSBw
+cm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNl
+IHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0gg
+aW4gTUFJTlRBSU5FUlMuCjcvMjEgQ2hlY2tpbmcgY29tbWl0IDBmNzgyNmU2MDBmZCAodGFyZ2V0
+L3J4OiBSWCBkaXNhc3NlbWJsZXIpCldBUk5JTkc6IGFkZGVkLCBtb3ZlZCBvciBkZWxldGVkIGZp
+bGUocyksIGRvZXMgTUFJTlRBSU5FUlMgbmVlZCB1cGRhdGluZz8KIzM4OiAKbmV3IGZpbGUgbW9k
+ZSAxMDA2NDQKCnRvdGFsOiAwIGVycm9ycywgMSB3YXJuaW5ncywgMTQ5NyBsaW5lcyBjaGVja2Vk
+CgpQYXRjaCA3LzIxIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBv
+ZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFp
+bnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCjgvMjEgQ2hlY2tpbmcgY29t
+bWl0IGY2OWMyNmE5Y2Y4YiAodGFyZ2V0L3J4OiBEaXNhc3NlbWJsZSByeF9pbmRleF9hZGRyIGlu
+dG8gYSBzdHJpbmcpCjkvMjEgQ2hlY2tpbmcgY29tbWl0IGZjNDJlYTZkYWE3ZiAodGFyZ2V0L3J4
+OiBSZXBsYWNlIG9wZXJhbmQgd2l0aCBwcnRfbGRtaSBpbiBkaXNhc3NlbWJsZXIpCjEwLzIxIENo
+ZWNraW5nIGNvbW1pdCBkMTM5NDkxN2Q0MTAgKHRhcmdldC9yeDogVXNlIHBydF9sZG1pIGZvciBY
+Q0hHX21yIGRpc2Fzc2VtYmx5KQoxMS8yMSBDaGVja2luZyBjb21taXQgZWY4NzM5ZDVmM2MzICh0
+YXJnZXQvcng6IEVtaXQgYWxsIGRpc2Fzc2VtYmx5IGluIG9uZSBwcnQoKSkKMTIvMjEgQ2hlY2tp
+bmcgY29tbWl0IDMyYTUwNzMyNDJkZCAodGFyZ2V0L3J4OiBDb2xsZWN0IGFsbCBieXRlcyBkdXJp
+bmcgZGlzYXNzZW1ibHkpCjEzLzIxIENoZWNraW5nIGNvbW1pdCAxZTc1ZDAxNzE5NjAgKHRhcmdl
+dC9yeDogRHVtcCBieXRlcyBmb3IgZWFjaCBpbnNuIGR1cmluZyBkaXNhc3NlbWJseSkKMTQvMjEg
+Q2hlY2tpbmcgY29tbWl0IDNhODgzNjUzNDYxMCAoaHcvaW50YzogUlg2Mk4gaW50ZXJydXB0IGNv
+bnRyb2xsZXIgKElDVWEpKQpXQVJOSU5HOiBhZGRlZCwgbW92ZWQgb3IgZGVsZXRlZCBmaWxlKHMp
+LCBkb2VzIE1BSU5UQUlORVJTIG5lZWQgdXBkYXRpbmc/CiM0MDogCm5ldyBmaWxlIG1vZGUgMTAw
+NjQ0Cgp0b3RhbDogMCBlcnJvcnMsIDEgd2FybmluZ3MsIDQ0NSBsaW5lcyBjaGVja2VkCgpQYXRj
+aCAxNC8yMSBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhl
+c2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWlu
+ZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoxNS8yMSBDaGVja2luZyBjb21taXQg
+NTAzZGRhYjllMDFiIChody90aW1lcjogUlg2Mk4gaW50ZXJuYWwgdGltZXIgbW9kdWxlcykKV0FS
+TklORzogYWRkZWQsIG1vdmVkIG9yIGRlbGV0ZWQgZmlsZShzKSwgZG9lcyBNQUlOVEFJTkVSUyBu
+ZWVkIHVwZGF0aW5nPwojNTA6IApuZXcgZmlsZSBtb2RlIDEwMDY0NAoKdG90YWw6IDAgZXJyb3Jz
+LCAxIHdhcm5pbmdzLCA4NDUgbGluZXMgY2hlY2tlZAoKUGF0Y2ggMTUvMjEgaGFzIHN0eWxlIHBy
+b2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2Ug
+cG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBp
+biBNQUlOVEFJTkVSUy4KMTYvMjEgQ2hlY2tpbmcgY29tbWl0IDU0ODI2YTk1YWI3YyAoaHcvY2hh
+cjogUlg2Mk4gc2VyaWFsIGNvbW11bmljYXRpb24gaW50ZXJmYWNlIChTQ0kpKQpXQVJOSU5HOiBh
+ZGRlZCwgbW92ZWQgb3IgZGVsZXRlZCBmaWxlKHMpLCBkb2VzIE1BSU5UQUlORVJTIG5lZWQgdXBk
+YXRpbmc/CiM0MzogCm5ldyBmaWxlIG1vZGUgMTAwNjQ0Cgp0b3RhbDogMCBlcnJvcnMsIDEgd2Fy
+bmluZ3MsIDQwMSBsaW5lcyBjaGVja2VkCgpQYXRjaCAxNi8yMSBoYXMgc3R5bGUgcHJvYmxlbXMs
+IHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2
+ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5U
+QUlORVJTLgoxNy8yMSBDaGVja2luZyBjb21taXQgMjJlOWI0NmZhNWM3IChody9yeDogUlggVGFy
+Z2V0IGhhcmR3YXJlIGRlZmluaXRpb24pCldBUk5JTkc6IGFkZGVkLCBtb3ZlZCBvciBkZWxldGVk
+IGZpbGUocyksIGRvZXMgTUFJTlRBSU5FUlMgbmVlZCB1cGRhdGluZz8KIzI5OiAKbmV3IGZpbGUg
+bW9kZSAxMDA2NDQKCnRvdGFsOiAwIGVycm9ycywgMSB3YXJuaW5ncywgNDgwIGxpbmVzIGNoZWNr
+ZWQKClBhdGNoIDE3LzIxIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFu
+eSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUg
+bWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCjE4LzIxIENoZWNraW5n
+IGNvbW1pdCA1MzM4M2MxYTg3NDcgKGh3L3J4OiBIb25vciAtYWNjZWwgcXRlc3QpCjE5LzIxIENo
+ZWNraW5nIGNvbW1pdCBmZDZkMGQ3YmY2NDEgKGh3L3J4OiBSZXN0cmljdCB0aGUgUlg2Mk4gbWlj
+cm9jb250cm9sbGVyIHRvIHRoZSBSWDYyTiBDUFUgY29yZSkKMjAvMjEgQ2hlY2tpbmcgY29tbWl0
+IDg3MGRhNjUxYmUxYyAoQWRkIHJ4LXNvZnRtbXUpCldBUk5JTkc6IGFkZGVkLCBtb3ZlZCBvciBk
+ZWxldGVkIGZpbGUocyksIGRvZXMgTUFJTlRBSU5FUlMgbmVlZCB1cGRhdGluZz8KIzU5OiAKbmV3
+IGZpbGUgbW9kZSAxMDA2NDQKCnRvdGFsOiAwIGVycm9ycywgMSB3YXJuaW5ncywgNzQgbGluZXMg
+Y2hlY2tlZAoKUGF0Y2ggMjAvMjEgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAg
+SWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRv
+IHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KMjEvMjEgQ2hl
+Y2tpbmcgY29tbWl0IDUwNWZmM2M3Yzg0MCAoQm9vdExpbnV4Q29uc29sZVRlc3Q6IFRlc3QgdGhl
+IFJYLVZpcnQgbWFjaGluZSkKPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVk
+IHdpdGggY29kZTogMQoKClRoZSBmdWxsIGxvZyBpcyBhdmFpbGFibGUgYXQKaHR0cDovL3BhdGNo
+ZXcub3JnL2xvZ3MvMjAxOTEwMTQxMTU3NTcuNTE4NjYtMS15c2F0b0B1c2Vycy5zb3VyY2Vmb3Jn
+ZS5qcC90ZXN0aW5nLmNoZWNrcGF0Y2gvP3R5cGU9bWVzc2FnZS4KLS0tCkVtYWlsIGdlbmVyYXRl
+ZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHBzOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNl
+IHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
 
-The guest may change the CPU APIC ID (although they rarely do),
-but I believe X86CPU::apic_id is always going to be the initial
-APIC ID.  I'll double check (and maybe send a patch to rename it
-to initial_apic_id).
-
--- 
-Eduardo
 
