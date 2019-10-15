@@ -2,91 +2,59 @@ Return-Path: <SRS0=6OCO=YI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 15518ECE588
-	for <qemu-devel@archiver.kernel.org>; Tue, 15 Oct 2019 11:16:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 33DF6C10F14
+	for <qemu-devel@archiver.kernel.org>; Tue, 15 Oct 2019 11:25:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D4E6C21835
-	for <qemu-devel@archiver.kernel.org>; Tue, 15 Oct 2019 11:16:50 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ZjV7P2un"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D4E6C21835
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 0552921835
+	for <qemu-devel@archiver.kernel.org>; Tue, 15 Oct 2019 11:25:21 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0552921835
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41304 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41498 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iKKor-0004bX-Un
-	for qemu-devel@archiver.kernel.org; Tue, 15 Oct 2019 07:16:49 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54477)
+	id 1iKKx5-0000Xa-Dg
+	for qemu-devel@archiver.kernel.org; Tue, 15 Oct 2019 07:25:19 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56201)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1iKKng-00048X-Nk
- for qemu-devel@nongnu.org; Tue, 15 Oct 2019 07:15:37 -0400
+ (envelope-from <slp@redhat.com>) id 1iKKvz-0007xI-CF
+ for qemu-devel@nongnu.org; Tue, 15 Oct 2019 07:24:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1iKKnf-0000Zb-Hu
- for qemu-devel@nongnu.org; Tue, 15 Oct 2019 07:15:36 -0400
-Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:53570)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1iKKnf-0000Z8-Am
- for qemu-devel@nongnu.org; Tue, 15 Oct 2019 07:15:35 -0400
-Received: by mail-wm1-x341.google.com with SMTP id i16so20409374wmd.3
- for <qemu-devel@nongnu.org>; Tue, 15 Oct 2019 04:15:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=CwKxY0sIZHpT7vnqE7rCLremCaSd/WFvL0xL/FY/kPE=;
- b=ZjV7P2unNnwc3uNxUsv/KPX077g3E0s3TBGre4UCPip9oyLg+ge7P8c8SIQkIPoaAx
- 3ew6H11p23kzxO6A5Ljb6B2Mg67ZodL34MtS8t3x9wNFkK+dhAObFdwg8ZdmOwZrcKvU
- Da0jRsDwaA5UFo2bCaQ0w4WXMi5oGkDAPD5aSsyO7x9EraRPqEX2ROEalyStRwS/YSdf
- C4V36UYpyNTztywJoT7lvyllhQ+qBynCaJuaZNSPzwzUPQpYuv91mLpOX/WDSPAUu/oT
- rfUzEBPHv8hTQ64n9CdVALz9ZO7NgJ4qocgG3Dsjz4J4RaFStLzpn3R9q51cIFbk3dqX
- cDfg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=CwKxY0sIZHpT7vnqE7rCLremCaSd/WFvL0xL/FY/kPE=;
- b=foTPHi7q7BF1V+zuoD8DNWoI25xKWj4djdtQBP3O3CHYg7vdl3LpNCllJLKKvVg+3/
- 1oq8+9G5DbaNu2foSzad3bMepP8xWNFcNaS1U+CWJB7VoXMrfquLCN7WZq2vs5Rvt9hF
- O+A9BBwLeo0XxR86cyGXFyUZiXKfbiRN31HlFmvC5reJwHGiG7teXDZ09lRft6m8sq0Y
- 4Im43dXFGEgwH7vaBpX8gNXxyB94hi5TOkNKtLdmFFjbhWDZLQbTDWm9qKXJrgeTyBfl
- l+voBTsSJseaAH59/dlAciP4RI7/0aUeQd2PYoradKoM4TtpRZ/4zvISwiXAfHLcvlBp
- tISw==
-X-Gm-Message-State: APjAAAVtJZCxSl6i8l6ZcCoBRY8DjjvJy7siuTVVouwrfffGn2VDPNLH
- Wx3uq6RQ7szcNJxIyPreN2FmVg==
-X-Google-Smtp-Source: APXvYqxTVAOBBirl+ygMVU4AVyeBF+gM/AjOHRmxmKAiYrzMspfVHatn+5EyCLdVWmt5o6q1Wq+l3Q==
-X-Received: by 2002:a05:600c:c1:: with SMTP id
- u1mr17493421wmm.87.1571138133438; 
- Tue, 15 Oct 2019 04:15:33 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id a9sm32517479wmf.14.2019.10.15.04.15.32
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 15 Oct 2019 04:15:32 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 989F01FF87;
- Tue, 15 Oct 2019 12:15:31 +0100 (BST)
-References: <20191014104948.4291-1-alex.bennee@linaro.org>
- <20191014104948.4291-3-alex.bennee@linaro.org>
- <32a1628d-55a1-fd1a-31c2-56bef720855f@linaro.org>
-User-agent: mu4e 1.3.5; emacs 27.0.50
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: Richard Henderson <richard.henderson@linaro.org>
-Subject: Re: [PATCH v5 02/55] trace: add mmu_index to mem_info
-In-reply-to: <32a1628d-55a1-fd1a-31c2-56bef720855f@linaro.org>
-Date: Tue, 15 Oct 2019 12:15:31 +0100
-Message-ID: <871rvemf8s.fsf@linaro.org>
+ (envelope-from <slp@redhat.com>) id 1iKKvw-00043G-N9
+ for qemu-devel@nongnu.org; Tue, 15 Oct 2019 07:24:09 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:39548)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <slp@redhat.com>) id 1iKKvw-00042s-DK
+ for qemu-devel@nongnu.org; Tue, 15 Oct 2019 07:24:08 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id BC18AC049E36;
+ Tue, 15 Oct 2019 11:24:06 +0000 (UTC)
+Received: from dritchie.redhat.com (unknown [10.33.36.106])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 79E991001B07;
+ Tue, 15 Oct 2019 11:23:54 +0000 (UTC)
+From: Sergio Lopez <slp@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v9 00/15] Introduce the microvm machine type
+Date: Tue, 15 Oct 2019 13:23:31 +0200
+Message-Id: <20191015112346.45554-1-slp@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=UTF-8
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.31]); Tue, 15 Oct 2019 11:24:06 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::341
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,68 +66,149 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: robert.foley@futurewei.com, Riku Voipio <riku.voipio@iki.fi>,
- qemu-devel@nongnu.org, peter.puhov@futurewei.com, aaron@os.amperecomputing.com,
- cota@braap.org, Stefan Hajnoczi <stefanha@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
+Cc: ehabkost@redhat.com, Sergio Lopez <slp@redhat.com>, mst@redhat.com,
+ lersek@redhat.com, kraxel@redhat.com, pbonzini@redhat.com, imammedo@redhat.com,
+ sgarzare@redhat.com, philmd@redhat.com, rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Microvm is a machine type inspired by Firecracker and constructed
+after the its machine model.
 
-Richard Henderson <richard.henderson@linaro.org> writes:
+It's a minimalist machine type without PCI nor ACPI support, designed
+for short-lived guests. Microvm also establishes a baseline for
+benchmarking and optimizing both QEMU and guest operating systems,
+since it is optimized for both boot time and footprint.
 
-> On 10/14/19 3:48 AM, Alex Benn=C3=A9e wrote:
->> diff --git a/accel/tcg/cputlb.c b/accel/tcg/cputlb.c
->> index defc8d5929..1210d8f243 100644
->> --- a/accel/tcg/cputlb.c
->> +++ b/accel/tcg/cputlb.c
->> @@ -1811,6 +1811,7 @@ void helper_be_stq_mmu(CPUArchState *env, target_u=
-long addr, uint64_t val,
->>  #define ATOMIC_MMU_DECLS
->>  #define ATOMIC_MMU_LOOKUP atomic_mmu_lookup(env, addr, oi, retaddr)
->>  #define ATOMIC_MMU_CLEANUP
->> +#define ATOMIC_MMU_IDX oi
->
-> That is not the mmu_idx.  That's the whole mmu_idx + MemOp combo.
-> Use get_mmuidx(oi).
+---
 
-Oops I missed that from last time. Fixing it for real now!
+Changelog
+v9:
+ - Fix a typo in "[PATCH v9 05/15] hw/i386/pc: avoid an assignment in
+   if condition in x86_load_linux()" (Philippe Mathieu-Daud=C3=A9)
+ - Replace qemu_strtol() with qemu_strtoui() to preserve the original
+   type of video_mode (Philippe Mathieu-Daud=C3=A9)
 
->
->> --- a/accel/tcg/user-exec.c
->> +++ b/accel/tcg/user-exec.c
->> @@ -751,6 +751,7 @@ static void *atomic_mmu_lookup(CPUArchState *env, ta=
-rget_ulong addr,
->>  #define ATOMIC_MMU_DECLS do {} while (0)
->>  #define ATOMIC_MMU_LOOKUP  atomic_mmu_lookup(env, addr, DATA_SIZE, GETP=
-C())
->>  #define ATOMIC_MMU_CLEANUP do { clear_helper_retaddr(); } while (0)
->> +#define ATOMIC_MMU_IDX 0
->
-> MMU_USER_IDX.  Best to be consistent, even if this is user-only and it is=
-n't
-> really used.
->
->> --- a/include/exec/cpu_ldst_useronly_template.h
->> +++ b/include/exec/cpu_ldst_useronly_template.h
->> @@ -73,7 +73,7 @@ glue(glue(cpu_ld, USUFFIX), MEMSUFFIX)(CPUArchState *e=
-nv, abi_ptr ptr)
->>  #else
->>      trace_guest_mem_before_exec(
->>          env_cpu(env), ptr,
->> -        trace_mem_build_info(SHIFT, false, MO_TE, false));
->> +        trace_mem_build_info(SHIFT, false, MO_TE, false, 0));
->
-> Likewise for the other uses in this file.
+v8:
+ - Split "[PATCH v7 03/12] hw/i386/pc: fix code style issues on
+   functions that will be moved out" into four different patches
+   (Philippe Mathieu-Daud=C3=A9)
 
-Fixed.
+v7:
+ - Fix code style issues on already present code touched by this patch
+   series (Michael S. Tsirkin, Philippe Mathieu-Daud=C3=A9)
+ - Add new files to MAINTAINERS (Michael S. Tsirkin, Philippe
+   Mathieu-Daud=C3=A9)
+ - Allow starting a microvm machine without a kernel image, fixing
+   "qom-test" (Michael S. Tsirkin)
+ - Change "bios-microvm.bin" mode to 0644 (Stefano Garzarella)
+ - Remove unneeded "hw/i386/pc.h" include from x86.c (Stefano
+   Garzarella)
 
->
->
-> r~
+v6:
+ - Some style fixes (Philippe Mathieu-Daud=C3=A9)
+ - Fix a documentation bug stating that LAPIC was in userspace (Paolo
+   Bonzini)
+ - Update Xen HVM code after X86MachineState introduction (Philippe
+   Mathieu-Daud=C3=A9)
+ - Rename header guard from QEMU_VIRTIO_MMIO_H to HW_VIRTIO_MMIO_H
+   (Philippe Mathieu-Daud=C3=A9)
 
+v5:
+ - Drop unneeded "[PATCH v4 2/8] hw/i386: Factorize e820 related
+   functions" (Philippe Mathieu-Daud=C3=A9)
+ - Drop unneeded "[PATCH v4 1/8] hw/i386: Factorize PVH related
+   functions" (Stefano Garzarella)
+ - Split X86MachineState introduction into smaller patches (Philippe
+   Mathieu-Daud=C3=A9)
+ - Change option-roms to x-option-roms and kernel-cmdline to
+   auto-kernel-cmdline (Paolo Bonzini)
+ - Make i8259 PIT and i8254 PIC optional (Paolo Bonzini)
+ - Some fixes to the documentation (Paolo Bonzini)
+ - Switch documentation format from txt to rst (Peter Maydell)
+ - Move NMI interface to X86_MACHINE (Philippe Mathieu-Daud=C3=A9, Paolo
+   Bonzini)
 
---
-Alex Benn=C3=A9e
+v4:
+ - This is a complete rewrite of the whole patchset, with a focus on
+   reusing as much existing code as possible to ease the maintenance burd=
+en
+   and making the machine type as compatible as possible by default. As
+   a result, the number of lines dedicated specifically to microvm is
+   383 (code lines measured by "cloc") and, with the default
+   configuration, it's now able to boot both PVH ELF images and
+   bzImages with either SeaBIOS or qboot.
+
+v3:
+  - Add initrd support (thanks Stefano).
+
+v2:
+  - Drop "[PATCH 1/4] hw/i386: Factorize CPU routine".
+  - Simplify machine definition (thanks Eduardo).
+  - Remove use of unneeded NUMA-related callbacks (thanks Eduardo).
+  - Add a patch to factorize PVH-related functions.
+  - Replace use of Linux's Zero Page with PVH (thanks Maran and Paolo).
+
+---
+
+Sergio Lopez (15):
+  hw/virtio: Factorize virtio-mmio headers
+  hw/i386/pc: rename functions shared with non-PC machines
+  hw/i386/pc: fix code style issues on functions that will be moved out
+  hw/i386/pc: replace use of strtol with qemu_strtol in x86_load_linux()
+  hw/i386/pc: avoid an assignment in if condition in x86_load_linux()
+  hw/i386/pc: remove commented out code from x86_load_linux()
+  hw/i386/pc: move shared x86 functions to x86.c and export them
+  hw/i386: split PCMachineState deriving X86MachineState from it
+  hw/i386: make x86.c independent from PCMachineState
+  fw_cfg: add "modify" functions for all types
+  hw/intc/apic: reject pic ints if isa_pic =3D=3D NULL
+  roms: add microvm-bios (qboot) as binary and git submodule
+  docs/microvm.rst: document the new microvm machine type
+  hw/i386: Introduce the microvm machine type
+  MAINTAINERS: add microvm related files
+
+ docs/microvm.rst                 |  98 ++++
+ default-configs/i386-softmmu.mak |   1 +
+ include/hw/i386/microvm.h        |  83 ++++
+ include/hw/i386/pc.h             |  28 +-
+ include/hw/i386/x86.h            |  96 ++++
+ include/hw/nvram/fw_cfg.h        |  42 ++
+ include/hw/virtio/virtio-mmio.h  |  73 +++
+ hw/acpi/cpu_hotplug.c            |  10 +-
+ hw/i386/acpi-build.c             |  29 +-
+ hw/i386/amd_iommu.c              |   3 +-
+ hw/i386/intel_iommu.c            |   3 +-
+ hw/i386/microvm.c                | 572 ++++++++++++++++++++++
+ hw/i386/pc.c                     | 781 +++---------------------------
+ hw/i386/pc_piix.c                |  46 +-
+ hw/i386/pc_q35.c                 |  38 +-
+ hw/i386/pc_sysfw.c               |  60 +--
+ hw/i386/x86.c                    | 795 +++++++++++++++++++++++++++++++
+ hw/i386/xen/xen-hvm.c            |  28 +-
+ hw/intc/apic.c                   |   2 +-
+ hw/intc/ioapic.c                 |   2 +-
+ hw/nvram/fw_cfg.c                |  29 ++
+ hw/virtio/virtio-mmio.c          |  48 +-
+ .gitmodules                      |   3 +
+ MAINTAINERS                      |  10 +
+ hw/i386/Kconfig                  |   4 +
+ hw/i386/Makefile.objs            |   2 +
+ pc-bios/bios-microvm.bin         | Bin 0 -> 65536 bytes
+ roms/Makefile                    |   6 +
+ roms/qboot                       |   1 +
+ 29 files changed, 1982 insertions(+), 911 deletions(-)
+ create mode 100644 docs/microvm.rst
+ create mode 100644 include/hw/i386/microvm.h
+ create mode 100644 include/hw/i386/x86.h
+ create mode 100644 include/hw/virtio/virtio-mmio.h
+ create mode 100644 hw/i386/microvm.c
+ create mode 100644 hw/i386/x86.c
+ create mode 100644 pc-bios/bios-microvm.bin
+ create mode 160000 roms/qboot
+
+--=20
+2.21.0
+
 
