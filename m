@@ -4,42 +4,42 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 57B9DECE588
-	for <qemu-devel@archiver.kernel.org>; Tue, 15 Oct 2019 10:41:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 55B5CECE588
+	for <qemu-devel@archiver.kernel.org>; Tue, 15 Oct 2019 10:42:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2E3C520854
-	for <qemu-devel@archiver.kernel.org>; Tue, 15 Oct 2019 10:41:59 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2E3C520854
+	by mail.kernel.org (Postfix) with ESMTPS id 2754420854
+	for <qemu-devel@archiver.kernel.org>; Tue, 15 Oct 2019 10:42:21 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2754420854
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=irrelevant.dk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40152 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40158 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iKKH7-0000v8-OD
-	for qemu-devel@archiver.kernel.org; Tue, 15 Oct 2019 06:41:57 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47710)
+	id 1iKKHU-0001ZP-1I
+	for qemu-devel@archiver.kernel.org; Tue, 15 Oct 2019 06:42:20 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47674)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <its@irrelevant.dk>) id 1iKKEZ-0007P3-PF
+ (envelope-from <its@irrelevant.dk>) id 1iKKEY-0007Nh-S3
  for qemu-devel@nongnu.org; Tue, 15 Oct 2019 06:39:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <its@irrelevant.dk>) id 1iKKEY-0006Fy-FX
- for qemu-devel@nongnu.org; Tue, 15 Oct 2019 06:39:19 -0400
-Received: from charlie.dont.surf ([128.199.63.193]:54798)
+ (envelope-from <its@irrelevant.dk>) id 1iKKEX-0006Eq-HH
+ for qemu-devel@nongnu.org; Tue, 15 Oct 2019 06:39:18 -0400
+Received: from charlie.dont.surf ([128.199.63.193]:54784)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <its@irrelevant.dk>)
- id 1iKKEV-0006Bq-SC; Tue, 15 Oct 2019 06:39:15 -0400
+ id 1iKKEU-0006B4-NN; Tue, 15 Oct 2019 06:39:14 -0400
 Received: from apples.localdomain (unknown [194.62.217.57])
- by charlie.dont.surf (Postfix) with ESMTPSA id D2248BF888;
- Tue, 15 Oct 2019 10:39:14 +0000 (UTC)
+ by charlie.dont.surf (Postfix) with ESMTPSA id 0B004BF80B;
+ Tue, 15 Oct 2019 10:39:13 +0000 (UTC)
 From: Klaus Jensen <its@irrelevant.dk>
 To: qemu-block@nongnu.org
-Subject: [PATCH v2 06/20] nvme: add support for the abort command
-Date: Tue, 15 Oct 2019 12:38:46 +0200
-Message-Id: <20191015103900.313928-7-its@irrelevant.dk>
+Subject: [PATCH v2 04/20] nvme: populate the mandatory subnqn and ver fields
+Date: Tue, 15 Oct 2019 12:38:44 +0200
+Message-Id: <20191015103900.313928-5-its@irrelevant.dk>
 X-Mailer: git-send-email 2.23.0
 In-Reply-To: <20191015103900.313928-1-its@irrelevant.dk>
 References: <20191015103900.313928-1-its@irrelevant.dk>
@@ -67,69 +67,65 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Required for compliance with NVMe revision 1.2.1. See NVM Express 1.2.1,
-Section 5.1 ("Abort command").
+Required for compliance with NVMe revision 1.2.1 or later. See NVM
+Express 1.2.1, Section 5.11 ("Identify command"), Figure 90 and Section
+7.9 ("NVMe Qualified Names").
 
-The Abort command is a best effort command; for now, the device always
-fails to abort the given command.
+This also bumps the supported version to 1.2.1.
 
 Signed-off-by: Klaus Jensen <klaus.jensen@cnexlabs.com>
 ---
- hw/block/nvme.c | 16 ++++++++++++++++
- 1 file changed, 16 insertions(+)
+ hw/block/nvme.c | 11 ++++++++---
+ 1 file changed, 8 insertions(+), 3 deletions(-)
 
 diff --git a/hw/block/nvme.c b/hw/block/nvme.c
-index daa2367b0863..84e4f2ea7a15 100644
+index 277700fdcc58..16f0fba10b08 100644
 --- a/hw/block/nvme.c
 +++ b/hw/block/nvme.c
-@@ -741,6 +741,18 @@ static uint16_t nvme_identify(NvmeCtrl *n, NvmeCmd *=
-cmd)
-     }
- }
+@@ -9,9 +9,9 @@
+  */
 =20
-+static uint16_t nvme_abort(NvmeCtrl *n, NvmeCmd *cmd, NvmeRequest *req)
-+{
-+    uint16_t sqid =3D le32_to_cpu(cmd->cdw10) & 0xffff;
-+
-+    req->cqe.result =3D 1;
-+    if (nvme_check_sqid(n, sqid)) {
-+        return NVME_INVALID_FIELD | NVME_DNR;
-+    }
-+
-+    return NVME_SUCCESS;
-+}
-+
- static inline void nvme_set_timestamp(NvmeCtrl *n, uint64_t ts)
- {
-     trace_nvme_setfeat_timestamp(ts);
-@@ -859,6 +871,7 @@ static uint16_t nvme_set_feature(NvmeCtrl *n, NvmeCmd=
- *cmd, NvmeRequest *req)
-         trace_nvme_err_invalid_setfeat(dw10);
-         return NVME_INVALID_FIELD | NVME_DNR;
-     }
-+
-     return NVME_SUCCESS;
- }
+ /**
+- * Reference Specs: http://www.nvmexpress.org, 1.2, 1.1, 1.0e
++ * Reference Specification: NVM Express 1.2.1
+  *
+- *  http://www.nvmexpress.org/resources/
++ *   https://nvmexpress.org/resources/specifications/
+  */
 =20
-@@ -875,6 +888,8 @@ static uint16_t nvme_admin_cmd(NvmeCtrl *n, NvmeCmd *=
-cmd, NvmeRequest *req)
-         return nvme_create_cq(n, cmd);
-     case NVME_ADM_CMD_IDENTIFY:
-         return nvme_identify(n, cmd);
-+    case NVME_ADM_CMD_ABORT:
-+        return nvme_abort(n, cmd, req);
-     case NVME_ADM_CMD_SET_FEATURES:
-         return nvme_set_feature(n, cmd, req);
-     case NVME_ADM_CMD_GET_FEATURES:
-@@ -1388,6 +1403,7 @@ static void nvme_realize(PCIDevice *pci_dev, Error =
+ /**
+@@ -1366,6 +1366,7 @@ static void nvme_realize(PCIDevice *pci_dev, Error =
 **errp)
+     id->ieee[0] =3D 0x00;
+     id->ieee[1] =3D 0x02;
      id->ieee[2] =3D 0xb3;
-     id->ver =3D cpu_to_le32(0x00010201);
++    id->ver =3D cpu_to_le32(0x00010201);
      id->oacs =3D cpu_to_le16(0);
-+    id->acl =3D 3;
      id->frmw =3D 7 << 1;
      id->lpa =3D 1 << 0;
-     id->sqes =3D (0x6 << 4) | 0x6;
+@@ -1373,6 +1374,10 @@ static void nvme_realize(PCIDevice *pci_dev, Error=
+ **errp)
+     id->cqes =3D (0x4 << 4) | 0x4;
+     id->nn =3D cpu_to_le32(n->num_namespaces);
+     id->oncs =3D cpu_to_le16(NVME_ONCS_WRITE_ZEROS | NVME_ONCS_TIMESTAMP=
+);
++
++    strcpy((char *) id->subnqn, "nqn.2019-08.org.qemu:");
++    pstrcat((char *) id->subnqn, sizeof(id->subnqn), n->params.serial);
++
+     id->psd[0].mp =3D cpu_to_le16(0x9c4);
+     id->psd[0].enlat =3D cpu_to_le32(0x10);
+     id->psd[0].exlat =3D cpu_to_le32(0x4);
+@@ -1387,7 +1392,7 @@ static void nvme_realize(PCIDevice *pci_dev, Error =
+**errp)
+     NVME_CAP_SET_CSS(n->bar.cap, 1);
+     NVME_CAP_SET_MPSMAX(n->bar.cap, 4);
+=20
+-    n->bar.vs =3D 0x00010200;
++    n->bar.vs =3D 0x00010201;
+     n->bar.intmc =3D n->bar.intms =3D 0;
+=20
+     if (n->params.cmb_size_mb) {
 --=20
 2.23.0
 
