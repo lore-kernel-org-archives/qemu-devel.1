@@ -2,84 +2,61 @@ Return-Path: <SRS0=6OCO=YI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 29ABDECE588
-	for <qemu-devel@archiver.kernel.org>; Tue, 15 Oct 2019 16:59:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C641C10F14
+	for <qemu-devel@archiver.kernel.org>; Tue, 15 Oct 2019 17:00:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E88F12084B
-	for <qemu-devel@archiver.kernel.org>; Tue, 15 Oct 2019 16:59:56 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="nj1pctCu"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E88F12084B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 031832084B
+	for <qemu-devel@archiver.kernel.org>; Tue, 15 Oct 2019 17:00:20 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 031832084B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53242 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53248 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iKQAt-0007i6-TL
-	for qemu-devel@archiver.kernel.org; Tue, 15 Oct 2019 12:59:55 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42553)
+	id 1iKQBG-0008HO-S3
+	for qemu-devel@archiver.kernel.org; Tue, 15 Oct 2019 13:00:18 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42237)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1iKPn1-0008FH-AE
- for qemu-devel@nongnu.org; Tue, 15 Oct 2019 12:35:16 -0400
+ (envelope-from <philmd@redhat.com>) id 1iKPlQ-0005uY-6w
+ for qemu-devel@nongnu.org; Tue, 15 Oct 2019 12:33:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1iKPmz-0000Ga-Rm
- for qemu-devel@nongnu.org; Tue, 15 Oct 2019 12:35:15 -0400
-Received: from mail-pf1-x441.google.com ([2607:f8b0:4864:20::441]:40797)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1iKPmz-0000Fo-MY
- for qemu-devel@nongnu.org; Tue, 15 Oct 2019 12:35:13 -0400
-Received: by mail-pf1-x441.google.com with SMTP id x127so12816432pfb.7
- for <qemu-devel@nongnu.org>; Tue, 15 Oct 2019 09:35:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=Z9j8volhtgefXr986PnBR9GXQR8t6Mv7RUHoAURHFm8=;
- b=nj1pctCulV9XzosVS4Royndi5VtaskoPn9t4VdjMis/CyzTEtURqNjpJZd22x7ZYpm
- WLYNEe5spgDEGTfxWf1gDIRqnF1u5qw1KKb/W+T/j4YS4cNnWOpedfXn7cpzKSfcFPNN
- +Sjb/QdFyozo32/PHJDjJxA11DRbV4JT+sFVoC+UlK4HoYmleHgjnAdkNIDLl8zsUcfQ
- h0vW2R4JMp0yh4djyTz+GSF/Z4kbwzriTJC9n+umFLa+tM6aH00aqsEV862DdVGhiC6J
- jaXWBawM0qW8E2GzGn/kbCxsLaRA81/AKT4LD6+XEP4mrgesvzFbkMkkgGmAZAoCgW5B
- qLJA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references;
- bh=Z9j8volhtgefXr986PnBR9GXQR8t6Mv7RUHoAURHFm8=;
- b=iPOe91QAX2iqBX1lrw+mO3CkCjj0SWtsqFlGGKCa+MdtO1wpMJ6G5kT2iwRJG1MDNN
- mcTIoSvpONYLrJzUJBtycjAw3uo2Wu7aUEiWpLHM74lXoI3lxIKVxHz0d9Lw9y54ApAI
- IKI5g4P3hlPMQ8nNmRu/F4MvarFd3fHsVCnWGsGKKWHSP9jSkRaV41AkUaqUjQ5/9eaQ
- K2boR3UVf6+b6oLorzsMsZ141lVJ44sS/ekFH0cPH24mTi4JAzPr08VmIlMFpkAgU/XT
- 0qWCmP3TUoND/9iSiWtJPTkLSzVoPgGy7MTpjP23bFYa/qAdNtawZIWw8uxxyLod4R5h
- d1EQ==
-X-Gm-Message-State: APjAAAUxVhGs4V5AdiYd1vvFCtkKBQHhRHKzENo3aYb/kbzQ5ImjYnco
- 32YLDNYWoTzyjr7/fQnNOMkjF4cZkDo=
-X-Google-Smtp-Source: APXvYqxkIeYn7eLe7ZWHcykV6S2alU5GzCLCwJhFOCLrbLgmfwdUW5N8tLr/k8ha/G3FoS7quW8B9A==
-X-Received: by 2002:a17:90a:9b86:: with SMTP id
- g6mr43664202pjp.76.1571157312303; 
- Tue, 15 Oct 2019 09:35:12 -0700 (PDT)
-Received: from localhost.localdomain (97-113-7-119.tukw.qwest.net.
- [97.113.7.119])
- by smtp.gmail.com with ESMTPSA id m22sm22011593pgj.29.2019.10.15.09.35.10
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 15 Oct 2019 09:35:11 -0700 (PDT)
-From: Richard Henderson <richard.henderson@linaro.org>
+ (envelope-from <philmd@redhat.com>) id 1iKPlO-0007ha-Rq
+ for qemu-devel@nongnu.org; Tue, 15 Oct 2019 12:33:35 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42644)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iKPlO-0007gv-Jb
+ for qemu-devel@nongnu.org; Tue, 15 Oct 2019 12:33:34 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 9E87A882FB;
+ Tue, 15 Oct 2019 16:33:33 +0000 (UTC)
+Received: from x1w.redhat.com (ovpn-204-35.brq.redhat.com [10.40.204.35])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id D044319C5B;
+ Tue, 15 Oct 2019 16:33:27 +0000 (UTC)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v3 2/3] target/arm: Add allocation tag storage for user mode
-Date: Tue, 15 Oct 2019 09:35:06 -0700
-Message-Id: <20191015163507.12153-3-richard.henderson@linaro.org>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20191015163507.12153-1-richard.henderson@linaro.org>
-References: <20191015163507.12153-1-richard.henderson@linaro.org>
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::441
+Subject: [PATCH 32/32] hw/pci-host/i440fx: Remove the last PIIX3 traces
+Date: Tue, 15 Oct 2019 18:27:05 +0200
+Message-Id: <20191015162705.28087-33-philmd@redhat.com>
+In-Reply-To: <20191015162705.28087-1-philmd@redhat.com>
+References: <20191015162705.28087-1-philmd@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.28]); Tue, 15 Oct 2019 16:33:33 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,126 +68,120 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: elver@google.com, icb@rice.edu, qemu-arm@nongnu.org
+Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
+ Stefano Stabellini <sstabellini@kernel.org>,
+ Eduardo Habkost <ehabkost@redhat.com>, kvm@vger.kernel.org,
+ Paul Durrant <paul@xen.org>, "Michael S. Tsirkin" <mst@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?q?Herv=C3=A9=20Poussineau?= <hpoussin@reactos.org>,
+ Aleksandar Markovic <amarkovic@wavecomp.com>, xen-devel@lists.xenproject.org,
+ Anthony Perard <anthony.perard@citrix.com>,
+ Igor Mammedov <imammedo@redhat.com>,
+ Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Aurelien Jarno <aurelien@aurel32.net>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Control this with x-tagged-pages, which is off by default.
+The PIIX3 is not tied to the i440FX and can even be used without it.
+Move its creation to the machine code (pc_piix.c).
+We have now removed the last trace of southbridge code in the i440FX
+northbridge.
 
-The limitation to non-shared pages is not part of a future kernel API,
-but a limitation of linux-user not being able to map virtual pages back
-to physical pages.
-
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 ---
-v2: Add the x-tagged-pages cpu property
----
- target/arm/cpu.h        |  4 ++++
- target/arm/cpu64.c      | 20 ++++++++++++++++++++
- target/arm/mte_helper.c | 35 +++++++++++++++++++++++++++++++++--
- 3 files changed, 57 insertions(+), 2 deletions(-)
+ hw/i386/pc_piix.c            | 8 +++++++-
+ hw/pci-host/i440fx.c         | 8 --------
+ include/hw/pci-host/i440fx.h | 3 +--
+ 3 files changed, 8 insertions(+), 11 deletions(-)
 
-diff --git a/target/arm/cpu.h b/target/arm/cpu.h
-index c3609ef9d5..272df43d3c 100644
---- a/target/arm/cpu.h
-+++ b/target/arm/cpu.h
-@@ -912,6 +912,10 @@ struct ARMCPU {
-      */
-     bool cfgend;
- 
-+#ifdef CONFIG_USER_ONLY
-+    bool tagged_pages;
-+#endif
+diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
+index 8ac4bf12ca..cb4f4fc94c 100644
+--- a/hw/i386/pc_piix.c
++++ b/hw/i386/pc_piix.c
+@@ -190,14 +190,20 @@ static void pc_init1(MachineState *machine,
+     gsi_state =3D pc_gsi_create(&pcms->gsi, pcmc->pci_enabled);
+=20
+     if (pcmc->pci_enabled) {
++        PIIX3State *piix3;
 +
-     QLIST_HEAD(, ARMELChangeHook) pre_el_change_hooks;
-     QLIST_HEAD(, ARMELChangeHook) el_change_hooks;
- 
-diff --git a/target/arm/cpu64.c b/target/arm/cpu64.c
-index ac1e2dc2c4..4bf498f778 100644
---- a/target/arm/cpu64.c
-+++ b/target/arm/cpu64.c
-@@ -279,6 +279,20 @@ static void cpu_max_set_sve_vq(Object *obj, Visitor *v, const char *name,
-     error_propagate(errp, err);
- }
- 
-+#ifdef CONFIG_USER_ONLY
-+static bool aarch64_cpu_get_tagged_pages(Object *obj, Error **errp)
-+{
-+    ARMCPU *cpu = ARM_CPU(obj);
-+    return cpu->tagged_pages;
-+}
+         pci_bus =3D i440fx_init(host_type,
+                               pci_type,
+-                              &i440fx_state, &piix3_devfn, &isa_bus, pcm=
+s->gsi,
++                              &i440fx_state,
+                               system_memory, system_io, machine->ram_siz=
+e,
+                               pcms->below_4g_mem_size,
+                               pcms->above_4g_mem_size,
+                               pci_memory, ram_memory);
+         pcms->bus =3D pci_bus;
 +
-+static void aarch64_cpu_set_tagged_pages(Object *obj, bool val, Error **errp)
-+{
-+    ARMCPU *cpu = ARM_CPU(obj);
-+    cpu->tagged_pages = val;
-+}
-+#endif
-+
- /* -cpu max: if KVM is enabled, like -cpu host (best possible with this host);
-  * otherwise, a CPU with as many features enabled as our emulation supports.
-  * The version of '-cpu max' for qemu-system-arm is defined in cpu.c;
-@@ -389,6 +403,12 @@ static void aarch64_max_initfn(Object *obj)
-          */
-         cpu->ctr = 0x80038003; /* 32 byte I and D cacheline size, VIPT icache */
-         cpu->dcz_blocksize = 7; /*  512 bytes */
-+
-+        object_property_add_bool(obj, "x-tagged-pages",
-+                                 aarch64_cpu_get_tagged_pages,
-+                                 aarch64_cpu_set_tagged_pages, NULL);
-+        object_property_set_description(obj, "x-tagged-pages",
-+            "Set on/off MemAttr Tagged for all pages", NULL);
- #endif
- 
-         cpu->sve_max_vq = ARM_MAX_VQ;
-diff --git a/target/arm/mte_helper.c b/target/arm/mte_helper.c
-index 657383ba0e..797c6229ab 100644
---- a/target/arm/mte_helper.c
-+++ b/target/arm/mte_helper.c
-@@ -29,8 +29,39 @@ static uint8_t *allocation_tag_mem(CPUARMState *env, uint64_t ptr,
-                                    bool write, uintptr_t ra)
- {
- #ifdef CONFIG_USER_ONLY
--    /* Tag storage not implemented.  */
--    return NULL;
-+    ARMCPU *cpu = env_archcpu(env);
-+    uint8_t *tags;
-+    uintptr_t index;
-+    int flags;
-+
-+    flags = page_get_flags(ptr);
-+
-+    if (!(flags & PAGE_VALID) || !(flags & (write ? PAGE_WRITE : PAGE_READ))) {
-+        /* SIGSEGV */
-+        env->exception.vaddress = ptr;
-+        cpu_restore_state(CPU(cpu), ra, true);
-+        raise_exception(env, EXCP_DATA_ABORT, 0, 1);
-+    }
-+
-+    if (!cpu->tagged_pages) {
-+        /* Tag storage is disabled.  */
-+        return NULL;
-+    }
-+    if (flags & PAGE_SHARED) {
-+        /* There may be multiple mappings; pretend not implemented.  */
-+        return NULL;
-+    }
-+
-+    tags = page_get_target_data(ptr);
-+    if (tags == NULL) {
-+        size_t alloc_size = TARGET_PAGE_SIZE >> (LOG2_TAG_GRANULE + 1);
-+        tags = page_alloc_target_data(ptr, alloc_size);
-+        assert(tags != NULL);
-+    }
-+
-+    index = extract32(ptr, LOG2_TAG_GRANULE + 1,
-+                      TARGET_PAGE_BITS - LOG2_TAG_GRANULE - 1);
-+    return tags + index;
- #else
-     CPUState *cs = env_cpu(env);
-     uintptr_t index;
--- 
-2.17.1
++        piix3 =3D piix3_create(pci_bus, &isa_bus);
++        piix3->pic =3D pcms->gsi;
++        piix3_devfn =3D piix3->dev.devfn;
+     } else {
+         pci_bus =3D NULL;
+         i440fx_state =3D NULL;
+diff --git a/hw/pci-host/i440fx.c b/hw/pci-host/i440fx.c
+index 79ecd58a2b..f27131102d 100644
+--- a/hw/pci-host/i440fx.c
++++ b/hw/pci-host/i440fx.c
+@@ -27,7 +27,6 @@
+ #include "hw/pci/pci.h"
+ #include "hw/pci/pci_host.h"
+ #include "hw/pci-host/i440fx.h"
+-#include "hw/southbridge/piix.h"
+ #include "hw/qdev-properties.h"
+ #include "hw/sysbus.h"
+ #include "qapi/error.h"
+@@ -272,8 +271,6 @@ static void i440fx_realize(PCIDevice *dev, Error **er=
+rp)
+=20
+ PCIBus *i440fx_init(const char *host_type, const char *pci_type,
+                     PCII440FXState **pi440fx_state,
+-                    int *piix3_devfn,
+-                    ISABus **isa_bus, qemu_irq *pic,
+                     MemoryRegion *address_space_mem,
+                     MemoryRegion *address_space_io,
+                     ram_addr_t ram_size,
+@@ -286,7 +283,6 @@ PCIBus *i440fx_init(const char *host_type, const char=
+ *pci_type,
+     PCIBus *b;
+     PCIDevice *d;
+     PCIHostState *s;
+-    PIIX3State *piix3;
+     PCII440FXState *f;
+     unsigned i;
+     I440FXState *i440fx;
+@@ -339,10 +335,6 @@ PCIBus *i440fx_init(const char *host_type, const cha=
+r *pci_type,
+                  PAM_EXPAN_SIZE);
+     }
+=20
+-    piix3 =3D piix3_create(b, isa_bus);
+-    piix3->pic =3D pic;
+-    *piix3_devfn =3D piix3->dev.devfn;
+-
+     ram_size =3D ram_size / 8 / 1024 / 1024;
+     if (ram_size > 255) {
+         ram_size =3D 255;
+diff --git a/include/hw/pci-host/i440fx.h b/include/hw/pci-host/i440fx.h
+index e327f9bf87..f54e6466e4 100644
+--- a/include/hw/pci-host/i440fx.h
++++ b/include/hw/pci-host/i440fx.h
+@@ -22,8 +22,7 @@ typedef struct PCII440FXState PCII440FXState;
+ #define TYPE_IGD_PASSTHROUGH_I440FX_PCI_DEVICE "igd-passthrough-i440FX"
+=20
+ PCIBus *i440fx_init(const char *host_type, const char *pci_type,
+-                    PCII440FXState **pi440fx_state, int *piix_devfn,
+-                    ISABus **isa_bus, qemu_irq *pic,
++                    PCII440FXState **pi440fx_state,
+                     MemoryRegion *address_space_mem,
+                     MemoryRegion *address_space_io,
+                     ram_addr_t ram_size,
+--=20
+2.21.0
 
 
