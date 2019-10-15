@@ -2,109 +2,91 @@ Return-Path: <SRS0=6OCO=YI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6AD46C10F14
-	for <qemu-devel@archiver.kernel.org>; Tue, 15 Oct 2019 18:51:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C2829ECE58C
+	for <qemu-devel@archiver.kernel.org>; Tue, 15 Oct 2019 18:56:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3A0BF2083B
-	for <qemu-devel@archiver.kernel.org>; Tue, 15 Oct 2019 18:51:26 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3A0BF2083B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 8AE6320663
+	for <qemu-devel@archiver.kernel.org>; Tue, 15 Oct 2019 18:56:39 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="o4LszdTq"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8AE6320663
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56368 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56396 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iKRun-0000CB-Ek
-	for qemu-devel@archiver.kernel.org; Tue, 15 Oct 2019 14:51:25 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35133)
+	id 1iKRzq-0002Ce-Ll
+	for qemu-devel@archiver.kernel.org; Tue, 15 Oct 2019 14:56:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35377)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <thuth@redhat.com>) id 1iKRu2-0008BO-Rz
- for qemu-devel@nongnu.org; Tue, 15 Oct 2019 14:50:39 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1iKRyX-0001fo-4p
+ for qemu-devel@nongnu.org; Tue, 15 Oct 2019 14:55:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <thuth@redhat.com>) id 1iKRu0-00069g-GL
- for qemu-devel@nongnu.org; Tue, 15 Oct 2019 14:50:38 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:45304)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <thuth@redhat.com>) id 1iKRty-00067O-FM
- for qemu-devel@nongnu.org; Tue, 15 Oct 2019 14:50:36 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id BF9DF307D985;
- Tue, 15 Oct 2019 18:50:32 +0000 (UTC)
-Received: from thuth.remote.csb (ovpn-117-28.ams2.redhat.com [10.36.117.28])
- by smtp.corp.redhat.com (Postfix) with ESMTP id CBAD05D6B7;
- Tue, 15 Oct 2019 18:50:31 +0000 (UTC)
-Subject: Re: [PATCH v3 1/3] capstone: Update to master
-To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
-References: <20191015175133.16598-1-richard.henderson@linaro.org>
- <20191015175133.16598-2-richard.henderson@linaro.org>
-From: Thomas Huth <thuth@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=thuth@redhat.com; prefer-encrypt=mutual; keydata=
- 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
-Organization: Red Hat
-Message-ID: <f7938ccf-333f-9b8a-9ed7-745fbe5f96f4@redhat.com>
-Date: Tue, 15 Oct 2019 20:50:30 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+ (envelope-from <alex.bennee@linaro.org>) id 1iKRyV-0007bz-RM
+ for qemu-devel@nongnu.org; Tue, 15 Oct 2019 14:55:16 -0400
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:37665)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1iKRyV-0007bO-8M
+ for qemu-devel@nongnu.org; Tue, 15 Oct 2019 14:55:15 -0400
+Received: by mail-wr1-x443.google.com with SMTP id p14so25137482wro.4
+ for <qemu-devel@nongnu.org>; Tue, 15 Oct 2019 11:55:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=uowN7Jvg9YZ/oWPNZRyoPfxI//fH3KolMkG6kf/X5SQ=;
+ b=o4LszdTq5d3LXqv6fUcHayjR5Ds7JP0WEB1cVrSWZ7q9imjgzryEoBG+PbrmLdem4t
+ w35nB9aA6Pdt1rq8jpEhBCFAvmfl/hEjrdFxZlm5jucXR3+Sw7g8V5yMFsNeo0hklwvp
+ 8NpupLnlsd0+TEgbqzBvo5/qZnw/jA1khGc34SL8fx5TdNKxadBNTAEqc/vzn4shWMEW
+ QMIq9sFqI6Ms0ll6R52YntVkmVgb730Hkf7VCs1oPIQWCH4jpx3pB7SiwldFmAQgP8V/
+ G+owT0Ba8Ia+INn4yujVCt57g0rplw9SXJUcc9F5VOEJH4xhjbhUptZDFlHpPLqH8QC0
+ OJvQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=uowN7Jvg9YZ/oWPNZRyoPfxI//fH3KolMkG6kf/X5SQ=;
+ b=SuFgb7M8PrybEcp94+z6qgB+NdteEhSLhYL91JAcsuV+RnaI3n3MYiL9WkCLHrjSvS
+ sqvJCJ+3ky2VOqcFNMS9K9zn2HseILoV88LdyiyqJUryVSV3InpWaj9mPEo6eWzRgpzU
+ DBNgLH05sDCrQjaIMKjoXN0wcrNVrCAQbSCpIMWOzzZQT3anN30UhbIEC7cAHVBxWgtW
+ CAewty2PaRTR454EMWP/CgIKUa6QUhBMI2nQyqTfakLt8/Kr3+c4vGrNjCUxzfWuPKSV
+ WK8Vl0XVX0Ln0bbXMpxUKtuUFo0+H82zt/vXLMcpxAX12Zz+Fk/nUV2ak9zQ+VvhD8UF
+ Gd4A==
+X-Gm-Message-State: APjAAAXJQmb2DTkhynDDdMVmuZztY4aGrv7muQE9kXZ/4CirSf6AYNZT
+ 2ZTTaNHqEePIIDwoJ41nnch3cQ==
+X-Google-Smtp-Source: APXvYqyQnTAwJcINFtBLBpaeX3PbZEmM+a4Gj6m3fx79UbHayNfTxvWwltdAjZyExfesw6OSqJtPqw==
+X-Received: by 2002:adf:fac2:: with SMTP id a2mr30500233wrs.290.1571165713857; 
+ Tue, 15 Oct 2019 11:55:13 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id g1sm19718338wrv.68.2019.10.15.11.55.12
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 15 Oct 2019 11:55:12 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 083411FF87;
+ Tue, 15 Oct 2019 19:55:12 +0100 (BST)
+References: <20191014104948.4291-1-alex.bennee@linaro.org>
+ <20191014104948.4291-24-alex.bennee@linaro.org>
+ <CAFEAcA-PJ8V4to4SKu6PXZH6yFkrQ7FJBZR=2O-fJFoZgEq=TQ@mail.gmail.com>
+User-agent: mu4e 1.3.5; emacs 27.0.50
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Peter Maydell <peter.maydell@linaro.org>
+Subject: Re: [PATCH v5 23/55] translator: add translator_ld{ub,sw,uw,l,q}
+In-reply-to: <CAFEAcA-PJ8V4to4SKu6PXZH6yFkrQ7FJBZR=2O-fJFoZgEq=TQ@mail.gmail.com>
+Date: Tue, 15 Oct 2019 19:55:11 +0100
+Message-ID: <87zhi1ltyo.fsf@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <20191015175133.16598-2-richard.henderson@linaro.org>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.48]); Tue, 15 Oct 2019 18:50:32 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.132.183.28
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::443
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -116,16 +98,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: robert.foley@futurewei.com,
+ Richard Henderson <richard.henderson@linaro.org>,
+ QEMU Developers <qemu-devel@nongnu.org>, peter.puhov@futurewei.com,
+ Aaron Lindsay <aaron@os.amperecomputing.com>,
+ "Emilio G. Cota" <cota@braap.org>, Paolo Bonzini <pbonzini@redhat.com>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 15/10/2019 19.51, Richard Henderson wrote:
-> Update to 418d36d695e0.  Choose this over the 4.0.1 tag because
-> master now includes the s390x z13 vector opcodes.
-In case you respin, please mention that this (hopefully) also fixes
-https://bugs.launchpad.net/qemu/+bug/1826175
 
- Thanks,
-  Thomas
+Peter Maydell <peter.maydell@linaro.org> writes:
+
+> On Mon, 14 Oct 2019 at 12:38, Alex Benn=C3=A9e <alex.bennee@linaro.org> w=
+rote:
+>>
+>> From: "Emilio G. Cota" <cota@braap.org>
+>>
+>> We don't bother with replicating the fast path (tlb_hit) of the old
+>> cpu_ldst helpers as it has no measurable effect on performance. This
+>> probably indicates we should consider flattening the whole set of
+>> helpers but that is out of scope for this change.
+>>
+>> Suggested-by: Richard Henderson <richard.henderson@linaro.org>
+>> Signed-off-by: Emilio G. Cota <cota@braap.org>
+>> [AJB: directly plumb into softmmu/user helpers]
+>> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+>>
+>> diff --git a/tcg/tcg.h b/tcg/tcg.h
+>> index a38659ea5b..302533b463 100644
+>> --- a/tcg/tcg.h
+>> +++ b/tcg/tcg.h
+>> @@ -1317,6 +1317,7 @@ uint64_t helper_be_ldq_cmmu(CPUArchState *env, tar=
+get_ulong addr,
+>>  # define helper_ret_stl_mmu   helper_be_stl_mmu
+>>  # define helper_ret_stq_mmu   helper_be_stq_mmu
+>>  # define helper_ret_ldw_cmmu  helper_be_ldw_cmmu
+>> +# define helper_ret_lduw_cmmu helper_be_ldw_cmmu
+>>  # define helper_ret_ldl_cmmu  helper_be_ldl_cmmu
+>>  # define helper_ret_ldq_cmmu  helper_be_ldq_cmmu
+>>  #else
+>> @@ -1330,6 +1331,7 @@ uint64_t helper_be_ldq_cmmu(CPUArchState *env, tar=
+get_ulong addr,
+>>  # define helper_ret_stl_mmu   helper_le_stl_mmu
+>>  # define helper_ret_stq_mmu   helper_le_stq_mmu
+>>  # define helper_ret_ldw_cmmu  helper_le_ldw_cmmu
+>> +# define helper_ret_lduw_cmmu helper_le_ldw_cmmu
+>>  # define helper_ret_ldl_cmmu  helper_le_ldl_cmmu
+>>  # define helper_ret_ldq_cmmu  helper_le_ldq_cmmu
+>>  #endif
+>
+> This looks odd. Why is it ok to define a 'lduw' helper
+> as the 'ldw' cmmu helper ? One ought to be sign
+> extending and the other not...
+
+This was attempting to make things line up between the softmmu helpers
+and the user-mode ld*_p helpers that we need to expand to. I'm not sure
+a sign extending loader even makes sense for code load anyway.
+
+>
+> thanks
+> -- PMM
+
+
+--
+Alex Benn=C3=A9e
 
