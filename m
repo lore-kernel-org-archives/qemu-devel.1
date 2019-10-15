@@ -2,89 +2,65 @@ Return-Path: <SRS0=6OCO=YI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3A327C10F14
-	for <qemu-devel@archiver.kernel.org>; Tue, 15 Oct 2019 17:55:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 16265ECE588
+	for <qemu-devel@archiver.kernel.org>; Tue, 15 Oct 2019 17:56:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 07C692086A
-	for <qemu-devel@archiver.kernel.org>; Tue, 15 Oct 2019 17:55:22 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Gj+Y+3dA"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 07C692086A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id E087E2067B
+	for <qemu-devel@archiver.kernel.org>; Tue, 15 Oct 2019 17:56:28 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E087E2067B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55182 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55258 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iKR2X-00083e-1l
-	for qemu-devel@archiver.kernel.org; Tue, 15 Oct 2019 13:55:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54596)
+	id 1iKR3c-0000xL-09
+	for qemu-devel@archiver.kernel.org; Tue, 15 Oct 2019 13:56:28 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54904)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1iKQyy-0004wl-JM
- for qemu-devel@nongnu.org; Tue, 15 Oct 2019 13:51:41 -0400
+ (envelope-from <alex.williamson@redhat.com>) id 1iKR1O-0007gz-Rv
+ for qemu-devel@nongnu.org; Tue, 15 Oct 2019 13:54:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1iKQyw-0003PV-Gj
- for qemu-devel@nongnu.org; Tue, 15 Oct 2019 13:51:40 -0400
-Received: from mail-pg1-x544.google.com ([2607:f8b0:4864:20::544]:35828)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1iKQyw-0003PH-AH
- for qemu-devel@nongnu.org; Tue, 15 Oct 2019 13:51:38 -0400
-Received: by mail-pg1-x544.google.com with SMTP id p30so12592805pgl.2
- for <qemu-devel@nongnu.org>; Tue, 15 Oct 2019 10:51:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:subject:date:message-id:in-reply-to:references:mime-version
- :content-transfer-encoding;
- bh=1C7c6L0AKcXy94kRypeBSB6XHbsCm+dRfwVNJ4dwo8Q=;
- b=Gj+Y+3dAOGc9dHpOy9mhXsLqGcNMj5MIDrIoxzeR1GgxkfrjmeMlA0X897dskiv2ee
- xrLxCmYtK2YwsYESQjAre+jDnLqp8k9nJ9N0t1qLZ7ak6StWqaXcGlyfGZoeNRtt7U2m
- 7gJqa9ScHJxsD4KNYTobWED2saHsYVwogmfgEDKZiean4+RfEK1h6Y8ulDC2o9SZfskQ
- FJJRHMP2lNlcH+jT1vkdCpTSE++ZQU+BCvGztqyJAR5NrtPZUunXgFEv2oTXQZDj3JP0
- GlSLSFNk1pSq1vVQ/C6enhK8e2o1HzjbL0wu4KCgzAHttRhONvy1de0NhlI0JyzBrx19
- pqVg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=1C7c6L0AKcXy94kRypeBSB6XHbsCm+dRfwVNJ4dwo8Q=;
- b=DFUgDkqZBcW1wPjadyMvc70ai6yHDTRMDUGIZClSmIU3yTHacTzyxefxBKtgCsJhSi
- fcRmfT3/04SRUXBP8Lb+fUsMXN8naVF89lNizYaNBGscINx5QCj52GbYKKfQpGtjJPXk
- WVJVvLI/GBgKeaOepOXhesKRCQ6fLKmCgai1xWS7d1ZPOZqgoniD0WQnA4+/E3ptMABu
- 3NAgatttBDEB6Q//Nv5shvRRecl7Z4caasOuunMhxAs5mEWzYhgoTkCZfhMLrlBGoZ+F
- CJYz+3qDPmvgdrdW11ntuvfRpS5jy1e3IzJ8TArH0Pl6+PWQ1LDiecXfguSiHqxghGuy
- cD/Q==
-X-Gm-Message-State: APjAAAWRiVixb/fRhjoawhQzrDoXUPJR2Xmirao1PIR2qFo16tvEeBGJ
- 1dRP1TQvxmbVIUZ7gwABhcWEpYxjChA=
-X-Google-Smtp-Source: APXvYqyB5BcjRmEAYh3iTjSbd2gDoDSUPazl7j1nWIqB6FKk719+Nm2N3+cm6jegnpbHhfkJJ9VEww==
-X-Received: by 2002:a17:90a:1b45:: with SMTP id
- q63mr43578475pjq.106.1571161896902; 
- Tue, 15 Oct 2019 10:51:36 -0700 (PDT)
-Received: from localhost.localdomain (97-113-7-119.tukw.qwest.net.
- [97.113.7.119])
- by smtp.gmail.com with ESMTPSA id t68sm20867845pgt.61.2019.10.15.10.51.35
- for <qemu-devel@nongnu.org>
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 15 Oct 2019 10:51:36 -0700 (PDT)
-From: Richard Henderson <richard.henderson@linaro.org>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v3 1/3] capstone: Update to master
-Date: Tue, 15 Oct 2019 10:51:31 -0700
-Message-Id: <20191015175133.16598-2-richard.henderson@linaro.org>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20191015175133.16598-1-richard.henderson@linaro.org>
-References: <20191015175133.16598-1-richard.henderson@linaro.org>
+ (envelope-from <alex.williamson@redhat.com>) id 1iKR1L-0004PM-S9
+ for qemu-devel@nongnu.org; Tue, 15 Oct 2019 13:54:08 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:57094)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
+ id 1iKR1L-0004ON-ME
+ for qemu-devel@nongnu.org; Tue, 15 Oct 2019 13:54:07 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 2AC23307D974;
+ Tue, 15 Oct 2019 17:54:05 +0000 (UTC)
+Received: from x1.home (ovpn-118-102.phx2.redhat.com [10.3.118.102])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 0B9245C1D6;
+ Tue, 15 Oct 2019 17:53:56 +0000 (UTC)
+Date: Tue, 15 Oct 2019 11:53:55 -0600
+From: Alex Williamson <alex.williamson@redhat.com>
+To: Peter Xu <peterx@redhat.com>
+Subject: Re: [for-4.2 PATCH 0/2] PCI DMA alias support
+Message-ID: <20191015115355.5a46000e@x1.home>
+In-Reply-To: <20191014025957.GA8666@xz-x1>
+References: <156418830210.10856.17740359763468342629.stgit@gimli.home>
+ <20190729151504-mutt-send-email-mst@kernel.org>
+ <20190819152316.232bf1e5@x1.home> <20191014025957.GA8666@xz-x1>
+Organization: Red Hat
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::544
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.48]); Tue, 15 Oct 2019 17:54:05 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,56 +72,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: brijesh.singh@amd.com, Suravee.Suthikulpanit@amd.com,
+ "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org, zhexu@redhat.com,
+ eric.auger@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Update to 418d36d695e0.  Choose this over the 4.0.1 tag because
-master now includes the s390x z13 vector opcodes.
+On Mon, 14 Oct 2019 10:59:57 +0800
+Peter Xu <peterx@redhat.com> wrote:
 
-Acked-by: David Hildenbrand <david@redhat.com>
-Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
----
- Makefile  | 1 +
- capstone  | 2 +-
- configure | 2 +-
- 3 files changed, 3 insertions(+), 2 deletions(-)
+> On Mon, Aug 19, 2019 at 03:23:16PM -0600, Alex Williamson wrote:
+> > On Mon, 29 Jul 2019 15:15:29 -0400
+> > "Michael S. Tsirkin" <mst@redhat.com> wrote:
+> >   
+> > > On Fri, Jul 26, 2019 at 06:55:27PM -0600, Alex Williamson wrote:  
+> > > > Please see patch 1/ for the motivation and utility of this series.
+> > > > This v1 submission improves on the previous RFC with revised commit
+> > > > logs, comments, and more testing, and the missing IVRS support for DMA
+> > > > alias ranges is now included.  Testing has been done with Linux guests
+> > > > with both SeaBIOS and OVMF with configurations of intel-iommu and
+> > > > amd-iommu.  Intel-iommu testing includes device assignment, amd-iommu
+> > > > is necessarily limited to emulated devices with interrupt remapping
+> > > > disabled and iommu=pt in the guest (enabling interrupt remapping or
+> > > > disabling guest passthrough mode fails to work regardless of this
+> > > > series).  This series is NOT intended for QEMU v4.1.  Thanks,
+> > > > 
+> > > > Alex    
+> > > 
+> > > 
+> > > series looks good to me.
+> > > pls ping when 4.1 is out and I'll queue it.  
+> > 
+> > Here's the requested ping :)  If you'd like a re-posting or comment
+> > update, just say so.  I think Peter was ultimately satisfied enough to
+> > not request a re-spin for comments alone.  Thanks,  
+> 
+> Hi, Michael,
+> 
+> Do you plan to merge this series?  Or do you still wait for an ack?
+> 
+> In all cases:
+> 
+> Reviewed-by: Peter Xu <peterx@redhat.com>
 
-diff --git a/Makefile b/Makefile
-index 30f0abfb42..8ce48e0342 100644
---- a/Makefile
-+++ b/Makefile
-@@ -498,6 +498,7 @@ dtc/%: .git-submodule-status
- # Remove all the extra -Warning flags that QEMU uses that Capstone doesn't;
- # no need to annoy QEMU developers with such things.
- CAP_CFLAGS = $(patsubst -W%,,$(CFLAGS) $(QEMU_CFLAGS))
-+CAP_CFLAGS += -I$(SRC_PATH)/capstone/include
- CAP_CFLAGS += -DCAPSTONE_USE_SYS_DYN_MEM
- CAP_CFLAGS += -DCAPSTONE_HAS_ARM
- CAP_CFLAGS += -DCAPSTONE_HAS_ARM64
-diff --git a/capstone b/capstone
-index 22ead3e0bf..418d36d695 160000
---- a/capstone
-+++ b/capstone
-@@ -1 +1 @@
--Subproject commit 22ead3e0bfdb87516656453336160e0a37b066bf
-+Subproject commit 418d36d695e075955674ace5a1191b495da50f84
-diff --git a/configure b/configure
-index 08ca4bcb46..f4f1860065 100755
---- a/configure
-+++ b/configure
-@@ -5008,7 +5008,7 @@ case "$capstone" in
-       git_submodules="${git_submodules} capstone"
-     fi
-     mkdir -p capstone
--    QEMU_CFLAGS="$QEMU_CFLAGS -I\$(SRC_PATH)/capstone/include"
-+    QEMU_CFLAGS="$QEMU_CFLAGS -I\$(SRC_PATH)/capstone/include/capstone"
-     if test "$mingw32" = "yes"; then
-       LIBCAPSTONE=capstone.lib
-     else
--- 
-2.17.1
+Thanks Peter, somehow I had it in my head that MST has already queued
+these, but it seems not.  There's been hardly any churn in these files
+upstream, so please consider these patches in play.  Thanks,
 
+Alex
 
