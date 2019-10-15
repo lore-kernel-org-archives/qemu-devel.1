@@ -2,60 +2,87 @@ Return-Path: <SRS0=6OCO=YI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F06E8ECE588
-	for <qemu-devel@archiver.kernel.org>; Tue, 15 Oct 2019 14:51:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0C079ECE588
+	for <qemu-devel@archiver.kernel.org>; Tue, 15 Oct 2019 14:52:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C56F72054F
-	for <qemu-devel@archiver.kernel.org>; Tue, 15 Oct 2019 14:51:08 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C56F72054F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id CE8A32086A
+	for <qemu-devel@archiver.kernel.org>; Tue, 15 Oct 2019 14:52:06 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZxlZ1zpk"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CE8A32086A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47358 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47374 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iKOAF-0006dE-TR
-	for qemu-devel@archiver.kernel.org; Tue, 15 Oct 2019 10:51:07 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36505)
+	id 1iKOBB-0007w5-JC
+	for qemu-devel@archiver.kernel.org; Tue, 15 Oct 2019 10:52:05 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38425)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1iKNoL-0007Iy-LV
- for qemu-devel@nongnu.org; Tue, 15 Oct 2019 10:28:30 -0400
+ (envelope-from <lantianyu1986@gmail.com>) id 1iKNw5-00070g-Gz
+ for qemu-devel@nongnu.org; Tue, 15 Oct 2019 10:36:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1iKNoK-0000KU-A0
- for qemu-devel@nongnu.org; Tue, 15 Oct 2019 10:28:29 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:50048)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>)
- id 1iKNoH-0000IB-D9; Tue, 15 Oct 2019 10:28:25 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id A2D4E30BE7DB;
- Tue, 15 Oct 2019 14:28:24 +0000 (UTC)
-Received: from localhost (ovpn-117-226.ams2.redhat.com [10.36.117.226])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 4773860628;
- Tue, 15 Oct 2019 14:28:24 +0000 (UTC)
-From: Max Reitz <mreitz@redhat.com>
-To: qemu-block@nongnu.org
-Subject: [PATCH v2 18/21] iotests: Make 137 work with data_file
-Date: Tue, 15 Oct 2019 16:27:26 +0200
-Message-Id: <20191015142729.18123-19-mreitz@redhat.com>
-In-Reply-To: <20191015142729.18123-1-mreitz@redhat.com>
-References: <20191015142729.18123-1-mreitz@redhat.com>
-MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.44]); Tue, 15 Oct 2019 14:28:24 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.132.183.28
+ (envelope-from <lantianyu1986@gmail.com>) id 1iKNw4-0003P0-5O
+ for qemu-devel@nongnu.org; Tue, 15 Oct 2019 10:36:29 -0400
+Received: from mail-pl1-x642.google.com ([2607:f8b0:4864:20::642]:35973)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <lantianyu1986@gmail.com>)
+ id 1iKNw3-0003Op-WA
+ for qemu-devel@nongnu.org; Tue, 15 Oct 2019 10:36:28 -0400
+Received: by mail-pl1-x642.google.com with SMTP id j11so9695132plk.3
+ for <qemu-devel@nongnu.org>; Tue, 15 Oct 2019 07:36:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=from:to:cc:subject:date:message-id:in-reply-to:references;
+ bh=nDdnaFQ+XrlOxK8EOBbb2S0iw996RRsfefgNMs2Lk8w=;
+ b=ZxlZ1zpkf0EwO7SCo/1WfIYyjjkrGBVwUBPqjxafsPo11P1eaEqKWl50ahhznkX33A
+ /u+xg6HgEkvjzv2kJtKA8SM+9HYVTtoA3QMXzajEJAvYV0OK51S6TGc7X/kEAR9rrS7F
+ IaK3lSZ+Z4c/mQtyNcj96hos3YfUgh00lAo/EyFpryKWFUzYh2+4knDxryZaPXZzee0S
+ Ax02jA+UN+GwJGI9p5vjL1yChYz44h8gd0o0wJN51ECJbNXEQFt9cZImy9ShjT0jwqwZ
+ dPbPL47D63cDusuljj+7bXRlielYcPI7tRdny4L73Kul84cU3gQwFiyIW76My+fpvBbT
+ xBLQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references;
+ bh=nDdnaFQ+XrlOxK8EOBbb2S0iw996RRsfefgNMs2Lk8w=;
+ b=tuuYKfWWlJsxkoMkTWpmGTm6oZG3V5dslgMIFmmxmoS5+4FErwWeJzbrOCNNh4nY51
+ YxE+Zbwp2ObPPrBFTUtrBNho3GOVak30oLHcR2BWe7abXV20dXgfZPLUNLS98WpJSBUC
+ 1nRcLkA4SKiTOCJ6xtCJcdmYICpRQpMLMU1eY23P4S1ywetNMKQtJvczmprOFVJv+gin
+ rjSkCcmsPjQxCxeZQoueaSs3HLNs6DZU7KZWu3Nlv7JsXibhbLfiovTcnNbXDE59gjY+
+ H1sGvuBOMC4N+8kHqUfEDuJz4S4xa0R4nTVKcH8chmrEejMpMiEpcFSx6JVnmNco8D+x
+ MBVA==
+X-Gm-Message-State: APjAAAXLra+KJvYf772j8erGxFzOby1q95BBsCsOM2QOuCseY4w3rmzS
+ ogaOgd6mxjtH8EFFU5rk8gs=
+X-Google-Smtp-Source: APXvYqzkwFA9UuJi+hpp+bmzkgE58AQvIxqXhomKWsTWWDscCp2u7ffZGA3dfbEgJ9cQjyrQImFFtw==
+X-Received: by 2002:a17:902:bd08:: with SMTP id
+ p8mr35891107pls.248.1571150187174; 
+ Tue, 15 Oct 2019 07:36:27 -0700 (PDT)
+Received: from localhost.corp.microsoft.com ([167.220.255.39])
+ by smtp.googlemail.com with ESMTPSA id v43sm4913165pjb.1.2019.10.15.07.36.23
+ (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+ Tue, 15 Oct 2019 07:36:26 -0700 (PDT)
+From: lantianyu1986@gmail.com
+X-Google-Original-From: Tianyu.Lan@microsoft.com
+To: mst@redhat.com, cohuck@redhat.com, pbonzini@redhat.com, rth@twiddle.net,
+ ehabkost@redhat.com, mtosatti@redhat.com, vkuznets@redhat.com,
+ rkagan@virtuozzo.com
+Subject: [PATCH V2 2/2] target/i386/kvm: Add Hyper-V direct tlb flush support
+Date: Tue, 15 Oct 2019 22:36:10 +0800
+Message-Id: <20191015143610.31857-3-Tianyu.Lan@microsoft.com>
+X-Mailer: git-send-email 2.14.5
+In-Reply-To: <20191015143610.31857-1-Tianyu.Lan@microsoft.com>
+References: <20191015143610.31857-1-Tianyu.Lan@microsoft.com>
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::642
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -67,86 +94,135 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Maxim Levitsky <mlevitsk@redhat.com>,
- qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>
+Cc: Tianyu Lan <Tianyu.Lan@microsoft.com>, qemu-devel@nongnu.org,
+ kvm@vger.kernel.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-When using an external data file, there are no refcounts for data
-clusters.  We thus have to adjust the corruption test in this patch to
-not be based around a data cluster allocation, but the L2 table
-allocation (L2 tables are still refcounted with external data files).
+From: Tianyu Lan <Tianyu.Lan@microsoft.com>
 
-Furthermore, we should not print qcow2.py's list of incompatible
-features because it differs depending on whether there is an external
-data file or not.
+Hyper-V direct tlb flush targets KVM on Hyper-V guest.
+Enable direct TLB flush for its guests meaning that TLB
+flush hypercalls are handled by Level 0 hypervisor (Hyper-V)
+bypassing KVM in Level 1. Due to the different ABI for hypercall
+parameters between Hyper-V and KVM, KVM capabilities should be
+hidden when enable Hyper-V direct tlb flush otherwise KVM
+hypercalls may be intercepted by Hyper-V. Add new parameter
+"hv-direct-tlbflush". Check expose_kvm and Hyper-V tlb flush
+capability status before enabling the feature.
 
-With those two changes, the test will work both with an external data
-files (once that options works with the iotests at all).
-
-Signed-off-by: Max Reitz <mreitz@redhat.com>
+Signed-off-by: Tianyu Lan <Tianyu.Lan@microsoft.com>
 ---
- tests/qemu-iotests/137     | 15 +++++++++++----
- tests/qemu-iotests/137.out |  6 ++----
- 2 files changed, 13 insertions(+), 8 deletions(-)
+Change since V1:
+       - Add direct tlb flush's Hyper-V property and use
+       hv_cpuid_check_and_set() to check the dependency of tlbflush
+       feature.
+       - Make new feature work with Hyper-V passthrough mode.
+---
+ docs/hyperv.txt   | 12 ++++++++++++
+ target/i386/cpu.c |  2 ++
+ target/i386/cpu.h |  1 +
+ target/i386/kvm.c | 23 +++++++++++++++++++++++
+ 4 files changed, 38 insertions(+)
 
-diff --git a/tests/qemu-iotests/137 b/tests/qemu-iotests/137
-index 6cf2997577..7ae86892f7 100755
---- a/tests/qemu-iotests/137
-+++ b/tests/qemu-iotests/137
-@@ -138,14 +138,21 @@ $QEMU_IO \
-     "$TEST_IMG" 2>&1 | _filter_qemu_io
-=20
- # The dirty bit must not be set
--$PYTHON qcow2.py "$TEST_IMG" dump-header | grep incompatible_features
-+# (Filter the external data file bit)
-+if $PYTHON qcow2.py "$TEST_IMG" dump-header | grep incompatible_features=
- \
-+    | grep -q '\<0\>'
-+then
-+    echo 'ERROR: Dirty bit set'
-+else
-+    echo 'OK: Dirty bit not set'
-+fi
-=20
- # Similarly we can test whether corruption detection has been enabled:
--# Create L1/L2, overwrite first entry in refcount block, allocate someth=
-ing.
-+# Create L1, overwrite refcounts, force allocation of L2 by writing
-+# data.
- # Disabling the checks should fail, so the corruption must be detected.
- _make_test_img 64M
--$QEMU_IO -c "write 0 64k" "$TEST_IMG" | _filter_qemu_io
--poke_file "$TEST_IMG" "$((0x20000))" "\x00\x00"
-+poke_file "$TEST_IMG" "$((0x20000))" "\x00\x00\x00\x00\x00\x00\x00\x00"
- $QEMU_IO \
-     -c "reopen -o overlap-check=3Dnone,lazy-refcounts=3D42" \
-     -c "write 64k 64k" \
-diff --git a/tests/qemu-iotests/137.out b/tests/qemu-iotests/137.out
-index bd4523a853..86377c80cd 100644
---- a/tests/qemu-iotests/137.out
-+++ b/tests/qemu-iotests/137.out
-@@ -36,11 +36,9 @@ qemu-io: Unsupported value 'blubb' for qcow2 option 'o=
-verlap-check'. Allowed are
- wrote 512/512 bytes at offset 0
- 512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
- ./common.rc: Killed                  ( VALGRIND_QEMU=3D"${VALGRIND_QEMU_=
-IO}" _qemu_proc_exec "${VALGRIND_LOGFILE}" "$QEMU_IO_PROG" $QEMU_IO_ARGS =
-"$@" )
--incompatible_features     []
-+OK: Dirty bit not set
- Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D67108864
--wrote 65536/65536 bytes at offset 0
--64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
- qemu-io: Parameter 'lazy-refcounts' expects 'on' or 'off'
--qcow2: Marking image as corrupt: Preventing invalid write on metadata (o=
-verlaps with qcow2_header); further corruption events will be suppressed
-+qcow2: Marking image as corrupt: Preventing invalid allocation of L2 tab=
-le at offset 0; further corruption events will be suppressed
- write failed: Input/output error
- *** done
---=20
-2.21.0
+diff --git a/docs/hyperv.txt b/docs/hyperv.txt
+index 8fdf25c829..ceab8c21fe 100644
+--- a/docs/hyperv.txt
++++ b/docs/hyperv.txt
+@@ -184,6 +184,18 @@ enabled.
+ 
+ Requires: hv-vpindex, hv-synic, hv-time, hv-stimer
+ 
++3.18. hv-direct-tlbflush
++=======================
++The enlightenment targets KVM on Hyper-V guest. Enable direct TLB flush for
++its guests meaning that TLB flush hypercalls are handled by Level 0 hypervisor
++(Hyper-V) bypassing KVM in Level 1. Due to the different ABI for hypercall
++parameters between Hyper-V and KVM, enabling this capability effectively
++disables all hypercall handling by KVM (as some KVM hypercall may be mistakenly
++treated as TLB flush hypercalls by Hyper-V). So kvm capability should not show
++to guest when enable this capability. If not, user will fail to enable this
++capability.
++
++Requires: hv-tlbflush, -kvm
+ 
+ 4. Development features
+ ========================
+diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+index 44f1bbdcac..7bc7fee512 100644
+--- a/target/i386/cpu.c
++++ b/target/i386/cpu.c
+@@ -6156,6 +6156,8 @@ static Property x86_cpu_properties[] = {
+                       HYPERV_FEAT_IPI, 0),
+     DEFINE_PROP_BIT64("hv-stimer-direct", X86CPU, hyperv_features,
+                       HYPERV_FEAT_STIMER_DIRECT, 0),
++    DEFINE_PROP_BIT64("hv-direct-tlbflush", X86CPU, hyperv_features,
++                      HYPERV_FEAT_DIRECT_TLBFLUSH, 0),
+     DEFINE_PROP_BOOL("hv-passthrough", X86CPU, hyperv_passthrough, false),
+ 
+     DEFINE_PROP_BOOL("check", X86CPU, check_cpuid, true),
+diff --git a/target/i386/cpu.h b/target/i386/cpu.h
+index eaa5395aa5..3cb105f7d6 100644
+--- a/target/i386/cpu.h
++++ b/target/i386/cpu.h
+@@ -907,6 +907,7 @@ typedef uint64_t FeatureWordArray[FEATURE_WORDS];
+ #define HYPERV_FEAT_EVMCS               12
+ #define HYPERV_FEAT_IPI                 13
+ #define HYPERV_FEAT_STIMER_DIRECT       14
++#define HYPERV_FEAT_DIRECT_TLBFLUSH     15
+ 
+ #ifndef HYPERV_SPINLOCK_NEVER_RETRY
+ #define HYPERV_SPINLOCK_NEVER_RETRY             0xFFFFFFFF
+diff --git a/target/i386/kvm.c b/target/i386/kvm.c
+index 11b9c854b5..7e0fbc730e 100644
+--- a/target/i386/kvm.c
++++ b/target/i386/kvm.c
+@@ -900,6 +900,10 @@ static struct {
+         },
+         .dependencies = BIT(HYPERV_FEAT_STIMER)
+     },
++    [HYPERV_FEAT_DIRECT_TLBFLUSH] = {
++        .desc = "direct tlbflush (hv-direct-tlbflush)",
++        .dependencies = BIT(HYPERV_FEAT_TLBFLUSH)
++    },
+ };
+ 
+ static struct kvm_cpuid2 *try_get_hv_cpuid(CPUState *cs, int max)
+@@ -1224,6 +1228,7 @@ static int hyperv_handle_properties(CPUState *cs,
+     r |= hv_cpuid_check_and_set(cs, cpuid, HYPERV_FEAT_EVMCS);
+     r |= hv_cpuid_check_and_set(cs, cpuid, HYPERV_FEAT_IPI);
+     r |= hv_cpuid_check_and_set(cs, cpuid, HYPERV_FEAT_STIMER_DIRECT);
++    r |= hv_cpuid_check_and_set(cs, cpuid, HYPERV_FEAT_DIRECT_TLBFLUSH);
+ 
+     /* Additional dependencies not covered by kvm_hyperv_properties[] */
+     if (hyperv_feat_enabled(cpu, HYPERV_FEAT_SYNIC) &&
+@@ -1243,6 +1248,24 @@ static int hyperv_handle_properties(CPUState *cs,
+         goto free;
+     }
+ 
++    if (hyperv_feat_enabled(cpu, HYPERV_FEAT_DIRECT_TLBFLUSH) ||
++        cpu->hyperv_passthrough) {
++        if (!cpu->expose_kvm) {
++            r = kvm_vcpu_enable_cap(cs, KVM_CAP_HYPERV_DIRECT_TLBFLUSH, 0, 0);
++            if (hyperv_feat_enabled(cpu, HYPERV_FEAT_DIRECT_TLBFLUSH) && r) {
++                fprintf(stderr,
++                    "Hyper-V %s is not supported by kernel\n",
++                    kvm_hyperv_properties[HYPERV_FEAT_DIRECT_TLBFLUSH].desc);
++                return -ENOSYS;
++            }
++        } else if (!cpu->hyperv_passthrough) {
++            fprintf(stderr,
++                "Hyper-V %s requires not to expose KVM capabilities.\n",
++                kvm_hyperv_properties[HYPERV_FEAT_DIRECT_TLBFLUSH].desc);
++            return -ENOSYS;
++        }
++    }
++
+     if (cpu->hyperv_passthrough) {
+         /* We already copied all feature words from KVM as is */
+         r = cpuid->nent;
+-- 
+2.14.5
 
 
