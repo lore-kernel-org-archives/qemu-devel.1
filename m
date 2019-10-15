@@ -3,57 +3,55 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B0C36ECE588
-	for <qemu-devel@archiver.kernel.org>; Tue, 15 Oct 2019 11:33:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CF784ECE588
+	for <qemu-devel@archiver.kernel.org>; Tue, 15 Oct 2019 11:33:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 87BD021848
-	for <qemu-devel@archiver.kernel.org>; Tue, 15 Oct 2019 11:33:11 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 87BD021848
+	by mail.kernel.org (Postfix) with ESMTPS id A3E0F21848
+	for <qemu-devel@archiver.kernel.org>; Tue, 15 Oct 2019 11:33:20 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A3E0F21848
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41602 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41604 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iKL4g-0008HY-9n
-	for qemu-devel@archiver.kernel.org; Tue, 15 Oct 2019 07:33:10 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56299)
+	id 1iKL4p-0008S4-41
+	for qemu-devel@archiver.kernel.org; Tue, 15 Oct 2019 07:33:19 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56579)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <slp@redhat.com>) id 1iKKwL-0008Rx-Tx
- for qemu-devel@nongnu.org; Tue, 15 Oct 2019 07:24:34 -0400
+ (envelope-from <slp@redhat.com>) id 1iKKxF-0001VQ-KU
+ for qemu-devel@nongnu.org; Tue, 15 Oct 2019 07:25:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <slp@redhat.com>) id 1iKKwK-00049N-Tm
- for qemu-devel@nongnu.org; Tue, 15 Oct 2019 07:24:33 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:55624)
+ (envelope-from <slp@redhat.com>) id 1iKKxD-0004ie-J4
+ for qemu-devel@nongnu.org; Tue, 15 Oct 2019 07:25:29 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:35064)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <slp@redhat.com>) id 1iKKwK-00049F-Nx
- for qemu-devel@nongnu.org; Tue, 15 Oct 2019 07:24:32 -0400
+ (Exim 4.71) (envelope-from <slp@redhat.com>) id 1iKKxD-0004gA-DD
+ for qemu-devel@nongnu.org; Tue, 15 Oct 2019 07:25:27 -0400
 Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
  [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 03AA0A3CD83;
- Tue, 15 Oct 2019 11:24:32 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 8DC27C054C52;
+ Tue, 15 Oct 2019 11:25:25 +0000 (UTC)
 Received: from dritchie.redhat.com (unknown [10.33.36.106])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 3513E10027A8;
- Tue, 15 Oct 2019 11:24:29 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 8CD6F1001DE4;
+ Tue, 15 Oct 2019 11:25:13 +0000 (UTC)
 From: Sergio Lopez <slp@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v9 05/15] hw/i386/pc: avoid an assignment in if condition in
- x86_load_linux()
-Date: Tue, 15 Oct 2019 13:23:36 +0200
-Message-Id: <20191015112346.45554-6-slp@redhat.com>
+Subject: [PATCH v9 11/15] hw/intc/apic: reject pic ints if isa_pic == NULL
+Date: Tue, 15 Oct 2019 13:23:42 +0200
+Message-Id: <20191015112346.45554-12-slp@redhat.com>
 In-Reply-To: <20191015112346.45554-1-slp@redhat.com>
 References: <20191015112346.45554-1-slp@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.68]); Tue, 15 Oct 2019 11:24:32 +0000 (UTC)
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.32]); Tue, 15 Oct 2019 11:25:25 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
@@ -76,35 +74,29 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Follow checkpatch.pl recommendation and avoid an assignment in if
-condition in x86_load_linux().
+In apic_accept_pic_intr(), reject PIC interruptions if a i8259 PIC has
+not been instantiated (isa_pic =3D=3D NULL).
 
+Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
 Signed-off-by: Sergio Lopez <slp@redhat.com>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 ---
- hw/i386/pc.c | 9 ++++++++-
- 1 file changed, 8 insertions(+), 1 deletion(-)
+ hw/intc/apic.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-index c8608b8007..90c2263a33 100644
---- a/hw/i386/pc.c
-+++ b/hw/i386/pc.c
-@@ -1045,7 +1045,14 @@ static void x86_load_linux(PCMachineState *pcms,
+diff --git a/hw/intc/apic.c b/hw/intc/apic.c
+index bce89911dc..2a74f7b4bf 100644
+--- a/hw/intc/apic.c
++++ b/hw/intc/apic.c
+@@ -610,7 +610,7 @@ int apic_accept_pic_intr(DeviceState *dev)
 =20
-     /* load the kernel header */
-     f =3D fopen(kernel_filename, "rb");
--    if (!f || !(kernel_size =3D get_file_size(f)) ||
-+    if (!f) {
-+        fprintf(stderr, "qemu: could not open kernel file '%s': %s\n",
-+                kernel_filename, strerror(errno));
-+        exit(1);
-+    }
-+
-+    kernel_size =3D get_file_size(f);
-+    if (!kernel_size ||
-         fread(header, 1, MIN(ARRAY_SIZE(header), kernel_size), f) !=3D
-         MIN(ARRAY_SIZE(header), kernel_size)) {
-         fprintf(stderr, "qemu: could not load kernel '%s': %s\n",
+     if ((s->apicbase & MSR_IA32_APICBASE_ENABLE) =3D=3D 0 ||
+         (lvt0 & APIC_LVT_MASKED) =3D=3D 0)
+-        return 1;
++        return isa_pic !=3D NULL;
+=20
+     return 0;
+ }
 --=20
 2.21.0
 
