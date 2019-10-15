@@ -2,84 +2,143 @@ Return-Path: <SRS0=6OCO=YI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A20F0C10F14
-	for <qemu-devel@archiver.kernel.org>; Tue, 15 Oct 2019 12:53:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0D3BEC10F14
+	for <qemu-devel@archiver.kernel.org>; Tue, 15 Oct 2019 12:56:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 73339217F9
-	for <qemu-devel@archiver.kernel.org>; Tue, 15 Oct 2019 12:53:11 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 73339217F9
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id 8C491217F9
+	for <qemu-devel@archiver.kernel.org>; Tue, 15 Oct 2019 12:56:36 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8C491217F9
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44158 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44250 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iKMK6-0008Ll-HZ
-	for qemu-devel@archiver.kernel.org; Tue, 15 Oct 2019 08:53:10 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44131)
+	id 1iKMNP-0002oC-Hu
+	for qemu-devel@archiver.kernel.org; Tue, 15 Oct 2019 08:56:35 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44889)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <luwei.kang@intel.com>) id 1iKMJ0-0007Rh-Iv
- for qemu-devel@nongnu.org; Tue, 15 Oct 2019 08:52:03 -0400
+ (envelope-from <jsnow@redhat.com>) id 1iKMMX-000289-Vi
+ for qemu-devel@nongnu.org; Tue, 15 Oct 2019 08:55:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <luwei.kang@intel.com>) id 1iKMIy-0006f9-Ok
- for qemu-devel@nongnu.org; Tue, 15 Oct 2019 08:52:01 -0400
-Received: from mga04.intel.com ([192.55.52.120]:61316)
+ (envelope-from <jsnow@redhat.com>) id 1iKMMW-0007zD-Ny
+ for qemu-devel@nongnu.org; Tue, 15 Oct 2019 08:55:41 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:51318)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <luwei.kang@intel.com>)
- id 1iKMIy-0006eB-GH
- for qemu-devel@nongnu.org; Tue, 15 Oct 2019 08:52:00 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga004.jf.intel.com ([10.7.209.38])
- by fmsmga104.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
- 15 Oct 2019 05:51:53 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.67,300,1566889200"; d="scan'208";a="347064321"
-Received: from fmsmsx106.amr.corp.intel.com ([10.18.124.204])
- by orsmga004.jf.intel.com with ESMTP; 15 Oct 2019 05:51:51 -0700
-Received: from fmsmsx101.amr.corp.intel.com (10.18.124.199) by
- FMSMSX106.amr.corp.intel.com (10.18.124.204) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Tue, 15 Oct 2019 05:51:51 -0700
-Received: from shsmsx151.ccr.corp.intel.com (10.239.6.50) by
- fmsmsx101.amr.corp.intel.com (10.18.124.199) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Tue, 15 Oct 2019 05:51:50 -0700
-Received: from shsmsx104.ccr.corp.intel.com ([169.254.5.166]) by
- SHSMSX151.ccr.corp.intel.com ([10.239.6.50]) with mapi id 14.03.0439.000;
- Tue, 15 Oct 2019 20:51:49 +0800
-From: "Kang, Luwei" <luwei.kang@intel.com>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Subject: RE: [PATCH v4 2/2] i386: Add support to get/set/migrate Intel
- Processor Trace feature
-Thread-Topic: [PATCH v4 2/2] i386: Add support to get/set/migrate Intel
- Processor Trace feature
-Thread-Index: AQHVgKsg+eNsNdVZH0GZ6Dwyyz/Lp6dbpngw
-Date: Tue, 15 Oct 2019 12:51:48 +0000
-Message-ID: <82D7661F83C1A047AF7DC287873BF1E17382A209@SHSMSX104.ccr.corp.intel.com>
-References: <1520182116-16485-1-git-send-email-luwei.kang@intel.com>
- <1520182116-16485-2-git-send-email-luwei.kang@intel.com>
- <20191012031407.GK4084@habkost.net>
-In-Reply-To: <20191012031407.GK4084@habkost.net>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ctpclassification: CTP_NT
-x-titus-metadata-40: eyJDYXRlZ29yeUxhYmVscyI6IiIsIk1ldGFkYXRhIjp7Im5zIjoiaHR0cDpcL1wvd3d3LnRpdHVzLmNvbVwvbnNcL0ludGVsMyIsImlkIjoiYWUzYjc0YjktZTE2MC00MjgxLTgxMDgtZjUyMTk4YzgzNmM4IiwicHJvcHMiOlt7Im4iOiJDVFBDbGFzc2lmaWNhdGlvbiIsInZhbHMiOlt7InZhbHVlIjoiQ1RQX05UIn1dfV19LCJTdWJqZWN0TGFiZWxzIjpbXSwiVE1DVmVyc2lvbiI6IjE3LjEwLjE4MDQuNDkiLCJUcnVzdGVkTGFiZWxIYXNoIjoicjBtTjVcL3dZSzBlS1lyOWV6cTA2bnRtaVdoWWxLaUdcLyt5dm9zVGErMllGXC9GTFdibHdTaWc3Q2I4ZEk5aEsyTSJ9
-dlp-product: dlpe-windows
-dlp-version: 11.2.0.6
-dlp-reaction: no-action
-x-originating-ip: [10.239.127.40]
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+ (Exim 4.71) (envelope-from <jsnow@redhat.com>)
+ id 1iKMMT-0007wk-H0; Tue, 15 Oct 2019 08:55:37 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 0446230A5403;
+ Tue, 15 Oct 2019 12:55:36 +0000 (UTC)
+Received: from [10.10.120.169] (ovpn-120-169.rdu2.redhat.com [10.10.120.169])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 43FC358BE;
+ Tue, 15 Oct 2019 12:55:07 +0000 (UTC)
+Subject: Re: [PULL 01/19] util/hbitmap: strict hbitmap_reset
+To: Kevin Wolf <kwolf@redhat.com>
+References: <20191011212550.27269-1-jsnow@redhat.com>
+ <20191011212550.27269-2-jsnow@redhat.com>
+ <15c20480-0240-bdd2-2cc2-60c388022e86@redhat.com>
+ <e403b26e-5775-a134-b23f-2fbc698dca25@redhat.com>
+ <0642e0a5-4304-6e7a-318e-0251c9642f46@redhat.com>
+ <20191015084443.GA4093@localhost.localdomain>
+From: John Snow <jsnow@redhat.com>
+Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+Message-ID: <c3e1acb3-71f9-6b31-7b8b-70f375d058c5@redhat.com>
+Date: Tue, 15 Oct 2019 08:55:07 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.0
 MIME-Version: 1.0
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 192.55.52.120
+In-Reply-To: <20191015084443.GA4093@localhost.localdomain>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.42]); Tue, 15 Oct 2019 12:55:36 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,69 +150,100 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
- "mtosatti@redhat.com" <mtosatti@redhat.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- Chao Peng <chao.p.peng@linux.intel.com>,
- "pbonzini@redhat.com" <pbonzini@redhat.com>,
- "rth@twiddle.net" <rth@twiddle.net>
+Cc: Fam Zheng <fam@euphon.net>, Peter Maydell <peter.maydell@linaro.org>,
+ Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org,
+ Juan Quintela <quintela@redhat.com>, libvir-list@redhat.com,
+ Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org,
+ Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-qemu> > diff --git a/target/i386/kvm.c b/target/i386/kvm.c index
-> > f9f4cd1..097c953 100644
-> > --- a/target/i386/kvm.c
-> > +++ b/target/i386/kvm.c
-> > @@ -1811,6 +1811,25 @@ static int kvm_put_msrs(X86CPU *cpu, int level)
-> >                  kvm_msr_entry_add(cpu, MSR_MTRRphysMask(i), mask);
-> >              }
-> >          }
-> > +        if (env->features[FEAT_7_0_EBX] & CPUID_7_0_EBX_INTEL_PT) {
-> > +            int addr_num =3D kvm_arch_get_supported_cpuid(kvm_state,
-> > +                                                    0x14, 1, R_EAX) &
-> > + 0x7;
-> > +
-> > +            kvm_msr_entry_add(cpu, MSR_IA32_RTIT_CTL,
-> > +                            env->msr_rtit_ctrl);
-> > +            kvm_msr_entry_add(cpu, MSR_IA32_RTIT_STATUS,
-> > +                            env->msr_rtit_status);
-> > +            kvm_msr_entry_add(cpu, MSR_IA32_RTIT_OUTPUT_BASE,
-> > +                            env->msr_rtit_output_base);
+
+
+On 10/15/19 4:44 AM, Kevin Wolf wrote:
+> Am 14.10.2019 um 20:10 hat John Snow geschrieben:
+>>
+>>
+>> On 10/11/19 7:18 PM, John Snow wrote:
+>>>
+>>>
+>>> On 10/11/19 5:48 PM, Eric Blake wrote:
+>>>> On 10/11/19 4:25 PM, John Snow wrote:
+>>>>> From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+>>>>>
+>>>>> hbitmap_reset has an unobvious property: it rounds requested region=
+ up.
+>>>>> It may provoke bugs, like in recently fixed write-blocking mode of
+>>>>> mirror: user calls reset on unaligned region, not keeping in mind t=
+hat
+>>>>> there are possible unrelated dirty bytes, covered by rounded-up reg=
+ion
+>>>>> and information of this unrelated "dirtiness" will be lost.
+>>>>>
+>>>>> Make hbitmap_reset strict: assert that arguments are aligned, allow=
+ing
+>>>>> only one exception when @start + @count =3D=3D hb->orig_size. It's =
+needed
+>>>>> to comfort users of hbitmap_next_dirty_area, which cares about
+>>>>> hb->orig_size.
+>>>>>
+>>>>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.c=
+om>
+>>>>> Reviewed-by: Max Reitz <mreitz@redhat.com>
+>>>>> Message-Id: <20190806152611.280389-1-vsementsov@virtuozzo.com>
+>>>>> [Maintainer edit: Max's suggestions from on-list. --js]
+>>>>> Signed-off-by: John Snow <jsnow@redhat.com>
+>>>>> ---
+>>>>> =C2=A0 include/qemu/hbitmap.h | 5 +++++
+>>>>> =C2=A0 tests/test-hbitmap.c=C2=A0=C2=A0 | 2 +-
+>>>>> =C2=A0 util/hbitmap.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+ | 4 ++++
+>>>>> =C2=A0 3 files changed, 10 insertions(+), 1 deletion(-)
+>>>>>
+>>>>
+>>>>> +++ b/util/hbitmap.c
+>>>>> @@ -476,6 +476,10 @@ void hbitmap_reset(HBitmap *hb, uint64_t start=
+,
+>>>>> uint64_t count)
+>>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 /* Compute range in the last layer.=C2=
+=A0 */
+>>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 uint64_t first;
+>>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 uint64_t last =3D start + count - 1;
+>>>>> +=C2=A0=C2=A0=C2=A0 uint64_t gran =3D 1ULL << hb->granularity;
+>>>>> +
+>>>>> +=C2=A0=C2=A0=C2=A0 assert(!(start & (gran - 1)));
+>>>>> +=C2=A0=C2=A0=C2=A0 assert(!(count & (gran - 1)) || (start + count =
+=3D=3D hb->orig_size));
+>>>>
+>>>> I know I'm replying a bit late (since this is now a pull request), b=
+ut
+>>>> would it be worth using the dedicated macro:
+>>>>
+>>>> assert(QEMU_IS_ALIGNED(start, gran));
+>>>> assert(QEMU_IS_ALIGNED(count, gran) || start + count =3D=3D hb->orig=
+_size);
+>>>>
+>>>> instead of open-coding it?=C2=A0 (I would also drop the extra () aro=
+und the
+>>>> right half of ||). If we want it, that would now be a followup patch=
+.
+>>
+>> I've noticed that seasoned C programmers hate extra parentheses a lot.
+>> I've noticed that I cannot remember operator precedence enough to ever
+>> feel like this is actually an improvement.
+>>
+>> Something about a nice weighted tree of ((expr1) || (expr2)) feels
+>> soothing to my weary eyes. So, if it's not terribly important, I'd
+>> prefer to leave it as-is.
 >=20
-> This causes the following crash on some hosts:
->=20
->   qemu-system-x86_64: error: failed to set MSR 0x560 to 0x0
->   qemu-system-x86_64: target/i386/kvm.c:2673: kvm_put_msrs: Assertion `re=
-t =3D=3D cpu->kvm_msr_buf->nmsrs' failed.
->=20
-> Checking for CPUID_7_0_EBX_INTEL_PT is not enough: KVM has additional con=
-ditions that might prevent writing to this MSR
-> (PT_CAP_topa_output && PT_CAP_single_range_output).  This causes QEMU to =
-crash if some of the conditions aren't met.
->=20
-> Writing and reading this MSR (and the ones below) need to be conditional =
-on KVM_GET_MSR_INDEX_LIST.
+> I don't mind the parentheses, but I do prefer QEMU_IS_ALIGNED() to the
+> open-coded version. Would that be a viable compromise?
 >=20
 
-Hi Eduardo,
-    I found this issue can't be reproduced in upstream source code but can =
-be reproduced on RHEL8.1. I haven't got the qemu source code of RHEL8.1. Bu=
-t after adding some trace in KVM, I found the KVM has reported the complete=
- Intel PT CPUID information to qemu but the Intel PT CPUID (0x14) is lost w=
-hen qemu setting the CPUID to KVM (cpuid level is 0xd). It looks like lost =
-the below patch.
+Oh, I'm sorry! I did change that. I didn't mean to appear any more
+stubborn than I actually am.
 
-commit f24c3a79a415042f6dc195f029a2ba7247d14cac
-Author: Luwei Kang <luwei.kang@intel.com>
-Date:   Tue Jan 29 18:52:59 2019 -0500
-    i386: extended the cpuid_level when Intel PT is enabled
-
-    Intel Processor Trace required CPUID[0x14] but the cpuid_level
-    have no change when create a kvm guest with
-    e.g. "-cpu qemu64,+intel-pt".
-
-Thanks,
-Luwei Kang
-
+--js
 
