@@ -2,62 +2,84 @@ Return-Path: <SRS0=6OCO=YI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 22D4AECE588
-	for <qemu-devel@archiver.kernel.org>; Tue, 15 Oct 2019 16:56:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B72F6C10F14
+	for <qemu-devel@archiver.kernel.org>; Tue, 15 Oct 2019 16:57:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EBAB220659
-	for <qemu-devel@archiver.kernel.org>; Tue, 15 Oct 2019 16:56:07 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EBAB220659
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 846BC2084B
+	for <qemu-devel@archiver.kernel.org>; Tue, 15 Oct 2019 16:57:33 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="TE/G92PH"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 846BC2084B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53122 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53166 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iKQ7D-0001yo-0W
-	for qemu-devel@archiver.kernel.org; Tue, 15 Oct 2019 12:56:07 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42072)
+	id 1iKQ8a-0003q9-Dg
+	for qemu-devel@archiver.kernel.org; Tue, 15 Oct 2019 12:57:32 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42579)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1iKPkj-00057H-V7
- for qemu-devel@nongnu.org; Tue, 15 Oct 2019 12:32:55 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1iKPn2-0008HK-JJ
+ for qemu-devel@nongnu.org; Tue, 15 Oct 2019 12:35:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1iKPki-0007MK-IM
- for qemu-devel@nongnu.org; Tue, 15 Oct 2019 12:32:53 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53434)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iKPki-0007M7-AA
- for qemu-devel@nongnu.org; Tue, 15 Oct 2019 12:32:52 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 681543018ED0;
- Tue, 15 Oct 2019 16:32:51 +0000 (UTC)
-Received: from x1w.redhat.com (ovpn-204-35.brq.redhat.com [10.40.204.35])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id D253319C69;
- Tue, 15 Oct 2019 16:32:44 +0000 (UTC)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+ (envelope-from <richard.henderson@linaro.org>) id 1iKPn1-0000Ic-BP
+ for qemu-devel@nongnu.org; Tue, 15 Oct 2019 12:35:16 -0400
+Received: from mail-pf1-x442.google.com ([2607:f8b0:4864:20::442]:38713)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+ id 1iKPn1-0000HW-5v
+ for qemu-devel@nongnu.org; Tue, 15 Oct 2019 12:35:15 -0400
+Received: by mail-pf1-x442.google.com with SMTP id h195so12826990pfe.5
+ for <qemu-devel@nongnu.org>; Tue, 15 Oct 2019 09:35:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id:in-reply-to:references;
+ bh=m4O3Xy7tWLBs5UuOTJ5dzdaA6h4n+q00OCHjnj+1vK8=;
+ b=TE/G92PHYDbz91JtzP8GE/LU/s06l3o0trtKUl5FKEffqZNPOpEurSJ4FBzjfTISD2
+ /lVZYw4s7DqW8g51X+BQGYyef8qCiqeZQkP1oa2JYc4Z4RWEbVsh8IOILSWCt5WFAvRk
+ 1wZWvB3gjOBEqH9+qVTuKKK8GsPbhtS2fXeXMmiaT37Y8x1mIi+NvekCyxln1O2opmLk
+ HXhwRP/Aya9Zv2VSKw2UTYCrNZgGuw/9/+0AqTpgvGdYAWvEv50/iZ+g9yXhbxiYWWOP
+ zmvDOpPmx9E/dJR+hDtYU50QacP12Vze4l+2axHMBELlJueUPJJzv0bY4qhvcOUWlElp
+ ZZlw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references;
+ bh=m4O3Xy7tWLBs5UuOTJ5dzdaA6h4n+q00OCHjnj+1vK8=;
+ b=nrV+rkcXJxmnFfclMBMoxED74+p/SlSEJ1h3qaA0cZpOxmUn1UMmQvAU9u4lrX3PCA
+ ZRo9SrG8LAqW8vu6xkvGTHoF0GrlY99NjeTKuauyV27iJW2ml8eB7aM8afXsJ0I8jzRb
+ yVCb/JTSDAtkhNDWGEOxQyVTpL0a2MEG1NjzIQenKuC9VSg/N8TljLlS2VTBFPahaFle
+ pA65jjJPF18vLjavGomKVm/0xEswRTvXkwaz/DLclNQRh+djlCNZyJlJhgnA2Zb2QtHL
+ npicUQhqh240MkU/YwAzYnILqB5mUqXcom9avna+MMGjISqhbU6YaskkID9X4k6G7nVA
+ Gm7Q==
+X-Gm-Message-State: APjAAAUcy+jWNq1vF+TCm1qjMBc8FPzD4BBvWg1aB0P4AGNBdiYFdWu/
+ RQByQDTPSmWtMzfPLgw9KfnxX6AXYew=
+X-Google-Smtp-Source: APXvYqz2uCiuKMXXRRK9lIVML/Zp5UEtKKiq15BJ9llu13JVcpuKlEOIcCdAjTN2tlcOa6Kmea+0Ow==
+X-Received: by 2002:a17:90a:654b:: with SMTP id
+ f11mr43562323pjs.49.1571157313791; 
+ Tue, 15 Oct 2019 09:35:13 -0700 (PDT)
+Received: from localhost.localdomain (97-113-7-119.tukw.qwest.net.
+ [97.113.7.119])
+ by smtp.gmail.com with ESMTPSA id m22sm22011593pgj.29.2019.10.15.09.35.12
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 15 Oct 2019 09:35:12 -0700 (PDT)
+From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 28/32] hw/pci-host/piix: Move i440FX declarations to
- hw/pci-host/i440fx.h
-Date: Tue, 15 Oct 2019 18:27:01 +0200
-Message-Id: <20191015162705.28087-29-philmd@redhat.com>
-In-Reply-To: <20191015162705.28087-1-philmd@redhat.com>
-References: <20191015162705.28087-1-philmd@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.46]); Tue, 15 Oct 2019 16:32:51 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.132.183.28
+Subject: [PATCH v3 3/3] tests/tcg/aarch64: Add mte smoke tests
+Date: Tue, 15 Oct 2019 09:35:07 -0700
+Message-Id: <20191015163507.12153-4-richard.henderson@linaro.org>
+X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20191015163507.12153-1-richard.henderson@linaro.org>
+References: <20191015163507.12153-1-richard.henderson@linaro.org>
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::442
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -69,181 +91,113 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
- Stefano Stabellini <sstabellini@kernel.org>,
- Eduardo Habkost <ehabkost@redhat.com>, kvm@vger.kernel.org,
- Paul Durrant <paul@xen.org>, "Michael S. Tsirkin" <mst@redhat.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
- Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?q?Herv=C3=A9=20Poussineau?= <hpoussin@reactos.org>,
- Aleksandar Markovic <amarkovic@wavecomp.com>, xen-devel@lists.xenproject.org,
- Anthony Perard <anthony.perard@citrix.com>,
- Igor Mammedov <imammedo@redhat.com>,
- Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Aurelien Jarno <aurelien@aurel32.net>, Richard Henderson <rth@twiddle.net>
+Cc: elver@google.com, icb@rice.edu, qemu-arm@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-
-The hw/pci-host/piix.c contains a mix of PIIX3 and i440FX chipsets
-functions. To be able to split it, we need to export some
-declarations first.
-
-Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- MAINTAINERS                  |  1 +
- hw/acpi/pcihp.c              |  2 +-
- hw/i386/pc_piix.c            |  1 +
- hw/pci-host/piix.c           |  1 +
- include/hw/i386/pc.h         | 22 ---------------------
- include/hw/pci-host/i440fx.h | 37 ++++++++++++++++++++++++++++++++++++
- stubs/pci-host-piix.c        |  3 ++-
- 7 files changed, 43 insertions(+), 24 deletions(-)
- create mode 100644 include/hw/pci-host/i440fx.h
+ tests/tcg/aarch64/mte-1.c         | 27 +++++++++++++++++++++
+ tests/tcg/aarch64/mte-2.c         | 39 +++++++++++++++++++++++++++++++
+ tests/tcg/aarch64/Makefile.target |  5 ++++
+ 3 files changed, 71 insertions(+)
+ create mode 100644 tests/tcg/aarch64/mte-1.c
+ create mode 100644 tests/tcg/aarch64/mte-2.c
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 556f58bd8c..adf059a164 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -1228,6 +1228,7 @@ F: hw/i386/
- F: hw/pci-host/piix.c
- F: hw/pci-host/q35.c
- F: hw/pci-host/pam.c
-+F: include/hw/pci-host/i440fx.h
- F: include/hw/pci-host/q35.h
- F: include/hw/pci-host/pam.h
- F: hw/isa/lpc_ich9.c
-diff --git a/hw/acpi/pcihp.c b/hw/acpi/pcihp.c
-index 82d295b6e8..8413348a33 100644
---- a/hw/acpi/pcihp.c
-+++ b/hw/acpi/pcihp.c
-@@ -27,7 +27,7 @@
- #include "qemu/osdep.h"
- #include "hw/acpi/pcihp.h"
-=20
--#include "hw/i386/pc.h"
-+#include "hw/pci-host/i440fx.h"
- #include "hw/pci/pci.h"
- #include "hw/pci/pci_bridge.h"
- #include "hw/acpi/acpi.h"
-diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
-index 5b35ff04c7..8ac4bf12ca 100644
---- a/hw/i386/pc_piix.c
-+++ b/hw/i386/pc_piix.c
-@@ -29,6 +29,7 @@
- #include "hw/loader.h"
- #include "hw/i386/pc.h"
- #include "hw/i386/apic.h"
-+#include "hw/pci-host/i440fx.h"
- #include "hw/southbridge/piix.h"
- #include "hw/display/ramfb.h"
- #include "hw/firmware/smbios.h"
-diff --git a/hw/pci-host/piix.c b/hw/pci-host/piix.c
-index a450fc726e..0b5da5bc94 100644
---- a/hw/pci-host/piix.c
-+++ b/hw/pci-host/piix.c
-@@ -27,6 +27,7 @@
- #include "hw/irq.h"
- #include "hw/pci/pci.h"
- #include "hw/pci/pci_host.h"
-+#include "hw/pci-host/i440fx.h"
- #include "hw/southbridge/piix.h"
- #include "hw/qdev-properties.h"
- #include "hw/isa/isa.h"
-diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
-index 1c20b96571..cead2828de 100644
---- a/include/hw/i386/pc.h
-+++ b/include/hw/i386/pc.h
-@@ -248,28 +248,6 @@ int cmos_get_fd_drive_type(FloppyDriveType fd0);
- /* hpet.c */
- extern int no_hpet;
-=20
--/* piix_pci.c */
--struct PCII440FXState;
--typedef struct PCII440FXState PCII440FXState;
--
--#define TYPE_I440FX_PCI_HOST_BRIDGE "i440FX-pcihost"
--#define TYPE_I440FX_PCI_DEVICE "i440FX"
--
--#define TYPE_IGD_PASSTHROUGH_I440FX_PCI_DEVICE "igd-passthrough-i440FX"
--
--PCIBus *i440fx_init(const char *host_type, const char *pci_type,
--                    PCII440FXState **pi440fx_state, int *piix_devfn,
--                    ISABus **isa_bus, qemu_irq *pic,
--                    MemoryRegion *address_space_mem,
--                    MemoryRegion *address_space_io,
--                    ram_addr_t ram_size,
--                    ram_addr_t below_4g_mem_size,
--                    ram_addr_t above_4g_mem_size,
--                    MemoryRegion *pci_memory,
--                    MemoryRegion *ram_memory);
--
--PCIBus *find_i440fx(void);
--
- /* pc_sysfw.c */
- void pc_system_flash_create(PCMachineState *pcms);
- void pc_system_firmware_init(PCMachineState *pcms, MemoryRegion *rom_mem=
-ory);
-diff --git a/include/hw/pci-host/i440fx.h b/include/hw/pci-host/i440fx.h
+diff --git a/tests/tcg/aarch64/mte-1.c b/tests/tcg/aarch64/mte-1.c
 new file mode 100644
-index 0000000000..e327f9bf87
+index 0000000000..18bfb1120f
 --- /dev/null
-+++ b/include/hw/pci-host/i440fx.h
-@@ -0,0 +1,37 @@
++++ b/tests/tcg/aarch64/mte-1.c
+@@ -0,0 +1,27 @@
 +/*
-+ * QEMU i440FX North Bridge Emulation
-+ *
-+ * Copyright (c) 2006 Fabrice Bellard
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or la=
-ter.
-+ * See the COPYING file in the top-level directory.
-+ *
++ * Memory tagging, basic pass cases.
 + */
 +
-+#ifndef HW_PCI_I440FX_H
-+#define HW_PCI_I440FX_H
++#include <assert.h>
 +
-+#include "hw/hw.h"
-+#include "hw/pci/pci_bus.h"
++asm(".arch armv8.5-a+memtag");
 +
-+typedef struct PCII440FXState PCII440FXState;
++int data[16 / sizeof(int)] __attribute__((aligned(16)));
 +
-+#define TYPE_I440FX_PCI_HOST_BRIDGE "i440FX-pcihost"
-+#define TYPE_I440FX_PCI_DEVICE "i440FX"
++int main(int ac, char **av)
++{
++    int *p0 = data;
++    int *p1, *p2;
++    long c;
 +
-+#define TYPE_IGD_PASSTHROUGH_I440FX_PCI_DEVICE "igd-passthrough-i440FX"
++    asm("irg %0,%1,%2" : "=r"(p1) : "r"(p0), "r"(1));
++    assert(p1 != p0);
++    asm("subp %0,%1,%2" : "=r"(c) : "r"(p0), "r"(p1));
++    assert(c == 0);
 +
-+PCIBus *i440fx_init(const char *host_type, const char *pci_type,
-+                    PCII440FXState **pi440fx_state, int *piix_devfn,
-+                    ISABus **isa_bus, qemu_irq *pic,
-+                    MemoryRegion *address_space_mem,
-+                    MemoryRegion *address_space_io,
-+                    ram_addr_t ram_size,
-+                    ram_addr_t below_4g_mem_size,
-+                    ram_addr_t above_4g_mem_size,
-+                    MemoryRegion *pci_memory,
-+                    MemoryRegion *ram_memory);
++    asm("stg %0, [%0]" : : "r"(p1));
++    asm("ldg %0, [%1]" : "=r"(p2) : "r"(p0), "0"(p0));
++    assert(p1 == p2);
 +
-+PCIBus *find_i440fx(void);
++    return 0;
++}
+diff --git a/tests/tcg/aarch64/mte-2.c b/tests/tcg/aarch64/mte-2.c
+new file mode 100644
+index 0000000000..2991b7df69
+--- /dev/null
++++ b/tests/tcg/aarch64/mte-2.c
+@@ -0,0 +1,39 @@
++/*
++ * Memory tagging, basic fail cases.
++ */
 +
-+#endif
-diff --git a/stubs/pci-host-piix.c b/stubs/pci-host-piix.c
-index 6ed81b1f21..93975adbfe 100644
---- a/stubs/pci-host-piix.c
-+++ b/stubs/pci-host-piix.c
-@@ -1,5 +1,6 @@
- #include "qemu/osdep.h"
--#include "hw/i386/pc.h"
-+#include "hw/pci-host/i440fx.h"
++#include <assert.h>
++#include <signal.h>
++#include <stdlib.h>
 +
- PCIBus *find_i440fx(void)
- {
-     return NULL;
---=20
-2.21.0
++asm(".arch armv8.5-a+memtag");
++
++int data[16 / sizeof(int)] __attribute__((aligned(16)));
++
++void pass(int sig)
++{
++    exit(0);
++}
++
++int main(int ac, char **av)
++{
++    int *p0 = data;
++    int *p1, *p2;
++    long excl = 1;
++
++    /* Create two differently tagged pointers.  */
++    asm("irg %0,%1,%2" : "=r"(p1) : "r"(p0), "r"(excl));
++    asm("gmi %0,%1,%0" : "+r"(excl) : "r" (p1));
++    assert(excl != 1);
++    asm("irg %0,%1,%2" : "=r"(p2) : "r"(p0), "r"(excl));
++    assert(p1 != p2);
++
++    /* Store the tag from the first pointer.  */
++    asm("stg %0, [%0]" : : "r"(p1));
++
++    *p1 = 0;
++    signal(SIGSEGV, pass);
++    *p2 = 0;
++
++    assert(0);
++}
+diff --git a/tests/tcg/aarch64/Makefile.target b/tests/tcg/aarch64/Makefile.target
+index 0040b68dd0..0971c244b7 100644
+--- a/tests/tcg/aarch64/Makefile.target
++++ b/tests/tcg/aarch64/Makefile.target
+@@ -32,4 +32,9 @@ run-semihosting: semihosting
+ # AARCH64_TESTS += bti-1
+ bti-1: LDFLAGS += -nostdlib -Wl,-T,$(AARCH64_SRC)/bti.ld
+ 
++# We need binutils-2.32 to assemble this test case.
++# AARCH64_TESTS += mte-1 mte-2
++mte-%: CFLAGS += -O -g
++run-mte-%: QEMU += -cpu max,x-tagged-pages=on
++
+ TESTS += $(AARCH64_TESTS)
+-- 
+2.17.1
 
 
