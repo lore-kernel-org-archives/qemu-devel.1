@@ -2,85 +2,67 @@ Return-Path: <SRS0=6OCO=YI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EA7AEC10F14
-	for <qemu-devel@archiver.kernel.org>; Tue, 15 Oct 2019 12:19:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 50830C10F14
+	for <qemu-devel@archiver.kernel.org>; Tue, 15 Oct 2019 12:25:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B4BDC21848
-	for <qemu-devel@archiver.kernel.org>; Tue, 15 Oct 2019 12:19:46 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="uGd5rkPw"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B4BDC21848
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 2425B2067B
+	for <qemu-devel@archiver.kernel.org>; Tue, 15 Oct 2019 12:25:11 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2425B2067B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43174 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43330 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iKLnl-0000CS-Pz
-	for qemu-devel@archiver.kernel.org; Tue, 15 Oct 2019 08:19:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37240)
+	id 1iKLsz-0002dl-Oq
+	for qemu-devel@archiver.kernel.org; Tue, 15 Oct 2019 08:25:09 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38552)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <aleksandar.m.mail@gmail.com>) id 1iKLlQ-0007tW-DJ
- for qemu-devel@nongnu.org; Tue, 15 Oct 2019 08:17:25 -0400
+ (envelope-from <no-reply@patchew.org>) id 1iKLsA-00027b-Ay
+ for qemu-devel@nongnu.org; Tue, 15 Oct 2019 08:24:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aleksandar.m.mail@gmail.com>) id 1iKLlO-0002rx-VW
- for qemu-devel@nongnu.org; Tue, 15 Oct 2019 08:17:20 -0400
-Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:39644)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
- id 1iKLlO-0002qj-Ql
- for qemu-devel@nongnu.org; Tue, 15 Oct 2019 08:17:18 -0400
-Received: by mail-oi1-x243.google.com with SMTP id w144so16571633oia.6
- for <qemu-devel@nongnu.org>; Tue, 15 Oct 2019 05:17:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:in-reply-to:references:from:date:message-id:subject:to
- :cc; bh=DW+pwd5ccaEqPqdb1U2F0RHM5IB3TG9RH0PzgM6eKP0=;
- b=uGd5rkPw0g+Llgq5VG6wuDkCIJC5ewqQmgvbz5nOOmPThr3OkFa05Ubys2wcL30HU3
- kAWmAZwyCmS8UwgmPjtESfT63vJK7MXcFxQdhoAfufJVaKQrMjQTU1w1quvuS/ZGtnT1
- 1ai1rjzKFUCxiuejXQ9XCfYu1x9hU2kDJM//WjEz2D01MFF6xI/DoTsd3K/ojZ23m9U4
- FWv59h850W2N2NoEFppavA2+Fjz6PV+cWwD3e6pAP5DbfFtQhTPPah+LUZNphcOPdbnw
- wISLuyUOS8sDJsHYPZjaDOO7xfRS0ENPjdbKevNz054pUjxztf/HodU7XLsahiPGsLNq
- St1Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:in-reply-to:references:from:date
- :message-id:subject:to:cc;
- bh=DW+pwd5ccaEqPqdb1U2F0RHM5IB3TG9RH0PzgM6eKP0=;
- b=YerkI04b/rnVE8UmaYrTmXoV06AAMgmdGYcMMv2oFaxIGxE59yvKVuOIdy4z3ougVJ
- 4eQDG1PZxQmqZA9jRoxvelnRW2B30BCgMRJSLvZfBCA2JeZ+hbcK8MlsoJms81bC4NOK
- L4dbUpswWB5QIn74o+rXRFCWTtOCiR8o+062ZQ8ALxwAouywZslMvXP9YZ2XtnBtkzK1
- JbZfKVvH9ouLdHQ4OtxrH9xLDSkSwHedmmg2sx/LsnYDFMI60iybSYW0JV4WU8ZM551K
- nPI/jj9VFW/qDlMAavCyVYbjUcK6MTLsmYw3XdPLmX7m6hJrNxJdfHJW3NJNqD6dgSyU
- z+lg==
-X-Gm-Message-State: APjAAAU78TOq1dGri2XpC8VJfVLs6c6aZkhWzX2HtyBPhbNoMQSmhT0e
- MqHm19BJFLPvq/d/axRAHQf1d5AWMpfKBTqY/gQ=
-X-Google-Smtp-Source: APXvYqxdTQNPj0atazn4u+WeHUNxL+8JfRonBIU9W5OuZz75/suHsAZFdLBo2T92PqoSd0anPN9F/5otocxMaGifne8=
-X-Received: by 2002:a54:460c:: with SMTP id p12mr28962919oip.62.1571141837642; 
- Tue, 15 Oct 2019 05:17:17 -0700 (PDT)
+ (envelope-from <no-reply@patchew.org>) id 1iKLs8-00058w-4v
+ for qemu-devel@nongnu.org; Tue, 15 Oct 2019 08:24:17 -0400
+Resent-Date: Tue, 15 Oct 2019 08:24:17 -0400
+Resent-Message-Id: <E1iKLs8-00058w-4v@eggs.gnu.org>
+Received: from sender4-of-o54.zoho.com ([136.143.188.54]:21467)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <no-reply@patchew.org>)
+ id 1iKLs7-00057x-TH
+ for qemu-devel@nongnu.org; Tue, 15 Oct 2019 08:24:16 -0400
+ARC-Seal: i=1; a=rsa-sha256; t=1571141332; cv=none; d=zoho.com; s=zohoarc; 
+ b=dV4v9bj88GS3IgOk17WEzDmp2lcMNDGFJ8w3ca0hSodo4LOoy/UGarFggnR6GAhjPQ161YQFrWK/ffwjS10Okst+dLpbgCIDa8eJIi0kxYlKAfBqQb812q/C2t1/6LJZSC+fprCruamefaop8hGE2PqXOi3j+JOqV99UJXgGmGU=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zoho.com;
+ s=zohoarc; t=1571141332;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
+ bh=J9MuKPtXGXvEra2FxzkdYBoz4ffg+FZzCunDEfJgP60=; 
+ b=WRF/qbAhnU2zrySqRUQROWXSx+nqZ4u/Y1gxoGH2N4drBOLYICbKxKuzcHYcvETJydxOkzGsVobYO7aQnWIwbhuozetmYfqjKwzCmjiqSbhV+CHvESuox9aC99xsRxVWYP43QLqpd5fXtAmYCQ/tF2kdKRk6qD8W51R6aUOP+5g=
+ARC-Authentication-Results: i=1; mx.zoho.com; dkim=pass  header.i=patchew.org;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 1571141331887230.3119140893316;
+ Tue, 15 Oct 2019 05:08:51 -0700 (PDT)
+In-Reply-To: <20191014115757.51866-1-ysato@users.sourceforge.jp>
+Subject: Re: [PATCH v26 00/21] Add RX archtecture support
+Message-ID: <157114133075.5946.3045460008800598265@37313f22b938>
 MIME-Version: 1.0
-Received: by 2002:a9d:340a:0:0:0:0:0 with HTTP; Tue, 15 Oct 2019 05:17:17
- -0700 (PDT)
-In-Reply-To: <87mue2xy3l.fsf@dusky.pond.sub.org>
-References: <1570991178-5511-1-git-send-email-aleksandar.markovic@rt-rk.com>
- <1570991178-5511-2-git-send-email-aleksandar.markovic@rt-rk.com>
- <87a7a36awg.fsf@dusky.pond.sub.org>
- <CAL1e-=gD629LfDPokJ6XAnR_xxE-vHw3RZqg=JDai-xAcJC0Dg@mail.gmail.com>
- <87mue2xy3l.fsf@dusky.pond.sub.org>
-From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
-Date: Tue, 15 Oct 2019 14:17:17 +0200
-Message-ID: <CAL1e-=gBkZEg-o7uy6wEW1M4eyf+OYbvWjxUAB7zwmvAPUahdw@mail.gmail.com>
-Subject: Re: [PATCH v4 1/8] target/mips: Clean up helper.c
-To: Markus Armbruster <armbru@redhat.com>
-Content-Type: multipart/alternative; boundary="0000000000001fde310594f1f7f7"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::243
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: ysato@users.sourceforge.jp
+Date: Tue, 15 Oct 2019 05:08:51 -0700 (PDT)
+X-ZohoMailClient: External
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 136.143.188.54
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -92,142 +74,142 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>,
- "aleksandar.rikalo@rt-rk.com" <aleksandar.rikalo@rt-rk.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Reply-To: qemu-devel@nongnu.org
+Cc: philmd@redhat.com, qemu-devel@nongnu.org, ysato@users.sourceforge.jp
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---0000000000001fde310594f1f7f7
-Content-Type: text/plain; charset="UTF-8"
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MTAxNDExNTc1Ny41MTg2
+Ni0xLXlzYXRvQHVzZXJzLnNvdXJjZWZvcmdlLmpwLwoKCgpIaSwKClRoaXMgc2VyaWVzIHNlZW1z
+IHRvIGhhdmUgc29tZSBjb2Rpbmcgc3R5bGUgcHJvYmxlbXMuIFNlZSBvdXRwdXQgYmVsb3cgZm9y
+Cm1vcmUgaW5mb3JtYXRpb246CgpTdWJqZWN0OiBbUEFUQ0ggdjI2IDAwLzIxXSBBZGQgUlggYXJj
+aHRlY3R1cmUgc3VwcG9ydApUeXBlOiBzZXJpZXMKTWVzc2FnZS1pZDogMjAxOTEwMTQxMTU3NTcu
+NTE4NjYtMS15c2F0b0B1c2Vycy5zb3VyY2Vmb3JnZS5qcAoKPT09IFRFU1QgU0NSSVBUIEJFR0lO
+ID09PQojIS9iaW4vYmFzaApnaXQgcmV2LXBhcnNlIGJhc2UgPiAvZGV2L251bGwgfHwgZXhpdCAw
+CmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2Fs
+IGRpZmYucmVuYW1lcyBUcnVlCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLmFsZ29yaXRobSBoaXN0
+b2dyYW0KLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFjayBiYXNlLi4KPT09IFRFU1Qg
+U0NSSVBUIEVORCA9PT0KCkZyb20gaHR0cHM6Ly9naXRodWIuY29tL3BhdGNoZXctcHJvamVjdC9x
+ZW11CiAtIFt0YWcgdXBkYXRlXSAgICAgIHBhdGNoZXcvMjAxOTEwMTQxMTU3NTcuNTE4NjYtMS15
+c2F0b0B1c2Vycy5zb3VyY2Vmb3JnZS5qcCAtPiBwYXRjaGV3LzIwMTkxMDE0MTE1NzU3LjUxODY2
+LTEteXNhdG9AdXNlcnMuc291cmNlZm9yZ2UuanAKU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0
+ZXN0JwozZGM0Y2UzIEJvb3RMaW51eENvbnNvbGVUZXN0OiBUZXN0IHRoZSBSWC1WaXJ0IG1hY2hp
+bmUKN2RiOWY5YiBBZGQgcngtc29mdG1tdQoyM2NhYmNjIGh3L3J4OiBSZXN0cmljdCB0aGUgUlg2
+Mk4gbWljcm9jb250cm9sbGVyIHRvIHRoZSBSWDYyTiBDUFUgY29yZQo3NjJmZTdjIGh3L3J4OiBI
+b25vciAtYWNjZWwgcXRlc3QKZDkxZjg5ZiBody9yeDogUlggVGFyZ2V0IGhhcmR3YXJlIGRlZmlu
+aXRpb24KMGM2ZmZlMCBody9jaGFyOiBSWDYyTiBzZXJpYWwgY29tbXVuaWNhdGlvbiBpbnRlcmZh
+Y2UgKFNDSSkKZTZhNWE0MiBody90aW1lcjogUlg2Mk4gaW50ZXJuYWwgdGltZXIgbW9kdWxlcwoz
+OGZlYmYwIGh3L2ludGM6IFJYNjJOIGludGVycnVwdCBjb250cm9sbGVyIChJQ1VhKQowODcxZmI5
+IHRhcmdldC9yeDogRHVtcCBieXRlcyBmb3IgZWFjaCBpbnNuIGR1cmluZyBkaXNhc3NlbWJseQox
+MzZkZGUyIHRhcmdldC9yeDogQ29sbGVjdCBhbGwgYnl0ZXMgZHVyaW5nIGRpc2Fzc2VtYmx5CmQ1
+NDFiMmYgdGFyZ2V0L3J4OiBFbWl0IGFsbCBkaXNhc3NlbWJseSBpbiBvbmUgcHJ0KCkKNTZlNDJi
+ZSB0YXJnZXQvcng6IFVzZSBwcnRfbGRtaSBmb3IgWENIR19tciBkaXNhc3NlbWJseQozYTRlMTAw
+IHRhcmdldC9yeDogUmVwbGFjZSBvcGVyYW5kIHdpdGggcHJ0X2xkbWkgaW4gZGlzYXNzZW1ibGVy
+CjE1MmJjNjMgdGFyZ2V0L3J4OiBEaXNhc3NlbWJsZSByeF9pbmRleF9hZGRyIGludG8gYSBzdHJp
+bmcKYzU0NDA0ZSB0YXJnZXQvcng6IFJYIGRpc2Fzc2VtYmxlcgphM2Y5Y2I2IHRhcmdldC9yeDog
+Q1BVIGRlZmluaXRpb24KMzc2NjM1NCB0YXJnZXQvcng6IFRDRyBoZWxwZXIKNDRjMDViNyB0YXJn
+ZXQvcng6IFRDRyB0cmFuc2xhdGlvbgo4OTk4OWEwIGh3L3JlZ2lzdGVyZmllbGRzLmg6IEFkZCA4
+Yml0IGFuZCAxNmJpdCByZWdpc3RlciBtYWNyb3MKNWFhNmU1MyBxZW11L2JpdG9wcy5oOiBBZGQg
+ZXh0cmFjdDggYW5kIGV4dHJhY3QxNgpmY2JhYWMwIE1BSU5UQUlORVJTOiBBZGQgUlgKCj09PSBP
+VVRQVVQgQkVHSU4gPT09CjEvMjEgQ2hlY2tpbmcgY29tbWl0IGZjYmFhYzBjNmVkMyAoTUFJTlRB
+SU5FUlM6IEFkZCBSWCkKMi8yMSBDaGVja2luZyBjb21taXQgNWFhNmU1MzhmZTk3IChxZW11L2Jp
+dG9wcy5oOiBBZGQgZXh0cmFjdDggYW5kIGV4dHJhY3QxNikKMy8yMSBDaGVja2luZyBjb21taXQg
+ODk5ODlhMDFkOWFlIChody9yZWdpc3RlcmZpZWxkcy5oOiBBZGQgOGJpdCBhbmQgMTZiaXQgcmVn
+aXN0ZXIgbWFjcm9zKQpVc2Ugb2YgdW5pbml0aWFsaXplZCB2YWx1ZSBpbiBjb25jYXRlbmF0aW9u
+ICguKSBvciBzdHJpbmcgYXQgLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgbGluZSAyNDg0LgpFUlJP
+UjogTWFjcm9zIHdpdGggbXVsdGlwbGUgc3RhdGVtZW50cyBzaG91bGQgYmUgZW5jbG9zZWQgaW4g
+YSBkbyAtIHdoaWxlIGxvb3AKIzI3OiBGSUxFOiBpbmNsdWRlL2h3L3JlZ2lzdGVyZmllbGRzLmg6
+MjU6CisjZGVmaW5lIFJFRzgocmVnLCBhZGRyKSAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgXAorICAgIGVudW0geyBBXyAjIyByZWcgPSAoYWRkcikgfTsg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBcCisgICAgZW51bSB7IFJf
+ICMjIHJlZyA9IChhZGRyKSB9OwoKRVJST1I6IE1hY3JvcyB3aXRoIG11bHRpcGxlIHN0YXRlbWVu
+dHMgc2hvdWxkIGJlIGVuY2xvc2VkIGluIGEgZG8gLSB3aGlsZSBsb29wCiMzMTogRklMRTogaW5j
+bHVkZS9ody9yZWdpc3RlcmZpZWxkcy5oOjI5OgorI2RlZmluZSBSRUcxNihyZWcsIGFkZHIpICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBcCisgICAgZW51
+bSB7IEFfICMjIHJlZyA9IChhZGRyKSB9OyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgIFwKKyAgICBlbnVtIHsgUl8gIyMgcmVnID0gKGFkZHIpIC8gMiB9OwoKdG90YWw6
+IDIgZXJyb3JzLCAwIHdhcm5pbmdzLCA1NiBsaW5lcyBjaGVja2VkCgpQYXRjaCAzLzIxIGhhcyBz
+dHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJl
+IGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNL
+UEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgo0LzIxIENoZWNraW5nIGNvbW1pdCA0NGMwNWI3OGM2NTkg
+KHRhcmdldC9yeDogVENHIHRyYW5zbGF0aW9uKQpXQVJOSU5HOiBhZGRlZCwgbW92ZWQgb3IgZGVs
+ZXRlZCBmaWxlKHMpLCBkb2VzIE1BSU5UQUlORVJTIG5lZWQgdXBkYXRpbmc/CiMyMDogCm5ldyBm
+aWxlIG1vZGUgMTAwNjQ0Cgp0b3RhbDogMCBlcnJvcnMsIDEgd2FybmluZ3MsIDMwNjUgbGluZXMg
+Y2hlY2tlZAoKUGF0Y2ggNC8yMSBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJ
+ZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8g
+dGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgo1LzIxIENoZWNr
+aW5nIGNvbW1pdCAzNzY2MzU0ZWEwNzAgKHRhcmdldC9yeDogVENHIGhlbHBlcikKV0FSTklORzog
+YWRkZWQsIG1vdmVkIG9yIGRlbGV0ZWQgZmlsZShzKSwgZG9lcyBNQUlOVEFJTkVSUyBuZWVkIHVw
+ZGF0aW5nPwojMjE6IApuZXcgZmlsZSBtb2RlIDEwMDY0NAoKdG90YWw6IDAgZXJyb3JzLCAxIHdh
+cm5pbmdzLCA2NTAgbGluZXMgY2hlY2tlZAoKUGF0Y2ggNS8yMSBoYXMgc3R5bGUgcHJvYmxlbXMs
+IHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2
+ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5U
+QUlORVJTLgo2LzIxIENoZWNraW5nIGNvbW1pdCBhM2Y5Y2I2OWJjZDMgKHRhcmdldC9yeDogQ1BV
+IGRlZmluaXRpb24pCldBUk5JTkc6IGFkZGVkLCBtb3ZlZCBvciBkZWxldGVkIGZpbGUocyksIGRv
+ZXMgTUFJTlRBSU5FUlMgbmVlZCB1cGRhdGluZz8KIzMyOiAKbmV3IGZpbGUgbW9kZSAxMDA2NDQK
+CnRvdGFsOiAwIGVycm9ycywgMSB3YXJuaW5ncywgNTg4IGxpbmVzIGNoZWNrZWQKClBhdGNoIDYv
+MjEgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVy
+cm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBz
+ZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KNy8yMSBDaGVja2luZyBjb21taXQgYzU0NDA0
+ZThjMWY0ICh0YXJnZXQvcng6IFJYIGRpc2Fzc2VtYmxlcikKV0FSTklORzogYWRkZWQsIG1vdmVk
+IG9yIGRlbGV0ZWQgZmlsZShzKSwgZG9lcyBNQUlOVEFJTkVSUyBuZWVkIHVwZGF0aW5nPwojMzg6
+IApuZXcgZmlsZSBtb2RlIDEwMDY0NAoKdG90YWw6IDAgZXJyb3JzLCAxIHdhcm5pbmdzLCAxNDk3
+IGxpbmVzIGNoZWNrZWQKClBhdGNoIDcvMjEgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2
+aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0
+aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KOC8y
+MSBDaGVja2luZyBjb21taXQgMTUyYmM2M2Y5OTNjICh0YXJnZXQvcng6IERpc2Fzc2VtYmxlIHJ4
+X2luZGV4X2FkZHIgaW50byBhIHN0cmluZykKOS8yMSBDaGVja2luZyBjb21taXQgM2E0ZTEwMGJl
+YmY0ICh0YXJnZXQvcng6IFJlcGxhY2Ugb3BlcmFuZCB3aXRoIHBydF9sZG1pIGluIGRpc2Fzc2Vt
+YmxlcikKMTAvMjEgQ2hlY2tpbmcgY29tbWl0IDU2ZTQyYmUyNzQwYSAodGFyZ2V0L3J4OiBVc2Ug
+cHJ0X2xkbWkgZm9yIFhDSEdfbXIgZGlzYXNzZW1ibHkpCjExLzIxIENoZWNraW5nIGNvbW1pdCBk
+NTQxYjJmMzZlYzcgKHRhcmdldC9yeDogRW1pdCBhbGwgZGlzYXNzZW1ibHkgaW4gb25lIHBydCgp
+KQoxMi8yMSBDaGVja2luZyBjb21taXQgMTM2ZGRlMjgxNDk0ICh0YXJnZXQvcng6IENvbGxlY3Qg
+YWxsIGJ5dGVzIGR1cmluZyBkaXNhc3NlbWJseSkKMTMvMjEgQ2hlY2tpbmcgY29tbWl0IDA4NzFm
+YjkyYjE1MSAodGFyZ2V0L3J4OiBEdW1wIGJ5dGVzIGZvciBlYWNoIGluc24gZHVyaW5nIGRpc2Fz
+c2VtYmx5KQoxNC8yMSBDaGVja2luZyBjb21taXQgMzhmZWJmMDZiNTYzIChody9pbnRjOiBSWDYy
+TiBpbnRlcnJ1cHQgY29udHJvbGxlciAoSUNVYSkpCldBUk5JTkc6IGFkZGVkLCBtb3ZlZCBvciBk
+ZWxldGVkIGZpbGUocyksIGRvZXMgTUFJTlRBSU5FUlMgbmVlZCB1cGRhdGluZz8KIzQwOiAKbmV3
+IGZpbGUgbW9kZSAxMDA2NDQKCnRvdGFsOiAwIGVycm9ycywgMSB3YXJuaW5ncywgNDQ1IGxpbmVz
+IGNoZWNrZWQKClBhdGNoIDE0LzIxIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4g
+IElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0
+byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCjE1LzIxIENo
+ZWNraW5nIGNvbW1pdCBlNmE1YTQyMzQwNzQgKGh3L3RpbWVyOiBSWDYyTiBpbnRlcm5hbCB0aW1l
+ciBtb2R1bGVzKQpXQVJOSU5HOiBhZGRlZCwgbW92ZWQgb3IgZGVsZXRlZCBmaWxlKHMpLCBkb2Vz
+IE1BSU5UQUlORVJTIG5lZWQgdXBkYXRpbmc/CiM1MDogCm5ldyBmaWxlIG1vZGUgMTAwNjQ0Cgp0
+b3RhbDogMCBlcnJvcnMsIDEgd2FybmluZ3MsIDg0NSBsaW5lcyBjaGVja2VkCgpQYXRjaCAxNS8y
+MSBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJy
+b3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNl
+ZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoxNi8yMSBDaGVja2luZyBjb21taXQgMGM2ZmZl
+MDY4NjZmIChody9jaGFyOiBSWDYyTiBzZXJpYWwgY29tbXVuaWNhdGlvbiBpbnRlcmZhY2UgKFND
+SSkpCldBUk5JTkc6IGFkZGVkLCBtb3ZlZCBvciBkZWxldGVkIGZpbGUocyksIGRvZXMgTUFJTlRB
+SU5FUlMgbmVlZCB1cGRhdGluZz8KIzQzOiAKbmV3IGZpbGUgbW9kZSAxMDA2NDQKCnRvdGFsOiAw
+IGVycm9ycywgMSB3YXJuaW5ncywgNDAxIGxpbmVzIGNoZWNrZWQKClBhdGNoIDE2LzIxIGhhcyBz
+dHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJl
+IGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNL
+UEFUQ0ggaW4gTUFJTlRBSU5FUlMuCjE3LzIxIENoZWNraW5nIGNvbW1pdCBkOTFmODlmODVjY2Qg
+KGh3L3J4OiBSWCBUYXJnZXQgaGFyZHdhcmUgZGVmaW5pdGlvbikKV0FSTklORzogYWRkZWQsIG1v
+dmVkIG9yIGRlbGV0ZWQgZmlsZShzKSwgZG9lcyBNQUlOVEFJTkVSUyBuZWVkIHVwZGF0aW5nPwoj
+Mjk6IApuZXcgZmlsZSBtb2RlIDEwMDY0NAoKdG90YWw6IDAgZXJyb3JzLCAxIHdhcm5pbmdzLCA0
+ODAgbGluZXMgY2hlY2tlZAoKUGF0Y2ggMTcvMjEgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2Ug
+cmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9y
+dCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4K
+MTgvMjEgQ2hlY2tpbmcgY29tbWl0IDc2MmZlN2NkYzgzZSAoaHcvcng6IEhvbm9yIC1hY2NlbCBx
+dGVzdCkKMTkvMjEgQ2hlY2tpbmcgY29tbWl0IDIzY2FiY2NlNGVhMiAoaHcvcng6IFJlc3RyaWN0
+IHRoZSBSWDYyTiBtaWNyb2NvbnRyb2xsZXIgdG8gdGhlIFJYNjJOIENQVSBjb3JlKQoyMC8yMSBD
+aGVja2luZyBjb21taXQgN2RiOWY5YmZlOWRjIChBZGQgcngtc29mdG1tdSkKV0FSTklORzogYWRk
+ZWQsIG1vdmVkIG9yIGRlbGV0ZWQgZmlsZShzKSwgZG9lcyBNQUlOVEFJTkVSUyBuZWVkIHVwZGF0
+aW5nPwojNTk6IApuZXcgZmlsZSBtb2RlIDEwMDY0NAoKdG90YWw6IDAgZXJyb3JzLCAxIHdhcm5p
+bmdzLCA3NCBsaW5lcyBjaGVja2VkCgpQYXRjaCAyMC8yMSBoYXMgc3R5bGUgcHJvYmxlbXMsIHBs
+ZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMg
+cmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlO
+RVJTLgoyMS8yMSBDaGVja2luZyBjb21taXQgM2RjNGNlM2ZiYTdlIChCb290TGludXhDb25zb2xl
+VGVzdDogVGVzdCB0aGUgUlgtVmlydCBtYWNoaW5lKQo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3Qg
+Y29tbWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoKVGhlIGZ1bGwgbG9nIGlzIGF2YWlsYWJsZSBh
+dApodHRwOi8vcGF0Y2hldy5vcmcvbG9ncy8yMDE5MTAxNDExNTc1Ny41MTg2Ni0xLXlzYXRvQHVz
+ZXJzLnNvdXJjZWZvcmdlLmpwL3Rlc3RpbmcuY2hlY2twYXRjaC8/dHlwZT1tZXNzYWdlLgotLS0K
+RW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cHM6Ly9wYXRjaGV3
+Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0
+LmNvbQ==
 
->
->
->
-Markus wrote:
-
-
-> However, I find the common pattern applied here
->
->     case 3: /* ERL */
->         /* If EU is set, always unmapped */
->         if (eu) {
->             return 0;
->         }
->
-> more readable ...
-
-
->
->
- I am going to do it this way in v5.
-
-Thanks,
-Aleksandar
-
-
-
-> ... than the unusual (to my eyes)
->
->     case 3:
->         /*
->          * ERL
->          * If EU is set, always unmapped
->          */
->         if (eu) {
->             return 0;
->         }
->
-> The first line of the comment applies to the value preceding it, the
-> second to the code following it.  Making these connections doesn't
-> exactly take genius, but neither is it effortless.
->
-> Nice and consistent coding style is all about reducing the effort of
-> reading code.
->
-> For what it's worth, the pattern
->
->     case VALUE: /* comment on VALUE */
->         /* comment on CODE */
->         CODE
->
-> occurs almost 300 times.
->
-> > I don't see any reason to change this patch. Please let me know it you
-> > still think I should do something else. And you are welcome to analyse
-> any
-> > patches of mine.
->
-> Please consider keeping two separate comments, i.e. just move the colon
-> to its usual place.
->
-> Thanks!
->
-
---0000000000001fde310594f1f7f7
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-<blockquote class=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;border-left:1p=
-x #ccc solid;padding-left:1ex"><br></blockquote><div>=C2=A0</div><div>Marku=
-s wrote:</div><div>=C2=A0</div><blockquote class=3D"gmail_quote" style=3D"m=
-argin:0 0 0 .8ex;border-left:1px #ccc solid;padding-left:1ex">
-However, I find the common pattern applied here<br>
-<br>
-=C2=A0 =C2=A0 case 3: /* ERL */<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 /* If EU is set, always unmapped */<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 if (eu) {<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 return 0;<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 }<br>
-<br>
-more readable ...</blockquote><blockquote class=3D"gmail_quote" style=3D"ma=
-rgin:0 0 0 .8ex;border-left:1px #ccc solid;padding-left:1ex"><br></blockquo=
-te><blockquote class=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;border-left=
-:1px #ccc solid;padding-left:1ex"><br></blockquote><div>=C2=A0</div><div>=
-=C2=A0I am going to do it this way in v5.</div><div><br></div><div>Thanks,<=
-/div><div>Aleksandar</div><div><br></div><div><br></div><blockquote class=
-=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;border-left:1px #ccc solid;padd=
-ing-left:1ex"><br></blockquote><blockquote class=3D"gmail_quote" style=3D"m=
-argin:0 0 0 .8ex;border-left:1px #ccc solid;padding-left:1ex">... than the =
-unusual (to my eyes)<br>
-<br>
-=C2=A0 =C2=A0 case 3:<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 /*<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0* ERL<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0* If EU is set, always unmapped<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0*/<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 if (eu) {<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 return 0;<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 }<br>
-<br>
-The first line of the comment applies to the value preceding it, the<br>
-second to the code following it.=C2=A0 Making these connections doesn&#39;t=
-<br>
-exactly take genius, but neither is it effortless.<br>
-<br>
-Nice and consistent coding style is all about reducing the effort of<br>
-reading code.<br>
-<br>
-For what it&#39;s worth, the pattern<br>
-<br>
-=C2=A0 =C2=A0 case VALUE: /* comment on VALUE */<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 /* comment on CODE */<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 CODE<br>
-<br>
-occurs almost 300 times.<br>
-<br>
-&gt; I don&#39;t see any reason to change this patch. Please let me know it=
- you<br>
-&gt; still think I should do something else. And you are welcome to analyse=
- any<br>
-&gt; patches of mine.<br>
-<br>
-Please consider keeping two separate comments, i.e. just move the colon<br>
-to its usual place.<br>
-<br>
-Thanks!<br>
-</blockquote>
-
---0000000000001fde310594f1f7f7--
 
