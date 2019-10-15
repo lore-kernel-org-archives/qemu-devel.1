@@ -2,46 +2,48 @@ Return-Path: <SRS0=6OCO=YI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9EF92C10F14
-	for <qemu-devel@archiver.kernel.org>; Tue, 15 Oct 2019 10:47:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 77E26ECE58F
+	for <qemu-devel@archiver.kernel.org>; Tue, 15 Oct 2019 10:49:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7115E2089C
-	for <qemu-devel@archiver.kernel.org>; Tue, 15 Oct 2019 10:47:26 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7115E2089C
+	by mail.kernel.org (Postfix) with ESMTPS id 3F5CE217F9
+	for <qemu-devel@archiver.kernel.org>; Tue, 15 Oct 2019 10:49:42 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3F5CE217F9
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=irrelevant.dk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40572 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40596 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iKKMO-0006rD-ON
-	for qemu-devel@archiver.kernel.org; Tue, 15 Oct 2019 06:47:25 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47711)
+	id 1iKKOa-0000Zc-Ui
+	for qemu-devel@archiver.kernel.org; Tue, 15 Oct 2019 06:49:40 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47789)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <its@irrelevant.dk>) id 1iKKEZ-0007P9-Rd
- for qemu-devel@nongnu.org; Tue, 15 Oct 2019 06:39:21 -0400
+ (envelope-from <its@irrelevant.dk>) id 1iKKEe-0007Wc-Dz
+ for qemu-devel@nongnu.org; Tue, 15 Oct 2019 06:39:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <its@irrelevant.dk>) id 1iKKEY-0006Fc-5Y
- for qemu-devel@nongnu.org; Tue, 15 Oct 2019 06:39:19 -0400
-Received: from charlie.dont.surf ([128.199.63.193]:54724)
+ (envelope-from <its@irrelevant.dk>) id 1iKKEc-0006JQ-77
+ for qemu-devel@nongnu.org; Tue, 15 Oct 2019 06:39:24 -0400
+Received: from charlie.dont.surf ([128.199.63.193]:54824)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <its@irrelevant.dk>)
- id 1iKKET-00067v-OZ; Tue, 15 Oct 2019 06:39:13 -0400
+ id 1iKKEW-0006Cy-UA; Tue, 15 Oct 2019 06:39:17 -0400
 Received: from apples.localdomain (unknown [194.62.217.57])
- by charlie.dont.surf (Postfix) with ESMTPSA id D6ED9BF506;
- Tue, 15 Oct 2019 10:39:09 +0000 (UTC)
+ by charlie.dont.surf (Postfix) with ESMTPSA id CEBA0BF916;
+ Tue, 15 Oct 2019 10:39:15 +0000 (UTC)
 From: Klaus Jensen <its@irrelevant.dk>
 To: qemu-block@nongnu.org
-Subject: [PATCH v2 00/20] nvme: support NVMe v1.3d,
- SGLs and multiple namespaces
-Date: Tue, 15 Oct 2019 12:38:40 +0200
-Message-Id: <20191015103900.313928-1-its@irrelevant.dk>
+Subject: [PATCH v2 09/20] nvme: add support for the asynchronous event request
+ command
+Date: Tue, 15 Oct 2019 12:38:49 +0200
+Message-Id: <20191015103900.313928-10-its@irrelevant.dk>
 X-Mailer: git-send-email 2.23.0
+In-Reply-To: <20191015103900.313928-1-its@irrelevant.dk>
+References: <20191015103900.313928-1-its@irrelevant.dk>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
@@ -66,85 +68,469 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi,
+Required for compliance with NVMe revision 1.2.1. See NVM Express 1.2.1,
+Section 5.2 ("Asynchronous Event Request command").
 
-(Quick note to Fam): most of this series is irrelevant to you as the
-maintainer of the nvme block driver, but patch "nvme: add support for
-scatter gather lists" touches block/nvme.c due to changes in the shared
-NvmeCmd struct.
+Mostly imported from Keith's qemu-nvme tree. Modified to not enqueue
+events if something of the same type is already queued (but not cleared
+by the host).
 
-Anyway, v2 comes with a good bunch of changes. Compared to v1[1], I have
-squashed some commits in the beginning of the series and heavily
-refactored "nvme: support multiple block requests per request" into the
-new commit "nvme: allow multiple aios per command".
+Signed-off-by: Klaus Jensen <klaus.jensen@cnexlabs.com>
+---
+ hw/block/nvme.c       | 180 ++++++++++++++++++++++++++++++++++++++++--
+ hw/block/nvme.h       |  13 ++-
+ hw/block/trace-events |   8 ++
+ include/block/nvme.h  |   4 +-
+ 4 files changed, 196 insertions(+), 9 deletions(-)
 
-I have also removed the original implementation of the Abort command
-(commit "nvme: add support for the abort command") as it is currently
-too tricky to test reliably. It has been replaced by a stub that,
-besides a trivial sanity check, just fails to abort the given command.
-*Some* implementation of the Abort command is mandatory, but given the
-"best effort" nature of the command this is acceptable for now. When the
-device gains support for arbitration it should be less tricky to test.
-
-The support for multiple namespaces is now backwards compatible. The
-nvme device still accepts a 'drive' parameter, but for multiple
-namespaces the use of 'nvme-ns' devices are required. I also integrated
-some feedback from Paul so the device supports non-consecutive namespace
-ids.
-
-I have also added some new commits at the end:
-
-  - "nvme: bump controller pci device id" makes sure the Linux kernel
-    doesn't apply any quirks to the controller that it no longer has.
-  - "nvme: handle dma errors" won't actually do anything before this[2]
-    fix to include/hw/pci/pci.h is merged. With these two patches added,
-    the device reliably passes some additional nasty tests from blktests
-    (block/011 "disable PCI device while doing I/O" and block/019 "break
-    PCI link device while doing I/O"). Before this patch, block/011
-    would pass from time to time if you were lucky, but would at least
-    mess up the controller pretty badly, causing a reset in the best
-    case.
-
-
-  [1]: https://patchwork.kernel.org/project/qemu-devel/list/?series=3D142=
-383
-  [2]: https://patchwork.kernel.org/patch/11184911/
-
-
-Klaus Jensen (20):
-  nvme: remove superfluous breaks
-  nvme: move device parameters to separate struct
-  nvme: add missing fields in the identify controller data structure
-  nvme: populate the mandatory subnqn and ver fields
-  nvme: allow completion queues in the cmb
-  nvme: add support for the abort command
-  nvme: refactor device realization
-  nvme: add support for the get log page command
-  nvme: add support for the asynchronous event request command
-  nvme: add logging to error information log page
-  nvme: add missing mandatory features
-  nvme: bump supported specification version to 1.3
-  nvme: refactor prp mapping
-  nvme: allow multiple aios per command
-  nvme: add support for scatter gather lists
-  nvme: support multiple namespaces
-  nvme: bump controller pci device id
-  nvme: remove redundant NvmeCmd pointer parameter
-  nvme: make lba data size configurable
-  nvme: handle dma errors
-
- block/nvme.c           |   18 +-
- hw/block/Makefile.objs |    2 +-
- hw/block/nvme-ns.c     |  139 +++
- hw/block/nvme-ns.h     |   60 ++
- hw/block/nvme.c        | 1863 +++++++++++++++++++++++++++++++++-------
- hw/block/nvme.h        |  219 ++++-
- hw/block/trace-events  |   37 +-
- include/block/nvme.h   |  132 ++-
- 8 files changed, 2094 insertions(+), 376 deletions(-)
- create mode 100644 hw/block/nvme-ns.c
- create mode 100644 hw/block/nvme-ns.h
-
+diff --git a/hw/block/nvme.c b/hw/block/nvme.c
+index 4412a3bea3bc..5cdee37582f9 100644
+--- a/hw/block/nvme.c
++++ b/hw/block/nvme.c
+@@ -334,6 +334,46 @@ static void nvme_enqueue_req_completion(NvmeCQueue *=
+cq, NvmeRequest *req)
+     timer_mod(cq->timer, qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) + 500);
+ }
+=20
++static void nvme_enqueue_event(NvmeCtrl *n, uint8_t event_type,
++    uint8_t event_info, uint8_t log_page)
++{
++    NvmeAsyncEvent *event;
++
++    trace_nvme_enqueue_event(event_type, event_info, log_page);
++
++    /*
++     * Do not enqueue the event if something of this type is already que=
+ued.
++     * This bounds the size of the event queue and makes sure it does no=
+t grow
++     * indefinitely when events are not processed by the host (i.e. does=
+ not
++     * issue any AERs).
++     */
++    if (n->aer_mask_queued & (1 << event_type)) {
++        trace_nvme_enqueue_event_masked(event_type);
++        return;
++    }
++    n->aer_mask_queued |=3D (1 << event_type);
++
++    event =3D g_new(NvmeAsyncEvent, 1);
++    event->result =3D (NvmeAerResult) {
++        .event_type =3D event_type,
++        .event_info =3D event_info,
++        .log_page   =3D log_page,
++    };
++
++    QTAILQ_INSERT_TAIL(&n->aer_queue, event, entry);
++
++    timer_mod(n->aer_timer, qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) + 500)=
+;
++}
++
++static void nvme_clear_events(NvmeCtrl *n, uint8_t event_type)
++{
++    n->aer_mask &=3D ~(1 << event_type);
++    if (!QTAILQ_EMPTY(&n->aer_queue)) {
++        timer_mod(n->aer_timer,
++            qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) + 500);
++    }
++}
++
+ static void nvme_rw_cb(void *opaque, int ret)
+ {
+     NvmeRequest *req =3D opaque;
+@@ -578,7 +618,7 @@ static uint16_t nvme_create_sq(NvmeCtrl *n, NvmeCmd *=
+cmd)
+     return NVME_SUCCESS;
+ }
+=20
+-static uint16_t nvme_error_info(NvmeCtrl *n, NvmeCmd *cmd,
++static uint16_t nvme_error_info(NvmeCtrl *n, NvmeCmd *cmd, uint8_t rae,
+     uint32_t buf_len, uint64_t off, NvmeRequest *req)
+ {
+     uint32_t trans_len;
+@@ -591,12 +631,16 @@ static uint16_t nvme_error_info(NvmeCtrl *n, NvmeCm=
+d *cmd,
+=20
+     trans_len =3D MIN(sizeof(*n->elpes) * (n->params.elpe + 1) - off, bu=
+f_len);
+=20
++    if (!rae) {
++        nvme_clear_events(n, NVME_AER_TYPE_ERROR);
++    }
++
+     return nvme_dma_read_prp(n, (uint8_t *) n->elpes + off, trans_len, p=
+rp1,
+         prp2);
+ }
+=20
+-static uint16_t nvme_smart_info(NvmeCtrl *n, NvmeCmd *cmd, uint32_t buf_=
+len,
+-    uint64_t off, NvmeRequest *req)
++static uint16_t nvme_smart_info(NvmeCtrl *n, NvmeCmd *cmd, uint8_t rae,
++    uint32_t buf_len, uint64_t off, NvmeRequest *req)
+ {
+     uint64_t prp1 =3D le64_to_cpu(cmd->prp1);
+     uint64_t prp2 =3D le64_to_cpu(cmd->prp2);
+@@ -646,6 +690,10 @@ static uint16_t nvme_smart_info(NvmeCtrl *n, NvmeCmd=
+ *cmd, uint32_t buf_len,
+     smart.power_on_hours[0] =3D cpu_to_le64(
+         (((current_ms - n->starttime_ms) / 1000) / 60) / 60);
+=20
++    if (!rae) {
++        nvme_clear_events(n, NVME_AER_TYPE_SMART);
++    }
++
+     return nvme_dma_read_prp(n, (uint8_t *) &smart + off, trans_len, prp=
+1,
+         prp2);
+ }
+@@ -698,9 +746,9 @@ static uint16_t nvme_get_log(NvmeCtrl *n, NvmeCmd *cm=
+d, NvmeRequest *req)
+=20
+     switch (lid) {
+     case NVME_LOG_ERROR_INFO:
+-        return nvme_error_info(n, cmd, len, off, req);
++        return nvme_error_info(n, cmd, rae, len, off, req);
+     case NVME_LOG_SMART_INFO:
+-        return nvme_smart_info(n, cmd, len, off, req);
++        return nvme_smart_info(n, cmd, rae, len, off, req);
+     case NVME_LOG_FW_SLOT_INFO:
+         return nvme_fw_log_info(n, cmd, len, off, req);
+     default:
+@@ -958,6 +1006,9 @@ static uint16_t nvme_get_feature(NvmeCtrl *n, NvmeCm=
+d *cmd, NvmeRequest *req)
+         break;
+     case NVME_TIMESTAMP:
+         return nvme_get_feature_timestamp(n, cmd);
++    case NVME_ASYNCHRONOUS_EVENT_CONF:
++        result =3D cpu_to_le32(n->features.async_config);
++        break;
+     default:
+         trace_nvme_err_invalid_getfeat(dw10);
+         return NVME_INVALID_FIELD | NVME_DNR;
+@@ -993,6 +1044,12 @@ static uint16_t nvme_set_feature(NvmeCtrl *n, NvmeC=
+md *cmd, NvmeRequest *req)
+     switch (dw10) {
+     case NVME_TEMPERATURE_THRESHOLD:
+         n->features.temp_thresh =3D dw11;
++
++        if (n->features.temp_thresh <=3D n->temperature) {
++            nvme_enqueue_event(n, NVME_AER_TYPE_SMART,
++                NVME_AER_INFO_SMART_TEMP_THRESH, NVME_LOG_SMART_INFO);
++        }
++
+         break;
+=20
+     case NVME_VOLATILE_WRITE_CACHE:
+@@ -1008,6 +1065,9 @@ static uint16_t nvme_set_feature(NvmeCtrl *n, NvmeC=
+md *cmd, NvmeRequest *req)
+         break;
+     case NVME_TIMESTAMP:
+         return nvme_set_feature_timestamp(n, cmd);
++    case NVME_ASYNCHRONOUS_EVENT_CONF:
++        n->features.async_config =3D dw11;
++        break;
+     default:
+         trace_nvme_err_invalid_setfeat(dw10);
+         return NVME_INVALID_FIELD | NVME_DNR;
+@@ -1016,6 +1076,22 @@ static uint16_t nvme_set_feature(NvmeCtrl *n, Nvme=
+Cmd *cmd, NvmeRequest *req)
+     return NVME_SUCCESS;
+ }
+=20
++static uint16_t nvme_aer(NvmeCtrl *n, NvmeCmd *cmd, NvmeRequest *req)
++{
++    trace_nvme_aer(req->cid);
++
++    if (n->outstanding_aers > n->params.aerl) {
++        trace_nvme_aer_aerl_exceeded();
++        return NVME_AER_LIMIT_EXCEEDED;
++    }
++
++    n->aer_reqs[n->outstanding_aers] =3D req;
++    timer_mod(n->aer_timer, qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) + 500)=
+;
++    n->outstanding_aers++;
++
++    return NVME_NO_COMPLETE;
++}
++
+ static uint16_t nvme_admin_cmd(NvmeCtrl *n, NvmeCmd *cmd, NvmeRequest *r=
+eq)
+ {
+     switch (cmd->opcode) {
+@@ -1037,12 +1113,60 @@ static uint16_t nvme_admin_cmd(NvmeCtrl *n, NvmeC=
+md *cmd, NvmeRequest *req)
+         return nvme_set_feature(n, cmd, req);
+     case NVME_ADM_CMD_GET_FEATURES:
+         return nvme_get_feature(n, cmd, req);
++    case NVME_ADM_CMD_ASYNC_EV_REQ:
++        return nvme_aer(n, cmd, req);
+     default:
+         trace_nvme_err_invalid_admin_opc(cmd->opcode);
+         return NVME_INVALID_OPCODE | NVME_DNR;
+     }
+ }
+=20
++static void nvme_process_aers(void *opaque)
++{
++    NvmeCtrl *n =3D opaque;
++    NvmeAsyncEvent *event, *next;
++
++    trace_nvme_process_aers();
++
++    QTAILQ_FOREACH_SAFE(event, &n->aer_queue, entry, next) {
++        NvmeRequest *req;
++        NvmeAerResult *result;
++
++        /* can't post cqe if there is nothing to complete */
++        if (!n->outstanding_aers) {
++            trace_nvme_no_outstanding_aers();
++            break;
++        }
++
++        /* ignore if masked (cqe posted, but event not cleared) */
++        if (n->aer_mask & (1 << event->result.event_type)) {
++            trace_nvme_aer_masked(event->result.event_type, n->aer_mask)=
+;
++            continue;
++        }
++
++        QTAILQ_REMOVE(&n->aer_queue, event, entry);
++
++        n->aer_mask |=3D 1 << event->result.event_type;
++        n->aer_mask_queued &=3D ~(1 << event->result.event_type);
++        n->outstanding_aers--;
++
++        req =3D n->aer_reqs[n->outstanding_aers];
++
++        result =3D (NvmeAerResult *) &req->cqe.result;
++        result->event_type =3D event->result.event_type;
++        result->event_info =3D event->result.event_info;
++        result->log_page =3D event->result.log_page;
++        g_free(event);
++
++        req->status =3D NVME_SUCCESS;
++
++        trace_nvme_aer_post_cqe(result->event_type, result->event_info,
++            result->log_page);
++
++        nvme_enqueue_req_completion(&n->admin_cq, req);
++    }
++}
++
+ static void nvme_process_sq(void *opaque)
+ {
+     NvmeSQueue *sq =3D opaque;
+@@ -1092,6 +1216,20 @@ static void nvme_clear_ctrl(NvmeCtrl *n)
+         }
+     }
+=20
++    if (n->aer_timer) {
++        timer_del(n->aer_timer);
++        timer_free(n->aer_timer);
++        n->aer_timer =3D NULL;
++    }
++
++    while (!QTAILQ_EMPTY(&n->aer_queue)) {
++        NvmeAsyncEvent *event =3D QTAILQ_FIRST(&n->aer_queue);
++        QTAILQ_REMOVE(&n->aer_queue, event, entry);
++        g_free(event);
++    }
++
++    n->outstanding_aers =3D 0;
++
+     blk_flush(n->conf.blk);
+     n->bar.cc =3D 0;
+ }
+@@ -1188,6 +1326,9 @@ static int nvme_start_ctrl(NvmeCtrl *n)
+=20
+     nvme_set_timestamp(n, 0ULL);
+=20
++    n->aer_timer =3D timer_new_ns(QEMU_CLOCK_VIRTUAL, nvme_process_aers,=
+ n);
++    QTAILQ_INIT(&n->aer_queue);
++
+     return 0;
+ }
+=20
+@@ -1380,6 +1521,13 @@ static void nvme_process_db(NvmeCtrl *n, hwaddr ad=
+dr, int val)
+                            "completion queue doorbell write"
+                            " for nonexistent queue,"
+                            " sqid=3D%"PRIu32", ignoring", qid);
++
++            if (n->outstanding_aers) {
++                nvme_enqueue_event(n, NVME_AER_TYPE_ERROR,
++                    NVME_AER_INFO_ERR_INVALID_DB_REGISTER,
++                    NVME_LOG_ERROR_INFO);
++            }
++
+             return;
+         }
+=20
+@@ -1390,6 +1538,12 @@ static void nvme_process_db(NvmeCtrl *n, hwaddr ad=
+dr, int val)
+                            " beyond queue size, sqid=3D%"PRIu32","
+                            " new_head=3D%"PRIu16", ignoring",
+                            qid, new_head);
++
++            if (n->outstanding_aers) {
++                nvme_enqueue_event(n, NVME_AER_TYPE_ERROR,
++                    NVME_AER_INFO_ERR_INVALID_DB_VALUE, NVME_LOG_ERROR_I=
+NFO);
++            }
++
+             return;
+         }
+=20
+@@ -1418,6 +1572,13 @@ static void nvme_process_db(NvmeCtrl *n, hwaddr ad=
+dr, int val)
+                            "submission queue doorbell write"
+                            " for nonexistent queue,"
+                            " sqid=3D%"PRIu32", ignoring", qid);
++
++            if (n->outstanding_aers) {
++                nvme_enqueue_event(n, NVME_AER_TYPE_ERROR,
++                    NVME_AER_INFO_ERR_INVALID_DB_REGISTER,
++                    NVME_LOG_ERROR_INFO);
++            }
++
+             return;
+         }
+=20
+@@ -1428,6 +1589,12 @@ static void nvme_process_db(NvmeCtrl *n, hwaddr ad=
+dr, int val)
+                            " beyond queue size, sqid=3D%"PRIu32","
+                            " new_tail=3D%"PRIu16", ignoring",
+                            qid, new_tail);
++
++            if (n->outstanding_aers) {
++                nvme_enqueue_event(n, NVME_AER_TYPE_ERROR,
++                    NVME_AER_INFO_ERR_INVALID_DB_VALUE, NVME_LOG_ERROR_I=
+NFO);
++            }
++
+             return;
+         }
+=20
+@@ -1524,6 +1691,7 @@ static void nvme_init_state(NvmeCtrl *n)
+     n->starttime_ms =3D qemu_clock_get_ms(QEMU_CLOCK_VIRTUAL);
+     n->temperature =3D NVME_TEMPERATURE;
+     n->features.temp_thresh =3D 0x14d;
++    n->aer_reqs =3D g_new0(NvmeRequest *, n->params.aerl + 1);
+ }
+=20
+ static void nvme_init_cmb(NvmeCtrl *n, PCIDevice *pci_dev)
+@@ -1591,6 +1759,7 @@ static void nvme_init_ctrl(NvmeCtrl *n)
+     id->ver =3D cpu_to_le32(0x00010201);
+     id->oacs =3D cpu_to_le16(0);
+     id->acl =3D 3;
++    id->aerl =3D n->params.aerl;
+     id->frmw =3D 7 << 1;
+     id->lpa =3D 1 << 2;
+     id->elpe =3D n->params.elpe;
+@@ -1678,6 +1847,7 @@ static void nvme_exit(PCIDevice *pci_dev)
+     g_free(n->cq);
+     g_free(n->sq);
+     g_free(n->elpes);
++    g_free(n->aer_reqs);
+=20
+     if (n->params.cmb_size_mb) {
+         g_free(n->cmbuf);
+diff --git a/hw/block/nvme.h b/hw/block/nvme.h
+index fcfd504e3f9f..3fc36f577b46 100644
+--- a/hw/block/nvme.h
++++ b/hw/block/nvme.h
+@@ -7,17 +7,19 @@
+     DEFINE_PROP_STRING("serial", _state, _props.serial), \
+     DEFINE_PROP_UINT32("cmb_size_mb", _state, _props.cmb_size_mb, 0), \
+     DEFINE_PROP_UINT32("num_queues", _state, _props.num_queues, 64), \
+-    DEFINE_PROP_UINT8("elpe", _state, _props.elpe, 24)
++    DEFINE_PROP_UINT8("elpe", _state, _props.elpe, 24), \
++    DEFINE_PROP_UINT8("aerl", _state, _props.aerl, 3)
+=20
+ typedef struct NvmeParams {
+     char     *serial;
+     uint32_t num_queues;
+     uint32_t cmb_size_mb;
+     uint8_t  elpe;
++    uint8_t  aerl;
+ } NvmeParams;
+=20
+ typedef struct NvmeAsyncEvent {
+-    QSIMPLEQ_ENTRY(NvmeAsyncEvent) entry;
++    QTAILQ_ENTRY(NvmeAsyncEvent) entry;
+     NvmeAerResult result;
+ } NvmeAsyncEvent;
+=20
+@@ -89,6 +91,7 @@ typedef struct NvmeCtrl {
+     uint32_t    num_namespaces;
+     uint32_t    max_q_ents;
+     uint64_t    ns_size;
++    uint8_t     outstanding_aers;
+     uint32_t    cmbsz;
+     uint32_t    cmbloc;
+     uint8_t     *cmbuf;
+@@ -98,6 +101,12 @@ typedef struct NvmeCtrl {
+     uint64_t    starttime_ms;
+     uint16_t    temperature;
+=20
++    QEMUTimer   *aer_timer;
++    uint8_t     aer_mask;
++    uint8_t     aer_mask_queued;
++    NvmeRequest **aer_reqs;
++    QTAILQ_HEAD(, NvmeAsyncEvent) aer_queue;
++
+     NvmeNamespace   *namespaces;
+     NvmeSQueue      **sq;
+     NvmeCQueue      **cq;
+diff --git a/hw/block/trace-events b/hw/block/trace-events
+index a2c7919c861e..6ddb13d34061 100644
+--- a/hw/block/trace-events
++++ b/hw/block/trace-events
+@@ -47,6 +47,14 @@ nvme_setfeat_numq(int reqcq, int reqsq, int gotcq, int=
+ gotsq) "requested cq_coun
+ nvme_setfeat_timestamp(uint64_t ts) "set feature timestamp =3D 0x%"PRIx6=
+4""
+ nvme_getfeat_timestamp(uint64_t ts) "get feature timestamp =3D 0x%"PRIx6=
+4""
+ nvme_get_log(uint16_t cid, uint16_t lid, uint8_t rae, uint32_t len, uint=
+64_t off) "cid %"PRIu16" lid 0x%"PRIx16" rae 0x%"PRIx8" len %"PRIu32" off=
+ %"PRIu64""
++nvme_process_aers(void) "processing aers"
++nvme_aer(uint16_t cid) "cid %"PRIu16""
++nvme_aer_aerl_exceeded(void) "aerl exceeded"
++nvme_aer_masked(uint8_t type, uint8_t mask) "type 0x%"PRIx8" mask 0x%"PR=
+Ix8""
++nvme_aer_post_cqe(uint8_t typ, uint8_t info, uint8_t log_page) "type 0x%=
+"PRIx8" info 0x%"PRIx8" lid 0x%"PRIx8""
++nvme_enqueue_event(uint8_t typ, uint8_t info, uint8_t log_page) "type 0x=
+%"PRIx8" info 0x%"PRIx8" lid 0x%"PRIx8""
++nvme_enqueue_event_masked(uint8_t typ) "type 0x%"PRIx8""
++nvme_no_outstanding_aers(void) "ignoring event; no outstanding AERs"
+ nvme_mmio_intm_set(uint64_t data, uint64_t new_mask) "wrote MMIO, interr=
+upt mask set, data=3D0x%"PRIx64", new_mask=3D0x%"PRIx64""
+ nvme_mmio_intm_clr(uint64_t data, uint64_t new_mask) "wrote MMIO, interr=
+upt mask clr, data=3D0x%"PRIx64", new_mask=3D0x%"PRIx64""
+ nvme_mmio_cfg(uint64_t data) "wrote MMIO, config controller config=3D0x%=
+"PRIx64""
+diff --git a/include/block/nvme.h b/include/block/nvme.h
+index a088ec7d4e38..7f1832d531f0 100644
+--- a/include/block/nvme.h
++++ b/include/block/nvme.h
+@@ -386,8 +386,8 @@ enum NvmeAsyncEventRequest {
+     NVME_AER_TYPE_SMART                     =3D 1,
+     NVME_AER_TYPE_IO_SPECIFIC               =3D 6,
+     NVME_AER_TYPE_VENDOR_SPECIFIC           =3D 7,
+-    NVME_AER_INFO_ERR_INVALID_SQ            =3D 0,
+-    NVME_AER_INFO_ERR_INVALID_DB            =3D 1,
++    NVME_AER_INFO_ERR_INVALID_DB_REGISTER   =3D 0,
++    NVME_AER_INFO_ERR_INVALID_DB_VALUE      =3D 1,
+     NVME_AER_INFO_ERR_DIAG_FAIL             =3D 2,
+     NVME_AER_INFO_ERR_PERS_INTERNAL_ERR     =3D 3,
+     NVME_AER_INFO_ERR_TRANS_INTERNAL_ERR    =3D 4,
 --=20
 2.23.0
 
