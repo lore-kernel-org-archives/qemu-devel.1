@@ -2,78 +2,64 @@ Return-Path: <SRS0=6OCO=YI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D323C10F14
-	for <qemu-devel@archiver.kernel.org>; Tue, 15 Oct 2019 15:14:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F0C6AC10F14
+	for <qemu-devel@archiver.kernel.org>; Tue, 15 Oct 2019 15:26:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4AF6C20854
-	for <qemu-devel@archiver.kernel.org>; Tue, 15 Oct 2019 15:14:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id BE98020640
+	for <qemu-devel@archiver.kernel.org>; Tue, 15 Oct 2019 15:26:50 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=astrobotic-com.20150623.gappssmtp.com header.i=@astrobotic-com.20150623.gappssmtp.com header.b="Y5XUgSS2"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4AF6C20854
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=astrobotic.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b="B0OEIY5D"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BE98020640
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=igalia.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48174 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48692 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iKOXJ-0004Bc-3T
-	for qemu-devel@archiver.kernel.org; Tue, 15 Oct 2019 11:14:57 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48863)
+	id 1iKOin-00057s-Gr
+	for qemu-devel@archiver.kernel.org; Tue, 15 Oct 2019 11:26:49 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48082)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <joshua.shaffer@astrobotic.com>) id 1iKMiH-0001bY-5u
- for qemu-devel@nongnu.org; Tue, 15 Oct 2019 09:18:10 -0400
+ (envelope-from <berto@igalia.com>) id 1iKOgy-0002ku-7a
+ for qemu-devel@nongnu.org; Tue, 15 Oct 2019 11:24:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <joshua.shaffer@astrobotic.com>) id 1iKMiF-0007Kw-QA
- for qemu-devel@nongnu.org; Tue, 15 Oct 2019 09:18:09 -0400
-Received: from mail-lf1-x12d.google.com ([2a00:1450:4864:20::12d]:33442)
+ (envelope-from <berto@igalia.com>) id 1iKOgw-0003fX-R2
+ for qemu-devel@nongnu.org; Tue, 15 Oct 2019 11:24:56 -0400
+Received: from fanzine.igalia.com ([178.60.130.6]:47099)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <joshua.shaffer@astrobotic.com>)
- id 1iKMiF-0007Jb-82
- for qemu-devel@nongnu.org; Tue, 15 Oct 2019 09:18:07 -0400
-Received: by mail-lf1-x12d.google.com with SMTP id y127so14478166lfc.0
- for <qemu-devel@nongnu.org>; Tue, 15 Oct 2019 06:18:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=astrobotic-com.20150623.gappssmtp.com; s=20150623;
- h=mime-version:from:date:message-id:subject:to;
- bh=GBsM+jjArf1xZWuYwUzAXxh0zV7QecWSOqNQxsYKnbU=;
- b=Y5XUgSS2I314k4eIv9/Lj2hh6OhItFxLAjLsphws+PtkohZzsuHS91a9IlsSUNiCyu
- pYpc7JoTWx1Hhh7lZaVAN9ZpWTCQDBBUMofwZOCHvqfDj0hGGAZ7N8ILha//Zm0m7rEM
- TqyaeAbg9Fi6Hs6MnWVdiSZSFP3CHUJ9uvjS5YEkLdLU40ZWd8Tjvz/S0ktzM327OIwO
- QtdvGLWektrgw3VYvbTdIjB+sEUDeomsyGnoMmYMoKnjkJQFy8WKOSOKg2dpu+RslXUj
- H+PxZCxT6LLtLKpB5gxrQrLCpfECHSiaEG6C8lXOqlz2M8aGuPDtCq9McFtG2LQxabmV
- sedw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
- bh=GBsM+jjArf1xZWuYwUzAXxh0zV7QecWSOqNQxsYKnbU=;
- b=gcvWV9Vq6tKM4AK/H+THXLfe+zvmnhAlkVs4F+A+yM7XFv3FN+DT2mpV2VCWXR78Pi
- GMSiW5OoDcREzInfo3Nw5AGxQJCfSwdF5upRJLejxCG6etLFMLLuEHPgt5RxxH/Cya/9
- 1A+Sa9NJfU2zZGSp6Ow9fUBxkzuAj5MR8VJ7LX0+E08U8kO1iMAjeNgCLVU+1CwHqAHA
- Je15ZNmwcN0vllW14CyJuUb/867Uc3aJu9e+l0a8PBvbDRLKAgNKfbDEQk9RJcJpK/tL
- kTdkIOcrsHNTjy//OrCuCyQUfhUYbW6EbvymGU03m9cmN0/ITdCE0G+T2/M9ggQlQarg
- Eynw==
-X-Gm-Message-State: APjAAAVtUmq53NcztECstciaRs9RkMdS16wBPiJhsUDV5q0RvNUM9Lap
- aFVab9OXTVn0aQf01bXXbIQUZ+/yoxdWWHEl0Ff0xaQBXTxNct0V0WjztJZL9o71T1k2Mtp0P2f
- AlVF9CoGfbH4qrnvGuAuJt0dmtt0=
-X-Google-Smtp-Source: APXvYqzmTvLUys4nSKeusfZ8C2r6Sa6okqkMpeBRMR3URTgt+d37v/WkiWV/PQBu5ulTsRmCN/zKEaLtkcrdJUOQTkI=
-X-Received: by 2002:ac2:555e:: with SMTP id l30mr20727504lfk.163.1571145483456; 
- Tue, 15 Oct 2019 06:18:03 -0700 (PDT)
-MIME-Version: 1.0
-From: Joshua Shaffer <joshua.shaffer@astrobotic.com>
-Date: Tue, 15 Oct 2019 09:17:52 -0400
-Message-ID: <CAPJW7GKLH3pkrGQQj_OaAy0UecUJttsHOJp35+CcpZvm9cM2WQ@mail.gmail.com>
-Subject: LEON3 networking
+ (Exim 4.71) (envelope-from <berto@igalia.com>)
+ id 1iKOgw-0003Z7-Ct; Tue, 15 Oct 2019 11:24:54 -0400
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=igalia.com;
+ s=20170329; 
+ h=Content-Transfer-Encoding:MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From;
+ bh=8hTqzhXCwSm+pnn+u/HHCmoHotoRRBHUylfmlt5TL7Y=; 
+ b=B0OEIY5DHZpNmhFoZ8Q68Z5+5FnefWRcaPktAFNDPOFJE+7CH4n6pdL42MJactzJgZn0q8mfR1Kabe8/fJBDEpdCYOW62yJCybHVIkKVh0Ev+JNdymVn4ZZ6VUiaQ+dt1bTpZp/c48ZuyizfDh+0BtF+hx3yk9utQjsWbRmPTxTbTf2/L0nyUvAN0sQH+IUmMvoHLTVdTbHta5H0ouZ5+WE9NvX2BOGq08NxuvR40DlmcJ1SfNs2jPo7D5gDQDtnuzJFrB1zhSb/TDncKyBtr1Is6YeuDI0MaBR5YyZiwrcIfluo60SyJRETTj2rfWKnUHRtTixxBrLOOe+8bR/1fQ==;
+Received: from 82-181-115-92.bb.dnainternet.fi ([82.181.115.92]
+ helo=perseus.local) by fanzine.igalia.com with esmtpsa 
+ (Cipher TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim)
+ id 1iKOgd-0003aN-W9; Tue, 15 Oct 2019 17:24:36 +0200
+Received: from berto by perseus.local with local (Exim 4.92)
+ (envelope-from <berto@igalia.com>)
+ id 1iKOfm-000615-GQ; Tue, 15 Oct 2019 18:23:42 +0300
+From: Alberto Garcia <berto@igalia.com>
 To: qemu-devel@nongnu.org
-Content-Type: multipart/alternative; boundary="0000000000006ea5f70594f2d066"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::12d
-X-Mailman-Approved-At: Tue, 15 Oct 2019 11:04:09 -0400
+Subject: [RFC PATCH 01/23] qcow2: Add calculate_l2_meta()
+Date: Tue, 15 Oct 2019 18:23:12 +0300
+Message-Id: <9a83358cfa0bf36b6fd7d6bb207511edee0260bc.1571152571.git.berto@igalia.com>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <cover.1571152571.git.berto@igalia.com>
+References: <cover.1571152571.git.berto@igalia.com>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x (no
+ timestamps) [generic] [fuzzy]
+X-Received-From: 178.60.130.6
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -85,65 +71,124 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Kevin Wolf <kwolf@redhat.com>, Anton Nefedov <anton.nefedov@virtuozzo.com>,
+ Alberto Garcia <berto@igalia.com>, qemu-block@nongnu.org,
+ Max Reitz <mreitz@redhat.com>, "Denis V . Lunev" <den@openvz.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---0000000000006ea5f70594f2d066
-Content-Type: text/plain; charset="UTF-8"
+handle_alloc() creates a QCowL2Meta structure in order to update the
+image metadata and perform the necessary copy-on-write operations.
 
-Hello,
+This patch moves that code to a separate function so it can be used
+from other places.
 
-I've been using the LEON3 port of qemu, and am wondering if anyone has
-touched the networking setup for such since the thread here:
-https://lists.rtems.org/pipermail/users/2014-September/028224.html
+Signed-off-by: Alberto Garcia <berto@igalia.com>
+---
+ block/qcow2-cluster.c | 76 +++++++++++++++++++++++++++++--------------
+ 1 file changed, 52 insertions(+), 24 deletions(-)
 
-Joshua Shaffer
-
+diff --git a/block/qcow2-cluster.c b/block/qcow2-cluster.c
+index 8d5fa1539c..fe2523ed66 100644
+--- a/block/qcow2-cluster.c
++++ b/block/qcow2-cluster.c
+@@ -1019,6 +1019,55 @@ void qcow2_alloc_cluster_abort(BlockDriverState *bs, QCowL2Meta *m)
+                         QCOW2_DISCARD_NEVER);
+ }
+ 
++/*
++ * For a given write request, create a new QCowL2Meta structure and
++ * add it to @m.
++ *
++ * @host_offset points to the beginning of the first cluster.
++ *
++ * @guest_offset and @bytes indicate the offset and length of the
++ * request.
++ *
++ * If @keep_old is true it means that the clusters were already
++ * allocated and will be overwritten. If false then the clusters are
++ * new and we have to decrease the reference count of the old ones.
++ */
++static void calculate_l2_meta(BlockDriverState *bs, uint64_t host_offset,
++                              uint64_t guest_offset, uint64_t bytes,
++                              QCowL2Meta **m, bool keep_old)
++{
++    BDRVQcow2State *s = bs->opaque;
++    unsigned cow_start_from = 0;
++    unsigned cow_start_to = offset_into_cluster(s, guest_offset);
++    unsigned cow_end_from = cow_start_to + bytes;
++    unsigned cow_end_to = ROUND_UP(cow_end_from, s->cluster_size);
++    unsigned nb_clusters = size_to_clusters(s, cow_end_from);
++    QCowL2Meta *old_m = *m;
++
++    *m = g_malloc0(sizeof(**m));
++    **m = (QCowL2Meta) {
++        .next           = old_m,
++
++        .alloc_offset   = host_offset,
++        .offset         = start_of_cluster(s, guest_offset),
++        .nb_clusters    = nb_clusters,
++
++        .keep_old_clusters = keep_old,
++
++        .cow_start = {
++            .offset     = cow_start_from,
++            .nb_bytes   = cow_start_to - cow_start_from,
++        },
++        .cow_end = {
++            .offset     = cow_end_from,
++            .nb_bytes   = cow_end_to - cow_end_from,
++        },
++    };
++
++    qemu_co_queue_init(&(*m)->dependent_requests);
++    QLIST_INSERT_HEAD(&s->cluster_allocs, *m, next_in_flight);
++}
++
+ /*
+  * Returns the number of contiguous clusters that can be used for an allocating
+  * write, but require COW to be performed (this includes yet unallocated space,
+@@ -1414,35 +1463,14 @@ static int handle_alloc(BlockDriverState *bs, uint64_t guest_offset,
+     uint64_t requested_bytes = *bytes + offset_into_cluster(s, guest_offset);
+     int avail_bytes = MIN(INT_MAX, nb_clusters << s->cluster_bits);
+     int nb_bytes = MIN(requested_bytes, avail_bytes);
+-    QCowL2Meta *old_m = *m;
+-
+-    *m = g_malloc0(sizeof(**m));
+-
+-    **m = (QCowL2Meta) {
+-        .next           = old_m,
+-
+-        .alloc_offset   = alloc_cluster_offset,
+-        .offset         = start_of_cluster(s, guest_offset),
+-        .nb_clusters    = nb_clusters,
+-
+-        .keep_old_clusters  = keep_old_clusters,
+-
+-        .cow_start = {
+-            .offset     = 0,
+-            .nb_bytes   = offset_into_cluster(s, guest_offset),
+-        },
+-        .cow_end = {
+-            .offset     = nb_bytes,
+-            .nb_bytes   = avail_bytes - nb_bytes,
+-        },
+-    };
+-    qemu_co_queue_init(&(*m)->dependent_requests);
+-    QLIST_INSERT_HEAD(&s->cluster_allocs, *m, next_in_flight);
+ 
+     *host_offset = alloc_cluster_offset + offset_into_cluster(s, guest_offset);
+     *bytes = MIN(*bytes, nb_bytes - offset_into_cluster(s, guest_offset));
+     assert(*bytes != 0);
+ 
++    calculate_l2_meta(bs, alloc_cluster_offset, guest_offset, *bytes,
++                      m, keep_old_clusters);
++
+     return 1;
+ 
+ fail:
 -- 
-Notice: This message is intended solely for use of the individual or entity 
-to which it is addressed and may contain information that is proprietary, 
-privileged, company confidential and/or exempt from disclosure under 
-applicable law. If the reader is not the intended recipient or agent 
-responsible for delivering the message to the intended recipient, you are 
-hereby notified that any dissemination, distribution or copying of this 
-communication is strictly prohibited. This communication may also contain 
-data subject to the International Traffic in Arms Regulations or U.S. 
-Export Administration Regulations and cannot be disseminated, distributed 
-or copied to foreign nationals, residing in the U.S. or abroad, without the 
-prior approval of the U.S. Department of State or appropriate export 
-licensing authority. If you have received this communication in error, 
-please notify the sender by reply e-mail or collect telephone call and 
-delete or destroy all copies of this email message, any physical copies 
-made of this e-mail message and/or any file attachment(s).
+2.20.1
 
---0000000000006ea5f70594f2d066
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-<div dir=3D"ltr"><div>Hello,</div><div><br></div><div>I&#39;ve been using t=
-he LEON3 port of qemu, and am wondering if anyone has touched the networkin=
-g setup for such since the thread here: <a href=3D"https://lists.rtems.org/=
-pipermail/users/2014-September/028224.html">https://lists.rtems.org/piperma=
-il/users/2014-September/028224.html</a> <br></div><div><br></div><div>Joshu=
-a Shaffer<br></div></div>
-
-<br>
-<span style=3D"color:rgb(34,34,34);font-family:arial,sans-serif;background-=
-color:rgb(255,255,255)">Notice: This message is intended solely for use of =
-the individual or entity to which it is addressed and may contain informati=
-on that is proprietary, privileged, company confidential and/or exempt from=
- disclosure under applicable law. If the reader is not the intended recipie=
-nt or agent responsible for delivering the message to the intended recipien=
-t, you are hereby notified that any dissemination, distribution or copying =
-of this communication is strictly prohibited. This communication may also c=
-ontain data subject to the International Traffic in Arms Regulations or U.S=
-. Export Administration Regulations and cannot be disseminated, distributed=
- or copied to foreign nationals, residing in the U.S. or abroad, without th=
-e prior approval of the U.S. Department of State or appropriate export lice=
-nsing authority. If you have received this communication in error, please n=
-otify the sender by reply e-mail or collect telephone call and delete or de=
-stroy all copies of this email message, any physical copies made of this e-=
-mail message and/or any file attachment(s).</span>
---0000000000006ea5f70594f2d066--
 
