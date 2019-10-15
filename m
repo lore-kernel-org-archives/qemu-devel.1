@@ -2,64 +2,91 @@ Return-Path: <SRS0=6OCO=YI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3AA63C10F14
-	for <qemu-devel@archiver.kernel.org>; Tue, 15 Oct 2019 11:04:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 15518ECE588
+	for <qemu-devel@archiver.kernel.org>; Tue, 15 Oct 2019 11:16:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 084482086A
-	for <qemu-devel@archiver.kernel.org>; Tue, 15 Oct 2019 11:04:39 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 084482086A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id D4E6C21835
+	for <qemu-devel@archiver.kernel.org>; Tue, 15 Oct 2019 11:16:50 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ZjV7P2un"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D4E6C21835
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41044 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41304 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iKKd4-0000od-60
-	for qemu-devel@archiver.kernel.org; Tue, 15 Oct 2019 07:04:38 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52864)
+	id 1iKKor-0004bX-Un
+	for qemu-devel@archiver.kernel.org; Tue, 15 Oct 2019 07:16:49 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54477)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgilbert@redhat.com>) id 1iKKbX-0008Bx-44
- for qemu-devel@nongnu.org; Tue, 15 Oct 2019 07:03:08 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1iKKng-00048X-Nk
+ for qemu-devel@nongnu.org; Tue, 15 Oct 2019 07:15:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgilbert@redhat.com>) id 1iKKbV-0003Ao-Lq
- for qemu-devel@nongnu.org; Tue, 15 Oct 2019 07:03:02 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60706)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1iKKbV-0003AK-Du
- for qemu-devel@nongnu.org; Tue, 15 Oct 2019 07:03:01 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 4F63F3082B3F
- for <qemu-devel@nongnu.org>; Tue, 15 Oct 2019 11:03:00 +0000 (UTC)
-Received: from work-vm (ovpn-117-145.ams2.redhat.com [10.36.117.145])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id F23925C1D4;
- Tue, 15 Oct 2019 11:02:56 +0000 (UTC)
-Date: Tue, 15 Oct 2019 12:02:53 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: Peter Xu <peterx@redhat.com>
-Subject: Re: [PATCH 2/2] apic: Use 32bit APIC ID for migration instance ID
-Message-ID: <20191015110253.GF3073@work-vm>
-References: <20191015075444.10955-1-peterx@redhat.com>
- <20191015075444.10955-3-peterx@redhat.com>
- <20191015092218.GC3073@work-vm> <20191015101641.GD8666@xz-x1>
+ (envelope-from <alex.bennee@linaro.org>) id 1iKKnf-0000Zb-Hu
+ for qemu-devel@nongnu.org; Tue, 15 Oct 2019 07:15:36 -0400
+Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:53570)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1iKKnf-0000Z8-Am
+ for qemu-devel@nongnu.org; Tue, 15 Oct 2019 07:15:35 -0400
+Received: by mail-wm1-x341.google.com with SMTP id i16so20409374wmd.3
+ for <qemu-devel@nongnu.org>; Tue, 15 Oct 2019 04:15:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=CwKxY0sIZHpT7vnqE7rCLremCaSd/WFvL0xL/FY/kPE=;
+ b=ZjV7P2unNnwc3uNxUsv/KPX077g3E0s3TBGre4UCPip9oyLg+ge7P8c8SIQkIPoaAx
+ 3ew6H11p23kzxO6A5Ljb6B2Mg67ZodL34MtS8t3x9wNFkK+dhAObFdwg8ZdmOwZrcKvU
+ Da0jRsDwaA5UFo2bCaQ0w4WXMi5oGkDAPD5aSsyO7x9EraRPqEX2ROEalyStRwS/YSdf
+ C4V36UYpyNTztywJoT7lvyllhQ+qBynCaJuaZNSPzwzUPQpYuv91mLpOX/WDSPAUu/oT
+ rfUzEBPHv8hTQ64n9CdVALz9ZO7NgJ4qocgG3Dsjz4J4RaFStLzpn3R9q51cIFbk3dqX
+ cDfg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=CwKxY0sIZHpT7vnqE7rCLremCaSd/WFvL0xL/FY/kPE=;
+ b=foTPHi7q7BF1V+zuoD8DNWoI25xKWj4djdtQBP3O3CHYg7vdl3LpNCllJLKKvVg+3/
+ 1oq8+9G5DbaNu2foSzad3bMepP8xWNFcNaS1U+CWJB7VoXMrfquLCN7WZq2vs5Rvt9hF
+ O+A9BBwLeo0XxR86cyGXFyUZiXKfbiRN31HlFmvC5reJwHGiG7teXDZ09lRft6m8sq0Y
+ 4Im43dXFGEgwH7vaBpX8gNXxyB94hi5TOkNKtLdmFFjbhWDZLQbTDWm9qKXJrgeTyBfl
+ l+voBTsSJseaAH59/dlAciP4RI7/0aUeQd2PYoradKoM4TtpRZ/4zvISwiXAfHLcvlBp
+ tISw==
+X-Gm-Message-State: APjAAAVtJZCxSl6i8l6ZcCoBRY8DjjvJy7siuTVVouwrfffGn2VDPNLH
+ Wx3uq6RQ7szcNJxIyPreN2FmVg==
+X-Google-Smtp-Source: APXvYqxTVAOBBirl+ygMVU4AVyeBF+gM/AjOHRmxmKAiYrzMspfVHatn+5EyCLdVWmt5o6q1Wq+l3Q==
+X-Received: by 2002:a05:600c:c1:: with SMTP id
+ u1mr17493421wmm.87.1571138133438; 
+ Tue, 15 Oct 2019 04:15:33 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id a9sm32517479wmf.14.2019.10.15.04.15.32
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 15 Oct 2019 04:15:32 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 989F01FF87;
+ Tue, 15 Oct 2019 12:15:31 +0100 (BST)
+References: <20191014104948.4291-1-alex.bennee@linaro.org>
+ <20191014104948.4291-3-alex.bennee@linaro.org>
+ <32a1628d-55a1-fd1a-31c2-56bef720855f@linaro.org>
+User-agent: mu4e 1.3.5; emacs 27.0.50
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Richard Henderson <richard.henderson@linaro.org>
+Subject: Re: [PATCH v5 02/55] trace: add mmu_index to mem_info
+In-reply-to: <32a1628d-55a1-fd1a-31c2-56bef720855f@linaro.org>
+Date: Tue, 15 Oct 2019 12:15:31 +0100
+Message-ID: <871rvemf8s.fsf@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20191015101641.GD8666@xz-x1>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.45]); Tue, 15 Oct 2019 11:03:00 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.132.183.28
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::341
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -71,97 +98,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Juan Quintela <quintela@redhat.com>,
- qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>,
- Igor Mammedov <imammedo@redhat.com>
+Cc: robert.foley@futurewei.com, Riku Voipio <riku.voipio@iki.fi>,
+ qemu-devel@nongnu.org, peter.puhov@futurewei.com, aaron@os.amperecomputing.com,
+ cota@braap.org, Stefan Hajnoczi <stefanha@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-* Peter Xu (peterx@redhat.com) wrote:
-> On Tue, Oct 15, 2019 at 10:22:18AM +0100, Dr. David Alan Gilbert wrote:
-> > * Peter Xu (peterx@redhat.com) wrote:
-> > > Migration is silently broken now with x2apic config like this:
-> > > 
-> > >      -smp 200,maxcpus=288,sockets=2,cores=72,threads=2 \
-> > >      -device intel-iommu,intremap=on,eim=on
-> > > 
-> > > After migration, the guest kernel could hang at anything, due to
-> > > x2apic bit not migrated correctly in IA32_APIC_BASE on some vcpus, so
-> > > any operations related to x2apic could be broken then (e.g., RDMSR on
-> > > x2apic MSRs could fail because KVM would think that the vcpu hasn't
-> > > enabled x2apic at all).
-> > > 
-> > > The issue is that the x2apic bit was never applied correctly for vcpus
-> > > whose ID > 255 when migrate completes, and that's because when we
-> > > migrate APIC we use the APICCommonState.id as instance ID of the
-> > > migration stream, while that's too short for x2apic.
-> > > 
-> > > Let's use the newly introduced initial_apic_id for that.
-> > 
-> > I'd like to understand a few things:
-> >    a) Does this change the instance ID of existing APICs on the
-> > migration stream? 
-> >      a1) Ever for <256 CPUs?
-> 
-> No.
-> 
-> >      a2) For >=256 CPUs?
-> 
-> Yes.
-> 
-> > 
-> >     [Because changing the ID breaks migration]
-> 
-> But if we don't change it, the stream is broken too. :)
-> 
-> Then the destination VM will receive e.g. two apic_id==0 instances (I
-> think the apic_id==256 instance will wrongly overwrite the apic_id==0
-> one), while the vcpu with apic_id==256 will use the initial apic
-> values.
-> 
-> So IMHO we should still fix this, even if it changes the migration
-> stream.  At least we start to make it right.
 
-Yes, that makes sense.
-It deserves a doc mention somewhere.
+Richard Henderson <richard.henderson@linaro.org> writes:
 
-> > 
-> >   b) Is the instance ID constant - I can see it's a property on the
-> >      APIC, but I cna't see who sets it
-> 
-> For each vcpu, I think yes it should be a constant as long as the
-> topology is the same.  This is how I understand it to be set:
-> 
-> (1) In pc_cpus_init(), we init these:
-> 
->     possible_cpus = mc->possible_cpu_arch_ids(ms);
->     for (i = 0; i < ms->smp.cpus; i++) {
->         pc_new_cpu(pcms, possible_cpus->cpus[i].arch_id, &error_fatal);
->     }
-> 
-> (2) In x86_cpu_apic_create(), we apply the apic_id to "id" property:
-> 
->     qdev_prop_set_uint32(cpu->apic_state, "id", cpu->apic_id);
+> On 10/14/19 3:48 AM, Alex Benn=C3=A9e wrote:
+>> diff --git a/accel/tcg/cputlb.c b/accel/tcg/cputlb.c
+>> index defc8d5929..1210d8f243 100644
+>> --- a/accel/tcg/cputlb.c
+>> +++ b/accel/tcg/cputlb.c
+>> @@ -1811,6 +1811,7 @@ void helper_be_stq_mmu(CPUArchState *env, target_u=
+long addr, uint64_t val,
+>>  #define ATOMIC_MMU_DECLS
+>>  #define ATOMIC_MMU_LOOKUP atomic_mmu_lookup(env, addr, oi, retaddr)
+>>  #define ATOMIC_MMU_CLEANUP
+>> +#define ATOMIC_MMU_IDX oi
+>
+> That is not the mmu_idx.  That's the whole mmu_idx + MemOp combo.
+> Use get_mmuidx(oi).
 
-OK, that's fine - as long as it's constaatn and not guest influenced.
+Oops I missed that from last time. Fixing it for real now!
 
-> > 
-> >   c) In the case where it fails, did we end up registering two
-> >      devices with the same name and instance ID?  If so, is it worth
-> >      adding a check that would error if we tried?
-> 
-> Sounds doable.
-> 
+>
+>> --- a/accel/tcg/user-exec.c
+>> +++ b/accel/tcg/user-exec.c
+>> @@ -751,6 +751,7 @@ static void *atomic_mmu_lookup(CPUArchState *env, ta=
+rget_ulong addr,
+>>  #define ATOMIC_MMU_DECLS do {} while (0)
+>>  #define ATOMIC_MMU_LOOKUP  atomic_mmu_lookup(env, addr, DATA_SIZE, GETP=
+C())
+>>  #define ATOMIC_MMU_CLEANUP do { clear_helper_retaddr(); } while (0)
+>> +#define ATOMIC_MMU_IDX 0
+>
+> MMU_USER_IDX.  Best to be consistent, even if this is user-only and it is=
+n't
+> really used.
+>
+>> --- a/include/exec/cpu_ldst_useronly_template.h
+>> +++ b/include/exec/cpu_ldst_useronly_template.h
+>> @@ -73,7 +73,7 @@ glue(glue(cpu_ld, USUFFIX), MEMSUFFIX)(CPUArchState *e=
+nv, abi_ptr ptr)
+>>  #else
+>>      trace_guest_mem_before_exec(
+>>          env_cpu(env), ptr,
+>> -        trace_mem_build_info(SHIFT, false, MO_TE, false));
+>> +        trace_mem_build_info(SHIFT, false, MO_TE, false, 0));
+>
+> Likewise for the other uses in this file.
 
-Great,
+Fixed.
 
-Dave
+>
+>
+> r~
 
-> Thanks,
-> 
-> -- 
-> Peter Xu
+
 --
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+Alex Benn=C3=A9e
 
