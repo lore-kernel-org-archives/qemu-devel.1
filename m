@@ -2,60 +2,84 @@ Return-Path: <SRS0=6OCO=YI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 79D17ECE588
-	for <qemu-devel@archiver.kernel.org>; Tue, 15 Oct 2019 12:52:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A20F0C10F14
+	for <qemu-devel@archiver.kernel.org>; Tue, 15 Oct 2019 12:53:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3DCDA217F9
-	for <qemu-devel@archiver.kernel.org>; Tue, 15 Oct 2019 12:52:07 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3DCDA217F9
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 73339217F9
+	for <qemu-devel@archiver.kernel.org>; Tue, 15 Oct 2019 12:53:11 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 73339217F9
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44118 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44158 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iKMJ4-0007KZ-7h
-	for qemu-devel@archiver.kernel.org; Tue, 15 Oct 2019 08:52:06 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43961)
+	id 1iKMK6-0008Ll-HZ
+	for qemu-devel@archiver.kernel.org; Tue, 15 Oct 2019 08:53:10 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44131)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eric.auger@redhat.com>) id 1iKMHy-0006Zt-N4
- for qemu-devel@nongnu.org; Tue, 15 Oct 2019 08:51:00 -0400
+ (envelope-from <luwei.kang@intel.com>) id 1iKMJ0-0007Rh-Iv
+ for qemu-devel@nongnu.org; Tue, 15 Oct 2019 08:52:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eric.auger@redhat.com>) id 1iKMHu-0006Qj-Or
- for qemu-devel@nongnu.org; Tue, 15 Oct 2019 08:50:56 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:41830)
+ (envelope-from <luwei.kang@intel.com>) id 1iKMIy-0006f9-Ok
+ for qemu-devel@nongnu.org; Tue, 15 Oct 2019 08:52:01 -0400
+Received: from mga04.intel.com ([192.55.52.120]:61316)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eric.auger@redhat.com>)
- id 1iKMHu-0006Q3-Fx
- for qemu-devel@nongnu.org; Tue, 15 Oct 2019 08:50:54 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 4DAAA18CB91E;
- Tue, 15 Oct 2019 12:50:53 +0000 (UTC)
-Received: from laptop.redhat.com (ovpn-116-245.ams2.redhat.com [10.36.116.245])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 52E6D19C5B;
- Tue, 15 Oct 2019 12:50:48 +0000 (UTC)
-From: Eric Auger <eric.auger@redhat.com>
-To: eric.auger.pro@gmail.com, eric.auger@redhat.com, qemu-devel@nongnu.org,
- dgilbert@redhat.com, quintela@redhat.com
-Subject: [PATCH v3] migration: Support QLIST migration
-Date: Tue, 15 Oct 2019 14:50:45 +0200
-Message-Id: <20191015125045.5006-1-eric.auger@redhat.com>
-MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.63]); Tue, 15 Oct 2019 12:50:53 +0000 (UTC)
+ (Exim 4.71) (envelope-from <luwei.kang@intel.com>)
+ id 1iKMIy-0006eB-GH
+ for qemu-devel@nongnu.org; Tue, 15 Oct 2019 08:52:00 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga004.jf.intel.com ([10.7.209.38])
+ by fmsmga104.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
+ 15 Oct 2019 05:51:53 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.67,300,1566889200"; d="scan'208";a="347064321"
+Received: from fmsmsx106.amr.corp.intel.com ([10.18.124.204])
+ by orsmga004.jf.intel.com with ESMTP; 15 Oct 2019 05:51:51 -0700
+Received: from fmsmsx101.amr.corp.intel.com (10.18.124.199) by
+ FMSMSX106.amr.corp.intel.com (10.18.124.204) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Tue, 15 Oct 2019 05:51:51 -0700
+Received: from shsmsx151.ccr.corp.intel.com (10.239.6.50) by
+ fmsmsx101.amr.corp.intel.com (10.18.124.199) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Tue, 15 Oct 2019 05:51:50 -0700
+Received: from shsmsx104.ccr.corp.intel.com ([169.254.5.166]) by
+ SHSMSX151.ccr.corp.intel.com ([10.239.6.50]) with mapi id 14.03.0439.000;
+ Tue, 15 Oct 2019 20:51:49 +0800
+From: "Kang, Luwei" <luwei.kang@intel.com>
+To: Eduardo Habkost <ehabkost@redhat.com>
+Subject: RE: [PATCH v4 2/2] i386: Add support to get/set/migrate Intel
+ Processor Trace feature
+Thread-Topic: [PATCH v4 2/2] i386: Add support to get/set/migrate Intel
+ Processor Trace feature
+Thread-Index: AQHVgKsg+eNsNdVZH0GZ6Dwyyz/Lp6dbpngw
+Date: Tue, 15 Oct 2019 12:51:48 +0000
+Message-ID: <82D7661F83C1A047AF7DC287873BF1E17382A209@SHSMSX104.ccr.corp.intel.com>
+References: <1520182116-16485-1-git-send-email-luwei.kang@intel.com>
+ <1520182116-16485-2-git-send-email-luwei.kang@intel.com>
+ <20191012031407.GK4084@habkost.net>
+In-Reply-To: <20191012031407.GK4084@habkost.net>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ctpclassification: CTP_NT
+x-titus-metadata-40: eyJDYXRlZ29yeUxhYmVscyI6IiIsIk1ldGFkYXRhIjp7Im5zIjoiaHR0cDpcL1wvd3d3LnRpdHVzLmNvbVwvbnNcL0ludGVsMyIsImlkIjoiYWUzYjc0YjktZTE2MC00MjgxLTgxMDgtZjUyMTk4YzgzNmM4IiwicHJvcHMiOlt7Im4iOiJDVFBDbGFzc2lmaWNhdGlvbiIsInZhbHMiOlt7InZhbHVlIjoiQ1RQX05UIn1dfV19LCJTdWJqZWN0TGFiZWxzIjpbXSwiVE1DVmVyc2lvbiI6IjE3LjEwLjE4MDQuNDkiLCJUcnVzdGVkTGFiZWxIYXNoIjoicjBtTjVcL3dZSzBlS1lyOWV6cTA2bnRtaVdoWWxLaUdcLyt5dm9zVGErMllGXC9GTFdibHdTaWc3Q2I4ZEk5aEsyTSJ9
+dlp-product: dlpe-windows
+dlp-version: 11.2.0.6
+dlp-reaction: no-action
+x-originating-ip: [10.239.127.40]
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.132.183.28
+MIME-Version: 1.0
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 192.55.52.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -67,418 +91,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+ "mtosatti@redhat.com" <mtosatti@redhat.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ Chao Peng <chao.p.peng@linux.intel.com>,
+ "pbonzini@redhat.com" <pbonzini@redhat.com>,
+ "rth@twiddle.net" <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Support QLIST migration using the same principle as QTAILQ:
-94869d5c52 ("migration: migrate QTAILQ").
+qemu> > diff --git a/target/i386/kvm.c b/target/i386/kvm.c index
+> > f9f4cd1..097c953 100644
+> > --- a/target/i386/kvm.c
+> > +++ b/target/i386/kvm.c
+> > @@ -1811,6 +1811,25 @@ static int kvm_put_msrs(X86CPU *cpu, int level)
+> >                  kvm_msr_entry_add(cpu, MSR_MTRRphysMask(i), mask);
+> >              }
+> >          }
+> > +        if (env->features[FEAT_7_0_EBX] & CPUID_7_0_EBX_INTEL_PT) {
+> > +            int addr_num =3D kvm_arch_get_supported_cpuid(kvm_state,
+> > +                                                    0x14, 1, R_EAX) &
+> > + 0x7;
+> > +
+> > +            kvm_msr_entry_add(cpu, MSR_IA32_RTIT_CTL,
+> > +                            env->msr_rtit_ctrl);
+> > +            kvm_msr_entry_add(cpu, MSR_IA32_RTIT_STATUS,
+> > +                            env->msr_rtit_status);
+> > +            kvm_msr_entry_add(cpu, MSR_IA32_RTIT_OUTPUT_BASE,
+> > +                            env->msr_rtit_output_base);
+>=20
+> This causes the following crash on some hosts:
+>=20
+>   qemu-system-x86_64: error: failed to set MSR 0x560 to 0x0
+>   qemu-system-x86_64: target/i386/kvm.c:2673: kvm_put_msrs: Assertion `re=
+t =3D=3D cpu->kvm_msr_buf->nmsrs' failed.
+>=20
+> Checking for CPUID_7_0_EBX_INTEL_PT is not enough: KVM has additional con=
+ditions that might prevent writing to this MSR
+> (PT_CAP_topa_output && PT_CAP_single_range_output).  This causes QEMU to =
+crash if some of the conditions aren't met.
+>=20
+> Writing and reading this MSR (and the ones below) need to be conditional =
+on KVM_GET_MSR_INDEX_LIST.
+>=20
 
-The VMSTATE_QLIST_V macro has the same proto as VMSTATE_QTAILQ_V.
-The change mainly resides in QLIST_RAW_INSERT_TAIL implementation.
+Hi Eduardo,
+    I found this issue can't be reproduced in upstream source code but can =
+be reproduced on RHEL8.1. I haven't got the qemu source code of RHEL8.1. Bu=
+t after adding some trace in KVM, I found the KVM has reported the complete=
+ Intel PT CPUID information to qemu but the Intel PT CPUID (0x14) is lost w=
+hen qemu setting the CPUID to KVM (cpuid level is 0xd). It looks like lost =
+the below patch.
 
-Tests also are provided.
+commit f24c3a79a415042f6dc195f029a2ba7247d14cac
+Author: Luwei Kang <luwei.kang@intel.com>
+Date:   Tue Jan 29 18:52:59 2019 -0500
+    i386: extended the cpuid_level when Intel PT is enabled
 
-Signed-off-by: Eric Auger <eric.auger@redhat.com>
+    Intel Processor Trace required CPUID[0x14] but the cpuid_level
+    have no change when create a kvm guest with
+    e.g. "-cpu qemu64,+intel-pt".
 
----
-
-v2 -> v3:
-- remove 2 spurious changes in gtree tests
-
-v1 -> v2:
-- rebase on top of gtree addition
-- add trace points
-- add g_free on error
----
- include/migration/vmstate.h |  21 ++++++
- include/qemu/queue.h        |  30 ++++++++
- migration/trace-events      |   5 ++
- migration/vmstate-types.c   |  69 +++++++++++++++++++
- tests/test-vmstate.c        | 133 ++++++++++++++++++++++++++++++++++++
- 5 files changed, 258 insertions(+)
-
-diff --git a/include/migration/vmstate.h b/include/migration/vmstate.h
-index b9ee563aa4..ea2f1f4749 100644
---- a/include/migration/vmstate.h
-+++ b/include/migration/vmstate.h
-@@ -225,6 +225,7 @@ extern const VMStateInfo vmstate_info_tmp;
- extern const VMStateInfo vmstate_info_bitmap;
- extern const VMStateInfo vmstate_info_qtailq;
- extern const VMStateInfo vmstate_info_gtree;
-+extern const VMStateInfo vmstate_info_qlist;
-=20
- #define type_check_2darray(t1,t2,n,m) ((t1(*)[n][m])0 - (t2*)0)
- /*
-@@ -794,6 +795,26 @@ extern const VMStateInfo vmstate_info_gtree;
-     .offset       =3D offsetof(_state, _field),                         =
-         \
- }
-=20
-+/*
-+ * For migrating a QLIST
-+ * Target QLIST needs be properly initialized.
-+ * _type: type of QLIST element
-+ * _next: name of QLIST_ENTRY entry field in QLIST element
-+ * _vmsd: VMSD for QLIST element
-+ * size: size of QLIST element
-+ * start: offset of QLIST_ENTRY in QTAILQ element
-+ */
-+#define VMSTATE_QLIST_V(_field, _state, _version, _vmsd, _type, _next)  =
-\
-+{                                                                       =
- \
-+    .name         =3D (stringify(_field)),                              =
-   \
-+    .version_id   =3D (_version),                                       =
-   \
-+    .vmsd         =3D &(_vmsd),                                         =
-   \
-+    .size         =3D sizeof(_type),                                    =
-   \
-+    .info         =3D &vmstate_info_qlist,                              =
-   \
-+    .offset       =3D offsetof(_state, _field),                         =
-   \
-+    .start        =3D offsetof(_type, _next),                           =
-   \
-+}
-+
- /* _f : field name
-    _f_n : num of elements field_name
-    _n : num of elements
-diff --git a/include/qemu/queue.h b/include/qemu/queue.h
-index 73bf4a984d..e965b4d18d 100644
---- a/include/qemu/queue.h
-+++ b/include/qemu/queue.h
-@@ -491,4 +491,34 @@ union {                                             =
-                    \
-         QTAILQ_RAW_TQH_CIRC(head)->tql_prev =3D QTAILQ_RAW_TQE_CIRC(elm,=
- entry);  \
- } while (/*CONSTCOND*/0)
-=20
-+#define QLIST_RAW_FIRST(head)                                           =
-       \
-+        field_at_offset(head, 0, void *)
-+
-+#define QLIST_RAW_NEXT(elm, entry)                                      =
-       \
-+        field_at_offset(elm, entry, void *)
-+
-+#define QLIST_RAW_PREVIOUS(elm, entry)                                  =
-       \
-+        field_at_offset(elm, entry + sizeof(void *), void *)
-+
-+#define QLIST_RAW_FOREACH(elm, head, entry)                             =
-       \
-+        for ((elm) =3D *QLIST_RAW_FIRST(head);                          =
-         \
-+             (elm);                                                     =
-       \
-+             (elm) =3D *QLIST_RAW_NEXT(elm, entry))
-+
-+#define QLIST_RAW_INSERT_TAIL(head, elm, entry) do {                    =
-       \
-+        void *iter, *last =3D NULL;                                     =
-         \
-+        *QLIST_RAW_NEXT(elm, entry) =3D NULL;                           =
-         \
-+        if (!*QLIST_RAW_FIRST(head)) {                                  =
-       \
-+            *QLIST_RAW_FIRST(head) =3D elm;                             =
-         \
-+            *QLIST_RAW_PREVIOUS(elm, entry) =3D head;                   =
-         \
-+            break;                                                      =
-       \
-+        }                                                               =
-       \
-+        for (iter =3D *QLIST_RAW_FIRST(head);                           =
-         \
-+             iter; last =3D iter, iter =3D *QLIST_RAW_NEXT(iter, entry))=
-           \
-+            { }                                                         =
-       \
-+        *QLIST_RAW_NEXT(last, entry) =3D elm;                           =
-         \
-+        *QLIST_RAW_PREVIOUS(elm, entry) =3D last;                       =
-         \
-+} while (0)
-+
-+
- #endif /* QEMU_SYS_QUEUE_H */
-diff --git a/migration/trace-events b/migration/trace-events
-index 6dee7b5389..e0a33cffca 100644
---- a/migration/trace-events
-+++ b/migration/trace-events
-@@ -76,6 +76,11 @@ get_gtree_end(const char *field_name, const char *key_=
-vmsd_name, const char *val
- put_gtree(const char *field_name, const char *key_vmsd_name, const char =
-*val_vmsd_name, uint32_t nnodes) "%s(%s/%s) nnodes=3D%d"
- put_gtree_end(const char *field_name, const char *key_vmsd_name, const c=
-har *val_vmsd_name, int ret) "%s(%s/%s) %d"
-=20
-+get_qlist(const char *field_name, const char *vmsd_name, int version_id)=
- "%s(%s v%d)"
-+get_qlist_end(const char *field_name, const char *vmsd_name) "%s(%s)"
-+put_qlist(const char *field_name, const char *vmsd_name, int version_id)=
- "%s(%s v%d)"
-+put_qlist_end(const char *field_name, const char *vmsd_name) "%s(%s)"
-+
- # qemu-file.c
- qemu_file_fclose(void) ""
-=20
-diff --git a/migration/vmstate-types.c b/migration/vmstate-types.c
-index 7236cf92bc..4d6d7efac2 100644
---- a/migration/vmstate-types.c
-+++ b/migration/vmstate-types.c
-@@ -843,3 +843,72 @@ const VMStateInfo vmstate_info_gtree =3D {
-     .get  =3D get_gtree,
-     .put  =3D put_gtree,
- };
-+
-+static int put_qlist(QEMUFile *f, void *pv, size_t unused_size,
-+                     const VMStateField *field, QJSON *vmdesc)
-+{
-+    const VMStateDescription *vmsd =3D field->vmsd;
-+    /* offset of the QTAILQ entry in a QTAILQ element*/
-+    size_t entry_offset =3D field->start;
-+    void *elm;
-+    int ret;
-+
-+    trace_put_qlist(field->name, vmsd->name, vmsd->version_id);
-+    QLIST_RAW_FOREACH(elm, pv, entry_offset) {
-+        qemu_put_byte(f, true);
-+        ret =3D vmstate_save_state(f, vmsd, elm, vmdesc);
-+        if (ret) {
-+            error_report("%s: failed to save %s (%d)", field->name,
-+                         vmsd->name, ret);
-+            return ret;
-+        }
-+    }
-+    qemu_put_byte(f, false);
-+    trace_put_qlist_end(field->name, vmsd->name);
-+
-+    return 0;
-+}
-+
-+static int get_qlist(QEMUFile *f, void *pv, size_t unused_size,
-+                     const VMStateField *field)
-+{
-+    int ret =3D 0;
-+    const VMStateDescription *vmsd =3D field->vmsd;
-+    /* size of a QLIST element */
-+    size_t size =3D field->size;
-+    /* offset of the QLIST entry in a QLIST element */
-+    size_t entry_offset =3D field->start;
-+    int version_id =3D field->version_id;
-+    void *elm;
-+
-+    trace_get_qlist(field->name, vmsd->name, vmsd->version_id);
-+    if (version_id > vmsd->version_id) {
-+        error_report("%s %s",  vmsd->name, "too new");
-+        return -EINVAL;
-+    }
-+    if (version_id < vmsd->minimum_version_id) {
-+        error_report("%s %s",  vmsd->name, "too old");
-+        return -EINVAL;
-+    }
-+
-+    while (qemu_get_byte(f)) {
-+        elm =3D g_malloc(size);
-+        ret =3D vmstate_load_state(f, vmsd, elm, version_id);
-+        if (ret) {
-+            error_report("%s: failed to load %s (%d)", field->name,
-+                         vmsd->name, ret);
-+            g_free(elm);
-+            return ret;
-+        }
-+        QLIST_RAW_INSERT_TAIL(pv, elm, entry_offset);
-+    }
-+    trace_get_qlist_end(field->name, vmsd->name);
-+
-+    return ret;
-+}
-+
-+const VMStateInfo vmstate_info_qlist =3D {
-+    .name =3D "qlist",
-+    .get  =3D get_qlist,
-+    .put  =3D put_qlist,
-+};
-diff --git a/tests/test-vmstate.c b/tests/test-vmstate.c
-index 1e5be1d4ff..22161bb34f 100644
---- a/tests/test-vmstate.c
-+++ b/tests/test-vmstate.c
-@@ -926,6 +926,28 @@ static const VMStateDescription vmstate_domain =3D {
-     }
- };
-=20
-+/* test QLIST Migration */
-+
-+typedef struct TestQListElement {
-+    uint32_t  id;
-+    QLIST_ENTRY(TestQListElement) next;
-+} TestQListElement;
-+
-+typedef struct TestQListContainer {
-+    uint32_t  id;
-+    QLIST_HEAD(, TestQListElement) list;
-+} TestQListContainer;
-+
-+static const VMStateDescription vmstate_qlist_element =3D {
-+    .name =3D "test/queue list",
-+    .version_id =3D 1,
-+    .minimum_version_id =3D 1,
-+    .fields =3D (VMStateField[]) {
-+        VMSTATE_UINT32(id, TestQListElement),
-+        VMSTATE_END_OF_LIST()
-+    }
-+};
-+
- static const VMStateDescription vmstate_iommu =3D {
-     .name =3D "iommu",
-     .version_id =3D 1,
-@@ -939,6 +961,18 @@ static const VMStateDescription vmstate_iommu =3D {
-     }
- };
-=20
-+static const VMStateDescription vmstate_container =3D {
-+    .name =3D "test/container/qlist",
-+    .version_id =3D 1,
-+    .minimum_version_id =3D 1,
-+    .fields =3D (VMStateField[]) {
-+        VMSTATE_UINT32(id, TestQListContainer),
-+        VMSTATE_QLIST_V(list, TestQListContainer, 1, vmstate_qlist_eleme=
-nt,
-+                        TestQListElement, next),
-+        VMSTATE_END_OF_LIST()
-+    }
-+};
-+
- uint8_t first_domain_dump[] =3D {
-     /* id */
-     0x00, 0x0, 0x0, 0x6,
-@@ -1229,6 +1263,103 @@ static void test_gtree_load_iommu(void)
-     qemu_fclose(fload);
- }
-=20
-+static uint8_t qlist_dump[] =3D {
-+    0x00, 0x00, 0x00, 0x01, /* container id */
-+    0x1, /* start of a */
-+    0x00, 0x00, 0x00, 0x0a,
-+    0x1, /* start of b */
-+    0x00, 0x00, 0x0b, 0x00,
-+    0x1, /* start of c */
-+    0x00, 0x0c, 0x00, 0x00,
-+    0x1, /* start of d */
-+    0x0d, 0x00, 0x00, 0x00,
-+    0x0, /* end of list */
-+    QEMU_VM_EOF, /* just to ensure we won't get EOF reported prematurely=
- */
-+};
-+
-+static TestQListContainer *alloc_container(void)
-+{
-+    TestQListElement *a =3D g_malloc(sizeof(TestQListElement));
-+    TestQListElement *b =3D g_malloc(sizeof(TestQListElement));
-+    TestQListElement *c =3D g_malloc(sizeof(TestQListElement));
-+    TestQListElement *d =3D g_malloc(sizeof(TestQListElement));
-+    TestQListContainer *container =3D g_malloc(sizeof(TestQListContainer=
-));
-+
-+    a->id =3D 0x0a;
-+    b->id =3D 0x0b00;
-+    c->id =3D 0xc0000;
-+    d->id =3D 0xd000000;
-+    container->id =3D 1;
-+
-+    QLIST_INIT(&container->list);
-+    QLIST_INSERT_HEAD(&container->list, d, next);
-+    QLIST_INSERT_HEAD(&container->list, c, next);
-+    QLIST_INSERT_HEAD(&container->list, b, next);
-+    QLIST_INSERT_HEAD(&container->list, a, next);
-+    return container;
-+}
-+
-+static void free_container(TestQListContainer *container)
-+{
-+    TestQListElement *iter, *tmp;
-+
-+    QLIST_FOREACH_SAFE(iter, &container->list, next, tmp) {
-+        QLIST_REMOVE(iter, next);
-+        g_free(iter);
-+    }
-+    g_free(container);
-+}
-+
-+static void compare_containers(TestQListContainer *c1, TestQListContaine=
-r *c2)
-+{
-+    TestQListElement *first_item_c1, *first_item_c2;
-+
-+    while (!QLIST_EMPTY(&c1->list)) {
-+        first_item_c1 =3D QLIST_FIRST(&c1->list);
-+        first_item_c2 =3D QLIST_FIRST(&c2->list);
-+        assert(first_item_c2);
-+        assert(first_item_c1->id =3D=3D first_item_c2->id);
-+        QLIST_REMOVE(first_item_c1, next);
-+        QLIST_REMOVE(first_item_c2, next);
-+        g_free(first_item_c1);
-+        g_free(first_item_c2);
-+    }
-+    assert(QLIST_EMPTY(&c2->list));
-+}
-+
-+static void test_save_qlist(void)
-+{
-+    TestQListContainer *container =3D alloc_container();
-+
-+    save_vmstate(&vmstate_container, container);
-+    compare_vmstate(qlist_dump, sizeof(qlist_dump));
-+    free_container(container);
-+}
-+
-+static void test_load_qlist(void)
-+{
-+    QEMUFile *fsave, *fload;
-+    TestQListContainer *orig_container =3D alloc_container();
-+    TestQListContainer *dest_container =3D g_malloc0(sizeof(TestQListCon=
-tainer));
-+    char eof;
-+
-+    QLIST_INIT(&dest_container->list);
-+
-+    fsave =3D open_test_file(true);
-+    qemu_put_buffer(fsave, qlist_dump, sizeof(qlist_dump));
-+    g_assert(!qemu_file_get_error(fsave));
-+    qemu_fclose(fsave);
-+
-+    fload =3D open_test_file(false);
-+    vmstate_load_state(fload, &vmstate_container, dest_container, 1);
-+    eof =3D qemu_get_byte(fload);
-+    g_assert(!qemu_file_get_error(fload));
-+    g_assert_cmpint(eof, =3D=3D, QEMU_VM_EOF);
-+    compare_containers(orig_container, dest_container);
-+    free_container(orig_container);
-+    free_container(dest_container);
-+}
-+
- typedef struct TmpTestStruct {
-     TestStruct *parent;
-     int64_t diff;
-@@ -1353,6 +1484,8 @@ int main(int argc, char **argv)
-     g_test_add_func("/vmstate/gtree/load/loaddomain", test_gtree_load_do=
-main);
-     g_test_add_func("/vmstate/gtree/save/saveiommu", test_gtree_save_iom=
-mu);
-     g_test_add_func("/vmstate/gtree/load/loadiommu", test_gtree_load_iom=
-mu);
-+    g_test_add_func("/vmstate/qlist/save/saveqlist", test_save_qlist);
-+    g_test_add_func("/vmstate/qlist/load/loadqlist", test_load_qlist);
-     g_test_add_func("/vmstate/tmp_struct", test_tmp_struct);
-     g_test_run();
-=20
---=20
-2.20.1
+Thanks,
+Luwei Kang
 
 
