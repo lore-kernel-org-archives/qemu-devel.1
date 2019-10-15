@@ -2,63 +2,91 @@ Return-Path: <SRS0=6OCO=YI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AD7C8ECE58F
-	for <qemu-devel@archiver.kernel.org>; Tue, 15 Oct 2019 19:04:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F8FFC10F14
+	for <qemu-devel@archiver.kernel.org>; Tue, 15 Oct 2019 19:11:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 857C520872
-	for <qemu-devel@archiver.kernel.org>; Tue, 15 Oct 2019 19:04:58 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 857C520872
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id EEC0B20854
+	for <qemu-devel@archiver.kernel.org>; Tue, 15 Oct 2019 19:11:06 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="pxBd1Ktx"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EEC0B20854
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56556 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56668 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iKS7t-0005VO-Ms
-	for qemu-devel@archiver.kernel.org; Tue, 15 Oct 2019 15:04:57 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36063)
+	id 1iKSDq-0000Xu-3m
+	for qemu-devel@archiver.kernel.org; Tue, 15 Oct 2019 15:11:06 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37022)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.williamson@redhat.com>) id 1iKS6T-0004MK-R1
- for qemu-devel@nongnu.org; Tue, 15 Oct 2019 15:03:32 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1iKSCY-00080x-Bx
+ for qemu-devel@nongnu.org; Tue, 15 Oct 2019 15:09:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.williamson@redhat.com>) id 1iKS6R-00025A-Ed
- for qemu-devel@nongnu.org; Tue, 15 Oct 2019 15:03:28 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:50100)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
- id 1iKS6R-00024s-8R
- for qemu-devel@nongnu.org; Tue, 15 Oct 2019 15:03:27 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 27E533082B41;
- Tue, 15 Oct 2019 19:03:26 +0000 (UTC)
-Received: from x1.home (ovpn-118-102.phx2.redhat.com [10.3.118.102])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 9BB325D6A9;
- Tue, 15 Oct 2019 19:03:18 +0000 (UTC)
-Date: Tue, 15 Oct 2019 13:03:17 -0600
-From: Alex Williamson <alex.williamson@redhat.com>
-To: Jens Freimann <jfreimann@redhat.com>
-Subject: Re: [PATCH v3 0/10] add failover feature for assigned network devices
-Message-ID: <20191015130317.64d68031@x1.home>
-In-Reply-To: <20191011112015.11785-1-jfreimann@redhat.com>
-References: <20191011112015.11785-1-jfreimann@redhat.com>
-Organization: Red Hat
+ (envelope-from <alex.bennee@linaro.org>) id 1iKSCX-00053K-3q
+ for qemu-devel@nongnu.org; Tue, 15 Oct 2019 15:09:45 -0400
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:35141)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1iKSCW-00052P-SC
+ for qemu-devel@nongnu.org; Tue, 15 Oct 2019 15:09:45 -0400
+Received: by mail-wr1-x442.google.com with SMTP id v8so25205630wrt.2
+ for <qemu-devel@nongnu.org>; Tue, 15 Oct 2019 12:09:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=3KFHf8YJUcAAbi1mXMZE1xa8jaVMs+4t2pxpxJYEBqg=;
+ b=pxBd1Ktx7ckLnMA85gNj/l3YwB81KUK68/auB9cfuMX94AQ1kZhTJyDRpy1eBTgQa6
+ qFbklR+xPwvYSY8Bsp0boaD0Nf+hQ+HOCWmmt62nJ/ze8pyyA3NgzyEfYY2fHn8b7wHL
+ DCmeF007XJFgZdruuBawYUspbgXuzfwUeJ19lZPzLXCQkTVPynvrPpQe5HbIXN2EQ2Ui
+ lxVqPDxflqnuGpN6QxCmYXK/MtjMESc0OagmO1kF5x+mB4ISDWpvPX2LpS/iqgcGZu/i
+ nVvk30dtDhhu0tEY4yOnoX1IRuwmnAA3/ncen2jLieMUB9ooLgSecn4B6xyzj/b/uAOH
+ /eFA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=3KFHf8YJUcAAbi1mXMZE1xa8jaVMs+4t2pxpxJYEBqg=;
+ b=qe6ELNtffOj3MBgjFDbsKgDhetFIEohGg3eL0Dkt4Rei2/wh2ZxajcdfqNOK+LY56J
+ WB0cMgMiQcFgveUUglcwF6s+oHHrcgH1DJ1HA8Uhqir5eH4o7gi6N4dGMO7PMd5BioyQ
+ OBlCv/0+PdVUjX2+9Z9rF/dw2+JMyl/tLPTqnxJnYRd+RCEda0BM+xEmG29yJDE8vQsI
+ sTGM99R5fEFNpADZVzPpdmanlq2AEScSuX1j6/LNhDGCXreHOd2t92PM9ETqyaXLzZxS
+ o+y9j4iZ5aIdTWR3nCs7dqJNQCj51K0/rU+isUI7rW/Oj+fk60XD6JeouqBc+2/K5Iqs
+ L3HA==
+X-Gm-Message-State: APjAAAWof6dY9eEAT6nPWAP/AmRbDHiuTffoW4QUig2/YQNbYEoQAioD
+ pWNFcqz7PnGX9K6Qa2/683IVTQ==
+X-Google-Smtp-Source: APXvYqwgz3dRp5qkxVLeOmcgLWIEKM5Zeas9NFgJrfKXKFD7DQMqer5lB4hYtTOToON+ri/a0xu9yw==
+X-Received: by 2002:adf:e38a:: with SMTP id e10mr21476748wrm.348.1571166583128; 
+ Tue, 15 Oct 2019 12:09:43 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id t83sm270741wmt.18.2019.10.15.12.09.42
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 15 Oct 2019 12:09:42 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 77D941FF87;
+ Tue, 15 Oct 2019 20:09:41 +0100 (BST)
+References: <20191014104948.4291-1-alex.bennee@linaro.org>
+ <20191014104948.4291-54-alex.bennee@linaro.org>
+ <3ce497fe-9dc1-5fa3-acf6-155ae16e0793@linaro.org>
+User-agent: mu4e 1.3.5; emacs 27.0.50
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Richard Henderson <richard.henderson@linaro.org>
+Subject: Re: [PATCH v5 53/55] plugins: add sparc64 instruction
+ classification table
+In-reply-to: <3ce497fe-9dc1-5fa3-acf6-155ae16e0793@linaro.org>
+Date: Tue, 15 Oct 2019 20:09:41 +0100
+Message-ID: <87wod5ltai.fsf@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.45]); Tue, 15 Oct 2019 19:03:26 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.132.183.28
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::442
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -70,56 +98,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: ehabkost@redhat.com, mst@redhat.com, aadam@redhat.com,
- qemu-devel@nongnu.org, dgilbert@redhat.com, laine@redhat.com, ailan@redhat.com,
- parav@mellanox.com
+Cc: aaron@os.amperecomputing.com, cota@braap.org, qemu-devel@nongnu.org,
+ peter.puhov@futurewei.com, robert.foley@futurewei.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, 11 Oct 2019 13:20:05 +0200
-Jens Freimann <jfreimann@redhat.com> wrote:
 
-> This is implementing the host side of the net_failover concept
-> (https://www.kernel.org/doc/html/latest/networking/net_failover.html)
-> 
-> Changes since v2:
-> * back out of creating failover pair when it is a non-networking
->   vfio-pci device (Alex W)
-> * handle migration state change from within the migration thread. I do a
->   timed wait on a semaphore and then check if all unplugs were
->   succesful. Added a new function to each device that checks the device
->   if the unplug for it has happened. When all devices report the succesful
->   unplug *or* the time/retries is up, continue with the migration or
->   cancel. When not all devices could be unplugged I am cancelling at the
->   moment. It is likely that we can't plug it back at the destination which
->   would result in degraded network performance.
-> * fix a few bugs regarding re-plug on migration source and target 
-> * run full set of tests including migration tests
-> * add patch for libqos to tolerate new migration state
-> * squashed patch 1 and 2, added patch 8 
->  
-> The general idea is that we have a pair of devices, a vfio-pci and a
-> virtio-net device. Before migration the vfio device is unplugged and data
-> flows to the virtio-net device, on the target side another vfio-pci device
-> is plugged in to take over the data-path. In the guest the net_failover
-> module will pair net devices with the same MAC address.
-> 
-> * Patch 1 adds the infrastructure to hide the device for the qbus and qdev APIs
-> 
-> * Patch 2 sets a new flag for PCIDevice 'partially_hotplugged' which we
->   use to skip the unrealize code path when doing a unplug of the primary
->   device
-> 
-> * Patch 3 sets the pending_deleted_event before triggering the guest
->   unplug request
+Richard Henderson <richard.henderson@linaro.org> writes:
 
-These only cover pcie hotplug, is this feature somehow dependent on
-pcie?  There's also ACPI-based PCI hotplug, SHPC hotplug, and it looks
-like s390 has it's own version (of course) of PCI hotplug.  IMO, we
-either need to make an attempt to support this universally or the
-option needs to fail if the hotplug controller doesn't support partial
-removal.  Thanks,
+> On 10/14/19 3:49 AM, Alex Benn=C3=A9e wrote:
+>> +InsnClassExecCount sparc32_insn_classes[] =3D {
+>> +    { "Call",                "call",   0xc0000000, 0x40000000, COUNT_CL=
+ASS},
+>> +    { "Branch ICond",        "bcc",    0xc1c00000, 0x00800000, COUNT_CL=
+ASS},
+>> +    { "Branch Fcond",        "fbcc",   0xc1c00000, 0x01800000, COUNT_CL=
+ASS},
+>> +    { "SetHi",               "sethi",  0xc1c00000, 0x01000000, COUNT_CL=
+ASS},
+>> +    { "FPU ALU",             "fpu",    0xc1f00000, 0x81a00000, COUNT_CL=
+ASS},
+>> +    { "ALU",                 "alu",    0xc0000000, 0x80000000, COUNT_CL=
+ASS},
+>> +    { "Load/Store",          "ldst",   0xc0000000, 0xc0000000, COUNT_CL=
+ASS},
+>> +    /* Unclassified */
+>> +    { "Unclassified",        "unclas", 0x00000000, 0x00000000, COUNT_IN=
+DIVIDUAL},
+>> +};
+>> +
+>
+> Unused.  You'd see this if they were static.
 
-Alex
+How similar are the sparc and sparc64 decodes? Is there a canonical
+table you can point to?
+
+>
+>
+> r~
+
+
+--
+Alex Benn=C3=A9e
 
