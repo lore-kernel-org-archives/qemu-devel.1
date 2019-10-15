@@ -2,77 +2,69 @@ Return-Path: <SRS0=6OCO=YI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D09A0C10F14
-	for <qemu-devel@archiver.kernel.org>; Tue, 15 Oct 2019 17:42:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 75F54ECE58F
+	for <qemu-devel@archiver.kernel.org>; Tue, 15 Oct 2019 17:44:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A967920854
-	for <qemu-devel@archiver.kernel.org>; Tue, 15 Oct 2019 17:42:12 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A967920854
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 4FEE420854
+	for <qemu-devel@archiver.kernel.org>; Tue, 15 Oct 2019 17:44:21 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4FEE420854
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54844 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54906 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iKQpn-0000QH-PL
-	for qemu-devel@archiver.kernel.org; Tue, 15 Oct 2019 13:42:11 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52812)
+	id 1iKQrs-0001nf-HR
+	for qemu-devel@archiver.kernel.org; Tue, 15 Oct 2019 13:44:20 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53254)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1iKQoY-0008Cm-6U
- for qemu-devel@nongnu.org; Tue, 15 Oct 2019 13:40:55 -0400
+ (envelope-from <clg@kaod.org>) id 1iKQqt-0001KM-R0
+ for qemu-devel@nongnu.org; Tue, 15 Oct 2019 13:43:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1iKQoW-0006Z4-Ku
- for qemu-devel@nongnu.org; Tue, 15 Oct 2019 13:40:54 -0400
-Received: from indium.canonical.com ([91.189.90.7]:38490)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1iKQoV-0006YE-KS
- for qemu-devel@nongnu.org; Tue, 15 Oct 2019 13:40:52 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1iKQoT-00049H-CH
- for <qemu-devel@nongnu.org>; Tue, 15 Oct 2019 17:40:49 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 57A142E8073
- for <qemu-devel@nongnu.org>; Tue, 15 Oct 2019 17:40:49 +0000 (UTC)
+ (envelope-from <clg@kaod.org>) id 1iKQqs-0007vm-8n
+ for qemu-devel@nongnu.org; Tue, 15 Oct 2019 13:43:19 -0400
+Received: from 13.mo4.mail-out.ovh.net ([178.33.251.8]:47149)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <clg@kaod.org>) id 1iKQqs-0007rZ-2W
+ for qemu-devel@nongnu.org; Tue, 15 Oct 2019 13:43:18 -0400
+Received: from player691.ha.ovh.net (unknown [10.109.159.159])
+ by mo4.mail-out.ovh.net (Postfix) with ESMTP id DF67D208ED3
+ for <qemu-devel@nongnu.org>; Tue, 15 Oct 2019 19:43:08 +0200 (CEST)
+Received: from kaod.org (lfbn-1-2229-223.w90-76.abo.wanadoo.fr [90.76.50.223])
+ (Authenticated sender: clg@kaod.org)
+ by player691.ha.ovh.net (Postfix) with ESMTPSA id C9E47B19587A;
+ Tue, 15 Oct 2019 17:43:03 +0000 (UTC)
+Subject: Re: [PULL 59/68] aspeed: Add an AST2600 eval board
+To: Peter Maydell <peter.maydell@linaro.org>,
+ QEMU Developers <qemu-devel@nongnu.org>
+References: <20191014160404.19553-1-peter.maydell@linaro.org>
+ <20191014160404.19553-60-peter.maydell@linaro.org>
+ <CAFEAcA-2EZnnrYViQUQK-mR0=JqR9mXNzfVNa_WR5HoCTJ+tag@mail.gmail.com>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <a888142d-7c9e-bc15-84d3-80bd01df1d11@kaod.org>
+Date: Tue, 15 Oct 2019 19:43:02 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <CAFEAcA-2EZnnrYViQUQK-mR0=JqR9mXNzfVNa_WR5HoCTJ+tag@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+X-Ovh-Tracer-Id: 372672870308350931
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrjeefgdduudehucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddm
 Content-Transfer-Encoding: quoted-printable
-Date: Tue, 15 Oct 2019 17:33:32 -0000
-From: Peter Maydell <peter.maydell@linaro.org>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=Invalid; importance=Undecided;
- assignee=None; 
-X-Launchpad-Bug-Tags: chardev
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: philmd pmaydell
-X-Launchpad-Bug-Reporter: =?utf-8?q?Philippe_Mathieu-Daud=C3=A9_=28philmd?=
- =?utf-8?q?=29?=
-X-Launchpad-Bug-Modifier: Peter Maydell (pmaydell)
-References: <157115912269.6241.2879996455235466128.malonedeb@gac.canonical.com>
-Message-Id: <157116081289.22310.16365337092715457705.malone@wampee.canonical.com>
-Subject: [Bug 1848231] Re: serial/parallel character devices created for the
- none-machine
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="44557a7d51630548e7d0aa4259446ccd7e1731bd";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 6a97a21af521f6091fb1e6e12f831051238679ae
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 91.189.90.7
+X-Received-From: 178.33.251.8
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -81,61 +73,94 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1848231 <1848231@bugs.launchpad.net>
+Cc: Joel Stanley <joel@jms.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-You can start 'none' without "-serial null". Examples:
+On 15/10/2019 19:03, Peter Maydell wrote:
+> On Mon, 14 Oct 2019 at 17:05, Peter Maydell <peter.maydell@linaro.org> =
+wrote:
+>>
+>> From: C=C3=A9dric Le Goater <clg@kaod.org>
+>>
+>> Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
+>> Reviewed-by: Joel Stanley <joel@jms.id.au>
+>> Message-id: 20190925143248.10000-21-clg@kaod.org
+>> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+>> ---
+>>  include/hw/arm/aspeed.h |  1 +
+>>  hw/arm/aspeed.c         | 23 +++++++++++++++++++++++
+>>  2 files changed, 24 insertions(+)
+>=20
+>> @@ -455,6 +467,17 @@ static const AspeedBoardConfig aspeed_boards[] =3D=
+ {
+>>          .num_cs    =3D 2,
+>>          .i2c_init  =3D witherspoon_bmc_i2c_init,
+>>          .ram       =3D 512 * MiB,
+>> +    }, {
+>> +        .name      =3D MACHINE_TYPE_NAME("ast2600-evb"),
+>> +        .desc      =3D "Aspeed AST2600 EVB (Cortex A7)",
+>> +        .soc_name  =3D "ast2600-a0",
+>> +        .hw_strap1 =3D AST2600_EVB_HW_STRAP1,
+>> +        .hw_strap2 =3D AST2600_EVB_HW_STRAP2,
+>> +        .fmc_model =3D "w25q512jv",
+>> +        .spi_model =3D "mx66u51235f",
+>> +        .num_cs    =3D 1,
+>> +        .i2c_init  =3D ast2600_evb_i2c_init,
+>> +        .ram       =3D 2 * GiB,
+>=20
+> Hi. I just discovered that this makes 'make check' fail on
+> 32-bit systems, because you can't default to 2GB of RAM
+> for a board:
+>=20
+> (armhf)pmaydell@mustang-maydell:~/qemu$
+> ./build/all-a32/arm-softmmu/qemu-system-arm -M ast2600-evb
+> qemu-system-arm: at most 2047 MB RAM can be simulated
+>=20
+> It's also a pretty rudely large amount of RAM to allocate
+> by default: it caused 'make check' to fail on my OSX
+> box, which is 64-bits but doesn't have huge swathes
+> of free RAM.
+>=20
+> I'm going to drop this patch from my queue and redo
+> the pullreq.
 
-qemu-system-x86_64 -machine none
-qemu-system-x86_64 -machine none -monitor stdio
-qemu-system-x86_64 -machine none -nographic
-qemu-system-x86_64 -machine none -monitor stdio -display none
+ok. We do have such a board.=20
 
-Your command line "qemu-system-x86_64 -machine none -nographic -monitor
-stdio" fails because "-nographic" says "please create a serial port
-using stdio" but "-monitor stdio" tries to use stdio for something else.
-You get the same message for any machine (eg "pc"), not just "none". If
-what you wanted was "just don't create the graphical display" that's
-"-display none" -- "-nographic" is a collection of things including both
-'no display' and also 'default to creating a serial device to stdio' and
-'default to creating a monitor muxed with that serial'.
+What do you suggest ? We can lower the RAM to 1G for QEMU.=20
+
+Thanks,
+
+C. =20
 
 
-** Changed in: qemu
-       Status: New =3D> Invalid
 
--- =
+U-Boot 2019.04-00299-g7eb9da617d8e (Aug 21 2019 - 17:46:13 +0930)
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1848231
+SOC : AST2600-A0=20
+RST : WDT1 SOC=20
+PCI RST : #1 #2=20
+eSPI Mode : SIO:Enable : SuperIO-2e
+Eth :    MAC0: RGMII ,MAC1: RGMII ,MAC2: RGMII ,MAC3: RGMII=20
+Model: Aspeed BMC
+DRAM:  2 GiB
+WARNING: Caches not enabled
+MMC:   emmc_slot0@100: 0
+Loading Environment from SPI Flash... SF: Detected w25q512jv with page si=
+ze 256 Bytes, erase size 4 KiB, total 64 MiB
+OK
+In:    serial@1e784000
+Out:   serial@1e784000
+Err:   serial@1e784000
+Model: Aspeed BMC
+Net:   eth1: ftgmac@1e680000, eth2: ftgmac@1e670000
+Warning: ftgmac@1e690000 (eth3) using random MAC address - 96:5c:26:8e:5e=
+:0a
+, eth3: ftgmac@1e690000
+Hit any key to stop autoboot:  0=20
 
-Title:
-  serial/parallel character devices created for the none-machine
 
-Status in QEMU:
-  Invalid
 
-Bug description:
-  The none-machine can not be started unless using "-serial null":
 
-  qemu-system-x86_64 -machine none -nographic -monitor stdio
-  QEMU 3.1.1 monitor - type 'help' for more information
-  (qemu) qemu-system-x86_64: cannot use stdio by multiple character devices
-  qemu-system-x86_64: could not connect serial device to character backend =
-'stdio'
-  $
-
-  $ qemu-system-mips -machine none -nographic -serial null -monitor stdio
-  QEMU 4.1.50 monitor - type 'help' for more information
-  (qemu) info chardev
-  parallel0: filename=3Dnull
-  compat_monitor0: filename=3Dstdio
-  serial0: filename=3Dnull
-  (qemu)
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1848231/+subscriptions
 
