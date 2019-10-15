@@ -2,65 +2,91 @@ Return-Path: <SRS0=6OCO=YI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A2366ECE58F
-	for <qemu-devel@archiver.kernel.org>; Tue, 15 Oct 2019 21:54:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8B416ECE58F
+	for <qemu-devel@archiver.kernel.org>; Tue, 15 Oct 2019 22:05:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6DC602064A
-	for <qemu-devel@archiver.kernel.org>; Tue, 15 Oct 2019 21:54:51 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6DC602064A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 5787120873
+	for <qemu-devel@archiver.kernel.org>; Tue, 15 Oct 2019 22:05:03 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="e+o7Flo/"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5787120873
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60186 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60434 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iKUmI-0001ar-CF
-	for qemu-devel@archiver.kernel.org; Tue, 15 Oct 2019 17:54:50 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60091)
+	id 1iKUwA-0006kS-CH
+	for qemu-devel@archiver.kernel.org; Tue, 15 Oct 2019 18:05:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35237)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <ehabkost@redhat.com>) id 1iKUWw-0006Zi-FJ
- for qemu-devel@nongnu.org; Tue, 15 Oct 2019 17:38:59 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1iKUvQ-0006EI-IK
+ for qemu-devel@nongnu.org; Tue, 15 Oct 2019 18:04:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <ehabkost@redhat.com>) id 1iKUWv-0006vy-6O
- for qemu-devel@nongnu.org; Tue, 15 Oct 2019 17:38:58 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:42072)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1iKUWu-0006vV-US
- for qemu-devel@nongnu.org; Tue, 15 Oct 2019 17:38:57 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id DA28E30832E9;
- Tue, 15 Oct 2019 21:38:55 +0000 (UTC)
-Received: from localhost (ovpn-116-20.phx2.redhat.com [10.3.116.20])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 4DC975D70D;
- Tue, 15 Oct 2019 21:38:55 +0000 (UTC)
-From: Eduardo Habkost <ehabkost@redhat.com>
-To: Paolo Bonzini <pbonzini@redhat.com>,
- Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
- Peter Maydell <peter.maydell@linaro.org>,
- Igor Mammedov <imammedo@redhat.com>, Richard Henderson <rth@twiddle.net>,
- qemu-devel@nongnu.org
-Subject: [PULL 16/18] i386: Fix legacy guest with xsave panic on host kvm
- without update cpuid.
-Date: Tue, 15 Oct 2019 18:37:43 -0300
-Message-Id: <20191015213745.22174-17-ehabkost@redhat.com>
-In-Reply-To: <20191015213745.22174-1-ehabkost@redhat.com>
-References: <20191015213745.22174-1-ehabkost@redhat.com>
+ (envelope-from <richard.henderson@linaro.org>) id 1iKUvP-00008E-7I
+ for qemu-devel@nongnu.org; Tue, 15 Oct 2019 18:04:16 -0400
+Received: from mail-pl1-x641.google.com ([2607:f8b0:4864:20::641]:47010)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+ id 1iKUvO-00007y-W2
+ for qemu-devel@nongnu.org; Tue, 15 Oct 2019 18:04:15 -0400
+Received: by mail-pl1-x641.google.com with SMTP id q24so10217234plr.13
+ for <qemu-devel@nongnu.org>; Tue, 15 Oct 2019 15:04:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=WlM9qJ26FVCtq2jMelepxWIYCn2U4CiSRTZw+YpUCb8=;
+ b=e+o7Flo/RQIdkm3zHprASXlgV+xKalpnNuUy66Cg4pWH2jsaB12eTKbyOX1XHcS2RW
+ aglfuAnOOkt2Izir/zLe5YrkGtMeLQd0K6LjUBMnwW2lWDPOwtyOhXStbVpJInUVHubz
+ UzRH8F/z3uL6Ml1nqWUAe5sSYdk8qwr3gY3fSkGCmYFx/LzlTI4KskfJzgWOZ7QxHbx+
+ pyBIrziISb8v/QfN8zTxKdxtNYH563nJkGhDr9N8HAeHV/dCotuNcsQ51vEi6BDkIBvQ
+ 5/e9+arnYRUOGoXS89fvKEqcF0caGde7VzBbMwA2JsP9O1KpBdn4nFW3P59zv1KZg6E3
+ VXdw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=WlM9qJ26FVCtq2jMelepxWIYCn2U4CiSRTZw+YpUCb8=;
+ b=c0vCG6OmozeukhAgjrdJ4eQOjdwbBLqBXrVz+LGWpHj6/5IBhUH5CRes+b0tYBG77j
+ HuIfBXXs9dhFbfK4lUcPnXmDzZiV4tr9KTeVH21xV34T5o+j/Yc8rL4XUH5le1Xb0W0Z
+ oG4braQ8cO0dLcvDP5lflcB+zct0+nUqUnb9HIFVii5Tb8Me/mY4pTfXSne2kmwFCZeh
+ KDWdwuARHHITl2VjVHoOaS2qgIJJ3USoFfHMR0uqpkzoidD+G3ArMfmqT3mIlmQvVDM5
+ j4z1Q2vNxMa5kiSJnvyf70Xx/YU7M1Ky7IoPUPt3zdXVfU2ei4MseETZifMEizK/oqC6
+ ZmgQ==
+X-Gm-Message-State: APjAAAW5gsS97GRD91e6ekdtq/CDATBDkkOKELO69IvujlpcuEFPB4DV
+ yzFfBjAjEXFy7+kXCXd0uXao8g==
+X-Google-Smtp-Source: APXvYqxC6LVo6IFjID5M2Or1B3+YgMiYotmEW1topciVqqIoIlkKxMgd+YuiU72TbGBuJIy1kLlreA==
+X-Received: by 2002:a17:902:bd47:: with SMTP id
+ b7mr3491572plx.124.1571177053361; 
+ Tue, 15 Oct 2019 15:04:13 -0700 (PDT)
+Received: from [192.168.1.11] (97-113-7-119.tukw.qwest.net. [97.113.7.119])
+ by smtp.gmail.com with ESMTPSA id a13sm33727661pfg.10.2019.10.15.15.04.11
+ (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+ Tue, 15 Oct 2019 15:04:12 -0700 (PDT)
+Subject: Re: [PATCH v5 00/22] target/arm: Implement ARMv8.5-MemTag, system mode
+To: Evgenii Stepanov <eugeni.stepanov@gmail.com>
+References: <20191011134744.2477-1-richard.henderson@linaro.org>
+ <CABMLtrhb2n3WbpROs0Qa9hFBObom0Qm60t2nioOyWTtgbpu7HA@mail.gmail.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Openpgp: preference=signencrypt
+Message-ID: <3d53c538-9725-18a8-079f-de490ed586a5@linaro.org>
+Date: Tue, 15 Oct 2019 15:04:10 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.44]); Tue, 15 Oct 2019 21:38:55 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.132.183.28
+In-Reply-To: <CABMLtrhb2n3WbpROs0Qa9hFBObom0Qm60t2nioOyWTtgbpu7HA@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::641
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -72,107 +98,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Bingsong Si <owen.si@ucloud.cn>
+Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Bingsong Si <owen.si@ucloud.cn>
+On 10/15/19 1:39 PM, Evgenii Stepanov wrote:
+> Hi,
+> 
+> please find attached three random fixes for instruction translation
+> and one for syscall emulation.
 
-without kvm commit 412a3c41, CPUID(EAX=3D0xd,ECX=3D0).EBX always equal to=
- 0 even
-through guest update xcr0, this will crash legacy guest(e.g., CentOS 6).
-Below is the call trace on the guest.
+Thanks for the patches.
 
-[    0.000000] kernel BUG at mm/bootmem.c:469!
-[    0.000000] invalid opcode: 0000 [#1] SMP
-[    0.000000] last sysfs file:
-[    0.000000] CPU 0
-[    0.000000] Modules linked in:
-[    0.000000]
-[    0.000000] Pid: 0, comm: swapper Tainted: G           ---------------=
- H  2.6.32-279#2 Red Hat KVM
-[    0.000000] RIP: 0010:[<ffffffff81c4edc4>]  [<ffffffff81c4edc4>] alloc=
-_bootmem_core+0x7b/0x29e
-[    0.000000] RSP: 0018:ffffffff81a01cd8  EFLAGS: 00010046
-[    0.000000] RAX: ffffffff81cb1748 RBX: ffffffff81cb1720 RCX: 000000000=
-1000000
-[    0.000000] RDX: 0000000000000040 RSI: 0000000000000000 RDI: ffffffff8=
-1cb1720
-[    0.000000] RBP: ffffffff81a01d38 R08: 0000000000000000 R09: 000000000=
-0001000
-[    0.000000] R10: 02008921da802087 R11: 00000000ffff8800 R12: 000000000=
-0000000
-[    0.000000] R13: 0000000000000000 R14: 0000000000000000 R15: 000000000=
-1000000
-[    0.000000] FS:  0000000000000000(0000) GS:ffff880002200000(0000) knlG=
-S:0000000000000000
-[    0.000000] CS:  0010 DS: 0018 ES: 0018 CR0: 0000000080050033
-[    0.000000] CR2: 0000000000000000 CR3: 0000000001a85000 CR4: 000000000=
-01406b0
-[    0.000000] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 000000000=
-0000000
-[    0.000000] DR3: 0000000000000000 DR6: 00000000ffff0ff0 DR7: 000000000=
-0000400
-[    0.000000] Process swapper (pid: 0, threadinfo ffffffff81a00000, task=
- ffffffff81a8d020)
-[    0.000000] Stack:
-[    0.000000]  0000000000000002 81a01dd881eaf060 000000007e5fe227 000000=
-0000001001
-[    0.000000] <d> 0000000000000040 0000000000000001 0000006cffffffff 000=
-0000001000000
-[    0.000000] <d> ffffffff81cb1720 0000000000000000 0000000000000000 000=
-0000000000000
-[    0.000000] Call Trace:
-[    0.000000]  [<ffffffff81c4f074>] ___alloc_bootmem_nopanic+0x8d/0xca
-[    0.000000]  [<ffffffff81c4f0cf>] ___alloc_bootmem+0x11/0x39
-[    0.000000]  [<ffffffff81c4f172>] __alloc_bootmem+0xb/0xd
-[    0.000000]  [<ffffffff814d42d9>] xsave_cntxt_init+0x249/0x2c0
-[    0.000000]  [<ffffffff814e0689>] init_thread_xstate+0x17/0x25
-[    0.000000]  [<ffffffff814e0710>] fpu_init+0x79/0xaa
-[    0.000000]  [<ffffffff814e27e3>] cpu_init+0x301/0x344
-[    0.000000]  [<ffffffff81276395>] ? sort+0x155/0x230
-[    0.000000]  [<ffffffff81c30cf2>] trap_init+0x24e/0x25f
-[    0.000000]  [<ffffffff81c2bd73>] start_kernel+0x21c/0x430
-[    0.000000]  [<ffffffff81c2b33a>] x86_64_start_reservations+0x125/0x12=
-9
-[    0.000000]  [<ffffffff81c2b438>] x86_64_start_kernel+0xfa/0x109
-[    0.000000] Code: 03 48 89 f1 49 c1 e8 0c 48 0f af d0 48 c7 c6 00 a6 6=
-1 81 48 c7 c7 00 e5 79 81 31 c0 4c 89 74 24 08 e8 f2 d7 89 ff 4d 85 e4 75=
- 04 <0f> 0b eb fe 48 8b 45 c0 48 83 e8 01 48 85 45
-c0 74 04 0f 0b eb
+> @@ -2763,7 +2763,8 @@ static void disas_ldst_pair
+>          return;
+>      }
+>  
+> -    offset <<= size;
+> +    // STGP offset is 16-scaled.
+> +    offset <<= (size + set_tag);
 
-Signed-off-by: Bingsong Si <owen.si@ucloud.cn>
-Message-Id: <20190822042901.16858-1-owen.si@ucloud.cn>
-Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
----
- target/i386/cpu.c | 8 +++++++-
- 1 file changed, 7 insertions(+), 1 deletion(-)
+Right.  I'll fix this with
 
-diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-index daece62c19..b821132b6a 100644
---- a/target/i386/cpu.c
-+++ b/target/i386/cpu.c
-@@ -4693,7 +4693,13 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t inde=
-x, uint32_t count,
-             *ecx =3D xsave_area_size(x86_cpu_xsave_components(cpu));
-             *eax =3D env->features[FEAT_XSAVE_COMP_LO];
-             *edx =3D env->features[FEAT_XSAVE_COMP_HI];
--            *ebx =3D xsave_area_size(env->xcr0);
-+            /*
-+             * The initial value of xcr0 and ebx =3D=3D 0, On host witho=
-ut kvm
-+             * commit 412a3c41(e.g., CentOS 6), the ebx's value always =3D=
-=3D 0
-+             * even through guest update xcr0, this will crash some lega=
-cy guest
-+             * (e.g., CentOS 6), So set ebx =3D=3D ecx to workaroud it.
-+             */
-+            *ebx =3D kvm_enabled() ? *ecx : xsave_area_size(env->xcr0);
-         } else if (count =3D=3D 1) {
-             *eax =3D env->features[FEAT_XSAVE];
-         } else if (count < ARRAY_SIZE(x86_ext_save_areas)) {
---=20
-2.21.0
+    offset <<= (set_tag ? LOG2_TAG_GRANULE : size);
 
+which I think is a bit clearer.
+
+> @@ -3611,7 +3611,7 @@ static void disas_ldst_tag
+>      int rt = extract32(insn, 0, 5);
+>      int rn = extract32(insn, 5, 5);
+>      uint64_t offset = sextract64(insn, 12, 9) << LOG2_TAG_GRANULE;
+> -    int op2 = extract32(insn, 10, 3);
+> +    int op2 = extract32(insn, 10, 2);
+
+Yep.
+
+> @@ -3679,7 +3679,7 @@ static void disas_ldst_tag(DisasContext *s, uint32_t insn)
+>      }
+>  
+>      dirty_addr = read_cpu_reg_sp(s, rn, true);
+> -    if (index <= 0) {
+> +    if (index >= 0) {
+>          /* pre-index or signed offset */
+>          tcg_gen_addi_i64(dirty_addr, dirty_addr, offset);
+>      }
+> @@ -3726,7 +3726,7 @@ static void disas_ldst_tag(DisasContext *s, uint32_t insn)
+>  
+>      if (index != 0) {
+>          /* pre-index or post-index */
+> -        if (index > 0) {
+> +        if (index < 0) {
+>              /* post-index */
+>              tcg_gen_addi_i64(dirty_addr, dirty_addr, offset);
+>          }
+
+Yep.
+
+Ideally there'd be a kernel patch for MTE that works well enough to run RISU on
+the fast model, and I'd be able to compare results.  I suppose in the meantime
+more unit testing will have to do.
+
+> +++ b/linux-user/qemu.h
+> @@ -456,8 +456,16 @@ extern unsigned long guest_stack_size;
+>  #define VERIFY_READ 0
+>  #define VERIFY_WRITE 1 /* implies read access */
+>  
+> +static inline abi_ulong untagged_addr(abi_ulong addr) {
+> +#if TARGET_ABI_BITS == 64
+> +    addr &= (((abi_ulong)-1) >> 8);
+> +#endif
+> +    return addr;
+> +}
+
+At minimum this needs TARGET_AARCH64, because this kernel feature doesn't apply
+to other targets.  But I'll see if I can do this such that it doesn't put
+target-specific stuff in linux-user/qemu.h.
+
+
+r~
 
