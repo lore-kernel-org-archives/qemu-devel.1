@@ -2,82 +2,60 @@ Return-Path: <SRS0=6OCO=YI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 724B2ECE588
-	for <qemu-devel@archiver.kernel.org>; Tue, 15 Oct 2019 14:53:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BCE46ECE588
+	for <qemu-devel@archiver.kernel.org>; Tue, 15 Oct 2019 14:53:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3CC1C2054F
-	for <qemu-devel@archiver.kernel.org>; Tue, 15 Oct 2019 14:53:07 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hMPbKjDk"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3CC1C2054F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 966D02054F
+	for <qemu-devel@archiver.kernel.org>; Tue, 15 Oct 2019 14:53:08 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 966D02054F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47384 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47388 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iKOC9-0000lJ-VB
-	for qemu-devel@archiver.kernel.org; Tue, 15 Oct 2019 10:53:05 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38381)
+	id 1iKOCB-0000rU-F0
+	for qemu-devel@archiver.kernel.org; Tue, 15 Oct 2019 10:53:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36608)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <lantianyu1986@gmail.com>) id 1iKNvy-0006qu-E9
- for qemu-devel@nongnu.org; Tue, 15 Oct 2019 10:36:23 -0400
+ (envelope-from <mreitz@redhat.com>) id 1iKNoS-0007Td-Qr
+ for qemu-devel@nongnu.org; Tue, 15 Oct 2019 10:28:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <lantianyu1986@gmail.com>) id 1iKNvx-0003Mg-AF
- for qemu-devel@nongnu.org; Tue, 15 Oct 2019 10:36:22 -0400
-Received: from mail-pl1-x642.google.com ([2607:f8b0:4864:20::642]:42514)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <lantianyu1986@gmail.com>)
- id 1iKNvx-0003MI-2U
- for qemu-devel@nongnu.org; Tue, 15 Oct 2019 10:36:21 -0400
-Received: by mail-pl1-x642.google.com with SMTP id e5so9681253pls.9
- for <qemu-devel@nongnu.org>; Tue, 15 Oct 2019 07:36:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:cc:subject:date:message-id;
- bh=cLAwBrnafbrt9J1uJn5jsQACw4S4ae1p8THVsWr/E1g=;
- b=hMPbKjDkqDoi0WTHeuY3YNKQOZURFyiBP95maDFM8tmxUOUUb5LxRgI8zktGTVcF5S
- 40qdEJLj4Tv6MITgm3lvDhtfRXIwhdExKHpln6zYABvcUPrBcibPxzn+oPCsyoa0cSGi
- SSWMF29uPKgpRPix6BL5YV/38X6io8hhwci8tCVzYAREAOmRIRXcgO/jTYphbQNB7c9Y
- srgLqZz/gsc+1qJPjJBD8txC+K/WVNghN9EL7l4T8rAKHEYxdvCOmp8PJIhzZbBEWim4
- 1BLc/+su3BDOyDN5SxHJNtEPvXnPR+DwP3g1rYBhImPvz5OQPhLyVzpjiaHaKuFcMPzw
- hmXQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id;
- bh=cLAwBrnafbrt9J1uJn5jsQACw4S4ae1p8THVsWr/E1g=;
- b=iX7eJxvTT+IL3EXEWh0syyy/Xi7/soe1O3/mT2i9p/BZOM+n9NbzCaLEXousLcONin
- +4VkARLM0IvwppcIqBdJS27qI1dcLM2hDPjD+RvyJ7qliMGLhnHhTRsf4OjeX8pTkA+Y
- WJLldkCAwdJqTxqAbSbBbLQwwHjHIQiNCOaG+B39Zy8EtcIGsRzHalDRUIKGlQkhPqTG
- DPapMqRz7OdF6vkyNXpwCNlUuR0GuYgSlqQ95AFszKz8AR4Rwbb8hmxMPlElPDdvh3MV
- MywBV42XUa8EyyOVgHZg2GjScS9psbCZpPA0r51DjNxZ+vyAZWTtbs+Rb+hm9w1gGCbE
- xKuw==
-X-Gm-Message-State: APjAAAXQTZIkCyHoEVjvD9GMTWxaYDiLkQPdkgnJHSp9M2oeJgWKVzyx
- /dX50QlgSHUyEGebunW6HPU=
-X-Google-Smtp-Source: APXvYqzF5pVPQErQhvHW99GLzPBhE8631lYzEVomzsVgfCIHBcKlZ9qSzfVbW15Q253AW9Hl83LDHw==
-X-Received: by 2002:a17:902:8ecc:: with SMTP id
- x12mr36755018plo.189.1571150179735; 
- Tue, 15 Oct 2019 07:36:19 -0700 (PDT)
-Received: from localhost.corp.microsoft.com ([167.220.255.39])
- by smtp.googlemail.com with ESMTPSA id v43sm4913165pjb.1.2019.10.15.07.36.16
- (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
- Tue, 15 Oct 2019 07:36:18 -0700 (PDT)
-From: lantianyu1986@gmail.com
-X-Google-Original-From: Tianyu.Lan@microsoft.com
-To: mst@redhat.com, cohuck@redhat.com, pbonzini@redhat.com, rth@twiddle.net,
- ehabkost@redhat.com, mtosatti@redhat.com, rkagan@virtuozzo.com
-Subject: [PATCH V2 0/2] target/i386/kvm: Add Hyper-V direct tlb flush support
-Date: Tue, 15 Oct 2019 22:36:08 +0800
-Message-Id: <20191015143610.31857-1-Tianyu.Lan@microsoft.com>
-X-Mailer: git-send-email 2.14.5
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::642
+ (envelope-from <mreitz@redhat.com>) id 1iKNoR-0000Pj-HM
+ for qemu-devel@nongnu.org; Tue, 15 Oct 2019 10:28:36 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:64618)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>)
+ id 1iKNoO-0000NC-Nz; Tue, 15 Oct 2019 10:28:32 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id EE9BC306F4AE;
+ Tue, 15 Oct 2019 14:28:31 +0000 (UTC)
+Received: from localhost (ovpn-117-226.ams2.redhat.com [10.36.117.226])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 5DC0A6402A;
+ Tue, 15 Oct 2019 14:28:31 +0000 (UTC)
+From: Max Reitz <mreitz@redhat.com>
+To: qemu-block@nongnu.org
+Subject: [PATCH v2 21/21] iotests: Allow check -o data_file
+Date: Tue, 15 Oct 2019 16:27:29 +0200
+Message-Id: <20191015142729.18123-22-mreitz@redhat.com>
+In-Reply-To: <20191015142729.18123-1-mreitz@redhat.com>
+References: <20191015142729.18123-1-mreitz@redhat.com>
+MIME-Version: 1.0
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.42]); Tue, 15 Oct 2019 14:28:32 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,59 +67,120 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Tianyu Lan <Tianyu.Lan@microsoft.com>, qemu-devel@nongnu.org,
- kvm@vger.kernel.org
+Cc: Kevin Wolf <kwolf@redhat.com>, Maxim Levitsky <mlevitsk@redhat.com>,
+ qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Tianyu Lan <Tianyu.Lan@microsoft.com>
+The problem with allowing the data_file option is that you want to use a
+different data file per image used in the test.  Therefore, we need to
+allow patterns like -o data_file=3D'$TEST_IMG.data_file'.
 
-This patchset is to enable Hyper-V direct tlbflush
-feature. The feature is to let L0 hypervisor to handle
-tlb flush hypercall for L1 hypervisor.
+Then, we need to filter it out from qemu-img map, qemu-img create, and
+remove the data file in _rm_test_img.
 
-Tianyu Lan (2):
-  linux headers: update against Linux 5.4-rc2
-  target/i386/kvm: Add Hyper-V direct tlb flush support
+Signed-off-by: Max Reitz <mreitz@redhat.com>
+---
+ tests/qemu-iotests/common.filter | 23 +++++++++++++++++++++--
+ tests/qemu-iotests/common.rc     | 22 +++++++++++++++++++++-
+ 2 files changed, 42 insertions(+), 3 deletions(-)
 
- docs/hyperv.txt                              | 12 +++++
- include/standard-headers/asm-x86/bootparam.h |  2 +
- include/standard-headers/asm-x86/kvm_para.h  |  1 +
- include/standard-headers/linux/ethtool.h     | 24 ++++++++++
- include/standard-headers/linux/pci_regs.h    | 19 +++++++-
- include/standard-headers/linux/virtio_ids.h  |  2 +
- include/standard-headers/linux/virtio_pmem.h |  6 +--
- linux-headers/asm-arm/kvm.h                  | 16 ++++++-
- linux-headers/asm-arm/unistd-common.h        |  2 +
- linux-headers/asm-arm64/kvm.h                | 21 +++++++-
- linux-headers/asm-generic/mman-common.h      | 18 ++++---
- linux-headers/asm-generic/mman.h             | 10 ++--
- linux-headers/asm-generic/unistd.h           | 10 +++-
- linux-headers/asm-mips/mman.h                |  3 ++
- linux-headers/asm-mips/unistd_n32.h          |  2 +
- linux-headers/asm-mips/unistd_n64.h          |  2 +
- linux-headers/asm-mips/unistd_o32.h          |  2 +
- linux-headers/asm-powerpc/mman.h             |  6 +--
- linux-headers/asm-powerpc/unistd_32.h        |  2 +
- linux-headers/asm-powerpc/unistd_64.h        |  2 +
- linux-headers/asm-s390/kvm.h                 |  6 +++
- linux-headers/asm-s390/unistd_32.h           |  2 +
- linux-headers/asm-s390/unistd_64.h           |  2 +
- linux-headers/asm-x86/kvm.h                  | 28 ++++++++---
- linux-headers/asm-x86/unistd.h               |  2 +-
- linux-headers/asm-x86/unistd_32.h            |  2 +
- linux-headers/asm-x86/unistd_64.h            |  2 +
- linux-headers/asm-x86/unistd_x32.h           |  2 +
- linux-headers/linux/kvm.h                    | 12 ++++-
- linux-headers/linux/psp-sev.h                |  5 +-
- linux-headers/linux/vfio.h                   | 71 ++++++++++++++++++++--------
- target/i386/cpu.c                            |  2 +
- target/i386/cpu.h                            |  1 +
- target/i386/kvm.c                            | 23 +++++++++
- 34 files changed, 263 insertions(+), 59 deletions(-)
-
--- 
-2.14.5
+diff --git a/tests/qemu-iotests/common.filter b/tests/qemu-iotests/common=
+.filter
+index 63bc6f6f26..9dd05689d1 100644
+--- a/tests/qemu-iotests/common.filter
++++ b/tests/qemu-iotests/common.filter
+@@ -121,7 +121,13 @@ _filter_actual_image_size()
+ # replace driver-specific options in the "Formatting..." line
+ _filter_img_create()
+ {
+-    $SED -e "s#$REMOTE_TEST_DIR#TEST_DIR#g" \
++    data_file_filter=3D()
++    if data_file=3D$(_get_data_file "$TEST_IMG"); then
++        data_file_filter=3D(-e "s# data_file=3D$data_file##")
++    fi
++
++    $SED "${data_file_filter[@]}" \
++        -e "s#$REMOTE_TEST_DIR#TEST_DIR#g" \
+         -e "s#$IMGPROTO:$TEST_DIR#TEST_DIR#g" \
+         -e "s#$TEST_DIR#TEST_DIR#g" \
+         -e "s#$IMGFMT#IMGFMT#g" \
+@@ -204,9 +210,22 @@ _filter_img_info()
+ # human and json output
+ _filter_qemu_img_map()
+ {
++    # Assuming the data_file value in $IMGOPTS contains a '$TEST_IMG',
++    # create a filter that replaces the data file name by $TEST_IMG.
++    # Example:
++    #   In $IMGOPTS: 'data_file=3D$TEST_IMG.data_file'
++    #   Then data_file_pattern =3D=3D '\(.*\).data_file'
++    #   And  data_file_filter  =3D=3D -e 's#\(.*\).data_file#\1#
++    data_file_filter=3D()
++    if data_file_pattern=3D$(_get_data_file '\\(.*\\)'); then
++        data_file_filter=3D(-e "s#$data_file_pattern#\\1#")
++    fi
++
+     $SED -e 's/\([0-9a-fx]* *[0-9a-fx]* *\)[0-9a-fx]* */\1/g' \
+         -e 's/"offset": [0-9]\+/"offset": OFFSET/g' \
+-        -e 's/Mapped to *//' | _filter_testdir | _filter_imgfmt
++        -e 's/Mapped to *//' \
++        "${data_file_filter[@]}" \
++        | _filter_testdir | _filter_imgfmt
+ }
+=20
+ _filter_nbd()
+diff --git a/tests/qemu-iotests/common.rc b/tests/qemu-iotests/common.rc
+index f3784077de..bed789a691 100644
+--- a/tests/qemu-iotests/common.rc
++++ b/tests/qemu-iotests/common.rc
+@@ -277,6 +277,20 @@ _stop_nbd_server()
+     fi
+ }
+=20
++# Gets the data_file value from IMGOPTS and replaces the '$TEST_IMG'
++# pattern by '$1'
++# Caution: The replacement is done with sed, so $1 must be escaped
++#          properly.  (The delimiter is '#'.)
++_get_data_file()
++{
++    if ! echo "$IMGOPTS" | grep -q 'data_file=3D'; then
++        return 1
++    fi
++
++    echo "$IMGOPTS" | sed -e 's/.*data_file=3D\([^,]*\).*/\1/' \
++                    | sed -e "s#\\\$TEST_IMG#$1#"
++}
++
+ _make_test_img()
+ {
+     # extra qemu-img options can be added by tests
+@@ -297,7 +311,8 @@ _make_test_img()
+     fi
+=20
+     if [ -n "$IMGOPTS" ]; then
+-        optstr=3D$(_optstr_add "$optstr" "$IMGOPTS")
++        imgopts_expanded=3D$(echo "$IMGOPTS" | sed -e "s#\\\$TEST_IMG#$i=
+mg_name#")
++        optstr=3D$(_optstr_add "$optstr" "$imgopts_expanded")
+     fi
+     if [ -n "$IMGKEYSECRET" ]; then
+         object_options=3D"--object secret,id=3Dkeysec0,data=3D$IMGKEYSEC=
+RET"
+@@ -376,6 +391,11 @@ _rm_test_img()
+         # Remove all the extents for vmdk
+         "$QEMU_IMG" info "$img" 2>/dev/null | grep 'filename:' | cut -f =
+2 -d: \
+             | xargs -I {} rm -f "{}"
++    elif [ "$IMGFMT" =3D "qcow2" ]; then
++        # Remove external data file
++        if data_file=3D$(_get_data_file "$img"); then
++            rm -f "$data_file"
++        fi
+     fi
+     rm -f "$img"
+ }
+--=20
+2.21.0
 
 
