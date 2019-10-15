@@ -2,64 +2,87 @@ Return-Path: <SRS0=6OCO=YI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=0.2 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,URIBL_SBL,URIBL_SBL_A autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C61AECE58E
-	for <qemu-devel@archiver.kernel.org>; Tue, 15 Oct 2019 08:57:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 15112C10F14
+	for <qemu-devel@archiver.kernel.org>; Tue, 15 Oct 2019 09:03:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1D9552089C
-	for <qemu-devel@archiver.kernel.org>; Tue, 15 Oct 2019 08:57:56 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1D9552089C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id CAF1420659
+	for <qemu-devel@archiver.kernel.org>; Tue, 15 Oct 2019 09:03:54 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ayyGywGm"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CAF1420659
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37926 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38046 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iKIeR-0007fK-8T
-	for qemu-devel@archiver.kernel.org; Tue, 15 Oct 2019 04:57:55 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33664)
+	id 1iKIkD-0000hM-Tq
+	for qemu-devel@archiver.kernel.org; Tue, 15 Oct 2019 05:03:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34226)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgilbert@redhat.com>) id 1iKIdp-0007C5-Fr
- for qemu-devel@nongnu.org; Tue, 15 Oct 2019 04:57:18 -0400
+ (envelope-from <marcandre.lureau@gmail.com>) id 1iKIjL-0000DG-Ix
+ for qemu-devel@nongnu.org; Tue, 15 Oct 2019 05:03:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgilbert@redhat.com>) id 1iKIdn-0005xX-GX
- for qemu-devel@nongnu.org; Tue, 15 Oct 2019 04:57:16 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:38662)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1iKIdn-0005xM-7x
- for qemu-devel@nongnu.org; Tue, 15 Oct 2019 04:57:15 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 14EEB81DE0
- for <qemu-devel@nongnu.org>; Tue, 15 Oct 2019 08:57:14 +0000 (UTC)
-Received: from work-vm (ovpn-117-145.ams2.redhat.com [10.36.117.145])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 2181219C58;
- Tue, 15 Oct 2019 08:57:07 +0000 (UTC)
-Date: Tue, 15 Oct 2019 09:57:05 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: Juan Quintela <quintela@redhat.com>
-Subject: Re: [PATCH 1/2] migration: Boost SaveStateEntry.instance_id to 64 bits
-Message-ID: <20191015085705.GB3073@work-vm>
-References: <20191015075444.10955-1-peterx@redhat.com>
- <20191015075444.10955-2-peterx@redhat.com>
- <87lftmqtvi.fsf@trasno.org>
+ (envelope-from <marcandre.lureau@gmail.com>) id 1iKIjK-00012J-2O
+ for qemu-devel@nongnu.org; Tue, 15 Oct 2019 05:02:59 -0400
+Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:37607)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+ id 1iKIjJ-00011H-Qt
+ for qemu-devel@nongnu.org; Tue, 15 Oct 2019 05:02:58 -0400
+Received: by mail-wm1-x341.google.com with SMTP id f22so19377939wmc.2
+ for <qemu-devel@nongnu.org>; Tue, 15 Oct 2019 02:02:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=Ikz63hKXJFAavngMtRsz875yRuwWOF8eQJx4CGhwIsA=;
+ b=ayyGywGmsSA159l6vn/Ot3dfbfw4ptamDKlbpC/0wZhPR4GcZCdI2upRhmB3zYXrxa
+ 17Q0fVvfL3MXcyQsA/JTuZsDtTKfWcqtNp0SbMFJo1t4q2DeWrSwr6ZRkLTYEN/iTeub
+ 5myn77++gH1gFBQPVI0r8OTwmdSvVTTx7TupZkrHocQCYuYg76vCJXo/eFdjHtSrX6EG
+ rMsc1QoAiRVGcWOk0cozsRFn8Vh4Kyd/okcUz5llVzLv6oFIH59ggnO32e8E6QKOpUR0
+ PxUD7HxyUQHFB8AMu4fX/P2IiTIjTi980/26Z/JANnRLNLLr1rHrDqeKlYQ8nwJBRfy+
+ JtZg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=Ikz63hKXJFAavngMtRsz875yRuwWOF8eQJx4CGhwIsA=;
+ b=JbEqqnOxySJ4d1Hir7kBWS41bj8fcQcQI+87ahO/noWd2M44LKsGcQEKSDfhWLxu+y
+ 5Cd+RRBTlE8JsnmqALRADnPx1zKRbrABoyWa167HHWWeHijwTvM0XGfT1TAqRxjIrAaP
+ aPreEC6Xd9XRv0Dfgb09zY9sszFqQnuILVRHqJU2HfAcAWaekHe41RSY7oMjRD7ll7KV
+ g31kBWDSHUVTRNzGtjUqgR1/k8aini2Oyvwuh+65rW899copPTH885dtm7OfJiYBzS5B
+ pLfE/uoazjVrbwPpBKHlUFu5SLsNa8F1LyMtCVKBgeeF6Hj1oL8j1Bq0+d+eDxJA8K2J
+ Xupg==
+X-Gm-Message-State: APjAAAVh+JuoTjYgdOsIx3N81Pop3s64abwJccHKZarYs26ZxGuIhGNc
+ tfQrzOClR8BCgrpIFKZQiDrQR5ieZ/mwqFGJIi8=
+X-Google-Smtp-Source: APXvYqyqKXs1xJttlcYFmq/50pGkXDPPDp03ZsyVU06UUJT+MQ/dmqXZBQyFrGW7QJGYuxPCfXx/sgQMFCj5QV00blk=
+X-Received: by 2002:a1c:9a43:: with SMTP id c64mr18028454wme.20.1571130176371; 
+ Tue, 15 Oct 2019 02:02:56 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <87lftmqtvi.fsf@trasno.org>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.25]); Tue, 15 Oct 2019 08:57:14 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.132.183.28
+References: <CALvKS=E-t1c+BVDn=0RbM8nBry8GcYOXh-PrziQO7XhS7W2NUw@mail.gmail.com>
+ <CALvKS=GB1-zDnkKxei6Dn5MNyr5kwj+vEtD_3MZyVNfzqQuRZg@mail.gmail.com>
+ <CAFEAcA-gLHm0D6vR0Rvpbi_bbVWpKspvm8YLSVPHpCVP6HmDUg@mail.gmail.com>
+ <20191015082708.GB22859@redhat.com>
+ <0a4262f8-df07-e83e-0928-b6cf4e12800d@redhat.com>
+ <20191015084722.GD22859@redhat.com>
+In-Reply-To: <20191015084722.GD22859@redhat.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Tue, 15 Oct 2019 11:02:43 +0200
+Message-ID: <CAJ+F1CJACARosH6agtDQoyo6VoubYfrRm5z6DpiiV+fdw0U8aQ@mail.gmail.com>
+Subject: Re: RFC: Why dont we move to newer capstone?
+To: =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::341
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -71,160 +94,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>,
- qemu-devel@nongnu.org, Peter Xu <peterx@redhat.com>,
- Igor Mammedov <imammedo@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ QEMU Developers <qemu-devel@nongnu.org>,
+ Lucien Murray-Pitts <lucienmp.qemu@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-* Juan Quintela (quintela@redhat.com) wrote:
-> Peter Xu <peterx@redhat.com> wrote:
-> > It was "int" and used as 32bits fields (see save_section_header()).
-> > It's unsafe already because sizeof(int) could be 2 on i386, I think.
-> > So at least uint32_t would suite more.  While it also uses "-1" as a
-> > placeholder of "we want to generate the instance ID automatically".
-> > Hence a more proper value should be int64_t.
+Hi
+
+On Tue, Oct 15, 2019 at 10:48 AM Daniel P. Berrang=C3=A9 <berrange@redhat.c=
+om> wrote:
+>
+> On Tue, Oct 15, 2019 at 10:36:40AM +0200, Thomas Huth wrote:
+> > On 15/10/2019 10.27, Daniel P. Berrang=C3=A9 wrote:
+> > > On Sat, Oct 05, 2019 at 02:33:34PM +0100, Peter Maydell wrote:
+> > >> On Sat, 5 Oct 2019 at 11:21, Lucien Murray-Pitts
+> > >> <lucienmp.qemu@gmail.com> wrote:
+> > >>> Whilst working on a m68k patch I noticed that the capstone in use
+> > >>> today (3.0) doesnt support the M68K and thus a hand turned disasm
+> > >>> function is used.
+> > >>>
+> > >>> The newer capstone (5.0) appears to support a few more CPU, inc. m6=
+8k.
+> > >>>
+> > >>> Why we move to this newer capstone?
+> > >>
+> > >> Moving to a newer capstone sounds like a good idea. The only
+> > >> reason we haven't moved forward as far as I'm aware is that
+> > >> nobody has done the work to send a patch to do that move
+> > >> forward to the newer version. Richard Henderson would
+> > >> probably know if there was any other blocker.
+> > >
+> > > Bearing in mind our distro support policy, we need to continue to
+> > > support 3.0 series of capstone for a while yet based on what I
+> > > see in various distros. eg Ubuntu 18.04 LTS has 3.0.4, as does
+> > > Fedora 29.  Version 4.0 is only in a few very new distros:
+> > >
+> > >    https://repology.org/project/capstone/versions
+> > >
+> > > We can of course use features from newer capstone, *provided* we corr=
+ectly
+> > > do conditional compilation so that we can still build against 3.0 ser=
+ies
+> > > on distros that have that version.
 > >
-> > This will start to be useful after next patch in which we can start to
-> > convert a real uint32_t value as instance ID.
-> >
-> > Signed-off-by: Peter Xu <peterx@redhat.com>
-> 
-> Hi
-> 
-> Being more helpful,  I think that it is better to just:
-> 
-> * change instance_id to be an uint32_t (notice that for all architectures
->   that we support, it is actually int32_t).
-> 
-> * export calculate_new_instance_id() and adjust callers that use -1.
-> 
-> or
-> 
-> * export a new function that just use the calculate_new_instance_id()
+> > We're embedding the capstone submodule in the release tarballs, so I
+> > think we're independent from the distro release, aren't we? So this
+> > should not be an issue, as far as I can see.
+>
+> It is an issue for people/distros who don't want to building with bundled
+> 3rd party code.
+>
+> I'd suggest it is probably time we could drop the capstone git submodule.
+> We originally added it because capstone wasn't widely present in distros
+> we care about. AFAICT, it is now present in all the distros, so could be
+> treated the same way as any other 3rd party library dep we have.
 
-Do you mean that we end up with two functions, one that does it
-automatically, and one that takes an ID?
+I suppose the same applies to dtc (1.4.2 required by qemu, but xenial
+has 1.4.0... so we have to wait until April 26, 2020? 18.04 LTS
+release date + 2y).
 
-Dave
-
-> A fast search shows:
-> 
-> 10 callers of vmstate_register() with -1
-> 1 caller of vmstate_register_with_alias_id with -1 (but it is the one
->   that sets all qdev devices).
-> 1 caller of vmstate_register_with_alias_id in apic, where it can be -1.
-> 1 caller of register_savevm_live() with -1 (spapr)
-> 
-> And call it a day?
-> 
-> What do you think, Juan.
-
-> 
-> > ---
-> >  include/migration/register.h |  2 +-
-> >  include/migration/vmstate.h  |  4 ++--
-> >  migration/savevm.c           | 10 +++++-----
-> >  stubs/vmstate.c              |  2 +-
-> >  4 files changed, 9 insertions(+), 9 deletions(-)
-> >
-> > diff --git a/include/migration/register.h b/include/migration/register.h
-> > index a13359a08d..54f42c7413 100644
-> > --- a/include/migration/register.h
-> > +++ b/include/migration/register.h
-> > @@ -69,7 +69,7 @@ typedef struct SaveVMHandlers {
-> >  } SaveVMHandlers;
-> >  
-> >  int register_savevm_live(const char *idstr,
-> > -                         int instance_id,
-> > +                         int64_t instance_id,
-> >                           int version_id,
-> >                           const SaveVMHandlers *ops,
-> >                           void *opaque);
-> > diff --git a/include/migration/vmstate.h b/include/migration/vmstate.h
-> > index 1fbfd099dd..6a7498463c 100644
-> > --- a/include/migration/vmstate.h
-> > +++ b/include/migration/vmstate.h
-> > @@ -1114,14 +1114,14 @@ int vmstate_save_state_v(QEMUFile *f, const VMStateDescription *vmsd,
-> >  bool vmstate_save_needed(const VMStateDescription *vmsd, void *opaque);
-> >  
-> >  /* Returns: 0 on success, -1 on failure */
-> > -int vmstate_register_with_alias_id(DeviceState *dev, int instance_id,
-> > +int vmstate_register_with_alias_id(DeviceState *dev, int64_t instance_id,
-> >                                     const VMStateDescription *vmsd,
-> >                                     void *base, int alias_id,
-> >                                     int required_for_version,
-> >                                     Error **errp);
-> >  
-> >  /* Returns: 0 on success, -1 on failure */
-> > -static inline int vmstate_register(DeviceState *dev, int instance_id,
-> > +static inline int vmstate_register(DeviceState *dev, int64_t instance_id,
-> >                                     const VMStateDescription *vmsd,
-> >                                     void *opaque)
-> >  {
-> > diff --git a/migration/savevm.c b/migration/savevm.c
-> > index bb9462a54d..dc9281c897 100644
-> > --- a/migration/savevm.c
-> > +++ b/migration/savevm.c
-> > @@ -233,7 +233,7 @@ typedef struct CompatEntry {
-> >  typedef struct SaveStateEntry {
-> >      QTAILQ_ENTRY(SaveStateEntry) entry;
-> >      char idstr[256];
-> > -    int instance_id;
-> > +    int64_t instance_id;
-> >      int alias_id;
-> >      int version_id;
-> >      /* version id read from the stream */
-> > @@ -668,7 +668,7 @@ void dump_vmstate_json_to_file(FILE *out_file)
-> >  static int calculate_new_instance_id(const char *idstr)
-> >  {
-> >      SaveStateEntry *se;
-> > -    int instance_id = 0;
-> > +    int64_t instance_id = 0;
-> >  
-> >      QTAILQ_FOREACH(se, &savevm_state.handlers, entry) {
-> >          if (strcmp(idstr, se->idstr) == 0
-> > @@ -730,7 +730,7 @@ static void savevm_state_handler_insert(SaveStateEntry *nse)
-> >     Meanwhile pass -1 as instance_id if you do not already have a clearly
-> >     distinguishing id for all instances of your device class. */
-> >  int register_savevm_live(const char *idstr,
-> > -                         int instance_id,
-> > +                         int64_t instance_id,
-> >                           int version_id,
-> >                           const SaveVMHandlers *ops,
-> >                           void *opaque)
-> > @@ -784,7 +784,7 @@ void unregister_savevm(DeviceState *dev, const char *idstr, void *opaque)
-> >      }
-> >  }
-> >  
-> > -int vmstate_register_with_alias_id(DeviceState *dev, int instance_id,
-> > +int vmstate_register_with_alias_id(DeviceState *dev, int64_t instance_id,
-> >                                     const VMStateDescription *vmsd,
-> >                                     void *opaque, int alias_id,
-> >                                     int required_for_version,
-> > @@ -1566,7 +1566,7 @@ int qemu_save_device_state(QEMUFile *f)
-> >      return qemu_file_get_error(f);
-> >  }
-> >  
-> > -static SaveStateEntry *find_se(const char *idstr, int instance_id)
-> > +static SaveStateEntry *find_se(const char *idstr, int64_t instance_id)
-> >  {
-> >      SaveStateEntry *se;
-> >  
-> > diff --git a/stubs/vmstate.c b/stubs/vmstate.c
-> > index e1e89b87f0..699003f3b0 100644
-> > --- a/stubs/vmstate.c
-> > +++ b/stubs/vmstate.c
-> > @@ -4,7 +4,7 @@
-> >  const VMStateDescription vmstate_dummy = {};
-> >  
-> >  int vmstate_register_with_alias_id(DeviceState *dev,
-> > -                                   int instance_id,
-> > +                                   int64_t instance_id,
-> >                                     const VMStateDescription *vmsd,
-> >                                     void *base, int alias_id,
-> >                                     int required_for_version,
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+libslirp will take even longer.
 
