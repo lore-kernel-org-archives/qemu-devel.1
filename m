@@ -2,69 +2,85 @@ Return-Path: <SRS0=6OCO=YI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 51382C4CECE
-	for <qemu-devel@archiver.kernel.org>; Tue, 15 Oct 2019 01:01:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 839BFC4CECE
+	for <qemu-devel@archiver.kernel.org>; Tue, 15 Oct 2019 01:08:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 25845217D9
-	for <qemu-devel@archiver.kernel.org>; Tue, 15 Oct 2019 01:01:48 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 25845217D9
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id 501FF217D9
+	for <qemu-devel@archiver.kernel.org>; Tue, 15 Oct 2019 01:08:51 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Tuf69UV6"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 501FF217D9
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59136 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59152 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iKBDf-0005iF-8R
-	for qemu-devel@archiver.kernel.org; Mon, 14 Oct 2019 21:01:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34033)
+	id 1iKBKU-0007of-GL
+	for qemu-devel@archiver.kernel.org; Mon, 14 Oct 2019 21:08:50 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34814)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <tao3.xu@intel.com>) id 1iKBC6-0005Dj-7E
- for qemu-devel@nongnu.org; Mon, 14 Oct 2019 21:00:11 -0400
+ (envelope-from <hikarupsp@gmail.com>) id 1iKBJb-000768-Ep
+ for qemu-devel@nongnu.org; Mon, 14 Oct 2019 21:07:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <tao3.xu@intel.com>) id 1iKBC3-0000VT-D1
- for qemu-devel@nongnu.org; Mon, 14 Oct 2019 21:00:09 -0400
-Received: from mga02.intel.com ([134.134.136.20]:39635)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <tao3.xu@intel.com>) id 1iKBC3-0000KP-4b
- for qemu-devel@nongnu.org; Mon, 14 Oct 2019 21:00:07 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga007.fm.intel.com ([10.253.24.52])
- by orsmga101.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
- 14 Oct 2019 17:59:56 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.67,297,1566889200"; d="scan'208";a="195138107"
-Received: from txu2-mobl.ccr.corp.intel.com (HELO [10.239.196.106])
- ([10.239.196.106])
- by fmsmga007.fm.intel.com with ESMTP; 14 Oct 2019 17:59:55 -0700
-Subject: Re: [PATCH v12 09/11] hmat acpi: Build System Locality Latency and
- Bandwidth Information Structure(s)
-To: Igor Mammedov <imammedo@redhat.com>
-References: <20190920074349.2616-1-tao3.xu@intel.com>
- <20190920074349.2616-10-tao3.xu@intel.com>
- <20191003164111.078fdce4@redhat.com>
- <24a4842c-4ce4-3a7f-5032-8e74458de44c@intel.com>
- <20191011160855.6d13eb69@redhat.com>
- <7f431c7c-b745-3001-d0ba-d94f7230b426@intel.com>
- <20191014110030.79fd2e18@redhat.com>
-From: Tao Xu <tao3.xu@intel.com>
-Message-ID: <710e65e8-0558-5c16-1e43-c801cf704b3c@intel.com>
-Date: Tue, 15 Oct 2019 08:59:54 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+ (envelope-from <hikarupsp@gmail.com>) id 1iKBJa-00073v-ES
+ for qemu-devel@nongnu.org; Mon, 14 Oct 2019 21:07:55 -0400
+Received: from mail-pl1-x643.google.com ([2607:f8b0:4864:20::643]:35405)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <hikarupsp@gmail.com>) id 1iKBJa-00073R-97
+ for qemu-devel@nongnu.org; Mon, 14 Oct 2019 21:07:54 -0400
+Received: by mail-pl1-x643.google.com with SMTP id c3so8757690plo.2
+ for <qemu-devel@nongnu.org>; Mon, 14 Oct 2019 18:07:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=6w/id44KoQSpmV9UDEkk07NlV1r3HtkmhgrenrSAqWU=;
+ b=Tuf69UV6R6I9wMaGUPVRCJVvOPivK2V13wCfD0DszvjPA94oxbls425J5zzEA0yiq7
+ TJZqaZ0jOLtkFjBBypuqJeCYCl0hDadoo3b06lZ3PG27JYx6Qq3cVw16DdQ2FaU4PsMd
+ phXnbXjyBKtw282I7j6WKuIRK3pGuqRDex2IurqbkOuaZ6P17S2Pd9Ez9zMGjLjAey44
+ ki43oaHt+nmNExwcFjpkdyXd7ZVJcl87H/tsQYaBzBj6+jnirNh1avT6ddUs4Gal7LOo
+ w+jxWEl3wz+lMXw9PQzZMQOhN+AUm+QMipuOkMRFNF4bLj16+E8sNME0KagK0qMAPTB+
+ NgdQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=6w/id44KoQSpmV9UDEkk07NlV1r3HtkmhgrenrSAqWU=;
+ b=p9d6EWhXbikEnVitdwI4jTeLR/oUZlF+DEehgg0JQ17F9Tybjn1stcmGX63nhhm3GD
+ nXX2q6xfWUM5rAsKwcy8K7sHcWUTc+rnFytHSkU4iJa4pFTb9IFh1vz/ljpc6odLCV1+
+ I6VmnBK360cWtnZWZqkbXYUDCZMbhyoc+3MIcnxp9FywnFdVT2gMr8n4SifB3RS/M/bC
+ wiTGuVUEmAfPbIMWgpONv/9H6HH2tI2Z/cTHj0zJtlAUHOz07vBl8BsofmlcmQqfPLMs
+ D7J2QvhwAvxCbVG4MA7Rx7utcoDDpCn7qck5OhO2pvNDd6wcHa+/WnNoxy1dorRKcRiE
+ II0w==
+X-Gm-Message-State: APjAAAVCj8HJDTNhI0/lK09QCLPkUrClO5A13SSuiT6uIYx9qWi/OP+o
+ 5xDo7x4Hy0VjXPjlS7uzJGkUDhbiyxw=
+X-Google-Smtp-Source: APXvYqw65CeTJk7/GSzfZunCkxgxsPMp3rQk4juePS9efJT8s94mSDqE80d31R6iR1isenqwIlPBgg==
+X-Received: by 2002:a17:902:9008:: with SMTP id
+ a8mr33297664plp.218.1571101672733; 
+ Mon, 14 Oct 2019 18:07:52 -0700 (PDT)
+Received: from t03.z01.hikalium.com.com (113x36x63x49.ap113.ftth.ucom.ne.jp.
+ [113.36.63.49])
+ by smtp.gmail.com with ESMTPSA id z2sm23511296pfq.58.2019.10.14.18.07.50
+ (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+ Mon, 14 Oct 2019 18:07:51 -0700 (PDT)
+From: hikarupsp@gmail.com
+To: qemu-devel@nongnu.org
+Subject: [PATCH v3] ui: Fix hanging up Cocoa display on macOS 10.15 (Catalina)
+Date: Tue, 15 Oct 2019 10:07:34 +0900
+Message-Id: <20191015010734.85229-1-hikarupsp@gmail.com>
+X-Mailer: git-send-email 2.21.0 (Apple Git-122)
 MIME-Version: 1.0
-In-Reply-To: <20191014110030.79fd2e18@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 134.134.136.20
+X-Received-From: 2607:f8b0:4864:20::643
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -76,184 +92,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "ehabkost@redhat.com" <ehabkost@redhat.com>, "Liu,
- Jingqi" <jingqi.liu@intel.com>, "Du, Fan" <fan.du@intel.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "jonathan.cameron@huawei.com" <jonathan.cameron@huawei.com>, "Williams,
- Dan J" <dan.j.williams@intel.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Hikaru Nishida <hikarupsp@gmail.com>, Gerd Hoffmann <kraxel@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 10/14/2019 5:00 PM, Igor Mammedov wrote:
-> On Sat, 12 Oct 2019 11:04:03 +0800
-> Tao Xu <tao3.xu@intel.com> wrote:
-> 
->> On 10/11/2019 10:08 PM, Igor Mammedov wrote:
->>> On Thu, 10 Oct 2019 14:53:56 +0800
->>> Tao Xu <tao3.xu@intel.com> wrote:
->>>    
->>>> On 10/3/2019 10:41 PM, Igor Mammedov wrote:
->>>>> On Fri, 20 Sep 2019 15:43:47 +0800
->>>>> Tao Xu <tao3.xu@intel.com> wrote:
->>>>>       
->>>>>> From: Liu Jingqi <jingqi.liu@intel.com>
->>>>>>
->>>>>> This structure describes the memory access latency and bandwidth
->>>>>> information from various memory access initiator proximity domains.
->>>>>> The latency and bandwidth numbers represented in this structure
->>>>>> correspond to rated latency and bandwidth for the platform.
->>>>>> The software could use this information as hint for optimization.
->>>>>>
->>>>>> Signed-off-by: Liu Jingqi <jingqi.liu@intel.com>
->>>>>> Signed-off-by: Tao Xu <tao3.xu@intel.com>
->>>>>> ---
->>>>>>
->>>>>> Changes in v12:
->>>>>>        - Fix a bug that if HMAT is enabled and without hmat-lb setting,
->>>>>>          QEMU will crash. (reported by Danmei Wei)
->>>>>>
->>>>>> Changes in v11:
->>>>>>        - Calculate base in build_hmat_lb().
->>>>>> ---
->>>>>>     hw/acpi/hmat.c | 126 ++++++++++++++++++++++++++++++++++++++++++++++++-
->>>>>>     hw/acpi/hmat.h |   2 +
->>>>>>     2 files changed, 127 insertions(+), 1 deletion(-)
->>>>>>
->>>>>> diff --git a/hw/acpi/hmat.c b/hw/acpi/hmat.c
->>>>>> index 1368fce7ee..e7be849581 100644
->>>>>> --- a/hw/acpi/hmat.c
->>>>>> +++ b/hw/acpi/hmat.c
->>>>>> @@ -27,6 +27,7 @@
->>>>>>     #include "qemu/osdep.h"
->>>>>>     #include "sysemu/numa.h"
->>>>>>     #include "hw/acpi/hmat.h"
->>>>>> +#include "qemu/error-report.h"
->>>>>>     
->>>>>>     /*
->>>>>>      * ACPI 6.3:
->>>>>> @@ -67,11 +68,105 @@ static void build_hmat_mpda(GArray *table_data, uint16_t flags, int initiator,
->>>>>>         build_append_int_noprefix(table_data, 0, 8);
->>>>>>     }
->>>>>>     
->>>>>> +static bool entry_overflow(uint64_t *lb_data, uint64_t base, int len)
->>>>>> +{
->>>>>> +    int i;
->>>>>> +
->>>>>> +    for (i = 0; i < len; i++) {
->>>>>> +        if (lb_data[i] / base >= UINT16_MAX) {
->>>>>> +            return true;
->>>>>> +        }
->>>>>> +    }
->>>>>> +
->>>>>> +    return false;
->>>>>> +}
->>>>> I suggest to do this check at CLI parsing time
->>>>>       
->>>>>> +/*
->>>>>> + * ACPI 6.3: 5.2.27.4 System Locality Latency and Bandwidth Information
->>>>>> + * Structure: Table 5-146
->>>>>> + */
->>>>>> +static void build_hmat_lb(GArray *table_data, HMAT_LB_Info *hmat_lb,
->>>>>> +                          uint32_t num_initiator, uint32_t num_target,
->>>>>> +                          uint32_t *initiator_list, int type)
->>>>>> +{
->>>>>> +    uint8_t mask = 0x0f;
->>>>>> +    uint32_t s = num_initiator;
->>>>>> +    uint32_t t = num_target;
->>>>> drop this locals and use arguments directly
->>>>>       
->>>>>> +    uint64_t base = 1;
->>>>>> +    uint64_t *lb_data;
->>>>>> +    int i, unit;
->>>>>> +
->>>>>> +    /* Type */
->>>>>> +    build_append_int_noprefix(table_data, 1, 2);
->>>>>> +    /* Reserved */
->>>>>> +    build_append_int_noprefix(table_data, 0, 2);
->>>>>> +    /* Length */
->>>>>> +    build_append_int_noprefix(table_data, 32 + 4 * s + 4 * t + 2 * s * t, 4);
->>>>>                                                 ^^^^
->>>>> to me above looks like /dev/random output, absolutely unreadable.
->>>>> Suggest to use local var (like: lb_length) for expression with comments
->>>>> beside magic numbers.
->>>>>       
->>>>>> +    /* Flags: Bits [3:0] Memory Hierarchy, Bits[7:4] Reserved */
->>>>>> +    build_append_int_noprefix(table_data, hmat_lb->hierarchy & mask, 1);
->>>>>
->>>>> why do you need to use mask here?
->>>>>       
->>>> Because Bits[7:4] Reserved, so I use mask to keep it reserved.
->>>
->>> these bits are not user provided and set to 0, if they get set it's
->>> programming error and instead of masking problem out QEMU should abort,
->>> I suggest replace masking with assert(!foo>>x).
->>>    
->>>>   
->>>>>> +    /* Data Type */
->>>>>> +    build_append_int_noprefix(table_data, hmat_lb->data_type, 1);
->>>>>
->>>>> Isn't hmat_lb->data_type and passed argument 'type' the same?
->>>>>       
->>>> Yes, I will drop 'type'.
->>>>>       
->>>>>> +    /* Reserved */
->>>>>> +    build_append_int_noprefix(table_data, 0, 2);
->>>>>> +    /* Number of Initiator Proximity Domains (s) */
->>>>>> +    build_append_int_noprefix(table_data, s, 4);
->>>>>> +    /* Number of Target Proximity Domains (t) */
->>>>>> +    build_append_int_noprefix(table_data, t, 4);
->>>>>> +    /* Reserved */
->>>>>> +    build_append_int_noprefix(table_data, 0, 4);
->>>>>> +
->>>>>> +    if (HMAT_IS_LATENCY(type)) {
->>>>>> +        unit = 1000;
->>>>>> +        lb_data = hmat_lb->latency;
->>>>>> +    } else {
->>>>>> +        unit = 1024;
->>>>>> +        lb_data = hmat_lb->bandwidth;
->>>>>> +    }
->>>>>> +
->>>>>> +    while (entry_overflow(lb_data, base, s * t)) {
->>>>>> +        for (i = 0; i < s * t; i++) {
->>>>>> +            if (!QEMU_IS_ALIGNED(lb_data[i], unit * base)) {
->>>>>> +                error_report("Invalid latency/bandwidth input, all "
->>>>>> +                "latencies/bandwidths should be specified in the same units.");
->>>>>> +                exit(1);
->>>>>> +            }
->>>>>> +        }
->>>>>> +        base *= unit;
->>>>>> +    }
->>>>> Can you clarify what you are trying to check here?
->>>>>       
->>>> This part I use entry_overflow() to check if uint16 can store entry. If
->>>> can't store and the entries matrix can be divisible by unit * base, then
->>>> base will be unit * base.
->>>>
->>>> For example, if lb_data[i] are 1048576(1TB/s) and 1024(1GB/s), unit is
->>>> 1024, so 1048576 is bigger than UINT16_MAX, and can be divisible by 1024
->>>> * 1, so base is 1024 and entries are 1024 and 1 (see entry =
->>>> hmat_lb->latency[i] / base;). The benefit is even user input different
->>>> unit(TB/s vs GB/s), we can still store the data as far as possible.
->>>
->>> Is it possible instead of doing multiple iterations over lb_data
->>> until it finds valid base, just go over lb_data once to find MIN/MAX
->>> and then calculate base using it. Error out with max/min offending
->>> values if it's not possible to compress the range into uint16_t?
->>>    
->>
->> Although we tell user input same unit data, such as use 1GB/s 3GB/s. If
->> user input data such as 1048575, 1048576(1TB/s) and 1024(1GB/s), then we
->> will get 1024 * (1023 1024 1). I am wondering if it is appropriate
->> because we lose a float number(0.999020). But in our codes, it will
->> raise error.
-> I do not understand what you are trying to say here, could you rephrase
-> it, so the problem would be more clear, please?
-> 
-Sorry, I mean how we treat the data cannot be divisible if we use 
-max/min as base. For another example, If user input the data(including 3 
-bandwidths) : 9GB/s 5GB/s 3GB/s. Then max/min result is 3. But entries 
-should be uint16, (5GB/s)/3 we can only get 1GB/s, then we should raise 
-error(overflow).
-But if this patch, we will get the base is 1GB/s.
+From: Hikaru Nishida <hikarupsp@gmail.com>
+
+macOS API documentation says that before applicationDidFinishLaunching
+is called, any events will not be processed. However, some events are
+fired before it is called in macOS Catalina. This causes deadlock of
+iothread_lock in handleEvent while it will be released after the
+app_started_sem is posted.
+This patch avoids processing events before the app_started_sem is
+posted to prevent this deadlock.
+
+Buglink: https://bugs.launchpad.net/qemu/+bug/1847906
+Signed-off-by: Hikaru Nishida <hikarupsp@gmail.com>
+---
+ ui/cocoa.m | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
+
+diff --git a/ui/cocoa.m b/ui/cocoa.m
+index f12e21df6e..fbb5b1b45f 100644
+--- a/ui/cocoa.m
++++ b/ui/cocoa.m
+@@ -134,6 +134,7 @@
+ 
+ static QemuSemaphore display_init_sem;
+ static QemuSemaphore app_started_sem;
++static bool allow_events;
+ 
+ // Utility functions to run specified code block with iothread lock held
+ typedef void (^CodeBlock)(void);
+@@ -729,6 +730,16 @@ - (void) handleMonitorInput:(NSEvent *)event
+ 
+ - (bool) handleEvent:(NSEvent *)event
+ {
++    if(!allow_events) {
++        /*
++         * Just let OSX have all events that arrive before
++         * applicationDidFinishLaunching.
++         * This avoids a deadlock on the iothread lock, which cocoa_display_init()
++         * will not drop until after the app_started_sem is posted. (In theory
++         * there should not be any such events, but OSX Catalina now emits some.)
++         */
++        return false;
++    }
+     return bool_with_iothread_lock(^{
+         return [self handleEventLocked:event];
+     });
+@@ -1156,6 +1167,7 @@ - (void) dealloc
+ - (void)applicationDidFinishLaunching: (NSNotification *) note
+ {
+     COCOA_DEBUG("QemuCocoaAppController: applicationDidFinishLaunching\n");
++    allow_events = true;
+     /* Tell cocoa_display_init to proceed */
+     qemu_sem_post(&app_started_sem);
+ }
+-- 
+2.21.0 (Apple Git-122)
+
 
