@@ -6,53 +6,54 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 03F29C10F14
-	for <qemu-devel@archiver.kernel.org>; Tue, 15 Oct 2019 16:37:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 96486ECE588
+	for <qemu-devel@archiver.kernel.org>; Tue, 15 Oct 2019 16:37:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D116020650
-	for <qemu-devel@archiver.kernel.org>; Tue, 15 Oct 2019 16:37:17 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D116020650
+	by mail.kernel.org (Postfix) with ESMTPS id 6B1B120650
+	for <qemu-devel@archiver.kernel.org>; Tue, 15 Oct 2019 16:37:39 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6B1B120650
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52744 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52746 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iKPoy-0001aj-NZ
-	for qemu-devel@archiver.kernel.org; Tue, 15 Oct 2019 12:37:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41331)
+	id 1iKPpJ-00028q-VI
+	for qemu-devel@archiver.kernel.org; Tue, 15 Oct 2019 12:37:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41389)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1iKPhd-00026m-If
- for qemu-devel@nongnu.org; Tue, 15 Oct 2019 12:29:42 -0400
+ (envelope-from <philmd@redhat.com>) id 1iKPhu-0002M4-1U
+ for qemu-devel@nongnu.org; Tue, 15 Oct 2019 12:29:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1iKPhc-0005By-F1
- for qemu-devel@nongnu.org; Tue, 15 Oct 2019 12:29:41 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:57614)
+ (envelope-from <philmd@redhat.com>) id 1iKPhs-0005MU-U9
+ for qemu-devel@nongnu.org; Tue, 15 Oct 2019 12:29:57 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:57298)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iKPhc-0005Ba-8v
- for qemu-devel@nongnu.org; Tue, 15 Oct 2019 12:29:40 -0400
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iKPhs-0005Lx-Oa
+ for qemu-devel@nongnu.org; Tue, 15 Oct 2019 12:29:56 -0400
 Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
  [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 547332D7E1;
- Tue, 15 Oct 2019 16:29:39 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 83C9F8E1CE1;
+ Tue, 15 Oct 2019 16:29:55 +0000 (UTC)
 Received: from x1w.redhat.com (ovpn-204-35.brq.redhat.com [10.40.204.35])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id C3D1319C58;
- Tue, 15 Oct 2019 16:29:31 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id B2B1D19C58;
+ Tue, 15 Oct 2019 16:29:48 +0000 (UTC)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 12/32] piix4: rename PIIX4 object to piix4-isa
-Date: Tue, 15 Oct 2019 18:26:45 +0200
-Message-Id: <20191015162705.28087-13-philmd@redhat.com>
+Subject: [PATCH 14/32] piix4: add a i8257 dma controller as specified in
+ datasheet
+Date: Tue, 15 Oct 2019 18:26:47 +0200
+Message-Id: <20191015162705.28087-15-philmd@redhat.com>
 In-Reply-To: <20191015162705.28087-1-philmd@redhat.com>
 References: <20191015162705.28087-1-philmd@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.30]); Tue, 15 Oct 2019 16:29:39 +0000 (UTC)
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.69]); Tue, 15 Oct 2019 16:29:55 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
@@ -72,7 +73,6 @@ Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
  Stefano Stabellini <sstabellini@kernel.org>,
  Eduardo Habkost <ehabkost@redhat.com>, kvm@vger.kernel.org,
  Paul Durrant <paul@xen.org>, "Michael S. Tsirkin" <mst@redhat.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
  Paolo Bonzini <pbonzini@redhat.com>,
  =?UTF-8?q?Herv=C3=A9=20Poussineau?= <hpoussin@reactos.org>,
  Aleksandar Markovic <amarkovic@wavecomp.com>, xen-devel@lists.xenproject.org,
@@ -87,58 +87,62 @@ Sender: "Qemu-devel"
 
 From: Herv=C3=A9 Poussineau <hpoussin@reactos.org>
 
-Other piix4 parts are already named piix4-ide and piix4-usb-uhci.
+Remove i8257 instanciated in malta board, to not have it twice.
 
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 Acked-by: Michael S. Tsirkin <mst@redhat.com>
 Acked-by: Paolo Bonzini <pbonzini@redhat.com>
 Signed-off-by: Herv=C3=A9 Poussineau <hpoussin@reactos.org>
-Message-Id: <20171216090228.28505-15-hpoussin@reactos.org>
+Message-Id: <20171216090228.28505-9-hpoussin@reactos.org>
 [PMD: rebased]
 Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 ---
- hw/isa/piix4.c       | 1 -
- hw/mips/mips_malta.c | 2 +-
- include/hw/isa/isa.h | 2 ++
- 3 files changed, 3 insertions(+), 2 deletions(-)
+ hw/isa/piix4.c       | 4 ++++
+ hw/mips/mips_malta.c | 2 --
+ 2 files changed, 4 insertions(+), 2 deletions(-)
 
 diff --git a/hw/isa/piix4.c b/hw/isa/piix4.c
-index 1cfc51335a..c3a2bd0d70 100644
+index 8998b0ca47..1bc91b590c 100644
 --- a/hw/isa/piix4.c
 +++ b/hw/isa/piix4.c
-@@ -45,7 +45,6 @@ typedef struct PIIX4State {
-     uint8_t rcr;
- } PIIX4State;
+@@ -29,6 +29,7 @@
+ #include "hw/pci/pci.h"
+ #include "hw/isa/isa.h"
+ #include "hw/sysbus.h"
++#include "hw/dma/i8257.h"
+ #include "migration/vmstate.h"
+ #include "sysemu/reset.h"
+ #include "sysemu/runstate.h"
+@@ -164,6 +165,9 @@ static void piix4_realize(PCIDevice *pci_dev, Error *=
+*errp)
+     /* initialize ISA irqs */
+     isa_bus_irqs(isa_bus, s->isa);
 =20
--#define TYPE_PIIX4_PCI_DEVICE "PIIX4"
- #define PIIX4_PCI_DEVICE(obj) \
-     OBJECT_CHECK(PIIX4State, (obj), TYPE_PIIX4_PCI_DEVICE)
-=20
-diff --git a/hw/mips/mips_malta.c b/hw/mips/mips_malta.c
-index 7d25ab6c23..e499b7a6bb 100644
---- a/hw/mips/mips_malta.c
-+++ b/hw/mips/mips_malta.c
-@@ -1414,7 +1414,7 @@ void mips_malta_init(MachineState *machine)
-     ide_drive_get(hd, ARRAY_SIZE(hd));
-=20
-     pci =3D pci_create_simple_multifunction(pci_bus, PCI_DEVFN(10, 0),
--                                          true, "PIIX4");
-+                                          true, TYPE_PIIX4_PCI_DEVICE);
-     dev =3D DEVICE(pci);
-     isa_bus =3D ISA_BUS(qdev_get_child_bus(dev, "isa.0"));
-     piix4_devfn =3D pci->devfn;
-diff --git a/include/hw/isa/isa.h b/include/hw/isa/isa.h
-index 018ada4f6f..79f703fd6c 100644
---- a/include/hw/isa/isa.h
-+++ b/include/hw/isa/isa.h
-@@ -147,4 +147,6 @@ static inline ISABus *isa_bus_from_device(ISADevice *=
-d)
-     return ISA_BUS(qdev_get_parent_bus(DEVICE(d)));
++    /* DMA */
++    i8257_dma_init(isa_bus, 0);
++
+     piix4_dev =3D pci_dev;
  }
 =20
-+#define TYPE_PIIX4_PCI_DEVICE "piix4-isa"
-+
- #endif
+diff --git a/hw/mips/mips_malta.c b/hw/mips/mips_malta.c
+index e499b7a6bb..df247177ca 100644
+--- a/hw/mips/mips_malta.c
++++ b/hw/mips/mips_malta.c
+@@ -28,7 +28,6 @@
+ #include "cpu.h"
+ #include "hw/i386/pc.h"
+ #include "hw/isa/superio.h"
+-#include "hw/dma/i8257.h"
+ #include "hw/char/serial.h"
+ #include "net/net.h"
+ #include "hw/boards.h"
+@@ -1430,7 +1429,6 @@ void mips_malta_init(MachineState *machine)
+     smbus =3D piix4_pm_init(pci_bus, piix4_devfn + 3, 0x1100,
+                           isa_get_irq(NULL, 9), NULL, 0, NULL);
+     pit =3D i8254_pit_init(isa_bus, 0x40, 0, NULL);
+-    i8257_dma_init(isa_bus, 0);
+     mc146818_rtc_init(isa_bus, 2000, NULL);
+=20
+     /* generate SPD EEPROM data */
 --=20
 2.21.0
 
