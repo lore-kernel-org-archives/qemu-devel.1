@@ -4,72 +4,72 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 25CBEC10F14
-	for <qemu-devel@archiver.kernel.org>; Tue, 15 Oct 2019 07:57:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4DBAEECE58E
+	for <qemu-devel@archiver.kernel.org>; Tue, 15 Oct 2019 07:58:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EB5052089C
-	for <qemu-devel@archiver.kernel.org>; Tue, 15 Oct 2019 07:57:06 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EB5052089C
+	by mail.kernel.org (Postfix) with ESMTPS id 1F5092089C
+	for <qemu-devel@archiver.kernel.org>; Tue, 15 Oct 2019 07:58:42 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1F5092089C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36522 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36558 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iKHha-0003ib-3z
-	for qemu-devel@archiver.kernel.org; Tue, 15 Oct 2019 03:57:06 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52333)
+	id 1iKHj7-0005m2-Bi
+	for qemu-devel@archiver.kernel.org; Tue, 15 Oct 2019 03:58:41 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52347)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peterx@redhat.com>) id 1iKHfb-0001ho-31
- for qemu-devel@nongnu.org; Tue, 15 Oct 2019 03:55:05 -0400
+ (envelope-from <peterx@redhat.com>) id 1iKHff-0001mJ-1n
+ for qemu-devel@nongnu.org; Tue, 15 Oct 2019 03:55:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peterx@redhat.com>) id 1iKHfZ-0005hN-RB
- for qemu-devel@nongnu.org; Tue, 15 Oct 2019 03:55:03 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:48076)
+ (envelope-from <peterx@redhat.com>) id 1iKHfc-0005iT-W8
+ for qemu-devel@nongnu.org; Tue, 15 Oct 2019 03:55:05 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53168)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <peterx@redhat.com>) id 1iKHfZ-0005h3-Iy
- for qemu-devel@nongnu.org; Tue, 15 Oct 2019 03:55:01 -0400
-Received: from mail-pf1-f197.google.com (mail-pf1-f197.google.com
- [209.85.210.197])
+ (Exim 4.71) (envelope-from <peterx@redhat.com>) id 1iKHfc-0005i7-Mf
+ for qemu-devel@nongnu.org; Tue, 15 Oct 2019 03:55:04 -0400
+Received: from mail-pg1-f200.google.com (mail-pg1-f200.google.com
+ [209.85.215.200])
  (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id A25125313B
- for <qemu-devel@nongnu.org>; Tue, 15 Oct 2019 07:55:00 +0000 (UTC)
-Received: by mail-pf1-f197.google.com with SMTP id r7so15352906pfg.2
- for <qemu-devel@nongnu.org>; Tue, 15 Oct 2019 00:55:00 -0700 (PDT)
+ by mx1.redhat.com (Postfix) with ESMTPS id E7C4AAD881
+ for <qemu-devel@nongnu.org>; Tue, 15 Oct 2019 07:55:03 +0000 (UTC)
+Received: by mail-pg1-f200.google.com with SMTP id b14so4485910pgm.22
+ for <qemu-devel@nongnu.org>; Tue, 15 Oct 2019 00:55:03 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=Prhq+elVYNderg0JL2udm40c7DMFWGn25Wjwjz4GK2c=;
- b=tFJW8n7gbP4AxuhaWzsMzFjq8AJpWKQDll5u7s8PGjzQ0bsk+pkdANLGD3WY0TbjxN
- Rygf9cXz/2dDoqFUd7ObZ/GeJbwhUeVnVgn2l3kBLXxuxwurvMwwZfhwqbN9Ft+P9JB7
- Qmm+mPcO8Q+iEFuWNvZ0v8JypnIAzbkcPcrjjKovvHmgVSbK99gQ8CveSotqunUClUTY
- uR/biaYgIWIMCKp5SFR5X1hDh+8JoBn/rwtEZmmzU9Ur8leB8plktGj5QFYwiKlhZC9L
- KtmqCQ3S+4DImrRqIddo+DzjL4maFBJ56aBzT/zJAraETCqzvm8ep0JVJqKMKoIZwaNT
- IgMA==
-X-Gm-Message-State: APjAAAUUrmauxYx0XOMu2smKmYcKEMAkUgRTq6sUIvwez/OUHYM9ciNy
- pEQOz3OgcQzy0JBWS1aZ06Df9X3nxg+xmsVuRRJukheK7PGKFgnzupuADBrGBK9THauvwbgaokl
- 04GAgZGfxtXkQx7E=
-X-Received: by 2002:a17:90a:aa98:: with SMTP id
- l24mr40658711pjq.96.1571126099652; 
- Tue, 15 Oct 2019 00:54:59 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqzKohrDHIiBy1fV/g+wU/ofwOOjwcZDoKQMEMzESTPKg8Zl3n/XjGr3U2g97PG5xPoyskcz+Q==
-X-Received: by 2002:a17:90a:aa98:: with SMTP id
- l24mr40658675pjq.96.1571126099130; 
- Tue, 15 Oct 2019 00:54:59 -0700 (PDT)
+ bh=4lnoz4PkLYCAulCk1xBitbDt3OgijwPGGC0TddpxLB4=;
+ b=EUNGZZdGtsIYJ3TBolNFJONKKUmQ+3He6Cfne7SW8xGn6SLCUJTBOtmKt/52YsRRDK
+ HHzdZ06AunvHvhcH4a54UJ/3cx0rGXVvGoPIKw5xujKVdO1f5rvLXE33hony3CwjTFPe
+ pZGrnpBB0zDJtJki+C2nS++yKUC9riTGppia5oOIDknpWtRgVIbHU7HGNDew3iz9hQug
+ Be2SpRrQ0oYGm5ruguRpB5v7776DCRxbFGgkKaZiCv8L8yv0topHpnfzHl8hkOEUBWl5
+ 2yBBAbfBN66RMifkgkd9wT4HHUPgcyySLoy4Yg3c45fug1/vrEXxyqAnuZzF06/DXPm9
+ XLUw==
+X-Gm-Message-State: APjAAAWIc5xInXQQ1K0RBVF9Kk+b/Ykp0LmmQL1VctGEWfKkc1K1c9iR
+ hf2fiVNUjEZJ1VewU8gqHolbQZ7pO8rJsOBcuoh1iD46Tsk0BCUou6iTGOZD9lvxR3w2HnbkJXK
+ UGESnyBTg0f7X80k=
+X-Received: by 2002:a17:902:900c:: with SMTP id
+ a12mr23391367plp.30.1571126102693; 
+ Tue, 15 Oct 2019 00:55:02 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqzE4SBCDfSEOhFhRENGfi5KEMlgYGPWZDEYGu9H+pOXotfrmwTIjfraTok8iQqa8umxNPTDkg==
+X-Received: by 2002:a17:902:900c:: with SMTP id
+ a12mr23391340plp.30.1571126102408; 
+ Tue, 15 Oct 2019 00:55:02 -0700 (PDT)
 Received: from xz-x1.redhat.com ([209.132.188.80])
- by smtp.gmail.com with ESMTPSA id r30sm24599850pfl.42.2019.10.15.00.54.56
+ by smtp.gmail.com with ESMTPSA id r30sm24599850pfl.42.2019.10.15.00.54.59
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 15 Oct 2019 00:54:58 -0700 (PDT)
+ Tue, 15 Oct 2019 00:55:01 -0700 (PDT)
 From: Peter Xu <peterx@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 1/2] migration: Boost SaveStateEntry.instance_id to 64 bits
-Date: Tue, 15 Oct 2019 15:54:43 +0800
-Message-Id: <20191015075444.10955-2-peterx@redhat.com>
+Subject: [PATCH 2/2] apic: Use 32bit APIC ID for migration instance ID
+Date: Tue, 15 Oct 2019 15:54:44 +0800
+Message-Id: <20191015075444.10955-3-peterx@redhat.com>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20191015075444.10955-1-peterx@redhat.com>
 References: <20191015075444.10955-1-peterx@redhat.com>
@@ -96,125 +96,43 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-It was "int" and used as 32bits fields (see save_section_header()).
-It's unsafe already because sizeof(int) could be 2 on i386, I think.
-So at least uint32_t would suite more.  While it also uses "-1" as a
-placeholder of "we want to generate the instance ID automatically".
-Hence a more proper value should be int64_t.
+Migration is silently broken now with x2apic config like this:
 
-This will start to be useful after next patch in which we can start to
-convert a real uint32_t value as instance ID.
+     -smp 200,maxcpus=3D288,sockets=3D2,cores=3D72,threads=3D2 \
+     -device intel-iommu,intremap=3Don,eim=3Don
+
+After migration, the guest kernel could hang at anything, due to
+x2apic bit not migrated correctly in IA32_APIC_BASE on some vcpus, so
+any operations related to x2apic could be broken then (e.g., RDMSR on
+x2apic MSRs could fail because KVM would think that the vcpu hasn't
+enabled x2apic at all).
+
+The issue is that the x2apic bit was never applied correctly for vcpus
+whose ID > 255 when migrate completes, and that's because when we
+migrate APIC we use the APICCommonState.id as instance ID of the
+migration stream, while that's too short for x2apic.
+
+Let's use the newly introduced initial_apic_id for that.
 
 Signed-off-by: Peter Xu <peterx@redhat.com>
 ---
- include/migration/register.h |  2 +-
- include/migration/vmstate.h  |  4 ++--
- migration/savevm.c           | 10 +++++-----
- stubs/vmstate.c              |  2 +-
- 4 files changed, 9 insertions(+), 9 deletions(-)
+ hw/intc/apic_common.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/include/migration/register.h b/include/migration/register.h
-index a13359a08d..54f42c7413 100644
---- a/include/migration/register.h
-+++ b/include/migration/register.h
-@@ -69,7 +69,7 @@ typedef struct SaveVMHandlers {
- } SaveVMHandlers;
+diff --git a/hw/intc/apic_common.c b/hw/intc/apic_common.c
+index aafd8e0e33..6024a3e06a 100644
+--- a/hw/intc/apic_common.c
++++ b/hw/intc/apic_common.c
+@@ -315,7 +315,7 @@ static void apic_common_realize(DeviceState *dev, Err=
+or **errp)
+     APICCommonState *s =3D APIC_COMMON(dev);
+     APICCommonClass *info;
+     static DeviceState *vapic;
+-    int instance_id =3D s->id;
++    int64_t instance_id =3D s->initial_apic_id;
 =20
- int register_savevm_live(const char *idstr,
--                         int instance_id,
-+                         int64_t instance_id,
-                          int version_id,
-                          const SaveVMHandlers *ops,
-                          void *opaque);
-diff --git a/include/migration/vmstate.h b/include/migration/vmstate.h
-index 1fbfd099dd..6a7498463c 100644
---- a/include/migration/vmstate.h
-+++ b/include/migration/vmstate.h
-@@ -1114,14 +1114,14 @@ int vmstate_save_state_v(QEMUFile *f, const VMSta=
-teDescription *vmsd,
- bool vmstate_save_needed(const VMStateDescription *vmsd, void *opaque);
-=20
- /* Returns: 0 on success, -1 on failure */
--int vmstate_register_with_alias_id(DeviceState *dev, int instance_id,
-+int vmstate_register_with_alias_id(DeviceState *dev, int64_t instance_id=
-,
-                                    const VMStateDescription *vmsd,
-                                    void *base, int alias_id,
-                                    int required_for_version,
-                                    Error **errp);
-=20
- /* Returns: 0 on success, -1 on failure */
--static inline int vmstate_register(DeviceState *dev, int instance_id,
-+static inline int vmstate_register(DeviceState *dev, int64_t instance_id=
-,
-                                    const VMStateDescription *vmsd,
-                                    void *opaque)
- {
-diff --git a/migration/savevm.c b/migration/savevm.c
-index bb9462a54d..dc9281c897 100644
---- a/migration/savevm.c
-+++ b/migration/savevm.c
-@@ -233,7 +233,7 @@ typedef struct CompatEntry {
- typedef struct SaveStateEntry {
-     QTAILQ_ENTRY(SaveStateEntry) entry;
-     char idstr[256];
--    int instance_id;
-+    int64_t instance_id;
-     int alias_id;
-     int version_id;
-     /* version id read from the stream */
-@@ -668,7 +668,7 @@ void dump_vmstate_json_to_file(FILE *out_file)
- static int calculate_new_instance_id(const char *idstr)
- {
-     SaveStateEntry *se;
--    int instance_id =3D 0;
-+    int64_t instance_id =3D 0;
-=20
-     QTAILQ_FOREACH(se, &savevm_state.handlers, entry) {
-         if (strcmp(idstr, se->idstr) =3D=3D 0
-@@ -730,7 +730,7 @@ static void savevm_state_handler_insert(SaveStateEntr=
-y *nse)
-    Meanwhile pass -1 as instance_id if you do not already have a clearly
-    distinguishing id for all instances of your device class. */
- int register_savevm_live(const char *idstr,
--                         int instance_id,
-+                         int64_t instance_id,
-                          int version_id,
-                          const SaveVMHandlers *ops,
-                          void *opaque)
-@@ -784,7 +784,7 @@ void unregister_savevm(DeviceState *dev, const char *=
-idstr, void *opaque)
-     }
- }
-=20
--int vmstate_register_with_alias_id(DeviceState *dev, int instance_id,
-+int vmstate_register_with_alias_id(DeviceState *dev, int64_t instance_id=
-,
-                                    const VMStateDescription *vmsd,
-                                    void *opaque, int alias_id,
-                                    int required_for_version,
-@@ -1566,7 +1566,7 @@ int qemu_save_device_state(QEMUFile *f)
-     return qemu_file_get_error(f);
- }
-=20
--static SaveStateEntry *find_se(const char *idstr, int instance_id)
-+static SaveStateEntry *find_se(const char *idstr, int64_t instance_id)
- {
-     SaveStateEntry *se;
-=20
-diff --git a/stubs/vmstate.c b/stubs/vmstate.c
-index e1e89b87f0..699003f3b0 100644
---- a/stubs/vmstate.c
-+++ b/stubs/vmstate.c
-@@ -4,7 +4,7 @@
- const VMStateDescription vmstate_dummy =3D {};
-=20
- int vmstate_register_with_alias_id(DeviceState *dev,
--                                   int instance_id,
-+                                   int64_t instance_id,
-                                    const VMStateDescription *vmsd,
-                                    void *base, int alias_id,
-                                    int required_for_version,
+     info =3D APIC_COMMON_GET_CLASS(s);
+     info->realize(dev, errp);
 --=20
 2.21.0
 
