@@ -2,83 +2,62 @@ Return-Path: <SRS0=6OCO=YI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.3 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 40237ECE58E
-	for <qemu-devel@archiver.kernel.org>; Tue, 15 Oct 2019 09:37:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F792C10F14
+	for <qemu-devel@archiver.kernel.org>; Tue, 15 Oct 2019 09:46:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 127C32083B
-	for <qemu-devel@archiver.kernel.org>; Tue, 15 Oct 2019 09:37:06 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 127C32083B
+	by mail.kernel.org (Postfix) with ESMTPS id 0F1DD20659
+	for <qemu-devel@archiver.kernel.org>; Tue, 15 Oct 2019 09:46:45 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0F1DD20659
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38740 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38938 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iKJGL-0005en-4X
-	for qemu-devel@archiver.kernel.org; Tue, 15 Oct 2019 05:37:05 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38392)
+	id 1iKJPh-0000W7-2A
+	for qemu-devel@archiver.kernel.org; Tue, 15 Oct 2019 05:46:45 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39418)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1iKJFf-0005Cr-TC
- for qemu-devel@nongnu.org; Tue, 15 Oct 2019 05:36:25 -0400
+ (envelope-from <jfreimann@redhat.com>) id 1iKJOf-0008TD-IB
+ for qemu-devel@nongnu.org; Tue, 15 Oct 2019 05:45:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1iKJFd-0005kV-SE
- for qemu-devel@nongnu.org; Tue, 15 Oct 2019 05:36:22 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:49708)
+ (envelope-from <jfreimann@redhat.com>) id 1iKJOZ-0001Na-CP
+ for qemu-devel@nongnu.org; Tue, 15 Oct 2019 05:45:38 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43924)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iKJFd-0005k7-Ma
- for qemu-devel@nongnu.org; Tue, 15 Oct 2019 05:36:21 -0400
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72])
- (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+ (Exim 4.71) (envelope-from <jfreimann@redhat.com>)
+ id 1iKJOX-0001Lw-LG
+ for qemu-devel@nongnu.org; Tue, 15 Oct 2019 05:45:35 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id F3C1565F45
- for <qemu-devel@nongnu.org>; Tue, 15 Oct 2019 09:36:18 +0000 (UTC)
-Received: by mail-wr1-f72.google.com with SMTP id 7so4599243wrl.2
- for <qemu-devel@nongnu.org>; Tue, 15 Oct 2019 02:36:18 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=KBQLqLkzFS+rs982qohFgWN2778/ZUbSRf77nwmJfqQ=;
- b=AQnm3tkYv4Y+9ZDlAyhPgfy/fzDqt7Sw8+NAPbg+I1mzdlKyoFpSLPDUsASXdHRjbM
- tk4PsafVzMht8RRd8b+BjAPCTLJB5/l4xABRWdkTR3rlSOpT5Cgmmka5j5uRdUloM674
- sL9su5gUHdv/0zOgUq5bKHlg9icyBLwQ3Vn40ckP0Q6NnkuPGpzRuuyAOUwSdQKhxY1N
- UGW+9c01gs2akRYYZazXBs+hg0B/UQp0DexzsywmMqkzTc1G1Nk2kpe/k6HwpLdqdwmG
- 8W3t6DVYko3yZjMA+jer5k9gZAazm+y/uaiEO9bsgeqOMZS+bCZYPLgIFhqDAdgWv8al
- /xtQ==
-X-Gm-Message-State: APjAAAW9oexdOaTekDIs0XrNHVEy+10yU6y4bHcUn7AKb06tvqPwdrff
- M20drpu7yR/KDWXhvq0jfhvQRzJCFkmHR7UvOE41koiU0jXD2UbuAEOKgRA/O4O5w4elNF8KBVq
- Wg7vBtXblsLigxwA=
-X-Received: by 2002:a5d:43c2:: with SMTP id v2mr24288051wrr.153.1571132177695; 
- Tue, 15 Oct 2019 02:36:17 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqzHVrLjTDXDqNH5mjr5BQTi/gWXttIbKyq1iwDk82THOvVgG/WSnxcs//XI2epW7RS3a7NtQQ==
-X-Received: by 2002:a5d:43c2:: with SMTP id v2mr24288027wrr.153.1571132177500; 
- Tue, 15 Oct 2019 02:36:17 -0700 (PDT)
-Received: from [192.168.1.36] (14.red-88-21-201.staticip.rima-tde.net.
- [88.21.201.14])
- by smtp.gmail.com with ESMTPSA id c132sm30492022wme.27.2019.10.15.02.36.16
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 15 Oct 2019 02:36:16 -0700 (PDT)
-Subject: Re: [PULL v2 0/2] Tracing patches
-To: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
-References: <20191015084914.18045-1-stefanha@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <e699021e-d917-dbc4-9fcd-e3fc888dba89@redhat.com>
-Date: Tue, 15 Oct 2019 11:36:16 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.0
+ by mx1.redhat.com (Postfix) with ESMTPS id 7D60B4E4E6;
+ Tue, 15 Oct 2019 09:45:32 +0000 (UTC)
+Received: from localhost (dhcp-192-238.str.redhat.com [10.33.192.238])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 27EAF5D6A9;
+ Tue, 15 Oct 2019 09:45:27 +0000 (UTC)
+Date: Tue, 15 Oct 2019 11:45:25 +0200
+From: Jens Freimann <jfreimann@redhat.com>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Subject: Re: [PATCH v3 07/10] migration: add new migration state wait-unplug
+Message-ID: <20191015094525.zqq4534ghe3l2ngr@jenstp.localdomain>
+References: <20191011112015.11785-1-jfreimann@redhat.com>
+ <20191011112015.11785-8-jfreimann@redhat.com>
+ <20191011171133.GU3354@work-vm>
 MIME-Version: 1.0
-In-Reply-To: <20191015084914.18045-1-stefanha@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <20191011171133.GU3354@work-vm>
+User-Agent: NeoMutt/20180716-1376-5d6ed1
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.38]); Tue, 15 Oct 2019 09:45:32 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 209.132.183.28
@@ -93,29 +72,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>
+Cc: ehabkost@redhat.com, mst@redhat.com, aadam@redhat.com,
+ qemu-devel@nongnu.org, alex.williamson@redhat.com, laine@redhat.com,
+ ailan@redhat.com, parav@mellanox.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 10/15/19 10:49 AM, Stefan Hajnoczi wrote:
-> The following changes since commit 98b2e3c9ab3abfe476a2b02f8f51813edb90e72d:
-> 
->    Merge remote-tracking branch 'remotes/stefanha/tags/block-pull-request' into staging (2019-10-08 16:08:35 +0100)
-> 
-> are available in the Git repository at:
-> 
->    https://github.com/stefanha/qemu.git tags/tracing-pull-request
-> 
-> for you to fetch changes up to 403e11edbfad5da2e6d5842adc9222f60e76ee43:
-> 
->    trace: avoid "is" with a literal Python 3.8 warnings (2019-10-15 09:47:16 +0100)
-> 
-> ----------------------------------------------------------------
-> Pull request
-> 
-> v2:
->   * Replaced "Launchpad:" tag with "Buglink:" as documented on the SubmitAPatch wiki page [Philippe]
+On Fri, Oct 11, 2019 at 06:11:33PM +0100, Dr. David Alan Gilbert wrote:
+>* Jens Freimann (jfreimann@redhat.com) wrote:
+>> This patch adds a new migration state called wait-unplug.  It is entered
+>> after the SETUP state and will transition into ACTIVE once all devices
+>> were succesfully unplugged from the guest.
+>>
+>> So if a guest doesn't respond or takes long to honor the unplug request
+>> the user will see the migration state 'wait-unplug'.
+>>
+>> In the migration thread we query failover devices if they're are still
+>> pending the guest unplug. When all are unplugged the migration
+>> continues. We give it a defined number of iterations including small
+>> waiting periods before we proceed.
+>>
+>> Signed-off-by: Jens Freimann <jfreimann@redhat.com>
+[..]
+>> @@ -3260,6 +3271,27 @@ static void *migration_thread(void *opaque)
+>>
+>>      qemu_savevm_state_setup(s->to_dst_file);
+>>
+>> +    migrate_set_state(&s->state, MIGRATION_STATUS_SETUP,
+>> +                      MIGRATION_STATUS_WAIT_UNPLUG);
+>
+>I think I'd prefer if you only went into this state if you had any
+>devices that were going to need unplugging.
 
-Thanks Stefan for this updated pullreq!
+Sure, that makes sense. I'll change it.
+
+>> +    while (i < FAILOVER_UNPLUG_RETRIES &&
+>> +           s->state == MIGRATION_STATUS_WAIT_UNPLUG) {
+>> +        i++;
+>> +        qemu_sem_timedwait(&s->wait_unplug_sem, FAILOVER_GUEST_UNPLUG_WAIT);
+>> +        all_unplugged = qemu_savevm_state_guest_unplug_pending();
+>> +        if (all_unplugged) {
+>> +            break;
+>> +        }
+>> +    }
+>> +
+>> +    if (all_unplugged) {
+>> +        migrate_set_state(&s->state, MIGRATION_STATUS_WAIT_UNPLUG,
+>> +                MIGRATION_STATUS_ACTIVE);
+>> +    } else {
+>> +        migrate_set_state(&s->state, MIGRATION_STATUS_WAIT_UNPLUG,
+>> +                          MIGRATION_STATUS_CANCELLING);
+>> +    }
+>
+>I think you can get rid of both the timeout and the count and just make
+>sure that migrate_cancel works at this point.
+
+I see, I need to add the new state to migration_is_setup_or_active() or
+a cancel won't work.  
+
+>This pushes the problem up a layer, which I think is fine.
+
+Seems good to me. To be clear, you're saying I should just poll on
+the device unplugged state? Like
+
+         while (s->state == MIGRATION_STATUS_WAIT_UNPLUG &&
+                !qemu_savevm_state_guest_unplug_pending()) {
+_            /* This block intentionally left blank */
+         }
+
+regards,
+Jens  
 
