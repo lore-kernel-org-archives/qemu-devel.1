@@ -6,66 +6,73 @@ X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 89862ECE588
-	for <qemu-devel@archiver.kernel.org>; Tue, 15 Oct 2019 17:27:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D09A0C10F14
+	for <qemu-devel@archiver.kernel.org>; Tue, 15 Oct 2019 17:42:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6233920650
-	for <qemu-devel@archiver.kernel.org>; Tue, 15 Oct 2019 17:27:35 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6233920650
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id A967920854
+	for <qemu-devel@archiver.kernel.org>; Tue, 15 Oct 2019 17:42:12 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A967920854
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54400 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54844 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iKQbe-0004Da-JS
-	for qemu-devel@archiver.kernel.org; Tue, 15 Oct 2019 13:27:34 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50531)
+	id 1iKQpn-0000QH-PL
+	for qemu-devel@archiver.kernel.org; Tue, 15 Oct 2019 13:42:11 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52812)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <no-reply@patchew.org>) id 1iKQaz-0003gf-A4
- for qemu-devel@nongnu.org; Tue, 15 Oct 2019 13:26:54 -0400
+ (envelope-from <bounces@canonical.com>) id 1iKQoY-0008Cm-6U
+ for qemu-devel@nongnu.org; Tue, 15 Oct 2019 13:40:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <no-reply@patchew.org>) id 1iKQax-0007dF-Pq
- for qemu-devel@nongnu.org; Tue, 15 Oct 2019 13:26:53 -0400
-Resent-Date: Tue, 15 Oct 2019 13:26:53 -0400
-Resent-Message-Id: <E1iKQax-0007dF-Pq@eggs.gnu.org>
-Received: from sender4-of-o54.zoho.com ([136.143.188.54]:21498)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <no-reply@patchew.org>)
- id 1iKQas-0007Y4-Cm; Tue, 15 Oct 2019 13:26:46 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1571160384; cv=none; d=zoho.com; s=zohoarc; 
- b=lPqecGJGOB4b80PP6swrM8bBzGfQfu244RZ+b+O4UemCsgWVJl8Wek5rzEPHrgUD7Ur9npCJ2bN57QM9QHeWUeL4iLkLsW2FxPwVVEj0F/QfQpp90MWrrZcqud6Xj0nsZGZ5e/hfuo16kND3PhV9fZweOKg3CrkklJ3XudVCBCo=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zoho.com;
- s=zohoarc; t=1571160384;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
- bh=7NR7/xW3GLdXT2TPqeBnSysTg53pGqrUbWum+NS0Y1c=; 
- b=IJXDPd5YyGzf/vK83/ZJog0PEqzmJKmz860laPhA1q0MhpQ5gfKz0+7tkllMWBvmTARxqUqquD+K0qSZfkgnNRj3OoPITgQCgHc7ASWoqjfPLIbNSUvJbsNMBu81c8VGjhBkQeX9WW2qkFkBTi6RudjyTVswjjJZ13ei5gWQGIA=
-ARC-Authentication-Results: i=1; mx.zoho.com; dkim=pass  header.i=patchew.org;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1571160383027660.346576208769;
- Tue, 15 Oct 2019 10:26:23 -0700 (PDT)
-In-Reply-To: <20191015103900.313928-1-its@irrelevant.dk>
-Subject: Re: [PATCH v2 00/20] nvme: support NVMe v1.3d,
- SGLs and multiple namespaces
-Message-ID: <157116038134.5946.14412649636938701674@37313f22b938>
+ (envelope-from <bounces@canonical.com>) id 1iKQoW-0006Z4-Ku
+ for qemu-devel@nongnu.org; Tue, 15 Oct 2019 13:40:54 -0400
+Received: from indium.canonical.com ([91.189.90.7]:38490)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <bounces@canonical.com>)
+ id 1iKQoV-0006YE-KS
+ for qemu-devel@nongnu.org; Tue, 15 Oct 2019 13:40:52 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1iKQoT-00049H-CH
+ for <qemu-devel@nongnu.org>; Tue, 15 Oct 2019 17:40:49 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 57A142E8073
+ for <qemu-devel@nongnu.org>; Tue, 15 Oct 2019 17:40:49 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: its@irrelevant.dk
-Date: Tue, 15 Oct 2019 10:26:23 -0700 (PDT)
-X-ZohoMailClient: External
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 15 Oct 2019 17:33:32 -0000
+From: Peter Maydell <peter.maydell@linaro.org>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=Invalid; importance=Undecided;
+ assignee=None; 
+X-Launchpad-Bug-Tags: chardev
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: philmd pmaydell
+X-Launchpad-Bug-Reporter: =?utf-8?q?Philippe_Mathieu-Daud=C3=A9_=28philmd?=
+ =?utf-8?q?=29?=
+X-Launchpad-Bug-Modifier: Peter Maydell (pmaydell)
+References: <157115912269.6241.2879996455235466128.malonedeb@gac.canonical.com>
+Message-Id: <157116081289.22310.16365337092715457705.malone@wampee.canonical.com>
+Subject: [Bug 1848231] Re: serial/parallel character devices created for the
+ none-machine
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="44557a7d51630548e7d0aa4259446ccd7e1731bd";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: 6a97a21af521f6091fb1e6e12f831051238679ae
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 136.143.188.54
+X-Received-From: 91.189.90.7
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -74,99 +81,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, fam@euphon.net, javier@javigon.com, qemu-block@nongnu.org,
- qemu-devel@nongnu.org, mreitz@redhat.com, keith.busch@intel.com,
- Paul.Durrant@citrix.com, sbates@raithlin.com
+Reply-To: Bug 1848231 <1848231@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MTAxNTEwMzkwMC4zMTM5
-MjgtMS1pdHNAaXJyZWxldmFudC5kay8KCgoKSGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZl
-IHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1zLiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGlu
-Zm9ybWF0aW9uOgoKU3ViamVjdDogW1BBVENIIHYyIDAwLzIwXSBudm1lOiBzdXBwb3J0IE5WTWUg
-djEuM2QsIFNHTHMgYW5kIG11bHRpcGxlIG5hbWVzcGFjZXMKVHlwZTogc2VyaWVzCk1lc3NhZ2Ut
-aWQ6IDIwMTkxMDE1MTAzOTAwLjMxMzkyOC0xLWl0c0BpcnJlbGV2YW50LmRrCgo9PT0gVEVTVCBT
-Q1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCmdpdCByZXYtcGFyc2UgYmFzZSA+IC9kZXYvbnVs
-bCB8fCBleGl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29u
-ZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYuYWxn
-b3JpdGhtIGhpc3RvZ3JhbQouL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIGJhc2Uu
-Lgo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0
-JwpjNjhmN2UwIG52bWU6IGhhbmRsZSBkbWEgZXJyb3JzCjg1NWYyYjggbnZtZTogbWFrZSBsYmEg
-ZGF0YSBzaXplIGNvbmZpZ3VyYWJsZQo2OGZjNTc1IG52bWU6IHJlbW92ZSByZWR1bmRhbnQgTnZt
-ZUNtZCBwb2ludGVyIHBhcmFtZXRlcgplYjU4NWQxIG52bWU6IGJ1bXAgY29udHJvbGxlciBwY2kg
-ZGV2aWNlIGlkCjIyNzI4MGMgbnZtZTogc3VwcG9ydCBtdWx0aXBsZSBuYW1lc3BhY2VzCmNjYzg3
-N2IgbnZtZTogYWRkIHN1cHBvcnQgZm9yIHNjYXR0ZXIgZ2F0aGVyIGxpc3RzCjc2ZDZmZTYgbnZt
-ZTogYWxsb3cgbXVsdGlwbGUgYWlvcyBwZXIgY29tbWFuZAo3MzIyN2NiIG52bWU6IHJlZmFjdG9y
-IHBycCBtYXBwaW5nCmRmNWZkOWYgbnZtZTogYnVtcCBzdXBwb3J0ZWQgc3BlY2lmaWNhdGlvbiB2
-ZXJzaW9uIHRvIDEuMwpjODVjMGZmIG52bWU6IGFkZCBtaXNzaW5nIG1hbmRhdG9yeSBmZWF0dXJl
-cwoxMTg4NTUyIG52bWU6IGFkZCBsb2dnaW5nIHRvIGVycm9yIGluZm9ybWF0aW9uIGxvZyBwYWdl
-CjcxNDgwOGMgbnZtZTogYWRkIHN1cHBvcnQgZm9yIHRoZSBhc3luY2hyb25vdXMgZXZlbnQgcmVx
-dWVzdCBjb21tYW5kCjg4YmRmY2UgbnZtZTogYWRkIHN1cHBvcnQgZm9yIHRoZSBnZXQgbG9nIHBh
-Z2UgY29tbWFuZAo3NzE2NjQ5IG52bWU6IHJlZmFjdG9yIGRldmljZSByZWFsaXphdGlvbgo3ZDJk
-NTFlIG52bWU6IGFkZCBzdXBwb3J0IGZvciB0aGUgYWJvcnQgY29tbWFuZAo0ZWMwZTgxIG52bWU6
-IGFsbG93IGNvbXBsZXRpb24gcXVldWVzIGluIHRoZSBjbWIKNjhmMDBkYiBudm1lOiBwb3B1bGF0
-ZSB0aGUgbWFuZGF0b3J5IHN1Ym5xbiBhbmQgdmVyIGZpZWxkcwpmMDhkNjZhIG52bWU6IGFkZCBt
-aXNzaW5nIGZpZWxkcyBpbiB0aGUgaWRlbnRpZnkgY29udHJvbGxlciBkYXRhIHN0cnVjdHVyZQoz
-MTVhNmViIG52bWU6IG1vdmUgZGV2aWNlIHBhcmFtZXRlcnMgdG8gc2VwYXJhdGUgc3RydWN0CmI5
-NGNmNGEgbnZtZTogcmVtb3ZlIHN1cGVyZmx1b3VzIGJyZWFrcwoKPT09IE9VVFBVVCBCRUdJTiA9
-PT0KMS8yMCBDaGVja2luZyBjb21taXQgYjk0Y2Y0YWVhMDdiIChudm1lOiByZW1vdmUgc3VwZXJm
-bHVvdXMgYnJlYWtzKQoyLzIwIENoZWNraW5nIGNvbW1pdCAzMTVhNmViMWYwOWYgKG52bWU6IG1v
-dmUgZGV2aWNlIHBhcmFtZXRlcnMgdG8gc2VwYXJhdGUgc3RydWN0KQpFUlJPUjogTWFjcm9zIHdp
-dGggY29tcGxleCB2YWx1ZXMgc2hvdWxkIGJlIGVuY2xvc2VkIGluIHBhcmVudGhlc2lzCiMxNzc6
-IEZJTEU6IGh3L2Jsb2NrL252bWUuaDo2OgorI2RlZmluZSBERUZJTkVfTlZNRV9QUk9QRVJUSUVT
-KF9zdGF0ZSwgX3Byb3BzKSBcCisgICAgREVGSU5FX1BST1BfU1RSSU5HKCJzZXJpYWwiLCBfc3Rh
-dGUsIF9wcm9wcy5zZXJpYWwpLCBcCisgICAgREVGSU5FX1BST1BfVUlOVDMyKCJjbWJfc2l6ZV9t
-YiIsIF9zdGF0ZSwgX3Byb3BzLmNtYl9zaXplX21iLCAwKSwgXAorICAgIERFRklORV9QUk9QX1VJ
-TlQzMigibnVtX3F1ZXVlcyIsIF9zdGF0ZSwgX3Byb3BzLm51bV9xdWV1ZXMsIDY0KQoKdG90YWw6
-IDEgZXJyb3JzLCAwIHdhcm5pbmdzLCAxODEgbGluZXMgY2hlY2tlZAoKUGF0Y2ggMi8yMCBoYXMg
-c3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFy
-ZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVD
-S1BBVENIIGluIE1BSU5UQUlORVJTLgoKMy8yMCBDaGVja2luZyBjb21taXQgZjA4ZDY2YWE3NjFi
-IChudm1lOiBhZGQgbWlzc2luZyBmaWVsZHMgaW4gdGhlIGlkZW50aWZ5IGNvbnRyb2xsZXIgZGF0
-YSBzdHJ1Y3R1cmUpCjQvMjAgQ2hlY2tpbmcgY29tbWl0IDY4ZjAwZGI1N2U4NyAobnZtZTogcG9w
-dWxhdGUgdGhlIG1hbmRhdG9yeSBzdWJucW4gYW5kIHZlciBmaWVsZHMpCjUvMjAgQ2hlY2tpbmcg
-Y29tbWl0IDRlYzBlODFhOGNhNSAobnZtZTogYWxsb3cgY29tcGxldGlvbiBxdWV1ZXMgaW4gdGhl
-IGNtYikKNi8yMCBDaGVja2luZyBjb21taXQgN2QyZDUxZTVkYTg5IChudm1lOiBhZGQgc3VwcG9y
-dCBmb3IgdGhlIGFib3J0IGNvbW1hbmQpCjcvMjAgQ2hlY2tpbmcgY29tbWl0IDc3MTY2NDljM2Q2
-ZCAobnZtZTogcmVmYWN0b3IgZGV2aWNlIHJlYWxpemF0aW9uKQo4LzIwIENoZWNraW5nIGNvbW1p
-dCA4OGJkZmNlMWE1OTkgKG52bWU6IGFkZCBzdXBwb3J0IGZvciB0aGUgZ2V0IGxvZyBwYWdlIGNv
-bW1hbmQpCjkvMjAgQ2hlY2tpbmcgY29tbWl0IDcxNDgwOGNkM2VmOCAobnZtZTogYWRkIHN1cHBv
-cnQgZm9yIHRoZSBhc3luY2hyb25vdXMgZXZlbnQgcmVxdWVzdCBjb21tYW5kKQoxMC8yMCBDaGVj
-a2luZyBjb21taXQgMTE4ODU1MjJmYTg3IChudm1lOiBhZGQgbG9nZ2luZyB0byBlcnJvciBpbmZv
-cm1hdGlvbiBsb2cgcGFnZSkKMTEvMjAgQ2hlY2tpbmcgY29tbWl0IGM4NWMwZmY1ZWEzNSAobnZt
-ZTogYWRkIG1pc3NpbmcgbWFuZGF0b3J5IGZlYXR1cmVzKQoxMi8yMCBDaGVja2luZyBjb21taXQg
-ZGY1ZmQ5ZjI4M2E0IChudm1lOiBidW1wIHN1cHBvcnRlZCBzcGVjaWZpY2F0aW9uIHZlcnNpb24g
-dG8gMS4zKQoxMy8yMCBDaGVja2luZyBjb21taXQgNzMyMjdjYjNjODNjIChudm1lOiByZWZhY3Rv
-ciBwcnAgbWFwcGluZykKMTQvMjAgQ2hlY2tpbmcgY29tbWl0IDc2ZDZmZTZlYTFjZiAobnZtZTog
-YWxsb3cgbXVsdGlwbGUgYWlvcyBwZXIgY29tbWFuZCkKMTUvMjAgQ2hlY2tpbmcgY29tbWl0IGNj
-Yzg3N2I2ZjcyYiAobnZtZTogYWRkIHN1cHBvcnQgZm9yIHNjYXR0ZXIgZ2F0aGVyIGxpc3RzKQox
-Ni8yMCBDaGVja2luZyBjb21taXQgMjI3MjgwYzhkMDhjIChudm1lOiBzdXBwb3J0IG11bHRpcGxl
-IG5hbWVzcGFjZXMpCldBUk5JTkc6IGFkZGVkLCBtb3ZlZCBvciBkZWxldGVkIGZpbGUocyksIGRv
-ZXMgTUFJTlRBSU5FUlMgbmVlZCB1cGRhdGluZz8KIzQyOiAKbmV3IGZpbGUgbW9kZSAxMDA2NDQK
-CnRvdGFsOiAwIGVycm9ycywgMSB3YXJuaW5ncywgODAxIGxpbmVzIGNoZWNrZWQKClBhdGNoIDE2
-LzIwIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBl
-cnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwg
-c2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCjE3LzIwIENoZWNraW5nIGNvbW1pdCBlYjU4
-NWQxMjMxZTMgKG52bWU6IGJ1bXAgY29udHJvbGxlciBwY2kgZGV2aWNlIGlkKQoxOC8yMCBDaGVj
-a2luZyBjb21taXQgNjhmYzU3NWIzZmM3IChudm1lOiByZW1vdmUgcmVkdW5kYW50IE52bWVDbWQg
-cG9pbnRlciBwYXJhbWV0ZXIpCjE5LzIwIENoZWNraW5nIGNvbW1pdCA4NTVmMmI4NmRkNmMgKG52
-bWU6IG1ha2UgbGJhIGRhdGEgc2l6ZSBjb25maWd1cmFibGUpCjIwLzIwIENoZWNraW5nIGNvbW1p
-dCBjNjhmN2UwZDBjNTUgKG52bWU6IGhhbmRsZSBkbWEgZXJyb3JzKQpXQVJOSU5HOiBsaW5lIG92
-ZXIgODAgY2hhcmFjdGVycwojNzc6IEZJTEU6IGh3L2Jsb2NrL252bWUuYzoyNTc6CisgICAgICAg
-ICAgICAgICAgICAgIGlmIChudm1lX2FkZHJfcmVhZChuLCBwcnBfZW50LCAodm9pZCAqKSBwcnBf
-bGlzdCwgcHJwX3RyYW5zKSkgewoKV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzEw
-MzogRklMRTogaHcvYmxvY2svbnZtZS5jOjQyODoKKyAgICAgICAgaWYgKG52bWVfYWRkcl9yZWFk
-KG4sIGFkZHIsIHNlZ21lbnQsIG5zZ2xkICogc2l6ZW9mKE52bWVTZ2xEZXNjcmlwdG9yKSkpIHsK
-CnRvdGFsOiAwIGVycm9ycywgMiB3YXJuaW5ncywgMTQ4IGxpbmVzIGNoZWNrZWQKClBhdGNoIDIw
-LzIwIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBl
-cnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwg
-c2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBj
-b21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgpUaGUgZnVsbCBsb2cgaXMgYXZhaWxhYmxlIGF0
-Cmh0dHA6Ly9wYXRjaGV3Lm9yZy9sb2dzLzIwMTkxMDE1MTAzOTAwLjMxMzkyOC0xLWl0c0BpcnJl
-bGV2YW50LmRrL3Rlc3RpbmcuY2hlY2twYXRjaC8/dHlwZT1tZXNzYWdlLgotLS0KRW1haWwgZ2Vu
-ZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cHM6Ly9wYXRjaGV3Lm9yZy9dLgpQ
-bGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
+You can start 'none' without "-serial null". Examples:
 
+qemu-system-x86_64 -machine none
+qemu-system-x86_64 -machine none -monitor stdio
+qemu-system-x86_64 -machine none -nographic
+qemu-system-x86_64 -machine none -monitor stdio -display none
+
+Your command line "qemu-system-x86_64 -machine none -nographic -monitor
+stdio" fails because "-nographic" says "please create a serial port
+using stdio" but "-monitor stdio" tries to use stdio for something else.
+You get the same message for any machine (eg "pc"), not just "none". If
+what you wanted was "just don't create the graphical display" that's
+"-display none" -- "-nographic" is a collection of things including both
+'no display' and also 'default to creating a serial device to stdio' and
+'default to creating a monitor muxed with that serial'.
+
+
+** Changed in: qemu
+       Status: New =3D> Invalid
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1848231
+
+Title:
+  serial/parallel character devices created for the none-machine
+
+Status in QEMU:
+  Invalid
+
+Bug description:
+  The none-machine can not be started unless using "-serial null":
+
+  qemu-system-x86_64 -machine none -nographic -monitor stdio
+  QEMU 3.1.1 monitor - type 'help' for more information
+  (qemu) qemu-system-x86_64: cannot use stdio by multiple character devices
+  qemu-system-x86_64: could not connect serial device to character backend =
+'stdio'
+  $
+
+  $ qemu-system-mips -machine none -nographic -serial null -monitor stdio
+  QEMU 4.1.50 monitor - type 'help' for more information
+  (qemu) info chardev
+  parallel0: filename=3Dnull
+  compat_monitor0: filename=3Dstdio
+  serial0: filename=3Dnull
+  (qemu)
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1848231/+subscriptions
 
