@@ -6,52 +6,52 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 56E77ECE588
-	for <qemu-devel@archiver.kernel.org>; Tue, 15 Oct 2019 14:38:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4F08AC10F14
+	for <qemu-devel@archiver.kernel.org>; Tue, 15 Oct 2019 14:39:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2F1FF20854
-	for <qemu-devel@archiver.kernel.org>; Tue, 15 Oct 2019 14:38:42 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2F1FF20854
+	by mail.kernel.org (Postfix) with ESMTPS id D566920854
+	for <qemu-devel@archiver.kernel.org>; Tue, 15 Oct 2019 14:39:53 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D566920854
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47054 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47056 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iKNyC-0000jx-PC
-	for qemu-devel@archiver.kernel.org; Tue, 15 Oct 2019 10:38:40 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36471)
+	id 1iKNzM-0001yr-2q
+	for qemu-devel@archiver.kernel.org; Tue, 15 Oct 2019 10:39:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35950)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1iKNoJ-0007FC-8d
- for qemu-devel@nongnu.org; Tue, 15 Oct 2019 10:28:28 -0400
+ (envelope-from <mreitz@redhat.com>) id 1iKNno-0006fh-Fh
+ for qemu-devel@nongnu.org; Tue, 15 Oct 2019 10:27:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1iKNoI-0000Jd-0O
- for qemu-devel@nongnu.org; Tue, 15 Oct 2019 10:28:27 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46240)
+ (envelope-from <mreitz@redhat.com>) id 1iKNnm-0008Pz-DP
+ for qemu-devel@nongnu.org; Tue, 15 Oct 2019 10:27:56 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:59516)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <mreitz@redhat.com>)
- id 1iKNoF-0000H6-AW; Tue, 15 Oct 2019 10:28:23 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+ id 1iKNnj-0008OL-Ed; Tue, 15 Oct 2019 10:27:51 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 88C832C9700;
- Tue, 15 Oct 2019 14:28:22 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id A87963082B41;
+ Tue, 15 Oct 2019 14:27:50 +0000 (UTC)
 Received: from localhost (ovpn-117-226.ams2.redhat.com [10.36.117.226])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 284D8579C;
- Tue, 15 Oct 2019 14:28:21 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 48FF710027A8;
+ Tue, 15 Oct 2019 14:27:50 +0000 (UTC)
 From: Max Reitz <mreitz@redhat.com>
 To: qemu-block@nongnu.org
-Subject: [PATCH v2 17/21] iotests: Make 110 work with data_file
-Date: Tue, 15 Oct 2019 16:27:25 +0200
-Message-Id: <20191015142729.18123-18-mreitz@redhat.com>
+Subject: [PATCH v2 07/21] iotests: Let _make_test_img parse its parameters
+Date: Tue, 15 Oct 2019 16:27:15 +0200
+Message-Id: <20191015142729.18123-8-mreitz@redhat.com>
 In-Reply-To: <20191015142729.18123-1-mreitz@redhat.com>
 References: <20191015142729.18123-1-mreitz@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.29]); Tue, 15 Oct 2019 14:28:22 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.45]); Tue, 15 Oct 2019 14:27:50 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
@@ -73,84 +73,78 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The only difference is that the json:{} filename of the image looks
-different.  We actually do not care about that filename in this test, we
-are only interested in (1) that there is a json:{} filename, and (2)
-whether the backing filename can be constructed.
-
-So just filter out the json:{} data, thus making this test pass both
-with and without data_file.
+This will allow us to add more options than just -b.
 
 Signed-off-by: Max Reitz <mreitz@redhat.com>
+Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
 ---
- tests/qemu-iotests/110     | 7 +++++--
- tests/qemu-iotests/110.out | 4 ++--
- 2 files changed, 7 insertions(+), 4 deletions(-)
+ tests/qemu-iotests/common.rc | 28 ++++++++++++++++++++--------
+ 1 file changed, 20 insertions(+), 8 deletions(-)
 
-diff --git a/tests/qemu-iotests/110 b/tests/qemu-iotests/110
-index f78df0e6e1..139c02c2cf 100755
---- a/tests/qemu-iotests/110
-+++ b/tests/qemu-iotests/110
-@@ -67,6 +67,7 @@ echo
- # Across blkdebug without a config file, you cannot reconstruct filename=
-s, so
- # qemu is incapable of knowing the directory of the top image from the f=
-ilename
- # alone. However, using bdrv_dirname(), it should still work.
-+# (Filter out the json:{} filename so this test works with external data=
- files)
- TEST_IMG=3D"json:{
-     'driver': '$IMGFMT',
-     'file': {
-@@ -82,7 +83,8 @@ TEST_IMG=3D"json:{
-             }
-         ]
-     }
--}" _img_info | _filter_img_info | grep -v 'backing file format'
-+}" _img_info | _filter_img_info | grep -v 'backing file format' \
-+    | _filter_json_filename
+diff --git a/tests/qemu-iotests/common.rc b/tests/qemu-iotests/common.rc
+index 12b4751848..3e7adc4834 100644
+--- a/tests/qemu-iotests/common.rc
++++ b/tests/qemu-iotests/common.rc
+@@ -282,12 +282,12 @@ _make_test_img()
+     # extra qemu-img options can be added by tests
+     # at least one argument (the image size) needs to be added
+     local extra_img_options=3D""
+-    local image_size=3D$*
+     local optstr=3D""
+     local img_name=3D""
+     local use_backing=3D0
+     local backing_file=3D""
+     local object_options=3D""
++    local misc_params=3D()
 =20
- echo
- echo '=3D=3D=3D Backing name is always relative to the backed image =3D=3D=
-=3D'
-@@ -114,7 +116,8 @@ TEST_IMG=3D"json:{
-             }
-         ]
-     }
--}" _img_info | _filter_img_info | grep -v 'backing file format'
-+}" _img_info | _filter_img_info | grep -v 'backing file format' \
-+    | _filter_json_filename
+     if [ -n "$TEST_IMG_FILE" ]; then
+         img_name=3D$TEST_IMG_FILE
+@@ -303,11 +303,23 @@ _make_test_img()
+         optstr=3D$(_optstr_add "$optstr" "key-secret=3Dkeysec0")
+     fi
 =20
+-    if [ "$1" =3D "-b" ]; then
+-        use_backing=3D1
+-        backing_file=3D$2
+-        image_size=3D$3
+-    fi
++    for param; do
++        if [ "$use_backing" =3D "1" -a -z "$backing_file" ]; then
++            backing_file=3D$param
++            continue
++        fi
++
++        case "$param" in
++            -b)
++                use_backing=3D1
++                ;;
++
++            *)
++                misc_params=3D("${misc_params[@]}" "$param")
++                ;;
++        esac
++    done
++
+     if [ \( "$IMGFMT" =3D "qcow2" -o "$IMGFMT" =3D "qed" \) -a -n "$CLUS=
+TER_SIZE" ]; then
+         optstr=3D$(_optstr_add "$optstr" "cluster_size=3D$CLUSTER_SIZE")
+     fi
+@@ -323,9 +335,9 @@ _make_test_img()
+     # XXX(hch): have global image options?
+     (
+      if [ $use_backing =3D 1 ]; then
+-        $QEMU_IMG create $object_options -f $IMGFMT $extra_img_options -=
+b "$backing_file" "$img_name" $image_size 2>&1
++        $QEMU_IMG create $object_options -f $IMGFMT $extra_img_options -=
+b "$backing_file" "$img_name" "${misc_params[@]}" 2>&1
+      else
+-        $QEMU_IMG create $object_options -f $IMGFMT $extra_img_options "=
+$img_name" $image_size 2>&1
++        $QEMU_IMG create $object_options -f $IMGFMT $extra_img_options "=
+$img_name" "${misc_params[@]}" 2>&1
+      fi
+     ) | _filter_img_create
 =20
- # success, all done
-diff --git a/tests/qemu-iotests/110.out b/tests/qemu-iotests/110.out
-index f60b26390e..f835553a99 100644
---- a/tests/qemu-iotests/110.out
-+++ b/tests/qemu-iotests/110.out
-@@ -11,7 +11,7 @@ backing file: t.IMGFMT.base (actual path: TEST_DIR/t.IM=
-GFMT.base)
-=20
- =3D=3D=3D Non-reconstructable filename =3D=3D=3D
-=20
--image: json:{"driver": "IMGFMT", "file": {"set-state.0.event": "read_aio=
-", "image": {"driver": "file", "filename": "TEST_DIR/t.IMGFMT"}, "driver"=
-: "blkdebug", "set-state.0.new_state": 42}}
-+image: json:{ /* filtered */ }
- file format: IMGFMT
- virtual size: 64 MiB (67108864 bytes)
- backing file: t.IMGFMT.base (actual path: TEST_DIR/t.IMGFMT.base)
-@@ -22,7 +22,7 @@ Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D671=
-08864 backing_file=3Dt.IMGFMT.b
-=20
- =3D=3D=3D Nodes without a common directory =3D=3D=3D
-=20
--image: json:{"driver": "IMGFMT", "file": {"children": [{"driver": "file"=
-, "filename": "TEST_DIR/t.IMGFMT"}, {"driver": "file", "filename": "TEST_=
-DIR/t.IMGFMT.copy"}], "driver": "quorum", "vote-threshold": 1}}
-+image: json:{ /* filtered */ }
- file format: IMGFMT
- virtual size: 64 MiB (67108864 bytes)
- backing file: t.IMGFMT.base (cannot determine actual path)
 --=20
 2.21.0
 
