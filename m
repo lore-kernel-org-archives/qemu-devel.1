@@ -4,56 +4,76 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C641C10F14
-	for <qemu-devel@archiver.kernel.org>; Tue, 15 Oct 2019 17:00:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3D44BC10F14
+	for <qemu-devel@archiver.kernel.org>; Tue, 15 Oct 2019 17:03:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 031832084B
-	for <qemu-devel@archiver.kernel.org>; Tue, 15 Oct 2019 17:00:20 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 031832084B
+	by mail.kernel.org (Postfix) with ESMTPS id 0D5E32084B
+	for <qemu-devel@archiver.kernel.org>; Tue, 15 Oct 2019 17:03:08 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0D5E32084B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53248 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53362 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iKQBG-0008HO-S3
-	for qemu-devel@archiver.kernel.org; Tue, 15 Oct 2019 13:00:18 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42237)
+	id 1iKQDz-0002oC-Ik
+	for qemu-devel@archiver.kernel.org; Tue, 15 Oct 2019 13:03:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46127)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1iKPlQ-0005uY-6w
- for qemu-devel@nongnu.org; Tue, 15 Oct 2019 12:33:37 -0400
+ (envelope-from <vkuznets@redhat.com>) id 1iKQCR-0001ZJ-C3
+ for qemu-devel@nongnu.org; Tue, 15 Oct 2019 13:01:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1iKPlO-0007ha-Rq
- for qemu-devel@nongnu.org; Tue, 15 Oct 2019 12:33:35 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:42644)
+ (envelope-from <vkuznets@redhat.com>) id 1iKQCP-0007GB-Rh
+ for qemu-devel@nongnu.org; Tue, 15 Oct 2019 13:01:31 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:36521)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iKPlO-0007gv-Jb
- for qemu-devel@nongnu.org; Tue, 15 Oct 2019 12:33:34 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (Exim 4.71) (envelope-from <vkuznets@redhat.com>) id 1iKQCP-0007F2-Ja
+ for qemu-devel@nongnu.org; Tue, 15 Oct 2019 13:01:29 -0400
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 9E87A882FB;
- Tue, 15 Oct 2019 16:33:33 +0000 (UTC)
-Received: from x1w.redhat.com (ovpn-204-35.brq.redhat.com [10.40.204.35])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id D044319C5B;
- Tue, 15 Oct 2019 16:33:27 +0000 (UTC)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH 32/32] hw/pci-host/i440fx: Remove the last PIIX3 traces
-Date: Tue, 15 Oct 2019 18:27:05 +0200
-Message-Id: <20191015162705.28087-33-philmd@redhat.com>
-In-Reply-To: <20191015162705.28087-1-philmd@redhat.com>
-References: <20191015162705.28087-1-philmd@redhat.com>
+ by mx1.redhat.com (Postfix) with ESMTPS id 78D08C0546D5
+ for <qemu-devel@nongnu.org>; Tue, 15 Oct 2019 17:01:27 +0000 (UTC)
+Received: by mail-wm1-f72.google.com with SMTP id q9so8927196wmj.9
+ for <qemu-devel@nongnu.org>; Tue, 15 Oct 2019 10:01:27 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
+ :message-id:mime-version;
+ bh=VGRbvJF6E2IH8bfXxTorreLtbiW/Eu+4508lD8RUR04=;
+ b=Y6cdGi2pYapQiiFsSTreZ6dIw4+ptaexOXUbuWbbhqym4HNIUfwC6mv5rm/qo+av37
+ NrEAqECIp4tTZI4/xuR/ei9FSwQELAfYpnAaJ6lWoiImWb3U2AmeT1wmxVcCgDBqHW6f
+ uvQ6eDip0ZPQScRZrXjsE2UM8Y5NdmoEWPGX+CACsrdbdeDZRNRM2wJo49QgpmzCB3xb
+ hXowx5p0KVsEdIK01Q0mWKQPdr+NooTVlUo81SMkCGbUaNXrHmFWRprGtbWVwvQg1jEs
+ kfLG+r+1DkMb58mqPHR2BR9dFAn4kBEBf2QjY/7iNBBi3baJEN9ZwTgXygFLJQKyt3e0
+ A3SA==
+X-Gm-Message-State: APjAAAW6c/lblc//LYbvFDSRz2aF0m+N4cpDDm8EduKQ3qSX0OKqaAWa
+ sq92Mal01bGy4yrIPnxVchvJObV6MQyKzfH6fyf/Z035ToZ6//UDasxvhARdDH1X18eHHKsWQNL
+ eCK2HWsZ2shIXEVI=
+X-Received: by 2002:adf:8385:: with SMTP id 5mr32476005wre.267.1571158886068; 
+ Tue, 15 Oct 2019 10:01:26 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqwky/GpobUXGsD/uJTzHRcZEX/xS3dGc+FuZhJ8nPAtP/NTMOLP9KwDXPdxfmX63NsDSbp5AA==
+X-Received: by 2002:adf:8385:: with SMTP id 5mr32475968wre.267.1571158885676; 
+ Tue, 15 Oct 2019 10:01:25 -0700 (PDT)
+Received: from vitty.brq.redhat.com ([95.82.135.254])
+ by smtp.gmail.com with ESMTPSA id r3sm13296316wre.29.2019.10.15.10.01.24
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 15 Oct 2019 10:01:24 -0700 (PDT)
+From: Vitaly Kuznetsov <vkuznets@redhat.com>
+To: lantianyu1986@gmail.com
+Subject: Re: [PATCH V2 2/2] target/i386/kvm: Add Hyper-V direct tlb flush
+ support
+In-Reply-To: <20191015143610.31857-3-Tianyu.Lan@microsoft.com>
+References: <20191015143610.31857-1-Tianyu.Lan@microsoft.com>
+ <20191015143610.31857-3-Tianyu.Lan@microsoft.com>
+Date: Tue, 15 Oct 2019 19:01:23 +0200
+Message-ID: <87ftju3puk.fsf@vitty.brq.redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.28]); Tue, 15 Oct 2019 16:33:33 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 209.132.183.28
@@ -68,120 +88,163 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
- Stefano Stabellini <sstabellini@kernel.org>,
- Eduardo Habkost <ehabkost@redhat.com>, kvm@vger.kernel.org,
- Paul Durrant <paul@xen.org>, "Michael S. Tsirkin" <mst@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?q?Herv=C3=A9=20Poussineau?= <hpoussin@reactos.org>,
- Aleksandar Markovic <amarkovic@wavecomp.com>, xen-devel@lists.xenproject.org,
- Anthony Perard <anthony.perard@citrix.com>,
- Igor Mammedov <imammedo@redhat.com>,
- Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Aurelien Jarno <aurelien@aurel32.net>, Richard Henderson <rth@twiddle.net>
+Cc: mtosatti@redhat.com, Tianyu Lan <Tianyu.Lan@microsoft.com>,
+ ehabkost@redhat.com, kvm@vger.kernel.org, mst@redhat.com, cohuck@redhat.com,
+ qemu-devel@nongnu.org, rkagan@virtuozzo.com, pbonzini@redhat.com,
+ rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The PIIX3 is not tied to the i440FX and can even be used without it.
-Move its creation to the machine code (pc_piix.c).
-We have now removed the last trace of southbridge code in the i440FX
-northbridge.
+lantianyu1986@gmail.com writes:
 
-Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
----
- hw/i386/pc_piix.c            | 8 +++++++-
- hw/pci-host/i440fx.c         | 8 --------
- include/hw/pci-host/i440fx.h | 3 +--
- 3 files changed, 8 insertions(+), 11 deletions(-)
+> From: Tianyu Lan <Tianyu.Lan@microsoft.com>
+>
+> Hyper-V direct tlb flush targets KVM on Hyper-V guest.
+> Enable direct TLB flush for its guests meaning that TLB
+> flush hypercalls are handled by Level 0 hypervisor (Hyper-V)
+> bypassing KVM in Level 1. Due to the different ABI for hypercall
+> parameters between Hyper-V and KVM, KVM capabilities should be
+> hidden when enable Hyper-V direct tlb flush otherwise KVM
+> hypercalls may be intercepted by Hyper-V. Add new parameter
+> "hv-direct-tlbflush". Check expose_kvm and Hyper-V tlb flush
+> capability status before enabling the feature.
+>
+> Signed-off-by: Tianyu Lan <Tianyu.Lan@microsoft.com>
+> ---
+> Change since V1:
+>        - Add direct tlb flush's Hyper-V property and use
+>        hv_cpuid_check_and_set() to check the dependency of tlbflush
+>        feature.
+>        - Make new feature work with Hyper-V passthrough mode.
+> ---
+>  docs/hyperv.txt   | 12 ++++++++++++
+>  target/i386/cpu.c |  2 ++
+>  target/i386/cpu.h |  1 +
+>  target/i386/kvm.c | 23 +++++++++++++++++++++++
+>  4 files changed, 38 insertions(+)
+>
+> diff --git a/docs/hyperv.txt b/docs/hyperv.txt
+> index 8fdf25c829..ceab8c21fe 100644
+> --- a/docs/hyperv.txt
+> +++ b/docs/hyperv.txt
+> @@ -184,6 +184,18 @@ enabled.
+>  
+>  Requires: hv-vpindex, hv-synic, hv-time, hv-stimer
+>  
+> +3.18. hv-direct-tlbflush
+> +=======================
+> +The enlightenment targets KVM on Hyper-V guest. Enable direct TLB flush for
+> +its guests meaning that TLB flush hypercalls are handled by Level 0 hypervisor
+> +(Hyper-V) bypassing KVM in Level 1. Due to the different ABI for hypercall
+> +parameters between Hyper-V and KVM, enabling this capability effectively
+> +disables all hypercall handling by KVM (as some KVM hypercall may be mistakenly
+> +treated as TLB flush hypercalls by Hyper-V). So kvm capability should not show
+> +to guest when enable this capability. If not, user will fail to enable this
+> +capability.
 
-diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
-index 8ac4bf12ca..cb4f4fc94c 100644
---- a/hw/i386/pc_piix.c
-+++ b/hw/i386/pc_piix.c
-@@ -190,14 +190,20 @@ static void pc_init1(MachineState *machine,
-     gsi_state =3D pc_gsi_create(&pcms->gsi, pcmc->pci_enabled);
-=20
-     if (pcmc->pci_enabled) {
-+        PIIX3State *piix3;
-+
-         pci_bus =3D i440fx_init(host_type,
-                               pci_type,
--                              &i440fx_state, &piix3_devfn, &isa_bus, pcm=
-s->gsi,
-+                              &i440fx_state,
-                               system_memory, system_io, machine->ram_siz=
-e,
-                               pcms->below_4g_mem_size,
-                               pcms->above_4g_mem_size,
-                               pci_memory, ram_memory);
-         pcms->bus =3D pci_bus;
-+
-+        piix3 =3D piix3_create(pci_bus, &isa_bus);
-+        piix3->pic =3D pcms->gsi;
-+        piix3_devfn =3D piix3->dev.devfn;
-     } else {
-         pci_bus =3D NULL;
-         i440fx_state =3D NULL;
-diff --git a/hw/pci-host/i440fx.c b/hw/pci-host/i440fx.c
-index 79ecd58a2b..f27131102d 100644
---- a/hw/pci-host/i440fx.c
-+++ b/hw/pci-host/i440fx.c
-@@ -27,7 +27,6 @@
- #include "hw/pci/pci.h"
- #include "hw/pci/pci_host.h"
- #include "hw/pci-host/i440fx.h"
--#include "hw/southbridge/piix.h"
- #include "hw/qdev-properties.h"
- #include "hw/sysbus.h"
- #include "qapi/error.h"
-@@ -272,8 +271,6 @@ static void i440fx_realize(PCIDevice *dev, Error **er=
-rp)
-=20
- PCIBus *i440fx_init(const char *host_type, const char *pci_type,
-                     PCII440FXState **pi440fx_state,
--                    int *piix3_devfn,
--                    ISABus **isa_bus, qemu_irq *pic,
-                     MemoryRegion *address_space_mem,
-                     MemoryRegion *address_space_io,
-                     ram_addr_t ram_size,
-@@ -286,7 +283,6 @@ PCIBus *i440fx_init(const char *host_type, const char=
- *pci_type,
-     PCIBus *b;
-     PCIDevice *d;
-     PCIHostState *s;
--    PIIX3State *piix3;
-     PCII440FXState *f;
-     unsigned i;
-     I440FXState *i440fx;
-@@ -339,10 +335,6 @@ PCIBus *i440fx_init(const char *host_type, const cha=
-r *pci_type,
-                  PAM_EXPAN_SIZE);
-     }
-=20
--    piix3 =3D piix3_create(b, isa_bus);
--    piix3->pic =3D pic;
--    *piix3_devfn =3D piix3->dev.devfn;
--
-     ram_size =3D ram_size / 8 / 1024 / 1024;
-     if (ram_size > 255) {
-         ram_size =3D 255;
-diff --git a/include/hw/pci-host/i440fx.h b/include/hw/pci-host/i440fx.h
-index e327f9bf87..f54e6466e4 100644
---- a/include/hw/pci-host/i440fx.h
-+++ b/include/hw/pci-host/i440fx.h
-@@ -22,8 +22,7 @@ typedef struct PCII440FXState PCII440FXState;
- #define TYPE_IGD_PASSTHROUGH_I440FX_PCI_DEVICE "igd-passthrough-i440FX"
-=20
- PCIBus *i440fx_init(const char *host_type, const char *pci_type,
--                    PCII440FXState **pi440fx_state, int *piix_devfn,
--                    ISABus **isa_bus, qemu_irq *pic,
-+                    PCII440FXState **pi440fx_state,
-                     MemoryRegion *address_space_mem,
-                     MemoryRegion *address_space_io,
-                     ram_addr_t ram_size,
---=20
-2.21.0
 
+My take:
+
+"Enable direct TLB flush for KVM when it is running as a nested
+hypervisor on top Hyper-V. When enabled, TLB flush hypercalls from L2
+guests are being passed through to L0 (Hyper-V) for handling. Due to ABI
+differences between Hyper-V and KVM hypercalls, L2 guests will not be
+able to issue KVM hypercalls (as those could be mishanled by L0
+Hyper-V), this requires KVM hypervisor signature to be hidden."
+
+It would be great if someone who doesn't know that the feature is would
+read these two paragraphs and tell us how they sound :-)
+
+> +
+> +Requires: hv-tlbflush, -kvm
+>  
+>  4. Development features
+>  ========================
+> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+> index 44f1bbdcac..7bc7fee512 100644
+> --- a/target/i386/cpu.c
+> +++ b/target/i386/cpu.c
+> @@ -6156,6 +6156,8 @@ static Property x86_cpu_properties[] = {
+>                        HYPERV_FEAT_IPI, 0),
+>      DEFINE_PROP_BIT64("hv-stimer-direct", X86CPU, hyperv_features,
+>                        HYPERV_FEAT_STIMER_DIRECT, 0),
+> +    DEFINE_PROP_BIT64("hv-direct-tlbflush", X86CPU, hyperv_features,
+> +                      HYPERV_FEAT_DIRECT_TLBFLUSH, 0),
+>      DEFINE_PROP_BOOL("hv-passthrough", X86CPU, hyperv_passthrough, false),
+>  
+>      DEFINE_PROP_BOOL("check", X86CPU, check_cpuid, true),
+> diff --git a/target/i386/cpu.h b/target/i386/cpu.h
+> index eaa5395aa5..3cb105f7d6 100644
+> --- a/target/i386/cpu.h
+> +++ b/target/i386/cpu.h
+> @@ -907,6 +907,7 @@ typedef uint64_t FeatureWordArray[FEATURE_WORDS];
+>  #define HYPERV_FEAT_EVMCS               12
+>  #define HYPERV_FEAT_IPI                 13
+>  #define HYPERV_FEAT_STIMER_DIRECT       14
+> +#define HYPERV_FEAT_DIRECT_TLBFLUSH     15
+>  
+>  #ifndef HYPERV_SPINLOCK_NEVER_RETRY
+>  #define HYPERV_SPINLOCK_NEVER_RETRY             0xFFFFFFFF
+> diff --git a/target/i386/kvm.c b/target/i386/kvm.c
+> index 11b9c854b5..7e0fbc730e 100644
+> --- a/target/i386/kvm.c
+> +++ b/target/i386/kvm.c
+> @@ -900,6 +900,10 @@ static struct {
+>          },
+>          .dependencies = BIT(HYPERV_FEAT_STIMER)
+>      },
+> +    [HYPERV_FEAT_DIRECT_TLBFLUSH] = {
+> +        .desc = "direct tlbflush (hv-direct-tlbflush)",
+
+"direct TLB flush" (to be consistent with "paravirtualized TLB flush" above
+
+> +        .dependencies = BIT(HYPERV_FEAT_TLBFLUSH)
+> +    },
+>  };
+>  
+>  static struct kvm_cpuid2 *try_get_hv_cpuid(CPUState *cs, int max)
+> @@ -1224,6 +1228,7 @@ static int hyperv_handle_properties(CPUState *cs,
+>      r |= hv_cpuid_check_and_set(cs, cpuid, HYPERV_FEAT_EVMCS);
+>      r |= hv_cpuid_check_and_set(cs, cpuid, HYPERV_FEAT_IPI);
+>      r |= hv_cpuid_check_and_set(cs, cpuid, HYPERV_FEAT_STIMER_DIRECT);
+> +    r |= hv_cpuid_check_and_set(cs, cpuid, HYPERV_FEAT_DIRECT_TLBFLUSH);
+>  
+>      /* Additional dependencies not covered by kvm_hyperv_properties[] */
+>      if (hyperv_feat_enabled(cpu, HYPERV_FEAT_SYNIC) &&
+> @@ -1243,6 +1248,24 @@ static int hyperv_handle_properties(CPUState *cs,
+>          goto free;
+>      }
+>  
+> +    if (hyperv_feat_enabled(cpu, HYPERV_FEAT_DIRECT_TLBFLUSH) ||
+> +        cpu->hyperv_passthrough) {
+> +        if (!cpu->expose_kvm) {
+> +            r = kvm_vcpu_enable_cap(cs, KVM_CAP_HYPERV_DIRECT_TLBFLUSH, 0, 0);
+> +            if (hyperv_feat_enabled(cpu, HYPERV_FEAT_DIRECT_TLBFLUSH) && r) {
+> +                fprintf(stderr,
+> +                    "Hyper-V %s is not supported by kernel\n",
+> +                    kvm_hyperv_properties[HYPERV_FEAT_DIRECT_TLBFLUSH].desc);
+> +                return -ENOSYS;
+> +            }
+> +        } else if (!cpu->hyperv_passthrough) {
+> +            fprintf(stderr,
+> +                "Hyper-V %s requires not to expose KVM capabilities.\n",
+
+My take:
+"... requires KVM hypervisor signature to be hidden (-kvm)."
+
+> +                kvm_hyperv_properties[HYPERV_FEAT_DIRECT_TLBFLUSH].desc);
+> +            return -ENOSYS;
+> +        }
+> +    }
+
+Thanks, the check looks correct to me now.
+
+> +
+>      if (cpu->hyperv_passthrough) {
+>          /* We already copied all feature words from KVM as is */
+>          r = cpuid->nent;
+
+-- 
+Vitaly
 
