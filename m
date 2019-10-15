@@ -3,55 +3,55 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E9D5C10F14
-	for <qemu-devel@archiver.kernel.org>; Tue, 15 Oct 2019 14:46:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F06E8ECE588
+	for <qemu-devel@archiver.kernel.org>; Tue, 15 Oct 2019 14:51:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5D78F20640
-	for <qemu-devel@archiver.kernel.org>; Tue, 15 Oct 2019 14:46:56 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5D78F20640
+	by mail.kernel.org (Postfix) with ESMTPS id C56F72054F
+	for <qemu-devel@archiver.kernel.org>; Tue, 15 Oct 2019 14:51:08 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C56F72054F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47120 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47358 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iKO6B-00021k-08
-	for qemu-devel@archiver.kernel.org; Tue, 15 Oct 2019 10:46:55 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36307)
+	id 1iKOAF-0006dE-TR
+	for qemu-devel@archiver.kernel.org; Tue, 15 Oct 2019 10:51:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36505)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1iKNo7-0006yD-HQ
- for qemu-devel@nongnu.org; Tue, 15 Oct 2019 10:28:16 -0400
+ (envelope-from <mreitz@redhat.com>) id 1iKNoL-0007Iy-LV
+ for qemu-devel@nongnu.org; Tue, 15 Oct 2019 10:28:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1iKNo6-0000D5-27
- for qemu-devel@nongnu.org; Tue, 15 Oct 2019 10:28:15 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:59340)
+ (envelope-from <mreitz@redhat.com>) id 1iKNoK-0000KU-A0
+ for qemu-devel@nongnu.org; Tue, 15 Oct 2019 10:28:29 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:50048)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <mreitz@redhat.com>)
- id 1iKNo2-00009k-Gi; Tue, 15 Oct 2019 10:28:10 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ id 1iKNoH-0000IB-D9; Tue, 15 Oct 2019 10:28:25 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id A93A630A7FC2;
- Tue, 15 Oct 2019 14:28:09 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id A2D4E30BE7DB;
+ Tue, 15 Oct 2019 14:28:24 +0000 (UTC)
 Received: from localhost (ovpn-117-226.ams2.redhat.com [10.36.117.226])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 4557861F22;
- Tue, 15 Oct 2019 14:28:09 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 4773860628;
+ Tue, 15 Oct 2019 14:28:24 +0000 (UTC)
 From: Max Reitz <mreitz@redhat.com>
 To: qemu-block@nongnu.org
-Subject: [PATCH v2 15/21] iotests: Avoid cp/mv of test images
-Date: Tue, 15 Oct 2019 16:27:23 +0200
-Message-Id: <20191015142729.18123-16-mreitz@redhat.com>
+Subject: [PATCH v2 18/21] iotests: Make 137 work with data_file
+Date: Tue, 15 Oct 2019 16:27:26 +0200
+Message-Id: <20191015142729.18123-19-mreitz@redhat.com>
 In-Reply-To: <20191015142729.18123-1-mreitz@redhat.com>
 References: <20191015142729.18123-1-mreitz@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.47]); Tue, 15 Oct 2019 14:28:09 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.44]); Tue, 15 Oct 2019 14:28:24 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
@@ -73,137 +73,79 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This will not work with external data files, so try to get tests working
-without it as far as possible.
+When using an external data file, there are no refcounts for data
+clusters.  We thus have to adjust the corruption test in this patch to
+not be based around a data cluster allocation, but the L2 table
+allocation (L2 tables are still refcounted with external data files).
+
+Furthermore, we should not print qcow2.py's list of incompatible
+features because it differs depending on whether there is an external
+data file or not.
+
+With those two changes, the test will work both with an external data
+files (once that options works with the iotests at all).
 
 Signed-off-by: Max Reitz <mreitz@redhat.com>
-Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
 ---
- tests/qemu-iotests/063     | 12 ++++--------
- tests/qemu-iotests/063.out |  3 ++-
- tests/qemu-iotests/085     |  9 +++------
- tests/qemu-iotests/085.out |  8 ++++----
- 4 files changed, 13 insertions(+), 19 deletions(-)
+ tests/qemu-iotests/137     | 15 +++++++++++----
+ tests/qemu-iotests/137.out |  6 ++----
+ 2 files changed, 13 insertions(+), 8 deletions(-)
 
-diff --git a/tests/qemu-iotests/063 b/tests/qemu-iotests/063
-index eef2b8a534..c750b3806e 100755
---- a/tests/qemu-iotests/063
-+++ b/tests/qemu-iotests/063
-@@ -51,15 +51,13 @@ _unsupported_imgopts "subformat=3DmonolithicFlat" \
- _make_test_img 4M
+diff --git a/tests/qemu-iotests/137 b/tests/qemu-iotests/137
+index 6cf2997577..7ae86892f7 100755
+--- a/tests/qemu-iotests/137
++++ b/tests/qemu-iotests/137
+@@ -138,14 +138,21 @@ $QEMU_IO \
+     "$TEST_IMG" 2>&1 | _filter_qemu_io
 =20
- echo "=3D=3D Testing conversion with -n fails with no target file =3D=3D=
-"
--# check .orig file does not exist
--rm -f "$TEST_IMG.orig"
- if $QEMU_IMG convert -f $IMGFMT -O $IMGFMT -n "$TEST_IMG" "$TEST_IMG.ori=
-g" >/dev/null 2>&1; then
-     exit 1
- fi
+ # The dirty bit must not be set
+-$PYTHON qcow2.py "$TEST_IMG" dump-header | grep incompatible_features
++# (Filter the external data file bit)
++if $PYTHON qcow2.py "$TEST_IMG" dump-header | grep incompatible_features=
+ \
++    | grep -q '\<0\>'
++then
++    echo 'ERROR: Dirty bit set'
++else
++    echo 'OK: Dirty bit not set'
++fi
 =20
- echo "=3D=3D Testing conversion with -n succeeds with a target file =3D=3D=
-"
--rm -f "$TEST_IMG.orig"
--cp "$TEST_IMG" "$TEST_IMG.orig"
-+_rm_test_img "$TEST_IMG.orig"
-+TEST_IMG=3D"$TEST_IMG.orig" _make_test_img 4M
- if ! $QEMU_IMG convert -f $IMGFMT -O $IMGFMT -n "$TEST_IMG" "$TEST_IMG.o=
-rig" ; then
-     exit 1
- fi
-@@ -85,10 +83,8 @@ fi
- _check_test_img
-=20
- echo "=3D=3D Testing conversion to a smaller file fails =3D=3D"
--rm -f "$TEST_IMG.orig"
--mv "$TEST_IMG" "$TEST_IMG.orig"
--_make_test_img 2M
--if $QEMU_IMG convert -f $IMGFMT -O $IMGFMT -n "$TEST_IMG.orig" "$TEST_IM=
-G" >/dev/null 2>&1; then
-+TEST_IMG=3D"$TEST_IMG.target" _make_test_img 2M
-+if $QEMU_IMG convert -f $IMGFMT -O $IMGFMT -n "$TEST_IMG" "$TEST_IMG.tar=
-get" >/dev/null 2>&1; then
-     exit 1
- fi
-=20
-diff --git a/tests/qemu-iotests/063.out b/tests/qemu-iotests/063.out
-index 7b691b2c9e..890b719bf0 100644
---- a/tests/qemu-iotests/063.out
-+++ b/tests/qemu-iotests/063.out
-@@ -2,11 +2,12 @@ QA output created by 063
- Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D4194304
- =3D=3D Testing conversion with -n fails with no target file =3D=3D
- =3D=3D Testing conversion with -n succeeds with a target file =3D=3D
-+Formatting 'TEST_DIR/t.IMGFMT.orig', fmt=3DIMGFMT size=3D4194304
- =3D=3D Testing conversion to raw is the same after conversion with -n =3D=
-=3D
- =3D=3D Testing conversion back to original format =3D=3D
- No errors were found on the image.
- =3D=3D Testing conversion to a smaller file fails =3D=3D
--Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D2097152
-+Formatting 'TEST_DIR/t.IMGFMT.target', fmt=3DIMGFMT size=3D2097152
- =3D=3D Regression testing for copy offloading bug =3D=3D
- Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D1048576
- Formatting 'TEST_DIR/t.IMGFMT.target', fmt=3DIMGFMT size=3D1048576
-diff --git a/tests/qemu-iotests/085 b/tests/qemu-iotests/085
-index bbea1252d2..46981dbb64 100755
---- a/tests/qemu-iotests/085
-+++ b/tests/qemu-iotests/085
-@@ -105,8 +105,7 @@ add_snapshot_image()
- {
-     base_image=3D"${TEST_DIR}/$((${1}-1))-${snapshot_virt0}"
-     snapshot_file=3D"${TEST_DIR}/${1}-${snapshot_virt0}"
--    _make_test_img -u -b "${base_image}" "$size"
--    mv "${TEST_IMG}" "${snapshot_file}"
-+    TEST_IMG=3D$snapshot_file _make_test_img -u -b "${base_image}" "$siz=
-e"
-     do_blockdev_add "$1" "'backing': null, " "${snapshot_file}"
- }
-=20
-@@ -122,10 +121,8 @@ blockdev_snapshot()
-=20
- size=3D128M
-=20
--_make_test_img $size
--mv "${TEST_IMG}" "${TEST_IMG}.1"
--_make_test_img $size
--mv "${TEST_IMG}" "${TEST_IMG}.2"
-+TEST_IMG=3D"$TEST_IMG.1" _make_test_img $size
-+TEST_IMG=3D"$TEST_IMG.2" _make_test_img $size
-=20
- echo
- echo =3D=3D=3D Running QEMU =3D=3D=3D
-diff --git a/tests/qemu-iotests/085.out b/tests/qemu-iotests/085.out
-index 2a5f256cd3..313198f182 100644
---- a/tests/qemu-iotests/085.out
-+++ b/tests/qemu-iotests/085.out
-@@ -1,6 +1,6 @@
- QA output created by 085
--Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D134217728
--Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D134217728
-+Formatting 'TEST_DIR/t.IMGFMT.1', fmt=3DIMGFMT size=3D134217728
-+Formatting 'TEST_DIR/t.IMGFMT.2', fmt=3DIMGFMT size=3D134217728
-=20
- =3D=3D=3D Running QEMU =3D=3D=3D
-=20
-@@ -55,10 +55,10 @@ Formatting 'TEST_DIR/10-snapshot-v1.qcow2', fmt=3Dqco=
-w2 size=3D134217728 backing_fil
-=20
- =3D=3D=3D Create a couple of snapshots using blockdev-snapshot =3D=3D=3D
-=20
--Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D134217728 backing_fi=
-le=3DTEST_DIR/10-snapshot-v0.IMGFMT
-+Formatting 'TEST_DIR/11-snapshot-v0.IMGFMT', fmt=3DIMGFMT size=3D1342177=
-28 backing_file=3DTEST_DIR/10-snapshot-v0.IMGFMT
- {"return": {}}
- {"return": {}}
--Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D134217728 backing_fi=
-le=3DTEST_DIR/11-snapshot-v0.IMGFMT
-+Formatting 'TEST_DIR/12-snapshot-v0.IMGFMT', fmt=3DIMGFMT size=3D1342177=
-28 backing_file=3DTEST_DIR/11-snapshot-v0.IMGFMT
- {"return": {}}
- {"return": {}}
-=20
+ # Similarly we can test whether corruption detection has been enabled:
+-# Create L1/L2, overwrite first entry in refcount block, allocate someth=
+ing.
++# Create L1, overwrite refcounts, force allocation of L2 by writing
++# data.
+ # Disabling the checks should fail, so the corruption must be detected.
+ _make_test_img 64M
+-$QEMU_IO -c "write 0 64k" "$TEST_IMG" | _filter_qemu_io
+-poke_file "$TEST_IMG" "$((0x20000))" "\x00\x00"
++poke_file "$TEST_IMG" "$((0x20000))" "\x00\x00\x00\x00\x00\x00\x00\x00"
+ $QEMU_IO \
+     -c "reopen -o overlap-check=3Dnone,lazy-refcounts=3D42" \
+     -c "write 64k 64k" \
+diff --git a/tests/qemu-iotests/137.out b/tests/qemu-iotests/137.out
+index bd4523a853..86377c80cd 100644
+--- a/tests/qemu-iotests/137.out
++++ b/tests/qemu-iotests/137.out
+@@ -36,11 +36,9 @@ qemu-io: Unsupported value 'blubb' for qcow2 option 'o=
+verlap-check'. Allowed are
+ wrote 512/512 bytes at offset 0
+ 512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+ ./common.rc: Killed                  ( VALGRIND_QEMU=3D"${VALGRIND_QEMU_=
+IO}" _qemu_proc_exec "${VALGRIND_LOGFILE}" "$QEMU_IO_PROG" $QEMU_IO_ARGS =
+"$@" )
+-incompatible_features     []
++OK: Dirty bit not set
+ Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D67108864
+-wrote 65536/65536 bytes at offset 0
+-64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+ qemu-io: Parameter 'lazy-refcounts' expects 'on' or 'off'
+-qcow2: Marking image as corrupt: Preventing invalid write on metadata (o=
+verlaps with qcow2_header); further corruption events will be suppressed
++qcow2: Marking image as corrupt: Preventing invalid allocation of L2 tab=
+le at offset 0; further corruption events will be suppressed
+ write failed: Input/output error
+ *** done
 --=20
 2.21.0
 
