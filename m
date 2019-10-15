@@ -3,60 +3,61 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no
-	autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3BE4BC10F14
-	for <qemu-devel@archiver.kernel.org>; Tue, 15 Oct 2019 12:58:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 42E0EC10F14
+	for <qemu-devel@archiver.kernel.org>; Tue, 15 Oct 2019 13:30:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0C5FC217F9
-	for <qemu-devel@archiver.kernel.org>; Tue, 15 Oct 2019 12:58:30 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0C5FC217F9
+	by mail.kernel.org (Postfix) with ESMTPS id 17CC2218DE
+	for <qemu-devel@archiver.kernel.org>; Tue, 15 Oct 2019 13:30:47 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 17CC2218DE
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44320 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45156 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iKMPF-00044l-65
-	for qemu-devel@archiver.kernel.org; Tue, 15 Oct 2019 08:58:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45133)
+	id 1iKMuC-0005SH-TN
+	for qemu-devel@archiver.kernel.org; Tue, 15 Oct 2019 09:30:28 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50712)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <quintela@redhat.com>) id 1iKMOa-0003c7-0K
- for qemu-devel@nongnu.org; Tue, 15 Oct 2019 08:57:49 -0400
+ (envelope-from <ehabkost@redhat.com>) id 1iKMtM-0004zd-E3
+ for qemu-devel@nongnu.org; Tue, 15 Oct 2019 09:29:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <quintela@redhat.com>) id 1iKMOY-0000F3-W5
- for qemu-devel@nongnu.org; Tue, 15 Oct 2019 08:57:47 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:41112)
+ (envelope-from <ehabkost@redhat.com>) id 1iKMtJ-0004PF-Et
+ for qemu-devel@nongnu.org; Tue, 15 Oct 2019 09:29:34 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:44938)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <quintela@redhat.com>) id 1iKMOY-0000Eo-Ql
- for qemu-devel@nongnu.org; Tue, 15 Oct 2019 08:57:46 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
+ (Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1iKMtJ-0004Oo-5b
+ for qemu-devel@nongnu.org; Tue, 15 Oct 2019 09:29:33 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 00937BB9C2
- for <qemu-devel@nongnu.org>; Tue, 15 Oct 2019 12:57:46 +0000 (UTC)
-Received: from redhat.com (ovpn-117-212.ams2.redhat.com [10.36.117.212])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id DB71060C80;
- Tue, 15 Oct 2019 12:57:42 +0000 (UTC)
-From: Juan Quintela <quintela@redhat.com>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Subject: Re: [PATCH 1/2] migration: Boost SaveStateEntry.instance_id to 64 bits
-In-Reply-To: <20191015085705.GB3073@work-vm> (David Alan Gilbert's message of
- "Tue, 15 Oct 2019 09:57:05 +0100")
-References: <20191015075444.10955-1-peterx@redhat.com>
- <20191015075444.10955-2-peterx@redhat.com> <87lftmqtvi.fsf@trasno.org>
- <20191015085705.GB3073@work-vm>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.2 (gnu/linux)
-Date: Tue, 15 Oct 2019 14:57:40 +0200
-Message-ID: <87h84aqi7v.fsf@trasno.org>
+ by mx1.redhat.com (Postfix) with ESMTPS id 8D31A7FDE5;
+ Tue, 15 Oct 2019 13:29:31 +0000 (UTC)
+Received: from localhost (ovpn-116-20.phx2.redhat.com [10.3.116.20])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 0B20B5C21F;
+ Tue, 15 Oct 2019 13:29:30 +0000 (UTC)
+Date: Tue, 15 Oct 2019 10:29:29 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+To: "Kang, Luwei" <luwei.kang@intel.com>
+Subject: Re: [PATCH v4 2/2] i386: Add support to get/set/migrate Intel
+ Processor Trace feature
+Message-ID: <20191015132929.GY4084@habkost.net>
+References: <1520182116-16485-1-git-send-email-luwei.kang@intel.com>
+ <1520182116-16485-2-git-send-email-luwei.kang@intel.com>
+ <20191012031407.GK4084@habkost.net>
+ <82D7661F83C1A047AF7DC287873BF1E17382A209@SHSMSX104.ccr.corp.intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <82D7661F83C1A047AF7DC287873BF1E17382A209@SHSMSX104.ccr.corp.intel.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.26]); Tue, 15 Oct 2019 12:57:46 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.27]); Tue, 15 Oct 2019 13:29:31 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 209.132.183.28
@@ -71,48 +72,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: quintela@redhat.com
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>,
- qemu-devel@nongnu.org, Peter Xu <peterx@redhat.com>,
- Igor Mammedov <imammedo@redhat.com>
+Cc: "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+ "mtosatti@redhat.com" <mtosatti@redhat.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ Chao Peng <chao.p.peng@linux.intel.com>,
+ "pbonzini@redhat.com" <pbonzini@redhat.com>,
+ "rth@twiddle.net" <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-"Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
-> * Juan Quintela (quintela@redhat.com) wrote:
->> Peter Xu <peterx@redhat.com> wrote:
->> > It was "int" and used as 32bits fields (see save_section_header()).
->> > It's unsafe already because sizeof(int) could be 2 on i386, I think.
->> > So at least uint32_t would suite more.  While it also uses "-1" as a
->> > placeholder of "we want to generate the instance ID automatically".
->> > Hence a more proper value should be int64_t.
->> >
->> > This will start to be useful after next patch in which we can start to
->> > convert a real uint32_t value as instance ID.
->> >
->> > Signed-off-by: Peter Xu <peterx@redhat.com>
->> 
->> Hi
->> 
->> Being more helpful,  I think that it is better to just:
->> 
->> * change instance_id to be an uint32_t (notice that for all architectures
->>   that we support, it is actually int32_t).
->> 
->> * export calculate_new_instance_id() and adjust callers that use -1.
->> 
->> or
->> 
->> * export a new function that just use the calculate_new_instance_id()
->
-> Do you mean that we end up with two functions, one that does it
-> automatically, and one that takes an ID?
+On Tue, Oct 15, 2019 at 12:51:48PM +0000, Kang, Luwei wrote:
+> qemu> > diff --git a/target/i386/kvm.c b/target/i386/kvm.c index
+> > > f9f4cd1..097c953 100644
+> > > --- a/target/i386/kvm.c
+> > > +++ b/target/i386/kvm.c
+> > > @@ -1811,6 +1811,25 @@ static int kvm_put_msrs(X86CPU *cpu, int level)
+> > >                  kvm_msr_entry_add(cpu, MSR_MTRRphysMask(i), mask);
+> > >              }
+> > >          }
+> > > +        if (env->features[FEAT_7_0_EBX] & CPUID_7_0_EBX_INTEL_PT) {
+> > > +            int addr_num = kvm_arch_get_supported_cpuid(kvm_state,
+> > > +                                                    0x14, 1, R_EAX) &
+> > > + 0x7;
+> > > +
+> > > +            kvm_msr_entry_add(cpu, MSR_IA32_RTIT_CTL,
+> > > +                            env->msr_rtit_ctrl);
+> > > +            kvm_msr_entry_add(cpu, MSR_IA32_RTIT_STATUS,
+> > > +                            env->msr_rtit_status);
+> > > +            kvm_msr_entry_add(cpu, MSR_IA32_RTIT_OUTPUT_BASE,
+> > > +                            env->msr_rtit_output_base);
+> > 
+> > This causes the following crash on some hosts:
+> > 
+> >   qemu-system-x86_64: error: failed to set MSR 0x560 to 0x0
+> >   qemu-system-x86_64: target/i386/kvm.c:2673: kvm_put_msrs: Assertion `ret == cpu->kvm_msr_buf->nmsrs' failed.
+> > 
+> > Checking for CPUID_7_0_EBX_INTEL_PT is not enough: KVM has additional conditions that might prevent writing to this MSR
+> > (PT_CAP_topa_output && PT_CAP_single_range_output).  This causes QEMU to crash if some of the conditions aren't met.
+> > 
+> > Writing and reading this MSR (and the ones below) need to be conditional on KVM_GET_MSR_INDEX_LIST.
+> > 
+> 
+> Hi Eduardo,
+>     I found this issue can't be reproduced in upstream source code but can be reproduced on RHEL8.1. I haven't got the qemu source code of RHEL8.1. But after adding some trace in KVM, I found the KVM has reported the complete Intel PT CPUID information to qemu but the Intel PT CPUID (0x14) is lost when qemu setting the CPUID to KVM (cpuid level is 0xd). It looks like lost the below patch.
+> 
+> commit f24c3a79a415042f6dc195f029a2ba7247d14cac
+> Author: Luwei Kang <luwei.kang@intel.com>
+> Date:   Tue Jan 29 18:52:59 2019 -0500
+>     i386: extended the cpuid_level when Intel PT is enabled
+> 
+>     Intel Processor Trace required CPUID[0x14] but the cpuid_level
+>     have no change when create a kvm guest with
+>     e.g. "-cpu qemu64,+intel-pt".
 
-That is one option.
+Thanks for the pointer.  This may avoid triggering the bug in the
+default configuration, but we still need to make the MSR writing
+conditional on KVM_GET_MSR_INDEX_LIST.  Older machine-types have
+x-intel-pt-auto-level=off, and the user may set `level` manually.
 
-The other is that we export calculate_new_instance_id(), and we use that
-instead of -1.
-
-Later, Juan.
+-- 
+Eduardo
 
