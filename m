@@ -3,56 +3,57 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 58D4EECE588
-	for <qemu-devel@archiver.kernel.org>; Tue, 15 Oct 2019 16:42:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 787D0ECE588
+	for <qemu-devel@archiver.kernel.org>; Tue, 15 Oct 2019 16:43:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2AD3220650
-	for <qemu-devel@archiver.kernel.org>; Tue, 15 Oct 2019 16:42:17 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2AD3220650
+	by mail.kernel.org (Postfix) with ESMTPS id 07B5420650
+	for <qemu-devel@archiver.kernel.org>; Tue, 15 Oct 2019 16:43:06 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 07B5420650
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52820 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52835 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iKPtn-0008V8-Tv
-	for qemu-devel@archiver.kernel.org; Tue, 15 Oct 2019 12:42:15 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41310)
+	id 1iKPub-0001Q6-Fp
+	for qemu-devel@archiver.kernel.org; Tue, 15 Oct 2019 12:43:05 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41673)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1iKPhV-0001tD-AT
- for qemu-devel@nongnu.org; Tue, 15 Oct 2019 12:29:34 -0400
+ (envelope-from <philmd@redhat.com>) id 1iKPii-0003Rn-EP
+ for qemu-devel@nongnu.org; Tue, 15 Oct 2019 12:30:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1iKPhU-00056j-7g
- for qemu-devel@nongnu.org; Tue, 15 Oct 2019 12:29:33 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:40616)
+ (envelope-from <philmd@redhat.com>) id 1iKPih-00062w-9E
+ for qemu-devel@nongnu.org; Tue, 15 Oct 2019 12:30:48 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:57900)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iKPhU-00055x-2I
- for qemu-devel@nongnu.org; Tue, 15 Oct 2019 12:29:32 -0400
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iKPig-00062S-Vz
+ for qemu-devel@nongnu.org; Tue, 15 Oct 2019 12:30:47 -0400
 Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
  [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 29DBC2102;
- Tue, 15 Oct 2019 16:29:31 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 1F817308FBAC;
+ Tue, 15 Oct 2019 16:30:46 +0000 (UTC)
 Received: from x1w.redhat.com (ovpn-204-35.brq.redhat.com [10.40.204.35])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 9CA0F19C58;
- Tue, 15 Oct 2019 16:29:24 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 22B6819C5B;
+ Tue, 15 Oct 2019 16:30:35 +0000 (UTC)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 11/32] Revert "irq: introduce qemu_irq_proxy()"
-Date: Tue, 15 Oct 2019 18:26:44 +0200
-Message-Id: <20191015162705.28087-12-philmd@redhat.com>
+Subject: [PATCH 18/32] hw/mips/mips_malta: Extract the PIIX4 creation code as
+ piix4_create()
+Date: Tue, 15 Oct 2019 18:26:51 +0200
+Message-Id: <20191015162705.28087-19-philmd@redhat.com>
 In-Reply-To: <20191015162705.28087-1-philmd@redhat.com>
 References: <20191015162705.28087-1-philmd@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.71]); Tue, 15 Oct 2019 16:29:31 +0000 (UTC)
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.43]); Tue, 15 Oct 2019 16:30:46 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
@@ -72,7 +73,6 @@ Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
  Stefano Stabellini <sstabellini@kernel.org>,
  Eduardo Habkost <ehabkost@redhat.com>, kvm@vger.kernel.org,
  Paul Durrant <paul@xen.org>, "Michael S. Tsirkin" <mst@redhat.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
  Paolo Bonzini <pbonzini@redhat.com>,
  =?UTF-8?q?Herv=C3=A9=20Poussineau?= <hpoussin@reactos.org>,
  Aleksandar Markovic <amarkovic@wavecomp.com>, xen-devel@lists.xenproject.org,
@@ -85,62 +85,97 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+The Malta board instantiate a PIIX4 chipset doing various
+calls. Refactor all those related calls into a single
+function: piix4_create().
 
-This function isn't used anymore.
-
-This reverts commit 22ec3283efba9ba0792790da786d6776d83f2a92.
-
-Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 ---
- hw/core/irq.c    | 14 --------------
- include/hw/irq.h |  5 -----
- 2 files changed, 19 deletions(-)
+ hw/mips/mips_malta.c | 47 +++++++++++++++++++++++++++-----------------
+ 1 file changed, 29 insertions(+), 18 deletions(-)
 
-diff --git a/hw/core/irq.c b/hw/core/irq.c
-index 7cc0295d0e..fb3045b912 100644
---- a/hw/core/irq.c
-+++ b/hw/core/irq.c
-@@ -120,20 +120,6 @@ qemu_irq qemu_irq_split(qemu_irq irq1, qemu_irq irq2=
-)
-     return qemu_allocate_irq(qemu_splitirq, s, 0);
+diff --git a/hw/mips/mips_malta.c b/hw/mips/mips_malta.c
+index 774bb810f6..0d4312840b 100644
+--- a/hw/mips/mips_malta.c
++++ b/hw/mips/mips_malta.c
+@@ -1210,6 +1210,34 @@ static void mips_create_cpu(MachineState *ms, Malt=
+aState *s,
+     }
  }
 =20
--static void proxy_irq_handler(void *opaque, int n, int level)
--{
--    qemu_irq **target =3D opaque;
--
--    if (*target) {
--        qemu_set_irq((*target)[n], level);
--    }
--}
--
--qemu_irq *qemu_irq_proxy(qemu_irq **target, int n)
--{
--    return qemu_allocate_irqs(proxy_irq_handler, target, n);
--}
--
- void qemu_irq_intercept_in(qemu_irq *gpio_in, qemu_irq_handler handler, =
-int n)
++static DeviceState *piix4_create(PCIBus *pci_bus, ISABus **isa_bus,
++                                 I2CBus **smbus, size_t ide_buses)
++{
++    const size_t ide_drives =3D ide_buses * MAX_IDE_DEVS;
++    DriveInfo **hd;
++    PCIDevice *pci;
++    DeviceState *dev;
++
++    pci =3D pci_create_simple_multifunction(pci_bus, PCI_DEVFN(10, 0),
++                                          true, TYPE_PIIX4_PCI_DEVICE);
++    dev =3D DEVICE(pci);
++    if (isa_bus) {
++        *isa_bus =3D ISA_BUS(qdev_get_child_bus(dev, "isa.0"));
++    }
++
++    hd =3D g_new(DriveInfo *, ide_drives);
++    ide_drive_get(hd, ide_drives);
++    pci_piix4_ide_init(pci_bus, hd, pci->devfn + 1);
++    g_free(hd);
++    pci_create_simple(pci_bus, pci->devfn + 2, "piix4-usb-uhci");
++    if (smbus) {
++        *smbus =3D piix4_pm_init(pci_bus, pci->devfn + 3, 0x1100,
++                               isa_get_irq(NULL, 9), NULL, 0, NULL);
++   }
++
++    return dev;
++}
++
+ static
+ void mips_malta_init(MachineState *machine)
  {
-     int i;
-diff --git a/include/hw/irq.h b/include/hw/irq.h
-index fe527f6f51..24ba0ece11 100644
---- a/include/hw/irq.h
-+++ b/include/hw/irq.h
-@@ -51,11 +51,6 @@ qemu_irq qemu_irq_invert(qemu_irq irq);
-  */
- qemu_irq qemu_irq_split(qemu_irq irq1, qemu_irq irq2);
+@@ -1231,12 +1259,8 @@ void mips_malta_init(MachineState *machine)
+     PCIBus *pci_bus;
+     ISABus *isa_bus;
+     qemu_irq cbus_irq, i8259_irq;
+-    PCIDevice *pci;
+-    int piix4_devfn;
+     I2CBus *smbus;
+     DriveInfo *dinfo;
+-    const size_t ide_drives =3D MAX_IDE_BUS * MAX_IDE_DEVS;
+-    DriveInfo **hd;
+     int fl_idx =3D 0;
+     int be;
 =20
--/* Returns a new IRQ set which connects 1:1 to another IRQ set, which
-- * may be set later.
-- */
--qemu_irq *qemu_irq_proxy(qemu_irq **target, int n);
+@@ -1407,14 +1431,7 @@ void mips_malta_init(MachineState *machine)
+     pci_bus =3D gt64120_register(s->i8259);
+=20
+     /* Southbridge */
+-    hd =3D g_new(DriveInfo *, ide_drives);
+-    ide_drive_get(hd, ide_drives);
 -
- /* For internal use in qtest.  Similar to qemu_irq_split, but operating
-    on an existing vector of qemu_irq.  */
- void qemu_irq_intercept_in(qemu_irq *gpio_in, qemu_irq_handler handler, =
-int n);
+-    pci =3D pci_create_simple_multifunction(pci_bus, PCI_DEVFN(10, 0),
+-                                          true, TYPE_PIIX4_PCI_DEVICE);
+-    dev =3D DEVICE(pci);
+-    isa_bus =3D ISA_BUS(qdev_get_child_bus(dev, "isa.0"));
+-    piix4_devfn =3D pci->devfn;
++    dev =3D piix4_create(pci_bus, &isa_bus, &smbus, MAX_IDE_BUS);
+=20
+     /* Interrupt controller */
+     qdev_connect_gpio_out_named(dev, "intr", 0, i8259_irq);
+@@ -1422,12 +1439,6 @@ void mips_malta_init(MachineState *machine)
+         s->i8259[i] =3D qdev_get_gpio_in_named(dev, "isa", i);
+     }
+=20
+-    pci_piix4_ide_init(pci_bus, hd, piix4_devfn + 1);
+-    g_free(hd);
+-    pci_create_simple(pci_bus, piix4_devfn + 2, "piix4-usb-uhci");
+-    smbus =3D piix4_pm_init(pci_bus, piix4_devfn + 3, 0x1100,
+-                          isa_get_irq(NULL, 9), NULL, 0, NULL);
+-
+     /* generate SPD EEPROM data */
+     generate_eeprom_spd(&smbus_eeprom_buf[0 * 256], ram_size);
+     generate_eeprom_serial(&smbus_eeprom_buf[6 * 256]);
 --=20
 2.21.0
 
