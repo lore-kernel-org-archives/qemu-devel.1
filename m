@@ -2,60 +2,83 @@ Return-Path: <SRS0=6OCO=YI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.3 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AF717ECE58E
-	for <qemu-devel@archiver.kernel.org>; Tue, 15 Oct 2019 09:23:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 40237ECE58E
+	for <qemu-devel@archiver.kernel.org>; Tue, 15 Oct 2019 09:37:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8122C2064B
-	for <qemu-devel@archiver.kernel.org>; Tue, 15 Oct 2019 09:23:15 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8122C2064B
+	by mail.kernel.org (Postfix) with ESMTPS id 127C32083B
+	for <qemu-devel@archiver.kernel.org>; Tue, 15 Oct 2019 09:37:06 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 127C32083B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38460 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38740 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iKJ2w-0000ji-N0
-	for qemu-devel@archiver.kernel.org; Tue, 15 Oct 2019 05:23:14 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36845)
+	id 1iKJGL-0005en-4X
+	for qemu-devel@archiver.kernel.org; Tue, 15 Oct 2019 05:37:05 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38392)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgilbert@redhat.com>) id 1iKJ2H-0000Fs-Ea
- for qemu-devel@nongnu.org; Tue, 15 Oct 2019 05:22:34 -0400
+ (envelope-from <philmd@redhat.com>) id 1iKJFf-0005Cr-TC
+ for qemu-devel@nongnu.org; Tue, 15 Oct 2019 05:36:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgilbert@redhat.com>) id 1iKJ2F-0001DK-S1
- for qemu-devel@nongnu.org; Tue, 15 Oct 2019 05:22:32 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:42564)
+ (envelope-from <philmd@redhat.com>) id 1iKJFd-0005kV-SE
+ for qemu-devel@nongnu.org; Tue, 15 Oct 2019 05:36:22 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49708)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1iKJ2F-0001CZ-MU
- for qemu-devel@nongnu.org; Tue, 15 Oct 2019 05:22:31 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iKJFd-0005k7-Ma
+ for qemu-devel@nongnu.org; Tue, 15 Oct 2019 05:36:21 -0400
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id F042918C4280
- for <qemu-devel@nongnu.org>; Tue, 15 Oct 2019 09:22:27 +0000 (UTC)
-Received: from work-vm (ovpn-117-145.ams2.redhat.com [10.36.117.145])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id A315B61341;
- Tue, 15 Oct 2019 09:22:20 +0000 (UTC)
-Date: Tue, 15 Oct 2019 10:22:18 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: Peter Xu <peterx@redhat.com>
-Subject: Re: [PATCH 2/2] apic: Use 32bit APIC ID for migration instance ID
-Message-ID: <20191015092218.GC3073@work-vm>
-References: <20191015075444.10955-1-peterx@redhat.com>
- <20191015075444.10955-3-peterx@redhat.com>
+ by mx1.redhat.com (Postfix) with ESMTPS id F3C1565F45
+ for <qemu-devel@nongnu.org>; Tue, 15 Oct 2019 09:36:18 +0000 (UTC)
+Received: by mail-wr1-f72.google.com with SMTP id 7so4599243wrl.2
+ for <qemu-devel@nongnu.org>; Tue, 15 Oct 2019 02:36:18 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=KBQLqLkzFS+rs982qohFgWN2778/ZUbSRf77nwmJfqQ=;
+ b=AQnm3tkYv4Y+9ZDlAyhPgfy/fzDqt7Sw8+NAPbg+I1mzdlKyoFpSLPDUsASXdHRjbM
+ tk4PsafVzMht8RRd8b+BjAPCTLJB5/l4xABRWdkTR3rlSOpT5Cgmmka5j5uRdUloM674
+ sL9su5gUHdv/0zOgUq5bKHlg9icyBLwQ3Vn40ckP0Q6NnkuPGpzRuuyAOUwSdQKhxY1N
+ UGW+9c01gs2akRYYZazXBs+hg0B/UQp0DexzsywmMqkzTc1G1Nk2kpe/k6HwpLdqdwmG
+ 8W3t6DVYko3yZjMA+jer5k9gZAazm+y/uaiEO9bsgeqOMZS+bCZYPLgIFhqDAdgWv8al
+ /xtQ==
+X-Gm-Message-State: APjAAAW9oexdOaTekDIs0XrNHVEy+10yU6y4bHcUn7AKb06tvqPwdrff
+ M20drpu7yR/KDWXhvq0jfhvQRzJCFkmHR7UvOE41koiU0jXD2UbuAEOKgRA/O4O5w4elNF8KBVq
+ Wg7vBtXblsLigxwA=
+X-Received: by 2002:a5d:43c2:: with SMTP id v2mr24288051wrr.153.1571132177695; 
+ Tue, 15 Oct 2019 02:36:17 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqzHVrLjTDXDqNH5mjr5BQTi/gWXttIbKyq1iwDk82THOvVgG/WSnxcs//XI2epW7RS3a7NtQQ==
+X-Received: by 2002:a5d:43c2:: with SMTP id v2mr24288027wrr.153.1571132177500; 
+ Tue, 15 Oct 2019 02:36:17 -0700 (PDT)
+Received: from [192.168.1.36] (14.red-88-21-201.staticip.rima-tde.net.
+ [88.21.201.14])
+ by smtp.gmail.com with ESMTPSA id c132sm30492022wme.27.2019.10.15.02.36.16
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Tue, 15 Oct 2019 02:36:16 -0700 (PDT)
+Subject: Re: [PULL v2 0/2] Tracing patches
+To: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
+References: <20191015084914.18045-1-stefanha@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <e699021e-d917-dbc4-9fcd-e3fc888dba89@redhat.com>
+Date: Tue, 15 Oct 2019 11:36:16 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20191015075444.10955-3-peterx@redhat.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.62]); Tue, 15 Oct 2019 09:22:27 +0000 (UTC)
+In-Reply-To: <20191015084914.18045-1-stefanha@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 209.132.183.28
@@ -70,71 +93,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Juan Quintela <quintela@redhat.com>,
- qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>,
- Igor Mammedov <imammedo@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-* Peter Xu (peterx@redhat.com) wrote:
-> Migration is silently broken now with x2apic config like this:
+On 10/15/19 10:49 AM, Stefan Hajnoczi wrote:
+> The following changes since commit 98b2e3c9ab3abfe476a2b02f8f51813edb90e72d:
 > 
->      -smp 200,maxcpus=288,sockets=2,cores=72,threads=2 \
->      -device intel-iommu,intremap=on,eim=on
+>    Merge remote-tracking branch 'remotes/stefanha/tags/block-pull-request' into staging (2019-10-08 16:08:35 +0100)
 > 
-> After migration, the guest kernel could hang at anything, due to
-> x2apic bit not migrated correctly in IA32_APIC_BASE on some vcpus, so
-> any operations related to x2apic could be broken then (e.g., RDMSR on
-> x2apic MSRs could fail because KVM would think that the vcpu hasn't
-> enabled x2apic at all).
+> are available in the Git repository at:
 > 
-> The issue is that the x2apic bit was never applied correctly for vcpus
-> whose ID > 255 when migrate completes, and that's because when we
-> migrate APIC we use the APICCommonState.id as instance ID of the
-> migration stream, while that's too short for x2apic.
+>    https://github.com/stefanha/qemu.git tags/tracing-pull-request
 > 
-> Let's use the newly introduced initial_apic_id for that.
+> for you to fetch changes up to 403e11edbfad5da2e6d5842adc9222f60e76ee43:
+> 
+>    trace: avoid "is" with a literal Python 3.8 warnings (2019-10-15 09:47:16 +0100)
+> 
+> ----------------------------------------------------------------
+> Pull request
+> 
+> v2:
+>   * Replaced "Launchpad:" tag with "Buglink:" as documented on the SubmitAPatch wiki page [Philippe]
 
-I'd like to understand a few things:
-   a) Does this change the instance ID of existing APICs on the
-migration stream? 
-     a1) Ever for <256 CPUs?
-     a2) For >=256 CPUs?
-
-    [Because changing the ID breaks migration]
-
-  b) Is the instance ID constant - I can see it's a property on the
-     APIC, but I cna't see who sets it
-
-  c) In the case where it fails, did we end up registering two
-     devices with the same name and instance ID?  If so, is it worth
-     adding a check that would error if we tried?
-
-Dave
-
-> 
-> Signed-off-by: Peter Xu <peterx@redhat.com>
-> ---
->  hw/intc/apic_common.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/hw/intc/apic_common.c b/hw/intc/apic_common.c
-> index aafd8e0e33..6024a3e06a 100644
-> --- a/hw/intc/apic_common.c
-> +++ b/hw/intc/apic_common.c
-> @@ -315,7 +315,7 @@ static void apic_common_realize(DeviceState *dev, Error **errp)
->      APICCommonState *s = APIC_COMMON(dev);
->      APICCommonClass *info;
->      static DeviceState *vapic;
-> -    int instance_id = s->id;
-> +    int64_t instance_id = s->initial_apic_id;
->  
->      info = APIC_COMMON_GET_CLASS(s);
->      info->realize(dev, errp);
-> -- 
-> 2.21.0
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+Thanks Stefan for this updated pullreq!
 
