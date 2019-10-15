@@ -2,57 +2,82 @@ Return-Path: <SRS0=6OCO=YI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9606EC10F14
-	for <qemu-devel@archiver.kernel.org>; Tue, 15 Oct 2019 11:39:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 148DDC10F14
+	for <qemu-devel@archiver.kernel.org>; Tue, 15 Oct 2019 11:43:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6C5C021848
-	for <qemu-devel@archiver.kernel.org>; Tue, 15 Oct 2019 11:39:14 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6C5C021848
+	by mail.kernel.org (Postfix) with ESMTPS id E08A721848
+	for <qemu-devel@archiver.kernel.org>; Tue, 15 Oct 2019 11:43:26 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E08A721848
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41708 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41870 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iKLAX-0007NV-Ji
-	for qemu-devel@archiver.kernel.org; Tue, 15 Oct 2019 07:39:13 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56623)
+	id 1iKLEb-0003mp-Vx
+	for qemu-devel@archiver.kernel.org; Tue, 15 Oct 2019 07:43:26 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58275)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <slp@redhat.com>) id 1iKKxK-0001dj-7J
- for qemu-devel@nongnu.org; Tue, 15 Oct 2019 07:25:35 -0400
+ (envelope-from <philmd@redhat.com>) id 1iKLAT-0007c0-US
+ for qemu-devel@nongnu.org; Tue, 15 Oct 2019 07:39:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <slp@redhat.com>) id 1iKKxI-0004nJ-T2
- for qemu-devel@nongnu.org; Tue, 15 Oct 2019 07:25:34 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:38940)
+ (envelope-from <philmd@redhat.com>) id 1iKLAR-0002Mi-ED
+ for qemu-devel@nongnu.org; Tue, 15 Oct 2019 07:39:09 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55920)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <slp@redhat.com>) id 1iKKxI-0004mx-Kh
- for qemu-devel@nongnu.org; Tue, 15 Oct 2019 07:25:32 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iKLAQ-0002M2-VD
+ for qemu-devel@nongnu.org; Tue, 15 Oct 2019 07:39:07 -0400
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id D9E7E3090FCE;
- Tue, 15 Oct 2019 11:25:31 +0000 (UTC)
-Received: from dritchie.redhat.com (unknown [10.33.36.106])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 1A7901001B07;
- Tue, 15 Oct 2019 11:25:28 +0000 (UTC)
-From: Sergio Lopez <slp@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v9 13/15] docs/microvm.rst: document the new microvm machine
- type
-Date: Tue, 15 Oct 2019 13:23:44 +0200
-Message-Id: <20191015112346.45554-14-slp@redhat.com>
-In-Reply-To: <20191015112346.45554-1-slp@redhat.com>
+ by mx1.redhat.com (Postfix) with ESMTPS id D6EBC11A24
+ for <qemu-devel@nongnu.org>; Tue, 15 Oct 2019 11:39:05 +0000 (UTC)
+Received: by mail-wm1-f69.google.com with SMTP id r21so5385194wme.5
+ for <qemu-devel@nongnu.org>; Tue, 15 Oct 2019 04:39:05 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=mTqLaqeFEbjVVwQNNIvunKHQFI9h93v9WYr9xpp1+eA=;
+ b=HjeiJ6rd91hWeemHsHn/422ut1fhVGq7/YN0SETN5epgmZJNKil+jnWCgCWD0wOhjw
+ hS4GeTE822EKDBi9hijs9T7rKv1Sv50YJ88XJ9g3YLZC5mTc2l9y1CQONf9nfyv7XGkW
+ /FvxGVGKjH8F/yEWYYm4hIOxHAdJ1BsHFMBu+bET9sVpbuPSkA61IhYreEWIWtfMz0dZ
+ LiXHNhX6q6MOvW2gHOsJRS5rA3bH//J03s3pjdMfPa8ajdW+3T20MqUjgd3+NO4TmKeF
+ CgzlOe7yn1Pj6WfZDBatHma0F6ZVy09qA2//SAZYiFN05GLknkXAFehqMb6vWpSyRoXs
+ g/jg==
+X-Gm-Message-State: APjAAAVTCId/jWLfYEwSbo5tfmrh1Q2O/4EL+rXFjMG/GrwDxj0SD/y0
+ ywH4yZX65+4ydsgJL34DAWpzJpIk4SVRPHmBkhxllNgoO1TWXTeU19EZa6tYLaX+KK44cvytKNM
+ V+rDo2og/OejtYWs=
+X-Received: by 2002:a5d:4f8f:: with SMTP id d15mr15317153wru.126.1571139542799; 
+ Tue, 15 Oct 2019 04:39:02 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqzYWqmL0r6OgLYVsQso3F4IM09Z2UOX8JMojI1+URNvckK/7O3p0zyrsT1BeMMS44DEChBi+A==
+X-Received: by 2002:a5d:4f8f:: with SMTP id d15mr15317138wru.126.1571139542611; 
+ Tue, 15 Oct 2019 04:39:02 -0700 (PDT)
+Received: from [192.168.1.36] (14.red-88-21-201.staticip.rima-tde.net.
+ [88.21.201.14])
+ by smtp.gmail.com with ESMTPSA id j26sm37556072wrd.2.2019.10.15.04.39.01
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Tue, 15 Oct 2019 04:39:02 -0700 (PDT)
+Subject: Re: [PATCH v9 15/15] MAINTAINERS: add microvm related files
+To: Sergio Lopez <slp@redhat.com>, qemu-devel@nongnu.org
 References: <20191015112346.45554-1-slp@redhat.com>
+ <20191015112346.45554-16-slp@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <321db25a-24c7-54e2-7a90-c7c5ef3708d1@redhat.com>
+Date: Tue, 15 Oct 2019 13:39:01 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.0
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.43]); Tue, 15 Oct 2019 11:25:31 +0000 (UTC)
+In-Reply-To: <20191015112346.45554-16-slp@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
@@ -68,131 +93,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: ehabkost@redhat.com, Sergio Lopez <slp@redhat.com>, mst@redhat.com,
- lersek@redhat.com, kraxel@redhat.com, pbonzini@redhat.com, imammedo@redhat.com,
- sgarzare@redhat.com, philmd@redhat.com, rth@twiddle.net
+Cc: ehabkost@redhat.com, mst@redhat.com, kraxel@redhat.com, pbonzini@redhat.com,
+ imammedo@redhat.com, sgarzare@redhat.com, lersek@redhat.com, rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Document the new microvm machine type.
+On 10/15/19 1:23 PM, Sergio Lopez wrote:
+> Add a new "Microvm" section under "X86 Machines" with the new files
+> related to this machine type.
+>=20
+> Signed-off-by: Sergio Lopez <slp@redhat.com>
+> Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+> ---
+>   MAINTAINERS | 10 ++++++++++
+>   1 file changed, 10 insertions(+)
+>=20
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index fe4dc51b08..9744f07727 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -1275,6 +1275,16 @@ F: include/hw/timer/hpet.h
+>   F: include/hw/timer/i8254*
+>   F: include/hw/timer/mc146818rtc*
+>  =20
+> +Microvm
+> +M: Sergio Lopez <slp@redhat.com>
+> +M: Paolo Bonzini <pbonzini@redhat.com>
+> +S: Maintained
+> +F: docs/microvm.rst
+> +F: hw/i386/microvm.c
+> +F: include/hw/i386/microvm.h
+> +F: roms/qboot
 
-Signed-off-by: Sergio Lopez <slp@redhat.com>
-Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
----
- docs/microvm.rst | 98 ++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 98 insertions(+)
- create mode 100644 docs/microvm.rst
+This is a submodule, change there won't be committed within QEMU.
 
-diff --git a/docs/microvm.rst b/docs/microvm.rst
-new file mode 100644
-index 0000000000..dc36ecf7c3
---- /dev/null
-+++ b/docs/microvm.rst
-@@ -0,0 +1,98 @@
-+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-+Microvm Machine Type
-+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-+
-+Microvm is a machine type inspired by ``Firecracker`` and constructed
-+after the its machine model.
-+
-+It's a minimalist machine type without ``PCI`` nor ``ACPI`` support,
-+designed for short-lived guests. Microvm also establishes a baseline
-+for benchmarking and optimizing both QEMU and guest operating systems,
-+since it is optimized for both boot time and footprint.
-+
-+
-+Supported devices
-+-----------------
-+
-+The microvm machine type supports the following devices:
-+
-+- ISA bus
-+- i8259 PIC (optional)
-+- i8254 PIT (optional)
-+- MC146818 RTC (optional)
-+- One ISA serial port (optional)
-+- LAPIC
-+- IOAPIC (with kernel-irqchip=3Dsplit by default)
-+- kvmclock (if using KVM)
-+- fw_cfg
-+- Up to eight virtio-mmio devices (configured by the user)
-+
-+
-+Using the microvm machine type
-+------------------------------
-+
-+Machine-specific options
-+~~~~~~~~~~~~~~~~~~~~~~~~
-+
-+It supports the following machine-specific options:
-+
-+- microvm.x-option-roms=3Dbool (Set off to disable loading option ROMs)
-+- microvm.pit=3DOnOffAuto (Enable i8254 PIT)
-+- microvm.isa-serial=3Dbool (Set off to disable the instantiation an ISA=
- serial port)
-+- microvm.pic=3DOnOffAuto (Enable i8259 PIC)
-+- microvm.rtc=3DOnOffAuto (Enable MC146818 RTC)
-+- microvm.auto-kernel-cmdline=3Dbool (Set off to disable adding virtio-m=
-mio devices to the kernel cmdline)
-+
-+
-+Boot options
-+~~~~~~~~~~~~
-+
-+By default, microvm uses ``qboot`` as its BIOS, to obtain better boot
-+times, but it's also compatible with ``SeaBIOS``.
-+
-+As no current FW is able to boot from a block device using
-+``virtio-mmio`` as its transport, a microvm-based VM needs to be run
-+using a host-side kernel and, optionally, an initrd image.
-+
-+
-+Running a microvm-based VM
-+~~~~~~~~~~~~~~~~~~~~~~~~~~
-+
-+By default, microvm aims for maximum compatibility, enabling both
-+legacy and non-legacy devices. In this example, a VM is created
-+without passing any additional machine-specific option, using the
-+legacy ``ISA serial`` device as console::
-+
-+  $ qemu-system-x86_64 -M microvm \
-+     -enable-kvm -cpu host -m 512m -smp 2 \
-+     -kernel vmlinux -append "earlyprintk=3DttyS0 console=3DttyS0 root=3D=
-/dev/vda" \
-+     -nodefaults -no-user-config -nographic \
-+     -serial stdio \
-+     -drive id=3Dtest,file=3Dtest.img,format=3Draw,if=3Dnone \
-+     -device virtio-blk-device,drive=3Dtest \
-+     -netdev tap,id=3Dtap0,script=3Dno,downscript=3Dno \
-+     -device virtio-net-device,netdev=3Dtap0
-+
-+While the example above works, you might be interested in reducing the
-+footprint further by disabling some legacy devices. If you're using
-+``KVM``, you can disable the ``RTC``, making the Guest rely on
-+``kvmclock`` exclusively. Additionally, if your host's CPUs have the
-+``TSC_DEADLINE`` feature, you can also disable both the i8259 PIC and
-+the i8254 PIT (make sure you're also emulating a CPU with such feature
-+in the guest).
-+
-+This is an example of a VM with all optional legacy features
-+disabled::
-+
-+  $ qemu-system-x86_64 \
-+     -M microvm,x-option-roms=3Doff,pit=3Doff,pic=3Doff,isa-serial=3Doff=
-,rtc=3Doff \
-+     -enable-kvm -cpu host -m 512m -smp 2 \
-+     -kernel vmlinux -append "console=3Dhvc0 root=3D/dev/vda" \
-+     -nodefaults -no-user-config -nographic \
-+     -chardev stdio,id=3Dvirtiocon0,server \
-+     -device virtio-serial-device \
-+     -device virtconsole,chardev=3Dvirtiocon0 \
-+     -drive id=3Dtest,file=3Dtest.img,format=3Draw,if=3Dnone \
-+     -device virtio-blk-device,drive=3Dtest \
-+     -netdev tap,id=3Dtap0,script=3Dno,downscript=3Dno \
-+     -device virtio-net-device,netdev=3Dtap0
---=20
-2.21.0
+Without the 'F: roms/qboot' line:
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 
+> +F: pc-bios/bios-microvm.bin
+> +
+>   Machine core
+>   M: Eduardo Habkost <ehabkost@redhat.com>
+>   M: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+>=20
 
