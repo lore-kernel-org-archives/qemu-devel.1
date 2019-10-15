@@ -2,61 +2,60 @@ Return-Path: <SRS0=6OCO=YI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,URIBL_SBL,URIBL_SBL_A,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 12A34C10F14
-	for <qemu-devel@archiver.kernel.org>; Tue, 15 Oct 2019 08:28:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5AFA4ECE595
+	for <qemu-devel@archiver.kernel.org>; Tue, 15 Oct 2019 08:32:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DA5182064B
-	for <qemu-devel@archiver.kernel.org>; Tue, 15 Oct 2019 08:28:38 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DA5182064B
+	by mail.kernel.org (Postfix) with ESMTPS id 308A52089C
+	for <qemu-devel@archiver.kernel.org>; Tue, 15 Oct 2019 08:32:24 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 308A52089C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37220 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37316 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iKIC5-0002cQ-It
-	for qemu-devel@archiver.kernel.org; Tue, 15 Oct 2019 04:28:37 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57293)
+	id 1iKIFj-0005Ft-CN
+	for qemu-devel@archiver.kernel.org; Tue, 15 Oct 2019 04:32:23 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57903)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <berrange@redhat.com>) id 1iKIAn-0001px-BL
- for qemu-devel@nongnu.org; Tue, 15 Oct 2019 04:27:18 -0400
+ (envelope-from <quintela@redhat.com>) id 1iKIEI-0004Fr-M9
+ for qemu-devel@nongnu.org; Tue, 15 Oct 2019 04:30:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <berrange@redhat.com>) id 1iKIAk-0000i8-Gd
- for qemu-devel@nongnu.org; Tue, 15 Oct 2019 04:27:15 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:59706)
+ (envelope-from <quintela@redhat.com>) id 1iKIEG-0002a1-2L
+ for qemu-devel@nongnu.org; Tue, 15 Oct 2019 04:30:54 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:39134)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <berrange@redhat.com>) id 1iKIAk-0000hV-Ag
- for qemu-devel@nongnu.org; Tue, 15 Oct 2019 04:27:14 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
+ (Exim 4.71) (envelope-from <quintela@redhat.com>) id 1iKIEF-0002Yx-TA
+ for qemu-devel@nongnu.org; Tue, 15 Oct 2019 04:30:52 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id AE0DC3084045;
- Tue, 15 Oct 2019 08:27:12 +0000 (UTC)
-Received: from redhat.com (ovpn-112-30.ams2.redhat.com [10.36.112.30])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 20F536012E;
- Tue, 15 Oct 2019 08:27:10 +0000 (UTC)
-Date: Tue, 15 Oct 2019 09:27:08 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: Peter Maydell <peter.maydell@linaro.org>
-Subject: Re: RFC: Why dont we move to newer capstone?
-Message-ID: <20191015082708.GB22859@redhat.com>
-References: <CALvKS=E-t1c+BVDn=0RbM8nBry8GcYOXh-PrziQO7XhS7W2NUw@mail.gmail.com>
- <CALvKS=GB1-zDnkKxei6Dn5MNyr5kwj+vEtD_3MZyVNfzqQuRZg@mail.gmail.com>
- <CAFEAcA-gLHm0D6vR0Rvpbi_bbVWpKspvm8YLSVPHpCVP6HmDUg@mail.gmail.com>
+ by mx1.redhat.com (Postfix) with ESMTPS id EB852BCFE0
+ for <qemu-devel@nongnu.org>; Tue, 15 Oct 2019 08:30:49 +0000 (UTC)
+Received: from redhat.com (unknown [10.36.118.28])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 5B24D5D6B0;
+ Tue, 15 Oct 2019 08:30:46 +0000 (UTC)
+From: Juan Quintela <quintela@redhat.com>
+To: Peter Xu <peterx@redhat.com>
+Subject: Re: [PATCH 2/2] apic: Use 32bit APIC ID for migration instance ID
+In-Reply-To: <20191015075444.10955-3-peterx@redhat.com> (Peter Xu's message of
+ "Tue, 15 Oct 2019 15:54:44 +0800")
+References: <20191015075444.10955-1-peterx@redhat.com>
+ <20191015075444.10955-3-peterx@redhat.com>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.2 (gnu/linux)
+Date: Tue, 15 Oct 2019 10:30:44 +0200
+Message-ID: <87v9sqqukr.fsf@trasno.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <CAFEAcA-gLHm0D6vR0Rvpbi_bbVWpKspvm8YLSVPHpCVP6HmDUg@mail.gmail.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+Content-Type: text/plain
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.40]); Tue, 15 Oct 2019 08:27:12 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.26]); Tue, 15 Oct 2019 08:30:50 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 209.132.183.28
@@ -71,46 +70,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: Richard Henderson <richard.henderson@linaro.org>,
- QEMU Developers <qemu-devel@nongnu.org>,
- Lucien Murray-Pitts <lucienmp.qemu@gmail.com>
+Reply-To: quintela@redhat.com
+Cc: Paolo Bonzini <pbonzini@redhat.com>,
+ "Dr . David Alan Gilbert" <dgilbert@redhat.com>, qemu-devel@nongnu.org,
+ Eduardo Habkost <ehabkost@redhat.com>, Igor Mammedov <imammedo@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Sat, Oct 05, 2019 at 02:33:34PM +0100, Peter Maydell wrote:
-> On Sat, 5 Oct 2019 at 11:21, Lucien Murray-Pitts
-> <lucienmp.qemu@gmail.com> wrote:
-> > Whilst working on a m68k patch I noticed that the capstone in use
-> > today (3.0) doesnt support the M68K and thus a hand turned disasm
-> > function is used.
-> >
-> > The newer capstone (5.0) appears to support a few more CPU, inc. m68k.
-> >
-> > Why we move to this newer capstone?
-> 
-> Moving to a newer capstone sounds like a good idea. The only
-> reason we haven't moved forward as far as I'm aware is that
-> nobody has done the work to send a patch to do that move
-> forward to the newer version. Richard Henderson would
-> probably know if there was any other blocker.
+Peter Xu <peterx@redhat.com> wrote:
+> Migration is silently broken now with x2apic config like this:
+>
+>      -smp 200,maxcpus=288,sockets=2,cores=72,threads=2 \
+>      -device intel-iommu,intremap=on,eim=on
+>
+> After migration, the guest kernel could hang at anything, due to
+> x2apic bit not migrated correctly in IA32_APIC_BASE on some vcpus, so
+> any operations related to x2apic could be broken then (e.g., RDMSR on
+> x2apic MSRs could fail because KVM would think that the vcpu hasn't
+> enabled x2apic at all).
+>
+> The issue is that the x2apic bit was never applied correctly for vcpus
+> whose ID > 255 when migrate completes, and that's because when we
+> migrate APIC we use the APICCommonState.id as instance ID of the
+> migration stream, while that's too short for x2apic.
+>
+> Let's use the newly introduced initial_apic_id for that.
+>
+> Signed-off-by: Peter Xu <peterx@redhat.com>
+> ---
+>  hw/intc/apic_common.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/hw/intc/apic_common.c b/hw/intc/apic_common.c
+> index aafd8e0e33..6024a3e06a 100644
+> --- a/hw/intc/apic_common.c
+> +++ b/hw/intc/apic_common.c
+> @@ -315,7 +315,7 @@ static void apic_common_realize(DeviceState *dev, Error **errp)
+>      APICCommonState *s = APIC_COMMON(dev);
+>      APICCommonClass *info;
+>      static DeviceState *vapic;
+> -    int instance_id = s->id;
+> +    int64_t instance_id = s->initial_apic_id;
 
-Bearing in mind our distro support policy, we need to continue to
-support 3.0 series of capstone for a while yet based on what I
-see in various distros. eg Ubuntu 18.04 LTS has 3.0.4, as does
-Fedora 29.  Version 4.0 is only in a few very new distros:
+int is ok here.
 
-   https://repology.org/project/capstone/versions
+But damn thing, initial_apic_id is uint32_t.  Sniff.
 
-We can of course use features from newer capstone, *provided* we correctly
-do conditional compilation so that we can still build against 3.0 series
-on distros that have that version.
-
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+Later, Juan.
 
