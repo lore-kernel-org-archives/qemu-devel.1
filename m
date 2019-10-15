@@ -2,85 +2,67 @@ Return-Path: <SRS0=6OCO=YI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 35406ECE596
-	for <qemu-devel@archiver.kernel.org>; Tue, 15 Oct 2019 17:16:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C9C7ECE588
+	for <qemu-devel@archiver.kernel.org>; Tue, 15 Oct 2019 17:21:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E4B5D217D6
-	for <qemu-devel@archiver.kernel.org>; Tue, 15 Oct 2019 17:16:54 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ixjgDo4P"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E4B5D217D6
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 11CEC20650
+	for <qemu-devel@archiver.kernel.org>; Tue, 15 Oct 2019 17:21:02 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 11CEC20650
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54020 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54134 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iKQRK-0007jV-48
-	for qemu-devel@archiver.kernel.org; Tue, 15 Oct 2019 13:16:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48439)
+	id 1iKQVJ-0001XG-8d
+	for qemu-devel@archiver.kernel.org; Tue, 15 Oct 2019 13:21:01 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49295)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1iKQQC-00071y-VN
- for qemu-devel@nongnu.org; Tue, 15 Oct 2019 13:15:46 -0400
+ (envelope-from <no-reply@patchew.org>) id 1iKQUf-0000yU-7n
+ for qemu-devel@nongnu.org; Tue, 15 Oct 2019 13:20:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1iKQQA-0007wJ-Nd
- for qemu-devel@nongnu.org; Tue, 15 Oct 2019 13:15:44 -0400
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:43388)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1iKQQA-0007vE-EL
- for qemu-devel@nongnu.org; Tue, 15 Oct 2019 13:15:42 -0400
-Received: by mail-wr1-x443.google.com with SMTP id j18so24807626wrq.10
- for <qemu-devel@nongnu.org>; Tue, 15 Oct 2019 10:15:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=P9FI3xy5T6ZPTjV1mRqBpOBPngWCbdi+cvfrJ3CQlbw=;
- b=ixjgDo4PH5mqyWWf3PunUoVhy619saLe6VdfcqPy/U2gY2YGXkN/BGmyc5TMBMI1cy
- zbRVH8NeF9TVA5pf7z+CkGcEIWdz49ai5gVyPW/c0JQLgiPvF0qpbtUFOo4rVh0Wel3Y
- EfrtxjMFK1/CwuzjY9eO3pN0YYWZgCByQSMljYmdNAx6FyhUxpKz032O4vGiQpQXTrFy
- wXD2MdO/RY+maLe28KMsMtN7USyMl4EAUTmXfbIMXNmx0IGn88q6I+mRDecybAB2T0vh
- xn2pEir6JW8uzNTH42MUw8cjlrrvJSc4Wws7Px0pnxFvbIrgFbuaKLoJE5WIaVW+INuj
- XZgQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=P9FI3xy5T6ZPTjV1mRqBpOBPngWCbdi+cvfrJ3CQlbw=;
- b=XRboeVf7UVyQd3rXHtXoRkm2vsA+V+o55euBI+QV8qOULD48wMzVNXFyr/nOrgGSRt
- 5pfmj8Gx8iWbj8K8j0PCnnH21YdtSKWt4trjrrmuy1wd8OvSS33lBalnsM722LJjPdnX
- CM/qnp+ursymX/lzlrlrZxL/D1JrLklKBi1jNT9lkzO3NJBYewdj0cgNhrltosXfo9FX
- lP0cxgSyMdi+CeUSV1o5vMPjaMl8lZ0ec1gU6QToM10f96HMUKd2AvGmUpxRP3yHgBgA
- b2cipPWZ6TEyuZWvW4whnAHnDrgtjVKHFUad1Hr1gUgwT/ZqEYsOi+XH2gTLbzxhpjsy
- XBUw==
-X-Gm-Message-State: APjAAAVqaGL61+EbkGL6rZMZvsGSANlo0tW/QSjOUDgtwHjsyMQXmfjr
- 2UIipWZg/e54igS1osZ6IVMZU3yWTAaCaA==
-X-Google-Smtp-Source: APXvYqyZeyu/B+fp3Ch7eFudjYoAecLee78p7K6SDwXkD0OjEwpUowj5QJwysTh3hFxSLYIWhVUf0g==
-X-Received: by 2002:adf:f983:: with SMTP id f3mr31124955wrr.169.1571159740453; 
- Tue, 15 Oct 2019 10:15:40 -0700 (PDT)
-Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id f20sm17764586wmb.6.2019.10.15.10.15.39
- for <qemu-devel@nongnu.org>
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 15 Oct 2019 10:15:39 -0700 (PDT)
-From: Peter Maydell <peter.maydell@linaro.org>
-To: qemu-devel@nongnu.org
-Subject: [PULL v2 00/67] target-arm queue
-Date: Tue, 15 Oct 2019 18:15:37 +0100
-Message-Id: <20191015171537.12499-1-peter.maydell@linaro.org>
-X-Mailer: git-send-email 2.20.1
+ (envelope-from <no-reply@patchew.org>) id 1iKQUd-0002yr-T2
+ for qemu-devel@nongnu.org; Tue, 15 Oct 2019 13:20:21 -0400
+Resent-Date: Tue, 15 Oct 2019 13:20:21 -0400
+Resent-Message-Id: <E1iKQUd-0002yr-T2@eggs.gnu.org>
+Received: from sender4-of-o54.zoho.com ([136.143.188.54]:21429)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <no-reply@patchew.org>)
+ id 1iKQUa-0002wZ-IM; Tue, 15 Oct 2019 13:20:16 -0400
+ARC-Seal: i=1; a=rsa-sha256; t=1571159987; cv=none; d=zoho.com; s=zohoarc; 
+ b=TL5UmkmCV5ia9Am98BNh2OuSZbL8r5F8jXIULiGNXPDNqa00bF8ymu7r4r6D6uIWFLBpBJxKgeUrSWLWHWvT2DDiE5Pe5JlKs5xtLAAn4xTE12f8Jwhq5b7SUBdF5fI8posSBy6XsckdGvasDNK/SugdIsNYOmA4qiVLdvB7HCE=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zoho.com;
+ s=zohoarc; t=1571159987;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
+ bh=Aqh5MrCD51ln0ZisFt8LyBN3Xb1lxcypGjm0uTJawJ4=; 
+ b=EZhnC4VzedN2XsVwEv1ORgCfxeW21+P88hZFgVM0W+8x+/WMD1/oXOTSH8W7XxUx65Uf4go1OnVCxPNqxIRciYMnReDU9BGtU9D99Xg819s6uU3U1Q1K7pAhsNIEHMbShRQLqFCBZSKpdZD05jXtAdISUSJNVVJZlVIF89OlwdM=
+ARC-Authentication-Results: i=1; mx.zoho.com; dkim=pass  header.i=patchew.org;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 1571159985851860.0421652292138;
+ Tue, 15 Oct 2019 10:19:45 -0700 (PDT)
+In-Reply-To: <20191015103900.313928-1-its@irrelevant.dk>
+Subject: Re: [PATCH v2 00/20] nvme: support NVMe v1.3d,
+ SGLs and multiple namespaces
+Message-ID: <157115998396.5946.7933572824392833452@37313f22b938>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::443
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: its@irrelevant.dk
+Date: Tue, 15 Oct 2019 10:19:45 -0700 (PDT)
+X-ZohoMailClient: External
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 136.143.188.54
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -92,232 +74,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Reply-To: qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, fam@euphon.net, javier@javigon.com, qemu-block@nongnu.org,
+ qemu-devel@nongnu.org, mreitz@redhat.com, keith.busch@intel.com,
+ Paul.Durrant@citrix.com, sbates@raithlin.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-v1->v2 changes: dropped the patch adding the new ast2600
-board, as it doesn't pass "make check" on 32-bit hosts or
-low-memory hosts.
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MTAxNTEwMzkwMC4zMTM5
+MjgtMS1pdHNAaXJyZWxldmFudC5kay8KCgoKSGksCgpUaGlzIHNlcmllcyBmYWlsZWQgdGhlIGRv
+Y2tlci1taW5nd0BmZWRvcmEgYnVpbGQgdGVzdC4gUGxlYXNlIGZpbmQgdGhlIHRlc3RpbmcgY29t
+bWFuZHMgYW5kCnRoZWlyIG91dHB1dCBiZWxvdy4gSWYgeW91IGhhdmUgRG9ja2VyIGluc3RhbGxl
+ZCwgeW91IGNhbiBwcm9iYWJseSByZXByb2R1Y2UgaXQKbG9jYWxseS4KCj09PSBURVNUIFNDUklQ
+VCBCRUdJTiA9PT0KIyEgL2Jpbi9iYXNoCmV4cG9ydCBBUkNIPXg4Nl82NAptYWtlIGRvY2tlci1p
+bWFnZS1mZWRvcmEgVj0xIE5FVFdPUks9MQp0aW1lIG1ha2UgZG9ja2VyLXRlc3QtbWluZ3dAZmVk
+b3JhIEo9MTQgTkVUV09SSz0xCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgogIENDICAgICAgaHcv
+bWlzYy9pbXg3X2dwci5vCiAgQ0MgICAgICBody9taXNjL21zdF9mcGdhLm8KL3RtcC9xZW11LXRl
+c3Qvc3JjL2h3L2Jsb2NrL252bWUuYzogSW4gZnVuY3Rpb24gJ252bWVfbWFwX3BycCc6Ci90bXAv
+cWVtdS10ZXN0L3NyYy9ody9ibG9jay9udm1lLmM6MjMyOjQyOiBlcnJvcjogY2FzdCB0byBwb2lu
+dGVyIGZyb20gaW50ZWdlciBvZiBkaWZmZXJlbnQgc2l6ZSBbLVdlcnJvcj1pbnQtdG8tcG9pbnRl
+ci1jYXN0XQogICAgICAgICAgICAgICAgIHRyYWNlX252bWVfZXJyX2FkZHJfcmVhZCgodm9pZCAq
+KSBwcnAyKTsKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXgovdG1w
+L3FlbXUtdGVzdC9zcmMvaHcvYmxvY2svbnZtZS5jOjI1ODo1MDogZXJyb3I6IGNhc3QgdG8gcG9p
+bnRlciBmcm9tIGludGVnZXIgb2YgZGlmZmVyZW50IHNpemUgWy1XZXJyb3I9aW50LXRvLXBvaW50
+ZXItY2FzdF0KICAgICAgICAgICAgICAgICAgICAgICAgIHRyYWNlX252bWVfZXJyX2FkZHJfcmVh
+ZCgodm9pZCAqKSBwcnBfZW50KTsKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICBeCi90bXAvcWVtdS10ZXN0L3NyYy9ody9ibG9jay9udm1lLmM6IEluIGZ1
+bmN0aW9uICdudm1lX21hcF9zZ2wnOgovdG1wL3FlbXUtdGVzdC9zcmMvaHcvYmxvY2svbnZtZS5j
+OjQxNDo0MjogZXJyb3I6IGNhc3QgdG8gcG9pbnRlciBmcm9tIGludGVnZXIgb2YgZGlmZmVyZW50
+IHNpemUgWy1XZXJyb3I9aW50LXRvLXBvaW50ZXItY2FzdF0KICAgICAgICAgICAgICAgICB0cmFj
+ZV9udm1lX2Vycl9hZGRyX3JlYWQoKHZvaWQgKikgYWRkcik7CiAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgIF4KL3RtcC9xZW11LXRlc3Qvc3JjL2h3L2Jsb2NrL252bWUu
+Yzo0Mjk6Mzg6IGVycm9yOiBjYXN0IHRvIHBvaW50ZXIgZnJvbSBpbnRlZ2VyIG9mIGRpZmZlcmVu
+dCBzaXplIFstV2Vycm9yPWludC10by1wb2ludGVyLWNhc3RdCiAgICAgICAgICAgICB0cmFjZV9u
+dm1lX2Vycl9hZGRyX3JlYWQoKHZvaWQgKikgYWRkcik7CiAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgXgovdG1wL3FlbXUtdGVzdC9zcmMvaHcvYmxvY2svbnZtZS5jOjQ3ODoz
+ODogZXJyb3I6IGNhc3QgdG8gcG9pbnRlciBmcm9tIGludGVnZXIgb2YgZGlmZmVyZW50IHNpemUg
+Wy1XZXJyb3I9aW50LXRvLXBvaW50ZXItY2FzdF0KICAgICAgICAgICAgIHRyYWNlX252bWVfZXJy
+X2FkZHJfcmVhZCgodm9pZCAqKSBhZGRyKTsKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICBeCi90bXAvcWVtdS10ZXN0L3NyYy9ody9ibG9jay9udm1lLmM6NDkzOjM0OiBlcnJv
+cjogY2FzdCB0byBwb2ludGVyIGZyb20gaW50ZWdlciBvZiBkaWZmZXJlbnQgc2l6ZSBbLVdlcnJv
+cj1pbnQtdG8tcG9pbnRlci1jYXN0XQogICAgICAgICB0cmFjZV9udm1lX2Vycl9hZGRyX3JlYWQo
+KHZvaWQgKikgYWRkcik7CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBeCi90bXAv
+cWVtdS10ZXN0L3NyYy9ody9ibG9jay9udm1lLmM6IEluIGZ1bmN0aW9uICdudm1lX3Bvc3RfY3Fl
+cyc6Ci90bXAvcWVtdS10ZXN0L3NyYy9ody9ibG9jay9udm1lLmM6ODQ3OjM5OiBlcnJvcjogY2Fz
+dCB0byBwb2ludGVyIGZyb20gaW50ZWdlciBvZiBkaWZmZXJlbnQgc2l6ZSBbLVdlcnJvcj1pbnQt
+dG8tcG9pbnRlci1jYXN0XQogICAgICAgICAgICAgdHJhY2VfbnZtZV9lcnJfYWRkcl93cml0ZSgo
+dm9pZCAqKSBhZGRyKTsKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXgov
+dG1wL3FlbXUtdGVzdC9zcmMvaHcvYmxvY2svbnZtZS5jOiBJbiBmdW5jdGlvbiAnbnZtZV9wcm9j
+ZXNzX3NxJzoKL3RtcC9xZW11LXRlc3Qvc3JjL2h3L2Jsb2NrL252bWUuYzoxOTcxOjM4OiBlcnJv
+cjogY2FzdCB0byBwb2ludGVyIGZyb20gaW50ZWdlciBvZiBkaWZmZXJlbnQgc2l6ZSBbLVdlcnJv
+cj1pbnQtdG8tcG9pbnRlci1jYXN0XQogICAgICAgICAgICAgdHJhY2VfbnZtZV9lcnJfYWRkcl9y
+ZWFkKCh2b2lkICopIGFkZHIpOwogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+IF4KY2MxOiBhbGwgd2FybmluZ3MgYmVpbmcgdHJlYXRlZCBhcyBlcnJvcnMKbWFrZTogKioqIFsv
+dG1wL3FlbXUtdGVzdC9zcmMvcnVsZXMubWFrOjY5OiBody9ibG9jay9udm1lLm9dIEVycm9yIDEK
+bWFrZTogKioqIFdhaXRpbmcgZm9yIHVuZmluaXNoZWQgam9icy4uLi4KVHJhY2ViYWNrIChtb3N0
+IHJlY2VudCBjYWxsIGxhc3QpOgogIEZpbGUgIi4vdGVzdHMvZG9ja2VyL2RvY2tlci5weSIsIGxp
+bmUgNjYyLCBpbiA8bW9kdWxlPgotLS0KICAgIHJhaXNlIENhbGxlZFByb2Nlc3NFcnJvcihyZXRj
+b2RlLCBjbWQpCnN1YnByb2Nlc3MuQ2FsbGVkUHJvY2Vzc0Vycm9yOiBDb21tYW5kICdbJ3N1ZG8n
+LCAnLW4nLCAnZG9ja2VyJywgJ3J1bicsICctLWxhYmVsJywgJ2NvbS5xZW11Lmluc3RhbmNlLnV1
+aWQ9OGFhMGE4NWZmZjFmNDU3YzlkYzdjODI2ZDdiMzE4OWQnLCAnLXUnLCAnMTAwMScsICctLXNl
+Y3VyaXR5LW9wdCcsICdzZWNjb21wPXVuY29uZmluZWQnLCAnLS1ybScsICctZScsICdUQVJHRVRf
+TElTVD0nLCAnLWUnLCAnRVhUUkFfQ09ORklHVVJFX09QVFM9JywgJy1lJywgJ1Y9JywgJy1lJywg
+J0o9MTQnLCAnLWUnLCAnREVCVUc9JywgJy1lJywgJ1NIT1dfRU5WPScsICctZScsICdDQ0FDSEVf
+RElSPS92YXIvdG1wL2NjYWNoZScsICctdicsICcvaG9tZS9wYXRjaGV3Ly5jYWNoZS9xZW11LWRv
+Y2tlci1jY2FjaGU6L3Zhci90bXAvY2NhY2hlOnonLCAnLXYnLCAnL3Zhci90bXAvcGF0Y2hldy10
+ZXN0ZXItdG1wLTJnMWJsNDFzL3NyYy9kb2NrZXItc3JjLjIwMTktMTAtMTUtMTMuMTMuNDguOTkz
+Oi92YXIvdG1wL3FlbXU6eixybycsICdxZW11OmZlZG9yYScsICcvdmFyL3RtcC9xZW11L3J1bics
+ICd0ZXN0LW1pbmd3J10nIHJldHVybmVkIG5vbi16ZXJvIGV4aXQgc3RhdHVzIDIuCmZpbHRlcj0t
+LWZpbHRlcj1sYWJlbD1jb20ucWVtdS5pbnN0YW5jZS51dWlkPThhYTBhODVmZmYxZjQ1N2M5ZGM3
+YzgyNmQ3YjMxODlkCm1ha2VbMV06ICoqKiBbZG9ja2VyLXJ1bl0gRXJyb3IgMQptYWtlWzFdOiBM
+ZWF2aW5nIGRpcmVjdG9yeSBgL3Zhci90bXAvcGF0Y2hldy10ZXN0ZXItdG1wLTJnMWJsNDFzL3Ny
+YycKbWFrZTogKioqIFtkb2NrZXItcnVuLXRlc3QtbWluZ3dAZmVkb3JhXSBFcnJvciAyCgpyZWFs
+ICAgIDVtNTYuNTIycwp1c2VyICAgIDBtNy45MTNzCgoKVGhlIGZ1bGwgbG9nIGlzIGF2YWlsYWJs
+ZSBhdApodHRwOi8vcGF0Y2hldy5vcmcvbG9ncy8yMDE5MTAxNTEwMzkwMC4zMTM5MjgtMS1pdHNA
+aXJyZWxldmFudC5kay90ZXN0aW5nLmRvY2tlci1taW5nd0BmZWRvcmEvP3R5cGU9bWVzc2FnZS4K
+LS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHBzOi8vcGF0
+Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJl
+ZGhhdC5jb20=
 
-thanks
--- PMM
-
-The following changes since commit 3af78db68176a049e2570822f64604e0692c1447:
-
-  Merge remote-tracking branch 'remotes/kevin/tags/for-upstream' into staging (2019-10-15 13:25:05 +0100)
-
-are available in the Git repository at:
-
-  https://git.linaro.org/people/pmaydell/qemu-arm.git tags/pull-target-arm-20191015
-
-for you to fetch changes up to 19845504da1bdee4be7d0fba33da5be9efa4c11b:
-
-  hw/misc/bcm2835_mbox: Add trace events (2019-10-15 18:09:05 +0100)
-
-----------------------------------------------------------------
-target-arm queue:
- * Add Aspeed AST2600 SoC support (but no new board model yet)
- * aspeed/wdt: Check correct register for clock source
- * bcm2835: code cleanups, better logging, trace events
- * implement v2.0 of the Arm semihosting specification
- * provide new 'transaction-based' ptimer API and use it
-   for the Arm devices that use ptimers
- * ARM: KVM: support more than 256 CPUs
-
-----------------------------------------------------------------
-Amithash Prasad (1):
-      aspeed/wdt: Check correct register for clock source
-
-Cédric Le Goater (14):
-      aspeed/timer: Introduce an object class per SoC
-      aspeed/timer: Add support for control register 3
-      aspeed/timer: Add AST2600 support
-      aspeed/timer: Add support for IRQ status register on the AST2600
-      aspeed/sdmc: Introduce an object class per SoC
-      watchdog/aspeed: Introduce an object class per SoC
-      aspeed/smc: Introduce segment operations
-      aspeed/smc: Add AST2600 support
-      aspeed/i2c: Introduce an object class per SoC
-      aspeed/i2c: Add AST2600 support
-      aspeed: Introduce an object class per SoC
-      aspeed/soc: Add AST2600 support
-      m25p80: Add support for w25q512jv
-      aspeed: add support for the Aspeed MII controller of the AST2600
-
-Eddie James (1):
-      hw/sd/aspeed_sdhci: New device
-
-Eric Auger (3):
-      linux headers: update against v5.4-rc1
-      intc/arm_gic: Support IRQ injection for more than 256 vpus
-      ARM: KVM: Check KVM_CAP_ARM_IRQ_LINE_LAYOUT_2 for smp_cpus > 256
-
-Joel Stanley (5):
-      hw: aspeed_scu: Add AST2600 support
-      aspeed/sdmc: Add AST2600 support
-      hw: wdt_aspeed: Add AST2600 support
-      aspeed: Parameterise number of MACs
-      aspeed/soc: Add ASPEED Video stub
-
-Peter Maydell (36):
-      ptimer: Rename ptimer_init() to ptimer_init_with_bh()
-      ptimer: Provide new transaction-based API
-      tests/ptimer-test: Switch to transaction-based ptimer API
-      hw/timer/arm_timer.c: Switch to transaction-based ptimer API
-      hw/arm/musicpal.c: Switch to transaction-based ptimer API
-      hw/timer/allwinner-a10-pit.c: Switch to transaction-based ptimer API
-      hw/timer/arm_mptimer.c: Switch to transaction-based ptimer API
-      hw/timer/cmsdk-apb-dualtimer.c: Switch to transaction-based ptimer API
-      hw/timer/cmsdk-apb-timer.c: Switch to transaction-based ptimer API
-      hw/timer/digic-timer.c: Switch to transaction-based ptimer API
-      hw/timer/exynos4210_mct.c: Switch GFRC to transaction-based ptimer API
-      hw/timer/exynos4210_mct.c: Switch LFRC to transaction-based ptimer API
-      hw/timer/exynos4210_mct.c: Switch ltick to transaction-based ptimer API
-      hw/timer/exynos4210_pwm.c: Switch to transaction-based ptimer API
-      hw/timer/exynos4210_rtc.c: Switch 1Hz ptimer to transaction-based API
-      hw/timer/exynos4210_rtc.c: Switch main ptimer to transaction-based API
-      hw/timer/imx_epit.c: Switch to transaction-based ptimer API
-      hw/timer/imx_gpt.c: Switch to transaction-based ptimer API
-      hw/timer/mss-timerc: Switch to transaction-based ptimer API
-      hw/watchdog/cmsdk-apb-watchdog.c: Switch to transaction-based ptimer API
-      hw/net/lan9118.c: Switch to transaction-based ptimer API
-      target/arm/arm-semi: Capture errno in softmmu version of set_swi_errno()
-      target/arm/arm-semi: Always set some kind of errno for failed calls
-      target/arm/arm-semi: Correct comment about gdb syscall races
-      target/arm/arm-semi: Make semihosting code hand out its own file descriptors
-      target/arm/arm-semi: Restrict use of TaskState*
-      target/arm/arm-semi: Use set_swi_errno() in gdbstub callback functions
-      target/arm/arm-semi: Factor out implementation of SYS_CLOSE
-      target/arm/arm-semi: Factor out implementation of SYS_WRITE
-      target/arm/arm-semi: Factor out implementation of SYS_READ
-      target/arm/arm-semi: Factor out implementation of SYS_ISTTY
-      target/arm/arm-semi: Factor out implementation of SYS_SEEK
-      target/arm/arm-semi: Factor out implementation of SYS_FLEN
-      target/arm/arm-semi: Implement support for semihosting feature detection
-      target/arm/arm-semi: Implement SH_EXT_EXIT_EXTENDED extension
-      target/arm/arm-semi: Implement SH_EXT_STDOUT_STDERR extension
-
-Philippe Mathieu-Daudé (6):
-      hw/arm/raspi: Use the IEC binary prefix definitions
-      hw/arm/bcm2835_peripherals: Improve logging
-      hw/arm/bcm2835_peripherals: Name various address spaces
-      hw/arm/bcm2835: Rename some definitions
-      hw/arm/bcm2835: Add various unimplemented peripherals
-      hw/misc/bcm2835_mbox: Add trace events
-
-Rashmica Gupta (1):
-      hw/gpio: Add in AST2600 specific implementation
-
- hw/arm/Makefile.objs                          |   2 +-
- hw/sd/Makefile.objs                           |   1 +
- include/hw/arm/aspeed_soc.h                   |  29 +-
- include/hw/arm/bcm2835_peripherals.h          |  15 +
- include/hw/arm/raspi_platform.h               |  24 +-
- include/hw/i2c/aspeed_i2c.h                   |  20 +-
- include/hw/misc/aspeed_scu.h                  |   7 +-
- include/hw/misc/aspeed_sdmc.h                 |  20 +-
- include/hw/net/ftgmac100.h                    |  17 +
- include/hw/ptimer.h                           |  83 ++-
- include/hw/sd/aspeed_sdhci.h                  |  34 ++
- include/hw/ssi/aspeed_smc.h                   |   4 +
- include/hw/timer/aspeed_timer.h               |  18 +
- include/hw/timer/mss-timer.h                  |   1 -
- include/hw/watchdog/wdt_aspeed.h              |  19 +-
- include/standard-headers/asm-x86/bootparam.h  |   2 +
- include/standard-headers/asm-x86/kvm_para.h   |   1 +
- include/standard-headers/linux/ethtool.h      |  24 +
- include/standard-headers/linux/pci_regs.h     |  19 +-
- include/standard-headers/linux/virtio_fs.h    |  19 +
- include/standard-headers/linux/virtio_ids.h   |   2 +
- include/standard-headers/linux/virtio_iommu.h | 165 ++++++
- include/standard-headers/linux/virtio_pmem.h  |   6 +-
- linux-headers/asm-arm/kvm.h                   |  16 +-
- linux-headers/asm-arm/unistd-common.h         |   2 +
- linux-headers/asm-arm64/kvm.h                 |  21 +-
- linux-headers/asm-generic/mman-common.h       |  18 +-
- linux-headers/asm-generic/mman.h              |  10 +-
- linux-headers/asm-generic/unistd.h            |  10 +-
- linux-headers/asm-mips/mman.h                 |   3 +
- linux-headers/asm-mips/unistd_n32.h           |   1 +
- linux-headers/asm-mips/unistd_n64.h           |   1 +
- linux-headers/asm-mips/unistd_o32.h           |   1 +
- linux-headers/asm-powerpc/mman.h              |   6 +-
- linux-headers/asm-powerpc/unistd_32.h         |   2 +
- linux-headers/asm-powerpc/unistd_64.h         |   2 +
- linux-headers/asm-s390/kvm.h                  |   6 +
- linux-headers/asm-s390/unistd_32.h            |   2 +
- linux-headers/asm-s390/unistd_64.h            |   2 +
- linux-headers/asm-x86/kvm.h                   |  28 +-
- linux-headers/asm-x86/unistd.h                |   2 +-
- linux-headers/asm-x86/unistd_32.h             |   2 +
- linux-headers/asm-x86/unistd_64.h             |   2 +
- linux-headers/asm-x86/unistd_x32.h            |   2 +
- linux-headers/linux/kvm.h                     |  12 +-
- linux-headers/linux/psp-sev.h                 |   5 +-
- linux-headers/linux/vfio.h                    |  71 ++-
- target/arm/kvm_arm.h                          |   1 +
- hw/arm/aspeed.c                               |  19 +-
- hw/arm/aspeed_ast2600.c                       | 523 +++++++++++++++++++
- hw/arm/aspeed_soc.c                           | 199 +++++---
- hw/arm/bcm2835_peripherals.c                  |  38 +-
- hw/arm/bcm2836.c                              |   2 +-
- hw/arm/musicpal.c                             |  16 +-
- hw/arm/raspi.c                                |   4 +-
- hw/block/m25p80.c                             |   1 +
- hw/char/bcm2835_aux.c                         |   5 +-
- hw/core/ptimer.c                              | 154 +++++-
- hw/display/bcm2835_fb.c                       |   2 +-
- hw/dma/bcm2835_dma.c                          |  10 +-
- hw/dma/xilinx_axidma.c                        |   2 +-
- hw/gpio/aspeed_gpio.c                         | 142 +++++-
- hw/i2c/aspeed_i2c.c                           | 106 +++-
- hw/intc/arm_gic_kvm.c                         |   7 +-
- hw/intc/bcm2836_control.c                     |   7 +-
- hw/m68k/mcf5206.c                             |   2 +-
- hw/m68k/mcf5208.c                             |   2 +-
- hw/misc/aspeed_scu.c                          | 194 ++++++-
- hw/misc/aspeed_sdmc.c                         | 250 ++++++---
- hw/misc/bcm2835_mbox.c                        |  14 +-
- hw/misc/bcm2835_property.c                    |  20 +-
- hw/net/fsl_etsec/etsec.c                      |   2 +-
- hw/net/ftgmac100.c                            | 162 ++++++
- hw/net/lan9118.c                              |  11 +-
- hw/sd/aspeed_sdhci.c                          | 198 ++++++++
- hw/ssi/aspeed_smc.c                           | 177 ++++++-
- hw/timer/allwinner-a10-pit.c                  |  12 +-
- hw/timer/altera_timer.c                       |   2 +-
- hw/timer/arm_mptimer.c                        |  18 +-
- hw/timer/arm_timer.c                          |  16 +-
- hw/timer/aspeed_timer.c                       | 213 +++++++-
- hw/timer/cmsdk-apb-dualtimer.c                |  14 +-
- hw/timer/cmsdk-apb-timer.c                    |  15 +-
- hw/timer/digic-timer.c                        |  16 +-
- hw/timer/etraxfs_timer.c                      |   6 +-
- hw/timer/exynos4210_mct.c                     | 107 +++-
- hw/timer/exynos4210_pwm.c                     |  17 +-
- hw/timer/exynos4210_rtc.c                     |  22 +-
- hw/timer/grlib_gptimer.c                      |   2 +-
- hw/timer/imx_epit.c                           |  32 +-
- hw/timer/imx_gpt.c                            |  21 +-
- hw/timer/lm32_timer.c                         |   2 +-
- hw/timer/milkymist-sysctl.c                   |   4 +-
- hw/timer/mss-timer.c                          |  11 +-
- hw/timer/puv3_ost.c                           |   2 +-
- hw/timer/sh_timer.c                           |   2 +-
- hw/timer/slavio_timer.c                       |   2 +-
- hw/timer/xilinx_timer.c                       |   2 +-
- hw/watchdog/cmsdk-apb-watchdog.c              |  13 +-
- hw/watchdog/wdt_aspeed.c                      | 153 +++---
- target/arm/arm-semi.c                         | 707 +++++++++++++++++++++-----
- target/arm/cpu.c                              |  10 +-
- target/arm/kvm.c                              |  22 +-
- tests/ptimer-test.c                           | 106 +++-
- hw/misc/trace-events                          |   6 +
- 105 files changed, 3934 insertions(+), 650 deletions(-)
- create mode 100644 include/hw/sd/aspeed_sdhci.h
- create mode 100644 include/standard-headers/linux/virtio_fs.h
- create mode 100644 include/standard-headers/linux/virtio_iommu.h
- create mode 100644 hw/arm/aspeed_ast2600.c
- create mode 100644 hw/sd/aspeed_sdhci.c
 
