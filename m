@@ -2,81 +2,82 @@ Return-Path: <SRS0=6OCO=YI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 24138C10F14
-	for <qemu-devel@archiver.kernel.org>; Tue, 15 Oct 2019 17:03:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 93804C10F14
+	for <qemu-devel@archiver.kernel.org>; Tue, 15 Oct 2019 17:04:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E58382084B
-	for <qemu-devel@archiver.kernel.org>; Tue, 15 Oct 2019 17:03:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6110D2084B
+	for <qemu-devel@archiver.kernel.org>; Tue, 15 Oct 2019 17:04:50 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="tptGsGvc"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E58382084B
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="EGM9Psqo"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6110D2084B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53366 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53498 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iKQEQ-0003Nr-Mn
-	for qemu-devel@archiver.kernel.org; Tue, 15 Oct 2019 13:03:34 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42499)
+	id 1iKQFd-0005In-Ex
+	for qemu-devel@archiver.kernel.org; Tue, 15 Oct 2019 13:04:49 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46470)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1iKPmy-0008AZ-Bj
- for qemu-devel@nongnu.org; Tue, 15 Oct 2019 12:35:13 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1iKQEf-00046R-40
+ for qemu-devel@nongnu.org; Tue, 15 Oct 2019 13:03:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1iKPmx-0000EO-4p
- for qemu-devel@nongnu.org; Tue, 15 Oct 2019 12:35:12 -0400
-Received: from mail-pg1-x541.google.com ([2607:f8b0:4864:20::541]:36482)
+ (envelope-from <peter.maydell@linaro.org>) id 1iKQEd-0000yp-Mj
+ for qemu-devel@nongnu.org; Tue, 15 Oct 2019 13:03:48 -0400
+Received: from mail-ot1-x334.google.com ([2607:f8b0:4864:20::334]:41143)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1iKPmw-0000Dp-Vu
- for qemu-devel@nongnu.org; Tue, 15 Oct 2019 12:35:11 -0400
-Received: by mail-pg1-x541.google.com with SMTP id 23so12476981pgk.3
- for <qemu-devel@nongnu.org>; Tue, 15 Oct 2019 09:35:10 -0700 (PDT)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1iKQEd-0000yP-IA
+ for qemu-devel@nongnu.org; Tue, 15 Oct 2019 13:03:47 -0400
+Received: by mail-ot1-x334.google.com with SMTP id g13so17563798otp.8
+ for <qemu-devel@nongnu.org>; Tue, 15 Oct 2019 10:03:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id;
- bh=H6OVoJrQX7RGgK41fMCeCXgNG3P+xR1iomsErR3VVAM=;
- b=tptGsGvcuiDdignTWCEnJsfOkpLL0mIF7qSYukBqx5kpO/ZSgPBfbQJMuhcG5+j6Cd
- IYJzVxNnoNWNq7kI6mVPwx/TEcb+IwiBA4FQbDo9X8RP/o/7iW/7br8byGj0OUnIOhUz
- MZ1aQavjk4sYDWdT6TJHy63BoL2BMA8FuWcozGHEsVHTKxbggSJxWeFk7Pd1vVIo8cfR
- eFsIesGghWdEZa9qRUnu2jyJu53UpOlj8kRMH2GHapngd6ptWpH4v9lu7yhIK8Lt74Ag
- 81axfUlVlrDXoBZJv0mbbjbLK5/EbxnOD3AGLm0B5czBMG5yMopjvYcgqKucOT8ew52s
- XLRQ==
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=UcIbnJ7VtnM5P+YWIC3SrDz4tB9UIeJ+PX7t0huq+uE=;
+ b=EGM9Psqo4C8uWFNP+wli2Uo9yj5SXrWnYsntut9T59LGF9JhgDpkYF5yIJSyXI3pjM
+ KHT/kz9SOJ2nXRiRbA88Q1D5N3dNgVEuTjFHmahkInw2El/PJddBzW17rWMFvGRV0qfL
+ KxbaipwPh5a0a2xxUUhyC3NUQRiFiX4Zl2DHHF6rJae0FZWbjOWmaJUxMJtR1UQMwPdr
+ l8mocb8hpyqaVsjaO0uYMcXmJlTZozCg3YeTnETMPOq0ci+sudnfGMPp756ykiM5/AsC
+ phmp2KxvbN91w4oOOM91UGA76JSRTRNZ1oE/l6UV/DptXukfpks/UJG8iSyJ6uhbXspd
+ LupQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id;
- bh=H6OVoJrQX7RGgK41fMCeCXgNG3P+xR1iomsErR3VVAM=;
- b=ScwfvQ9SJOG0N3oAkcMnsRzMTQb8vHo4cqgXvk+Xy9LajbWUZSPhcCbz1XKjWXXruO
- 1TaFpbVEk1A2NX43jPCln9/nG93wzbCRyFMhe7l+b7czea0T/WuwVVvWgLLvJUB3eUq4
- LnjAX/7twYth/jxEuTQcoVMleKy3s2Bj/II6oMBpebyN9vw506hp5dmT7ARHlmBzUG6L
- YFxwLKZ4SoEDlGX5+1wkkpqSeZDqyBpuYNZmuSrqMAijPDOtV223nv1laca7XhSxFQVj
- 9KA1+ohgzX6dDEfeWU7DH1wtZYl0tmQAf4lnmh6YvMHtEivJODL4+Db62dKMRFX86sfg
- j/MA==
-X-Gm-Message-State: APjAAAXEQ6fvwLg4rg7yQ5utMvdl1oijwDTNGsyXvvUsJTCcHXeSZal7
- fifHYPa0Kitm6vgHznFCr0BWysoUP1Y=
-X-Google-Smtp-Source: APXvYqw8PUUNorYJhXzynVKfMgaumNth08pebIIkQpp2QCiK9KQoCTorLAP8ay0EknlCwOSD8O1yhA==
-X-Received: by 2002:a17:90b:d90:: with SMTP id
- bg16mr43937814pjb.143.1571157309569; 
- Tue, 15 Oct 2019 09:35:09 -0700 (PDT)
-Received: from localhost.localdomain (97-113-7-119.tukw.qwest.net.
- [97.113.7.119])
- by smtp.gmail.com with ESMTPSA id m22sm22011593pgj.29.2019.10.15.09.35.08
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 15 Oct 2019 09:35:08 -0700 (PDT)
-From: Richard Henderson <richard.henderson@linaro.org>
-To: qemu-devel@nongnu.org
-Subject: [PATCH 0/3] target/arm: Implement ARMv8.5-MemTag, user mode
-Date: Tue, 15 Oct 2019 09:35:04 -0700
-Message-Id: <20191015163507.12153-1-richard.henderson@linaro.org>
-X-Mailer: git-send-email 2.17.1
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=UcIbnJ7VtnM5P+YWIC3SrDz4tB9UIeJ+PX7t0huq+uE=;
+ b=Xyg9r5ukXVDRTAhztkFrgW5KOXntU1ei/s3dY1vGZ62ryp+zyGfZKYyp00/bjS1ln/
+ C+KfPax9S0ythwmFHRZW8eR7+OEYRI/CCvy0QcQN+EgFq0TVU+ic2RjiugjpX36IRi3X
+ s3b3KSkadAjdD8pj+K09p0oCQdHKAewttGTAEe2ZYRffC+hi9ZxHXGW4RqlZ9a2VKOn1
+ iaxxvUptQOyTeByBytPU+lH3+d9cZBGksML9zbGWlRI/Zyz8VBZtb0kCt+uIqfGdEgvq
+ kL9ym8XehusBJKfKYUupdYPUFMcsZRZSGCzsx8TY5vxTdfud5+sjKIPraqkHdzwSCMe6
+ TrqQ==
+X-Gm-Message-State: APjAAAW5BxC4c0F8lE47kTHQpRWlZgQvAPmpDOzSbpA6keJOO0mJOTFZ
+ 3o0S8yji+IBWJrYjfkL0wikttjumYGYqmGE/3kUJpaQMEJw=
+X-Google-Smtp-Source: APXvYqyH1xYyYWU3DMGaTlTzYfLyOJ6BZB/bGaXkQ28UQagK48oCdgELgW8l1ju/yKtc8Tbn5xvUEcU5hv3UwVFY0zI=
+X-Received: by 2002:a9d:708e:: with SMTP id l14mr30046282otj.135.1571159025709; 
+ Tue, 15 Oct 2019 10:03:45 -0700 (PDT)
+MIME-Version: 1.0
+References: <20191014160404.19553-1-peter.maydell@linaro.org>
+ <20191014160404.19553-60-peter.maydell@linaro.org>
+In-Reply-To: <20191014160404.19553-60-peter.maydell@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 15 Oct 2019 18:03:33 +0100
+Message-ID: <CAFEAcA-2EZnnrYViQUQK-mR0=JqR9mXNzfVNa_WR5HoCTJ+tag@mail.gmail.com>
+Subject: Re: [PULL 59/68] aspeed: Add an AST2600 eval board
+To: QEMU Developers <qemu-devel@nongnu.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::541
+X-Received-From: 2607:f8b0:4864:20::334
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,53 +89,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: elver@google.com, icb@rice.edu, qemu-arm@nongnu.org
+Cc: =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>,
+ Joel Stanley <joel@jms.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is a refresh of the user-only patch set from March.
+On Mon, 14 Oct 2019 at 17:05, Peter Maydell <peter.maydell@linaro.org> wrot=
+e:
+>
+> From: C=C3=A9dric Le Goater <clg@kaod.org>
+>
+> Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
+> Reviewed-by: Joel Stanley <joel@jms.id.au>
+> Message-id: 20190925143248.10000-21-clg@kaod.org
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> ---
+>  include/hw/arm/aspeed.h |  1 +
+>  hw/arm/aspeed.c         | 23 +++++++++++++++++++++++
+>  2 files changed, 24 insertions(+)
 
-I do not attempt to implement any part of a kernel abi wrt mmap
-and/or mprotect.  Instead, it uses a x-tagged-pages property to
-assume that all anonymous pages have tags.
+> @@ -455,6 +467,17 @@ static const AspeedBoardConfig aspeed_boards[] =3D {
+>          .num_cs    =3D 2,
+>          .i2c_init  =3D witherspoon_bmc_i2c_init,
+>          .ram       =3D 512 * MiB,
+> +    }, {
+> +        .name      =3D MACHINE_TYPE_NAME("ast2600-evb"),
+> +        .desc      =3D "Aspeed AST2600 EVB (Cortex A7)",
+> +        .soc_name  =3D "ast2600-a0",
+> +        .hw_strap1 =3D AST2600_EVB_HW_STRAP1,
+> +        .hw_strap2 =3D AST2600_EVB_HW_STRAP2,
+> +        .fmc_model =3D "w25q512jv",
+> +        .spi_model =3D "mx66u51235f",
+> +        .num_cs    =3D 1,
+> +        .i2c_init  =3D ast2600_evb_i2c_init,
+> +        .ram       =3D 2 * GiB,
 
-The tests added are disabled by default, but do pass if you have
-binutils 2.32 installed.
+Hi. I just discovered that this makes 'make check' fail on
+32-bit systems, because you can't default to 2GB of RAM
+for a board:
 
+(armhf)pmaydell@mustang-maydell:~/qemu$
+./build/all-a32/arm-softmmu/qemu-system-arm -M ast2600-evb
+qemu-system-arm: at most 2047 MB RAM can be simulated
 
-r~
+It's also a pretty rudely large amount of RAM to allocate
+by default: it caused 'make check' to fail on my OSX
+box, which is 64-bits but doesn't have huge swathes
+of free RAM.
 
+I'm going to drop this patch from my queue and redo
+the pullreq.
 
-Based-on: <20191011134744.2477-1-richard.henderson@linaro.org>
-("target/arm: Implement ARMv8.5-MemTag, system mode")
-
-Based-on: <20190803210803.5701-1-richard.henderson@linaro.org>
-("target/arm: Implement ARMv8.5-BTI for linux-user")
-
-Complete tree: https://github.com/rth7680/qemu/tree/tgt-arm-mte-user
-
-
-Richard Henderson (3):
-  tcg: Introduce target-specific page data for user-only
-  target/arm: Add allocation tag storage for user mode
-  tests/tcg/aarch64: Add mte smoke tests
-
- include/exec/cpu-all.h            | 10 ++++++--
- target/arm/cpu.h                  |  4 ++++
- accel/tcg/translate-all.c         | 28 ++++++++++++++++++++++
- linux-user/mmap.c                 |  8 ++++++-
- linux-user/syscall.c              |  4 ++--
- target/arm/cpu64.c                | 20 ++++++++++++++++
- target/arm/mte_helper.c           | 35 +++++++++++++++++++++++++--
- tests/tcg/aarch64/mte-1.c         | 27 +++++++++++++++++++++
- tests/tcg/aarch64/mte-2.c         | 39 +++++++++++++++++++++++++++++++
- tests/tcg/aarch64/Makefile.target |  5 ++++
- 10 files changed, 173 insertions(+), 7 deletions(-)
- create mode 100644 tests/tcg/aarch64/mte-1.c
- create mode 100644 tests/tcg/aarch64/mte-2.c
-
--- 
-2.17.1
-
+thanks
+-- PMM
 
