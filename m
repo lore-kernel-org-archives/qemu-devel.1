@@ -4,44 +4,45 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1B2D4ECE58F
-	for <qemu-devel@archiver.kernel.org>; Tue, 15 Oct 2019 18:26:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CE526ECE588
+	for <qemu-devel@archiver.kernel.org>; Tue, 15 Oct 2019 18:26:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E7B3E2086A
-	for <qemu-devel@archiver.kernel.org>; Tue, 15 Oct 2019 18:26:02 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E7B3E2086A
+	by mail.kernel.org (Postfix) with ESMTPS id A2EEB2084B
+	for <qemu-devel@archiver.kernel.org>; Tue, 15 Oct 2019 18:26:24 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A2EEB2084B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56068 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56070 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iKRWD-0003S1-KN
-	for qemu-devel@archiver.kernel.org; Tue, 15 Oct 2019 14:26:01 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59675)
+	id 1iKRWZ-0003u9-Dm
+	for qemu-devel@archiver.kernel.org; Tue, 15 Oct 2019 14:26:23 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59692)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <andrey.shinkevich@virtuozzo.com>) id 1iKRR6-0005ok-9e
- for qemu-devel@nongnu.org; Tue, 15 Oct 2019 14:20:45 -0400
+ (envelope-from <andrey.shinkevich@virtuozzo.com>) id 1iKRR6-0005q9-U2
+ for qemu-devel@nongnu.org; Tue, 15 Oct 2019 14:20:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <andrey.shinkevich@virtuozzo.com>) id 1iKRR4-0001TD-Ub
+ (envelope-from <andrey.shinkevich@virtuozzo.com>) id 1iKRR5-0001Tm-Jd
  for qemu-devel@nongnu.org; Tue, 15 Oct 2019 14:20:44 -0400
-Received: from relay.sw.ru ([185.231.240.75]:35008)
+Received: from relay.sw.ru ([185.231.240.75]:35016)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <andrey.shinkevich@virtuozzo.com>)
- id 1iKRR4-0001RJ-Ma; Tue, 15 Oct 2019 14:20:42 -0400
+ id 1iKRR5-0001RK-Bx; Tue, 15 Oct 2019 14:20:43 -0400
 Received: from [172.16.25.136] (helo=dhcp-172-16-25-136.sw.ru)
  by relay.sw.ru with esmtp (Exim 4.92.2)
  (envelope-from <andrey.shinkevich@virtuozzo.com>)
- id 1iKRQz-0003ry-09; Tue, 15 Oct 2019 21:20:37 +0300
+ id 1iKRQy-0003ry-Pg; Tue, 15 Oct 2019 21:20:36 +0300
 From: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
 To: qemu-devel@nongnu.org,
 	qemu-block@nongnu.org
-Subject: [PATCH v3 3/5] block: support compressed write for copy-on-read
-Date: Tue, 15 Oct 2019 21:20:23 +0300
-Message-Id: <1571163625-642312-4-git-send-email-andrey.shinkevich@virtuozzo.com>
+Subject: [PATCH v3 2/5] tests/qemu-iotests: add case to write compressed data
+ of multiple clusters
+Date: Tue, 15 Oct 2019 21:20:22 +0300
+Message-Id: <1571163625-642312-3-git-send-email-andrey.shinkevich@virtuozzo.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1571163625-642312-1-git-send-email-andrey.shinkevich@virtuozzo.com>
 References: <1571163625-642312-1-git-send-email-andrey.shinkevich@virtuozzo.com>
@@ -65,82 +66,85 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Support the data compression during block-stream job over a backup
-backing chain implemented in the following patch 'block-stream:
-add compress option'.
+Add the test case to the iotest #214 that checks possibility of writing
+compressed data of more than one cluster size.
 
-Signed-off-by: Anton Nefedov <anton.nefedov@virtuozzo.com>
-Signed-off-by: Denis V. Lunev <den@openvz.org>
 Signed-off-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
 ---
- block/io.c         | 21 ++++++++++++++++-----
- block/trace-events |  2 +-
- 2 files changed, 17 insertions(+), 6 deletions(-)
+ tests/qemu-iotests/214     | 35 +++++++++++++++++++++++++++++++++++
+ tests/qemu-iotests/214.out | 15 +++++++++++++++
+ 2 files changed, 50 insertions(+)
 
-diff --git a/block/io.c b/block/io.c
-index 6a5509c..fc7f157 100644
---- a/block/io.c
-+++ b/block/io.c
-@@ -1264,12 +1264,13 @@ static int coroutine_fn bdrv_co_do_copy_on_readv(BdrvChild *child,
-      * allocating cluster in the image file.  Note that this value may exceed
-      * BDRV_REQUEST_MAX_BYTES (even when the original read did not), which
-      * is one reason we loop rather than doing it all at once.
-+     * Also, this is crucial for compressed copy-on-read.
-      */
-     bdrv_round_to_clusters(bs, offset, bytes, &cluster_offset, &cluster_bytes);
-     skip_bytes = offset - cluster_offset;
+diff --git a/tests/qemu-iotests/214 b/tests/qemu-iotests/214
+index 21ec8a2..0003dc2 100755
+--- a/tests/qemu-iotests/214
++++ b/tests/qemu-iotests/214
+@@ -89,6 +89,41 @@ _check_test_img -r all
+ $QEMU_IO -c "read  -P 0x11  0 4M" "$TEST_IMG" 2>&1 | _filter_qemu_io | _filter_testdir
+ $QEMU_IO -c "read  -P 0x22 4M 4M" "$TEST_IMG" 2>&1 | _filter_qemu_io | _filter_testdir
  
-     trace_bdrv_co_do_copy_on_readv(bs, offset, bytes,
--                                   cluster_offset, cluster_bytes);
-+                                   cluster_offset, cluster_bytes, flags);
- 
-     while (cluster_bytes) {
-         int64_t pnum;
-@@ -1328,9 +1329,15 @@ static int coroutine_fn bdrv_co_do_copy_on_readv(BdrvChild *child,
-                 /* This does not change the data on the disk, it is not
-                  * necessary to flush even in cache=writethrough mode.
-                  */
--                ret = bdrv_driver_pwritev(bs, cluster_offset, pnum,
--                                          &local_qiov, 0,
--                                          BDRV_REQ_WRITE_UNCHANGED);
-+                if (flags & BDRV_REQ_WRITE_COMPRESSED) {
-+                    ret = bdrv_driver_pwritev_compressed(bs, cluster_offset,
-+                                                         pnum, &local_qiov,
-+                                                         qiov_offset);
-+                } else {
-+                    ret = bdrv_driver_pwritev(bs, cluster_offset, pnum,
-+                                              &local_qiov, 0,
-+                                              BDRV_REQ_WRITE_UNCHANGED);
-+                }
-             }
- 
-             if (ret < 0) {
-@@ -1396,7 +1403,11 @@ static int coroutine_fn bdrv_aligned_preadv(BdrvChild *child,
-      * to pass through to drivers.  For now, there aren't any
-      * passthrough flags.  */
-     assert(!(flags & ~(BDRV_REQ_NO_SERIALISING | BDRV_REQ_COPY_ON_READ |
--                       BDRV_REQ_PREFETCH)));
-+                       BDRV_REQ_PREFETCH | BDRV_REQ_WRITE_COMPRESSED)));
++echo
++echo "=== Write compressed data of multiple clusters ==="
++echo
++cluster_size=0x10000
++_make_test_img 2M -o cluster_size=$cluster_size
 +
-+    /* write compressed only makes sense with copy on read */
-+    assert(!(flags & BDRV_REQ_WRITE_COMPRESSED) ||
-+           (flags & BDRV_REQ_COPY_ON_READ));
- 
-     /* Handle Copy on Read and associated serialisation */
-     if (flags & BDRV_REQ_COPY_ON_READ) {
-diff --git a/block/trace-events b/block/trace-events
-index 3aa27e6..f444548 100644
---- a/block/trace-events
-+++ b/block/trace-events
-@@ -14,7 +14,7 @@ blk_root_detach(void *child, void *blk, void *bs) "child %p blk %p bs %p"
- bdrv_co_preadv(void *bs, int64_t offset, int64_t nbytes, unsigned int flags) "bs %p offset %"PRId64" nbytes %"PRId64" flags 0x%x"
- bdrv_co_pwritev(void *bs, int64_t offset, int64_t nbytes, unsigned int flags) "bs %p offset %"PRId64" nbytes %"PRId64" flags 0x%x"
- bdrv_co_pwrite_zeroes(void *bs, int64_t offset, int count, int flags) "bs %p offset %"PRId64" count %d flags 0x%x"
--bdrv_co_do_copy_on_readv(void *bs, int64_t offset, unsigned int bytes, int64_t cluster_offset, int64_t cluster_bytes) "bs %p offset %"PRId64" bytes %u cluster_offset %"PRId64" cluster_bytes %"PRId64
-+bdrv_co_do_copy_on_readv(void *bs, int64_t offset, unsigned int bytes, int64_t cluster_offset, int64_t cluster_bytes, int flags) "bs %p offset %"PRId64" bytes %u cluster_offset %"PRId64" cluster_bytes %"PRId64" flags 0x%x"
- bdrv_co_copy_range_from(void *src, uint64_t src_offset, void *dst, uint64_t dst_offset, uint64_t bytes, int read_flags, int write_flags) "src %p offset %"PRIu64" dst %p offset %"PRIu64" bytes %"PRIu64" rw flags 0x%x 0x%x"
- bdrv_co_copy_range_to(void *src, uint64_t src_offset, void *dst, uint64_t dst_offset, uint64_t bytes, int read_flags, int write_flags) "src %p offset %"PRIu64" dst %p offset %"PRIu64" bytes %"PRIu64" rw flags 0x%x 0x%x"
- 
++echo "Uncompressed data:"
++let data_size="8 * $cluster_size"
++$QEMU_IO -c "write -P 0xaa 0 $data_size" "$TEST_IMG" \
++         2>&1 | _filter_qemu_io | _filter_testdir
++$QEMU_IMG info "$TEST_IMG" | sed -n '/disk size:/ s/^ *//p'
++
++_make_test_img 2M -o cluster_size=$cluster_size
++let data_size="3 * $cluster_size + ($cluster_size >> 1)"
++# Set compress=on. That will align the written data
++# by the cluster size and will write them compressed.
++QEMU_IO_OPTIONS=$QEMU_IO_OPTIONS_NO_FMT \
++$QEMU_IO -c "write -P 0xbb 0 $data_size" --image-opts \
++         driver=$IMGFMT,compress=on,file.filename=$TEST_IMG \
++         2>&1 | _filter_qemu_io | _filter_testdir
++
++let offset="4 * $cluster_size"
++QEMU_IO_OPTIONS=$QEMU_IO_OPTIONS_NO_FMT \
++$QEMU_IO -c "write -P 0xcc $offset $data_size" "json:{\
++    'driver': '$IMGFMT',
++    'file': {
++        'driver': 'file',
++        'filename': '$TEST_IMG'
++    },
++    'compress': true
++}" | _filter_qemu_io | _filter_testdir
++
++echo "After the multiple cluster data have been written compressed,"
++$QEMU_IMG info "$TEST_IMG" | sed -n '/disk size:/ s/^ *//p'
++
+ # success, all done
+ echo '*** done'
+ rm -f $seq.full
+diff --git a/tests/qemu-iotests/214.out b/tests/qemu-iotests/214.out
+index 0fcd8dc..09a2e9a 100644
+--- a/tests/qemu-iotests/214.out
++++ b/tests/qemu-iotests/214.out
+@@ -32,4 +32,19 @@ read 4194304/4194304 bytes at offset 0
+ 4 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+ read 4194304/4194304 bytes at offset 4194304
+ 4 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++
++=== Write compressed data of multiple clusters ===
++
++Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=2097152
++Uncompressed data:
++wrote 524288/524288 bytes at offset 0
++512 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++disk size: 772 KiB
++Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=2097152
++wrote 229376/229376 bytes at offset 0
++224 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++wrote 229376/229376 bytes at offset 262144
++224 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++After the multiple cluster data have been written compressed,
++disk size: 268 KiB
+ *** done
 -- 
 1.8.3.1
 
