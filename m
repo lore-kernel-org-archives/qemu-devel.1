@@ -2,111 +2,66 @@ Return-Path: <SRS0=/TIv=YJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2837CFA372A
-	for <qemu-devel@archiver.kernel.org>; Wed, 16 Oct 2019 11:04:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CF3B8FA3728
+	for <qemu-devel@archiver.kernel.org>; Wed, 16 Oct 2019 11:06:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F0A8920854
-	for <qemu-devel@archiver.kernel.org>; Wed, 16 Oct 2019 11:04:51 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F0A8920854
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id A4E5C2064B
+	for <qemu-devel@archiver.kernel.org>; Wed, 16 Oct 2019 11:06:07 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A4E5C2064B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40908 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40922 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iKh6o-0005eP-V4
-	for qemu-devel@archiver.kernel.org; Wed, 16 Oct 2019 07:04:50 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39786)
+	id 1iKh82-0006w0-Ot
+	for qemu-devel@archiver.kernel.org; Wed, 16 Oct 2019 07:06:06 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39897)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <thuth@redhat.com>) id 1iKh59-0004d8-L0
- for qemu-devel@nongnu.org; Wed, 16 Oct 2019 07:03:09 -0400
+ (envelope-from <no-reply@patchew.org>) id 1iKh6Y-0005kP-LR
+ for qemu-devel@nongnu.org; Wed, 16 Oct 2019 07:04:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <thuth@redhat.com>) id 1iKh56-0005xY-RP
- for qemu-devel@nongnu.org; Wed, 16 Oct 2019 07:03:06 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46992)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <thuth@redhat.com>) id 1iKh56-0005x5-Ip
- for qemu-devel@nongnu.org; Wed, 16 Oct 2019 07:03:04 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 4AEB130860DA;
- Wed, 16 Oct 2019 11:03:03 +0000 (UTC)
-Received: from thuth.remote.csb (dhcp-200-228.str.redhat.com [10.33.200.228])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 0B3DF5C541;
- Wed, 16 Oct 2019 11:02:48 +0000 (UTC)
-Subject: Re: Python 2 and test/vm/netbsd
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
- Kamil Rytarowski <n54@gmx.com>
-References: <20191016030021.GD4084@habkost.net>
- <a83d518a-6e39-0017-203d-2ee3d61935ca@redhat.com>
- <b61252af-9eae-d655-0602-d270ce6223ef@gmx.com> <875zkp5534.fsf@linaro.org>
-From: Thomas Huth <thuth@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=thuth@redhat.com; prefer-encrypt=mutual; keydata=
- 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
-Organization: Red Hat
-Message-ID: <ea15af9e-efac-a656-bf77-c97192a0f445@redhat.com>
-Date: Wed, 16 Oct 2019 13:02:48 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+ (envelope-from <no-reply@patchew.org>) id 1iKh6X-0006JY-8E
+ for qemu-devel@nongnu.org; Wed, 16 Oct 2019 07:04:34 -0400
+Resent-Date: Wed, 16 Oct 2019 07:04:34 -0400
+Resent-Message-Id: <E1iKh6X-0006JY-8E@eggs.gnu.org>
+Received: from sender4-of-o56.zoho.com ([136.143.188.56]:21640)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <no-reply@patchew.org>)
+ id 1iKh6V-0006JD-7U; Wed, 16 Oct 2019 07:04:32 -0400
+ARC-Seal: i=1; a=rsa-sha256; t=1571223851; cv=none; d=zoho.com; s=zohoarc; 
+ b=CianeI3/lFjQxwYU977hcGbjCqZLpA4bIcfgLRqagP92AbqtlctmHoiDPKnVP5l6lhISSJBh0SR/1qzzCchYN1L7jwgHqSazdHK97plZ4xiQrnKIfmJCInFh4T5ORpNwzvGvNM0BNk/pVqJiLg8pRNEJIM3Zt+dzT0dBiDh0CHI=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zoho.com;
+ s=zohoarc; t=1571223851;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
+ bh=whZEdFnPyujDtZA5D/ecWY4xRUgsjjwobdn2blHMRX4=; 
+ b=Sod+BSYyyQ2DZ+Mqv9YnhDE3rrBRz4D8tGkjJWATDNaFcAbx9ZHuOP3I8tIyBKd2GtXjq1mzW0EGDa9+cwK0UkTVeotprYr3DrftmF2wl2ZBAY3C122wfizbx+TZpqb4YG81tDVQl1txd6ri6fyWYZ0WvV0uVoqeFm1R9xDoIpY=
+ARC-Authentication-Results: i=1; mx.zoho.com; dkim=pass  header.i=patchew.org;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 1571223849943473.2473956051375;
+ Wed, 16 Oct 2019 04:04:09 -0700 (PDT)
+In-Reply-To: <1571163625-642312-1-git-send-email-andrey.shinkevich@virtuozzo.com>
+Subject: Re: [PATCH v3 0/5] qcow2: advanced compression options
+Message-ID: <157122384800.13250.3362775585671797138@37313f22b938>
 MIME-Version: 1.0
-In-Reply-To: <875zkp5534.fsf@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.44]); Wed, 16 Oct 2019 11:03:03 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: andrey.shinkevich@virtuozzo.com
+Date: Wed, 16 Oct 2019 04:04:09 -0700 (PDT)
+X-ZohoMailClient: External
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 209.132.183.28
+X-Received-From: 136.143.188.56
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -118,80 +73,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Peter Maydell <peter.maydell@linaro.org>,
- Eduardo Habkost <ehabkost@redhat.com>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>,
- =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
- Kamil Rytarowski <kamil@netbsd.org>, Gerd Hoffmann <kraxel@redhat.com>,
- Cleber Rosa <crosa@redhat.com>, Kevin Wolf <kwolf@redhat.com>,
- John Snow <jsnow@redhat.com>
+Reply-To: qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, fam@euphon.net, vsementsov@virtuozzo.com,
+ qemu-block@nongnu.org, qemu-devel@nongnu.org, armbru@redhat.com,
+ stefanha@redhat.com, den@openvz.org, andrey.shinkevich@virtuozzo.com,
+ mreitz@redhat.com, jsnow@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 16/10/2019 12.59, Alex Benn=C3=A9e wrote:
->=20
-> Kamil Rytarowski <n54@gmx.com> writes:
->=20
->> On 16.10.2019 08:11, Thomas Huth wrote:
->>> On 16/10/2019 05.00, Eduardo Habkost wrote:
->>>> On Tue, Sep 17, 2019 at 08:31:40PM -0300, Eduardo Habkost wrote:
->>>>> On Mon, Jul 01, 2019 at 07:25:27PM -0300, Eduardo Habkost wrote:
->>>>>> On Mon, Jun 10, 2019 at 01:58:50PM +0100, Peter Maydell wrote:
->>>> [...]
->>>>>>> The configure check also spits out deprecation warnings for
->>>>>>> the NetBSD/FreeBSD/OpenBSD tests/vm configurations. It would be n=
-ice
->>>>>>> to get those updated.
->>>>>>
->>>>>> CCing the test/vm maintainers.
->>>>>>
->>>>>> Fam, Alex, are you able to fix this and create new BSD VM images
->>>>>> with Python 3 available?  I thought the VM image configurations
->>>>>> were stored in the source tree, but they are downloaded from
->>>>>> download.patchew.org.
->>>>>
->>>>> Fam, Alex, can you help us on this?  Python 2 won't be supported
->>>>> anymore, so we need the VM images to be updated.
->>>>
->>>> Anyone?
->>>>
->>>> I'm about to submit patches to remove Python 2 support, and this
->>>> will break tests/vm/netbsd.
->>>>
->>>> I'm powerless to fix this issue, because the netbsd image is
->>>> hosted at download.patchew.org.
->>>
->>> Gerd had a patch to convert the netbsd VM script to ad hoc image
->>> creation, too:
->>>
->>> https://lists.gnu.org/archive/html/qemu-devel/2019-05/msg04459.html
->>>
->>> But there was a regression with the serial port between QEMU v3.0 and
->>> v4.x, so it was not included:
->>>
->>> https://lists.gnu.org/archive/html/qemu-devel/2019-05/msg06784.html
->>>
->>> I guess someone=E2=84=A2 needs to bisect that regression, so we can f=
-ix that bug
->>> and finally include Gerd's patch...
->>>
->>>   Thomas
->>>
->>
->> Is this a regression in qemu? How to reproduce the problem? "make
->> vm-build-netbsd V=3D1" ?
->=20
-> You'll need to apply the patch from that series:
->=20
->   tests/vm: netbsd autoinstall, using serial
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8xNTcxMTYzNjI1LTY0MjMxMi0x
+LWdpdC1zZW5kLWVtYWlsLWFuZHJleS5zaGlua2V2aWNoQHZpcnR1b3p6by5jb20vCgoKCkhpLAoK
+VGhpcyBzZXJpZXMgZmFpbGVkIHRoZSBkb2NrZXItbWluZ3dAZmVkb3JhIGJ1aWxkIHRlc3QuIFBs
+ZWFzZSBmaW5kIHRoZSB0ZXN0aW5nIGNvbW1hbmRzIGFuZAp0aGVpciBvdXRwdXQgYmVsb3cuIElm
+IHlvdSBoYXZlIERvY2tlciBpbnN0YWxsZWQsIHlvdSBjYW4gcHJvYmFibHkgcmVwcm9kdWNlIGl0
+CmxvY2FsbHkuCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhIC9iaW4vYmFzaApleHBvcnQg
+QVJDSD14ODZfNjQKbWFrZSBkb2NrZXItaW1hZ2UtZmVkb3JhIFY9MSBORVRXT1JLPTEKdGltZSBt
+YWtlIGRvY2tlci10ZXN0LW1pbmd3QGZlZG9yYSBKPTE0IE5FVFdPUks9MQo9PT0gVEVTVCBTQ1JJ
+UFQgRU5EID09PQoKICBDQyAgICAgIGJsb2NrL3NuYXBzaG90Lm8KICBDQyAgICAgIGJsb2NrL3Fh
+cGkubwovdG1wL3FlbXUtdGVzdC9zcmMvYmxvY2svcWNvdzIuYzogSW4gZnVuY3Rpb24gJ3Fjb3cy
+X2NvX3B3cml0ZXZfY29tcHJlc3NlZF9wYXJ0JzoKL3RtcC9xZW11LXRlc3Qvc3JjL2Jsb2NrL3Fj
+b3cyLmM6NDI0NDo5OiBlcnJvcjogJ3JldCcgbWF5IGJlIHVzZWQgdW5pbml0aWFsaXplZCBpbiB0
+aGlzIGZ1bmN0aW9uIFstV2Vycm9yPW1heWJlLXVuaW5pdGlhbGl6ZWRdCiAgICAgaW50IHJldDsK
+ICAgICAgICAgXn5+CmNjMTogYWxsIHdhcm5pbmdzIGJlaW5nIHRyZWF0ZWQgYXMgZXJyb3JzCm1h
+a2U6ICoqKiBbL3RtcC9xZW11LXRlc3Qvc3JjL3J1bGVzLm1hazo2OTogYmxvY2svcWNvdzIub10g
+RXJyb3IgMQptYWtlOiAqKiogV2FpdGluZyBmb3IgdW5maW5pc2hlZCBqb2JzLi4uLgpUcmFjZWJh
+Y2sgKG1vc3QgcmVjZW50IGNhbGwgbGFzdCk6CiAgRmlsZSAiLi90ZXN0cy9kb2NrZXIvZG9ja2Vy
+LnB5IiwgbGluZSA2NjQsIGluIDxtb2R1bGU+Ci0tLQogIEZpbGUgIi9vcHQvcmgvcmgtcHl0aG9u
+MzYvcm9vdC91c3IvbGliNjQvcHl0aG9uMy42L3N1YnByb2Nlc3MucHkiLCBsaW5lIDI5MSwgaW4g
+Y2hlY2tfY2FsbAogICAgcmFpc2UgQ2FsbGVkUHJvY2Vzc0Vycm9yKHJldGNvZGUsIGNtZCkKc3Vi
+cHJvY2Vzcy5DYWxsZWRQcm9jZXNzRXJyb3I6IENvbW1hbmQgJ1snc3VkbycsICctbicsICdkb2Nr
+ZXInLCAncnVuJywgJy0tbGFiZWwnLCAnY29tLnFlbXUuaW5zdGFuY2UudXVpZD00YzU4ZTIyMGYw
+MDQxMWU5YmU3ODY4YjU5OTczYjdkMCcsICctdScsICcxMDAxJywgJy0tc2VjdXJpdHktb3B0Jywg
+J3NlY2NvbXA9dW5jb25maW5lZCcsICctLXJtJywgJy1lJywgJ1RBUkdFVF9MSVNUPScsICctZScs
+ICdFWFRSQV9DT05GSUdVUkVfT1BUUz0nLCAnLWUnLCAnVj0nLCAnLWUnLCAnSj0xNCcsICctZScs
+ICdERUJVRz0nLCAnLWUnLCAnU0hPV19FTlY9JywgJy1lJywgJ0NDQUNIRV9ESVI9L3Zhci90bXAv
+Y2NhY2hlJywgJy12JywgJy9ob21lL3BhdGNoZXcvLmNhY2hlL3FlbXUtZG9ja2VyLWNjYWNoZTov
+dmFyL3RtcC9jY2FjaGU6eicsICctdicsICcvdmFyL3RtcC9wYXRjaGV3LXRlc3Rlci10bXAtZWVv
+cTR1XzAvc3JjL2RvY2tlci1zcmMuMjAxOS0xMC0xNi0wNy4wMS4xMS4xMTA1NjovdmFyL3RtcC9x
+ZW11Onoscm8nLCAncWVtdTpmZWRvcmEnLCAnL3Zhci90bXAvcWVtdS9ydW4nLCAndGVzdC1taW5n
+dyddJyByZXR1cm5lZCBub24temVybyBleGl0IHN0YXR1cyAyLgptYWtlWzFdOiAqKiogW2RvY2tl
+ci1ydW5dIEVycm9yIDEKbWFrZVsxXTogTGVhdmluZyBkaXJlY3RvcnkgYC92YXIvdG1wL3BhdGNo
+ZXctdGVzdGVyLXRtcC1lZW9xNHVfMC9zcmMnCm1ha2U6ICoqKiBbZG9ja2VyLXJ1bi10ZXN0LW1p
+bmd3QGZlZG9yYV0gRXJyb3IgMgoKcmVhbCAgICAybTU3LjY0NHMKdXNlciAgICAwbTguNTE4cwoK
+ClRoZSBmdWxsIGxvZyBpcyBhdmFpbGFibGUgYXQKaHR0cDovL3BhdGNoZXcub3JnL2xvZ3MvMTU3
+MTE2MzYyNS02NDIzMTItMS1naXQtc2VuZC1lbWFpbC1hbmRyZXkuc2hpbmtldmljaEB2aXJ0dW96
+em8uY29tL3Rlc3RpbmcuZG9ja2VyLW1pbmd3QGZlZG9yYS8/dHlwZT1tZXNzYWdlLgotLS0KRW1h
+aWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cHM6Ly9wYXRjaGV3Lm9y
+Zy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNv
+bQ==
 
-Patch (mbox for applying with "git am") is still available in Patchew if
-you don't have it in your local qemu-devel folder anymore:
-
- http://next.patchew.org/QEMU/20190520124716.30472-13-kraxel@redhat.com/m=
-box
-
- Thomas
 
