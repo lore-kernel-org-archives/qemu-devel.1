@@ -2,104 +2,123 @@ Return-Path: <SRS0=/TIv=YJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E7CB7FA372A
-	for <qemu-devel@archiver.kernel.org>; Wed, 16 Oct 2019 12:46:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 788D2FA372A
+	for <qemu-devel@archiver.kernel.org>; Wed, 16 Oct 2019 12:49:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B04C82168B
-	for <qemu-devel@archiver.kernel.org>; Wed, 16 Oct 2019 12:46:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 41FD62168B
+	for <qemu-devel@archiver.kernel.org>; Wed, 16 Oct 2019 12:49:50 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SDPGedAc"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B04C82168B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=nutanix.com header.i=@nutanix.com header.b="dsDVcQUd"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 41FD62168B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=nutanix.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42376 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42392 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iKih9-0006C1-S3
-	for qemu-devel@archiver.kernel.org; Wed, 16 Oct 2019 08:46:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51816)
+	id 1iKikP-0007aP-Fq
+	for qemu-devel@archiver.kernel.org; Wed, 16 Oct 2019 08:49:49 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52271)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1iKifl-0005CK-4k
- for qemu-devel@nongnu.org; Wed, 16 Oct 2019 08:45:02 -0400
+ (envelope-from <ani.sinha@nutanix.com>) id 1iKijR-00078O-Ks
+ for qemu-devel@nongnu.org; Wed, 16 Oct 2019 08:48:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1iKifi-0005RL-Fb
- for qemu-devel@nongnu.org; Wed, 16 Oct 2019 08:44:59 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:57924
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iKifi-0005Qu-2e
- for qemu-devel@nongnu.org; Wed, 16 Oct 2019 08:44:58 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1571229897;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=CBdfY/1i7TbYf0JgScF/YSZX5J4wrGZzD7wCV2O5FqY=;
- b=SDPGedAcy20isja4T3r73fdmUbUfTv+jAQ5BKorw9yRxZ3tK+4NB4PwghQw32vMO4zPlTU
- VFH7PftQ2qJRQBOnY5VvHD6xewqfuT6pEAvGlpuvoSTFhk2BG+//pJMaxZ5Oq3sk0gpMD2
- hYVwcLfLSPas94prJdi27AwI00dtZB0=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-27-Ax_RvExDObytHLVcZYcEDA-1; Wed, 16 Oct 2019 08:44:55 -0400
-Received: by mail-wm1-f71.google.com with SMTP id o188so1159473wmo.5
- for <qemu-devel@nongnu.org>; Wed, 16 Oct 2019 05:44:55 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=IUF8uus1tt/CbKNov4kwWjotnaqRaJYeSCPtFu4fjT4=;
- b=UnSVHmJ0+f3KNxbx5+f4VnRrWiddX+al8YOsEqX/cqNMdLsHx3PeG2oHrM8mstHA+o
- J8SQ6w9xsAOVzfHNtHM07DVND07XuvXqtV9vG8AIDUysY/1rwl3qg3vzj6jZStF08HKq
- UKNg3Eh2Aff6y8qBTbSnrdJ2EMi8CwroFMjVZ5er2JSpyieGOiYm3ZO0VbvCyRq4e+Cb
- QCnlZiOu/yEBldqJXL7hOL9sfh3ZbbZuk/dsVQq4J6XzI15lcNBxkLE7SthyINdV3/v9
- YXHS8BeHpDiaTIy4V5mWmFDm/Hyd2blNqDzy7QdGQMAURHgYZW4EF8B8E/qQf5P89YjA
- lWFw==
-X-Gm-Message-State: APjAAAUWNHQ9tTkWBnS88Ttf9s9lLsl59HDik0YTMc3cs+bWsMezRgHN
- Fkgxvgg6vqMIuPaITOoVRyhjCaskchzT8BcaIqrH8ev0rPh2WtwQY7GzurMcMR4eALx7WQHp2oq
- D8HzvC5Pj+ib5pdc=
-X-Received: by 2002:a5d:44c5:: with SMTP id z5mr996412wrr.252.1571229894616;
- Wed, 16 Oct 2019 05:44:54 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqyqleRj/Tb2EuODic8NQWEJwDLnRw5WGNsKwFbnHQ50I7Xh6cj2vYiH19Dp9S7hYv28H9jTRQ==
-X-Received: by 2002:a5d:44c5:: with SMTP id z5mr996392wrr.252.1571229894363;
- Wed, 16 Oct 2019 05:44:54 -0700 (PDT)
-Received: from [192.168.1.36] (14.red-88-21-201.staticip.rima-tde.net.
- [88.21.201.14])
- by smtp.gmail.com with ESMTPSA id x2sm31109104wrn.81.2019.10.16.05.44.53
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Wed, 16 Oct 2019 05:44:53 -0700 (PDT)
-Subject: Re: [PULL 59/68] aspeed: Add an AST2600 eval board
-To: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>,
- Peter Maydell <peter.maydell@linaro.org>,
- QEMU Developers <qemu-devel@nongnu.org>, Joel Stanley <joel@jms.id.au>
-References: <20191014160404.19553-1-peter.maydell@linaro.org>
- <20191014160404.19553-60-peter.maydell@linaro.org>
- <CAFEAcA-2EZnnrYViQUQK-mR0=JqR9mXNzfVNa_WR5HoCTJ+tag@mail.gmail.com>
- <2f6dd2bc-27e7-91a2-e673-18b9715a9628@redhat.com>
- <81879465-e235-e146-46d9-b8e1441b30cf@kaod.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <53a6663a-bfbc-b90c-a982-46aeee838f19@redhat.com>
-Date: Wed, 16 Oct 2019 14:44:52 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.0
-MIME-Version: 1.0
-In-Reply-To: <81879465-e235-e146-46d9-b8e1441b30cf@kaod.org>
+ (envelope-from <ani.sinha@nutanix.com>) id 1iKijP-00072I-MN
+ for qemu-devel@nongnu.org; Wed, 16 Oct 2019 08:48:48 -0400
+Received: from mx0b-002c1b01.pphosted.com ([148.163.155.12]:19756)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <ani.sinha@nutanix.com>)
+ id 1iKijP-000724-FW
+ for qemu-devel@nongnu.org; Wed, 16 Oct 2019 08:48:47 -0400
+Received: from pps.filterd (m0127843.ppops.net [127.0.0.1])
+ by mx0b-002c1b01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ x9GCjLIU026300
+ for <qemu-devel@nongnu.org>; Wed, 16 Oct 2019 05:48:45 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nutanix.com;
+ h=from : to : subject
+ : date : message-id : content-type : mime-version; s=proofpoint20171006;
+ bh=ZqBdEt61l2m3RvTAhhyMquLh2FJY+MpNJQ8EuKf0enI=;
+ b=dsDVcQUdrEoWKvk87aq0U/XDX4wtlikKgO+cb96UkTqg0m0BNg3HZkVX0mB/R09NatAT
+ qtfYSjVuKTnAR0/DKXFW+AFY2ADtzeWdMAa2wUxaheV9ZPlHxxu2JBvb222SW4wAPdA2
+ JbLFU5q7E7umIPhQHTCjNeb71kYxBBe/v+OZyMmwpXK0GxZpJdXHeNcRc4Yxbih5zOPn
+ RPlFfz4tsXIXctBWS4tH/OyJEq6e32zEa4pkYOf8HRMIVBD1EAUHVimhtL7mBH5npU4W
+ QZ4F9JQ2hoJVFOD/hfCiMw0Ta5+cHqcfUBfSO8TUZzLHBixs1udaDZEk4PbuH0TDYHm/ 1Q== 
+Received: from nam02-sn1-obe.outbound.protection.outlook.com
+ (mail-sn1nam02lp2059.outbound.protection.outlook.com [104.47.36.59])
+ by mx0b-002c1b01.pphosted.com with ESMTP id 2vkcxjrc1x-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
+ for <qemu-devel@nongnu.org>; Wed, 16 Oct 2019 05:48:45 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Fmi6dRq0Pd8WDTJGxW/Nd27aTG7hgq58FCYH7HCzJh60WX3DvtJUjLfXVVlZeFdzFqKzF8F3x/VMSaccmOnjlpubdXgGVl+iYDluj8TpkBa6vzDc/PCnziHKVJXocTxqJOrTibrvMHj18opfC5z/tPQYbsHm4vm6B1b9rnegl9PskjB6ddSNsvE6YsXIXpw+E2iCwEvfEUUtERwIG7syl3KG0blmoAawgENO7ET5R8O0twxrdjp75tDUiF0eNLw/d3XuZjLkbSB8D3AJxb8GX//pIIiy0+wqoCDmnGymy2mhy8EqZfLFRf+MDIQgUOnDKTleJOVpRaRurupBIbfXIg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=ZqBdEt61l2m3RvTAhhyMquLh2FJY+MpNJQ8EuKf0enI=;
+ b=WmKyOsB0giaQ+x5nB74lDF9s6aiTwRocgKeu/UPdJXldy+ix1S3xpiU1Hn4Ok26mT0zizN1cOnU/VkTkSAtQwa6cpUgO2wLb5vnZCUa4XR/wRFT4p4Sq0yOhkBHN9tR1px3xy+hHjtz08Y4eF5lkIEfz9BuIOjf6HxwTS9GCyR/pRBfHH9HKw3HySulFmG0aIzmaf0SpuNB92G3P17KLE2wuwzAADNJLEHrHuxFWipRPPaDCBTp9NZdHa7h5VNTeQ9ziInQmf0z967bfKski0GBb9GvWLch06saDT5TAbiOn6rIgtF2QvS4t2Gr4zG1J2vTv5z6dU701dV7LIGoCuQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nutanix.com; dmarc=pass action=none header.from=nutanix.com;
+ dkim=pass header.d=nutanix.com; arc=none
+Received: from SN6PR02MB5135.namprd02.prod.outlook.com (52.135.99.152) by
+ SN6PR02MB5629.namprd02.prod.outlook.com (20.177.251.93) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2347.16; Wed, 16 Oct 2019 12:48:43 +0000
+Received: from SN6PR02MB5135.namprd02.prod.outlook.com
+ ([fe80::3522:65f0:16b:52ba]) by SN6PR02MB5135.namprd02.prod.outlook.com
+ ([fe80::3522:65f0:16b:52ba%2]) with mapi id 15.20.2347.023; Wed, 16 Oct 2019
+ 12:48:43 +0000
+From: Ani Sinha <ani.sinha@nutanix.com>
+To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Subject: TOPOEXT and CentOs 7 guests
+Thread-Topic: TOPOEXT and CentOs 7 guests
+Thread-Index: AQHVhCALCLRy80IVsUW+6b2LGtEckQ==
+Date: Wed, 16 Oct 2019 12:48:43 +0000
+Message-ID: <113f8174-8b0a-4574-9a64-45d5cfcce0cc@Spark>
+Accept-Language: en-US
 Content-Language: en-US
-X-MC-Unique: Ax_RvExDObytHLVcZYcEDA-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.81
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [103.68.105.248]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: dc8e3f37-c950-4da5-a7cf-08d752372da8
+x-ms-traffictypediagnostic: SN6PR02MB5629:
+x-ms-exchange-purlcount: 1
+x-microsoft-antispam-prvs: <SN6PR02MB5629984BCE2FA9E7417AEF9EF1920@SN6PR02MB5629.namprd02.prod.outlook.com>
+x-proofpoint-crosstenant: true
+x-ms-oob-tlc-oobclassifiers: OLM:9508;
+x-forefront-prvs: 0192E812EC
+x-forefront-antispam-report: SFV:NSPM;
+ SFS:(10019020)(7916004)(346002)(396003)(136003)(366004)(376002)(39860400002)(199004)(189003)(66446008)(66476007)(33716001)(21615005)(2906002)(66556008)(6916009)(476003)(6116002)(3846002)(486006)(6436002)(256004)(7736002)(6306002)(9686003)(236005)(44832011)(6512007)(64756008)(5640700003)(54896002)(66946007)(81156014)(81166006)(8676002)(8936002)(2351001)(6486002)(76116006)(14454004)(31686004)(91956017)(316002)(99286004)(186003)(26005)(71200400001)(5660300002)(2501003)(966005)(478600001)(86362001)(606006)(6506007)(31696002)(25786009)(66066001)(102836004)(71190400001)(64030200001);
+ DIR:OUT; SFP:1102; SCL:1; SRVR:SN6PR02MB5629;
+ H:SN6PR02MB5135.namprd02.prod.outlook.com; FPR:; SPF:None; LANG:en;
+ PTR:InfoNoRecords; A:1; MX:1; 
+received-spf: None (protection.outlook.com: nutanix.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: gPvMp5P8XrxUkFcAmD9ZLUosSNVMhKMnbDg0X1yxr6DeYS7Q7Qe3fomJIzOvgZuk9CkvJ/GiPTAqIMYL/WI25GKIqzjoluMlPhnpo/vB2IVcoka6VkCvsZzgA/NDtvZusjq1BhbWjj7waYpmJyGkwkoOiQUHkpXbbmfktJwJTs5a7Zj8ftJxKYX2SFd+QHSOe6atFp6BDnfcMJKGHjcImwRZ5WkU5YjXHDDTTDYilnsmXX8h/UWAtVo2NnmQ4Yf0rWqo5dzBGf+6BgnWU5R+79ox6UKrBkSKlA06DtFV+zDGO5Edg6OwYLN68HCQ5E8GeWgJr+4UY6n0EagqbNYRc/skt+kvdrMnOuTLkXHoB1n2p6svgCP2oEq2BqNdf/GM5NzBTW1RTBmzt7NRT7kDqxj6/OtT9Q/FpLZ4EA3Tzh/qAeobTHjqTEBoANtjo8SKmaBi2l4xvRzZdMUpBB/11A==
+x-ms-exchange-transport-forked: True
+Content-Type: multipart/alternative;
+ boundary="_000_113f81748b0a45749a6445d5cfcce0ccSpark_"
+MIME-Version: 1.0
+X-OriginatorOrg: nutanix.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: dc8e3f37-c950-4da5-a7cf-08d752372da8
+X-MS-Exchange-CrossTenant-originalarrivaltime: 16 Oct 2019 12:48:43.6490 (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: bb047546-786f-4de1-bd75-24e5b6f79043
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: juvZRYBlNsf59e+k7c9wzUihSrEtNs/y13ZSVS0z1Ma9GUykrH9D118ftkigCmQtJ5e9AwX5XIyU2vtTh01YmQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN6PR02MB5629
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.95,1.0.8
+ definitions=2019-10-16_04:2019-10-16,2019-10-16 signatures=0
+X-Proofpoint-Spam-Reason: safe
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
+X-Received-From: 148.163.155.12
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -115,92 +134,70 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 10/16/19 2:41 PM, C=C3=A9dric Le Goater wrote:
-> On 16/10/2019 14:20, Philippe Mathieu-Daud=C3=A9 wrote:
->> Hi Peter,
->>
->> On 10/15/19 7:03 PM, Peter Maydell wrote:
->>> On Mon, 14 Oct 2019 at 17:05, Peter Maydell <peter.maydell@linaro.org> =
-wrote:
->>>>
->>>> From: C=C3=A9dric Le Goater <clg@kaod.org>
->>>>
->>>> Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
->>>> Reviewed-by: Joel Stanley <joel@jms.id.au>
->>>> Message-id: 20190925143248.10000-21-clg@kaod.org
->>>> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
->>>> ---
->>>>  =C2=A0 include/hw/arm/aspeed.h |=C2=A0 1 +
->>>>  =C2=A0 hw/arm/aspeed.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0 | 23 +++++++++++++++++++++++
->>>>  =C2=A0 2 files changed, 24 insertions(+)
->>>
->>>> @@ -455,6 +467,17 @@ static const AspeedBoardConfig aspeed_boards[] =
-=3D {
->>>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 .num_cs=C2=A0=
-=C2=A0=C2=A0 =3D 2,
->>>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 .i2c_init=C2=
-=A0 =3D witherspoon_bmc_i2c_init,
->>>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 .ram=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0 =3D 512 * MiB,
->>>> +=C2=A0=C2=A0=C2=A0 }, {
->>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 .name=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0 =3D MACHINE_TYPE_NAME("ast2600-evb"),
->>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 .desc=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0 =3D "Aspeed AST2600 EVB (Cortex A7)",
->>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 .soc_name=C2=A0 =3D "ast26=
-00-a0",
->>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 .hw_strap1 =3D AST2600_EVB=
-_HW_STRAP1,
->>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 .hw_strap2 =3D AST2600_EVB=
-_HW_STRAP2,
->>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 .fmc_model =3D "w25q512jv"=
-,
->>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 .spi_model =3D "mx66u51235=
-f",
->>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 .num_cs=C2=A0=C2=A0=C2=A0 =
-=3D 1,
->>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 .i2c_init=C2=A0 =3D ast260=
-0_evb_i2c_init,
->>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 .ram=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0 =3D 2 * GiB,
->>>
->>> Hi. I just discovered that this makes 'make check' fail on
->>> 32-bit systems, because you can't default to 2GB of RAM
->>> for a board:
->>>
->>> (armhf)pmaydell@mustang-maydell:~/qemu$
->>> ./build/all-a32/arm-softmmu/qemu-system-arm -M ast2600-evb
->>> qemu-system-arm: at most 2047 MB RAM can be simulated
->>>
->>> It's also a pretty rudely large amount of RAM to allocate
->>> by default: it caused 'make check' to fail on my OSX
->>> box, which is 64-bits but doesn't have huge swathes
->>> of free RAM.
->>
->> It is unlikely you use this board on a 32-bit system...
->>
->> You usually prefer to have modeled hardware matching real-life,
->> what about making this board not available on 32-bit systems
->> (we will soon have more boards like this):
->>
->>  =C2=A0 #if HOST_LONG_BITS > 32
->>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 {
->>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 .name=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0 =3D MACHINE_TYPE_NAME("ast2600-evb"),
->>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 .desc=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0 =3D "Aspeed AST2600 EVB (Cortex A7)",
->>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ...
->>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 },
->>  =C2=A0 #endif /* HOST_LONG_BITS > 32 */
->=20
-> I sent a patch to lower the default RAM size to 1G but you can always
-> increase it on the command line.
->=20
-> Making the machine available seems a better choice but that's fine with
-> me if we prefer to restrict its use to 64bits hosts. As you wish.
+--_000_113f81748b0a45749a6445d5cfcce0ccSpark_
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 
-I'd rather keep models consistent with real hardware and not cripple=20
-them to test them on unlikely setups.
+SGkgOg0KDQpJIGFtIGxvb2tpbmcgYXQgYSBwYXRjaCB3aGVyZSB3ZSBkaXNhYmxlIFRPUE9FWFQg
+d2hlbiAtY3B1IGhvc3Qgb3IgLWNwdSBtYXggaXMgcGFzc2VkIHRvIHFlbXUgOg0KDQppZiAoY3B1
+LT5tYXhfZmVhdHVyZXMpIHsNCiAgIGZvciAodyA9IDA7IHcgPCBGRUFUVVJFX1dPUkRTOyB3Kysp
+IHsNCiAgICAgLyogT3ZlcnJpZGUgb25seSBmZWF0dXJlcyB0aGF0IHdlcmVuJ3Qgc2V0IGV4cGxp
+Y2l0bHkNCiAgICAgICogYnkgdGhlIHVzZXIuDQogICAgICAqLw0KICAgICAgZW52LT5mZWF0dXJl
+c1t3XSB8PQ0KICAgICAgeDg2X2NwdV9nZXRfc3VwcG9ydGVkX2ZlYXR1cmVfd29yZCh3LCBjcHUt
+Pm1pZ3JhdGFibGUpICYNCiAgICAgICAgIH5lbnYtPnVzZXJfZmVhdHVyZXNbd10gJiBcDQogICAg
+ICAgICB+ZmVhdHVyZV93b3JkX2luZm9bd10ubm9fYXV0b2VuYWJsZV9mbGFnczsNCiAgICB9DQp9
+DQoNCmh0dHBzOi8vbGlzdHMubm9uZ251Lm9yZy9hcmNoaXZlL2h0bWwvcWVtdS1kZXZlbC8yMDE4
+LTA4L21zZzAxNjQxLmh0bWwNCg0KV2UgYXJlIHVzaW5nIGEgc2V0dXAgd2hlcmUgd2UgcGFzcyDi
+gJxrdm02NOKAnSBhcyB0aGUgY3B1IG1vZGVsIGFsb25nIHdpdGggb3RoZXIgaHlwZXJ2aXNvciBD
+UElVRCBjYXBhYmlsaXRpZXMgYXMgZGV0ZWN0ZWQgYnkgbGlidmlydCB0byBhIGNlbnRPUyA3Ljcg
+Z3Vlc3QgYW5kIHRoZSBndWVzdCBpcyB1bmFibGUgdG8gYm9vdC4gV2UgYXJlIHVzaW5nIGEgQU1E
+IEVQWUMgcGxhdGZvcm0gYW5kIHdlIGhhdmUgdHJhY2VkIGl0IGRvd24gdG8gVE9QT0VYVCBmbGFn
+IGJlaW5nIHRoZSBvZmZlbmRpbmcgQ1BVSUQgZnJvbSB0aGUgaG9zdCBDUFUgd2hpY2ggaXMgY2F1
+c2luZyB0aGUgaXNzdWUuIERvZXMgaXQgbWFrZXMgc2Vuc2UgdG8gbm90IGVuYWJsZSB0aGlzIGZs
+YWcgYnkgZGVmYXVsdCBvbiBhbGwgb3RoZXIgZ3Vlc3QgQ1BVIG1vZGVscyBhcyB3ZWxsIGV4Y2Vw
+dCBmb3IgRVBZQyBhbmQgRVBUQy1JQlBCPw0KDQpKdXN0IGxvb2tpbmcgYXQgdGhlIGNvZGUgdmVy
+eSByZWNlbnRseSBhbmQgdGhvdWdodCBJ4oCZZCBnZXQgYW4gb3BpbmlvbiBmcm9tIHRoZSB3aXNl
+ciBxZW11IGNvbW11bml0eS4NCg0KVGhhbmtzDQpBbmkNCg==
 
+--_000_113f81748b0a45749a6445d5cfcce0ccSpark_
+Content-Type: text/html; charset="utf-8"
+Content-ID: <C8F27458810AB34984E10FB2952A5BAB@namprd02.prod.outlook.com>
+Content-Transfer-Encoding: base64
+
+PGh0bWwgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGh0bWwiPg0KPGhlYWQ+DQo8bWV0
+YSBodHRwLWVxdWl2PSJDb250ZW50LVR5cGUiIGNvbnRlbnQ9InRleHQvaHRtbDsgY2hhcnNldD11
+dGYtOCI+DQo8dGl0bGU+PC90aXRsZT4NCjwvaGVhZD4NCjxib2R5Pg0KPGRpdiBuYW1lPSJtZXNz
+YWdlQm9keVNlY3Rpb24iIHN0eWxlPSJmb250LXNpemU6IDE0cHg7IGZvbnQtZmFtaWx5OiAtYXBw
+bGUtc3lzdGVtLCBCbGlua01hY1N5c3RlbUZvbnQsIHNhbnMtc2VyaWY7Ij4NCkhpIDo8YnI+DQo8
+YnI+DQpJIGFtIGxvb2tpbmcgYXQgYSBwYXRjaCB3aGVyZSB3ZSBkaXNhYmxlIFRPUE9FWFQgd2hl
+biAtY3B1IGhvc3Qgb3IgLWNwdSBtYXggaXMgcGFzc2VkIHRvIHFlbXUgOjxicj4NCjxicj4NCmlm
+IChjcHUtJmd0O21heF9mZWF0dXJlcykgezxicj4NCiZuYnNwOyAmbmJzcDtmb3IgKHcgPSAwOyB3
+ICZsdDsgRkVBVFVSRV9XT1JEUzsgdyYjNDM7JiM0MzspIHs8YnI+DQombmJzcDsgJm5ic3A7ICZu
+YnNwOy8qIE92ZXJyaWRlIG9ubHkgZmVhdHVyZXMgdGhhdCB3ZXJlbid0IHNldCBleHBsaWNpdGx5
+PGJyPg0KJm5ic3A7ICZuYnNwOyAmbmJzcDsgKiBieSB0aGUgdXNlci48YnI+DQombmJzcDsgJm5i
+c3A7ICZuYnNwOyAqLzxicj4NCiZuYnNwOyAmbmJzcDsgJm5ic3A7IGVudi0mZ3Q7ZmVhdHVyZXNb
+d10gfD08YnI+DQombmJzcDsgJm5ic3A7ICZuYnNwOyB4ODZfY3B1X2dldF9zdXBwb3J0ZWRfZmVh
+dHVyZV93b3JkKHcsIGNwdS0mZ3Q7bWlncmF0YWJsZSkgJmFtcDs8YnI+DQombmJzcDsgJm5ic3A7
+ICZuYnNwOyAmbmJzcDsgJm5ic3A7fmVudi0mZ3Q7dXNlcl9mZWF0dXJlc1t3XSAmYW1wOyBcPGJy
+Pg0KJm5ic3A7ICZuYnNwOyAmbmJzcDsgJm5ic3A7ICZuYnNwO35mZWF0dXJlX3dvcmRfaW5mb1t3
+XS5ub19hdXRvZW5hYmxlX2ZsYWdzOzxicj4NCiZuYnNwOyAmbmJzcDsgfTxicj4NCn08YnI+DQo8
+YnI+DQo8YSBocmVmPSJodHRwczovL2xpc3RzLm5vbmdudS5vcmcvYXJjaGl2ZS9odG1sL3FlbXUt
+ZGV2ZWwvMjAxOC0wOC9tc2cwMTY0MS5odG1sIj5odHRwczovL2xpc3RzLm5vbmdudS5vcmcvYXJj
+aGl2ZS9odG1sL3FlbXUtZGV2ZWwvMjAxOC0wOC9tc2cwMTY0MS5odG1sPC9hPjxicj4NCjxicj4N
+CldlIGFyZSB1c2luZyBhIHNldHVwIHdoZXJlIHdlIHBhc3Mg4oCca3ZtNjTigJ0gYXMgdGhlIGNw
+dSBtb2RlbCBhbG9uZyB3aXRoIG90aGVyIGh5cGVydmlzb3IgQ1BJVUQgY2FwYWJpbGl0aWVzIGFz
+IGRldGVjdGVkIGJ5IGxpYnZpcnQgdG8gYSBjZW50T1MgNy43IGd1ZXN0IGFuZCB0aGUgZ3Vlc3Qg
+aXMgdW5hYmxlIHRvIGJvb3QuIFdlIGFyZSB1c2luZyBhIEFNRCBFUFlDIHBsYXRmb3JtIGFuZCB3
+ZSBoYXZlIHRyYWNlZCBpdCBkb3duIHRvIFRPUE9FWFQgZmxhZw0KIGJlaW5nIHRoZSBvZmZlbmRp
+bmcgQ1BVSUQgZnJvbSB0aGUgaG9zdCBDUFUgd2hpY2ggaXMgY2F1c2luZyB0aGUgaXNzdWUuIERv
+ZXMgaXQgbWFrZXMgc2Vuc2UgdG8gbm90IGVuYWJsZSB0aGlzIGZsYWcgYnkgZGVmYXVsdCBvbiBh
+bGwgb3RoZXIgZ3Vlc3QgQ1BVIG1vZGVscyBhcyB3ZWxsIGV4Y2VwdCBmb3IgRVBZQyBhbmQgRVBU
+Qy1JQlBCPzxicj4NCjxicj4NCkp1c3QgbG9va2luZyBhdCB0aGUgY29kZSB2ZXJ5IHJlY2VudGx5
+IGFuZCB0aG91Z2h0IEnigJlkIGdldCBhbiBvcGluaW9uIGZyb20gdGhlIHdpc2VyIHFlbXUgY29t
+bXVuaXR5Ljxicj4NCjxicj4NClRoYW5rczxicj4NCkFuaTwvZGl2Pg0KPGRpdiBuYW1lPSJtZXNz
+YWdlUmVwbHlTZWN0aW9uIiBzdHlsZT0iZm9udC1zaXplOiAxNHB4OyBmb250LWZhbWlseTogLWFw
+cGxlLXN5c3RlbSwgQmxpbmtNYWNTeXN0ZW1Gb250LCBzYW5zLXNlcmlmOyI+DQo8ZGl2PjwvZGl2
+Pg0KPC9kaXY+DQo8L2JvZHk+DQo8L2h0bWw+DQo=
+
+--_000_113f81748b0a45749a6445d5cfcce0ccSpark_--
 
