@@ -2,98 +2,65 @@ Return-Path: <SRS0=/TIv=YJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7DB92ECE588
-	for <qemu-devel@archiver.kernel.org>; Wed, 16 Oct 2019 09:09:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 05F7DECE588
+	for <qemu-devel@archiver.kernel.org>; Wed, 16 Oct 2019 09:14:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5073D2168B
-	for <qemu-devel@archiver.kernel.org>; Wed, 16 Oct 2019 09:09:21 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5073D2168B
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id CCCA821835
+	for <qemu-devel@archiver.kernel.org>; Wed, 16 Oct 2019 09:14:40 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CCCA821835
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39794 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39906 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iKfJ2-0000zi-ET
-	for qemu-devel@archiver.kernel.org; Wed, 16 Oct 2019 05:09:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52984)
+	id 1iKfOB-0003OL-Up
+	for qemu-devel@archiver.kernel.org; Wed, 16 Oct 2019 05:14:39 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53656)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <clg@kaod.org>) id 1iKfI3-0008Uu-Q6
- for qemu-devel@nongnu.org; Wed, 16 Oct 2019 05:08:20 -0400
+ (envelope-from <drjones@redhat.com>) id 1iKfN3-0002o0-Sr
+ for qemu-devel@nongnu.org; Wed, 16 Oct 2019 05:13:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <clg@kaod.org>) id 1iKfI2-0001MZ-9J
- for qemu-devel@nongnu.org; Wed, 16 Oct 2019 05:08:19 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:42898
- helo=mx0a-001b2d01.pphosted.com)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <clg@kaod.org>) id 1iKfI2-0001M8-45
- for qemu-devel@nongnu.org; Wed, 16 Oct 2019 05:08:18 -0400
-Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
- by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
- x9G98FuX044874
- for <qemu-devel@nongnu.org>; Wed, 16 Oct 2019 05:08:17 -0400
-Received: from e06smtp01.uk.ibm.com (e06smtp01.uk.ibm.com [195.75.94.97])
- by mx0b-001b2d01.pphosted.com with ESMTP id 2vnym21an3-1
- (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
- for <qemu-devel@nongnu.org>; Wed, 16 Oct 2019 05:08:16 -0400
-Received: from localhost
- by e06smtp01.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
- Violators will be prosecuted
- for <qemu-devel@nongnu.org> from <clg@kaod.org>;
- Wed, 16 Oct 2019 10:07:54 +0100
-Received: from b06avi18878370.portsmouth.uk.ibm.com (9.149.26.194)
- by e06smtp01.uk.ibm.com (192.168.101.131) with IBM ESMTP SMTP Gateway:
- Authorized Use Only! Violators will be prosecuted; 
- (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
- Wed, 16 Oct 2019 10:07:50 +0100
-Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com
- [9.149.105.62])
- by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP
- id x9G97nsB44892588
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Wed, 16 Oct 2019 09:07:49 GMT
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 96D1CAE056;
- Wed, 16 Oct 2019 09:07:49 +0000 (GMT)
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 81EC1AE055;
- Wed, 16 Oct 2019 09:07:49 +0000 (GMT)
-Received: from smtp.tls.ibm.com (unknown [9.101.4.1])
- by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
- Wed, 16 Oct 2019 09:07:49 +0000 (GMT)
-Received: from yukon.kaod.org.com (sig-9-145-54-117.uk.ibm.com [9.145.54.117])
- by smtp.tls.ibm.com (Postfix) with ESMTP id D86862201ED;
- Wed, 16 Oct 2019 11:07:48 +0200 (CEST)
-From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
-To: Peter Maydell <peter.maydell@linaro.org>
-Subject: [PATCH] aspeed: Add an AST2600 eval board
-Date: Wed, 16 Oct 2019 11:07:45 +0200
-X-Mailer: git-send-email 2.21.0
+ (envelope-from <drjones@redhat.com>) id 1iKfN2-00036G-HY
+ for qemu-devel@nongnu.org; Wed, 16 Oct 2019 05:13:29 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:35628)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <drjones@redhat.com>)
+ id 1iKfMv-00034O-Ua; Wed, 16 Oct 2019 05:13:22 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 97D2610CBC4B;
+ Wed, 16 Oct 2019 09:13:20 +0000 (UTC)
+Received: from kamzik.brq.redhat.com (unknown [10.43.2.160])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 8F3555D9CD;
+ Wed, 16 Oct 2019 09:13:16 +0000 (UTC)
+Date: Wed, 16 Oct 2019 11:13:14 +0200
+From: Andrew Jones <drjones@redhat.com>
+To: Richard Henderson <richard.henderson@linaro.org>
+Subject: Re: [PATCH v2] target/arm/arch_dump: Add SVE notes
+Message-ID: <20191016091314.cu76t3ovwofsfart@kamzik.brq.redhat.com>
+References: <20191004120313.5347-1-drjones@redhat.com>
+ <f23153f2-35be-f74d-ad7b-d9c324cba1cf@linaro.org>
+ <20191010061600.pwhos4huazbsv6kn@kamzik.brq.redhat.com>
+ <6451070f-9488-cc8f-2f4b-a7577e11f447@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-X-TM-AS-GCONF: 00
-x-cbid: 19101609-4275-0000-0000-0000037286F9
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19101609-4276-0000-0000-000038859BAC
-Message-Id: <20191016090745.15334-1-clg@kaod.org>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
- definitions=2019-10-16_03:, , signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- priorityscore=1501
- malwarescore=0 suspectscore=2 phishscore=0 bulkscore=0 spamscore=0
- clxscore=1034 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1908290000 definitions=main-1910160082
-Content-Transfer-Encoding: quoted-printable
-X-MIME-Autoconverted: from 8bit to quoted-printable by
- mx0b-001b2d01.pphosted.com id x9G98FuX044874
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
-X-Received-From: 148.163.158.5
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <6451070f-9488-cc8f-2f4b-a7577e11f447@linaro.org>
+User-Agent: NeoMutt/20180716
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.66]); Wed, 16 Oct 2019 09:13:20 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -105,103 +72,157 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Andrew Jeffery <andrew@aj.id.au>,
- =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>, qemu-arm@nongnu.org,
- Joel Stanley <joel@jms.id.au>, qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, qemu-devel@nongnu.org, eric.auger@redhat.com,
+ qemu-arm@nongnu.org, alex.bennee@linaro.org, Dave.Martin@arm.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Define the board with 1 GiB of RAM but some boards can have up to 2
-GiB.
+On Thu, Oct 10, 2019 at 01:33:02PM -0400, Richard Henderson wrote:
+> On 10/10/19 2:16 AM, Andrew Jones wrote:
+> >> It might be best to avoid the ifdef altogether:
+> >>
+> >>     for (i = 0; i < 32; ++i) {
+> >>         uint64_t *d = (uint64_t *)&buf[sve_zreg_offset(vq, i)];
+> >>         for (j = 0; j < vq * 2; ++j) {
+> >>             d[j] = cpu_to_le64(env->vfp.zregs[i].d[j]);
+> >>         }
+> >>     }
+> >>
+> >> The compiler may well transform the inner loop to memcpy for little-endian
+> >> host, but even if it doesn't core dumping is hardly performance sensitive.
+> > 
+> > True. I even had something like the above at first, but then
+> > overcomplicated it with the #ifdef-ing.
+> 
+> Ah, I wonder if you changed things around with the ifdefs due to the pregs.
+> There's no trivial solution for those.  It'd be nice to share the bswapping
+> subroutine that you add in the SVE KVM patch set, and size the temporary array
+> using ARM_MAX_VQ.
 
-Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
-Reviewed-by: Joel Stanley <joel@jms.id.au>
----
+How about something like this squashed in?
 
- Changes since AST2600 patchset:
+Thanks,
+drew
 
- - lowered the RAM size to 1 GiB as it was breaking the tests on some
-   hosts.
-
- include/hw/arm/aspeed.h |  1 +
- hw/arm/aspeed.c         | 23 +++++++++++++++++++++++
- 2 files changed, 24 insertions(+)
-
-diff --git a/include/hw/arm/aspeed.h b/include/hw/arm/aspeed.h
-index 02073a6b4d61..f49bc7081e4d 100644
---- a/include/hw/arm/aspeed.h
-+++ b/include/hw/arm/aspeed.h
-@@ -18,6 +18,7 @@ typedef struct AspeedBoardConfig {
-     const char *desc;
-     const char *soc_name;
-     uint32_t hw_strap1;
-+    uint32_t hw_strap2;
-     const char *fmc_model;
-     const char *spi_model;
-     uint32_t num_cs;
-diff --git a/hw/arm/aspeed.c b/hw/arm/aspeed.c
-index 52993f84b461..028191ff36fc 100644
---- a/hw/arm/aspeed.c
-+++ b/hw/arm/aspeed.c
-@@ -88,6 +88,10 @@ struct AspeedBoardState {
- /* Witherspoon hardware value: 0xF10AD216 (but use romulus definition) *=
-/
- #define WITHERSPOON_BMC_HW_STRAP1 ROMULUS_BMC_HW_STRAP1
-=20
-+/* AST2600 evb hardware value */
-+#define AST2600_EVB_HW_STRAP1 0x000000C0
-+#define AST2600_EVB_HW_STRAP2 0x00000003
+diff --git a/target/arm/arch_dump.c b/target/arm/arch_dump.c
+index b02e398430b9..7c7fd23f4d94 100644
+--- a/target/arm/arch_dump.c
++++ b/target/arm/arch_dump.c
+@@ -182,6 +182,7 @@ static int aarch64_write_elf64_sve(WriteCoreDumpFunction f,
+     struct aarch64_note *note;
+     ARMCPU *cpu = env_archcpu(env);
+     uint32_t vq = sve_current_vq(env);
++    uint64_t tmp[ARM_MAX_VQ * 2], *r;
+     uint32_t fpr;
+     uint8_t *buf;
+     int ret, i;
+@@ -198,31 +199,14 @@ static int aarch64_write_elf64_sve(WriteCoreDumpFunction f,
+     note->sve.flags = cpu_to_dump16(s, 1);
+ 
+     for (i = 0; i < 32; ++i) {
+-#ifdef HOST_WORDS_BIGENDIAN
+-        uint64_t d[vq * 2];
+-        int j;
+-
+-        for (j = 0; j < vq * 2; ++j) {
+-            d[j] = bswap64(env->vfp.zregs[i].d[j]);
+-        }
+-#else
+-        uint64_t *d = &env->vfp.zregs[i].d[0];
+-#endif
+-        memcpy(&buf[sve_zreg_offset(vq, i)], &d[0], vq * 16);
++        r = sve_bswap64(tmp, &env->vfp.zregs[i].d[0], vq * 2);
++        memcpy(&buf[sve_zreg_offset(vq, i)], r, vq * 16);
+     }
+ 
+     for (i = 0; i < 17; ++i) {
+-#ifdef HOST_WORDS_BIGENDIAN
+-        uint64_t d[DIV_ROUND_UP(vq * 2, 8)];
+-        int j;
+-
+-        for (j = 0; j < DIV_ROUND_UP(vq * 2, 8); ++j) {
+-            d[j] = bswap64(env->vfp.pregs[i].p[j]);
+-        }
+-#else
+-        uint64_t *d = &env->vfp.pregs[i].p[0];
+-#endif
+-        memcpy(&buf[sve_preg_offset(vq, i)], &d[0], vq * 16 / 8);
++        r = sve_bswap64(tmp, r = &env->vfp.pregs[i].p[0],
++                        DIV_ROUND_UP(vq * 2, 8));
++        memcpy(&buf[sve_preg_offset(vq, i)], r, vq * 16 / 8);
+     }
+ 
+     fpr = cpu_to_dump32(s, vfp_get_fpsr(env));
+diff --git a/target/arm/cpu.h b/target/arm/cpu.h
+index 5b9c3e4cd73d..b3092e5213e6 100644
+--- a/target/arm/cpu.h
++++ b/target/arm/cpu.h
+@@ -975,6 +975,31 @@ void aarch64_sve_narrow_vq(CPUARMState *env, unsigned vq);
+ void aarch64_sve_change_el(CPUARMState *env, int old_el,
+                            int new_el, bool el0_a64);
+ void aarch64_add_sve_properties(Object *obj);
 +
- /*
-  * The max ram region is for firmwares that scan the address space
-  * with load/store to guess how much RAM the SoC has.
-@@ -187,6 +191,8 @@ static void aspeed_board_init(MachineState *machine,
-                              &error_abort);
-     object_property_set_int(OBJECT(&bmc->soc), cfg->hw_strap1, "hw-strap=
-1",
-                             &error_abort);
-+    object_property_set_int(OBJECT(&bmc->soc), cfg->hw_strap2, "hw-strap=
-2",
-+                            &error_abort);
-     object_property_set_int(OBJECT(&bmc->soc), cfg->num_cs, "num-cs",
-                             &error_abort);
-     object_property_set_int(OBJECT(&bmc->soc), machine->smp.cpus, "num-c=
-pus",
-@@ -308,6 +314,12 @@ static void ast2500_evb_i2c_init(AspeedBoardState *b=
-mc)
-     i2c_create_slave(aspeed_i2c_get_bus(DEVICE(&soc->i2c), 11), "ds1338"=
-, 0x32);
- }
-=20
-+static void ast2600_evb_i2c_init(AspeedBoardState *bmc)
++/*
++ * SVE registers are encoded in KVM's memory in an endianness-invariant format.
++ * The byte at offset i from the start of the in-memory representation contains
++ * the bits [(7 + 8 * i) : (8 * i)] of the register value. As this means the
++ * lowest offsets are stored in the lowest memory addresses, then that nearly
++ * matches QEMU's representation, which is to use an array of host-endian
++ * uint64_t's, where the lower offsets are at the lower indices. To complete
++ * the translation we just need to byte swap the uint64_t's on big-endian hosts.
++ */
++static inline uint64_t *sve_bswap64(uint64_t *dst, uint64_t *src, int nr)
 +{
-+    /* Start with some devices on our I2C busses */
-+    ast2500_evb_i2c_init(bmc);
++#ifdef HOST_WORDS_BIGENDIAN
++    int i;
++
++    for (i = 0; i < nr; ++i) {
++        dst[i] = bswap64(src[i]);
++    }
++
++    return dst;
++#else
++    return src;
++#endif
 +}
 +
- static void romulus_bmc_i2c_init(AspeedBoardState *bmc)
- {
-     AspeedSoCState *soc =3D &bmc->soc;
-@@ -455,6 +467,17 @@ static const AspeedBoardConfig aspeed_boards[] =3D {
-         .num_cs    =3D 2,
-         .i2c_init  =3D witherspoon_bmc_i2c_init,
-         .ram       =3D 512 * MiB,
-+    }, {
-+        .name      =3D MACHINE_TYPE_NAME("ast2600-evb"),
-+        .desc      =3D "Aspeed AST2600 EVB (Cortex A7)",
-+        .soc_name  =3D "ast2600-a0",
-+        .hw_strap1 =3D AST2600_EVB_HW_STRAP1,
-+        .hw_strap2 =3D AST2600_EVB_HW_STRAP2,
-+        .fmc_model =3D "w25q512jv",
-+        .spi_model =3D "mx66u51235f",
-+        .num_cs    =3D 1,
-+        .i2c_init  =3D ast2600_evb_i2c_init,
-+        .ram       =3D 1 * GiB,
-     },
- };
-=20
---=20
-2.21.0
-
+ #else
+ static inline void aarch64_sve_narrow_vq(CPUARMState *env, unsigned vq) { }
+ static inline void aarch64_sve_change_el(CPUARMState *env, int o,
+diff --git a/target/arm/kvm64.c b/target/arm/kvm64.c
+index 876184b8fe4d..e2da756e65ed 100644
+--- a/target/arm/kvm64.c
++++ b/target/arm/kvm64.c
+@@ -876,30 +876,6 @@ static int kvm_arch_put_fpsimd(CPUState *cs)
+     return 0;
+ }
+ 
+-/*
+- * SVE registers are encoded in KVM's memory in an endianness-invariant format.
+- * The byte at offset i from the start of the in-memory representation contains
+- * the bits [(7 + 8 * i) : (8 * i)] of the register value. As this means the
+- * lowest offsets are stored in the lowest memory addresses, then that nearly
+- * matches QEMU's representation, which is to use an array of host-endian
+- * uint64_t's, where the lower offsets are at the lower indices. To complete
+- * the translation we just need to byte swap the uint64_t's on big-endian hosts.
+- */
+-static uint64_t *sve_bswap64(uint64_t *dst, uint64_t *src, int nr)
+-{
+-#ifdef HOST_WORDS_BIGENDIAN
+-    int i;
+-
+-    for (i = 0; i < nr; ++i) {
+-        dst[i] = bswap64(src[i]);
+-    }
+-
+-    return dst;
+-#else
+-    return src;
+-#endif
+-}
+-
+ /*
+  * KVM SVE registers come in slices where ZREGs have a slice size of 2048 bits
+  * and PREGS and the FFR have a slice size of 256 bits. However we simply hard
 
