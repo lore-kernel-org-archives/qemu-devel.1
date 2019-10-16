@@ -6,59 +6,55 @@ X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8A6B1FA372A
-	for <qemu-devel@archiver.kernel.org>; Wed, 16 Oct 2019 13:35:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9EB37FA372A
+	for <qemu-devel@archiver.kernel.org>; Wed, 16 Oct 2019 13:38:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 603AA2168B
-	for <qemu-devel@archiver.kernel.org>; Wed, 16 Oct 2019 13:35:20 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 603AA2168B
+	by mail.kernel.org (Postfix) with ESMTPS id 715E72168B
+	for <qemu-devel@archiver.kernel.org>; Wed, 16 Oct 2019 13:38:31 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 715E72168B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42746 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42792 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iKjSR-00037A-Ho
-	for qemu-devel@archiver.kernel.org; Wed, 16 Oct 2019 09:35:19 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57791)
+	id 1iKjVW-0005sI-GG
+	for qemu-devel@archiver.kernel.org; Wed, 16 Oct 2019 09:38:30 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58391)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <drjones@redhat.com>) id 1iKjRT-0002SA-Qf
- for qemu-devel@nongnu.org; Wed, 16 Oct 2019 09:34:20 -0400
+ (envelope-from <berrange@redhat.com>) id 1iKjUR-0004sV-I1
+ for qemu-devel@nongnu.org; Wed, 16 Oct 2019 09:37:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <drjones@redhat.com>) id 1iKjRS-0004LP-O9
- for qemu-devel@nongnu.org; Wed, 16 Oct 2019 09:34:19 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:36892)
+ (envelope-from <berrange@redhat.com>) id 1iKjUQ-00066w-8n
+ for qemu-devel@nongnu.org; Wed, 16 Oct 2019 09:37:23 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49384)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <drjones@redhat.com>)
- id 1iKjRO-0004Gh-4R; Wed, 16 Oct 2019 09:34:14 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
+ (Exim 4.71) (envelope-from <berrange@redhat.com>) id 1iKjUQ-00066E-2d
+ for qemu-devel@nongnu.org; Wed, 16 Oct 2019 09:37:22 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 2828B10DCC94;
- Wed, 16 Oct 2019 13:34:13 +0000 (UTC)
-Received: from kamzik.brq.redhat.com (unknown [10.43.2.160])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 8D1661001B35;
- Wed, 16 Oct 2019 13:34:02 +0000 (UTC)
-Date: Wed, 16 Oct 2019 15:34:00 +0200
-From: Andrew Jones <drjones@redhat.com>
-To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-Subject: Re: [PATCH v6 2/9] tests: arm: Introduce cpu feature tests
-Message-ID: <20191016133400.sx3ypcolhxxtjqlb@kamzik.brq.redhat.com>
-References: <20191016085408.24360-1-drjones@redhat.com>
- <20191016085408.24360-3-drjones@redhat.com>
- <cec54f08-9508-13e5-600f-3442962a1642@redhat.com>
- <20191016122103.l6vz423k3gpdr2bv@kamzik.brq.redhat.com>
- <626412a4-5c61-1f6e-0f18-7b0d9f754baa@redhat.com>
+ by mx1.redhat.com (Postfix) with ESMTPS id 92C1D30044C9;
+ Wed, 16 Oct 2019 13:37:20 +0000 (UTC)
+Received: from redhat.com (unknown [10.42.16.231])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id E3D8E60605;
+ Wed, 16 Oct 2019 13:37:19 +0000 (UTC)
+Date: Wed, 16 Oct 2019 14:37:17 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To: Ani Sinha <ani.sinha@nutanix.com>
+Subject: Re: TOPOEXT and CentOs 7 guests
+Message-ID: <20191016133717.GC16089@redhat.com>
+References: <SN6PR02MB513583C0D0C43777B47910D1F1920@SN6PR02MB5135.namprd02.prod.outlook.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <626412a4-5c61-1f6e-0f18-7b0d9f754baa@redhat.com>
-User-Agent: NeoMutt/20180716
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.64]); Wed, 16 Oct 2019 13:34:13 +0000 (UTC)
+In-Reply-To: <SN6PR02MB513583C0D0C43777B47910D1F1920@SN6PR02MB5135.namprd02.prod.outlook.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.46]); Wed, 16 Oct 2019 13:37:20 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
@@ -74,53 +70,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, richard.henderson@linaro.org,
- qemu-devel@nongnu.org, armbru@redhat.com, eric.auger@redhat.com,
- qemu-arm@nongnu.org, imammedo@redhat.com, alex.bennee@linaro.org,
- Dave.Martin@arm.com
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Cc: Qemu-Devel <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, Oct 16, 2019 at 02:26:05PM +0200, Philippe Mathieu-Daud=E9 wrote:
-> On 10/16/19 2:21 PM, Andrew Jones wrote:
-> > On Wed, Oct 16, 2019 at 02:05:24PM +0200, Philippe Mathieu-Daud=E9 wr=
-ote:
-> > > > +static void test_query_cpu_model_expansion_kvm(const void *data)
-> > > > +{
-> > > > +    QTestState *qts;
-> > > > +
-> > > > +    qts =3D qtest_init(MACHINE "-accel kvm -cpu host");
-> > > > +
-> > > > +    assert_has_feature(qts, "host", "pmu");
-> > >=20
-> > > Have you tried this on a ARM host? I wanted to but don't have acces=
-s to one
-> > > :(
-> > >=20
-> >=20
-> > Yes. All code in this series has been tested; covering these
-> > configurations
-> >=20
-> >   - TCG aarch64
-> >   - TCG arm
-> >   - KVM aarch64 without SVE
-> >   - KVM aarch64 with SVE
-> >   - compile tested arm code with CONFIG_KVM enabled
+On Wed, Oct 16, 2019 at 12:51:58PM +0000, Ani Sinha wrote:
+> Hi :
 >=20
-> OK, I'd appreciate if someone with ARM hardware can test:
+> I am looking at a patch where we disable TOPOEXT when -cpu host or -cpu=
+ max is passed to qemu :
 >=20
->     - KVM arm
->
+> if (cpu->max_features) {
+> =C2=A0 =C2=A0for (w =3D 0; w < FEATURE_WORDS; w++) {
+> =C2=A0 =C2=A0 =C2=A0/* Override only features that weren't set explicit=
+ly
+> =C2=A0 =C2=A0 =C2=A0 * by the user.
+> =C2=A0 =C2=A0 =C2=A0 */
+> =C2=A0 =C2=A0 =C2=A0 env->features[w] |=3D
+> =C2=A0 =C2=A0 =C2=A0 x86_cpu_get_supported_feature_word(w, cpu->migrata=
+ble) &
+> =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0~env->user_features[w] & \
+> =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0~feature_word_info[w].no_autoenable_f=
+lags;
+> =C2=A0 =C2=A0 }
+> }
+>=20
+> https://lists.nongnu.org/archive/html/qemu-devel/2018-08/msg01641.html
+>=20
+> We are using a setup where we pass =E2=80=9Ckvm64=E2=80=9D as the cpu m=
+odel along with
+> other hypervisor CPIUD capabilities as detected by libvirt to a centOS
+> 7.7 guest and the guest is unable to boot. We are using a AMD EPYC
+> platform and we have traced it down to TOPOEXT flag being the offending
+> CPUID from the host CPU which is causing the issue. Does it makes sense
+> to not enable this flag by default on all other guest CPU models as wel=
+l
+> except for EPYC and EPTC-IBPB?
+>=20
+> Just looking at the code very recently and thought I=E2=80=99d get an o=
+pinion
+> from the wiser qemu community.
 
-Me too, but if nobody is testing on KVM arm then I guess we don't really
-care if the test code has the correct expectations for KVM arm. If
-somebody does eventually try this test on KVM arm then it will either
-pass, meaning its expectations are correct, or fail, alerting us to the
-fact that our expectations are incorrect. IOW, I don't intend to change
-this test code for KVM arm unless somebody with the hardware does the
-testing and can justify a change.
+I don't have any insight into the particular problem cause. I do very
+vaguely recall some previous bug I've seen related to AMD/topoext but
+don't recall the details.
 
-Thanks,
-drew
+The single best advice though is to **NOT** use the 'kvm64' CPU
+model. This is an *awful* CPU model that IIRC represents the lowest
+common denominator of the first generation of x86 CPUs with hardware
+virt.  Trying to take an old CPU model and turn on an arbitarary
+set of extra features is well know to cause bugs.
+
+See our guidance on CPU models to use for AMD hosts:
+
+https://qemu.weilnetz.de/doc/qemu-doc.html#preferred_005fcpu_005fmodels_0=
+05famd_005fx86
+
+Essentially either use host passthrough, or use a plain named CPU model.
+Only very few individual features make sense as extra things to turn
+on above what the named CPU model supports. Mostly this is just side
+channel vulnerability fixes, and a couple of perf related things like
+pdpe1gb for huge page enablement as described in the above doc.
+
+Regards,
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
+ge :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.c=
+om :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
+ge :|
 
