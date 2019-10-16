@@ -2,60 +2,64 @@ Return-Path: <SRS0=/TIv=YJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2A307ECE58F
-	for <qemu-devel@archiver.kernel.org>; Wed, 16 Oct 2019 03:03:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A3A4C4360C
+	for <qemu-devel@archiver.kernel.org>; Wed, 16 Oct 2019 03:27:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F407720854
-	for <qemu-devel@archiver.kernel.org>; Wed, 16 Oct 2019 03:03:16 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F407720854
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 2F30D2075E
+	for <qemu-devel@archiver.kernel.org>; Wed, 16 Oct 2019 03:27:26 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2F30D2075E
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35434 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35540 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iKZam-0004SH-2M
-	for qemu-devel@archiver.kernel.org; Tue, 15 Oct 2019 23:03:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:32943)
+	id 1iKZy9-0001If-Cp
+	for qemu-devel@archiver.kernel.org; Tue, 15 Oct 2019 23:27:25 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35044)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <ehabkost@redhat.com>) id 1iKZY9-0002qL-Fc
- for qemu-devel@nongnu.org; Tue, 15 Oct 2019 23:00:34 -0400
+ (envelope-from <zhengxiang9@huawei.com>) id 1iKZxH-0000Rx-OJ
+ for qemu-devel@nongnu.org; Tue, 15 Oct 2019 23:26:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <ehabkost@redhat.com>) id 1iKZY7-0006hN-8R
- for qemu-devel@nongnu.org; Tue, 15 Oct 2019 23:00:32 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:56178)
+ (envelope-from <zhengxiang9@huawei.com>) id 1iKZxG-0005Kb-HO
+ for qemu-devel@nongnu.org; Tue, 15 Oct 2019 23:26:31 -0400
+Received: from szxga04-in.huawei.com ([45.249.212.190]:2180 helo=huawei.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1iKZY7-0006gt-38
- for qemu-devel@nongnu.org; Tue, 15 Oct 2019 23:00:31 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id E82B34627A;
- Wed, 16 Oct 2019 03:00:29 +0000 (UTC)
-Received: from localhost (ovpn-116-20.phx2.redhat.com [10.3.116.20])
- by smtp.corp.redhat.com (Postfix) with ESMTP id C5B1F60C57;
- Wed, 16 Oct 2019 03:00:23 +0000 (UTC)
-Date: Wed, 16 Oct 2019 00:00:21 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
+ (Exim 4.71) (envelope-from <zhengxiang9@huawei.com>)
+ id 1iKZxD-0005F2-ID; Tue, 15 Oct 2019 23:26:27 -0400
+Received: from DGGEMS408-HUB.china.huawei.com (unknown [172.30.72.58])
+ by Forcepoint Email with ESMTP id 83F0FEC8CDB2DA02A902;
+ Wed, 16 Oct 2019 11:26:22 +0800 (CST)
+Received: from [127.0.0.1] (10.133.224.57) by DGGEMS408-HUB.china.huawei.com
+ (10.3.19.208) with Microsoft SMTP Server id 14.3.439.0; Wed, 16 Oct 2019
+ 11:26:13 +0800
+Subject: Re: [PATCH v19 2/5] docs: APEI GHES generation and CPER record
+ description
 To: Peter Maydell <peter.maydell@linaro.org>
-Subject: Python 2 and test/vm/netbsd (was Re: [Qemu-devel] [PULL 0/8] Python
- queue, 2019-06-07)
-Message-ID: <20191016030021.GD4084@habkost.net>
+References: <20191015140140.34748-1-zhengxiang9@huawei.com>
+ <20191015140140.34748-3-zhengxiang9@huawei.com>
+ <CAFEAcA85gZUXnL+Qy=Wdg-MVbb1PqiKWCi72XvRnX8pZsgVr_A@mail.gmail.com>
+From: Xiang Zheng <zhengxiang9@huawei.com>
+Message-ID: <9724f69a-2887-7896-29d8-3e9aa022df14@huawei.com>
+Date: Wed, 16 Oct 2019 11:26:11 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.29]); Wed, 16 Oct 2019 03:00:30 +0000 (UTC)
+In-Reply-To: <CAFEAcA85gZUXnL+Qy=Wdg-MVbb1PqiKWCi72XvRnX8pZsgVr_A@mail.gmail.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.133.224.57]
+X-CFilter-Loop: Reflected
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 209.132.183.28
+X-Received-From: 45.249.212.190
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -67,41 +71,116 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>,
- John Snow <jsnow@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>,
- Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>,
- Cleber Rosa <crosa@redhat.com>,
- Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
+Cc: Eduardo Habkost <ehabkost@redhat.com>, kvm-devel <kvm@vger.kernel.org>,
+ "Michael S. Tsirkin" <mst@redhat.com>, wanghaibin.wang@huawei.com,
+ Marcelo Tosatti <mtosatti@redhat.com>, Linuxarm <linuxarm@huawei.com>, QEMU
+ Developers <qemu-devel@nongnu.org>, gengdongjiu <gengdongjiu@huawei.com>,
+ Shannon Zhao <shannon.zhaosl@gmail.com>, qemu-arm <qemu-arm@nongnu.org>,
+ James Morse <james.morse@arm.com>,
+ Jonathan Cameron <jonathan.cameron@huawei.com>,
+ Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ "xuwei \(O\)" <xuwei5@huawei.com>, Laszlo Ersek <lersek@redhat.com>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, Sep 17, 2019 at 08:31:40PM -0300, Eduardo Habkost wrote:
-> On Mon, Jul 01, 2019 at 07:25:27PM -0300, Eduardo Habkost wrote:
-> > On Mon, Jun 10, 2019 at 01:58:50PM +0100, Peter Maydell wrote:
-[...]
-> > > The configure check also spits out deprecation warnings for
-> > > the NetBSD/FreeBSD/OpenBSD tests/vm configurations. It would be nice
-> > > to get those updated.
-> > 
-> > CCing the test/vm maintainers.
-> > 
-> > Fam, Alex, are you able to fix this and create new BSD VM images
-> > with Python 3 available?  I thought the VM image configurations
-> > were stored in the source tree, but they are downloaded from
-> > download.patchew.org.
+
+
+On 2019/10/15 23:08, Peter Maydell wrote:
+> On Tue, 15 Oct 2019 at 15:02, Xiang Zheng <zhengxiang9@huawei.com> wrote:
+>>
+>> From: Dongjiu Geng <gengdongjiu@huawei.com>
+>>
+>> Add APEI/GHES detailed design document
+>>
+>> Signed-off-by: Dongjiu Geng <gengdongjiu@huawei.com>
+>> Signed-off-by: Xiang Zheng <zhengxiang9@huawei.com>
+>> ---
+>>  docs/specs/acpi_hest_ghes.rst | 94 +++++++++++++++++++++++++++++++++++++++++++
+>>  docs/specs/index.rst          |  1 +
+>>  2 files changed, 95 insertions(+)
+>>  create mode 100644 docs/specs/acpi_hest_ghes.rst
+>>
+>> diff --git a/docs/specs/acpi_hest_ghes.rst b/docs/specs/acpi_hest_ghes.rst
+>> new file mode 100644
+>> index 0000000..905b6d1
+>> --- /dev/null
+>> +++ b/docs/specs/acpi_hest_ghes.rst
+>> @@ -0,0 +1,94 @@
+>> +APEI tables generating and CPER record
+>> +======================================
+>> +
+>> +Copyright (c) 2019 HUAWEI TECHNOLOGIES CO., LTD.
+>> +
+>> +This work is licensed under the terms of the GNU GPL, version 2 or later.
+>> +See the COPYING file in the top-level directory.
 > 
-> Fam, Alex, can you help us on this?  Python 2 won't be supported
-> anymore, so we need the VM images to be updated.
+> This puts the copyright/license statement into the HTML rendered
+> docs seen by the user. We generally put them into an RST comment,
+> so they're in the source .rst but not the rendered views, like this:
+> 
+> diff --git a/docs/specs/acpi_hest_ghes.rst b/docs/specs/acpi_hest_ghes.rst
+> index 5b43e4b0da2..348825f9d3e 100644
+> --- a/docs/specs/acpi_hest_ghes.rst
+> +++ b/docs/specs/acpi_hest_ghes.rst
+> @@ -1,10 +1,11 @@
+>  APEI tables generating and CPER record
+>  ======================================
+> 
+> -Copyright (c) 2019 HUAWEI TECHNOLOGIES CO., LTD.
+> +..
+> +   Copyright (c) 2019 HUAWEI TECHNOLOGIES CO., LTD.
+> 
+> -This work is licensed under the terms of the GNU GPL, version 2 or later.
+> -See the COPYING file in the top-level directory.
+> +   This work is licensed under the terms of the GNU GPL, version 2 or later.
+> +   See the COPYING file in the top-level directory.
+> 
 
-Anyone?
+OK.
 
-I'm about to submit patches to remove Python 2 support, and this
-will break tests/vm/netbsd.
+> 
+>> +(9) When QEMU gets a SIGBUS from the kernel, QEMU formats the CPER right into
+>> +    guest memory, and then injects platform specific interrupt (in case of
+>> +    arm/virt machine it's Synchronous External Abort) as a notification which
+>> +    is necessary for notifying the guest.
+>> +
+>> +(10) This notification (in virtual hardware) will be handled by the guest
+>> +    kernel, guest APEI driver will read the CPER which is recorded by QEMU and
+>> +    do the recovery.
+> 
+> Sphinx thinks the indentation here is not syntactically valid:
+> 
+>   SPHINX  docs/specs
+> 
+> Warning, treated as error:
+> /home/petmay01/linaro/qemu-from-laptop/qemu/docs/specs/acpi_hest_ghes.rst:93:Enumerated
+> list ends without a blank line; unexpected unindent.
+> Makefile:997: recipe for target 'docs/specs/index.html' failed
+> 
+> That's because for an enumerated list all the lines in the paragraph need to
+> start at the same column. Moving in the two following lines in the (10) item
+> fixes this:
+> 
+> --- a/docs/specs/acpi_hest_ghes.rst
+> +++ b/docs/specs/acpi_hest_ghes.rst
+> @@ -90,5 +90,5 @@ Design Details
+>      is necessary for notifying the guest.
+> 
+>  (10) This notification (in virtual hardware) will be handled by the guest
+> -    kernel, guest APEI driver will read the CPER which is recorded by QEMU and
+> -    do the recovery.
+> +     kernel, guest APEI driver will read the CPER which is recorded by QEMU and
+> +     do the recovery.
+> 
 
-I'm powerless to fix this issue, because the netbsd image is
-hosted at download.patchew.org.
+Thanks, I will fix them.
+
 
 -- 
-Eduardo
+
+Thanks,
+Xiang
+
 
