@@ -2,89 +2,86 @@ Return-Path: <SRS0=/TIv=YJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0437BFA3728
-	for <qemu-devel@archiver.kernel.org>; Wed, 16 Oct 2019 17:57:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 90168FA372A
+	for <qemu-devel@archiver.kernel.org>; Wed, 16 Oct 2019 18:45:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C5E07207FF
-	for <qemu-devel@archiver.kernel.org>; Wed, 16 Oct 2019 17:57:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 60669218DE
+	for <qemu-devel@archiver.kernel.org>; Wed, 16 Oct 2019 18:45:53 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ULzOd9Ld"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C5E07207FF
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JmuxAIIN"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 60669218DE
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46680 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47028 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iKnY0-0006uU-Ib
-	for qemu-devel@archiver.kernel.org; Wed, 16 Oct 2019 13:57:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49064)
+	id 1iKoIy-0001kS-Gs
+	for qemu-devel@archiver.kernel.org; Wed, 16 Oct 2019 14:45:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56133)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1iKnXK-0006SR-UU
- for qemu-devel@nongnu.org; Wed, 16 Oct 2019 13:56:39 -0400
+ (envelope-from <stefanha@gmail.com>) id 1iKoI4-00018W-8u
+ for qemu-devel@nongnu.org; Wed, 16 Oct 2019 14:44:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1iKnXJ-0005se-Ba
- for qemu-devel@nongnu.org; Wed, 16 Oct 2019 13:56:38 -0400
-Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:35641)
+ (envelope-from <stefanha@gmail.com>) id 1iKoI3-0005oi-5a
+ for qemu-devel@nongnu.org; Wed, 16 Oct 2019 14:44:56 -0400
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:39081)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1iKnXJ-0005sI-5H
- for qemu-devel@nongnu.org; Wed, 16 Oct 2019 13:56:37 -0400
-Received: by mail-wm1-x341.google.com with SMTP id y21so3754419wmi.0
- for <qemu-devel@nongnu.org>; Wed, 16 Oct 2019 10:56:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=4EbsfDokOIkOLaV0giHdnvonQWEjy7lBJVHzgkXQhWk=;
- b=ULzOd9LdM2RNHdPQylbBlEGOfmCcis/gdL9ZMphjsv+Mz62nlKSIMyfNSmoOS8cCI2
- +UFpd/j83OVptrtUmZs6XPKWMK6VGW0OUdymxBn4kKtNp/vDQOX6gR98VFkD7TOsaWTV
- xsZMCwOrIKreiROLzNUtYjXaGrDZ43JMcrK/kzJKgjyUGgGYN5WYpxElBItpAAbF3gqy
- l3hdsVsfz302mu3NG7ZoX1tAKNdTScDGkj+v9xEc3wowG00qKJPmQBI+8GoGkzNl0ma/
- HiYLCvb0wYXHyucaugbqAqET0sip73LN4Zs/54pVTD+0KxoOlrw8/myml3FbBeV9xCzJ
- dCwg==
+ (Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1iKoI2-0005oB-TJ
+ for qemu-devel@nongnu.org; Wed, 16 Oct 2019 14:44:55 -0400
+Received: by mail-wr1-x444.google.com with SMTP id r3so29271923wrj.6
+ for <qemu-devel@nongnu.org>; Wed, 16 Oct 2019 11:44:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:in-reply-to:user-agent;
+ bh=xMXXNS5avxy69xRg1DGFF/riCwTTYHJMnGimGq68Sl0=;
+ b=JmuxAIINvi13NbnxAW5ft8QY7D+hdUclFGbQJX6MyyNxYc0L8kIm1Q6sacZ2I9fNCA
+ 6MecOXPQssxNcuxW/xZJ3iMmckw1KrtkRBXyuFa9r9lmkIj0ftoLekjWf8+fJRcNU94b
+ vH/FCAQvT+pBKtV2hGwPovQ6C6JCWwDTXObvs7lwF3AVp+yNKfR8Q5pM0JmUbTGVN1o/
+ Yn7jvmbcjm/Npj3C3lftDY92yefKX5xyVozU2bGmVYV8kjETiPQYIX/mqz7KSjxd2iZa
+ Gd8F5eL7wvQr+sTV/kHTScbiN68gMaXVzuWz1x0+iDrxO3p/B+fesE4eOsS+myvJXytK
+ Pn+g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=4EbsfDokOIkOLaV0giHdnvonQWEjy7lBJVHzgkXQhWk=;
- b=tdmyZ9uD3ks1N2QLlrceeEtyeyIQA5cRvMbZTy2m2YqDtQIj1XshcISUA88J2SSQxv
- vDvJNp1ZAXpp0S/b3izZyGmLLZ5zq9ubmcUdmT7FRt8swmD1agiXCYbt6TD1ywBe+FX5
- A9osvWR+FRMSayP9WqVhidoPXj4KjFuEdnOMJXUF2iFoObTJddsy9C2vmFDRk2uz7THb
- DcPH0BZCDlGJrXUij/O2ytCB59jWFc8sTO2sz1WyTKX3fMl+aOS+tH1NgBc6/gWqFeNN
- 2bEHWB0J2t/6fiJKT0R7Y3VDhNeLQseKGrtAC97++FBDm+Ugo46je2k81YNU4PXB6gxQ
- 9qjA==
-X-Gm-Message-State: APjAAAXDw7w0ZtrcCu/KGOHf8NPmxWTuhIf4DC7e3HUSFdhkGKy+hX8u
- IoTJsScox+AUNxvPIKdYkCGpvQ==
-X-Google-Smtp-Source: APXvYqyW59QK69+m8QEIg2sjdFO8Boq9flDOd36/G2xrfuJOexunVN/B5kj2LGFJY0NMb7zU+HHY9Q==
-X-Received: by 2002:a7b:c219:: with SMTP id x25mr4736785wmi.143.1571248594991; 
- Wed, 16 Oct 2019 10:56:34 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id s1sm36071637wrg.80.2019.10.16.10.56.34
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to:user-agent;
+ bh=xMXXNS5avxy69xRg1DGFF/riCwTTYHJMnGimGq68Sl0=;
+ b=jSjI04vPyflv8t5IagU1dCoxLoyneQcmh9CShe+HmFMyqfiUE9QkoFmN58VlX9VaTj
+ azLL44x4N53lky2R/7UGMUBm6k1BTGBoCgQtdGyq8V5IDcd8DZXYnh0USD/VbM6HWgq5
+ hmY1BNhIwY+/uAp58xeSIG/ObNRKNPWwlLYpuRt6IGDFVRQTa7F9ml7wqnJKz2KTC7n8
+ fQmxp1GzxzwxI/YEYhRPXf6RxfGv3vsCxOrz53F+IIPUNSYUEDXilhTMTdFxMyhBs4hQ
+ Yk92qFFXRFkMJz1p0LswVe2SpTWbm86bFdPkEBWaXLHtd8HSiaszkI7Zmfe7yafVOWKT
+ VURw==
+X-Gm-Message-State: APjAAAXKD4SDn0UbU3+9bRscS6VJjZ2G7YnYBS1lOnwDe0ckDT5C9H16
+ wRoZWttEIrLXrx2HGC5KqDk=
+X-Google-Smtp-Source: APXvYqznD5UronV9BZEbXh7bmzngn8z3xevGEKeaOtfvGbqRv9ilsdSAXJLvkbGqa9z19sZRZ6Ma3A==
+X-Received: by 2002:adf:aacc:: with SMTP id i12mr3949008wrc.15.1571251493413; 
+ Wed, 16 Oct 2019 11:44:53 -0700 (PDT)
+Received: from localhost ([51.15.41.238])
+ by smtp.gmail.com with ESMTPSA id y186sm5103761wmd.26.2019.10.16.11.44.51
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 16 Oct 2019 10:56:34 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 9F5D51FF87;
- Wed, 16 Oct 2019 18:56:33 +0100 (BST)
-References: <20191009170701.14756-1-thuth@redhat.com>
-User-agent: mu4e 1.3.5; emacs 27.0.50
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: Thomas Huth <thuth@redhat.com>
-Subject: Re: [PATCH 0/5] travis.yml improvements: Update libraries, build
- with arm64
-In-reply-to: <20191009170701.14756-1-thuth@redhat.com>
-Date: Wed, 16 Oct 2019 18:56:33 +0100
-Message-ID: <874l0860by.fsf@linaro.org>
+ Wed, 16 Oct 2019 11:44:51 -0700 (PDT)
+Date: Wed, 16 Oct 2019 19:44:50 +0100
+From: Stefan Hajnoczi <stefanha@gmail.com>
+To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
+Subject: Re: [PATCH] virito: Use auto rcu_read macros
+Message-ID: <20191016184450.GA15027@stefanha-x1.localdomain>
+References: <20191014175440.152609-1-dgilbert@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="cWoXeonUoKmBZSoM"
+Content-Disposition: inline
+In-Reply-To: <20191014175440.152609-1-dgilbert@redhat.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::341
+X-Received-From: 2a00:1450:4864:20::444
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,35 +93,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Peter Maydell <peter.maydell@linaro.org>,
- Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- qemu-devel@nongnu.org
+Cc: qemu-devel@nongnu.org, stefanha@redhat.com, mst@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
-Thomas Huth <thuth@redhat.com> writes:
+--cWoXeonUoKmBZSoM
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-> Update / add some libraries that we use in the Travis builds, and
-> enable compiling on the aarch64 host, too.
+On Mon, Oct 14, 2019 at 06:54:40PM +0100, Dr. David Alan Gilbert (git) wrot=
+e:
+> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+>=20
+> Use RCU_READ_LOCK_GUARD and WITH_RCU_READ_LOCK_GUARD
+> to replace the manual rcu_read_(un)lock calls.
+>=20
+> I think the only change is virtio_load which was missing unlocks
+> in error paths; those end up being fatal errors so it's not
+> that important anyway.
+>=20
+> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> ---
+>  hw/virtio/virtio.c | 46 ++++++++++++++++------------------------------
+>  1 file changed, 16 insertions(+), 30 deletions(-)
 
-Queued 1-3 to testing/next and I'll have a play with 4/5 but probably
-won't include them in the final PR unless they seem solid.
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 
->
-> Thomas Huth (5):
->   travis.yml: Add libvdeplug-dev to compile-test net/vde.c
->   travis.yml: Use libsdl2 instead of libsdl1.2, and install
->     libsdl2-image
->   travis.yml: Use newer version of libgnutls and libpng
->   travis.yml: Fix the ccache lines
->   travis.yml: Compile on arm64, too
->
->  .travis.yml | 21 +++++++++++++++------
->  1 file changed, 15 insertions(+), 6 deletions(-)
+--cWoXeonUoKmBZSoM
+Content-Type: application/pgp-signature; name="signature.asc"
 
+-----BEGIN PGP SIGNATURE-----
 
---
-Alex Benn=C3=A9e
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl2nZSEACgkQnKSrs4Gr
+c8ilfggAxZJ8UG+TgvE9DZr5SJ8+82NgAg1ZPnSYys65m3EcQGj1S4CDxjKR3icC
+KK4R6WoydLdxZH2PcuakoSc32iLbo+23aAhbLrOnn4b4dmUXIw3phttAqbuMsf7p
+kn2Z9C0SuaoVwA+6KGScTaV/2fsSxhcke4on9LGUmH1InDp56/RllAgvJ3mscdr9
+G2QHubgXV3JKqX7hR+0pIid5rTKVnRp6Js3rd1R2dJW/ZRc/AeDamLKdbHXdULjA
+NWDUNPGlY01C5vtzz03CRfYurq3ZNW3jpmtomq80mdqVsuJbS3APVywDkLUjWfig
+VCV3b0DY7Dz4SsiPzqDzQzs2izLY1A==
+=NIIz
+-----END PGP SIGNATURE-----
+
+--cWoXeonUoKmBZSoM--
 
