@@ -2,66 +2,93 @@ Return-Path: <SRS0=/TIv=YJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-14.4 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 406C5FA372A
-	for <qemu-devel@archiver.kernel.org>; Wed, 16 Oct 2019 11:02:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1ACC7FA372A
+	for <qemu-devel@archiver.kernel.org>; Wed, 16 Oct 2019 11:04:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0502620854
-	for <qemu-devel@archiver.kernel.org>; Wed, 16 Oct 2019 11:02:12 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0502620854
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id C6AF020854
+	for <qemu-devel@archiver.kernel.org>; Wed, 16 Oct 2019 11:04:41 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="nyBQdNED"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C6AF020854
+Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40866 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40902 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iKh4F-0003oS-6q
-	for qemu-devel@archiver.kernel.org; Wed, 16 Oct 2019 07:02:11 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39510)
+	id 1iKh6e-0005RZ-BP
+	for qemu-devel@archiver.kernel.org; Wed, 16 Oct 2019 07:04:40 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39727)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <no-reply@patchew.org>) id 1iKh3E-0003PG-MW
- for qemu-devel@nongnu.org; Wed, 16 Oct 2019 07:01:10 -0400
+ (envelope-from <sameid@google.com>) id 1iKh4w-0004SH-Kz
+ for qemu-devel@nongnu.org; Wed, 16 Oct 2019 07:02:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <no-reply@patchew.org>) id 1iKh3C-0005IN-HV
- for qemu-devel@nongnu.org; Wed, 16 Oct 2019 07:01:08 -0400
-Resent-Date: Wed, 16 Oct 2019 07:01:08 -0400
-Resent-Message-Id: <E1iKh3C-0005IN-HV@eggs.gnu.org>
-Received: from sender4-of-o54.zoho.com ([136.143.188.54]:21435)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <no-reply@patchew.org>)
- id 1iKh3C-0005HY-6k; Wed, 16 Oct 2019 07:01:06 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1571223646; cv=none; d=zoho.com; s=zohoarc; 
- b=AhEcyAXWDI70WohnYrBJtcFJnO69mSSSVkeYcajXgqjF05wtBy74IVB7WGKrHgjjLKknTrKfwHnfeHVI3isWpimfvycL83fgFbbnAfieEqYiRdYj730EBAUHqW7k9nJhKjI0OT5epgtGzFiemO4HezLNRxE72NcAycFg0iMhf9Y=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zoho.com;
- s=zohoarc; t=1571223646;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
- bh=F9ZxL2/gEOyCw+dq2vYve9n3u/Gn66+3I7izxRdnym0=; 
- b=Nn/QMiG99CqT/H7njd4Dhrr8zOS7RSrPOZzn4yyoiyVdVgokzSQngkAt/yc1ofLRM3+G3foWJ8VGjZ+PVqIwZH37r1u8bgAd+42252zcaw97FRfg9T9t6XpviInq6HqJrY3Y3VcmHmr4trdzs7sh6YG7DgSXnlpOg4wau9QPK9A=
-ARC-Authentication-Results: i=1; mx.zoho.com; dkim=pass  header.i=patchew.org;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1571223644748457.24497172992153;
- Wed, 16 Oct 2019 04:00:44 -0700 (PDT)
-In-Reply-To: <1571163625-642312-1-git-send-email-andrey.shinkevich@virtuozzo.com>
-Subject: Re: [PATCH v3 0/5] qcow2: advanced compression options
-Message-ID: <157122364287.13250.2103795348744623419@37313f22b938>
+ (envelope-from <sameid@google.com>) id 1iKh4u-0005uD-SX
+ for qemu-devel@nongnu.org; Wed, 16 Oct 2019 07:02:54 -0400
+Received: from mail-qk1-x741.google.com ([2607:f8b0:4864:20::741]:36228)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <sameid@google.com>) id 1iKh4u-0005ty-Km
+ for qemu-devel@nongnu.org; Wed, 16 Oct 2019 07:02:52 -0400
+Received: by mail-qk1-x741.google.com with SMTP id y189so22317893qkc.3
+ for <qemu-devel@nongnu.org>; Wed, 16 Oct 2019 04:02:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=vgnNsYi5RZ+7McE18uMjrGwKc4YB8zqLpgtvoRPPOPY=;
+ b=nyBQdNEDyCaF4jhGZsmN0BOiFKs2xyOtRo1HsnI7pu2lOmWKoEb5kPARAK+hUpXZD7
+ MMQkFU9p/DJoZ95yoUTWCe3JRjd14aFw3vKdUXC/axNQovd6lMf/SyTbzy0LvERmjBwO
+ fRCUdteTrLqC4WWdVa8ZMSDAI5ipbjzTcN3wf431niM9wmqt5HzOpePugV2WMfheDOWf
+ llAYfSO3KaO1A+OA3+Xt6PEUMrkOA8Gt5XFdDzpkY286ivFhs7UNLKMGog2V1cTKCLjq
+ 82umRqwnUM1eJr2+xqUh01qlWjZZuJ4VJW1TAiYNvCIyDRIoY+Ao4HKhwkCFHdoNPVpX
+ rJNw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=vgnNsYi5RZ+7McE18uMjrGwKc4YB8zqLpgtvoRPPOPY=;
+ b=VjjPyKT+wmVqUnVZymgyrIP8lNDBAGzeio/wGrht7+cp0qnZMPQYDusz8BDPRKtdL/
+ 40Zm5brsIhucX8cfGpg/WLfwm4pi6ArxdpKPGNNYh8qLgsQOCtyzqe+F+7btzUoj9KlY
+ M8zHF5Xj8GjqpbrkXs8rinDmPoyGFu9qCUeeR5y1rcEONPKUvl09WlHNy3zDp/i7ZtG5
+ TM9XQ0pzF5rpN+84VMwEXAQubn7a/pJJ6ajGrCQ7eDa9b3HJ7UnDnpByWdYlf1BpTzb7
+ I8Gm56xl+uDm3aptKk/heYlCdGi2TjZ+Z4hxxgrZhszg2mWBjeKC48gvtjc2V2BDvCyZ
+ GqlQ==
+X-Gm-Message-State: APjAAAWdcGeVaLnHBop0Y7pkBHexq6B/kndynsoHiepMYP4xNbGU5OZN
+ Qh+qdlcFfE+7hVrka7rVlZlgSi/gWOvq6nPQHT7b0g==
+X-Google-Smtp-Source: APXvYqy1ZEOvjkLcN7lTo4WPo7ZI7KpQwYk8vWnnXgBD9EgtfoJed0NmG1rujmZAE2tgQfFo6TXayTGML2oiFykeX1w=
+X-Received: by 2002:a05:620a:2f3:: with SMTP id
+ a19mr13486098qko.272.1571223770923; 
+ Wed, 16 Oct 2019 04:02:50 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: andrey.shinkevich@virtuozzo.com
-Date: Wed, 16 Oct 2019 04:00:44 -0700 (PDT)
-X-ZohoMailClient: External
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 136.143.188.54
+References: <20190925110639.100699-1-sameid@google.com>
+ <20190925110639.100699-8-sameid@google.com>
+ <ffff9a59-3cbf-8b04-f4e5-8a01dad8d381@redhat.com>
+ <7dc7b14c-8e89-4851-6d05-d69b1bf36e3e@redhat.com>
+ <92b719a7-3838-b019-cd51-5f5b2120a431@redhat.com>
+ <1d863ce2-0e45-63e4-ceb2-d2eb2d9aa03a@redhat.com>
+ <CAFr6bU=2B9JcmfJZ25BTYkhnw2V+YAghyAyK9YHto18KRptPAg@mail.gmail.com>
+ <1dc0c7cd-cf9f-0c33-04f5-ed8d89119c9f@redhat.com>
+ <CAFr6bUnsxhqBqHgRdw3dtv0rEvfCVn0oM4XD8Vb1xv_UGKvepg@mail.gmail.com>
+In-Reply-To: <CAFr6bUnsxhqBqHgRdw3dtv0rEvfCVn0oM4XD8Vb1xv_UGKvepg@mail.gmail.com>
+From: Sam Eiderman <sameid@google.com>
+Date: Wed, 16 Oct 2019 14:02:39 +0300
+Message-ID: <CAFr6bUm53A+gBVBRr00XKDkt=GiJ5QSOEEXPFfuUJ2PcLeG04w@mail.gmail.com>
+Subject: Re: [SeaBIOS] [PATCH v7 7/8] bootdevice: FW_CFG interface for LCHS
+ values
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
+Cc: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org, kwolf@redhat.com, 
+ qemu-block@nongnu.org, arbel.moshe@oracle.com, seabios@seabios.org, 
+ kraxel@redhat.com, Laszlo Ersek <lersek@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::741
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -73,148 +100,293 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, fam@euphon.net, vsementsov@virtuozzo.com,
- qemu-block@nongnu.org, qemu-devel@nongnu.org, armbru@redhat.com,
- stefanha@redhat.com, den@openvz.org, andrey.shinkevich@virtuozzo.com,
- mreitz@redhat.com, jsnow@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8xNTcxMTYzNjI1LTY0MjMxMi0x
-LWdpdC1zZW5kLWVtYWlsLWFuZHJleS5zaGlua2V2aWNoQHZpcnR1b3p6by5jb20vCgoKCkhpLAoK
-VGhpcyBzZXJpZXMgZmFpbGVkIHRoZSBkb2NrZXItcXVpY2tAY2VudG9zNyBidWlsZCB0ZXN0LiBQ
-bGVhc2UgZmluZCB0aGUgdGVzdGluZyBjb21tYW5kcyBhbmQKdGhlaXIgb3V0cHV0IGJlbG93LiBJ
-ZiB5b3UgaGF2ZSBEb2NrZXIgaW5zdGFsbGVkLCB5b3UgY2FuIHByb2JhYmx5IHJlcHJvZHVjZSBp
-dApsb2NhbGx5LgoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaAptYWtlIGRv
-Y2tlci1pbWFnZS1jZW50b3M3IFY9MSBORVRXT1JLPTEKdGltZSBtYWtlIGRvY2tlci10ZXN0LXF1
-aWNrQGNlbnRvczcgU0hPV19FTlY9MSBKPTE0IE5FVFdPUks9MQo9PT0gVEVTVCBTQ1JJUFQgRU5E
-ID09PQoKLS0+IFByb2Nlc3NpbmcgRGVwZW5kZW5jeTogcGVybChGaWxlOjpDb3B5KSBmb3IgcGFj
-a2FnZTogZ2l0LTEuOC4zLjEtMjAuZWw3Lng4Nl82NAotLT4gUHJvY2Vzc2luZyBEZXBlbmRlbmN5
-OiBwZXJsKEZpbGU6OkJhc2VuYW1lKSBmb3IgcGFja2FnZTogZ2l0LTEuOC4zLjEtMjAuZWw3Lng4
-Nl82NAotLT4gUHJvY2Vzc2luZyBEZXBlbmRlbmN5OiBwZXJsKEV4cG9ydGVyKSBmb3IgcGFja2Fn
-ZTogZ2l0LTEuOC4zLjEtMjAuZWw3Lng4Nl82NAotLT4gUHJvY2Vzc2luZyBEZXBlbmRlbmN5OiBw
-ZXJsKEVycm9yKSBmb3IgcGFja2FnZTogZ2l0LTEuOC4zLjEtMjAuZWw3Lng4Nl82NAotLT4gUHJv
-Y2Vzc2luZyBEZXBlbmRlbmN5OiBvcGVuc3NoLWNsaWVudHMgZm9yIHBhY2thZ2U6IGdpdC0xLjgu
-My4xLTIwLmVsNy54ODZfNjQKLS0+IFByb2Nlc3NpbmcgRGVwZW5kZW5jeTogbGVzcyBmb3IgcGFj
-a2FnZTogZ2l0LTEuOC4zLjEtMjAuZWw3Lng4Nl82NAotLT4gUHJvY2Vzc2luZyBEZXBlbmRlbmN5
-OiAvdXNyL2Jpbi9wZXJsIGZvciBwYWNrYWdlOiBnaXQtMS44LjMuMS0yMC5lbDcueDg2XzY0Ci0t
-LQotLT4gUHJvY2Vzc2luZyBEZXBlbmRlbmN5OiBwZXJsKEZpbHRlcjo6VXRpbDo6Q2FsbCkgZm9y
-IHBhY2thZ2U6IDQ6cGVybC01LjE2LjMtMjk0LmVsN182Lng4Nl82NAotLT4gUHJvY2Vzc2luZyBE
-ZXBlbmRlbmN5OiBsaWJwZXJsLnNvKCkoNjRiaXQpIGZvciBwYWNrYWdlOiA0OnBlcmwtNS4xNi4z
-LTI5NC5lbDdfNi54ODZfNjQKLS0tPiBQYWNrYWdlIHBlcmwtQ2FycC5ub2FyY2ggMDoxLjI2LTI0
-NC5lbDcgd2lsbCBiZSBpbnN0YWxsZWQKLS0tPiBQYWNrYWdlIHBlcmwtRXJyb3Iubm9hcmNoIDE6
-MC4xNzAyMC0yLmVsNyB3aWxsIGJlIGluc3RhbGxlZAotLS0+IFBhY2thZ2UgcGVybC1FeHBvcnRl
-ci5ub2FyY2ggMDo1LjY4LTMuZWw3IHdpbGwgYmUgaW5zdGFsbGVkCi0tLT4gUGFja2FnZSBwZXJs
-LUZpbGUtUGF0aC5ub2FyY2ggMDoyLjA5LTIuZWw3IHdpbGwgYmUgaW5zdGFsbGVkCi0tLT4gUGFj
-a2FnZSBwZXJsLUZpbGUtVGVtcC5ub2FyY2ggMDowLjIzLjAxLTMuZWw3IHdpbGwgYmUgaW5zdGFs
-bGVkCi0tLQogcGVybC1DYXJwICAgICAgICAgICAgICAgIG5vYXJjaCAxLjI2LTI0NC5lbDcgICAg
-ICAgICAgICAgICBiYXNlICAgICAgICAgICAxOSBrCiBwZXJsLURhdGEtRHVtcGVyICAgICAgICAg
-eDg2XzY0IDIuMTQ1LTMuZWw3ICAgICAgICAgICAgICAgIGJhc2UgICAgICAgICAgIDQ3IGsKIHBl
-cmwtRW5jb2RlICAgICAgICAgICAgICB4ODZfNjQgMi41MS03LmVsNyAgICAgICAgICAgICAgICAg
-YmFzZSAgICAgICAgICAxLjUgTQogcGVybC1FcnJvciAgICAgICAgICAgICAgIG5vYXJjaCAxOjAu
-MTcwMjAtMi5lbDcgICAgICAgICAgICBiYXNlICAgICAgICAgICAzMiBrCiBwZXJsLUV4cG9ydGVy
-ICAgICAgICAgICAgbm9hcmNoIDUuNjgtMy5lbDcgICAgICAgICAgICAgICAgIGJhc2UgICAgICAg
-ICAgIDI4IGsKIHBlcmwtRmlsZS1QYXRoICAgICAgICAgICBub2FyY2ggMi4wOS0yLmVsNyAgICAg
-ICAgICAgICAgICAgYmFzZSAgICAgICAgICAgMjYgawogcGVybC1GaWxlLVRlbXAgICAgICAgICAg
-IG5vYXJjaCAwLjIzLjAxLTMuZWw3ICAgICAgICAgICAgICBiYXNlICAgICAgICAgICA1NiBrCi0t
-LQpUb3RhbCBkb3dubG9hZCBzaXplOiAxNDYgTQpEb3dubG9hZGluZyBwYWNrYWdlczoKRGVsdGEg
-UlBNcyBkaXNhYmxlZCBiZWNhdXNlIC91c3IvYmluL2FwcGx5ZGVsdGFycG0gbm90IGluc3RhbGxl
-ZC4Kd2FybmluZzogL3Zhci9jYWNoZS95dW0veDg2XzY0LzcvZXBlbC9wYWNrYWdlcy9jY2FjaGUt
-My4zLjQtMS5lbDcueDg2XzY0LnJwbTogSGVhZGVyIFYzIFJTQS9TSEEyNTYgU2lnbmF0dXJlLCBr
-ZXkgSUQgMzUyYzY0ZTU6IE5PS0VZClB1YmxpYyBrZXkgZm9yIGNjYWNoZS0zLjMuNC0xLmVsNy54
-ODZfNjQucnBtIGlzIG5vdCBpbnN0YWxsZWQKd2FybmluZzogL3Zhci9jYWNoZS95dW0veDg2XzY0
-LzcvY2VudG9zLXZpcnQteGVuLTQ4L3BhY2thZ2VzL2tlcm5lbC1oZWFkZXJzLTQuOS4xODgtMzUu
-ZWw3Lng4Nl82NC5ycG06IEhlYWRlciBWNCBSU0EvU0hBMSBTaWduYXR1cmUsIGtleSBJRCA2MWU4
-ODA2YzogTk9LRVkKUHVibGljIGtleSBmb3Iga2VybmVsLWhlYWRlcnMtNC45LjE4OC0zNS5lbDcu
-eDg2XzY0LnJwbSBpcyBub3QgaW5zdGFsbGVkCi0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tClRvdGFs
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIDguMyBNQi9zIHwg
-MTQ2IE1CICAwMDoxNyAgICAgCi0tLQogIFVwZGF0aW5nICAgOiBnbGliYy1jb21tb24tMi4xNy0y
-OTIuZWw3Lng4Nl82NCAgICAgICAgICAgICAgICAgICAgICAgICAgIDIvMzE1IAogIFVwZGF0aW5n
-ICAgOiBuc3Mtc29mdG9rbi1mcmVlYmwtMy40NC4wLTUuZWw3Lng4Nl82NCAgICAgICAgICAgICAg
-ICAgICAgIDMvMzE1IAogIFVwZGF0aW5nICAgOiBnbGliYy0yLjE3LTI5Mi5lbDcueDg2XzY0ICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIDQvMzE1IAp3YXJuaW5nOiAvZXRjL25zc3dp
-dGNoLmNvbmYgY3JlYXRlZCBhcyAvZXRjL25zc3dpdGNoLmNvbmYucnBtbmV3CiAgVXBkYXRpbmcg
-ICA6IG5zcHItNC4yMS4wLTEuZWw3Lng4Nl82NCAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgNS8zMTUgCiAgVXBkYXRpbmcgICA6IG5zcy11dGlsLTMuNDQuMC0zLmVsNy54ODZfNjQg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgNi8zMTUgCiAgVXBkYXRpbmcgICA6IGxpYnN0
-ZGMrKy00LjguNS0zOS5lbDcueDg2XzY0ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgNy8z
-MTUgCi0tLQogIEluc3RhbGxpbmcgOiAxOnBlcmwtUG9kLVNpbXBsZS0zLjI4LTQuZWw3Lm5vYXJj
-aCAgICAgICAgICAgICAgICAgICAgICAxMTgvMzE1IAogIEluc3RhbGxpbmcgOiBwZXJsLUdldG9w
-dC1Mb25nLTIuNDAtMy5lbDcubm9hcmNoICAgICAgICAgICAgICAgICAgICAgICAxMTkvMzE1IAog
-IEluc3RhbGxpbmcgOiA0OnBlcmwtNS4xNi4zLTI5NC5lbDdfNi54ODZfNjQgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAxMjAvMzE1IAogIEluc3RhbGxpbmcgOiAxOnBlcmwtRXJyb3ItMC4xNzAy
-MC0yLmVsNy5ub2FyY2ggICAgICAgICAgICAgICAgICAgICAgICAxMjEvMzE1IAogIEluc3RhbGxp
-bmcgOiBwZXJsLVRlcm1SZWFkS2V5LTIuMzAtMjAuZWw3Lng4Nl82NCAgICAgICAgICAgICAgICAg
-ICAgICAxMjIvMzE1IAogIEluc3RhbGxpbmcgOiBwZXJsLURhdGEtRHVtcGVyLTIuMTQ1LTMuZWw3
-Lng4Nl82NCAgICAgICAgICAgICAgICAgICAgICAxMjMvMzE1IAogIEluc3RhbGxpbmcgOiBhdXRv
-Y29uZi0yLjY5LTExLmVsNy5ub2FyY2ggICAgICAgICAgICAgICAgICAgICAgICAgICAgICAxMjQv
-MzE1IAotLS0KICBJbnN0YWxsaW5nIDogcHl0aG9uLXJwbS1tYWNyb3MtMy0zMi5lbDcubm9hcmNo
-ICAgICAgICAgICAgICAgICAgICAgICAgMTkzLzMxNSAKICBJbnN0YWxsaW5nIDogbGliZmZpLWRl
-dmVsLTMuMC4xMy0xOC5lbDcueDg2XzY0ICAgICAgICAgICAgICAgICAgICAgICAgMTk0LzMxNSAK
-aW5zdGFsbC1pbmZvOiBObyBzdWNoIGZpbGUgb3IgZGlyZWN0b3J5IGZvciAvdXNyL3NoYXJlL2lu
-Zm8vbGliZmZpLmluZm8uZ3oKd2FybmluZzogJXBvc3QobGliZmZpLWRldmVsLTMuMC4xMy0xOC5l
-bDcueDg2XzY0KSBzY3JpcHRsZXQgZmFpbGVkLCBleGl0IHN0YXR1cyAxCk5vbi1mYXRhbCBQT1NU
-SU4gc2NyaXB0bGV0IGZhaWx1cmUgaW4gcnBtIHBhY2thZ2UgbGliZmZpLWRldmVsLTMuMC4xMy0x
-OC5lbDcueDg2XzY0CiAgSW5zdGFsbGluZyA6IHhtbC1jb21tb24tMC42LjMtMzkuZWw3Lm5vYXJj
-aCAgICAgICAgICAgICAgICAgICAgICAgICAgIDE5NS8zMTUgCiAgSW5zdGFsbGluZyA6IGlzby1j
-b2Rlcy0zLjQ2LTIuZWw3Lm5vYXJjaCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIDE5Ni8z
-MTUgCi0tLQogIFZlcmlmeWluZyAgOiBmbGFjLWxpYnMtMS4zLjAtNS5lbDdfMS54ODZfNjQgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAyNjEvMzE1IAogIFZlcmlmeWluZyAgOiBvcHVzLTEuMC4y
-LTYuZWw3Lng4Nl82NCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAyNjIvMzE1IAog
-IFZlcmlmeWluZyAgOiBsaWJ1dWlkLTIuMjMuMi02MS5lbDcueDg2XzY0ICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAyNjMvMzE1IAogIFZlcmlmeWluZyAgOiAxOnBlcmwtRXJyb3ItMC4xNzAy
-MC0yLmVsNy5ub2FyY2ggICAgICAgICAgICAgICAgICAgICAgICAyNjQvMzE1IAogIFZlcmlmeWlu
-ZyAgOiBsaWJYZml4ZXMtNS4wLjMtMS5lbDcueDg2XzY0ICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAyNjUvMzE1IAogIFZlcmlmeWluZyAgOiB4bWwtY29tbW9uLTAuNi4zLTM5LmVsNy5ub2Fy
-Y2ggICAgICAgICAgICAgICAgICAgICAgICAgICAyNjYvMzE1IAogIFZlcmlmeWluZyAgOiBwZXJs
-LVNjYWxhci1MaXN0LVV0aWxzLTEuMjctMjQ4LmVsNy54ODZfNjQgICAgICAgICAgICAgICAyNjcv
-MzE1IAotLS0KICBwZXJsLUNhcnAubm9hcmNoIDA6MS4yNi0yNDQuZWw3ICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICBwZXJsLURhdGEtRHVtcGVyLng4Nl82
-NCAwOjIuMTQ1LTMuZWw3ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAK
-ICBwZXJsLUVuY29kZS54ODZfNjQgMDoyLjUxLTcuZWw3ICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAKICBwZXJsLUVycm9yLm5vYXJjaCAxOjAuMTcwMjAtMi5l
-bDcgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICBwZXJsLUV4
-cG9ydGVyLm5vYXJjaCAwOjUuNjgtMy5lbDcgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAKICBwZXJsLUZpbGUtUGF0aC5ub2FyY2ggMDoyLjA5LTIuZWw3ICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICBwZXJsLUZpbGUtVGVtcC5u
-b2FyY2ggMDowLjIzLjAxLTMuZWw3ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAKLS0tCmxpYnVkZXYgICAgICAgICAgIG5vCmRlZmF1bHQgZGV2aWNlcyAgIHllcwoKd2Fy
-bmluZzogUHl0aG9uIDIgc3VwcG9ydCBpcyBkZXByZWNhdGVkCndhcm5pbmc6IFB5dGhvbiAzIHdp
-bGwgYmUgcmVxdWlyZWQgZm9yIGJ1aWxkaW5nIGZ1dHVyZSB2ZXJzaW9ucyBvZiBRRU1VCmNyb3Nz
-IGNvbnRhaW5lcnMgIG5vCgpOT1RFOiBndWVzdCBjcm9zcy1jb21waWxlcnMgZW5hYmxlZDogY2MK
-LS0tCiAgQ0MgICAgICBibG9jay9hY2NvdW50aW5nLm8KICBDQyAgICAgIGJsb2NrL2RpcnR5LWJp
-dG1hcC5vCi90bXAvcWVtdS10ZXN0L3NyYy9ibG9jay9xY293Mi5jOiBJbiBmdW5jdGlvbiAncWNv
-dzJfY29fcHdyaXRldl9jb21wcmVzc2VkX3BhcnQnOgovdG1wL3FlbXUtdGVzdC9zcmMvYmxvY2sv
-cWNvdzIuYzo0MjQ0Ojk6IGVycm9yOiAncmV0JyBtYXkgYmUgdXNlZCB1bmluaXRpYWxpemVkIGlu
-IHRoaXMgZnVuY3Rpb24gWy1XZXJyb3I9bWF5YmUtdW5pbml0aWFsaXplZF0KICAgICBpbnQgcmV0
-OwogICAgICAgICBeCmNjMTogYWxsIHdhcm5pbmdzIGJlaW5nIHRyZWF0ZWQgYXMgZXJyb3JzCm1h
-a2U6ICoqKiBbYmxvY2svcWNvdzIub10gRXJyb3IgMQptYWtlOiAqKiogV2FpdGluZyBmb3IgdW5m
-aW5pc2hlZCBqb2JzLi4uLgpUcmFjZWJhY2sgKG1vc3QgcmVjZW50IGNhbGwgbGFzdCk6CiAgRmls
-ZSAiLi90ZXN0cy9kb2NrZXIvZG9ja2VyLnB5IiwgbGluZSA2NjQsIGluIDxtb2R1bGU+Ci0tLQog
-IEZpbGUgIi9vcHQvcmgvcmgtcHl0aG9uMzYvcm9vdC91c3IvbGliNjQvcHl0aG9uMy42L3N1YnBy
-b2Nlc3MucHkiLCBsaW5lIDI5MSwgaW4gY2hlY2tfY2FsbAogICAgcmFpc2UgQ2FsbGVkUHJvY2Vz
-c0Vycm9yKHJldGNvZGUsIGNtZCkKc3VicHJvY2Vzcy5DYWxsZWRQcm9jZXNzRXJyb3I6IENvbW1h
-bmQgJ1snc3VkbycsICctbicsICdkb2NrZXInLCAncnVuJywgJy0tbGFiZWwnLCAnY29tLnFlbXUu
-aW5zdGFuY2UudXVpZD1mMThlMzRlZWYwMDMxMWU5OGMwNzY4YjU5OTczYjdkMCcsICctdScsICcx
-MDAzJywgJy0tc2VjdXJpdHktb3B0JywgJ3NlY2NvbXA9dW5jb25maW5lZCcsICctLXJtJywgJy1l
-JywgJ1RBUkdFVF9MSVNUPScsICctZScsICdFWFRSQV9DT05GSUdVUkVfT1BUUz0nLCAnLWUnLCAn
-Vj0nLCAnLWUnLCAnSj0xNCcsICctZScsICdERUJVRz0nLCAnLWUnLCAnU0hPV19FTlY9MScsICct
-ZScsICdDQ0FDSEVfRElSPS92YXIvdG1wL2NjYWNoZScsICctdicsICcvaG9tZS9wYXRjaGV3Mi8u
-Y2FjaGUvcWVtdS1kb2NrZXItY2NhY2hlOi92YXIvdG1wL2NjYWNoZTp6JywgJy12JywgJy92YXIv
-dG1wL3BhdGNoZXctdGVzdGVyLXRtcC05ZGRnNV9xbi9zcmMvZG9ja2VyLXNyYy4yMDE5LTEwLTE2
-LTA2LjU4LjM4LjM5Mzk6L3Zhci90bXAvcWVtdTp6LHJvJywgJ3FlbXU6Y2VudG9zNycsICcvdmFy
-L3RtcC9xZW11L3J1bicsICd0ZXN0LXF1aWNrJ10nIHJldHVybmVkIG5vbi16ZXJvIGV4aXQgc3Rh
-dHVzIDIuCm1ha2VbMV06ICoqKiBbZG9ja2VyLXJ1bl0gRXJyb3IgMQptYWtlWzFdOiBMZWF2aW5n
-IGRpcmVjdG9yeSBgL3Zhci90bXAvcGF0Y2hldy10ZXN0ZXItdG1wLTlkZGc1X3FuL3NyYycKbWFr
-ZTogKioqIFtkb2NrZXItcnVuLXRlc3QtcXVpY2tAY2VudG9zN10gRXJyb3IgMgoKcmVhbCAgICAy
-bTQuNTQ0cwp1c2VyICAgIDBtNy43NTJzCgoKVGhlIGZ1bGwgbG9nIGlzIGF2YWlsYWJsZSBhdApo
-dHRwOi8vcGF0Y2hldy5vcmcvbG9ncy8xNTcxMTYzNjI1LTY0MjMxMi0xLWdpdC1zZW5kLWVtYWls
-LWFuZHJleS5zaGlua2V2aWNoQHZpcnR1b3p6by5jb20vdGVzdGluZy5kb2NrZXItcXVpY2tAY2Vu
-dG9zNy8/dHlwZT1tZXNzYWdlLgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkg
-UGF0Y2hldyBbaHR0cHM6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNr
-IHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
+Gentle Ping,
 
+Philippe, John?
+
+Just wondering if the series is okay, as Gerd pointed out this series
+is a blocker for the corresponding changes in SeaBIOS for v 1.13
+
+Sam
+
+
+On Tue, Oct 8, 2019 at 2:51 PM Sam Eiderman <sameid@google.com> wrote:
+>
+>
+>
+> On Tue, Oct 8, 2019, 13:34 Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com=
+> wrote:
+>>
+>> Hi Sam,
+>>
+>> On 9/29/19 12:13 PM, Sam Eiderman wrote:
+>> > Philippe, thanks for the fast review,
+>>
+>> Fast is not always the friend of careful.
+>>
+>> >
+>> > John, thanks for picking up this hot potato :-)
+>> >
+>> > Sam
+>> >
+>> > On Thu, Sep 26, 2019 at 10:16 PM Philippe Mathieu-Daud=C3=A9
+>> > <philmd@redhat.com <mailto:philmd@redhat.com>> wrote:
+>> >
+>> >     On 9/26/19 9:09 PM, Philippe Mathieu-Daud=C3=A9 wrote:
+>> >      > On 9/26/19 8:26 PM, John Snow wrote:
+>> >      >> On 9/26/19 5:57 AM, Philippe Mathieu-Daud=C3=A9 wrote:
+>> >      >>> Hi Sam,
+>> >      >>>
+>> >      >>> On 9/25/19 1:06 PM, Sam Eiderman wrote:
+>> >      >>>> From: Sam Eiderman <shmuel.eiderman@oracle.com
+>> >     <mailto:shmuel.eiderman@oracle.com>>
+>> >      >>>>
+>> >      >>>> Using fw_cfg, supply logical CHS values directly from QEMU t=
+o
+>> >     the BIOS.
+>> >      >>>>
+>> >      >>>> Non-standard logical geometries break under QEMU.
+>> >      >>>>
+>> >      >>>> A virtual disk which contains an operating system which depe=
+nds on
+>> >      >>>> logical geometries (consistent values being reported from BI=
+OS
+>> >     INT13
+>> >      >>>> AH=3D08) will most likely break under QEMU/SeaBIOS if it has
+>> >     non-standard
+>> >      >>>> logical geometries - for example 56 SPT (sectors per track).
+>> >      >>>> No matter what QEMU will report - SeaBIOS, for large enough
+>> >     disks - will
+>> >      >>>> use LBA translation, which will report 63 SPT instead.
+>> >      >>>>
+>> >      >>>> In addition we cannot force SeaBIOS to rely on physical
+>> >     geometries at
+>> >      >>>> all. A virtio-blk-pci virtual disk with 255 phyiscal heads c=
+annot
+>> >      >>>> report more than 16 physical heads when moved to an IDE
+>> >     controller,
+>> >      >>>> since the ATA spec allows a maximum of 16 heads - this is an
+>> >     artifact of
+>> >      >>>> virtualization.
+>> >      >>>>
+>> >      >>>> By supplying the logical geometries directly we are able to
+>> >     support such
+>> >      >>>> "exotic" disks.
+>> >      >>>>
+>> >      >>>> We serialize this information in a similar way to the "booto=
+rder"
+>> >      >>>> interface.
+>> >      >>>> The new fw_cfg entry is "bios-geometry".
+>> >      >>>>
+>> >      >>>> Reviewed-by: Karl Heubaum <karl.heubaum@oracle.com
+>> >     <mailto:karl.heubaum@oracle.com>>
+>> >      >>>> Reviewed-by: Arbel Moshe <arbel.moshe@oracle.com
+>> >     <mailto:arbel.moshe@oracle.com>>
+>> >      >>>> Signed-off-by: Sam Eiderman <shmuel.eiderman@oracle.com
+>> >     <mailto:shmuel.eiderman@oracle.com>>
+>> >      >>>> ---
+>> >      >>>>  bootdevice.c            | 32 ++++++++++++++++++++++++++++++=
+++
+>> >      >>>>  hw/nvram/fw_cfg.c       | 14 +++++++++++---
+>> >      >>>>  include/sysemu/sysemu.h |  1 +
+>> >      >>>>  3 files changed, 44 insertions(+), 3 deletions(-)
+>> >      >>>>
+>> >      >>>> diff --git a/bootdevice.c b/bootdevice.c
+>> >      >>>> index 2b12fb85a4..b034ad7bdc 100644
+>> >      >>>> --- a/bootdevice.c
+>> >      >>>> +++ b/bootdevice.c
+>> >      >>>> @@ -405,3 +405,35 @@ void del_boot_device_lchs(DeviceState
+>> >     *dev, const char *suffix)
+>> >      >>>>          }
+>> >      >>>>      }
+>> >      >>>>  }
+>> >      >>>> +
+>> >      >>>> +/* Serialized as: (device name\0 + lchs struct) x devices *=
+/
+>>
+>> I suppose the lchs struct is serialized in little-endian.
+>
+>
+> Nice catch, that's just a bad comment, should be removed.
+> There used to be a struct with 3 uint32_t values, Laszlo pointed out that=
+ there is an endianess problem (this was fixed in v3) later Kevin suggested=
+ to make it a textual interface and the struct was removed (in v4) but the =
+comment remained.
+>>
+>>
+>> >      >>>> +char *get_boot_devices_lchs_list(size_t *size)
+>> >      >>>> +{
+>> >      >>>> +    FWLCHSEntry *i;
+>> >      >>>> +    size_t total =3D 0;
+>> >      >>>> +    char *list =3D NULL;
+>> >      >>>> +
+>> >      >>>> +    QTAILQ_FOREACH(i, &fw_lchs, link) {
+>> >      >>>> +        char *bootpath;
+>> >      >>>> +        char *chs_string;
+>> >      >>>> +        size_t len;
+>> >      >>>> +
+>> >      >>>> +        bootpath =3D get_boot_device_path(i->dev, false,
+>> >     i->suffix);
+>> >      >>>> +        chs_string =3D g_strdup_printf("%s %" PRIu32 " %"
+>> >     PRIu32 " %" PRIu32,
+>> >      >>>> +                                     bootpath, i->lcyls,
+>> >     i->lheads, i->lsecs);
+>>
+>> Sam. can you check if you don't need endianness conversion here?
+>
+>
+> Hmm, since this is a textual interface, I believe this should work no?
+>
+> uint32_t a =3D 4;
+> g_strdup_printf("%s" PRIu32, a);
+>
+> Should return "4" no matter the endianess? (Taken care of by glib?)
+>
+>>
+>> >      >>>
+>> >      >>> Hmm maybe we can g_free(bootpath) directly here.
+>> >      >>>
+>> >      >>
+>> >      >> I think it's okay to do it at the bottom of the loop. No real
+>> >     benefit to
+>> >      >> being that eager to free resources in my mind. I expect setup =
+at
+>> >     the top
+>> >      >> of a block and teardown at the bottom of a block.
+>> >      >>
+>> >      >> Trying to do too much in the middle gets messy in my opinion,
+>> >     not that
+>> >      >> it seems to matter here.
+>> >      >
+>> >      > No problem.
+>> >      >
+>> >      >>>> +
+>> >      >>>> +        if (total) {
+>> >      >>>> +            list[total - 1] =3D '\n';
+>> >      >>>> +        }
+>> >      >>>> +        len =3D strlen(chs_string) + 1;
+>> >      >>>> +        list =3D g_realloc(list, total + len);
+>> >      >>>> +        memcpy(&list[total], chs_string, len);
+>> >      >>>> +        total +=3D len;
+>> >      >>>> +        g_free(chs_string);
+>> >      >>>> +        g_free(bootpath);
+>> >      >>>> +    }
+>> >      >>>> +
+>> >      >>>> +    *size =3D total;
+>> >      >>>> +
+>> >      >>>> +    return list;
+>> >      >>>> +}
+>> >      >>>> diff --git a/hw/nvram/fw_cfg.c b/hw/nvram/fw_cfg.c
+>> >      >>>> index 7dc3ac378e..18aff658c0 100644
+>> >      >>>> --- a/hw/nvram/fw_cfg.c
+>> >      >>>> +++ b/hw/nvram/fw_cfg.c
+>> >      >>>> @@ -920,13 +920,21 @@ void *fw_cfg_modify_file(FWCfgState *s=
+,
+>> >     const char *filename,
+>> >      >>>>
+>> >      >>>>  static void fw_cfg_machine_reset(void *opaque)
+>> >      >>>>  {
+>> >      >>>> +    MachineClass *mc =3D MACHINE_GET_CLASS(qdev_get_machine=
+());
+>> >      >>>> +    FWCfgState *s =3D opaque;
+>> >      >>>>      void *ptr;
+>> >      >>>>      size_t len;
+>> >      >>>> -    FWCfgState *s =3D opaque;
+>> >      >>>> -    char *bootindex =3D get_boot_devices_list(&len);
+>> >      >>>> +    char *buf;
+>> >      >>>>
+>> >      >>>> -    ptr =3D fw_cfg_modify_file(s, "bootorder", (uint8_t
+>> >     *)bootindex, len);
+>> >      >>>> +    buf =3D get_boot_devices_list(&len);
+>> >      >>>> +    ptr =3D fw_cfg_modify_file(s, "bootorder", (uint8_t *)b=
+uf,
+>> >     len);
+>> >      >>>>      g_free(ptr);
+>> >      >>>> +
+>> >      >>>> +    if (!mc->legacy_fw_cfg_order) {
+>> >      >>>> +        buf =3D get_boot_devices_lchs_list(&len);
+>> >      >>>> +        ptr =3D fw_cfg_modify_file(s, "bios-geometry", (uin=
+t8_t
+>> >     *)buf, len);
+>> >      >>>
+>> >      >>> OK. Can you add a test in tests/fw_cfg-test.c please?
+>> >      >>>
+>> >      >>
+>> >      >> :D
+>> >      >>
+>> >      >>>> +        g_free(ptr);
+>> >      >>>> +    }
+>> >      >>>>  }
+>> >      >>>>
+>> >      >>>>  static void fw_cfg_machine_ready(struct Notifier *n, void *=
+data)
+>> >      >>>> diff --git a/include/sysemu/sysemu.h b/include/sysemu/sysemu=
+.h
+>> >      >>>> index 5bc5c79cbc..80c57fdc4e 100644
+>> >      >>>> --- a/include/sysemu/sysemu.h
+>> >      >>>> +++ b/include/sysemu/sysemu.h
+>> >      >>>> @@ -106,6 +106,7 @@ void validate_bootdevices(const char
+>> >     *devices, Error **errp);
+>> >      >>>>  void add_boot_device_lchs(DeviceState *dev, const char *suf=
+fix,
+>> >      >>>>                            uint32_t lcyls, uint32_t lheads,
+>> >     uint32_t lsecs);
+>> >      >>>>  void del_boot_device_lchs(DeviceState *dev, const char *suf=
+fix);
+>> >      >>>> +char *get_boot_devices_lchs_list(size_t *size);
+>> >      >>>
+>> >      >>> Please add some documentation. At least 'size' must be non-NU=
+LL.
+>> >      >>>
+>> >      >>
+>> >      >> Sure; but I wasn't going to gate on it because this series wen=
+t
+>> >     unloved
+>> >      >> for so long. At this point, a follow-up patch is fine.
+>> >      >
+>> >      > OK
+>> >      >
+>> >      >>
+>> >      >>> Ideally you should add doc for the other functions added in 3=
+/8
+>> >      >>> "bootdevice: Add interface to gather LCHS" too.
+>> >      >>>
+>> >      >>
+>> >      >> Same thing here.
+>> >      >>
+>> >      >>> John, what do you think about extracting the *boot_device*
+>> >     functions out
+>> >      >>> of "sysemu.h"?
+>> >      >>>
+>> >      >>
+>> >      >> Potentially worthwhile; but not critical at the moment. The
+>> >     source tree
+>> >      >> is not the best-organized thing as-is and I don't think it's f=
+air to
+>> >      >> hold this series up for much longer for nice-to-haves, ultimat=
+ely.
+>> >      >>
+>> >      >> More targeted improvements might avoid the "whose responsibili=
+ty
+>> >     is it
+>> >      >> to stage this?" hot potato we played with this one; so I'd
+>> >     rather have
+>> >      >> smaller follow-up patches handled by the respective maintainer=
+s.
+>> >      >
+>> >      > Sure, fair enough.
+>> >
+>> >     I forgot:
+>> >     Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com
+>> >     <mailto:philmd@redhat.com>>
+>>
+>> Meanwhile I withdraw my fast R-b :(
+>>
+>> Regards,
+>>
+>> Phil.
 
