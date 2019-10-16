@@ -2,138 +2,80 @@ Return-Path: <SRS0=/TIv=YJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A018AECE599
-	for <qemu-devel@archiver.kernel.org>; Wed, 16 Oct 2019 22:49:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E0A76ECE599
+	for <qemu-devel@archiver.kernel.org>; Wed, 16 Oct 2019 23:14:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6D6E42082C
-	for <qemu-devel@archiver.kernel.org>; Wed, 16 Oct 2019 22:49:48 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6D6E42082C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id A17C02168B
+	for <qemu-devel@archiver.kernel.org>; Wed, 16 Oct 2019 23:14:24 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FQkpTZ2z"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A17C02168B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49172 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49728 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iKs71-0001TU-J0
-	for qemu-devel@archiver.kernel.org; Wed, 16 Oct 2019 18:49:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57826)
+	id 1iKsUp-0006gi-P9
+	for qemu-devel@archiver.kernel.org; Wed, 16 Oct 2019 19:14:23 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33330)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jsnow@redhat.com>) id 1iKs5u-0000eK-TO
- for qemu-devel@nongnu.org; Wed, 16 Oct 2019 18:48:40 -0400
+ (envelope-from <alistair23@gmail.com>) id 1iKsUA-0006CL-1G
+ for qemu-devel@nongnu.org; Wed, 16 Oct 2019 19:13:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1iKs5t-0001eh-Al
- for qemu-devel@nongnu.org; Wed, 16 Oct 2019 18:48:38 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:38854)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1iKs5t-0001eK-0u
- for qemu-devel@nongnu.org; Wed, 16 Oct 2019 18:48:37 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id EB5143090FC1;
- Wed, 16 Oct 2019 22:48:35 +0000 (UTC)
-Received: from [10.18.17.173] (dhcp-17-173.bos.redhat.com [10.18.17.173])
- by smtp.corp.redhat.com (Postfix) with ESMTP id EF78019C70;
- Wed, 16 Oct 2019 22:48:34 +0000 (UTC)
-Subject: Re: [PATCH] configure: Require Python >= 3.5
-To: Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org
-References: <20191016224237.26180-1-ehabkost@redhat.com>
-From: John Snow <jsnow@redhat.com>
-Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
- 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
-Message-ID: <7146bebf-6e99-f27a-3753-d48dea1977f9@redhat.com>
-Date: Wed, 16 Oct 2019 18:48:34 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.0
+ (envelope-from <alistair23@gmail.com>) id 1iKsU8-0001TL-Rq
+ for qemu-devel@nongnu.org; Wed, 16 Oct 2019 19:13:41 -0400
+Received: from mail-lj1-x241.google.com ([2a00:1450:4864:20::241]:40467)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <alistair23@gmail.com>)
+ id 1iKsU8-0001T1-KU
+ for qemu-devel@nongnu.org; Wed, 16 Oct 2019 19:13:40 -0400
+Received: by mail-lj1-x241.google.com with SMTP id 7so459149ljw.7
+ for <qemu-devel@nongnu.org>; Wed, 16 Oct 2019 16:13:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=DWFRF4RJ0QSt4UwT65kWbkwBZSAvB9dTyKR5CLZQGYw=;
+ b=FQkpTZ2zw0h7snDHWXKV2Gl1hkjVBzSdQTESuSk3rZfJTUZvdQLx6uwEmbDpy9mpJU
+ 9NUltdY4qIwfBCYpkNrgDyPoc9oFHIf5x8pu4eqL7lgHFXZEVYOWpjZFjrJi7rDyr+BJ
+ n/uyINwjP0EBjzP3emVyRSp2P9dUTn/sC8acCSjYw4nA81kvcMCP0YFQyX4toJdC2ekn
+ Wsf3FrE2lO9Z7tJRifzl0zkY7vXUndR/LCdRQihrWAW5mzocQDVtBSwhJsoNH9izqTij
+ iOGj9fr1lanyCMRHpvRXmgQiiYv2hM7yV4QSF5OyoVCVM4gNz9B0094WPj7LtjeM+x79
+ FxPw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=DWFRF4RJ0QSt4UwT65kWbkwBZSAvB9dTyKR5CLZQGYw=;
+ b=NIizRqEBdLN3DidsTQaIy1k64SuzWmYdqQ4cVeoxdM79n6J3R2B9XmYeTRYaFs3nDz
+ 0wkvMDmNc5TShSXJ9Ck5176BwcOIcimSTxIYafGF92HXc0dNeL09tkm2AJ6q1de+PRxO
+ I3sg+Yh6EQQMVQggYSP8uzU6OqK5ZLy15TOQdOioO1QdiU0rCA3IrRQf8hrNyIiE9yKW
+ dM+SMvMvqPprXXtIgEHufzOaCnJP6+GrOBV9gpABNhxmO8mZXvfrXcBkIUq1twsBZj56
+ MR3e9OJGGNT4DqMXgYcw84alFy/WEM4XNYvCiEwak7ZiVAjiaIP19qGWgMPvy0My8uqa
+ clLg==
+X-Gm-Message-State: APjAAAU7+D0btq6tfVUHOaUSF7ezsPGGL1bcPulcendenNnj2GCCfnBV
+ CiUV4gwilGBbiXNIR970xTXYD0QfLGDZOsgkIps=
+X-Google-Smtp-Source: APXvYqxU3Ix6eXJd0wFxAR/ov6eg1nsF/aByloQM9VAAn560jRZY9uzjPGvB8vh30JkrRrjPhL5HBY9Bd4CGrJ19ACQ=
+X-Received: by 2002:a2e:9604:: with SMTP id v4mr363363ljh.101.1571267619152;
+ Wed, 16 Oct 2019 16:13:39 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20191016224237.26180-1-ehabkost@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.43]); Wed, 16 Oct 2019 22:48:36 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.132.183.28
+References: <1571035899-9692-1-git-send-email-sai.pavan.boddu@xilinx.com>
+In-Reply-To: <1571035899-9692-1-git-send-email-sai.pavan.boddu@xilinx.com>
+From: Alistair Francis <alistair23@gmail.com>
+Date: Wed, 16 Oct 2019 16:08:31 -0700
+Message-ID: <CAKmqyKPtXc4LOeaSyCdh=T3qgM8e+F=oiasbynH1VfTnofOrVA@mail.gmail.com>
+Subject: Re: [PATCH] ssi: xilinx_spips: Filter the non spi registers
+ transactions
+To: Sai Pavan Boddu <sai.pavan.boddu@xilinx.com>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::241
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -145,112 +87,97 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>,
- Thomas Huth <thuth@redhat.com>, Cleber Rosa <crosa@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Alistair Francis <alistair@alistair23.me>,
+ "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-
-
-On 10/16/19 6:42 PM, Eduardo Habkost wrote:
-> Python 3.5 is the oldest Python version available on our
-> supported build platforms, and Python 2 end of life will be 3
-> weeks after the planned release date of QEMU 4.2.0.  Drop Python
-> 2 support from configure completely, and require Python 3.5 or
-> newer.
-> 
-> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-
-Seems like a good time and place to mention this. Kevin, you require
-3.6+ for iotests, which are -- at present -- invoked as part of "make
-check".
-
-Do we care? Basically, this just means that iotests won't run for
-systems that don't have 3.6+, which would be platforms like Debian 9 --
-which is why ehabkost is choosing 3.5 here.
-
---js
-
+On Sun, Oct 13, 2019 at 11:51 PM Sai Pavan Boddu
+<sai.pavan.boddu@xilinx.com> wrote:
+>
+> ZynqMP/Versal specific qspi registers should be handled inside
+> zynqmp_qspi_read/write calls. When few of these transactions are handled by
+> spi hooks we see state change in spi bus unexpectedly.
+>
+> Signed-off-by: Sai Pavan Boddu <sai.pavan.boddu@xilinx.com>
 > ---
->  configure              | 18 ++++--------------
->  tests/Makefile.include |  5 -----
->  2 files changed, 4 insertions(+), 19 deletions(-)
-> 
-> diff --git a/configure b/configure
-> index 08ca4bcb46..870657ec7b 100755
-> --- a/configure
-> +++ b/configure
-> @@ -895,9 +895,9 @@ fi
->  : ${install=${INSTALL-install}}
->  # We prefer python 3.x. A bare 'python' is traditionally
->  # python 2.x, but some distros have it as python 3.x, so
-> -# we check that before python2
-> +# we check that too
->  python=
-> -for binary in "${PYTHON-python3}" python python2
-> +for binary in "${PYTHON-python3}" python
->  do
->      if has "$binary"
->      then
-> @@ -1824,8 +1824,8 @@ fi
->  
->  # Note that if the Python conditional here evaluates True we will exit
->  # with status 1 which is a shell 'false' value.
-> -if ! $python -c 'import sys; sys.exit(sys.version_info < (2,7))'; then
-> -  error_exit "Cannot use '$python', Python 2 >= 2.7 or Python 3 is required." \
-> +if ! $python -c 'import sys; sys.exit(sys.version_info < (3,5))'; then
-> +  error_exit "Cannot use '$python', Python >= 3.5 is required." \
->        "Use --python=/path/to/python to specify a supported Python."
->  fi
->  
-> @@ -6456,15 +6456,6 @@ if test "$supported_os" = "no"; then
->      echo "us upstream at qemu-devel@nongnu.org."
->  fi
->  
-> -# Note that if the Python conditional here evaluates True we will exit
-> -# with status 1 which is a shell 'false' value.
-> -if ! $python -c 'import sys; sys.exit(sys.version_info < (3,0))'; then
-> -  echo
-> -  echo "warning: Python 2 support is deprecated" >&2
-> -  echo "warning: Python 3 will be required for building future versions of QEMU" >&2
-> -  python2="y"
-> -fi
-> -
->  config_host_mak="config-host.mak"
->  
->  echo "# Automatically generated by configure - do not modify" >config-all-disas.mak
-> @@ -7282,7 +7273,6 @@ echo "INSTALL_DATA=$install -c -m 0644" >> $config_host_mak
->  echo "INSTALL_PROG=$install -c -m 0755" >> $config_host_mak
->  echo "INSTALL_LIB=$install -c -m 0644" >> $config_host_mak
->  echo "PYTHON=$python" >> $config_host_mak
-> -echo "PYTHON2=$python2" >> $config_host_mak
->  echo "CC=$cc" >> $config_host_mak
->  if $iasl -h > /dev/null 2>&1; then
->    echo "IASL=$iasl" >> $config_host_mak
-> diff --git a/tests/Makefile.include b/tests/Makefile.include
-> index 3543451ed3..54ee1f0a2f 100644
-> --- a/tests/Makefile.include
-> +++ b/tests/Makefile.include
-> @@ -1137,7 +1137,6 @@ TESTS_RESULTS_DIR=$(BUILD_DIR)/tests/results
->  AVOCADO_SHOW=app
->  AVOCADO_TAGS=$(patsubst %-softmmu,-t arch:%, $(filter %-softmmu,$(TARGET_DIRS)))
->  
-> -ifneq ($(PYTHON2),y)
->  $(TESTS_VENV_DIR): $(TESTS_VENV_REQ)
->  	$(call quiet-command, \
->              $(PYTHON) -m venv --system-site-packages $@, \
-> @@ -1146,10 +1145,6 @@ $(TESTS_VENV_DIR): $(TESTS_VENV_REQ)
->              $(TESTS_VENV_DIR)/bin/python -m pip -q install -r $(TESTS_VENV_REQ), \
->              PIP, $(TESTS_VENV_REQ))
->  	$(call quiet-command, touch $@)
-> -else
-> -$(TESTS_VENV_DIR):
-> -	$(error "venv directory for tests requires Python 3")
-> -endif
->  
->  $(TESTS_RESULTS_DIR):
->  	$(call quiet-command, mkdir -p $@, \
-> 
+>  hw/ssi/xilinx_spips.c | 26 ++++++++++++++++++++++++--
+>  1 file changed, 24 insertions(+), 2 deletions(-)
+>
+> diff --git a/hw/ssi/xilinx_spips.c b/hw/ssi/xilinx_spips.c
+> index a309c71..4f9f8e0 100644
+> --- a/hw/ssi/xilinx_spips.c
+> +++ b/hw/ssi/xilinx_spips.c
+> @@ -109,6 +109,7 @@
+>  #define R_GPIO              (0x30 / 4)
+>  #define R_LPBK_DLY_ADJ      (0x38 / 4)
+>  #define R_LPBK_DLY_ADJ_RESET (0x33)
+> +#define R_IOU_TAPDLY_BYPASS (0x3C / 4)
+>  #define R_TXD1              (0x80 / 4)
+>  #define R_TXD2              (0x84 / 4)
+>  #define R_TXD3              (0x88 / 4)
+> @@ -139,6 +140,8 @@
+>  #define R_LQSPI_STS         (0xA4 / 4)
+>  #define LQSPI_STS_WR_RECVD      (1 << 1)
+>
+> +#define R_DUMMY_CYCLE_EN    (0xC8 / 4)
+> +#define R_ECO               (0xF8 / 4)
+>  #define R_MOD_ID            (0xFC / 4)
+>
+>  #define R_GQSPI_SELECT          (0x144 / 4)
+> @@ -938,7 +941,16 @@ static uint64_t xlnx_zynqmp_qspips_read(void *opaque,
+>      int shortfall;
+>
+>      if (reg <= R_MOD_ID) {
+> -        return xilinx_spips_read(opaque, addr, size);
+> +        switch (addr) {
+> +        case R_GPIO:
+> +        case R_LPBK_DLY_ADJ:
+> +        case R_IOU_TAPDLY_BYPASS:
+> +        case R_DUMMY_CYCLE_EN:
+> +        case R_ECO:
+> +            return s->regs[addr / 4];
+> +        default:
+> +            return xilinx_spips_read(opaque, addr, size);
 
+This doesn't seem right. This should have no functional change for the
+read function and has the consequence of not printing the memory
+accesses. If you try to debug this code now you won't see all of these
+operations in the log.
+
+> +        }
+>      } else {
+>          switch (reg) {
+>          case R_GQSPI_RXD:
+> @@ -1063,7 +1075,17 @@ static void xlnx_zynqmp_qspips_write(void *opaque, hwaddr addr,
+>      uint32_t reg = addr / 4;
+>
+>      if (reg <= R_MOD_ID) {
+> -        xilinx_qspips_write(opaque, addr, value, size);
+> +        switch (reg) {
+> +        case R_GPIO:
+> +        case R_LPBK_DLY_ADJ:
+> +        case R_IOU_TAPDLY_BYPASS:
+> +        case R_DUMMY_CYCLE_EN:
+> +        case R_ECO:
+> +            s->regs[addr] = value;
+> +            break;
+> +        default:
+> +            xilinx_qspips_write(opaque, addr, value, size);
+> +        }
+
+For the write code it looks like this skips the "no_reg_update" goto.
+Maybe that is the issue that you are seeing?
+
+Alistair
+
+>      } else {
+>          switch (reg) {
+>          case R_GQSPI_CNFG:
+> --
+> 2.7.4
+>
+>
 
