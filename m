@@ -2,73 +2,92 @@ Return-Path: <SRS0=/TIv=YJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D2513FA372A
-	for <qemu-devel@archiver.kernel.org>; Wed, 16 Oct 2019 17:31:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0437BFA3728
+	for <qemu-devel@archiver.kernel.org>; Wed, 16 Oct 2019 17:57:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A78A82064B
-	for <qemu-devel@archiver.kernel.org>; Wed, 16 Oct 2019 17:31:53 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A78A82064B
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id C5E07207FF
+	for <qemu-devel@archiver.kernel.org>; Wed, 16 Oct 2019 17:57:21 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ULzOd9Ld"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C5E07207FF
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46562 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46680 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iKn9M-0007tb-Ph
-	for qemu-devel@archiver.kernel.org; Wed, 16 Oct 2019 13:31:52 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46012)
+	id 1iKnY0-0006uU-Ib
+	for qemu-devel@archiver.kernel.org; Wed, 16 Oct 2019 13:57:20 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49064)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1iKn8N-0007Rq-3n
- for qemu-devel@nongnu.org; Wed, 16 Oct 2019 13:30:52 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1iKnXK-0006SR-UU
+ for qemu-devel@nongnu.org; Wed, 16 Oct 2019 13:56:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1iKn8L-0004b7-P1
- for qemu-devel@nongnu.org; Wed, 16 Oct 2019 13:30:51 -0400
-Received: from indium.canonical.com ([91.189.90.7]:46824)
+ (envelope-from <alex.bennee@linaro.org>) id 1iKnXJ-0005se-Ba
+ for qemu-devel@nongnu.org; Wed, 16 Oct 2019 13:56:38 -0400
+Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:35641)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1iKn8L-0004Zy-4s
- for qemu-devel@nongnu.org; Wed, 16 Oct 2019 13:30:49 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1iKn8J-0006Mj-3B
- for <qemu-devel@nongnu.org>; Wed, 16 Oct 2019 17:30:47 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 171B92E80C0
- for <qemu-devel@nongnu.org>; Wed, 16 Oct 2019 17:30:47 +0000 (UTC)
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1iKnXJ-0005sI-5H
+ for qemu-devel@nongnu.org; Wed, 16 Oct 2019 13:56:37 -0400
+Received: by mail-wm1-x341.google.com with SMTP id y21so3754419wmi.0
+ for <qemu-devel@nongnu.org>; Wed, 16 Oct 2019 10:56:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=4EbsfDokOIkOLaV0giHdnvonQWEjy7lBJVHzgkXQhWk=;
+ b=ULzOd9LdM2RNHdPQylbBlEGOfmCcis/gdL9ZMphjsv+Mz62nlKSIMyfNSmoOS8cCI2
+ +UFpd/j83OVptrtUmZs6XPKWMK6VGW0OUdymxBn4kKtNp/vDQOX6gR98VFkD7TOsaWTV
+ xsZMCwOrIKreiROLzNUtYjXaGrDZ43JMcrK/kzJKgjyUGgGYN5WYpxElBItpAAbF3gqy
+ l3hdsVsfz302mu3NG7ZoX1tAKNdTScDGkj+v9xEc3wowG00qKJPmQBI+8GoGkzNl0ma/
+ HiYLCvb0wYXHyucaugbqAqET0sip73LN4Zs/54pVTD+0KxoOlrw8/myml3FbBeV9xCzJ
+ dCwg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=4EbsfDokOIkOLaV0giHdnvonQWEjy7lBJVHzgkXQhWk=;
+ b=tdmyZ9uD3ks1N2QLlrceeEtyeyIQA5cRvMbZTy2m2YqDtQIj1XshcISUA88J2SSQxv
+ vDvJNp1ZAXpp0S/b3izZyGmLLZ5zq9ubmcUdmT7FRt8swmD1agiXCYbt6TD1ywBe+FX5
+ A9osvWR+FRMSayP9WqVhidoPXj4KjFuEdnOMJXUF2iFoObTJddsy9C2vmFDRk2uz7THb
+ DcPH0BZCDlGJrXUij/O2ytCB59jWFc8sTO2sz1WyTKX3fMl+aOS+tH1NgBc6/gWqFeNN
+ 2bEHWB0J2t/6fiJKT0R7Y3VDhNeLQseKGrtAC97++FBDm+Ugo46je2k81YNU4PXB6gxQ
+ 9qjA==
+X-Gm-Message-State: APjAAAXDw7w0ZtrcCu/KGOHf8NPmxWTuhIf4DC7e3HUSFdhkGKy+hX8u
+ IoTJsScox+AUNxvPIKdYkCGpvQ==
+X-Google-Smtp-Source: APXvYqyW59QK69+m8QEIg2sjdFO8Boq9flDOd36/G2xrfuJOexunVN/B5kj2LGFJY0NMb7zU+HHY9Q==
+X-Received: by 2002:a7b:c219:: with SMTP id x25mr4736785wmi.143.1571248594991; 
+ Wed, 16 Oct 2019 10:56:34 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id s1sm36071637wrg.80.2019.10.16.10.56.34
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 16 Oct 2019 10:56:34 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 9F5D51FF87;
+ Wed, 16 Oct 2019 18:56:33 +0100 (BST)
+References: <20191009170701.14756-1-thuth@redhat.com>
+User-agent: mu4e 1.3.5; emacs 27.0.50
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Thomas Huth <thuth@redhat.com>
+Subject: Re: [PATCH 0/5] travis.yml improvements: Update libraries, build
+ with arm64
+In-reply-to: <20191009170701.14756-1-thuth@redhat.com>
+Date: Wed, 16 Oct 2019 18:56:33 +0100
+Message-ID: <874l0860by.fsf@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Date: Wed, 16 Oct 2019 17:19:47 -0000
-From: Anastasios Vacharakis <1848244@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: docmax3
-X-Launchpad-Bug-Reporter: Anastasios Vacharakis (docmax3)
-X-Launchpad-Bug-Modifier: Anastasios Vacharakis (docmax3)
-References: <157116697702.19855.6802467063820397619.malonedeb@gac.canonical.com>
-Message-Id: <157124638777.22114.14872963198001534244.malone@wampee.canonical.com>
-Subject: [Bug 1848244] Re: QEMU KVM IGD SandyBridge Passthrough crash
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="186023fa645d8be19d403a76064f0643f510db2f";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 21f509f385144b72445b61f9cddce530fd0b5809
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 91.189.90.7
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::341
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -77,55 +96,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1848244 <1848244@bugs.launchpad.net>
+Cc: Fam Zheng <fam@euphon.net>, Peter Maydell <peter.maydell@linaro.org>,
+ Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Solved: I added kvm.ignore_msrs=3D1 to kernel parameter!
 
--- =
+Thomas Huth <thuth@redhat.com> writes:
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1848244
+> Update / add some libraries that we use in the Travis builds, and
+> enable compiling on the aarch64 host, too.
 
-Title:
-  QEMU KVM IGD SandyBridge Passthrough crash
+Queued 1-3 to testing/next and I'll have a play with 4/5 but probably
+won't include them in the final PR unless they seem solid.
 
-Status in QEMU:
-  New
+>
+> Thomas Huth (5):
+>   travis.yml: Add libvdeplug-dev to compile-test net/vde.c
+>   travis.yml: Use libsdl2 instead of libsdl1.2, and install
+>     libsdl2-image
+>   travis.yml: Use newer version of libgnutls and libpng
+>   travis.yml: Fix the ccache lines
+>   travis.yml: Compile on arm64, too
+>
+>  .travis.yml | 21 +++++++++++++++------
+>  1 file changed, 15 insertions(+), 6 deletions(-)
 
-Bug description:
-  I try to passthrough my Intel GPU with this command:
 
-  qemu-system-x86_64 -nodefaults -parallel none -k de -rtc
-  base=3Dlocaltime -serial unix:/run/qemu/win7-serial.sock,server,nowait
-  -monitor unix:/run/qemu/win7-monitor.sock,server,nowait -netdev
-  user,id=3Dnet0 -device virtio-net-pci,netdev=3Dnet0,mac=3D52:54:00:00:00:=
-07
-  -device vfio-pci,host=3D0000:00:02.0,addr=3D0x2 -device vfio-
-  pci,host=3D0000:00:1b.0 -device virtio-keyboard-pci -device virtio-
-  mouse-pci -object input-linux,id=3Dkbd1,evdev=3D/dev/input/by-
-  path/pci-0000:00:1a.0-usb-0:1.2.2:1.2-event-kbd,grab_all=3Don,repeat=3Don
-  -object input-linux,id=3Dmouse1,evdev=3D/dev/input/by-
-  path/pci-0000:00:1a.0-usb-0:1.2.2:1.2-event-mouse -enable-kvm -cpu
-  host -smp 4,sockets=3D1,cores=3D4,threads=3D1 -vga none -display none -m =
-2g
-  -device virtio-blk-pci,drive=3Dboot,bootindex=3D1 -drive
-  file=3D/opt/vm/qcow2/win7.qcow2,format=3Dqcow2,if=3Dnone,id=3Dboot
-
-  This ONLY works if i remove "-enable-kvm" else the windows (7 and 10)
-  boot crashes in bluescreen "stop 0x0000003b" (probably while loading
-  the intel gpu driver (intel graphics 3000).
-
-  The system is an older ThinkPad T420 with Intel(R) Core(TM) i5-2520M
-  CPU @ 2.50GHz.
-
-  CMDLINE: BOOT_IMAGE=3D/vmlinuz-linux root=3DLABEL=3Droot rw ipv6.disable=
-=3D0
-  net.ifnames=3D0 intel_iommu=3Don iommu=3Dpt video=3DLVDS-1:d
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1848244/+subscriptions
+--
+Alex Benn=C3=A9e
 
