@@ -2,48 +2,46 @@ Return-Path: <SRS0=/TIv=YJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 56BFDFA3728
-	for <qemu-devel@archiver.kernel.org>; Wed, 16 Oct 2019 17:11:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 43AA4FA372A
+	for <qemu-devel@archiver.kernel.org>; Wed, 16 Oct 2019 17:13:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2C4392067D
-	for <qemu-devel@archiver.kernel.org>; Wed, 16 Oct 2019 17:11:01 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2C4392067D
+	by mail.kernel.org (Postfix) with ESMTPS id 1A0092067D
+	for <qemu-devel@archiver.kernel.org>; Wed, 16 Oct 2019 17:13:14 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1A0092067D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46003 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46018 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iKmp9-0007zO-VE
-	for qemu-devel@archiver.kernel.org; Wed, 16 Oct 2019 13:10:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42179)
+	id 1iKmrJ-0001dx-8q
+	for qemu-devel@archiver.kernel.org; Wed, 16 Oct 2019 13:13:13 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42180)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iKmnb-0005y0-V3
- for qemu-devel@nongnu.org; Wed, 16 Oct 2019 13:09:25 -0400
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iKmnb-0005y1-W4
+ for qemu-devel@nongnu.org; Wed, 16 Oct 2019 13:09:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iKmna-0003UN-1W
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iKmna-0003U9-14
  for qemu-devel@nongnu.org; Wed, 16 Oct 2019 13:09:23 -0400
-Received: from relay.sw.ru ([185.231.240.75]:52720)
+Received: from relay.sw.ru ([185.231.240.75]:52716)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1iKmnS-0003Pc-Ar; Wed, 16 Oct 2019 13:09:15 -0400
+ id 1iKmnS-0003PY-A6; Wed, 16 Oct 2019 13:09:14 -0400
 Received: from [10.94.3.0] (helo=kvm.qa.sw.ru)
  by relay.sw.ru with esmtp (Exim 4.92.2)
  (envelope-from <vsementsov@virtuozzo.com>)
- id 1iKmnL-0002PI-Hz; Wed, 16 Oct 2019 20:09:08 +0300
+ id 1iKmnK-0002PI-NX; Wed, 16 Oct 2019 20:09:06 +0300
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 To: qemu-block@nongnu.org
-Subject: [PATCH v2 2/6] block/block-copy: limit copy_range_size to 16 MiB
-Date: Wed, 16 Oct 2019 20:09:01 +0300
-Message-Id: <20191016170905.8325-3-vsementsov@virtuozzo.com>
+Subject: [PATCH v2 0/6] block-copy: memory limit
+Date: Wed, 16 Oct 2019 20:08:59 +0300
+Message-Id: <20191016170905.8325-1-vsementsov@virtuozzo.com>
 X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20191016170905.8325-1-vsementsov@virtuozzo.com>
-References: <20191016170905.8325-1-vsementsov@virtuozzo.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [fuzzy]
@@ -65,49 +63,40 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Large copy range may imply memory allocation and large io effort, so
-using 2G copy range request may be bad idea. Let's limit it to 16 MiB.
-It also helps the following patch to refactor copy-with-offload
-fallback to copy-with-bounce-buffer.
+I'm going to bring block-status driven, async copying process to
+block-copy, to make it fast. The first step is to limit memory usage of
+backup, here is it.
 
-Note, that total memory usage of backup is still not limited, it will
-be fixed in further commit.
+v2: [mostly by Max's comments]
+Now based on master (Thank you Max!)
+01: add Max's r-b
+02: add Max's r-b
+03: - refactor block_copy_do_copy goto/return
+    - add small comment to block_copy_do_copy
+04: - a lot of renaming and wording fixes
+    - refactor to use "available" instead of "taken"
+    - refactor co_get_from_shres
+05: rebase on 04 changes
+06: drop extra things from max_transfer calculation
 
-Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Reviewed-by: Max Reitz <mreitz@redhat.com>
----
- block/block-copy.c | 10 ++++++++--
- 1 file changed, 8 insertions(+), 2 deletions(-)
+Vladimir Sementsov-Ogievskiy (6):
+  block/block-copy: allocate buffer in block_copy_with_bounce_buffer
+  block/block-copy: limit copy_range_size to 16 MiB
+  block/block-copy: refactor copying
+  util: introduce SharedResource
+  block/block-copy: add memory limit
+  block/block-copy: increase buffered copy request
 
-diff --git a/block/block-copy.c b/block/block-copy.c
-index 22b0bd7d07..e37dfbfd03 100644
---- a/block/block-copy.c
-+++ b/block/block-copy.c
-@@ -18,6 +18,9 @@
- #include "qapi/error.h"
- #include "block/block-copy.h"
- #include "sysemu/block-backend.h"
-+#include "qemu/units.h"
-+
-+#define BLOCK_COPY_MAX_COPY_RANGE (16 * MiB)
- 
- static void coroutine_fn block_copy_wait_inflight_reqs(BlockCopyState *s,
-                                                        int64_t start,
-@@ -70,9 +73,12 @@ BlockCopyState *block_copy_state_new(BdrvChild *source, BdrvChild *target,
- {
-     BlockCopyState *s;
-     BdrvDirtyBitmap *copy_bitmap;
-+
-+    /* Ignore BLOCK_COPY_MAX_COPY_RANGE if requested cluster_size is larger */
-     uint32_t max_transfer =
--            MIN_NON_ZERO(INT_MAX, MIN_NON_ZERO(source->bs->bl.max_transfer,
--                                               target->bs->bl.max_transfer));
-+            MIN_NON_ZERO(MAX(cluster_size, BLOCK_COPY_MAX_COPY_RANGE),
-+                         MIN_NON_ZERO(source->bs->bl.max_transfer,
-+                                      target->bs->bl.max_transfer));
- 
-     copy_bitmap = bdrv_create_dirty_bitmap(source->bs, cluster_size, NULL,
-                                            errp);
+ include/block/block-copy.h        |   5 +-
+ include/qemu/co-shared-resource.h |  71 ++++++++++++
+ block/block-copy.c                | 182 +++++++++++++++---------------
+ util/qemu-co-shared-resource.c    |  76 +++++++++++++
+ block/trace-events                |   6 +-
+ util/Makefile.objs                |   1 +
+ 6 files changed, 249 insertions(+), 92 deletions(-)
+ create mode 100644 include/qemu/co-shared-resource.h
+ create mode 100644 util/qemu-co-shared-resource.c
+
 -- 
 2.21.0
 
