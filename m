@@ -2,72 +2,67 @@ Return-Path: <SRS0=/TIv=YJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BD1BEFA3728
-	for <qemu-devel@archiver.kernel.org>; Wed, 16 Oct 2019 19:03:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7DC06ECE599
+	for <qemu-devel@archiver.kernel.org>; Wed, 16 Oct 2019 19:18:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 951D621E6F
-	for <qemu-devel@archiver.kernel.org>; Wed, 16 Oct 2019 19:03:54 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 951D621E6F
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=sifive.com
+	by mail.kernel.org (Postfix) with ESMTPS id 54C0E21835
+	for <qemu-devel@archiver.kernel.org>; Wed, 16 Oct 2019 19:18:56 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 54C0E21835
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47196 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47312 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iKoaP-0002vI-Ow
-	for qemu-devel@archiver.kernel.org; Wed, 16 Oct 2019 15:03:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58371)
+	id 1iKoox-0006eb-GJ
+	for qemu-devel@archiver.kernel.org; Wed, 16 Oct 2019 15:18:55 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60280)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <palmer@dabbelt.com>) id 1iKoZN-0001zn-S6
- for qemu-devel@nongnu.org; Wed, 16 Oct 2019 15:02:51 -0400
+ (envelope-from <no-reply@patchew.org>) id 1iKonr-00065g-Vf
+ for qemu-devel@nongnu.org; Wed, 16 Oct 2019 15:17:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <palmer@dabbelt.com>) id 1iKoZL-0006mq-MN
- for qemu-devel@nongnu.org; Wed, 16 Oct 2019 15:02:49 -0400
-Received: from mail-pg1-f193.google.com ([209.85.215.193]:36943)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <palmer@dabbelt.com>) id 1iKoZH-0006io-Os
- for qemu-devel@nongnu.org; Wed, 16 Oct 2019 15:02:45 -0400
-Received: by mail-pg1-f193.google.com with SMTP id p1so14829733pgi.4
- for <qemu-devel@nongnu.org>; Wed, 16 Oct 2019 12:02:40 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:subject:in-reply-to:cc:from:to:message-id
- :mime-version:content-transfer-encoding;
- bh=VoUAelHoI5V1dDOgS0kCadoKVsKPF3UKMPiydVe91WA=;
- b=mzAgwziSwRkLyJUNlzouNYBoy8A4agYsD2CLsfO4+Nj/lF5e63fwNP8Ajw1iiIJe96
- 0qhz/eA+ZaRA6rJAQPiVavPTsK5idb4+jQf24njs+rbDOVSnG42vnr48XTg11xo11jy7
- /OUpnCkyUSNrhNdm3Q6UrHlxx2U07dz5PWMhyUbkzuimv6ze6qW/HSCZD7wMAbcv4tBT
- iT628rv8U+AlF8qYmXG6vjhItG3SkQ5sgYuZssluc9K4NaTaHo+rSWo4MB1ZbjRoNZXX
- dvO7gv1Z+LgZUiN8/uLJWjakv8riF6lt7TgPtyRb14Px6ABMWgiwFJJ7r448JXtdZ2ah
- dzJA==
-X-Gm-Message-State: APjAAAUFBcs56MSAO1NPb3DALu4pqAv9gwInFCgI+mUe9RDS4mOumRtw
- 0aHie5Q1mZWdHfEd6MdtgovjxQ==
-X-Google-Smtp-Source: APXvYqzyn64nwbUQaFXJFN0zNxjeU3uva0H9KzIOUOJsapQy1O0csL+s73+oNNBZy0TUUaT5Sw3U7A==
-X-Received: by 2002:a17:90a:2ec1:: with SMTP id
- h1mr6881400pjs.96.1571252559100; 
- Wed, 16 Oct 2019 12:02:39 -0700 (PDT)
-Received: from localhost ([12.206.222.5])
- by smtp.gmail.com with ESMTPSA id s36sm26596156pgk.84.2019.10.16.12.02.37
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 16 Oct 2019 12:02:38 -0700 (PDT)
-Date: Wed, 16 Oct 2019 12:02:38 -0700 (PDT)
-X-Google-Original-Date: Wed, 16 Oct 2019 09:36:47 PDT (-0700)
-Subject: Re: [PATCH v1 22/28] target/riscv: Allow specifying MMU stage
-In-Reply-To: <CAKmqyKOV0J3w3fPUF3CGAip=j_+D_M+7X9r+2TwEZwkapsQZMQ@mail.gmail.com>
-From: Palmer Dabbelt <palmer@sifive.com>
-To: alistair23@gmail.com
-Message-ID: <mhng-8a742b0f-e79f-4da0-81fc-b91d184b6279@palmer-si-x1e>
-Mime-Version: 1.0 (MHng)
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
+ (envelope-from <no-reply@patchew.org>) id 1iKonq-0007GF-Hc
+ for qemu-devel@nongnu.org; Wed, 16 Oct 2019 15:17:47 -0400
+Resent-Date: Wed, 16 Oct 2019 15:17:47 -0400
+Resent-Message-Id: <E1iKonq-0007GF-Hc@eggs.gnu.org>
+Received: from sender4-of-o56.zoho.com ([136.143.188.56]:21661)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <no-reply@patchew.org>)
+ id 1iKonq-0007Fa-A8
+ for qemu-devel@nongnu.org; Wed, 16 Oct 2019 15:17:46 -0400
+ARC-Seal: i=1; a=rsa-sha256; t=1571253436; cv=none; d=zoho.com; s=zohoarc; 
+ b=QKwteOkAhonZQ3U9ZuWWTD+sboGzlkuTxe9JU5s1HVWlaspAQsNAmAVYAmkIPYEaKeR2w2hbRZqSbZdQD+nIDJTbqfu1wBpP3YfgR1bfp4XGoX6XdaK70Y0MIha+Ch1ncbRoEZ7oJ0yvcTqvDAxbfJgKPw3cdKFF159+HEm34Ok=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zoho.com;
+ s=zohoarc; t=1571253436;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
+ bh=5GHhjemoNO/OEDDLAZQJ/C3ACvaKepribzwUSIpTTZY=; 
+ b=RpvXkfeC/DVECPF2FIhRqZ5udZoMI0kKSgwgIDdnE7trZy1ZeVO+jlD0p7S+ZTz5E9YH8UgYVqDCLIBcliY278hdoGxYYj73x3vdAM1ddS3f0KxU1eYIhBw9r+LXShH65FUHOJ/jsxQskHcjquUX96WzIlEIaqiACx5sUocgK8U=
+ARC-Authentication-Results: i=1; mx.zoho.com; dkim=pass  header.i=patchew.org;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 157125343426373.19325636141127;
+ Wed, 16 Oct 2019 12:17:14 -0700 (PDT)
+In-Reply-To: <1571243333-882302-1-git-send-email-andrey.shinkevich@virtuozzo.com>
+Subject: Re: [PATCH v4 0/4] qcow2: advanced compression options
+Message-ID: <157125343247.16217.14509317350988321635@37313f22b938>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: andrey.shinkevich@virtuozzo.com
+Date: Wed, 16 Oct 2019 12:17:14 -0700 (PDT)
+X-ZohoMailClient: External
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 209.85.215.193
+X-Received-From: 136.143.188.56
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -79,117 +74,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-riscv@nongnu.org, Anup Patel <Anup.Patel@wdc.com>,
- Alistair Francis <Alistair.Francis@wdc.com>, qemu-devel@nongnu.org,
- Atish Patra <Atish.Patra@wdc.com>
+Reply-To: qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, fam@euphon.net, vsementsov@virtuozzo.com,
+ qemu-block@nongnu.org, qemu-devel@nongnu.org, armbru@redhat.com,
+ stefanha@redhat.com, den@openvz.org, andrey.shinkevich@virtuozzo.com,
+ mreitz@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, 07 Oct 2019 11:05:33 PDT (-0700), alistair23@gmail.com wrote:
-> On Thu, Oct 3, 2019 at 8:53 AM Palmer Dabbelt <palmer@sifive.com> wrote:
->>
->> On Fri, 23 Aug 2019 16:38:47 PDT (-0700), Alistair Francis wrote:
->> > Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
->> > ---
->> >  target/riscv/cpu_helper.c | 39 ++++++++++++++++++++++++++++++---------
->> >  1 file changed, 30 insertions(+), 9 deletions(-)
->> >
->> > diff --git a/target/riscv/cpu_helper.c b/target/riscv/cpu_helper.c
->> > index 098873c83e..9aa6906acd 100644
->> > --- a/target/riscv/cpu_helper.c
->> > +++ b/target/riscv/cpu_helper.c
->> > @@ -318,10 +318,19 @@ void riscv_cpu_set_mode(CPURISCVState *env, target_ulong newpriv)
->> >   *
->> >   * Adapted from Spike's mmu_t::translate and mmu_t::walk
->> >   *
->> > + * @env: CPURISCVState
->> > + * @physical: This will be set to the calculated physical address
->> > + * @prot: The returned protection attributes
->> > + * @addr: The virtual address to be translated
->> > + * @access_type: The type of MMU access
->> > + * @mmu_idx: Indicates current privilege level
->> > + * @first_stage: Are we in first stage translation?
->> > + *               Second stage is used for hypervisor guest translation
->> >   */
->> >  static int get_physical_address(CPURISCVState *env, hwaddr *physical,
->> >                                  int *prot, target_ulong addr,
->> > -                                int access_type, int mmu_idx)
->> > +                                int access_type, int mmu_idx,
->> > +                                bool first_stage)
->> >  {
->> >      /* NOTE: the env->pc value visible here will not be
->> >       * correct, but the value visible to the exception handler
->> > @@ -518,13 +527,23 @@ restart:
->> >  }
->> >
->> >  static void raise_mmu_exception(CPURISCVState *env, target_ulong address,
->> > -                                MMUAccessType access_type, bool pmp_violation)
->> > +                                MMUAccessType access_type, bool pmp_violation,
->> > +                                bool first_stage)
->> >  {
->> >      CPUState *cs = env_cpu(env);
->> > -    int page_fault_exceptions =
->> > -        (env->priv_ver >= PRIV_VERSION_1_10_0) &&
->> > -        get_field(env->satp, SATP_MODE) != VM_1_10_MBARE &&
->> > -        !pmp_violation;
->> > +    int page_fault_exceptions;
->> > +    if (first_stage) {
->> > +        page_fault_exceptions =
->> > +            (env->priv_ver >= PRIV_VERSION_1_10_0) &&
->> > +            get_field(env->satp, SATP_MODE) != VM_1_10_MBARE &&
->> > +            !pmp_violation;
->> > +            riscv_cpu_set_force_hs_excep(env, CLEAR_HS_EXCEP);
->>
->> It might just be email, but the indentation looks wrong here.
->
-> Yep, fixed.
->
->>
->> > +    } else {
->> > +        page_fault_exceptions =
->> > +            get_field(env->hgatp, HGATP_MODE) != VM_1_10_MBARE &&
->> > +            !pmp_violation;
->> > +            riscv_cpu_set_force_hs_excep(env, FORCE_HS_EXCEP);
->> > +    }
->> >      switch (access_type) {
->> >      case MMU_INST_FETCH:
->> >          cs->exception_index = page_fault_exceptions ?
->> > @@ -551,7 +570,8 @@ hwaddr riscv_cpu_get_phys_page_debug(CPUState *cs, vaddr addr)
->> >      int prot;
->> >      int mmu_idx = cpu_mmu_index(&cpu->env, false);
->> >
->> > -    if (get_physical_address(&cpu->env, &phys_addr, &prot, addr, 0, mmu_idx)) {
->> > +    if (get_physical_address(&cpu->env, &phys_addr, &prot, addr, 0, mmu_idx,
->> > +                             true)) {
->> >          return -1;
->> >      }
->> >      return phys_addr;
->> > @@ -613,7 +633,8 @@ bool riscv_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
->> >      qemu_log_mask(CPU_LOG_MMU, "%s ad %" VADDR_PRIx " rw %d mmu_idx %d\n",
->> >                    __func__, address, access_type, mmu_idx);
->> >
->> > -    ret = get_physical_address(env, &pa, &prot, address, access_type, mmu_idx);
->> > +    ret = get_physical_address(env, &pa, &prot, address, access_type, mmu_idx,
->> > +                               true);
->> >
->> >      if (mode == PRV_M && access_type != MMU_INST_FETCH) {
->> >          if (get_field(*env->mstatus, MSTATUS_MPRV)) {
->> > @@ -640,7 +661,7 @@ bool riscv_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
->> >      } else if (probe) {
->> >          return false;
->> >      } else {
->> > -        raise_mmu_exception(env, address, access_type, pmp_violation);
->> > +        raise_mmu_exception(env, address, access_type, pmp_violation, true);
->> >          riscv_raise_exception(env, cs->exception_index, retaddr);
->> >      }
->> >  #else
->>
->> I don't think it makes sense to split off these two (23 and 24, that add the
->> argument) out from the implementation.
->
-> The goal was just to make it easier to review. If you want them
-> combined I can easily combine them.
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8xNTcxMjQzMzMzLTg4MjMwMi0x
+LWdpdC1zZW5kLWVtYWlsLWFuZHJleS5zaGlua2V2aWNoQHZpcnR1b3p6by5jb20vCgoKCkhpLAoK
+VGhpcyBzZXJpZXMgZmFpbGVkIHRoZSBkb2NrZXItcXVpY2tAY2VudG9zNyBidWlsZCB0ZXN0LiBQ
+bGVhc2UgZmluZCB0aGUgdGVzdGluZyBjb21tYW5kcyBhbmQKdGhlaXIgb3V0cHV0IGJlbG93LiBJ
+ZiB5b3UgaGF2ZSBEb2NrZXIgaW5zdGFsbGVkLCB5b3UgY2FuIHByb2JhYmx5IHJlcHJvZHVjZSBp
+dApsb2NhbGx5LgoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaAptYWtlIGRv
+Y2tlci1pbWFnZS1jZW50b3M3IFY9MSBORVRXT1JLPTEKdGltZSBtYWtlIGRvY2tlci10ZXN0LXF1
+aWNrQGNlbnRvczcgU0hPV19FTlY9MSBKPTE0IE5FVFdPUks9MQo9PT0gVEVTVCBTQ1JJUFQgRU5E
+ID09PQoKICBDQyAgICAgIGJsb2NrL3FlZC10YWJsZS5vCiAgQ0MgICAgICBibG9jay9xZWQtY2x1
+c3Rlci5vCi90bXAvcWVtdS10ZXN0L3NyYy9ibG9jay9xY293Mi5jOiBJbiBmdW5jdGlvbiAncWNv
+dzJfY29fcHdyaXRldl9jb21wcmVzc2VkX3BhcnQnOgovdG1wL3FlbXUtdGVzdC9zcmMvYmxvY2sv
+cWNvdzIuYzo0MjQ0Ojk6IGVycm9yOiAncmV0JyBtYXkgYmUgdXNlZCB1bmluaXRpYWxpemVkIGlu
+IHRoaXMgZnVuY3Rpb24gWy1XZXJyb3I9bWF5YmUtdW5pbml0aWFsaXplZF0KICAgICBpbnQgcmV0
+OwogICAgICAgICBeCmNjMTogYWxsIHdhcm5pbmdzIGJlaW5nIHRyZWF0ZWQgYXMgZXJyb3JzCm1h
+a2U6ICoqKiBbYmxvY2svcWNvdzIub10gRXJyb3IgMQptYWtlOiAqKiogV2FpdGluZyBmb3IgdW5m
+aW5pc2hlZCBqb2JzLi4uLgpUcmFjZWJhY2sgKG1vc3QgcmVjZW50IGNhbGwgbGFzdCk6CiAgRmls
+ZSAiLi90ZXN0cy9kb2NrZXIvZG9ja2VyLnB5IiwgbGluZSA2NjIsIGluIDxtb2R1bGU+Ci0tLQog
+ICAgcmFpc2UgQ2FsbGVkUHJvY2Vzc0Vycm9yKHJldGNvZGUsIGNtZCkKc3VicHJvY2Vzcy5DYWxs
+ZWRQcm9jZXNzRXJyb3I6IENvbW1hbmQgJ1snc3VkbycsICctbicsICdkb2NrZXInLCAncnVuJywg
+Jy0tbGFiZWwnLCAnY29tLnFlbXUuaW5zdGFuY2UudXVpZD1iMTA5YWJhY2Q4MDU0ZWZjOTkyZDY2
+ZmEyOGNhN2Q4YycsICctdScsICcxMDAzJywgJy0tc2VjdXJpdHktb3B0JywgJ3NlY2NvbXA9dW5j
+b25maW5lZCcsICctLXJtJywgJy1lJywgJ1RBUkdFVF9MSVNUPScsICctZScsICdFWFRSQV9DT05G
+SUdVUkVfT1BUUz0nLCAnLWUnLCAnVj0nLCAnLWUnLCAnSj0xNCcsICctZScsICdERUJVRz0nLCAn
+LWUnLCAnU0hPV19FTlY9MScsICctZScsICdDQ0FDSEVfRElSPS92YXIvdG1wL2NjYWNoZScsICct
+dicsICcvaG9tZS9wYXRjaGV3Mi8uY2FjaGUvcWVtdS1kb2NrZXItY2NhY2hlOi92YXIvdG1wL2Nj
+YWNoZTp6JywgJy12JywgJy92YXIvdG1wL3BhdGNoZXctdGVzdGVyLXRtcC1nZTlpa3Zlei9zcmMv
+ZG9ja2VyLXNyYy4yMDE5LTEwLTE2LTE1LjE1LjA4Ljk4MzI6L3Zhci90bXAvcWVtdTp6LHJvJywg
+J3FlbXU6Y2VudG9zNycsICcvdmFyL3RtcC9xZW11L3J1bicsICd0ZXN0LXF1aWNrJ10nIHJldHVy
+bmVkIG5vbi16ZXJvIGV4aXQgc3RhdHVzIDIuCmZpbHRlcj0tLWZpbHRlcj1sYWJlbD1jb20ucWVt
+dS5pbnN0YW5jZS51dWlkPWIxMDlhYmFjZDgwNTRlZmM5OTJkNjZmYTI4Y2E3ZDhjCm1ha2VbMV06
+ICoqKiBbZG9ja2VyLXJ1bl0gRXJyb3IgMQptYWtlWzFdOiBMZWF2aW5nIGRpcmVjdG9yeSBgL3Zh
+ci90bXAvcGF0Y2hldy10ZXN0ZXItdG1wLWdlOWlrdmV6L3NyYycKbWFrZTogKioqIFtkb2NrZXIt
+cnVuLXRlc3QtcXVpY2tAY2VudG9zN10gRXJyb3IgMgoKcmVhbCAgICAybTQuNTQzcwp1c2VyICAg
+IDBtOC4xNjFzCgoKVGhlIGZ1bGwgbG9nIGlzIGF2YWlsYWJsZSBhdApodHRwOi8vcGF0Y2hldy5v
+cmcvbG9ncy8xNTcxMjQzMzMzLTg4MjMwMi0xLWdpdC1zZW5kLWVtYWlsLWFuZHJleS5zaGlua2V2
+aWNoQHZpcnR1b3p6by5jb20vdGVzdGluZy5kb2NrZXItcXVpY2tAY2VudG9zNy8/dHlwZT1tZXNz
+YWdlLgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cHM6
+Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2
+ZWxAcmVkaGF0LmNvbQ==
 
-It's making it harder to read on my end :)
 
