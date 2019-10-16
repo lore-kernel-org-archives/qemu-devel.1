@@ -6,69 +6,59 @@ X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0BA82FA372A
-	for <qemu-devel@archiver.kernel.org>; Wed, 16 Oct 2019 14:31:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6D1C1FA372A
+	for <qemu-devel@archiver.kernel.org>; Wed, 16 Oct 2019 14:36:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D2E312067D
-	for <qemu-devel@archiver.kernel.org>; Wed, 16 Oct 2019 14:31:39 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D2E312067D
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=weiser.dinsnail.net
+	by mail.kernel.org (Postfix) with ESMTPS id 435CE2067D
+	for <qemu-devel@archiver.kernel.org>; Wed, 16 Oct 2019 14:36:57 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 435CE2067D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43322 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43446 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iKkKw-0003sg-Qd
-	for qemu-devel@archiver.kernel.org; Wed, 16 Oct 2019 10:31:38 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40792)
+	id 1iKkQ4-0007LP-5s
+	for qemu-devel@archiver.kernel.org; Wed, 16 Oct 2019 10:36:56 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41715)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1iKkK4-0003B6-Ut
- for qemu-devel@nongnu.org; Wed, 16 Oct 2019 10:30:46 -0400
+ (envelope-from <drjones@redhat.com>) id 1iKkNZ-000555-8J
+ for qemu-devel@nongnu.org; Wed, 16 Oct 2019 10:34:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1iKkK3-0007bD-A8
- for qemu-devel@nongnu.org; Wed, 16 Oct 2019 10:30:44 -0400
-Received: from indium.canonical.com ([91.189.90.7]:59540)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1iKkK3-0007a5-2l
- for qemu-devel@nongnu.org; Wed, 16 Oct 2019 10:30:43 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1iKkK1-0006yf-Pg
- for <qemu-devel@nongnu.org>; Wed, 16 Oct 2019 14:30:41 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id AD9882E806E
- for <qemu-devel@nongnu.org>; Wed, 16 Oct 2019 14:30:41 +0000 (UTC)
+ (envelope-from <drjones@redhat.com>) id 1iKkNX-0000iT-PP
+ for qemu-devel@nongnu.org; Wed, 16 Oct 2019 10:34:21 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55842)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <drjones@redhat.com>)
+ id 1iKkNT-0000g1-9J; Wed, 16 Oct 2019 10:34:15 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id DABCF3090FE0;
+ Wed, 16 Oct 2019 14:34:13 +0000 (UTC)
+Received: from kamzik.brq.redhat.com (unknown [10.43.2.160])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 90FB219C68;
+ Wed, 16 Oct 2019 14:34:11 +0000 (UTC)
+From: Andrew Jones <drjones@redhat.com>
+To: qemu-devel@nongnu.org,
+	qemu-arm@nongnu.org
+Subject: [PATCH v1 0/5] target/arm/kvm: Provide an option to adjust virtual
+ time
+Date: Wed, 16 Oct 2019 16:34:05 +0200
+Message-Id: <20191016143410.5023-1-drjones@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.43]); Wed, 16 Oct 2019 14:34:13 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
-Date: Wed, 16 Oct 2019 14:19:43 -0000
-From: Michael Weiser <michael@weiser.dinsnail.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: dgilbert-h michael-weiser
-X-Launchpad-Bug-Reporter: Michael Weiser (michael-weiser)
-X-Launchpad-Bug-Modifier: Michael Weiser (michael-weiser)
-References: <157005622285.15919.12087374175062502233.malonedeb@gac.canonical.com>
-Message-Id: <157123558316.25827.3719061841811635529.malone@chaenomeles.canonical.com>
-Subject: [Bug 1846427] Re: 4.1.0: qcow2 corruption on savevm/quit/loadvm cycle
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="186023fa645d8be19d403a76064f0643f510db2f";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: ef5019e8ed5d4198ad6303ca9f09abac08a60ffd
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 91.189.90.7
+X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -77,152 +67,112 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1846427 <1846427@bugs.launchpad.net>
+Cc: peter.maydell@linaro.org, richard.henderson@linaro.org,
+ bijan.mottahedeh@oracle.com, maz@kernel.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Yes. As said:
+v2:
+ - move from RFC status to v1
+ - put kvm_arm_vm_state_change() in kvm.c to share among kvm32.c and kvm6=
+4.c
+ - add r-b's from Richard
 
-> qemu compiled from the commit before does not exhibit the issue, from that
-> commit on it does and reverting the commit off of current master makes it
-> disappear.
 
-In my tests the problem only occurs with that commit in the code. I used
-git bisect to narrow it down to that commit. Even just reverting it off
-of current master made it go away with my automated reproducer.
+This series is inspired by a series[1] posted by Bijan Mottahedeh about
+a year ago.  The problem described in the cover letter of [1] is easily
+reproducible and some users would like to have the option to avoid it.
+However the solution, which is to adjust the virtual counter offset each
+time the VM transitions to the running state, introduces a different
+problem, which is that the virtual and physical counters diverge.  As
+described in the cover letter of [1] this divergence is easily observed
+when comparing the output of `date` and `hwclock` after suspending the
+guest, waiting a while, and then resuming it.  Because this different
+problem may actually be worse for some users, unlike [1], the series
+posted here makes the virtual counter offset adjustment optional and not
+even enabled by default.  Besides the adjustment being optional, this
+series approaches the needed changes differently to apply them in more
+appropriate locations.  Finally, unlike [1], this series doesn't attempt
+to measure "pause time" itself.  Simply using QEMU_CLOCK_VIRTUAL, which
+only ticks when the VM is not stopped, is sufficient.
 
-If helpful I can retest manually with a real-world VM. OTOH it would
-certainly be helpful if someone else said they can or cannot reproduce
-the problem based on my description of the reproducer.
+I've based this series on the SVE series[2] because we're adding a new
+CPU feature (kvm-adjvtime) and the SVE series introduces CPU feature
+documentation, probing, and tests that we can then immediately apply
+to kvm-adjvtime.
 
--- =
+Additional notes
+----------------
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1846427
+Note 1
+------
 
-Title:
-  4.1.0: qcow2 corruption on savevm/quit/loadvm cycle
+As described above, when running a guest with kvm-adjtime enabled it
+will be less likely the guest OS and guest applications get surprise
+time jumps when they use the virtual counter.  However the counter will
+no longer reflect real time.  It will lag behind.  If this is a problem
+then the guest can resynchronize its time from an external source or
+even from its physical counter.  If the suspend/resume is done with
+libvirt's virsh, and the guest is running the guest agent, then it's
+also possible to use a sequence like this
 
-Status in QEMU:
-  New
+ $ virsh suspend $GUEST
+ $ virsh resume $GUEST
+ $ virsh domtime --sync $GUEST
 
-Bug description:
-  I'm seeing massive corruption of qcow2 images with qemu 4.1.0 and git
-  master as of 7f21573c822805a8e6be379d9bcf3ad9effef3dc after a few
-  savevm/quit/loadvm cycles. I've narrowed it down to the following
-  reproducer (further notes below):
+in order to resynchronize a guest right after the resume.  Of course
+there will still be time when the clock is not right, possibly creating
+confusing timestamps in logs, for example, and the guest must still be
+tolerant to the time synchronizations.
 
-  # qemu-img check debian.qcow2
-  No errors were found on the image.
-  251601/327680 =3D 76.78% allocated, 1.63% fragmented, 0.00% compressed cl=
-usters
-  Image end offset: 18340446208
-  # bin/qemu/bin/qemu-system-x86_64 -machine pc-q35-4.0.1,accel=3Dkvm -m 40=
-96 -chardev stdio,id=3Dcharmonitor -mon chardev=3Dcharmonitor -drive file=
-=3Ddebian.qcow2,id=3Dd -S
-  qemu-system-x86_64: warning: dbind: Couldn't register with accessibility =
-bus: Did not receive a reply. Possible causes include: the remote applicati=
-on did not send a reply, the message bus security policy blocked the reply,=
- the reply timeout expired, or the network connection was broken.
-  QEMU 4.1.50 monitor - type 'help' for more information
-  (qemu) loadvm foo
-  (qemu) c
-  (qemu) qcow2_free_clusters failed: Invalid argument
-  qcow2_free_clusters failed: Invalid argument
-  qcow2_free_clusters failed: Invalid argument
-  qcow2_free_clusters failed: Invalid argument
-  quit
-  [m@nargothrond:~] qemu-img check debian.qcow2
-  Leaked cluster 85179 refcount=3D2 reference=3D1
-  Leaked cluster 85180 refcount=3D2 reference=3D1
-  ERROR cluster 266150 refcount=3D0 reference=3D2
-  [...]
-  ERROR OFLAG_COPIED data cluster: l2_entry=3D422840000 refcount=3D1
+Note 2
+------
 
-  9493 errors were found on the image.
-  Data may be corrupted, or further writes to the image may corrupt it.
+Userspace that wants to set KVM_REG_ARM_TIMER_CNT should beware that
+the KVM register ID is not correct.  This cannot be fixed because it's
+UAPI and if the UAPI headers are used then it can't be a problem.
+However, if a userspace attempts to create the ID themselves from the
+register's specification, then they will get KVM_REG_ARM_TIMER_CVAL
+instead, as the _CNT and _CVAL definitions have their register
+parameters swapped.
 
-  2 leaked clusters were found on the image.
-  This means waste of disk space, but no harm to data.
-  259266/327680 =3D 79.12% allocated, 1.67% fragmented, 0.00% compressed cl=
-usters
-  Image end offset: 18340446208
+Note 3
+------
 
-  This is on a x86_64 Linux 5.3.1 Gentoo host with qemu-system-x86_64
-  and accel=3Dkvm. The compiler is gcc-9.2.0 with the rest of the system
-  similarly current.
+I didn't test this with a 32-bit KVM host, but the changes to kvm32.c
+are the same as kvm64.c. So what could go wrong? Test results would be
+appreciated.
+=20
 
-  Reproduced with qemu-4.1.0 from distribution package as well as
-  vanilla git checkout of tag v4.1.0 and commit
-  7f21573c822805a8e6be379d9bcf3ad9effef3dc (today's master). Does not
-  happen with qemu compiled from vanilla checkout of tag v4.0.0. Build
-  sequence:
+[1] https://lists.gnu.org/archive/html/qemu-devel/2018-11/msg05713.html
+[2] https://patchew.org/QEMU/20191001125845.8793-1-drjones@redhat.com/
 
-  ./configure --prefix=3D$HOME/bin/qemu-bisect --target-list=3Dx86_64-softm=
-mu --disable-werror --disable-docs
-  [...]
-  CFLAGS            -O2 -U_FORTIFY_SOURCE -D_FORTIFY_SOURCE=3D2 -g
-  [...] (can provide full configure output if helpful)
-  make -j8 install
+Thanks,
+drew
 
-  The kind of guest OS does not matter: seen with Debian testing 64bit,
-  Windows 7 x86/x64 BIOS and Windows 7 x64 EFI.
 
-  The virtual storage controller does not seem to matter: seen with
-  VirtIO SCSI, emulated SCSI and emulated SATA AHCI.
+Andrew Jones (5):
+  target/arm/kvm64: kvm64 cpus have timer registers
+  timer: arm: Introduce functions to get the host cntfrq
+  target/arm/kvm: Implement cpu feature kvm-adjvtime
+  tests/arm-cpu-features: Check feature default values
+  target/arm/cpu: Add the kvm-adjvtime CPU property
 
-  Caching modes (none, directsync, writeback), aio mode (threads,
-  native) or discard (ignore, unmap) or detect-zeroes (off, unmap) does
-  not influence occurence either.
+ docs/arm-cpu-features.rst | 27 +++++++++++++++++-
+ include/qemu/timer.h      | 16 +++++++++++
+ target/arm/cpu.c          |  2 ++
+ target/arm/cpu.h          |  3 ++
+ target/arm/cpu64.c        |  1 +
+ target/arm/kvm.c          | 59 +++++++++++++++++++++++++++++++++++++++
+ target/arm/kvm32.c        |  3 ++
+ target/arm/kvm64.c        |  4 +++
+ target/arm/kvm_arm.h      | 25 +++++++++++++++++
+ target/arm/monitor.c      |  1 +
+ tests/arm-cpu-features.c  | 48 +++++++++++++++++++++++++------
+ 11 files changed, 179 insertions(+), 10 deletions(-)
 
-  Having more RAM in the guest seems to increase odds of corruption:
-  With 512MB to the Debian guest problem hardly occurs at all, with 4GB
-  RAM it happens almost instantly.
+--=20
+2.21.0
 
-  An automated reproducer works as follows:
-
-  - the guest *does* mount its root fs and swap with option discard and
-  my testing leaves me with the impression that file deletion rather
-  than reading is causing the issue
-
-  - foo is a snapshot of the running Debian VM which is already running
-  command
-
-  # while true ; do dd if=3D/dev/zero of=3Dfoo bs=3D10240k count=3D400 ; do=
-ne
-
-  to produce some I/O to the disk (4GB file with 4GB of RAM).
-
-  - on the host a loop continuously resumes and saves the guest state
-  and quits qemu inbetween:
-
-  # while true ; do (echo loadvm foo ; echo c ; sleep 10 ; echo stop ;
-  echo savevm foo ; echo quit ) | bin/qemu-bisect/bin/qemu-system-x86_64
-  -machine pc-q35-3.1,accel=3Dkvm -m 4096 -chardev stdio,id=3Dcharmonitor
-  -mon chardev=3Dcharmonitor -drive file=3Ddebian.qcow2,id=3Dd -S -display
-  none ; done
-
-  - quitting qemu inbetween saves and loads seems to be necessary for
-  the problem to occur. Just continusouly in one session saving and
-  loading guest state does not trigger it.
-
-  - For me, after about 2 to 6 iterations of above loop the image is
-  corrupted.
-
-  - corruption manifests with other messages from qemu as well, e.g.:
-
-  (qemu) loadvm foo
-  Error: Device 'd' does not have the requested snapshot 'foo'
-
-  Using above reproducer I have to the be best of my ability bisected
-  the introduction of the problem to commit
-  69f47505ee66afaa513305de0c1895a224e52c45 (block: avoid recursive
-  block_status call if possible). qemu compiled from the commit before
-  does not exhibit the issue, from that commit on it does and reverting
-  the commit off of current master makes it disappear.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1846427/+subscriptions
 
