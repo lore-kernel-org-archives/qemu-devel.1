@@ -2,60 +2,58 @@ Return-Path: <SRS0=/TIv=YJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CCDE8C4360C
-	for <qemu-devel@archiver.kernel.org>; Wed, 16 Oct 2019 09:06:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B5361ECE588
+	for <qemu-devel@archiver.kernel.org>; Wed, 16 Oct 2019 09:06:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9E3F22168B
-	for <qemu-devel@archiver.kernel.org>; Wed, 16 Oct 2019 09:06:01 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9E3F22168B
+	by mail.kernel.org (Postfix) with ESMTPS id 8D8C12168B
+	for <qemu-devel@archiver.kernel.org>; Wed, 16 Oct 2019 09:06:02 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8D8C12168B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39690 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39688 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iKfFo-0005lA-PN
-	for qemu-devel@archiver.kernel.org; Wed, 16 Oct 2019 05:06:00 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51279)
+	id 1iKfFp-0005ku-P7
+	for qemu-devel@archiver.kernel.org; Wed, 16 Oct 2019 05:06:01 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50390)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <kwolf@redhat.com>) id 1iKfAa-0000pj-Uz
- for qemu-devel@nongnu.org; Wed, 16 Oct 2019 05:00:37 -0400
+ (envelope-from <drjones@redhat.com>) id 1iKf4q-00028o-Cc
+ for qemu-devel@nongnu.org; Wed, 16 Oct 2019 04:54:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kwolf@redhat.com>) id 1iKfAZ-0007v3-U5
- for qemu-devel@nongnu.org; Wed, 16 Oct 2019 05:00:36 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:30665)
+ (envelope-from <drjones@redhat.com>) id 1iKf4o-00069b-QO
+ for qemu-devel@nongnu.org; Wed, 16 Oct 2019 04:54:40 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43316)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1iKfAZ-0007ut-Od
- for qemu-devel@nongnu.org; Wed, 16 Oct 2019 05:00:35 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
+ (Exim 4.71) (envelope-from <drjones@redhat.com>)
+ id 1iKf4k-00068f-A8; Wed, 16 Oct 2019 04:54:34 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id ACE84A3CD8D;
- Wed, 16 Oct 2019 09:00:34 +0000 (UTC)
-Received: from localhost.localdomain (ovpn-117-113.ams2.redhat.com
- [10.36.117.113])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id AEBDA60C5D;
- Wed, 16 Oct 2019 09:00:32 +0000 (UTC)
-Date: Wed, 16 Oct 2019 11:00:31 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-To: Pavel Dovgalyuk <pavel.dovgaluk@gmail.com>
-Subject: Re: [PATCH] qapi: add support for blkreplay driver
-Message-ID: <20191016090031.GA4940@localhost.localdomain>
-References: <157121523944.19602.3366908428295086643.stgit@pasha-Precision-3630-Tower>
+ by mx1.redhat.com (Postfix) with ESMTPS id 7F6F618021AD;
+ Wed, 16 Oct 2019 08:54:33 +0000 (UTC)
+Received: from kamzik.brq.redhat.com (unknown [10.43.2.160])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 1BEED5D9CD;
+ Wed, 16 Oct 2019 08:54:28 +0000 (UTC)
+From: Andrew Jones <drjones@redhat.com>
+To: qemu-devel@nongnu.org,
+	qemu-arm@nongnu.org
+Subject: [PATCH v6 6/9] target/arm/kvm64: max cpu: Enable SVE when available
+Date: Wed, 16 Oct 2019 10:54:05 +0200
+Message-Id: <20191016085408.24360-7-drjones@redhat.com>
+In-Reply-To: <20191016085408.24360-1-drjones@redhat.com>
+References: <20191016085408.24360-1-drjones@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <157121523944.19602.3366908428295086643.stgit@pasha-Precision-3630-Tower>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.68]); Wed, 16 Oct 2019 09:00:34 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.70]); Wed, 16 Oct 2019 08:54:33 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 209.132.183.28
@@ -70,24 +68,222 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: armbru@redhat.com, qemu-devel@nongnu.org, mreitz@redhat.com,
- dovgaluk@ispras.ru, pavel.dovgaluk@ispras.ru, pbonzini@redhat.com
+Cc: peter.maydell@linaro.org, richard.henderson@linaro.org, armbru@redhat.com,
+ eric.auger@redhat.com, imammedo@redhat.com, alex.bennee@linaro.org,
+ Dave.Martin@arm.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Am 16.10.2019 um 10:40 hat Pavel Dovgalyuk geschrieben:
-> This patch adds support for blkreplay driver to the blockdev options.
-> Now blkreplay can be used with -blockdev command line option
-> in the following format:
-> -blockdev driver=blkreplay,image=file-node-name,node-name=replay-node-name
-> 
-> This option makes possible implementation of the better command
-> line support for record/replay invocations.
-> 
-> Signed-off-by: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
+Enable SVE in the KVM guest when the 'max' cpu type is configured
+and KVM supports it. KVM SVE requires use of the new finalize
+vcpu ioctl, so we add that now too. For starters SVE can only be
+turned on or off, getting all vector lengths the host CPU supports
+when on. We'll add the other SVE CPU properties in later patches.
 
-Thanks, applied to the block branch.
+Signed-off-by: Andrew Jones <drjones@redhat.com>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Reviewed-by: Eric Auger <eric.auger@redhat.com>
+---
+ target/arm/cpu64.c       | 17 ++++++++++++++---
+ target/arm/kvm.c         |  5 +++++
+ target/arm/kvm64.c       | 20 +++++++++++++++++++-
+ target/arm/kvm_arm.h     | 27 +++++++++++++++++++++++++++
+ tests/arm-cpu-features.c |  1 +
+ 5 files changed, 66 insertions(+), 4 deletions(-)
 
-Kevin
+diff --git a/target/arm/cpu64.c b/target/arm/cpu64.c
+index 34b0ba2cf6f7..a771a28daa56 100644
+--- a/target/arm/cpu64.c
++++ b/target/arm/cpu64.c
+@@ -493,6 +493,11 @@ static void cpu_arm_set_sve(Object *obj, Visitor *v,=
+ const char *name,
+         return;
+     }
+=20
++    if (value && kvm_enabled() && !kvm_arm_sve_supported(CPU(cpu))) {
++        error_setg(errp, "'sve' feature not supported by KVM on this hos=
+t");
++        return;
++    }
++
+     t =3D cpu->isar.id_aa64pfr0;
+     t =3D FIELD_DP64(t, ID_AA64PFR0, SVE, value);
+     cpu->isar.id_aa64pfr0 =3D t;
+@@ -507,11 +512,16 @@ static void aarch64_max_initfn(Object *obj)
+ {
+     ARMCPU *cpu =3D ARM_CPU(obj);
+     uint32_t vq;
++    uint64_t t;
+=20
+     if (kvm_enabled()) {
+         kvm_arm_set_cpu_features_from_host(cpu);
++        if (kvm_arm_sve_supported(CPU(cpu))) {
++            t =3D cpu->isar.id_aa64pfr0;
++            t =3D FIELD_DP64(t, ID_AA64PFR0, SVE, 1);
++            cpu->isar.id_aa64pfr0 =3D t;
++        }
+     } else {
+-        uint64_t t;
+         uint32_t u;
+         aarch64_a57_initfn(obj);
+=20
+@@ -612,8 +622,6 @@ static void aarch64_max_initfn(Object *obj)
+=20
+         object_property_add(obj, "sve-max-vq", "uint32", cpu_max_get_sve=
+_max_vq,
+                             cpu_max_set_sve_max_vq, NULL, NULL, &error_f=
+atal);
+-        object_property_add(obj, "sve", "bool", cpu_arm_get_sve,
+-                            cpu_arm_set_sve, NULL, NULL, &error_fatal);
+=20
+         for (vq =3D 1; vq <=3D ARM_MAX_VQ; ++vq) {
+             char name[8];
+@@ -622,6 +630,9 @@ static void aarch64_max_initfn(Object *obj)
+                                 cpu_arm_set_sve_vq, NULL, NULL, &error_f=
+atal);
+         }
+     }
++
++    object_property_add(obj, "sve", "bool", cpu_arm_get_sve,
++                        cpu_arm_set_sve, NULL, NULL, &error_fatal);
+ }
+=20
+ struct ARMCPUInfo {
+diff --git a/target/arm/kvm.c b/target/arm/kvm.c
+index b473c63edb1c..f07332bbda30 100644
+--- a/target/arm/kvm.c
++++ b/target/arm/kvm.c
+@@ -51,6 +51,11 @@ int kvm_arm_vcpu_init(CPUState *cs)
+     return kvm_vcpu_ioctl(cs, KVM_ARM_VCPU_INIT, &init);
+ }
+=20
++int kvm_arm_vcpu_finalize(CPUState *cs, int feature)
++{
++    return kvm_vcpu_ioctl(cs, KVM_ARM_VCPU_FINALIZE, &feature);
++}
++
+ void kvm_arm_init_serror_injection(CPUState *cs)
+ {
+     cap_has_inject_serror_esr =3D kvm_check_extension(cs->kvm_state,
+diff --git a/target/arm/kvm64.c b/target/arm/kvm64.c
+index 4c0b11d105a4..850da1b5e6aa 100644
+--- a/target/arm/kvm64.c
++++ b/target/arm/kvm64.c
+@@ -602,6 +602,13 @@ bool kvm_arm_aarch32_supported(CPUState *cpu)
+     return kvm_check_extension(s, KVM_CAP_ARM_EL1_32BIT);
+ }
+=20
++bool kvm_arm_sve_supported(CPUState *cpu)
++{
++    KVMState *s =3D KVM_STATE(current_machine->accelerator);
++
++    return kvm_check_extension(s, KVM_CAP_ARM_SVE);
++}
++
+ #define ARM_CPU_ID_MPIDR       3, 0, 0, 0, 5
+=20
+ int kvm_arch_init_vcpu(CPUState *cs)
+@@ -630,13 +637,17 @@ int kvm_arch_init_vcpu(CPUState *cs)
+         cpu->kvm_init_features[0] |=3D 1 << KVM_ARM_VCPU_EL1_32BIT;
+     }
+     if (!kvm_check_extension(cs->kvm_state, KVM_CAP_ARM_PMU_V3)) {
+-            cpu->has_pmu =3D false;
++        cpu->has_pmu =3D false;
+     }
+     if (cpu->has_pmu) {
+         cpu->kvm_init_features[0] |=3D 1 << KVM_ARM_VCPU_PMU_V3;
+     } else {
+         unset_feature(&env->features, ARM_FEATURE_PMU);
+     }
++    if (cpu_isar_feature(aa64_sve, cpu)) {
++        assert(kvm_arm_sve_supported(cs));
++        cpu->kvm_init_features[0] |=3D 1 << KVM_ARM_VCPU_SVE;
++    }
+=20
+     /* Do KVM_ARM_VCPU_INIT ioctl */
+     ret =3D kvm_arm_vcpu_init(cs);
+@@ -644,6 +655,13 @@ int kvm_arch_init_vcpu(CPUState *cs)
+         return ret;
+     }
+=20
++    if (cpu_isar_feature(aa64_sve, cpu)) {
++        ret =3D kvm_arm_vcpu_finalize(cs, KVM_ARM_VCPU_SVE);
++        if (ret) {
++            return ret;
++        }
++    }
++
+     /*
+      * When KVM is in use, PSCI is emulated in-kernel and not by qemu.
+      * Currently KVM has its own idea about MPIDR assignment, so we
+diff --git a/target/arm/kvm_arm.h b/target/arm/kvm_arm.h
+index b4e19457a094..7c12f1501a8b 100644
+--- a/target/arm/kvm_arm.h
++++ b/target/arm/kvm_arm.h
+@@ -27,6 +27,20 @@
+  */
+ int kvm_arm_vcpu_init(CPUState *cs);
+=20
++/**
++ * kvm_arm_vcpu_finalize
++ * @cs: CPUState
++ * @feature: int
++ *
++ * Finalizes the configuration of the specified VCPU feature by
++ * invoking the KVM_ARM_VCPU_FINALIZE ioctl. Features requiring
++ * this are documented in the "KVM_ARM_VCPU_FINALIZE" section of
++ * KVM's API documentation.
++ *
++ * Returns: 0 if success else < 0 error code
++ */
++int kvm_arm_vcpu_finalize(CPUState *cs, int feature);
++
+ /**
+  * kvm_arm_register_device:
+  * @mr: memory region for this device
+@@ -225,6 +239,14 @@ bool kvm_arm_aarch32_supported(CPUState *cs);
+  */
+ bool kvm_arm_pmu_supported(CPUState *cs);
+=20
++/**
++ * bool kvm_arm_sve_supported:
++ * @cs: CPUState
++ *
++ * Returns true if the KVM VCPU can enable SVE and false otherwise.
++ */
++bool kvm_arm_sve_supported(CPUState *cs);
++
+ /**
+  * kvm_arm_get_max_vm_ipa_size - Returns the number of bits in the
+  * IPA address space supported by KVM
+@@ -276,6 +298,11 @@ static inline bool kvm_arm_pmu_supported(CPUState *c=
+s)
+     return false;
+ }
+=20
++static inline bool kvm_arm_sve_supported(CPUState *cs)
++{
++    return false;
++}
++
+ static inline int kvm_arm_get_max_vm_ipa_size(MachineState *ms)
+ {
+     return -ENOENT;
+diff --git a/tests/arm-cpu-features.c b/tests/arm-cpu-features.c
+index 0190148260dc..3c8ed85b5adb 100644
+--- a/tests/arm-cpu-features.c
++++ b/tests/arm-cpu-features.c
+@@ -391,6 +391,7 @@ static void test_query_cpu_model_expansion_kvm(const =
+void *data)
+=20
+     if (g_str_equal(qtest_get_arch(), "aarch64")) {
+         assert_has_feature(qts, "host", "aarch64");
++        assert_has_feature(qts, "max", "sve");
+=20
+         assert_error(qts, "cortex-a15",
+             "We cannot guarantee the CPU type 'cortex-a15' works "
+--=20
+2.21.0
+
 
