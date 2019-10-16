@@ -2,91 +2,80 @@ Return-Path: <SRS0=/TIv=YJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 692C6FA372A
-	for <qemu-devel@archiver.kernel.org>; Wed, 16 Oct 2019 15:45:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C4094FA372A
+	for <qemu-devel@archiver.kernel.org>; Wed, 16 Oct 2019 15:49:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E279220640
-	for <qemu-devel@archiver.kernel.org>; Wed, 16 Oct 2019 15:45:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9058121A49
+	for <qemu-devel@archiver.kernel.org>; Wed, 16 Oct 2019 15:49:08 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="F3jbKYdC"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E279220640
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="chNScY/D"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9058121A49
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44730 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44754 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iKlUq-0004VT-WE
-	for qemu-devel@archiver.kernel.org; Wed, 16 Oct 2019 11:45:57 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55097)
+	id 1iKlXv-0006fh-6I
+	for qemu-devel@archiver.kernel.org; Wed, 16 Oct 2019 11:49:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55818)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1iKlSe-00039E-7w
- for qemu-devel@nongnu.org; Wed, 16 Oct 2019 11:43:41 -0400
+ (envelope-from <zhangckid@gmail.com>) id 1iKlWc-0005mz-DW
+ for qemu-devel@nongnu.org; Wed, 16 Oct 2019 11:47:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1iKlSc-0006mA-UC
- for qemu-devel@nongnu.org; Wed, 16 Oct 2019 11:43:40 -0400
-Received: from mail-pf1-x441.google.com ([2607:f8b0:4864:20::441]:34849)
+ (envelope-from <zhangckid@gmail.com>) id 1iKlWa-0000jg-Hl
+ for qemu-devel@nongnu.org; Wed, 16 Oct 2019 11:47:46 -0400
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:33129)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1iKlSb-0006lC-GW
- for qemu-devel@nongnu.org; Wed, 16 Oct 2019 11:43:38 -0400
-Received: by mail-pf1-x441.google.com with SMTP id 205so14989135pfw.2
- for <qemu-devel@nongnu.org>; Wed, 16 Oct 2019 08:43:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=EA9zcpkFhFBVFdP9uD0atbtljeKL9cSU/AhS7aO0ASQ=;
- b=F3jbKYdCfCto85j60IRAK/pLt/1vYqBvIPfjI/SfnFh2LGuh9D+eJ87RPbPP0p7uBy
- 0F2w30euZUNDUQBTWRvP38AcDspsHgcV4N7Gx3AKrpWrGyOj5m6Xs/P55gjtJ4Dknq8+
- 1q+TNgFCwts5SBKhF1m7ARk57vAGBJC8sNxSH3jORDH4Td5js9ALmho2cqf5KisgJlmF
- DhtxyOeR8XBGP9QdJlJHAPFHKAGDVfR42QoxBIXv47MBS0K3Uj5pXwD4fj1k3KWtOefo
- DjE03li6ObAxMXMK0Ehkz4aZuqRzvZjeH7G+cceLwIzrIj8Rsx+3eMnagWgcgeFE7nx9
- K6JA==
+ (Exim 4.71) (envelope-from <zhangckid@gmail.com>) id 1iKlWa-0000hk-Bs
+ for qemu-devel@nongnu.org; Wed, 16 Oct 2019 11:47:44 -0400
+Received: by mail-wr1-x442.google.com with SMTP id b9so28675702wrs.0
+ for <qemu-devel@nongnu.org>; Wed, 16 Oct 2019 08:47:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to;
+ bh=Xb5v9ZJf0Np4qLVXzWMyMOn1cIToqMjUDmZphZ7zdy0=;
+ b=chNScY/DPFrsIjo0Rr+P8b4/gC3Faq9/D+XiQu2cFbM3zBkUY/hf+Z+cO2ZbIPqpc5
+ YBiBa2A8AUTMMMtBJLJtcuSC9luSCezN2VA5qtq5+eOMZE8d8+4gJRJ48aVQ433pFXxx
+ m0oGUA0UaLRZV+zbGdSQIA5k73DyKB/fyjt1RgbIJ3LDRIXYvkidvxSD7lLAGryz/2y1
+ 4Td4txjHCivMJbmRQrNIkcdCdfbx5omKXxQW6F0NJYOr0GbiL7lbBzASCqJ76XBMJ2cZ
+ A+nujuH6e+SrlSBLBywAD3B5WqIuRJKFE3Qdm2gfF+VHgU2zmpZEj3Y0xDm9pkaC2Ieu
+ 8BKA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=EA9zcpkFhFBVFdP9uD0atbtljeKL9cSU/AhS7aO0ASQ=;
- b=oRw+0ZYZ2P1jY5dK5C9sFmxGV4fF9dnm1rXV29Wdreos8mQEeHkpXXWeXb+ucAqzBV
- LxMSlXv6gnSHh8SPixyM9O9qdP4KN/mVsaVBUmvwf+LMTBzZs4DUYhIwywUhIHThO1Ew
- mLCExcFV1Wx494tSY2N6Xd1FYxYUw9K4zwQkRj5ST/HXqdMMCxPMl47dUOnWh7BfufPo
- UAioiPUlF2y6VzRr7IznC7dFm9JcI5Xq9bBMRLOYNALynSW92sayz+1DRLm9PbGctOl2
- iRFvCrH1WoT5fAfZO50rv2ZupE9IwY2U5RUxE0KaMsh1zFGHmZhsO7aPodX/qHLRLKIt
- SDIQ==
-X-Gm-Message-State: APjAAAXMU1Ckcb9Fztc+wpzSzu7rwPby4wrKozYinoSETYoWjtSlHE5M
- nYesJ0UgiinfTlNkTZQysEGRH6cssA8=
-X-Google-Smtp-Source: APXvYqwOv99Yy+EPIZ/B5Y6mODRaFTJOJ3NFR4UGsCNZqnZ/ELQ9xX+Ogm/Md0DFlyVFzhikcoHfDw==
-X-Received: by 2002:a63:1e1f:: with SMTP id e31mr24363685pge.303.1571240615211; 
- Wed, 16 Oct 2019 08:43:35 -0700 (PDT)
-Received: from [192.168.1.11] (97-113-7-119.tukw.qwest.net. [97.113.7.119])
- by smtp.gmail.com with ESMTPSA id c8sm30088162pfi.117.2019.10.16.08.43.34
- (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Wed, 16 Oct 2019 08:43:34 -0700 (PDT)
-Subject: Re: [PATCH] checkpatch: sugguest to use qemu_real_host_page_size
- instead of getpagesize() or sysconf(_SC_PAGESIZE)
-To: Wei Yang <richardw.yang@linux.intel.com>, pbonzini@redhat.com,
- philmd@redhat.com, thuth@redhat.com, eblake@redhat.com, berrange@redhat.com
-References: <20191016012432.22731-1-richardw.yang@linux.intel.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Openpgp: preference=signencrypt
-Message-ID: <d45f4f13-cff1-9a17-6ce3-255dcca5503b@linaro.org>
-Date: Wed, 16 Oct 2019 08:43:32 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to;
+ bh=Xb5v9ZJf0Np4qLVXzWMyMOn1cIToqMjUDmZphZ7zdy0=;
+ b=FmcaQ2EpnVdlvx34/pDZjXCMj6CxZX10qxiM+/yZq0vFOwueu5fsQ7WwbEBdxflPbP
+ VIMI9AUjWtekUvNr6YTa8GfLP3wIpATgaxB1VNfi3db3tMtkjUJQDc9UYGedrP0fGnwZ
+ LR6wCTnB8HgQCAqVMRiXQ0yeRsse84X/z0R85L4s71Bo+8c8QeUjx4QHojSgItmFj16u
+ wwFB5XP7/etj+oN4eEBBFMngsln49leMtOC3JF0gampX9Rl1KGR/WiQvJ0c0pvwXqHfe
+ 3e4ZkkRZN+zviIWZWjnoXDN+6jDjhOVTTc8q16yAbYwLos4kyWLkWL9LykjxePnOf+XJ
+ 5L4w==
+X-Gm-Message-State: APjAAAWNtEeB1Z4yiva1KIvVzwadFmjRiIN46Wcgm34kBqN6SxFSTAyV
+ 47PasjOuCYoLVRz7YRnendMyAQ3lmdvkRAULYKXY5kcU
+X-Google-Smtp-Source: APXvYqzMAujs0ebseRGlsKkA+QGFIVHLIDI0+T6oSJQwKgUWcWGlPBtnxSvVPmQ50ymlKpStmsOgd+43wv/+4DALNwU=
+X-Received: by 2002:adf:e8c6:: with SMTP id k6mr3348042wrn.78.1571240861500;
+ Wed, 16 Oct 2019 08:47:41 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20191016012432.22731-1-richardw.yang@linux.intel.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+References: <20191016112209.9024-1-chen.zhang@intel.com>
+ <157124010247.15388.11052477009886074916@37313f22b938>
+In-Reply-To: <157124010247.15388.11052477009886074916@37313f22b938>
+From: Zhang Chen <zhangckid@gmail.com>
+Date: Wed, 16 Oct 2019 23:40:53 +0800
+Message-ID: <CAK3tnv+QcXrGyOsb5LYN8MvL+t_K1vPGdB-V7p57QALbno1k8Q@mail.gmail.com>
+Subject: Re: [RFC PATCH 0/4] Introduce Advanced Watch Dog module
+To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Content-Type: text/plain; charset="UTF-8"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::441
+X-Received-From: 2a00:1450:4864:20::442
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,22 +87,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 10/15/19 6:24 PM, Wei Yang wrote:
->  		if ($line =~ /\bbzero\(/) {
->  			ERROR("use memset() instead of bzero()\n" . $herecurr);
->  		}
-> +		if ($line =~ /getpagesize\(\)/) {
-> +			ERROR("use qemu_real_host_page_size instead of getpagesize()\n" . $herecurr);
-> +		}
-> +		if ($line =~ /sysconf\(_SC_PAGESIZE\)/) {
+On Wed, Oct 16, 2019 at 11:35 PM <no-reply@patchew.org> wrote:
+>
+> Patchew URL: https://patchew.org/QEMU/20191016112209.9024-1-chen.zhang@intel.com/
+>
+>
+>
+> Hi,
+>
+> This series failed the docker-quick@centos7 build test. Please find the testing commands and
+> their output below. If you have Docker installed, you can probably reproduce it
+> locally.
+>
+> === TEST SCRIPT BEGIN ===
+> #!/bin/bash
+> make docker-image-centos7 V=1 NETWORK=1
+> time make docker-test-quick@centos7 SHOW_ENV=1 J=14 NETWORK=1
+> === TEST SCRIPT END ===
+>
+> Clone of 'https://git.qemu.org/git/dtc.git' into submodule path 'dtc' failed
+> failed to update submodule dtc
+> Submodule 'dtc' (https://git.qemu.org/git/dtc.git) unregistered for path 'dtc'
+> make[1]: *** [/var/tmp/patchew-tester-tmp-2eq69u33/src/docker-src.2019-10-16-11.34.59.10123] Error 1
+> make[1]: Leaving directory `/var/tmp/patchew-tester-tmp-2eq69u33/src'
+> make: *** [docker-run-test-quick@centos7] Error 2
+>
 
-Use \b to match beginning of symbol like bzero did?
+It looks this problem dose not caused by my patch series?
 
+Thanks
+Zhang Chen
 
-r~
+> real    0m3.762s
+> user    0m2.349s
+>
+>
+> The full log is available at
+> http://patchew.org/logs/20191016112209.9024-1-chen.zhang@intel.com/testing.docker-quick@centos7/?type=message.
+> ---
+> Email generated automatically by Patchew [https://patchew.org/].
+> Please send your feedback to patchew-devel@redhat.com
 
