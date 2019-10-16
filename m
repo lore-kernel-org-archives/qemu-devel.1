@@ -2,117 +2,84 @@ Return-Path: <SRS0=/TIv=YJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BA184FA372A
-	for <qemu-devel@archiver.kernel.org>; Wed, 16 Oct 2019 11:14:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ECCA6FA3728
+	for <qemu-devel@archiver.kernel.org>; Wed, 16 Oct 2019 11:25:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 750D820854
-	for <qemu-devel@archiver.kernel.org>; Wed, 16 Oct 2019 11:14:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B8E4E2067B
+	for <qemu-devel@archiver.kernel.org>; Wed, 16 Oct 2019 11:25:41 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="Z8t3I5Ch"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 750D820854
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="qv0RwlQf"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B8E4E2067B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41018 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41178 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iKhG8-0001WR-Mj
-	for qemu-devel@archiver.kernel.org; Wed, 16 Oct 2019 07:14:28 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40802)
+	id 1iKhQy-0006WY-NM
+	for qemu-devel@archiver.kernel.org; Wed, 16 Oct 2019 07:25:40 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42177)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iKhEx-0000t7-4l
- for qemu-devel@nongnu.org; Wed, 16 Oct 2019 07:13:16 -0400
+ (envelope-from <pdurrant@gmail.com>) id 1iKhPp-0005ka-Co
+ for qemu-devel@nongnu.org; Wed, 16 Oct 2019 07:24:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iKhEv-0000jX-Hh
- for qemu-devel@nongnu.org; Wed, 16 Oct 2019 07:13:14 -0400
-Received: from mail-eopbgr150099.outbound.protection.outlook.com
- ([40.107.15.99]:4078 helo=EUR01-DB5-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1iKhEu-0000i7-Nu; Wed, 16 Oct 2019 07:13:13 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Er60TvEZ60mnCVex1oRm/CejzRe++etlK47KUBp3KzDs/ba+ECCRlkohAMh0yrM6nG6bFIH3oAnt+YkiG1EHPE5qFpueqWkJltQNcqdck68fBtltDh7uiMZ1bY6jpnVS/CaNNhvTnwd4k25GKIpHaMi3wJLRsjAMUIoz7gBHcTNfLNUWZPz5DkYvAlUoVFZiUVeu28QVuhscXeGVyT5X7Auc0OB9w4iIGPxvIb+P2jKTxgMXBPvahUZptxJQJokBP8jlE77b404XXoYbRVeFSzrpDwPgy6SsjwYb5MlfTJjZ/s+dPAwEPZ3HLNUEKb1+KWfmZPqjwhb3h7XmggNgLw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=yQXYsJcXs3UAKIRj4OsqoElC8g6Qt89ms6UEkS0BVcs=;
- b=idUyz5Po63XoaT76FQFZIiGH9Lqss+3dJsggrDd9lIx6sG88CnYh949SQofoXmcthX5+d0V96HYIA78esVGFyaAiDnF/6OECOEhQrd9i77RLs7Tq2GmAHwEOs7zFy2NPhPM1p0uv/KYAuxslbDr6FG/ums/FjeUE+lLqbHK1bzjLjY0FG+lFhsCBJC8+L5Ea4IzRh7rCIIMSWAt25bO+jzUa4ABkkTBjiQJh2kDiVs5I2CehIpm399NUeVmq0e8pizuI4+yr1yX6Qc9lP3uf2QdVukBUxKGW7KFouOlMt9lo9VcQk5eECOlZvHC7OSCH9oIdrnDwUY/DLNNwYu2gvQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=yQXYsJcXs3UAKIRj4OsqoElC8g6Qt89ms6UEkS0BVcs=;
- b=Z8t3I5ChkwR6ftHVElH1cpAEXfusS2gxNqopl9MVtOcol8Ej6UPudNSU9Fo/It3mFlJ2R0CqJMjHt6JGE9iVvcYZkSaez6U9LTlbl+LefASdPiSKBB48DhknyqyCKoTXwT3ees1nM6UKU0qZfp0vmXt5+oYrYdKS0gtSOqnICgE=
-Received: from AM0PR08MB4435.eurprd08.prod.outlook.com (20.179.35.83) by
- AM0PR08MB3074.eurprd08.prod.outlook.com (52.134.94.150) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2347.16; Wed, 16 Oct 2019 11:13:08 +0000
-Received: from AM0PR08MB4435.eurprd08.prod.outlook.com
- ([fe80::4461:dd32:b358:110c]) by AM0PR08MB4435.eurprd08.prod.outlook.com
- ([fe80::4461:dd32:b358:110c%7]) with mapi id 15.20.2347.023; Wed, 16 Oct 2019
- 11:13:08 +0000
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-To: Max Reitz <mreitz@redhat.com>, "qemu-block@nongnu.org"
- <qemu-block@nongnu.org>
-Subject: Re: [PATCH v3 2/4] blkdebug: Allow taking/unsharing permissions
-Thread-Topic: [PATCH v3 2/4] blkdebug: Allow taking/unsharing permissions
-Thread-Index: AQHVgqWgndY/u+VhiEaqkY3/Ua0H9qddIBMA
-Date: Wed, 16 Oct 2019 11:13:08 +0000
-Message-ID: <2341e2c4-5a80-7995-dbbd-a43d75f43dcf@virtuozzo.com>
-References: <20191014153931.20699-1-mreitz@redhat.com>
- <20191014153931.20699-3-mreitz@redhat.com>
-In-Reply-To: <20191014153931.20699-3-mreitz@redhat.com>
-Accept-Language: ru-RU, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-clientproxiedby: HE1PR0701CA0077.eurprd07.prod.outlook.com
- (2603:10a6:3:64::21) To AM0PR08MB4435.eurprd08.prod.outlook.com
- (2603:10a6:208:144::19)
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=vsementsov@virtuozzo.com; 
-x-ms-exchange-messagesentrepresentingtype: 1
-x-tagtoolbar-keys: D20191016141306413
-x-originating-ip: [185.231.240.5]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 0d55471a-fd3a-498f-ed70-08d75229d2ed
-x-ms-traffictypediagnostic: AM0PR08MB3074:
-x-microsoft-antispam-prvs: <AM0PR08MB3074BA393A505919BBE3F446C1920@AM0PR08MB3074.eurprd08.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:1303;
-x-forefront-prvs: 0192E812EC
-x-forefront-antispam-report: SFV:NSPM;
- SFS:(10019020)(376002)(136003)(346002)(39840400004)(396003)(366004)(189003)(199004)(2906002)(14444005)(36756003)(7736002)(305945005)(3846002)(478600001)(14454004)(6116002)(71190400001)(71200400001)(31696002)(256004)(2501003)(110136005)(316002)(54906003)(86362001)(6436002)(6486002)(81166006)(6512007)(66446008)(229853002)(64756008)(186003)(66066001)(99286004)(25786009)(66556008)(52116002)(8676002)(76176011)(8936002)(81156014)(66476007)(2616005)(476003)(486006)(446003)(5660300002)(11346002)(386003)(102836004)(26005)(4326008)(6246003)(66946007)(6506007)(31686004);
- DIR:OUT; SFP:1102; SCL:1; SRVR:AM0PR08MB3074;
- H:AM0PR08MB4435.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
- PTR:InfoNoRecords; MX:1; A:1; 
-received-spf: None (protection.outlook.com: virtuozzo.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: hbfvrJIeqNBMJE/gZ5ySCmqovUF402Vjnx0qc8an1TdBXVLxnTxT7n4d+O2ArrbnZ7ij/SMztbIfynX+cPB4ED5LvX9hZqUDnigp7JCIXc7lA/RzBpllxSW2E9U5DOkOXpYii1+lKbgrCUBI/9n++xNfDltFqcxC+Ac8IPQRJpZKNE45MHqUTcy4+DJxCtODRqWPghJSd2hK0jsFs9fLq0CA51OaCoR1t7a0IE4McxAb8JnhmZcR//a0CV7nmtArYwFIPtVe8+psSL4tu/7qRPR17UHNopqkA6STggs3ZPT9crwcE3iqU1SvWTetLNwEd98U4autzjAAY90fAqsxutJW6QkCPd7nwS9OPPKI7/dpsPZa5gzTqkl4qc5lRorXXNPN0jVe+hRWIBijst+sBCE3qBji3Bd2XERBe995lVk=
-x-ms-exchange-transport-forked: True
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <316F8173963D9E4E869656A49F0F1D01@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+ (envelope-from <pdurrant@gmail.com>) id 1iKhPo-0003Zp-2P
+ for qemu-devel@nongnu.org; Wed, 16 Oct 2019 07:24:29 -0400
+Received: from mail-pg1-x544.google.com ([2607:f8b0:4864:20::544]:37649)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <pdurrant@gmail.com>) id 1iKhPn-0003ZT-RC
+ for qemu-devel@nongnu.org; Wed, 16 Oct 2019 07:24:28 -0400
+Received: by mail-pg1-x544.google.com with SMTP id p1so14112526pgi.4
+ for <qemu-devel@nongnu.org>; Wed, 16 Oct 2019 04:24:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=LOhxSmhltHVmCHIgrxp16EKj8XAolAsY7/5MxXVPJeg=;
+ b=qv0RwlQfuyAV06Rt87qK/UWtE06kLYJBl1B7flH3oYBYMZ3WBvvlBjWzQIAO17RosM
+ pWkGzHPPdw+nL4xc2/rX4dsVOjYbVG3eZ2AiWCwNH/M7Eyka4Fa12UVP9hZsbCSHZjKe
+ 4aoy2dhnK4C5KifXK6Qvf/gd5EszL0madtYJd3fsd1wHPpgLEbgsXkMcr0a8l6a312Yc
+ FJPEYir3JsQ3j/xOB3WAySj5fuJowgpL8vNDsSiIDoKRZZNwBDm+k2mdAVG2uk8CgCt1
+ 4arQqvc4oo5+56fvSgC+2XsAndZRThn3zBTxGN6W7zxoQDzdvXkpJz43BTbw4h4/HgPa
+ HnRQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=LOhxSmhltHVmCHIgrxp16EKj8XAolAsY7/5MxXVPJeg=;
+ b=hpVLaGy2VJ5EnFoOrrbJOa6cBIhFw0/ijqTIaoh8sV+/meDg5b/mqVTzJ1/5dtH9rN
+ NUhnc5grbXjPto8wgrDBQdYR3QXutYmThNDKEMWIKdZjkDk4lIvSlTT/c/egchkuv56g
+ DGo0TtsFy4by8NJs+rVP3j+9mlzSUKx4MKkfNGtTNp3C1uylz3Df56IcuxKbAlPtN9u7
+ XQEdTKbChJbACj8wuEM41/pxmoavk6LUHnJdTSJQNGvD9Aaf5HAkKqGd1BXABibtedp8
+ GYtYArpfX2ebqpZhI+NEkOOY7SteQtnEiJia+LXftjFDL1xDi4fC5QTt0I5JWPkwTYFy
+ l3iA==
+X-Gm-Message-State: APjAAAX9bbcgWy94vR/LRZ2YuV6mkQj9+uZATZcaBwa7Xd2UtoLKgShg
+ 934vDsTg1Cj0s8FSLa8ZKjvOoYw6py3tRkFNBWo=
+X-Google-Smtp-Source: APXvYqx/K3HVs2y8kHeKYg41IQD9q1KLMW4BxhnkYePE6OPi6UiZwMnm8IQr0qxQpi9GF6ZNT6tQ0S1OQNNMywxKpWQ=
+X-Received: by 2002:a17:90a:e001:: with SMTP id
+ u1mr4460927pjy.102.1571225066213; 
+ Wed, 16 Oct 2019 04:24:26 -0700 (PDT)
 MIME-Version: 1.0
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 0d55471a-fd3a-498f-ed70-08d75229d2ed
-X-MS-Exchange-CrossTenant-originalarrivaltime: 16 Oct 2019 11:13:08.3078 (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: hRjczXjJfhICEeMWpUMBRV/LcuUdWf6htO2vJjqRJs4oMwBSUL09d0tcQ6zNpLghZtnfCNNieMsihGEXajop5cL4poeeBxMc/oOf/AdqHJU=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM0PR08MB3074
-X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
-X-Received-From: 40.107.15.99
+References: <20191015162705.28087-1-philmd@redhat.com>
+ <20191015162705.28087-28-philmd@redhat.com>
+In-Reply-To: <20191015162705.28087-28-philmd@redhat.com>
+From: Paul Durrant <pdurrant@gmail.com>
+Date: Wed, 16 Oct 2019 12:24:15 +0100
+Message-ID: <CACCGGhDsJ==Z_rVRNJ28N_p3Ar=dtbPZcgMaXiw=cLEvAiYSKQ@mail.gmail.com>
+Subject: Re: [PATCH 27/32] hw/pci-host/piix: Define and use the PIIX IRQ Route
+ Control Registers
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::544
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -124,144 +91,163 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, John Snow <jsnow@redhat.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
+ Stefano Stabellini <sstabellini@kernel.org>,
+ Eduardo Habkost <ehabkost@redhat.com>, kvm@vger.kernel.org,
+ Paul Durrant <paul@xen.org>, "Michael S. Tsirkin" <mst@redhat.com>,
+ qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?Q?Herv=C3=A9_Poussineau?= <hpoussin@reactos.org>,
+ Aleksandar Markovic <amarkovic@wavecomp.com>,
+ xen-devel <xen-devel@lists.xenproject.org>,
+ Anthony Perard <anthony.perard@citrix.com>,
+ Igor Mammedov <imammedo@redhat.com>,
+ Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
+ Aurelien Jarno <aurelien@aurel32.net>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-MTQuMTAuMjAxOSAxODozOSwgTWF4IFJlaXR6IHdyb3RlOg0KPiBTb21ldGltZXMgaXQgaXMgdXNl
-ZnVsIHRvIGJlIGFibGUgdG8gYWRkIGEgbm9kZSB0byB0aGUgYmxvY2sgZ3JhcGggdGhhdA0KPiB0
-YWtlcyBvciB1bnNoYXJlIGEgY2VydGFpbiBzZXQgb2YgcGVybWlzc2lvbnMgZm9yIGRlYnVnZ2lu
-ZyBwdXJwb3Nlcy4NCj4gVGhpcyBwYXRjaCBhZGRzIHRoaXMgY2FwYWJpbGl0eSB0byBibGtkZWJ1
-Zy4NCj4gDQo+IChOb3RlIHRoYXQgeW91IGNhbm5vdCBtYWtlIGJsa2RlYnVnIHJlbGVhc2Ugb3Ig
-c2hhcmUgcGVybWlzc2lvbnMgdGhhdCBpdA0KPiBuZWVkcyB0byB0YWtlIG9yIGNhbm5vdCBzaGFy
-ZSwgYmVjYXVzZSB0aGlzIG1pZ2h0IHJlc3VsdCBpbiBhc3NlcnRpb24NCj4gZmFpbHVyZXMgaW4g
-dGhlIGJsb2NrIGxheWVyLiAgQnV0IGlmIHRoZSBibGtkZWJ1ZyBub2RlIGhhcyBubyBwYXJlbnRz
-LA0KPiBpdCB3aWxsIG5vdCB0YWtlIGFueSBwZXJtaXNzaW9ucyBhbmQgc2hhcmUgZXZlcnl0aGlu
-ZyBieSBkZWZhdWx0LCBzbyB5b3UNCj4gY2FuIHRoZW4gZnJlZWx5IGNob29zZSB3aGF0IHBlcm1p
-c3Npb25zIHRvIHRha2UgYW5kIHNoYXJlLikNCj4gDQo+IFNpZ25lZC1vZmYtYnk6IE1heCBSZWl0
-eiA8bXJlaXR6QHJlZGhhdC5jb20+DQo+IC0tLQ0KPiAgIHFhcGkvYmxvY2stY29yZS5qc29uIHwg
-MTQgKysrKysrLQ0KPiAgIGJsb2NrL2Jsa2RlYnVnLmMgICAgIHwgOTEgKysrKysrKysrKysrKysr
-KysrKysrKysrKysrKysrKysrKysrKysrKysrKy0NCj4gICAyIGZpbGVzIGNoYW5nZWQsIDEwMyBp
-bnNlcnRpb25zKCspLCAyIGRlbGV0aW9ucygtKQ0KPiANCj4gZGlmZiAtLWdpdCBhL3FhcGkvYmxv
-Y2stY29yZS5qc29uIGIvcWFwaS9ibG9jay1jb3JlLmpzb24NCj4gaW5kZXggZjY2NTUzYWFjNy4u
-MDU0Y2U2NTFkZSAxMDA2NDQNCj4gLS0tIGEvcWFwaS9ibG9jay1jb3JlLmpzb24NCj4gKysrIGIv
-cWFwaS9ibG9jay1jb3JlLmpzb24NCj4gQEAgLTM0NTMsNiArMzQ1MywxNiBAQA0KPiAgICMNCj4g
-ICAjIEBzZXQtc3RhdGU6ICAgICAgIGFycmF5IG9mIHN0YXRlLWNoYW5nZSBkZXNjcmlwdGlvbnMN
-Cj4gICAjDQo+ICsjIEB0YWtlLWNoaWxkLXBlcm1zOiBQZXJtaXNzaW9ucyB0byB0YWtlIG9uIEBp
-bWFnZSBpbiBhZGRpdGlvbiB0byB3aGF0DQo+ICsjICAgICAgICAgICAgICAgICAgICBpcyBuZWNl
-c3NhcnkgYW55d2F5ICh3aGljaCBkZXBlbmRzIG9uIGhvdyB0aGUNCj4gKyMgICAgICAgICAgICAg
-ICAgICAgIGJsa2RlYnVnIG5vZGUgaXMgdXNlZCkuICBEZWZhdWx0cyB0byBub25lLg0KPiArIyAg
-ICAgICAgICAgICAgICAgICAgKHNpbmNlIDQuMikNCj4gKyMNCj4gKyMgQHVuc2hhcmUtY2hpbGQt
-cGVybXM6IFBlcm1pc3Npb25zIG5vdCB0byBzaGFyZSBvbiBAaW1hZ2UgaW4gYWRkaXRpb24NCj4g
-KyMgICAgICAgICAgICAgICAgICAgICAgIHRvIHdoYXQgY2Fubm90IGJlIHNoYXJlZCBhbnl3YXkg
-KHdoaWNoIGRlcGVuZHMNCj4gKyMgICAgICAgICAgICAgICAgICAgICAgIG9uIGhvdyB0aGUgYmxr
-ZGVidWcgbm9kZSBpcyB1c2VkKS4gIERlZmF1bHRzDQo+ICsjICAgICAgICAgICAgICAgICAgICAg
-ICB0byBub25lLiAgKHNpbmNlIDQuMikNCj4gKyMNCj4gICAjIFNpbmNlOiAyLjkNCj4gICAjIw0K
-PiAgIHsgJ3N0cnVjdCc6ICdCbG9ja2Rldk9wdGlvbnNCbGtkZWJ1ZycsDQo+IEBAIC0zNDYyLDcg
-KzM0NzIsOSBAQA0KPiAgICAgICAgICAgICAgICcqb3B0LXdyaXRlLXplcm8nOiAnaW50MzInLCAn
-Km1heC13cml0ZS16ZXJvJzogJ2ludDMyJywNCj4gICAgICAgICAgICAgICAnKm9wdC1kaXNjYXJk
-JzogJ2ludDMyJywgJyptYXgtZGlzY2FyZCc6ICdpbnQzMicsDQo+ICAgICAgICAgICAgICAgJypp
-bmplY3QtZXJyb3InOiBbJ0Jsa2RlYnVnSW5qZWN0RXJyb3JPcHRpb25zJ10sDQo+IC0gICAgICAg
-ICAgICAnKnNldC1zdGF0ZSc6IFsnQmxrZGVidWdTZXRTdGF0ZU9wdGlvbnMnXSB9IH0NCj4gKyAg
-ICAgICAgICAgICcqc2V0LXN0YXRlJzogWydCbGtkZWJ1Z1NldFN0YXRlT3B0aW9ucyddLA0KPiAr
-ICAgICAgICAgICAgJyp0YWtlLWNoaWxkLXBlcm1zJzogWydCbG9ja1Blcm1pc3Npb24nXSwNCj4g
-KyAgICAgICAgICAgICcqdW5zaGFyZS1jaGlsZC1wZXJtcyc6IFsnQmxvY2tQZXJtaXNzaW9uJ10g
-fSB9DQo+ICAgDQo+ICAgIyMNCj4gICAjIEBCbG9ja2Rldk9wdGlvbnNCbGtsb2d3cml0ZXM6DQo+
-IGRpZmYgLS1naXQgYS9ibG9jay9ibGtkZWJ1Zy5jIGIvYmxvY2svYmxrZGVidWcuYw0KPiBpbmRl
-eCA1YWU5NmM1MmIwLi42ODA3YzAzMDY1IDEwMDY0NA0KPiAtLS0gYS9ibG9jay9ibGtkZWJ1Zy5j
-DQo+ICsrKyBiL2Jsb2NrL2Jsa2RlYnVnLmMNCj4gQEAgLTI4LDEwICsyOCwxNCBAQA0KPiAgICNp
-bmNsdWRlICJxZW11L2N1dGlscy5oIg0KPiAgICNpbmNsdWRlICJxZW11L2NvbmZpZy1maWxlLmgi
-DQo+ICAgI2luY2x1ZGUgImJsb2NrL2Jsb2NrX2ludC5oIg0KPiArI2luY2x1ZGUgImJsb2NrL3Fk
-aWN0LmgiDQo+ICAgI2luY2x1ZGUgInFlbXUvbW9kdWxlLmgiDQo+ICAgI2luY2x1ZGUgInFlbXUv
-b3B0aW9uLmgiDQo+ICsjaW5jbHVkZSAicWFwaS9xYXBpLXZpc2l0LWJsb2NrLWNvcmUuaCINCj4g
-ICAjaW5jbHVkZSAicWFwaS9xbXAvcWRpY3QuaCINCj4gKyNpbmNsdWRlICJxYXBpL3FtcC9xbGlz
-dC5oIg0KPiAgICNpbmNsdWRlICJxYXBpL3FtcC9xc3RyaW5nLmgiDQo+ICsjaW5jbHVkZSAicWFw
-aS9xb2JqZWN0LWlucHV0LXZpc2l0b3IuaCINCj4gICAjaW5jbHVkZSAic3lzZW11L3F0ZXN0Lmgi
-DQo+ICAgDQo+ICAgdHlwZWRlZiBzdHJ1Y3QgQkRSVkJsa2RlYnVnU3RhdGUgew0KPiBAQCAtNDQs
-NiArNDgsOSBAQCB0eXBlZGVmIHN0cnVjdCBCRFJWQmxrZGVidWdTdGF0ZSB7DQo+ICAgICAgIHVp
-bnQ2NF90IG9wdF9kaXNjYXJkOw0KPiAgICAgICB1aW50NjRfdCBtYXhfZGlzY2FyZDsNCj4gICAN
-Cj4gKyAgICB1aW50NjRfdCB0YWtlX2NoaWxkX3Blcm1zOw0KPiArICAgIHVpbnQ2NF90IHVuc2hh
-cmVfY2hpbGRfcGVybXM7DQo+ICsNCj4gICAgICAgLyogRm9yIGJsa2RlYnVnX3JlZnJlc2hfZmls
-ZW5hbWUoKSAqLw0KPiAgICAgICBjaGFyICpjb25maWdfZmlsZTsNCj4gICANCj4gQEAgLTM0NCw2
-ICszNTEsNjcgQEAgc3RhdGljIHZvaWQgYmxrZGVidWdfcGFyc2VfZmlsZW5hbWUoY29uc3QgY2hh
-ciAqZmlsZW5hbWUsIFFEaWN0ICpvcHRpb25zLA0KPiAgICAgICBxZGljdF9wdXRfc3RyKG9wdGlv
-bnMsICJ4LWltYWdlIiwgZmlsZW5hbWUpOw0KPiAgIH0NCj4gICANCj4gK3N0YXRpYyBpbnQgYmxr
-ZGVidWdfcGFyc2VfcGVybV9saXN0KHVpbnQ2NF90ICpkZXN0LCBRRGljdCAqb3B0aW9ucywNCj4g
-KyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIGNvbnN0IGNoYXIgKnByZWZpeCwg
-RXJyb3IgKiplcnJwKQ0KPiArew0KPiArICAgIGludCByZXQgPSAwOw0KPiArICAgIFFEaWN0ICpz
-dWJxZGljdCA9IE5VTEw7DQo+ICsgICAgUU9iamVjdCAqY3J1bXBsZWRfc3VicWRpY3QgPSBOVUxM
-Ow0KPiArICAgIFZpc2l0b3IgKnYgPSBOVUxMOw0KPiArICAgIEJsb2NrUGVybWlzc2lvbkxpc3Qg
-KnBlcm1fbGlzdCA9IE5VTEwsICplbGVtZW50Ow0KPiArICAgIEVycm9yICpsb2NhbF9lcnIgPSBO
-VUxMOw0KPiArDQo+ICsgICAgcWRpY3RfZXh0cmFjdF9zdWJxZGljdChvcHRpb25zLCAmc3VicWRp
-Y3QsIHByZWZpeCk7DQo+ICsgICAgaWYgKCFxZGljdF9zaXplKHN1YnFkaWN0KSkgew0KDQoNCkht
-bSwgeW91IGNvbnNpZGVyIGl0IGFzIGEgc3VjY2Vzcywgc28geW91IG1lYW4gZGVmYXVsdC4gVGhl
-biwgaXQncyBzYWZlciB0bw0Kc2V0ICpkZXN0ID0gMCBoZXJlLg0KDQo+ICsgICAgICAgIGdvdG8g
-b3V0Ow0KPiArICAgIH0NCj4gKw0KPiArICAgIGNydW1wbGVkX3N1YnFkaWN0ID0gcWRpY3RfY3J1
-bXBsZShzdWJxZGljdCwgZXJycCk7DQo+ICsgICAgaWYgKCFjcnVtcGxlZF9zdWJxZGljdCkgew0K
-PiArICAgICAgICByZXQgPSAtRUlOVkFMOw0KPiArICAgICAgICBnb3RvIG91dDsNCj4gKyAgICB9
-DQo+ICsNCj4gKyAgICB2ID0gcW9iamVjdF9pbnB1dF92aXNpdG9yX25ldyhjcnVtcGxlZF9zdWJx
-ZGljdCk7DQo+ICsgICAgdmlzaXRfdHlwZV9CbG9ja1Blcm1pc3Npb25MaXN0KHYsIE5VTEwsICZw
-ZXJtX2xpc3QsICZsb2NhbF9lcnIpOw0KPiArICAgIGlmIChsb2NhbF9lcnIpIHsNCj4gKyAgICAg
-ICAgZXJyb3JfcHJvcGFnYXRlKGVycnAsIGxvY2FsX2Vycik7DQo+ICsgICAgICAgIHJldCA9IC1F
-SU5WQUw7DQo+ICsgICAgICAgIGdvdG8gb3V0Ow0KPiArICAgIH0NCj4gKw0KDQpJJ2QgcHJlZmVy
-IGV4cGxpY2l0bHkgc2V0ICpkZXN0ID0gMCBoZXJlIHRvby4NCg0KPiArICAgIGZvciAoZWxlbWVu
-dCA9IHBlcm1fbGlzdDsgZWxlbWVudDsgZWxlbWVudCA9IGVsZW1lbnQtPm5leHQpIHsNCj4gKyAg
-ICAgICAgKmRlc3QgfD0gVUlOVDY0X0MoMSkgPDwgZWxlbWVudC0+dmFsdWU7DQoNCkhtbSwgc28s
-IHlvdSByZWx5IG9uIGNvcnJlY3QgY29ycmVzcG9uZGVuY2UgYmV0d2VlbiBnZW5lcmF0ZWQgQmxv
-Y2tQZXJtaXNzaW9uIGVudW0NCmFuZCB1bm5hbWVkIGVudW0gd2l0aCBCTEtfUEVSTV8qIGNvbnN0
-YW50cy4uLg0KDQpJJ20gYWZyYWlkIGl0J3MgdW5zYWZlLCBzbywgaW4geGRiZ19ncmFwaF9hZGRf
-ZWRnZSgpIHNwZWNpYWwgbWFwcGluZyB2YXJpYWJsZSBpcw0KdXNlZCArIFFFTVVfQlVJTERfQlVH
-X09OIG9uIEJMS19QRVJNX0FMTC4NCg0KSSB0aGluayBzb21ldGhpbmcgbGlrZSB0aGlzIHNob3Vs
-ZCBiZSBkb25lIGhlcmUuDQoNCj4gKyAgICB9DQo+ICsNCj4gK291dDoNCj4gKyAgICBxYXBpX2Zy
-ZWVfQmxvY2tQZXJtaXNzaW9uTGlzdChwZXJtX2xpc3QpOw0KPiArICAgIHZpc2l0X2ZyZWUodik7
-DQo+ICsgICAgcW9iamVjdF91bnJlZihzdWJxZGljdCk7DQo+ICsgICAgcW9iamVjdF91bnJlZihj
-cnVtcGxlZF9zdWJxZGljdCk7DQo+ICsgICAgcmV0dXJuIHJldDsNCj4gK30NCj4gKw0KPiArc3Rh
-dGljIGludCBibGtkZWJ1Z19wYXJzZV9wZXJtcyhCRFJWQmxrZGVidWdTdGF0ZSAqcywgUURpY3Qg
-Km9wdGlvbnMsDQo+ICsgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIEVycm9yICoqZXJy
-cCkNCj4gK3sNCj4gKyAgICBpbnQgcmV0Ow0KPiArDQo+ICsgICAgcmV0ID0gYmxrZGVidWdfcGFy
-c2VfcGVybV9saXN0KCZzLT50YWtlX2NoaWxkX3Blcm1zLCBvcHRpb25zLA0KPiArICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAidGFrZS1jaGlsZC1wZXJtcy4iLCBlcnJwKTsNCj4g
-KyAgICBpZiAocmV0IDwgMCkgew0KPiArICAgICAgICByZXR1cm4gcmV0Ow0KPiArICAgIH0NCj4g
-Kw0KPiArICAgIHJldCA9IGJsa2RlYnVnX3BhcnNlX3Blcm1fbGlzdCgmcy0+dW5zaGFyZV9jaGls
-ZF9wZXJtcywgb3B0aW9ucywNCj4gKyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-InVuc2hhcmUtY2hpbGQtcGVybXMuIiwgZXJycCk7DQo+ICsgICAgaWYgKHJldCA8IDApIHsNCj4g
-KyAgICAgICAgcmV0dXJuIHJldDsNCj4gKyAgICB9DQo+ICsNCj4gKyAgICByZXR1cm4gMDsNCj4g
-K30NCj4gKw0KPiAgIHN0YXRpYyBRZW11T3B0c0xpc3QgcnVudGltZV9vcHRzID0gew0KPiAgICAg
-ICAubmFtZSA9ICJibGtkZWJ1ZyIsDQo+ICAgICAgIC5oZWFkID0gUVRBSUxRX0hFQURfSU5JVElB
-TElaRVIocnVudGltZV9vcHRzLmhlYWQpLA0KPiBAQCAtNDE5LDYgKzQ4NywxMiBAQCBzdGF0aWMg
-aW50IGJsa2RlYnVnX29wZW4oQmxvY2tEcml2ZXJTdGF0ZSAqYnMsIFFEaWN0ICpvcHRpb25zLCBp
-bnQgZmxhZ3MsDQo+ICAgICAgIC8qIFNldCBpbml0aWFsIHN0YXRlICovDQo+ICAgICAgIHMtPnN0
-YXRlID0gMTsNCj4gICANCj4gKyAgICAvKiBQYXJzZSBwZXJtaXNzaW9ucyBtb2RpZmllcnMgYmVm
-b3JlIG9wZW5pbmcgdGhlIGltYWdlIGZpbGUgKi8NCj4gKyAgICByZXQgPSBibGtkZWJ1Z19wYXJz
-ZV9wZXJtcyhzLCBvcHRpb25zLCBlcnJwKTsNCj4gKyAgICBpZiAocmV0IDwgMCkgew0KPiArICAg
-ICAgICBnb3RvIG91dDsNCj4gKyAgICB9DQo+ICsNCj4gICAgICAgLyogT3BlbiB0aGUgaW1hZ2Ug
-ZmlsZSAqLw0KPiAgICAgICBicy0+ZmlsZSA9IGJkcnZfb3Blbl9jaGlsZChxZW11X29wdF9nZXQo
-b3B0cywgIngtaW1hZ2UiKSwgb3B0aW9ucywgImltYWdlIiwNCj4gICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgYnMsICZjaGlsZF9maWxlLCBmYWxzZSwgJmxvY2FsX2Vycik7DQo+IEBA
-IC05MTYsNiArOTkwLDIxIEBAIHN0YXRpYyBpbnQgYmxrZGVidWdfcmVvcGVuX3ByZXBhcmUoQkRS
-VlJlb3BlblN0YXRlICpyZW9wZW5fc3RhdGUsDQo+ICAgICAgIHJldHVybiAwOw0KPiAgIH0NCj4g
-ICANCj4gK3N0YXRpYyB2b2lkIGJsa2RlYnVnX2NoaWxkX3Blcm0oQmxvY2tEcml2ZXJTdGF0ZSAq
-YnMsIEJkcnZDaGlsZCAqYywNCj4gKyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgY29u
-c3QgQmRydkNoaWxkUm9sZSAqcm9sZSwNCj4gKyAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgQmxvY2tSZW9wZW5RdWV1ZSAqcmVvcGVuX3F1ZXVlLA0KPiArICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICB1aW50NjRfdCBwZXJtLCB1aW50NjRfdCBzaGFyZWQsDQo+ICsgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgIHVpbnQ2NF90ICpucGVybSwgdWludDY0X3QgKm5zaGFy
-ZWQpDQo+ICt7DQo+ICsgICAgQkRSVkJsa2RlYnVnU3RhdGUgKnMgPSBicy0+b3BhcXVlOw0KPiAr
-DQo+ICsgICAgYmRydl9maWx0ZXJfZGVmYXVsdF9wZXJtcyhicywgYywgcm9sZSwgcmVvcGVuX3F1
-ZXVlLCBwZXJtLCBzaGFyZWQsDQo+ICsgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBucGVy
-bSwgbnNoYXJlZCk7DQo+ICsNCj4gKyAgICAqbnBlcm0gfD0gcy0+dGFrZV9jaGlsZF9wZXJtczsN
-Cj4gKyAgICAqbnNoYXJlZCAmPSB+cy0+dW5zaGFyZV9jaGlsZF9wZXJtczsNCj4gK30NCj4gKw0K
-PiAgIHN0YXRpYyBjb25zdCBjaGFyICpjb25zdCBibGtkZWJ1Z19zdHJvbmdfcnVudGltZV9vcHRz
-W10gPSB7DQo+ICAgICAgICJjb25maWciLA0KPiAgICAgICAiaW5qZWN0LWVycm9yLiIsDQo+IEBA
-IC05NDAsNyArMTAyOSw3IEBAIHN0YXRpYyBCbG9ja0RyaXZlciBiZHJ2X2Jsa2RlYnVnID0gew0K
-PiAgICAgICAuYmRydl9maWxlX29wZW4gICAgICAgICA9IGJsa2RlYnVnX29wZW4sDQo+ICAgICAg
-IC5iZHJ2X2Nsb3NlICAgICAgICAgICAgID0gYmxrZGVidWdfY2xvc2UsDQo+ICAgICAgIC5iZHJ2
-X3Jlb3Blbl9wcmVwYXJlICAgID0gYmxrZGVidWdfcmVvcGVuX3ByZXBhcmUsDQo+IC0gICAgLmJk
-cnZfY2hpbGRfcGVybSAgICAgICAgPSBiZHJ2X2ZpbHRlcl9kZWZhdWx0X3Blcm1zLA0KPiArICAg
-IC5iZHJ2X2NoaWxkX3Blcm0gICAgICAgID0gYmxrZGVidWdfY2hpbGRfcGVybSwNCj4gICANCj4g
-ICAgICAgLmJkcnZfZ2V0bGVuZ3RoICAgICAgICAgPSBibGtkZWJ1Z19nZXRsZW5ndGgsDQo+ICAg
-ICAgIC5iZHJ2X3JlZnJlc2hfZmlsZW5hbWUgID0gYmxrZGVidWdfcmVmcmVzaF9maWxlbmFtZSwN
-Cj4gDQoNCg0KLS0gDQpCZXN0IHJlZ2FyZHMsDQpWbGFkaW1pcg0K
+On Tue, 15 Oct 2019 at 17:34, Philippe Mathieu-Daud=C3=A9 <philmd@redhat.co=
+m> wrote:
+>
+> The IRQ Route Control registers definitions belong to the PIIX
+> chipset. We were only defining the 'A' register. Define the other
+> B, C and D registers, and use them.
+>
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+
+Xen change...
+
+Acked-by: Paul Durrant <paul@xen.org>
+
+> ---
+>  hw/i386/xen/xen-hvm.c         | 5 +++--
+>  hw/mips/gt64xxx_pci.c         | 4 ++--
+>  hw/pci-host/piix.c            | 9 ++++-----
+>  include/hw/southbridge/piix.h | 6 ++++++
+>  4 files changed, 15 insertions(+), 9 deletions(-)
+>
+> diff --git a/hw/i386/xen/xen-hvm.c b/hw/i386/xen/xen-hvm.c
+> index 6b5e5bb7f5..4ce2fb9c89 100644
+> --- a/hw/i386/xen/xen-hvm.c
+> +++ b/hw/i386/xen/xen-hvm.c
+> @@ -14,6 +14,7 @@
+>  #include "hw/pci/pci.h"
+>  #include "hw/pci/pci_host.h"
+>  #include "hw/i386/pc.h"
+> +#include "hw/southbridge/piix.h"
+>  #include "hw/irq.h"
+>  #include "hw/hw.h"
+>  #include "hw/i386/apic-msidef.h"
+> @@ -156,8 +157,8 @@ void xen_piix_pci_write_config_client(uint32_t addres=
+s, uint32_t val, int len)
+>              v =3D 0;
+>          }
+>          v &=3D 0xf;
+> -        if (((address + i) >=3D 0x60) && ((address + i) <=3D 0x63)) {
+> -            xen_set_pci_link_route(xen_domid, address + i - 0x60, v);
+> +        if (((address + i) >=3D PIIX_PIRQCA) && ((address + i) <=3D PIIX=
+_PIRQCD)) {
+> +            xen_set_pci_link_route(xen_domid, address + i - PIIX_PIRQCA,=
+ v);
+>          }
+>      }
+>  }
+> diff --git a/hw/mips/gt64xxx_pci.c b/hw/mips/gt64xxx_pci.c
+> index c277398c0d..5cab9c1ee1 100644
+> --- a/hw/mips/gt64xxx_pci.c
+> +++ b/hw/mips/gt64xxx_pci.c
+> @@ -1013,12 +1013,12 @@ static void gt64120_pci_set_irq(void *opaque, int=
+ irq_num, int level)
+>
+>      /* now we change the pic irq level according to the piix irq mapping=
+s */
+>      /* XXX: optimize */
+> -    pic_irq =3D piix4_dev->config[0x60 + irq_num];
+> +    pic_irq =3D piix4_dev->config[PIIX_PIRQCA + irq_num];
+>      if (pic_irq < 16) {
+>          /* The pic level is the logical OR of all the PCI irqs mapped to=
+ it. */
+>          pic_level =3D 0;
+>          for (i =3D 0; i < 4; i++) {
+> -            if (pic_irq =3D=3D piix4_dev->config[0x60 + i]) {
+> +            if (pic_irq =3D=3D piix4_dev->config[PIIX_PIRQCA + i]) {
+>                  pic_level |=3D pci_irq_levels[i];
+>              }
+>          }
+> diff --git a/hw/pci-host/piix.c b/hw/pci-host/piix.c
+> index 3770575c1a..a450fc726e 100644
+> --- a/hw/pci-host/piix.c
+> +++ b/hw/pci-host/piix.c
+> @@ -61,7 +61,6 @@ typedef struct I440FXState {
+>  #define PIIX_NUM_PIC_IRQS       16      /* i8259 * 2 */
+>  #define PIIX_NUM_PIRQS          4ULL    /* PIRQ[A-D] */
+>  #define XEN_PIIX_NUM_PIRQS      128ULL
+> -#define PIIX_PIRQC              0x60
+>
+>  typedef struct PIIX3State {
+>      PCIDevice dev;
+> @@ -468,7 +467,7 @@ static void piix3_set_irq_level_internal(PIIX3State *=
+piix3, int pirq, int level)
+>      int pic_irq;
+>      uint64_t mask;
+>
+> -    pic_irq =3D piix3->dev.config[PIIX_PIRQC + pirq];
+> +    pic_irq =3D piix3->dev.config[PIIX_PIRQCA + pirq];
+>      if (pic_irq >=3D PIIX_NUM_PIC_IRQS) {
+>          return;
+>      }
+> @@ -482,7 +481,7 @@ static void piix3_set_irq_level(PIIX3State *piix3, in=
+t pirq, int level)
+>  {
+>      int pic_irq;
+>
+> -    pic_irq =3D piix3->dev.config[PIIX_PIRQC + pirq];
+> +    pic_irq =3D piix3->dev.config[PIIX_PIRQCA + pirq];
+>      if (pic_irq >=3D PIIX_NUM_PIC_IRQS) {
+>          return;
+>      }
+> @@ -501,7 +500,7 @@ static void piix3_set_irq(void *opaque, int pirq, int=
+ level)
+>  static PCIINTxRoute piix3_route_intx_pin_to_irq(void *opaque, int pin)
+>  {
+>      PIIX3State *piix3 =3D opaque;
+> -    int irq =3D piix3->dev.config[PIIX_PIRQC + pin];
+> +    int irq =3D piix3->dev.config[PIIX_PIRQCA + pin];
+>      PCIINTxRoute route;
+>
+>      if (irq < PIIX_NUM_PIC_IRQS) {
+> @@ -530,7 +529,7 @@ static void piix3_write_config(PCIDevice *dev,
+>                                 uint32_t address, uint32_t val, int len)
+>  {
+>      pci_default_write_config(dev, address, val, len);
+> -    if (ranges_overlap(address, len, PIIX_PIRQC, 4)) {
+> +    if (ranges_overlap(address, len, PIIX_PIRQCA, 4)) {
+>          PIIX3State *piix3 =3D PIIX3_PCI_DEVICE(dev);
+>          int pic_irq;
+>
+> diff --git a/include/hw/southbridge/piix.h b/include/hw/southbridge/piix.=
+h
+> index 79ebe0089b..9c92c37a4d 100644
+> --- a/include/hw/southbridge/piix.h
+> +++ b/include/hw/southbridge/piix.h
+> @@ -18,6 +18,12 @@ I2CBus *piix4_pm_init(PCIBus *bus, int devfn, uint32_t=
+ smb_io_base,
+>                        qemu_irq sci_irq, qemu_irq smi_irq,
+>                        int smm_enabled, DeviceState **piix4_pm);
+>
+> +/* PIRQRC[A:D]: PIRQx Route Control Registers */
+> +#define PIIX_PIRQCA 0x60
+> +#define PIIX_PIRQCB 0x61
+> +#define PIIX_PIRQCC 0x62
+> +#define PIIX_PIRQCD 0x63
+> +
+>  /*
+>   * Reset Control Register: PCI-accessible ISA-Compatible Register at add=
+ress
+>   * 0xcf9, provided by the PCI/ISA bridge (PIIX3 PCI function 0, 8086:700=
+0).
+> --
+> 2.21.0
+>
 
