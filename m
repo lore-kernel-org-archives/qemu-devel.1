@@ -2,59 +2,55 @@ Return-Path: <SRS0=/TIv=YJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6AAAFECE599
-	for <qemu-devel@archiver.kernel.org>; Wed, 16 Oct 2019 22:42:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 57F3BECE599
+	for <qemu-devel@archiver.kernel.org>; Wed, 16 Oct 2019 22:43:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3D53321835
-	for <qemu-devel@archiver.kernel.org>; Wed, 16 Oct 2019 22:42:39 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3D53321835
+	by mail.kernel.org (Postfix) with ESMTPS id 23F2A21835
+	for <qemu-devel@archiver.kernel.org>; Wed, 16 Oct 2019 22:43:40 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 23F2A21835
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48980 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49006 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iKs06-0005ud-FK
-	for qemu-devel@archiver.kernel.org; Wed, 16 Oct 2019 18:42:38 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56473)
+	id 1iKs15-0006xg-8l
+	for qemu-devel@archiver.kernel.org; Wed, 16 Oct 2019 18:43:39 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56702)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <ehabkost@redhat.com>) id 1iKrzB-0004kv-Mt
- for qemu-devel@nongnu.org; Wed, 16 Oct 2019 18:41:42 -0400
+ (envelope-from <ehabkost@redhat.com>) id 1iKs0C-0006Dk-QF
+ for qemu-devel@nongnu.org; Wed, 16 Oct 2019 18:42:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <ehabkost@redhat.com>) id 1iKrzA-0007vy-Dc
- for qemu-devel@nongnu.org; Wed, 16 Oct 2019 18:41:41 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:52712)
+ (envelope-from <ehabkost@redhat.com>) id 1iKs0B-0008BM-Lm
+ for qemu-devel@nongnu.org; Wed, 16 Oct 2019 18:42:44 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:58252)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1iKrzA-0007vk-4e
- for qemu-devel@nongnu.org; Wed, 16 Oct 2019 18:41:40 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
+ (Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1iKs0B-0008AB-Da
+ for qemu-devel@nongnu.org; Wed, 16 Oct 2019 18:42:43 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id DFACA18C426E;
- Wed, 16 Oct 2019 22:41:38 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id A757818CB8E8;
+ Wed, 16 Oct 2019 22:42:42 +0000 (UTC)
 Received: from localhost (ovpn-116-20.phx2.redhat.com [10.3.116.20])
- by smtp.corp.redhat.com (Postfix) with ESMTP id F143860BE1;
- Wed, 16 Oct 2019 22:41:26 +0000 (UTC)
-Date: Wed, 16 Oct 2019 19:41:24 -0300
+ by smtp.corp.redhat.com (Postfix) with ESMTP id E295E19C70;
+ Wed, 16 Oct 2019 22:42:39 +0000 (UTC)
 From: Eduardo Habkost <ehabkost@redhat.com>
-To: Thomas Huth <thuth@redhat.com>
-Subject: Re: Python 2 and test/vm/netbsd
-Message-ID: <20191016224124.GF4084@habkost.net>
-References: <20191016030021.GD4084@habkost.net>
- <a83d518a-6e39-0017-203d-2ee3d61935ca@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH] configure: Require Python >= 3.5
+Date: Wed, 16 Oct 2019 19:42:37 -0300
+Message-Id: <20191016224237.26180-1-ehabkost@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <a83d518a-6e39-0017-203d-2ee3d61935ca@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.62]); Wed, 16 Oct 2019 22:41:38 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.63]); Wed, 16 Oct 2019 22:42:42 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 209.132.183.28
@@ -69,83 +65,105 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Peter Maydell <peter.maydell@linaro.org>,
- Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>,
- QEMU Developers <qemu-devel@nongnu.org>,
- Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>,
- =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>,
- Kamil Rytarowski <kamil@netbsd.org>, Gerd Hoffmann <kraxel@redhat.com>,
- Cleber Rosa <crosa@redhat.com>, Kevin Wolf <kwolf@redhat.com>,
- John Snow <jsnow@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>,
+ John Snow <jsnow@redhat.com>, Cleber Rosa <crosa@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, Oct 16, 2019 at 08:11:57AM +0200, Thomas Huth wrote:
-> On 16/10/2019 05.00, Eduardo Habkost wrote:
-> > On Tue, Sep 17, 2019 at 08:31:40PM -0300, Eduardo Habkost wrote:
-> >> On Mon, Jul 01, 2019 at 07:25:27PM -0300, Eduardo Habkost wrote:
-> >>> On Mon, Jun 10, 2019 at 01:58:50PM +0100, Peter Maydell wrote:
-> > [...]
-> >>>> The configure check also spits out deprecation warnings for
-> >>>> the NetBSD/FreeBSD/OpenBSD tests/vm configurations. It would be nice
-> >>>> to get those updated.
-> >>>
-> >>> CCing the test/vm maintainers.
-> >>>
-> >>> Fam, Alex, are you able to fix this and create new BSD VM images
-> >>> with Python 3 available?  I thought the VM image configurations
-> >>> were stored in the source tree, but they are downloaded from
-> >>> download.patchew.org.
-> >>
-> >> Fam, Alex, can you help us on this?  Python 2 won't be supported
-> >> anymore, so we need the VM images to be updated.
-> > 
-> > Anyone?
-> > 
-> > I'm about to submit patches to remove Python 2 support, and this
-> > will break tests/vm/netbsd.
-> > 
-> > I'm powerless to fix this issue, because the netbsd image is
-> > hosted at download.patchew.org.
-> 
-> Gerd had a patch to convert the netbsd VM script to ad hoc image
-> creation, too:
-> 
-> https://lists.gnu.org/archive/html/qemu-devel/2019-05/msg04459.html
-> 
-> But there was a regression with the serial port between QEMU v3.0 and
-> v4.x, so it was not included:
-> 
-> https://lists.gnu.org/archive/html/qemu-devel/2019-05/msg06784.html
+Python 3.5 is the oldest Python version available on our
+supported build platforms, and Python 2 end of life will be 3
+weeks after the planned release date of QEMU 4.2.0.  Drop Python
+2 support from configure completely, and require Python 3.5 or
+newer.
 
-The URL above has this error:
+Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+---
+ configure              | 18 ++++--------------
+ tests/Makefile.include |  5 -----
+ 2 files changed, 4 insertions(+), 19 deletions(-)
 
-  con recv:  x: Exitqqqqqqqqqqqqqqqqqqqqqqqqqj
-  con recv: To be able to use the network, we need answers to the
-  following:Network media type
-  con send: <enter>
-  con recv: : qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqk Perform autoconfiguration?
-     >a: Yes b: Noqqqqqqqqqqqqqqqqq
-  console: *** read timeout ***
-  console: waiting for: 'a: Yes'
-  console: line buffer:
-  
-  con recv: qqqqqqqqqqqqqqj
+diff --git a/configure b/configure
+index 08ca4bcb46..870657ec7b 100755
+--- a/configure
++++ b/configure
+@@ -895,9 +895,9 @@ fi
+ : ${install=3D${INSTALL-install}}
+ # We prefer python 3.x. A bare 'python' is traditionally
+ # python 2.x, but some distros have it as python 3.x, so
+-# we check that before python2
++# we check that too
+ python=3D
+-for binary in "${PYTHON-python3}" python python2
++for binary in "${PYTHON-python3}" python
+ do
+     if has "$binary"
+     then
+@@ -1824,8 +1824,8 @@ fi
+=20
+ # Note that if the Python conditional here evaluates True we will exit
+ # with status 1 which is a shell 'false' value.
+-if ! $python -c 'import sys; sys.exit(sys.version_info < (2,7))'; then
+-  error_exit "Cannot use '$python', Python 2 >=3D 2.7 or Python 3 is req=
+uired." \
++if ! $python -c 'import sys; sys.exit(sys.version_info < (3,5))'; then
++  error_exit "Cannot use '$python', Python >=3D 3.5 is required." \
+       "Use --python=3D/path/to/python to specify a supported Python."
+ fi
+=20
+@@ -6456,15 +6456,6 @@ if test "$supported_os" =3D "no"; then
+     echo "us upstream at qemu-devel@nongnu.org."
+ fi
+=20
+-# Note that if the Python conditional here evaluates True we will exit
+-# with status 1 which is a shell 'false' value.
+-if ! $python -c 'import sys; sys.exit(sys.version_info < (3,0))'; then
+-  echo
+-  echo "warning: Python 2 support is deprecated" >&2
+-  echo "warning: Python 3 will be required for building future versions =
+of QEMU" >&2
+-  python2=3D"y"
+-fi
+-
+ config_host_mak=3D"config-host.mak"
+=20
+ echo "# Automatically generated by configure - do not modify" >config-al=
+l-disas.mak
+@@ -7282,7 +7273,6 @@ echo "INSTALL_DATA=3D$install -c -m 0644" >> $confi=
+g_host_mak
+ echo "INSTALL_PROG=3D$install -c -m 0755" >> $config_host_mak
+ echo "INSTALL_LIB=3D$install -c -m 0644" >> $config_host_mak
+ echo "PYTHON=3D$python" >> $config_host_mak
+-echo "PYTHON2=3D$python2" >> $config_host_mak
+ echo "CC=3D$cc" >> $config_host_mak
+ if $iasl -h > /dev/null 2>&1; then
+   echo "IASL=3D$iasl" >> $config_host_mak
+diff --git a/tests/Makefile.include b/tests/Makefile.include
+index 3543451ed3..54ee1f0a2f 100644
+--- a/tests/Makefile.include
++++ b/tests/Makefile.include
+@@ -1137,7 +1137,6 @@ TESTS_RESULTS_DIR=3D$(BUILD_DIR)/tests/results
+ AVOCADO_SHOW=3Dapp
+ AVOCADO_TAGS=3D$(patsubst %-softmmu,-t arch:%, $(filter %-softmmu,$(TARG=
+ET_DIRS)))
+=20
+-ifneq ($(PYTHON2),y)
+ $(TESTS_VENV_DIR): $(TESTS_VENV_REQ)
+ 	$(call quiet-command, \
+             $(PYTHON) -m venv --system-site-packages $@, \
+@@ -1146,10 +1145,6 @@ $(TESTS_VENV_DIR): $(TESTS_VENV_REQ)
+             $(TESTS_VENV_DIR)/bin/python -m pip -q install -r $(TESTS_VE=
+NV_REQ), \
+             PIP, $(TESTS_VENV_REQ))
+ 	$(call quiet-command, touch $@)
+-else
+-$(TESTS_VENV_DIR):
+-	$(error "venv directory for tests requires Python 3")
+-endif
+=20
+ $(TESTS_RESULTS_DIR):
+ 	$(call quiet-command, mkdir -p $@, \
+--=20
+2.21.0
 
-I believe that problem was solved in v4, because v4 was reading
-the serial output 1 byte at a time.
-
-The issue that caused the netbsd patch to be dropped was:
-https://lore.kernel.org/qemu-devel/CAFEAcA8k9QJA9iE-kwiaPhr0fY_2zG7JRX5uV4AaSSjXCSs4+A@mail.gmail.com/
-
-Possibly this is the same issue we saw at:
-https://lore.kernel.org/qemu-devel/20190607034214.GB22416@habkost.net/
-
-The test script must either close the console socket, or keep
-reading from it.  Otherwise, the QEMU VCPU threads might get
-stuck waiting for the chardev to be writeable.
-
--- 
-Eduardo
 
