@@ -2,61 +2,85 @@ Return-Path: <SRS0=/TIv=YJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 437C7ECE588
-	for <qemu-devel@archiver.kernel.org>; Wed, 16 Oct 2019 09:16:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E9851C4360C
+	for <qemu-devel@archiver.kernel.org>; Wed, 16 Oct 2019 09:27:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 19735205F4
-	for <qemu-devel@archiver.kernel.org>; Wed, 16 Oct 2019 09:16:13 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 19735205F4
+	by mail.kernel.org (Postfix) with ESMTPS id BF93620650
+	for <qemu-devel@archiver.kernel.org>; Wed, 16 Oct 2019 09:27:25 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BF93620650
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39976 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40076 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iKfPg-0005KT-9Y
-	for qemu-devel@archiver.kernel.org; Wed, 16 Oct 2019 05:16:12 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53929)
+	id 1iKfaW-0001HC-WA
+	for qemu-devel@archiver.kernel.org; Wed, 16 Oct 2019 05:27:25 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55727)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgilbert@redhat.com>) id 1iKfOQ-0004OE-Pb
- for qemu-devel@nongnu.org; Wed, 16 Oct 2019 05:14:55 -0400
+ (envelope-from <philmd@redhat.com>) id 1iKfZt-0000pP-4L
+ for qemu-devel@nongnu.org; Wed, 16 Oct 2019 05:26:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgilbert@redhat.com>) id 1iKfOP-0003dR-Ob
- for qemu-devel@nongnu.org; Wed, 16 Oct 2019 05:14:54 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:35104)
+ (envelope-from <philmd@redhat.com>) id 1iKfZr-00005l-NI
+ for qemu-devel@nongnu.org; Wed, 16 Oct 2019 05:26:44 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:52526)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1iKfOP-0003ck-JF
- for qemu-devel@nongnu.org; Wed, 16 Oct 2019 05:14:53 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iKfZr-00005B-HB
+ for qemu-devel@nongnu.org; Wed, 16 Oct 2019 05:26:43 -0400
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id D9F288E581
- for <qemu-devel@nongnu.org>; Wed, 16 Oct 2019 09:14:52 +0000 (UTC)
-Received: from work-vm (ovpn-117-133.ams2.redhat.com [10.36.117.133])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 7A92660C5D;
- Wed, 16 Oct 2019 09:14:46 +0000 (UTC)
-Date: Wed, 16 Oct 2019 10:14:44 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: Peter Xu <peterx@redhat.com>
-Subject: Re: [PATCH v2 4/4] migration: Check in savevm_state_handler_insert
- for dups
-Message-ID: <20191016091444.GC2978@work-vm>
-References: <20191016022933.7276-1-peterx@redhat.com>
- <20191016022933.7276-5-peterx@redhat.com>
+ by mx1.redhat.com (Postfix) with ESMTPS id 483BA4ACA7
+ for <qemu-devel@nongnu.org>; Wed, 16 Oct 2019 09:26:42 +0000 (UTC)
+Received: by mail-wr1-f71.google.com with SMTP id j14so76474wrp.6
+ for <qemu-devel@nongnu.org>; Wed, 16 Oct 2019 02:26:42 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=FmNieoC72m25n2CcxRCXGkjoghdzkJVIg2/SkdBBodA=;
+ b=bd6N/pofH195B+fxNMDoYJWirhvwJzIPCqWqRAa3dqrYQXKsW6Oh0Q1frUvbSq2BE0
+ WvkjFMZN0XQeq7G+dwsMXvrZLQ3LsblL6oP75Vx2dnHkzl9p8T9GOpXwShOrBRJGs/pe
+ rufCaugS5PuE8vaT55QR40vMcm57nONgCyTyGx4Ng3BKnWth+i/yoXK62RMKaZyRblYV
+ djrrajYYdF8cRhpCX8JMJZfQkzyIW8RwMvmN0gxqr5QMTLjD70ND0e7KMY7NVCNe0TRY
+ NXhnDF9E2eeB5HznhaebMOOMHUtPjuLOe98ZIjm3sBcksUuxMvEtVQCNHymlH0S1tN3s
+ B+SA==
+X-Gm-Message-State: APjAAAU8W9kn6QZ7zqnRG3okaymRE5/0JrAZoNZSvExVB2o1p0tqGpgK
+ urOJNrHybWsl73x7KfXE8KYtbRtLsC0GJNkI8HV8wOLy9nx7YmVmq08FyoDX922bPIQY6zX26YM
+ D9rZfigVxPmJMplI=
+X-Received: by 2002:adf:db0e:: with SMTP id s14mr1857518wri.341.1571218001020; 
+ Wed, 16 Oct 2019 02:26:41 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqy39ueEYMoc+9aIF9Hfr2TJ61eXMUMOVHdvTH4sMMpu9l23YOllxGjnLfP36zcoaZEsGKy45g==
+X-Received: by 2002:adf:db0e:: with SMTP id s14mr1857496wri.341.1571218000781; 
+ Wed, 16 Oct 2019 02:26:40 -0700 (PDT)
+Received: from [192.168.1.36] (14.red-88-21-201.staticip.rima-tde.net.
+ [88.21.201.14])
+ by smtp.gmail.com with ESMTPSA id z9sm23895495wrl.35.2019.10.16.02.26.39
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Wed, 16 Oct 2019 02:26:40 -0700 (PDT)
+Subject: Re: [PATCH v9 14/15] hw/i386: Introduce the microvm machine type
+To: Paolo Bonzini <pbonzini@redhat.com>, Sergio Lopez <slp@redhat.com>,
+ qemu-devel@nongnu.org
+References: <20191015112346.45554-1-slp@redhat.com>
+ <20191015112346.45554-15-slp@redhat.com>
+ <6276a8e7-2928-6e33-64a1-3ae01a30a718@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <a5863b05-4021-df51-d84f-1bb070fa6137@redhat.com>
+Date: Wed, 16 Oct 2019 11:26:39 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20191016022933.7276-5-peterx@redhat.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.28]); Wed, 16 Oct 2019 09:14:52 +0000 (UTC)
+In-Reply-To: <6276a8e7-2928-6e33-64a1-3ae01a30a718@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 209.132.183.28
@@ -71,71 +95,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Juan Quintela <quintela@redhat.com>,
- qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>,
- Igor Mammedov <imammedo@redhat.com>
+Cc: ehabkost@redhat.com, mst@redhat.com, kraxel@redhat.com, imammedo@redhat.com,
+ rth@twiddle.net, lersek@redhat.com, sgarzare@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-* Peter Xu (peterx@redhat.com) wrote:
-> Before finally register one SaveStateEntry, we detect for duplicated
-> entries.  This could be helpful to notify us asap instead of get
-> silent migration failures which could be hard to diagnose.
+On 10/16/19 9:46 AM, Paolo Bonzini wrote:
 > 
-> For example, this patch will generate a message like this (if without
-> previous fixes on x2apic) as long as we wants to boot a VM instance
-> with "-smp 200,maxcpus=288,sockets=2,cores=72,threads=2" and QEMU will
-> bail out even before VM starts:
+>> diff --git a/hw/i386/Kconfig b/hw/i386/Kconfig
+>> index c5c9d4900e..d399dcba52 100644
+>> --- a/hw/i386/Kconfig
+>> +++ b/hw/i386/Kconfig
+>> @@ -92,6 +92,10 @@ config Q35
+>>       select SMBIOS
+>>       select FW_CFG_DMA
+>>   
+>> +config MICROVM
+>> +    bool
 > 
-> savevm_state_handler_insert: Detected duplicate SaveStateEntry: id=apic, instance_id=0x0
+> Missing:
 > 
-> Suggested-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> Signed-off-by: Peter Xu <peterx@redhat.com>
+>      select ISA_BUS
+>      select APIC
+>      select IOAPIC
+>      select I8259
+>      select MC146818RTC
 
-Right, lets see what this triggers :-)
+maybe 'select SERIAL_ISA' too?
 
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-
-> ---
->  migration/savevm.c | 14 ++++++++++++++
->  1 file changed, 14 insertions(+)
+> No need to post v10 just for this.
 > 
-> diff --git a/migration/savevm.c b/migration/savevm.c
-> index 1e44f06d7a..83e91ddafa 100644
-> --- a/migration/savevm.c
-> +++ b/migration/savevm.c
-> @@ -264,6 +264,8 @@ static SaveState savevm_state = {
->      .global_section_id = 0,
->  };
->  
-> +static SaveStateEntry *find_se(const char *idstr, uint32_t instance_id);
-> +
->  static bool should_validate_capability(int capability)
->  {
->      assert(capability >= 0 && capability < MIGRATION_CAPABILITY__MAX);
-> @@ -714,6 +716,18 @@ static void savevm_state_handler_insert(SaveStateEntry *nse)
->  
->      assert(priority <= MIG_PRI_MAX);
->  
-> +    /*
-> +     * This should never happen otherwise migration will probably fail
-> +     * silently somewhere because we can be wrongly applying one
-> +     * object properties upon another one.  Bail out ASAP.
-> +     */
-> +    if (find_se(nse->idstr, nse->instance_id)) {
-> +        error_report("%s: Detected duplicate SaveStateEntry: "
-> +                     "id=%s, instance_id=0x%"PRIx32, __func__,
-> +                     nse->idstr, nse->instance_id);
-> +        exit(EXIT_FAILURE);
-> +    }
-> +
->      QTAILQ_FOREACH(se, &savevm_state.handlers, entry) {
->          if (save_state_priority(se) < priority) {
->              break;
-> -- 
-> 2.21.0
+> Paolo
 > 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> 
+>> +    select VIRTIO_MMIO
+>> +
+>>   config VTD
+>>       bool
+>>   
+>> diff --git a/hw/i386/Makefile.objs b/hw/i386/Makefile.objs
+>> index 7ed80a4853..0d195b5210 100644
+>> --- a/hw/i386/Makefile.objs
+>> +++ b/hw/i386/Makefile.objs
+>> @@ -4,6 +4,7 @@ obj-y += x86.o
+>>   obj-y += pc.o
+>>   obj-$(CONFIG_I440FX) += pc_piix.o
+>>   obj-$(CONFIG_Q35) += pc_q35.o
+>> +obj-$(CONFIG_MICROVM) += microvm.o
+>>   obj-y += fw_cfg.o pc_sysfw.o
+>>   obj-y += x86-iommu.o
+>>   obj-$(CONFIG_VTD) += intel_iommu.o
+>>
+> 
 
