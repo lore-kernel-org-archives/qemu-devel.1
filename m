@@ -2,99 +2,75 @@ Return-Path: <SRS0=/TIv=YJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.7 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0B29FFA372A
-	for <qemu-devel@archiver.kernel.org>; Wed, 16 Oct 2019 17:28:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BC980FA3728
+	for <qemu-devel@archiver.kernel.org>; Wed, 16 Oct 2019 17:29:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D65A92064B
-	for <qemu-devel@archiver.kernel.org>; Wed, 16 Oct 2019 17:28:20 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D65A92064B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.vnet.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id 92D462064B
+	for <qemu-devel@archiver.kernel.org>; Wed, 16 Oct 2019 17:29:52 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 92D462064B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46532 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46548 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iKn5w-0004wO-12
-	for qemu-devel@archiver.kernel.org; Wed, 16 Oct 2019 13:28:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36020)
+	id 1iKn7P-0006n1-Pa
+	for qemu-devel@archiver.kernel.org; Wed, 16 Oct 2019 13:29:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39753)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <cheloha@linux.vnet.ibm.com>) id 1iKmNC-00041R-CR
- for qemu-devel@nongnu.org; Wed, 16 Oct 2019 12:42:07 -0400
+ (envelope-from <bounces@canonical.com>) id 1iKmaO-0007HO-7K
+ for qemu-devel@nongnu.org; Wed, 16 Oct 2019 12:55:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <cheloha@linux.vnet.ibm.com>) id 1iKmN9-00067s-8r
- for qemu-devel@nongnu.org; Wed, 16 Oct 2019 12:42:05 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:13836)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <cheloha@linux.vnet.ibm.com>)
- id 1iKmN8-00066L-VR
- for qemu-devel@nongnu.org; Wed, 16 Oct 2019 12:42:03 -0400
-Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
- by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
- x9GGbF6v055415
- for <qemu-devel@nongnu.org>; Wed, 16 Oct 2019 12:41:59 -0400
-Received: from pps.reinject (localhost [127.0.0.1])
- by mx0a-001b2d01.pphosted.com with ESMTP id 2vp67rhr37-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
- for <qemu-devel@nongnu.org>; Wed, 16 Oct 2019 12:41:59 -0400
-Received: from m0098394.ppops.net (m0098394.ppops.net [127.0.0.1])
- by pps.reinject (8.16.0.27/8.16.0.27) with SMTP id x9GGfw8o095682
- for <qemu-devel@nongnu.org>; Wed, 16 Oct 2019 12:41:59 -0400
-Received: from ppma03dal.us.ibm.com (b.bd.3ea9.ip4.static.sl-reverse.com
- [169.62.189.11])
- by mx0a-001b2d01.pphosted.com with ESMTP id 2vp67rhr2q-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Wed, 16 Oct 2019 12:41:58 -0400
-Received: from pps.filterd (ppma03dal.us.ibm.com [127.0.0.1])
- by ppma03dal.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id x9GGeeJF023910;
- Wed, 16 Oct 2019 16:41:58 GMT
-Received: from b01cxnp22036.gho.pok.ibm.com (b01cxnp22036.gho.pok.ibm.com
- [9.57.198.26]) by ppma03dal.us.ibm.com with ESMTP id 2vk6f97jjd-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Wed, 16 Oct 2019 16:41:58 +0000
-Received: from b01ledav002.gho.pok.ibm.com (b01ledav002.gho.pok.ibm.com
- [9.57.199.107])
- by b01cxnp22036.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- x9GGfvpw40632780
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Wed, 16 Oct 2019 16:41:57 GMT
-Received: from b01ledav002.gho.pok.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 406DE124053;
- Wed, 16 Oct 2019 16:41:57 +0000 (GMT)
-Received: from b01ledav002.gho.pok.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id D7884124052;
- Wed, 16 Oct 2019 16:41:56 +0000 (GMT)
-Received: from rascal.austin.ibm.com (unknown [9.41.179.32])
- by b01ledav002.gho.pok.ibm.com (Postfix) with ESMTP;
- Wed, 16 Oct 2019 16:41:56 +0000 (GMT)
-From: Scott Cheloha <cheloha@linux.vnet.ibm.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH] migration: savevm_state_insert_handler: constant-time element
- insertion
-Date: Wed, 16 Oct 2019 11:41:56 -0500
-Message-Id: <20191016164156.4506-1-cheloha@linux.vnet.ibm.com>
-X-Mailer: git-send-email 2.23.0
+ (envelope-from <bounces@canonical.com>) id 1iKmaM-0005RI-Mf
+ for qemu-devel@nongnu.org; Wed, 16 Oct 2019 12:55:44 -0400
+Received: from indium.canonical.com ([91.189.90.7]:34558)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <bounces@canonical.com>)
+ id 1iKmaM-0005Qv-H3
+ for qemu-devel@nongnu.org; Wed, 16 Oct 2019 12:55:42 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1iKmaL-00088l-2a
+ for <qemu-devel@nongnu.org>; Wed, 16 Oct 2019 16:55:41 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 11FAF2E802D
+ for <qemu-devel@nongnu.org>; Wed, 16 Oct 2019 16:55:41 +0000 (UTC)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
- definitions=2019-10-16_07:, , signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- priorityscore=1501
- malwarescore=0 suspectscore=3 phishscore=0 bulkscore=0 spamscore=0
- clxscore=1011 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1908290000 definitions=main-1910160140
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
-X-Received-From: 148.163.156.1
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 16 Oct 2019 16:48:18 -0000
+From: psyhomb <psyhomb@gmail.com>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: dgilbert-h lersek michael-weiser psyhomb
+X-Launchpad-Bug-Reporter: Michael Weiser (michael-weiser)
+X-Launchpad-Bug-Modifier: psyhomb (psyhomb)
+References: <157005622285.15919.12087374175062502233.malonedeb@gac.canonical.com>
+Message-Id: <157124449906.21692.3856963267324677703.malone@wampee.canonical.com>
+Subject: [Bug 1846427] Re: 4.1.0: qcow2 corruption on savevm/quit/loadvm cycle
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="186023fa645d8be19d403a76064f0643f510db2f";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: 9eeab619f4d460b0e461db871e15c93912931e91
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 91.189.90.7
 X-Mailman-Approved-At: Wed, 16 Oct 2019 13:27:17 -0400
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -103,119 +79,143 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
- Juan Quintela <quintela@redhat.com>
+Reply-To: Bug 1846427 <1846427@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Registering a SaveStateEntry object via savevm_state_insert_handler()
-is an O(n) operation because the list is a priority queue maintained by
-walking the list from head to tail to find a suitable insertion point.
+I can confirm exactly the same issue on Arch linux running qemu-4.1.0.
 
-This adds considerable overhead for VMs with many such objects.  For
-instance, ppc64 machines with large maxmem (8T+) spend ~10% or more of
-their CPU time in savevm_state_insert_handler() before attempting to
-boot a kernel.
+After downgrading from 4.1.0 =3D> 4.0.0 everything is running normal
+again, no corruption detected and all qcow2 images stays healthy.
 
-If we track the head for each priority's subqueue we can insert new
-elements in constant time.
+-- =
 
-This commit also introduces a new function, savevm_state_remove_handler(),
-which abstracts the logic for replacing the head of an element's subqueue
-when removing it.
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1846427
 
-Signed-off-by: Scott Cheloha <cheloha@linux.vnet.ibm.com>
----
- migration/savevm.c | 35 ++++++++++++++++++++++++++++++-----
- 1 file changed, 30 insertions(+), 5 deletions(-)
+Title:
+  4.1.0: qcow2 corruption on savevm/quit/loadvm cycle
 
-diff --git a/migration/savevm.c b/migration/savevm.c
-index 8d95e261f6..f7a2d36bba 100644
---- a/migration/savevm.c
-+++ b/migration/savevm.c
-@@ -250,6 +250,7 @@ typedef struct SaveStateEntry {
- 
- typedef struct SaveState {
-     QTAILQ_HEAD(, SaveStateEntry) handlers;
-+    SaveStateEntry *handler_pri_head[MIG_PRI_MAX + 1];
-     int global_section_id;
-     uint32_t len;
-     const char *name;
-@@ -261,6 +262,7 @@ typedef struct SaveState {
- 
- static SaveState savevm_state = {
-     .handlers = QTAILQ_HEAD_INITIALIZER(savevm_state.handlers),
-+    .handler_pri_head = { [MIG_PRI_DEFAULT ... MIG_PRI_MAX] = NULL },
-     .global_section_id = 0,
- };
- 
-@@ -709,20 +711,43 @@ static void savevm_state_handler_insert(SaveStateEntry *nse)
- {
-     MigrationPriority priority = save_state_priority(nse);
-     SaveStateEntry *se;
-+    int i;
- 
-     assert(priority <= MIG_PRI_MAX);
- 
--    QTAILQ_FOREACH(se, &savevm_state.handlers, entry) {
--        if (save_state_priority(se) < priority) {
-+    for (i = priority - 1; i >= 0; i--) {
-+        se = savevm_state.handler_pri_head[i];
-+        if (se != NULL) {
-+            assert(save_state_priority(se) < priority);
-             break;
-         }
-     }
- 
--    if (se) {
-+    if (i >= 0) {
-         QTAILQ_INSERT_BEFORE(se, nse, entry);
-     } else {
-         QTAILQ_INSERT_TAIL(&savevm_state.handlers, nse, entry);
-     }
-+
-+    if (savevm_state.handler_pri_head[priority] == NULL) {
-+        savevm_state.handler_pri_head[priority] = nse;
-+    }
-+}
-+
-+static void savevm_state_handler_remove(SaveStateEntry *se)
-+{
-+    SaveStateEntry *next;
-+    MigrationPriority priority = save_state_priority(se);
-+
-+    if (se == savevm_state.handler_pri_head[priority]) {
-+        next = QTAILQ_NEXT(se, entry);
-+        if (next != NULL && save_state_priority(next) == priority) {
-+            savevm_state.handler_pri_head[priority] = next;
-+        } else {
-+            savevm_state.handler_pri_head[priority] = NULL;
-+        }
-+    }
-+    QTAILQ_REMOVE(&savevm_state.handlers, se, entry);
- }
- 
- /* TODO: Individual devices generally have very little idea about the rest
-@@ -777,7 +802,7 @@ void unregister_savevm(DeviceState *dev, const char *idstr, void *opaque)
- 
-     QTAILQ_FOREACH_SAFE(se, &savevm_state.handlers, entry, new_se) {
-         if (strcmp(se->idstr, id) == 0 && se->opaque == opaque) {
--            QTAILQ_REMOVE(&savevm_state.handlers, se, entry);
-+            savevm_state_handler_remove(se);
-             g_free(se->compat);
-             g_free(se);
-         }
-@@ -841,7 +866,7 @@ void vmstate_unregister(DeviceState *dev, const VMStateDescription *vmsd,
- 
-     QTAILQ_FOREACH_SAFE(se, &savevm_state.handlers, entry, new_se) {
-         if (se->vmsd == vmsd && se->opaque == opaque) {
--            QTAILQ_REMOVE(&savevm_state.handlers, se, entry);
-+            savevm_state_handler_remove(se);
-             g_free(se->compat);
-             g_free(se);
-         }
--- 
-2.23.0
+Status in QEMU:
+  New
 
+Bug description:
+  I'm seeing massive corruption of qcow2 images with qemu 4.1.0 and git
+  master as of 7f21573c822805a8e6be379d9bcf3ad9effef3dc after a few
+  savevm/quit/loadvm cycles. I've narrowed it down to the following
+  reproducer (further notes below):
+
+  # qemu-img check debian.qcow2
+  No errors were found on the image.
+  251601/327680 =3D 76.78% allocated, 1.63% fragmented, 0.00% compressed cl=
+usters
+  Image end offset: 18340446208
+  # bin/qemu/bin/qemu-system-x86_64 -machine pc-q35-4.0.1,accel=3Dkvm -m 40=
+96 -chardev stdio,id=3Dcharmonitor -mon chardev=3Dcharmonitor -drive file=
+=3Ddebian.qcow2,id=3Dd -S
+  qemu-system-x86_64: warning: dbind: Couldn't register with accessibility =
+bus: Did not receive a reply. Possible causes include: the remote applicati=
+on did not send a reply, the message bus security policy blocked the reply,=
+ the reply timeout expired, or the network connection was broken.
+  QEMU 4.1.50 monitor - type 'help' for more information
+  (qemu) loadvm foo
+  (qemu) c
+  (qemu) qcow2_free_clusters failed: Invalid argument
+  qcow2_free_clusters failed: Invalid argument
+  qcow2_free_clusters failed: Invalid argument
+  qcow2_free_clusters failed: Invalid argument
+  quit
+  [m@nargothrond:~] qemu-img check debian.qcow2
+  Leaked cluster 85179 refcount=3D2 reference=3D1
+  Leaked cluster 85180 refcount=3D2 reference=3D1
+  ERROR cluster 266150 refcount=3D0 reference=3D2
+  [...]
+  ERROR OFLAG_COPIED data cluster: l2_entry=3D422840000 refcount=3D1
+
+  9493 errors were found on the image.
+  Data may be corrupted, or further writes to the image may corrupt it.
+
+  2 leaked clusters were found on the image.
+  This means waste of disk space, but no harm to data.
+  259266/327680 =3D 79.12% allocated, 1.67% fragmented, 0.00% compressed cl=
+usters
+  Image end offset: 18340446208
+
+  This is on a x86_64 Linux 5.3.1 Gentoo host with qemu-system-x86_64
+  and accel=3Dkvm. The compiler is gcc-9.2.0 with the rest of the system
+  similarly current.
+
+  Reproduced with qemu-4.1.0 from distribution package as well as
+  vanilla git checkout of tag v4.1.0 and commit
+  7f21573c822805a8e6be379d9bcf3ad9effef3dc (today's master). Does not
+  happen with qemu compiled from vanilla checkout of tag v4.0.0. Build
+  sequence:
+
+  ./configure --prefix=3D$HOME/bin/qemu-bisect --target-list=3Dx86_64-softm=
+mu --disable-werror --disable-docs
+  [...]
+  CFLAGS            -O2 -U_FORTIFY_SOURCE -D_FORTIFY_SOURCE=3D2 -g
+  [...] (can provide full configure output if helpful)
+  make -j8 install
+
+  The kind of guest OS does not matter: seen with Debian testing 64bit,
+  Windows 7 x86/x64 BIOS and Windows 7 x64 EFI.
+
+  The virtual storage controller does not seem to matter: seen with
+  VirtIO SCSI, emulated SCSI and emulated SATA AHCI.
+
+  Caching modes (none, directsync, writeback), aio mode (threads,
+  native) or discard (ignore, unmap) or detect-zeroes (off, unmap) does
+  not influence occurence either.
+
+  Having more RAM in the guest seems to increase odds of corruption:
+  With 512MB to the Debian guest problem hardly occurs at all, with 4GB
+  RAM it happens almost instantly.
+
+  An automated reproducer works as follows:
+
+  - the guest *does* mount its root fs and swap with option discard and
+  my testing leaves me with the impression that file deletion rather
+  than reading is causing the issue
+
+  - foo is a snapshot of the running Debian VM which is already running
+  command
+
+  # while true ; do dd if=3D/dev/zero of=3Dfoo bs=3D10240k count=3D400 ; do=
+ne
+
+  to produce some I/O to the disk (4GB file with 4GB of RAM).
+
+  - on the host a loop continuously resumes and saves the guest state
+  and quits qemu inbetween:
+
+  # while true ; do (echo loadvm foo ; echo c ; sleep 10 ; echo stop ;
+  echo savevm foo ; echo quit ) | bin/qemu-bisect/bin/qemu-system-x86_64
+  -machine pc-q35-3.1,accel=3Dkvm -m 4096 -chardev stdio,id=3Dcharmonitor
+  -mon chardev=3Dcharmonitor -drive file=3Ddebian.qcow2,id=3Dd -S -display
+  none ; done
+
+  - quitting qemu inbetween saves and loads seems to be necessary for
+  the problem to occur. Just continusouly in one session saving and
+  loading guest state does not trigger it.
+
+  - For me, after about 2 to 6 iterations of above loop the image is
+  corrupted.
+
+  - corruption manifests with other messages from qemu as well, e.g.:
+
+  (qemu) loadvm foo
+  Error: Device 'd' does not have the requested snapshot 'foo'
+
+  Using above reproducer I have to the be best of my ability bisected
+  the introduction of the problem to commit
+  69f47505ee66afaa513305de0c1895a224e52c45 (block: avoid recursive
+  block_status call if possible). qemu compiled from the commit before
+  does not exhibit the issue, from that commit on it does and reverting
+  the commit off of current master makes it disappear.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1846427/+subscriptions
 
