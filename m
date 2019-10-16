@@ -2,109 +2,102 @@ Return-Path: <SRS0=/TIv=YJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BB9C3FA3728
-	for <qemu-devel@archiver.kernel.org>; Wed, 16 Oct 2019 12:17:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B6B63FA3728
+	for <qemu-devel@archiver.kernel.org>; Wed, 16 Oct 2019 12:21:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 90789205F4
-	for <qemu-devel@archiver.kernel.org>; Wed, 16 Oct 2019 12:17:03 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 90789205F4
+	by mail.kernel.org (Postfix) with ESMTPS id 7FAD8205F4
+	for <qemu-devel@archiver.kernel.org>; Wed, 16 Oct 2019 12:21:04 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="epcVagc+"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7FAD8205F4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42092 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42128 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iKiEg-00087n-OC
-	for qemu-devel@archiver.kernel.org; Wed, 16 Oct 2019 08:17:02 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48184)
+	id 1iKiIZ-0001Oi-Nd
+	for qemu-devel@archiver.kernel.org; Wed, 16 Oct 2019 08:21:03 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48619)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <thuth@redhat.com>) id 1iKiDb-0007Ui-Jv
- for qemu-devel@nongnu.org; Wed, 16 Oct 2019 08:15:56 -0400
+ (envelope-from <philmd@redhat.com>) id 1iKiHs-0000vH-QR
+ for qemu-devel@nongnu.org; Wed, 16 Oct 2019 08:20:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <thuth@redhat.com>) id 1iKiDa-0002gm-Le
- for qemu-devel@nongnu.org; Wed, 16 Oct 2019 08:15:55 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:17667)
+ (envelope-from <philmd@redhat.com>) id 1iKiHr-00040e-L3
+ for qemu-devel@nongnu.org; Wed, 16 Oct 2019 08:20:20 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:39973
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <thuth@redhat.com>) id 1iKiDa-0002g9-Cr
- for qemu-devel@nongnu.org; Wed, 16 Oct 2019 08:15:54 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 9F5AB4E926
- for <qemu-devel@nongnu.org>; Wed, 16 Oct 2019 12:15:53 +0000 (UTC)
-Received: from thuth.remote.csb (dhcp-200-228.str.redhat.com [10.33.200.228])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 340975D9CD;
- Wed, 16 Oct 2019 12:15:47 +0000 (UTC)
-Subject: Re: [PATCH v2 3/7] libqos: pass full QVirtQueue to set_queue_address()
-To: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
-References: <20191011085611.4194-1-stefanha@redhat.com>
- <20191011085611.4194-4-stefanha@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=thuth@redhat.com; prefer-encrypt=mutual; keydata=
- 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
-Organization: Red Hat
-Message-ID: <213667b4-c8a8-4e72-20cb-a5143bbae501@redhat.com>
-Date: Wed, 16 Oct 2019 14:15:47 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iKiHr-00040B-D0
+ for qemu-devel@nongnu.org; Wed, 16 Oct 2019 08:20:19 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1571228418;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=gHFD217dcO65tiUuIUg3e87g4ojwa9Ge6fz/0+n/HAM=;
+ b=epcVagc+3mLH8EXYH7ZW4FnOJDTeZTw89k3o1OYI2OWNpIA4jK5Am4s4EOYAKrIISPrQcN
+ m/PIXaRbVmzdXo7Wt8Zo6fUnwdlrqM9sRvVZPj9FU0SVBGbN1TyDYM5Ink8KXhrLvsQRLJ
+ uqRf12NSuTOg8gGQqXCaCzBwC3HNb44=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-108-5GUa3P8vO3y6V-aw5Ye5Lg-1; Wed, 16 Oct 2019 08:20:15 -0400
+Received: by mail-wm1-f70.google.com with SMTP id n3so1133457wmf.3
+ for <qemu-devel@nongnu.org>; Wed, 16 Oct 2019 05:20:14 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=Txgl9dk6JaDGRA+qRaaDtMFeiybFPhOcD1t2h81Xpc0=;
+ b=bHInZFXfcplfz3NORWpuUErTnEuMPnaLzIIMwwXJRbT5nKMKSoFrJXUIp/lfKK8xZ5
+ zwzd+F5BHFMve3YJHshRLSjTk62e/j1tY5GAlVqMZkllvO0mFewsK5SjxrmEu+JqoxvL
+ Fw8F2aMozoIOAekephwCRkFPUW2q1pVQkmVV0r83VDlL0xP2bqMpRYI+x9F1SCXKYDDt
+ g951n0Jr2O/ziyORZz0IMY60XZlqfPRtN36jsWdWdlWItWTnxqKRcxahBd05yGwJfqqj
+ 04g2Q5k/7F2xZS2bg/JkbZhy/Dc/nDfbroKoCksq8kS/iyzLLuO8LQjPJhVaS9HIgtXA
+ HHGw==
+X-Gm-Message-State: APjAAAUjHqMSu4QBCREtMUJJRfq0H5IoM1I8v76foD/1e9TTWk4OMpBe
+ B5WYjuyG8iK2O+6AyCe1hb1LsXz4T1qIukqj8iygSyhKzwZdea7Y0ex7fkui+1Ebyx7wF9EIXk4
+ TbgddXhruCuhqrxM=
+X-Received: by 2002:a5d:5542:: with SMTP id g2mr2522968wrw.115.1571228413831; 
+ Wed, 16 Oct 2019 05:20:13 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqxNZc/OOzXk3uhDfn3WAe8UgwDSUjedt5mI953h10clp2egtffEV7opC+DopvjMdbaWyUJf0A==
+X-Received: by 2002:a5d:5542:: with SMTP id g2mr2522948wrw.115.1571228413582; 
+ Wed, 16 Oct 2019 05:20:13 -0700 (PDT)
+Received: from [192.168.1.36] (14.red-88-21-201.staticip.rima-tde.net.
+ [88.21.201.14])
+ by smtp.gmail.com with ESMTPSA id a13sm60718090wrf.73.2019.10.16.05.20.12
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Wed, 16 Oct 2019 05:20:13 -0700 (PDT)
+Subject: Re: [PULL 59/68] aspeed: Add an AST2600 eval board
+To: Peter Maydell <peter.maydell@linaro.org>,
+ QEMU Developers <qemu-devel@nongnu.org>, =?UTF-8?Q?C=c3=a9dric_Le_Goater?=
+ <clg@kaod.org>, Joel Stanley <joel@jms.id.au>
+References: <20191014160404.19553-1-peter.maydell@linaro.org>
+ <20191014160404.19553-60-peter.maydell@linaro.org>
+ <CAFEAcA-2EZnnrYViQUQK-mR0=JqR9mXNzfVNa_WR5HoCTJ+tag@mail.gmail.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <2f6dd2bc-27e7-91a2-e673-18b9715a9628@redhat.com>
+Date: Wed, 16 Oct 2019 14:20:12 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.0
 MIME-Version: 1.0
-In-Reply-To: <20191011085611.4194-4-stefanha@redhat.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <CAFEAcA-2EZnnrYViQUQK-mR0=JqR9mXNzfVNa_WR5HoCTJ+tag@mail.gmail.com>
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.38]); Wed, 16 Oct 2019 12:15:53 +0000 (UTC)
+X-MC-Unique: 5GUa3P8vO3y6V-aw5Ye5Lg-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 209.132.183.28
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -116,23 +109,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- "Michael S. Tsirkin" <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 11/10/2019 10.56, Stefan Hajnoczi wrote:
-> Instead of just passing the vring page frame number, pass the full
-> QVirtQueue.  This will allow the VIRTIO 1.0 transport to program the
-> fine-grained vring address registers in the future.
-> 
-> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
-> ---
->  tests/libqos/virtio.h      | 2 +-
->  tests/libqos/virtio-mmio.c | 6 ++++--
->  tests/libqos/virtio-pci.c  | 6 ++++--
->  3 files changed, 9 insertions(+), 5 deletions(-)
+Hi Peter,
 
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+On 10/15/19 7:03 PM, Peter Maydell wrote:
+> On Mon, 14 Oct 2019 at 17:05, Peter Maydell <peter.maydell@linaro.org> wr=
+ote:
+>>
+>> From: C=C3=A9dric Le Goater <clg@kaod.org>
+>>
+>> Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
+>> Reviewed-by: Joel Stanley <joel@jms.id.au>
+>> Message-id: 20190925143248.10000-21-clg@kaod.org
+>> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+>> ---
+>>   include/hw/arm/aspeed.h |  1 +
+>>   hw/arm/aspeed.c         | 23 +++++++++++++++++++++++
+>>   2 files changed, 24 insertions(+)
+>=20
+>> @@ -455,6 +467,17 @@ static const AspeedBoardConfig aspeed_boards[] =3D =
+{
+>>           .num_cs    =3D 2,
+>>           .i2c_init  =3D witherspoon_bmc_i2c_init,
+>>           .ram       =3D 512 * MiB,
+>> +    }, {
+>> +        .name      =3D MACHINE_TYPE_NAME("ast2600-evb"),
+>> +        .desc      =3D "Aspeed AST2600 EVB (Cortex A7)",
+>> +        .soc_name  =3D "ast2600-a0",
+>> +        .hw_strap1 =3D AST2600_EVB_HW_STRAP1,
+>> +        .hw_strap2 =3D AST2600_EVB_HW_STRAP2,
+>> +        .fmc_model =3D "w25q512jv",
+>> +        .spi_model =3D "mx66u51235f",
+>> +        .num_cs    =3D 1,
+>> +        .i2c_init  =3D ast2600_evb_i2c_init,
+>> +        .ram       =3D 2 * GiB,
+>=20
+> Hi. I just discovered that this makes 'make check' fail on
+> 32-bit systems, because you can't default to 2GB of RAM
+> for a board:
+>=20
+> (armhf)pmaydell@mustang-maydell:~/qemu$
+> ./build/all-a32/arm-softmmu/qemu-system-arm -M ast2600-evb
+> qemu-system-arm: at most 2047 MB RAM can be simulated
+>=20
+> It's also a pretty rudely large amount of RAM to allocate
+> by default: it caused 'make check' to fail on my OSX
+> box, which is 64-bits but doesn't have huge swathes
+> of free RAM.
+
+It is unlikely you use this board on a 32-bit system...
+
+You usually prefer to have modeled hardware matching real-life,
+what about making this board not available on 32-bit systems
+(we will soon have more boards like this):
+
+   #if HOST_LONG_BITS > 32
+       {
+           .name      =3D MACHINE_TYPE_NAME("ast2600-evb"),
+           .desc      =3D "Aspeed AST2600 EVB (Cortex A7)",
+           ...
+       },
+   #endif /* HOST_LONG_BITS > 32 */
+
+Regards,
+
+Phil.
+
 
