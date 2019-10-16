@@ -4,75 +4,75 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 301C7FA372A
-	for <qemu-devel@archiver.kernel.org>; Wed, 16 Oct 2019 11:33:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D6EBEFA3728
+	for <qemu-devel@archiver.kernel.org>; Wed, 16 Oct 2019 11:34:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EDA3F2082C
-	for <qemu-devel@archiver.kernel.org>; Wed, 16 Oct 2019 11:33:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A2B2A2082C
+	for <qemu-devel@archiver.kernel.org>; Wed, 16 Oct 2019 11:34:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=jms.id.au header.i=@jms.id.au header.b="FALOGVTV"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EDA3F2082C
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=jms.id.au header.i=@jms.id.au header.b="U5PWcI3g"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A2B2A2082C
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=jms.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41262 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41274 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iKhYL-00049g-Oa
-	for qemu-devel@archiver.kernel.org; Wed, 16 Oct 2019 07:33:17 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42274)
+	id 1iKhZN-00058y-NR
+	for qemu-devel@archiver.kernel.org; Wed, 16 Oct 2019 07:34:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42336)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <joel.stan@gmail.com>) id 1iKhQG-00063v-3N
- for qemu-devel@nongnu.org; Wed, 16 Oct 2019 07:24:56 -0400
+ (envelope-from <joel.stan@gmail.com>) id 1iKhQU-0006LN-Kl
+ for qemu-devel@nongnu.org; Wed, 16 Oct 2019 07:25:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <joel.stan@gmail.com>) id 1iKhQF-0003nZ-6C
- for qemu-devel@nongnu.org; Wed, 16 Oct 2019 07:24:56 -0400
-Received: from mail-qk1-x744.google.com ([2607:f8b0:4864:20::744]:37870)
+ (envelope-from <joel.stan@gmail.com>) id 1iKhQS-0003rF-Em
+ for qemu-devel@nongnu.org; Wed, 16 Oct 2019 07:25:10 -0400
+Received: from mail-qk1-x743.google.com ([2607:f8b0:4864:20::743]:37870)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <joel.stan@gmail.com>)
- id 1iKhQD-0003n6-6j; Wed, 16 Oct 2019 07:24:53 -0400
-Received: by mail-qk1-x744.google.com with SMTP id u184so22373274qkd.4;
- Wed, 16 Oct 2019 04:24:53 -0700 (PDT)
+ id 1iKhQP-0003qK-HD; Wed, 16 Oct 2019 07:25:05 -0400
+Received: by mail-qk1-x743.google.com with SMTP id u184so22373796qkd.4;
+ Wed, 16 Oct 2019 04:25:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=jms.id.au; s=google;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
  :cc:content-transfer-encoding;
- bh=ezbudHyz+ciaLuc8AlZnUmQoDFo0/hkA2HkcuRJ623o=;
- b=FALOGVTVO2eaiS9HFLoXHHIsVVyOhxgs/SSzjOWuKS3L1xyYQIOrSXkGmQ8hx0LPQ/
- TMNBiTuuM//5Buri6xaws0AwERSbaUi1D/B3jhqox+ne++cObsYDrNIlgi7kFjIpPydx
- 4li9tgFAzovFdrZHo+KTxECfMfyuzMJdvElak=
+ bh=cP7wYXPS1LIP0QvJUqyPcWVisGTLgBxAvOkjcnJYZTw=;
+ b=U5PWcI3gn+bq9MQR5PUH10Pv8w+eFBRpCvZWKJRqFNHkmqXVHNlySUjTlyNdLHBN/K
+ QkZ2EVvb0CX8yYkHvvCM+qco487KaVCs1YPHly6G4VH2W8GNFULVUmdRhbzJW7sCYKPr
+ ivJnWNKxFDtbVRmDb/bndF3u0SVziYpFcyUx0=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc:content-transfer-encoding;
- bh=ezbudHyz+ciaLuc8AlZnUmQoDFo0/hkA2HkcuRJ623o=;
- b=I+C/dKIjRFuyl4fY4WScIcFTN7UG0CwUJSa4bJ37yOpctq2CPgkxxLl8PRtjYIXmAd
- QPR6FOHvjmre2IPh3gBFnPdpPQtWlcBBskPzaICkyUXvnISMb2IYa2C+DH5ccJrkMgK9
- oSuYHaTMrqJ6/9B6rn3qNICbbr2a/0Qs4wNAekXbufrgl1l1PKWUxEaycsz01XT4Emxi
- nn+Qiv86GWQbSn5SFqAVA/ZhvGwtqXeAduJuZsYSXRmoJ/PlilC7swSahksmxLcRC/nK
- fdRPzGb/fMGpNXWz6jyLd2jHrLzSsKFz6x32qzY6FiRQ9SPh1tTGOHazveUlqSDeK6UH
- P4Jg==
-X-Gm-Message-State: APjAAAXUtLCL396XF+Eb3VltQAt+T1hY8y0PFDoAUIBt9Ej57t2a1Crm
- TX+6LVGfywydq27UjpoD7dC3h0tbFHTlFvtCycY=
-X-Google-Smtp-Source: APXvYqzOkwRT5F6dWdiqkrcynmKxddNB1TuHiJIDIZ3ih3u9zyEA8uMlPGpPWWEF3A13XuY1xhlhzOQi4lsr5DUtzzQ=
-X-Received: by 2002:ae9:e30d:: with SMTP id v13mr39741353qkf.208.1571225092489; 
- Wed, 16 Oct 2019 04:24:52 -0700 (PDT)
+ bh=cP7wYXPS1LIP0QvJUqyPcWVisGTLgBxAvOkjcnJYZTw=;
+ b=X8ToXMid9+/Zi0vySLgcYWIVXjOHo421aFfuWheY4qOEZtKf4z8jqNwR+twYo9uqw5
+ 1iJd0dO9n8jTWX53mUCAxHYMGP/lX6hBcYNr9G5VWcdxS655Wk3NhCLrSqJPVA4hGbxE
+ 0NERGBkPWR4/RFP1FiVd6HRmctvlOac0EI3t5jx9ZMIzhLWb1cU43jBGNv1v0xmgz6jf
+ PtC3wMtIUZV4qDNUIhfjwMAxbG9ReesxOq1HM0iRt9NfGT/avpS3lXtWXLTg3joSheRV
+ FZLxnpjQr6kxzj3oFyHsVA1xlRYG3QvwQDWuXPnXnc744nx/Dp+3kVqXWiZVXr4IdsTL
+ gSPA==
+X-Gm-Message-State: APjAAAX7NgN5A/LVr2MbwD6TbM5JXS7jh8GeH5YyRZ8n0F3aI6G9Sw7z
+ jkshwGb83rBgrPA8xGDzFy305ZRgogxNuNS8cLo=
+X-Google-Smtp-Source: APXvYqwFlhb2tguRcC2g4H/W7nrH3ukEAKlxGnmqJGSfzQZcmXbyzMua+ISqyEYunlPHvmqZbvi4PrUmgsz5CaAowOU=
+X-Received: by 2002:a37:d87:: with SMTP id 129mr40610041qkn.414.1571225104884; 
+ Wed, 16 Oct 2019 04:25:04 -0700 (PDT)
 MIME-Version: 1.0
 References: <20191016085035.12136-1-clg@kaod.org>
- <20191016085035.12136-4-clg@kaod.org>
-In-Reply-To: <20191016085035.12136-4-clg@kaod.org>
+ <20191016085035.12136-5-clg@kaod.org>
+In-Reply-To: <20191016085035.12136-5-clg@kaod.org>
 From: Joel Stanley <joel@jms.id.au>
-Date: Wed, 16 Oct 2019 11:24:40 +0000
-Message-ID: <CACPK8XcUv+wj3Jv02YGrLW49nSWcW_h_7h+TUL6SEqpnwZb1kA@mail.gmail.com>
-Subject: Re: [PATCH 3/5] aspeed: Add a DRAM memory region at the SoC level
+Date: Wed, 16 Oct 2019 11:24:53 +0000
+Message-ID: <CACPK8XfVdYNy45mnVx_4Bq00iaFjC78w-F=omw1Db0wJ-FU7xA@mail.gmail.com>
+Subject: Re: [PATCH 4/5] aspeed/i2c: Add support for DMA transfers
 To: =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::744
+X-Received-From: 2607:f8b0:4864:20::743
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,10 +94,14 @@ Sender: "Qemu-devel"
 
 On Wed, 16 Oct 2019 at 08:50, C=C3=A9dric Le Goater <clg@kaod.org> wrote:
 >
-> Currently, we link the DRAM memory region to the FMC model (for DMAs)
-> through a property alias at the SoC level. The I2C model will need a
-> similar region for DMA support, add a DRAM region property at the SoC
-> level for both model to use.
+> The I2C controller of the Aspeed AST2500 and AST2600 SoCs supports DMA
+> transfers to and from DRAM.
+>
+> A pair of registers defines the buffer address and the length of the
+> DMA transfer. The address should be aligned on 4 bytes and the maximum
+> length should not exceed 4K. The receive or transmit DMA transfer can
+> then be initiated with specific bits in the Command/Status register of
+> the controller.
 >
 > Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
 
