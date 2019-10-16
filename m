@@ -2,80 +2,80 @@ Return-Path: <SRS0=/TIv=YJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6C2FDECE599
-	for <qemu-devel@archiver.kernel.org>; Wed, 16 Oct 2019 21:32:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9CC6EFA3728
+	for <qemu-devel@archiver.kernel.org>; Wed, 16 Oct 2019 22:02:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3753B2168B
-	for <qemu-devel@archiver.kernel.org>; Wed, 16 Oct 2019 21:32:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6A19D218DE
+	for <qemu-devel@archiver.kernel.org>; Wed, 16 Oct 2019 22:02:31 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FQOh/9Gz"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3753B2168B
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Id8jpQ7h"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6A19D218DE
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48346 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48528 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iKqtt-00016r-AY
-	for qemu-devel@archiver.kernel.org; Wed, 16 Oct 2019 17:32:09 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48462)
+	id 1iKrNG-0000zN-Gi
+	for qemu-devel@archiver.kernel.org; Wed, 16 Oct 2019 18:02:30 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51872)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alistair23@gmail.com>) id 1iKqsL-0008PH-UK
- for qemu-devel@nongnu.org; Wed, 16 Oct 2019 17:30:37 -0400
+ (envelope-from <incredible.tack@gmail.com>) id 1iKrMP-0000Vm-KG
+ for qemu-devel@nongnu.org; Wed, 16 Oct 2019 18:01:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alistair23@gmail.com>) id 1iKqsK-0001Mv-0R
- for qemu-devel@nongnu.org; Wed, 16 Oct 2019 17:30:33 -0400
-Received: from mail-lj1-x244.google.com ([2a00:1450:4864:20::244]:38888)
+ (envelope-from <incredible.tack@gmail.com>) id 1iKrMO-0002oU-6c
+ for qemu-devel@nongnu.org; Wed, 16 Oct 2019 18:01:37 -0400
+Received: from mail-wr1-x436.google.com ([2a00:1450:4864:20::436]:46496)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alistair23@gmail.com>)
- id 1iKqsG-0001MF-6p; Wed, 16 Oct 2019 17:30:30 -0400
-Received: by mail-lj1-x244.google.com with SMTP id b20so258625ljj.5;
- Wed, 16 Oct 2019 14:30:27 -0700 (PDT)
+ (Exim 4.71) (envelope-from <incredible.tack@gmail.com>)
+ id 1iKrMN-0002oC-V4
+ for qemu-devel@nongnu.org; Wed, 16 Oct 2019 18:01:36 -0400
+Received: by mail-wr1-x436.google.com with SMTP id o18so29678039wrv.13
+ for <qemu-devel@nongnu.org>; Wed, 16 Oct 2019 15:01:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=XUlea2DSAEKe346P1bx5HoBWo3c3p+mbjpfa8oZZRD0=;
- b=FQOh/9GzHqr3SoL8SuIK02YCXqoPg+hMkfNOh2T3lV3X7x5DbBRbsNXAmhxC36BfKi
- W18ilXDNMyPvCVGZIXplDbEyBtNvrzlGUqQCn+StOz480NaLjTGYxp+xFH6zZr4VUIHQ
- Mkj9xFS202Q9da1pEgFY09DH/2hb6I/JXs0NhpCI00bd4xff+Lq1LDxhgMuoM6oo/rPu
- oCdmHFVTLVdWhfvi6KY4EhDgkQhzHCRrSpUaoQvl93vvXRbt0dPBOPYi0uvXKeRRx+Ro
- F+oqA3fKTac76BvZ4WSwiC+30pWJxfWBIEOUUEs6tvwuSnnSystU/tdwYecoMOluRwNv
- WsRQ==
+ :cc; bh=yTf2cKEGSgtpM0CdnbYL8M/XD+QtqvoTZ9y7pEowYZ8=;
+ b=Id8jpQ7hbPVXO5Tu8yhJReby0UwGlvUKwyHZmKQyE+6q4VjvFUSkqjEQOH59xvbbWI
+ kaQtjU4IDDSq3N//MyQTk8yo8FUN5l/qFVWtM9JiYDLFBWaIc3qaxSsgvir1YUpQPJzN
+ gqOH/+YcQbFt3ePCcgRZ0bnVQtqnfVj9K/rit6Qsw4TEPtvMATbTeleDpL2PktHLht2h
+ R6UDmtYsG58mGCh8yCLmeyJNRshLaavMGyGAdbjyGXzksqRbhsd32ryPp9YHlDNJ5Kud
+ wGOAUE74yc891VQ+XI9hG6XUojyk3ds84EdvOTervsE9Yd3l/iYVv6tjSPTL4v/0x0ww
+ dlGg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=XUlea2DSAEKe346P1bx5HoBWo3c3p+mbjpfa8oZZRD0=;
- b=DfAITVhdjozX7vDjI0OHnHweY80KOm6h9FUD3B8vgspj3qq0o2W2Id7cBsGGeazz3l
- XEqTAJAGjID7+rX0LWKRlKDgNSnERxaUaZ3TF4n6D2qbtZSZJ+sXtimdymu98yjb2BRh
- Hw22sB2g97Xszhieeaz49fHSQWr95qARGSdmXt6/PsG3votdjrlTLi0s4hS1fh1MvLKm
- yiGe4pUMbpRJ9he3ppsuz68G6ceLvbB6pT4QtGq23LD9IcJbWGvuZlFyH5fYud6g7aDU
- o09RzOU8MwygppKX2ys4ZF+0DpWg4QAKnvpTK/O4mBi0ClV3U67DeyHl4kyzSoavLXB9
- o0Hg==
-X-Gm-Message-State: APjAAAW4K3rG9NxuHY0+vD/J1F5Myc11qg+f2m58Dagyk3WEsw97WVdF
- Zv9dZh0+X446OkJl2xjRsWHefjNe7QxNKx1NPUg=
-X-Google-Smtp-Source: APXvYqxTan272op6Ym5ZyK29amK3gPEEMtLXTfsrijfZhCc6ypUZQ3tW90W49pvFeA8XR/xbbTxIQQQmzMMwGFmTI6o=
-X-Received: by 2002:a2e:9890:: with SMTP id b16mr179727ljj.4.1571261425599;
- Wed, 16 Oct 2019 14:30:25 -0700 (PDT)
+ bh=yTf2cKEGSgtpM0CdnbYL8M/XD+QtqvoTZ9y7pEowYZ8=;
+ b=JVToggtgsVJUqTPdF11CM9csptlpF2aKCXdWvMzMQ05xrHN0Sbz9nm6EdvH+P1ShbP
+ bTXnILCDeHmPcIhm3kkQK4A64U5LCMc6yeynyXW+JI/t9aEA2b/xnu7oiTstYuVbGxD+
+ 9zXguJZT6kVQAjVA5iIYtz0fEIxymp41Tpki0zYbutI2wrrFoM0XZXJNRnUsSshfFrna
+ N1nHx7TKokZ5wFkR8yb3h6x/3Fqu+wP2/udy+OqVWFmDk28A50vcIlTk1ra4WDGZrAbI
+ kTaYhhdZY+/mRASavjdZH74t/mihpLfT7jdJeDOggAXfntSvA2dSWajxd8/v5mCuioFo
+ 3Ldg==
+X-Gm-Message-State: APjAAAWWfW3zEVUOhOIdJalUJJoItcrA7ozhFrmfbsNJAcc/1Fq1FXiw
+ qOUhP7Akcdirg9+xcN1ILLYbkczeZpMHYxL61g0=
+X-Google-Smtp-Source: APXvYqx6bbS0LYIbsmwxRKOYTaspah8MDFOhGcznxNZz4csxBxpkWDS/1WcEx6VYTfdoFrtxyR8kI4Wj+HxSO+YpThc=
+X-Received: by 2002:adf:f685:: with SMTP id v5mr74364wrp.246.1571263294001;
+ Wed, 16 Oct 2019 15:01:34 -0700 (PDT)
 MIME-Version: 1.0
-References: <CAKmqyKOV0J3w3fPUF3CGAip=j_+D_M+7X9r+2TwEZwkapsQZMQ@mail.gmail.com>
- <mhng-8a742b0f-e79f-4da0-81fc-b91d184b6279@palmer-si-x1e>
-In-Reply-To: <mhng-8a742b0f-e79f-4da0-81fc-b91d184b6279@palmer-si-x1e>
-From: Alistair Francis <alistair23@gmail.com>
-Date: Wed, 16 Oct 2019 14:25:17 -0700
-Message-ID: <CAKmqyKPin+yU2C973rtUVoKr452GX8Bq7fqKeuOqNER5hO4CfA@mail.gmail.com>
-Subject: Re: [PATCH v1 22/28] target/riscv: Allow specifying MMU stage
-To: Palmer Dabbelt <palmer@sifive.com>
+References: <CAHyh4xisBvQ+-p5R6Wj0po17-3EOkKsALzRysHU+R=mprbdjtg@mail.gmail.com>
+ <20191015024947.GC8666@xz-x1>
+In-Reply-To: <20191015024947.GC8666@xz-x1>
+From: Jintack Lim <incredible.tack@gmail.com>
+Date: Wed, 16 Oct 2019 15:01:22 -0700
+Message-ID: <CAHyh4xgzqMuWR7moxPfWZarED5HtPcu3LmnTHMe7CpwScHa4Eg@mail.gmail.com>
+Subject: Re: Using virtual IOMMU in guest hypervisors other than KVM and Xen?
+To: Peter Xu <peterx@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::244
+X-Received-From: 2a00:1450:4864:20::436
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,124 +87,94 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "open list:RISC-V" <qemu-riscv@nongnu.org>, Anup Patel <Anup.Patel@wdc.com>,
- Alistair Francis <Alistair.Francis@wdc.com>,
- "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
- Atish Patra <Atish.Patra@wdc.com>
+Cc: QEMU Devel Mailing List <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, Oct 16, 2019 at 12:02 PM Palmer Dabbelt <palmer@sifive.com> wrote:
+On Mon, Oct 14, 2019 at 7:50 PM Peter Xu <peterx@redhat.com> wrote:
 >
-> On Mon, 07 Oct 2019 11:05:33 PDT (-0700), alistair23@gmail.com wrote:
-> > On Thu, Oct 3, 2019 at 8:53 AM Palmer Dabbelt <palmer@sifive.com> wrote:
-> >>
-> >> On Fri, 23 Aug 2019 16:38:47 PDT (-0700), Alistair Francis wrote:
-> >> > Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
-> >> > ---
-> >> >  target/riscv/cpu_helper.c | 39 ++++++++++++++++++++++++++++++---------
-> >> >  1 file changed, 30 insertions(+), 9 deletions(-)
-> >> >
-> >> > diff --git a/target/riscv/cpu_helper.c b/target/riscv/cpu_helper.c
-> >> > index 098873c83e..9aa6906acd 100644
-> >> > --- a/target/riscv/cpu_helper.c
-> >> > +++ b/target/riscv/cpu_helper.c
-> >> > @@ -318,10 +318,19 @@ void riscv_cpu_set_mode(CPURISCVState *env, target_ulong newpriv)
-> >> >   *
-> >> >   * Adapted from Spike's mmu_t::translate and mmu_t::walk
-> >> >   *
-> >> > + * @env: CPURISCVState
-> >> > + * @physical: This will be set to the calculated physical address
-> >> > + * @prot: The returned protection attributes
-> >> > + * @addr: The virtual address to be translated
-> >> > + * @access_type: The type of MMU access
-> >> > + * @mmu_idx: Indicates current privilege level
-> >> > + * @first_stage: Are we in first stage translation?
-> >> > + *               Second stage is used for hypervisor guest translation
-> >> >   */
-> >> >  static int get_physical_address(CPURISCVState *env, hwaddr *physical,
-> >> >                                  int *prot, target_ulong addr,
-> >> > -                                int access_type, int mmu_idx)
-> >> > +                                int access_type, int mmu_idx,
-> >> > +                                bool first_stage)
-> >> >  {
-> >> >      /* NOTE: the env->pc value visible here will not be
-> >> >       * correct, but the value visible to the exception handler
-> >> > @@ -518,13 +527,23 @@ restart:
-> >> >  }
-> >> >
-> >> >  static void raise_mmu_exception(CPURISCVState *env, target_ulong address,
-> >> > -                                MMUAccessType access_type, bool pmp_violation)
-> >> > +                                MMUAccessType access_type, bool pmp_violation,
-> >> > +                                bool first_stage)
-> >> >  {
-> >> >      CPUState *cs = env_cpu(env);
-> >> > -    int page_fault_exceptions =
-> >> > -        (env->priv_ver >= PRIV_VERSION_1_10_0) &&
-> >> > -        get_field(env->satp, SATP_MODE) != VM_1_10_MBARE &&
-> >> > -        !pmp_violation;
-> >> > +    int page_fault_exceptions;
-> >> > +    if (first_stage) {
-> >> > +        page_fault_exceptions =
-> >> > +            (env->priv_ver >= PRIV_VERSION_1_10_0) &&
-> >> > +            get_field(env->satp, SATP_MODE) != VM_1_10_MBARE &&
-> >> > +            !pmp_violation;
-> >> > +            riscv_cpu_set_force_hs_excep(env, CLEAR_HS_EXCEP);
-> >>
-> >> It might just be email, but the indentation looks wrong here.
-> >
-> > Yep, fixed.
-> >
-> >>
-> >> > +    } else {
-> >> > +        page_fault_exceptions =
-> >> > +            get_field(env->hgatp, HGATP_MODE) != VM_1_10_MBARE &&
-> >> > +            !pmp_violation;
-> >> > +            riscv_cpu_set_force_hs_excep(env, FORCE_HS_EXCEP);
-> >> > +    }
-> >> >      switch (access_type) {
-> >> >      case MMU_INST_FETCH:
-> >> >          cs->exception_index = page_fault_exceptions ?
-> >> > @@ -551,7 +570,8 @@ hwaddr riscv_cpu_get_phys_page_debug(CPUState *cs, vaddr addr)
-> >> >      int prot;
-> >> >      int mmu_idx = cpu_mmu_index(&cpu->env, false);
-> >> >
-> >> > -    if (get_physical_address(&cpu->env, &phys_addr, &prot, addr, 0, mmu_idx)) {
-> >> > +    if (get_physical_address(&cpu->env, &phys_addr, &prot, addr, 0, mmu_idx,
-> >> > +                             true)) {
-> >> >          return -1;
-> >> >      }
-> >> >      return phys_addr;
-> >> > @@ -613,7 +633,8 @@ bool riscv_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
-> >> >      qemu_log_mask(CPU_LOG_MMU, "%s ad %" VADDR_PRIx " rw %d mmu_idx %d\n",
-> >> >                    __func__, address, access_type, mmu_idx);
-> >> >
-> >> > -    ret = get_physical_address(env, &pa, &prot, address, access_type, mmu_idx);
-> >> > +    ret = get_physical_address(env, &pa, &prot, address, access_type, mmu_idx,
-> >> > +                               true);
-> >> >
-> >> >      if (mode == PRV_M && access_type != MMU_INST_FETCH) {
-> >> >          if (get_field(*env->mstatus, MSTATUS_MPRV)) {
-> >> > @@ -640,7 +661,7 @@ bool riscv_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
-> >> >      } else if (probe) {
-> >> >          return false;
-> >> >      } else {
-> >> > -        raise_mmu_exception(env, address, access_type, pmp_violation);
-> >> > +        raise_mmu_exception(env, address, access_type, pmp_violation, true);
-> >> >          riscv_raise_exception(env, cs->exception_index, retaddr);
-> >> >      }
-> >> >  #else
-> >>
-> >> I don't think it makes sense to split off these two (23 and 24, that add the
-> >> argument) out from the implementation.
-> >
-> > The goal was just to make it easier to review. If you want them
-> > combined I can easily combine them.
+> On Mon, Oct 14, 2019 at 01:28:49PM -0700, Jintack Lim wrote:
+> > Hi,
 >
-> It's making it harder to read on my end :)
+> Hello, Jintack,
+>
+Hi Peter,
 
-Ha ok. I have squashed all three.
+> >
+> > I'm trying to pass through a physical network device to a nested VM
+> > using virtual IOMMU. While I was able to do it successfully using KVM
+> > and Xen guest hypervisors running in a VM respectively, I couldn't do
+> > it with Hyper-V as I described below. I wonder if anyone have
+> > successfully used virtual IOMMU in other hypervisors other than KVM
+> > and Xen? (like Hyper-V or VMware)
+> >
+> > The issue I have with Hyper-V is that Hyper-V gives an error that the
+> > underlying hardware is not capable of doing passthrough. The exact
+> > error message is as follows.
+> >
+> > Windows Power-shell > (Get-VMHost).IovSupportReasons
+> > The chipset on the system does not do DMA remapping, without which
+> > SR-IOV cannot be supported.
+> >
+> > I'm pretty sure that Hyper-V recognizes virtual IOMMU, though; I have
+> > enabled iommu in windows boot loader[1], and I see differences when
+> > booing a Windows VM with and without virtual IOMMU. I also checked
+> > that virtual IOMMU traces are printed.
+>
+> What traces have you checked?  More explicitly, have you seen DMAR
+> enabled and page table setup for that specific device to be
+> pass-throughed?
 
-Alistair
+Thanks for the pointers. I checked that DMAR is NOT enabled. The only
+registers that Windows guest accessed were Version Register,
+Capability Register, and Extended Capability Register. On the other
+hand, a Linux guest accessed other registers and enabled DMAR.
+Here's a link to the trace I got using QEMU 4.1.0. Do you see anything
+interesting there?
+http://paste.ubuntu.com/p/YcSyxG9Z3x/
+
+>
+> >
+> > I have tried multiple KVM/QEMU versions including the latest ones
+> > (kernel v5.3, QEMU 4.1.0) as well as two different Windows servers
+> > (2016 and 2019), but I see the same result. [4]
+> >
+> > I'd love to hear if somebody is using virtual IOMMU in Hyper-V or
+> > VMware successfully, especially for passthrough. I also appreciate if
+> > somebody can point out any configuration errors I have.
+> >
+> > Here's the qemu command line I use, basically from the QEMU vt-d
+> > page[2] and Hyper-v on KVM from kvmforum [3].
+> >
+> > ./qemu/x86_64-softmmu/qemu-system-x86_64 -device
+> > intel-iommu,intremap=on,caching-mode=on -smp 6 -m 24G -M
+>
+> Have you tried to use 4-level IOMMU page table (aw-bits=48 on latest
+> QEMU, or x-aw-bits=48 on some old ones)?  IIRC we've encountered
+> issues when trying to pass the SVVP Windows test with this, in which
+> 4-level is required.  I'm not sure whether whether that is required in
+> general usages of vIOMMU in Windows.
+
+I just tried the option you mentioned, but it didn't change anything.
+BTW, what version of Windows was it?
+
+>
+> > q35,accel=kvm,kernel-irqchip=split -cpu
+> > host,hv_relaxed,hv_spinlocks=0x1fff,hv_vapic,hv_time -drive
+> > if=none,file=/vm/guest0.img,id=vda,cache=none,format=raw -device
+> > virtio-blk-pci,drive=vda --nographic -qmp
+> > unix:/var/run/qmp,server,nowait -serial
+> > telnet:127.0.0.1:4444,server,nowait -netdev
+> > user,id=net0,hostfwd=tcp::2222-:22 -device
+> > virtio-net-pci,netdev=net0,mac=de:ad:be:ef:f2:12 -netdev
+> > tap,id=net1,vhost=on,helper=/srv/vm/qemu/qemu-bridge-helper -device
+> > virtio-net-pci,netdev=net1,disable-modern=off,disable-legacy=on,mac=de:ad:be:ef:f2:11
+> > -device vfio-pci,host=0000:06:10.0,id=net2 -monitor stdio -usb -device
+> > usb-tablet -rtc base=localtime,clock=host -vnc 127.0.0.1:4 --cdrom
+> > win19.iso --drive file=virtio-win.iso,index=3,media=cdrom
+>
+> --
+> Peter Xu
+>
 
