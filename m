@@ -2,69 +2,80 @@ Return-Path: <SRS0=/TIv=YJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 68096FA3728
-	for <qemu-devel@archiver.kernel.org>; Wed, 16 Oct 2019 20:41:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B1FBECE599
+	for <qemu-devel@archiver.kernel.org>; Wed, 16 Oct 2019 21:02:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 38DCB20854
-	for <qemu-devel@archiver.kernel.org>; Wed, 16 Oct 2019 20:41:39 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 38DCB20854
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id E2C8820872
+	for <qemu-devel@archiver.kernel.org>; Wed, 16 Oct 2019 21:02:51 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WNMmTUrc"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E2C8820872
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48060 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48138 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iKq70-0008Fg-By
-	for qemu-devel@archiver.kernel.org; Wed, 16 Oct 2019 16:41:38 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42566)
+	id 1iKqRX-00052p-2M
+	for qemu-devel@archiver.kernel.org; Wed, 16 Oct 2019 17:02:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45045)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <armbru@redhat.com>) id 1iKq6C-0007oN-TU
- for qemu-devel@nongnu.org; Wed, 16 Oct 2019 16:40:49 -0400
+ (envelope-from <alistair23@gmail.com>) id 1iKqQ2-0004A4-7B
+ for qemu-devel@nongnu.org; Wed, 16 Oct 2019 17:01:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1iKq6A-0006vw-Ex
- for qemu-devel@nongnu.org; Wed, 16 Oct 2019 16:40:47 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:36961)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1iKq6A-0006vf-5Z
- for qemu-devel@nongnu.org; Wed, 16 Oct 2019 16:40:46 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id D9562307BD27;
- Wed, 16 Oct 2019 20:40:44 +0000 (UTC)
-Received: from blackfin.pond.sub.org (unknown [10.36.118.123])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 0A57960BF7;
- Wed, 16 Oct 2019 20:40:33 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 673591138619; Wed, 16 Oct 2019 22:40:29 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-Subject: Re: [PATCH v9 04/15] hw/i386/pc: replace use of strtol with
- qemu_strtol in x86_load_linux()
-References: <20191015112346.45554-1-slp@redhat.com>
- <20191015112346.45554-5-slp@redhat.com>
- <b7baa2ab-210b-e7ef-399e-4dbbbc0ee0aa@redhat.com>
-Date: Wed, 16 Oct 2019 22:40:29 +0200
-In-Reply-To: <b7baa2ab-210b-e7ef-399e-4dbbbc0ee0aa@redhat.com> ("Philippe
- =?utf-8?Q?Mathieu-Daud=C3=A9=22's?= message of "Tue, 15 Oct 2019 13:36:09
- +0200")
-Message-ID: <87wod4pgoy.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.2 (gnu/linux)
+ (envelope-from <alistair23@gmail.com>) id 1iKqQ0-0007M0-U7
+ for qemu-devel@nongnu.org; Wed, 16 Oct 2019 17:01:18 -0400
+Received: from mail-lj1-x244.google.com ([2a00:1450:4864:20::244]:44572)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <alistair23@gmail.com>)
+ id 1iKqQ0-0007JJ-Ka; Wed, 16 Oct 2019 17:01:16 -0400
+Received: by mail-lj1-x244.google.com with SMTP id m13so155468ljj.11;
+ Wed, 16 Oct 2019 14:01:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=ZgU+CS0nFS1d6H6euIDyJtA+7V3NZ/G1q7nqIQcmhQU=;
+ b=WNMmTUrcWtZTH28bykLrng0AMGYm15kBq8yhX8Tw8yyiBPS8YiXb6sZ1KU502AwymG
+ zopQjCz5reegDdg3w5bhWSFSOK+g/pk7CkF/u9DNq6ld2FS2fC1XA5TekeE5l0a9P73z
+ VfU/hySQWlugGbhNJK/CQ+Fe4eB7RnP+u5JtpRrnc4DgwCwDe9c99Ps+SL8bFApAk6Ub
+ Oq/LxKdiaRxoSqKmuYIZCN8TSoUGxkRrqD9TUhuTpVN4bUbwwE9vTWjs3lmmTMUsG/qO
+ YOkK7aijqFxo0SttSiFV49TKtcIgd6Z6mFpK5BfPbLbfpCjME2SnqpyYk0ZtQ1/mW02Q
+ eK4w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=ZgU+CS0nFS1d6H6euIDyJtA+7V3NZ/G1q7nqIQcmhQU=;
+ b=rwBenOCIkUuPUHPpnYAyDQ2qzLQ5N43hsmG4A7ZV7+e5Ba6sBBdD0Ub7fKkMnYXiVE
+ RKKs8mSjDdqrbqhC57+e8v0rL88vekMvwmgM6uoFgMdUp9u725NI8GVPOYihPfV11u2j
+ BrGzLmz1fA9T04KyPpmbyOEB55wzRY3B1Mg/3mBSfzgSv4xVfaCe57hXyzMp027Ms6CE
+ yOnPqap4C94w9W7j9ERvimn427MNQfrCzHpdtZ7ymbI5y5RqWL29qByGAUOM5VmGuGYM
+ OirY7PYmMhtaSoM4muP05NikyILJqaV7u8nA99+JkieYGt3aD1fL9oevf32BHbqDmXdx
+ uh8g==
+X-Gm-Message-State: APjAAAV7MoitDiDgPZYMSuWzXUWy2UcBPkWWWLSAsD44iBabW3zksx9C
+ MQCNyekUucq9jUFsE5mZLn1uuVk+A+gEOGqR4l0=
+X-Google-Smtp-Source: APXvYqxHj873CSI4EMCmF1u85bevrHwiaEyLj4rsEGgUgfL47SkQvwkyBxkuFNHbe/wYuUG/BpF8qwP6wjGd2WlCa4I=
+X-Received: by 2002:a2e:9890:: with SMTP id b16mr113641ljj.4.1571259674714;
+ Wed, 16 Oct 2019 14:01:14 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.49]); Wed, 16 Oct 2019 20:40:44 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.132.183.28
+References: <a090bc437bf412c279b1254d05eae5c2d67225db.1566603412.git.alistair.francis@wdc.com>
+ <mhng-afa69c9b-17b7-4043-b204-512c92cf618a@palmer-si-x1e>
+In-Reply-To: <mhng-afa69c9b-17b7-4043-b204-512c92cf618a@palmer-si-x1e>
+From: Alistair Francis <alistair23@gmail.com>
+Date: Wed, 16 Oct 2019 13:56:04 -0700
+Message-ID: <CAKmqyKMf1bPSpM7RP1ULmOK7sKcUFA5Rbb_TkD7f0vTtu5fa1Q@mail.gmail.com>
+Subject: Re: [PATCH v1 04/28] target/riscv: Fix CSR perm checking for HS mode
+To: Palmer Dabbelt <palmer@sifive.com>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::244
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -76,99 +87,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Daniel P . Berrange" <berrange@redhat.com>, ehabkost@redhat.com,
- Sergio Lopez <slp@redhat.com>, mst@redhat.com, qemu-devel@nongnu.org,
- kraxel@redhat.com, imammedo@redhat.com, pbonzini@redhat.com, rth@twiddle.net,
- lersek@redhat.com, sgarzare@redhat.com
+Cc: "open list:RISC-V" <qemu-riscv@nongnu.org>, Anup Patel <Anup.Patel@wdc.com>,
+ Alistair Francis <Alistair.Francis@wdc.com>,
+ "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
+ Atish Patra <Atish.Patra@wdc.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> writes:
-
-> Hi Sergio,
+On Tue, Sep 10, 2019 at 7:48 AM Palmer Dabbelt <palmer@sifive.com> wrote:
 >
-> On 10/15/19 1:23 PM, Sergio Lopez wrote:
->> Follow checkpatch.pl recommendation and replace the use of strtol with
->> qemu_strtol in x86_load_linux().
+> On Fri, 23 Aug 2019 16:38:00 PDT (-0700), Alistair Francis wrote:
+> > Update the CSR permission checking to work correctly when we are in
+> > HS-mode.
+> >
+> > Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
+> > ---
+> >  target/riscv/csr.c | 10 ++++++++--
+> >  1 file changed, 8 insertions(+), 2 deletions(-)
+> >
+> > diff --git a/target/riscv/csr.c b/target/riscv/csr.c
+> > index f767ad24be..471f23a1d0 100644
+> > --- a/target/riscv/csr.c
+> > +++ b/target/riscv/csr.c
+> > @@ -799,9 +799,15 @@ int riscv_csrrw(CPURISCVState *env, int csrno, target_ulong *ret_value,
+> >
+> >      /* check privileges and return -1 if check fails */
+> >  #if !defined(CONFIG_USER_ONLY)
+> > -    int csr_priv = get_field(csrno, 0x300);
+> > +    int csr_priv = env->priv;
 >
-> "with qemu_strtoui"
+> This isn't really "csr_priv" (ie, the priv needed to access the CSR) any more,
+> it's really the effective priv of the machine.  Leaving the variable with the
+> same name makes this hard to read, but I think it is correct.
+
+I changed the name to effective_priv.
+
 >
->>
->> Signed-off-by: Sergio Lopez <slp@redhat.com>
->> ---
->>   hw/i386/pc.c | 9 ++++++++-
->>   1 file changed, 8 insertions(+), 1 deletion(-)
->>
->> diff --git a/hw/i386/pc.c b/hw/i386/pc.c
->> index 77e86bfc3d..c8608b8007 100644
->> --- a/hw/i386/pc.c
->> +++ b/hw/i386/pc.c
->> @@ -68,6 +68,7 @@
->>   #include "qemu/config-file.h"
->>   #include "qemu/error-report.h"
->>   #include "qemu/option.h"
->> +#include "qemu/cutils.h"
->>   #include "hw/acpi/acpi.h"
->>   #include "hw/acpi/cpu_hotplug.h"
->>   #include "hw/boards.h"
->> @@ -1202,6 +1203,7 @@ static void x86_load_linux(PCMachineState *pcms,
->>       vmode =3D strstr(kernel_cmdline, "vga=3D");
->>       if (vmode) {
->>           unsigned int video_mode;
->> +        int ret;
->>           /* skip "vga=3D" */
->>           vmode +=3D 4;
->>           if (!strncmp(vmode, "normal", 6)) {
->> @@ -1211,7 +1213,12 @@ static void x86_load_linux(PCMachineState *pcms,
->>           } else if (!strncmp(vmode, "ask", 3)) {
->>               video_mode =3D 0xfffd;
->>           } else {
->> -            video_mode =3D strtol(vmode, NULL, 0);
->> +            ret =3D qemu_strtoui(vmode, NULL, 0, &video_mode);
->> +            if (ret !=3D 0) {
->> +                fprintf(stderr, "qemu: can't parse 'vga' parameter: %s\=
-n",
->> +                        strerror(-ret));
+> >      int read_only = get_field(csrno, 0xC00) == 3;
+> > -    if ((write_mask && read_only) || (env->priv < csr_priv)) {
+> > +
+> > +    if (riscv_has_ext(env, RVH) && !riscv_cpu_virt_enabled(env)) {
+> > +        /* Plus 1 as we are in HS mode */
 >
-> (Cc'ing Markus/Daniel just in case)
+> The comment is useless, it doesn't say why we increment it.  Also, I don't
+> think this is correct: doesn't it allow U mode to access S CSRs when H is
+> present and V is disabled?
+
+Yes, you are correct. I have changed it to check that we are in S mode.
+
 >
-> I'm wondering if using fprintf() is appropriate, thinking about
-> instantiating a machine via libvirt, is this error reported to the
-> user?
+> Something like
 >
-> I first thought about using error_report() instead:
+>     riscv_effective_priv(CPURISCVState *env)
+>     {
+>         if (riscv_has_ext(env, RVH) && env->priv == PRIV_S && !riscv_cpu_virt_enabled(env)) {
+>             return PRIV_HS;
+
+I don't like this as there is no PRIV_HS. It seems like a bad idea to
+start using a reserved privilege level, if it is ever used we will
+then be stuck updating this. I also don't think this is used anywhere
+else. I have just fixed up the if statement and comment.
+
+Alistair
+
+>         }
 >
->     error_report("qemu: can't parse 'vga' parameter: %s",
->                  strerror(-ret));
-
-Make that
-
-     error_report("can't parse 'vga' parameter: %s", strerror(-ret));
-
-> But this API is meaningful when used in console/monitor. We can't get
-> here from the monitor,
-
-True, but error_report() should be used anyway, because (1) it makes
-intent more obvious, and (2) it uses a uniform, featureful error format.
-
-With the proposed fprintf(), we get
-
-    qemu: can't parse 'vga' parameter: Numerical result out of range
-
-With error_report():
-
-* we report the *actual* argv[0] instead of "qemu"
-
-* we obey -msg timestamp=3Don
-
-* if "[PATCHv2 1/2] util/qemu-error: add guest name helper with -msg
-  options" gets accepted, we obey -msg guest-name=3Don, too
-
-* we have a common way to point to the offending command line argument
-  or configuration file line (not worth doing here)
-
-Please use error_report().
-
-[...]
+>         return env->priv;
+>     }
+>
+> would probably be used in a handful of places, and would be a drop in for
+> env->priv here.
+>
+> > +        csr_priv++;
+> > +    }
+> > +
+> > +    if ((write_mask && read_only) || (csr_priv < get_field(csrno, 0x300))) {
+> >          return -1;
+> >      }
+> >  #endif
 
