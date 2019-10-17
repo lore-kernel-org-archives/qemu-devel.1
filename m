@@ -2,61 +2,67 @@ Return-Path: <SRS0=yZS3=YK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A7CBECE58E
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 10:35:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E91CBECE58E
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 10:36:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D2BFD2089C
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 10:35:41 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D2BFD2089C
+	by mail.kernel.org (Postfix) with ESMTPS id BA7062089C
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 10:36:45 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BA7062089C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43102 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43158 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iL389-0001ne-0o
-	for qemu-devel@archiver.kernel.org; Thu, 17 Oct 2019 06:35:41 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37256)
+	id 1iL39A-0002vZ-Vf
+	for qemu-devel@archiver.kernel.org; Thu, 17 Oct 2019 06:36:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37578)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jfreimann@redhat.com>) id 1iL36a-0000ct-As
- for qemu-devel@nongnu.org; Thu, 17 Oct 2019 06:34:08 -0400
+ (envelope-from <david@redhat.com>) id 1iL388-0001xT-Ng
+ for qemu-devel@nongnu.org; Thu, 17 Oct 2019 06:35:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jfreimann@redhat.com>) id 1iL36X-000736-6N
- for qemu-devel@nongnu.org; Thu, 17 Oct 2019 06:34:04 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:33486)
+ (envelope-from <david@redhat.com>) id 1iL385-0007vF-Ks
+ for qemu-devel@nongnu.org; Thu, 17 Oct 2019 06:35:40 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34456)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jfreimann@redhat.com>)
- id 1iL36X-00070p-1d
- for qemu-devel@nongnu.org; Thu, 17 Oct 2019 06:34:01 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
+ (Exim 4.71) (envelope-from <david@redhat.com>)
+ id 1iL385-0007uk-GC; Thu, 17 Oct 2019 06:35:37 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 1190C84A5;
- Thu, 17 Oct 2019 10:33:59 +0000 (UTC)
-Received: from localhost (dhcp-192-238.str.redhat.com [10.33.192.238])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 7B0ED5C1D6;
- Thu, 17 Oct 2019 10:33:48 +0000 (UTC)
-Date: Thu, 17 Oct 2019 12:33:47 +0200
-From: Jens Freimann <jfreimann@redhat.com>
-To: Alex Williamson <alex.williamson@redhat.com>
-Subject: Re: [PATCH v3 0/10] add failover feature for assigned network devices
-Message-ID: <20191017103347.gdlkkplpj64ivw5q@jenstp.localdomain>
-References: <20191011112015.11785-1-jfreimann@redhat.com>
- <20191015130317.64d68031@x1.home>
+ by mx1.redhat.com (Postfix) with ESMTPS id A85A58AC6FB;
+ Thu, 17 Oct 2019 10:35:36 +0000 (UTC)
+Received: from [10.36.117.42] (ovpn-117-42.ams2.redhat.com [10.36.117.42])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 7F3FF60BE1;
+ Thu, 17 Oct 2019 10:35:33 +0000 (UTC)
+Subject: Re: s390x/qemu-user: TODO /home/dhildenb/git/qemu/tcg/tci.c:859:
+ tcg_qemu_tb_exec()
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ qemu-s390x <qemu-s390x@nongnu.org>,
+ Richard Henderson <richard.henderson@linaro.org>
+References: <60a0d510-b693-0ed7-560f-e70904d9574d@redhat.com>
+ <95ddf722-ba5d-dd48-a840-0d940ded3acd@redhat.com>
+From: David Hildenbrand <david@redhat.com>
+Organization: Red Hat GmbH
+Message-ID: <2f96242c-7108-f9a6-0a1a-fdef3eee2a47@redhat.com>
+Date: Thu, 17 Oct 2019 12:35:32 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <20191015130317.64d68031@x1.home>
-User-Agent: NeoMutt/20180716-1376-5d6ed1
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.39]); Thu, 17 Oct 2019 10:33:59 +0000 (UTC)
+In-Reply-To: <95ddf722-ba5d-dd48-a840-0d940ded3acd@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.69]); Thu, 17 Oct 2019 10:35:36 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 209.132.183.28
@@ -71,64 +77,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: ehabkost@redhat.com, mst@redhat.com, aadam@redhat.com,
- qemu-devel@nongnu.org, dgilbert@redhat.com, laine@redhat.com, ailan@redhat.com,
- parav@mellanox.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, Oct 15, 2019 at 01:03:17PM -0600, Alex Williamson wrote:
->On Fri, 11 Oct 2019 13:20:05 +0200
->Jens Freimann <jfreimann@redhat.com> wrote:
->
->> This is implementing the host side of the net_failover concept
->> (https://www.kernel.org/doc/html/latest/networking/net_failover.html)
+On 17.10.19 12:25, Philippe Mathieu-Daud=C3=A9 wrote:
+> Hi David,
+>=20
+> On 10/17/19 12:02 PM, David Hildenbrand wrote:
+>> Hi,
 >>
->> Changes since v2:
->> * back out of creating failover pair when it is a non-networking
->>   vfio-pci device (Alex W)
->> * handle migration state change from within the migration thread. I do a
->>   timed wait on a semaphore and then check if all unplugs were
->>   succesful. Added a new function to each device that checks the device
->>   if the unplug for it has happened. When all devices report the succesful
->>   unplug *or* the time/retries is up, continue with the migration or
->>   cancel. When not all devices could be unplugged I am cancelling at the
->>   moment. It is likely that we can't plug it back at the destination which
->>   would result in degraded network performance.
->> * fix a few bugs regarding re-plug on migration source and target
->> * run full set of tests including migration tests
->> * add patch for libqos to tolerate new migration state
->> * squashed patch 1 and 2, added patch 8
+>> I'm currently trying to run Fedora 31 under qemu-user
+>> (https://github.com/fedora-cloud/docker-brew-fedora/tree/8a81f67271e95=
+9dfc8f8a888b161bbd540b7a83b/s390x)
+>> in order to debug=C2=A0 a vector instruction issue.
 >>
->> The general idea is that we have a pair of devices, a vfio-pci and a
->> virtio-net device. Before migration the vfio device is unplugged and data
->> flows to the virtio-net device, on the target side another vfio-pci device
->> is plugged in to take over the data-path. In the guest the net_failover
->> module will pair net devices with the same MAC address.
+>> Strangely, when trying to chroot into above rootfs and running
+>> /bin/bash, I get
 >>
->> * Patch 1 adds the infrastructure to hide the device for the qbus and qdev APIs
+>> t460s: ~/f31=C2=A0 $ sudo chroot . ./qemu-s390x=C2=A0 /bin/bash
+>> TODO /home/dhildenb/git/qemu/tcg/tci.c:859: tcg_qemu_tb_exec()
+>> /home/dhildenb/git/qemu/tcg/tci.c:859: tcg fatal error
+>> Aborted
 >>
->> * Patch 2 sets a new flag for PCIDevice 'partially_hotplugged' which we
->>   use to skip the unrealize code path when doing a unplug of the primary
->>   device
 >>
->> * Patch 3 sets the pending_deleted_event before triggering the guest
->>   unplug request
->
->These only cover pcie hotplug, is this feature somehow dependent on
->pcie?  There's also ACPI-based PCI hotplug, SHPC hotplug, and it looks
->like s390 has it's own version (of course) of PCI hotplug.  IMO, we
->either need to make an attempt to support this universally or the
->option needs to fail if the hotplug controller doesn't support partial
->removal.  Thanks,
+>> But it's not fundamentally broken:
+>>
+>> t460s: ~/f31=C2=A0 $ sudo chroot . ./qemu-s390x=C2=A0 /bin/ls
+>> bin=C2=A0=C2=A0 dev=C2=A0 home=C2=A0 lib64=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0 media=C2=A0 opt=C2=A0=C2=A0 qemu-s390x=C2=A0 run=C2=A0=C2=A0 srv=C2=
+=A0 tmp=C2=A0 var
+>> boot=C2=A0 etc=C2=A0 lib=C2=A0=C2=A0 lost+found=C2=A0 mnt=C2=A0=C2=A0=C2=
+=A0 proc=C2=A0 root=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 sbin=C2=A0 =
+sys=C2=A0 usr
+>>
+>>
+>> I do wonder why we don't run into the same issue under qemu-systems390=
+x.
+>=20
+> Are you also using TCI in system emulation?
 
-It is possible to make it work with non-pcie hotplug but as the first
-step I want to enable it for pcie only. For that I would add a check
-into pci_qdev_realize(), where I also check if the device is an
-ethernet device, and fail if it is not a pcie device. Would that work
-for you?
+Most probably not. It took me longer than expected to find a ./configure=20
+variant that at least allows me to build static qemu-user binaries. Most=20
+probably something sneeked in there.
 
-regards,
-Jens 
+>=20
+> Can you simply use TCG to debug your vector instruction issue instead?
+
+I was using
+
+./configure --disable-strip --disable-werror --python=3D/usr/bin/python3=20
+--enable-tcg-interpreter --disable-system --enable-linux-user --static=20
+--disable-pie --disable-sdl --disable-gtk --disable-spice=20
+--disable-tools --disable-guest-agent --disable-guest-agent-msi=20
+--disable-curses --disable-curl --disable-gnutls --disable-gcrypt=20
+--disable-nettle --disable-cap-ng --disable-brlapi --disable-mpath=20
+--disable-capstone --disable-xen --disable-rdma=20
+--extra-ldflags=3D"-Wl,-z,relro -Wl,-z,now" --target-list=3Ds390x-linux-u=
+ser
+
+inspired by the Fedora rpm SPEC.
+
+"--enable-tcg-interpreter" is the relevant bit I blindly copied without=20
+thinking about it (in the rpm SPEC, it is wrapped by an ifdef ...)
+
+Thanks for the hint, will try with --disable-tcg-interpreter
+
+>=20
+> Regards,
+>=20
+> Phil.
+>=20
+
+
+--=20
+
+Thanks,
+
+David / dhildenb
 
