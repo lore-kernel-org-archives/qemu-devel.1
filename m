@@ -2,89 +2,84 @@ Return-Path: <SRS0=yZS3=YK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BDAEBFA372A
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 16:11:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5122BECE58E
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 16:11:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9688D2067B
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 16:11:05 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9688D2067B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 18BF420872
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 16:11:33 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="cNcKwAxh"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 18BF420872
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52084 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52098 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iL8Mi-0006OC-1L
-	for qemu-devel@archiver.kernel.org; Thu, 17 Oct 2019 12:11:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56866)
+	id 1iL8N9-00073w-Lj
+	for qemu-devel@archiver.kernel.org; Thu, 17 Oct 2019 12:11:31 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54167)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1iL7dh-0006a4-ON
- for qemu-devel@nongnu.org; Thu, 17 Oct 2019 11:24:34 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1iL7MM-0000Po-1n
+ for qemu-devel@nongnu.org; Thu, 17 Oct 2019 11:06:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1iL7dg-0000nc-MK
- for qemu-devel@nongnu.org; Thu, 17 Oct 2019 11:24:33 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:48144)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iL7dg-0000n6-EU
- for qemu-devel@nongnu.org; Thu, 17 Oct 2019 11:24:32 -0400
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69])
- (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 896033E2AF
- for <qemu-devel@nongnu.org>; Thu, 17 Oct 2019 15:24:31 +0000 (UTC)
-Received: by mail-wr1-f69.google.com with SMTP id 7so1136945wrl.2
- for <qemu-devel@nongnu.org>; Thu, 17 Oct 2019 08:24:31 -0700 (PDT)
+ (envelope-from <peter.maydell@linaro.org>) id 1iL7MF-0008DC-QD
+ for qemu-devel@nongnu.org; Thu, 17 Oct 2019 11:06:37 -0400
+Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:35731)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1iL7MF-0008Cd-M0
+ for qemu-devel@nongnu.org; Thu, 17 Oct 2019 11:06:31 -0400
+Received: by mail-ot1-x344.google.com with SMTP id z6so2193857otb.2
+ for <qemu-devel@nongnu.org>; Thu, 17 Oct 2019 08:06:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=fNuiZxDXxKW4b1rxU5MwVhy7UslYOkpsYFLTQrIrZh4=;
+ b=cNcKwAxhUgNDOJvCTtgAtWQA3K+GQsbTih5kA8Nc/NPKcXN9yn76d8w7pyn4U4ZR8j
+ by8ZQjjZ9TE8VFnKMCwrbnXlWO+atjUVoWlj56UvE2pcuyvkyUpKfsJP1gG90jLR7LoX
+ 6pf6R0TxSJGMXZcZ1U0SV7EwrotSxkT1KSTco+fODHwBoUSAIENrN8mk7LIJToSEq5m4
+ YjLRb1skeHGFuTpHMrPwCJ74KtX1dNZwHAXYZx7DOnzWYMbSdOLsurRlF4mFJmDtxXxq
+ eGndFYEQgnVEAAW0OVt1WZFHabtRBSnzHt41/KJG0yKs5pfLBbpJ4eUpDbAHh6cqTpXP
+ yp7A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=IS/vtS+qEHcMK9d+rcriOqJkkt4vsA+YTxXci4TyB6U=;
- b=RdexYmYPDmjJsrSJQM7bHoKlattPtTWEqOhi3iaE0hOw6KADlmIybEohV3XchpPeYF
- edoRjjkc/JkY+nDBnDB5E7Etp4cEjVlNXji+vMwiCxtSTH2y8nbMxkLWexNGTIVQ7V+A
- sv4xX4V3ynzR0PGhEMd4xFh6WxY7aUGKb0uNslVlqQ0L7XBrG+90DsTKWC3bfnY4l/yQ
- IrsYaVe4IdIdLLs0Eyy+1pNME2owpBXyDYjfOFIz3xIOpQMOQZBtfrre6+9zDkhP1iX+
- 1t3/eZTRkWhyrqZp48Y2xwAH3OpWWURb/72ED0oNj2ZDYc9Z7Q1au3pADkDyNMhFldAv
- u3kQ==
-X-Gm-Message-State: APjAAAVB8qSwrLXxLSHem5sH5OssdfalhflPsdjSyfDQs+8t6QKkWYjU
- eja4FSBQQZd66w57VAUk8svZDUksYlErv8PihorTpuXN050g6UyJf59jIB2LLIcFXeQ8HkX92Fa
- ECKLoHqNxdeKkVLQ=
-X-Received: by 2002:adf:8567:: with SMTP id 94mr591057wrh.65.1571325870249;
- Thu, 17 Oct 2019 08:24:30 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqzhFPVbKfUp3tx76jtZI8VakBCjX11WPTy7buNDPK/URMAYlqlnKm68uUiP2gvOXliZrShARw==
-X-Received: by 2002:adf:8567:: with SMTP id 94mr591040wrh.65.1571325870084;
- Thu, 17 Oct 2019 08:24:30 -0700 (PDT)
-Received: from [192.168.50.32] (243.red-88-26-246.staticip.rima-tde.net.
- [88.26.246.243])
- by smtp.gmail.com with ESMTPSA id a71sm2433307wme.11.2019.10.17.08.24.28
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Thu, 17 Oct 2019 08:24:29 -0700 (PDT)
-Subject: Re: [PATCH 2/3] hw/timer/xilinx_timer.c: Switch to transaction-based
- ptimer API
-To: Peter Maydell <peter.maydell@linaro.org>
-References: <20191017132122.4402-1-peter.maydell@linaro.org>
- <20191017132122.4402-3-peter.maydell@linaro.org>
- <cabcec27-c6a7-6ea7-e933-589f2385c137@redhat.com>
- <CAFEAcA9dRMu_hauo_PuJyWh03+-Y9ogWmKSBfzu_6GhYCrnDAQ@mail.gmail.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <57a5d309-97a5-75ce-dade-504557071fc4@redhat.com>
-Date: Thu, 17 Oct 2019 17:24:28 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.1
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=fNuiZxDXxKW4b1rxU5MwVhy7UslYOkpsYFLTQrIrZh4=;
+ b=KmLlpQ0RlW58roMAUVxWX8TdMdp+m4S+2STpW3aqa1Xox97hbPHgB6+oTIZhmvl6zc
+ bk8LC/uKAhbgzdSinObTwyydFL7nbGjlDJCkMLLvceQLeV4Y/xYyEK5IlMnFz6nFyKo9
+ 0+uL3ukASD9HotAVO86LUDoyTvUNUMUeOImNEEsXA8rQ7X0dr7XVeEEpF0t7xVI8Vpz4
+ DR/HLqLx0Pzs1nqQRAhRpmkvmd3TZBsjxdbi1WXPSgf5izvWlsUyYIFkYTukfEXcvVwe
+ hdDDIP9jUl6xlPpf50fZRFCTpnIZdwgjDYWuJC4yp4H5XnWVU+mIfx5okgPYVUoDcbdH
+ u3iQ==
+X-Gm-Message-State: APjAAAVX61gG92XlKSSW9STlIRQhjgvQZEPw0SCvwijPQxrZXuk0WDkF
+ 6PtGUu9a+C+um9xrJStSYvjyjq+brYeQ//oyijiF0g==
+X-Google-Smtp-Source: APXvYqyNFqn0sFI+yjtXobDaL5PEcPhhpURwvVCojvljibhuKZ1pbHBPLmU1jQzH6h4dLYEVhK6eTd5EEmkSdIaBgPU=
+X-Received: by 2002:a9d:30c1:: with SMTP id r1mr3507111otg.91.1571324790733;
+ Thu, 17 Oct 2019 08:06:30 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA9dRMu_hauo_PuJyWh03+-Y9ogWmKSBfzu_6GhYCrnDAQ@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
+References: <20191017132122.4402-1-peter.maydell@linaro.org>
+ <20191017132122.4402-4-peter.maydell@linaro.org>
+ <d9e7dd55-01e5-d852-bbab-84f5209abb6f@redhat.com>
+In-Reply-To: <d9e7dd55-01e5-d852-bbab-84f5209abb6f@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 17 Oct 2019 16:06:19 +0100
+Message-ID: <CAFEAcA_zz=SYwD=iDgwVZcvPF4seZW9qdvfGKfmK_UaaUDF7Vg@mail.gmail.com>
+Subject: Re: [PATCH 3/3] hw/dma/xilinx_axidma.c: Switch to transaction-based
+ ptimer API
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.132.183.28
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::344
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -104,35 +99,77 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 10/17/19 5:03 PM, Peter Maydell wrote:
-> On Thu, 17 Oct 2019 at 15:57, Philippe Mathieu-Daud=C3=A9 <philmd@redha=
-t.com> wrote:
->>
->> Hi Peter,
->>
->> On 10/17/19 3:21 PM, Peter Maydell wrote:
->>> +/* Must be called inside ptimer transaction block */
->>>    static void timer_enable(struct xlx_timer *xt)
->>>    {
->>>        uint64_t count;
->>> @@ -174,8 +173,11 @@ timer_write(void *opaque, hwaddr addr,
->>>                    value &=3D ~TCSR_TINT;
->>>
->>>                xt->regs[addr] =3D value & 0x7ff;
->>> -            if (value & TCSR_ENT)
->>> +            if (value & TCSR_ENT) {
->>> +                ptimer_transaction_begin(xt->ptimer);
->>>                    timer_enable(xt);
->>> +                ptimer_transaction_commit(xt->ptimer);
->>
->> Why not move these inside timer_enable()?
->=20
-> Because timer_enable() is called from the callback
-> function timer_hit(). Since callback functions are called
-> from within a begin/commit block, if we called begin
-> again in timer_enable() it would assert().
+On Thu, 17 Oct 2019 at 16:01, Philippe Mathieu-Daud=C3=A9 <philmd@redhat.co=
+m> wrote:
+>
+> Hi Peter,
+>
+> On 10/17/19 3:21 PM, Peter Maydell wrote:
+> > Switch the xilinx_axidma code away from bottom-half based ptimers to
+> > the new transaction-based ptimer API.  This just requires adding
+> > begin/commit calls around the various places that modify the ptimer
+> > state, and using the new ptimer_init() function to create the timer.
+> >
+> > Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> > ---
+> >   hw/dma/xilinx_axidma.c | 9 +++++----
+> >   1 file changed, 5 insertions(+), 4 deletions(-)
+> >
+> > diff --git a/hw/dma/xilinx_axidma.c b/hw/dma/xilinx_axidma.c
+> > index e035d1f7504..fb3a978e282 100644
+> > --- a/hw/dma/xilinx_axidma.c
+> > +++ b/hw/dma/xilinx_axidma.c
+> > @@ -31,7 +31,6 @@
+> >   #include "hw/ptimer.h"
+> >   #include "hw/qdev-properties.h"
+> >   #include "qemu/log.h"
+> > -#include "qemu/main-loop.h"
+> >   #include "qemu/module.h"
+> >
+> >   #include "hw/stream.h"
+> > @@ -104,7 +103,6 @@ enum {
+> >   };
+> >
+> >   struct Stream {
+> > -    QEMUBH *bh;
+> >       ptimer_state *ptimer;
+> >       qemu_irq irq;
+> >
+> > @@ -242,6 +240,7 @@ static void stream_complete(struct Stream *s)
+> >       unsigned int comp_delay;
+> >
+> >       /* Start the delayed timer.  */
+> > +    ptimer_transaction_begin(s->ptimer);
+> >       comp_delay =3D s->regs[R_DMACR] >> 24;
+> >       if (comp_delay) {
+> >           ptimer_stop(s->ptimer);
+> > @@ -255,6 +254,7 @@ static void stream_complete(struct Stream *s)
+> >           s->regs[R_DMASR] |=3D DMASR_IOC_IRQ;
+> >           stream_reload_complete_cnt(s);
+> >       }
+> > +    ptimer_transaction_commit(s->ptimer);
+>
+> I'd restrict the transaction here within the if() statement:
+>
+> -- >8 --
+> @@ -244,9 +244,11 @@ static void stream_complete(struct Stream *s)
+>       /* Start the delayed timer.  */
+>       comp_delay =3D s->regs[R_DMACR] >> 24;
+>       if (comp_delay) {
+> +        ptimer_transaction_begin(s->ptimer);
+>           ptimer_stop(s->ptimer);
+>           ptimer_set_count(s->ptimer, comp_delay);
+>           ptimer_run(s->ptimer, 1);
+> +        ptimer_transaction_commit(s->ptimer);
+>       }
+>
+>       s->complete_cnt--;
 
-Yes, now I understood the point of this new API ;)
+The timer_hit callback function itself writes to
+s->complete_cnt, so we don't want to allow it to
+be called (via the commit()) before stream_complete()
+is done with changing that state.
 
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+thanks
+-- PMM
 
