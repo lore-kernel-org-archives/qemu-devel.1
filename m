@@ -2,50 +2,50 @@ Return-Path: <SRS0=yZS3=YK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.2 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B49DAECE58D
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 19:36:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D8179ECE58E
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 19:40:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7D48120640
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 19:36:09 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7D48120640
+	by mail.kernel.org (Postfix) with ESMTPS id A75F720650
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 19:40:36 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A75F720650
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58124 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58218 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iLBZA-0006um-Kg
-	for qemu-devel@archiver.kernel.org; Thu, 17 Oct 2019 15:36:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42514)
+	id 1iLBdT-0000yG-TO
+	for qemu-devel@archiver.kernel.org; Thu, 17 Oct 2019 15:40:35 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42906)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jsnow@redhat.com>) id 1iLBYF-0006FK-9a
- for qemu-devel@nongnu.org; Thu, 17 Oct 2019 15:35:12 -0400
+ (envelope-from <jsnow@redhat.com>) id 1iLBcT-0008SG-Cn
+ for qemu-devel@nongnu.org; Thu, 17 Oct 2019 15:39:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1iLBYE-0005Jp-7i
- for qemu-devel@nongnu.org; Thu, 17 Oct 2019 15:35:11 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:8082)
+ (envelope-from <jsnow@redhat.com>) id 1iLBcR-0000QY-VO
+ for qemu-devel@nongnu.org; Thu, 17 Oct 2019 15:39:32 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54838)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jsnow@redhat.com>)
- id 1iLBYA-00055D-4H; Thu, 17 Oct 2019 15:35:06 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+ (Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1iLBcR-0000Q1-N2
+ for qemu-devel@nongnu.org; Thu, 17 Oct 2019 15:39:31 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 436F689F304;
- Thu, 17 Oct 2019 19:35:04 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id B48BD2A09BF;
+ Thu, 17 Oct 2019 19:39:30 +0000 (UTC)
 Received: from [10.18.17.173] (dhcp-17-173.bos.redhat.com [10.18.17.173])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 4FBF319C70;
- Thu, 17 Oct 2019 19:34:57 +0000 (UTC)
-Subject: Re: [PULL v2 00/19] Bitmaps patches
-To: Peter Maydell <peter.maydell@linaro.org>
-References: <20191014192909.16044-1-jsnow@redhat.com>
- <CAFEAcA91Yr3g5V9GdV5FbctQjQG5MiCgf7mk-MnsYmdx+63TYg@mail.gmail.com>
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 0C3355C1B5;
+ Thu, 17 Oct 2019 19:39:29 +0000 (UTC)
+Subject: Re: [PATCH] configure: Require Python >= 3.5
+To: Kevin Wolf <kwolf@redhat.com>
+References: <20191016224237.26180-1-ehabkost@redhat.com>
+ <7146bebf-6e99-f27a-3753-d48dea1977f9@redhat.com>
+ <20191017112121.GA9233@localhost.localdomain>
 From: John Snow <jsnow@redhat.com>
 Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
  mQINBFTKefwBEAChvwqYC6saTzawbih87LqBYq0d5A8jXYXaiFMV/EvMSDqqY4EY6whXliNO
@@ -121,18 +121,18 @@ Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
  i0HjnLoJP5jDcoMTabZTIazXmJz3pKM11HYJ5/ZsTIf3ZRJJKIvXJpbmcAPVwTZII6XxiJdh
  RSSX4Mvd5pL/+5WI6NTdW6DMfigTtdd85fe6PwBNVJL2ZvBfsBJZ5rxg1TOH3KLsYBqBTgW2
  glQofxhkJhDEcvjLhe3Y2BlbCWKOmvM8XS9TRt0OwUs=
-Message-ID: <f2d45d13-c494-68e6-072d-23d361c368a3@redhat.com>
-Date: Thu, 17 Oct 2019 15:34:57 -0400
+Message-ID: <c9e18dc9-0c94-601c-f4c7-735aedc9a92b@redhat.com>
+Date: Thu, 17 Oct 2019 15:39:29 -0400
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.1.0
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA91Yr3g5V9GdV5FbctQjQG5MiCgf7mk-MnsYmdx+63TYg@mail.gmail.com>
+In-Reply-To: <20191017112121.GA9233@localhost.localdomain>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.68]); Thu, 17 Oct 2019 19:35:04 +0000 (UTC)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.38]); Thu, 17 Oct 2019 19:39:30 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 209.132.183.28
@@ -147,54 +147,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>,
- Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- Qemu-block <qemu-block@nongnu.org>, Juan Quintela <quintela@redhat.com>,
- Libvirt <libvir-list@redhat.com>, Markus Armbruster <armbru@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>,
- Stefan Hajnoczi <stefanha@redhat.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>,
+ Cleber Rosa <crosa@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
 
-On 10/17/19 7:07 AM, Peter Maydell wrote:
-> On Mon, 14 Oct 2019 at 20:29, John Snow <jsnow@redhat.com> wrote:
+On 10/17/19 7:21 AM, Kevin Wolf wrote:
+> Am 17.10.2019 um 00:48 hat John Snow geschrieben:
 >>
->> The following changes since commit c760cb77e511eb05094df67c1b30029a952efa35:
 >>
->>   Merge remote-tracking branch 'remotes/dgilbert/tags/pull-migration-20191011a' into staging (2019-10-14 16:09:52 +0100)
+>> On 10/16/19 6:42 PM, Eduardo Habkost wrote:
+>>> Python 3.5 is the oldest Python version available on our
+>>> supported build platforms, and Python 2 end of life will be 3
+>>> weeks after the planned release date of QEMU 4.2.0.  Drop Python
+>>> 2 support from configure completely, and require Python 3.5 or
+>>> newer.
+>>>
+>>> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 >>
->> are available in the Git repository at:
+>> Seems like a good time and place to mention this. Kevin, you require
+>> 3.6+ for iotests, which are -- at present -- invoked as part of "make
+>> check".
 >>
->>   https://github.com/jnsnow/qemu.git tags/bitmaps-pull-request
->>
->> for you to fetch changes up to b2ca29ee390743c42a6062d44ee3b10fb51f9fa6:
->>
->>   dirty-bitmaps: remove deprecated autoload parameter (2019-10-14 15:28:17 -0400)
->>
->> ----------------------------------------------------------------
->> Pull request
->>
->> ----------------------------------------------------------------
+>> Do we care? Basically, this just means that iotests won't run for
+>> systems that don't have 3.6+, which would be platforms like Debian 9 --
+>> which is why ehabkost is choosing 3.5 here.
 > 
-> Hi; this pullreq fails on some hosts on the newly added iotest 260
-> with an "AF_UNIX path too long" error:
-> https://lists.gnu.org/archive/html/qemu-devel/2019-10/msg04063.html
+> I think we were aware of this when we made the change to iotests. That
+> all tests of the current upstream QEMU version are run on Debian
+> oldstable (with the distro Python version) is, to say the least, not a
+> priority for me. They must not fail, but I'd say skipping is fine.
 > 
-> Max tells me that this is a known problem (a fix is in the works)
-> but that for the moment we've chosen not to add any python based
-> tests to the 'auto' group, so that this AF_UNIX issue doesn't
-> affect "make check". Could you respin the pullreq with the
-> new iotest(s?) not in the 'auto' group, please?
+> And actually, we should still have a reasonable coverage there with the
+> shell-based test cases.
 > 
-> thanks
-> -- PMM
+> Kevin
 > 
 
-Anguish and turmoil.
+This seems like a weirdly arbitrary decision for a benefit that's not
+clear to me. Is it because you want variable annotations?
 
-Alright, V3 coming up.
+(Well, regardless, you're the ranger in charge of this forest.)
 
