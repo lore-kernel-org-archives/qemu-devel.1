@@ -2,86 +2,80 @@ Return-Path: <SRS0=yZS3=YK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 66E8EFA3733
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 11:54:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2DAC0FA372A
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 11:58:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3DEDC2089C
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 11:54:28 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3DEDC2089C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id EAD6F2082C
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 11:58:05 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="rZytt+Hd"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EAD6F2082C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44802 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44884 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iL4MN-0007wR-9J
-	for qemu-devel@archiver.kernel.org; Thu, 17 Oct 2019 07:54:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49982)
+	id 1iL4Pt-0001R0-1z
+	for qemu-devel@archiver.kernel.org; Thu, 17 Oct 2019 07:58:05 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50461)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <slp@redhat.com>) id 1iL4Kw-0006yO-2M
- for qemu-devel@nongnu.org; Thu, 17 Oct 2019 07:52:59 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1iL4PA-00010U-1T
+ for qemu-devel@nongnu.org; Thu, 17 Oct 2019 07:57:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <slp@redhat.com>) id 1iL4Ku-00057M-UM
- for qemu-devel@nongnu.org; Thu, 17 Oct 2019 07:52:57 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:38090)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <slp@redhat.com>) id 1iL4Ku-000574-Lw
- for qemu-devel@nongnu.org; Thu, 17 Oct 2019 07:52:56 -0400
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72])
- (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 6131F7FDC9
- for <qemu-devel@nongnu.org>; Thu, 17 Oct 2019 11:52:55 +0000 (UTC)
-Received: by mail-wm1-f72.google.com with SMTP id k184so1038972wmk.1
- for <qemu-devel@nongnu.org>; Thu, 17 Oct 2019 04:52:55 -0700 (PDT)
+ (envelope-from <peter.maydell@linaro.org>) id 1iL4P8-0006HE-Bx
+ for qemu-devel@nongnu.org; Thu, 17 Oct 2019 07:57:19 -0400
+Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:36359)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1iL4P7-0006Gr-Or
+ for qemu-devel@nongnu.org; Thu, 17 Oct 2019 07:57:18 -0400
+Received: by mail-ot1-x341.google.com with SMTP id 67so1633933oto.3
+ for <qemu-devel@nongnu.org>; Thu, 17 Oct 2019 04:57:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=zIAvEvJnJARZAm+fFGiE5GBmrEcwikfV06GnqKZ4tVs=;
+ b=rZytt+Hd/A6N/fA6Vi12xKmUwXkT4S4OIf36nPid28LTdFcpjr645onE8Yj6p6Hr5M
+ hwwTu5XXIAHFlLOTVHo7ih9x86dUbow1uDZhworm6TFJp42DOGUF4zYYY7BTQgkFzuiA
+ 202EPNBNP8MeM6Cc8W/2TtQubypEDZzb9a01FfMTbY81/FhO9Hq+ZNFsEo+pnoTNENmg
+ vygXMAHRA3Vu4GcfZD2svLq9KoSq3OJJajXJwGzfpaKBnz2ZIlk1b4nB3OUCZywCRTU0
+ mC/YDxjSUA1sSE3KY6WF4ZHa5VxNzIQEBM+geo52SXCyn4CzvkYzw0Zt1yOHhdiugNLg
+ SCOw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version;
- bh=xnWgpye6CWWjgYx0MDMULGRITOWwwMNvlCrv+mBv1Ec=;
- b=l/ek6FvCoXE3R+KTAPOpXYGxRFk8o5mCdnDF7MRPgNBTHiZWXraJKRqhu+g3LcLc9v
- bZTORPd5xO+nhWTpg5ZXA0IRL/pp7KwF1CObos2gmFywULVFcBSDMEak8/DF+PNerwRn
- 0R5uBDX7ecUtj8fxw30RqC4Qn6ujb0Kq/v5s9jd0bQ6fKtWjNnqtE8QDgzLBPvSuMpxp
- 5w2l2h+ps9KLU50WJfRu4OFy63dytblqmj/4FOxbPdX3PNXMaiVfugONrcJmAy14Qz7a
- tOUYjiOH2YDIwOjFrUgBtUZKaf7kzRDTAjODNqNJ8YHXY7C2Ub4J+UieGpxOREociasY
- ZF2w==
-X-Gm-Message-State: APjAAAV8gxBwLF+/wooq2ZKRccAUdI8F3ydY8MN/5Phb50HjzMi+1426
- Es/Bi8AwVPgRl836JbvS8Wb+gm/0QxMK8WSq13ZJCZzOygiwFIx02UkdZ+swnJY1CwVDVU0rLqq
- JFOcm5itd5KWao2k=
-X-Received: by 2002:a5d:630f:: with SMTP id i15mr2747488wru.226.1571313174131; 
- Thu, 17 Oct 2019 04:52:54 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqyttAP3t47m1665WWXKO78MkfdLtuJWRxHXA3bqwTU4SMuKHJ9XjNERijxu6RpIJ60D6cs4uQ==
-X-Received: by 2002:a5d:630f:: with SMTP id i15mr2747458wru.226.1571313173912; 
- Thu, 17 Oct 2019 04:52:53 -0700 (PDT)
-Received: from dritchie.redhat.com (139.red-95-120-215.dynamicip.rima-tde.net.
- [95.120.215.139])
- by smtp.gmail.com with ESMTPSA id v20sm1772174wml.26.2019.10.17.04.52.52
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 17 Oct 2019 04:52:53 -0700 (PDT)
-References: <20191016101241.24405-1-slp@redhat.com>
- <20191016101241.24405-14-slp@redhat.com>
- <d981516f-f23a-47f5-d825-a101fdaaf471@redhat.com> <87ftjrhcq7.fsf@redhat.com>
- <6e84a3fb-0ded-6302-af44-a1d70eea60fa@redhat.com>
-User-agent: mu4e 1.2.0; emacs 26.2
-From: Sergio Lopez <slp@redhat.com>
-To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-Subject: Re: [PATCH v10 13/15] docs/microvm.rst: document the new microvm
- machine type
-In-reply-to: <6e84a3fb-0ded-6302-af44-a1d70eea60fa@redhat.com>
-Date: Thu, 17 Oct 2019 13:52:50 +0200
-Message-ID: <87d0evh9m5.fsf@redhat.com>
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=zIAvEvJnJARZAm+fFGiE5GBmrEcwikfV06GnqKZ4tVs=;
+ b=O6uQqj7PddDYLwk3+pSuEMGTaFjF9frVIeOUkU0F7A6jLwYossc2iaXvmRKC1EOdQ0
+ oFsCozQMpjDlLCIfNZejIYHiHxKNmPL1ofQaAVpIdTqam+sNzTO/wYlr4UkHb2zEjVV5
+ GAtXUjiPA9OzUy060ZazvO9MURmPdo321uxM7uUpYlGVJWqdpS6i1PShsV0OoSRAPpiC
+ f79CWQO2jQUxnbyg+ux21xAhTenlat0a/qEVJ8w0o0GTOeahxAKB9wsGD2CGzeNNPoI0
+ rXhOaCgqQ0cWH+mAfSdZ5e2uIKVTYZu9jFkGd1eRFzB6fvBe8NDEI6EyVrOntNPsKEgk
+ XFjQ==
+X-Gm-Message-State: APjAAAUYJ2ogmOtFdGzWucLzmC9p8+Pj053cXMJx42Cf3YbOzoScazFg
+ qcXUByt5Jfsb/6vCILuHC6WSV/KnbgTMj5s3+2kNUg==
+X-Google-Smtp-Source: APXvYqx0TKqUHwz6zKwfZvtZgS+pk1d6qQqlYVAnh1kxSVYjGAKmgeQ2/O7K5lTcKvdo0ylpkepltnitUxe1TTD9NWI=
+X-Received: by 2002:a9d:708e:: with SMTP id l14mr2697955otj.135.1571313436432; 
+ Thu, 17 Oct 2019 04:57:16 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="=-=-=";
- micalg=pgp-sha256; protocol="application/pgp-signature"
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.132.183.28
+References: <20191010113356.5017-1-david@redhat.com>
+ <20191010113356.5017-20-david@redhat.com>
+In-Reply-To: <20191010113356.5017-20-david@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 17 Oct 2019 12:57:04 +0100
+Message-ID: <CAFEAcA-Z94EAN_dt06nH97SbyMc3Jg6uj_xn-zTTMjUrvNrUDw@mail.gmail.com>
+Subject: Re: [PULL 19/31] target/s390x: Return exception from
+ mmu_translate_real
+To: David Hildenbrand <david@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::341
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -93,87 +87,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: ehabkost@redhat.com, mst@redhat.com, qemu-devel@nongnu.org, groug@kaod.org,
- kraxel@redhat.com, pbonzini@redhat.com, imammedo@redhat.com,
- sgarzare@redhat.com, lersek@redhat.com, rth@twiddle.net
+Cc: Thomas Huth <thuth@redhat.com>, qemu-s390x <qemu-s390x@nongnu.org>,
+ Cornelia Huck <cohuck@redhat.com>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---=-=-=
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-
-Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> writes:
-
-> On 10/17/19 12:45 PM, Sergio Lopez wrote:
->>
->> Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> writes:
->>
->>> Hi Sergio,
->>>
->>> On 10/16/19 12:12 PM, Sergio Lopez wrote:
->>>> +Supported devices
->>>> +-----------------
->>>> +
->>>> +The microvm machine type supports the following devices:
->>>> +
->>>> +- ISA bus
->>>> +- i8259 PIC (optional)
->>>> +- i8254 PIT (optional)
->>>> +- MC146818 RTC (optional)
->>>> +- One ISA serial port (optional)
->>>> +- LAPIC
->>>> +- IOAPIC (with kernel-irqchip=3Dsplit by default)
->>>> +- kvmclock (if using KVM)
->>>> +- fw_cfg
->>>> +- Up to eight virtio-mmio devices (configured by the user)
->>>
->>> If we have VirtIO devices, why not use virtio-serial instead of the
->>> one on the ISA bus?
->>
->> The serial port on the ISA bus is simpler, and thus is supported for
->> both SeaBIOS debugging and Linux's earlyprintk. This makes it *very*
->> convenient for debugging boot issues.
+On Thu, 10 Oct 2019 at 12:35, David Hildenbrand <david@redhat.com> wrote:
 >
-> "... but it's also compatible with SeaBIOS"
+> From: Richard Henderson <richard.henderson@linaro.org>
 >
-> OK. Maybe we can add a comment such "These devices are the minimum
-> required to run SeaBIOS" in the 'Supported devices' section.
+> Do not raise the exception directly within mmu_translate_real,
+> but pass it back so that caller may do so.
+>
+> Reviewed-by: David Hildenbrand <david@redhat.com>
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> Message-Id: <20191001171614.8405-8-richard.henderson@linaro.org>
+> Signed-off-by: David Hildenbrand <david@redhat.com>
 
-Well, that's not exactly true. SeaBIOS works without a serial port, it's
-just you can't get it to send its debugging messages anywhere (which
-most people won't see anyway).
-
-Sergio.
-
->>
->> Also, as it's explained in the documentation, users that no longer need
->> it can disable the device and just rely on virtio-console.
->>
->> Sergio.
->>
+Hi; Coverity complains about dead code in this patch:
 
 
---=-=-=
-Content-Type: application/pgp-signature; name="signature.asc"
 
------BEGIN PGP SIGNATURE-----
+> --- a/target/s390x/mmu_helper.c
+> +++ b/target/s390x/mmu_helper.c
+> @@ -554,14 +554,11 @@ void s390_cpu_virt_mem_handle_exc(S390CPU *cpu, uintptr_t ra)
+>   * @param rw     0 = read, 1 = write, 2 = code fetch
+>   * @param addr   the translated address is stored to this pointer
+>   * @param flags  the PAGE_READ/WRITE/EXEC flags are stored to this pointer
+> - * @return       0 if the translation was successful, < 0 if a fault occurred
+> + * @return       0 = success, != 0, the exception to raise
+>   */
+>  int mmu_translate_real(CPUS390XState *env, target_ulong raddr, int rw,
+> -                       target_ulong *addr, int *flags)
+> +                       target_ulong *addr, int *flags, uint64_t *tec)
+>  {
+> -    /* Code accesses have an undefined ilc, let's use 2 bytes. */
+> -    uint64_t tec = (raddr & TARGET_PAGE_MASK) |
+> -                   (rw == MMU_DATA_STORE ? FS_WRITE : FS_READ);
+>      const bool lowprot_enabled = env->cregs[0] & CR0_LOWPROT;
+>
+>      *flags = PAGE_READ | PAGE_WRITE | PAGE_EXEC;
+> @@ -570,9 +567,10 @@ int mmu_translate_real(CPUS390XState *env, target_ulong raddr, int rw,
+>          *flags |= PAGE_WRITE_INV;
+>          if (is_low_address(raddr) && rw == MMU_DATA_STORE) {
+>              /* LAP sets bit 56 */
+> -            tec |= 0x80;
+> -            trigger_access_exception(env, PGM_PROTECTION, ILEN_AUTO, tec);
+> -            return -EACCES;
+> +            *tec = (raddr & TARGET_PAGE_MASK)
+> +                 | (rw == MMU_DATA_STORE ? FS_WRITE : FS_READ)
 
-iQIzBAEBCAAdFiEEvtX891EthoCRQuii9GknjS8MAjUFAl2oVhIACgkQ9GknjS8M
-AjWpvBAAonw3XrsDPxBKG5S3Fc0cGjnZ2odGA2BQvYnuXLSag83meMtTLwOBReSg
-PhZ5FkM4dR0BmOubiv3V/nI7mkNT4Lt7Kf1fe/lWZ6kKGIe9NjcGPMJuYz6iR59g
-O5wJqxJ4bTuwIVdhHgAJd1trmoxB+yHXxcgkCE90nFWuXoTU6MNeXoIUkmaISCFd
-P3xj6X8xihMnExOL79qAnuljLr54vfGDvtzSywWRegaeKub7ePGlLK7nx30NsPVB
-7CE2kW5h5YnNGZODopGwxkR1cKe6RCHz4pJCJDhkvzl3Ls7gKEQQxHn1opJD1yyZ
-Eol3Ex4Z4TecExnqbGDEzF0cXIXBxjll7DepVdGTZYJrir6+W7O0REtbSVSxSm4J
-PyUQuWJ5JhC457QPYp9nPp5CgUfJFid0GwsbofjXXyu+eujC7nrQa5P7bNKyi35u
-UjCZirSnOYcex/jEvTYjMWqrsXCRcBBU8inLvJc/xuowwEz2kqxMClku4iszgVkr
-AH/TjIhWSldxRJNed9VH8b3lLrH7bYIAgjrsySks+GPZ7x6ak101k2H+XR/9HCot
-520uqRehcexblnSpwKeDoj8T1GlOc9f/ImXTSpsI14fRaoB0FVWtY+qttx+URWOE
-t6+LHZlZQxdfqljjDLzxz28ZbF1jdlZQmCz/MctF0Xp6W6igkwo=
-=gX5s
------END PGP SIGNATURE-----
---=-=-=--
+We're inside a condition which includes 'rw == MMU_DATA_STORE',
+so checking it again here is unnecessary, and the 'false'
+part of this ?: conditional is dead-code.
+
+> +                 | 0x80;
+> +            return PGM_PROTECTION;
+>          }
+>      }
+
+thanks
+-- PMM
 
