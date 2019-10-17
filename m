@@ -7,77 +7,80 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 14C2FECE58E
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 13:55:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EB179ECE58E
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 13:56:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D3D1F2082C
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 13:55:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B3BC82082C
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 13:56:07 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="iuGkR5zC"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D3D1F2082C
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="QYTzuTqT"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B3BC82082C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48490 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48554 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iL6FI-0003mI-E7
-	for qemu-devel@archiver.kernel.org; Thu, 17 Oct 2019 09:55:17 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35002)
+	id 1iL6G6-0004lw-Ai
+	for qemu-devel@archiver.kernel.org; Thu, 17 Oct 2019 09:56:06 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35665)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1iL5id-00053N-LK
- for qemu-devel@nongnu.org; Thu, 17 Oct 2019 09:21:32 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1iL5ma-0002QH-Tc
+ for qemu-devel@nongnu.org; Thu, 17 Oct 2019 09:25:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1iL5ic-0000Pp-F8
- for qemu-devel@nongnu.org; Thu, 17 Oct 2019 09:21:31 -0400
-Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:55474)
+ (envelope-from <alex.bennee@linaro.org>) id 1iL5mY-0001K6-SS
+ for qemu-devel@nongnu.org; Thu, 17 Oct 2019 09:25:36 -0400
+Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:38960)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1iL5ic-0000PD-79
- for qemu-devel@nongnu.org; Thu, 17 Oct 2019 09:21:30 -0400
-Received: by mail-wm1-x342.google.com with SMTP id a6so2535214wma.5
- for <qemu-devel@nongnu.org>; Thu, 17 Oct 2019 06:21:30 -0700 (PDT)
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1iL5mY-0001Jj-Lt
+ for qemu-devel@nongnu.org; Thu, 17 Oct 2019 09:25:34 -0400
+Received: by mail-wm1-x342.google.com with SMTP id v17so2523603wml.4
+ for <qemu-devel@nongnu.org>; Thu, 17 Oct 2019 06:25:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=KWHu+m1O+EERA4S9NNTm+FIYK5BZF9JX07P8U3F6Cyk=;
- b=iuGkR5zCFL4filGYWyr6lIL6j5aQJ/Bxt6aRGY5pOq+xT7IEWp8369nt/MTC1yiN7h
- AZi6Sl8AsceN6aONXZ2s9fXrqRLyDVvmkXD0/Qtck7e07xwjTSylbb87zArPWTsiakUv
- T8BGsgJ2ILhHgqC/MQSyveu3o/i3NZQem/3jU9SCgBaJRNC2mwNVISy37Vv1ZJ7OSrjH
- kX5bDe2FXD2QmhTIzTfxQQUBcqalUpdri0pTxo7VwNgPqFugSBm5HNelZAgJIoxPaLR0
- INMp3EZDvG7LDpUF4n+jG+lxAUGtnc5o4SzOz66wfiqAqyrXdWqoj0MXiVlahB31ohOm
- 9t1g==
+ bh=uTKqy+wnCWVLTWShRSYu/D5n/xFvdeK0I9HBQnZtYcw=;
+ b=QYTzuTqTRv9k4dwikGibJ6BTRaMcJ9Z22ScLexM4hESE2I1l0JLdiL8/deaPzVKLHb
+ oqkNgssyVemThpqxv96DQcyx8jSVEkOVJIhUH5KTOQ3qQ7WTGa0pl3/KjJSHMOzRyJfo
+ tSxML33moo9itmA69RYwIOFfdbqc9cMFdarvQryfG7tFfIiQyUGIUWfxg64scuedhWfE
+ d8yNqGmPoJzAuN1d6mfGKK6q/Xfk7CsvrDkY8YKxrb4xMa+1lrJRzOzjihxl83+0I7Zv
+ 9nWcdmf3807axu1kAF6yqBJDbzTr1nfv+pYFSPn780U9eaQyCOOQ0rNu1izpTuCRGfuT
+ 8ElQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=KWHu+m1O+EERA4S9NNTm+FIYK5BZF9JX07P8U3F6Cyk=;
- b=S9O9YohQbHTKacbFGRyIn7VLAhAJREz971coMYn+AZF7bAmQGSfEh295JuFb8XFRAb
- 1ZKqtXbycbOzs3HtFTokv4Ef4CsySSUMkotmWFj1o6xsw3mYA+Bm+Z2I8Smcj9/G+sx3
- +ExD8KHUiCr/f1/rROrWf/OJkUgkWawnDsw2aTGi4ep5EH1t+uzcbWSpdcHUhUVWoQqr
- 8eK08UDQyzPDmmtqcuP563/uwCto4n6hNEixlyq+UeThjGvTvLiK86YLDOyu3BdaeWKN
- VOQhoYIvLFcUR+HdxhRSj9B+T+V2JuYRF3njaFuYXu5ju0g7mfaR7uYBAyiDPf8wVjre
- NUzQ==
-X-Gm-Message-State: APjAAAU/3Ncgoa4pkRzN+owFGoyYAhmgdPYcoQJh+ZjZcEqT02dMxJ+2
- lJQypj/X0U1MDTinJL5WihIxgM00d3+m9w==
-X-Google-Smtp-Source: APXvYqyO68O8sT8SfsWQwNqGoXsIoG9yk6awNeiYKx/xMQU4OcRBgfNCTH6ZtIqi3UJRicKuI28peQ==
-X-Received: by 2002:a7b:c011:: with SMTP id c17mr2959378wmb.95.1571318488967; 
- Thu, 17 Oct 2019 06:21:28 -0700 (PDT)
-Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id e9sm11543164wme.3.2019.10.17.06.21.27
+ bh=uTKqy+wnCWVLTWShRSYu/D5n/xFvdeK0I9HBQnZtYcw=;
+ b=htUXtyME6fRbDISY8GCiF0ZxVGDVwv0bfofO0cVgOFJz4kj0auU0HdlIqsReoNicfU
+ 9gEome7elAe4AyEHwo42MMEzOzgZOMtw5v2VwQuKEpL493MSe7TDBB8ItR8qxNPAJe44
+ ieNG4WNnT8RKaPCsRiS+Orif9PrKQV706TbHvAKOPPdKNsmFh7bN1+NS3simuFBqr/cU
+ rsLfw7KuCbusX9mvsH5VqlumI4e3Q7tnWJHj9+yAIU69VBuVf+KqLM26/6A6P/SaonjQ
+ s3owmwNUgC+aJ+b+f3DWGJojV+XylnpbFoQxJ/QKZ3NO7BdTsEitUlMfQzRJ/rfJ8cu5
+ U3CQ==
+X-Gm-Message-State: APjAAAV7yWOWGpUkf2Vo5JZSeR4KRPfyWGswstwQsAH6/YkSJ+NNW7Qj
+ 4WwcJAKRrzrPm47WwJDq+JxKgA==
+X-Google-Smtp-Source: APXvYqxY2BcWAETFmftWm8+CwG8lkrOqA8UAZFIfPcjGm90iWsSgo2rvtAkX7XGhIm1BWnuiF6t4WA==
+X-Received: by 2002:a1c:dcd6:: with SMTP id t205mr2950572wmg.10.1571318733514; 
+ Thu, 17 Oct 2019 06:25:33 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id k24sm10131817wmi.1.2019.10.17.06.25.27
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 17 Oct 2019 06:21:28 -0700 (PDT)
-From: Peter Maydell <peter.maydell@linaro.org>
+ Thu, 17 Oct 2019 06:25:30 -0700 (PDT)
+Received: from zen.lan (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id A22671FF87;
+ Thu, 17 Oct 2019 14:16:17 +0100 (BST)
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 3/3] hw/dma/xilinx_axidma.c: Switch to transaction-based
- ptimer API
-Date: Thu, 17 Oct 2019 14:21:22 +0100
-Message-Id: <20191017132122.4402-4-peter.maydell@linaro.org>
+Subject: [PATCH  v6 18/54] *-user: notify plugin of exit
+Date: Thu, 17 Oct 2019 14:15:39 +0100
+Message-Id: <20191017131615.19660-19-alex.bennee@linaro.org>
 X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20191017132122.4402-1-peter.maydell@linaro.org>
-References: <20191017132122.4402-1-peter.maydell@linaro.org>
+In-Reply-To: <20191017131615.19660-1-alex.bennee@linaro.org>
+References: <20191017131615.19660-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
@@ -93,73 +96,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Jason Wang <jasowang@redhat.com>, Alistair Francis <alistair@alistair23.me>,
- qemu-arm@nongnu.org, qemu-ppc@nongnu.org,
- "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
- David Gibson <david@gibson.dropbear.id.au>
+Cc: robert.foley@futurewei.com, Riku Voipio <riku.voipio@iki.fi>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ Laurent Vivier <laurent@vivier.eu>, peter.puhov@futurewei.com,
+ aaron@os.amperecomputing.com, cota@braap.org,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Switch the xilinx_axidma code away from bottom-half based ptimers to
-the new transaction-based ptimer API.  This just requires adding
-begin/commit calls around the various places that modify the ptimer
-state, and using the new ptimer_init() function to create the timer.
+From: "Emilio G. Cota" <cota@braap.org>
 
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
+Signed-off-by: Emilio G. Cota <cota@braap.org>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 ---
- hw/dma/xilinx_axidma.c | 9 +++++----
- 1 file changed, 5 insertions(+), 4 deletions(-)
+ bsd-user/syscall.c | 3 +++
+ linux-user/exit.c  | 1 +
+ 2 files changed, 4 insertions(+)
 
-diff --git a/hw/dma/xilinx_axidma.c b/hw/dma/xilinx_axidma.c
-index e035d1f7504..fb3a978e282 100644
---- a/hw/dma/xilinx_axidma.c
-+++ b/hw/dma/xilinx_axidma.c
-@@ -31,7 +31,6 @@
- #include "hw/ptimer.h"
- #include "hw/qdev-properties.h"
- #include "qemu/log.h"
--#include "qemu/main-loop.h"
- #include "qemu/module.h"
- 
- #include "hw/stream.h"
-@@ -104,7 +103,6 @@ enum {
- };
- 
- struct Stream {
--    QEMUBH *bh;
-     ptimer_state *ptimer;
-     qemu_irq irq;
- 
-@@ -242,6 +240,7 @@ static void stream_complete(struct Stream *s)
-     unsigned int comp_delay;
- 
-     /* Start the delayed timer.  */
-+    ptimer_transaction_begin(s->ptimer);
-     comp_delay = s->regs[R_DMACR] >> 24;
-     if (comp_delay) {
-         ptimer_stop(s->ptimer);
-@@ -255,6 +254,7 @@ static void stream_complete(struct Stream *s)
-         s->regs[R_DMASR] |= DMASR_IOC_IRQ;
-         stream_reload_complete_cnt(s);
-     }
-+    ptimer_transaction_commit(s->ptimer);
+diff --git a/bsd-user/syscall.c b/bsd-user/syscall.c
+index 1ee6195d9f..84a983a9a1 100644
+--- a/bsd-user/syscall.c
++++ b/bsd-user/syscall.c
+@@ -332,6 +332,7 @@ abi_long do_freebsd_syscall(void *cpu_env, int num, abi_long arg1,
+         _mcleanup();
+ #endif
+         gdb_exit(cpu_env, arg1);
++        qemu_plugin_atexit_cb();
+         /* XXX: should free thread stack and CPU env */
+         _exit(arg1);
+         ret = 0; /* avoid warning */
+@@ -430,6 +431,7 @@ abi_long do_netbsd_syscall(void *cpu_env, int num, abi_long arg1,
+         _mcleanup();
+ #endif
+         gdb_exit(cpu_env, arg1);
++        qemu_plugin_atexit_cb();
+         /* XXX: should free thread stack and CPU env */
+         _exit(arg1);
+         ret = 0; /* avoid warning */
+@@ -505,6 +507,7 @@ abi_long do_openbsd_syscall(void *cpu_env, int num, abi_long arg1,
+         _mcleanup();
+ #endif
+         gdb_exit(cpu_env, arg1);
++        qemu_plugin_atexit_cb();
+         /* XXX: should free thread stack and CPU env */
+         _exit(arg1);
+         ret = 0; /* avoid warning */
+diff --git a/linux-user/exit.c b/linux-user/exit.c
+index bdda720553..a362ef67d2 100644
+--- a/linux-user/exit.c
++++ b/linux-user/exit.c
+@@ -35,4 +35,5 @@ void preexit_cleanup(CPUArchState *env, int code)
+         __gcov_dump();
+ #endif
+         gdb_exit(env, code);
++        qemu_plugin_atexit_cb();
  }
- 
- static void stream_process_mem2s(struct Stream *s, StreamSlave *tx_data_dev,
-@@ -551,9 +551,10 @@ static void xilinx_axidma_realize(DeviceState *dev, Error **errp)
-         struct Stream *st = &s->streams[i];
- 
-         st->nr = i;
--        st->bh = qemu_bh_new(timer_hit, st);
--        st->ptimer = ptimer_init_with_bh(st->bh, PTIMER_POLICY_DEFAULT);
-+        st->ptimer = ptimer_init(timer_hit, st, PTIMER_POLICY_DEFAULT);
-+        ptimer_transaction_begin(st->ptimer);
-         ptimer_set_freq(st->ptimer, s->freqhz);
-+        ptimer_transaction_commit(st->ptimer);
-     }
-     return;
- 
 -- 
 2.20.1
 
