@@ -4,81 +4,85 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5EC05FA372A
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 12:57:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C666FA372A
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 13:00:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 20B1220854
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 12:57:57 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 20B1220854
+	by mail.kernel.org (Postfix) with ESMTPS id 10962214E0
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 13:00:46 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 10962214E0
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46554 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46638 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iL5Lo-0004lo-9y
-	for qemu-devel@archiver.kernel.org; Thu, 17 Oct 2019 08:57:56 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58794)
+	id 1iL5OX-0006fp-58
+	for qemu-devel@archiver.kernel.org; Thu, 17 Oct 2019 09:00:45 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59180)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1iL5LB-0004Mp-C6
- for qemu-devel@nongnu.org; Thu, 17 Oct 2019 08:57:19 -0400
+ (envelope-from <mreitz@redhat.com>) id 1iL5Ne-0005nE-1I
+ for qemu-devel@nongnu.org; Thu, 17 Oct 2019 08:59:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1iL5L9-0005jB-Lj
- for qemu-devel@nongnu.org; Thu, 17 Oct 2019 08:57:17 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:38002)
+ (envelope-from <mreitz@redhat.com>) id 1iL5Nc-0006d0-GD
+ for qemu-devel@nongnu.org; Thu, 17 Oct 2019 08:59:49 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:44416)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iL5L9-0005iK-DR
- for qemu-devel@nongnu.org; Thu, 17 Oct 2019 08:57:15 -0400
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70])
- (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>)
+ id 1iL5NY-0006b6-5n; Thu, 17 Oct 2019 08:59:44 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 63ED02D0FB7
- for <qemu-devel@nongnu.org>; Thu, 17 Oct 2019 12:57:13 +0000 (UTC)
-Received: by mail-wm1-f70.google.com with SMTP id r21so1014084wme.5
- for <qemu-devel@nongnu.org>; Thu, 17 Oct 2019 05:57:13 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=ih/gQtZvaH6oY+/qHdkguuZ+1ocYjIOII9gfQ3Q9D6w=;
- b=E7z0/krfRMOaZyOTseSaNLB8TcABDVHysyqGxSBWhQ9tFINRhEHsTdDznV962YmXb2
- Sc+lioGXqGNSSc/dM/y9du9NTi5cRH3Z0+aGuCar+cgzMqCKBQ3hUzFqXZhKCqYJ8nWh
- LlQ/IAXRlTmrdm5cWyoUpeivrIIf/pvlsWnhVIcVbpb08gnHvro51jqu/VdmoBl4k6oL
- wHAjWYKs6FEb7HiuYYmzIbZyl7SUBQV9rjPTVj1zrY0/H/lcrC/dA47qp4RjJnqmMSlg
- Rou8OykGeSRW/4FqYrIy5GyxbZSbpYiPpQsClCGJWFVWdN4FsG7OS2/QPz8VnP9ZAg5P
- G2yA==
-X-Gm-Message-State: APjAAAVhE04yQm9ZoRyrVI/e3c8TGI0UZzWf8ESAMGPfLNTiR5ugJB6U
- GxYSoa/NC2/FLr6qQfwD55kAM9S1d9igm/5pVbfAUi1DhCqhmWwKlwZtPV6kBF+cVK2uDAPJRjH
- ODCrCZJvi7jMB2BQ=
-X-Received: by 2002:a1c:7f4e:: with SMTP id a75mr2724395wmd.68.1571317031914; 
- Thu, 17 Oct 2019 05:57:11 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqyahsbhfRW7LzkEcf0uUjGW14//99SdRyu+gUcYpoNvH0PZeL5y1/d2iRXawkGZSVGWBPu0Hw==
-X-Received: by 2002:a1c:7f4e:: with SMTP id a75mr2724376wmd.68.1571317031550; 
- Thu, 17 Oct 2019 05:57:11 -0700 (PDT)
-Received: from [192.168.1.36] (14.red-88-21-201.staticip.rima-tde.net.
- [88.21.201.14])
- by smtp.gmail.com with ESMTPSA id p12sm2341862wrm.62.2019.10.17.05.57.10
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Thu, 17 Oct 2019 05:57:10 -0700 (PDT)
-Subject: Re: [PATCH] Acceptance tests: refactor wait_for_console_pattern
-To: Cleber Rosa <crosa@redhat.com>, qemu-devel@nongnu.org
-References: <252b6e94-fe8f-f9a7-0d4b-4743b1809a06@redhat.com>
- <20190916164011.7653-1-crosa@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <96f3e12c-93d0-60d4-d1c7-ffbc77d1224e@redhat.com>
-Date: Thu, 17 Oct 2019 14:57:09 +0200
+ by mx1.redhat.com (Postfix) with ESMTPS id 53B53307D96D;
+ Thu, 17 Oct 2019 12:59:43 +0000 (UTC)
+Received: from dresden.str.redhat.com (ovpn-117-3.ams2.redhat.com
+ [10.36.117.3])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 886505C1B5;
+ Thu, 17 Oct 2019 12:59:39 +0000 (UTC)
+Subject: Re: [PATCH v2 2/3] iotests: Include QMP input in .out files
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+References: <20191015193503.25591-1-eblake@redhat.com>
+ <20191015193503.25591-3-eblake@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <0962fe1d-df21-0efb-818a-1afabdc4fcfe@redhat.com>
+Date: Thu, 17 Oct 2019 14:59:38 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.1
+ Thunderbird/68.1.0
 MIME-Version: 1.0
-In-Reply-To: <20190916164011.7653-1-crosa@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20191015193503.25591-3-eblake@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="EQe0izuzArNOji8R3YLbiRUiqCGPwrLgb"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.48]); Thu, 17 Oct 2019 12:59:43 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 209.132.183.28
@@ -93,292 +97,220 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Aleksandar Rikalo <arikalo@wavecomp.com>,
- Aurelien Jarno <aurelien@aurel32.net>, Willian Rampazzo <wrampazz@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>,
- Wainer dos Santos Moschetta <wainersm@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 9/16/19 6:40 PM, Cleber Rosa wrote:
-> The same utility method is already present in two different test
-> files, so let's consolidate it into a single utility function.
->=20
-> Signed-off-by: Cleber Rosa <crosa@redhat.com>
-> ---
->   tests/acceptance/avocado_qemu/__init__.py | 26 +++++++++++++
->   tests/acceptance/boot_linux_console.py    | 47 +++++++---------------=
--
->   tests/acceptance/linux_ssh_mips_malta.py  | 18 ++-------
->   3 files changed, 42 insertions(+), 49 deletions(-)
->=20
-> diff --git a/tests/acceptance/avocado_qemu/__init__.py b/tests/acceptan=
-ce/avocado_qemu/__init__.py
-> index bd41e0443c..a0fe16e47f 100644
-> --- a/tests/acceptance/avocado_qemu/__init__.py
-> +++ b/tests/acceptance/avocado_qemu/__init__.py
-> @@ -8,6 +8,7 @@
->   # This work is licensed under the terms of the GNU GPL, version 2 or
->   # later.  See the COPYING file in the top-level directory.
->  =20
-> +import logging
->   import os
->   import sys
->   import uuid
-> @@ -53,6 +54,31 @@ def pick_default_qemu_bin(arch=3DNone):
->           return qemu_bin_from_src_dir_path
->  =20
->  =20
-> +def wait_for_console_pattern(test, success_message,
-> +                             failure_message=3D'Kernel panic - not syn=
-cing'):
-> +    """
-> +    Waits for messages to appear on the console, while logging the con=
-tent
-> +
-> +    :param test: an Avocado test containing a VM that will have its co=
-nsole
-> +                 read and probed for a success or failure message
-> +    :type test: :class:`avocado_qemu.Test`
-> +    :param success_message: if this message appears, test succeeds
-> +    :param failure_message: if this message appears, test fails
-> +    """
-> +    console =3D test.vm.console_socket.makefile()
-> +    console_logger =3D logging.getLogger('console')
-> +    while True:
-> +        msg =3D console.readline().strip()
-> +        if not msg:
-> +            continue
-> +        console_logger.debug(msg)
-> +        if success_message in msg:
-> +            break
-> +        if failure_message in msg:
-> +            fail =3D 'Failure message found in console: %s' % failure_=
-message
-> +            test.fail(fail)
-> +
-> +
->   class Test(avocado.Test):
->       def setUp(self):
->           self._vms =3D {}
-> diff --git a/tests/acceptance/boot_linux_console.py b/tests/acceptance/=
-boot_linux_console.py
-> index 8a9a314ab4..9ff2213874 100644
-> --- a/tests/acceptance/boot_linux_console.py
-> +++ b/tests/acceptance/boot_linux_console.py
-> @@ -9,12 +9,12 @@
->   # later.  See the COPYING file in the top-level directory.
->  =20
->   import os
-> -import logging
->   import lzma
->   import gzip
->   import shutil
->  =20
->   from avocado_qemu import Test
-> +from avocado_qemu import wait_for_console_pattern
->   from avocado.utils import process
->   from avocado.utils import archive
->  =20
-> @@ -29,31 +29,10 @@ class BootLinuxConsole(Test):
->  =20
->       KERNEL_COMMON_COMMAND_LINE =3D 'printk.time=3D0 '
->  =20
-> -    def wait_for_console_pattern(self, success_message,
-> -                                 failure_message=3D'Kernel panic - not=
- syncing'):
-> -        """
-> -        Waits for messages to appear on the console, while logging the=
- content
-> -
-> -        :param success_message: if this message appears, test succeeds
-> -        :param failure_message: if this message appears, test fails
-> -        """
-> -        console =3D self.vm.console_socket.makefile()
-> -        console_logger =3D logging.getLogger('console')
-> -        while True:
-> -            msg =3D console.readline().strip()
-> -            if not msg:
-> -                continue
-> -            console_logger.debug(msg)
-> -            if success_message in msg:
-> -                break
-> -            if failure_message in msg:
-> -                fail =3D 'Failure message found in console: %s' % fail=
-ure_message
-> -                self.fail(fail)
-> -
->       def exec_command_and_wait_for_pattern(self, command, success_mess=
-age):
->           command +=3D '\n'
->           self.vm.console_socket.sendall(command.encode())
-> -        self.wait_for_console_pattern(success_message)
-> +        wait_for_console_pattern(self, success_message)
->  =20
->       def extract_from_deb(self, deb, path):
->           """
-> @@ -89,7 +68,7 @@ class BootLinuxConsole(Test):
->                            '-append', kernel_command_line)
->           self.vm.launch()
->           console_pattern =3D 'Kernel command line: %s' % kernel_comman=
-d_line
-> -        self.wait_for_console_pattern(console_pattern)
-> +        wait_for_console_pattern(self, console_pattern)
->  =20
->       def test_mips_malta(self):
->           """
-> @@ -112,7 +91,7 @@ class BootLinuxConsole(Test):
->                            '-append', kernel_command_line)
->           self.vm.launch()
->           console_pattern =3D 'Kernel command line: %s' % kernel_comman=
-d_line
-> -        self.wait_for_console_pattern(console_pattern)
-> +        wait_for_console_pattern(self, console_pattern)
->  =20
->       def test_mips64el_malta(self):
->           """
-> @@ -145,7 +124,7 @@ class BootLinuxConsole(Test):
->                            '-append', kernel_command_line)
->           self.vm.launch()
->           console_pattern =3D 'Kernel command line: %s' % kernel_comman=
-d_line
-> -        self.wait_for_console_pattern(console_pattern)
-> +        wait_for_console_pattern(self, console_pattern)
->  =20
->       def test_mips_malta_cpio(self):
->           """
-> @@ -181,7 +160,7 @@ class BootLinuxConsole(Test):
->                            '-append', kernel_command_line,
->                            '-no-reboot')
->           self.vm.launch()
-> -        self.wait_for_console_pattern('Boot successful.')
-> +        wait_for_console_pattern(self, 'Boot successful.')
->  =20
->           self.exec_command_and_wait_for_pattern('cat /proc/cpuinfo',
->                                                  'BogoMIPS')
-> @@ -208,7 +187,7 @@ class BootLinuxConsole(Test):
->                            '-append', kernel_command_line)
->           self.vm.launch()
->           console_pattern =3D 'Kernel command line: %s' % kernel_comman=
-d_line
-> -        self.wait_for_console_pattern(console_pattern)
-> +        wait_for_console_pattern(self, console_pattern)
->  =20
->       def test_mips_malta32el_nanomips_4k(self):
->           """
-> @@ -266,7 +245,7 @@ class BootLinuxConsole(Test):
->                            '-append', kernel_command_line)
->           self.vm.launch()
->           console_pattern =3D 'Kernel command line: %s' % kernel_comman=
-d_line
-> -        self.wait_for_console_pattern(console_pattern)
-> +        wait_for_console_pattern(self, console_pattern)
->  =20
->       def test_arm_virt(self):
->           """
-> @@ -287,7 +266,7 @@ class BootLinuxConsole(Test):
->                            '-append', kernel_command_line)
->           self.vm.launch()
->           console_pattern =3D 'Kernel command line: %s' % kernel_comman=
-d_line
-> -        self.wait_for_console_pattern(console_pattern)
-> +        wait_for_console_pattern(self, console_pattern)
->  =20
->       def test_arm_emcraft_sf2(self):
->           """
-> @@ -314,7 +293,7 @@ class BootLinuxConsole(Test):
->                            '-drive', 'file=3D' + spi_path + ',if=3Dmtd,=
-format=3Draw',
->                            '-no-reboot')
->           self.vm.launch()
-> -        self.wait_for_console_pattern('init started: BusyBox')
-> +        wait_for_console_pattern(self, 'init started: BusyBox')
->  =20
->       def test_s390x_s390_ccw_virtio(self):
->           """
-> @@ -335,7 +314,7 @@ class BootLinuxConsole(Test):
->                            '-append', kernel_command_line)
->           self.vm.launch()
->           console_pattern =3D 'Kernel command line: %s' % kernel_comman=
-d_line
-> -        self.wait_for_console_pattern(console_pattern)
-> +        wait_for_console_pattern(self, console_pattern)
->  =20
->       def test_alpha_clipper(self):
->           """
-> @@ -357,7 +336,7 @@ class BootLinuxConsole(Test):
->                            '-append', kernel_command_line)
->           self.vm.launch()
->           console_pattern =3D 'Kernel command line: %s' % kernel_comman=
-d_line
-> -        self.wait_for_console_pattern(console_pattern)
-> +        wait_for_console_pattern(self, console_pattern)
->  =20
->       def test_ppc64_pseries(self):
->           """
-> @@ -377,4 +356,4 @@ class BootLinuxConsole(Test):
->                            '-append', kernel_command_line)
->           self.vm.launch()
->           console_pattern =3D 'Kernel command line: %s' % kernel_comman=
-d_line
-> -        self.wait_for_console_pattern(console_pattern)
-> +        wait_for_console_pattern(self, console_pattern)
-> diff --git a/tests/acceptance/linux_ssh_mips_malta.py b/tests/acceptanc=
-e/linux_ssh_mips_malta.py
-> index 134f10cac3..da7a386117 100644
-> --- a/tests/acceptance/linux_ssh_mips_malta.py
-> +++ b/tests/acceptance/linux_ssh_mips_malta.py
-> @@ -14,6 +14,7 @@ import time
->  =20
->   from avocado import skipIf
->   from avocado_qemu import Test
-> +from avocado_qemu import wait_for_console_pattern
->   from avocado.utils import process
->   from avocado.utils import archive
->  =20
-> @@ -56,19 +57,6 @@ class LinuxSSH(Test):
->           },
->       }
->  =20
-> -    def wait_for_console_pattern(self, success_message,
-> -                                 failure_message=3D'Oops'):
-> -        console =3D self.vm.console_socket.makefile()
-> -        console_logger =3D logging.getLogger('console')
-> -        while True:
-> -            msg =3D console.readline()
-> -            console_logger.debug(msg.strip())
-> -            if success_message in msg:
-> -                break
-> -            if failure_message in msg:
-> -                fail =3D 'Failure message found in console: %s' % fail=
-ure_message
-> -                self.fail(fail)
-> -
->       def get_portfwd(self):
->           res =3D self.vm.command('human-monitor-command',
->                                 command_line=3D'info usernet')
-> @@ -135,7 +123,7 @@ class LinuxSSH(Test):
->  =20
->           self.log.info('VM launched, waiting for sshd')
->           console_pattern =3D 'Starting OpenBSD Secure Shell server: ss=
-hd'
-> -        self.wait_for_console_pattern(console_pattern)
-> +        wait_for_console_pattern(self, console_pattern, 'Oops')
->           self.log.info('sshd ready')
->  =20
->           self.ssh_connect('root', 'root', rsa_hostkey_b64=3Drsa_hostke=
-y_b64)
-> @@ -143,7 +131,7 @@ class LinuxSSH(Test):
->       def shutdown_via_ssh(self):
->           self.ssh_command('poweroff')
->           self.ssh_disconnect_vm()
-> -        self.wait_for_console_pattern('Power down')
-> +        wait_for_console_pattern(self, 'Power down', 'Oops')
->  =20
->       def run_common_commands(self):
->           stdout, stderr =3D self.ssh_command('lspci -d 11ab:4620')
->=20
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--EQe0izuzArNOji8R3YLbiRUiqCGPwrLgb
+Content-Type: multipart/mixed; boundary="VGxpYuG7MSRwJTGT8c3UoGQIWmlHjRjKx"
 
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+--VGxpYuG7MSRwJTGT8c3UoGQIWmlHjRjKx
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+
+On 15.10.19 21:35, Eric Blake wrote:
+> We generally include relevant HMP input in .out files, by virtue of
+> the fact that HMP echoes its input.  But QMP does not, so we have to
+> explicitly inject it in the output stream, in order to make it easier
+> to read .out files to see what behavior is being tested (especially
+> true where the output file is a sequence of {'return': {}}).
+>=20
+> Suggested-by: Max Reitz <mreitz@redhat.com>
+
+That was actually not my intention. :-)
+
+I was thinking of a new parameter that enables this behavior and is
+disabled by default so that existing tests don=E2=80=99t change.
+
+But then again I did see that you interpreted my suggestion in a
+slightly different way, and thought this is probably better, actually.
+
+> Signed-off-by: Eric Blake <eblake@redhat.com>
+> ---
+>  tests/qemu-iotests/common.qemu |  9 ++++
+>  tests/qemu-iotests/085.out     | 26 ++++++++++
+>  tests/qemu-iotests/094.out     |  4 ++
+>  tests/qemu-iotests/095.out     |  2 +
+>  tests/qemu-iotests/109.out     | 88 ++++++++++++++++++++++++++++++++++=
+
+>  tests/qemu-iotests/117.out     |  5 ++
+>  tests/qemu-iotests/127.out     |  4 ++
+>  tests/qemu-iotests/140.out     |  5 ++
+>  tests/qemu-iotests/141.out     | 26 ++++++++++
+>  tests/qemu-iotests/143.out     |  3 ++
+>  tests/qemu-iotests/144.out     |  5 ++
+>  tests/qemu-iotests/153.out     | 11 +++++
+>  tests/qemu-iotests/156.out     | 11 +++++
+>  tests/qemu-iotests/161.out     |  8 ++++
+>  tests/qemu-iotests/173.out     |  4 ++
+>  tests/qemu-iotests/182.out     |  8 ++++
+>  tests/qemu-iotests/183.out     | 11 +++++
+>  tests/qemu-iotests/185.out     | 18 +++++++
+>  tests/qemu-iotests/191.out     |  8 ++++
+>  tests/qemu-iotests/200.out     |  1 +
+>  tests/qemu-iotests/223.out     | 19 ++++++++
+>  tests/qemu-iotests/229.out     |  3 ++
+>  tests/qemu-iotests/249.out     |  6 +++
+>  23 files changed, 285 insertions(+)
+> diff --git a/tests/qemu-iotests/common.qemu b/tests/qemu-iotests/common=
+=2Eqemu
+> index 8d2021a7eb0c..abc231743e82 100644
+> --- a/tests/qemu-iotests/common.qemu
+> +++ b/tests/qemu-iotests/common.qemu
+> @@ -123,6 +123,9 @@ _timed_wait_for()
+>  # until either timeout, or a response.  If it is not set, or <=3D0,
+>  # then the command is only sent once.
+>  #
+> +# If neither $silent nor $mismatch_only is set, and $cmd begins with '=
+{',
+> +# echo the command before sending it the first time.
+> +#
+>  # If $qemu_error_no_exit is set, then even if the expected response
+>  # is not seen, we will not exit.  $QEMU_STATUS[$1] will be set it -1 i=
+n
+>  # that case.
+> @@ -152,6 +155,12 @@ _send_qemu_cmd()
+>          shift $(($# - 2))
+>      fi
+>=20
+> +    # Display QMP being sent, but not HMP (since HMP already echoes it=
+s
+> +    # input back to output); decide based on leading '{'
+> +    if [ -z "$silent" ] && [ -z "$mismatch_only" ] &&
+> +            [ "$cmd" !=3D "${cmd#{}" ]; then
+
+It=E2=80=99s a shame that this breaks syntax highlighting in (my) vim.  (=
+Also I
+have to admit googling to understand ${cmd#{} wasn=E2=80=99t trivial.)
+
+Can I persuade you to use "${cmd#\{}" instead?  That seems to work for me=
+=2E
+
+> diff --git a/tests/qemu-iotests/094.out b/tests/qemu-iotests/094.out
+> index f3b9ecf22b73..f3e1a9ecf736 100644
+> --- a/tests/qemu-iotests/094.out
+> +++ b/tests/qemu-iotests/094.out
+> @@ -1,16 +1,20 @@
+>  QA output created by 094
+>  Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D67108864
+>  Formatting 'TEST_DIR/source.IMGFMT', fmt=3DIMGFMT size=3D67108864
+> +{'execute': 'qmp_capabilities'}
+>  {"return": {}}
+> +{'execute': 'drive-mirror', 'arguments': {'device': 'src', 'target': '=
+nbd:127.0.0.1:10810', 'format': 'nbd', 'sync':'full', 'mode':'existing'}}=
+
+
+This reminds me that we need to fix nbd=E2=80=99s $TEST_IMG to not be fix=
+ed to
+port 10810.  I get intermittent failures because of that.
+
+[...]
+
+> diff --git a/tests/qemu-iotests/140.out b/tests/qemu-iotests/140.out
+> index 67fe44a3e390..3857675f7ebd 100644
+> --- a/tests/qemu-iotests/140.out
+> +++ b/tests/qemu-iotests/140.out
+> @@ -2,14 +2,19 @@ QA output created by 140
+>  Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D65536
+>  wrote 65536/65536 bytes at offset 0
+>  64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+> +{ 'execute': 'qmp_capabilities' }
+>  {"return": {}}
+> +{ 'execute': 'nbd-server-start', 'arguments': { 'addr': { 'type': 'uni=
+x', 'data': { 'path': 'TEST_DIR/nbd' }}}}
+
+Hmmmmm, this conflicts with my SOCK_DIR series.  common.qemu would then
+also need a SOCK_DIR filter.  Well, or 140 should filter it (and the
+other tests that are concerned).  I=E2=80=99m not 100 % sure, but a SOCK_=
+DIR
+filter in common.qemu probably can=E2=80=99t hurt.
+
+>  {"return": {}}
+> +{ 'execute': 'nbd-server-add', 'arguments': { 'device': 'drv' }}
+>  {"return": {}}
+>  read 65536/65536 bytes at offset 0
+>  64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+> +{ 'execute': 'eject', 'arguments': { 'device': 'drv' }}
+>  {"return": {}}
+>  qemu-io: can't open device nbd+unix:///drv?socket=3DTEST_DIR/nbd: Requ=
+ested export not available
+>  server reported: export 'drv' not present
+> +{ 'execute': 'quit' }
+>  {"return": {}}
+>  {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "ev=
+ent": "SHUTDOWN", "data": {"guest": false, "reason": "host-qmp-quit"}}
+>  *** done
+> diff --git a/tests/qemu-iotests/141.out b/tests/qemu-iotests/141.out
+> index e3b578282da4..cb37ccd8ea42 100644
+> --- a/tests/qemu-iotests/141.out
+> +++ b/tests/qemu-iotests/141.out
+> @@ -2,82 +2,108 @@ QA output created by 141
+>  Formatting 'TEST_DIR/b.IMGFMT', fmt=3DIMGFMT size=3D1048576
+>  Formatting 'TEST_DIR/m.IMGFMT', fmt=3DIMGFMT size=3D1048576 backing_fi=
+le=3DTEST_DIR/b.IMGFMT
+>  Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D1048576 backing_fi=
+le=3DTEST_DIR/m.IMGFMT
+> +{'execute': 'qmp_capabilities'}
+>  {"return": {}}
+>=20
+>  =3D=3D=3D Testing drive-backup =3D=3D=3D
+>=20
+> +{'execute': 'blockdev-add', 'arguments': { 'node-name': 'drv0', 'drive=
+r': 'qcow2', 'file': { 'driver': 'file', 'filename': 'TEST_DIR/t.qcow2' }=
+}}
+
+141 also supports qed, so this then results in a mismatch.  I suppose
+common.qemu should filter the image format.
+
+(Same for 156, 161, and 229.)
+
+[...]
+
+> diff --git a/tests/qemu-iotests/156.out b/tests/qemu-iotests/156.out
+> index 4c391a760371..d1865044f81a 100644
+> --- a/tests/qemu-iotests/156.out
+> +++ b/tests/qemu-iotests/156.out
+> @@ -5,21 +5,27 @@ wrote 262144/262144 bytes at offset 0
+>  256 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+>  wrote 196608/196608 bytes at offset 65536
+>  192 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+> +{ 'execute': 'qmp_capabilities' }
+>  {"return": {}}
+>  Formatting 'TEST_DIR/t.IMGFMT.overlay', fmt=3DIMGFMT size=3D1048576 ba=
+cking_file=3DTEST_DIR/t.IMGFMT
+> +{ 'execute': 'blockdev-snapshot-sync', 'arguments': { 'device': 'sourc=
+e', 'snapshot-file': 'TEST_DIR/t.qcow2.overlay', 'format': 'qcow2', 'mode=
+': 'existing' } }
+
+Same here (as said above), although there=E2=80=99s also the fact to cons=
+ider
+that 156 supports generic protocols.  I hope _filter_testdir handles
+that, though.
+
+Max
+
+
+--VGxpYuG7MSRwJTGT8c3UoGQIWmlHjRjKx--
+
+--EQe0izuzArNOji8R3YLbiRUiqCGPwrLgb
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl2oZboACgkQ9AfbAGHV
+z0AG5Qf+PUPeOwwSAJpbVXZvTG69NnkEatio3C14uhgsVPsIzvxWzLSlfoW3fwpD
+lfpSQwsTO+GUspoKtvnoz0BOc/yQWOIQ5UUPtZcItx+JrZk2tqOiHzcdGjTOzjDB
+Y1ggQl4a1rO3kxvmgU2qmuO4DCAcXz2VilKa4XkOBZqggFjl+c6tQ6MWNDU8nPua
+nUjCxHEmSGJk9cO1ywErkce/TCTGolsVXMLUbU32E1vfj6lOqQjTM6Q5mVI2McCH
+dbbauHbNLjy2RVU7l69Wz/O2JUvgV0jKrkV/ZqHjF2f0yt3l3KjhssLgDvqarSMx
+A4fzTh4vDI3uQ5MWURSEo5pz5uE6Ew==
+=MHJO
+-----END PGP SIGNATURE-----
+
+--EQe0izuzArNOji8R3YLbiRUiqCGPwrLgb--
 
