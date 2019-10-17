@@ -2,60 +2,89 @@ Return-Path: <SRS0=yZS3=YK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C4761FA3735
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 13:57:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0EA04FA372A
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 13:58:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9CF982082C
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 13:57:58 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9CF982082C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id CBC462082C
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 13:58:45 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="EI1fy+cN"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CBC462082C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48594 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48610 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iL6Ht-0007M9-87
-	for qemu-devel@archiver.kernel.org; Thu, 17 Oct 2019 09:57:57 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36627)
+	id 1iL6Ie-0008L7-J4
+	for qemu-devel@archiver.kernel.org; Thu, 17 Oct 2019 09:58:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35675)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1iL5su-00026f-Sr
- for qemu-devel@nongnu.org; Thu, 17 Oct 2019 09:32:10 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1iL5mb-0002RJ-Gj
+ for qemu-devel@nongnu.org; Thu, 17 Oct 2019 09:25:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1iL5st-0003GU-GM
- for qemu-devel@nongnu.org; Thu, 17 Oct 2019 09:32:08 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:44308)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>)
- id 1iL5sq-0003Fe-F5; Thu, 17 Oct 2019 09:32:04 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id ADB1618C428C;
- Thu, 17 Oct 2019 13:32:03 +0000 (UTC)
-Received: from localhost (ovpn-117-3.ams2.redhat.com [10.36.117.3])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 25CFE5D9D5;
- Thu, 17 Oct 2019 13:32:02 +0000 (UTC)
-From: Max Reitz <mreitz@redhat.com>
-To: qemu-block@nongnu.org
-Subject: [PATCH v2 02/23] iotests.py: Store socket files in $SOCK_DIR
-Date: Thu, 17 Oct 2019 15:31:34 +0200
-Message-Id: <20191017133155.5327-3-mreitz@redhat.com>
-In-Reply-To: <20191017133155.5327-1-mreitz@redhat.com>
-References: <20191017133155.5327-1-mreitz@redhat.com>
+ (envelope-from <alex.bennee@linaro.org>) id 1iL5mZ-0001KQ-Lq
+ for qemu-devel@nongnu.org; Thu, 17 Oct 2019 09:25:37 -0400
+Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:55504)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1iL5mZ-0001KA-Ey
+ for qemu-devel@nongnu.org; Thu, 17 Oct 2019 09:25:35 -0400
+Received: by mail-wm1-x341.google.com with SMTP id a6so2548970wma.5
+ for <qemu-devel@nongnu.org>; Thu, 17 Oct 2019 06:25:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=CM8rduArDqqabgd+Q5UUF66iucomwd7DJwe474OgRXM=;
+ b=EI1fy+cNslWhqY31RZJBm/N1TQKD/yZFrvCP9EcqCWzIblgirdgxhSQRHTrCo505x8
+ z74xQnLE8y4uw5YmdLU5dwCoi/AHKHf0I00p5eQjwHC/x/YrO1O7LQXhczwk9SpgIMbG
+ PSUiPztKTuoWLxODIhUzFmzFMmj91uINyOGE/vMaBAfqd286Kk6lWsfqikytPxlabwwA
+ aRfgv1EYI7iyPY9+6TsZD24iQ3JVbUtCPf6r2vUDHs4hp8X46c3z1EbhT66Xed4l+Gva
+ FJtZgmjAoF7Gi5R+D7IoXyD6E0ODvwVdxGBHzZ5iKumDRQ7toEYeyWUVy4cfnYJmgz1p
+ xnWw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=CM8rduArDqqabgd+Q5UUF66iucomwd7DJwe474OgRXM=;
+ b=riQ7Bi2qF68heFZwv1bQD9oC+ZlTiapbvW19qnSmw4XdJRNGjtvyaVyjxs8lRnUOV6
+ zSsw5Bu4Lr11iNwuHn2PAWLyISFm4F0Rkac3lCILBGUWj8315oPIYZHc0/HgzLx5bkbM
+ iqgRBy6XdKK/Jev4rISchkq31gHRndxTCN/jK3agew0gRl3uaeYu4fkQFiRuNZhEqGa2
+ 8Zqz1mcnrczYGwNUAeHIXiMdTDQw1Wbue336XVWqvBeA8+Q8qa9tXWao50dEBpUu0H7k
+ RLsAG1Yr/Nbm3/owE7WwQN2QRoe/2Fh5DGKeWgu0CmooHVTb8x1VUA+5nQmSZ75mCnuJ
+ fS9w==
+X-Gm-Message-State: APjAAAXGqLOX9NGwPH7AHUBIDWkdchd1GjtKpCGIvaZRIvsIvSFVqI4Q
+ GsWbHMRV4HvULVf5D5iX84P5x+Lsng0=
+X-Google-Smtp-Source: APXvYqyKUGq02fZOoPTq6bImFqROhVGlVOuFWJSwNOJYbmatRj8twMwEzXUM0YTodD3sLVbyoLlryg==
+X-Received: by 2002:a7b:ca4b:: with SMTP id m11mr2765271wml.129.1571318734262; 
+ Thu, 17 Oct 2019 06:25:34 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id 26sm2173721wmf.20.2019.10.17.06.25.26
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 17 Oct 2019 06:25:30 -0700 (PDT)
+Received: from zen.lan (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 439E21FFBB;
+ Thu, 17 Oct 2019 14:16:19 +0100 (BST)
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: qemu-devel@nongnu.org
+Subject: [PATCH  v6 36/54] plugin: add API symbols to qemu-plugins.symbols
+Date: Thu, 17 Oct 2019 14:15:57 +0100
+Message-Id: <20191017131615.19660-37-alex.bennee@linaro.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20191017131615.19660-1-alex.bennee@linaro.org>
+References: <20191017131615.19660-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.62]); Thu, 17 Oct 2019 13:32:03 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.132.183.28
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::341
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -67,151 +96,234 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org,
- Max Reitz <mreitz@redhat.com>
+Cc: robert.foley@futurewei.com,
+ Richard Henderson <richard.henderson@linaro.org>, peter.puhov@futurewei.com,
+ aaron@os.amperecomputing.com, cota@braap.org,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-iotests.py itself does not store socket files, but machine.py and
-qtest.py do.  iotests.py needs to pass the respective path to them, and
-they need to adhere to it.
+From: "Emilio G. Cota" <cota@braap.org>
 
-Signed-off-by: Max Reitz <mreitz@redhat.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+Signed-off-by: Emilio G. Cota <cota@braap.org>
+[AJB: moved into plugins]
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- python/qemu/machine.py        | 15 ++++++++++++---
- python/qemu/qtest.py          |  9 ++++++---
- tests/qemu-iotests/iotests.py |  4 +++-
- 3 files changed, 21 insertions(+), 7 deletions(-)
+v3
+  - moved to plugins/
+  - include qemu_plugin_reset
+v5
+  - re-trigger configure if symbols are updated
+  - wrap ld checks inside if static = no
+---
+ Makefile                     |  7 ++++
+ configure                    | 72 ++++++++++++++++++++++++++++++++++++
+ plugins/.gitignore           |  2 +
+ plugins/Makefile.objs        | 14 +++++++
+ plugins/qemu-plugins.symbols | 38 +++++++++++++++++++
+ 5 files changed, 133 insertions(+)
+ create mode 100644 plugins/.gitignore
+ create mode 100644 plugins/qemu-plugins.symbols
 
-diff --git a/python/qemu/machine.py b/python/qemu/machine.py
-index 128a3d1dc2..2024e8b1b1 100644
---- a/python/qemu/machine.py
-+++ b/python/qemu/machine.py
-@@ -71,7 +71,7 @@ class QEMUMachine(object):
-=20
-     def __init__(self, binary, args=3DNone, wrapper=3DNone, name=3DNone,
-                  test_dir=3D"/var/tmp", monitor_address=3DNone,
--                 socket_scm_helper=3DNone):
-+                 socket_scm_helper=3DNone, sock_dir=3DNone):
-         '''
-         Initialize a QEMUMachine
-=20
-@@ -90,6 +90,8 @@ class QEMUMachine(object):
-             wrapper =3D []
-         if name is None:
-             name =3D "qemu-%d" % os.getpid()
-+        if sock_dir is None:
-+            sock_dir =3D test_dir
-         self._name =3D name
-         self._monitor_address =3D monitor_address
-         self._vm_monitor =3D None
-@@ -106,12 +108,14 @@ class QEMUMachine(object):
-         self._qemu_full_args =3D None
-         self._test_dir =3D test_dir
-         self._temp_dir =3D None
-+        self._sock_dir =3D sock_dir
-         self._launched =3D False
-         self._machine =3D None
-         self._console_set =3D False
-         self._console_device_type =3D None
-         self._console_address =3D None
-         self._console_socket =3D None
-+        self._remove_files =3D []
-=20
-         # just in case logging wasn't configured by the main script:
-         logging.basicConfig()
-@@ -236,8 +240,9 @@ class QEMUMachine(object):
-         if self._machine is not None:
-             args.extend(['-machine', self._machine])
-         if self._console_set:
--            self._console_address =3D os.path.join(self._temp_dir,
-+            self._console_address =3D os.path.join(self._sock_dir,
-                                                  self._name + "-console.=
-sock")
-+            self._remove_files.append(self._console_address)
-             chardev =3D ('socket,id=3Dconsole,path=3D%s,server,nowait' %
-                        self._console_address)
-             args.extend(['-chardev', chardev])
-@@ -253,8 +258,9 @@ class QEMUMachine(object):
-         if self._monitor_address is not None:
-             self._vm_monitor =3D self._monitor_address
-         else:
--            self._vm_monitor =3D os.path.join(self._temp_dir,
-+            self._vm_monitor =3D os.path.join(self._sock_dir,
-                                             self._name + "-monitor.sock"=
-)
-+            self._remove_files.append(self._vm_monitor)
-         self._qemu_log_path =3D os.path.join(self._temp_dir, self._name =
-+ ".log")
-         self._qemu_log_file =3D open(self._qemu_log_path, 'wb')
-=20
-@@ -279,6 +285,9 @@ class QEMUMachine(object):
-             shutil.rmtree(self._temp_dir)
-             self._temp_dir =3D None
-=20
-+        while len(self._remove_files) > 0:
-+            self._remove_if_exists(self._remove_files.pop())
+diff --git a/Makefile b/Makefile
+index 15f4745cf3..370eb9ad8d 100644
+--- a/Makefile
++++ b/Makefile
+@@ -74,6 +74,12 @@ CONFIG_ALL=y
+ config-host.mak: $(SRC_PATH)/configure $(SRC_PATH)/pc-bios $(SRC_PATH)/VERSION
+ 	@echo $@ is out-of-date, running configure
+ 	@./config.status
 +
-     def launch(self):
-         """
-         Launch the VM and make sure we cleanup and expose the
-diff --git a/python/qemu/qtest.py b/python/qemu/qtest.py
-index 3f1d2cb325..d24ad04256 100644
---- a/python/qemu/qtest.py
-+++ b/python/qemu/qtest.py
-@@ -84,14 +84,17 @@ class QEMUQtestMachine(QEMUMachine):
-     '''A QEMU VM'''
-=20
-     def __init__(self, binary, args=3DNone, name=3DNone, test_dir=3D"/va=
-r/tmp",
--                 socket_scm_helper=3DNone):
-+                 socket_scm_helper=3DNone, sock_dir=3DNone):
-         if name is None:
-             name =3D "qemu-%d" % os.getpid()
-+        if sock_dir is None:
-+            sock_dir =3D test_dir
-         super(QEMUQtestMachine,
-               self).__init__(binary, args, name=3Dname, test_dir=3Dtest_=
-dir,
--                             socket_scm_helper=3Dsocket_scm_helper)
-+                             socket_scm_helper=3Dsocket_scm_helper,
-+                             sock_dir=3Dsock_dir)
-         self._qtest =3D None
--        self._qtest_path =3D os.path.join(test_dir, name + "-qtest.sock"=
-)
-+        self._qtest_path =3D os.path.join(sock_dir, name + "-qtest.sock"=
-)
-=20
-     def _base_args(self):
-         args =3D super(QEMUQtestMachine, self)._base_args()
-diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotests.p=
-y
-index 43759e4e27..0616129342 100644
---- a/tests/qemu-iotests/iotests.py
-+++ b/tests/qemu-iotests/iotests.py
-@@ -57,6 +57,7 @@ qemu_opts =3D os.environ.get('QEMU_OPTIONS', '').strip(=
-).split(' ')
- imgfmt =3D os.environ.get('IMGFMT', 'raw')
- imgproto =3D os.environ.get('IMGPROTO', 'file')
- test_dir =3D os.environ.get('TEST_DIR')
-+sock_dir =3D os.environ.get('SOCK_DIR')
- output_dir =3D os.environ.get('OUTPUT_DIR', '.')
- cachemode =3D os.environ.get('CACHEMODE')
- qemu_default_machine =3D os.environ.get('QEMU_DEFAULT_MACHINE')
-@@ -445,7 +446,8 @@ class VM(qtest.QEMUQtestMachine):
-         name =3D "qemu%s-%d" % (path_suffix, os.getpid())
-         super(VM, self).__init__(qemu_prog, qemu_opts, name=3Dname,
-                                  test_dir=3Dtest_dir,
--                                 socket_scm_helper=3Dsocket_scm_helper)
-+                                 socket_scm_helper=3Dsocket_scm_helper,
-+                                 sock_dir=3Dsock_dir)
-         self._num_drives =3D 0
-=20
-     def add_object(self, opts):
---=20
-2.21.0
++# Force configure to re-run if the API symbols are updated
++ifeq ($(CONFIG_PLUGIN),y)
++config-host.mak: $(SRC_PATH)/plugins/qemu-plugins.symbols
++endif
++
+ else
+ config-host.mak:
+ ifneq ($(filter-out $(UNCHECKED_GOALS),$(MAKECMDGOALS)),$(if $(MAKECMDGOALS),,fail))
+@@ -730,6 +736,7 @@ distclean: clean
+ 	rm -f qemu-doc.fn qemu-doc.fns qemu-doc.info qemu-doc.ky qemu-doc.kys
+ 	rm -f qemu-doc.log qemu-doc.pdf qemu-doc.pg qemu-doc.toc qemu-doc.tp
+ 	rm -f qemu-doc.vr qemu-doc.txt
++	rm -f qemu-plugins-ld.symbols qemu-plugins-ld64.symbols
+ 	rm -f config.log
+ 	rm -f linux-headers/asm
+ 	rm -f docs/version.texi
+diff --git a/configure b/configure
+index 65cfd6c403..163eda23b7 100755
+--- a/configure
++++ b/configure
+@@ -30,6 +30,7 @@ TMPO="${TMPDIR1}/${TMPB}.o"
+ TMPCXX="${TMPDIR1}/${TMPB}.cxx"
+ TMPE="${TMPDIR1}/${TMPB}.exe"
+ TMPMO="${TMPDIR1}/${TMPB}.mo"
++TMPTXT="${TMPDIR1}/${TMPB}.txt"
+ 
+ rm -f config.log
+ 
+@@ -5467,6 +5468,61 @@ if compile_prog "" "" ; then
+   atomic64=yes
+ fi
+ 
++#########################################
++# See if --dynamic-list is supported by the linker
++ld_dynamic_list="no"
++if test "$static" = "no" ; then
++    cat > $TMPTXT <<EOF
++{
++  foo;
++};
++EOF
++
++    cat > $TMPC <<EOF
++#include <stdio.h>
++void foo(void);
++
++void foo(void)
++{
++  printf("foo\n");
++}
++
++int main(void)
++{
++  foo();
++  return 0;
++}
++EOF
++
++    if compile_prog "" "-Wl,--dynamic-list=$TMPTXT" ; then
++        ld_dynamic_list="yes"
++    fi
++fi
++
++#########################################
++# See if -exported_symbols_list is supported by the linker
++
++ld_exported_symbols_list="no"
++if test "$static" = "no" ; then
++    cat > $TMPTXT <<EOF
++  _foo
++EOF
++
++    if compile_prog "" "-Wl,-exported_symbols_list,$TMPTXT" ; then
++        ld_exported_symbols_list="yes"
++    fi
++fi
++
++if  test "$plugins" = "yes" &&
++    test "$ld_dynamic_list" = "no" &&
++    test "$ld_exported_symbols_list" = "no" ; then
++  error_exit \
++      "Plugin support requires dynamic linking and specifying a set of symbols " \
++      "that are exported to plugins. Unfortunately your linker doesn't " \
++      "support the flag (--dynamic-list or -exported_symbols_list) used " \
++      "for this purpose. You can't build with --static."
++fi
++
+ ########################################
+ # See if 16-byte vector operations are supported.
+ # Even without a vector unit the compiler may expand these.
+@@ -7270,6 +7326,22 @@ fi
+ if test "$plugins" = "yes" ; then
+     echo "CONFIG_PLUGIN=y" >> $config_host_mak
+     LIBS="-ldl $LIBS"
++    # Copy the export object list to the build dir
++    if test "$ld_dynamic_list" = "yes" ; then
++	echo "CONFIG_HAS_LD_DYNAMIC_LIST=yes" >> $config_host_mak
++	ld_symbols=qemu-plugins-ld.symbols
++	cp "$source_path/plugins/qemu-plugins.symbols" $ld_symbols
++    elif test "$ld_exported_symbols_list" = "yes" ; then
++	echo "CONFIG_HAS_LD_EXPORTED_SYMBOLS_LIST=yes" >> $config_host_mak
++	ld64_symbols=qemu-plugins-ld64.symbols
++	echo "# Automatically generated by configure - do not modify" > $ld64_symbols
++	grep 'qemu_' "$source_path/plugins/qemu-plugins.symbols" | sed 's/;//g' | \
++	    sed -E 's/^[[:space:]]*(.*)/_\1/' >> $ld64_symbols
++    else
++	error_exit \
++	    "If \$plugins=yes, either \$ld_dynamic_list or " \
++	    "\$ld_exported_symbols_list should have been set to 'yes'."
++    fi
+ fi
+ 
+ if test "$tcg_interpreter" = "yes"; then
+diff --git a/plugins/.gitignore b/plugins/.gitignore
+new file mode 100644
+index 0000000000..7b8aaa1f10
+--- /dev/null
++++ b/plugins/.gitignore
+@@ -0,0 +1,2 @@
++qemu-plugins-ld.symbols
++qemu-plugins-ld64.symbols
+diff --git a/plugins/Makefile.objs b/plugins/Makefile.objs
+index 95baabf3d2..6f14d91ccb 100644
+--- a/plugins/Makefile.objs
++++ b/plugins/Makefile.objs
+@@ -5,3 +5,17 @@
+ obj-y += loader.o
+ obj-y += core.o
+ obj-y += api.o
++
++# Abuse -libs suffix to only link with --dynamic-list/-exported_symbols_list
++# when the final binary includes the plugin object.
++#
++# Note that simply setting LDFLAGS is not enough: we build binaries that
++# never link plugin.o, and the linker might fail (at least ld64 does)
++# if the symbols in the list are not in the output binary.
++ifdef CONFIG_HAS_LD_DYNAMIC_LIST
++api.o-libs := -Wl,--dynamic-list=$(BUILD_DIR)/qemu-plugins-ld.symbols
++else
++ifdef CONFIG_HAS_LD_EXPORTED_SYMBOLS_LIST
++api.o-libs := -Wl,-exported_symbols_list,$(BUILD_DIR)/qemu-plugins-ld64.symbols
++endif
++endif
+diff --git a/plugins/qemu-plugins.symbols b/plugins/qemu-plugins.symbols
+new file mode 100644
+index 0000000000..40c0d1abd2
+--- /dev/null
++++ b/plugins/qemu-plugins.symbols
+@@ -0,0 +1,38 @@
++{
++  qemu_plugin_uninstall;
++  qemu_plugin_reset;
++  qemu_plugin_register_vcpu_init_cb;
++  qemu_plugin_register_vcpu_exit_cb;
++  qemu_plugin_register_vcpu_idle_cb;
++  qemu_plugin_register_vcpu_resume_cb;
++  qemu_plugin_register_vcpu_insn_exec_cb;
++  qemu_plugin_register_vcpu_insn_exec_inline;
++  qemu_plugin_register_vcpu_mem_cb;
++  qemu_plugin_register_vcpu_mem_haddr_cb;
++  qemu_plugin_register_vcpu_mem_inline;
++  qemu_plugin_ram_addr_from_host;
++  qemu_plugin_register_vcpu_tb_trans_cb;
++  qemu_plugin_register_vcpu_tb_exec_cb;
++  qemu_plugin_register_vcpu_tb_exec_inline;
++  qemu_plugin_register_flush_cb;
++  qemu_plugin_register_vcpu_syscall_cb;
++  qemu_plugin_register_vcpu_syscall_ret_cb;
++  qemu_plugin_register_atexit_cb;
++  qemu_plugin_tb_n_insns;
++  qemu_plugin_tb_get_insn;
++  qemu_plugin_tb_vaddr;
++  qemu_plugin_insn_data;
++  qemu_plugin_insn_size;
++  qemu_plugin_insn_vaddr;
++  qemu_plugin_insn_haddr;
++  qemu_plugin_mem_size_shift;
++  qemu_plugin_mem_is_sign_extended;
++  qemu_plugin_mem_is_big_endian;
++  qemu_plugin_mem_is_store;
++  qemu_plugin_get_hwaddr;
++  qemu_plugin_hwaddr_is_io;
++  qemu_plugin_hwaddr_to_raddr;
++  qemu_plugin_vcpu_for_each;
++  qemu_plugin_n_vcpus;
++  qemu_plugin_n_max_vcpus;
++};
+-- 
+2.20.1
 
 
