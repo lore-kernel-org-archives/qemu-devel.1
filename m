@@ -2,63 +2,84 @@ Return-Path: <SRS0=yZS3=YK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.4 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CD982ECE58D
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 20:29:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F64AFA372A
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 20:44:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9869520872
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 20:29:39 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9869520872
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 200422089C
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 20:44:59 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WQJXxAM3"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 200422089C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59212 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59494 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iLCOw-0006n2-OL
-	for qemu-devel@archiver.kernel.org; Thu, 17 Oct 2019 16:29:38 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51588)
+	id 1iLCdm-0004Tg-7D
+	for qemu-devel@archiver.kernel.org; Thu, 17 Oct 2019 16:44:58 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53178)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.williamson@redhat.com>) id 1iLCOB-0005zG-BC
- for qemu-devel@nongnu.org; Thu, 17 Oct 2019 16:28:52 -0400
+ (envelope-from <mrolnik@gmail.com>) id 1iLCcp-0003ew-Th
+ for qemu-devel@nongnu.org; Thu, 17 Oct 2019 16:44:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.williamson@redhat.com>) id 1iLCO8-0005rM-Pr
- for qemu-devel@nongnu.org; Thu, 17 Oct 2019 16:28:50 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:59208)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
- id 1iLCO8-0005pn-Gl; Thu, 17 Oct 2019 16:28:48 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 2D65018C4287;
- Thu, 17 Oct 2019 20:28:47 +0000 (UTC)
-Received: from x1.home (ovpn-118-102.phx2.redhat.com [10.3.118.102])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 89A641001B35;
- Thu, 17 Oct 2019 20:28:45 +0000 (UTC)
-Date: Thu, 17 Oct 2019 14:28:45 -0600
-From: Alex Williamson <alex.williamson@redhat.com>
-To: David Gibson <david@gibson.dropbear.id.au>
-Subject: Re: [RFC 3/5] vfio/pci: Respond to KVM irqchip change notifier
-Message-ID: <20191017142845.5d4d9121@x1.home>
-In-Reply-To: <20191017054218.8876-4-david@gibson.dropbear.id.au>
-References: <20191017054218.8876-1-david@gibson.dropbear.id.au>
- <20191017054218.8876-4-david@gibson.dropbear.id.au>
-Organization: Red Hat
+ (envelope-from <mrolnik@gmail.com>) id 1iLCcn-0006DE-BK
+ for qemu-devel@nongnu.org; Thu, 17 Oct 2019 16:43:59 -0400
+Received: from mail-qk1-x744.google.com ([2607:f8b0:4864:20::744]:38732)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <mrolnik@gmail.com>) id 1iLCcn-0006Cz-7a
+ for qemu-devel@nongnu.org; Thu, 17 Oct 2019 16:43:57 -0400
+Received: by mail-qk1-x744.google.com with SMTP id p4so3219069qkf.5
+ for <qemu-devel@nongnu.org>; Thu, 17 Oct 2019 13:43:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=znJaM4yXAXZ1huYG2YR0JYXPOgt9ggfLtiihvaHCQZc=;
+ b=WQJXxAM3C6JTv2zJ3jI47DQPwwdVKYiwt81niXnZEDYSch38RdCqXfthIxyA6usNL3
+ 95l8+LOcr4Vh1R8kTg8i3SOE4J2aZTawO0eBluGCBD/67SOULzLnI/vZ3a38scE+gtmp
+ PamjR2ORN8R77Lh0shlV6xiRoc91mDzUCs2HEWE99YkyB3pDp8kIYdWZRqeePoxWSNFU
+ dn+w+z149R+BYjIafZBCrqMUCnrA/yVmJwIYGjcAsiVGBCaCXVUDnNb1btjNITmj/9O0
+ aJ2s+EGsNJrKs3WZWq+wi6ZAaHS14qrgbky4QeTvoJUtx7hSoU38vdLenlSQ0iRJ3b1n
+ P8tw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=znJaM4yXAXZ1huYG2YR0JYXPOgt9ggfLtiihvaHCQZc=;
+ b=nyYcvf9MJWa/jqyNej6BXZkfS5nuNLvag2YLv2M6fcu0OTDD/95wMeFB21stUfQRwW
+ 7psqMI9xgIpV3VvQQkCOb8y4nMQMHlqleajhAnSMkBpkfZVYdsPLCi1Lqs3zMc3aMQV6
+ BoP7px1shq8eMe4z2dCyZXDpOszw13sxW97L+DdGSjSbH2S+MvK/G/AzCU3UVr2MSSyt
+ 7Uaqd7PFl06EAvetkNSkvtHcR7b3uIhJYNKwMg+JRKUwhUwamUDLWWmHVRJHzyCtn+De
+ oquVTqBBS7nzACWwV5RBcoMR8IQ2f2kHnYjTqPRcGxt5O39wc+mg1RpmGwnDg1yXj868
+ P3dg==
+X-Gm-Message-State: APjAAAUrPZ7DOV1gKOgnlbgvFatejglf7VQFKKCza6e/yVLXLjXP7QyR
+ AlKuRw/ezYN3d3E7+FCctLCmBgpwzvbC06pY3kw=
+X-Google-Smtp-Source: APXvYqzMpS4sEgIebH2zwXJC2Qrsm23eXkOeoIaWbIgq9pcIwf3iM3z2z0NEsb//KzD+yyz+0EGQgPsEqw8r6RMcuNM=
+X-Received: by 2002:a05:620a:140d:: with SMTP id
+ d13mr5221256qkj.460.1571345036295; 
+ Thu, 17 Oct 2019 13:43:56 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.62]); Thu, 17 Oct 2019 20:28:47 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.132.183.28
+References: <20191014161843.84845-1-mrolnik@gmail.com>
+ <20191014161843.84845-5-mrolnik@gmail.com>
+ <CAL1e-=g9ER4tuqEL2ubqb7oAbatcVR8x+A0LAydSwBJEnk9_ow@mail.gmail.com>
+ <CAK4993gm=8tVXyprjHPMiNZuKZRkx0iDYnXh76cQfMwUayqcWQ@mail.gmail.com>
+ <CAL1e-=hGJQqVnvAu=ZJRV-AdoAWpkSvdf5ex=b7EwkodUGKpUg@mail.gmail.com>
+In-Reply-To: <CAL1e-=hGJQqVnvAu=ZJRV-AdoAWpkSvdf5ex=b7EwkodUGKpUg@mail.gmail.com>
+From: Michael Rolnik <mrolnik@gmail.com>
+Date: Thu, 17 Oct 2019 23:43:04 +0300
+Message-ID: <CAK4993jaqFrzcmAyz7neJoq5cQgnB_o35dZhdh9_uVyOfKGG-Q@mail.gmail.com>
+Subject: Re: [PATCH v32 04/13] target/avr: Add instruction translation -
+ Registers definition
+To: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::744
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -70,99 +91,160 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: aik@ozlabs.ru, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, clg@kaod.org,
- groug@kaod.org
+Cc: "thuth@redhat.com" <thuth@redhat.com>,
+ "richard.henderson@linaro.org" <richard.henderson@linaro.org>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "dovgaluk@ispras.ru" <dovgaluk@ispras.ru>,
+ "imammedo@redhat.com" <imammedo@redhat.com>,
+ "philmd@redhat.com" <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, 17 Oct 2019 16:42:16 +1100
-David Gibson <david@gibson.dropbear.id.au> wrote:
+On Thu, Oct 17, 2019 at 11:17 PM Aleksandar Markovic
+<aleksandar.m.mail@gmail.com> wrote:
+>>
+>>
+>> >> +static TCGv cpu_Cf;
+>> >> +static TCGv cpu_Zf;
+>> >> +static TCGv cpu_Nf;
+>> >> +static TCGv cpu_Vf;
+>> >> +static TCGv cpu_Sf;
+>> >> +static TCGv cpu_Hf;
+>> >> +static TCGv cpu_Tf;
+>> >> +static TCGv cpu_If;
+>> >> +
+>> >
+>> >
+>> > Hello, Michael,
+>> >
+>> > Is there any particular reason or motivation beyond modelling status register flags as TCGv variables?
+>>
+>>
+>>
+>> I think it's easier this way as I don't need to convert flag values to
+>> bits or bits to flag values.
+>
+>
+> Ok. But, how do you map 0/1 flag value to the value of a TCGv variable and vice versa? In other words, what value or values (out of 2^32 vales) of a TCGv variable mean the flag is 1? And the same question for 0.
+>
+> Is 0110000111000010100 one or zero?
+>
+> Besides, in such arrangement, how do you display the 8-bit status register in gdb, if at all?
 
-> VFIO PCI devices already respond to the pci intx routing notifier, in order
-> to update kernel irqchip mappings when routing is updated.  However this
-> won't handle the case where the irqchip itself is replaced by a different
-> model while retaining the same routing.  This case can happen on
-> the pseries machine type due to PAPR feature negotiation.
-> 
-> To handle that case, add a handler for the irqchip change notifier, which
-> does much the same thing as the routing notifier, but is unconditional,
-> rather than being a no-op when the routing hasn't changed.
-> 
-> Cc: Alex Williamson <alex.williamson@redhat.com>
-> Cc: Alexey Kardashevskiy <aik@ozlabs.ru>
-> 
-> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-> ---
->  hw/vfio/pci.c | 12 ++++++++++++
->  hw/vfio/pci.h |  2 ++
->  2 files changed, 14 insertions(+)
-> 
-> diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
-> index 529ad13908..6aa806baff 100644
-> --- a/hw/vfio/pci.c
-> +++ b/hw/vfio/pci.c
-> @@ -255,6 +255,14 @@ static void vfio_intx_routing_notifier(PCIDevice *pdev)
->      }
->  }
->  
-> +static void vfio_irqchip_change(Notifier *notify, void *data)
-> +{
-> +    VFIOPCIDevice *vdev = container_of(notify, VFIOPCIDevice,
-> +                                       irqchip_change_notifier);
-> +
-> +    vfio_intx_update(vdev, &vdev->intx.route);
-> +}
-> +
->  static int vfio_intx_enable(VFIOPCIDevice *vdev, Error **errp)
->  {
->      uint8_t pin = vfio_pci_read_config(&vdev->pdev, PCI_INTERRUPT_PIN, 1);
-> @@ -2960,6 +2968,8 @@ static void vfio_realize(PCIDevice *pdev, Error **errp)
->                                                    vfio_intx_mmap_enable, vdev);
->          pci_device_set_intx_routing_notifier(&vdev->pdev,
->                                               vfio_intx_routing_notifier);
-> +        vdev->irqchip_change_notifier.notify = vfio_irqchip_change;
-> +        kvm_irqchip_add_change_notifier(&vdev->irqchip_change_notifier);
->          ret = vfio_intx_enable(vdev, errp);
->          if (ret) {
->              goto out_teardown;
-> @@ -3009,6 +3019,7 @@ static void vfio_realize(PCIDevice *pdev, Error **errp)
->  
->  out_teardown:
->      pci_device_set_intx_routing_notifier(&vdev->pdev, NULL);
-> +    kvm_irqchip_remove_change_notifier(&vdev->irqchip_change_notifier);
+each flag register is either 0 or 1, they are calculated here
+1. https://github.com/michaelrolnik/qemu-avr/blob/avr-v32/target/avr/translate.c#L146-L148
+2. https://github.com/michaelrolnik/qemu-avr/blob/avr-v32/target/avr/translate.c#L166
+3. https://github.com/michaelrolnik/qemu-avr/blob/avr-v32/target/avr/translate.c#L185-L187
+4. https://github.com/michaelrolnik/qemu-avr/blob/avr-v32/target/avr/translate.c#L205
+5. https://github.com/michaelrolnik/qemu-avr/blob/avr-v32/target/avr/translate.c#L214-L215
+6. https://github.com/michaelrolnik/qemu-avr/blob/avr-v32/target/avr/translate.c#L222-L223
+The COU itself never uses SREG at all, only the flags.
 
-We can get here without having added the irqchip notifier and I don't
-think QLIST_REMOVE is very friendly with gratuitous calls.
+As for the GDB it's get assembled/disassembled here
+1. https://github.com/michaelrolnik/qemu-avr/blob/avr-v32/target/avr/cpu.h#L219-L243
+2. https://github.com/michaelrolnik/qemu-avr/blob/avr-v32/target/avr/gdbstub.c#L35-L37
+3. https://github.com/michaelrolnik/qemu-avr/blob/avr-v32/target/avr/gdbstub.c#L66-L68
 
->      vfio_teardown_msi(vdev);
->      vfio_bars_exit(vdev);
->  error:
-> @@ -3042,6 +3053,7 @@ static void vfio_exitfn(PCIDevice *pdev)
->      vfio_unregister_req_notifier(vdev);
->      vfio_unregister_err_notifier(vdev);
->      pci_device_set_intx_routing_notifier(&vdev->pdev, NULL);
-> +    kvm_irqchip_remove_change_notifier(&vdev->irqchip_change_notifier);
+>
+> A.
+>
+>>
+>> >
+>> > A.
+>> >
+>> >
+>> >
+>> >>
+>> >> +static TCGv cpu_rampD;
+>> >> +static TCGv cpu_rampX;
+>> >> +static TCGv cpu_rampY;
+>> >> +static TCGv cpu_rampZ;
+>> >> +
+>> >> +static TCGv cpu_r[NO_CPU_REGISTERS];
+>> >> +static TCGv cpu_eind;
+>> >> +static TCGv cpu_sp;
+>> >> +
+>> >> +static TCGv cpu_skip;
+>> >> +
+>> >> +static const char reg_names[NO_CPU_REGISTERS][8] = {
+>> >> +    "r0",  "r1",  "r2",  "r3",  "r4",  "r5",  "r6",  "r7",
+>> >> +    "r8",  "r9",  "r10", "r11", "r12", "r13", "r14", "r15",
+>> >> +    "r16", "r17", "r18", "r19", "r20", "r21", "r22", "r23",
+>> >> +    "r24", "r25", "r26", "r27", "r28", "r29", "r30", "r31",
+>> >> +};
+>> >> +#define REG(x) (cpu_r[x])
+>> >> +
+>> >> +enum {
+>> >> +    DISAS_EXIT   = DISAS_TARGET_0,  /* We want return to the cpu main loop.  */
+>> >> +    DISAS_LOOKUP = DISAS_TARGET_1,  /* We have a variable condition exit.  */
+>> >> +    DISAS_CHAIN  = DISAS_TARGET_2,  /* We have a single condition exit.  */
+>> >> +};
+>> >> +
+>> >> +typedef struct DisasContext DisasContext;
+>> >> +
+>> >> +/* This is the state at translation time. */
+>> >> +struct DisasContext {
+>> >> +    TranslationBlock *tb;
+>> >> +
+>> >> +    CPUAVRState *env;
+>> >> +    CPUState *cs;
+>> >> +
+>> >> +    target_long npc;
+>> >> +    uint32_t opcode;
+>> >> +
+>> >> +    /* Routine used to access memory */
+>> >> +    int memidx;
+>> >> +    int bstate;
+>> >> +    int singlestep;
+>> >> +
+>> >> +    TCGv skip_var0;
+>> >> +    TCGv skip_var1;
+>> >> +    TCGCond skip_cond;
+>> >> +    bool free_skip_var0;
+>> >> +};
+>> >> +
+>> >> +static int to_A(DisasContext *ctx, int indx) { return 16 + (indx % 16); }
+>> >> +static int to_B(DisasContext *ctx, int indx) { return 16 + (indx % 8); }
+>> >> +static int to_C(DisasContext *ctx, int indx) { return 24 + (indx % 4) * 2; }
+>> >> +static int to_D(DisasContext *ctx, int indx) { return (indx % 16) * 2; }
+>> >> +
+>> >> +static uint16_t next_word(DisasContext *ctx)
+>> >> +{
+>> >> +    return cpu_lduw_code(ctx->env, ctx->npc++ * 2);
+>> >> +}
+>> >> +
+>> >> +static int append_16(DisasContext *ctx, int x)
+>> >> +{
+>> >> +    return x << 16 | next_word(ctx);
+>> >> +}
+>> >> +
+>> >> +
+>> >> +static bool avr_have_feature(DisasContext *ctx, int feature)
+>> >> +{
+>> >> +    if (!avr_feature(ctx->env, feature)) {
+>> >> +        gen_helper_unsupported(cpu_env);
+>> >> +        ctx->bstate = DISAS_NORETURN;
+>> >> +        return false;
+>> >> +    }
+>> >> +    return true;
+>> >> +}
+>> >> +
+>> >> +static bool decode_insn(DisasContext *ctx, uint16_t insn);
+>> >> +#include "decode_insn.inc.c"
+>> >> +
+>> >> --
+>> >> 2.17.2 (Apple Git-113)
+>> >>
+>>
+>>
+>> --
+>> Best Regards,
+>> Michael Rolnik
 
-Same here.  Otherwise the approach looks sane to me.  Thanks,
 
-Alex
 
->      vfio_disable_interrupts(vdev);
->      if (vdev->intx.mmap_timer) {
->          timer_free(vdev->intx.mmap_timer);
-> diff --git a/hw/vfio/pci.h b/hw/vfio/pci.h
-> index 834a90d646..11324f28ce 100644
-> --- a/hw/vfio/pci.h
-> +++ b/hw/vfio/pci.h
-> @@ -168,6 +168,8 @@ typedef struct VFIOPCIDevice {
->      bool no_vfio_ioeventfd;
->      bool enable_ramfb;
->      VFIODisplay *dpy;
-> +
-> +    Notifier irqchip_change_notifier;
->  } VFIOPCIDevice;
->  
->  uint32_t vfio_pci_read_config(PCIDevice *pdev, uint32_t addr, int len);
-
+-- 
+Best Regards,
+Michael Rolnik
 
