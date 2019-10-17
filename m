@@ -1,63 +1,77 @@
 Return-Path: <SRS0=yZS3=YK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
-X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Level: *
+X-Spam-Status: No, score=1.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,PDS_TONAME_EQ_TOLOCAL_SHORT,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0B409FA372A
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 08:07:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1701AFA372A
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 08:21:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C4F0C20872
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 08:07:45 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C4F0C20872
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id D300820640
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 08:21:02 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HEFM2JxR"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D300820640
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39292 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39584 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iL0oy-0003IF-Sm
-	for qemu-devel@archiver.kernel.org; Thu, 17 Oct 2019 04:07:44 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42747)
+	id 1iL11p-0007IE-VQ
+	for qemu-devel@archiver.kernel.org; Thu, 17 Oct 2019 04:21:01 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44316)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <quintela@redhat.com>) id 1iL0oK-0002qz-PL
- for qemu-devel@nongnu.org; Thu, 17 Oct 2019 04:07:05 -0400
+ (envelope-from <stefanha@gmail.com>) id 1iL118-0006mf-68
+ for qemu-devel@nongnu.org; Thu, 17 Oct 2019 04:20:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <quintela@redhat.com>) id 1iL0oJ-00020e-CC
- for qemu-devel@nongnu.org; Thu, 17 Oct 2019 04:07:04 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:48160)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <quintela@redhat.com>) id 1iL0oJ-00020V-3N
- for qemu-devel@nongnu.org; Thu, 17 Oct 2019 04:07:03 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id E6A178AC6FB;
- Thu, 17 Oct 2019 08:07:01 +0000 (UTC)
-Received: from redhat.com (ovpn-116-80.ams2.redhat.com [10.36.116.80])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 53EFF5D70D;
- Thu, 17 Oct 2019 08:06:58 +0000 (UTC)
-From: Juan Quintela <quintela@redhat.com>
-To: Eric Auger <eric.auger@redhat.com>
-Subject: Re: [PATCH v3] migration: Support QLIST migration
-In-Reply-To: <20191015125045.5006-1-eric.auger@redhat.com> (Eric Auger's
- message of "Tue, 15 Oct 2019 14:50:45 +0200")
-References: <20191015125045.5006-1-eric.auger@redhat.com>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.2 (gnu/linux)
-Date: Thu, 17 Oct 2019 10:06:56 +0200
-Message-ID: <87r23bpzhb.fsf@trasno.org>
+ (envelope-from <stefanha@gmail.com>) id 1iL117-0006hO-3V
+ for qemu-devel@nongnu.org; Thu, 17 Oct 2019 04:20:18 -0400
+Received: from mail-qk1-x72d.google.com ([2607:f8b0:4864:20::72d]:44690)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1iL117-0006hJ-01
+ for qemu-devel@nongnu.org; Thu, 17 Oct 2019 04:20:17 -0400
+Received: by mail-qk1-x72d.google.com with SMTP id u22so1059788qkk.11
+ for <qemu-devel@nongnu.org>; Thu, 17 Oct 2019 01:20:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:from:date:message-id:subject:to;
+ bh=VLr6A+GuHyShcjJPiDYAx6zRrDRm2jat2pVrt52z7rw=;
+ b=HEFM2JxRbwJBxT9d6kfBnsn22htAT0iRI+fDialpmw3GyCpgc0J7QU+xiqyzrK/Gaz
+ YqarWOIUlzdqyDpa1qRGYW9tN0cewh9+ege9+HSY/1v/112lwVKsP4iRktO/wi9bzPoI
+ yS44/kwKz9BKYPVdkMfjYu9YhaAICCABCkOaOo5BVVfCsSOBJeNaB1gY3bc7XymcG9V4
+ lKwwl2WHJMsXlmq93F2RKQE5G2+szddMWgg2JHrI2JaC1056LQh0pAm93tQZh3f3rwnG
+ Z0MEN2CPQp0gFR93N2kKrV+gsMK9ZZ+b90kmfrCp3PSPRpfFZbwFL8SSYCGHZbUJrugq
+ QQyw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
+ bh=VLr6A+GuHyShcjJPiDYAx6zRrDRm2jat2pVrt52z7rw=;
+ b=dl5vsNE2p45Jl81/uczdssocW8fsGjP+yq3YWhAVwbcH8EZoJ18Uv2NL9hBneiPTRU
+ wkR8UKiNHBrJJdnZuH5CNZmFm7bCGke1pC8wO3s49nOdGj89ZfWL7i1M0xYVxD2M0kmY
+ L+QvK5MGwlDlWiBja1Zi0laBXu856mlhqu7NTuAWkfk1EQoCvqIiINruw6tVdPHzvT72
+ XP3IGczqBPwFHoXW6CqjjWYGjLFkQa+iYz5qZeJ4WetqPAjoitsKbM5kkO8h47L52XQo
+ uwMpO3WGuadSZp9u9cKQbj/CLMR29gwPCQEFxF/SFHwLgq9WAUtI45QEcGBxZQPGslQw
+ KHbA==
+X-Gm-Message-State: APjAAAVoUKHAK8IDQZsWwojNXHM2pGEHHn+TL5Yc/Dgj1jXVZ0CDBHDg
+ kXFb+fqNA7ns/wHC2Gp4ow/UaVR8MjWbY8ntZ4caoiTxwLE=
+X-Google-Smtp-Source: APXvYqzptmso4QWc4fzonqbnWa+zMj2dQpARVfJyzKJuMaq0IjKCqIhX04Nmo8CYPUaahjL9WCyuFIlqBcQchSNfaJA=
+X-Received: by 2002:a37:a345:: with SMTP id m66mr2066441qke.487.1571300416088; 
+ Thu, 17 Oct 2019 01:20:16 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.69]); Thu, 17 Oct 2019 08:07:02 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.132.183.28
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Date: Thu, 17 Oct 2019 09:20:05 +0100
+Message-ID: <CAJSP0QWchnsEqCFiPr9-axrAx3rF6HxDBQ0HUgSg3WriVqSusw@mail.gmail.com>
+Subject: [Call for Presentations] FOSDEM 2020 Virtualization & IaaS Devroom
+To: qemu-devel <qemu-devel@nongnu.org>, kvm <kvm@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::72d
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -69,92 +83,19 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: quintela@redhat.com
-Cc: qemu-devel@nongnu.org, dgilbert@redhat.com, eric.auger.pro@gmail.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Eric Auger <eric.auger@redhat.com> wrote:
-> Support QLIST migration using the same principle as QTAILQ:
-> 94869d5c52 ("migration: migrate QTAILQ").
->
-> The VMSTATE_QLIST_V macro has the same proto as VMSTATE_QTAILQ_V.
-> The change mainly resides in QLIST_RAW_INSERT_TAIL implementation.
->
-> Tests also are provided.
->
-> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+The FOSDEM open source developer conference is taking place in
+Brussels, Belgium on February 1st & 2nd, 2020.  The call for
+virtualization presentations has been posted:
 
-Hi
+https://lists.fosdem.org/pipermail/fosdem/2019q4/002889.html
 
+I just wanted to forward this because the CfP only went to
+qemu-discuss where developers may have missed it.  Hope to see you at
+FOSDEM!
 
-How long are these lists normally?  I think that the INSERT_TAIL is the
-wrong approach.  If lists can be long, it is much better to just insert
-at the beggining and as last operation, reverse things, no?
-
-> +#define QLIST_RAW_INSERT_TAIL(head, elm, entry) do {                           \
-> +        void *iter, *last = NULL;                                              \
-> +        *QLIST_RAW_NEXT(elm, entry) = NULL;                                    \
-> +        if (!*QLIST_RAW_FIRST(head)) {                                         \
-> +            *QLIST_RAW_FIRST(head) = elm;                                      \
-> +            *QLIST_RAW_PREVIOUS(elm, entry) = head;                            \
-> +            break;                                                             \
-> +        }                                                                      \
-> +        for (iter = *QLIST_RAW_FIRST(head);                                    \
-> +             iter; last = iter, iter = *QLIST_RAW_NEXT(iter, entry))           \
-> +            { }                                                                \
-> +        *QLIST_RAW_NEXT(last, entry) = elm;                                    \
-> +        *QLIST_RAW_PREVIOUS(elm, entry) = last;                                \
-
-I think that you normally want to do this two instructions in the
-reverse order, just in case (famous last words).
-
-
-> +static int get_qlist(QEMUFile *f, void *pv, size_t unused_size,
-> +                     const VMStateField *field)
-> +{
-> +    int ret = 0;
-> +    const VMStateDescription *vmsd = field->vmsd;
-> +    /* size of a QLIST element */
-> +    size_t size = field->size;
-> +    /* offset of the QLIST entry in a QLIST element */
-> +    size_t entry_offset = field->start;
-> +    int version_id = field->version_id;
-> +    void *elm;
-> +
-> +    trace_get_qlist(field->name, vmsd->name, vmsd->version_id);
-> +    if (version_id > vmsd->version_id) {
-> +        error_report("%s %s",  vmsd->name, "too new");
-> +        return -EINVAL;
-> +    }
-> +    if (version_id < vmsd->minimum_version_id) {
-> +        error_report("%s %s",  vmsd->name, "too old");
-> +        return -EINVAL;
-> +    }
-> +
-> +    while (qemu_get_byte(f)) {
-> +        elm = g_malloc(size);
-> +        ret = vmstate_load_state(f, vmsd, elm, version_id);
-> +        if (ret) {
-> +            error_report("%s: failed to load %s (%d)", field->name,
-> +                         vmsd->name, ret);
-> +            g_free(elm);
-> +            return ret;
-> +        }
-> +        QLIST_RAW_INSERT_TAIL(pv, elm, entry_offset);
-
-Here we insert at the beggining.
-
-> +    }
-
-Here we reverse?
-
-We move from O(n^2) to O(2n), much better, no?
-As said, except if the lists are normally very short.
-
-
-The rest of the patch looks ok to me.
-
-Later, Juan.
+Stefan
 
