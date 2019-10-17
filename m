@@ -2,63 +2,68 @@ Return-Path: <SRS0=yZS3=YK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 059DAECE599
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 00:51:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 191DBECE599
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 03:18:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C33C021928
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 00:51:49 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="aKGi5hfp"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C33C021928
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
+	by mail.kernel.org (Postfix) with ESMTPS id DFEBC20872
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 03:18:52 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DFEBC20872
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52692 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58798 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iKu16-0004ux-TD
-	for qemu-devel@archiver.kernel.org; Wed, 16 Oct 2019 20:51:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53047)
+	id 1iKwJQ-0005UK-2o
+	for qemu-devel@archiver.kernel.org; Wed, 16 Oct 2019 23:18:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37134)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgibson@ozlabs.org>) id 1iKtzg-0003jo-RS
- for qemu-devel@nongnu.org; Wed, 16 Oct 2019 20:50:22 -0400
+ (envelope-from <no-reply@patchew.org>) id 1iKwIm-0004uR-8A
+ for qemu-devel@nongnu.org; Wed, 16 Oct 2019 23:18:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1iKtze-0006Yi-Fd
- for qemu-devel@nongnu.org; Wed, 16 Oct 2019 20:50:20 -0400
-Received: from bilbo.ozlabs.org ([203.11.71.1]:34277 helo=ozlabs.org)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1iKtzd-0006SO-Eo; Wed, 16 Oct 2019 20:50:18 -0400
-Received: by ozlabs.org (Postfix, from userid 1007)
- id 46trDM0FVRz9sPV; Thu, 17 Oct 2019 11:50:10 +1100 (AEDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1571273411;
- bh=4c6OdtewzD73zXbG2cVjN6fv9sbWN1rUR/s8+Oh9tqE=;
- h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=aKGi5hfp1IRvSDY//X6CQ2HAntc0/AribBmOybOmoG1bss/IMxoQWs1PZIZi3biJp
- oo8qBjgaNy4Fuk58hllg/jMcBxzu3vB3TVxqgTmwC4gWlEOYaIJ/UV52z+MeajGrmi
- fm67mepoTjrSy3z3SXfe5tcfhWWyWUHoLB2gBr8k=
-Date: Thu, 17 Oct 2019 11:26:45 +1100
-From: David Gibson <david@gibson.dropbear.id.au>
-To: Greg Kurz <groug@kaod.org>
-Subject: Re: [PATCH v4 00/19] spapr: IRQ subsystem cleanup
-Message-ID: <20191017002645.GA2000@umbus.fritz.box>
-References: <20191009060818.29719-1-david@gibson.dropbear.id.au>
- <20191016180404.6cbfce9f@bahia.lan>
+ (envelope-from <no-reply@patchew.org>) id 1iKwIk-0002cA-MY
+ for qemu-devel@nongnu.org; Wed, 16 Oct 2019 23:18:11 -0400
+Resent-Date: Wed, 16 Oct 2019 23:18:11 -0400
+Resent-Message-Id: <E1iKwIk-0002cA-MY@eggs.gnu.org>
+Received: from sender4-of-o56.zoho.com ([136.143.188.56]:21669)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <no-reply@patchew.org>)
+ id 1iKwIk-0002bo-Em
+ for qemu-devel@nongnu.org; Wed, 16 Oct 2019 23:18:10 -0400
+ARC-Seal: i=1; a=rsa-sha256; t=1571279557; cv=none; d=zoho.com; s=zohoarc; 
+ b=mUnNux7o3ORMrppgxtGR8lC+/T9JFskDFkSm9sSRz7oF9kJcsHFUbAKqtPW3qjmNNKBlEQ1jWEz/FwSlNDY40SFIizpeqvRpFFv4TYeHym9aVyTUBLjVPD1WZZwpAKWawpVxFtr7QvuasPrGBvEEUFEwEWsz2Ob4VMJmZRvdgME=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zoho.com;
+ s=zohoarc; t=1571279557;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
+ bh=9z0lrA0jdjvRxBYQrseoJ3L0hvAZwodoi0YFlIrvouY=; 
+ b=MqjEUVREKSdOiujZb4OyTXsYNaVYgu7ewQBTXe88Seolkc+ZsZizp2osZBbdqgf1BSzeB6uimZC4GIzHa55s7sMIXcABl5vYjR5mqeHszcUVwH76HNywAnuxNo/0WYKhDjcRU15Vm0CwcyhUOZmrpsxpQJdBW7pvbhZ9KDWwI/4=
+ARC-Authentication-Results: i=1; mx.zoho.com; dkim=pass  header.i=patchew.org;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 1571279555862317.1057361649091;
+ Wed, 16 Oct 2019 19:32:35 -0700 (PDT)
+In-Reply-To: <20191017004633.13229-1-richardw.yang@linux.intel.com>
+Subject: Re: [Patch v2] checkpatch: sugguest to use qemu_real_host_page_size
+ instead of getpagesize() or sysconf(_SC_PAGESIZE)
+Message-ID: <157127955407.19066.17686745347793772900@37313f22b938>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="ZGiS0Q5IWpPtfppv"
-Content-Disposition: inline
-In-Reply-To: <20191016180404.6cbfce9f@bahia.lan>
-User-Agent: Mutt/1.12.1 (2019-06-15)
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: richardw.yang@linux.intel.com
+Date: Wed, 16 Oct 2019 19:32:35 -0700 (PDT)
+X-ZohoMailClient: External
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 203.11.71.1
+X-Received-From: 136.143.188.56
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -70,61 +75,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Jason Wang <jasowang@redhat.com>, Riku Voipio <riku.voipio@iki.fi>,
- qemu-devel@nongnu.org, Laurent Vivier <laurent@vivier.eu>, qemu-ppc@nongnu.org,
- clg@kaod.org, Paolo Bonzini <pbonzini@redhat.com>,
- =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>,
- philmd@redhat.com
+Reply-To: qemu-devel@nongnu.org
+Cc: thuth@redhat.com, berrange@redhat.com, richard.henderson@linaro.org,
+ qemu-devel@nongnu.org, richardw.yang@linux.intel.com, stefanha@redhat.com,
+ pbonzini@redhat.com, philmd@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MTAxNzAwNDYzMy4xMzIy
+OS0xLXJpY2hhcmR3LnlhbmdAbGludXguaW50ZWwuY29tLwoKCgpIaSwKClRoaXMgc2VyaWVzIHNl
+ZW1zIHRvIGhhdmUgc29tZSBjb2Rpbmcgc3R5bGUgcHJvYmxlbXMuIFNlZSBvdXRwdXQgYmVsb3cg
+Zm9yCm1vcmUgaW5mb3JtYXRpb246CgpTdWJqZWN0OiBbUGF0Y2ggdjJdIGNoZWNrcGF0Y2g6IHN1
+Z2d1ZXN0IHRvIHVzZSBxZW11X3JlYWxfaG9zdF9wYWdlX3NpemUgaW5zdGVhZCBvZiBnZXRwYWdl
+c2l6ZSgpIG9yIHN5c2NvbmYoX1NDX1BBR0VTSVpFKQpUeXBlOiBzZXJpZXMKTWVzc2FnZS1pZDog
+MjAxOTEwMTcwMDQ2MzMuMTMyMjktMS1yaWNoYXJkdy55YW5nQGxpbnV4LmludGVsLmNvbQoKPT09
+IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaApnaXQgcmV2LXBhcnNlIGJhc2UgPiAv
+ZGV2L251bGwgfHwgZXhpdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAK
+Z2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCmdpdCBjb25maWcgLS1sb2NhbCBk
+aWZmLmFsZ29yaXRobSBoaXN0b2dyYW0KLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFj
+ayBiYXNlLi4KPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KClVwZGF0aW5nIDNjOGNmNWE5YzIxZmY4
+NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0
+JwozNzUxZDc2IGNoZWNrcGF0Y2g6IHN1Z2d1ZXN0IHRvIHVzZSBxZW11X3JlYWxfaG9zdF9wYWdl
+X3NpemUgaW5zdGVhZCBvZiBnZXRwYWdlc2l6ZSgpIG9yIHN5c2NvbmYoX1NDX1BBR0VTSVpFKQoK
+PT09IE9VVFBVVCBCRUdJTiA9PT0KRVJST1I6IGxpbmUgb3ZlciA5MCBjaGFyYWN0ZXJzCiMyMjog
+RklMRTogc2NyaXB0cy9jaGVja3BhdGNoLnBsOjI5MTk6CisgICAgICAgICAgICAgICAgICAgICAg
+IEVSUk9SKCJ1c2UgcWVtdV9yZWFsX2hvc3RfcGFnZV9zaXplIGluc3RlYWQgb2YgZ2V0cGFnZXNp
+emUoKVxuIiAuICRoZXJlY3Vycik7CgpFUlJPUjogbGluZSBvdmVyIDkwIGNoYXJhY3RlcnMKIzI1
+OiBGSUxFOiBzY3JpcHRzL2NoZWNrcGF0Y2gucGw6MjkyMjoKKyAgICAgICAgICAgICAgICAgICAg
+ICAgRVJST1IoInVzZSBxZW11X3JlYWxfaG9zdF9wYWdlX3NpemUgaW5zdGVhZCBvZiBzeXNjb25m
+KF9TQ19QQUdFU0laRSlcbiIgLiAkaGVyZWN1cnIpOwoKdG90YWw6IDIgZXJyb3JzLCAwIHdhcm5p
+bmdzLCAxMiBsaW5lcyBjaGVja2VkCgpDb21taXQgMzc1MWQ3NjMzNjUzIChjaGVja3BhdGNoOiBz
+dWdndWVzdCB0byB1c2UgcWVtdV9yZWFsX2hvc3RfcGFnZV9zaXplIGluc3RlYWQgb2YgZ2V0cGFn
+ZXNpemUoKSBvciBzeXNjb25mKF9TQ19QQUdFU0laRSkpIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxl
+YXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyBy
+ZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5F
+UlMuCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEK
+CgpUaGUgZnVsbCBsb2cgaXMgYXZhaWxhYmxlIGF0Cmh0dHA6Ly9wYXRjaGV3Lm9yZy9sb2dzLzIw
+MTkxMDE3MDA0NjMzLjEzMjI5LTEtcmljaGFyZHcueWFuZ0BsaW51eC5pbnRlbC5jb20vdGVzdGlu
+Zy5jaGVja3BhdGNoLz90eXBlPW1lc3NhZ2UuCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGlj
+YWxseSBieSBQYXRjaGV3IFtodHRwczovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIg
+ZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
 
---ZGiS0Q5IWpPtfppv
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Wed, Oct 16, 2019 at 06:04:04PM +0200, Greg Kurz wrote:
-> On Wed,  9 Oct 2019 17:07:59 +1100
-> David Gibson <david@gibson.dropbear.id.au> wrote:
->=20
-> > This is a substantial rework to clean up the handling of IRQs in
-> > spapr.  It includes some cleanups to both the XICS and XIVE interrupt
-> > controller backends, as well as more to the common spapr irq handling
-> > infrastructure.
-> >=20
->=20
-> Patches up to 16 have been reviewed. Any chance you merge them before
-> soft freeze (12 days left) ?
-
-Seems reasonable, merged to ppc-for-4.2.
-
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---ZGiS0Q5IWpPtfppv
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl2ntUMACgkQbDjKyiDZ
-s5Is9w//XsVK15VRaJoqXI9QEkOwQ5CnEglA+4Pg8XbHHLcPMSfiPp1RDk8Mdm51
-gahx9kfDK28O92382I7TE7AMzmpObDUG6ofQe/ExW0+E8xz70ww5VbJ/WfLLYzQz
-WDJ1zbDROsEpud2jC7DHnZSx+BVPbqxZjgzL5naEuKXzLboDcROGL0VjvI5rQ0Ty
-PDTF2KY0W5KjzeENbKV18iuefU6S8sLBhpdj/EeqnAniKuwjPr/14R9RqSV89t8h
-Axm4Dcnh3QuIanr0qJHnTt13V/G4K5c+gmXfbUnZl6Jt/kzkq4vLRh3sDLm5Ov6m
-2JiSffjj7ycNJfI41zRZO649BTvoAUtVqfdeRrNGg+E1KJIxEn9JXZFnBfOPOs4u
-We1fIkjFBMYkC6lsXFGzoiQGZSr3gAp2C9v8REVhKuCq1rqjbLxUqbN3ObhAZWSP
-mIH1pwTjAekEPaBuMAoXzIrJCJ2GDViwlYavOuN6on76nhqqfr3DrNxwoiYThXjO
-LvyLpYK+vs8L6xBmC26hSRp0gSiWL/ays+XxSgxAumTZ04HPQjcQVktt6N8ZhV1B
-3ti4yb97LsjF6jGP0+ozr+4W3xAlstsdLK1+fV85Vl6QaOf1dUDiKv9z+D31tfwX
-hVDLFU1/yDfKjjdQpg6hOZq2kThsVQbXhxAKGPsyQf+s5hNnJN4=
-=+82w
------END PGP SIGNATURE-----
-
---ZGiS0Q5IWpPtfppv--
 
