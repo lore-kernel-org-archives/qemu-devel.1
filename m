@@ -3,83 +3,86 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 74DBDECE58E
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 09:53:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4D502ECE58E
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 09:55:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4A0D3214E0
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 09:53:30 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4A0D3214E0
+	by mail.kernel.org (Postfix) with ESMTPS id 219542089C
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 09:55:13 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 219542089C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40988 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41046 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iL2TJ-0005Hs-9n
-	for qemu-devel@archiver.kernel.org; Thu, 17 Oct 2019 05:53:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54441)
+	id 1iL2Uy-0006tM-BW
+	for qemu-devel@archiver.kernel.org; Thu, 17 Oct 2019 05:55:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54569)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1iL2S9-0004RQ-Bj
- for qemu-devel@nongnu.org; Thu, 17 Oct 2019 05:52:18 -0400
+ (envelope-from <mreitz@redhat.com>) id 1iL2TM-0005cy-Nc
+ for qemu-devel@nongnu.org; Thu, 17 Oct 2019 05:53:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1iL2S7-0005fY-N7
- for qemu-devel@nongnu.org; Thu, 17 Oct 2019 05:52:16 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:38628)
+ (envelope-from <mreitz@redhat.com>) id 1iL2TL-0006TN-Kd
+ for qemu-devel@nongnu.org; Thu, 17 Oct 2019 05:53:32 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:36976)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iL2S7-0005eX-Gz
- for qemu-devel@nongnu.org; Thu, 17 Oct 2019 05:52:15 -0400
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71])
- (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>)
+ id 1iL2TJ-0006QW-3A; Thu, 17 Oct 2019 05:53:29 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 195D7368DA
- for <qemu-devel@nongnu.org>; Thu, 17 Oct 2019 09:52:14 +0000 (UTC)
-Received: by mail-wr1-f71.google.com with SMTP id j2so660511wrg.19
- for <qemu-devel@nongnu.org>; Thu, 17 Oct 2019 02:52:14 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=RplGin3fGtgMXDdqQRrbU9VfWvpGsxgt51JrIMmknc4=;
- b=Yv4NIoqtGJmhaDTKQCP9PEdF9cVl2P8tJ2InzgS6+HGLyvX8FKvm+105DDo1PYUmgZ
- rQzyz4Wnoag1tE8MMwo0vAFEQZQrT4k/g/qAbVNJXtyKpwsjAKa/CK7myaJFLR6rD9UL
- q2nlEBOfMvVRs5PaGkMvsysXTDs1zN9xDR1CLznTuHCoFzxP1C8qos/VhZB7VTujoV39
- zoASN5LSReyH74aHMjGfqP5Co3ZArvyADfpDNvmri6Mo0pL6Mup+cNexMl5ZtaM6UjGW
- dZ9A/Cn4BveGs4zChLLky8PfKDpimedH+kfSWON8XKDeyx3JfNIIZssipYMd1QBLTtjR
- tEWg==
-X-Gm-Message-State: APjAAAWuI3xsPo3m0cfo7wgQA+eO8/ljt6TybngDPDRU0n3Y2MezdZfs
- Y3TvFSXJPOEtNfufYlGX0j0G37iRzAkySXmvK3DBNa2udxQ+FVtOkw1fLYRi6A6CsOGZs5rRKq4
- joWtGBHynuBs6byU=
-X-Received: by 2002:a1c:7ed7:: with SMTP id z206mr2083127wmc.104.1571305932795; 
- Thu, 17 Oct 2019 02:52:12 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqx4lNF+hUnLEbW/xifhdNOwd+1tDH4M+XaEiPru0tuVYqxpvt6OwHv4qMifTT2b6WyLkfoSyA==
-X-Received: by 2002:a1c:7ed7:: with SMTP id z206mr2083101wmc.104.1571305932600; 
- Thu, 17 Oct 2019 02:52:12 -0700 (PDT)
-Received: from [192.168.1.36] (14.red-88-21-201.staticip.rima-tde.net.
- [88.21.201.14])
- by smtp.gmail.com with ESMTPSA id g185sm1769014wme.10.2019.10.17.02.52.11
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Thu, 17 Oct 2019 02:52:12 -0700 (PDT)
-Subject: Re: [PATCH v10 13/15] docs/microvm.rst: document the new microvm
- machine type
-To: Sergio Lopez <slp@redhat.com>, qemu-devel@nongnu.org
-References: <20191016101241.24405-1-slp@redhat.com>
- <20191016101241.24405-14-slp@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <d981516f-f23a-47f5-d825-a101fdaaf471@redhat.com>
-Date: Thu, 17 Oct 2019 11:52:10 +0200
+ by mx1.redhat.com (Postfix) with ESMTPS id 82140882F5;
+ Thu, 17 Oct 2019 09:53:27 +0000 (UTC)
+Received: from dresden.str.redhat.com (ovpn-117-3.ams2.redhat.com
+ [10.36.117.3])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 8A48D5D712;
+ Thu, 17 Oct 2019 09:53:26 +0000 (UTC)
+Subject: Re: iotest 260 failure (linux host): "OSError: AF_UNIX path too long"
+To: Peter Maydell <peter.maydell@linaro.org>, Kevin Wolf <kwolf@redhat.com>,
+ Qemu-block <qemu-block@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
+References: <CAFEAcA-jutAw2KFBDX9v=Q7LQ8_Mj0AHB79wi74hoW6J81fbhw@mail.gmail.com>
+From: Max Reitz <mreitz@redhat.com>
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <71badd7c-a9f0-ef91-5477-623389aa52fd@redhat.com>
+Date: Thu, 17 Oct 2019 11:53:24 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.1
+ Thunderbird/68.1.0
 MIME-Version: 1.0
-In-Reply-To: <20191016101241.24405-14-slp@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <CAFEAcA-jutAw2KFBDX9v=Q7LQ8_Mj0AHB79wi74hoW6J81fbhw@mail.gmail.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="VRiQrGGLADfqXyNmqlnRjVacHURZE238p"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.28]); Thu, 17 Oct 2019 09:53:27 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 209.132.183.28
@@ -94,32 +97,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: ehabkost@redhat.com, mst@redhat.com, groug@kaod.org, kraxel@redhat.com,
- pbonzini@redhat.com, imammedo@redhat.com, sgarzare@redhat.com,
- lersek@redhat.com, rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Sergio,
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--VRiQrGGLADfqXyNmqlnRjVacHURZE238p
+Content-Type: multipart/mixed; boundary="rb8UZMG9o6kMBcUYSTLq7EcqQjwctCch4"
 
-On 10/16/19 12:12 PM, Sergio Lopez wrote:
-> +Supported devices
-> +-----------------
-> +
-> +The microvm machine type supports the following devices:
-> +
-> +- ISA bus
-> +- i8259 PIC (optional)
-> +- i8254 PIT (optional)
-> +- MC146818 RTC (optional)
-> +- One ISA serial port (optional)
-> +- LAPIC
-> +- IOAPIC (with kernel-irqchip=split by default)
-> +- kvmclock (if using KVM)
-> +- fw_cfg
-> +- Up to eight virtio-mmio devices (configured by the user)
+--rb8UZMG9o6kMBcUYSTLq7EcqQjwctCch4
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
-If we have VirtIO devices, why not use virtio-serial instead of the one 
-on the ISA bus?
+On 17.10.19 11:51, Peter Maydell wrote:
+> I just got this iotest 260 failure processing an
+> unrelated merge on my x86-64 Ubuntu box. I assume
+> it's an intermittent (have just kicked off a retry) but
+> post the backtrace in case it's of interest:
+
+I hope it=E2=80=99s intermittent, although I presume it might not be.
+
+In any case, I=E2=80=99ve recently sent a series to address this kind of =
+issue
+(https://lists.nongnu.org/archive/html/qemu-block/2019-10/msg00561.html)
+
+Max
+
+
+--rb8UZMG9o6kMBcUYSTLq7EcqQjwctCch4--
+
+--VRiQrGGLADfqXyNmqlnRjVacHURZE238p
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl2oOhQACgkQ9AfbAGHV
+z0DEwwgAoppvbxd0I62vrXfixLeEj/OABy6EpuOo2BHFplRqOA29PfOd3PiIS1LV
+65Amprw4Xkc+5JCZ7wkMDWVakmwrBC1s+6L6qlrsD13y0rwJH5yhELlR78dUUXsr
+nW2/WHQcf4XXA/nKqeKxfe9fq+nls5gQRoHdvPCrCs/Zarb59efOD3+IZ4ph4ekD
+Nt0DMT+ULCi1BTW0W00C4o1CkRWqNXNYO+YHvhKhBtyRnTCXCD3EAm4+nqODu5Jr
+TxPdJOF64eGLV0eTORWgs984IPh8g9KWmODeRaXCMXlwuntjUxOG8ur6UTWafUXR
+y+4vzZ/HHoJ5Zy127Lff3TG/OOTmOg==
+=eLLK
+-----END PGP SIGNATURE-----
+
+--VRiQrGGLADfqXyNmqlnRjVacHURZE238p--
 
