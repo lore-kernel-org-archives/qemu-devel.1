@@ -2,100 +2,109 @@ Return-Path: <SRS0=yZS3=YK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B753AFA372A
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 15:25:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 56D88FA372A
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 15:25:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 35EDB20872
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 15:25:01 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="P1cEHYG5"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 35EDB20872
+	by mail.kernel.org (Postfix) with ESMTPS id 2ACFA20872
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 15:25:41 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2ACFA20872
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50908 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50912 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iL7e7-0006bp-IG
-	for qemu-devel@archiver.kernel.org; Thu, 17 Oct 2019 11:24:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47993)
+	id 1iL7el-0007cO-RP
+	for qemu-devel@archiver.kernel.org; Thu, 17 Oct 2019 11:25:39 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47084)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1iL6qS-0000yb-GH
- for qemu-devel@nongnu.org; Thu, 17 Oct 2019 10:33:41 -0400
+ (envelope-from <thuth@redhat.com>) id 1iL6kv-0002DN-0f
+ for qemu-devel@nongnu.org; Thu, 17 Oct 2019 10:27:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1iL6qR-0005gr-1x
- for qemu-devel@nongnu.org; Thu, 17 Oct 2019 10:33:40 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:20863
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <thuth@redhat.com>) id 1iL6kt-0001Lu-95
+ for qemu-devel@nongnu.org; Thu, 17 Oct 2019 10:27:56 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:57778)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iL6qQ-0005gO-R3
- for qemu-devel@nongnu.org; Thu, 17 Oct 2019 10:33:38 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1571322817;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=0DN0b5UKbUanEX/TRvsJ4e4lLM4dURX19s46UiOAC/s=;
- b=P1cEHYG5/cNqFDyFo+GYpQNtwiqx9C1Gd8HIDvop65MP5Xz3qf2/6NhtmPXQ2uskQJBrXD
- u7fDtCsY7QN+ODaVh9hjSkScnZfmLi8sKu0pCd2MGcErJ8QWKSSTBZV3xyPeHG21h+Zp+a
- BKbz8O9/WUe/uKvcw0pTe36m0AI75r8=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-183--58yd14sN_qooLXVsA5yAQ-1; Thu, 17 Oct 2019 10:33:36 -0400
-Received: by mail-wr1-f72.google.com with SMTP id k4so1066593wru.1
- for <qemu-devel@nongnu.org>; Thu, 17 Oct 2019 07:33:36 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=brJm6Hpaai1XMyXMQedvlncKTY5kxTaja0y7tcfRAeE=;
- b=cgxPpPLN6mOgqJyykIRAmpaxeLAMjVs4YyhxHeWYF/jBZGjFfWUbHJFoQYW17rsNPO
- NhfV9JE5Cj0yTKyGP4gNHDD5MhTAlBh47dOjnxs2otLyDZSHi8XvAHB2fBEmYgjIgFLk
- ozjIcKFaykfW8RQiN7+51GD/lG+VUVUI8xwt0N15UznsqJaJMVKU6yNPrI/5fmkbYGSb
- svLWLEmEIj3LMoYP41YyLhzHpW7LR2cya0WWTub7nDJKz0M9ZUpi3vKICha/PV+ayVgF
- bWXXhXovFDuLTto7D+oKk2NBZsbP0PVTRH7un1+XQG9WmbgJ5xhJnxYe7DlE8oisMOG8
- U6KA==
-X-Gm-Message-State: APjAAAUpBd2oMsdhE1NeJhtRivOythE/n3zN2coICPqu2ttghA5qD7Hp
- hjpqCoFnLvyeS7Il68eLfjq4aM2tgILvAhT5nNrYFiA5OUiUy/1vuM0GVLkj1/fYP85aqjRX9KQ
- EPqdeCb2uPf0ZWTk=
-X-Received: by 2002:a5d:4a8d:: with SMTP id o13mr3485973wrq.227.1571322815109; 
- Thu, 17 Oct 2019 07:33:35 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqx4sU+jGXD0TSPzf+6vLvW7Nd6FtdJ31Ji9ZvfM0y+IsJRYySTfUIrpCeUOZXp5gSboXwIv8A==
-X-Received: by 2002:a5d:4a8d:: with SMTP id o13mr3485940wrq.227.1571322814596; 
- Thu, 17 Oct 2019 07:33:34 -0700 (PDT)
-Received: from [192.168.50.32] (243.red-88-26-246.staticip.rima-tde.net.
- [88.26.246.243])
- by smtp.gmail.com with ESMTPSA id f18sm2386846wrv.38.2019.10.17.07.33.33
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Thu, 17 Oct 2019 07:33:34 -0700 (PDT)
-Subject: Re: [PATCH] hw/timer/arm_mptimer.c: Undo accidental rename of
- arm_mptimer_init()
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org,
- qemu-devel@nongnu.org
-References: <20191017133331.5901-1-peter.maydell@linaro.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <b9263235-7786-2e24-943c-32626f00dd75@redhat.com>
-Date: Thu, 17 Oct 2019 16:33:31 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.1
+ (Exim 4.71) (envelope-from <thuth@redhat.com>) id 1iL6kt-0001LY-0P
+ for qemu-devel@nongnu.org; Thu, 17 Oct 2019 10:27:55 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 30AE718B20E6
+ for <qemu-devel@nongnu.org>; Thu, 17 Oct 2019 14:27:54 +0000 (UTC)
+Received: from thuth.remote.csb (dhcp-200-228.str.redhat.com [10.33.200.228])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 72D98600C8;
+ Thu, 17 Oct 2019 14:27:45 +0000 (UTC)
+Subject: Re: [PATCH v2 6/7] libqos: make the virtio-pci BAR index configurable
+To: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
+References: <20191011085611.4194-1-stefanha@redhat.com>
+ <20191011085611.4194-7-stefanha@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=thuth@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+Organization: Red Hat
+Message-ID: <158c87c0-8773-6f10-6ab8-5b6f047592db@redhat.com>
+Date: Thu, 17 Oct 2019 16:27:45 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-In-Reply-To: <20191017133331.5901-1-peter.maydell@linaro.org>
+In-Reply-To: <20191011085611.4194-7-stefanha@redhat.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-X-MC-Unique: -58yd14sN_qooLXVsA5yAQ-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.70]); Thu, 17 Oct 2019 14:27:54 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.81
+X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -107,47 +116,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Laurent Vivier <lvivier@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 10/17/19 3:33 PM, Peter Maydell wrote:
-> In commit b01422622b we did an automated rename of the ptimer_init()
-> function to ptimer_init_with_bh().  Unfortunately this caught the
-> unrelated arm_mptimer_init() function.  Undo that accidental
-> renaming.
->=20
-> Fixes: b01422622b7c7293196fdaf1dbb4f495af44ecf9
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-
+On 11/10/2019 10.56, Stefan Hajnoczi wrote:
+> The Legacy virtio-pci interface always uses BAR 0.  VIRTIO 1.0 may need
+> to use a different BAR index, so make it configurable.
+> 
+> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
 > ---
->   hw/timer/arm_mptimer.c | 4 ++--
->   1 file changed, 2 insertions(+), 2 deletions(-)
->=20
-> diff --git a/hw/timer/arm_mptimer.c b/hw/timer/arm_mptimer.c
-> index fdf97d1800f..2bf11f788c3 100644
-> --- a/hw/timer/arm_mptimer.c
-> +++ b/hw/timer/arm_mptimer.c
-> @@ -237,7 +237,7 @@ static void arm_mptimer_reset(DeviceState *dev)
->       }
->   }
->  =20
-> -static void arm_mptimer_init_with_bh(Object *obj)
-> +static void arm_mptimer_init(Object *obj)
->   {
->       ARMMPTimerState *s =3D ARM_MPTIMER(obj);
->  =20
-> @@ -319,7 +319,7 @@ static const TypeInfo arm_mptimer_info =3D {
->       .name          =3D TYPE_ARM_MPTIMER,
->       .parent        =3D TYPE_SYS_BUS_DEVICE,
->       .instance_size =3D sizeof(ARMMPTimerState),
-> -    .instance_init =3D arm_mptimer_init_with_bh,
-> +    .instance_init =3D arm_mptimer_init,
->       .class_init    =3D arm_mptimer_class_init,
->   };
->  =20
->=20
+>  tests/libqos/virtio-pci.h | 2 ++
+>  tests/libqos/virtio-pci.c | 3 ++-
+>  2 files changed, 4 insertions(+), 1 deletion(-)
+> 
+> diff --git a/tests/libqos/virtio-pci.h b/tests/libqos/virtio-pci.h
+> index b620c30451..f2d53aa377 100644
+> --- a/tests/libqos/virtio-pci.h
+> +++ b/tests/libqos/virtio-pci.h
+> @@ -25,6 +25,8 @@ typedef struct QVirtioPCIDevice {
+>      uint16_t config_msix_entry;
+>      uint64_t config_msix_addr;
+>      uint32_t config_msix_data;
+> +
+> +    uint8_t bar_idx;
 
+I think I'd rather make that an "int" instead of "uint8_t" ... but
+that's just my personal taste, so anyway:
+
+Reviewed-by: Thomas Huth <thuth@redhat.com>
 
