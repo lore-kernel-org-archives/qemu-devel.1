@@ -7,73 +7,74 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0DF3BECE58D
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 19:04:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 83EB3ECE58E
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 19:05:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C3AF22089C
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 19:04:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 43C972089C
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 19:05:48 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="DYDYv4z5"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C3AF22089C
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="qLwtHFjk"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 43C972089C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57178 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57210 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iLB4o-0006ln-Gr
-	for qemu-devel@archiver.kernel.org; Thu, 17 Oct 2019 15:04:46 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35135)
+	id 1iLB5n-0008OK-0w
+	for qemu-devel@archiver.kernel.org; Thu, 17 Oct 2019 15:05:47 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35345)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1iLArs-0001C4-N7
- for qemu-devel@nongnu.org; Thu, 17 Oct 2019 14:51:26 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1iLAs8-0001JU-Pj
+ for qemu-devel@nongnu.org; Thu, 17 Oct 2019 14:51:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1iLArq-0000sX-Vx
- for qemu-devel@nongnu.org; Thu, 17 Oct 2019 14:51:24 -0400
-Received: from mail-pf1-x441.google.com ([2607:f8b0:4864:20::441]:38366)
+ (envelope-from <richard.henderson@linaro.org>) id 1iLAs6-0000wc-Go
+ for qemu-devel@nongnu.org; Thu, 17 Oct 2019 14:51:40 -0400
+Received: from mail-pl1-x641.google.com ([2607:f8b0:4864:20::641]:36821)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1iLArq-0000s7-PM
- for qemu-devel@nongnu.org; Thu, 17 Oct 2019 14:51:22 -0400
-Received: by mail-pf1-x441.google.com with SMTP id h195so2215787pfe.5
- for <qemu-devel@nongnu.org>; Thu, 17 Oct 2019 11:51:22 -0700 (PDT)
+ id 1iLAs6-0000uL-59
+ for qemu-devel@nongnu.org; Thu, 17 Oct 2019 14:51:38 -0400
+Received: by mail-pl1-x641.google.com with SMTP id j11so1564987plk.3
+ for <qemu-devel@nongnu.org>; Thu, 17 Oct 2019 11:51:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=IBA+abtZ26hlRDDlZ8eTB3Pn4yNYwZChmFB+u2JQGOM=;
- b=DYDYv4z5rYOHKgP6fl/oD3gy6IBcwlCqU6Lzlv3YGFO/8SgQx3joZpGJThFmfmg0zW
- OkKJlj2e1FzwP+0oSvb4zOC9V3kEUMaQ85rUx/HNCgjsaQ/Y6yDYxzDF4rBhb8lvgsuJ
- DHR3tIaDWRfRCeUNirUziKF7BcSO5GsHFOenZeZYdByCKSvRZs7yjlsVcmkRRwRrOelP
- kWv2KfQj81uoYjaABTZd59k7DvZ0FwXRCTflLI7grg0vr3Xng4IFSv6BpgRkinPpT3KT
- k3YhgAN1i6OdqKwNrkiX3ONQbaJnXfaxJGUe2DY0K9wggeKOx85bGRZfHRmazbhYY0Fl
- tGzA==
+ bh=xWBixVJrplgoFEDYWsC1KvhyFbMO/zEb6ezvCN+GZN0=;
+ b=qLwtHFjka0RAuBfWznYLYokdMU6JmAewlx7MtQyQaY+cxUeLFNiS2BWWRlqM7bHH+N
+ appSYNhRgn32/i203CIH6ROoriq7MgPxwQv3d3GFvj27A7NY+GBY8GMCqnFijBikanj6
+ 22jePEC3JGoqEl1Q4knIVv9RmR0zigQacCYqmIQM5gtFuPSDpr56xJiJM7yOGkzCWZKv
+ wG+c8eBtJVXy0NBZJfZ8nDmOAuHyhChNDOhSaQlBn61R2B7iFdwcpUsg9EM5JTHkMBVv
+ zLgRE6hWqELjjDpY1L5tKaNMBKi935EDHZ3emxEGwg/v84B8Utpf8vxfQ2FSSUWwlZzA
+ sxZg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=IBA+abtZ26hlRDDlZ8eTB3Pn4yNYwZChmFB+u2JQGOM=;
- b=O/Imc6nBgL0Q0fL0LDF8RS2hZ6EuI+m9erXi9/ILflrNIsXdXsbIdL7S6BbMUfbK3S
- jXw5THa8Dpxx/DLXD17OaiuXkUD+AxXbU4NFIhU3EQIPkJH7N++GaRybHzK7cX9cTq4W
- sBhMfInCphTC/Fj8uEjbZNL/K6MyWWuq0ZITAa7XcfZJWi4oPubUi8CIKMriIFrout5p
- h5OGbw2iiS/ojOVr3DVKjHusakO0PD+tntqjglcosksMf+3c0D3TlVM4NdZRuE9se6Ul
- JFoT1whu7MSfRMiynhPstrIPNCO4QENFwHatX5w09+cUJTrAhAn8AubOFNwtY9NC4Hye
- 3eOw==
-X-Gm-Message-State: APjAAAW1AhdlE6y6lrFvCrjT0WkZbz05GUw7r7Aiz77ka/J+OEuaVTuS
- T+evUbe17RVTWgmAD6RzhSkUjxrz4b0=
-X-Google-Smtp-Source: APXvYqyVwWYfM2o9N7W3q5VNlxHpSt3mWSSauKW8wsSRDebW/2xSrQFLSUmQkFbnkoQMa5JBUn+gGw==
-X-Received: by 2002:a63:cf4d:: with SMTP id b13mr5600676pgj.396.1571338281342; 
- Thu, 17 Oct 2019 11:51:21 -0700 (PDT)
+ bh=xWBixVJrplgoFEDYWsC1KvhyFbMO/zEb6ezvCN+GZN0=;
+ b=dx3BTVBQz67Zs3NSnjYnQZBkiJtOflUambY+hxG8urs2hxX20CHR+Vxc1EY1EBlDNn
+ c3eyvWu7VebVttyE8yKXRLKuQwnsNwTZXFSCKpiCnnVXfMWa7JRcE8Wk+e+JIOdkcU1g
+ a5mjS+DDg3K8aE6lnHbJLIuS3qd4AU1nnMN1ePl+FqFFYmJzeWJHRVRlVrAe8/7porlx
+ byuI4wGO7Q5rmOIT9Mi7dUIOu7d7tvY9Aem70Uck10uaj7UjWUwd/51fXQBzc07DZxbD
+ HHmja7D7+415yfX/GaVXMDD3hYG/3bbzPTe5WuW6XqUHMEeSSFpSAUTdz28IvDWkW5iI
+ ZQ8A==
+X-Gm-Message-State: APjAAAUEI/O2qeSYs3D1v0UzjWbAgcd2DMu2gdyT3DlE57+uPVvlKQor
+ +Dsnwwh8Yz360sN4t/3aMkZoagz3r1U=
+X-Google-Smtp-Source: APXvYqw9dGHsRPI15Iy+w97ujJBYO7YlLA/SDu57cYFmvjIwEvu0znrj6Rxl+QqsDN+epxe/OWLGuQ==
+X-Received: by 2002:a17:902:8642:: with SMTP id
+ y2mr5292662plt.187.1571338289434; 
+ Thu, 17 Oct 2019 11:51:29 -0700 (PDT)
 Received: from localhost.localdomain (97-113-7-119.tukw.qwest.net.
  [97.113.7.119])
- by smtp.gmail.com with ESMTPSA id s97sm5009256pjc.4.2019.10.17.11.51.20
+ by smtp.gmail.com with ESMTPSA id s97sm5009256pjc.4.2019.10.17.11.51.28
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 17 Oct 2019 11:51:20 -0700 (PDT)
+ Thu, 17 Oct 2019 11:51:28 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v7 07/20] target/arm: Split out rebuild_hflags_a32
-Date: Thu, 17 Oct 2019 11:50:57 -0700
-Message-Id: <20191017185110.539-8-richard.henderson@linaro.org>
+Subject: [PATCH v7 13/20] target/arm: Split out arm_mmu_idx_el
+Date: Thu, 17 Oct 2019 11:51:03 -0700
+Message-Id: <20191017185110.539-14-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20191017185110.539-1-richard.henderson@linaro.org>
 References: <20191017185110.539-1-richard.henderson@linaro.org>
@@ -82,7 +83,7 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::441
+X-Received-From: 2607:f8b0:4864:20::641
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,40 +100,78 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Currently a trivial wrapper for rebuild_hflags_common_32.
+Avoid calling arm_current_el() twice.
 
 Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/arm/helper.c | 8 +++++++-
- 1 file changed, 7 insertions(+), 1 deletion(-)
+ target/arm/internals.h |  9 +++++++++
+ target/arm/helper.c    | 12 +++++++-----
+ 2 files changed, 16 insertions(+), 5 deletions(-)
 
+diff --git a/target/arm/internals.h b/target/arm/internals.h
+index 232d963875..f5313dd3d4 100644
+--- a/target/arm/internals.h
++++ b/target/arm/internals.h
+@@ -949,6 +949,15 @@ void arm_cpu_update_virq(ARMCPU *cpu);
+  */
+ void arm_cpu_update_vfiq(ARMCPU *cpu);
+ 
++/**
++ * arm_mmu_idx_el:
++ * @env: The cpu environment
++ * @el: The EL to use.
++ *
++ * Return the full ARMMMUIdx for the translation regime for EL.
++ */
++ARMMMUIdx arm_mmu_idx_el(CPUARMState *env, int el);
++
+ /**
+  * arm_mmu_idx:
+  * @env: The cpu environment
 diff --git a/target/arm/helper.c b/target/arm/helper.c
-index 296a4b2232..d1cd54cc93 100644
+index 85de96d071..3f7d3f257d 100644
 --- a/target/arm/helper.c
 +++ b/target/arm/helper.c
-@@ -11106,6 +11106,12 @@ static uint32_t rebuild_hflags_m32(CPUARMState *env, int fp_el,
-     return rebuild_hflags_common_32(env, fp_el, mmu_idx, flags);
+@@ -11026,15 +11026,12 @@ ARMMMUIdx arm_v7m_mmu_idx_for_secstate(CPUARMState *env, bool secstate)
+ }
+ #endif
+ 
+-ARMMMUIdx arm_mmu_idx(CPUARMState *env)
++ARMMMUIdx arm_mmu_idx_el(CPUARMState *env, int el)
+ {
+-    int el;
+-
+     if (arm_feature(env, ARM_FEATURE_M)) {
+         return arm_v7m_mmu_idx_for_secstate(env, env->v7m.secure);
+     }
+ 
+-    el = arm_current_el(env);
+     if (el < 2 && arm_is_secure_below_el3(env)) {
+         return ARMMMUIdx_S1SE0 + el;
+     } else {
+@@ -11042,6 +11039,11 @@ ARMMMUIdx arm_mmu_idx(CPUARMState *env)
+     }
  }
  
-+static uint32_t rebuild_hflags_a32(CPUARMState *env, int fp_el,
-+                                   ARMMMUIdx mmu_idx)
++ARMMMUIdx arm_mmu_idx(CPUARMState *env)
 +{
-+    return rebuild_hflags_common_32(env, fp_el, mmu_idx, 0);
++    return arm_mmu_idx_el(env, arm_current_el(env));
 +}
 +
- static uint32_t rebuild_hflags_a64(CPUARMState *env, int el, int fp_el,
-                                    ARMMMUIdx mmu_idx)
+ int cpu_mmu_index(CPUARMState *env, bool ifetch)
  {
-@@ -11218,7 +11224,7 @@ void cpu_get_tb_cpu_state(CPUARMState *env, target_ulong *pc,
-                 flags = FIELD_DP32(flags, TBFLAG_A32, LSPACT, 1);
-             }
-         } else {
--            flags = rebuild_hflags_common_32(env, fp_el, mmu_idx, 0);
-+            flags = rebuild_hflags_a32(env, fp_el, mmu_idx);
-         }
+     return arm_to_core_mmu_idx(arm_mmu_idx(env));
+@@ -11202,7 +11204,7 @@ static uint32_t rebuild_hflags_internal(CPUARMState *env)
+ {
+     int el = arm_current_el(env);
+     int fp_el = fp_exception_el(env, el);
+-    ARMMMUIdx mmu_idx = arm_mmu_idx(env);
++    ARMMMUIdx mmu_idx = arm_mmu_idx_el(env, el);
  
-         flags = FIELD_DP32(flags, TBFLAG_A32, THUMB, env->thumb);
+     if (is_a64(env)) {
+         return rebuild_hflags_a64(env, el, fp_el, mmu_idx);
 -- 
 2.17.1
 
