@@ -2,81 +2,63 @@ Return-Path: <SRS0=yZS3=YK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A160FECE58E
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 10:05:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B7ECFECE58E
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 10:06:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6997D20869
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 10:05:07 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="RnXINwOp"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6997D20869
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 8AF9720869
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 10:06:14 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8AF9720869
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41300 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41328 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iL2eY-0004E3-Ib
-	for qemu-devel@archiver.kernel.org; Thu, 17 Oct 2019 06:05:06 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55969)
+	id 1iL2fd-0005CV-PK
+	for qemu-devel@archiver.kernel.org; Thu, 17 Oct 2019 06:06:13 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56148)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1iL2dk-0003jy-8G
- for qemu-devel@nongnu.org; Thu, 17 Oct 2019 06:04:21 -0400
+ (envelope-from <stefanha@redhat.com>) id 1iL2f1-0004nj-Ul
+ for qemu-devel@nongnu.org; Thu, 17 Oct 2019 06:05:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1iL2dj-0004x9-1W
- for qemu-devel@nongnu.org; Thu, 17 Oct 2019 06:04:16 -0400
-Received: from mail-oi1-x22f.google.com ([2607:f8b0:4864:20::22f]:44624)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1iL2di-0004wc-SC
- for qemu-devel@nongnu.org; Thu, 17 Oct 2019 06:04:14 -0400
-Received: by mail-oi1-x22f.google.com with SMTP id w6so1615137oie.11
- for <qemu-devel@nongnu.org>; Thu, 17 Oct 2019 03:04:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=x46/Y0c5lJXtRFzt2GFc9umks5ThF0UiZW+q+cH2RpQ=;
- b=RnXINwOpPBJlW6crevhHZdf53Yicd2GnobuomIxcDF0ND++0ruiu7ZofOdz6vDWcJG
- CNBV9OVaQXYNAa+Hdla/cey+suPGOR3WRRd4XHNuPHcV7RSeqm6i0o5h6GW2Fa6GQNU2
- G4iM8Tw9ulEIDVcBkzcgrfSSpau5A4omsPCB+n+8f7WEF28833qTHmrZSdXGlWeQJja1
- ZxIyr5XttG0xStSOrbKMq8/bdePpc6eY+q0h7B/yZdXwBsq+jEQuwiHf22W2yhGdMmjd
- 2YIe0Yni6bW4lE7W6EhRKODHAlbcHHGBW0pHMa3pvn+fJkLvCKk3xq1kOsPPubsTZ+9E
- AY7g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=x46/Y0c5lJXtRFzt2GFc9umks5ThF0UiZW+q+cH2RpQ=;
- b=AIxnkhBQvcl0FYbVnBfLh0J1HNg7fa9YDDHivneXi3khKezRamkGitQ4qDoHm3DRQV
- HMJ2ScAaVg+IIYEldDIVnXvrDTI/8mb7sQIKVHsM64nA5rcsxhDRL1ajjtolfvFOlzV8
- MemLclzKBEcw2HcWMN+aaSGNDNlBQxul8R9sBB2GJAYwE3Gv86lMuPJhdShWmN8576SZ
- dtTeWQqbJT0286js0tyl/2cdw5vWctrPfd5OzF0dAErOeB04ppzNkBEr+rUP8ARF6krM
- xt6bWHgr8BpEQB6pVMnKgEf81Eu5ddZt9pOgbR9Uxtgk7gSQdrwJMNXRepsm3/16wZBQ
- WE+Q==
-X-Gm-Message-State: APjAAAV+JwdY39jdRTye6ZvTrklr8zt7V5TY0feJqneltRss+TKD1SoA
- uKWJIMpPVPCvnm/xYH9LiMWVEN6kKaLBr8jeROqXlQ==
-X-Google-Smtp-Source: APXvYqwBu6bKoROTiDWyqiMeAAbTqj9UK5eGTDGvxBObPTcm0VjFDncUZvGQ1OvCtVpx+TRj/ysDBXnx1N+ZUAfefZ8=
-X-Received: by 2002:aca:2b08:: with SMTP id i8mr2315796oik.146.1571306653982; 
- Thu, 17 Oct 2019 03:04:13 -0700 (PDT)
+ (envelope-from <stefanha@redhat.com>) id 1iL2ez-0005gE-PM
+ for qemu-devel@nongnu.org; Thu, 17 Oct 2019 06:05:35 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55360)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1iL2ez-0005fn-JN
+ for qemu-devel@nongnu.org; Thu, 17 Oct 2019 06:05:33 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 946BB89B002;
+ Thu, 17 Oct 2019 10:05:32 +0000 (UTC)
+Received: from localhost (ovpn-117-215.ams2.redhat.com [10.36.117.215])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 4965A5D9CA;
+ Thu, 17 Oct 2019 10:05:29 +0000 (UTC)
+Date: Thu, 17 Oct 2019 11:05:28 +0100
+From: Stefan Hajnoczi <stefanha@redhat.com>
+To: Misono Tomohiro <misono.tomohiro@jp.fujitsu.com>
+Subject: Re: [Virtio-fs] [PATCH 0/2] virtiofsd: Two fix for xattr operation
+Message-ID: <20191017100528.GA24790@stefanha-x1.localdomain>
+References: <20191016103754.2047-1-misono.tomohiro@jp.fujitsu.com>
 MIME-Version: 1.0
-References: <CAFEAcA-jutAw2KFBDX9v=Q7LQ8_Mj0AHB79wi74hoW6J81fbhw@mail.gmail.com>
- <71badd7c-a9f0-ef91-5477-623389aa52fd@redhat.com>
-In-Reply-To: <71badd7c-a9f0-ef91-5477-623389aa52fd@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 17 Oct 2019 11:04:02 +0100
-Message-ID: <CAFEAcA-0aYLbEoWf_ZeTxoLdKNaeFESyiuHi5KYG9kdUWaAJtg@mail.gmail.com>
-Subject: Re: iotest 260 failure (linux host): "OSError: AF_UNIX path too long"
-To: Max Reitz <mreitz@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::22f
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="bg08WKrSYDhXBjb5"
+Content-Disposition: inline
+In-Reply-To: <20191016103754.2047-1-misono.tomohiro@jp.fujitsu.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.67]); Thu, 17 Oct 2019 10:05:32 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,27 +70,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>,
- Qemu-block <qemu-block@nongnu.org>
+Cc: virtio-fs@redhat.com, mszeredi@redhat.com, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, 17 Oct 2019 at 10:53, Max Reitz <mreitz@redhat.com> wrote:
->
-> On 17.10.19 11:51, Peter Maydell wrote:
-> > I just got this iotest 260 failure processing an
-> > unrelated merge on my x86-64 Ubuntu box. I assume
-> > it's an intermittent (have just kicked off a retry) but
-> > post the backtrace in case it's of interest:
->
-> I hope it=E2=80=99s intermittent, although I presume it might not be.
 
-It has indeed failed again. Is there some way to get the
-build to pick a shorter test directory name, or to get
-'make check' to skip the iotests, so I can proceed with
-testing until that fix lands?
+--bg08WKrSYDhXBjb5
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-thanks
--- PMM
+On Wed, Oct 16, 2019 at 07:37:52PM +0900, Misono Tomohiro wrote:
+> Hello,
+>=20
+> I test xattr operation on virtiofs using xfstest generic/062
+> (with -o xattr option and XFS backend) and see some problems.
+>=20
+> These patches fixes the two of the problems.
+>=20
+> The remaining problems are:
+>  1. we cannot xattr to block device created by mknod
+>     which does not have actual device (since open in virtiofsd fails)
+>  2. we cannot xattr to symbolic link
+>=20
+> I don't think 1 is a big problem but can we fix 2?
+
+Sorry, I don't know the answer.  Maybe it would be necessary to add a
+new O_SYMLINK open flag to open(2) so that fgetxattr()/fsetxattr()
+operations can be performed.  A kernel change like that would take some
+time to get accepted upstream and shipped by distros, but it might be
+the only way since the current syscall interface doesn't seem to offer a
+way to do this.
+
+>=20
+> Misono Tomohiro (2):
+>   virtiofsd: Avoid process hang when doing xattr operation to FIFO
+>   virtiofsd: Allow setxattr operation to directry
+>=20
+>  contrib/virtiofsd/passthrough_ll.c | 8 ++++----
+>  1 file changed, 4 insertions(+), 4 deletions(-)
+>=20
+> --=20
+> 2.21.0
+>=20
+> _______________________________________________
+> Virtio-fs mailing list
+> Virtio-fs@redhat.com
+> https://www.redhat.com/mailman/listinfo/virtio-fs
+
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+
+--bg08WKrSYDhXBjb5
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl2oPOgACgkQnKSrs4Gr
+c8jxtgf/WI9gWbbOf82Q7BK4jYeVjCxtU+4YSMk2a9IWhkctkK6irnIYUsj9Aw/X
+EqQ8by0dZmAYqDV6e9rtW1gaKS0wAOEYhaf5hh+mKAi+NXT+bYyfKp00yePClObI
+N0lEO9oVNnDlXag5T3BBfgN/Nrw9StUlBhY9S8eOYsl9nhBgiJJSpbpzYK6FsvMw
+TtkR1MRGf90GGgDXkAeKvbUgVnT+TLEchHogS3TwUHBeKxX3+EvR0kCuw+NoUolB
+VUyd9JnhSuNswXiY4ghlJfPBI1K42pohzHF8Ax39Qq0aLN573hSEV0VmM5vKWiMB
+dprF3PxuPcRZt355mz5puhlUqVKoFQ==
+=No4s
+-----END PGP SIGNATURE-----
+
+--bg08WKrSYDhXBjb5--
 
