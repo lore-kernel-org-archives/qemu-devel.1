@@ -2,55 +2,72 @@ Return-Path: <SRS0=yZS3=YK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 52D13FA3735
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 11:28:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 31A27ECE58E
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 11:30:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2AC5120854
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 11:28:51 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2AC5120854
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=rt-rk.com
+	by mail.kernel.org (Postfix) with ESMTPS id 0339020854
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 11:30:04 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0339020854
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44256 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44271 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iL3xa-0000gx-BN
-	for qemu-devel@archiver.kernel.org; Thu, 17 Oct 2019 07:28:50 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46642)
+	id 1iL3yk-0002MW-Uk
+	for qemu-devel@archiver.kernel.org; Thu, 17 Oct 2019 07:30:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46769)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <stefan.brankovic@rt-rk.com>) id 1iL3wc-0008F9-LT
- for qemu-devel@nongnu.org; Thu, 17 Oct 2019 07:27:52 -0400
+ (envelope-from <david@redhat.com>) id 1iL3xD-0000ZL-SF
+ for qemu-devel@nongnu.org; Thu, 17 Oct 2019 07:28:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <stefan.brankovic@rt-rk.com>) id 1iL3wa-0007Jx-UQ
- for qemu-devel@nongnu.org; Thu, 17 Oct 2019 07:27:50 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:33396 helo=mail.rt-rk.com)
+ (envelope-from <david@redhat.com>) id 1iL3xC-0007VO-41
+ for qemu-devel@nongnu.org; Thu, 17 Oct 2019 07:28:27 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34128)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <stefan.brankovic@rt-rk.com>)
- id 1iL3wa-0007Ir-Jo
- for qemu-devel@nongnu.org; Thu, 17 Oct 2019 07:27:48 -0400
-Received: from localhost (localhost [127.0.0.1])
- by mail.rt-rk.com (Postfix) with ESMTP id 7B2FB1A21DB;
- Thu, 17 Oct 2019 13:27:43 +0200 (CEST)
-X-Virus-Scanned: amavisd-new at rt-rk.com
-Received: from rtrkw870-lin.domain.local (rtrkw870-lin.domain.local
- [10.10.14.77])
- by mail.rt-rk.com (Postfix) with ESMTPSA id F167F1A21C3;
- Thu, 17 Oct 2019 13:27:42 +0200 (CEST)
-From: Stefan Brankovic <stefan.brankovic@rt-rk.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v7 2/3] target/ppc: Optimize emulation of vpkpx instruction
-Date: Thu, 17 Oct 2019 13:27:38 +0200
-Message-Id: <1571311659-15556-3-git-send-email-stefan.brankovic@rt-rk.com>
-X-Mailer: git-send-email 2.7.4
-In-Reply-To: <1571311659-15556-1-git-send-email-stefan.brankovic@rt-rk.com>
-References: <1571311659-15556-1-git-send-email-stefan.brankovic@rt-rk.com>
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [fuzzy]
-X-Received-From: 89.216.37.149
+ (Exim 4.71) (envelope-from <david@redhat.com>) id 1iL3xB-0007V8-Py
+ for qemu-devel@nongnu.org; Thu, 17 Oct 2019 07:28:26 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id AFE1C3078468;
+ Thu, 17 Oct 2019 11:28:24 +0000 (UTC)
+Received: from [10.36.117.42] (ovpn-117-42.ams2.redhat.com [10.36.117.42])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 0393C5D9CA;
+ Thu, 17 Oct 2019 11:28:22 +0000 (UTC)
+Subject: Re: [Bug 1847232] [NEW] qemu TCG in s390x mode issue with calculating
+ HASH
+From: David Hildenbrand <david@redhat.com>
+To: Ivan Warren <ivan@vmfacility.fr>, Cornelia Huck <cohuck@redhat.com>,
+ Bug 1847232 <1847232@bugs.launchpad.net>
+References: <157053356610.22354.6751604707489617887.malonedeb@gac.canonical.com>
+ <20191008141135.11f5a065.cohuck@redhat.com>
+ <61ce859f-0817-0eba-7eb8-2c16b3e73889@redhat.com>
+ <7a661e58-72df-94bc-4712-f306ce5ee7c6@vmfacility.fr>
+ <8ada8acb-d2ce-a09d-6c9a-b758360edcb2@redhat.com>
+ <4115ee76-8f74-cce2-348b-44752cd402ed@redhat.com>
+Organization: Red Hat GmbH
+Message-ID: <d5147fcd-ff24-160a-ee00-59482538f502@redhat.com>
+Date: Thu, 17 Oct 2019 13:28:22 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.1
+MIME-Version: 1.0
+In-Reply-To: <4115ee76-8f74-cce2-348b-44752cd402ed@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.41]); Thu, 17 Oct 2019 11:28:24 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -62,197 +79,160 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: stefan.brankovic@rt-rk.com, richard.henderson@linaro.org,
- david@gibson.dropbear.id.au
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Optimize altivec instruction vpkpx (Vector Pack Pixel).
-Rearranges 8 pixels coded in 6-5-5 pattern (4 from each source register)
-into contigous array of bits in the destination register.
+On 14.10.19 12:22, David Hildenbrand wrote:
+> On 14.10.19 11:53, David Hildenbrand wrote:
+>> On 08.10.19 16:11, Ivan Warren wrote:
+>>>
+>>> On 10/8/2019 3:35 PM, David Hildenbrand wrote:
+>>>> On 08.10.19 14:11, Cornelia Huck wrote:
+>>>>> On Tue, 08 Oct 2019 11:19:25 -0000
+>>>>> Ivan Warren via <qemu-devel@nongnu.org> wrote:
+>>>>>
+>>>>>> Public bug reported:
+>>>>>>
+>>>>>> When using go on s390x on Debian x64 (buster) (host) and debian s3=
+90x
+>>>>>> (sid) (guest) I run into the following problem :
+>>>>>>
+>>>>>> The following occurs while trying to build a custom project :
+>>>>>>
+>>>>>> go: github.com/FactomProject/basen@v0.0.0-20150613233007-fe3947df7=
+16e:
+>>>>>> Get
+>>>>>> https://proxy.golang.org/github.com/%21factom%21project/basen/@v/v=
+0.0.0-20150613233007-fe3947df716e.mod:
+>>>>>> local error: tls: bad record MAC
+>>>>>>
+>>>>>> Doing a git bisect I find that this problem only occurs on and aft=
+er
+>>>>>> commit 08ef92d556c584c7faf594ff3af46df456276e1b
+>>>>>>
+>>>>>> Before that commit, all works fine. Past this commit, build always
+>>>>>> fails.
+>>>>> What version are you using? Current master?
+>>>>>
+>>>>> Can you please share your command line?
+>>>>>
+>>>>>> Without any proof, It looks like a hash calculation bug related to=
+ using
+>>>>>> z/Arch vector facilities...
+>>>>> Not an unreasonable guess, cc:ing David in case he has seen that be=
+fore.
+>>>>>
+>>>> Can you reproduce with "-cpu qemu,vx=3Doff" added to the QEMU comman=
+d
+>>>> line? Could be some fallout from vector instruction support. Current=
+ly
+>>>> ill, will have a look when I'm feeling better.
+>>>
+>>> Reposted with a reply all... (sorry for the duplicates)
+>>>
+>>> So it does !
+>>>
+>>>
+>>> My qemu command line is now (forget the odd funny networking things..=
+)
+>>>
+>>> qemu-system-s390x \
+>>>     =C2=A0=C2=A0=C2=A0 -drive
+>>> file=3DDEB002.IMG.NEW,discard=3Dunmap,cache=3Dwriteback,id=3Ddrive-0,=
+if=3Dnone \
+>>>     =C2=A0=C2=A0=C2=A0 -device virtio-scsi-ccw,id=3Dvirtio-scsi-0 \
+>>>     =C2=A0=C2=A0=C2=A0 -device scsi-hd,id=3Dscsi-hd-0,drive=3Ddrive-0=
+ \
+>>>     =C2=A0=C2=A0=C2=A0 -m 8G \
+>>>     =C2=A0=C2=A0=C2=A0 -net nic,macaddr=3D52:54:00:00:00:02 \
+>>>     =C2=A0=C2=A0=C2=A0 -net tap,ifname=3Dtaparm,script=3Dno \
+>>>     =C2=A0=C2=A0=C2=A0 -nographic -accel tcg,thread=3Dmulti \
+>>>     =C2=A0=C2=A0=C2=A0 -monitor unix:ms,server,nowait \
+>>>     =C2=A0=C2=A0=C2=A0 -cpu qemu,vx=3Doff \=C2=A0 ##### THAT WAS ADDE=
+D as instructed - without it
+>>> everything goes kaput !
+>>>     =C2=A0=C2=A0=C2=A0 -smp 12
+>>>
+>>> And using the latest bleeding edge qemu from github, my build works (=
+the
+>>> problem goes away).
+>>>
+>>> So the z/Arch vector instructions may have a glitch is a venue to
+>>> consider.. Probably one that couldn't be screened through conventiona=
+l
+>>> methods.
+>>>
+>>> I'm not that versed into z/Arch vector instruction, but if there
+>>> anything I can help with, I will !
+>>
+>> I'll have to reproduce, can you outline the steps needed to trigger
+>> this? (never had to build a go project before #luckyme ( ;) )). It loo=
+ks
+>> like https://github.com/FactomProject/basen is getting pulled in from
+>> some other project?
+>>
+>=20
+> I just tried with Fedora 31 Nightly using "go get"
+>=20
+> [root@f31 ~]# go get -v -d github.com/FactomProject/factom
+> github.com/FactomProject/factom (download)
+> github.com/FactomProject/btcutil (download)
+> github.com/FactomProject/ed25519 (download)
+> github.com/FactomProject/go-bip32 (download)
+> github.com/FactomProject/btcutilecc (download)
+> package golang.org/x/crypto/ripemd160: unrecognized import path "golang=
+.org/x/crypto/ripemd160" (https fetch: Get https://golang.org/x/crypto/ri=
+pemd160?go-get=3D1: local error: tls: bad record MAC)
+> github.com/FactomProject/go-bip39 (download)
+> package golang.org/x/crypto/pbkdf2: unrecognized import path "golang.or=
+g/x/crypto/pbkdf2" (https fetch: Get https://golang.org/x/crypto/pbkdf2?g=
+o-get=3D1: local error: tls: bad record MAC)
+> github.com/FactomProject/go-bip44 (download)
+> github.com/FactomProject/netki-go-partner-client (download)
+> github.com/FactomProject/go-simplejson (download)
+>=20
+> With vx=3Doff:
+>=20
+> [root@f31 ~]# go get -v -d github.com/FactomProject/factom
+> github.com/FactomProject/factom (download)
+> github.com/FactomProject/btcutil (download)
+> github.com/FactomProject/ed25519 (download)
+> github.com/FactomProject/go-bip32 (download)
+> github.com/FactomProject/basen (download)
+> github.com/FactomProject/btcutilecc (download)
+> get "golang.org/x/crypto/ripemd160": found meta tag get.metaImport{Pref=
+ix:"golang.org/x/crypto", VCS:"git", RepoRoot:"https://go.googlesource.co=
+m/crypto"} at //golang.org/x/crypto/ripemd160?go-get=3D1
+> get "golang.org/x/crypto/ripemd160": verifying non-authoritative meta t=
+ag
+> golang.org/x/crypto (download)
+> github.com/FactomProject/go-bip39 (download)
+> github.com/FactomProject/go-bip44 (download)
+> github.com/FactomProject/netki-go-partner-client (download)
+> github.com/FactomProject/go-simplejson (download)
+>=20
+>=20
+> That should be sufficient to identify the instruction. Might take some =
+time, though. E.g.,
+> the HASH calculation in the kernel works just fine.
+>=20
 
-In each iteration of outer loop, the instruction is to be done with
-the 6-5-5 pack for 2 pixels of each doubleword element of each
-source register. The first thing to be done in outer loop is
-choosing which doubleword element of which register is to be used
-in current iteration and it is to be placed in avr variable. The
-next step is to perform 6-5-5 pack of pixels on avr variable in inner
-for loop(2 iterations, 1 for each pixel) and save result in tmp variable.
-In the end of outer for loop, the result is merged in variable called
-result and saved in appropriate doubleword element of vD if the whole
-doubleword is finished(every second iteration). The outer loop has 4
-iterations.
+By now I am pretty sure the code that gets triggered is
 
-Signed-off-by: Stefan Brankovic <stefan.brankovic@rt-rk.com>
----
- target/ppc/helper.h                 |  1 -
- target/ppc/int_helper.c             | 21 --------
- target/ppc/translate/vmx-impl.inc.c | 99 ++++++++++++++++++++++++++++++++++++-
- 3 files changed, 98 insertions(+), 23 deletions(-)
+src/vendor/golang.org/x/crypto/poly1305/sum_s390x.s
 
-diff --git a/target/ppc/helper.h b/target/ppc/helper.h
-index 281e54f..b489b38 100644
---- a/target/ppc/helper.h
-+++ b/target/ppc/helper.h
-@@ -258,7 +258,6 @@ DEF_HELPER_4(vpkudus, void, env, avr, avr, avr)
- DEF_HELPER_4(vpkuhum, void, env, avr, avr, avr)
- DEF_HELPER_4(vpkuwum, void, env, avr, avr, avr)
- DEF_HELPER_4(vpkudum, void, env, avr, avr, avr)
--DEF_HELPER_3(vpkpx, void, avr, avr, avr)
- DEF_HELPER_5(vmhaddshs, void, env, avr, avr, avr, avr)
- DEF_HELPER_5(vmhraddshs, void, env, avr, avr, avr, avr)
- DEF_HELPER_5(vmsumuhm, void, env, avr, avr, avr, avr)
-diff --git a/target/ppc/int_helper.c b/target/ppc/int_helper.c
-index cd00f5e..f910c11 100644
---- a/target/ppc/int_helper.c
-+++ b/target/ppc/int_helper.c
-@@ -1262,27 +1262,6 @@ void helper_vpmsumd(ppc_avr_t *r, ppc_avr_t *a, ppc_avr_t *b)
- #else
- #define PKBIG 0
- #endif
--void helper_vpkpx(ppc_avr_t *r, ppc_avr_t *a, ppc_avr_t *b)
--{
--    int i, j;
--    ppc_avr_t result;
--#if defined(HOST_WORDS_BIGENDIAN)
--    const ppc_avr_t *x[2] = { a, b };
--#else
--    const ppc_avr_t *x[2] = { b, a };
--#endif
--
--    VECTOR_FOR_INORDER_I(i, u64) {
--        VECTOR_FOR_INORDER_I(j, u32) {
--            uint32_t e = x[i]->u32[j];
--
--            result.u16[4 * i + j] = (((e >> 9) & 0xfc00) |
--                                     ((e >> 6) & 0x3e0) |
--                                     ((e >> 3) & 0x1f));
--        }
--    }
--    *r = result;
--}
- 
- #define VPK(suffix, from, to, cvt, dosat)                               \
-     void helper_vpk##suffix(CPUPPCState *env, ppc_avr_t *r,             \
-diff --git a/target/ppc/translate/vmx-impl.inc.c b/target/ppc/translate/vmx-impl.inc.c
-index a428ef3..3550ffa 100644
---- a/target/ppc/translate/vmx-impl.inc.c
-+++ b/target/ppc/translate/vmx-impl.inc.c
-@@ -579,6 +579,103 @@ static void trans_lvsr(DisasContext *ctx)
- }
- 
- /*
-+ * vpkpx VRT,VRA,VRB - Vector Pack Pixel
-+ *
-+ * Rearranges 8 pixels coded in 6-5-5 pattern (4 from each source register)
-+ * into contigous array of bits in the destination register.
-+ */
-+static void trans_vpkpx(DisasContext *ctx)
-+{
-+    int VT = rD(ctx->opcode);
-+    int VA = rA(ctx->opcode);
-+    int VB = rB(ctx->opcode);
-+    TCGv_i64 tmp = tcg_temp_new_i64();
-+    TCGv_i64 shifted = tcg_temp_new_i64();
-+    TCGv_i64 avr = tcg_temp_new_i64();
-+    TCGv_i64 result = tcg_temp_new_i64();
-+    TCGv_i64 result1 = tcg_temp_new_i64();
-+    TCGv_i64 result2 = tcg_temp_new_i64();
-+    int64_t mask1 = 0x1fULL;
-+    int64_t mask2 = 0x1fULL << 5;
-+    int64_t mask3 = 0x3fULL << 10;
-+    int i, j;
-+    /*
-+     * In each iteration do the 6-5-5 pack for 2 pixels of each doubleword
-+     * element of each source register.
-+     */
-+    for (i = 0; i < 4; i++) {
-+        switch (i) {
-+        case 0:
-+            /*
-+             * Get high doubleword of vA to perform 6-5-5 pack of pixels
-+             * 1 and 2.
-+             */
-+            get_avr64(avr, VA, true);
-+            tcg_gen_movi_i64(result, 0x0ULL);
-+            break;
-+        case 1:
-+            /*
-+             * Get low doubleword of vA to perform 6-5-5 pack of pixels
-+             * 3 and 4.
-+             */
-+            get_avr64(avr, VA, false);
-+            break;
-+        case 2:
-+            /*
-+             * Get high doubleword of vB to perform 6-5-5 pack of pixels
-+             * 5 and 6.
-+             */
-+            get_avr64(avr, VB, true);
-+            tcg_gen_movi_i64(result, 0x0ULL);
-+            break;
-+        case 3:
-+            /*
-+             * Get low doubleword of vB to perform 6-5-5 pack of pixels
-+             * 7 and 8.
-+             */
-+            get_avr64(avr, VB, false);
-+            break;
-+        }
-+        /* Perform the packing for 2 pixels(each iteration for 1). */
-+        tcg_gen_movi_i64(tmp, 0x0ULL);
-+        for (j = 0; j < 2; j++) {
-+            tcg_gen_shri_i64(shifted, avr, (j * 16 + 3));
-+            tcg_gen_andi_i64(shifted, shifted, mask1 << (j * 16));
-+            tcg_gen_or_i64(tmp, tmp, shifted);
-+
-+            tcg_gen_shri_i64(shifted, avr, (j * 16 + 6));
-+            tcg_gen_andi_i64(shifted, shifted, mask2 << (j * 16));
-+            tcg_gen_or_i64(tmp, tmp, shifted);
-+
-+            tcg_gen_shri_i64(shifted, avr, (j * 16 + 9));
-+            tcg_gen_andi_i64(shifted, shifted, mask3 << (j * 16));
-+            tcg_gen_or_i64(tmp, tmp, shifted);
-+        }
-+        if ((i == 0) || (i == 2)) {
-+            tcg_gen_shli_i64(tmp, tmp, 32);
-+        }
-+        tcg_gen_or_i64(result, result, tmp);
-+        if (i == 1) {
-+            /* Place packed pixels 1:4 to high doubleword of vD. */
-+            tcg_gen_mov_i64(result1, result);
-+        }
-+        if (i == 3) {
-+            /* Place packed pixels 5:8 to low doubleword of vD. */
-+            tcg_gen_mov_i64(result2, result);
-+        }
-+    }
-+    set_avr64(VT, result1, true);
-+    set_avr64(VT, result2, false);
-+
-+    tcg_temp_free_i64(tmp);
-+    tcg_temp_free_i64(shifted);
-+    tcg_temp_free_i64(avr);
-+    tcg_temp_free_i64(result);
-+    tcg_temp_free_i64(result1);
-+    tcg_temp_free_i64(result2);
-+}
-+
-+/*
-  * vsl VRT,VRA,VRB - Vector Shift Left
-  *
-  * Shifting left 128 bit value of vA by value specified in bits 125-127 of vB.
-@@ -1063,7 +1160,7 @@ GEN_VXFORM_ENV(vpksdus, 7, 21);
- GEN_VXFORM_ENV(vpkshss, 7, 6);
- GEN_VXFORM_ENV(vpkswss, 7, 7);
- GEN_VXFORM_ENV(vpksdss, 7, 23);
--GEN_VXFORM(vpkpx, 7, 12);
-+GEN_VXFORM_TRANS(vpkpx, 7, 12);
- GEN_VXFORM_ENV(vsum4ubs, 4, 24);
- GEN_VXFORM_ENV(vsum4sbs, 4, 28);
- GEN_VXFORM_ENV(vsum4shs, 4, 25);
--- 
-2.7.4
+in the go repository.
 
+I started writing unit tests for all involved vector instructions, no=20
+luck so far. Could also be some side-effect/BUG of another instruction.
+
+Will let you know once I know more :)
+
+--=20
+
+Thanks,
+
+David / dhildenb
 
