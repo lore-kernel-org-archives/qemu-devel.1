@@ -2,64 +2,76 @@ Return-Path: <SRS0=yZS3=YK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E7F82FA3735
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 09:41:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A4C0FA3730
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 09:53:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B91CC222C1
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 09:41:09 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B91CC222C1
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 6296021835
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 09:53:13 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="QvC+Ifn1"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6296021835
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40784 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40984 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iL2HM-0001Uc-V2
-	for qemu-devel@archiver.kernel.org; Thu, 17 Oct 2019 05:41:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53365)
+	id 1iL2T2-0004pW-Ge
+	for qemu-devel@archiver.kernel.org; Thu, 17 Oct 2019 05:53:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54351)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <stefanha@redhat.com>) id 1iL2Gh-00013K-13
- for qemu-devel@nongnu.org; Thu, 17 Oct 2019 05:40:27 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1iL2Rq-00045q-1R
+ for qemu-devel@nongnu.org; Thu, 17 Oct 2019 05:51:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <stefanha@redhat.com>) id 1iL2GZ-0003TK-OL
- for qemu-devel@nongnu.org; Thu, 17 Oct 2019 05:40:24 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:56472)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1iL2GZ-0003SM-IA
- for qemu-devel@nongnu.org; Thu, 17 Oct 2019 05:40:19 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 4E98F7652E;
- Thu, 17 Oct 2019 09:40:18 +0000 (UTC)
-Received: from localhost (ovpn-117-215.ams2.redhat.com [10.36.117.215])
- by smtp.corp.redhat.com (Postfix) with ESMTP id CDBDB5D71C;
- Thu, 17 Oct 2019 09:40:14 +0000 (UTC)
-Date: Thu, 17 Oct 2019 10:40:13 +0100
-From: Stefan Hajnoczi <stefanha@redhat.com>
-To: Wei Yang <richardw.yang@linux.intel.com>
-Subject: Re: [Patch v2] checkpatch: sugguest to use qemu_real_host_page_size
- instead of getpagesize() or sysconf(_SC_PAGESIZE)
-Message-ID: <20191017094013.GE23557@stefanha-x1.localdomain>
-References: <20191017004633.13229-1-richardw.yang@linux.intel.com>
+ (envelope-from <peter.maydell@linaro.org>) id 1iL2Ro-0005RQ-Cp
+ for qemu-devel@nongnu.org; Thu, 17 Oct 2019 05:51:57 -0400
+Received: from mail-oi1-x231.google.com ([2607:f8b0:4864:20::231]:42904)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1iL2Ro-0005Qp-6y
+ for qemu-devel@nongnu.org; Thu, 17 Oct 2019 05:51:56 -0400
+Received: by mail-oi1-x231.google.com with SMTP id i185so1597313oif.9
+ for <qemu-devel@nongnu.org>; Thu, 17 Oct 2019 02:51:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:from:date:message-id:subject:to;
+ bh=2DZMTNhuY6bZVod6dcL5n/43rTrIL7Z2A8hzh+el0Ww=;
+ b=QvC+Ifn199XeRdGQO3UktqcNkfbSZY42d1XEmLXa+gqpemSaI9LnLQjcB5fsCOTpmF
+ L+eEYWVXXj+asjFhBqo2IDmRNXy2B33yg4pXs9mzBCT4SeUgSnf5A+1R2m9gOjHEALaC
+ upHKL6Kd3vC6T6CUcECzq2iiL5Sjh8JG6vnq6niPjw12+KWmAxtNjwzSB3p33KwK9mdr
+ gp+W48T+Et8UHBRX2h3llKY1KSbwg4n8TGaphudBJuIoPdAlkvrgpBPxTGmx3MVmXrPx
+ Udk8Uz+Q+llA0wlM2VoGaLlT4C4rhCHPV7UiM+MMvu05016Q4Po2yl5hVndoim30Rkn/
+ Wm/Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
+ bh=2DZMTNhuY6bZVod6dcL5n/43rTrIL7Z2A8hzh+el0Ww=;
+ b=FaupPV7hcQwuuh7lvdataWYwBIIy8kYxgON/YCvein8/93291nheors/F4wYF/K4lX
+ 8cGliejlLBh8ztBhFeTnF0ILBQsVF1pO2cGGXESA+FZnDYdjpWQ6e79NYIwjIbGI3qus
+ N5Kbi8hR9xpFTJn7RUtBirlgbiG7iK0EOj/tStCY1Ml6NHrrvQL02HByyp0iRG3Gu9WT
+ D2zqD9z1C+Mff6f907rEKSY//Q8khKZzSBvxk6Nj9SlT0p7f1UKyNX/GFH93F8IIsr1E
+ ma9LbsPcBRHPpvmcn6fZuBb+F+2M7eHM1bAlkstcA0BiTBq7fXVZGUspKM9/7coHtYc0
+ HDGg==
+X-Gm-Message-State: APjAAAXpNofyJYS/FLP1geTILnd/cABDtP6ejvpTvD1JqIbHrGOUNjbF
+ Fy0yVUTQm2GyCckGjnvMt62qS7XpKO2LbQtD4VQ2/A==
+X-Google-Smtp-Source: APXvYqyyT2KAO5HWl+Wb0E/N/VLvFGGhZdqwEbV5EP2K7gcop24sOL7F5cRLBbJj1P+pv53DZb52B2E5ShJxfySVVtw=
+X-Received: by 2002:a05:6808:9:: with SMTP id u9mr2424622oic.98.1571305914975; 
+ Thu, 17 Oct 2019 02:51:54 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="ryJZkp9/svQ58syV"
-Content-Disposition: inline
-In-Reply-To: <20191017004633.13229-1-richardw.yang@linux.intel.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.26]); Thu, 17 Oct 2019 09:40:18 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.132.183.28
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 17 Oct 2019 10:51:43 +0100
+Message-ID: <CAFEAcA-jutAw2KFBDX9v=Q7LQ8_Mj0AHB79wi74hoW6J81fbhw@mail.gmail.com>
+Subject: iotest 260 failure (linux host): "OSError: AF_UNIX path too long"
+To: Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, 
+ Qemu-block <qemu-block@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::231
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -71,47 +83,143 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: thuth@redhat.com, berrange@redhat.com,
- Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org,
- pbonzini@redhat.com, philmd@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+I just got this iotest 260 failure processing an
+unrelated merge on my x86-64 Ubuntu box. I assume
+it's an intermittent (have just kicked off a retry) but
+post the backtrace in case it's of interest:
 
---ryJZkp9/svQ58syV
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
 
-On Thu, Oct 17, 2019 at 08:46:33AM +0800, Wei Yang wrote:
-> Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
-> CC: Richard Henderson <richard.henderson@linaro.org>
-> CC: Stefan Hajnoczi <stefanha@redhat.com>
->=20
-> ---
-> v2: add "\b" for better match, suggested by Richard Henderson <richard.he=
-nderson@linaro.org>
-> ---
->  scripts/checkpatch.pl | 6 ++++++
->  1 file changed, 6 insertions(+)
+  TEST    iotest-qcow2: 260 [fail]
+QEMU          --
+"/home/petmay01/linaro/qemu-for-merges/build/alldbg/tests/qemu-iotests/../../x86_64-softmmu/qemu-system-x86_64"
+-nodefaults -display none -machine accel=qtest
+QEMU_IMG      --
+"/home/petmay01/linaro/qemu-for-merges/build/alldbg/tests/qemu-iotests/../../qemu-img"
+QEMU_IO       --
+"/home/petmay01/linaro/qemu-for-merges/build/alldbg/tests/qemu-iotests/../../qemu-io"
+ --cache writeback -f qcow2
+QEMU_NBD      --
+"/home/petmay01/linaro/qemu-for-merges/build/alldbg/tests/qemu-iotests/../../qemu-nbd"
+IMGFMT        -- qcow2 (compat=1.1)
+IMGPROTO      -- file
+PLATFORM      -- Linux/x86_64 e104462 4.15.0-60-generic
+TEST_DIR      --
+/home/petmay01/linaro/qemu-for-merges/build/alldbg/tests/qemu-iotests/scratch
+SOCKET_SCM_HELPER --
+/home/petmay01/linaro/qemu-for-merges/build/alldbg/tests/qemu-iotests/socket_scm_helper
 
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+--- /home/petmay01/linaro/qemu-for-merges/tests/qemu-iotests/260.out
+ 2019-10-15 19:38:40.208504628 +0100
++++ /home/petmay01/linaro/qemu-for-merges/build/alldbg/tests/qemu-iotests/260.out.bad
+  2019-10-15 20:01:22.658839136 +0100
+@@ -1,52 +1,19 @@
 
---ryJZkp9/svQ58syV
-Content-Type: application/pgp-signature; name="signature.asc"
+ Testcase non-persistent without restart
 
------BEGIN PGP SIGNATURE-----
+-{"execute": "block-dirty-bitmap-add", "arguments": {"name":
+"bitmap0", "node": "drive0", "persistent": false}}
+-{"return": {}}
+-initial bitmap: name=bitmap0 dirty-clusters=1
+-{"execute": "blockdev-snapshot-sync", "arguments": {"device":
+"drive0", "format": "qcow2", "snapshot-file": "TEST_DIR/PID-top"}}
+-{"return": {}}
+-check that no bitmaps are in snapshot: not found
+-{"execute": "block-commit", "arguments": {"device": "drive0", "top":
+"TEST_DIR/PID-top"}}
+-{"return": {}}
+-{"data": {"device": "drive0", "len": 65536, "offset": 65536, "speed":
+0, "type": "commit"}, "event": "BLOCK_JOB_READY", "timestamp":
+{"microseconds": "USECS", "seconds": "SECS"}}
+-{"execute": "block-job-complete", "arguments": {"device": "drive0"}}
+-{"return": {}}
+-{"data": {"device": "drive0", "len": 65536, "offset": 65536, "speed":
+0, "type": "commit"}, "event": "BLOCK_JOB_COMPLETED", "timestamp":
+{"microseconds": "USECS", "seconds": "SECS"}}
+-check bitmap after commit: name=bitmap0 dirty-clusters=2
+-check updated bitmap: name=bitmap0 dirty-clusters=3
+-
+-Testcase persistent without restart
+-
+-{"execute": "block-dirty-bitmap-add", "arguments": {"name":
+"bitmap0", "node": "drive0", "persistent": true}}
+-{"return": {}}
+-initial bitmap: name=bitmap0 dirty-clusters=1
+-{"execute": "blockdev-snapshot-sync", "arguments": {"device":
+"drive0", "format": "qcow2", "snapshot-file": "TEST_DIR/PID-top"}}
+-{"return": {}}
+-check that no bitmaps are in snapshot: not found
+-{"execute": "block-commit", "arguments": {"device": "drive0", "top":
+"TEST_DIR/PID-top"}}
+-{"return": {}}
+-{"data": {"device": "drive0", "len": 65536, "offset": 65536, "speed":
+0, "type": "commit"}, "event": "BLOCK_JOB_READY", "timestamp":
+{"microseconds": "USECS", "seconds": "SECS"}}
+-{"execute": "block-job-complete", "arguments": {"device": "drive0"}}
+-{"return": {}}
+-{"data": {"device": "drive0", "len": 65536, "offset": 65536, "speed":
+0, "type": "commit"}, "event": "BLOCK_JOB_COMPLETED", "timestamp":
+{"microseconds": "USECS", "seconds": "SECS"}}
+-check bitmap after commit: name=bitmap0 dirty-clusters=2
+-check updated bitmap: name=bitmap0 dirty-clusters=3
+-
+-Testcase persistent with restart
+-
+-{"execute": "block-dirty-bitmap-add", "arguments": {"name":
+"bitmap0", "node": "drive0", "persistent": true}}
+-{"return": {}}
+-initial bitmap: name=bitmap0 dirty-clusters=1
+-{"execute": "blockdev-snapshot-sync", "arguments": {"device":
+"drive0", "format": "qcow2", "snapshot-file": "TEST_DIR/PID-top"}}
+-{"return": {}}
+-check that no bitmaps are in snapshot: not found
+-... Restart ...
+-{"execute": "block-commit", "arguments": {"device": "drive0", "top":
+"TEST_DIR/PID-top"}}
+-{"return": {}}
+-{"data": {"device": "drive0", "len": 65536, "offset": 65536, "speed":
+0, "type": "commit"}, "event": "BLOCK_JOB_READY", "timestamp":
+{"microseconds": "USECS", "seconds": "SECS"}}
+-{"execute": "block-job-complete", "arguments": {"device": "drive0"}}
+-{"return": {}}
+-{"data": {"device": "drive0", "len": 65536, "offset": 65536, "speed":
+0, "type": "commit"}, "event": "BLOCK_JOB_COMPLETED", "timestamp":
+{"microseconds": "USECS", "seconds": "SECS"}}
+-check bitmap after commit: name=bitmap0 dirty-clusters=2
+-check updated bitmap: name=bitmap0 dirty-clusters=3
++Traceback (most recent call last):
++  File "260", line 87, in <module>
++    test(persistent=False, restart=False)
++  File "260", line 48, in test
++    vm.launch()
++  File "/home/petmay01/linaro/qemu-for-merges/tests/qemu-iotests/../../python/qemu/machine.py",
+line 294, in launch
++    self._launch()
++  File "/home/petmay01/linaro/qemu-for-merges/tests/qemu-iotests/../../python/qemu/machine.py",
+line 311, in _launch
++    self._pre_launch()
++  File "/home/petmay01/linaro/qemu-for-merges/tests/qemu-iotests/../../python/qemu/qtest.py",
+line 103, in _pre_launch
++    super(QEMUQtestMachine, self)._pre_launch()
++  File "/home/petmay01/linaro/qemu-for-merges/tests/qemu-iotests/../../python/qemu/machine.py",
+line 262, in _pre_launch
++    server=True)
++  File "/home/petmay01/linaro/qemu-for-merges/tests/qemu-iotests/../../python/qemu/qmp.py",
+line 60, in __init__
++    self.__sock.bind(self.__address)
++OSError: AF_UNIX path too long
+  TEST    iotest-qcow2: 265
+  TEST    iotest-qcow2: 267
+  TEST    iotest-qcow2: 268
+Not run: 220
+Failures: 260
+Failed 1 of 109 iotests
 
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl2oNv0ACgkQnKSrs4Gr
-c8jdCQf/TMqTuiNZ8n3MikUR74g6eBG93MlsiWUHmKO1et+23FuVo6m91k7znxZ/
-b8q2qgs7CzgD8dOUBC3EVwc4j/kmCzeoWSm1xJqMd7dm1sdZtuCugfHpDZ48X9n8
-3hQvW8s0ZbEEopeAu332opJZlflK2YHfwhLgveaN8bnJR9SBUt/jLWa7ZPCebGGb
-jlWQDJxjjb8jvI/xSJFqSzlpNMP10p/9Ht9kfNaUyddga16P7EoO2JxE/0qBKqsd
-BPrEFV/X9gv7qPUfsVJdC5Fvk7oUn9iv4goWcq2JHvEweC4wEs1rIyGVDoJfjXJb
-38Z4zmQrkklFnt/XcmC0yOxdY0h6bw==
-=LKFl
------END PGP SIGNATURE-----
 
---ryJZkp9/svQ58syV--
+
+thanks
+-- PMM
 
