@@ -2,80 +2,110 @@ Return-Path: <SRS0=yZS3=YK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 23F7DECE58E
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 15:08:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8FEFAECE58E
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 15:10:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E327820820
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 15:08:04 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="BAqReE4K"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E327820820
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 5EE3820820
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 15:10:10 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5EE3820820
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50376 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50484 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iL7Nj-0001pV-I7
-	for qemu-devel@archiver.kernel.org; Thu, 17 Oct 2019 11:08:03 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47437)
+	id 1iL7Pk-0004Zc-PT
+	for qemu-devel@archiver.kernel.org; Thu, 17 Oct 2019 11:10:08 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44134)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1iL6nU-0005fI-Si
- for qemu-devel@nongnu.org; Thu, 17 Oct 2019 10:30:37 -0400
+ (envelope-from <thuth@redhat.com>) id 1iL6Wx-0000uk-4a
+ for qemu-devel@nongnu.org; Thu, 17 Oct 2019 10:13:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1iL6nT-0003NI-GH
- for qemu-devel@nongnu.org; Thu, 17 Oct 2019 10:30:36 -0400
-Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:46402)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1iL6nT-0003MP-AM
- for qemu-devel@nongnu.org; Thu, 17 Oct 2019 10:30:35 -0400
-Received: by mail-ot1-x341.google.com with SMTP id 89so2022952oth.13
- for <qemu-devel@nongnu.org>; Thu, 17 Oct 2019 07:30:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=9zFqbX1Trp+6JVLcAAM9mbHykBac0O8F4pvk15u1K10=;
- b=BAqReE4KMz98xenQ9ptl7wTFO4o8VFR13UZVQEBFGgoRlRwEovRfF+Jh2ptTEMGFn/
- zTkIK/t9nJeiRppBJHrOM54VWBKsEtqJdt/nS5aBrnGlb9Nu05XEPUYGeb9F858Vr1N2
- M0IyJZ9/iKbdoW8duOssd4XkhsWE26tdWH24Se+sfeHzJPW3N8DBh2F+fs579xO5FAMw
- LeYteDfKRXmha2YZnJn/0NbQLg+q6BcCHqk2CxmeWtnlHMjALSoYTtxSZ8xSv6Iwa7aK
- gLQeVF0LXtRQmvPKirSWvdSHA/FtnCrGIRLd909Nezb2y+w1WAjaEplYa/TdXnxxJZJT
- PQsg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=9zFqbX1Trp+6JVLcAAM9mbHykBac0O8F4pvk15u1K10=;
- b=qqR9+bES3pdUr4pbf5cIMj3WHHnlRrGCFAyG8Up4LqP1qmqeOTrXXBDSfsfvfsXNFT
- ezreg+rviKBurJQxNt1YtA3XZFPd8a954Gl0xCCpuxVA2FFwhkQvbNk664sddavA8t3E
- GB9ADCsfFnnupTBtT8lMl4eFJpZpP5hbFTxoZwHfzgCyhNcT1OJY62MhvRKuEwulLqeu
- ZrNKjiGGbXx9N957E5bl0DJzj3q4vHn7CiIEDtI51G8D7TrhiRJMUTbFe2A3xPkfDnI0
- Ry8Cz1X9m4jj9haXe7axPpshXIMbqwtIcROw8lsO2XyNXC9kCwbOLjPc62o+em71Do7J
- VaLw==
-X-Gm-Message-State: APjAAAX7pwSgMMlL5Q0wBpCF/m7wH772V+cM4VSIceYjSitbr3D4VtAP
- +kTjSuH8tbEg9vR0JP2fi4ImP45eZ4wPdY+LL7mylw==
-X-Google-Smtp-Source: APXvYqzy7u1ldQm0JP2rhU8LYqSf04qyFx6ERE4lHoNO6pcjymKtjZ+6l2w8yTvve8yCly7Y7cIJiIiuUrSSDlKeeO4=
-X-Received: by 2002:a9d:30c1:: with SMTP id r1mr3359342otg.91.1571322633748;
- Thu, 17 Oct 2019 07:30:33 -0700 (PDT)
+ (envelope-from <thuth@redhat.com>) id 1iL6Ws-0000sD-JF
+ for qemu-devel@nongnu.org; Thu, 17 Oct 2019 10:13:30 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:51140)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <thuth@redhat.com>) id 1iL6Wq-0000qS-Ia
+ for qemu-devel@nongnu.org; Thu, 17 Oct 2019 10:13:25 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 41FE01DA2
+ for <qemu-devel@nongnu.org>; Thu, 17 Oct 2019 14:13:23 +0000 (UTC)
+Received: from thuth.remote.csb (dhcp-200-228.str.redhat.com [10.33.200.228])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id B77751001B0B;
+ Thu, 17 Oct 2019 14:13:17 +0000 (UTC)
+Subject: Re: [PATCH v2 5/7] libqos: expose common virtqueue setup/cleanup
+ functions
+To: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
+References: <20191011085611.4194-1-stefanha@redhat.com>
+ <20191011085611.4194-6-stefanha@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=thuth@redhat.com; prefer-encrypt=mutual; keydata=
+ mQINBFH7eUwBEACzyOXKU+5Pcs6wNpKzrlJwzRl3VGZt95VCdb+FgoU9g11m7FWcOafrVRwU
+ yYkTm9+7zBUc0sW5AuPGR/dp3pSLX/yFWsA/UB4nJsHqgDvDU7BImSeiTrnpMOTXb7Arw2a2
+ 4CflIyFqjCpfDM4MuTmzTjXq4Uov1giGE9X6viNo1pxyEpd7PanlKNnf4PqEQp06X4IgUacW
+ tSGj6Gcns1bCuHV8OPWLkf4hkRnu8hdL6i60Yxz4E6TqlrpxsfYwLXgEeswPHOA6Mn4Cso9O
+ 0lewVYfFfsmokfAVMKWzOl1Sr0KGI5T9CpmRfAiSHpthhHWnECcJFwl72NTi6kUcUzG4se81
+ O6n9d/kTj7pzTmBdfwuOZ0YUSqcqs0W+l1NcASSYZQaDoD3/SLk+nqVeCBB4OnYOGhgmIHNW
+ 0CwMRO/GK+20alxzk//V9GmIM2ACElbfF8+Uug3pqiHkVnKqM7W9/S1NH2qmxB6zMiJUHlTH
+ gnVeZX0dgH27mzstcF786uPcdEqS0KJuxh2kk5IvUSL3Qn3ZgmgdxBMyCPciD/1cb7/Ahazr
+ 3ThHQXSHXkH/aDXdfLsKVuwDzHLVSkdSnZdt5HHh75/NFHxwaTlydgfHmFFwodK8y/TjyiGZ
+ zg2Kje38xnz8zKn9iesFBCcONXS7txENTzX0z80WKBhK+XSFJwARAQABtB5UaG9tYXMgSHV0
+ aCA8dGh1dGhAcmVkaGF0LmNvbT6JAjgEEwECACIFAlVgX6oCGwMGCwkIBwMCBhUIAgkKCwQW
+ AgMBAh4BAheAAAoJEC7Z13T+cC21EbIP/ii9cvT2HHGbFRl8HqGT6+7Wkb+XLMqJBMAIGiQK
+ QIP3xk1HPTsLfVG0ao4hy/oYkGNOP8+ubLnZen6Yq3zAFiMhQ44lvgigDYJo3Ve59gfe99KX
+ EbtB+X95ODARkq0McR6OAsPNJ7gpEUzfkQUUJTXRDQXfG/FX303Gvk+YU0spm2tsIKPl6AmV
+ 1CegDljzjycyfJbk418MQmMu2T82kjrkEofUO2a24ed3VGC0/Uz//XCR2ZTo+vBoBUQl41BD
+ eFFtoCSrzo3yPFS+w5fkH9NT8ChdpSlbNS32NhYQhJtr9zjWyFRf0Zk+T/1P7ECn6gTEkp5k
+ ofFIA4MFBc/fXbaDRtBmPB0N9pqTFApIUI4vuFPPO0JDrII9dLwZ6lO9EKiwuVlvr1wwzsgq
+ zJTPBU3qHaUO4d/8G+gD7AL/6T4zi8Jo/GmjBsnYaTzbm94lf0CjXjsOX3seMhaE6WAZOQQG
+ tZHAO1kAPWpaxne+wtgMKthyPLNwelLf+xzGvrIKvLX6QuLoWMnWldu22z2ICVnLQChlR9d6
+ WW8QFEpo/FK7omuS8KvvopFcOOdlbFMM8Y/8vBgVMSsK6fsYUhruny/PahprPbYGiNIhKqz7
+ UvgyZVl4pBFjTaz/SbimTk210vIlkDyy1WuS8Zsn0htv4+jQPgo9rqFE4mipJjy/iboDuQIN
+ BFH7eUwBEAC2nzfUeeI8dv0C4qrfCPze6NkryUflEut9WwHhfXCLjtvCjnoGqFelH/PE9NF4
+ 4VPSCdvD1SSmFVzu6T9qWdcwMSaC+e7G/z0/AhBfqTeosAF5XvKQlAb9ZPkdDr7YN0a1XDfa
+ +NgA+JZB4ROyBZFFAwNHT+HCnyzy0v9Sh3BgJJwfpXHH2l3LfncvV8rgFv0bvdr70U+On2XH
+ 5bApOyW1WpIG5KPJlDdzcQTyptOJ1dnEHfwnABEfzI3dNf63rlxsGouX/NFRRRNqkdClQR3K
+ gCwciaXfZ7ir7fF0u1N2UuLsWA8Ei1JrNypk+MRxhbvdQC4tyZCZ8mVDk+QOK6pyK2f4rMf/
+ WmqxNTtAVmNuZIwnJdjRMMSs4W4w6N/bRvpqtykSqx7VXcgqtv6eqoDZrNuhGbekQA0sAnCJ
+ VPArerAZGArm63o39me/bRUQeQVSxEBmg66yshF9HkcUPGVeC4B0TPwz+HFcVhheo6hoJjLq
+ knFOPLRj+0h+ZL+D0GenyqD3CyuyeTT5dGcNU9qT74bdSr20k/CklvI7S9yoQje8BeQAHtdV
+ cvO8XCLrpGuw9SgOS7OP5oI26a0548M4KldAY+kqX6XVphEw3/6U1KTf7WxW5zYLTtadjISB
+ X9xsRWSU+Yqs3C7oN5TIPSoj9tXMoxZkCIHWvnqGwZ7JhwARAQABiQIfBBgBAgAJBQJR+3lM
+ AhsMAAoJEC7Z13T+cC21hPAQAIsBL9MdGpdEpvXs9CYrBkd6tS9mbaSWj6XBDfA1AEdQkBOn
+ ZH1Qt7HJesk+qNSnLv6+jP4VwqK5AFMrKJ6IjE7jqgzGxtcZnvSjeDGPF1h2CKZQPpTw890k
+ fy18AvgFHkVk2Oylyexw3aOBsXg6ukN44vIFqPoc+YSU0+0QIdYJp/XFsgWxnFIMYwDpxSHS
+ 5fdDxUjsk3UBHZx+IhFjs2siVZi5wnHIqM7eK9abr2cK2weInTBwXwqVWjsXZ4tq5+jQrwDK
+ cvxIcwXdUTLGxc4/Z/VRH1PZSvfQxdxMGmNTGaXVNfdFZjm4fz0mz+OUi6AHC4CZpwnsliGV
+ ODqwX8Y1zic9viSTbKS01ZNp175POyWViUk9qisPZB7ypfSIVSEULrL347qY/hm9ahhqmn17
+ Ng255syASv3ehvX7iwWDfzXbA0/TVaqwa1YIkec+/8miicV0zMP9siRcYQkyTqSzaTFBBmqD
+ oiT+z+/E59qj/EKfyce3sbC9XLjXv3mHMrq1tKX4G7IJGnS989E/fg6crv6NHae9Ckm7+lSs
+ IQu4bBP2GxiRQ+NV3iV/KU3ebMRzqIC//DCOxzQNFNJAKldPe/bKZMCxEqtVoRkuJtNdp/5a
+ yXFZ6TfE1hGKrDBYAm4vrnZ4CXFSBDllL59cFFOJCkn4Xboj/aVxxJxF30bn
+Organization: Red Hat
+Message-ID: <8779d790-84d7-7041-9915-d9da3a922176@redhat.com>
+Date: Thu, 17 Oct 2019 16:13:16 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-References: <20191014150133.14318-1-ehabkost@redhat.com>
-In-Reply-To: <20191014150133.14318-1-ehabkost@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 17 Oct 2019 15:30:22 +0100
-Message-ID: <CAFEAcA-FRU_WTh8zWLZJKVxoMWLQHYDTpzh8OiwgS465yR_BUQ@mail.gmail.com>
-Subject: Re: [PATCH] sphinx: Use separate doctree directories for different
- builders
-To: Eduardo Habkost <ehabkost@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::341
+In-Reply-To: <20191011085611.4194-6-stefanha@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.71]); Thu, 17 Oct 2019 14:13:23 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,30 +117,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
- QEMU Developers <qemu-devel@nongnu.org>
+Cc: Laurent Vivier <lvivier@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, 14 Oct 2019 at 16:01, Eduardo Habkost <ehabkost@redhat.com> wrote:
->
-> sphinx-build is buggy when multiple processes are using the same
-> doctree directory in parallel.  See the 3-year-old Sphinx bug
-> report at: https://github.com/sphinx-doc/sphinx/issues/2946
->
-> Instead of avoiding parallel builds or adding some kind of
-> locking, I'm using the simplest solution: just using a different
-> doctree cache for each builder.
->
-> Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+On 11/10/2019 10.56, Stefan Hajnoczi wrote:
+> The VIRTIO 1.0 code will need to perform additional steps but it will
+> reuse the common virtqueue setup/cleanup code.  Make these functions
+> public.
+> 
+> Make sure to invoke callbacks via QVirtioBus instead of directly calling
+> the virtio-pci Legacy versions of these functions.
+> 
+> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
 > ---
->  Makefile | 5 ++++-
->  1 file changed, 4 insertions(+), 1 deletion(-)
+>  tests/libqos/virtio-pci.h |  8 ++++++++
+>  tests/libqos/virtio-pci.c | 19 ++++++++++---------
+>  2 files changed, 18 insertions(+), 9 deletions(-)
 
-
-Applied to master as a buildfix, thanks.
-
--- PMM
+Reviewed-by: Thomas Huth <thuth@redhat.com>
 
