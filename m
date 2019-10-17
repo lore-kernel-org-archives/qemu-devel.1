@@ -2,75 +2,79 @@ Return-Path: <SRS0=yZS3=YK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 29BC5ECE58E
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 12:39:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 63D0EFA372A
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 12:48:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E91382082C
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 12:39:35 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E91382082C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 2DC1020854
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 12:48:51 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="XZwiViVE"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2DC1020854
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46154 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46358 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iL543-00021X-0E
-	for qemu-devel@archiver.kernel.org; Thu, 17 Oct 2019 08:39:35 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56330)
+	id 1iL5D0-00070Z-9n
+	for qemu-devel@archiver.kernel.org; Thu, 17 Oct 2019 08:48:50 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57558)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <casantos@redhat.com>) id 1iL522-00088P-58
- for qemu-devel@nongnu.org; Thu, 17 Oct 2019 08:37:31 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1iL5Bm-0006Gj-UQ
+ for qemu-devel@nongnu.org; Thu, 17 Oct 2019 08:47:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <casantos@redhat.com>) id 1iL51z-00070M-OU
- for qemu-devel@nongnu.org; Thu, 17 Oct 2019 08:37:28 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:17309)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <casantos@redhat.com>) id 1iL51z-0006zo-J1
- for qemu-devel@nongnu.org; Thu, 17 Oct 2019 08:37:27 -0400
-Received: from mail-qk1-f197.google.com (mail-qk1-f197.google.com
- [209.85.222.197])
- (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id BDABE83F45
- for <qemu-devel@nongnu.org>; Thu, 17 Oct 2019 12:37:25 +0000 (UTC)
-Received: by mail-qk1-f197.google.com with SMTP id s28so1988811qkm.5
- for <qemu-devel@nongnu.org>; Thu, 17 Oct 2019 05:37:25 -0700 (PDT)
+ (envelope-from <peter.maydell@linaro.org>) id 1iL5Bj-0002OI-Rz
+ for qemu-devel@nongnu.org; Thu, 17 Oct 2019 08:47:34 -0400
+Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:40722)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1iL5Bj-0002Nr-Ji
+ for qemu-devel@nongnu.org; Thu, 17 Oct 2019 08:47:31 -0400
+Received: by mail-oi1-x243.google.com with SMTP id k9so2004258oib.7
+ for <qemu-devel@nongnu.org>; Thu, 17 Oct 2019 05:47:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=0lnNRYmX4oZQoNtlYcwmEpfp6gY49DYWNQDO6djXtnY=;
+ b=XZwiViVE33Z50pQmYgl6sYTpD0ytamd3VEv9h6idlOlbkcMEvX9JVL1vksQETXJ9N0
+ 4bzAwBh3NITMpPRSC0RCxWJv21YZ3hHAznrUA25JVUFUTi5bQsRbYDhnlxowFbzkIC+r
+ ubVfTAJzSI/ngyTL2DlwydN2N5Z1sMlwDOgUs8GStExm4/1DGSWtzrp1VKrUjpo7Wy7C
+ c8q1hp2eiN8C5YQ1Zj+lgWxnLAAWLmoZB4LAKf40SAO8Q2jCEZnv8ehH0s68RT6scaGv
+ WdS/eE+Dzj8K3/WAF70QZZst0E8Zea5jyXI5NovKMp7T60Kj36TE9dHO4xjXOhkcBLy4
+ qhEw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id;
- bh=k4bv22+6vrvmE7LRTGqHXn7bDo6l5gcFE05UN7e9g8Y=;
- b=cB3GgIsP6UCR3H4bQ0FQmDrv2KYzFNzKSmWtSnRXJ3xRQKTGtk5K3bWr1nYv6Q70OJ
- 6mKa1kyMx/fCu46ftAELeaOrJ5iAeYIcJ4ZCUzIQRdB/EOJQn7F1H0ghVtUNomlvRNlc
- pPRko05gbOkJpNCXskMc7kO+SObe4vfkfpG9EwqTVGfI3SwyivV/RT3SscJB4CS0cf3f
- OWpjLlLcc92aOFIDjnmECQrkShS1ksBxP+7lnMZ/n2mh32dtvrGvrpVHwVSCUaYByM25
- 7SgTWie1JHg+0+tyukIrot80nXHD20Bmqeb8Iiahodwp1sJpryiV+OLQNybNFCIO/D80
- Tiiw==
-X-Gm-Message-State: APjAAAWIbzBYPA+bgD+4phEAa2a6OLzcCAZmu98vLhcLhbCExwNPhUum
- 6babNJ5GXE54bY9K6Sf5qgrYlrjUnIRC5bpucQx94IPzaFh7z4fWLOh/H4DINJ6eq/kmxADQC+2
- 56W54oaUytE1VaFc=
-X-Received: by 2002:aed:3c67:: with SMTP id u36mr3513798qte.142.1571315844976; 
- Thu, 17 Oct 2019 05:37:24 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqzRB4JleuNeb5TiK5uWS7hNhdSBS9cabcD1YUM1fTN1XoCG33nKqOhsnPYti0t2pRJZ75rABw==
-X-Received: by 2002:aed:3c67:: with SMTP id u36mr3513778qte.142.1571315844725; 
- Thu, 17 Oct 2019 05:37:24 -0700 (PDT)
-Received: from casantos.remote.csb ([177.18.44.193])
- by smtp.gmail.com with ESMTPSA id g31sm1242159qte.78.2019.10.17.05.37.22
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 17 Oct 2019 05:37:24 -0700 (PDT)
-From: casantos@redhat.com
-To: qemu-devel@nongnu.org
-Subject: [PATCH] util/cacheinfo: fix crash when compiling with uClibc
-Date: Thu, 17 Oct 2019 09:37:13 -0300
-Message-Id: <20191017123713.30192-1-casantos@redhat.com>
-X-Mailer: git-send-email 2.18.1
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.132.183.28
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=0lnNRYmX4oZQoNtlYcwmEpfp6gY49DYWNQDO6djXtnY=;
+ b=JE62/hvkYBzowB5+NdPPC+ttBqSLr5Ghs3nxg0Pa1zRNlfivr1LweUKTJR3eHuhsrF
+ GoCVTl+XcftVHxH9UEBu/ul1PhZirZunZE3kfeod9elxzgDsnCUI8kxl1cZYVkY5daYy
+ JfkTWGfJrEFQ6hb1RYzWrgMMU4bpinTyfHCtAijIaHEPJ4dcFeYFx2CtkUx/flS4C6fL
+ TmK8H8VPfjdqy25IqbGevB2T/PzihRCsDxyMOEQBPbo1/Q01zC+2zE3VeBNprIvuyj5F
+ QqDRl0WAjngPTW/Q9FoRL1ObA0RRCxnyWUSmzu1pVVAa8wKZ9M8SQDDGOKLcEBBf4TCo
+ 7cfA==
+X-Gm-Message-State: APjAAAUF7nIX3mK+jeMfw5g2DDNK7qNnJNol8HAx7B5aoM9APADqUJfk
+ H/afGOgeivnmySqVg9OZsOgS2A9yHj0DO8PBDubM3Q==
+X-Google-Smtp-Source: APXvYqxcm+7c9tYvv8Vdbw4ZCqpDfS5TKh2N2CtPQsyrVW+u/KrqUXOfZWtzd2yJKdTK5QgmexMQfeLm/nY8PuTB+Ts=
+X-Received: by 2002:aca:3b41:: with SMTP id i62mr2931910oia.48.1571316450457; 
+ Thu, 17 Oct 2019 05:47:30 -0700 (PDT)
+MIME-Version: 1.0
+References: <20191017123713.30192-1-casantos@redhat.com>
+In-Reply-To: <20191017123713.30192-1-casantos@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 17 Oct 2019 13:47:18 +0100
+Message-ID: <CAFEAcA9dMRBtDs6QSXGVv_bNhtu5wnGKLvMxr2YuoWM=yomGDg@mail.gmail.com>
+Subject: Re: [PATCH] util/cacheinfo: fix crash when compiling with uClibc
+To: casantos@redhat.com
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::243
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -82,49 +86,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Carlos Santos <casantos@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Carlos Santos <casantos@redhat.com>
+On Thu, 17 Oct 2019 at 13:39, <casantos@redhat.com> wrote:
+>
+> From: Carlos Santos <casantos@redhat.com>
+>
+> uClibc defines _SC_LEVEL1_ICACHE_LINESIZE and _SC_LEVEL1_DCACHE_LINESIZE
+> but the corresponding sysconf calls returns -1, which is a valid result,
+> meaning that the limit is indeterminate.
+>
+> Handle this situation using the fallback values instead of crashing due
+> to an assertion failure.
+>
+> Signed-off-by: Carlos Santos <casantos@redhat.com>
+> ---
+>  util/cacheinfo.c | 10 ++++++++--
+>  1 file changed, 8 insertions(+), 2 deletions(-)
+>
+> diff --git a/util/cacheinfo.c b/util/cacheinfo.c
+> index ea6f3e99bf..d94dc6adc8 100644
+> --- a/util/cacheinfo.c
+> +++ b/util/cacheinfo.c
+> @@ -93,10 +93,16 @@ static void sys_cache_info(int *isize, int *dsize)
+>  static void sys_cache_info(int *isize, int *dsize)
+>  {
+>  # ifdef _SC_LEVEL1_ICACHE_LINESIZE
+> -    *isize = sysconf(_SC_LEVEL1_ICACHE_LINESIZE);
+> +    int tmp_isize = (int) sysconf(_SC_LEVEL1_ICACHE_LINESIZE);
 
-uClibc defines _SC_LEVEL1_ICACHE_LINESIZE and _SC_LEVEL1_DCACHE_LINESIZE
-but the corresponding sysconf calls returns -1, which is a valid result,
-meaning that the limit is indeterminate.
+Do we need the cast here ?
 
-Handle this situation using the fallback values instead of crashing due
-to an assertion failure.
+> +    if (tmp_isize > 0) {
+> +        *isize = tmp_isize;
+> +    }
+>  # endif
+>  # ifdef _SC_LEVEL1_DCACHE_LINESIZE
+> -    *dsize = sysconf(_SC_LEVEL1_DCACHE_LINESIZE);
+> +    int tmp_dsize = (int) sysconf(_SC_LEVEL1_DCACHE_LINESIZE);
+> +    if (tmp_dsize > 0) {
+> +        *dsize = tmp_dsize;
+> +    }
+>  # endif
+>  }
+>  #endif /* sys_cache_info */
+> --
 
-Signed-off-by: Carlos Santos <casantos@redhat.com>
----
- util/cacheinfo.c | 10 ++++++++--
- 1 file changed, 8 insertions(+), 2 deletions(-)
-
-diff --git a/util/cacheinfo.c b/util/cacheinfo.c
-index ea6f3e99bf..d94dc6adc8 100644
---- a/util/cacheinfo.c
-+++ b/util/cacheinfo.c
-@@ -93,10 +93,16 @@ static void sys_cache_info(int *isize, int *dsize)
- static void sys_cache_info(int *isize, int *dsize)
- {
- # ifdef _SC_LEVEL1_ICACHE_LINESIZE
--    *isize = sysconf(_SC_LEVEL1_ICACHE_LINESIZE);
-+    int tmp_isize = (int) sysconf(_SC_LEVEL1_ICACHE_LINESIZE);
-+    if (tmp_isize > 0) {
-+        *isize = tmp_isize;
-+    }
- # endif
- # ifdef _SC_LEVEL1_DCACHE_LINESIZE
--    *dsize = sysconf(_SC_LEVEL1_DCACHE_LINESIZE);
-+    int tmp_dsize = (int) sysconf(_SC_LEVEL1_DCACHE_LINESIZE);
-+    if (tmp_dsize > 0) {
-+        *dsize = tmp_dsize;
-+    }
- # endif
- }
- #endif /* sys_cache_info */
--- 
-2.18.1
-
+thanks
+-- PMM
 
