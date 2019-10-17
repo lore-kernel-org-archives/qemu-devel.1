@@ -2,80 +2,80 @@ Return-Path: <SRS0=yZS3=YK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 15576CA9EB3
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 23:07:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 63927CA9EB3
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 23:08:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C1CC12089C
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 23:07:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 19CC721D7A
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 23:08:13 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BplDj5SS"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C1CC12089C
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TddYRqK4"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 19CC721D7A
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33926 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34004 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iLErD-0001pC-Pq
-	for qemu-devel@archiver.kernel.org; Thu, 17 Oct 2019 19:06:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41130)
+	id 1iLEsO-0003Ns-B2
+	for qemu-devel@archiver.kernel.org; Thu, 17 Oct 2019 19:08:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41145)
  by lists.gnu.org with esmtp (Exim 4.90_1)
  (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1iLEiu-0000kl-Qm
- for qemu-devel@nongnu.org; Thu, 17 Oct 2019 18:58:26 -0400
+ id 1iLEiw-0000pU-UB
+ for qemu-devel@nongnu.org; Thu, 17 Oct 2019 18:58:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
  (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1iLEis-0002RI-MW
- for qemu-devel@nongnu.org; Thu, 17 Oct 2019 18:58:24 -0400
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:36669)
+ id 1iLEiu-0002Sd-Sb
+ for qemu-devel@nongnu.org; Thu, 17 Oct 2019 18:58:26 -0400
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:37839)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1iLEis-0002Qh-Eo; Thu, 17 Oct 2019 18:58:22 -0400
-Received: by mail-wr1-x442.google.com with SMTP id w18so3573721wrt.3;
- Thu, 17 Oct 2019 15:58:22 -0700 (PDT)
+ id 1iLEiu-0002SI-KW; Thu, 17 Oct 2019 18:58:24 -0400
+Received: by mail-wr1-x443.google.com with SMTP id p14so4144721wro.4;
+ Thu, 17 Oct 2019 15:58:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=qV4TP2j98+fYZFc2JMpmFae2oOSeawDZWNXGLNyTYjo=;
- b=BplDj5SSrP2fBJXD05CrW1W6kinP7ywFSeP/c5DEh/Kke0uOK/v8iUsSx4X3jlJnM+
- wqy1c7doGeKgsmU0o5HPpJeCqA7DDqw1Lik+dm6nOuHL7mFPAE3HQ0eqIfigdbt0LXRH
- YAH/xVHmCUzU/+BHG1148XwjqpmKDoigbO+lEjWkHAa48G6CME1/B76oX5FxhBLLzFXg
- GaiZGqFSBeB07MhnJB99MKNSjLhyRUuXY1G1BJzr/JupzppEt5zd1JhO91EGbFMU8vyr
- vzaByrCHwNZgqmvkuJ6c+u0Vp2S1HOf8h9ifsHhPrEx862maT6S9lu73L24r/eOXCsMA
- eydQ==
+ bh=A6i2oQoY030V1ibxvwKbd3JNI8/xljifPg8xnDM8bpc=;
+ b=TddYRqK4pjYaWEwXdwK/nje98MV+a6JTtudrFNjsb4T+3M55bMOmvtxtX4h5FFOP5Y
+ MFoDX655F+PPaDV5FbvYlInrXYk8/gSu932XViyQM3VU8XCqEKBZGiRIcNQPvLeOtKWu
+ LIddyIvpLizpBh16pTqvlauv37qUuJLVFSI9RmQjvn/nmwl9jZ2R7wM3LgwCJyxth5lc
+ N6kZljLn6c9IAJGlfWYB6WVbbqlCia8BvcBtuG+CaM8NIxd3QMvYPjTyoflWl0eC5Jpw
+ t7viHR55f05XsVJ2vpf8O7WIvMph779bBPVUmZ1qYrRRp7KZ2SFncdkFTD2FO8kELRE8
+ BVVQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=qV4TP2j98+fYZFc2JMpmFae2oOSeawDZWNXGLNyTYjo=;
- b=bFH/w+aoj2UnQolkFhYW7bO/l0Oo8ZyP0VuWljrQORe1oIjrrFxbM3EaM4Da0GjEXV
- Rjhb3DaizobzkE/tGYV/ogKP52SZftJ0X/CoJ4lWf/XEftwdNbZPszDtHH1Y+AqGFeBo
- YUlq8jNqSQOFG2OSlFcDzdQ1Svt+m//FOsx7rhOUDauPyn2oBamXt++MixpZohQAbjZ3
- p+SAYUwQ8c9wNDjDyzWbqanL3n84wf/YPIuJq5QPmQTfhF8p6J5S/5oCf28YybgQlSd5
- zStXHvPRtY1WwGhcIF9IxLchZ7jBtyvBrW/TJyqGAq/b0uKR4vrP8aSa4YzOcDpONzKn
- 9R5w==
-X-Gm-Message-State: APjAAAWyPOTTdAOIxtIC7EYaltBx7G5mPCjXhTtDNq4Kgq5OGwsd8bpg
- jIWFbFvdwxUMPuaNhOAabvcTZxZE
-X-Google-Smtp-Source: APXvYqzzj9+NRnLd8RJdWJZkN6YCuofgEN5bsM1XWAIxMMv3v/VQ9HMmcAQnP1bAGN32130y7rFMXg==
-X-Received: by 2002:adf:f1d1:: with SMTP id z17mr4776449wro.198.1571353100901; 
- Thu, 17 Oct 2019 15:58:20 -0700 (PDT)
+ bh=A6i2oQoY030V1ibxvwKbd3JNI8/xljifPg8xnDM8bpc=;
+ b=inXNxvi4232pG8EjopwpUsw8ZaElj4NJ7Lav47SupleUBH22ekXbCkGregpam0nqPM
+ +LQBvWi/JaV4/9FtGVwkUMf22vab2DDs6NrwOoNxzfhBUF8WYDU5lQrM6CDLRVCA6iwZ
+ OdaXhECAt10PhfWAlzXulgMPZSOc4MILwyeQVWxq1r/kZAG2fo8Cy5m3g1dzUWkhffAW
+ Fr9ANkSBwKApgtxJpZd4DKX3y1b0bYOk7wpEDzOJaiR+QooXtH84bLsY9a501zUSe5Zj
+ S/4pf+fW4rApBivEfcvNcxAYwGNOSaNJeFiZhSADaXFCy+15YkuMC9Lc67gPXpbqSpAt
+ xqsQ==
+X-Gm-Message-State: APjAAAXTlVu0cOh3PbWElim4FiGuU8Whqa7n4r4ccphicMbMIZmLXVsN
+ ARPD5SlTJc4q5+Hgi/o5SDz3xNQv
+X-Google-Smtp-Source: APXvYqyixix39WThzTRntJ5RlrVJoTugbcHCzaH5/4FNWfKk4nigfS5QZMBzQFv2D3CXIA+EDfbPvg==
+X-Received: by 2002:a05:6000:11d2:: with SMTP id
+ i18mr5204364wrx.109.1571353103049; 
+ Thu, 17 Oct 2019 15:58:23 -0700 (PDT)
 Received: from localhost.localdomain (14.red-88-21-201.staticip.rima-tde.net.
  [88.21.201.14])
- by smtp.gmail.com with ESMTPSA id m18sm3993873wrg.97.2019.10.17.15.58.19
+ by smtp.gmail.com with ESMTPSA id m18sm3993873wrg.97.2019.10.17.15.58.21
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 17 Oct 2019 15:58:20 -0700 (PDT)
+ Thu, 17 Oct 2019 15:58:22 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 06/10] hw/arm/bcm2836: Create VideoCore address space in
- the SoC
-Date: Fri, 18 Oct 2019 00:57:56 +0200
-Message-Id: <20191017225800.6946-7-f4bug@amsat.org>
+Subject: [PATCH v2 07/10] hw/arm/bcm2836: Use per CPU address spaces
+Date: Fri, 18 Oct 2019 00:57:57 +0200
+Message-Id: <20191017225800.6946-8-f4bug@amsat.org>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20191017225800.6946-1-f4bug@amsat.org>
 References: <20191017225800.6946-1-f4bug@amsat.org>
@@ -85,7 +85,7 @@ Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::442
+X-Received-From: 2a00:1450:4864:20::443
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -111,307 +111,265 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Currently the VideoCore is created in the Peripheral container
-as the 'GPU bus'. It is created there because the peripherals
-using DMA use physical addresses from the VideoCore bus.
-However the VideoCore is a GPU core placed at the same
-hierarchical level than the ARM cores.
+Currently all CPUs access the main system bus. Let each CPU have
+his own address space.
 
-To match the datasheet design, create the VideoCore container
-in the SoC, and link it to the peripheral container.
+Before:
 
-The VideoCore bus is 1GiB wide, accessible at 4 regions in
-different cache configurations. Add the full mapping.
+  address-space: cpu-secure-memory-0
+    0000000000000000-ffffffffffffffff (prio 0, i/o): system
+      0000000000000000-000000003fffffff (prio 0, ram): ram
+      000000003f000000-000000003fffffff (prio 1, i/o): bcm2835-peripherals
+        000000003f003000-000000003f00301f (prio 0, i/o): bcm2835-sys-timer
+        000000003f007000-000000003f007fff (prio 0, i/o): bcm2835-dma
+        000000003f00b200-000000003f00b3ff (prio 0, i/o): bcm2835-ic
+        000000003f00b400-000000003f00b43f (prio -1000, i/o): bcm2835-sp804
+        000000003f00b800-000000003f00bbff (prio 0, i/o): bcm2835-mbox
+        000000003f100000-000000003f100fff (prio -1000, i/o): bcm2835-cprman
+        000000003f102000-000000003f102fff (prio -1000, i/o): bcm2835-a2w
+        000000003f104000-000000003f10400f (prio 0, i/o): bcm2835-rng
+        000000003f200000-000000003f200fff (prio 0, i/o): bcm2835_gpio
+        000000003f201000-000000003f201fff (prio 0, i/o): pl011
+        000000003f202000-000000003f202fff (prio 0, i/o): bcm2835-sdhost
+        000000003f203000-000000003f2030ff (prio -1000, i/o): bcm2835-i2s
+        000000003f204000-000000003f20401f (prio -1000, i/o): bcm2835-spi0
+        000000003f205000-000000003f20501f (prio -1000, i/o): bcm2835-i2c0
+        000000003f20f000-000000003f20f07f (prio -1000, i/o): bcm2835-otp
+        000000003f212000-000000003f212007 (prio 0, i/o): bcm2835-thermal
+        000000003f214000-000000003f2140ff (prio -1000, i/o): bcm2835-spis
+        000000003f215000-000000003f2150ff (prio 0, i/o): bcm2835-aux
+        000000003f300000-000000003f3000ff (prio 0, i/o): sdhci
+        000000003f600000-000000003f6000ff (prio -1000, i/o): bcm2835-smi
+        000000003f804000-000000003f80401f (prio -1000, i/o): bcm2835-i2c1
+        000000003f805000-000000003f80501f (prio -1000, i/o): bcm2835-i2c2
+        000000003f900000-000000003f907fff (prio -1000, i/o): bcm2835-dbus
+        000000003f910000-000000003f917fff (prio -1000, i/o): bcm2835-ave0
+        000000003f980000-000000003f980fff (prio -1000, i/o): dwc-usb2
+        000000003fe00000-000000003fe000ff (prio -1000, i/o): bcm2835-sdramc
+        000000003fe05000-000000003fe050ff (prio 0, i/o): bcm2835-dma-chan15
+      0000000040000000-00000000400000ff (prio 0, i/o): bcm2836-control
 
-Before this commit the memory tree is:
+  address-space: cpu-memory-0
+    0000000000000000-ffffffffffffffff (prio 0, i/o): system
+      0000000000000000-000000003fffffff (prio 0, ram): ram
+      000000003f000000-000000003fffffff (prio 1, i/o): bcm2835-peripherals
+        000000003f003000-000000003f00301f (prio 0, i/o): bcm2835-sys-timer
+        000000003f007000-000000003f007fff (prio 0, i/o): bcm2835-dma
+        000000003f00b200-000000003f00b3ff (prio 0, i/o): bcm2835-ic
+        000000003f00b400-000000003f00b43f (prio -1000, i/o): bcm2835-sp804
+        000000003f00b800-000000003f00bbff (prio 0, i/o): bcm2835-mbox
+        000000003f100000-000000003f100fff (prio -1000, i/o): bcm2835-cprman
+        000000003f102000-000000003f102fff (prio -1000, i/o): bcm2835-a2w
+        000000003f104000-000000003f10400f (prio 0, i/o): bcm2835-rng
+        000000003f200000-000000003f200fff (prio 0, i/o): bcm2835_gpio
+        000000003f201000-000000003f201fff (prio 0, i/o): pl011
+        000000003f202000-000000003f202fff (prio 0, i/o): bcm2835-sdhost
+        000000003f203000-000000003f2030ff (prio -1000, i/o): bcm2835-i2s
+        000000003f204000-000000003f20401f (prio -1000, i/o): bcm2835-spi0
+        000000003f205000-000000003f20501f (prio -1000, i/o): bcm2835-i2c0
+        000000003f20f000-000000003f20f07f (prio -1000, i/o): bcm2835-otp
+        000000003f212000-000000003f212007 (prio 0, i/o): bcm2835-thermal
+        000000003f214000-000000003f2140ff (prio -1000, i/o): bcm2835-spis
+        000000003f215000-000000003f2150ff (prio 0, i/o): bcm2835-aux
+        000000003f300000-000000003f3000ff (prio 0, i/o): sdhci
+        000000003f600000-000000003f6000ff (prio -1000, i/o): bcm2835-smi
+        000000003f804000-000000003f80401f (prio -1000, i/o): bcm2835-i2c1
+        000000003f805000-000000003f80501f (prio -1000, i/o): bcm2835-i2c2
+        000000003f900000-000000003f907fff (prio -1000, i/o): bcm2835-dbus
+        000000003f910000-000000003f917fff (prio -1000, i/o): bcm2835-ave0
+        000000003f980000-000000003f980fff (prio -1000, i/o): dwc-usb2
+        000000003fe00000-000000003fe000ff (prio -1000, i/o): bcm2835-sdramc
+        000000003fe05000-000000003fe050ff (prio 0, i/o): bcm2835-dma-chan15
+      0000000040000000-00000000400000ff (prio 0, i/o): bcm2836-control
 
-  (qemu) info mtree
-  address-space: bcm2835-dma-memory
-    0000000000000000-00000000ffffffff (prio 0, i/o): bcm2835-gpu
-      0000000000000000-000000003fffffff (prio 0, i/o): alias bcm2835-gpu-ram-alias[*] @ram 0000000000000000-000000003fffffff
-      0000000040000000-000000007fffffff (prio 0, i/o): alias bcm2835-gpu-ram-alias[*] @ram 0000000000000000-000000003fffffff
-      000000007e000000-000000007effffff (prio 1, i/o): alias bcm2835-peripherals @bcm2835-peripherals 0000000000000000-0000000000ffffff
-      0000000080000000-00000000bfffffff (prio 0, i/o): alias bcm2835-gpu-ram-alias[*] @ram 0000000000000000-000000003fffffff
-      00000000c0000000-00000000ffffffff (prio 0, i/o): alias bcm2835-gpu-ram-alias[*] @ram 0000000000000000-000000003fffffff
+  memory-region: bcm2835-peripherals
+    000000003f000000-000000003fffffff (prio 1, i/o): bcm2835-peripherals
+      000000003f003000-000000003f00301f (prio 0, i/o): bcm2835-sys-timer
+      000000003f007000-000000003f007fff (prio 0, i/o): bcm2835-dma
+      000000003f00b200-000000003f00b3ff (prio 0, i/o): bcm2835-ic
+      000000003f00b400-000000003f00b43f (prio -1000, i/o): bcm2835-sp804
+      000000003f00b800-000000003f00bbff (prio 0, i/o): bcm2835-mbox
+      000000003f100000-000000003f100fff (prio -1000, i/o): bcm2835-cprman
+      000000003f102000-000000003f102fff (prio -1000, i/o): bcm2835-a2w
+      000000003f104000-000000003f10400f (prio 0, i/o): bcm2835-rng
+      000000003f200000-000000003f200fff (prio 0, i/o): bcm2835_gpio
+      000000003f201000-000000003f201fff (prio 0, i/o): pl011
+      000000003f202000-000000003f202fff (prio 0, i/o): bcm2835-sdhost
+      000000003f203000-000000003f2030ff (prio -1000, i/o): bcm2835-i2s
+      000000003f204000-000000003f20401f (prio -1000, i/o): bcm2835-spi0
+      000000003f205000-000000003f20501f (prio -1000, i/o): bcm2835-i2c0
+      000000003f20f000-000000003f20f07f (prio -1000, i/o): bcm2835-otp
+      000000003f212000-000000003f212007 (prio 0, i/o): bcm2835-thermal
+      000000003f214000-000000003f2140ff (prio -1000, i/o): bcm2835-spis
+      000000003f215000-000000003f2150ff (prio 0, i/o): bcm2835-aux
+      000000003f300000-000000003f3000ff (prio 0, i/o): sdhci
+      000000003f600000-000000003f6000ff (prio -1000, i/o): bcm2835-smi
+      000000003f804000-000000003f80401f (prio -1000, i/o): bcm2835-i2c1
+      000000003f805000-000000003f80501f (prio -1000, i/o): bcm2835-i2c2
+      000000003f900000-000000003f907fff (prio -1000, i/o): bcm2835-dbus
+      000000003f910000-000000003f917fff (prio -1000, i/o): bcm2835-ave0
+      000000003f980000-000000003f980fff (prio -1000, i/o): dwc-usb2
+      000000003fe00000-000000003fe000ff (prio -1000, i/o): bcm2835-sdramc
+      000000003fe05000-000000003fe050ff (prio 0, i/o): bcm2835-dma-chan15
 
 After:
 
-  address-space: bcm2835-dma-memory
-    0000000000000000-000000003fffffff (prio 0, i/o): videocore-bus
-      0000000000000000-000000003fffffff (prio 1, i/o): alias vc-ram-alias @ram 0000000000000000-000000003fffffff
-      000000003e000000-000000003effffff (prio 2, i/o): alias vc-peripherals-alias @bcm2835-peripherals 0000000000000000-0000000000ffffff
-      0000000040000000-000000007fffffff (prio 0, i/o): alias cached-coherent @videocore-bus 0000000000000000-000000003fffffff
-      0000000080000000-00000000bfffffff (prio 0, i/o): alias cached @videocore-bus 0000000000000000-000000003fffffff
-      00000000c0000000-00000000ffffffff (prio 0, i/o): alias uncached @videocore-bus 0000000000000000-000000003fffffff
+  address-space: cpu-secure-memory-0
+    0000000000000000-00000000ffffffff (prio 0, i/o): cpu-bus
+      0000000000000000-000000003fffffff (prio 1, i/o): alias arm-ram-alias @ram 0000000000000000-000000003fffffff
+      000000003f000000-000000003fffffff (prio 2, i/o): alias arm-peripherals-alias @bcm2835-peripherals 0000000000000000-0000000000ffffff
+      0000000040000000-0000000040003fff (prio 2, i/o): alias arm-control-alias @bcm2836-control 0000000000000000-0000000000003fff
 
-Now the periferals are accessible from the uncached region too.
+  address-space: cpu-memory-0
+    0000000000000000-00000000ffffffff (prio 0, i/o): cpu-bus
+      0000000000000000-000000003fffffff (prio 1, i/o): alias arm-ram-alias @ram 0000000000000000-000000003fffffff
+      000000003f000000-000000003fffffff (prio 2, i/o): alias arm-peripherals-alias @bcm2835-peripherals 0000000000000000-0000000000ffffff
+      0000000040000000-0000000040003fff (prio 2, i/o): alias arm-control-alias @bcm2836-control 0000000000000000-0000000000003fff
+
+  memory-region: bcm2835-peripherals
+    0000000000000000-0000000000ffffff (prio 0, i/o): bcm2835-peripherals
+      0000000000003000-000000000000301f (prio 0, i/o): bcm2835-sys-timer
+      0000000000007000-0000000000007fff (prio 0, i/o): bcm2835-dma
+      000000000000b200-000000000000b3ff (prio 0, i/o): bcm2835-ic
+      000000000000b400-000000000000b43f (prio -1000, i/o): bcm2835-sp804
+      000000000000b800-000000000000bbff (prio 0, i/o): bcm2835-mbox
+      0000000000100000-0000000000100fff (prio -1000, i/o): bcm2835-cprman
+      0000000000102000-0000000000102fff (prio -1000, i/o): bcm2835-a2w
+      0000000000104000-000000000010400f (prio 0, i/o): bcm2835-rng
+      0000000000200000-0000000000200fff (prio 0, i/o): bcm2835_gpio
+      0000000000201000-0000000000201fff (prio 0, i/o): pl011
+      0000000000202000-0000000000202fff (prio 0, i/o): bcm2835-sdhost
+      0000000000203000-00000000002030ff (prio -1000, i/o): bcm2835-i2s
+      0000000000204000-000000000020401f (prio -1000, i/o): bcm2835-spi0
+      0000000000205000-000000000020501f (prio -1000, i/o): bcm2835-i2c0
+      000000000020f000-000000000020f07f (prio -1000, i/o): bcm2835-otp
+      0000000000212000-0000000000212007 (prio 0, i/o): bcm2835-thermal
+      0000000000214000-00000000002140ff (prio -1000, i/o): bcm2835-spis
+      0000000000215000-00000000002150ff (prio 0, i/o): bcm2835-aux
+      0000000000300000-00000000003000ff (prio 0, i/o): sdhci
+      0000000000600000-00000000006000ff (prio -1000, i/o): bcm2835-smi
+      0000000000804000-000000000080401f (prio -1000, i/o): bcm2835-i2c1
+      0000000000805000-000000000080501f (prio -1000, i/o): bcm2835-i2c2
+      0000000000900000-0000000000907fff (prio -1000, i/o): bcm2835-dbus
+      0000000000910000-0000000000917fff (prio -1000, i/o): bcm2835-ave0
+      0000000000980000-0000000000980fff (prio -1000, i/o): dwc-usb2
+      0000000000e00000-0000000000e000ff (prio -1000, i/o): bcm2835-sdramc
+      0000000000e05000-0000000000e050ff (prio 0, i/o): bcm2835-dma-chan15
 
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- hw/arm/bcm2835_peripherals.c         | 45 +++++++++-------------------
- hw/arm/bcm2836.c                     | 43 ++++++++++++++++++++++++--
- include/hw/arm/bcm2835_peripherals.h |  4 +--
- include/hw/arm/bcm2836.h             |  5 ++++
- 4 files changed, 62 insertions(+), 35 deletions(-)
+ hw/arm/bcm2836.c         | 38 ++++++++++++++++++++++++++++++++------
+ hw/arm/raspi.c           |  2 --
+ include/hw/arm/bcm2836.h |  8 +++++++-
+ 3 files changed, 39 insertions(+), 9 deletions(-)
 
-diff --git a/hw/arm/bcm2835_peripherals.c b/hw/arm/bcm2835_peripherals.c
-index 17207ae07e..059e44a620 100644
---- a/hw/arm/bcm2835_peripherals.c
-+++ b/hw/arm/bcm2835_peripherals.c
-@@ -9,6 +9,7 @@
-  */
- 
- #include "qemu/osdep.h"
-+#include "qemu/units.h"
- #include "qapi/error.h"
- #include "qemu/module.h"
- #include "hw/arm/bcm2835_peripherals.h"
-@@ -16,9 +17,6 @@
- #include "hw/arm/raspi_platform.h"
- #include "sysemu/sysemu.h"
- 
--/* Peripheral base address on the VC (GPU) system bus */
--#define BCM2835_VC_PERI_BASE 0x7e000000
--
- /* Capabilities for SD controller: no DMA, high-speed, default clocks etc. */
- #define BCM2835_SDHC_CAPAREG 0x52134b4
- 
-@@ -45,10 +43,6 @@ static void bcm2835_peripherals_init(Object *obj)
-     object_property_add_child(obj, "peripheral-io", OBJECT(&s->peri_mr), NULL);
-     sysbus_init_mmio(SYS_BUS_DEVICE(s), &s->peri_mr);
- 
--    /* Internal memory region for peripheral bus addresses (not exported) */
--    memory_region_init(&s->gpu_bus_mr, obj, "bcm2835-gpu", (uint64_t)1 << 32);
--    object_property_add_child(obj, "gpu-bus", OBJECT(&s->gpu_bus_mr), NULL);
--
-     /* Internal memory region for request/response communication with
-      * mailbox-addressable peripherals (not exported)
-      */
-@@ -82,9 +76,6 @@ static void bcm2835_peripherals_init(Object *obj)
-     object_property_add_alias(obj, "vcram-size", OBJECT(&s->fb), "vcram-size",
-                               &error_abort);
- 
--    object_property_add_const_link(OBJECT(&s->fb), "dma-mr",
--                                   OBJECT(&s->gpu_bus_mr), &error_abort);
--
-     /* Property channel */
-     sysbus_init_child_obj(obj, "property", &s->property, sizeof(s->property),
-                           TYPE_BCM2835_PROPERTY);
-@@ -93,8 +84,6 @@ static void bcm2835_peripherals_init(Object *obj)
- 
-     object_property_add_const_link(OBJECT(&s->property), "fb",
-                                    OBJECT(&s->fb), &error_abort);
--    object_property_add_const_link(OBJECT(&s->property), "dma-mr",
--                                   OBJECT(&s->gpu_bus_mr), &error_abort);
- 
-     /* Random Number Generator */
-     sysbus_init_child_obj(obj, "rng", &s->rng, sizeof(s->rng),
-@@ -112,9 +101,6 @@ static void bcm2835_peripherals_init(Object *obj)
-     sysbus_init_child_obj(obj, "dma", &s->dma, sizeof(s->dma),
-                           TYPE_BCM2835_DMA);
- 
--    object_property_add_const_link(OBJECT(&s->dma), "dma-mr",
--                                   OBJECT(&s->gpu_bus_mr), &error_abort);
--
-     /* Thermal */
-     sysbus_init_child_obj(obj, "thermal", &s->thermal, sizeof(s->thermal),
-                           TYPE_BCM2835_THERMAL);
-@@ -133,7 +119,7 @@ static void bcm2835_peripherals_realize(DeviceState *dev, Error **errp)
- {
-     BCM2835PeripheralState *s = BCM2835_PERIPHERALS(dev);
-     Object *obj;
--    MemoryRegion *ram;
-+    MemoryRegion *ram, *vc;
-     Error *err = NULL;
-     uint64_t ram_size, vcram_size;
-     int n;
-@@ -144,25 +130,16 @@ static void bcm2835_peripherals_realize(DeviceState *dev, Error **errp)
-                    __func__, error_get_pretty(err));
-         return;
-     }
--
-     ram = MEMORY_REGION(obj);
-     ram_size = memory_region_size(ram);
- 
--    /* Map peripherals and RAM into the GPU address space. */
--    memory_region_init_alias(&s->peri_mr_alias, OBJECT(s),
--                             "bcm2835-peripherals", &s->peri_mr, 0,
--                             memory_region_size(&s->peri_mr));
--
--    memory_region_add_subregion_overlap(&s->gpu_bus_mr, BCM2835_VC_PERI_BASE,
--                                        &s->peri_mr_alias, 1);
--
--    /* RAM is aliased four times (different cache configurations) on the GPU */
--    for (n = 0; n < 4; n++) {
--        memory_region_init_alias(&s->ram_alias[n], OBJECT(s),
--                                 "bcm2835-gpu-ram-alias[*]", ram, 0, ram_size);
--        memory_region_add_subregion_overlap(&s->gpu_bus_mr, (hwaddr)n << 30,
--                                            &s->ram_alias[n], 0);
-+    obj = object_property_get_link(OBJECT(dev), "videocore", &err);
-+    if (obj == NULL) {
-+        error_setg(errp, "%s: required videocore link not found: %s",
-+                   __func__, error_get_pretty(err));
-+        return;
-     }
-+    vc = MEMORY_REGION(obj);
- 
-     /* Interrupt Controller */
-     object_property_set_bool(OBJECT(&s->ic), true, "realized", &err);
-@@ -243,6 +220,8 @@ static void bcm2835_peripherals_realize(DeviceState *dev, Error **errp)
-         return;
-     }
- 
-+    object_property_add_const_link(OBJECT(&s->fb), "dma-mr",
-+                                   OBJECT(vc), &error_abort);
-     object_property_set_bool(OBJECT(&s->fb), true, "realized", &err);
-     if (err) {
-         error_propagate(errp, err);
-@@ -255,6 +234,8 @@ static void bcm2835_peripherals_realize(DeviceState *dev, Error **errp)
-                        qdev_get_gpio_in(DEVICE(&s->mboxes), MBOX_CHAN_FB));
- 
-     /* Property channel */
-+    object_property_add_const_link(OBJECT(&s->property), "dma-mr",
-+                                   OBJECT(vc), &error_abort);
-     object_property_set_bool(OBJECT(&s->property), true, "realized", &err);
-     if (err) {
-         error_propagate(errp, err);
-@@ -323,6 +304,8 @@ static void bcm2835_peripherals_realize(DeviceState *dev, Error **errp)
-                                INTERRUPT_SDIO));
- 
-     /* DMA Channels */
-+    object_property_add_const_link(OBJECT(&s->dma), "dma-mr",
-+                                   OBJECT(vc), &error_abort);
-     object_property_set_bool(OBJECT(&s->dma), true, "realized", &err);
-     if (err) {
-         error_propagate(errp, err);
 diff --git a/hw/arm/bcm2836.c b/hw/arm/bcm2836.c
-index 019e67b906..d712f36052 100644
+index d712f36052..36742af403 100644
 --- a/hw/arm/bcm2836.c
 +++ b/hw/arm/bcm2836.c
-@@ -9,6 +9,7 @@
-  */
+@@ -70,6 +70,8 @@ static void bcm2836_init(Object *obj)
+     }
  
- #include "qemu/osdep.h"
-+#include "qemu/units.h"
- #include "qapi/error.h"
- #include "qemu/module.h"
- #include "cpu.h"
-@@ -16,6 +17,9 @@
- #include "hw/arm/raspi_platform.h"
- #include "hw/sysbus.h"
- 
-+/* Peripheral base address on the VC (GPU) system bus */
-+#define BCM2835_VC_PERI_BASE    0x3e000000
-+
- struct BCM283XInfo {
-     const char *name;
-     const char *cpu_type;
-@@ -50,6 +54,21 @@ static void bcm2836_init(Object *obj)
-     const BCM283XInfo *info = bc->info;
-     int n;
- 
-+    /* VideoCore memory region */
-+    memory_region_init(&s->videocore.mr[0], obj, "videocore-bus", 1 * GiB);
-+    object_property_add_child(obj, "videocore",
-+                              OBJECT(&s->videocore.mr[0]), NULL);
-+    for (n = 1; n < BCM283X_NCPUS; n++) {
-+        static const char *alias_name[] = {
-+            NULL, "cached-coherent", "cached", "uncached"
-+        };
-+        memory_region_init_alias(&s->videocore.mr[n], obj,
-+                                 alias_name[n], &s->videocore.mr[0],
-+                                 0, 1 * GiB);
-+        memory_region_add_subregion_overlap(&s->videocore.mr[0], n * GiB,
-+                                            &s->videocore.mr[n], 0);
-+    }
-+
      for (n = 0; n < BCM283X_NCPUS; n++) {
++        memory_region_init(&s->cpu[n].container_mr, obj, "cpu-bus", 4 * GiB);
++
          object_initialize_child(obj, "cpu[*]", &s->cpus[n], sizeof(s->cpus[n]),
                                  info->cpu_type, &error_abort, NULL);
-@@ -71,6 +90,7 @@ static void bcm2836_realize(DeviceState *dev, Error **errp)
+     }
+@@ -90,7 +92,7 @@ static void bcm2836_realize(DeviceState *dev, Error **errp)
      BCM283XState *s = BCM283X(dev);
      BCM283XClass *bc = BCM283X_GET_CLASS(dev);
      const BCM283XInfo *info = bc->info;
-+    MemoryRegion *ram_mr, *peri_mr;
+-    MemoryRegion *ram_mr, *peri_mr;
++    MemoryRegion *ram_mr, *peri_mr, *ctrl_mr;
      Object *obj;
      Error *err = NULL;
      int n;
-@@ -83,26 +103,45 @@ static void bcm2836_realize(DeviceState *dev, Error **errp)
-                    __func__, error_get_pretty(err));
+@@ -142,8 +144,6 @@ static void bcm2836_realize(DeviceState *dev, Error **errp)
+         error_propagate(errp, err);
+         return;
+     }
+-    sysbus_mmio_map_overlap(SYS_BUS_DEVICE(&s->peripherals), 0,
+-                            info->peri_base, 1);
+ 
+     /* bcm2836 interrupt controller (and mailboxes, etc.) */
+     object_property_set_bool(OBJECT(&s->control), true, "realized", &err);
+@@ -151,15 +151,41 @@ static void bcm2836_realize(DeviceState *dev, Error **errp)
+         error_propagate(errp, err);
          return;
      }
 -
-+    ram_mr = MEMORY_REGION(obj);
-     object_property_add_const_link(OBJECT(&s->peripherals), "ram", obj, &err);
-     if (err) {
-         error_propagate(errp, err);
-         return;
-     }
+-    sysbus_mmio_map(SYS_BUS_DEVICE(&s->control), 0, info->ctrl_base);
+-
+     sysbus_connect_irq(SYS_BUS_DEVICE(&s->peripherals), 0,
+         qdev_get_gpio_in_named(DEVICE(&s->control), "gpu-irq", 0));
+     sysbus_connect_irq(SYS_BUS_DEVICE(&s->peripherals), 1,
+         qdev_get_gpio_in_named(DEVICE(&s->control), "gpu-fiq", 0));
++    ctrl_mr = sysbus_mmio_get_region(SYS_BUS_DEVICE(&s->control), 0);
  
-+    object_property_add_const_link(OBJECT(&s->peripherals), "videocore",
-+                                   OBJECT(&s->videocore), &err);
-+    if (err) {
-+        error_propagate(errp, err);
-+        return;
-+    }
-     object_property_set_bool(OBJECT(&s->peripherals), true, "realized", &err);
-     if (err) {
-         error_propagate(errp, err);
-         return;
-     }
- 
-+    /* Map peripherals and RAM into the GPU address space. */
-+    memory_region_init_alias(&s->videocore.ram_mr_alias, OBJECT(s),
-+                             "vc-ram-alias", ram_mr, 0,
-+                             memory_region_size(ram_mr));
-+    memory_region_add_subregion_overlap(&s->videocore.mr[0], 0,
-+                                        &s->videocore.ram_mr_alias, 1);
-+    peri_mr = sysbus_mmio_get_region(SYS_BUS_DEVICE(&s->peripherals), 0);
-+    memory_region_init_alias(&s->videocore.peri_mr_alias, OBJECT(s),
-+                             "vc-peripherals-alias",
-+                             peri_mr, 0, 16 * MiB);
-+    memory_region_add_subregion_overlap(&s->videocore.mr[0],
-+                                        BCM2835_VC_PERI_BASE,
-+                                        &s->videocore.peri_mr_alias, 2);
+     for (n = 0; n < BCM283X_NCPUS; n++) {
++        memory_region_init_alias(&s->cpu[n].ram_mr_alias, OBJECT(s),
++                                 "arm-ram-alias", ram_mr, 0,
++                                 memory_region_size(ram_mr));
++        memory_region_add_subregion_overlap(&s->cpu[n].container_mr, 0,
++                                            &s->cpu[n].ram_mr_alias, 1);
 +
-     object_property_add_alias(OBJECT(s), "sd-bus", OBJECT(&s->peripherals),
-                               "sd-bus", &err);
-     if (err) {
-         error_propagate(errp, err);
-         return;
-     }
--
-     sysbus_mmio_map_overlap(SYS_BUS_DEVICE(&s->peripherals), 0,
-                             info->peri_base, 1);
++        memory_region_init_alias(&s->cpu[n].peri_mr_alias, OBJECT(s),
++                                 "arm-peripherals-alias",
++                                 peri_mr, 0, 16 * MiB);
++        memory_region_add_subregion_overlap(&s->cpu[n].container_mr,
++                                            info->peri_base,
++                                            &s->cpu[n].peri_mr_alias, 2);
++
++        memory_region_init_alias(&s->cpu[n].control_mr_alias, OBJECT(s),
++                                 "arm-control-alias", ctrl_mr,
++                                 0, 16 * KiB);
++        memory_region_add_subregion_overlap(&s->cpu[n].container_mr,
++                                            info->ctrl_base,
++                                            &s->cpu[n].control_mr_alias, 2);
++
++        object_property_set_link(OBJECT(&s->cpus[n]),
++                                 OBJECT(&s->cpu[n].container_mr),
++                                 "memory", &err);
++        if (err) {
++            error_propagate(errp, err);
++            return;
++        }
++
+         /* TODO: this should be converted to a property of ARM_CPU */
+         s->cpus[n].mp_affinity = (info->clusterid << 8) | n;
  
-diff --git a/include/hw/arm/bcm2835_peripherals.h b/include/hw/arm/bcm2835_peripherals.h
-index 7859281e11..f485f20aae 100644
---- a/include/hw/arm/bcm2835_peripherals.h
-+++ b/include/hw/arm/bcm2835_peripherals.h
-@@ -36,8 +36,8 @@ typedef struct BCM2835PeripheralState {
-     SysBusDevice parent_obj;
-     /*< public >*/
+diff --git a/hw/arm/raspi.c b/hw/arm/raspi.c
+index 615d755879..a12459bc41 100644
+--- a/hw/arm/raspi.c
++++ b/hw/arm/raspi.c
+@@ -184,8 +184,6 @@ static void raspi_init(MachineState *machine, int version)
+     /* Allocate and map RAM */
+     memory_region_allocate_system_memory(&s->ram, OBJECT(machine), "ram",
+                                          machine->ram_size);
+-    /* FIXME: Remove when we have custom CPU address space support */
+-    memory_region_add_subregion_overlap(get_system_memory(), 0, &s->ram, 0);
  
--    MemoryRegion peri_mr, peri_mr_alias, gpu_bus_mr, mbox_mr;
--    MemoryRegion ram_alias[4];
-+    MemoryRegion peri_mr;
-+    MemoryRegion mbox_mr;
-     qemu_irq irq, fiq;
- 
-     BCM2835SystemTimerState systmr;
+     /* Setup the SOC */
+     object_property_add_const_link(OBJECT(&s->soc), "ram", OBJECT(&s->ram),
 diff --git a/include/hw/arm/bcm2836.h b/include/hw/arm/bcm2836.h
-index 97187f72be..a26bf895a4 100644
+index a26bf895a4..af4c60dbad 100644
 --- a/include/hw/arm/bcm2836.h
 +++ b/include/hw/arm/bcm2836.h
-@@ -35,6 +35,11 @@ typedef struct BCM283XState {
-     char *cpu_type;
-     uint32_t enabled_cpus;
+@@ -37,9 +37,15 @@ typedef struct BCM283XState {
  
-+    struct {
-+        MemoryRegion mr[4];
+     struct {
+         MemoryRegion mr[4];
+-        MemoryRegion peri_mr_alias;
+         MemoryRegion ram_mr_alias;
 +        MemoryRegion peri_mr_alias;
+     } videocore;
++    struct {
++        MemoryRegion container_mr;
 +        MemoryRegion ram_mr_alias;
-+    } videocore;
++        MemoryRegion peri_mr_alias;
++        MemoryRegion control_mr_alias;
++    } cpu[BCM283X_NCPUS];
      ARMCPU cpus[BCM283X_NCPUS];
      BCM2836ControlState control;
      BCM2835PeripheralState peripherals;
