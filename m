@@ -2,83 +2,62 @@ Return-Path: <SRS0=yZS3=YK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.4 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9FCADECE58E
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 15:52:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D6AAAECE58E
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 15:54:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6B4D821835
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 15:52:27 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="F+eHOyXV"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6B4D821835
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id A9EDA21835
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 15:54:47 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A9EDA21835
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51554 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51656 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iL84g-00076M-0N
-	for qemu-devel@archiver.kernel.org; Thu, 17 Oct 2019 11:52:26 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53103)
+	id 1iL86w-00021t-JM
+	for qemu-devel@archiver.kernel.org; Thu, 17 Oct 2019 11:54:46 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52109)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <aleksandar.m.mail@gmail.com>) id 1iL7I3-0003B9-Px
- for qemu-devel@nongnu.org; Thu, 17 Oct 2019 11:02:16 -0400
+ (envelope-from <berrange@redhat.com>) id 1iL7D6-00059g-Ns
+ for qemu-devel@nongnu.org; Thu, 17 Oct 2019 10:57:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aleksandar.m.mail@gmail.com>) id 1iL7Hy-0005mc-MN
- for qemu-devel@nongnu.org; Thu, 17 Oct 2019 11:02:11 -0400
-Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:36111)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
- id 1iL7Hy-0005m3-EE
- for qemu-devel@nongnu.org; Thu, 17 Oct 2019 11:02:06 -0400
-Received: by mail-ot1-x343.google.com with SMTP id 67so2171283oto.3
- for <qemu-devel@nongnu.org>; Thu, 17 Oct 2019 08:02:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:in-reply-to:references:from:date:message-id:subject:to
- :cc; bh=V3T+1azaMg8NUc9PO9jV2L5D2pl3K6geSnd7GbRgO0g=;
- b=F+eHOyXVsh6t3wEA1YUsddrsm4eQb+ddP7zJw0ik0Huxs6jvW27NTdvxsBJAlP2Xc5
- 4Yywje6GYOLulBwneOK5sGa3pUZfS3ofECu72/bi94jzshCh6c63qh4D/dHAGWCzhLgd
- i9C/01ybPe5To80K9XV0doMtquTGURapEagG0yn2FQo8izUlBGLdVo40tOW72npraeof
- 5IBtfBRT87gAflNX+zf0yJ4z+3HGb7sXVh3BF6/IAQuj8p09/W4mwp7BA8MWAH32XLT/
- w0NOTTZHY8pyD5nvhMMWP+NwSj7vvBziMKe5bOrmSh6kTIUmR/QO86C1jjibCcT+2HC2
- Mrww==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:in-reply-to:references:from:date
- :message-id:subject:to:cc;
- bh=V3T+1azaMg8NUc9PO9jV2L5D2pl3K6geSnd7GbRgO0g=;
- b=kKr/vg6pCtmTabvW1cmCLcf+/UDdvEh2bScJqtDBOQLd7WxdSUFFFAVdIzm6vw90OJ
- MrvjeB7j5g7AN/11zOX3Fw2l+nDrFazBj02ljQdfzQLU5EHBh+zaOhZFNNnNNcQOdNy2
- flODxHFYucDiq1lmZhxDbDI8howclTD2Qs7YqGb7gBVK4oJp2082nrEH6sd/Iup0bioJ
- rsLdKdouty/InqPkgenAjmDvtfz2dJY+pTbyU74YdpfnBVJl0Ldsn1a89YqwB74vxJdF
- bFm2ZX1qrApQk1V6E9YHVlZlNHp6AmHYkjURE00s3SuD44nwSoqBk1TEzcyE/PZRY4ex
- v3PQ==
-X-Gm-Message-State: APjAAAWhJutodLdQoKQjyYyEWT5TfzRcdo1XtnIqnZcM83G6Nd998c15
- 9o+UdLm4UnM93QI5fMOP5g2T37CmSMRcsDJ1kkA=
-X-Google-Smtp-Source: APXvYqyrU9aaOe5JLw52+PJAGLKf5ISS7fmybl6MLdyj3TO5lWzr8SBUelK5f5TBnqVykPQUzg2Iv3XF60Pcze4mF9s=
-X-Received: by 2002:a9d:684c:: with SMTP id c12mr3506598oto.341.1571324525196; 
- Thu, 17 Oct 2019 08:02:05 -0700 (PDT)
+ (envelope-from <berrange@redhat.com>) id 1iL7D4-00038g-GE
+ for qemu-devel@nongnu.org; Thu, 17 Oct 2019 10:57:04 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:60664)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <berrange@redhat.com>) id 1iL7D4-00038B-8J
+ for qemu-devel@nongnu.org; Thu, 17 Oct 2019 10:57:02 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 71AD8C08E282
+ for <qemu-devel@nongnu.org>; Thu, 17 Oct 2019 14:57:01 +0000 (UTC)
+Received: from localhost.localdomain.com (ovpn-112-36.ams2.redhat.com
+ [10.36.112.36])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 6F7DD100194E;
+ Thu, 17 Oct 2019 14:57:00 +0000 (UTC)
+From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH 3/4] crypto: add support for gcrypt's native XTS impl
+Date: Thu, 17 Oct 2019 15:56:53 +0100
+Message-Id: <20191017145654.11371-4-berrange@redhat.com>
+In-Reply-To: <20191017145654.11371-1-berrange@redhat.com>
+References: <20191017145654.11371-1-berrange@redhat.com>
 MIME-Version: 1.0
-Received: by 2002:a9d:340a:0:0:0:0:0 with HTTP; Thu, 17 Oct 2019 08:02:02
- -0700 (PDT)
-In-Reply-To: <20191015162705.28087-5-philmd@redhat.com>
-References: <20191015162705.28087-1-philmd@redhat.com>
- <20191015162705.28087-5-philmd@redhat.com>
-From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
-Date: Thu, 17 Oct 2019 17:02:02 +0200
-Message-ID: <CAL1e-=jOiMe2--=ht0Wgwh0a_At=sDhUzX7EkNU86nPt230a-g@mail.gmail.com>
-Subject: Re: [PATCH 04/32] mc146818rtc: Move RTC_ISA_IRQ definition
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
-Content-Type: multipart/alternative; boundary="00000000000026bad505951c80e1"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::343
+Content-Type: text/plain; charset=UTF-8
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.31]); Thu, 17 Oct 2019 14:57:01 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,174 +69,329 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
- Stefano Stabellini <sstabellini@kernel.org>,
- Eduardo Habkost <ehabkost@redhat.com>,
- "kvm@vger.kernel.org" <kvm@vger.kernel.org>, Paul Durrant <paul@xen.org>,
- "Michael S. Tsirkin" <mst@redhat.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>,
- Igor Mammedov <imammedo@redhat.com>,
- =?UTF-8?Q?Herv=C3=A9_Poussineau?= <hpoussin@reactos.org>,
- Aleksandar Markovic <amarkovic@wavecomp.com>,
- "xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>,
- Anthony Perard <anthony.perard@citrix.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
- Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
- Aurelien Jarno <aurelien@aurel32.net>, Richard Henderson <rth@twiddle.net>
+Cc: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---00000000000026bad505951c80e1
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Libgcrypt 1.8.0 added support for the XTS mode. Use this because long
+term we wish to delete QEMU's XTS impl to avoid carrying private crypto
+algorithm impls.
 
-On Tuesday, October 15, 2019, Philippe Mathieu-Daud=C3=A9 <philmd@redhat.co=
-m>
-wrote:
+As an added benefit, using this improves performance from 531 MB/sec to
+670 MB/sec, since we are avoiding several layers of function call
+indirection.
 
-> From: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
->
-> The ISA default number for the RTC devices is not related to its
-> registers neither. Move this definition to "hw/timer/mc146818rtc.h".
->
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-> ---
->  include/hw/timer/mc146818rtc.h      | 2 ++
->  include/hw/timer/mc146818rtc_regs.h | 2 --
->  tests/rtc-test.c                    | 1 +
->  3 files changed, 3 insertions(+), 2 deletions(-)
->
->
-Philippe, do this and related patches clash with your recent reorganization
-of timers/rtcs?
+This is even more noticable with the gcrypt builds in Fedora or RHEL-8
+which have a non-upstream patch for FIPS mode which does mutex locking.
+This is catastrophic for encryption performance with small block sizes,
+meaning this patch improves encryption from 240 MB/sec to 670 MB/sec.
 
-A.
+Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+---
+ configure              | 22 ++++++++++++++++++++++
+ crypto/Makefile.objs   |  2 +-
+ crypto/cipher-gcrypt.c | 36 +++++++++++++++++++++++++++++++++++-
+ tests/Makefile.include |  2 +-
+ 4 files changed, 59 insertions(+), 3 deletions(-)
 
+diff --git a/configure b/configure
+index 08ca4bcb46..98edb0ff44 100755
+--- a/configure
++++ b/configure
+@@ -473,6 +473,8 @@ gnutls=3D""
+ nettle=3D""
+ gcrypt=3D""
+ gcrypt_hmac=3D"no"
++gcrypt_xts=3D"no"
++qemu_private_xts=3D"yes"
+ auth_pam=3D""
+ vte=3D""
+ virglrenderer=3D""
+@@ -2902,6 +2904,18 @@ EOF
+         if compile_prog "$gcrypt_cflags" "$gcrypt_libs" ; then
+             gcrypt_hmac=3Dyes
+         fi
++        cat > $TMPC << EOF
++#include <gcrypt.h>
++int main(void) {
++  gcry_cipher_hd_t handle;
++  gcry_cipher_open(&handle, GCRY_CIPHER_AES, GCRY_CIPHER_MODE_XTS, 0);
++  return 0;
++}
++EOF
++        if compile_prog "$gcrypt_cflags" "$gcrypt_libs" ; then
++            gcrypt_xts=3Dyes
++            qemu_private_xts=3Dno
++        fi
+     elif test "$gcrypt" =3D "yes"; then
+         feature_not_found "gcrypt" "Install gcrypt devel >=3D 1.5.0"
+     else
+@@ -6317,6 +6331,11 @@ echo "VTE support       $vte $(echo_version $vte $=
+vteversion)"
+ echo "TLS priority      $tls_priority"
+ echo "GNUTLS support    $gnutls"
+ echo "libgcrypt         $gcrypt"
++if test "$gcrypt" =3D "yes"
++then
++   echo "  hmac            $gcrypt_hmac"
++   echo "  XTS             $gcrypt_xts"
++fi
+ echo "nettle            $nettle $(echo_version $nettle $nettle_version)"
+ echo "libtasn1          $tasn1"
+ echo "PAM               $auth_pam"
+@@ -6794,6 +6813,9 @@ if test "$nettle" =3D "yes" ; then
+   echo "CONFIG_NETTLE=3Dy" >> $config_host_mak
+   echo "CONFIG_NETTLE_VERSION_MAJOR=3D${nettle_version%%.*}" >> $config_=
+host_mak
+ fi
++if test "$qemu_private_xts" =3D "yes" ; then
++  echo "CONFIG_QEMU_PRIVATE_XTS=3Dy" >> $config_host_mak
++fi
+ if test "$tasn1" =3D "yes" ; then
+   echo "CONFIG_TASN1=3Dy" >> $config_host_mak
+ fi
+diff --git a/crypto/Makefile.objs b/crypto/Makefile.objs
+index 7fe2fa9da2..cdb01f9de9 100644
+--- a/crypto/Makefile.objs
++++ b/crypto/Makefile.objs
+@@ -31,7 +31,7 @@ crypto-obj-y +=3D ivgen-essiv.o
+ crypto-obj-y +=3D ivgen-plain.o
+ crypto-obj-y +=3D ivgen-plain64.o
+ crypto-obj-y +=3D afsplit.o
+-crypto-obj-y +=3D xts.o
++crypto-obj-$(CONFIG_QEMU_PRIVATE_XTS) +=3D xts.o
+ crypto-obj-y +=3D block.o
+ crypto-obj-y +=3D block-qcow.o
+ crypto-obj-y +=3D block-luks.o
+diff --git a/crypto/cipher-gcrypt.c b/crypto/cipher-gcrypt.c
+index 5cece9b244..ace719526a 100644
+--- a/crypto/cipher-gcrypt.c
++++ b/crypto/cipher-gcrypt.c
+@@ -19,7 +19,9 @@
+  */
+=20
+ #include "qemu/osdep.h"
++#ifdef CONFIG_QEMU_PRIVATE_XTS
+ #include "crypto/xts.h"
++#endif
+ #include "cipherpriv.h"
+=20
+ #include <gcrypt.h>
+@@ -59,10 +61,12 @@ bool qcrypto_cipher_supports(QCryptoCipherAlgorithm a=
+lg,
+ typedef struct QCryptoCipherGcrypt QCryptoCipherGcrypt;
+ struct QCryptoCipherGcrypt {
+     gcry_cipher_hd_t handle;
+-    gcry_cipher_hd_t tweakhandle;
+     size_t blocksize;
++#ifdef CONFIG_QEMU_PRIVATE_XTS
++    gcry_cipher_hd_t tweakhandle;
+     /* Initialization vector or Counter */
+     uint8_t *iv;
++#endif
+ };
+=20
+ static void
+@@ -74,10 +78,12 @@ qcrypto_gcrypt_cipher_free_ctx(QCryptoCipherGcrypt *c=
+tx,
+     }
+=20
+     gcry_cipher_close(ctx->handle);
++#ifdef CONFIG_QEMU_PRIVATE_XTS
+     if (mode =3D=3D QCRYPTO_CIPHER_MODE_XTS) {
+         gcry_cipher_close(ctx->tweakhandle);
+     }
+     g_free(ctx->iv);
++#endif
+     g_free(ctx);
+ }
+=20
+@@ -94,8 +100,14 @@ static QCryptoCipherGcrypt *qcrypto_cipher_ctx_new(QC=
+ryptoCipherAlgorithm alg,
+=20
+     switch (mode) {
+     case QCRYPTO_CIPHER_MODE_ECB:
++        gcrymode =3D GCRY_CIPHER_MODE_ECB;
++        break;
+     case QCRYPTO_CIPHER_MODE_XTS:
++#ifdef CONFIG_QEMU_PRIVATE_XTS
+         gcrymode =3D GCRY_CIPHER_MODE_ECB;
++#else
++        gcrymode =3D GCRY_CIPHER_MODE_XTS;
++#endif
+         break;
+     case QCRYPTO_CIPHER_MODE_CBC:
+         gcrymode =3D GCRY_CIPHER_MODE_CBC;
+@@ -172,6 +184,7 @@ static QCryptoCipherGcrypt *qcrypto_cipher_ctx_new(QC=
+ryptoCipherAlgorithm alg,
+                    gcry_strerror(err));
+         goto error;
+     }
++#ifdef CONFIG_QEMU_PRIVATE_XTS
+     if (mode =3D=3D QCRYPTO_CIPHER_MODE_XTS) {
+         err =3D gcry_cipher_open(&ctx->tweakhandle, gcryalg, gcrymode, 0=
+);
+         if (err !=3D 0) {
+@@ -180,6 +193,7 @@ static QCryptoCipherGcrypt *qcrypto_cipher_ctx_new(QC=
+ryptoCipherAlgorithm alg,
+             goto error;
+         }
+     }
++#endif
+=20
+     if (alg =3D=3D QCRYPTO_CIPHER_ALG_DES_RFB) {
+         /* We're using standard DES cipher from gcrypt, so we need
+@@ -191,6 +205,7 @@ static QCryptoCipherGcrypt *qcrypto_cipher_ctx_new(QC=
+ryptoCipherAlgorithm alg,
+         g_free(rfbkey);
+         ctx->blocksize =3D 8;
+     } else {
++#ifdef CONFIG_QEMU_PRIVATE_XTS
+         if (mode =3D=3D QCRYPTO_CIPHER_MODE_XTS) {
+             nkey /=3D 2;
+             err =3D gcry_cipher_setkey(ctx->handle, key, nkey);
+@@ -201,8 +216,11 @@ static QCryptoCipherGcrypt *qcrypto_cipher_ctx_new(Q=
+CryptoCipherAlgorithm alg,
+             }
+             err =3D gcry_cipher_setkey(ctx->tweakhandle, key + nkey, nke=
+y);
+         } else {
++#endif
+             err =3D gcry_cipher_setkey(ctx->handle, key, nkey);
++#ifdef CONFIG_QEMU_PRIVATE_XTS
+         }
++#endif
+         if (err !=3D 0) {
+             error_setg(errp, "Cannot set key: %s",
+                        gcry_strerror(err));
+@@ -228,6 +246,7 @@ static QCryptoCipherGcrypt *qcrypto_cipher_ctx_new(QC=
+ryptoCipherAlgorithm alg,
+         }
+     }
+=20
++#ifdef CONFIG_QEMU_PRIVATE_XTS
+     if (mode =3D=3D QCRYPTO_CIPHER_MODE_XTS) {
+         if (ctx->blocksize !=3D XTS_BLOCK_SIZE) {
+             error_setg(errp,
+@@ -237,6 +256,7 @@ static QCryptoCipherGcrypt *qcrypto_cipher_ctx_new(QC=
+ryptoCipherAlgorithm alg,
+         }
+         ctx->iv =3D g_new0(uint8_t, ctx->blocksize);
+     }
++#endif
+=20
+     return ctx;
+=20
+@@ -253,6 +273,7 @@ qcrypto_gcrypt_cipher_ctx_free(QCryptoCipher *cipher)
+ }
+=20
+=20
++#ifdef CONFIG_QEMU_PRIVATE_XTS
+ static void qcrypto_gcrypt_xts_encrypt(const void *ctx,
+                                        size_t length,
+                                        uint8_t *dst,
+@@ -272,6 +293,7 @@ static void qcrypto_gcrypt_xts_decrypt(const void *ct=
+x,
+     err =3D gcry_cipher_decrypt((gcry_cipher_hd_t)ctx, dst, length, src,=
+ length);
+     g_assert(err =3D=3D 0);
+ }
++#endif
+=20
+ static int
+ qcrypto_gcrypt_cipher_encrypt(QCryptoCipher *cipher,
+@@ -289,12 +311,14 @@ qcrypto_gcrypt_cipher_encrypt(QCryptoCipher *cipher=
+,
+         return -1;
+     }
+=20
++#ifdef CONFIG_QEMU_PRIVATE_XTS
+     if (cipher->mode =3D=3D QCRYPTO_CIPHER_MODE_XTS) {
+         xts_encrypt(ctx->handle, ctx->tweakhandle,
+                     qcrypto_gcrypt_xts_encrypt,
+                     qcrypto_gcrypt_xts_decrypt,
+                     ctx->iv, len, out, in);
+     } else {
++#endif
+         err =3D gcry_cipher_encrypt(ctx->handle,
+                                   out, len,
+                                   in, len);
+@@ -303,7 +327,9 @@ qcrypto_gcrypt_cipher_encrypt(QCryptoCipher *cipher,
+                        gcry_strerror(err));
+             return -1;
+         }
++#ifdef CONFIG_QEMU_PRIVATE_XTS
+     }
++#endif
+=20
+     return 0;
+ }
+@@ -325,12 +351,14 @@ qcrypto_gcrypt_cipher_decrypt(QCryptoCipher *cipher=
+,
+         return -1;
+     }
+=20
++#ifdef CONFIG_QEMU_PRIVATE_XTS
+     if (cipher->mode =3D=3D QCRYPTO_CIPHER_MODE_XTS) {
+         xts_decrypt(ctx->handle, ctx->tweakhandle,
+                     qcrypto_gcrypt_xts_encrypt,
+                     qcrypto_gcrypt_xts_decrypt,
+                     ctx->iv, len, out, in);
+     } else {
++#endif
+         err =3D gcry_cipher_decrypt(ctx->handle,
+                                   out, len,
+                                   in, len);
+@@ -339,7 +367,9 @@ qcrypto_gcrypt_cipher_decrypt(QCryptoCipher *cipher,
+                        gcry_strerror(err));
+             return -1;
+         }
++#ifdef CONFIG_QEMU_PRIVATE_XTS
+     }
++#endif
+=20
+     return 0;
+ }
+@@ -358,9 +388,11 @@ qcrypto_gcrypt_cipher_setiv(QCryptoCipher *cipher,
+         return -1;
+     }
+=20
++#ifdef CONFIG_QEMU_PRIVATE_XTS
+     if (ctx->iv) {
+         memcpy(ctx->iv, iv, niv);
+     } else {
++#endif
+         if (cipher->mode =3D=3D QCRYPTO_CIPHER_MODE_CTR) {
+             err =3D gcry_cipher_setctr(ctx->handle, iv, niv);
+             if (err !=3D 0) {
+@@ -377,7 +409,9 @@ qcrypto_gcrypt_cipher_setiv(QCryptoCipher *cipher,
+                 return -1;
+             }
+         }
++#ifdef CONFIG_QEMU_PRIVATE_XTS
+     }
++#endif
+=20
+     return 0;
+ }
+diff --git a/tests/Makefile.include b/tests/Makefile.include
+index 3543451ed3..2e5b0d3604 100644
+--- a/tests/Makefile.include
++++ b/tests/Makefile.include
+@@ -133,7 +133,7 @@ check-unit-y +=3D tests/test-base64$(EXESUF)
+ check-unit-$(call land,$(CONFIG_BLOCK),$(if $(CONFIG_NETTLE),y,$(CONFIG_=
+GCRYPT))) +=3D tests/test-crypto-pbkdf$(EXESUF)
+ check-unit-$(CONFIG_BLOCK) +=3D tests/test-crypto-ivgen$(EXESUF)
+ check-unit-$(CONFIG_BLOCK)  +=3D tests/test-crypto-afsplit$(EXESUF)
+-check-unit-$(CONFIG_BLOCK)  +=3D tests/test-crypto-xts$(EXESUF)
++check-unit-$(if $(CONFIG_BLOCK),$(CONFIG_QEMU_PRIVATE_XTS)) +=3D tests/t=
+est-crypto-xts$(EXESUF)
+ check-unit-$(CONFIG_BLOCK)  +=3D tests/test-crypto-block$(EXESUF)
+ check-unit-y +=3D tests/test-logging$(EXESUF)
+ check-unit-$(call land,$(CONFIG_BLOCK),$(CONFIG_REPLICATION)) +=3D tests=
+/test-replication$(EXESUF)
+--=20
+2.21.0
 
-
-> diff --git a/include/hw/timer/mc146818rtc.h b/include/hw/timer/
-> mc146818rtc.h
-> index 0f1c886e5b..17761cf6d9 100644
-> --- a/include/hw/timer/mc146818rtc.h
-> +++ b/include/hw/timer/mc146818rtc.h
-> @@ -39,6 +39,8 @@ typedef struct RTCState {
->      QLIST_ENTRY(RTCState) link;
->  } RTCState;
->
-> +#define RTC_ISA_IRQ 8
-> +
->  ISADevice *mc146818_rtc_init(ISABus *bus, int base_year,
->                               qemu_irq intercept_irq);
->  void rtc_set_memory(ISADevice *dev, int addr, int val);
-> diff --git a/include/hw/timer/mc146818rtc_regs.h b/include/hw/timer/
-> mc146818rtc_regs.h
-> index bfbb57e570..631f71cfd9 100644
-> --- a/include/hw/timer/mc146818rtc_regs.h
-> +++ b/include/hw/timer/mc146818rtc_regs.h
-> @@ -27,8 +27,6 @@
->
->  #include "qemu/timer.h"
->
-> -#define RTC_ISA_IRQ 8
-> -
->  #define RTC_SECONDS             0
->  #define RTC_SECONDS_ALARM       1
->  #define RTC_MINUTES             2
-> diff --git a/tests/rtc-test.c b/tests/rtc-test.c
-> index 6309b0ef6c..18f895690f 100644
-> --- a/tests/rtc-test.c
-> +++ b/tests/rtc-test.c
-> @@ -15,6 +15,7 @@
->
->  #include "libqtest-single.h"
->  #include "qemu/timer.h"
-> +#include "hw/timer/mc146818rtc.h"
->  #include "hw/timer/mc146818rtc_regs.h"
->
->  #define UIP_HOLD_LENGTH           (8 * NANOSECONDS_PER_SECOND / 32768)
-> --
-> 2.21.0
->
->
->
-
---00000000000026bad505951c80e1
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-<br><br>On Tuesday, October 15, 2019, Philippe Mathieu-Daud=C3=A9 &lt;<a hr=
-ef=3D"mailto:philmd@redhat.com">philmd@redhat.com</a>&gt; wrote:<br><blockq=
-uote class=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;border-left:1px #ccc =
-solid;padding-left:1ex">From: Philippe Mathieu-Daud=C3=A9 &lt;<a href=3D"ma=
-ilto:f4bug@amsat.org">f4bug@amsat.org</a>&gt;<br>
-<br>
-The ISA default number for the RTC devices is not related to its<br>
-registers neither. Move this definition to &quot;hw/timer/mc146818rtc.h&quo=
-t;.<br>
-<br>
-Signed-off-by: Philippe Mathieu-Daud=C3=A9 &lt;<a href=3D"mailto:philmd@red=
-hat.com">philmd@redhat.com</a>&gt;<br>
----<br>
-=C2=A0include/hw/timer/mc146818rtc.h=C2=A0 =C2=A0 =C2=A0 | 2 ++<br>
-=C2=A0include/hw/timer/mc146818rtc_<wbr>regs.h | 2 --<br>
-=C2=A0tests/rtc-test.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 | 1 +<br>
-=C2=A03 files changed, 3 insertions(+), 2 deletions(-)<br>
-<br></blockquote><div><br></div><div>Philippe, do this and related patches =
-clash with your recent reorganization of timers/rtcs?</div><div><br></div><=
-div>A.</div><div><br></div><div>=C2=A0</div><blockquote class=3D"gmail_quot=
-e" style=3D"margin:0 0 0 .8ex;border-left:1px #ccc solid;padding-left:1ex">
-diff --git a/include/hw/timer/<wbr>mc146818rtc.h b/include/hw/timer/<wbr>mc=
-146818rtc.h<br>
-index 0f1c886e5b..17761cf6d9 100644<br>
---- a/include/hw/timer/<wbr>mc146818rtc.h<br>
-+++ b/include/hw/timer/<wbr>mc146818rtc.h<br>
-@@ -39,6 +39,8 @@ typedef struct RTCState {<br>
-=C2=A0 =C2=A0 =C2=A0QLIST_ENTRY(RTCState) link;<br>
-=C2=A0} RTCState;<br>
-<br>
-+#define RTC_ISA_IRQ 8<br>
-+<br>
-=C2=A0ISADevice *mc146818_rtc_init(ISABus *bus, int base_year,<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 qemu_irq intercept_irq);<br>
-=C2=A0void rtc_set_memory(ISADevice *dev, int addr, int val);<br>
-diff --git a/include/hw/timer/<wbr>mc146818rtc_regs.h b/include/hw/timer/<w=
-br>mc146818rtc_regs.h<br>
-index bfbb57e570..631f71cfd9 100644<br>
---- a/include/hw/timer/<wbr>mc146818rtc_regs.h<br>
-+++ b/include/hw/timer/<wbr>mc146818rtc_regs.h<br>
-@@ -27,8 +27,6 @@<br>
-<br>
-=C2=A0#include &quot;qemu/timer.h&quot;<br>
-<br>
--#define RTC_ISA_IRQ 8<br>
--<br>
-=C2=A0#define RTC_SECONDS=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A00<=
-br>
-=C2=A0#define RTC_SECONDS_ALARM=C2=A0 =C2=A0 =C2=A0 =C2=A01<br>
-=C2=A0#define RTC_MINUTES=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A02<=
-br>
-diff --git a/tests/rtc-test.c b/tests/rtc-test.c<br>
-index 6309b0ef6c..18f895690f 100644<br>
---- a/tests/rtc-test.c<br>
-+++ b/tests/rtc-test.c<br>
-@@ -15,6 +15,7 @@<br>
-<br>
-=C2=A0#include &quot;libqtest-single.h&quot;<br>
-=C2=A0#include &quot;qemu/timer.h&quot;<br>
-+#include &quot;hw/timer/mc146818rtc.h&quot;<br>
-=C2=A0#include &quot;hw/timer/mc146818rtc_regs.h&quot;<br>
-<br>
-=C2=A0#define UIP_HOLD_LENGTH=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0(8 * =
-NANOSECONDS_PER_SECOND / 32768)<br>
--- <br>
-2.21.0<br>
-<br>
-<br>
-</blockquote>
-
---00000000000026bad505951c80e1--
 
