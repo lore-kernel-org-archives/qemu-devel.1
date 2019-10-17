@@ -2,86 +2,60 @@ Return-Path: <SRS0=yZS3=YK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C21EECE58E
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 14:20:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B4D99FA3735
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 14:21:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 23CE92089C
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 14:20:10 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Xz5gXCHq"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 23CE92089C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 8C60021835
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 14:21:45 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8C60021835
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49108 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49138 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iL6dM-0008EY-Fc
-	for qemu-devel@archiver.kernel.org; Thu, 17 Oct 2019 10:20:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36155)
+	id 1iL6eu-0001wc-0G
+	for qemu-devel@archiver.kernel.org; Thu, 17 Oct 2019 10:21:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36976)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1iL5q5-0006lv-J9
- for qemu-devel@nongnu.org; Thu, 17 Oct 2019 09:29:14 -0400
+ (envelope-from <mreitz@redhat.com>) id 1iL5tS-0002go-OW
+ for qemu-devel@nongnu.org; Thu, 17 Oct 2019 09:32:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1iL5q4-0002ZS-Ez
- for qemu-devel@nongnu.org; Thu, 17 Oct 2019 09:29:13 -0400
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:51638)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1iL5q4-0002Z9-6i
- for qemu-devel@nongnu.org; Thu, 17 Oct 2019 09:29:12 -0400
-Received: by mail-wm1-x343.google.com with SMTP id 7so2597999wme.1
- for <qemu-devel@nongnu.org>; Thu, 17 Oct 2019 06:29:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=03WlCBecLigWxgy0uEAlie3BbhfPPehObmaYLG7brlM=;
- b=Xz5gXCHqWKuYSqNNSfMGOAzxv0kS8vBU+JXJZUV9MP9h5fFGp2EyMWPPRBvywLP0IY
- pSoUk08RiPLsqXSH+1BgNljjvFelBYrYcAMHIsQJi1eCKtwnAycELUwS7QuzsDicapQy
- wUwSfD9nlX5Fhgf8Ku2BnTSF9khJV04jVKCp47bfS94mosKqqGyxhJxEfPgv9RfuyQ+K
- laldxmLpxCLOi62yv0NhamzOuNmB69ZTpkniacUyMcIOdlt7FP/JbM0Y/J1pK8NFEIo6
- JNKMFL1FDnDB9fn1XghClhLS/WOXQBLGFxvDawdfDdhJlvwEfzXMAdEO6Pai//rOe+9N
- p+jA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=03WlCBecLigWxgy0uEAlie3BbhfPPehObmaYLG7brlM=;
- b=FZI8T8OaKjH1h7MoKTKZcUhnlR0rYtZaBjbXB/K/4kYFLXW/zPI4SHW0+WCWpI/mf1
- MnVneAaE1h79zzOu2w53ItI1oDYOzobL9KqFlVRX44Gz5xRAlXQ1h19XPZqibn00TjkC
- zNTWjn1ec9KqJBdrAPTIKTV93HVACik+yq1gejKpY3tCcfLb2xSwE/V5bArAWXNnVEG/
- vHVgDdSXbSO2YrhA44ccyJft5pvBpSyz6N8Myo1s4lYWkTHlDS+Tvcfq+jE28fRmC7QJ
- bGvdRuc5PfsKYL0+vNpVP7csasxlnBPPb4aKxC4OT2lywtCY3vfbLGsnKSPRDZOYsuVL
- 5R5A==
-X-Gm-Message-State: APjAAAWc6NigC9xIIw0SIBdkSA/p5IdyIk2anxxXdoG3xMsj1Tzlp1lW
- nH3HmRWtnH/LUMF+2vxn75RPTg6Y2mx2BQ==
-X-Google-Smtp-Source: APXvYqy1ZoYtWzGJH2+pSITnqzsFZxZa18WrkhFTPNHgCYsTNAHNewaT2KzSdJEkrwv/CPK9Vu0Hug==
-X-Received: by 2002:a1c:ac02:: with SMTP id v2mr2779754wme.85.1571318951000;
- Thu, 17 Oct 2019 06:29:11 -0700 (PDT)
-Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id n15sm2703392wrw.47.2019.10.17.06.29.09
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 17 Oct 2019 06:29:10 -0700 (PDT)
-From: Peter Maydell <peter.maydell@linaro.org>
-To: qemu-devel@nongnu.org
-Subject: [PATCH 3/8] hw/timer/lm32_timer: Switch to transaction-based ptimer
- API
-Date: Thu, 17 Oct 2019 14:29:00 +0100
-Message-Id: <20191017132905.5604-4-peter.maydell@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20191017132905.5604-1-peter.maydell@linaro.org>
-References: <20191017132905.5604-1-peter.maydell@linaro.org>
+ (envelope-from <mreitz@redhat.com>) id 1iL5tR-0003Zu-A3
+ for qemu-devel@nongnu.org; Thu, 17 Oct 2019 09:32:42 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37510)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>)
+ id 1iL5tH-0003Vo-SJ; Thu, 17 Oct 2019 09:32:32 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 19587C04AC50;
+ Thu, 17 Oct 2019 13:32:31 +0000 (UTC)
+Received: from localhost (ovpn-117-3.ams2.redhat.com [10.36.117.3])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id B0F2B5D9D5;
+ Thu, 17 Oct 2019 13:32:30 +0000 (UTC)
+From: Max Reitz <mreitz@redhat.com>
+To: qemu-block@nongnu.org
+Subject: [PATCH v2 12/23] iotests/183: Create socket in $SOCK_DIR
+Date: Thu, 17 Oct 2019 15:31:44 +0200
+Message-Id: <20191017133155.5327-13-mreitz@redhat.com>
+In-Reply-To: <20191017133155.5327-1-mreitz@redhat.com>
+References: <20191017133155.5327-1-mreitz@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::343
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.31]); Thu, 17 Oct 2019 13:32:31 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -93,91 +67,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Huth <huth@tuxfamily.org>,
- "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
- Michael Walle <michael@walle.cc>, Guan Xuetao <gxt@mprc.pku.edu.cn>,
- Magnus Damm <magnus.damm@gmail.com>
+Cc: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org,
+ Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Switch the lm32_timer code away from bottom-half based ptimers to the
-new transaction-based ptimer API.  This just requires adding
-begin/commit calls around the various places that modify the ptimer
-state, and using the new ptimer_init() function to create the ytimer.
-
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+Signed-off-by: Max Reitz <mreitz@redhat.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+Reviewed-by: Thomas Huth <thuth@redhat.com>
 ---
- hw/timer/lm32_timer.c | 13 +++++++++----
- 1 file changed, 9 insertions(+), 4 deletions(-)
+ tests/qemu-iotests/183 | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/hw/timer/lm32_timer.c b/hw/timer/lm32_timer.c
-index fabde760b2d..3fdecd09fe2 100644
---- a/hw/timer/lm32_timer.c
-+++ b/hw/timer/lm32_timer.c
-@@ -30,7 +30,6 @@
- #include "hw/ptimer.h"
- #include "hw/qdev-properties.h"
- #include "qemu/error-report.h"
--#include "qemu/main-loop.h"
- #include "qemu/module.h"
- 
- #define DEFAULT_FREQUENCY (50*1000000)
-@@ -63,7 +62,6 @@ struct LM32TimerState {
- 
-     MemoryRegion iomem;
- 
--    QEMUBH *bh;
-     ptimer_state *ptimer;
- 
-     qemu_irq irq;
-@@ -119,6 +117,7 @@ static void timer_write(void *opaque, hwaddr addr,
-         s->regs[R_SR] &= ~SR_TO;
-         break;
-     case R_CR:
-+        ptimer_transaction_begin(s->ptimer);
-         s->regs[R_CR] = value;
-         if (s->regs[R_CR] & CR_START) {
-             ptimer_run(s->ptimer, 1);
-@@ -126,10 +125,13 @@ static void timer_write(void *opaque, hwaddr addr,
-         if (s->regs[R_CR] & CR_STOP) {
-             ptimer_stop(s->ptimer);
-         }
-+        ptimer_transaction_commit(s->ptimer);
-         break;
-     case R_PERIOD:
-         s->regs[R_PERIOD] = value;
-+        ptimer_transaction_begin(s->ptimer);
-         ptimer_set_count(s->ptimer, value);
-+        ptimer_transaction_commit(s->ptimer);
-         break;
-     case R_SNAPSHOT:
-         error_report("lm32_timer: write access to read only register 0x"
-@@ -176,7 +178,9 @@ static void timer_reset(DeviceState *d)
-     for (i = 0; i < R_MAX; i++) {
-         s->regs[i] = 0;
-     }
-+    ptimer_transaction_begin(s->ptimer);
-     ptimer_stop(s->ptimer);
-+    ptimer_transaction_commit(s->ptimer);
- }
- 
- static void lm32_timer_init(Object *obj)
-@@ -195,10 +199,11 @@ static void lm32_timer_realize(DeviceState *dev, Error **errp)
+diff --git a/tests/qemu-iotests/183 b/tests/qemu-iotests/183
+index 04fb344d08..bced83fae0 100755
+--- a/tests/qemu-iotests/183
++++ b/tests/qemu-iotests/183
+@@ -26,7 +26,7 @@ echo "QA output created by $seq"
+=20
+ status=3D1 # failure is the default!
+=20
+-MIG_SOCKET=3D"${TEST_DIR}/migrate"
++MIG_SOCKET=3D"${SOCK_DIR}/migrate"
+=20
+ _cleanup()
  {
-     LM32TimerState *s = LM32_TIMER(dev);
- 
--    s->bh = qemu_bh_new(timer_hit, s);
--    s->ptimer = ptimer_init_with_bh(s->bh, PTIMER_POLICY_DEFAULT);
-+    s->ptimer = ptimer_init(timer_hit, s, PTIMER_POLICY_DEFAULT);
- 
-+    ptimer_transaction_begin(s->ptimer);
-     ptimer_set_freq(s->ptimer, s->freq_hz);
-+    ptimer_transaction_commit(s->ptimer);
- }
- 
- static const VMStateDescription vmstate_lm32_timer = {
--- 
-2.20.1
+--=20
+2.21.0
 
 
