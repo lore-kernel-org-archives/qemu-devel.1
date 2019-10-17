@@ -6,52 +6,52 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9CD09ECE58E
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 14:34:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 20F7FECE58E
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 14:36:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 703C321A4C
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 14:34:51 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 703C321A4C
+	by mail.kernel.org (Postfix) with ESMTPS id E866B21A4C
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 14:36:18 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E866B21A4C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49416 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49438 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iL6rZ-0001f7-GS
-	for qemu-devel@archiver.kernel.org; Thu, 17 Oct 2019 10:34:50 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37180)
+	id 1iL6sz-0003sk-Ll
+	for qemu-devel@archiver.kernel.org; Thu, 17 Oct 2019 10:36:17 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37177)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1iL5tg-0002yD-KV
+ (envelope-from <mreitz@redhat.com>) id 1iL5tg-0002xn-DJ
  for qemu-devel@nongnu.org; Thu, 17 Oct 2019 09:32:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1iL5tf-0003l6-A9
+ (envelope-from <mreitz@redhat.com>) id 1iL5tf-0003kr-1O
  for qemu-devel@nongnu.org; Thu, 17 Oct 2019 09:32:56 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43824)
+Received: from mx1.redhat.com ([209.132.183.28]:43780)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <mreitz@redhat.com>)
- id 1iL5tc-0003ho-R7; Thu, 17 Oct 2019 09:32:52 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
+ id 1iL5tY-0003eT-NK; Thu, 17 Oct 2019 09:32:48 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 1518B305ABF2;
- Thu, 17 Oct 2019 13:32:52 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 023B9300CB2C;
+ Thu, 17 Oct 2019 13:32:48 +0000 (UTC)
 Received: from localhost (ovpn-117-3.ams2.redhat.com [10.36.117.3])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id B0ECF60852;
- Thu, 17 Oct 2019 13:32:51 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 98432600C4;
+ Thu, 17 Oct 2019 13:32:47 +0000 (UTC)
 From: Max Reitz <mreitz@redhat.com>
 To: qemu-block@nongnu.org
-Subject: [PATCH v2 22/23] iotests/267: Create socket in $SOCK_DIR
-Date: Thu, 17 Oct 2019 15:31:54 +0200
-Message-Id: <20191017133155.5327-23-mreitz@redhat.com>
+Subject: [PATCH v2 20/23] iotests/223: Create socket in $SOCK_DIR
+Date: Thu, 17 Oct 2019 15:31:52 +0200
+Message-Id: <20191017133155.5327-21-mreitz@redhat.com>
 In-Reply-To: <20191017133155.5327-1-mreitz@redhat.com>
 References: <20191017133155.5327-1-mreitz@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.46]); Thu, 17 Oct 2019 13:32:52 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.46]); Thu, 17 Oct 2019 13:32:48 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
@@ -76,50 +76,73 @@ Sender: "Qemu-devel"
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
 ---
- tests/qemu-iotests/267     | 4 ++--
- tests/qemu-iotests/267.out | 2 +-
- 2 files changed, 3 insertions(+), 3 deletions(-)
+ tests/qemu-iotests/223 | 14 +++++++-------
+ 1 file changed, 7 insertions(+), 7 deletions(-)
 
-diff --git a/tests/qemu-iotests/267 b/tests/qemu-iotests/267
-index d37a67c012..170e173c0a 100755
---- a/tests/qemu-iotests/267
-+++ b/tests/qemu-iotests/267
-@@ -29,7 +29,7 @@ status=3D1	# failure is the default!
- _cleanup()
- {
+diff --git a/tests/qemu-iotests/223 b/tests/qemu-iotests/223
+index 2ba3d8124b..b5a80e50bb 100755
+--- a/tests/qemu-iotests/223
++++ b/tests/qemu-iotests/223
+@@ -28,7 +28,7 @@ _cleanup()
+     nbd_server_stop
      _cleanup_test_img
+     _cleanup_qemu
 -    rm -f "$TEST_DIR/nbd"
 +    rm -f "$SOCK_DIR/nbd"
  }
  trap "_cleanup; exit \$status" 0 1 2 3 15
 =20
-@@ -143,7 +143,7 @@ echo
+@@ -125,11 +125,11 @@ _send_qemu_cmd $QEMU_HANDLE '{"execute":"nbd-server=
+-add",
+   "arguments":{"device":"n"}}' "error" # Attempt add without server
+ _send_qemu_cmd $QEMU_HANDLE '{"execute":"nbd-server-start",
+   "arguments":{"addr":{"type":"unix",
+-    "data":{"path":"'"$TEST_DIR/nbd"'"}}}}' "return"
++    "data":{"path":"'"$SOCK_DIR/nbd"'"}}}}' "return"
+ _send_qemu_cmd $QEMU_HANDLE '{"execute":"nbd-server-start",
+   "arguments":{"addr":{"type":"unix",
+-    "data":{"path":"'"$TEST_DIR/nbd"1'"}}}}' "error" # Attempt second se=
+rver
+-$QEMU_NBD_PROG -L -k "$TEST_DIR/nbd"
++    "data":{"path":"'"$SOCK_DIR/nbd"1'"}}}}' "error" # Attempt second se=
+rver
++$QEMU_NBD_PROG -L -k "$SOCK_DIR/nbd"
+ _send_qemu_cmd $QEMU_HANDLE '{"execute":"nbd-server-add",
+   "arguments":{"device":"n", "bitmap":"b"}}' "return"
+ _send_qemu_cmd $QEMU_HANDLE '{"execute":"nbd-server-add",
+@@ -145,14 +145,14 @@ _send_qemu_cmd $QEMU_HANDLE '{"execute":"nbd-server=
+-add",
+ _send_qemu_cmd $QEMU_HANDLE '{"execute":"nbd-server-add",
+   "arguments":{"device":"n", "name":"n2", "writable":true,
+   "bitmap":"b2"}}' "return"
+-$QEMU_NBD_PROG -L -k "$TEST_DIR/nbd"
++$QEMU_NBD_PROG -L -k "$SOCK_DIR/nbd"
 =20
- IMGOPTS=3D"backing_file=3D$TEST_IMG.base" _make_test_img $size
- cat <<EOF |
--nbd_server_start unix:$TEST_DIR/nbd
-+nbd_server_start unix:$SOCK_DIR/nbd
- nbd_server_add -w backing-fmt
- savevm snap0
- info snapshots
-diff --git a/tests/qemu-iotests/267.out b/tests/qemu-iotests/267.out
-index 9d812e3c72..8dddb4baa4 100644
---- a/tests/qemu-iotests/267.out
-+++ b/tests/qemu-iotests/267.out
-@@ -161,7 +161,7 @@ Internal snapshots on backing file:
- Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D134217728 backing_fi=
-le=3DTEST_DIR/t.IMGFMT.base
- Testing: -blockdev driver=3Dfile,filename=3DTEST_DIR/t.IMGFMT.base,node-=
-name=3Dbacking-file -blockdev driver=3DIMGFMT,file=3Dbacking-file,node-na=
-me=3Dbacking-fmt -blockdev driver=3Dfile,filename=3DTEST_DIR/t.IMGFMT,nod=
-e-name=3Dfile -blockdev driver=3DIMGFMT,file=3Dfile,backing=3Dbacking-fmt=
-,node-name=3Dfmt
- QEMU X.Y.Z monitor - type 'help' for more information
--(qemu) nbd_server_start unix:TEST_DIR/nbd
-+(qemu) nbd_server_start unix:SOCK_DIR/nbd
- (qemu) nbd_server_add -w backing-fmt
- (qemu) savevm snap0
- (qemu) info snapshots
+ echo
+ echo "=3D=3D=3D Contrast normal status to large granularity dirty-bitmap=
+ =3D=3D=3D"
+ echo
+=20
+ QEMU_IO_OPTIONS=3D$QEMU_IO_OPTIONS_NO_FMT
+-IMG=3D"driver=3Dnbd,export=3Dn,server.type=3Dunix,server.path=3D$TEST_DI=
+R/nbd"
++IMG=3D"driver=3Dnbd,export=3Dn,server.type=3Dunix,server.path=3D$SOCK_DI=
+R/nbd"
+ $QEMU_IO -r -c 'r -P 0x22 512 512' -c 'r -P 0 512k 512k' -c 'r -P 0x11 1=
+m 1m' \
+   -c 'r -P 0x33 2m 2m' --image-opts "$IMG" | _filter_qemu_io
+ $QEMU_IMG map --output=3Djson --image-opts \
+@@ -164,7 +164,7 @@ echo
+ echo "=3D=3D=3D Contrast to small granularity dirty-bitmap =3D=3D=3D"
+ echo
+=20
+-IMG=3D"driver=3Dnbd,export=3Dn2,server.type=3Dunix,server.path=3D$TEST_D=
+IR/nbd"
++IMG=3D"driver=3Dnbd,export=3Dn2,server.type=3Dunix,server.path=3D$SOCK_D=
+IR/nbd"
+ $QEMU_IMG map --output=3Djson --image-opts \
+   "$IMG,x-dirty-bitmap=3Dqemu:dirty-bitmap:b2" | _filter_qemu_img_map
+=20
 --=20
 2.21.0
 
