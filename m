@@ -2,87 +2,81 @@ Return-Path: <SRS0=yZS3=YK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1AF5AECE58E
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 11:47:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 18829FA372A
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 11:50:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E49712089C
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 11:47:39 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E49712089C
+	by mail.kernel.org (Postfix) with ESMTPS id DF4EA2082C
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 11:50:15 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DF4EA2082C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44646 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44718 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iL4Fn-0003Je-3R
-	for qemu-devel@archiver.kernel.org; Thu, 17 Oct 2019 07:47:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49060)
+	id 1iL4IJ-0005Ew-1u
+	for qemu-devel@archiver.kernel.org; Thu, 17 Oct 2019 07:50:15 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49444)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1iL4Ef-0002o6-7E
- for qemu-devel@nongnu.org; Thu, 17 Oct 2019 07:46:30 -0400
+ (envelope-from <slp@redhat.com>) id 1iL4HY-0004pI-Br
+ for qemu-devel@nongnu.org; Thu, 17 Oct 2019 07:49:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1iL4Ee-0003vR-8e
- for qemu-devel@nongnu.org; Thu, 17 Oct 2019 07:46:29 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:38004)
+ (envelope-from <slp@redhat.com>) id 1iL4HX-0004T8-2h
+ for qemu-devel@nongnu.org; Thu, 17 Oct 2019 07:49:28 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43406)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>)
- id 1iL4Ec-0003us-2V; Thu, 17 Oct 2019 07:46:26 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (Exim 4.71) (envelope-from <slp@redhat.com>) id 1iL4HW-0004St-Qh
+ for qemu-devel@nongnu.org; Thu, 17 Oct 2019 07:49:27 -0400
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 3E8347BDA6;
- Thu, 17 Oct 2019 11:46:25 +0000 (UTC)
-Received: from dresden.str.redhat.com (ovpn-117-3.ams2.redhat.com
- [10.36.117.3])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id E73861001DC0;
- Thu, 17 Oct 2019 11:46:23 +0000 (UTC)
-Subject: Re: [PATCH v2 1/3] iotests: Fix 173
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
-References: <20191015193503.25591-1-eblake@redhat.com>
- <20191015193503.25591-2-eblake@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <4aa107c6-db84-006c-962a-81c90933c3a4@redhat.com>
-Date: Thu, 17 Oct 2019 13:46:21 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.0
+ by mx1.redhat.com (Postfix) with ESMTPS id C9E138553F
+ for <qemu-devel@nongnu.org>; Thu, 17 Oct 2019 11:49:25 +0000 (UTC)
+Received: by mail-wr1-f72.google.com with SMTP id e14so814454wrm.21
+ for <qemu-devel@nongnu.org>; Thu, 17 Oct 2019 04:49:25 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version;
+ bh=4krLb12OnICKjaMwH7B3tTaL3awfMGRuLrOJzZJZDNU=;
+ b=pi55hoYWKluF+71X7JelWfiC4H699NLgQAW3hs7zEevA15R1sRDL5wU2Deirppc8qB
+ nupWIQqRc/RjBRY846/2Cgq2csKRuJoSIt0nV2ah/k0/BBbWrnoM8rO+/wXvUjwW+1ID
+ 5O/As1vhEXRGCloLxscEiUDRYHNWLCasz4RP6bEOrLHb700ZhTvusOYsuW4YMemac3tk
+ F436wR3+JzoVIcTSbVpW9dCuH1XXKGDNWhO9gPf0EtpqfBKK1v05alI4sDZGCaJxbWmZ
+ QPzssaQ81Ca+iGUtwW4gJ2dP2QtVBNfnLFH9NjgUebemM7MDHq2wWpVoMj+ciHC2Xg60
+ FdWQ==
+X-Gm-Message-State: APjAAAUBs7Ajv0FoCS4xxqHB2x5Vero4Ff59v/FKVj+bsEfcekehgM6C
+ KYm4qK3Tk+tfNR3MyErWXi7dZ+Lvop8kIxroUMxXuYG6/Bl+0UZnySnzSIyHxdgorUpcUSofzW3
+ /f9ZOntg2pTVSoww=
+X-Received: by 2002:adf:ed49:: with SMTP id u9mr2594901wro.229.1571312964458; 
+ Thu, 17 Oct 2019 04:49:24 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqxDZuoh6NQoXkaDkROe2ccgO2d6DmZpRLdcVfci9SPyjrAQOBeVc8xAv1+MYolNBydHH3KWMw==
+X-Received: by 2002:adf:ed49:: with SMTP id u9mr2594868wro.229.1571312964167; 
+ Thu, 17 Oct 2019 04:49:24 -0700 (PDT)
+Received: from dritchie.redhat.com (139.red-95-120-215.dynamicip.rima-tde.net.
+ [95.120.215.139])
+ by smtp.gmail.com with ESMTPSA id b5sm1925178wmj.18.2019.10.17.04.49.22
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 17 Oct 2019 04:49:23 -0700 (PDT)
+References: <20191016101241.24405-1-slp@redhat.com>
+ <20191016101241.24405-14-slp@redhat.com> <20191017110051.GH31072@redhat.com>
+User-agent: mu4e 1.2.0; emacs 26.2
+From: Sergio Lopez <slp@redhat.com>
+To: =?utf-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>
+Subject: Re: [PATCH v10 13/15] docs/microvm.rst: document the new microvm
+ machine type
+In-reply-to: <20191017110051.GH31072@redhat.com>
+Date: Thu, 17 Oct 2019 13:49:20 +0200
+Message-ID: <87eezbh9rz.fsf@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20191015193503.25591-2-eblake@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="KMrMsm5FRKFelttDDAgOm8LIjeg0RKCDq"
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.26]); Thu, 17 Oct 2019 11:46:25 +0000 (UTC)
+Content-Type: multipart/signed; boundary="=-=-=";
+ micalg=pgp-sha256; protocol="application/pgp-signature"
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 209.132.183.28
@@ -97,77 +91,191 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: ehabkost@redhat.com, mst@redhat.com, philmd@redhat.com, groug@kaod.org,
+ qemu-devel@nongnu.org, kraxel@redhat.com, imammedo@redhat.com,
+ pbonzini@redhat.com, rth@twiddle.net, lersek@redhat.com, sgarzare@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---KMrMsm5FRKFelttDDAgOm8LIjeg0RKCDq
-Content-Type: multipart/mixed; boundary="JHgGW6wlTaPGAaizqWmG13V7eGOmxJWyv"
-
---JHgGW6wlTaPGAaizqWmG13V7eGOmxJWyv
+--=-=-=
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
-On 15.10.19 21:35, Eric Blake wrote:
-> This test has been broken since 3.0.  It used TEST_IMG to influence
-> the name of a file created during _make_test_img, but commit 655ae6bb
-> changed things so that the wrong file name is being created, which
-> then caused _launch_qemu to fail.  In the meantime, the set of events
-> issued for the actions of the test has increased.
->=20
-> Why haven't we noticed the failure? Because the test rarely gets run:
-> './check -qcow2 173' is insufficient (that defaults to using file proto=
-col)
-> './check -nfs 173' is insufficient (that defaults to using raw format)
-> so the test is only run with:
-> ./check -qcow2 -nfs 173
->=20
-> Note that we already have a number of other problems with -nfs:
-> ./check -nfs (fails 18/30)
-> ./check -qcow2 -nfs (fails 45/76 after this patch)
-> and it's not on my priority list to fix those.  Rather, I found this
-> because of my next patch's work on tests using _send_qemu_cmd.
->=20
-> Fixes: 655ae6b
-> Signed-off-by: Eric Blake <eblake@redhat.com>
-> ---
->  tests/qemu-iotests/173     | 4 ++--
->  tests/qemu-iotests/173.out | 6 +++++-
->  2 files changed, 7 insertions(+), 3 deletions(-)
 
-On second thought, I wonder whether this test actually does anything
-with NFS.  It doesn=E2=80=99t look like it to me.
+Daniel P. Berrang=C3=A9 <berrange@redhat.com> writes:
 
-I wonder because for some reason I can=E2=80=99t get NFS to work with qem=
-u at
-all.  I don=E2=80=99t think the iotests are at fault why so many tests fa=
-il,
-actually.
+> On Wed, Oct 16, 2019 at 12:12:40PM +0200, Sergio Lopez wrote:
+>> Document the new microvm machine type.
+>>=20
+>> Signed-off-by: Sergio Lopez <slp@redhat.com>
+>> Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+>> ---
+>>  docs/microvm.rst | 98 ++++++++++++++++++++++++++++++++++++++++++++++++
+>>  1 file changed, 98 insertions(+)
+>>  create mode 100644 docs/microvm.rst
+>>=20
+>> diff --git a/docs/microvm.rst b/docs/microvm.rst
+>> new file mode 100644
+>> index 0000000000..0aab55576c
+>> --- /dev/null
+>> +++ b/docs/microvm.rst
+>> @@ -0,0 +1,98 @@
+>> +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+>> +microvm Machine Type
+>> +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+>> +
+>> +``microvm`` is a machine type inspired by ``Firecracker`` and
+>> +constructed after its machine model.
+>> +
+>> +It's a minimalist machine type without ``PCI`` nor ``ACPI`` support,
+>> +designed for short-lived guests. microvm also establishes a baseline
+>> +for benchmarking and optimizing both QEMU and guest operating systems,
+>> +since it is optimized for both boot time and footprint.
+>
+> I'm wondering about live migration support across QEMU versions.
+>
+> IIUC, this is not intended to be a versioned machined type, so
+> live migration won't be supportable across QEMU versions.
+>
+> Given that its for short lived guests, this shouldn't be an
+> issue, but it might be worth saying something explicit here
+> about migration to avoid any risk of misunderstanding.
 
-Max
+It may be worth adding a Limitations section. Something like this:
+
+Limitations
+=2D----------
+
+Currently, microvm does *not* support the following features:
+
+ - PCI-only devices.
+ - Hotplug of any kind.
+ - Live migration across QEMU versions.
+
+Any other thing we should highlight there?
+
+Thanks,
+Sergio.
+
+>> +
+>> +
+>> +Supported devices
+>> +-----------------
+>> +
+>> +The microvm machine type supports the following devices:
+>> +
+>> +- ISA bus
+>> +- i8259 PIC (optional)
+>> +- i8254 PIT (optional)
+>> +- MC146818 RTC (optional)
+>> +- One ISA serial port (optional)
+>> +- LAPIC
+>> +- IOAPIC (with kernel-irqchip=3Dsplit by default)
+>> +- kvmclock (if using KVM)
+>> +- fw_cfg
+>> +- Up to eight virtio-mmio devices (configured by the user)
+>> +
+>> +
+>> +Using the microvm machine type
+>> +------------------------------
+>> +
+>> +Machine-specific options
+>> +~~~~~~~~~~~~~~~~~~~~~~~~
+>> +
+>> +It supports the following machine-specific options:
+>> +
+>> +- microvm.x-option-roms=3Dbool (Set off to disable loading option ROMs)
+>> +- microvm.pit=3DOnOffAuto (Enable i8254 PIT)
+>> +- microvm.isa-serial=3Dbool (Set off to disable the instantiation an IS=
+A serial port)
+>> +- microvm.pic=3DOnOffAuto (Enable i8259 PIC)
+>> +- microvm.rtc=3DOnOffAuto (Enable MC146818 RTC)
+>> +- microvm.auto-kernel-cmdline=3Dbool (Set off to disable adding virtio-=
+mmio devices to the kernel cmdline)
+>> +
+>> +
+>> +Boot options
+>> +~~~~~~~~~~~~
+>> +
+>> +By default, microvm uses ``qboot`` as its BIOS, to obtain better boot
+>> +times, but it's also compatible with ``SeaBIOS``.
+>> +
+>> +As no current FW is able to boot from a block device using
+>> +``virtio-mmio`` as its transport, a microvm-based VM needs to be run
+>> +using a host-side kernel and, optionally, an initrd image.
+>> +
+>> +
+>> +Running a microvm-based VM
+>> +~~~~~~~~~~~~~~~~~~~~~~~~~~
+>> +
+>> +By default, microvm aims for maximum compatibility, enabling both
+>> +legacy and non-legacy devices. In this example, a VM is created
+>> +without passing any additional machine-specific option, using the
+>> +legacy ``ISA serial`` device as console::
+>> +
+>> +  $ qemu-system-x86_64 -M microvm \
+>> +     -enable-kvm -cpu host -m 512m -smp 2 \
+>> +     -kernel vmlinux -append "earlyprintk=3DttyS0 console=3DttyS0 root=
+=3D/dev/vda" \
+>> +     -nodefaults -no-user-config -nographic \
+>> +     -serial stdio \
+>> +     -drive id=3Dtest,file=3Dtest.img,format=3Draw,if=3Dnone \
+>> +     -device virtio-blk-device,drive=3Dtest \
+>> +     -netdev tap,id=3Dtap0,script=3Dno,downscript=3Dno \
+>> +     -device virtio-net-device,netdev=3Dtap0
+>> +
+>> +While the example above works, you might be interested in reducing the
+>> +footprint further by disabling some legacy devices. If you're using
+>> +``KVM``, you can disable the ``RTC``, making the Guest rely on
+>> +``kvmclock`` exclusively. Additionally, if your host's CPUs have the
+>> +``TSC_DEADLINE`` feature, you can also disable both the i8259 PIC and
+>> +the i8254 PIT (make sure you're also emulating a CPU with such feature
+>> +in the guest).
+>> +
+>> +This is an example of a VM with all optional legacy features
+>> +disabled::
+>> +
+>> +  $ qemu-system-x86_64 \
+>> +     -M microvm,x-option-roms=3Doff,pit=3Doff,pic=3Doff,isa-serial=3Dof=
+f,rtc=3Doff \
+>> +     -enable-kvm -cpu host -m 512m -smp 2 \
+>> +     -kernel vmlinux -append "console=3Dhvc0 root=3D/dev/vda" \
+>> +     -nodefaults -no-user-config -nographic \
+>> +     -chardev stdio,id=3Dvirtiocon0,server \
+>> +     -device virtio-serial-device \
+>> +     -device virtconsole,chardev=3Dvirtiocon0 \
+>> +     -drive id=3Dtest,file=3Dtest.img,format=3Draw,if=3Dnone \
+>> +     -device virtio-blk-device,drive=3Dtest \
+>> +     -netdev tap,id=3Dtap0,script=3Dno,downscript=3Dno \
+>> +     -device virtio-net-device,netdev=3Dtap0
+>> --=20
+>> 2.21.0
+>>=20
+>>=20
+>
+> Regards,
+> Daniel
 
 
---JHgGW6wlTaPGAaizqWmG13V7eGOmxJWyv--
-
---KMrMsm5FRKFelttDDAgOm8LIjeg0RKCDq
+--=-=-=
 Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl2oVI0ACgkQ9AfbAGHV
-z0CPNAf/YbkpXl9FJUzrMf5xKDF1t59zztZEZxqjvFvD/OkST07z3Ivr8W81E06F
-4dIprVZtNBaMCjbRIsT96zZPYZma9+wOgZ+Lnbwz5d8prpASsM4Vjc72ilemqVzr
-NCo9tdLj6Qt4TRMLPYNQ0gW6ypobgtpyD9Z0XmWo2zeKD77FushTk6DiqIyZ0kGv
-ueSqN3SoH5dWQ5TD4NO0Wfoiw65Wy/7f7y19a9Kl01e411F/aLXYaRK4f+Xdw8MN
-dxqpiCIkd3cHck+sUKaXFVIitVUbHRcW2c0Ilw33/0Ja5aBXj2CQnlZyTbTDmBUV
-I1hIkywWp7yVylIXrzBo6AhePb1kwA==
-=I9mo
+iQIzBAEBCAAdFiEEvtX891EthoCRQuii9GknjS8MAjUFAl2oVUAACgkQ9GknjS8M
+AjVVxhAApC+vcWnK2ONLTirD1+eJVxLNOyJngLRL6ZbgK/dQIKgwl6r1rAdAi5Gh
+5cjlh13q7NJ5l6PkfpUPzJTtkOa0ucPnPZ7UWIL3vm2/mtkYJHm4k9DqMQIkBDMc
+k3jl3LKT9Qy3LyHyqYzuVjis5CnIJXT+RE4BJa4p+lhbtOJsgmVFLQNaYHbDASs4
+etfSyOUsC6ICJY6d2xEpnHI2nBPBAonC6AAYJWlm7GW0ssBgylG4kSfVKW2VFwNI
+nqZdhJWlC+yFUVcrYtclWON41hqwS8wzlPxuknZaWZYLwXgSFgzaqWHEqe/JxNGc
+t9xA/880B2mm9kV/f5eYIacGVST/y7u7+t8RxXfdJDpIxq/3gi/KlmK1GAjb2MPR
+h3P8Dh8EM6YT9XuBbd6pXYcdIzvaVm5uBPmstD8v+V6XkyhrIg/pGolbrYwFlVUO
+nRZkIO25cNZjWaQ+LbuWdU+0jkxYc9I6x0QBolGtKOLVkt/2Gmaja8WJJqCVDVhr
+RqVtp7Sj3KxEh7ZX9Zy9Idb5JTMQTIKMPAAX4F8HZXKUhyVDIJzGRkyQjlzDiUp0
+C96j9lABgWtek90g3+bOZLWt9bsySLuKAtNBhASIJch0hpWzSfb0B6DrCvAJLVsJ
+uVnIfK+5w9GprTLTWhFa06n1ShblGYFRAjeUZV/nI+TB1BR13Cw=
+=U56e
 -----END PGP SIGNATURE-----
-
---KMrMsm5FRKFelttDDAgOm8LIjeg0RKCDq--
+--=-=-=--
 
