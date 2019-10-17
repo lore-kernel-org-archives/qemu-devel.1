@@ -2,50 +2,49 @@ Return-Path: <SRS0=yZS3=YK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9C5CEECE58E
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 16:39:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B07F6ECE58E
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 16:41:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 71F3921835
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 16:39:14 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 71F3921835
+	by mail.kernel.org (Postfix) with ESMTPS id 81A5321835
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 16:41:19 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 81A5321835
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52854 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52884 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iL8nx-0006o0-DS
-	for qemu-devel@archiver.kernel.org; Thu, 17 Oct 2019 12:39:13 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58481)
+	id 1iL8py-0001L5-BE
+	for qemu-devel@archiver.kernel.org; Thu, 17 Oct 2019 12:41:18 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33521)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <thuth@redhat.com>) id 1iL7mm-0000Kc-QQ
- for qemu-devel@nongnu.org; Thu, 17 Oct 2019 11:33:57 -0400
+ (envelope-from <thuth@redhat.com>) id 1iL87G-000311-DY
+ for qemu-devel@nongnu.org; Thu, 17 Oct 2019 11:55:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <thuth@redhat.com>) id 1iL7ml-00042Y-QB
- for qemu-devel@nongnu.org; Thu, 17 Oct 2019 11:33:56 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46054)
+ (envelope-from <thuth@redhat.com>) id 1iL87F-0001V0-6a
+ for qemu-devel@nongnu.org; Thu, 17 Oct 2019 11:55:06 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:52308)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <thuth@redhat.com>) id 1iL7ml-00042J-Hm
- for qemu-devel@nongnu.org; Thu, 17 Oct 2019 11:33:55 -0400
+ (Exim 4.71) (envelope-from <thuth@redhat.com>)
+ id 1iL87C-0001UF-UG; Thu, 17 Oct 2019 11:55:03 -0400
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
  [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 9A74D882F5;
- Thu, 17 Oct 2019 15:33:54 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 283752B84;
+ Thu, 17 Oct 2019 15:55:02 +0000 (UTC)
 Received: from thuth.remote.csb (dhcp-200-228.str.redhat.com [10.33.200.228])
- by smtp.corp.redhat.com (Postfix) with ESMTP id D255A60872;
- Thu, 17 Oct 2019 15:33:46 +0000 (UTC)
-Subject: Re: [PATCH 20/32] hw/i386/pc: Extract pc_gsi_create()
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- qemu-devel@nongnu.org
-References: <20191015162705.28087-1-philmd@redhat.com>
- <20191015162705.28087-21-philmd@redhat.com>
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 6012660605;
+ Thu, 17 Oct 2019 15:55:01 +0000 (UTC)
+Subject: Re: [PATCH v2 15/23] iotests/201: Create socket in $SOCK_DIR
+To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+References: <20191017133155.5327-1-mreitz@redhat.com>
+ <20191017133155.5327-16-mreitz@redhat.com>
 From: Thomas Huth <thuth@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=thuth@redhat.com; prefer-encrypt=mutual; keydata=
@@ -91,18 +90,18 @@ Autocrypt: addr=thuth@redhat.com; prefer-encrypt=mutual; keydata=
  IQu4bBP2GxiRQ+NV3iV/KU3ebMRzqIC//DCOxzQNFNJAKldPe/bKZMCxEqtVoRkuJtNdp/5a
  yXFZ6TfE1hGKrDBYAm4vrnZ4CXFSBDllL59cFFOJCkn4Xboj/aVxxJxF30bn
 Organization: Red Hat
-Message-ID: <19560568-4f59-9ee4-92fd-2a6ef6a21a8e@redhat.com>
-Date: Thu, 17 Oct 2019 17:33:46 +0200
+Message-ID: <2d7b6c6e-0435-4117-833c-6fbb091abc4e@redhat.com>
+Date: Thu, 17 Oct 2019 17:55:00 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.9.0
 MIME-Version: 1.0
-In-Reply-To: <20191015162705.28087-21-philmd@redhat.com>
+In-Reply-To: <20191017133155.5327-16-mreitz@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.28]); Thu, 17 Oct 2019 15:33:54 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.71]); Thu, 17 Oct 2019 15:55:02 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 209.132.183.28
@@ -117,36 +116,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>,
- Stefano Stabellini <sstabellini@kernel.org>,
- Eduardo Habkost <ehabkost@redhat.com>, kvm@vger.kernel.org,
- Paul Durrant <paul@xen.org>, "Michael S. Tsirkin" <mst@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>,
- Aleksandar Markovic <amarkovic@wavecomp.com>, xen-devel@lists.xenproject.org,
- Anthony Perard <anthony.perard@citrix.com>,
- Igor Mammedov <imammedo@redhat.com>,
- Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
- Aurelien Jarno <aurelien@aurel32.net>, Richard Henderson <rth@twiddle.net>
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 15/10/2019 18.26, Philippe Mathieu-Daud=C3=A9 wrote:
-> The GSI creation code is common to all PC machines, extract the
-> common code.
->=20
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+On 17/10/2019 15.31, Max Reitz wrote:
+> Signed-off-by: Max Reitz <mreitz@redhat.com>
+> Reviewed-by: Eric Blake <eblake@redhat.com>
 > ---
->  hw/i386/pc.c         | 15 +++++++++++++++
->  hw/i386/pc_piix.c    |  9 +--------
->  hw/i386/pc_q35.c     |  9 +--------
->  include/hw/i386/pc.h |  2 ++
->  4 files changed, 19 insertions(+), 16 deletions(-)
+>  tests/qemu-iotests/201 | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/tests/qemu-iotests/201 b/tests/qemu-iotests/201
+> index 7abf740fe4..86fa37e714 100755
+> --- a/tests/qemu-iotests/201
+> +++ b/tests/qemu-iotests/201
+> @@ -24,7 +24,7 @@ echo "QA output created by $seq"
+>  
+>  status=1	# failure is the default!
+>  
+> -MIG_SOCKET="${TEST_DIR}/migrate"
+> +MIG_SOCKET="${SOCK_DIR}/migrate"
+>  
+>  # get standard environment, filters and checks
+>  . ./common.rc
+> 
 
-Is this really needed for this series here, or should this and the
-following patches maybe rather be handled seperately?
-
-Anyway, it looks like a good modification, so:
 Reviewed-by: Thomas Huth <thuth@redhat.com>
 
