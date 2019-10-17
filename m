@@ -2,109 +2,100 @@ Return-Path: <SRS0=yZS3=YK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D4DFFA372A
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 15:38:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 93A7BECE58E
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 15:38:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 01FC42089C
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 15:38:53 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 01FC42089C
+	by mail.kernel.org (Postfix) with ESMTPS id 616D02089C
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 15:38:56 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GsmPpC/b"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 616D02089C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51212 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51214 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iL7rX-0005Qg-MR
-	for qemu-devel@archiver.kernel.org; Thu, 17 Oct 2019 11:38:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51355)
+	id 1iL7rb-0005VD-1M
+	for qemu-devel@archiver.kernel.org; Thu, 17 Oct 2019 11:38:55 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50410)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <thuth@redhat.com>) id 1iL79F-000890-Pf
- for qemu-devel@nongnu.org; Thu, 17 Oct 2019 10:53:07 -0400
+ (envelope-from <philmd@redhat.com>) id 1iL72a-0008VY-Jj
+ for qemu-devel@nongnu.org; Thu, 17 Oct 2019 10:46:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <thuth@redhat.com>) id 1iL79D-0001PP-6p
- for qemu-devel@nongnu.org; Thu, 17 Oct 2019 10:53:05 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:37498)
+ (envelope-from <philmd@redhat.com>) id 1iL72Y-0007dm-T0
+ for qemu-devel@nongnu.org; Thu, 17 Oct 2019 10:46:12 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:53970
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <thuth@redhat.com>) id 1iL79C-0001Ox-JN
- for qemu-devel@nongnu.org; Thu, 17 Oct 2019 10:53:02 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 88B8D18C426B
- for <qemu-devel@nongnu.org>; Thu, 17 Oct 2019 14:53:01 +0000 (UTC)
-Received: from thuth.remote.csb (dhcp-200-228.str.redhat.com [10.33.200.228])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 0652E5D9CA;
- Thu, 17 Oct 2019 14:52:55 +0000 (UTC)
-Subject: Re: [PATCH v2 7/7] libqos: add VIRTIO PCI 1.0 support
-To: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
-References: <20191011085611.4194-1-stefanha@redhat.com>
- <20191011085611.4194-8-stefanha@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=thuth@redhat.com; prefer-encrypt=mutual; keydata=
- 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
-Organization: Red Hat
-Message-ID: <e7821640-de44-5e65-b9c1-2534dc676690@redhat.com>
-Date: Thu, 17 Oct 2019 16:52:54 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iL72Y-0007dQ-HO
+ for qemu-devel@nongnu.org; Thu, 17 Oct 2019 10:46:10 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1571323569;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=4ePLuvdpjiCrVsfMHqaKGaoDZ/EbnB1HE43qLtprzLU=;
+ b=GsmPpC/b1IxF286fs/H1GqUlYGPOcOTLHqfVsb5mBcqA9e5KZkwW+yKcmfy6xnD4suoaVX
+ V6h+fO90lK7+fcEXBsKao0qcbEgoFpNtZIBWZoH8As2Qv7EoXoDJxv6UmjVlvNX1HHdacq
+ pKwNbCvPVO6qBlYzjjIuCMBRXGHxWOQ=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-359-pUfIQZDBMjyd_NpUzv5N3Q-1; Thu, 17 Oct 2019 10:46:06 -0400
+Received: by mail-wr1-f71.google.com with SMTP id j2so1068023wrg.19
+ for <qemu-devel@nongnu.org>; Thu, 17 Oct 2019 07:46:05 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=dKjKISv6Eh/62IDaORUG/Ahz7/jSmijXvXZXmqrw8Qo=;
+ b=FFuTsUQ1+dEfzEHjuxVntSuX4ouQ0FTeLq2jF7QczkVAyRn14C7FGhdQ0a4j/fHrX0
+ L0CHqGOAPs9IsPVMWc1tRRiBHPt4YSgnVqBYexmamzFDhjuB9hWkCY7s/AYNq+pVFjGs
+ GTMlUgFM6vjWWS1Av1pG67ue542K7C7S+PnqrKonwF6mi9zssJFfX1aotAyWSdkEuONn
+ z195M23ZjDAtSjecx5B/vkTURC26940y4Iw09g4FpVLHXVed5T1EudXX8zqkim6Mod0f
+ HUj1TKzc7aGkwWNqCBPkMX31i4+AQSc2GJ8xhlGysuXsWeRYeKo/DsLWmv5W2LpG67aO
+ Nzpw==
+X-Gm-Message-State: APjAAAUt9b8z3EyEcH6LQlnS5VtYCt3pe05V6Xc47YjNvNgGxafrEJ8v
+ 78/TFgJxuPMLborZIzsi4XXSJDmreR3SY9VSekUql7yb0Ut5QwBbOSGuVlwyHEE1SHZG+9KF73t
+ BF5n/kYDU7JZl+sI=
+X-Received: by 2002:adf:ef0a:: with SMTP id e10mr3290163wro.234.1571323564978; 
+ Thu, 17 Oct 2019 07:46:04 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqxl9BKLBVlXWDQ4HFQuWvt5Yg0IkvV54R92QwyDh6KzWvXku0gS+71OviymYpc2SrEt13NcOQ==
+X-Received: by 2002:adf:ef0a:: with SMTP id e10mr3290136wro.234.1571323564739; 
+ Thu, 17 Oct 2019 07:46:04 -0700 (PDT)
+Received: from [192.168.50.32] (243.red-88-26-246.staticip.rima-tde.net.
+ [88.26.246.243])
+ by smtp.gmail.com with ESMTPSA id u1sm2558055wru.90.2019.10.17.07.46.02
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Thu, 17 Oct 2019 07:46:04 -0700 (PDT)
+Subject: Re: [PATCH 1/2] hw/timer/grlib_gptimer.c: Switch to transaction-based
+ ptimer API
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
+References: <20191017132351.4762-1-peter.maydell@linaro.org>
+ <20191017132351.4762-2-peter.maydell@linaro.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <4c6b7739-84c5-95b6-2af4-94f561b404c8@redhat.com>
+Date: Thu, 17 Oct 2019 16:46:01 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.1
 MIME-Version: 1.0
-In-Reply-To: <20191011085611.4194-8-stefanha@redhat.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20191017132351.4762-2-peter.maydell@linaro.org>
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.62]); Thu, 17 Oct 2019 14:53:01 +0000 (UTC)
+X-MC-Unique: pUfIQZDBMjyd_NpUzv5N3Q-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 209.132.183.28
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -116,79 +107,150 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- "Michael S. Tsirkin" <mst@redhat.com>
+Cc: KONRAD Frederic <frederic.konrad@adacore.com>,
+ Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
+ Fabien Chouteau <chouteau@adacore.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 11/10/2019 10.56, Stefan Hajnoczi wrote:
-> Implement the VIRTIO 1.0 virtio-pci interface.  The main change here is
-> that the register layout is no longer a fixed layout in BAR 0.  Instead
-> we have to iterate of PCI Capabilities to find descriptions of where
-> various registers are located.  The vring registers are also more
-> fine-grained, allowing for more flexible vring layouts, but we don't
-> take advantage of that.
-> 
-> Note that test cases do not negotiate VIRTIO_F_VERSION_1 yet and are
-> therefore not running in VIRTIO 1.0 mode.
-> 
-> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+
+
+On 10/17/19 3:23 PM, Peter Maydell wrote:
+> Switch the grlib_gptimer code away from bottom-half based ptimers to
+> the new transaction-based ptimer API.  This just requires adding
+> begin/commit calls around the various places that modify the ptimer
+> state, and using the new ptimer_init() function to create the timer.
+>=20
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 > ---
->  tests/Makefile.include           |   1 +
->  tests/libqos/virtio-pci-modern.h |  17 ++
->  tests/libqos/virtio-pci.h        |  10 +
->  tests/libqos/virtio-pci-modern.c | 412 +++++++++++++++++++++++++++++++
->  tests/libqos/virtio-pci.c        |   6 +-
->  5 files changed, 445 insertions(+), 1 deletion(-)
->  create mode 100644 tests/libqos/virtio-pci-modern.h
->  create mode 100644 tests/libqos/virtio-pci-modern.c
-[...]
-> +static bool probe_device_type(QVirtioPCIDevice *dev)
+>   hw/timer/grlib_gptimer.c | 28 ++++++++++++++++++++++++----
+>   1 file changed, 24 insertions(+), 4 deletions(-)
+>=20
+> diff --git a/hw/timer/grlib_gptimer.c b/hw/timer/grlib_gptimer.c
+> index bb09268ea14..7a9371c0e30 100644
+> --- a/hw/timer/grlib_gptimer.c
+> +++ b/hw/timer/grlib_gptimer.c
+> @@ -29,7 +29,6 @@
+>   #include "hw/irq.h"
+>   #include "hw/ptimer.h"
+>   #include "hw/qdev-properties.h"
+> -#include "qemu/main-loop.h"
+>   #include "qemu/module.h"
+>  =20
+>   #include "trace.h"
+> @@ -63,7 +62,6 @@ typedef struct GPTimer     GPTimer;
+>   typedef struct GPTimerUnit GPTimerUnit;
+>  =20
+>   struct GPTimer {
+> -    QEMUBH *bh;
+>       struct ptimer_state *ptimer;
+>  =20
+>       qemu_irq     irq;
+> @@ -93,6 +91,17 @@ struct GPTimerUnit {
+>       uint32_t config;
+>   };
+>  =20
+> +static void grlib_gptimer_tx_begin(GPTimer *timer)
 > +{
-> +    uint16_t vendor_id;
-> +    uint16_t device_id;
-> +
-> +    /* "Drivers MUST match devices with the PCI Vendor ID 0x1AF4" */
-> +    vendor_id = qpci_config_readw(dev->pdev, PCI_VENDOR_ID);
-> +    if (vendor_id != 0x1af4) {
-> +        return false;
-> +    }
-> +
-> +    /*
-> +     * "Any PCI device with ... PCI Device ID 0x1000 through 0x107F inclusive
-> +     * is a virtio device"
-> +     */
-> +    device_id = qpci_config_readw(dev->pdev, PCI_DEVICE_ID);
-> +    if (device_id < 0x1000 || device_id > 0x107f) {
-> +        return false;
-> +    }
-> +
-> +    /*
-> +     * "Devices MAY utilize a Transitional PCI Device ID range, 0x1000 to
-> +     * 0x103F depending on the device type"
-> +     */
-> +    if (device_id < 0x1040) {
-> +        /*
-> +         * "Transitional devices MUST have the PCI Subsystem Device ID matching
-> +         * the Virtio Device ID"
-> +         */
-> +        dev->vdev.device_type = qpci_config_readw(dev->pdev, PCI_SUBSYSTEM_ID);
-
-Shouldn't you return "false" here in case the device_type is 0 ? Which
-likely means that it is a legacy or broken device ...?
-
-> +    } else {
-> +        /*
-> +         * "The PCI Device ID is calculated by adding 0x1040 to the Virtio
-> +         * Device ID"
-> +         */
-> +        dev->vdev.device_type = device_id - 0x1040;
-> +    }
-> +
-> +    return true;
+> +    ptimer_transaction_begin(timer->ptimer);
 > +}
+> +
+> +static void grlib_gptimer_tx_commit(GPTimer *timer)
+> +{
+> +    ptimer_transaction_commit(timer->ptimer);
+> +}
+> +
+> +/* Must be called within grlib_gptimer_tx_begin/commit block */
+>   static void grlib_gptimer_enable(GPTimer *timer)
+>   {
+>       assert(timer !=3D NULL);
+> @@ -115,6 +124,7 @@ static void grlib_gptimer_enable(GPTimer *timer)
+>       ptimer_run(timer->ptimer, 1);
+>   }
+>  =20
+> +/* Must be called within grlib_gptimer_tx_begin/commit block */
+>   static void grlib_gptimer_restart(GPTimer *timer)
+>   {
+>       assert(timer !=3D NULL);
+> @@ -141,7 +151,9 @@ static void grlib_gptimer_set_scaler(GPTimerUnit *uni=
+t, uint32_t scaler)
+>       trace_grlib_gptimer_set_scaler(scaler, value);
+>  =20
+>       for (i =3D 0; i < unit->nr_timers; i++) {
+> +        ptimer_transaction_begin(unit->timers[i].ptimer);
+>           ptimer_set_freq(unit->timers[i].ptimer, value);
+> +        ptimer_transaction_commit(unit->timers[i].ptimer);
+>       }
+>   }
+>  =20
+> @@ -266,8 +278,10 @@ static void grlib_gptimer_write(void *opaque, hwaddr=
+ addr,
+>           switch (timer_addr) {
+>           case COUNTER_OFFSET:
+>               trace_grlib_gptimer_writel(id, addr, value);
+> +            grlib_gptimer_tx_begin(&unit->timers[id]);
+>               unit->timers[id].counter =3D value;
+>               grlib_gptimer_enable(&unit->timers[id]);
+> +            grlib_gptimer_tx_commit(&unit->timers[id]);
+>               return;
+>  =20
+>           case COUNTER_RELOAD_OFFSET:
+> @@ -291,6 +305,7 @@ static void grlib_gptimer_write(void *opaque, hwaddr =
+addr,
+>               /* gptimer_restart calls gptimer_enable, so if "enable" and=
+ "load"
+>                  bits are present, we just have to call restart. */
+>  =20
+> +            grlib_gptimer_tx_begin(&unit->timers[id]);
+>               if (value & GPTIMER_LOAD) {
+>                   grlib_gptimer_restart(&unit->timers[id]);
+>               } else if (value & GPTIMER_ENABLE) {
+> @@ -301,6 +316,7 @@ static void grlib_gptimer_write(void *opaque, hwaddr =
+addr,
+>               value &=3D ~(GPTIMER_LOAD & GPTIMER_DEBUG_HALT);
+>  =20
+>               unit->timers[id].config =3D value;
+> +            grlib_gptimer_tx_commit(&unit->timers[id]);
+>               return;
+>  =20
+>           default:
+> @@ -344,9 +360,11 @@ static void grlib_gptimer_reset(DeviceState *d)
+>           timer->counter =3D 0;
+>           timer->reload =3D 0;
+>           timer->config =3D 0;
+> +        ptimer_transaction_begin(timer->ptimer);
+>           ptimer_stop(timer->ptimer);
+>           ptimer_set_count(timer->ptimer, 0);
+>           ptimer_set_freq(timer->ptimer, unit->freq_hz);
+> +        ptimer_transaction_commit(timer->ptimer);
+>       }
+>   }
+>  =20
+> @@ -365,14 +383,16 @@ static void grlib_gptimer_realize(DeviceState *dev,=
+ Error **errp)
+>           GPTimer *timer =3D &unit->timers[i];
+>  =20
+>           timer->unit   =3D unit;
+> -        timer->bh     =3D qemu_bh_new(grlib_gptimer_hit, timer);
+> -        timer->ptimer =3D ptimer_init_with_bh(timer->bh, PTIMER_POLICY_D=
+EFAULT);
+> +        timer->ptimer =3D ptimer_init(grlib_gptimer_hit, timer,
+> +                                    PTIMER_POLICY_DEFAULT);
+>           timer->id     =3D i;
+>  =20
+>           /* One IRQ line for each timer */
+>           sysbus_init_irq(sbd, &timer->irq);
+>  =20
+> +        ptimer_transaction_begin(timer->ptimer);
+>           ptimer_set_freq(timer->ptimer, unit->freq_hz);
+> +        ptimer_transaction_commit(timer->ptimer);
+>       }
+>  =20
+>       memory_region_init_io(&unit->iomem, OBJECT(unit), &grlib_gptimer_op=
+s,
+>=20
 
- Thomas
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 
 
