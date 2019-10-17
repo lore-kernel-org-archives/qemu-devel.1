@@ -2,107 +2,59 @@ Return-Path: <SRS0=yZS3=YK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 206ADC4CECE
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 07:57:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0B409FA372A
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 08:07:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E9D242082C
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 07:57:25 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E9D242082C
+	by mail.kernel.org (Postfix) with ESMTPS id C4F0C20872
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 08:07:45 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C4F0C20872
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39026 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39292 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iL0ez-0008Cr-3f
-	for qemu-devel@archiver.kernel.org; Thu, 17 Oct 2019 03:57:25 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41229)
+	id 1iL0oy-0003IF-Sm
+	for qemu-devel@archiver.kernel.org; Thu, 17 Oct 2019 04:07:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42747)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <thuth@redhat.com>) id 1iL0eL-0007ka-RK
- for qemu-devel@nongnu.org; Thu, 17 Oct 2019 03:56:46 -0400
+ (envelope-from <quintela@redhat.com>) id 1iL0oK-0002qz-PL
+ for qemu-devel@nongnu.org; Thu, 17 Oct 2019 04:07:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <thuth@redhat.com>) id 1iL0eJ-0007Nm-DS
- for qemu-devel@nongnu.org; Thu, 17 Oct 2019 03:56:44 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:42366)
+ (envelope-from <quintela@redhat.com>) id 1iL0oJ-00020e-CC
+ for qemu-devel@nongnu.org; Thu, 17 Oct 2019 04:07:04 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:48160)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <thuth@redhat.com>) id 1iL0eJ-0007Lk-4m
- for qemu-devel@nongnu.org; Thu, 17 Oct 2019 03:56:43 -0400
+ (Exim 4.71) (envelope-from <quintela@redhat.com>) id 1iL0oJ-00020V-3N
+ for qemu-devel@nongnu.org; Thu, 17 Oct 2019 04:07:03 -0400
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
  [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id BE3E52D6E4F;
- Thu, 17 Oct 2019 07:56:41 +0000 (UTC)
-Received: from thuth.remote.csb (dhcp-200-228.str.redhat.com [10.33.200.228])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 2DD8D5D712;
- Thu, 17 Oct 2019 07:56:38 +0000 (UTC)
-Subject: Re: [PATCH] configure: Require Python >= 3.5
-To: John Snow <jsnow@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>,
- qemu-devel@nongnu.org
-References: <20191016224237.26180-1-ehabkost@redhat.com>
- <7146bebf-6e99-f27a-3753-d48dea1977f9@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=thuth@redhat.com; prefer-encrypt=mutual; keydata=
- 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
-Organization: Red Hat
-Message-ID: <12feccfa-08fd-d5a4-d5ec-92bf88e9f552@redhat.com>
-Date: Thu, 17 Oct 2019 09:56:37 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+ by mx1.redhat.com (Postfix) with ESMTPS id E6A178AC6FB;
+ Thu, 17 Oct 2019 08:07:01 +0000 (UTC)
+Received: from redhat.com (ovpn-116-80.ams2.redhat.com [10.36.116.80])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 53EFF5D70D;
+ Thu, 17 Oct 2019 08:06:58 +0000 (UTC)
+From: Juan Quintela <quintela@redhat.com>
+To: Eric Auger <eric.auger@redhat.com>
+Subject: Re: [PATCH v3] migration: Support QLIST migration
+In-Reply-To: <20191015125045.5006-1-eric.auger@redhat.com> (Eric Auger's
+ message of "Tue, 15 Oct 2019 14:50:45 +0200")
+References: <20191015125045.5006-1-eric.auger@redhat.com>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.2 (gnu/linux)
+Date: Thu, 17 Oct 2019 10:06:56 +0200
+Message-ID: <87r23bpzhb.fsf@trasno.org>
 MIME-Version: 1.0
-In-Reply-To: <7146bebf-6e99-f27a-3753-d48dea1977f9@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.29]); Thu, 17 Oct 2019 07:56:41 +0000 (UTC)
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.69]); Thu, 17 Oct 2019 08:07:02 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 209.132.183.28
@@ -117,34 +69,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>,
- Cleber Rosa <crosa@redhat.com>
+Reply-To: quintela@redhat.com
+Cc: qemu-devel@nongnu.org, dgilbert@redhat.com, eric.auger.pro@gmail.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 17/10/2019 00.48, John Snow wrote:
-> 
-> 
-> On 10/16/19 6:42 PM, Eduardo Habkost wrote:
->> Python 3.5 is the oldest Python version available on our
->> supported build platforms, and Python 2 end of life will be 3
->> weeks after the planned release date of QEMU 4.2.0.  Drop Python
->> 2 support from configure completely, and require Python 3.5 or
->> newer.
->>
->> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-> 
-> Seems like a good time and place to mention this. Kevin, you require
-> 3.6+ for iotests, which are -- at present -- invoked as part of "make
-> check".
-> 
-> Do we care? Basically, this just means that iotests won't run for
-> systems that don't have 3.6+, which would be platforms like Debian 9 --
-> which is why ehabkost is choosing 3.5 here.
+Eric Auger <eric.auger@redhat.com> wrote:
+> Support QLIST migration using the same principle as QTAILQ:
+> 94869d5c52 ("migration: migrate QTAILQ").
+>
+> The VMSTATE_QLIST_V macro has the same proto as VMSTATE_QTAILQ_V.
+> The change mainly resides in QLIST_RAW_INSERT_TAIL implementation.
+>
+> Tests also are provided.
+>
+> Signed-off-by: Eric Auger <eric.auger@redhat.com>
 
-I think it's ok to simply skip the iotests in case we run on a Python
-3.5 system.
+Hi
 
- Thomas
+
+How long are these lists normally?  I think that the INSERT_TAIL is the
+wrong approach.  If lists can be long, it is much better to just insert
+at the beggining and as last operation, reverse things, no?
+
+> +#define QLIST_RAW_INSERT_TAIL(head, elm, entry) do {                           \
+> +        void *iter, *last = NULL;                                              \
+> +        *QLIST_RAW_NEXT(elm, entry) = NULL;                                    \
+> +        if (!*QLIST_RAW_FIRST(head)) {                                         \
+> +            *QLIST_RAW_FIRST(head) = elm;                                      \
+> +            *QLIST_RAW_PREVIOUS(elm, entry) = head;                            \
+> +            break;                                                             \
+> +        }                                                                      \
+> +        for (iter = *QLIST_RAW_FIRST(head);                                    \
+> +             iter; last = iter, iter = *QLIST_RAW_NEXT(iter, entry))           \
+> +            { }                                                                \
+> +        *QLIST_RAW_NEXT(last, entry) = elm;                                    \
+> +        *QLIST_RAW_PREVIOUS(elm, entry) = last;                                \
+
+I think that you normally want to do this two instructions in the
+reverse order, just in case (famous last words).
+
+
+> +static int get_qlist(QEMUFile *f, void *pv, size_t unused_size,
+> +                     const VMStateField *field)
+> +{
+> +    int ret = 0;
+> +    const VMStateDescription *vmsd = field->vmsd;
+> +    /* size of a QLIST element */
+> +    size_t size = field->size;
+> +    /* offset of the QLIST entry in a QLIST element */
+> +    size_t entry_offset = field->start;
+> +    int version_id = field->version_id;
+> +    void *elm;
+> +
+> +    trace_get_qlist(field->name, vmsd->name, vmsd->version_id);
+> +    if (version_id > vmsd->version_id) {
+> +        error_report("%s %s",  vmsd->name, "too new");
+> +        return -EINVAL;
+> +    }
+> +    if (version_id < vmsd->minimum_version_id) {
+> +        error_report("%s %s",  vmsd->name, "too old");
+> +        return -EINVAL;
+> +    }
+> +
+> +    while (qemu_get_byte(f)) {
+> +        elm = g_malloc(size);
+> +        ret = vmstate_load_state(f, vmsd, elm, version_id);
+> +        if (ret) {
+> +            error_report("%s: failed to load %s (%d)", field->name,
+> +                         vmsd->name, ret);
+> +            g_free(elm);
+> +            return ret;
+> +        }
+> +        QLIST_RAW_INSERT_TAIL(pv, elm, entry_offset);
+
+Here we insert at the beggining.
+
+> +    }
+
+Here we reverse?
+
+We move from O(n^2) to O(2n), much better, no?
+As said, except if the lists are normally very short.
+
+
+The rest of the patch looks ok to me.
+
+Later, Juan.
 
