@@ -2,80 +2,68 @@ Return-Path: <SRS0=yZS3=YK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D45ACECE58E
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 17:01:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 64247ECE58E
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 17:04:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9E66A2089C
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 17:01:32 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="A3wjScqK"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9E66A2089C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 33B3A2089C
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 17:04:01 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 33B3A2089C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53566 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53684 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iL99X-0002gX-FF
-	for qemu-devel@archiver.kernel.org; Thu, 17 Oct 2019 13:01:31 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38117)
+	id 1iL9Bw-0005aV-48
+	for qemu-devel@archiver.kernel.org; Thu, 17 Oct 2019 13:04:00 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36788)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1iL8Yf-0005r4-Tt
- for qemu-devel@nongnu.org; Thu, 17 Oct 2019 12:23:26 -0400
+ (envelope-from <eblake@redhat.com>) id 1iL8QW-000445-Jm
+ for qemu-devel@nongnu.org; Thu, 17 Oct 2019 12:15:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1iL8Ye-0006do-P2
- for qemu-devel@nongnu.org; Thu, 17 Oct 2019 12:23:25 -0400
-Received: from mail-oi1-x241.google.com ([2607:f8b0:4864:20::241]:33385)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1iL8Ye-0006dS-Jm
- for qemu-devel@nongnu.org; Thu, 17 Oct 2019 12:23:24 -0400
-Received: by mail-oi1-x241.google.com with SMTP id a15so2701648oic.0
- for <qemu-devel@nongnu.org>; Thu, 17 Oct 2019 09:23:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=y9ZSlsYdwjwLKINTtXzEqwFkN0ObS5a2YzjMPz4vtNo=;
- b=A3wjScqK8w1PwuBDHmD/Muw5+PwOiR0GccU8Nv7E2p+k6O2fPS8cFPPFBWIHy77Pye
- Gvz4X3ayIU7Nl1LlSXHMUzyzmCB8XIZsTVPmFfGoYBWWdNDjACCpC6KTHPphCr6T/TRp
- 5qwdlvjqCERziOFwfLqjdcRXjd2k9mXD/g9C1+BQRP3jh4HTeLX35kks2SUu8OSjXjRi
- HJ5gyTWNqGOtHzbKy4qOlmd2F1+fM/77m6FDYsQlIJS3wrH+ZY315p4CnRnRV9tm9lFQ
- kkjXB+pPy9f5/4utcMH7tEb1zmHabQ63p0MOzQe1aCPIVg7waH18z3ThtZa7KujFxBBm
- tihw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=y9ZSlsYdwjwLKINTtXzEqwFkN0ObS5a2YzjMPz4vtNo=;
- b=EI2TWJ/MxgqG+3ULZAyClT0xTCY4/0UmhaiXSIZK3UQFguE8sQD0ci6t3EVfHGeyWH
- TIKD8qx3EBKehw20XHOKjjDLQDoJaG/7sdrSjJTrygV1vrUXGm+bnzc2lUmOay/BL9xM
- u/uAazlu11mKb3D5000CqWKdu5kFHQZp4TgZypbQNj0c6CZY2Lb9n5JmserEPHypmlEe
- a8wQ736krADpNeTr8PdPjgtLO/zwF+hhu48SB7+iLzgVkxHIU4X8bblHi40UqP8YWcrm
- +323oZghocyWdbKrPIzVvE7vdA3biJq0cjOpdeU8P26y/d01n1CvOyvNF6lUBEPZahSn
- Bzbg==
-X-Gm-Message-State: APjAAAWlKehKQ126KBv3eFgUeXITc/iOuBnpzI+ku1TbBgbJAQ+ModP7
- MMA+OJCmtfNqMnIVZhKZjMXk2/a1lO6hacMte04O/A==
-X-Google-Smtp-Source: APXvYqxfM4jeF+m+YVtOI6WXtLgGDcTWlVLYpC846dI9F084Sdpjm558vXGT4ccuF34Ds9lgJQ1Mr7Fc96PrtxWDp28=
-X-Received: by 2002:a05:6808:9:: with SMTP id u9mr3997466oic.98.1571329403409; 
- Thu, 17 Oct 2019 09:23:23 -0700 (PDT)
+ (envelope-from <eblake@redhat.com>) id 1iL8QV-00023O-M3
+ for qemu-devel@nongnu.org; Thu, 17 Oct 2019 12:15:00 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:60902)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <eblake@redhat.com>)
+ id 1iL8QV-000236-G7; Thu, 17 Oct 2019 12:14:59 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id B4CDD30842A9;
+ Thu, 17 Oct 2019 16:14:58 +0000 (UTC)
+Received: from [10.3.116.168] (ovpn-116-168.phx2.redhat.com [10.3.116.168])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 311185D6C8;
+ Thu, 17 Oct 2019 16:14:58 +0000 (UTC)
+Subject: Re: [PATCH] hw/s390x: Emit a warning if user tried to enable USB
+To: Christian Borntraeger <borntraeger@de.ibm.com>,
+ Thomas Huth <thuth@redhat.com>, Cornelia Huck <cohuck@redhat.com>,
+ qemu-s390x@nongnu.org
+References: <20191017142123.1236-1-thuth@redhat.com>
+ <c35a910b-4a61-331b-e0b7-3dfc6f0b256f@de.ibm.com>
+From: Eric Blake <eblake@redhat.com>
+Organization: Red Hat, Inc.
+Message-ID: <3f32cfc0-3d32-3648-3b58-900d1f9f1331@redhat.com>
+Date: Thu, 17 Oct 2019 11:14:57 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.0
 MIME-Version: 1.0
-References: <20191007170646.14961-1-f4bug@amsat.org>
-In-Reply-To: <20191007170646.14961-1-f4bug@amsat.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 17 Oct 2019 17:23:12 +0100
-Message-ID: <CAFEAcA9DiMXu9a6nzSo4967y9G2E3tC8ijHF2=b6Kvpt=XeYEw@mail.gmail.com>
-Subject: Re: [PATCH 0/3] hw/arm/raspi: Split the UART block from the AUX block
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::241
+In-Reply-To: <c35a910b-4a61-331b-e0b7-3dfc6f0b256f@de.ibm.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.40]); Thu, 17 Oct 2019 16:14:58 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,35 +75,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Alistair Francis <alistair@alistair23.me>, qemu-arm <qemu-arm@nongnu.org>,
- QEMU Developers <qemu-devel@nongnu.org>,
- Andrew Baumann <Andrew.Baumann@microsoft.com>
+Cc: Halil Pasic <pasic@linux.ibm.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, 7 Oct 2019 at 18:06, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> =
-wrote:
->
-> The BCM2838 has many more peripherals than his little brother,
-> the BCM2837. With the raspi4, the Linux kernel takes more steps
-> to configure the various MUXed devices. At some point it started
-> to bug me, so I plan to add a dummy simple BCM2835_SPI block.
-> It is cleaner to add it as a separate device than mixed with the
-> AUX block. As a first step, split the UART block out.
->
-> Since this part is self-contained and my raspi4 branch is getting
-> too big, I'm sending it as a single series.
+On 10/17/19 9:45 AM, Christian Borntraeger wrote:
+> 
+> 
+> On 17.10.19 16:21, Thomas Huth wrote:
+>> There is no USB on s390x, so running qemu-system-s390x with
+>> "-machine ...,usb=on" is certainly wrong. Emit a warning to make
+>> the users aware of their misconfiguration.
+>>
+>> Signed-off-by: Thomas Huth <thuth@redhat.com>
+>> ---
+>>   After a year or two, we could finally turn this into a hard error,
+>>   but I think we should give the users some time to fix their command
+>>   lines first, so I'm initially only emitting a warning here.
+> 
+> I think a warn message is ok, but we should never make  this a hard
+> error.
+> 
+> I am pretty sure that there are some tools in the wild that create xmls
+> or qemu commands lines cross-platform and deploy those  dynamically.
+> These tools have probably been fixed to work good enough with s390x
+> but nobody with qemu clue has ever looked at these command lines. And
+> I am pretty sure that no user will actually see the command like nor
+> the error message.
+> 
+> So this warning will stay unnoticed until we make this a hard error. And
+> then we have broken a previously working setup.
+> 
+> In other words, I appreciate the willingness to detect mis-uses but I
+> fear that we will never be able to assume that everything is fixed.
 
-If you squash patches 1 and 2 together and avoid doing
-things like renaming all the register offset constant
-names (or, for stuff like fixing up comment syntax and
-checkpatch nits, do them in a preparatory patch), then it
-becomes somewhat easier to review, because then you can use
-git diff --color-moved and can see easily that code has
-only been moved to the other file without any accidental
-extra changes.
+That's what the deprecation process is for. This patch is incomplete 
+unless it also touches qemu-deprecated.texi.
 
-thanks
--- PMM
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
 
