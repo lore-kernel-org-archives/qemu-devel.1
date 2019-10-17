@@ -2,83 +2,59 @@ Return-Path: <SRS0=yZS3=YK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 66707FA372A
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 15:51:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 463EAECE58E
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 15:52:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3E55B21835
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 15:51:56 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3E55B21835
+	by mail.kernel.org (Postfix) with ESMTPS id 19D9521835
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 15:52:19 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 19D9521835
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51548 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51552 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iL84A-0006LV-V3
-	for qemu-devel@archiver.kernel.org; Thu, 17 Oct 2019 11:51:55 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52339)
+	id 1iL84X-0006y6-Pm
+	for qemu-devel@archiver.kernel.org; Thu, 17 Oct 2019 11:52:17 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52083)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1iL7Dt-0006Rv-Pv
- for qemu-devel@nongnu.org; Thu, 17 Oct 2019 10:57:54 -0400
+ (envelope-from <berrange@redhat.com>) id 1iL7D4-00056I-G6
+ for qemu-devel@nongnu.org; Thu, 17 Oct 2019 10:57:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1iL7Ds-0003TM-M8
- for qemu-devel@nongnu.org; Thu, 17 Oct 2019 10:57:53 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:48906)
+ (envelope-from <berrange@redhat.com>) id 1iL7D3-00037k-24
+ for qemu-devel@nongnu.org; Thu, 17 Oct 2019 10:57:02 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:25929)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iL7Ds-0003Sm-DN
- for qemu-devel@nongnu.org; Thu, 17 Oct 2019 10:57:52 -0400
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70])
- (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+ (Exim 4.71) (envelope-from <berrange@redhat.com>) id 1iL7D2-00037J-PO
+ for qemu-devel@nongnu.org; Thu, 17 Oct 2019 10:57:01 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 5D73883F3F
- for <qemu-devel@nongnu.org>; Thu, 17 Oct 2019 14:57:51 +0000 (UTC)
-Received: by mail-wr1-f70.google.com with SMTP id h4so1083702wrx.15
- for <qemu-devel@nongnu.org>; Thu, 17 Oct 2019 07:57:51 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=o5+mN5TWocD074lChA+EtfESe1UDQF/8fNvSRG/oXdc=;
- b=T2jUyUHBV5yq5g5HOCKfgfJO+6Y/YVW239ltd4HT7GiwLV8X130sqDlgFC3DfwpzDQ
- YLq4nVw2+vc8ug20iLz4+fyFMhXsUSWxSURMIcyxAC6RXIbR1xmhVxROrmYr+YH2RJtM
- rX9x5TdHbsVmEHVKEGuryfpOtGydiSD1x8AkVvakQy9afXGPSb2VFwLV5M1jVYFCMOkS
- 3lPlWcXKetnVDQcipU3DyQs9XIHL6RzS+WPH59plD1toRss/NYJalEjpjVyoF09hinad
- fChBnQUJbDMues0S5RDpVKA9L3bSeQVKI4OMedVzVYZ1GRf64H7Q/fQuQvq6BnCuT0mG
- NPYw==
-X-Gm-Message-State: APjAAAWKCgb+f/JUKEo70MeMT2h/U8TvxHqLOuZ/x2V9gQTnlGmeOw1R
- Jaful/FrKB5NjaXLrRsoTlG0Tx349IWJLHmz87ULIp2eg3HXOgVc16j3jR4HeV9wY748tQk/p1X
- G1+vmMz+MnXwdLFA=
-X-Received: by 2002:adf:ed49:: with SMTP id u9mr3345418wro.229.1571324270000; 
- Thu, 17 Oct 2019 07:57:50 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqyvlsipnDQOGuTSRWJXCYCbRTMN7USRD+lufA69xqQgOllIx3S/gWXBWgMphYlqXNB8s+E1wQ==
-X-Received: by 2002:adf:ed49:: with SMTP id u9mr3345403wro.229.1571324269810; 
- Thu, 17 Oct 2019 07:57:49 -0700 (PDT)
-Received: from [192.168.50.32] (243.red-88-26-246.staticip.rima-tde.net.
- [88.26.246.243])
- by smtp.gmail.com with ESMTPSA id g13sm2511574wrm.42.2019.10.17.07.57.48
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Thu, 17 Oct 2019 07:57:49 -0700 (PDT)
-Subject: Re: [PATCH 1/3] hw/net/fsl_etsec/etsec.c: Switch to transaction-based
- ptimer API
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
-References: <20191017132122.4402-1-peter.maydell@linaro.org>
- <20191017132122.4402-2-peter.maydell@linaro.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <d95174ee-9ee1-f977-8755-2f9b3de01e0c@redhat.com>
-Date: Thu, 17 Oct 2019 16:57:47 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.1
+ by mx1.redhat.com (Postfix) with ESMTPS id 0BC2888FFF8
+ for <qemu-devel@nongnu.org>; Thu, 17 Oct 2019 14:57:00 +0000 (UTC)
+Received: from localhost.localdomain.com (ovpn-112-36.ams2.redhat.com
+ [10.36.112.36])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 46A5E100EBA3;
+ Thu, 17 Oct 2019 14:56:59 +0000 (UTC)
+From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH 2/4] tests: benchmark crypto with fixed data size,
+ not time period
+Date: Thu, 17 Oct 2019 15:56:52 +0100
+Message-Id: <20191017145654.11371-3-berrange@redhat.com>
+In-Reply-To: <20191017145654.11371-1-berrange@redhat.com>
+References: <20191017145654.11371-1-berrange@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20191017132122.4402-2-peter.maydell@linaro.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.68]); Thu, 17 Oct 2019 14:57:00 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
@@ -94,83 +70,158 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Jason Wang <jasowang@redhat.com>, Alistair Francis <alistair@alistair23.me>,
- qemu-arm@nongnu.org, qemu-ppc@nongnu.org,
- "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
- David Gibson <david@gibson.dropbear.id.au>
+Cc: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 10/17/19 3:21 PM, Peter Maydell wrote:
-> Switch the fsl_etsec code away from bottom-half based ptimers to
-> the new transaction-based ptimer API.  This just requires adding
-> begin/commit calls around the various places that modify the ptimer
-> state, and using the new ptimer_init() function to create the timer.
->=20
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-> ---
->   hw/net/fsl_etsec/etsec.h | 1 -
->   hw/net/fsl_etsec/etsec.c | 9 +++++----
->   2 files changed, 5 insertions(+), 5 deletions(-)
->=20
-> diff --git a/hw/net/fsl_etsec/etsec.h b/hw/net/fsl_etsec/etsec.h
-> index 09d05c21338..7951c3ad65f 100644
-> --- a/hw/net/fsl_etsec/etsec.h
-> +++ b/hw/net/fsl_etsec/etsec.h
-> @@ -141,7 +141,6 @@ typedef struct eTSEC {
->       uint16_t phy_control;
->  =20
->       /* Polling */
-> -    QEMUBH *bh;
->       struct ptimer_state *ptimer;
->  =20
->       /* Whether we should flush the rx queue when buffer becomes avail=
-able. */
-> diff --git a/hw/net/fsl_etsec/etsec.c b/hw/net/fsl_etsec/etsec.c
-> index d9b3e8c691e..717de76569a 100644
-> --- a/hw/net/fsl_etsec/etsec.c
-> +++ b/hw/net/fsl_etsec/etsec.c
-> @@ -34,7 +34,6 @@
->   #include "etsec.h"
->   #include "registers.h"
->   #include "qemu/log.h"
-> -#include "qemu/main-loop.h"
->   #include "qemu/module.h"
->  =20
->   /* #define HEX_DUMP */
-> @@ -195,9 +194,11 @@ static void write_dmactrl(eTSEC          *etsec,
->  =20
->       if (!(value & DMACTRL_WOP)) {
->           /* Start polling */
-> +        ptimer_transaction_begin(etsec->ptimer);
->           ptimer_stop(etsec->ptimer);
->           ptimer_set_count(etsec->ptimer, 1);
->           ptimer_run(etsec->ptimer, 1);
-> +        ptimer_transaction_commit(etsec->ptimer);
->       }
->   }
->  =20
-> @@ -391,10 +392,10 @@ static void etsec_realize(DeviceState *dev, Error=
- **errp)
->                                 object_get_typename(OBJECT(dev)), dev->=
-id, etsec);
->       qemu_format_nic_info_str(qemu_get_queue(etsec->nic), etsec->conf.=
-macaddr.a);
->  =20
-> -
-> -    etsec->bh     =3D qemu_bh_new(etsec_timer_hit, etsec);
-> -    etsec->ptimer =3D ptimer_init_with_bh(etsec->bh, PTIMER_POLICY_DEF=
-AULT);
-> +    etsec->ptimer =3D ptimer_init(etsec_timer_hit, etsec, PTIMER_POLIC=
-Y_DEFAULT);
-> +    ptimer_transaction_begin(etsec->ptimer);
->       ptimer_set_freq(etsec->ptimer, 100);
-> +    ptimer_transaction_commit(etsec->ptimer);
->   }
->  =20
->   static void etsec_instance_init(Object *obj)
->=20
+Currently the crypto benchmarks are processing data in varying chunk
+sizes, over a fixed time period. This turns out to be a terrible idea
+because with small chunk sizes the overhead of checking the elapsed
+time on each loop iteration masks the true performance.
 
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Benchmarking over a fixed data size avoids the loop running any system
+calls which can interfere with the performance measurements.
+
+Before this change
+
+Enc chunk 512 bytes 2283.47 MB/sec Dec chunk 512 bytes 2236.23 MB/sec OK
+Enc chunk 4096 bytes 2744.97 MB/sec Dec chunk 4096 bytes 2614.71 MB/sec O=
+K
+Enc chunk 16384 bytes 2777.53 MB/sec Dec chunk 16384 bytes 2678.44 MB/sec=
+ OK
+Enc chunk 65536 bytes 2809.34 MB/sec Dec chunk 65536 bytes 2699.47 MB/sec=
+ OK
+
+After this change
+
+Enc chunk 512 bytes 2058.22 MB/sec Dec chunk 512 bytes 2030.11 MB/sec OK
+Enc chunk 4096 bytes 2699.27 MB/sec Dec chunk 4096 bytes 2573.78 MB/sec O=
+K
+Enc chunk 16384 bytes 2748.52 MB/sec Dec chunk 16384 bytes 2653.76 MB/sec=
+ OK
+Enc chunk 65536 bytes 2814.08 MB/sec Dec chunk 65536 bytes 2712.74 MB/sec=
+ OK
+
+The actual crypto performance hasn't changed, which shows how
+significant the mis-measurement has been for small data sizes.
+
+Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+---
+ tests/benchmark-crypto-cipher.c | 26 ++++++++++++++------------
+ tests/benchmark-crypto-hash.c   | 17 +++++++++--------
+ 2 files changed, 23 insertions(+), 20 deletions(-)
+
+diff --git a/tests/benchmark-crypto-cipher.c b/tests/benchmark-crypto-cip=
+her.c
+index 3ca31a2779..d8db5504d4 100644
+--- a/tests/benchmark-crypto-cipher.c
++++ b/tests/benchmark-crypto-cipher.c
+@@ -21,11 +21,12 @@ static void test_cipher_speed(size_t chunk_size,
+ {
+     QCryptoCipher *cipher;
+     Error *err =3D NULL;
+-    double total =3D 0.0;
+     uint8_t *key =3D NULL, *iv =3D NULL;
+     uint8_t *plaintext =3D NULL, *ciphertext =3D NULL;
+     size_t nkey;
+     size_t niv;
++    size_t total =3D 2 * GiB;
++    size_t remain;
+=20
+     if (!qcrypto_cipher_supports(alg, mode)) {
+         return;
+@@ -58,33 +59,34 @@ static void test_cipher_speed(size_t chunk_size,
+                                       &err) =3D=3D 0);
+=20
+     g_test_timer_start();
+-    do {
++    remain =3D total;
++    while (remain) {
+         g_assert(qcrypto_cipher_encrypt(cipher,
+                                         plaintext,
+                                         ciphertext,
+                                         chunk_size,
+                                         &err) =3D=3D 0);
+-        total +=3D chunk_size;
+-    } while (g_test_timer_elapsed() < 1.0);
++        remain -=3D chunk_size;
++    }
++    g_test_timer_elapsed();
+=20
+-    total /=3D MiB;
+     g_print("Enc chunk %zu bytes ", chunk_size);
+-    g_print("%.2f MB/sec ", total / g_test_timer_last());
++    g_print("%.2f MB/sec ", (double)total / MiB / g_test_timer_last());
+=20
+-    total =3D 0.0;
+     g_test_timer_start();
+-    do {
++    remain =3D total;
++    while (remain) {
+         g_assert(qcrypto_cipher_decrypt(cipher,
+                                         plaintext,
+                                         ciphertext,
+                                         chunk_size,
+                                         &err) =3D=3D 0);
+-        total +=3D chunk_size;
+-    } while (g_test_timer_elapsed() < 1.0);
++        remain -=3D chunk_size;
++    }
++    g_test_timer_elapsed();
+=20
+-    total /=3D MiB;
+     g_print("Dec chunk %zu bytes ", chunk_size);
+-    g_print("%.2f MB/sec ", total / g_test_timer_last());
++    g_print("%.2f MB/sec ", (double)total / MiB / g_test_timer_last());
+=20
+     qcrypto_cipher_free(cipher);
+     g_free(plaintext);
+diff --git a/tests/benchmark-crypto-hash.c b/tests/benchmark-crypto-hash.=
+c
+index 9b6f7a9155..67b7067223 100644
+--- a/tests/benchmark-crypto-hash.c
++++ b/tests/benchmark-crypto-hash.c
+@@ -20,7 +20,8 @@ static void test_hash_speed(const void *opaque)
+     size_t chunk_size =3D (size_t)opaque;
+     uint8_t *in =3D NULL, *out =3D NULL;
+     size_t out_len =3D 0;
+-    double total =3D 0.0;
++    size_t total =3D 2 * GiB;
++    size_t remain;
+     struct iovec iov;
+     int ret;
+=20
+@@ -31,20 +32,20 @@ static void test_hash_speed(const void *opaque)
+     iov.iov_len =3D chunk_size;
+=20
+     g_test_timer_start();
+-    do {
++    remain =3D total;
++    while (remain) {
+         ret =3D qcrypto_hash_bytesv(QCRYPTO_HASH_ALG_SHA256,
+                                   &iov, 1, &out, &out_len,
+                                   NULL);
+         g_assert(ret =3D=3D 0);
+=20
+-        total +=3D chunk_size;
+-    } while (g_test_timer_elapsed() < 5.0);
++        remain -=3D chunk_size;
++    }
++    g_test_timer_elapsed();
+=20
+-    total /=3D MiB;
+     g_print("sha256: ");
+-    g_print("Testing chunk_size %zu bytes ", chunk_size);
+-    g_print("done: %.2f MB in %.2f secs: ", total, g_test_timer_last());
+-    g_print("%.2f MB/sec\n", total / g_test_timer_last());
++    g_print("Hash %zu GB chunk size %zu bytes ", total / GiB, chunk_size=
+);
++    g_print("%.2f MB/sec ", (double)total / MiB / g_test_timer_last());
+=20
+     g_free(out);
+     g_free(in);
+--=20
+2.21.0
+
 
