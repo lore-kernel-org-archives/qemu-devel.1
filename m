@@ -2,78 +2,90 @@ Return-Path: <SRS0=yZS3=YK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 67971ECE58D
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 17:31:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 41A52ECE58D
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 17:32:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F095020820
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 17:31:54 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F095020820
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 106B620820
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 17:32:54 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gOhgq8GP"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 106B620820
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54432 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54436 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iL9cv-0003Q8-J5
-	for qemu-devel@archiver.kernel.org; Thu, 17 Oct 2019 13:31:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41910)
+	id 1iL9ds-0003uQ-TH
+	for qemu-devel@archiver.kernel.org; Thu, 17 Oct 2019 13:32:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42712)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mszeredi@redhat.com>) id 1iL8xG-0003sY-Id
- for qemu-devel@nongnu.org; Thu, 17 Oct 2019 12:48:51 -0400
+ (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1iL91L-0001OW-RD
+ for qemu-devel@nongnu.org; Thu, 17 Oct 2019 12:53:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mszeredi@redhat.com>) id 1iL8xD-0005Vz-Rj
- for qemu-devel@nongnu.org; Thu, 17 Oct 2019 12:48:49 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53382)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mszeredi@redhat.com>) id 1iL8xD-0005VX-Jv
- for qemu-devel@nongnu.org; Thu, 17 Oct 2019 12:48:47 -0400
-Received: from mail-io1-f71.google.com (mail-io1-f71.google.com
- [209.85.166.71])
- (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 5324F89AC2
- for <qemu-devel@nongnu.org>; Thu, 17 Oct 2019 16:48:46 +0000 (UTC)
-Received: by mail-io1-f71.google.com with SMTP id w8so3976268iol.20
- for <qemu-devel@nongnu.org>; Thu, 17 Oct 2019 09:48:46 -0700 (PDT)
+ (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1iL91K-0006gA-K7
+ for qemu-devel@nongnu.org; Thu, 17 Oct 2019 12:53:03 -0400
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:40325)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1iL91K-0006fu-Dj; Thu, 17 Oct 2019 12:53:02 -0400
+Received: by mail-wr1-x441.google.com with SMTP id o28so3163852wro.7;
+ Thu, 17 Oct 2019 09:53:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=uoKHrShfOPAUn47GW20hABBgh2KN1hcOeK5Wq7+CL6M=;
+ b=gOhgq8GP5sYQEnSW9WK3rcpCFNDQEysr0bZf+j33qQ9INcqOoJ05Hbx3usMGHTxNY3
+ 5f5/j02S3fp1D9KysZTFY1/BQXxjEh8K3tKaOHptqa9v6LzPSxYICaYrRA0o1QVKz54A
+ 4WGdg2J8ctbGopmI3ApETFld5hSmZOrt9WUOmT2ms3rtKWRQF9I4ywSzucMyXN+Z/wwj
+ iBzmLBPX88OHr1x2JBCJPMBcJzVMA9PdEWB1Qfj1cAmhbrJHGGaVo8VBS84zof3+Sl0s
+ dskA98hxBTLMnHXAwZgWMBSnsu1MF37Q53DK+kjYdbJMqlr+epqdfFgJ8clYR/Qrbs9p
+ fQpg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=Y4rHzJCRGmNizBTI5vprS4vyA5fTwk2yNR5VfJsgrFQ=;
- b=Lsd0JBbczVqw+rVInZjHuUwp1njfMfSgWDO8lyaTSGRCiMQr7jUnhrPmlSobUfy56e
- 1cYN2kvU3+WJmHQwwGPCwQAkhr3Fofl3yLWJ//cVdiz4YjoHrLowCjVa/bj+fsqdw+w6
- CUYmOKq2CeG+LmF6tajG2078d+zampp4SDncWu9TRny7uxcZ5Av6mefSHrje+slqigqC
- eiDYxqUrgDlJvTtzHf5TYOKHXEugrZqj7aJC9dwRX7xwhLxSyWolqen8x7loY/Fnxn96
- 575wLtKDV6OoY5Bwkw910wrD75maKbIJA3mo6DbKIySGr9sLXuZ+C52GiLnsS2ki0J4/
- mm9w==
-X-Gm-Message-State: APjAAAXQuQiLIOxSgcN7zH7kYscBMnbwgNa2cqu9QV7pARcuUxg6gIHG
- niCyLGm6cW/ZY6OVMcfW5pJCVxbnpZaEVkIwjHtSCQiO7Atb6AYbK9HoklHXFUxVfyBDOOgmbm3
- dTvEJYspDC7WFkkFSBdXQ5i4CRc8+TAk=
-X-Received: by 2002:a02:2302:: with SMTP id u2mr4283366jau.70.1571330925655;
- Thu, 17 Oct 2019 09:48:45 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqx3F8CQzzgEEMNVm9WqsXKqg2V9UOgRNZfQr/OsGaw9Y0qH8XgHN7gSUEpfO54wAXM0rIOgaOAkIngHbMZtKj0=
-X-Received: by 2002:a02:2302:: with SMTP id u2mr4283345jau.70.1571330925395;
- Thu, 17 Oct 2019 09:48:45 -0700 (PDT)
+ h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
+ :in-reply-to:references:mime-version:content-transfer-encoding;
+ bh=uoKHrShfOPAUn47GW20hABBgh2KN1hcOeK5Wq7+CL6M=;
+ b=hqzLhs1BOKVEopNqz8U5xdV8E6f8TnevDNz0UaVIlhqeXgqenqhOybY2UDtvJi9bi1
+ EfEXZqze9osQqQ2atp9Dh3goYt7fND8OvT9FHuzk+GDE7h4kZHIlH3j4K+PlO2prsSx8
+ PgOUsMcicWgJbJuoEeKAAsk6rbQtVxVAItm4iXWLe9o9SVZdz+BESyAsjCFfLFBm3Cap
+ k7bLyw+POMFXUF2Fv6zRarIyy/XdOH0iUUKHduhyB1kWc3Tv6npevF2l+UpSRbj5xg99
+ 4w9nIlqAzd0JdaNKuv4hqArNxYag5DMji08S7QabgNkT4s/CnnHN00HGQsaqti8cQlHk
+ nP7A==
+X-Gm-Message-State: APjAAAXRyYac0SlDk4WI5LLofZR1e7fN0zYwA3vriQRx9izK+f/490ru
+ CugbtyogTYjuZqzZL0XrEl4uI7ajjI0=
+X-Google-Smtp-Source: APXvYqwFMjkMxlqMJHq5vRSpIZ2CTxLrz/6a18DkzbUwXN7ZZEjDtoBlaGtf3DiFOYmq6yvkeGKjOg==
+X-Received: by 2002:a5d:6246:: with SMTP id m6mr4084034wrv.262.1571331181223; 
+ Thu, 17 Oct 2019 09:53:01 -0700 (PDT)
+Received: from x1w.redhat.com (243.red-88-26-246.staticip.rima-tde.net.
+ [88.26.246.243])
+ by smtp.gmail.com with ESMTPSA id w22sm2557363wmc.16.2019.10.17.09.52.59
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 17 Oct 2019 09:53:00 -0700 (PDT)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v3 8/9] tests/acceptance: Test Sandalfoot initrd on the
+ PReP/40p
+Date: Thu, 17 Oct 2019 18:52:38 +0200
+Message-Id: <20191017165239.30159-9-f4bug@amsat.org>
+X-Mailer: git-send-email 2.21.0
+In-Reply-To: <20191017165239.30159-1-f4bug@amsat.org>
+References: <20191017165239.30159-1-f4bug@amsat.org>
 MIME-Version: 1.0
-References: <20191016103754.2047-1-misono.tomohiro@jp.fujitsu.com>
- <20191017100528.GA24790@stefanha-x1.localdomain>
- <CAOssrKfR=sfE1RzOXzvPbdQg-g7i5-f8W9y8bWFnO=gyJ2VMsg@mail.gmail.com>
- <20191017160953.GC1266@stefanha-x1.localdomain>
-In-Reply-To: <20191017160953.GC1266@stefanha-x1.localdomain>
-From: Miklos Szeredi <mszeredi@redhat.com>
-Date: Thu, 17 Oct 2019 18:48:33 +0200
-Message-ID: <CAOssrKejcfVWXw6Nu1owyEeofTdVp6BNx4bL91ma2g7bg9-nmg@mail.gmail.com>
-Subject: Re: [Virtio-fs] [PATCH 0/2] virtiofsd: Two fix for xattr operation
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.132.183.28
+Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::441
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -85,58 +97,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: virtio-fs@redhat.com, Misono Tomohiro <misono.tomohiro@jp.fujitsu.com>,
- qemu-devel@nongnu.org
+Cc: Fam Zheng <fam@euphon.net>, Eduardo Habkost <ehabkost@redhat.com>,
+ Aleksandar Rikalo <arikalo@wavecomp.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
+ Kamil Rytarowski <kamil@netbsd.org>, qemu-ppc@nongnu.org,
+ Artyom Tarasenko <atar4qemu@gmail.com>, Cleber Rosa <crosa@redhat.com>,
+ =?UTF-8?q?Herv=C3=A9=20Poussineau?= <hpoussin@reactos.org>,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ Aurelien Jarno <aurelien@aurel32.net>,
+ David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Oct 17, 2019 at 6:09 PM Stefan Hajnoczi <stefanha@redhat.com> wrote:
->
-> On Thu, Oct 17, 2019 at 01:23:57PM +0200, Miklos Szeredi wrote:
-> > On Thu, Oct 17, 2019 at 12:05 PM Stefan Hajnoczi <stefanha@redhat.com> wrote:
-> > >
-> > > On Wed, Oct 16, 2019 at 07:37:52PM +0900, Misono Tomohiro wrote:
-> > > > Hello,
-> > > >
-> > > > I test xattr operation on virtiofs using xfstest generic/062
-> > > > (with -o xattr option and XFS backend) and see some problems.
-> > > >
-> > > > These patches fixes the two of the problems.
-> > > >
-> > > > The remaining problems are:
-> > > >  1. we cannot xattr to block device created by mknod
-> > > >     which does not have actual device (since open in virtiofsd fails)
-> > > >  2. we cannot xattr to symbolic link
-> > > >
-> > > > I don't think 1 is a big problem but can we fix 2?
-> > >
-> > > Sorry, I don't know the answer.  Maybe it would be necessary to add a
-> > > new O_SYMLINK open flag to open(2) so that fgetxattr()/fsetxattr()
-> > > operations can be performed.  A kernel change like that would take some
-> > > time to get accepted upstream and shipped by distros, but it might be
-> > > the only way since the current syscall interface doesn't seem to offer a
-> > > way to do this.
-> >
-> > The real problem is that open() on a non-regular, non-directory file
-> > may have side effects (unless O_PATH is used).  These patches try to
-> > paper over that, but the fact is: opening special files from a file
-> > server is forbidden.
-> >
-> > I see why this is being done, and it's not easy to fix properly
-> > without the ..at() versions of these syscalls.  One idea is to fork()
-> > + fchdir(lo->proc_self_fd) + ..xattr().  Another related idea is to do
-> > a unshare(CLONE_FS) after each thread's startup (will pthread library
-> > balk?  I don't know) so that it's safe to do fchdir(lo->proc_self_fd)
-> > + ...xattr() + fchdir(lo->root_fd).
->
-> Looking at the f*xattr() code in the kernel, it doesn't really care
-> about the file descriptor, it wants the inode instead.  So the O_SYMLINK
-> idea I mentioned could also be called O_XATTR and be similar to O_PATH,
-> except that only f*xattr() calls are allowed on this file descriptor.
+User case from:
+https://mail.coreboot.org/pipermail/openbios/2018-May/010360.html
 
-Even simpler: allow O_PATH descriptors for f*xattr().
+Sandalfoot info:
+http://www.juneau-lug.org/sandalfoot.php
 
-Thanks,
-Miklos
+Acked-by: David Gibson <david@gibson.dropbear.id.au>
+Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+---
+v3:
+- use avocado_qemu.wait_for_console_pattern (Cleber)
+- use exec_command_and_wait_for_pattern
+---
+ tests/acceptance/ppc_prep_40p.py | 30 ++++++++++++++++++++++++++++++
+ 1 file changed, 30 insertions(+)
+
+diff --git a/tests/acceptance/ppc_prep_40p.py b/tests/acceptance/ppc_prep_40p.py
+index 0ebedd16c8..d022fe5ab0 100644
+--- a/tests/acceptance/ppc_prep_40p.py
++++ b/tests/acceptance/ppc_prep_40p.py
+@@ -10,6 +10,7 @@ import logging
+ 
+ from avocado import skipIf
+ from avocado_qemu import Test
++from avocado_qemu import exec_command_and_wait_for_pattern
+ from avocado_qemu import wait_for_console_pattern
+ 
+ 
+@@ -94,3 +95,32 @@ class IbmPrep40pMachine(Test):
+ 
+         self.vm.launch()
+         wait_for_console_pattern(self, 'NetBSD/prep BOOT, Revision 1.9')
++
++    def test_sandalfoot_busybox(self):
++        """
++        :avocado: tags=arch:ppc
++        :avocado: tags=machine:40p
++        """
++        drive_url = ('http://www.juneau-lug.org/zImage.initrd.sandalfoot')
++        drive_hash = 'dacacfc4085ea51d34d99ef70e972b849e2c6949'
++        drive_path = self.fetch_asset(drive_url, asset_hash=drive_hash)
++
++        self.vm.set_machine('40p')
++        self.vm.set_console()
++        self.vm.add_args('-cdrom', drive_path,
++                         '-boot', 'd')
++
++        self.vm.launch()
++        wait_for_console_pattern(self, 'Now booting the kernel')
++
++        msg = 'Please press Enter to activate this console.'
++        wait_for_console_pattern(self, msg)
++
++        version = 'BusyBox v0.60.0 (2001.08.19-09:26+0000) Built-in shell (ash)'
++        exec_command_and_wait_for_pattern(self, '', version)
++
++        uname = 'Linux ppc 2.4.18 #5 Wed May 21 23:50:43 AKDT 2003 ppc unknown'
++        exec_command_and_wait_for_pattern(self, 'uname -a', uname)
++
++        cpu = 'PReP IBM 6015/7020 (Sandalfoot/Sandalbow)'
++        exec_command_and_wait_for_pattern(self, 'cat /proc/cpuinfo', cpu)
+-- 
+2.21.0
+
 
