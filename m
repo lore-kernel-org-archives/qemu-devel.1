@@ -8,77 +8,77 @@ X-Spam-Status: No, score=-6.4 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5218CECE58E
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 15:58:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D0A3CECE58E
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 15:59:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0F8C021848
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 15:58:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9797221835
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 15:59:14 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DgOCllxV"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0F8C021848
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NEM4mLaf"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9797221835
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51750 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51756 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iL8Au-0007P3-OV
-	for qemu-devel@archiver.kernel.org; Thu, 17 Oct 2019 11:58:52 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52703)
+	id 1iL8BF-000827-G7
+	for qemu-devel@archiver.kernel.org; Thu, 17 Oct 2019 11:59:13 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54425)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <aleksandar.m.mail@gmail.com>) id 1iL7G7-000154-5E
- for qemu-devel@nongnu.org; Thu, 17 Oct 2019 11:00:16 -0400
+ (envelope-from <aleksandar.m.mail@gmail.com>) id 1iL7O5-00038W-W3
+ for qemu-devel@nongnu.org; Thu, 17 Oct 2019 11:08:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aleksandar.m.mail@gmail.com>) id 1iL7G5-0004cX-K6
- for qemu-devel@nongnu.org; Thu, 17 Oct 2019 11:00:11 -0400
-Received: from mail-oi1-x242.google.com ([2607:f8b0:4864:20::242]:38637)
+ (envelope-from <aleksandar.m.mail@gmail.com>) id 1iL7O4-0000VS-KN
+ for qemu-devel@nongnu.org; Thu, 17 Oct 2019 11:08:25 -0400
+Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:46822)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
- id 1iL7G5-0004c1-Dw
- for qemu-devel@nongnu.org; Thu, 17 Oct 2019 11:00:09 -0400
-Received: by mail-oi1-x242.google.com with SMTP id k10so115079oij.5
- for <qemu-devel@nongnu.org>; Thu, 17 Oct 2019 08:00:09 -0700 (PDT)
+ id 1iL7O4-0000V8-F3
+ for qemu-devel@nongnu.org; Thu, 17 Oct 2019 11:08:24 -0400
+Received: by mail-ot1-x341.google.com with SMTP id 89so2143173oth.13
+ for <qemu-devel@nongnu.org>; Thu, 17 Oct 2019 08:08:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=mime-version:in-reply-to:references:from:date:message-id:subject:to
- :cc; bh=M5Y5S4bU2xkOzKBGjT0DmAhs+QC4phjwSWTyUm/ZWo4=;
- b=DgOCllxVk+7vJLGmedLbu/nQL2Z9+Hb+ND/4SVae1h8tWWQueFNLYOMaAARFkLYL55
- jhsKA54/5Wdbg3bP/sDljVyiyxKJTN9R2TVC5S9WmL9eSYVpZR9AYgqUrlYDTVa6puKF
- g+b/FI5ZCfdy/f5eGnbfhqN/HR4c4ts9lGeG/IAOUSfzqxQTAJApkZ/e5jTpbJcA8RTH
- 8bia4TLBp+W1pUYNuSKxv049R1VnDmGhw/SQMX7tpyuQqLO1RACt5nKxWyk2MqB4Wut6
- QnUAT2zueO5vXvcnBQDc+RoGJ3L9+p76BI4Xprpx82/R9AYLtT+QvT6MwB05EaYmooIn
- tsDA==
+ :cc; bh=Te8iL1ySJYsi3TwuCbc9+ISM/XmgmPuQ5oUDyGYi3wg=;
+ b=NEM4mLafveESryGZ/FAFGhdi1XOz8bFhZxPxM57dcv3qHbRqOOYOrzJDTSUGVvd3Tw
+ e6vFSebqteu0l5ktJJbFAY9PC8gtQrX+E1x32O7GNSoo0M7RGSzsy7lbtjJ54Alzkytf
+ jfVAshPkNODfLrNha9VMh+4LJSf8OON4fLKHRu19uSSd8FQ32VCYrk6dwfepm3sWuyhi
+ 0YC55RcaBemNM5y41Lkb2M2VnSlD6I/DRu6+OEqxQ2OV4FormdjlR/a7icdDHDPXk5i2
+ Gh04mQ9RBGapOYseI7bbP2V+VUfLV6mm5l1R3Hs2w9BHho/Ca13XPUWfCDLO2ZSG52mS
+ A+Tw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:in-reply-to:references:from:date
  :message-id:subject:to:cc;
- bh=M5Y5S4bU2xkOzKBGjT0DmAhs+QC4phjwSWTyUm/ZWo4=;
- b=UNWCHfkao6tOYozZf31V3KteScQBRUdQs/LvG1i5Jjv3PxpaybP41PMip8wl/R1uKS
- 6LnmnpD2t6fwEInVkP8qG9zKCyq/fK1BK4ITCyyIwZaXmRI9Ffn0Bvo2NwOhmHGobGYR
- VuAGqWf/7rnyrpD3Hum4tf/wIIeIQpEsAfq8t7NAP5ESqyvqC0LWLE6jlfpI638HSVSf
- eo1p8OH5Ju1wySTiZRvoi/JFbTcwrvU9phl2FmleCezHzva8EhutSs8YY8OCxqE+B3jn
- GZMyFs5AOagpbsynZK5Wlf4jWHsA1jeiLqF/nvfKPpXLPqmh2GvDejtJLAZD+hU5K2t/
- LtrA==
-X-Gm-Message-State: APjAAAV8ha41Bw+Mt9lWOtOYNy8vZ6NVJ7dvosWjZA9tQpDYEN4AHOz0
- kL3rpUAKl0Cb7aayanej8N6rjFh34OSAqxDFYFA=
-X-Google-Smtp-Source: APXvYqwlhAh0sKvyLqI7nCmavqIbjFOtTsBOMv/I2tNto28moIFL1Cj0mLBEV4gsN+xS/ZGyiMAIMkRmYIn2cXd5uzY=
-X-Received: by 2002:aca:4e56:: with SMTP id c83mr3618429oib.53.1571324408479; 
- Thu, 17 Oct 2019 08:00:08 -0700 (PDT)
+ bh=Te8iL1ySJYsi3TwuCbc9+ISM/XmgmPuQ5oUDyGYi3wg=;
+ b=leBtAejSyeDf9QWEkbjyNEJuRilcZ0cW0A9HxHj6HOUJs0yfx2ZTk2JkoUwX/nWrEF
+ Eener07OxUczLEBdwhwwrlzVB3rwnPoIpL6tJ7SsuFnCtTnonXJPMY9cb69EVLPf3eXt
+ sXivryoCthIi6gGR+fqzo6i2I9pcbFfTsnNImF5eMspx3LfPLLIhFlMGcS4XvwVH9JsF
+ WyIGnatim/iG5jAW0yYBwftR27Q4yJvwE854RIso7q4pTRp8VMJ6vTFIozz5m4IoRlwW
+ srnjb69dr91RmpBDnMA/4xKPI7hcfn+/WQ0/nZy4jYYi2x2zmtjpjJPsv9wPIVacSfkQ
+ pHRQ==
+X-Gm-Message-State: APjAAAXm0zlxKYexRuVVPgDkG+Xvq3xi/gT4N+DYZLIVc/482QR4e9sP
+ Vv9lnKXyh7bI3EwhEysY0XfozsPiMY+7RznN+w4=
+X-Google-Smtp-Source: APXvYqxeE8bkHz+4rdTuiC2swckEAr5SOf51TdhrM8/a7iOdcX2s5a8wlbX5169LopVNHRUx7yKEwTxdYQ2NN2SxMfk=
+X-Received: by 2002:a9d:4f0f:: with SMTP id d15mr3283229otl.64.1571324903693; 
+ Thu, 17 Oct 2019 08:08:23 -0700 (PDT)
 MIME-Version: 1.0
-Received: by 2002:a9d:340a:0:0:0:0:0 with HTTP; Thu, 17 Oct 2019 08:00:07
+Received: by 2002:a9d:340a:0:0:0:0:0 with HTTP; Thu, 17 Oct 2019 08:08:22
  -0700 (PDT)
-In-Reply-To: <20191015162705.28087-4-philmd@redhat.com>
+In-Reply-To: <20191015162705.28087-14-philmd@redhat.com>
 References: <20191015162705.28087-1-philmd@redhat.com>
- <20191015162705.28087-4-philmd@redhat.com>
+ <20191015162705.28087-14-philmd@redhat.com>
 From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
-Date: Thu, 17 Oct 2019 17:00:07 +0200
-Message-ID: <CAL1e-=isxvTctgthzP2Z-4ETKYSZ2P8KOee7-a6K6_LPppn6iw@mail.gmail.com>
-Subject: Re: [PATCH 03/32] mc146818rtc: move structure to header file
+Date: Thu, 17 Oct 2019 17:08:22 +0200
+Message-ID: <CAL1e-=iiea+spwyVRCjMsfz-B1PxGfYx_b1ter0yxF0K9L1ghA@mail.gmail.com>
+Subject: Re: [PATCH 13/32] piix4: convert reset function to QOM
 To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
-Content-Type: multipart/alternative; boundary="00000000000031c31505951c791d"
+Content-Type: multipart/alternative; boundary="000000000000b6214d05951c9610"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::242
+X-Received-From: 2607:f8b0:4864:20::341
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -108,7 +108,7 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---00000000000031c31505951c791d
+--000000000000b6214d05951c9610
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
@@ -118,122 +118,62 @@ wrote:
 
 > From: Herv=C3=A9 Poussineau <hpoussin@reactos.org>
 >
-> We are now able to embed a timer in another object.
->
 > Acked-by: Michael S. Tsirkin <mst@redhat.com>
 > Acked-by: Paolo Bonzini <pbonzini@redhat.com>
 > Signed-off-by: Herv=C3=A9 Poussineau <hpoussin@reactos.org>
-> Message-Id: <20171216090228.28505-4-hpoussin@reactos.org>
+> Message-Id: <20180106153730.30313-15-hpoussin@reactos.org>
 > Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 > ---
->  hw/timer/mc146818rtc.c         | 30 ------------------------------
->  include/hw/timer/mc146818rtc.h | 33 +++++++++++++++++++++++++++++++++
->  2 files changed, 33 insertions(+), 30 deletions(-)
+>  hw/isa/piix4.c | 8 ++++----
+>  1 file changed, 4 insertions(+), 4 deletions(-)
 >
 >
 Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 
 
-
-> diff --git a/hw/timer/mc146818rtc.c b/hw/timer/mc146818rtc.c
-> index 6cb378751b..e40b54e743 100644
-> --- a/hw/timer/mc146818rtc.c
-> +++ b/hw/timer/mc146818rtc.c
-> @@ -71,36 +71,6 @@
->  #define RTC_CLOCK_RATE            32768
->  #define UIP_HOLD_LENGTH           (8 * NANOSECONDS_PER_SECOND / 32768)
+> diff --git a/hw/isa/piix4.c b/hw/isa/piix4.c
+> index c3a2bd0d70..8998b0ca47 100644
+> --- a/hw/isa/piix4.c
+> +++ b/hw/isa/piix4.c
+> @@ -48,10 +48,10 @@ typedef struct PIIX4State {
+>  #define PIIX4_PCI_DEVICE(obj) \
+>      OBJECT_CHECK(PIIX4State, (obj), TYPE_PIIX4_PCI_DEVICE)
 >
-> -#define MC146818_RTC(obj) OBJECT_CHECK(RTCState, (obj), TYPE_MC146818_RT=
-C)
-> -
-> -typedef struct RTCState {
-> -    ISADevice parent_obj;
-> -
-> -    MemoryRegion io;
-> -    MemoryRegion coalesced_io;
-> -    uint8_t cmos_data[128];
-> -    uint8_t cmos_index;
-> -    int32_t base_year;
-> -    uint64_t base_rtc;
-> -    uint64_t last_update;
-> -    int64_t offset;
-> -    qemu_irq irq;
-> -    int it_shift;
-> -    /* periodic timer */
-> -    QEMUTimer *periodic_timer;
-> -    int64_t next_periodic_time;
-> -    /* update-ended timer */
-> -    QEMUTimer *update_timer;
-> -    uint64_t next_alarm_time;
-> -    uint16_t irq_reinject_on_ack_count;
-> -    uint32_t irq_coalesced;
-> -    uint32_t period;
-> -    QEMUTimer *coalesced_timer;
-> -    LostTickPolicy lost_tick_policy;
-> -    Notifier suspend_notifier;
-> -    QLIST_ENTRY(RTCState) link;
-> -} RTCState;
-> -
->  static void rtc_set_time(RTCState *s);
->  static void rtc_update_time(RTCState *s);
->  static void rtc_set_cmos(RTCState *s, const struct tm *tm);
-> diff --git a/include/hw/timer/mc146818rtc.h b/include/hw/timer/
-> mc146818rtc.h
-> index fe6ed63f71..0f1c886e5b 100644
-> --- a/include/hw/timer/mc146818rtc.h
-> +++ b/include/hw/timer/mc146818rtc.h
-> @@ -1,10 +1,43 @@
->  #ifndef MC146818RTC_H
->  #define MC146818RTC_H
+> -static void piix4_reset(void *opaque)
+> +static void piix4_reset(DeviceState *dev)
+>  {
+> -    PIIX4State *d =3D opaque;
+> -    uint8_t *pci_conf =3D d->dev.config;
+> +    PIIX4State *s =3D PIIX4_PCI_DEVICE(dev);
+> +    uint8_t *pci_conf =3D s->dev.config;
 >
-> +#include "qapi/qapi-types-misc.h"
-> +#include "qemu/queue.h"
-> +#include "qemu/timer.h"
->  #include "hw/isa/isa.h"
->  #include "hw/timer/mc146818rtc_regs.h"
+>      pci_conf[0x04] =3D 0x07; // master, memory and I/O
+>      pci_conf[0x05] =3D 0x00;
+> @@ -165,7 +165,6 @@ static void piix4_realize(PCIDevice *pci_dev, Error
+> **errp)
+>      isa_bus_irqs(isa_bus, s->isa);
 >
->  #define TYPE_MC146818_RTC "mc146818rtc"
-> +#define MC146818_RTC(obj) OBJECT_CHECK(RTCState, (obj), TYPE_MC146818_RT=
-C)
-> +
-> +typedef struct RTCState {
-> +    ISADevice parent_obj;
-> +
-> +    MemoryRegion io;
-> +    MemoryRegion coalesced_io;
-> +    uint8_t cmos_data[128];
-> +    uint8_t cmos_index;
-> +    int32_t base_year;
-> +    uint64_t base_rtc;
-> +    uint64_t last_update;
-> +    int64_t offset;
-> +    qemu_irq irq;
-> +    int it_shift;
-> +    /* periodic timer */
-> +    QEMUTimer *periodic_timer;
-> +    int64_t next_periodic_time;
-> +    /* update-ended timer */
-> +    QEMUTimer *update_timer;
-> +    uint64_t next_alarm_time;
-> +    uint16_t irq_reinject_on_ack_count;
-> +    uint32_t irq_coalesced;
-> +    uint32_t period;
-> +    QEMUTimer *coalesced_timer;
-> +    Notifier clock_reset_notifier;
-> +    LostTickPolicy lost_tick_policy;
-> +    Notifier suspend_notifier;
-> +    QLIST_ENTRY(RTCState) link;
-> +} RTCState;
+>      piix4_dev =3D pci_dev;
+> -    qemu_register_reset(piix4_reset, s);
+>  }
 >
->  ISADevice *mc146818_rtc_init(ISABus *bus, int base_year,
->                               qemu_irq intercept_irq);
+>  static void piix4_class_init(ObjectClass *klass, void *data)
+> @@ -177,6 +176,7 @@ static void piix4_class_init(ObjectClass *klass, void
+> *data)
+>      k->vendor_id =3D PCI_VENDOR_ID_INTEL;
+>      k->device_id =3D PCI_DEVICE_ID_INTEL_82371AB_0;
+>      k->class_id =3D PCI_CLASS_BRIDGE_ISA;
+> +    dc->reset =3D piix4_reset;
+>      dc->desc =3D "ISA bridge";
+>      dc->vmsd =3D &vmstate_piix4;
+>      /*
 > --
 > 2.21.0
 >
 >
 >
 
---00000000000031c31505951c791d
+--000000000000b6214d05951c9610
 Content-Type: text/html; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
@@ -243,140 +183,77 @@ uote class=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;border-left:1px #ccc =
 solid;padding-left:1ex">From: Herv=C3=A9 Poussineau &lt;<a href=3D"mailto:h=
 poussin@reactos.org">hpoussin@reactos.org</a>&gt;<br>
 <br>
-We are now able to embed a timer in another object.<br>
-<br>
 Acked-by: Michael S. Tsirkin &lt;<a href=3D"mailto:mst@redhat.com">mst@redh=
 at.com</a>&gt;<br>
 Acked-by: Paolo Bonzini &lt;<a href=3D"mailto:pbonzini@redhat.com">pbonzini=
 @redhat.com</a>&gt;<br>
 Signed-off-by: Herv=C3=A9 Poussineau &lt;<a href=3D"mailto:hpoussin@reactos=
 .org">hpoussin@reactos.org</a>&gt;<br>
-Message-Id: &lt;<a href=3D"mailto:20171216090228.28505-4-hpoussin@reactos.o=
-rg">20171216090228.28505-4-hpoussin@reactos.org</a>&gt;<br>
+Message-Id: &lt;<a href=3D"mailto:20180106153730.30313-15-hpoussin@reactos.=
+org">20180106153730.30313-15-hpoussin@reactos.org</a>&gt;<br>
 Signed-off-by: Philippe Mathieu-Daud=C3=A9 &lt;<a href=3D"mailto:philmd@red=
 hat.com">philmd@redhat.com</a>&gt;<br>
 ---<br>
-=C2=A0hw/timer/mc146818rtc.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0| 30 --------=
-----------------------<br>
-=C2=A0include/hw/timer/mc146818rtc.h | 33 ++++++++++++++++++++++++++++++<wb=
-r>+++<br>
-=C2=A02 files changed, 33 insertions(+), 30 deletions(-)<br>
-<br></blockquote><div><br></div><div><div id=3D"cvcmsg_16dbfeb33c93ed97" cl=
-ass=3D"yh  " style=3D"border-top-left-radius:0px;border-top-right-radius:0p=
-x;margin-bottom:11px;overflow:visible"><div class=3D"Vh" id=3D"cvcfullmsg_1=
-6dbfeb33c93ed97"><div id=3D"cvcmsgbod_16dbfeb33c93ed97" class=3D"aj"><div c=
-lass=3D"Ni"><div class=3D"ni pi " dir=3D"ltr"><p dir=3D"ltr">Reviewed-by: A=
-leksandar Markovic &lt;<a href=3D"mailto:amarkovic@wavecomp.com" target=3D"=
-_blank">amarkovic@wavecomp.com</a>&gt;</p><div style=3D"clear:both"></div><=
-/div><div style=3D"clear:both"></div><div><div class=3D"M j T b hc Aj S" ta=
-bindex=3D"0"><div class=3D"V j hf"></div></div></div><div style=3D"clear:bo=
-th"></div></div></div></div></div><div id=3D"cvcmsg_16dbfecd588da1f7" class=
-=3D"yh" style=3D"margin-bottom:11px"><div class=3D"Vh" id=3D"cvcfullmsg_16d=
-bfecd588da1f7"><div class=3D"M j Zi Mi  " tabindex=3D"0"><div id=3D"cvcrepl=
-y_16dbfecd588da1f7" class=3D"M j T b hc xh S  " tabindex=3D"0"><div class=
-=3D"V j td"></div></div></div></div></div></div><div><br></div><div>=C2=A0<=
-/div><blockquote class=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;border-le=
-ft:1px #ccc solid;padding-left:1ex">
-diff --git a/hw/timer/mc146818rtc.c b/hw/timer/mc146818rtc.c<br>
-index 6cb378751b..e40b54e743 100644<br>
---- a/hw/timer/mc146818rtc.c<br>
-+++ b/hw/timer/mc146818rtc.c<br>
-@@ -71,36 +71,6 @@<br>
-=C2=A0#define RTC_CLOCK_RATE=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 32768=
+=C2=A0hw/isa/piix4.c | 8 ++++----<br>
+=C2=A01 file changed, 4 insertions(+), 4 deletions(-)<br>
+<br></blockquote><div><br></div><div id=3D"cvcmsg_16dbfeb33c93ed97" class=
+=3D"yh  " style=3D"border-top-left-radius:0px;border-top-right-radius:0px;m=
+argin-bottom:11px;overflow:visible"><div class=3D"Vh" id=3D"cvcfullmsg_16db=
+feb33c93ed97"><div id=3D"cvcmsgbod_16dbfeb33c93ed97" class=3D"aj"><div clas=
+s=3D"Ni"><div class=3D"ni pi " dir=3D"ltr"><p dir=3D"ltr">Reviewed-by: Alek=
+sandar Markovic &lt;<a href=3D"mailto:amarkovic@wavecomp.com" target=3D"_bl=
+ank">amarkovic@wavecomp.com</a>&gt;</p><div style=3D"clear:both"></div></di=
+v><div style=3D"clear:both"></div><div><div class=3D"M j T b hc Aj S" tabin=
+dex=3D"0"><div class=3D"V j hf"></div></div></div><div style=3D"clear:both"=
+></div></div></div></div></div><div id=3D"cvcmsg_16dbfecd588da1f7" class=3D=
+"yh" style=3D"margin-bottom:11px"><div class=3D"Vh" id=3D"cvcfullmsg_16dbfe=
+cd588da1f7"><div class=3D"M j Zi Mi  " tabindex=3D"0"><div id=3D"cvcreply_1=
+6dbfecd588da1f7" class=3D"M j T b hc xh S  " tabindex=3D"0"><div class=3D"V=
+ j td"></div></div></div></div></div><div>=C2=A0<br></div><blockquote class=
+=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;border-left:1px #ccc solid;padd=
+ing-left:1ex">
+diff --git a/hw/isa/piix4.c b/hw/isa/piix4.c<br>
+index c3a2bd0d70..8998b0ca47 100644<br>
+--- a/hw/isa/piix4.c<br>
++++ b/hw/isa/piix4.c<br>
+@@ -48,10 +48,10 @@ typedef struct PIIX4State {<br>
+=C2=A0#define PIIX4_PCI_DEVICE(obj) \<br>
+=C2=A0 =C2=A0 =C2=A0OBJECT_CHECK(PIIX4State, (obj), TYPE_PIIX4_PCI_DEVICE)<=
+br>
 <br>
-=C2=A0#define UIP_HOLD_LENGTH=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0(8 * =
-NANOSECONDS_PER_SECOND / 32768)<br>
+-static void piix4_reset(void *opaque)<br>
++static void piix4_reset(DeviceState *dev)<br>
+=C2=A0{<br>
+-=C2=A0 =C2=A0 PIIX4State *d =3D opaque;<br>
+-=C2=A0 =C2=A0 uint8_t *pci_conf =3D d-&gt;dev.config;<br>
++=C2=A0 =C2=A0 PIIX4State *s =3D PIIX4_PCI_DEVICE(dev);<br>
++=C2=A0 =C2=A0 uint8_t *pci_conf =3D s-&gt;dev.config;<br>
 <br>
--#define MC146818_RTC(obj) OBJECT_CHECK(RTCState, (obj), TYPE_MC146818_RTC)=
+=C2=A0 =C2=A0 =C2=A0pci_conf[0x04] =3D 0x07; // master, memory and I/O<br>
+=C2=A0 =C2=A0 =C2=A0pci_conf[0x05] =3D 0x00;<br>
+@@ -165,7 +165,6 @@ static void piix4_realize(PCIDevice *pci_dev, Error **e=
+rrp)<br>
+=C2=A0 =C2=A0 =C2=A0isa_bus_irqs(isa_bus, s-&gt;isa);<br>
 <br>
--<br>
--typedef struct RTCState {<br>
--=C2=A0 =C2=A0 ISADevice parent_obj;<br>
--<br>
--=C2=A0 =C2=A0 MemoryRegion io;<br>
--=C2=A0 =C2=A0 MemoryRegion coalesced_io;<br>
--=C2=A0 =C2=A0 uint8_t cmos_data[128];<br>
--=C2=A0 =C2=A0 uint8_t cmos_index;<br>
--=C2=A0 =C2=A0 int32_t base_year;<br>
--=C2=A0 =C2=A0 uint64_t base_rtc;<br>
--=C2=A0 =C2=A0 uint64_t last_update;<br>
--=C2=A0 =C2=A0 int64_t offset;<br>
--=C2=A0 =C2=A0 qemu_irq irq;<br>
--=C2=A0 =C2=A0 int it_shift;<br>
--=C2=A0 =C2=A0 /* periodic timer */<br>
--=C2=A0 =C2=A0 QEMUTimer *periodic_timer;<br>
--=C2=A0 =C2=A0 int64_t next_periodic_time;<br>
--=C2=A0 =C2=A0 /* update-ended timer */<br>
--=C2=A0 =C2=A0 QEMUTimer *update_timer;<br>
--=C2=A0 =C2=A0 uint64_t next_alarm_time;<br>
--=C2=A0 =C2=A0 uint16_t irq_reinject_on_ack_count;<br>
--=C2=A0 =C2=A0 uint32_t irq_coalesced;<br>
--=C2=A0 =C2=A0 uint32_t period;<br>
--=C2=A0 =C2=A0 QEMUTimer *coalesced_timer;<br>
--=C2=A0 =C2=A0 LostTickPolicy lost_tick_policy;<br>
--=C2=A0 =C2=A0 Notifier suspend_notifier;<br>
--=C2=A0 =C2=A0 QLIST_ENTRY(RTCState) link;<br>
--} RTCState;<br>
--<br>
-=C2=A0static void rtc_set_time(RTCState *s);<br>
-=C2=A0static void rtc_update_time(RTCState *s);<br>
-=C2=A0static void rtc_set_cmos(RTCState *s, const struct tm *tm);<br>
-diff --git a/include/hw/timer/<wbr>mc146818rtc.h b/include/hw/timer/<wbr>mc=
-146818rtc.h<br>
-index fe6ed63f71..0f1c886e5b 100644<br>
---- a/include/hw/timer/<wbr>mc146818rtc.h<br>
-+++ b/include/hw/timer/<wbr>mc146818rtc.h<br>
-@@ -1,10 +1,43 @@<br>
-=C2=A0#ifndef MC146818RTC_H<br>
-=C2=A0#define MC146818RTC_H<br>
+=C2=A0 =C2=A0 =C2=A0piix4_dev =3D pci_dev;<br>
+-=C2=A0 =C2=A0 qemu_register_reset(piix4_<wbr>reset, s);<br>
+=C2=A0}<br>
 <br>
-+#include &quot;qapi/qapi-types-misc.h&quot;<br>
-+#include &quot;qemu/queue.h&quot;<br>
-+#include &quot;qemu/timer.h&quot;<br>
-=C2=A0#include &quot;hw/isa/isa.h&quot;<br>
-=C2=A0#include &quot;hw/timer/mc146818rtc_regs.h&quot;<br>
-<br>
-=C2=A0#define TYPE_MC146818_RTC &quot;mc146818rtc&quot;<br>
-+#define MC146818_RTC(obj) OBJECT_CHECK(RTCState, (obj), TYPE_MC146818_RTC)=
-<br>
-+<br>
-+typedef struct RTCState {<br>
-+=C2=A0 =C2=A0 ISADevice parent_obj;<br>
-+<br>
-+=C2=A0 =C2=A0 MemoryRegion io;<br>
-+=C2=A0 =C2=A0 MemoryRegion coalesced_io;<br>
-+=C2=A0 =C2=A0 uint8_t cmos_data[128];<br>
-+=C2=A0 =C2=A0 uint8_t cmos_index;<br>
-+=C2=A0 =C2=A0 int32_t base_year;<br>
-+=C2=A0 =C2=A0 uint64_t base_rtc;<br>
-+=C2=A0 =C2=A0 uint64_t last_update;<br>
-+=C2=A0 =C2=A0 int64_t offset;<br>
-+=C2=A0 =C2=A0 qemu_irq irq;<br>
-+=C2=A0 =C2=A0 int it_shift;<br>
-+=C2=A0 =C2=A0 /* periodic timer */<br>
-+=C2=A0 =C2=A0 QEMUTimer *periodic_timer;<br>
-+=C2=A0 =C2=A0 int64_t next_periodic_time;<br>
-+=C2=A0 =C2=A0 /* update-ended timer */<br>
-+=C2=A0 =C2=A0 QEMUTimer *update_timer;<br>
-+=C2=A0 =C2=A0 uint64_t next_alarm_time;<br>
-+=C2=A0 =C2=A0 uint16_t irq_reinject_on_ack_count;<br>
-+=C2=A0 =C2=A0 uint32_t irq_coalesced;<br>
-+=C2=A0 =C2=A0 uint32_t period;<br>
-+=C2=A0 =C2=A0 QEMUTimer *coalesced_timer;<br>
-+=C2=A0 =C2=A0 Notifier clock_reset_notifier;<br>
-+=C2=A0 =C2=A0 LostTickPolicy lost_tick_policy;<br>
-+=C2=A0 =C2=A0 Notifier suspend_notifier;<br>
-+=C2=A0 =C2=A0 QLIST_ENTRY(RTCState) link;<br>
-+} RTCState;<br>
-<br>
-=C2=A0ISADevice *mc146818_rtc_init(ISABus *bus, int base_year,<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 qemu_irq intercept_irq);<br>
+=C2=A0static void piix4_class_init(ObjectClass *klass, void *data)<br>
+@@ -177,6 +176,7 @@ static void piix4_class_init(ObjectClass *klass, void *=
+data)<br>
+=C2=A0 =C2=A0 =C2=A0k-&gt;vendor_id =3D PCI_VENDOR_ID_INTEL;<br>
+=C2=A0 =C2=A0 =C2=A0k-&gt;device_id =3D PCI_DEVICE_ID_INTEL_82371AB_0;<br>
+=C2=A0 =C2=A0 =C2=A0k-&gt;class_id =3D PCI_CLASS_BRIDGE_ISA;<br>
++=C2=A0 =C2=A0 dc-&gt;reset =3D piix4_reset;<br>
+=C2=A0 =C2=A0 =C2=A0dc-&gt;desc =3D &quot;ISA bridge&quot;;<br>
+=C2=A0 =C2=A0 =C2=A0dc-&gt;vmsd =3D &amp;vmstate_piix4;<br>
+=C2=A0 =C2=A0 =C2=A0/*<br>
 -- <br>
 2.21.0<br>
 <br>
 <br>
 </blockquote>
 
---00000000000031c31505951c791d--
+--000000000000b6214d05951c9610--
 
