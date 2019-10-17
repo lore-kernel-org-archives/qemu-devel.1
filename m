@@ -2,90 +2,109 @@ Return-Path: <SRS0=yZS3=YK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D2DDBFA372A
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 13:50:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 748E9FA372A
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 13:51:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9BC8B2067B
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 13:50:29 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="F0Vb0TwW"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9BC8B2067B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 455A52067B
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 13:51:20 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 455A52067B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48368 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48406 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iL6Ae-0005HL-0G
-	for qemu-devel@archiver.kernel.org; Thu, 17 Oct 2019 09:50:28 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35456)
+	id 1iL6BS-0006fZ-Ot
+	for qemu-devel@archiver.kernel.org; Thu, 17 Oct 2019 09:51:18 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35412)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1iL5mP-00028b-PS
- for qemu-devel@nongnu.org; Thu, 17 Oct 2019 09:25:26 -0400
+ (envelope-from <thuth@redhat.com>) id 1iL5mH-0001vQ-86
+ for qemu-devel@nongnu.org; Thu, 17 Oct 2019 09:25:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1iL5mO-0001FC-KC
- for qemu-devel@nongnu.org; Thu, 17 Oct 2019 09:25:25 -0400
-Received: from mail-wr1-x436.google.com ([2a00:1450:4864:20::436]:42836)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1iL5mO-0001Et-EF
- for qemu-devel@nongnu.org; Thu, 17 Oct 2019 09:25:24 -0400
-Received: by mail-wr1-x436.google.com with SMTP id n14so2339894wrw.9
- for <qemu-devel@nongnu.org>; Thu, 17 Oct 2019 06:25:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=J5h9LF/cBImRwgBymxo6bpvt6wjjRh3DJds8b7bRsjM=;
- b=F0Vb0TwWW1BUduZbamzC0yB5eWrB/FWr0gz4JEIqQQqbx27l7sDZ3xm+0uNKm/56Ri
- CAzQMQZAn/QnafbL6Me8wcdtDJx93zD/piEQwvCN+vHbKkIQJQuRo5FxruOL4P9vrCzv
- p1U6J87gutNnneKMT7t3nsX961zrEwBtaB3I+CblSkDL1AtKUmQ4C6+JsQMIXJO2lwNC
- cn0lTU/5gUiogWn5tuKRHJMsYIKI4pu6BFNpvUOgo69Kkka6l7d2mabRghZDyrTmpiXd
- ua/ljXnkT+61npG0+pak6hhuvr3iGgElfPI+tL3KNLxOc/Ivt9oJUqBBIDgdXssbpOBN
- LqFA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=J5h9LF/cBImRwgBymxo6bpvt6wjjRh3DJds8b7bRsjM=;
- b=XbMg3sVj5Wntqe5qMos0al6bWXGNnjnTQvDcpkC33ZmT23f2xOs+u6rf5M/l3yxHPH
- ZDSGSV6PNrsOFUIWC/7sMGKw2n53qLmGi0xk1r8cdAJXl4ElbNj5JCm4L5fFuKPcdJNC
- 7/8AfHjZslO46voPzjk2AJ7IeB+mDddvhMQZMBTlePqCG9flFgFtGjD2U5u+7QjWIomw
- GrWp7g0tFPMT7JMJspcPbvQv60d7ThSA+9Wb342BOy27y577JPLmUX1G0wn9cWYFueq0
- XhJhq6NApU4msSvoeTkF6b2RnJgtX3uja6ccC8hFl7TnTNrSJr9ypwu8d9PIKgcfj0s3
- XyNw==
-X-Gm-Message-State: APjAAAWnOAoUTtqGjoNxeQGc5Faj7FK6UpyhZqsWn+0D9Ua1/7uC1Ppp
- T2uRO2jsiXP1iO0QhYiy25YKOnrraNs=
-X-Google-Smtp-Source: APXvYqyWguMhQDrteAaUtS6t6unxm+CgIaao0CAHGxtBrkO4qUDUCaHsM40Ut4nHn7kBIhVVAjELPA==
-X-Received: by 2002:a05:6000:1190:: with SMTP id
- g16mr2997913wrx.133.1571318723103; 
- Thu, 17 Oct 2019 06:25:23 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id x5sm2494190wrt.75.2019.10.17.06.25.22
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 17 Oct 2019 06:25:22 -0700 (PDT)
-Received: from zen.lan (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 921BF1FFBE;
- Thu, 17 Oct 2019 14:16:19 +0100 (BST)
-From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: qemu-devel@nongnu.org
-Subject: [PATCH  v6 39/54] plugin: add qemu_plugin_outs helper
-Date: Thu, 17 Oct 2019 14:16:00 +0100
-Message-Id: <20191017131615.19660-40-alex.bennee@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20191017131615.19660-1-alex.bennee@linaro.org>
-References: <20191017131615.19660-1-alex.bennee@linaro.org>
+ (envelope-from <thuth@redhat.com>) id 1iL5mE-0001Co-4g
+ for qemu-devel@nongnu.org; Thu, 17 Oct 2019 09:25:15 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:48499)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <thuth@redhat.com>) id 1iL5mC-00019y-6z
+ for qemu-devel@nongnu.org; Thu, 17 Oct 2019 09:25:12 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 73FB959465
+ for <qemu-devel@nongnu.org>; Thu, 17 Oct 2019 13:25:10 +0000 (UTC)
+Received: from thuth.remote.csb (dhcp-200-228.str.redhat.com [10.33.200.228])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id E331D600CC;
+ Thu, 17 Oct 2019 13:25:04 +0000 (UTC)
+Subject: Re: [PATCH v2 4/7] libqos: add MSI-X callbacks to QVirtioPCIDevice
+To: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
+References: <20191011085611.4194-1-stefanha@redhat.com>
+ <20191011085611.4194-5-stefanha@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=thuth@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+Organization: Red Hat
+Message-ID: <d5ffe89a-480f-e7d7-94b5-636dbedba646@redhat.com>
+Date: Thu, 17 Oct 2019 15:25:03 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::436
+In-Reply-To: <20191011085611.4194-5-stefanha@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.39]); Thu, 17 Oct 2019 13:25:10 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,98 +116,22 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: aaron@os.amperecomputing.com, cota@braap.org,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
- robert.foley@futurewei.com, peter.puhov@futurewei.com
+Cc: Laurent Vivier <lvivier@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Having the plugins grab stdout and spew stuff there is a bit ugly and
-certainly makes the tests look ugly. Provide a hook back into QEMU
-which can be redirected as needed.
+On 11/10/2019 10.56, Stefan Hajnoczi wrote:
+> The MSI-X vectors are programmed differently in the VIRTIO 1.0 and
+> Legacy interfaces.  Introduce callbacks so different implementations can
+> be used depending on the interface version.
+> 
+> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+> ---
+>  tests/libqos/virtio-pci.h | 12 ++++++++++++
+>  tests/libqos/virtio-pci.c | 37 ++++++++++++++++++++++++++++---------
+>  2 files changed, 40 insertions(+), 9 deletions(-)
 
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-
----
-v6
-  - split and move to pre example plugins
----
- include/qemu/log.h           | 1 +
- include/qemu/qemu-plugin.h   | 6 ++++++
- plugins/api.c                | 8 ++++++++
- plugins/qemu-plugins.symbols | 1 +
- util/log.c                   | 3 +++
- 5 files changed, 19 insertions(+)
-
-diff --git a/include/qemu/log.h b/include/qemu/log.h
-index b097a6cae1..a91105b2ad 100644
---- a/include/qemu/log.h
-+++ b/include/qemu/log.h
-@@ -45,6 +45,7 @@ static inline bool qemu_log_separate(void)
- /* LOG_TRACE (1 << 15) is defined in log-for-trace.h */
- #define CPU_LOG_TB_OP_IND  (1 << 16)
- #define CPU_LOG_TB_FPU     (1 << 17)
-+#define CPU_LOG_PLUGIN     (1 << 18)
- 
- /* Lock output for a series of related logs.  Since this is not needed
-  * for a single qemu_log / qemu_log_mask / qemu_log_mask_and_addr, we
-diff --git a/include/qemu/qemu-plugin.h b/include/qemu/qemu-plugin.h
-index ddf267fbfe..a00a7deb46 100644
---- a/include/qemu/qemu-plugin.h
-+++ b/include/qemu/qemu-plugin.h
-@@ -384,4 +384,10 @@ int qemu_plugin_n_vcpus(void);
- /* returns -1 in user-mode */
- int qemu_plugin_n_max_vcpus(void);
- 
-+/**
-+ * qemu_plugin_outs() - output string via QEMU's logging system
-+ * @string: a string
-+ */
-+void qemu_plugin_outs(const char *string);
-+
- #endif /* QEMU_PLUGIN_API_H */
-diff --git a/plugins/api.c b/plugins/api.c
-index 5adc4d25a1..fa1d9f276d 100644
---- a/plugins/api.c
-+++ b/plugins/api.c
-@@ -331,3 +331,11 @@ int qemu_plugin_n_max_vcpus(void)
-     return get_ms()->smp.max_cpus;
- #endif
- }
-+
-+/*
-+ * Plugin output
-+ */
-+void qemu_plugin_outs(const char *string)
-+{
-+    qemu_log_mask(CPU_LOG_PLUGIN, "%s", string);
-+}
-diff --git a/plugins/qemu-plugins.symbols b/plugins/qemu-plugins.symbols
-index 267ec381b4..4bdb381f48 100644
---- a/plugins/qemu-plugins.symbols
-+++ b/plugins/qemu-plugins.symbols
-@@ -36,4 +36,5 @@
-   qemu_plugin_vcpu_for_each;
-   qemu_plugin_n_vcpus;
-   qemu_plugin_n_max_vcpus;
-+  qemu_plugin_outs;
- };
-diff --git a/util/log.c b/util/log.c
-index 1d1b33f7d9..1ca13059ee 100644
---- a/util/log.c
-+++ b/util/log.c
-@@ -273,6 +273,9 @@ const QEMULogItem qemu_log_items[] = {
-     { CPU_LOG_TB_NOCHAIN, "nochain",
-       "do not chain compiled TBs so that \"exec\" and \"cpu\" show\n"
-       "complete traces" },
-+#ifdef CONFIG_PLUGIN
-+    { CPU_LOG_PLUGIN, "plugin", "output from TCG plugins\n"},
-+#endif
-     { 0, NULL, NULL },
- };
- 
--- 
-2.20.1
-
+Reviewed-by: Thomas Huth <thuth@redhat.com>
 
