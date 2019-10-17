@@ -6,54 +6,53 @@ X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 548E1FA372A
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 22:05:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BA016ECE58D
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 22:05:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 276BA21D7C
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 22:05:51 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 276BA21D7C
+	by mail.kernel.org (Postfix) with ESMTPS id 8D01421D7C
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 22:05:56 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8D01421D7C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:32798 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:32800 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iLDu2-0002Oy-4z
-	for qemu-devel@archiver.kernel.org; Thu, 17 Oct 2019 18:05:50 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:32885)
+	id 1iLDu7-0002Vu-K2
+	for qemu-devel@archiver.kernel.org; Thu, 17 Oct 2019 18:05:55 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:32848)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jsnow@redhat.com>) id 1iLDjq-0007Fz-9W
- for qemu-devel@nongnu.org; Thu, 17 Oct 2019 17:55:19 -0400
+ (envelope-from <jsnow@redhat.com>) id 1iLDjo-0007Bf-0r
+ for qemu-devel@nongnu.org; Thu, 17 Oct 2019 17:55:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1iLDjp-0002Yo-3U
- for qemu-devel@nongnu.org; Thu, 17 Oct 2019 17:55:18 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:25139)
+ (envelope-from <jsnow@redhat.com>) id 1iLDjm-0002W8-54
+ for qemu-devel@nongnu.org; Thu, 17 Oct 2019 17:55:15 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43961)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <jsnow@redhat.com>)
- id 1iLDjm-0002UY-8I; Thu, 17 Oct 2019 17:55:14 -0400
+ id 1iLDji-0002PE-1P; Thu, 17 Oct 2019 17:55:10 -0400
 Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
  [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 4640F30089BA;
- Thu, 17 Oct 2019 21:55:12 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 3C24018C8927;
+ Thu, 17 Oct 2019 21:55:09 +0000 (UTC)
 Received: from probe.bos.redhat.com (dhcp-17-173.bos.redhat.com [10.18.17.173])
- by smtp.corp.redhat.com (Postfix) with ESMTP id DDAD45D9CA;
- Thu, 17 Oct 2019 21:55:10 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id D5E6F5D9DC;
+ Thu, 17 Oct 2019 21:55:07 +0000 (UTC)
 From: John Snow <jsnow@redhat.com>
 To: Peter Maydell <peter.maydell@linaro.org>, jsnow@redhat.com,
  qemu-devel@nongnu.org
-Subject: [PULL v3 11/19] iotests: add test-case to 165 to test reopening qcow2
- bitmaps to RW
-Date: Thu, 17 Oct 2019 17:54:28 -0400
-Message-Id: <20191017215436.14252-12-jsnow@redhat.com>
+Subject: [PULL v3 09/19] block: switch reopen queue from QSIMPLEQ to QTAILQ
+Date: Thu, 17 Oct 2019 17:54:26 -0400
+Message-Id: <20191017215436.14252-10-jsnow@redhat.com>
 In-Reply-To: <20191017215436.14252-1-jsnow@redhat.com>
 References: <20191017215436.14252-1-jsnow@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.46]); Thu, 17 Oct 2019 21:55:12 +0000 (UTC)
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.70]); Thu, 17 Oct 2019 21:55:09 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
@@ -81,110 +80,159 @@ Sender: "Qemu-devel"
 
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
-Reopening bitmaps to RW was broken prior to previous commit. Check that
-it works now.
+We'll need reverse-foreach in the following commit, QTAILQ support it,
+so move to QTAILQ.
 
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-id: 20190927122355.7344-4-vsementsov@virtuozzo.com
+Reviewed-by: Max Reitz <mreitz@redhat.com>
+Message-id: 20190927122355.7344-2-vsementsov@virtuozzo.com
 Signed-off-by: John Snow <jsnow@redhat.com>
 ---
- tests/qemu-iotests/165     | 57 ++++++++++++++++++++++++++++++++++++--
- tests/qemu-iotests/165.out |  4 +--
- 2 files changed, 57 insertions(+), 4 deletions(-)
+ include/block/block.h |  2 +-
+ block.c               | 24 ++++++++++++------------
+ 2 files changed, 13 insertions(+), 13 deletions(-)
 
-diff --git a/tests/qemu-iotests/165 b/tests/qemu-iotests/165
-index 5650dc7c87..951ea011a2 100755
---- a/tests/qemu-iotests/165
-+++ b/tests/qemu-iotests/165
-@@ -43,10 +43,10 @@ class TestPersistentDirtyBitmap(iotests.QMPTestCase):
-         os.remove(disk)
+diff --git a/include/block/block.h b/include/block/block.h
+index 792bb826db..89606bd9f8 100644
+--- a/include/block/block.h
++++ b/include/block/block.h
+@@ -195,7 +195,7 @@ typedef struct HDGeometry {
+ #define BDRV_BLOCK_EOF          0x20
+ #define BDRV_BLOCK_RECURSE      0x40
 =20
-     def mkVm(self):
--        return iotests.VM().add_drive(disk)
-+        return iotests.VM().add_drive(disk, opts=3D'node-name=3Dnode0')
+-typedef QSIMPLEQ_HEAD(BlockReopenQueue, BlockReopenQueueEntry) BlockReop=
+enQueue;
++typedef QTAILQ_HEAD(BlockReopenQueue, BlockReopenQueueEntry) BlockReopen=
+Queue;
 =20
-     def mkVmRo(self):
--        return iotests.VM().add_drive(disk, opts=3D'readonly=3Don')
-+        return iotests.VM().add_drive(disk, opts=3D'readonly=3Don,node-n=
-ame=3Dnode0')
+ typedef struct BDRVReopenState {
+     BlockDriverState *bs;
+diff --git a/block.c b/block.c
+index 5721441697..0347632c6c 100644
+--- a/block.c
++++ b/block.c
+@@ -1719,7 +1719,7 @@ typedef struct BlockReopenQueueEntry {
+      bool prepared;
+      bool perms_checked;
+      BDRVReopenState state;
+-     QSIMPLEQ_ENTRY(BlockReopenQueueEntry) entry;
++     QTAILQ_ENTRY(BlockReopenQueueEntry) entry;
+ } BlockReopenQueueEntry;
 =20
-     def getSha256(self):
-         result =3D self.vm.qmp('x-debug-block-dirty-bitmap-sha256',
-@@ -102,6 +102,59 @@ class TestPersistentDirtyBitmap(iotests.QMPTestCase)=
-:
+ /*
+@@ -1732,7 +1732,7 @@ static int bdrv_reopen_get_flags(BlockReopenQueue *=
+q, BlockDriverState *bs)
+     BlockReopenQueueEntry *entry;
 =20
-         self.vm.shutdown()
+     if (q !=3D NULL) {
+-        QSIMPLEQ_FOREACH(entry, q, entry) {
++        QTAILQ_FOREACH(entry, q, entry) {
+             if (entry->state.bs =3D=3D bs) {
+                 return entry->state.flags;
+             }
+@@ -3249,7 +3249,7 @@ static bool bdrv_recurse_has_child(BlockDriverState=
+ *bs,
+  * Adds a BlockDriverState to a simple queue for an atomic, transactiona=
+l
+  * reopen of multiple devices.
+  *
+- * bs_queue can either be an existing BlockReopenQueue that has had QSIM=
+PLE_INIT
++ * bs_queue can either be an existing BlockReopenQueue that has had QTAI=
+LQ_INIT
+  * already performed, or alternatively may be NULL a new BlockReopenQueu=
+e will
+  * be created and initialized. This newly created BlockReopenQueue shoul=
+d be
+  * passed back in for subsequent calls that are intended to be of the sa=
+me
+@@ -3290,7 +3290,7 @@ static BlockReopenQueue *bdrv_reopen_queue_child(Bl=
+ockReopenQueue *bs_queue,
 =20
-+    def test_reopen_rw(self):
-+        self.vm =3D self.mkVm()
-+        self.vm.launch()
-+        self.qmpAddBitmap()
-+
-+        # Calculate hashes
-+
-+        self.writeRegions(regions1)
-+        sha256_1 =3D self.getSha256()
-+
-+        self.writeRegions(regions2)
-+        sha256_2 =3D self.getSha256()
-+        assert sha256_1 !=3D sha256_2 # Otherwise, it's not very interes=
-ting.
-+
-+        result =3D self.vm.qmp('block-dirty-bitmap-clear', node=3D'drive=
-0',
-+                             name=3D'bitmap0')
-+        self.assert_qmp(result, 'return', {})
-+
-+        # Start with regions1
-+
-+        self.writeRegions(regions1)
-+        assert sha256_1 =3D=3D self.getSha256()
-+
-+        self.vm.shutdown()
-+
-+        self.vm =3D self.mkVmRo()
-+        self.vm.launch()
-+
-+        assert sha256_1 =3D=3D self.getSha256()
-+
-+        # Check that we are in RO mode and can't modify bitmap.
-+        self.writeRegions(regions2)
-+        assert sha256_1 =3D=3D self.getSha256()
-+
-+        # Reopen to RW
-+        result =3D self.vm.qmp('x-blockdev-reopen', **{
-+            'node-name': 'node0',
-+            'driver': iotests.imgfmt,
-+            'file': {
-+                'driver': 'file',
-+                'filename': disk
-+            },
-+            'read-only': False
-+        })
-+        self.assert_qmp(result, 'return', {})
-+
-+        # Check that bitmap is reopened to RW and we can write to it.
-+        self.writeRegions(regions2)
-+        assert sha256_2 =3D=3D self.getSha256()
-+
-+        self.vm.shutdown()
-+
-+
- if __name__ =3D=3D '__main__':
-     iotests.main(supported_fmts=3D['qcow2'],
-                  supported_protocols=3D['file'])
-diff --git a/tests/qemu-iotests/165.out b/tests/qemu-iotests/165.out
-index ae1213e6f8..fbc63e62f8 100644
---- a/tests/qemu-iotests/165.out
-+++ b/tests/qemu-iotests/165.out
-@@ -1,5 +1,5 @@
--.
-+..
- ----------------------------------------------------------------------
--Ran 1 tests
-+Ran 2 tests
+     if (bs_queue =3D=3D NULL) {
+         bs_queue =3D g_new0(BlockReopenQueue, 1);
+-        QSIMPLEQ_INIT(bs_queue);
++        QTAILQ_INIT(bs_queue);
+     }
 =20
- OK
+     if (!options) {
+@@ -3298,7 +3298,7 @@ static BlockReopenQueue *bdrv_reopen_queue_child(Bl=
+ockReopenQueue *bs_queue,
+     }
+=20
+     /* Check if this BlockDriverState is already in the queue */
+-    QSIMPLEQ_FOREACH(bs_entry, bs_queue, entry) {
++    QTAILQ_FOREACH(bs_entry, bs_queue, entry) {
+         if (bs =3D=3D bs_entry->state.bs) {
+             break;
+         }
+@@ -3354,7 +3354,7 @@ static BlockReopenQueue *bdrv_reopen_queue_child(Bl=
+ockReopenQueue *bs_queue,
+=20
+     if (!bs_entry) {
+         bs_entry =3D g_new0(BlockReopenQueueEntry, 1);
+-        QSIMPLEQ_INSERT_TAIL(bs_queue, bs_entry, entry);
++        QTAILQ_INSERT_TAIL(bs_queue, bs_entry, entry);
+     } else {
+         qobject_unref(bs_entry->state.options);
+         qobject_unref(bs_entry->state.explicit_options);
+@@ -3455,7 +3455,7 @@ int bdrv_reopen_multiple(BlockReopenQueue *bs_queue=
+, Error **errp)
+=20
+     assert(bs_queue !=3D NULL);
+=20
+-    QSIMPLEQ_FOREACH(bs_entry, bs_queue, entry) {
++    QTAILQ_FOREACH(bs_entry, bs_queue, entry) {
+         assert(bs_entry->state.bs->quiesce_counter > 0);
+         if (bdrv_reopen_prepare(&bs_entry->state, bs_queue, errp)) {
+             goto cleanup;
+@@ -3463,7 +3463,7 @@ int bdrv_reopen_multiple(BlockReopenQueue *bs_queue=
+, Error **errp)
+         bs_entry->prepared =3D true;
+     }
+=20
+-    QSIMPLEQ_FOREACH(bs_entry, bs_queue, entry) {
++    QTAILQ_FOREACH(bs_entry, bs_queue, entry) {
+         BDRVReopenState *state =3D &bs_entry->state;
+         ret =3D bdrv_check_perm(state->bs, bs_queue, state->perm,
+                               state->shared_perm, NULL, NULL, errp);
+@@ -3489,13 +3489,13 @@ int bdrv_reopen_multiple(BlockReopenQueue *bs_que=
+ue, Error **errp)
+     /* If we reach this point, we have success and just need to apply th=
+e
+      * changes
+      */
+-    QSIMPLEQ_FOREACH(bs_entry, bs_queue, entry) {
++    QTAILQ_FOREACH(bs_entry, bs_queue, entry) {
+         bdrv_reopen_commit(&bs_entry->state);
+     }
+=20
+     ret =3D 0;
+ cleanup_perm:
+-    QSIMPLEQ_FOREACH_SAFE(bs_entry, bs_queue, entry, next) {
++    QTAILQ_FOREACH_SAFE(bs_entry, bs_queue, entry, next) {
+         BDRVReopenState *state =3D &bs_entry->state;
+=20
+         if (!bs_entry->perms_checked) {
+@@ -3512,7 +3512,7 @@ cleanup_perm:
+         }
+     }
+ cleanup:
+-    QSIMPLEQ_FOREACH_SAFE(bs_entry, bs_queue, entry, next) {
++    QTAILQ_FOREACH_SAFE(bs_entry, bs_queue, entry, next) {
+         if (ret) {
+             if (bs_entry->prepared) {
+                 bdrv_reopen_abort(&bs_entry->state);
+@@ -3552,7 +3552,7 @@ static BlockReopenQueueEntry *find_parent_in_reopen=
+_queue(BlockReopenQueue *q,
+ {
+     BlockReopenQueueEntry *entry;
+=20
+-    QSIMPLEQ_FOREACH(entry, q, entry) {
++    QTAILQ_FOREACH(entry, q, entry) {
+         BlockDriverState *bs =3D entry->state.bs;
+         BdrvChild *child;
+=20
 --=20
 2.21.0
 
