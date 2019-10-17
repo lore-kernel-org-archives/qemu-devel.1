@@ -2,59 +2,57 @@ Return-Path: <SRS0=yZS3=YK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.8 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D405AECE58D
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 21:30:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E5B8ECE58D
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 21:57:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A51EA21A49
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 21:30:49 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A51EA21A49
+	by mail.kernel.org (Postfix) with ESMTPS id 009992089C
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 21:57:22 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 009992089C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60458 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60892 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iLDM8-0000PO-Qh
-	for qemu-devel@archiver.kernel.org; Thu, 17 Oct 2019 17:30:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58660)
+	id 1iLDlo-0000N2-V2
+	for qemu-devel@archiver.kernel.org; Thu, 17 Oct 2019 17:57:20 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60868)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <ehabkost@redhat.com>) id 1iLDL9-0007io-07
- for qemu-devel@nongnu.org; Thu, 17 Oct 2019 17:29:47 -0400
+ (envelope-from <jsnow@redhat.com>) id 1iLDjS-0006mT-Bd
+ for qemu-devel@nongnu.org; Thu, 17 Oct 2019 17:54:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <ehabkost@redhat.com>) id 1iLDL7-0001oQ-Ve
- for qemu-devel@nongnu.org; Thu, 17 Oct 2019 17:29:46 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:41410)
+ (envelope-from <jsnow@redhat.com>) id 1iLDjR-0002FE-10
+ for qemu-devel@nongnu.org; Thu, 17 Oct 2019 17:54:54 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43608)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <ehabkost@redhat.com>)
- id 1iLDL4-0001n1-B7; Thu, 17 Oct 2019 17:29:42 -0400
+ (Exim 4.71) (envelope-from <jsnow@redhat.com>)
+ id 1iLDjN-0002Cm-1o; Thu, 17 Oct 2019 17:54:49 -0400
 Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
  [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id DED233082A6C;
- Thu, 17 Oct 2019 21:29:40 +0000 (UTC)
-Received: from localhost (ovpn-116-20.phx2.redhat.com [10.3.116.20])
- by smtp.corp.redhat.com (Postfix) with ESMTP id C3E505DC18;
- Thu, 17 Oct 2019 21:29:29 +0000 (UTC)
-Date: Thu, 17 Oct 2019 18:29:27 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-To: John Snow <jsnow@redhat.com>
-Subject: Re: [PATCH 00/10] image-fuzzer: Port to Python 3
-Message-ID: <20191017212927.GI4084@habkost.net>
-References: <20191016192430.25098-1-ehabkost@redhat.com>
- <318ecbf2-b077-1a5d-b7d5-a2fc1c9c1c96@redhat.com>
+ by mx1.redhat.com (Postfix) with ESMTPS id CC94169089;
+ Thu, 17 Oct 2019 21:54:47 +0000 (UTC)
+Received: from probe.bos.redhat.com (dhcp-17-173.bos.redhat.com [10.18.17.173])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id A7F965D9DC;
+ Thu, 17 Oct 2019 21:54:36 +0000 (UTC)
+From: John Snow <jsnow@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>, jsnow@redhat.com,
+ qemu-devel@nongnu.org
+Subject: [PULL v3 00/19] Bitmaps patches
+Date: Thu, 17 Oct 2019 17:54:17 -0400
+Message-Id: <20191017215436.14252-1-jsnow@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <318ecbf2-b077-1a5d-b7d5-a2fc1c9c1c96@redhat.com>
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.45]); Thu, 17 Oct 2019 21:29:41 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.28]); Thu, 17 Oct 2019 21:54:48 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 209.132.183.28
@@ -69,45 +67,90 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org,
+Cc: Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>,
+ Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org,
+ Juan Quintela <quintela@redhat.com>, libvir-list@redhat.com,
+ Markus Armbruster <armbru@redhat.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Max Reitz <mreitz@redhat.com>,
  Stefan Hajnoczi <stefanha@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Oct 17, 2019 at 05:11:29PM -0400, John Snow wrote:
-> 
-> 
-> On 10/16/19 3:24 PM, Eduardo Habkost wrote:
-> > This series ports image-fuzzer to Python 3.
-> > 
-> > Eduardo Habkost (10):
-> >   image-fuzzer: Open image files in binary mode
-> >   image-fuzzer: Write bytes instead of string to image file
-> >   image-fuzzer: Explicitly use integer division operator
-> >   image-fuzzer: Use io.StringIO
-> >   image-fuzzer: Use %r for all fiels at Field.__repr__()
-> >   image-fuzzer: Return bytes objects on string fuzzing functions
-> >   image-fuzzer: Use bytes constant for field values
-> >   image-fuzzer: Encode file name and file format to bytes
-> >   image-fuzzer: Run using python3
-> >   image-fuzzer: Use errors parameter of subprocess.Popen()
-> > 
-> >  tests/image-fuzzer/qcow2/__init__.py |  1 -
-> >  tests/image-fuzzer/qcow2/fuzz.py     | 54 +++++++++++++-------------
-> >  tests/image-fuzzer/qcow2/layout.py   | 57 ++++++++++++++--------------
-> >  tests/image-fuzzer/runner.py         | 12 +++---
-> >  4 files changed, 61 insertions(+), 63 deletions(-)
-> > 
-> 
-> When I gave my try at converting this to python3 I noticed that the
-> "except OSError as e" segments used e[1] in a way that was not seemingly
-> supported.
-> 
-> Did you fix that in this series or did I miss it?
+The following changes since commit f22f553efffd083ff624be116726f843a39f11=
+48:
 
-Good catch, I hadn't noticed that.  I didn't fix it.
+  Merge remote-tracking branch 'remotes/rth/tags/pull-tcg-20191013' into =
+staging (2019-10-17 16:48:56 +0100)
 
--- 
-Eduardo
+are available in the Git repository at:
+
+  https://github.com/jnsnow/qemu.git tags/bitmaps-pull-request
+
+for you to fetch changes up to 3264ffced3d087bbe72d759639ef84fd5bd924cc:
+
+  dirty-bitmaps: remove deprecated autoload parameter (2019-10-17 17:53:2=
+8 -0400)
+
+----------------------------------------------------------------
+pull request
+
+----------------------------------------------------------------
+
+John Snow (2):
+  MAINTAINERS: Add Vladimir as a reviewer for bitmaps
+  dirty-bitmaps: remove deprecated autoload parameter
+
+Vladimir Sementsov-Ogievskiy (17):
+  util/hbitmap: strict hbitmap_reset
+  block: move bdrv_can_store_new_dirty_bitmap to block/dirty-bitmap.c
+  block/dirty-bitmap: return int from
+    bdrv_remove_persistent_dirty_bitmap
+  block/qcow2: proper locking on bitmap add/remove paths
+  block/dirty-bitmap: drop meta
+  block/dirty-bitmap: add bs link
+  block/dirty-bitmap: drop BdrvDirtyBitmap.mutex
+  block/dirty-bitmap: refactor bdrv_dirty_bitmap_next
+  block: switch reopen queue from QSIMPLEQ to QTAILQ
+  block: reverse order for reopen commits
+  iotests: add test-case to 165 to test reopening qcow2 bitmaps to RW
+  block/qcow2-bitmap: get rid of bdrv_has_changed_persistent_bitmaps
+  block/qcow2-bitmap: drop qcow2_reopen_bitmaps_rw_hint()
+  block/qcow2-bitmap: do not remove bitmaps on reopen-ro
+  iotests: add test 260 to check bitmap life after snapshot + commit
+  block/qcow2-bitmap: fix and improve qcow2_reopen_bitmaps_rw
+  qcow2-bitmap: move bitmap reopen-rw code to qcow2_reopen_commit
+
+ qemu-deprecated.texi           |  20 ++-
+ qapi/block-core.json           |   6 +-
+ block/qcow2.h                  |  19 +--
+ include/block/block.h          |   2 +-
+ include/block/block_int.h      |  20 +--
+ include/block/dirty-bitmap.h   |  34 ++--
+ include/qemu/hbitmap.h         |   5 +
+ block.c                        |  79 +++------
+ block/backup.c                 |   8 +-
+ block/block-copy.c             |   2 +-
+ block/dirty-bitmap.c           | 290 +++++++++++++++++++--------------
+ block/mirror.c                 |   4 +-
+ block/qcow2-bitmap.c           | 212 +++++++++++++++---------
+ block/qcow2.c                  |  22 ++-
+ blockdev.c                     |  40 ++---
+ migration/block-dirty-bitmap.c |  11 +-
+ migration/block.c              |   4 +-
+ tests/test-hbitmap.c           |   2 +-
+ util/hbitmap.c                 |   4 +
+ MAINTAINERS                    |   3 +-
+ tests/qemu-iotests/165         |  57 ++++++-
+ tests/qemu-iotests/165.out     |   4 +-
+ tests/qemu-iotests/260         |  89 ++++++++++
+ tests/qemu-iotests/260.out     |  52 ++++++
+ tests/qemu-iotests/group       |   1 +
+ 25 files changed, 623 insertions(+), 367 deletions(-)
+ create mode 100755 tests/qemu-iotests/260
+ create mode 100644 tests/qemu-iotests/260.out
+
+--=20
+2.21.0
+
 
