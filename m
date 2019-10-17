@@ -2,86 +2,140 @@ Return-Path: <SRS0=yZS3=YK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1ECECECE58D
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 22:22:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E6144CA9EC8
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 22:43:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CA15E21D7A
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 22:22:23 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CA15E21D7A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.vnet.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id BB465222BD
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 22:43:01 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BB465222BD
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33326 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33554 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iLEA2-0003U7-Rd
-	for qemu-devel@archiver.kernel.org; Thu, 17 Oct 2019 18:22:22 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36422)
+	id 1iLEU0-0003N2-Q6
+	for qemu-devel@archiver.kernel.org; Thu, 17 Oct 2019 18:43:00 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38826)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mdroth@linux.vnet.ibm.com>) id 1iLE9K-0002wp-KL
- for qemu-devel@nongnu.org; Thu, 17 Oct 2019 18:21:41 -0400
+ (envelope-from <jsnow@redhat.com>) id 1iLESx-0002L4-8G
+ for qemu-devel@nongnu.org; Thu, 17 Oct 2019 18:41:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mdroth@linux.vnet.ibm.com>) id 1iLE9I-0007WY-Gf
- for qemu-devel@nongnu.org; Thu, 17 Oct 2019 18:21:38 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:19244)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
- id 1iLE9E-0007VH-8q; Thu, 17 Oct 2019 18:21:32 -0400
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
- by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
- x9HMHTbS140315; Thu, 17 Oct 2019 18:21:31 -0400
-Received: from ppma01dal.us.ibm.com (83.d6.3fa9.ip4.static.sl-reverse.com
- [169.63.214.131])
- by mx0a-001b2d01.pphosted.com with ESMTP id 2vq0hks0cb-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Thu, 17 Oct 2019 18:21:31 -0400
-Received: from pps.filterd (ppma01dal.us.ibm.com [127.0.0.1])
- by ppma01dal.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id x9HMFaCn003472;
- Thu, 17 Oct 2019 22:21:30 GMT
-Received: from b01cxnp22035.gho.pok.ibm.com (b01cxnp22035.gho.pok.ibm.com
- [9.57.198.25]) by ppma01dal.us.ibm.com with ESMTP id 2vq0brgb3m-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Thu, 17 Oct 2019 22:21:29 +0000
-Received: from b01ledav003.gho.pok.ibm.com (b01ledav003.gho.pok.ibm.com
- [9.57.199.108])
- by b01cxnp22035.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- x9HMLT9c54002102
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Thu, 17 Oct 2019 22:21:29 GMT
-Received: from b01ledav003.gho.pok.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 36CF7B20A2;
- Thu, 17 Oct 2019 22:21:29 +0000 (GMT)
-Received: from b01ledav003.gho.pok.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 05707B20A3;
- Thu, 17 Oct 2019 22:21:29 +0000 (GMT)
-Received: from localhost (unknown [9.53.179.213])
- by b01ledav003.gho.pok.ibm.com (Postfix) with ESMTP;
- Thu, 17 Oct 2019 22:21:28 +0000 (GMT)
-Content-Type: text/plain; charset="utf-8"
+ (envelope-from <jsnow@redhat.com>) id 1iLESv-00017f-DJ
+ for qemu-devel@nongnu.org; Thu, 17 Oct 2019 18:41:54 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:48120)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <jsnow@redhat.com>)
+ id 1iLESq-000113-A0; Thu, 17 Oct 2019 18:41:48 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id E164B58B5D;
+ Thu, 17 Oct 2019 22:41:46 +0000 (UTC)
+Received: from [10.18.17.173] (dhcp-17-173.bos.redhat.com [10.18.17.173])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id E01DC1001938;
+ Thu, 17 Oct 2019 22:41:43 +0000 (UTC)
+Subject: Re: [PATCH 00/10] image-fuzzer: Port to Python 3
+To: Eduardo Habkost <ehabkost@redhat.com>
+References: <20191016192430.25098-1-ehabkost@redhat.com>
+ <318ecbf2-b077-1a5d-b7d5-a2fc1c9c1c96@redhat.com>
+ <20191017212927.GI4084@habkost.net>
+From: John Snow <jsnow@redhat.com>
+Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+Message-ID: <74c5d371-0c5b-698c-a74e-46517c1a3ae1@redhat.com>
+Date: Thu, 17 Oct 2019 18:41:43 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-From: Michael Roth <mdroth@linux.vnet.ibm.com>
-User-Agent: alot/0.7
-To: qemu-devel@nongnu.org
-Message-ID: <157135088187.11473.6203817274726226536@sif>
-Subject: [ANNOUNCE] QEMU 4.0.1 Stable released
-Date: Thu, 17 Oct 2019 17:21:21 -0500
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
- definitions=2019-10-17_06:, , signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- priorityscore=1501
- malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
- clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1908290000 definitions=main-1910170194
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
-X-Received-From: 148.163.156.1
+In-Reply-To: <20191017212927.GI4084@habkost.net>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.71]); Thu, 17 Oct 2019 22:41:46 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -93,192 +147,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-stable@nongnu.org
+Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org,
+ Stefan Hajnoczi <stefanha@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi everyone,
 
-I am pleased to announce that the QEMU v4.0.1 stable release is now
-available:
 
-You can grab the tarball from our download page here:
+On 10/17/19 5:29 PM, Eduardo Habkost wrote:
+> On Thu, Oct 17, 2019 at 05:11:29PM -0400, John Snow wrote:
+>>
+>>
+>> On 10/16/19 3:24 PM, Eduardo Habkost wrote:
+>>> This series ports image-fuzzer to Python 3.
+>>>
+>>> Eduardo Habkost (10):
+>>>   image-fuzzer: Open image files in binary mode
+>>>   image-fuzzer: Write bytes instead of string to image file
+>>>   image-fuzzer: Explicitly use integer division operator
+>>>   image-fuzzer: Use io.StringIO
+>>>   image-fuzzer: Use %r for all fiels at Field.__repr__()
+>>>   image-fuzzer: Return bytes objects on string fuzzing functions
+>>>   image-fuzzer: Use bytes constant for field values
+>>>   image-fuzzer: Encode file name and file format to bytes
+>>>   image-fuzzer: Run using python3
+>>>   image-fuzzer: Use errors parameter of subprocess.Popen()
+>>>
+>>>  tests/image-fuzzer/qcow2/__init__.py |  1 -
+>>>  tests/image-fuzzer/qcow2/fuzz.py     | 54 +++++++++++++-------------
+>>>  tests/image-fuzzer/qcow2/layout.py   | 57 ++++++++++++++--------------
+>>>  tests/image-fuzzer/runner.py         | 12 +++---
+>>>  4 files changed, 61 insertions(+), 63 deletions(-)
+>>>
+>>
+>> When I gave my try at converting this to python3 I noticed that the
+>> "except OSError as e" segments used e[1] in a way that was not seemingly
+>> supported.
+>>
+>> Did you fix that in this series or did I miss it?
+> 
+> Good catch, I hadn't noticed that.  I didn't fix it.
+> 
 
-  https://www.qemu.org/download/#source
+I recommend using pylint(3) with a bunch of the style issues turned off,
+e.g.;
 
-v4.0.1 is now tagged in the official qemu.git repository,
-and the stable-4.0 branch has been updated accordingly:
+--disable=missing-docstring --disable=invalid-name
 
-  https://git.qemu.org/?p=3Dqemu.git;a=3Dshortlog;h=3Drefs/heads/stable-4.0
+it will still whine about a lot of reasonably harmless stuff, but
+sometimes it has a few errors to show.
 
-This update contains security fixes for CVE-2019-12068 (LSI SCSI emulation)
-and CVE-2019-14378/CVE-2019-15890 (slirp), as well as a broad range of
-general fixes for various subsystems and machine types.
-
-Also note that this update introduces a new default machine type for Q35
-guests, pc-q35-4.0.1, which should be used in favor of pc-q35-4.0 for
-any configurations involving VFIO passthrough. See commit 92fa1b1a28 for
-more details.
-
-Please see the changelog for additional details and update accordingly.
-
-Thank you to everyone involved!
-
-CHANGELOG:
-
-23967e5b2a: Update version for 4.0.1 release (Michael Roth)
-a678cd4d30: xen-bus: check whether the frontend is active during device res=
-et... (Paul Durrant)
-6341bef468: virtio-blk: Cancel the pending BH when the dataplane is reset (=
-Philippe Mathieu-Daud=C3=A9)
-35d6458d6a: migration: Fix use-after-free during process exit (Yury Kotov)
-306ecc0d24: hw/nvram/fw_cfg: Store 'reboot-timeout' as little endian (Li Qi=
-ang)
-1e821a0abc: hw/display/xlnx_dp: Avoid crash when reading empty RX FIFO (Phi=
-lippe Mathieu-Daud=C3=A9)
-96389e9061: hw/ssi/mss-spi: Avoid crash when reading empty RX FIFO (Philipp=
-e Mathieu-Daud=C3=A9)
-535b8d00c1: nvme: Set number of queues later in nvme_init() (Michal Privozn=
-ik)
-a81a7fc22e: pc-dimm: fix crash when invalid slot number is used (Igor Mamme=
-dov)
-b65e78320b: scsi: lsi: exit infinite loop while executing script (CVE-2019-=
-12068) (Paolo Bonzini)
-4f1c6cb2f9: hw/core/loader: Fix possible crash in rom_copy() (Thomas Huth)
-a8f24b6bdf: s390: PCI: fix IOMMU region init (Matthew Rosato)
-b27192be13: slirp: ip_reass: Fix use after free (Michael Roth)
-c2e03e2aa4: slirp: Fix heap overflow in ip_reass on big packet input (Micha=
-el Roth)
-4e5fe75422: curl: Check curl_multi_add_handle()'s return code (Max Reitz)
-6739c97bde: curl: Handle success in multi_check_completion (Max Reitz)
-deea66dc61: curl: Report only ready sockets (Max Reitz)
-076796fd39: curl: Pass CURLSocket to curl_multi_do() (Max Reitz)
-2aba40a2c8: curl: Check completion in curl_multi_do() (Max Reitz)
-06b178eb61: curl: Keep *socket until the end of curl_sock_cb() (Max Reitz)
-c4134c9c46: curl: Keep pointer to the CURLState in CURLSocket (Max Reitz)
-b9405afb09: blockjob: update nodes head while removing all bdrv (Sergio Lop=
-ez)
-6cb3e9e4f1: block/nfs: tear down aio before nfs_close (Peter Lieven)
-c24d971c13: block/create: Do not abort if a block driver is not available (=
-Philippe Mathieu-Daud=C3=A9)
-ce9c8f6767: libvhost-user: fix SLAVE_SEND_FD handling (Johannes Berg)
-e40124c487: iotests: Test blockdev-create for vpc (Max Reitz)
-491bf15671: iotests: Restrict nbd Python tests to nbd (Max Reitz)
-f949655dd3: iotests: Restrict file Python tests to file (Max Reitz)
-89e4faa9ca: iotests: Add supported protocols to execute_test() (Max Reitz)
-43143d5d91: vpc: Return 0 from vpc_co_create() on success (Max Reitz)
-88a2ea5a48: iotests: add testing shim for script-style python tests (John S=
-now)
-83f9b84c8b: pr-manager: Fix invalid g_free() crash bug (Markus Armbruster)
-434a15214f: xen-bus: Fix backend state transition on device reset (Anthony =
-PERARD)
-0570d468b7: target/arm: Don't abort on M-profile exception return in linux-=
-user mode (Peter Maydell)
-53c641048e: dma-helpers: ensure AIO callback is invoked after cancellation =
-(Paolo Bonzini)
-cb7630af20: qcow2: Fix the calculation of the maximum L2 cache size (Albert=
-o Garcia)
-107018c4fd: Revert "ide/ahci: Check for -ECANCELED in aio callbacks" (John =
-Snow)
-7d4b467790: block/backup: disable copy_range for compressed backup (Vladimi=
-r Sementsov-Ogievskiy)
-5a35dbf228: iotests: Test unaligned blocking mirror write (Max Reitz)
-d65d02614b: mirror: Only mirror granularity-aligned chunks (Max Reitz)
-f69d8f2347: iotests: Test incremental backup after truncation (Max Reitz)
-fc5c701636: util/hbitmap: update orig_size on truncate (Vladimir Sementsov-=
-Ogievskiy)
-c430d7684e: iotests: Test backup job with two guest writes (Max Reitz)
-70353442db: backup: Copy only dirty areas (Max Reitz)
-872b7b8ef9: block/backup: refactor: split out backup_calculate_cluster_size=
- (Vladimir Sementsov-Ogievskiy)
-54d45c8251: block/backup: unify different modes code path (Vladimir Sements=
-ov-Ogievskiy)
-87851171b4: block/backup: refactor and tolerate unallocated cluster skippin=
-g (Vladimir Sementsov-Ogievskiy)
-3f6c00eb61: block/backup: move to copy_bitmap with granularity (Vladimir Se=
-mentsov-Ogievskiy)
-0b55b27908: block/backup: simplify backup_incremental_init_copy_bitmap (Vla=
-dimir Sementsov-Ogievskiy)
-6210ff6aa2: tpm_emulator: Translate TPM error codes to strings (Stefan Berg=
-er)
-0647727e47: tpm: Exit in reset when backend indicates failure (Stefan Berge=
-r)
-d7e9b19f0b: i386/acpi: fix gint overflow in crs_range_compare (Evgeny Yakov=
-lev)
-c4ac494578: virtio-balloon: free pbp more aggressively (Michael S. Tsirkin)
-f18bce29e1: virtio-balloon: don't track subpages for the PBP (David Hildenb=
-rand)
-8e20acad63: virtio-balloon: Use temporary PBP only (David Hildenbrand)
-d0444b1ee3: virtio-balloon: Rework pbp tracking data (David Hildenbrand)
-b50aab6b83: virtio-balloon: Better names for offset variables in inflate/de=
-flate code (David Hildenbrand)
-2c743c8522: virtio-balloon: Simplify deflate with pbp (David Hildenbrand)
-04e35fe3c4: virtio-balloon: Fix QEMU crashes on pagesize > BALLOON_PAGE_SIZ=
-E (David Hildenbrand)
-912440beb5: virtio-balloon: Fix wrong sign extension of PFNs (David Hildenb=
-rand)
-eeb25956e7: i386/acpi: show PCI Express bus on pxb-pcie expanders (Evgeny Y=
-akovlev)
-d25b37247d: ioapic: kvm: Skip route updates for masked pins (Jan Kiszka)
-5ad70231d3: hw/ssi/xilinx_spips: Avoid out-of-bound access to lqspi_buf[] (=
-Philippe Mathieu-Daud=C3=A9)
-804a0ae6c0: hw/ssi/xilinx_spips: Avoid AXI writes to the LQSPI linear memor=
-y (Philippe Mathieu-Daud=C3=A9)
-255325da13: hw/ssi/xilinx_spips: Convert lqspi_read() to read_with_attrs (P=
-hilippe Mathieu-Daud=C3=A9)
-e11cd43f24: docs/bitmaps: use QMP lexer instead of json (John Snow)
-22a03c48e7: sphinx: add qmp_lexer (John Snow)
-e653d5ed18: docs/interop/bitmaps.rst: Fix typos (John Snow)
-a6fe4a3aa8: virtio-balloon: fix QEMU 4.0 config size migration incompatibil=
-ity (Stefan Hajnoczi)
-e86e620656: usbredir: fix buffer-overflow on vmload (Marc-Andr=C3=A9 Lureau)
-32e8ac8a28: virtio-pci: fix missing device properties (Marc-Andr=C3=A9 Lure=
-au)
-8da804f4f9: docs: recommend use of md-clear feature on all Intel CPUs (Dani=
-el P. Berrang=C3=A9)
-7427060f98: target/i386: define md-clear bit (Paolo Bonzini)
-41e1564fb5: target/i386: add MDS-NO feature (Paolo Bonzini)
-8e29c657ca: vl: Fix -drive / -blockdev persistent reservation management (M=
-arkus Armbruster)
-92fa1b1a28: q35: Revert to kernel irqchip (Alex Williamson)
-75f83e7c4a: target/ppc: Fix lxvw4x, lxvh8x and lxvb16x (Anton Blanchard)
-b6159fc9a6: target/ppc: Fix vsum2sws (Anton Blanchard)
-da3bd13802: target/ppc: Fix xxbrq, xxbrw (Anton Blanchard)
-fd72de9047: target/ppc: Fix xvxsigdp (Anton Blanchard)
-14c9bbab09: target/ppc: Fix xvabs[sd]p, xvnabs[sd]p, xvneg[sd]p, xvcpsgn[sd=
-]p (Anton Blanchard)
-1cf90f8a97: vhost: fix vhost_log size overflow during migration (Li Hangjin=
-g)
-3a87d07722: migration/dirty-bitmaps: change bitmap enumeration method (John=
- Snow)
-07cc0a207f: iotests: add iotest 256 for testing blockdev-backup across ioth=
-read contexts (John Snow)
-32097f14fc: iotests.py: rewrite run_job to be pickier (John Snow)
-2ab69df8db: iotests.py: Fix VM.run_job (Max Reitz)
-c7b4a73541: QEMUMachine: add events_wait method (John Snow)
-94a14e6f2a: iotests.py: do not use infinite waits (John Snow)
-7415a83e9b: iotests: Test commit job start with concurrent I/O (Kevin Wolf)
-627fadfa1c: block: Drain source node in bdrv_replace_node() (Kevin Wolf)
-2429dc4eea: blockdev-backup: don't check aio_context too early (John Snow)
-f8d98e2b6d: s390x/cpumodel: ignore csske for expansion (Christian Borntraeg=
-er)
-d8328a3ca5: iotests: Test unaligned raw images with O_DIRECT (Max Reitz)
-241d89b760: block/file-posix: Unaligned O_DIRECT block-status (Max Reitz)
-665218cc08: usb-tablet: fix serial compat property (Gerd Hoffmann)
-a68ab7c88f: kbd-state: fix autorepeat handling (Gerd Hoffmann)
-ffabb55ec2: spapr/xive: fix EQ page addresses above 64GB (C=C3=A9dric Le Go=
-ater)
-2974d63658: docs/interop/bitmaps: rewrite and modernize doc (John Snow)
-da436b77d8: Makefile: add nit-picky mode to sphinx-build (John Snow)
-48025d942e: cutils: Fix size_to_str() on 32-bit platforms (Eric Blake)
-626a95f4aa: block: Fix AioContext switch for bs->drv =3D=3D NULL (Kevin Wol=
-f)
-774f013111: qcow2: Fix qcow2_make_empty() with external data file (Kevin Wo=
-lf)
-173e30de4c: megasas: fix mapped frame size (Peter Lieven)
-4382e8da22: qcow2: Fix full preallocation with external data file (Kevin Wo=
-lf)
-e628c14be4: qcow2: Add errp to preallocate_co() (Kevin Wolf)
-5669ef1e6c: qcow2: Avoid COW during metadata preallocation (Kevin Wolf)
+--js
 
