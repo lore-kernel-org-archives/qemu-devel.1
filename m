@@ -2,59 +2,84 @@ Return-Path: <SRS0=yZS3=YK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 05681FA372A
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 15:48:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C274EFA372A
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 15:49:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CF20F20869
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 15:48:43 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CF20F20869
+	by mail.kernel.org (Postfix) with ESMTPS id 97D8D20869
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 15:49:03 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 97D8D20869
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51472 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51474 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iL814-0001eb-CP
-	for qemu-devel@archiver.kernel.org; Thu, 17 Oct 2019 11:48:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52113)
+	id 1iL81O-0001u2-4u
+	for qemu-devel@archiver.kernel.org; Thu, 17 Oct 2019 11:49:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52139)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <berrange@redhat.com>) id 1iL7D6-00059m-Q0
- for qemu-devel@nongnu.org; Thu, 17 Oct 2019 10:57:06 -0400
+ (envelope-from <philmd@redhat.com>) id 1iL7D8-0005CS-9A
+ for qemu-devel@nongnu.org; Thu, 17 Oct 2019 10:57:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <berrange@redhat.com>) id 1iL7D5-00039E-En
- for qemu-devel@nongnu.org; Thu, 17 Oct 2019 10:57:04 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:55528)
+ (envelope-from <philmd@redhat.com>) id 1iL7D6-0003AS-Uz
+ for qemu-devel@nongnu.org; Thu, 17 Oct 2019 10:57:06 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55538)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <berrange@redhat.com>) id 1iL7D5-00038p-6X
- for qemu-devel@nongnu.org; Thu, 17 Oct 2019 10:57:03 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iL7D6-00039b-LN
+ for qemu-devel@nongnu.org; Thu, 17 Oct 2019 10:57:04 -0400
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 7821A8553F
- for <qemu-devel@nongnu.org>; Thu, 17 Oct 2019 14:57:02 +0000 (UTC)
-Received: from localhost.localdomain.com (ovpn-112-36.ams2.redhat.com
- [10.36.112.36])
- by smtp.corp.redhat.com (Postfix) with ESMTP id B6024100194E;
- Thu, 17 Oct 2019 14:57:01 +0000 (UTC)
-From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH 4/4] crypto: add support for nettle's native XTS impl
-Date: Thu, 17 Oct 2019 15:56:54 +0100
-Message-Id: <20191017145654.11371-5-berrange@redhat.com>
-In-Reply-To: <20191017145654.11371-1-berrange@redhat.com>
-References: <20191017145654.11371-1-berrange@redhat.com>
+ by mx1.redhat.com (Postfix) with ESMTPS id 7A4558553F
+ for <qemu-devel@nongnu.org>; Thu, 17 Oct 2019 14:57:03 +0000 (UTC)
+Received: by mail-wr1-f69.google.com with SMTP id s9so1073867wrw.23
+ for <qemu-devel@nongnu.org>; Thu, 17 Oct 2019 07:57:03 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=uMdAiWip7KyhYWmFEHqoUDP8uaHMYKFRgJSe/YWHELs=;
+ b=ohXnAXuRJeFx5Sm8iPysDBb/U9CI54MxEKrjlWPDsMLLBHYgH7wSWdU6oLL1KR6JSX
+ oJAYfQEm2TBfiljUj1y4QYItqpnB0AlzwjRk06Shyic2GpuYDu3PN+Vm2UnDK9hWeDj1
+ nCrW7gFkPZr4dPaUWXU8scfF8AOVRpRcISYvEpx73paP5OutVGNwlIq5Hz9JYpsZ5NNr
+ jUk5FZP49k7RiDfaGhlKtV0ZR6VqJWVN+jVrSv9qcMqs2jQXSBzdMPfAAOl1iJAzXraP
+ mQ2i1O7dkwtG5ZSYopbUyWzT0ERmVYXjL7L8Y7CreMcWRQPjtZjnpc9ZazbCzWrgg46L
+ IN8Q==
+X-Gm-Message-State: APjAAAU4H5pZ4H77TqdcfXzVFrILS3wuR+fVZzjuUu3U0av72uyCy1fs
+ Gzv40YlaIweQPQNe4IQPYBjZstO4qKMh44LbbLsKOsgvjCws6HMrTLFg1fsRHJtJoYwRyltjdIT
+ 38JyUispyGVeT3ew=
+X-Received: by 2002:adf:f342:: with SMTP id e2mr3636568wrp.61.1571324222163;
+ Thu, 17 Oct 2019 07:57:02 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqzdbddbpq5p3MMwIDBuNECUZ2nk3dSFYgBmPE7rpt6vW2kU5xcBEioJKKoy8TZFOKb2KQrnIg==
+X-Received: by 2002:adf:f342:: with SMTP id e2mr3636535wrp.61.1571324221921;
+ Thu, 17 Oct 2019 07:57:01 -0700 (PDT)
+Received: from [192.168.50.32] (243.red-88-26-246.staticip.rima-tde.net.
+ [88.26.246.243])
+ by smtp.gmail.com with ESMTPSA id h63sm3543106wmf.15.2019.10.17.07.57.00
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Thu, 17 Oct 2019 07:57:01 -0700 (PDT)
+Subject: Re: [PATCH 2/3] hw/timer/xilinx_timer.c: Switch to transaction-based
+ ptimer API
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
+References: <20191017132122.4402-1-peter.maydell@linaro.org>
+ <20191017132122.4402-3-peter.maydell@linaro.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <cabcec27-c6a7-6ea7-e933-589f2385c137@redhat.com>
+Date: Thu, 17 Oct 2019 16:56:59 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.28]); Thu, 17 Oct 2019 14:57:02 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20191017132122.4402-3-peter.maydell@linaro.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 209.132.183.28
@@ -69,125 +94,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
+Cc: Jason Wang <jasowang@redhat.com>, Alistair Francis <alistair@alistair23.me>,
+ qemu-arm@nongnu.org, qemu-ppc@nongnu.org,
+ "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
+ David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Nettle 3.5.0 will add support for the XTS mode. Use this because long
-term we wish to delete QEMU's XTS impl to avoid carrying private crypto
-algorithm impls.
+Hi Peter,
 
-Unfortunately this degrades nettle performance from 612 MB/s to 568 MB/s
-as nettle's XTS impl isn't so well optimized yet.
+On 10/17/19 3:21 PM, Peter Maydell wrote:
+> Switch the xilinx_timer code away from bottom-half based ptimers to
+> the new transaction-based ptimer API.  This just requires adding
+> begin/commit calls around the various places that modify the ptimer
+> state, and using the new ptimer_init() function to create the timer.
+> 
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> ---
+>   hw/timer/xilinx_timer.c | 13 ++++++++-----
+>   1 file changed, 8 insertions(+), 5 deletions(-)
+> 
+> diff --git a/hw/timer/xilinx_timer.c b/hw/timer/xilinx_timer.c
+> index 92dbff304d9..7191ea54f58 100644
+> --- a/hw/timer/xilinx_timer.c
+> +++ b/hw/timer/xilinx_timer.c
+> @@ -28,7 +28,6 @@
+>   #include "hw/ptimer.h"
+>   #include "hw/qdev-properties.h"
+>   #include "qemu/log.h"
+> -#include "qemu/main-loop.h"
+>   #include "qemu/module.h"
+>   
+>   #define D(x)
+> @@ -52,7 +51,6 @@
+>   
+>   struct xlx_timer
+>   {
+> -    QEMUBH *bh;
+>       ptimer_state *ptimer;
+>       void *parent;
+>       int nr; /* for debug.  */
+> @@ -134,6 +132,7 @@ timer_read(void *opaque, hwaddr addr, unsigned int size)
+>       return r;
+>   }
+>   
+> +/* Must be called inside ptimer transaction block */
+>   static void timer_enable(struct xlx_timer *xt)
+>   {
+>       uint64_t count;
+> @@ -174,8 +173,11 @@ timer_write(void *opaque, hwaddr addr,
+>                   value &= ~TCSR_TINT;
+>   
+>               xt->regs[addr] = value & 0x7ff;
+> -            if (value & TCSR_ENT)
+> +            if (value & TCSR_ENT) {
+> +                ptimer_transaction_begin(xt->ptimer);
+>                   timer_enable(xt);
+> +                ptimer_transaction_commit(xt->ptimer);
 
-Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
----
- configure              | 18 ++++++++++++++++++
- crypto/cipher-nettle.c | 18 ++++++++++++++++++
- 2 files changed, 36 insertions(+)
+Why not move these inside timer_enable()?
 
-diff --git a/configure b/configure
-index 98edb0ff44..6650c72348 100755
---- a/configure
-+++ b/configure
-@@ -471,6 +471,7 @@ gtk_gl=3D"no"
- tls_priority=3D"NORMAL"
- gnutls=3D""
- nettle=3D""
-+nettle_xts=3D"no"
- gcrypt=3D""
- gcrypt_hmac=3D"no"
- gcrypt_xts=3D"no"
-@@ -2862,6 +2863,19 @@ if test "$nettle" !=3D "no"; then
-             pass=3D"yes"
-         fi
-     fi
-+    if test "$pass" =3D "yes"
-+    then
-+        cat > $TMPC << EOF
-+#include <nettle/xts.h>
-+int main(void) {
-+  return 0;
-+}
-+EOF
-+        if compile_prog "$nettle_cflags" "$nettle_libs" ; then
-+            nettle_xts=3Dyes
-+            qemu_private_xts=3Dno
-+        fi
-+    fi
-     if test "$pass" =3D "no" && test "$nettle" =3D "yes"; then
-         feature_not_found "nettle" "Install nettle devel >=3D 2.7.1"
-     else
-@@ -6337,6 +6351,10 @@ then
-    echo "  XTS             $gcrypt_xts"
- fi
- echo "nettle            $nettle $(echo_version $nettle $nettle_version)"
-+if test "$nettle" =3D "yes"
-+then
-+   echo "  XTS             $nettle_xts"
-+fi
- echo "libtasn1          $tasn1"
- echo "PAM               $auth_pam"
- echo "iconv support     $iconv"
-diff --git a/crypto/cipher-nettle.c b/crypto/cipher-nettle.c
-index d7411bb8ff..08794a9b10 100644
---- a/crypto/cipher-nettle.c
-+++ b/crypto/cipher-nettle.c
-@@ -19,7 +19,9 @@
-  */
-=20
- #include "qemu/osdep.h"
-+#ifdef CONFIG_QEMU_PRIVATE_XTS
- #include "crypto/xts.h"
-+#endif
- #include "cipherpriv.h"
-=20
- #include <nettle/nettle-types.h>
-@@ -30,6 +32,9 @@
- #include <nettle/serpent.h>
- #include <nettle/twofish.h>
- #include <nettle/ctr.h>
-+#ifndef CONFIG_QEMU_PRIVATE_XTS
-+#include <nettle/xts.h>
-+#endif
-=20
- typedef void (*QCryptoCipherNettleFuncWrapper)(const void *ctx,
-                                                size_t length,
-@@ -626,9 +631,15 @@ qcrypto_nettle_cipher_encrypt(QCryptoCipher *cipher,
-         break;
-=20
-     case QCRYPTO_CIPHER_MODE_XTS:
-+#ifdef CONFIG_QEMU_PRIVATE_XTS
-         xts_encrypt(ctx->ctx, ctx->ctx_tweak,
-                     ctx->alg_encrypt_wrapper, ctx->alg_encrypt_wrapper,
-                     ctx->iv, len, out, in);
-+#else
-+        xts_encrypt_message(ctx->ctx, ctx->ctx_tweak,
-+                            ctx->alg_encrypt_native,
-+                            ctx->iv, len, out, in);
-+#endif
-         break;
-=20
-     case QCRYPTO_CIPHER_MODE_CTR:
-@@ -673,9 +684,16 @@ qcrypto_nettle_cipher_decrypt(QCryptoCipher *cipher,
-         break;
-=20
-     case QCRYPTO_CIPHER_MODE_XTS:
-+#ifdef CONFIG_QEMU_PRIVATE_XTS
-         xts_decrypt(ctx->ctx, ctx->ctx_tweak,
-                     ctx->alg_encrypt_wrapper, ctx->alg_decrypt_wrapper,
-                     ctx->iv, len, out, in);
-+#else
-+        xts_decrypt_message(ctx->ctx, ctx->ctx_tweak,
-+                            ctx->alg_encrypt_native,
-+                            ctx->alg_decrypt_native,
-+                            ctx->iv, len, out, in);
-+#endif
-         break;
-     case QCRYPTO_CIPHER_MODE_CTR:
-         ctr_crypt(ctx->ctx, ctx->alg_encrypt_native,
---=20
-2.21.0
-
+> +            }
+>               break;
+>    
+>           default:
+> @@ -220,9 +222,10 @@ static void xilinx_timer_realize(DeviceState *dev, Error **errp)
+>   
+>           xt->parent = t;
+>           xt->nr = i;
+> -        xt->bh = qemu_bh_new(timer_hit, xt);
+> -        xt->ptimer = ptimer_init_with_bh(xt->bh, PTIMER_POLICY_DEFAULT);
+> +        xt->ptimer = ptimer_init(timer_hit, xt, PTIMER_POLICY_DEFAULT);
+> +        ptimer_transaction_begin(xt->ptimer);
+>           ptimer_set_freq(xt->ptimer, t->freq_hz);
+> +        ptimer_transaction_commit(xt->ptimer);
+>       }
+>   
+>       memory_region_init_io(&t->mmio, OBJECT(t), &timer_ops, t, "xlnx.xps-timer",
+> 
 
