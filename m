@@ -3,63 +3,105 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DCF40FA372A
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 15:36:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D4DFFA372A
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 15:38:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B359620650
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 15:36:05 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B359620650
+	by mail.kernel.org (Postfix) with ESMTPS id 01FC42089C
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 15:38:53 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 01FC42089C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51148 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51212 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iL7oq-0002BV-0p
-	for qemu-devel@archiver.kernel.org; Thu, 17 Oct 2019 11:36:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49819)
+	id 1iL7rX-0005Qg-MR
+	for qemu-devel@archiver.kernel.org; Thu, 17 Oct 2019 11:38:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51355)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eblake@redhat.com>) id 1iL6zQ-0004Nh-CG
- for qemu-devel@nongnu.org; Thu, 17 Oct 2019 10:42:57 -0400
+ (envelope-from <thuth@redhat.com>) id 1iL79F-000890-Pf
+ for qemu-devel@nongnu.org; Thu, 17 Oct 2019 10:53:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eblake@redhat.com>) id 1iL6zO-0006D0-Na
- for qemu-devel@nongnu.org; Thu, 17 Oct 2019 10:42:56 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58174)
+ (envelope-from <thuth@redhat.com>) id 1iL79D-0001PP-6p
+ for qemu-devel@nongnu.org; Thu, 17 Oct 2019 10:53:05 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37498)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eblake@redhat.com>)
- id 1iL6zL-00069Z-Bn; Thu, 17 Oct 2019 10:42:51 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
+ (Exim 4.71) (envelope-from <thuth@redhat.com>) id 1iL79C-0001Ox-JN
+ for qemu-devel@nongnu.org; Thu, 17 Oct 2019 10:53:02 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 8D41FC04D936;
- Thu, 17 Oct 2019 14:42:50 +0000 (UTC)
-Received: from [10.3.116.168] (ovpn-116-168.phx2.redhat.com [10.3.116.168])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 1ECDE60497;
- Thu, 17 Oct 2019 14:42:50 +0000 (UTC)
-Subject: Re: [PATCH v2 2/3] iotests: Include QMP input in .out files
-To: Max Reitz <mreitz@redhat.com>, qemu-devel@nongnu.org
-References: <20191015193503.25591-1-eblake@redhat.com>
- <20191015193503.25591-3-eblake@redhat.com>
- <0962fe1d-df21-0efb-818a-1afabdc4fcfe@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Organization: Red Hat, Inc.
-Message-ID: <3d3ea98f-49db-8fc4-e0df-d99a9d7963d9@redhat.com>
-Date: Thu, 17 Oct 2019 09:42:49 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.0
+ by mx1.redhat.com (Postfix) with ESMTPS id 88B8D18C426B
+ for <qemu-devel@nongnu.org>; Thu, 17 Oct 2019 14:53:01 +0000 (UTC)
+Received: from thuth.remote.csb (dhcp-200-228.str.redhat.com [10.33.200.228])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 0652E5D9CA;
+ Thu, 17 Oct 2019 14:52:55 +0000 (UTC)
+Subject: Re: [PATCH v2 7/7] libqos: add VIRTIO PCI 1.0 support
+To: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
+References: <20191011085611.4194-1-stefanha@redhat.com>
+ <20191011085611.4194-8-stefanha@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=thuth@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+Organization: Red Hat
+Message-ID: <e7821640-de44-5e65-b9c1-2534dc676690@redhat.com>
+Date: Thu, 17 Oct 2019 16:52:54 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-In-Reply-To: <0962fe1d-df21-0efb-818a-1afabdc4fcfe@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <20191011085611.4194-8-stefanha@redhat.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.32]); Thu, 17 Oct 2019 14:42:50 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.62]); Thu, 17 Oct 2019 14:53:01 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 209.132.183.28
@@ -74,169 +116,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: Laurent Vivier <lvivier@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 10/17/19 7:59 AM, Max Reitz wrote:
-> On 15.10.19 21:35, Eric Blake wrote:
->> We generally include relevant HMP input in .out files, by virtue of
->> the fact that HMP echoes its input.  But QMP does not, so we have to
->> explicitly inject it in the output stream, in order to make it easier
->> to read .out files to see what behavior is being tested (especially
->> true where the output file is a sequence of {'return': {}}).
->>
->> Suggested-by: Max Reitz <mreitz@redhat.com>
->=20
-> That was actually not my intention. :-)
->=20
-> I was thinking of a new parameter that enables this behavior and is
-> disabled by default so that existing tests don=E2=80=99t change.
->=20
-> But then again I did see that you interpreted my suggestion in a
-> slightly different way, and thought this is probably better, actually.
+On 11/10/2019 10.56, Stefan Hajnoczi wrote:
+> Implement the VIRTIO 1.0 virtio-pci interface.  The main change here is
+> that the register layout is no longer a fixed layout in BAR 0.  Instead
+> we have to iterate of PCI Capabilities to find descriptions of where
+> various registers are located.  The vring registers are also more
+> fine-grained, allowing for more flexible vring layouts, but we don't
+> take advantage of that.
+> 
+> Note that test cases do not negotiate VIRTIO_F_VERSION_1 yet and are
+> therefore not running in VIRTIO 1.0 mode.
+> 
+> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+> ---
+>  tests/Makefile.include           |   1 +
+>  tests/libqos/virtio-pci-modern.h |  17 ++
+>  tests/libqos/virtio-pci.h        |  10 +
+>  tests/libqos/virtio-pci-modern.c | 412 +++++++++++++++++++++++++++++++
+>  tests/libqos/virtio-pci.c        |   6 +-
+>  5 files changed, 445 insertions(+), 1 deletion(-)
+>  create mode 100644 tests/libqos/virtio-pci-modern.h
+>  create mode 100644 tests/libqos/virtio-pci-modern.c
+[...]
+> +static bool probe_device_type(QVirtioPCIDevice *dev)
+> +{
+> +    uint16_t vendor_id;
+> +    uint16_t device_id;
+> +
+> +    /* "Drivers MUST match devices with the PCI Vendor ID 0x1AF4" */
+> +    vendor_id = qpci_config_readw(dev->pdev, PCI_VENDOR_ID);
+> +    if (vendor_id != 0x1af4) {
+> +        return false;
+> +    }
+> +
+> +    /*
+> +     * "Any PCI device with ... PCI Device ID 0x1000 through 0x107F inclusive
+> +     * is a virtio device"
+> +     */
+> +    device_id = qpci_config_readw(dev->pdev, PCI_DEVICE_ID);
+> +    if (device_id < 0x1000 || device_id > 0x107f) {
+> +        return false;
+> +    }
+> +
+> +    /*
+> +     * "Devices MAY utilize a Transitional PCI Device ID range, 0x1000 to
+> +     * 0x103F depending on the device type"
+> +     */
+> +    if (device_id < 0x1040) {
+> +        /*
+> +         * "Transitional devices MUST have the PCI Subsystem Device ID matching
+> +         * the Virtio Device ID"
+> +         */
+> +        dev->vdev.device_type = qpci_config_readw(dev->pdev, PCI_SUBSYSTEM_ID);
 
-I'm glad you like how it turned out.  Now to fix the problems ;)
+Shouldn't you return "false" here in case the device_type is 0 ? Which
+likely means that it is a legacy or broken device ...?
 
+> +    } else {
+> +        /*
+> +         * "The PCI Device ID is calculated by adding 0x1040 to the Virtio
+> +         * Device ID"
+> +         */
+> +        dev->vdev.device_type = device_id - 0x1040;
+> +    }
+> +
+> +    return true;
+> +}
 
->> +++ b/tests/qemu-iotests/common.qemu
->> @@ -123,6 +123,9 @@ _timed_wait_for()
->>   # until either timeout, or a response.  If it is not set, or <=3D0,
->>   # then the command is only sent once.
->>   #
->> +# If neither $silent nor $mismatch_only is set, and $cmd begins with =
-'{',
->> +# echo the command before sending it the first time.
->> +#
->>   # If $qemu_error_no_exit is set, then even if the expected response
->>   # is not seen, we will not exit.  $QEMU_STATUS[$1] will be set it -1=
- in
->>   # that case.
->> @@ -152,6 +155,12 @@ _send_qemu_cmd()
->>           shift $(($# - 2))
->>       fi
->>
->> +    # Display QMP being sent, but not HMP (since HMP already echoes i=
-ts
->> +    # input back to output); decide based on leading '{'
->> +    if [ -z "$silent" ] && [ -z "$mismatch_only" ] &&
->> +            [ "$cmd" !=3D "${cmd#{}" ]; then
->=20
-> It=E2=80=99s a shame that this breaks syntax highlighting in (my) vim. =
- (Also I
-> have to admit googling to understand ${cmd#{} wasn=E2=80=99t trivial.)
->=20
-> Can I persuade you to use "${cmd#\{}" instead?  That seems to work for =
-me.
+ Thomas
 
-Yes.  That, or "${cmd#'{'}" should also work.
-
->=20
->> diff --git a/tests/qemu-iotests/094.out b/tests/qemu-iotests/094.out
->> index f3b9ecf22b73..f3e1a9ecf736 100644
->> --- a/tests/qemu-iotests/094.out
->> +++ b/tests/qemu-iotests/094.out
->> @@ -1,16 +1,20 @@
->>   QA output created by 094
->>   Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D67108864
->>   Formatting 'TEST_DIR/source.IMGFMT', fmt=3DIMGFMT size=3D67108864
->> +{'execute': 'qmp_capabilities'}
->>   {"return": {}}
->> +{'execute': 'drive-mirror', 'arguments': {'device': 'src', 'target': =
-'nbd:127.0.0.1:10810', 'format': 'nbd', 'sync':'full', 'mode':'existing'}=
-}
->=20
-> This reminds me that we need to fix nbd=E2=80=99s $TEST_IMG to not be f=
-ixed to
-> port 10810.  I get intermittent failures because of that.
-
-And I should therefore fix the filter to display it as something more=20
-stable (perhaps nbd:HOST:PORT).  But I also agree that the hard-coded=20
-value is pre-existing broken, so a separate patch here to improve it is=20
-warranted.
-
->=20
-> [...]
->=20
->> diff --git a/tests/qemu-iotests/140.out b/tests/qemu-iotests/140.out
->> index 67fe44a3e390..3857675f7ebd 100644
->> --- a/tests/qemu-iotests/140.out
->> +++ b/tests/qemu-iotests/140.out
->> @@ -2,14 +2,19 @@ QA output created by 140
->>   Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D65536
->>   wrote 65536/65536 bytes at offset 0
->>   64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
->> +{ 'execute': 'qmp_capabilities' }
->>   {"return": {}}
->> +{ 'execute': 'nbd-server-start', 'arguments': { 'addr': { 'type': 'un=
-ix', 'data': { 'path': 'TEST_DIR/nbd' }}}}
->=20
-> Hmmmmm, this conflicts with my SOCK_DIR series.  common.qemu would then
-> also need a SOCK_DIR filter.  Well, or 140 should filter it (and the
-> other tests that are concerned).  I=E2=80=99m not 100 % sure, but a SOC=
-K_DIR
-> filter in common.qemu probably can=E2=80=99t hurt.
-
-Agreed. I will rebase a v3 on top of your pending series.
-
-
->> +++ b/tests/qemu-iotests/141.out
->> @@ -2,82 +2,108 @@ QA output created by 141
->>   Formatting 'TEST_DIR/b.IMGFMT', fmt=3DIMGFMT size=3D1048576
->>   Formatting 'TEST_DIR/m.IMGFMT', fmt=3DIMGFMT size=3D1048576 backing_=
-file=3DTEST_DIR/b.IMGFMT
->>   Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D1048576 backing_=
-file=3DTEST_DIR/m.IMGFMT
->> +{'execute': 'qmp_capabilities'}
->>   {"return": {}}
->>
->>   =3D=3D=3D Testing drive-backup =3D=3D=3D
->>
->> +{'execute': 'blockdev-add', 'arguments': { 'node-name': 'drv0', 'driv=
-er': 'qcow2', 'file': { 'driver': 'file', 'filename': 'TEST_DIR/t.qcow2' =
-}}}
->=20
-> 141 also supports qed, so this then results in a mismatch.  I suppose
-> common.qemu should filter the image format.
->=20
-> (Same for 156, 161, and 229.)
-
-Yep, I'll have to improve the filtering.  I'll make sure I run -qed=20
-tests before posting v3.
-
->=20
-> [...]
->=20
->> diff --git a/tests/qemu-iotests/156.out b/tests/qemu-iotests/156.out
->> index 4c391a760371..d1865044f81a 100644
->> --- a/tests/qemu-iotests/156.out
->> +++ b/tests/qemu-iotests/156.out
->> @@ -5,21 +5,27 @@ wrote 262144/262144 bytes at offset 0
->>   256 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
->>   wrote 196608/196608 bytes at offset 65536
->>   192 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
->> +{ 'execute': 'qmp_capabilities' }
->>   {"return": {}}
->>   Formatting 'TEST_DIR/t.IMGFMT.overlay', fmt=3DIMGFMT size=3D1048576 =
-backing_file=3DTEST_DIR/t.IMGFMT
->> +{ 'execute': 'blockdev-snapshot-sync', 'arguments': { 'device': 'sour=
-ce', 'snapshot-file': 'TEST_DIR/t.qcow2.overlay', 'format': 'qcow2', 'mod=
-e': 'existing' } }
->=20
-> Same here (as said above), although there=E2=80=99s also the fact to co=
-nsider
-> that 156 supports generic protocols.  I hope _filter_testdir handles
-> that, though.
-
-or _filter_imgfmt.  It should not be hard to turn on extra filters, such=20
-that this looks more like:
-
-'snapshot-file': 'TEST_DIR/t.IMGFMT.overlay', 'format': 'IMGFMT', ...
-
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
 
