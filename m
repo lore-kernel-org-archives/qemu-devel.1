@@ -6,59 +6,60 @@ X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D987AFA372A
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 16:19:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 11F93FA372A
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 16:20:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id ACE802089C
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 16:19:33 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ACE802089C
+	by mail.kernel.org (Postfix) with ESMTPS id D3AEB2089C
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 16:20:01 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D3AEB2089C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52294 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52308 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iL8Uu-00084Z-8V
-	for qemu-devel@archiver.kernel.org; Thu, 17 Oct 2019 12:19:32 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57016)
+	id 1iL8VM-0000Qu-H1
+	for qemu-devel@archiver.kernel.org; Thu, 17 Oct 2019 12:20:00 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57927)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vgoyal@redhat.com>) id 1iL7ed-0008CG-FD
- for qemu-devel@nongnu.org; Thu, 17 Oct 2019 11:25:32 -0400
+ (envelope-from <david@redhat.com>) id 1iL7k8-0006KI-QH
+ for qemu-devel@nongnu.org; Thu, 17 Oct 2019 11:31:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vgoyal@redhat.com>) id 1iL7eb-0001Ce-Tz
- for qemu-devel@nongnu.org; Thu, 17 Oct 2019 11:25:31 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:56804)
+ (envelope-from <david@redhat.com>) id 1iL7k4-0002zo-UK
+ for qemu-devel@nongnu.org; Thu, 17 Oct 2019 11:31:12 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:51524)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <vgoyal@redhat.com>) id 1iL7eb-0001Aq-ON
- for qemu-devel@nongnu.org; Thu, 17 Oct 2019 11:25:29 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+ (Exim 4.71) (envelope-from <david@redhat.com>) id 1iL7k4-0002zR-Ft
+ for qemu-devel@nongnu.org; Thu, 17 Oct 2019 11:31:08 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 0602B30832C0
- for <qemu-devel@nongnu.org>; Thu, 17 Oct 2019 15:25:29 +0000 (UTC)
-Received: from horse.redhat.com (unknown [10.18.25.35])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 69D8619C7F;
- Thu, 17 Oct 2019 15:25:23 +0000 (UTC)
-Received: by horse.redhat.com (Postfix, from userid 10451)
- id 0031A2202E5; Thu, 17 Oct 2019 11:25:22 -0400 (EDT)
-Date: Thu, 17 Oct 2019 11:25:22 -0400
-From: Vivek Goyal <vgoyal@redhat.com>
-To: Miklos Szeredi <mszeredi@redhat.com>
-Subject: Re: [Virtio-fs] [PATCH 0/2] virtiofsd: Two fix for xattr operation
-Message-ID: <20191017152522.GB12588@redhat.com>
-References: <20191016103754.2047-1-misono.tomohiro@jp.fujitsu.com>
- <20191017100528.GA24790@stefanha-x1.localdomain>
- <CAOssrKfR=sfE1RzOXzvPbdQg-g7i5-f8W9y8bWFnO=gyJ2VMsg@mail.gmail.com>
+ by mx1.redhat.com (Postfix) with ESMTPS id EDBF136961
+ for <qemu-devel@nongnu.org>; Thu, 17 Oct 2019 15:31:06 +0000 (UTC)
+Received: from [10.36.117.42] (ovpn-117-42.ams2.redhat.com [10.36.117.42])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id E784A600C4;
+ Thu, 17 Oct 2019 15:31:05 +0000 (UTC)
+Subject: Re: Default CPU models on s390x and ppc64
+From: David Hildenbrand <david@redhat.com>
+To: Jiri Denemark <jdenemar@redhat.com>, qemu-devel@nongnu.org,
+ David Hildenbrand <dhildenb@redhat.com>, David Gibson <dgibson@redhat.com>
+References: <20191017151606.GA1880840@orkuz.int.mamuti.net>
+ <82ea23ea-be23-c374-3f10-65d8f6e79432@redhat.com>
+Organization: Red Hat GmbH
+Message-ID: <3c2d2d20-682e-ab4f-ced4-c7f48473dd24@redhat.com>
+Date: Thu, 17 Oct 2019 17:31:04 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAOssrKfR=sfE1RzOXzvPbdQg-g7i5-f8W9y8bWFnO=gyJ2VMsg@mail.gmail.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+In-Reply-To: <82ea23ea-be23-c374-3f10-65d8f6e79432@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.44]); Thu, 17 Oct 2019 15:25:29 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.30]); Thu, 17 Oct 2019 15:31:06 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 209.132.183.28
@@ -73,63 +74,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: virtio-fs@redhat.com, qemu-devel@nongnu.org,
- Stefan Hajnoczi <stefanha@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Oct 17, 2019 at 01:23:57PM +0200, Miklos Szeredi wrote:
-> On Thu, Oct 17, 2019 at 12:05 PM Stefan Hajnoczi <stefanha@redhat.com> wrote:
-> >
-> > On Wed, Oct 16, 2019 at 07:37:52PM +0900, Misono Tomohiro wrote:
-> > > Hello,
-> > >
-> > > I test xattr operation on virtiofs using xfstest generic/062
-> > > (with -o xattr option and XFS backend) and see some problems.
-> > >
-> > > These patches fixes the two of the problems.
-> > >
-> > > The remaining problems are:
-> > >  1. we cannot xattr to block device created by mknod
-> > >     which does not have actual device (since open in virtiofsd fails)
-> > >  2. we cannot xattr to symbolic link
-> > >
-> > > I don't think 1 is a big problem but can we fix 2?
-> >
-> > Sorry, I don't know the answer.  Maybe it would be necessary to add a
-> > new O_SYMLINK open flag to open(2) so that fgetxattr()/fsetxattr()
-> > operations can be performed.  A kernel change like that would take some
-> > time to get accepted upstream and shipped by distros, but it might be
-> > the only way since the current syscall interface doesn't seem to offer a
-> > way to do this.
+On 17.10.19 17:18, David Hildenbrand wrote:
+> On 17.10.19 17:16, Jiri Denemark wrote:
+>> Hi David and David,
+>>
+>> I'm working on libvirt's support [1] for query-machines'
+>> default-cpu-type, which is supposed to return the type of the default
+>> CPU model that QEMU uses for each machine type. Rather than hard coding
+>> the default in libvirt (which we currently do on x86), we ask QEMU for
+>> the default CPU model and use it unless a user asks for a specific CPU
+>> model explicitly.
+>>
+>> We use query-cpu-definitions for translating the default CPU type to the
+>> actual CPU model we need to pass to -cpu by looking up the CPU model
+>> with matching typename.
+>>
+>> However, all this seems to work only with TCG on both s390x and ppc64.
+>> The issues I met with KVM on each architecture are described below.
+>>
+>> On ppc64 the default CPU type reported by query-machines is
+>> power*-powerpc64-cpu, while IIUC QEMU would effectively use -cpu host by
+>> default. In fact -cpu power8 is mostly just a fancy alias to -cpu host
+>> on a Power8 machine. But QEMU even rewrites typename of the current host
+>> CPU model to host-powerpc64-cpu. Which means on a Power8 host the power8
+>> CPU model would have typename=host-powerpc64-cpu while the default CPU
+>> type would still use power8*-powerpc64-cpu. Thus we may just fail to
+>> find any CPU model corresponding to the default CPU model.
+>>
+>> And to make it even worse, the default CPU model changes with machine
+>> type. E.g., pseries-3.1 uses power8_v2.0-powerpc64-cpu while pseries-4.2
+>> uses power9_v2.0-powerpc64-cpu. However, starting QEMU with pseries-4.2
+>> machine type and the reported default -cpu power9 fails on any
+>> non-Power9 host. That said QEMU just lies about the default CPU model.
+>>
+>> So for all combinations of (pseries-3.1, pseries-4.2) machine types and
+>> (Power8, Power9) hosts, one will get the following mixed results:
+>>
+>> - pseries-3.1 on Power8: no default CPU model will be detected, QEMU
+>>     starts fine with it's own default
+>> - pseries-4.2 on Power9: same as above
+>> - pseries-3.1 on Power9: -cpu power8 (not sure if this works, though)
+>> - pseries-4.2 on Power8: -cpu power9, QEMU doesn't start
+>>
+>>
+>> This situation on s390x is not so complicated, but not really better.
+>> The default CPU is said to be "qemu" for all machine types, which works
+>> fine for TCG domains, but it doesn't work on KVM because QEMU complains
+>> that some features requested in the CPU model are not available. In
+>> other words the "qemu" CPU model is not runnable on KVM. This a bit
+>> similar to what happens on x86_64, but QEMU just ignores missing
+>> features and starts happily there.
 > 
-> The real problem is that open() on a non-regular, non-directory file
-> may have side effects (unless O_PATH is used).  These patches try to
-> paper over that, but the fact is: opening special files from a file
-> server is forbidden.
+> The default model under KVM is "host", under TCG it's "qemu". We should
+> not use "qemu" under KVM, although it might work on some setups ...
 > 
-> I see why this is being done, and it's not easy to fix properly
-> without the ..at() versions of these syscalls.  One idea is to fork()
-> + fchdir(lo->proc_self_fd) + ..xattr().  Another related idea is to do
-> a unshare(CLONE_FS) after each thread's startup (will pthread library
-> balk?  I don't know) so that it's safe to do fchdir(lo->proc_self_fd)
-> + ...xattr() + fchdir(lo->root_fd).
+> Where/how is this default model detected?
+> 
 
-Hi Miklos,
+... target/s390x/kvm.c:kvm_arch_init()
 
-Trying to understand your proposal. So if we want to do an ..xattr()
-operation on a special file (and we don't have _at() variants), how
-will fchdir() help. Are you suggesting fchdir() to parent and then
-do something special.
+MachineClass *mc = MACHINE_GET_CLASS(ms);
 
-Can you please elaborate your proposal a bit more. I think I have
-missed the core idea completely.
+mc->default_cpu_type = S390_CPU_TYPE_NAME("host");
 
-I understand that you want to do unshare(CLONE_FS) to make sure one thrad's
-fchdir() does not impact other thread. But did not understand that how
-fchdir() alone is enough to do getxattr()/setxattr() on special file.
 
-Thanks
-Vivek
+I think the call order should make sure that "host" is set after "qemu" 
+is set. I'll go ahead and verify that.
+
+-- 
+
+Thanks,
+
+David / dhildenb
 
