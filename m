@@ -2,89 +2,60 @@ Return-Path: <SRS0=yZS3=YK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6DA5BECE58E
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 14:07:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CB06AFA372A
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 14:07:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 388532054F
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 14:07:17 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="uvwIHcJV"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 388532054F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 9EB912054F
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 14:07:48 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9EB912054F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48760 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48772 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iL6Qt-0000by-KY
-	for qemu-devel@archiver.kernel.org; Thu, 17 Oct 2019 10:07:15 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35624)
+	id 1iL6RP-0001SS-Gr
+	for qemu-devel@archiver.kernel.org; Thu, 17 Oct 2019 10:07:47 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36798)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1iL5mY-0002N7-IJ
- for qemu-devel@nongnu.org; Thu, 17 Oct 2019 09:25:36 -0400
+ (envelope-from <mreitz@redhat.com>) id 1iL5t8-0002Sn-Ow
+ for qemu-devel@nongnu.org; Thu, 17 Oct 2019 09:32:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1iL5mX-0001JI-EF
- for qemu-devel@nongnu.org; Thu, 17 Oct 2019 09:25:34 -0400
-Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:55504)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1iL5mX-0001Ir-58
- for qemu-devel@nongnu.org; Thu, 17 Oct 2019 09:25:33 -0400
-Received: by mail-wm1-x342.google.com with SMTP id a6so2548808wma.5
- for <qemu-devel@nongnu.org>; Thu, 17 Oct 2019 06:25:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=LYziuWTaDyCvsXZWL+7dYTQAPkm19wADCHnlP8tL2bI=;
- b=uvwIHcJVTMPxqYoN2aLnZ1NxqBojTuMg/mGUCpXG86IZunIwoRh+AquVopd4zJF4Qe
- dcKhCqu9ogf5ehBxPpHFMUOYRLHL4PMW9putiUXq9TfNayI+V+DroIEL+jLI5/iV0ss4
- wjl5WHMOR2MIdKuVKgVHQklpcbAnR/rSiKVq6LnPmMG0tGRw9YcfYqHS5z4JNjz8jAWB
- sZEF9kbJTRrAyx8qV0Fcov7B91pYIc599zbCNVh+fyvdRjzh+8bz3/5t789N1McrNVPy
- ssRB71E2CxyIanQ6W96540iIKbWuaDaKZKlwBfl7iHKfmeQPNHYdGtPXWS+/+sin1vqu
- 0fiQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=LYziuWTaDyCvsXZWL+7dYTQAPkm19wADCHnlP8tL2bI=;
- b=jeDnOHizWEq1Vq5VU41h/h7LAb3lTs+zFqOQ1VtGdyDspRpn+2bL0dzt9SP1RLrk2C
- TEvYGxWLiuo33wAwjChkWGvnSWM8GlP//CTjc4VjSNmu/Lk11Ml9oETM7/QOKziX56iw
- WLuWEe31ollQLma0fv1G5qd676nmT2Y8lcO7Iz7M+TiKvgFeseH+Qn24Q5XtgY4f1lLn
- kcYxASq64sEvQdPWDi0fRG7EzKX2fRnZQy1olmq647Y17bpRCOS21os0UPfDlH10USwK
- rjcbFg5enDm7CMbazKt4peo+YAJx43nzcMtd/7idFizdp35oE7OYPxSBklPt22qoZlBW
- SH5A==
-X-Gm-Message-State: APjAAAX6atEM6XLe+73Ykx9BIZ+8AyUMXVmy0HP6DZND7R2Sb/CAu19X
- utWKLTXDOcNyx/H6qsnT/gnFRw==
-X-Google-Smtp-Source: APXvYqxhTr3+FsLlVkBR4WL5JqRtTQWdhnCvNQvBT/Buq6xx8FQnzNNHQ7i/9DeUtURkaXNmG7PytA==
-X-Received: by 2002:a7b:caa9:: with SMTP id r9mr2822057wml.58.1571318732081;
- Thu, 17 Oct 2019 06:25:32 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id u1sm2041089wmc.38.2019.10.17.06.25.26
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 17 Oct 2019 06:25:30 -0700 (PDT)
-Received: from zen.lan (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 4A0841FFAE;
- Thu, 17 Oct 2019 14:16:18 +0100 (BST)
-From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: qemu-devel@nongnu.org
-Subject: [PATCH  v6 25/54] target/sh4: fetch code with translator_ld
-Date: Thu, 17 Oct 2019 14:15:46 +0100
-Message-Id: <20191017131615.19660-26-alex.bennee@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20191017131615.19660-1-alex.bennee@linaro.org>
-References: <20191017131615.19660-1-alex.bennee@linaro.org>
+ (envelope-from <mreitz@redhat.com>) id 1iL5t7-0003Ny-Je
+ for qemu-devel@nongnu.org; Thu, 17 Oct 2019 09:32:22 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37482)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>)
+ id 1iL5t5-0003M9-4b; Thu, 17 Oct 2019 09:32:19 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 4C341307B189;
+ Thu, 17 Oct 2019 13:32:18 +0000 (UTC)
+Received: from localhost (ovpn-117-3.ams2.redhat.com [10.36.117.3])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id B993460852;
+ Thu, 17 Oct 2019 13:32:17 +0000 (UTC)
+From: Max Reitz <mreitz@redhat.com>
+To: qemu-block@nongnu.org
+Subject: [PATCH v2 07/23] iotests/140: Create socket in $SOCK_DIR
+Date: Thu, 17 Oct 2019 15:31:39 +0200
+Message-Id: <20191017133155.5327-8-mreitz@redhat.com>
+In-Reply-To: <20191017133155.5327-1-mreitz@redhat.com>
+References: <20191017133155.5327-1-mreitz@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::342
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.45]); Thu, 17 Oct 2019 13:32:18 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,55 +67,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: robert.foley@futurewei.com,
- Richard Henderson <richard.henderson@linaro.org>, peter.puhov@futurewei.com,
- aaron@os.amperecomputing.com, cota@braap.org,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
- Aurelien Jarno <aurelien@aurel32.net>
+Cc: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org,
+ Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: "Emilio G. Cota" <cota@braap.org>
-
-There is a small wrinkle with the gUSA instruction. The translator
-effectively treats a (known) gUSA sequence as a single instruction.
-For the purposes of the plugin we end up with a long multi-instruction
-qemu_plugin_insn.
-
-If the known sequence isn't detected we shall never run this
-translation anyway.
-
-Signed-off-by: Emilio G. Cota <cota@braap.org>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+Signed-off-by: Max Reitz <mreitz@redhat.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+Reviewed-by: Thomas Huth <thuth@redhat.com>
 ---
- target/sh4/translate.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ tests/qemu-iotests/140     | 8 ++++----
+ tests/qemu-iotests/140.out | 2 +-
+ 2 files changed, 5 insertions(+), 5 deletions(-)
 
-diff --git a/target/sh4/translate.c b/target/sh4/translate.c
-index 5a7d8c4535..922785e225 100644
---- a/target/sh4/translate.c
-+++ b/target/sh4/translate.c
-@@ -1917,7 +1917,7 @@ static void decode_gusa(DisasContext *ctx, CPUSH4State *env)
- 
-     /* Read all of the insns for the region.  */
-     for (i = 0; i < max_insns; ++i) {
--        insns[i] = cpu_lduw_code(env, pc + i * 2);
-+        insns[i] = translator_lduw(env, pc + i * 2);
-     }
- 
-     ld_adr = ld_dst = ld_mop = -1;
-@@ -2332,7 +2332,7 @@ static void sh4_tr_translate_insn(DisasContextBase *dcbase, CPUState *cs)
-     }
- #endif
- 
--    ctx->opcode = cpu_lduw_code(env, ctx->base.pc_next);
-+    ctx->opcode = translator_lduw(env, ctx->base.pc_next);
-     decode_opc(ctx);
-     ctx->base.pc_next += 2;
+diff --git a/tests/qemu-iotests/140 b/tests/qemu-iotests/140
+index b965b1dd5d..8d2ce5d9e3 100755
+--- a/tests/qemu-iotests/140
++++ b/tests/qemu-iotests/140
+@@ -34,7 +34,7 @@ _cleanup()
+ {
+     _cleanup_qemu
+     _cleanup_test_img
+-    rm -f "$TEST_DIR/nbd"
++    rm -f "$SOCK_DIR/nbd"
  }
--- 
-2.20.1
+ trap "_cleanup; exit \$status" 0 1 2 3 15
+=20
+@@ -69,7 +69,7 @@ _send_qemu_cmd $QEMU_HANDLE \
+ _send_qemu_cmd $QEMU_HANDLE \
+     "{ 'execute': 'nbd-server-start',
+        'arguments': { 'addr': { 'type': 'unix',
+-                                'data': { 'path': '$TEST_DIR/nbd' }}}}" =
+\
++                                'data': { 'path': '$SOCK_DIR/nbd' }}}}" =
+\
+     'return'
+=20
+ _send_qemu_cmd $QEMU_HANDLE \
+@@ -78,7 +78,7 @@ _send_qemu_cmd $QEMU_HANDLE \
+     'return'
+=20
+ $QEMU_IO_PROG -f raw -r -c 'read -P 42 0 64k' \
+-    "nbd+unix:///drv?socket=3D$TEST_DIR/nbd" 2>&1 \
++    "nbd+unix:///drv?socket=3D$SOCK_DIR/nbd" 2>&1 \
+     | _filter_qemu_io | _filter_nbd
+=20
+ _send_qemu_cmd $QEMU_HANDLE \
+@@ -87,7 +87,7 @@ _send_qemu_cmd $QEMU_HANDLE \
+     'return'
+=20
+ $QEMU_IO_PROG -f raw -r -c close \
+-    "nbd+unix:///drv?socket=3D$TEST_DIR/nbd" 2>&1 \
++    "nbd+unix:///drv?socket=3D$SOCK_DIR/nbd" 2>&1 \
+     | _filter_qemu_io | _filter_nbd
+=20
+ _send_qemu_cmd $QEMU_HANDLE \
+diff --git a/tests/qemu-iotests/140.out b/tests/qemu-iotests/140.out
+index 67fe44a3e3..2511eb7369 100644
+--- a/tests/qemu-iotests/140.out
++++ b/tests/qemu-iotests/140.out
+@@ -8,7 +8,7 @@ wrote 65536/65536 bytes at offset 0
+ read 65536/65536 bytes at offset 0
+ 64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+ {"return": {}}
+-qemu-io: can't open device nbd+unix:///drv?socket=3DTEST_DIR/nbd: Reques=
+ted export not available
++qemu-io: can't open device nbd+unix:///drv?socket=3DSOCK_DIR/nbd: Reques=
+ted export not available
+ server reported: export 'drv' not present
+ {"return": {}}
+ {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "even=
+t": "SHUTDOWN", "data": {"guest": false, "reason": "host-qmp-quit"}}
+--=20
+2.21.0
 
 
