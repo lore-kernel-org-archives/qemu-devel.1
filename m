@@ -2,100 +2,80 @@ Return-Path: <SRS0=yZS3=YK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+X-Spam-Status: No, score=-13.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 05F70FA3735
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 16:29:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 132A5ECE58E
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 16:30:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C432D2089C
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 16:29:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id CA80721835
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 16:30:43 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZdCTMX/z"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C432D2089C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="eVBABDWi"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CA80721835
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52684 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52686 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iL8ef-00040X-8w
-	for qemu-devel@archiver.kernel.org; Thu, 17 Oct 2019 12:29:37 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60735)
+	id 1iL8fi-0004h3-61
+	for qemu-devel@archiver.kernel.org; Thu, 17 Oct 2019 12:30:42 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60755)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1iL817-0002eu-G0
- for qemu-devel@nongnu.org; Thu, 17 Oct 2019 11:48:46 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1iL81E-0002hU-6V
+ for qemu-devel@nongnu.org; Thu, 17 Oct 2019 11:48:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1iL816-0007J0-C5
- for qemu-devel@nongnu.org; Thu, 17 Oct 2019 11:48:45 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:32204
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iL816-0007Ih-8R
- for qemu-devel@nongnu.org; Thu, 17 Oct 2019 11:48:44 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1571327323;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=WKcc62ehRcnzZ89Q3j85/aBilRcTC66Wv7xdtTQzX1Q=;
- b=ZdCTMX/zOewrOSeJ05QQ5x/D7IP2GkWS3fXkyR42IGsuhYEcdL+SiG9bOI68Lpzs1V2z1t
- pqdVLPhfdLcyv7YMDIELZTnXwCXKre1tsMSI7fhrjXoWRxpPpM/NyPVUXDtx+Sh9HAxhz8
- X+FZak2W+sS9fC+wmhvyZ5UdGMN6GKU=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-183-VM41dRixM4K5KgHbiEyoig-1; Thu, 17 Oct 2019 11:48:40 -0400
-Received: by mail-wm1-f72.google.com with SMTP id q22so1249609wmc.1
- for <qemu-devel@nongnu.org>; Thu, 17 Oct 2019 08:48:40 -0700 (PDT)
+ (envelope-from <peter.maydell@linaro.org>) id 1iL81B-0007K7-Id
+ for qemu-devel@nongnu.org; Thu, 17 Oct 2019 11:48:51 -0400
+Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:38247)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1iL81B-0007Jj-DR
+ for qemu-devel@nongnu.org; Thu, 17 Oct 2019 11:48:49 -0400
+Received: by mail-ot1-x341.google.com with SMTP id e11so2305876otl.5
+ for <qemu-devel@nongnu.org>; Thu, 17 Oct 2019 08:48:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=94hQ4hS26Gc80H1gPDmnkPs72qalH6DjEZVes+qBZJE=;
+ b=eVBABDWiCA1fnMq15WPL1NObVpdL5J7Sz7M3Z2xO2dqDgp0EDl2qbQjrhnMuyRtsr7
+ 9MQiDT3wj6KnvWWZ18eKyUUf0+E2i4BNUupY6tdeiGx3IrzT0zWc+rIw3pg/4W8aTKao
+ 7+dv6wEbCDftsNK+3HXacaM9pTAqE5Ms+4h0ilxMlaraVkAtGLDvNM115NFrR0Ga46jR
+ 6aWkWBGTCOJKVyo2WcPk8YlrTLvXsPotet1gEotoEE/ox9A5yHIOidej1Aba5GNS/JBg
+ vTV1Vh0NeGG76NVrM9b8ojRrXm9EllqJwbu6c3PgXIsKsmFPH9DUE6pdt61c5pr6lvuS
+ 3OtQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=//a6ZMda0piniY0slwuENg30EVcXCtJhVlmp9K1c7DU=;
- b=r7fOHecpWWqt97/iJenEwh7nmfuIKxP2gBKfxBf03PAS1g78ALLN1QAkLffdoSF2ES
- LAVNkf0DfFjPV+5OxOgh7AZZiTKNPcSLOCObF7Qxl2mimzYXm3HlJz4NJQ3+dNYjY8ge
- RyTf5pLExU4gECRTa4ZWKJvTcPwgo6+Hk4gL9+e9OgEK3cFK5RXGLwAeSxVh7sMQTLt+
- WHnOqG+DzFOeVDdt1OMKKZ5AaaQ6Xq6W+kt03Yt9Xd5WOupKyS7RXyUNwrHF+SfimUek
- fmEiBovYjrH8/RFPrarA4QUB5feAtxdZ+Cp3Pe3Ion+Ae7QGfuOnzT/HJQqrmRVK+im0
- o6ZA==
-X-Gm-Message-State: APjAAAXBr37d1HCVCg2zBCFis8ie9EeXR6P0qUMRoyKFC7WOL4FNquGf
- Z6Vn+IuUQmKpMZwl3UcHA8apPXsnsdAazGU16k1t+vTETfIiWA93WmTV06yWsdXbJ1N0Ut+2CRL
- tmZEYTfwSV9HUVAU=
-X-Received: by 2002:adf:ed88:: with SMTP id c8mr3571383wro.214.1571327319083; 
- Thu, 17 Oct 2019 08:48:39 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqyoCWSs1W1UdvWUgiToSC/JHJpf8ncoFbVXGY70v98CfZtV6JGU9XoAeiHxkFmQ+EvryCDnqg==
-X-Received: by 2002:adf:ed88:: with SMTP id c8mr3571368wro.214.1571327318883; 
- Thu, 17 Oct 2019 08:48:38 -0700 (PDT)
-Received: from [192.168.50.32] (243.red-88-26-246.staticip.rima-tde.net.
- [88.26.246.243])
- by smtp.gmail.com with ESMTPSA id u26sm2803794wrd.87.2019.10.17.08.48.37
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Thu, 17 Oct 2019 08:48:38 -0700 (PDT)
-Subject: Re: [PATCH 7/8] hw/m68k/mcf5206.c: Switch to transaction-based ptimer
- API
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
-References: <20191017132905.5604-1-peter.maydell@linaro.org>
- <20191017132905.5604-8-peter.maydell@linaro.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <a5bcdd56-aded-1d01-c20b-d1673f3ef70a@redhat.com>
-Date: Thu, 17 Oct 2019 17:48:37 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.1
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=94hQ4hS26Gc80H1gPDmnkPs72qalH6DjEZVes+qBZJE=;
+ b=tnHpPwO/ibShI7gqW/MecLlv5oTIGHtoUdGPTiHEd8f6JAHSsvmhG1vtmP3mYMxyre
+ YQu3GDD2pC59RtKaLladYymc/TLtPUMc9NZ4CvFlCZCL/D5AUaCcmQygaZt4CaNujeVu
+ fB6rZA/ka+5t/IiQh+lNXFB3XLzzwzmj23cAI6c3CxVPNYD3QOg2ZAc1Ep82jCFDgpIg
+ VGtIN704zw9rpz8c7HFCqZ7Ocgg2kj7WU8qn3SOvwy1rkUgrknWOTuwvhy0OasPPE/ar
+ cfCVX40luTWmnitplNll15pvAnwQx08uq7j0s+SU4T1/0qqI3fGt5L/P/yUGYoHQTnl1
+ AbhQ==
+X-Gm-Message-State: APjAAAWb8RxVSuK/zcRkdfiqz+ZfITwPNu2qoccaBpuFnQm1OchBpmRh
+ tZ12ugmpUrWCFJjaoNlTejlERJmnEHlpX46mNUB45A==
+X-Google-Smtp-Source: APXvYqxp1g1zDf3pD0c3cWMJ4st8Wf0Q2hwfTdZYGFttcslfSn5mw55e2DBrXDKfe+/x5Lsm2Fp+MbEdYDgVlAvtQpg=
+X-Received: by 2002:a05:6830:4c1:: with SMTP id
+ s1mr3787882otd.232.1571327326966; 
+ Thu, 17 Oct 2019 08:48:46 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20191017132905.5604-8-peter.maydell@linaro.org>
-Content-Language: en-US
-X-MC-Unique: VM41dRixM4K5KgHbiEyoig-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.120
+References: <20191005215508.28754-1-mst@redhat.com>
+In-Reply-To: <20191005215508.28754-1-mst@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 17 Oct 2019 16:48:35 +0100
+Message-ID: <CAFEAcA-_pATmTJPQF8CXGxR6tJbHwip++PWYckKKBc0HSDuo6Q@mail.gmail.com>
+Subject: Re: [PULL 00/19] virtio, vhost, acpi: features, fixes, tests
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::341
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -107,83 +87,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Huth <huth@tuxfamily.org>,
- "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
- Michael Walle <michael@walle.cc>, Guan Xuetao <gxt@mprc.pku.edu.cn>,
- Magnus Damm <magnus.damm@gmail.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 10/17/19 3:29 PM, Peter Maydell wrote:
-> Switch the mcf5206 code away from bottom-half based ptimers to
-> the new transaction-based ptimer API.  This just requires adding
-> begin/commit calls around the various places that modify the ptimer
-> state, and using the new ptimer_init() function to create the timer.
->=20
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-> ---
->   hw/m68k/mcf5206.c | 9 +++++----
->   1 file changed, 5 insertions(+), 4 deletions(-)
->=20
-> diff --git a/hw/m68k/mcf5206.c b/hw/m68k/mcf5206.c
-> index a49096367cb..c05401e0e50 100644
-> --- a/hw/m68k/mcf5206.c
-> +++ b/hw/m68k/mcf5206.c
-> @@ -8,7 +8,6 @@
->  =20
->   #include "qemu/osdep.h"
->   #include "qemu/error-report.h"
-> -#include "qemu/main-loop.h"
->   #include "cpu.h"
->   #include "hw/hw.h"
->   #include "hw/irq.h"
-> @@ -57,6 +56,7 @@ static void m5206_timer_recalibrate(m5206_timer_state *=
-s)
->       int prescale;
->       int mode;
->  =20
-> +    ptimer_transaction_begin(s->timer);
->       ptimer_stop(s->timer);
->  =20
->       if ((s->tmr & TMR_RST) =3D=3D 0)
-> @@ -78,6 +78,7 @@ static void m5206_timer_recalibrate(m5206_timer_state *=
-s)
->       ptimer_set_limit(s->timer, s->trr, 0);
->  =20
->       ptimer_run(s->timer, 0);
-> +    ptimer_transaction_commit(s->timer);
->   }
->  =20
->   static void m5206_timer_trigger(void *opaque)
-> @@ -123,7 +124,9 @@ static void m5206_timer_write(m5206_timer_state *s, u=
-int32_t addr, uint32_t val)
->           s->tcr =3D val;
->           break;
->       case 0xc:
-> +        ptimer_transaction_begin(s->timer);
->           ptimer_set_count(s->timer, val);
-> +        ptimer_transaction_commit(s->timer);
->           break;
->       case 0x11:
->           s->ter &=3D ~val;
-> @@ -137,11 +140,9 @@ static void m5206_timer_write(m5206_timer_state *s, =
-uint32_t addr, uint32_t val)
->   static m5206_timer_state *m5206_timer_init(qemu_irq irq)
->   {
->       m5206_timer_state *s;
-> -    QEMUBH *bh;
->  =20
->       s =3D g_new0(m5206_timer_state, 1);
-> -    bh =3D qemu_bh_new(m5206_timer_trigger, s);
-> -    s->timer =3D ptimer_init_with_bh(bh, PTIMER_POLICY_DEFAULT);
-> +    s->timer =3D ptimer_init(m5206_timer_trigger, s, PTIMER_POLICY_DEFAU=
-LT);
->       s->irq =3D irq;
->       m5206_timer_reset(s);
->       return s;
->=20
+On Sat, 5 Oct 2019 at 22:58, Michael S. Tsirkin <mst@redhat.com> wrote:
+>
+> A couple of tweaks to the bios table test weren't
+> reviewed yet but as they are really helpful to
+> the arm tests I'm pushing, and affecting only the
+> test so fairly benign (dropped assert + a comment),
+> I cut a corner and pushed them straight away.
+> Will be easy to tweak with a patch on top or revert.
+>
+> The following changes since commit 4f59102571fce49af180cfc6d4cdd2b5df7bdb14:
+>
+>   Merge remote-tracking branch 'remotes/amarkovic/tags/mips-queue-oct-01-2019' into staging (2019-10-01 16:21:42 +0100)
+>
+> are available in the Git repository at:
+>
+>   git://git.kernel.org/pub/scm/virt/kvm/mst/qemu.git tags/for_upstream
+>
+> for you to fetch changes up to 9d59bed1da5e5815987879346cf708344060ea63:
+>
+>   virtio: add vhost-user-fs-pci device (2019-10-05 17:43:55 -0400)
+>
+> ----------------------------------------------------------------
+> virtio, vhost, acpi: features, fixes, tests
+>
+> Tests for arm/virt ACPI tables.
+> Virtio fs support (no migration).
+> A vhost-user reconnect bugfix.
+>
+> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+>
+> ----------------------------------------------------------------
 
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 
+Applied, thanks.
+
+Please update the changelog at https://wiki.qemu.org/ChangeLog/4.2
+for any user-visible changes.
+(I put in an entry for the Arm parts:
+  * The virt board now supports memory hotplugging, when used with a
+UEFI guest BIOS and ACPI.
+)
+
+thanks
+-- PMM
 
