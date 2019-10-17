@@ -7,50 +7,51 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1BA17C4CECE
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 05:46:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A1503FA372B
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 05:47:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CF8652067B
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 05:46:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6C1A42067B
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 05:47:13 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="d5nB3dZD"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CF8652067B
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="GzdT5c+w"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6C1A42067B
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35584 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35588 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iKycV-0005zk-TJ
-	for qemu-devel@archiver.kernel.org; Thu, 17 Oct 2019 01:46:43 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44387)
+	id 1iKycy-0006Mc-EV
+	for qemu-devel@archiver.kernel.org; Thu, 17 Oct 2019 01:47:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44343)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgibson@ozlabs.org>) id 1iKyYQ-00016k-IQ
- for qemu-devel@nongnu.org; Thu, 17 Oct 2019 01:42:31 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1iKyYP-0005Jd-JT
+ (envelope-from <dgibson@ozlabs.org>) id 1iKyYO-00016E-Ha
  for qemu-devel@nongnu.org; Thu, 17 Oct 2019 01:42:30 -0400
-Received: from bilbo.ozlabs.org ([203.11.71.1]:41887 helo=ozlabs.org)
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+ (envelope-from <dgibson@ozlabs.org>) id 1iKyYN-0005IO-2q
+ for qemu-devel@nongnu.org; Thu, 17 Oct 2019 01:42:28 -0400
+Received: from bilbo.ozlabs.org ([203.11.71.1]:34509 helo=ozlabs.org)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1iKyYP-0005Ik-8L; Thu, 17 Oct 2019 01:42:29 -0400
+ id 1iKyYL-0005HY-SK; Thu, 17 Oct 2019 01:42:27 -0400
 Received: by ozlabs.org (Postfix, from userid 1007)
- id 46tyjT6m1bz9sPc; Thu, 17 Oct 2019 16:42:21 +1100 (AEDT)
+ id 46tyjT62qhz9sPW; Thu, 17 Oct 2019 16:42:21 +1100 (AEDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
  d=gibson.dropbear.id.au; s=201602; t=1571290941;
- bh=mGl9erpGvqOrf7exLX2jon0zItJbqLirNCGx+VikJ1Q=;
+ bh=qeV4bTD0CrZcVuH/WEAA1NqQ/0d0617D6DXPN3gPjK4=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=d5nB3dZDlhZ2E1yiltlu72vEEnyFQTnFOMKueOq5If+DHT610AyiIbx0xp6GywPVq
- Nw0biffJMmE99WBz9ZmvmJocd/aMljYjUcCciVF9ETpHJbZv8xbpOH6NxgSSVoXizq
- oV/cU57lGpwD5J5yTZYnXbH748sl/lMvtbUATjEo=
+ b=GzdT5c+wRt8g8RPorfRghqoB7zQ8ShLWhkIKKcwlz/OtHLkKWlGQNE2Q9ETWS3xZ2
+ hn1cmDG2Fbl/YhsTJt7yaPTDMtSwSTIc0Rnvbj82xNkrH3XzKQHwQHFhmKeqbtcp6r
+ uO55kX84H6U3NYBfbOGc+bl6EFYc9nSHeDAtspBo=
 From: David Gibson <david@gibson.dropbear.id.au>
 To: alex.williamson@redhat.com,
 	clg@kaod.org,
 	groug@kaod.org
-Subject: [RFC 4/5] spapr: Handle irq backend changes with VFIO PCI devices
-Date: Thu, 17 Oct 2019 16:42:17 +1100
-Message-Id: <20191017054218.8876-5-david@gibson.dropbear.id.au>
+Subject: [RFC 5/5] spapr: Work around spurious warnings from vfio INTx
+ initialization
+Date: Thu, 17 Oct 2019 16:42:18 +1100
+Message-Id: <20191017054218.8876-6-david@gibson.dropbear.id.au>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20191017054218.8876-1-david@gibson.dropbear.id.au>
 References: <20191017054218.8876-1-david@gibson.dropbear.id.au>
@@ -76,44 +77,64 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-pseries machine type can have one of two different interrupt controllers =
-in
-use depending on feature negotiation with the guest.  Usually this is
-invisible to devices, because they route to a common set of qemu_irqs whi=
-ch
-in turn dispatch to the correct back end.
+Traditional PCI INTx for vfio devices can only perform well if using
+an in-kernel irqchip.  Therefore, vfio_intx_update() issues a warning
+if an in kernel irqchip is not available.
 
-VFIO passthrough devices, however, wire themselves up directly to the KVM
-irqchip for performance, which means they are affected by this change in
-interrupt controller.  To get them to adjust correctly for the change in
-irqchip, we need to fire the kvm irqchip change notifier.
+We usually do have an in-kernel irqchip available for pseries machines
+on POWER hosts.  However, because the platform allows feature
+negotiation of what interrupt controller model to use, we don't
+currently initialize it until machine reset.  vfio_intx_update() is
+called (first) from vfio_realize() before that, so it can issue a
+spurious warning, even if we will have an in kernel irqchip by the
+time we need it.
+
+To workaround this, make a call to spapr_irq_update_active_intc() from
+spapr_irq_init() which is called at machine realize time, before the
+vfio realize.  This call will be pretty much obsoleted by the later
+call at reset time, but it serves to suppress the spurious warning
+from VFIO.
 
 Cc: Alex Williamson <alex.williamson@redhat.com>
 Cc: Alexey Kardashevskiy <aik@ozlabs.ru>
 
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/ppc/spapr_irq.c | 6 ++++++
- 1 file changed, 6 insertions(+)
+ hw/ppc/spapr_irq.c | 11 ++++++++++-
+ 1 file changed, 10 insertions(+), 1 deletion(-)
 
 diff --git a/hw/ppc/spapr_irq.c b/hw/ppc/spapr_irq.c
-index 234d1073e5..45544b8976 100644
+index 45544b8976..bb91c61fa0 100644
 --- a/hw/ppc/spapr_irq.c
 +++ b/hw/ppc/spapr_irq.c
-@@ -480,6 +480,12 @@ static void set_active_intc(SpaprMachineState *spapr=
-,
-     }
+@@ -345,6 +345,14 @@ void spapr_irq_init(SpaprMachineState *spapr, Error =
+**errp)
 =20
-     spapr->active_intc =3D new_intc;
+     spapr->qirqs =3D qemu_allocate_irqs(spapr_set_irq, spapr,
+                                       smc->nr_xirqs + SPAPR_XIRQ_BASE);
 +
 +    /*
-+     * We've changed the kernel irqchip, let VFIO devices know they
-+     * need to readjust.
++     * Mostly we don't actually need this until reset, except that not
++     * having this set up can cause VFIO devices to issue a
++     * false-positive warning during realize(), because they don't yet
++     * have an in-kernel irq chip.
 +     */
-+    kvm_irqchip_change_notify();
++    spapr_irq_update_active_intc(spapr);
  }
 =20
- void spapr_irq_update_active_intc(SpaprMachineState *spapr)
+ int spapr_irq_claim(SpaprMachineState *spapr, int irq, bool lsi, Error *=
+*errp)
+@@ -500,7 +508,8 @@ void spapr_irq_update_active_intc(SpaprMachineState *=
+spapr)
+          * this.
+          */
+         new_intc =3D SPAPR_INTC(spapr->xive);
+-    } else if (spapr_ovec_test(spapr->ov5_cas, OV5_XIVE_EXPLOIT)) {
++    } else if (spapr->ov5_cas
++               && spapr_ovec_test(spapr->ov5_cas, OV5_XIVE_EXPLOIT)) {
+         new_intc =3D SPAPR_INTC(spapr->xive);
+     } else {
+         new_intc =3D SPAPR_INTC(spapr->ics);
 --=20
 2.21.0
 
