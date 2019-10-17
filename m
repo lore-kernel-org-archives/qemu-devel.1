@@ -2,64 +2,58 @@ Return-Path: <SRS0=yZS3=YK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 11F93FA372A
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 16:20:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BC0ABFA372A
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 16:20:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D3AEB2089C
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 16:20:01 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D3AEB2089C
+	by mail.kernel.org (Postfix) with ESMTPS id 8F8882089C
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 16:20:29 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8F8882089C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52308 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52310 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iL8VM-0000Qu-H1
-	for qemu-devel@archiver.kernel.org; Thu, 17 Oct 2019 12:20:00 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57927)
+	id 1iL8Vo-00014h-8y
+	for qemu-devel@archiver.kernel.org; Thu, 17 Oct 2019 12:20:28 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58187)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <david@redhat.com>) id 1iL7k8-0006KI-QH
- for qemu-devel@nongnu.org; Thu, 17 Oct 2019 11:31:14 -0400
+ (envelope-from <imammedo@redhat.com>) id 1iL7lE-000750-1L
+ for qemu-devel@nongnu.org; Thu, 17 Oct 2019 11:32:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <david@redhat.com>) id 1iL7k4-0002zo-UK
- for qemu-devel@nongnu.org; Thu, 17 Oct 2019 11:31:12 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:51524)
+ (envelope-from <imammedo@redhat.com>) id 1iL7lB-0003Zq-Rr
+ for qemu-devel@nongnu.org; Thu, 17 Oct 2019 11:32:19 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:50318)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <david@redhat.com>) id 1iL7k4-0002zR-Ft
- for qemu-devel@nongnu.org; Thu, 17 Oct 2019 11:31:08 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
+ (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1iL7lB-0003ZV-Lm
+ for qemu-devel@nongnu.org; Thu, 17 Oct 2019 11:32:17 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id EDBF136961
- for <qemu-devel@nongnu.org>; Thu, 17 Oct 2019 15:31:06 +0000 (UTC)
-Received: from [10.36.117.42] (ovpn-117-42.ams2.redhat.com [10.36.117.42])
- by smtp.corp.redhat.com (Postfix) with ESMTP id E784A600C4;
- Thu, 17 Oct 2019 15:31:05 +0000 (UTC)
-Subject: Re: Default CPU models on s390x and ppc64
-From: David Hildenbrand <david@redhat.com>
-To: Jiri Denemark <jdenemar@redhat.com>, qemu-devel@nongnu.org,
- David Hildenbrand <dhildenb@redhat.com>, David Gibson <dgibson@redhat.com>
-References: <20191017151606.GA1880840@orkuz.int.mamuti.net>
- <82ea23ea-be23-c374-3f10-65d8f6e79432@redhat.com>
-Organization: Red Hat GmbH
-Message-ID: <3c2d2d20-682e-ab4f-ced4-c7f48473dd24@redhat.com>
-Date: Thu, 17 Oct 2019 17:31:04 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.1
+ by mx1.redhat.com (Postfix) with ESMTPS id E867C3082A6C;
+ Thu, 17 Oct 2019 15:32:16 +0000 (UTC)
+Received: from localhost (unknown [10.43.2.182])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 4379A1001B11;
+ Thu, 17 Oct 2019 15:32:16 +0000 (UTC)
+Date: Thu, 17 Oct 2019 17:32:14 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+To: Gautam Bhat <mindentropy@gmail.com>
+Subject: Re: ACPI table modifications
+Message-ID: <20191017173214.5e81a0d7@redhat.com>
+In-Reply-To: <CAM2a4uzF-mtTEYwQE3+MvvDiQrfC_KQMwX4vqCg_dY9ytjZrjA@mail.gmail.com>
+References: <CAM2a4uzF-mtTEYwQE3+MvvDiQrfC_KQMwX4vqCg_dY9ytjZrjA@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <82ea23ea-be23-c374-3f10-65d8f6e79432@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.30]); Thu, 17 Oct 2019 15:31:06 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.45]); Thu, 17 Oct 2019 15:32:16 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 209.132.183.28
@@ -74,80 +68,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 17.10.19 17:18, David Hildenbrand wrote:
-> On 17.10.19 17:16, Jiri Denemark wrote:
->> Hi David and David,
->>
->> I'm working on libvirt's support [1] for query-machines'
->> default-cpu-type, which is supposed to return the type of the default
->> CPU model that QEMU uses for each machine type. Rather than hard coding
->> the default in libvirt (which we currently do on x86), we ask QEMU for
->> the default CPU model and use it unless a user asks for a specific CPU
->> model explicitly.
->>
->> We use query-cpu-definitions for translating the default CPU type to the
->> actual CPU model we need to pass to -cpu by looking up the CPU model
->> with matching typename.
->>
->> However, all this seems to work only with TCG on both s390x and ppc64.
->> The issues I met with KVM on each architecture are described below.
->>
->> On ppc64 the default CPU type reported by query-machines is
->> power*-powerpc64-cpu, while IIUC QEMU would effectively use -cpu host by
->> default. In fact -cpu power8 is mostly just a fancy alias to -cpu host
->> on a Power8 machine. But QEMU even rewrites typename of the current host
->> CPU model to host-powerpc64-cpu. Which means on a Power8 host the power8
->> CPU model would have typename=host-powerpc64-cpu while the default CPU
->> type would still use power8*-powerpc64-cpu. Thus we may just fail to
->> find any CPU model corresponding to the default CPU model.
->>
->> And to make it even worse, the default CPU model changes with machine
->> type. E.g., pseries-3.1 uses power8_v2.0-powerpc64-cpu while pseries-4.2
->> uses power9_v2.0-powerpc64-cpu. However, starting QEMU with pseries-4.2
->> machine type and the reported default -cpu power9 fails on any
->> non-Power9 host. That said QEMU just lies about the default CPU model.
->>
->> So for all combinations of (pseries-3.1, pseries-4.2) machine types and
->> (Power8, Power9) hosts, one will get the following mixed results:
->>
->> - pseries-3.1 on Power8: no default CPU model will be detected, QEMU
->>     starts fine with it's own default
->> - pseries-4.2 on Power9: same as above
->> - pseries-3.1 on Power9: -cpu power8 (not sure if this works, though)
->> - pseries-4.2 on Power8: -cpu power9, QEMU doesn't start
->>
->>
->> This situation on s390x is not so complicated, but not really better.
->> The default CPU is said to be "qemu" for all machine types, which works
->> fine for TCG domains, but it doesn't work on KVM because QEMU complains
->> that some features requested in the CPU model are not available. In
->> other words the "qemu" CPU model is not runnable on KVM. This a bit
->> similar to what happens on x86_64, but QEMU just ignores missing
->> features and starts happily there.
+On Sat, 12 Oct 2019 00:17:10 +0530
+Gautam Bhat <mindentropy@gmail.com> wrote:
+
+> Hi,
 > 
-> The default model under KVM is "host", under TCG it's "qemu". We should
-> not use "qemu" under KVM, although it might work on some setups ...
+> I want to add some I2C based temperature sensors to the -M Q35 machine. I
+> want to update the ACPI tables to add this device information. How can I go
+> about  doing this?
+
+Process is described here:
+   https://www.mail-archive.com/qemu-devel@nongnu.org/msg650066.html
+
+
 > 
-> Where/how is this default model detected?
-> 
+> Thanks,
+> Gautam.
 
-... target/s390x/kvm.c:kvm_arch_init()
-
-MachineClass *mc = MACHINE_GET_CLASS(ms);
-
-mc->default_cpu_type = S390_CPU_TYPE_NAME("host");
-
-
-I think the call order should make sure that "host" is set after "qemu" 
-is set. I'll go ahead and verify that.
-
--- 
-
-Thanks,
-
-David / dhildenb
 
