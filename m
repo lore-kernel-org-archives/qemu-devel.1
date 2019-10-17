@@ -7,75 +7,75 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C4349FA3735
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 13:31:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C47B1FA372A
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 13:32:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7F436205F4
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 13:31:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8AEB02089C
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 13:32:10 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Efwjq8f0"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7F436205F4
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="h5jx0zyI"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8AEB02089C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47710 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47744 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iL5rt-0000Dj-53
-	for qemu-devel@archiver.kernel.org; Thu, 17 Oct 2019 09:31:05 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33920)
+	id 1iL5su-0001W6-HB
+	for qemu-devel@archiver.kernel.org; Thu, 17 Oct 2019 09:32:08 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33903)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1iL5dh-00082b-Gt
- for qemu-devel@nongnu.org; Thu, 17 Oct 2019 09:16:27 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1iL5df-0005Px-JD
+ (envelope-from <alex.bennee@linaro.org>) id 1iL5dg-00081M-Jt
  for qemu-devel@nongnu.org; Thu, 17 Oct 2019 09:16:25 -0400
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:43486)
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+ (envelope-from <alex.bennee@linaro.org>) id 1iL5de-0005PT-SZ
+ for qemu-devel@nongnu.org; Thu, 17 Oct 2019 09:16:24 -0400
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:42411)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1iL5df-0005P6-9r
- for qemu-devel@nongnu.org; Thu, 17 Oct 2019 09:16:23 -0400
-Received: by mail-wr1-x444.google.com with SMTP id j18so2299754wrq.10
- for <qemu-devel@nongnu.org>; Thu, 17 Oct 2019 06:16:23 -0700 (PDT)
+ id 1iL5de-0005Nq-MA
+ for qemu-devel@nongnu.org; Thu, 17 Oct 2019 09:16:22 -0400
+Received: by mail-wr1-x442.google.com with SMTP id n14so2302635wrw.9
+ for <qemu-devel@nongnu.org>; Thu, 17 Oct 2019 06:16:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=1K5R87gH+RKq1gBcfzruUhBEbc4LEOKl5E0k+gGHnl8=;
- b=Efwjq8f0c2DIJJXvD72ATIyCNpaWymKuB1m7wRUfG2rucjej40Et1QRYm5HdJTR7Nl
- lnWmTn3qs0EyWFnhrk1HYigdvKZDmT/zHwuFMGWhJo6RZuETwXZXrK9MHTaEmIH/AkWv
- HOGBjrdEnyLFoCVlxuTggIzVzQunC5zKoJmZ9Q2C+m1bfh86hNazOTbKb27mzfClb6k0
- UDr/QGPXGfc3tB/ZTIK+Ysa8RdvFcyVgkvz0fI46m7KEu6c5heEPolzPZtyjCnxV4B9s
- mL9rJhkaiE0BJuuhOrttjMNfTSb6mfAsEg8ksrsWusQZ5Mp3iP0gMpjqTWOR6eufbrZ1
- Fepw==
+ bh=lLM+xKKxPEW7VAxcx9ZcpQ8DuflKLaTBtk33YYXEM9o=;
+ b=h5jx0zyIIhYP5HfBCpDxUm8pyJ3IONYuZjTk4ZJM7NQLrtWlWf4FU5AsIVuB4McQzF
+ n3ZhLCAUgrcttQMc04m7ydpcNhT4LNjFXSYGXZXUoN9c8E3MHjI0yBhjAI03CN77101N
+ oYiIx+c95oMT+I1ExVZQ4woT/l8Z5CeqdQ+r+gI56r5kK/I8q22RVjHPDRNbQrRQ8L5n
+ 8nT1q/wCq0WG8PIP+IMa7budCnHuoM90oeibe76Oriqv7ZZMt9jNZbjAM1DZpBeaQGud
+ YvvtBUGknanoWmZhGAJbiHo5FgEXtJ8SuLq/UWctsHLw9MhMOOMeoPnFjlC00a1tY0b6
+ 1cCw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=1K5R87gH+RKq1gBcfzruUhBEbc4LEOKl5E0k+gGHnl8=;
- b=BPymHttejEBmnEczK3op6MdiHlKR1yrpEjEvJua8zYVIucE/X6hlSYxpvFuJXXqmYS
- +qYhR5Pb8mwYHygdUUMXakkzX0BSzVeQtqpbnxzmRtwAG8EZhsWPP15Wlqxvi0csDzfX
- S9Bv95RzZN98dw6Rqx0I5Xe7iLSidlNWWSZHZTZ6TL1odcMeVxrJ1FHTMP+ifqGgryw7
- isXeRQvIKwOqkblclkc9UALtQYKRHrlQqiIBVuSsZOc+WtONglWbNwtpusuyr2Z2dRSo
- 2hUa3m2+6mNQbAJhOxoErQ3Xtv4SFKp/euIHhw8RnxjJ25exGUXdskw/04mUD7IVLQZv
- K0sA==
-X-Gm-Message-State: APjAAAVWLRBGFfTm5+JNIsRv3ZH9mLPxs8AWl6srgJPor1cHk/by/dlS
- o5xvlOrckkxpGvvdlsx3WgZ67Q==
-X-Google-Smtp-Source: APXvYqwAuisyZI0/oJy07wVtyDN11z/Fq9cTYoGxPWGcc7Ob2cJo951pignm3X0JSHsy4rqyvV1u4A==
-X-Received: by 2002:adf:ee81:: with SMTP id b1mr2770255wro.58.1571318182052;
- Thu, 17 Oct 2019 06:16:22 -0700 (PDT)
+ bh=lLM+xKKxPEW7VAxcx9ZcpQ8DuflKLaTBtk33YYXEM9o=;
+ b=qudc9jkBWt876yeJml8VZVurEkMCAwxwd3g9jU0r3KvXN+zKh3HpWXpfbxToqZGNKU
+ FTbAZoMKFIto/BSCrFvjhf9nP1EhdaibUrPDCsj/2Sw5ntLTIBG8a44+zURv6Pm/ij7o
+ 7p3auvSFS4CyLcqEvZb0QfwsZmhhzkvXCedTgWu+hS5AIvD5S9z43kgztGGsXmQ+U6ln
+ /Rm3tck9ygBGdZlZUeGp7Bq5GvijcF1E40C0Ro76uMqsxGMzYK5okLWN4g8lEtkpXCTA
+ 4jMNRkpEz0PJeUxLVCIJLuZte1oHj2qnOOjUQ3/v8Bk8nGwVpiCCtcrV5SpHqfwTyNl4
+ LcgA==
+X-Gm-Message-State: APjAAAUTSmlilrexoJBxtaxPgzNqcZOxPNxCUhQBCYGSnV813HDMABy7
+ yTxvwBgOa3zzY1KIGMdE2nDTkw==
+X-Google-Smtp-Source: APXvYqwezblox7MzJdQ9JylT7e0lNnwDz5FPBcUPWCf3zHtWhYoCYEciPPmBT4zM1Xh/9uUxJIEisQ==
+X-Received: by 2002:a5d:544b:: with SMTP id w11mr1444015wrv.205.1571318181510; 
+ Thu, 17 Oct 2019 06:16:21 -0700 (PDT)
 Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id c4sm2063264wru.31.2019.10.17.06.16.17
+ by smtp.gmail.com with ESMTPSA id z6sm2419443wro.16.2019.10.17.06.16.19
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 17 Oct 2019 06:16:19 -0700 (PDT)
+ Thu, 17 Oct 2019 06:16:21 -0700 (PDT)
 Received: from zen.lan (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 9948A1FF98;
+ by zen.linaroharston (Postfix) with ESMTP id DB3F41FF9B;
  Thu, 17 Oct 2019 14:16:16 +0100 (BST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH  v6 08/54] plugin: add implementation of the api
-Date: Thu, 17 Oct 2019 14:15:29 +0100
-Message-Id: <20191017131615.19660-9-alex.bennee@linaro.org>
+Subject: [PATCH  v6 11/54] cputlb: introduce get_page_addr_code_hostp
+Date: Thu, 17 Oct 2019 14:15:32 +0100
+Message-Id: <20191017131615.19660-12-alex.bennee@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20191017131615.19660-1-alex.bennee@linaro.org>
 References: <20191017131615.19660-1-alex.bennee@linaro.org>
@@ -84,7 +84,7 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::444
+X-Received-From: 2a00:1450:4864:20::442
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,335 +99,128 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 Cc: robert.foley@futurewei.com,
  Richard Henderson <richard.henderson@linaro.org>, peter.puhov@futurewei.com,
  aaron@os.amperecomputing.com, cota@braap.org,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+ Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-[AJB: split from the core code commit]
+From: "Emilio G. Cota" <cota@braap.org>
+
+This will be used by plugins to get the host address
+of instructions.
+
+Signed-off-by: Emilio G. Cota <cota@braap.org>
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 ---
-v4
-   - add qemu_plugin_ram_addr_from_host
-   - remove _haddr api calls
-v5
-   - remove stray #if 0
-v6
-   - drop hwaddr queries from initial api (in later patch)
----
- include/qemu/qemu-plugin.h |   3 -
- plugins/Makefile.objs      |   1 +
- plugins/api.c              | 277 +++++++++++++++++++++++++++++++++++++
- 3 files changed, 278 insertions(+), 3 deletions(-)
- create mode 100644 plugins/api.c
+ accel/tcg/cputlb.c      | 14 +++++++++++++-
+ include/exec/exec-all.h | 38 ++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 51 insertions(+), 1 deletion(-)
 
-diff --git a/include/qemu/qemu-plugin.h b/include/qemu/qemu-plugin.h
-index d9c1ca3b4c..b9a4a4b684 100644
---- a/include/qemu/qemu-plugin.h
-+++ b/include/qemu/qemu-plugin.h
-@@ -285,9 +285,6 @@ bool qemu_plugin_mem_is_store(qemu_plugin_meminfo_t info);
- struct qemu_plugin_hwaddr *qemu_plugin_get_hwaddr(qemu_plugin_meminfo_t info,
-                                                   uint64_t vaddr);
+diff --git a/accel/tcg/cputlb.c b/accel/tcg/cputlb.c
+index a8f9069582..82a5783a2b 100644
+--- a/accel/tcg/cputlb.c
++++ b/accel/tcg/cputlb.c
+@@ -1051,7 +1051,8 @@ static bool victim_tlb_hit(CPUArchState *env, size_t mmu_idx, size_t index,
+  * NOTE: This function will trigger an exception if the page is
+  * not executable.
+  */
+-tb_page_addr_t get_page_addr_code(CPUArchState *env, target_ulong addr)
++tb_page_addr_t get_page_addr_code_hostp(CPUArchState *env, target_ulong addr,
++                                        void **hostp)
+ {
+     uintptr_t mmu_idx = cpu_mmu_index(env, true);
+     uintptr_t index = tlb_index(env, mmu_idx, addr);
+@@ -1077,13 +1078,24 @@ tb_page_addr_t get_page_addr_code(CPUArchState *env, target_ulong addr)
  
--bool qemu_plugin_hwaddr_is_io(struct qemu_plugin_hwaddr *hwaddr);
--uint64_t qemu_plugin_hwaddr_to_raddr(const struct qemu_plugin_hwaddr *haddr);
--
- typedef void
- (*qemu_plugin_vcpu_mem_cb_t)(unsigned int vcpu_index,
-                              qemu_plugin_meminfo_t info, uint64_t vaddr,
-diff --git a/plugins/Makefile.objs b/plugins/Makefile.objs
-index 58940335bc..95baabf3d2 100644
---- a/plugins/Makefile.objs
-+++ b/plugins/Makefile.objs
-@@ -4,3 +4,4 @@
+     if (unlikely(entry->addr_code & TLB_MMIO)) {
+         /* The region is not backed by RAM.  */
++        if (hostp) {
++            *hostp = NULL;
++        }
+         return -1;
+     }
  
- obj-y += loader.o
- obj-y += core.o
-+obj-y += api.o
-diff --git a/plugins/api.c b/plugins/api.c
-new file mode 100644
-index 0000000000..facf2a132d
---- /dev/null
-+++ b/plugins/api.c
-@@ -0,0 +1,277 @@
-+/*
-+ * QEMU Plugin API
-+ *
-+ * This provides the API that is available to the plugins to interact
-+ * with QEMU. We have to be careful not to expose internal details of
-+ * how QEMU works so we abstract out things like translation and
-+ * instructions to anonymous data types:
-+ *
-+ *  qemu_plugin_tb
-+ *  qemu_plugin_insn
-+ *
-+ * Which can then be passed back into the API to do additional things.
-+ * As such all the public functions in here are exported in
-+ * qemu-plugin.h.
-+ *
-+ * The general life-cycle of a plugin is:
-+ *
-+ *  - plugin is loaded, public qemu_plugin_install called
-+ *    - the install func registers callbacks for events
-+ *    - usually an atexit_cb is registered to dump info at the end
-+ *  - when a registered event occurs the plugin is called
-+ *     - some events pass additional info
-+ *     - during translation the plugin can decide to instrument any
-+ *       instruction
-+ *  - when QEMU exits all the registered atexit callbacks are called
-+ *
-+ * Copyright (C) 2017, Emilio G. Cota <cota@braap.org>
-+ * Copyright (C) 2019, Linaro
-+ *
-+ * License: GNU GPL, version 2 or later.
-+ *   See the COPYING file in the top-level directory.
-+ *
-+ * SPDX-License-Identifier: GPL-2.0-or-later
-+ *
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "qemu/plugin.h"
-+#include "cpu.h"
-+#include "sysemu/sysemu.h"
-+#include "tcg/tcg.h"
-+#include "trace/mem-internal.h" /* mem_info macros */
-+#include "plugin.h"
-+#ifndef CONFIG_USER_ONLY
-+#include "hw/boards.h"
-+#endif
-+
-+/* Uninstall and Reset handlers */
-+
-+void qemu_plugin_uninstall(qemu_plugin_id_t id, qemu_plugin_simple_cb_t cb)
-+{
-+    plugin_reset_uninstall(id, cb, false);
-+}
-+
-+void qemu_plugin_reset(qemu_plugin_id_t id, qemu_plugin_simple_cb_t cb)
-+{
-+    plugin_reset_uninstall(id, cb, true);
-+}
-+
-+/*
-+ * Plugin Register Functions
-+ *
-+ * This allows the plugin to register callbacks for various events
-+ * during the translation.
-+ */
-+
-+void qemu_plugin_register_vcpu_init_cb(qemu_plugin_id_t id,
-+                                       qemu_plugin_vcpu_simple_cb_t cb)
-+{
-+    plugin_register_cb(id, QEMU_PLUGIN_EV_VCPU_INIT, cb);
-+}
-+
-+void qemu_plugin_register_vcpu_exit_cb(qemu_plugin_id_t id,
-+                                       qemu_plugin_vcpu_simple_cb_t cb)
-+{
-+    plugin_register_cb(id, QEMU_PLUGIN_EV_VCPU_EXIT, cb);
-+}
-+
-+void qemu_plugin_register_vcpu_tb_exec_cb(struct qemu_plugin_tb *tb,
-+                                          qemu_plugin_vcpu_udata_cb_t cb,
-+                                          enum qemu_plugin_cb_flags flags,
-+                                          void *udata)
-+{
-+    plugin_register_dyn_cb__udata(&tb->cbs[PLUGIN_CB_REGULAR],
-+                                  cb, flags, udata);
-+}
-+
-+void qemu_plugin_register_vcpu_tb_exec_inline(struct qemu_plugin_tb *tb,
-+                                              enum qemu_plugin_op op,
-+                                              void *ptr, uint64_t imm)
-+{
-+    plugin_register_inline_op(&tb->cbs[PLUGIN_CB_INLINE], 0, op, ptr, imm);
-+}
-+
-+void qemu_plugin_register_vcpu_insn_exec_cb(struct qemu_plugin_insn *insn,
-+                                            qemu_plugin_vcpu_udata_cb_t cb,
-+                                            enum qemu_plugin_cb_flags flags,
-+                                            void *udata)
-+{
-+    plugin_register_dyn_cb__udata(&insn->cbs[PLUGIN_CB_INSN][PLUGIN_CB_REGULAR],
-+        cb, flags, udata);
-+}
-+
-+void qemu_plugin_register_vcpu_insn_exec_inline(struct qemu_plugin_insn *insn,
-+                                                enum qemu_plugin_op op,
-+                                                void *ptr, uint64_t imm)
-+{
-+    plugin_register_inline_op(&insn->cbs[PLUGIN_CB_INSN][PLUGIN_CB_INLINE],
-+                              0, op, ptr, imm);
-+}
-+
-+
-+
-+void qemu_plugin_register_vcpu_mem_cb(struct qemu_plugin_insn *insn,
-+                                      qemu_plugin_vcpu_mem_cb_t cb,
-+                                      enum qemu_plugin_cb_flags flags,
-+                                      enum qemu_plugin_mem_rw rw,
-+                                      void *udata)
-+{
-+    plugin_register_vcpu_mem_cb(&insn->cbs[PLUGIN_CB_MEM][PLUGIN_CB_REGULAR],
-+                                cb, flags, rw, udata);
-+}
-+
-+void qemu_plugin_register_vcpu_mem_inline(struct qemu_plugin_insn *insn,
-+                                          enum qemu_plugin_mem_rw rw,
-+                                          enum qemu_plugin_op op, void *ptr,
-+                                          uint64_t imm)
-+{
-+    plugin_register_inline_op(&insn->cbs[PLUGIN_CB_MEM][PLUGIN_CB_INLINE],
-+        rw, op, ptr, imm);
-+}
-+
-+void qemu_plugin_register_vcpu_tb_trans_cb(qemu_plugin_id_t id,
-+                                           qemu_plugin_vcpu_tb_trans_cb_t cb)
-+{
-+    plugin_register_cb(id, QEMU_PLUGIN_EV_VCPU_TB_TRANS, cb);
-+}
-+
-+void qemu_plugin_register_vcpu_syscall_cb(qemu_plugin_id_t id,
-+                                          qemu_plugin_vcpu_syscall_cb_t cb)
-+{
-+    plugin_register_cb(id, QEMU_PLUGIN_EV_VCPU_SYSCALL, cb);
-+}
-+
-+void
-+qemu_plugin_register_vcpu_syscall_ret_cb(qemu_plugin_id_t id,
-+                                         qemu_plugin_vcpu_syscall_ret_cb_t cb)
-+{
-+    plugin_register_cb(id, QEMU_PLUGIN_EV_VCPU_SYSCALL_RET, cb);
-+}
-+
-+/*
-+ * Plugin Queries
-+ *
-+ * These are queries that the plugin can make to gauge information
-+ * from our opaque data types. We do not want to leak internal details
-+ * here just information useful to the plugin.
-+ */
-+
-+/*
-+ * Translation block information:
-+ *
-+ * A plugin can query the virtual address of the start of the block
-+ * and the number of instructions in it. It can also get access to
-+ * each translated instruction.
-+ */
-+
-+size_t qemu_plugin_tb_n_insns(const struct qemu_plugin_tb *tb)
-+{
-+    return tb->n;
-+}
-+
-+uint64_t qemu_plugin_tb_vaddr(const struct qemu_plugin_tb *tb)
-+{
-+    return tb->vaddr;
-+}
-+
-+struct qemu_plugin_insn *
-+qemu_plugin_tb_get_insn(const struct qemu_plugin_tb *tb, size_t idx)
-+{
-+    if (unlikely(idx >= tb->n)) {
-+        return NULL;
+     p = (void *)((uintptr_t)addr + entry->addend);
++    if (hostp) {
++        *hostp = p;
 +    }
-+    return g_ptr_array_index(tb->insns, idx);
+     return qemu_ram_addr_from_host_nofail(p);
+ }
+ 
++tb_page_addr_t get_page_addr_code(CPUArchState *env, target_ulong addr)
++{
++    return get_page_addr_code_hostp(env, addr, NULL);
 +}
 +
-+/*
-+ * Instruction information
+ static void notdirty_write(CPUState *cpu, vaddr mem_vaddr, unsigned size,
+                            CPUIOTLBEntry *iotlbentry, uintptr_t retaddr)
+ {
+diff --git a/include/exec/exec-all.h b/include/exec/exec-all.h
+index e4206cb173..eadcf29d0c 100644
+--- a/include/exec/exec-all.h
++++ b/include/exec/exec-all.h
+@@ -22,6 +22,7 @@
+ 
+ #include "cpu.h"
+ #include "exec/tb-context.h"
++#include "exec/cpu_ldst.h"
+ #include "sysemu/cpus.h"
+ 
+ /* allow to see translation results - the slowdown should be negligible, so we leave it */
+@@ -516,6 +517,26 @@ static inline tb_page_addr_t get_page_addr_code(CPUArchState *env,
+ {
+     return addr;
+ }
++
++/**
++ * get_page_addr_code_hostp() - user-mode version
++ * @env: CPUArchState
++ * @addr: guest virtual address of guest code
 + *
-+ * These queries allow the plugin to retrieve information about each
-+ * instruction being translated.
++ * Returns @addr.
++ *
++ * If @hostp is non-NULL, sets *@hostp to the host address where @addr's content
++ * is kept.
 + */
-+
-+const void *qemu_plugin_insn_data(const struct qemu_plugin_insn *insn)
++static inline tb_page_addr_t get_page_addr_code_hostp(CPUArchState *env,
++                                                      target_ulong addr,
++                                                      void **hostp)
 +{
-+    return insn->data->data;
++    if (hostp) {
++        *hostp = g2h(addr);
++    }
++    return addr;
 +}
-+
-+size_t qemu_plugin_insn_size(const struct qemu_plugin_insn *insn)
-+{
-+    return insn->data->len;
-+}
-+
-+uint64_t qemu_plugin_insn_vaddr(const struct qemu_plugin_insn *insn)
-+{
-+    return insn->vaddr;
-+}
-+
-+void *qemu_plugin_insn_haddr(const struct qemu_plugin_insn *insn)
-+{
-+    return insn->haddr;
-+}
-+
-+/*
-+ * The memory queries allow the plugin to query information about a
-+ * memory access.
+ #else
+ static inline void mmap_lock(void) {}
+ static inline void mmap_unlock(void) {}
+@@ -533,6 +554,23 @@ static inline void mmap_unlock(void) {}
+  */
+ tb_page_addr_t get_page_addr_code(CPUArchState *env, target_ulong addr);
+ 
++/**
++ * get_page_addr_code_hostp() - full-system version
++ * @env: CPUArchState
++ * @addr: guest virtual address of guest code
++ *
++ * See get_page_addr_code() (full-system version) for documentation on the
++ * return value.
++ *
++ * Sets *@hostp (when @hostp is non-NULL) as follows.
++ * If the return value is -1, sets *@hostp to NULL. Otherwise, sets *@hostp
++ * to the host address where @addr's content is kept.
++ *
++ * Note: this function can trigger an exception.
 + */
++tb_page_addr_t get_page_addr_code_hostp(CPUArchState *env, target_ulong addr,
++                                        void **hostp);
 +
-+unsigned qemu_plugin_mem_size_shift(qemu_plugin_meminfo_t info)
-+{
-+    return info & TRACE_MEM_SZ_SHIFT_MASK;
-+}
-+
-+bool qemu_plugin_mem_is_sign_extended(qemu_plugin_meminfo_t info)
-+{
-+    return !!(info & TRACE_MEM_SE);
-+}
-+
-+bool qemu_plugin_mem_is_big_endian(qemu_plugin_meminfo_t info)
-+{
-+    return !!(info & TRACE_MEM_BE);
-+}
-+
-+bool qemu_plugin_mem_is_store(qemu_plugin_meminfo_t info)
-+{
-+    return !!(info & TRACE_MEM_ST);
-+}
-+
-+/*
-+ * Virtual Memory queries
-+ */
-+
-+struct qemu_plugin_hwaddr *qemu_plugin_get_hwaddr(qemu_plugin_meminfo_t info,
-+                                                  uint64_t vaddr)
-+{
-+    return NULL;
-+}
-+
-+/*
-+ * Queries to the number and potential maximum number of vCPUs there
-+ * will be. This helps the plugin dimension per-vcpu arrays.
-+ */
-+
-+#ifndef CONFIG_USER_ONLY
-+static MachineState * get_ms(void)
-+{
-+    return MACHINE(qdev_get_machine());
-+}
-+#endif
-+
-+int qemu_plugin_n_vcpus(void)
-+{
-+#ifdef CONFIG_USER_ONLY
-+    return -1;
-+#else
-+    return get_ms()->smp.cpus;
-+#endif
-+}
-+
-+int qemu_plugin_n_max_vcpus(void)
-+{
-+#ifdef CONFIG_USER_ONLY
-+    return -1;
-+#else
-+    return get_ms()->smp.max_cpus;
-+#endif
-+}
+ void tlb_reset_dirty(CPUState *cpu, ram_addr_t start1, ram_addr_t length);
+ void tlb_set_dirty(CPUState *cpu, target_ulong vaddr);
+ 
 -- 
 2.20.1
 
