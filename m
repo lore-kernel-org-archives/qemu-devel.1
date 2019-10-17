@@ -2,57 +2,58 @@ Return-Path: <SRS0=yZS3=YK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.7 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 53DDFECE58D
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 21:57:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4F222ECE58D
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 21:59:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 275B82089C
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 21:57:31 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 275B82089C
+	by mail.kernel.org (Postfix) with ESMTPS id 210C121D7C
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 21:59:13 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 210C121D7C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60896 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60922 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iLDlx-0000YT-Cm
-	for qemu-devel@archiver.kernel.org; Thu, 17 Oct 2019 17:57:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60950)
+	id 1iLDnb-0002xq-NQ
+	for qemu-devel@archiver.kernel.org; Thu, 17 Oct 2019 17:59:11 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33027)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jsnow@redhat.com>) id 1iLDjY-0006vN-QT
- for qemu-devel@nongnu.org; Thu, 17 Oct 2019 17:55:03 -0400
+ (envelope-from <jsnow@redhat.com>) id 1iLDk9-0007m7-Cj
+ for qemu-devel@nongnu.org; Thu, 17 Oct 2019 17:55:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1iLDjX-0002Jy-Im
- for qemu-devel@nongnu.org; Thu, 17 Oct 2019 17:55:00 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:38090)
+ (envelope-from <jsnow@redhat.com>) id 1iLDk7-0002jM-Ub
+ for qemu-devel@nongnu.org; Thu, 17 Oct 2019 17:55:37 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:51794)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <jsnow@redhat.com>)
- id 1iLDjU-0002IH-63; Thu, 17 Oct 2019 17:54:56 -0400
+ id 1iLDk5-0002hT-9o; Thu, 17 Oct 2019 17:55:33 -0400
 Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
  [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 623C02E95AC;
- Thu, 17 Oct 2019 21:54:55 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 6284FC0495A3;
+ Thu, 17 Oct 2019 21:55:31 +0000 (UTC)
 Received: from probe.bos.redhat.com (dhcp-17-173.bos.redhat.com [10.18.17.173])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 02A5B5D9DC;
- Thu, 17 Oct 2019 21:54:53 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 0980A5D9CA;
+ Thu, 17 Oct 2019 21:55:29 +0000 (UTC)
 From: John Snow <jsnow@redhat.com>
 To: Peter Maydell <peter.maydell@linaro.org>, jsnow@redhat.com,
  qemu-devel@nongnu.org
-Subject: [PULL v3 05/19] block/dirty-bitmap: drop meta
-Date: Thu, 17 Oct 2019 17:54:22 -0400
-Message-Id: <20191017215436.14252-6-jsnow@redhat.com>
+Subject: [PULL v3 18/19] MAINTAINERS: Add Vladimir as a reviewer for bitmaps
+Date: Thu, 17 Oct 2019 17:54:35 -0400
+Message-Id: <20191017215436.14252-19-jsnow@redhat.com>
 In-Reply-To: <20191017215436.14252-1-jsnow@redhat.com>
 References: <20191017215436.14252-1-jsnow@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.29]); Thu, 17 Oct 2019 21:54:55 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.31]); Thu, 17 Oct 2019 21:55:31 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
@@ -78,146 +79,42 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+I already try to make sure all bitmaps patches have been reviewed by both
+Red Hat and Virtuozzo anyway, so this formalizes the arrangement.
 
-Drop meta bitmaps, as they are unused.
+Fam meanwhile is no longer as active, so I am removing him as a co-mainta=
+iner
+simply to reflect the current practice.
 
-Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Reviewed-by: John Snow <jsnow@redhat.com>
-Message-id: 20190916141911.5255-2-vsementsov@virtuozzo.com
 Signed-off-by: John Snow <jsnow@redhat.com>
+Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-id: 20191005194448.16629-2-jsnow@redhat.com
 ---
- include/block/dirty-bitmap.h |  5 ----
- block/dirty-bitmap.c         | 46 ------------------------------------
- 2 files changed, 51 deletions(-)
+ MAINTAINERS | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-diff --git a/include/block/dirty-bitmap.h b/include/block/dirty-bitmap.h
-index 07503b03b5..973056778a 100644
---- a/include/block/dirty-bitmap.h
-+++ b/include/block/dirty-bitmap.h
-@@ -18,9 +18,6 @@ BdrvDirtyBitmap *bdrv_create_dirty_bitmap(BlockDriverSt=
-ate *bs,
-                                           uint32_t granularity,
-                                           const char *name,
-                                           Error **errp);
--void bdrv_create_meta_dirty_bitmap(BdrvDirtyBitmap *bitmap,
--                                   int chunk_size);
--void bdrv_release_meta_dirty_bitmap(BdrvDirtyBitmap *bitmap);
- int bdrv_dirty_bitmap_create_successor(BlockDriverState *bs,
-                                        BdrvDirtyBitmap *bitmap,
-                                        Error **errp);
-@@ -54,7 +51,6 @@ void bdrv_set_dirty_bitmap(BdrvDirtyBitmap *bitmap,
-                            int64_t offset, int64_t bytes);
- void bdrv_reset_dirty_bitmap(BdrvDirtyBitmap *bitmap,
-                              int64_t offset, int64_t bytes);
--BdrvDirtyBitmapIter *bdrv_dirty_meta_iter_new(BdrvDirtyBitmap *bitmap);
- BdrvDirtyBitmapIter *bdrv_dirty_iter_new(BdrvDirtyBitmap *bitmap);
- void bdrv_dirty_iter_free(BdrvDirtyBitmapIter *iter);
+diff --git a/MAINTAINERS b/MAINTAINERS
+index fe4dc51b08..250ce8e7a1 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -1816,8 +1816,8 @@ F: qapi/transaction.json
+ T: git https://repo.or.cz/qemu/armbru.git block-next
 =20
-@@ -96,7 +92,6 @@ void bdrv_reset_dirty_bitmap_locked(BdrvDirtyBitmap *bi=
-tmap,
- int64_t bdrv_dirty_iter_next(BdrvDirtyBitmapIter *iter);
- void bdrv_set_dirty_iter(BdrvDirtyBitmapIter *hbi, int64_t offset);
- int64_t bdrv_get_dirty_count(BdrvDirtyBitmap *bitmap);
--int64_t bdrv_get_meta_dirty_count(BdrvDirtyBitmap *bitmap);
- void bdrv_dirty_bitmap_truncate(BlockDriverState *bs, int64_t bytes);
- bool bdrv_dirty_bitmap_readonly(const BdrvDirtyBitmap *bitmap);
- bool bdrv_has_readonly_bitmaps(BlockDriverState *bs);
-diff --git a/block/dirty-bitmap.c b/block/dirty-bitmap.c
-index 03e0872b97..4ecf18d5df 100644
---- a/block/dirty-bitmap.c
-+++ b/block/dirty-bitmap.c
-@@ -31,7 +31,6 @@
- struct BdrvDirtyBitmap {
-     QemuMutex *mutex;
-     HBitmap *bitmap;            /* Dirty bitmap implementation */
--    HBitmap *meta;              /* Meta dirty bitmap */
-     bool busy;                  /* Bitmap is busy, it can't be used via =
-QMP */
-     BdrvDirtyBitmap *successor; /* Anonymous child, if any. */
-     char *name;                 /* Optional non-empty unique ID */
-@@ -127,36 +126,6 @@ BdrvDirtyBitmap *bdrv_create_dirty_bitmap(BlockDrive=
-rState *bs,
-     return bitmap;
- }
+ Dirty Bitmaps
+-M: Fam Zheng <fam@euphon.net>
+ M: John Snow <jsnow@redhat.com>
++R: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+ L: qemu-block@nongnu.org
+ S: Supported
+ F: util/hbitmap.c
+@@ -1826,7 +1826,6 @@ F: include/qemu/hbitmap.h
+ F: include/block/dirty-bitmap.h
+ F: tests/test-hbitmap.c
+ F: docs/interop/bitmaps.rst
+-T: git https://github.com/famz/qemu.git bitmaps
+ T: git https://github.com/jnsnow/qemu.git bitmaps
 =20
--/* bdrv_create_meta_dirty_bitmap
-- *
-- * Create a meta dirty bitmap that tracks the changes of bits in @bitmap=
-. I.e.
-- * when a dirty status bit in @bitmap is changed (either from reset to s=
-et or
-- * the other way around), its respective meta dirty bitmap bit will be m=
-arked
-- * dirty as well.
-- *
-- * @bitmap: the block dirty bitmap for which to create a meta dirty bitm=
-ap.
-- * @chunk_size: how many bytes of bitmap data does each bit in the meta =
-bitmap
-- * track.
-- */
--void bdrv_create_meta_dirty_bitmap(BdrvDirtyBitmap *bitmap,
--                                   int chunk_size)
--{
--    assert(!bitmap->meta);
--    qemu_mutex_lock(bitmap->mutex);
--    bitmap->meta =3D hbitmap_create_meta(bitmap->bitmap,
--                                       chunk_size * BITS_PER_BYTE);
--    qemu_mutex_unlock(bitmap->mutex);
--}
--
--void bdrv_release_meta_dirty_bitmap(BdrvDirtyBitmap *bitmap)
--{
--    assert(bitmap->meta);
--    qemu_mutex_lock(bitmap->mutex);
--    hbitmap_free_meta(bitmap->bitmap);
--    bitmap->meta =3D NULL;
--    qemu_mutex_unlock(bitmap->mutex);
--}
--
- int64_t bdrv_dirty_bitmap_size(const BdrvDirtyBitmap *bitmap)
- {
-     return bitmap->size;
-@@ -320,7 +289,6 @@ static void bdrv_release_dirty_bitmap_locked(BdrvDirt=
-yBitmap *bitmap)
-     assert(!bitmap->active_iterators);
-     assert(!bdrv_dirty_bitmap_busy(bitmap));
-     assert(!bdrv_dirty_bitmap_has_successor(bitmap));
--    assert(!bitmap->meta);
-     QLIST_REMOVE(bitmap, list);
-     hbitmap_free(bitmap->bitmap);
-     g_free(bitmap->name);
-@@ -666,15 +634,6 @@ BdrvDirtyBitmapIter *bdrv_dirty_iter_new(BdrvDirtyBi=
-tmap *bitmap)
-     return iter;
- }
-=20
--BdrvDirtyBitmapIter *bdrv_dirty_meta_iter_new(BdrvDirtyBitmap *bitmap)
--{
--    BdrvDirtyBitmapIter *iter =3D g_new(BdrvDirtyBitmapIter, 1);
--    hbitmap_iter_init(&iter->hbi, bitmap->meta, 0);
--    iter->bitmap =3D bitmap;
--    bitmap->active_iterators++;
--    return iter;
--}
--
- void bdrv_dirty_iter_free(BdrvDirtyBitmapIter *iter)
- {
-     if (!iter) {
-@@ -821,11 +780,6 @@ int64_t bdrv_get_dirty_count(BdrvDirtyBitmap *bitmap=
-)
-     return hbitmap_count(bitmap->bitmap);
- }
-=20
--int64_t bdrv_get_meta_dirty_count(BdrvDirtyBitmap *bitmap)
--{
--    return hbitmap_count(bitmap->meta);
--}
--
- bool bdrv_dirty_bitmap_readonly(const BdrvDirtyBitmap *bitmap)
- {
-     return bitmap->readonly;
+ Character device backends
 --=20
 2.21.0
 
