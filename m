@@ -4,62 +4,113 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_2 autolearn=ham autolearn_force=no version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 42EACECE58E
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 09:01:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E4E1FA3732
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 09:09:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 16C062089C
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 09:01:41 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 16C062089C
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id 43F392089C
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 09:09:45 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 43F392089C
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40222 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40332 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iL1fA-0004s3-5g
-	for qemu-devel@archiver.kernel.org; Thu, 17 Oct 2019 05:01:40 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49354)
+	id 1iL1my-0007OC-FF
+	for qemu-devel@archiver.kernel.org; Thu, 17 Oct 2019 05:09:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49859)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <groug@kaod.org>) id 1iL1e5-0004GQ-8F
- for qemu-devel@nongnu.org; Thu, 17 Oct 2019 05:00:38 -0400
+ (envelope-from <laurent@vivier.eu>) id 1iL1m8-0006Ya-Bf
+ for qemu-devel@nongnu.org; Thu, 17 Oct 2019 05:08:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <groug@kaod.org>) id 1iL1e3-0004l1-Ff
- for qemu-devel@nongnu.org; Thu, 17 Oct 2019 05:00:32 -0400
-Received: from 2.mo68.mail-out.ovh.net ([46.105.52.162]:59762)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <groug@kaod.org>) id 1iL1e3-0004h6-94
- for qemu-devel@nongnu.org; Thu, 17 Oct 2019 05:00:31 -0400
-Received: from player771.ha.ovh.net (unknown [10.108.57.245])
- by mo68.mail-out.ovh.net (Postfix) with ESMTP id E267C1472FB
- for <qemu-devel@nongnu.org>; Thu, 17 Oct 2019 11:00:28 +0200 (CEST)
-Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
- [82.253.208.248]) (Authenticated sender: groug@kaod.org)
- by player771.ha.ovh.net (Postfix) with ESMTPSA id 6F80BB13AF12;
- Thu, 17 Oct 2019 09:00:22 +0000 (UTC)
-Date: Thu, 17 Oct 2019 11:00:19 +0200
-From: Greg Kurz <groug@kaod.org>
-To: =?UTF-8?B?Q8OpZHJpYw==?= Le Goater <clg@kaod.org>
-Subject: Re: [RFC 5/5] spapr: Work around spurious warnings from vfio INTx
- initialization
-Message-ID: <20191017110019.3c900fbc@bahia.lan>
-In-Reply-To: <3cded480-ce51-eef7-dc75-686022a18726@kaod.org>
-References: <20191017054218.8876-1-david@gibson.dropbear.id.au>
- <20191017054218.8876-6-david@gibson.dropbear.id.au>
- <3cded480-ce51-eef7-dc75-686022a18726@kaod.org>
-X-Mailer: Claws Mail 3.17.4 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+ (envelope-from <laurent@vivier.eu>) id 1iL1m7-0001Wa-1Y
+ for qemu-devel@nongnu.org; Thu, 17 Oct 2019 05:08:52 -0400
+Received: from mout.kundenserver.de ([212.227.126.134]:36997)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1iL1m6-0001VB-Oo
+ for qemu-devel@nongnu.org; Thu, 17 Oct 2019 05:08:50 -0400
+Received: from [192.168.100.1] ([78.238.229.36]) by mrelayeu.kundenserver.de
+ (mreue011 [213.165.67.103]) with ESMTPSA (Nemesis) id
+ 1N7Qgn-1hyNYT2dlF-017nOi; Thu, 17 Oct 2019 11:08:40 +0200
+Subject: Re: [PATCH] ui: fix keymap file search in input-barrier object
+References: <20190923220658.27007-1-laurent@vivier.eu>
+To: Gerd Hoffmann <kraxel@redhat.com>
+From: Laurent Vivier <laurent@vivier.eu>
+Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
+ 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
+Message-ID: <3aeb80b7-0c8b-7baa-aa99-f654e43b1537@vivier.eu>
+Date: Thu, 17 Oct 2019 11:08:38 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-Ovh-Tracer-Id: 3291005431517714827
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrjeejgdduudcutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
+In-Reply-To: <20190923220658.27007-1-laurent@vivier.eu>
+Content-Type: text/plain; charset=utf-8
+Content-Language: fr
+Content-Transfer-Encoding: 8bit
+X-Provags-ID: V03:K1:fPqL7UAr2uV4DF+CjU6JzX/gXJcY/B1zN2n+nXKKOEkNCrCsft/
+ NaSu0wzprTcTqw7nQJl+MQ5800Fu012R9Q70xjHdQuVuYV2RdQATbY1YS84SYsNwm26RDaU
+ ZDLYNCSAWjTh6gv/tvEudGGpyPrntrvPHEyPRb9roW20WQ1hC2uOAB3Ek10IQE5HHkgG6PI
+ BRJUsafE8UVxGvcnJmIiA==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:ASvA9nVmmT0=:PNhjpTC29xSm2GQU4rchAf
+ QNJB76kcMfqC0C8utUlWNd1DzAtoBhuA5d76kGlmyTcL3rTVPFzCKfBvkHuJhNvQAiuSq2Oo0
+ KwD0fzAWzwkVMdKj16raChJ9B/t5T8gwGY5KPajbDTm5tF/ZOUIsIwfU/0F+ggSOd06mxaTxZ
+ v2kGYraf2XTmBGhFlUPzd2rNAFxQ5PGBXnFNr66hwx/Q5s0O5AlKM+LNlF6zTxph373a+0ClM
+ 2m/p8W1yydBMgU005AAnyfA/XNzHiAl5XTmQ2uHsI0nv0EzBsqv0J2nm7mgqoUyKHxYnem+Hx
+ tlMzbDjihWUvyQi7hZIQyXFw/48iguv/4NXWCVhpZLs2XnBJIVNkh63iJzZPUY9R92ff7KRKB
+ cBoUTYcut6bc6hSnlBnMoklgVGZ41JeReuQcry0c11+wzBVhkFCjH246JDnJN5xKbAB9lL/cR
+ vyQO7sNAyQNDFOjynyeQNt/7KAkQSCvA6hlKvKQHKJLLgh6TT+2l22K6GnHtytiQ5DNFYADV7
+ lrs2xNR1ydogom85y/+3Jg9AuhNbvmuYTMOozWwl4X5OgsGBR1G+V32T1OO4G5PyD/lqfcisx
+ +oUYsEsz5QqDYkcRM61DwCQE/zC4ZG6+BNHvUKXtRuPew/CjuOIvWS8pBho1ZpMQc7QcIf9Z/
+ fEPWwPS55f0B66791LhbvflG7yftigxdskTgYapN7WKC7y4mmQO2qjqPnrCqUgFOAW+0fFg9f
+ fAaLw+TPy7voak9ZBvRsqjV+fiLGfeRUy8wiOZYoRcOF7SCkJ16Rr7/g4w1pNzQSp1AJIUCu/
+ cmmPxJBbYj6X8/P82spVU3j5/OEy11FQ64QBLf7XYup5ScJgF9HSd2Fc8lU181h3CGiJGxmZC
+ 8xJmUTJ839FVNGEdF1d1wx6dSO8/1lans3bJmp2ZQ=
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 46.105.52.162
+X-Received-From: 212.227.126.134
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -71,123 +122,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: aik@ozlabs.ru, alex.williamson@redhat.com, qemu-ppc@nongnu.org,
- qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
+Cc: Anthony PERARD <anthony.perard@citrix.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, 17 Oct 2019 10:43:11 +0200
-C=C3=A9dric Le Goater <clg@kaod.org> wrote:
+Ping?
 
-> On 17/10/2019 07:42, David Gibson wrote:
-> > Traditional PCI INTx for vfio devices can only perform well if using
-> > an in-kernel irqchip.  Therefore, vfio_intx_update() issues a warning
-> > if an in kernel irqchip is not available.
-> >=20
-> > We usually do have an in-kernel irqchip available for pseries machines
-> > on POWER hosts.  However, because the platform allows feature
-> > negotiation of what interrupt controller model to use, we don't
-> > currently initialize it until machine reset.  vfio_intx_update() is
-> > called (first) from vfio_realize() before that, so it can issue a
-> > spurious warning, even if we will have an in kernel irqchip by the
-> > time we need it.
-> >=20
-> > To workaround this, make a call to spapr_irq_update_active_intc() from
-> > spapr_irq_init() which is called at machine realize time, before the
-> > vfio realize.  This call will be pretty much obsoleted by the later
-> > call at reset time, but it serves to suppress the spurious warning
-> > from VFIO.
-> >=20
-> > Cc: Alex Williamson <alex.williamson@redhat.com>
-> > Cc: Alexey Kardashevskiy <aik@ozlabs.ru>
-> >=20
-> > Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-> > ---
-> >  hw/ppc/spapr_irq.c | 11 ++++++++++-
-> >  1 file changed, 10 insertions(+), 1 deletion(-)
-> >=20
-> > diff --git a/hw/ppc/spapr_irq.c b/hw/ppc/spapr_irq.c
-> > index 45544b8976..bb91c61fa0 100644
-> > --- a/hw/ppc/spapr_irq.c
-> > +++ b/hw/ppc/spapr_irq.c
-> > @@ -345,6 +345,14 @@ void spapr_irq_init(SpaprMachineState *spapr, Erro=
-r **errp)
-> > =20
-> >      spapr->qirqs =3D qemu_allocate_irqs(spapr_set_irq, spapr,
-> >                                        smc->nr_xirqs + SPAPR_XIRQ_BASE);
-> > +
-> > +    /*
-> > +     * Mostly we don't actually need this until reset, except that not
-> > +     * having this set up can cause VFIO devices to issue a
-> > +     * false-positive warning during realize(), because they don't yet
-> > +     * have an in-kernel irq chip.
-> > +     */
-> > +    spapr_irq_update_active_intc(spapr);
->=20
-> This will call the de/activate hooks of the irq chip very early=20
-> before reset and CAS, and won't call them at reset if the intc
-> pointers are the same (xive only for instance). It breaks very=20
-> obviously the emulated XIVE device which won't reset the OS CAM=20
-> line with the CPU id values and CPU notification will be broken.
->=20
-
-Yes. The problem is that we now have a new path:
-
-spapr_irq_init()
- spapr_irq_update_active_intc()
-  set_active_intc()
-   spapr_xive_activate()
-
-and we go there before the CPUs are realized:
-
-(gdb) p cpus
-$6 =3D {tqh_first =3D 0x0, tqh_circ =3D {tql_next =3D 0x0,=20
-    tql_prev =3D 0x100f203a8 <cpus>}}
-
-spapr_xive_activate() thus doesn't reset the OS CAM line.
-
-When the initial machine reset happens later, CPUs are
-present but we don't go down the activate path since XIVE
-is already active.
-
-Commenting away the following check in set_active_intc() is enough
-to fix:
-
-    if (new_intc =3D=3D spapr->active_intc) {
-        /* Nothing to do */
-        return;
-    }
-
-but this also reveals that handling the OS CAM line reset in
-spapr_xive_activate() only may be a bit fragile since it obviously
-requires CPUs to be present... Maybe this should also be done by
-the CPUs on their realize path ?
-
-> We have to find something else.
->=20
->=20
-> >  }
-> > =20
-> >  int spapr_irq_claim(SpaprMachineState *spapr, int irq, bool lsi, Error=
- **errp)
-> > @@ -500,7 +508,8 @@ void spapr_irq_update_active_intc(SpaprMachineState=
- *spapr)
-> >           * this.
-> >           */
-> >          new_intc =3D SPAPR_INTC(spapr->xive);
-> > -    } else if (spapr_ovec_test(spapr->ov5_cas, OV5_XIVE_EXPLOIT)) {
-> > +    } else if (spapr->ov5_cas
-> > +               && spapr_ovec_test(spapr->ov5_cas, OV5_XIVE_EXPLOIT)) {
->=20
-> This change can go in another patch.
->=20
-> C.=20
->=20
-> >          new_intc =3D SPAPR_INTC(spapr->xive);
-> >      } else {
-> >          new_intc =3D SPAPR_INTC(spapr->ics);
-> >=20
->=20
+Le 24/09/2019 à 00:06, Laurent Vivier a écrit :
+> If we try to start QEMU with "-k en-us", qemu prints a message and exits
+> with:
+> 
+>     qemu-system-i386: could not read keymap file: 'en-us'
+> 
+> It's because this function is called way too early, before
+> qemu_add_data_dir() is called, and so qemu_find_file() fails.
+> 
+> To fix that, move init_keyboard_layout() from the class init function to the
+> instance init function.
+> 
+> Reported-by: Anthony PERARD <anthony.perard@citrix.com>
+> Fixes: 6105683da35b ("ui: add an embedded Barrier client")
+> Signed-off-by: Laurent Vivier <laurent@vivier.eu>
+> ---
+>  ui/input-barrier.c | 14 +++++++-------
+>  1 file changed, 7 insertions(+), 7 deletions(-)
+> 
+> diff --git a/ui/input-barrier.c b/ui/input-barrier.c
+> index a2c961f285a4..fe35049b83a2 100644
+> --- a/ui/input-barrier.c
+> +++ b/ui/input-barrier.c
+> @@ -682,6 +682,13 @@ static void input_barrier_instance_init(Object *obj)
+>  {
+>      InputBarrier *ib = INPUT_BARRIER(obj);
+>  
+> +    /* always use generic keymaps */
+> +    if (keyboard_layout && !kbd_layout) {
+> +        /* We use X11 key id, so use VNC name2keysym */
+> +        kbd_layout = init_keyboard_layout(name2keysym, keyboard_layout,
+> +                                          &error_fatal);
+> +    }
+> +
+>      ib->saddr.type = SOCKET_ADDRESS_TYPE_INET;
+>      ib->saddr.u.inet.host = g_strdup("localhost");
+>      ib->saddr.u.inet.port = g_strdup("24800");
+> @@ -719,13 +726,6 @@ static void input_barrier_class_init(ObjectClass *oc, void *data)
+>      UserCreatableClass *ucc = USER_CREATABLE_CLASS(oc);
+>  
+>      ucc->complete = input_barrier_complete;
+> -
+> -    /* always use generic keymaps */
+> -    if (keyboard_layout) {
+> -        /* We use X11 key id, so use VNC name2keysym */
+> -        kbd_layout = init_keyboard_layout(name2keysym, keyboard_layout,
+> -                                          &error_fatal);
+> -    }
+>  }
+>  
+>  static const TypeInfo input_barrier_info = {
+> 
 
 
