@@ -2,75 +2,91 @@ Return-Path: <SRS0=yZS3=YK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AAA80FA372A
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 10:48:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6BEE2FA372A
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 10:57:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 844F720869
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 10:48:09 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 844F720869
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 4177620869
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 10:57:35 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4177620869
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43452 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43624 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iL3KB-0007XT-28
-	for qemu-devel@archiver.kernel.org; Thu, 17 Oct 2019 06:48:07 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39366)
+	id 1iL3TK-0003bW-En
+	for qemu-devel@archiver.kernel.org; Thu, 17 Oct 2019 06:57:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41835)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1iL3I6-0005zh-60
- for qemu-devel@nongnu.org; Thu, 17 Oct 2019 06:45:59 -0400
+ (envelope-from <philmd@redhat.com>) id 1iL3SS-00038O-Eh
+ for qemu-devel@nongnu.org; Thu, 17 Oct 2019 06:56:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1iL3I4-0004eQ-M7
- for qemu-devel@nongnu.org; Thu, 17 Oct 2019 06:45:58 -0400
-Received: from indium.canonical.com ([91.189.90.7]:40330)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1iL3I4-0004e2-G5
- for qemu-devel@nongnu.org; Thu, 17 Oct 2019 06:45:56 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1iL3I2-0006sd-L0
- for <qemu-devel@nongnu.org>; Thu, 17 Oct 2019 10:45:54 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id A530B2E80EA
- for <qemu-devel@nongnu.org>; Thu, 17 Oct 2019 10:45:53 +0000 (UTC)
+ (envelope-from <philmd@redhat.com>) id 1iL3SQ-00022I-B2
+ for qemu-devel@nongnu.org; Thu, 17 Oct 2019 06:56:39 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40526)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iL3SQ-00021g-3I
+ for qemu-devel@nongnu.org; Thu, 17 Oct 2019 06:56:38 -0400
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id A69A63CBE2
+ for <qemu-devel@nongnu.org>; Thu, 17 Oct 2019 10:56:36 +0000 (UTC)
+Received: by mail-wm1-f69.google.com with SMTP id z205so961650wmb.7
+ for <qemu-devel@nongnu.org>; Thu, 17 Oct 2019 03:56:36 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=wu5u7KI0XMs64BWGJ0e74lh478FbAVJbyhcQ98bW4RQ=;
+ b=uGPF6ZjQkxJpRizJO0/5f+D3jd0ITSp/i1cpIHN9J6fjLaA9K33Ch58jH1GMGBZEQw
+ RhHpNMW3iVoqlJT9BXFceio8HgjR/3p0iiw5TghPcG6ZVgdNIAk7lgWhJcSkJXI1rwDl
+ hUfsRQuW9qqWofBuTANSdBHk6htbu9Vq5+2Aoj6XmuddMKGKN29hqP8FIYhosGaPHXnq
+ kalyxfKT4lXOcMXO7ikW9wDySRw+/W8zXe6rOMVxsummDiCxdPWSgOEWb74YG7JHartB
+ 1uoLdeMw3dfeCGAAtbBzz3eDjBYikTWUzIC5bIvm1WBIOUM4ehS7fEDOcVHSW5SLJdWJ
+ B5rw==
+X-Gm-Message-State: APjAAAXEUcEyLQNdUCGzfVZgW1/yPvx7Ql4JTKosIqNa+7KTh4LQSxFn
+ 5AoMqGgnLsNd72WhWUcOGzunvBilRYoc8IdDtw6ZPxmDesGtgGmZe3PncIjtJFLrN8w7NE3mmYM
+ Iq71+vBtNoPMarv4=
+X-Received: by 2002:a7b:c773:: with SMTP id x19mr2247101wmk.157.1571309795418; 
+ Thu, 17 Oct 2019 03:56:35 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqwHR8f8SQMXO1nEgnjev2E29jT9jApGgMj3PYJK5PXnAgs+EmF2Gdqw0H0hGPKqlBjWFMA0mA==
+X-Received: by 2002:a7b:c773:: with SMTP id x19mr2247077wmk.157.1571309795229; 
+ Thu, 17 Oct 2019 03:56:35 -0700 (PDT)
+Received: from [192.168.1.36] (14.red-88-21-201.staticip.rima-tde.net.
+ [88.21.201.14])
+ by smtp.gmail.com with ESMTPSA id f83sm1882500wmf.43.2019.10.17.03.56.33
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Thu, 17 Oct 2019 03:56:34 -0700 (PDT)
+Subject: Re: [PATCH v10 13/15] docs/microvm.rst: document the new microvm
+ machine type
+To: Sergio Lopez <slp@redhat.com>
+References: <20191016101241.24405-1-slp@redhat.com>
+ <20191016101241.24405-14-slp@redhat.com>
+ <d981516f-f23a-47f5-d825-a101fdaaf471@redhat.com> <87ftjrhcq7.fsf@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <6e84a3fb-0ded-6302-af44-a1d70eea60fa@redhat.com>
+Date: Thu, 17 Oct 2019 12:56:33 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <87ftjrhcq7.fsf@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Date: Thu, 17 Oct 2019 10:34:36 -0000
-From: Daniel 'f0o' Preussker <1838569@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug: distribution=ubuntu; sourcepackage=qemu; component=main;
- status=Confirmed; importance=Undecided; assignee=None; 
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: bjoern-teipel dgilbert-h dpreussker janitor paelzer
-X-Launchpad-Bug-Reporter: Bjoern Teipel (bjoern-teipel)
-X-Launchpad-Bug-Modifier: Daniel 'f0o' Preussker (dpreussker)
-References: <156460681322.6584.3709701644111615718.malonedeb@soybean.canonical.com>
-Message-Id: <157130847639.25749.5890791683465001559.malone@chaenomeles.canonical.com>
-Subject: [Bug 1838569] Re: virtio-balloon change breaks post 4.0 upgrade
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="186023fa645d8be19d403a76064f0643f510db2f";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: f4c85f353a0ad1104557ce67506de11a9a74c466
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 91.189.90.7
+X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -79,112 +95,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1838569 <1838569@bugs.launchpad.net>
+Cc: ehabkost@redhat.com, mst@redhat.com, qemu-devel@nongnu.org, groug@kaod.org,
+ kraxel@redhat.com, pbonzini@redhat.com, imammedo@redhat.com,
+ sgarzare@redhat.com, lersek@redhat.com, rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-With recent release of OpenStack Train this issue reappears...
+On 10/17/19 12:45 PM, Sergio Lopez wrote:
+>=20
+> Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> writes:
+>=20
+>> Hi Sergio,
+>>
+>> On 10/16/19 12:12 PM, Sergio Lopez wrote:
+>>> +Supported devices
+>>> +-----------------
+>>> +
+>>> +The microvm machine type supports the following devices:
+>>> +
+>>> +- ISA bus
+>>> +- i8259 PIC (optional)
+>>> +- i8254 PIT (optional)
+>>> +- MC146818 RTC (optional)
+>>> +- One ISA serial port (optional)
+>>> +- LAPIC
+>>> +- IOAPIC (with kernel-irqchip=3Dsplit by default)
+>>> +- kvmclock (if using KVM)
+>>> +- fw_cfg
+>>> +- Up to eight virtio-mmio devices (configured by the user)
+>>
+>> If we have VirtIO devices, why not use virtio-serial instead of the
+>> one on the ISA bus?
+>=20
+> The serial port on the ISA bus is simpler, and thus is supported for
+> both SeaBIOS debugging and Linux's earlyprintk. This makes it *very*
+> convenient for debugging boot issues.
 
-Upgrading from Stein to Train will require all VMs to be hard-rebooted
-to be migrated as a final step because Live Migration fails with:
+"... but it's also compatible with SeaBIOS"
 
-Oct 17 10:28:43 h2.1.openstack.r0cket.net libvirtd[1545]: Unable to read fr=
-om monitor: Connection reset by peer
-Oct 17 10:28:43 h2.1.openstack.r0cket.net libvirtd[1545]: internal error: q=
-emu unexpectedly closed the monitor: 2019-10-17T10:28:42.981201Z qemu-syste=
-m-x86_64: get_pci_config_device: Bad config data: i=3D0x10 read: a1 device:=
- 1 cmask: ff wmask: c0 w1cmask:0
-                                                          2019-10-17T10:28:=
-42.981250Z qemu-system-x86_64: Failed to load PCIDevice:config
-                                                          2019-10-17T10:28:=
-42.981263Z qemu-system-x86_64: Failed to load virtio-balloon:virtio
-                                                          2019-10-17T10:28:=
-42.981272Z qemu-system-x86_64: error while loading state for instance 0x0 o=
-f device '0000:00:05.0/virtio-balloon'
-                                                          2019-10-17T10:28:=
-42.981391Z qemu-system-x86_64: warning: TSC frequency mismatch between VM (=
-2532609 kHz) and host (2532608 kHz), and TSC scaling unavailable
-                                                          2019-10-17T10:28:=
-42.983157Z qemu-system-x86_64: warning: TSC frequency mismatch between VM (=
-2532609 kHz) and host (2532608 kHz), and TSC scaling unavailable
-                                                          2019-10-17T10:28:=
-42.983672Z qemu-system-x86_64: load of migration failed: Invalid argument
+OK. Maybe we can add a comment such "These devices are the minimum=20
+required to run SeaBIOS" in the 'Supported devices' section.
 
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1838569
-
-Title:
-  virtio-balloon change breaks post 4.0 upgrade
-
-Status in QEMU:
-  New
-Status in qemu package in Ubuntu:
-  Confirmed
-
-Bug description:
-  We upgraded the libvirt UCA packages from 3.6 to 4.0 and qemu 2.10 to 2.1=
-1  as part of a queens upgrade and noticed that
-  virtio-ballon is broken when instances live migrate (started with a prior=
- 3.6 version)  with:
-
-  2019-07-24T06:46:49.487109Z qemu-system-x86_64: warning: Unknown firmware=
- file in legacy mode: etc/msr_feature_control
-  2019-07-24T06:47:22.187749Z qemu-system-x86_64: VQ 2 size 0x80 < last_ava=
-il_idx 0xb57 - used_idx 0xb59
-  2019-07-24T06:47:22.187768Z qemu-system-x86_64: Failed to load virtio-bal=
-loon:virtio
-  2019-07-24T06:47:22.187771Z qemu-system-x86_64: error while loading state=
- for instance 0x0 of device '0000:00:05.0/virtio-balloon'
-  2019-07-24T06:47:22.188194Z qemu-system-x86_64: load of migration failed:=
- Operation not permitted
-  2019-07-24 06:47:22.430+0000: shutting down, reason=3Dfailed
-
-  This seem to be the exact problem as reported by
-  https://lists.gnu.org/archive/html/qemu-devel/2019-07/msg02228.html
-
-  Listed the packages which changed:
-
-  Start-Date: 2019-07-06  06:40:55
-  Commandline: /usr/bin/apt-get -y -o Dpkg::Options::=3D--force-confdef -o =
-Dpkg::Options::=3D--force-confold install libvirt-bin python-libvirt qemu q=
-emu-utils qemu-system qemu-system-arm qemu-system-mips qemu-system-ppc qemu=
--system-sparc qemu-system-x86 qemu-system-misc qemu-block-extra qemu-utils =
-qemu-user qemu-kvm
-  Install: librdmacm1:amd64 (17.1-1ubuntu0.1~cloud0, automatic), libvirt-da=
-emon-driver-storage-rbd:amd64 (4.0.0-1ubuntu8.10~cloud0, automatic), ipxe-q=
-emu-256k-compat-efi-roms:amd64 (1.0.0+git-20150424.a25a16d-0ubuntu2~cloud0,=
- automatic)
-  Upgrade: qemu-system-mips:amd64 (1:2.10+dfsg-0ubuntu3.8~cloud1, 1:2.11+df=
-sg-1ubuntu7.13~cloud0), qemu-system-misc:amd64 (1:2.10+dfsg-0ubuntu3.8~clou=
-d1, 1:2.11+dfsg-1ubuntu7.13~cloud0), qemu-system-ppc:amd64 (1:2.10+dfsg-0ub=
-untu3.8~cloud1, 1:2.11+dfsg-1ubuntu7.13~cloud0), python-libvirt:amd64 (3.5.=
-0-1build1~cloud0, 4.0.0-1~cloud0), qemu-system-x86:amd64 (1:2.10+dfsg-0ubun=
-tu3.8~cloud1, 1:2.11+dfsg-1ubuntu7.13~cloud0), libvirt-clients:amd64 (3.6.0=
--1ubuntu6.8~cloud0, 4.0.0-1ubuntu8.10~cloud0), qemu-user:amd64 (1:2.10+dfsg=
--0ubuntu3.8~cloud1, 1:2.11+dfsg-1ubuntu7.13~cloud0), libvirt-bin:amd64 (3.6=
-.0-1ubuntu6.8~cloud0, 4.0.0-1ubuntu8.10~cloud0), qemu:amd64 (1:2.10+dfsg-0u=
-buntu3.8~cloud1, 1:2.11+dfsg-1ubuntu7.13~cloud0), qemu-utils:amd64 (1:2.10+=
-dfsg-0ubuntu3.8~cloud1, 1:2.11+dfsg-1ubuntu7.13~cloud0), libvirt-daemon-sys=
-tem:amd64 (3.6.0-1ubuntu6.8~cloud0, 4.0.0-1ubuntu8.10~cloud0), qemu-system-=
-sparc:amd64 (1:2.10+dfsg-0ubuntu3.8~cloud1, 1:2.11+dfsg-1ubuntu7.13~cloud0)=
-, qemu-user-binfmt:amd64 (1:2.10+dfsg-0ubuntu3.8~cloud1, 1:2.11+dfsg-1ubunt=
-u7.13~cloud0), qemu-kvm:amd64 (1:2.10+dfsg-0ubuntu3.8~cloud1, 1:2.11+dfsg-1=
-ubuntu7.13~cloud0), libvirt0:amd64 (3.6.0-1ubuntu6.8~cloud0, 4.0.0-1ubuntu8=
-.10~cloud0), qemu-system-arm:amd64 (1:2.10+dfsg-0ubuntu3.8~cloud1, 1:2.11+d=
-fsg-1ubuntu7.13~cloud0), qemu-block-extra:amd64 (1:2.10+dfsg-0ubuntu3.8~clo=
-ud1, 1:2.11+dfsg-1ubuntu7.13~cloud0), qemu-system-common:amd64 (1:2.10+dfsg=
--0ubuntu3.8~cloud1, 1:2.11+dfsg-1ubuntu7.13~cloud0), qemu-system:amd64 (1:2=
-.10+dfsg-0ubuntu3.8~cloud1, 1:2.11+dfsg-1ubuntu7.13~cloud0), libvirt-daemon=
-:amd64 (3.6.0-1ubuntu6.8~cloud0, 4.0.0-1ubuntu8.10~cloud0)
-  End-Date: 2019-07-06  06:41:08
-
-  At this point the instances would have to be hard rebooted or
-  stopped/started to fix the issue for future live migration attemps
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1838569/+subscriptions
+>=20
+> Also, as it's explained in the documentation, users that no longer need
+> it can disable the device and just rely on virtio-console.
+>=20
+> Sergio.
+>=20
 
