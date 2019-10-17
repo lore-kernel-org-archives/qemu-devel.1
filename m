@@ -2,140 +2,86 @@ Return-Path: <SRS0=yZS3=YK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.4 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D8179ECE58E
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 19:40:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 95C4DECE58D
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 20:17:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A75F720650
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 19:40:36 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A75F720650
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 4809320869
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 20:17:49 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LT8/D1nw"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4809320869
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58218 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58946 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iLBdT-0000yG-TO
-	for qemu-devel@archiver.kernel.org; Thu, 17 Oct 2019 15:40:35 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42906)
+	id 1iLCDU-000841-C1
+	for qemu-devel@archiver.kernel.org; Thu, 17 Oct 2019 16:17:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49624)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jsnow@redhat.com>) id 1iLBcT-0008SG-Cn
- for qemu-devel@nongnu.org; Thu, 17 Oct 2019 15:39:34 -0400
+ (envelope-from <aleksandar.m.mail@gmail.com>) id 1iLCCk-0007bu-Gw
+ for qemu-devel@nongnu.org; Thu, 17 Oct 2019 16:17:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1iLBcR-0000QY-VO
- for qemu-devel@nongnu.org; Thu, 17 Oct 2019 15:39:32 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54838)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1iLBcR-0000Q1-N2
- for qemu-devel@nongnu.org; Thu, 17 Oct 2019 15:39:31 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id B48BD2A09BF;
- Thu, 17 Oct 2019 19:39:30 +0000 (UTC)
-Received: from [10.18.17.173] (dhcp-17-173.bos.redhat.com [10.18.17.173])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 0C3355C1B5;
- Thu, 17 Oct 2019 19:39:29 +0000 (UTC)
-Subject: Re: [PATCH] configure: Require Python >= 3.5
-To: Kevin Wolf <kwolf@redhat.com>
-References: <20191016224237.26180-1-ehabkost@redhat.com>
- <7146bebf-6e99-f27a-3753-d48dea1977f9@redhat.com>
- <20191017112121.GA9233@localhost.localdomain>
-From: John Snow <jsnow@redhat.com>
-Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
- 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
-Message-ID: <c9e18dc9-0c94-601c-f4c7-735aedc9a92b@redhat.com>
-Date: Thu, 17 Oct 2019 15:39:29 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.0
+ (envelope-from <aleksandar.m.mail@gmail.com>) id 1iLCCj-0007zL-4A
+ for qemu-devel@nongnu.org; Thu, 17 Oct 2019 16:17:02 -0400
+Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:37920)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
+ id 1iLCCi-0007yt-Uk
+ for qemu-devel@nongnu.org; Thu, 17 Oct 2019 16:17:01 -0400
+Received: by mail-ot1-x341.google.com with SMTP id e11so3032993otl.5
+ for <qemu-devel@nongnu.org>; Thu, 17 Oct 2019 13:17:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:in-reply-to:references:from:date:message-id:subject:to
+ :cc; bh=lPikBztTwrznI9bZxTqDNGMe94Wng8kpLIKl8jgo5Ts=;
+ b=LT8/D1nwlbi29IegoOzl3deU8DX4QDYVfmx+CK1C+eyFswClNqpBMK/QqGp0wr/0BF
+ xWD+xf/ZiZgV+JwXAW28Ru3VuIuWaDL98682oRThft145J5tqFsa9vloP6P2vOhLjKww
+ 7z30QcmYJ4mD6h/QSvjDdWDZsu19OS3TkfT2ZGFecRgJVUFWSdmeFpLT5TcSskM7H4Ig
+ jYut1dTTHKEU1iNJ4BNaRWIdK7qny9U++bKY1KPE3U4cwTnMIqXvenDoXPQQ4xM9PoUn
+ Ob09R6Klg/TPHFn1kufsx/9RlhN72QWgiGU1UtuW3tqbyMpWUY1uNa5JbCv2WyAKbsri
+ RjFA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:in-reply-to:references:from:date
+ :message-id:subject:to:cc;
+ bh=lPikBztTwrznI9bZxTqDNGMe94Wng8kpLIKl8jgo5Ts=;
+ b=YNuqQu+WU05qrdLx3sqAHKzJSQ3OcGRzl+ggpLTdpyxhJlP4zONWNyYZTXLaUpEkxb
+ 0kFNn41qtONGLfzegZqzBaHvdB1sk6oZGz4kaQjaNQJlh9qbLOuDl0LsxOZY6utC3rBC
+ LvKc+sutILTdnF8KFAZ6jSyI1tFu81dHBQuIlzhPAltxsurptxrdF+WH5B3Ak/fwSIff
+ uailyuk0jVln+fl/YvOaweFNSiub94kHRk940IFQ9gER9CeUY4OYVg9nFZW/nftyGhTC
+ CfxxXIwlQO7eJJHM7NLFCb0+76+T8k7KGRwZZmwMgQ92ihkCpNLS5oJZfN4MRdtp1Re6
+ c1kg==
+X-Gm-Message-State: APjAAAX+uKXNDkDuYosGmoVzMQ9xRtbfY3Ntz9B/qs09GCdu+ThyPyaf
+ A/2cNyWr5cD7C1Je9IeiAYTGfJlaEKMj3ttS/MQ=
+X-Google-Smtp-Source: APXvYqykcfycEbcjiTOBxPtxqBVLEQhNYBceYvYcPb9DMJh6h6PetMQHp4x7G0EYG+Aysu3JSEKIyAhNILjLSRQ7qpQ=
+X-Received: by 2002:a05:6830:1d8f:: with SMTP id
+ y15mr4344701oti.121.1571343419914; 
+ Thu, 17 Oct 2019 13:16:59 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20191017112121.GA9233@localhost.localdomain>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.38]); Thu, 17 Oct 2019 19:39:30 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.132.183.28
+Received: by 2002:a9d:340a:0:0:0:0:0 with HTTP; Thu, 17 Oct 2019 13:16:59
+ -0700 (PDT)
+In-Reply-To: <CAK4993gm=8tVXyprjHPMiNZuKZRkx0iDYnXh76cQfMwUayqcWQ@mail.gmail.com>
+References: <20191014161843.84845-1-mrolnik@gmail.com>
+ <20191014161843.84845-5-mrolnik@gmail.com>
+ <CAL1e-=g9ER4tuqEL2ubqb7oAbatcVR8x+A0LAydSwBJEnk9_ow@mail.gmail.com>
+ <CAK4993gm=8tVXyprjHPMiNZuKZRkx0iDYnXh76cQfMwUayqcWQ@mail.gmail.com>
+From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+Date: Thu, 17 Oct 2019 22:16:59 +0200
+Message-ID: <CAL1e-=hGJQqVnvAu=ZJRV-AdoAWpkSvdf5ex=b7EwkodUGKpUg@mail.gmail.com>
+Subject: Re: [PATCH v32 04/13] target/avr: Add instruction translation -
+ Registers definition
+To: Michael Rolnik <mrolnik@gmail.com>
+Content-Type: multipart/alternative; boundary="0000000000005d471f059520e6ef"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::341
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -147,49 +93,300 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>,
- Cleber Rosa <crosa@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>,
- qemu-devel@nongnu.org
+Cc: "thuth@redhat.com" <thuth@redhat.com>,
+ "richard.henderson@linaro.org" <richard.henderson@linaro.org>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "dovgaluk@ispras.ru" <dovgaluk@ispras.ru>,
+ "imammedo@redhat.com" <imammedo@redhat.com>,
+ "philmd@redhat.com" <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+--0000000000005d471f059520e6ef
+Content-Type: text/plain; charset="UTF-8"
+
+>
+>
+> >> +static TCGv cpu_Cf;
+> >> +static TCGv cpu_Zf;
+> >> +static TCGv cpu_Nf;
+> >> +static TCGv cpu_Vf;
+> >> +static TCGv cpu_Sf;
+> >> +static TCGv cpu_Hf;
+> >> +static TCGv cpu_Tf;
+> >> +static TCGv cpu_If;
+> >> +
+> >
+> >
+> > Hello, Michael,
+> >
+> > Is there any particular reason or motivation beyond modelling status
+> register flags as TCGv variables?
 
 
-On 10/17/19 7:21 AM, Kevin Wolf wrote:
-> Am 17.10.2019 um 00:48 hat John Snow geschrieben:
->>
->>
->> On 10/16/19 6:42 PM, Eduardo Habkost wrote:
->>> Python 3.5 is the oldest Python version available on our
->>> supported build platforms, and Python 2 end of life will be 3
->>> weeks after the planned release date of QEMU 4.2.0.  Drop Python
->>> 2 support from configure completely, and require Python 3.5 or
->>> newer.
->>>
->>> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
->>
->> Seems like a good time and place to mention this. Kevin, you require
->> 3.6+ for iotests, which are -- at present -- invoked as part of "make
->> check".
->>
->> Do we care? Basically, this just means that iotests won't run for
->> systems that don't have 3.6+, which would be platforms like Debian 9 --
->> which is why ehabkost is choosing 3.5 here.
-> 
-> I think we were aware of this when we made the change to iotests. That
-> all tests of the current upstream QEMU version are run on Debian
-> oldstable (with the distro Python version) is, to say the least, not a
-> priority for me. They must not fail, but I'd say skipping is fine.
-> 
-> And actually, we should still have a reasonable coverage there with the
-> shell-based test cases.
-> 
-> Kevin
-> 
 
-This seems like a weirdly arbitrary decision for a benefit that's not
-clear to me. Is it because you want variable annotations?
+I think it's easier this way as I don't need to convert flag values to
+> bits or bits to flag values.
 
-(Well, regardless, you're the ranger in charge of this forest.)
+
+Ok. But, how do you map 0/1 flag value to the value of a TCGv variable and
+vice versa? In other words, what value or values (out of 2^32 vales) of a
+TCGv variable mean the flag is 1? And the same question for 0.
+
+Is 0110000111000010100 one or zero?
+
+Besides, in such arrangement, how do you display the 8-bit status register
+in gdb, if at all?
+
+A.
+
+
+> >
+> > A.
+> >
+> >
+> >
+> >>
+> >> +static TCGv cpu_rampD;
+> >> +static TCGv cpu_rampX;
+> >> +static TCGv cpu_rampY;
+> >> +static TCGv cpu_rampZ;
+> >> +
+> >> +static TCGv cpu_r[NO_CPU_REGISTERS];
+> >> +static TCGv cpu_eind;
+> >> +static TCGv cpu_sp;
+> >> +
+> >> +static TCGv cpu_skip;
+> >> +
+> >> +static const char reg_names[NO_CPU_REGISTERS][8] = {
+> >> +    "r0",  "r1",  "r2",  "r3",  "r4",  "r5",  "r6",  "r7",
+> >> +    "r8",  "r9",  "r10", "r11", "r12", "r13", "r14", "r15",
+> >> +    "r16", "r17", "r18", "r19", "r20", "r21", "r22", "r23",
+> >> +    "r24", "r25", "r26", "r27", "r28", "r29", "r30", "r31",
+> >> +};
+> >> +#define REG(x) (cpu_r[x])
+> >> +
+> >> +enum {
+> >> +    DISAS_EXIT   = DISAS_TARGET_0,  /* We want return to the cpu main
+> loop.  */
+> >> +    DISAS_LOOKUP = DISAS_TARGET_1,  /* We have a variable condition
+> exit.  */
+> >> +    DISAS_CHAIN  = DISAS_TARGET_2,  /* We have a single condition
+> exit.  */
+> >> +};
+> >> +
+> >> +typedef struct DisasContext DisasContext;
+> >> +
+> >> +/* This is the state at translation time. */
+> >> +struct DisasContext {
+> >> +    TranslationBlock *tb;
+> >> +
+> >> +    CPUAVRState *env;
+> >> +    CPUState *cs;
+> >> +
+> >> +    target_long npc;
+> >> +    uint32_t opcode;
+> >> +
+> >> +    /* Routine used to access memory */
+> >> +    int memidx;
+> >> +    int bstate;
+> >> +    int singlestep;
+> >> +
+> >> +    TCGv skip_var0;
+> >> +    TCGv skip_var1;
+> >> +    TCGCond skip_cond;
+> >> +    bool free_skip_var0;
+> >> +};
+> >> +
+> >> +static int to_A(DisasContext *ctx, int indx) { return 16 + (indx %
+> 16); }
+> >> +static int to_B(DisasContext *ctx, int indx) { return 16 + (indx % 8);
+> }
+> >> +static int to_C(DisasContext *ctx, int indx) { return 24 + (indx % 4)
+> * 2; }
+> >> +static int to_D(DisasContext *ctx, int indx) { return (indx % 16) * 2;
+> }
+> >> +
+> >> +static uint16_t next_word(DisasContext *ctx)
+> >> +{
+> >> +    return cpu_lduw_code(ctx->env, ctx->npc++ * 2);
+> >> +}
+> >> +
+> >> +static int append_16(DisasContext *ctx, int x)
+> >> +{
+> >> +    return x << 16 | next_word(ctx);
+> >> +}
+> >> +
+> >> +
+> >> +static bool avr_have_feature(DisasContext *ctx, int feature)
+> >> +{
+> >> +    if (!avr_feature(ctx->env, feature)) {
+> >> +        gen_helper_unsupported(cpu_env);
+> >> +        ctx->bstate = DISAS_NORETURN;
+> >> +        return false;
+> >> +    }
+> >> +    return true;
+> >> +}
+> >> +
+> >> +static bool decode_insn(DisasContext *ctx, uint16_t insn);
+> >> +#include "decode_insn.inc.c"
+> >> +
+> >> --
+> >> 2.17.2 (Apple Git-113)
+> >>
+>
+>
+> --
+> Best Regards,
+> Michael Rolnik
+>
+
+--0000000000005d471f059520e6ef
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+<blockquote class=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;border-left:1p=
+x #ccc solid;padding-left:1ex"><br>
+&gt;&gt; +static TCGv cpu_Cf;<br>
+&gt;&gt; +static TCGv cpu_Zf;<br>
+&gt;&gt; +static TCGv cpu_Nf;<br>
+&gt;&gt; +static TCGv cpu_Vf;<br>
+&gt;&gt; +static TCGv cpu_Sf;<br>
+&gt;&gt; +static TCGv cpu_Hf;<br>
+&gt;&gt; +static TCGv cpu_Tf;<br>
+&gt;&gt; +static TCGv cpu_If;<br>
+&gt;&gt; +<br>
+&gt;<br>
+&gt;<br>
+&gt; Hello, Michael,<br>
+&gt;<br>
+&gt; Is there any particular reason or motivation beyond modelling status r=
+egister flags as TCGv variables?</blockquote><blockquote class=3D"gmail_quo=
+te" style=3D"margin:0 0 0 .8ex;border-left:1px #ccc solid;padding-left:1ex"=
+>=C2=A0</blockquote><blockquote class=3D"gmail_quote" style=3D"margin:0 0 0=
+ .8ex;border-left:1px #ccc solid;padding-left:1ex">
+I think it&#39;s easier this way as I don&#39;t need to convert flag values=
+ to<br>
+bits or bits to flag values.</blockquote><div><br></div><div>Ok. But, how d=
+o you map 0/1 flag value to the value of a TCGv variable and vice versa? In=
+ other words, what value or values (out of 2^32 vales) of a TCGv variable m=
+ean the flag is 1? And the same question for 0.</div><div><br></div><div>Is=
+ 0110000111000010100 one or zero?</div><div><br></div><div>Besides, in such=
+ arrangement, how do you display the 8-bit status register in gdb, if at al=
+l?</div><div><br></div><div>A.</div><div>=C2=A0</div><blockquote class=3D"g=
+mail_quote" style=3D"margin:0 0 0 .8ex;border-left:1px #ccc solid;padding-l=
+eft:1ex">
+&gt;<br>
+&gt; A.<br>
+&gt;<br>
+&gt;<br>
+&gt;<br>
+&gt;&gt;<br>
+&gt;&gt; +static TCGv cpu_rampD;<br>
+&gt;&gt; +static TCGv cpu_rampX;<br>
+&gt;&gt; +static TCGv cpu_rampY;<br>
+&gt;&gt; +static TCGv cpu_rampZ;<br>
+&gt;&gt; +<br>
+&gt;&gt; +static TCGv cpu_r[NO_CPU_REGISTERS];<br>
+&gt;&gt; +static TCGv cpu_eind;<br>
+&gt;&gt; +static TCGv cpu_sp;<br>
+&gt;&gt; +<br>
+&gt;&gt; +static TCGv cpu_skip;<br>
+&gt;&gt; +<br>
+&gt;&gt; +static const char reg_names[NO_CPU_REGISTERS][8] =3D {<br>
+&gt;&gt; +=C2=A0 =C2=A0 &quot;r0&quot;,=C2=A0 &quot;r1&quot;,=C2=A0 &quot;r=
+2&quot;,=C2=A0 &quot;r3&quot;,=C2=A0 &quot;r4&quot;,=C2=A0 &quot;r5&quot;,=
+=C2=A0 &quot;r6&quot;,=C2=A0 &quot;r7&quot;,<br>
+&gt;&gt; +=C2=A0 =C2=A0 &quot;r8&quot;,=C2=A0 &quot;r9&quot;,=C2=A0 &quot;r=
+10&quot;, &quot;r11&quot;, &quot;r12&quot;, &quot;r13&quot;, &quot;r14&quot=
+;, &quot;r15&quot;,<br>
+&gt;&gt; +=C2=A0 =C2=A0 &quot;r16&quot;, &quot;r17&quot;, &quot;r18&quot;, =
+&quot;r19&quot;, &quot;r20&quot;, &quot;r21&quot;, &quot;r22&quot;, &quot;r=
+23&quot;,<br>
+&gt;&gt; +=C2=A0 =C2=A0 &quot;r24&quot;, &quot;r25&quot;, &quot;r26&quot;, =
+&quot;r27&quot;, &quot;r28&quot;, &quot;r29&quot;, &quot;r30&quot;, &quot;r=
+31&quot;,<br>
+&gt;&gt; +};<br>
+&gt;&gt; +#define REG(x) (cpu_r[x])<br>
+&gt;&gt; +<br>
+&gt;&gt; +enum {<br>
+&gt;&gt; +=C2=A0 =C2=A0 DISAS_EXIT=C2=A0 =C2=A0=3D DISAS_TARGET_0,=C2=A0 /*=
+ We want return to the cpu main loop.=C2=A0 */<br>
+&gt;&gt; +=C2=A0 =C2=A0 DISAS_LOOKUP =3D DISAS_TARGET_1,=C2=A0 /* We have a=
+ variable condition exit.=C2=A0 */<br>
+&gt;&gt; +=C2=A0 =C2=A0 DISAS_CHAIN=C2=A0 =3D DISAS_TARGET_2,=C2=A0 /* We h=
+ave a single condition exit.=C2=A0 */<br>
+&gt;&gt; +};<br>
+&gt;&gt; +<br>
+&gt;&gt; +typedef struct DisasContext DisasContext;<br>
+&gt;&gt; +<br>
+&gt;&gt; +/* This is the state at translation time. */<br>
+&gt;&gt; +struct DisasContext {<br>
+&gt;&gt; +=C2=A0 =C2=A0 TranslationBlock *tb;<br>
+&gt;&gt; +<br>
+&gt;&gt; +=C2=A0 =C2=A0 CPUAVRState *env;<br>
+&gt;&gt; +=C2=A0 =C2=A0 CPUState *cs;<br>
+&gt;&gt; +<br>
+&gt;&gt; +=C2=A0 =C2=A0 target_long npc;<br>
+&gt;&gt; +=C2=A0 =C2=A0 uint32_t opcode;<br>
+&gt;&gt; +<br>
+&gt;&gt; +=C2=A0 =C2=A0 /* Routine used to access memory */<br>
+&gt;&gt; +=C2=A0 =C2=A0 int memidx;<br>
+&gt;&gt; +=C2=A0 =C2=A0 int bstate;<br>
+&gt;&gt; +=C2=A0 =C2=A0 int singlestep;<br>
+&gt;&gt; +<br>
+&gt;&gt; +=C2=A0 =C2=A0 TCGv skip_var0;<br>
+&gt;&gt; +=C2=A0 =C2=A0 TCGv skip_var1;<br>
+&gt;&gt; +=C2=A0 =C2=A0 TCGCond skip_cond;<br>
+&gt;&gt; +=C2=A0 =C2=A0 bool free_skip_var0;<br>
+&gt;&gt; +};<br>
+&gt;&gt; +<br>
+&gt;&gt; +static int to_A(DisasContext *ctx, int indx) { return 16 + (indx =
+% 16); }<br>
+&gt;&gt; +static int to_B(DisasContext *ctx, int indx) { return 16 + (indx =
+% 8); }<br>
+&gt;&gt; +static int to_C(DisasContext *ctx, int indx) { return 24 + (indx =
+% 4) * 2; }<br>
+&gt;&gt; +static int to_D(DisasContext *ctx, int indx) { return (indx % 16)=
+ * 2; }<br>
+&gt;&gt; +<br>
+&gt;&gt; +static uint16_t next_word(DisasContext *ctx)<br>
+&gt;&gt; +{<br>
+&gt;&gt; +=C2=A0 =C2=A0 return cpu_lduw_code(ctx-&gt;env, ctx-&gt;npc++ * 2=
+);<br>
+&gt;&gt; +}<br>
+&gt;&gt; +<br>
+&gt;&gt; +static int append_16(DisasContext *ctx, int x)<br>
+&gt;&gt; +{<br>
+&gt;&gt; +=C2=A0 =C2=A0 return x &lt;&lt; 16 | next_word(ctx);<br>
+&gt;&gt; +}<br>
+&gt;&gt; +<br>
+&gt;&gt; +<br>
+&gt;&gt; +static bool avr_have_feature(DisasContext *ctx, int feature)<br>
+&gt;&gt; +{<br>
+&gt;&gt; +=C2=A0 =C2=A0 if (!avr_feature(ctx-&gt;env, feature)) {<br>
+&gt;&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 gen_helper_unsupported(cpu_<wbr>env);=
+<br>
+&gt;&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 ctx-&gt;bstate =3D DISAS_NORETURN;<br=
+>
+&gt;&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 return false;<br>
+&gt;&gt; +=C2=A0 =C2=A0 }<br>
+&gt;&gt; +=C2=A0 =C2=A0 return true;<br>
+&gt;&gt; +}<br>
+&gt;&gt; +<br>
+&gt;&gt; +static bool decode_insn(DisasContext *ctx, uint16_t insn);<br>
+&gt;&gt; +#include &quot;decode_insn.inc.c&quot;<br>
+&gt;&gt; +<br>
+&gt;&gt; --<br>
+&gt;&gt; 2.17.2 (Apple Git-113)<br>
+&gt;&gt;<br>
+<br>
+<br>
+-- <br>
+Best Regards,<br>
+Michael Rolnik<br>
+</blockquote>
+
+--0000000000005d471f059520e6ef--
 
