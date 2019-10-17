@@ -2,56 +2,90 @@ Return-Path: <SRS0=yZS3=YK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DCE21FA372A
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 11:32:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7571DECE58E
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 11:33:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B052A20659
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 11:32:01 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B052A20659
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=rt-rk.com
+	by mail.kernel.org (Postfix) with ESMTPS id 4B97E20659
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 11:33:30 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4B97E20659
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44310 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44370 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iL40e-00044l-S1
-	for qemu-devel@archiver.kernel.org; Thu, 17 Oct 2019 07:32:00 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46647)
+	id 1iL425-000597-FO
+	for qemu-devel@archiver.kernel.org; Thu, 17 Oct 2019 07:33:29 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47321)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <stefan.brankovic@rt-rk.com>) id 1iL3wc-0008FA-MM
- for qemu-devel@nongnu.org; Thu, 17 Oct 2019 07:27:52 -0400
+ (envelope-from <mreitz@redhat.com>) id 1iL40t-0004UB-MI
+ for qemu-devel@nongnu.org; Thu, 17 Oct 2019 07:32:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <stefan.brankovic@rt-rk.com>) id 1iL3wb-0007KC-54
- for qemu-devel@nongnu.org; Thu, 17 Oct 2019 07:27:50 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:33347 helo=mail.rt-rk.com)
+ (envelope-from <mreitz@redhat.com>) id 1iL40s-0008Sg-Li
+ for qemu-devel@nongnu.org; Thu, 17 Oct 2019 07:32:15 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34095)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <stefan.brankovic@rt-rk.com>)
- id 1iL3wa-0007Iq-RF
- for qemu-devel@nongnu.org; Thu, 17 Oct 2019 07:27:49 -0400
-Received: from localhost (localhost [127.0.0.1])
- by mail.rt-rk.com (Postfix) with ESMTP id 829CD1A21BA;
- Thu, 17 Oct 2019 13:27:43 +0200 (CEST)
-X-Virus-Scanned: amavisd-new at rt-rk.com
-Received: from rtrkw870-lin.domain.local (rtrkw870-lin.domain.local
- [10.10.14.77])
- by mail.rt-rk.com (Postfix) with ESMTPSA id 1312C1A21DA;
- Thu, 17 Oct 2019 13:27:43 +0200 (CEST)
-From: Stefan Brankovic <stefan.brankovic@rt-rk.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v7 3/3] target/ppc: Optimize emulation of vupkhpx and vupklpx
- instructions
-Date: Thu, 17 Oct 2019 13:27:39 +0200
-Message-Id: <1571311659-15556-4-git-send-email-stefan.brankovic@rt-rk.com>
-X-Mailer: git-send-email 2.7.4
-In-Reply-To: <1571311659-15556-1-git-send-email-stefan.brankovic@rt-rk.com>
-References: <1571311659-15556-1-git-send-email-stefan.brankovic@rt-rk.com>
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [fuzzy]
-X-Received-From: 89.216.37.149
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>)
+ id 1iL40q-0008S0-Ak; Thu, 17 Oct 2019 07:32:12 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 781622A09AA;
+ Thu, 17 Oct 2019 11:32:11 +0000 (UTC)
+Received: from dresden.str.redhat.com (ovpn-117-3.ams2.redhat.com
+ [10.36.117.3])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 1B358600C4;
+ Thu, 17 Oct 2019 11:32:09 +0000 (UTC)
+Subject: Re: [PATCH v2 1/3] iotests: Fix 173
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+References: <20191015193503.25591-1-eblake@redhat.com>
+ <20191015193503.25591-2-eblake@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <1c7014e3-055a-a15b-5c8a-48e3a7e99aaa@redhat.com>
+Date: Thu, 17 Oct 2019 13:32:08 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.0
+MIME-Version: 1.0
+In-Reply-To: <20191015193503.25591-2-eblake@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="BVx1nme8ptos2xMxnPppn5uxE1g6uZCTz"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.38]); Thu, 17 Oct 2019 11:32:11 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -63,181 +97,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: stefan.brankovic@rt-rk.com, richard.henderson@linaro.org,
- david@gibson.dropbear.id.au
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-'trans_vupkpx' function implements both vupkhpx and vupklpx instructions with
-argument 'high' determine which instruction is processed. Instructions are
-implemented in two 'for' loops. Outer 'for' loop repeats unpacking two times,
-since both doubleword elements of destination register are formed the same way.
-It also stores result of every iteration in temporary register, that is later
-transferred to destination register. Inner 'for' loop does unpacking of pixels
-and forms resulting doubleword 32 by 32 bits.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--BVx1nme8ptos2xMxnPppn5uxE1g6uZCTz
+Content-Type: multipart/mixed; boundary="OFyi71kmiQqhwLndjKn4uEEvqJjjdbBKT"
 
-Signed-off-by: Stefan Brankovic <stefan.brankovic@rt-rk.com>
----
- target/ppc/helper.h                 |  2 -
- target/ppc/int_helper.c             | 20 --------
- target/ppc/translate/vmx-impl.inc.c | 91 ++++++++++++++++++++++++++++++++++++-
- 3 files changed, 89 insertions(+), 24 deletions(-)
+--OFyi71kmiQqhwLndjKn4uEEvqJjjdbBKT
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
-diff --git a/target/ppc/helper.h b/target/ppc/helper.h
-index b489b38..fd06b56 100644
---- a/target/ppc/helper.h
-+++ b/target/ppc/helper.h
-@@ -233,8 +233,6 @@ DEF_HELPER_2(vextsh2d, void, avr, avr)
- DEF_HELPER_2(vextsw2d, void, avr, avr)
- DEF_HELPER_2(vnegw, void, avr, avr)
- DEF_HELPER_2(vnegd, void, avr, avr)
--DEF_HELPER_2(vupkhpx, void, avr, avr)
--DEF_HELPER_2(vupklpx, void, avr, avr)
- DEF_HELPER_2(vupkhsb, void, avr, avr)
- DEF_HELPER_2(vupkhsh, void, avr, avr)
- DEF_HELPER_2(vupkhsw, void, avr, avr)
-diff --git a/target/ppc/int_helper.c b/target/ppc/int_helper.c
-index f910c11..9ee667d 100644
---- a/target/ppc/int_helper.c
-+++ b/target/ppc/int_helper.c
-@@ -1737,26 +1737,6 @@ void helper_vsum4ubs(CPUPPCState *env, ppc_avr_t *r, ppc_avr_t *a, ppc_avr_t *b)
- #define UPKHI 0
- #define UPKLO 1
- #endif
--#define VUPKPX(suffix, hi)                                              \
--    void helper_vupk##suffix(ppc_avr_t *r, ppc_avr_t *b)                \
--    {                                                                   \
--        int i;                                                          \
--        ppc_avr_t result;                                               \
--                                                                        \
--        for (i = 0; i < ARRAY_SIZE(r->u32); i++) {                      \
--            uint16_t e = b->u16[hi ? i : i + 4];                        \
--            uint8_t a = (e >> 15) ? 0xff : 0;                           \
--            uint8_t r = (e >> 10) & 0x1f;                               \
--            uint8_t g = (e >> 5) & 0x1f;                                \
--            uint8_t b = e & 0x1f;                                       \
--                                                                        \
--            result.u32[i] = (a << 24) | (r << 16) | (g << 8) | b;       \
--        }                                                               \
--        *r = result;                                                    \
--    }
--VUPKPX(lpx, UPKLO)
--VUPKPX(hpx, UPKHI)
--#undef VUPKPX
- 
- #define VUPK(suffix, unpacked, packee, hi)                              \
-     void helper_vupk##suffix(ppc_avr_t *r, ppc_avr_t *b)                \
-diff --git a/target/ppc/translate/vmx-impl.inc.c b/target/ppc/translate/vmx-impl.inc.c
-index 3550ffa..09d80d6 100644
---- a/target/ppc/translate/vmx-impl.inc.c
-+++ b/target/ppc/translate/vmx-impl.inc.c
-@@ -1031,6 +1031,95 @@ static void trans_vclzd(DisasContext *ctx)
-     tcg_temp_free_i64(avr);
- }
- 
-+/*
-+ * vupkhpx VRT,VRB - Vector Unpack High Pixel
-+ * vupklpx VRT,VRB - Vector Unpack Low Pixel
-+ *
-+ * Unpacks 4 pixels coded in 1-5-5-5 pattern from high/low doubleword element
-+ * of source register into contigous array of bits in the destination register.
-+ * Argument 'high' determines if high or low doubleword element of source
-+ * register is processed.
-+ */
-+static void trans_vupkpx(DisasContext *ctx, int high)
-+{
-+    int VT = rD(ctx->opcode);
-+    int VB = rB(ctx->opcode);
-+    TCGv_i64 tmp = tcg_temp_new_i64();
-+    TCGv_i64 avr = tcg_temp_new_i64();
-+    TCGv_i64 result = tcg_temp_new_i64();
-+    TCGv_i64 result1 = tcg_temp_new_i64();
-+    TCGv_i64 result2 = tcg_temp_new_i64();
-+    int64_t mask1 = 0x1fULL;
-+    int64_t mask2 = 0x1fULL << 8;
-+    int64_t mask3 = 0x1fULL << 16;
-+    int64_t mask4 = 0xffULL << 56;
-+    int i, j;
-+
-+    if (high == 1) {
-+        get_avr64(avr, VB, true);
-+    } else {
-+        get_avr64(avr, VB, false);
-+    }
-+
-+    tcg_gen_movi_i64(result, 0x0ULL);
-+    for (i = 0; i < 2; i++) {
-+        for (j = 0; j < 2; j++) {
-+            tcg_gen_shli_i64(tmp, avr, (j * 16));
-+            tcg_gen_andi_i64(tmp, tmp, mask1 << (j * 32));
-+            tcg_gen_or_i64(result, result, tmp);
-+
-+            tcg_gen_shli_i64(tmp, avr, 3 + (j * 16));
-+            tcg_gen_andi_i64(tmp, tmp, mask2 << (j * 32));
-+            tcg_gen_or_i64(result, result, tmp);
-+
-+            tcg_gen_shli_i64(tmp, avr, 6 + (j * 16));
-+            tcg_gen_andi_i64(tmp, tmp, mask3 << (j * 32));
-+            tcg_gen_or_i64(result, result, tmp);
-+
-+            tcg_gen_shri_i64(tmp, avr, (j * 16));
-+            tcg_gen_ext16s_i64(tmp, tmp);
-+            tcg_gen_andi_i64(tmp, tmp, mask4);
-+            tcg_gen_shri_i64(tmp, tmp, (32 * (1 - j)));
-+            tcg_gen_or_i64(result, result, tmp);
-+        }
-+        if (i == 0) {
-+            tcg_gen_mov_i64(result1, result);
-+            tcg_gen_movi_i64(result, 0x0ULL);
-+            tcg_gen_shri_i64(avr, avr, 32);
-+        }
-+        if (i == 1) {
-+            tcg_gen_mov_i64(result2, result);
-+        }
-+    }
-+
-+    set_avr64(VT, result1, false);
-+    set_avr64(VT, result2, true);
-+
-+    tcg_temp_free_i64(tmp);
-+    tcg_temp_free_i64(avr);
-+    tcg_temp_free_i64(result);
-+    tcg_temp_free_i64(result1);
-+    tcg_temp_free_i64(result2);
-+}
-+
-+static void gen_vupkhpx(DisasContext *ctx)
-+{
-+    if (unlikely(!ctx->altivec_enabled)) {
-+        gen_exception(ctx, POWERPC_EXCP_VPU);
-+        return;
-+    }
-+    trans_vupkpx(ctx, 1);
-+}
-+
-+static void gen_vupklpx(DisasContext *ctx)
-+{
-+    if (unlikely(!ctx->altivec_enabled)) {
-+        gen_exception(ctx, POWERPC_EXCP_VPU);
-+        return;
-+    }
-+    trans_vupkpx(ctx, 0);
-+}
-+
- GEN_VXFORM(vmuloub, 4, 0);
- GEN_VXFORM(vmulouh, 4, 1);
- GEN_VXFORM(vmulouw, 4, 2);
-@@ -1348,8 +1437,6 @@ GEN_VXFORM_NOA(vupkhsw, 7, 25);
- GEN_VXFORM_NOA(vupklsb, 7, 10);
- GEN_VXFORM_NOA(vupklsh, 7, 11);
- GEN_VXFORM_NOA(vupklsw, 7, 27);
--GEN_VXFORM_NOA(vupkhpx, 7, 13);
--GEN_VXFORM_NOA(vupklpx, 7, 15);
- GEN_VXFORM_NOA_ENV(vrefp, 5, 4);
- GEN_VXFORM_NOA_ENV(vrsqrtefp, 5, 5);
- GEN_VXFORM_NOA_ENV(vexptefp, 5, 6);
--- 
-2.7.4
+On 15.10.19 21:35, Eric Blake wrote:
+> This test has been broken since 3.0.  It used TEST_IMG to influence
+> the name of a file created during _make_test_img, but commit 655ae6bb
+> changed things so that the wrong file name is being created, which
+> then caused _launch_qemu to fail.  In the meantime, the set of events
+> issued for the actions of the test has increased.
+>=20
+> Why haven't we noticed the failure? Because the test rarely gets run:
+> './check -qcow2 173' is insufficient (that defaults to using file proto=
+col)
+> './check -nfs 173' is insufficient (that defaults to using raw format)
+> so the test is only run with:
+> ./check -qcow2 -nfs 173
+>=20
+> Note that we already have a number of other problems with -nfs:
+> ./check -nfs (fails 18/30)
+> ./check -qcow2 -nfs (fails 45/76 after this patch)
+> and it's not on my priority list to fix those.  Rather, I found this
+> because of my next patch's work on tests using _send_qemu_cmd.
+>=20
+> Fixes: 655ae6b
+> Signed-off-by: Eric Blake <eblake@redhat.com>
+> ---
+>  tests/qemu-iotests/173     | 4 ++--
+>  tests/qemu-iotests/173.out | 6 +++++-
+>  2 files changed, 7 insertions(+), 3 deletions(-)
 
+Reviewed-by: Max Reitz <mreitz@redhat.com>
+
+
+--OFyi71kmiQqhwLndjKn4uEEvqJjjdbBKT--
+
+--BVx1nme8ptos2xMxnPppn5uxE1g6uZCTz
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl2oUTgACgkQ9AfbAGHV
+z0BMjQf/cAAgGoPCouEmslP2sr56PrXkXufH9ABwrnO9RqkGIsF7FMBXpl0uxdjp
+d7udeOqlWpNB1KezGsGBlMgVQcUFNywprtyrb8RVgFq+Gg9Aoi4WlsopIyVVW53Y
+e0tNSkoNo1kLn25bqtoSbjFkgBlIAV+T7nwUS2B07WOMaqFwmwCt+biwK7mFYDrZ
++PbmR+7i+SmSyNCqe5NSRxELg9O3WG3VoxhskSi+DKZ2ZQP734Cgy67K7LVkrFKV
+AO2KuP5lRWIH3KXZzXYzs+QkR+VRytl3t+HHSjr4qsHl/15JbwXcf0SAfF3rc1pA
+FHpc4Ppj/zs2sPHJiCqC/VHe7ARQ0A==
+=wTRe
+-----END PGP SIGNATURE-----
+
+--BVx1nme8ptos2xMxnPppn5uxE1g6uZCTz--
 
