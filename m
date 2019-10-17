@@ -2,128 +2,89 @@ Return-Path: <SRS0=yZS3=YK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.9 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 001F7ECE58E
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 17:20:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1AC5FECE58E
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 17:21:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C053720872
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 17:20:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9604C20872
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 17:21:27 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=nutanix.com header.i=@nutanix.com header.b="pmPRWocC"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C053720872
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=nutanix.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SBHaRncs"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9604C20872
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54138 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54178 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iL9RY-0005bW-U3
-	for qemu-devel@archiver.kernel.org; Thu, 17 Oct 2019 13:20:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40561)
+	id 1iL9Sn-0008Cp-TW
+	for qemu-devel@archiver.kernel.org; Thu, 17 Oct 2019 13:21:25 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41332)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <felipe@nutanix.com>) id 1iL8ob-0008Qd-KA
- for qemu-devel@nongnu.org; Thu, 17 Oct 2019 12:39:56 -0400
+ (envelope-from <msys.mizuma@gmail.com>) id 1iL8sq-0006ka-U6
+ for qemu-devel@nongnu.org; Thu, 17 Oct 2019 12:44:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <felipe@nutanix.com>) id 1iL8oZ-0003S6-Cz
- for qemu-devel@nongnu.org; Thu, 17 Oct 2019 12:39:52 -0400
-Received: from mx0b-002c1b01.pphosted.com ([148.163.155.12]:3090)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <felipe@nutanix.com>) id 1iL8oZ-0003RX-6W
- for qemu-devel@nongnu.org; Thu, 17 Oct 2019 12:39:51 -0400
-Received: from pps.filterd (m0127842.ppops.net [127.0.0.1])
- by mx0b-002c1b01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- x9HGU1ha025066; Thu, 17 Oct 2019 09:39:46 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nutanix.com;
- h=from : to : cc :
- subject : date : message-id : content-type : content-transfer-encoding :
- mime-version; s=proofpoint20171006;
- bh=bp5DMnv0anlavCrigTezZ4G/B950mX6P/T8viMbFf1A=;
- b=pmPRWocCtpBDaMz+duYhStMfxKgxlOlxIX/geuEnNJGUkZY7iW9zTLJfiu4d/06jcY0X
- MxMr6iCBxkeYJa1AoqXMMzk+dFm/s92fzv2HXUJ3Q24bt1LZJ+Re6FsJmmd8uxDlztDX
- m7YnBazeGRQ3KH3+5Z1SwPr4tDibRWt7S85wDxF1/rJQoH7hYctFP2ge6sBsTCspyii+
- RvL4J5VLSHerVj4esNEWRkwEFiG6jF7elMYxijQ8PF8KGp7OU1YFdQn7XQDhtdogfgJx
- taYI6b3rnqTXV5uzClkOp+vu8W4fe2qPtMRt2U6jhtevUZEcNC1M1ePcB+RfQSaGQZSi CQ== 
-Received: from nam01-by2-obe.outbound.protection.outlook.com
- (mail-by2nam01lp2052.outbound.protection.outlook.com [104.47.34.52])
- by mx0b-002c1b01.pphosted.com with ESMTP id 2vke5ekh88-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
- Thu, 17 Oct 2019 09:39:46 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=AQJZMIIvdcHUKE9M5fB1PCHBuCURw+eoJ9fzWIencpmsGrLdOM4jJNyXPjp4D9KeU0KBgEcC0CLLnJMY4b21HUsg4jeiMMNi2YjpmAOjfV/Ve/ZsnIeWaFY175ta+s02RpRkVQ/uBwDTnuswoCSBUdZmSVT/AX1tRMzN6XAMoquXJH7aglZ4m8WyVsnrpW3xhxNaGeoFSmxbqCNApVIXnc/7WBXS1ij20MtTinQZ3wc+pWPjTpbB7Ks/XhuL6OznwLLqgNELKYCw+WUSqJHoZO4AT+COPR7j2ruIdmSeqVraZhzuUdCUE9txGGVxVPiVhFaaIRjy8RGqaB8QMgGqcQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=bp5DMnv0anlavCrigTezZ4G/B950mX6P/T8viMbFf1A=;
- b=RdePpKPLK/ZwqesK3S7HcodfpXT91IJ/TxBbSZ0c1miWpAS0Yy/FIDnEPBa3DpHnwHxHhe/NNAeo7tq7R9MZmoHnKpuoU3olIgHjw6sGaMPe4InK/ufInm3JKnGgOXwrHBkvIVRpPKPxeUEfd7O5sxXgm+8qMN9opB0lZ7wYdmiOkcCOFqoUY/2SPv4S0xzgzECYKQwnyvXuzUxguH9bXd2L5gjAdTAnax8sNcqz2TO5o7j278rpblrzudUYSFVhAV5uFlG6YUaKtvEdvCKEIO8iGJq5zc61LVdj8WsnWtsTnf0t7obMGB65c1Y7eglbvPLByMbVNx2cdwPJBd5ksg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nutanix.com; dmarc=pass action=none header.from=nutanix.com;
- dkim=pass header.d=nutanix.com; arc=none
-Received: from MWHPR02MB2656.namprd02.prod.outlook.com (10.168.206.142) by
- MWHPR02MB2797.namprd02.prod.outlook.com (10.175.49.17) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2347.16; Thu, 17 Oct 2019 16:39:44 +0000
-Received: from MWHPR02MB2656.namprd02.prod.outlook.com
- ([fe80::7ca0:95fd:4b35:3435]) by MWHPR02MB2656.namprd02.prod.outlook.com
- ([fe80::7ca0:95fd:4b35:3435%6]) with mapi id 15.20.2347.023; Thu, 17 Oct 2019
- 16:39:44 +0000
-From: Felipe Franciosi <felipe@nutanix.com>
-To: Stefan Hajnoczi <stefanha@redhat.com>, Alex Williamson
- <alex.williamson@redhat.com>, "Dr . David Alan Gilbert"
- <dgilbert@redhat.com>, Felipe Franciosi <felipe@nutanix.com>
-Subject: [PATCH] vhost-user-scsi: implement handle_output
-Thread-Topic: [PATCH] vhost-user-scsi: implement handle_output
-Thread-Index: AQHVhQl71p+KRszYckq7k3pyTpDK5Q==
-Date: Thu, 17 Oct 2019 16:39:44 +0000
-Message-ID: <20191017163859.23184-1-felipe@nutanix.com>
-Accept-Language: en-GB, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-clientproxiedby: BYAPR08CA0053.namprd08.prod.outlook.com
- (2603:10b6:a03:117::30) To MWHPR02MB2656.namprd02.prod.outlook.com
- (2603:10b6:300:45::14)
-x-ms-exchange-messagesentrepresentingtype: 1
-x-mailer: git-send-email 2.20.1
-x-originating-ip: [62.254.189.133]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: cc49d3d8-cc3b-4c0c-143b-08d753209d60
-x-ms-traffictypediagnostic: MWHPR02MB2797:
-x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <MWHPR02MB2797F469091A67A5CC1E6D61D76D0@MWHPR02MB2797.namprd02.prod.outlook.com>
-x-proofpoint-crosstenant: true
-x-ms-oob-tlc-oobclassifiers: OLM:3513;
-x-forefront-prvs: 01930B2BA8
-x-forefront-antispam-report: SFV:NSPM;
- SFS:(10019020)(396003)(39860400002)(376002)(366004)(346002)(136003)(199004)(189003)(2906002)(8936002)(25786009)(305945005)(110136005)(7736002)(478600001)(99286004)(6486002)(6436002)(6116002)(3846002)(81156014)(81166006)(316002)(6512007)(66556008)(8676002)(66446008)(64756008)(66476007)(66946007)(50226002)(14454004)(14444005)(486006)(256004)(86362001)(2616005)(476003)(1076003)(4326008)(66066001)(6506007)(386003)(5660300002)(52116002)(71200400001)(71190400001)(7049001)(36756003)(186003)(26005)(102836004)(64030200001);
- DIR:OUT; SFP:1102; SCL:1; SRVR:MWHPR02MB2797;
- H:MWHPR02MB2656.namprd02.prod.outlook.com; FPR:; SPF:None; LANG:en;
- PTR:InfoNoRecords; A:1; MX:1; 
-received-spf: None (protection.outlook.com: nutanix.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: xFLljhRSvh8cebUr/dB+LgFspCk/HD2LVHsicasUnWveol2SZRvNvecfKz8Gir1fNy3ixNM2LgX0f7GqgootQxKVpWDiFRv0aBQP00sjUgPWG4wAKQzH/qU/BfDyCzjDLmcBJpm1AxY0jxSAaE3ysAw9hPQTUZV5t7/feYTHME/rUnjJjpLJz2hXgyeVfpRx0vNfIJQcqnrhUwmdQNeWfOcO3EIPwMy6rm8qleECCqvRPuW06ec8o1RiCFw6EBcyWJ95R+VQH6eYHgqe4qkhQyumLehOaIYnHsm/YPRKS1dx7TwH5Ed2KS7cg8uWzdDcgEEwlT6QKWJUrfSs1YEjoyO1GPRodQo41OkZVVQVRrJSbgLDJkUCqTLGWcoZLF38YJ81DzwOYuWeot7M9mVhVEun+rnOeEOkKCfDZOZDa3I=
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+ (envelope-from <msys.mizuma@gmail.com>) id 1iL8sm-0004UT-W0
+ for qemu-devel@nongnu.org; Thu, 17 Oct 2019 12:44:14 -0400
+Received: from mail-qk1-x741.google.com ([2607:f8b0:4864:20::741]:45166)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <msys.mizuma@gmail.com>)
+ id 1iL8sm-0004UH-Ro; Thu, 17 Oct 2019 12:44:12 -0400
+Received: by mail-qk1-x741.google.com with SMTP id z67so2455780qkb.12;
+ Thu, 17 Oct 2019 09:44:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:in-reply-to:user-agent;
+ bh=h9q8Pc+WDp35mofry08Rs0+qfTQt4B5s1h/hLQXXb9E=;
+ b=SBHaRncs3a0kSYLnMuDQ2muyXiWIgrUCkpK1KCiETHiI75NCpPWyLjXe6vK6HgoSEI
+ fxEqyf3n+TpsGpuqPqsLEG3Wce6SbNZj6YTjLT4p5rOr86qbpI+MaYFCY8X2EuwUk2Xa
+ 1out+lWnpgvjdgyqe/kY7kuS4KOvaITi8XJv9SNkYtOV4KILPBXtMdLdbXj3lsGKy151
+ uoRS48TlrhREY3qx19F84KCjJODd9lzfsPWiMgkCD9gNObAYaLZm3Ubve/XDzgc0Kc9W
+ 3pa3IrTr+0ZXpOEC6ZWgC+rLeW58y8+wq9jP5Q6BAlukaxgBgik2WfSuKPpceVWOOcSm
+ ZOcQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to:user-agent;
+ bh=h9q8Pc+WDp35mofry08Rs0+qfTQt4B5s1h/hLQXXb9E=;
+ b=tSdsczA/pwD4XbN8fQMb+LaQWICXxPww0BQC+CFSsQc096iEBh46KTnMnZuM10/csd
+ 23iR6IrTPBGxsnLAR8BEi6iJepeRjMKWfFmsfYUEYzH34EGaKEOxM/8vrgcgxjxFqDBo
+ WTGPu5Qt3SzmSbquULOuMyS3cnGRVAvraFf79iw6DWtwypVdZiv1YXn4lKXS4Q/yQVGP
+ o9ShwEdwfE50ncV4SiOxvLA8o6ooWKcxsXj6ky5Rkd/KX5TQpbHRGOnxYxPwMerrs21+
+ Y4mORL2dg08dqolZjcHIARk0mGWFQsx4DnPn0OorvncNXz6TYJ9Gf6122WYGivWBX8Bo
+ Y9qQ==
+X-Gm-Message-State: APjAAAUixrwKtuoggw/cH/LggSFUzaWc5Et3FEwGoFYAlm82LmS5c9i7
+ ixRWUSQ23kTtouTACk9hCg==
+X-Google-Smtp-Source: APXvYqw0Vpegw8MrL+WhVpa1I7mnkNgLDaaOE30Iz//GZDMH3rkNefouS7duIf10J5Dk5RZCSTz1lQ==
+X-Received: by 2002:a05:620a:896:: with SMTP id
+ b22mr4247013qka.216.1571330651957; 
+ Thu, 17 Oct 2019 09:44:11 -0700 (PDT)
+Received: from gabell (nat-pool-bos-t.redhat.com. [66.187.233.206])
+ by smtp.gmail.com with ESMTPSA id o38sm1871411qtc.39.2019.10.17.09.44.10
+ (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+ Thu, 17 Oct 2019 09:44:11 -0700 (PDT)
+Date: Thu, 17 Oct 2019 12:44:08 -0400
+From: Masayoshi Mizuma <msys.mizuma@gmail.com>
+To: Andrew Jones <drjones@redhat.com>
+Subject: Re: [PATCH v6 7/9] target/arm/kvm: scratch vcpu: Preserve input
+ kvm_vcpu_init features
+Message-ID: <20191017164408.k56d2u3swgkvunyx@gabell>
+References: <20191016085408.24360-1-drjones@redhat.com>
+ <20191016085408.24360-8-drjones@redhat.com>
 MIME-Version: 1.0
-X-OriginatorOrg: nutanix.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: cc49d3d8-cc3b-4c0c-143b-08d753209d60
-X-MS-Exchange-CrossTenant-originalarrivaltime: 17 Oct 2019 16:39:44.3871 (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: bb047546-786f-4de1-bd75-24e5b6f79043
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: mZjZg3Hjj53PgOsslrLy3JEepsGvXi2RYG9ssRrJBORKNPEUJ8/BFRXW1AWgwcmV9s21elhTf9cV/agcMmVwGel+hWubO0eiiJLQ87ZY/Zs=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MWHPR02MB2797
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.95,1.0.8
- definitions=2019-10-17_05:2019-10-17,2019-10-17 signatures=0
-X-Proofpoint-Spam-Reason: safe
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
-X-Received-From: 148.163.155.12
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20191016085408.24360-8-drjones@redhat.com>
+User-Agent: NeoMutt/20180716
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::741
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -135,41 +96,129 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: peter.maydell@linaro.org, richard.henderson@linaro.org,
+ qemu-devel@nongnu.org, armbru@redhat.com, eric.auger@redhat.com,
+ qemu-arm@nongnu.org, imammedo@redhat.com, alex.bennee@linaro.org,
+ Dave.Martin@arm.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-T3JpZ2luYWxseSwgdmhvc3QtdXNlci1zY3NpIGRpZCBub3QgaW1wbGVtZW50IGEgaGFuZGxlX291
-dHB1dCBjYWxsYmFjaw0KYXMgdGhhdCBkaWRuJ3Qgc2VlbSBuZWNlc3NhcnkuIFR1cm5zIG91dCBp
-dCBpcy4NCg0KRGVwZW5kaW5nIG9uIHdoaWNoIG90aGVyIGRldmljZXMgYXJlIHByZXNlbnRlZCB0
-byBhIFZNLCBTZWFCSU9TIG1heQ0KZGVjaWRlIHRvIG1hcCB2aG9zdC11c2VyLXNjc2kgZGV2aWNl
-cyBvbiB0aGUgNjQtYml0IHJhbmdlIG9mIHRoZSBhZGRyZXNzDQpzcGFjZS4gQXMgYSByZXN1bHQs
-IFNlYUJJT1Mgd2lsbCBraWNrIFZRcyB2aWEgdGhlIGNvbmZpZyBzcGFjZS4gVGhvc2UNCmxhbmQg
-b24gUWVtdSAobm90IHRoZSB2aG9zdCBiYWNrZW5kKSBhbmQgYXJlIG1pc3NlZCwgY2F1c2luZyB0
-aGUgVk0gbm90DQp0byBib290LiBUaGlzIGZpeGVzIHRoZSBpc3N1ZSBieSBnZXR0aW5nIFFlbXUg
-dG8gcG9zdCB0aGUgbm90aWZpY2F0aW9uLg0KDQpTaWduZWQtb2ZmLWJ5OiBGZWxpcGUgRnJhbmNp
-b3NpIDxmZWxpcGVAbnV0YW5peC5jb20+DQotLS0NCiBody9zY3NpL3Zob3N0LXVzZXItc2NzaS5j
-IHwgOSArKysrKy0tLS0NCiAxIGZpbGUgY2hhbmdlZCwgNSBpbnNlcnRpb25zKCspLCA0IGRlbGV0
-aW9ucygtKQ0KDQpkaWZmIC0tZ2l0IGEvaHcvc2NzaS92aG9zdC11c2VyLXNjc2kuYyBiL2h3L3Nj
-c2kvdmhvc3QtdXNlci1zY3NpLmMNCmluZGV4IDZhNmMxNWRkMzIuLjEzMjc4ZWQxNTEgMTAwNjQ0
-DQotLS0gYS9ody9zY3NpL3Zob3N0LXVzZXItc2NzaS5jDQorKysgYi9ody9zY3NpL3Zob3N0LXVz
-ZXItc2NzaS5jDQpAQCAtNjIsOCArNjIsOSBAQCBzdGF0aWMgdm9pZCB2aG9zdF91c2VyX3Njc2lf
-c2V0X3N0YXR1cyhWaXJ0SU9EZXZpY2UgKnZkZXYsIHVpbnQ4X3Qgc3RhdHVzKQ0KICAgICB9DQog
-fQ0KIA0KLXN0YXRpYyB2b2lkIHZob3N0X2R1bW15X2hhbmRsZV9vdXRwdXQoVmlydElPRGV2aWNl
-ICp2ZGV2LCBWaXJ0UXVldWUgKnZxKQ0KK3N0YXRpYyB2b2lkIHZob3N0X2hhbmRsZV9vdXRwdXQo
-VmlydElPRGV2aWNlICp2ZGV2LCBWaXJ0UXVldWUgKnZxKQ0KIHsNCisgICAgZXZlbnRfbm90aWZp
-ZXJfc2V0KHZpcnRpb19xdWV1ZV9nZXRfaG9zdF9ub3RpZmllcih2cSkpOw0KIH0NCiANCiBzdGF0
-aWMgdm9pZCB2aG9zdF91c2VyX3Njc2lfcmVhbGl6ZShEZXZpY2VTdGF0ZSAqZGV2LCBFcnJvciAq
-KmVycnApDQpAQCAtODAsOSArODEsOSBAQCBzdGF0aWMgdm9pZCB2aG9zdF91c2VyX3Njc2lfcmVh
-bGl6ZShEZXZpY2VTdGF0ZSAqZGV2LCBFcnJvciAqKmVycnApDQogICAgICAgICByZXR1cm47DQog
-ICAgIH0NCiANCi0gICAgdmlydGlvX3Njc2lfY29tbW9uX3JlYWxpemUoZGV2LCB2aG9zdF9kdW1t
-eV9oYW5kbGVfb3V0cHV0LA0KLSAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICB2aG9zdF9k
-dW1teV9oYW5kbGVfb3V0cHV0LA0KLSAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICB2aG9z
-dF9kdW1teV9oYW5kbGVfb3V0cHV0LCAmZXJyKTsNCisgICAgdmlydGlvX3Njc2lfY29tbW9uX3Jl
-YWxpemUoZGV2LCB2aG9zdF9oYW5kbGVfb3V0cHV0LA0KKyAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICB2aG9zdF9oYW5kbGVfb3V0cHV0LA0KKyAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICB2aG9zdF9oYW5kbGVfb3V0cHV0LCAmZXJyKTsNCiAgICAgaWYgKGVyciAhPSBOVUxMKSB7
-DQogICAgICAgICBlcnJvcl9wcm9wYWdhdGUoZXJycCwgZXJyKTsNCiAgICAgICAgIHJldHVybjsN
-Ci0tIA0KMi4yMC4xDQoNCg==
+On Wed, Oct 16, 2019 at 10:54:06AM +0200, Andrew Jones wrote:
+> kvm_arm_create_scratch_host_vcpu() takes a struct kvm_vcpu_init
+> parameter. Rather than just using it as an output parameter to
+> pass back the preferred target, use it also as an input parameter,
+> allowing a caller to pass a selected target if they wish and to
+> also pass cpu features. If the caller doesn't want to select a
+> target they can pass -1 for the target which indicates they want
+> to use the preferred target and have it passed back like before.
+> 
+> Signed-off-by: Andrew Jones <drjones@redhat.com>
+> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+> Reviewed-by: Eric Auger <eric.auger@redhat.com>
+
+This patch works well on aarch64 with SVE machine, thanks!
+Please feel free to add:
+
+    Tested-by: Masayoshi Mizuma <m.mizuma@jp.fujitsu.com>
+
+- Masa
+
+> ---
+>  target/arm/kvm.c   | 20 +++++++++++++++-----
+>  target/arm/kvm32.c |  6 +++++-
+>  target/arm/kvm64.c |  6 +++++-
+>  3 files changed, 25 insertions(+), 7 deletions(-)
+> 
+> diff --git a/target/arm/kvm.c b/target/arm/kvm.c
+> index f07332bbda30..5b82cefef608 100644
+> --- a/target/arm/kvm.c
+> +++ b/target/arm/kvm.c
+> @@ -66,7 +66,7 @@ bool kvm_arm_create_scratch_host_vcpu(const uint32_t *cpus_to_try,
+>                                        int *fdarray,
+>                                        struct kvm_vcpu_init *init)
+>  {
+> -    int ret, kvmfd = -1, vmfd = -1, cpufd = -1;
+> +    int ret = 0, kvmfd = -1, vmfd = -1, cpufd = -1;
+>  
+>      kvmfd = qemu_open("/dev/kvm", O_RDWR);
+>      if (kvmfd < 0) {
+> @@ -86,7 +86,14 @@ bool kvm_arm_create_scratch_host_vcpu(const uint32_t *cpus_to_try,
+>          goto finish;
+>      }
+>  
+> -    ret = ioctl(vmfd, KVM_ARM_PREFERRED_TARGET, init);
+> +    if (init->target == -1) {
+> +        struct kvm_vcpu_init preferred;
+> +
+> +        ret = ioctl(vmfd, KVM_ARM_PREFERRED_TARGET, &preferred);
+> +        if (!ret) {
+> +            init->target = preferred.target;
+> +        }
+> +    }
+>      if (ret >= 0) {
+>          ret = ioctl(cpufd, KVM_ARM_VCPU_INIT, init);
+>          if (ret < 0) {
+> @@ -98,10 +105,12 @@ bool kvm_arm_create_scratch_host_vcpu(const uint32_t *cpus_to_try,
+>           * creating one kind of guest CPU which is its preferred
+>           * CPU type.
+>           */
+> +        struct kvm_vcpu_init try;
+> +
+>          while (*cpus_to_try != QEMU_KVM_ARM_TARGET_NONE) {
+> -            init->target = *cpus_to_try++;
+> -            memset(init->features, 0, sizeof(init->features));
+> -            ret = ioctl(cpufd, KVM_ARM_VCPU_INIT, init);
+> +            try.target = *cpus_to_try++;
+> +            memcpy(try.features, init->features, sizeof(init->features));
+> +            ret = ioctl(cpufd, KVM_ARM_VCPU_INIT, &try);
+>              if (ret >= 0) {
+>                  break;
+>              }
+> @@ -109,6 +118,7 @@ bool kvm_arm_create_scratch_host_vcpu(const uint32_t *cpus_to_try,
+>          if (ret < 0) {
+>              goto err;
+>          }
+> +        init->target = try.target;
+>      } else {
+>          /* Treat a NULL cpus_to_try argument the same as an empty
+>           * list, which means we will fail the call since this must
+> diff --git a/target/arm/kvm32.c b/target/arm/kvm32.c
+> index 2451a2d4bbef..32bf8d6757c4 100644
+> --- a/target/arm/kvm32.c
+> +++ b/target/arm/kvm32.c
+> @@ -53,7 +53,11 @@ bool kvm_arm_get_host_cpu_features(ARMHostCPUFeatures *ahcf)
+>          QEMU_KVM_ARM_TARGET_CORTEX_A15,
+>          QEMU_KVM_ARM_TARGET_NONE
+>      };
+> -    struct kvm_vcpu_init init;
+> +    /*
+> +     * target = -1 informs kvm_arm_create_scratch_host_vcpu()
+> +     * to use the preferred target
+> +     */
+> +    struct kvm_vcpu_init init = { .target = -1, };
+>  
+>      if (!kvm_arm_create_scratch_host_vcpu(cpus_to_try, fdarray, &init)) {
+>          return false;
+> diff --git a/target/arm/kvm64.c b/target/arm/kvm64.c
+> index 850da1b5e6aa..c7ecefbed720 100644
+> --- a/target/arm/kvm64.c
+> +++ b/target/arm/kvm64.c
+> @@ -502,7 +502,11 @@ bool kvm_arm_get_host_cpu_features(ARMHostCPUFeatures *ahcf)
+>          KVM_ARM_TARGET_CORTEX_A57,
+>          QEMU_KVM_ARM_TARGET_NONE
+>      };
+> -    struct kvm_vcpu_init init;
+> +    /*
+> +     * target = -1 informs kvm_arm_create_scratch_host_vcpu()
+> +     * to use the preferred target
+> +     */
+> +    struct kvm_vcpu_init init = { .target = -1, };
+>  
+>      if (!kvm_arm_create_scratch_host_vcpu(cpus_to_try, fdarray, &init)) {
+>          return false;
+> -- 
+> 2.21.0
+> 
+> 
 
