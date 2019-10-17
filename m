@@ -6,76 +6,77 @@ X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 771F9FA372A
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 09:56:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DA927FA372A
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 09:57:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4CF2B2089C
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 09:56:52 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4CF2B2089C
+	by mail.kernel.org (Postfix) with ESMTPS id AFC3121835
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 09:57:37 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AFC3121835
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41092 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41106 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iL2WZ-0000Fy-DO
-	for qemu-devel@archiver.kernel.org; Thu, 17 Oct 2019 05:56:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54841)
+	id 1iL2XI-0001M7-SY
+	for qemu-devel@archiver.kernel.org; Thu, 17 Oct 2019 05:57:36 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54881)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1iL2Vh-0007kQ-8W
- for qemu-devel@nongnu.org; Thu, 17 Oct 2019 05:55:58 -0400
+ (envelope-from <philmd@redhat.com>) id 1iL2Vu-00081T-3e
+ for qemu-devel@nongnu.org; Thu, 17 Oct 2019 05:56:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1iL2Vg-0008BQ-50
- for qemu-devel@nongnu.org; Thu, 17 Oct 2019 05:55:57 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:50008)
+ (envelope-from <philmd@redhat.com>) id 1iL2Vt-0008Lt-5P
+ for qemu-devel@nongnu.org; Thu, 17 Oct 2019 05:56:10 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49378)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iL2Vf-0008Ab-Vl
- for qemu-devel@nongnu.org; Thu, 17 Oct 2019 05:55:56 -0400
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72])
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iL2Vs-0008L1-W4
+ for qemu-devel@nongnu.org; Thu, 17 Oct 2019 05:56:09 -0400
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71])
  (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 224DC2D6A0D
- for <qemu-devel@nongnu.org>; Thu, 17 Oct 2019 09:55:55 +0000 (UTC)
-Received: by mail-wm1-f72.google.com with SMTP id o8so884111wmc.2
- for <qemu-devel@nongnu.org>; Thu, 17 Oct 2019 02:55:55 -0700 (PDT)
+ by mx1.redhat.com (Postfix) with ESMTPS id 1EB6F10F09
+ for <qemu-devel@nongnu.org>; Thu, 17 Oct 2019 09:56:08 +0000 (UTC)
+Received: by mail-wm1-f71.google.com with SMTP id g67so796108wmg.4
+ for <qemu-devel@nongnu.org>; Thu, 17 Oct 2019 02:56:08 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:message-id:date
  :user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=po95gEQUT9586jzthi0ftrXVak07893o1boEFXjiqzE=;
- b=KoelWJ7PKf7sVhKOJq2lbBWiFtRfT5LMkD33uzBBFYyOzbeV50vFWTmHXhVlHRylxH
- W1dNAMQ1ylirjmNpGkGxi8uq0w2Ni+YyGtBQgjS0PjxLStCIJ/c833H6NdhC6up5x692
- nnlrVbvxxtg47wb+P/mjoYPg+kg64XI0+ivLCEo4R9dzyQxcEtMAh92hneeBcDbiC/BH
- AZzee+cIOzAtHoCkR5VIoo8wPhZaZlzuqHG36C9DmZ5TmvW60T3F/egaY9Qgosl3M0ml
- wWA6SU6wvMXZNOwgg1/KljatK/VpC6KAepQYH+pD91iIxBStGbIjoi1njv/ur7KohKF6
- vyrA==
-X-Gm-Message-State: APjAAAVWQ1+zlQDGYsTzgwKV6opJo7h3sJEZvTzRdgsER1D0k30podW7
- T98l4hrXHP/xm4lZ/damG6x7GVr/YFt9sJuJJTtmtc1JQZcK04vVutnLY5Biuo7tM6iFDh1e2B+
- DlPrqZkUUkBDGl6o=
-X-Received: by 2002:a5d:6506:: with SMTP id x6mr2191782wru.366.1571306153902; 
- Thu, 17 Oct 2019 02:55:53 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqyrZwv7mq5zh6Y/QcR78vcM6bnq96blAKdQ9DOeanCD6WiX6ZZ7DfyMKqj7OLmt/C1PWpeEiA==
-X-Received: by 2002:a5d:6506:: with SMTP id x6mr2191770wru.366.1571306153744; 
- Thu, 17 Oct 2019 02:55:53 -0700 (PDT)
+ bh=yxs6sSSu8VQ8YzYH0Wt1/Gm2Fn9mHxn6/3jjKVtlMt8=;
+ b=fEHWlEIwtHjp3mIs9FCNYqN908wzakZq+IloEH1xcoukZjwzRfYvvrKHpRzdw0iuIo
+ EmnEWW/jRt2CS+f1d07nWvCWvIb7SoLWbwBf17BxLRjKljMMqEF5qGsvKNGvR5E+K5bm
+ HlRFNVDgp7tfFtSEpUO6wiroX68kdeBxV/QtalfSY1QETqVEeKJYYC5HHGgarf60RZF5
+ AA2pbyPeD/TnXEEyhewItfThMRJ329Tnns8TZaSIfNbhOsmK10+MWAK5H4ypd5Z3I8WV
+ uHqVXpjRTIMf6uMGc0n/FNOYGDXA2fme02v9fap1i9M6QPkVOQGUacgpPiDnGR+liJrZ
+ Px3A==
+X-Gm-Message-State: APjAAAWVuFt0KkZThkzACXCT4s8oW+LEuWaRhH5ByM9pS29ryUseSyi3
+ aqKTAp4fuytArr2a21OWV7gwRQN+pKNVQK4yaNzzU3Jy6rgYWsGEQm9mUX7eXqjlcUG7kyjtl6+
+ 7FrWEHtBaWPlDf58=
+X-Received: by 2002:a5d:5408:: with SMTP id g8mr2158174wrv.202.1571306166560; 
+ Thu, 17 Oct 2019 02:56:06 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqwZaLHZnEvkVjo4PxZzMa3R8MtwgISSBnkBejfcjUCoedOJKc+xABhzxXXl2HRhzIVW3/4/Lw==
+X-Received: by 2002:a5d:5408:: with SMTP id g8mr2158159wrv.202.1571306166397; 
+ Thu, 17 Oct 2019 02:56:06 -0700 (PDT)
 Received: from [192.168.1.36] (14.red-88-21-201.staticip.rima-tde.net.
  [88.21.201.14])
- by smtp.gmail.com with ESMTPSA id y11sm1566237wrp.44.2019.10.17.02.55.50
+ by smtp.gmail.com with ESMTPSA id x5sm1640257wrg.69.2019.10.17.02.56.05
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Thu, 17 Oct 2019 02:55:53 -0700 (PDT)
-Subject: Re: [PATCH 01/10] image-fuzzer: Open image files in binary mode
+ Thu, 17 Oct 2019 02:56:05 -0700 (PDT)
+Subject: Re: [PATCH 02/10] image-fuzzer: Write bytes instead of string to
+ image file
 To: Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org
 References: <20191016192430.25098-1-ehabkost@redhat.com>
- <20191016192430.25098-2-ehabkost@redhat.com>
+ <20191016192430.25098-3-ehabkost@redhat.com>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <b76b52af-c1b7-273e-cfdf-2d061ee37de2@redhat.com>
-Date: Thu, 17 Oct 2019 11:55:49 +0200
+Message-ID: <9e9063e0-c8cd-5edd-1180-52fb53f07ee9@redhat.com>
+Date: Thu, 17 Oct 2019 11:56:05 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.1.1
 MIME-Version: 1.0
-In-Reply-To: <20191016192430.25098-2-ehabkost@redhat.com>
+In-Reply-To: <20191016192430.25098-3-ehabkost@redhat.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
@@ -99,10 +100,7 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 On 10/16/19 9:24 PM, Eduardo Habkost wrote:
-> This probably never caused problems because on Linux there's no
-> actual newline conversion happening, but on Python 3 the
-> binary/text distinction is stronger and we must explicitly open
-> the image file in binary mode.
+> This is necessary for Python 3 compatibility.
 >=20
 > Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 > ---
@@ -111,18 +109,19 @@ On 10/16/19 9:24 PM, Eduardo Habkost wrote:
 >=20
 > diff --git a/tests/image-fuzzer/qcow2/layout.py b/tests/image-fuzzer/qc=
 ow2/layout.py
-> index 675877da96..c57418fa15 100644
+> index c57418fa15..fe273d4143 100644
 > --- a/tests/image-fuzzer/qcow2/layout.py
 > +++ b/tests/image-fuzzer/qcow2/layout.py
-> @@ -503,7 +503,7 @@ class Image(object):
+> @@ -518,7 +518,7 @@ class Image(object):
+>           rounded =3D (size + self.cluster_size - 1) & ~(self.cluster_s=
+ize - 1)
+>           if rounded > size:
+>               image_file.seek(rounded - 1)
+> -            image_file.write("\0")
+> +            image_file.write(b'\x00')
+>           image_file.close()
 >  =20
->       def write(self, filename):
->           """Write an entire image to the file."""
-> -        image_file =3D open(filename, 'w')
-> +        image_file =3D open(filename, 'wb')
->           for field in self:
->               image_file.seek(field.offset)
->               image_file.write(struct.pack(field.fmt, field.value))
+>       @staticmethod
 >=20
 
 Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
