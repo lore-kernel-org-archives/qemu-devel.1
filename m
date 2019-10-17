@@ -2,50 +2,48 @@ Return-Path: <SRS0=yZS3=YK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 95BEBFA372A
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 21:10:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E866ECE58D
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 21:12:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 690B320872
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 21:10:10 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 690B320872
+	by mail.kernel.org (Postfix) with ESMTPS id 3F1F921D7A
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 21:12:35 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3F1F921D7A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60000 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60070 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iLD29-0007sD-HG
-	for qemu-devel@archiver.kernel.org; Thu, 17 Oct 2019 17:10:09 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56296)
+	id 1iLD4U-0000yX-Ef
+	for qemu-devel@archiver.kernel.org; Thu, 17 Oct 2019 17:12:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56706)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jsnow@redhat.com>) id 1iLD16-0007Ar-6y
- for qemu-devel@nongnu.org; Thu, 17 Oct 2019 17:09:05 -0400
+ (envelope-from <jsnow@redhat.com>) id 1iLD3g-0000PU-H4
+ for qemu-devel@nongnu.org; Thu, 17 Oct 2019 17:11:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1iLD15-00033I-8c
- for qemu-devel@nongnu.org; Thu, 17 Oct 2019 17:09:04 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:45274)
+ (envelope-from <jsnow@redhat.com>) id 1iLD3f-0003uo-FV
+ for qemu-devel@nongnu.org; Thu, 17 Oct 2019 17:11:44 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43272)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <jsnow@redhat.com>)
- id 1iLD11-00032P-HV; Thu, 17 Oct 2019 17:08:59 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ id 1iLD3W-0003sg-6Q; Thu, 17 Oct 2019 17:11:36 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 240273086202;
- Thu, 17 Oct 2019 21:08:58 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 07A40796EB;
+ Thu, 17 Oct 2019 21:11:33 +0000 (UTC)
 Received: from [10.18.17.173] (dhcp-17-173.bos.redhat.com [10.18.17.173])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 2DFEE5D9CA;
- Thu, 17 Oct 2019 21:08:55 +0000 (UTC)
-Subject: Re: [PATCH 05/10] image-fuzzer: Use %r for all fiels at
- Field.__repr__()
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 11AA5600C4;
+ Thu, 17 Oct 2019 21:11:29 +0000 (UTC)
+Subject: Re: [PATCH 00/10] image-fuzzer: Port to Python 3
 To: Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org
 References: <20191016192430.25098-1-ehabkost@redhat.com>
- <20191016192430.25098-6-ehabkost@redhat.com>
 From: John Snow <jsnow@redhat.com>
 Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
  mQINBFTKefwBEAChvwqYC6saTzawbih87LqBYq0d5A8jXYXaiFMV/EvMSDqqY4EY6whXliNO
@@ -121,18 +119,18 @@ Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
  i0HjnLoJP5jDcoMTabZTIazXmJz3pKM11HYJ5/ZsTIf3ZRJJKIvXJpbmcAPVwTZII6XxiJdh
  RSSX4Mvd5pL/+5WI6NTdW6DMfigTtdd85fe6PwBNVJL2ZvBfsBJZ5rxg1TOH3KLsYBqBTgW2
  glQofxhkJhDEcvjLhe3Y2BlbCWKOmvM8XS9TRt0OwUs=
-Message-ID: <f1c86481-ffa3-9e51-65a6-c7880d34e112@redhat.com>
-Date: Thu, 17 Oct 2019 17:08:54 -0400
+Message-ID: <318ecbf2-b077-1a5d-b7d5-a2fc1c9c1c96@redhat.com>
+Date: Thu, 17 Oct 2019 17:11:29 -0400
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.1.0
 MIME-Version: 1.0
-In-Reply-To: <20191016192430.25098-6-ehabkost@redhat.com>
+In-Reply-To: <20191016192430.25098-1-ehabkost@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.42]); Thu, 17 Oct 2019 21:08:58 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.25]); Thu, 17 Oct 2019 21:11:33 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 209.132.183.28
@@ -152,31 +150,35 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-"fields" in the commit message.
+
 
 On 10/16/19 3:24 PM, Eduardo Habkost wrote:
-> This makes the formatting code simpler, and safer if we change
-> the type of self.value from str to bytes.
+> This series ports image-fuzzer to Python 3.
 > 
-> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-> ---
->  tests/image-fuzzer/qcow2/layout.py | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
+> Eduardo Habkost (10):
+>   image-fuzzer: Open image files in binary mode
+>   image-fuzzer: Write bytes instead of string to image file
+>   image-fuzzer: Explicitly use integer division operator
+>   image-fuzzer: Use io.StringIO
+>   image-fuzzer: Use %r for all fiels at Field.__repr__()
+>   image-fuzzer: Return bytes objects on string fuzzing functions
+>   image-fuzzer: Use bytes constant for field values
+>   image-fuzzer: Encode file name and file format to bytes
+>   image-fuzzer: Run using python3
+>   image-fuzzer: Use errors parameter of subprocess.Popen()
 > 
-> diff --git a/tests/image-fuzzer/qcow2/layout.py b/tests/image-fuzzer/qcow2/layout.py
-> index 6501c9fd4b..0adcbd448d 100644
-> --- a/tests/image-fuzzer/qcow2/layout.py
-> +++ b/tests/image-fuzzer/qcow2/layout.py
-> @@ -53,8 +53,8 @@ class Field(object):
->          return iter([self.fmt, self.offset, self.value, self.name])
->  
->      def __repr__(self):
-> -        return "Field(fmt='%s', offset=%d, value=%s, name=%s)" % \
-> -            (self.fmt, self.offset, str(self.value), self.name)
-> +        return "Field(fmt=%r, offset=%r, value=%r, name=%r)" % \
-> +            (self.fmt, self.offset, self.value, self.name)
->  
->  
->  class FieldsList(object):
+>  tests/image-fuzzer/qcow2/__init__.py |  1 -
+>  tests/image-fuzzer/qcow2/fuzz.py     | 54 +++++++++++++-------------
+>  tests/image-fuzzer/qcow2/layout.py   | 57 ++++++++++++++--------------
+>  tests/image-fuzzer/runner.py         | 12 +++---
+>  4 files changed, 61 insertions(+), 63 deletions(-)
 > 
+
+When I gave my try at converting this to python3 I noticed that the
+"except OSError as e" segments used e[1] in a way that was not seemingly
+supported.
+
+Did you fix that in this series or did I miss it?
+
+--js
 
