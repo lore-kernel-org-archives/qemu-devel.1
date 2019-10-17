@@ -5,77 +5,77 @@ X-Spam-Level:
 X-Spam-Status: No, score=-6.4 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 04E25ECE58E
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 16:05:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A7E8DECE58E
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 16:07:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C3A7221835
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 16:05:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6C40B20640
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 16:07:04 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Pa0YsQ5V"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C3A7221835
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LRnSB184"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6C40B20640
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51942 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51988 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iL8HR-0006oG-Bl
-	for qemu-devel@archiver.kernel.org; Thu, 17 Oct 2019 12:05:37 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53256)
+	id 1iL8Ip-0000HE-Bo
+	for qemu-devel@archiver.kernel.org; Thu, 17 Oct 2019 12:07:03 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55677)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <aleksandar.m.mail@gmail.com>) id 1iL7Ie-0004Ft-Eb
- for qemu-devel@nongnu.org; Thu, 17 Oct 2019 11:02:53 -0400
+ (envelope-from <aleksandar.m.mail@gmail.com>) id 1iL7Vs-0003qD-Nb
+ for qemu-devel@nongnu.org; Thu, 17 Oct 2019 11:16:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aleksandar.m.mail@gmail.com>) id 1iL7Id-0006CR-7E
- for qemu-devel@nongnu.org; Thu, 17 Oct 2019 11:02:48 -0400
-Received: from mail-oi1-x242.google.com ([2607:f8b0:4864:20::242]:45119)
+ (envelope-from <aleksandar.m.mail@gmail.com>) id 1iL7Vn-00056Y-Mq
+ for qemu-devel@nongnu.org; Thu, 17 Oct 2019 11:16:28 -0400
+Received: from mail-oi1-x242.google.com ([2607:f8b0:4864:20::242]:34228)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
- id 1iL7Id-0006C9-1P
- for qemu-devel@nongnu.org; Thu, 17 Oct 2019 11:02:47 -0400
-Received: by mail-oi1-x242.google.com with SMTP id o205so2390136oib.12
- for <qemu-devel@nongnu.org>; Thu, 17 Oct 2019 08:02:46 -0700 (PDT)
+ id 1iL7Vn-00056P-ID
+ for qemu-devel@nongnu.org; Thu, 17 Oct 2019 11:16:23 -0400
+Received: by mail-oi1-x242.google.com with SMTP id 83so2493437oii.1
+ for <qemu-devel@nongnu.org>; Thu, 17 Oct 2019 08:16:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=mime-version:in-reply-to:references:from:date:message-id:subject:to
- :cc; bh=2rOcTm1sqKA59B8RWKLJWb/9GvZdB5Zwo6ax6qEP27s=;
- b=Pa0YsQ5VgdFErvtGZD/AyXdh7bsdfMYIjABclSqWwEk0O3WL/cWoChtmitFqpIgUFW
- hLYc/SK1+D8edM1itN0psvO44Q91x4VbvmrobHETzpDEpQ7sjGkdPIkAUbzWecbKrdFB
- 9+gsLGNHJsNzJ4vTAeiZhQk0z4L5WS4isgTqlq8EKEG5OIYIfcn8ubNk7S3GGlNel74i
- lFh+nvVAc0zN2UhLmx5diiY0LPChTE9VYSLA9h2oDAwQjyxlL/LGBqScGaON5LD/ovS0
- FKqw4jEOmN/bKos2S+Ud+Cu3boNuYwLt6D4y1LDYrIz5Z000DWFWlkFKqIQN4pH0Z/Ql
- tZcA==
+ :cc; bh=AyW8NM6SJoGlUUn/caesoONpoZFYdqbED9wtAipUY7Q=;
+ b=LRnSB184BsuH9LrV/bwFshWgP2XeAAUH44yEASK7+n3o/THTEY8W/7incOAx2V/GjU
+ 4qAt8d6oUwfPefR0gITGLKjTUnalbjKED/56rYlVo6ycBjq6hjHhUa/goMJotZYS5+aj
+ 5ro9nrjVMhogoJRPwY7aldvdb3Urf6a/FhANETyOinuxiHUWPyVzMVrlr6ugVGvlmee+
+ F+3hNk3jPQwtGPVYnLIa2bxL+0wUglY3oCxCrR0qpL6NLAJLK4ZR6m1gKYdnA7t33j/Q
+ HFwx8SfyzL+uZkBRotKzVJm+frxNfdbPd25QlLy0q0Enf1ELYAe7aLyOeilLrwrRlJPB
+ mIZA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:in-reply-to:references:from:date
  :message-id:subject:to:cc;
- bh=2rOcTm1sqKA59B8RWKLJWb/9GvZdB5Zwo6ax6qEP27s=;
- b=bHcH9IaAhswyK7VbLdJYvQfPG1O0LUU/nd0VeLAmO5Xzppr5vdVG6YZgsmqiP2gWig
- bezFS3CzoLBqoAY9u7ETRCqjrxXzbrpSVMERfbcTCLU6kH5lJm9boC62cpLjRfqwsptS
- KADmGW4kU9nEc5zQN1Xglb/S0Dm6ohXO4ZUwfK78Xlx6JVG4cS3kp4PVcujP3ExeHcTG
- IutpiitBTKamriDvXKhWm5VYVVup/9Uj/ek+AbAQGrTXoOC7THWEWXTIVfa4w9sNZkwL
- GFpOdHjnFWj/QYeiaQ7bB2NsW02jbpGMbMSQ1hsEpQVGMkJfnKIXZ0RhBVZF3MbqE3W2
- D28Q==
-X-Gm-Message-State: APjAAAXdgvR7fKMNVyLMXbBwGoWSXpRdEUdRLRLMQHcc0pfG6TK446ck
- 4cV9RQC1D+TaL0Q8HGivIZERtojTfUnPerLxQRI=
-X-Google-Smtp-Source: APXvYqyVxk8RcMbzJ7z6I6VLl7CGsWoVXOirTUKBF16CjXjOWggjLG4/TsvWqmsCquRG/zn1zJmj9uYRO1Stg3kL9vM=
-X-Received: by 2002:a54:460c:: with SMTP id p12mr3655091oip.62.1571324566072; 
- Thu, 17 Oct 2019 08:02:46 -0700 (PDT)
+ bh=AyW8NM6SJoGlUUn/caesoONpoZFYdqbED9wtAipUY7Q=;
+ b=DWKvHhM/G78+Okj0n8AS9j1ECSNjcKubfWn+1a5EVyXam9EFZ8MTMewU6q7UzfJll1
+ eTZ1QrGOkZcSRQqDMR7bQl1ffpcwKzRtq2kG92YEbNweolwLfsx6bjJS7ZHyl9ARg5QS
+ dEEddmOAXvpjzq2AdjuYPjQ/5coQ8KKlNhfuTtDy+ks7UFj0Hkoy6IdJW2Y3F+u6h/4r
+ yNvEwwnHK4ZHBaoVzpGtkiCGcw9jgYItxMhm3eekiQTq3mL9Ei39L40RCqSEE/X78tmN
+ oONjt+GOpn8dhfVr7yUeciLbj6vNtEhC9/BHQU6l+SDIf/euCvrd2P60X2g+L183QeMy
+ fOXg==
+X-Gm-Message-State: APjAAAVMPFyivYt1B/ZzKsbRtpDpMafJ0ZEcBnhr712cfSTXBojY1nhs
+ W1FF4cUeHmIq+dRTt2I0ufztfK9dcm6URMKLIq4=
+X-Google-Smtp-Source: APXvYqw07qJjPokcVhwk/D87QvKmD4UjYp48DXnEdjIzgiiW8ZjoAHftG/wPAwoPFRE9z8BKjwAVnW0sE6vYehgJDDk=
+X-Received: by 2002:aca:4e56:: with SMTP id c83mr3701878oib.53.1571325382899; 
+ Thu, 17 Oct 2019 08:16:22 -0700 (PDT)
 MIME-Version: 1.0
-Received: by 2002:a9d:340a:0:0:0:0:0 with HTTP; Thu, 17 Oct 2019 08:02:44
+Received: by 2002:a9d:340a:0:0:0:0:0 with HTTP; Thu, 17 Oct 2019 08:16:22
  -0700 (PDT)
-In-Reply-To: <20191015162705.28087-9-philmd@redhat.com>
+In-Reply-To: <20191015162705.28087-22-philmd@redhat.com>
 References: <20191015162705.28087-1-philmd@redhat.com>
- <20191015162705.28087-9-philmd@redhat.com>
+ <20191015162705.28087-22-philmd@redhat.com>
 From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
-Date: Thu, 17 Oct 2019 17:02:44 +0200
-Message-ID: <CAL1e-=i89vA3T2hKSWsg_FkQdJfOAKvi7pGE-o56HxTz-URCXQ@mail.gmail.com>
-Subject: Re: [PATCH 08/32] piix4: rename some variables in realize function
+Date: Thu, 17 Oct 2019 17:16:22 +0200
+Message-ID: <CAL1e-=hLUDDqFiV8W1f2PFGYJMomvmZUXmjA55X7WEEYMykjHQ@mail.gmail.com>
+Subject: Re: [PATCH 21/32] hw/i386/pc: Reduce gsi_handler scope
 To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
-Content-Type: multipart/alternative; boundary="00000000000096802905951c8296"
+Content-Type: multipart/alternative; boundary="000000000000463b3505951cb36b"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
 X-Received-From: 2607:f8b0:4864:20::242
@@ -108,7 +108,7 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---00000000000096802905951c8296
+--000000000000463b3505951cb36b
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
@@ -116,137 +116,108 @@ On Tuesday, October 15, 2019, Philippe Mathieu-Daud=C3=A9 <philmd@redhat.co=
 m>
 wrote:
 
-> From: Herv=C3=A9 Poussineau <hpoussin@reactos.org>
+> pc_gsi_create() is the single function that uses gsi_handler.
+> Make it a static variable.
 >
-> PIIX4 structure is now 's'
-> PCI device is now 'pci_dev'
-> DeviceState is now 'dev'
->
-> Acked-by: Michael S. Tsirkin <mst@redhat.com>
-> Acked-by: Paolo Bonzini <pbonzini@redhat.com>
-> Signed-off-by: Herv=C3=A9 Poussineau <hpoussin@reactos.org>
-> Message-Id: <20171216090228.28505-6-hpoussin@reactos.org>
 > Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 > ---
->  hw/isa/piix4.c | 13 +++++++------
->  1 file changed, 7 insertions(+), 6 deletions(-)
+>  hw/i386/pc.c         | 2 +-
+>  include/hw/i386/pc.h | 2 --
+>  2 files changed, 1 insertion(+), 3 deletions(-)
 >
->
-Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
-
-
-> diff --git a/hw/isa/piix4.c b/hw/isa/piix4.c
-> index 3294056cd5..4202243e41 100644
-> --- a/hw/isa/piix4.c
-> +++ b/hw/isa/piix4.c
-> @@ -88,16 +88,17 @@ static const VMStateDescription vmstate_piix4 =3D {
->      }
+> diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+> index a7597c6c44..59de0c8a1f 100644
+> --- a/hw/i386/pc.c
+> +++ b/hw/i386/pc.c
+> @@ -346,7 +346,7 @@ GlobalProperty pc_compat_1_4[] =3D {
 >  };
+>  const size_t pc_compat_1_4_len =3D G_N_ELEMENTS(pc_compat_1_4);
 >
-> -static void piix4_realize(PCIDevice *dev, Error **errp)
-> +static void piix4_realize(PCIDevice *pci_dev, Error **errp)
+> -void gsi_handler(void *opaque, int n, int level)
+> +static void gsi_handler(void *opaque, int n, int level)
 >  {
-> -    PIIX4State *d =3D PIIX4_PCI_DEVICE(dev);
-> +    DeviceState *dev =3D DEVICE(pci_dev);
-> +    PIIX4State *s =3D DO_UPCAST(PIIX4State, dev, pci_dev);
+>      GSIState *s =3D opaque;
 >
-> -    if (!isa_bus_new(DEVICE(d), pci_address_space(dev),
-> -                     pci_address_space_io(dev), errp)) {
-> +    if (!isa_bus_new(dev, pci_address_space(pci_dev),
-> +                     pci_address_space_io(pci_dev), errp)) {
->          return;
->      }
-> -    piix4_dev =3D &d->dev;
-> -    qemu_register_reset(piix4_reset, d);
-> +    piix4_dev =3D pci_dev;
-> +    qemu_register_reset(piix4_reset, s);
->  }
+> diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
+> index d0c6b9d469..75b44e156c 100644
+> --- a/include/hw/i386/pc.h
+> +++ b/include/hw/i386/pc.h
+> @@ -172,8 +172,6 @@ typedef struct GSIState {
+>      qemu_irq ioapic_irq[IOAPIC_NUM_PINS];
+>  } GSIState;
 >
->  int piix4_init(PCIBus *bus, ISABus **isa_bus, int devfn)
+> -void gsi_handler(void *opaque, int n, int level);
+> -
+>  GSIState *pc_gsi_create(qemu_irq **irqs, bool pci_enabled);
+>
+>
+Philippe, this 2-line deletion seems not to belong to this patch. If true,
+please place it in another or a separate patch.
+
+A.
+
+
+
+>  /* vmport.c */
 > --
 > 2.21.0
 >
 >
 >
 
---00000000000096802905951c8296
+--000000000000463b3505951cb36b
 Content-Type: text/html; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
 <br><br>On Tuesday, October 15, 2019, Philippe Mathieu-Daud=C3=A9 &lt;<a hr=
 ef=3D"mailto:philmd@redhat.com">philmd@redhat.com</a>&gt; wrote:<br><blockq=
 uote class=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;border-left:1px #ccc =
-solid;padding-left:1ex">From: Herv=C3=A9 Poussineau &lt;<a href=3D"mailto:h=
-poussin@reactos.org">hpoussin@reactos.org</a>&gt;<br>
+solid;padding-left:1ex">pc_gsi_create() is the single function that uses gs=
+i_handler.<br>
+Make it a static variable.<br>
 <br>
-PIIX4 structure is now &#39;s&#39;<br>
-PCI device is now &#39;pci_dev&#39;<br>
-DeviceState is now &#39;dev&#39;<br>
-<br>
-Acked-by: Michael S. Tsirkin &lt;<a href=3D"mailto:mst@redhat.com">mst@redh=
-at.com</a>&gt;<br>
-Acked-by: Paolo Bonzini &lt;<a href=3D"mailto:pbonzini@redhat.com">pbonzini=
-@redhat.com</a>&gt;<br>
-Signed-off-by: Herv=C3=A9 Poussineau &lt;<a href=3D"mailto:hpoussin@reactos=
-.org">hpoussin@reactos.org</a>&gt;<br>
-Message-Id: &lt;<a href=3D"mailto:20171216090228.28505-6-hpoussin@reactos.o=
-rg">20171216090228.28505-6-hpoussin@reactos.org</a>&gt;<br>
 Signed-off-by: Philippe Mathieu-Daud=C3=A9 &lt;<a href=3D"mailto:philmd@red=
 hat.com">philmd@redhat.com</a>&gt;<br>
 ---<br>
-=C2=A0hw/isa/piix4.c | 13 +++++++------<br>
-=C2=A01 file changed, 7 insertions(+), 6 deletions(-)<br>
-<br></blockquote><div><br></div><div><div id=3D"cvcmsg_16dbfeb33c93ed97" cl=
-ass=3D"yh  " style=3D"border-top-left-radius:0px;border-top-right-radius:0p=
-x;margin-bottom:11px;overflow:visible"><div class=3D"Vh" id=3D"cvcfullmsg_1=
-6dbfeb33c93ed97"><div id=3D"cvcmsgbod_16dbfeb33c93ed97" class=3D"aj"><div c=
-lass=3D"Ni"><div class=3D"ni pi " dir=3D"ltr"><p dir=3D"ltr">Reviewed-by: A=
-leksandar Markovic &lt;<a href=3D"mailto:amarkovic@wavecomp.com" target=3D"=
-_blank">amarkovic@wavecomp.com</a>&gt;</p><div style=3D"clear:both"></div><=
-/div><div style=3D"clear:both"></div><div><div class=3D"M j T b hc Aj S" ta=
-bindex=3D"0"><div class=3D"V j hf"></div></div></div><div style=3D"clear:bo=
-th"></div></div></div></div></div><div id=3D"cvcmsg_16dbfecd588da1f7" class=
-=3D"yh" style=3D"margin-bottom:11px"><div class=3D"Vh" id=3D"cvcfullmsg_16d=
-bfecd588da1f7"><div class=3D"M j Zi Mi  " tabindex=3D"0"><div id=3D"cvcrepl=
-y_16dbfecd588da1f7" class=3D"M j T b hc xh S  " tabindex=3D"0"><div class=
-=3D"V j td"></div></div></div></div></div></div><div>=C2=A0</div><blockquot=
-e class=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;border-left:1px #ccc sol=
-id;padding-left:1ex">
-diff --git a/hw/isa/piix4.c b/hw/isa/piix4.c<br>
-index 3294056cd5..4202243e41 100644<br>
---- a/hw/isa/piix4.c<br>
-+++ b/hw/isa/piix4.c<br>
-@@ -88,16 +88,17 @@ static const VMStateDescription vmstate_piix4 =3D {<br>
-=C2=A0 =C2=A0 =C2=A0}<br>
+=C2=A0hw/i386/pc.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0| 2 +-<br>
+=C2=A0include/hw/i386/pc.h | 2 --<br>
+=C2=A02 files changed, 1 insertion(+), 3 deletions(-)<br>
+<br>
+diff --git a/hw/i386/pc.c b/hw/i386/pc.c<br>
+index a7597c6c44..59de0c8a1f 100644<br>
+--- a/hw/i386/pc.c<br>
++++ b/hw/i386/pc.c<br>
+@@ -346,7 +346,7 @@ GlobalProperty pc_compat_1_4[] =3D {<br>
 =C2=A0};<br>
+=C2=A0const size_t pc_compat_1_4_len =3D G_N_ELEMENTS(pc_compat_1_4);<br>
 <br>
--static void piix4_realize(PCIDevice *dev, Error **errp)<br>
-+static void piix4_realize(PCIDevice *pci_dev, Error **errp)<br>
+-void gsi_handler(void *opaque, int n, int level)<br>
++static void gsi_handler(void *opaque, int n, int level)<br>
 =C2=A0{<br>
--=C2=A0 =C2=A0 PIIX4State *d =3D PIIX4_PCI_DEVICE(dev);<br>
-+=C2=A0 =C2=A0 DeviceState *dev =3D DEVICE(pci_dev);<br>
-+=C2=A0 =C2=A0 PIIX4State *s =3D DO_UPCAST(PIIX4State, dev, pci_dev);<br>
+=C2=A0 =C2=A0 =C2=A0GSIState *s =3D opaque;<br>
 <br>
--=C2=A0 =C2=A0 if (!isa_bus_new(DEVICE(d), pci_address_space(dev),<br>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0pci_address_space_io(dev), errp)) {<br>
-+=C2=A0 =C2=A0 if (!isa_bus_new(dev, pci_address_space(pci_dev),<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0pci_address_space_io(pci_dev), errp)) {<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0return;<br>
-=C2=A0 =C2=A0 =C2=A0}<br>
--=C2=A0 =C2=A0 piix4_dev =3D &amp;d-&gt;dev;<br>
--=C2=A0 =C2=A0 qemu_register_reset(piix4_<wbr>reset, d);<br>
-+=C2=A0 =C2=A0 piix4_dev =3D pci_dev;<br>
-+=C2=A0 =C2=A0 qemu_register_reset(piix4_<wbr>reset, s);<br>
-=C2=A0}<br>
+diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h<br>
+index d0c6b9d469..75b44e156c 100644<br>
+--- a/include/hw/i386/pc.h<br>
++++ b/include/hw/i386/pc.h<br>
+@@ -172,8 +172,6 @@ typedef struct GSIState {<br>
+=C2=A0 =C2=A0 =C2=A0qemu_irq ioapic_irq[IOAPIC_NUM_PINS];<br>
+=C2=A0} GSIState;<br>
 <br>
-=C2=A0int piix4_init(PCIBus *bus, ISABus **isa_bus, int devfn)<br>
+-void gsi_handler(void *opaque, int n, int level);<br>
+-<br>
+=C2=A0GSIState *pc_gsi_create(qemu_irq **irqs, bool pci_enabled);<br>
+<br></blockquote><div><br></div><div>Philippe, this 2-line deletion seems n=
+ot to belong to this patch. If true, please place it in another or a separa=
+te patch.</div><div><br></div><div>A.</div><div><br></div><div>=C2=A0</div>=
+<blockquote class=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;border-left:1p=
+x #ccc solid;padding-left:1ex">
+=C2=A0/* vmport.c */<br>
 -- <br>
 2.21.0<br>
 <br>
 <br>
 </blockquote>
 
---00000000000096802905951c8296--
+--000000000000463b3505951cb36b--
 
