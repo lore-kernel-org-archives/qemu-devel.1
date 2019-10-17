@@ -2,88 +2,82 @@ Return-Path: <SRS0=yZS3=YK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D2B0ECE58E
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 10:43:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 82437FA372A
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 10:47:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 503CD2089C
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 10:43:01 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 503CD2089C
+	by mail.kernel.org (Postfix) with ESMTPS id 52CE720869
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 10:47:35 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 52CE720869
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43360 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43444 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iL3FE-00055V-Gg
-	for qemu-devel@archiver.kernel.org; Thu, 17 Oct 2019 06:43:00 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38594)
+	id 1iL3Je-00070l-AE
+	for qemu-devel@archiver.kernel.org; Thu, 17 Oct 2019 06:47:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39310)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1iL3EY-0004aU-5p
- for qemu-devel@nongnu.org; Thu, 17 Oct 2019 06:42:19 -0400
+ (envelope-from <slp@redhat.com>) id 1iL3Ht-0005r0-68
+ for qemu-devel@nongnu.org; Thu, 17 Oct 2019 06:45:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1iL3EW-0002gl-8h
- for qemu-devel@nongnu.org; Thu, 17 Oct 2019 06:42:17 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:51576)
+ (envelope-from <slp@redhat.com>) id 1iL3Hs-0004X5-5f
+ for qemu-devel@nongnu.org; Thu, 17 Oct 2019 06:45:45 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:41202)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iL3EW-0002ft-14
- for qemu-devel@nongnu.org; Thu, 17 Oct 2019 06:42:16 -0400
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70])
+ (Exim 4.71) (envelope-from <slp@redhat.com>) id 1iL3Hr-0004WZ-Pd
+ for qemu-devel@nongnu.org; Thu, 17 Oct 2019 06:45:44 -0400
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71])
  (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id E309050F45
- for <qemu-devel@nongnu.org>; Thu, 17 Oct 2019 10:42:14 +0000 (UTC)
-Received: by mail-wr1-f70.google.com with SMTP id m14so731955wru.17
- for <qemu-devel@nongnu.org>; Thu, 17 Oct 2019 03:42:14 -0700 (PDT)
+ by mx1.redhat.com (Postfix) with ESMTPS id 93FE84E925
+ for <qemu-devel@nongnu.org>; Thu, 17 Oct 2019 10:45:42 +0000 (UTC)
+Received: by mail-wm1-f71.google.com with SMTP id o8so956602wmc.2
+ for <qemu-devel@nongnu.org>; Thu, 17 Oct 2019 03:45:42 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=w7b4nH/P5f+bAD1c9cUnIsGN8q7TlnpEDNN1DtYchnE=;
- b=Rytji/T253kzQHo+HRPtfCXr+ltiTfu3OgtPbw//P2VCWnrq0XEVmdgh22zWpMlgZS
- bii+6CQAxUthay+fDC3xWXfo+449lMckzMpJTQRY8CoFnlJ/zwUO+KzkvyCOf0BIHOUO
- 8kUlXVvKy32W+hi+0472O7g5b/6ZaOn9PrIvYz806GJRlyvKdPdvlpAp2UZoEhtVVPHx
- vQtHV3XhvKKpWB6Fu3pAeQcHlgPferQ19diWB0kxqmq0VuqYMye80J32GBNRNQy5mql0
- MbNOJLiYltUv/l4j8yEZB+dszcM8Zj2ttxYOHv28uVRBRwT3bkqa98ruGwQmVCWJBJNv
- lJNQ==
-X-Gm-Message-State: APjAAAXsit4iYuHdzLiZU4u5EghgmD4r5lk7gz+jyrRjW5FxWcPv1IUD
- cBJ+loGyIHkGMPX9CsldaU2Q6YQ9ljOGU+EG75sGbGZJt2MgB+RFG8F0HtOyATEQX+T40TcwjLb
- gnPBkML2G/mHiGgY=
-X-Received: by 2002:a5d:664f:: with SMTP id f15mr2443681wrw.358.1571308933665; 
- Thu, 17 Oct 2019 03:42:13 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqx7COTnD81dJcN4mJb42nz2SD1dpFEG2H3OSe9bRjCSpgizoogVGDqVazPhpxyU8CXh39lI1A==
-X-Received: by 2002:a5d:664f:: with SMTP id f15mr2443655wrw.358.1571308933328; 
- Thu, 17 Oct 2019 03:42:13 -0700 (PDT)
-Received: from [192.168.1.36] (14.red-88-21-201.staticip.rima-tde.net.
- [88.21.201.14])
- by smtp.gmail.com with ESMTPSA id f13sm1721057wmj.17.2019.10.17.03.42.12
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Thu, 17 Oct 2019 03:42:12 -0700 (PDT)
-Subject: Re: s390x/qemu-user: TODO /home/dhildenb/git/qemu/tcg/tci.c:859:
- tcg_qemu_tb_exec()
-To: David Hildenbrand <david@redhat.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- qemu-s390x <qemu-s390x@nongnu.org>,
- Richard Henderson <richard.henderson@linaro.org>
-References: <60a0d510-b693-0ed7-560f-e70904d9574d@redhat.com>
- <95ddf722-ba5d-dd48-a840-0d940ded3acd@redhat.com>
- <2f96242c-7108-f9a6-0a1a-fdef3eee2a47@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <aa10989e-676e-8f57-cfd3-6b29d1d896ad@redhat.com>
-Date: Thu, 17 Oct 2019 12:42:11 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.1
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version;
+ bh=gxLm2Wq78FkSxgC6/pRtf+KctOp43uz9i3yGV1/50H4=;
+ b=L5SRgfgibzNGIYV/sir/9RupRsuqQ0UdPBVrJipMXwG7HhS040IV+6ZTwk99A8eIgr
+ uY81hNj1CVfdCD7X+8nsGiQMt/RAR7aGVNpHqN0GFcTj0+pizTPvbEs6aort50OFhvO8
+ r2Ary0OMbeQsle2PiQGR3MmXXteGKzht0vMaLieLd8wH7gdJn7pxmvvY/vw9yPXlxBdI
+ 0OqtO4WfrFFI2H5md4j3YDKpxd/ggr5WRLcBiS+POsAyM0JBoMCFJRhpPafyp9LQ8Z1a
+ C8KSAArkOI3PLdd0YvE9unV0WmYY++QZbpSj0wMYv9/6zY8ZFg4ss+dd+LSKoUf+GR0T
+ nWeA==
+X-Gm-Message-State: APjAAAWrmbzY64mjdjZgE2IKqna7bYwTHr6vL42bHcnIHC1KAD6vla92
+ 9PXo1ZtO8P04smTZmjUfh7DeeuLMZYROxud2ImECa9FEFlx7D9jFUNpVXzvUY65X2qYudo8TPHs
+ MgtzfmHikeQq753c=
+X-Received: by 2002:a1c:2e94:: with SMTP id u142mr2364286wmu.69.1571309141370; 
+ Thu, 17 Oct 2019 03:45:41 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqxEBs2G4Kc7RFK5QQ3yZRQWCcCaE57xk/04ngRYLbnkRJ4XvUhQm0huDWYLCP+tBts3y4o/fg==
+X-Received: by 2002:a1c:2e94:: with SMTP id u142mr2364270wmu.69.1571309141138; 
+ Thu, 17 Oct 2019 03:45:41 -0700 (PDT)
+Received: from dritchie.redhat.com (139.red-95-120-215.dynamicip.rima-tde.net.
+ [95.120.215.139])
+ by smtp.gmail.com with ESMTPSA id w17sm1867573wra.34.2019.10.17.03.45.38
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 17 Oct 2019 03:45:39 -0700 (PDT)
+References: <20191016101241.24405-1-slp@redhat.com>
+ <20191016101241.24405-14-slp@redhat.com>
+ <d981516f-f23a-47f5-d825-a101fdaaf471@redhat.com>
+User-agent: mu4e 1.2.0; emacs 26.2
+From: Sergio Lopez <slp@redhat.com>
+To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Subject: Re: [PATCH v10 13/15] docs/microvm.rst: document the new microvm
+ machine type
+In-reply-to: <d981516f-f23a-47f5-d825-a101fdaaf471@redhat.com>
+Date: Thu, 17 Oct 2019 12:45:36 +0200
+Message-ID: <87ftjrhcq7.fsf@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <2f96242c-7108-f9a6-0a1a-fdef3eee2a47@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+Content-Type: multipart/signed; boundary="=-=-=";
+ micalg=pgp-sha256; protocol="application/pgp-signature"
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 209.132.183.28
@@ -98,85 +92,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: ehabkost@redhat.com, mst@redhat.com, qemu-devel@nongnu.org, groug@kaod.org,
+ kraxel@redhat.com, pbonzini@redhat.com, imammedo@redhat.com,
+ sgarzare@redhat.com, lersek@redhat.com, rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 10/17/19 12:35 PM, David Hildenbrand wrote:
-> On 17.10.19 12:25, Philippe Mathieu-Daud=C3=A9 wrote:
->> Hi David,
->>
->> On 10/17/19 12:02 PM, David Hildenbrand wrote:
->>> Hi,
->>>
->>> I'm currently trying to run Fedora 31 under qemu-user
->>> (https://github.com/fedora-cloud/docker-brew-fedora/tree/8a81f67271e9=
-59dfc8f8a888b161bbd540b7a83b/s390x)=20
->>>
->>> in order to debug=C2=A0 a vector instruction issue.
->>>
->>> Strangely, when trying to chroot into above rootfs and running
->>> /bin/bash, I get
->>>
->>> t460s: ~/f31=C2=A0 $ sudo chroot . ./qemu-s390x=C2=A0 /bin/bash
->>> TODO /home/dhildenb/git/qemu/tcg/tci.c:859: tcg_qemu_tb_exec()
->>> /home/dhildenb/git/qemu/tcg/tci.c:859: tcg fatal error
->>> Aborted
->>>
->>>
->>> But it's not fundamentally broken:
->>>
->>> t460s: ~/f31=C2=A0 $ sudo chroot . ./qemu-s390x=C2=A0 /bin/ls
->>> bin=C2=A0=C2=A0 dev=C2=A0 home=C2=A0 lib64=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0 media=C2=A0 opt=C2=A0=C2=A0 qemu-s390x=C2=A0 run=C2=A0=C2=A0 sr=
-v=C2=A0 tmp =20
->>> var
->>> boot=C2=A0 etc=C2=A0 lib=C2=A0=C2=A0 lost+found=C2=A0 mnt=C2=A0=C2=A0=
-=C2=A0 proc=C2=A0 root=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 sbin=C2=A0=
- sys=C2=A0 usr
->>>
->>>
->>> I do wonder why we don't run into the same issue under qemu-systems39=
-0x.
->>
->> Are you also using TCI in system emulation?
->=20
-> Most probably not. It took me longer than expected to find a ./configur=
-e=20
-> variant that at least allows me to build static qemu-user binaries. Mos=
-t=20
-> probably something sneeked in there.
->=20
->>
->> Can you simply use TCG to debug your vector instruction issue instead?
->=20
-> I was using
->=20
-> ./configure --disable-strip --disable-werror --python=3D/usr/bin/python=
-3=20
-> --enable-tcg-interpreter --disable-system --enable-linux-user --static=20
-> --disable-pie --disable-sdl --disable-gtk --disable-spice=20
-> --disable-tools --disable-guest-agent --disable-guest-agent-msi=20
-> --disable-curses --disable-curl --disable-gnutls --disable-gcrypt=20
-> --disable-nettle --disable-cap-ng --disable-brlapi --disable-mpath=20
-> --disable-capstone --disable-xen --disable-rdma=20
-> --extra-ldflags=3D"-Wl,-z,relro -Wl,-z,now" --target-list=3Ds390x-linux=
--user
->=20
-> inspired by the Fedora rpm SPEC.
->=20
-> "--enable-tcg-interpreter" is the relevant bit I blindly copied without=
-=20
-> thinking about it (in the rpm SPEC, it is wrapped by an ifdef ...)
+--=-=-=
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-I thought there was a patch adding a big warning when ./configure is run=20
-with this option, but I can't find it so maybe we just talked about it.
 
-> Thanks for the hint, will try with --disable-tcg-interpreter
->=20
->>
->> Regards,
->>
->> Phil.
->>
+Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> writes:
+
+> Hi Sergio,
+>
+> On 10/16/19 12:12 PM, Sergio Lopez wrote:
+>> +Supported devices
+>> +-----------------
+>> +
+>> +The microvm machine type supports the following devices:
+>> +
+>> +- ISA bus
+>> +- i8259 PIC (optional)
+>> +- i8254 PIT (optional)
+>> +- MC146818 RTC (optional)
+>> +- One ISA serial port (optional)
+>> +- LAPIC
+>> +- IOAPIC (with kernel-irqchip=3Dsplit by default)
+>> +- kvmclock (if using KVM)
+>> +- fw_cfg
+>> +- Up to eight virtio-mmio devices (configured by the user)
+>
+> If we have VirtIO devices, why not use virtio-serial instead of the
+> one on the ISA bus?
+
+The serial port on the ISA bus is simpler, and thus is supported for
+both SeaBIOS debugging and Linux's earlyprintk. This makes it *very*
+convenient for debugging boot issues.
+
+Also, as it's explained in the documentation, users that no longer need
+it can disable the device and just rely on virtio-console.
+
+Sergio.
+
+--=-=-=
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEvtX891EthoCRQuii9GknjS8MAjUFAl2oRlAACgkQ9GknjS8M
+AjX9mhAAmYfmZAbdZ9X3KQHWi0AdlFM3fhOnI+pK36Ctk/ydMfgA0MaCsee73Out
+WRY+dzNg8FwzPdeOAIIJk5tSwCVXK5iIEkDMAW/8EErTF/LR8OOCKPB1dRAGXy0v
+unocaNHeYOP8BVPbnwwGgyBVuVv7J21BbVf4wwQ/M/4tz6VJGahiTrGUhFWkaVZT
+aaaWMnrdaccn4u0q1/uR0llJnY8CLGPEKANV2zRvqNKUz/ehyUYrLtRdlcHAsBZU
+IRucEaHJk5OfPntoWNMjTEJRVj78Nfv3JUVSRScn3EBYR973gAdUXhFinCD1uEW3
+PSYDjqu9qJjq14UOHlh/TSiCaixjWHwGIcnYe42hcSj3kdvungA01xDkFrGlz6bj
+ST2xgGWmplu/B9cc55TdKM2vajjqCI4mY5Tnb9CJwtcri8hWLRQeSCB6Wl1BnpvL
+yMpOb5rWBm0oF34iFaxCYCgZ9H8CdvJQLagChzQsvRHPjGyYBDlHhQDEXLqXuTk7
+os3r1D7SygrvslcMM+nNSDeS+87tah28lXmvA4ClZ/Bm9tcdQ4dPcAW5qQ9MIAUf
+sQZMGw+WQ/6lRO8fnNoMlWsJgvwfFKFRqsT9r8qt9XGvW5SSGl3ziLpMVdTWn18l
+i7B//7p7PhtIeqZrc84udDw5SKz9bJAyUswDqv7SqFdjHKq2x/k=
+=gXeR
+-----END PGP SIGNATURE-----
+--=-=-=--
 
