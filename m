@@ -2,89 +2,83 @@ Return-Path: <SRS0=yZS3=YK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.9 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1AC5FECE58E
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 72B7AECE58D
 	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 17:21:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9604C20872
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 17:21:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 43B8220872
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 17:21:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SBHaRncs"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9604C20872
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="M5F13e/B"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 43B8220872
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54178 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54180 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iL9Sn-0008Cp-TW
-	for qemu-devel@archiver.kernel.org; Thu, 17 Oct 2019 13:21:25 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41332)
+	id 1iL9So-00004u-S1
+	for qemu-devel@archiver.kernel.org; Thu, 17 Oct 2019 13:21:26 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36223)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <msys.mizuma@gmail.com>) id 1iL8sq-0006ka-U6
- for qemu-devel@nongnu.org; Thu, 17 Oct 2019 12:44:18 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1iL8MZ-0006jK-T7
+ for qemu-devel@nongnu.org; Thu, 17 Oct 2019 12:10:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <msys.mizuma@gmail.com>) id 1iL8sm-0004UT-W0
- for qemu-devel@nongnu.org; Thu, 17 Oct 2019 12:44:14 -0400
-Received: from mail-qk1-x741.google.com ([2607:f8b0:4864:20::741]:45166)
+ (envelope-from <peter.maydell@linaro.org>) id 1iL8MY-0000ZK-FA
+ for qemu-devel@nongnu.org; Thu, 17 Oct 2019 12:10:55 -0400
+Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:37253)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <msys.mizuma@gmail.com>)
- id 1iL8sm-0004UH-Ro; Thu, 17 Oct 2019 12:44:12 -0400
-Received: by mail-qk1-x741.google.com with SMTP id z67so2455780qkb.12;
- Thu, 17 Oct 2019 09:44:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:in-reply-to:user-agent;
- bh=h9q8Pc+WDp35mofry08Rs0+qfTQt4B5s1h/hLQXXb9E=;
- b=SBHaRncs3a0kSYLnMuDQ2muyXiWIgrUCkpK1KCiETHiI75NCpPWyLjXe6vK6HgoSEI
- fxEqyf3n+TpsGpuqPqsLEG3Wce6SbNZj6YTjLT4p5rOr86qbpI+MaYFCY8X2EuwUk2Xa
- 1out+lWnpgvjdgyqe/kY7kuS4KOvaITi8XJv9SNkYtOV4KILPBXtMdLdbXj3lsGKy151
- uoRS48TlrhREY3qx19F84KCjJODd9lzfsPWiMgkCD9gNObAYaLZm3Ubve/XDzgc0Kc9W
- 3pa3IrTr+0ZXpOEC6ZWgC+rLeW58y8+wq9jP5Q6BAlukaxgBgik2WfSuKPpceVWOOcSm
- ZOcQ==
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1iL8MY-0000Z5-9k
+ for qemu-devel@nongnu.org; Thu, 17 Oct 2019 12:10:54 -0400
+Received: by mail-ot1-x341.google.com with SMTP id k32so2379882otc.4
+ for <qemu-devel@nongnu.org>; Thu, 17 Oct 2019 09:10:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=4pccs28A3obC2PWpJv9i2yXkR50++8k8gHsTRlSoNyc=;
+ b=M5F13e/Ba5j7krASuoq9b7V05tAPKAFi9XrieCcxg8qLSCU5SGpuinWIHK1PCamkS9
+ lPssevGyx10h0H2/dzgstftdAm5iTwYEoKT3UfeWoqQs2FkVvAvgoQ6OZp5ZtFFvL/Ot
+ YRdZcFuBLytZ1KHytcTAbPL+payZgvNS+qIlhXOFpUsy++2UP8ims0kDfk7qr0rphyOF
+ bay4DbvyK9+0hE5qbOZfWFEj5loqY3dxo5tdAbLVr3nWLmwfBKKtHF8ezCy1fiV/3m6X
+ wKXpAx3gRd+rOG8P88sWfyykptJ9FSHxNQh6D3BEJOnr+7eDxGGLPDv1hLUJ2aYNGvUG
+ iy4w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to:user-agent;
- bh=h9q8Pc+WDp35mofry08Rs0+qfTQt4B5s1h/hLQXXb9E=;
- b=tSdsczA/pwD4XbN8fQMb+LaQWICXxPww0BQC+CFSsQc096iEBh46KTnMnZuM10/csd
- 23iR6IrTPBGxsnLAR8BEi6iJepeRjMKWfFmsfYUEYzH34EGaKEOxM/8vrgcgxjxFqDBo
- WTGPu5Qt3SzmSbquULOuMyS3cnGRVAvraFf79iw6DWtwypVdZiv1YXn4lKXS4Q/yQVGP
- o9ShwEdwfE50ncV4SiOxvLA8o6ooWKcxsXj6ky5Rkd/KX5TQpbHRGOnxYxPwMerrs21+
- Y4mORL2dg08dqolZjcHIARk0mGWFQsx4DnPn0OorvncNXz6TYJ9Gf6122WYGivWBX8Bo
- Y9qQ==
-X-Gm-Message-State: APjAAAUixrwKtuoggw/cH/LggSFUzaWc5Et3FEwGoFYAlm82LmS5c9i7
- ixRWUSQ23kTtouTACk9hCg==
-X-Google-Smtp-Source: APXvYqw0Vpegw8MrL+WhVpa1I7mnkNgLDaaOE30Iz//GZDMH3rkNefouS7duIf10J5Dk5RZCSTz1lQ==
-X-Received: by 2002:a05:620a:896:: with SMTP id
- b22mr4247013qka.216.1571330651957; 
- Thu, 17 Oct 2019 09:44:11 -0700 (PDT)
-Received: from gabell (nat-pool-bos-t.redhat.com. [66.187.233.206])
- by smtp.gmail.com with ESMTPSA id o38sm1871411qtc.39.2019.10.17.09.44.10
- (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
- Thu, 17 Oct 2019 09:44:11 -0700 (PDT)
-Date: Thu, 17 Oct 2019 12:44:08 -0400
-From: Masayoshi Mizuma <msys.mizuma@gmail.com>
-To: Andrew Jones <drjones@redhat.com>
-Subject: Re: [PATCH v6 7/9] target/arm/kvm: scratch vcpu: Preserve input
- kvm_vcpu_init features
-Message-ID: <20191017164408.k56d2u3swgkvunyx@gabell>
-References: <20191016085408.24360-1-drjones@redhat.com>
- <20191016085408.24360-8-drjones@redhat.com>
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=4pccs28A3obC2PWpJv9i2yXkR50++8k8gHsTRlSoNyc=;
+ b=hLB6pBzjgH2Y1IDaG2AOyqLoHUkUsJ9R0eELYFKfG8YPRKtMDDfJbESPG5gTPwIa2y
+ XdpCq48uSZIgRYCVrk39dviy87LwR2we71bG+0R5jtmY+3TDFrIXKPtDMQ5eV+wfYOIR
+ t78yu0ycplCjyxMsII8fjvcvi+6QrKIZD9S0Hzp8pfUNMSst23sanNc07/4pkl7ytIPa
+ AXGo2iHaji/a3OUXCIacBL+pOTCYlpB5lPor5A9PuZ3nenTS2dnH8VWJM4EXoe3l6wJN
+ 0+flTfieXbL5lJMvCIVQETiE8eixvz8Rw1QKV6cz14HGNtwT6yDOpOPLYvBNbV/K4eBB
+ FnaQ==
+X-Gm-Message-State: APjAAAUrj8soXIqDb2wN9E8jACkbr4/6mOVEC5e7TZyXHfK+ImvP6qrT
+ GUD5Brbsz5GT2mt4V93MD77tWZA+WWRIc0JN5nQ7aA==
+X-Google-Smtp-Source: APXvYqwPS8ytHPWS3QyoObXLeAL6Jcq68wu+BEHpTLqkufeyRfo/7bQBJHE+Wdj+oy6Byh5TgZIOqgrZrzb8p49CCRI=
+X-Received: by 2002:a9d:30c1:: with SMTP id r1mr3787149otg.91.1571328653377;
+ Thu, 17 Oct 2019 09:10:53 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20191016085408.24360-8-drjones@redhat.com>
-User-Agent: NeoMutt/20180716
+References: <20191017132905.5604-1-peter.maydell@linaro.org>
+ <20191017132905.5604-6-peter.maydell@linaro.org>
+ <18066f84-ea56-20c3-6e43-58978f8569bb@redhat.com>
+In-Reply-To: <18066f84-ea56-20c3-6e43-58978f8569bb@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 17 Oct 2019 17:10:40 +0100
+Message-ID: <CAFEAcA-CFGt3vXnrvtbXF-GOJmx=34GdbrhnNHyPnHAnguKtuw@mail.gmail.com>
+Subject: Re: [PATCH 5/8] hw/timer/altera_timer.c: Switch to transaction-based
+ ptimer API
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::741
+X-Received-From: 2607:f8b0:4864:20::341
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,129 +90,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, richard.henderson@linaro.org,
- qemu-devel@nongnu.org, armbru@redhat.com, eric.auger@redhat.com,
- qemu-arm@nongnu.org, imammedo@redhat.com, alex.bennee@linaro.org,
- Dave.Martin@arm.com
+Cc: Thomas Huth <huth@tuxfamily.org>, Magnus Damm <magnus.damm@gmail.com>,
+ QEMU Developers <qemu-devel@nongnu.org>, Michael Walle <michael@walle.cc>,
+ "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
+ Guan Xuetao <gxt@mprc.pku.edu.cn>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, Oct 16, 2019 at 10:54:06AM +0200, Andrew Jones wrote:
-> kvm_arm_create_scratch_host_vcpu() takes a struct kvm_vcpu_init
-> parameter. Rather than just using it as an output parameter to
-> pass back the preferred target, use it also as an input parameter,
-> allowing a caller to pass a selected target if they wish and to
-> also pass cpu features. If the caller doesn't want to select a
-> target they can pass -1 for the target which indicates they want
-> to use the preferred target and have it passed back like before.
-> 
-> Signed-off-by: Andrew Jones <drjones@redhat.com>
-> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-> Reviewed-by: Eric Auger <eric.auger@redhat.com>
+On Thu, 17 Oct 2019 at 17:09, Philippe Mathieu-Daud=C3=A9 <philmd@redhat.co=
+m> wrote:
+>
+> On 10/17/19 3:29 PM, Peter Maydell wrote:
+> > -    t->bh =3D qemu_bh_new(timer_hit, t);
+> > -    t->ptimer =3D ptimer_init_with_bh(t->bh, PTIMER_POLICY_DEFAULT);
+> > +    t->ptimer =3D ptimer_init(timer_hit, t, PTIMER_POLICY_DEFAULT);
+> > +    ptimer_transaction_begin(t->ptimer);
+> >       ptimer_set_freq(t->ptimer, t->freq_hz);
+> > +    ptimer_transaction_commit(t->ptimer);
+>
+> This looks odd because timers are not running at this point (REALIZE),
+> but if we don't protect it, ptimer_set_freq() will trigger the assertion.
 
-This patch works well on aarch64 with SVE machine, thanks!
-Please feel free to add:
+Yep. The same pattern is used in several of the other ptimer
+users where a fixed frequency or period is set immediately after
+init.
 
-    Tested-by: Masayoshi Mizuma <m.mizuma@jp.fujitsu.com>
-
-- Masa
-
-> ---
->  target/arm/kvm.c   | 20 +++++++++++++++-----
->  target/arm/kvm32.c |  6 +++++-
->  target/arm/kvm64.c |  6 +++++-
->  3 files changed, 25 insertions(+), 7 deletions(-)
-> 
-> diff --git a/target/arm/kvm.c b/target/arm/kvm.c
-> index f07332bbda30..5b82cefef608 100644
-> --- a/target/arm/kvm.c
-> +++ b/target/arm/kvm.c
-> @@ -66,7 +66,7 @@ bool kvm_arm_create_scratch_host_vcpu(const uint32_t *cpus_to_try,
->                                        int *fdarray,
->                                        struct kvm_vcpu_init *init)
->  {
-> -    int ret, kvmfd = -1, vmfd = -1, cpufd = -1;
-> +    int ret = 0, kvmfd = -1, vmfd = -1, cpufd = -1;
->  
->      kvmfd = qemu_open("/dev/kvm", O_RDWR);
->      if (kvmfd < 0) {
-> @@ -86,7 +86,14 @@ bool kvm_arm_create_scratch_host_vcpu(const uint32_t *cpus_to_try,
->          goto finish;
->      }
->  
-> -    ret = ioctl(vmfd, KVM_ARM_PREFERRED_TARGET, init);
-> +    if (init->target == -1) {
-> +        struct kvm_vcpu_init preferred;
-> +
-> +        ret = ioctl(vmfd, KVM_ARM_PREFERRED_TARGET, &preferred);
-> +        if (!ret) {
-> +            init->target = preferred.target;
-> +        }
-> +    }
->      if (ret >= 0) {
->          ret = ioctl(cpufd, KVM_ARM_VCPU_INIT, init);
->          if (ret < 0) {
-> @@ -98,10 +105,12 @@ bool kvm_arm_create_scratch_host_vcpu(const uint32_t *cpus_to_try,
->           * creating one kind of guest CPU which is its preferred
->           * CPU type.
->           */
-> +        struct kvm_vcpu_init try;
-> +
->          while (*cpus_to_try != QEMU_KVM_ARM_TARGET_NONE) {
-> -            init->target = *cpus_to_try++;
-> -            memset(init->features, 0, sizeof(init->features));
-> -            ret = ioctl(cpufd, KVM_ARM_VCPU_INIT, init);
-> +            try.target = *cpus_to_try++;
-> +            memcpy(try.features, init->features, sizeof(init->features));
-> +            ret = ioctl(cpufd, KVM_ARM_VCPU_INIT, &try);
->              if (ret >= 0) {
->                  break;
->              }
-> @@ -109,6 +118,7 @@ bool kvm_arm_create_scratch_host_vcpu(const uint32_t *cpus_to_try,
->          if (ret < 0) {
->              goto err;
->          }
-> +        init->target = try.target;
->      } else {
->          /* Treat a NULL cpus_to_try argument the same as an empty
->           * list, which means we will fail the call since this must
-> diff --git a/target/arm/kvm32.c b/target/arm/kvm32.c
-> index 2451a2d4bbef..32bf8d6757c4 100644
-> --- a/target/arm/kvm32.c
-> +++ b/target/arm/kvm32.c
-> @@ -53,7 +53,11 @@ bool kvm_arm_get_host_cpu_features(ARMHostCPUFeatures *ahcf)
->          QEMU_KVM_ARM_TARGET_CORTEX_A15,
->          QEMU_KVM_ARM_TARGET_NONE
->      };
-> -    struct kvm_vcpu_init init;
-> +    /*
-> +     * target = -1 informs kvm_arm_create_scratch_host_vcpu()
-> +     * to use the preferred target
-> +     */
-> +    struct kvm_vcpu_init init = { .target = -1, };
->  
->      if (!kvm_arm_create_scratch_host_vcpu(cpus_to_try, fdarray, &init)) {
->          return false;
-> diff --git a/target/arm/kvm64.c b/target/arm/kvm64.c
-> index 850da1b5e6aa..c7ecefbed720 100644
-> --- a/target/arm/kvm64.c
-> +++ b/target/arm/kvm64.c
-> @@ -502,7 +502,11 @@ bool kvm_arm_get_host_cpu_features(ARMHostCPUFeatures *ahcf)
->          KVM_ARM_TARGET_CORTEX_A57,
->          QEMU_KVM_ARM_TARGET_NONE
->      };
-> -    struct kvm_vcpu_init init;
-> +    /*
-> +     * target = -1 informs kvm_arm_create_scratch_host_vcpu()
-> +     * to use the preferred target
-> +     */
-> +    struct kvm_vcpu_init init = { .target = -1, };
->  
->      if (!kvm_arm_create_scratch_host_vcpu(cpus_to_try, fdarray, &init)) {
->          return false;
-> -- 
-> 2.21.0
-> 
-> 
+thanks
+-- PMM
 
