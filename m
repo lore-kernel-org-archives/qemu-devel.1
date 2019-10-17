@@ -7,75 +7,74 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2BC08CA9EB3
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 23:03:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 754E9CA9EB3
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 23:03:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E316321D7A
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 23:03:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 41F5621D7A
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 23:03:25 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="qpGJuwyU"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E316321D7A
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dnrccJ+a"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 41F5621D7A
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33840 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33842 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iLEnX-0006HB-G1
-	for qemu-devel@archiver.kernel.org; Thu, 17 Oct 2019 19:03:11 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41023)
+	id 1iLEnj-0006TT-Uw
+	for qemu-devel@archiver.kernel.org; Thu, 17 Oct 2019 19:03:23 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41090)
  by lists.gnu.org with esmtp (Exim 4.90_1)
  (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1iLEij-0000LL-LV
- for qemu-devel@nongnu.org; Thu, 17 Oct 2019 18:58:14 -0400
+ id 1iLEir-0000ed-Id
+ for qemu-devel@nongnu.org; Thu, 17 Oct 2019 18:58:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
  (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1iLEii-0002LA-EH
- for qemu-devel@nongnu.org; Thu, 17 Oct 2019 18:58:13 -0400
-Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:53577)
+ id 1iLEiq-0002Pv-EI
+ for qemu-devel@nongnu.org; Thu, 17 Oct 2019 18:58:21 -0400
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:45239)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1iLEii-0002Km-7b; Thu, 17 Oct 2019 18:58:12 -0400
-Received: by mail-wm1-x341.google.com with SMTP id i16so4174770wmd.3;
- Thu, 17 Oct 2019 15:58:12 -0700 (PDT)
+ id 1iLEiq-0002Pi-7w; Thu, 17 Oct 2019 18:58:20 -0400
+Received: by mail-wr1-x444.google.com with SMTP id r5so4105607wrm.12;
+ Thu, 17 Oct 2019 15:58:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=wn44savEe+flJq53w0kELlQpNWIaC5iY2joSfr7hWdU=;
- b=qpGJuwyUINs2+y1Lr/g9dGA0RrPnzmRG+jKIso5SuM6WgbkjkgwgQghSkX3EHP5MtF
- 0gzWwjtCz73x/lRc4CA8gzwLBN5/5qXZ5nfd7GMlnkt58ZW4IFnhxL8PjV0lj+b0U9aL
- Ixm/XVRuQ426sLRAxxfjlJbRdRY3n4n/t734vnlh3kSTaQbkBx+49ZK5miHrMe3N7kpM
- ouia4ZilNq30YiDGVyWF5h8jyBGI5ki4Il+PQ7gn00FDRjyYqenIYn6hQZys2qioR1+j
- LD1f3Oisu/AudRgrQVprB2FHTwnuJa1mYgYIsowpMgMHHgSlZV51HjJf4scVai9D1Ez8
- EnNg==
+ bh=tcth+JDU+ZzQi6ASbN2YExjNxmTw0uOL6sqXDgsMrm4=;
+ b=dnrccJ+atmGReobUNWXCkrr2NHQh4LOYZ8yz7ISqYGtpB1SwMrNT23tMMHfbbi7xmi
+ DXHULJjMsqF1tM6JTe65WwYVtNY319qLIegsRGTTyqiT7X8t4hwA3HZnnirkdijh8BZe
+ L2CtVkx2qiTnc5Ad5eAu5Zgc47nWXzdWSjC4dGxhOkTzam2U6Z3x5hVILu365wr/USxa
+ eExlnFzcWEU9zWYs9QUtFANzs6ek7FPlYezevriK/jZrTBG7IG7aRoCy0wEhQZZsZ2Yf
+ 4wtu6sRuMf3YN2gNsm6KXIOoiDP126AOG1OGR//Bke06rbfOBeZhs6u232ydZpt37kh6
+ Al5g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=wn44savEe+flJq53w0kELlQpNWIaC5iY2joSfr7hWdU=;
- b=KhKxrz3fRLLfmRflN0U4wUZ2mNsaqUE80heQKT/Crp0u7hlIH4BtwLL5lThn8Wfv8a
- RE2VNEzg2M2UxKQ6qCOvqxBfYGklTnJQdHssV1nAFPe16Igi7+lr4sWJ0IhsPbWNFutM
- rKnYzFxBrjbpJ0Lz+ivyYbzAo0+AKKlm88AKnXf1nFTHLrWHhNc3OdtokKkvLalqkrK8
- xY3FDOhLk3lbY2sfXVN3MAM6/tE+FK0RX2gHa/UMg43EAZr1eB+XMRo/xgXxf7a2j8IS
- TT+oZ6g4IV7iNLn0A8cvRurLeERwUeFugfkfc+BR6tbOVl6hemMpmKM2jXJjJSx1QAXB
- owng==
-X-Gm-Message-State: APjAAAUhAJ1j/IKRLdSolTMnT7QVK9T6XKPLH0x9bOrGPQOXr4rN4Ggx
- Qb+M1Kthi5voDwYkLANqIg47f1ZQ
-X-Google-Smtp-Source: APXvYqwxUPvjTtX6r658QRECOZC7LX/V5FW1MG6wfJZeK8dJvNuQRgDbGTaC6y0bQOQvfqOA5dIa0A==
-X-Received: by 2002:a1c:6389:: with SMTP id x131mr4665604wmb.77.1571353090326; 
- Thu, 17 Oct 2019 15:58:10 -0700 (PDT)
+ bh=tcth+JDU+ZzQi6ASbN2YExjNxmTw0uOL6sqXDgsMrm4=;
+ b=hAQ5bXdNn1SPN2GwPdFbvYqTQMSHJDw5FSkPHJ11qysTmGnZ2nQDE5Ehtdp/q9zktd
+ uwXWiTazD3D3PLTHH0XphTZavVdObZCc7aMWXUx44Bg7U3jgutgmd9a4fWN20JjhyUEe
+ 6FB/fnEFw1/Qnik7vUzd8asoQoD5M4bzNosnMYFsOn1l377vZvarNhUxcboDnawBpyeb
+ u0ndbWiM0gmfGVZqCrtxQDYJb01AQln34ZiF0PSbGCotcWL1WJkPHiAd/+9Xj3TDgtOn
+ QCCAUGciMABsrTH/cNjb+3JVbEncEkrC7Ey1oYYbCx+p61h0WGzWvkghq15PWizSPKZV
+ hrAA==
+X-Gm-Message-State: APjAAAW6z5UWnd9Z+Pi7G9e8UqWTqqbmOHXRdDoCEKtlqwgGG/DVm7Qg
+ kctcqMDdpXVO6v40ggFlgI7G9vUv
+X-Google-Smtp-Source: APXvYqzpC2GtwcLIwVS4px2vVzoMruFiOfAGfWJQsbiKUBqABvEuPe7wjlRP5ZwdQds/xPBG+10w7Q==
+X-Received: by 2002:adf:c98b:: with SMTP id f11mr5309958wrh.274.1571353098869; 
+ Thu, 17 Oct 2019 15:58:18 -0700 (PDT)
 Received: from localhost.localdomain (14.red-88-21-201.staticip.rima-tde.net.
  [88.21.201.14])
- by smtp.gmail.com with ESMTPSA id m18sm3993873wrg.97.2019.10.17.15.58.06
+ by smtp.gmail.com with ESMTPSA id m18sm3993873wrg.97.2019.10.17.15.58.16
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 17 Oct 2019 15:58:07 -0700 (PDT)
+ Thu, 17 Oct 2019 15:58:18 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 02/10] hw/arm/bcm2835_peripherals: Use the thermal sensor
- block
-Date: Fri, 18 Oct 2019 00:57:52 +0200
-Message-Id: <20191017225800.6946-3-f4bug@amsat.org>
+Subject: [PATCH v2 05/10] hw/arm/bcm2836: Make the SoC code modular
+Date: Fri, 18 Oct 2019 00:57:55 +0200
+Message-Id: <20191017225800.6946-6-f4bug@amsat.org>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20191017225800.6946-1-f4bug@amsat.org>
 References: <20191017225800.6946-1-f4bug@amsat.org>
@@ -85,7 +84,7 @@ Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::341
+X-Received-From: 2a00:1450:4864:20::444
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,8 +96,7 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Rob Herring <robh@kernel.org>, Alistair Francis <alistair.francis@wdc.com>,
- Peter Maydell <peter.maydell@linaro.org>,
+Cc: Rob Herring <robh@kernel.org>, Peter Maydell <peter.maydell@linaro.org>,
  Alistair Francis <alistair@alistair23.me>,
  =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
  Andrew Baumann <Andrew.Baumann@microsoft.com>, Pekka Enberg <penberg@iki.fi>,
@@ -112,79 +110,85 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Map the thermal sensor in the BCM2835 block.
+This file creates the BCM2836/BCM2837 blocks.
+The biggest differences with the BCM2838 we are going to add, are
+the base addresses of the interrupt controller and the peripherals.
+Add these addresses in the BCM283XInfo structure to make this
+block more modular. Remove the MCORE_OFFSET offset as it is
+not useful and rather confusing.
 
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+Reviewed-by: Esteban Bosse <estebanbosse@gmail.com>
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- hw/arm/bcm2835_peripherals.c         | 13 +++++++++++++
- include/hw/arm/bcm2835_peripherals.h |  2 ++
- include/hw/arm/raspi_platform.h      |  1 +
- 3 files changed, 16 insertions(+)
+ hw/arm/bcm2836.c | 18 +++++++++---------
+ 1 file changed, 9 insertions(+), 9 deletions(-)
 
-diff --git a/hw/arm/bcm2835_peripherals.c b/hw/arm/bcm2835_peripherals.c
-index fdcf616c56..70bf927a02 100644
---- a/hw/arm/bcm2835_peripherals.c
-+++ b/hw/arm/bcm2835_peripherals.c
-@@ -111,6 +111,10 @@ static void bcm2835_peripherals_init(Object *obj)
-     object_property_add_const_link(OBJECT(&s->dma), "dma-mr",
-                                    OBJECT(&s->gpu_bus_mr), &error_abort);
+diff --git a/hw/arm/bcm2836.c b/hw/arm/bcm2836.c
+index 723aef6bf5..019e67b906 100644
+--- a/hw/arm/bcm2836.c
++++ b/hw/arm/bcm2836.c
+@@ -16,15 +16,11 @@
+ #include "hw/arm/raspi_platform.h"
+ #include "hw/sysbus.h"
  
-+    /* Thermal */
-+    sysbus_init_child_obj(obj, "thermal", &s->thermal, sizeof(s->thermal),
-+                          TYPE_BCM2835_THERMAL);
-+
-     /* GPIO */
-     sysbus_init_child_obj(obj, "gpio", &s->gpio, sizeof(s->gpio),
-                           TYPE_BCM2835_GPIO);
-@@ -321,6 +325,15 @@ static void bcm2835_peripherals_realize(DeviceState *dev, Error **errp)
-                                                   INTERRUPT_DMA0 + n));
+-/* Peripheral base address seen by the CPU */
+-#define BCM2836_PERI_BASE       0x3F000000
+-
+-/* "QA7" (Pi2) interrupt controller and mailboxes etc. */
+-#define BCM2836_CONTROL_BASE    0x40000000
+-
+ struct BCM283XInfo {
+     const char *name;
+     const char *cpu_type;
++    hwaddr peri_base; /* Peripheral base address seen by the CPU */
++    hwaddr ctrl_base; /* Interrupt controller and mailboxes etc. */
+     int clusterid;
+ };
+ 
+@@ -32,12 +28,16 @@ static const BCM283XInfo bcm283x_socs[] = {
+     {
+         .name = TYPE_BCM2836,
+         .cpu_type = ARM_CPU_TYPE_NAME("cortex-a7"),
++        .peri_base = 0x3f000000,
++        .ctrl_base = 0x40000000,
+         .clusterid = 0xf,
+     },
+ #ifdef TARGET_AARCH64
+     {
+         .name = TYPE_BCM2837,
+         .cpu_type = ARM_CPU_TYPE_NAME("cortex-a53"),
++        .peri_base = 0x3f000000,
++        .ctrl_base = 0x40000000,
+         .clusterid = 0x0,
+     },
+ #endif
+@@ -104,7 +104,7 @@ static void bcm2836_realize(DeviceState *dev, Error **errp)
      }
  
-+    /* THERMAL */
-+    object_property_set_bool(OBJECT(&s->thermal), true, "realized", &err);
-+    if (err) {
-+        error_propagate(errp, err);
-+        return;
-+    }
-+    memory_region_add_subregion(&s->peri_mr, THERMAL_OFFSET,
-+                sysbus_mmio_get_region(SYS_BUS_DEVICE(&s->thermal), 0));
-+
-     /* GPIO */
-     object_property_set_bool(OBJECT(&s->gpio), true, "realized", &err);
-     if (err) {
-diff --git a/include/hw/arm/bcm2835_peripherals.h b/include/hw/arm/bcm2835_peripherals.h
-index 62a4c7b559..be7ad9b499 100644
---- a/include/hw/arm/bcm2835_peripherals.h
-+++ b/include/hw/arm/bcm2835_peripherals.h
-@@ -20,6 +20,7 @@
- #include "hw/misc/bcm2835_property.h"
- #include "hw/misc/bcm2835_rng.h"
- #include "hw/misc/bcm2835_mbox.h"
-+#include "hw/misc/bcm2835_thermal.h"
- #include "hw/sd/sdhci.h"
- #include "hw/sd/bcm2835_sdhost.h"
- #include "hw/gpio/bcm2835_gpio.h"
-@@ -53,6 +54,7 @@ typedef struct BCM2835PeripheralState {
-     SDHCIState sdhci;
-     BCM2835SDHostState sdhost;
-     BCM2835GpioState gpio;
-+    Bcm2835ThermalState thermal;
-     UnimplementedDeviceState i2s;
-     UnimplementedDeviceState spi[1];
-     UnimplementedDeviceState i2c[3];
-diff --git a/include/hw/arm/raspi_platform.h b/include/hw/arm/raspi_platform.h
-index cdcbca943f..61b04a1bd4 100644
---- a/include/hw/arm/raspi_platform.h
-+++ b/include/hw/arm/raspi_platform.h
-@@ -48,6 +48,7 @@
- #define SPI0_OFFSET             0x204000
- #define BSC0_OFFSET             0x205000 /* BSC0 I2C/TWI */
- #define OTP_OFFSET              0x20f000
-+#define THERMAL_OFFSET          0x212000
- #define BSC_SL_OFFSET           0x214000 /* SPI slave */
- #define AUX_OFFSET              0x215000 /* AUX: UART1/SPI1/SPI2 */
- #define EMMC1_OFFSET            0x300000
+     sysbus_mmio_map_overlap(SYS_BUS_DEVICE(&s->peripherals), 0,
+-                            BCM2836_PERI_BASE, 1);
++                            info->peri_base, 1);
+ 
+     /* bcm2836 interrupt controller (and mailboxes, etc.) */
+     object_property_set_bool(OBJECT(&s->control), true, "realized", &err);
+@@ -113,7 +113,7 @@ static void bcm2836_realize(DeviceState *dev, Error **errp)
+         return;
+     }
+ 
+-    sysbus_mmio_map(SYS_BUS_DEVICE(&s->control), 0, BCM2836_CONTROL_BASE);
++    sysbus_mmio_map(SYS_BUS_DEVICE(&s->control), 0, info->ctrl_base);
+ 
+     sysbus_connect_irq(SYS_BUS_DEVICE(&s->peripherals), 0,
+         qdev_get_gpio_in_named(DEVICE(&s->control), "gpu-irq", 0));
+@@ -126,7 +126,7 @@ static void bcm2836_realize(DeviceState *dev, Error **errp)
+ 
+         /* set periphbase/CBAR value for CPU-local registers */
+         object_property_set_int(OBJECT(&s->cpus[n]),
+-                                BCM2836_PERI_BASE + MSYNC_OFFSET,
++                                info->peri_base,
+                                 "reset-cbar", &err);
+         if (err) {
+             error_propagate(errp, err);
 -- 
 2.21.0
 
