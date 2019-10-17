@@ -2,79 +2,90 @@ Return-Path: <SRS0=yZS3=YK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CD868ECE58E
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 17:24:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8579BECE58D
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 17:25:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9B71720872
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 17:24:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5185720872
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 17:25:14 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="xzpils4x"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9B71720872
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="i1djodDc"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5185720872
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54294 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54300 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iL9Vy-0004LR-4S
-	for qemu-devel@archiver.kernel.org; Thu, 17 Oct 2019 13:24:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36577)
+	id 1iL9WT-0004xt-8L
+	for qemu-devel@archiver.kernel.org; Thu, 17 Oct 2019 13:25:13 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42567)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1iL8P0-00023a-7x
- for qemu-devel@nongnu.org; Thu, 17 Oct 2019 12:13:28 -0400
+ (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1iL91B-00018S-KK
+ for qemu-devel@nongnu.org; Thu, 17 Oct 2019 12:52:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1iL8Oy-0001R4-9R
- for qemu-devel@nongnu.org; Thu, 17 Oct 2019 12:13:26 -0400
-Received: from mail-ot1-x32f.google.com ([2607:f8b0:4864:20::32f]:38925)
+ (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1iL91A-0006ay-Jn
+ for qemu-devel@nongnu.org; Thu, 17 Oct 2019 12:52:53 -0400
+Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:52233)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1iL8Oy-0001QN-39
- for qemu-devel@nongnu.org; Thu, 17 Oct 2019 12:13:24 -0400
-Received: by mail-ot1-x32f.google.com with SMTP id s22so2374511otr.6
- for <qemu-devel@nongnu.org>; Thu, 17 Oct 2019 09:13:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=ULGX1Pw0oU0K+1vmNUVb8VFsgvzKvU/ec8B90seQ/cQ=;
- b=xzpils4xsulwztPOEwAPFmJi5x96TP6E6YT0wXTwPW06R1YSb4xSbH5/n5N33LEMi4
- l7yC2oj1BZmn1xmhL6lXfvfxdUqp+gwt/dFVu1YuPck2KQ+ob0oWdji1yoiHfv1986Bt
- B81ADXDpx5A7iqORWmSmSwytGyGXLyBUc1sGd//n/ihAI4pUukgc/dWhVAgdOIaPa2fN
- cQs25yZff92Gi4M6IZggHTOACAeBPEzDWp6C+sO6RFlH/bvOIgRmlunoIfMOerkb8KfW
- amkH+qeenG29hORl/bnz28jiiP7JOyNo6J9NWD4959Nc4CzZUdb9BbvSGOqjY9VXbXNg
- k0qA==
+ (Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1iL91A-0006ag-E0; Thu, 17 Oct 2019 12:52:52 -0400
+Received: by mail-wm1-x341.google.com with SMTP id r19so3298738wmh.2;
+ Thu, 17 Oct 2019 09:52:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=Fw8En6w1n23AXCLCPcsRW4J3X8Ym/DLL6U1eg1A662Y=;
+ b=i1djodDcuYTdG28urBgXgCbYwElAubJwRUaf83f9I5LhoP0Xy9vYJ4IpFcbh48dAfr
+ FcIK8AVS05/+eNalZFOBYXK8HGJA0zsCL7g+pLsr11iIIAaiS2xtFeXf/JP5yhUgRCrj
+ 24aBglX5gF1TSWiZNflg3rWP4n+EOTd+AJQ+UKl+5A2cXAO5K2wFt7bupK+nlKfU1sDu
+ jc5Y+H1ODTSbNhXDCROWdQ8kxFIgjVUNrfRrl2IdW3OfobKm4vVNR+4Fqnt5eEwFnOR/
+ HIxRMVbaoNvOEEnRLGpG6489WyqMduIWIHaSmLElqKvLxATV3Utx+Ii5i3RaxOTxjSmM
+ 8LDw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=ULGX1Pw0oU0K+1vmNUVb8VFsgvzKvU/ec8B90seQ/cQ=;
- b=RF2wzgfJVvNlHOWjq2lV0L1hFuAGGXvwP3TWS2dPud3R9WEBBCP/mpS4VK92aC+cFb
- NKTYez9GN9via5mqXC61tyirRZ045UlZoUWD/rfAjC6uPck2C9pmRFaOqPWAC0v7sVxx
- KZJvzmtSp2rz5Fgqktdw8L4aIQ83iD3S0M781dI4r19bA13/YsJ23no9YTM87Zln6meb
- gCz/NFoAoQPPhr8BZEqM0rc6KaGxHsk/YFBHxYQ+ufjMwje34SzQwBN3pLQ2stXcFu8S
- 9v2KyJlLu01ZxAmnK+VTzEYJR5P6nZsHzCWiQ8cQHw9C69yli1kOcGZIvrfq+oWjr+n7
- 1J7g==
-X-Gm-Message-State: APjAAAWuk1g/o+scG1rRnNqYW7Cyir4FBiFaYqqiwxVR6G7FprD/3Lk9
- GjzEPAvHx/FjIpboknMlwClyJHMhQjW+j3c1rRoqGuMbkVU=
-X-Google-Smtp-Source: APXvYqwuwA9uUCSNFBfLocasJQ3cAnaofaYkAmhWWYnDSm/JcOVc3UxUiP0O81EW1CCaUtR/Eka/hhH2jUMcmb103f0=
-X-Received: by 2002:a9d:708e:: with SMTP id l14mr3757501otj.135.1571328801844; 
- Thu, 17 Oct 2019 09:13:21 -0700 (PDT)
+ h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
+ :in-reply-to:references:mime-version:content-transfer-encoding;
+ bh=Fw8En6w1n23AXCLCPcsRW4J3X8Ym/DLL6U1eg1A662Y=;
+ b=hORUhw06pqozwXCxXJ9hGUIETUte0v3hSy1MK7maD4m53eOc2k/yBRCw7fYtaPStQB
+ QgxrR9aFnXMXTazBMvSnPn87JlKcETizC/wzOh2WDlTqjXGcbKIMDRoEFBXuX5f6FsPH
+ dWFItwvtray0P0CNNsG287e3XHC+y3f7wB1yZSMsah9+UJljR0ukKh5VWY0pMTnYo24w
+ 5U6jsZN0ExHY5ny99zstq6CPNMPufWi7ocx6zvfZDAoxotU3529Rtx93QEC9p7o9rZeV
+ KZoYZSEwKmy1uucbHvC2SMH348Uxal8Kzp9rA4xeEFAB6bjKGUQF6m3dQh6vv4nAZi0E
+ pkqQ==
+X-Gm-Message-State: APjAAAVKgj2qDHkrfz6FPeiVNWeAcwIWHK0ZbVertRX+l8KxnblvADjF
+ SzpfGHigdVUhdzXxyifq0T6v1IfRHDg=
+X-Google-Smtp-Source: APXvYqxAUt6M0DTBolt+Uie0MwJXpaR+X8GTIikvt7JZU/w0Ypc9aa7hYAJYuqtBq+ZZ4hf6TkL12w==
+X-Received: by 2002:a7b:c930:: with SMTP id h16mr3690875wml.163.1571331171138; 
+ Thu, 17 Oct 2019 09:52:51 -0700 (PDT)
+Received: from x1w.redhat.com (243.red-88-26-246.staticip.rima-tde.net.
+ [88.26.246.243])
+ by smtp.gmail.com with ESMTPSA id w22sm2557363wmc.16.2019.10.17.09.52.49
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 17 Oct 2019 09:52:50 -0700 (PDT)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+To: qemu-devel@nongnu.org
+Subject: [RFC PATCH v3 2/9] tests/acceptance: Fix wait_for_console_pattern()
+ hangs
+Date: Thu, 17 Oct 2019 18:52:32 +0200
+Message-Id: <20191017165239.30159-3-f4bug@amsat.org>
+X-Mailer: git-send-email 2.21.0
+In-Reply-To: <20191017165239.30159-1-f4bug@amsat.org>
+References: <20191017165239.30159-1-f4bug@amsat.org>
 MIME-Version: 1.0
-References: <20191017151606.GA1880840@orkuz.int.mamuti.net>
- <82ea23ea-be23-c374-3f10-65d8f6e79432@redhat.com>
-In-Reply-To: <82ea23ea-be23-c374-3f10-65d8f6e79432@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 17 Oct 2019 17:13:10 +0100
-Message-ID: <CAFEAcA-pkD_LCh++TWoO77=Bu9mYe7HOkaeyCXjLopAmqhpi-g@mail.gmail.com>
-Subject: Re: Default CPU models on s390x and ppc64
-To: David Hildenbrand <david@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::32f
+X-Received-From: 2a00:1450:4864:20::341
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,25 +97,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: David Gibson <dgibson@redhat.com>, Jiri Denemark <jdenemar@redhat.com>,
- David Hildenbrand <dhildenb@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>
+Cc: Fam Zheng <fam@euphon.net>, Eduardo Habkost <ehabkost@redhat.com>,
+ Aleksandar Rikalo <arikalo@wavecomp.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Kamil Rytarowski <kamil@netbsd.org>, qemu-ppc@nongnu.org,
+ Artyom Tarasenko <atar4qemu@gmail.com>, Cleber Rosa <crosa@redhat.com>,
+ =?UTF-8?q?Herv=C3=A9=20Poussineau?= <hpoussin@reactos.org>,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ Aurelien Jarno <aurelien@aurel32.net>,
+ David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, 17 Oct 2019 at 17:09, David Hildenbrand <david@redhat.com> wrote:
-> The default model under KVM is "host", under TCG it's "qemu". We should
-> not use "qemu" under KVM, although it might work on some setups ...
+From: Philippe Mathieu-Daudé <philmd@redhat.com>
 
-Possibly a tangent, but on Arm the approach we used to deal
-with "'-cpu host' only works for kvm" was to define a "-cpu max"
-meaning "best thing you can give me", which is an alias for
--cpu host with KVM and an alias for a CPU with all the extra
-features we have emulation support under TCG. Then users can
-use '-cpu max' and have something that generally will DTRT
-regardless of accelerator.
+Because of a possible deadlock (QEMU waiting for the socket to
+become writable) let's close the console socket as soon as we
+stop to use it.
 
-thanks
--- PMM
+Suggested-by: Cleber Rosa <crosa@redhat.com>
+Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+---
+ tests/acceptance/avocado_qemu/__init__.py | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/tests/acceptance/avocado_qemu/__init__.py b/tests/acceptance/avocado_qemu/__init__.py
+index a0fe16e47f..39f72945cd 100644
+--- a/tests/acceptance/avocado_qemu/__init__.py
++++ b/tests/acceptance/avocado_qemu/__init__.py
+@@ -75,6 +75,7 @@ def wait_for_console_pattern(test, success_message,
+         if success_message in msg:
+             break
+         if failure_message in msg:
++            console.close()
+             fail = 'Failure message found in console: %s' % failure_message
+             test.fail(fail)
+ 
+-- 
+2.21.0
+
 
