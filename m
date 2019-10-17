@@ -2,63 +2,66 @@ Return-Path: <SRS0=yZS3=YK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C3304FA372A
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 08:44:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A7D5EFA3731
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 08:44:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9888C20869
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 08:44:03 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9888C20869
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 7BA1F20869
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 08:44:40 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7BA1F20869
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39966 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39972 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iL1O6-0005qr-OR
-	for qemu-devel@archiver.kernel.org; Thu, 17 Oct 2019 04:44:02 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47276)
+	id 1iL1Oh-0006gt-IY
+	for qemu-devel@archiver.kernel.org; Thu, 17 Oct 2019 04:44:39 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47367)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <quintela@redhat.com>) id 1iL1NM-0005M5-TW
- for qemu-devel@nongnu.org; Thu, 17 Oct 2019 04:43:17 -0400
+ (envelope-from <clg@kaod.org>) id 1iL1Nm-0005gH-CB
+ for qemu-devel@nongnu.org; Thu, 17 Oct 2019 04:43:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <quintela@redhat.com>) id 1iL1NK-0005WO-9F
- for qemu-devel@nongnu.org; Thu, 17 Oct 2019 04:43:15 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:37251)
+ (envelope-from <clg@kaod.org>) id 1iL1Nk-0005iN-WD
+ for qemu-devel@nongnu.org; Thu, 17 Oct 2019 04:43:42 -0400
+Received: from 5.mo4.mail-out.ovh.net ([188.165.44.50]:56919)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <quintela@redhat.com>) id 1iL1NK-0005VX-3O
- for qemu-devel@nongnu.org; Thu, 17 Oct 2019 04:43:14 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id EFEC318CB8F0;
- Thu, 17 Oct 2019 08:43:11 +0000 (UTC)
-Received: from redhat.com (ovpn-116-80.ams2.redhat.com [10.36.116.80])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 6C4E55D713;
- Thu, 17 Oct 2019 08:43:11 +0000 (UTC)
-From: Juan Quintela <quintela@redhat.com>
-To: Scott Cheloha <cheloha@linux.vnet.ibm.com>
-Subject: Re: [PATCH] migration: savevm_state_insert_handler: constant-time
- element insertion
-In-Reply-To: <20191016164156.4506-1-cheloha@linux.vnet.ibm.com> (Scott
- Cheloha's message of "Wed, 16 Oct 2019 11:41:56 -0500")
-References: <20191016164156.4506-1-cheloha@linux.vnet.ibm.com>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.2 (gnu/linux)
-Date: Thu, 17 Oct 2019 10:43:08 +0200
-Message-ID: <87lftjpxsz.fsf@trasno.org>
+ (Exim 4.71) (envelope-from <clg@kaod.org>) id 1iL1Nk-0005eG-QL
+ for qemu-devel@nongnu.org; Thu, 17 Oct 2019 04:43:40 -0400
+Received: from player711.ha.ovh.net (unknown [10.109.160.62])
+ by mo4.mail-out.ovh.net (Postfix) with ESMTP id 2C41520C2AC
+ for <qemu-devel@nongnu.org>; Thu, 17 Oct 2019 10:43:28 +0200 (CEST)
+Received: from kaod.org (lfbn-1-2229-223.w90-76.abo.wanadoo.fr [90.76.50.223])
+ (Authenticated sender: clg@kaod.org)
+ by player711.ha.ovh.net (Postfix) with ESMTPSA id C119BAF6D266;
+ Thu, 17 Oct 2019 08:43:12 +0000 (UTC)
+Subject: Re: [RFC 5/5] spapr: Work around spurious warnings from vfio INTx
+ initialization
+To: David Gibson <david@gibson.dropbear.id.au>, alex.williamson@redhat.com,
+ groug@kaod.org
+References: <20191017054218.8876-1-david@gibson.dropbear.id.au>
+ <20191017054218.8876-6-david@gibson.dropbear.id.au>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <3cded480-ce51-eef7-dc75-686022a18726@kaod.org>
+Date: Thu, 17 Oct 2019 10:43:11 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.0
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.63]); Thu, 17 Oct 2019 08:43:12 +0000 (UTC)
+In-Reply-To: <20191017054218.8876-6-david@gibson.dropbear.id.au>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Ovh-Tracer-Id: 3003900954685180736
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrjeejgddtjecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 209.132.183.28
+X-Received-From: 188.165.44.50
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -70,68 +73,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: quintela@redhat.com
-Cc: qemu-devel@nongnu.org, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+Cc: aik@ozlabs.ru, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Scott Cheloha <cheloha@linux.vnet.ibm.com> wrote:
+On 17/10/2019 07:42, David Gibson wrote:
+> Traditional PCI INTx for vfio devices can only perform well if using
+> an in-kernel irqchip.  Therefore, vfio_intx_update() issues a warning
+> if an in kernel irqchip is not available.
+> 
+> We usually do have an in-kernel irqchip available for pseries machines
+> on POWER hosts.  However, because the platform allows feature
+> negotiation of what interrupt controller model to use, we don't
+> currently initialize it until machine reset.  vfio_intx_update() is
+> called (first) from vfio_realize() before that, so it can issue a
+> spurious warning, even if we will have an in kernel irqchip by the
+> time we need it.
+> 
+> To workaround this, make a call to spapr_irq_update_active_intc() from
+> spapr_irq_init() which is called at machine realize time, before the
+> vfio realize.  This call will be pretty much obsoleted by the later
+> call at reset time, but it serves to suppress the spurious warning
+> from VFIO.
+> 
+> Cc: Alex Williamson <alex.williamson@redhat.com>
+> Cc: Alexey Kardashevskiy <aik@ozlabs.ru>
+> 
+> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+> ---
+>  hw/ppc/spapr_irq.c | 11 ++++++++++-
+>  1 file changed, 10 insertions(+), 1 deletion(-)
+> 
+> diff --git a/hw/ppc/spapr_irq.c b/hw/ppc/spapr_irq.c
+> index 45544b8976..bb91c61fa0 100644
+> --- a/hw/ppc/spapr_irq.c
+> +++ b/hw/ppc/spapr_irq.c
+> @@ -345,6 +345,14 @@ void spapr_irq_init(SpaprMachineState *spapr, Error **errp)
+>  
+>      spapr->qirqs = qemu_allocate_irqs(spapr_set_irq, spapr,
+>                                        smc->nr_xirqs + SPAPR_XIRQ_BASE);
+> +
+> +    /*
+> +     * Mostly we don't actually need this until reset, except that not
+> +     * having this set up can cause VFIO devices to issue a
+> +     * false-positive warning during realize(), because they don't yet
+> +     * have an in-kernel irq chip.
+> +     */
+> +    spapr_irq_update_active_intc(spapr);
 
-Hi
+This will call the de/activate hooks of the irq chip very early 
+before reset and CAS, and won't call them at reset if the intc
+pointers are the same (xive only for instance). It breaks very 
+obviously the emulated XIVE device which won't reset the OS CAM 
+line with the CPU id values and CPU notification will be broken.
 
-> Registering a SaveStateEntry object via savevm_state_insert_handler()
-> is an O(n) operation because the list is a priority queue maintained by
-> walking the list from head to tail to find a suitable insertion point.
->
-> This adds considerable overhead for VMs with many such objects.  For
-> instance, ppc64 machines with large maxmem (8T+) spend ~10% or more of
-> their CPU time in savevm_state_insert_handler() before attempting to
-> boot a kernel.
-
-Ouch ...
+We have to find something else.
 
 
-> If we track the head for each priority's subqueue we can insert new
-> elements in constant time.
+>  }
+>  
+>  int spapr_irq_claim(SpaprMachineState *spapr, int irq, bool lsi, Error **errp)
+> @@ -500,7 +508,8 @@ void spapr_irq_update_active_intc(SpaprMachineState *spapr)
+>           * this.
+>           */
+>          new_intc = SPAPR_INTC(spapr->xive);
+> -    } else if (spapr_ovec_test(spapr->ov5_cas, OV5_XIVE_EXPLOIT)) {
+> +    } else if (spapr->ov5_cas
+> +               && spapr_ovec_test(spapr->ov5_cas, OV5_XIVE_EXPLOIT)) {
 
-We are adding a subqueue by priority, right? (see later comments)
+This change can go in another patch.
 
-> This commit also introduces a new function,
-> savevm_state_remove_handler(),
+C. 
 
-savevm_state_handler_remove()
+>          new_intc = SPAPR_INTC(spapr->xive);
+>      } else {
+>          new_intc = SPAPR_INTC(spapr->ics);
+> 
 
-search didn't find it O:-)
-
-> which abstracts the logic for replacing the head of an element's subqueue
-> when removing it.
-
-I think that it is better if you split the new function creation.  Make
-commit easier to write O:-)
-
-
->  static SaveState savevm_state = {
->      .handlers = QTAILQ_HEAD_INITIALIZER(savevm_state.handlers),
-> +    .handler_pri_head = { [MIG_PRI_DEFAULT ... MIG_PRI_MAX] = NULL },
-
-Why are you still maintaining the handlers QTAILQ?  Once here will not
-be easier to just change handlers field to be an array
-handlers[MIG_PRI_MAX] field, and adjust callers?
-
-Changes are only inside this file.
-
-The code to maintain the subqueue inside the other queue is just as
-complex as chaning all the callers.  What do you think?
-
-savevm_state_handler_insert() for instance becomes even easier, just a
-QTALIQ_INSERT_TAIL() in the proper queue, right?
-
-
-I agree with the idea of the patch.  Especially when you told us how bad
-the performance of the current code is.
-
-Out of curiosity, how many objects are we talking about?
-
-Later, Juan.
 
