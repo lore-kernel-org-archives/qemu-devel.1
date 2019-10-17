@@ -2,99 +2,100 @@ Return-Path: <SRS0=yZS3=YK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0D5DDFA372A
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 15:38:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B3769FA372A
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 15:41:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C55B72089C
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 15:38:58 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C55B72089C
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id 7EDFC2089C
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 15:41:07 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Xf3tAE9C"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7EDFC2089C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51216 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51266 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iL7rd-0005c3-6u
-	for qemu-devel@archiver.kernel.org; Thu, 17 Oct 2019 11:38:57 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49901)
+	id 1iL7ti-0000VA-Bj
+	for qemu-devel@archiver.kernel.org; Thu, 17 Oct 2019 11:41:06 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51493)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <clg@kaod.org>) id 1iL6zZ-0004dy-LV
- for qemu-devel@nongnu.org; Thu, 17 Oct 2019 10:43:07 -0400
+ (envelope-from <philmd@redhat.com>) id 1iL7AN-0001N2-WD
+ for qemu-devel@nongnu.org; Thu, 17 Oct 2019 10:54:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <clg@kaod.org>) id 1iL6zY-0006Hq-2D
- for qemu-devel@nongnu.org; Thu, 17 Oct 2019 10:43:05 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:58914)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <clg@kaod.org>) id 1iL6zX-0006HK-RI
- for qemu-devel@nongnu.org; Thu, 17 Oct 2019 10:43:04 -0400
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
- by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
- x9HEgvUk067382
- for <qemu-devel@nongnu.org>; Thu, 17 Oct 2019 10:43:01 -0400
-Received: from e06smtp04.uk.ibm.com (e06smtp04.uk.ibm.com [195.75.94.100])
- by mx0a-001b2d01.pphosted.com with ESMTP id 2vps54ub6j-1
- (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
- for <qemu-devel@nongnu.org>; Thu, 17 Oct 2019 10:43:01 -0400
-Received: from localhost
- by e06smtp04.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
- Violators will be prosecuted
- for <qemu-devel@nongnu.org> from <clg@kaod.org>;
- Thu, 17 Oct 2019 15:42:46 +0100
-Received: from b06cxnps4074.portsmouth.uk.ibm.com (9.149.109.196)
- by e06smtp04.uk.ibm.com (192.168.101.134) with IBM ESMTP SMTP Gateway:
- Authorized Use Only! Violators will be prosecuted; 
- (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
- Thu, 17 Oct 2019 15:42:44 +0100
-Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com
- [9.149.105.62])
- by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- x9HEgh6D54526138
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Thu, 17 Oct 2019 14:42:43 GMT
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 5F458AE057;
- Thu, 17 Oct 2019 14:42:43 +0000 (GMT)
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 40B4EAE056;
- Thu, 17 Oct 2019 14:42:43 +0000 (GMT)
-Received: from smtp.tls.ibm.com (unknown [9.101.4.1])
- by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
- Thu, 17 Oct 2019 14:42:43 +0000 (GMT)
-Received: from yukon.tls.ibm.com (yukon.tls.ibm.com [9.101.4.25])
- by smtp.tls.ibm.com (Postfix) with ESMTP id 05C1D22010B;
- Thu, 17 Oct 2019 16:42:43 +0200 (CEST)
-From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
-To: David Gibson <david@gibson.dropbear.id.au>
-Subject: [PATCH 1/2] spapr: Introduce a interrupt presenter reset handler
-Date: Thu, 17 Oct 2019 16:42:40 +0200
-X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20191017144241.12522-1-clg@kaod.org>
-References: <20191017144241.12522-1-clg@kaod.org>
+ (envelope-from <philmd@redhat.com>) id 1iL7AM-0001qv-C8
+ for qemu-devel@nongnu.org; Thu, 17 Oct 2019 10:54:15 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:44837
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iL7AM-0001qI-5B
+ for qemu-devel@nongnu.org; Thu, 17 Oct 2019 10:54:14 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1571324053;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=fFgW5Se6XfgeBSJbMeJJLtNFbsF1E5RfdMxY5hhwjAs=;
+ b=Xf3tAE9CuvUf3V9x1E//gVZxukHXEwM2MI5+VNPfqBE8BZDmpxZKOJy+hVS/wHHHkDl86y
+ CYaKHL+HnhPQjk6Vcwhqo6sP9blZ0ENlQMyl/LiUV0NpExvK6KTO9smguZYIa8bP8zu2Ez
+ 7BXVJBBP0xirTZfNtwYFw7l50sb4qbY=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-199-qa1aUo20MgeyJKXBg-iTsA-1; Thu, 17 Oct 2019 10:54:11 -0400
+Received: by mail-wr1-f70.google.com with SMTP id e14so1072302wrm.21
+ for <qemu-devel@nongnu.org>; Thu, 17 Oct 2019 07:54:11 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=ONFvR+2nNf7DtaVDGzcbQp6qaCHCrPZNp0H5NB58D5c=;
+ b=gckNg8osuJelv6/k5QdQGhKL2vILgDe7vnLTQ40Y/nq/006yChYrTn+vwshKeyhLI+
+ 6c93ETezuG+64Xs2iRDgxrHYQ5gr3mVbIZsulIe3rwS1+bihVCr8CPp0/HVwncbGQo/G
+ Gqeenkk84oDiTro764///KdmZFKuMeWA2PcJDMCQFfxbR3VgDjHsfegciOQocNvr71P/
+ 5Z1k/o1g5tsYYCWhYkSXWcbm8jOYsJfC+ixkVt7n84fWYNZIFNKp8sc9605/Jh+xPAmn
+ dRQToZzpFJfKjNnTFJSZZ111YHzO35b84fDgQ9mXU9J+6wq0DjxhlNaYEQrAMp63ak99
+ tzFw==
+X-Gm-Message-State: APjAAAW+54fwAcT0SyYcfjrYILaGyYQIPvGA5NnUghEKM1BxY+GFeB9T
+ NrVr/ebD63caj8QqXENMQrxVf4F7cpEmjFsfu7bgGFuoo3xUnyJBrinH1RkAl+aLoU94KDXDCxu
+ pzcLZgcmQzN/AAA0=
+X-Received: by 2002:adf:eb8c:: with SMTP id t12mr3387096wrn.34.1571324050525; 
+ Thu, 17 Oct 2019 07:54:10 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqwDDbMGFfB3v10ptuQWX2ANapfZw8ISeh1MsxmtDhhJCVXlipXJkLdq6qWXAk0wC8huzoKKNw==
+X-Received: by 2002:adf:eb8c:: with SMTP id t12mr3387076wrn.34.1571324050262; 
+ Thu, 17 Oct 2019 07:54:10 -0700 (PDT)
+Received: from [192.168.50.32] (243.red-88-26-246.staticip.rima-tde.net.
+ [88.26.246.243])
+ by smtp.gmail.com with ESMTPSA id b12sm2383212wrt.21.2019.10.17.07.54.09
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Thu, 17 Oct 2019 07:54:09 -0700 (PDT)
+Subject: Re: [PATCH 2/2] hw/timer/slavio_timer.c: Switch to transaction-based
+ ptimer API
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
+References: <20191017132351.4762-1-peter.maydell@linaro.org>
+ <20191017132351.4762-3-peter.maydell@linaro.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <2210f783-1159-1263-dfff-3bd84111e2f5@redhat.com>
+Date: Thu, 17 Oct 2019 16:54:08 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-X-TM-AS-GCONF: 00
-x-cbid: 19101714-0016-0000-0000-000002B8F9CE
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19101714-0017-0000-0000-0000331A233B
-Message-Id: <20191017144241.12522-2-clg@kaod.org>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
- definitions=2019-10-17_05:, , signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- priorityscore=1501
- malwarescore=0 suspectscore=2 phishscore=0 bulkscore=0 spamscore=0
- clxscore=1034 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=978 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1908290000 definitions=main-1910170133
+In-Reply-To: <20191017132351.4762-3-peter.maydell@linaro.org>
+Content-Language: en-US
+X-MC-Unique: qa1aUo20MgeyJKXBg-iTsA-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: quoted-printable
-X-MIME-Autoconverted: from 8bit to quoted-printable by
- mx0a-001b2d01.pphosted.com id x9HEgvUk067382
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
-X-Received-From: 148.163.156.1
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -106,274 +107,195 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>, qemu-ppc@nongnu.org,
- qemu-devel@nongnu.org, Greg Kurz <groug@kaod.org>
+Cc: KONRAD Frederic <frederic.konrad@adacore.com>,
+ Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
+ Fabien Chouteau <chouteau@adacore.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The interrupt presenters are not reseted today. Extend the sPAPR IRQ
-backend with a new cpu_intc_reset() handler which will be called by
-the CPU reset handler.
+Hi Peter,
 
-spapr_realize_vcpu() is modified to call the CPU reset only after the
-the intc presenter has been created.
+On 10/17/19 3:23 PM, Peter Maydell wrote:
+> Switch the slavio_timer code away from bottom-half based ptimers to
+> the new transaction-based ptimer API.  This just requires adding
+> begin/commit calls around the various places that modify the ptimer
+> state, and using the new ptimer_init() function to create the timer.
+>=20
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> ---
+>   hw/timer/slavio_timer.c | 20 ++++++++++++++++----
+>   1 file changed, 16 insertions(+), 4 deletions(-)
+>=20
+> diff --git a/hw/timer/slavio_timer.c b/hw/timer/slavio_timer.c
+> index 692d213897d..0e2efe6fe89 100644
+> --- a/hw/timer/slavio_timer.c
+> +++ b/hw/timer/slavio_timer.c
+> @@ -30,7 +30,6 @@
+>   #include "hw/sysbus.h"
+>   #include "migration/vmstate.h"
+>   #include "trace.h"
+> -#include "qemu/main-loop.h"
+>   #include "qemu/module.h"
+>  =20
+>   /*
+> @@ -213,6 +212,7 @@ static void slavio_timer_mem_writel(void *opaque, hwa=
+ddr addr,
+>       saddr =3D addr >> 2;
+>       switch (saddr) {
+>       case TIMER_LIMIT:
+> +        ptimer_transaction_begin(t->timer);
+>           if (slavio_timer_is_user(tc)) {
+>               uint64_t count;
 
-Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
+
+This part is odd since there is a check on t->timer !=3D NULL later, and=20
+ptimer_transaction_commit() can't take NULL.
+
+This won't happen if you restrict to ptimer_* calls:
+
+-- >8 --
+@@ -222,18 +222,22 @@ static void slavio_timer_mem_writel(void *opaque,=20
+hwaddr addr,
+              t->reached =3D 0;
+              count =3D ((uint64_t)t->counthigh << 32) | t->count;
+              trace_slavio_timer_mem_writel_limit(timer_index, count);
++            ptimer_transaction_begin(t->timer);
+              ptimer_set_count(t->timer, LIMIT_TO_PERIODS(t->limit -=20
+count));
++            ptimer_transaction_commit(t->timer);
+          } else {
+              // set limit, reset counter
+              qemu_irq_lower(t->irq);
+              t->limit =3D val & TIMER_MAX_COUNT32;
+              if (t->timer) {
++                ptimer_transaction_begin(t->timer);
+                  if (t->limit =3D=3D 0) { /* free-run */
+                      ptimer_set_limit(t->timer,
+=20
+LIMIT_TO_PERIODS(TIMER_MAX_COUNT32), 1);
+                  } else {
+                      ptimer_set_limit(t->timer,=20
+LIMIT_TO_PERIODS(t->limit), 1);
+                  }
++                ptimer_transaction_commit(t->timer);
+              }
+          }
+          break;
 ---
- include/hw/ppc/spapr_irq.h |  4 ++++
- include/hw/ppc/xics.h      |  1 +
- include/hw/ppc/xive.h      |  1 +
- hw/intc/spapr_xive.c       |  8 ++++++++
- hw/intc/xics.c             |  5 +++++
- hw/intc/xics_spapr.c       |  8 ++++++++
- hw/intc/xive.c             | 11 ++++++++---
- hw/ppc/spapr_cpu_core.c    |  8 ++++++--
- hw/ppc/spapr_irq.c         | 21 +++++++++++++++++++++
- 9 files changed, 62 insertions(+), 5 deletions(-)
 
-diff --git a/include/hw/ppc/spapr_irq.h b/include/hw/ppc/spapr_irq.h
-index 5e150a667902..78327496c102 100644
---- a/include/hw/ppc/spapr_irq.h
-+++ b/include/hw/ppc/spapr_irq.h
-@@ -52,6 +52,8 @@ typedef struct SpaprInterruptControllerClass {
-      */
-     int (*cpu_intc_create)(SpaprInterruptController *intc,
-                             PowerPCCPU *cpu, Error **errp);
-+    int (*cpu_intc_reset)(SpaprInterruptController *intc, PowerPCCPU *cp=
-u,
-+                          Error **errp);
-     int (*claim_irq)(SpaprInterruptController *intc, int irq, bool lsi,
-                      Error **errp);
-     void (*free_irq)(SpaprInterruptController *intc, int irq);
-@@ -68,6 +70,8 @@ void spapr_irq_update_active_intc(SpaprMachineState *sp=
-apr);
-=20
- int spapr_irq_cpu_intc_create(SpaprMachineState *spapr,
-                               PowerPCCPU *cpu, Error **errp);
-+int spapr_irq_cpu_intc_reset(SpaprMachineState *spapr,
-+                             PowerPCCPU *cpu, Error **errp);
- void spapr_irq_print_info(SpaprMachineState *spapr, Monitor *mon);
- void spapr_irq_dt(SpaprMachineState *spapr, uint32_t nr_servers,
-                   void *fdt, uint32_t phandle);
-diff --git a/include/hw/ppc/xics.h b/include/hw/ppc/xics.h
-index 1e6a9300eb2b..602173c12250 100644
---- a/include/hw/ppc/xics.h
-+++ b/include/hw/ppc/xics.h
-@@ -161,6 +161,7 @@ void icp_set_mfrr(ICPState *icp, uint8_t mfrr);
- uint32_t icp_accept(ICPState *ss);
- uint32_t icp_ipoll(ICPState *ss, uint32_t *mfrr);
- void icp_eoi(ICPState *icp, uint32_t xirr);
-+void icp_reset(ICPState *icp);
-=20
- void ics_write_xive(ICSState *ics, int nr, int server,
-                     uint8_t priority, uint8_t saved_priority);
-diff --git a/include/hw/ppc/xive.h b/include/hw/ppc/xive.h
-index fd3319bd3202..99381639f50c 100644
---- a/include/hw/ppc/xive.h
-+++ b/include/hw/ppc/xive.h
-@@ -415,6 +415,7 @@ uint64_t xive_tctx_tm_read(XiveTCTX *tctx, hwaddr off=
-set, unsigned size);
-=20
- void xive_tctx_pic_print_info(XiveTCTX *tctx, Monitor *mon);
- Object *xive_tctx_create(Object *cpu, XiveRouter *xrtr, Error **errp);
-+void xive_tctx_reset(XiveTCTX *tctx);
-=20
- static inline uint32_t xive_nvt_cam_line(uint8_t nvt_blk, uint32_t nvt_i=
-dx)
- {
-diff --git a/hw/intc/spapr_xive.c b/hw/intc/spapr_xive.c
-index ba32d2cc5b0f..0c3acf1a4192 100644
---- a/hw/intc/spapr_xive.c
-+++ b/hw/intc/spapr_xive.c
-@@ -553,6 +553,13 @@ static int spapr_xive_cpu_intc_create(SpaprInterrupt=
-Controller *intc,
-     return 0;
- }
-=20
-+static int spapr_xive_cpu_intc_reset(SpaprInterruptController *intc,
-+                                     PowerPCCPU *cpu, Error **errp)
-+{
-+    xive_tctx_reset(spapr_cpu_state(cpu)->tctx);
-+    return 0;
-+}
-+
- static void spapr_xive_set_irq(SpaprInterruptController *intc, int irq, =
-int val)
- {
-     SpaprXive *xive =3D SPAPR_XIVE(intc);
-@@ -697,6 +704,7 @@ static void spapr_xive_class_init(ObjectClass *klass,=
- void *data)
-     sicc->activate =3D spapr_xive_activate;
-     sicc->deactivate =3D spapr_xive_deactivate;
-     sicc->cpu_intc_create =3D spapr_xive_cpu_intc_create;
-+    sicc->cpu_intc_reset =3D spapr_xive_cpu_intc_reset;
-     sicc->claim_irq =3D spapr_xive_claim_irq;
-     sicc->free_irq =3D spapr_xive_free_irq;
-     sicc->set_irq =3D spapr_xive_set_irq;
-diff --git a/hw/intc/xics.c b/hw/intc/xics.c
-index b5ac408f7b74..652771d6a5a5 100644
---- a/hw/intc/xics.c
-+++ b/hw/intc/xics.c
-@@ -295,6 +295,11 @@ static void icp_reset_handler(void *dev)
-     }
- }
-=20
-+void icp_reset(ICPState *icp)
-+{
-+    icp_reset_handler(icp);
-+}
-+
- static void icp_realize(DeviceState *dev, Error **errp)
- {
-     ICPState *icp =3D ICP(dev);
-diff --git a/hw/intc/xics_spapr.c b/hw/intc/xics_spapr.c
-index 4f64b9a9fc66..c0b2a576effe 100644
---- a/hw/intc/xics_spapr.c
-+++ b/hw/intc/xics_spapr.c
-@@ -346,6 +346,13 @@ static int xics_spapr_cpu_intc_create(SpaprInterrupt=
-Controller *intc,
-     return 0;
- }
-=20
-+static int xics_spapr_cpu_intc_reset(SpaprInterruptController *intc,
-+                                     PowerPCCPU *cpu, Error **errp)
-+{
-+    icp_reset(spapr_cpu_state(cpu)->icp);
-+    return 0;
-+}
-+
- static int xics_spapr_claim_irq(SpaprInterruptController *intc, int irq,
-                                 bool lsi, Error **errp)
- {
-@@ -433,6 +440,7 @@ static void ics_spapr_class_init(ObjectClass *klass, =
-void *data)
-     sicc->activate =3D xics_spapr_activate;
-     sicc->deactivate =3D xics_spapr_deactivate;
-     sicc->cpu_intc_create =3D xics_spapr_cpu_intc_create;
-+    sicc->cpu_intc_reset =3D xics_spapr_cpu_intc_reset;
-     sicc->claim_irq =3D xics_spapr_claim_irq;
-     sicc->free_irq =3D xics_spapr_free_irq;
-     sicc->set_irq =3D xics_spapr_set_irq;
-diff --git a/hw/intc/xive.c b/hw/intc/xive.c
-index d420c6571e14..0ae3f9b1efe4 100644
---- a/hw/intc/xive.c
-+++ b/hw/intc/xive.c
-@@ -547,7 +547,7 @@ void xive_tctx_pic_print_info(XiveTCTX *tctx, Monitor=
- *mon)
-     }
- }
-=20
--static void xive_tctx_reset(void *dev)
-+static void xive_tctx_reset_handler(void *dev)
- {
-     XiveTCTX *tctx =3D XIVE_TCTX(dev);
-=20
-@@ -568,6 +568,11 @@ static void xive_tctx_reset(void *dev)
-         ipb_to_pipr(tctx->regs[TM_QW3_HV_PHYS + TM_IPB]);
- }
-=20
-+void xive_tctx_reset(XiveTCTX *tctx)
-+{
-+    xive_tctx_reset_handler(tctx);
-+}
-+
- static void xive_tctx_realize(DeviceState *dev, Error **errp)
- {
-     XiveTCTX *tctx =3D XIVE_TCTX(dev);
-@@ -608,12 +613,12 @@ static void xive_tctx_realize(DeviceState *dev, Err=
-or **errp)
-         }
-     }
-=20
--    qemu_register_reset(xive_tctx_reset, dev);
-+    qemu_register_reset(xive_tctx_reset_handler, dev);
- }
-=20
- static void xive_tctx_unrealize(DeviceState *dev, Error **errp)
- {
--    qemu_unregister_reset(xive_tctx_reset, dev);
-+    qemu_unregister_reset(xive_tctx_reset_handler, dev);
- }
-=20
- static int vmstate_xive_tctx_pre_save(void *opaque)
-diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
-index 3e4302c7d596..416aa75e5fba 100644
---- a/hw/ppc/spapr_cpu_core.c
-+++ b/hw/ppc/spapr_cpu_core.c
-@@ -33,6 +33,7 @@ static void spapr_cpu_reset(void *opaque)
-     PowerPCCPUClass *pcc =3D POWERPC_CPU_GET_CLASS(cpu);
-     SpaprCpuState *spapr_cpu =3D spapr_cpu_state(cpu);
-     target_ulong lpcr;
-+    SpaprMachineState *spapr =3D SPAPR_MACHINE(qdev_get_machine());
-=20
-     cpu_reset(cs);
-=20
-@@ -77,9 +78,11 @@ static void spapr_cpu_reset(void *opaque)
-     spapr_cpu->dtl_addr =3D 0;
-     spapr_cpu->dtl_size =3D 0;
-=20
--    spapr_caps_cpu_apply(SPAPR_MACHINE(qdev_get_machine()), cpu);
-+    spapr_caps_cpu_apply(spapr, cpu);
-=20
-     kvm_check_mmu(cpu, &error_fatal);
-+
-+    spapr_irq_cpu_intc_reset(spapr, cpu, &error_fatal);
- }
-=20
- void spapr_cpu_set_entry_state(PowerPCCPU *cpu, target_ulong nip, target=
-_ulong r3)
-@@ -235,12 +238,13 @@ static void spapr_realize_vcpu(PowerPCCPU *cpu, Spa=
-prMachineState *spapr,
-     kvmppc_set_papr(cpu);
-=20
-     qemu_register_reset(spapr_cpu_reset, cpu);
--    spapr_cpu_reset(cpu);
-=20
-     if (spapr_irq_cpu_intc_create(spapr, cpu, &local_err) < 0) {
-         goto error_unregister;
-     }
-=20
-+    spapr_cpu_reset(cpu);
-+
-     if (!sc->pre_3_0_migration) {
-         vmstate_register(NULL, cs->cpu_index, &vmstate_spapr_cpu_state,
-                          cpu->machine_data);
-diff --git a/hw/ppc/spapr_irq.c b/hw/ppc/spapr_irq.c
-index bb91c61fa000..5d2b64029cd5 100644
---- a/hw/ppc/spapr_irq.c
-+++ b/hw/ppc/spapr_irq.c
-@@ -220,6 +220,27 @@ int spapr_irq_cpu_intc_create(SpaprMachineState *spa=
-pr,
-     return 0;
- }
-=20
-+int spapr_irq_cpu_intc_reset(SpaprMachineState *spapr,
-+                             PowerPCCPU *cpu, Error **errp)
-+{
-+    SpaprInterruptController *intcs[] =3D ALL_INTCS(spapr);
-+    int i;
-+    int rc;
-+
-+    for (i =3D 0; i < ARRAY_SIZE(intcs); i++) {
-+        SpaprInterruptController *intc =3D intcs[i];
-+        if (intc) {
-+            SpaprInterruptControllerClass *sicc =3D SPAPR_INTC_GET_CLASS=
-(intc);
-+            rc =3D sicc->cpu_intc_reset(intc, cpu, errp);
-+            if (rc < 0) {
-+                return rc;
-+            }
-+        }
-+    }
-+
-+    return 0;
-+}
-+
- static void spapr_set_irq(void *opaque, int irq, int level)
- {
-     SpaprMachineState *spapr =3D SPAPR_MACHINE(opaque);
---=20
-2.21.0
+>  =20
+> @@ -236,6 +236,7 @@ static void slavio_timer_mem_writel(void *opaque, hwa=
+ddr addr,
+>                   }
+>               }
+>           }
+> +        ptimer_transaction_commit(t->timer);
+>           break;
+>       case TIMER_COUNTER:
+>           if (slavio_timer_is_user(tc)) {
+> @@ -247,7 +248,9 @@ static void slavio_timer_mem_writel(void *opaque, hwa=
+ddr addr,
+>               t->reached =3D 0;
+>               count =3D ((uint64_t)t->counthigh) << 32 | t->count;
+>               trace_slavio_timer_mem_writel_limit(timer_index, count);
+> +            ptimer_transaction_begin(t->timer);
+>               ptimer_set_count(t->timer, LIMIT_TO_PERIODS(t->limit - coun=
+t));
+> +            ptimer_transaction_commit(t->timer);
+>           } else {
+>               trace_slavio_timer_mem_writel_counter_invalid();
+>           }
+> @@ -255,13 +258,16 @@ static void slavio_timer_mem_writel(void *opaque, h=
+waddr addr,
+>       case TIMER_COUNTER_NORST:
+>           // set limit without resetting counter
+>           t->limit =3D val & TIMER_MAX_COUNT32;
+> +        ptimer_transaction_begin(t->timer);
+>           if (t->limit =3D=3D 0) { /* free-run */
+>               ptimer_set_limit(t->timer, LIMIT_TO_PERIODS(TIMER_MAX_COUNT=
+32), 0);
+>           } else {
+>               ptimer_set_limit(t->timer, LIMIT_TO_PERIODS(t->limit), 0);
+>           }
+> +        ptimer_transaction_commit(t->timer);
+>           break;
+>       case TIMER_STATUS:
+> +        ptimer_transaction_begin(t->timer);
+>           if (slavio_timer_is_user(tc)) {
+
+I'd move the begin() here.
+
+>               // start/stop user counter
+>               if (val & 1) {
+> @@ -273,6 +279,7 @@ static void slavio_timer_mem_writel(void *opaque, hwa=
+ddr addr,
+>               }
+>           }
+>           t->run =3D val & 1;
+> +        ptimer_transaction_commit(t->timer);
+>           break;
+>       case TIMER_MODE:
+>           if (timer_index =3D=3D 0) {
+> @@ -282,6 +289,7 @@ static void slavio_timer_mem_writel(void *opaque, hwa=
+ddr addr,
+>                   unsigned int processor =3D 1 << i;
+>                   CPUTimerState *curr_timer =3D &s->cputimer[i + 1];
+>  =20
+> +                ptimer_transaction_begin(curr_timer->timer);
+>                   // check for a change in timer mode for this processor
+>                   if ((val & processor) !=3D (s->cputimer_mode & processo=
+r)) {
+
+Ditto, begin() here.
+
+>                       if (val & processor) { // counter -> user timer
+> @@ -308,6 +316,7 @@ static void slavio_timer_mem_writel(void *opaque, hwa=
+ddr addr,
+>                           trace_slavio_timer_mem_writel_mode_counter(time=
+r_index);
+>                       }
+>                   }
+> +                ptimer_transaction_commit(curr_timer->timer);
+>               }
+>           } else {
+>               trace_slavio_timer_mem_writel_mode_invalid();
+> @@ -367,10 +376,12 @@ static void slavio_timer_reset(DeviceState *d)
+>           curr_timer->count =3D 0;
+>           curr_timer->reached =3D 0;
+>           if (i <=3D s->num_cpus) {
+> +            ptimer_transaction_begin(curr_timer->timer);
+>               ptimer_set_limit(curr_timer->timer,
+>                                LIMIT_TO_PERIODS(TIMER_MAX_COUNT32), 1);
+>               ptimer_run(curr_timer->timer, 0);
+>               curr_timer->run =3D 1;
+> +            ptimer_transaction_commit(curr_timer->timer);
+>           }
+>       }
+>       s->cputimer_mode =3D 0;
+> @@ -380,7 +391,6 @@ static void slavio_timer_init(Object *obj)
+>   {
+>       SLAVIO_TIMERState *s =3D SLAVIO_TIMER(obj);
+>       SysBusDevice *dev =3D SYS_BUS_DEVICE(obj);
+> -    QEMUBH *bh;
+>       unsigned int i;
+>       TimerContext *tc;
+>  =20
+> @@ -392,9 +402,11 @@ static void slavio_timer_init(Object *obj)
+>           tc->s =3D s;
+>           tc->timer_index =3D i;
+>  =20
+> -        bh =3D qemu_bh_new(slavio_timer_irq, tc);
+> -        s->cputimer[i].timer =3D ptimer_init_with_bh(bh, PTIMER_POLICY_D=
+EFAULT);
+> +        s->cputimer[i].timer =3D ptimer_init(slavio_timer_irq, tc,
+> +                                           PTIMER_POLICY_DEFAULT);
+> +        ptimer_transaction_begin(s->cputimer[i].timer);
+>           ptimer_set_period(s->cputimer[i].timer, TIMER_PERIOD);
+> +        ptimer_transaction_commit(s->cputimer[i].timer);
+>  =20
+>           size =3D i =3D=3D 0 ? SYS_TIMER_SIZE : CPU_TIMER_SIZE;
+>           snprintf(timer_name, sizeof(timer_name), "timer-%i", i);
+>=20
 
 
