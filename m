@@ -2,100 +2,84 @@ Return-Path: <SRS0=yZS3=YK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.4 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B3769FA372A
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 15:41:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E0DBFA372A
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 15:42:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7EDFC2089C
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 15:41:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 288502089C
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 15:42:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Xf3tAE9C"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7EDFC2089C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IPBRNTmt"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 288502089C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51266 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51278 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iL7ti-0000VA-Bj
-	for qemu-devel@archiver.kernel.org; Thu, 17 Oct 2019 11:41:06 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51493)
+	id 1iL7ua-0001c5-NJ
+	for qemu-devel@archiver.kernel.org; Thu, 17 Oct 2019 11:42:00 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50305)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1iL7AN-0001N2-WD
- for qemu-devel@nongnu.org; Thu, 17 Oct 2019 10:54:17 -0400
+ (envelope-from <aleksandar.m.mail@gmail.com>) id 1iL71o-0007db-I0
+ for qemu-devel@nongnu.org; Thu, 17 Oct 2019 10:45:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1iL7AM-0001qv-C8
- for qemu-devel@nongnu.org; Thu, 17 Oct 2019 10:54:15 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:44837
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iL7AM-0001qI-5B
- for qemu-devel@nongnu.org; Thu, 17 Oct 2019 10:54:14 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1571324053;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=fFgW5Se6XfgeBSJbMeJJLtNFbsF1E5RfdMxY5hhwjAs=;
- b=Xf3tAE9CuvUf3V9x1E//gVZxukHXEwM2MI5+VNPfqBE8BZDmpxZKOJy+hVS/wHHHkDl86y
- CYaKHL+HnhPQjk6Vcwhqo6sP9blZ0ENlQMyl/LiUV0NpExvK6KTO9smguZYIa8bP8zu2Ez
- 7BXVJBBP0xirTZfNtwYFw7l50sb4qbY=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-199-qa1aUo20MgeyJKXBg-iTsA-1; Thu, 17 Oct 2019 10:54:11 -0400
-Received: by mail-wr1-f70.google.com with SMTP id e14so1072302wrm.21
- for <qemu-devel@nongnu.org>; Thu, 17 Oct 2019 07:54:11 -0700 (PDT)
+ (envelope-from <aleksandar.m.mail@gmail.com>) id 1iL71n-0007IQ-3r
+ for qemu-devel@nongnu.org; Thu, 17 Oct 2019 10:45:24 -0400
+Received: from mail-oi1-x241.google.com ([2607:f8b0:4864:20::241]:43279)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
+ id 1iL71m-0007Hz-Ug
+ for qemu-devel@nongnu.org; Thu, 17 Oct 2019 10:45:23 -0400
+Received: by mail-oi1-x241.google.com with SMTP id t84so2340270oih.10
+ for <qemu-devel@nongnu.org>; Thu, 17 Oct 2019 07:45:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:in-reply-to:references:from:date:message-id:subject:to
+ :cc; bh=NVOIQm4H/O0Cx5VJa3R22BQF2d1DAtNSsVKXlEKnY1o=;
+ b=IPBRNTmt1Tgx1L2hARo2oYLM8u5khR4Zw3KmCLU3i4xVkScVO2orpzAe2+p2vVGD94
+ n6JmwpAe8G7SuKvmIWX4T/io377hyec3VdgEwpormFgGgjnuIVJW0mCls2AmX7z0CZkB
+ LXn4VIbhT7y7S5rNmofuHK6iNukXM79WYQQt4N++BrlQ/9NdAxZpIr41oCvHqWANh8YA
+ QPphVSfVA/sPS0jZTOSKbZNMp6srZ6GM7uAYIEoQCnyUdWfwrHEASxaemkki5UuI67jr
+ 6Lu2SEew4GZTvcgYDX1SyHnMYE6en7WyldX7Dk6KooT6oI6r3XNef/427aKhKMHHtLYy
+ /aoQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=ONFvR+2nNf7DtaVDGzcbQp6qaCHCrPZNp0H5NB58D5c=;
- b=gckNg8osuJelv6/k5QdQGhKL2vILgDe7vnLTQ40Y/nq/006yChYrTn+vwshKeyhLI+
- 6c93ETezuG+64Xs2iRDgxrHYQ5gr3mVbIZsulIe3rwS1+bihVCr8CPp0/HVwncbGQo/G
- Gqeenkk84oDiTro764///KdmZFKuMeWA2PcJDMCQFfxbR3VgDjHsfegciOQocNvr71P/
- 5Z1k/o1g5tsYYCWhYkSXWcbm8jOYsJfC+ixkVt7n84fWYNZIFNKp8sc9605/Jh+xPAmn
- dRQToZzpFJfKjNnTFJSZZ111YHzO35b84fDgQ9mXU9J+6wq0DjxhlNaYEQrAMp63ak99
- tzFw==
-X-Gm-Message-State: APjAAAW+54fwAcT0SyYcfjrYILaGyYQIPvGA5NnUghEKM1BxY+GFeB9T
- NrVr/ebD63caj8QqXENMQrxVf4F7cpEmjFsfu7bgGFuoo3xUnyJBrinH1RkAl+aLoU94KDXDCxu
- pzcLZgcmQzN/AAA0=
-X-Received: by 2002:adf:eb8c:: with SMTP id t12mr3387096wrn.34.1571324050525; 
- Thu, 17 Oct 2019 07:54:10 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqwDDbMGFfB3v10ptuQWX2ANapfZw8ISeh1MsxmtDhhJCVXlipXJkLdq6qWXAk0wC8huzoKKNw==
-X-Received: by 2002:adf:eb8c:: with SMTP id t12mr3387076wrn.34.1571324050262; 
- Thu, 17 Oct 2019 07:54:10 -0700 (PDT)
-Received: from [192.168.50.32] (243.red-88-26-246.staticip.rima-tde.net.
- [88.26.246.243])
- by smtp.gmail.com with ESMTPSA id b12sm2383212wrt.21.2019.10.17.07.54.09
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Thu, 17 Oct 2019 07:54:09 -0700 (PDT)
-Subject: Re: [PATCH 2/2] hw/timer/slavio_timer.c: Switch to transaction-based
- ptimer API
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
-References: <20191017132351.4762-1-peter.maydell@linaro.org>
- <20191017132351.4762-3-peter.maydell@linaro.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <2210f783-1159-1263-dfff-3bd84111e2f5@redhat.com>
-Date: Thu, 17 Oct 2019 16:54:08 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.1
+ h=x-gm-message-state:mime-version:in-reply-to:references:from:date
+ :message-id:subject:to:cc;
+ bh=NVOIQm4H/O0Cx5VJa3R22BQF2d1DAtNSsVKXlEKnY1o=;
+ b=tLNyKQt/gpC54DQL5SIu4TrN59Y7h8xFufJ2I6qoUBObz43Uol9RAYCAmM/y99Xteb
+ 9Xnt3QT/Iks/+vPjF3xi438Gcj1CrG0li8+7bZcS+jEghYzkAaI+Ldpzw1NDcPTyBk0F
+ HyLsBxxHCbFbgm/RFoBa3IEK52Y2FvnmQtPs/Q32f/IIV4rKfn2yzb5LZaeIG/jd0pFQ
+ XXjtcqtqxeB/5YikqqtF+s2Wkw++zNpjmD6tm1Ac/JQZBxMaIpliZ0hH6cW5wo/ZVWvp
+ SJKnWiY/eFX9wpfoTEWXMtdxtVgVK1c93lkKjxzn0NVmIFCzZDQjBANN53sMyzrPLKco
+ gvcA==
+X-Gm-Message-State: APjAAAXjPmjVA2YjF4AISHNZpM4YuUVyKOxfZed63rtWfQVk5H9/0Iw3
+ FbYpgTCw5WrjKfe2YsImMzeQeiBjyM725ISiCu4=
+X-Google-Smtp-Source: APXvYqxxPmqsoiYCMSa9/sz4vxEvLCM1pfKYNicVq8B751PVe8aOK0zLkgvBQELFeXhyUSAv+IQ58H0JDp/WyDdwHSE=
+X-Received: by 2002:aca:62d5:: with SMTP id w204mr3552201oib.136.1571323522344; 
+ Thu, 17 Oct 2019 07:45:22 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20191017132351.4762-3-peter.maydell@linaro.org>
-Content-Language: en-US
-X-MC-Unique: qa1aUo20MgeyJKXBg-iTsA-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.120
+Received: by 2002:a9d:340a:0:0:0:0:0 with HTTP; Thu, 17 Oct 2019 07:45:21
+ -0700 (PDT)
+In-Reply-To: <20191015162705.28087-18-philmd@redhat.com>
+References: <20191015162705.28087-1-philmd@redhat.com>
+ <20191015162705.28087-18-philmd@redhat.com>
+From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+Date: Thu, 17 Oct 2019 16:45:21 +0200
+Message-ID: <CAL1e-=hQ2jG-CwR9bWb1YprNfL4MviWh6xn08oh0ucpEDjRm4A@mail.gmail.com>
+Subject: Re: [PATCH 17/32] hw/mips/mips_malta: Create IDE hard drive array
+ dynamically
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
+Content-Type: multipart/alternative; boundary="000000000000606b4005951c4431"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::241
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -107,195 +91,159 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: KONRAD Frederic <frederic.konrad@adacore.com>,
- Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
- Fabien Chouteau <chouteau@adacore.com>
+Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
+ Stefano Stabellini <sstabellini@kernel.org>,
+ Eduardo Habkost <ehabkost@redhat.com>,
+ "kvm@vger.kernel.org" <kvm@vger.kernel.org>, Paul Durrant <paul@xen.org>,
+ "Michael S. Tsirkin" <mst@redhat.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ Igor Mammedov <imammedo@redhat.com>,
+ =?UTF-8?Q?Herv=C3=A9_Poussineau?= <hpoussin@reactos.org>,
+ Aleksandar Markovic <amarkovic@wavecomp.com>,
+ "xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>,
+ Anthony Perard <anthony.perard@citrix.com>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
+ Aurelien Jarno <aurelien@aurel32.net>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Peter,
+--000000000000606b4005951c4431
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 10/17/19 3:23 PM, Peter Maydell wrote:
-> Switch the slavio_timer code away from bottom-half based ptimers to
-> the new transaction-based ptimer API.  This just requires adding
-> begin/commit calls around the various places that modify the ptimer
-> state, and using the new ptimer_init() function to create the timer.
->=20
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+On Tuesday, October 15, 2019, Philippe Mathieu-Daud=C3=A9 <philmd@redhat.co=
+m>
+wrote:
+
+> In the next commit we'll refactor the PIIX4 code out of
+> mips_malta_init(). As a preliminary step, add the 'ide_drives'
+> variable and create the drive array dynamically.
+>
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 > ---
->   hw/timer/slavio_timer.c | 20 ++++++++++++++++----
->   1 file changed, 16 insertions(+), 4 deletions(-)
->=20
-> diff --git a/hw/timer/slavio_timer.c b/hw/timer/slavio_timer.c
-> index 692d213897d..0e2efe6fe89 100644
-> --- a/hw/timer/slavio_timer.c
-> +++ b/hw/timer/slavio_timer.c
-> @@ -30,7 +30,6 @@
->   #include "hw/sysbus.h"
->   #include "migration/vmstate.h"
->   #include "trace.h"
-> -#include "qemu/main-loop.h"
->   #include "qemu/module.h"
->  =20
->   /*
-> @@ -213,6 +212,7 @@ static void slavio_timer_mem_writel(void *opaque, hwa=
-ddr addr,
->       saddr =3D addr >> 2;
->       switch (saddr) {
->       case TIMER_LIMIT:
-> +        ptimer_transaction_begin(t->timer);
->           if (slavio_timer_is_user(tc)) {
->               uint64_t count;
+>  hw/mips/mips_malta.c | 7 +++++--
+>  1 file changed, 5 insertions(+), 2 deletions(-)
+>
+>
+Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 
 
-This part is odd since there is a check on t->timer !=3D NULL later, and=20
-ptimer_transaction_commit() can't take NULL.
+> diff --git a/hw/mips/mips_malta.c b/hw/mips/mips_malta.c
+> index 528c34a1c3..774bb810f6 100644
+> --- a/hw/mips/mips_malta.c
+> +++ b/hw/mips/mips_malta.c
+> @@ -1235,7 +1235,8 @@ void mips_malta_init(MachineState *machine)
+>      int piix4_devfn;
+>      I2CBus *smbus;
+>      DriveInfo *dinfo;
+> -    DriveInfo *hd[MAX_IDE_BUS * MAX_IDE_DEVS];
+> +    const size_t ide_drives =3D MAX_IDE_BUS * MAX_IDE_DEVS;
+> +    DriveInfo **hd;
+>      int fl_idx =3D 0;
+>      int be;
+>
+> @@ -1406,7 +1407,8 @@ void mips_malta_init(MachineState *machine)
+>      pci_bus =3D gt64120_register(s->i8259);
+>
+>      /* Southbridge */
+> -    ide_drive_get(hd, ARRAY_SIZE(hd));
+> +    hd =3D g_new(DriveInfo *, ide_drives);
+> +    ide_drive_get(hd, ide_drives);
+>
+>      pci =3D pci_create_simple_multifunction(pci_bus, PCI_DEVFN(10, 0),
+>                                            true, TYPE_PIIX4_PCI_DEVICE);
+> @@ -1421,6 +1423,7 @@ void mips_malta_init(MachineState *machine)
+>      }
+>
+>      pci_piix4_ide_init(pci_bus, hd, piix4_devfn + 1);
+> +    g_free(hd);
+>      pci_create_simple(pci_bus, piix4_devfn + 2, "piix4-usb-uhci");
+>      smbus =3D piix4_pm_init(pci_bus, piix4_devfn + 3, 0x1100,
+>                            isa_get_irq(NULL, 9), NULL, 0, NULL);
+> --
+> 2.21.0
+>
+>
+>
 
-This won't happen if you restrict to ptimer_* calls:
+--000000000000606b4005951c4431
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
--- >8 --
-@@ -222,18 +222,22 @@ static void slavio_timer_mem_writel(void *opaque,=20
-hwaddr addr,
-              t->reached =3D 0;
-              count =3D ((uint64_t)t->counthigh << 32) | t->count;
-              trace_slavio_timer_mem_writel_limit(timer_index, count);
-+            ptimer_transaction_begin(t->timer);
-              ptimer_set_count(t->timer, LIMIT_TO_PERIODS(t->limit -=20
-count));
-+            ptimer_transaction_commit(t->timer);
-          } else {
-              // set limit, reset counter
-              qemu_irq_lower(t->irq);
-              t->limit =3D val & TIMER_MAX_COUNT32;
-              if (t->timer) {
-+                ptimer_transaction_begin(t->timer);
-                  if (t->limit =3D=3D 0) { /* free-run */
-                      ptimer_set_limit(t->timer,
-=20
-LIMIT_TO_PERIODS(TIMER_MAX_COUNT32), 1);
-                  } else {
-                      ptimer_set_limit(t->timer,=20
-LIMIT_TO_PERIODS(t->limit), 1);
-                  }
-+                ptimer_transaction_commit(t->timer);
-              }
-          }
-          break;
----
+<br><br>On Tuesday, October 15, 2019, Philippe Mathieu-Daud=C3=A9 &lt;<a hr=
+ef=3D"mailto:philmd@redhat.com">philmd@redhat.com</a>&gt; wrote:<br><blockq=
+uote class=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;border-left:1px #ccc =
+solid;padding-left:1ex">In the next commit we&#39;ll refactor the PIIX4 cod=
+e out of<br>
+mips_malta_init(). As a preliminary step, add the &#39;ide_drives&#39;<br>
+variable and create the drive array dynamically.<br>
+<br>
+Signed-off-by: Philippe Mathieu-Daud=C3=A9 &lt;<a href=3D"mailto:philmd@red=
+hat.com">philmd@redhat.com</a>&gt;<br>
+---<br>
+=C2=A0hw/mips/mips_malta.c | 7 +++++--<br>
+=C2=A01 file changed, 5 insertions(+), 2 deletions(-)<br>
+<br></blockquote><div><br></div><div><div id=3D"cvcmsg_16dbfeb33c93ed97" cl=
+ass=3D"yh  " style=3D"border-top-left-radius:0px;border-top-right-radius:0p=
+x;margin-bottom:11px;overflow:visible"><div class=3D"Vh" id=3D"cvcfullmsg_1=
+6dbfeb33c93ed97"><div id=3D"cvcmsgbod_16dbfeb33c93ed97" class=3D"aj"><div c=
+lass=3D"Ni"><div class=3D"ni pi " dir=3D"ltr"><p dir=3D"ltr">Reviewed-by: A=
+leksandar Markovic &lt;<a href=3D"mailto:amarkovic@wavecomp.com" target=3D"=
+_blank">amarkovic@wavecomp.com</a>&gt;</p><div style=3D"clear:both"></div><=
+/div><div style=3D"clear:both"></div><div><div class=3D"M j T b hc Aj S" ta=
+bindex=3D"0"><div class=3D"V j hf"></div></div></div><div style=3D"clear:bo=
+th"></div></div></div></div></div><div id=3D"cvcmsg_16dbfecd588da1f7" class=
+=3D"yh" style=3D"margin-bottom:11px"><div class=3D"Vh" id=3D"cvcfullmsg_16d=
+bfecd588da1f7"><div class=3D"M j Zi Mi  " tabindex=3D"0"><div id=3D"cvcrepl=
+y_16dbfecd588da1f7" class=3D"M j T b hc xh S  " tabindex=3D"0"><div class=
+=3D"V j td"></div></div></div></div></div></div><div>=C2=A0</div><blockquot=
+e class=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;border-left:1px #ccc sol=
+id;padding-left:1ex">
+diff --git a/hw/mips/mips_malta.c b/hw/mips/mips_malta.c<br>
+index 528c34a1c3..774bb810f6 100644<br>
+--- a/hw/mips/mips_malta.c<br>
++++ b/hw/mips/mips_malta.c<br>
+@@ -1235,7 +1235,8 @@ void mips_malta_init(MachineState *machine)<br>
+=C2=A0 =C2=A0 =C2=A0int piix4_devfn;<br>
+=C2=A0 =C2=A0 =C2=A0I2CBus *smbus;<br>
+=C2=A0 =C2=A0 =C2=A0DriveInfo *dinfo;<br>
+-=C2=A0 =C2=A0 DriveInfo *hd[MAX_IDE_BUS * MAX_IDE_DEVS];<br>
++=C2=A0 =C2=A0 const size_t ide_drives =3D MAX_IDE_BUS * MAX_IDE_DEVS;<br>
++=C2=A0 =C2=A0 DriveInfo **hd;<br>
+=C2=A0 =C2=A0 =C2=A0int fl_idx =3D 0;<br>
+=C2=A0 =C2=A0 =C2=A0int be;<br>
+<br>
+@@ -1406,7 +1407,8 @@ void mips_malta_init(MachineState *machine)<br>
+=C2=A0 =C2=A0 =C2=A0pci_bus =3D gt64120_register(s-&gt;i8259);<br>
+<br>
+=C2=A0 =C2=A0 =C2=A0/* Southbridge */<br>
+-=C2=A0 =C2=A0 ide_drive_get(hd, ARRAY_SIZE(hd));<br>
++=C2=A0 =C2=A0 hd =3D g_new(DriveInfo *, ide_drives);<br>
++=C2=A0 =C2=A0 ide_drive_get(hd, ide_drives);<br>
+<br>
+=C2=A0 =C2=A0 =C2=A0pci =3D pci_create_simple_<wbr>multifunction(pci_bus, P=
+CI_DEVFN(10, 0),<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0true, TYPE_PIIX4_PCI_DEVICE);<br>
+@@ -1421,6 +1423,7 @@ void mips_malta_init(MachineState *machine)<br>
+=C2=A0 =C2=A0 =C2=A0}<br>
+<br>
+=C2=A0 =C2=A0 =C2=A0pci_piix4_ide_init(pci_bus, hd, piix4_devfn + 1);<br>
++=C2=A0 =C2=A0 g_free(hd);<br>
+=C2=A0 =C2=A0 =C2=A0pci_create_simple(pci_bus, piix4_devfn + 2, &quot;piix4=
+-usb-uhci&quot;);<br>
+=C2=A0 =C2=A0 =C2=A0smbus =3D piix4_pm_init(pci_bus, piix4_devfn + 3, 0x110=
+0,<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0isa_get_irq(NULL, 9), NULL, 0, NULL);<br>
+-- <br>
+2.21.0<br>
+<br>
+<br>
+</blockquote>
 
->  =20
-> @@ -236,6 +236,7 @@ static void slavio_timer_mem_writel(void *opaque, hwa=
-ddr addr,
->                   }
->               }
->           }
-> +        ptimer_transaction_commit(t->timer);
->           break;
->       case TIMER_COUNTER:
->           if (slavio_timer_is_user(tc)) {
-> @@ -247,7 +248,9 @@ static void slavio_timer_mem_writel(void *opaque, hwa=
-ddr addr,
->               t->reached =3D 0;
->               count =3D ((uint64_t)t->counthigh) << 32 | t->count;
->               trace_slavio_timer_mem_writel_limit(timer_index, count);
-> +            ptimer_transaction_begin(t->timer);
->               ptimer_set_count(t->timer, LIMIT_TO_PERIODS(t->limit - coun=
-t));
-> +            ptimer_transaction_commit(t->timer);
->           } else {
->               trace_slavio_timer_mem_writel_counter_invalid();
->           }
-> @@ -255,13 +258,16 @@ static void slavio_timer_mem_writel(void *opaque, h=
-waddr addr,
->       case TIMER_COUNTER_NORST:
->           // set limit without resetting counter
->           t->limit =3D val & TIMER_MAX_COUNT32;
-> +        ptimer_transaction_begin(t->timer);
->           if (t->limit =3D=3D 0) { /* free-run */
->               ptimer_set_limit(t->timer, LIMIT_TO_PERIODS(TIMER_MAX_COUNT=
-32), 0);
->           } else {
->               ptimer_set_limit(t->timer, LIMIT_TO_PERIODS(t->limit), 0);
->           }
-> +        ptimer_transaction_commit(t->timer);
->           break;
->       case TIMER_STATUS:
-> +        ptimer_transaction_begin(t->timer);
->           if (slavio_timer_is_user(tc)) {
-
-I'd move the begin() here.
-
->               // start/stop user counter
->               if (val & 1) {
-> @@ -273,6 +279,7 @@ static void slavio_timer_mem_writel(void *opaque, hwa=
-ddr addr,
->               }
->           }
->           t->run =3D val & 1;
-> +        ptimer_transaction_commit(t->timer);
->           break;
->       case TIMER_MODE:
->           if (timer_index =3D=3D 0) {
-> @@ -282,6 +289,7 @@ static void slavio_timer_mem_writel(void *opaque, hwa=
-ddr addr,
->                   unsigned int processor =3D 1 << i;
->                   CPUTimerState *curr_timer =3D &s->cputimer[i + 1];
->  =20
-> +                ptimer_transaction_begin(curr_timer->timer);
->                   // check for a change in timer mode for this processor
->                   if ((val & processor) !=3D (s->cputimer_mode & processo=
-r)) {
-
-Ditto, begin() here.
-
->                       if (val & processor) { // counter -> user timer
-> @@ -308,6 +316,7 @@ static void slavio_timer_mem_writel(void *opaque, hwa=
-ddr addr,
->                           trace_slavio_timer_mem_writel_mode_counter(time=
-r_index);
->                       }
->                   }
-> +                ptimer_transaction_commit(curr_timer->timer);
->               }
->           } else {
->               trace_slavio_timer_mem_writel_mode_invalid();
-> @@ -367,10 +376,12 @@ static void slavio_timer_reset(DeviceState *d)
->           curr_timer->count =3D 0;
->           curr_timer->reached =3D 0;
->           if (i <=3D s->num_cpus) {
-> +            ptimer_transaction_begin(curr_timer->timer);
->               ptimer_set_limit(curr_timer->timer,
->                                LIMIT_TO_PERIODS(TIMER_MAX_COUNT32), 1);
->               ptimer_run(curr_timer->timer, 0);
->               curr_timer->run =3D 1;
-> +            ptimer_transaction_commit(curr_timer->timer);
->           }
->       }
->       s->cputimer_mode =3D 0;
-> @@ -380,7 +391,6 @@ static void slavio_timer_init(Object *obj)
->   {
->       SLAVIO_TIMERState *s =3D SLAVIO_TIMER(obj);
->       SysBusDevice *dev =3D SYS_BUS_DEVICE(obj);
-> -    QEMUBH *bh;
->       unsigned int i;
->       TimerContext *tc;
->  =20
-> @@ -392,9 +402,11 @@ static void slavio_timer_init(Object *obj)
->           tc->s =3D s;
->           tc->timer_index =3D i;
->  =20
-> -        bh =3D qemu_bh_new(slavio_timer_irq, tc);
-> -        s->cputimer[i].timer =3D ptimer_init_with_bh(bh, PTIMER_POLICY_D=
-EFAULT);
-> +        s->cputimer[i].timer =3D ptimer_init(slavio_timer_irq, tc,
-> +                                           PTIMER_POLICY_DEFAULT);
-> +        ptimer_transaction_begin(s->cputimer[i].timer);
->           ptimer_set_period(s->cputimer[i].timer, TIMER_PERIOD);
-> +        ptimer_transaction_commit(s->cputimer[i].timer);
->  =20
->           size =3D i =3D=3D 0 ? SYS_TIMER_SIZE : CPU_TIMER_SIZE;
->           snprintf(timer_name, sizeof(timer_name), "timer-%i", i);
->=20
-
+--000000000000606b4005951c4431--
 
