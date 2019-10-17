@@ -2,58 +2,60 @@ Return-Path: <SRS0=yZS3=YK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4EC0EECE58D
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 22:14:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CD498ECE58D
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 22:15:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 18E3C21D7A
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 22:14:38 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 18E3C21D7A
+	by mail.kernel.org (Postfix) with ESMTPS id 9EC2821D7A
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 22:15:36 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9EC2821D7A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33068 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33138 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iLE2X-00059z-7j
-	for qemu-devel@archiver.kernel.org; Thu, 17 Oct 2019 18:14:37 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33087)
+	id 1iLE3T-0006mY-LH
+	for qemu-devel@archiver.kernel.org; Thu, 17 Oct 2019 18:15:35 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34226)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jsnow@redhat.com>) id 1iLDkP-0007zL-Dk
- for qemu-devel@nongnu.org; Thu, 17 Oct 2019 17:55:54 -0400
+ (envelope-from <ehabkost@redhat.com>) id 1iLDu9-00030F-87
+ for qemu-devel@nongnu.org; Thu, 17 Oct 2019 18:05:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1iLDkN-0002pc-B2
- for qemu-devel@nongnu.org; Thu, 17 Oct 2019 17:55:53 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:51896)
+ (envelope-from <ehabkost@redhat.com>) id 1iLDu7-0006wM-Dc
+ for qemu-devel@nongnu.org; Thu, 17 Oct 2019 18:05:56 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:45098)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jsnow@redhat.com>)
- id 1iLDkH-0002o1-BC; Thu, 17 Oct 2019 17:55:45 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ (Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1iLDu7-0006w7-54
+ for qemu-devel@nongnu.org; Thu, 17 Oct 2019 18:05:55 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id D78B336961;
- Thu, 17 Oct 2019 21:55:43 +0000 (UTC)
-Received: from probe.bos.redhat.com (dhcp-17-173.bos.redhat.com [10.18.17.173])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 851905D9CA;
- Thu, 17 Oct 2019 21:55:31 +0000 (UTC)
-From: John Snow <jsnow@redhat.com>
-To: Peter Maydell <peter.maydell@linaro.org>, jsnow@redhat.com,
- qemu-devel@nongnu.org
-Subject: [PULL v3 19/19] dirty-bitmaps: remove deprecated autoload parameter
-Date: Thu, 17 Oct 2019 17:54:36 -0400
-Message-Id: <20191017215436.14252-20-jsnow@redhat.com>
-In-Reply-To: <20191017215436.14252-1-jsnow@redhat.com>
-References: <20191017215436.14252-1-jsnow@redhat.com>
+ by mx1.redhat.com (Postfix) with ESMTPS id 0DC7D10F13;
+ Thu, 17 Oct 2019 22:05:54 +0000 (UTC)
+Received: from localhost (ovpn-116-20.phx2.redhat.com [10.3.116.20])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 3919F60852;
+ Thu, 17 Oct 2019 22:05:43 +0000 (UTC)
+Date: Thu, 17 Oct 2019 19:05:41 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+To: Thomas Huth <thuth@redhat.com>
+Subject: Re: Python 2 and test/vm/netbsd
+Message-ID: <20191017220541.GJ4084@habkost.net>
+References: <20191016030021.GD4084@habkost.net>
+ <a83d518a-6e39-0017-203d-2ee3d61935ca@redhat.com>
+ <20191016224124.GF4084@habkost.net>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20191016224124.GF4084@habkost.net>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.30]); Thu, 17 Oct 2019 21:55:43 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
+ (mx1.redhat.com [10.5.110.39]); Thu, 17 Oct 2019 22:05:54 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 209.132.183.28
@@ -68,135 +70,91 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>,
- Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org,
- Juan Quintela <quintela@redhat.com>, libvir-list@redhat.com,
- Markus Armbruster <armbru@redhat.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Max Reitz <mreitz@redhat.com>,
- Stefan Hajnoczi <stefanha@redhat.com>
+Cc: Fam Zheng <fam@euphon.net>, Peter Maydell <peter.maydell@linaro.org>,
+ Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>,
+ QEMU Developers <qemu-devel@nongnu.org>,
+ Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>,
+ =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>,
+ Kamil Rytarowski <kamil@netbsd.org>, Gerd Hoffmann <kraxel@redhat.com>,
+ Cleber Rosa <crosa@redhat.com>, Kevin Wolf <kwolf@redhat.com>,
+ John Snow <jsnow@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This parameter has been deprecated since 2.12.0 and is eligible for
-removal. Remove this parameter as it is actually completely ignored;
-let's not give false hope.
+On Wed, Oct 16, 2019 at 07:41:24PM -0300, Eduardo Habkost wrote:
+> On Wed, Oct 16, 2019 at 08:11:57AM +0200, Thomas Huth wrote:
+> > On 16/10/2019 05.00, Eduardo Habkost wrote:
+> > > On Tue, Sep 17, 2019 at 08:31:40PM -0300, Eduardo Habkost wrote:
+> > >> On Mon, Jul 01, 2019 at 07:25:27PM -0300, Eduardo Habkost wrote:
+> > >>> On Mon, Jun 10, 2019 at 01:58:50PM +0100, Peter Maydell wrote:
+> > > [...]
+> > >>>> The configure check also spits out deprecation warnings for
+> > >>>> the NetBSD/FreeBSD/OpenBSD tests/vm configurations. It would be nice
+> > >>>> to get those updated.
+> > >>>
+> > >>> CCing the test/vm maintainers.
+> > >>>
+> > >>> Fam, Alex, are you able to fix this and create new BSD VM images
+> > >>> with Python 3 available?  I thought the VM image configurations
+> > >>> were stored in the source tree, but they are downloaded from
+> > >>> download.patchew.org.
+> > >>
+> > >> Fam, Alex, can you help us on this?  Python 2 won't be supported
+> > >> anymore, so we need the VM images to be updated.
+> > > 
+> > > Anyone?
+> > > 
+> > > I'm about to submit patches to remove Python 2 support, and this
+> > > will break tests/vm/netbsd.
+> > > 
+> > > I'm powerless to fix this issue, because the netbsd image is
+> > > hosted at download.patchew.org.
+> > 
+> > Gerd had a patch to convert the netbsd VM script to ad hoc image
+> > creation, too:
+> > 
+> > https://lists.gnu.org/archive/html/qemu-devel/2019-05/msg04459.html
+> > 
+> > But there was a regression with the serial port between QEMU v3.0 and
+> > v4.x, so it was not included:
+> > 
+> > https://lists.gnu.org/archive/html/qemu-devel/2019-05/msg06784.html
+> 
+> The URL above has this error:
+> 
+>   con recv:  x: Exitqqqqqqqqqqqqqqqqqqqqqqqqqj
+>   con recv: To be able to use the network, we need answers to the
+>   following:Network media type
+>   con send: <enter>
+>   con recv: : qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqk Perform autoconfiguration?
+>      >a: Yes b: Noqqqqqqqqqqqqqqqqq
+>   console: *** read timeout ***
+>   console: waiting for: 'a: Yes'
+>   console: line buffer:
+>   
+>   con recv: qqqqqqqqqqqqqqj
+> 
+> I believe that problem was solved in v4, because v4 was reading
+> the serial output 1 byte at a time.
+> 
+> The issue that caused the netbsd patch to be dropped was:
+> https://lore.kernel.org/qemu-devel/CAFEAcA8k9QJA9iE-kwiaPhr0fY_2zG7JRX5uV4AaSSjXCSs4+A@mail.gmail.com/
+> 
+> Possibly this is the same issue we saw at:
+> https://lore.kernel.org/qemu-devel/20190607034214.GB22416@habkost.net/
+> 
+> The test script must either close the console socket, or keep
+> reading from it.  Otherwise, the QEMU VCPU threads might get
+> stuck waiting for the chardev to be writeable.
 
-Signed-off-by: John Snow <jsnow@redhat.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
-Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-id: 20191002232411.29968-1-jsnow@redhat.com
----
- qemu-deprecated.texi | 20 +++++++++++++++-----
- qapi/block-core.json |  6 +-----
- blockdev.c           |  6 ------
- 3 files changed, 16 insertions(+), 16 deletions(-)
+It doesn't seem to be the same issue.  Even if the console socket is closed,
+I'm seeing results similar to the ones reported by Peter (the "pkgin -y
+install" step is unreasonably slow).
 
-diff --git a/qemu-deprecated.texi b/qemu-deprecated.texi
-index 01245e0b1c..7239e0959d 100644
---- a/qemu-deprecated.texi
-+++ b/qemu-deprecated.texi
-@@ -149,11 +149,6 @@ QEMU 4.1 has three options, please migrate to one of=
- these three:
-=20
- @section QEMU Machine Protocol (QMP) commands
-=20
--@subsection block-dirty-bitmap-add "autoload" parameter (since 2.12.0)
--
--"autoload" parameter is now ignored. All bitmaps are automatically loade=
-d
--from qcow2 images.
--
- @subsection query-block result field dirty-bitmaps[i].status (since 4.0)
-=20
- The ``status'' field of the ``BlockDirtyInfo'' structure, returned by
-@@ -356,3 +351,18 @@ existing CPU models.  Management software that needs=
- runnability
- guarantees must resolve the CPU model aliases using te
- ``alias-of'' field returned by the ``query-cpu-definitions'' QMP
- command.
-+
-+
-+@node Recently removed features
-+@appendix Recently removed features
-+
-+What follows is a record of recently removed, formerly deprecated
-+features that serves as a record for users who have encountered
-+trouble after a recent upgrade.
-+
-+@section QEMU Machine Protocol (QMP) commands
-+
-+@subsection block-dirty-bitmap-add "autoload" parameter (since 4.2.0)
-+
-+The "autoload" parameter has been ignored since 2.12.0. All bitmaps
-+are automatically loaded from qcow2 images.
-diff --git a/qapi/block-core.json b/qapi/block-core.json
-index f66553aac7..b274aef713 100644
---- a/qapi/block-core.json
-+++ b/qapi/block-core.json
-@@ -2052,10 +2052,6 @@
- #              Qcow2 disks support persistent bitmaps. Default is false =
-for
- #              block-dirty-bitmap-add. (Since: 2.10)
- #
--# @autoload: ignored and deprecated since 2.12.
--#            Currently, all dirty tracking bitmaps are loaded from Qcow2=
- on
--#            open.
--#
- # @disabled: the bitmap is created in the disabled state, which means th=
-at
- #            it will not track drive changes. The bitmap may be enabled =
-with
- #            block-dirty-bitmap-enable. Default is false. (Since: 4.0)
-@@ -2064,7 +2060,7 @@
- ##
- { 'struct': 'BlockDirtyBitmapAdd',
-   'data': { 'node': 'str', 'name': 'str', '*granularity': 'uint32',
--            '*persistent': 'bool', '*autoload': 'bool', '*disabled': 'bo=
-ol' } }
-+            '*persistent': 'bool', '*disabled': 'bool' } }
-=20
- ##
- # @BlockDirtyBitmapMergeSource:
-diff --git a/blockdev.c b/blockdev.c
-index d77e809623..03c7cd7651 100644
---- a/blockdev.c
-+++ b/blockdev.c
-@@ -1966,7 +1966,6 @@ static void block_dirty_bitmap_add_prepare(BlkActio=
-nState *common,
-     qmp_block_dirty_bitmap_add(action->node, action->name,
-                                action->has_granularity, action->granular=
-ity,
-                                action->has_persistent, action->persisten=
-t,
--                               action->has_autoload, action->autoload,
-                                action->has_disabled, action->disabled,
-                                &local_err);
-=20
-@@ -2858,7 +2857,6 @@ out:
- void qmp_block_dirty_bitmap_add(const char *node, const char *name,
-                                 bool has_granularity, uint32_t granulari=
-ty,
-                                 bool has_persistent, bool persistent,
--                                bool has_autoload, bool autoload,
-                                 bool has_disabled, bool disabled,
-                                 Error **errp)
- {
-@@ -2890,10 +2888,6 @@ void qmp_block_dirty_bitmap_add(const char *node, =
-const char *name,
-         persistent =3D false;
-     }
-=20
--    if (has_autoload) {
--        warn_report("Autoload option is deprecated and its value is igno=
-red");
--    }
--
-     if (!has_disabled) {
-         disabled =3D false;
-     }
---=20
-2.21.0
+Running with V=1, I see packages being downloaded at reasonable speeds, but
+there's a huge interval (of various minutes) between each package download.
 
+-- 
+Eduardo
 
