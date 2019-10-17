@@ -2,65 +2,107 @@ Return-Path: <SRS0=yZS3=YK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E1DCDC4CECE
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 07:46:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 206ADC4CECE
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 07:57:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B00F42082C
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 07:46:29 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B00F42082C
+	by mail.kernel.org (Postfix) with ESMTPS id E9D242082C
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 07:57:25 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E9D242082C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38834 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39026 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iL0UO-0004wB-Sk
-	for qemu-devel@archiver.kernel.org; Thu, 17 Oct 2019 03:46:28 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39877)
+	id 1iL0ez-0008Cr-3f
+	for qemu-devel@archiver.kernel.org; Thu, 17 Oct 2019 03:57:25 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41229)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jfreimann@redhat.com>) id 1iL0TT-0004Vq-Tm
- for qemu-devel@nongnu.org; Thu, 17 Oct 2019 03:45:33 -0400
+ (envelope-from <thuth@redhat.com>) id 1iL0eL-0007ka-RK
+ for qemu-devel@nongnu.org; Thu, 17 Oct 2019 03:56:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jfreimann@redhat.com>) id 1iL0TR-0003Zw-BO
- for qemu-devel@nongnu.org; Thu, 17 Oct 2019 03:45:30 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34940)
+ (envelope-from <thuth@redhat.com>) id 1iL0eJ-0007Nm-DS
+ for qemu-devel@nongnu.org; Thu, 17 Oct 2019 03:56:44 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42366)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jfreimann@redhat.com>)
- id 1iL0TR-0003Zk-2f
- for qemu-devel@nongnu.org; Thu, 17 Oct 2019 03:45:29 -0400
+ (Exim 4.71) (envelope-from <thuth@redhat.com>) id 1iL0eJ-0007Lk-4m
+ for qemu-devel@nongnu.org; Thu, 17 Oct 2019 03:56:43 -0400
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
  [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 87D35307D98A;
- Thu, 17 Oct 2019 07:45:27 +0000 (UTC)
-Received: from localhost (dhcp-192-238.str.redhat.com [10.33.192.238])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 12F6E5D713;
- Thu, 17 Oct 2019 07:45:26 +0000 (UTC)
-Date: Thu, 17 Oct 2019 09:45:25 +0200
-From: Jens Freimann <jfreimann@redhat.com>
-To: Alex Williamson <alex.williamson@redhat.com>
-Subject: Re: [PATCH v3 10/10] vfio: unplug failover primary device before
- migration
-Message-ID: <20191017074525.3z4m6zg45qhq4ezc@jenstp.localdomain>
-References: <20191011112015.11785-1-jfreimann@redhat.com>
- <20191011112015.11785-11-jfreimann@redhat.com>
- <20191015195212.27e0f944@x1.home>
- <20191016201847.izgvkxfoepci4w23@jenstp.localdomain>
- <20191016183958.2f66f055@x1.home>
+ by mx1.redhat.com (Postfix) with ESMTPS id BE3E52D6E4F;
+ Thu, 17 Oct 2019 07:56:41 +0000 (UTC)
+Received: from thuth.remote.csb (dhcp-200-228.str.redhat.com [10.33.200.228])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 2DD8D5D712;
+ Thu, 17 Oct 2019 07:56:38 +0000 (UTC)
+Subject: Re: [PATCH] configure: Require Python >= 3.5
+To: John Snow <jsnow@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>,
+ qemu-devel@nongnu.org
+References: <20191016224237.26180-1-ehabkost@redhat.com>
+ <7146bebf-6e99-f27a-3753-d48dea1977f9@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=thuth@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+Organization: Red Hat
+Message-ID: <12feccfa-08fd-d5a4-d5ec-92bf88e9f552@redhat.com>
+Date: Thu, 17 Oct 2019 09:56:37 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <20191016183958.2f66f055@x1.home>
-User-Agent: NeoMutt/20180716-1376-5d6ed1
+In-Reply-To: <7146bebf-6e99-f27a-3753-d48dea1977f9@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.48]); Thu, 17 Oct 2019 07:45:27 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.29]); Thu, 17 Oct 2019 07:56:41 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 209.132.183.28
@@ -75,119 +117,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: ehabkost@redhat.com, mst@redhat.com, aadam@redhat.com,
- qemu-devel@nongnu.org, dgilbert@redhat.com, laine@redhat.com, ailan@redhat.com,
- parav@mellanox.com
+Cc: Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>,
+ Cleber Rosa <crosa@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, Oct 16, 2019 at 06:39:58PM -0600, Alex Williamson wrote:
->On Wed, 16 Oct 2019 22:18:47 +0200
->Jens Freimann <jfreimann@redhat.com> wrote:
->
->> On Tue, Oct 15, 2019 at 07:52:12PM -0600, Alex Williamson wrote:
->> >On Fri, 11 Oct 2019 13:20:15 +0200
->> >Jens Freimann <jfreimann@redhat.com> wrote:
->> >
->> >> As usual block all vfio-pci devices from being migrated, but make an
->> >> exception for failover primary devices. This is achieved by setting
->> >> unmigratable to 0 but also add a migration blocker for all vfio-pci
->> >> devices except failover primary devices. These will be unplugged before
->> >> migration happens by the migration handler of the corresponding
->> >> virtio-net standby device.
->> >>
->> >> Signed-off-by: Jens Freimann <jfreimann@redhat.com>
->> >> ---
->> >>  hw/vfio/pci.c | 35 ++++++++++++++++++++++++++++++++++-
->> >>  hw/vfio/pci.h |  2 ++
->> >>  2 files changed, 36 insertions(+), 1 deletion(-)
->> >>
->> >> diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
->> >> index c5e6fe61cb..64cf8e07d9 100644
->> >> --- a/hw/vfio/pci.c
->> >> +++ b/hw/vfio/pci.c
->> >> @@ -40,6 +40,9 @@
->> >>  #include "pci.h"
->> >>  #include "trace.h"
->> >>  #include "qapi/error.h"
->> >> +#include "migration/blocker.h"
->> >> +#include "qemu/option.h"
->> >> +#include "qemu/option_int.h"
->> >>
->> >>  #define TYPE_VFIO_PCI "vfio-pci"
->> >>  #define PCI_VFIO(obj)    OBJECT_CHECK(VFIOPCIDevice, obj, TYPE_VFIO_PCI)
->> >> @@ -2698,6 +2701,12 @@ static void vfio_unregister_req_notifier(VFIOPCIDevice *vdev)
->> >>      vdev->req_enabled = false;
->> >>  }
->> >>
->> >> +static int has_net_failover_arg(void *opaque, const char *name,
->> >> +                           const char *value, Error **errp)
->> >> +{
->> >> +    return (strcmp(name, "net_failover_pair_id") == 0);
->> >> +}
->> >> +
->> >>  static void vfio_realize(PCIDevice *pdev, Error **errp)
->> >>  {
->> >>      VFIOPCIDevice *vdev = PCI_VFIO(pdev);
->> >> @@ -2710,6 +2719,20 @@ static void vfio_realize(PCIDevice *pdev, Error **errp)
->> >>      int groupid;
->> >>      int i, ret;
->> >>      bool is_mdev;
->> >> +    uint16_t class_id;
->> >> +
->> >> +    if (qemu_opt_foreach(pdev->qdev.opts, has_net_failover_arg,
->> >> +                         (void *) pdev->qdev.opts, &err) == 0) {
->> >
->> >Why do we need a qemu_opt_foreach here versus testing
->> >vdev->net_failover_pair_id as you do below or similar to how we test
->> >sysfsdev immediately below this chunk?
+On 17/10/2019 00.48, John Snow wrote:
+> 
+> 
+> On 10/16/19 6:42 PM, Eduardo Habkost wrote:
+>> Python 3.5 is the oldest Python version available on our
+>> supported build platforms, and Python 2 end of life will be 3
+>> weeks after the planned release date of QEMU 4.2.0.  Drop Python
+>> 2 support from configure completely, and require Python 3.5 or
+>> newer.
 >>
->> We don't need it, I will change it and move it to where we check for
->> the PCI class.
->> >
->> >> +        error_setg(&vdev->migration_blocker,
->> >> +                "VFIO device doesn't support migration");
->> >> +        ret = migrate_add_blocker(vdev->migration_blocker, &err);
->> >
->> >Where's the migrate_del_blocker()/error_free() for any other realize
->> >error or device removal?
->> >
->> >> +        if (err) {
->> >> +            error_propagate(errp, err);
->> >> +            error_free(vdev->migration_blocker);
->> >> +        }
->> >
->> >As Connie noted, unclear if this aborts or continues without a
->> >migration blocker, which would be bad.
->>
->> It aborts in my test. PCI realize propagates it further and eventually
->> it leads to aborting qemu.
->>
->> It looks like this now:
->>
->>      if (!pdev->net_failover_pair_id) {
->>           error_setg(&vdev->migration_blocker,
->>                   "VFIO device doesn't support migration");
->>           ret = migrate_add_blocker(vdev->migration_blocker, &err);
->>           if (err) {
->>               error_propagate(errp, err);
->>           } else {
->>               error_propagate(errp, vdev->migration_blocker);
->>           }
->>           goto error;
->
->This unconditionally goes to error when we don't have a failover pair
->set :-\
->
->I suspect we don't want any sort of error propagate in the success
->case, the migration_blocker pre-defines the error when the migration is
->blocked, right?  Thanks,
+>> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+> 
+> Seems like a good time and place to mention this. Kevin, you require
+> 3.6+ for iotests, which are -- at present -- invoked as part of "make
+> check".
+> 
+> Do we care? Basically, this just means that iotests won't run for
+> systems that don't have 3.6+, which would be platforms like Debian 9 --
+> which is why ehabkost is choosing 3.5 here.
 
-I shouldn't code or send mails late at night :) I'll fix it in v4
+I think it's ok to simply skip the iotests in case we run on a Python
+3.5 system.
 
-Thanks!
-
-regards,
-Jens 
+ Thomas
 
