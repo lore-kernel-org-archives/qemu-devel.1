@@ -2,65 +2,77 @@ Return-Path: <SRS0=yZS3=YK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B086FECE58E
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 12:23:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1FA61FA372A
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 12:34:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7FE6F2064B
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 12:23:22 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7FE6F2064B
+	by mail.kernel.org (Postfix) with ESMTPS id E4E342067B
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 12:34:53 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E4E342067B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45868 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46062 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iL4oL-00081E-NA
-	for qemu-devel@archiver.kernel.org; Thu, 17 Oct 2019 08:23:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54381)
+	id 1iL4zU-0003lV-W3
+	for qemu-devel@archiver.kernel.org; Thu, 17 Oct 2019 08:34:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46200)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <david@redhat.com>) id 1iL4lF-0005sY-Ui
- for qemu-devel@nongnu.org; Thu, 17 Oct 2019 08:20:10 -0400
+ (envelope-from <mszeredi@redhat.com>) id 1iL3t7-0007bK-1I
+ for qemu-devel@nongnu.org; Thu, 17 Oct 2019 07:24:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <david@redhat.com>) id 1iL4lE-00070S-Sz
- for qemu-devel@nongnu.org; Thu, 17 Oct 2019 08:20:09 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47470)
+ (envelope-from <mszeredi@redhat.com>) id 1iL3t5-00064G-IR
+ for qemu-devel@nongnu.org; Thu, 17 Oct 2019 07:24:12 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40976)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <david@redhat.com>)
- id 1iL4lE-0006zz-N8; Thu, 17 Oct 2019 08:20:08 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (Exim 4.71) (envelope-from <mszeredi@redhat.com>) id 1iL3t5-00063Q-D9
+ for qemu-devel@nongnu.org; Thu, 17 Oct 2019 07:24:11 -0400
+Received: from mail-io1-f72.google.com (mail-io1-f72.google.com
+ [209.85.166.72])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id C5BF3307BD25;
- Thu, 17 Oct 2019 12:20:07 +0000 (UTC)
-Received: from [10.36.117.42] (ovpn-117-42.ams2.redhat.com [10.36.117.42])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 19B5C60852;
- Thu, 17 Oct 2019 12:20:05 +0000 (UTC)
-Subject: Re: [PATCH v1] s390x/mmu: Remove duplicate check for MMU_DATA_STORE
-To: qemu-devel@nongnu.org
-References: <20191017121922.18840-1-david@redhat.com>
-From: David Hildenbrand <david@redhat.com>
-Organization: Red Hat GmbH
-Message-ID: <5ad7023f-310b-eb7b-2e2e-b5cab073bb61@redhat.com>
-Date: Thu, 17 Oct 2019 14:20:05 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.1
+ by mx1.redhat.com (Postfix) with ESMTPS id B755DC057E3C
+ for <qemu-devel@nongnu.org>; Thu, 17 Oct 2019 11:24:09 +0000 (UTC)
+Received: by mail-io1-f72.google.com with SMTP id w1so2784293ioj.9
+ for <qemu-devel@nongnu.org>; Thu, 17 Oct 2019 04:24:09 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=KIlvdxjquMP8D6iZz8pMvSRRxqczlnDyMCAaCQUvZRU=;
+ b=Bt1BQEcfdglJ8KeNALKYJxbDLN76SzGtSC2cyvKcBlMkvKM8ye2GFuTNg4LpcmZzEl
+ iULVUHq78iCrL9YHpnwW/LpjWgmZ3HWLQzGd9ijy9bM/RLANe1DCRqCYRWThsU69VgS+
+ kZnVXWfdXp8mA4uLSkgWIj0lHP1M7xy3AL1aX/nqEFE/fIlKz2vZMYSoDnRl84Sy/xM2
+ 2xgQL7/UdNrXt151yjOepYewUt65xJn/BNRU5FaiQdkgRF5EBx9+pkPwdYSodjcYC6aC
+ h8F3zJWc2OcQ3nXutKVVYFronOg7dxYy1pfqRpP1tV+bgXZAybh7/BqBcO79oy7MJZM+
+ wx0A==
+X-Gm-Message-State: APjAAAVxn4qM+y34vTNPVgAszDRkttv2hutnydq7toah4UED6JclCLlN
+ jebqMM9hfK7yKlxp5EZOUZE7jzx5XcxO4nafB/fQThys3eDbugu0ARL9A4scwaD+e7CsaQQtX1m
+ +pCJsClh8fnQwYAx404paw6OQB6wEl8c=
+X-Received: by 2002:a92:c80b:: with SMTP id v11mr3144519iln.6.1571311449151;
+ Thu, 17 Oct 2019 04:24:09 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqxZKDjn8jAIEK4RlDfzAmTrjDo1jVm3VEPUhWZPFSwDUfjGchYtYSUI3gESKeovbENyiADTnDyUxTInt/VUv8s=
+X-Received: by 2002:a92:c80b:: with SMTP id v11mr3144495iln.6.1571311448908;
+ Thu, 17 Oct 2019 04:24:08 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20191017121922.18840-1-david@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.49]); Thu, 17 Oct 2019 12:20:07 +0000 (UTC)
+References: <20191016103754.2047-1-misono.tomohiro@jp.fujitsu.com>
+ <20191017100528.GA24790@stefanha-x1.localdomain>
+In-Reply-To: <20191017100528.GA24790@stefanha-x1.localdomain>
+From: Miklos Szeredi <mszeredi@redhat.com>
+Date: Thu, 17 Oct 2019 13:23:57 +0200
+Message-ID: <CAOssrKfR=sfE1RzOXzvPbdQg-g7i5-f8W9y8bWFnO=gyJ2VMsg@mail.gmail.com>
+Subject: Re: [Virtio-fs] [PATCH 0/2] virtiofsd: Two fix for xattr operation
+To: Stefan Hajnoczi <stefanha@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 209.132.183.28
+X-Mailman-Approved-At: Thu, 17 Oct 2019 08:31:58 -0400
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -72,51 +84,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>,
- Janosch Frank <frankja@linux.ibm.com>, Cornelia Huck <cohuck@redhat.com>,
- Richard Henderson <richard.henderson@linaro.org>,
- Halil Pasic <pasic@linux.ibm.com>,
- Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org
+Cc: virtio-fs@redhat.com, Misono Tomohiro <misono.tomohiro@jp.fujitsu.com>,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 17.10.19 14:19, David Hildenbrand wrote:
-> No need to double-check if we have a write.
-> 
-> Found by Coverity (CID: 1381016).
+On Thu, Oct 17, 2019 at 12:05 PM Stefan Hajnoczi <stefanha@redhat.com> wrote:
+>
+> On Wed, Oct 16, 2019 at 07:37:52PM +0900, Misono Tomohiro wrote:
+> > Hello,
+> >
+> > I test xattr operation on virtiofs using xfstest generic/062
+> > (with -o xattr option and XFS backend) and see some problems.
+> >
+> > These patches fixes the two of the problems.
+> >
+> > The remaining problems are:
+> >  1. we cannot xattr to block device created by mknod
+> >     which does not have actual device (since open in virtiofsd fails)
+> >  2. we cannot xattr to symbolic link
+> >
+> > I don't think 1 is a big problem but can we fix 2?
+>
+> Sorry, I don't know the answer.  Maybe it would be necessary to add a
+> new O_SYMLINK open flag to open(2) so that fgetxattr()/fsetxattr()
+> operations can be performed.  A kernel change like that would take some
+> time to get accepted upstream and shipped by distros, but it might be
+> the only way since the current syscall interface doesn't seem to offer a
+> way to do this.
 
-Copy and past error, it's 1406404.
+The real problem is that open() on a non-regular, non-directory file
+may have side effects (unless O_PATH is used).  These patches try to
+paper over that, but the fact is: opening special files from a file
+server is forbidden.
 
-> 
-> Fixes: 31b59419069e ("target/s390x: Return exception from mmu_translate_real")
-> Cc: Peter Maydell <peter.maydell@linaro.org>
-> Signed-off-by: David Hildenbrand <david@redhat.com>
-> ---
->   target/s390x/mmu_helper.c | 4 +---
->   1 file changed, 1 insertion(+), 3 deletions(-)
-> 
-> diff --git a/target/s390x/mmu_helper.c b/target/s390x/mmu_helper.c
-> index 90b81335f9..c9f3f34750 100644
-> --- a/target/s390x/mmu_helper.c
-> +++ b/target/s390x/mmu_helper.c
-> @@ -556,9 +556,7 @@ int mmu_translate_real(CPUS390XState *env, target_ulong raddr, int rw,
->           *flags |= PAGE_WRITE_INV;
->           if (is_low_address(raddr) && rw == MMU_DATA_STORE) {
->               /* LAP sets bit 56 */
-> -            *tec = (raddr & TARGET_PAGE_MASK)
-> -                 | (rw == MMU_DATA_STORE ? FS_WRITE : FS_READ)
-> -                 | 0x80;
-> +            *tec = (raddr & TARGET_PAGE_MASK) | FS_WRITE | 0x80;
->               return PGM_PROTECTION;
->           }
->       }
-> 
-
-
--- 
+I see why this is being done, and it's not easy to fix properly
+without the ..at() versions of these syscalls.  One idea is to fork()
++ fchdir(lo->proc_self_fd) + ..xattr().  Another related idea is to do
+a unshare(CLONE_FS) after each thread's startup (will pthread library
+balk?  I don't know) so that it's safe to do fchdir(lo->proc_self_fd)
++ ...xattr() + fchdir(lo->root_fd).
 
 Thanks,
-
-David / dhildenb
+Miklos
 
