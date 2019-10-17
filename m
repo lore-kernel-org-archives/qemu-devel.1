@@ -2,65 +2,91 @@ Return-Path: <SRS0=yZS3=YK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BC6E7FA372A
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 12:53:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8601AFA372A
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 12:55:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9115F20854
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 12:53:37 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9115F20854
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 538CC20854
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Oct 2019 12:55:04 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JJ2cMUEM"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 538CC20854
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46464 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46500 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iL5H4-0002V7-9O
-	for qemu-devel@archiver.kernel.org; Thu, 17 Oct 2019 08:53:02 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58221)
+	id 1iL5J1-0003Uy-IR
+	for qemu-devel@archiver.kernel.org; Thu, 17 Oct 2019 08:55:03 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58482)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.williamson@redhat.com>) id 1iL5G3-0001JN-Uy
- for qemu-devel@nongnu.org; Thu, 17 Oct 2019 08:52:01 -0400
+ (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1iL5IK-00035j-Dz
+ for qemu-devel@nongnu.org; Thu, 17 Oct 2019 08:54:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.williamson@redhat.com>) id 1iL5G1-0003zM-Ds
- for qemu-devel@nongnu.org; Thu, 17 Oct 2019 08:51:58 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:37782)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
- id 1iL5G1-0003yu-5u
- for qemu-devel@nongnu.org; Thu, 17 Oct 2019 08:51:57 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id C5FAB757C8;
- Thu, 17 Oct 2019 12:51:55 +0000 (UTC)
-Received: from x1.home (ovpn-118-102.phx2.redhat.com [10.3.118.102])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 2DE6560852;
- Thu, 17 Oct 2019 12:51:55 +0000 (UTC)
-Date: Thu, 17 Oct 2019 06:51:54 -0600
-From: Alex Williamson <alex.williamson@redhat.com>
-To: Jens Freimann <jfreimann@redhat.com>
-Subject: Re: [PATCH v3 0/10] add failover feature for assigned network devices
-Message-ID: <20191017065154.1247a762@x1.home>
-In-Reply-To: <20191017103347.gdlkkplpj64ivw5q@jenstp.localdomain>
-References: <20191011112015.11785-1-jfreimann@redhat.com>
- <20191015130317.64d68031@x1.home>
- <20191017103347.gdlkkplpj64ivw5q@jenstp.localdomain>
-Organization: Red Hat
+ (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1iL5IJ-0004hb-Eo
+ for qemu-devel@nongnu.org; Thu, 17 Oct 2019 08:54:20 -0400
+Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:54601)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1iL5IJ-0004h8-77
+ for qemu-devel@nongnu.org; Thu, 17 Oct 2019 08:54:19 -0400
+Received: by mail-wm1-x343.google.com with SMTP id p7so2445117wmp.4
+ for <qemu-devel@nongnu.org>; Thu, 17 Oct 2019 05:54:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=D5Eu7bOTFGaZ9y1gn0jALJIwMznA7mHgWe1Zy7hNNSs=;
+ b=JJ2cMUEMsm5jM6oL2C+IjVkMMppBSREXUnv8gj6CTwL/uY8wk1ZiFzCw6mIl2UsPSD
+ ZtZLMNY6Q1RPXxwCXGubaAwMnzdDJHexXli1dJLGcjFrJe8ZZKd9rIQR2/4LRxKwpoas
+ Mbf8XBQtwDd67GWsXkSuFC1/LKQmh/AQZV+5Vcs++1IQyxGFLZrd23ShOyyh1lS+LFk/
+ J419/B7DFqnt0S8yy/l95eqIbd6026B9cx+HHHtaLMEoe7XoBXhjZDiY70jtUQFZyuAC
+ +TBZ6muaLJE9OHiW1bqtNubXnZcWWp1nS9Nm+AlWD3K1pjje5Ta6SgiCj57gDG5eRGHH
+ vLkg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=D5Eu7bOTFGaZ9y1gn0jALJIwMznA7mHgWe1Zy7hNNSs=;
+ b=rIJz9hT2QDDaSf6hVXzQieMDsxPsr0sbHWePFvD7tjDzHSzR/aDD76JofiBkRQ+v5z
+ c5nY9KIJ9YI1ExpwlliJNcCut761SJoul0wd1ZoxYHn+4utOtoGBcGKbb/IamnlSLYas
+ nBsF5rpobaE06X4pGLI+BSi76E+aYADosd8vroI4d2qrNtRxwQS5z+LHgmJamEo5ibiP
+ 5eJA4umJ0qLPlxI/eBC/I8IPDds39MM7gHwHhsXhdEwJ7xGPb/XSU6yKAmHBu/ZoyqB6
+ cb9k8nHCmp0dTsa9hPhFhBEWAHp4s9Z8vBQddQ+7yLIDv+5hKdNmHTVu7GajUI/naE0K
+ uSbA==
+X-Gm-Message-State: APjAAAWY0d5op9EH6HNAPwgeLouxHfosK5H4AHmf6RjcRLqINu/RvLvh
+ ya9SFno39iLsUvxaeEy9ZLs=
+X-Google-Smtp-Source: APXvYqzg+bxvM3KFMIdZC6XwwIp3ItI2LSlrPScygg9eTKZNSBStKZ+oJHfDtfLSPSgs2s3nJIW8zA==
+X-Received: by 2002:a7b:caa9:: with SMTP id r9mr2692624wml.58.1571316857774;
+ Thu, 17 Oct 2019 05:54:17 -0700 (PDT)
+Received: from [192.168.1.36] (14.red-88-21-201.staticip.rima-tde.net.
+ [88.21.201.14])
+ by smtp.gmail.com with ESMTPSA id 63sm2289972wri.25.2019.10.17.05.54.16
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Thu, 17 Oct 2019 05:54:17 -0700 (PDT)
+Subject: Re: [PATCH 0/3] tests/acceptance: Add tests for the Leon3 board
+To: qemu-devel@nongnu.org, Cleber Rosa <crosa@redhat.com>
+References: <20190627115331.2373-1-f4bug@amsat.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <0fbfa3b9-8f4b-594c-04e4-32fcc35a53a4@amsat.org>
+Date: Thu, 17 Oct 2019 14:54:15 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.26]); Thu, 17 Oct 2019 12:51:55 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.132.183.28
+In-Reply-To: <20190627115331.2373-1-f4bug@amsat.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::343
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -72,71 +98,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: ehabkost@redhat.com, mst@redhat.com, aadam@redhat.com,
- qemu-devel@nongnu.org, dgilbert@redhat.com, laine@redhat.com, ailan@redhat.com,
- parav@mellanox.com
+Cc: Fam Zheng <fam@euphon.net>, Eduardo Habkost <ehabkost@redhat.com>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
+ Fabien Chouteau <chouteau@adacore.com>,
+ KONRAD Frederic <frederic.konrad@adacore.com>,
+ =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, 17 Oct 2019 12:33:47 +0200
-Jens Freimann <jfreimann@redhat.com> wrote:
+ping?
 
-> On Tue, Oct 15, 2019 at 01:03:17PM -0600, Alex Williamson wrote:
-> >On Fri, 11 Oct 2019 13:20:05 +0200
-> >Jens Freimann <jfreimann@redhat.com> wrote:
-> >  
-> >> This is implementing the host side of the net_failover concept
-> >> (https://www.kernel.org/doc/html/latest/networking/net_failover.html)
-> >>
-> >> Changes since v2:
-> >> * back out of creating failover pair when it is a non-networking
-> >>   vfio-pci device (Alex W)
-> >> * handle migration state change from within the migration thread. I do a
-> >>   timed wait on a semaphore and then check if all unplugs were
-> >>   succesful. Added a new function to each device that checks the device
-> >>   if the unplug for it has happened. When all devices report the succesful
-> >>   unplug *or* the time/retries is up, continue with the migration or
-> >>   cancel. When not all devices could be unplugged I am cancelling at the
-> >>   moment. It is likely that we can't plug it back at the destination which
-> >>   would result in degraded network performance.
-> >> * fix a few bugs regarding re-plug on migration source and target
-> >> * run full set of tests including migration tests
-> >> * add patch for libqos to tolerate new migration state
-> >> * squashed patch 1 and 2, added patch 8
-> >>
-> >> The general idea is that we have a pair of devices, a vfio-pci and a
-> >> virtio-net device. Before migration the vfio device is unplugged and data
-> >> flows to the virtio-net device, on the target side another vfio-pci device
-> >> is plugged in to take over the data-path. In the guest the net_failover
-> >> module will pair net devices with the same MAC address.
-> >>
-> >> * Patch 1 adds the infrastructure to hide the device for the qbus and qdev APIs
-> >>
-> >> * Patch 2 sets a new flag for PCIDevice 'partially_hotplugged' which we
-> >>   use to skip the unrealize code path when doing a unplug of the primary
-> >>   device
-> >>
-> >> * Patch 3 sets the pending_deleted_event before triggering the guest
-> >>   unplug request  
-> >
-> >These only cover pcie hotplug, is this feature somehow dependent on
-> >pcie?  There's also ACPI-based PCI hotplug, SHPC hotplug, and it looks
-> >like s390 has it's own version (of course) of PCI hotplug.  IMO, we
-> >either need to make an attempt to support this universally or the
-> >option needs to fail if the hotplug controller doesn't support partial
-> >removal.  Thanks,  
+On 6/27/19 1:53 PM, Philippe Mathieu-Daudé wrote:
+> Quick tests worth to avoid regressions, idea from
+> https://lists.gnu.org/archive/html/qemu-devel/2019-03/msg04177.html
+> "Maintainers, please tell us how to boot your machines"
 > 
-> It is possible to make it work with non-pcie hotplug but as the first
-> step I want to enable it for pcie only. For that I would add a check
-> into pci_qdev_realize(), where I also check if the device is an
-> ethernet device, and fail if it is not a pcie device. Would that work
-> for you?
-
-How would libvirt introspect what topologies are supported rather than
-trial and error?  I think this solves my issue that I get bugs that the
-failover pair option doesn't work on vfio-pci depending on the
-topology, but it really just pushes the problem up the stack.  Thanks,
-
-Alex
+> Regards,
+> 
+> Phil.
+> 
+> Philippe Mathieu-Daudé (3):
+>    tests/acceptance: Add test that boots the HelenOS microkernel on Leon3
+>    tests/acceptance: Add test that boots Linux up to BusyBox on Leon3
+>    .travis.yml: Let the avocado job run the Leon3 test
+> 
+>   .travis.yml                             |  2 +-
+>   MAINTAINERS                             |  1 +
+>   tests/acceptance/machine_sparc_leon3.py | 89 +++++++++++++++++++++++++
+>   3 files changed, 91 insertions(+), 1 deletion(-)
+>   create mode 100644 tests/acceptance/machine_sparc_leon3.py
+> 
 
