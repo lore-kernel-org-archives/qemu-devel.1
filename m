@@ -2,66 +2,64 @@ Return-Path: <SRS0=ht5U=YL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9C91DCA9ECF
-	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 05:06:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4DFABCA9ED0
+	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 05:21:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6D371222C5
-	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 05:06:08 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6D371222C5
+	by mail.kernel.org (Postfix) with ESMTPS id 21FB9222BD
+	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 05:21:43 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 21FB9222BD
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35398 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35442 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iLKSl-0001sa-Iz
-	for qemu-devel@archiver.kernel.org; Fri, 18 Oct 2019 01:06:07 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46806)
+	id 1iLKhq-0004pt-8g
+	for qemu-devel@archiver.kernel.org; Fri, 18 Oct 2019 01:21:42 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48024)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <armbru@redhat.com>) id 1iLKS8-0001TN-Hv
- for qemu-devel@nongnu.org; Fri, 18 Oct 2019 01:05:29 -0400
+ (envelope-from <armbru@redhat.com>) id 1iLKh7-0004Mz-Ru
+ for qemu-devel@nongnu.org; Fri, 18 Oct 2019 01:20:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1iLKS6-0006KH-3O
- for qemu-devel@nongnu.org; Fri, 18 Oct 2019 01:05:27 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:41940)
+ (envelope-from <armbru@redhat.com>) id 1iLKh6-0003UV-LI
+ for qemu-devel@nongnu.org; Fri, 18 Oct 2019 01:20:57 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54942)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1iLKS5-0006K0-RT
- for qemu-devel@nongnu.org; Fri, 18 Oct 2019 01:05:26 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
+ (Exim 4.71) (envelope-from <armbru@redhat.com>)
+ id 1iLKh6-0003U5-Fx; Fri, 18 Oct 2019 01:20:56 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id E791010C0933;
- Fri, 18 Oct 2019 05:05:23 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id F07C069084;
+ Fri, 18 Oct 2019 05:20:54 +0000 (UTC)
 Received: from blackfin.pond.sub.org (unknown [10.36.118.123])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 1361560925;
- Fri, 18 Oct 2019 05:05:12 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 877F8600C4;
+ Fri, 18 Oct 2019 05:20:54 +0000 (UTC)
 Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 6D5081138619; Fri, 18 Oct 2019 07:05:11 +0200 (CEST)
+ id 07F4C1138619; Fri, 18 Oct 2019 07:20:53 +0200 (CEST)
 From: Markus Armbruster <armbru@redhat.com>
-To: Sergio Lopez <slp@redhat.com>
-Subject: Re: [PATCH v9 04/15] hw/i386/pc: replace use of strtol with
- qemu_strtol in x86_load_linux()
-References: <20191015112346.45554-1-slp@redhat.com>
- <20191015112346.45554-5-slp@redhat.com>
- <b7baa2ab-210b-e7ef-399e-4dbbbc0ee0aa@redhat.com>
- <87wod4pgoy.fsf@dusky.pond.sub.org> <87k193hnxp.fsf@redhat.com>
-Date: Fri, 18 Oct 2019 07:05:11 +0200
-In-Reply-To: <87k193hnxp.fsf@redhat.com> (Sergio Lopez's message of "Thu, 17
- Oct 2019 08:43:30 +0200")
-Message-ID: <87lftilk3c.fsf@dusky.pond.sub.org>
+To: Cornelia Huck <cohuck@redhat.com>
+Subject: Re: [PATCH] hw/s390x: Emit a warning if user tried to enable USB
+References: <20191017142123.1236-1-thuth@redhat.com>
+ <20191017163402.43437191.cohuck@redhat.com>
+ <2e689f2b-9bed-e40e-c761-6f38efaae635@redhat.com>
+ <20191017172954.4e9712de.cohuck@redhat.com>
+Date: Fri, 18 Oct 2019 07:20:52 +0200
+In-Reply-To: <20191017172954.4e9712de.cohuck@redhat.com> (Cornelia Huck's
+ message of "Thu, 17 Oct 2019 17:29:54 +0200")
+Message-ID: <87eezaljd7.fsf@dusky.pond.sub.org>
 User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.2 (gnu/linux)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.66]); Fri, 18 Oct 2019 05:05:23 +0000 (UTC)
+Content-Type: text/plain
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.28]); Fri, 18 Oct 2019 05:20:55 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 209.132.183.28
@@ -76,114 +74,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Daniel P . Berrange" <berrange@redhat.com>, ehabkost@redhat.com,
- mst@redhat.com, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>,
- kraxel@redhat.com, pbonzini@redhat.com, imammedo@redhat.com,
- sgarzare@redhat.com, lersek@redhat.com, rth@twiddle.net
+Cc: Halil Pasic <pasic@linux.ibm.com>,
+ Christian Borntraeger <borntraeger@de.ibm.com>, Thomas Huth <thuth@redhat.com>,
+ qemu-s390x@nongnu.org, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Sergio Lopez <slp@redhat.com> writes:
+Cornelia Huck <cohuck@redhat.com> writes:
 
-> Markus Armbruster <armbru@redhat.com> writes:
+> On Thu, 17 Oct 2019 16:40:56 +0200
+> Thomas Huth <thuth@redhat.com> wrote:
 >
->> Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> writes:
->>
->>> Hi Sergio,
->>>
->>> On 10/15/19 1:23 PM, Sergio Lopez wrote:
->>>> Follow checkpatch.pl recommendation and replace the use of strtol with
->>>> qemu_strtol in x86_load_linux().
->>>
->>> "with qemu_strtoui"
->>>
->>>>
->>>> Signed-off-by: Sergio Lopez <slp@redhat.com>
->>>> ---
->>>>   hw/i386/pc.c | 9 ++++++++-
->>>>   1 file changed, 8 insertions(+), 1 deletion(-)
->>>>
->>>> diff --git a/hw/i386/pc.c b/hw/i386/pc.c
->>>> index 77e86bfc3d..c8608b8007 100644
->>>> --- a/hw/i386/pc.c
->>>> +++ b/hw/i386/pc.c
->>>> @@ -68,6 +68,7 @@
->>>>   #include "qemu/config-file.h"
->>>>   #include "qemu/error-report.h"
->>>>   #include "qemu/option.h"
->>>> +#include "qemu/cutils.h"
->>>>   #include "hw/acpi/acpi.h"
->>>>   #include "hw/acpi/cpu_hotplug.h"
->>>>   #include "hw/boards.h"
->>>> @@ -1202,6 +1203,7 @@ static void x86_load_linux(PCMachineState *pcms,
->>>>       vmode =3D strstr(kernel_cmdline, "vga=3D");
->>>>       if (vmode) {
->>>>           unsigned int video_mode;
->>>> +        int ret;
->>>>           /* skip "vga=3D" */
->>>>           vmode +=3D 4;
->>>>           if (!strncmp(vmode, "normal", 6)) {
->>>> @@ -1211,7 +1213,12 @@ static void x86_load_linux(PCMachineState *pcms,
->>>>           } else if (!strncmp(vmode, "ask", 3)) {
->>>>               video_mode =3D 0xfffd;
->>>>           } else {
->>>> -            video_mode =3D strtol(vmode, NULL, 0);
->>>> +            ret =3D qemu_strtoui(vmode, NULL, 0, &video_mode);
->>>> +            if (ret !=3D 0) {
->>>> +                fprintf(stderr, "qemu: can't parse 'vga' parameter: %=
-s\n",
->>>> +                        strerror(-ret));
->>>
->>> (Cc'ing Markus/Daniel just in case)
->>>
->>> I'm wondering if using fprintf() is appropriate, thinking about
->>> instantiating a machine via libvirt, is this error reported to the
->>> user?
->>>
->>> I first thought about using error_report() instead:
->>>
->>>     error_report("qemu: can't parse 'vga' parameter: %s",
->>>                  strerror(-ret));
->>
->> Make that
->>
->>      error_report("can't parse 'vga' parameter: %s", strerror(-ret));
->>
->>> But this API is meaningful when used in console/monitor. We can't get
->>> here from the monitor,
->>
->> True, but error_report() should be used anyway, because (1) it makes
->> intent more obvious, and (2) it uses a uniform, featureful error format.
->>
->> With the proposed fprintf(), we get
->>
->>     qemu: can't parse 'vga' parameter: Numerical result out of range
->>
->> With error_report():
->>
->> * we report the *actual* argv[0] instead of "qemu"
->>
->> * we obey -msg timestamp=3Don
->>
->> * if "[PATCHv2 1/2] util/qemu-error: add guest name helper with -msg
->>   options" gets accepted, we obey -msg guest-name=3Don, too
->>
->> * we have a common way to point to the offending command line argument
->>   or configuration file line (not worth doing here)
->>
->> Please use error_report().
->>
->> [...]
+>> On 17/10/2019 16.34, Cornelia Huck wrote:
+>> > On Thu, 17 Oct 2019 16:21:23 +0200
+>> > Thomas Huth <thuth@redhat.com> wrote:
+>> >   
+>> >> There is no USB on s390x, so running qemu-system-s390x with
+>> >> "-machine ...,usb=on" is certainly wrong. Emit a warning to make
+>> >> the users aware of their misconfiguration.
+>> >>
+>> >> Signed-off-by: Thomas Huth <thuth@redhat.com>
+>> >> ---
+>> >>  After a year or two, we could finally turn this into a hard error,
+>> >>  but I think we should give the users some time to fix their command
+>> >>  lines first, so I'm initially only emitting a warning here.
+>> >>
+>> >>  hw/s390x/s390-virtio-ccw.c | 4 ++++
+>> >>  1 file changed, 4 insertions(+)
+>> >>
+>> >> diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
+>> >> index d3edeef0ad..af8c4c0daf 100644
+>> >> --- a/hw/s390x/s390-virtio-ccw.c
+>> >> +++ b/hw/s390x/s390-virtio-ccw.c
+>> >> @@ -243,6 +243,10 @@ static void ccw_init(MachineState *machine)
+>> >>      VirtualCssBus *css_bus;
+>> >>      DeviceState *dev;
+>> >>  
+>> >> +    if (machine->usb) {
+>> >> +        warn_report("This machine does not support USB");  
+>> > 
+>> > I'm wondering if this is the only machine type not supporting usb...
+>> > if not, how are others handling it?  
+>> 
+>> I think most machines are silently ignoring it, like we did on s390x
+>> until now, too.
 >
-> But should we use error_report even if other occurrences in the same
-> function are using fprintf? Or are you suggesting to change those too?
+> I'm wondering how many options we have that do nothing when configured
+> :)
 
-Change those, too.
+Plenty.
 
-> If so, is it really worth it doing it now or can we do that in a future
-> patch (seems completely unrelated to this patch series)?
+-machine usb=on (and its sugared form -usb) are just one of many options
+that deposit configuration for the board to pick up.  Some boards do,
+some don't.  Some boards pick up and reject some configuration they
+can't use.  Some don't.  It's a big family of hack jobs.
 
-As long as it gets done, which patch series does it is unimportant.
+For -drive (and its sugared forms), we have generic code to turn "not
+picked up" into an error: drive_check_orphaned().
+a66c9dc734 "blockdev: Orphaned drive search", 2014-10-03
+720b8dc052 "blockdev: Make orphaned -drive fatal", 2017-02-21
+
+[...]
 
