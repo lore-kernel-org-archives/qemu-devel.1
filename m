@@ -7,72 +7,72 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C6189CA9EA9
-	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 15:11:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9FAE8CA9EA0
+	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 15:12:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8F10421897
-	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 15:11:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6D82A21897
+	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 15:12:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=greensocs.com header.i=@greensocs.com header.b="PBwy97xz"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8F10421897
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=greensocs.com header.i=@greensocs.com header.b="t/JpbLai"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6D82A21897
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=greensocs.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41610 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41616 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iLTv2-000122-KR
-	for qemu-devel@archiver.kernel.org; Fri, 18 Oct 2019 11:11:56 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39035)
+	id 1iLTv6-00017k-GS
+	for qemu-devel@archiver.kernel.org; Fri, 18 Oct 2019 11:12:00 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39121)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <damien.hedde@greensocs.com>) id 1iLTrA-0006i2-2X
- for qemu-devel@nongnu.org; Fri, 18 Oct 2019 11:07:57 -0400
+ (envelope-from <damien.hedde@greensocs.com>) id 1iLTrC-0006kn-Jh
+ for qemu-devel@nongnu.org; Fri, 18 Oct 2019 11:07:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <damien.hedde@greensocs.com>) id 1iLTr8-0000GG-OU
- for qemu-devel@nongnu.org; Fri, 18 Oct 2019 11:07:55 -0400
-Received: from beetle.greensocs.com ([5.135.226.135]:38632)
+ (envelope-from <damien.hedde@greensocs.com>) id 1iLTrB-0000IN-EZ
+ for qemu-devel@nongnu.org; Fri, 18 Oct 2019 11:07:58 -0400
+Received: from beetle.greensocs.com ([5.135.226.135]:38708)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <damien.hedde@greensocs.com>)
- id 1iLTr5-0000Bb-3T; Fri, 18 Oct 2019 11:07:51 -0400
+ id 1iLTr8-0000F9-G2; Fri, 18 Oct 2019 11:07:54 -0400
 Received: from crumble.bar.greensocs.com (crumble.bar.greensocs.com
  [172.16.11.102])
- by beetle.greensocs.com (Postfix) with ESMTPS id 8F51196F50;
- Fri, 18 Oct 2019 15:07:49 +0000 (UTC)
+ by beetle.greensocs.com (Postfix) with ESMTPS id E71AE96F56;
+ Fri, 18 Oct 2019 15:07:52 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=greensocs.com;
- s=mail; t=1571411270;
+ s=mail; t=1571411273;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=Zfp9zlChmuFK1Pa2AVwC8e4Fq2eoeBhB8UD5of7fOMs=;
- b=PBwy97xzkwO5a+WE8Uw44NrivQqmB6ffNzafEeuQfl8sehIeNzjrBr/GYcI+vFLhTATFFt
- l2WdumD/scex6A/CLEelHaClHtbN5ZPYPvkb4uNtqHWdrsk62RhpZsO5f03l9Qy7E7IuLW
- v1lDjra5z0hJWGKNRYlgJDxzKaMoZwU=
+ bh=wKAieN4stMmjUC4G+xrrQnH6uT0wInwvb/2V4Wkfc+U=;
+ b=t/JpbLaiv6mEH12jp92pt87B4PTZjY2iM95fBJW2Kf0dkrq6O4qzHNKlIwovbEt3AkvhVz
+ AraTiTB/xQEczOzZFdnZ78DEjUA3RxeGhPBSF8MfcyU+/+CysGIEJltqnrLBJU9015ivx1
+ KVBGuGuav4FgeW9vDRMeBGnrw3mguU0=
 From: Damien Hedde <damien.hedde@greensocs.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v5 02/13] hw/core/qdev: add trace events to help with
- resettable transition
-Date: Fri, 18 Oct 2019 17:06:19 +0200
-Message-Id: <20191018150630.31099-3-damien.hedde@greensocs.com>
+Subject: [PATCH v5 07/13] hw/core/qdev: update hotplug reset regarding
+ resettable
+Date: Fri, 18 Oct 2019 17:06:24 +0200
+Message-Id: <20191018150630.31099-8-damien.hedde@greensocs.com>
 X-Mailer: git-send-email 2.23.0
 In-Reply-To: <20191018150630.31099-1-damien.hedde@greensocs.com>
 References: <20191018150630.31099-1-damien.hedde@greensocs.com>
 MIME-Version: 1.0
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=greensocs.com; 
- s=mail; t=1571411270;
+ s=mail; t=1571411273;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=Zfp9zlChmuFK1Pa2AVwC8e4Fq2eoeBhB8UD5of7fOMs=;
- b=mESurmyKi15E7+sjU1odZZIJeXpGvKmr2vXUGCJNUOGVl63oaWILcJRkKOHwbl3AfFOe3/
- 4y/+83014ICrz6f6uscPHY2T8Aa0DVd2AmURoe7EDugpBO8ueTnb2RXWkaE8O6SMjx8h95
- Hz39UGcezTQnZ8+gJVAvzx1YQ6Lsc7g=
-ARC-Seal: i=1; s=mail; d=greensocs.com; t=1571411270; a=rsa-sha256; cv=none;
- b=ccxL60ncAMyHElXbkVU63rvERbdZAc1My1LAvQOJcMd77zQFJ78pI72WZk1B5AeEEMp1s9
- nQqRU7YLAsn0Tq/TQEyYZm7jjaVzPcmwyPdHJgF3JZuMTTdy/8rGHd0uk6e2/9hmeRxbQJ
- Xo42DMAB9xHNTmG4Md/u0J+jKt7MnHI=
+ bh=wKAieN4stMmjUC4G+xrrQnH6uT0wInwvb/2V4Wkfc+U=;
+ b=DOfavnjmrGE2i3KZzhr1n2LohBZbkDZoaMXwQkJRtxNgqnugTYcjIXqm2nf5BkKD8oPL+S
+ Gwxnr0VRX4wt7NbvBsCzODJqSvR03lx6YJ5Y+43zHMTWabAeJU1WtbYUsI+rMBkow/25zy
+ OK/rW69WuIyh82Z0Msrl/PHqjN6CYC0=
+ARC-Seal: i=1; s=mail; d=greensocs.com; t=1571411273; a=rsa-sha256; cv=none;
+ b=bI2cHCkU3ZTtOgQXYD2R2ehrrhcvUA+Uf/ug/7ha851RAGTOpVTibBpp6z4O+hrQkUsdC0
+ 6Zb7BTz27Y1BxoXaOu13IKw+pkYiTILk+lfSaxQf1TEj/vR/Q/Wcc6WU1sLN6CjJ0Y9eqZ
+ 85rgFmFGP2nHHQ1rj6YJfljaJczxWMc=
 ARC-Authentication-Results: i=1;
 	beetle.greensocs.com;
 	none
@@ -100,119 +100,56 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Adds trace events to reset procedure and when updating the parent
-bus of a device.
+This commit make use of the resettable API to reset the device being
+hotplugged during when it is realized. Also it make sure it is put in
+a reset state coherent with the parent it is plugged into.
 
 Signed-off-by: Damien Hedde <damien.hedde@greensocs.com>
 ---
- hw/core/qdev.c       | 27 ++++++++++++++++++++++++---
- hw/core/trace-events |  9 +++++++++
- 2 files changed, 33 insertions(+), 3 deletions(-)
+
+I'm not sure I've done everything that's required here since I do not
+understand everything that's behind the hotplug and realize/unrealize.
+I'm a bit lost there...
+
+One of the remaining question is: do we need to do things related to
+unrealize ?
+It seems, a device can be realized, unrealized, and re-realized ? But
+is that true also for a hotplugged device ?
+
+Also resettable API is called there, so children if any are reset too.
+This was not the case before, this a probably not a big deal, as long
+as all children are realized too at this point. I'm not sure we have a
+guarantee on this; the recursive realize is not done in the base bus
+class so it will go only down to first buses level if it is not
+propagated by bus subclasses. Do hotplug devices can have more than
+single level bus subtree (ie: more than some child buses with no
+devices on them) ?
+---
+ hw/core/qdev.c | 9 ++++++++-
+ 1 file changed, 8 insertions(+), 1 deletion(-)
 
 diff --git a/hw/core/qdev.c b/hw/core/qdev.c
-index 60be2f2fef..f230063189 100644
+index 3933f62d0c..c5d107ea4e 100644
 --- a/hw/core/qdev.c
 +++ b/hw/core/qdev.c
-@@ -38,6 +38,7 @@
- #include "hw/boards.h"
- #include "hw/sysbus.h"
- #include "migration/vmstate.h"
-+#include "trace.h"
+@@ -930,7 +930,14 @@ static void device_set_realized(Object *obj, bool va=
+lue, Error **errp)
+             }
+         }
+         if (dev->hotplugged) {
+-            device_legacy_reset(dev);
++            /*
++             * Reset the device, as well as its subtree which should be
++             * realized too
++             */
++            resettable_assert_reset(OBJECT(dev), RESET_TYPE_COLD);
++            resettable_change_parent(OBJECT(dev), OBJECT(dev->parent_bus=
+),
++                                     NULL);
++            resettable_release_reset(OBJECT(dev), RESET_TYPE_COLD);
+         }
+         dev->pending_deleted_event =3D false;
 =20
- bool qdev_hotplug =3D false;
- static bool qdev_hot_added =3D false;
-@@ -98,7 +99,9 @@ void qdev_set_parent_bus(DeviceState *dev, BusState *bu=
-s)
-     bool replugging =3D dev->parent_bus !=3D NULL;
-=20
-     if (replugging) {
--        /* Keep a reference to the device while it's not plugged into
-+        trace_qdev_update_parent_bus(dev, dev->parent_bus, bus);
-+        /*
-+         * Keep a reference to the device while it's not plugged into
-          * any bus, to avoid it potentially evaporating when it is
-          * dereffed in bus_remove_child().
-          */
-@@ -272,6 +275,18 @@ HotplugHandler *qdev_get_hotplug_handler(DeviceState=
- *dev)
-     return hotplug_ctrl;
- }
-=20
-+static int qdev_prereset(DeviceState *dev, void *opaque)
-+{
-+    trace_qdev_reset_tree(dev, object_get_typename(OBJECT(dev)));
-+    return 0;
-+}
-+
-+static int qbus_prereset(BusState *bus, void *opaque)
-+{
-+    trace_qbus_reset_tree(bus, object_get_typename(OBJECT(bus)));
-+    return 0;
-+}
-+
- static int qdev_reset_one(DeviceState *dev, void *opaque)
- {
-     device_legacy_reset(dev);
-@@ -282,6 +297,7 @@ static int qdev_reset_one(DeviceState *dev, void *opa=
-que)
- static int qbus_reset_one(BusState *bus, void *opaque)
- {
-     BusClass *bc =3D BUS_GET_CLASS(bus);
-+    trace_qbus_reset(bus, object_get_typename(OBJECT(bus)));
-     if (bc->reset) {
-         bc->reset(bus);
-     }
-@@ -290,7 +306,9 @@ static int qbus_reset_one(BusState *bus, void *opaque=
-)
-=20
- void qdev_reset_all(DeviceState *dev)
- {
--    qdev_walk_children(dev, NULL, NULL, qdev_reset_one, qbus_reset_one, =
-NULL);
-+    trace_qdev_reset_all(dev, object_get_typename(OBJECT(dev)));
-+    qdev_walk_children(dev, qdev_prereset, qbus_prereset,
-+                       qdev_reset_one, qbus_reset_one, NULL);
- }
-=20
- void qdev_reset_all_fn(void *opaque)
-@@ -300,7 +318,9 @@ void qdev_reset_all_fn(void *opaque)
-=20
- void qbus_reset_all(BusState *bus)
- {
--    qbus_walk_children(bus, NULL, NULL, qdev_reset_one, qbus_reset_one, =
-NULL);
-+    trace_qbus_reset_all(bus, object_get_typename(OBJECT(bus)));
-+    qbus_walk_children(bus, qdev_prereset, qbus_prereset,
-+                       qdev_reset_one, qbus_reset_one, NULL);
- }
-=20
- void qbus_reset_all_fn(void *opaque)
-@@ -1108,6 +1128,7 @@ void device_legacy_reset(DeviceState *dev)
- {
-     DeviceClass *klass =3D DEVICE_GET_CLASS(dev);
-=20
-+    trace_qdev_reset(dev, object_get_typename(OBJECT(dev)));
-     if (klass->reset) {
-         klass->reset(dev);
-     }
-diff --git a/hw/core/trace-events b/hw/core/trace-events
-index fe47a9c8cb..1a669be0ea 100644
---- a/hw/core/trace-events
-+++ b/hw/core/trace-events
-@@ -1,2 +1,11 @@
- # loader.c
- loader_write_rom(const char *name, uint64_t gpa, uint64_t size, bool isr=
-om) "%s: @0x%"PRIx64" size=3D0x%"PRIx64" ROM=3D%d"
-+
-+# qdev.c
-+qdev_reset(void *obj, const char *objtype) "obj=3D%p(%s)"
-+qdev_reset_all(void *obj, const char *objtype) "obj=3D%p(%s)"
-+qdev_reset_tree(void *obj, const char *objtype) "obj=3D%p(%s)"
-+qbus_reset(void *obj, const char *objtype) "obj=3D%p(%s)"
-+qbus_reset_all(void *obj, const char *objtype) "obj=3D%p(%s)"
-+qbus_reset_tree(void *obj, const char *objtype) "obj=3D%p(%s)"
-+qdev_update_parent_bus(void *obj, void *oldp, void *newp) "obj=3D%p old_=
-parent=3D%p new_parent=3D%p"
 --=20
 2.23.0
 
