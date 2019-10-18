@@ -2,79 +2,49 @@ Return-Path: <SRS0=ht5U=YL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6FDC8CA9EA0
-	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 12:08:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 51E93CA9EA0
+	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 12:10:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3BBBC21925
-	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 12:08:53 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="AMhhgu6n"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3BBBC21925
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 26B8D21925
+	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 12:10:41 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 26B8D21925
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39006 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39026 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iLR3s-0006Vs-Fs
-	for qemu-devel@archiver.kernel.org; Fri, 18 Oct 2019 08:08:52 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38633)
+	id 1iLR5c-0007xG-C5
+	for qemu-devel@archiver.kernel.org; Fri, 18 Oct 2019 08:10:40 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38936)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1iLR1l-0004JT-M7
- for qemu-devel@nongnu.org; Fri, 18 Oct 2019 08:06:42 -0400
+ (envelope-from <dplotnikov@virtuozzo.com>) id 1iLR4x-0007Ab-57
+ for qemu-devel@nongnu.org; Fri, 18 Oct 2019 08:10:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1iLR1k-0000bQ-4x
- for qemu-devel@nongnu.org; Fri, 18 Oct 2019 08:06:41 -0400
-Received: from mail-oi1-x244.google.com ([2607:f8b0:4864:20::244]:36000)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1iLR1j-0000ae-UV
- for qemu-devel@nongnu.org; Fri, 18 Oct 2019 08:06:40 -0400
-Received: by mail-oi1-x244.google.com with SMTP id k20so5002698oih.3
- for <qemu-devel@nongnu.org>; Fri, 18 Oct 2019 05:06:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=pbtQf0dCAxjRy4gOM7VwKg1sAYn/2JuMOtYjd4ENOrw=;
- b=AMhhgu6n+WYaGZaDREALzjKqN+m0weP3LtUv/9Jy9ClRzZ1bMJJ3uXf4Ls8cdz9BGg
- vCB8Uj2T59pNspCDM0HuR0yey55t56QT3F63vFKNAiWCTH2pYlhC9733rz2pxDLbTmBe
- svf0mP74E1UcVj7FCkQWENNGo6T6q8TvhITHGzQLoy3dd+eN2lHgl5trgChiKOzn4TUu
- TYOahUUUv9psz3mpc8SyNAboSBWb4icq7KZaQiiA0JJDB3CDwZ7S9KWqWPmUNWnF1pgq
- +gcy+AgMkmzrWgcxyDNJopBQXJ0eyENBC7yZgdSnvPhWtx9FwIUt6vz3pGOI/UQMtf+h
- D/1w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=pbtQf0dCAxjRy4gOM7VwKg1sAYn/2JuMOtYjd4ENOrw=;
- b=I9nskvl4MiDvG6V7fGNlN5i2pU+VqpGG+MAPP3QnYISVlew0ag6y0eHEN8mOxT+xwd
- uRShvCZ/780Qlcx75mcXh8z07vro7KTuQhh1eF42WpBUpJQTStFCEqMPtMfVcVRwMtUl
- 9z8M9jnr+szgzV75XckCjmjEiVXxCNNLRXpVwTjjzrwktYt+3M6NU3fBGvkpwHGp9TTn
- A46H9fjAOr2gAIQRTMs2Q/sUgUxLtENDToAF0wwEK1WIKbsQMSJDDjqi1eY/nOVW+TFG
- DH97/AYgnd7XK8TzKXER5+gUHg25u/syIthpJ5W8UJ0gyykIinbvt5Z3lP9FLRv1nwic
- IEFg==
-X-Gm-Message-State: APjAAAVJgIcP1SMqKg3fbo2vriExtqsmFjNmH3oNk6A9JYkj2eEWVPLY
- sPf4a+yy0GuxWFhPe2IXHxWpgBZm0fADZSPRzJe2eA==
-X-Google-Smtp-Source: APXvYqzDUxnxxqPWeC82g5BvY/sqLkwv4+5zN0Cp+O4AT7V36kUg9GPl9AIfB22NBuoN/ZN62fsJQBiSoJ2nYjOf2zE=
-X-Received: by 2002:aca:49c2:: with SMTP id w185mr7861115oia.163.1571400398903; 
- Fri, 18 Oct 2019 05:06:38 -0700 (PDT)
-MIME-Version: 1.0
-References: <20191018120235.4438-1-kwolf@redhat.com>
-In-Reply-To: <20191018120235.4438-1-kwolf@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 18 Oct 2019 13:06:27 +0100
-Message-ID: <CAFEAcA-qpw4bZXgMLOn2PcTedNeELJKPOaV9be=Dbxv9PisQQw@mail.gmail.com>
-Subject: Re: [PATCH v2] doc: Describe missing generic -blockdev options
-To: Kevin Wolf <kwolf@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::244
+ (envelope-from <dplotnikov@virtuozzo.com>) id 1iLR4v-0002Ul-R4
+ for qemu-devel@nongnu.org; Fri, 18 Oct 2019 08:09:59 -0400
+Received: from relay.sw.ru ([185.231.240.75]:48416)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <dplotnikov@virtuozzo.com>)
+ id 1iLR4s-0002Rj-CY; Fri, 18 Oct 2019 08:09:54 -0400
+Received: from [10.94.4.71] (helo=dptest2.qa.sw.ru)
+ by relay.sw.ru with esmtp (Exim 4.92.2)
+ (envelope-from <dplotnikov@virtuozzo.com>)
+ id 1iLR4p-00059I-A0; Fri, 18 Oct 2019 15:09:51 +0300
+From: Denis Plotnikov <dplotnikov@virtuozzo.com>
+To: qemu-block@nongnu.org
+Subject: [PATCH] blockdev: modify blockdev-change-medium to change
+ non-removable device
+Date: Fri, 18 Oct 2019 15:09:50 +0300
+Message-Id: <20191018120950.26849-1-dplotnikov@virtuozzo.com>
+X-Mailer: git-send-email 2.17.0
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [fuzzy]
+X-Received-From: 185.231.240.75
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,71 +56,176 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Qemu-block <qemu-block@nongnu.org>
+Cc: kwolf@redhat.com, den@virtuozzo.com, armbru@redhat.com,
+ qemu-devel@nongnu.org, mreitz@redhat.com, dgilbert@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, 18 Oct 2019 at 13:02, Kevin Wolf <kwolf@redhat.com> wrote:
->
-> We added more generic options after introducing -blockdev and forgot to
-> update the documentation (man page and --help output) accordingly. Do
-> that now.
->
-> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-> ---
->  qemu-options.hx | 22 +++++++++++++++++++++-
->  1 file changed, 21 insertions(+), 1 deletion(-)
->
-> diff --git a/qemu-options.hx b/qemu-options.hx
-> index 793d70ff93..2e6ba5ef1f 100644
-> --- a/qemu-options.hx
-> +++ b/qemu-options.hx
-> @@ -849,7 +849,8 @@ ETEXI
->  DEF("blockdev", HAS_ARG, QEMU_OPTION_blockdev,
->      "-blockdev [driver=]driver[,node-name=N][,discard=ignore|unmap]\n"
->      "          [,cache.direct=on|off][,cache.no-flush=on|off]\n"
-> -    "          [,read-only=on|off][,detect-zeroes=on|off|unmap]\n"
-> +    "          [,read-only=on|off][,auto-read-only=on|off]\n"
-> +    "          [,force-share=on|off][,detect-zeroes=on|off|unmap]\n"
->      "          [,driver specific parameters...]\n"
->      "                configure a block backend\n", QEMU_ARCH_ALL)
->  STEXI
-> @@ -885,6 +886,25 @@ name is not intended to be predictable and changes between QEMU invocations.
->  For the top level, an explicit node name must be specified.
->  @item read-only
->  Open the node read-only. Guest write attempts will fail.
-> +
-> +Note that some block drivers support only read-only access, either generally or
-> +in certain configurations. In this case, the default value
-> +@option{read-only=off} does not work and the option must be specified
-> +explicitly.
-> +@item auto-read-only
-> +If @option{auto-read-only=on} is set, QEMU may fall back to read-only usage
-> +even when @option{read-only=off} is requested, or even switch between modes as
-> +needed, e.g. depending on whether the image file is writable or whether a
-> +writing user is attached to the node.
-> +@item force-share
-> +Override the image locking system of QEMU by forcing the node to utilize
-> +weaker shared access for permissions where it would normally request exclusive
-> +access.  When there is the potential for multiple instances to have the same
-> +file open (whether this invocation of qemu is the first or the second
+The modification is useful to workaround exclusive file access restrictions,
+e.g. to implement VM migration with shared disk stored on a storage with
+the exclusive file opening model: a destination VM is started waiting for
+incomming migration with a fake image drive, and later, on the last migration
+phase, the fake image file is replaced with the real one.
 
-"QEMU" should be all-upper-case.
+Signed-off-by: Denis Plotnikov <dplotnikov@virtuozzo.com>
+---
+ blockdev.c           | 69 +++++++++++++++++++++++++++++++-------------
+ hmp.c                |  2 ++
+ qapi/block-core.json |  7 +++--
+ qmp.c                |  3 +-
+ 4 files changed, 57 insertions(+), 24 deletions(-)
 
-> +instance), both instances must permit shared access for the second instance to
-> +succeed at opening the file.
-> +
-> +Enabling @option{force-share=on} requires @option{read-only=on}.
->  @item cache.direct
->  The host page cache can be avoided with @option{cache.direct=on}. This will
->  attempt to do disk IO directly to the guest's memory. QEMU may still perform an
-> --
-> 2.20.1
+diff --git a/blockdev.c b/blockdev.c
+index d358169995..23f3465cfc 100644
+--- a/blockdev.c
++++ b/blockdev.c
+@@ -2609,6 +2609,8 @@ void qmp_blockdev_change_medium(bool has_device, const char *device,
+                                 bool has_format, const char *format,
+                                 bool has_read_only,
+                                 BlockdevChangeReadOnlyMode read_only,
++                                bool has_medium_name,
++                                const char *medium_name,
+                                 Error **errp)
+ {
+     BlockBackend *blk;
+@@ -2667,29 +2669,56 @@ void qmp_blockdev_change_medium(bool has_device, const char *device,
+         goto fail;
+     }
+ 
+-    rc = do_open_tray(has_device ? device : NULL,
+-                      has_id ? id : NULL,
+-                      false, &err);
+-    if (rc && rc != -ENOSYS) {
+-        error_propagate(errp, err);
+-        goto fail;
+-    }
+-    error_free(err);
+-    err = NULL;
++    if (blk_dev_has_removable_media(blk)) {
++        rc = do_open_tray(has_device ? device : NULL,
++                          has_id ? id : NULL,
++                          false, &err);
++        if (rc && rc != -ENOSYS) {
++            error_propagate(errp, err);
++            goto fail;
++        }
++        error_free(err);
++        err = NULL;
+ 
+-    blockdev_remove_medium(has_device, device, has_id, id, &err);
+-    if (err) {
+-        error_propagate(errp, err);
+-        goto fail;
+-    }
++        blockdev_remove_medium(has_device, device, has_id, id, &err);
++        if (err) {
++            error_propagate(errp, err);
++            goto fail;
++        }
+ 
+-    qmp_blockdev_insert_anon_medium(blk, medium_bs, &err);
+-    if (err) {
+-        error_propagate(errp, err);
+-        goto fail;
+-    }
++        qmp_blockdev_insert_anon_medium(blk, medium_bs, &err);
++        if (err) {
++            error_propagate(errp, err);
++            goto fail;
++        }
++
++        qmp_blockdev_close_tray(has_device, device, has_id, id, errp);
++    } else {
++        if (!medium_name) {
++            error_setg(errp, "A medium name should be given");
++            goto fail;
++        }
+ 
+-    qmp_blockdev_close_tray(has_device, device, has_id, id, errp);
++        if (runstate_is_running()) {
++            error_setg(errp, "Can't set a medium for non-removable device "
++                    "in a running VM");
++            goto fail;
++        }
++
++        if (strlen(blk_name(blk))) {
++            error_setg(errp, "The device already has a medium");
++            goto fail;
++        }
++
++        if (blk_insert_bs(blk, medium_bs, &err) < 0) {
++            error_propagate(errp, err);
++            goto fail;
++        }
++
++        if (!monitor_add_blk(blk, medium_name, &err)) {
++            error_propagate(errp, err);
++        }
++    }
+ 
+ fail:
+     /* If the medium has been inserted, the device has its own reference, so
+diff --git a/hmp.c b/hmp.c
+index 8eec768088..fc7bac5b4b 100644
+--- a/hmp.c
++++ b/hmp.c
+@@ -1948,6 +1948,7 @@ void hmp_change(Monitor *mon, const QDict *qdict)
+     const char *target = qdict_get_str(qdict, "target");
+     const char *arg = qdict_get_try_str(qdict, "arg");
+     const char *read_only = qdict_get_try_str(qdict, "read-only-mode");
++    const char *target_name = qdict_get_try_str(qdict, "target-name");
+     BlockdevChangeReadOnlyMode read_only_mode = 0;
+     Error *err = NULL;
+ 
+@@ -1982,6 +1983,7 @@ void hmp_change(Monitor *mon, const QDict *qdict)
+ 
+         qmp_blockdev_change_medium(true, device, false, NULL, target,
+                                    !!arg, arg, !!read_only, read_only_mode,
++                                   !!target_name, target_name,
+                                    &err);
+     }
+ 
+diff --git a/qapi/block-core.json b/qapi/block-core.json
+index 7ccbfff9d0..f493a7c737 100644
+--- a/qapi/block-core.json
++++ b/qapi/block-core.json
+@@ -4769,6 +4769,8 @@
+ # @read-only-mode:  change the read-only mode of the device; defaults
+ #                   to 'retain'
+ #
++# @medium-name:     drive-name when changing the media in non-removable devices
++#                   ignored when changing media in removable devices
+ # Since: 2.5
+ #
+ # Examples:
+@@ -4807,9 +4809,8 @@
+             '*id': 'str',
+             'filename': 'str',
+             '*format': 'str',
+-            '*read-only-mode': 'BlockdevChangeReadOnlyMode' } }
+-
+-
++            '*read-only-mode': 'BlockdevChangeReadOnlyMode',
++            '*medium-name': 'str' } }
+ ##
+ # @BlockErrorAction:
+ #
+diff --git a/qmp.c b/qmp.c
+index b92d62cd5f..c95831a49f 100644
+--- a/qmp.c
++++ b/qmp.c
+@@ -399,7 +399,8 @@ void qmp_change(const char *device, const char *target,
+ #endif
+     } else {
+         qmp_blockdev_change_medium(true, device, false, NULL, target,
+-                                   has_arg, arg, false, 0, errp);
++                                   has_arg, arg, false, 0, false, NULL,
++                                   errp);
+     }
+ }
+ 
+-- 
+2.17.0
 
-Otherwise
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-
-thanks
--- PMM
 
