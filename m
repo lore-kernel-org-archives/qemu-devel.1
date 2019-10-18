@@ -2,65 +2,56 @@ Return-Path: <SRS0=ht5U=YL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EF016CA9EA1
-	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 10:42:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6BA33CA9EA0
+	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 10:45:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C3E03222BD
-	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 10:42:52 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C3E03222BD
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id 3F0AA222C3
+	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 10:45:49 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3F0AA222C3
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37726 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37756 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iLPic-0000If-7S
-	for qemu-devel@archiver.kernel.org; Fri, 18 Oct 2019 06:42:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56338)
+	id 1iLPlU-0001t7-BQ
+	for qemu-devel@archiver.kernel.org; Fri, 18 Oct 2019 06:45:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56504)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <clg@kaod.org>) id 1iLPhU-000888-EJ
- for qemu-devel@nongnu.org; Fri, 18 Oct 2019 06:41:41 -0400
+ (envelope-from <thuth@redhat.com>) id 1iLPkW-0000ys-D3
+ for qemu-devel@nongnu.org; Fri, 18 Oct 2019 06:44:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <clg@kaod.org>) id 1iLPhT-0002hp-EI
- for qemu-devel@nongnu.org; Fri, 18 Oct 2019 06:41:40 -0400
-Received: from 6.mo7.mail-out.ovh.net ([188.165.39.218]:43181)
+ (envelope-from <thuth@redhat.com>) id 1iLPkT-00042D-M4
+ for qemu-devel@nongnu.org; Fri, 18 Oct 2019 06:44:46 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34366)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <clg@kaod.org>) id 1iLPhT-0002g7-2q
- for qemu-devel@nongnu.org; Fri, 18 Oct 2019 06:41:39 -0400
-Received: from player714.ha.ovh.net (unknown [10.108.54.217])
- by mo7.mail-out.ovh.net (Postfix) with ESMTP id 38BDF13871C
- for <qemu-devel@nongnu.org>; Fri, 18 Oct 2019 12:41:35 +0200 (CEST)
-Received: from kaod.org (lfbn-1-2229-223.w90-76.abo.wanadoo.fr [90.76.50.223])
- (Authenticated sender: clg@kaod.org)
- by player714.ha.ovh.net (Postfix) with ESMTPSA id 14AEFB11AC18;
- Fri, 18 Oct 2019 10:41:31 +0000 (UTC)
-Subject: Re: [PATCH 2/2] spapr/xive: Set the OS CAM line at reset
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-To: David Gibson <david@gibson.dropbear.id.au>
-References: <20191017144241.12522-1-clg@kaod.org>
- <20191017144241.12522-3-clg@kaod.org> <20191018035557.GC2000@umbus.fritz.box>
- <cacfb9a2-4bbf-54e6-a493-8b362e4789c0@kaod.org>
-Message-ID: <ecf898f4-bfa6-9841-d847-6c061edf7d8c@kaod.org>
-Date: Fri, 18 Oct 2019 12:41:30 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.0
-MIME-Version: 1.0
-In-Reply-To: <cacfb9a2-4bbf-54e6-a493-8b362e4789c0@kaod.org>
-Content-Type: text/plain; charset=windows-1252
-Content-Language: en-US
-X-Ovh-Tracer-Id: 10871126552282368921
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrjeelgdeftdcutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
-Content-Transfer-Encoding: quoted-printable
+ (Exim 4.71) (envelope-from <thuth@redhat.com>)
+ id 1iLPkT-0003z5-GG; Fri, 18 Oct 2019 06:44:45 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id ABE7310DCC96;
+ Fri, 18 Oct 2019 10:44:44 +0000 (UTC)
+Received: from thuth.com (dhcp-200-228.str.redhat.com [10.33.200.228])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 7DD6860852;
+ Fri, 18 Oct 2019 10:44:43 +0000 (UTC)
+From: Thomas Huth <thuth@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH] Do not use %m in common code to print error messages
+Date: Fri, 18 Oct 2019 12:44:38 +0200
+Message-Id: <20191018104438.6158-1-thuth@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.64]); Fri, 18 Oct 2019 10:44:44 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 188.165.39.218
+X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -72,31 +63,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Greg Kurz <groug@kaod.org>
+Cc: qemu-trivial@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
+ Kamil Rytarowski <kamil@netbsd.org>, berrange@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 18/10/2019 11:42, C=E9dric Le Goater wrote:
-> On 18/10/2019 05:55, David Gibson wrote:
->> On Thu, Oct 17, 2019 at 04:42:41PM +0200, C=E9dric Le Goater wrote:
->>> When a Virtual Processor is scheduled to run on a HW thread, the
->>> hypervisor pushes its identifier in the OS CAM line. When running in
->>> TCG or kernel_irqchip=3Doff, QEMU needs to emulate the same behavior.
->>>
->>> Introduce a 'os-cam' property which will be used to set the OS CAM
->>> line at reset and remove the spapr_xive_set_tctx_os_cam() calls which
->>> are done when the XIVE interrupt controller are activated.
->>
->> I'm not immediately seeing the advantage of doing this via a property,
->> rather than poking it from the PAPR code which already knows the right
->> values.
->=20
-> we can simplify by passing the OS CAM line value as a parameter of the=20
-> xive_tctx_reset routine, as suggested by Greg.
+The %m format specifier is an extension from glibc - and when compiling
+QEMU for NetBSD, the compiler correctly complains, e.g.:
 
-and if we remove the reset handlers from XiveTCTX and rely only on the=20
-CPU reset handler to reset the presenter.=20
+/home/qemu/qemu-test.ELjfrQ/src/util/main-loop.c: In function 'sigfd_handler':
+/home/qemu/qemu-test.ELjfrQ/src/util/main-loop.c:64:13: warning: %m is only
+ allowed in syslog(3) like functions [-Wformat=]
+             printf("read from sigfd returned %zd: %m\n", len);
+             ^
+Let's use g_strerror() here instead, which is an easy-to-use wrapper
+around the thread-safe strerror_r() function.
 
-C.
+While we're at it, also convert the "printf()" in main-loop.c into
+the preferred "error_report()".
+
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+---
+ hw/misc/tmp421.c | 8 ++++++--
+ util/main-loop.c | 4 +++-
+ util/systemd.c   | 5 +++--
+ 3 files changed, 12 insertions(+), 5 deletions(-)
+
+diff --git a/hw/misc/tmp421.c b/hw/misc/tmp421.c
+index 9f044705fa..f23c46a40a 100644
+--- a/hw/misc/tmp421.c
++++ b/hw/misc/tmp421.c
+@@ -120,7 +120,9 @@ static void tmp421_get_temperature(Object *obj, Visitor *v, const char *name,
+     int tempid;
+ 
+     if (sscanf(name, "temperature%d", &tempid) != 1) {
+-        error_setg(errp, "error reading %s: %m", name);
++        const char *errmsg = g_strerror(errno);
++        error_setg(errp, "error reading %s: %s", name, errmsg);
++        g_free((gpointer)errmsg);
+         return;
+     }
+ 
+@@ -160,7 +162,9 @@ static void tmp421_set_temperature(Object *obj, Visitor *v, const char *name,
+     }
+ 
+     if (sscanf(name, "temperature%d", &tempid) != 1) {
+-        error_setg(errp, "error reading %s: %m", name);
++        const char *errmsg = g_strerror(errno);
++        error_setg(errp, "error reading %s: %s", errmsg);
++        g_free((gpointer)errmsg);
+         return;
+     }
+ 
+diff --git a/util/main-loop.c b/util/main-loop.c
+index e3eaa55866..e95d93fef3 100644
+--- a/util/main-loop.c
++++ b/util/main-loop.c
+@@ -61,7 +61,9 @@ static void sigfd_handler(void *opaque)
+         }
+ 
+         if (len != sizeof(info)) {
+-            printf("read from sigfd returned %zd: %m\n", len);
++            const char *errmsg = g_strerror(errno);
++            error_report("read from sigfd returned %zd: %s", len, errmsg);
++            g_free((gpointer)errmsg);
+             return;
+         }
+ 
+diff --git a/util/systemd.c b/util/systemd.c
+index d22e86c707..17862c704f 100644
+--- a/util/systemd.c
++++ b/util/systemd.c
+@@ -59,9 +59,10 @@ unsigned int check_socket_activation(void)
+              * descriptor is invalid, so socket activation has gone wrong
+              * and we should exit.
+              */
++            const char *errmsg = g_strerror(errno);
+             error_report("Socket activation failed: "
+-                         "invalid file descriptor fd = %d: %m",
+-                         fd);
++                         "invalid file descriptor fd = %d: %s", fd, errmsg);
++            g_free((gpointer)errmsg);
+             exit(EXIT_FAILURE);
+         }
+     }
+-- 
+2.18.1
+
 
