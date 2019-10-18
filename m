@@ -2,83 +2,90 @@ Return-Path: <SRS0=ht5U=YL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BE0DCCA9EA9
-	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 16:20:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C7AACA9EA0
+	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 16:21:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 89A19205C9
-	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 16:20:04 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fs7+3/n2"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 89A19205C9
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 5060420869
+	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 16:21:58 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5060420869
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42826 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42878 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iLUyx-0007f3-Gk
-	for qemu-devel@archiver.kernel.org; Fri, 18 Oct 2019 12:20:03 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49220)
+	id 1iLV0n-000227-Ex
+	for qemu-devel@archiver.kernel.org; Fri, 18 Oct 2019 12:21:57 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49765)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <marcandre.lureau@gmail.com>) id 1iLUqi-0007pR-HB
- for qemu-devel@nongnu.org; Fri, 18 Oct 2019 12:11:33 -0400
+ (envelope-from <mreitz@redhat.com>) id 1iLUuJ-0003zZ-U4
+ for qemu-devel@nongnu.org; Fri, 18 Oct 2019 12:15:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <marcandre.lureau@gmail.com>) id 1iLUqh-0007o6-1A
- for qemu-devel@nongnu.org; Fri, 18 Oct 2019 12:11:32 -0400
-Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:38703)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
- id 1iLUqg-0007nC-Of; Fri, 18 Oct 2019 12:11:30 -0400
-Received: by mail-wr1-x441.google.com with SMTP id o15so6439145wru.5;
- Fri, 18 Oct 2019 09:11:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=Y5PULPuT9aUOc2jHLrc3v6r7EulnXS/eTA+A22k80Fk=;
- b=fs7+3/n2Z+d8Z/P4MmRV/HVv2oKJkmO/XOdB3WxHAv0O29gw5XB8/U8Dr9rIDqnQaQ
- XF3wmON0LnILLr4E9oKLIn0wwoBb4IZW813+abfqVlGDDzy/KaYnCZjSo9jys7KN90Nm
- 01DGXoAOneQyd0+RdwKWtNU1wMSGU8ECB/sOgeOc/lNeAd6RMweW6t0tYcyQsqoqM2hz
- 399DKKGFWbx/VjnhQi9G6fc9gtE34d5wUnesYKpgdx6ejqLjEaJBDVnAlZWsxqqLc3ND
- 5+xFtJlCRB+khNCShy5V/rp3W4bojNXg2uiDijEn1zrR27FscFWa/78EBYvB97emLQR0
- zkCA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=Y5PULPuT9aUOc2jHLrc3v6r7EulnXS/eTA+A22k80Fk=;
- b=jxJEV/RsBBR4FHGlZ8YBoBA/SvNjyWJIMSgb35Q1HYfb+Gilu+tJR9tNZ/NkmoVBxC
- O4Ckt7hhIUcKsxng8cw9YdsqNec+wmmDE3lKdYk50u32zjNmqdpRRrIG6IPVSEexzCMU
- +sSH64x38zyAib+m+Fby3ZIo9MaesoZL+0kGM3e8UVfcwmB0WNkTxVlnPRyFM3KSX7NQ
- GOD71pkkBtdoICv06xCCyzabefhghQRiO7SkRRJdVgwmxPIEv7sbt8syTYqiuI6EKS9j
- RRed65GYJHZhhhx4r9aGTXlqfuWVba4TIWOuW6lBS0UXrm+L/n+of6IRUzR136A47UfP
- OcqA==
-X-Gm-Message-State: APjAAAVjMW8uWOIPtIHijnDBcU81mlMLFd5RxCeMQN7piOaOv57dzxt+
- Yf07pnesgQNrzOfJZd7Qb0tp8beMCbOzsj8SdcE=
-X-Google-Smtp-Source: APXvYqyxGoKLIO9VaZM6Ba/DqPPdp4CLztpE2QnXDpxQ6d6Xy9ZuewjKo7QKBaBcqzW+tTyw0qUkCsbTbf3ss1xDoUQ=
-X-Received: by 2002:adf:ef0f:: with SMTP id e15mr8884200wro.312.1571415088907; 
- Fri, 18 Oct 2019 09:11:28 -0700 (PDT)
+ (envelope-from <mreitz@redhat.com>) id 1iLUuH-000147-H7
+ for qemu-devel@nongnu.org; Fri, 18 Oct 2019 12:15:14 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37594)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>)
+ id 1iLUuE-0000zW-Gx; Fri, 18 Oct 2019 12:15:10 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id BF24610DCC96;
+ Fri, 18 Oct 2019 16:15:09 +0000 (UTC)
+Received: from dresden.str.redhat.com (unknown [10.36.118.46])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 3C87960A97;
+ Fri, 18 Oct 2019 16:15:08 +0000 (UTC)
+Subject: Re: [PATCH 1/5] iotests: remove 'linux' from default supported
+ platforms
+To: Thomas Huth <thuth@redhat.com>, qemu-block@nongnu.org
+References: <20191011145047.19051-1-thuth@redhat.com>
+ <20191011145047.19051-2-thuth@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <019acd42-e6ca-012e-b998-8c2359180c44@redhat.com>
+Date: Fri, 18 Oct 2019 18:15:06 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.0
 MIME-Version: 1.0
-References: <20191018154212.13458-1-marcandre.lureau@redhat.com>
- <20191018154212.13458-5-marcandre.lureau@redhat.com>
- <CAFEAcA-Qaq0W-4kpRGSQTxzH1LZ3znoxZo6Fnd4NmnnE4O_G9w@mail.gmail.com>
-In-Reply-To: <CAFEAcA-Qaq0W-4kpRGSQTxzH1LZ3znoxZo6Fnd4NmnnE4O_G9w@mail.gmail.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Fri, 18 Oct 2019 18:11:16 +0200
-Message-ID: <CAJ+F1CL8AdRv8ktb8V0Ox7XZEO7GOXqPjVd=_CsZ=oSmHxtP_Q@mail.gmail.com>
-Subject: Re: [PATCH 04/14] etraxfs: remove PROP_PTR usage
-To: Peter Maydell <peter.maydell@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::441
+In-Reply-To: <20191011145047.19051-2-thuth@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="VNbIrOzl8a1H5MaLwsCd32eWW9ox24w0a"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.64]); Fri, 18 Oct 2019 16:15:09 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,136 +97,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Corey Minyard <cminyard@mvista.com>,
- =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>,
- Aleksandar Rikalo <arikalo@wavecomp.com>, Magnus Damm <magnus.damm@gmail.com>,
- Jason Wang <jasowang@redhat.com>,
- Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
- QEMU Developers <qemu-devel@nongnu.org>,
- Fabien Chouteau <chouteau@adacore.com>,
- KONRAD Frederic <frederic.konrad@adacore.com>, qemu-arm <qemu-arm@nongnu.org>,
- =?UTF-8?Q?Herv=C3=A9_Poussineau?= <hpoussin@reactos.org>,
- Aurelien Jarno <aurelien@aurel32.net>,
- Aleksandar Markovic <amarkovic@wavecomp.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
- "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, qemu-ppc <qemu-ppc@nongnu.org>,
- Artyom Tarasenko <atar4qemu@gmail.com>, Richard Henderson <rth@twiddle.net>
+Cc: Kevin Wolf <kwolf@redhat.com>, John Snow <jsnow@redhat.com>,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--VNbIrOzl8a1H5MaLwsCd32eWW9ox24w0a
+Content-Type: multipart/mixed; boundary="CqGUJJkotCF771nfWRxfiP2rxDrUJ8CzX"
 
-On Fri, Oct 18, 2019 at 5:59 PM Peter Maydell <peter.maydell@linaro.org> wr=
-ote:
->
-> On Fri, 18 Oct 2019 at 16:42, Marc-Andr=C3=A9 Lureau
-> <marcandre.lureau@redhat.com> wrote:
-> >
-> > etraxfs_dma_client are not Object, so can't be exposed to user with
-> > QOM path. Let's remove property usage and move the constructor to the
-> > .c unit, simplifying some code on the way.
-> >
-> > Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
->
-> > +
-> > +/* Instantiate an ETRAXFS Ethernet MAC.  */
-> > +DeviceState *
-> > +etraxfs_eth_init(NICInfo *nd, hwaddr base, int phyaddr,
-> > +                 struct etraxfs_dma_client *dma_out,
-> > +                 struct etraxfs_dma_client *dma_in)
-> > +{
-> > +    DeviceState *dev;
-> > +    qemu_check_nic_model(nd, "fseth");
-> > +
-> > +    dev =3D qdev_create(NULL, "etraxfs-eth");
-> > +    qdev_set_nic_properties(dev, nd);
-> > +    qdev_prop_set_uint32(dev, "phyaddr", phyaddr);
-> > +    ETRAX_FS_ETH(dev)->dma_out =3D dma_out;
-> > +    ETRAX_FS_ETH(dev)->dma_in =3D dma_in;
-> > +    qdev_init_nofail(dev);
-> > +    sysbus_mmio_map(SYS_BUS_DEVICE(dev), 0, base);
-> > +
-> > +    return dev;
-> > +}
-> > +
-> >  static const TypeInfo etraxfs_eth_info =3D {
-> >      .name          =3D TYPE_ETRAX_FS_ETH,
-> >      .parent        =3D TYPE_SYS_BUS_DEVICE,
-> > diff --git a/include/hw/cris/etraxfs.h b/include/hw/cris/etraxfs.h
-> > index aa146a2cd8..403e7f95e6 100644
-> > --- a/include/hw/cris/etraxfs.h
-> > +++ b/include/hw/cris/etraxfs.h
-> > @@ -30,23 +30,9 @@
-> >  #include "hw/qdev-properties.h"
-> >  #include "hw/sysbus.h"
-> >
-> > -/* Instantiate an ETRAXFS Ethernet MAC.  */
-> > -static inline DeviceState *
-> > -etraxfs_eth_init(NICInfo *nd, hwaddr base, int phyaddr,
-> > -                 void *dma_out, void *dma_in)
-> > -{
-> > -    DeviceState *dev;
-> > -    qemu_check_nic_model(nd, "fseth");
-> > -
-> > -    dev =3D qdev_create(NULL, "etraxfs-eth");
-> > -    qdev_set_nic_properties(dev, nd);
-> > -    qdev_prop_set_uint32(dev, "phyaddr", phyaddr);
-> > -    qdev_prop_set_ptr(dev, "dma_out", dma_out);
-> > -    qdev_prop_set_ptr(dev, "dma_in", dma_in);
-> > -    qdev_init_nofail(dev);
-> > -    sysbus_mmio_map(SYS_BUS_DEVICE(dev), 0, base);
-> > -    return dev;
-> > -}
-> > +DeviceState *etraxfs_eth_init(NICInfo *nd, hwaddr base, int phyaddr,
-> > +                              struct etraxfs_dma_client *dma_out,
-> > +                              struct etraxfs_dma_client *dma_in);
->
->
-> I don't think this is an improvement -- it's taking a step
-> back in the direction of "you need to call a funny _init
-> function to initialize a device". You should be able to
-> create devices using generic qdev functions.
->
+--CqGUJJkotCF771nfWRxfiP2rxDrUJ8CzX
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
-Is there really much difference between:
+On 11.10.19 16:50, Thomas Huth wrote:
+> From: John Snow <jsnow@redhat.com>
+>=20
+> verify_platform will check an explicit whitelist and blacklist instead.=
 
-dev =3D qdev_create()
-qdev_prop_set_ptr(dev, "prop", ptr);
-qdev_init_nofail()
+> The default will now be assumed to be allowed to run anywhere.
+>=20
+> For tests that do not specify their platforms explicitly, this has the =
+effect of
+> enabling these tests on non-linux platforms. For tests that always spec=
+ified
+> linux explicitly, there is no change.
+>=20
+> For Python tests on FreeBSD at least; only seven python tests fail:
+> 045 147 149 169 194 199 211
+>=20
+> 045 and 149 appear to be misconfigurations,
+> 147 and 194 are the AF_UNIX path too long error,
+> 169 and 199 are bitmap migration bugs, and
+> 211 is a bug that shows up on Linux platforms, too.
+>=20
+> This is at least good evidence that these tests are not Linux-only. If
+> they aren't suitable for other platforms, they should be disabled on a
+> per-platform basis as appropriate.
+>=20
+> Therefore, let's switch these on and deal with the failures.
+>=20
+> Signed-off-by: John Snow <jsnow@redhat.com>
+> ---
+>  tests/qemu-iotests/iotests.py | 16 +++++++++++-----
+>  1 file changed, 11 insertions(+), 5 deletions(-)
 
-and
-
-dev =3D qdev_create(MYDEV)
-MYDEV(dev)->prop =3D ptr;
-qdev_init_nofail()
+Reviewed-by: Max Reitz <mreitz@redhat.com>
 
 
-As "prop" can only be set from code, and those objects are usually
-very tightly coupled with the parent/owner.
+--CqGUJJkotCF771nfWRxfiP2rxDrUJ8CzX--
 
-I don't think it's worth to keep PROP_PTR for this, it just adds complexity=
-.
+--VNbIrOzl8a1H5MaLwsCd32eWW9ox24w0a
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-> What we're actually connecting here is 'etraxfs_dma_client'
-> struct pointers between the devices like this ethernet
-> device and the DMA controller. The connection is currently
-> done via a pointer property because we don't have a more
-> QOM-like way to do it, but if we want to get rid of the
-> pointer property we need to actually implement the more
-> QOM-like mechanism, not go backwards from having devices
-> connected via properties.
->
-> (Similar comments apply for the omap clock connections.
-> In that case the answer might be Damien's clock framework
-> API, eventually.)
->
-> thanks
-> -- PMM
->
+-----BEGIN PGP SIGNATURE-----
 
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl2p5QoACgkQ9AfbAGHV
+z0A29Af/XJKq6RFjExvgxc2OJ+Y+ops6YZh8MAYQ0X1OeE3aGkr+x4WJopToqdJz
+aV23q6fHnuc591gdikGk6DF7qfI7yfZASzWsevRIuZrcUNVhl2RwxL9NEVax4eXJ
+n2yO+Mne6HjEWxAyBssasO5yrOCaoXd3xCeqjs2Idyuz6Waxau2sZU2cnSpqbNQ2
+PeFlrpPYdy15o0yG4xmhAwAx720bsxdQPPKn6+NBKlyCHVgiRQjZRB/QW6RYYI6h
+NwJ0Ofjs072YxR+Sfmwr6nYNAniCacoeQyWLTVGa7v/5ET9fQ4Zmxa8aZMr/xza6
+M0LbzYFXl7uNBixIKJkShAVHZlrx9Q==
+=Mh5s
+-----END PGP SIGNATURE-----
 
---=20
-Marc-Andr=C3=A9 Lureau
+--VNbIrOzl8a1H5MaLwsCd32eWW9ox24w0a--
 
