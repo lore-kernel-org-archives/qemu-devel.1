@@ -2,56 +2,61 @@ Return-Path: <SRS0=ht5U=YL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 25BD5CA9EA0
-	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 12:03:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A22CCA9EA0
+	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 12:04:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EA03121925
-	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 12:03:58 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EA03121925
+	by mail.kernel.org (Postfix) with ESMTPS id 3D38421925
+	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 12:04:11 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3D38421925
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38934 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38936 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iLQz8-0001Ll-2P
-	for qemu-devel@archiver.kernel.org; Fri, 18 Oct 2019 08:03:58 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38136)
+	id 1iLQzK-0001WS-56
+	for qemu-devel@archiver.kernel.org; Fri, 18 Oct 2019 08:04:10 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38181)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <kwolf@redhat.com>) id 1iLQy8-0000WH-Gr
- for qemu-devel@nongnu.org; Fri, 18 Oct 2019 08:02:57 -0400
+ (envelope-from <drjones@redhat.com>) id 1iLQyH-0000eD-Co
+ for qemu-devel@nongnu.org; Fri, 18 Oct 2019 08:03:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kwolf@redhat.com>) id 1iLQy7-0006oh-77
- for qemu-devel@nongnu.org; Fri, 18 Oct 2019 08:02:56 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:40238)
+ (envelope-from <drjones@redhat.com>) id 1iLQyG-0006vX-3S
+ for qemu-devel@nongnu.org; Fri, 18 Oct 2019 08:03:05 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:35798)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <kwolf@redhat.com>)
- id 1iLQxz-0006di-JL; Fri, 18 Oct 2019 08:02:47 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
+ (Exim 4.71) (envelope-from <drjones@redhat.com>)
+ id 1iLQy9-0006pt-Ef; Fri, 18 Oct 2019 08:02:57 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id D5FF0A76C;
- Fri, 18 Oct 2019 12:02:46 +0000 (UTC)
-Received: from localhost.localdomain.com (ovpn-117-198.ams2.redhat.com
- [10.36.117.198])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 892CC1001B03;
- Fri, 18 Oct 2019 12:02:45 +0000 (UTC)
-From: Kevin Wolf <kwolf@redhat.com>
-To: qemu-block@nongnu.org
-Subject: [PATCH v2] doc: Describe missing generic -blockdev options
-Date: Fri, 18 Oct 2019 14:02:35 +0200
-Message-Id: <20191018120235.4438-1-kwolf@redhat.com>
+ by mx1.redhat.com (Postfix) with ESMTPS id 0156F4FCCE;
+ Fri, 18 Oct 2019 12:02:56 +0000 (UTC)
+Received: from kamzik.brq.redhat.com (unknown [10.43.2.160])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 853E9196B2;
+ Fri, 18 Oct 2019 12:02:54 +0000 (UTC)
+Date: Fri, 18 Oct 2019 14:02:52 +0200
+From: Andrew Jones <drjones@redhat.com>
+To: Masayoshi Mizuma <msys.mizuma@gmail.com>
+Subject: Re: [PATCH v1 0/5] target/arm/kvm: Provide an option to adjust
+ virtual time
+Message-ID: <20191018120252.sdpi4t7jlectnspu@kamzik.brq.redhat.com>
+References: <20191016143410.5023-1-drjones@redhat.com>
+ <20191017211758.ownflk2c7mzv3poh@gabell>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20191017211758.ownflk2c7mzv3poh@gabell>
+User-Agent: NeoMutt/20180716
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.29]); Fri, 18 Oct 2019 12:02:46 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
+ (mx1.redhat.com [10.5.110.30]); Fri, 18 Oct 2019 12:02:56 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 209.132.183.28
@@ -66,72 +71,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, peter.maydell@linaro.org, qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, bijan.mottahedeh@oracle.com, maz@kernel.org,
+ richard.henderson@linaro.org, qemu-devel@nongnu.org, qemu-arm@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-We added more generic options after introducing -blockdev and forgot to
-update the documentation (man page and --help output) accordingly. Do
-that now.
+On Thu, Oct 17, 2019 at 05:17:59PM -0400, Masayoshi Mizuma wrote:
+> Hi Drew,
+> 
+> Thank you for posting the patches, they seems to work well
+> because the softlockup is gone and the timestamp jump of
+> dmesg and ftrace record also disappeared after the guest
+> is virsh resume'ed.
+> 
+> Let me add comments.
+> I think the kvm-adjvtime behavior should be the default.
+> How about introducing 'kvm-noadjvtime' parameter instead?
+> kvm-noadjvtime is to provide the old behavior.
+> 
+> That is because the time jump occurs timeout for timers even though
+> the timer doesn't reach the timeout in the guest time.
+> 
+> For example, below flow shows that user and/or kernel sets timer A
+> for +10 sec and B for +20 sec in Guest, then Guest is suspended and
+> it passes 60 sec, then Guest is resumed. Timer A and B go off because
+> the Guest timestamp (TS) is jumped to 63. That is unexpected timer
+> behavior for Guest.
+> 
+>  Host TS(sec) Guest TS(sec) Event
+>  ============ ============= =============================
+>  00           00            Guest: Set timer A for +10 sec
+>  01           01            Guest: Set timer B for +20 sec
+>  03           03            Host: virsh suspend Guest
+>  63           63            Host: virsh resume Guest
+>                             Guest: Timer A and B go off
+> 
+> I believe kvm-adjvtime behavior is as following. So Time A
+> and B go off as expected time. So, kvm-adjvtime behavior should
+> be the default.
+> 
+>  Host TS(sec) Guest TS(sec) Event
+>  ============ ============= =============================
+>  00           00            Guest: Set timer A for +10 sec
+>  01           01            Guest: Set timer B for +20 sec
+>  03           03            Host: virsh suspend guest
+>  63           03            Host: virsh resume guest
+>  70           10            Guest: Timer A goes off
+>  81           21            Guest: Timer B goes off
+> 
 
-Signed-off-by: Kevin Wolf <kwolf@redhat.com>
----
- qemu-options.hx | 22 +++++++++++++++++++++-
- 1 file changed, 21 insertions(+), 1 deletion(-)
+Thanks for the testing Masa. Your timer test is another good example of
+what can happen when a guest is paused. I'm sure there are many other ways
+a pause could be problematic as well, especially if the guest has devices
+passed through to it that it's actively using. I also don't expect
+kvm-adjvtime to solve all those problems (like, for example, potential
+problems with passthrough devices, networks, etc.)  This means that guest
+pausing should only be done by host admins that are intimately familiar
+with the guest OS, workload, and network connections. They should be sure
+that it can tolerate and recover from the pauses. Since the admins need to
+make the decision to pause at all, then I think it's fair for them to also
+decide if they want to try and mitigate some of the issues with
+kvm-adjvtime, i.e. require them to enable it, rather than have it on by
+default. Also, if we choose to enable it by default, then we'll need to
+deal with the compatibility issues that come with changing a behavior.
+That's not impossible, as this feature could be disabled for older
+machine types, but it's messy.
 
-diff --git a/qemu-options.hx b/qemu-options.hx
-index 793d70ff93..2e6ba5ef1f 100644
---- a/qemu-options.hx
-+++ b/qemu-options.hx
-@@ -849,7 +849,8 @@ ETEXI
- DEF("blockdev", HAS_ARG, QEMU_OPTION_blockdev,
-     "-blockdev [driver=3D]driver[,node-name=3DN][,discard=3Dignore|unmap=
-]\n"
-     "          [,cache.direct=3Don|off][,cache.no-flush=3Don|off]\n"
--    "          [,read-only=3Don|off][,detect-zeroes=3Don|off|unmap]\n"
-+    "          [,read-only=3Don|off][,auto-read-only=3Don|off]\n"
-+    "          [,force-share=3Don|off][,detect-zeroes=3Don|off|unmap]\n"
-     "          [,driver specific parameters...]\n"
-     "                configure a block backend\n", QEMU_ARCH_ALL)
- STEXI
-@@ -885,6 +886,25 @@ name is not intended to be predictable and changes b=
-etween QEMU invocations.
- For the top level, an explicit node name must be specified.
- @item read-only
- Open the node read-only. Guest write attempts will fail.
-+
-+Note that some block drivers support only read-only access, either gener=
-ally or
-+in certain configurations. In this case, the default value
-+@option{read-only=3Doff} does not work and the option must be specified
-+explicitly.
-+@item auto-read-only
-+If @option{auto-read-only=3Don} is set, QEMU may fall back to read-only =
-usage
-+even when @option{read-only=3Doff} is requested, or even switch between =
-modes as
-+needed, e.g. depending on whether the image file is writable or whether =
-a
-+writing user is attached to the node.
-+@item force-share
-+Override the image locking system of QEMU by forcing the node to utilize
-+weaker shared access for permissions where it would normally request exc=
-lusive
-+access.  When there is the potential for multiple instances to have the =
-same
-+file open (whether this invocation of qemu is the first or the second
-+instance), both instances must permit shared access for the second insta=
-nce to
-+succeed at opening the file.
-+
-+Enabling @option{force-share=3Don} requires @option{read-only=3Don}.
- @item cache.direct
- The host page cache can be avoided with @option{cache.direct=3Don}. This=
- will
- attempt to do disk IO directly to the guest's memory. QEMU may still per=
-form an
---=20
-2.20.1
+All that said, I won't argue too hard against kvm-adjvtime being on by
+default, but let's see if others like Peter or Marc want to chime in on
+it too.
 
+Thanks,
+drew
 
