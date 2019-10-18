@@ -2,88 +2,88 @@ Return-Path: <SRS0=ht5U=YL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 979EDCA9EA9
-	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 18:07:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BD247CA9EA9
+	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 18:09:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5FCAD20869
-	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 18:07:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9058520869
+	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 18:09:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="VrjTkilR"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5FCAD20869
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="vSIDsLNq"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9058520869
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44634 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44678 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iLWes-0005GP-7J
-	for qemu-devel@archiver.kernel.org; Fri, 18 Oct 2019 14:07:26 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60704)
+	id 1iLWgj-0007V9-Pz
+	for qemu-devel@archiver.kernel.org; Fri, 18 Oct 2019 14:09:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59571)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1iLWWB-0004yv-Ga
- for qemu-devel@nongnu.org; Fri, 18 Oct 2019 13:58:28 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1iLWJE-0006zr-5M
+ for qemu-devel@nongnu.org; Fri, 18 Oct 2019 13:45:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1iLWWA-0005aF-6u
- for qemu-devel@nongnu.org; Fri, 18 Oct 2019 13:58:27 -0400
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:35279)
+ (envelope-from <richard.henderson@linaro.org>) id 1iLWJC-0005hx-Uo
+ for qemu-devel@nongnu.org; Fri, 18 Oct 2019 13:45:03 -0400
+Received: from mail-pf1-x441.google.com ([2607:f8b0:4864:20::441]:45361)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1iLWWA-0005Zj-0A
- for qemu-devel@nongnu.org; Fri, 18 Oct 2019 13:58:26 -0400
-Received: by mail-wr1-x442.google.com with SMTP id l10so6766149wrb.2
- for <qemu-devel@nongnu.org>; Fri, 18 Oct 2019 10:58:25 -0700 (PDT)
+ (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+ id 1iLWJC-0005hQ-NR
+ for qemu-devel@nongnu.org; Fri, 18 Oct 2019 13:45:02 -0400
+Received: by mail-pf1-x441.google.com with SMTP id y72so4303689pfb.12
+ for <qemu-devel@nongnu.org>; Fri, 18 Oct 2019 10:45:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=lKt53I7f/6CmozSTncyZXV9A7UBvRK9P650MPucCeC4=;
- b=VrjTkilRff11h+nF8Ta7+TeZ09YtwLrwM07VorzQD/ncWmu54qP9UPy1bS/mj9mFAp
- HEhtNKwOwox+/Qv+9NIo763jBhc4H+2dFBRGppyFMQ5/FtGxXhCHxjLtkH03TbecxmtZ
- Y9b7Q3sMSBUfYq9XZ4XQfyiPzmI8qxbKUGOKCj0T3unyVszx8sCwr4Raq6Uy4Py+GQr8
- coYJKUIImHRLpnumjcgAvl6pkmOglo5FkDvl4q09ojZPO/ZnH6D9Sa8jGsJJ838d78OR
- ZVTrJU/C0erkQNDn+O1UWDKbhvqaijr2DkLfAFRih9qWKLTl5Klq+Dnj+iS0eQcKb+S8
- VOhw==
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=xYzA79nlkAAXT+tYBTRBvIlOCILLFnnuEHFTBSl+bu8=;
+ b=vSIDsLNqsnrQQPJVv21MsXEaz4hVN60xT3imyizOIAuCOBHlxzIpfVSEN7ngciqPVv
+ HCRNpEGWxcfpAC30lbz6eEB94vkXTh/Bzeg+sIPc039kJeTPyPRcZKngAujNtbIaHMuw
+ Xex2OQfPcj8wyGm21ub2exiE7HoeZ3mDNUuzceF+sm+Qbhn/SiJvbDhTGlutN85l7KiE
+ 8DPYmi75i9pXbnqMF2WhnzipDr2fOnDriz4518pbZ310JKLW3Crao8XBtqbT+hwDu35u
+ i1GphTsBa2aDA8fPOMONO66ombvkYAdmVTC+Sjpo7cJVYIoiRpvffZmbaCRgNjmzytB0
+ JF7w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=lKt53I7f/6CmozSTncyZXV9A7UBvRK9P650MPucCeC4=;
- b=kPdT4N6KHyCDBPw3HsmAONNIvRFYGmCJq/E4vME/oHFuXohlxI6VcmEpo4WRkEikvZ
- 7AJDgVAc2N/Caq/7yGC3tmelLCzMSB5tJLyp9conA1naj5bxwM5f7U2dau10yRedAAMk
- PBm3LTWYobRmXyp6k7P1AjzHMtxnEU4YRN+v8hcsYqHGHZP32vUJuPiJ2G1duYteCou9
- HJICx1x0GMSsB+j7Xr7nThOjFqAZGtYAvUKa4LiAJmBTNz2yScd8RmqF/LUf05QSHUCr
- skmpD48o6iXfVXHEY/WL0mEvL+owNfCjhzCe7PLgJfEVDs9T5rINWN3B9rCLjWeZMsB+
- 7KJw==
-X-Gm-Message-State: APjAAAWvQuArVU/wFSdG10WEbkb8bwYvpuGGAQw7gNMRrAWBFwoYELEJ
- ORqkJ2kyd+7NkC4CD8D8RWuWzg==
-X-Google-Smtp-Source: APXvYqxC/6hQ1ihONVT4MwfAtZnbSHG2BSdEJxErkUBrgNbxlaghlnfTOu168SE6HO8LPck42J8nDg==
-X-Received: by 2002:adf:e5cc:: with SMTP id a12mr9157997wrn.258.1571421504665; 
- Fri, 18 Oct 2019 10:58:24 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id p68sm3167756wme.0.2019.10.18.10.58.23
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=xYzA79nlkAAXT+tYBTRBvIlOCILLFnnuEHFTBSl+bu8=;
+ b=MbRoz7R0laPnVo/k40jSVTvE4W1m2cqnRgzsWqwwECc8smD+TM7qyZFGe39UIrhLkg
+ pwQcYhPcJ5aUeUwmaU4tZL3y4XnDsWWUbSHmMe0e+FBWU8o7siEhFsAm5p9mpwiqR+3g
+ OJxD7KTffrETQK1fIgM/wOvYS8i/TSAW0MwrRKxCplEJTnoz9lNg94O5VLK3EpJ39BTi
+ 9Lswo/Y1OHSL1HoIU6LZUhQyOht1pRWjFYP1fkfFVH4ZUFF2KHLCQspeOoKaysWch/W5
+ dcPU1sPPrFyZSCJzbOuxAhiNAMTchexucynghM7Il5Tr2Y0YSXu8mFUydoJODfVEHYRl
+ Fx1g==
+X-Gm-Message-State: APjAAAWZdIYoqHh/WVtnwMLWzLRL6XIEgrLz27Wg4yUbxHRXD4LhWbbb
+ ptAmsDLDv8gBsOtpP2uvtyN6w6YqlxI=
+X-Google-Smtp-Source: APXvYqynyLdcscgIG5Yxy2j2jsrMtHtCcKuyvCnVHwQu3YvRskmWbfiqLGfUNkoZA46dpHbYk4oUBQ==
+X-Received: by 2002:a65:5a81:: with SMTP id c1mr11210178pgt.245.1571420700036; 
+ Fri, 18 Oct 2019 10:45:00 -0700 (PDT)
+Received: from localhost.localdomain (97-113-7-119.tukw.qwest.net.
+ [97.113.7.119])
+ by smtp.gmail.com with ESMTPSA id d20sm7857534pfq.88.2019.10.18.10.44.59
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 18 Oct 2019 10:58:23 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 567891FF87;
- Fri, 18 Oct 2019 18:58:23 +0100 (BST)
-References: <20191017044232.27601-1-richard.henderson@linaro.org>
-User-agent: mu4e 1.3.5; emacs 27.0.50
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: qemu-arm@nongnu.org
-Subject: Re: [PATCH 0/4] target/arm vector improvements
-In-reply-to: <20191017044232.27601-1-richard.henderson@linaro.org>
-Date: Fri, 18 Oct 2019 18:58:23 +0100
-Message-ID: <87sgnqndfk.fsf@linaro.org>
+ Fri, 18 Oct 2019 10:44:59 -0700 (PDT)
+From: Richard Henderson <richard.henderson@linaro.org>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v8 22/22] target/arm: Rely on hflags correct in
+ cpu_get_tb_cpu_state
+Date: Fri, 18 Oct 2019 10:44:31 -0700
+Message-Id: <20191018174431.1784-23-richard.henderson@linaro.org>
+X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20191018174431.1784-1-richard.henderson@linaro.org>
+References: <20191018174431.1784-1-richard.henderson@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::442
+X-Received-From: 2607:f8b0:4864:20::441
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -95,72 +95,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, qemu-arm@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+This is the payoff.
 
-Richard Henderson <richard.henderson@linaro.org> writes:
+From perf record -g data of ubuntu 18 boot and shutdown:
 
-> The first patch has been seen before.
->
->   https://patchwork.ozlabs.org/patch/1115039/
->
-> It had a bug and I didn't fix it right away and then forgot.
-> Fixed now; I had mixed up the operand ordering for aarch32.
->
-> The next 3 are something that I noticed while doing other stuff.
->
-> In particular, pmull is used heavily during https transfers.
-> While cloning a repository, the old code peaks at 27% of the
-> total runtime, as measured by perf top.  The new code does
-> not quite reach 3% repeating the same clone.
->
-> In addition, the new helper functions are in the form that
-> will be required for the implementation of SVE2.
->
-> The comment in patch 2 about ARMv8.4-DIT is perhaps a stretch,
-> but re-reading the pmull instruction description in the current
-> ARM ARM brought it to mind.
->
-> Since TCG is officially not in the security domain, it's
-> probably not a bug to just claim to support DIT without
-> actually doing anything to ensure the algorithms used are in
-> fact timing independent of the data.
->
-> On the other hand, I expect the bit distribution of stuff
-> going through these sort of hashing algorithms to approach
-> 50% 1's and 0's, so I also don't think we gain anything on
-> average to terminate the loop early.
->
-> Thoughts on DIT specifically?
+BEFORE:
 
-It would be an interesting academic exercise to see if someone could
-exploit the JIT from the guest but as you say not a security domain
-so....
+-   23.02%     2.82%  qemu-system-aar  [.] helper_lookup_tb_ptr
+   - 20.22% helper_lookup_tb_ptr
+      + 10.05% tb_htable_lookup
+      - 9.13% cpu_get_tb_cpu_state
+           3.20% aa64_va_parameters_both
+           0.55% fp_exception_el
 
->
->
-> r~
->
->
-> Richard Henderson (4):
->   target/arm: Vectorize USHL and SSHL
->   target/arm: Convert PMUL.8 to gvec
->   target/arm: Convert PMULL.64 to gvec
->   target/arm: Convert PMULL.8 to gvec
->
->  target/arm/helper-sve.h    |   2 +
->  target/arm/helper.h        |  21 ++-
->  target/arm/translate.h     |   6 +
->  target/arm/neon_helper.c   | 117 -------------
->  target/arm/translate-a64.c |  83 ++++-----
->  target/arm/translate.c     | 350 ++++++++++++++++++++++++++++++++-----
->  target/arm/vec_helper.c    | 211 ++++++++++++++++++++++
->  7 files changed, 562 insertions(+), 228 deletions(-)
+-   11.66%     4.74%  qemu-system-aar  [.] cpu_get_tb_cpu_state
+   - 6.96% cpu_get_tb_cpu_state
+        3.63% aa64_va_parameters_both
+        0.60% fp_exception_el
+        0.53% sve_exception_el
 
+AFTER:
 
---
-Alex Benn=C3=A9e
+-   16.40%     3.40%  qemu-system-aar  [.] helper_lookup_tb_ptr
+   - 13.03% helper_lookup_tb_ptr
+      + 11.19% tb_htable_lookup
+        0.55% cpu_get_tb_cpu_state
+
+     0.98%     0.71%  qemu-system-aar  [.] cpu_get_tb_cpu_state
+
+     0.87%     0.24%  qemu-system-aar  [.] rebuild_hflags_a64
+
+Before, helper_lookup_tb_ptr is the second hottest function in the
+application, consuming almost a quarter of the runtime.  Within the
+entire execution, cpu_get_tb_cpu_state consumes about 12%.
+
+After, helper_lookup_tb_ptr has dropped to the fourth hottest function,
+with consumption dropping to a sixth of the runtime.  Within the
+entire execution, cpu_get_tb_cpu_state has dropped below 1%, and the
+supporting function to rebuild hflags also consumes about 1%.
+
+Assertions are retained for --enable-debug-tcg.
+
+Tested-by: Alex Bennée <alex.bennee@linaro.org>
+Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+---
+v2: Retain asserts for future debugging.
+---
+ target/arm/helper.c | 9 ++++++---
+ 1 file changed, 6 insertions(+), 3 deletions(-)
+
+diff --git a/target/arm/helper.c b/target/arm/helper.c
+index c55783e540..63815fc4cf 100644
+--- a/target/arm/helper.c
++++ b/target/arm/helper.c
+@@ -11259,12 +11259,15 @@ void HELPER(rebuild_hflags_a64)(CPUARMState *env, int el)
+ void cpu_get_tb_cpu_state(CPUARMState *env, target_ulong *pc,
+                           target_ulong *cs_base, uint32_t *pflags)
+ {
+-    uint32_t flags, pstate_for_ss;
++    uint32_t flags = env->hflags;
++    uint32_t pstate_for_ss;
+ 
+     *cs_base = 0;
+-    flags = rebuild_hflags_internal(env);
++#ifdef CONFIG_DEBUG_TCG
++    assert(flags == rebuild_hflags_internal(env));
++#endif
+ 
+-    if (is_a64(env)) {
++    if (FIELD_EX32(flags, TBFLAG_ANY, AARCH64_STATE)) {
+         *pc = env->pc;
+         if (cpu_isar_feature(aa64_bti, env_archcpu(env))) {
+             flags = FIELD_DP32(flags, TBFLAG_A64, BTYPE, env->btype);
+-- 
+2.17.1
+
 
