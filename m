@@ -2,81 +2,65 @@ Return-Path: <SRS0=ht5U=YL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2092ACA9EA0
-	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 12:35:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F016FCA9EA0
+	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 12:38:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DF1FD21852
-	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 12:35:03 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="sVZx+vdO"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DF1FD21852
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id C899120820
+	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 12:38:04 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C899120820
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39324 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39348 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iLRTD-0002RO-1T
-	for qemu-devel@archiver.kernel.org; Fri, 18 Oct 2019 08:35:03 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41822)
+	id 1iLRW8-0004MO-2B
+	for qemu-devel@archiver.kernel.org; Fri, 18 Oct 2019 08:38:04 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42250)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1iLRRX-0001YG-7X
- for qemu-devel@nongnu.org; Fri, 18 Oct 2019 08:33:21 -0400
+ (envelope-from <kwolf@redhat.com>) id 1iLRVI-0003v7-FK
+ for qemu-devel@nongnu.org; Fri, 18 Oct 2019 08:37:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1iLRRT-0003ah-Bd
- for qemu-devel@nongnu.org; Fri, 18 Oct 2019 08:33:17 -0400
-Received: from mail-oi1-x241.google.com ([2607:f8b0:4864:20::241]:34385)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1iLRRR-0003Xr-Fa
- for qemu-devel@nongnu.org; Fri, 18 Oct 2019 08:33:15 -0400
-Received: by mail-oi1-x241.google.com with SMTP id 83so5087842oii.1
- for <qemu-devel@nongnu.org>; Fri, 18 Oct 2019 05:33:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=78OJkJ4IhTQipG9ELDS8c/fdUHRcaCtnkATcqPXAcbI=;
- b=sVZx+vdOBBt8GNbzfXyHRYR7DUo4MQpQgPR9rKeLIox/6/g0jZ7UCNEPzCunWASjYG
- /D3Od5FkQudtwG595RlTczzyvaId7jOQ9e/shGKNPweh58SmRlTMu9g/SRNJBZxb2aP9
- adfp1wg1dgRQQ4E8iwCv1lMTk79y+vrfHxDl9AYwNs35PYG3DMdcdBbuam56PdROeU3t
- EJXThIV4JVz6CGgWBhPgr7abZzFCi2+qNBqXifzr8Y5QV8feJhyDs6EQmTDAF/A2uYbU
- AX1xcEfvl19HK2egzCHqwbQ7lospyvbaUNrCKLqyT0aNPTVuMmIYy3U2S/UGYdZt3DO1
- sgSw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=78OJkJ4IhTQipG9ELDS8c/fdUHRcaCtnkATcqPXAcbI=;
- b=MCxPu8++O/cYteRbuWii47EVsrpVGklT7nef4tcfsQPoQdkpx8dTuYconD1l2Io4gd
- AeZzPwvA5jdNbvkJXo+nCufNUcNRgFea7OLvgPEfyoe8C1SuwGgdMSPrwlh/MIh/A1ze
- MAzM4360C+/uICKDjN3ojRNLT2KJMZ1sx9y8uUE0FHmgxP2sXy7XKEgyw5X2YJhz0saB
- zm+JsJHpHBlOvMbG6j2ypas3LYlzFBQ17yZ4dtX8e4xZMGtpfUf0tAZG/CtzcIWu7yZM
- S4kjvvh/5OTmQUnUNal8cvhd8l9dduDTme8CpC2EdVqSC4qGjRjPeEmPWes0DEdvSLFR
- K5kQ==
-X-Gm-Message-State: APjAAAWIt+gXsQfNZ2zeqZ0KirgO9n5Dz4agOk+oGkP9xcxLMzljncwj
- U1JF3zTVC8oA46CgC7zmHd9JzSRH7GWPEx5VNLu+0g==
-X-Google-Smtp-Source: APXvYqzc6mhK81Pk/sLWTkyHUO21Iam+WOWOPM1kyx6DtiPTjqsCrDd8awCzoDQ/hvB/UfkgtRyvxJWLXVYZhE/vTNc=
-X-Received: by 2002:aca:2b08:: with SMTP id i8mr7479583oik.146.1571401984190; 
- Fri, 18 Oct 2019 05:33:04 -0700 (PDT)
+ (envelope-from <kwolf@redhat.com>) id 1iLRVF-0004p1-UB
+ for qemu-devel@nongnu.org; Fri, 18 Oct 2019 08:37:11 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:45994)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1iLRVF-0004op-La
+ for qemu-devel@nongnu.org; Fri, 18 Oct 2019 08:37:09 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 62916101BC52;
+ Fri, 18 Oct 2019 12:37:08 +0000 (UTC)
+Received: from localhost.localdomain (ovpn-117-198.ams2.redhat.com
+ [10.36.117.198])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id D286F60852;
+ Fri, 18 Oct 2019 12:37:04 +0000 (UTC)
+Date: Fri, 18 Oct 2019 14:37:03 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+To: Daniel Henrique Barboza <danielhb413@gmail.com>
+Subject: Re: [PATCH v7 2/4] block.c: adding bdrv_delete_file
+Message-ID: <20191018123703.GE6122@localhost.localdomain>
+References: <20190903135708.21624-1-danielhb413@gmail.com>
+ <20190903135708.21624-3-danielhb413@gmail.com>
 MIME-Version: 1.0
-References: <20191017185110.539-1-richard.henderson@linaro.org>
- <20191017185110.539-18-richard.henderson@linaro.org>
-In-Reply-To: <20191017185110.539-18-richard.henderson@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 18 Oct 2019 13:32:53 +0100
-Message-ID: <CAFEAcA8h9CN_qarQdfXRonE8KYO2=s+Jh_o+LFs9qk9M20pweA@mail.gmail.com>
-Subject: Re: [PATCH v7 17/20] target/arm: Rebuild hflags at MSR writes
-To: Richard Henderson <richard.henderson@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <20190903135708.21624-3-danielhb413@gmail.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.64]); Fri, 18 Oct 2019 12:37:08 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::241
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,74 +72,137 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
+Cc: Daniel P =?iso-8859-1?Q?=2E_Berrang=E9?= <berrange@redhat.com>,
+ jsnow@redhat.com, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, 17 Oct 2019 at 19:51, Richard Henderson
-<richard.henderson@linaro.org> wrote:
->
-> Continue setting, but not relying upon, env->hflags.
->
-> Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-> ---
->  target/arm/translate-a64.c | 13 +++++++++++--
->  target/arm/translate.c     | 28 +++++++++++++++++++++++-----
->  2 files changed, 34 insertions(+), 7 deletions(-)
-> @@ -7068,14 +7070,30 @@ static int disas_coproc_insn(DisasContext *s, uin=
-t32_t insn)
->              }
->          }
->
-> -        if ((tb_cflags(s->base.tb) & CF_USE_ICOUNT) && (ri->type & ARM_C=
-P_IO)) {
-> -            /* I/O operations must end the TB here (whether read or writ=
-e) */
-> -            gen_lookup_tb(s);
-> -        } else if (!isread && !(ri->type & ARM_CP_SUPPRESS_TB_END)) {
-> -            /* We default to ending the TB on a coprocessor register wri=
-te,
-> +        /* I/O operations must end the TB here (whether read or write) *=
-/
-> +        need_exit_tb =3D ((tb_cflags(s->base.tb) & CF_USE_ICOUNT) &&
-> +                        (ri->type & ARM_CP_IO));
+Am 03.09.2019 um 15:57 hat Daniel Henrique Barboza geschrieben:
+> Using the new 'bdrv_co_delete_file' interface, bdrv_delete_file
+> can be used in a way similar of the existing bdrv_create_file to
+> to clean up a created file.
+>=20
+> The logic is also similar to what is already done in bdrv_create_file:
+> a qemu_coroutine is created if needed, a specialized function
+> bdrv_delete_co_entry is used to call the bdrv_co_delete_file
+> co-routine of the driver, if the driver implements it.
+>=20
+> Suggested-by: Daniel P. Berrang=E9 <berrange@redhat.com>
+> Signed-off-by: Daniel Henrique Barboza <danielhb413@gmail.com>
+
+The only caller of bdrv_delete_file() is in coroutine context, so I
+think this patch can be made much simpler by turning it into a pure
+coroutine function bdrv_co_delete_file().
+
+> diff --git a/block.c b/block.c
+> index 874a29a983..250c69ca7a 100644
+> --- a/block.c
+> +++ b/block.c
+> @@ -548,6 +548,79 @@ int bdrv_create_file(const char *filename, QemuOpt=
+s *opts, Error **errp)
+>      return ret;
+>  }
+> =20
+> +typedef struct DeleteCo {
+> +    BlockDriver *drv;
+> +    BlockDriverState *bs;
+> +    int ret;
+> +    Error *err;
+> +} DeleteCo;
 > +
-> +        if (!isread && !(ri->type & ARM_CP_SUPPRESS_TB_END)) {
-> +            /*
-> +             * A write to any coprocessor regiser that ends a TB
+> +static void coroutine_fn bdrv_delete_co_entry(void *opaque)
+> +{
+> +    Error *local_err =3D NULL;
+> +    DeleteCo *dco =3D opaque;
+> +    BlockDriver *drv =3D dco->bs->drv;
+> +
+> +    assert(dco->bs);
+> +
+> +    dco->ret =3D drv->bdrv_co_delete_file(dco->bs, &local_err);
+> +    error_propagate(&dco->err, local_err);
+> +}
+> +
+> +int bdrv_delete_file(BlockDriverState *bs, Error **errp)
+> +{
+> +    DeleteCo dco =3D {
+> +        .bs =3D bs,
+> +        .ret =3D NOT_DONE,
+> +        .err =3D NULL,
+> +    };
+> +    Coroutine *co;
+> +    int ret;
+> +
+> +    if (!bs) {
+> +        error_setg(errp, "Could not open image '%s' for erasing",
+> +                   bs->filename);
+> +        ret =3D -1;
 
-(typo: "register")
+For a function returning 0/-errno, -1 is not a good return code because
+it could be any error (or an undefined one). On Linux, this happens to
+be -EPERM.
 
-> +             * must rebuild the hflags for the next TB.
-> +             */
-> +            TCGv_i32 tcg_el =3D tcg_const_i32(s->current_el);
-> +            if (arm_dc_feature(s, ARM_FEATURE_M)) {
-> +                gen_helper_rebuild_hflags_m32(cpu_env, tcg_el);
-> +            } else {
-> +                gen_helper_rebuild_hflags_a32(cpu_env, tcg_el);
-> +            }
-> +            tcg_temp_free_i32(tcg_el);
+> +        goto out;
+> +    }
 
-Why only rebuild hflags if !ARM_CP_SUPPRESS_TB_END ?
-For instance on the Xscale CPUs we set SUPPRESS_TB_END for the SCTLR,
-but some of the SCTLR bits are cached in hflags, right? Do we somehow
-arrange to rebuild the hflags when the TB does eventually end ?
+We're not trying to open it here, so the error message is odd.
 
-> +            /*
-> +             * We default to ending the TB on a coprocessor register wri=
-te,
->               * but allow this to be suppressed by the register definitio=
-n
->               * (usually only necessary to work around guest bugs).
->               */
-> +            need_exit_tb =3D true;
+I think the caller should make sure that bs !=3D NULL.
+
+> +    if (!bs->drv) {
+> +        error_setg(errp, "File '%s' has unknown format", bs->filename)=
+;
+> +        ret =3D -ENOMEDIUM;
+> +        goto out;
+> +    }
+
+bs->drv means that file isn't open. It has nothing to do with an unknown
+format. Maybe you can combine both cases into one with an error message
+"block node is not opened".
+
+> +    if (!bs->drv->bdrv_co_delete_file) {
+> +        error_setg(errp, "Driver '%s' does not support image delete",
+
+s/delete/deletion/
+
+> +                   bs->drv->format_name);
+> +        ret =3D -ENOTSUP;
+> +        goto out;
+> +    }
+> +
+> +    if (qemu_in_coroutine()) {
+> +        /* Fast-path if already in coroutine context */
+> +        bdrv_delete_co_entry(&dco);
+> +    } else {
+> +        co =3D qemu_coroutine_create(bdrv_delete_co_entry, &dco);
+> +        qemu_coroutine_enter(co);
+> +        while (dco.ret =3D=3D NOT_DONE) {
+> +            aio_poll(qemu_get_aio_context(), true);
 > +        }
-> +        if (need_exit_tb) {
->              gen_lookup_tb(s);
->          }
+> +    }
 
-thanks
--- PMM
+We don't really want to have this kind of different behaviour for
+coroutine and non-coroutine contexts. It only exists for compatibility
+reasons in other places (when we already had callers that didn't know
+whether they were run inside a coroutine or not).
+
+With a bdrv_co_delete_file(), it will go away.
+
+> +
+> +    ret =3D dco.ret;
+> +    if (ret < 0) {
+> +        if (dco.err) {
+> +            error_propagate(errp, dco.err);
+> +        } else {
+> +            error_setg_errno(errp, -ret, "Could not delete image");
+> +        }
+> +    }
+> +
+> +out:
+> +    return ret;
+
+No cleanup code, so all "ret =3D ...; goto out;" instances above could be
+replaced with a direct return.
+
+Kevin
 
