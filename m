@@ -2,140 +2,111 @@ Return-Path: <SRS0=ht5U=YL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9800FCA9EA9
-	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 21:20:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F191CA9EA9
+	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 21:27:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6BD042089C
-	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 21:20:15 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6BD042089C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 58BF120679
+	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 21:27:07 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b="SilpBNym"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 58BF120679
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=outlook.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46102 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46154 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iLZfO-0005qe-B7
-	for qemu-devel@archiver.kernel.org; Fri, 18 Oct 2019 17:20:10 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53130)
+	id 1iLZm6-0000Kr-Ei
+	for qemu-devel@archiver.kernel.org; Fri, 18 Oct 2019 17:27:06 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53939)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jsnow@redhat.com>) id 1iLZeE-00057W-AZ
- for qemu-devel@nongnu.org; Fri, 18 Oct 2019 17:18:59 -0400
+ (envelope-from <casasfernando@outlook.com>) id 1iLZlQ-0008Au-5v
+ for qemu-devel@nongnu.org; Fri, 18 Oct 2019 17:26:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1iLZeD-00049W-52
- for qemu-devel@nongnu.org; Fri, 18 Oct 2019 17:18:58 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:55580)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1iLZeC-00047H-SH
- for qemu-devel@nongnu.org; Fri, 18 Oct 2019 17:18:57 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 0E3A8315C000;
- Fri, 18 Oct 2019 21:18:56 +0000 (UTC)
-Received: from [10.18.17.145] (dhcp-17-145.bos.redhat.com [10.18.17.145])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 55AC579B4;
- Fri, 18 Oct 2019 21:18:54 +0000 (UTC)
-Subject: Re: [PATCH] configure: Require Python >= 3.5
-To: Eduardo Habkost <ehabkost@redhat.com>
-References: <20191016224237.26180-1-ehabkost@redhat.com>
- <e0631f8e-5c0b-c6cf-b513-68113c7ebd6d@redhat.com>
- <20191018211449.GR4084@habkost.net>
-From: John Snow <jsnow@redhat.com>
-Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
- mQINBFTKefwBEAChvwqYC6saTzawbih87LqBYq0d5A8jXYXaiFMV/EvMSDqqY4EY6whXliNO
- IYzhgrPEe7ZmPxbCSe4iMykjhwMh5byIHDoPGDU+FsQty2KXuoxto+ZdrP9gymAgmyqdk3aV
- vzzmCa3cOppcqKvA0Kqr10UeX/z4OMVV390V+DVWUvzXpda45/Sxup57pk+hyY52wxxjIqef
- rj8u5BN93s5uCVTus0oiVA6W+iXYzTvVDStMFVqnTxSxlpZoH5RGKvmoWV3uutByQyBPHW2U
- 1Y6n6iEZ9MlP3hcDqlo0S8jeP03HaD4gOqCuqLceWF5+2WyHzNfylpNMFVi+Hp0H/nSDtCvQ
- ua7j+6Pt7q5rvqgHvRipkDDVsjqwasuNc3wyoHexrBeLU/iJBuDld5iLy+dHXoYMB3HmjMxj
- 3K5/8XhGrDx6BDFeO3HIpi3u2z1jniB7RtyVEtdupED6lqsDj0oSz9NxaOFZrS3Jf6z/kHIf
- h42mM9Sx7+s4c07N2LieUxcfqhFTaa/voRibF4cmkBVUhOD1AKXNfhEsTvmcz9NbUchCkcvA
- T9119CrsxfVsE7bXiGvdXnzyGLXdsoosjzwacKdOrVaDmN3Uy+SHiQXo6TlkSdV0XH2PUxTM
- LsBFIO9qXO43Ai6J6iPAP/01l8fuZfpJE0/L/c25yyaND7xA3wARAQABtCpKb2huIFNub3cg
- KEpvaG4gSHVzdG9uKSA8anNub3dAcmVkaGF0LmNvbT6JAlQEEwECAD4CGwMCHgECF4AFCwkI
- BwMFFQoJCAsFFgIDAQAWIQT665cRoSz0dYEvGPKIqQZNGDVh6wUCXF392gUJC1Xq3gAKCRCI
- qQZNGDVh6558D/9pM4pu4njX5aT6uUW3vAmbWLF1jfPxiTQgSHAnm9EBMZED/fsvkzj97clo
- LN7JKmbYZNgJmR01A7flG45V4iOR/249qAfaVuD+ZzZi1R4jFzr13WS+IEdn0hYp9ITndb7R
- ezW+HGu6/rP2PnfmDnNowgJu6Dp6IUEabq8SXXwGHXZPuMIrsXJxUdKJdGnh1o2u7271yNO7
- J9PEMuMDsgjsdnaGtv7aQ9CECtXvBleAc06pLW2HU10r5wQyBMZGITemJdBhhdzGmbHAL0M6
- vKi/bafHRWqfMqOAdDkv3Jg4arl2NCG/uNateR1z5e529+UlB4XVAQT+f5T/YyI65DFTY940
- il3aZhA8u788jZEPMXmt94u7uPZbEYp7V0jt68SrTaOgO7NaXsboXFjwEa42Ug5lB5d5/Qdp
- 1AITUv0NJ51kKwhHL1dEagGeloIsGVQILmpS0MLdtitBHqZLsnJkRvtMaxo47giyBlv2ewmq
- tIGTlVLxHx9xkc9aVepOuiGlZaZB72c9AvZs9rKaAjgU2UfJHlB/Hr4uSk/1EY0IgMv4vnsG
- 1sA5gvS7A4T4euu0PqHtn2sZEWDrk5RDbw0yIb53JYdXboLFmFXKzVASfKh2ZVeXRBlQQSJi
- 3PBR1GzzqORlfryby7mkY857xzCI2NkIkD2eq+HhzFTfFOTdGrkCDQRUynn8ARAAwbhP45BE
- d/zAMBPV2dk2WwIwKRSKULElP3kXpcuiDWYQob3UODUUqClO+3aXVRndaNmZX9WbzGYexVo3
- 5j+CVBCGr3DlU8AL9pp3KQ3SJihWcDed1LSmUf8tS+10d6mdGxDqgnd/OWU214isvhgWZtZG
- MM/Xj7cx5pERIiP+jqu7PT1cibcfcEKhPjYdyV1QnLtKNGrTg/UMKaL+qkWBUI/8uBoa0HLs
- NH63bXsRtNAG8w6qG7iiueYZUIXKc4IHINUguqYQJVdSe+u8b2N5XNhDSEUhdlqFYraJvX6d
- TjxMTW5lzVG2KjztfErRNSUmu2gezbw1/CV0ztniOKDA7mkQi6UIUDRh4LxRm5mflfKiCyDQ
- L6P/jxHBxFv+sIgjuLrfNhIC1p3z9rvCh+idAVJgtHtYl8p6GAVrF+4xQV2zZH45tgmHo2+S
- JsLPjXZtWVsWANpepXnesyabWtNAV4qQB7/SfC77zZwsVX0OOY2Qc+iohmXo8U7DgXVDgl/R
- /5Qgfnlv0/3rOdMt6ZPy5LJr8D9LJmcP0RvX98jyoBOf06Q9QtEwJsNLCOCo2LKNL71DNjZr
- nXEwjUH66CXiRXDbDKprt71BiSTitkFhGGU88XCtrp8R9yArXPf4MN+wNYBjfT7K29gWTzxt
- 9DYQIvEf69oZD5Z5qHYGp031E90AEQEAAYkCPAQYAQIAJgIbDBYhBPrrlxGhLPR1gS8Y8oip
- Bk0YNWHrBQJcXf3JBQkLVerNAAoJEIipBk0YNWHrU1AP/1FOK2SBGbyhHa5vDHuf47fgLipC
- e0/h1E0vdSonzlhPxuZoQ47FjzG9uOhqqQG6/PqtWs/FJIyz8aGG4aV+pSA/9Ko3/2ND8MSY
- ZflWs7Y8Peg08Ro01GTHFITjEUgHpTpHiT6TNcZB5aZNJ8jqCtW5UlqvXXbVeSTmO70ZiVtc
- vUJbpvSxYmzhFfZWaXIPcNcKWL1rnmnzs67lDhMLdkYVf91aml/XtyMUlfB8Iaejzud9Ht3r
- C0pA9MG57pLblX7okEshxAC0+tUdY2vANWFeX0mgqRt1GSuG9XM9H/cKP1czfUV/FgaWo/Ya
- fM4eMhUAlL/y+/AJxxumPhBXftM4yuiktp2JMezoIMJI9fmhjfWDw7+2jVrx9ze1joLakFD1
- rVAoHxVJ7ORfQ4Ni/qWbQm3T6qQkSMt4N/scNsMczibdTPxU7qtwQwIeFOOc3wEwmJ9Qe3ox
- TODQ0agXiWVj0OXYCHJ6MxTDswtyTGQW+nUHpKBgHGwUaR6d1kr/LK9+5LpOfRlK9VRfEu7D
- PGNiRkr8Abp8jHsrBqQWfUS1bAf62bq6XUel0kUCtb7qCq024aOczXYWPFpJFX+nhp4d7NeH
- Edq+wlC13sBSiSHC7T5yssJ+7JPa2ATLlSKhEvBsLe2TsSTTtFlA0nBclqhfJXzimiuge9qU
- E40lvMWBuQINBFTKimUBEADDbJ+pQ5M4QBMWkaWImRj7c598xIZ37oKM6rGaSnuB1SVb7YCr
- Ci2MTwQcrQscA2jm80O8VFqWk+/XsEp62dty47GVwSfdGje/3zv3VTH2KhOCKOq3oPP5ZXWY
- rz2d2WnTvx++o6lU7HLHDEC3NGLYNLkL1lyVxLhnhvcMxkf1EGA1DboEcMgnJrNB1pGP27ww
- cSfvdyPGseV+qZZa8kuViDga1oxmnYDxFKMGLxrClqHrRt8geQL1Wj5KFM5hFtGTK4da5lPn
- wGNd6/CINMeCT2AWZY5ySz7/tSZe5F22vPvVZGoPgQicYWdNc3ap7+7IKP86JNjmec/9RJcz
- jvrYjJdiqBVldXou72CtDydKVLVSKv8c2wBDJghYZitfYIaL8cTvQfUHRYTfo0n5KKSec8Vo
- vjDuxmdbOUBA+SkRxqmneP5OxGoZ92VusrwWCjry8HRsNdR+2T+ClDCO6Wpihu4V3CPkQwTy
- eCuMHPAT0ka5paTwLrnZIxsdfnjUa96T10vzmQgAxpbbiaLvgKJ8+76OPdDnhddyxd2ldYfw
- RkF5PEGg3mqZnYKNNBtwjvX49SAvgETQvLzQ8IKVgZS0m4z9qHHvtc1BsQnFfe+LJOFjzZr7
- CrDNJMqk1JTHYsSi2JcN3vY32WMezXSQ0TzeMK4kdnclSQyp/h23GWod5QARAQABiQRbBBgB
- AgAmAhsCFiEE+uuXEaEs9HWBLxjyiKkGTRg1YesFAlxd/coFCQtV2mQCKcFdIAQZAQIABgUC
- VMqKZQAKCRB974EGqvw5DiJoEACLmuiRq9ifvOh5DyBFwRS7gvA14DsGQngmC57EzV0EFcfM
- XVi1jX5OtwUyUe0Az5r6lHyyHDsDsIpLKBlWrYCeLpUhRR3oy181T7UNxvujGFeTkzvLAOo6
- Hs3b8Wv9ARg+7acRYkQRNY7k0GIJ6YZz149tRyRKAy/vSjsaB9Lt0NOd1wf2EQMKwRVELwJD
- y0AazGn+0PRP7Bua2YbtxaBmhBBDb2tPpwn8U9xdckB4Vlft9lcWNsC/18Gi9bpjd9FSbdH/
- sOUI+3ToWYENeoT4IP09wn6EkgWaJS3nAUN/MOycNej2i4Yhy2wDDSKyTAnVkSSSoXk+tK91
- HfqtokbDanB8daP+K5LgoiWHzjfWzsxA2jKisI4YCGjrYQzTyGOT6P6u6SEeoEx10865B/zc
- 8/vN50kncdjYz2naacIDEKQNZlnGLsGkpCbfmfdi3Zg4vuWKNdWr0wGUzDUcpqW0y/lUXna+
- 6uyQShX5e4JD2UPuf9WAQ9HtgSAkaDd4O1I2J41sleePzZOVB3DmYgy+ECRJJ5nw3ihdxpgc
- y/v3lfcJaqiyCv0PF+K/gSOvwhH7CbVqARmptT7yhhxqFdaYWo2Z2ksuKyoKSRMFCXQY5oac
- uTmyPIT4STFyUQFeqSCWDum/NFNoSKhmItw2Td+4VSJHShRVbg39KNFPZ7mXYAkQiKkGTRg1
- YesWJA/+PV3qDUtPNEGwjVvjQqHSbrBy94tu6gJvPHgGPtRDYvxnCaJsmgiC0pGB2KFRsnfl
- 2zBNBEWF/XwsI081jQE5UO60GKmHTputChLXpVobyuc+lroG2YhknXRBAV969SLnZR4BS/1s
- Gi046gOXfaKYatve8BiZr5it5Foq3FMPDNgZMit1H9Dk8rkKFfDMRf8EGS/Z+TmyEsIf99H7
- TH3n7lco8qO81fSFwkh4pvo2kWRFYTC5vsIVQ+GqVUp+W1DZJHxX8LwWuF1AzUt4MUTtNAvy
- TXl5EgsmoY9mpNNL7ZnW65oG63nEP5KNiybvuQJzXVxR8eqzOh2Mod4nHg3PE7UCd3DvLNsn
- GXFRo44WyT/G2lArBtjpkut7bDm0i1nENABy2UgS+1QvdmgNu6aEZxdNthwRjUhuuvCCDMA4
- rCDQYyakH2tJNQgkXkeLodBKF4bHiBbuwj0E39S9wmGgg+q4OTnAO/yhQGknle7a7G5xHBwE
- i0HjnLoJP5jDcoMTabZTIazXmJz3pKM11HYJ5/ZsTIf3ZRJJKIvXJpbmcAPVwTZII6XxiJdh
- RSSX4Mvd5pL/+5WI6NTdW6DMfigTtdd85fe6PwBNVJL2ZvBfsBJZ5rxg1TOH3KLsYBqBTgW2
- glQofxhkJhDEcvjLhe3Y2BlbCWKOmvM8XS9TRt0OwUs=
-Message-ID: <dc796293-93a9-4e36-8275-caea527aa98e@redhat.com>
-Date: Fri, 18 Oct 2019 17:18:54 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.0
-MIME-Version: 1.0
-In-Reply-To: <20191018211449.GR4084@habkost.net>
-Content-Type: text/plain; charset=utf-8
+ (envelope-from <casasfernando@outlook.com>) id 1iLZlN-00014B-K6
+ for qemu-devel@nongnu.org; Fri, 18 Oct 2019 17:26:23 -0400
+Received: from mail-oln040092071054.outbound.protection.outlook.com
+ ([40.92.71.54]:31028 helo=EUR03-DB5-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <casasfernando@outlook.com>)
+ id 1iLZlM-00012d-PO; Fri, 18 Oct 2019 17:26:21 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=maEx2Ri9CiINmNbTfr7M5tdtGZRFlIf/1WdT8JZcFb1Bg14IkbbvpmRvm+wGIpN8WLpVbpuBPB8v2hoeEf+kbFmVqZ4B2Yy4zINNaWkNrpm9O8LnCi0161Vu8nLh71GfntaY1dI+lLHN5Rx2ktlj/DmyotnqoZ8G/Z6hqBEDgNkIjDnPQd+Ve8Jlrr9TNuNgJcKsDkfYH3nG0s/6Cc6FqEAhgtq/FsE54sGyCjiysqReOJERR+HfjKskRxaaLL8KHjjASnXzP1K1ix2fDrh3x5d/CTLNs2j9SJCWO8QFGNxiwLCe5zN7ZJ8VXwBgyVxNnxFSEPVjtB6kt2tqjZW2TQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=cp8sCteAN0RR2zF80j+8JkBLsHL7cTihJmt0c85dclU=;
+ b=WH0m4dU4Z3LvXl0HJzqfdXPL3yJTP1aTJ1P6o7F+V4LgxOp8onyha641x6rdAITsJnb02Uc4ezOHYXASnlzyZRwa+dcBjQLZikd2/+kuR+WR9Ku95vMuIqsvp/oyRbMIRNLKPzziV09wBfBdRMpT7RZJ8OGzT5fKpWVUBbWoeZMmgQwakZAjJCM99iSgD9687pfmPbg8XEjR+TS9xLwLTd1V7aP8G3bcKBZeDG9zS3e97LNE5phhJ5UzC5nFws4QycF67s/RnatRCwNYtFdN+KQXx6yuowd90FPi52SNOlNoCmQ8lBmha+IvT58VYlp+LUQKOUeM8Q9m95lCbWmADg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
+ dkim=none; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=outlook.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=cp8sCteAN0RR2zF80j+8JkBLsHL7cTihJmt0c85dclU=;
+ b=SilpBNymZ98/ha/gPBJJIf2N/i0BCqCXrDNnT+GQxxw/BgvrBufsCJg8+XHisenUFC6FD93/oDHw/tvAq5QfnIKFkFG0dFQ0m6CO1sq9d4GXeHkd5gzisoc2wynGjAXcLN9Mvp1lN4SXtVkyY4hs+8vtLBs73nKnAdiajmLHra7ez6ORjDIaF68f6KGIb36y0belx7HsI3pIzNz7g1EoLTVfw2o3pY/ED2ewQ1lMK6NOVZnPGdlirB1yZWnMLbcAWajKVBMjpE19KpUM8sraIheXSGhTMlU9ctkyjXpSbo/WNdbCCTkoW53YB7D5CoJ5kMM7d3H/zCEiE2pAcDW5Mw==
+Received: from VE1EUR03FT026.eop-EUR03.prod.protection.outlook.com
+ (10.152.18.54) by VE1EUR03HT085.eop-EUR03.prod.protection.outlook.com
+ (10.152.19.53) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.20.2305.15; Fri, 18 Oct
+ 2019 21:26:16 +0000
+Received: from VI1PR03MB4814.eurprd03.prod.outlook.com (10.152.18.60) by
+ VE1EUR03FT026.mail.protection.outlook.com (10.152.18.148) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
+ 15.20.2305.15 via Frontend Transport; Fri, 18 Oct 2019 21:26:16 +0000
+Received: from VI1PR03MB4814.eurprd03.prod.outlook.com
+ ([fe80::a063:1748:6dae:1c75]) by VI1PR03MB4814.eurprd03.prod.outlook.com
+ ([fe80::a063:1748:6dae:1c75%6]) with mapi id 15.20.2347.026; Fri, 18 Oct 2019
+ 21:26:16 +0000
+From: =?iso-8859-1?Q?Fernando_Casas_Sch=F6ssow?= <casasfernando@outlook.com>
+To: QEMU Developers <qemu-devel@nongnu.org>, "qemu-block@nongnu.org"
+ <qemu-block@nongnu.org>
+Subject: qemu crashing when attaching an ISO file to a virtio-scsi CD-ROM
+ device through libvirt
+Thread-Topic: qemu crashing when attaching an ISO file to a virtio-scsi CD-ROM
+ device through libvirt
+Thread-Index: AQHVhfqst2hJzspceUeOPqO+fuJixA==
+Date: Fri, 18 Oct 2019 21:26:16 +0000
+Message-ID: <VI1PR03MB48149AFE8CC9A7B88F796844A46C0@VI1PR03MB4814.eurprd03.prod.outlook.com>
+Accept-Language: en-US
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.41]); Fri, 18 Oct 2019 21:18:56 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.132.183.28
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-clientproxiedby: MR2P264CA0020.FRAP264.PROD.OUTLOOK.COM
+ (2603:10a6:500:1::32) To VI1PR03MB4814.eurprd03.prod.outlook.com
+ (2603:10a6:803:b7::21)
+x-incomingtopheadermarker: OriginalChecksum:6702F896892B01793EACC1C2A7A5978BDFFD984E7E87AD9ADC2C709EE854B6C3;
+ UpperCasedChecksum:FC49EA8C20C96B1D09C5585F7434C07176F808B7FAC5528043B44767C0D5652A;
+ SizeAsReceived:7500; Count:48
+x-ms-exchange-messagesentrepresentingtype: 1
+x-mailer: pantheon-mail/1.0.8
+x-tmn: [JMTd4fTGc5hjDQeSA00iVMrDonMYh24BxxrkT0zDuY4=]
+x-microsoft-original-message-id: <1571433973.5255.0@smtp-mail.outlook.com>
+x-ms-publictraffictype: Email
+x-incomingheadercount: 48
+x-eopattributedmessage: 0
+x-ms-traffictypediagnostic: VE1EUR03HT085:
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: Y8c4w+u1O9WsKmYZumSpd01C+vuwiJ9lXxblw8NMB+EDdFyVJ9uarXrtRxWPwx43V3EmsLiVOtHPqUMbFNDslp0H/tGUcrIoOtjPkRN2IbMPtKIby4QBK/ivJTmGSbzWy2PJdR57GW6uZwpkXuOwgvV27g7yNEPkhdmZZpWswkqOTzma2jVWcf+tmdYrhqW0
+x-ms-exchange-transport-forked: True
+Content-Type: multipart/alternative;
+ boundary="_000_VI1PR03MB48149AFE8CC9A7B88F796844A46C0VI1PR03MB4814eurp_"
+MIME-Version: 1.0
+X-OriginatorOrg: outlook.com
+X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg: 00000000-0000-0000-0000-000000000000
+X-MS-Exchange-CrossTenant-Network-Message-Id: 4d0aa1f6-0fca-4fff-0f87-08d75411ceb3
+X-MS-Exchange-CrossTenant-rms-persistedconsumerorg: 00000000-0000-0000-0000-000000000000
+X-MS-Exchange-CrossTenant-originalarrivaltime: 18 Oct 2019 21:26:16.0909 (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Internet
+X-MS-Exchange-CrossTenant-id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: VE1EUR03HT085
+X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
+X-Received-From: 40.92.71.54
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -147,38 +118,210 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>,
- qemu-devel@nongnu.org, Cleber Rosa <crosa@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+--_000_VI1PR03MB48149AFE8CC9A7B88F796844A46C0VI1PR03MB4814eurp_
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
+
+Hi,
+
+Today while working with two different Windows Server 2012 R2 guests I foun=
+d that when I try to attach an ISO file to a SCSI CD-ROM device through lib=
+virt (virsh or virt-manager) while the guest is running, qemu crashes and t=
+he following message is logged:
+
+Assertion failed: blk_get_aio_context(d->conf.blk) =3D=3D s->ctx (/home/bui=
+ldozer/aports/main/qemu/src/qemu-4.0.0/hw/scsi/virtio-scsi.c: virtio_scsi_c=
+tx_check: 246)
+
+I can repro this at will. All I have to do is to try to attach an ISO file =
+to the SCSI CDROM while the guest is running.
+The SCSI controller model is virtio-scsi with iothread enabled.
+Please find below all the details about my setup that I considered relevant=
+ but I missed something please don't hesitate to let me know:
+
+Host arch: x86_64
+Distro: Alpine Linux 3.10.2
+qemu version: 4.0
+Linux kernel version: 4.19.67
+libvirt: 5.5.0
+Emulated SCSI controller: virtio-scsi (with iothread enabled)
+Guest firmware: OVMF-EFI
+Guest OS: Window Server 2012 R2
+Guest virtio drivers version: 171 (current stable)
+
+qemu command line:
+
+/usr/bin/qemu-system-x86_64 -name guest=3DDCHOMENET01,debug-threads=3Don -S=
+ -object secret,id=3DmasterKey0,format=3Draw,file=3D/var/lib/libvirt/qemu/d=
+omain-78-DCHOMENET01/master-key.aes -machine pc-i440fx-4.0,accel=3Dkvm,usb=
+=3Doff,dump-guest-core=3Don -cpu IvyBridge,ss=3Don,vmx=3Doff,pcid=3Don,hype=
+rvisor=3Don,arat=3Don,tsc_adjust=3Don,umip=3Don,xsaveopt=3Don,hv_time,hv_re=
+laxed,hv_vapic,hv_spinlocks=3D0x1fff -drive file=3D/usr/share/edk2.git/ovmf=
+-x64/OVMF_CODE-pure-efi.fd,if=3Dpflash,format=3Draw,unit=3D0,readonly=3Don =
+-drive file=3D/var/lib/libvirt/qemu/nvram/DCHOMENET01_VARS.fd,if=3Dpflash,f=
+ormat=3Draw,unit=3D1 -m 1536 -overcommit mem-lock=3Doff -smp 1,sockets=3D1,=
+cores=3D1,threads=3D1 -object iothread,id=3Diothread1 -uuid f06978ad-2734-4=
+4ab-a518-5dfcf71d625e -no-user-config -nodefaults -chardev socket,id=3Dchar=
+monitor,fd=3D33,server,nowait -mon chardev=3Dcharmonitor,id=3Dmonitor,mode=
+=3Dcontrol -rtc base=3Dlocaltime,driftfix=3Dslew -global kvm-pit.lost_tick_=
+policy=3Ddelay -no-hpet -no-shutdown -global PIIX4_PM.disable_s3=3D1 -globa=
+l PIIX4_PM.disable_s4=3D1 -boot strict=3Don -device qemu-xhci,id=3Dusb,bus=
+=3Dpci.0,addr=3D0x4 -device virtio-scsi-pci,iothread=3Diothread1,id=3Dscsi0=
+,num_queues=3D1,bus=3Dpci.0,addr=3D0x5 -device virtio-serial-pci,id=3Dvirti=
+o-serial0,bus=3Dpci.0,addr=3D0x6 -drive file=3D/storage/storage-hdd-vms/vir=
+tual_machines_hdd/dchomenet01.qcow2,format=3Dqcow2,if=3Dnone,id=3Ddrive-scs=
+i0-0-0-0,cache=3Dnone,discard=3Dunmap,aio=3Dthreads -device scsi-hd,bus=3Ds=
+csi0.0,channel=3D0,scsi-id=3D0,lun=3D0,device_id=3Ddrive-scsi0-0-0-0,drive=
+=3Ddrive-scsi0-0-0-0,id=3Dscsi0-0-0-0,bootindex=3D1,write-cache=3Don -drive=
+ if=3Dnone,id=3Ddrive-scsi0-0-0-1,readonly=3Don -device scsi-cd,bus=3Dscsi0=
+.0,channel=3D0,scsi-id=3D0,lun=3D1,device_id=3Ddrive-scsi0-0-0-1,drive=3Ddr=
+ive-scsi0-0-0-1,id=3Dscsi0-0-0-1 -netdev tap,fd=3D41,id=3Dhostnet0,vhost=3D=
+on,vhostfd=3D43 -device virtio-net-pci,netdev=3Dhostnet0,id=3Dnet0,mac=3D52=
+:54:00:99:b5:62,bus=3Dpci.0,addr=3D0x3 -chardev socket,id=3Dcharserial0,hos=
+t=3D127.0.0.1,port=3D4900,telnet,server,nowait -device isa-serial,chardev=
+=3Dcharserial0,id=3Dserial0 -chardev spicevmc,id=3Dcharchannel0,name=3Dvdag=
+ent -device virtserialport,bus=3Dvirtio-serial0.0,nr=3D1,chardev=3Dcharchan=
+nel0,id=3Dchannel0,name=3Dcom.redhat.spice.0 -chardev socket,id=3Dcharchann=
+el1,fd=3D45,server,nowait -device virtserialport,bus=3Dvirtio-serial0.0,nr=
+=3D2,chardev=3Dcharchannel1,id=3Dchannel1,name=3Dorg.qemu.guest_agent.0 -ch=
+ardev spiceport,id=3Dcharchannel2,name=3Dorg.spice-space.webdav.0 -device v=
+irtserialport,bus=3Dvirtio-serial0.0,nr=3D3,chardev=3Dcharchannel2,id=3Dcha=
+nnel2,name=3Dorg.spice-space.webdav.0 -device virtio-tablet-pci,id=3Dinput2=
+,bus=3Dpci.0,addr=3D0x7 -spice port=3D5900,addr=3D127.0.0.1,disable-ticketi=
+ng,seamless-migration=3Don -device qxl-vga,id=3Dvideo0,ram_size=3D67108864,=
+vram_size=3D67108864,vram64_size_mb=3D0,vgamem_mb=3D16,max_outputs=3D1,bus=
+=3Dpci.0,addr=3D0x2 -chardev spicevmc,id=3Dcharredir0,name=3Dusbredir -devi=
+ce usb-redir,chardev=3Dcharredir0,id=3Dredir0,bus=3Dusb.0,port=3D2 -chardev=
+ spicevmc,id=3Dcharredir1,name=3Dusbredir -device usb-redir,chardev=3Dcharr=
+edir1,id=3Dredir1,bus=3Dusb.0,port=3D3 -device virtio-balloon-pci,id=3Dball=
+oon0,bus=3Dpci.0,addr=3D0x8 -sandbox on,obsolete=3Ddeny,elevateprivileges=
+=3Ddeny,spawn=3Ddeny,resourcecontrol=3Ddeny -msg timestamp=3Don
+
+I can provide a core dump of the process if needed for debugging and the gu=
+est XML as well.
+
+Thanks.
+
+Fernando
 
 
-On 10/18/19 5:14 PM, Eduardo Habkost wrote:
-> On Fri, Oct 18, 2019 at 05:07:36PM -0400, John Snow wrote:
->>
->>
->> On 10/16/19 6:42 PM, Eduardo Habkost wrote:
->>> Python 3.5 is the oldest Python version available on our
->>> supported build platforms, and Python 2 end of life will be 3
->>> weeks after the planned release date of QEMU 4.2.0.  Drop Python
->>> 2 support from configure completely, and require Python 3.5 or
->>> newer.
->>>
->>
->> Which distributions constrain us to 3.5 right now? I know Debian9 is one
->> of them, but I'm not sure what others exist.
->>
->> I know I went through and checked a month ago, but I'm very smart and
->> didn't write it down.
->>
->> It might be nice to document (somewhere) so we know when we can require
->> something newer than 3.5 at the next major deprecation event.
-> 
-> I've summarized the release dates and Python version information I
-> could find here: https://wiki.qemu.org/Supported_Build_Platforms
-> 
 
-You are an ABSOLUTE CHAMPION. Thank you so much!
+--_000_VI1PR03MB48149AFE8CC9A7B88F796844A46C0VI1PR03MB4814eurp_
+Content-Type: text/html; charset="iso-8859-1"
+Content-ID: <95698BD07CC53F4DABED93AFDD7B71EB@eurprd03.prod.outlook.com>
+Content-Transfer-Encoding: quoted-printable
+
+<html>
+<head>
+<meta http-equiv=3D"Content-Type" content=3D"text/html; charset=3Diso-8859-=
+1">
+</head>
+<body>
+Hi,
+<div><br>
+</div>
+<div>Today while working with two different Windows Server 2012 R2 guests I=
+ found that when I try to attach an ISO file to a SCSI CD-ROM device throug=
+h libvirt (virsh or virt-manager) while the guest is running, qemu crashes =
+and the following message is logged:<br>
+<div><br>
+</div>
+<div>Assertion failed: blk_get_aio_context(d-&gt;conf.blk) =3D=3D s-&gt;ctx=
+ (/home/buildozer/aports/main/qemu/src/qemu-4.0.0/hw/scsi/virtio-scsi.c: vi=
+rtio_scsi_ctx_check: 246)</div>
+<div><br>
+</div>
+<div>I can repro this at will. All I have to do is to try to attach an ISO =
+file to the SCSI CDROM while the guest is running.</div>
+<div>The SCSI controller model is virtio-scsi with iothread enabled.</div>
+<div>Please find below all the details about my setup that I considered rel=
+evant but I missed something please don't hesitate to let me know:</div>
+<div><br>
+</div>
+<div>Host arch: x86_64</div>
+<div>Distro: Alpine Linux 3.10.2</div>
+<div>qemu version: 4.0</div>
+<div>Linux kernel version: 4.19.67</div>
+<div>libvirt: 5.5.0</div>
+<div>Emulated SCSI controller: virtio-scsi (with iothread enabled)</div>
+<div>Guest firmware: OVMF-EFI</div>
+<div>Guest OS: Window Server 2012 R2</div>
+<div>Guest virtio drivers version: 171 (current stable)</div>
+<div><br>
+</div>
+<div>qemu command line:</div>
+<div><br>
+</div>
+<div>/usr/bin/qemu-system-x86_64 -name guest=3DDCHOMENET01,debug-threads=3D=
+on -S -object secret,id=3DmasterKey0,format=3Draw,file=3D/var/lib/libvirt/q=
+emu/domain-78-DCHOMENET01/master-key.aes -machine pc-i440fx-4.0,accel=3Dkvm=
+,usb=3Doff,dump-guest-core=3Don -cpu IvyBridge,ss=3Don,vmx=3Doff,pcid=3Don,=
+hypervisor=3Don,arat=3Don,tsc_adjust=3Don,umip=3Don,xsaveopt=3Don,hv_time,h=
+v_relaxed,hv_vapic,hv_spinlocks=3D0x1fff
+ -drive file=3D/usr/share/edk2.git/ovmf-x64/OVMF_CODE-pure-efi.fd,if=3Dpfla=
+sh,format=3Draw,unit=3D0,readonly=3Don -drive file=3D/var/lib/libvirt/qemu/=
+nvram/DCHOMENET01_VARS.fd,if=3Dpflash,format=3Draw,unit=3D1 -m 1536 -overco=
+mmit mem-lock=3Doff -smp 1,sockets=3D1,cores=3D1,threads=3D1
+ -object iothread,id=3Diothread1 -uuid f06978ad-2734-44ab-a518-5dfcf71d625e=
+ -no-user-config -nodefaults -chardev socket,id=3Dcharmonitor,fd=3D33,serve=
+r,nowait -mon chardev=3Dcharmonitor,id=3Dmonitor,mode=3Dcontrol -rtc base=
+=3Dlocaltime,driftfix=3Dslew -global kvm-pit.lost_tick_policy=3Ddelay
+ -no-hpet -no-shutdown -global PIIX4_PM.disable_s3=3D1 -global PIIX4_PM.dis=
+able_s4=3D1 -boot strict=3Don -device qemu-xhci,id=3Dusb,bus=3Dpci.0,addr=
+=3D0x4 -device virtio-scsi-pci,iothread=3Diothread1,id=3Dscsi0,num_queues=
+=3D1,bus=3Dpci.0,addr=3D0x5 -device virtio-serial-pci,id=3Dvirtio-serial0,b=
+us=3Dpci.0,addr=3D0x6
+ -drive file=3D/storage/storage-hdd-vms/virtual_machines_hdd/dchomenet01.qc=
+ow2,format=3Dqcow2,if=3Dnone,id=3Ddrive-scsi0-0-0-0,cache=3Dnone,discard=3D=
+unmap,aio=3Dthreads -device scsi-hd,bus=3Dscsi0.0,channel=3D0,scsi-id=3D0,l=
+un=3D0,device_id=3Ddrive-scsi0-0-0-0,drive=3Ddrive-scsi0-0-0-0,id=3Dscsi0-0=
+-0-0,bootindex=3D1,write-cache=3Don
+ -drive if=3Dnone,id=3Ddrive-scsi0-0-0-1,readonly=3Don -device scsi-cd,bus=
+=3Dscsi0.0,channel=3D0,scsi-id=3D0,lun=3D1,device_id=3Ddrive-scsi0-0-0-1,dr=
+ive=3Ddrive-scsi0-0-0-1,id=3Dscsi0-0-0-1 -netdev tap,fd=3D41,id=3Dhostnet0,=
+vhost=3Don,vhostfd=3D43 -device virtio-net-pci,netdev=3Dhostnet0,id=3Dnet0,=
+mac=3D52:54:00:99:b5:62,bus=3Dpci.0,addr=3D0x3
+ -chardev socket,id=3Dcharserial0,host=3D127.0.0.1,port=3D4900,telnet,serve=
+r,nowait -device isa-serial,chardev=3Dcharserial0,id=3Dserial0 -chardev spi=
+cevmc,id=3Dcharchannel0,name=3Dvdagent -device virtserialport,bus=3Dvirtio-=
+serial0.0,nr=3D1,chardev=3Dcharchannel0,id=3Dchannel0,name=3Dcom.redhat.spi=
+ce.0
+ -chardev socket,id=3Dcharchannel1,fd=3D45,server,nowait -device virtserial=
+port,bus=3Dvirtio-serial0.0,nr=3D2,chardev=3Dcharchannel1,id=3Dchannel1,nam=
+e=3Dorg.qemu.guest_agent.0 -chardev spiceport,id=3Dcharchannel2,name=3Dorg.=
+spice-space.webdav.0 -device virtserialport,bus=3Dvirtio-serial0.0,nr=3D3,c=
+hardev=3Dcharchannel2,id=3Dchannel2,name=3Dorg.spice-space.webdav.0
+ -device virtio-tablet-pci,id=3Dinput2,bus=3Dpci.0,addr=3D0x7 -spice port=
+=3D5900,addr=3D127.0.0.1,disable-ticketing,seamless-migration=3Don -device =
+qxl-vga,id=3Dvideo0,ram_size=3D67108864,vram_size=3D67108864,vram64_size_mb=
+=3D0,vgamem_mb=3D16,max_outputs=3D1,bus=3Dpci.0,addr=3D0x2 -chardev
+ spicevmc,id=3Dcharredir0,name=3Dusbredir -device usb-redir,chardev=3Dcharr=
+edir0,id=3Dredir0,bus=3Dusb.0,port=3D2 -chardev spicevmc,id=3Dcharredir1,na=
+me=3Dusbredir -device usb-redir,chardev=3Dcharredir1,id=3Dredir1,bus=3Dusb.=
+0,port=3D3 -device virtio-balloon-pci,id=3Dballoon0,bus=3Dpci.0,addr=3D0x8
+ -sandbox on,obsolete=3Ddeny,elevateprivileges=3Ddeny,spawn=3Ddeny,resource=
+control=3Ddeny -msg timestamp=3Don</div>
+<div><br>
+</div>
+<div>I can provide a core dump of the process if needed for debugging and t=
+he guest XML as well.</div>
+<div><br>
+</div>
+<div>Thanks.</div>
+<div><br>
+</div>
+<div>Fernando</div>
+<div><br>
+</div>
+<div><br>
+</div>
+</div>
+</body>
+</html>
+
+--_000_VI1PR03MB48149AFE8CC9A7B88F796844A46C0VI1PR03MB4814eurp_--
 
