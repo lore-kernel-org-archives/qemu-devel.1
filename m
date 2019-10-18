@@ -6,53 +6,52 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 77506CA9EA1
-	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 07:57:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E343CA9EA1
+	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 07:58:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4DF5B222C6
-	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 07:57:56 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4DF5B222C6
+	by mail.kernel.org (Postfix) with ESMTPS id D8DD121897
+	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 07:58:33 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D8DD121897
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36126 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36140 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iLN91-0007V1-3E
-	for qemu-devel@archiver.kernel.org; Fri, 18 Oct 2019 03:57:55 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59512)
+	id 1iLN9c-0008Rx-Ew
+	for qemu-devel@archiver.kernel.org; Fri, 18 Oct 2019 03:58:32 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59499)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <armbru@redhat.com>) id 1iLMvQ-0000SQ-8Y
- for qemu-devel@nongnu.org; Fri, 18 Oct 2019 03:43:53 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1iLMvO-0007fX-Un
+ (envelope-from <armbru@redhat.com>) id 1iLMvP-0000RO-K0
  for qemu-devel@nongnu.org; Fri, 18 Oct 2019 03:43:52 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:36442)
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+ (envelope-from <armbru@redhat.com>) id 1iLMvO-0007fN-L0
+ for qemu-devel@nongnu.org; Fri, 18 Oct 2019 03:43:51 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:36438)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1iLMvO-0007f1-MY
+ (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1iLMvO-0007ev-Fd
  for qemu-devel@nongnu.org; Fri, 18 Oct 2019 03:43:50 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id E95033E2AF;
+ by mx1.redhat.com (Postfix) with ESMTPS id A179D3D965;
  Fri, 18 Oct 2019 07:43:49 +0000 (UTC)
 Received: from blackfin.pond.sub.org (unknown [10.36.118.123])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 12D1919C77;
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 1688410027A8;
  Fri, 18 Oct 2019 07:43:47 +0000 (UTC)
 Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 8565F1133034; Fri, 18 Oct 2019 09:43:45 +0200 (CEST)
+ id 888ED1132D6D; Fri, 18 Oct 2019 09:43:45 +0200 (CEST)
 From: Markus Armbruster <armbru@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 2/7] qapi: Store pragma state in QAPISourceInfo,
- not global state
-Date: Fri, 18 Oct 2019 09:43:40 +0200
-Message-Id: <20191018074345.24034-3-armbru@redhat.com>
+Subject: [PATCH v2 3/7] qapi: Eliminate accidental global frontend state
+Date: Fri, 18 Oct 2019 09:43:41 +0200
+Message-Id: <20191018074345.24034-4-armbru@redhat.com>
 In-Reply-To: <20191018074345.24034-1-armbru@redhat.com>
 References: <20191018074345.24034-1-armbru@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
  (mx1.redhat.com [10.5.110.30]); Fri, 18 Oct 2019 07:43:49 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
@@ -78,135 +77,38 @@ Sender: "Qemu-devel"
 The frontend can't be run more than once due to its global state.
 A future commit will want to do that.
 
-Recent commit "qapi: Move context-sensitive checking to the proper
-place" got rid of many global variables already, but pragma state is
-still stored in global variables (that's why a pragma directive's
-scope is the complete schema).
-
-Move the pragma state to QAPISourceInfo.
+The only global frontend state remaining is accidental:
+QAPISchemaParser.__init__()'s parameter previously_included=3D[].
+Python evaluates the default once, at definition time.  Any
+modifications to it are visible in subsequent calls.  Well-known
+Python trap.  Change the default to None and replace it by the real
+default in the function body.  Use the opportunity to convert
+previously_included to a set.
 
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
 ---
- scripts/qapi/common.py | 36 +++++++++++++++++++-----------------
- 1 file changed, 19 insertions(+), 17 deletions(-)
+ scripts/qapi/common.py | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
 diff --git a/scripts/qapi/common.py b/scripts/qapi/common.py
-index d6e00c80ea..5abab44302 100644
+index 5abab44302..9d5c05f6a1 100644
 --- a/scripts/qapi/common.py
 +++ b/scripts/qapi/common.py
-@@ -21,25 +21,28 @@ import string
- import sys
- from collections import OrderedDict
+@@ -391,8 +391,9 @@ class QAPIDoc(object):
 =20
--# Are documentation comments required?
--doc_required =3D False
--
--# Whitelist of commands allowed to return a non-dictionary
--returns_whitelist =3D []
--
--# Whitelist of entities allowed to violate case conventions
--name_case_whitelist =3D []
--
+ class QAPISchemaParser(object):
 =20
- #
- # Parsing the schema into expressions
- #
+-    def __init__(self, fname, previously_included=3D[], incl_info=3DNone=
+):
+-        previously_included.append(os.path.abspath(fname))
++    def __init__(self, fname, previously_included=3DNone, incl_info=3DNo=
+ne):
++        previously_included =3D previously_included or set()
++        previously_included.add(os.path.abspath(fname))
 =20
-+
-+class QAPISchemaPragma(object):
-+    def __init__(self):
-+        # Are documentation comments required?
-+        self.doc_required =3D False
-+        # Whitelist of commands allowed to return a non-dictionary
-+        self.returns_whitelist =3D []
-+        # Whitelist of entities allowed to violate case conventions
-+        self.name_case_whitelist =3D []
-+
-+
- class QAPISourceInfo(object):
-     def __init__(self, fname, line, parent):
-         self.fname =3D fname
-         self.line =3D line
-         self.parent =3D parent
-+        self.pragma =3D parent.pragma if parent else QAPISchemaPragma()
-         self.defn_meta =3D None
-         self.defn_name =3D None
-=20
-@@ -486,26 +489,25 @@ class QAPISchemaParser(object):
-         return QAPISchemaParser(incl_fname, previously_included, info)
-=20
-     def _pragma(self, name, value, info):
--        global doc_required, returns_whitelist, name_case_whitelist
-         if name =3D=3D 'doc-required':
-             if not isinstance(value, bool):
-                 raise QAPISemError(info,
-                                    "pragma 'doc-required' must be boolea=
-n")
--            doc_required =3D value
-+            info.pragma.doc_required =3D value
-         elif name =3D=3D 'returns-whitelist':
-             if (not isinstance(value, list)
-                     or any([not isinstance(elt, str) for elt in value]))=
-:
-                 raise QAPISemError(
-                     info,
-                     "pragma returns-whitelist must be a list of strings"=
-)
--            returns_whitelist =3D value
-+            info.pragma.returns_whitelist =3D value
-         elif name =3D=3D 'name-case-whitelist':
-             if (not isinstance(value, list)
-                     or any([not isinstance(elt, str) for elt in value]))=
-:
-                 raise QAPISemError(
-                     info,
-                     "pragma name-case-whitelist must be a list of string=
-s")
--            name_case_whitelist =3D value
-+            info.pragma.name_case_whitelist =3D value
-         else:
-             raise QAPISemError(info, "unknown pragma '%s'" % name)
-=20
-@@ -757,7 +759,7 @@ def check_type(value, info, source,
-         raise QAPISemError(info,
-                            "%s should be an object or type name" % sourc=
-e)
-=20
--    permit_upper =3D allow_dict in name_case_whitelist
-+    permit_upper =3D allow_dict in info.pragma.name_case_whitelist
-=20
-     # value is a dictionary, check that each member is okay
-     for (key, arg) in value.items():
-@@ -840,7 +842,7 @@ def check_enum(expr, info):
-     if prefix is not None and not isinstance(prefix, str):
-         raise QAPISemError(info, "'prefix' must be a string")
-=20
--    permit_upper =3D name in name_case_whitelist
-+    permit_upper =3D name in info.pragma.name_case_whitelist
-=20
-     for member in members:
-         source =3D "'data' member"
-@@ -968,7 +970,7 @@ def check_exprs(exprs):
-                 raise QAPISemError(
-                     info, "documentation comment is for '%s'" % doc.symb=
-ol)
-             doc.check_expr(expr)
--        elif doc_required:
-+        elif info.pragma.doc_required:
-             raise QAPISemError(info,
-                                "documentation comment required")
-=20
-@@ -1690,7 +1692,7 @@ class QAPISchemaCommand(QAPISchemaEntity):
-         if self._ret_type_name:
-             self.ret_type =3D schema.resolve_type(
-                 self._ret_type_name, self.info, "command's 'returns'")
--            if self.name not in returns_whitelist:
-+            if self.name not in self.info.pragma.returns_whitelist:
-                 if not (isinstance(self.ret_type, QAPISchemaObjectType)
-                         or (isinstance(self.ret_type, QAPISchemaArrayTyp=
-e)
-                             and isinstance(self.ret_type.element_type,
+         try:
+             if sys.version_info[0] >=3D 3:
 --=20
 2.21.0
 
