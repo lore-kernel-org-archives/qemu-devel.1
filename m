@@ -2,53 +2,55 @@ Return-Path: <SRS0=ht5U=YL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 48571CA9EC8
-	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 00:52:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 38363CA9EC8
+	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 00:53:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2305921852
-	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 00:52:22 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2305921852
+	by mail.kernel.org (Postfix) with ESMTPS id 0D63E21852
+	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 00:53:59 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0D63E21852
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34438 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34450 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iLGVB-00083g-C2
-	for qemu-devel@archiver.kernel.org; Thu, 17 Oct 2019 20:52:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49238)
+	id 1iLGWk-0001RF-6b
+	for qemu-devel@archiver.kernel.org; Thu, 17 Oct 2019 20:53:58 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49303)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richardw.yang@linux.intel.com>) id 1iLGSJ-0004Pv-2s
- for qemu-devel@nongnu.org; Thu, 17 Oct 2019 20:49:24 -0400
+ (envelope-from <richardw.yang@linux.intel.com>) id 1iLGSN-0004TW-5v
+ for qemu-devel@nongnu.org; Thu, 17 Oct 2019 20:49:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richardw.yang@linux.intel.com>) id 1iLGSI-000177-4U
- for qemu-devel@nongnu.org; Thu, 17 Oct 2019 20:49:23 -0400
-Received: from mga06.intel.com ([134.134.136.31]:15619)
+ (envelope-from <richardw.yang@linux.intel.com>) id 1iLGSL-0001C4-RF
+ for qemu-devel@nongnu.org; Thu, 17 Oct 2019 20:49:27 -0400
+Received: from mga06.intel.com ([134.134.136.31]:15620)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <richardw.yang@linux.intel.com>)
- id 1iLGSH-0000zO-TP
- for qemu-devel@nongnu.org; Thu, 17 Oct 2019 20:49:22 -0400
+ id 1iLGSL-00010g-Jt
+ for qemu-devel@nongnu.org; Thu, 17 Oct 2019 20:49:25 -0400
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from orsmga003.jf.intel.com ([10.7.209.27])
  by orsmga104.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
- 17 Oct 2019 17:49:14 -0700
+ 17 Oct 2019 17:49:25 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.67,309,1566889200"; d="scan'208";a="199552611"
+X-IronPort-AV: E=Sophos;i="5.67,309,1566889200"; d="scan'208";a="199552647"
 Received: from richard.sh.intel.com (HELO localhost) ([10.239.159.54])
- by orsmga003.jf.intel.com with ESMTP; 17 Oct 2019 17:49:13 -0700
+ by orsmga003.jf.intel.com with ESMTP; 17 Oct 2019 17:49:24 -0700
 From: Wei Yang <richardw.yang@linux.intel.com>
 To: quintela@redhat.com,
 	dgilbert@redhat.com
-Subject: [PATCH 0/6] migration/postcopy: enable compress during postcopy
-Date: Fri, 18 Oct 2019 08:48:44 +0800
-Message-Id: <20191018004850.9888-1-richardw.yang@linux.intel.com>
+Subject: [PATCH 6/6] migration/postcopy: enable compress during postcopy
+Date: Fri, 18 Oct 2019 08:48:50 +0800
+Message-Id: <20191018004850.9888-7-richardw.yang@linux.intel.com>
 X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20191018004850.9888-1-richardw.yang@linux.intel.com>
+References: <20191018004850.9888-1-richardw.yang@linux.intel.com>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
 X-Received-From: 134.134.136.31
@@ -68,11 +70,9 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This patch set tries enable compress during postcopy.
-
-postcopy requires to place a whole host page, while migration thread migrate
-memory in target page size. This makes postcopy need to collect all target
-pages in one host page before placing via userfaultfd.
+postcopy requires to place a whole host page, while migration thread
+migrate memory in target page size. This makes postcopy need to collect
+all target pages in one host page before placing via userfaultfd.
 
 To enable compress during postcopy, there are two problems to solve:
 
@@ -80,31 +80,108 @@ To enable compress during postcopy, there are two problems to solve:
     2. Target pages in one host page arrives without interrupt by target
        page from other host page
 
-The first one is handled by counting the number of target pages arrived
-instead of the last target page arrived.
+The first one is handled by previous cleanup patch.
 
-The second one is handled by:
+This patch handles the second one by:
 
     1. Flush compress thread for each host page
     2. Wait for decompress thread for before placing host page
 
-With the combination of these two changes, compress is enabled during
-postcopy.
+Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
+---
+ migration/migration.c | 11 -----------
+ migration/ram.c       | 28 +++++++++++++++++++++++++++-
+ 2 files changed, 27 insertions(+), 12 deletions(-)
 
-Wei Yang (6):
-  migration/postcopy: reduce memset when it is zero page and
-    matches_target_page_size
-  migration/postcopy: wait for decompress thread in precopy
-  migration/postcopy: count target page number to decide the
-    place_needed
-  migration/postcopy: set all_zero to true on the first target page
-  migration/postcopy: enable random order target page arrival
-  migration/postcopy: enable compress during postcopy
-
- migration/migration.c | 11 --------
- migration/ram.c       | 65 ++++++++++++++++++++++++++++++-------------
- 2 files changed, 45 insertions(+), 31 deletions(-)
-
+diff --git a/migration/migration.c b/migration/migration.c
+index 3febd0f8f3..72e53e2249 100644
+--- a/migration/migration.c
++++ b/migration/migration.c
+@@ -1000,17 +1000,6 @@ static bool migrate_caps_check(bool *cap_list,
+ #endif
+ 
+     if (cap_list[MIGRATION_CAPABILITY_POSTCOPY_RAM]) {
+-        if (cap_list[MIGRATION_CAPABILITY_COMPRESS]) {
+-            /* The decompression threads asynchronously write into RAM
+-             * rather than use the atomic copies needed to avoid
+-             * userfaulting.  It should be possible to fix the decompression
+-             * threads for compatibility in future.
+-             */
+-            error_setg(errp, "Postcopy is not currently compatible "
+-                       "with compression");
+-            return false;
+-        }
+-
+         /* This check is reasonably expensive, so only when it's being
+          * set the first time, also it's only the destination that needs
+          * special support.
+diff --git a/migration/ram.c b/migration/ram.c
+index da0596411c..1403978d75 100644
+--- a/migration/ram.c
++++ b/migration/ram.c
+@@ -3449,6 +3449,14 @@ static int ram_save_iterate(QEMUFile *f, void *opaque)
+ 
+             rs->target_page_count += pages;
+ 
++            /*
++             * During postcopy, it is necessary to make sure one whole host
++             * page is sent in one chunk.
++             */
++            if (migrate_postcopy_ram()) {
++                flush_compressed_data(rs);
++            }
++
+             /*
+              * we want to check in the 1st loop, just in case it was the 1st
+              * time and we had to sync the dirty bitmap.
+@@ -4025,6 +4033,7 @@ static int ram_load_postcopy(QEMUFile *f)
+         void *place_source = NULL;
+         RAMBlock *block = NULL;
+         uint8_t ch;
++        int len;
+ 
+         addr = qemu_get_be64(f);
+ 
+@@ -4042,7 +4051,8 @@ static int ram_load_postcopy(QEMUFile *f)
+ 
+         trace_ram_load_postcopy_loop((uint64_t)addr, flags);
+         place_needed = false;
+-        if (flags & (RAM_SAVE_FLAG_ZERO | RAM_SAVE_FLAG_PAGE)) {
++        if (flags & (RAM_SAVE_FLAG_ZERO | RAM_SAVE_FLAG_PAGE |
++                     RAM_SAVE_FLAG_COMPRESS_PAGE)) {
+             block = ram_block_from_stream(f, flags);
+ 
+             host = host_from_ram_block_offset(block, addr);
+@@ -4114,6 +4124,17 @@ static int ram_load_postcopy(QEMUFile *f)
+                                          TARGET_PAGE_SIZE);
+             }
+             break;
++        case RAM_SAVE_FLAG_COMPRESS_PAGE:
++            all_zero = false;
++            len = qemu_get_be32(f);
++            if (len < 0 || len > compressBound(TARGET_PAGE_SIZE)) {
++                error_report("Invalid compressed data length: %d", len);
++                ret = -EINVAL;
++                break;
++            }
++            decompress_data_with_multi_threads(f, page_buffer, len);
++            break;
++
+         case RAM_SAVE_FLAG_EOS:
+             /* normal exit */
+             multifd_recv_sync_main();
+@@ -4125,6 +4146,11 @@ static int ram_load_postcopy(QEMUFile *f)
+             break;
+         }
+ 
++        /* Got the whole host page, wait for decompress before placing. */
++        if (place_needed) {
++            ret |= wait_for_decompress_done();
++        }
++
+         /* Detect for any possible file errors */
+         if (!ret && qemu_file_get_error(f)) {
+             ret = qemu_file_get_error(f);
 -- 
 2.17.1
 
