@@ -2,63 +2,89 @@ Return-Path: <SRS0=ht5U=YL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D74B5CA9EA1
-	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 08:42:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 51CBBCA9EA1
+	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 08:43:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AE1C9222BD
-	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 08:42:22 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AE1C9222BD
+	by mail.kernel.org (Postfix) with ESMTPS id 2B849222BD
+	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 08:43:34 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2B849222BD
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36702 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36724 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iLNq1-0001nG-Qa
-	for qemu-devel@archiver.kernel.org; Fri, 18 Oct 2019 04:42:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40812)
+	id 1iLNrB-0003RH-BV
+	for qemu-devel@archiver.kernel.org; Fri, 18 Oct 2019 04:43:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40965)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <cohuck@redhat.com>) id 1iLNp8-0000kg-9k
- for qemu-devel@nongnu.org; Fri, 18 Oct 2019 04:41:27 -0400
+ (envelope-from <mreitz@redhat.com>) id 1iLNqL-0002eh-41
+ for qemu-devel@nongnu.org; Fri, 18 Oct 2019 04:42:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <cohuck@redhat.com>) id 1iLNp6-0006ar-IU
- for qemu-devel@nongnu.org; Fri, 18 Oct 2019 04:41:25 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47748)
+ (envelope-from <mreitz@redhat.com>) id 1iLNqJ-00073x-N0
+ for qemu-devel@nongnu.org; Fri, 18 Oct 2019 04:42:41 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:51410)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <cohuck@redhat.com>)
- id 1iLNp6-0006a0-A3; Fri, 18 Oct 2019 04:41:24 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>)
+ id 1iLNqG-00072q-IL; Fri, 18 Oct 2019 04:42:36 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id DC0B9307B19B;
- Fri, 18 Oct 2019 08:41:22 +0000 (UTC)
-Received: from gondolin (dhcp-192-202.str.redhat.com [10.33.192.202])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 321631001B0B;
- Fri, 18 Oct 2019 08:41:19 +0000 (UTC)
-Date: Fri, 18 Oct 2019 10:41:16 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-To: Thomas Huth <thuth@redhat.com>
-Subject: Re: [PATCH] hw/s390x: Emit a warning if user tried to enable USB
-Message-ID: <20191018104116.341e0cd0.cohuck@redhat.com>
-In-Reply-To: <620c3bfe-2163-6bb4-cdc9-689dcd74dcac@redhat.com>
-References: <20191017142123.1236-1-thuth@redhat.com>
- <20191017163402.43437191.cohuck@redhat.com>
- <2e689f2b-9bed-e40e-c761-6f38efaae635@redhat.com>
- <181d44b3-3333-91a3-0003-d312e8ab4805@redhat.com>
- <620c3bfe-2163-6bb4-cdc9-689dcd74dcac@redhat.com>
-Organization: Red Hat GmbH
+ by mx1.redhat.com (Postfix) with ESMTPS id ACD7E189F45F;
+ Fri, 18 Oct 2019 08:42:35 +0000 (UTC)
+Received: from dresden.str.redhat.com (unknown [10.36.118.46])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 9E9A35C57A;
+ Fri, 18 Oct 2019 08:42:33 +0000 (UTC)
+Subject: Re: iotest failure -- test possibly not using sufficiently unique
+ temp filename?
+To: Thomas Huth <thuth@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
+References: <CAFEAcA8fwM03PXzkMvLdOWAL0R1Mq8hLmt8O-+NFSri6oHun1w@mail.gmail.com>
+ <010553d9-9dc6-907f-fc74-4cd5614f4a0e@redhat.com>
+ <CAFEAcA89CTV2jfv5chWH3fdCFS55CqMjqQ4MwFGwFumaqig6RA@mail.gmail.com>
+ <22502e83-f630-f9a6-8099-2373a52c6873@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <95fd1227-e733-92b1-787b-7682b0f4d1cc@redhat.com>
+Date: Fri, 18 Oct 2019 10:42:30 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.45]); Fri, 18 Oct 2019 08:41:22 +0000 (UTC)
+In-Reply-To: <22502e83-f630-f9a6-8099-2373a52c6873@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="FLBey3zd0mPOYvQ6H4Ud9qp7U8Jw4aQWL"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.70]); Fri, 18 Oct 2019 08:42:35 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 209.132.183.28
@@ -73,100 +99,181 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Halil Pasic <pasic@linux.ibm.com>,
- Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org,
- Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <philmd@redhat.com>,
- qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>,
+ Qemu-block <qemu-block@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, 18 Oct 2019 08:35:17 +0200
-Thomas Huth <thuth@redhat.com> wrote:
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--FLBey3zd0mPOYvQ6H4Ud9qp7U8Jw4aQWL
+Content-Type: multipart/mixed; boundary="JL1PkhFnOFx150SJPrl8D6huTklbv3n2H"
 
-> On 17/10/2019 20.18, Philippe Mathieu-Daud=C3=A9 wrote:
-> > On 10/17/19 4:40 PM, Thomas Huth wrote: =20
-> >> On 17/10/2019 16.34, Cornelia Huck wrote: =20
-> >>> On Thu, 17 Oct 2019 16:21:23 +0200
-> >>> Thomas Huth <thuth@redhat.com> wrote:
-> >>> =20
-> >>>> There is no USB on s390x, so running qemu-system-s390x with
-> >>>> "-machine ...,usb=3Don" is certainly wrong. Emit a warning to make
-> >>>> the users aware of their misconfiguration.
-> >>>>
-> >>>> Signed-off-by: Thomas Huth <thuth@redhat.com>
-> >>>> ---
-> >>>> =C2=A0 After a year or two, we could finally turn this into a hard e=
-rror,
-> >>>> =C2=A0 but I think we should give the users some time to fix their c=
-ommand
-> >>>> =C2=A0 lines first, so I'm initially only emitting a warning here.
-> >>>>
-> >>>> =C2=A0 hw/s390x/s390-virtio-ccw.c | 4 ++++
-> >>>> =C2=A0 1 file changed, 4 insertions(+)
-> >>>>
-> >>>> diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
-> >>>> index d3edeef0ad..af8c4c0daf 100644
-> >>>> --- a/hw/s390x/s390-virtio-ccw.c
-> >>>> +++ b/hw/s390x/s390-virtio-ccw.c
-> >>>> @@ -243,6 +243,10 @@ static void ccw_init(MachineState *machine)
-> >>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 VirtualCssBus *css_bus;
-> >>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 DeviceState *dev;
-> >>>> =C2=A0 +=C2=A0=C2=A0=C2=A0 if (machine->usb) {
-> >>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 warn_report("This machin=
-e does not support USB"); =20
-> >>>
-> >>> I'm wondering if this is the only machine type not supporting usb...
-> >>> if not, how are others handling it? =20
-> >>
-> >> I think most machines are silently ignoring it, like we did on s390x
-> >> until now, too.
-> >> =20
-> >>> The usb parsing code in machine.c does not care if usb is even
-> >>> configured (CONFIG_USB). =20
-> >>
-> >> machine.c is common code, so you can not use CONFIG_USB there. =20
-> >=20
-> > We already have:
-> >=20
-> > bool target_words_bigendian(void)
-> > {
-> > #if defined(TARGET_WORDS_BIGENDIAN)
-> > =C2=A0=C2=A0=C2=A0 return true;
-> > #else
-> > =C2=A0=C2=A0=C2=A0 return false;
-> > #endif
-> > } =20
->=20
-> ... and kvm_available() and xen_available() ...
->=20
-> > diff --git a/hw/usb/machine.c b/hw/usb/machine.c
-> > new file mode 100644
-> > index 0000000000..5381928479
-> > --- /dev/null
-> > +++ b/hw/usb/machine.c
-> > @@ -0,0 +1,12 @@
-> > +#include "qemu/osdep.h"
-> > +#include "hw/boards.h"
-> > +#include "config-devices.h"
-> > +
-> > +bool machine_has_usb(void)
-> > +{
-> > +#if defined(CONFIG_USB)
-> > +=C2=A0=C2=A0=C2=A0 return true;
-> > +#else
-> > +=C2=A0=C2=A0=C2=A0 return false;
-> > +#endif
-> > +} =20
->=20
-> I think I'd rather call it usb_available() (like the other _available()
-> functions) and put it into arch_init.c (and rename that file to arch.c
-> or target.c or something like that).
+--JL1PkhFnOFx150SJPrl8D6huTklbv3n2H
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
-I like 'usb_available()'.
+On 18.10.19 08:20, Thomas Huth wrote:
+> On 17/10/2019 18.41, Peter Maydell wrote:
+>> On Fri, 27 Sep 2019 at 17:44, Max Reitz <mreitz@redhat.com> wrote:
+>>>
+>>> On 27.09.19 18:39, Peter Maydell wrote:
+>>>> Hi; I just saw this iotest failure (on an s390x box, as it happens):=
 
-Maybe we should also warn for igd_passthru if not xen_available()? Not
-sure how helpful that is, though. Even if we warn and put it in the
-deprecation notes, I'm not sure how much we'd gain if we were to make
-it an actual error.
+>>>>
+>>>>   TEST    iotest-qcow2: 130 [fail]
+>>>> QEMU          --
+>>>> "/home/linux1/qemu/build/all/tests/qemu-iotests/../../s390x-softmmu/=
+qemu-system-s390x"
+>>>> -nodefaults -display none -machine accel=3Dqtest
+>>>> QEMU_IMG      -- "/home/linux1/qemu/build/all/tests/qemu-iotests/../=
+=2E./qemu-img"
+>>>> QEMU_IO       --
+>>>> "/home/linux1/qemu/build/all/tests/qemu-iotests/../../qemu-io"
+>>>> --cache writeback -f qcow2
+>>>> QEMU_NBD      -- "/home/linux1/qemu/build/all/tests/qemu-iotests/../=
+=2E./qemu-nbd"
+>>>> IMGFMT        -- qcow2 (compat=3D1.1)
+>>>> IMGPROTO      -- file
+>>>> PLATFORM      -- Linux/s390x lxub05 4.15.0-58-generic
+>>>> TEST_DIR      -- /home/linux1/qemu/build/all/tests/qemu-iotests/scra=
+tch
+>>>> SOCKET_SCM_HELPER --
+>>>> /home/linux1/qemu/build/all/tests/qemu-iotests/socket_scm_helper
+>>>>
+>>>> --- /home/linux1/qemu/tests/qemu-iotests/130.out        2019-05-10
+>>>> 12:27:16.948075733 -0400
+>>>> +++ /home/linux1/qemu/build/all/tests/qemu-iotests/130.out.bad
+>>>> 2019-09-27 12:01:23.649722655 -0400
+>>>> @@ -18,20 +18,22 @@
+>>>>  QEMU X.Y.Z monitor - type 'help' for more information
+>>>>  (qemu) commit testdisk
+>>>>  (qemu)
+>>>> -image: TEST_DIR/t.IMGFMT
+>>>> -file format: IMGFMT
+>>>> -virtual size: 64 MiB (67108864 bytes)
+>>>> -backing file: TEST_DIR/t.IMGFMT.orig
+>>>> -backing file format: raw
+>>>> +qemu-img: Could not open 'TEST_DIR/t.IMGFMT': Failed to get shared =
+"write" lock
+>>>> +Is another process using the image [TEST_DIR/t.IMGFMT]?
+>>>>
+>>>>  =3D=3D=3D Marking image dirty (lazy refcounts) =3D=3D=3D
+>>>>
+>>>> +qemu-img: TEST_DIR/t.IMGFMT: Failed to get "write" lock
+>>>> +Is another process using the image [TEST_DIR/t.IMGFMT]?
+>>>>  Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D67108864
+>>>> -wrote 4096/4096 bytes at offset 0
+>>>> -4 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+>>>> +qemu-io: can't open device
+>>>> /home/linux1/qemu/build/all/tests/qemu-iotests/scratch/t.qcow2: Fail=
+ed
+>>>> to get "write" lock
+>>>> +Is another process using the image
+>>>> [/home/linux1/qemu/build/all/tests/qemu-iotests/scratch/t.qcow2]?
+>>>> +no file open, try 'help open'
+>>>>  image: TEST_DIR/t.IMGFMT
+>>>>  file format: IMGFMT
+>>>>  virtual size: 64 MiB (67108864 bytes)
+>>>> +backing file: TEST_DIR/t.IMGFMT.orig
+>>>> +backing file format: raw
+>>>>  Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D67108864
+>>>> backing_file=3DTEST_DIR/t.IMGFMT.orig backing_fmt=3Draw
+>>>>  wrote 4096/4096 bytes at offset 0
+>>>>  4 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+>>>>
+>>>>
+>>>>
+>>>> This looks suspiciously like the test isn't using a unique
+>>>> filename for its disk image: "qemu-iotests/scratch/t.qcow2"
+>>>> in the build directory, and so perhaps it has collided with
+>>>> another iotest ?
+>>>>
+>>>> If we run 'make check' with a -j<something> option do the
+>>>> iotests all get run serially anyway, or do they run in
+>>>> parallel against each other ?
+>>>
+>>> As far as I know, all iotests are executed serially.  Anything else
+>>> would not work with the same scratch directory.
+>>>
+>>> The only thing I suspect is that some tool has been accidentally left=
+
+>>> running by some previous test that still accesses its own image.  But=
+ I
+>>> don=E2=80=99t know.
+>>
+>> Just saw this one again with the same iotest 130 on the same
+>> s390 box; only difference is that the log this time around
+>> has the first part where qemu-img fails, but not the second part
+>> where qemu-io fails:
+>>
+>> --- /home/linux1/qemu/tests/qemu-iotests/130.out        2019-05-10
+>> 12:27:16.948075733 -0400
+>> +++ /home/linux1/qemu/build/all/tests/qemu-iotests/130.out.bad
+>> 2019-10-17 11:56:43.450750873 -0400
+>> @@ -18,11 +18,8 @@
+>>  QEMU X.Y.Z monitor - type 'help' for more information
+>>  (qemu) commit testdisk
+>>  (qemu)
+>> -image: TEST_DIR/t.IMGFMT
+>> -file format: IMGFMT
+>> -virtual size: 64 MiB (67108864 bytes)
+>> -backing file: TEST_DIR/t.IMGFMT.orig
+>> -backing file format: raw
+>> +qemu-img: Could not open 'TEST_DIR/t.IMGFMT': Failed to get shared "w=
+rite" lock
+>> +Is another process using the image [TEST_DIR/t.IMGFMT]?
+>>
+>>  =3D=3D=3D Marking image dirty (lazy refcounts) =3D=3D=3D
+>>
+>> On the host machine there don't seem to be any stray
+>> processes which might have held the file open, and
+>> indeed the file doesn't exist at all, so it got removed
+>> by some cleanup or other.
+>=20
+> Ok, so unless someone has a clue what might be going on here (is there =
+a
+> race in the test?), I'd suggest that we simply remove 130 from the auto=
+
+> group again. Shall I send a patch?
+
+I don=E2=80=99t have much of an idea.  It looks like maybe the qemu proce=
+ss
+(which dos the commit) is lingering, but that shouldn=E2=80=99t be becaus=
+e
+_cleanup_qemu always waits for it.  (Also, I can=E2=80=99t reproduce the =
+problem
+on my system.)
+
+The only hunch that I have is that 130 seems to be the only test that
+uses _cleanup_qemu to kill a qemu process (i.e. without wait=3D1) while i=
+t
+has taken locks on an image and then still uses the image afterwards.
+Maybe making it quit qemu through HMP would fix the problem.  But
+knowing is difficult because I can=E2=80=99t reproduce it.
+
+Max
+
+
+--JL1PkhFnOFx150SJPrl8D6huTklbv3n2H--
+
+--FLBey3zd0mPOYvQ6H4Ud9qp7U8Jw4aQWL
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl2pevcACgkQ9AfbAGHV
+z0A7HAf/fQGGjPW3yC0S3KIn+wEzlBO87yfQqTNQPX0K6BwfyjNRFoCyG91jcV2S
+ENMjh8fNwMPeJOLFjeAJmCKWux7BtuyrCf06lqlE7478ekNZtPpX1W/YhtWTuLjY
+k8RJnxjWbU4ZNKbfFKJ6FUU/HYb0hD/Ccv0OswrFB3HVfLXNuGNABA7YGiz6DtOG
+lDv6agQGPoaHvu6iosRP+GbP6NmD/1lm/zOI9vkQh/aBM2krUH/V1+xi6MMbyKT/
+uA+KSG68O1v3jx0XzEpXySMui52eoXEm7K20EZKLmvIvQ3vjfDOD1ZeuRtYhmSmE
+vbtD1KOew8BmgMbLev7xuiMArkISmg==
+=9rh1
+-----END PGP SIGNATURE-----
+
+--FLBey3zd0mPOYvQ6H4Ud9qp7U8Jw4aQWL--
 
