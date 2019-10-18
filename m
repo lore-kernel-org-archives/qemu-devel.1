@@ -6,55 +6,55 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8BE51CA9EA0
-	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 07:56:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 77506CA9EA1
+	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 07:57:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6574521897
-	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 07:56:56 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6574521897
+	by mail.kernel.org (Postfix) with ESMTPS id 4DF5B222C6
+	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 07:57:56 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4DF5B222C6
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36118 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36126 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iLN82-0006Sb-Tp
-	for qemu-devel@archiver.kernel.org; Fri, 18 Oct 2019 03:56:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59541)
+	id 1iLN91-0007V1-3E
+	for qemu-devel@archiver.kernel.org; Fri, 18 Oct 2019 03:57:55 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59512)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <armbru@redhat.com>) id 1iLMvR-0000Uu-Qn
- for qemu-devel@nongnu.org; Fri, 18 Oct 2019 03:43:55 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1iLMvQ-0007gq-Cw
+ (envelope-from <armbru@redhat.com>) id 1iLMvQ-0000SQ-8Y
  for qemu-devel@nongnu.org; Fri, 18 Oct 2019 03:43:53 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:55854)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1iLMvQ-0007g8-42
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+ (envelope-from <armbru@redhat.com>) id 1iLMvO-0007fX-Un
  for qemu-devel@nongnu.org; Fri, 18 Oct 2019 03:43:52 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+Received: from mx1.redhat.com ([209.132.183.28]:36442)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1iLMvO-0007f1-MY
+ for qemu-devel@nongnu.org; Fri, 18 Oct 2019 03:43:50 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 5440018CB916;
- Fri, 18 Oct 2019 07:43:51 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id E95033E2AF;
+ Fri, 18 Oct 2019 07:43:49 +0000 (UTC)
 Received: from blackfin.pond.sub.org (unknown [10.36.118.123])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id EBD085D9CC;
- Fri, 18 Oct 2019 07:43:50 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 12D1919C77;
+ Fri, 18 Oct 2019 07:43:47 +0000 (UTC)
 Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 942FC1132A0B; Fri, 18 Oct 2019 09:43:45 +0200 (CEST)
+ id 8565F1133034; Fri, 18 Oct 2019 09:43:45 +0200 (CEST)
 From: Markus Armbruster <armbru@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 5/7] qapi: Move gen_enum(),
- gen_enum_lookup() back to qapi/types.py
-Date: Fri, 18 Oct 2019 09:43:43 +0200
-Message-Id: <20191018074345.24034-6-armbru@redhat.com>
+Subject: [PATCH v2 2/7] qapi: Store pragma state in QAPISourceInfo,
+ not global state
+Date: Fri, 18 Oct 2019 09:43:40 +0200
+Message-Id: <20191018074345.24034-3-armbru@redhat.com>
 In-Reply-To: <20191018074345.24034-1-armbru@redhat.com>
 References: <20191018074345.24034-1-armbru@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.63]); Fri, 18 Oct 2019 07:43:51 +0000 (UTC)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.30]); Fri, 18 Oct 2019 07:43:49 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
@@ -75,182 +75,138 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The next commit will split up qapi/common.py.  gen_enum() needs
-QAPISchemaEnumMember, and that's in the way.  Move it to qapi/types.py
-along with its buddy gen_enum_lookup().
+The frontend can't be run more than once due to its global state.
+A future commit will want to do that.
 
-Permit me a short a digression on history: how did gen_enum() end up
-in qapi/common.py?  Commit 21cd70dfc1 "qapi script: add event support"
-duplicated qapi-types.py's gen_enum() and gen_enum_lookup() in
-qapi-event.py.  Simply importing them would have been cleaner, but
-wasn't possible as qapi-types.py was a program, not a module.  Commit
-efd2eaa6c2 "qapi: De-duplicate enum code generation" de-duplicated by
-moving them to qapi.py, which was a module.
+Recent commit "qapi: Move context-sensitive checking to the proper
+place" got rid of many global variables already, but pragma state is
+still stored in global variables (that's why a pragma directive's
+scope is the complete schema).
 
-Since then, program qapi-types.py has morphed into module types.py.
-It's where gen_enum() and gen_enum_lookup() started, and where they
-belong.
+Move the pragma state to QAPISourceInfo.
 
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
 ---
- scripts/qapi/common.py | 59 ------------------------------------------
- scripts/qapi/events.py |  1 +
- scripts/qapi/types.py  | 59 ++++++++++++++++++++++++++++++++++++++++++
- 3 files changed, 60 insertions(+), 59 deletions(-)
+ scripts/qapi/common.py | 36 +++++++++++++++++++-----------------
+ 1 file changed, 19 insertions(+), 17 deletions(-)
 
 diff --git a/scripts/qapi/common.py b/scripts/qapi/common.py
-index 9d5c05f6a1..306857f0c0 100644
+index d6e00c80ea..5abab44302 100644
 --- a/scripts/qapi/common.py
 +++ b/scripts/qapi/common.py
-@@ -2239,65 +2239,6 @@ def _wrap_ifcond(ifcond, before, after):
-     return out
+@@ -21,25 +21,28 @@ import string
+ import sys
+ from collections import OrderedDict
 =20
+-# Are documentation comments required?
+-doc_required =3D False
+-
+-# Whitelist of commands allowed to return a non-dictionary
+-returns_whitelist =3D []
+-
+-# Whitelist of entities allowed to violate case conventions
+-name_case_whitelist =3D []
+-
 =20
--def gen_enum_lookup(name, members, prefix=3DNone):
--    ret =3D mcgen('''
--
--const QEnumLookup %(c_name)s_lookup =3D {
--    .array =3D (const char *const[]) {
--''',
--                c_name=3Dc_name(name))
--    for m in members:
--        ret +=3D gen_if(m.ifcond)
--        index =3D c_enum_const(name, m.name, prefix)
--        ret +=3D mcgen('''
--        [%(index)s] =3D "%(name)s",
--''',
--                     index=3Dindex, name=3Dm.name)
--        ret +=3D gen_endif(m.ifcond)
--
--    ret +=3D mcgen('''
--    },
--    .size =3D %(max_index)s
--};
--''',
--                 max_index=3Dc_enum_const(name, '_MAX', prefix))
--    return ret
--
--
--def gen_enum(name, members, prefix=3DNone):
--    # append automatically generated _MAX value
--    enum_members =3D members + [QAPISchemaEnumMember('_MAX', None)]
--
--    ret =3D mcgen('''
--
--typedef enum %(c_name)s {
--''',
--                c_name=3Dc_name(name))
--
--    for m in enum_members:
--        ret +=3D gen_if(m.ifcond)
--        ret +=3D mcgen('''
--    %(c_enum)s,
--''',
--                     c_enum=3Dc_enum_const(name, m.name, prefix))
--        ret +=3D gen_endif(m.ifcond)
--
--    ret +=3D mcgen('''
--} %(c_name)s;
--''',
--                 c_name=3Dc_name(name))
--
--    ret +=3D mcgen('''
--
--#define %(c_name)s_str(val) \\
--    qapi_enum_lookup(&%(c_name)s_lookup, (val))
--
--extern const QEnumLookup %(c_name)s_lookup;
--''',
--                 c_name=3Dc_name(name))
--    return ret
--
--
- def build_params(arg_type, boxed, extra=3DNone):
-     ret =3D ''
-     sep =3D ''
-diff --git a/scripts/qapi/events.py b/scripts/qapi/events.py
-index 7308e8e589..a716a1d27f 100644
---- a/scripts/qapi/events.py
-+++ b/scripts/qapi/events.py
-@@ -13,6 +13,7 @@ See the COPYING file in the top-level directory.
- """
+ #
+ # Parsing the schema into expressions
+ #
 =20
- from qapi.common import *
-+from qapi.types import gen_enum, gen_enum_lookup
++
++class QAPISchemaPragma(object):
++    def __init__(self):
++        # Are documentation comments required?
++        self.doc_required =3D False
++        # Whitelist of commands allowed to return a non-dictionary
++        self.returns_whitelist =3D []
++        # Whitelist of entities allowed to violate case conventions
++        self.name_case_whitelist =3D []
++
++
+ class QAPISourceInfo(object):
+     def __init__(self, fname, line, parent):
+         self.fname =3D fname
+         self.line =3D line
+         self.parent =3D parent
++        self.pragma =3D parent.pragma if parent else QAPISchemaPragma()
+         self.defn_meta =3D None
+         self.defn_name =3D None
 =20
+@@ -486,26 +489,25 @@ class QAPISchemaParser(object):
+         return QAPISchemaParser(incl_fname, previously_included, info)
 =20
- def build_event_send_proto(name, arg_type, boxed):
-diff --git a/scripts/qapi/types.py b/scripts/qapi/types.py
-index 3edd9374aa..711543147d 100644
---- a/scripts/qapi/types.py
-+++ b/scripts/qapi/types.py
-@@ -21,6 +21,65 @@ from qapi.common import *
- objects_seen =3D set()
+     def _pragma(self, name, value, info):
+-        global doc_required, returns_whitelist, name_case_whitelist
+         if name =3D=3D 'doc-required':
+             if not isinstance(value, bool):
+                 raise QAPISemError(info,
+                                    "pragma 'doc-required' must be boolea=
+n")
+-            doc_required =3D value
++            info.pragma.doc_required =3D value
+         elif name =3D=3D 'returns-whitelist':
+             if (not isinstance(value, list)
+                     or any([not isinstance(elt, str) for elt in value]))=
+:
+                 raise QAPISemError(
+                     info,
+                     "pragma returns-whitelist must be a list of strings"=
+)
+-            returns_whitelist =3D value
++            info.pragma.returns_whitelist =3D value
+         elif name =3D=3D 'name-case-whitelist':
+             if (not isinstance(value, list)
+                     or any([not isinstance(elt, str) for elt in value]))=
+:
+                 raise QAPISemError(
+                     info,
+                     "pragma name-case-whitelist must be a list of string=
+s")
+-            name_case_whitelist =3D value
++            info.pragma.name_case_whitelist =3D value
+         else:
+             raise QAPISemError(info, "unknown pragma '%s'" % name)
 =20
+@@ -757,7 +759,7 @@ def check_type(value, info, source,
+         raise QAPISemError(info,
+                            "%s should be an object or type name" % sourc=
+e)
 =20
-+def gen_enum_lookup(name, members, prefix=3DNone):
-+    ret =3D mcgen('''
-+
-+const QEnumLookup %(c_name)s_lookup =3D {
-+    .array =3D (const char *const[]) {
-+''',
-+                c_name=3Dc_name(name))
-+    for m in members:
-+        ret +=3D gen_if(m.ifcond)
-+        index =3D c_enum_const(name, m.name, prefix)
-+        ret +=3D mcgen('''
-+        [%(index)s] =3D "%(name)s",
-+''',
-+                     index=3Dindex, name=3Dm.name)
-+        ret +=3D gen_endif(m.ifcond)
-+
-+    ret +=3D mcgen('''
-+    },
-+    .size =3D %(max_index)s
-+};
-+''',
-+                 max_index=3Dc_enum_const(name, '_MAX', prefix))
-+    return ret
-+
-+
-+def gen_enum(name, members, prefix=3DNone):
-+    # append automatically generated _MAX value
-+    enum_members =3D members + [QAPISchemaEnumMember('_MAX', None)]
-+
-+    ret =3D mcgen('''
-+
-+typedef enum %(c_name)s {
-+''',
-+                c_name=3Dc_name(name))
-+
-+    for m in enum_members:
-+        ret +=3D gen_if(m.ifcond)
-+        ret +=3D mcgen('''
-+    %(c_enum)s,
-+''',
-+                     c_enum=3Dc_enum_const(name, m.name, prefix))
-+        ret +=3D gen_endif(m.ifcond)
-+
-+    ret +=3D mcgen('''
-+} %(c_name)s;
-+''',
-+                 c_name=3Dc_name(name))
-+
-+    ret +=3D mcgen('''
-+
-+#define %(c_name)s_str(val) \\
-+    qapi_enum_lookup(&%(c_name)s_lookup, (val))
-+
-+extern const QEnumLookup %(c_name)s_lookup;
-+''',
-+                 c_name=3Dc_name(name))
-+    return ret
-+
-+
- def gen_fwd_object_or_array(name):
-     return mcgen('''
+-    permit_upper =3D allow_dict in name_case_whitelist
++    permit_upper =3D allow_dict in info.pragma.name_case_whitelist
 =20
+     # value is a dictionary, check that each member is okay
+     for (key, arg) in value.items():
+@@ -840,7 +842,7 @@ def check_enum(expr, info):
+     if prefix is not None and not isinstance(prefix, str):
+         raise QAPISemError(info, "'prefix' must be a string")
+=20
+-    permit_upper =3D name in name_case_whitelist
++    permit_upper =3D name in info.pragma.name_case_whitelist
+=20
+     for member in members:
+         source =3D "'data' member"
+@@ -968,7 +970,7 @@ def check_exprs(exprs):
+                 raise QAPISemError(
+                     info, "documentation comment is for '%s'" % doc.symb=
+ol)
+             doc.check_expr(expr)
+-        elif doc_required:
++        elif info.pragma.doc_required:
+             raise QAPISemError(info,
+                                "documentation comment required")
+=20
+@@ -1690,7 +1692,7 @@ class QAPISchemaCommand(QAPISchemaEntity):
+         if self._ret_type_name:
+             self.ret_type =3D schema.resolve_type(
+                 self._ret_type_name, self.info, "command's 'returns'")
+-            if self.name not in returns_whitelist:
++            if self.name not in self.info.pragma.returns_whitelist:
+                 if not (isinstance(self.ret_type, QAPISchemaObjectType)
+                         or (isinstance(self.ret_type, QAPISchemaArrayTyp=
+e)
+                             and isinstance(self.ret_type.element_type,
 --=20
 2.21.0
 
