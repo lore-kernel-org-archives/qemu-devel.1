@@ -3,56 +3,56 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E1CAACA9EA1
-	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 14:06:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DF352CA9EA0
+	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 14:07:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A6EA021925
-	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 14:06:55 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A6EA021925
+	by mail.kernel.org (Postfix) with ESMTPS id B4EC521925
+	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 14:07:35 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B4EC521925
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40570 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40578 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iLSu6-0007j3-C1
-	for qemu-devel@archiver.kernel.org; Fri, 18 Oct 2019 10:06:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55446)
+	id 1iLSuk-0000WH-Lr
+	for qemu-devel@archiver.kernel.org; Fri, 18 Oct 2019 10:07:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55224)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1iLSfS-0007IR-Jw
- for qemu-devel@nongnu.org; Fri, 18 Oct 2019 09:51:47 -0400
+ (envelope-from <philmd@redhat.com>) id 1iLSeB-0005ka-FJ
+ for qemu-devel@nongnu.org; Fri, 18 Oct 2019 09:50:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1iLSfR-00078p-B8
- for qemu-devel@nongnu.org; Fri, 18 Oct 2019 09:51:46 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:1776)
+ (envelope-from <philmd@redhat.com>) id 1iLSeA-0006cp-3H
+ for qemu-devel@nongnu.org; Fri, 18 Oct 2019 09:50:27 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40472)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iLSfR-00078R-2f
- for qemu-devel@nongnu.org; Fri, 18 Oct 2019 09:51:45 -0400
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iLSe9-0006cW-RJ
+ for qemu-devel@nongnu.org; Fri, 18 Oct 2019 09:50:26 -0400
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
  [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 3CB12307D986;
- Fri, 18 Oct 2019 13:51:44 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id F15B518CB91A;
+ Fri, 18 Oct 2019 13:50:24 +0000 (UTC)
 Received: from x1w.redhat.com (unknown [10.40.205.74])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 2B09C60BF1;
- Fri, 18 Oct 2019 13:51:33 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id E7B3D60BF1;
+ Fri, 18 Oct 2019 13:50:19 +0000 (UTC)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 20/20] hw/pci-host/i440fx: Remove the last PIIX3 traces
-Date: Fri, 18 Oct 2019 15:47:54 +0200
-Message-Id: <20191018134754.16362-21-philmd@redhat.com>
+Subject: [PATCH v2 13/20] hw/pci-host/piix: Extract piix3_create()
+Date: Fri, 18 Oct 2019 15:47:47 +0200
+Message-Id: <20191018134754.16362-14-philmd@redhat.com>
 In-Reply-To: <20191018134754.16362-1-philmd@redhat.com>
 References: <20191018134754.16362-1-philmd@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.48]); Fri, 18 Oct 2019 13:51:44 +0000 (UTC)
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.63]); Fri, 18 Oct 2019 13:50:25 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
@@ -83,103 +83,87 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The PIIX3 is not tied to the i440FX and can even be used without it.
-Move its creation to the machine code (pc_piix.c).
-We have now removed the last trace of southbridge code in the i440FX
-northbridge.
+Extract the PIIX3 creation code from the i440fx_init() function.
 
+Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 ---
- hw/i386/pc_piix.c            | 8 +++++++-
- hw/pci-host/i440fx.c         | 8 --------
- include/hw/pci-host/i440fx.h | 3 +--
- 3 files changed, 8 insertions(+), 11 deletions(-)
+ hw/pci-host/piix.c | 51 ++++++++++++++++++++++++++++------------------
+ 1 file changed, 31 insertions(+), 20 deletions(-)
 
-diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
-index 11b8de049f..f6e7196a82 100644
---- a/hw/i386/pc_piix.c
-+++ b/hw/i386/pc_piix.c
-@@ -199,14 +199,20 @@ static void pc_init1(MachineState *machine,
+diff --git a/hw/pci-host/piix.c b/hw/pci-host/piix.c
+index 2f4cbcbfe9..3292703de7 100644
+--- a/hw/pci-host/piix.c
++++ b/hw/pci-host/piix.c
+@@ -331,6 +331,36 @@ static void i440fx_realize(PCIDevice *dev, Error **e=
+rrp)
      }
+ }
 =20
-     if (pcmc->pci_enabled) {
-+        PIIX3State *piix3;
++static PIIX3State *piix3_create(PCIBus *pci_bus, ISABus **isa_bus)
++{
++    PIIX3State *piix3;
++    PCIDevice *pci_dev;
 +
-         pci_bus =3D i440fx_init(host_type,
-                               pci_type,
--                              &i440fx_state, &piix3_devfn, &isa_bus, pcm=
-s->gsi,
-+                              &i440fx_state,
-                               system_memory, system_io, machine->ram_siz=
-e,
-                               pcms->below_4g_mem_size,
-                               pcms->above_4g_mem_size,
-                               pci_memory, ram_memory);
-         pcms->bus =3D pci_bus;
++    /*
++     * Xen supports additional interrupt routes from the PCI devices to
++     * the IOAPIC: the four pins of each PCI device on the bus are also
++     * connected to the IOAPIC directly.
++     * These additional routes can be discovered through ACPI.
++     */
++    if (xen_enabled()) {
++        pci_dev =3D pci_create_simple_multifunction(pci_bus, -1, true,
++                                                  TYPE_PIIX3_XEN_DEVICE)=
+;
++        piix3 =3D PIIX3_PCI_DEVICE(pci_dev);
++        pci_bus_irqs(pci_bus, xen_piix3_set_irq, xen_pci_slot_get_pirq,
++                     piix3, XEN_PIIX_NUM_PIRQS);
++    } else {
++        pci_dev =3D pci_create_simple_multifunction(pci_bus, -1, true,
++                                                  TYPE_PIIX3_DEVICE);
++        piix3 =3D PIIX3_PCI_DEVICE(pci_dev);
++        pci_bus_irqs(pci_bus, piix3_set_irq, pci_slot_get_pirq,
++                     piix3, PIIX_NUM_PIRQS);
++        pci_bus_set_route_irq_fn(pci_bus, piix3_route_intx_pin_to_irq);
++    }
++    *isa_bus =3D ISA_BUS(qdev_get_child_bus(DEVICE(piix3), "isa.0"));
 +
-+        piix3 =3D piix3_create(pci_bus, &isa_bus);
-+        piix3->pic =3D pcms->gsi;
-+        piix3_devfn =3D piix3->dev.devfn;
-     } else {
-         pci_bus =3D NULL;
-         i440fx_state =3D NULL;
-diff --git a/hw/pci-host/i440fx.c b/hw/pci-host/i440fx.c
-index 79ecd58a2b..f27131102d 100644
---- a/hw/pci-host/i440fx.c
-+++ b/hw/pci-host/i440fx.c
-@@ -27,7 +27,6 @@
- #include "hw/pci/pci.h"
- #include "hw/pci/pci_host.h"
- #include "hw/pci-host/i440fx.h"
--#include "hw/southbridge/piix.h"
- #include "hw/qdev-properties.h"
- #include "hw/sysbus.h"
- #include "qapi/error.h"
-@@ -272,8 +271,6 @@ static void i440fx_realize(PCIDevice *dev, Error **er=
-rp)
-=20
++    return piix3;
++}
++
  PCIBus *i440fx_init(const char *host_type, const char *pci_type,
                      PCII440FXState **pi440fx_state,
--                    int *piix3_devfn,
--                    ISABus **isa_bus, qemu_irq *pic,
-                     MemoryRegion *address_space_mem,
-                     MemoryRegion *address_space_io,
-                     ram_addr_t ram_size,
-@@ -286,7 +283,6 @@ PCIBus *i440fx_init(const char *host_type, const char=
- *pci_type,
-     PCIBus *b;
-     PCIDevice *d;
-     PCIHostState *s;
--    PIIX3State *piix3;
-     PCII440FXState *f;
-     unsigned i;
-     I440FXState *i440fx;
-@@ -339,10 +335,6 @@ PCIBus *i440fx_init(const char *host_type, const cha=
+                     int *piix3_devfn,
+@@ -400,27 +430,8 @@ PCIBus *i440fx_init(const char *host_type, const cha=
 r *pci_type,
                   PAM_EXPAN_SIZE);
      }
 =20
--    piix3 =3D piix3_create(b, isa_bus);
--    piix3->pic =3D pic;
--    *piix3_devfn =3D piix3->dev.devfn;
+-    /* Xen supports additional interrupt routes from the PCI devices to
+-     * the IOAPIC: the four pins of each PCI device on the bus are also
+-     * connected to the IOAPIC directly.
+-     * These additional routes can be discovered through ACPI. */
+-    if (xen_enabled()) {
+-        PCIDevice *pci_dev =3D pci_create_simple_multifunction(b,
+-                             -1, true, TYPE_PIIX3_XEN_DEVICE);
+-        piix3 =3D PIIX3_PCI_DEVICE(pci_dev);
+-        pci_bus_irqs(b, xen_piix3_set_irq, xen_pci_slot_get_pirq,
+-                piix3, XEN_PIIX_NUM_PIRQS);
+-    } else {
+-        PCIDevice *pci_dev =3D pci_create_simple_multifunction(b,
+-                             -1, true, TYPE_PIIX3_DEVICE);
+-        piix3 =3D PIIX3_PCI_DEVICE(pci_dev);
+-        pci_bus_irqs(b, piix3_set_irq, pci_slot_get_pirq, piix3,
+-                PIIX_NUM_PIRQS);
+-        pci_bus_set_route_irq_fn(b, piix3_route_intx_pin_to_irq);
+-    }
++    piix3 =3D piix3_create(b, isa_bus);
+     piix3->pic =3D pic;
+-    *isa_bus =3D ISA_BUS(qdev_get_child_bus(DEVICE(piix3), "isa.0"));
 -
-     ram_size =3D ram_size / 8 / 1024 / 1024;
-     if (ram_size > 255) {
-         ram_size =3D 255;
-diff --git a/include/hw/pci-host/i440fx.h b/include/hw/pci-host/i440fx.h
-index e327f9bf87..f54e6466e4 100644
---- a/include/hw/pci-host/i440fx.h
-+++ b/include/hw/pci-host/i440fx.h
-@@ -22,8 +22,7 @@ typedef struct PCII440FXState PCII440FXState;
- #define TYPE_IGD_PASSTHROUGH_I440FX_PCI_DEVICE "igd-passthrough-i440FX"
+     *piix3_devfn =3D piix3->dev.devfn;
 =20
- PCIBus *i440fx_init(const char *host_type, const char *pci_type,
--                    PCII440FXState **pi440fx_state, int *piix_devfn,
--                    ISABus **isa_bus, qemu_irq *pic,
-+                    PCII440FXState **pi440fx_state,
-                     MemoryRegion *address_space_mem,
-                     MemoryRegion *address_space_io,
-                     ram_addr_t ram_size,
+     ram_size =3D ram_size / 8 / 1024 / 1024;
 --=20
 2.21.0
 
