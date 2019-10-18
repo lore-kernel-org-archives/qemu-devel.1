@@ -7,74 +7,73 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BD247CA9EA9
-	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 18:09:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8817CCA9EA0
+	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 18:09:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9058520869
-	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 18:09:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 57843222C2
+	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 18:09:36 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="vSIDsLNq"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9058520869
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="X5gHWOT2"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 57843222C2
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44678 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44682 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iLWgj-0007V9-Pz
-	for qemu-devel@archiver.kernel.org; Fri, 18 Oct 2019 14:09:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59571)
+	id 1iLWgw-0007bU-C5
+	for qemu-devel@archiver.kernel.org; Fri, 18 Oct 2019 14:09:35 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59297)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1iLWJE-0006zr-5M
- for qemu-devel@nongnu.org; Fri, 18 Oct 2019 13:45:06 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1iLWIy-0006bk-IG
+ for qemu-devel@nongnu.org; Fri, 18 Oct 2019 13:44:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1iLWJC-0005hx-Uo
- for qemu-devel@nongnu.org; Fri, 18 Oct 2019 13:45:03 -0400
-Received: from mail-pf1-x441.google.com ([2607:f8b0:4864:20::441]:45361)
+ (envelope-from <richard.henderson@linaro.org>) id 1iLWIx-0005UM-CI
+ for qemu-devel@nongnu.org; Fri, 18 Oct 2019 13:44:48 -0400
+Received: from mail-pg1-x542.google.com ([2607:f8b0:4864:20::542]:44718)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1iLWJC-0005hQ-NR
- for qemu-devel@nongnu.org; Fri, 18 Oct 2019 13:45:02 -0400
-Received: by mail-pf1-x441.google.com with SMTP id y72so4303689pfb.12
- for <qemu-devel@nongnu.org>; Fri, 18 Oct 2019 10:45:02 -0700 (PDT)
+ id 1iLWIx-0005Td-6g
+ for qemu-devel@nongnu.org; Fri, 18 Oct 2019 13:44:47 -0400
+Received: by mail-pg1-x542.google.com with SMTP id e10so3741485pgd.11
+ for <qemu-devel@nongnu.org>; Fri, 18 Oct 2019 10:44:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=xYzA79nlkAAXT+tYBTRBvIlOCILLFnnuEHFTBSl+bu8=;
- b=vSIDsLNqsnrQQPJVv21MsXEaz4hVN60xT3imyizOIAuCOBHlxzIpfVSEN7ngciqPVv
- HCRNpEGWxcfpAC30lbz6eEB94vkXTh/Bzeg+sIPc039kJeTPyPRcZKngAujNtbIaHMuw
- Xex2OQfPcj8wyGm21ub2exiE7HoeZ3mDNUuzceF+sm+Qbhn/SiJvbDhTGlutN85l7KiE
- 8DPYmi75i9pXbnqMF2WhnzipDr2fOnDriz4518pbZ310JKLW3Crao8XBtqbT+hwDu35u
- i1GphTsBa2aDA8fPOMONO66ombvkYAdmVTC+Sjpo7cJVYIoiRpvffZmbaCRgNjmzytB0
- JF7w==
+ bh=HNW+DKXClNFoWE5mAVnYOdmYoSifNB4F8oskeNBuM9U=;
+ b=X5gHWOT202VQRwzSmAviUtQdEEfz1DuVcXPtMUdkmFhvtmwVqWeZSSA6EuKgHx/ig7
+ IJPgcibeDPYPIfNviQe+aAwrVhmFYPXtVClBAy6yke4pVKHCBywOAzqCKLyLsEpbrRLZ
+ aZ1pnVwGs1fMSLkP9yxe3rAjbIFEKeaTZy2bHj/6czbhpHCj1Eiqkqg2uwypAuII58jA
+ sCWh9rBZiZc7XWufeR3G0fq4cG77JJk9ycnKofn2OVs/RVUzS6uXZeT0jd8NRS3MuJx/
+ kKki63c8PKpmdPc8fHfzVfpxdQh7LHh6MupU11Ba1Un3ltW5wkgFa3ZqZUldEH+SaQVi
+ wC3A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=xYzA79nlkAAXT+tYBTRBvIlOCILLFnnuEHFTBSl+bu8=;
- b=MbRoz7R0laPnVo/k40jSVTvE4W1m2cqnRgzsWqwwECc8smD+TM7qyZFGe39UIrhLkg
- pwQcYhPcJ5aUeUwmaU4tZL3y4XnDsWWUbSHmMe0e+FBWU8o7siEhFsAm5p9mpwiqR+3g
- OJxD7KTffrETQK1fIgM/wOvYS8i/TSAW0MwrRKxCplEJTnoz9lNg94O5VLK3EpJ39BTi
- 9Lswo/Y1OHSL1HoIU6LZUhQyOht1pRWjFYP1fkfFVH4ZUFF2KHLCQspeOoKaysWch/W5
- dcPU1sPPrFyZSCJzbOuxAhiNAMTchexucynghM7Il5Tr2Y0YSXu8mFUydoJODfVEHYRl
- Fx1g==
-X-Gm-Message-State: APjAAAWZdIYoqHh/WVtnwMLWzLRL6XIEgrLz27Wg4yUbxHRXD4LhWbbb
- ptAmsDLDv8gBsOtpP2uvtyN6w6YqlxI=
-X-Google-Smtp-Source: APXvYqynyLdcscgIG5Yxy2j2jsrMtHtCcKuyvCnVHwQu3YvRskmWbfiqLGfUNkoZA46dpHbYk4oUBQ==
-X-Received: by 2002:a65:5a81:: with SMTP id c1mr11210178pgt.245.1571420700036; 
- Fri, 18 Oct 2019 10:45:00 -0700 (PDT)
+ bh=HNW+DKXClNFoWE5mAVnYOdmYoSifNB4F8oskeNBuM9U=;
+ b=uM+MNuz9uAuSigx135mI2x/ftGePpiMmC7YEeW3kqhjBZfEZGt9Xe1mQvicavfgHHt
+ xgm7kLGOOLgqfx8cYcFzikAHIq2OysCZTtfi55I9HZ2m/0PE/onIukD5ghQRVOoTmRq6
+ Yq78fmeRFsLvDWh6TmFQH1M8+xpieBq/P+Gl9qRKuq5QUf+BypQMrMrs2MjOKwr2a62v
+ LhrX9+o5QPIknbN37dCHZ9wY2+AULPPclnr2G7Sv4+aw4nBySheuKyZjMubijgkO/bI6
+ YOHZ3Si15YrYwoJAtHOnzt6k/Dp8iYYthkn+eN9IrMFaGHcIlPlnHTfW8IMZgiYqEUtI
+ /PEg==
+X-Gm-Message-State: APjAAAVs4he1nAA9jgjGSL4xRaqigDNDnkNalQF1FN26/a5/DHpk3ehN
+ h180zqDBdhy6p8F4WMpWz3dTxGKz/54=
+X-Google-Smtp-Source: APXvYqzrMztr0EtKpXatimDu0CSZtbBxsY2M0Nr4p4GLJrNlI+48Y1uI/6xyOqrIAdtSWpVjfuxFDw==
+X-Received: by 2002:a62:ae0d:: with SMTP id q13mr8199450pff.53.1571420685722; 
+ Fri, 18 Oct 2019 10:44:45 -0700 (PDT)
 Received: from localhost.localdomain (97-113-7-119.tukw.qwest.net.
  [97.113.7.119])
- by smtp.gmail.com with ESMTPSA id d20sm7857534pfq.88.2019.10.18.10.44.59
+ by smtp.gmail.com with ESMTPSA id d20sm7857534pfq.88.2019.10.18.10.44.44
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 18 Oct 2019 10:44:59 -0700 (PDT)
+ Fri, 18 Oct 2019 10:44:44 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v8 22/22] target/arm: Rely on hflags correct in
- cpu_get_tb_cpu_state
-Date: Fri, 18 Oct 2019 10:44:31 -0700
-Message-Id: <20191018174431.1784-23-richard.henderson@linaro.org>
+Subject: [PATCH v8 11/22] target/arm: Hoist computation of TBFLAG_A32.VFPEN
+Date: Fri, 18 Oct 2019 10:44:20 -0700
+Message-Id: <20191018174431.1784-12-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20191018174431.1784-1-richard.henderson@linaro.org>
 References: <20191018174431.1784-1-richard.henderson@linaro.org>
@@ -83,7 +82,7 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::441
+X-Received-From: 2607:f8b0:4864:20::542
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -100,79 +99,74 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is the payoff.
+There are 3 conditions that each enable this flag.  M-profile always
+enables; A-profile with EL1 as AA64 always enables.  Both of these
+conditions can easily be cached.  The final condition relies on the
+FPEXC register which we are not prepared to cache.
 
-From perf record -g data of ubuntu 18 boot and shutdown:
-
-BEFORE:
-
--   23.02%     2.82%  qemu-system-aar  [.] helper_lookup_tb_ptr
-   - 20.22% helper_lookup_tb_ptr
-      + 10.05% tb_htable_lookup
-      - 9.13% cpu_get_tb_cpu_state
-           3.20% aa64_va_parameters_both
-           0.55% fp_exception_el
-
--   11.66%     4.74%  qemu-system-aar  [.] cpu_get_tb_cpu_state
-   - 6.96% cpu_get_tb_cpu_state
-        3.63% aa64_va_parameters_both
-        0.60% fp_exception_el
-        0.53% sve_exception_el
-
-AFTER:
-
--   16.40%     3.40%  qemu-system-aar  [.] helper_lookup_tb_ptr
-   - 13.03% helper_lookup_tb_ptr
-      + 11.19% tb_htable_lookup
-        0.55% cpu_get_tb_cpu_state
-
-     0.98%     0.71%  qemu-system-aar  [.] cpu_get_tb_cpu_state
-
-     0.87%     0.24%  qemu-system-aar  [.] rebuild_hflags_a64
-
-Before, helper_lookup_tb_ptr is the second hottest function in the
-application, consuming almost a quarter of the runtime.  Within the
-entire execution, cpu_get_tb_cpu_state consumes about 12%.
-
-After, helper_lookup_tb_ptr has dropped to the fourth hottest function,
-with consumption dropping to a sixth of the runtime.  Within the
-entire execution, cpu_get_tb_cpu_state has dropped below 1%, and the
-supporting function to rebuild hflags also consumes about 1%.
-
-Assertions are retained for --enable-debug-tcg.
-
-Tested-by: Alex Bennée <alex.bennee@linaro.org>
 Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
-v2: Retain asserts for future debugging.
----
- target/arm/helper.c | 9 ++++++---
- 1 file changed, 6 insertions(+), 3 deletions(-)
+ target/arm/cpu.h    |  2 +-
+ target/arm/helper.c | 14 ++++++++++----
+ 2 files changed, 11 insertions(+), 5 deletions(-)
 
+diff --git a/target/arm/cpu.h b/target/arm/cpu.h
+index 4d961474ce..9909ff89d4 100644
+--- a/target/arm/cpu.h
++++ b/target/arm/cpu.h
+@@ -3192,7 +3192,7 @@ FIELD(TBFLAG_A32, XSCALE_CPAR, 4, 2)
+  * the same thing as the current security state of the processor!
+  */
+ FIELD(TBFLAG_A32, NS, 6, 1)
+-FIELD(TBFLAG_A32, VFPEN, 7, 1)          /* Not cached. */
++FIELD(TBFLAG_A32, VFPEN, 7, 1)          /* Partially cached, minus FPEXC. */
+ FIELD(TBFLAG_A32, CONDEXEC, 8, 8)       /* Not cached. */
+ FIELD(TBFLAG_A32, SCTLR_B, 16, 1)
+ /* For M profile only, set if FPCCR.LSPACT is set */
 diff --git a/target/arm/helper.c b/target/arm/helper.c
-index c55783e540..63815fc4cf 100644
+index 398e5f5d6d..89aa6fd933 100644
 --- a/target/arm/helper.c
 +++ b/target/arm/helper.c
-@@ -11259,12 +11259,15 @@ void HELPER(rebuild_hflags_a64)(CPUARMState *env, int el)
- void cpu_get_tb_cpu_state(CPUARMState *env, target_ulong *pc,
-                           target_ulong *cs_base, uint32_t *pflags)
+@@ -11088,6 +11088,9 @@ static uint32_t rebuild_hflags_m32(CPUARMState *env, int fp_el,
  {
--    uint32_t flags, pstate_for_ss;
-+    uint32_t flags = env->hflags;
-+    uint32_t pstate_for_ss;
+     uint32_t flags = 0;
  
-     *cs_base = 0;
--    flags = rebuild_hflags_internal(env);
-+#ifdef CONFIG_DEBUG_TCG
-+    assert(flags == rebuild_hflags_internal(env));
-+#endif
++    /* v8M always enables the fpu.  */
++    flags = FIELD_DP32(flags, TBFLAG_A32, VFPEN, 1);
++
+     if (arm_v7m_is_handler_mode(env)) {
+         flags = FIELD_DP32(flags, TBFLAG_A32, HANDLER, 1);
+     }
+@@ -11119,6 +11122,10 @@ static uint32_t rebuild_hflags_a32(CPUARMState *env, int fp_el,
+                                    ARMMMUIdx mmu_idx)
+ {
+     uint32_t flags = rebuild_hflags_aprofile(env);
++
++    if (arm_el_is_aa64(env, 1)) {
++        flags = FIELD_DP32(flags, TBFLAG_A32, VFPEN, 1);
++    }
+     return rebuild_hflags_common_32(env, fp_el, mmu_idx, flags);
+ }
  
--    if (is_a64(env)) {
-+    if (FIELD_EX32(flags, TBFLAG_ANY, AARCH64_STATE)) {
-         *pc = env->pc;
-         if (cpu_isar_feature(aa64_bti, env_archcpu(env))) {
-             flags = FIELD_DP32(flags, TBFLAG_A64, BTYPE, env->btype);
+@@ -11250,14 +11257,13 @@ void cpu_get_tb_cpu_state(CPUARMState *env, target_ulong *pc,
+                 flags = FIELD_DP32(flags, TBFLAG_A32, VECSTRIDE,
+                                    env->vfp.vec_stride);
+             }
++            if (env->vfp.xregs[ARM_VFP_FPEXC] & (1 << 30)) {
++                flags = FIELD_DP32(flags, TBFLAG_A32, VFPEN, 1);
++            }
+         }
+ 
+         flags = FIELD_DP32(flags, TBFLAG_A32, THUMB, env->thumb);
+         flags = FIELD_DP32(flags, TBFLAG_A32, CONDEXEC, env->condexec_bits);
+-        if (env->vfp.xregs[ARM_VFP_FPEXC] & (1 << 30)
+-            || arm_el_is_aa64(env, 1) || arm_feature(env, ARM_FEATURE_M)) {
+-            flags = FIELD_DP32(flags, TBFLAG_A32, VFPEN, 1);
+-        }
+         pstate_for_ss = env->uncached_cpsr;
+     }
+ 
 -- 
 2.17.1
 
