@@ -6,72 +6,71 @@ X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
 	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0463FCA9EA9
-	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 17:00:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ABD46CA9EA0
+	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 17:01:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C18372089C
-	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 17:00:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 731782064A
+	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 17:01:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="lxaF4xje"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C18372089C
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="uAIvnoiD"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 731782064A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43458 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43516 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iLVbm-0002XJ-IB
-	for qemu-devel@archiver.kernel.org; Fri, 18 Oct 2019 13:00:10 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54730)
+	id 1iLVdO-0003zm-Gk
+	for qemu-devel@archiver.kernel.org; Fri, 18 Oct 2019 13:01:50 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54956)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1iLVa4-0001F9-1i
- for qemu-devel@nongnu.org; Fri, 18 Oct 2019 12:58:25 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1iLVbf-0002lp-D2
+ for qemu-devel@nongnu.org; Fri, 18 Oct 2019 13:00:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1iLVZy-0003us-QR
- for qemu-devel@nongnu.org; Fri, 18 Oct 2019 12:58:21 -0400
-Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:46105)
+ (envelope-from <peter.maydell@linaro.org>) id 1iLVbd-0004k1-AI
+ for qemu-devel@nongnu.org; Fri, 18 Oct 2019 13:00:03 -0400
+Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:43644)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1iLVZy-0003sP-Ku
- for qemu-devel@nongnu.org; Fri, 18 Oct 2019 12:58:18 -0400
-Received: by mail-ot1-x343.google.com with SMTP id 89so5513476oth.13
- for <qemu-devel@nongnu.org>; Fri, 18 Oct 2019 09:58:16 -0700 (PDT)
+ id 1iLVbY-0004ij-53
+ for qemu-devel@nongnu.org; Fri, 18 Oct 2019 12:59:57 -0400
+Received: by mail-ot1-x343.google.com with SMTP id o44so5537414ota.10
+ for <qemu-devel@nongnu.org>; Fri, 18 Oct 2019 09:59:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
  :cc:content-transfer-encoding;
- bh=6Vw5JEKY7XK+klh3K7KSH90DzcAkWBFboMgSM3fJzrM=;
- b=lxaF4xje6lcouaosLDnZySZ5fBy1TcoNQAIlCnOLH5LRSTA2qIQCQkEQjR+gKFFQ75
- xrYAL1Fj4iNsEyVaZUcnMmCnp/wmbsZxuFQNljgh1EBKPKQ4pmu7cLdC2Ov9DAOjxidT
- xkH8+Ur/oxxQ+UpDmkDoJmKH9Hd38rZ4gYm6vXMPHDYY2ubc5w6s+Q6XE6D+TWdBF5Vg
- ONrtRWrWwhWg3Ks/0aYVG8i2mapsmofeBOnkZxMf7EmcjypJgagVmn8EtZk3dvDBkLgl
- 8jdjremQCufHb5hCj4FPjOhF70Aii48739VxN4JBJFJpSs2tS3KhNqpbVrzqCb+2dkxw
- jzTw==
+ bh=brKJQVGK8zfwG+wODMWZklzQKwkI6ehnbopN2Ik5gXE=;
+ b=uAIvnoiDQvjuFycLPpLqGrrD1MGdxof9rE/dRe6AwFJ+3jRZVa8koJ6sAtGA1R3PCZ
+ Nbm0sbJDZRcP35/x3DnOivltpvTg2RyE1IqRoXmKKta2in4bkFIOsjWBt4SAH7qjLn76
+ uQdWqc0m5SuHNUMsp1J8XaYReWsY/lnPDkWu170J42aC7nLKqlq0plHSLc7sxNWUYIj1
+ RPllqmJO3raIjfzpsZ+9tTb+LUqE7CzXd3XEwxa9RgfCVLFCqtCkubsp1WMql6lqa1Vl
+ 4qnG9cjAPwZGLwPn78oogEKmYeqwgj+9uXIJyoyheVexoIkh4id1M3D6sYzP1jF+OK7O
+ C3qg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc:content-transfer-encoding;
- bh=6Vw5JEKY7XK+klh3K7KSH90DzcAkWBFboMgSM3fJzrM=;
- b=KotReqPSgGcU8cjUqa9hWO0xSxfWPIIVaqm+KqW0++sDYg+iaqCaDRSPGcA619eVWO
- OB1PLl+KI36NakGbcejXpkmwQdvo+z9/zhzipyha6rU40kDTVORppO1oL7oRxuGKzjbl
- B45zjz7ZlKHowYegnlJuxqAfqIYHsXgaxSsglBO4SeGKES/W/++OCMRjwYV7jEbpme5k
- MFG+qoDHgOFwDEsCXK8x2Fym3Bnerv+iERzE+l+uxCePXwIqZVsG8vRy6jUqHzQWjKz3
- 2sn1OMrFUcFJOjHZjJU78dhg4nGRPFkDjbWC6gEyy3D0nAxZs8FQy9elkjLwWnku/vFK
- DrtA==
-X-Gm-Message-State: APjAAAVPCtRCwqvYjIhiEaqa5oAf0EBeYVj9o+wzxU2zBlqyZUveuV7P
- x63lnI7TTZ8EkO1gkFeeUezI1T9e5M2OOb06m9KrHg==
-X-Google-Smtp-Source: APXvYqxkcsoqCta1MhtmAKTy73mVp3pS7kqGfbGzBj4nNg94RPrdBk8cXyfcW4j38k+2v+8oNLGJmXmcL2sGERpQbFE=
-X-Received: by 2002:a05:6830:4c1:: with SMTP id
- s1mr8796928otd.232.1571417895348; 
- Fri, 18 Oct 2019 09:58:15 -0700 (PDT)
+ bh=brKJQVGK8zfwG+wODMWZklzQKwkI6ehnbopN2Ik5gXE=;
+ b=KQT6g0Y+4EP7oPl4T/yCWneSyz3TAf9Y5mTE1Qj+cqVARsqM/WL6gD8z/4f6aN4c41
+ KElLMLudJwun4DNEYIehZcCXD5whzMVsvvwU704MhWaPMyJp+T7u+HUHFedQC9yDswaS
+ 4Z9CO+Cl8v5afSxRVjF38dkYL59j8rPduNJGVZXPkbnKJ1CgI7OqQzHfKAIefH2UiIps
+ Ca4Fm+R1AQmeqwWeZz/F41a4O0Q2DtEhoTc6Zj1E5Si87tK0sAMrvtp+1URrpbCiOZo5
+ LkKv2+zQnK+Q2bgmVIBv0cHkx5rZakt9nWQ5Fta1HQuja5BRSmGxDhkdQZ2t95jXou5I
+ cvrA==
+X-Gm-Message-State: APjAAAUr5Nv+aTy5VXlt9WL1Sq4VmCGrAHEmBeBOemopbXJBk9R6iBtz
+ lR2d9qdYQRf4ra0aGgvuBdxTh3vPuHuMOachDjgwBg==
+X-Google-Smtp-Source: APXvYqzsGkkRpakEJDwdq45hYfaaCoS+MSE0GClI4vnbAnCBD4EQRezxFvGKPI/19i+ieuiJFAWzil7f7x5OGbVjXGg=
+X-Received: by 2002:a9d:708e:: with SMTP id l14mr8508471otj.135.1571417995180; 
+ Fri, 18 Oct 2019 09:59:55 -0700 (PDT)
 MIME-Version: 1.0
 References: <20191018154212.13458-1-marcandre.lureau@redhat.com>
- <20191018154212.13458-13-marcandre.lureau@redhat.com>
-In-Reply-To: <20191018154212.13458-13-marcandre.lureau@redhat.com>
+ <20191018154212.13458-15-marcandre.lureau@redhat.com>
+In-Reply-To: <20191018154212.13458-15-marcandre.lureau@redhat.com>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 18 Oct 2019 17:58:04 +0100
-Message-ID: <CAFEAcA-Sf=rc89R+H3VwHwB52RW=BfA2VU70-OcNPx=MJD+zaA@mail.gmail.com>
-Subject: Re: [PATCH 12/14] omap-gpio: remove PROP_PTR
+Date: Fri, 18 Oct 2019 17:59:44 +0100
+Message-ID: <CAFEAcA8PyEfmWUbTqC7dHRzRT7OzQYR3dX9j=2fiH-CxHqWptg@mail.gmail.com>
+Subject: Re: [PATCH 14/14] Remove QDEV_PROP_PTR
 To: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
@@ -107,29 +106,17 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, 18 Oct 2019 at 16:43, Marc-Andr=C3=A9 Lureau
+On Fri, 18 Oct 2019 at 16:44, Marc-Andr=C3=A9 Lureau
 <marcandre.lureau@redhat.com> wrote:
 >
-> Since clock are not QOM objects, replace PROP_PTR of clocks with
-> setters methods.
+> No longer used in the tree. The comment about user_creatable is still
+> quite relevant, but there is already a similar comment in qdev-core.h.
 >
 > Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-
-
-> -/* Using qdev pointer properties for the clocks is not ideal.
-> - * qdev should support a generic means of defining a 'port' with
-> - * an arbitrary interface for connecting two devices. Then we
-> - * could reframe the omap clock API in terms of clock ports,
-> - * and get some type safety. For now the best qdev provides is
-> - * passing an arbitrary pointer.
-> - * (It's not possible to pass in the string which is the clock
-> - * name, because this device does not have the necessary information
-> - * (ie the struct omap_mpu_state_s*) to do the clockname to pointer
-> - * translation.)
-> - */
-
-Ah, here's what's effectively a todo comment that you could
-repurpose/adapt/move.
+> ---
+>  hw/core/qdev-properties.c    | 18 ------------------
+>  include/hw/qdev-properties.h | 22 ----------------------
+>  2 files changed, 40 deletions(-)
 
 Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 
