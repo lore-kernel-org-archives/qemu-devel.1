@@ -2,64 +2,116 @@ Return-Path: <SRS0=ht5U=YL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=DATE_IN_PAST_06_12,
-	DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+X-Spam-Status: No, score=-7.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 55242CA9EA1
-	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 09:32:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 129F8CA9EA0
+	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 09:34:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 149BF21852
-	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 09:32:43 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="NtgeFg41"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 149BF21852
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
+	by mail.kernel.org (Postfix) with ESMTPS id DCBED21852
+	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 09:34:43 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DCBED21852
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37050 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37082 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iLOcj-0002h6-NA
-	for qemu-devel@archiver.kernel.org; Fri, 18 Oct 2019 05:32:41 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46587)
+	id 1iLOeh-0004xZ-3h
+	for qemu-devel@archiver.kernel.org; Fri, 18 Oct 2019 05:34:43 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46684)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgibson@ozlabs.org>) id 1iLOax-0001CV-9Z
- for qemu-devel@nongnu.org; Fri, 18 Oct 2019 05:30:54 -0400
+ (envelope-from <thuth@redhat.com>) id 1iLObi-000293-Vv
+ for qemu-devel@nongnu.org; Fri, 18 Oct 2019 05:31:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1iLOav-0006ea-12
- for qemu-devel@nongnu.org; Fri, 18 Oct 2019 05:30:51 -0400
-Received: from bilbo.ozlabs.org ([203.11.71.1]:33205 helo=ozlabs.org)
+ (envelope-from <thuth@redhat.com>) id 1iLObg-0006wM-Co
+ for qemu-devel@nongnu.org; Fri, 18 Oct 2019 05:31:37 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:45458)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1iLOat-0006cS-Bj; Fri, 18 Oct 2019 05:30:48 -0400
-Received: by ozlabs.org (Postfix, from userid 1007)
- id 46vgkT5Xbfz9sPT; Fri, 18 Oct 2019 20:30:41 +1100 (AEDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1571391041;
- bh=9mHfDxRqy/b9QPNQWRKx2tBTm3r53ToBquM3HQA8+ok=;
- h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=NtgeFg41z8a4zPD/cTrAnj8jximwltxPHwYq/PwemlxZGDQPKtpCkU3D0CrpikSzM
- f5pfNOywwQDJ9jkPgaRuxSCyCFfM1f88sUo9S6H0n1/JHAhihe/ZyAonunGuh6hTeC
- 0BqPIvkFxb4lwtIIvqa+f+xW1ZU+XQKNt+NPFgSk=
-Date: Fri, 18 Oct 2019 13:47:07 +1100
-From: David Gibson <david@gibson.dropbear.id.au>
-To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
-Subject: Re: [PATCH 1/2] spapr: Introduce a interrupt presenter reset handler
-Message-ID: <20191018024707.GB2000@umbus.fritz.box>
-References: <20191017144241.12522-1-clg@kaod.org>
- <20191017144241.12522-2-clg@kaod.org>
+ (Exim 4.71) (envelope-from <thuth@redhat.com>) id 1iLObg-0006vt-2w
+ for qemu-devel@nongnu.org; Fri, 18 Oct 2019 05:31:36 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 23856307C654
+ for <qemu-devel@nongnu.org>; Fri, 18 Oct 2019 09:31:34 +0000 (UTC)
+Received: from thuth.remote.csb (dhcp-200-228.str.redhat.com [10.33.200.228])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 02FC65D9D5;
+ Fri, 18 Oct 2019 09:31:20 +0000 (UTC)
+Subject: Re: [Qemu-devel] [PATCH v2 3/4] trace: forbid use of %m in trace
+ event format strings
+To: Eric Blake <eblake@redhat.com>, =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?=
+ <berrange@redhat.com>
+References: <20190118173103.4903-1-berrange@redhat.com>
+ <20190118173103.4903-4-berrange@redhat.com>
+ <c18e222d-ae68-968b-7738-edfa21c8ceef@redhat.com>
+ <20190122143257.GR13143@redhat.com>
+ <c06dd0a6-166f-a522-1f54-736519076432@redhat.com>
+ <20190122172333.GA13143@redhat.com>
+ <9d0997e0-9019-c7c2-56d6-26c70f0d5c7e@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=thuth@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+Organization: Red Hat
+Message-ID: <8e9b4f93-234b-9ae0-0ffc-d96de3ce02cb@redhat.com>
+Date: Fri, 18 Oct 2019 11:31:15 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
+In-Reply-To: <9d0997e0-9019-c7c2-56d6-26c70f0d5c7e@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="PmA2V3Z32TCmWXqI"
-Content-Disposition: inline
-In-Reply-To: <20191017144241.12522-2-clg@kaod.org>
-User-Agent: Mutt/1.12.1 (2019-06-15)
+ protocol="application/pgp-signature";
+ boundary="oavsMs1krcPZwOrJzYPfxinbIm5aH64IV"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.42]); Fri, 18 Oct 2019 09:31:34 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 203.11.71.1
+X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -71,314 +123,122 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Greg Kurz <groug@kaod.org>
+Cc: Alex Williamson <alex.williamson@redhat.com>, qemu-devel@nongnu.org,
+ Stefan Hajnoczi <stefanha@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--oavsMs1krcPZwOrJzYPfxinbIm5aH64IV
+Content-Type: multipart/mixed; boundary="kdmSty2OLfAjJpCraHdFXrDi9XIN2fyqI";
+ protected-headers="v1"
+From: Thomas Huth <thuth@redhat.com>
+To: Eric Blake <eblake@redhat.com>, =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?=
+ <berrange@redhat.com>
+Cc: Alex Williamson <alex.williamson@redhat.com>, qemu-devel@nongnu.org,
+ Stefan Hajnoczi <stefanha@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
+Message-ID: <8e9b4f93-234b-9ae0-0ffc-d96de3ce02cb@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 3/4] trace: forbid use of %m in trace
+ event format strings
+References: <20190118173103.4903-1-berrange@redhat.com>
+ <20190118173103.4903-4-berrange@redhat.com>
+ <c18e222d-ae68-968b-7738-edfa21c8ceef@redhat.com>
+ <20190122143257.GR13143@redhat.com>
+ <c06dd0a6-166f-a522-1f54-736519076432@redhat.com>
+ <20190122172333.GA13143@redhat.com>
+ <9d0997e0-9019-c7c2-56d6-26c70f0d5c7e@redhat.com>
+In-Reply-To: <9d0997e0-9019-c7c2-56d6-26c70f0d5c7e@redhat.com>
 
---PmA2V3Z32TCmWXqI
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
+--kdmSty2OLfAjJpCraHdFXrDi9XIN2fyqI
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Oct 17, 2019 at 04:42:40PM +0200, C=E9dric Le Goater wrote:
-> The interrupt presenters are not reseted today.
-
-I don't think that's accurate.  We register reset handlers for both
-ICP and TCTX already.  We might not be resetting in quite the right
-order, but this will need a clearer description of what's changing.
-
-Also, with this patch as is, I think we'll reset twice (once from the
-registered handler, once via the cpu).
-
-> Extend the sPAPR IRQ
-> backend with a new cpu_intc_reset() handler which will be called by
-> the CPU reset handler.
+On 22/01/2019 19.10, Eric Blake wrote:
+> On 1/22/19 11:23 AM, Daniel P. Berrang=C3=A9 wrote:
 >=20
-> spapr_realize_vcpu() is modified to call the CPU reset only after the
-> the intc presenter has been created.
->=20
-> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
-> ---
->  include/hw/ppc/spapr_irq.h |  4 ++++
->  include/hw/ppc/xics.h      |  1 +
->  include/hw/ppc/xive.h      |  1 +
->  hw/intc/spapr_xive.c       |  8 ++++++++
->  hw/intc/xics.c             |  5 +++++
->  hw/intc/xics_spapr.c       |  8 ++++++++
->  hw/intc/xive.c             | 11 ++++++++---
->  hw/ppc/spapr_cpu_core.c    |  8 ++++++--
->  hw/ppc/spapr_irq.c         | 21 +++++++++++++++++++++
->  9 files changed, 62 insertions(+), 5 deletions(-)
->=20
-> diff --git a/include/hw/ppc/spapr_irq.h b/include/hw/ppc/spapr_irq.h
-> index 5e150a667902..78327496c102 100644
-> --- a/include/hw/ppc/spapr_irq.h
-> +++ b/include/hw/ppc/spapr_irq.h
-> @@ -52,6 +52,8 @@ typedef struct SpaprInterruptControllerClass {
->       */
->      int (*cpu_intc_create)(SpaprInterruptController *intc,
->                              PowerPCCPU *cpu, Error **errp);
-> +    int (*cpu_intc_reset)(SpaprInterruptController *intc, PowerPCCPU *cp=
-u,
-> +                          Error **errp);
->      int (*claim_irq)(SpaprInterruptController *intc, int irq, bool lsi,
->                       Error **errp);
->      void (*free_irq)(SpaprInterruptController *intc, int irq);
-> @@ -68,6 +70,8 @@ void spapr_irq_update_active_intc(SpaprMachineState *sp=
-apr);
-> =20
->  int spapr_irq_cpu_intc_create(SpaprMachineState *spapr,
->                                PowerPCCPU *cpu, Error **errp);
-> +int spapr_irq_cpu_intc_reset(SpaprMachineState *spapr,
-> +                             PowerPCCPU *cpu, Error **errp);
->  void spapr_irq_print_info(SpaprMachineState *spapr, Monitor *mon);
->  void spapr_irq_dt(SpaprMachineState *spapr, uint32_t nr_servers,
->                    void *fdt, uint32_t phandle);
-> diff --git a/include/hw/ppc/xics.h b/include/hw/ppc/xics.h
-> index 1e6a9300eb2b..602173c12250 100644
-> --- a/include/hw/ppc/xics.h
-> +++ b/include/hw/ppc/xics.h
-> @@ -161,6 +161,7 @@ void icp_set_mfrr(ICPState *icp, uint8_t mfrr);
->  uint32_t icp_accept(ICPState *ss);
->  uint32_t icp_ipoll(ICPState *ss, uint32_t *mfrr);
->  void icp_eoi(ICPState *icp, uint32_t xirr);
-> +void icp_reset(ICPState *icp);
-> =20
->  void ics_write_xive(ICSState *ics, int nr, int server,
->                      uint8_t priority, uint8_t saved_priority);
-> diff --git a/include/hw/ppc/xive.h b/include/hw/ppc/xive.h
-> index fd3319bd3202..99381639f50c 100644
-> --- a/include/hw/ppc/xive.h
-> +++ b/include/hw/ppc/xive.h
-> @@ -415,6 +415,7 @@ uint64_t xive_tctx_tm_read(XiveTCTX *tctx, hwaddr off=
-set, unsigned size);
-> =20
->  void xive_tctx_pic_print_info(XiveTCTX *tctx, Monitor *mon);
->  Object *xive_tctx_create(Object *cpu, XiveRouter *xrtr, Error **errp);
-> +void xive_tctx_reset(XiveTCTX *tctx);
-> =20
->  static inline uint32_t xive_nvt_cam_line(uint8_t nvt_blk, uint32_t nvt_i=
-dx)
->  {
-> diff --git a/hw/intc/spapr_xive.c b/hw/intc/spapr_xive.c
-> index ba32d2cc5b0f..0c3acf1a4192 100644
-> --- a/hw/intc/spapr_xive.c
-> +++ b/hw/intc/spapr_xive.c
-> @@ -553,6 +553,13 @@ static int spapr_xive_cpu_intc_create(SpaprInterrupt=
-Controller *intc,
->      return 0;
->  }
-> =20
-> +static int spapr_xive_cpu_intc_reset(SpaprInterruptController *intc,
-> +                                     PowerPCCPU *cpu, Error **errp)
-> +{
-> +    xive_tctx_reset(spapr_cpu_state(cpu)->tctx);
-> +    return 0;
-> +}
-> +
->  static void spapr_xive_set_irq(SpaprInterruptController *intc, int irq, =
-int val)
->  {
->      SpaprXive *xive =3D SPAPR_XIVE(intc);
-> @@ -697,6 +704,7 @@ static void spapr_xive_class_init(ObjectClass *klass,=
- void *data)
->      sicc->activate =3D spapr_xive_activate;
->      sicc->deactivate =3D spapr_xive_deactivate;
->      sicc->cpu_intc_create =3D spapr_xive_cpu_intc_create;
-> +    sicc->cpu_intc_reset =3D spapr_xive_cpu_intc_reset;
->      sicc->claim_irq =3D spapr_xive_claim_irq;
->      sicc->free_irq =3D spapr_xive_free_irq;
->      sicc->set_irq =3D spapr_xive_set_irq;
-> diff --git a/hw/intc/xics.c b/hw/intc/xics.c
-> index b5ac408f7b74..652771d6a5a5 100644
-> --- a/hw/intc/xics.c
-> +++ b/hw/intc/xics.c
-> @@ -295,6 +295,11 @@ static void icp_reset_handler(void *dev)
->      }
->  }
-> =20
-> +void icp_reset(ICPState *icp)
-> +{
-> +    icp_reset_handler(icp);
-> +}
-> +
->  static void icp_realize(DeviceState *dev, Error **errp)
->  {
->      ICPState *icp =3D ICP(dev);
-> diff --git a/hw/intc/xics_spapr.c b/hw/intc/xics_spapr.c
-> index 4f64b9a9fc66..c0b2a576effe 100644
-> --- a/hw/intc/xics_spapr.c
-> +++ b/hw/intc/xics_spapr.c
-> @@ -346,6 +346,13 @@ static int xics_spapr_cpu_intc_create(SpaprInterrupt=
-Controller *intc,
->      return 0;
->  }
-> =20
-> +static int xics_spapr_cpu_intc_reset(SpaprInterruptController *intc,
-> +                                     PowerPCCPU *cpu, Error **errp)
-> +{
-> +    icp_reset(spapr_cpu_state(cpu)->icp);
-> +    return 0;
-> +}
-> +
->  static int xics_spapr_claim_irq(SpaprInterruptController *intc, int irq,
->                                  bool lsi, Error **errp)
->  {
-> @@ -433,6 +440,7 @@ static void ics_spapr_class_init(ObjectClass *klass, =
-void *data)
->      sicc->activate =3D xics_spapr_activate;
->      sicc->deactivate =3D xics_spapr_deactivate;
->      sicc->cpu_intc_create =3D xics_spapr_cpu_intc_create;
-> +    sicc->cpu_intc_reset =3D xics_spapr_cpu_intc_reset;
->      sicc->claim_irq =3D xics_spapr_claim_irq;
->      sicc->free_irq =3D xics_spapr_free_irq;
->      sicc->set_irq =3D xics_spapr_set_irq;
-> diff --git a/hw/intc/xive.c b/hw/intc/xive.c
-> index d420c6571e14..0ae3f9b1efe4 100644
-> --- a/hw/intc/xive.c
-> +++ b/hw/intc/xive.c
-> @@ -547,7 +547,7 @@ void xive_tctx_pic_print_info(XiveTCTX *tctx, Monitor=
- *mon)
->      }
->  }
-> =20
-> -static void xive_tctx_reset(void *dev)
-> +static void xive_tctx_reset_handler(void *dev)
->  {
->      XiveTCTX *tctx =3D XIVE_TCTX(dev);
-> =20
-> @@ -568,6 +568,11 @@ static void xive_tctx_reset(void *dev)
->          ipb_to_pipr(tctx->regs[TM_QW3_HV_PHYS + TM_IPB]);
->  }
-> =20
-> +void xive_tctx_reset(XiveTCTX *tctx)
-> +{
-> +    xive_tctx_reset_handler(tctx);
-> +}
-> +
->  static void xive_tctx_realize(DeviceState *dev, Error **errp)
->  {
->      XiveTCTX *tctx =3D XIVE_TCTX(dev);
-> @@ -608,12 +613,12 @@ static void xive_tctx_realize(DeviceState *dev, Err=
-or **errp)
->          }
->      }
-> =20
-> -    qemu_register_reset(xive_tctx_reset, dev);
-> +    qemu_register_reset(xive_tctx_reset_handler, dev);
->  }
-> =20
->  static void xive_tctx_unrealize(DeviceState *dev, Error **errp)
->  {
-> -    qemu_unregister_reset(xive_tctx_reset, dev);
-> +    qemu_unregister_reset(xive_tctx_reset_handler, dev);
->  }
-> =20
->  static int vmstate_xive_tctx_pre_save(void *opaque)
-> diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
-> index 3e4302c7d596..416aa75e5fba 100644
-> --- a/hw/ppc/spapr_cpu_core.c
-> +++ b/hw/ppc/spapr_cpu_core.c
-> @@ -33,6 +33,7 @@ static void spapr_cpu_reset(void *opaque)
->      PowerPCCPUClass *pcc =3D POWERPC_CPU_GET_CLASS(cpu);
->      SpaprCpuState *spapr_cpu =3D spapr_cpu_state(cpu);
->      target_ulong lpcr;
-> +    SpaprMachineState *spapr =3D SPAPR_MACHINE(qdev_get_machine());
-> =20
->      cpu_reset(cs);
-> =20
-> @@ -77,9 +78,11 @@ static void spapr_cpu_reset(void *opaque)
->      spapr_cpu->dtl_addr =3D 0;
->      spapr_cpu->dtl_size =3D 0;
-> =20
-> -    spapr_caps_cpu_apply(SPAPR_MACHINE(qdev_get_machine()), cpu);
-> +    spapr_caps_cpu_apply(spapr, cpu);
-> =20
->      kvm_check_mmu(cpu, &error_fatal);
-> +
-> +    spapr_irq_cpu_intc_reset(spapr, cpu, &error_fatal);
->  }
-> =20
->  void spapr_cpu_set_entry_state(PowerPCCPU *cpu, target_ulong nip, target=
-_ulong r3)
-> @@ -235,12 +238,13 @@ static void spapr_realize_vcpu(PowerPCCPU *cpu, Spa=
-prMachineState *spapr,
->      kvmppc_set_papr(cpu);
-> =20
->      qemu_register_reset(spapr_cpu_reset, cpu);
-> -    spapr_cpu_reset(cpu);
-> =20
->      if (spapr_irq_cpu_intc_create(spapr, cpu, &local_err) < 0) {
->          goto error_unregister;
->      }
-> =20
-> +    spapr_cpu_reset(cpu);
-> +
->      if (!sc->pre_3_0_migration) {
->          vmstate_register(NULL, cs->cpu_index, &vmstate_spapr_cpu_state,
->                           cpu->machine_data);
-> diff --git a/hw/ppc/spapr_irq.c b/hw/ppc/spapr_irq.c
-> index bb91c61fa000..5d2b64029cd5 100644
-> --- a/hw/ppc/spapr_irq.c
-> +++ b/hw/ppc/spapr_irq.c
-> @@ -220,6 +220,27 @@ int spapr_irq_cpu_intc_create(SpaprMachineState *spa=
-pr,
->      return 0;
->  }
-> =20
-> +int spapr_irq_cpu_intc_reset(SpaprMachineState *spapr,
-> +                             PowerPCCPU *cpu, Error **errp)
-> +{
-> +    SpaprInterruptController *intcs[] =3D ALL_INTCS(spapr);
-> +    int i;
-> +    int rc;
-> +
-> +    for (i =3D 0; i < ARRAY_SIZE(intcs); i++) {
-> +        SpaprInterruptController *intc =3D intcs[i];
-> +        if (intc) {
-> +            SpaprInterruptControllerClass *sicc =3D SPAPR_INTC_GET_CLASS=
-(intc);
-> +            rc =3D sicc->cpu_intc_reset(intc, cpu, errp);
-> +            if (rc < 0) {
-> +                return rc;
-> +            }
-> +        }
-> +    }
-> +
-> +    return 0;
-> +}
-> +
->  static void spapr_set_irq(void *opaque, int irq, int level)
->  {
->      SpaprMachineState *spapr =3D SPAPR_MACHINE(opaque);
+>>
+>>>> On this point though, does anyone know of any platforms we support[1=
+],
+>>>> or are likely to support in future, where 'strerror' is *not* thread=
 
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
+>>>> safe ?
+>>>
+>>> I'm not coming up with one, and I think the problem is independent of=
 
---PmA2V3Z32TCmWXqI
+>>> this series (if we DO have a problem, it's a series all its own to
+>>> eradicate the use of strerror() in favor of something safer, either
+>>> picking strerror_l() or dealing with the glibc vs. BSD differences in=
+
+>>> strerror_r()).
+>>
+>> Agree that its not really something for this series - this just
+>> made me think of it again.
+>=20
+> Shoot - FreeBSD strerror() is not threadsafe:
+> https://github.com/freebsd/freebsd/blob/master/lib/libc/string/strerror=
+=2Ec#L119
+>=20
+> char *
+> strerror(int num)
+> {
+> 	static char ebuf[NL_TEXTMAX];
+>=20
+> 	if (strerror_r(num, ebuf, sizeof(ebuf)) !=3D 0)
+> 		errno =3D EINVAL;
+> 	return (ebuf);
+> }
+>=20
+>>
+>> We went through the scrubbing in libvirt to use the sane, but still
+>> tedious to call, variant of strerror_r() many years ago. With luck
+>> though it is a worry that can be confined the dustbin of ancient
+>> UNIX history....unless someone can point to evidence to the contrary ?=
+
+>=20
+> libvirt has it easy - they let gnulib do all the work of futzing around=
+
+> with getting a working strerror() despite platform bugs and despite
+> glibc's insistence on a non-POSIX signature if _GNU_SOURCE is defined.
+> We'll have to do a bit more legwork.
+>=20
+> That said, I've added it to:
+> https://wiki.qemu.org/Contribute/BiteSizedTasks#Error_checking
+>=20
+> if someone wants to do the grunt work.
+
+I think we should change that task to switch to g_strerror() from glib
+instead ... as far as I can see, this is a proper wrapper around
+strerror_r(), so we don't have to deal with the implementation oddities
+of strerror_r() in QEMU.
+
+ Thomas
+
+
+--kdmSty2OLfAjJpCraHdFXrDi9XIN2fyqI--
+
+--oavsMs1krcPZwOrJzYPfxinbIm5aH64IV
 Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl2pJ6gACgkQbDjKyiDZ
-s5Kw3xAAsJMOTR9TTROriB5LD/mPLrGWSBDHTFsVROvd524nda+63YC4y91319Zi
-gOK1I33swu9d7K6qd5+hwO1QXgr+0zQDxaJDkiEc5Js3hDi5ewFXs3pqL8JgsLEo
-dvOy1XnKJqgHjbd5kRzo4noGKw4X2L0uabiSsexI2IeDl/GrvbHLuaEata8Ri89+
-XS4qidk/N6K2JQkMKUwquT9vMccqXaSS19oxaOJGm8FLxGUEKbD0tgdB46eUyeRL
-G/vdl7qnDTFIG82r+kqy6K9gV2J/A43DKnkxG9W7NSHewOtxJdgfP249rrrxTf4h
-/5NfrrjzdGNCkoOmJLdhz66oeRYI9lmCCo2J2A1l+lPheMd6sjWFXU44t+elOZ2M
-2qNNqcDcqcvpvwZBZo5RtgA3qLEQApEqu21SDzuCK3fCkmRtNm5i1rW78EuLcZvv
-tzjfv5HbMpsOEPAm9Ch13TJiw3J3ku4d3ydXDvltKebMWpdKOezHo+IP4HFN5Ztp
-RouFjrKLJ/0rFt4V/LkTsf1HQZiubTLy6Ys3yBk/3nJDLUmMzN02QPO7cACrkDfx
-Gg18FLmJElLtQLXtJ4/faKfEoCb2pzd7kxwFd63vGRdWCL+vhcxJUJDIl6d+OICx
-kN8gRIQB3gEmiFU4V+QK/dpazhdB7+SDHP3DdDA64ZIKvd5LEs8=
-=nbmt
+iQIzBAEBCAAdFiEEJ7iIR+7gJQEY8+q5LtnXdP5wLbUFAl2phmMACgkQLtnXdP5w
+LbU5Wg//dUv5ZwZalsdAVgj6u6eJo7WE59nDnBMSPiXQgjFPrF3cFZD2UbljkWfE
+rmuiwn5wCnlkvawmSsYZs+WALcEAiht8nBVz0qCpQ5hCFvp64/G84HB7JUXkcKdo
+TQ2Escn22xefESv7WZK2IToqYxLZs7tsoI6+VMVlDmK6c1rJHpxBZTcUfdTo7nW4
+qacDDadolf7+dd7opTDP+6drdJdD7YtrYrhNqB1e9pOu06unMu+J0PM62fNegwUm
+3GjqSjoU+mrv7SFOHy8gkXpUfWkgqAHYUbF+SvwHHg9CkJRzSQ4wCHc1aVSGrtlB
+U0QnYzbqgKin7N0Rppy3Plf8Dlkg88OJn5N48oE7nkjHwOWF4i8OR6+zu13vR7Vi
+xg5ZXqjaT9aV6CDdRD2PSsZDoDEatrn/OXxZdF6Q9wHKsRn5sdE2qMOwUyV0qdpo
+z/8GCkCGgo01Six8vL5wcP1IVKVgpAOLN95eM1BC4egEe9lxmP9YVvoxYFfFEn5q
+Be1f0Z8mUBmEYuNzcj3CMkLVPzLPHKzG0TRuTHgO7o0msQ5tlLCI9+HtjXzl1AD7
+1i+vXAiUCQSrauzXMA1DaScIYO/b4udQ7jWgkUEjQtOTbSeVvFSRRQbHoHD+Ant0
+urQIS8EYt3kjt41tjNFi30t65oSmd4nlj+leBz0IUgXsy0hYHVM=
+=Ut5Z
 -----END PGP SIGNATURE-----
 
---PmA2V3Z32TCmWXqI--
+--oavsMs1krcPZwOrJzYPfxinbIm5aH64IV--
 
