@@ -2,81 +2,49 @@ Return-Path: <SRS0=ht5U=YL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E864CA9EA0
-	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 11:56:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C35C8CA9EA0
+	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 11:57:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 37BC620700
-	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 11:56:06 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="pqqwmRb9"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 37BC620700
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 9602F20700
+	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 11:57:29 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9602F20700
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38482 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38500 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iLQrV-00060k-Bm
-	for qemu-devel@archiver.kernel.org; Fri, 18 Oct 2019 07:56:05 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36848)
+	id 1iLQsq-0006vq-Qz
+	for qemu-devel@archiver.kernel.org; Fri, 18 Oct 2019 07:57:28 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37106)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1iLQqY-0004kb-Hw
- for qemu-devel@nongnu.org; Fri, 18 Oct 2019 07:55:07 -0400
+ (envelope-from <dplotnikov@virtuozzo.com>) id 1iLQrP-00065G-IM
+ for qemu-devel@nongnu.org; Fri, 18 Oct 2019 07:56:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1iLQqX-0002D6-8Q
- for qemu-devel@nongnu.org; Fri, 18 Oct 2019 07:55:06 -0400
-Received: from mail-oi1-x22e.google.com ([2607:f8b0:4864:20::22e]:36035)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1iLQqX-0002CZ-4G
- for qemu-devel@nongnu.org; Fri, 18 Oct 2019 07:55:05 -0400
-Received: by mail-oi1-x22e.google.com with SMTP id k20so4975021oih.3
- for <qemu-devel@nongnu.org>; Fri, 18 Oct 2019 04:55:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=DtIlcyul9aLdZziuGa4qPSMs18kQJ9pup3Mvo8v6yzI=;
- b=pqqwmRb9HCtk7hfTBRda/GoV+eqctA1jF/ljkDjnjKOhPiVvjiNeNVQxjDvxNM5iXf
- L0DjB0LyUYqID62JuPPsz9Jv66+iwv2KV1rYOx0clyrD6PTSX3dZVx5U04zLMId/8YFd
- j3awtwhEnN3EllZaE3lbGkdM6FT9sOVIKnvxC8eC0JcxzSuNDlB83dijyiclLXvdYNhR
- irgIOaBmKSYUsa5INhyzOUSL9W/4vvICVwLtSr7eHsKzjwUbC0TPZNdUbsLwQnvr3ly8
- CLGuLG4ihot+0HlsF64rRqvHp+U9yD/mGcFeTMoggV3URYMwDaYdFy7Jo3PV/Utb73jR
- 9a7g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=DtIlcyul9aLdZziuGa4qPSMs18kQJ9pup3Mvo8v6yzI=;
- b=RdWss0KLzjPoK4lT0QsH1QawCFjvtJPJ49v9qCXLtkb4cQ8YwxE2dXLdLOC3zoojtb
- U4t6cSsRJawGzMecHZP6MIwj3S6fXPdl1KUVl6C4dlJzWQz4Gb7TkkvpVbZ2Z+Z+8OfH
- ckikfKoCg+RIPECpTFr2ie2rIqhPcH5ulv+/jMSInyEPKKQdraxCDPCjXxiMuAQhU+w4
- Wu5vFfoHCF7rfgOas+KK7Qc16UTgjPIZyXemhWD+K52fr4Lz9zPZ9VrcQ1I8fKI70gO4
- 4uxg3+QyJLuksFF5tuAe6wurwtZ3D9jxF11ejEJnaaWYf+fzTblqinRc4CZuwMAsVK8y
- Wy7A==
-X-Gm-Message-State: APjAAAV7dBC9ZekDR2zyHYSS9Fmr/UnHyo8QuqVoJc/x9leqUM1sW3zA
- cuhjTDXUMFqhOcKzlRQv9xaUDQG61PgBetvfv/iqGA==
-X-Google-Smtp-Source: APXvYqxI2VQvWTnQcoxy7TyrmB5biKKcl615nWibcQvTEeRrwcioVhJtyaGGoUN8rUC5IiYYFV8AL0CyW6FFP1g0Cok=
-X-Received: by 2002:aca:2b08:: with SMTP id i8mr7327992oik.146.1571399704090; 
- Fri, 18 Oct 2019 04:55:04 -0700 (PDT)
-MIME-Version: 1.0
-References: <20191018101711.24105-1-kraxel@redhat.com>
- <20191018101711.24105-2-kraxel@redhat.com>
-In-Reply-To: <20191018101711.24105-2-kraxel@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 18 Oct 2019 12:54:53 +0100
-Message-ID: <CAFEAcA9QMKaQiC+=0MYZsdX5NRMJ3D5Hqws=ZmWK8mHYakGr0w@mail.gmail.com>
-Subject: Re: [PULL 1/4] ui: Fix hanging up Cocoa display on macOS 10.15
- (Catalina)
-To: Gerd Hoffmann <kraxel@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::22e
+ (envelope-from <dplotnikov@virtuozzo.com>) id 1iLQrN-0002fm-Sg
+ for qemu-devel@nongnu.org; Fri, 18 Oct 2019 07:55:59 -0400
+Received: from relay.sw.ru ([185.231.240.75]:47784)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <dplotnikov@virtuozzo.com>)
+ id 1iLQrN-0002ei-Kl
+ for qemu-devel@nongnu.org; Fri, 18 Oct 2019 07:55:57 -0400
+Received: from [10.94.4.71] (helo=dptest2.qa.sw.ru)
+ by relay.sw.ru with esmtp (Exim 4.92.2)
+ (envelope-from <dplotnikov@virtuozzo.com>)
+ id 1iLQrJ-00053n-Uk; Fri, 18 Oct 2019 14:55:54 +0300
+From: Denis Plotnikov <dplotnikov@virtuozzo.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH] virtio: fix IO request length in virtio SCSI/block #PSBM-78839
+Date: Fri, 18 Oct 2019 14:55:47 +0300
+Message-Id: <20191018115547.19299-1-dplotnikov@virtuozzo.com>
+X-Mailer: git-send-email 2.17.0
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [fuzzy]
+X-Received-From: 185.231.240.75
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,77 +56,160 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Hikaru Nishida <hikarupsp@gmail.com>,
- QEMU Developers <qemu-devel@nongnu.org>, qemu-stable <qemu-stable@nongnu.org>
+Cc: kwolf@redhat.com, den@virtuozzo.com, mst@redhat.com, mreitz@redhat.com,
+ kraxel@redhat.com, stefanha@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Oops, just noticed that this patch should have been
-Cc: qemu-stable@nongnu.org.
+From: "Denis V. Lunev" <den@openvz.org>
 
-Hopefully the stable team can pick it up anyway.
+Linux guests submit IO requests no longer than PAGE_SIZE * max_seg
+field reported by SCSI controler. Thus typical sequential read with
+1 MB size results in the following pattern of the IO from the guest:
+  8,16   1    15754     2.766095122  2071  D   R 2095104 + 1008 [dd]
+  8,16   1    15755     2.766108785  2071  D   R 2096112 + 1008 [dd]
+  8,16   1    15756     2.766113486  2071  D   R 2097120 + 32 [dd]
+  8,16   1    15757     2.767668961     0  C   R 2095104 + 1008 [0]
+  8,16   1    15758     2.768534315     0  C   R 2096112 + 1008 [0]
+  8,16   1    15759     2.768539782     0  C   R 2097120 + 32 [0]
+The IO was generated by
+  dd if=/dev/sda of=/dev/null bs=1024 iflag=direct
 
-thanks
--- PMM
+This effectively means that on rotational disks we will observe 3 IOPS
+for each 2 MBs processed. This definitely negatively affects both
+guest and host IO performance.
 
-On Fri, 18 Oct 2019 at 11:17, Gerd Hoffmann <kraxel@redhat.com> wrote:
->
-> From: Hikaru Nishida <hikarupsp@gmail.com>
->
-> macOS API documentation says that before applicationDidFinishLaunching
-> is called, any events will not be processed. However, some events are
-> fired before it is called in macOS Catalina. This causes deadlock of
-> iothread_lock in handleEvent while it will be released after the
-> app_started_sem is posted.
-> This patch avoids processing events before the app_started_sem is
-> posted to prevent this deadlock.
->
-> Buglink: https://bugs.launchpad.net/qemu/+bug/1847906
-> Signed-off-by: Hikaru Nishida <hikarupsp@gmail.com>
-> Message-id: 20191015010734.85229-1-hikarupsp@gmail.com
-> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
-> ---
->  ui/cocoa.m | 12 ++++++++++++
->  1 file changed, 12 insertions(+)
->
-> diff --git a/ui/cocoa.m b/ui/cocoa.m
-> index f12e21df6e10..fbb5b1b45f81 100644
-> --- a/ui/cocoa.m
-> +++ b/ui/cocoa.m
-> @@ -134,6 +134,7 @@ NSArray * supportedImageFileTypes;
->
->  static QemuSemaphore display_init_sem;
->  static QemuSemaphore app_started_sem;
-> +static bool allow_events;
->
->  // Utility functions to run specified code block with iothread lock held
->  typedef void (^CodeBlock)(void);
-> @@ -729,6 +730,16 @@ QemuCocoaView *cocoaView;
->
->  - (bool) handleEvent:(NSEvent *)event
->  {
-> +    if(!allow_events) {
-> +        /*
-> +         * Just let OSX have all events that arrive before
-> +         * applicationDidFinishLaunching.
-> +         * This avoids a deadlock on the iothread lock, which cocoa_display_init()
-> +         * will not drop until after the app_started_sem is posted. (In theory
-> +         * there should not be any such events, but OSX Catalina now emits some.)
-> +         */
-> +        return false;
-> +    }
->      return bool_with_iothread_lock(^{
->          return [self handleEventLocked:event];
->      });
-> @@ -1156,6 +1167,7 @@ QemuCocoaView *cocoaView;
->  - (void)applicationDidFinishLaunching: (NSNotification *) note
->  {
->      COCOA_DEBUG("QemuCocoaAppController: applicationDidFinishLaunching\n");
-> +    allow_events = true;
->      /* Tell cocoa_display_init to proceed */
->      qemu_sem_post(&app_started_sem);
->  }
-> --
-> 2.18.1
+The cure is relatively simple - we should report lengthy scatter-gather
+ability of the SCSI controller. Fortunately the situation here is very
+good. VirtIO transport layer can accomodate 1024 items in one request
+while we are using only 128. This situation is present since almost
+very beginning. 2 items are dedicated for request metadata thus we
+should publish VIRTQUEUE_MAX_SIZE - 2 as max_seg.
+
+The following pattern is observed after the patch:
+  8,16   1     9921     2.662721340  2063  D   R 2095104 + 1024 [dd]
+  8,16   1     9922     2.662737585  2063  D   R 2096128 + 1024 [dd]
+  8,16   1     9923     2.665188167     0  C   R 2095104 + 1024 [0]
+  8,16   1     9924     2.665198777     0  C   R 2096128 + 1024 [0]
+which is much better.
+
+The dark side of this patch is that we are tweaking guest visible
+parameter, though this should be relatively safe as above transport
+layer support is present in QEMU/host Linux for a very long time.
+The patch adds configurable property for VirtIO SCSI with a new default
+and hardcode option for VirtBlock which does not provide good
+configurable framework.
+
+Unfortunately the commit can not be applied as is. For the real cure we
+need guest to be fixed to accomodate that queue length, which is done
+only in the latest 4.14 kernel. Thus we are going to expose the property
+and tweak it on machine type level.
+
+The problem with the old kernels is that they have
+max_segments <= virtqueue_size restriction which cause the guest
+crashing in the case of violation.
+To fix the case described above in the old kernels we can increase
+virtqueue_size to 256 and max_segments to 254. The pitfall here is
+that seabios allows the virtqueue_size-s < 128, however, the seabios
+patch extending that value to 256 is pending.
+
+CC: "Michael S. Tsirkin" <mst@redhat.com>
+CC: Stefan Hajnoczi <stefanha@redhat.com>
+CC: Kevin Wolf <kwolf@redhat.com>
+CC: Max Reitz <mreitz@redhat.com>
+CC: Gerd Hoffmann <kraxel@redhat.com>
+Signed-off-by: Denis V. Lunev <den@openvz.org>
+Signed-off-by: Denis Plotnikov <dplotnikov@virtuozzo.com>
+---
+ hw/block/virtio-blk.c           | 3 ++-
+ hw/scsi/vhost-scsi.c            | 2 ++
+ hw/scsi/virtio-scsi.c           | 4 +++-
+ include/hw/virtio/virtio-blk.h  | 1 +
+ include/hw/virtio/virtio-scsi.h | 1 +
+ 5 files changed, 9 insertions(+), 2 deletions(-)
+
+diff --git a/hw/block/virtio-blk.c b/hw/block/virtio-blk.c
+index 06e57a4d39..b2eaeeaf67 100644
+--- a/hw/block/virtio-blk.c
++++ b/hw/block/virtio-blk.c
+@@ -903,7 +903,7 @@ static void virtio_blk_update_config(VirtIODevice *vdev, uint8_t *config)
+     blk_get_geometry(s->blk, &capacity);
+     memset(&blkcfg, 0, sizeof(blkcfg));
+     virtio_stq_p(vdev, &blkcfg.capacity, capacity);
+-    virtio_stl_p(vdev, &blkcfg.seg_max, 128 - 2);
++    virtio_stl_p(vdev, &blkcfg.seg_max, s->conf.max_segments);
+     virtio_stw_p(vdev, &blkcfg.geometry.cylinders, conf->cyls);
+     virtio_stl_p(vdev, &blkcfg.blk_size, blk_size);
+     virtio_stw_p(vdev, &blkcfg.min_io_size, conf->min_io_size / blk_size);
+@@ -1240,6 +1240,7 @@ static Property virtio_blk_properties[] = {
+                        conf.max_discard_sectors, BDRV_REQUEST_MAX_SECTORS),
+     DEFINE_PROP_UINT32("max-write-zeroes-sectors", VirtIOBlock,
+                        conf.max_write_zeroes_sectors, BDRV_REQUEST_MAX_SECTORS),
++    DEFINE_PROP_UINT32("max_segments", VirtIOBlock, conf.max_segments, 126),
+     DEFINE_PROP_END_OF_LIST(),
+ };
+ 
+diff --git a/hw/scsi/vhost-scsi.c b/hw/scsi/vhost-scsi.c
+index 61e2e57da9..fa3b377807 100644
+--- a/hw/scsi/vhost-scsi.c
++++ b/hw/scsi/vhost-scsi.c
+@@ -242,6 +242,8 @@ static Property vhost_scsi_properties[] = {
+     DEFINE_PROP_BIT64("t10_pi", VHostSCSICommon, host_features,
+                                                  VIRTIO_SCSI_F_T10_PI,
+                                                  false),
++    DEFINE_PROP_UINT32("max_segments", VirtIOSCSICommon, conf.max_segments,
++                       126),
+     DEFINE_PROP_END_OF_LIST(),
+ };
+ 
+diff --git a/hw/scsi/virtio-scsi.c b/hw/scsi/virtio-scsi.c
+index 839f120256..8b070ddeed 100644
+--- a/hw/scsi/virtio-scsi.c
++++ b/hw/scsi/virtio-scsi.c
+@@ -650,7 +650,7 @@ static void virtio_scsi_get_config(VirtIODevice *vdev,
+     VirtIOSCSICommon *s = VIRTIO_SCSI_COMMON(vdev);
+ 
+     virtio_stl_p(vdev, &scsiconf->num_queues, s->conf.num_queues);
+-    virtio_stl_p(vdev, &scsiconf->seg_max, 128 - 2);
++    virtio_stl_p(vdev, &scsiconf->seg_max, s->conf.max_segments);
+     virtio_stl_p(vdev, &scsiconf->max_sectors, s->conf.max_sectors);
+     virtio_stl_p(vdev, &scsiconf->cmd_per_lun, s->conf.cmd_per_lun);
+     virtio_stl_p(vdev, &scsiconf->event_info_size, sizeof(VirtIOSCSIEvent));
+@@ -948,6 +948,8 @@ static Property virtio_scsi_properties[] = {
+                                                 VIRTIO_SCSI_F_CHANGE, true),
+     DEFINE_PROP_LINK("iothread", VirtIOSCSI, parent_obj.conf.iothread,
+                      TYPE_IOTHREAD, IOThread *),
++    DEFINE_PROP_UINT32("max_segments", VirtIOSCSI, parent_obj.conf.max_segments,
++                       126),
+     DEFINE_PROP_END_OF_LIST(),
+ };
+ 
+diff --git a/include/hw/virtio/virtio-blk.h b/include/hw/virtio/virtio-blk.h
+index cddcfbebe9..22da23a4a3 100644
+--- a/include/hw/virtio/virtio-blk.h
++++ b/include/hw/virtio/virtio-blk.h
+@@ -40,6 +40,7 @@ struct VirtIOBlkConf
+     uint16_t queue_size;
+     uint32_t max_discard_sectors;
+     uint32_t max_write_zeroes_sectors;
++    uint32_t max_segments;
+ };
+ 
+ struct VirtIOBlockDataPlane;
+diff --git a/include/hw/virtio/virtio-scsi.h b/include/hw/virtio/virtio-scsi.h
+index 4c0bcdb788..1e5805eec4 100644
+--- a/include/hw/virtio/virtio-scsi.h
++++ b/include/hw/virtio/virtio-scsi.h
+@@ -49,6 +49,7 @@ struct VirtIOSCSIConf {
+     uint32_t num_queues;
+     uint32_t virtqueue_size;
+     uint32_t max_sectors;
++    uint32_t max_segments;
+     uint32_t cmd_per_lun;
+ #ifdef CONFIG_VHOST_SCSI
+     char *vhostfd;
+-- 
+2.17.0
+
 
