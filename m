@@ -2,53 +2,54 @@ Return-Path: <SRS0=ht5U=YL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.2 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4443DCA9EA0
-	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 06:36:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 930C6CA9EA0
+	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 06:49:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1846020820
-	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 06:36:07 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1846020820
+	by mail.kernel.org (Postfix) with ESMTPS id 6531C21925
+	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 06:49:25 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6531C21925
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35676 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35726 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iLLrq-0002Zz-9A
-	for qemu-devel@archiver.kernel.org; Fri, 18 Oct 2019 02:36:06 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52884)
+	id 1iLM4i-0005eP-Eb
+	for qemu-devel@archiver.kernel.org; Fri, 18 Oct 2019 02:49:24 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53768)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <thuth@redhat.com>) id 1iLLrB-00029W-TV
- for qemu-devel@nongnu.org; Fri, 18 Oct 2019 02:35:26 -0400
+ (envelope-from <thuth@redhat.com>) id 1iLM43-0005F3-Qb
+ for qemu-devel@nongnu.org; Fri, 18 Oct 2019 02:48:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <thuth@redhat.com>) id 1iLLrA-0006Xn-73
- for qemu-devel@nongnu.org; Fri, 18 Oct 2019 02:35:25 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60976)
+ (envelope-from <thuth@redhat.com>) id 1iLM40-0001is-VD
+ for qemu-devel@nongnu.org; Fri, 18 Oct 2019 02:48:42 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:50298)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <thuth@redhat.com>)
- id 1iLLr9-0006XI-VT; Fri, 18 Oct 2019 02:35:24 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+ (Exim 4.71) (envelope-from <thuth@redhat.com>) id 1iLM40-0001he-MS
+ for qemu-devel@nongnu.org; Fri, 18 Oct 2019 02:48:40 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 0D5B6C05AA57;
- Fri, 18 Oct 2019 06:35:22 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 884FEC028358
+ for <qemu-devel@nongnu.org>; Fri, 18 Oct 2019 06:48:38 +0000 (UTC)
 Received: from thuth.remote.csb (dhcp-200-228.str.redhat.com [10.33.200.228])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 3F4DE19D70;
- Fri, 18 Oct 2019 06:35:18 +0000 (UTC)
-Subject: Re: [PATCH] hw/s390x: Emit a warning if user tried to enable USB
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- Cornelia Huck <cohuck@redhat.com>
-References: <20191017142123.1236-1-thuth@redhat.com>
- <20191017163402.43437191.cohuck@redhat.com>
- <2e689f2b-9bed-e40e-c761-6f38efaae635@redhat.com>
- <181d44b3-3333-91a3-0003-d312e8ab4805@redhat.com>
+ by smtp.corp.redhat.com (Postfix) with ESMTP id C2E6F600C1;
+ Fri, 18 Oct 2019 06:48:28 +0000 (UTC)
+Subject: Re: [PATCH v2 7/7] libqos: add VIRTIO PCI 1.0 support
 From: Thomas Huth <thuth@redhat.com>
+To: Stefan Hajnoczi <stefanha@redhat.com>
+References: <20191011085611.4194-1-stefanha@redhat.com>
+ <20191011085611.4194-8-stefanha@redhat.com>
+ <e7821640-de44-5e65-b9c1-2534dc676690@redhat.com>
+ <20191017160735.GB1266@stefanha-x1.localdomain>
+ <d803e58f-f0cc-b13b-6041-682497c6fe2f@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=thuth@redhat.com; prefer-encrypt=mutual; keydata=
  mQINBFH7eUwBEACzyOXKU+5Pcs6wNpKzrlJwzRl3VGZt95VCdb+FgoU9g11m7FWcOafrVRwU
@@ -93,18 +94,18 @@ Autocrypt: addr=thuth@redhat.com; prefer-encrypt=mutual; keydata=
  IQu4bBP2GxiRQ+NV3iV/KU3ebMRzqIC//DCOxzQNFNJAKldPe/bKZMCxEqtVoRkuJtNdp/5a
  yXFZ6TfE1hGKrDBYAm4vrnZ4CXFSBDllL59cFFOJCkn4Xboj/aVxxJxF30bn
 Organization: Red Hat
-Message-ID: <620c3bfe-2163-6bb4-cdc9-689dcd74dcac@redhat.com>
-Date: Fri, 18 Oct 2019 08:35:17 +0200
+Message-ID: <2545dd3e-f398-0e7a-0f82-fc340034a004@redhat.com>
+Date: Fri, 18 Oct 2019 08:48:23 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.9.0
 MIME-Version: 1.0
-In-Reply-To: <181d44b3-3333-91a3-0003-d312e8ab4805@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+In-Reply-To: <d803e58f-f0cc-b13b-6041-682497c6fe2f@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="GIK40EoU1vBedlPRb0KrewTAPhFsFGOak"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.32]); Fri, 18 Oct 2019 06:35:22 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
+ (mx1.redhat.com [10.5.110.31]); Fri, 18 Oct 2019 06:48:38 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 209.132.183.28
@@ -119,91 +120,155 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Halil Pasic <pasic@linux.ibm.com>,
- Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org,
- qemu-devel@nongnu.org
+Cc: Laurent Vivier <lvivier@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ qemu-devel@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 17/10/2019 20.18, Philippe Mathieu-Daud=C3=A9 wrote:
-> On 10/17/19 4:40 PM, Thomas Huth wrote:
->> On 17/10/2019 16.34, Cornelia Huck wrote:
->>> On Thu, 17 Oct 2019 16:21:23 +0200
->>> Thomas Huth <thuth@redhat.com> wrote:
->>>
->>>> There is no USB on s390x, so running qemu-system-s390x with
->>>> "-machine ...,usb=3Don" is certainly wrong. Emit a warning to make
->>>> the users aware of their misconfiguration.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--GIK40EoU1vBedlPRb0KrewTAPhFsFGOak
+Content-Type: multipart/mixed; boundary="2CckmgdMNZWPrQhXlkwPYEodhV81Aousm";
+ protected-headers="v1"
+From: Thomas Huth <thuth@redhat.com>
+To: Stefan Hajnoczi <stefanha@redhat.com>
+Cc: Laurent Vivier <lvivier@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ qemu-devel@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <2545dd3e-f398-0e7a-0f82-fc340034a004@redhat.com>
+Subject: Re: [PATCH v2 7/7] libqos: add VIRTIO PCI 1.0 support
+References: <20191011085611.4194-1-stefanha@redhat.com>
+ <20191011085611.4194-8-stefanha@redhat.com>
+ <e7821640-de44-5e65-b9c1-2534dc676690@redhat.com>
+ <20191017160735.GB1266@stefanha-x1.localdomain>
+ <d803e58f-f0cc-b13b-6041-682497c6fe2f@redhat.com>
+In-Reply-To: <d803e58f-f0cc-b13b-6041-682497c6fe2f@redhat.com>
+
+--2CckmgdMNZWPrQhXlkwPYEodhV81Aousm
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+
+On 17/10/2019 18.18, Thomas Huth wrote:
+> On 17/10/2019 18.07, Stefan Hajnoczi wrote:
+>> On Thu, Oct 17, 2019 at 04:52:54PM +0200, Thomas Huth wrote:
+>>> On 11/10/2019 10.56, Stefan Hajnoczi wrote:
+>>>> Implement the VIRTIO 1.0 virtio-pci interface.  The main change here=
+ is
+>>>> that the register layout is no longer a fixed layout in BAR 0.  Inst=
+ead
+>>>> we have to iterate of PCI Capabilities to find descriptions of where=
+
+>>>> various registers are located.  The vring registers are also more
+>>>> fine-grained, allowing for more flexible vring layouts, but we don't=
+
+>>>> take advantage of that.
 >>>>
->>>> Signed-off-by: Thomas Huth <thuth@redhat.com>
+>>>> Note that test cases do not negotiate VIRTIO_F_VERSION_1 yet and are=
+
+>>>> therefore not running in VIRTIO 1.0 mode.
+>>>>
+>>>> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
 >>>> ---
->>>> =C2=A0 After a year or two, we could finally turn this into a hard e=
-rror,
->>>> =C2=A0 but I think we should give the users some time to fix their c=
-ommand
->>>> =C2=A0 lines first, so I'm initially only emitting a warning here.
->>>>
->>>> =C2=A0 hw/s390x/s390-virtio-ccw.c | 4 ++++
->>>> =C2=A0 1 file changed, 4 insertions(+)
->>>>
->>>> diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
->>>> index d3edeef0ad..af8c4c0daf 100644
->>>> --- a/hw/s390x/s390-virtio-ccw.c
->>>> +++ b/hw/s390x/s390-virtio-ccw.c
->>>> @@ -243,6 +243,10 @@ static void ccw_init(MachineState *machine)
->>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 VirtualCssBus *css_bus;
->>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 DeviceState *dev;
->>>> =C2=A0 +=C2=A0=C2=A0=C2=A0 if (machine->usb) {
->>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 warn_report("This machin=
-e does not support USB");
+>>>>  tests/Makefile.include           |   1 +
+>>>>  tests/libqos/virtio-pci-modern.h |  17 ++
+>>>>  tests/libqos/virtio-pci.h        |  10 +
+>>>>  tests/libqos/virtio-pci-modern.c | 412 ++++++++++++++++++++++++++++=
++++
+>>>>  tests/libqos/virtio-pci.c        |   6 +-
+>>>>  5 files changed, 445 insertions(+), 1 deletion(-)
+>>>>  create mode 100644 tests/libqos/virtio-pci-modern.h
+>>>>  create mode 100644 tests/libqos/virtio-pci-modern.c
+>>> [...]
+>>>> +static bool probe_device_type(QVirtioPCIDevice *dev)
+>>>> +{
+>>>> +    uint16_t vendor_id;
+>>>> +    uint16_t device_id;
+>>>> +
+>>>> +    /* "Drivers MUST match devices with the PCI Vendor ID 0x1AF4" *=
+/
+>>>> +    vendor_id =3D qpci_config_readw(dev->pdev, PCI_VENDOR_ID);
+>>>> +    if (vendor_id !=3D 0x1af4) {
+>>>> +        return false;
+>>>> +    }
+>>>> +
+>>>> +    /*
+>>>> +     * "Any PCI device with ... PCI Device ID 0x1000 through 0x107F=
+ inclusive
+>>>> +     * is a virtio device"
+>>>> +     */
+>>>> +    device_id =3D qpci_config_readw(dev->pdev, PCI_DEVICE_ID);
+>>>> +    if (device_id < 0x1000 || device_id > 0x107f) {
+>>>> +        return false;
+>>>> +    }
+>>>> +
+>>>> +    /*
+>>>> +     * "Devices MAY utilize a Transitional PCI Device ID range, 0x1=
+000 to
+>>>> +     * 0x103F depending on the device type"
+>>>> +     */
+>>>> +    if (device_id < 0x1040) {
+>>>> +        /*
+>>>> +         * "Transitional devices MUST have the PCI Subsystem Device=
+ ID matching
+>>>> +         * the Virtio Device ID"
+>>>> +         */
+>>>> +        dev->vdev.device_type =3D qpci_config_readw(dev->pdev, PCI_=
+SUBSYSTEM_ID);
 >>>
->>> I'm wondering if this is the only machine type not supporting usb...
->>> if not, how are others handling it?
+>>> Shouldn't you return "false" here in case the device_type is 0 ? Whic=
+h
+>>> likely means that it is a legacy or broken device ...?
 >>
->> I think most machines are silently ignoring it, like we did on s390x
->> until now, too.
->>
->>> The usb parsing code in machine.c does not care if usb is even
->>> configured (CONFIG_USB).
->>
->> machine.c is common code, so you can not use CONFIG_USB there.
+>> The real decision whether to use this PCI device or not happens in
+>> probe_device_layout().  If it's broken or a legacy device then that
+>> function will fail.
 >=20
-> We already have:
+> Ok, fair.
 >=20
-> bool target_words_bigendian(void)
-> {
-> #if defined(TARGET_WORDS_BIGENDIAN)
-> =C2=A0=C2=A0=C2=A0 return true;
-> #else
-> =C2=A0=C2=A0=C2=A0 return false;
-> #endif
-> }
+> I've added the patches to my qtest-next branch:
+>=20
+> https://gitlab.com/huth/qemu/tree/qtest-next
 
-... and kvm_available() and xen_available() ...
+ Hi Stephan,
 
-> diff --git a/hw/usb/machine.c b/hw/usb/machine.c
-> new file mode 100644
-> index 0000000000..5381928479
-> --- /dev/null
-> +++ b/hw/usb/machine.c
-> @@ -0,0 +1,12 @@
-> +#include "qemu/osdep.h"
-> +#include "hw/boards.h"
-> +#include "config-devices.h"
-> +
-> +bool machine_has_usb(void)
-> +{
-> +#if defined(CONFIG_USB)
-> +=C2=A0=C2=A0=C2=A0 return true;
-> +#else
-> +=C2=A0=C2=A0=C2=A0 return false;
-> +#endif
-> +}
+looks like this is breaking the virtio-blk-test in certain configurations=
+:
 
-I think I'd rather call it usb_available() (like the other _available()
-functions) and put it into arch_init.c (and rename that file to arch.c
-or target.c or something like that).
+ https://gitlab.com/huth/qemu/-/jobs/324085741
 
- Thomas
+and:
+
+ https://cirrus-ci.com/task/4511314474434560
+
+Could you please have a look?
+
+ Thanks,
+  Thomas
+
+
+--2CckmgdMNZWPrQhXlkwPYEodhV81Aousm--
+
+--GIK40EoU1vBedlPRb0KrewTAPhFsFGOak
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEJ7iIR+7gJQEY8+q5LtnXdP5wLbUFAl2pYDwACgkQLtnXdP5w
+LbWJgQ/+OceceplB9mj/FnwxMM+oGFOQIQBg48sePFyNtZt0INWtb/x8FLIas7eX
+CCrj6gEsIc1iY328RDcLO32qffe4we6dd2if8u8l74EUJUuCIVaMCF2hR/Stn2lg
+o1kHEzzHOF4gTd/WEEtzZJ2vFt/eynzmlJbOqYYuLGn4+AYq53EQajxQEObWzeUQ
+0az1cr3Qr1Fb9A55cuchrkRf1gl4nKM2LyDQJFbvEjSzQxLZRAYm/NBIJYIqKh5u
+kfyMjTycOK2mPCoNjKryRL7WVKmKhC6Evbjtvn/1mR6lJOrjyL/0dOFiXeXTSPeQ
+AIrNrp2Xz7uyjEcetVsN5+MOOfLV5DHhv8kCQ+ECRXK+UvDBXTAhCLUqmUZaTm8J
+4iGgjJ0MkrcAcI1ETiBBfIQj6ntadhTp8kMs/GbhKW+Dl+94bKgURnceqtbTBalU
+n7qxelxs7NDbU5ShNW40kNMcll52aFU04VwIQeU2wqHAIeT/LbWfpWx0NQX7ITC7
+VbIG7SnTFjI0100R51W4dGYSKdtHfr7gVepPeyhw/OIRRj6mmKIU/e4im3+mTGfw
+gu6eyDOFiBJqf+prdpvdyQrABEd3J4/uAJeKVU02y3BxPeYfKfHlPt1PYhCiOxjk
+RHjL8BEe/GAtCjaeKhD2pAkLv6Z3XAC1j+p0vdXTH9mOqV1qU3Y=
+=lNMY
+-----END PGP SIGNATURE-----
+
+--GIK40EoU1vBedlPRb0KrewTAPhFsFGOak--
 
