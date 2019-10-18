@@ -2,107 +2,86 @@ Return-Path: <SRS0=ht5U=YL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A626CCA9EA0
-	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 16:05:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 910ECCA9EA0
+	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 16:06:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7B64721897
-	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 16:05:33 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7B64721897
+	by mail.kernel.org (Postfix) with ESMTPS id 6616F21D7C
+	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 16:06:29 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6616F21D7C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42548 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42560 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iLUkt-0008Rk-PC
-	for qemu-devel@archiver.kernel.org; Fri, 18 Oct 2019 12:05:31 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47418)
+	id 1iLUlo-0001Jr-2d
+	for qemu-devel@archiver.kernel.org; Fri, 18 Oct 2019 12:06:28 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46693)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <thuth@redhat.com>) id 1iLUh2-0005B4-Ho
- for qemu-devel@nongnu.org; Fri, 18 Oct 2019 12:01:35 -0400
+ (envelope-from <mreitz@redhat.com>) id 1iLUaD-0005kp-Lu
+ for qemu-devel@nongnu.org; Fri, 18 Oct 2019 11:54:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <thuth@redhat.com>) id 1iLUgz-0003NP-JC
- for qemu-devel@nongnu.org; Fri, 18 Oct 2019 12:01:31 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:49853)
+ (envelope-from <mreitz@redhat.com>) id 1iLUaC-0007mf-Cm
+ for qemu-devel@nongnu.org; Fri, 18 Oct 2019 11:54:29 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:38618)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <thuth@redhat.com>)
- id 1iLUgx-0003Mn-QN; Fri, 18 Oct 2019 12:01:28 -0400
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>)
+ id 1iLUa9-0007ik-NY; Fri, 18 Oct 2019 11:54:25 -0400
 Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
  [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 9D83918CCEE2;
- Fri, 18 Oct 2019 16:01:26 +0000 (UTC)
-Received: from thuth.remote.csb (ovpn-116-252.ams2.redhat.com [10.36.116.252])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 9ED61600C1;
- Fri, 18 Oct 2019 16:01:23 +0000 (UTC)
-Subject: Re: [PATCH v2] Do not use %m in common code to print error messages
-To: Kamil Rytarowski <n54@gmx.com>, Stefano Garzarella <sgarzare@redhat.com>
-References: <20191018130716.25438-1-thuth@redhat.com>
- <20191018134215.u6psfffrrxlsa2ns@steredhat>
- <1f36c112-fabb-df41-e01d-476e4c86186e@gmx.com>
-From: Thomas Huth <thuth@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=thuth@redhat.com; prefer-encrypt=mutual; keydata=
- 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
-Organization: Red Hat
-Message-ID: <f8fc0de2-b4b0-a75a-a00f-c6bca6914159@redhat.com>
-Date: Fri, 18 Oct 2019 18:01:22 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+ by mx1.redhat.com (Postfix) with ESMTPS id A4FB581F0F;
+ Fri, 18 Oct 2019 15:54:24 +0000 (UTC)
+Received: from dresden.str.redhat.com (unknown [10.36.118.46])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 5B637600C4;
+ Fri, 18 Oct 2019 15:54:20 +0000 (UTC)
+Subject: Re: [PATCH v2 0/5] active-mirror: support unaligned guest operations
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-block@nongnu.org
+References: <20191011090711.19940-1-vsementsov@virtuozzo.com>
+From: Max Reitz <mreitz@redhat.com>
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <dc555030-9238-126c-9256-8df6304d30e1@redhat.com>
+Date: Fri, 18 Oct 2019 17:54:18 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.0
 MIME-Version: 1.0
-In-Reply-To: <1f36c112-fabb-df41-e01d-476e4c86186e@gmx.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <20191011090711.19940-1-vsementsov@virtuozzo.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="9WD5X87wB97H0UCeSCOpiTN03ptUuRa0S"
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.63]); Fri, 18 Oct 2019 16:01:26 +0000 (UTC)
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.27]); Fri, 18 Oct 2019 15:54:24 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 209.132.183.28
@@ -117,53 +96,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-trivial@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
- Kamil Rytarowski <kamil@netbsd.org>, berrange@redhat.com,
- qemu-devel@nongnu.org
+Cc: fam@euphon.net, kwolf@redhat.com, jsnow@redhat.com, qemu-devel@nongnu.org,
+ den@openvz.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 18/10/2019 15.49, Kamil Rytarowski wrote:
-> On 18.10.2019 15:42, Stefano Garzarella wrote:
->> On Fri, Oct 18, 2019 at 03:07:16PM +0200, Thomas Huth wrote:
->>> The %m format specifier is an extension from glibc - and when compiling
->>> QEMU for NetBSD, the compiler correctly complains, e.g.:
->>>
->>> /home/qemu/qemu-test.ELjfrQ/src/util/main-loop.c: In function 'sigfd_handler':
->>> /home/qemu/qemu-test.ELjfrQ/src/util/main-loop.c:64:13: warning: %m is only
->>>  allowed in syslog(3) like functions [-Wformat=]
->>>              printf("read from sigfd returned %zd: %m\n", len);
->>>              ^
->>> Let's use g_strerror() here instead, which is an easy-to-use wrapper
->>> around the thread-safe strerror_r() function.
->>>
->>> While we're at it, also convert the "printf()" in main-loop.c into
->>> the preferred "error_report()".
->>>
->>> Signed-off-by: Thomas Huth <thuth@redhat.com>
->>> ---
->>>  v2: Do not try to g_free() the strings
->>>
->>>  hw/misc/tmp421.c | 4 ++--
->>>  util/main-loop.c | 3 ++-
->>>  util/systemd.c   | 4 ++--
->>>  3 files changed, 6 insertions(+), 5 deletions(-)
->>
->> There are many uses of %m also in hw/vfio/ but that's Linux stuff.
->> Should we change those too or it doesn't matter since it never really
->> compiled on NetBSD?
-> 
-> It's a gnu (glibc) extension and linux can use alternative libc
-> implementations. Probably most of them capable to host qemu use %m.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--9WD5X87wB97H0UCeSCOpiTN03ptUuRa0S
+Content-Type: multipart/mixed; boundary="eVjNE0Z50utQCaCz9h3WT3YwHoZ8DpEdr"
 
-I think I read somewhere that other libcs on Linux also support %m (like
-musl), but I just can't find that reference anymore. Anyway, we can
-still fix that later in case someone hits the issue.
+--eVjNE0Z50utQCaCz9h3WT3YwHoZ8DpEdr
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
->> Anyway, this patch LGTM:
->> Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
+On 11.10.19 11:07, Vladimir Sementsov-Ogievskiy wrote:
+> Commit 9adc1cb49af8d fixed a bug about unaligned (to dirty bitmap
+> granularity) guest writes (and discards) by simply requesting
+> corresponding alignment on mirror-top filter. However forcing large
+> alignment obviously decreases performance of unaligned requests.
+>=20
+> So it's time for a new solution which is in 04. And 05 reverts
+> 9adc1cb49af8d.
+>=20
+> v2:
+> 01: new fix (do we need it for stable?)
 
- Thanks,
-  Thomas
+I don=E2=80=99t know? :-)
+
+I=E2=80=99ll just add the stable tag for good measure, I suppose it can=E2=
+=80=99t hurt.
+
+> 02,03,05: add Max's r-b
+> 04: fix bitmap handling
+>     improve comments
+>=20
+> Vladimir Sementsov-Ogievskiy (5):
+>   hbitmap: handle set/reset with zero length
+>   block/mirror: simplify do_sync_target_write
+>   block/block-backend: add blk_co_pwritev_part
+>   block/mirror: support unaligned write in active mirror
+>   Revert "mirror: Only mirror granularity-aligned chunks"
+>=20
+>  include/sysemu/block-backend.h |   4 +
+>  block/block-backend.c          |  17 +++-
+>  block/mirror.c                 | 181 ++++++++++++++++-----------------=
+
+>  util/hbitmap.c                 |   8 ++
+>  4 files changed, 114 insertions(+), 96 deletions(-)
+
+Thanks, applied to my block branch:
+
+https://git.xanclic.moe/XanClic/qemu/commits/branch/block
+
+Max
+
+
+--eVjNE0Z50utQCaCz9h3WT3YwHoZ8DpEdr--
+
+--9WD5X87wB97H0UCeSCOpiTN03ptUuRa0S
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl2p4CoACgkQ9AfbAGHV
+z0BCFwgAqPUueYv7aX8dBo+g4ctS7OU7q7T1UEELsJ7Lw3hmBHe0M0McDGiY9TzT
+ev49LP/P10p+vYtFpqtvUkyQ5DxkwLI0sHDWJKHugIE4afSTP0o3lBF8sKRrE0s8
+Aw2g/p9VlVD9FQdJHqbkbsMbWHJcRUlfpv/o6Cj9yWL6O3pyqos1hv41WiutHRbL
+kjOhmdE0MCaMQSPyXKkvQ1psASONIwuMD/F5dWu42qMffI3FEuNPuF79evhKt1d6
+2gZ/P8GVjzBPmkUVJ+dHNTo6yuL8wFCwh+GQbX5Z+Ao3eDjl4LSYN8cXmebjUPW7
+UcjyJdZ+gs2/pCV9iKohx9ONUqFvcw==
+=s9I3
+-----END PGP SIGNATURE-----
+
+--9WD5X87wB97H0UCeSCOpiTN03ptUuRa0S--
 
