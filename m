@@ -2,129 +2,83 @@ Return-Path: <SRS0=ht5U=YL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4CDE7CA9EA1
-	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 09:09:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9804FCA9EA1
+	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 09:15:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 17B83222BD
-	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 09:09:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4DA14222BD
+	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 09:15:20 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=xilinx.onmicrosoft.com header.i=@xilinx.onmicrosoft.com header.b="JDfoS8AW"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 17B83222BD
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=xilinx.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="vGGpiPn3"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4DA14222BD
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36894 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36914 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iLOFw-0004ts-4T
-	for qemu-devel@archiver.kernel.org; Fri, 18 Oct 2019 05:09:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44022)
+	id 1iLOLv-0006pd-Cw
+	for qemu-devel@archiver.kernel.org; Fri, 18 Oct 2019 05:15:19 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44652)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <saipava@xilinx.com>) id 1iLOFE-0004TC-0f
- for qemu-devel@nongnu.org; Fri, 18 Oct 2019 05:08:25 -0400
+ (envelope-from <aleksandar.m.mail@gmail.com>) id 1iLOLC-0006Q8-3d
+ for qemu-devel@nongnu.org; Fri, 18 Oct 2019 05:14:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <saipava@xilinx.com>) id 1iLOFC-0003Ui-GG
- for qemu-devel@nongnu.org; Fri, 18 Oct 2019 05:08:23 -0400
-Received: from mail-eopbgr700064.outbound.protection.outlook.com
- ([40.107.70.64]:64609 helo=NAM04-SN1-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <saipava@xilinx.com>) id 1iLOFC-0003U5-3X
- for qemu-devel@nongnu.org; Fri, 18 Oct 2019 05:08:22 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=bFg5hQsWpgk1534n1OjQIwxEQjyLWDhvFJEJZcZMHkOasGgUbF97++E2DCWh4Get3IaowGW2V3338OCZvxVkXm4zbk7+xocUDvW4qN5OYfHUc/rLJcuJie93M2k8ATkfgMHZ66A4s9a4/yqOY6yw3I9jEmP2onf8axjfnpwKJi6/eGur63LQndfzaxK1NbihE2Jl2c1mr5/yZwYkzDiJBhERmeta7PiKnQn5wI8bWU03Thh/M5nOty6ouB9GykjsWvcNIIysxUGIr957CncLUF217bn8mwajovN04IW29FnafZ+MxRb2c4hDBrIhfn/aimFYfyuumsVrmkW+KdbtiQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=2V/WtIo7vDt1fSByUP+AcQNDAjqdZDlxV3dPBZ+mBOo=;
- b=RzmhZoBokuEk7f6H34FxFNridGQP/QikJ2GtO2cs6vsAyXPAWWeGLuHxoplb1r+3byy45EX8z8hWegilFjJZtSgSxWuSkbRGHh/E8qHVGHZFFZdR9iQ5LA9Vt4gzuq9CM2GLuaZptALC7w+ucjo8UawCnz/4HSpHnldImsgG9CQ3e6lcqCzxo2M3OzCB10zRkabTDhTTwYgdoKyY1YQp5LHnWa2YGW3uk8cpTlapbHJpJC9uhAcxIg66SOxqiA/QjqRXE/HHzRmyWSq+lefx44R7FMtW1pqbOblOKbXopo9ZbzwPeXsJjKjk6Ks0hdctQPTr84BZsyNFZZrx2qZtmA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 149.199.60.83) smtp.rcpttodomain=alistair23.me smtp.mailfrom=xilinx.com;
- dmarc=bestguesspass action=none header.from=xilinx.com; dkim=none (message
- not signed); arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=xilinx.onmicrosoft.com; s=selector2-xilinx-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=2V/WtIo7vDt1fSByUP+AcQNDAjqdZDlxV3dPBZ+mBOo=;
- b=JDfoS8AWeNSl5GO3eld3zOVC3VuKO+yLCPR6u8sM+ItUuA0CGQ7xG9b+K0EeF6BviKDDwDRiJ0v9raGRDEQyQzpiC9DeKRkCnOOwXPfpUEfQMyKfEM2DrN4yj4Qg0ttoaUfl8Xt563WkXRw45YpigzHVDOp5f7Eo4jgeWI9t4Ds=
-Received: from MWHPR0201CA0012.namprd02.prod.outlook.com
- (2603:10b6:301:74::25) by DM6PR02MB5483.namprd02.prod.outlook.com
- (2603:10b6:5:7a::22) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2347.16; Fri, 18 Oct
- 2019 09:08:19 +0000
-Received: from CY1NAM02FT040.eop-nam02.prod.protection.outlook.com
- (2a01:111:f400:7e45::200) by MWHPR0201CA0012.outlook.office365.com
- (2603:10b6:301:74::25) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2347.16 via Frontend
- Transport; Fri, 18 Oct 2019 09:08:19 +0000
-Authentication-Results: spf=pass (sender IP is 149.199.60.83)
- smtp.mailfrom=xilinx.com; alistair23.me; dkim=none (message not signed)
- header.d=none;alistair23.me; dmarc=bestguesspass action=none
- header.from=xilinx.com;
-Received-SPF: Pass (protection.outlook.com: domain of xilinx.com designates
- 149.199.60.83 as permitted sender) receiver=protection.outlook.com;
- client-ip=149.199.60.83; helo=xsj-pvapsmtpgw01;
-Received: from xsj-pvapsmtpgw01 (149.199.60.83) by
- CY1NAM02FT040.mail.protection.outlook.com (10.152.75.135) with Microsoft SMTP
- Server (version=TLS1_0, cipher=TLS_RSA_WITH_AES_256_CBC_SHA) id 15.20.2367.14
- via Frontend Transport; Fri, 18 Oct 2019 09:08:18 +0000
-Received: from unknown-38-66.xilinx.com ([149.199.38.66] helo=xsj-pvapsmtp01)
- by xsj-pvapsmtpgw01 with esmtp (Exim 4.63)
- (envelope-from <sai.pavan.boddu@xilinx.com>)
- id 1iLOF8-0004ER-AX; Fri, 18 Oct 2019 02:08:18 -0700
-Received: from localhost ([127.0.0.1] helo=xsj-pvapsmtp01)
- by xsj-pvapsmtp01 with esmtp (Exim 4.63)
- (envelope-from <sai.pavan.boddu@xilinx.com>)
- id 1iLOF2-0003TF-NM; Fri, 18 Oct 2019 02:08:12 -0700
-Received: from [10.140.6.35] (helo=xhdsaipava40.xilinx.com)
- by xsj-pvapsmtp01 with esmtp (Exim 4.63)
- (envelope-from <saipava@xhdsaipava40.xilinx.com>)
- id 1iLOF2-0003T3-0g; Fri, 18 Oct 2019 02:08:12 -0700
-Received: by xhdsaipava40.xilinx.com (Postfix, from userid 14131)
- id A6BC713C1372; Fri, 18 Oct 2019 14:39:11 +0530 (IST)
-From: Sai Pavan Boddu <sai.pavan.boddu@xilinx.com>
-To: Alistair Francis <alistair@alistair23.me>
-Subject: [PATCH v3] ssi: xilinx_spips: Skip spi bus update for few register
- writes
-Date: Fri, 18 Oct 2019 14:39:04 +0530
-Message-Id: <1571389744-11740-1-git-send-email-sai.pavan.boddu@xilinx.com>
-X-Mailer: git-send-email 2.7.4
-X-TM-AS-Product-Ver: IMSS-7.1.0.1224-8.2.0.1013-23620.005
-X-TM-AS-User-Approved-Sender: Yes;Yes
-X-EOPAttributedMessage: 0
-X-MS-Office365-Filtering-HT: Tenant
-X-Forefront-Antispam-Report: CIP:149.199.60.83; IPV:NLI; CTRY:US; EFV:NLI;
- SFV:NSPM;
- SFS:(10009020)(4636009)(136003)(39860400002)(376002)(396003)(346002)(189003)(199004)(54906003)(16586007)(42186006)(2906002)(70586007)(316002)(14444005)(47776003)(305945005)(486006)(476003)(5660300002)(106002)(15650500001)(2616005)(50466002)(126002)(26005)(81166006)(6916009)(81156014)(50226002)(8676002)(336012)(6666004)(478600001)(8936002)(36756003)(103686004)(4326008)(48376002)(356004)(426003)(6266002)(70206006)(51416003)(186003);
- DIR:OUT; SFP:1101; SCL:1; SRVR:DM6PR02MB5483; H:xsj-pvapsmtpgw01; FPR:;
- SPF:Pass; LANG:en; PTR:unknown-60-83.xilinx.com; MX:1; A:1; 
+ (envelope-from <aleksandar.m.mail@gmail.com>) id 1iLOLA-0007EP-OU
+ for qemu-devel@nongnu.org; Fri, 18 Oct 2019 05:14:34 -0400
+Received: from mail-oi1-x242.google.com ([2607:f8b0:4864:20::242]:36325)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
+ id 1iLOLA-0007E8-JN
+ for qemu-devel@nongnu.org; Fri, 18 Oct 2019 05:14:32 -0400
+Received: by mail-oi1-x242.google.com with SMTP id k20so4632366oih.3
+ for <qemu-devel@nongnu.org>; Fri, 18 Oct 2019 02:14:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:in-reply-to:references:from:date:message-id:subject:to
+ :cc; bh=P5siBUFI5iZMtiZieqJjBBSJeQKA4aa2rYGk1Uryo30=;
+ b=vGGpiPn3K5IcIS6zPguDDmG3J1LWJDbzfqTn/Q5Xo1PyAyjtie+B2SbjTKOiAsjwvz
+ ABeDQ6lD67FEdT5sKDBhlnQRtg73WHpNleAlcrkQpDmEmdgPzl1ZpSzO3DOZbFSFvOiC
+ LF+j9JoHXCc5fLw/QaFXDRSV/wcZKhstNDxR6ijEtj7jUv3QTu3Vo4i7Zm6O9S060Fv7
+ uWvhcK0yr7X4fFjcYA8m+B8W3mqWRoEmAhUBp9x7C024TjcHmyyPDSKd9OuUctH5uKDl
+ Xpu8IPKA2Qq1ZxIB3wHXpWAvk3Q6GkZXZorJ0Ih5HR0FXFHmFuK+pJwv8DeHf/9OuXgv
+ s/cg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:in-reply-to:references:from:date
+ :message-id:subject:to:cc;
+ bh=P5siBUFI5iZMtiZieqJjBBSJeQKA4aa2rYGk1Uryo30=;
+ b=eOvvilTPp7MjgjHNR1VAEQO6lKMOVbfqMDkHsf2VUCQcw54+5oMQTMnlqPyTeOdrDl
+ UKrucP6AclsORdIkxCERzG4arQbaGo2DAOb1iEWmo/Y/fl2CiFmcIEweg8POZZFjo5jN
+ Uh5j7tIbQBJzFp8cf5r8uj+frzOpHOpbr5UxGYqKPLr8E3Y8LIX0RFdoSiap4ptEQQcz
+ x8a1bNyKtiD1d88Z26MoJMB7x6naJh2RwnKis98eAEBVPatiUF7uK4bQpUnYYo8M+1cC
+ AuDVgJIGYwxsQMyWOaGGRnjX1p910dmL7q2KLr9CQ/mE3Mk54RFR3DKHrw4xyxWcmJYt
+ mXLw==
+X-Gm-Message-State: APjAAAWaXvrC4n8eNsReN787WeTbqdRUscXm0aFnovrpHwhrYoDfabh6
+ xqR4/cZh4v3R+4FEPacf1izRTjjvndfMkSMpHJg=
+X-Google-Smtp-Source: APXvYqweA1ISXOChYbXDU6YJ0gWI3xlkWzXDwhaWlC7LhH/QEHgzq2p/193RI5+7aHz/7gq2+EKJUjRHlKouyJtwgTM=
+X-Received: by 2002:aca:4d12:: with SMTP id a18mr6804354oib.79.1571390071889; 
+ Fri, 18 Oct 2019 02:14:31 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: e6e32476-49a1-48da-50f3-08d753aab7cd
-X-MS-TrafficTypeDiagnostic: DM6PR02MB5483:
-X-Microsoft-Antispam-PRVS: <DM6PR02MB548304A72AAB9879E0E6EFDDCA6C0@DM6PR02MB5483.namprd02.prod.outlook.com>
-X-Auto-Response-Suppress: DR, RN, NRN, OOF, AutoReply
-X-MS-Oob-TLC-OOBClassifiers: OLM:72;
-X-Forefront-PRVS: 01949FE337
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: nCWCgis/eS3gJQj3fcE7UXMF3xl2qmbcEhnEBwnUj/s0XjcDQhnl711L9OpOPZdoj5ARZEQtDsHwD05UffnMcVySlR0nud8iW8SkfMdFeeLT31TEfe5V+7l5CEdgtHo0bt0QWYBVRRKQUEpbwxjlFcZ9YVbTndpO/F0FVgEi4VGPo4lMvYe9elKLlG36vdif9okSTpmyP6/qP3jS2l0Aj4XYpH2S0tOBGvxULMQS3L3Dn3+peim4a/Ba1tEOwiqXN7nkZF6KCGuoSzd0YY1tUWOajNo8Gz2zXFfk9WFUiipjd8UEAv8V0X8Y0gX9F11ne1kvFGmtTWwKvo21loIITSYfwPOAycoFQY5BCocAChmNWh+pfDPd6wuFRvroA3HzrESxjNcgfOMTRjaIMVJFOrKJSp+DZcu3MHKpQkcfOVE=
-X-OriginatorOrg: xilinx.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Oct 2019 09:08:18.8035 (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: e6e32476-49a1-48da-50f3-08d753aab7cd
-X-MS-Exchange-CrossTenant-Id: 657af505-d5df-48d0-8300-c31994686c5c
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=657af505-d5df-48d0-8300-c31994686c5c; Ip=[149.199.60.83];
- Helo=[xsj-pvapsmtpgw01]
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR02MB5483
-X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
-X-Received-From: 40.107.70.64
+Received: by 2002:a9d:340a:0:0:0:0:0 with HTTP; Fri, 18 Oct 2019 02:14:31
+ -0700 (PDT)
+In-Reply-To: <20191015162705.28087-26-philmd@redhat.com>
+References: <20191015162705.28087-1-philmd@redhat.com>
+ <20191015162705.28087-26-philmd@redhat.com>
+From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+Date: Fri, 18 Oct 2019 11:14:31 +0200
+Message-ID: <CAL1e-=iWxE1GKw5dUWrx1knvr+M4sY1tV2d1uRBHPa01c3jLzg@mail.gmail.com>
+Subject: Re: [PATCH 25/32] hw/pci-host/piix: Extract piix3_create()
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
+Content-Type: multipart/alternative; boundary="00000000000009e44005952bc33f"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::242
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -136,66 +90,267 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: edgar.iglesias@xilinx.com, Peter Maydell <peter.maydell@linaro.org>,
- qemu-devel@nongnu.org, Francisco Iglesias <frasse.iglesias@gmail.com>
+Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
+ Stefano Stabellini <sstabellini@kernel.org>,
+ Eduardo Habkost <ehabkost@redhat.com>,
+ "kvm@vger.kernel.org" <kvm@vger.kernel.org>, Paul Durrant <paul@xen.org>,
+ "Michael S. Tsirkin" <mst@redhat.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ Igor Mammedov <imammedo@redhat.com>,
+ =?UTF-8?Q?Herv=C3=A9_Poussineau?= <hpoussin@reactos.org>,
+ Aleksandar Markovic <amarkovic@wavecomp.com>,
+ "xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>,
+ Anthony Perard <anthony.perard@citrix.com>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
+ Aurelien Jarno <aurelien@aurel32.net>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Few of the register writes need not update the spi bus state, so just
-return after reg write. Added few more dummy register offsets which need
-the same behaviour.
+--00000000000009e44005952bc33f
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Signed-off-by: Sai Pavan Boddu <sai.pavan.boddu@xilinx.com>
----
-Changes for V2:
-	Just skip update of spips cs and fifos
-	Update commit message accordingly
-Changes for V3:
-	Avoid checking for zynqmp qspi
-	Skip spi bus update for few of the registers
+On Tuesday, October 15, 2019, Philippe Mathieu-Daud=C3=A9 <philmd@redhat.co=
+m>
+wrote:
 
- hw/ssi/xilinx_spips.c | 12 ++++++++++++
- 1 file changed, 12 insertions(+)
+> Extract the PIIX3 creation code from the i440fx_init() function.
+>
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+> ---
+>  hw/pci-host/piix.c | 51 ++++++++++++++++++++++++++++------------------
+>  1 file changed, 31 insertions(+), 20 deletions(-)
+>
+>
+Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 
-diff --git a/hw/ssi/xilinx_spips.c b/hw/ssi/xilinx_spips.c
-index a309c71..c23de47 100644
---- a/hw/ssi/xilinx_spips.c
-+++ b/hw/ssi/xilinx_spips.c
-@@ -109,6 +109,7 @@
- #define R_GPIO              (0x30 / 4)
- #define R_LPBK_DLY_ADJ      (0x38 / 4)
- #define R_LPBK_DLY_ADJ_RESET (0x33)
-+#define R_IOU_TAPDLY_BYPASS (0x3C / 4)
- #define R_TXD1              (0x80 / 4)
- #define R_TXD2              (0x84 / 4)
- #define R_TXD3              (0x88 / 4)
-@@ -139,6 +140,8 @@
- #define R_LQSPI_STS         (0xA4 / 4)
- #define LQSPI_STS_WR_RECVD      (1 << 1)
- 
-+#define R_DUMMY_CYCLE_EN    (0xC8 / 4)
-+#define R_ECO               (0xF8 / 4)
- #define R_MOD_ID            (0xFC / 4)
- 
- #define R_GQSPI_SELECT          (0x144 / 4)
-@@ -1022,6 +1025,15 @@ static void xilinx_spips_write(void *opaque, hwaddr addr,
-     }
-     s->regs[addr] = (s->regs[addr] & ~mask) | (value & mask);
- no_reg_update:
-+    /* Skip SPI bus update for below registers writes */
-+    switch (addr) {
-+    case R_GPIO:
-+    case R_LPBK_DLY_ADJ:
-+    case R_IOU_TAPDLY_BYPASS:
-+    case R_DUMMY_CYCLE_EN:
-+    case R_ECO:
-+        return;
-+    }
-     xilinx_spips_update_cs_lines(s);
-     xilinx_spips_check_flush(s);
-     xilinx_spips_update_cs_lines(s);
--- 
-2.7.4
 
+> diff --git a/hw/pci-host/piix.c b/hw/pci-host/piix.c
+> index 2f4cbcbfe9..3292703de7 100644
+> --- a/hw/pci-host/piix.c
+> +++ b/hw/pci-host/piix.c
+> @@ -331,6 +331,36 @@ static void i440fx_realize(PCIDevice *dev, Error
+> **errp)
+>      }
+>  }
+>
+> +static PIIX3State *piix3_create(PCIBus *pci_bus, ISABus **isa_bus)
+> +{
+> +    PIIX3State *piix3;
+> +    PCIDevice *pci_dev;
+> +
+> +    /*
+> +     * Xen supports additional interrupt routes from the PCI devices to
+> +     * the IOAPIC: the four pins of each PCI device on the bus are also
+> +     * connected to the IOAPIC directly.
+> +     * These additional routes can be discovered through ACPI.
+> +     */
+> +    if (xen_enabled()) {
+> +        pci_dev =3D pci_create_simple_multifunction(pci_bus, -1, true,
+> +                                                  TYPE_PIIX3_XEN_DEVICE)=
+;
+> +        piix3 =3D PIIX3_PCI_DEVICE(pci_dev);
+> +        pci_bus_irqs(pci_bus, xen_piix3_set_irq, xen_pci_slot_get_pirq,
+> +                     piix3, XEN_PIIX_NUM_PIRQS);
+> +    } else {
+> +        pci_dev =3D pci_create_simple_multifunction(pci_bus, -1, true,
+> +                                                  TYPE_PIIX3_DEVICE);
+> +        piix3 =3D PIIX3_PCI_DEVICE(pci_dev);
+> +        pci_bus_irqs(pci_bus, piix3_set_irq, pci_slot_get_pirq,
+> +                     piix3, PIIX_NUM_PIRQS);
+> +        pci_bus_set_route_irq_fn(pci_bus, piix3_route_intx_pin_to_irq);
+> +    }
+> +    *isa_bus =3D ISA_BUS(qdev_get_child_bus(DEVICE(piix3), "isa.0"));
+> +
+> +    return piix3;
+> +}
+> +
+>  PCIBus *i440fx_init(const char *host_type, const char *pci_type,
+>                      PCII440FXState **pi440fx_state,
+>                      int *piix3_devfn,
+> @@ -400,27 +430,8 @@ PCIBus *i440fx_init(const char *host_type, const cha=
+r
+> *pci_type,
+>                   PAM_EXPAN_SIZE);
+>      }
+>
+> -    /* Xen supports additional interrupt routes from the PCI devices to
+> -     * the IOAPIC: the four pins of each PCI device on the bus are also
+> -     * connected to the IOAPIC directly.
+> -     * These additional routes can be discovered through ACPI. */
+> -    if (xen_enabled()) {
+> -        PCIDevice *pci_dev =3D pci_create_simple_multifunction(b,
+> -                             -1, true, TYPE_PIIX3_XEN_DEVICE);
+> -        piix3 =3D PIIX3_PCI_DEVICE(pci_dev);
+> -        pci_bus_irqs(b, xen_piix3_set_irq, xen_pci_slot_get_pirq,
+> -                piix3, XEN_PIIX_NUM_PIRQS);
+> -    } else {
+> -        PCIDevice *pci_dev =3D pci_create_simple_multifunction(b,
+> -                             -1, true, TYPE_PIIX3_DEVICE);
+> -        piix3 =3D PIIX3_PCI_DEVICE(pci_dev);
+> -        pci_bus_irqs(b, piix3_set_irq, pci_slot_get_pirq, piix3,
+> -                PIIX_NUM_PIRQS);
+> -        pci_bus_set_route_irq_fn(b, piix3_route_intx_pin_to_irq);
+> -    }
+> +    piix3 =3D piix3_create(b, isa_bus);
+>      piix3->pic =3D pic;
+> -    *isa_bus =3D ISA_BUS(qdev_get_child_bus(DEVICE(piix3), "isa.0"));
+> -
+>      *piix3_devfn =3D piix3->dev.devfn;
+>
+>      ram_size =3D ram_size / 8 / 1024 / 1024;
+> --
+> 2.21.0
+>
+>
+>
+
+--00000000000009e44005952bc33f
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+<br><br>On Tuesday, October 15, 2019, Philippe Mathieu-Daud=C3=A9 &lt;<a hr=
+ef=3D"mailto:philmd@redhat.com">philmd@redhat.com</a>&gt; wrote:<br><blockq=
+uote class=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;border-left:1px #ccc =
+solid;padding-left:1ex">Extract the PIIX3 creation code from the i440fx_ini=
+t() function.<br>
+<br>
+Signed-off-by: Philippe Mathieu-Daud=C3=A9 &lt;<a href=3D"mailto:philmd@red=
+hat.com">philmd@redhat.com</a>&gt;<br>
+---<br>
+=C2=A0hw/pci-host/piix.c | 51 ++++++++++++++++++++++++++++--<wbr>----------=
+------<br>
+=C2=A01 file changed, 31 insertions(+), 20 deletions(-)<br>
+<br></blockquote><div><br></div><div id=3D"cvcmsg_16dda40b83dfdaa3" class=
+=3D"yh  " style=3D"border-top-left-radius:0px;border-top-right-radius:0px;c=
+olor:rgb(34,34,34);font-size:14px;margin-bottom:11px;overflow:visible"><div=
+ class=3D"Vh" id=3D"cvcfullmsg_16dda40b83dfdaa3"><div id=3D"cvcmsgbod_16dda=
+40b83dfdaa3" class=3D"aj"><div class=3D"Ni"><div class=3D"ni pi " dir=3D"lt=
+r"><div><div style=3D"border-top-left-radius:0px;border-top-right-radius:0p=
+x;margin-bottom:11px;overflow:visible"><div dir=3D"ltr"><p dir=3D"ltr">Revi=
+ewed-by: Aleksandar Markovic &lt;<a href=3D"mailto:amarkovic@wavecomp.com" =
+target=3D"_blank">amarkovic@wavecomp.com</a>&gt;</p><div style=3D"clear:bot=
+h"></div></div><div style=3D"clear:both"></div><div><div></div></div><div s=
+tyle=3D"clear:both"></div></div><div style=3D"margin-bottom:11px"><div></di=
+v></div></div><div style=3D"clear:both"></div></div><div style=3D"clear:bot=
+h"></div><div><div class=3D"M j T b hc Aj S" tabindex=3D"0"><div class=3D"V=
+ j hf"></div></div></div><div style=3D"clear:both"></div></div></div></div>=
+</div><div id=3D"cvcmsg_16dda40c47482bd5" class=3D"yh wj" style=3D"color:rg=
+b(34,34,34);font-size:14px;height:70px;margin-bottom:0px;overflow:hidden"><=
+div class=3D"Vh" id=3D"cvcfullmsg_16dda40c47482bd5"><div class=3D"M j Zi Mi=
+  " tabindex=3D"0"></div></div></div><div>=C2=A0<br></div><blockquote class=
+=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;border-left:1px #ccc solid;padd=
+ing-left:1ex">
+diff --git a/hw/pci-host/piix.c b/hw/pci-host/piix.c<br>
+index 2f4cbcbfe9..3292703de7 100644<br>
+--- a/hw/pci-host/piix.c<br>
++++ b/hw/pci-host/piix.c<br>
+@@ -331,6 +331,36 @@ static void i440fx_realize(PCIDevice *dev, Error **err=
+p)<br>
+=C2=A0 =C2=A0 =C2=A0}<br>
+=C2=A0}<br>
+<br>
++static PIIX3State *piix3_create(PCIBus *pci_bus, ISABus **isa_bus)<br>
++{<br>
++=C2=A0 =C2=A0 PIIX3State *piix3;<br>
++=C2=A0 =C2=A0 PCIDevice *pci_dev;<br>
++<br>
++=C2=A0 =C2=A0 /*<br>
++=C2=A0 =C2=A0 =C2=A0* Xen supports additional interrupt routes from the PC=
+I devices to<br>
++=C2=A0 =C2=A0 =C2=A0* the IOAPIC: the four pins of each PCI device on the =
+bus are also<br>
++=C2=A0 =C2=A0 =C2=A0* connected to the IOAPIC directly.<br>
++=C2=A0 =C2=A0 =C2=A0* These additional routes can be discovered through AC=
+PI.<br>
++=C2=A0 =C2=A0 =C2=A0*/<br>
++=C2=A0 =C2=A0 if (xen_enabled()) {<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 pci_dev =3D pci_create_simple_<wbr>multifuncti=
+on(pci_bus, -1, true,<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 TYPE_PIIX3_XEN_DEVICE);<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 piix3 =3D PIIX3_PCI_DEVICE(pci_dev);<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 pci_bus_irqs(pci_bus, xen_piix3_set_irq, xen_p=
+ci_slot_get_pirq,<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0piix3, XEN_PIIX_NUM_PIRQS);<br>
++=C2=A0 =C2=A0 } else {<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 pci_dev =3D pci_create_simple_<wbr>multifuncti=
+on(pci_bus, -1, true,<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 TYPE_PIIX3_DEVICE);<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 piix3 =3D PIIX3_PCI_DEVICE(pci_dev);<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 pci_bus_irqs(pci_bus, piix3_set_irq, pci_slot_=
+get_pirq,<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0piix3, PIIX_NUM_PIRQS);<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 pci_bus_set_route_irq_fn(pci_<wbr>bus, piix3_r=
+oute_intx_pin_to_irq);<br>
++=C2=A0 =C2=A0 }<br>
++=C2=A0 =C2=A0 *isa_bus =3D ISA_BUS(qdev_get_child_bus(<wbr>DEVICE(piix3), =
+&quot;isa.0&quot;));<br>
++<br>
++=C2=A0 =C2=A0 return piix3;<br>
++}<br>
++<br>
+=C2=A0PCIBus *i440fx_init(const char *host_type, const char *pci_type,<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0PCII440FXState **pi440fx_state,<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0int *piix3_devfn,<br>
+@@ -400,27 +430,8 @@ PCIBus *i440fx_init(const char *host_type, const char =
+*pci_type,<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 PAM_EXPAN_SI=
+ZE);<br>
+=C2=A0 =C2=A0 =C2=A0}<br>
+<br>
+-=C2=A0 =C2=A0 /* Xen supports additional interrupt routes from the PCI dev=
+ices to<br>
+-=C2=A0 =C2=A0 =C2=A0* the IOAPIC: the four pins of each PCI device on the =
+bus are also<br>
+-=C2=A0 =C2=A0 =C2=A0* connected to the IOAPIC directly.<br>
+-=C2=A0 =C2=A0 =C2=A0* These additional routes can be discovered through AC=
+PI. */<br>
+-=C2=A0 =C2=A0 if (xen_enabled()) {<br>
+-=C2=A0 =C2=A0 =C2=A0 =C2=A0 PCIDevice *pci_dev =3D pci_create_simple_<wbr>=
+multifunction(b,<br>
+-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0-1, true, TYPE_PIIX3_XEN_DEVICE);<br>
+-=C2=A0 =C2=A0 =C2=A0 =C2=A0 piix3 =3D PIIX3_PCI_DEVICE(pci_dev);<br>
+-=C2=A0 =C2=A0 =C2=A0 =C2=A0 pci_bus_irqs(b, xen_piix3_set_irq, xen_pci_slo=
+t_get_pirq,<br>
+-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 piix3, XEN_PIIX_NU=
+M_PIRQS);<br>
+-=C2=A0 =C2=A0 } else {<br>
+-=C2=A0 =C2=A0 =C2=A0 =C2=A0 PCIDevice *pci_dev =3D pci_create_simple_<wbr>=
+multifunction(b,<br>
+-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0-1, true, TYPE_PIIX3_DEVICE);<br>
+-=C2=A0 =C2=A0 =C2=A0 =C2=A0 piix3 =3D PIIX3_PCI_DEVICE(pci_dev);<br>
+-=C2=A0 =C2=A0 =C2=A0 =C2=A0 pci_bus_irqs(b, piix3_set_irq, pci_slot_get_pi=
+rq, piix3,<br>
+-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 PIIX_NUM_PIRQS);<b=
+r>
+-=C2=A0 =C2=A0 =C2=A0 =C2=A0 pci_bus_set_route_irq_fn(b, piix3_route_intx_p=
+in_to_irq);<br>
+-=C2=A0 =C2=A0 }<br>
++=C2=A0 =C2=A0 piix3 =3D piix3_create(b, isa_bus);<br>
+=C2=A0 =C2=A0 =C2=A0piix3-&gt;pic =3D pic;<br>
+-=C2=A0 =C2=A0 *isa_bus =3D ISA_BUS(qdev_get_child_bus(<wbr>DEVICE(piix3), =
+&quot;isa.0&quot;));<br>
+-<br>
+=C2=A0 =C2=A0 =C2=A0*piix3_devfn =3D piix3-&gt;dev.devfn;<br>
+<br>
+=C2=A0 =C2=A0 =C2=A0ram_size =3D ram_size / 8 / 1024 / 1024;<br>
+-- <br>
+2.21.0<br>
+<br>
+<br>
+</blockquote>
+
+--00000000000009e44005952bc33f--
 
