@@ -2,64 +2,59 @@ Return-Path: <SRS0=ht5U=YL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C57AECA9EA1
-	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 14:00:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4D639CA9EA1
+	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 14:01:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9EDCD222BD
-	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 14:00:19 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9EDCD222BD
+	by mail.kernel.org (Postfix) with ESMTPS id 0B67420854
+	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 14:01:25 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0B67420854
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40476 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40490 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iLSni-0008QA-KO
-	for qemu-devel@archiver.kernel.org; Fri, 18 Oct 2019 10:00:18 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56520)
+	id 1iLSom-0000tT-03
+	for qemu-devel@archiver.kernel.org; Fri, 18 Oct 2019 10:01:24 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55200)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jdenemar@redhat.com>) id 1iLSlw-0006m5-Bc
- for qemu-devel@nongnu.org; Fri, 18 Oct 2019 09:58:29 -0400
+ (envelope-from <philmd@redhat.com>) id 1iLSe6-0005cs-DW
+ for qemu-devel@nongnu.org; Fri, 18 Oct 2019 09:50:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jdenemar@redhat.com>) id 1iLSlu-0001Le-0G
- for qemu-devel@nongnu.org; Fri, 18 Oct 2019 09:58:27 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:42327)
+ (envelope-from <philmd@redhat.com>) id 1iLSe4-0006ZU-HH
+ for qemu-devel@nongnu.org; Fri, 18 Oct 2019 09:50:22 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:57058)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jdenemar@redhat.com>) id 1iLSlr-0001KM-SD
- for qemu-devel@nongnu.org; Fri, 18 Oct 2019 09:58:25 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iLSe4-0006Yx-8h
+ for qemu-devel@nongnu.org; Fri, 18 Oct 2019 09:50:20 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id D7CF118C4299
- for <qemu-devel@nongnu.org>; Fri, 18 Oct 2019 13:58:22 +0000 (UTC)
-Received: from virval.usersys.redhat.com (unknown [10.43.2.188])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 967A864045;
- Fri, 18 Oct 2019 13:58:22 +0000 (UTC)
-Received: by virval.usersys.redhat.com (Postfix, from userid 500)
- id 4BC97101CE9; Fri, 18 Oct 2019 15:58:21 +0200 (CEST)
-Date: Fri, 18 Oct 2019 15:58:21 +0200
-From: Jiri Denemark <jdenemar@redhat.com>
-To: David Hildenbrand <david@redhat.com>
-Subject: Re: Default CPU models on s390x and ppc64
-Message-ID: <20191018135821.GR4204@orkuz.int.mamuti.net>
-References: <20191017151606.GA1880840@orkuz.int.mamuti.net>
- <82ea23ea-be23-c374-3f10-65d8f6e79432@redhat.com>
- <3c2d2d20-682e-ab4f-ced4-c7f48473dd24@redhat.com>
- <9083f32c-68db-cc28-e0ea-7fafd014be9b@redhat.com>
+ by mx1.redhat.com (Postfix) with ESMTPS id 69BB73175295;
+ Fri, 18 Oct 2019 13:50:19 +0000 (UTC)
+Received: from x1w.redhat.com (unknown [10.40.205.74])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 3C4C760BF1;
+ Fri, 18 Oct 2019 13:50:02 +0000 (UTC)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v2 12/20] hw/i386: Remove obsolete
+ LoadStateHandler::load_state_old handlers
+Date: Fri, 18 Oct 2019 15:47:46 +0200
+Message-Id: <20191018134754.16362-13-philmd@redhat.com>
+In-Reply-To: <20191018134754.16362-1-philmd@redhat.com>
+References: <20191018134754.16362-1-philmd@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <9083f32c-68db-cc28-e0ea-7fafd014be9b@redhat.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.62]); Fri, 18 Oct 2019 13:58:22 +0000 (UTC)
+Content-Type: text/plain; charset=UTF-8
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.49]); Fri, 18 Oct 2019 13:50:19 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 209.132.183.28
@@ -74,121 +69,302 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: David Gibson <dgibson@redhat.com>, David Hildenbrand <dhildenb@redhat.com>,
- qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Stefano Stabellini <sstabellini@kernel.org>,
+ "Michael S. Tsirkin" <mst@redhat.com>, Paul Durrant <paul@xen.org>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?q?Herv=C3=A9=20Poussineau?= <hpoussin@reactos.org>,
+ Aleksandar Markovic <amarkovic@wavecomp.com>,
+ Igor Mammedov <imammedo@redhat.com>,
+ Anthony Perard <anthony.perard@citrix.com>, xen-devel@lists.xenproject.org,
+ Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
+ Richard Henderson <rth@twiddle.net>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Aurelien Jarno <aurelien@aurel32.net>, Eduardo Habkost <ehabkost@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Oct 17, 2019 at 17:35:30 +0200, David Hildenbrand wrote:
-> On 17.10.19 17:31, David Hildenbrand wrote:
-> > On 17.10.19 17:18, David Hildenbrand wrote:
-> >> On 17.10.19 17:16, Jiri Denemark wrote:
-> >>> Hi David and David,
-> >>>
-> >>> I'm working on libvirt's support [1] for query-machines'
-> >>> default-cpu-type, which is supposed to return the type of the default
-> >>> CPU model that QEMU uses for each machine type. Rather than hard coding
-> >>> the default in libvirt (which we currently do on x86), we ask QEMU for
-> >>> the default CPU model and use it unless a user asks for a specific CPU
-> >>> model explicitly.
-> >>>
-...
-> >>> This situation on s390x is not so complicated, but not really better.
-> >>> The default CPU is said to be "qemu" for all machine types, which works
-> >>> fine for TCG domains, but it doesn't work on KVM because QEMU complains
-> >>> that some features requested in the CPU model are not available. In
-> >>> other words the "qemu" CPU model is not runnable on KVM. This a bit
-> >>> similar to what happens on x86_64, but QEMU just ignores missing
-> >>> features and starts happily there.
-> >>
-> >> The default model under KVM is "host", under TCG it's "qemu". We should
-> >> not use "qemu" under KVM, although it might work on some setups ...
-> >>
-> >> Where/how is this default model detected?
+These devices implemented their load_state_old() handler 10 years
+ago, previous to QEMU v0.12.
+Since commit cc425b5ddf removed the pc-0.10 and pc-0.11 machines,
+we can drop this code.
 
-All this is about probing QEMU capabilities so that we can tell users
-what to expect and let them change the default. E.g., qemu64 default CPU
-model on x86_64 is never the right one to be used with KVM. By making
-the default CPU model visible in the domain XML even before the domain
-gets started, we help users detect such suboptimal configurations.
+Note: the mips_r4k machine started to use the i8254 device just
+after QEMU v0.5.0, but the MIPS machine types are not versioned,
+so there is no migration compatibility issue removing this handler.
 
-> > 
-> > ... target/s390x/kvm.c:kvm_arch_init()
-> > 
-> > MachineClass *mc = MACHINE_GET_CLASS(ms);
-> > 
-> > mc->default_cpu_type = S390_CPU_TYPE_NAME("host");
-> > 
-> > 
-> > I think the call order should make sure that "host" is set after "qemu"
-> > is set. I'll go ahead and verify that.kvm_arch_init(
-> > 
-> 
-> configure_accelerator(current_machine, argv[0]) -> kvm_arch_init()
-> 
-> is called after
-> 
-> current_machine = MACHINE(object_new(object_class_get_name(
-> 		  OBJECT_CLASS(machine_class))));
-> 
-> and therefore after the .class_init function of the machine was called.
-> 
-> I don't see how the default cpu model could not be "host" if qemu was 
-> started with "--enable-kvm"
+Suggested-by: Peter Maydell <peter.maydell@linaro.org>
+Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+---
+ hw/acpi/piix4.c         | 40 ---------------------------------
+ hw/intc/apic_common.c   | 49 -----------------------------------------
+ hw/pci-host/piix.c      | 25 ---------------------
+ hw/timer/i8254_common.c | 40 ---------------------------------
+ 4 files changed, 154 deletions(-)
 
-I guess the problem could be that QEMU capabilities probing in libvirt
-is done with -machine none. We first probe with KVM enabled and then for
-a few specific commands reprobe with TCG only. We could do it with
-query-machines too to get different default CPU models depending on the
-accelerator, but it wouldn't actually help.
+diff --git a/hw/acpi/piix4.c b/hw/acpi/piix4.c
+index 2efd1605b8..93aec2dd2c 100644
+--- a/hw/acpi/piix4.c
++++ b/hw/acpi/piix4.c
+@@ -41,7 +41,6 @@
+ #include "hw/acpi/memory_hotplug.h"
+ #include "hw/acpi/acpi_dev_interface.h"
+ #include "hw/xen/xen.h"
+-#include "migration/qemu-file-types.h"
+ #include "migration/vmstate.h"
+ #include "hw/core/cpu.h"
+ #include "trace.h"
+@@ -204,43 +203,6 @@ static const VMStateDescription vmstate_pci_status =3D=
+ {
+     }
+ };
+=20
+-static int acpi_load_old(QEMUFile *f, void *opaque, int version_id)
+-{
+-    PIIX4PMState *s =3D opaque;
+-    int ret, i;
+-    uint16_t temp;
+-
+-    ret =3D pci_device_load(PCI_DEVICE(s), f);
+-    if (ret < 0) {
+-        return ret;
+-    }
+-    qemu_get_be16s(f, &s->ar.pm1.evt.sts);
+-    qemu_get_be16s(f, &s->ar.pm1.evt.en);
+-    qemu_get_be16s(f, &s->ar.pm1.cnt.cnt);
+-
+-    ret =3D vmstate_load_state(f, &vmstate_apm, &s->apm, 1);
+-    if (ret) {
+-        return ret;
+-    }
+-
+-    timer_get(f, s->ar.tmr.timer);
+-    qemu_get_sbe64s(f, &s->ar.tmr.overflow_time);
+-
+-    qemu_get_be16s(f, (uint16_t *)s->ar.gpe.sts);
+-    for (i =3D 0; i < 3; i++) {
+-        qemu_get_be16s(f, &temp);
+-    }
+-
+-    qemu_get_be16s(f, (uint16_t *)s->ar.gpe.en);
+-    for (i =3D 0; i < 3; i++) {
+-        qemu_get_be16s(f, &temp);
+-    }
+-
+-    ret =3D vmstate_load_state(f, &vmstate_pci_status,
+-        &s->acpi_pci_hotplug.acpi_pcihp_pci_status[ACPI_PCIHP_BSEL_DEFAU=
+LT], 1);
+-    return ret;
+-}
+-
+ static bool vmstate_test_use_acpi_pci_hotplug(void *opaque, int version_=
+id)
+ {
+     PIIX4PMState *s =3D opaque;
+@@ -312,8 +274,6 @@ static const VMStateDescription vmstate_acpi =3D {
+     .name =3D "piix4_pm",
+     .version_id =3D 3,
+     .minimum_version_id =3D 3,
+-    .minimum_version_id_old =3D 1,
+-    .load_state_old =3D acpi_load_old,
+     .post_load =3D vmstate_acpi_post_load,
+     .fields =3D (VMStateField[]) {
+         VMSTATE_PCI_DEVICE(parent_obj, PIIX4PMState),
+diff --git a/hw/intc/apic_common.c b/hw/intc/apic_common.c
+index aafd8e0e33..375cb6abe9 100644
+--- a/hw/intc/apic_common.c
++++ b/hw/intc/apic_common.c
+@@ -31,7 +31,6 @@
+ #include "sysemu/kvm.h"
+ #include "hw/qdev-properties.h"
+ #include "hw/sysbus.h"
+-#include "migration/qemu-file-types.h"
+ #include "migration/vmstate.h"
+=20
+ static int apic_irq_delivered;
+@@ -262,52 +261,6 @@ static void apic_reset_common(DeviceState *dev)
+     apic_init_reset(dev);
+ }
+=20
+-/* This function is only used for old state version 1 and 2 */
+-static int apic_load_old(QEMUFile *f, void *opaque, int version_id)
+-{
+-    APICCommonState *s =3D opaque;
+-    APICCommonClass *info =3D APIC_COMMON_GET_CLASS(s);
+-    int i;
+-
+-    if (version_id > 2) {
+-        return -EINVAL;
+-    }
+-
+-    /* XXX: what if the base changes? (registered memory regions) */
+-    qemu_get_be32s(f, &s->apicbase);
+-    qemu_get_8s(f, &s->id);
+-    qemu_get_8s(f, &s->arb_id);
+-    qemu_get_8s(f, &s->tpr);
+-    qemu_get_be32s(f, &s->spurious_vec);
+-    qemu_get_8s(f, &s->log_dest);
+-    qemu_get_8s(f, &s->dest_mode);
+-    for (i =3D 0; i < 8; i++) {
+-        qemu_get_be32s(f, &s->isr[i]);
+-        qemu_get_be32s(f, &s->tmr[i]);
+-        qemu_get_be32s(f, &s->irr[i]);
+-    }
+-    for (i =3D 0; i < APIC_LVT_NB; i++) {
+-        qemu_get_be32s(f, &s->lvt[i]);
+-    }
+-    qemu_get_be32s(f, &s->esr);
+-    qemu_get_be32s(f, &s->icr[0]);
+-    qemu_get_be32s(f, &s->icr[1]);
+-    qemu_get_be32s(f, &s->divide_conf);
+-    s->count_shift =3D qemu_get_be32(f);
+-    qemu_get_be32s(f, &s->initial_count);
+-    s->initial_count_load_time =3D qemu_get_be64(f);
+-    s->next_time =3D qemu_get_be64(f);
+-
+-    if (version_id >=3D 2) {
+-        s->timer_expiry =3D qemu_get_be64(f);
+-    }
+-
+-    if (info->post_load) {
+-        info->post_load(s);
+-    }
+-    return 0;
+-}
+-
+ static const VMStateDescription vmstate_apic_common;
+=20
+ static void apic_common_realize(DeviceState *dev, Error **errp)
+@@ -408,8 +361,6 @@ static const VMStateDescription vmstate_apic_common =3D=
+ {
+     .name =3D "apic",
+     .version_id =3D 3,
+     .minimum_version_id =3D 3,
+-    .minimum_version_id_old =3D 1,
+-    .load_state_old =3D apic_load_old,
+     .pre_load =3D apic_pre_load,
+     .pre_save =3D apic_dispatch_pre_save,
+     .post_load =3D apic_dispatch_post_load,
+diff --git a/hw/pci-host/piix.c b/hw/pci-host/piix.c
+index 135c645535..2f4cbcbfe9 100644
+--- a/hw/pci-host/piix.c
++++ b/hw/pci-host/piix.c
+@@ -33,7 +33,6 @@
+ #include "qapi/error.h"
+ #include "qemu/range.h"
+ #include "hw/xen/xen.h"
+-#include "migration/qemu-file-types.h"
+ #include "migration/vmstate.h"
+ #include "hw/pci-host/pam.h"
+ #include "sysemu/reset.h"
+@@ -174,28 +173,6 @@ static void i440fx_write_config(PCIDevice *dev,
+     }
+ }
+=20
+-static int i440fx_load_old(QEMUFile* f, void *opaque, int version_id)
+-{
+-    PCII440FXState *d =3D opaque;
+-    PCIDevice *pd =3D PCI_DEVICE(d);
+-    int ret, i;
+-    uint8_t smm_enabled;
+-
+-    ret =3D pci_device_load(pd, f);
+-    if (ret < 0)
+-        return ret;
+-    i440fx_update_memory_mappings(d);
+-    qemu_get_8s(f, &smm_enabled);
+-
+-    if (version_id =3D=3D 2) {
+-        for (i =3D 0; i < PIIX_NUM_PIRQS; i++) {
+-            qemu_get_be32(f); /* dummy load for compatibility */
+-        }
+-    }
+-
+-    return 0;
+-}
+-
+ static int i440fx_post_load(void *opaque, int version_id)
+ {
+     PCII440FXState *d =3D opaque;
+@@ -208,8 +185,6 @@ static const VMStateDescription vmstate_i440fx =3D {
+     .name =3D "I440FX",
+     .version_id =3D 3,
+     .minimum_version_id =3D 3,
+-    .minimum_version_id_old =3D 1,
+-    .load_state_old =3D i440fx_load_old,
+     .post_load =3D i440fx_post_load,
+     .fields =3D (VMStateField[]) {
+         VMSTATE_PCI_DEVICE(parent_obj, PCII440FXState),
+diff --git a/hw/timer/i8254_common.c b/hw/timer/i8254_common.c
+index 57bf10cc94..050875b497 100644
+--- a/hw/timer/i8254_common.c
++++ b/hw/timer/i8254_common.c
+@@ -29,7 +29,6 @@
+ #include "qemu/timer.h"
+ #include "hw/timer/i8254.h"
+ #include "hw/timer/i8254_internal.h"
+-#include "migration/qemu-file-types.h"
+ #include "migration/vmstate.h"
+=20
+ /* val must be 0 or 1 */
+@@ -202,43 +201,6 @@ static const VMStateDescription vmstate_pit_channel =
+=3D {
+     }
+ };
+=20
+-static int pit_load_old(QEMUFile *f, void *opaque, int version_id)
+-{
+-    PITCommonState *pit =3D opaque;
+-    PITCommonClass *c =3D PIT_COMMON_GET_CLASS(pit);
+-    PITChannelState *s;
+-    int i;
+-
+-    if (version_id !=3D 1) {
+-        return -EINVAL;
+-    }
+-
+-    for (i =3D 0; i < 3; i++) {
+-        s =3D &pit->channels[i];
+-        s->count =3D qemu_get_be32(f);
+-        qemu_get_be16s(f, &s->latched_count);
+-        qemu_get_8s(f, &s->count_latched);
+-        qemu_get_8s(f, &s->status_latched);
+-        qemu_get_8s(f, &s->status);
+-        qemu_get_8s(f, &s->read_state);
+-        qemu_get_8s(f, &s->write_state);
+-        qemu_get_8s(f, &s->write_latch);
+-        qemu_get_8s(f, &s->rw_mode);
+-        qemu_get_8s(f, &s->mode);
+-        qemu_get_8s(f, &s->bcd);
+-        qemu_get_8s(f, &s->gate);
+-        s->count_load_time =3D qemu_get_be64(f);
+-        s->irq_disabled =3D 0;
+-        if (i =3D=3D 0) {
+-            s->next_transition_time =3D qemu_get_be64(f);
+-        }
+-    }
+-    if (c->post_load) {
+-        c->post_load(pit);
+-    }
+-    return 0;
+-}
+-
+ static int pit_dispatch_pre_save(void *opaque)
+ {
+     PITCommonState *s =3D opaque;
+@@ -266,8 +228,6 @@ static const VMStateDescription vmstate_pit_common =3D=
+ {
+     .name =3D "i8254",
+     .version_id =3D 3,
+     .minimum_version_id =3D 2,
+-    .minimum_version_id_old =3D 1,
+-    .load_state_old =3D pit_load_old,
+     .pre_save =3D pit_dispatch_pre_save,
+     .post_load =3D pit_dispatch_post_load,
+     .fields =3D (VMStateField[]) {
+--=20
+2.21.0
 
-The full command line used for capabilities probing is
-
-    qemu-system-s390x \
-        -S \
-        -no-user-config \
-        -nodefaults \
-        -nographic \
-        -machine none,accel=kvm:tcg \
-        -qmp unix:/tmp/qmp-ivG4UN/qmp.monitor,server,nowait \
-        -pidfile /tmp/qmp-ivG4UN/qmp.pid \
-        -daemonize
-
-One of the command we send is
-
-    {"execute":"query-kvm","id":"libvirt-5"}
-
-and the reply is
-
-    {"return": {"enabled": true, "present": true}, "id": "libvirt-5"}
-
-Which means KVM is usable and enabled, but still query-machines returns
-
-    {
-      "return": [
-        {
-          "hotpluggable-cpus": true,
-          "name": "s390-ccw-virtio-4.0",
-          "numa-mem-supported": false,
-          "default-cpu-type": "qemu-s390x-cpu",
-          "cpu-max": 248,
-          "deprecated": false
-        },
-        {
-          "hotpluggable-cpus": true,
-          "name": "s390-ccw-virtio-3.1",
-          "numa-mem-supported": false,
-          "default-cpu-type": "qemu-s390x-cpu",
-          "cpu-max": 248,
-          "deprecated": false
-        },
-        ...
-      ]
-    }
-
-So it seems the code is run during the machine initialization and thus
-it doesn't affect what query-machines returns with -machine none.
-
-Jirka
 
