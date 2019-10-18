@@ -2,81 +2,89 @@ Return-Path: <SRS0=ht5U=YL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 027F2CA9EA9
-	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 16:24:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A29BCCA9EA9
+	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 16:24:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7DEB520854
-	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 16:24:27 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="aSEf11Fu"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7DEB520854
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 79FA420854
+	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 16:24:29 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 79FA420854
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42934 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42938 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iLV3C-0004Rf-8u
-	for qemu-devel@archiver.kernel.org; Fri, 18 Oct 2019 12:24:26 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50543)
+	id 1iLV3E-0004aM-HB
+	for qemu-devel@archiver.kernel.org; Fri, 18 Oct 2019 12:24:28 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50294)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1iLV17-0002ro-ED
- for qemu-devel@nongnu.org; Fri, 18 Oct 2019 12:22:18 -0400
+ (envelope-from <mreitz@redhat.com>) id 1iLUz6-0008NX-1z
+ for qemu-devel@nongnu.org; Fri, 18 Oct 2019 12:20:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1iLV15-0005D3-Vr
- for qemu-devel@nongnu.org; Fri, 18 Oct 2019 12:22:17 -0400
-Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:42817)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1iLV15-0005CW-Nt
- for qemu-devel@nongnu.org; Fri, 18 Oct 2019 12:22:15 -0400
-Received: by mail-oi1-x243.google.com with SMTP id i185so5673747oif.9
- for <qemu-devel@nongnu.org>; Fri, 18 Oct 2019 09:22:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=Z3J8zBG/x0gGvw/4SLO7Xf14rp5jikY8twc4FguRhQw=;
- b=aSEf11FuU18DhALqeJuiPbLB0yKfBi1x+j9vRF/peZuvV27hc/rRgM/Qa7ymRqZv0y
- yDWqK2S6HGT/jLQTKvaEk398IHBhxoViCQiJVm/knM9jThay+QQEhlG8CIXPw3SLvoiK
- GkTkDeXJhLXPn4fRP+7Tbf9+lt+5D+l6pOkqe/woo1+3XB2bOJQBgvpgCZLTfhCQj6mv
- hu1ZtOYwVoY+i02K8gJvqP60tg7APv4VzPYq2vOCElY3nWbrd3UXc0VgU5sRlT76PL3z
- 1N5ael3jRv7jzJZljkmrvliMGiCI9SozI4RCQMh1ueSXD+NSmTNUOj5FddpJ0NyY/HNX
- RrFw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=Z3J8zBG/x0gGvw/4SLO7Xf14rp5jikY8twc4FguRhQw=;
- b=L3Iu1tDecHnv/NeOFN6LB6uPLjYRKizSn9T/zSY9+u/Monl5zU9JMuh6dHjTifvdAt
- kJj/ZhGB9LCOk9Dw0ROcXwggOjm6LQRJjJ1AU8G2f06l91ZIYX5kH6nynx0+0k+vekRO
- X/VyeSWkRgNKzTN2vaSOHLnQrV933DU0lbBAiy8SNYkeeC+udhP1OWDZqQpGm7rG1e6Y
- hQe0vKxIcBmFP4BqjkOnjmTyHmGRYn9/WktC31VVgaTLh0Uwx9ZFXfINZaEV+ysj/4Sw
- 01cdQA5EmMxGdZkI1LPe8s2JQou+EiOSsy5wp8fHVRib+TRy2QrOH0WPyyF9ixDzipys
- L+rA==
-X-Gm-Message-State: APjAAAVmFIy9Qd13HNNovToObtq0h4PmtvrCm9JctyBJTwLQAvKVGtRj
- X/l7tzZ6Y7iSqjotPZB/HyrgKQ1NrdZrKEh0NmSCzNr7hiQ=
-X-Google-Smtp-Source: APXvYqw3OREf/eP9r/sePvEmHqqDSNNheixBlpEXwrDcpiGpxzv4tSLxhHlA7XsNgrHwZx8vufqhePkGuZNoiMrIdDU=
-X-Received: by 2002:aca:3b41:: with SMTP id i62mr8371759oia.48.1571415734844; 
- Fri, 18 Oct 2019 09:22:14 -0700 (PDT)
+ (envelope-from <mreitz@redhat.com>) id 1iLUz3-0003yc-UX
+ for qemu-devel@nongnu.org; Fri, 18 Oct 2019 12:20:10 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:12947)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>)
+ id 1iLUz1-0003xR-K6; Fri, 18 Oct 2019 12:20:07 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id D023E3172D9A;
+ Fri, 18 Oct 2019 16:20:06 +0000 (UTC)
+Received: from dresden.str.redhat.com (unknown [10.36.118.46])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 457E26107E;
+ Fri, 18 Oct 2019 16:19:54 +0000 (UTC)
+Subject: Re: [PATCH 2/5] iotests: Test 041 does not work on macOS
+To: Thomas Huth <thuth@redhat.com>, qemu-block@nongnu.org
+References: <20191011145047.19051-1-thuth@redhat.com>
+ <20191011145047.19051-3-thuth@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <cacfc0c2-cdb4-fded-e317-a51d38cc512c@redhat.com>
+Date: Fri, 18 Oct 2019 18:19:52 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.0
 MIME-Version: 1.0
-References: <20191018154212.13458-1-marcandre.lureau@redhat.com>
- <20191018154212.13458-2-marcandre.lureau@redhat.com>
-In-Reply-To: <20191018154212.13458-2-marcandre.lureau@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 18 Oct 2019 17:22:03 +0100
-Message-ID: <CAFEAcA_7zxe6YfM6c8v_SQ+qh2L7Q5RS_xEPvy01q9aPZ6YyiQ@mail.gmail.com>
-Subject: Re: [PATCH 01/14] sm501: replace PROP_PTR with PROP_LINK
-To: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::243
+In-Reply-To: <20191011145047.19051-3-thuth@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="4H8pQOsbJYLkbTYVbK9aQOkZifbcJLX8B"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.41]); Fri, 18 Oct 2019 16:20:06 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,100 +96,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Corey Minyard <cminyard@mvista.com>, "Michael S. Tsirkin" <mst@redhat.com>,
- Jason Wang <jasowang@redhat.com>,
- Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
- QEMU Developers <qemu-devel@nongnu.org>,
- KONRAD Frederic <frederic.konrad@adacore.com>,
- "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
- Aleksandar Rikalo <arikalo@wavecomp.com>, Magnus Damm <magnus.damm@gmail.com>,
- =?UTF-8?Q?Herv=C3=A9_Poussineau?= <hpoussin@reactos.org>,
- Artyom Tarasenko <atar4qemu@gmail.com>, Eduardo Habkost <ehabkost@redhat.com>,
- Fabien Chouteau <chouteau@adacore.com>, qemu-arm <qemu-arm@nongnu.org>,
- Richard Henderson <rth@twiddle.net>,
- =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>,
- qemu-ppc <qemu-ppc@nongnu.org>, Aleksandar Markovic <amarkovic@wavecomp.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>
+Cc: Kevin Wolf <kwolf@redhat.com>, John Snow <jsnow@redhat.com>,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, 18 Oct 2019 at 16:42, Marc-Andr=C3=A9 Lureau
-<marcandre.lureau@redhat.com> wrote:
->
-> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--4H8pQOsbJYLkbTYVbK9aQOkZifbcJLX8B
+Content-Type: multipart/mixed; boundary="z07JpOEVS46HDhlSx4RT1IEr84XIBpqYw"
+
+--z07JpOEVS46HDhlSx4RT1IEr84XIBpqYw
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+
+On 11.10.19 16:50, Thomas Huth wrote:
+> 041 works fine on Linux, FreeBSD and OpenBSD, so let's mark it as
+> only supported on these systems.
+>=20
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
 > ---
->  hw/display/sm501.c | 5 +++--
->  hw/sh4/r2d.c       | 3 ++-
->  2 files changed, 5 insertions(+), 3 deletions(-)
->
-> diff --git a/hw/display/sm501.c b/hw/display/sm501.c
-> index 1f33c87e65..a87d18efab 100644
-> --- a/hw/display/sm501.c
-> +++ b/hw/display/sm501.c
-> @@ -1930,7 +1930,7 @@ typedef struct {
->      SM501State state;
->      uint32_t vram_size;
->      uint32_t base;
-> -    void *chr_state;
-> +    Chardev *chr_state;
->  } SM501SysBusState;
->
->  static void sm501_realize_sysbus(DeviceState *dev, Error **errp)
-> @@ -1968,7 +1968,8 @@ static void sm501_realize_sysbus(DeviceState *dev, =
-Error **errp)
->  static Property sm501_sysbus_properties[] =3D {
->      DEFINE_PROP_UINT32("vram-size", SM501SysBusState, vram_size, 0),
->      DEFINE_PROP_UINT32("base", SM501SysBusState, base, 0),
-> -    DEFINE_PROP_PTR("chr-state", SM501SysBusState, chr_state),
-> +    DEFINE_PROP_LINK("chr-state", SM501SysBusState, chr_state,
-> +                     TYPE_CHARDEV, Chardev *),
->      DEFINE_PROP_END_OF_LIST(),
->  };
->
-> diff --git a/hw/sh4/r2d.c b/hw/sh4/r2d.c
-> index ee0840f380..5780ee85d9 100644
-> --- a/hw/sh4/r2d.c
-> +++ b/hw/sh4/r2d.c
-> @@ -272,7 +272,8 @@ static void r2d_init(MachineState *machine)
->      busdev =3D SYS_BUS_DEVICE(dev);
->      qdev_prop_set_uint32(dev, "vram-size", SM501_VRAM_SIZE);
->      qdev_prop_set_uint32(dev, "base", 0x10000000);
-> -    qdev_prop_set_ptr(dev, "chr-state", serial_hd(2));
-> +    object_property_set_link(OBJECT(dev), OBJECT(serial_hd(2)),
-> +                             "chr-state", &error_abort);
->      qdev_init_nofail(dev);
->      sysbus_mmio_map(busdev, 0, 0x10000000);
->      sysbus_mmio_map(busdev, 1, 0x13e00000);
+>  tests/qemu-iotests/041 | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
+>=20
+> diff --git a/tests/qemu-iotests/041 b/tests/qemu-iotests/041
+> index 8568426311..7211f1950a 100755
+> --- a/tests/qemu-iotests/041
+> +++ b/tests/qemu-iotests/041
+> @@ -1123,4 +1123,5 @@ class TestOrphanedSource(iotests.QMPTestCase):
+> =20
+>  if __name__ =3D=3D '__main__':
+>      iotests.main(supported_fmts=3D['qcow2', 'qed'],
+> -                 supported_protocols=3D['file'])
+> +                 supported_protocols=3D['file'],
+> +                 supported_platforms=3D['linux', 'freebsd', 'openbsd6'=
+])
 
-We have a typed way of passing a Chardev to devices:
-use qdev_prop_set_chr(). Unfortunately it's not trivially
-easy to drop in here, because it sets a property defined
-with DEFINE_PROP_CHR to set a field of type CharBackend
-(note, not Chardev, and not a pointer) in the device struct.
-But serial_mm_init() wants a Chardev*, because it is a
-non-QOM interface to the serial device and is manually
-doing the qemu_chr_fe_init() that connects the Chardev
-to its own CharBackend. The QOM CHR property setter wants
-to do that qemu_chr_fe_init() itself.
+Hmm, why not just =E2=80=9Copenbsd=E2=80=9D, or single out macOS as unsup=
+ported?  (I
+suppose the latter would require an additional patch.)
 
-So I think the right fix here is to properly QOMify the
-code which is not QOMified, ie hw/char/serial.c, in a
-way that means that the various "memory mapped 16650-ish
-devices" we have can use it and can define a
-TYPE_CHARDEV property.
+There=E2=80=99s also the fact that I maybe wanted to let make check skip =
+all
+tests on macOS and Windows =E2=80=93 though that doesn=E2=80=99t make thi=
+s patch
+unnecessary, because that would only fix make check, not running the
+iotests explicitly.
 
-In general I think our uses of PROP_PTR are code smells
-that indicate places where we have not properly converted
-code over to the general approach that the QOM/qdev
-design desires; but we should be getting rid of PROP_PTR
-by actually doing all those (difficult) conversions.
-Merely removing PROP_PTR itself by rephrasing the dubious
-inter-device connections in a way that makes them harder
-to grep for doesn't seem to me to be necessarily worth
-doing. Is the existence of PROP_PTR getting in your way
-for a change you want to make ?
+And I suppose maybe we even want to run the tests in macOS if it=E2=80=99=
+s part
+of the CI anyway?
 
-thanks
--- PMM
+Max
+
+
+--z07JpOEVS46HDhlSx4RT1IEr84XIBpqYw--
+
+--4H8pQOsbJYLkbTYVbK9aQOkZifbcJLX8B
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl2p5igACgkQ9AfbAGHV
+z0C6hgf/WbDAGvAOx/MPmnEzdHNCSGgHOz+Azd2zGpcgC0cWNmTzkGCUviqqSgJv
+ty7WG45wRzdFtMhXW/a03tDTYMAogAhDDE7NAHcU0WBeA2yVpFgUJbm7Np5hKl4+
+MF4c/Z1cMIB/WrvI0oTEi+ovHU+naGsRp4CxQAk3y2ws8qDVIfriEmdLMrAC5c0G
+/dPEeuzSDFIGYHRaLo2zrzISrH7Dr1+iTf80IzOLWgxhU65EGLb4f0SXQLU7umwB
+KiAFQ5h3/GPOAEbYK2dBHf81ZmfF8uDBJtMrzo4zfb0jtO9L5CjM/SmAUAwdSTcN
+ZHmlGw1JBMSpQ90ypKYU9741mFlEnQ==
+=NEnM
+-----END PGP SIGNATURE-----
+
+--4H8pQOsbJYLkbTYVbK9aQOkZifbcJLX8B--
 
