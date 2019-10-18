@@ -2,81 +2,65 @@ Return-Path: <SRS0=ht5U=YL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D735ACA9EAB
-	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 14:25:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E2550CA9EA9
+	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 14:28:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A57F8222C3
-	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 14:25:28 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="WZofIa95"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A57F8222C3
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id B736E21897
+	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 14:28:55 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B736E21897
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40860 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40902 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iLTC3-00030D-Tm
-	for qemu-devel@archiver.kernel.org; Fri, 18 Oct 2019 10:25:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59334)
+	id 1iLTFO-0005yT-UH
+	for qemu-devel@archiver.kernel.org; Fri, 18 Oct 2019 10:28:54 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:32842)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1iLT2A-0001B3-JM
- for qemu-devel@nongnu.org; Fri, 18 Oct 2019 10:15:15 -0400
+ (envelope-from <kwolf@redhat.com>) id 1iLTEA-0004pg-1D
+ for qemu-devel@nongnu.org; Fri, 18 Oct 2019 10:27:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1iLT27-00017D-2L
- for qemu-devel@nongnu.org; Fri, 18 Oct 2019 10:15:13 -0400
-Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:45157)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1iLT26-00016R-PP
- for qemu-devel@nongnu.org; Fri, 18 Oct 2019 10:15:11 -0400
-Received: by mail-ot1-x341.google.com with SMTP id 41so5055438oti.12
- for <qemu-devel@nongnu.org>; Fri, 18 Oct 2019 07:15:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=BlzVq9+AMGPMLacU+sHt4TVQEGsqdmskKDXy04V2Qzs=;
- b=WZofIa95/FTHmkB8x7VD6Ktf6GtQV9BhvAea/yTP9iVgNI0eA1B3gLvenwWsVx+Jk6
- fuxKwiVxpr5piRzmMGE9nSx7wggey4npfbAJrOHMNkfR52rhpSix4iiQ+4pzTCB9y/TZ
- Z3Mu5tONxX66idmr/pAlBPzNiCUm6x9bPSAIvWU9hsh36ul+0RncEfShObwnWrMJen5n
- hvY2T7uUjOHTfu+EzPjKP0tLk24oFQTFodgiDFXaBO5EtHeJSFEBORBqI+ka+GPHxlDY
- dDZ6AIjd6TF5ulYl0EUS9U9s+nWdfrMw/cCxSuryoo7wHGBd8DhP2jK7l+Fid+UdCxw8
- FnLQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=BlzVq9+AMGPMLacU+sHt4TVQEGsqdmskKDXy04V2Qzs=;
- b=dXUrXMsCXfnXo4fvwb9QWB1kGLJi50PlIyq9bAUI4K7A4CtKjuKV4zgQx/HCsVEjq9
- M/enxmWJxvUDOuhmygn0Ft/Ff6GkAK/PMd9Q5kOhkWtPB5DGOfqTW3C4GlIkWzk/S1iU
- sqRZgAFD4ee3NXGCAO5qKPs2FrXLKJVJYb9OQH/wQhEEHnJLEEwt7jgum9nV5orU3/JT
- nliM/KU4Ez6vhPqpkvYiLy3CrFORydoPgeXj/nBqQWNlpI4VWUiyWk7JU3WUedbP4wBU
- XpG3Ou0KYCtvjor8csBPDky7glhPajI0jyqYvYrjcJw+pS4EfR5ezu3RkI0GLO05ylPR
- y/Mg==
-X-Gm-Message-State: APjAAAVPVHEpFwDLBqzTisaB9fhsLDbbws+UWsHS7ynyPPoo2uDN/84j
- Jf4iRBqAW0hEyzbQo5s+havwgGJUz5+rJCmXUGC0sA==
-X-Google-Smtp-Source: APXvYqxmRs6lJ7HKwGlRS8aZCELuJQde1hwF4eHTi+7gqbg2MG4U6I1FqT9pVpvBNES8CACWbZ7ryIYDeWs5+hYOhAQ=
-X-Received: by 2002:a9d:30c1:: with SMTP id r1mr8028707otg.91.1571408109768;
- Fri, 18 Oct 2019 07:15:09 -0700 (PDT)
+ (envelope-from <kwolf@redhat.com>) id 1iLTE6-00019y-TM
+ for qemu-devel@nongnu.org; Fri, 18 Oct 2019 10:27:37 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:60338)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <kwolf@redhat.com>)
+ id 1iLTDz-00012W-LC; Fri, 18 Oct 2019 10:27:27 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 632A18E581;
+ Fri, 18 Oct 2019 14:27:25 +0000 (UTC)
+Received: from localhost.localdomain (ovpn-117-198.ams2.redhat.com
+ [10.36.117.198])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 73B4060BF4;
+ Fri, 18 Oct 2019 14:27:21 +0000 (UTC)
+Date: Fri, 18 Oct 2019 16:27:20 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
+Subject: Re: [PATCH] iotests: Skip read-only cases in 118 when run as root
+Message-ID: <20191018142720.GH6122@localhost.localdomain>
+References: <20191018115127.2671-1-kwolf@redhat.com>
+ <a810971a-639e-e7dc-d5e6-6b0bb524079b@redhat.com>
 MIME-Version: 1.0
-References: <20191017151606.GA1880840@orkuz.int.mamuti.net>
- <82ea23ea-be23-c374-3f10-65d8f6e79432@redhat.com>
- <CAFEAcA-pkD_LCh++TWoO77=Bu9mYe7HOkaeyCXjLopAmqhpi-g@mail.gmail.com>
- <20191018140219.GS4204@orkuz.int.mamuti.net>
-In-Reply-To: <20191018140219.GS4204@orkuz.int.mamuti.net>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 18 Oct 2019 15:14:57 +0100
-Message-ID: <CAFEAcA-JAvQOyW8dsmf1sVzv6JvqUe2w-EtBgT3Jsx5Hgq11Pg@mail.gmail.com>
-Subject: Re: Default CPU models on s390x and ppc64
-To: Jiri Denemark <jdenemar@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::341
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <a810971a-639e-e7dc-d5e6-6b0bb524079b@redhat.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.28]); Fri, 18 Oct 2019 14:27:25 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,52 +72,90 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: David Gibson <dgibson@redhat.com>, David Hildenbrand <dhildenb@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>, David Hildenbrand <david@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, 18 Oct 2019 at 15:02, Jiri Denemark <jdenemar@redhat.com> wrote:
->
-> On Thu, Oct 17, 2019 at 17:13:10 +0100, Peter Maydell wrote:
-> > On Thu, 17 Oct 2019 at 17:09, David Hildenbrand <david@redhat.com> wrote:
-> > > The default model under KVM is "host", under TCG it's "qemu". We should
-> > > not use "qemu" under KVM, although it might work on some setups ...
-> >
-> > Possibly a tangent, but on Arm the approach we used to deal
-> > with "'-cpu host' only works for kvm" was to define a "-cpu max"
-> > meaning "best thing you can give me", which is an alias for
-> > -cpu host with KVM and an alias for a CPU with all the extra
-> > features we have emulation support under TCG. Then users can
-> > use '-cpu max' and have something that generally will DTRT
-> > regardless of accelerator.
->
-> This thread is not really about a CPU model that users could universally
-> use for both TCG or KVM. It's about checking what CPU model is used by
-> QEMU if no CPU model is specified on the command line.
+Am 18.10.2019 um 14:59 hat Philippe Mathieu-Daud=E9 geschrieben:
+> Hi Kevin,
+>=20
+> On 10/18/19 1:51 PM, Kevin Wolf wrote:
+> > Some tests in 118 use chmod to remove write permissions from the file
+> > and assume that the image can indeed not be opened read-write
+> > afterwards. This doesn't work when the test is run as root, because r=
+oot
+> > can still open the file as writable even when the permission bit isn'=
+t
+> > set.
+> >=20
+> > Introduce a @skip_if_root decorator and use it in 118 to skip the tes=
+ts
+> > in question when the script is run as root.
+> >=20
+> > Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> > ---
+> >   tests/qemu-iotests/118        |  3 +++
+> >   tests/qemu-iotests/iotests.py | 10 ++++++++++
+> >   2 files changed, 13 insertions(+)
+> >=20
+> > diff --git a/tests/qemu-iotests/118 b/tests/qemu-iotests/118
+> > index ea0b326ae0..9eff46d189 100755
+> > --- a/tests/qemu-iotests/118
+> > +++ b/tests/qemu-iotests/118
+> > @@ -446,6 +446,7 @@ class TestChangeReadOnly(ChangeBaseClass):
+> >           self.assert_qmp(result, 'return[0]/inserted/ro', True)
+> >           self.assert_qmp(result, 'return[0]/inserted/image/filename'=
+, new_img)
+> > +    @iotests.skip_if_root
+>=20
+> Why not have case_notrun() return 'reason' and use:
+>=20
+> @unittest.skipIf(os.getuid() =3D=3D 0, case_notrun("cannot be run as ro=
+ot"))
 
-Yes, but the default CPU model if none is specified should ideally
-not be one which only works with one accelerator (among other
-things, that makes it more complicated to implement and to probe for
-because you need to ensure it's set after the accelerator is
-selected and that if you're probing that you've told QEMU what
-the accelerator type is).
+Because we can't skip test cases using unittest functionality, it
+results in different output (the test is marked as 's' instead of '.'
+and a message '(skipped=3Dn)' is added), which means failure for
+qemu-iotests.
 
-> BTW, I was told aarch64 is a bit different and QEMU fails to start with
-> KVM unless -cpu host is explicitly specified. Is that correct?
+Apart from that, it would duplicate the logic and the error message in
+every place, which wouldn't be very nice anyway. With the necessary
+iotests.case_notrun() the line becomes > 80 characters, too.
 
-Either -cpu host or -cpu max will work. If your host is a real
-Cortex-A57 then I think -cpu cortex-a57 will work; similarly
-with -cpu cortex-a53 on a host A53. (The underlying constraint
-here is that the kernel doesn't support "claim to the guest
-that it is running on some different CPU than the host CPU",
-so you can't use command line options or defaults that would
-require that.) 32-bit arm is similar. The other point to note
-is that the "virt" board's default CPU is Cortex-A15 for
-historical reasons, which means that in practice if you want
-to use 64-bit KVM you don't want the default value.
+> >       def test_rw_ro_retain(self):
+> >           os.chmod(new_img, 0o444)
+> >           self.vm.add_drive(old_img, 'media=3Ddisk', 'none')
+> > @@ -530,6 +531,7 @@ class TestChangeReadOnly(ChangeBaseClass):
+> >           self.assert_qmp(result, 'return[0]/inserted/ro', True)
+> >           self.assert_qmp(result, 'return[0]/inserted/image/filename'=
+, new_img)
+> > +    @iotests.skip_if_root
+> >       def test_make_ro_rw(self):
+> >           os.chmod(new_img, 0o444)
+> >           self.vm.add_drive(old_img, 'media=3Ddisk', 'none')
+> > @@ -571,6 +573,7 @@ class TestChangeReadOnly(ChangeBaseClass):
+> >           self.assert_qmp(result, 'return[0]/inserted/ro', True)
+> >           self.assert_qmp(result, 'return[0]/inserted/image/filename'=
+, new_img)
+> > +    @iotests.skip_if_root
+> >       def test_make_ro_rw_by_retain(self):
+> >           os.chmod(new_img, 0o444)
+> >           self.vm.add_drive(old_img, 'media=3Ddisk', 'none')
+> > diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotes=
+ts.py
+> > index 3a8f378f90..9c66db613e 100644
+> > --- a/tests/qemu-iotests/iotests.py
+> > +++ b/tests/qemu-iotests/iotests.py
+> > @@ -920,6 +920,16 @@ def skip_if_unsupported(required_formats=3D[], r=
+ead_only=3DFalse):
+> >           return func_wrapper
+> >       return skip_test_decorator
+> > +def skip_if_root(func):
+>=20
+> skip_if_user_is_root() is slightly less confuse.
 
-thanks
--- PMM
+Ok, I can make this change.
+
+Kevin
 
