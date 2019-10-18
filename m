@@ -2,78 +2,69 @@ Return-Path: <SRS0=ht5U=YL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.4 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 54129CA9EC8
-	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 03:00:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9C91DCA9ECF
+	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 05:06:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2041221897
-	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 03:00:30 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FTcqYpL1"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2041221897
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 6D371222C5
+	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 05:06:08 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6D371222C5
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34846 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35398 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iLIVB-0000QT-8b
-	for qemu-devel@archiver.kernel.org; Thu, 17 Oct 2019 23:00:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57977)
+	id 1iLKSl-0001sa-Iz
+	for qemu-devel@archiver.kernel.org; Fri, 18 Oct 2019 01:06:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46806)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <elohimes@gmail.com>) id 1iLIUM-0008MF-1l
- for qemu-devel@nongnu.org; Thu, 17 Oct 2019 22:59:39 -0400
+ (envelope-from <armbru@redhat.com>) id 1iLKS8-0001TN-Hv
+ for qemu-devel@nongnu.org; Fri, 18 Oct 2019 01:05:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <elohimes@gmail.com>) id 1iLIUK-0006tO-V2
- for qemu-devel@nongnu.org; Thu, 17 Oct 2019 22:59:37 -0400
-Received: from mail-qk1-x743.google.com ([2607:f8b0:4864:20::743]:41909)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <elohimes@gmail.com>) id 1iLIUK-0006t4-RT
- for qemu-devel@nongnu.org; Thu, 17 Oct 2019 22:59:36 -0400
-Received: by mail-qk1-x743.google.com with SMTP id p10so3981207qkg.8
- for <qemu-devel@nongnu.org>; Thu, 17 Oct 2019 19:59:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=9LvNOEvxkKeEfYNd3NSNBotW+Qur9uR661fnCY2SQVs=;
- b=FTcqYpL1IQgUEygPRSuhCHyXf9bEqbBrPIKZLNJYuh831c7zrH7XUVW0DZGOjiZr41
- RUfUQ8msAol/ALVpk5pQV4EXe28YiOVWWAZjvs+k9x0cjwULobjEOekgpcd9rlVltapc
- 01M4xtLLI2F3EViUMOB4x1Dl9KYXS77ITQNKVO+oUaRW+cmaZEzdFb724xFwK+Ny4E/s
- zxIXZvJrtAWZ997ktee/EZCq6MqRf9hGfK5sS9GeK58dS9W7aTYehAoTw4ahzDYcyVP1
- ijt2ul6tASEhEgpNAYllnHd2fWcjZes7q71MX5WT+AHwKREBDRSnU8ouXr8wVLpeXbk3
- UQXg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=9LvNOEvxkKeEfYNd3NSNBotW+Qur9uR661fnCY2SQVs=;
- b=Y4k3CHMm+eTi7eaJdGmAAlrdVRMxrZyauh4KqgUx4pywREPVNfNS1ObV39lr5n7L19
- OcnuChxFh9+9lmC4Z/CouiSa4FiP0rdc7s1mJ52FS/Th4jfscMnKddVkRPRKnxIGad5c
- wzQi4//kJ5WQ0lnWdrhR4KEQ3exQiz8sIq+FJxz7EOV5FcwlnUpIN74e3w1VKxbL5S6q
- Zi6vSEg+zl0Pi72FhqiN+tqjLtRdGUyWELPBllnVgStUGV9wZQUAw6rSWI+TA2h6YCHI
- b8pg0OYRevOtTd6ckg3hDPrlYHvNoinyC6I7e/09DMicKGG14q/sm+kNJeWP9POWqIQD
- MsnA==
-X-Gm-Message-State: APjAAAXMh4O0jpVXHpksVqdud3b6RQP49eXYNupIrgfz18gy6rEYCb0V
- gLugznmdOivXYNKBKcz9EZSoaQHTvrGNx35Z1qk=
-X-Google-Smtp-Source: APXvYqwM09CzGvufs+G8ubVoO7Lufyvf1d7GW9bu+tH3wHyaIdB8LQ4VTE3D3SelPzQ+WLKmXqPogbgPCoRaVsMnRBM=
-X-Received: by 2002:a37:a2d5:: with SMTP id l204mr1416442qke.285.1571367575385; 
- Thu, 17 Oct 2019 19:59:35 -0700 (PDT)
+ (envelope-from <armbru@redhat.com>) id 1iLKS6-0006KH-3O
+ for qemu-devel@nongnu.org; Fri, 18 Oct 2019 01:05:27 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:41940)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1iLKS5-0006K0-RT
+ for qemu-devel@nongnu.org; Fri, 18 Oct 2019 01:05:26 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id E791010C0933;
+ Fri, 18 Oct 2019 05:05:23 +0000 (UTC)
+Received: from blackfin.pond.sub.org (unknown [10.36.118.123])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 1361560925;
+ Fri, 18 Oct 2019 05:05:12 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id 6D5081138619; Fri, 18 Oct 2019 07:05:11 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: Sergio Lopez <slp@redhat.com>
+Subject: Re: [PATCH v9 04/15] hw/i386/pc: replace use of strtol with
+ qemu_strtol in x86_load_linux()
+References: <20191015112346.45554-1-slp@redhat.com>
+ <20191015112346.45554-5-slp@redhat.com>
+ <b7baa2ab-210b-e7ef-399e-4dbbbc0ee0aa@redhat.com>
+ <87wod4pgoy.fsf@dusky.pond.sub.org> <87k193hnxp.fsf@redhat.com>
+Date: Fri, 18 Oct 2019 07:05:11 +0200
+In-Reply-To: <87k193hnxp.fsf@redhat.com> (Sergio Lopez's message of "Thu, 17
+ Oct 2019 08:43:30 +0200")
+Message-ID: <87lftilk3c.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.2 (gnu/linux)
 MIME-Version: 1.0
-References: <20191017163859.23184-1-felipe@nutanix.com>
-In-Reply-To: <20191017163859.23184-1-felipe@nutanix.com>
-From: Yongji Xie <elohimes@gmail.com>
-Date: Fri, 18 Oct 2019 10:59:23 +0800
-Message-ID: <CAONzpcbR+OjcrfavTnFXVopG-YsTdnFCT=no0eFei4oanfmj1Q@mail.gmail.com>
-Subject: Re: [PATCH] vhost-user-scsi: implement handle_output
-To: Felipe Franciosi <felipe@nutanix.com>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::743
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.66]); Fri, 18 Oct 2019 05:05:23 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -85,64 +76,114 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Alex Williamson <alex.williamson@redhat.com>,
- "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
- Stefan Hajnoczi <stefanha@redhat.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "Daniel P . Berrange" <berrange@redhat.com>, ehabkost@redhat.com,
+ mst@redhat.com, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>,
+ kraxel@redhat.com, pbonzini@redhat.com, imammedo@redhat.com,
+ sgarzare@redhat.com, lersek@redhat.com, rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, 18 Oct 2019 at 01:17, Felipe Franciosi <felipe@nutanix.com> wrote:
->
-> Originally, vhost-user-scsi did not implement a handle_output callback
-> as that didn't seem necessary. Turns out it is.
->
-> Depending on which other devices are presented to a VM, SeaBIOS may
-> decide to map vhost-user-scsi devices on the 64-bit range of the address
-> space. As a result, SeaBIOS will kick VQs via the config space. Those
-> land on Qemu (not the vhost backend) and are missed, causing the VM not
-> to boot. This fixes the issue by getting Qemu to post the notification.
->
-Should we fix this in vhost-user-blk too?
+Sergio Lopez <slp@redhat.com> writes:
 
-Thanks,
-Yongji
+> Markus Armbruster <armbru@redhat.com> writes:
+>
+>> Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> writes:
+>>
+>>> Hi Sergio,
+>>>
+>>> On 10/15/19 1:23 PM, Sergio Lopez wrote:
+>>>> Follow checkpatch.pl recommendation and replace the use of strtol with
+>>>> qemu_strtol in x86_load_linux().
+>>>
+>>> "with qemu_strtoui"
+>>>
+>>>>
+>>>> Signed-off-by: Sergio Lopez <slp@redhat.com>
+>>>> ---
+>>>>   hw/i386/pc.c | 9 ++++++++-
+>>>>   1 file changed, 8 insertions(+), 1 deletion(-)
+>>>>
+>>>> diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+>>>> index 77e86bfc3d..c8608b8007 100644
+>>>> --- a/hw/i386/pc.c
+>>>> +++ b/hw/i386/pc.c
+>>>> @@ -68,6 +68,7 @@
+>>>>   #include "qemu/config-file.h"
+>>>>   #include "qemu/error-report.h"
+>>>>   #include "qemu/option.h"
+>>>> +#include "qemu/cutils.h"
+>>>>   #include "hw/acpi/acpi.h"
+>>>>   #include "hw/acpi/cpu_hotplug.h"
+>>>>   #include "hw/boards.h"
+>>>> @@ -1202,6 +1203,7 @@ static void x86_load_linux(PCMachineState *pcms,
+>>>>       vmode =3D strstr(kernel_cmdline, "vga=3D");
+>>>>       if (vmode) {
+>>>>           unsigned int video_mode;
+>>>> +        int ret;
+>>>>           /* skip "vga=3D" */
+>>>>           vmode +=3D 4;
+>>>>           if (!strncmp(vmode, "normal", 6)) {
+>>>> @@ -1211,7 +1213,12 @@ static void x86_load_linux(PCMachineState *pcms,
+>>>>           } else if (!strncmp(vmode, "ask", 3)) {
+>>>>               video_mode =3D 0xfffd;
+>>>>           } else {
+>>>> -            video_mode =3D strtol(vmode, NULL, 0);
+>>>> +            ret =3D qemu_strtoui(vmode, NULL, 0, &video_mode);
+>>>> +            if (ret !=3D 0) {
+>>>> +                fprintf(stderr, "qemu: can't parse 'vga' parameter: %=
+s\n",
+>>>> +                        strerror(-ret));
+>>>
+>>> (Cc'ing Markus/Daniel just in case)
+>>>
+>>> I'm wondering if using fprintf() is appropriate, thinking about
+>>> instantiating a machine via libvirt, is this error reported to the
+>>> user?
+>>>
+>>> I first thought about using error_report() instead:
+>>>
+>>>     error_report("qemu: can't parse 'vga' parameter: %s",
+>>>                  strerror(-ret));
+>>
+>> Make that
+>>
+>>      error_report("can't parse 'vga' parameter: %s", strerror(-ret));
+>>
+>>> But this API is meaningful when used in console/monitor. We can't get
+>>> here from the monitor,
+>>
+>> True, but error_report() should be used anyway, because (1) it makes
+>> intent more obvious, and (2) it uses a uniform, featureful error format.
+>>
+>> With the proposed fprintf(), we get
+>>
+>>     qemu: can't parse 'vga' parameter: Numerical result out of range
+>>
+>> With error_report():
+>>
+>> * we report the *actual* argv[0] instead of "qemu"
+>>
+>> * we obey -msg timestamp=3Don
+>>
+>> * if "[PATCHv2 1/2] util/qemu-error: add guest name helper with -msg
+>>   options" gets accepted, we obey -msg guest-name=3Don, too
+>>
+>> * we have a common way to point to the offending command line argument
+>>   or configuration file line (not worth doing here)
+>>
+>> Please use error_report().
+>>
+>> [...]
+>
+> But should we use error_report even if other occurrences in the same
+> function are using fprintf? Or are you suggesting to change those too?
 
-> Signed-off-by: Felipe Franciosi <felipe@nutanix.com>
-> ---
->  hw/scsi/vhost-user-scsi.c | 9 +++++----
->  1 file changed, 5 insertions(+), 4 deletions(-)
->
-> diff --git a/hw/scsi/vhost-user-scsi.c b/hw/scsi/vhost-user-scsi.c
-> index 6a6c15dd32..13278ed151 100644
-> --- a/hw/scsi/vhost-user-scsi.c
-> +++ b/hw/scsi/vhost-user-scsi.c
-> @@ -62,8 +62,9 @@ static void vhost_user_scsi_set_status(VirtIODevice *vdev, uint8_t status)
->      }
->  }
->
-> -static void vhost_dummy_handle_output(VirtIODevice *vdev, VirtQueue *vq)
-> +static void vhost_handle_output(VirtIODevice *vdev, VirtQueue *vq)
->  {
-> +    event_notifier_set(virtio_queue_get_host_notifier(vq));
->  }
->
->  static void vhost_user_scsi_realize(DeviceState *dev, Error **errp)
-> @@ -80,9 +81,9 @@ static void vhost_user_scsi_realize(DeviceState *dev, Error **errp)
->          return;
->      }
->
-> -    virtio_scsi_common_realize(dev, vhost_dummy_handle_output,
-> -                               vhost_dummy_handle_output,
-> -                               vhost_dummy_handle_output, &err);
-> +    virtio_scsi_common_realize(dev, vhost_handle_output,
-> +                               vhost_handle_output,
-> +                               vhost_handle_output, &err);
->      if (err != NULL) {
->          error_propagate(errp, err);
->          return;
-> --
-> 2.20.1
->
+Change those, too.
+
+> If so, is it really worth it doing it now or can we do that in a future
+> patch (seems completely unrelated to this patch series)?
+
+As long as it gets done, which patch series does it is unimportant.
 
