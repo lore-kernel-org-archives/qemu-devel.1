@@ -6,53 +6,53 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D03C5CA9EA9
-	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 15:46:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 98C83CA9EA0
+	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 15:49:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A9896222C6
-	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 15:46:49 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A9896222C6
+	by mail.kernel.org (Postfix) with ESMTPS id 71A9C2064B
+	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 15:49:33 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 71A9C2064B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42172 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42184 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iLUSm-0004JM-2L
-	for qemu-devel@archiver.kernel.org; Fri, 18 Oct 2019 11:46:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44693)
+	id 1iLUVP-0006CV-V8
+	for qemu-devel@archiver.kernel.org; Fri, 18 Oct 2019 11:49:32 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44166)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <marcandre.lureau@redhat.com>) id 1iLUQ3-0001n3-0H
- for qemu-devel@nongnu.org; Fri, 18 Oct 2019 11:44:00 -0400
+ (envelope-from <marcandre.lureau@redhat.com>) id 1iLUOf-0008Ij-Qc
+ for qemu-devel@nongnu.org; Fri, 18 Oct 2019 11:42:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <marcandre.lureau@redhat.com>) id 1iLUQ1-0007hL-IA
- for qemu-devel@nongnu.org; Fri, 18 Oct 2019 11:43:58 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:52722)
+ (envelope-from <marcandre.lureau@redhat.com>) id 1iLUOe-0006DI-JM
+ for qemu-devel@nongnu.org; Fri, 18 Oct 2019 11:42:33 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:9868)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
- id 1iLUPy-0007eB-5X; Fri, 18 Oct 2019 11:43:54 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
+ id 1iLUOb-0006AN-WB; Fri, 18 Oct 2019 11:42:30 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 394733090FEC;
- Fri, 18 Oct 2019 15:43:53 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 0832281F19;
+ Fri, 18 Oct 2019 15:42:29 +0000 (UTC)
 Received: from localhost (ovpn-112-40.ams2.redhat.com [10.36.112.40])
- by smtp.corp.redhat.com (Postfix) with ESMTP id ED2BB60925;
- Fri, 18 Oct 2019 15:43:49 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 5E33658BE;
+ Fri, 18 Oct 2019 15:42:28 +0000 (UTC)
 From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 12/14] omap-gpio: remove PROP_PTR
-Date: Fri, 18 Oct 2019 17:42:10 +0200
-Message-Id: <20191018154212.13458-13-marcandre.lureau@redhat.com>
+Subject: [PATCH 02/14] vmmouse: replace PROP_PTR with PROP_LINK
+Date: Fri, 18 Oct 2019 17:42:00 +0200
+Message-Id: <20191018154212.13458-3-marcandre.lureau@redhat.com>
 In-Reply-To: <20191018154212.13458-1-marcandre.lureau@redhat.com>
 References: <20191018154212.13458-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.43]); Fri, 18 Oct 2019 15:43:53 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.27]); Fri, 18 Oct 2019 15:42:29 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
@@ -87,172 +87,122 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Since clock are not QOM objects, replace PROP_PTR of clocks with
-setters methods.
+While at it, use the expected type.
 
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 ---
- hw/arm/omap1.c        |  2 +-
- hw/arm/omap2.c        | 13 +++++++------
- hw/gpio/omap_gpio.c   | 42 +++++++++++++++---------------------------
- include/hw/arm/omap.h | 17 +++++++++++++++++
- 4 files changed, 40 insertions(+), 34 deletions(-)
+ hw/i386/pc.c             | 6 +++---
+ hw/i386/vmmouse.c        | 8 +++-----
+ hw/input/pckbd.c         | 8 +++-----
+ include/hw/input/i8042.h | 4 +++-
+ 4 files changed, 12 insertions(+), 14 deletions(-)
 
-diff --git a/hw/arm/omap1.c b/hw/arm/omap1.c
-index fe55c44c7e..f13d46afaa 100644
---- a/hw/arm/omap1.c
-+++ b/hw/arm/omap1.c
-@@ -4014,7 +4014,7 @@ struct omap_mpu_state_s *omap310_mpu_init(MemoryReg=
-ion *system_memory,
-=20
-     s->gpio =3D qdev_create(NULL, "omap-gpio");
-     qdev_prop_set_int32(s->gpio, "mpu_model", s->mpu_model);
--    qdev_prop_set_ptr(s->gpio, "clk", omap_findclk(s, "arm_gpio_ck"));
-+    omap_gpio_set_clk(OMAP1_GPIO(s->gpio), omap_findclk(s, "arm_gpio_ck"=
-));
-     qdev_init_nofail(s->gpio);
-     sysbus_connect_irq(SYS_BUS_DEVICE(s->gpio), 0,
-                        qdev_get_gpio_in(s->ih[0], OMAP_INT_GPIO_BANK1));
-diff --git a/hw/arm/omap2.c b/hw/arm/omap2.c
-index 046fb6ffb5..d5c20f6486 100644
---- a/hw/arm/omap2.c
-+++ b/hw/arm/omap2.c
-@@ -2452,13 +2452,14 @@ struct omap_mpu_state_s *omap2420_mpu_init(Memory=
-Region *sysmem,
-=20
-     s->gpio =3D qdev_create(NULL, "omap2-gpio");
-     qdev_prop_set_int32(s->gpio, "mpu_model", s->mpu_model);
--    qdev_prop_set_ptr(s->gpio, "iclk", omap_findclk(s, "gpio_iclk"));
--    qdev_prop_set_ptr(s->gpio, "fclk0", omap_findclk(s, "gpio1_dbclk"));
--    qdev_prop_set_ptr(s->gpio, "fclk1", omap_findclk(s, "gpio2_dbclk"));
--    qdev_prop_set_ptr(s->gpio, "fclk2", omap_findclk(s, "gpio3_dbclk"));
--    qdev_prop_set_ptr(s->gpio, "fclk3", omap_findclk(s, "gpio4_dbclk"));
-+    omap2_gpio_set_iclk(OMAP2_GPIO(s->gpio), omap_findclk(s, "gpio_iclk"=
-));
-+    omap2_gpio_set_fclk(OMAP2_GPIO(s->gpio), 0, omap_findclk(s, "gpio1_d=
-bclk"));
-+    omap2_gpio_set_fclk(OMAP2_GPIO(s->gpio), 1, omap_findclk(s, "gpio2_d=
-bclk"));
-+    omap2_gpio_set_fclk(OMAP2_GPIO(s->gpio), 2, omap_findclk(s, "gpio3_d=
-bclk"));
-+    omap2_gpio_set_fclk(OMAP2_GPIO(s->gpio), 3, omap_findclk(s, "gpio4_d=
-bclk"));
-     if (s->mpu_model =3D=3D omap2430) {
--        qdev_prop_set_ptr(s->gpio, "fclk4", omap_findclk(s, "gpio5_dbclk=
-"));
-+        omap2_gpio_set_fclk(OMAP2_GPIO(s->gpio), 4,
-+                            omap_findclk(s, "gpio5_dbclk"));
+diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+index 4b1904237e..ada1ea8802 100644
+--- a/hw/i386/pc.c
++++ b/hw/i386/pc.c
+@@ -1861,9 +1861,9 @@ static void pc_superio_init(ISABus *isa_bus, bool c=
+reate_fdctrl, bool no_vmport)
+         vmmouse =3D NULL;
      }
-     qdev_init_nofail(s->gpio);
-     busdev =3D SYS_BUS_DEVICE(s->gpio);
-diff --git a/hw/gpio/omap_gpio.c b/hw/gpio/omap_gpio.c
-index 41e1aa798c..85c16897ae 100644
---- a/hw/gpio/omap_gpio.c
-+++ b/hw/gpio/omap_gpio.c
-@@ -40,10 +40,6 @@ struct omap_gpio_s {
-     uint16_t pins;
- };
-=20
--#define TYPE_OMAP1_GPIO "omap-gpio"
--#define OMAP1_GPIO(obj) \
--    OBJECT_CHECK(struct omap_gpif_s, (obj), TYPE_OMAP1_GPIO)
--
- struct omap_gpif_s {
-     SysBusDevice parent_obj;
-=20
-@@ -212,10 +208,6 @@ struct omap2_gpio_s {
-     uint8_t delay;
- };
-=20
--#define TYPE_OMAP2_GPIO "omap2-gpio"
--#define OMAP2_GPIO(obj) \
--    OBJECT_CHECK(struct omap2_gpif_s, (obj), TYPE_OMAP2_GPIO)
--
- struct omap2_gpif_s {
-     SysBusDevice parent_obj;
-=20
-@@ -747,21 +739,13 @@ static void omap2_gpio_realize(DeviceState *dev, Er=
-ror **errp)
+     if (vmmouse) {
+-        DeviceState *dev =3D DEVICE(vmmouse);
+-        qdev_prop_set_ptr(dev, "ps2_mouse", i8042);
+-        qdev_init_nofail(dev);
++        object_property_set_link(OBJECT(vmmouse), OBJECT(i8042),
++                                 "i8042", &error_abort);
++        qdev_init_nofail(DEVICE(vmmouse));
      }
+     port92 =3D isa_create_simple(isa_bus, "port92");
+=20
+diff --git a/hw/i386/vmmouse.c b/hw/i386/vmmouse.c
+index 41ad91ad53..c0c329f817 100644
+--- a/hw/i386/vmmouse.c
++++ b/hw/i386/vmmouse.c
+@@ -66,7 +66,7 @@ typedef struct VMMouseState
+     uint16_t status;
+     uint8_t absolute;
+     QEMUPutMouseEntry *entry;
+-    void *ps2_mouse;
++    ISAKBDState *i8042;
+ } VMMouseState;
+=20
+ static uint32_t vmmouse_get_status(VMMouseState *s)
+@@ -105,7 +105,7 @@ static void vmmouse_mouse_event(void *opaque, int x, =
+int y, int dz, int buttons_
+=20
+     /* need to still generate PS2 events to notify driver to
+        read from queue */
+-    i8042_isa_mouse_fake_event(s->ps2_mouse);
++    i8042_isa_mouse_fake_event(s->i8042);
  }
 =20
--/* Using qdev pointer properties for the clocks is not ideal.
-- * qdev should support a generic means of defining a 'port' with
-- * an arbitrary interface for connecting two devices. Then we
-- * could reframe the omap clock API in terms of clock ports,
-- * and get some type safety. For now the best qdev provides is
-- * passing an arbitrary pointer.
-- * (It's not possible to pass in the string which is the clock
-- * name, because this device does not have the necessary information
-- * (ie the struct omap_mpu_state_s*) to do the clockname to pointer
-- * translation.)
-- */
-+void omap_gpio_set_clk(omap_gpif *gpio, omap_clk clk)
-+{
-+    gpio->clk =3D clk;
-+}
+ static void vmmouse_remove_handler(VMMouseState *s)
+@@ -275,7 +275,7 @@ static void vmmouse_realizefn(DeviceState *dev, Error=
+ **errp)
+ }
 =20
- static Property omap_gpio_properties[] =3D {
-     DEFINE_PROP_INT32("mpu_model", struct omap_gpif_s, mpu_model, 0),
--    DEFINE_PROP_PTR("clk", struct omap_gpif_s, clk),
+ static Property vmmouse_properties[] =3D {
+-    DEFINE_PROP_PTR("ps2_mouse", VMMouseState, ps2_mouse),
++    DEFINE_PROP_LINK("i8042", VMMouseState, i8042, TYPE_I8042, ISAKBDSta=
+te *),
      DEFINE_PROP_END_OF_LIST(),
  };
 =20
-@@ -784,15 +768,19 @@ static const TypeInfo omap_gpio_info =3D {
-     .class_init    =3D omap_gpio_class_init,
- };
+@@ -287,8 +287,6 @@ static void vmmouse_class_initfn(ObjectClass *klass, =
+void *data)
+     dc->reset =3D vmmouse_reset;
+     dc->vmsd =3D &vmstate_vmmouse;
+     dc->props =3D vmmouse_properties;
+-    /* Reason: pointer property "ps2_mouse" */
+-    dc->user_creatable =3D false;
+ }
 =20
-+void omap2_gpio_set_iclk(omap2_gpif *gpio, omap_clk clk)
-+{
-+    gpio->iclk =3D clk;
-+}
-+
-+void omap2_gpio_set_fclk(omap2_gpif *gpio, uint8_t i, omap_clk clk)
-+{
-+    assert(i <=3D 5);
-+    gpio->fclk[i] =3D clk;
-+}
-+
- static Property omap2_gpio_properties[] =3D {
-     DEFINE_PROP_INT32("mpu_model", struct omap2_gpif_s, mpu_model, 0),
--    DEFINE_PROP_PTR("iclk", struct omap2_gpif_s, iclk),
--    DEFINE_PROP_PTR("fclk0", struct omap2_gpif_s, fclk[0]),
--    DEFINE_PROP_PTR("fclk1", struct omap2_gpif_s, fclk[1]),
--    DEFINE_PROP_PTR("fclk2", struct omap2_gpif_s, fclk[2]),
--    DEFINE_PROP_PTR("fclk3", struct omap2_gpif_s, fclk[3]),
--    DEFINE_PROP_PTR("fclk4", struct omap2_gpif_s, fclk[4]),
--    DEFINE_PROP_PTR("fclk5", struct omap2_gpif_s, fclk[5]),
-     DEFINE_PROP_END_OF_LIST(),
- };
+ static const TypeInfo vmmouse_info =3D {
+diff --git a/hw/input/pckbd.c b/hw/input/pckbd.c
+index f0acfd86f7..9b641021c9 100644
+--- a/hw/input/pckbd.c
++++ b/hw/input/pckbd.c
+@@ -483,17 +483,15 @@ void i8042_mm_init(qemu_irq kbd_irq, qemu_irq mouse=
+_irq,
 =20
-diff --git a/include/hw/arm/omap.h b/include/hw/arm/omap.h
-index 08ee0c7702..97115891f8 100644
---- a/include/hw/arm/omap.h
-+++ b/include/hw/arm/omap.h
-@@ -86,6 +86,23 @@ typedef struct OMAPI2CState OMAPI2CState;
- void omap_i2c_set_iclk(OMAPI2CState *i2c, omap_clk clk);
- void omap_i2c_set_fclk(OMAPI2CState *i2c, omap_clk clk);
+ #define I8042(obj) OBJECT_CHECK(ISAKBDState, (obj), TYPE_I8042)
 =20
-+/* omap_gpio.c */
-+#define TYPE_OMAP1_GPIO "omap-gpio"
-+#define OMAP1_GPIO(obj)                                         \
-+    OBJECT_CHECK(struct omap_gpif_s, (obj), TYPE_OMAP1_GPIO)
+-typedef struct ISAKBDState {
++struct ISAKBDState {
+     ISADevice parent_obj;
+=20
+     KBDState kbd;
+     MemoryRegion io[2];
+-} ISAKBDState;
++};
+=20
+-void i8042_isa_mouse_fake_event(void *opaque)
++void i8042_isa_mouse_fake_event(ISAKBDState *isa)
+ {
+-    ISADevice *dev =3D opaque;
+-    ISAKBDState *isa =3D I8042(dev);
+     KBDState *s =3D &isa->kbd;
+=20
+     ps2_mouse_fake_event(s->mouse);
+diff --git a/include/hw/input/i8042.h b/include/hw/input/i8042.h
+index 246e6f3335..8eaebf50ce 100644
+--- a/include/hw/input/i8042.h
++++ b/include/hw/input/i8042.h
+@@ -14,10 +14,12 @@
+=20
+ #define I8042_A20_LINE "a20"
+=20
++typedef struct ISAKBDState ISAKBDState;
 +
-+#define TYPE_OMAP2_GPIO "omap2-gpio"
-+#define OMAP2_GPIO(obj)                                         \
-+    OBJECT_CHECK(struct omap2_gpif_s, (obj), TYPE_OMAP2_GPIO)
-+
-+typedef struct omap_gpif_s omap_gpif;
-+typedef struct omap2_gpif_s omap2_gpif;
-+
-+void omap_gpio_set_clk(omap_gpif *gpio, omap_clk clk);
-+
-+void omap2_gpio_set_iclk(omap2_gpif *gpio, omap_clk clk);
-+void omap2_gpio_set_fclk(omap2_gpif *gpio, uint8_t i, omap_clk clk);
-+
- /* OMAP2 l4 Interconnect */
- struct omap_l4_s;
- struct omap_l4_region_s {
+ void i8042_mm_init(qemu_irq kbd_irq, qemu_irq mouse_irq,
+                    MemoryRegion *region, ram_addr_t size,
+                    hwaddr mask);
+-void i8042_isa_mouse_fake_event(void *opaque);
++void i8042_isa_mouse_fake_event(ISAKBDState *isa);
+ void i8042_setup_a20_line(ISADevice *dev, qemu_irq a20_out);
+=20
+ #endif /* HW_INPUT_I8042_H */
 --=20
 2.23.0.606.g08da6496b6
 
