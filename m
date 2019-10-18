@@ -2,79 +2,73 @@ Return-Path: <SRS0=ht5U=YL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AAE1ECA9EA0
-	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 13:16:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C8A2CA9EA1
+	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 13:17:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6E6CC21925
-	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 13:16:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id EA8F621925
+	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 13:17:50 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="cz46Fwtt"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6E6CC21925
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=pass (4096-bit key) header.d=crudebyte.com header.i=@crudebyte.com header.b="L/MvreJl"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EA8F621925
+Authentication-Results: mail.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=crudebyte.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39884 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39916 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iLS6y-0002Ph-9Z
-	for qemu-devel@archiver.kernel.org; Fri, 18 Oct 2019 09:16:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48508)
+	id 1iLS8c-0004Hw-1f
+	for qemu-devel@archiver.kernel.org; Fri, 18 Oct 2019 09:17:50 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49112)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1iLS4A-0008NL-O4
- for qemu-devel@nongnu.org; Fri, 18 Oct 2019 09:13:15 -0400
+ (envelope-from <qemu_oss@crudebyte.com>) id 1iLS6e-0002i7-NI
+ for qemu-devel@nongnu.org; Fri, 18 Oct 2019 09:15:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1iLS49-000418-Bg
- for qemu-devel@nongnu.org; Fri, 18 Oct 2019 09:13:14 -0400
-Received: from mail-oi1-x22e.google.com ([2607:f8b0:4864:20::22e]:46272)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1iLS49-00040d-70
- for qemu-devel@nongnu.org; Fri, 18 Oct 2019 09:13:13 -0400
-Received: by mail-oi1-x22e.google.com with SMTP id k25so5119294oiw.13
- for <qemu-devel@nongnu.org>; Fri, 18 Oct 2019 06:13:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=GkGWRlPvcyznc+MnaIZL8/SVyGRtJXSSli8QHCfpFOE=;
- b=cz46FwttxbzADnV5IW8Jp923NxHJ8+hnjac7WxIJJCYucQHhUxUl8/VNTytVlQ7DDf
- 4hIFPvrUXnzAo8mK1xdUWlmnkQ1UJNKv7N+5qpKlmAc19ML3DvSblzYycCwyDb1IjECi
- gsYXCu5oUTjp1JfmoKeTKRT2su8FzN8/RMZ06KsczlSWk8yHIJcMnjk384TQdI3s0iXq
- PjpNNn2/S+O/ChrJcQFHjevEgx+Bm1T7V4xA7ySBWBBiOuFx+HYG3E/wpoYJcwDtsKdO
- xI2+b2VYNBm5KvcjcxI0QzXjSdcoQO/qmbDuufOGRviciukc0PFy7Ho6vfU6dOlFTTly
- W79A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=GkGWRlPvcyznc+MnaIZL8/SVyGRtJXSSli8QHCfpFOE=;
- b=XovqHTd4arZspHsFZVJedCSJKCSZlaP4P3FO8oguBCUtMRa42vtAhyW8QewGXHbmHu
- TtfPA599f63Up8tAyuprBx8QECrdl2IdAARo3OSRPFXhwEjIvaDjmXwlE6x5OTSKbM3F
- /T86S64lOqX9LeK6PAohy5Ea/XjX4cNKch/u2qDvW6DXp+QXzZaug4i0FL0aCrokgJns
- Jp6uzLhnBRKh7mcclq7EN/UeZak13ixt1xfWpPi2MpNw6MRiaHtyLNOYMPzLJ+kSn5b0
- WmqtgEIdpiIZZjkpgUW8ri4OTjLKLy8ZtrnuyodaWUNLtEsv/s9wbyhB2mp8CneGP/+Z
- pQgQ==
-X-Gm-Message-State: APjAAAVmXxCWffs5TXxVRgZWfiaWqVKU3laGlg/H9E4Ruy2OR0yjWxdU
- 4Gn3R/s0sq42WGeW0ViKerVa57ZpCy6q6s2/ASqAVw==
-X-Google-Smtp-Source: APXvYqxRVmd89ldJjoPDYTEchxdpYJgDWhRYh0M9CTibvUlMudbHpJeJAH0+s+c55slFBrQ7L1Eu+azUF4HqSwGrHl4=
-X-Received: by 2002:aca:49c2:: with SMTP id w185mr8125706oia.163.1571404391802; 
- Fri, 18 Oct 2019 06:13:11 -0700 (PDT)
+ (envelope-from <qemu_oss@crudebyte.com>) id 1iLS6d-0005Yi-Fp
+ for qemu-devel@nongnu.org; Fri, 18 Oct 2019 09:15:48 -0400
+Received: from kylie.crudebyte.com ([5.189.157.229]:36441)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <qemu_oss@crudebyte.com>)
+ id 1iLS6c-0005W4-Tj
+ for qemu-devel@nongnu.org; Fri, 18 Oct 2019 09:15:47 -0400
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+ d=crudebyte.com; s=kylie; h=Content-Type:Content-Transfer-Encoding:
+ MIME-Version:References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:
+ Content-ID:Content-Description;
+ bh=Kp4HYJDHNEKmOJfuEN8/j/a9aK4OYU5hQ6PcyIRX6GI=; b=L/MvreJl8y3ll1JRYWw76UPUyi
+ Bp88td0NxmdYmikTXm5VhUAnAd0w07fC9BxIrMo9EME4SMh7xOJS0JpQxm3GTj6TDX1lN4rRTQqCg
+ 2XsoKx9XQT7sye7HrMDGgWB4aDSUJKdjV8//1OUfDjM0ZUTBjmCb6ANBc0HwLZb901ptM7QLcRD4u
+ JGmPne9vxAX3MLByHU1+VA4BixipitHkaYCoa72+CZ4ZWKdAHmL6fzvUl9zCtls84aAsM68kMyE3k
+ EXoIZ/3znD9ItUOcVE+khBiWsCdycCbHW8Qj89BNMMw1YXN/eCWE5GOA0tHb+ppkgE35TRM3sAm4J
+ WXQBYy75heBMx7ZNm6m1Bva/GiTC8vPlv5lfhNGY0Y/fSBZouygUdIa1GQZxXFGd2b8oghTcr7G3L
+ ZWsU7yLd8PW1ndWHyFSVhjPsEWnsWIWKmmPJBrlj5Z5GY7MsyGcM2/Hkw7FOLUPrsYnTWYQengxzy
+ ZpmpGzA6Zf9C9GRDizc0pXOdsqxt7v0+ycpdoTsS6MRCi8QLYBbPTOGrIIO51atUWNVgY3UAon4UY
+ mEHv5oSTBfBM7QeCHp63wWWTV1Pylrhjzwt9Gp4tPcQ3Ewp+b/qySabl/XkSzC3aeU54GeZRp6sDo
+ RH67uClnDiR6jyVWWpUkHlPH8AGRmct1T4/589t+c=;
+From: Christian Schoenebeck <qemu_oss@crudebyte.com>
+To: qemu-devel@nongnu.org
+Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Christian Schoenebeck <qemu_oss@crudebyte.com>,
+ Stefan Hajnoczi <stefanha@gmail.com>,
+ Daniel =?ISO-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>,
+ Antonios Motakis <antonios.motakis@huawei.com>, Greg Kurz <groug@kaod.org>
+Subject: Re: virtio-fs: Fix file ID collisions (was: 9p: Fix file ID
+ collisions)
+Date: Fri, 18 Oct 2019 15:15:43 +0200
+Message-ID: <4866803.EgEq5jnlfW@silver>
+In-Reply-To: <20191016134409.GG2978@work-vm>
+References: <cover.1567680121.git.qemu_oss@crudebyte.com>
+ <4114483.KuMf1QML1b@silver> <20191016134409.GG2978@work-vm>
 MIME-Version: 1.0
-References: <20191017215436.14252-1-jsnow@redhat.com>
-In-Reply-To: <20191017215436.14252-1-jsnow@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 18 Oct 2019 14:13:00 +0100
-Message-ID: <CAFEAcA_w1BYZNS6gzZ4SmxX_7qCZPzMpZAYTefH3-aP-WDvcAA@mail.gmail.com>
-Subject: Re: [PULL v3 00/19] Bitmaps patches
-To: John Snow <jsnow@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::22e
+Content-Transfer-Encoding: 7Bit
+Content-Type: text/plain; charset="us-ascii"
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 5.189.157.229
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,42 +80,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>,
- Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- Qemu-block <qemu-block@nongnu.org>, Juan Quintela <quintela@redhat.com>,
- Libvirt <libvir-list@redhat.com>, Markus Armbruster <armbru@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>,
- Stefan Hajnoczi <stefanha@redhat.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, 17 Oct 2019 at 22:54, John Snow <jsnow@redhat.com> wrote:
->
-> The following changes since commit f22f553efffd083ff624be116726f843a39f1148:
->
->   Merge remote-tracking branch 'remotes/rth/tags/pull-tcg-20191013' into staging (2019-10-17 16:48:56 +0100)
->
-> are available in the Git repository at:
->
->   https://github.com/jnsnow/qemu.git tags/bitmaps-pull-request
->
-> for you to fetch changes up to 3264ffced3d087bbe72d759639ef84fd5bd924cc:
->
->   dirty-bitmaps: remove deprecated autoload parameter (2019-10-17 17:53:28 -0400)
->
-> ----------------------------------------------------------------
-> pull request
->
-> ----------------------------------------------------------------
->
+On Mittwoch, 16. Oktober 2019 15:44:09 CEST Dr. David Alan Gilbert wrote:
+> > > Unless I'm missing something, it seems that "virtio-fs" has the same
+> > > issue we had on 9pfs before Christian's patches... :-\
+> > 
+> > Is a fix for this desired for virtio-fs?
+> 
+> Yes I think so;  we had originally thought we were hiding the host inode
+> numbers; but that's not true - since we pass both a device and inode
+> number in virtiofs, unlike 9p, it seems we can probably get away with
+> only remapping device IDs rather than inode numbers; but that requires
+> some understanding of how multiple block device IDs are supposed to look
+> like to the guest kernel.
+
+Postponed on my side then. My original idea was simply sharing the existing 
+inode remapping code from 9p. But remapping/adding device ids on guest side 
+like you suggested is cleaner; takes more time though to lookup the required 
+kernel interfaces to achieve that.
+
+Best regards,
+Christian Schoenebeck
 
 
-Applied, thanks.
-
-Please update the changelog at https://wiki.qemu.org/ChangeLog/4.2
-for any user-visible changes.
-
--- PMM
 
