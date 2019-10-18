@@ -3,57 +3,56 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7F1C1CA9EA4
-	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 14:05:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CDC93CA9EA0
+	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 14:06:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 56CA821925
-	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 14:05:29 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 56CA821925
+	by mail.kernel.org (Postfix) with ESMTPS id 9FBC121925
+	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 14:06:12 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9FBC121925
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40550 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40556 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iLSsh-0005KT-S9
-	for qemu-devel@archiver.kernel.org; Fri, 18 Oct 2019 10:05:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54934)
+	id 1iLStP-0006WQ-5c
+	for qemu-devel@archiver.kernel.org; Fri, 18 Oct 2019 10:06:11 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56890)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1iLSd4-000475-Sf
- for qemu-devel@nongnu.org; Fri, 18 Oct 2019 09:49:19 -0400
+ (envelope-from <philmd@redhat.com>) id 1iLSnN-0008Rm-48
+ for qemu-devel@nongnu.org; Fri, 18 Oct 2019 09:59:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1iLSd3-00060C-Ln
- for qemu-devel@nongnu.org; Fri, 18 Oct 2019 09:49:18 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:3784)
+ (envelope-from <philmd@redhat.com>) id 1iLSnL-0001vf-Vk
+ for qemu-devel@nongnu.org; Fri, 18 Oct 2019 09:59:57 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:60732)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iLSd3-0005zs-GJ
- for qemu-devel@nongnu.org; Fri, 18 Oct 2019 09:49:17 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iLSnL-0001vS-Nl
+ for qemu-devel@nongnu.org; Fri, 18 Oct 2019 09:59:55 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id A749D3090FEC;
- Fri, 18 Oct 2019 13:49:16 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id EBD2A18C4287;
+ Fri, 18 Oct 2019 13:59:54 +0000 (UTC)
 Received: from x1w.redhat.com (unknown [10.40.205.74])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id D673960BF4;
- Fri, 18 Oct 2019 13:49:09 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 8320A60566;
+ Fri, 18 Oct 2019 13:59:51 +0000 (UTC)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 07/20] piix4: Add a i8254 PIT Controller as specified in
- datasheet
-Date: Fri, 18 Oct 2019 15:47:41 +0200
-Message-Id: <20191018134754.16362-8-philmd@redhat.com>
-In-Reply-To: <20191018134754.16362-1-philmd@redhat.com>
-References: <20191018134754.16362-1-philmd@redhat.com>
+Subject: [PATCH 4/5] hw/i386/pc: Extract pc_i8259_create()
+Date: Fri, 18 Oct 2019 15:59:09 +0200
+Message-Id: <20191018135910.24286-5-philmd@redhat.com>
+In-Reply-To: <20191018135910.24286-1-philmd@redhat.com>
+References: <20191018135910.24286-1-philmd@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.43]); Fri, 18 Oct 2019 13:49:16 +0000 (UTC)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.62]); Fri, 18 Oct 2019 13:59:55 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
@@ -69,90 +68,132 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Stefano Stabellini <sstabellini@kernel.org>,
- "Michael S. Tsirkin" <mst@redhat.com>, Paul Durrant <paul@xen.org>,
- Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?q?Herv=C3=A9=20Poussineau?= <hpoussin@reactos.org>,
- Aleksandar Markovic <amarkovic@wavecomp.com>,
- Igor Mammedov <imammedo@redhat.com>,
- Anthony Perard <anthony.perard@citrix.com>, xen-devel@lists.xenproject.org,
- Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
- Richard Henderson <rth@twiddle.net>,
+Cc: Thomas Huth <thuth@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
  =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Aurelien Jarno <aurelien@aurel32.net>, Eduardo Habkost <ehabkost@redhat.com>
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Herv=C3=A9 Poussineau <hpoussin@reactos.org>
+The i8259 creation code is common to all PC machines, extract the
+common code.
 
-Remove i8254 instanciated in malta board, to not have it twice.
-
-Acked-by: Michael S. Tsirkin <mst@redhat.com>
-Acked-by: Paolo Bonzini <pbonzini@redhat.com>
-Signed-off-by: Herv=C3=A9 Poussineau <hpoussin@reactos.org>
-Message-Id: <20171216090228.28505-10-hpoussin@reactos.org>
-Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 ---
-v2: Fixed typo (thuth)
----
- hw/isa/piix4.c       | 4 ++++
- hw/mips/mips_malta.c | 4 ----
- 2 files changed, 4 insertions(+), 4 deletions(-)
+ hw/i386/pc.c         | 19 +++++++++++++++++++
+ hw/i386/pc_piix.c    | 13 +------------
+ hw/i386/pc_q35.c     | 14 +-------------
+ include/hw/i386/pc.h |  1 +
+ 4 files changed, 22 insertions(+), 25 deletions(-)
 
-diff --git a/hw/isa/piix4.c b/hw/isa/piix4.c
-index 0b24d8323c..dda8bc3f90 100644
---- a/hw/isa/piix4.c
-+++ b/hw/isa/piix4.c
-@@ -30,6 +30,7 @@
- #include "hw/isa/isa.h"
- #include "hw/sysbus.h"
- #include "hw/dma/i8257.h"
-+#include "hw/timer/i8254.h"
- #include "migration/vmstate.h"
- #include "sysemu/reset.h"
- #include "sysemu/runstate.h"
-@@ -168,6 +169,9 @@ static void piix4_realize(PCIDevice *dev, Error **err=
-p)
-     /* initialize ISA irqs */
-     isa_bus_irqs(isa_bus, s->isa);
+diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+index 21efde33a5..16703c5edb 100644
+--- a/hw/i386/pc.c
++++ b/hw/i386/pc.c
+@@ -1981,6 +1981,25 @@ void pc_nic_init(PCMachineClass *pcmc, ISABus *isa=
+_bus, PCIBus *pci_bus)
+     rom_reset_order_override();
+ }
 =20
-+    /* initialize pit */
-+    i8254_pit_init(isa_bus, 0x40, 0, NULL);
++void pc_i8259_create(ISABus *isa_bus, qemu_irq *i8259_irqs)
++{
++    qemu_irq *i8259;
 +
-     /* DMA */
-     i8257_dma_init(isa_bus, 0);
++    if (kvm_pic_in_kernel()) {
++        i8259 =3D kvm_i8259_init(isa_bus);
++    } else if (xen_enabled()) {
++        i8259 =3D xen_interrupt_controller_init();
++    } else {
++        i8259 =3D i8259_init(isa_bus, pc_allocate_cpu_irq());
++    }
++
++    for (size_t i =3D 0; i < ISA_NUM_IRQS; i++) {
++        i8259_irqs[i] =3D i8259[i];
++    }
++
++    g_free(i8259);
++}
++
+ void ioapic_init_gsi(GSIState *gsi_state, const char *parent_name)
+ {
+     DeviceState *dev;
+diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
+index 47bdc64f64..1200ac6c0b 100644
+--- a/hw/i386/pc_piix.c
++++ b/hw/i386/pc_piix.c
+@@ -82,7 +82,6 @@ static void pc_init1(MachineState *machine,
+     ISABus *isa_bus;
+     PCII440FXState *i440fx_state;
+     int piix3_devfn =3D -1;
+-    qemu_irq *i8259;
+     qemu_irq smi_irq;
+     GSIState *gsi_state;
+     DriveInfo *hd[MAX_IDE_BUS * MAX_IDE_DEVS];
+@@ -215,18 +214,8 @@ static void pc_init1(MachineState *machine,
+     }
+     isa_bus_irqs(isa_bus, pcms->gsi);
 =20
-diff --git a/hw/mips/mips_malta.c b/hw/mips/mips_malta.c
-index df247177ca..16d7a0e785 100644
---- a/hw/mips/mips_malta.c
-+++ b/hw/mips/mips_malta.c
-@@ -45,7 +45,6 @@
- #include "hw/loader.h"
- #include "elf.h"
- #include "hw/timer/mc146818rtc.h"
--#include "hw/timer/i8254.h"
- #include "exec/address-spaces.h"
- #include "hw/sysbus.h"             /* SysBusDevice */
- #include "qemu/host-utils.h"
-@@ -99,8 +98,6 @@ typedef struct {
-     qemu_irq i8259[16];
- } MaltaState;
+-    if (kvm_pic_in_kernel()) {
+-        i8259 =3D kvm_i8259_init(isa_bus);
+-    } else if (xen_enabled()) {
+-        i8259 =3D xen_interrupt_controller_init();
+-    } else {
+-        i8259 =3D i8259_init(isa_bus, pc_allocate_cpu_irq());
+-    }
++    pc_i8259_create(isa_bus, gsi_state->i8259_irq);
 =20
--static ISADevice *pit;
+-    for (i =3D 0; i < ISA_NUM_IRQS; i++) {
+-        gsi_state->i8259_irq[i] =3D i8259[i];
+-    }
+-    g_free(i8259);
+     if (pcmc->pci_enabled) {
+         ioapic_init_gsi(gsi_state, "i440fx");
+     }
+diff --git a/hw/i386/pc_q35.c b/hw/i386/pc_q35.c
+index 6d096eff28..f4fb9a02ba 100644
+--- a/hw/i386/pc_q35.c
++++ b/hw/i386/pc_q35.c
+@@ -128,7 +128,6 @@ static void pc_q35_init(MachineState *machine)
+     MemoryRegion *ram_memory;
+     GSIState *gsi_state;
+     ISABus *isa_bus;
+-    qemu_irq *i8259;
+     int i;
+     ICH9LPCState *ich9_lpc;
+     PCIDevice *ahci;
+@@ -255,18 +254,7 @@ static void pc_q35_init(MachineState *machine)
+     pci_bus_set_route_irq_fn(host_bus, ich9_route_intx_pin_to_irq);
+     isa_bus =3D ich9_lpc->isa_bus;
+=20
+-    if (kvm_pic_in_kernel()) {
+-        i8259 =3D kvm_i8259_init(isa_bus);
+-    } else if (xen_enabled()) {
+-        i8259 =3D xen_interrupt_controller_init();
+-    } else {
+-        i8259 =3D i8259_init(isa_bus, pc_allocate_cpu_irq());
+-    }
 -
- static struct _loaderparams {
-     int ram_size, ram_low_size;
-     const char *kernel_filename;
-@@ -1428,7 +1425,6 @@ void mips_malta_init(MachineState *machine)
-     pci_create_simple(pci_bus, piix4_devfn + 2, "piix4-usb-uhci");
-     smbus =3D piix4_pm_init(pci_bus, piix4_devfn + 3, 0x1100,
-                           isa_get_irq(NULL, 9), NULL, 0, NULL);
--    pit =3D i8254_pit_init(isa_bus, 0x40, 0, NULL);
-     mc146818_rtc_init(isa_bus, 2000, NULL);
+-    for (i =3D 0; i < ISA_NUM_IRQS; i++) {
+-        gsi_state->i8259_irq[i] =3D i8259[i];
+-    }
+-    g_free(i8259);
++    pc_i8259_create(isa_bus, gsi_state->i8259_irq);
 =20
-     /* generate SPD EEPROM data */
+     if (pcmc->pci_enabled) {
+         ioapic_init_gsi(gsi_state, "q35");
+diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
+index 9ad417cef0..06126034ae 100644
+--- a/include/hw/i386/pc.h
++++ b/include/hw/i386/pc.h
+@@ -239,6 +239,7 @@ void pc_pci_device_init(PCIBus *pci_bus);
+=20
+ typedef void (*cpu_set_smm_t)(int smm, void *arg);
+=20
++void pc_i8259_create(ISABus *isa_bus, qemu_irq *i8259_irqs);
+ void ioapic_init_gsi(GSIState *gsi_state, const char *parent_name);
+=20
+ ISADevice *pc_find_fdc0(void);
 --=20
 2.21.0
 
