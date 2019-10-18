@@ -2,59 +2,79 @@ Return-Path: <SRS0=ht5U=YL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C9881CA9EA4
-	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 11:52:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2EDB3CA9EA1
+	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 11:54:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A1F3D21D7C
-	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 11:52:30 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A1F3D21D7C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id E53CB20700
+	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 11:54:40 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="i3Gs40AW"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E53CB20700
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38400 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38434 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iLQo1-00035g-RQ
-	for qemu-devel@archiver.kernel.org; Fri, 18 Oct 2019 07:52:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36552)
+	id 1iLQq8-00049t-3b
+	for qemu-devel@archiver.kernel.org; Fri, 18 Oct 2019 07:54:40 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36734)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <kwolf@redhat.com>) id 1iLQnB-0002a5-Io
- for qemu-devel@nongnu.org; Fri, 18 Oct 2019 07:51:38 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1iLQpM-0003d3-59
+ for qemu-devel@nongnu.org; Fri, 18 Oct 2019 07:53:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kwolf@redhat.com>) id 1iLQnA-0000CX-Hv
- for qemu-devel@nongnu.org; Fri, 18 Oct 2019 07:51:37 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:51603)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <kwolf@redhat.com>)
- id 1iLQn7-0000AK-K3; Fri, 18 Oct 2019 07:51:33 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 4617A302C096;
- Fri, 18 Oct 2019 11:51:32 +0000 (UTC)
-Received: from localhost.localdomain.com (ovpn-117-198.ams2.redhat.com
- [10.36.117.198])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 4D8225C1B5;
- Fri, 18 Oct 2019 11:51:31 +0000 (UTC)
-From: Kevin Wolf <kwolf@redhat.com>
-To: qemu-block@nongnu.org
-Subject: [PATCH] iotests: Skip read-only cases in 118 when run as root
-Date: Fri, 18 Oct 2019 13:51:27 +0200
-Message-Id: <20191018115127.2671-1-kwolf@redhat.com>
+ (envelope-from <peter.maydell@linaro.org>) id 1iLQpK-0001Gv-OO
+ for qemu-devel@nongnu.org; Fri, 18 Oct 2019 07:53:51 -0400
+Received: from mail-oi1-x230.google.com ([2607:f8b0:4864:20::230]:43477)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1iLQpK-0001GL-IR
+ for qemu-devel@nongnu.org; Fri, 18 Oct 2019 07:53:50 -0400
+Received: by mail-oi1-x230.google.com with SMTP id t84so4928391oih.10
+ for <qemu-devel@nongnu.org>; Fri, 18 Oct 2019 04:53:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=TAp7akDBp+m+p70PlrZfvmenov/HhcjneicNL3r6XpI=;
+ b=i3Gs40AWgf8sUao6R9Csj636cUCQLMPqUMLJzfxvQadDFQ8MMs4rCdqkJhQM8jt0IR
+ o+qDBtK5znyN/UNLwHNIMhKyz495BX2Y3HVHmMk47tc07r2BNVPQmFA9zAf0GvlmfTzo
+ oxFOFssyyoXR/31Nm8eDN/pItbJDW6NWhm3jNyEpq1/KK2jjp95/IONF10tz45BPVsjq
+ F6rqcpkFG5628Avf6fvPHN/rGpp0bzmzf4DyyhwV+vNAldkuXjitD4deGEZz1Hik8S5E
+ HGswM8DaPrrzn0iIi490lvpp5cpRE5IVSwVCVBQk0E2BdCl0seyOsr9ktseUzm8WgN+i
+ wjoQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=TAp7akDBp+m+p70PlrZfvmenov/HhcjneicNL3r6XpI=;
+ b=sFF5Op4Iuq2KpczJUT13fUH2F1ttEROpCIUIogCBU03m7hS9WKWda7bTBtq/twjYfm
+ YtfUggzVaIfGU3sRc8HgMzSQf/pZscBiQPBrR1HXk5v2DtNkel6f1t9PXTMukaGqhu7I
+ +iDFm1olrMx+esiMW6nn7OMA97gh6CUnzOJpT8T37wg7m0r7ZIU/hENFVflldY3V47CP
+ r5rdJfmxoVaZsJiP2ZKaXm5H8fd6Yc91opHbaXnZXeEZahrDv2544Zn5rBGQww0/Xdpt
+ vz6Mwc3jzNnj6RCvagiYlos+xMnKrR447ji9IALNjeB4bwPrEXO58/PPxIMbmBpihipg
+ ERFg==
+X-Gm-Message-State: APjAAAVZwATL3V79QF+qNdwA0o6I9rH+mtuW8uBUJlQtAoKikhpdGjhe
+ 4O/kb1aeUpVzoxeNTw2eUMwcuhcex0bQhXi8rhgJdA==
+X-Google-Smtp-Source: APXvYqx1tX3OG10qWJTY8CTY+UylRoy3vBXD/0pcEHYpFM69Hcwr2IynW7eIGdBYAJfJLttt2kFfLAcKt3ans1CAarw=
+X-Received: by 2002:a05:6808:9:: with SMTP id u9mr7745777oic.98.1571399629715; 
+ Fri, 18 Oct 2019 04:53:49 -0700 (PDT)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.46]); Fri, 18 Oct 2019 11:51:32 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.132.183.28
+References: <20191018101711.24105-1-kraxel@redhat.com>
+In-Reply-To: <20191018101711.24105-1-kraxel@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 18 Oct 2019 12:53:38 +0100
+Message-ID: <CAFEAcA9bhW2CJ4ZiAeFK9TWdrmR3p08LDr1Hh+iyK92LWDt7fQ@mail.gmail.com>
+Subject: Re: [PULL 0/4] Ui 20191018 patches
+To: Gerd Hoffmann <kraxel@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::230
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -66,82 +86,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, qemu-devel@nongnu.org
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Some tests in 118 use chmod to remove write permissions from the file
-and assume that the image can indeed not be opened read-write
-afterwards. This doesn't work when the test is run as root, because root
-can still open the file as writable even when the permission bit isn't
-set.
+On Fri, 18 Oct 2019 at 11:17, Gerd Hoffmann <kraxel@redhat.com> wrote:
+>
+> The following changes since commit f22f553efffd083ff624be116726f843a39f1148:
+>
+>   Merge remote-tracking branch 'remotes/rth/tags/pull-tcg-20191013' into staging (2019-10-17 16:48:56 +0100)
+>
+> are available in the Git repository at:
+>
+>   git://git.kraxel.org/qemu tags/ui-20191018-pull-request
+>
+> for you to fetch changes up to 707f75070a94c28889f887deef0ab4da09e25ddf:
+>
+>   ui: fix keymap file search in input-barrier object (2019-10-18 10:40:46 +0200)
+>
+> ----------------------------------------------------------------
+> ui: bugfixes for cocoa, curses and input-barrier.
+>
+> ----------------------------------------------------------------
+>
 
-Introduce a @skip_if_root decorator and use it in 118 to skip the tests
-in question when the script is run as root.
 
-Signed-off-by: Kevin Wolf <kwolf@redhat.com>
----
- tests/qemu-iotests/118        |  3 +++
- tests/qemu-iotests/iotests.py | 10 ++++++++++
- 2 files changed, 13 insertions(+)
+Applied, thanks.
 
-diff --git a/tests/qemu-iotests/118 b/tests/qemu-iotests/118
-index ea0b326ae0..9eff46d189 100755
---- a/tests/qemu-iotests/118
-+++ b/tests/qemu-iotests/118
-@@ -446,6 +446,7 @@ class TestChangeReadOnly(ChangeBaseClass):
-         self.assert_qmp(result, 'return[0]/inserted/ro', True)
-         self.assert_qmp(result, 'return[0]/inserted/image/filename', new=
-_img)
-=20
-+    @iotests.skip_if_root
-     def test_rw_ro_retain(self):
-         os.chmod(new_img, 0o444)
-         self.vm.add_drive(old_img, 'media=3Ddisk', 'none')
-@@ -530,6 +531,7 @@ class TestChangeReadOnly(ChangeBaseClass):
-         self.assert_qmp(result, 'return[0]/inserted/ro', True)
-         self.assert_qmp(result, 'return[0]/inserted/image/filename', new=
-_img)
-=20
-+    @iotests.skip_if_root
-     def test_make_ro_rw(self):
-         os.chmod(new_img, 0o444)
-         self.vm.add_drive(old_img, 'media=3Ddisk', 'none')
-@@ -571,6 +573,7 @@ class TestChangeReadOnly(ChangeBaseClass):
-         self.assert_qmp(result, 'return[0]/inserted/ro', True)
-         self.assert_qmp(result, 'return[0]/inserted/image/filename', new=
-_img)
-=20
-+    @iotests.skip_if_root
-     def test_make_ro_rw_by_retain(self):
-         os.chmod(new_img, 0o444)
-         self.vm.add_drive(old_img, 'media=3Ddisk', 'none')
-diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotests.p=
-y
-index 3a8f378f90..9c66db613e 100644
---- a/tests/qemu-iotests/iotests.py
-+++ b/tests/qemu-iotests/iotests.py
-@@ -920,6 +920,16 @@ def skip_if_unsupported(required_formats=3D[], read_=
-only=3DFalse):
-         return func_wrapper
-     return skip_test_decorator
-=20
-+def skip_if_root(func):
-+    '''Skip Test Decorator
-+       Runs the test only without root permissions'''
-+    def func_wrapper(*args, **kwargs):
-+        if os.getuid() =3D=3D 0:
-+            case_notrun('{}: cannot be run as root'.format(args[0]))
-+        else:
-+            return func(*args, **kwargs)
-+    return func_wrapper
-+
- def execute_unittest(output, verbosity, debug):
-     runner =3D unittest.TextTestRunner(stream=3Doutput, descriptions=3DT=
-rue,
-                                      verbosity=3Dverbosity)
---=20
-2.20.1
+Please update the changelog at https://wiki.qemu.org/ChangeLog/4.2
+for any user-visible changes.
 
+-- PMM
 
