@@ -2,85 +2,138 @@ Return-Path: <SRS0=ht5U=YL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C4605CA9EA9
-	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 20:42:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 056A7CA9EA9
+	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 20:59:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 902AB21925
-	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 20:42:54 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b="nBUrreQk"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 902AB21925
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=sifive.com
+	by mail.kernel.org (Postfix) with ESMTPS id CC51E2070B
+	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 20:59:45 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CC51E2070B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45906 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45978 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iLZ5J-0005m2-MC
-	for qemu-devel@archiver.kernel.org; Fri, 18 Oct 2019 16:42:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49994)
+	id 1iLZLd-0002Ri-05
+	for qemu-devel@archiver.kernel.org; Fri, 18 Oct 2019 16:59:45 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51275)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <palmer@sifive.com>) id 1iLZ4E-00054a-SF
- for qemu-devel@nongnu.org; Fri, 18 Oct 2019 16:41:47 -0400
+ (envelope-from <jsnow@redhat.com>) id 1iLZKj-0001wH-5V
+ for qemu-devel@nongnu.org; Fri, 18 Oct 2019 16:58:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <palmer@sifive.com>) id 1iLZ4D-0005Vh-HK
- for qemu-devel@nongnu.org; Fri, 18 Oct 2019 16:41:46 -0400
-Received: from mail-pl1-x644.google.com ([2607:f8b0:4864:20::644]:37527)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <palmer@sifive.com>) id 1iLZ4C-0005Ut-R6
- for qemu-devel@nongnu.org; Fri, 18 Oct 2019 16:41:45 -0400
-Received: by mail-pl1-x644.google.com with SMTP id u20so3402934plq.4
- for <qemu-devel@nongnu.org>; Fri, 18 Oct 2019 13:41:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sifive.com; s=google;
- h=date:subject:in-reply-to:cc:from:to:message-id:mime-version
- :content-transfer-encoding;
- bh=MLz7DnVdESSnmHkJ4Sc37niu2QQkAm0+3fXFiaPQXJE=;
- b=nBUrreQkpUmAByHTWzfYZfkEGqXWMHJQFbN8qUEEMbeXllXlYEPkqRlyhxjkgJ2WwG
- R81fX8RtoNq4rFEluaBHBvjkzQ96rjPvUjkvEJ33osihmy+GKjaLnd/MfRJ/fwtxztiL
- /Kx73p+cQOlkNYujrc/1WzhotFJ19KPs2WvSR/MUWvPWgCBWt75XQnlQ8g3GFMwkWNdw
- Fsxlfft9WVSjMPtGhIH+LILnNiOP91xNbVbSDrS3CXuYfLka77k1mUVVxVC/hQkhWAEY
- 4WmiVXxZl66CyYOJn+tDkxKbnaVxgV4w1EGqjsnUD+iu1hiUFEs4VXv9KWUN3V10sY7z
- L+3A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:subject:in-reply-to:cc:from:to:message-id
- :mime-version:content-transfer-encoding;
- bh=MLz7DnVdESSnmHkJ4Sc37niu2QQkAm0+3fXFiaPQXJE=;
- b=kgrx+HCe1e6QemF40OylB/W44SYeGI8RlIeeVOGh7RSmAYvD4AAMKzO9pYfMoOL9DS
- AfEFjgVIqm2OT+Tuym/TNYpegGKxD5GoiP6zXA2nipcWHGtmrAgK7LtxRhrPR1uz2OOZ
- HJv5w5CmN7S+j6pRKjxgyraPLqIyayheeDb2oO5RtPoSbllTe2MRBXc4e1dzDLaIRMNW
- ZjW4XTFBrcBLovOkMXP/d3dLiO1miNVfu79bRYC5HHFGiD0dLhnkStD4CHxjeS1JH4GI
- tas2qcFiBB8nX1DzfSS5GQnBDUcCx53xzTCZXtGYfZqlr+tkZHP6JZsQJgjhwJEWPFwu
- xRzQ==
-X-Gm-Message-State: APjAAAVoiOXsGG8TuTNr2xzWu93BQ81YZDkc1tGaDDh8GzCqr4Mb/0fm
- zMGag9P9aKJpLhFN/oIgKkpt4g==
-X-Google-Smtp-Source: APXvYqxHXvByHlY/eL1PwTCF/HIST0o6FRRo+d+t8Wi36ji+gjjirg/0PkVTMNmGqJpdm1mh2R0zrA==
-X-Received: by 2002:a17:902:8542:: with SMTP id
- d2mr11829756plo.86.1571431303381; 
- Fri, 18 Oct 2019 13:41:43 -0700 (PDT)
-Received: from localhost ([152.179.112.46])
- by smtp.gmail.com with ESMTPSA id m12sm8965342pff.66.2019.10.18.13.41.41
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 18 Oct 2019 13:41:42 -0700 (PDT)
-Date: Fri, 18 Oct 2019 13:41:42 -0700 (PDT)
-X-Google-Original-Date: Fri, 18 Oct 2019 13:40:14 PDT (-0700)
-Subject: Re: [PATCH v2 1/1] riscv/boot: Fix possible memory leak
-In-Reply-To: <CAFEAcA_Sk2VFxxHV92RpaaRt3MLY2n_xYYM7CSwTTcxLDVtsgg@mail.gmail.com>
-From: Palmer Dabbelt <palmer@sifive.com>
-To: Peter Maydell <peter.maydell@linaro.org>
-Message-ID: <mhng-91e0cd9d-237f-4dce-9ebf-2cc863c1b012@palmer-si-x1c4>
-Mime-Version: 1.0 (MHng)
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::644
+ (envelope-from <jsnow@redhat.com>) id 1iLZKi-00065L-1w
+ for qemu-devel@nongnu.org; Fri, 18 Oct 2019 16:58:49 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53304)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <jsnow@redhat.com>)
+ id 1iLZKe-00063s-G6; Fri, 18 Oct 2019 16:58:44 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 4E4DF4FCCE;
+ Fri, 18 Oct 2019 20:58:42 +0000 (UTC)
+Received: from [10.18.17.145] (dhcp-17-145.bos.redhat.com [10.18.17.145])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 89157600C4;
+ Fri, 18 Oct 2019 20:58:41 +0000 (UTC)
+Subject: Re: [PATCH] qemu-img.texi: Describe data_file and data_file_raw
+To: Han Han <hhan@redhat.com>, qemu-devel@nongnu.org
+References: <20191018095924.4409-1-hhan@redhat.com>
+From: John Snow <jsnow@redhat.com>
+Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
+ mQINBFTKefwBEAChvwqYC6saTzawbih87LqBYq0d5A8jXYXaiFMV/EvMSDqqY4EY6whXliNO
+ IYzhgrPEe7ZmPxbCSe4iMykjhwMh5byIHDoPGDU+FsQty2KXuoxto+ZdrP9gymAgmyqdk3aV
+ vzzmCa3cOppcqKvA0Kqr10UeX/z4OMVV390V+DVWUvzXpda45/Sxup57pk+hyY52wxxjIqef
+ rj8u5BN93s5uCVTus0oiVA6W+iXYzTvVDStMFVqnTxSxlpZoH5RGKvmoWV3uutByQyBPHW2U
+ 1Y6n6iEZ9MlP3hcDqlo0S8jeP03HaD4gOqCuqLceWF5+2WyHzNfylpNMFVi+Hp0H/nSDtCvQ
+ ua7j+6Pt7q5rvqgHvRipkDDVsjqwasuNc3wyoHexrBeLU/iJBuDld5iLy+dHXoYMB3HmjMxj
+ 3K5/8XhGrDx6BDFeO3HIpi3u2z1jniB7RtyVEtdupED6lqsDj0oSz9NxaOFZrS3Jf6z/kHIf
+ h42mM9Sx7+s4c07N2LieUxcfqhFTaa/voRibF4cmkBVUhOD1AKXNfhEsTvmcz9NbUchCkcvA
+ T9119CrsxfVsE7bXiGvdXnzyGLXdsoosjzwacKdOrVaDmN3Uy+SHiQXo6TlkSdV0XH2PUxTM
+ LsBFIO9qXO43Ai6J6iPAP/01l8fuZfpJE0/L/c25yyaND7xA3wARAQABtCpKb2huIFNub3cg
+ KEpvaG4gSHVzdG9uKSA8anNub3dAcmVkaGF0LmNvbT6JAlQEEwECAD4CGwMCHgECF4AFCwkI
+ BwMFFQoJCAsFFgIDAQAWIQT665cRoSz0dYEvGPKIqQZNGDVh6wUCXF392gUJC1Xq3gAKCRCI
+ qQZNGDVh6558D/9pM4pu4njX5aT6uUW3vAmbWLF1jfPxiTQgSHAnm9EBMZED/fsvkzj97clo
+ LN7JKmbYZNgJmR01A7flG45V4iOR/249qAfaVuD+ZzZi1R4jFzr13WS+IEdn0hYp9ITndb7R
+ ezW+HGu6/rP2PnfmDnNowgJu6Dp6IUEabq8SXXwGHXZPuMIrsXJxUdKJdGnh1o2u7271yNO7
+ J9PEMuMDsgjsdnaGtv7aQ9CECtXvBleAc06pLW2HU10r5wQyBMZGITemJdBhhdzGmbHAL0M6
+ vKi/bafHRWqfMqOAdDkv3Jg4arl2NCG/uNateR1z5e529+UlB4XVAQT+f5T/YyI65DFTY940
+ il3aZhA8u788jZEPMXmt94u7uPZbEYp7V0jt68SrTaOgO7NaXsboXFjwEa42Ug5lB5d5/Qdp
+ 1AITUv0NJ51kKwhHL1dEagGeloIsGVQILmpS0MLdtitBHqZLsnJkRvtMaxo47giyBlv2ewmq
+ tIGTlVLxHx9xkc9aVepOuiGlZaZB72c9AvZs9rKaAjgU2UfJHlB/Hr4uSk/1EY0IgMv4vnsG
+ 1sA5gvS7A4T4euu0PqHtn2sZEWDrk5RDbw0yIb53JYdXboLFmFXKzVASfKh2ZVeXRBlQQSJi
+ 3PBR1GzzqORlfryby7mkY857xzCI2NkIkD2eq+HhzFTfFOTdGrkCDQRUynn8ARAAwbhP45BE
+ d/zAMBPV2dk2WwIwKRSKULElP3kXpcuiDWYQob3UODUUqClO+3aXVRndaNmZX9WbzGYexVo3
+ 5j+CVBCGr3DlU8AL9pp3KQ3SJihWcDed1LSmUf8tS+10d6mdGxDqgnd/OWU214isvhgWZtZG
+ MM/Xj7cx5pERIiP+jqu7PT1cibcfcEKhPjYdyV1QnLtKNGrTg/UMKaL+qkWBUI/8uBoa0HLs
+ NH63bXsRtNAG8w6qG7iiueYZUIXKc4IHINUguqYQJVdSe+u8b2N5XNhDSEUhdlqFYraJvX6d
+ TjxMTW5lzVG2KjztfErRNSUmu2gezbw1/CV0ztniOKDA7mkQi6UIUDRh4LxRm5mflfKiCyDQ
+ L6P/jxHBxFv+sIgjuLrfNhIC1p3z9rvCh+idAVJgtHtYl8p6GAVrF+4xQV2zZH45tgmHo2+S
+ JsLPjXZtWVsWANpepXnesyabWtNAV4qQB7/SfC77zZwsVX0OOY2Qc+iohmXo8U7DgXVDgl/R
+ /5Qgfnlv0/3rOdMt6ZPy5LJr8D9LJmcP0RvX98jyoBOf06Q9QtEwJsNLCOCo2LKNL71DNjZr
+ nXEwjUH66CXiRXDbDKprt71BiSTitkFhGGU88XCtrp8R9yArXPf4MN+wNYBjfT7K29gWTzxt
+ 9DYQIvEf69oZD5Z5qHYGp031E90AEQEAAYkCPAQYAQIAJgIbDBYhBPrrlxGhLPR1gS8Y8oip
+ Bk0YNWHrBQJcXf3JBQkLVerNAAoJEIipBk0YNWHrU1AP/1FOK2SBGbyhHa5vDHuf47fgLipC
+ e0/h1E0vdSonzlhPxuZoQ47FjzG9uOhqqQG6/PqtWs/FJIyz8aGG4aV+pSA/9Ko3/2ND8MSY
+ ZflWs7Y8Peg08Ro01GTHFITjEUgHpTpHiT6TNcZB5aZNJ8jqCtW5UlqvXXbVeSTmO70ZiVtc
+ vUJbpvSxYmzhFfZWaXIPcNcKWL1rnmnzs67lDhMLdkYVf91aml/XtyMUlfB8Iaejzud9Ht3r
+ C0pA9MG57pLblX7okEshxAC0+tUdY2vANWFeX0mgqRt1GSuG9XM9H/cKP1czfUV/FgaWo/Ya
+ fM4eMhUAlL/y+/AJxxumPhBXftM4yuiktp2JMezoIMJI9fmhjfWDw7+2jVrx9ze1joLakFD1
+ rVAoHxVJ7ORfQ4Ni/qWbQm3T6qQkSMt4N/scNsMczibdTPxU7qtwQwIeFOOc3wEwmJ9Qe3ox
+ TODQ0agXiWVj0OXYCHJ6MxTDswtyTGQW+nUHpKBgHGwUaR6d1kr/LK9+5LpOfRlK9VRfEu7D
+ PGNiRkr8Abp8jHsrBqQWfUS1bAf62bq6XUel0kUCtb7qCq024aOczXYWPFpJFX+nhp4d7NeH
+ Edq+wlC13sBSiSHC7T5yssJ+7JPa2ATLlSKhEvBsLe2TsSTTtFlA0nBclqhfJXzimiuge9qU
+ E40lvMWBuQINBFTKimUBEADDbJ+pQ5M4QBMWkaWImRj7c598xIZ37oKM6rGaSnuB1SVb7YCr
+ Ci2MTwQcrQscA2jm80O8VFqWk+/XsEp62dty47GVwSfdGje/3zv3VTH2KhOCKOq3oPP5ZXWY
+ rz2d2WnTvx++o6lU7HLHDEC3NGLYNLkL1lyVxLhnhvcMxkf1EGA1DboEcMgnJrNB1pGP27ww
+ cSfvdyPGseV+qZZa8kuViDga1oxmnYDxFKMGLxrClqHrRt8geQL1Wj5KFM5hFtGTK4da5lPn
+ wGNd6/CINMeCT2AWZY5ySz7/tSZe5F22vPvVZGoPgQicYWdNc3ap7+7IKP86JNjmec/9RJcz
+ jvrYjJdiqBVldXou72CtDydKVLVSKv8c2wBDJghYZitfYIaL8cTvQfUHRYTfo0n5KKSec8Vo
+ vjDuxmdbOUBA+SkRxqmneP5OxGoZ92VusrwWCjry8HRsNdR+2T+ClDCO6Wpihu4V3CPkQwTy
+ eCuMHPAT0ka5paTwLrnZIxsdfnjUa96T10vzmQgAxpbbiaLvgKJ8+76OPdDnhddyxd2ldYfw
+ RkF5PEGg3mqZnYKNNBtwjvX49SAvgETQvLzQ8IKVgZS0m4z9qHHvtc1BsQnFfe+LJOFjzZr7
+ CrDNJMqk1JTHYsSi2JcN3vY32WMezXSQ0TzeMK4kdnclSQyp/h23GWod5QARAQABiQRbBBgB
+ AgAmAhsCFiEE+uuXEaEs9HWBLxjyiKkGTRg1YesFAlxd/coFCQtV2mQCKcFdIAQZAQIABgUC
+ VMqKZQAKCRB974EGqvw5DiJoEACLmuiRq9ifvOh5DyBFwRS7gvA14DsGQngmC57EzV0EFcfM
+ XVi1jX5OtwUyUe0Az5r6lHyyHDsDsIpLKBlWrYCeLpUhRR3oy181T7UNxvujGFeTkzvLAOo6
+ Hs3b8Wv9ARg+7acRYkQRNY7k0GIJ6YZz149tRyRKAy/vSjsaB9Lt0NOd1wf2EQMKwRVELwJD
+ y0AazGn+0PRP7Bua2YbtxaBmhBBDb2tPpwn8U9xdckB4Vlft9lcWNsC/18Gi9bpjd9FSbdH/
+ sOUI+3ToWYENeoT4IP09wn6EkgWaJS3nAUN/MOycNej2i4Yhy2wDDSKyTAnVkSSSoXk+tK91
+ HfqtokbDanB8daP+K5LgoiWHzjfWzsxA2jKisI4YCGjrYQzTyGOT6P6u6SEeoEx10865B/zc
+ 8/vN50kncdjYz2naacIDEKQNZlnGLsGkpCbfmfdi3Zg4vuWKNdWr0wGUzDUcpqW0y/lUXna+
+ 6uyQShX5e4JD2UPuf9WAQ9HtgSAkaDd4O1I2J41sleePzZOVB3DmYgy+ECRJJ5nw3ihdxpgc
+ y/v3lfcJaqiyCv0PF+K/gSOvwhH7CbVqARmptT7yhhxqFdaYWo2Z2ksuKyoKSRMFCXQY5oac
+ uTmyPIT4STFyUQFeqSCWDum/NFNoSKhmItw2Td+4VSJHShRVbg39KNFPZ7mXYAkQiKkGTRg1
+ YesWJA/+PV3qDUtPNEGwjVvjQqHSbrBy94tu6gJvPHgGPtRDYvxnCaJsmgiC0pGB2KFRsnfl
+ 2zBNBEWF/XwsI081jQE5UO60GKmHTputChLXpVobyuc+lroG2YhknXRBAV969SLnZR4BS/1s
+ Gi046gOXfaKYatve8BiZr5it5Foq3FMPDNgZMit1H9Dk8rkKFfDMRf8EGS/Z+TmyEsIf99H7
+ TH3n7lco8qO81fSFwkh4pvo2kWRFYTC5vsIVQ+GqVUp+W1DZJHxX8LwWuF1AzUt4MUTtNAvy
+ TXl5EgsmoY9mpNNL7ZnW65oG63nEP5KNiybvuQJzXVxR8eqzOh2Mod4nHg3PE7UCd3DvLNsn
+ GXFRo44WyT/G2lArBtjpkut7bDm0i1nENABy2UgS+1QvdmgNu6aEZxdNthwRjUhuuvCCDMA4
+ rCDQYyakH2tJNQgkXkeLodBKF4bHiBbuwj0E39S9wmGgg+q4OTnAO/yhQGknle7a7G5xHBwE
+ i0HjnLoJP5jDcoMTabZTIazXmJz3pKM11HYJ5/ZsTIf3ZRJJKIvXJpbmcAPVwTZII6XxiJdh
+ RSSX4Mvd5pL/+5WI6NTdW6DMfigTtdd85fe6PwBNVJL2ZvBfsBJZ5rxg1TOH3KLsYBqBTgW2
+ glQofxhkJhDEcvjLhe3Y2BlbCWKOmvM8XS9TRt0OwUs=
+Message-ID: <39bde897-fd65-582d-7d2e-8aec27254898@redhat.com>
+Date: Fri, 18 Oct 2019 16:58:41 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.0
+MIME-Version: 1.0
+In-Reply-To: <20191018095924.4409-1-hhan@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.30]); Fri, 18 Oct 2019 20:58:42 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -92,72 +145,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-riscv@nongnu.org, Alistair Francis <Alistair.Francis@wdc.com>,
- qemu-devel@nongnu.org, alistair23@gmail.com
+Cc: Kevin Wolf <kwolf@redhat.com>, Qemu-block <qemu-block@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, 17 Oct 2019 05:08:39 PDT (-0700), Peter Maydell wrote:
-> Ping? It would be nice to see this patch get into master
-> to silence the coverity errors.
+CC qemu-block
 
-Sorry, it looks like I dropped this.  It's in my queue, I hope to submit a PR 
-soon.
+On 10/18/19 5:59 AM, Han Han wrote:
+> https://bugzilla.redhat.com/show_bug.cgi?id=1763105
+> 
+> Signed-off-by: Han Han <hhan@redhat.com>
+> ---
+>  qemu-img.texi | 10 ++++++++++
+>  1 file changed, 10 insertions(+)
+> 
+> diff --git a/qemu-img.texi b/qemu-img.texi
+> index b5156d6316..44596c2d93 100644
+> --- a/qemu-img.texi
+> +++ b/qemu-img.texi
+> @@ -763,6 +763,16 @@ file which is COW and has data blocks already, it couldn't be changed to NOCOW
+>  by setting @code{nocow=on}. One can issue @code{lsattr filename} to check if
+>  the NOCOW flag is set or not (Capital 'C' is NOCOW flag).
+>  
+> +@item data_file
+> +File name of data file that is stored in the image and used as a default for
+> +opening the image. If the option is used, qcow2 file only stores the metadata
+> +of the image.
+> +
 
->
-> thanks
-> -- PMM
->
-> On Thu, 3 Oct 2019 at 18:05, Alistair Francis <alistair.francis@wdc.com> wrote:
->>
->> Coverity (CID 1405786) thinks that there is a possible memory leak as
->> we don't guarantee that the memory allocated from riscv_find_firmware()
->> is freed. This is a false positive, but let's tidy up the code to fix
->> the warning.
->>
->> Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
->> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
->> Reviewed-by: Bin Meng <bmeng.cn@gmail.com>
->> Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
->> ---
->> v2:
->>  - Fix commit typos
->>
->>  hw/riscv/boot.c | 11 ++++-------
->>  1 file changed, 4 insertions(+), 7 deletions(-)
->>
->> diff --git a/hw/riscv/boot.c b/hw/riscv/boot.c
->> index 2e92fb0680..7fee98d2f8 100644
->> --- a/hw/riscv/boot.c
->> +++ b/hw/riscv/boot.c
->> @@ -38,7 +38,7 @@ void riscv_find_and_load_firmware(MachineState *machine,
->>                                    const char *default_machine_firmware,
->>                                    hwaddr firmware_load_addr)
->>  {
->> -    char *firmware_filename;
->> +    char *firmware_filename = NULL;
->>
->>      if (!machine->firmware) {
->>          /*
->> @@ -70,14 +70,11 @@ void riscv_find_and_load_firmware(MachineState *machine,
->>           * if no -bios option is set without breaking anything.
->>           */
->>          firmware_filename = riscv_find_firmware(default_machine_firmware);
->> -    } else {
->> -        firmware_filename = machine->firmware;
->> -        if (strcmp(firmware_filename, "none")) {
->> -            firmware_filename = riscv_find_firmware(firmware_filename);
->> -        }
->> +    } else if (strcmp(machine->firmware, "none")) {
->> +        firmware_filename = riscv_find_firmware(machine->firmware);
->>      }
->>
->> -    if (strcmp(firmware_filename, "none")) {
->> +    if (firmware_filename) {
->>          /* If not "none" load the firmware */
->>          riscv_load_firmware(firmware_filename, firmware_load_addr);
->>          g_free(firmware_filename);
->> --
->> 2.23.0
+This is a little unclear, and seems to imply the data file is stored
+*IN* the image.
+
+"Optional filename to be used as a data store for this qcow2 file. If
+this option is used, the qcow2 file only stores metadata for this image."
+
+> +@item data_file_raw
+> +This option requires @option{data_file}. If this option is set to @code{on},
+> +qemu will always keep the external data file consistent as a standalone
+> +read-only raw image. Default value is @code{off}.
+> +
+>  @end table
+>  
+>  @item Other
+> 
+
 
