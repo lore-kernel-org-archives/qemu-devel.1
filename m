@@ -2,80 +2,142 @@ Return-Path: <SRS0=ht5U=YL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B988FCA9EA0
-	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 21:05:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3B7F2CA9EA9
+	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 21:07:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7679220869
-	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 21:05:09 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="djINRZqN"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7679220869
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 0E01D20869
+	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 21:07:01 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0E01D20869
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46008 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46024 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iLZQq-0004Eb-GL
-	for qemu-devel@archiver.kernel.org; Fri, 18 Oct 2019 17:05:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51701)
+	id 1iLZSf-0005PJ-5u
+	for qemu-devel@archiver.kernel.org; Fri, 18 Oct 2019 17:07:01 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51801)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alistair23@gmail.com>) id 1iLZQA-0003pq-Eo
- for qemu-devel@nongnu.org; Fri, 18 Oct 2019 17:04:28 -0400
+ (envelope-from <jsnow@redhat.com>) id 1iLZRF-0004uk-5C
+ for qemu-devel@nongnu.org; Fri, 18 Oct 2019 17:05:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alistair23@gmail.com>) id 1iLZQ8-0007fj-Cv
- for qemu-devel@nongnu.org; Fri, 18 Oct 2019 17:04:26 -0400
-Received: from mail-lj1-x243.google.com ([2a00:1450:4864:20::243]:35771)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alistair23@gmail.com>)
- id 1iLZQ3-0007eM-Je; Fri, 18 Oct 2019 17:04:19 -0400
-Received: by mail-lj1-x243.google.com with SMTP id m7so7577225lji.2;
- Fri, 18 Oct 2019 14:04:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=yW8kLrqLRFfBjbeGVbf/sDPQHXYwhLkyL3l0+zgTKsQ=;
- b=djINRZqNdjMseKEop0r58SuQ5O6VA2HA1PnGdtxAkPmxElyIFpEWLBiJ+MCpknUKZb
- Hn5mRpSB7zQnMB+RW1uGWy/fXQBWpLCKieBLPwiW6CKxFxrVIiVxofT8A7F2qAzteYWC
- HeToYLo2iE2bc1j3b3J6LSn+Ktia+ksQrx1D4qieGZZhis0hs5jDTN1UEi7AjfGPkDjW
- XzRKqwcVmo60lrJWFpGzAtIwxARy/XdbyjufytKMW2pIfRgmsoGUKvgxPc5dC2e/W+7t
- IbgYylNxGzsvXSXDRaISeQn3cJmvuCzyuvuEFVzQNLq5t86/EcHBtpJMAG+CDnddR4FK
- q+qw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=yW8kLrqLRFfBjbeGVbf/sDPQHXYwhLkyL3l0+zgTKsQ=;
- b=iw4piJRt4QyDywTY8O0kmuqSHp47kT90v8flXFo3mQrypTFXDI8LTvWqQ7HhApqbCv
- /erY1akXFWnGRusxzsT6ow8DMXsm3gvRCHnNb5VCnlRp0mja4On66HdRLfCHU0yJj0ry
- ONFbqGHYAVaSTyiR7nyqPHMnADdkx84aYQh1dac9mZRozMNkqOConTABPIlkHnh4vV7m
- XZq586bGo2iKMEXb5K5GYIlt7ulnDIkeT6wvHpa2ULVQSJtWzm0YB9tHkucKr83hzEOF
- 88igCB0g/Z7+7brqmzGWRh5GuwZiEUGwgTYgrxyaBlx+X0WsQmij/uy/DM6zCZ13uugC
- 1aDg==
-X-Gm-Message-State: APjAAAUqGpUgvucSUU0IXqqdPRyr09q5f0hvwarfcs9a9p4dZuA3S0xF
- AZQWas0qiNifyd255pUZxxUjz8pa77CG8HvScT0=
-X-Google-Smtp-Source: APXvYqyxRlWezED7Z/1LYKmDES7a+DM0mW7JF+tfDbP5VSVJs4hiYBG00/DbY5/Je/5G5uZFTmDxBqDWF2IoaUON3r4=
-X-Received: by 2002:a2e:9604:: with SMTP id v4mr7595893ljh.101.1571432657859; 
- Fri, 18 Oct 2019 14:04:17 -0700 (PDT)
+ (envelope-from <jsnow@redhat.com>) id 1iLZRD-0007wf-G9
+ for qemu-devel@nongnu.org; Fri, 18 Oct 2019 17:05:32 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:57044)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1iLZRD-0007wT-6q
+ for qemu-devel@nongnu.org; Fri, 18 Oct 2019 17:05:31 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 3471E30860D7;
+ Fri, 18 Oct 2019 21:05:30 +0000 (UTC)
+Received: from [10.18.17.145] (dhcp-17-145.bos.redhat.com [10.18.17.145])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 7AA92600C4;
+ Fri, 18 Oct 2019 21:05:29 +0000 (UTC)
+Subject: Re: [PATCH] configure: Require Python >= 3.5
+To: Kevin Wolf <kwolf@redhat.com>
+References: <20191016224237.26180-1-ehabkost@redhat.com>
+ <7146bebf-6e99-f27a-3753-d48dea1977f9@redhat.com>
+ <20191017112121.GA9233@localhost.localdomain>
+ <c9e18dc9-0c94-601c-f4c7-735aedc9a92b@redhat.com>
+ <20191018081536.GB6122@localhost.localdomain>
+From: John Snow <jsnow@redhat.com>
+Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+Message-ID: <053d2024-5804-27b1-fdc2-20c23978790b@redhat.com>
+Date: Fri, 18 Oct 2019 17:05:29 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.0
 MIME-Version: 1.0
-References: <20191015083459.76959-1-anup.patel@wdc.com>
- <20191015083459.76959-2-anup.patel@wdc.com>
-In-Reply-To: <20191015083459.76959-2-anup.patel@wdc.com>
-From: Alistair Francis <alistair23@gmail.com>
-Date: Fri, 18 Oct 2019 13:59:04 -0700
-Message-ID: <CAKmqyKM_pObuk_AYXre0aU9CF72xKcPrxBDixe0d2Q1PwKpqhA@mail.gmail.com>
-Subject: Re: [PATCH v3 1/2] hw: timer: Add Goldfish RTC device
-To: Anup Patel <Anup.Patel@wdc.com>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::243
+In-Reply-To: <20191018081536.GB6122@localhost.localdomain>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.44]); Fri, 18 Oct 2019 21:05:30 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,417 +149,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- "qemu-riscv@nongnu.org" <qemu-riscv@nongnu.org>,
- Sagar Karandikar <sagark@eecs.berkeley.edu>,
- Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
- Palmer Dabbelt <palmer@sifive.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- Atish Patra <Atish.Patra@wdc.com>, Alistair Francis <Alistair.Francis@wdc.com>,
- Anup Patel <anup@brainfault.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>,
+ Cleber Rosa <crosa@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, Oct 15, 2019 at 1:36 AM Anup Patel <Anup.Patel@wdc.com> wrote:
->
-> This patch adds model for Google Goldfish virtual platform RTC device.
->
-> We will be adding Goldfish RTC device to the QEMU RISC-V virt machine
-> for providing real date-time to Guest Linux. The corresponding Linux
-> driver for Goldfish RTC device is already available in upstream Linux.
->
-> For now, VM migration support is available but untested for Goldfish RTC
-> device. It will be hardened in-future when we implement VM migration for
-> KVM RISC-V.
->
-> Signed-off-by: Anup Patel <anup.patel@wdc.com>
-> ---
->  hw/rtc/Kconfig                  |   3 +
->  hw/rtc/Makefile.objs            |   1 +
->  hw/rtc/goldfish_rtc.c           | 278 ++++++++++++++++++++++++++++++++
->  include/hw/timer/goldfish_rtc.h |  46 ++++++
->  4 files changed, 328 insertions(+)
->  create mode 100644 hw/rtc/goldfish_rtc.c
->  create mode 100644 include/hw/timer/goldfish_rtc.h
->
-> diff --git a/hw/rtc/Kconfig b/hw/rtc/Kconfig
-> index 45daa8d655..bafe6ac2c9 100644
-> --- a/hw/rtc/Kconfig
-> +++ b/hw/rtc/Kconfig
-> @@ -21,3 +21,6 @@ config MC146818RTC
->
->  config SUN4V_RTC
->      bool
-> +
-> +config GOLDFISH_RTC
-> +    bool
-> diff --git a/hw/rtc/Makefile.objs b/hw/rtc/Makefile.objs
-> index 8dc9fcd3a9..aa208d0d10 100644
-> --- a/hw/rtc/Makefile.objs
-> +++ b/hw/rtc/Makefile.objs
-> @@ -11,3 +11,4 @@ common-obj-$(CONFIG_EXYNOS4) += exynos4210_rtc.o
->  obj-$(CONFIG_MC146818RTC) += mc146818rtc.o
->  common-obj-$(CONFIG_SUN4V_RTC) += sun4v-rtc.o
->  common-obj-$(CONFIG_ASPEED_SOC) += aspeed_rtc.o
-> +common-obj-$(CONFIG_GOLDFISH_RTC) += goldfish_rtc.o
-> diff --git a/hw/rtc/goldfish_rtc.c b/hw/rtc/goldfish_rtc.c
-> new file mode 100644
-> index 0000000000..223616ed75
-> --- /dev/null
-> +++ b/hw/rtc/goldfish_rtc.c
-> @@ -0,0 +1,278 @@
-> +/*
-> + * Goldfish virtual platform RTC
-> + *
-> + * Copyright (C) 2019 Western Digital Corporation or its affiliates.
-> + *
-> + * For more details on Google Goldfish virtual platform refer:
-> + * https://android.googlesource.com/platform/external/qemu/+/master/docs/GOLDFISH-VIRTUAL-HARDWARE.TXT
-> + *
-> + * This program is free software; you can redistribute it and/or modify it
-> + * under the terms and conditions of the GNU General Public License,
-> + * version 2 or later, as published by the Free Software Foundation.
-> + *
-> + * This program is distributed in the hope it will be useful, but WITHOUT
-> + * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-> + * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
-> + * more details.
-> + *
-> + * You should have received a copy of the GNU General Public License along with
-> + * this program.  If not, see <http://www.gnu.org/licenses/>.
-> + */
-> +
-> +#include "qemu/osdep.h"
-> +#include "qemu-common.h"
-> +#include "hw/timer/goldfish_rtc.h"
-> +#include "migration/vmstate.h"
-> +#include "hw/irq.h"
-> +#include "hw/qdev-properties.h"
-> +#include "hw/sysbus.h"
-> +#include "qemu/timer.h"
-> +#include "sysemu/sysemu.h"
-> +#include "qemu/cutils.h"
-> +#include "qemu/log.h"
-> +
-> +#define RTC_TIME_LOW            0x00
-> +#define RTC_TIME_HIGH           0x04
-> +#define RTC_ALARM_LOW           0x08
-> +#define RTC_ALARM_HIGH          0x0c
-> +#define RTC_IRQ_ENABLED         0x10
-> +#define RTC_CLEAR_ALARM         0x14
-> +#define RTC_ALARM_STATUS        0x18
-> +#define RTC_CLEAR_INTERRUPT     0x1c
-> +
-> +static void goldfish_rtc_update(GoldfishRTCState *s)
-> +{
-> +    qemu_set_irq(s->irq, (s->irq_pending & s->irq_enabled) ? 1 : 0);
-> +}
-> +
-> +static void goldfish_rtc_interrupt(void *opaque)
-> +{
-> +    GoldfishRTCState *s = (GoldfishRTCState *)opaque;
-> +
-> +    s->alarm_running = 0;
-> +    s->irq_pending = 1;
-> +    goldfish_rtc_update(s);
-> +}
-> +
-> +static uint64_t goldfish_rtc_get_count(GoldfishRTCState *s)
-> +{
-> +    return s->tick_offset + (uint64_t)qemu_clock_get_ns(rtc_clock);
-> +}
-> +
-> +static void goldfish_rtc_clear_alarm(GoldfishRTCState *s)
-> +{
-> +    timer_del(s->timer);
-> +    s->alarm_running = 0;
-> +}
-> +
-> +static void goldfish_rtc_set_alarm(GoldfishRTCState *s)
-> +{
-> +    uint64_t ticks = goldfish_rtc_get_count(s);
-> +    uint64_t event = s->alarm_next;
-> +
-> +    if (event <= ticks) {
-> +        goldfish_rtc_clear_alarm(s);
-> +        goldfish_rtc_interrupt(s);
-> +    } else {
-> +        int64_t now = qemu_clock_get_ns(rtc_clock);
-> +        timer_mod(s->timer, now + (event - ticks));
 
-Isn't this just: event - s->tick_offset?
 
-> +        s->alarm_running = 1;
-> +    }
-> +}
-> +
-> +static uint64_t goldfish_rtc_read(void *opaque, hwaddr offset,
-> +                                  unsigned size)
-> +{
-> +    GoldfishRTCState *s = (GoldfishRTCState *)opaque;
-> +    uint64_t r;
+On 10/18/19 4:15 AM, Kevin Wolf wrote:
+> Am 17.10.2019 um 21:39 hat John Snow geschrieben:
+>> On 10/17/19 7:21 AM, Kevin Wolf wrote:
+>>> Am 17.10.2019 um 00:48 hat John Snow geschrieben:
+>>>> On 10/16/19 6:42 PM, Eduardo Habkost wrote:
+>>>>> Python 3.5 is the oldest Python version available on our
+>>>>> supported build platforms, and Python 2 end of life will be 3
+>>>>> weeks after the planned release date of QEMU 4.2.0.  Drop Python
+>>>>> 2 support from configure completely, and require Python 3.5 or
+>>>>> newer.
+>>>>>
+>>>>> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+>>>>
+>>>> Seems like a good time and place to mention this. Kevin, you require
+>>>> 3.6+ for iotests, which are -- at present -- invoked as part of "make
+>>>> check".
+>>>>
+>>>> Do we care? Basically, this just means that iotests won't run for
+>>>> systems that don't have 3.6+, which would be platforms like Debian 9 --
+>>>> which is why ehabkost is choosing 3.5 here.
+>>>
+>>> I think we were aware of this when we made the change to iotests. That
+>>> all tests of the current upstream QEMU version are run on Debian
+>>> oldstable (with the distro Python version) is, to say the least, not a
+>>> priority for me. They must not fail, but I'd say skipping is fine.
+>>>
+>>> And actually, we should still have a reasonable coverage there with the
+>>> shell-based test cases.
+>>
+>> This seems like a weirdly arbitrary decision for a benefit that's not
+>> clear to me. Is it because you want variable annotations?
+> 
+> Yes, the discussion about type annotations is what made me check whether
+> we could do 3.6, because if we want to make use of type checking, we'll
+> need it for both functions and variables to get reasonable results.
+> 
+> And actually, we currently don't have any Python tests in the auto
+> group, so the only effect is for people manually running ./check on
+> Debian oldstable. I'm not sure, but I suspect this might be the empty
+> set.
+> 
+> Kevin
+> 
 
-There should be a trace or debug print showing read/write operations.
+It would have an effect on `make docker-test-block@debian-amd64" I
+think, but I guess nobody runs that right now.
 
-> +
-> +    switch (offset) {
-> +    case RTC_TIME_LOW:
-> +        r = goldfish_rtc_get_count(s) & 0xffffffff;
-> +        break;
-> +    case RTC_TIME_HIGH:
-> +        r = goldfish_rtc_get_count(s) >> 32;
-> +        break;
-> +    case RTC_ALARM_LOW:
-> +        r = s->alarm_next & 0xffffffff;
-> +        break;
-> +    case RTC_ALARM_HIGH:
-> +        r = s->alarm_next >> 32;
-> +        break;
-> +    case RTC_IRQ_ENABLED:
-> +        r = s->irq_enabled;
-> +        break;
-> +    case RTC_ALARM_STATUS:
-> +        r = s->alarm_running;
-> +        break;
-> +    default:
-> +        qemu_log_mask(LOG_GUEST_ERROR,
-> +                      "goldfish_rtc_read: Bad offset 0x%x\n", (int)offset);
-> +        r = 0;
+Well, alright.
 
-Just set 0 as the init value and remove this.
-
-> +        break;
-> +    }
-> +
-> +    return r;
-> +}
-> +
-> +static void goldfish_rtc_write(void *opaque, hwaddr offset,
-> +                               uint64_t value, unsigned size)
-> +{
-> +    uint64_t current_tick, new_tick;
-> +    GoldfishRTCState *s = (GoldfishRTCState *)opaque;
-
-The state struct should be first.
-
-> +
-> +    switch (offset) {
-> +    case RTC_TIME_LOW:
-> +        current_tick = goldfish_rtc_get_count(s);
-> +        new_tick = current_tick & (0xffffffffULL << 32);
-> +        new_tick |= value;
-> +        s->tick_offset += new_tick - current_tick;
-> +        break;
-> +    case RTC_TIME_HIGH:
-> +        current_tick = goldfish_rtc_get_count(s);
-> +        new_tick = current_tick & 0xffffffffULL;
-> +        new_tick |= (value << 32);
-> +        s->tick_offset += new_tick - current_tick;
-> +        break;
-> +    case RTC_ALARM_LOW:
-> +        s->alarm_next &= (0xffffffffULL << 32);
-> +        s->alarm_next |= value;
-> +        goldfish_rtc_set_alarm(s);
-> +        break;
-> +    case RTC_ALARM_HIGH:
-> +        s->alarm_next &= 0xffffffffULL;
-> +        s->alarm_next |= (value << 32);
-> +        break;
-> +    case RTC_IRQ_ENABLED:
-> +        s->irq_enabled = (uint32_t)(value & 0x1);
-> +        goldfish_rtc_update(s);
-> +        break;
-> +    case RTC_CLEAR_ALARM:
-> +        goldfish_rtc_clear_alarm(s);
-> +        break;
-> +    case RTC_CLEAR_INTERRUPT:
-> +        s->irq_pending = 0;
-> +        goldfish_rtc_update(s);
-> +        break;
-> +    default:
-> +        qemu_log_mask(LOG_GUEST_ERROR,
-> +                      "goldfish_rtc_write: Bad offset 0x%x\n", (int)offset);
-> +        break;
-> +    }
-> +}
-> +
-> +static int goldfish_rtc_pre_save(void *opaque)
-> +{
-> +    uint64_t delta;
-> +    GoldfishRTCState *s = opaque;
-> +
-> +    /*
-> +     * We want to migrate this offset, which sounds straightforward.
-> +     * Unfortunately, we cannot directly pass tick_offset because
-> +     * rtc_clock on destinetion Host might not be same source Host.
-
-s/destinetion/destination/g
-
-and below as well.
-
-Alistair
-
-> +     *
-> +     * To tackle, this we pass tick_offset relative to vm_clock from
-> +     * source Host and make it relative to rtc_clock at destinetion Host.
-> +     */
-> +    delta = qemu_clock_get_ns(rtc_clock) -
-> +            qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
-> +    s->tick_offset_vmstate = s->tick_offset + delta;
-> +
-> +    return 0;
-> +}
-> +
-> +static int goldfish_rtc_post_load(void *opaque, int version_id)
-> +{
-> +    uint64_t delta;
-> +    GoldfishRTCState *s = opaque;
-> +
-> +    /*
-> +     * We extract tick_offset from tick_offset_vmstate by doing
-> +     * reverse math compared to pre_save() function.
-> +     */
-> +    delta = qemu_clock_get_ns(rtc_clock) -
-> +            qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
-> +    s->tick_offset = s->tick_offset_vmstate - delta;
-> +
-> +    return 0;
-> +}
-> +
-> +static const MemoryRegionOps goldfish_rtc_ops = {
-> +    .read = goldfish_rtc_read,
-> +    .write = goldfish_rtc_write,
-> +    .endianness = DEVICE_LITTLE_ENDIAN,
-> +    .valid = {
-> +        .min_access_size = 4,
-> +        .max_access_size = 4
-> +    }
-> +};
-> +
-> +static const VMStateDescription goldfish_rtc_vmstate = {
-> +    .name = TYPE_GOLDFISH_RTC,
-> +    .version_id = 1,
-> +    .pre_save = goldfish_rtc_pre_save,
-> +    .post_load = goldfish_rtc_post_load,
-> +    .fields = (VMStateField[]) {
-> +        VMSTATE_UINT64(tick_offset_vmstate, GoldfishRTCState),
-> +        VMSTATE_UINT64(alarm_next, GoldfishRTCState),
-> +        VMSTATE_UINT32(alarm_running, GoldfishRTCState),
-> +        VMSTATE_UINT32(irq_pending, GoldfishRTCState),
-> +        VMSTATE_UINT32(irq_enabled, GoldfishRTCState),
-> +        VMSTATE_END_OF_LIST()
-> +    }
-> +};
-> +
-> +static void goldfish_rtc_reset(DeviceState *dev)
-> +{
-> +    GoldfishRTCState *s = GOLDFISH_RTC(dev);
-> +    struct tm tm;
-> +
-> +    timer_del(s->timer);
-> +
-> +    qemu_get_timedate(&tm, 0);
-> +    s->tick_offset = mktimegm(&tm);
-> +    s->tick_offset *= NANOSECONDS_PER_SECOND;
-> +    s->tick_offset -= qemu_clock_get_ns(rtc_clock);
-> +    s->tick_offset_vmstate = 0;
-> +    s->alarm_next = 0;
-> +    s->alarm_running = 0;
-> +    s->irq_pending = 0;
-> +    s->irq_enabled = 0;
-> +}
-> +
-> +static void goldfish_rtc_realize(DeviceState *d, Error **errp)
-> +{
-> +    SysBusDevice *dev = SYS_BUS_DEVICE(d);
-> +    GoldfishRTCState *s = GOLDFISH_RTC(d);
-> +
-> +    memory_region_init_io(&s->iomem, OBJECT(s), &goldfish_rtc_ops, s,
-> +                          "goldfish_rtc", 0x1000);
-> +    sysbus_init_mmio(dev, &s->iomem);
-> +
-> +    sysbus_init_irq(dev, &s->irq);
-> +
-> +    s->timer = timer_new_ns(rtc_clock, goldfish_rtc_interrupt, s);
-> +}
-> +
-> +static void goldfish_rtc_class_init(ObjectClass *klass, void *data)
-> +{
-> +    DeviceClass *dc = DEVICE_CLASS(klass);
-> +
-> +    dc->realize = goldfish_rtc_realize;
-> +    dc->reset = goldfish_rtc_reset;
-> +    dc->vmsd = &goldfish_rtc_vmstate;
-> +}
-> +
-> +static const TypeInfo goldfish_rtc_info = {
-> +    .name          = TYPE_GOLDFISH_RTC,
-> +    .parent        = TYPE_SYS_BUS_DEVICE,
-> +    .instance_size = sizeof(GoldfishRTCState),
-> +    .class_init    = goldfish_rtc_class_init,
-> +};
-> +
-> +static void goldfish_rtc_register_types(void)
-> +{
-> +    type_register_static(&goldfish_rtc_info);
-> +}
-> +
-> +type_init(goldfish_rtc_register_types)
-> diff --git a/include/hw/timer/goldfish_rtc.h b/include/hw/timer/goldfish_rtc.h
-> new file mode 100644
-> index 0000000000..dfb6d70b86
-> --- /dev/null
-> +++ b/include/hw/timer/goldfish_rtc.h
-> @@ -0,0 +1,46 @@
-> +/*
-> + * Goldfish virtual platform RTC
-> + *
-> + * Copyright (C) 2019 Western Digital Corporation or its affiliates.
-> + *
-> + * For more details on Google Goldfish virtual platform refer:
-> + * https://android.googlesource.com/platform/external/qemu/+/master/docs/GOLDFISH-VIRTUAL-HARDWARE.TXT
-> + *
-> + * This program is free software; you can redistribute it and/or modify it
-> + * under the terms and conditions of the GNU General Public License,
-> + * version 2 or later, as published by the Free Software Foundation.
-> + *
-> + * This program is distributed in the hope it will be useful, but WITHOUT
-> + * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-> + * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
-> + * more details.
-> + *
-> + * You should have received a copy of the GNU General Public License along with
-> + * this program.  If not, see <http://www.gnu.org/licenses/>.
-> + */
-> +
-> +#ifndef HW_TIMER_GOLDFISH_RTC_H
-> +#define HW_TIMER_GOLDFISH_RTC_H
-> +
-> +#include "hw/sysbus.h"
-> +
-> +#define TYPE_GOLDFISH_RTC "goldfish_rtc"
-> +#define GOLDFISH_RTC(obj) \
-> +OBJECT_CHECK(GoldfishRTCState, (obj), TYPE_GOLDFISH_RTC)
-> +
-> +typedef struct GoldfishRTCState {
-> +    SysBusDevice parent_obj;
-> +
-> +    MemoryRegion iomem;
-> +    QEMUTimer *timer;
-> +    qemu_irq irq;
-> +
-> +    uint64_t tick_offset;
-> +    uint64_t tick_offset_vmstate;
-> +    uint64_t alarm_next;
-> +    uint32_t alarm_running;
-> +    uint32_t irq_pending;
-> +    uint32_t irq_enabled;
-> +} GoldfishRTCState;
-> +
-> +#endif
-> --
-> 2.17.1
->
->
+--js
 
