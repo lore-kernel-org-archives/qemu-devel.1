@@ -2,82 +2,56 @@ Return-Path: <SRS0=ht5U=YL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DA3D8CA9EA1
-	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 13:04:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 121BBCA9EA1
+	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 13:08:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A56852089C
-	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 13:04:40 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="im1mQ1Ps"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A56852089C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id CCA7C222BD
+	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 13:08:19 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CCA7C222BD
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39640 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39712 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iLRvr-0001w8-RE
-	for qemu-devel@archiver.kernel.org; Fri, 18 Oct 2019 09:04:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46667)
+	id 1iLRzO-0003lc-Rs
+	for qemu-devel@archiver.kernel.org; Fri, 18 Oct 2019 09:08:18 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47536)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1iLRuN-0001HB-LI
- for qemu-devel@nongnu.org; Fri, 18 Oct 2019 09:03:13 -0400
+ (envelope-from <thuth@redhat.com>) id 1iLRyW-0003CP-7J
+ for qemu-devel@nongnu.org; Fri, 18 Oct 2019 09:07:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1iLRuL-0006lL-9q
- for qemu-devel@nongnu.org; Fri, 18 Oct 2019 09:03:07 -0400
-Received: from mail-ot1-x329.google.com ([2607:f8b0:4864:20::329]:33446)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1iLRuJ-0006hf-92
- for qemu-devel@nongnu.org; Fri, 18 Oct 2019 09:03:03 -0400
-Received: by mail-ot1-x329.google.com with SMTP id 60so4893766otu.0
- for <qemu-devel@nongnu.org>; Fri, 18 Oct 2019 06:03:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=CmzuGxvpZuc7Xgh7YOe86VRqjswtcKMLeek9MVZfI1o=;
- b=im1mQ1Pscq12YKcmshrKi+tGfpkt5mR+A39ECz0TK6fj6kv+ih10CwHwptE4YaXxUw
- 8TRSNf/v46YghgqrtUNTHP8/HN3/938HX9jwgXeuXCcSe6e1hkDIYd/OwFMu7yKz2x36
- JLhVe49Cd9jY+Tw6HEveoypJ1HrIlhv4tq5eHXxGRpUmr+eqLjxmXDf9IUDlzmuhCGA6
- LDEeed5+BE47l4kGTGz1hb3BF2ylpSJBbgzkym6S+HHReY0K39B2wBMQUd9ogBrtg7ix
- yCtyKApOp+P1QcDNnlzJoyNrmOQ5A4fdAEtdAMxiI8SL8Alf5wembfe0jsvY/AhTCjKb
- qnuA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=CmzuGxvpZuc7Xgh7YOe86VRqjswtcKMLeek9MVZfI1o=;
- b=OPU2txUuyxbTkTxGjKr5Zl7WWuyDazWhxwE1vRUQkOP7mKSg4KtLnKFxsvizXfyfqN
- oQPGXhau7MIVj8TbCCsRtQsMkc1z3rOzsnuvwbHzsN123wISd8UIEb2IQbWSlKLNsqZp
- wILcSBUv4Jn9NRicTmVqvhWPcS5XDLZSiTkgndZ9RwM3xvzHyEG5P9TjYHLG0zuqnk87
- WIMVfxdvnFPM/0t4w7udLxvXu/BUeQrKfSfWu/yDVXJbgQNrWBAyuoL7FdaaLYTn4B7Y
- 3kDE0ZVf20uIAViVRBAykI1x+7FLSrcJP/IrxKJ1hTZL0YLuvdTlmC9bCwGBoRPGrWOF
- cH4w==
-X-Gm-Message-State: APjAAAW18+aYRVnRAsr/O2lGym8K9qj1CEVTm+QtW7kPtYJanK20WP2X
- ltaXDytVcGbLQecLGjg79aHMqPcVGmzimOza4I7/jQ==
-X-Google-Smtp-Source: APXvYqzVh817xODuIajgQYiAWZ2WHpfS4BpFSXp6/Xz41/jFf8J0sFyMIor2bT+emycTFQsjsrBy+S9ygaMejgGHmAA=
-X-Received: by 2002:a05:6830:ca:: with SMTP id
- x10mr7161698oto.221.1571403781501; 
- Fri, 18 Oct 2019 06:03:01 -0700 (PDT)
-MIME-Version: 1.0
-References: <20191018101711.24105-1-kraxel@redhat.com>
- <20191018101711.24105-2-kraxel@redhat.com>
- <2488172.SrBWvpgbjs@silver>
-In-Reply-To: <2488172.SrBWvpgbjs@silver>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 18 Oct 2019 14:02:49 +0100
-Message-ID: <CAFEAcA8AP7hjSz9QoF78uhYtc3nf7DtijvsCHh6BXt4udzUjtA@mail.gmail.com>
-Subject: Re: [PULL 1/4] ui: Fix hanging up Cocoa display on macOS 10.15
- (Catalina)
-To: Christian Schoenebeck <qemu_oss@crudebyte.com>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::329
+ (envelope-from <thuth@redhat.com>) id 1iLRyU-0000gh-AI
+ for qemu-devel@nongnu.org; Fri, 18 Oct 2019 09:07:23 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:41050)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <thuth@redhat.com>)
+ id 1iLRyU-0000ff-56; Fri, 18 Oct 2019 09:07:22 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 1F196307D9D0;
+ Fri, 18 Oct 2019 13:07:21 +0000 (UTC)
+Received: from thuth.com (reserved-198-128.str.redhat.com [10.33.198.128])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 6986D5D772;
+ Fri, 18 Oct 2019 13:07:19 +0000 (UTC)
+From: Thomas Huth <thuth@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v2] Do not use %m in common code to print error messages
+Date: Fri, 18 Oct 2019 15:07:16 +0200
+Message-Id: <20191018130716.25438-1-thuth@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.48]); Fri, 18 Oct 2019 13:07:21 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,27 +63,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Hikaru Nishida <hikarupsp@gmail.com>,
- QEMU Developers <qemu-devel@nongnu.org>, Gerd Hoffmann <kraxel@redhat.com>
+Cc: qemu-trivial@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
+ Kamil Rytarowski <kamil@netbsd.org>, berrange@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, 18 Oct 2019 at 14:01, Christian Schoenebeck
-<qemu_oss@crudebyte.com> wrote:
->
-> On Freitag, 18. Oktober 2019 12:17:08 CEST Gerd Hoffmann wrote:
-> > From: Hikaru Nishida <hikarupsp@gmail.com>
-> >
-> > macOS API documentation says that before applicationDidFinishLaunching
-> > is called, any events will not be processed. However, some events are
-> > fired before it is called in macOS Catalina.
->
-> Even though fixed now on qemu side, I filed a bug report with Apple to let
-> them know, since this indeed looks like unintended behaviour change a.k.a. bug
-> in Catalina.
+The %m format specifier is an extension from glibc - and when compiling
+QEMU for NetBSD, the compiler correctly complains, e.g.:
 
-Thanks -- do you have an apple bug number or something for that?
+/home/qemu/qemu-test.ELjfrQ/src/util/main-loop.c: In function 'sigfd_handler':
+/home/qemu/qemu-test.ELjfrQ/src/util/main-loop.c:64:13: warning: %m is only
+ allowed in syslog(3) like functions [-Wformat=]
+             printf("read from sigfd returned %zd: %m\n", len);
+             ^
+Let's use g_strerror() here instead, which is an easy-to-use wrapper
+around the thread-safe strerror_r() function.
 
--- PMM
+While we're at it, also convert the "printf()" in main-loop.c into
+the preferred "error_report()".
+
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+---
+ v2: Do not try to g_free() the strings
+
+ hw/misc/tmp421.c | 4 ++--
+ util/main-loop.c | 3 ++-
+ util/systemd.c   | 4 ++--
+ 3 files changed, 6 insertions(+), 5 deletions(-)
+
+diff --git a/hw/misc/tmp421.c b/hw/misc/tmp421.c
+index 9f044705fa..c0bc150bca 100644
+--- a/hw/misc/tmp421.c
++++ b/hw/misc/tmp421.c
+@@ -120,7 +120,7 @@ static void tmp421_get_temperature(Object *obj, Visitor *v, const char *name,
+     int tempid;
+ 
+     if (sscanf(name, "temperature%d", &tempid) != 1) {
+-        error_setg(errp, "error reading %s: %m", name);
++        error_setg(errp, "error reading %s: %s", name, g_strerror(errno));
+         return;
+     }
+ 
+@@ -160,7 +160,7 @@ static void tmp421_set_temperature(Object *obj, Visitor *v, const char *name,
+     }
+ 
+     if (sscanf(name, "temperature%d", &tempid) != 1) {
+-        error_setg(errp, "error reading %s: %m", name);
++        error_setg(errp, "error reading %s: %s", name, g_strerror(errno));
+         return;
+     }
+ 
+diff --git a/util/main-loop.c b/util/main-loop.c
+index e3eaa55866..eda63fe4e0 100644
+--- a/util/main-loop.c
++++ b/util/main-loop.c
+@@ -61,7 +61,8 @@ static void sigfd_handler(void *opaque)
+         }
+ 
+         if (len != sizeof(info)) {
+-            printf("read from sigfd returned %zd: %m\n", len);
++            error_report("read from sigfd returned %zd: %s", len,
++                         g_strerror(errno));
+             return;
+         }
+ 
+diff --git a/util/systemd.c b/util/systemd.c
+index d22e86c707..1dd0367d9a 100644
+--- a/util/systemd.c
++++ b/util/systemd.c
+@@ -60,8 +60,8 @@ unsigned int check_socket_activation(void)
+              * and we should exit.
+              */
+             error_report("Socket activation failed: "
+-                         "invalid file descriptor fd = %d: %m",
+-                         fd);
++                         "invalid file descriptor fd = %d: %s",
++                         fd, g_strerror(errno));
+             exit(EXIT_FAILURE);
+         }
+     }
+-- 
+2.18.1
+
 
