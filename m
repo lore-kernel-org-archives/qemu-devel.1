@@ -2,64 +2,58 @@ Return-Path: <SRS0=ht5U=YL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7B529CA9EA1
-	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 14:06:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E1CAACA9EA1
+	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 14:06:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4F60E21925
-	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 14:06:29 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4F60E21925
+	by mail.kernel.org (Postfix) with ESMTPS id A6EA021925
+	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 14:06:55 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A6EA021925
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40558 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40570 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iLStf-0006wB-US
-	for qemu-devel@archiver.kernel.org; Fri, 18 Oct 2019 10:06:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57786)
+	id 1iLSu6-0007j3-C1
+	for qemu-devel@archiver.kernel.org; Fri, 18 Oct 2019 10:06:54 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55446)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eblake@redhat.com>) id 1iLSs2-000542-5V
- for qemu-devel@nongnu.org; Fri, 18 Oct 2019 10:04:47 -0400
+ (envelope-from <philmd@redhat.com>) id 1iLSfS-0007IR-Jw
+ for qemu-devel@nongnu.org; Fri, 18 Oct 2019 09:51:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eblake@redhat.com>) id 1iLSs0-00045k-PO
- for qemu-devel@nongnu.org; Fri, 18 Oct 2019 10:04:46 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43658)
+ (envelope-from <philmd@redhat.com>) id 1iLSfR-00078p-B8
+ for qemu-devel@nongnu.org; Fri, 18 Oct 2019 09:51:46 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:1776)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eblake@redhat.com>)
- id 1iLSry-00044E-2I; Fri, 18 Oct 2019 10:04:42 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iLSfR-00078R-2f
+ for qemu-devel@nongnu.org; Fri, 18 Oct 2019 09:51:45 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 31EB9881363;
- Fri, 18 Oct 2019 14:04:41 +0000 (UTC)
-Received: from [10.3.116.168] (ovpn-116-168.phx2.redhat.com [10.3.116.168])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 9330210013A1;
- Fri, 18 Oct 2019 14:04:40 +0000 (UTC)
-Subject: Re: [PATCH v8 3/3] docs: qcow2: introduce compression type feature
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-block@nongnu.org
-References: <20191018094758.7124-1-vsementsov@virtuozzo.com>
- <20191018094758.7124-4-vsementsov@virtuozzo.com>
-From: Eric Blake <eblake@redhat.com>
-Organization: Red Hat, Inc.
-Message-ID: <29df7fb8-8218-2228-9575-e84e369a7d9a@redhat.com>
-Date: Fri, 18 Oct 2019 09:04:40 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.0
+ by mx1.redhat.com (Postfix) with ESMTPS id 3CB12307D986;
+ Fri, 18 Oct 2019 13:51:44 +0000 (UTC)
+Received: from x1w.redhat.com (unknown [10.40.205.74])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 2B09C60BF1;
+ Fri, 18 Oct 2019 13:51:33 +0000 (UTC)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v2 20/20] hw/pci-host/i440fx: Remove the last PIIX3 traces
+Date: Fri, 18 Oct 2019 15:47:54 +0200
+Message-Id: <20191018134754.16362-21-philmd@redhat.com>
+In-Reply-To: <20191018134754.16362-1-philmd@redhat.com>
+References: <20191018134754.16362-1-philmd@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20191018094758.7124-4-vsementsov@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.69]); Fri, 18 Oct 2019 14:04:41 +0000 (UTC)
+Content-Type: text/plain; charset=UTF-8
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.48]); Fri, 18 Oct 2019 13:51:44 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 209.132.183.28
@@ -74,73 +68,119 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, qemu-devel@nongnu.org, armbru@redhat.com,
- dplotnikov@virtuozzo.com, den@openvz.org, mreitz@redhat.com
+Cc: Stefano Stabellini <sstabellini@kernel.org>,
+ "Michael S. Tsirkin" <mst@redhat.com>, Paul Durrant <paul@xen.org>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?q?Herv=C3=A9=20Poussineau?= <hpoussin@reactos.org>,
+ Aleksandar Markovic <amarkovic@wavecomp.com>,
+ Igor Mammedov <imammedo@redhat.com>,
+ Anthony Perard <anthony.perard@citrix.com>, xen-devel@lists.xenproject.org,
+ Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
+ Richard Henderson <rth@twiddle.net>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Aurelien Jarno <aurelien@aurel32.net>, Eduardo Habkost <ehabkost@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 10/18/19 4:47 AM, Vladimir Sementsov-Ogievskiy wrote:
-> The patch add new additional field to qcow2 header: compression_type,
-> which specifies compression type. If field is absent or zero, default
-> compression type is set: ZLIB, which corresponds to current behavior.
-> 
-> New compression type (ZSTD) is to be added in further commit.
-> 
-> Suggested-by: Denis Plotnikov <dplotnikov@virtuozzo.com>
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> ---
->   docs/interop/qcow2.txt | 19 ++++++++++++++++++-
->   1 file changed, 18 insertions(+), 1 deletion(-)
-> 
-> diff --git a/docs/interop/qcow2.txt b/docs/interop/qcow2.txt
-> index b971e59b1a..4eabd81363 100644
-> --- a/docs/interop/qcow2.txt
-> +++ b/docs/interop/qcow2.txt
-> @@ -109,6 +109,12 @@ least next five fields, up to the @header_length field.
->                                   An External Data File Name header extension may
->                                   be present if this bit is set.
->   
-> +                    Bit 3:      Compression type bit.  If this bit is set,
-> +                                non-default compression is used for compressed
-> +                                clusters. In this case, @header_length must
-> +                                be at least 105 and @compression_type field
-> +                                must be non-zero.
+The PIIX3 is not tied to the i440FX and can even be used without it.
+Move its creation to the machine code (pc_piix.c).
+We have now removed the last trace of southbridge code in the i440FX
+northbridge.
 
-I want to insist on 8-byte alignment, so this should be at least 112.
+Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+---
+ hw/i386/pc_piix.c            | 8 +++++++-
+ hw/pci-host/i440fx.c         | 8 --------
+ include/hw/pci-host/i440fx.h | 3 +--
+ 3 files changed, 8 insertions(+), 11 deletions(-)
 
-Also, as pointed out in v7, use of the decoration '@header_length' and 
-'@compression_type' is not consistent with the rest of the document. 
-Drop the @.
+diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
+index 11b8de049f..f6e7196a82 100644
+--- a/hw/i386/pc_piix.c
++++ b/hw/i386/pc_piix.c
+@@ -199,14 +199,20 @@ static void pc_init1(MachineState *machine,
+     }
+=20
+     if (pcmc->pci_enabled) {
++        PIIX3State *piix3;
++
+         pci_bus =3D i440fx_init(host_type,
+                               pci_type,
+-                              &i440fx_state, &piix3_devfn, &isa_bus, pcm=
+s->gsi,
++                              &i440fx_state,
+                               system_memory, system_io, machine->ram_siz=
+e,
+                               pcms->below_4g_mem_size,
+                               pcms->above_4g_mem_size,
+                               pci_memory, ram_memory);
+         pcms->bus =3D pci_bus;
++
++        piix3 =3D piix3_create(pci_bus, &isa_bus);
++        piix3->pic =3D pcms->gsi;
++        piix3_devfn =3D piix3->dev.devfn;
+     } else {
+         pci_bus =3D NULL;
+         i440fx_state =3D NULL;
+diff --git a/hw/pci-host/i440fx.c b/hw/pci-host/i440fx.c
+index 79ecd58a2b..f27131102d 100644
+--- a/hw/pci-host/i440fx.c
++++ b/hw/pci-host/i440fx.c
+@@ -27,7 +27,6 @@
+ #include "hw/pci/pci.h"
+ #include "hw/pci/pci_host.h"
+ #include "hw/pci-host/i440fx.h"
+-#include "hw/southbridge/piix.h"
+ #include "hw/qdev-properties.h"
+ #include "hw/sysbus.h"
+ #include "qapi/error.h"
+@@ -272,8 +271,6 @@ static void i440fx_realize(PCIDevice *dev, Error **er=
+rp)
+=20
+ PCIBus *i440fx_init(const char *host_type, const char *pci_type,
+                     PCII440FXState **pi440fx_state,
+-                    int *piix3_devfn,
+-                    ISABus **isa_bus, qemu_irq *pic,
+                     MemoryRegion *address_space_mem,
+                     MemoryRegion *address_space_io,
+                     ram_addr_t ram_size,
+@@ -286,7 +283,6 @@ PCIBus *i440fx_init(const char *host_type, const char=
+ *pci_type,
+     PCIBus *b;
+     PCIDevice *d;
+     PCIHostState *s;
+-    PIIX3State *piix3;
+     PCII440FXState *f;
+     unsigned i;
+     I440FXState *i440fx;
+@@ -339,10 +335,6 @@ PCIBus *i440fx_init(const char *host_type, const cha=
+r *pci_type,
+                  PAM_EXPAN_SIZE);
+     }
+=20
+-    piix3 =3D piix3_create(b, isa_bus);
+-    piix3->pic =3D pic;
+-    *piix3_devfn =3D piix3->dev.devfn;
+-
+     ram_size =3D ram_size / 8 / 1024 / 1024;
+     if (ram_size > 255) {
+         ram_size =3D 255;
+diff --git a/include/hw/pci-host/i440fx.h b/include/hw/pci-host/i440fx.h
+index e327f9bf87..f54e6466e4 100644
+--- a/include/hw/pci-host/i440fx.h
++++ b/include/hw/pci-host/i440fx.h
+@@ -22,8 +22,7 @@ typedef struct PCII440FXState PCII440FXState;
+ #define TYPE_IGD_PASSTHROUGH_I440FX_PCI_DEVICE "igd-passthrough-i440FX"
+=20
+ PCIBus *i440fx_init(const char *host_type, const char *pci_type,
+-                    PCII440FXState **pi440fx_state, int *piix_devfn,
+-                    ISABus **isa_bus, qemu_irq *pic,
++                    PCII440FXState **pi440fx_state,
+                     MemoryRegion *address_space_mem,
+                     MemoryRegion *address_space_io,
+                     ram_addr_t ram_size,
+--=20
+2.21.0
 
-> +
->                       Bits 3-63:  Reserved (set to 0)
->   
->            80 -  87:  compatible_features
-> @@ -183,7 +189,18 @@ It's allowed for the header end to cut some field in the middle (in this case
->   the field is considered as absent), but in this case the part of the field
->   which is covered by @header_length must be zeroed.
->   
-> -        < ... No additional fields in the header currently ... >
-> +              104:  compression_type
-> +                    Defines the compression method used for compressed clusters.
-> +                    A single compression type is applied to all compressed image
-> +                    clusters.
-> +                    If incompatible compression type bit is set: the field must
-> +                    exist (i.e. @header_length >= 105) and must be non-zero (
-> +                    which means non-zlib compression type)
-> +                    If incompatible compression type bit is unset: the field
-> +                    may not exist (if @header_length < 105) or it must be zero
-> +                    (which means zlib).
-> +                    Available compression type values:
-> +                        0: zlib <https://www.zlib.net/>
->   
-
-One byte for the field is fine, but I'd still explicitly document 7 
-bytes of unused padding, since I want to insist on an 8-byte multiple.
-
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
 
