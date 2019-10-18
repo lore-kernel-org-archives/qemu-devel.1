@@ -6,60 +6,78 @@ X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3BE89CA9EA1
-	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 08:32:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 89BD6CA9EA0
+	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 08:34:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 10FB021897
-	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 08:32:41 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 10FB021897
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id 605DF21897
+	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 08:34:52 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 605DF21897
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36498 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36588 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iLNgd-0000q5-Te
-	for qemu-devel@archiver.kernel.org; Fri, 18 Oct 2019 04:32:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38742)
+	id 1iLNil-00033z-HM
+	for qemu-devel@archiver.kernel.org; Fri, 18 Oct 2019 04:34:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38929)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <clg@kaod.org>) id 1iLNe2-0007ab-2J
- for qemu-devel@nongnu.org; Fri, 18 Oct 2019 04:29:59 -0400
+ (envelope-from <sgarzare@redhat.com>) id 1iLNfI-0000XZ-AB
+ for qemu-devel@nongnu.org; Fri, 18 Oct 2019 04:31:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <clg@kaod.org>) id 1iLNe0-0007jH-8K
- for qemu-devel@nongnu.org; Fri, 18 Oct 2019 04:29:57 -0400
-Received: from 1.mo173.mail-out.ovh.net ([178.33.111.180]:55066)
+ (envelope-from <sgarzare@redhat.com>) id 1iLNfG-000096-B9
+ for qemu-devel@nongnu.org; Fri, 18 Oct 2019 04:31:15 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53990)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <clg@kaod.org>) id 1iLNe0-0007hy-2n
- for qemu-devel@nongnu.org; Fri, 18 Oct 2019 04:29:56 -0400
-Received: from player762.ha.ovh.net (unknown [10.108.54.67])
- by mo173.mail-out.ovh.net (Postfix) with ESMTP id 42395119537
- for <qemu-devel@nongnu.org>; Fri, 18 Oct 2019 10:29:52 +0200 (CEST)
-Received: from kaod.org (lfbn-1-2229-223.w90-76.abo.wanadoo.fr [90.76.50.223])
- (Authenticated sender: clg@kaod.org)
- by player762.ha.ovh.net (Postfix) with ESMTPSA id 3583EB208CF9;
- Fri, 18 Oct 2019 08:29:46 +0000 (UTC)
-Subject: Re: [PATCH 2/2] spapr/xive: Set the OS CAM line at reset
-To: Greg Kurz <groug@kaod.org>
-References: <20191017144241.12522-1-clg@kaod.org>
- <20191017144241.12522-3-clg@kaod.org> <20191018100716.35b417ac@bahia.lan>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <6f394913-1477-8d3b-d2c4-ec4c743e8aa6@kaod.org>
-Date: Fri, 18 Oct 2019 10:29:45 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.0
+ (Exim 4.71) (envelope-from <sgarzare@redhat.com>) id 1iLNfG-00007G-3j
+ for qemu-devel@nongnu.org; Fri, 18 Oct 2019 04:31:14 -0400
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 7E85910F0E
+ for <qemu-devel@nongnu.org>; Fri, 18 Oct 2019 08:31:11 +0000 (UTC)
+Received: by mail-wr1-f69.google.com with SMTP id j14so1967255wrm.6
+ for <qemu-devel@nongnu.org>; Fri, 18 Oct 2019 01:31:11 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to:user-agent;
+ bh=t/TQfPA0hAXJ5ts/4Euck+8Ln2s48TU/JjhsfsQsYbE=;
+ b=IjX7wlJQ3FwcKznNOizWjK8RalzVAejHGWeBdxQAjgCpNCOo5wrvroNGQBWERMaAuj
+ NMJeY+0FSIzwS1fzy2klVYoU83zcPIUOgvY6J4i/pewwe7nab+n6mjqjVFq2Z+ddIoqA
+ YWzSySsHm1fRrkGtKFLpcco2whQ43M6D5ncp6Fakh23aPhBmZTqeo0vUDD+Ys5DGtGyY
+ 1z4JRdhHiCSJYoMAQyKdd3bfdXTenQkeqifCsB+pUOtZ2BjyNUbZFunbipJSPLUvw5L2
+ 5Noy+DMqPpNpKcqtKtnFfUZqghUTTxOVKJ2yh14cbumwTZum5wSnIA96Kf2BQGLjL2ol
+ IHJA==
+X-Gm-Message-State: APjAAAUFJ+K30U94f3D8a4Isc8Q0L57UeZukfpL+h0c2Tk74zirdQnF6
+ qa5S+4xCadWS6Cml5omuIPRBzcsh5W0D3nq66VTeQ6bjydf3whjSTzkxTs43CBuYBUtOawbZox1
+ Yeq9gYB2q5Kf1vZQ=
+X-Received: by 2002:a7b:cf28:: with SMTP id m8mr6673826wmg.63.1571387470128;
+ Fri, 18 Oct 2019 01:31:10 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqwG3GFyYGz15I8b1Ua84hYOEJanSgw3R1Lfo2nZPTkcEJYCxYwVIZ6T5OWgzpC6qh3znCfDgg==
+X-Received: by 2002:a7b:cf28:: with SMTP id m8mr6673801wmg.63.1571387469856;
+ Fri, 18 Oct 2019 01:31:09 -0700 (PDT)
+Received: from steredhat (host174-200-dynamic.52-79-r.retail.telecomitalia.it.
+ [79.52.200.174])
+ by smtp.gmail.com with ESMTPSA id l9sm4341468wme.45.2019.10.18.01.31.08
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Fri, 18 Oct 2019 01:31:09 -0700 (PDT)
+Date: Fri, 18 Oct 2019 10:31:07 +0200
+From: Stefano Garzarella <sgarzare@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Subject: Re: [PATCH] block/backup: drop dead code from backup_job_create
+Message-ID: <20191018083107.7wfoaadk4huulxmo@steredhat>
+References: <20191017142122.20897-1-vsementsov@virtuozzo.com>
 MIME-Version: 1.0
-In-Reply-To: <20191018100716.35b417ac@bahia.lan>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-X-Ovh-Tracer-Id: 8646911285698071379
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrjeelgddtudcutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20191017142122.20897-1-vsementsov@virtuozzo.com>
+User-Agent: NeoMutt/20180716
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 178.33.111.180
+X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -71,260 +89,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org,
- David Gibson <david@gibson.dropbear.id.au>
+Cc: kwolf@redhat.com, qemu-devel@nongnu.org, qemu-block@nongnu.org,
+ mreitz@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 18/10/2019 10:07, Greg Kurz wrote:
-> On Thu, 17 Oct 2019 16:42:41 +0200
-> C=C3=A9dric Le Goater <clg@kaod.org> wrote:
->=20
->> When a Virtual Processor is scheduled to run on a HW thread, the
->> hypervisor pushes its identifier in the OS CAM line. When running in
->> TCG or kernel_irqchip=3Doff, QEMU needs to emulate the same behavior.
->>
->=20
-> This is only related to kernel_irqchip=3Doff, which is always the case
-> when running in TCG actually. Maybe rephrase to "When not running with
-> an in-kernel irqchip, QEMU needs..." ?
+Hi Vladimir,
 
-yes.=20
+On Thu, Oct 17, 2019 at 05:21:22PM +0300, Vladimir Sementsov-Ogievskiy wrote:
+> After commit 00e30f05de1d195, there is no more "goto error" points
+> after job creation, so after "error:" @job is always NULL and we don't
+> need roll-back job creation.
 
+I don't know this code very well, but IIUC only block_job_add_bdrv() could
+fail after the job creation, but this shouldn't happen because "Required
+permissions are already taken by backup-top target", so it seems safe
+for me:
 
->> Introduce a 'os-cam' property which will be used to set the OS CAM
->> line at reset and remove the spapr_xive_set_tctx_os_cam() calls which
->> are done when the XIVE interrupt controller are activated.
->>
->=20
-> Since OS CAM is constant, I guess it is ok to make it a property.
-> Alternatively, you could pass it as an extra parameter to
-> xive_tctx_reset().
-
-
-indeed. We have all we need to do that. I will wait for some feedback.
-
->> This change also has the benefit to remove the use of CPU_FOREACH()
->> which can be unsafe.
->>
->=20
-> Nice !
->=20
->> Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
->> ---
->>  include/hw/ppc/spapr_xive.h |  1 -
->>  include/hw/ppc/xive.h       |  4 +++-
->>  hw/intc/spapr_xive.c        | 31 +++++--------------------------
->>  hw/intc/xive.c              | 22 +++++++++++++++++++++-
->>  hw/ppc/pnv.c                |  3 ++-
->>  5 files changed, 31 insertions(+), 30 deletions(-)
->>
->> diff --git a/include/hw/ppc/spapr_xive.h b/include/hw/ppc/spapr_xive.h
->> index d84bd5c229f0..742b7e834f2a 100644
->> --- a/include/hw/ppc/spapr_xive.h
->> +++ b/include/hw/ppc/spapr_xive.h
->> @@ -57,7 +57,6 @@ typedef struct SpaprXive {
->>  void spapr_xive_pic_print_info(SpaprXive *xive, Monitor *mon);
->> =20
->>  void spapr_xive_hcall_init(SpaprMachineState *spapr);
->> -void spapr_xive_set_tctx_os_cam(XiveTCTX *tctx);
->>  void spapr_xive_mmio_set_enabled(SpaprXive *xive, bool enable);
->>  void spapr_xive_map_mmio(SpaprXive *xive);
->> =20
->> diff --git a/include/hw/ppc/xive.h b/include/hw/ppc/xive.h
->> index 99381639f50c..e273069c25a9 100644
->> --- a/include/hw/ppc/xive.h
->> +++ b/include/hw/ppc/xive.h
->> @@ -319,6 +319,7 @@ typedef struct XiveTCTX {
->>      qemu_irq    os_output;
->> =20
->>      uint8_t     regs[XIVE_TM_RING_COUNT * XIVE_TM_RING_SIZE];
->> +    uint32_t    os_cam;
->>  } XiveTCTX;
->> =20
->>  /*
->> @@ -414,7 +415,8 @@ void xive_tctx_tm_write(XiveTCTX *tctx, hwaddr off=
-set, uint64_t value,
->>  uint64_t xive_tctx_tm_read(XiveTCTX *tctx, hwaddr offset, unsigned si=
-ze);
->> =20
->>  void xive_tctx_pic_print_info(XiveTCTX *tctx, Monitor *mon);
->> -Object *xive_tctx_create(Object *cpu, XiveRouter *xrtr, Error **errp)=
-;
->> +Object *xive_tctx_create(Object *cpu, XiveRouter *xrtr, uint32_t os_c=
-am,
->> +                         Error **errp);
->>  void xive_tctx_reset(XiveTCTX *tctx);
->> =20
->>  static inline uint32_t xive_nvt_cam_line(uint8_t nvt_blk, uint32_t nv=
-t_idx)
->> diff --git a/hw/intc/spapr_xive.c b/hw/intc/spapr_xive.c
->> index 0c3acf1a4192..71f138512a1c 100644
->> --- a/hw/intc/spapr_xive.c
->> +++ b/hw/intc/spapr_xive.c
->> @@ -205,21 +205,13 @@ void spapr_xive_mmio_set_enabled(SpaprXive *xive=
-, bool enable)
->>      memory_region_set_enabled(&xive->end_source.esb_mmio, false);
->>  }
->> =20
->> -/*
->> - * When a Virtual Processor is scheduled to run on a HW thread, the
->> - * hypervisor pushes its identifier in the OS CAM line. Emulate the
->> - * same behavior under QEMU.
->> - */
->> -void spapr_xive_set_tctx_os_cam(XiveTCTX *tctx)
->> +static uint32_t spapr_xive_get_os_cam(PowerPCCPU *cpu)
->>  {
->>      uint8_t  nvt_blk;
->>      uint32_t nvt_idx;
->> -    uint32_t nvt_cam;
->> -
->> -    spapr_xive_cpu_to_nvt(POWERPC_CPU(tctx->cs), &nvt_blk, &nvt_idx);
->> =20
->> -    nvt_cam =3D cpu_to_be32(TM_QW1W2_VO | xive_nvt_cam_line(nvt_blk, =
-nvt_idx));
->> -    memcpy(&tctx->regs[TM_QW1_OS + TM_WORD2], &nvt_cam, 4);
->> +    spapr_xive_cpu_to_nvt(cpu, &nvt_blk, &nvt_idx);
->> +    return xive_nvt_cam_line(nvt_blk, nvt_idx);
->>  }
->> =20
->>  static void spapr_xive_end_reset(XiveEND *end)
->> @@ -537,19 +529,14 @@ static int spapr_xive_cpu_intc_create(SpaprInter=
-ruptController *intc,
->>      SpaprXive *xive =3D SPAPR_XIVE(intc);
->>      Object *obj;
->>      SpaprCpuState *spapr_cpu =3D spapr_cpu_state(cpu);
->> +    uint32_t os_cam =3D spapr_xive_get_os_cam(cpu);
->> =20
->> -    obj =3D xive_tctx_create(OBJECT(cpu), XIVE_ROUTER(xive), errp);
->> +    obj =3D xive_tctx_create(OBJECT(cpu), XIVE_ROUTER(xive), os_cam, =
-errp);
->>      if (!obj) {
->>          return -1;
->>      }
->> =20
->>      spapr_cpu->tctx =3D XIVE_TCTX(obj);
->> -
->> -    /*
->> -     * (TCG) Early setting the OS CAM line for hotplugged CPUs as the=
-y
->> -     * don't beneficiate from the reset of the XIVE IRQ backend
->> -     */
->> -    spapr_xive_set_tctx_os_cam(spapr_cpu->tctx);
->>      return 0;
->>  }
->> =20
->> @@ -650,14 +637,6 @@ static void spapr_xive_dt(SpaprInterruptControlle=
-r *intc, uint32_t nr_servers,
->>  static int spapr_xive_activate(SpaprInterruptController *intc, Error =
-**errp)
->>  {
->>      SpaprXive *xive =3D SPAPR_XIVE(intc);
->> -    CPUState *cs;
->> -
->> -    CPU_FOREACH(cs) {
->> -        PowerPCCPU *cpu =3D POWERPC_CPU(cs);
->> -
->> -        /* (TCG) Set the OS CAM line of the thread interrupt context.=
- */
->> -        spapr_xive_set_tctx_os_cam(spapr_cpu_state(cpu)->tctx);
->> -    }
->> =20
->>      if (kvm_enabled()) {
->>          int rc =3D spapr_irq_init_kvm(kvmppc_xive_connect, intc, errp=
-);
->> diff --git a/hw/intc/xive.c b/hw/intc/xive.c
->> index 0ae3f9b1efe4..be4f2c974178 100644
->> --- a/hw/intc/xive.c
->> +++ b/hw/intc/xive.c
->> @@ -566,6 +566,18 @@ static void xive_tctx_reset_handler(void *dev)
->>          ipb_to_pipr(tctx->regs[TM_QW1_OS + TM_IPB]);
->>      tctx->regs[TM_QW3_HV_PHYS + TM_PIPR] =3D
->>          ipb_to_pipr(tctx->regs[TM_QW3_HV_PHYS + TM_IPB]);
->> +
->> +    /*
->> +     * (TCG) Set the OS CAM line of the thread interrupt context.
->=20
-> As per my remark above, this shouldn't mention TCG but rather
-> kernel-irqchip=3Doff.
-
-ok.
+Acked-by: Stefano Garzarella <sgarzare@redhat.com>
 
 Thanks,
+Stefano
 
-C.
-
->=20
->> +     *
->> +     * When a Virtual Processor is scheduled to run on a HW thread,
->> +     * the hypervisor pushes its identifier in the OS CAM line.
->> +     * Emulate the same behavior under QEMU.
->> +     */
->> +    if (tctx->os_cam) {
->> +        uint32_t qw1w2 =3D cpu_to_be32(TM_QW1W2_VO | tctx->os_cam);
->> +        memcpy(&tctx->regs[TM_QW1_OS + TM_WORD2], &qw1w2, 4);
->> +    }
->>  }
->> =20
->>  void xive_tctx_reset(XiveTCTX *tctx)
->> @@ -667,11 +679,17 @@ static const VMStateDescription vmstate_xive_tct=
-x =3D {
->>      },
->>  };
->> =20
->> +static Property  xive_tctx_properties[] =3D {
->> +    DEFINE_PROP_UINT32("os-cam", XiveTCTX, os_cam, 0),
->> +    DEFINE_PROP_END_OF_LIST(),
->> +};
->> +
->>  static void xive_tctx_class_init(ObjectClass *klass, void *data)
->>  {
->>      DeviceClass *dc =3D DEVICE_CLASS(klass);
->> =20
->>      dc->desc =3D "XIVE Interrupt Thread Context";
->> +    dc->props =3D xive_tctx_properties;
->>      dc->realize =3D xive_tctx_realize;
->>      dc->unrealize =3D xive_tctx_unrealize;
->>      dc->vmsd =3D &vmstate_xive_tctx;
->> @@ -689,7 +707,8 @@ static const TypeInfo xive_tctx_info =3D {
->>      .class_init    =3D xive_tctx_class_init,
->>  };
->> =20
->> -Object *xive_tctx_create(Object *cpu, XiveRouter *xrtr, Error **errp)
->> +Object *xive_tctx_create(Object *cpu, XiveRouter *xrtr, uint32_t os_c=
-am,
->> +                         Error **errp)
->>  {
->>      Error *local_err =3D NULL;
->>      Object *obj;
->> @@ -698,6 +717,7 @@ Object *xive_tctx_create(Object *cpu, XiveRouter *=
-xrtr, Error **errp)
->>      object_property_add_child(cpu, TYPE_XIVE_TCTX, obj, &error_abort)=
-;
->>      object_unref(obj);
->>      object_property_add_const_link(obj, "cpu", cpu, &error_abort);
->> +    object_property_set_int(obj, os_cam, "os-cam", &local_err);
->>      object_property_set_bool(obj, true, "realized", &local_err);
->>      if (local_err) {
->>          goto error;
->> diff --git a/hw/ppc/pnv.c b/hw/ppc/pnv.c
->> index 7cf64b6d2533..99c06842573e 100644
->> --- a/hw/ppc/pnv.c
->> +++ b/hw/ppc/pnv.c
->> @@ -806,7 +806,8 @@ static void pnv_chip_power9_intc_create(PnvChip *c=
-hip, PowerPCCPU *cpu,
->>       * controller object is initialized afterwards. Hopefully, it's
->>       * only used at runtime.
->>       */
->> -    obj =3D xive_tctx_create(OBJECT(cpu), XIVE_ROUTER(&chip9->xive), =
-&local_err);
->> +    obj =3D xive_tctx_create(OBJECT(cpu), XIVE_ROUTER(&chip9->xive), =
-0,
->> +                           &local_err);
->>      if (local_err) {
->>          error_propagate(errp, local_err);
->>          return;
->=20
-
+> 
+> Reported-by: Coverity (CID 1406402)
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> ---
+>  block/backup.c | 5 +----
+>  1 file changed, 1 insertion(+), 4 deletions(-)
+> 
+> diff --git a/block/backup.c b/block/backup.c
+> index 46978c1785..6e1497f7bb 100644
+> --- a/block/backup.c
+> +++ b/block/backup.c
+> @@ -474,10 +474,7 @@ BlockJob *backup_job_create(const char *job_id, BlockDriverState *bs,
+>      if (sync_bitmap) {
+>          bdrv_reclaim_dirty_bitmap(bs, sync_bitmap, NULL);
+>      }
+> -    if (job) {
+> -        backup_clean(&job->common.job);
+> -        job_early_fail(&job->common.job);
+> -    } else if (backup_top) {
+> +    if (backup_top) {
+>          bdrv_backup_top_drop(backup_top);
+>      }
+>  
+> -- 
+> 2.21.0
+> 
+> 
 
