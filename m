@@ -2,84 +2,99 @@ Return-Path: <SRS0=ht5U=YL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9FCECCA9EA0
-	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 17:08:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3BFFFCA9EA0
+	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 17:09:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 593862064B
-	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 17:08:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 075FA2064B
+	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 17:09:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="qBXq6i5P"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 593862064B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cCkYPf9Y"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 075FA2064B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43590 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43604 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iLVkG-0000Rq-FM
-	for qemu-devel@archiver.kernel.org; Fri, 18 Oct 2019 13:08:56 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55583)
+	id 1iLVl1-0001L6-0h
+	for qemu-devel@archiver.kernel.org; Fri, 18 Oct 2019 13:09:43 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56061)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <aleksandar.m.mail@gmail.com>) id 1iLVfd-0005e2-Ef
- for qemu-devel@nongnu.org; Fri, 18 Oct 2019 13:04:10 -0400
+ (envelope-from <philmd@redhat.com>) id 1iLVk0-0000QW-Vn
+ for qemu-devel@nongnu.org; Fri, 18 Oct 2019 13:08:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aleksandar.m.mail@gmail.com>) id 1iLVfb-0007ng-P5
- for qemu-devel@nongnu.org; Fri, 18 Oct 2019 13:04:09 -0400
-Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:40395)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
- id 1iLVfb-0007mz-Id
- for qemu-devel@nongnu.org; Fri, 18 Oct 2019 13:04:07 -0400
-Received: by mail-ot1-x342.google.com with SMTP id y39so5551095ota.7
- for <qemu-devel@nongnu.org>; Fri, 18 Oct 2019 10:04:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:in-reply-to:references:from:date:message-id:subject:to
- :cc; bh=bDkaYEuXLrk5gORcRlPGVt7oxf6zCxNVYFWtJrj+Y6E=;
- b=qBXq6i5P5242KBGQVy0CX7I12MH8WNP3dL4wJI3TW6ILw0F22FrYnMuDA/FUKcp+3/
- cgdZW0sEqm/Ptt+8NrCUvbILt4nhwcBTYzVJ8/g27EoqB+U4ZY4zp989a6Hz9my0dxyd
- MZ74Tv+esTjIB1z2pJt7NjNzPH2SPxsBWjz8WfFRf/EO3jNHDdailNqEzJUxlbTHl4hb
- MxC8VtMevE6OyLDr5Uvdj4ErmOcRSpeIbfnGsyjU+cd4B5hkrh3CFDaYEoCbjWLO5HXh
- fqpce8tYWFVQxJ2eyX53wbGV/8nXT7aj5bl3VIlzBetabH7scYlN1dFMBzjjbIT0aRNS
- efAA==
+ (envelope-from <philmd@redhat.com>) id 1iLVjz-0002Yu-OU
+ for qemu-devel@nongnu.org; Fri, 18 Oct 2019 13:08:40 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:57914
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iLVjz-0002YP-AE
+ for qemu-devel@nongnu.org; Fri, 18 Oct 2019 13:08:39 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1571418517;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=QXGwq7satY0SL/cS2CzEgbJS0cYj7J5feez3/pDUP94=;
+ b=cCkYPf9YOq+WBLw/9d8KGejYjylxzwd43NIRp8jqrxdXgEa5e+jNWWXQFz2ow5xXpHIhS9
+ J3EqXGV6tYW6C+qAeaBFuvXjh9LJSTUv4ZRxWkr/W4SRg/s5Rdh/ZoCl3zaqtyN4/8kaA3
+ d3RCJfiD3egg2n8/Y049WyYwMklShKs=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-146-1VYITBcDP4y2Q1YODPqQEQ-1; Fri, 18 Oct 2019 13:08:34 -0400
+Received: by mail-wm1-f71.google.com with SMTP id g67so2592434wmg.4
+ for <qemu-devel@nongnu.org>; Fri, 18 Oct 2019 10:08:33 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:in-reply-to:references:from:date
- :message-id:subject:to:cc;
- bh=bDkaYEuXLrk5gORcRlPGVt7oxf6zCxNVYFWtJrj+Y6E=;
- b=RiMnSbV0VClxu7tCmzgPZN9xNzshWrbq+IVjDK58uan2hjxqFnqiV9rjlX5nI35BMM
- mmC57xMYVrpYF8iqqYYHlASapb/iZggZHv3YKi68O6AwsXA5+zBnOkQxlKlDonOS7fen
- 5BJ+yrVpa2IlkjhABcXFm2MYJpU5MXvGBv7IpZ2dkyl2NN0GMkWXs4sCIUvOA0oaRCTb
- T0lhxV1K5Tr4fUgtADSH6luL/rMMmDjLmSAGdeV5+h9RludKm6L8rYmYidWsrXbdMsi2
- SEVMSb8WGeiEdwU8VYbX3xBUQrcbCGLkQTo1RYkWl0BfD66rrGuDKOnbe2D1hH8hu/r+
- V3WQ==
-X-Gm-Message-State: APjAAAVunWk5uJ1Jl7nWKhAYXsLJQXix7wOrLlz9RCT8If+/tHr6LDOC
- feD+cnYap+DLxAqP4Vcu4YTejTki8Tki0XWgMiw=
-X-Google-Smtp-Source: APXvYqxDdpOvXmKbC0prh5gAR8ElpRIgErg2wqpu+0QNVY1zzrSln2fvSp8S1Aa03XRqC0pzq9XcFldtIO4/bE1/1Xo=
-X-Received: by 2002:a05:6830:452:: with SMTP id
- d18mr8718963otc.295.1571418246685; 
- Fri, 18 Oct 2019 10:04:06 -0700 (PDT)
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=yg31NkL/u8KHyGmrjmGF2gQvSSP84/j0Vs1bd0WsxgA=;
+ b=eh2mHGlGKE3lpCIbNPpat6oMDpdKt96yQH+bcS1gmjqt/rpJXJbGtPSYwKUr6rePr8
+ Me37D+qkKoSMsW5gIJco2d7PeVJTGErVbcYPydtD8p7gQ6DQ2erWeJSlXxtTODzZgtR9
+ DQ1WY1YKOruVKfhGkr1syLDBTbfi1owzAOyDaBkifht1qP7zQpHJj+nYtFT1KALblXP1
+ 183J3osrVikVtGvz9npL4zkluL0ZeF0q6VDDBZzIcPJaCYC/s39NXfIg6M5SDQlZllvT
+ Uu4QNU2tZvlnvJ4kxXhj0ommT+gu3gse5Ly/8ET7VO8ZfFUM9wxgm45Vrvm2ody2rozD
+ pqsw==
+X-Gm-Message-State: APjAAAV/ieqQnM0rb47CDZX+lv/LWZNJXWr3AWizpgSrO74cOBp4ppk/
+ 3qCEkt0MYruAPTCzIaIuGfoxWihYsAyvTcwocRFK6KNA+MUb2/SNp6OxLF3yGUBJRzrhQgsKvgG
+ ZLlYKnO93nqMlXf4=
+X-Received: by 2002:adf:fe10:: with SMTP id n16mr9272897wrr.288.1571418512954; 
+ Fri, 18 Oct 2019 10:08:32 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqzACGUco+CIdwKaVFRn3TA87hhQr6mRLKx+T2TtiDm5YG1doy87BBw82+uiyAR46Gt3R565vQ==
+X-Received: by 2002:adf:fe10:: with SMTP id n16mr9272860wrr.288.1571418512633; 
+ Fri, 18 Oct 2019 10:08:32 -0700 (PDT)
+Received: from [192.168.1.36] (14.red-88-21-201.staticip.rima-tde.net.
+ [88.21.201.14])
+ by smtp.gmail.com with ESMTPSA id y19sm5760739wmi.13.2019.10.18.10.08.31
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Fri, 18 Oct 2019 10:08:31 -0700 (PDT)
+Subject: Re: [PATCH v2] .travis.yml: Test the release tarball
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+References: <20191007160450.3619-1-philmd@redhat.com>
+ <4fbafa72-321c-2062-f97e-502616ec6c32@redhat.com> <87v9smnj2h.fsf@linaro.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <85317436-ca1e-ce9c-2242-9c31ab6b4f9d@redhat.com>
+Date: Fri, 18 Oct 2019 19:08:30 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.1
 MIME-Version: 1.0
-Received: by 2002:a9d:340a:0:0:0:0:0 with HTTP; Fri, 18 Oct 2019 10:04:06
- -0700 (PDT)
-In-Reply-To: <20191018134754.16362-21-philmd@redhat.com>
-References: <20191018134754.16362-1-philmd@redhat.com>
- <20191018134754.16362-21-philmd@redhat.com>
-From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
-Date: Fri, 18 Oct 2019 19:04:06 +0200
-Message-ID: <CAL1e-=gHBfvchVaAbus+GVaSVUFyae41iCB3i5HGhyLTvOr2Ew@mail.gmail.com>
-Subject: Re: [PATCH v2 20/20] hw/pci-host/i440fx: Remove the last PIIX3 traces
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
-Content-Type: multipart/alternative; boundary="000000000000632a83059532525f"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::342
+In-Reply-To: <87v9smnj2h.fsf@linaro.org>
+Content-Language: en-US
+X-MC-Unique: 1VYITBcDP4y2Q1YODPqQEQ-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,309 +106,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Stefano Stabellini <sstabellini@kernel.org>,
- "xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>,
- Paul Durrant <paul@xen.org>, "Michael S. Tsirkin" <mst@redhat.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- Eduardo Habkost <ehabkost@redhat.com>,
- =?UTF-8?Q?Herv=C3=A9_Poussineau?= <hpoussin@reactos.org>,
- Aleksandar Markovic <amarkovic@wavecomp.com>,
- Igor Mammedov <imammedo@redhat.com>,
- Anthony Perard <anthony.perard@citrix.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
- Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
- Aurelien Jarno <aurelien@aurel32.net>, Richard Henderson <rth@twiddle.net>
+Cc: Fam Zheng <fam@euphon.net>, Michael Roth <mdroth@linux.vnet.ibm.com>,
+ Michael Tokarev <mjt@tls.msk.ru>, qemu-devel@nongnu.org,
+ Bruce Rogers <brogers@suse.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---000000000000632a83059532525f
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+On 10/18/19 5:56 PM, Alex Benn=C3=A9e wrote:
+>=20
+> Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> writes:
+>=20
+>> ping?
+>=20
+> I've pulled it into testing/next to play but I was wondering if it was
+> worth it given how infrequently it would run...
 
-On Friday, October 18, 2019, Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com=
->
-wrote:
+Well, it will run when we tag release candidate and catch eventual bugs=20
+before we tag the final release. The idea is to avoid the same mistake=20
+we did with the last release that Bruce spotted.
 
-> The PIIX3 is not tied to the i440FX and can even be used without it.
-> Move its creation to the machine code (pc_piix.c).
-> We have now removed the last trace of southbridge code in the i440FX
-> northbridge.
->
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-> ---
->  hw/i386/pc_piix.c            | 8 +++++++-
->  hw/pci-host/i440fx.c         | 8 --------
->  include/hw/pci-host/i440fx.h | 3 +--
->  3 files changed, 8 insertions(+), 11 deletions(-)
->
->
-Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
-
-Philippe, I don't have any test equipment available at the moment, did you
-do some smoke tests with new v2 of the series (like booting a Malta board,
-or other relevant scenario)?
-
-Veuillez agr=C3=A9er, Monsieur Philippe, l'assurance de mon parfaite
-consid=C3=A9ration.
-
-Aleksandar
-
-
-> diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
-> index 11b8de049f..f6e7196a82 100644
-> --- a/hw/i386/pc_piix.c
-> +++ b/hw/i386/pc_piix.c
-> @@ -199,14 +199,20 @@ static void pc_init1(MachineState *machine,
->      }
->
->      if (pcmc->pci_enabled) {
-> +        PIIX3State *piix3;
-> +
->          pci_bus =3D i440fx_init(host_type,
->                                pci_type,
-> -                              &i440fx_state, &piix3_devfn, &isa_bus,
-> pcms->gsi,
-> +                              &i440fx_state,
->                                system_memory, system_io, machine->ram_siz=
-e,
->                                pcms->below_4g_mem_size,
->                                pcms->above_4g_mem_size,
->                                pci_memory, ram_memory);
->          pcms->bus =3D pci_bus;
-> +
-> +        piix3 =3D piix3_create(pci_bus, &isa_bus);
-> +        piix3->pic =3D pcms->gsi;
-> +        piix3_devfn =3D piix3->dev.devfn;
->      } else {
->          pci_bus =3D NULL;
->          i440fx_state =3D NULL;
-> diff --git a/hw/pci-host/i440fx.c b/hw/pci-host/i440fx.c
-> index 79ecd58a2b..f27131102d 100644
-> --- a/hw/pci-host/i440fx.c
-> +++ b/hw/pci-host/i440fx.c
-> @@ -27,7 +27,6 @@
->  #include "hw/pci/pci.h"
->  #include "hw/pci/pci_host.h"
->  #include "hw/pci-host/i440fx.h"
-> -#include "hw/southbridge/piix.h"
->  #include "hw/qdev-properties.h"
->  #include "hw/sysbus.h"
->  #include "qapi/error.h"
-> @@ -272,8 +271,6 @@ static void i440fx_realize(PCIDevice *dev, Error
-> **errp)
->
->  PCIBus *i440fx_init(const char *host_type, const char *pci_type,
->                      PCII440FXState **pi440fx_state,
-> -                    int *piix3_devfn,
-> -                    ISABus **isa_bus, qemu_irq *pic,
->                      MemoryRegion *address_space_mem,
->                      MemoryRegion *address_space_io,
->                      ram_addr_t ram_size,
-> @@ -286,7 +283,6 @@ PCIBus *i440fx_init(const char *host_type, const char
-> *pci_type,
->      PCIBus *b;
->      PCIDevice *d;
->      PCIHostState *s;
-> -    PIIX3State *piix3;
->      PCII440FXState *f;
->      unsigned i;
->      I440FXState *i440fx;
-> @@ -339,10 +335,6 @@ PCIBus *i440fx_init(const char *host_type, const cha=
-r
-> *pci_type,
->                   PAM_EXPAN_SIZE);
->      }
->
-> -    piix3 =3D piix3_create(b, isa_bus);
-> -    piix3->pic =3D pic;
-> -    *piix3_devfn =3D piix3->dev.devfn;
-> -
->      ram_size =3D ram_size / 8 / 1024 / 1024;
->      if (ram_size > 255) {
->          ram_size =3D 255;
-> diff --git a/include/hw/pci-host/i440fx.h b/include/hw/pci-host/i440fx.h
-> index e327f9bf87..f54e6466e4 100644
-> --- a/include/hw/pci-host/i440fx.h
-> +++ b/include/hw/pci-host/i440fx.h
-> @@ -22,8 +22,7 @@ typedef struct PCII440FXState PCII440FXState;
->  #define TYPE_IGD_PASSTHROUGH_I440FX_PCI_DEVICE "igd-passthrough-i440FX"
->
->  PCIBus *i440fx_init(const char *host_type, const char *pci_type,
-> -                    PCII440FXState **pi440fx_state, int *piix_devfn,
-> -                    ISABus **isa_bus, qemu_irq *pic,
-> +                    PCII440FXState **pi440fx_state,
->                      MemoryRegion *address_space_mem,
->                      MemoryRegion *address_space_io,
->                      ram_addr_t ram_size,
+>> On 10/7/19 6:04 PM, Philippe Mathieu-Daud=C3=A9 wrote:
+>>> Add a job to generate the release tarball and build/install few
+>>> QEMU targets from it.
+>>> Ideally we should build the 'efi' target from the 'roms' directory,
+>>> but it is too time consuming.
+>>> This job is only triggered when a tag starting with 'v' is pushed,
+>>> which is the case with release candidate tags.
+>>> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+>>> ---
+>>> v2: addressed mdroth comments
+>>> This job is quick enough: Ran for 16 min 33 sec
+>>> https://travis-ci.org/philmd/qemu/jobs/594565293
+>>> Based-on: <20191007133540.30623-1-philmd@redhat.com>
+>>> pull request including "Fix tarball builds of UEFI/EDK2 firmware"
+>>> https://lists.gnu.org/archive/html/qemu-devel/2019-09/msg02734.html
+>>> ---
+>>>    .travis.yml | 23 +++++++++++++++++++++++
+>>>    1 file changed, 23 insertions(+)
+>>> diff --git a/.travis.yml b/.travis.yml
+>>> index d0b9e099b9..d881ea0849 100644
+>>> --- a/.travis.yml
+>>> +++ b/.travis.yml
+>>> @@ -339,3 +339,26 @@ matrix:
+>>>            - CONFIG=3D"--target-list=3Dxtensa-softmmu,arm-softmmu,aarch=
+64-softmmu,alpha-softmmu"
+>>>            - TEST_CMD=3D"make -j3 check-tcg V=3D1"
+>>>            - CACHE_NAME=3D"${TRAVIS_BRANCH}-linux-gcc-default"
+>>> +
+>>> +
+>>> +    # Release builds
+>>> +    # The make-release script expect a QEMU version, so our tag must s=
+tart with a 'v'.
+>>> +    # This is the case when release candidate tags are created.
+>>> +    - if: tag IS present AND tag =3D~ /^v\d+\.\d+(\.\d+)?(-\S*)?$/
+>>> +      env:
+>>> +        # We want to build from the release tarball
+>>> +        - BUILD_DIR=3D"release/build/dir" SRC_DIR=3D"../../.."
+>>> +        - BASE_CONFIG=3D"--prefix=3D$PWD/dist"
+>>> +        - CONFIG=3D"--target-list=3Dx86_64-softmmu,aarch64-softmmu,arm=
+eb-linux-user,ppc-linux-user"
+>>> +        - TEST_CMD=3D"make install -j3"
+>>> +        - QEMU_VERSION=3D"${TRAVIS_TAG:1}"
+>>> +        - CACHE_NAME=3D"${TRAVIS_BRANCH}-linux-gcc-default"
+>>> +      before_script:
+>>> +        - command -v ccache && ccache --zero-stats
+>>> +        - mkdir -p ${BUILD_DIR} && cd ${BUILD_DIR}
+>>> +      script:
+>>> +        - make -C ${SRC_DIR} qemu-${QEMU_VERSION}.tar.bz2
+>>> +        - ls -l ${SRC_DIR}/qemu-${QEMU_VERSION}.tar.bz2
+>>> +        - tar -xf ${SRC_DIR}/qemu-${QEMU_VERSION}.tar.bz2 && cd qemu-$=
+{QEMU_VERSION}
+>>> +        - ./configure ${BASE_CONFIG} ${CONFIG} || { cat config.log && =
+exit 1; }
+>>> +        - make install
+>>>
+>=20
+>=20
 > --
-> 2.21.0
->
->
->
+> Alex Benn=C3=A9e
+>=20
 
---000000000000632a83059532525f
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-<br><br>On Friday, October 18, 2019, Philippe Mathieu-Daud=C3=A9 &lt;<a hre=
-f=3D"mailto:philmd@redhat.com">philmd@redhat.com</a>&gt; wrote:<br><blockqu=
-ote class=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;border-left:1px #ccc s=
-olid;padding-left:1ex">The PIIX3 is not tied to the i440FX and can even be =
-used without it.<br>
-Move its creation to the machine code (pc_piix.c).<br>
-We have now removed the last trace of southbridge code in the i440FX<br>
-northbridge.<br>
-<br>
-Signed-off-by: Philippe Mathieu-Daud=C3=A9 &lt;<a href=3D"mailto:philmd@red=
-hat.com">philmd@redhat.com</a>&gt;<br>
----<br>
-=C2=A0hw/i386/pc_piix.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 | 8 ++++++=
-+-<br>
-=C2=A0hw/pci-host/i440fx.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0| 8 --------<br=
->
-=C2=A0include/hw/pci-host/i440fx.h | 3 +--<br>
-=C2=A03 files changed, 8 insertions(+), 11 deletions(-)<br>
-<br></blockquote><div><br></div><div><span style=3D"color:rgb(34,34,34);fon=
-t-size:14px;line-height:22.1200008392334px">Reviewed-by: Aleksandar Markovi=
-c &lt;</span><a href=3D"mailto:amarkovic@wavecomp.com" style=3D"font-size:1=
-4px;line-height:22.1200008392334px">amarkovic@wavecomp.com</a><span style=
-=3D"color:rgb(34,34,34);font-size:14px;line-height:22.1200008392334px">&gt;=
-</span><br></div><div><span style=3D"color:rgb(34,34,34);font-size:14px;lin=
-e-height:22.1200008392334px"><br></span></div><div><span style=3D"color:rgb=
-(34,34,34);font-size:14px;line-height:22.1200008392334px">Philippe, I don&#=
-39;t have any test equipment available at the moment, did you do some smoke=
- tests with new v2 of the series (like booting a Malta board, or other rele=
-vant scenario)?</span></div><div><span style=3D"color:rgb(34,34,34);font-si=
-ze:14px;line-height:22.1200008392334px"><br></span></div><div><span style=
-=3D"margin:0px;padding:0px;border:0px;font-family:&#39;Helvetica Neue&#39;,=
-Helvetica,&#39;Nimbus Sans L&#39;,Arial,&#39;Liberation Sans&#39;,sans-seri=
-f;font-size:16px;font-style:inherit;font-stretch:inherit;line-height:25px;v=
-ertical-align:baseline;color:rgb(51,51,51)">Veuillez agr=C3=A9er, Monsieur =
-Philippe, l&#39;assurance de mon parfaite consid=C3=A9ration.</span><br></d=
-iv><div><span style=3D"margin:0px;padding:0px;border:0px;font-family:&#39;H=
-elvetica Neue&#39;,Helvetica,&#39;Nimbus Sans L&#39;,Arial,&#39;Liberation =
-Sans&#39;,sans-serif;font-size:16px;font-style:inherit;font-stretch:inherit=
-;line-height:25px;vertical-align:baseline;color:rgb(51,51,51)"><br></span><=
-/div><div><span style=3D"margin:0px;padding:0px;border:0px;font-family:&#39=
-;Helvetica Neue&#39;,Helvetica,&#39;Nimbus Sans L&#39;,Arial,&#39;Liberatio=
-n Sans&#39;,sans-serif;font-size:16px;font-style:inherit;font-stretch:inher=
-it;line-height:25px;vertical-align:baseline;color:rgb(51,51,51)">Aleksandar=
-</span></div><div>=C2=A0</div><blockquote class=3D"gmail_quote" style=3D"ma=
-rgin:0 0 0 .8ex;border-left:1px #ccc solid;padding-left:1ex">
-diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c<br>
-index 11b8de049f..f6e7196a82 100644<br>
---- a/hw/i386/pc_piix.c<br>
-+++ b/hw/i386/pc_piix.c<br>
-@@ -199,14 +199,20 @@ static void pc_init1(MachineState *machine,<br>
-=C2=A0 =C2=A0 =C2=A0}<br>
-<br>
-=C2=A0 =C2=A0 =C2=A0if (pcmc-&gt;pci_enabled) {<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 PIIX3State *piix3;<br>
-+<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0pci_bus =3D i440fx_init(host_type,<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0pci_type,<br>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 &amp;i440fx_state, &amp;piix3_devfn, &amp;i=
-sa_bus, pcms-&gt;gsi,<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 &amp;i440fx_state,<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0system_memory, system_io, machine-&gt=
-;ram_size,<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0pcms-&gt;below_4g_mem_size,<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0pcms-&gt;above_4g_mem_size,<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0pci_memory, ram_memory);<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0pcms-&gt;bus =3D pci_bus;<br>
-+<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 piix3 =3D piix3_create(pci_bus, &amp;isa_bus);=
-<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 piix3-&gt;pic =3D pcms-&gt;gsi;<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 piix3_devfn =3D piix3-&gt;dev.devfn;<br>
-=C2=A0 =C2=A0 =C2=A0} else {<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0pci_bus =3D NULL;<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0i440fx_state =3D NULL;<br>
-diff --git a/hw/pci-host/i440fx.c b/hw/pci-host/i440fx.c<br>
-index 79ecd58a2b..f27131102d 100644<br>
---- a/hw/pci-host/i440fx.c<br>
-+++ b/hw/pci-host/i440fx.c<br>
-@@ -27,7 +27,6 @@<br>
-=C2=A0#include &quot;hw/pci/pci.h&quot;<br>
-=C2=A0#include &quot;hw/pci/pci_host.h&quot;<br>
-=C2=A0#include &quot;hw/pci-host/i440fx.h&quot;<br>
--#include &quot;hw/southbridge/piix.h&quot;<br>
-=C2=A0#include &quot;hw/qdev-properties.h&quot;<br>
-=C2=A0#include &quot;hw/sysbus.h&quot;<br>
-=C2=A0#include &quot;qapi/error.h&quot;<br>
-@@ -272,8 +271,6 @@ static void i440fx_realize(PCIDevice *dev, Error **errp=
-)<br>
-<br>
-=C2=A0PCIBus *i440fx_init(const char *host_type, const char *pci_type,<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0PCII440FXState **pi440fx_state,<br>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 int =
-*piix3_devfn,<br>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 ISAB=
-us **isa_bus, qemu_irq *pic,<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0MemoryRegion *address_space_mem,<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0MemoryRegion *address_space_io,<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0ram_addr_t ram_size,<br>
-@@ -286,7 +283,6 @@ PCIBus *i440fx_init(const char *host_type, const char *=
-pci_type,<br>
-=C2=A0 =C2=A0 =C2=A0PCIBus *b;<br>
-=C2=A0 =C2=A0 =C2=A0PCIDevice *d;<br>
-=C2=A0 =C2=A0 =C2=A0PCIHostState *s;<br>
--=C2=A0 =C2=A0 PIIX3State *piix3;<br>
-=C2=A0 =C2=A0 =C2=A0PCII440FXState *f;<br>
-=C2=A0 =C2=A0 =C2=A0unsigned i;<br>
-=C2=A0 =C2=A0 =C2=A0I440FXState *i440fx;<br>
-@@ -339,10 +335,6 @@ PCIBus *i440fx_init(const char *host_type, const char =
-*pci_type,<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 PAM_EXPAN_SI=
-ZE);<br>
-=C2=A0 =C2=A0 =C2=A0}<br>
-<br>
--=C2=A0 =C2=A0 piix3 =3D piix3_create(b, isa_bus);<br>
--=C2=A0 =C2=A0 piix3-&gt;pic =3D pic;<br>
--=C2=A0 =C2=A0 *piix3_devfn =3D piix3-&gt;dev.devfn;<br>
--<br>
-=C2=A0 =C2=A0 =C2=A0ram_size =3D ram_size / 8 / 1024 / 1024;<br>
-=C2=A0 =C2=A0 =C2=A0if (ram_size &gt; 255) {<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0ram_size =3D 255;<br>
-diff --git a/include/hw/pci-host/i440fx.h b/include/hw/pci-host/i440fx.h<br=
->
-index e327f9bf87..f54e6466e4 100644<br>
---- a/include/hw/pci-host/i440fx.h<br>
-+++ b/include/hw/pci-host/i440fx.h<br>
-@@ -22,8 +22,7 @@ typedef struct PCII440FXState PCII440FXState;<br>
-=C2=A0#define TYPE_IGD_PASSTHROUGH_I440FX_<wbr>PCI_DEVICE &quot;igd-passthr=
-ough-i440FX&quot;<br>
-<br>
-=C2=A0PCIBus *i440fx_init(const char *host_type, const char *pci_type,<br>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 PCII=
-440FXState **pi440fx_state, int *piix_devfn,<br>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 ISAB=
-us **isa_bus, qemu_irq *pic,<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 PCII=
-440FXState **pi440fx_state,<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0MemoryRegion *address_space_mem,<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0MemoryRegion *address_space_io,<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0ram_addr_t ram_size,<br>
--- <br>
-2.21.0<br>
-<br>
-<br>
-</blockquote>
-
---000000000000632a83059532525f--
 
