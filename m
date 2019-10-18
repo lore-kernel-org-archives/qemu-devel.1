@@ -4,56 +4,57 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 28C1BCA9EA9
-	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 15:13:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DB0C5CA9EA0
+	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 15:18:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E532021897
-	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 15:13:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A4C38222BD
+	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 15:18:15 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=greensocs.com header.i=@greensocs.com header.b="A5S94pTw"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E532021897
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=greensocs.com header.i=@greensocs.com header.b="qWEoTFz3"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A4C38222BD
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=greensocs.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41620 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41682 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iLTwB-0001oX-V4
-	for qemu-devel@archiver.kernel.org; Fri, 18 Oct 2019 11:13:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39112)
+	id 1iLU17-0005na-Ac
+	for qemu-devel@archiver.kernel.org; Fri, 18 Oct 2019 11:18:14 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39149)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <damien.hedde@greensocs.com>) id 1iLTrC-0006ka-Ar
- for qemu-devel@nongnu.org; Fri, 18 Oct 2019 11:07:59 -0400
+ (envelope-from <damien.hedde@greensocs.com>) id 1iLTrE-0006lf-9J
+ for qemu-devel@nongnu.org; Fri, 18 Oct 2019 11:08:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <damien.hedde@greensocs.com>) id 1iLTrA-0000I5-TJ
- for qemu-devel@nongnu.org; Fri, 18 Oct 2019 11:07:58 -0400
-Received: from beetle.greensocs.com ([5.135.226.135]:38684)
+ (envelope-from <damien.hedde@greensocs.com>) id 1iLTrB-0000Ie-L5
+ for qemu-devel@nongnu.org; Fri, 18 Oct 2019 11:07:59 -0400
+Received: from beetle.greensocs.com ([5.135.226.135]:38696)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <damien.hedde@greensocs.com>)
- id 1iLTr7-0000DH-6A; Fri, 18 Oct 2019 11:07:53 -0400
+ id 1iLTr7-0000Dd-Ru; Fri, 18 Oct 2019 11:07:54 -0400
 Received: from crumble.bar.greensocs.com (crumble.bar.greensocs.com
  [172.16.11.102])
- by beetle.greensocs.com (Postfix) with ESMTPS id 985CC96F53;
- Fri, 18 Oct 2019 15:07:51 +0000 (UTC)
+ by beetle.greensocs.com (Postfix) with ESMTPS id 43F9296F54;
+ Fri, 18 Oct 2019 15:07:52 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=greensocs.com;
  s=mail; t=1571411272;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=viHjPgtc5HTCRsQlMywrp57XhUG1VOp0+kLWxpMlyqs=;
- b=A5S94pTw0UDr+7bCBWTCw6RNRzg4BRCxMf3Yvd5hzNDKaiz2WjH9pJUPNpSuiWK7Rz4SAm
- hUcVW8CKZV5x/gpe3vQB8dztdHy3XXwlsD35CEjoKL/geqKd3u5I39VpAJBvdKYLn1DlGZ
- DODUOGDTDvB5xB4ZQW/ONMRYJ6/BF5g=
+ bh=6vGveMHLjzG3M9XbNsp7F2Gj1HQXW7Dw2jM2Twu2XEE=;
+ b=qWEoTFz351lHwa00qgecQpLR87ZlhCBgZk5PdaDs/JxkrLy4WmdzJKZN6mUTQVMlocHFxj
+ 2Igm3HuZBpINENBo/+r133kH1Ham6v6yhMEe+whhc06prgxy+wRFyPi/NK7IHk89BIobuG
+ LVmU1Dlrj0eMv6NCL756tn1LEQ+pU2s=
 From: Damien Hedde <damien.hedde@greensocs.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v5 05/13] hw/core/resettable: add support for changing parent
-Date: Fri, 18 Oct 2019 17:06:22 +0200
-Message-Id: <20191018150630.31099-6-damien.hedde@greensocs.com>
+Subject: [PATCH v5 06/13] hw/core/qdev: handle parent bus change regarding
+ resettable
+Date: Fri, 18 Oct 2019 17:06:23 +0200
+Message-Id: <20191018150630.31099-7-damien.hedde@greensocs.com>
 X-Mailer: git-send-email 2.23.0
 In-Reply-To: <20191018150630.31099-1-damien.hedde@greensocs.com>
 References: <20191018150630.31099-1-damien.hedde@greensocs.com>
@@ -64,14 +65,14 @@ ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=greensocs.com;
  to:to:cc:cc:mime-version:mime-version:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=viHjPgtc5HTCRsQlMywrp57XhUG1VOp0+kLWxpMlyqs=;
- b=xtM+7hXVtdGDUw9yE8WtYEHDnqFfDJHWCGz6rs0uOddJ0P4YaVdORYpA9yoPdeeSlp5V1a
- /QMpV1k8F+sZnkMYW02T5eZxF+rXo0lW6MgyIsDNQDv8nxPp/mXAN3nw+qdKy8IBbbsDO7
- TjsOw6fmBJJY7vb44eg9yEC6U5HCQmk=
+ bh=6vGveMHLjzG3M9XbNsp7F2Gj1HQXW7Dw2jM2Twu2XEE=;
+ b=rtuhlzY5vEWPsHgKqSb8gxkp/4KKzilEu/e4CYnyO81zlGPI/mF6GQpMlzcZ4adY9ESB79
+ UvayK0Ni7pbny9NE7mZpDos3vEi0OFGQI5sKsfqYwMv/iKioqFJWovPErK41OEhQlGNU7Q
+ TFHr8qujVWV8H5CZVZYW7krBmEfX4pA=
 ARC-Seal: i=1; s=mail; d=greensocs.com; t=1571411272; a=rsa-sha256; cv=none;
- b=ofUFQx6vB2S5YrWDeau9gYS9mzviv68FpdylAFHdKZf668q/I23kNUVepXfB0l0EkbOv5v
- jJD1xxSTY8yzaDBhfN+fNObGMTORJyLo/wyGmv7UoIpf6l8+F0laaigJvKrWyE6pR2/eJt
- PjoU30p5sbS7CP7ZlAMexYdITjBQASs=
+ b=loeaI8nBfTzxSv+OVhDob4D6JCsA5YoPoobpLb/JrdBlvbXiMbhiHDnqYVnUSbM7nXPBNA
+ AricptmnI1k+3dkObdCuuotzTz9gwNh9jALzf9qs5EpCWFFgEEiFFoYeqaOdHz0XADuJ0y
+ okoHknY8MyHZFwjlSwmf36LRyA2kw+c=
 ARC-Authentication-Results: i=1;
 	beetle.greensocs.com;
 	none
@@ -99,165 +100,142 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Add a function resettable_change_parent() to do the required
-plumbing when changing the parent a of Resettable object.
+In qdev_set_parent_bus(), when changing the parent bus of a
+realized device, if the source and destination buses are not in the
+same reset state, some adaptation are required. This patch adds
+needed call to resettable_change_parent() to make sure a device reset
+state stays coherent with its parent bus.
 
-We need to make sure that the reset state of the object remains
-coherent with the reset state of the new parent.
+The addition is a no-op if:
+1. the device being parented is not realized.
+2. the device is realized, but both buses are not under reset.
 
-We make the 2 following hypothesis:
-+ when an object is put in a parent under reset, the object goes in
+Case 2 means that as long as qdev_set_parent_bus() is called
+during the machine realization procedure (which is before the
+machine reset so nothing is in reset), it is a no op.
+
+There are 49 call sites of qdev_set_parent_bus(). All but one fall
+into the no-op case:
++ 28 calls related to virtio (in hw/{s390x,display,virtio}/
+  {vhost,virtio}-xxx.c) to set a _vdev_/_vgpu_ composing device
+  parent bus just before realizing the _vdev_/_vgpu_.
++ hw/qdev.c: when creating a device in qdev_try_create()
++ hw/sysbus.c: when initializing a device in the sysbus
++ hw/display/virtio-gpu-pci.c: before realizing VirtIOGPUPCIBase/vgpu
++ hw/display/virtio-vga.c: before realizing VirtIOVGABase/vgpu
++ hw/i386/amd_iommu.c: before realizing AMDVIState/pci
++ hw/misc/auxbus.c: when creating an AUXBus
++ hw/misc/auxbus.c: when creating an AUXBus child
++ hw/misc/macio/macio.c: when initializing a MACIOState child
++ hw/misc/macio/macio.c: before realizing NewWorldMacIOState/pmu
++ hw/misc/macio/macio.c: before realizing NewWorldMacIOState/cuda
++ hw/pci-host/designware.c: before realizing DesignwarePCIEHost/root
++ hw/pci-host/gpex.c: before realizing GPEXHost/root
++ hw/pci-host/prep.c: when initializaing PREPPCIState/pci_dev
++ hw/pci-host/q35.c: before realizing Q35PCIHost/mch
++ hw/pci-host/versatile.c: when initializing PCIVPBState/pci_dev
++ hw/pci-host/xilinx-pcie.c: before realizing XilinxPCIEHost/root
++ hw/s390x/event-facility.c: when creating SCLPEventFacility/
+                             TYPE_SCLP_QUIESCE
++ hw/s390x/event-facility.c: ditto with SCLPEventFacility/
+                             TYPE_SCLP_CPU_HOTPLUG
++ hw/s390x/sclp.c: Not trivial because it is called on a SLCPDevice
+  just after realizing it. Ok because at this point the destination
+  bus (sysbus) is not in reset; the realize step is before the
+  machine reset.
++ hw/sd/core.c: Not OK. Used in sdbus_reparent_card(). See below.
++ hw/ssi/ssi.c: Used to put spi slave on spi bus and connect the cs
+  line in ssi_auto_connect_slave(). Ok because this function is only
+  used in realize step in hw/ssi/aspeed_smc.ci, hw/ssi/imx_spi.c,
+  hw/ssi/mss-spi.c, hw/ssi/xilinx_spi.c and hw/ssi/xilinx_spips.c.
++ hw/xen/xen-legacy-backend.c: when creating a XenLegacyDevice device
++ qdev-monitor.c: in device hotplug creation procedure before realize
+
+Note that this commit alone will have no effect, right now there is no
+use of resettable API to reset anything. So a bus will never be tagged
+as in-reset by this same API.
+
+The one place where side-effect will occurs is in hw/sd/core.c in
+sdbus_reparent_card(). This function is only used in the raspi machines,
+including during the sysbus reset procedure. This case will be fixed by
+a following commit before globally enabling resettable API for sysbus
 reset.
-+ when an object is removed from a parent under reset, the object
-leaves reset.
-
-The added function avoid any glitch if both old and new parent are
-already in reset.
 
 Signed-off-by: Damien Hedde <damien.hedde@greensocs.com>
 ---
- hw/core/resettable.c    | 54 +++++++++++++++++++++++++++++++++++++++++
- hw/core/trace-events    |  1 +
- include/hw/resettable.h | 16 ++++++++++++
- 3 files changed, 71 insertions(+)
 
-diff --git a/hw/core/resettable.c b/hw/core/resettable.c
-index c5e11cff4f..60d4285fcc 100644
---- a/hw/core/resettable.c
-+++ b/hw/core/resettable.c
-@@ -32,6 +32,14 @@ static void resettable_phase_exit(Object *obj, void *o=
-paque, ResetType type);
-  */
- static bool enter_phase_in_progress;
+Exhaustive list of the 28 virtio caller to qdev_set_parent_bus():
++ hw/display/virtio-gpu-pci.c     -> VirtIOGPUPCIBase/vgpu realize
++ hw/display_virtio-vga.c         -> VirtIOVGABase/vgpu realize
++ hw/s390x/vhost-vsock-ccw.c      -> VHostVSockCCWState/vdev realize
++ hw/s390x/virtio-ccw-9p.c        -> V9fsCCWState/vdev realize
++ hw/s390x/virtio-ccw-balloon.c   -> VirtIOBalloonCcw/vdev realize
++ hw/s390x/virtio-ccw-blk.c       -> VirtIOBlkCcw/vdev realize
++ hw/s390x/virtio-ccw-crypto.c    -> VirtIOCryptoCcw/vdev realize
++ hw/s390x/virtio-ccw-gpu.c       -> VirtIOGPUCcw/vdev realize
++ hw/s390x/virtio-ccw-input.c     -> VirtIOInputCcw/vdev realize
++ hw/s390x/virtio-ccw-net.c       -> VirtIONetCcw/vdev realize
++ hw/s390x/virtio-ccw-rng.c       -> VirtIORNGCcw/vdev realize
++ hw/s390x/virtio-ccw-scsi.c      -> VirtIOSCSICcw/vdev realize
++ hw/s390x/virtio-ccw-scsi.c      -> VHostSCSICcw/vdev realize
++ hw/s390x/virtio-ccw-serial.c    -> VirtioSerialCcw/vdev realize
++ hw/virtio/vhost-scsi-pci.c      -> VHostSCSIPCI/vdev realize
++ hw/virtio/vhost-user-blk-pci.c  -> VHostUserBlkPCI/vdev realize
++ hw/virtio/vhost-user-scsi-pci.c -> VHostUserSCSIPCI/vdev realize
++ hw/virtio/vhost-vsock-pci.c     -> VHostVSockPCI/vdev realize
++ hw/virtio/virtio-9p-pci.c       -> V9fsPCIState/vdev realize
++ hw/virtio/virtio-balloon-pci.c  -> VirtIOBalloonPCI/vdev realize
++ hw/virtio/virtio-blk-pci.c      -> VirtIOBlkPCI/vdev realize
++ hw/virtio/virtio-crypto-pci.c   -> VirtIOCryptoPCI/vdev realize
++ hw/virtio/virtio-input-pci.c    -> VirtIOInputPCI/vdev realize
++ hw/virtio/virtio-net-pci.c      -> VirtIONetPCI/vdev realize
++ hw/virtio/virtio-pmem-pci.c     -> VirtIOPMEMPCI/vdev realize
++ hw/virtio/virtio-rng-pci.c      -> VirtIORngPCI/vdev realize
++ hw/virtio/virtio-scsi-pci.c     -> VirtIOSCSIPCI/vdev realize
++ hw/virtio/virtio-serial-pci.c   -> VirtIOSerialPCI/vdev realize
+---
+ hw/core/qdev.c | 14 ++++++++++----
+ 1 file changed, 10 insertions(+), 4 deletions(-)
+
+diff --git a/hw/core/qdev.c b/hw/core/qdev.c
+index 81784c73fb..3933f62d0c 100644
+--- a/hw/core/qdev.c
++++ b/hw/core/qdev.c
+@@ -96,23 +96,29 @@ static void bus_add_child(BusState *bus, DeviceState =
+*child)
 =20
-+/**
-+ * exit_phase_in_progress:
-+ * Flag telling whether we are currently in an enter phase where side
-+ * effects are forbidden. This flag allows us to catch if
-+ * resettable_change_parent() is called during exit phase.
-+ */
-+static unsigned exit_phase_in_progress;
-+
- void resettable_reset(Object *obj, ResetType type)
+ void qdev_set_parent_bus(DeviceState *dev, BusState *bus)
  {
-     trace_resettable_reset(obj, type);
-@@ -58,7 +66,9 @@ void resettable_release_reset(Object *obj, ResetType ty=
-pe)
-     /* TODO: change that assert when adding support for other reset type=
-s */
-     assert(type =3D=3D RESET_TYPE_COLD);
-     trace_resettable_reset_release_begin(obj, type);
-+    exit_phase_in_progress +=3D 1;
-     resettable_phase_exit(obj, NULL, type);
-+    exit_phase_in_progress -=3D 1;
-     trace_resettable_reset_release_end(obj);
+-    bool replugging =3D dev->parent_bus !=3D NULL;
++    BusState *old_parent_bus =3D dev->parent_bus;
+=20
+-    if (replugging) {
++    if (old_parent_bus) {
+         trace_qdev_update_parent_bus(dev, dev->parent_bus, bus);
+         /*
+          * Keep a reference to the device while it's not plugged into
+          * any bus, to avoid it potentially evaporating when it is
+          * dereffed in bus_remove_child().
++         * Also keep the ref of the parent bus until the end, so that
++         * we can safely call resettable_change_parent() below.
+          */
+         object_ref(OBJECT(dev));
+         bus_remove_child(dev->parent_bus, dev);
+-        object_unref(OBJECT(dev->parent_bus));
+     }
+     dev->parent_bus =3D bus;
+     object_ref(OBJECT(bus));
+     bus_add_child(bus, dev);
+-    if (replugging) {
++    if (dev->realized) {
++        resettable_change_parent(OBJECT(dev), OBJECT(bus),
++                                 OBJECT(old_parent_bus));
++    }
++    if (old_parent_bus) {
++        object_unref(OBJECT(old_parent_bus));
+         object_unref(OBJECT(dev));
+     }
  }
-=20
-@@ -198,6 +208,50 @@ static void resettable_phase_exit(Object *obj, void =
-*opaque, ResetType type)
-     trace_resettable_phase_exit_end(obj, obj_typename, s->count);
- }
-=20
-+/*
-+ * resettable_get_count:
-+ * Get the count of the Resettable object @obj. Return 0 if @obj is NULL=
-.
-+ */
-+static uint32_t resettable_get_count(Object *obj)
-+{
-+    if (obj) {
-+        ResettableClass *rc =3D RESETTABLE_GET_CLASS(obj);
-+        return rc->get_state(obj)->count;
-+    }
-+    return 0;
-+}
-+
-+void resettable_change_parent(Object *obj, Object *newp, Object *oldp)
-+{
-+    ResettableClass *rc =3D RESETTABLE_GET_CLASS(obj);
-+    ResettableState *s =3D rc->get_state(obj);
-+    uint32_t newp_count =3D resettable_get_count(newp);
-+    uint32_t oldp_count =3D resettable_get_count(oldp);
-+
-+    assert(!enter_phase_in_progress && !exit_phase_in_progress);
-+    trace_resettable_change_parent(obj, oldp, oldp_count, newp, newp_cou=
-nt);
-+
-+    /*
-+     * At most one of the two 'for' loop will be executed below
-+     * in order to cope with the diff between the two count.
-+     */
-+    /* if newp is more reset than oldp */
-+    for (uint32_t i =3D oldp_count; i < newp_count; i++) {
-+        resettable_assert_reset(obj, RESET_TYPE_COLD);
-+    }
-+    /*
-+     * if obj is leaving a bus under reset, we need to ensure
-+     * hold phase is not pending.
-+     */
-+    if (oldp_count && s->hold_phase_pending) {
-+        resettable_phase_hold(obj, NULL, RESET_TYPE_COLD);
-+    }
-+    /* if oldp is more reset than newp */
-+    for (uint32_t i =3D newp_count; i < oldp_count; i++) {
-+        resettable_release_reset(obj, RESET_TYPE_COLD);
-+    }
-+}
-+
- void resettable_class_set_parent_phases(ResettableClass *rc,
-                                         ResettableEnterPhase enter,
-                                         ResettableHoldPhase hold,
-diff --git a/hw/core/trace-events b/hw/core/trace-events
-index 66081d0fb4..6d03ef7ff9 100644
---- a/hw/core/trace-events
-+++ b/hw/core/trace-events
-@@ -16,6 +16,7 @@ resettable_reset_assert_begin(void *obj, int cold) "obj=
-=3D%p cold=3D%d"
- resettable_reset_assert_end(void *obj) "obj=3D%p"
- resettable_reset_release_begin(void *obj, int cold) "obj=3D%p cold=3D%d"
- resettable_reset_release_end(void *obj) "obj=3D%p"
-+resettable_change_parent(void *obj, void *o, uint32_t oc, void *n, uint3=
-2_t nc) "obj=3D%p from=3D%p(%" PRIu32 ") to=3D%p(%" PRIu32 ")"
- resettable_phase_enter_begin(void *obj, const char *objtype, uint32_t co=
-unt, int type) "obj=3D%p(%s) count=3D%" PRIu32 " type=3D%d"
- resettable_phase_enter_exec(void *obj, const char *objtype, int type, in=
-t has_method) "obj=3D%p(%s) type=3D%d method=3D%d"
- resettable_phase_enter_end(void *obj, const char *objtype, uint32_t coun=
-t) "obj=3D%p(%s) count=3D%" PRIu32
-diff --git a/include/hw/resettable.h b/include/hw/resettable.h
-index 6b24e1633b..f6d379669f 100644
---- a/include/hw/resettable.h
-+++ b/include/hw/resettable.h
-@@ -182,6 +182,22 @@ void resettable_release_reset(Object *obj, ResetType=
- type);
-  */
- bool resettable_is_in_reset(Object *obj);
-=20
-+/**
-+ * resettable_change_parent:
-+ * Indicate that the parent of Ressettable @obj change from @oldp to @ne=
-wp.
-+ * All 3 objects must implements resettable interface. @oldp or @newp ma=
-y be
-+ * NULL.
-+ *
-+ * This function will adapt the reset state of @obj so that it is cohere=
-nt
-+ * with the reset state of @newp. It may trigger @resettable_assert_rese=
-t()
-+ * or @resettable_release_reset(). It will do such things only if the re=
-set
-+ * state of @newp and @oldp are different.
-+ *
-+ * When using this function during reset, it must only be called during
-+ * an hold phase method. Calling this during enter or exit phase is an e=
-rror.
-+ */
-+void resettable_change_parent(Object *obj, Object *newp, Object *oldp);
-+
- /**
-  * resettable_class_set_parent_phases:
-  *
 --=20
 2.23.0
 
