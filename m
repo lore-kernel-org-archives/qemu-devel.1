@@ -6,53 +6,53 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CDB40CA9EA0
-	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 20:22:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B1E97CA9EA0
+	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 20:23:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9F91B2082C
-	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 20:22:44 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9F91B2082C
+	by mail.kernel.org (Postfix) with ESMTPS id 834912082C
+	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 20:23:58 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 834912082C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45754 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45772 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iLYln-0007at-Pz
-	for qemu-devel@archiver.kernel.org; Fri, 18 Oct 2019 16:22:43 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48045)
+	id 1iLYmz-0001AI-BL
+	for qemu-devel@archiver.kernel.org; Fri, 18 Oct 2019 16:23:57 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48214)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jfreimann@redhat.com>) id 1iLYkB-0005cX-1L
- for qemu-devel@nongnu.org; Fri, 18 Oct 2019 16:21:04 -0400
+ (envelope-from <jfreimann@redhat.com>) id 1iLYlA-00076i-Pp
+ for qemu-devel@nongnu.org; Fri, 18 Oct 2019 16:22:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jfreimann@redhat.com>) id 1iLYk9-0005bS-G4
- for qemu-devel@nongnu.org; Fri, 18 Oct 2019 16:21:02 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43040)
+ (envelope-from <jfreimann@redhat.com>) id 1iLYl8-0005ue-Qg
+ for qemu-devel@nongnu.org; Fri, 18 Oct 2019 16:22:04 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55944)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <jfreimann@redhat.com>)
- id 1iLYk9-0005aq-7n
- for qemu-devel@nongnu.org; Fri, 18 Oct 2019 16:21:01 -0400
+ id 1iLYl8-0005uR-6L
+ for qemu-devel@nongnu.org; Fri, 18 Oct 2019 16:22:02 -0400
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
  [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 7A55A30842A9;
- Fri, 18 Oct 2019 20:21:00 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 6A70B307C650;
+ Fri, 18 Oct 2019 20:22:01 +0000 (UTC)
 Received: from localhost (ovpn-116-92.ams2.redhat.com [10.36.116.92])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 0C16A5D70E;
- Fri, 18 Oct 2019 20:20:52 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id C7CCE5D70E;
+ Fri, 18 Oct 2019 20:21:53 +0000 (UTC)
 From: Jens Freimann <jfreimann@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 01/11] qdev/qbus: add hidden device support
-Date: Fri, 18 Oct 2019 22:20:30 +0200
-Message-Id: <20191018202040.30349-2-jfreimann@redhat.com>
+Subject: [PATCH 08/11] migration: add new migration state wait-unplug
+Date: Fri, 18 Oct 2019 22:20:37 +0200
+Message-Id: <20191018202040.30349-9-jfreimann@redhat.com>
 In-Reply-To: <20191018202040.30349-1-jfreimann@redhat.com>
 References: <20191018202040.30349-1-jfreimann@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.40]); Fri, 18 Oct 2019 20:21:00 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.42]); Fri, 18 Oct 2019 20:22:01 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
@@ -76,199 +76,217 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This adds support for hiding a device to the qbus and qdev APIs.  The
-first user of this will be the virtio-net failover feature but the API
-introduced with this patch could be used to implement other features as
-well, for example hiding pci devices when a pci bus is powered off.
+This patch adds a new migration state called wait-unplug.  It is entered
+after the SETUP state if failover devices are present. It will transition
+into ACTIVE once all devices were succesfully unplugged from the guest.
 
-qdev_device_add() is modified to check for a net_failover_pair_id
-argument in the option string. A DeviceListener callback
-should_be_hidden() is added. It can be used by a standby device to
-inform qdev that this device should not be added now. The standby device
-handler can store the device options to plug the device in at a later
-point in time.
+So if a guest doesn't respond or takes long to honor the unplug request
+the user will see the migration state 'wait-unplug'.
 
-One reason for hiding the device is that we don't want to expose both
-devices to the guest kernel until the respective virtio feature bit
-VIRTIO_NET_F_STANDBY was negotiated and we know that the devices will be
-handled correctly by the guest.
-
-More information on the kernel feature this is using:
- https://www.kernel.org/doc/html/latest/networking/net_failover.html
-
-An example where the primary device is a vfio-pci device and the standby
-device is a virtio-net device:
-
-A device is hidden when it has an "net_failover_pair_id" option, e.g.
-
- -device virtio-net-pci,...,failover=3Don,...
- -device vfio-pci,...,net_failover_pair_id=3Dnet1,...
+In the migration thread we query failover devices if they're are still
+pending the guest unplug. When all are unplugged the migration
+continues. If one device won't unplug migration will stay in wait_unplug
+state.
 
 Signed-off-by: Jens Freimann <jfreimann@redhat.com>
 ---
- hw/core/qdev.c         | 23 +++++++++++++++++++++++
- include/hw/qdev-core.h |  8 ++++++++
- qdev-monitor.c         | 36 +++++++++++++++++++++++++++++++++---
- vl.c                   |  6 ++++--
- 4 files changed, 68 insertions(+), 5 deletions(-)
+ include/migration/vmstate.h |  2 ++
+ migration/migration.c       | 21 +++++++++++++++++++++
+ migration/migration.h       |  3 +++
+ migration/savevm.c          | 36 ++++++++++++++++++++++++++++++++++++
+ migration/savevm.h          |  2 ++
+ qapi/migration.json         |  5 ++++-
+ 6 files changed, 68 insertions(+), 1 deletion(-)
 
-diff --git a/hw/core/qdev.c b/hw/core/qdev.c
-index cbad6c1d55..89c134ec53 100644
---- a/hw/core/qdev.c
-+++ b/hw/core/qdev.c
-@@ -212,6 +212,29 @@ void device_listener_unregister(DeviceListener *list=
-ener)
-     QTAILQ_REMOVE(&device_listeners, listener, link);
- }
-=20
-+bool qdev_should_hide_device(QemuOpts *opts)
-+{
-+    int rc;
-+    DeviceListener *listener;
+diff --git a/include/migration/vmstate.h b/include/migration/vmstate.h
+index b9ee563aa4..ac4f46a67d 100644
+--- a/include/migration/vmstate.h
++++ b/include/migration/vmstate.h
+@@ -186,6 +186,8 @@ struct VMStateDescription {
+     int (*pre_save)(void *opaque);
+     int (*post_save)(void *opaque);
+     bool (*needed)(void *opaque);
++    bool (*dev_unplug_pending)(void *opaque);
 +
-+    QTAILQ_FOREACH(listener, &device_listeners, link) {
-+       if (listener->should_be_hidden) {
-+            /* should_be_hidden_will return
-+             *  1 if device matches opts and it should be hidden
-+             *  0 if device matches opts and should not be hidden
-+             *  -1 if device doesn't match ops
-+             */
-+            rc =3D listener->should_be_hidden(listener, opts);
-+        }
-+
-+        if (rc > 0) {
-+            break;
-+        }
-+    }
-+
-+    return rc > 0;
-+}
-+
- void qdev_set_legacy_instance_id(DeviceState *dev, int alias_id,
-                                  int required_for_version)
- {
-diff --git a/include/hw/qdev-core.h b/include/hw/qdev-core.h
-index aa123f88cb..28f594a47d 100644
---- a/include/hw/qdev-core.h
-+++ b/include/hw/qdev-core.h
-@@ -154,6 +154,12 @@ struct DeviceState {
- struct DeviceListener {
-     void (*realize)(DeviceListener *listener, DeviceState *dev);
-     void (*unrealize)(DeviceListener *listener, DeviceState *dev);
-+    /*
-+     * This callback is called upon init of the DeviceState and allows t=
-o
-+     * inform qdev that a device should be hidden, depending on the devi=
-ce
-+     * opts, for example, to hide a standby device.
-+     */
-+    int (*should_be_hidden)(DeviceListener *listener, QemuOpts *device_o=
-pts);
-     QTAILQ_ENTRY(DeviceListener) link;
+     const VMStateField *fields;
+     const VMStateDescription **subsections;
  };
+diff --git a/migration/migration.c b/migration/migration.c
+index 3febd0f8f3..51764f2565 100644
+--- a/migration/migration.c
++++ b/migration/migration.c
+@@ -52,6 +52,7 @@
+ #include "hw/qdev-properties.h"
+ #include "monitor/monitor.h"
+ #include "net/announce.h"
++#include "qemu/queue.h"
 =20
-@@ -451,4 +457,6 @@ static inline bool qbus_is_hotpluggable(BusState *bus=
-)
- void device_listener_register(DeviceListener *listener);
- void device_listener_unregister(DeviceListener *listener);
+ #define MAX_THROTTLE  (32 << 20)      /* Migration transfer speed thrott=
+ling */
 =20
-+bool qdev_should_hide_device(QemuOpts *opts);
+@@ -819,6 +820,7 @@ bool migration_is_setup_or_active(int state)
+     case MIGRATION_STATUS_SETUP:
+     case MIGRATION_STATUS_PRE_SWITCHOVER:
+     case MIGRATION_STATUS_DEVICE:
++    case MIGRATION_STATUS_WAIT_UNPLUG:
+         return true;
+=20
+     default:
+@@ -954,6 +956,9 @@ static void fill_source_migration_info(MigrationInfo =
+*info)
+     case MIGRATION_STATUS_CANCELLED:
+         info->has_status =3D true;
+         break;
++    case MIGRATION_STATUS_WAIT_UNPLUG:
++        info->has_status =3D true;
++        break;
+     }
+     info->status =3D s->state;
+ }
+@@ -1694,6 +1699,7 @@ bool migration_is_idle(void)
+     case MIGRATION_STATUS_COLO:
+     case MIGRATION_STATUS_PRE_SWITCHOVER:
+     case MIGRATION_STATUS_DEVICE:
++    case MIGRATION_STATUS_WAIT_UNPLUG:
+         return false;
+     case MIGRATION_STATUS__MAX:
+         g_assert_not_reached();
+@@ -3264,6 +3270,19 @@ static void *migration_thread(void *opaque)
+=20
+     qemu_savevm_state_setup(s->to_dst_file);
+=20
++    if (qemu_savevm_nr_failover_devices()) {
++        migrate_set_state(&s->state, MIGRATION_STATUS_SETUP,
++                          MIGRATION_STATUS_WAIT_UNPLUG);
 +
- #endif
-diff --git a/qdev-monitor.c b/qdev-monitor.c
-index 148df9cacf..508d85df87 100644
---- a/qdev-monitor.c
-+++ b/qdev-monitor.c
-@@ -32,9 +32,11 @@
- #include "qemu/help_option.h"
- #include "qemu/option.h"
- #include "qemu/qemu-print.h"
-+#include "qemu/option_int.h"
- #include "sysemu/block-backend.h"
- #include "sysemu/sysemu.h"
- #include "migration/misc.h"
-+#include "migration/migration.h"
++        while (s->state =3D=3D MIGRATION_STATUS_WAIT_UNPLUG &&
++                !qemu_savevm_state_guest_unplug_pending()) {
++            qemu_sem_timedwait(&s->wait_unplug_sem, 250);
++        }
++
++        migrate_set_state(&s->state, MIGRATION_STATUS_WAIT_UNPLUG,
++                MIGRATION_STATUS_ACTIVE);
++    }
++
+     s->setup_time =3D qemu_clock_get_ms(QEMU_CLOCK_HOST) - setup_start;
+     migrate_set_state(&s->state, MIGRATION_STATUS_SETUP,
+                       MIGRATION_STATUS_ACTIVE);
+@@ -3511,6 +3530,7 @@ static void migration_instance_finalize(Object *obj=
+)
+     qemu_mutex_destroy(&ms->qemu_file_lock);
+     g_free(params->tls_hostname);
+     g_free(params->tls_creds);
++    qemu_sem_destroy(&ms->wait_unplug_sem);
+     qemu_sem_destroy(&ms->rate_limit_sem);
+     qemu_sem_destroy(&ms->pause_sem);
+     qemu_sem_destroy(&ms->postcopy_pause_sem);
+@@ -3556,6 +3576,7 @@ static void migration_instance_init(Object *obj)
+     qemu_sem_init(&ms->postcopy_pause_rp_sem, 0);
+     qemu_sem_init(&ms->rp_state.rp_sem, 0);
+     qemu_sem_init(&ms->rate_limit_sem, 0);
++    qemu_sem_init(&ms->wait_unplug_sem, 0);
+     qemu_mutex_init(&ms->qemu_file_lock);
+ }
 =20
- /*
-  * Aliases were a bad idea from the start.  Let's keep them
-@@ -562,14 +564,40 @@ void qdev_set_id(DeviceState *dev, const char *id)
+diff --git a/migration/migration.h b/migration/migration.h
+index 4f2fe193dc..79b3dda146 100644
+--- a/migration/migration.h
++++ b/migration/migration.h
+@@ -206,6 +206,9 @@ struct MigrationState
+     /* Flag set once the migration thread called bdrv_inactivate_all */
+     bool block_inactive;
+=20
++    /* Migration is waiting for guest to unplug device */
++    QemuSemaphore wait_unplug_sem;
++
+     /* Migration is paused due to pause-before-switchover */
+     QemuSemaphore pause_sem;
+=20
+diff --git a/migration/savevm.c b/migration/savevm.c
+index 8d95e261f6..0f18dea49e 100644
+--- a/migration/savevm.c
++++ b/migration/savevm.c
+@@ -1113,6 +1113,42 @@ void qemu_savevm_state_header(QEMUFile *f)
      }
  }
 =20
-+static int is_failover_device(void *opaque, const char *name, const char=
- *value,
-+                        Error **errp)
++int qemu_savevm_nr_failover_devices(void)
 +{
-+    if (strcmp(name, "net_failover_pair_id") =3D=3D 0) {
-+        QemuOpts *opts =3D (QemuOpts *)opaque;
++    SaveStateEntry *se;
++    int n =3D 0;
 +
-+        if (qdev_should_hide_device(opts)) {
-+            return 1;
++    QTAILQ_FOREACH(se, &savevm_state.handlers, entry) {
++        if (se->vmsd && se->vmsd->dev_unplug_pending) {
++            n++;
 +        }
 +    }
 +
-+    return 0;
++    return n;
 +}
 +
-+static bool should_hide_device(QemuOpts *opts)
++bool qemu_savevm_state_guest_unplug_pending(void)
 +{
-+    if (qemu_opt_foreach(opts, is_failover_device, opts, NULL) =3D=3D 0)=
- {
-+        return false;
++    int nr_failover_devs;
++    SaveStateEntry *se;
++    bool ret =3D false;
++    int n =3D 0;
++
++    nr_failover_devs =3D qemu_savevm_nr_failover_devices();
++
++    QTAILQ_FOREACH(se, &savevm_state.handlers, entry) {
++        if (!se->vmsd || !se->vmsd->dev_unplug_pending) {
++            continue;
++        }
++        ret =3D se->vmsd->dev_unplug_pending(se->opaque);
++        if (!ret) {
++            n++;
++        }
 +    }
-+    return true;
++
++    return n =3D=3D nr_failover_devs;
 +}
 +
- DeviceState *qdev_device_add(QemuOpts *opts, Error **errp)
+ void qemu_savevm_state_setup(QEMUFile *f)
  {
-     DeviceClass *dc;
-     const char *driver, *path;
--    DeviceState *dev;
-+    DeviceState *dev =3D NULL;
-     BusState *bus =3D NULL;
-     Error *err =3D NULL;
+     SaveStateEntry *se;
+diff --git a/migration/savevm.h b/migration/savevm.h
+index 51a4b9caa8..c42b9c80ee 100644
+--- a/migration/savevm.h
++++ b/migration/savevm.h
+@@ -31,6 +31,8 @@
 =20
-+    if (opts && should_hide_device(opts)) {
-+        return NULL;
-+    }
-+
-     driver =3D qemu_opt_get(opts, "driver");
-     if (!driver) {
-         error_setg(errp, QERR_MISSING_PARAMETER, "driver");
-@@ -648,8 +676,10 @@ DeviceState *qdev_device_add(QemuOpts *opts, Error *=
-*errp)
+ bool qemu_savevm_state_blocked(Error **errp);
+ void qemu_savevm_state_setup(QEMUFile *f);
++int qemu_savevm_nr_failover_devices(void);
++bool qemu_savevm_state_guest_unplug_pending(void);
+ int qemu_savevm_state_resume_prepare(MigrationState *s);
+ void qemu_savevm_state_header(QEMUFile *f);
+ int qemu_savevm_state_iterate(QEMUFile *f, bool postcopy);
+diff --git a/qapi/migration.json b/qapi/migration.json
+index 52e69e2868..5a06cd489f 100644
+--- a/qapi/migration.json
++++ b/qapi/migration.json
+@@ -133,6 +133,9 @@
+ # @device: During device serialisation when pause-before-switchover is e=
+nabled
+ #        (since 2.11)
+ #
++# @wait-unplug: wait for device unplug request by guest OS to be complet=
+ed.
++#               (since 4.2)
++#
+ # Since: 2.3
+ #
+ ##
+@@ -140,7 +143,7 @@
+   'data': [ 'none', 'setup', 'cancelling', 'cancelled',
+             'active', 'postcopy-active', 'postcopy-paused',
+             'postcopy-recover', 'completed', 'failed', 'colo',
+-            'pre-switchover', 'device' ] }
++            'pre-switchover', 'device', 'wait-unplug' ] }
 =20
- err_del_dev:
-     error_propagate(errp, err);
--    object_unparent(OBJECT(dev));
--    object_unref(OBJECT(dev));
-+    if (dev) {
-+        object_unparent(OBJECT(dev));
-+        object_unref(OBJECT(dev));
-+    }
-     return NULL;
- }
-=20
-diff --git a/vl.c b/vl.c
-index 4489cfb2bb..62c388cb49 100644
---- a/vl.c
-+++ b/vl.c
-@@ -2204,10 +2204,12 @@ static int device_init_func(void *opaque, QemuOpt=
-s *opts, Error **errp)
-     DeviceState *dev;
-=20
-     dev =3D qdev_device_add(opts, errp);
--    if (!dev) {
-+    if (!dev && *errp) {
-+        error_report_err(*errp);
-         return -1;
-+    } else if (dev) {
-+        object_unref(OBJECT(dev));
-     }
--    object_unref(OBJECT(dev));
-     return 0;
- }
-=20
+ ##
+ # @MigrationInfo:
 --=20
 2.21.0
 
