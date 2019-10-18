@@ -7,72 +7,72 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0F130CA9EA0
-	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 15:23:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 25099CA9EA9
+	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 15:23:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BCA2C222C3
-	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 15:23:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E6A94222C3
+	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 15:23:57 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=greensocs.com header.i=@greensocs.com header.b="OztOSSu1"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BCA2C222C3
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=greensocs.com header.i=@greensocs.com header.b="K+BEr3S4"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E6A94222C3
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=greensocs.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41730 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41732 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iLU6d-0001rL-L2
-	for qemu-devel@archiver.kernel.org; Fri, 18 Oct 2019 11:23:55 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39174)
+	id 1iLU6e-0001ts-WF
+	for qemu-devel@archiver.kernel.org; Fri, 18 Oct 2019 11:23:57 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39187)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <damien.hedde@greensocs.com>) id 1iLTrE-0006mx-7B
- for qemu-devel@nongnu.org; Fri, 18 Oct 2019 11:08:02 -0400
+ (envelope-from <damien.hedde@greensocs.com>) id 1iLTrE-0006nY-MT
+ for qemu-devel@nongnu.org; Fri, 18 Oct 2019 11:08:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <damien.hedde@greensocs.com>) id 1iLTrC-0000Iv-2g
+ (envelope-from <damien.hedde@greensocs.com>) id 1iLTrD-0000Ju-4R
  for qemu-devel@nongnu.org; Fri, 18 Oct 2019 11:08:00 -0400
-Received: from beetle.greensocs.com ([5.135.226.135]:38668)
+Received: from beetle.greensocs.com ([5.135.226.135]:38718)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <damien.hedde@greensocs.com>)
- id 1iLTr6-0000CX-Dg; Fri, 18 Oct 2019 11:07:52 -0400
+ id 1iLTr9-0000G7-4u; Fri, 18 Oct 2019 11:07:55 -0400
 Received: from crumble.bar.greensocs.com (crumble.bar.greensocs.com
  [172.16.11.102])
- by beetle.greensocs.com (Postfix) with ESMTPS id E71D596F52;
- Fri, 18 Oct 2019 15:07:50 +0000 (UTC)
+ by beetle.greensocs.com (Postfix) with ESMTPS id 99A8E96F57;
+ Fri, 18 Oct 2019 15:07:53 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=greensocs.com;
- s=mail; t=1571411271;
+ s=mail; t=1571411274;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=DrJX7O1hycYGcVhsAI3l8UAbeaCqX5CMwVucNEK0BOg=;
- b=OztOSSu1S3c7vtDE3sUiJzx7+0f48/wWSvIhoqdOKRuvOmqfxNHMpmNuKCQ8PYWXo0bYcW
- eJynRO9uyZ1Ea41qvkrVB35JIKp0nBsqTu9ZmgVUI4+odDDA5k9P96Ohje5ElcqER7ErII
- YiM5xxxFsktIf5HzqRwKv0rk/t69nGU=
+ bh=RqBxcWOE3GUk9NOvDWwY7MRG2couRRZlrwQCMsx9cb8=;
+ b=K+BEr3S4fPz3+bqUh8rvo/LlgeBgDXJWbAL2F34zlmCe/tfuU70xY46CfbwiHCYR526AQW
+ X8WpjL/Nhp2Na70OQCniAfLMIn0t0mlf0Y7wCFlN/nzkrvVS+nUAOQatXOgfeW1G88IHQz
+ n5GqnSgHfirY0ckPaf7LMpImztCueoY=
 From: Damien Hedde <damien.hedde@greensocs.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v5 04/13] hw/core: add Resettable support to BusClass and
- DeviceClass
-Date: Fri, 18 Oct 2019 17:06:21 +0200
-Message-Id: <20191018150630.31099-5-damien.hedde@greensocs.com>
+Subject: [PATCH v5 08/13] hw/core: deprecate old reset functions and introduce
+ new ones
+Date: Fri, 18 Oct 2019 17:06:25 +0200
+Message-Id: <20191018150630.31099-9-damien.hedde@greensocs.com>
 X-Mailer: git-send-email 2.23.0
 In-Reply-To: <20191018150630.31099-1-damien.hedde@greensocs.com>
 References: <20191018150630.31099-1-damien.hedde@greensocs.com>
 MIME-Version: 1.0
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=greensocs.com; 
- s=mail; t=1571411271;
+ s=mail; t=1571411274;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=DrJX7O1hycYGcVhsAI3l8UAbeaCqX5CMwVucNEK0BOg=;
- b=t01CQPwAdb0FS6Z3cHmrrQKreke9fUsZAGFTyPhngjH1tPkJd2zCPLiymE1k5kTzeYKzrd
- 7r+TOM+JpCG6hckdazjX+rfj3z1UBIydQWhkUGDO+X64nsB+pYKAkwPC6ePiF/7/A05ym7
- kIuiqgVkNd6OW7mgGFOwuCayJHKAAIE=
-ARC-Seal: i=1; s=mail; d=greensocs.com; t=1571411271; a=rsa-sha256; cv=none;
- b=lD8g60Pg5L2ZU6s5ve7iiBzs39r6MdABnwcJqbduHBmdQwBNm/A6PdsDOMGNp0LINtSyLL
- O8heAsvO1XH/8ev6wb6IAgA97r7SL31cgYtD9yjJx9wQzflWdfeEXIUw891MQj7s8H+5WA
- ZfbMyFpWGhyU2d9bylkgw1JJ3lBPXEQ=
+ bh=RqBxcWOE3GUk9NOvDWwY7MRG2couRRZlrwQCMsx9cb8=;
+ b=Y3rATdAWJGXlgMiQg6iq0xdgiAsrgs/zyRhnX1e/XFoqFzjPIU/tCRUUDh03ox4nu7l0r/
+ jOUcfnFqEf0pfquEOu94y0wwkPYNYmu4WTNQaCLZWb2q8qswzRzxqlvXAcV1PpA18g3cIX
+ jksywxxs5VfW8OE26roXqJbhW57RYMk=
+ARC-Seal: i=1; s=mail; d=greensocs.com; t=1571411274; a=rsa-sha256; cv=none;
+ b=VFXiwxs2wZt0y1qBLHG37/xc2o0HrHCMhFU3jE9NMo8IDB/kJaLShZniac8usop1xwSkBo
+ zj+eIw8mGH1bLkmMgehjPEJ7v1XUB7Cyg/oC686my9pQnTOI5nDlq4+j9gZCXWZ40vYb9R
+ R+rp3leK4H+t1LLe06LYjxOg4v/ty0I=
 ARC-Authentication-Results: i=1;
 	beetle.greensocs.com;
 	none
@@ -100,414 +100,182 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This commit adds support of Resettable interface to buses and devices:
-+ ResettableState structure is added in the Bus/Device state
-+ Resettable methods are implemented.
-+ device/bus_is_in_reset function defined
+Deprecate device_legacy_reset(), qdev_reset_all() and
+qbus_reset_all() to be replaced by new functions
+device_cold_reset() and bus_cold_reset() which uses resettable API.
 
-This commit allows to transition the objects to the new
-multi-phase interface without changing the reset behavior at all.
-Object single reset method can be split into the 3 different phases
-but the 3 phases are still executed in a row for a given object.
-From the qdev/qbus reset api point of view, nothing is changed.
-qdev_reset_all() and qbus_reset_all() are not modified as well as
-device_legacy_reset().
+Also introduce resettable_cold_reset_fn() which may be used as a
+replacement for qdev_reset_all_fn and qbus_reset_all_fn().
 
-Transition of an object must be done from mother class to daughter
-classes. Care has been taken to allow the transition of a mother class
-without requiring the daughter classes to be transitioned at the same
-time. Note that SysBus and SysBusDevice class do not need any transition
-because they do not override the legacy reset method.
+Following patches will be needed to look at legacy reset call sites
+and switch to resettable api. The legacy functions will be removed
+when unused.
 
 Signed-off-by: Damien Hedde <damien.hedde@greensocs.com>
 ---
- hw/core/bus.c          | 97 ++++++++++++++++++++++++++++++++++++++++++
- hw/core/qdev.c         | 97 ++++++++++++++++++++++++++++++++++++++++++
- include/hw/qdev-core.h | 27 ++++++++++++
- tests/Makefile.include |  1 +
- 4 files changed, 222 insertions(+)
+
+I've removed the general helpers
++ device_reset(DeviceState *dev, ResetType type)
++ bus_reset(BusState *dev, ResetType type)
+because with several reset types, all devices and buses will not
+implement all of them. I think it is preferable to define a
+type-specific helper every time it is needed for base classes
+implementing the reset type (eg a device_pci_reset(PciDev*) for the
+pci reset type if add that).
+
+So device_reset()/bus_reset() symbol names are not taken anymore. I
+don't have a strong opinion of what names should have the
+device_cold_reset() and bus_cold_reset() function added in this
+patch. It could be device/bus_hard_reset() (the current
+qbus_reset_all() comment mention we do a "hard" reset) or simply
+device/bus_reset() or anything else.
+What do you think ? Any better idea ? It should be consistent with
+the reset type name but we can change it also if cold is not what we
+want.
+
+Note that if we don't settle for device/bus_reset(). We can drop
+the first patch that renames device_reset() to device_legacy_reset()
+---
+ hw/core/bus.c           |  5 +++++
+ hw/core/qdev.c          |  5 +++++
+ hw/core/resettable.c    |  5 +++++
+ include/hw/qdev-core.h  | 27 +++++++++++++++++++++++++++
+ include/hw/resettable.h |  9 +++++++++
+ 5 files changed, 51 insertions(+)
 
 diff --git a/hw/core/bus.c b/hw/core/bus.c
-index 7f3d2a3dbd..7c05e80db8 100644
+index 7c05e80db8..5f9e261bb2 100644
 --- a/hw/core/bus.c
 +++ b/hw/core/bus.c
-@@ -68,6 +68,28 @@ int qbus_walk_children(BusState *bus,
+@@ -68,6 +68,11 @@ int qbus_walk_children(BusState *bus,
      return 0;
  }
 =20
-+bool bus_is_in_reset(BusState *bus)
++void bus_cold_reset(BusState *bus)
 +{
-+    return resettable_is_in_reset(OBJECT(bus));
++    resettable_reset(OBJECT(bus), RESET_TYPE_COLD);
 +}
 +
-+static ResettableState *bus_get_reset_state(Object *obj)
-+{
-+    BusState *bus =3D BUS(obj);
-+    return &bus->reset;
-+}
-+
-+static void bus_reset_child_foreach(Object *obj, ResettableChildCallback=
- cb,
-+                                    void *opaque, ResetType type)
-+{
-+    BusState *bus =3D BUS(obj);
-+    BusChild *kid;
-+
-+    QTAILQ_FOREACH(kid, &bus->children, sibling) {
-+        cb(OBJECT(kid->child), opaque, type);
-+    }
-+}
-+
- static void qbus_realize(BusState *bus, DeviceState *parent, const char =
-*name)
+ bool bus_is_in_reset(BusState *bus)
  {
-     const char *typename =3D object_get_typename(OBJECT(bus));
-@@ -199,12 +221,83 @@ static char *default_bus_get_fw_dev_path(DeviceStat=
-e *dev)
-     return g_strdup(object_get_typename(OBJECT(dev)));
- }
-=20
-+/**
-+ * bus_phases_reset:
-+ * Transition reset method for buses to allow moving
-+ * smoothly from legacy reset method to multi-phases
-+ */
-+static void bus_phases_reset(BusState *bus)
-+{
-+    ResettableClass *rc =3D RESETTABLE_GET_CLASS(bus);
-+
-+    if (rc->phases.enter) {
-+        rc->phases.enter(OBJECT(bus), RESET_TYPE_COLD);
-+    }
-+    if (rc->phases.hold) {
-+        rc->phases.hold(OBJECT(bus));
-+    }
-+    if (rc->phases.exit) {
-+        rc->phases.exit(OBJECT(bus));
-+    }
-+}
-+
-+static void bus_transitional_reset(Object *obj)
-+{
-+    BusClass *bc =3D BUS_GET_CLASS(obj);
-+
-+    /*
-+     * This will call either @bus_phases_reset (for multi-phases transit=
-ioned
-+     * buses) or a bus's specific method for not-yet transitioned buses.
-+     * In both case, it does not reset children.
-+     */
-+    if (bc->reset) {
-+        bc->reset(BUS(obj));
-+    }
-+}
-+
-+/**
-+ * bus_get_transitional_reset:
-+ * check if the bus's class is ready for multi-phase
-+ */
-+static ResettableTrFunction bus_get_transitional_reset(Object *obj)
-+{
-+    BusClass *dc =3D BUS_GET_CLASS(obj);
-+    if (dc->reset !=3D bus_phases_reset) {
-+        /*
-+         * dc->reset has been overridden by a subclass,
-+         * the bus is not ready for multi phase yet.
-+         */
-+        return bus_transitional_reset;
-+    }
-+    return NULL;
-+}
-+
- static void bus_class_init(ObjectClass *class, void *data)
- {
-     BusClass *bc =3D BUS_CLASS(class);
-+    ResettableClass *rc =3D RESETTABLE_CLASS(class);
-=20
-     class->unparent =3D bus_unparent;
-     bc->get_fw_dev_path =3D default_bus_get_fw_dev_path;
-+
-+    rc->get_state =3D bus_get_reset_state;
-+    rc->child_foreach =3D bus_reset_child_foreach;
-+
-+    /*
-+     * @bus_phases_reset is put as the default reset method below, allow=
-ing
-+     * to do the multi-phase transition from base classes to leaf classe=
-s. It
-+     * allows a legacy-reset Bus class to extend a multi-phases-reset
-+     * Bus class for the following reason:
-+     * + If a base class B has been moved to multi-phase, then it does n=
-ot
-+     *   override this default reset method and may have defined phase m=
-ethods.
-+     * + A daughter class C (extending class B) which uses
-+     *   bus_class_set_parent_reset() (or similar means) to override the
-+     *   reset method will still work as expected. @bus_phases_reset fun=
-ction
-+     *   will be registered as the parent reset method and effectively c=
-all
-+     *   parent reset phases.
-+     */
-+    bc->reset =3D bus_phases_reset;
-+    rc->get_transitional_function =3D bus_get_transitional_reset;
- }
-=20
- static void qbus_finalize(Object *obj)
-@@ -223,6 +316,10 @@ static const TypeInfo bus_info =3D {
-     .instance_init =3D qbus_initfn,
-     .instance_finalize =3D qbus_finalize,
-     .class_init =3D bus_class_init,
-+    .interfaces =3D (InterfaceInfo[]) {
-+        { TYPE_RESETTABLE_INTERFACE },
-+        { }
-+    },
- };
-=20
- static void bus_register_types(void)
+     return resettable_is_in_reset(OBJECT(bus));
 diff --git a/hw/core/qdev.c b/hw/core/qdev.c
-index f230063189..81784c73fb 100644
+index c5d107ea4e..3e6600ce76 100644
 --- a/hw/core/qdev.c
 +++ b/hw/core/qdev.c
-@@ -329,6 +329,28 @@ void qbus_reset_all_fn(void *opaque)
+@@ -335,6 +335,11 @@ void qbus_reset_all_fn(void *opaque)
      qbus_reset_all(bus);
  }
 =20
-+bool device_is_in_reset(DeviceState *dev)
++void device_cold_reset(DeviceState *dev)
 +{
-+    return resettable_is_in_reset(OBJECT(dev));
++    resettable_reset(OBJECT(dev), RESET_TYPE_COLD);
 +}
 +
-+static ResettableState *device_get_reset_state(Object *obj)
-+{
-+    DeviceState *dev =3D DEVICE(obj);
-+    return &dev->reset;
-+}
-+
-+static void device_reset_child_foreach(Object *obj, ResettableChildCallb=
-ack cb,
-+                                       void *opaque, ResetType type)
-+{
-+    DeviceState *dev =3D DEVICE(obj);
-+    BusState *bus;
-+
-+    QLIST_FOREACH(bus, &dev->child_bus, sibling) {
-+        cb(OBJECT(bus), opaque, type);
-+    }
-+}
-+
- /* can be used as ->unplug() callback for the simple cases */
- void qdev_simple_device_unplug_cb(HotplugHandler *hotplug_dev,
-                                   DeviceState *dev, Error **errp)
-@@ -1084,9 +1106,61 @@ static void device_unparent(Object *obj)
+ bool device_is_in_reset(DeviceState *dev)
+ {
+     return resettable_is_in_reset(OBJECT(dev));
+diff --git a/hw/core/resettable.c b/hw/core/resettable.c
+index 60d4285fcc..3d3200bdbc 100644
+--- a/hw/core/resettable.c
++++ b/hw/core/resettable.c
+@@ -252,6 +252,11 @@ void resettable_change_parent(Object *obj, Object *n=
+ewp, Object *oldp)
      }
  }
 =20
-+/**
-+ * device_phases_reset:
-+ * Transition reset method for devices to allow moving
-+ * smoothly from legacy reset method to multi-phases
-+ */
-+static void device_phases_reset(DeviceState *dev)
++void resettable_cold_reset_fn(void *opaque)
 +{
-+    ResettableClass *rc =3D RESETTABLE_GET_CLASS(dev);
-+
-+    if (rc->phases.enter) {
-+        rc->phases.enter(OBJECT(dev), RESET_TYPE_COLD);
-+    }
-+    if (rc->phases.hold) {
-+        rc->phases.hold(OBJECT(dev));
-+    }
-+    if (rc->phases.exit) {
-+        rc->phases.exit(OBJECT(dev));
-+    }
++    resettable_reset((Object *) opaque, RESET_TYPE_COLD);
 +}
 +
-+static void device_transitional_reset(Object *obj)
-+{
-+    DeviceClass *dc =3D DEVICE_GET_CLASS(obj);
-+
-+    /*
-+     * This will call either @device_phases_reset (for multi-phases tran=
-sitioned
-+     * devices) or a device's specific method for not-yet transitioned d=
-evices.
-+     * In both case, it does not reset children.
-+     */
-+    if (dc->reset) {
-+        dc->reset(DEVICE(obj));
-+    }
-+}
-+
-+/**
-+ * device_get_transitional_reset:
-+ * check if the device's class is ready for multi-phase
-+ */
-+static ResettableTrFunction device_get_transitional_reset(Object *obj)
-+{
-+    DeviceClass *dc =3D DEVICE_GET_CLASS(obj);
-+    if (dc->reset !=3D device_phases_reset) {
-+        /*
-+         * dc->reset has been overridden by a subclass,
-+         * the device is not ready for multi phase yet.
-+         */
-+        return device_transitional_reset;
-+    }
-+    return NULL;
-+}
-+
- static void device_class_init(ObjectClass *class, void *data)
- {
-     DeviceClass *dc =3D DEVICE_CLASS(class);
-+    ResettableClass *rc =3D RESETTABLE_CLASS(class);
-=20
-     class->unparent =3D device_unparent;
-=20
-@@ -1098,6 +1172,25 @@ static void device_class_init(ObjectClass *class, =
-void *data)
-      */
-     dc->hotpluggable =3D true;
-     dc->user_creatable =3D true;
-+
-+    rc->get_state =3D device_get_reset_state;
-+    rc->child_foreach =3D device_reset_child_foreach;
-+
-+    /*
-+     * @device_phases_reset is put as the default reset method below, al=
-lowing
-+     * to do the multi-phase transition from base classes to leaf classe=
-s. It
-+     * allows a legacy-reset Device class to extend a multi-phases-reset
-+     * Device class for the following reason:
-+     * + If a base class B has been moved to multi-phase, then it does n=
-ot
-+     *   override this default reset method and may have defined phase m=
-ethods.
-+     * + A daughter class C (extending class B) which uses
-+     *   device_class_set_parent_reset() (or similar means) to override =
-the
-+     *   reset method will still work as expected. @device_phases_reset =
-function
-+     *   will be registered as the parent reset method and effectively c=
-all
-+     *   parent reset phases.
-+     */
-+    dc->reset =3D device_phases_reset;
-+    rc->get_transitional_function =3D device_get_transitional_reset;
- }
-=20
- void device_class_set_parent_reset(DeviceClass *dc,
-@@ -1156,6 +1249,10 @@ static const TypeInfo device_type_info =3D {
-     .class_init =3D device_class_init,
-     .abstract =3D true,
-     .class_size =3D sizeof(DeviceClass),
-+    .interfaces =3D (InterfaceInfo[]) {
-+        { TYPE_RESETTABLE_INTERFACE },
-+        { }
-+    },
- };
-=20
- static void qdev_register_types(void)
+ void resettable_class_set_parent_phases(ResettableClass *rc,
+                                         ResettableEnterPhase enter,
+                                         ResettableHoldPhase hold,
 diff --git a/include/hw/qdev-core.h b/include/hw/qdev-core.h
-index 01963984f8..2e3346600e 100644
+index 2e3346600e..1e88cb2f6a 100644
 --- a/include/hw/qdev-core.h
 +++ b/include/hw/qdev-core.h
-@@ -5,6 +5,7 @@
- #include "qemu/bitmap.h"
- #include "qom/object.h"
- #include "hw/hotplug.h"
-+#include "hw/resettable.h"
+@@ -386,6 +386,13 @@ int qdev_walk_children(DeviceState *dev,
+                        qdev_walkerfn *post_devfn, qbus_walkerfn *post_bu=
+sfn,
+                        void *opaque);
 =20
- enum {
-     DEV_NVECTORS_UNSPECIFIED =3D -1,
-@@ -104,6 +105,11 @@ typedef struct DeviceClass {
-     bool hotpluggable;
++/**
++ * @qdev_reset_all:
++ * Reset @dev. See @qbus_reset_all() for more details.
++ *
++ * Note: This function is deprecated and will be removed when it becomes=
+ unused.
++ * Please use device_cold_reset() now.
++ */
+ void qdev_reset_all(DeviceState *dev);
+ void qdev_reset_all_fn(void *opaque);
 =20
-     /* callbacks */
-+    /*
-+     * Reset method here is deprecated and replaced by methods in the
-+     * resettable class interface to implement a multi-phase reset.
-+     * TODO: remove once every reset callback is unused
-+     */
-     DeviceReset reset;
-     DeviceRealize realize;
-     DeviceUnrealize unrealize;
-@@ -128,6 +134,7 @@ struct NamedGPIOList {
- /**
-  * DeviceState:
-  * @realized: Indicates whether the device has been fully constructed.
-+ * @reset: ResettableState for the device; handled by Resettable interfa=
+@@ -398,10 +405,28 @@ void qdev_reset_all_fn(void *opaque);
+  * hard reset means that qbus_reset_all will reset all state of the devi=
 ce.
-  *
-  * This structure should not be accessed directly.  We declare it here
-  * so that it can be embedded in individual device state structures.
-@@ -149,6 +156,7 @@ struct DeviceState {
-     int num_child_bus;
-     int instance_id_alias;
-     int alias_required_for_version;
-+    ResettableState reset;
- };
-=20
- struct DeviceListener {
-@@ -195,6 +203,7 @@ typedef struct BusChild {
- /**
-  * BusState:
-  * @hotplug_handler: link to a hotplug handler associated with bus.
-+ * @reset: ResettableState for the bus; handled by Resettable interface.
+  * For PCI devices, for example, this will include the base address regi=
+sters
+  * or configuration space.
++ *
++ * Note: This function is deprecated and will be removed when it becomes=
+ unused.
++ * Please use bus_cold_reset() now.
   */
- struct BusState {
-     Object obj;
-@@ -206,6 +215,7 @@ struct BusState {
-     int num_children;
-     QTAILQ_HEAD(, BusChild) children;
-     QLIST_ENTRY(BusState) sibling;
-+    ResettableState reset;
- };
-=20
- /**
-@@ -392,6 +402,18 @@ void qdev_reset_all_fn(void *opaque);
  void qbus_reset_all(BusState *bus);
  void qbus_reset_all_fn(void *opaque);
 =20
 +/**
-+ * device_is_in_reset:
-+ * Return true if the device @dev is currently being reset.
++ * device_cold_reset:
++ * Reset device @dev and perform a recursive processing using the resett=
+able
++ * interface. It triggers a RESET_TYPE_COLD.
 + */
-+bool device_is_in_reset(DeviceState *dev);
++void device_cold_reset(DeviceState *dev);
 +
 +/**
-+ * bus_is_in_reset:
-+ * Return true if the bus @bus is currently being reset.
++ * bus_cold_reset:
++ *
++ * Reset bus @bus and perform a recursive processing using the resettabl=
+e
++ * interface. It triggers a RESET_TYPE_COLD.
 + */
-+bool bus_is_in_reset(BusState *bus);
++void bus_cold_reset(BusState *bus);
 +
- /* This should go away once we get rid of the NULL bus hack */
- BusState *sysbus_get_default(void);
-=20
-@@ -413,6 +435,11 @@ void qdev_machine_init(void);
+ /**
+  * device_is_in_reset:
+  * Return true if the device @dev is currently being reset.
+@@ -432,6 +457,8 @@ void qdev_machine_init(void);
+  * device_legacy_reset:
+  *
+  * Reset a single device (by calling the reset method).
++ * Note: This function is deprecated and will be removed when it becomes=
+ unused.
++ * Please use device_cold_reset() now.
   */
  void device_legacy_reset(DeviceState *dev);
 =20
+diff --git a/include/hw/resettable.h b/include/hw/resettable.h
+index f6d379669f..6a9e17344e 100644
+--- a/include/hw/resettable.h
++++ b/include/hw/resettable.h
+@@ -198,6 +198,15 @@ bool resettable_is_in_reset(Object *obj);
+  */
+ void resettable_change_parent(Object *obj, Object *newp, Object *oldp);
+=20
 +/**
-+ * device_class_set_parent_reset:
-+ * TODO: remove the function when DeviceClass's reset method
-+ * is not used anymore.
++ * resettable_cold_reset_fn:
++ * Helper to call resettable_reset((Object *) opaque, RESET_TYPE_COLD).
++ *
++ * This function is typically useful to register a reset handler with
++ * qemu_register_reset.
 + */
- void device_class_set_parent_reset(DeviceClass *dc,
-                                    DeviceReset dev_reset,
-                                    DeviceReset *parent_reset);
-diff --git a/tests/Makefile.include b/tests/Makefile.include
-index 3543451ed3..618ad55401 100644
---- a/tests/Makefile.include
-+++ b/tests/Makefile.include
-@@ -562,6 +562,7 @@ tests/fp/%:
- tests/test-qdev-global-props$(EXESUF): tests/test-qdev-global-props.o \
- 	hw/core/qdev.o hw/core/qdev-properties.o hw/core/hotplug.o\
- 	hw/core/bus.o \
-+	hw/core/resettable.o \
- 	hw/core/irq.o \
- 	hw/core/fw-path-provider.o \
- 	hw/core/reset.o \
++void resettable_cold_reset_fn(void *opaque);
++
+ /**
+  * resettable_class_set_parent_phases:
+  *
 --=20
 2.23.0
 
