@@ -2,77 +2,69 @@ Return-Path: <SRS0=ht5U=YL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,NUMERIC_HTTP_ADDR,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 55733CA9EA0
-	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 08:41:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D74B5CA9EA1
+	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 08:42:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2B23A222BD
-	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 08:41:56 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2B23A222BD
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id AE1C9222BD
+	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 08:42:22 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AE1C9222BD
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36700 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36702 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iLNpb-0001Ax-7w
-	for qemu-devel@archiver.kernel.org; Fri, 18 Oct 2019 04:41:55 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40762)
+	id 1iLNq1-0001nG-Qa
+	for qemu-devel@archiver.kernel.org; Fri, 18 Oct 2019 04:42:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40812)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1iLNoe-0000I8-5v
- for qemu-devel@nongnu.org; Fri, 18 Oct 2019 04:40:57 -0400
+ (envelope-from <cohuck@redhat.com>) id 1iLNp8-0000kg-9k
+ for qemu-devel@nongnu.org; Fri, 18 Oct 2019 04:41:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1iLNoc-00064i-Sy
- for qemu-devel@nongnu.org; Fri, 18 Oct 2019 04:40:56 -0400
-Received: from indium.canonical.com ([91.189.90.7]:41424)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1iLNoc-000649-Mw
- for qemu-devel@nongnu.org; Fri, 18 Oct 2019 04:40:54 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1iLNob-0004q6-DO
- for <qemu-devel@nongnu.org>; Fri, 18 Oct 2019 08:40:53 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 61C532E80C9
- for <qemu-devel@nongnu.org>; Fri, 18 Oct 2019 08:40:53 +0000 (UTC)
+ (envelope-from <cohuck@redhat.com>) id 1iLNp6-0006ar-IU
+ for qemu-devel@nongnu.org; Fri, 18 Oct 2019 04:41:25 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47748)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <cohuck@redhat.com>)
+ id 1iLNp6-0006a0-A3; Fri, 18 Oct 2019 04:41:24 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id DC0B9307B19B;
+ Fri, 18 Oct 2019 08:41:22 +0000 (UTC)
+Received: from gondolin (dhcp-192-202.str.redhat.com [10.33.192.202])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 321631001B0B;
+ Fri, 18 Oct 2019 08:41:19 +0000 (UTC)
+Date: Fri, 18 Oct 2019 10:41:16 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+To: Thomas Huth <thuth@redhat.com>
+Subject: Re: [PATCH] hw/s390x: Emit a warning if user tried to enable USB
+Message-ID: <20191018104116.341e0cd0.cohuck@redhat.com>
+In-Reply-To: <620c3bfe-2163-6bb4-cdc9-689dcd74dcac@redhat.com>
+References: <20191017142123.1236-1-thuth@redhat.com>
+ <20191017163402.43437191.cohuck@redhat.com>
+ <2e689f2b-9bed-e40e-c761-6f38efaae635@redhat.com>
+ <181d44b3-3333-91a3-0003-d312e8ab4805@redhat.com>
+ <620c3bfe-2163-6bb4-cdc9-689dcd74dcac@redhat.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Date: Fri, 18 Oct 2019 08:31:22 -0000
-From: =?utf-8?q?Christian_Ehrhardt_=EE=83=BF?= <1848556@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=Confirmed; importance=Undecided;
- assignee=None; 
-X-Launchpad-Bug: distribution=ubuntu; sourcepackage=qemu; component=main;
- status=New; importance=Undecided; assignee=None; 
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: paelzer rodsmith
-X-Launchpad-Bug-Reporter: Rod Smith (rodsmith)
-X-Launchpad-Bug-Modifier: =?utf-8?q?Christian_Ehrhardt_=EE=83=BF_=28paelzer?=
- =?utf-8?q?=29?=
-References: <157133449178.19203.719001918774596241.malonedeb@gac.canonical.com>
-Message-Id: <157138748241.25202.5771988691436628321.malone@chaenomeles.canonical.com>
-Subject: [Bug 1848556] Re: qemu-img check failing on remote image in Eoan
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="186023fa645d8be19d403a76064f0643f510db2f";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 21c0fce3f99eb1279af49e14e6b765c127d9d042
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.45]); Fri, 18 Oct 2019 08:41:22 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 91.189.90.7
+X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -81,64 +73,100 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1848556 <1848556@bugs.launchpad.net>
+Cc: Halil Pasic <pasic@linux.ibm.com>,
+ Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org,
+ Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <philmd@redhat.com>,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Since it seemed so easy, while bisecting I found that it hangs with
-v4.0.0 and v3.1.0 from git and even v3.0.0.
+On Fri, 18 Oct 2019 08:35:17 +0200
+Thomas Huth <thuth@redhat.com> wrote:
 
-Since the reported good version was 3.1 I began to wonder if I might have o=
-verlooked something.
-I wondered if it might be e.g. the apache version providing a different beh=
-avior on http.
+> On 17/10/2019 20.18, Philippe Mathieu-Daud=C3=A9 wrote:
+> > On 10/17/19 4:40 PM, Thomas Huth wrote: =20
+> >> On 17/10/2019 16.34, Cornelia Huck wrote: =20
+> >>> On Thu, 17 Oct 2019 16:21:23 +0200
+> >>> Thomas Huth <thuth@redhat.com> wrote:
+> >>> =20
+> >>>> There is no USB on s390x, so running qemu-system-s390x with
+> >>>> "-machine ...,usb=3Don" is certainly wrong. Emit a warning to make
+> >>>> the users aware of their misconfiguration.
+> >>>>
+> >>>> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> >>>> ---
+> >>>> =C2=A0 After a year or two, we could finally turn this into a hard e=
+rror,
+> >>>> =C2=A0 but I think we should give the users some time to fix their c=
+ommand
+> >>>> =C2=A0 lines first, so I'm initially only emitting a warning here.
+> >>>>
+> >>>> =C2=A0 hw/s390x/s390-virtio-ccw.c | 4 ++++
+> >>>> =C2=A0 1 file changed, 4 insertions(+)
+> >>>>
+> >>>> diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
+> >>>> index d3edeef0ad..af8c4c0daf 100644
+> >>>> --- a/hw/s390x/s390-virtio-ccw.c
+> >>>> +++ b/hw/s390x/s390-virtio-ccw.c
+> >>>> @@ -243,6 +243,10 @@ static void ccw_init(MachineState *machine)
+> >>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 VirtualCssBus *css_bus;
+> >>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 DeviceState *dev;
+> >>>> =C2=A0 +=C2=A0=C2=A0=C2=A0 if (machine->usb) {
+> >>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 warn_report("This machin=
+e does not support USB"); =20
+> >>>
+> >>> I'm wondering if this is the only machine type not supporting usb...
+> >>> if not, how are others handling it? =20
+> >>
+> >> I think most machines are silently ignoring it, like we did on s390x
+> >> until now, too.
+> >> =20
+> >>> The usb parsing code in machine.c does not care if usb is even
+> >>> configured (CONFIG_USB). =20
+> >>
+> >> machine.c is common code, so you can not use CONFIG_USB there. =20
+> >=20
+> > We already have:
+> >=20
+> > bool target_words_bigendian(void)
+> > {
+> > #if defined(TARGET_WORDS_BIGENDIAN)
+> > =C2=A0=C2=A0=C2=A0 return true;
+> > #else
+> > =C2=A0=C2=A0=C2=A0 return false;
+> > #endif
+> > } =20
+>=20
+> ... and kvm_available() and xen_available() ...
+>=20
+> > diff --git a/hw/usb/machine.c b/hw/usb/machine.c
+> > new file mode 100644
+> > index 0000000000..5381928479
+> > --- /dev/null
+> > +++ b/hw/usb/machine.c
+> > @@ -0,0 +1,12 @@
+> > +#include "qemu/osdep.h"
+> > +#include "hw/boards.h"
+> > +#include "config-devices.h"
+> > +
+> > +bool machine_has_usb(void)
+> > +{
+> > +#if defined(CONFIG_USB)
+> > +=C2=A0=C2=A0=C2=A0 return true;
+> > +#else
+> > +=C2=A0=C2=A0=C2=A0 return false;
+> > +#endif
+> > +} =20
+>=20
+> I think I'd rather call it usb_available() (like the other _available()
+> functions) and put it into arch_init.c (and rename that file to arch.c
+> or target.c or something like that).
 
+I like 'usb_available()'.
 
-I was trying to access the same apache server with 4.0 and 3.1 and ran it a=
-gainst the download target:
-$ qemu-img check https://download.fedoraproject.org/pub/fedora/linux/releas=
-es/30/Cloud/x86_64/images/Fedora-Cloud-Base-30-1.2.x86_64.qcow2
-
-3.1 ran into a segfault and 4.0 seems to hang on that.
-Maybe I should take a break and revisit that later, as people might have an=
- idea already what this might be about.
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1848556
-
-Title:
-  qemu-img check failing on remote image in Eoan
-
-Status in QEMU:
-  Confirmed
-Status in qemu package in Ubuntu:
-  New
-
-Bug description:
-  The "qemu-img check" function is failing on remote (HTTP-hosted)
-  images, beginning with Ubuntu 19.10 (qemu-utils version 1:4.0+dfsg-
-  0ubuntu9). With previous versions, through Ubuntu 19.04/qemu-utils
-  version 1:3.1+dfsg-2ubuntu3.5, the following worked:
-
-  $ /usr/bin/qemu-img check  http://10.193.37.117/cloud/eoan-server-cloudim=
-g-amd64.img
-  No errors were found on the image.
-  19778/36032 =3D 54.89% allocated, 90.34% fragmented, 89.90% compressed cl=
-usters
-  Image end offset: 514064384
-
-  The 10.193.37.117 server holds an Apache server that hosts the cloud
-  images on a LAN. Beginning with Ubuntu 19.10/qemu-utils 1:4.0+dfsg-
-  0ubuntu9, the same command never returns. (I've left it for up to an
-  hour with no change.) I'm able to wget the image from the same server
-  and installation on which qemu-img check fails. I've tried several
-  .img files on the server, ranging from Bionic to Eoan, with the same
-  results with all of them.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1848556/+subscriptions
+Maybe we should also warn for igd_passthru if not xen_available()? Not
+sure how helpful that is, though. Even if we warn and put it in the
+deprecation notes, I'm not sure how much we'd gain if we were to make
+it an actual error.
 
