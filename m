@@ -2,60 +2,84 @@ Return-Path: <SRS0=ht5U=YL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0581ECA9EA0
-	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 14:49:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 30AECCA9EA0
+	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 14:50:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CEB1721D7C
-	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 14:49:03 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CEB1721D7C
+	by mail.kernel.org (Postfix) with ESMTPS id 0298621D7C
+	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 14:50:29 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0298621D7C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41258 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41278 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iLTYs-00073H-3P
-	for qemu-devel@archiver.kernel.org; Fri, 18 Oct 2019 10:49:02 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36086)
+	id 1iLTaF-00006O-QM
+	for qemu-devel@archiver.kernel.org; Fri, 18 Oct 2019 10:50:27 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36407)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <imammedo@redhat.com>) id 1iLTVR-0004VG-CX
- for qemu-devel@nongnu.org; Fri, 18 Oct 2019 10:45:30 -0400
+ (envelope-from <philmd@redhat.com>) id 1iLTYa-0007AS-R4
+ for qemu-devel@nongnu.org; Fri, 18 Oct 2019 10:48:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <imammedo@redhat.com>) id 1iLTVQ-0008Sq-0I
- for qemu-devel@nongnu.org; Fri, 18 Oct 2019 10:45:29 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:39616)
+ (envelope-from <philmd@redhat.com>) id 1iLTYY-00025i-GZ
+ for qemu-devel@nongnu.org; Fri, 18 Oct 2019 10:48:44 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:7201)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1iLTVP-0008SO-NS
- for qemu-devel@nongnu.org; Fri, 18 Oct 2019 10:45:27 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iLTYX-00024u-OD
+ for qemu-devel@nongnu.org; Fri, 18 Oct 2019 10:48:42 -0400
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 3A4E789AFB9;
- Fri, 18 Oct 2019 14:45:26 +0000 (UTC)
-Received: from localhost (unknown [10.43.2.182])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 4BBB160BFB;
- Fri, 18 Oct 2019 14:45:17 +0000 (UTC)
-Date: Fri, 18 Oct 2019 16:45:15 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-To: Laszlo Ersek <lersek@redhat.com>
-Subject: Re: [RFC 2/3] acpi: cpuhp: add typical usecases into spec
-Message-ID: <20191018164515.05aef75d@redhat.com>
-In-Reply-To: <2b10ca48-c734-4f41-9521-136c44060812@redhat.com>
-References: <20191009132252.17860-1-imammedo@redhat.com>
- <20191009132252.17860-3-imammedo@redhat.com>
- <2b10ca48-c734-4f41-9521-136c44060812@redhat.com>
+ by mx1.redhat.com (Postfix) with ESMTPS id BA1C17EBBD
+ for <qemu-devel@nongnu.org>; Fri, 18 Oct 2019 14:48:40 +0000 (UTC)
+Received: by mail-wm1-f72.google.com with SMTP id o128so5063764wmo.1
+ for <qemu-devel@nongnu.org>; Fri, 18 Oct 2019 07:48:40 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=cZN9s9L8r9niF23MrvL5IG8jaedcfH9gMuNiubfVR8Q=;
+ b=NxCmPiu7Dbf2DjdLku0250WVenV81BJgLx1yqV6ZR1fCvbf9BHQtGW7ctKw+v72J5M
+ 4JMES1k9oPSWAPz42W0i/rpdd2JeXeb5cBZufotUmf0mDBR4pw3fqsCR4QsSDvoVruRH
+ 05sKw4H9ERP77L0ZLpVFcABmcEYrsp+nd9Ddxc32SAaOhySu3NbpAe6G1wunHULuV+os
+ pmoMV9xrUWxeghMQJIKGNXDHGMu0RtMT3gNMWmxJ/yMeC7MnEqo1TDkuuDeFWsBBF9lk
+ StEHNXfJ0h1KBcVw8uv5RqsNKTFsBJO26hlao0/IhOXuRUfOpZLIeDtH63ZXsUTI7J+J
+ 5yGw==
+X-Gm-Message-State: APjAAAWwimTzxtp+9flXETl41AFPF0leLdTtXTg+07GyN7vKMCp2K/Yc
+ ZrXhnIATCGtPE4OPlPFX/ujWR/qfsQ/BPxv2RbOL/zO5ZJAnzkYxA5ZTXP15eLQ+BKiZi5q6hpa
+ +4CF+Nz4jsOnxzVo=
+X-Received: by 2002:adf:e40c:: with SMTP id g12mr8617930wrm.216.1571410119461; 
+ Fri, 18 Oct 2019 07:48:39 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqyfBik8qlzvmojjNT0mZ5L+LQ8T6fgiFeR1TuZRqo5QKfEHaiib6wOKAm4s8biv4j5+G5vCUw==
+X-Received: by 2002:adf:e40c:: with SMTP id g12mr8617903wrm.216.1571410119254; 
+ Fri, 18 Oct 2019 07:48:39 -0700 (PDT)
+Received: from [192.168.1.36] (14.red-88-21-201.staticip.rima-tde.net.
+ [88.21.201.14])
+ by smtp.gmail.com with ESMTPSA id u83sm12703335wme.0.2019.10.18.07.48.37
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Fri, 18 Oct 2019 07:48:38 -0700 (PDT)
+Subject: Re: [PATCH 0/5] hw/arm/exynos4210: Add acceptance tests to the
+ SMDKC210 board
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
+ qemu-devel@nongnu.org
+References: <20191005154748.21718-1-f4bug@amsat.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <6ac9df42-a928-0d45-4aa5-3155a1a3ceaa@redhat.com>
+Date: Fri, 18 Oct 2019 16:48:37 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.67]); Fri, 18 Oct 2019 14:45:26 +0000 (UTC)
+In-Reply-To: <20191005154748.21718-1-f4bug@amsat.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 209.132.183.28
@@ -70,106 +94,100 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Eduardo Habkost <ehabkost@redhat.com>, "Michael
- S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org,
- Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <philmd@redhat.com>,
- Richard Henderson <rth@twiddle.net>
+Cc: =?UTF-8?Q?Fr=c3=a9d=c3=a9ric_Basse?= <contact@fredericb.info>,
+ Peter Maydell <peter.maydell@linaro.org>,
+ Eduardo Habkost <ehabkost@redhat.com>,
+ Evgeny Voevodin <e.voevodin@samsung.com>,
+ Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>,
+ Igor Mitsyanko <i.mitsyanko@gmail.com>, Krzysztof Kozlowski <krzk@kernel.org>,
+ Jean-Christophe Dubois <jcd@tribudubois.net>, qemu-arm@nongnu.org,
+ Dmitry Solodkiy <d.solodkiy@samsung.com>, Cleber Rosa <crosa@redhat.com>,
+ Maksim Kozlov <m.kozlov@samsung.com>, Guenter Roeck <linux@roeck-us.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, 10 Oct 2019 16:13:22 +0200
-Laszlo Ersek <lersek@redhat.com> wrote:
+Hi Peter,
 
-> On 10/09/19 15:22, Igor Mammedov wrote:
-> > Clarify values of "CPU selector' register and add workflows for
-> >   * finding CPU with pending 'insert/remove' event
-> >   * enumerating present/non present CPUs
-> > 
-> > Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-> > ---
-> >  docs/specs/acpi_cpu_hotplug.txt | 22 ++++++++++++++++++++++
-> >  1 file changed, 22 insertions(+)
-> > 
-> > diff --git a/docs/specs/acpi_cpu_hotplug.txt b/docs/specs/acpi_cpu_hotplug.txt
-> > index ac5903b2b1..43c5a193f0 100644
-> > --- a/docs/specs/acpi_cpu_hotplug.txt
-> > +++ b/docs/specs/acpi_cpu_hotplug.txt
-> > @@ -54,6 +54,7 @@ write access:
-> >      [0x0-0x3] CPU selector: (DWORD access)
-> >                selects active CPU device. All following accesses to other
-> >                registers will read/store data from/to selected CPU.
-> > +              Valid values: [0 .. max_cpus)
-> >      [0x4] CPU device control fields: (1 byte access)
-> >          bits:
-> >              0: reserved, OSPM must clear it before writing to register.
-> > @@ -93,3 +94,24 @@ Selecting CPU device beyond possible range has no effect on platform:
-> >       ignored
-> >     - read accesses to CPU hot-plug registers not documented above return
-> >       all bits set to 0.
-> > +
-> > +Typical usecases:
-> > +   - Get a cpu with pending event
-> > +     1. write 0x0 into 'Command field' register
-> > +     2. read from 'Command data' register, CPU selector value (CPU's UID in ACPI
-> > +        tables) and event for selected CPU from 'CPU device status fields'
-> > +        register. If there aren't pending events, CPU selector value doesn't
-> > +        change and 'insert' and 'remove' bits are not set.  
-> 
-> Okay, so based on the "Command data" documentation I'm suggesting in
-> <http://mid.mail-archive.com/cd0713b5-fd64-d3e1-7f83-3a0725b819a3@redhat.com>,
-> I propose:
-> 
-> 1. Store 0x0 to the 'CPU selector' register.
-With ACPI code being the only user it was not necessary
-as value val always correct. But if someone wrote invalid selector
-value it would break CPHP_GET_NEXT_CPU_WITH_EVENT_CMD command.
-I shall update AML code to include this step as well so it would
-be more robust.
+On 10/5/19 5:47 PM, Philippe Mathieu-Daud=C3=A9 wrote:
+> Hi all,
+>=20
+> Yesterday Peter Maydell asked on IRC if I had any working Exynos4
+> image. I looked at some old backuped notes and could boot Guenter
+> initrd with BusyBox.
+> I'll use this cover letter to share my notes, they might help to
+> have this board fully usable again.
+>=20
+> This board is listed as "Odd Fixes". Since we have it covered, I
+> thought it was worthwhile to have it covered by tests to avoid
+> more regressions.
+>=20
+> Fr=C3=A9d=C3=A9ric Basse used this board last year:
+> https://fredericb.info/2018/03/emulating-exynos-4210-bootrom-in-qemu.ht=
+ml
+>=20
+> I'll have a look a these particular commits he added:
+>=20
+> - https://github.com/frederic/qemu-exynos-bootrom/commit/9be5c9f2253dbc=
+04ee
+>=20
+>     sd: add sd clock support to SDHC_CLKCON
+>=20
+> - https://github.com/frederic/qemu-exynos-bootrom/commit/6f045949ee2fde=
+c624
+>=20
+>     sd: always reply to ACMD41 (SD_APP_OP_COND)
+>=20
+> Guenter also carries on this patch:
+>=20
+> - https://github.com/groeck/qemu/commit/0a80543cc910d
+>=20
+>    hw/timer/exynos4210_mct: Initialize timer before starting it
+>=20
+>    When booting a recent Linux kernel, the qemu message "Timer with per=
+iod
+>    zero, disabling" is seen, apparently because a timer is started befo=
+re
+>    being initialized.  Fix the problem by initializing the offending ti=
+mer
+>    before starting it.
+>=20
+> It might also be interesting to use Krzysztof's initramfs image:
+> https://github.com/krzk/tools/blob/master/run-qemu.sh#L29
+>=20
+> The 1st test added works fine, however the 2nd (SD card) is not
+> reliable so it is disabled. We might need to adapt the ADMA patch
+> Igor sent once:
+> https://patchwork.ozlabs.org/patch/181854/
+>=20
+> If you want to run the Avocado tests, you need these other patches
+> pending review:
+>=20
+> - https://lists.gnu.org/archive/html/qemu-devel/2019-09/msg06439.html
+>    "tests/boot_linux_console: Extract the gunzip() helper"
+>=20
+> - https://lists.gnu.org/archive/html/qemu-devel/2019-09/msg06438.html
+>    "python/qemu/machine: Allow to use other serial consoles than defaul=
+t"
+>    (only for the 2nd disabled test)
+>=20
+> Regards,
+>=20
+> Phil.
+>=20
+> Based-on: 20190926173428.10713-16-f4bug@amsat.org
+>=20
+> Philippe Mathieu-Daud=C3=A9 (5):
+>    tests/boot_linux_console: Add initrd test for the Exynos4210
+>    hw/sd/sdhci: Add a comment to distinct the i.MX eSDHC functions
+>    hw/sd/sdhci: Add dummy Samsung SDHCI controller
+>    hw/arm/exynos4210: Use the Samsung s3c SDHCI controller
+>    tests/boot_linux_console: Add sdcard test for the Exynos4210
 
-> 2. Store 0x0 to the 'Command field' register.
-> 3. Read the 'CPU device status fields' register.
-> 4. If both bit#1 and bit#2 are clear in the value read, there is no CPU
->    with a pending event.
-> 5. Otherwise, read the 'Command data' register. The value read is the
->    selector of the CPU with the pending event (which is already
->    selected).
-> 
-> > +   - Enumerate CPUs present/non present CPUs.
-> > +     1. set iterator to 0x0
-> > +     2. write 0x0 into 'Command field' register and then iterator
-> > +        into 'CPU selector' register.
-> > +     3. read 'enabled' flag for selected CPU from 'CPU device status fields'
-> > +        register
-> > +     4. to continue to the next CPU, increment iterator and repeat step 2
-> > +     5. read 'Command data' register
-> > +     5.1 if 'Command data' register matches iterator continue to step 3.
-> > +         (read presence bit for the next CPU)
-> > +     5.2 if 'Command data' register has not changed, there is not CPU
-> > +         corresponding to iterator value and the last valid iterator value
-> > +         equals to 'max_cpus' + 1
-> >   
-> 
-> How about:
-> 
-> 01. Set the present CPU count to 0.
-> 02. Set the iterator to 0.
-> 03. Store 0x0 to the 'Command field' register.
-> 04. Store 0x0 to the 'CPU selector' register.
-> 05. Read the 'CPU device status fields' register.
-> 06. If bit#0 is set, increment the present CPU count.
-> 07. Increment the iterator.
-> 08. Store the iterator to the 'CPU selector' register.
-> 09. Read the 'Command data' register.
-> 10. If the value read is zero, then the iterator equals "max_cpus";
->     exit now.
-> 11. Goto 05.
+Can you take patches 2-4 from this series? (C part, not Python).
+All these patches have been reviewed.
 
-Looks good, I'll use both suggestions, thanks!
+Thanks,
 
-> 
-> Thanks
-> Laszlo
-
+Phil.
 
