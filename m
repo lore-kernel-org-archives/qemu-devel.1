@@ -7,78 +7,82 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5CE19CA9EA9
-	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 18:03:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 38EFBCA9EA9
+	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 18:03:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D814E21D7C
-	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 18:03:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 03DBA21D7C
+	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 18:03:18 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="nI0rWgGQ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D814E21D7C
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="jqqk+gJi"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 03DBA21D7C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44544 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44554 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iLWag-0000Ds-5Q
-	for qemu-devel@archiver.kernel.org; Fri, 18 Oct 2019 14:03:06 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59490)
+	id 1iLWaq-0000SL-F0
+	for qemu-devel@archiver.kernel.org; Fri, 18 Oct 2019 14:03:16 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59246)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1iLWJ9-0006rE-3c
- for qemu-devel@nongnu.org; Fri, 18 Oct 2019 13:44:59 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1iLWIw-0006Y9-Py
+ for qemu-devel@nongnu.org; Fri, 18 Oct 2019 13:44:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1iLWJ7-0005dw-Vz
- for qemu-devel@nongnu.org; Fri, 18 Oct 2019 13:44:58 -0400
-Received: from mail-pg1-x543.google.com ([2607:f8b0:4864:20::543]:40071)
+ (envelope-from <richard.henderson@linaro.org>) id 1iLWIu-0005RZ-EF
+ for qemu-devel@nongnu.org; Fri, 18 Oct 2019 13:44:46 -0400
+Received: from mail-pf1-x444.google.com ([2607:f8b0:4864:20::444]:42904)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1iLWJ7-0005dQ-Qz
- for qemu-devel@nongnu.org; Fri, 18 Oct 2019 13:44:57 -0400
-Received: by mail-pg1-x543.google.com with SMTP id e13so3750371pga.7
- for <qemu-devel@nongnu.org>; Fri, 18 Oct 2019 10:44:57 -0700 (PDT)
+ id 1iLWIu-0005Pq-6Y
+ for qemu-devel@nongnu.org; Fri, 18 Oct 2019 13:44:44 -0400
+Received: by mail-pf1-x444.google.com with SMTP id q12so4311358pff.9
+ for <qemu-devel@nongnu.org>; Fri, 18 Oct 2019 10:44:43 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=4z2zPWedOviyKqg3qmIWn8g3R8jv2yS1u67ka41eHWc=;
- b=nI0rWgGQzrA9U6zEdQj3b1jl+SAttb9L65Ev0KMFewggAH/JgNkTbBgKH5FUFPaVUk
- yT77aBDq1capTDD5XBJ0kHvzCdLzW6UtviyBLhNXknkCHDTIdwRE8n4wPP/ipPvq42lN
- huTPPuL9IbYNLT2RuvJF2FZm+rZf1BQUIvcsqi+l1ne7UiawUsAaimf2vg27SEVhGf2Y
- +wu4VSTc9ZZovdt++QjjrMcI3FwGjhB9l1KOmwFPGGedB55xqNd0bG3gyY2o/8br/beF
- RsaaHHn7Symv/XgyQANNCF1A4200J3lPZGuMZYYgVaGIvAb3DJl4GBKNwIs0/ZH65EE3
- JFWg==
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=EExBny+oAa/2RvpDTj0xViQxKJSM6o83jutlTagIpwU=;
+ b=jqqk+gJiZ9YrCR3dy0o3Lgiw7Z6ZqhF1P8W+cy4NtzomqpZ8PrM4mz/jL6j2JhgsR5
+ HxiaSaMqOiq7zTWCHl0SU8YnfWKfBh8Rau+7AdBfO00MPF7tCs1D/nW7POj3E6RR4+Np
+ fvCuO5qo5WDIrHNgR2CL6kUZfBP+V1HA6e8McptspXkKcsXDJxDCi4edsDzua71ZCdsc
+ +4OwL01JdMDficT9qtIHihX0x/W6TZ9kchFmNVS7QjKblCnpR3QuWPYoEoJ+v/3u6fYa
+ QOFbuZzbGa1IvMe1rUEXsXulOD4ZUJMSU3Kl2PS5ECL2v5n5gPqxEJQCa3zcxsXR88pG
+ ZHPw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references;
- bh=4z2zPWedOviyKqg3qmIWn8g3R8jv2yS1u67ka41eHWc=;
- b=isAgvnkhVpwRsNGRp77zdYWxQG5oaGtr0p0zrWzJ+9jOLtF9EwXC6Xo56SFZFZxUKj
- 53Q31mTPcqkxA8zkYNDcBhtomBDUiWJs2nggl1zMy977UYKB+KPfIAncrLjZ60kXePbt
- h9e4WHoubPL/rf3N6xN2RpZYB8tJZovuedxngDUlv6mVUjo8phX8oItCWQtJ/ay25FfM
- /ozWc7tys9L7FTQ/MYWHFHTm07E43UffD8ztZdnrMycdql56zgT6I5kq3XB0ustK2jCi
- N77HJ2JrU3aHxaxbLiUqJ0R+qUtn1SnWvqSjVKOVXfujMTB2cFZbgoEqWF34gW7Aq3Ag
- lydQ==
-X-Gm-Message-State: APjAAAUq+iqxGajxnijP54MR83oYzIi2uIxxNtR91MAgswy6RiCf/7dw
- Dsuxrg98gUM0WNyjLGZmhsM8FUYMch4=
-X-Google-Smtp-Source: APXvYqwxy1zRvO52BhYb3sT+8Kuovf6j5LDyQQBtrjSUB7osj1rB9wryaNlqvorPcNxjV43eQGd0HQ==
-X-Received: by 2002:a63:ff54:: with SMTP id s20mr9314597pgk.398.1571420696525; 
- Fri, 18 Oct 2019 10:44:56 -0700 (PDT)
+ :references:mime-version:content-transfer-encoding;
+ bh=EExBny+oAa/2RvpDTj0xViQxKJSM6o83jutlTagIpwU=;
+ b=XOiGNherXt8KTVN8r/CoFT2BXlj0kE9rvTG9KQj7WbUfLj8SZ/u8hfEaH3E3kxsuLx
+ 9sHocId7eDLdt5pC1zhGy5Ioa1LVqraFlOcnoQEAlDq9m+IVHElaRzi32mcrLVLJFFmm
+ kLPMxOihc/BBVYr+/gS4Ks7Bv6aAb9dyX44O+rX+2bq0iC9SLki372xVzZXnqXYjP1S0
+ 3B7Ylngn1ozb91SIjtqxC0d56CNxKAzCRHluevTrlxxU9dV0M8WIvfL2A0ClgwE5z+Fp
+ MvjVBfIoieVxSTN/CvMxQgcQudj41+fDn2hHcBKkWbAdJC8Hk2p+Nc32iR+7Vlogyrqt
+ jOHg==
+X-Gm-Message-State: APjAAAVsALiqBTI+ig6yp/r0cq+dRVB+GUBuSo0Nj6PKxuSzKvTVha1X
+ BfAU8vrrJaBFwtsM+uxSDUuqHznC0R8=
+X-Google-Smtp-Source: APXvYqzLQUC6hh/IqxoPtGDjyO1VhA5GgyP8xz1xzWcTx/3ot4w+5tTZnPHPfizhpflbjIvQy1ggDw==
+X-Received: by 2002:a62:b616:: with SMTP id j22mr8036487pff.55.1571420682064; 
+ Fri, 18 Oct 2019 10:44:42 -0700 (PDT)
 Received: from localhost.localdomain (97-113-7-119.tukw.qwest.net.
  [97.113.7.119])
- by smtp.gmail.com with ESMTPSA id d20sm7857534pfq.88.2019.10.18.10.44.55
+ by smtp.gmail.com with ESMTPSA id d20sm7857534pfq.88.2019.10.18.10.44.40
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 18 Oct 2019 10:44:55 -0700 (PDT)
+ Fri, 18 Oct 2019 10:44:41 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v8 19/22] target/arm: Rebuild hflags at Xscale SCTLR writes
-Date: Fri, 18 Oct 2019 10:44:28 -0700
-Message-Id: <20191018174431.1784-20-richard.henderson@linaro.org>
+Subject: [PATCH v8 08/22] target/arm: Split out rebuild_hflags_aprofile
+Date: Fri, 18 Oct 2019 10:44:17 -0700
+Message-Id: <20191018174431.1784-9-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20191018174431.1784-1-richard.henderson@linaro.org>
 References: <20191018174431.1784-1-richard.henderson@linaro.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::543
+X-Received-From: 2607:f8b0:4864:20::444
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -95,34 +99,63 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Continue setting, but not relying upon, env->hflags.
+Create a function to compute the values of the TBFLAG_ANY bits
+that will be cached, and are used by A-profile.
 
+Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/arm/helper.c | 10 ++++++++++
- 1 file changed, 10 insertions(+)
+ target/arm/helper.c | 20 ++++++++++++--------
+ 1 file changed, 12 insertions(+), 8 deletions(-)
 
 diff --git a/target/arm/helper.c b/target/arm/helper.c
-index aae7b62458..c55783e540 100644
+index d1cd54cc93..ddd21edfcf 100644
 --- a/target/arm/helper.c
 +++ b/target/arm/helper.c
-@@ -4174,6 +4174,16 @@ static void sctlr_write(CPUARMState *env, const ARMCPRegInfo *ri,
-     /* ??? Lots of these bits are not implemented.  */
-     /* This may enable/disable the MMU, so do a TLB flush.  */
-     tlb_flush(CPU(cpu));
-+
-+    if (ri->type & ARM_CP_SUPPRESS_TB_END) {
-+        /*
-+         * Normally we would always end the TB on an SCTLR write; see the
-+         * comment in ARMCPRegInfo sctlr initialization below for why Xscale
-+         * is special.  Setting ARM_CP_SUPPRESS_TB_END also stops the rebuild
-+         * of hflags from the translator, so do it here.
-+         */
-+        arm_rebuild_hflags(env);
-+    }
+@@ -11106,18 +11106,28 @@ static uint32_t rebuild_hflags_m32(CPUARMState *env, int fp_el,
+     return rebuild_hflags_common_32(env, fp_el, mmu_idx, flags);
  }
  
- static CPAccessResult fpexc32_access(CPUARMState *env, const ARMCPRegInfo *ri,
++static uint32_t rebuild_hflags_aprofile(CPUARMState *env)
++{
++    int flags = 0;
++
++    flags = FIELD_DP32(flags, TBFLAG_ANY, DEBUG_TARGET_EL,
++                       arm_debug_target_el(env));
++    return flags;
++}
++
+ static uint32_t rebuild_hflags_a32(CPUARMState *env, int fp_el,
+                                    ARMMMUIdx mmu_idx)
+ {
+-    return rebuild_hflags_common_32(env, fp_el, mmu_idx, 0);
++    uint32_t flags = rebuild_hflags_aprofile(env);
++    return rebuild_hflags_common_32(env, fp_el, mmu_idx, flags);
+ }
+ 
+ static uint32_t rebuild_hflags_a64(CPUARMState *env, int el, int fp_el,
+                                    ARMMMUIdx mmu_idx)
+ {
++    uint32_t flags = rebuild_hflags_aprofile(env);
+     ARMMMUIdx stage1 = stage_1_mmu_idx(mmu_idx);
+     ARMVAParameters p0 = aa64_va_parameters_both(env, 0, stage1);
+-    uint32_t flags = 0;
+     uint64_t sctlr;
+     int tbii, tbid;
+ 
+@@ -11262,12 +11272,6 @@ void cpu_get_tb_cpu_state(CPUARMState *env, target_ulong *pc,
+         }
+     }
+ 
+-    if (!arm_feature(env, ARM_FEATURE_M)) {
+-        int target_el = arm_debug_target_el(env);
+-
+-        flags = FIELD_DP32(flags, TBFLAG_ANY, DEBUG_TARGET_EL, target_el);
+-    }
+-
+     *pflags = flags;
+     *cs_base = 0;
+ }
 -- 
 2.17.1
 
