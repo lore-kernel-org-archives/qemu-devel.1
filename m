@@ -6,44 +6,45 @@ X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 868B6CA9EA0
-	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 21:09:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D5611CA9EA9
+	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 21:11:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 57FC620869
-	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 21:09:07 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 57FC620869
+	by mail.kernel.org (Postfix) with ESMTPS id A9B39205C9
+	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 21:11:01 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A9B39205C9
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46044 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46060 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iLZUg-0007kZ-HA
-	for qemu-devel@archiver.kernel.org; Fri, 18 Oct 2019 17:09:06 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52027)
+	id 1iLZWW-0001D0-Tv
+	for qemu-devel@archiver.kernel.org; Fri, 18 Oct 2019 17:11:00 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52452)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jsnow@redhat.com>) id 1iLZTJ-0006Fe-9b
- for qemu-devel@nongnu.org; Fri, 18 Oct 2019 17:07:43 -0400
+ (envelope-from <jsnow@redhat.com>) id 1iLZVs-0000VH-N2
+ for qemu-devel@nongnu.org; Fri, 18 Oct 2019 17:10:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1iLZTH-0008VR-TW
- for qemu-devel@nongnu.org; Fri, 18 Oct 2019 17:07:41 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:56600)
+ (envelope-from <jsnow@redhat.com>) id 1iLZVr-0000rU-NN
+ for qemu-devel@nongnu.org; Fri, 18 Oct 2019 17:10:20 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:52126)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1iLZTG-0008V9-K2
- for qemu-devel@nongnu.org; Fri, 18 Oct 2019 17:07:39 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ (Exim 4.71) (envelope-from <jsnow@redhat.com>)
+ id 1iLZVp-0000qv-EO; Fri, 18 Oct 2019 17:10:17 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id CAAF889F2BE;
- Fri, 18 Oct 2019 21:07:37 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 935A7C049E12;
+ Fri, 18 Oct 2019 21:10:16 +0000 (UTC)
 Received: from [10.18.17.145] (dhcp-17-145.bos.redhat.com [10.18.17.145])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 36E335D713;
- Fri, 18 Oct 2019 21:07:37 +0000 (UTC)
-Subject: Re: [PATCH] configure: Require Python >= 3.5
-To: Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org
-References: <20191016224237.26180-1-ehabkost@redhat.com>
+ by smtp.corp.redhat.com (Postfix) with ESMTP id C87AD600C8;
+ Fri, 18 Oct 2019 21:10:15 +0000 (UTC)
+Subject: Re: [PATCH] iotests: Remove 130 from the "auto" group
+To: Thomas Huth <thuth@redhat.com>, Max Reitz <mreitz@redhat.com>,
+ qemu-block@nongnu.org
+References: <20191018161008.17140-1-thuth@redhat.com>
 From: John Snow <jsnow@redhat.com>
 Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
  mQINBFTKefwBEAChvwqYC6saTzawbih87LqBYq0d5A8jXYXaiFMV/EvMSDqqY4EY6whXliNO
@@ -119,18 +120,18 @@ Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
  i0HjnLoJP5jDcoMTabZTIazXmJz3pKM11HYJ5/ZsTIf3ZRJJKIvXJpbmcAPVwTZII6XxiJdh
  RSSX4Mvd5pL/+5WI6NTdW6DMfigTtdd85fe6PwBNVJL2ZvBfsBJZ5rxg1TOH3KLsYBqBTgW2
  glQofxhkJhDEcvjLhe3Y2BlbCWKOmvM8XS9TRt0OwUs=
-Message-ID: <e0631f8e-5c0b-c6cf-b513-68113c7ebd6d@redhat.com>
-Date: Fri, 18 Oct 2019 17:07:36 -0400
+Message-ID: <7a087ba0-b8b4-47a9-d914-0e98ee207442@redhat.com>
+Date: Fri, 18 Oct 2019 17:10:15 -0400
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.1.0
 MIME-Version: 1.0
-In-Reply-To: <20191016224237.26180-1-ehabkost@redhat.com>
+In-Reply-To: <20191018161008.17140-1-thuth@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.68]); Fri, 18 Oct 2019 21:07:37 +0000 (UTC)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.31]); Fri, 18 Oct 2019 21:10:16 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 209.132.183.28
@@ -146,115 +147,44 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>,
- Cleber Rosa <crosa@redhat.com>
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
 
-On 10/16/19 6:42 PM, Eduardo Habkost wrote:
-> Python 3.5 is the oldest Python version available on our
-> supported build platforms, and Python 2 end of life will be 3
-> weeks after the planned release date of QEMU 4.2.0.  Drop Python
-> 2 support from configure completely, and require Python 3.5 or
-> newer.
-> 
-
-Which distributions constrain us to 3.5 right now? I know Debian9 is one
-of them, but I'm not sure what others exist.
-
-I know I went through and checked a month ago, but I'm very smart and
-didn't write it down.
-
-It might be nice to document (somewhere) so we know when we can require
-something newer than 3.5 at the next major deprecation event.
-
-> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-
+On 10/18/19 12:10 PM, Thomas Huth wrote:
+> Peter hit a "Could not open 'TEST_DIR/t.IMGFMT': Failed to get shared
+> 'write' lock - Is another process using the image [TEST_DIR/t.IMGFMT]?"
+> error with 130 already twice. Looks like this test is a little bit
+> shaky, and currently nobody has a real clue what could be causing this
+> issue, so for the time being, let's disable it from the "auto" group so
+> that it does not gate the pull requests.
+>=20
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
 
 Reviewed-by: John Snow <jsnow@redhat.com>
 
-Thanks!
-
 > ---
->  configure              | 18 ++++--------------
->  tests/Makefile.include |  5 -----
->  2 files changed, 4 insertions(+), 19 deletions(-)
-> 
-> diff --git a/configure b/configure
-> index 08ca4bcb46..870657ec7b 100755
-> --- a/configure
-> +++ b/configure
-> @@ -895,9 +895,9 @@ fi
->  : ${install=${INSTALL-install}}
->  # We prefer python 3.x. A bare 'python' is traditionally
->  # python 2.x, but some distros have it as python 3.x, so
-> -# we check that before python2
-> +# we check that too
->  python=
-> -for binary in "${PYTHON-python3}" python python2
-> +for binary in "${PYTHON-python3}" python
->  do
->      if has "$binary"
->      then
-> @@ -1824,8 +1824,8 @@ fi
->  
->  # Note that if the Python conditional here evaluates True we will exit
->  # with status 1 which is a shell 'false' value.
-> -if ! $python -c 'import sys; sys.exit(sys.version_info < (2,7))'; then
-> -  error_exit "Cannot use '$python', Python 2 >= 2.7 or Python 3 is required." \
-> +if ! $python -c 'import sys; sys.exit(sys.version_info < (3,5))'; then
-> +  error_exit "Cannot use '$python', Python >= 3.5 is required." \
->        "Use --python=/path/to/python to specify a supported Python."
->  fi
->  
-> @@ -6456,15 +6456,6 @@ if test "$supported_os" = "no"; then
->      echo "us upstream at qemu-devel@nongnu.org."
->  fi
->  
-> -# Note that if the Python conditional here evaluates True we will exit
-> -# with status 1 which is a shell 'false' value.
-> -if ! $python -c 'import sys; sys.exit(sys.version_info < (3,0))'; then
-> -  echo
-> -  echo "warning: Python 2 support is deprecated" >&2
-> -  echo "warning: Python 3 will be required for building future versions of QEMU" >&2
-> -  python2="y"
-> -fi
-> -
->  config_host_mak="config-host.mak"
->  
->  echo "# Automatically generated by configure - do not modify" >config-all-disas.mak
-> @@ -7282,7 +7273,6 @@ echo "INSTALL_DATA=$install -c -m 0644" >> $config_host_mak
->  echo "INSTALL_PROG=$install -c -m 0755" >> $config_host_mak
->  echo "INSTALL_LIB=$install -c -m 0644" >> $config_host_mak
->  echo "PYTHON=$python" >> $config_host_mak
-> -echo "PYTHON2=$python2" >> $config_host_mak
->  echo "CC=$cc" >> $config_host_mak
->  if $iasl -h > /dev/null 2>&1; then
->    echo "IASL=$iasl" >> $config_host_mak
-> diff --git a/tests/Makefile.include b/tests/Makefile.include
-> index 3543451ed3..54ee1f0a2f 100644
-> --- a/tests/Makefile.include
-> +++ b/tests/Makefile.include
-> @@ -1137,7 +1137,6 @@ TESTS_RESULTS_DIR=$(BUILD_DIR)/tests/results
->  AVOCADO_SHOW=app
->  AVOCADO_TAGS=$(patsubst %-softmmu,-t arch:%, $(filter %-softmmu,$(TARGET_DIRS)))
->  
-> -ifneq ($(PYTHON2),y)
->  $(TESTS_VENV_DIR): $(TESTS_VENV_REQ)
->  	$(call quiet-command, \
->              $(PYTHON) -m venv --system-site-packages $@, \
-> @@ -1146,10 +1145,6 @@ $(TESTS_VENV_DIR): $(TESTS_VENV_REQ)
->              $(TESTS_VENV_DIR)/bin/python -m pip -q install -r $(TESTS_VENV_REQ), \
->              PIP, $(TESTS_VENV_REQ))
->  	$(call quiet-command, touch $@)
-> -else
-> -$(TESTS_VENV_DIR):
-> -	$(error "venv directory for tests requires Python 3")
-> -endif
->  
->  $(TESTS_RESULTS_DIR):
->  	$(call quiet-command, mkdir -p $@, \
-> 
+>  tests/qemu-iotests/group | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>=20
+> diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
+> index 7dac79a783..6aa4b8d098 100644
+> --- a/tests/qemu-iotests/group
+> +++ b/tests/qemu-iotests/group
+> @@ -151,7 +151,7 @@
+>  127 rw backing quick
+>  128 rw quick
+>  129 rw quick
+> -130 rw auto quick
+> +130 rw quick
+>  131 rw quick
+>  132 rw quick
+>  133 auto quick
+>=20
+
+--=20
+=E2=80=94js
 
