@@ -2,89 +2,67 @@ Return-Path: <SRS0=ht5U=YL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 910ECCA9EA0
-	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 16:06:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A7E79CA9EA0
+	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 16:09:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6616F21D7C
-	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 16:06:29 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6616F21D7C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 7AFC121D7C
+	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 16:09:31 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7AFC121D7C
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gnu.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42560 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42670 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iLUlo-0001Jr-2d
-	for qemu-devel@archiver.kernel.org; Fri, 18 Oct 2019 12:06:28 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46693)
+	id 1iLUok-000520-HL
+	for qemu-devel@archiver.kernel.org; Fri, 18 Oct 2019 12:09:30 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47309)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1iLUaD-0005kp-Lu
- for qemu-devel@nongnu.org; Fri, 18 Oct 2019 11:54:30 -0400
+ (envelope-from <samuel.thibault@gnu.org>) id 1iLUfy-0004UK-0K
+ for qemu-devel@nongnu.org; Fri, 18 Oct 2019 12:00:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1iLUaC-0007mf-Cm
- for qemu-devel@nongnu.org; Fri, 18 Oct 2019 11:54:29 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:38618)
+ (envelope-from <samuel.thibault@gnu.org>) id 1iLUfv-00032X-NL
+ for qemu-devel@nongnu.org; Fri, 18 Oct 2019 12:00:25 -0400
+Received: from mail3-relais-sop.national.inria.fr ([192.134.164.104]:13604)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>)
- id 1iLUa9-0007ik-NY; Fri, 18 Oct 2019 11:54:25 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id A4FB581F0F;
- Fri, 18 Oct 2019 15:54:24 +0000 (UTC)
-Received: from dresden.str.redhat.com (unknown [10.36.118.46])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 5B637600C4;
- Fri, 18 Oct 2019 15:54:20 +0000 (UTC)
-Subject: Re: [PATCH v2 0/5] active-mirror: support unaligned guest operations
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-block@nongnu.org
-References: <20191011090711.19940-1-vsementsov@virtuozzo.com>
-From: Max Reitz <mreitz@redhat.com>
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <dc555030-9238-126c-9256-8df6304d30e1@redhat.com>
-Date: Fri, 18 Oct 2019 17:54:18 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.0
+ (Exim 4.71) (envelope-from <samuel.thibault@gnu.org>)
+ id 1iLUfu-00031p-So
+ for qemu-devel@nongnu.org; Fri, 18 Oct 2019 12:00:23 -0400
+X-IronPort-AV: E=Sophos;i="5.67,312,1566856800"; d="scan'208";a="323214373"
+Received: from unknown (HELO function) ([193.50.111.121])
+ by mail3-relais-sop.national.inria.fr with ESMTP/TLS/AES256-GCM-SHA384;
+ 18 Oct 2019 18:00:20 +0200
+Received: from samy by function with local (Exim 4.92.2)
+ (envelope-from <samuel.thibault@gnu.org>)
+ id 1iLUfr-0006xf-Sk; Fri, 18 Oct 2019 18:00:19 +0200
+Date: Fri, 18 Oct 2019 18:00:19 +0200
+From: Samuel Thibault <samuel.thibault@gnu.org>
+To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Subject: Re: Python 2 and test/vm/netbsd
+Message-ID: <20191018160019.he52tpvjqolzgswg@function>
+References: <20191016030021.GD4084@habkost.net>
+ <a83d518a-6e39-0017-203d-2ee3d61935ca@redhat.com>
+ <20191016224124.GF4084@habkost.net>
+ <20191017220541.GJ4084@habkost.net>
+ <20191017225548.GL4084@habkost.net>
+ <20191018104439.c2tojlvi2c5zzesi@sirius.home.kraxel.org>
+ <20191018142940.GN4084@habkost.net>
+ <a0c2df74-360b-79de-132e-f4d5be5bfc12@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20191011090711.19940-1-vsementsov@virtuozzo.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="9WD5X87wB97H0UCeSCOpiTN03ptUuRa0S"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.27]); Fri, 18 Oct 2019 15:54:24 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.132.183.28
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <a0c2df74-360b-79de-132e-f4d5be5bfc12@redhat.com>
+Organization: I am not organized
+User-Agent: NeoMutt/20170609 (1.8.3)
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 192.134.164.104
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,81 +74,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: fam@euphon.net, kwolf@redhat.com, jsnow@redhat.com, qemu-devel@nongnu.org,
- den@openvz.org
+Cc: Fam Zheng <fam@euphon.net>, Peter Maydell <peter.maydell@linaro.org>,
+ Thomas Huth <thuth@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>,
+ John Snow <jsnow@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>,
+ Kamil Rytarowski <kamil@netbsd.org>, Gerd Hoffmann <kraxel@redhat.com>,
+ Kevin Wolf <kwolf@redhat.com>, Cleber Rosa <crosa@redhat.com>,
+ =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>,
+ Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---9WD5X87wB97H0UCeSCOpiTN03ptUuRa0S
-Content-Type: multipart/mixed; boundary="eVjNE0Z50utQCaCz9h3WT3YwHoZ8DpEdr"
+Philippe Mathieu-Daudé, le ven. 18 oct. 2019 16:58:00 +0200, a ecrit:
+> On 10/18/19 4:29 PM, Eduardo Habkost wrote:
+> > On Fri, Oct 18, 2019 at 12:44:39PM +0200, Gerd Hoffmann wrote:
+> > >    Hi,
+> > > 
+> > > > > Running with V=1, I see packages being downloaded at reasonable speeds, but
+> > > > > there's a huge interval (of various minutes) between each package download.
+> > > > 
+> > > > I've found the cause for the slowness I'm seeing: for each file
+> > > > being downloaded, the guest spents at least 75 seconds trying to
+> > > > connect to the IPv6 address of ftp.NetBSD.org, before trying
+> > > > IPv4.
+> > > 
+> > > Ah, that nicely explains why it worked just fine for me.  First, I have
+> > > a local proxy configured so the installer isn't going to connect to
+> > > ftp.NetBSD.org directly.  Second I have IPv6 connectivity.
+> > > 
+> > > > I don't know if this is a NetBSD bug, or a slirp bug.
+> > > 
+> > > Both I'd say ...
+> > > 
+> > > First, by default slirp should not send IPv6 router announcements
+> > > to the user network if the host has no IPv6 connectivity.
+> > > 
+> > > Second, the recommended way to connect is to try ipv4 and ipv6 in
+> > > parallel, then use whatever connects first.  Web browsers typically
+> > > do it that way.  wget and curl don't do that though, they try one
+> > > address after the other, and I guess this is where the delay comes
+> > > from ...
+> > 
+> > In addition to that, the connect() error should be generating a
+> > ICMP6_UNREACH message, and I'd expect the NetBSD guest to notice
+> > it instead of waiting for timeout.
+> 
+> Is this missing in SLiRP?
 
---eVjNE0Z50utQCaCz9h3WT3YwHoZ8DpEdr
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+It was implemented at the time of introduction of IPv6 in SLIRP. Perhaps
+NetBSD has a slightly different behavior which makes the implementation
+fail to notice the error.
 
-On 11.10.19 11:07, Vladimir Sementsov-Ogievskiy wrote:
-> Commit 9adc1cb49af8d fixed a bug about unaligned (to dirty bitmap
-> granularity) guest writes (and discards) by simply requesting
-> corresponding alignment on mirror-top filter. However forcing large
-> alignment obviously decreases performance of unaligned requests.
->=20
-> So it's time for a new solution which is in 04. And 05 reverts
-> 9adc1cb49af8d.
->=20
-> v2:
-> 01: new fix (do we need it for stable?)
-
-I don=E2=80=99t know? :-)
-
-I=E2=80=99ll just add the stable tag for good measure, I suppose it can=E2=
-=80=99t hurt.
-
-> 02,03,05: add Max's r-b
-> 04: fix bitmap handling
->     improve comments
->=20
-> Vladimir Sementsov-Ogievskiy (5):
->   hbitmap: handle set/reset with zero length
->   block/mirror: simplify do_sync_target_write
->   block/block-backend: add blk_co_pwritev_part
->   block/mirror: support unaligned write in active mirror
->   Revert "mirror: Only mirror granularity-aligned chunks"
->=20
->  include/sysemu/block-backend.h |   4 +
->  block/block-backend.c          |  17 +++-
->  block/mirror.c                 | 181 ++++++++++++++++-----------------=
-
->  util/hbitmap.c                 |   8 ++
->  4 files changed, 114 insertions(+), 96 deletions(-)
-
-Thanks, applied to my block branch:
-
-https://git.xanclic.moe/XanClic/qemu/commits/branch/block
-
-Max
-
-
---eVjNE0Z50utQCaCz9h3WT3YwHoZ8DpEdr--
-
---9WD5X87wB97H0UCeSCOpiTN03ptUuRa0S
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl2p4CoACgkQ9AfbAGHV
-z0BCFwgAqPUueYv7aX8dBo+g4ctS7OU7q7T1UEELsJ7Lw3hmBHe0M0McDGiY9TzT
-ev49LP/P10p+vYtFpqtvUkyQ5DxkwLI0sHDWJKHugIE4afSTP0o3lBF8sKRrE0s8
-Aw2g/p9VlVD9FQdJHqbkbsMbWHJcRUlfpv/o6Cj9yWL6O3pyqos1hv41WiutHRbL
-kjOhmdE0MCaMQSPyXKkvQ1psASONIwuMD/F5dWu42qMffI3FEuNPuF79evhKt1d6
-2gZ/P8GVjzBPmkUVJ+dHNTo6yuL8wFCwh+GQbX5Z+Ao3eDjl4LSYN8cXmebjUPW7
-UcjyJdZ+gs2/pCV9iKohx9ONUqFvcw==
-=s9I3
------END PGP SIGNATURE-----
-
---9WD5X87wB97H0UCeSCOpiTN03ptUuRa0S--
+Samuel
 
