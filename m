@@ -6,44 +6,44 @@ X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,NUMERIC_HTTP_ADDR,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D7DD6CA9EA0
-	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 07:21:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0C699CA9EA1
+	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 07:21:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id ACC952089C
+	by mail.kernel.org (Postfix) with ESMTPS id DA28421897
 	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 07:21:34 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ACC952089C
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DA28421897
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35866 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35868 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iLMZp-0006a3-MG
-	for qemu-devel@archiver.kernel.org; Fri, 18 Oct 2019 03:21:33 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56881)
+	id 1iLMZq-0006ba-0U
+	for qemu-devel@archiver.kernel.org; Fri, 18 Oct 2019 03:21:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56883)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1iLMZ5-0005k4-1i
+ (envelope-from <bounces@canonical.com>) id 1iLMZ5-0005k5-DJ
  for qemu-devel@nongnu.org; Fri, 18 Oct 2019 03:20:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1iLMZ3-0005pn-UU
- for qemu-devel@nongnu.org; Fri, 18 Oct 2019 03:20:46 -0400
-Received: from indium.canonical.com ([91.189.90.7]:43340)
+ (envelope-from <bounces@canonical.com>) id 1iLMZ4-0005pu-8H
+ for qemu-devel@nongnu.org; Fri, 18 Oct 2019 03:20:47 -0400
+Received: from indium.canonical.com ([91.189.90.7]:43366)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1iLMZ3-0005pe-Ow
- for qemu-devel@nongnu.org; Fri, 18 Oct 2019 03:20:45 -0400
+ id 1iLMZ4-0005pj-33
+ for qemu-devel@nongnu.org; Fri, 18 Oct 2019 03:20:46 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
  by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1iLMZ2-0002a2-ES
- for <qemu-devel@nongnu.org>; Fri, 18 Oct 2019 07:20:44 +0000
+ id 1iLMZ3-0002dc-3x
+ for <qemu-devel@nongnu.org>; Fri, 18 Oct 2019 07:20:45 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 6BCF72E80C0
- for <qemu-devel@nongnu.org>; Fri, 18 Oct 2019 07:20:44 +0000 (UTC)
+ by loganberry.canonical.com (Postfix) with ESMTP id 15F4E2E80C8
+ for <qemu-devel@nongnu.org>; Fri, 18 Oct 2019 07:20:45 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Fri, 18 Oct 2019 07:09:23 -0000
+Date: Fri, 18 Oct 2019 07:11:32 -0000
 From: =?utf-8?q?Christian_Ehrhardt_=EE=83=BF?= <1848556@bugs.launchpad.net>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
@@ -57,7 +57,7 @@ X-Launchpad-Bug-Reporter: Rod Smith (rodsmith)
 X-Launchpad-Bug-Modifier: =?utf-8?q?Christian_Ehrhardt_=EE=83=BF_=28paelzer?=
  =?utf-8?q?=29?=
 References: <157133449178.19203.719001918774596241.malonedeb@gac.canonical.com>
-Message-Id: <157138256353.22274.17676096119874925893.malone@wampee.canonical.com>
+Message-Id: <157138269266.19532.5124947725594971047.malone@gac.canonical.com>
 Subject: [Bug 1848556] Re: qemu-img check failing on remote image in Eoan
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
 X-Launchpad-Message-For: qemu-devel-ml
@@ -65,7 +65,7 @@ Precedence: bulk
 X-Generated-By: Launchpad (canonical.com);
  Revision="186023fa645d8be19d403a76064f0643f510db2f";
  Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 164b4ff62b6c9594b8778ad1d618e25343ea5576
+X-Launchpad-Hash: dcd0787097430411f73c084ab7110bd1cdb4418f
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 91.189.90.7
@@ -84,48 +84,9 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Rod,
-I did try to recreate with the qemu version that you have.
-
-$ apt install apache2 qemu-system-x86
-$ qemu-img create -f qcow2 /var/www/html/test.img 1G
-# local
-$ qemu-img check test.img
-No errors were found on the image.
-# remote
-$ qemu-img check http://localhost:80/test.img                              =
-                                                                           =
-                                =
-
-No errors were found on the image.                                         =
-                                                                           =
-                                        =
-
-Image end offset: 262144
-
-Local check and remote check both work just fine.
-
-I recognized the image that you have there and then did:
-$ cd /var/www/html/
-$ wget https://cloud-images.ubuntu.com/bionic/current/bionic-server-cloudim=
-g-amd64.img
-# local
-$ qemu-img check bionic-server-cloudimg-amd64.img
-No errors were found on the image.
-16651/36032 =3D 46.21% allocated, 98.92% fragmented, 98.49% compressed clus=
-ters
-Image end offset: 344195072
-# remote
-$ qemu-img check http://localhost:80/bionic-server-cloudimg-amd64.img
-<hangs>
-
-Therefore I can confirm the behavior you described.
-
-** Changed in: qemu
-       Status: New =3D> Incomplete
-
-** Changed in: qemu
-       Status: Incomplete =3D> Confirmed
+** Attachment added: "strace of the hanging qemu-img"
+   https://bugs.launchpad.net/qemu/+bug/1848556/+attachment/5298128/+files/=
+qemu-img-hangs.strace
 
 -- =
 
