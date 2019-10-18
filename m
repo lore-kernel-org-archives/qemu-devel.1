@@ -2,90 +2,129 @@ Return-Path: <SRS0=ht5U=YL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4709FCA9EA0
-	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 09:04:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4CDE7CA9EA1
+	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 09:09:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1D0FE2064B
-	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 09:04:50 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1D0FE2064B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 17B83222BD
+	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 09:09:08 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=xilinx.onmicrosoft.com header.i=@xilinx.onmicrosoft.com header.b="JDfoS8AW"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 17B83222BD
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=xilinx.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36872 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36894 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iLOBl-0003Ky-7L
-	for qemu-devel@archiver.kernel.org; Fri, 18 Oct 2019 05:04:49 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43485)
+	id 1iLOFw-0004ts-4T
+	for qemu-devel@archiver.kernel.org; Fri, 18 Oct 2019 05:09:08 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44022)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1iLOAv-0002k3-MU
- for qemu-devel@nongnu.org; Fri, 18 Oct 2019 05:03:58 -0400
+ (envelope-from <saipava@xilinx.com>) id 1iLOFE-0004TC-0f
+ for qemu-devel@nongnu.org; Fri, 18 Oct 2019 05:08:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1iLOAu-0000P7-Ie
- for qemu-devel@nongnu.org; Fri, 18 Oct 2019 05:03:57 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:35222)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>)
- id 1iLOAq-0000KJ-Am; Fri, 18 Oct 2019 05:03:52 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 4C83C3086E27;
- Fri, 18 Oct 2019 09:03:50 +0000 (UTC)
-Received: from dresden.str.redhat.com (unknown [10.36.118.46])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id B61E05C1B5;
- Fri, 18 Oct 2019 09:03:48 +0000 (UTC)
-Subject: Re: [PATCH v2 01/23] iotests: Introduce $SOCK_DIR
-To: Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org
-References: <20191017133155.5327-1-mreitz@redhat.com>
- <20191017133155.5327-2-mreitz@redhat.com>
- <b8251992-a52b-f605-e45e-edf381394130@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <1ea69391-fa2b-bb19-ce34-f47036f1a064@redhat.com>
-Date: Fri, 18 Oct 2019 11:03:46 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.0
+ (envelope-from <saipava@xilinx.com>) id 1iLOFC-0003Ui-GG
+ for qemu-devel@nongnu.org; Fri, 18 Oct 2019 05:08:23 -0400
+Received: from mail-eopbgr700064.outbound.protection.outlook.com
+ ([40.107.70.64]:64609 helo=NAM04-SN1-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <saipava@xilinx.com>) id 1iLOFC-0003U5-3X
+ for qemu-devel@nongnu.org; Fri, 18 Oct 2019 05:08:22 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=bFg5hQsWpgk1534n1OjQIwxEQjyLWDhvFJEJZcZMHkOasGgUbF97++E2DCWh4Get3IaowGW2V3338OCZvxVkXm4zbk7+xocUDvW4qN5OYfHUc/rLJcuJie93M2k8ATkfgMHZ66A4s9a4/yqOY6yw3I9jEmP2onf8axjfnpwKJi6/eGur63LQndfzaxK1NbihE2Jl2c1mr5/yZwYkzDiJBhERmeta7PiKnQn5wI8bWU03Thh/M5nOty6ouB9GykjsWvcNIIysxUGIr957CncLUF217bn8mwajovN04IW29FnafZ+MxRb2c4hDBrIhfn/aimFYfyuumsVrmkW+KdbtiQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=2V/WtIo7vDt1fSByUP+AcQNDAjqdZDlxV3dPBZ+mBOo=;
+ b=RzmhZoBokuEk7f6H34FxFNridGQP/QikJ2GtO2cs6vsAyXPAWWeGLuHxoplb1r+3byy45EX8z8hWegilFjJZtSgSxWuSkbRGHh/E8qHVGHZFFZdR9iQ5LA9Vt4gzuq9CM2GLuaZptALC7w+ucjo8UawCnz/4HSpHnldImsgG9CQ3e6lcqCzxo2M3OzCB10zRkabTDhTTwYgdoKyY1YQp5LHnWa2YGW3uk8cpTlapbHJpJC9uhAcxIg66SOxqiA/QjqRXE/HHzRmyWSq+lefx44R7FMtW1pqbOblOKbXopo9ZbzwPeXsJjKjk6Ks0hdctQPTr84BZsyNFZZrx2qZtmA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 149.199.60.83) smtp.rcpttodomain=alistair23.me smtp.mailfrom=xilinx.com;
+ dmarc=bestguesspass action=none header.from=xilinx.com; dkim=none (message
+ not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=xilinx.onmicrosoft.com; s=selector2-xilinx-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=2V/WtIo7vDt1fSByUP+AcQNDAjqdZDlxV3dPBZ+mBOo=;
+ b=JDfoS8AWeNSl5GO3eld3zOVC3VuKO+yLCPR6u8sM+ItUuA0CGQ7xG9b+K0EeF6BviKDDwDRiJ0v9raGRDEQyQzpiC9DeKRkCnOOwXPfpUEfQMyKfEM2DrN4yj4Qg0ttoaUfl8Xt563WkXRw45YpigzHVDOp5f7Eo4jgeWI9t4Ds=
+Received: from MWHPR0201CA0012.namprd02.prod.outlook.com
+ (2603:10b6:301:74::25) by DM6PR02MB5483.namprd02.prod.outlook.com
+ (2603:10b6:5:7a::22) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2347.16; Fri, 18 Oct
+ 2019 09:08:19 +0000
+Received: from CY1NAM02FT040.eop-nam02.prod.protection.outlook.com
+ (2a01:111:f400:7e45::200) by MWHPR0201CA0012.outlook.office365.com
+ (2603:10b6:301:74::25) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2347.16 via Frontend
+ Transport; Fri, 18 Oct 2019 09:08:19 +0000
+Authentication-Results: spf=pass (sender IP is 149.199.60.83)
+ smtp.mailfrom=xilinx.com; alistair23.me; dkim=none (message not signed)
+ header.d=none;alistair23.me; dmarc=bestguesspass action=none
+ header.from=xilinx.com;
+Received-SPF: Pass (protection.outlook.com: domain of xilinx.com designates
+ 149.199.60.83 as permitted sender) receiver=protection.outlook.com;
+ client-ip=149.199.60.83; helo=xsj-pvapsmtpgw01;
+Received: from xsj-pvapsmtpgw01 (149.199.60.83) by
+ CY1NAM02FT040.mail.protection.outlook.com (10.152.75.135) with Microsoft SMTP
+ Server (version=TLS1_0, cipher=TLS_RSA_WITH_AES_256_CBC_SHA) id 15.20.2367.14
+ via Frontend Transport; Fri, 18 Oct 2019 09:08:18 +0000
+Received: from unknown-38-66.xilinx.com ([149.199.38.66] helo=xsj-pvapsmtp01)
+ by xsj-pvapsmtpgw01 with esmtp (Exim 4.63)
+ (envelope-from <sai.pavan.boddu@xilinx.com>)
+ id 1iLOF8-0004ER-AX; Fri, 18 Oct 2019 02:08:18 -0700
+Received: from localhost ([127.0.0.1] helo=xsj-pvapsmtp01)
+ by xsj-pvapsmtp01 with esmtp (Exim 4.63)
+ (envelope-from <sai.pavan.boddu@xilinx.com>)
+ id 1iLOF2-0003TF-NM; Fri, 18 Oct 2019 02:08:12 -0700
+Received: from [10.140.6.35] (helo=xhdsaipava40.xilinx.com)
+ by xsj-pvapsmtp01 with esmtp (Exim 4.63)
+ (envelope-from <saipava@xhdsaipava40.xilinx.com>)
+ id 1iLOF2-0003T3-0g; Fri, 18 Oct 2019 02:08:12 -0700
+Received: by xhdsaipava40.xilinx.com (Postfix, from userid 14131)
+ id A6BC713C1372; Fri, 18 Oct 2019 14:39:11 +0530 (IST)
+From: Sai Pavan Boddu <sai.pavan.boddu@xilinx.com>
+To: Alistair Francis <alistair@alistair23.me>
+Subject: [PATCH v3] ssi: xilinx_spips: Skip spi bus update for few register
+ writes
+Date: Fri, 18 Oct 2019 14:39:04 +0530
+Message-Id: <1571389744-11740-1-git-send-email-sai.pavan.boddu@xilinx.com>
+X-Mailer: git-send-email 2.7.4
+X-TM-AS-Product-Ver: IMSS-7.1.0.1224-8.2.0.1013-23620.005
+X-TM-AS-User-Approved-Sender: Yes;Yes
+X-EOPAttributedMessage: 0
+X-MS-Office365-Filtering-HT: Tenant
+X-Forefront-Antispam-Report: CIP:149.199.60.83; IPV:NLI; CTRY:US; EFV:NLI;
+ SFV:NSPM;
+ SFS:(10009020)(4636009)(136003)(39860400002)(376002)(396003)(346002)(189003)(199004)(54906003)(16586007)(42186006)(2906002)(70586007)(316002)(14444005)(47776003)(305945005)(486006)(476003)(5660300002)(106002)(15650500001)(2616005)(50466002)(126002)(26005)(81166006)(6916009)(81156014)(50226002)(8676002)(336012)(6666004)(478600001)(8936002)(36756003)(103686004)(4326008)(48376002)(356004)(426003)(6266002)(70206006)(51416003)(186003);
+ DIR:OUT; SFP:1101; SCL:1; SRVR:DM6PR02MB5483; H:xsj-pvapsmtpgw01; FPR:;
+ SPF:Pass; LANG:en; PTR:unknown-60-83.xilinx.com; MX:1; A:1; 
 MIME-Version: 1.0
-In-Reply-To: <b8251992-a52b-f605-e45e-edf381394130@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="HayhKeLOle2yT2ew4NGDOMmR3X9YSWCll"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.44]); Fri, 18 Oct 2019 09:03:50 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.132.183.28
+Content-Type: text/plain
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: e6e32476-49a1-48da-50f3-08d753aab7cd
+X-MS-TrafficTypeDiagnostic: DM6PR02MB5483:
+X-Microsoft-Antispam-PRVS: <DM6PR02MB548304A72AAB9879E0E6EFDDCA6C0@DM6PR02MB5483.namprd02.prod.outlook.com>
+X-Auto-Response-Suppress: DR, RN, NRN, OOF, AutoReply
+X-MS-Oob-TLC-OOBClassifiers: OLM:72;
+X-Forefront-PRVS: 01949FE337
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: nCWCgis/eS3gJQj3fcE7UXMF3xl2qmbcEhnEBwnUj/s0XjcDQhnl711L9OpOPZdoj5ARZEQtDsHwD05UffnMcVySlR0nud8iW8SkfMdFeeLT31TEfe5V+7l5CEdgtHo0bt0QWYBVRRKQUEpbwxjlFcZ9YVbTndpO/F0FVgEi4VGPo4lMvYe9elKLlG36vdif9okSTpmyP6/qP3jS2l0Aj4XYpH2S0tOBGvxULMQS3L3Dn3+peim4a/Ba1tEOwiqXN7nkZF6KCGuoSzd0YY1tUWOajNo8Gz2zXFfk9WFUiipjd8UEAv8V0X8Y0gX9F11ne1kvFGmtTWwKvo21loIITSYfwPOAycoFQY5BCocAChmNWh+pfDPd6wuFRvroA3HzrESxjNcgfOMTRjaIMVJFOrKJSp+DZcu3MHKpQkcfOVE=
+X-OriginatorOrg: xilinx.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Oct 2019 09:08:18.8035 (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: e6e32476-49a1-48da-50f3-08d753aab7cd
+X-MS-Exchange-CrossTenant-Id: 657af505-d5df-48d0-8300-c31994686c5c
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=657af505-d5df-48d0-8300-c31994686c5c; Ip=[149.199.60.83];
+ Helo=[xsj-pvapsmtpgw01]
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR02MB5483
+X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
+X-Received-From: 40.107.70.64
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,120 +136,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
+Cc: edgar.iglesias@xilinx.com, Peter Maydell <peter.maydell@linaro.org>,
+ qemu-devel@nongnu.org, Francisco Iglesias <frasse.iglesias@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---HayhKeLOle2yT2ew4NGDOMmR3X9YSWCll
-Content-Type: multipart/mixed; boundary="9UT4jQAldrH7oOKnnkiw1D1euHBL7juoz"
+Few of the register writes need not update the spi bus state, so just
+return after reg write. Added few more dummy register offsets which need
+the same behaviour.
 
---9UT4jQAldrH7oOKnnkiw1D1euHBL7juoz
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+Signed-off-by: Sai Pavan Boddu <sai.pavan.boddu@xilinx.com>
+---
+Changes for V2:
+	Just skip update of spips cs and fifos
+	Update commit message accordingly
+Changes for V3:
+	Avoid checking for zynqmp qspi
+	Skip spi bus update for few of the registers
 
-On 17.10.19 16:52, Eric Blake wrote:
-> On 10/17/19 8:31 AM, Max Reitz wrote:
->> Unix sockets generally have a maximum path length.=C2=A0 Depending on =
-your
->> $TEST_DIR, it may be exceeded and then all tests that create and use
->> Unix sockets there may fail.
->>
->> Circumvent this by adding a new scratch directory specifically for
->> Unix socket files.=C2=A0 It defaults to a temporary directory (mktemp =
--d)
->> that is completely removed after the iotests are done.
->>
->> (By default, mktemp -d creates a /tmp/tmp.XXXXXXXXXX directory, which
->> should be short enough for our use cases.)
->>
->> Use mkdir -p to create the directory (because it seems right), and do
->> the same for $TEST_DIR (because there is no reason for that to be
->> created in any different way).
->>
->> Signed-off-by: Max Reitz <mreitz@redhat.com>
->> ---
->> =C2=A0 tests/qemu-iotests/check | 15 +++++++++++++--
->> =C2=A0 1 file changed, 13 insertions(+), 2 deletions(-)
->=20
->> @@ -116,10 +117,14 @@ set_prog_path()
->> =C2=A0 if [ -z "$TEST_DIR" ]; then
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 TEST_DIR=3D$PWD=
-/scratch
->> =C2=A0 fi
->> +mkdir -p "$TEST_DIR" || _init_error 'Failed to create TEST_DIR'
->=20
-> This one seems fine. We are either using the user's name (and if it is
-> pre-existing, not fail) or using a well-known name (if someone else
-> slams in files into that directory in parallel with our test run, oh
-> well).=C2=A0 But at least the well-known name is a directory that is pr=
-obably
-> already accessible only to the current user, not world-writable.
->=20
->> =C2=A0 -if [ ! -e "$TEST_DIR" ]; then
->> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 mkdir "$TEST_DIR"
->> +tmp_sock_dir=3Dfalse
->> +if [ -z "$SOCK_DIR" ]; then
->> +=C2=A0=C2=A0=C2=A0 SOCK_DIR=3D$(mktemp -d)
->> +=C2=A0=C2=A0=C2=A0 tmp_sock_dir=3Dtrue
->> =C2=A0 fi
->> +mkdir -p "$SOCK_DIR" || _init_error 'Failed to create SOCK_DIR'
->=20
-> Thinking about this again: if the user passed in a name, we probably
-> want to use it no matter whether the directory already exists (mkdir -p=
+ hw/ssi/xilinx_spips.c | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
 
-> makes sense: either the directory did not exist, or the user is in
-> charge of passing us a directory that they already secured).=C2=A0 But =
-if we
-> generate our own name in a world-writable location in /tmp, using mkdir=
+diff --git a/hw/ssi/xilinx_spips.c b/hw/ssi/xilinx_spips.c
+index a309c71..c23de47 100644
+--- a/hw/ssi/xilinx_spips.c
++++ b/hw/ssi/xilinx_spips.c
+@@ -109,6 +109,7 @@
+ #define R_GPIO              (0x30 / 4)
+ #define R_LPBK_DLY_ADJ      (0x38 / 4)
+ #define R_LPBK_DLY_ADJ_RESET (0x33)
++#define R_IOU_TAPDLY_BYPASS (0x3C / 4)
+ #define R_TXD1              (0x80 / 4)
+ #define R_TXD2              (0x84 / 4)
+ #define R_TXD3              (0x88 / 4)
+@@ -139,6 +140,8 @@
+ #define R_LQSPI_STS         (0xA4 / 4)
+ #define LQSPI_STS_WR_RECVD      (1 << 1)
+ 
++#define R_DUMMY_CYCLE_EN    (0xC8 / 4)
++#define R_ECO               (0xF8 / 4)
+ #define R_MOD_ID            (0xFC / 4)
+ 
+ #define R_GQSPI_SELECT          (0x144 / 4)
+@@ -1022,6 +1025,15 @@ static void xilinx_spips_write(void *opaque, hwaddr addr,
+     }
+     s->regs[addr] = (s->regs[addr] & ~mask) | (value & mask);
+ no_reg_update:
++    /* Skip SPI bus update for below registers writes */
++    switch (addr) {
++    case R_GPIO:
++    case R_LPBK_DLY_ADJ:
++    case R_IOU_TAPDLY_BYPASS:
++    case R_DUMMY_CYCLE_EN:
++    case R_ECO:
++        return;
++    }
+     xilinx_spips_update_cs_lines(s);
+     xilinx_spips_check_flush(s);
+     xilinx_spips_update_cs_lines(s);
+-- 
+2.7.4
 
-> -p means someone else can race us to the creation of the directory, and=
-
-> potentially populate it in a way to cause us a security hole while we
-> execute our tests.
-
-I don=E2=80=99t quite see how this is a security hole.  mktemp -d creates=
- the
-directory, so noone can race us.
-
-Max
-
-> I would be a bit more comfortable with:
->=20
-> tmp_sock_dir=3Dfalse
-> tmp_sock_opt=3D-p
-> if [ -z "$SOCK_DIR" ]; then
-> =C2=A0=C2=A0=C2=A0 SOCK_DIR=3D$(mktemp -d)
-> =C2=A0=C2=A0=C2=A0 tmp_sock_dir=3Dtrue
-> =C2=A0=C2=A0=C2=A0 tmp_sock_opt=3D=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 # disa=
-ble -p for our generated name
-> fi
-> mkdir $tmp_sock_opt "$SOCK_DIR" || _init_error 'Failed to create SOCK_D=
-IR'
->=20
-
-
-
---9UT4jQAldrH7oOKnnkiw1D1euHBL7juoz--
-
---HayhKeLOle2yT2ew4NGDOMmR3X9YSWCll
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl2pf/IACgkQ9AfbAGHV
-z0CZLQf9GLUxbmeMLRl9Tvf1ew7vQQaMUOgD2jp5Z2U/Rn0hhwDroW6YyptL2kz/
-jXkN7xZfIUwZKGd1p+wrv+bTxCrLp936XR/ryEv5WkRrXhTy2+OEBNfM2fyqkJGm
-Fhe9HahnTaPv4kMIitCvPaB5DqlhGtZCMWKKEru+9O2eKVWNeJ1eo//zY894OBDq
-lp9ZeoUYv9Ed1mSeYybiOqkyFdOG5CjnbJy6oRWqop6goad092VnjHQjbYSH/1Re
-I/yyRj2y97LMDZuL3MQ9H1cn+4s8PO3KV9ZfbTh4nSfFD5NTSIL5PzOJpECKq4L3
-xkWJv3sIHKwSpfGg3oJgVkpE4Ng2BQ==
-=pBmx
------END PGP SIGNATURE-----
-
---HayhKeLOle2yT2ew4NGDOMmR3X9YSWCll--
 
