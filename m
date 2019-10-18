@@ -2,68 +2,83 @@ Return-Path: <SRS0=ht5U=YL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E8B40CA9EA0
-	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 17:27:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 82FC7CA9EA0
+	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 17:38:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BCF0F222C3
-	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 17:27:41 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BCF0F222C3
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 4F5E1222C3
+	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 17:38:33 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="mDonSJbM"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4F5E1222C3
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43782 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43850 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iLW2O-0006mb-U3
-	for qemu-devel@archiver.kernel.org; Fri, 18 Oct 2019 13:27:40 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57639)
+	id 1iLWCu-0002D5-HZ
+	for qemu-devel@archiver.kernel.org; Fri, 18 Oct 2019 13:38:32 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58366)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgilbert@redhat.com>) id 1iLW1W-0006H7-H8
- for qemu-devel@nongnu.org; Fri, 18 Oct 2019 13:26:48 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1iLWBz-0001Ve-Qi
+ for qemu-devel@nongnu.org; Fri, 18 Oct 2019 13:37:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgilbert@redhat.com>) id 1iLW1T-0001Ck-Pu
- for qemu-devel@nongnu.org; Fri, 18 Oct 2019 13:26:45 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58470)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1iLW1T-0001CL-Hf
- for qemu-devel@nongnu.org; Fri, 18 Oct 2019 13:26:43 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 7EA943071CD1;
- Fri, 18 Oct 2019 17:26:42 +0000 (UTC)
-Received: from work-vm (unknown [10.36.118.42])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id D6B5A100EA05;
- Fri, 18 Oct 2019 17:26:40 +0000 (UTC)
-Date: Fri, 18 Oct 2019 18:26:38 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: Michael Roth <mdroth@linux.vnet.ibm.com>
-Subject: Re: [PATCH v2 2/2] migration: savevm_state_handler_insert:
- constant-time element insertion
-Message-ID: <20191018172638.GD2990@work-vm>
-References: <20191017205953.13122-1-cheloha@linux.vnet.ibm.com>
- <20191017205953.13122-3-cheloha@linux.vnet.ibm.com>
- <20191018081625.GA2990@work-vm>
- <351dca8e-e77c-c450-845b-d78ba621156a@redhat.com>
- <20191018094352.GC2990@work-vm>
- <157141671749.15348.15966144834012002565@sif>
+ (envelope-from <peter.maydell@linaro.org>) id 1iLWBy-0007au-Cm
+ for qemu-devel@nongnu.org; Fri, 18 Oct 2019 13:37:35 -0400
+Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:44125)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1iLWBy-0007Zv-70
+ for qemu-devel@nongnu.org; Fri, 18 Oct 2019 13:37:34 -0400
+Received: by mail-ot1-x343.google.com with SMTP id 21so5615635otj.11
+ for <qemu-devel@nongnu.org>; Fri, 18 Oct 2019 10:37:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=q3Dgggzvmh33bgxoFL75y/5zguo8PaVi4JqFgwckaVI=;
+ b=mDonSJbMtU2D/Iix8aA8+u2Ov059+VZg/xRm9n6lgXLIrqvdGqoeVE1cQKGHl2C4ad
+ Pvrc0pdhqMIgBvNhNIynyG0k58IO8JEHeK/RgfYgQshFjtLUj1KhuOkSu33dQaG5PYfD
+ vRmOXUNUtAYkpywon/HYXU3sA8oSeK+SWkO8rNxunXmLGU5LBKCLcgI1lhO4tt0kBhyJ
+ XNiMayyzk1jvqq4G6hX2IaL6CW0JdpsTDhqp7sb/lY7UVbGMDatWn1pdEW18TiEfeox0
+ 5vofXHKQbixW+oZdKNFNwmleQkk/aJtzH6nnkWd3EoisCJ6YK1PxDnWSgwW2DDf2ejVE
+ mkoQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=q3Dgggzvmh33bgxoFL75y/5zguo8PaVi4JqFgwckaVI=;
+ b=jX3TVJv370fP0Zr4uXbLtOd2ue/+TNu2RqCXSPlKhXFdRp5w80MjGc6yZo9nHzNHz2
+ rZHGZqlAdqmIGizqH/4MEreJfURCscaLoHHHTy5p5xbZXc/cdceq210NpISyt/VCpodt
+ AFcYtlFbIk8bfvCeQNIsM0Y0ek2ZzZYIEOfs+Cq+yGJTTW6w3hpkVm1waoSOs2KzEdoz
+ yejAjZvgXng4jEOCk1wgItAZLkzHLNsI9koSkSCjhCMp+D6JRf8f232QEbZ1BsRttXtn
+ 6GYSvidVog7/FDvoQZuH5f4HuhZ9TKx8ZoGrfwiVPAtEVR/Zb2ese0zfCSNU1hCAfSnp
+ mkoA==
+X-Gm-Message-State: APjAAAUE5RBY6PiGJIFCUMVRTH+pWMXrPgbBLTy7MYr/38qidHZDCf2n
+ 4on2Xa38F0o4sg+Hgnf5UK3ZifDaYJ0QogT7ubyo4Q==
+X-Google-Smtp-Source: APXvYqwSgb9gEHy5xr2wp00je0d7puch/tNiEX+KGkSGfE4oWiaXJJX/LP1+SBckdkg4Z6F+vp5bUf94vgc951g0lJU=
+X-Received: by 2002:a05:6830:ca:: with SMTP id
+ x10mr8154761oto.221.1571420253150; 
+ Fri, 18 Oct 2019 10:37:33 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <157141671749.15348.15966144834012002565@sif>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.47]); Fri, 18 Oct 2019 17:26:42 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.132.183.28
+References: <20191018154212.13458-1-marcandre.lureau@redhat.com>
+ <20191018154212.13458-9-marcandre.lureau@redhat.com>
+In-Reply-To: <20191018154212.13458-9-marcandre.lureau@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 18 Oct 2019 18:37:22 +0100
+Message-ID: <CAFEAcA_vpmUn4+GZEmUpYw4rQyE2irwgBs9oSQvTrDcv-7Buog@mail.gmail.com>
+Subject: Re: [PATCH 08/14] cris: replace PROP_PTR with PROP_LINK for interrupt
+ vector
+To: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::343
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -75,127 +90,117 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>, david@gibson.dropbear.id.au,
- Scott Cheloha <cheloha@linux.vnet.ibm.com>, qemu-devel@nongnu.org,
- Juan Quintela <quintela@redhat.com>
+Cc: Corey Minyard <cminyard@mvista.com>,
+ =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>,
+ Magnus Damm <magnus.damm@gmail.com>, Jason Wang <jasowang@redhat.com>,
+ =?UTF-8?Q?Herv=C3=A9_Poussineau?= <hpoussin@reactos.org>,
+ Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
+ QEMU Developers <qemu-devel@nongnu.org>,
+ Fabien Chouteau <chouteau@adacore.com>,
+ Aleksandar Markovic <amarkovic@wavecomp.com>,
+ KONRAD Frederic <frederic.konrad@adacore.com>, qemu-arm <qemu-arm@nongnu.org>,
+ qemu-ppc <qemu-ppc@nongnu.org>, Aurelien Jarno <aurelien@aurel32.net>,
+ "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Artyom Tarasenko <atar4qemu@gmail.com>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-* Michael Roth (mdroth@linux.vnet.ibm.com) wrote:
-> Quoting Dr. David Alan Gilbert (2019-10-18 04:43:52)
-> > * Laurent Vivier (lvivier@redhat.com) wrote:
-> > > On 18/10/2019 10:16, Dr. David Alan Gilbert wrote:
-> > > > * Scott Cheloha (cheloha@linux.vnet.ibm.com) wrote:
-> > > >> savevm_state's SaveStateEntry TAILQ is a priority queue.  Priority
-> > > >> sorting is maintained by searching from head to tail for a suitable
-> > > >> insertion spot.  Insertion is thus an O(n) operation.
-> > > >>
-> > > >> If we instead keep track of the head of each priority's subqueue
-> > > >> within that larger queue we can reduce this operation to O(1) time.
-> > > >>
-> > > >> savevm_state_handler_remove() becomes slightly more complex to
-> > > >> accomodate these gains: we need to replace the head of a priority's
-> > > >> subqueue when removing it.
-> > > >>
-> > > >> With O(1) insertion, booting VMs with many SaveStateEntry objects is
-> > > >> more plausible.  For example, a ppc64 VM with maxmem=8T has 40000 such
-> > > >> objects to insert.
-> > > > 
-> > > > Separate from reviewing this patch, I'd like to understand why you've
-> > > > got 40000 objects.  This feels very very wrong and is likely to cause
-> > > > problems to random other bits of qemu as well.
-> > > 
-> > > I think the 40000 objects are the "dr-connectors" that are used to plug
-> > > peripherals (memory, pci card, cpus, ...).
-> > 
-> > Yes, Scott confirmed that in the reply to the previous version.
-> > IMHO nothing in qemu is designed to deal with that many devices/objects
-> > - I'm sure that something other than the migration code is going to get upset.
-> 
-> The device/object management aspect seems to handle things *mostly* okay, at
-> least ever since QOM child properties started being tracked by a hash table
-> instead of a linked list. It's worth noting that that change (b604a854) was
-> done to better handle IRQ pins for ARM guests with lots of CPUs. I think it is
-> inevitable that certain machine types/configurations will call for large
-> numbers of objects and I think it is fair to improve things to allow for this
-> sort of scalability.
-> 
-> But I agree it shouldn't be abused, and you're right that there are some
-> problem areas that arise. Trying to outline them:
-> 
->  a) introspection commands like 'info qom-tree' become pretty unwieldly,
->     and with large enough numbers of objects might even break things (QMP
->     response size limits maybe?)
->  b) various related lists like reset handlers, vmstate/savevm handlers might
->     grow quite large
-> 
-> I think we could work around a) with maybe flagging certain
-> "internally-only" objects as 'hidden'. Introspection routines could then
-> filter these out, and routines like qom-set/qom-get could return report
-> something similar to EACCESS so they are never used/useful to management
-> tools.
-> 
-> In cases like b) we can optimize things where it makes sense like with
-> Scott's patch here. In most cases these lists need to be walked one way
-> or another, whether it's done internally by the object or through common
-> interfaces provided by QEMU. It's really just the O(n^2) type handling
-> where relying on common interfaces becomes drastically less efficient,
-> but I think we should avoid implementing things in that way anyway, or
-> improve them as needed.
-> 
-> > 
-> > Is perhaps the structure wrong somewhere - should there be a single DRC
-> > device that knows about all DRCs?
-> 
-> That's an interesting proposition, I think it's worth exploring further,
-> but from a high level:
-> 
->  - each SpaprDrc has migration state, and some sub-classes SpaprDrc (e.g.
->    SpaprDrcPhysical) have additional migration state. These are sent
->    as-needed as separate VMState entries in the migration stream.
->    Moving to a single DRC means we're either sending them as an flat
->    array or a sparse list, which would put just as much load on the
->    migration code (at least, with Scott's changes in place). It would
->    also be difficult to do all this in a way which maintains migration
->    compatibility with older machine types.
+On Fri, 18 Oct 2019 at 16:43, Marc-Andr=C3=A9 Lureau
+<marcandre.lureau@redhat.com> wrote:
+>
+> Instead of using raw interrupt vector pointer, store the associated
+> CPU with a link property.
+>
+> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
-Having sparse arrays etc within a vmstate isn't as bad; none of
-them actually need to be 'objects' as such - even if you have
-separate chunks of VMState.
+A link property is reasonable for a tightly coupled CPU and
+interrupt-controller. But in this case the binding is not
+actually very tight, and we can avoid it.
 
->  - other aspects of modeling these as QOM objects, such as look-ups,
->    reset-handling, and memory allocations, wouldn't be dramatically
->    improved upon by handling it all internally within the object
-> 
-> AFAICT the biggest issue with modeling the DRCs as individual objects
-> is actually how we deal with introspection, and we should try to
-> improve. What do you think of the alternative suggestion above of
-> marking certain objects as 'hidden' from various introspection
-> interfaces?
+> @@ -298,7 +296,7 @@ void axisdev88_init(MachineState *machine)
+>
+>      dev =3D qdev_create(NULL, "etraxfs,pic");
+>      /* FIXME: Is there a proper way to signal vectors to the CPU core?  =
+*/
+> -    qdev_prop_set_ptr(dev, "interrupt_vector", &env->interrupt_vector);
+> +    object_property_set_link(OBJECT(dev), OBJECT(cpu), "cpu", &error_abo=
+rt);
 
-That's one for someone who knows/cares about QOM more than me;
-Paolo, Dan Berrange, or Eduardo Habkost are QOM people.
+Rather than using a link property like this, we could
+instead make use of the fact that a qemu_irq line is
+actually capable of passing an arbitrary "int" value,
+not merely a bool. To do this we would:
 
-Dave
+ * remove the FIXME comment and the ptr prop/link prop code here
+ * remove the definition of the property from the PIC device
 
-> > 
-> > Dave
-> > 
-> > 
-> > > https://github.com/qemu/qemu/blob/master/hw/ppc/spapr_drc.c
-> > > 
-> > > They are part of SPAPR specification.
-> > > 
-> > > https://raw.githubusercontent.com/qemu/qemu/master/docs/specs/ppc-spapr-hotplug.txt
-> > > 
-> > > CC Michael Roth
-> > > 
-> > > Thanks,
-> > > Laurent
-> > --
-> > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
-> > 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> @@ -79,9 +78,10 @@ static void pic_update(struct etrax_pic *fs)
+>          }
+>      }
+>
+> -    if (fs->interrupt_vector) {
+> -        /* hack alert: ptr property */
+> -        *(uint32_t*)(fs->interrupt_vector) =3D vector;
+> +    if (fs->cpu) {
+> +        /* hack alert: cpu link property */
+> +        int32_t *int_vec =3D &fs->cpu->env.interrupt_vector;
+> +        *int_vec =3D (uint32_t)vector;
+>      }
+>      qemu_set_irq(fs->parent_irq, !!vector);
+
+ * here, instead of setting the CPU interrupt_vector field
+   and passing !!vector to qemu_set_irq, we just pass "vector",
+   so the other end gets the whole integer
+
+ * in target/cris/cpu.c:cris_cpu_set_irq(), we add something like
+   if (irq =3D=3D CRIS_CPU_IRQ) {
+       /*
+        * The PIC passes us the vector for the IRQ as the value it sends
+        * over the qemu_irq line
+        */
+       cpu->interrupt_vector =3D value;
+   }
+   at the top of the function.
+
+It would also be nice somewhere to have a comment documenting
+that this is the semantics the CPU expects for its incoming
+IRQ line. Unless anybody has a better place, then perhaps
+in the part of target/cris/cpu.h that defines CRIS_CPU_IRQ.
+(If the PIC followed the just-recently-invented qdev convention
+of having a .h file with a comment defining the "QEMU interface"
+to the device, as eg include/hw/misc/armsse-mhu.h, then that
+comment would be a good place to note that its sysbus IRQ 0
+has these value-is-the-vector semantics. But it doesn't.)
+
+>  }
+> @@ -164,7 +164,7 @@ static void etraxfs_pic_init(Object *obj)
+>  }
+>
+>  static Property etraxfs_pic_properties[] =3D {
+> -    DEFINE_PROP_PTR("interrupt_vector", struct etrax_pic, interrupt_vect=
+or),
+> +    DEFINE_PROP_LINK("cpu", struct etrax_pic, cpu, TYPE_CRIS_CPU, CRISCP=
+U *),
+>      DEFINE_PROP_END_OF_LIST(),
+>  };
+>
+> @@ -173,10 +173,6 @@ static void etraxfs_pic_class_init(ObjectClass *klas=
+s, void *data)
+>      DeviceClass *dc =3D DEVICE_CLASS(klass);
+>
+>      dc->props =3D etraxfs_pic_properties;
+> -    /*
+> -     * Note: pointer property "interrupt_vector" may remain null, thus
+> -     * no need for dc->user_creatable =3D false;
+> -     */
+>  }
+
+Incidentally this is a sysbus device, so it's not user
+creatable anyway.
+
+thanks
+-- PMM
 
