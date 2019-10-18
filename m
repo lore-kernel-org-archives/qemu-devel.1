@@ -2,72 +2,76 @@ Return-Path: <SRS0=ht5U=YL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 81CF1CA9EA9
-	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 15:12:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 28C1BCA9EA9
+	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 15:13:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4AFF321897
-	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 15:12:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E532021897
+	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 15:13:08 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=greensocs.com header.i=@greensocs.com header.b="eUopk+AS"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4AFF321897
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=greensocs.com header.i=@greensocs.com header.b="A5S94pTw"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E532021897
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=greensocs.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41618 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41620 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iLTvf-0001Vo-CF
-	for qemu-devel@archiver.kernel.org; Fri, 18 Oct 2019 11:12:35 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39049)
+	id 1iLTwB-0001oX-V4
+	for qemu-devel@archiver.kernel.org; Fri, 18 Oct 2019 11:13:08 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39112)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <damien.hedde@greensocs.com>) id 1iLTrA-0006iM-LA
- for qemu-devel@nongnu.org; Fri, 18 Oct 2019 11:07:58 -0400
+ (envelope-from <damien.hedde@greensocs.com>) id 1iLTrC-0006ka-Ar
+ for qemu-devel@nongnu.org; Fri, 18 Oct 2019 11:07:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <damien.hedde@greensocs.com>) id 1iLTr8-0000GQ-PT
- for qemu-devel@nongnu.org; Fri, 18 Oct 2019 11:07:56 -0400
-Received: from beetle.greensocs.com ([5.135.226.135]:38582)
+ (envelope-from <damien.hedde@greensocs.com>) id 1iLTrA-0000I5-TJ
+ for qemu-devel@nongnu.org; Fri, 18 Oct 2019 11:07:58 -0400
+Received: from beetle.greensocs.com ([5.135.226.135]:38684)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <damien.hedde@greensocs.com>)
- id 1iLTr4-0000B3-HI; Fri, 18 Oct 2019 11:07:51 -0400
+ id 1iLTr7-0000DH-6A; Fri, 18 Oct 2019 11:07:53 -0400
 Received: from crumble.bar.greensocs.com (crumble.bar.greensocs.com
  [172.16.11.102])
- by beetle.greensocs.com (Postfix) with ESMTPS id 704BE96EF0;
- Fri, 18 Oct 2019 15:07:46 +0000 (UTC)
+ by beetle.greensocs.com (Postfix) with ESMTPS id 985CC96F53;
+ Fri, 18 Oct 2019 15:07:51 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=greensocs.com;
- s=mail; t=1571411267;
+ s=mail; t=1571411272;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding;
- bh=uVZEjVjf5RkbOzKuBwII7TJZpvbTBPo7Ayc+WX9Uv0Q=;
- b=eUopk+ASRZQmQL+cpP1uSfZChRMXiUIxX8Qkm348DJGLe8K4raBgX9q/g7iM7ZqjTzPd4i
- JWMkrf/h96/cDLie0UUhzmKf4Os1IVr2ZF24VirTBVDvRtYTCP0Xysjb9+Do+D48hxEKQI
- /UM6YBeIZglNk59Rim7HYiT+hG4pDyw=
+ to:to:cc:cc:mime-version:mime-version:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=viHjPgtc5HTCRsQlMywrp57XhUG1VOp0+kLWxpMlyqs=;
+ b=A5S94pTw0UDr+7bCBWTCw6RNRzg4BRCxMf3Yvd5hzNDKaiz2WjH9pJUPNpSuiWK7Rz4SAm
+ hUcVW8CKZV5x/gpe3vQB8dztdHy3XXwlsD35CEjoKL/geqKd3u5I39VpAJBvdKYLn1DlGZ
+ DODUOGDTDvB5xB4ZQW/ONMRYJ6/BF5g=
 From: Damien Hedde <damien.hedde@greensocs.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v5 00/13] Multi-phase reset mechanism
-Date: Fri, 18 Oct 2019 17:06:17 +0200
-Message-Id: <20191018150630.31099-1-damien.hedde@greensocs.com>
+Subject: [PATCH v5 05/13] hw/core/resettable: add support for changing parent
+Date: Fri, 18 Oct 2019 17:06:22 +0200
+Message-Id: <20191018150630.31099-6-damien.hedde@greensocs.com>
 X-Mailer: git-send-email 2.23.0
+In-Reply-To: <20191018150630.31099-1-damien.hedde@greensocs.com>
+References: <20191018150630.31099-1-damien.hedde@greensocs.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=greensocs.com; 
- s=mail; t=1571411267;
+ s=mail; t=1571411272;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding;
- bh=uVZEjVjf5RkbOzKuBwII7TJZpvbTBPo7Ayc+WX9Uv0Q=;
- b=Mav+uUqQnveDlUlxVrQvCBj+Kw0Sk0VladuSyY/ifSVNjj4RWUThPSszOZJP9BWuNYpMp8
- aR43yXl19rnQX0jGdtwswFSNdvUY/t31ptjQunm/N1R1Z+cB4nonGX794UOwhZ4ecFozGk
- KJZkMY/PoYuDzPz4xmHDfUpoda9PkME=
-ARC-Seal: i=1; s=mail; d=greensocs.com; t=1571411267; a=rsa-sha256; cv=none;
- b=EGYlgA1M/i+/169sG32BFdflGqKn0bvVxz70TyTjDjWc+X5Emelr7LlESlnWLkTpJSHPS1
- OvjbjXZtz3HcvNIcg0e2khBiKpR24tYxJloEt2yFHxmmvTsRwu6Y3LwxHfJ0AbxgjlTexb
- mUfaXnowI5y6DZeKoydtqb342Q8XkUU=
+ to:to:cc:cc:mime-version:mime-version:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=viHjPgtc5HTCRsQlMywrp57XhUG1VOp0+kLWxpMlyqs=;
+ b=xtM+7hXVtdGDUw9yE8WtYEHDnqFfDJHWCGz6rs0uOddJ0P4YaVdORYpA9yoPdeeSlp5V1a
+ /QMpV1k8F+sZnkMYW02T5eZxF+rXo0lW6MgyIsDNQDv8nxPp/mXAN3nw+qdKy8IBbbsDO7
+ TjsOw6fmBJJY7vb44eg9yEC6U5HCQmk=
+ARC-Seal: i=1; s=mail; d=greensocs.com; t=1571411272; a=rsa-sha256; cv=none;
+ b=ofUFQx6vB2S5YrWDeau9gYS9mzviv68FpdylAFHdKZf668q/I23kNUVepXfB0l0EkbOv5v
+ jJD1xxSTY8yzaDBhfN+fNObGMTORJyLo/wyGmv7UoIpf6l8+F0laaigJvKrWyE6pR2/eJt
+ PjoU30p5sbS7CP7ZlAMexYdITjBQASs=
 ARC-Authentication-Results: i=1;
 	beetle.greensocs.com;
 	none
@@ -95,109 +99,165 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi all,
+Add a function resettable_change_parent() to do the required
+plumbing when changing the parent a of Resettable object.
 
-The purpose of this series is to split the current reset procedure
-into multiple phases. This will help to solve some ordering
-difficulties we have during reset. Previous version can be found here:
-https://lists.gnu.org/archive/html/qemu-devel/2019-08/msg04359.html
+We need to make sure that the reset state of the object remains
+coherent with the reset state of the new parent.
 
-This series adds resettable interface and transitions base Device and
-Bus classes (sysbus subclasses are ok too). It provides new reset
-functions but does not switch anymore the old functions
-(device_reset() and qdev/qbus_reset_all()) to resettable interface.
-These functions keep the exact same behavior as before.
+We make the 2 following hypothesis:
++ when an object is put in a parent under reset, the object goes in
+reset.
++ when an object is removed from a parent under reset, the object
+leaves reset.
 
-The series also transition the main reset handlers registration which
-has no impact until devices and buses are transitioned.
+The added function avoid any glitch if both old and new parent are
+already in reset.
 
-I think this version is way better regarding the transition from the
-legacy to the resettable interface than the previous one.
-After this series, the plan is then to transition devices, buses and
-legacy reset call sites. Devices and buses have to be transitioned
-from mother class to daughter classes order but until the final
-(daughter) class is transitioned, old monolitic reset behavior will
-be kept for this class.
+Signed-off-by: Damien Hedde <damien.hedde@greensocs.com>
+---
+ hw/core/resettable.c    | 54 +++++++++++++++++++++++++++++++++++++++++
+ hw/core/trace-events    |  1 +
+ include/hw/resettable.h | 16 ++++++++++++
+ 3 files changed, 71 insertions(+)
 
-Changes v4 -> v5:
-  + various improvement in the resettable interface (regarding
-    transition, robustness and several reset types)
-  + better handling of transition from legacy reset to resettable
-  + device hotplug and parent bus 'hot' change support
-  + improved doc with examples and converted to rst format
-
-Regarding the Resettable interface changes and how to handle more
-reset types, please read patch 3 message.
-
-The series is organized as follows:
-Patch 1 is unmodified. Patch 2 adds some utility trace events.
-Patches 3 to 8 adds resettable api in devices and buses. Patch 9 adds
-some documentation. Patches 10 and 11 transition the call sites of
-qemu_register_reset(qdev/qbus_reset_all_fn, ...).
-
-Apart from patch 7 about hotplug which is really a rfc. I think other
-patches are in pretty good shape.
-Patch 3 and 4 are quite big but I don't think it make much sense to
-split them. I could give it a try if you think it will ease reviews.
-Note that depending on what name we choose for device/bus reset
-functions (see patch 8), we may finally don't need patch 1.
-
-I've also added patches 12 and 13 which handle the raspi sd card
-reparenting. I'm not sure they fit well in this series but at some
-point in this development I thought they had to be before patch 9
-(finally it is not the case). Since I had to develop some specific
-resettable support just for this case , I kept them as an example
-of what transition a device is. Note that patch 13 handle the only
-reset parent change (tricky) case I found (apart from hotplug).
-
-Thanks for your feedback,
-Damien
-
-Damien Hedde (13):
-  add device_legacy_reset function to prepare for reset api change
-  hw/core/qdev: add trace events to help with resettable transition
-  hw/core: create Resettable QOM interface
-  hw/core: add Resettable support to BusClass and DeviceClass
-  hw/core/resettable: add support for changing parent
-  hw/core/qdev: handle parent bus change regarding resettable
-  hw/core/qdev: update hotplug reset regarding resettable
-  hw/core: deprecate old reset functions and introduce new ones
-  docs/devel/reset.txt: add doc about Resettable interface
-  vl: replace deprecated qbus_reset_all registration
-  hw/s390x/ipl: replace deprecated qdev_reset_all registration
-  hw/gpio/bcm2835_gpio: Isolate sdbus reparenting
-  hw/gpio/bcm2835_gpio: Update to resettable
-
- Makefile.objs            |   1 +
- docs/devel/reset.rst     | 282 ++++++++++++++++++++++++++++++++++++++
- hw/audio/intel-hda.c     |   2 +-
- hw/core/Makefile.objs    |   1 +
- hw/core/bus.c            | 102 ++++++++++++++
- hw/core/qdev.c           | 156 +++++++++++++++++++--
- hw/core/resettable.c     | 289 +++++++++++++++++++++++++++++++++++++++
- hw/core/trace-events     |  27 ++++
- hw/gpio/bcm2835_gpio.c   |  31 +++--
- hw/hyperv/hyperv.c       |   2 +-
- hw/i386/pc.c             |   2 +-
- hw/ide/microdrive.c      |   8 +-
- hw/intc/spapr_xive.c     |   2 +-
- hw/ppc/pnv_psi.c         |   2 +-
- hw/ppc/spapr_pci.c       |   2 +-
- hw/ppc/spapr_vio.c       |   2 +-
- hw/s390x/ipl.c           |  10 +-
- hw/s390x/s390-pci-inst.c |   2 +-
- hw/scsi/vmw_pvscsi.c     |   2 +-
- hw/sd/omap_mmc.c         |   2 +-
- hw/sd/pl181.c            |   2 +-
- include/hw/qdev-core.h   |  58 +++++++-
- include/hw/resettable.h  | 224 ++++++++++++++++++++++++++++++
- tests/Makefile.include   |   1 +
- vl.c                     |  10 +-
- 25 files changed, 1185 insertions(+), 37 deletions(-)
- create mode 100644 docs/devel/reset.rst
- create mode 100644 hw/core/resettable.c
- create mode 100644 include/hw/resettable.h
-
+diff --git a/hw/core/resettable.c b/hw/core/resettable.c
+index c5e11cff4f..60d4285fcc 100644
+--- a/hw/core/resettable.c
++++ b/hw/core/resettable.c
+@@ -32,6 +32,14 @@ static void resettable_phase_exit(Object *obj, void *o=
+paque, ResetType type);
+  */
+ static bool enter_phase_in_progress;
+=20
++/**
++ * exit_phase_in_progress:
++ * Flag telling whether we are currently in an enter phase where side
++ * effects are forbidden. This flag allows us to catch if
++ * resettable_change_parent() is called during exit phase.
++ */
++static unsigned exit_phase_in_progress;
++
+ void resettable_reset(Object *obj, ResetType type)
+ {
+     trace_resettable_reset(obj, type);
+@@ -58,7 +66,9 @@ void resettable_release_reset(Object *obj, ResetType ty=
+pe)
+     /* TODO: change that assert when adding support for other reset type=
+s */
+     assert(type =3D=3D RESET_TYPE_COLD);
+     trace_resettable_reset_release_begin(obj, type);
++    exit_phase_in_progress +=3D 1;
+     resettable_phase_exit(obj, NULL, type);
++    exit_phase_in_progress -=3D 1;
+     trace_resettable_reset_release_end(obj);
+ }
+=20
+@@ -198,6 +208,50 @@ static void resettable_phase_exit(Object *obj, void =
+*opaque, ResetType type)
+     trace_resettable_phase_exit_end(obj, obj_typename, s->count);
+ }
+=20
++/*
++ * resettable_get_count:
++ * Get the count of the Resettable object @obj. Return 0 if @obj is NULL=
+.
++ */
++static uint32_t resettable_get_count(Object *obj)
++{
++    if (obj) {
++        ResettableClass *rc =3D RESETTABLE_GET_CLASS(obj);
++        return rc->get_state(obj)->count;
++    }
++    return 0;
++}
++
++void resettable_change_parent(Object *obj, Object *newp, Object *oldp)
++{
++    ResettableClass *rc =3D RESETTABLE_GET_CLASS(obj);
++    ResettableState *s =3D rc->get_state(obj);
++    uint32_t newp_count =3D resettable_get_count(newp);
++    uint32_t oldp_count =3D resettable_get_count(oldp);
++
++    assert(!enter_phase_in_progress && !exit_phase_in_progress);
++    trace_resettable_change_parent(obj, oldp, oldp_count, newp, newp_cou=
+nt);
++
++    /*
++     * At most one of the two 'for' loop will be executed below
++     * in order to cope with the diff between the two count.
++     */
++    /* if newp is more reset than oldp */
++    for (uint32_t i =3D oldp_count; i < newp_count; i++) {
++        resettable_assert_reset(obj, RESET_TYPE_COLD);
++    }
++    /*
++     * if obj is leaving a bus under reset, we need to ensure
++     * hold phase is not pending.
++     */
++    if (oldp_count && s->hold_phase_pending) {
++        resettable_phase_hold(obj, NULL, RESET_TYPE_COLD);
++    }
++    /* if oldp is more reset than newp */
++    for (uint32_t i =3D newp_count; i < oldp_count; i++) {
++        resettable_release_reset(obj, RESET_TYPE_COLD);
++    }
++}
++
+ void resettable_class_set_parent_phases(ResettableClass *rc,
+                                         ResettableEnterPhase enter,
+                                         ResettableHoldPhase hold,
+diff --git a/hw/core/trace-events b/hw/core/trace-events
+index 66081d0fb4..6d03ef7ff9 100644
+--- a/hw/core/trace-events
++++ b/hw/core/trace-events
+@@ -16,6 +16,7 @@ resettable_reset_assert_begin(void *obj, int cold) "obj=
+=3D%p cold=3D%d"
+ resettable_reset_assert_end(void *obj) "obj=3D%p"
+ resettable_reset_release_begin(void *obj, int cold) "obj=3D%p cold=3D%d"
+ resettable_reset_release_end(void *obj) "obj=3D%p"
++resettable_change_parent(void *obj, void *o, uint32_t oc, void *n, uint3=
+2_t nc) "obj=3D%p from=3D%p(%" PRIu32 ") to=3D%p(%" PRIu32 ")"
+ resettable_phase_enter_begin(void *obj, const char *objtype, uint32_t co=
+unt, int type) "obj=3D%p(%s) count=3D%" PRIu32 " type=3D%d"
+ resettable_phase_enter_exec(void *obj, const char *objtype, int type, in=
+t has_method) "obj=3D%p(%s) type=3D%d method=3D%d"
+ resettable_phase_enter_end(void *obj, const char *objtype, uint32_t coun=
+t) "obj=3D%p(%s) count=3D%" PRIu32
+diff --git a/include/hw/resettable.h b/include/hw/resettable.h
+index 6b24e1633b..f6d379669f 100644
+--- a/include/hw/resettable.h
++++ b/include/hw/resettable.h
+@@ -182,6 +182,22 @@ void resettable_release_reset(Object *obj, ResetType=
+ type);
+  */
+ bool resettable_is_in_reset(Object *obj);
+=20
++/**
++ * resettable_change_parent:
++ * Indicate that the parent of Ressettable @obj change from @oldp to @ne=
+wp.
++ * All 3 objects must implements resettable interface. @oldp or @newp ma=
+y be
++ * NULL.
++ *
++ * This function will adapt the reset state of @obj so that it is cohere=
+nt
++ * with the reset state of @newp. It may trigger @resettable_assert_rese=
+t()
++ * or @resettable_release_reset(). It will do such things only if the re=
+set
++ * state of @newp and @oldp are different.
++ *
++ * When using this function during reset, it must only be called during
++ * an hold phase method. Calling this during enter or exit phase is an e=
+rror.
++ */
++void resettable_change_parent(Object *obj, Object *newp, Object *oldp);
++
+ /**
+  * resettable_class_set_parent_phases:
+  *
 --=20
 2.23.0
 
