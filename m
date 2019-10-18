@@ -2,69 +2,83 @@ Return-Path: <SRS0=ht5U=YL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A1929CA9EA0
-	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 16:51:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8ECC9CA9EA9
+	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 16:51:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 755F020854
-	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 16:51:20 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 755F020854
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id 5834320854
+	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 16:51:58 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="NMvjkleR"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5834320854
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43260 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43262 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iLVTD-00032M-I1
-	for qemu-devel@archiver.kernel.org; Fri, 18 Oct 2019 12:51:19 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53611)
+	id 1iLVTp-0003b3-9R
+	for qemu-devel@archiver.kernel.org; Fri, 18 Oct 2019 12:51:57 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53697)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <no-reply@patchew.org>) id 1iLVSL-00026n-Pv
- for qemu-devel@nongnu.org; Fri, 18 Oct 2019 12:50:27 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1iLVSd-0002X8-5e
+ for qemu-devel@nongnu.org; Fri, 18 Oct 2019 12:50:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <no-reply@patchew.org>) id 1iLVSJ-0000fA-GW
- for qemu-devel@nongnu.org; Fri, 18 Oct 2019 12:50:24 -0400
-Resent-Date: Fri, 18 Oct 2019 12:50:24 -0400
-Resent-Message-Id: <E1iLVSJ-0000fA-GW@eggs.gnu.org>
-Received: from sender4-of-o54.zoho.com ([136.143.188.54]:21425)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <no-reply@patchew.org>)
- id 1iLVSJ-0000ea-96
- for qemu-devel@nongnu.org; Fri, 18 Oct 2019 12:50:23 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1571417406; cv=none; 
- d=zohomail.com; s=zohoarc; 
- b=ah1BBq2sj6uq9yyjUeqgU1zB+o7dgN88hiSp7hfyc2W1NRYKtJ43phIMG9OcEUL3+mp263WRVAi1q/7AknOY4BIeSuYpzkL6zQ23XFLynabUV888rNigxIqgU9NjxmR6RVfkmWS104ApNJlK3yGS4MePSNASCljE3C2dcRJD/y0=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
- s=zohoarc; t=1571417406;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
- bh=lCRxQndVMWw580CPFSP2puM0BF6Sa+i89VhFf4OZrDE=; 
- b=mngBavJdA7mzgZLSllpuOfjCC6mxAL91tXP8Nqj64y7OkWEG6QRMb5PmIYpLQCqtG4xtsIOtY9TKnuAszwRaodaMiDEqpqLOhpSO7v7ZiUC+QzawRKWJOdY8l4ElpA+6B2knm2wVG+bABG9YGYZWI8jZr9EyUwlkBtx8xTiIj1w=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
- dkim=pass  header.i=patchew.org;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1571417405255312.60141177390335;
- Fri, 18 Oct 2019 09:50:05 -0700 (PDT)
-In-Reply-To: <20191018004850.9888-1-richardw.yang@linux.intel.com>
-Subject: Re: [PATCH 0/6] migration/postcopy: enable compress during postcopy
-Message-ID: <157141740394.24734.9600428911119666435@37313f22b938>
+ (envelope-from <peter.maydell@linaro.org>) id 1iLVSb-0000rN-UF
+ for qemu-devel@nongnu.org; Fri, 18 Oct 2019 12:50:43 -0400
+Received: from mail-oi1-x241.google.com ([2607:f8b0:4864:20::241]:39765)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1iLVSb-0000qt-Lx
+ for qemu-devel@nongnu.org; Fri, 18 Oct 2019 12:50:41 -0400
+Received: by mail-oi1-x241.google.com with SMTP id w144so5777715oia.6
+ for <qemu-devel@nongnu.org>; Fri, 18 Oct 2019 09:50:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=C4eO51fwA1ukbfwgea+E2N+xXGL/cfwgmawR3uZJAMs=;
+ b=NMvjkleR5y8POmR0i9XQbuNlRFR2Vq2Vjzmay0avN+Xaazu0w2BXP25TUQHCqntCrV
+ UeILQA5RjXuEYYT6spgx2i+bOlR6ST2Iq/PZZtncX+yG219PPYXynEnBtlGQcnjYc6js
+ mTFCvyYmgA4NXVWkrpX1Fg5RjVG+cImIr6273f2JWyfCDXLon/XAVz+RqveqTyZawJCx
+ Iu8PF3EEIL8lVU9Vyv1JylE8N4+VhhRGtENwb8/VJk8lZnKeTVRnWqdgUs+7U0iO421r
+ 4J/wcskVDeVuGhxupdE51bkIdMDDfeg+r8kjH+ap/gcVRmROXGyEmzJMy2GN4gpO25D0
+ nwFg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=C4eO51fwA1ukbfwgea+E2N+xXGL/cfwgmawR3uZJAMs=;
+ b=jqdCf3+iaz/iRIR9el7G1h7IxvrAyHzq06ralPnZ4VfNObtjuPvHG//FCnj45lLwFQ
+ gV9ihpe0Eg08JbBjkSPkfX49glHEQQ1VYQEgHtctvO6RAk5jXM1kJycDo/MTfCnD1zP6
+ ThBY29vs6o7ORvQPs5GRhpCIq4gFIBEqCjH/BppGyO34CFGfTVNV+H3NxbaPfO2KekmY
+ gyQ/pkD3GDv6tmvcXIrQNDhTlzCFzv98AqBlvQ0mhDt4Ex2AvmdfLqfYASC9lBSsPaCc
+ znP6Y0wwl7N4Cnj8IT4qn0hkUYJgJxs7K+5cKueIUkSMotlGMhAk/LCZGKm0L6/nFd9K
+ a8mg==
+X-Gm-Message-State: APjAAAVwJfkLrqoiBkaIsZS1zo0ZNXEz4wyLRi69mljuLhbJkMJrHBzW
+ 19/hbbp0JLVKMXMykeeOLGSfzIsVEaohlc9CDYBNOw==
+X-Google-Smtp-Source: APXvYqzKDpMkIThMztdejS5wjfDJkZi1vLc3NM8jLJeCVXnumOFs7cvr6NaHmwQJz82co5OJHx1X3nOI7kh5Hb4s/oI=
+X-Received: by 2002:aca:2b08:: with SMTP id i8mr8464402oik.146.1571417440323; 
+ Fri, 18 Oct 2019 09:50:40 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: richardw.yang@linux.intel.com
-Date: Fri, 18 Oct 2019 09:50:05 -0700 (PDT)
-X-ZohoMailClient: External
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 136.143.188.54
+References: <20191018154212.13458-1-marcandre.lureau@redhat.com>
+ <20191018154212.13458-2-marcandre.lureau@redhat.com>
+ <CAFEAcA_7zxe6YfM6c8v_SQ+qh2L7Q5RS_xEPvy01q9aPZ6YyiQ@mail.gmail.com>
+ <CAMxuvaw2CMqOuGXVq4Gk+GDNrjq++Ho+460WN9yo-pJFPVZhjw@mail.gmail.com>
+In-Reply-To: <CAMxuvaw2CMqOuGXVq4Gk+GDNrjq++Ho+460WN9yo-pJFPVZhjw@mail.gmail.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 18 Oct 2019 17:50:29 +0100
+Message-ID: <CAFEAcA9fRzCKQp=KkqXHdrN69ZNhtuy=XU+MZHJsjP-smx6MzQ@mail.gmail.com>
+Subject: Re: [PATCH 01/14] sm501: replace PROP_PTR with PROP_LINK
+To: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::241
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -76,75 +90,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: qemu-devel@nongnu.org, richardw.yang@linux.intel.com, dgilbert@redhat.com,
- quintela@redhat.com
+Cc: Corey Minyard <cminyard@mvista.com>, "Michael S. Tsirkin" <mst@redhat.com>,
+ Jason Wang <jasowang@redhat.com>,
+ Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
+ QEMU Developers <qemu-devel@nongnu.org>,
+ KONRAD Frederic <frederic.konrad@adacore.com>,
+ "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
+ Aleksandar Rikalo <arikalo@wavecomp.com>, Magnus Damm <magnus.damm@gmail.com>,
+ =?UTF-8?Q?Herv=C3=A9_Poussineau?= <hpoussin@reactos.org>,
+ Artyom Tarasenko <atar4qemu@gmail.com>, Eduardo Habkost <ehabkost@redhat.com>,
+ Fabien Chouteau <chouteau@adacore.com>, qemu-arm <qemu-arm@nongnu.org>,
+ Richard Henderson <rth@twiddle.net>,
+ =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>,
+ qemu-ppc <qemu-ppc@nongnu.org>, Aleksandar Markovic <amarkovic@wavecomp.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MTAxODAwNDg1MC45ODg4
-LTEtcmljaGFyZHcueWFuZ0BsaW51eC5pbnRlbC5jb20vCgoKCkhpLAoKVGhpcyBzZXJpZXMgZmFp
-bGVkIHRoZSBkb2NrZXItbWluZ3dAZmVkb3JhIGJ1aWxkIHRlc3QuIFBsZWFzZSBmaW5kIHRoZSB0
-ZXN0aW5nIGNvbW1hbmRzIGFuZAp0aGVpciBvdXRwdXQgYmVsb3cuIElmIHlvdSBoYXZlIERvY2tl
-ciBpbnN0YWxsZWQsIHlvdSBjYW4gcHJvYmFibHkgcmVwcm9kdWNlIGl0CmxvY2FsbHkuCgo9PT0g
-VEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhIC9iaW4vYmFzaApleHBvcnQgQVJDSD14ODZfNjQKbWFr
-ZSBkb2NrZXItaW1hZ2UtZmVkb3JhIFY9MSBORVRXT1JLPTEKdGltZSBtYWtlIGRvY2tlci10ZXN0
-LW1pbmd3QGZlZG9yYSBKPTE0IE5FVFdPUks9MQo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKICBD
-QyAgICAgIGFhcmNoNjQtc29mdG1tdS9ody90aW1lci9hbGx3aW5uZXItYTEwLXBpdC5vCkluIGZp
-bGUgaW5jbHVkZWQgZnJvbSAvdG1wL3FlbXUtdGVzdC9zcmMvbWlncmF0aW9uL3JhbS5jOjI5Ogov
-dG1wL3FlbXUtdGVzdC9zcmMvbWlncmF0aW9uL3JhbS5jOiBJbiBmdW5jdGlvbiAncmFtX2xvYWRf
-cG9zdGNvcHknOgovdG1wL3FlbXUtdGVzdC9zcmMvbWlncmF0aW9uL3JhbS5jOjQxNzc6NTY6IGVy
-cm9yOiBjYXN0IGZyb20gcG9pbnRlciB0byBpbnRlZ2VyIG9mIGRpZmZlcmVudCBzaXplIFstV2Vy
-cm9yPXBvaW50ZXItdG8taW50LWNhc3RdCiAgICAgICAgICAgICB2b2lkICpwbGFjZV9kZXN0ID0g
-KHZvaWQgKilRRU1VX0FMSUdOX0RPV04oKHVuc2lnbmVkIGxvbmcpaG9zdCwKICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBeCi90bXAvcWVtdS10
-ZXN0L3NyYy9pbmNsdWRlL3FlbXUvb3NkZXAuaDoyNjg6MzM6IG5vdGU6IGluIGRlZmluaXRpb24g
-b2YgbWFjcm8gJ1FFTVVfQUxJR05fRE9XTicKICNkZWZpbmUgUUVNVV9BTElHTl9ET1dOKG4sIG0p
-ICgobikgLyAobSkgKiAobSkpCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIF4KY2Mx
-OiBhbGwgd2FybmluZ3MgYmVpbmcgdHJlYXRlZCBhcyBlcnJvcnMKbWFrZVsxXTogKioqIFsvdG1w
-L3FlbXUtdGVzdC9zcmMvcnVsZXMubWFrOjY5OiBtaWdyYXRpb24vcmFtLm9dIEVycm9yIDEKbWFr
-ZVsxXTogKioqIFdhaXRpbmcgZm9yIHVuZmluaXNoZWQgam9icy4uLi4KICBDQyAgICAgIHg4Nl82
-NC1zb2Z0bW11L3RhcmdldC9pMzg2L2FyY2hfZHVtcC5vCiAgQ0MgICAgICBhYXJjaDY0LXNvZnRt
-bXUvaHcvdXNiL3R1c2I2MDEwLm8KLS0tCiAgQ0MgICAgICBhYXJjaDY0LXNvZnRtbXUvaHcvYXJt
-L3hsbngtenlucW1wLm8KSW4gZmlsZSBpbmNsdWRlZCBmcm9tIC90bXAvcWVtdS10ZXN0L3NyYy9t
-aWdyYXRpb24vcmFtLmM6Mjk6Ci90bXAvcWVtdS10ZXN0L3NyYy9taWdyYXRpb24vcmFtLmM6IElu
-IGZ1bmN0aW9uICdyYW1fbG9hZF9wb3N0Y29weSc6Ci90bXAvcWVtdS10ZXN0L3NyYy9taWdyYXRp
-b24vcmFtLmM6NDE3Nzo1NjogZXJyb3I6IGNhc3QgZnJvbSBwb2ludGVyIHRvIGludGVnZXIgb2Yg
-ZGlmZmVyZW50IHNpemUgWy1XZXJyb3I9cG9pbnRlci10by1pbnQtY2FzdF0KICAgICAgICAgICAg
-IHZvaWQgKnBsYWNlX2Rlc3QgPSAodm9pZCAqKVFFTVVfQUxJR05fRE9XTigodW5zaWduZWQgbG9u
-Zylob3N0LAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgIF4KL3RtcC9xZW11LXRlc3Qvc3JjL2luY2x1ZGUvcWVtdS9vc2RlcC5oOjI2ODozMzog
-bm90ZTogaW4gZGVmaW5pdGlvbiBvZiBtYWNybyAnUUVNVV9BTElHTl9ET1dOJwogI2RlZmluZSBR
-RU1VX0FMSUdOX0RPV04obiwgbSkgKChuKSAvIChtKSAqIChtKSkKICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgXgpjYzE6IGFsbCB3YXJuaW5ncyBiZWluZyB0cmVhdGVkIGFzIGVycm9y
-cwptYWtlWzFdOiAqKiogWy90bXAvcWVtdS10ZXN0L3NyYy9ydWxlcy5tYWs6Njk6IG1pZ3JhdGlv
-bi9yYW0ub10gRXJyb3IgMQptYWtlWzFdOiAqKiogV2FpdGluZyBmb3IgdW5maW5pc2hlZCBqb2Jz
-Li4uLgptYWtlOiAqKiogW01ha2VmaWxlOjQ4MjogYWFyY2g2NC1zb2Z0bW11L2FsbF0gRXJyb3Ig
-MgptYWtlOiAqKiogV2FpdGluZyBmb3IgdW5maW5pc2hlZCBqb2JzLi4uLgptYWtlOiAqKiogW01h
-a2VmaWxlOjQ4MjogeDg2XzY0LXNvZnRtbXUvYWxsXSBFcnJvciAyClRyYWNlYmFjayAobW9zdCBy
-ZWNlbnQgY2FsbCBsYXN0KToKICBGaWxlICIuL3Rlc3RzL2RvY2tlci9kb2NrZXIucHkiLCBsaW5l
-IDY2MiwgaW4gPG1vZHVsZT4KICAgIHN5cy5leGl0KG1haW4oKSkKLS0tCiAgICByYWlzZSBDYWxs
-ZWRQcm9jZXNzRXJyb3IocmV0Y29kZSwgY21kKQpzdWJwcm9jZXNzLkNhbGxlZFByb2Nlc3NFcnJv
-cjogQ29tbWFuZCAnWydzdWRvJywgJy1uJywgJ2RvY2tlcicsICdydW4nLCAnLS1sYWJlbCcsICdj
-b20ucWVtdS5pbnN0YW5jZS51dWlkPTkwNTcwNDM0ODgwMzQ0MjQ5Y2ZmNzAxYmFhMTg4MTYzJywg
-Jy11JywgJzEwMDEnLCAnLS1zZWN1cml0eS1vcHQnLCAnc2VjY29tcD11bmNvbmZpbmVkJywgJy0t
-cm0nLCAnLWUnLCAnVEFSR0VUX0xJU1Q9JywgJy1lJywgJ0VYVFJBX0NPTkZJR1VSRV9PUFRTPScs
-ICctZScsICdWPScsICctZScsICdKPTE0JywgJy1lJywgJ0RFQlVHPScsICctZScsICdTSE9XX0VO
-Vj0nLCAnLWUnLCAnQ0NBQ0hFX0RJUj0vdmFyL3RtcC9jY2FjaGUnLCAnLXYnLCAnL2hvbWUvcGF0
-Y2hldy8uY2FjaGUvcWVtdS1kb2NrZXItY2NhY2hlOi92YXIvdG1wL2NjYWNoZTp6JywgJy12Jywg
-Jy92YXIvdG1wL3BhdGNoZXctdGVzdGVyLXRtcC1kaDhwNmYyNy9zcmMvZG9ja2VyLXNyYy4yMDE5
-LTEwLTE4LTEyLjQ3LjE5LjQxNjQ6L3Zhci90bXAvcWVtdTp6LHJvJywgJ3FlbXU6ZmVkb3JhJywg
-Jy92YXIvdG1wL3FlbXUvcnVuJywgJ3Rlc3QtbWluZ3cnXScgcmV0dXJuZWQgbm9uLXplcm8gZXhp
-dCBzdGF0dXMgMi4KZmlsdGVyPS0tZmlsdGVyPWxhYmVsPWNvbS5xZW11Lmluc3RhbmNlLnV1aWQ9
-OTA1NzA0MzQ4ODAzNDQyNDljZmY3MDFiYWExODgxNjMKbWFrZVsxXTogKioqIFtkb2NrZXItcnVu
-XSBFcnJvciAxCm1ha2VbMV06IExlYXZpbmcgZGlyZWN0b3J5IGAvdmFyL3RtcC9wYXRjaGV3LXRl
-c3Rlci10bXAtZGg4cDZmMjcvc3JjJwptYWtlOiAqKiogW2RvY2tlci1ydW4tdGVzdC1taW5nd0Bm
-ZWRvcmFdIEVycm9yIDIKCnJlYWwgICAgMm00NS42OTFzCnVzZXIgICAgMG04LjM5MHMKCgpUaGUg
-ZnVsbCBsb2cgaXMgYXZhaWxhYmxlIGF0Cmh0dHA6Ly9wYXRjaGV3Lm9yZy9sb2dzLzIwMTkxMDE4
-MDA0ODUwLjk4ODgtMS1yaWNoYXJkdy55YW5nQGxpbnV4LmludGVsLmNvbS90ZXN0aW5nLmRvY2tl
-ci1taW5nd0BmZWRvcmEvP3R5cGU9bWVzc2FnZS4KLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0
-aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHBzOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91
-ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
+On Fri, 18 Oct 2019 at 17:36, Marc-Andr=C3=A9 Lureau
+<marcandre.lureau@redhat.com> wrote:
+> On Fri, Oct 18, 2019 at 6:22 PM Peter Maydell <peter.maydell@linaro.org> =
+wrote:
+> > So I think the right fix here is to properly QOMify the
+> > code which is not QOMified, ie hw/char/serial.c, in a
+> > way that means that the various "memory mapped 16650-ish
+> > devices" we have can use it and can define a
+> > TYPE_CHARDEV property.
+>
+> I see, I can look at that.
 
+It would certainly be a nice cleanup/refactoring to have;
+it's likely quite painful though as so many things use
+serial_mm_init, many of them not properly QOMified themselves;
+and because SerialState is used by x86 it's likely to be
+tricky to handle for migration-compat reasons.
+
+> > In general I think our uses of PROP_PTR are code smells
+> > that indicate places where we have not properly converted
+> > code over to the general approach that the QOM/qdev
+> > design desires; but we should be getting rid of PROP_PTR
+> > by actually doing all those (difficult) conversions.
+>
+> I think all user_creatable =3D false are smelly in that regard.
+
+I dunno, I tend to think that "not user creatable" is the
+default state of things. Almost all devices aren't user
+creatable, because they need to be wired up and put at
+suitable addresses and IRQ lines. Pluggable devices like
+PCI, ISA, etc are the weird exceptions that are usefully
+user-creatable.
+
+> > Merely removing PROP_PTR itself by rephrasing the dubious
+> > inter-device connections in a way that makes them harder
+> > to grep for doesn't seem to me to be necessarily worth
+>
+> grep for user_creatable =3D false
+>
+> > doing. Is the existence of PROP_PTR getting in your way
+> > for a change you want to make ?
+>
+> Yes, I am looking at improving the qdev vs object and class vs
+> instance properties. I have a larger series of wip refactoring. This
+> initial series is preliminary cleanup that would help.
+
+OK, that makes sense. I'll have a look through the series
+again; if we don't want to do the nice cleanups now then
+probably these changes are ok, possibly with some TODO
+comments noting what we ideally ought to do instead.
+
+thanks
+-- PMM
 
