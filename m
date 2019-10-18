@@ -2,80 +2,59 @@ Return-Path: <SRS0=ht5U=YL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 26D9CCA9EA9
-	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 19:32:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D882FCA9EA9
+	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 20:22:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D76C02082C
-	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 19:32:25 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=berkeley-edu.20150623.gappssmtp.com header.i=@berkeley-edu.20150623.gappssmtp.com header.b="E/DQLOre"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D76C02082C
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=berkeley.edu
+	by mail.kernel.org (Postfix) with ESMTPS id 9F5E82082C
+	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 20:22:16 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9F5E82082C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45588 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45742 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iLXz6-000440-RB
-	for qemu-devel@archiver.kernel.org; Fri, 18 Oct 2019 15:32:25 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43614)
+	id 1iLYlL-0006oX-93
+	for qemu-devel@archiver.kernel.org; Fri, 18 Oct 2019 16:22:15 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48027)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dayeol@berkeley.edu>) id 1iLXvp-00036N-RD
- for qemu-devel@nongnu.org; Fri, 18 Oct 2019 15:29:03 -0400
+ (envelope-from <jfreimann@redhat.com>) id 1iLYk6-0005bR-34
+ for qemu-devel@nongnu.org; Fri, 18 Oct 2019 16:21:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dayeol@berkeley.edu>) id 1iLXvm-0004Ey-OU
- for qemu-devel@nongnu.org; Fri, 18 Oct 2019 15:29:00 -0400
-Received: from mail-pf1-x444.google.com ([2607:f8b0:4864:20::444]:39902)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <dayeol@berkeley.edu>) id 1iLXvl-0004E7-V2
- for qemu-devel@nongnu.org; Fri, 18 Oct 2019 15:28:58 -0400
-Received: by mail-pf1-x444.google.com with SMTP id v4so4468763pff.6
- for <qemu-devel@nongnu.org>; Fri, 18 Oct 2019 12:28:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=berkeley-edu.20150623.gappssmtp.com; s=20150623;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=o2ASzqNDOudnlD9OoriHepPheuyTCPpOcDnqilBEaGA=;
- b=E/DQLOre61oJePXWKAcCM2FJ90Gq955P1sO9rndKdQcJ16wudPnPIpXgHLXj57lkPa
- dHcNRHuhLRzX7OrPj/M7mwcwSjslrhstemtHGx/2uqs/7A84Au7/zJ+2AbXh1aaD1GPA
- KLCwXTNZ2nkjw7LL+ynA42iEA7liz2Q5GuXhBBjMVwYUnRTQve7iWZBhHT1Vaq8Pxu9R
- NJSGF76AS/0bAZwSwBXPbhjx0IYOgJy/ynuRQsquv4agmZQwmlE7r4UNw2UrV/24oYvg
- Aps3Rd8iuWnH91YtQzr2Le86aluptvS0c38sfwXadTJNFH94I2VjX63kvSHPOpNcEv0z
- 9Eew==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=o2ASzqNDOudnlD9OoriHepPheuyTCPpOcDnqilBEaGA=;
- b=l+Ey5Br+ciEpy6dZElERaC/7AXxN/nZakErHhX7q5ClRfxtxJ51QIvDrwv6XuBOIr+
- FBe5pP3VExN5cVOsvvrDHCqofT8bSTZ8AtVg1Ld17bwjqwZzm1UnFvS4xgJCZBdvvRC2
- GtYPQBCl/2CNlCbpawXbR+bC+nqSOFprQYdIkyCti1MvpiAUh63wErbmuIH1OqyVgAIi
- TaJ5qzN9+oP1iamVK6GY2xyGK4akfB4qyr+DiU82BsDsaaFnrfKOBOlcYzCM7prjqujr
- cakxRwikwUXO1pYZKn8adxq2AMZnoqmlnt0jUvhIWtf1MGWEXSh+BljqzSouafu0Pkgv
- 62Ug==
-X-Gm-Message-State: APjAAAU+lenwopK1BtmV3Z6+9IV7jC9tjMDWhN/INRImlxY+L4FcDDsN
- UmMabRI3VOw8W1PB8tkpW5Vh57jtboCcLUrSiDdxjQ==
-X-Google-Smtp-Source: APXvYqyz4p9Xdnw6TsnqaTKQuROcf1yapEIpffd92Zc74q3zdKBTSX6GYQ83+MXfBxn8yYbSIwEOmWj5YD8izYaIvlI=
-X-Received: by 2002:a65:5b02:: with SMTP id y2mr12177529pgq.365.1571426935785; 
- Fri, 18 Oct 2019 12:28:55 -0700 (PDT)
+ (envelope-from <jfreimann@redhat.com>) id 1iLYk3-0005ZK-45
+ for qemu-devel@nongnu.org; Fri, 18 Oct 2019 16:20:57 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42830)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <jfreimann@redhat.com>)
+ id 1iLYk2-0005WB-KH
+ for qemu-devel@nongnu.org; Fri, 18 Oct 2019 16:20:54 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 4B83510F2E83;
+ Fri, 18 Oct 2019 20:20:51 +0000 (UTC)
+Received: from localhost (ovpn-116-92.ams2.redhat.com [10.36.116.92])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 83E5860600;
+ Fri, 18 Oct 2019 20:20:42 +0000 (UTC)
+From: Jens Freimann <jfreimann@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v4 0/11] add failover feature for assigned network devices
+Date: Fri, 18 Oct 2019 22:20:29 +0200
+Message-Id: <20191018202040.30349-1-jfreimann@redhat.com>
 MIME-Version: 1.0
-References: <CACjxMEt-zOt8VktL_Ut-9vA0FdeO5jPf0XVeCzuT2OOnyehMmA@mail.gmail.com>
- <mhng-20e0918b-b63e-4054-bae9-b94145e22cbe@palmer-si-x1c4>
-In-Reply-To: <mhng-20e0918b-b63e-4054-bae9-b94145e22cbe@palmer-si-x1c4>
-From: Dayeol Lee <dayeol@berkeley.edu>
-Date: Fri, 18 Oct 2019 15:28:43 -0400
-Message-ID: <CACjxMEsN-7x0O_j0BYj1LYt_YD9nGdg4snhZM0He=L4Ogiq+iA@mail.gmail.com>
-Subject: Re: [PATCH] target/riscv: PMP violation due to wrong size parameter
-To: Palmer Dabbelt <palmer@sifive.com>
-Content-Type: multipart/alternative; boundary="0000000000004c6ef805953458ee"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::444
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.66]); Fri, 18 Oct 2019 20:20:51 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,270 +66,320 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-riscv@nongnu.org, sagark@eecs.berkeley.edu,
- Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
- richard.henderson@linaro.org, Jonathan Behrens <fintelia@gmail.com>,
- Qemu Devel <qemu-devel@nongnu.org>,
- Alistair Francis <Alistair.Francis@wdc.com>, diodesign@tuta.io
+Cc: pkrempa@redhat.com, berrange@redhat.com, ehabkost@redhat.com,
+ mst@redhat.com, aadam@redhat.com, dgilbert@redhat.com,
+ alex.williamson@redhat.com, laine@redhat.com, ailan@redhat.com,
+ parav@mellanox.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---0000000000004c6ef805953458ee
-Content-Type: text/plain; charset="UTF-8"
+This is implementing the host side of the net_failover concept
+(https://www.kernel.org/doc/html/latest/networking/net_failover.html)
 
-I'll move the entire check into pmp_hart_has_privs as it makes more sense.
+Changes since v3:
+* Patch 1,  make return values of qdev_should_hide_device() more clear
+* Patch 1,  clarify comment about new should_be_hidden DeviceListener
+* Patch 2   new patch, add net_failover_option_id to PCIDevice, only
+            allow PCIExpress devices for now=20
+* Patch 8,  only go into wait_unplug state when failover devices are pres=
+ent
+* Patch 8,  add new state to migration_is_setup_or_active, tested cancell=
+ing
+            while migration is in this state
+* Patch 8,  simplify handling of wait_unplug state, don't cancel migratio=
+n after
+            timeout, let upper layer do this, get rid of retry counter (d=
+gilbert)
+* Patch 11, move net_failover_pair_id to PCIDev, move check for pci class
+            to PCI code, only allow PCIe devices for now as we only suppo=
+rt
+            hotplugging these devices (aw)
+* verified qemu make check tests ran, checked that docker-test-quick@cent=
+os7 runs
+  successful, tested migration with/without failover, without vfio-pci=20
+* this now allows only PCIe devices because that's the only hotplug
+  controller that supports the partial unplug as of now. I'll work on=20
+  making it discoverable for libvirt or on support for the
+  other hotplug controllers in a follow-on patch set
+=20
+The general idea is that we have a pair of devices, a vfio-pci and a
+virtio-net device. Before migration the vfio device is unplugged and data
+flows to the virtio-net device, on the target side another vfio-pci devic=
+e
+is plugged in to take over the data-path. In the guest the net_failover
+module will pair net devices with the same MAC address.
+
+* Patch 1 adds the infrastructure to hide the device for the qbus and qde=
+v APIs
+
+* Patch 2 adds checks to PCIDevice for only allowing ethernet devices as
+  failover primary and only PCIExpress capable devices
+
+* Patch 3 sets a new flag for PCIDevice 'partially_hotplugged' which we
+  use to skip the unrealize code path when doing a unplug of the primary
+  device
+
+* Patch 4 sets the pending_deleted_event before triggering the guest
+  unplug request
+
+* Patch 5 and 6 add new qmp events, one sends the device id of a device
+  that was just requested to be unplugged from the guest and another one
+  to let libvirt know if VIRTIO_NET_F_STANDBY was negotiated
+
+* Patch 7 make sure that we can unplug the vfio-device before
+  migration starts
+
+* Patch 8 adds a new migration state that is entered while we wait for
+  devices to be unplugged by guest OS
+
+* Patch 9 just adds the new migration state to a check in libqos code
+
+* Patch 10 In the second patch the virtio-net uses the API to defer addin=
+g the vfio
+  device until the VIRTIO_NET_F_STANDBY feature is acked. It also
+  implements the migration handler to unplug the device from the guest an=
+d
+  re-plug in case of migration failure
+
+* Patch 11 allows migration for failover vfio-pci devices
+
+Previous discussion:
+  RFC v1 https://patchwork.ozlabs.org/cover/989098/
+  RFC v2 https://www.mail-archive.com/qemu-devel@nongnu.org/msg606906.htm=
+l
+  v1: https://lists.gnu.org/archive/html/qemu-devel/2019-05/msg03968.html
+  v2: https://www.mail-archive.com/qemu-devel@nongnu.org/msg635214.html
+  v3: https://patchew.org/QEMU/20191011112015.11785-1-jfreimann@redhat.co=
+m/
+
+To summarize concerns/feedback from previous discussion:
+1.- guest OS can reject or worse _delay_ unplug by any amount of time.
+  Migration might get stuck for unpredictable time with unclear reason.
+  This approach combines two tricky things, hot/unplug and migration.
+  -> We need to let libvirt know what's happening. Add new qmp events
+     and a new migration state. When a primary device is (partially)
+     unplugged (only from guest) we send a qmp event with the device id. =
+When
+     it is unplugged from the guest the DEVICE_DELETED event is sent.
+     Migration will enter the wait-unplug state while waiting for the gue=
+st
+     os to unplug all primary devices and then move on with migration.
+2. PCI devices are a precious ressource. The primary device should never
+  be added to QEMU if it won't be used by guest instead of hiding it in
+  QEMU.
+  -> We only hotplug the device when the standby feature bit was
+     negotiated. We save the device cmdline options until we need it for
+     qdev_device_add()
+     Hiding a device can be a useful concept to model. For example a
+     pci device in a powered-off slot could be marked as hidden until the=
+ slot is
+     powered on (mst).
+3. Management layer software should handle this. Open Stack already has
+  components/code to handle unplug/replug VFIO devices and metadata to
+  provide to the guest for detecting which devices should be paired.
+  -> An approach that includes all software from firmware to
+     higher-level management software wasn't tried in the last years. Thi=
+s is
+     an attempt to keep it simple and contained in QEMU as much as possib=
+le.
+     One of the problems that stopped management software and libvirt fro=
+m
+     implementing this idea is that it can't be sure that it's possible t=
+o
+     re-plug the primary device. By not freeing the devices resources in =
+QEMU
+     and only asking the guest OS to unplug it is possible to re-plug the
+     device in case of a migration failure.
+4. Hotplugging a device and then making it part of a failover setup is
+   not possible
+  -> addressed by extending qdev hotplug functions to check for hidden
+     attribute, so e.g. device_add can be used to plug a device.
+
+
+I have tested this with a mlx5 and igb NIC and was able to migrate the VM=
+.
+
+Command line example:
+
+qemu-system-x86_64 -enable-kvm -m 3072 -smp 3 \
+        -machine q35,kernel-irqchip=3Dsplit -cpu host   \
+        -serial stdio   \
+        -net none \
+        -qmp unix:/tmp/qmp.socket,server,nowait \
+        -monitor telnet:127.0.0.1:5555,server,nowait \
+        -device pcie-root-port,id=3Droot0,multifunction=3Don,chassis=3D0,=
+addr=3D0xa \
+        -device pcie-root-port,id=3Droot1,bus=3Dpcie.0,chassis=3D1 \
+        -device pcie-root-port,id=3Droot2,bus=3Dpcie.0,chassis=3D2 \
+        -netdev tap,script=3D/root/bin/bridge.sh,downscript=3Dno,id=3Dhos=
+tnet1,vhost=3Don \
+        -device virtio-net-pci,netdev=3Dhostnet1,id=3Dnet1,mac=3D52:54:00=
+:6f:55:cc,bus=3Droot2,failover=3Don \
+	-device vfio-pci,host=3D5e:00.2,id=3Dhostdev0,bus=3Droot1,net_failover_p=
+air_id =3Dnet1 \
+        /root/rhel-guest-image-8.0-1781.x86_64.qcow2
+
+I'm grateful for any remarks or ideas!
 
 Thanks!
 
-On Fri, Oct 18, 2019, 3:01 PM Palmer Dabbelt <palmer@sifive.com> wrote:
+regards,
+Jens=20
 
-> On Tue, 15 Oct 2019 10:04:32 PDT (-0700), dayeol@berkeley.edu wrote:
-> > Hi,
-> >
-> > Could this patch go through?
-> > If not please let me know so that I can fix.
-> > Thank you!
->
-> Sorry, I dropped this one.  It's in the patch queue now.  We should also
-> check
-> for size==0 in pmp_hart_has_privs(), as that won't work.  LMK if you want
-> to
-> send a patch for that.
->
-> >
-> > Dayeol
-> >
-> >
-> > On Sat, Oct 12, 2019, 11:30 AM Dayeol Lee <dayeol@berkeley.edu> wrote:
-> >
-> >> No it doesn't mean that.
-> >> But the following code will make the size TARGET_PAGE_SIZE - (page
-> offset)
-> >> if the address is not aligned.
-> >>
-> >> pmp_size = -(address | TARGET_PAGE_MASK)
-> >>
-> >>
-> >> On Fri, Oct 11, 2019, 7:37 PM Jonathan Behrens <fintelia@gmail.com>
-> wrote:
-> >>
-> >>> How do you know that the access won't straddle a page boundary? Is
-> there
-> >>> a guarantee somewhere that size=0 means that the access is naturally
-> >>> aligned?
-> >>>
-> >>> Jonathan
-> >>>
-> >>>
-> >>> On Fri, Oct 11, 2019 at 7:14 PM Dayeol Lee <dayeol@berkeley.edu>
-> wrote:
-> >>>
-> >>>> riscv_cpu_tlb_fill() uses the `size` parameter to check PMP violation
-> >>>> using pmp_hart_has_privs().
-> >>>> However, if the size is unknown (=0), the ending address will be
-> >>>> `addr - 1` as it is `addr + size - 1` in `pmp_hart_has_privs()`.
-> >>>> This always causes a false PMP violation on the starting address of
-> the
-> >>>> range, as `addr - 1` is not in the range.
-> >>>>
-> >>>> In order to fix, we just assume that all bytes from addr to the end of
-> >>>> the page will be accessed if the size is unknown.
-> >>>>
-> >>>> Signed-off-by: Dayeol Lee <dayeol@berkeley.edu>
-> >>>> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-> >>>> ---
-> >>>>  target/riscv/cpu_helper.c | 13 ++++++++++++-
-> >>>>  1 file changed, 12 insertions(+), 1 deletion(-)
-> >>>>
-> >>>> diff --git a/target/riscv/cpu_helper.c b/target/riscv/cpu_helper.c
-> >>>> index e32b6126af..7d9a22b601 100644
-> >>>> --- a/target/riscv/cpu_helper.c
-> >>>> +++ b/target/riscv/cpu_helper.c
-> >>>> @@ -441,6 +441,7 @@ bool riscv_cpu_tlb_fill(CPUState *cs, vaddr
-> address,
-> >>>> int size,
-> >>>>      CPURISCVState *env = &cpu->env;
-> >>>>      hwaddr pa = 0;
-> >>>>      int prot;
-> >>>> +    int pmp_size = 0;
-> >>>>      bool pmp_violation = false;
-> >>>>      int ret = TRANSLATE_FAIL;
-> >>>>      int mode = mmu_idx;
-> >>>> @@ -460,9 +461,19 @@ bool riscv_cpu_tlb_fill(CPUState *cs, vaddr
-> >>>> address, int size,
-> >>>>                    "%s address=%" VADDR_PRIx " ret %d physical "
-> >>>> TARGET_FMT_plx
-> >>>>                    " prot %d\n", __func__, address, ret, pa, prot);
-> >>>>
-> >>>> +    /*
-> >>>> +     * if size is unknown (0), assume that all bytes
-> >>>> +     * from addr to the end of the page will be accessed.
-> >>>> +     */
-> >>>> +    if (size == 0) {
-> >>>> +        pmp_size = -(address | TARGET_PAGE_MASK);
-> >>>> +    } else {
-> >>>> +        pmp_size = size;
-> >>>> +    }
-> >>>> +
-> >>>>      if (riscv_feature(env, RISCV_FEATURE_PMP) &&
-> >>>>          (ret == TRANSLATE_SUCCESS) &&
-> >>>> -        !pmp_hart_has_privs(env, pa, size, 1 << access_type, mode)) {
-> >>>> +        !pmp_hart_has_privs(env, pa, pmp_size, 1 << access_type,
-> mode))
-> >>>> {
-> >>>>          ret = TRANSLATE_PMP_FAIL;
-> >>>>      }
-> >>>>      if (ret == TRANSLATE_PMP_FAIL) {
-> >>>> --
-> >>>> 2.20.1
-> >>>>
-> >>>>
-> >>>>
->
 
---0000000000004c6ef805953458ee
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Jens Freimann (10):
+  qdev/qbus: add hidden device support
+  pci: mark devices partially unplugged
+  pci: mark device having guest unplug request pending
+  qapi: add unplug primary event
+  qapi: add failover negotiated event
+  migration: allow unplug during migration for failover devices
+  migration: add new migration state wait-unplug
+  libqos: tolerate wait-unplug migration state
+  net/virtio: add failover support
+  vfio: unplug failover primary device before migration
 
-<div dir=3D"auto">I&#39;ll move the entire check into pmp_hart_has_privs as=
- it makes more=C2=A0sense.<div dir=3D"auto"><br></div><div dir=3D"auto">Tha=
-nks!</div></div><br><div class=3D"gmail_quote"><div dir=3D"ltr" class=3D"gm=
-ail_attr">On Fri, Oct 18, 2019, 3:01 PM Palmer Dabbelt &lt;<a href=3D"mailt=
-o:palmer@sifive.com">palmer@sifive.com</a>&gt; wrote:<br></div><blockquote =
-class=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;border-left:1px #ccc solid=
-;padding-left:1ex">On Tue, 15 Oct 2019 10:04:32 PDT (-0700), <a href=3D"mai=
-lto:dayeol@berkeley.edu" target=3D"_blank" rel=3D"noreferrer">dayeol@berkel=
-ey.edu</a> wrote:<br>
-&gt; Hi,<br>
-&gt;<br>
-&gt; Could this patch go through?<br>
-&gt; If not please let me know so that I can fix.<br>
-&gt; Thank you!<br>
-<br>
-Sorry, I dropped this one.=C2=A0 It&#39;s in the patch queue now.=C2=A0 We =
-should also check <br>
-for size=3D=3D0 in pmp_hart_has_privs(), as that won&#39;t work.=C2=A0 LMK =
-if you want to <br>
-send a patch for that.<br>
-<br>
-&gt;<br>
-&gt; Dayeol<br>
-&gt;<br>
-&gt;<br>
-&gt; On Sat, Oct 12, 2019, 11:30 AM Dayeol Lee &lt;<a href=3D"mailto:dayeol=
-@berkeley.edu" target=3D"_blank" rel=3D"noreferrer">dayeol@berkeley.edu</a>=
-&gt; wrote:<br>
-&gt;<br>
-&gt;&gt; No it doesn&#39;t mean that.<br>
-&gt;&gt; But the following code will make the size TARGET_PAGE_SIZE - (page=
- offset)<br>
-&gt;&gt; if the address is not aligned.<br>
-&gt;&gt;<br>
-&gt;&gt; pmp_size =3D -(address | TARGET_PAGE_MASK)<br>
-&gt;&gt;<br>
-&gt;&gt;<br>
-&gt;&gt; On Fri, Oct 11, 2019, 7:37 PM Jonathan Behrens &lt;<a href=3D"mail=
-to:fintelia@gmail.com" target=3D"_blank" rel=3D"noreferrer">fintelia@gmail.=
-com</a>&gt; wrote:<br>
-&gt;&gt;<br>
-&gt;&gt;&gt; How do you know that the access won&#39;t straddle a page boun=
-dary? Is there<br>
-&gt;&gt;&gt; a guarantee somewhere that size=3D0 means that the access is n=
-aturally<br>
-&gt;&gt;&gt; aligned?<br>
-&gt;&gt;&gt;<br>
-&gt;&gt;&gt; Jonathan<br>
-&gt;&gt;&gt;<br>
-&gt;&gt;&gt;<br>
-&gt;&gt;&gt; On Fri, Oct 11, 2019 at 7:14 PM Dayeol Lee &lt;<a href=3D"mail=
-to:dayeol@berkeley.edu" target=3D"_blank" rel=3D"noreferrer">dayeol@berkele=
-y.edu</a>&gt; wrote:<br>
-&gt;&gt;&gt;<br>
-&gt;&gt;&gt;&gt; riscv_cpu_tlb_fill() uses the `size` parameter to check PM=
-P violation<br>
-&gt;&gt;&gt;&gt; using pmp_hart_has_privs().<br>
-&gt;&gt;&gt;&gt; However, if the size is unknown (=3D0), the ending address=
- will be<br>
-&gt;&gt;&gt;&gt; `addr - 1` as it is `addr + size - 1` in `pmp_hart_has_pri=
-vs()`.<br>
-&gt;&gt;&gt;&gt; This always causes a false PMP violation on the starting a=
-ddress of the<br>
-&gt;&gt;&gt;&gt; range, as `addr - 1` is not in the range.<br>
-&gt;&gt;&gt;&gt;<br>
-&gt;&gt;&gt;&gt; In order to fix, we just assume that all bytes from addr t=
-o the end of<br>
-&gt;&gt;&gt;&gt; the page will be accessed if the size is unknown.<br>
-&gt;&gt;&gt;&gt;<br>
-&gt;&gt;&gt;&gt; Signed-off-by: Dayeol Lee &lt;<a href=3D"mailto:dayeol@ber=
-keley.edu" target=3D"_blank" rel=3D"noreferrer">dayeol@berkeley.edu</a>&gt;=
-<br>
-&gt;&gt;&gt;&gt; Reviewed-by: Richard Henderson &lt;<a href=3D"mailto:richa=
-rd.henderson@linaro.org" target=3D"_blank" rel=3D"noreferrer">richard.hende=
-rson@linaro.org</a>&gt;<br>
-&gt;&gt;&gt;&gt; ---<br>
-&gt;&gt;&gt;&gt;=C2=A0 target/riscv/cpu_helper.c | 13 ++++++++++++-<br>
-&gt;&gt;&gt;&gt;=C2=A0 1 file changed, 12 insertions(+), 1 deletion(-)<br>
-&gt;&gt;&gt;&gt;<br>
-&gt;&gt;&gt;&gt; diff --git a/target/riscv/cpu_helper.c b/target/riscv/cpu_=
-helper.c<br>
-&gt;&gt;&gt;&gt; index e32b6126af..7d9a22b601 100644<br>
-&gt;&gt;&gt;&gt; --- a/target/riscv/cpu_helper.c<br>
-&gt;&gt;&gt;&gt; +++ b/target/riscv/cpu_helper.c<br>
-&gt;&gt;&gt;&gt; @@ -441,6 +441,7 @@ bool riscv_cpu_tlb_fill(CPUState *cs, =
-vaddr address,<br>
-&gt;&gt;&gt;&gt; int size,<br>
-&gt;&gt;&gt;&gt;=C2=A0 =C2=A0 =C2=A0 CPURISCVState *env =3D &amp;cpu-&gt;en=
-v;<br>
-&gt;&gt;&gt;&gt;=C2=A0 =C2=A0 =C2=A0 hwaddr pa =3D 0;<br>
-&gt;&gt;&gt;&gt;=C2=A0 =C2=A0 =C2=A0 int prot;<br>
-&gt;&gt;&gt;&gt; +=C2=A0 =C2=A0 int pmp_size =3D 0;<br>
-&gt;&gt;&gt;&gt;=C2=A0 =C2=A0 =C2=A0 bool pmp_violation =3D false;<br>
-&gt;&gt;&gt;&gt;=C2=A0 =C2=A0 =C2=A0 int ret =3D TRANSLATE_FAIL;<br>
-&gt;&gt;&gt;&gt;=C2=A0 =C2=A0 =C2=A0 int mode =3D mmu_idx;<br>
-&gt;&gt;&gt;&gt; @@ -460,9 +461,19 @@ bool riscv_cpu_tlb_fill(CPUState *cs,=
- vaddr<br>
-&gt;&gt;&gt;&gt; address, int size,<br>
-&gt;&gt;&gt;&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 &quot;%s address=3D%&quot; VADDR_PRIx &quot; ret %d physical &qu=
-ot;<br>
-&gt;&gt;&gt;&gt; TARGET_FMT_plx<br>
-&gt;&gt;&gt;&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 &quot; prot %d\n&quot;, __func__, address, ret, pa, prot);<br>
-&gt;&gt;&gt;&gt;<br>
-&gt;&gt;&gt;&gt; +=C2=A0 =C2=A0 /*<br>
-&gt;&gt;&gt;&gt; +=C2=A0 =C2=A0 =C2=A0* if size is unknown (0), assume that=
- all bytes<br>
-&gt;&gt;&gt;&gt; +=C2=A0 =C2=A0 =C2=A0* from addr to the end of the page wi=
-ll be accessed.<br>
-&gt;&gt;&gt;&gt; +=C2=A0 =C2=A0 =C2=A0*/<br>
-&gt;&gt;&gt;&gt; +=C2=A0 =C2=A0 if (size =3D=3D 0) {<br>
-&gt;&gt;&gt;&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 pmp_size =3D -(address | TARG=
-ET_PAGE_MASK);<br>
-&gt;&gt;&gt;&gt; +=C2=A0 =C2=A0 } else {<br>
-&gt;&gt;&gt;&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 pmp_size =3D size;<br>
-&gt;&gt;&gt;&gt; +=C2=A0 =C2=A0 }<br>
-&gt;&gt;&gt;&gt; +<br>
-&gt;&gt;&gt;&gt;=C2=A0 =C2=A0 =C2=A0 if (riscv_feature(env, RISCV_FEATURE_P=
-MP) &amp;&amp;<br>
-&gt;&gt;&gt;&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 (ret =3D=3D TRANSLATE_SU=
-CCESS) &amp;&amp;<br>
-&gt;&gt;&gt;&gt; -=C2=A0 =C2=A0 =C2=A0 =C2=A0 !pmp_hart_has_privs(env, pa, =
-size, 1 &lt;&lt; access_type, mode)) {<br>
-&gt;&gt;&gt;&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 !pmp_hart_has_privs(env, pa, =
-pmp_size, 1 &lt;&lt; access_type, mode))<br>
-&gt;&gt;&gt;&gt; {<br>
-&gt;&gt;&gt;&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 ret =3D TRANSLATE_PMP_FA=
-IL;<br>
-&gt;&gt;&gt;&gt;=C2=A0 =C2=A0 =C2=A0 }<br>
-&gt;&gt;&gt;&gt;=C2=A0 =C2=A0 =C2=A0 if (ret =3D=3D TRANSLATE_PMP_FAIL) {<b=
-r>
-&gt;&gt;&gt;&gt; --<br>
-&gt;&gt;&gt;&gt; 2.20.1<br>
-&gt;&gt;&gt;&gt;<br>
-&gt;&gt;&gt;&gt;<br>
-&gt;&gt;&gt;&gt;<br>
-</blockquote></div>
+ hw/core/qdev.c                 |  20 +++
+ hw/net/virtio-net.c            | 267 +++++++++++++++++++++++++++++++++
+ hw/pci/pci.c                   |   2 +
+ hw/pci/pcie.c                  |   6 +
+ hw/vfio/pci.c                  |  35 ++++-
+ hw/vfio/pci.h                  |   2 +
+ include/hw/pci/pci.h           |   1 +
+ include/hw/qdev-core.h         |  10 ++
+ include/hw/virtio/virtio-net.h |  12 ++
+ include/hw/virtio/virtio.h     |   1 +
+ include/migration/vmstate.h    |   2 +
+ migration/migration.c          |  34 +++++
+ migration/migration.h          |   3 +
+ migration/savevm.c             |  36 +++++
+ migration/savevm.h             |   1 +
+ qapi/migration.json            |  24 ++-
+ qapi/net.json                  |  16 ++
+ qdev-monitor.c                 |  43 +++++-
+ tests/libqos/libqos.c          |   3 +-
+ vl.c                           |   6 +-
+ 20 files changed, 515 insertions(+), 9 deletions(-)
 
---0000000000004c6ef805953458ee--
+--=20
+2.21.0
+
+*** BLURB HERE ***
+
+Jens Freimann (11):
+  qdev/qbus: add hidden device support
+  pci: add option for net failover
+  pci: mark devices partially unplugged
+  pci: mark device having guest unplug request pending
+  qapi: add unplug primary event
+  qapi: add failover negotiated event
+  migration: allow unplug during migration for failover devices
+  migration: add new migration state wait-unplug
+  libqos: tolerate wait-unplug migration state
+  net/virtio: add failover support
+  vfio: unplug failover primary device before migration
+
+ hw/core/qdev.c                 |  24 +++
+ hw/net/virtio-net.c            | 282 +++++++++++++++++++++++++++++++++
+ hw/pci/pci.c                   |  17 ++
+ hw/pci/pcie.c                  |   6 +
+ hw/vfio/pci.c                  |  26 ++-
+ hw/vfio/pci.h                  |   1 +
+ include/hw/pci/pci.h           |   4 +
+ include/hw/qdev-core.h         |   9 ++
+ include/hw/virtio/virtio-net.h |  12 ++
+ include/hw/virtio/virtio.h     |   1 +
+ include/migration/vmstate.h    |   2 +
+ migration/migration.c          |  22 +++
+ migration/migration.h          |   3 +
+ migration/savevm.c             |  36 +++++
+ migration/savevm.h             |   1 +
+ qapi/migration.json            |  24 ++-
+ qapi/net.json                  |  16 ++
+ qdev-monitor.c                 |  38 ++++-
+ tests/libqos/libqos.c          |   3 +-
+ vl.c                           |   6 +-
+ 20 files changed, 519 insertions(+), 14 deletions(-)
+
+--=20
+2.21.0
+
+
+Jens Freimann (11):
+  qdev/qbus: add hidden device support
+  pci: add option for net failover
+  pci: mark devices partially unplugged
+  pci: mark device having guest unplug request pending
+  qapi: add unplug primary event
+  qapi: add failover negotiated event
+  migration: allow unplug during migration for failover devices
+  migration: add new migration state wait-unplug
+  libqos: tolerate wait-unplug migration state
+  net/virtio: add failover support
+  vfio: unplug failover primary device before migration
+
+ hw/core/qdev.c                 |  24 +++
+ hw/net/virtio-net.c            | 282 +++++++++++++++++++++++++++++++++
+ hw/pci/pci.c                   |  17 ++
+ hw/pci/pcie.c                  |   6 +
+ hw/vfio/pci.c                  |  26 ++-
+ hw/vfio/pci.h                  |   1 +
+ include/hw/pci/pci.h           |   4 +
+ include/hw/qdev-core.h         |   9 ++
+ include/hw/virtio/virtio-net.h |  12 ++
+ include/hw/virtio/virtio.h     |   1 +
+ include/migration/vmstate.h    |   2 +
+ migration/migration.c          |  21 +++
+ migration/migration.h          |   3 +
+ migration/savevm.c             |  36 +++++
+ migration/savevm.h             |   2 +
+ qapi/migration.json            |  24 ++-
+ qapi/net.json                  |  16 ++
+ qdev-monitor.c                 |  38 ++++-
+ tests/libqos/libqos.c          |   3 +-
+ vl.c                           |   6 +-
+ 20 files changed, 519 insertions(+), 14 deletions(-)
+
+--=20
+2.21.0
+
+Jens Freimann (11):
+  qdev/qbus: add hidden device support
+  pci: add option for net failover
+  pci: mark devices partially unplugged
+  pci: mark device having guest unplug request pending
+  qapi: add unplug primary event
+  qapi: add failover negotiated event
+  migration: allow unplug during migration for failover devices
+  migration: add new migration state wait-unplug
+  libqos: tolerate wait-unplug migration state
+  net/virtio: add failover support
+  vfio: unplug failover primary device before migration
+
+ hw/core/qdev.c                 |  24 +++
+ hw/net/virtio-net.c            | 282 +++++++++++++++++++++++++++++++++
+ hw/pci/pci.c                   |  17 ++
+ hw/pci/pcie.c                  |   6 +
+ hw/vfio/pci.c                  |  31 +++-
+ hw/vfio/pci.h                  |   1 +
+ include/hw/pci/pci.h           |   4 +
+ include/hw/qdev-core.h         |   9 ++
+ include/hw/virtio/virtio-net.h |  12 ++
+ include/hw/virtio/virtio.h     |   1 +
+ include/migration/vmstate.h    |   2 +
+ migration/migration.c          |  21 +++
+ migration/migration.h          |   3 +
+ migration/savevm.c             |  36 +++++
+ migration/savevm.h             |   2 +
+ qapi/migration.json            |  24 ++-
+ qapi/net.json                  |  16 ++
+ qdev-monitor.c                 |  38 ++++-
+ tests/libqos/libqos.c          |   3 +-
+ vl.c                           |   6 +-
+ 20 files changed, 524 insertions(+), 14 deletions(-)
+
+--=20
+2.21.0
+
 
