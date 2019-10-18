@@ -6,53 +6,53 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 13B9BCA9EA9
-	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 20:27:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 57F4BCA9EAB
+	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 20:27:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DDF0220854
-	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 20:27:04 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DDF0220854
+	by mail.kernel.org (Postfix) with ESMTPS id 31FDC20854
+	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 20:27:16 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 31FDC20854
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45792 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45794 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iLYpz-0004UL-TG
-	for qemu-devel@archiver.kernel.org; Fri, 18 Oct 2019 16:27:03 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48165)
+	id 1iLYqA-00058i-UU
+	for qemu-devel@archiver.kernel.org; Fri, 18 Oct 2019 16:27:14 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48125)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jfreimann@redhat.com>) id 1iLYkp-0006ek-OC
- for qemu-devel@nongnu.org; Fri, 18 Oct 2019 16:21:44 -0400
+ (envelope-from <jfreimann@redhat.com>) id 1iLYke-0006N1-7m
+ for qemu-devel@nongnu.org; Fri, 18 Oct 2019 16:21:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jfreimann@redhat.com>) id 1iLYko-0005pA-RI
- for qemu-devel@nongnu.org; Fri, 18 Oct 2019 16:21:43 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:37142)
+ (envelope-from <jfreimann@redhat.com>) id 1iLYkd-0005mD-8s
+ for qemu-devel@nongnu.org; Fri, 18 Oct 2019 16:21:32 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:45842)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <jfreimann@redhat.com>)
- id 1iLYko-0005ov-MA
- for qemu-devel@nongnu.org; Fri, 18 Oct 2019 16:21:42 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
+ id 1iLYkd-0005m0-3i
+ for qemu-devel@nongnu.org; Fri, 18 Oct 2019 16:21:31 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id E4AE38A1C8F;
- Fri, 18 Oct 2019 20:21:41 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 5A57989F30D;
+ Fri, 18 Oct 2019 20:21:30 +0000 (UTC)
 Received: from localhost (ovpn-116-92.ams2.redhat.com [10.36.116.92])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 76F7960BF4;
- Fri, 18 Oct 2019 20:21:41 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 296385D9CA;
+ Fri, 18 Oct 2019 20:21:21 +0000 (UTC)
 From: Jens Freimann <jfreimann@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 06/11] qapi: add failover negotiated event
-Date: Fri, 18 Oct 2019 22:20:35 +0200
-Message-Id: <20191018202040.30349-7-jfreimann@redhat.com>
+Subject: [PATCH 04/11] pci: mark device having guest unplug request pending
+Date: Fri, 18 Oct 2019 22:20:33 +0200
+Message-Id: <20191018202040.30349-5-jfreimann@redhat.com>
 In-Reply-To: <20191018202040.30349-1-jfreimann@redhat.com>
 References: <20191018202040.30349-1-jfreimann@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.69]); Fri, 18 Oct 2019 20:21:41 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.68]); Fri, 18 Oct 2019 20:21:30 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
@@ -76,41 +76,38 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This event is sent to let libvirt know that VIRTIO_NET_F_STANDBY
-feature was not negotiated during virtio feature negotiation. If this
-event is received it means any primary devices hotplugged before
-this were were never really added to QEMU devices.
+Set pending_deleted_event in DeviceState for failover
+primary devices that were successfully unplugged by the Guest OS.
 
 Signed-off-by: Jens Freimann <jfreimann@redhat.com>
 ---
- qapi/net.json | 16 ++++++++++++++++
- 1 file changed, 16 insertions(+)
+ hw/pci/pcie.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/qapi/net.json b/qapi/net.json
-index 728990f4fb..8c5f3f1fb2 100644
---- a/qapi/net.json
-+++ b/qapi/net.json
-@@ -737,3 +737,19 @@
- ##
- { 'command': 'announce-self', 'boxed': true,
-   'data' : 'AnnounceParameters'}
+diff --git a/hw/pci/pcie.c b/hw/pci/pcie.c
+index 19363ff8ce..08718188bb 100644
+--- a/hw/pci/pcie.c
++++ b/hw/pci/pcie.c
+@@ -457,6 +457,7 @@ static void pcie_unplug_device(PCIBus *bus, PCIDevice=
+ *dev, void *opaque)
+     HotplugHandler *hotplug_ctrl =3D qdev_get_hotplug_handler(DEVICE(dev=
+));
+=20
+     if (dev->partially_hotplugged) {
++        dev->qdev.pending_deleted_event =3D false;
+         return;
+     }
+     hotplug_handler_unplug(hotplug_ctrl, DEVICE(dev), &error_abort);
+@@ -476,6 +477,8 @@ void pcie_cap_slot_unplug_request_cb(HotplugHandler *=
+hotplug_dev,
+         return;
+     }
+=20
++    dev->pending_deleted_event =3D true;
 +
-+##
-+# @FAILOVER_NEGOTIATED:
-+#
-+# Emitted when VIRTIO_NET_F_STANDBY was negotiated during feature negoti=
-ation
-+#
-+# Since: 4.2
-+#
-+# Example:
-+#
-+# <- { "event": "FAILOVER_NEGOTIATED",
-+#      "data": {} }
-+#
-+##
-+{ 'event': 'FAILOVER_NEGOTIATED',
-+  'data': {} }
+     /* In case user cancel the operation of multi-function hot-add,
+      * remove the function that is unexposed to guest individually,
+      * without interaction with guest.
 --=20
 2.21.0
 
