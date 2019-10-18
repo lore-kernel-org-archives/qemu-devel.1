@@ -2,49 +2,59 @@ Return-Path: <SRS0=ht5U=YL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C35C8CA9EA0
-	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 11:57:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 25BD5CA9EA0
+	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 12:03:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9602F20700
-	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 11:57:29 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9602F20700
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	by mail.kernel.org (Postfix) with ESMTPS id EA03121925
+	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 12:03:58 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EA03121925
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38500 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38934 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iLQsq-0006vq-Qz
-	for qemu-devel@archiver.kernel.org; Fri, 18 Oct 2019 07:57:28 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37106)
+	id 1iLQz8-0001Ll-2P
+	for qemu-devel@archiver.kernel.org; Fri, 18 Oct 2019 08:03:58 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38136)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dplotnikov@virtuozzo.com>) id 1iLQrP-00065G-IM
- for qemu-devel@nongnu.org; Fri, 18 Oct 2019 07:56:01 -0400
+ (envelope-from <kwolf@redhat.com>) id 1iLQy8-0000WH-Gr
+ for qemu-devel@nongnu.org; Fri, 18 Oct 2019 08:02:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dplotnikov@virtuozzo.com>) id 1iLQrN-0002fm-Sg
- for qemu-devel@nongnu.org; Fri, 18 Oct 2019 07:55:59 -0400
-Received: from relay.sw.ru ([185.231.240.75]:47784)
+ (envelope-from <kwolf@redhat.com>) id 1iLQy7-0006oh-77
+ for qemu-devel@nongnu.org; Fri, 18 Oct 2019 08:02:56 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40238)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dplotnikov@virtuozzo.com>)
- id 1iLQrN-0002ei-Kl
- for qemu-devel@nongnu.org; Fri, 18 Oct 2019 07:55:57 -0400
-Received: from [10.94.4.71] (helo=dptest2.qa.sw.ru)
- by relay.sw.ru with esmtp (Exim 4.92.2)
- (envelope-from <dplotnikov@virtuozzo.com>)
- id 1iLQrJ-00053n-Uk; Fri, 18 Oct 2019 14:55:54 +0300
-From: Denis Plotnikov <dplotnikov@virtuozzo.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH] virtio: fix IO request length in virtio SCSI/block #PSBM-78839
-Date: Fri, 18 Oct 2019 14:55:47 +0300
-Message-Id: <20191018115547.19299-1-dplotnikov@virtuozzo.com>
-X-Mailer: git-send-email 2.17.0
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [fuzzy]
-X-Received-From: 185.231.240.75
+ (Exim 4.71) (envelope-from <kwolf@redhat.com>)
+ id 1iLQxz-0006di-JL; Fri, 18 Oct 2019 08:02:47 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id D5FF0A76C;
+ Fri, 18 Oct 2019 12:02:46 +0000 (UTC)
+Received: from localhost.localdomain.com (ovpn-117-198.ams2.redhat.com
+ [10.36.117.198])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 892CC1001B03;
+ Fri, 18 Oct 2019 12:02:45 +0000 (UTC)
+From: Kevin Wolf <kwolf@redhat.com>
+To: qemu-block@nongnu.org
+Subject: [PATCH v2] doc: Describe missing generic -blockdev options
+Date: Fri, 18 Oct 2019 14:02:35 +0200
+Message-Id: <20191018120235.4438-1-kwolf@redhat.com>
+MIME-Version: 1.0
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.29]); Fri, 18 Oct 2019 12:02:46 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -56,160 +66,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, den@virtuozzo.com, mst@redhat.com, mreitz@redhat.com,
- kraxel@redhat.com, stefanha@redhat.com
+Cc: kwolf@redhat.com, peter.maydell@linaro.org, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: "Denis V. Lunev" <den@openvz.org>
+We added more generic options after introducing -blockdev and forgot to
+update the documentation (man page and --help output) accordingly. Do
+that now.
 
-Linux guests submit IO requests no longer than PAGE_SIZE * max_seg
-field reported by SCSI controler. Thus typical sequential read with
-1 MB size results in the following pattern of the IO from the guest:
-  8,16   1    15754     2.766095122  2071  D   R 2095104 + 1008 [dd]
-  8,16   1    15755     2.766108785  2071  D   R 2096112 + 1008 [dd]
-  8,16   1    15756     2.766113486  2071  D   R 2097120 + 32 [dd]
-  8,16   1    15757     2.767668961     0  C   R 2095104 + 1008 [0]
-  8,16   1    15758     2.768534315     0  C   R 2096112 + 1008 [0]
-  8,16   1    15759     2.768539782     0  C   R 2097120 + 32 [0]
-The IO was generated by
-  dd if=/dev/sda of=/dev/null bs=1024 iflag=direct
-
-This effectively means that on rotational disks we will observe 3 IOPS
-for each 2 MBs processed. This definitely negatively affects both
-guest and host IO performance.
-
-The cure is relatively simple - we should report lengthy scatter-gather
-ability of the SCSI controller. Fortunately the situation here is very
-good. VirtIO transport layer can accomodate 1024 items in one request
-while we are using only 128. This situation is present since almost
-very beginning. 2 items are dedicated for request metadata thus we
-should publish VIRTQUEUE_MAX_SIZE - 2 as max_seg.
-
-The following pattern is observed after the patch:
-  8,16   1     9921     2.662721340  2063  D   R 2095104 + 1024 [dd]
-  8,16   1     9922     2.662737585  2063  D   R 2096128 + 1024 [dd]
-  8,16   1     9923     2.665188167     0  C   R 2095104 + 1024 [0]
-  8,16   1     9924     2.665198777     0  C   R 2096128 + 1024 [0]
-which is much better.
-
-The dark side of this patch is that we are tweaking guest visible
-parameter, though this should be relatively safe as above transport
-layer support is present in QEMU/host Linux for a very long time.
-The patch adds configurable property for VirtIO SCSI with a new default
-and hardcode option for VirtBlock which does not provide good
-configurable framework.
-
-Unfortunately the commit can not be applied as is. For the real cure we
-need guest to be fixed to accomodate that queue length, which is done
-only in the latest 4.14 kernel. Thus we are going to expose the property
-and tweak it on machine type level.
-
-The problem with the old kernels is that they have
-max_segments <= virtqueue_size restriction which cause the guest
-crashing in the case of violation.
-To fix the case described above in the old kernels we can increase
-virtqueue_size to 256 and max_segments to 254. The pitfall here is
-that seabios allows the virtqueue_size-s < 128, however, the seabios
-patch extending that value to 256 is pending.
-
-CC: "Michael S. Tsirkin" <mst@redhat.com>
-CC: Stefan Hajnoczi <stefanha@redhat.com>
-CC: Kevin Wolf <kwolf@redhat.com>
-CC: Max Reitz <mreitz@redhat.com>
-CC: Gerd Hoffmann <kraxel@redhat.com>
-Signed-off-by: Denis V. Lunev <den@openvz.org>
-Signed-off-by: Denis Plotnikov <dplotnikov@virtuozzo.com>
+Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- hw/block/virtio-blk.c           | 3 ++-
- hw/scsi/vhost-scsi.c            | 2 ++
- hw/scsi/virtio-scsi.c           | 4 +++-
- include/hw/virtio/virtio-blk.h  | 1 +
- include/hw/virtio/virtio-scsi.h | 1 +
- 5 files changed, 9 insertions(+), 2 deletions(-)
+ qemu-options.hx | 22 +++++++++++++++++++++-
+ 1 file changed, 21 insertions(+), 1 deletion(-)
 
-diff --git a/hw/block/virtio-blk.c b/hw/block/virtio-blk.c
-index 06e57a4d39..b2eaeeaf67 100644
---- a/hw/block/virtio-blk.c
-+++ b/hw/block/virtio-blk.c
-@@ -903,7 +903,7 @@ static void virtio_blk_update_config(VirtIODevice *vdev, uint8_t *config)
-     blk_get_geometry(s->blk, &capacity);
-     memset(&blkcfg, 0, sizeof(blkcfg));
-     virtio_stq_p(vdev, &blkcfg.capacity, capacity);
--    virtio_stl_p(vdev, &blkcfg.seg_max, 128 - 2);
-+    virtio_stl_p(vdev, &blkcfg.seg_max, s->conf.max_segments);
-     virtio_stw_p(vdev, &blkcfg.geometry.cylinders, conf->cyls);
-     virtio_stl_p(vdev, &blkcfg.blk_size, blk_size);
-     virtio_stw_p(vdev, &blkcfg.min_io_size, conf->min_io_size / blk_size);
-@@ -1240,6 +1240,7 @@ static Property virtio_blk_properties[] = {
-                        conf.max_discard_sectors, BDRV_REQUEST_MAX_SECTORS),
-     DEFINE_PROP_UINT32("max-write-zeroes-sectors", VirtIOBlock,
-                        conf.max_write_zeroes_sectors, BDRV_REQUEST_MAX_SECTORS),
-+    DEFINE_PROP_UINT32("max_segments", VirtIOBlock, conf.max_segments, 126),
-     DEFINE_PROP_END_OF_LIST(),
- };
- 
-diff --git a/hw/scsi/vhost-scsi.c b/hw/scsi/vhost-scsi.c
-index 61e2e57da9..fa3b377807 100644
---- a/hw/scsi/vhost-scsi.c
-+++ b/hw/scsi/vhost-scsi.c
-@@ -242,6 +242,8 @@ static Property vhost_scsi_properties[] = {
-     DEFINE_PROP_BIT64("t10_pi", VHostSCSICommon, host_features,
-                                                  VIRTIO_SCSI_F_T10_PI,
-                                                  false),
-+    DEFINE_PROP_UINT32("max_segments", VirtIOSCSICommon, conf.max_segments,
-+                       126),
-     DEFINE_PROP_END_OF_LIST(),
- };
- 
-diff --git a/hw/scsi/virtio-scsi.c b/hw/scsi/virtio-scsi.c
-index 839f120256..8b070ddeed 100644
---- a/hw/scsi/virtio-scsi.c
-+++ b/hw/scsi/virtio-scsi.c
-@@ -650,7 +650,7 @@ static void virtio_scsi_get_config(VirtIODevice *vdev,
-     VirtIOSCSICommon *s = VIRTIO_SCSI_COMMON(vdev);
- 
-     virtio_stl_p(vdev, &scsiconf->num_queues, s->conf.num_queues);
--    virtio_stl_p(vdev, &scsiconf->seg_max, 128 - 2);
-+    virtio_stl_p(vdev, &scsiconf->seg_max, s->conf.max_segments);
-     virtio_stl_p(vdev, &scsiconf->max_sectors, s->conf.max_sectors);
-     virtio_stl_p(vdev, &scsiconf->cmd_per_lun, s->conf.cmd_per_lun);
-     virtio_stl_p(vdev, &scsiconf->event_info_size, sizeof(VirtIOSCSIEvent));
-@@ -948,6 +948,8 @@ static Property virtio_scsi_properties[] = {
-                                                 VIRTIO_SCSI_F_CHANGE, true),
-     DEFINE_PROP_LINK("iothread", VirtIOSCSI, parent_obj.conf.iothread,
-                      TYPE_IOTHREAD, IOThread *),
-+    DEFINE_PROP_UINT32("max_segments", VirtIOSCSI, parent_obj.conf.max_segments,
-+                       126),
-     DEFINE_PROP_END_OF_LIST(),
- };
- 
-diff --git a/include/hw/virtio/virtio-blk.h b/include/hw/virtio/virtio-blk.h
-index cddcfbebe9..22da23a4a3 100644
---- a/include/hw/virtio/virtio-blk.h
-+++ b/include/hw/virtio/virtio-blk.h
-@@ -40,6 +40,7 @@ struct VirtIOBlkConf
-     uint16_t queue_size;
-     uint32_t max_discard_sectors;
-     uint32_t max_write_zeroes_sectors;
-+    uint32_t max_segments;
- };
- 
- struct VirtIOBlockDataPlane;
-diff --git a/include/hw/virtio/virtio-scsi.h b/include/hw/virtio/virtio-scsi.h
-index 4c0bcdb788..1e5805eec4 100644
---- a/include/hw/virtio/virtio-scsi.h
-+++ b/include/hw/virtio/virtio-scsi.h
-@@ -49,6 +49,7 @@ struct VirtIOSCSIConf {
-     uint32_t num_queues;
-     uint32_t virtqueue_size;
-     uint32_t max_sectors;
-+    uint32_t max_segments;
-     uint32_t cmd_per_lun;
- #ifdef CONFIG_VHOST_SCSI
-     char *vhostfd;
--- 
-2.17.0
+diff --git a/qemu-options.hx b/qemu-options.hx
+index 793d70ff93..2e6ba5ef1f 100644
+--- a/qemu-options.hx
++++ b/qemu-options.hx
+@@ -849,7 +849,8 @@ ETEXI
+ DEF("blockdev", HAS_ARG, QEMU_OPTION_blockdev,
+     "-blockdev [driver=3D]driver[,node-name=3DN][,discard=3Dignore|unmap=
+]\n"
+     "          [,cache.direct=3Don|off][,cache.no-flush=3Don|off]\n"
+-    "          [,read-only=3Don|off][,detect-zeroes=3Don|off|unmap]\n"
++    "          [,read-only=3Don|off][,auto-read-only=3Don|off]\n"
++    "          [,force-share=3Don|off][,detect-zeroes=3Don|off|unmap]\n"
+     "          [,driver specific parameters...]\n"
+     "                configure a block backend\n", QEMU_ARCH_ALL)
+ STEXI
+@@ -885,6 +886,25 @@ name is not intended to be predictable and changes b=
+etween QEMU invocations.
+ For the top level, an explicit node name must be specified.
+ @item read-only
+ Open the node read-only. Guest write attempts will fail.
++
++Note that some block drivers support only read-only access, either gener=
+ally or
++in certain configurations. In this case, the default value
++@option{read-only=3Doff} does not work and the option must be specified
++explicitly.
++@item auto-read-only
++If @option{auto-read-only=3Don} is set, QEMU may fall back to read-only =
+usage
++even when @option{read-only=3Doff} is requested, or even switch between =
+modes as
++needed, e.g. depending on whether the image file is writable or whether =
+a
++writing user is attached to the node.
++@item force-share
++Override the image locking system of QEMU by forcing the node to utilize
++weaker shared access for permissions where it would normally request exc=
+lusive
++access.  When there is the potential for multiple instances to have the =
+same
++file open (whether this invocation of qemu is the first or the second
++instance), both instances must permit shared access for the second insta=
+nce to
++succeed at opening the file.
++
++Enabling @option{force-share=3Don} requires @option{read-only=3Don}.
+ @item cache.direct
+ The host page cache can be avoided with @option{cache.direct=3Don}. This=
+ will
+ attempt to do disk IO directly to the guest's memory. QEMU may still per=
+form an
+--=20
+2.20.1
 
 
