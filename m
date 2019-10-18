@@ -2,87 +2,84 @@ Return-Path: <SRS0=ht5U=YL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0597DCA9EA0
-	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 17:07:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9FCECCA9EA0
+	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 17:08:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C87622064B
-	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 17:07:41 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C87622064B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 593862064B
+	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 17:08:57 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="qBXq6i5P"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 593862064B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43582 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43590 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iLVj3-00080Y-0Q
-	for qemu-devel@archiver.kernel.org; Fri, 18 Oct 2019 13:07:41 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55572)
+	id 1iLVkG-0000Rq-FM
+	for qemu-devel@archiver.kernel.org; Fri, 18 Oct 2019 13:08:56 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55583)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1iLVfc-0005df-SA
- for qemu-devel@nongnu.org; Fri, 18 Oct 2019 13:04:09 -0400
+ (envelope-from <aleksandar.m.mail@gmail.com>) id 1iLVfd-0005e2-Ef
+ for qemu-devel@nongnu.org; Fri, 18 Oct 2019 13:04:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1iLVfb-0007nJ-DT
- for qemu-devel@nongnu.org; Fri, 18 Oct 2019 13:04:08 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46056)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iLVfb-0007ml-5Y
+ (envelope-from <aleksandar.m.mail@gmail.com>) id 1iLVfb-0007ng-P5
+ for qemu-devel@nongnu.org; Fri, 18 Oct 2019 13:04:09 -0400
+Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:40395)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
+ id 1iLVfb-0007mz-Id
  for qemu-devel@nongnu.org; Fri, 18 Oct 2019 13:04:07 -0400
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69])
- (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 227A5C049E12
- for <qemu-devel@nongnu.org>; Fri, 18 Oct 2019 17:04:06 +0000 (UTC)
-Received: by mail-wm1-f69.google.com with SMTP id o188so3001229wmo.5
- for <qemu-devel@nongnu.org>; Fri, 18 Oct 2019 10:04:06 -0700 (PDT)
+Received: by mail-ot1-x342.google.com with SMTP id y39so5551095ota.7
+ for <qemu-devel@nongnu.org>; Fri, 18 Oct 2019 10:04:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:in-reply-to:references:from:date:message-id:subject:to
+ :cc; bh=bDkaYEuXLrk5gORcRlPGVt7oxf6zCxNVYFWtJrj+Y6E=;
+ b=qBXq6i5P5242KBGQVy0CX7I12MH8WNP3dL4wJI3TW6ILw0F22FrYnMuDA/FUKcp+3/
+ cgdZW0sEqm/Ptt+8NrCUvbILt4nhwcBTYzVJ8/g27EoqB+U4ZY4zp989a6Hz9my0dxyd
+ MZ74Tv+esTjIB1z2pJt7NjNzPH2SPxsBWjz8WfFRf/EO3jNHDdailNqEzJUxlbTHl4hb
+ MxC8VtMevE6OyLDr5Uvdj4ErmOcRSpeIbfnGsyjU+cd4B5hkrh3CFDaYEoCbjWLO5HXh
+ fqpce8tYWFVQxJ2eyX53wbGV/8nXT7aj5bl3VIlzBetabH7scYlN1dFMBzjjbIT0aRNS
+ efAA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=20VL07eZ6pVWeEvn8kJv/AgmnvUHrvm1zFQD1xroqRA=;
- b=Kh1Un8BoLqzpEDZZaJu3sIEi7lXAB6KFAT7cuRJ/0rMxxxOwclhbQ+XcdZVsptHiM1
- PU3UkY0BtM2LxHjUJrIJhsNWFPQChEqO99BNkf4ZKZZ8bR1dr9Hyre/QEPxmf9PHkrvL
- rZYQnxec4garKcyV1UGFgRL0AjSSS3/JHYqmnugWvRB/Pdj82N5vrKYAUbVMsTzk40zR
- DvmflHPqe2vdBJuw7aqIWm677hV8BfUQdQEvn50/l7PZXVR2LqqraxR7+OZalznovyen
- 7gcRLaM2UOsGb6810/CqtLE+gV6o4qPWneZxYnO7LqPFmn42Tv/L746qkl0rxDrWivhu
- FcoA==
-X-Gm-Message-State: APjAAAW6IYt13e4VEODozVxgeAH1uhue79jSteg6OfTcltLovZxO+dm4
- DfXPPvA52fPLUTQ32cIEix9Swp3OSH2WX3jqx6uHDXBgx+curIzp5Er2FbSlA0719ofIsUgDvtQ
- DlC299M+ec52xUVc=
-X-Received: by 2002:adf:e7c2:: with SMTP id e2mr8657942wrn.29.1571418244763;
- Fri, 18 Oct 2019 10:04:04 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqwFcHxiedG1B5NB4Az+XyB9urxjLFgVPZvCib1nv+lgs7UKaKH+R/BqDJbfHY8LZ2lnBi4rAg==
-X-Received: by 2002:adf:e7c2:: with SMTP id e2mr8657901wrn.29.1571418244445;
- Fri, 18 Oct 2019 10:04:04 -0700 (PDT)
-Received: from [192.168.1.36] (14.red-88-21-201.staticip.rima-tde.net.
- [88.21.201.14])
- by smtp.gmail.com with ESMTPSA id s9sm6805467wme.36.2019.10.18.10.04.01
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Fri, 18 Oct 2019 10:04:03 -0700 (PDT)
-Subject: Re: [PATCH 07/14] RFC: mips/cps: fix setting saar property
-To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
- qemu-devel@nongnu.org
-References: <20191018154212.13458-1-marcandre.lureau@redhat.com>
- <20191018154212.13458-8-marcandre.lureau@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <e13cbf70-e7a3-904c-f230-c42f75d5adbc@redhat.com>
-Date: Fri, 18 Oct 2019 19:04:01 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.1
+ h=x-gm-message-state:mime-version:in-reply-to:references:from:date
+ :message-id:subject:to:cc;
+ bh=bDkaYEuXLrk5gORcRlPGVt7oxf6zCxNVYFWtJrj+Y6E=;
+ b=RiMnSbV0VClxu7tCmzgPZN9xNzshWrbq+IVjDK58uan2hjxqFnqiV9rjlX5nI35BMM
+ mmC57xMYVrpYF8iqqYYHlASapb/iZggZHv3YKi68O6AwsXA5+zBnOkQxlKlDonOS7fen
+ 5BJ+yrVpa2IlkjhABcXFm2MYJpU5MXvGBv7IpZ2dkyl2NN0GMkWXs4sCIUvOA0oaRCTb
+ T0lhxV1K5Tr4fUgtADSH6luL/rMMmDjLmSAGdeV5+h9RludKm6L8rYmYidWsrXbdMsi2
+ SEVMSb8WGeiEdwU8VYbX3xBUQrcbCGLkQTo1RYkWl0BfD66rrGuDKOnbe2D1hH8hu/r+
+ V3WQ==
+X-Gm-Message-State: APjAAAVunWk5uJ1Jl7nWKhAYXsLJQXix7wOrLlz9RCT8If+/tHr6LDOC
+ feD+cnYap+DLxAqP4Vcu4YTejTki8Tki0XWgMiw=
+X-Google-Smtp-Source: APXvYqxDdpOvXmKbC0prh5gAR8ElpRIgErg2wqpu+0QNVY1zzrSln2fvSp8S1Aa03XRqC0pzq9XcFldtIO4/bE1/1Xo=
+X-Received: by 2002:a05:6830:452:: with SMTP id
+ d18mr8718963otc.295.1571418246685; 
+ Fri, 18 Oct 2019 10:04:06 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20191018154212.13458-8-marcandre.lureau@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.132.183.28
+Received: by 2002:a9d:340a:0:0:0:0:0 with HTTP; Fri, 18 Oct 2019 10:04:06
+ -0700 (PDT)
+In-Reply-To: <20191018134754.16362-21-philmd@redhat.com>
+References: <20191018134754.16362-1-philmd@redhat.com>
+ <20191018134754.16362-21-philmd@redhat.com>
+From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+Date: Fri, 18 Oct 2019 19:04:06 +0200
+Message-ID: <CAL1e-=gHBfvchVaAbus+GVaSVUFyae41iCB3i5HGhyLTvOr2Ew@mail.gmail.com>
+Subject: Re: [PATCH v2 20/20] hw/pci-host/i440fx: Remove the last PIIX3 traces
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
+Content-Type: multipart/alternative; boundary="000000000000632a83059532525f"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::342
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,69 +91,309 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Corey Minyard <cminyard@mvista.com>,
- =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>,
- Peter Maydell <peter.maydell@linaro.org>, Magnus Damm <magnus.damm@gmail.com>,
- Jason Wang <jasowang@redhat.com>,
- Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
- Fabien Chouteau <chouteau@adacore.com>,
- KONRAD Frederic <frederic.konrad@adacore.com>, qemu-arm@nongnu.org,
- =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>,
- Aurelien Jarno <aurelien@aurel32.net>,
+Cc: Stefano Stabellini <sstabellini@kernel.org>,
+ "xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>,
+ Paul Durrant <paul@xen.org>, "Michael S. Tsirkin" <mst@redhat.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ Eduardo Habkost <ehabkost@redhat.com>,
+ =?UTF-8?Q?Herv=C3=A9_Poussineau?= <hpoussin@reactos.org>,
  Aleksandar Markovic <amarkovic@wavecomp.com>,
+ Igor Mammedov <imammedo@redhat.com>,
+ Anthony Perard <anthony.perard@citrix.com>,
  Paolo Bonzini <pbonzini@redhat.com>,
- "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
- Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>, qemu-ppc@nongnu.org,
- Artyom Tarasenko <atar4qemu@gmail.com>, Richard Henderson <rth@twiddle.net>
+ Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
+ Aurelien Jarno <aurelien@aurel32.net>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 10/18/19 5:42 PM, Marc-Andr=C3=A9 Lureau wrote:
-> There is no "saar" property. Note: I haven't been able to test this
-> code. Help welcome. >
-> May fix commit 043715d1e0fbb3e3411be3f898c5b77b7f90327a ("target/mips:
-> Update ITU to utilize SAARI and SAAR CP0 registers")
+--000000000000632a83059532525f
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-This seems a MIPS feature that is not fully mainstreamed, I suppose we=20
-miss the DSPRAM patches, see:
-https://www.mail-archive.com/qemu-devel@nongnu.org/msg638373.html
+On Friday, October 18, 2019, Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com=
+>
+wrote:
 
-This code is currently not reachable:
-
-$ git grep saarp
-hw/mips/cps.c:98:    saar_present =3D (bool)env->saarp;
-target/mips/cpu.h:1103:    int saarp;
-
-Unfortunately the author email is bouncing:
-
-host mips-com.mail.protection.outlook.com[104.47.46.36] said:
-550 5.4.1 [yongbok.kim@mips.com]: Recipient address rejected:
-Access denied [BN3NAM04FT027.eop-NAM04.prod.protection.outlook.com]
-(in reply to RCPT TO command)
-
-> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> The PIIX3 is not tied to the i440FX and can even be used without it.
+> Move its creation to the machine code (pc_piix.c).
+> We have now removed the last trace of southbridge code in the i440FX
+> northbridge.
+>
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 > ---
->   hw/mips/cps.c | 2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
->=20
-> diff --git a/hw/mips/cps.c b/hw/mips/cps.c
-> index 1660f86908..c49868d5da 100644
-> --- a/hw/mips/cps.c
-> +++ b/hw/mips/cps.c
-> @@ -106,7 +106,7 @@ static void mips_cps_realize(DeviceState *dev, Erro=
-r **errp)
->           object_property_set_bool(OBJECT(&s->itu), saar_present, "saar=
--present",
->                                    &err);
->           if (saar_present) {
-> -            qdev_prop_set_ptr(DEVICE(&s->itu), "saar", (void *)&env->C=
-P0_SAAR);
-> +            s->itu.saar =3D &env->CP0_SAAR;
->           }
->           object_property_set_bool(OBJECT(&s->itu), true, "realized", &=
-err);
->           if (err !=3D NULL) {
->=20
+>  hw/i386/pc_piix.c            | 8 +++++++-
+>  hw/pci-host/i440fx.c         | 8 --------
+>  include/hw/pci-host/i440fx.h | 3 +--
+>  3 files changed, 8 insertions(+), 11 deletions(-)
+>
+>
+Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+
+Philippe, I don't have any test equipment available at the moment, did you
+do some smoke tests with new v2 of the series (like booting a Malta board,
+or other relevant scenario)?
+
+Veuillez agr=C3=A9er, Monsieur Philippe, l'assurance de mon parfaite
+consid=C3=A9ration.
+
+Aleksandar
+
+
+> diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
+> index 11b8de049f..f6e7196a82 100644
+> --- a/hw/i386/pc_piix.c
+> +++ b/hw/i386/pc_piix.c
+> @@ -199,14 +199,20 @@ static void pc_init1(MachineState *machine,
+>      }
+>
+>      if (pcmc->pci_enabled) {
+> +        PIIX3State *piix3;
+> +
+>          pci_bus =3D i440fx_init(host_type,
+>                                pci_type,
+> -                              &i440fx_state, &piix3_devfn, &isa_bus,
+> pcms->gsi,
+> +                              &i440fx_state,
+>                                system_memory, system_io, machine->ram_siz=
+e,
+>                                pcms->below_4g_mem_size,
+>                                pcms->above_4g_mem_size,
+>                                pci_memory, ram_memory);
+>          pcms->bus =3D pci_bus;
+> +
+> +        piix3 =3D piix3_create(pci_bus, &isa_bus);
+> +        piix3->pic =3D pcms->gsi;
+> +        piix3_devfn =3D piix3->dev.devfn;
+>      } else {
+>          pci_bus =3D NULL;
+>          i440fx_state =3D NULL;
+> diff --git a/hw/pci-host/i440fx.c b/hw/pci-host/i440fx.c
+> index 79ecd58a2b..f27131102d 100644
+> --- a/hw/pci-host/i440fx.c
+> +++ b/hw/pci-host/i440fx.c
+> @@ -27,7 +27,6 @@
+>  #include "hw/pci/pci.h"
+>  #include "hw/pci/pci_host.h"
+>  #include "hw/pci-host/i440fx.h"
+> -#include "hw/southbridge/piix.h"
+>  #include "hw/qdev-properties.h"
+>  #include "hw/sysbus.h"
+>  #include "qapi/error.h"
+> @@ -272,8 +271,6 @@ static void i440fx_realize(PCIDevice *dev, Error
+> **errp)
+>
+>  PCIBus *i440fx_init(const char *host_type, const char *pci_type,
+>                      PCII440FXState **pi440fx_state,
+> -                    int *piix3_devfn,
+> -                    ISABus **isa_bus, qemu_irq *pic,
+>                      MemoryRegion *address_space_mem,
+>                      MemoryRegion *address_space_io,
+>                      ram_addr_t ram_size,
+> @@ -286,7 +283,6 @@ PCIBus *i440fx_init(const char *host_type, const char
+> *pci_type,
+>      PCIBus *b;
+>      PCIDevice *d;
+>      PCIHostState *s;
+> -    PIIX3State *piix3;
+>      PCII440FXState *f;
+>      unsigned i;
+>      I440FXState *i440fx;
+> @@ -339,10 +335,6 @@ PCIBus *i440fx_init(const char *host_type, const cha=
+r
+> *pci_type,
+>                   PAM_EXPAN_SIZE);
+>      }
+>
+> -    piix3 =3D piix3_create(b, isa_bus);
+> -    piix3->pic =3D pic;
+> -    *piix3_devfn =3D piix3->dev.devfn;
+> -
+>      ram_size =3D ram_size / 8 / 1024 / 1024;
+>      if (ram_size > 255) {
+>          ram_size =3D 255;
+> diff --git a/include/hw/pci-host/i440fx.h b/include/hw/pci-host/i440fx.h
+> index e327f9bf87..f54e6466e4 100644
+> --- a/include/hw/pci-host/i440fx.h
+> +++ b/include/hw/pci-host/i440fx.h
+> @@ -22,8 +22,7 @@ typedef struct PCII440FXState PCII440FXState;
+>  #define TYPE_IGD_PASSTHROUGH_I440FX_PCI_DEVICE "igd-passthrough-i440FX"
+>
+>  PCIBus *i440fx_init(const char *host_type, const char *pci_type,
+> -                    PCII440FXState **pi440fx_state, int *piix_devfn,
+> -                    ISABus **isa_bus, qemu_irq *pic,
+> +                    PCII440FXState **pi440fx_state,
+>                      MemoryRegion *address_space_mem,
+>                      MemoryRegion *address_space_io,
+>                      ram_addr_t ram_size,
+> --
+> 2.21.0
+>
+>
+>
+
+--000000000000632a83059532525f
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+<br><br>On Friday, October 18, 2019, Philippe Mathieu-Daud=C3=A9 &lt;<a hre=
+f=3D"mailto:philmd@redhat.com">philmd@redhat.com</a>&gt; wrote:<br><blockqu=
+ote class=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;border-left:1px #ccc s=
+olid;padding-left:1ex">The PIIX3 is not tied to the i440FX and can even be =
+used without it.<br>
+Move its creation to the machine code (pc_piix.c).<br>
+We have now removed the last trace of southbridge code in the i440FX<br>
+northbridge.<br>
+<br>
+Signed-off-by: Philippe Mathieu-Daud=C3=A9 &lt;<a href=3D"mailto:philmd@red=
+hat.com">philmd@redhat.com</a>&gt;<br>
+---<br>
+=C2=A0hw/i386/pc_piix.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 | 8 ++++++=
++-<br>
+=C2=A0hw/pci-host/i440fx.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0| 8 --------<br=
+>
+=C2=A0include/hw/pci-host/i440fx.h | 3 +--<br>
+=C2=A03 files changed, 8 insertions(+), 11 deletions(-)<br>
+<br></blockquote><div><br></div><div><span style=3D"color:rgb(34,34,34);fon=
+t-size:14px;line-height:22.1200008392334px">Reviewed-by: Aleksandar Markovi=
+c &lt;</span><a href=3D"mailto:amarkovic@wavecomp.com" style=3D"font-size:1=
+4px;line-height:22.1200008392334px">amarkovic@wavecomp.com</a><span style=
+=3D"color:rgb(34,34,34);font-size:14px;line-height:22.1200008392334px">&gt;=
+</span><br></div><div><span style=3D"color:rgb(34,34,34);font-size:14px;lin=
+e-height:22.1200008392334px"><br></span></div><div><span style=3D"color:rgb=
+(34,34,34);font-size:14px;line-height:22.1200008392334px">Philippe, I don&#=
+39;t have any test equipment available at the moment, did you do some smoke=
+ tests with new v2 of the series (like booting a Malta board, or other rele=
+vant scenario)?</span></div><div><span style=3D"color:rgb(34,34,34);font-si=
+ze:14px;line-height:22.1200008392334px"><br></span></div><div><span style=
+=3D"margin:0px;padding:0px;border:0px;font-family:&#39;Helvetica Neue&#39;,=
+Helvetica,&#39;Nimbus Sans L&#39;,Arial,&#39;Liberation Sans&#39;,sans-seri=
+f;font-size:16px;font-style:inherit;font-stretch:inherit;line-height:25px;v=
+ertical-align:baseline;color:rgb(51,51,51)">Veuillez agr=C3=A9er, Monsieur =
+Philippe, l&#39;assurance de mon parfaite consid=C3=A9ration.</span><br></d=
+iv><div><span style=3D"margin:0px;padding:0px;border:0px;font-family:&#39;H=
+elvetica Neue&#39;,Helvetica,&#39;Nimbus Sans L&#39;,Arial,&#39;Liberation =
+Sans&#39;,sans-serif;font-size:16px;font-style:inherit;font-stretch:inherit=
+;line-height:25px;vertical-align:baseline;color:rgb(51,51,51)"><br></span><=
+/div><div><span style=3D"margin:0px;padding:0px;border:0px;font-family:&#39=
+;Helvetica Neue&#39;,Helvetica,&#39;Nimbus Sans L&#39;,Arial,&#39;Liberatio=
+n Sans&#39;,sans-serif;font-size:16px;font-style:inherit;font-stretch:inher=
+it;line-height:25px;vertical-align:baseline;color:rgb(51,51,51)">Aleksandar=
+</span></div><div>=C2=A0</div><blockquote class=3D"gmail_quote" style=3D"ma=
+rgin:0 0 0 .8ex;border-left:1px #ccc solid;padding-left:1ex">
+diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c<br>
+index 11b8de049f..f6e7196a82 100644<br>
+--- a/hw/i386/pc_piix.c<br>
++++ b/hw/i386/pc_piix.c<br>
+@@ -199,14 +199,20 @@ static void pc_init1(MachineState *machine,<br>
+=C2=A0 =C2=A0 =C2=A0}<br>
+<br>
+=C2=A0 =C2=A0 =C2=A0if (pcmc-&gt;pci_enabled) {<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 PIIX3State *piix3;<br>
++<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0pci_bus =3D i440fx_init(host_type,<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0pci_type,<br>
+-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 &amp;i440fx_state, &amp;piix3_devfn, &amp;i=
+sa_bus, pcms-&gt;gsi,<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 &amp;i440fx_state,<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0system_memory, system_io, machine-&gt=
+;ram_size,<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0pcms-&gt;below_4g_mem_size,<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0pcms-&gt;above_4g_mem_size,<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0pci_memory, ram_memory);<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0pcms-&gt;bus =3D pci_bus;<br>
++<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 piix3 =3D piix3_create(pci_bus, &amp;isa_bus);=
+<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 piix3-&gt;pic =3D pcms-&gt;gsi;<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 piix3_devfn =3D piix3-&gt;dev.devfn;<br>
+=C2=A0 =C2=A0 =C2=A0} else {<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0pci_bus =3D NULL;<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0i440fx_state =3D NULL;<br>
+diff --git a/hw/pci-host/i440fx.c b/hw/pci-host/i440fx.c<br>
+index 79ecd58a2b..f27131102d 100644<br>
+--- a/hw/pci-host/i440fx.c<br>
++++ b/hw/pci-host/i440fx.c<br>
+@@ -27,7 +27,6 @@<br>
+=C2=A0#include &quot;hw/pci/pci.h&quot;<br>
+=C2=A0#include &quot;hw/pci/pci_host.h&quot;<br>
+=C2=A0#include &quot;hw/pci-host/i440fx.h&quot;<br>
+-#include &quot;hw/southbridge/piix.h&quot;<br>
+=C2=A0#include &quot;hw/qdev-properties.h&quot;<br>
+=C2=A0#include &quot;hw/sysbus.h&quot;<br>
+=C2=A0#include &quot;qapi/error.h&quot;<br>
+@@ -272,8 +271,6 @@ static void i440fx_realize(PCIDevice *dev, Error **errp=
+)<br>
+<br>
+=C2=A0PCIBus *i440fx_init(const char *host_type, const char *pci_type,<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0PCII440FXState **pi440fx_state,<br>
+-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 int =
+*piix3_devfn,<br>
+-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 ISAB=
+us **isa_bus, qemu_irq *pic,<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0MemoryRegion *address_space_mem,<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0MemoryRegion *address_space_io,<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0ram_addr_t ram_size,<br>
+@@ -286,7 +283,6 @@ PCIBus *i440fx_init(const char *host_type, const char *=
+pci_type,<br>
+=C2=A0 =C2=A0 =C2=A0PCIBus *b;<br>
+=C2=A0 =C2=A0 =C2=A0PCIDevice *d;<br>
+=C2=A0 =C2=A0 =C2=A0PCIHostState *s;<br>
+-=C2=A0 =C2=A0 PIIX3State *piix3;<br>
+=C2=A0 =C2=A0 =C2=A0PCII440FXState *f;<br>
+=C2=A0 =C2=A0 =C2=A0unsigned i;<br>
+=C2=A0 =C2=A0 =C2=A0I440FXState *i440fx;<br>
+@@ -339,10 +335,6 @@ PCIBus *i440fx_init(const char *host_type, const char =
+*pci_type,<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 PAM_EXPAN_SI=
+ZE);<br>
+=C2=A0 =C2=A0 =C2=A0}<br>
+<br>
+-=C2=A0 =C2=A0 piix3 =3D piix3_create(b, isa_bus);<br>
+-=C2=A0 =C2=A0 piix3-&gt;pic =3D pic;<br>
+-=C2=A0 =C2=A0 *piix3_devfn =3D piix3-&gt;dev.devfn;<br>
+-<br>
+=C2=A0 =C2=A0 =C2=A0ram_size =3D ram_size / 8 / 1024 / 1024;<br>
+=C2=A0 =C2=A0 =C2=A0if (ram_size &gt; 255) {<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0ram_size =3D 255;<br>
+diff --git a/include/hw/pci-host/i440fx.h b/include/hw/pci-host/i440fx.h<br=
+>
+index e327f9bf87..f54e6466e4 100644<br>
+--- a/include/hw/pci-host/i440fx.h<br>
++++ b/include/hw/pci-host/i440fx.h<br>
+@@ -22,8 +22,7 @@ typedef struct PCII440FXState PCII440FXState;<br>
+=C2=A0#define TYPE_IGD_PASSTHROUGH_I440FX_<wbr>PCI_DEVICE &quot;igd-passthr=
+ough-i440FX&quot;<br>
+<br>
+=C2=A0PCIBus *i440fx_init(const char *host_type, const char *pci_type,<br>
+-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 PCII=
+440FXState **pi440fx_state, int *piix_devfn,<br>
+-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 ISAB=
+us **isa_bus, qemu_irq *pic,<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 PCII=
+440FXState **pi440fx_state,<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0MemoryRegion *address_space_mem,<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0MemoryRegion *address_space_io,<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0ram_addr_t ram_size,<br>
+-- <br>
+2.21.0<br>
+<br>
+<br>
+</blockquote>
+
+--000000000000632a83059532525f--
 
