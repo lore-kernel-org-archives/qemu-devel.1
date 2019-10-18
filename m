@@ -6,101 +6,57 @@ X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 33F5ECA9EA1
-	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 11:32:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9E5DBCA9EA0
+	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 11:37:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0441220854
-	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 11:32:49 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0441220854
+	by mail.kernel.org (Postfix) with ESMTPS id 70E8920854
+	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 11:37:50 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 70E8920854
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38247 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38278 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iLQUy-0004Ua-81
-	for qemu-devel@archiver.kernel.org; Fri, 18 Oct 2019 07:32:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34358)
+	id 1iLQZp-00067x-Kn
+	for qemu-devel@archiver.kernel.org; Fri, 18 Oct 2019 07:37:49 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35023)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <thuth@redhat.com>) id 1iLQTs-0003a7-Qk
- for qemu-devel@nongnu.org; Fri, 18 Oct 2019 07:31:41 -0400
+ (envelope-from <berrange@redhat.com>) id 1iLQZC-0005fo-Im
+ for qemu-devel@nongnu.org; Fri, 18 Oct 2019 07:37:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <thuth@redhat.com>) id 1iLQTp-00051g-P6
- for qemu-devel@nongnu.org; Fri, 18 Oct 2019 07:31:39 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:38096)
+ (envelope-from <berrange@redhat.com>) id 1iLQZB-00082J-72
+ for qemu-devel@nongnu.org; Fri, 18 Oct 2019 07:37:10 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:39470)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <thuth@redhat.com>)
- id 1iLQTp-00051F-Gl; Fri, 18 Oct 2019 07:31:37 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
+ (Exim 4.71) (envelope-from <berrange@redhat.com>)
+ id 1iLQZA-00081t-VA; Fri, 18 Oct 2019 07:37:09 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 3276A2A09B1;
- Fri, 18 Oct 2019 11:31:36 +0000 (UTC)
-Received: from thuth.remote.csb (dhcp-200-228.str.redhat.com [10.33.200.228])
- by smtp.corp.redhat.com (Postfix) with ESMTP id EFB785C1B5;
- Fri, 18 Oct 2019 11:31:34 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 0FE5E99C43;
+ Fri, 18 Oct 2019 11:37:08 +0000 (UTC)
+Received: from redhat.com (ovpn-112-62.ams2.redhat.com [10.36.112.62])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 1DC851001B05;
+ Fri, 18 Oct 2019 11:37:05 +0000 (UTC)
+Date: Fri, 18 Oct 2019 12:37:03 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To: Thomas Huth <thuth@redhat.com>
 Subject: Re: [PATCH] Do not use %m in common code to print error messages
-To: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>
+Message-ID: <20191018113703.GE28271@redhat.com>
 References: <20191018104438.6158-1-thuth@redhat.com>
  <20191018105710.GD28271@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=thuth@redhat.com; prefer-encrypt=mutual; keydata=
- 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
-Organization: Red Hat
-Message-ID: <4bb84a56-30b1-72e7-7df1-770505744b39@redhat.com>
-Date: Fri, 18 Oct 2019 13:31:34 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+ <4bb84a56-30b1-72e7-7df1-770505744b39@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20191018105710.GD28271@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+Content-Disposition: inline
+In-Reply-To: <4bb84a56-30b1-72e7-7df1-770505744b39@redhat.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.38]); Fri, 18 Oct 2019 11:31:36 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.38]); Fri, 18 Oct 2019 11:37:08 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
@@ -116,65 +72,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
 Cc: qemu-trivial@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
  Kamil Rytarowski <kamil@netbsd.org>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 18/10/2019 12.57, Daniel P. Berrang=C3=A9 wrote:
-> On Fri, Oct 18, 2019 at 12:44:38PM +0200, Thomas Huth wrote:
->> The %m format specifier is an extension from glibc - and when compilin=
-g
->> QEMU for NetBSD, the compiler correctly complains, e.g.:
->>
->> /home/qemu/qemu-test.ELjfrQ/src/util/main-loop.c: In function 'sigfd_h=
-andler':
->> /home/qemu/qemu-test.ELjfrQ/src/util/main-loop.c:64:13: warning: %m is=
- only
->>  allowed in syslog(3) like functions [-Wformat=3D]
->>              printf("read from sigfd returned %zd: %m\n", len);
->>              ^
->> Let's use g_strerror() here instead, which is an easy-to-use wrapper
->> around the thread-safe strerror_r() function.
->>
->> While we're at it, also convert the "printf()" in main-loop.c into
->> the preferred "error_report()".
->>
->> Signed-off-by: Thomas Huth <thuth@redhat.com>
->> ---
->>  hw/misc/tmp421.c | 8 ++++++--
->>  util/main-loop.c | 4 +++-
->>  util/systemd.c   | 5 +++--
->>  3 files changed, 12 insertions(+), 5 deletions(-)
->>
->> diff --git a/hw/misc/tmp421.c b/hw/misc/tmp421.c
->> index 9f044705fa..f23c46a40a 100644
->> --- a/hw/misc/tmp421.c
->> +++ b/hw/misc/tmp421.c
->> @@ -120,7 +120,9 @@ static void tmp421_get_temperature(Object *obj, Vi=
-sitor *v, const char *name,
->>      int tempid;
->> =20
->>      if (sscanf(name, "temperature%d", &tempid) !=3D 1) {
->> -        error_setg(errp, "error reading %s: %m", name);
->> +        const char *errmsg =3D g_strerror(errno);
->> +        error_setg(errp, "error reading %s: %s", name, errmsg);
->> +        g_free((gpointer)errmsg);
+On Fri, Oct 18, 2019 at 01:31:34PM +0200, Thomas Huth wrote:
+> On 18/10/2019 12.57, Daniel P. Berrang=C3=A9 wrote:
+> > On Fri, Oct 18, 2019 at 12:44:38PM +0200, Thomas Huth wrote:
+> >> The %m format specifier is an extension from glibc - and when compil=
+ing
+> >> QEMU for NetBSD, the compiler correctly complains, e.g.:
+> >>
+> >> /home/qemu/qemu-test.ELjfrQ/src/util/main-loop.c: In function 'sigfd=
+_handler':
+> >> /home/qemu/qemu-test.ELjfrQ/src/util/main-loop.c:64:13: warning: %m =
+is only
+> >>  allowed in syslog(3) like functions [-Wformat=3D]
+> >>              printf("read from sigfd returned %zd: %m\n", len);
+> >>              ^
+> >> Let's use g_strerror() here instead, which is an easy-to-use wrapper
+> >> around the thread-safe strerror_r() function.
+> >>
+> >> While we're at it, also convert the "printf()" in main-loop.c into
+> >> the preferred "error_report()".
+> >>
+> >> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> >> ---
+> >>  hw/misc/tmp421.c | 8 ++++++--
+> >>  util/main-loop.c | 4 +++-
+> >>  util/systemd.c   | 5 +++--
+> >>  3 files changed, 12 insertions(+), 5 deletions(-)
+> >>
+> >> diff --git a/hw/misc/tmp421.c b/hw/misc/tmp421.c
+> >> index 9f044705fa..f23c46a40a 100644
+> >> --- a/hw/misc/tmp421.c
+> >> +++ b/hw/misc/tmp421.c
+> >> @@ -120,7 +120,9 @@ static void tmp421_get_temperature(Object *obj, =
+Visitor *v, const char *name,
+> >>      int tempid;
+> >> =20
+> >>      if (sscanf(name, "temperature%d", &tempid) !=3D 1) {
+> >> -        error_setg(errp, "error reading %s: %m", name);
+> >> +        const char *errmsg =3D g_strerror(errno);
+> >> +        error_setg(errp, "error reading %s: %s", name, errmsg);
+> >> +        g_free((gpointer)errmsg);
+> >=20
+> > Kaboom crash. This is trying to free a const string that is the calle=
+r
+> > doesn't own. It remains under ownership of g_strerror forever.
 >=20
-> Kaboom crash. This is trying to free a const string that is the caller
-> doesn't own. It remains under ownership of g_strerror forever.
+> Well, if you look at the implementation of g_strerror(), you can see
+> that glib returns allocated memory here (with g_strdup() for example).
+> So if we don't free, this will leak memory over time.
 
-Well, if you look at the implementation of g_strerror(), you can see
-that glib returns allocated memory here (with g_strdup() for example).
-So if we don't free, this will leak memory over time.
+This is *not* a leak, it is a cache.
 
-But you're right, the "const" and documentation of the function indicate
-that the caller should rather not free the memory. What a bummer, sounds
-like g_strerror() is pretty much useless unless you immediately exit()
-afterwards (and you care about not leaking memory).
+It is maintaining a static hash table that caches the mapping from
+errno -> string. So many calls all with the same errno value will
+return the same cached string. So by free'ing the string you're
+causing a use-after-free flaw the next time the same errno is
+passed to g_strerror. The memory usage here is finite, bounded
+by the number of possible errnos that we see.
 
-I guess we have to implement our own wrapper, qemu_strerror() instead?
+> But you're right, the "const" and documentation of the function indicat=
+e
+> that the caller should rather not free the memory. What a bummer, sound=
+s
+> like g_strerror() is pretty much useless unless you immediately exit()
+> afterwards (and you care about not leaking memory).
+>=20
+> I guess we have to implement our own wrapper, qemu_strerror() instead?
 
- Thomas
+No, g_strerror is working fine without free'ing the result.
+
+Regards,
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
+ge :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.c=
+om :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
+ge :|
 
