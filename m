@@ -6,53 +6,53 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9683FCA9EAB
-	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 15:52:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 64733CA9EA0
+	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 15:52:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6F5652064B
-	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 15:52:27 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6F5652064B
+	by mail.kernel.org (Postfix) with ESMTPS id 39B042064B
+	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 15:52:31 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 39B042064B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42226 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42228 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iLUYE-0001xM-2k
-	for qemu-devel@archiver.kernel.org; Fri, 18 Oct 2019 11:52:26 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44366)
+	id 1iLUYH-0001yY-NI
+	for qemu-devel@archiver.kernel.org; Fri, 18 Oct 2019 11:52:29 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44253)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <marcandre.lureau@redhat.com>) id 1iLUPK-0000Zv-7J
- for qemu-devel@nongnu.org; Fri, 18 Oct 2019 11:43:16 -0400
+ (envelope-from <marcandre.lureau@redhat.com>) id 1iLUOw-0000Dy-Pg
+ for qemu-devel@nongnu.org; Fri, 18 Oct 2019 11:42:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <marcandre.lureau@redhat.com>) id 1iLUPI-0006wX-SL
- for qemu-devel@nongnu.org; Fri, 18 Oct 2019 11:43:14 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:38886)
+ (envelope-from <marcandre.lureau@redhat.com>) id 1iLUOu-0006TU-Qo
+ for qemu-devel@nongnu.org; Fri, 18 Oct 2019 11:42:50 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:59308)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
- id 1iLUPG-0006tX-0U; Fri, 18 Oct 2019 11:43:10 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
+ id 1iLUOp-0006Mv-Em; Fri, 18 Oct 2019 11:42:43 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 1E58E18CCEE0;
- Fri, 18 Oct 2019 15:43:08 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 8F8B27EBBD;
+ Fri, 18 Oct 2019 15:42:42 +0000 (UTC)
 Received: from localhost (ovpn-112-40.ams2.redhat.com [10.36.112.40])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 55DFE5C1B5;
- Fri, 18 Oct 2019 15:42:51 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 40731600C4;
+ Fri, 18 Oct 2019 15:42:33 +0000 (UTC)
 From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 06/14] leon3: replace PROP_PTR with PROP_LINK
-Date: Fri, 18 Oct 2019 17:42:04 +0200
-Message-Id: <20191018154212.13458-7-marcandre.lureau@redhat.com>
+Subject: [PATCH 04/14] etraxfs: remove PROP_PTR usage
+Date: Fri, 18 Oct 2019 17:42:02 +0200
+Message-Id: <20191018154212.13458-5-marcandre.lureau@redhat.com>
 In-Reply-To: <20191018154212.13458-1-marcandre.lureau@redhat.com>
 References: <20191018154212.13458-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.63]); Fri, 18 Oct 2019 15:43:08 +0000 (UTC)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.27]); Fri, 18 Oct 2019 15:42:42 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
@@ -87,129 +87,112 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-"set_pil_in" and "set_pil_in" are used to set a callback, but have a
-single user and cannot be modified by the user.
-
-Simplify the code by calling directly into leon3_set_pil_in(), and use
-a "cpu" link property.
+etraxfs_dma_client are not Object, so can't be exposed to user with
+QOM path. Let's remove property usage and move the constructor to the
+.c unit, simplifying some code on the way.
 
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 ---
- hw/intc/grlib_irqmp.c | 20 ++++++--------------
- hw/sparc/leon3.c      |  7 +++----
- target/sparc/cpu.h    |  1 +
- 3 files changed, 10 insertions(+), 18 deletions(-)
+ hw/net/etraxfs_eth.c      | 35 ++++++++++++++++++++++++-----------
+ include/hw/cris/etraxfs.h | 20 +++-----------------
+ 2 files changed, 27 insertions(+), 28 deletions(-)
 
-diff --git a/hw/intc/grlib_irqmp.c b/hw/intc/grlib_irqmp.c
-index bc78e1a14f..34b7e1b4e1 100644
---- a/hw/intc/grlib_irqmp.c
-+++ b/hw/intc/grlib_irqmp.c
-@@ -58,10 +58,8 @@ typedef struct IRQMP {
+diff --git a/hw/net/etraxfs_eth.c b/hw/net/etraxfs_eth.c
+index 4cfbf1135a..4726ad5298 100644
+--- a/hw/net/etraxfs_eth.c
++++ b/hw/net/etraxfs_eth.c
+@@ -338,14 +338,8 @@ typedef struct ETRAXFSEthState
+     uint8_t macaddr[2][6];
+     uint32_t regs[FS_ETH_MAX_REGS];
 =20
-     MemoryRegion iomem;
+-    union {
+-        void *vdma_out;
+-        struct etraxfs_dma_client *dma_out;
+-    };
+-    union {
+-        void *vdma_in;
+-        struct etraxfs_dma_client *dma_in;
+-    };
++    struct etraxfs_dma_client *dma_out;
++    struct etraxfs_dma_client *dma_in;
 =20
--    void *set_pil_in;
--    void *set_pil_in_opaque;
--
-     IRQMPState *state;
-+    SPARCCPU *cpu;
- } IRQMP;
+     /* MDIO bus.  */
+     struct qemu_mdio mdio_bus;
+@@ -635,8 +629,6 @@ static void etraxfs_eth_realize(DeviceState *dev, Err=
+or **errp)
 =20
- struct IRQMPState {
-@@ -82,7 +80,6 @@ static void grlib_irqmp_check_irqs(IRQMPState *state)
-     uint32_t      pend   =3D 0;
-     uint32_t      level0 =3D 0;
-     uint32_t      level1 =3D 0;
--    set_pil_in_fn set_pil_in;
-=20
-     assert(state !=3D NULL);
-     assert(state->parent !=3D NULL);
-@@ -97,13 +94,11 @@ static void grlib_irqmp_check_irqs(IRQMPState *state)
-     trace_grlib_irqmp_check_irqs(state->pending, state->force[0],
-                                  state->mask[0], level1, level0);
-=20
--    set_pil_in =3D (set_pil_in_fn)state->parent->set_pil_in;
--
-     /* Trigger level1 interrupt first and level0 if there is no level1 *=
-/
-     if (level1 !=3D 0) {
--        set_pil_in(state->parent->set_pil_in_opaque, level1);
-+        leon3_set_pil_in(state->parent->cpu, level1);
-     } else {
--        set_pil_in(state->parent->set_pil_in_opaque, level0);
-+        leon3_set_pil_in(state->parent->cpu, level0);
-     }
- }
-=20
-@@ -348,14 +343,13 @@ static void grlib_irqmp_realize(DeviceState *dev, E=
-rror **errp)
-     IRQMP *irqmp =3D GRLIB_IRQMP(dev);
-=20
-         /* Check parameters */
--    if (irqmp->set_pil_in =3D=3D NULL) {
--        error_setg(errp, "set_pil_in cannot be NULL.");
-+    if (irqmp->cpu =3D=3D NULL) {
-+        error_setg(errp, "cpu cannot be NULL.");
-     }
- }
-=20
- static Property grlib_irqmp_properties[] =3D {
--    DEFINE_PROP_PTR("set_pil_in", IRQMP, set_pil_in),
--    DEFINE_PROP_PTR("set_pil_in_opaque", IRQMP, set_pil_in_opaque),
-+    DEFINE_PROP_LINK("cpu", IRQMP, cpu, TYPE_SPARC_CPU, SPARCCPU *),
+ static Property etraxfs_eth_properties[] =3D {
+     DEFINE_PROP_UINT32("phyaddr", ETRAXFSEthState, phyaddr, 1),
+-    DEFINE_PROP_PTR("dma_out", ETRAXFSEthState, vdma_out),
+-    DEFINE_PROP_PTR("dma_in", ETRAXFSEthState, vdma_in),
+     DEFINE_NIC_PROPERTIES(ETRAXFSEthState, conf),
      DEFINE_PROP_END_OF_LIST(),
  };
-=20
-@@ -365,8 +359,6 @@ static void grlib_irqmp_class_init(ObjectClass *klass=
-, void *data)
-=20
-     dc->reset =3D grlib_irqmp_reset;
-     dc->props =3D grlib_irqmp_properties;
--    /* Reason: pointer properties "set_pil_in", "set_pil_in_opaque" */
--    dc->user_creatable =3D false;
-     dc->realize =3D grlib_irqmp_realize;
+@@ -648,10 +640,31 @@ static void etraxfs_eth_class_init(ObjectClass *kla=
+ss, void *data)
+     dc->realize =3D etraxfs_eth_realize;
+     dc->reset =3D etraxfs_eth_reset;
+     dc->props =3D etraxfs_eth_properties;
+-    /* Reason: pointer properties "dma_out", "dma_in" */
++    /* Reason: dma_out, dma_in are not user settable */
+     dc->user_creatable =3D false;
  }
 =20
-diff --git a/hw/sparc/leon3.c b/hw/sparc/leon3.c
-index c5f1b1ee72..fa32936ca4 100644
---- a/hw/sparc/leon3.c
-+++ b/hw/sparc/leon3.c
-@@ -143,9 +143,9 @@ void leon3_irq_ack(void *irq_manager, int intno)
-     grlib_irqmp_ack((DeviceState *)irq_manager, intno);
- }
++
++/* Instantiate an ETRAXFS Ethernet MAC.  */
++DeviceState *
++etraxfs_eth_init(NICInfo *nd, hwaddr base, int phyaddr,
++                 struct etraxfs_dma_client *dma_out,
++                 struct etraxfs_dma_client *dma_in)
++{
++    DeviceState *dev;
++    qemu_check_nic_model(nd, "fseth");
++
++    dev =3D qdev_create(NULL, "etraxfs-eth");
++    qdev_set_nic_properties(dev, nd);
++    qdev_prop_set_uint32(dev, "phyaddr", phyaddr);
++    ETRAX_FS_ETH(dev)->dma_out =3D dma_out;
++    ETRAX_FS_ETH(dev)->dma_in =3D dma_in;
++    qdev_init_nofail(dev);
++    sysbus_mmio_map(SYS_BUS_DEVICE(dev), 0, base);
++
++    return dev;
++}
++
+ static const TypeInfo etraxfs_eth_info =3D {
+     .name          =3D TYPE_ETRAX_FS_ETH,
+     .parent        =3D TYPE_SYS_BUS_DEVICE,
+diff --git a/include/hw/cris/etraxfs.h b/include/hw/cris/etraxfs.h
+index aa146a2cd8..403e7f95e6 100644
+--- a/include/hw/cris/etraxfs.h
++++ b/include/hw/cris/etraxfs.h
+@@ -30,23 +30,9 @@
+ #include "hw/qdev-properties.h"
+ #include "hw/sysbus.h"
 =20
--static void leon3_set_pil_in(void *opaque, uint32_t pil_in)
-+void leon3_set_pil_in(SPARCCPU *cpu, uint32_t pil_in)
- {
--    CPUSPARCState *env =3D (CPUSPARCState *)opaque;
-+    CPUSPARCState *env =3D &cpu->env;
-     CPUState *cs;
+-/* Instantiate an ETRAXFS Ethernet MAC.  */
+-static inline DeviceState *
+-etraxfs_eth_init(NICInfo *nd, hwaddr base, int phyaddr,
+-                 void *dma_out, void *dma_in)
+-{
+-    DeviceState *dev;
+-    qemu_check_nic_model(nd, "fseth");
+-
+-    dev =3D qdev_create(NULL, "etraxfs-eth");
+-    qdev_set_nic_properties(dev, nd);
+-    qdev_prop_set_uint32(dev, "phyaddr", phyaddr);
+-    qdev_prop_set_ptr(dev, "dma_out", dma_out);
+-    qdev_prop_set_ptr(dev, "dma_in", dma_in);
+-    qdev_init_nofail(dev);
+-    sysbus_mmio_map(SYS_BUS_DEVICE(dev), 0, base);
+-    return dev;
+-}
++DeviceState *etraxfs_eth_init(NICInfo *nd, hwaddr base, int phyaddr,
++                              struct etraxfs_dma_client *dma_out,
++                              struct etraxfs_dma_client *dma_in);
 =20
-     assert(env !=3D NULL);
-@@ -225,8 +225,7 @@ static void leon3_generic_hw_init(MachineState *machi=
-ne)
-=20
-     /* Allocate IRQ manager */
-     dev =3D qdev_create(NULL, TYPE_GRLIB_IRQMP);
--    qdev_prop_set_ptr(dev, "set_pil_in", leon3_set_pil_in);
--    qdev_prop_set_ptr(dev, "set_pil_in_opaque", env);
-+    object_property_set_link(OBJECT(dev), OBJECT(cpu), "cpu", &error_abo=
-rt);
-     qdev_init_nofail(dev);
-     sysbus_mmio_map(SYS_BUS_DEVICE(dev), 0, LEON3_IRQMP_OFFSET);
-     env->irq_manager =3D dev;
-diff --git a/target/sparc/cpu.h b/target/sparc/cpu.h
-index 778aa8e073..5f8e6ec6e8 100644
---- a/target/sparc/cpu.h
-+++ b/target/sparc/cpu.h
-@@ -592,6 +592,7 @@ void cpu_check_irqs(CPUSPARCState *env);
-=20
- /* leon3.c */
- void leon3_irq_ack(void *irq_manager, int intno);
-+void leon3_set_pil_in(SPARCCPU *cpu, uint32_t pil_in);
-=20
- #if defined (TARGET_SPARC64)
-=20
+ static inline DeviceState *etraxfs_ser_create(hwaddr addr,
+                                               qemu_irq irq,
 --=20
 2.23.0.606.g08da6496b6
 
