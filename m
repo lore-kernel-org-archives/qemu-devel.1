@@ -2,122 +2,84 @@ Return-Path: <SRS0=ht5U=YL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,MAILING_LIST_MULTI,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8F249CA9EA1
-	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 09:28:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 00008CA9EA1
+	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 09:29:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4A24521897
-	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 09:28:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B002D21897
+	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 09:29:43 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="aOcFoybx"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4A24521897
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eriAxyZt"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B002D21897
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37012 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37020 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iLOYj-0007V5-Fe
-	for qemu-devel@archiver.kernel.org; Fri, 18 Oct 2019 05:28:33 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46214)
+	id 1iLOZq-0008SW-Tk
+	for qemu-devel@archiver.kernel.org; Fri, 18 Oct 2019 05:29:42 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46234)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iLOXy-0006ur-0m
- for qemu-devel@nongnu.org; Fri, 18 Oct 2019 05:27:48 -0400
+ (envelope-from <aleksandar.m.mail@gmail.com>) id 1iLOY2-0006vd-5Y
+ for qemu-devel@nongnu.org; Fri, 18 Oct 2019 05:27:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iLOXv-00057B-JO
- for qemu-devel@nongnu.org; Fri, 18 Oct 2019 05:27:45 -0400
-Received: from mail-eopbgr80117.outbound.protection.outlook.com
- ([40.107.8.117]:13536 helo=EUR04-VI1-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1iLOXu-000566-MN; Fri, 18 Oct 2019 05:27:43 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=OGT8B2H3NygKodzU5TBg0BKpAbF7BXKGM9KG2CSh2g9IQCivnesQe/aGF5T4m0wNgioCGNqJVZEo1KdzTOk3rq+4vRpWWEUSgzA/Ez/5aL8EOXXX4pw+DI5KYTb/nx8eYahl4nd7QcMLG4L8tJ3pDRqp190WdeGWHlsAMeIXWmC9Sptw0/KMn4s1nrp8kJNhA/ywZmkAxSSvV4tBiXpaAoj9VD+1qhlH/KWy90W3ZxkWTarfC9cIx7HnQNUleAtrH4XUpJI9y9X5jN3YwvNpA0iRcC0CTzSfXks7nneLZHv2szDw0RjcV4q5o62vSa+tU2zlOwSDM9j9w/EShliN6g==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=DIMpF1nfo/auHiORJRWL5823Gi39phcvRJOd0KqYKok=;
- b=ZTq/Zk131HRCCrpvJZ6Q+QP2NGm77aTP6dP3KqAG9kRfvttyCMHO+gytRPw7gWTpZP4BwXvISlxSaGZRvscCWmfMT6rTbDlgrlGpWqkRKVGAwZy7iyJL3YB5ijy49xkEqGd+ALTlPD62iWT8T5vLedyKGQrBbrV2r+n6HLuj94Wg2qG/5cIHElTkStXz84Y0/K62JJ8S/SmacQdn5ogotxryQHTDAadvmLZPvi2b7ua4nfwp0pW6v9qYzNs6jlcNnwsD2EXhXvOHDUWYxIGJYFhI2/a6FgHGbF7b415E5bf0fC/qSgBOHKpLL/9pQ5RiP5Ve0jnI3tytPx2yAOdKmw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=DIMpF1nfo/auHiORJRWL5823Gi39phcvRJOd0KqYKok=;
- b=aOcFoybxcV0+2Tczzcdi4ELPm/5rhRn3nog6Z7Ot8InK6cHPO3pPmljGxCCdCIK66LNXQXpMpd+s9gjscIOsuABRvA/LKOzOlQjPkNBLodV9vL43419Qp6qGLvSvHeGO4qKarpM20fexviMKLbeqA+pSOSMGZxV0DjVIxDVEuw8=
-Received: from AM0PR08MB4435.eurprd08.prod.outlook.com (20.179.35.83) by
- AM0PR08MB4163.eurprd08.prod.outlook.com (20.178.119.204) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2347.21; Fri, 18 Oct 2019 09:27:40 +0000
-Received: from AM0PR08MB4435.eurprd08.prod.outlook.com
- ([fe80::4461:dd32:b358:110c]) by AM0PR08MB4435.eurprd08.prod.outlook.com
- ([fe80::4461:dd32:b358:110c%7]) with mapi id 15.20.2347.026; Fri, 18 Oct 2019
- 09:27:40 +0000
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-To: Eric Blake <eblake@redhat.com>, "qemu-block@nongnu.org"
- <qemu-block@nongnu.org>
-Subject: Re: [PATCH v7 1/2] docs: improve qcow2 spec about extending image
- header
-Thread-Topic: [PATCH v7 1/2] docs: improve qcow2 spec about extending image
- header
-Thread-Index: AQHVfSj4NZxneckXjESRnSlwVfPCUadPn1aAgADVRwCAD61pgIAAEDYA
-Date: Fri, 18 Oct 2019 09:27:39 +0000
-Message-ID: <b157b428-4f30-ddad-2eb6-78bd9ca3bc21@virtuozzo.com>
-References: <20191007160451.27334-1-vsementsov@virtuozzo.com>
- <20191007160451.27334-2-vsementsov@virtuozzo.com>
- <7afa803e-3efd-1186-2b37-7056d9a983f0@redhat.com>
- <90102485-ccbb-018c-c90d-b85a7b2f0392@virtuozzo.com>
- <2d60f7aa-7f3a-18f2-434f-0ab176924be2@virtuozzo.com>
-In-Reply-To: <2d60f7aa-7f3a-18f2-434f-0ab176924be2@virtuozzo.com>
-Accept-Language: ru-RU, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-clientproxiedby: HE1PR05CA0236.eurprd05.prod.outlook.com
- (2603:10a6:3:fb::12) To AM0PR08MB4435.eurprd08.prod.outlook.com
- (2603:10a6:208:144::19)
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=vsementsov@virtuozzo.com; 
-x-ms-exchange-messagesentrepresentingtype: 1
-x-tagtoolbar-keys: D20191018122736617
-x-originating-ip: [185.231.240.5]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 5bbb6aa5-f9c4-466f-cf33-08d753ad6b54
-x-ms-traffictypediagnostic: AM0PR08MB4163:
-x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <AM0PR08MB4163CD63C7B0A03230496B79C16C0@AM0PR08MB4163.eurprd08.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:9508;
-x-forefront-prvs: 01949FE337
-x-forefront-antispam-report: SFV:NSPM;
- SFS:(10019020)(346002)(366004)(396003)(39850400004)(136003)(376002)(199004)(189003)(6246003)(305945005)(316002)(99286004)(71190400001)(14454004)(3846002)(71200400001)(7736002)(31686004)(66556008)(110136005)(64756008)(66476007)(54906003)(66446008)(2906002)(66946007)(36756003)(107886003)(4326008)(81166006)(8936002)(478600001)(102836004)(31696002)(6116002)(386003)(476003)(229853002)(256004)(25786009)(6486002)(52116002)(26005)(81156014)(66066001)(486006)(6436002)(11346002)(186003)(8676002)(2616005)(6512007)(5660300002)(2501003)(76176011)(86362001)(446003)(53546011)(6506007);
- DIR:OUT; SFP:1102; SCL:1; SRVR:AM0PR08MB4163;
- H:AM0PR08MB4435.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
- PTR:InfoNoRecords; A:1; MX:1; 
-received-spf: None (protection.outlook.com: virtuozzo.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: fhcGqSj1N5N3AQIP87uCqTI8kSnWgTQqSbVsXKaQsMgAn/gK8b2OMFITaT3dylCUytYyhyUvwosQNdA1gH5ErvAEX/g2p7eQ536lg5+k812Q/Q37m+S3VrFq8G4ZPLl0t8rkW3tljSb1HrL/5DxLEqj1iDWKEH+mQoUb8nQvbnasNPQmBC2VUbEX2QB7H3xIQFYMm+jnqmr1gpmicsluyUN1R4OJwRT3vAoUqDGAVgjYuEjbVnKaSasruy3eX/h6uJFNK77ju5io+2UT5XLUjiMOzwqCLw+30LlNinipJF6k4EtDp8VBQaVsSsYhxPkLFOvz8VkLG2BKnfzvLClEtb2J32ziymR3YUR+pNoFfpCWdW20XTZU/f3U+lPKhtcKly+KZyNS4J2a301Hn6CDab7KiMGofR50XGcMI49m9/o=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <11B7ED25A2E0D64AA4D6D2639E239967@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+ (envelope-from <aleksandar.m.mail@gmail.com>) id 1iLOY0-00058u-9J
+ for qemu-devel@nongnu.org; Fri, 18 Oct 2019 05:27:50 -0400
+Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:39466)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
+ id 1iLOY0-00058W-3P
+ for qemu-devel@nongnu.org; Fri, 18 Oct 2019 05:27:48 -0400
+Received: by mail-ot1-x344.google.com with SMTP id s22so4398150otr.6
+ for <qemu-devel@nongnu.org>; Fri, 18 Oct 2019 02:27:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:in-reply-to:references:from:date:message-id:subject:to
+ :cc; bh=pUEiwwQjLt2xYtGo8SnML1+NaFafEWCmpGE3KBmhDn0=;
+ b=eriAxyZteyVB4WtHCAzvWmaRQhkwM0uMDCK+my7Yjf1sn5WRYrPsA4yUc1qT++2uFQ
+ bC4MFJbyEZVmSl0s7mc45RfXkjObw1xFrD33nZSb7vW5t9FqxrAD3S+vqktS3FSMElnZ
+ qOqE7TOWMm43Cv0wsL/OHgEugzOxQKlQNLJMjkeEZLatlwH7T0BYyuGpwv4Ywd4qNtmi
+ IRfxoT7kRuBmf1OHbfIOHASJGhHDCW0RKwLq5309ORgkG3ms/HL/RA+trH6uU0GH1Yz9
+ DNCg08rLd1AWKa6COhUoL6OBM/jGXo9w9Jrj+Y6D2F5DCHjBNv+VnQSJ6BshlxL9H2Te
+ xz2g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:in-reply-to:references:from:date
+ :message-id:subject:to:cc;
+ bh=pUEiwwQjLt2xYtGo8SnML1+NaFafEWCmpGE3KBmhDn0=;
+ b=rDEaV6qyUvPbNA+vHi5vir45datokj+t/1/6Gg2qnl9kkbcsrV0DsljFvUoQzgDz78
+ jlH+iRAZgYxJrKfdUGDm0/H2C/wjaqkWFsqKFEvwDiQJXwaKTQHH6TG8MOCBSdw745wv
+ z+pBjraIatu9vjPrmQu+1p7l/Zeuq9ArClwWmNoGFuJ6xnnI42uKi/4YZdf/G14Ce4vK
+ NS/LGuIUlK5LZUtXY/owoE/vSF4EYpjMWHAAgP99fxa6/3Pudd293iSllDcFnrosn4op
+ V22jO5LuF0l/N7B0gY/lnNooTjGZ7cCsKAX8ImPyUmzrPiJcO7LF94AC8icMr5RJTS0h
+ gFpg==
+X-Gm-Message-State: APjAAAVCnqHzARbwWe6PboRbwWMINFMk2yhfdXx5jubCoNWk+MgMA3Bd
+ oXmbdjPCfh3h+1LN4r3CegYr36JgrGOfWeFat7B0cg==
+X-Google-Smtp-Source: APXvYqxLUhgmO8EKAWDeaK/wSUnVVwy1YBz5OXY5mIPd5Mh9un+34aA9PHp1kh0TApObn8a+hdslUGrfDw9XYkfzfOo=
+X-Received: by 2002:a9d:4f0f:: with SMTP id d15mr6463206otl.64.1571390867071; 
+ Fri, 18 Oct 2019 02:27:47 -0700 (PDT)
 MIME-Version: 1.0
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 5bbb6aa5-f9c4-466f-cf33-08d753ad6b54
-X-MS-Exchange-CrossTenant-originalarrivaltime: 18 Oct 2019 09:27:39.9277 (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: R2Rt5xEaN7MP0LcE2sKD1dJiZqulf9S3d5q98Oko8X6KnaYs4X6m8z0QFj6UKFKdSrlNxA/xzAM5GUVhLZhDsOQXsocOzFmOZBp7rqZTiKM=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM0PR08MB4163
-X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
-X-Received-From: 40.107.8.117
+Received: by 2002:a9d:340a:0:0:0:0:0 with HTTP; Fri, 18 Oct 2019 02:27:46
+ -0700 (PDT)
+In-Reply-To: <20191015162705.28087-29-philmd@redhat.com>
+References: <20191015162705.28087-1-philmd@redhat.com>
+ <20191015162705.28087-29-philmd@redhat.com>
+From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+Date: Fri, 18 Oct 2019 11:27:46 +0200
+Message-ID: <CAL1e-=ioYVfXb1JEwM58BKt+wQ4bV82QnqiTD2uX65aJpVmdYw@mail.gmail.com>
+Subject: Re: [PATCH 28/32] hw/pci-host/piix: Move i440FX declarations to
+ hw/pci-host/i440fx.h
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
+Content-Type: multipart/alternative; boundary="0000000000006f688a05952bf23b"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::344
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -129,153 +91,407 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "kwolf@redhat.com" <kwolf@redhat.com>, Denis Lunev <den@virtuozzo.com>,
- "armbru@redhat.com" <armbru@redhat.com>,
+Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
+ Stefano Stabellini <sstabellini@kernel.org>,
+ Eduardo Habkost <ehabkost@redhat.com>,
+ "kvm@vger.kernel.org" <kvm@vger.kernel.org>, Paul Durrant <paul@xen.org>,
+ "Michael S. Tsirkin" <mst@redhat.com>,
  "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- Denis Plotnikov <dplotnikov@virtuozzo.com>,
- "mreitz@redhat.com" <mreitz@redhat.com>
+ =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>,
+ Igor Mammedov <imammedo@redhat.com>,
+ =?UTF-8?Q?Herv=C3=A9_Poussineau?= <hpoussin@reactos.org>,
+ Aleksandar Markovic <amarkovic@wavecomp.com>,
+ "xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>,
+ Anthony Perard <anthony.perard@citrix.com>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
+ Aurelien Jarno <aurelien@aurel32.net>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-MTguMTAuMjAxOSAxMToyOSwgVmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSB3cm90ZToNCj4g
-MDguMTAuMjAxOSAxMjowNSwgVmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSB3cm90ZToNCj4+
-IDA3LjEwLjIwMTkgMjM6MjEsIEVyaWMgQmxha2Ugd3JvdGU6DQo+Pj4gT24gMTAvNy8xOSAxMTow
-NCBBTSwgVmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSB3cm90ZToNCj4+Pj4gTWFrZSBpdCBt
-b3JlIG9idmlvdXMgaG93IHRvIGFkZCBuZXcgZmllbGRzIHRvIHRoZSB2ZXJzaW9uIDMgaGVhZGVy
-IGFuZA0KPj4+PiBob3cgdG8gaW50ZXJwcmV0IHRoZW0uDQo+Pj4+DQo+Pj4+IFNpZ25lZC1vZmYt
-Ynk6IFZsYWRpbWlyIFNlbWVudHNvdi1PZ2lldnNraXkgPHZzZW1lbnRzb3ZAdmlydHVvenpvLmNv
-bT4NCj4+Pj4gLS0tDQo+Pj4+IMKgIGRvY3MvaW50ZXJvcC9xY293Mi50eHQgfCAyNiArKysrKysr
-KysrKysrKysrKysrKysrKy0tLQ0KPj4+PiDCoCAxIGZpbGUgY2hhbmdlZCwgMjMgaW5zZXJ0aW9u
-cygrKSwgMyBkZWxldGlvbnMoLSkNCj4+Pj4NCj4+Pj4gZGlmZiAtLWdpdCBhL2RvY3MvaW50ZXJv
-cC9xY293Mi50eHQgYi9kb2NzL2ludGVyb3AvcWNvdzIudHh0DQo+Pj4+IGluZGV4IGFmNTcxMWU1
-MzMuLjNmMjg1NTU5M2YgMTAwNjQ0DQo+Pj4+IC0tLSBhL2RvY3MvaW50ZXJvcC9xY293Mi50eHQN
-Cj4+Pj4gKysrIGIvZG9jcy9pbnRlcm9wL3Fjb3cyLnR4dA0KPj4+PiBAQCAtNzksOSArNzksOSBA
-QCBUaGUgZmlyc3QgY2x1c3RlciBvZiBhIHFjb3cyIGltYWdlIGNvbnRhaW5zIHRoZSBmaWxlIGhl
-YWRlcjoNCj4+Pj4gwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIE9m
-ZnNldCBpbnRvIHRoZSBpbWFnZSBmaWxlIGF0IHdoaWNoIHRoZSBzbmFwc2hvdCB0YWJsZQ0KPj4+
-PiDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgc3RhcnRzLiBNdXN0
-IGJlIGFsaWduZWQgdG8gYSBjbHVzdGVyIGJvdW5kYXJ5Lg0KPj4+PiAtSWYgdGhlIHZlcnNpb24g
-aXMgMyBvciBoaWdoZXIsIHRoZSBoZWFkZXIgaGFzIHRoZSBmb2xsb3dpbmcgYWRkaXRpb25hbCBm
-aWVsZHMuDQo+Pj4+IC1Gb3IgdmVyc2lvbiAyLCB0aGUgdmFsdWVzIGFyZSBhc3N1bWVkIHRvIGJl
-IHplcm8sIHVubGVzcyBzcGVjaWZpZWQgb3RoZXJ3aXNlDQo+Pj4+IC1pbiB0aGUgZGVzY3JpcHRp
-b24gb2YgYSBmaWVsZC4NCj4+Pj4gK0ZvciB2ZXJzaW9uIDIsIGhlYWRlciBpcyBhbHdheXMgNzIg
-Ynl0ZXMgbGVuZ3RoIGFuZCBmaW5pc2hlcyBoZXJlLg0KPj4+PiArRm9yIHZlcnNpb24gMyBvciBo
-aWdoZXIgdGhlIGhlYWRlciBsZW5ndGggaXMgYXQgbGVhc3QgMTA0IGJ5dGVzIGFuZCBoYXMgYXQN
-Cj4+Pj4gK2xlYXN0IG5leHQgZml2ZSBmaWVsZHMsIHVwIHRvIHRoZSBAaGVhZGVyX2xlbmd0aCBm
-aWVsZC4NCj4+Pg0KPj4+IFRoaXMgaHVuayBzZWVtcyBva2F5Lg0KPj4+DQo+Pj4+IMKgwqDCoMKg
-wqDCoMKgwqDCoMKgIDcyIC3CoCA3OTrCoCBpbmNvbXBhdGlibGVfZmVhdHVyZXMNCj4+Pj4gwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIEJpdG1hc2sgb2YgaW5jb21w
-YXRpYmxlIGZlYXR1cmVzLiBBbiBpbXBsZW1lbnRhdGlvbiBtdXN0DQo+Pj4+IEBAIC0xNjUsNiAr
-MTY1LDI2IEBAIGluIHRoZSBkZXNjcmlwdGlvbiBvZiBhIGZpZWxkLg0KPj4+PiDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgTGVuZ3RoIG9mIHRoZSBoZWFkZXIgc3Ry
-dWN0dXJlIGluIGJ5dGVzLiBGb3IgdmVyc2lvbiAyDQo+Pj4+IMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBpbWFnZXMsIHRoZSBsZW5ndGggaXMgYWx3YXlzIGFzc3Vt
-ZWQgdG8gYmUgNzIgYnl0ZXMuDQo+Pj4+ICtBZGRpdGlvbmFsIGZpZWxkcyAodmVyc2lvbiAzIGFu
-ZCBoaWdoZXIpDQo+Pj4+ICsNCj4+Pj4gK1RoZSBmb2xsb3dpbmcgZmllbGRzIG9mIHRoZSBoZWFk
-ZXIgYXJlIG9wdGlvbmFsOiBpZiBzb2Z0d2FyZSBkb24ndCBrbm93IGhvdyB0bw0KPj4+PiAraW50
-ZXJwcmV0IHRoZSBmaWVsZCwgaXQgbWF5IHNhZmVseSBpZ25vcmUgaXQuIFN0aWxsIHRoZSBmaWVs
-ZCBtdXN0IGJlIGtlcHQgYXMgaXMNCj4+Pj4gK3doZW4gcmV3cml0aW5nIHRoZSBpbWFnZS4NCj4+
-Pg0KPj4+IGlmIHNvZnR3YXJlIGRvZXNuJ3Qga25vdyBob3cgdG8gaW50ZXJwcmV0IHRoZSBmaWVs
-ZCwgaXQgbWF5IGJlIHNhZmVseSBpZ25vcmVkLCBvdGhlciB0aGFuIHByZXNlcnZpbmcgdGhlIGZp
-ZWxkIHVuY2hhbmdlZCB3aGVuIHJld3JpdGluZyB0aGUgaW1hZ2UgaGVhZGVyLg0KPj4+DQo+Pj4g
-TWlzc2luZzoNCj4+Pg0KPj4+IElmIGhlYWRlcl9sZW5ndGggZXhjbHVkZXMgYW4gb3B0aW9uYWwg
-ZmllbGQsIHRoZSB2YWx1ZSBvZiAwIHNob3VsZCBiZSB1c2VkIGZvciB0aGF0IGZpZWxkLg0KPj4N
-Cj4+IFRoaXMgaXMgd2hhdCBJIGRpc2xpa2UgaW4gb2xkIHdvcmRpbmcuIFdoeSBkbyB3ZSBuZWVk
-IHRoaXMgZGVmYXVsdC16ZXJvIHRoaW5nWypdPyBXaGF0IGlzIHRoZSBkZWZhdWx0Pw0KPj4NCj4+
-IERlZmF1bHQgaXMgYWJzZW5jZSBvZiB0aGUgZmVhdHVyZSwgd2UgZG9uJ3QgaGF2ZSB0aGVzZSBm
-dXR1cmUgZmVhdHVyZXMgbm93IGFuZCBkb24ndCBjYXJlIG9mIHRoZW0uDQo+PiBXaGF0IGlzIHRo
-aXMgZGVmYXVsdCAwIGZvciB1cyBub3c/IE5vdGhpbmcuDQo+Pg0KPj4gQ29uc2lkZXIgc29tZSBm
-dXR1cmUgdmVyc2lvbjogaWYgaXQgc2VlcyB0aGF0IGhlYWRlcl9sZW5ndGggZXhjbHVkZXMgc29t
-ZSBmaWVsZHMsIGl0IHVuZGVyc3RhbmRzLA0KPj4gdGhhdCB0aGVyZSBpcyBubyBzdWNoIGZlYXR1
-cmUgaGVyZS4gVGhhdCdzIGFsbC4gV29yayB3aXRob3V0IGl0LiBUaGUgZmVhdHVyZSBpdHNlbGYg
-c2hvdWxkIGRlY2xhcmUNCj4+IGJlaGF2aW9yIHdpdGhvdXQgdGhpcyBmZWF0dXJlLCB3aGljaCBz
-aG91bGQgY29ycmVzcG9uZCB0byBiZWhhdmlvciBiZWZvcmUgdGhpcyBmZWF0dXJlIGludHJvZHVj
-dGlvbi4uDQo+Pg0KPj4gU28gYXQgbGVhc3QsIEkgZG9uJ3QgbGlrZSAidGhlIHZhbHVlIG9mIDAg
-c2hvdWxkIGJlIHVzZWQgZm9yIHRoYXQgZmllbGQiLCBhcyBpbnN0YW5jZXMgb2YgUWVtdSB3aGlj
-aA0KPj4gZG9uJ3Qga25vdyBhYm91dCB0aGUgZmVhdHVyZSB3aWxsIGlnbm9yZSB0aGlzIHJlcXVp
-cmVtZW50LCBhcyB0aGV5IGRvbid0IG5lZWQgYW55IHZhbHVlIG9mIHRoYXQNCj4+IGZpZWxkIGF0
-IGFsbC4NCj4+DQo+PiBXaGF0IHlvdSBhY3R1YWxseSBtZWFuLCBJTUhPLCBpczogZm9yIGFsbCBv
-cHRpb25hbCBmaWVsZCAwIHZhbHVlIG11c3QgYmUgZXF1YWwgdG8gYWJzZW5jZSBvZiB0aGUgZmVh
-dHVyZSwNCj4+IGxpa2Ugd2hlbiBoZWFkZXJfbGVuZ3RoIGV4Y2x1ZGVzIHRoaXMgZmllbGQuIEkg
-ZG9uJ3Qgc2VlLCBkbyB3ZSByZWFsbHkgbmVlZCB0aGlzIHJlcXVpcmVtZW50LCBidXQNCj4+IHNl
-ZW1zIGl0IHdhcyBtZW50aW9uZWQgYmVmb3JlIHRoaXMgcGF0Y2ggYW5kIHdlJ2QgYmV0dGVyIGtl
-ZXAgaXQuLiBJIGp1c3QgZG9uJ3QgbGlrZSBjb25jZXB0IG9mDQo+PiAiZGVmYXVsdCIgdmFsdWUg
-a2VlcGluZyBpbiBtaW5kIHZhbGlkIFFlbXUgaW5zdGFuY2VzIHdoaWNoIGRvbid0IGtub3cgYWJv
-dXQgZmllbGQgYXQgYWxsLg0KPj4NCj4+Pg0KPj4+PiBAaGVhZGVyX2xlbmd0aCBtdXN0IGJlIGJv
-dW5kIHRvIHRoZSBlbmQgb2Ygb25lIG9mDQo+Pj4+ICt0aGVzZSBmaWVsZHMgKG9yIHRvIEBoZWFk
-ZXJfbGVuZ3RoIGZpZWxkIGVuZCBpdHNlbGYsIHRvIGJlIDEwNCBieXRlcykuDQo+Pj4NCj4+PiBX
-ZSBkb24ndCB1c2UgdGhlIEBoZWFkZXJfbGVuZ3RoIG1hcmt1cCBhbnl3aGVyZSBlbHNlIGluIHRo
-aXMgZmlsZSwgc3RhcnRpbmcgdG8gZG8gc28gaGVyZSBpcyBvZGQuDQo+Pj4NCj4+PiBJIHdvdWxk
-IHN1Z2dlc3QgYSBzdHJvbmdlciByZXF1aXJlbWVudDoNCj4+Pg0KPj4+IGhlYWRlcl9sZW5ndGgg
-bXVzdCBiZSBhIG11bHRpcGxlIG9mIDQsIGFuZCBtdXN0IG5vdCBsYW5kIGluIHRoZSBtaWRkbGUg
-b2YgYW55IG9wdGlvbmFsIDgtYnl0ZSBmaWVsZC4NCj4+Pg0KPj4+IE9yIG1heWJlIGV2ZW4gYWRk
-IG91ciBjb21wcmVzc2lvbiB0eXBlIGV4dGVuc2lvbiB3aXRoIDQgYnl0ZXMgb2YgcGFkZGluZywg
-c28gdGhhdCB3ZSBjb3VsZCBnbyBldmVuIHN0cm9uZ2VyOg0KPj4+DQo+Pj4gaGVhZGVyX2xlbmd0
-aCBtdXN0IGJlIGEgbXVsdGlwbGUgb2YgOC4NCj4+DQo+PiBIbW0sIGlmIHdlIGltcGx5IHRoYXQg
-c29mdHdhcmUgd2lsbCBoYXZlIHRvIGFkZCBzb21lIHBhZGRpbmcsIHRoYW4gcmVxdWlyZW1lbnQg
-YWJvdmUgYWJvdXQgemVybyA9PT0gZmVhdHVyZS1hYnNlbmNlDQo+PiBiZWNvbWVzIG5lY2Vzc2Fy
-eS4gWypdDQo+Pg0KPj4gU3RpbGwgSSBoYXZlIHR3byBxdWVzdGlvbnM6DQo+PiAxLiBEbyB3ZSBy
-ZWFsbHkgbmVlZCBhbGwgZmllbGRzIHRvIGJlIDQgb3IgOCBieXRlcz8gV2h5IG5vdCB1c2UgMSBi
-eXRlIGZvciBjb21wcmVzc2lvbj8NCj4+IDIuIFdoYXQgaXMgdGhlIGJlbmVmaXQgb2YgcGFkZGlu
-Zywgd2hpY2ggeW91IHByb3Bvc2U/DQo+IA0KPiBIbW0sIG5vdyBJIHRoaW5rLCB0aGF0IHdlIHNo
-b3VsZCBhbGlnbiBoZWFkZXIgdG8gbXVsdGlwbHkgb2YgOCwgYXMgaGVhZGVyIGV4dGVuc2lvbnMg
-YXJlIGFscmVhZHkgaGF2ZQ0KPiAiIiINCj4gRGlyZWN0bHkgYWZ0ZXIgdGhlIGltYWdlIGhlYWRl
-ciwgb3B0aW9uYWwgc2VjdGlvbnMgY2FsbGVkIGhlYWRlciBleHRlbnNpb25zIGNhbg0KPiBiZSBz
-dG9yZWQuIEVhY2ggZXh0ZW5zaW9uIGhhcyBhIHN0cnVjdHVyZSBsaWtlIHRoZSBmb2xsb3dpbmc6
-DQo+IA0KPiBbLi4uXQ0KPiANCj4gIMKgwqDCoMKgwqDCoMKgwqDCoCBuIC3CoCBtOsKgwqAgUGFk
-ZGluZyB0byByb3VuZCB1cCB0aGUgaGVhZGVyIGV4dGVuc2lvbiBzaXplIHRvIHRoZSBuZXh0DQo+
-ICDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBtdWx0aXBsZSBvZiA4Lg0K
-PiAiIiINCj4gDQo+IFNvLCBpdCBsb29rcyBpbmNvbnNpc3RlbnQsIGlmIHdlIHBhZCBhbGwgaGVh
-ZGVyIGV4dGVuc2lvbnMgdG/CoCA4IGJ5dGVzIGV4Y2VwdCBmb3IgdGhlIHN0YXJ0IG9mIHRoZSBm
-aXJzdCBleHRlbnNpb24uDQo+IA0KPiBJJ2xsIHJlc2VuZCB3aXRoIHBhZGRpbmcgc29vbi4NCg0K
-DQpTdGlsbCwgd2UgaGF2ZSB0byBtYWtlIGFuIGV4Y2VwdGlvbiBhdCBsZWFzdCBmb3IgaGVhZGVy
-X2xlbmd0aCA9IDEwNCwgd2hpY2ggaXMgbm90IGEgbXVsdGlwbHkgb2YgOC4NCg0KQWxzbywgaXMg
-cmVxdWlyaW5nIGFsaWdubWVudCBpcyBhbiBpbmNvbXBhdGlibGUgY2hhbmdlIG9mIHNwZWNpZmlj
-YXRpb24/DQoNCj4gDQo+Pg0KPj4+DQo+Pj4+ICtUaGlzIGRlZmluaXRpb24gaW1wbGllcyB0aGUg
-Zm9sbG93aW5nOg0KPj4+PiArMS4gU29mdHdhcmUgbWF5IHN1cHBvcnQgc29tZSBvZiB0aGVzZSBv
-cHRpb25hbCBmaWVsZHMgYW5kIGlnbm9yZSB0aGUgb3RoZXJzLA0KPj4+PiArwqDCoCB3aGljaCBt
-ZWFucyB0aGF0IGZlYXR1cmVzIG1heSBiZSBiYWNrcG9ydGVkIHRvIGRvd25zdHJlYW0gUWVtdSBp
-bmRlcGVuZGVudGx5Lg0KPj4+DQo+Pj4gSSBkb24ndCB0aGluayB0aGlzIGJlbG9uZ3MgaW4gdGhl
-IHNwZWMuDQo+Pg0KPj4gTWUgdG9vLiBCdXQgYXQgbGVhc3QgSSBub3RlZCB3aGF0IEkgdHJ5IHRv
-IGFjaGlldmUsIHNvIGNvbnNpZGVyIGl0IGEgYml0IGxpa2UgUkZDLiBBbmQgb2YgY291cnNlIEkg
-aG9wZWQgZm9yIHlvdXIgcmV3b3JkaW5ncyApDQo+Pg0KPj4+IMKgIElkZWFsbHksIHdlIGFkZCBm
-aWVsZHMgc28gaW5mcmVxdWVudGx5IHRoYXQgYmFja3BvcnRpbmcgZG9lc24ndCBoYXZlIHRvIHdv
-cnJ5IGFib3V0IGJhY2twb3J0aW5nIGZpZWxkIDIgd2hpbGUgc2tpcHBpbmcgZmllbGQgMS4NCj4+
-DQo+PiBXaG8ga25vd3MuLiBFdmVuIGhhdmluZyBvbmx5IHR3byBmaWVsZHMgQSBhbmQgQiwgd2hl
-biB3ZSBuZWVkIEIgd2hpY2ggYWN0dWFsbHkgbmVlZHMgMTAgcGF0Y2hlcyB0byBiYWNrcG9ydCBh
-bmQgQSBuZWVkcyAxMDAgd291bGQgYmUNCj4+IGEgcHJvYmxlbSwgaWYgd2UgY2FuJ3QgYmFja3Bv
-cnQgQiBpbiBzZXBhcmF0ZS4NCj4+DQo+PiBJIHJlbWVtYmVyIHNpbWlsYXIgdGhpbmcgYWJvdXQg
-TkJEOiBJIG5lZWRlZCBCTE9DS19TVEFUVVMsIGJ1dCBiZWNhdXNlIG9mIHNwZWNpZmljYXRpb24g
-SSBoYWQgdG8gaW1wbGVtZW50DQo+PiBzdHJ1Y3R1cmVkIHJlYWQgZmlyc3QsIHdoaWNoIHdhc24n
-dCBpbnRlcmVzdGluZyB0byBtZSBhdCB0aGF0IG1vbWVudC4NCj4+DQo+Pj4NCj4+Pj4gKzIuIFNv
-ZnR3YXJlIG1heSBjaGVjayBAaGVhZGVyX2xlbmd0aCwgaWYgaXQga25vd3Mgb3B0aW9uYWwgZmll
-bGRzIHNwZWNpZmljYXRpb24NCj4+Pj4gK8KgwqAgZW5vdWdoIChrbm93cyBhYm91dCB0aGUgZmll
-bGQgd2hpY2ggZXhjZWVkcyBAaGVhZGVyX2xlbmd0aCkuDQo+Pj4NCj4+PiBBZ2FpbiwgSSBkb24n
-dCB0aGluayB0aGlzIGFkZHMgYW55dGhpbmcuwqAgU2luY2Ugd2UgYWxyZWFkeSBkb2N1bWVudGVk
-IGZpZWxkcyBhcmUgb3B0aW9uYWwsIGFuZCB0aGF0IGlmIGhlYWRlcl9sZW5ndGggaXMgdG9vIHNo
-b3J0LCB0aGUgbWlzc2luZyBmaWVsZCBpcyB0cmVhdGVkIGFzIDAsIHNvZnR3YXJlIHRoYXQga25v
-d3MgYWJvdXQgYSBsb25nZXIgaGVhZGVyX2xlbmd0aCB3aWxsIGFscmVhZHkgaGFuZGxlIGl0IGNv
-cnJlY3RseS4NCj4+DQo+PiBJIHRoaW5rLCBJJ2xsIG1vdmUgdGhlc2UgcG9pbnRzIHRvIGNvbW1p
-dCBtZXNzYWdlLCB0byBrZWVwIHRoZW0gc29tZWhvdy4NCj4+DQo+Pj4NCj4+Pj4gKzMuIElmIEBo
-ZWFkZXJfbGVuZ3RoIGlzIGhpZ2hlciB0aGFuIHRoZSBoaWdoZXN0IGZpZWxkIGVuZCB0aGF0IHNv
-ZnR3YXJlIGtub3dzLA0KPj4+PiArwqDCoCBpdCBzaG91bGQgYXNzdW1lIHRoYXQgYWRkaXRpb25h
-bCBmaWVsZHMgYXJlIGNvcnJlY3QsIEBoZWFkZXJfbGVuZ3RoIGlzDQo+Pj4+ICvCoMKgIGNvcnJl
-Y3QgYW5kIGtlZXAgQGhlYWRlcl9sZW5ndGggYW5kIGFkZGl0aW9uYWwgdW5rbm93biBmaWVsZHMg
-YXMgaXMgb24NCj4+Pj4gK8KgwqAgcmV3cml0aW5nIHRoZSBpbWFnZS4NCj4+Pj4gKzMuIElmIHdl
-IHdhbnQgdG8gYWRkIGluY29tcGF0aWJsZSBmaWVsZCAob3IgYSBmaWVsZCwgZm9yIHdoaWNoIHNv
-bWUgaXRzIHZhbHVlcw0KPj4+PiArwqDCoCB3b3VsZCBiZSBpbmNvbXBhdGlibGUpLCBpdCBtdXN0
-IGJlIGFjY29tcGFuaWVkIGJ5IGluY29tcGF0aWJsZSBmZWF0dXJlIGJpdC4NCj4+Pj4gKw0KPj4+
-PiArwqDCoMKgwqDCoMKgwqAgPCAuLi4gTm8gYWRkaXRpb25hbCBmaWVsZHMgaW4gdGhlIGhlYWRl
-ciBjdXJyZW50bHkgLi4uID4NCj4+Pj4gKw0KPj4+DQo+Pj4gSSdtIHN0aWxsIG5vdCBzZWVpbmcg
-dGhlIHZhbHVlIGluIGFkZGluZyBhbnkgb2YgdGhpcyBwYXJhZ3JhcGggdG8gdGhlIHNwZWMuwqAg
-TWF5YmUgaW4gdGhlIGNvbW1pdCBtZXNzYWdlIHRoYXQgYWNjb21wYW5pZXMgdGhlIHNwZWMgY2hh
-bmdlLCBidXQgdGhlIHNwZWMgaXMgY2xlYXIgZW5vdWdoIGlmIGl0IGRvY3VtZW50cyBob3cgb3B0
-aW9uYWwgaGVhZGVyIGZpZWxkcyBhcmUgdG8gYmUgbWFuYWdlZCAodHJlYXQgYXMgMCBpZiBtaXNz
-aW5nLCBwcmVzZXJ2ZSBvbiB3cml0ZSBpZiB1bmtub3duLCBhbmQgd2l0aCBhIG1hbmRhdGVkIGFs
-aWdubWVudCB0byBhdm9pZCBoYXZpbmcgdG8gd29ycnkgYWJvdXQgb3RoZXIgaXNzdWVzKS4NCj4+
-Pg0KPj4+PiDCoCBEaXJlY3RseSBhZnRlciB0aGUgaW1hZ2UgaGVhZGVyLCBvcHRpb25hbCBzZWN0
-aW9ucyBjYWxsZWQgaGVhZGVyIGV4dGVuc2lvbnMgY2FuDQo+Pj4+IMKgIGJlIHN0b3JlZC4gRWFj
-aCBleHRlbnNpb24gaGFzIGEgc3RydWN0dXJlIGxpa2UgdGhlIGZvbGxvd2luZzoNCj4+Pj4NCj4+
-Pg0KPj4NCj4+DQo+IA0KPiANCg0KDQotLSANCkJlc3QgcmVnYXJkcywNClZsYWRpbWlyDQo=
+--0000000000006f688a05952bf23b
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+On Tuesday, October 15, 2019, Philippe Mathieu-Daud=C3=A9 <philmd@redhat.co=
+m>
+wrote:
+
+> From: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+>
+> The hw/pci-host/piix.c contains a mix of PIIX3 and i440FX chipsets
+> functions. To be able to split it, we need to export some
+> declarations first.
+>
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+> ---
+>  MAINTAINERS                  |  1 +
+>  hw/acpi/pcihp.c              |  2 +-
+>  hw/i386/pc_piix.c            |  1 +
+>  hw/pci-host/piix.c           |  1 +
+>  include/hw/i386/pc.h         | 22 ---------------------
+>  include/hw/pci-host/i440fx.h | 37 ++++++++++++++++++++++++++++++++++++
+>  stubs/pci-host-piix.c        |  3 ++-
+>  7 files changed, 43 insertions(+), 24 deletions(-)
+>  create mode 100644 include/hw/pci-host/i440fx.h
+>
+>
+Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+
+
+
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index 556f58bd8c..adf059a164 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -1228,6 +1228,7 @@ F: hw/i386/
+>  F: hw/pci-host/piix.c
+>  F: hw/pci-host/q35.c
+>  F: hw/pci-host/pam.c
+> +F: include/hw/pci-host/i440fx.h
+>  F: include/hw/pci-host/q35.h
+>  F: include/hw/pci-host/pam.h
+>  F: hw/isa/lpc_ich9.c
+> diff --git a/hw/acpi/pcihp.c b/hw/acpi/pcihp.c
+> index 82d295b6e8..8413348a33 100644
+> --- a/hw/acpi/pcihp.c
+> +++ b/hw/acpi/pcihp.c
+> @@ -27,7 +27,7 @@
+>  #include "qemu/osdep.h"
+>  #include "hw/acpi/pcihp.h"
+>
+> -#include "hw/i386/pc.h"
+> +#include "hw/pci-host/i440fx.h"
+>  #include "hw/pci/pci.h"
+>  #include "hw/pci/pci_bridge.h"
+>  #include "hw/acpi/acpi.h"
+> diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
+> index 5b35ff04c7..8ac4bf12ca 100644
+> --- a/hw/i386/pc_piix.c
+> +++ b/hw/i386/pc_piix.c
+> @@ -29,6 +29,7 @@
+>  #include "hw/loader.h"
+>  #include "hw/i386/pc.h"
+>  #include "hw/i386/apic.h"
+> +#include "hw/pci-host/i440fx.h"
+>  #include "hw/southbridge/piix.h"
+>  #include "hw/display/ramfb.h"
+>  #include "hw/firmware/smbios.h"
+> diff --git a/hw/pci-host/piix.c b/hw/pci-host/piix.c
+> index a450fc726e..0b5da5bc94 100644
+> --- a/hw/pci-host/piix.c
+> +++ b/hw/pci-host/piix.c
+> @@ -27,6 +27,7 @@
+>  #include "hw/irq.h"
+>  #include "hw/pci/pci.h"
+>  #include "hw/pci/pci_host.h"
+> +#include "hw/pci-host/i440fx.h"
+>  #include "hw/southbridge/piix.h"
+>  #include "hw/qdev-properties.h"
+>  #include "hw/isa/isa.h"
+> diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
+> index 1c20b96571..cead2828de 100644
+> --- a/include/hw/i386/pc.h
+> +++ b/include/hw/i386/pc.h
+> @@ -248,28 +248,6 @@ int cmos_get_fd_drive_type(FloppyDriveType fd0);
+>  /* hpet.c */
+>  extern int no_hpet;
+>
+> -/* piix_pci.c */
+> -struct PCII440FXState;
+> -typedef struct PCII440FXState PCII440FXState;
+> -
+> -#define TYPE_I440FX_PCI_HOST_BRIDGE "i440FX-pcihost"
+> -#define TYPE_I440FX_PCI_DEVICE "i440FX"
+> -
+> -#define TYPE_IGD_PASSTHROUGH_I440FX_PCI_DEVICE "igd-passthrough-i440FX"
+> -
+> -PCIBus *i440fx_init(const char *host_type, const char *pci_type,
+> -                    PCII440FXState **pi440fx_state, int *piix_devfn,
+> -                    ISABus **isa_bus, qemu_irq *pic,
+> -                    MemoryRegion *address_space_mem,
+> -                    MemoryRegion *address_space_io,
+> -                    ram_addr_t ram_size,
+> -                    ram_addr_t below_4g_mem_size,
+> -                    ram_addr_t above_4g_mem_size,
+> -                    MemoryRegion *pci_memory,
+> -                    MemoryRegion *ram_memory);
+> -
+> -PCIBus *find_i440fx(void);
+> -
+>  /* pc_sysfw.c */
+>  void pc_system_flash_create(PCMachineState *pcms);
+>  void pc_system_firmware_init(PCMachineState *pcms, MemoryRegion
+> *rom_memory);
+> diff --git a/include/hw/pci-host/i440fx.h b/include/hw/pci-host/i440fx.h
+> new file mode 100644
+> index 0000000000..e327f9bf87
+> --- /dev/null
+> +++ b/include/hw/pci-host/i440fx.h
+> @@ -0,0 +1,37 @@
+> +/*
+> + * QEMU i440FX North Bridge Emulation
+> + *
+> + * Copyright (c) 2006 Fabrice Bellard
+> + *
+> + * This work is licensed under the terms of the GNU GPL, version 2 or
+> later.
+> + * See the COPYING file in the top-level directory.
+> + *
+> + */
+> +
+> +#ifndef HW_PCI_I440FX_H
+> +#define HW_PCI_I440FX_H
+> +
+> +#include "hw/hw.h"
+> +#include "hw/pci/pci_bus.h"
+> +
+> +typedef struct PCII440FXState PCII440FXState;
+> +
+> +#define TYPE_I440FX_PCI_HOST_BRIDGE "i440FX-pcihost"
+> +#define TYPE_I440FX_PCI_DEVICE "i440FX"
+> +
+> +#define TYPE_IGD_PASSTHROUGH_I440FX_PCI_DEVICE "igd-passthrough-i440FX"
+> +
+> +PCIBus *i440fx_init(const char *host_type, const char *pci_type,
+> +                    PCII440FXState **pi440fx_state, int *piix_devfn,
+> +                    ISABus **isa_bus, qemu_irq *pic,
+> +                    MemoryRegion *address_space_mem,
+> +                    MemoryRegion *address_space_io,
+> +                    ram_addr_t ram_size,
+> +                    ram_addr_t below_4g_mem_size,
+> +                    ram_addr_t above_4g_mem_size,
+> +                    MemoryRegion *pci_memory,
+> +                    MemoryRegion *ram_memory);
+> +
+> +PCIBus *find_i440fx(void);
+> +
+> +#endif
+> diff --git a/stubs/pci-host-piix.c b/stubs/pci-host-piix.c
+> index 6ed81b1f21..93975adbfe 100644
+> --- a/stubs/pci-host-piix.c
+> +++ b/stubs/pci-host-piix.c
+> @@ -1,5 +1,6 @@
+>  #include "qemu/osdep.h"
+> -#include "hw/i386/pc.h"
+> +#include "hw/pci-host/i440fx.h"
+> +
+>  PCIBus *find_i440fx(void)
+>  {
+>      return NULL;
+> --
+> 2.21.0
+>
+>
+>
+
+--0000000000006f688a05952bf23b
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+<br><br>On Tuesday, October 15, 2019, Philippe Mathieu-Daud=C3=A9 &lt;<a hr=
+ef=3D"mailto:philmd@redhat.com">philmd@redhat.com</a>&gt; wrote:<br><blockq=
+uote class=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;border-left:1px #ccc =
+solid;padding-left:1ex">From: Philippe Mathieu-Daud=C3=A9 &lt;<a href=3D"ma=
+ilto:f4bug@amsat.org">f4bug@amsat.org</a>&gt;<br>
+<br>
+The hw/pci-host/piix.c contains a mix of PIIX3 and i440FX chipsets<br>
+functions. To be able to split it, we need to export some<br>
+declarations first.<br>
+<br>
+Signed-off-by: Philippe Mathieu-Daud=C3=A9 &lt;<a href=3D"mailto:philmd@red=
+hat.com">philmd@redhat.com</a>&gt;<br>
+---<br>
+=C2=A0MAINTAINERS=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 |=C2=A0 1 +<br>
+=C2=A0hw/acpi/pcihp.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 |=C2=
+=A0 2 +-<br>
+=C2=A0hw/i386/pc_piix.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 |=C2=A0 1 =
++<br>
+=C2=A0hw/pci-host/piix.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0|=C2=A0 1 =
++<br>
+=C2=A0include/hw/i386/pc.h=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0| 22 ----------=
+-----------<br>
+=C2=A0include/hw/pci-host/i440fx.h | 37 ++++++++++++++++++++++++++++++<wbr>=
+++++++<br>
+=C2=A0stubs/pci-host-piix.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 |=C2=A0 3 ++-<br>
+=C2=A07 files changed, 43 insertions(+), 24 deletions(-)<br>
+=C2=A0create mode 100644 include/hw/pci-host/i440fx.h<br>
+<br></blockquote><div><br></div><div><span style=3D"color:rgb(34,34,34);fon=
+t-size:14px;line-height:22.1200008392334px">Reviewed-by: Aleksandar Markovi=
+c &lt;</span><a href=3D"mailto:amarkovic@wavecomp.com" target=3D"_blank" st=
+yle=3D"font-size:14px;line-height:22.1200008392334px">amarkovic@wavecomp.co=
+m</a><span style=3D"color:rgb(34,34,34);font-size:14px;line-height:22.12000=
+08392334px">&gt;</span><br></div><div><br></div><div>=C2=A0</div><blockquot=
+e class=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;border-left:1px #ccc sol=
+id;padding-left:1ex">
+diff --git a/MAINTAINERS b/MAINTAINERS<br>
+index 556f58bd8c..adf059a164 100644<br>
+--- a/MAINTAINERS<br>
++++ b/MAINTAINERS<br>
+@@ -1228,6 +1228,7 @@ F: hw/i386/<br>
+=C2=A0F: hw/pci-host/piix.c<br>
+=C2=A0F: hw/pci-host/q35.c<br>
+=C2=A0F: hw/pci-host/pam.c<br>
++F: include/hw/pci-host/i440fx.h<br>
+=C2=A0F: include/hw/pci-host/q35.h<br>
+=C2=A0F: include/hw/pci-host/pam.h<br>
+=C2=A0F: hw/isa/lpc_ich9.c<br>
+diff --git a/hw/acpi/pcihp.c b/hw/acpi/pcihp.c<br>
+index 82d295b6e8..8413348a33 100644<br>
+--- a/hw/acpi/pcihp.c<br>
++++ b/hw/acpi/pcihp.c<br>
+@@ -27,7 +27,7 @@<br>
+=C2=A0#include &quot;qemu/osdep.h&quot;<br>
+=C2=A0#include &quot;hw/acpi/pcihp.h&quot;<br>
+<br>
+-#include &quot;hw/i386/pc.h&quot;<br>
++#include &quot;hw/pci-host/i440fx.h&quot;<br>
+=C2=A0#include &quot;hw/pci/pci.h&quot;<br>
+=C2=A0#include &quot;hw/pci/pci_bridge.h&quot;<br>
+=C2=A0#include &quot;hw/acpi/acpi.h&quot;<br>
+diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c<br>
+index 5b35ff04c7..8ac4bf12ca 100644<br>
+--- a/hw/i386/pc_piix.c<br>
++++ b/hw/i386/pc_piix.c<br>
+@@ -29,6 +29,7 @@<br>
+=C2=A0#include &quot;hw/loader.h&quot;<br>
+=C2=A0#include &quot;hw/i386/pc.h&quot;<br>
+=C2=A0#include &quot;hw/i386/apic.h&quot;<br>
++#include &quot;hw/pci-host/i440fx.h&quot;<br>
+=C2=A0#include &quot;hw/southbridge/piix.h&quot;<br>
+=C2=A0#include &quot;hw/display/ramfb.h&quot;<br>
+=C2=A0#include &quot;hw/firmware/smbios.h&quot;<br>
+diff --git a/hw/pci-host/piix.c b/hw/pci-host/piix.c<br>
+index a450fc726e..0b5da5bc94 100644<br>
+--- a/hw/pci-host/piix.c<br>
++++ b/hw/pci-host/piix.c<br>
+@@ -27,6 +27,7 @@<br>
+=C2=A0#include &quot;hw/irq.h&quot;<br>
+=C2=A0#include &quot;hw/pci/pci.h&quot;<br>
+=C2=A0#include &quot;hw/pci/pci_host.h&quot;<br>
++#include &quot;hw/pci-host/i440fx.h&quot;<br>
+=C2=A0#include &quot;hw/southbridge/piix.h&quot;<br>
+=C2=A0#include &quot;hw/qdev-properties.h&quot;<br>
+=C2=A0#include &quot;hw/isa/isa.h&quot;<br>
+diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h<br>
+index 1c20b96571..cead2828de 100644<br>
+--- a/include/hw/i386/pc.h<br>
++++ b/include/hw/i386/pc.h<br>
+@@ -248,28 +248,6 @@ int cmos_get_fd_drive_type(<wbr>FloppyDriveType fd0);<=
+br>
+=C2=A0/* hpet.c */<br>
+=C2=A0extern int no_hpet;<br>
+<br>
+-/* piix_pci.c */<br>
+-struct PCII440FXState;<br>
+-typedef struct PCII440FXState PCII440FXState;<br>
+-<br>
+-#define TYPE_I440FX_PCI_HOST_BRIDGE &quot;i440FX-pcihost&quot;<br>
+-#define TYPE_I440FX_PCI_DEVICE &quot;i440FX&quot;<br>
+-<br>
+-#define TYPE_IGD_PASSTHROUGH_I440FX_<wbr>PCI_DEVICE &quot;igd-passthrough-=
+i440FX&quot;<br>
+-<br>
+-PCIBus *i440fx_init(const char *host_type, const char *pci_type,<br>
+-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 PCII=
+440FXState **pi440fx_state, int *piix_devfn,<br>
+-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 ISAB=
+us **isa_bus, qemu_irq *pic,<br>
+-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 Memo=
+ryRegion *address_space_mem,<br>
+-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 Memo=
+ryRegion *address_space_io,<br>
+-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 ram_=
+addr_t ram_size,<br>
+-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 ram_=
+addr_t below_4g_mem_size,<br>
+-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 ram_=
+addr_t above_4g_mem_size,<br>
+-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 Memo=
+ryRegion *pci_memory,<br>
+-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 Memo=
+ryRegion *ram_memory);<br>
+-<br>
+-PCIBus *find_i440fx(void);<br>
+-<br>
+=C2=A0/* pc_sysfw.c */<br>
+=C2=A0void pc_system_flash_create(<wbr>PCMachineState *pcms);<br>
+=C2=A0void pc_system_firmware_init(<wbr>PCMachineState *pcms, MemoryRegion =
+*rom_memory);<br>
+diff --git a/include/hw/pci-host/i440fx.h b/include/hw/pci-host/i440fx.h<br=
+>
+new file mode 100644<br>
+index 0000000000..e327f9bf87<br>
+--- /dev/null<br>
++++ b/include/hw/pci-host/i440fx.h<br>
+@@ -0,0 +1,37 @@<br>
++/*<br>
++ * QEMU i440FX North Bridge Emulation<br>
++ *<br>
++ * Copyright (c) 2006 Fabrice Bellard<br>
++ *<br>
++ * This work is licensed under the terms of the GNU GPL, version 2 or late=
+r.<br>
++ * See the COPYING file in the top-level directory.<br>
++ *<br>
++ */<br>
++<br>
++#ifndef HW_PCI_I440FX_H<br>
++#define HW_PCI_I440FX_H<br>
++<br>
++#include &quot;hw/hw.h&quot;<br>
++#include &quot;hw/pci/pci_bus.h&quot;<br>
++<br>
++typedef struct PCII440FXState PCII440FXState;<br>
++<br>
++#define TYPE_I440FX_PCI_HOST_BRIDGE &quot;i440FX-pcihost&quot;<br>
++#define TYPE_I440FX_PCI_DEVICE &quot;i440FX&quot;<br>
++<br>
++#define TYPE_IGD_PASSTHROUGH_I440FX_<wbr>PCI_DEVICE &quot;igd-passthrough-=
+i440FX&quot;<br>
++<br>
++PCIBus *i440fx_init(const char *host_type, const char *pci_type,<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 PCII=
+440FXState **pi440fx_state, int *piix_devfn,<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 ISAB=
+us **isa_bus, qemu_irq *pic,<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 Memo=
+ryRegion *address_space_mem,<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 Memo=
+ryRegion *address_space_io,<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 ram_=
+addr_t ram_size,<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 ram_=
+addr_t below_4g_mem_size,<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 ram_=
+addr_t above_4g_mem_size,<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 Memo=
+ryRegion *pci_memory,<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 Memo=
+ryRegion *ram_memory);<br>
++<br>
++PCIBus *find_i440fx(void);<br>
++<br>
++#endif<br>
+diff --git a/stubs/pci-host-piix.c b/stubs/pci-host-piix.c<br>
+index 6ed81b1f21..93975adbfe 100644<br>
+--- a/stubs/pci-host-piix.c<br>
++++ b/stubs/pci-host-piix.c<br>
+@@ -1,5 +1,6 @@<br>
+=C2=A0#include &quot;qemu/osdep.h&quot;<br>
+-#include &quot;hw/i386/pc.h&quot;<br>
++#include &quot;hw/pci-host/i440fx.h&quot;<br>
++<br>
+=C2=A0PCIBus *find_i440fx(void)<br>
+=C2=A0{<br>
+=C2=A0 =C2=A0 =C2=A0return NULL;<br>
+-- <br>
+2.21.0<br>
+<br>
+<br>
+</blockquote>
+
+--0000000000006f688a05952bf23b--
 
