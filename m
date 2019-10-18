@@ -2,62 +2,92 @@ Return-Path: <SRS0=ht5U=YL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 663C2CA9EA9
-	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 15:57:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EEA68CA9EA9
+	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 15:58:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3B4882082C
-	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 15:57:16 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3B4882082C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id B876A2082C
+	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 15:58:53 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="fiwI0jDI"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B876A2082C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42322 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42330 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iLUct-0000m4-5V
-	for qemu-devel@archiver.kernel.org; Fri, 18 Oct 2019 11:57:15 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44437)
+	id 1iLUeS-00027v-OJ
+	for qemu-devel@archiver.kernel.org; Fri, 18 Oct 2019 11:58:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46711)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <marcandre.lureau@redhat.com>) id 1iLUPU-0000qj-Fz
- for qemu-devel@nongnu.org; Fri, 18 Oct 2019 11:43:25 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1iLUaO-0005zg-1d
+ for qemu-devel@nongnu.org; Fri, 18 Oct 2019 11:54:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <marcandre.lureau@redhat.com>) id 1iLUPT-000763-4p
- for qemu-devel@nongnu.org; Fri, 18 Oct 2019 11:43:24 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60072)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
- id 1iLUPQ-00072e-AO; Fri, 18 Oct 2019 11:43:20 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 6390483F45;
- Fri, 18 Oct 2019 15:43:19 +0000 (UTC)
-Received: from localhost (ovpn-112-40.ams2.redhat.com [10.36.112.40])
- by smtp.corp.redhat.com (Postfix) with ESMTP id DEDD2600D1;
- Fri, 18 Oct 2019 15:43:17 +0000 (UTC)
-From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH 08/14] cris: replace PROP_PTR with PROP_LINK for interrupt
- vector
-Date: Fri, 18 Oct 2019 17:42:06 +0200
-Message-Id: <20191018154212.13458-9-marcandre.lureau@redhat.com>
-In-Reply-To: <20191018154212.13458-1-marcandre.lureau@redhat.com>
-References: <20191018154212.13458-1-marcandre.lureau@redhat.com>
+ (envelope-from <alex.bennee@linaro.org>) id 1iLUaM-0007vR-DD
+ for qemu-devel@nongnu.org; Fri, 18 Oct 2019 11:54:39 -0400
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:44784)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1iLUaL-0007uC-51
+ for qemu-devel@nongnu.org; Fri, 18 Oct 2019 11:54:38 -0400
+Received: by mail-wr1-x441.google.com with SMTP id z9so6796139wrl.11
+ for <qemu-devel@nongnu.org>; Fri, 18 Oct 2019 08:54:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=EsxKVD/646QdrOyId90stplzTbEBMqQ5c3CQ4aWyxr8=;
+ b=fiwI0jDIW3gcOZyas8BQ5j2p84VMLn6X4bIMNdCbVbxv7Gg2aVBbcWZ2zYA8C6xHC3
+ xGLpD1gnmO4R6piM3q1FTwvXMRXjKA0Pj0vM5MdkBJy7XzU3I5oRdXQu6wO3RU1I8GMQ
+ 8oyhjLTPgcp29hfxIzUG86lZe6Thc7GIRbDbQo992XAuVrD0dZzPEnjGm1mAZutsb0lk
+ fOiq4CJcUmQg7lDW+tW/604adu3Z1Z/itOb9ewbfP/MiyHAcx8y2XDugW7R+wNhmKC1V
+ d+bOKsjze6hl6sw9fW83mnqdB94+gGY9dIuqfHVYQ7t8OF18bVYDu1F0/NX7Ct9mILTR
+ YbJg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=EsxKVD/646QdrOyId90stplzTbEBMqQ5c3CQ4aWyxr8=;
+ b=f6iIldvB57jmVxDpjVNGVBe1vCPRLDmPdyZlT0pO6i6qWr+dF1a0TGoAAD+RapqzQh
+ +S7r/h4GWlUotrWharX0dQqPtB9d0evlr4rz9MrfUtFHICTB+BnP8Ponhyw0ez8BsEmy
+ 8JX0MAd+cu6q3z4k3bFkspd1QlGHlWFQg3KyuXG0CpP/4+w1YZgc6avnSYSuI44eo47v
+ 6qTYzo0aesSE30+wZNSoPv5Vu/uEP16NhX9Oi5do+AJlVS/LEdUV3hlOjW9IzpxiNLpN
+ JpGmmq5xr+9vx7l53PKlw/ueVz2r2reomRgIfxlVugUNIxHLROMMxkECWpSTi/HuBWUm
+ 9cjg==
+X-Gm-Message-State: APjAAAXIOs8YApbGClsTCWo4RJKrG7hw1h735vLR5A6nvK+Ww3yhKmOD
+ aiWFDYWyEXYo8DDb5TiUxHNOgw==
+X-Google-Smtp-Source: APXvYqzEqIA87lmOYdg55cw071pPNmI9tuxuXp+jL5s+kF8j5ue1unSYTSpxirzmeF6S2KcHSWlqsw==
+X-Received: by 2002:adf:a516:: with SMTP id i22mr9137412wrb.273.1571414075363; 
+ Fri, 18 Oct 2019 08:54:35 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id q22sm5197506wmj.31.2019.10.18.08.54.34
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Fri, 18 Oct 2019 08:54:34 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 0C4AF1FF87;
+ Fri, 18 Oct 2019 16:54:34 +0100 (BST)
+References: <20191017131615.19660-1-alex.bennee@linaro.org>
+ <20191017131615.19660-38-alex.bennee@linaro.org>
+ <20191018153214.GE42857@RDU-FVFX20TUHV2H>
+User-agent: mu4e 1.3.5; emacs 27.0.50
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Aaron Lindsay OS <aaron@os.amperecomputing.com>
+Subject: Re: [PATCH  v6 37/54] plugin: expand the plugin_init function to
+ include an info block
+In-reply-to: <20191018153214.GE42857@RDU-FVFX20TUHV2H>
+Date: Fri, 18 Oct 2019 16:54:34 +0100
+Message-ID: <87wod2nj5x.fsf@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.27]); Fri, 18 Oct 2019 15:43:19 +0000 (UTC)
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.132.183.28
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::441
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -69,148 +99,124 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Corey Minyard <cminyard@mvista.com>,
- Peter Maydell <peter.maydell@linaro.org>,
- "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
- Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
- KONRAD Frederic <frederic.konrad@adacore.com>,
- "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
- Aleksandar Rikalo <arikalo@wavecomp.com>, Magnus Damm <magnus.damm@gmail.com>,
- =?UTF-8?q?Herv=C3=A9=20Poussineau?= <hpoussin@reactos.org>,
- =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
- Artyom Tarasenko <atar4qemu@gmail.com>, Eduardo Habkost <ehabkost@redhat.com>,
- Fabien Chouteau <chouteau@adacore.com>, qemu-arm@nongnu.org,
- Richard Henderson <rth@twiddle.net>,
- =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
- qemu-ppc@nongnu.org, Aleksandar Markovic <amarkovic@wavecomp.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>
+Cc: "robert.foley@futurewei.com" <robert.foley@futurewei.com>,
+ "cota@braap.org" <cota@braap.org>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "peter.puhov@futurewei.com" <peter.puhov@futurewei.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Instead of using raw interrupt vector pointer, store the associated
-CPU with a link property.
 
-Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
----
- hw/cris/axis_dev88.c  |  4 +---
- hw/intc/Makefile.objs |  2 +-
- hw/intc/etraxfs_pic.c | 18 +++++++-----------
- 3 files changed, 9 insertions(+), 15 deletions(-)
+Aaron Lindsay OS <aaron@os.amperecomputing.com> writes:
 
-diff --git a/hw/cris/axis_dev88.c b/hw/cris/axis_dev88.c
-index 940c7dd122..cb7b1b58aa 100644
---- a/hw/cris/axis_dev88.c
-+++ b/hw/cris/axis_dev88.c
-@@ -253,7 +253,6 @@ void axisdev88_init(MachineState *machine)
-     const char *kernel_filename =3D machine->kernel_filename;
-     const char *kernel_cmdline =3D machine->kernel_cmdline;
-     CRISCPU *cpu;
--    CPUCRISState *env;
-     DeviceState *dev;
-     SysBusDevice *s;
-     DriveInfo *nand;
-@@ -267,7 +266,6 @@ void axisdev88_init(MachineState *machine)
-=20
-     /* init CPUs */
-     cpu =3D CRIS_CPU(cpu_create(machine->cpu_type));
--    env =3D &cpu->env;
-=20
-     /* allocate RAM */
-     memory_region_allocate_system_memory(phys_ram, NULL, "axisdev88.ram"=
-,
-@@ -298,7 +296,7 @@ void axisdev88_init(MachineState *machine)
-=20
-     dev =3D qdev_create(NULL, "etraxfs,pic");
-     /* FIXME: Is there a proper way to signal vectors to the CPU core?  =
-*/
--    qdev_prop_set_ptr(dev, "interrupt_vector", &env->interrupt_vector);
-+    object_property_set_link(OBJECT(dev), OBJECT(cpu), "cpu", &error_abo=
-rt);
-     qdev_init_nofail(dev);
-     s =3D SYS_BUS_DEVICE(dev);
-     sysbus_mmio_map(s, 0, 0x3001c000);
-diff --git a/hw/intc/Makefile.objs b/hw/intc/Makefile.objs
-index f726d87532..26a3cb36cb 100644
---- a/hw/intc/Makefile.objs
-+++ b/hw/intc/Makefile.objs
-@@ -5,7 +5,6 @@ common-obj-$(CONFIG_PUV3) +=3D puv3_intc.o
- common-obj-$(CONFIG_XILINX) +=3D xilinx_intc.o
- common-obj-$(CONFIG_XLNX_ZYNQMP_PMU) +=3D xlnx-pmu-iomod-intc.o
- common-obj-$(CONFIG_XLNX_ZYNQMP) +=3D xlnx-zynqmp-ipi.o
--common-obj-$(CONFIG_ETRAXFS) +=3D etraxfs_pic.o
- common-obj-$(CONFIG_IMX) +=3D imx_avic.o imx_gpcv2.o
- common-obj-$(CONFIG_LM32) +=3D lm32_pic.o
- common-obj-$(CONFIG_REALVIEW) +=3D realview_gic.o
-@@ -49,3 +48,4 @@ obj-$(CONFIG_ARM_GIC) +=3D arm_gicv3_cpuif.o
- obj-$(CONFIG_MIPS_CPS) +=3D mips_gic.o
- obj-$(CONFIG_NIOS2) +=3D nios2_iic.o
- obj-$(CONFIG_OMPIC) +=3D ompic.o
-+obj-$(CONFIG_ETRAXFS) +=3D etraxfs_pic.o
-diff --git a/hw/intc/etraxfs_pic.c b/hw/intc/etraxfs_pic.c
-index 77f652acec..8065fc757e 100644
---- a/hw/intc/etraxfs_pic.c
-+++ b/hw/intc/etraxfs_pic.c
-@@ -27,8 +27,7 @@
- #include "qemu/module.h"
- #include "hw/irq.h"
- #include "hw/qdev-properties.h"
--//#include "pc.h"
--//#include "etraxfs.h"
-+#include "target/cris/cpu.h"
-=20
- #define D(x)
-=20
-@@ -48,10 +47,10 @@ struct etrax_pic
-     SysBusDevice parent_obj;
-=20
-     MemoryRegion mmio;
--    void *interrupt_vector;
-     qemu_irq parent_irq;
-     qemu_irq parent_nmi;
-     uint32_t regs[R_MAX];
-+    CRISCPU *cpu;
- };
-=20
- static void pic_update(struct etrax_pic *fs)
-@@ -79,9 +78,10 @@ static void pic_update(struct etrax_pic *fs)
-         }
-     }
-=20
--    if (fs->interrupt_vector) {
--        /* hack alert: ptr property */
--        *(uint32_t*)(fs->interrupt_vector) =3D vector;
-+    if (fs->cpu) {
-+        /* hack alert: cpu link property */
-+        int32_t *int_vec =3D &fs->cpu->env.interrupt_vector;
-+        *int_vec =3D (uint32_t)vector;
-     }
-     qemu_set_irq(fs->parent_irq, !!vector);
- }
-@@ -164,7 +164,7 @@ static void etraxfs_pic_init(Object *obj)
- }
-=20
- static Property etraxfs_pic_properties[] =3D {
--    DEFINE_PROP_PTR("interrupt_vector", struct etrax_pic, interrupt_vect=
-or),
-+    DEFINE_PROP_LINK("cpu", struct etrax_pic, cpu, TYPE_CRIS_CPU, CRISCP=
-U *),
-     DEFINE_PROP_END_OF_LIST(),
- };
-=20
-@@ -173,10 +173,6 @@ static void etraxfs_pic_class_init(ObjectClass *klas=
-s, void *data)
-     DeviceClass *dc =3D DEVICE_CLASS(klass);
-=20
-     dc->props =3D etraxfs_pic_properties;
--    /*
--     * Note: pointer property "interrupt_vector" may remain null, thus
--     * no need for dc->user_creatable =3D false;
--     */
- }
-=20
- static const TypeInfo etraxfs_pic_info =3D {
---=20
-2.23.0.606.g08da6496b6
+> On Oct 17 14:15, Alex Benn=C3=A9e wrote:
+>> This provides a limited amount of info to plugins about the guest
+>> system that will allow them to make some additional decisions on
+>> setup.
+>>
+>> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+>>
+>> ---
+>> v6
+>>   - split and move to pre example plugins
+>>   - checkpatch fixes
+>> ---
+>>  include/qemu/qemu-plugin.h | 26 ++++++++++++++++++++++++--
+>>  plugins/loader.c           | 23 +++++++++++++++++++----
+>>  2 files changed, 43 insertions(+), 6 deletions(-)
+>>
+>> diff --git a/include/qemu/qemu-plugin.h b/include/qemu/qemu-plugin.h
+>> index c213d1dd19..784f1dfc3d 100644
+>> --- a/include/qemu/qemu-plugin.h
+>> +++ b/include/qemu/qemu-plugin.h
+>> @@ -38,9 +38,27 @@
+>>
+>>  typedef uint64_t qemu_plugin_id_t;
+>>
+>> +typedef struct {
+>> +    /* string describing architecture */
+>
+> Might be worth noting that this is set to the value of TARGET_NAME qemu
+> was built with, and pointing to documentation about the possible values
+> it may hold.
 
+OK.
+
+>> +    const char *target_name;
+>> +    /* is this a full system emulation? */
+>> +    bool system_emulation;
+>
+> It seems that 'system_emulation' is meant primarily in opposition to
+> user-mode. I'm wondering if this could/should this be an enum of the
+> execution mode being used to allow for future expansion? Or, if your
+> intention here is mostly to allow the user to detect when the *_vcpus
+> variables are valid, could it be renamed or commented differently to
+> make that link more clear?
+
+The only other operating mode that's ever been mooted is softmmu-user
+(and no implementation has been done so far). Even then I don't think
+that is a distinction that should be reported to the plugin as we are
+trying not to leak implementation details.
+
+But yes the practical upshot is for system emulation you at least have
+sort of bounded size for how many threads you may have running.
+
+>
+>> +    union {
+>> +        /*
+>> +         * smp_vcpus may change if vCPUs can be hot-plugged, max_vcpus
+>> +         * is the system-wide limit.
+>> +         */
+>> +        struct {
+>> +            int smp_vcpus;
+>> +            int max_vcpus;
+>> +        } system;
+>> +    };
+>> +} qemu_info_t;
+>
+> [...]
+>
+>> @@ -241,11 +245,22 @@ static void plugin_desc_free(struct qemu_plugin_de=
+sc *desc)
+>>  int qemu_plugin_load_list(QemuPluginList *head)
+>>  {
+>>      struct qemu_plugin_desc *desc, *next;
+>> +    g_autofree qemu_info_t *info =3D g_new0(qemu_info_t, 1);
+>> +
+>> +    info->target_name =3D TARGET_NAME;
+>> +#ifndef CONFIG_USER_ONLY
+>> +    MachineState *ms =3D MACHINE(qdev_get_machine());
+>> +    info->system_emulation =3D true;
+>> +    info->system.smp_vcpus =3D ms->smp.cpus;
+>> +    info->system.max_vcpus =3D ms->smp.max_cpus;
+>> +#else
+>> +    info->system_emulation =3D false;
+>
+> Thinking "out loud" here - I wonder if it would be helpful to set the
+> *_vcpus variables even for user mode here. It might allow unconditional
+> allocation of "per-cpu" structures that the plugin might need - without
+> first needing to check whether the *_vcpus variables were valid.
+
+but what too? It would certainly be wrong because any user-space process
+could create (and destroy) thousands of threads.
+
+We could consider just asking plugins to deal with threads with their
+own __thread variables but in that case we'd need to expose some sort of
+thread exit/cleanup method so they can collect data from threads and
+safely place it somewhere else - but I suspect that is a hairy
+programming model to impose on plugins.
+
+So far all the example plugins have just used locks to serialise things
+and it's not been too bad. I guess we could do with an example that
+tries to use this information to get an idea of how grungy the interface
+is. Perhaps exposing the vCPUs at this point is pointless and we should
+just stick to TARGET_NAME for now?
+
+>
+> -Aaron
+
+
+--
+Alex Benn=C3=A9e
 
