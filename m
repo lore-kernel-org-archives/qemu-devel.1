@@ -2,85 +2,63 @@ Return-Path: <SRS0=ht5U=YL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_2 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 13B51CA9EA1
-	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 09:38:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BAF1CCA9EA1
+	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 09:42:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CED5021897
-	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 09:38:27 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="W5joDb6R"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CED5021897
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 7EF8C20820
+	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 09:42:50 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7EF8C20820
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37126 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37142 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iLOiJ-0000Hf-1v
-	for qemu-devel@archiver.kernel.org; Fri, 18 Oct 2019 05:38:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46937)
+	id 1iLOmX-00023Q-Mx
+	for qemu-devel@archiver.kernel.org; Fri, 18 Oct 2019 05:42:49 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47858)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <aleksandar.m.mail@gmail.com>) id 1iLOe3-0004S2-VH
- for qemu-devel@nongnu.org; Fri, 18 Oct 2019 05:34:05 -0400
+ (envelope-from <groug@kaod.org>) id 1iLOlj-0001Jw-Iu
+ for qemu-devel@nongnu.org; Fri, 18 Oct 2019 05:42:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aleksandar.m.mail@gmail.com>) id 1iLOe2-0007hc-HJ
- for qemu-devel@nongnu.org; Fri, 18 Oct 2019 05:34:03 -0400
-Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:35484)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
- id 1iLOe1-0007gz-Qe
- for qemu-devel@nongnu.org; Fri, 18 Oct 2019 05:34:01 -0400
-Received: by mail-ot1-x342.google.com with SMTP id z6so4431675otb.2
- for <qemu-devel@nongnu.org>; Fri, 18 Oct 2019 02:34:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:in-reply-to:references:from:date:message-id:subject:to
- :cc; bh=8kmGKBvA+pMQPbeVneluAYIicVpDPfuuiN2lYzvLGFY=;
- b=W5joDb6Rjcl2602j/Rjoiuwtu4mxydfJjiGCU9G08MoH2kOVU8N1joNJ0VEKOzm0Ni
- Fy0bW93fVZ0tsQ2kT6cjnTGbCTBSf/9QhHJlhWompWQCLbux2saYsa0tsnt4d5OLowGk
- IeEjUbzm783DNHpqIXLqXL9FgoAc/HXTKZm5E9tu7RvFIHW0QqtYui6gy1RbuZmgFqkm
- iXIoSySM+Q+TJOBf50OrPXtZpMw6b1FS2jZcuMviQf5MdG7swbWgNVr6URSx3ZDAULMo
- VxOeE3xAWgeiI3sM7ZZEB4TE28syIYtYeQ7QBGAqo/vXSrDTIkBcqFGc9pfRW9uNkPMv
- seGg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:in-reply-to:references:from:date
- :message-id:subject:to:cc;
- bh=8kmGKBvA+pMQPbeVneluAYIicVpDPfuuiN2lYzvLGFY=;
- b=baZpgPaFvIc+KgGOPbzgcmwdlM2FDJGoN1jJHUypV8rg8ZBFTNlz8cPGEbUOv16I+k
- SO5OWBeZxZSSNVRom/pEaFGfQy0SpOAfKI+AXp9On6eO4Iqjlv+g8D8hrdw4aVFYFzcY
- E0l7O4d1kXotBKzi4cx9B+QKk/aZh3pBOVn82cs23xy6J+3edYSD3dzNtmWvpqKUx6hQ
- wxlK4/kEqV4nI+g2zTAleMo8NvYxQTjMXpMJBGiHeC/mI6/RyqZiMyi2RCwfOVFUsUyW
- Rp1poV5NNBnNpZaCIqsYo+ZncstJG7lesmM8ahKPp1bY7IrIFENX6YgUlotYGIWdPC+t
- jbaw==
-X-Gm-Message-State: APjAAAVkqCvKQuVHU26IKRVwZ3j/ZGILts74e/DuqTYJHlFqyoKG+3ST
- 9P5KTteCjlj4tiKQs/L3QWmpn/KehceNU531hjo=
-X-Google-Smtp-Source: APXvYqyEuy4kvkbgBNCF1zQARF+H+MSyf/x3b0H3+IF5IOlbgKSSw5h6llJaNaTRCvCxy8pVlEw8pzwRvTjBSqDBtvs=
-X-Received: by 2002:a05:6830:1d8f:: with SMTP id
- y15mr6448632oti.121.1571391240977; 
- Fri, 18 Oct 2019 02:34:00 -0700 (PDT)
+ (envelope-from <groug@kaod.org>) id 1iLOlh-0002L6-NH
+ for qemu-devel@nongnu.org; Fri, 18 Oct 2019 05:41:59 -0400
+Received: from 20.mo1.mail-out.ovh.net ([188.165.45.168]:57547)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <groug@kaod.org>) id 1iLOlh-0002KE-Cj
+ for qemu-devel@nongnu.org; Fri, 18 Oct 2019 05:41:57 -0400
+Received: from player716.ha.ovh.net (unknown [10.109.160.106])
+ by mo1.mail-out.ovh.net (Postfix) with ESMTP id E8185194CC5
+ for <qemu-devel@nongnu.org>; Fri, 18 Oct 2019 11:41:54 +0200 (CEST)
+Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
+ [82.253.208.248]) (Authenticated sender: groug@kaod.org)
+ by player716.ha.ovh.net (Postfix) with ESMTPSA id 41E39B111E63;
+ Fri, 18 Oct 2019 09:41:48 +0000 (UTC)
+Date: Fri, 18 Oct 2019 11:41:46 +0200
+From: Greg Kurz <groug@kaod.org>
+To: David Gibson <david@gibson.dropbear.id.au>
+Subject: Re: [PATCH 1/2] spapr: Introduce a interrupt presenter reset handler
+Message-ID: <20191018114146.3fe2f60d@bahia.lan>
+In-Reply-To: <20191018024707.GB2000@umbus.fritz.box>
+References: <20191017144241.12522-1-clg@kaod.org>
+ <20191017144241.12522-2-clg@kaod.org>
+ <20191018024707.GB2000@umbus.fritz.box>
+X-Mailer: Claws Mail 3.17.4 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-Received: by 2002:a9d:340a:0:0:0:0:0 with HTTP; Fri, 18 Oct 2019 02:34:00
- -0700 (PDT)
-In-Reply-To: <20191015162705.28087-32-philmd@redhat.com>
-References: <20191015162705.28087-1-philmd@redhat.com>
- <20191015162705.28087-32-philmd@redhat.com>
-From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
-Date: Fri, 18 Oct 2019 11:34:00 +0200
-Message-ID: <CAL1e-=j78xuEhqdHaXn9StE=3M4VBx+yimosTMP6VtgCo0GuGw@mail.gmail.com>
-Subject: Re: [PATCH 31/32] hw/pci-host: Rename incorrectly named 'piix' as
- 'i440fx'
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
-Content-Type: multipart/alternative; boundary="000000000000b8c01d05952c080b"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::342
+Content-Type: multipart/signed; boundary="Sig_/zZ7miGw67LAU9P1TpW=q.Zs";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
+X-Ovh-Tracer-Id: 9863446137521674726
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrjeelgddujecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 188.165.45.168
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -92,214 +70,319 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
- Stefano Stabellini <sstabellini@kernel.org>,
- Eduardo Habkost <ehabkost@redhat.com>,
- "kvm@vger.kernel.org" <kvm@vger.kernel.org>, Paul Durrant <paul@xen.org>,
- "Michael S. Tsirkin" <mst@redhat.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>,
- Igor Mammedov <imammedo@redhat.com>,
- =?UTF-8?Q?Herv=C3=A9_Poussineau?= <hpoussin@reactos.org>,
- Aleksandar Markovic <amarkovic@wavecomp.com>,
- "xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>,
- Anthony Perard <anthony.perard@citrix.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
- Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
- Aurelien Jarno <aurelien@aurel32.net>, Richard Henderson <rth@twiddle.net>
+Cc: qemu-ppc@nongnu.org, =?UTF-8?B?Q8OpZHJpYw==?= Le Goater <clg@kaod.org>,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---000000000000b8c01d05952c080b
-Content-Type: text/plain; charset="UTF-8"
+--Sig_/zZ7miGw67LAU9P1TpW=q.Zs
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 
-On Tuesday, October 15, 2019, Philippe Mathieu-Daud=C3=A9 <philmd@redhat.co=
-m>
-wrote:
+On Fri, 18 Oct 2019 13:47:07 +1100
+David Gibson <david@gibson.dropbear.id.au> wrote:
 
-> From: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
->
-> We moved all the PIIX3 southbridge code out of hw/pci-host/piix.c,
-> it now only contains i440FX northbridge code.
-> Rename it to match the chipset modelled.
->
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-> ---
->  MAINTAINERS                      | 2 +-
->  hw/i386/Kconfig                  | 2 +-
->  hw/pci-host/Kconfig              | 2 +-
->  hw/pci-host/Makefile.objs        | 2 +-
->  hw/pci-host/{piix.c =3D> i440fx.c} | 0
->  5 files changed, 4 insertions(+), 4 deletions(-)
->  rename hw/pci-host/{piix.c =3D> i440fx.c} (100%)
->
->
+> On Thu, Oct 17, 2019 at 04:42:40PM +0200, C=C3=A9dric Le Goater wrote:
+> > The interrupt presenters are not reseted today.
+>=20
+> I don't think that's accurate.  We register reset handlers for both
+> ICP and TCTX already.  We might not be resetting in quite the right
+> order, but this will need a clearer description of what's changing.
+>=20
+> Also, with this patch as is, I think we'll reset twice (once from the
+> registered handler, once via the cpu).
+>=20
 
-Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+That makes three at first boot since we also reset the CPU during
+realize :) But yes, if we go that way, we should probably change
+the pnv machine to do the same and stop registering reset handlers.
+
+> > Extend the sPAPR IRQ
+> > backend with a new cpu_intc_reset() handler which will be called by
+> > the CPU reset handler.
+> >=20
+> > spapr_realize_vcpu() is modified to call the CPU reset only after the
+> > the intc presenter has been created.
+> >=20
+> > Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
+> > ---
+> >  include/hw/ppc/spapr_irq.h |  4 ++++
+> >  include/hw/ppc/xics.h      |  1 +
+> >  include/hw/ppc/xive.h      |  1 +
+> >  hw/intc/spapr_xive.c       |  8 ++++++++
+> >  hw/intc/xics.c             |  5 +++++
+> >  hw/intc/xics_spapr.c       |  8 ++++++++
+> >  hw/intc/xive.c             | 11 ++++++++---
+> >  hw/ppc/spapr_cpu_core.c    |  8 ++++++--
+> >  hw/ppc/spapr_irq.c         | 21 +++++++++++++++++++++
+> >  9 files changed, 62 insertions(+), 5 deletions(-)
+> >=20
+> > diff --git a/include/hw/ppc/spapr_irq.h b/include/hw/ppc/spapr_irq.h
+> > index 5e150a667902..78327496c102 100644
+> > --- a/include/hw/ppc/spapr_irq.h
+> > +++ b/include/hw/ppc/spapr_irq.h
+> > @@ -52,6 +52,8 @@ typedef struct SpaprInterruptControllerClass {
+> >       */
+> >      int (*cpu_intc_create)(SpaprInterruptController *intc,
+> >                              PowerPCCPU *cpu, Error **errp);
+> > +    int (*cpu_intc_reset)(SpaprInterruptController *intc, PowerPCCPU *=
+cpu,
+> > +                          Error **errp);
+> >      int (*claim_irq)(SpaprInterruptController *intc, int irq, bool lsi,
+> >                       Error **errp);
+> >      void (*free_irq)(SpaprInterruptController *intc, int irq);
+> > @@ -68,6 +70,8 @@ void spapr_irq_update_active_intc(SpaprMachineState *=
+spapr);
+> > =20
+> >  int spapr_irq_cpu_intc_create(SpaprMachineState *spapr,
+> >                                PowerPCCPU *cpu, Error **errp);
+> > +int spapr_irq_cpu_intc_reset(SpaprMachineState *spapr,
+> > +                             PowerPCCPU *cpu, Error **errp);
+> >  void spapr_irq_print_info(SpaprMachineState *spapr, Monitor *mon);
+> >  void spapr_irq_dt(SpaprMachineState *spapr, uint32_t nr_servers,
+> >                    void *fdt, uint32_t phandle);
+> > diff --git a/include/hw/ppc/xics.h b/include/hw/ppc/xics.h
+> > index 1e6a9300eb2b..602173c12250 100644
+> > --- a/include/hw/ppc/xics.h
+> > +++ b/include/hw/ppc/xics.h
+> > @@ -161,6 +161,7 @@ void icp_set_mfrr(ICPState *icp, uint8_t mfrr);
+> >  uint32_t icp_accept(ICPState *ss);
+> >  uint32_t icp_ipoll(ICPState *ss, uint32_t *mfrr);
+> >  void icp_eoi(ICPState *icp, uint32_t xirr);
+> > +void icp_reset(ICPState *icp);
+> > =20
+> >  void ics_write_xive(ICSState *ics, int nr, int server,
+> >                      uint8_t priority, uint8_t saved_priority);
+> > diff --git a/include/hw/ppc/xive.h b/include/hw/ppc/xive.h
+> > index fd3319bd3202..99381639f50c 100644
+> > --- a/include/hw/ppc/xive.h
+> > +++ b/include/hw/ppc/xive.h
+> > @@ -415,6 +415,7 @@ uint64_t xive_tctx_tm_read(XiveTCTX *tctx, hwaddr o=
+ffset, unsigned size);
+> > =20
+> >  void xive_tctx_pic_print_info(XiveTCTX *tctx, Monitor *mon);
+> >  Object *xive_tctx_create(Object *cpu, XiveRouter *xrtr, Error **errp);
+> > +void xive_tctx_reset(XiveTCTX *tctx);
+> > =20
+> >  static inline uint32_t xive_nvt_cam_line(uint8_t nvt_blk, uint32_t nvt=
+_idx)
+> >  {
+> > diff --git a/hw/intc/spapr_xive.c b/hw/intc/spapr_xive.c
+> > index ba32d2cc5b0f..0c3acf1a4192 100644
+> > --- a/hw/intc/spapr_xive.c
+> > +++ b/hw/intc/spapr_xive.c
+> > @@ -553,6 +553,13 @@ static int spapr_xive_cpu_intc_create(SpaprInterru=
+ptController *intc,
+> >      return 0;
+> >  }
+> > =20
+> > +static int spapr_xive_cpu_intc_reset(SpaprInterruptController *intc,
+> > +                                     PowerPCCPU *cpu, Error **errp)
+> > +{
+> > +    xive_tctx_reset(spapr_cpu_state(cpu)->tctx);
+> > +    return 0;
+> > +}
+> > +
+> >  static void spapr_xive_set_irq(SpaprInterruptController *intc, int irq=
+, int val)
+> >  {
+> >      SpaprXive *xive =3D SPAPR_XIVE(intc);
+> > @@ -697,6 +704,7 @@ static void spapr_xive_class_init(ObjectClass *klas=
+s, void *data)
+> >      sicc->activate =3D spapr_xive_activate;
+> >      sicc->deactivate =3D spapr_xive_deactivate;
+> >      sicc->cpu_intc_create =3D spapr_xive_cpu_intc_create;
+> > +    sicc->cpu_intc_reset =3D spapr_xive_cpu_intc_reset;
+> >      sicc->claim_irq =3D spapr_xive_claim_irq;
+> >      sicc->free_irq =3D spapr_xive_free_irq;
+> >      sicc->set_irq =3D spapr_xive_set_irq;
+> > diff --git a/hw/intc/xics.c b/hw/intc/xics.c
+> > index b5ac408f7b74..652771d6a5a5 100644
+> > --- a/hw/intc/xics.c
+> > +++ b/hw/intc/xics.c
+> > @@ -295,6 +295,11 @@ static void icp_reset_handler(void *dev)
+> >      }
+> >  }
+> > =20
+> > +void icp_reset(ICPState *icp)
+> > +{
+> > +    icp_reset_handler(icp);
+> > +}
+> > +
+> >  static void icp_realize(DeviceState *dev, Error **errp)
+> >  {
+> >      ICPState *icp =3D ICP(dev);
+> > diff --git a/hw/intc/xics_spapr.c b/hw/intc/xics_spapr.c
+> > index 4f64b9a9fc66..c0b2a576effe 100644
+> > --- a/hw/intc/xics_spapr.c
+> > +++ b/hw/intc/xics_spapr.c
+> > @@ -346,6 +346,13 @@ static int xics_spapr_cpu_intc_create(SpaprInterru=
+ptController *intc,
+> >      return 0;
+> >  }
+> > =20
+> > +static int xics_spapr_cpu_intc_reset(SpaprInterruptController *intc,
+> > +                                     PowerPCCPU *cpu, Error **errp)
+> > +{
+> > +    icp_reset(spapr_cpu_state(cpu)->icp);
+> > +    return 0;
+> > +}
+> > +
+> >  static int xics_spapr_claim_irq(SpaprInterruptController *intc, int ir=
+q,
+> >                                  bool lsi, Error **errp)
+> >  {
+> > @@ -433,6 +440,7 @@ static void ics_spapr_class_init(ObjectClass *klass=
+, void *data)
+> >      sicc->activate =3D xics_spapr_activate;
+> >      sicc->deactivate =3D xics_spapr_deactivate;
+> >      sicc->cpu_intc_create =3D xics_spapr_cpu_intc_create;
+> > +    sicc->cpu_intc_reset =3D xics_spapr_cpu_intc_reset;
+> >      sicc->claim_irq =3D xics_spapr_claim_irq;
+> >      sicc->free_irq =3D xics_spapr_free_irq;
+> >      sicc->set_irq =3D xics_spapr_set_irq;
+> > diff --git a/hw/intc/xive.c b/hw/intc/xive.c
+> > index d420c6571e14..0ae3f9b1efe4 100644
+> > --- a/hw/intc/xive.c
+> > +++ b/hw/intc/xive.c
+> > @@ -547,7 +547,7 @@ void xive_tctx_pic_print_info(XiveTCTX *tctx, Monit=
+or *mon)
+> >      }
+> >  }
+> > =20
+> > -static void xive_tctx_reset(void *dev)
+> > +static void xive_tctx_reset_handler(void *dev)
+> >  {
+> >      XiveTCTX *tctx =3D XIVE_TCTX(dev);
+> > =20
+> > @@ -568,6 +568,11 @@ static void xive_tctx_reset(void *dev)
+> >          ipb_to_pipr(tctx->regs[TM_QW3_HV_PHYS + TM_IPB]);
+> >  }
+> > =20
+> > +void xive_tctx_reset(XiveTCTX *tctx)
+> > +{
+> > +    xive_tctx_reset_handler(tctx);
+> > +}
+> > +
+> >  static void xive_tctx_realize(DeviceState *dev, Error **errp)
+> >  {
+> >      XiveTCTX *tctx =3D XIVE_TCTX(dev);
+> > @@ -608,12 +613,12 @@ static void xive_tctx_realize(DeviceState *dev, E=
+rror **errp)
+> >          }
+> >      }
+> > =20
+> > -    qemu_register_reset(xive_tctx_reset, dev);
+> > +    qemu_register_reset(xive_tctx_reset_handler, dev);
+> >  }
+> > =20
+> >  static void xive_tctx_unrealize(DeviceState *dev, Error **errp)
+> >  {
+> > -    qemu_unregister_reset(xive_tctx_reset, dev);
+> > +    qemu_unregister_reset(xive_tctx_reset_handler, dev);
+> >  }
+> > =20
+> >  static int vmstate_xive_tctx_pre_save(void *opaque)
+> > diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
+> > index 3e4302c7d596..416aa75e5fba 100644
+> > --- a/hw/ppc/spapr_cpu_core.c
+> > +++ b/hw/ppc/spapr_cpu_core.c
+> > @@ -33,6 +33,7 @@ static void spapr_cpu_reset(void *opaque)
+> >      PowerPCCPUClass *pcc =3D POWERPC_CPU_GET_CLASS(cpu);
+> >      SpaprCpuState *spapr_cpu =3D spapr_cpu_state(cpu);
+> >      target_ulong lpcr;
+> > +    SpaprMachineState *spapr =3D SPAPR_MACHINE(qdev_get_machine());
+> > =20
+> >      cpu_reset(cs);
+> > =20
+> > @@ -77,9 +78,11 @@ static void spapr_cpu_reset(void *opaque)
+> >      spapr_cpu->dtl_addr =3D 0;
+> >      spapr_cpu->dtl_size =3D 0;
+> > =20
+> > -    spapr_caps_cpu_apply(SPAPR_MACHINE(qdev_get_machine()), cpu);
+> > +    spapr_caps_cpu_apply(spapr, cpu);
+> > =20
+> >      kvm_check_mmu(cpu, &error_fatal);
+> > +
+> > +    spapr_irq_cpu_intc_reset(spapr, cpu, &error_fatal);
+> >  }
+> > =20
+> >  void spapr_cpu_set_entry_state(PowerPCCPU *cpu, target_ulong nip, targ=
+et_ulong r3)
+> > @@ -235,12 +238,13 @@ static void spapr_realize_vcpu(PowerPCCPU *cpu, S=
+paprMachineState *spapr,
+> >      kvmppc_set_papr(cpu);
+> > =20
+> >      qemu_register_reset(spapr_cpu_reset, cpu);
+> > -    spapr_cpu_reset(cpu);
+> > =20
+> >      if (spapr_irq_cpu_intc_create(spapr, cpu, &local_err) < 0) {
+> >          goto error_unregister;
+> >      }
+> > =20
+> > +    spapr_cpu_reset(cpu);
+> > +
+> >      if (!sc->pre_3_0_migration) {
+> >          vmstate_register(NULL, cs->cpu_index, &vmstate_spapr_cpu_state,
+> >                           cpu->machine_data);
+> > diff --git a/hw/ppc/spapr_irq.c b/hw/ppc/spapr_irq.c
+> > index bb91c61fa000..5d2b64029cd5 100644
+> > --- a/hw/ppc/spapr_irq.c
+> > +++ b/hw/ppc/spapr_irq.c
+> > @@ -220,6 +220,27 @@ int spapr_irq_cpu_intc_create(SpaprMachineState *s=
+papr,
+> >      return 0;
+> >  }
+> > =20
+> > +int spapr_irq_cpu_intc_reset(SpaprMachineState *spapr,
+> > +                             PowerPCCPU *cpu, Error **errp)
+> > +{
+> > +    SpaprInterruptController *intcs[] =3D ALL_INTCS(spapr);
+> > +    int i;
+> > +    int rc;
+> > +
+> > +    for (i =3D 0; i < ARRAY_SIZE(intcs); i++) {
+> > +        SpaprInterruptController *intc =3D intcs[i];
+> > +        if (intc) {
+> > +            SpaprInterruptControllerClass *sicc =3D SPAPR_INTC_GET_CLA=
+SS(intc);
+> > +            rc =3D sicc->cpu_intc_reset(intc, cpu, errp);
+> > +            if (rc < 0) {
+> > +                return rc;
+> > +            }
+> > +        }
+> > +    }
+> > +
+> > +    return 0;
+> > +}
+> > +
+> >  static void spapr_set_irq(void *opaque, int irq, int level)
+> >  {
+> >      SpaprMachineState *spapr =3D SPAPR_MACHINE(opaque);
+>=20
 
 
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index 4845f47d93..1bc9959b8a 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -1225,7 +1225,7 @@ M: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
->  S: Supported
->  F: include/hw/i386/
->  F: hw/i386/
-> -F: hw/pci-host/piix.c
-> +F: hw/pci-host/i440fx.c
->  F: hw/pci-host/q35.c
->  F: hw/pci-host/pam.c
->  F: include/hw/pci-host/i440fx.h
-> diff --git a/hw/i386/Kconfig b/hw/i386/Kconfig
-> index 589d75e26a..cfe94aede7 100644
-> --- a/hw/i386/Kconfig
-> +++ b/hw/i386/Kconfig
-> @@ -60,7 +60,7 @@ config I440FX
->      select PC_PCI
->      select PC_ACPI
->      select ACPI_SMBUS
-> -    select PCI_PIIX
-> +    select PCI_I440FX
->      select PIIX3
->      select IDE_PIIX
->      select DIMM
-> diff --git a/hw/pci-host/Kconfig b/hw/pci-host/Kconfig
-> index 397043b289..b0aa8351c4 100644
-> --- a/hw/pci-host/Kconfig
-> +++ b/hw/pci-host/Kconfig
-> @@ -28,7 +28,7 @@ config PCI_SABRE
->      select PCI
->      bool
->
-> -config PCI_PIIX
-> +config PCI_I440FX
->      bool
->      select PCI
->      select PAM
-> diff --git a/hw/pci-host/Makefile.objs b/hw/pci-host/Makefile.objs
-> index a9cd3e022d..efd752b766 100644
-> --- a/hw/pci-host/Makefile.objs
-> +++ b/hw/pci-host/Makefile.objs
-> @@ -13,7 +13,7 @@ common-obj-$(CONFIG_VERSATILE_PCI) +=3D versatile.o
->
->  common-obj-$(CONFIG_PCI_SABRE) +=3D sabre.o
->  common-obj-$(CONFIG_FULONG) +=3D bonito.o
-> -common-obj-$(CONFIG_PCI_PIIX) +=3D piix.o
-> +common-obj-$(CONFIG_PCI_I440FX) +=3D i440fx.o
->  common-obj-$(CONFIG_PCI_EXPRESS_Q35) +=3D q35.o
->  common-obj-$(CONFIG_PCI_EXPRESS_GENERIC_BRIDGE) +=3D gpex.o
->  common-obj-$(CONFIG_PCI_EXPRESS_XILINX) +=3D xilinx-pcie.o
-> diff --git a/hw/pci-host/piix.c b/hw/pci-host/i440fx.c
-> similarity index 100%
-> rename from hw/pci-host/piix.c
-> rename to hw/pci-host/i440fx.c
-> --
-> 2.21.0
->
->
->
+--Sig_/zZ7miGw67LAU9P1TpW=q.Zs
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
 
---000000000000b8c01d05952c080b
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+-----BEGIN PGP SIGNATURE-----
 
-<br><br>On Tuesday, October 15, 2019, Philippe Mathieu-Daud=C3=A9 &lt;<a hr=
-ef=3D"mailto:philmd@redhat.com">philmd@redhat.com</a>&gt; wrote:<br><blockq=
-uote class=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;border-left:1px #ccc =
-solid;padding-left:1ex">From: Philippe Mathieu-Daud=C3=A9 &lt;<a href=3D"ma=
-ilto:f4bug@amsat.org">f4bug@amsat.org</a>&gt;<br>
-<br>
-We moved all the PIIX3 southbridge code out of hw/pci-host/piix.c,<br>
-it now only contains i440FX northbridge code.<br>
-Rename it to match the chipset modelled.<br>
-<br>
-Signed-off-by: Philippe Mathieu-Daud=C3=A9 &lt;<a href=3D"mailto:philmd@red=
-hat.com">philmd@redhat.com</a>&gt;<br>
----<br>
-=C2=A0MAINTAINERS=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 =C2=A0 =C2=A0 | 2 +-<br>
-=C2=A0hw/i386/Kconfig=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 | 2 +-<br>
-=C2=A0hw/pci-host/Kconfig=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 |=
- 2 +-<br>
-=C2=A0hw/pci-host/Makefile.objs=C2=A0 =C2=A0 =C2=A0 =C2=A0 | 2 +-<br>
-=C2=A0hw/pci-host/{piix.c =3D&gt; i440fx.c} | 0<br>
-=C2=A05 files changed, 4 insertions(+), 4 deletions(-)<br>
-=C2=A0rename hw/pci-host/{piix.c =3D&gt; i440fx.c} (100%)<br>
-<br></blockquote><div><br></div><div><br></div><div><span style=3D"color:rg=
-b(34,34,34);font-size:14px;line-height:22.1200008392334px">Reviewed-by: Ale=
-ksandar Markovic &lt;</span><a href=3D"mailto:amarkovic@wavecomp.com" targe=
-t=3D"_blank" style=3D"font-size:14px;line-height:22.1200008392334px">amarko=
-vic@wavecomp.com</a><span style=3D"color:rgb(34,34,34);font-size:14px;line-=
-height:22.1200008392334px">&gt;</span><br></div><div>=C2=A0</div><blockquot=
-e class=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;border-left:1px #ccc sol=
-id;padding-left:1ex">
-diff --git a/MAINTAINERS b/MAINTAINERS<br>
-index 4845f47d93..1bc9959b8a 100644<br>
---- a/MAINTAINERS<br>
-+++ b/MAINTAINERS<br>
-@@ -1225,7 +1225,7 @@ M: Marcel Apfelbaum &lt;<a href=3D"mailto:marcel.apfe=
-lbaum@gmail.com">marcel.apfelbaum@gmail.com</a>&gt;<br>
-=C2=A0S: Supported<br>
-=C2=A0F: include/hw/i386/<br>
-=C2=A0F: hw/i386/<br>
--F: hw/pci-host/piix.c<br>
-+F: hw/pci-host/i440fx.c<br>
-=C2=A0F: hw/pci-host/q35.c<br>
-=C2=A0F: hw/pci-host/pam.c<br>
-=C2=A0F: include/hw/pci-host/i440fx.h<br>
-diff --git a/hw/i386/Kconfig b/hw/i386/Kconfig<br>
-index 589d75e26a..cfe94aede7 100644<br>
---- a/hw/i386/Kconfig<br>
-+++ b/hw/i386/Kconfig<br>
-@@ -60,7 +60,7 @@ config I440FX<br>
-=C2=A0 =C2=A0 =C2=A0select PC_PCI<br>
-=C2=A0 =C2=A0 =C2=A0select PC_ACPI<br>
-=C2=A0 =C2=A0 =C2=A0select ACPI_SMBUS<br>
--=C2=A0 =C2=A0 select PCI_PIIX<br>
-+=C2=A0 =C2=A0 select PCI_I440FX<br>
-=C2=A0 =C2=A0 =C2=A0select PIIX3<br>
-=C2=A0 =C2=A0 =C2=A0select IDE_PIIX<br>
-=C2=A0 =C2=A0 =C2=A0select DIMM<br>
-diff --git a/hw/pci-host/Kconfig b/hw/pci-host/Kconfig<br>
-index 397043b289..b0aa8351c4 100644<br>
---- a/hw/pci-host/Kconfig<br>
-+++ b/hw/pci-host/Kconfig<br>
-@@ -28,7 +28,7 @@ config PCI_SABRE<br>
-=C2=A0 =C2=A0 =C2=A0select PCI<br>
-=C2=A0 =C2=A0 =C2=A0bool<br>
-<br>
--config PCI_PIIX<br>
-+config PCI_I440FX<br>
-=C2=A0 =C2=A0 =C2=A0bool<br>
-=C2=A0 =C2=A0 =C2=A0select PCI<br>
-=C2=A0 =C2=A0 =C2=A0select PAM<br>
-diff --git a/hw/pci-host/Makefile.objs b/hw/pci-host/Makefile.objs<br>
-index a9cd3e022d..efd752b766 100644<br>
---- a/hw/pci-host/Makefile.objs<br>
-+++ b/hw/pci-host/Makefile.objs<br>
-@@ -13,7 +13,7 @@ common-obj-$(CONFIG_VERSATILE_<wbr>PCI) +=3D versatile.o<=
-br>
-<br>
-=C2=A0common-obj-$(CONFIG_PCI_SABRE) +=3D sabre.o<br>
-=C2=A0common-obj-$(CONFIG_FULONG) +=3D bonito.o<br>
--common-obj-$(CONFIG_PCI_PIIX) +=3D piix.o<br>
-+common-obj-$(CONFIG_PCI_<wbr>I440FX) +=3D i440fx.o<br>
-=C2=A0common-obj-$(CONFIG_PCI_<wbr>EXPRESS_Q35) +=3D q35.o<br>
-=C2=A0common-obj-$(CONFIG_PCI_<wbr>EXPRESS_GENERIC_BRIDGE) +=3D gpex.o<br>
-=C2=A0common-obj-$(CONFIG_PCI_<wbr>EXPRESS_XILINX) +=3D xilinx-pcie.o<br>
-diff --git a/hw/pci-host/piix.c b/hw/pci-host/i440fx.c<br>
-similarity index 100%<br>
-rename from hw/pci-host/piix.c<br>
-rename to hw/pci-host/i440fx.c<br>
--- <br>
-2.21.0<br>
-<br>
-<br>
-</blockquote>
+iQIzBAEBCAAdFiEEtIKLr5QxQM7yo0kQcdTV5YIvc9YFAl2piNsACgkQcdTV5YIv
+c9YfpBAAj9/OEFH/Cjw9VBmB1bDW7ujfrDWfOVUOmn4O2NlMSbW5I21QlGdA8DBa
+z/Gf0ebmyRilIkIOVzHo6jd7EKtvtsJvh49BlVoHH00MT6O1NBZfDyNqsNhgDfAV
+5IfCRlRmFnkq/dNZEbC4EMdIwTujDASIezd6W5yBoIsZSpxndQlzzhmX3nzq/AM6
+bZfMFZhQ6PK1kzLIdCoSFJO7GjTiBllPpGnsKfI5/dqoVOCxnu6vhUGLxq12Ud1P
+W+okFfpkmZRIiX5Ua1PDEQ2N2p2m0//YQFf3gj1qTexcudCtOlIoZVCO+8S+9XV3
+PdGrmdSjukNN06JocOh2DZvpy9hsvV8bbvR0miaBCAlhBp00LQ5fXKmkeORRhK1f
+U6yYGhjfPwuNtaACNBmMiEYxlSBgaEKaBU1UePhjL+i5M+42Vs6juynKpWdWFXEk
+oboeXJ+IswnjPkV9LhTtLOgvhq55eyM37A0wL0h8BXFi1Hz1gr1Vp8dsq8d30WrF
+iX006OM1sWr2i5yTP4R5BAYTd4Uai61DWrjcqmpuv8AXna8ck04isjz19ieSaarm
+N/dF2vghyeOJ9urNMp3l8K9FsDb7ScbyWI6kVJwv/R0dLXE7GzuKQTFPz1oDH/nK
+S0k5OyT2ffWgC7LIcyTivmE//yZQnkzxca0+0RAi0Pze2JdXDCk=
+=eTaD
+-----END PGP SIGNATURE-----
 
---000000000000b8c01d05952c080b--
+--Sig_/zZ7miGw67LAU9P1TpW=q.Zs--
 
