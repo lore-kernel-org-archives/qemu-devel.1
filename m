@@ -2,92 +2,91 @@ Return-Path: <SRS0=ht5U=YL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.0 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 49622CA9EA0
-	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 10:06:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C947ACA9EA1
+	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 10:09:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1860220663
-	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 10:06:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 977C4222CE
+	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 10:09:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Rg71yZOy"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1860220663
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DF2FV5kU"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 977C4222CE
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37480 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37498 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iLP96-0001BW-9s
-	for qemu-devel@archiver.kernel.org; Fri, 18 Oct 2019 06:06:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51848)
+	id 1iLPCj-0002lK-PZ
+	for qemu-devel@archiver.kernel.org; Fri, 18 Oct 2019 06:09:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52332)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <stefanha@gmail.com>) id 1iLP88-0000QA-07
- for qemu-devel@nongnu.org; Fri, 18 Oct 2019 06:05:10 -0400
+ (envelope-from <stefanha@gmail.com>) id 1iLPC6-0002JF-Ji
+ for qemu-devel@nongnu.org; Fri, 18 Oct 2019 06:09:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <stefanha@gmail.com>) id 1iLP86-00058P-GM
- for qemu-devel@nongnu.org; Fri, 18 Oct 2019 06:05:07 -0400
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:38088)
+ (envelope-from <stefanha@gmail.com>) id 1iLPC5-0007rd-La
+ for qemu-devel@nongnu.org; Fri, 18 Oct 2019 06:09:14 -0400
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:38964)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1iLP86-000587-6o
- for qemu-devel@nongnu.org; Fri, 18 Oct 2019 06:05:06 -0400
-Received: by mail-wr1-x442.google.com with SMTP id o15so5150529wru.5
- for <qemu-devel@nongnu.org>; Fri, 18 Oct 2019 03:05:06 -0700 (PDT)
+ (Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1iLPC5-0007rG-FL
+ for qemu-devel@nongnu.org; Fri, 18 Oct 2019 06:09:13 -0400
+Received: by mail-wr1-x441.google.com with SMTP id r3so5606714wrj.6
+ for <qemu-devel@nongnu.org>; Fri, 18 Oct 2019 03:09:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=date:from:to:cc:subject:message-id:references:mime-version
  :content-disposition:in-reply-to:user-agent;
- bh=doHzIrn7ThOeSoMQbOIYfqyXITXPZKqan6tlP2+KfHk=;
- b=Rg71yZOye0jXOicviISRhidAEEqBTSBT8NKI2r5egC88ZrmwV5p+BMnYcUcrbBDUhs
- PcMKhwVMftO0yXcj5Jux4Rr2vOqt0pZnxMDapfmVQiIlCQa8qgI5w0RdoH2yYZnyOfVB
- ci50y1w13kNzjIpPukl943w6Tzjeh4GfhbJwZoYz3lk1qGDfj4qwECyXAtpwlXLvkMDq
- E2P1BtHDkHiV7dr6R13SRRTeiAdcfwCMYNRoKIaj/r8AxAXq3/Pj7F+eAOKJlfNq/4nx
- iNy8e9cFlMifMRMf+5Z3h+P+1CJoId+mu0HBhm8EGRF/3j+x/GfDMQv93ud+Vv2WIJBa
- mgpw==
+ bh=Jlq9FZcvZf1xuE9ojcvY5JlBHqwm16Z+6mIUoj9IPzM=;
+ b=DF2FV5kUcyitm5oZPiUc2ykgH0BQy8b0fX7wXHXDgYvAiUuhxxBpi0KJsjt57Tpban
+ 0hWI8ILTGkrl4whQuwNi/QBoV5mApDPxyiAHGRV1CnkvBToqNfeId622UWt6dp2ps59j
+ E8kBZKnkjAvuBxwj3SGQLonltN0a5hUowxJDk/4kIk6n2Wcx+wa7iXMrzK0tOBlT6nZ7
+ VzfATyh4BcrKfAYrpvfXudNXU7hM/Xcs/PABv/8ZOgy22VAjyWaxa21oJavO6jLE0b6W
+ OXxvJgCU56Sd60esaDUDQPbVRMgyaM0yo2P3CTmUiUwgQSJZEP2yJuVSpnFhSHvI9Hqb
+ pkng==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
  :mime-version:content-disposition:in-reply-to:user-agent;
- bh=doHzIrn7ThOeSoMQbOIYfqyXITXPZKqan6tlP2+KfHk=;
- b=jBw5pDRkyykLuBblgo+R6h14RsFgHnJ8rz4ufXdMndTEnAVgZ8Xc3RCp+SSttvkSSQ
- xcIOi5HYBq/+jAuKZGR9Q7GgsnrKTLwjHC1yyxz1WiDm869eQKpB8yIJxmmwrWuSm6pj
- kgZEy323DuZtn7SoJiLPXc9BCWkb98H5vrwxnMFfO0xFNKnQNcZsW5BZYlUgQ+vJ+Eyk
- oWW+uw7eyN68S/OOLjs9x3qS0yX7nw2cKqFXKTtOasIsZmL6ND2glMuHIsR/EHFXOeP2
- LSu+D3zpRfZJ7C0k3E0bbVx3skOffFBJpMfRmwpkdFCgTrejmdC/5mtxQ2oRyHEVPLPh
- Xjfw==
-X-Gm-Message-State: APjAAAXuRJQKgpqEm3YlFu5qQuLaxeVIdRKczOqpoUwys7ljyaHBm86O
- EIGYwzCykLz81MzLup5aTIM=
-X-Google-Smtp-Source: APXvYqy9wHFamy7WPcZO6knwkk2u8MYI/DUDYv82ZSO5Wq0uayOa4Nvh9h8YjKbAsW22rwJYzYxfbA==
-X-Received: by 2002:adf:fe12:: with SMTP id n18mr7468171wrr.114.1571393104639; 
- Fri, 18 Oct 2019 03:05:04 -0700 (PDT)
+ bh=Jlq9FZcvZf1xuE9ojcvY5JlBHqwm16Z+6mIUoj9IPzM=;
+ b=XwK7lEpj0q2R7Ux+RyB5rY7bE6XPk3Z5t0SdfeXaYlROF2AwBlt+DtTmvCdnO/t3HL
+ yuGHcH7t/dClgw/98tt/Kas8zAGHJnqOz0BWOs3KkaB/XCCjpVwRCdMTstd1qwuZRJjB
+ swJVw1agFhI9HkmW61gPiHOclodINgW66jjHaw9jOE7Qpd9MQVX9as5GLBZCo78nIWtx
+ 3DEEcfEfUwilIEZRFvgcrMkO21GFo9wXq3zS/X5pmNBrrTahAf9R7IFQ2+X012WjCdDY
+ CcowVCtzQ97zHqiciredLpfYMF6VjD8jyhF+qsPTvCFfpc/m8vAG4ntsg0hHA0mTWij5
+ YoNg==
+X-Gm-Message-State: APjAAAUv9QhktjQsE42NZ89bYP3gTVKx0DmYvgscmXJ25hqPy6cXoK2K
+ s0iThbTgMFL8t6V3k8JjYyI=
+X-Google-Smtp-Source: APXvYqyt9B0RBlUcRDg7Gx/W7jLab4kkuohNtIpTuUqeEzV5piRUdi7bKuBQaXI/1Vc4iRpRmJ7HyA==
+X-Received: by 2002:adf:9c81:: with SMTP id d1mr6779098wre.238.1571393352116; 
+ Fri, 18 Oct 2019 03:09:12 -0700 (PDT)
 Received: from localhost ([51.15.41.238])
- by smtp.gmail.com with ESMTPSA id t16sm4444732wrq.52.2019.10.18.03.05.03
+ by smtp.gmail.com with ESMTPSA id v11sm4474454wml.30.2019.10.18.03.09.10
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 18 Oct 2019 03:05:03 -0700 (PDT)
-Date: Fri, 18 Oct 2019 11:05:01 +0100
+ Fri, 18 Oct 2019 03:09:11 -0700 (PDT)
+Date: Fri, 18 Oct 2019 11:09:09 +0100
 From: Stefan Hajnoczi <stefanha@gmail.com>
-To: Thomas Huth <thuth@redhat.com>
-Subject: Re: [PATCH v2 7/7] libqos: add VIRTIO PCI 1.0 support
-Message-ID: <20191018100501.GA9360@stefanha-x1.localdomain>
-References: <20191011085611.4194-1-stefanha@redhat.com>
- <20191011085611.4194-8-stefanha@redhat.com>
- <e7821640-de44-5e65-b9c1-2534dc676690@redhat.com>
- <20191017160735.GB1266@stefanha-x1.localdomain>
- <d803e58f-f0cc-b13b-6041-682497c6fe2f@redhat.com>
- <2545dd3e-f398-0e7a-0f82-fc340034a004@redhat.com>
+To: Miklos Szeredi <mszeredi@redhat.com>
+Subject: Re: [Virtio-fs] [PATCH 0/2] virtiofsd: Two fix for xattr operation
+Message-ID: <20191018100909.GB9360@stefanha-x1.localdomain>
+References: <20191016103754.2047-1-misono.tomohiro@jp.fujitsu.com>
+ <20191017100528.GA24790@stefanha-x1.localdomain>
+ <CAOssrKfR=sfE1RzOXzvPbdQg-g7i5-f8W9y8bWFnO=gyJ2VMsg@mail.gmail.com>
+ <20191017160953.GC1266@stefanha-x1.localdomain>
+ <CAOssrKejcfVWXw6Nu1owyEeofTdVp6BNx4bL91ma2g7bg9-nmg@mail.gmail.com>
+ <CAOssrKdbAT5s=CYG6PBtE6OYdqgwG8vp9T6QMJpwZ7X3tKjPmg@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="vkogqOf2sHV7VnPd"
+ protocol="application/pgp-signature"; boundary="lEGEL1/lMxI0MVQ2"
 Content-Disposition: inline
-In-Reply-To: <2545dd3e-f398-0e7a-0f82-fc340034a004@redhat.com>
+In-Reply-To: <CAOssrKdbAT5s=CYG6PBtE6OYdqgwG8vp9T6QMJpwZ7X3tKjPmg@mail.gmail.com>
 User-Agent: Mutt/1.12.1 (2019-06-15)
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::442
+X-Received-From: 2a00:1450:4864:20::441
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,139 +98,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>,
- "Michael S. Tsirkin" <mst@redhat.com>
+Cc: virtio-fs@redhat.com, Misono Tomohiro <misono.tomohiro@jp.fujitsu.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
---vkogqOf2sHV7VnPd
+--lEGEL1/lMxI0MVQ2
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, Oct 18, 2019 at 08:48:23AM +0200, Thomas Huth wrote:
-> On 17/10/2019 18.18, Thomas Huth wrote:
-> > On 17/10/2019 18.07, Stefan Hajnoczi wrote:
-> >> On Thu, Oct 17, 2019 at 04:52:54PM +0200, Thomas Huth wrote:
-> >>> On 11/10/2019 10.56, Stefan Hajnoczi wrote:
-> >>>> Implement the VIRTIO 1.0 virtio-pci interface.  The main change here=
- is
-> >>>> that the register layout is no longer a fixed layout in BAR 0.  Inst=
-ead
-> >>>> we have to iterate of PCI Capabilities to find descriptions of where
-> >>>> various registers are located.  The vring registers are also more
-> >>>> fine-grained, allowing for more flexible vring layouts, but we don't
-> >>>> take advantage of that.
-> >>>>
-> >>>> Note that test cases do not negotiate VIRTIO_F_VERSION_1 yet and are
-> >>>> therefore not running in VIRTIO 1.0 mode.
-> >>>>
-> >>>> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
-> >>>> ---
-> >>>>  tests/Makefile.include           |   1 +
-> >>>>  tests/libqos/virtio-pci-modern.h |  17 ++
-> >>>>  tests/libqos/virtio-pci.h        |  10 +
-> >>>>  tests/libqos/virtio-pci-modern.c | 412 ++++++++++++++++++++++++++++=
-+++
-> >>>>  tests/libqos/virtio-pci.c        |   6 +-
-> >>>>  5 files changed, 445 insertions(+), 1 deletion(-)
-> >>>>  create mode 100644 tests/libqos/virtio-pci-modern.h
-> >>>>  create mode 100644 tests/libqos/virtio-pci-modern.c
-> >>> [...]
-> >>>> +static bool probe_device_type(QVirtioPCIDevice *dev)
-> >>>> +{
-> >>>> +    uint16_t vendor_id;
-> >>>> +    uint16_t device_id;
-> >>>> +
-> >>>> +    /* "Drivers MUST match devices with the PCI Vendor ID 0x1AF4" */
-> >>>> +    vendor_id =3D qpci_config_readw(dev->pdev, PCI_VENDOR_ID);
-> >>>> +    if (vendor_id !=3D 0x1af4) {
-> >>>> +        return false;
-> >>>> +    }
-> >>>> +
-> >>>> +    /*
-> >>>> +     * "Any PCI device with ... PCI Device ID 0x1000 through 0x107F=
- inclusive
-> >>>> +     * is a virtio device"
-> >>>> +     */
-> >>>> +    device_id =3D qpci_config_readw(dev->pdev, PCI_DEVICE_ID);
-> >>>> +    if (device_id < 0x1000 || device_id > 0x107f) {
-> >>>> +        return false;
-> >>>> +    }
-> >>>> +
-> >>>> +    /*
-> >>>> +     * "Devices MAY utilize a Transitional PCI Device ID range, 0x1=
-000 to
-> >>>> +     * 0x103F depending on the device type"
-> >>>> +     */
-> >>>> +    if (device_id < 0x1040) {
-> >>>> +        /*
-> >>>> +         * "Transitional devices MUST have the PCI Subsystem Device=
- ID matching
-> >>>> +         * the Virtio Device ID"
-> >>>> +         */
-> >>>> +        dev->vdev.device_type =3D qpci_config_readw(dev->pdev, PCI_=
-SUBSYSTEM_ID);
-> >>>
-> >>> Shouldn't you return "false" here in case the device_type is 0 ? Which
-> >>> likely means that it is a legacy or broken device ...?
-> >>
-> >> The real decision whether to use this PCI device or not happens in
-> >> probe_device_layout().  If it's broken or a legacy device then that
-> >> function will fail.
-> >=20
-> > Ok, fair.
-> >=20
-> > I've added the patches to my qtest-next branch:
-> >=20
-> > https://gitlab.com/huth/qemu/tree/qtest-next
+On Fri, Oct 18, 2019 at 09:16:36AM +0200, Miklos Szeredi wrote:
+> On Thu, Oct 17, 2019 at 6:48 PM Miklos Szeredi <mszeredi@redhat.com> wrot=
+e:
 >=20
->  Hi Stephan,
+> > Even simpler: allow O_PATH descriptors for f*xattr().
 >=20
-> looks like this is breaking the virtio-blk-test in certain configurations:
+> Attached patch.  Will post shortly.
 >=20
->  https://gitlab.com/huth/qemu/-/jobs/324085741
+> However, I think it would make sense to fix virtiofsd as well, as this
+> will take time to percolate down, even if Al doesn't find anything
+> wrong with it.
 >=20
-> and:
->=20
->  https://cirrus-ci.com/task/4511314474434560
->=20
-> Could you please have a look?
+> Doing unshare(CLONE_FS) after thread startup seems safe, though must
+> be careful to change the working directory to the root of the mount
+> *before* starting any threads.
 
-On reading the VIRTIO specification again, I think my idea of supporting
-the VIRTIO 1.0 PCI interface without actually negotiating the
-VIRTIO_F_VERSION_1 feature bit is non-compliant:
+Thank you for extending O_PATH, that's great!  This will be the cleanest
+way to perform xattr operations.
 
-  2.2.3 Legacy Interface: A Note on Feature Bits
+If your patch is accepted I will send a man-pages.git patch to update
+the open(2) O_PATH documentation (with a minimum kernel version).
 
-  Transitional Drivers MUST detect Legacy Devices by detecting that the fea=
-ture bit VIRTIO_F_VERSION_1 is not offered. [...]
-
-  In this case device is used through the legacy interface.
-
-Please drop this patch series for now.  Additional patches are required
-to implement VIRTIO_F_VERSION_1 and then the endianness issue will go
-away.  I will send a v2.
+I've added the unshare(CLONE_FS) task to my todo list in case no one
+else gets to it first.  I may not have time to work on it before
+Novemeber though.
 
 Stefan
 
---vkogqOf2sHV7VnPd
+--lEGEL1/lMxI0MVQ2
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl2pjk0ACgkQnKSrs4Gr
-c8g25gf6AxPG/6B1qdwICbjk0G9icoLutxFjH1U5gr34Zy580QydUZXi86wXEpip
-nw229+Bd61nSW6OBqCbtOyHbhxLpBLbjQ+8otqqC1FP6n1lLWIGfovbX4jQ6oV/H
-1eG/EQtfmlQjPEhHbDo0cyCqZTS//l0VTBuppAvdOtQ6MfEDfT/ER8i2zbhKqQKW
-OsP5a4G1fNbdXfZN/oSX/kgM02+o22w3YGcgypQ5G0JNQK41KnL4EExMjVkmon88
-BHuhh1qrF5kVxGg8r0LyPl+UHM3OmX3S+HrExbt+zDxRLqxjGye7xEpnStpv4zcO
-TjzO8QDUYHdDnPWwwWy3ka6PJXrMpg==
-=k0aq
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl2pj0UACgkQnKSrs4Gr
+c8ihKAf9HtkKCMKQu3EvE+nGschLd/P5PZJdPs1o2ZmGG6yHO5lSlBMt8eNF5frd
+58XBP5jHk/0ii88ZFSXYXcvm+MaMIuEPKTfZSKY91vkjmp45NGqkLeq83F1wMoXE
+LDZCgba/h8ZTY6e/g0WrNUyNywUvqhOcvl7Fk9NfIjaMNtNl7U/IewiETe+ekY68
+4WMdHFOCjqkmwZZ+VowJTtiofRWAGlqn98IJA08qE3jTTtONVGxNge/CmHqkihEa
+oLLleTxItT++w1Vh0gvqQWLUPr/QQEy2ZyMr8zOuAy85mytJZu7XhFx15orpr6Ul
+awL/0E+Ek2F1tDbq+PFNcAX4SwEnmQ==
+=bw0r
 -----END PGP SIGNATURE-----
 
---vkogqOf2sHV7VnPd--
+--lEGEL1/lMxI0MVQ2--
 
