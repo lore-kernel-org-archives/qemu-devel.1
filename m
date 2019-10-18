@@ -2,67 +2,84 @@ Return-Path: <SRS0=ht5U=YL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2628ACA9EA0
-	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 16:54:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A624FCA9EA0
+	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 16:54:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EED6C20854
-	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 16:53:59 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EED6C20854
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 71B8820854
+	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 16:54:42 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b="KhRT4sWu"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 71B8820854
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=sifive.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43298 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43310 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iLVVm-0005es-VP
-	for qemu-devel@archiver.kernel.org; Fri, 18 Oct 2019 12:53:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53968)
+	id 1iLVWT-0006cx-JJ
+	for qemu-devel@archiver.kernel.org; Fri, 18 Oct 2019 12:54:41 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53837)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <kwolf@redhat.com>) id 1iLVUu-0004kk-NW
- for qemu-devel@nongnu.org; Fri, 18 Oct 2019 12:53:05 -0400
+ (envelope-from <palmer@sifive.com>) id 1iLVTa-0003er-Uh
+ for qemu-devel@nongnu.org; Fri, 18 Oct 2019 12:51:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kwolf@redhat.com>) id 1iLVUt-0001dC-Fb
- for qemu-devel@nongnu.org; Fri, 18 Oct 2019 12:53:04 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43754)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <kwolf@redhat.com>)
- id 1iLVUp-0001bV-Nm; Fri, 18 Oct 2019 12:52:59 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 4EFA22EF175;
- Fri, 18 Oct 2019 16:52:58 +0000 (UTC)
-Received: from localhost.localdomain (ovpn-117-198.ams2.redhat.com
- [10.36.117.198])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id C676F600C4;
- Fri, 18 Oct 2019 16:52:54 +0000 (UTC)
-Date: Fri, 18 Oct 2019 18:52:53 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-To: Max Reitz <mreitz@redhat.com>
-Subject: Re: [PATCH] iotests: Skip read-only cases in 118 when run as root
-Message-ID: <20191018165253.GI6122@localhost.localdomain>
-References: <20191018115127.2671-1-kwolf@redhat.com>
- <a810971a-639e-e7dc-d5e6-6b0bb524079b@redhat.com>
- <20191018142720.GH6122@localhost.localdomain>
- <69055f0f-70a3-2a94-01f8-82fe3e8bca7b@redhat.com>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
- protocol="application/pgp-signature"; boundary="7iMSBzlTiPOCCT2k"
-Content-Disposition: inline
-In-Reply-To: <69055f0f-70a3-2a94-01f8-82fe3e8bca7b@redhat.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.29]); Fri, 18 Oct 2019 16:52:58 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.132.183.28
+ (envelope-from <palmer@sifive.com>) id 1iLVTY-0001Dq-FA
+ for qemu-devel@nongnu.org; Fri, 18 Oct 2019 12:51:42 -0400
+Received: from mail-pf1-x441.google.com ([2607:f8b0:4864:20::441]:41540)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <palmer@sifive.com>) id 1iLVTW-0001DD-RD
+ for qemu-devel@nongnu.org; Fri, 18 Oct 2019 12:51:39 -0400
+Received: by mail-pf1-x441.google.com with SMTP id q7so4231905pfh.8
+ for <qemu-devel@nongnu.org>; Fri, 18 Oct 2019 09:51:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sifive.com; s=google;
+ h=date:subject:in-reply-to:cc:from:to:message-id:mime-version
+ :content-transfer-encoding;
+ bh=ARYfeLlfHFBjrpxDYrmOJMzIkA5EYdBh/O+HE0MSO9s=;
+ b=KhRT4sWuJKWpr9dQ3RdIDJ3hRbQOWEWHZ+OQ9RdkmXjhyG/ZcZfROYiNUZrQ2pctIJ
+ DDHmgipwlLkFXT87B6Bgs4exe3PgdH4l0SsG1Bi55eCuQWN+/I6UThvX5nWW3jgNircb
+ QWEGv/0ShCyVsWGdhW+YDp6CwvSDD9cXXgN3NywL1w6cE7brFecLl22ElRihsjqHlLLb
+ 1nLIxxzIEWGk3CkCnAu8blI7TjawjOFtjpycYqDQBTaGGr6VIlMEVXiolA81aP5PIFYB
+ 5UI/Wrveko2tX84jfHVZouwE2uSEEhU9m0qrvSPNOnNV/DPN3xBj+JcBJXTbbLasyH/O
+ EzAQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:subject:in-reply-to:cc:from:to:message-id
+ :mime-version:content-transfer-encoding;
+ bh=ARYfeLlfHFBjrpxDYrmOJMzIkA5EYdBh/O+HE0MSO9s=;
+ b=soeyXLPN/WNVar8LcevS4JGS4u8Qm1ztSDGPsb8sSZDUO/8dUYMAP3lF4QzVc/PCtP
+ um4XFLiNSx9vVexN1nyui46vf3N8kNP0apgISQpCkb5PB/KGl3J/BBMERj/MRK8b4EQ0
+ XEdZI9DwVk8hmajWzGilkAQTkNyDe1cCe6dF6DqfdOZcg7y7Rnev5ZPcJeLPMqUeK+KE
+ zimJRGIaNel/bQCPXEgli5hAGYqIuPnTGFoZ439XJMh+aCew2wwKuVPB8pNJxZ7bPccm
+ m57aYlKOwzb/QeZa29cr9lsHEgGBdRWrdxBlyjRWcmJ/nxH9uBuUcdI0LsrVOl5SxMUe
+ 07ug==
+X-Gm-Message-State: APjAAAXmU7GzsIL1PVshX9+x60ogwgNLDMIrL8CZcNK0ipVgDrvE6z36
+ N+6wZDldiqN78Cke+Cw7b9C2a0RLt7eriQ==
+X-Google-Smtp-Source: APXvYqys1aGXk96w7zvObecfYzCtmUy/4gXurQ7nAx6bEzc5I+TnJEha7fYxCsr4CSgtQlcraspCHQ==
+X-Received: by 2002:a63:3853:: with SMTP id h19mr7720183pgn.55.1571417496628; 
+ Fri, 18 Oct 2019 09:51:36 -0700 (PDT)
+Received: from localhost ([152.179.112.46])
+ by smtp.gmail.com with ESMTPSA id y9sm6343841pgq.11.2019.10.18.09.51.35
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Fri, 18 Oct 2019 09:51:35 -0700 (PDT)
+Date: Fri, 18 Oct 2019 09:51:35 -0700 (PDT)
+X-Google-Original-Date: Fri, 18 Oct 2019 09:34:58 PDT (-0700)
+Subject: Re: [PATCH v1 1/1] target/riscv: Remove atomic accesses to MIP CSR
+In-Reply-To: <34350af3b53fadc50bfe4f1fbc452c7d3a8fe8f7.1570572202.git.alistair.francis@wdc.com>
+From: Palmer Dabbelt <palmer@sifive.com>
+To: Alistair Francis <Alistair.Francis@wdc.com>
+Message-ID: <mhng-55b18e6b-d882-4d24-a4af-2cbecd403a49@palmer-si-x1c4>
+Mime-Version: 1.0 (MHng)
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::441
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -74,95 +91,162 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>,
- qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: Alistair Francis <Alistair.Francis@wdc.com>, qemu-riscv@nongnu.org,
+ qemu-devel@nongnu.org, alistair23@gmail.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On Tue, 08 Oct 2019 15:04:18 PDT (-0700), Alistair Francis wrote:
+> Instead of relying on atomics to access the MIP register let's update
+> our helper function to instead just lock the IO mutex thread before
+> writing. This follows the same concept as used in PPC for handling
+> interrupts
+>
+> Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
+> ---
+>  target/riscv/cpu.c        |  5 ++--
+>  target/riscv/cpu.h        |  9 --------
+>  target/riscv/cpu_helper.c | 48 +++++++++++++++------------------------
+>  target/riscv/csr.c        |  2 +-
+>  4 files changed, 21 insertions(+), 43 deletions(-)
+>
+> diff --git a/target/riscv/cpu.c b/target/riscv/cpu.c
+> index f13e298a36..e09dd7aa23 100644
+> --- a/target/riscv/cpu.c
+> +++ b/target/riscv/cpu.c
+> @@ -224,8 +224,7 @@ static void riscv_cpu_dump_state(CPUState *cs, FILE *f, int flags)
+>  #ifndef CONFIG_USER_ONLY
+>      qemu_fprintf(f, " %s " TARGET_FMT_lx "\n", "mhartid ", env->mhartid);
+>      qemu_fprintf(f, " %s " TARGET_FMT_lx "\n", "mstatus ", env->mstatus);
+> -    qemu_fprintf(f, " %s " TARGET_FMT_lx "\n", "mip     ",
+> -                 (target_ulong)atomic_read(&env->mip));
+> +    qemu_fprintf(f, " %s 0x%x\n", "mip     ", env->mip);
+>      qemu_fprintf(f, " %s " TARGET_FMT_lx "\n", "mie     ", env->mie);
+>      qemu_fprintf(f, " %s " TARGET_FMT_lx "\n", "mideleg ", env->mideleg);
+>      qemu_fprintf(f, " %s " TARGET_FMT_lx "\n", "medeleg ", env->medeleg);
+> @@ -275,7 +274,7 @@ static bool riscv_cpu_has_work(CPUState *cs)
+>       * Definition of the WFI instruction requires it to ignore the privilege
+>       * mode and delegation registers, but respect individual enables
+>       */
+> -    return (atomic_read(&env->mip) & env->mie) != 0;
+> +    return (env->mip & env->mie) != 0;
+>  #else
+>      return true;
+>  #endif
+> diff --git a/target/riscv/cpu.h b/target/riscv/cpu.h
+> index 124ed33ee4..a71473b243 100644
+> --- a/target/riscv/cpu.h
+> +++ b/target/riscv/cpu.h
+> @@ -121,15 +121,6 @@ struct CPURISCVState {
+>      target_ulong mhartid;
+>      target_ulong mstatus;
+>
+> -    /*
+> -     * CAUTION! Unlike the rest of this struct, mip is accessed asynchonously
+> -     * by I/O threads. It should be read with atomic_read. It should be updated
+> -     * using riscv_cpu_update_mip with the iothread mutex held. The iothread
+> -     * mutex must be held because mip must be consistent with the CPU inturrept
+> -     * state. riscv_cpu_update_mip calls cpu_interrupt or cpu_reset_interrupt
+> -     * wuth the invariant that CPU_INTERRUPT_HARD is set iff mip is non-zero.
+> -     * mip is 32-bits to allow atomic_read on 32-bit hosts.
+> -     */
+>      uint32_t mip;
+>      uint32_t miclaim;
+>
+> diff --git a/target/riscv/cpu_helper.c b/target/riscv/cpu_helper.c
+> index 87dd6a6ece..4334978c2e 100644
+> --- a/target/riscv/cpu_helper.c
+> +++ b/target/riscv/cpu_helper.c
+> @@ -19,6 +19,7 @@
+>
+>  #include "qemu/osdep.h"
+>  #include "qemu/log.h"
+> +#include "qemu/main-loop.h"
+>  #include "cpu.h"
+>  #include "exec/exec-all.h"
+>  #include "tcg-op.h"
+> @@ -38,7 +39,7 @@ static int riscv_cpu_local_irq_pending(CPURISCVState *env)
+>  {
+>      target_ulong mstatus_mie = get_field(env->mstatus, MSTATUS_MIE);
+>      target_ulong mstatus_sie = get_field(env->mstatus, MSTATUS_SIE);
+> -    target_ulong pending = atomic_read(&env->mip) & env->mie;
+> +    target_ulong pending = env->mip & env->mie;
+>      target_ulong mie = env->priv < PRV_M || (env->priv == PRV_M && mstatus_mie);
+>      target_ulong sie = env->priv < PRV_S || (env->priv == PRV_S && mstatus_sie);
+>      target_ulong irqs = (pending & ~env->mideleg & -mie) |
+> @@ -92,42 +93,29 @@ int riscv_cpu_claim_interrupts(RISCVCPU *cpu, uint32_t interrupts)
+>      }
+>  }
+>
+> -struct CpuAsyncInfo {
+> -    uint32_t new_mip;
+> -};
+> -
+> -static void riscv_cpu_update_mip_irqs_async(CPUState *target_cpu_state,
+> -                                            run_on_cpu_data data)
+> -{
+> -    struct CpuAsyncInfo *info = (struct CpuAsyncInfo *) data.host_ptr;
+> -
+> -    if (info->new_mip) {
+> -        cpu_interrupt(target_cpu_state, CPU_INTERRUPT_HARD);
+> -    } else {
+> -        cpu_reset_interrupt(target_cpu_state, CPU_INTERRUPT_HARD);
+> -    }
+> -
+> -    g_free(info);
+> -}
+> -
+>  uint32_t riscv_cpu_update_mip(RISCVCPU *cpu, uint32_t mask, uint32_t value)
+>  {
+>      CPURISCVState *env = &cpu->env;
+>      CPUState *cs = CPU(cpu);
+> -    struct CpuAsyncInfo *info;
+> -    uint32_t old, new, cmp = atomic_read(&env->mip);
+> +    uint32_t old = env->mip;
+> +    bool locked = false;
+> +
+> +    if (!qemu_mutex_iothread_locked()) {
+> +        locked = true;
+> +        qemu_mutex_lock_iothread();
+> +    }
 
---7iMSBzlTiPOCCT2k
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+I must be lost here, because I have no idea what this is trying to do.
 
-Am 18.10.2019 um 17:00 hat Max Reitz geschrieben:
-> On 18.10.19 16:27, Kevin Wolf wrote:
-> > Am 18.10.2019 um 14:59 hat Philippe Mathieu-Daud=C3=A9 geschrieben:
-> >> Hi Kevin,
-> >>
-> >> On 10/18/19 1:51 PM, Kevin Wolf wrote:
-> >>> Some tests in 118 use chmod to remove write permissions from the file
-> >>> and assume that the image can indeed not be opened read-write
-> >>> afterwards. This doesn't work when the test is run as root, because r=
-oot
-> >>> can still open the file as writable even when the permission bit isn't
-> >>> set.
-> >>>
-> >>> Introduce a @skip_if_root decorator and use it in 118 to skip the tes=
-ts
-> >>> in question when the script is run as root.
-> >>>
-> >>> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-> >>> ---
-> >>>   tests/qemu-iotests/118        |  3 +++
-> >>>   tests/qemu-iotests/iotests.py | 10 ++++++++++
-> >>>   2 files changed, 13 insertions(+)
-> >>>
-> >>> diff --git a/tests/qemu-iotests/118 b/tests/qemu-iotests/118
-> >>> index ea0b326ae0..9eff46d189 100755
-> >>> --- a/tests/qemu-iotests/118
-> >>> +++ b/tests/qemu-iotests/118
-> >>> @@ -446,6 +446,7 @@ class TestChangeReadOnly(ChangeBaseClass):
-> >>>           self.assert_qmp(result, 'return[0]/inserted/ro', True)
-> >>>           self.assert_qmp(result, 'return[0]/inserted/image/filename'=
-, new_img)
-> >>> +    @iotests.skip_if_root
-> >>
-> >> Why not have case_notrun() return 'reason' and use:
-> >>
-> >> @unittest.skipIf(os.getuid() =3D=3D 0, case_notrun("cannot be run as r=
-oot"))
-> >=20
-> > Because we can't skip test cases using unittest functionality, it
-> > results in different output (the test is marked as 's' instead of '.'
-> > and a message '(skipped=3Dn)' is added), which means failure for
-> > qemu-iotests.
->=20
-> Not arguing that we should use unittest skipping here, but my =E2=80=9CSe=
-lfish
-> patches=E2=80=9D series allows it:
->=20
-> https://lists.nongnu.org/archive/html/qemu-devel/2019-09/msg03423.html
->=20
-> The advantage is that using unittest skipping works in setUp, too.
-
-Ah, good to know. If this had already been in master, I might have
-chosen a simple function call iotests.skip_if_root() inside the test
-function instead of using a decorator. But in the end, I don't think it
-makes a big difference in this case.
-
-Kevin
-
---7iMSBzlTiPOCCT2k
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIcBAEBAgAGBQJdqe3lAAoJEH8JsnLIjy/WWXEP/2AzbqgIORtc1BdIZhHW7769
-fWrG0U142x56D3T433YoWuj7lIcfBh3kEJ9IFb0ae1ZnCbgiRq87ce2hngGV65/P
-l6byhWdulo7P/J5EqcWW8us1Kd1/sjkOeqEjqQFex13zx0Igsq+f4OXLlrzlISog
-7VVwdST6LKcI5Qyti0Opquq3yxxuVeUI1QTYON0dCRQhOS8b3bg4CYWa8Etr09vT
-LhN6+OTDaIRcxXLZ7SvMvCRYjGlzBuBSbJM+KnJnGcNb23SPKiuYW97UMhjcy56s
-1Gr3nksJg+UMXPh96njuwJFE6TTKwVv5ZadA4nIk4ZMhCpWAXFloas94/pw8uXGH
-Ro4cKxGmfoIHCjEIl/UfwH9NYiPR9x4IkTYUySR6kNIo7nwWmIKO7FG+h297l4kF
-c+72TaK2yisOSCbsrbxC36GSL1I5bgERcg3k3CWbOVvw/QSPFuMqKRlrqASuJMPO
-woxc4N2YZoqPS5c1FDvhKITo4IC+lm76ITOepARqTjWmjDSoI7Scn2MZRtvXbfEz
-1sspwRD+wwVICrijRZhJaiXGSxgPTR+DEa6gCgBtHheZ1pfsL1Z8Uyv7aNy/yvlC
-JPwHHeIzyQqaQCFiBtGtzWpcCneiz5hm/cnkvboQBx2huj70doAHVliKDB6bocfL
-2WKYnbotVa/Js2NqrcEA
-=8Uj+
------END PGP SIGNATURE-----
-
---7iMSBzlTiPOCCT2k--
+> -    do {
+> -        old = cmp;
+> -        new = (old & ~mask) | (value & mask);
+> -        cmp = atomic_cmpxchg(&env->mip, old, new);
+> -    } while (old != cmp);
+> +    env->mip = (env->mip & ~mask) | (value & mask);
+>
+> -    info = g_new(struct CpuAsyncInfo, 1);
+> -    info->new_mip = new;
+> +    if (env->mip) {
+> +        cpu_interrupt(cs, CPU_INTERRUPT_HARD);
+> +    } else {
+> +        cpu_reset_interrupt(cs, CPU_INTERRUPT_HARD);
+> +    }
+>
+> -    async_run_on_cpu(cs, riscv_cpu_update_mip_irqs_async,
+> -                     RUN_ON_CPU_HOST_PTR(info));
+> +    if (locked) {
+> +        qemu_mutex_unlock_iothread();
+> +    }
+>
+>      return old;
+>  }
+> diff --git a/target/riscv/csr.c b/target/riscv/csr.c
+> index f767ad24be..db0cc6ef55 100644
+> --- a/target/riscv/csr.c
+> +++ b/target/riscv/csr.c
+> @@ -579,7 +579,7 @@ static int rmw_mip(CPURISCVState *env, int csrno, target_ulong *ret_value,
+>      if (mask) {
+>          old_mip = riscv_cpu_update_mip(cpu, mask, (new_value & mask));
+>      } else {
+> -        old_mip = atomic_read(&env->mip);
+> +        old_mip = env->mip;
+>      }
+>
+>      if (ret_value) {
 
