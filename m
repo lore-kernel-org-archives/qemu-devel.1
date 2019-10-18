@@ -2,84 +2,88 @@ Return-Path: <SRS0=ht5U=YL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DF8CACA9EAB
-	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 18:07:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 979EDCA9EA9
+	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 18:07:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AE1F92246B
-	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 18:07:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5FCAD20869
+	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 18:07:27 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Uvo+O8B5"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AE1F92246B
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="VrjTkilR"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5FCAD20869
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44622 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44634 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iLWeV-0004UH-90
-	for qemu-devel@archiver.kernel.org; Fri, 18 Oct 2019 14:07:03 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59547)
+	id 1iLWes-0005GP-7J
+	for qemu-devel@archiver.kernel.org; Fri, 18 Oct 2019 14:07:26 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60704)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1iLWJC-0006wS-6Z
- for qemu-devel@nongnu.org; Fri, 18 Oct 2019 13:45:03 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1iLWWB-0004yv-Ga
+ for qemu-devel@nongnu.org; Fri, 18 Oct 2019 13:58:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1iLWJA-0005gO-QP
- for qemu-devel@nongnu.org; Fri, 18 Oct 2019 13:45:01 -0400
-Received: from mail-pf1-x441.google.com ([2607:f8b0:4864:20::441]:33304)
+ (envelope-from <alex.bennee@linaro.org>) id 1iLWWA-0005aF-6u
+ for qemu-devel@nongnu.org; Fri, 18 Oct 2019 13:58:27 -0400
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:35279)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1iLWJA-0005fm-Kt
- for qemu-devel@nongnu.org; Fri, 18 Oct 2019 13:45:00 -0400
-Received: by mail-pf1-x441.google.com with SMTP id q10so4340457pfl.0
- for <qemu-devel@nongnu.org>; Fri, 18 Oct 2019 10:45:00 -0700 (PDT)
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1iLWWA-0005Zj-0A
+ for qemu-devel@nongnu.org; Fri, 18 Oct 2019 13:58:26 -0400
+Received: by mail-wr1-x442.google.com with SMTP id l10so6766149wrb.2
+ for <qemu-devel@nongnu.org>; Fri, 18 Oct 2019 10:58:25 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=X22okviioTNDt7zI04Hhn7/Ba9cdRHpUwnG0LrTV7qc=;
- b=Uvo+O8B5nhB1hCuO8tXl8IgS+fjESYIng+bYLuPYt0ykIXNCI9m9GMcqDYYKDAKUKA
- B7NgaY+lnBS5CbCpqcZccKMYBn9koqvBa6866Y8ApTyAAH+4mUVRGAKNhEwRrnUmE5Sg
- GcoVkm338NIhcWuUElXc2hMzpc0a73HGAdUeC55c7a0KTnUWQFFeoVD2Z6z/U8mq70Q8
- meuefAnx0EK/BAeNBVRQDbWW2m0g+J3ZMpQZ59xkw+IcR66NyyykpZoM+gXWKxIjbUa7
- YZSxTyooCpviez/XFSKbT+Gej1f2p8N6ODFg1jmHiLx5sJGGGWtn4zz81uP1FoLWuh7D
- cMZQ==
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=lKt53I7f/6CmozSTncyZXV9A7UBvRK9P650MPucCeC4=;
+ b=VrjTkilRff11h+nF8Ta7+TeZ09YtwLrwM07VorzQD/ncWmu54qP9UPy1bS/mj9mFAp
+ HEhtNKwOwox+/Qv+9NIo763jBhc4H+2dFBRGppyFMQ5/FtGxXhCHxjLtkH03TbecxmtZ
+ Y9b7Q3sMSBUfYq9XZ4XQfyiPzmI8qxbKUGOKCj0T3unyVszx8sCwr4Raq6Uy4Py+GQr8
+ coYJKUIImHRLpnumjcgAvl6pkmOglo5FkDvl4q09ojZPO/ZnH6D9Sa8jGsJJ838d78OR
+ ZVTrJU/C0erkQNDn+O1UWDKbhvqaijr2DkLfAFRih9qWKLTl5Klq+Dnj+iS0eQcKb+S8
+ VOhw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references;
- bh=X22okviioTNDt7zI04Hhn7/Ba9cdRHpUwnG0LrTV7qc=;
- b=BirXQzCuSv3Z3FW+HAEU/fk944JJvFkip6fqjJ8fyxfUo4aDKSaB4CNYazlwdiVs9i
- lKlPMD6R2QBPen+qaPyzWAPJSJ6ykkEbIc0zfdZwbk3f6C1xc8Ckk//3oDEdyHld29v2
- U2k0bWfgRpd3ZQM7kroROjvm8Gr/Xauey4qrSdhMTLtXPDtWXKM0RaoqJfeQyLUreQKW
- rhAPe3ekY3PsLPiHqGUhnG32o92NsEaH8xv/K6mFlip6wrvnXGwpn+DFTwsu/Rc1pD5p
- q1tP/LHC4xKv550+4+88D6n06xVrH+gCR0/K+6S2/q/RiZ/LKN6NhPT9diP4H4zcjThR
- IcDg==
-X-Gm-Message-State: APjAAAWnGVJ7xPu/ACOwVaM5MaRffX01o2WymN61BqTZjlqrzdQ4Lm/x
- e1/PuKYt2RdPFBQh12tMrJBCivBVS9U=
-X-Google-Smtp-Source: APXvYqxEiMHTFWd0+8+Jjwot2B4GNA7AKnYndljV5p2qZvznW7FluKoKIk5gs03JrCesOj8KQEDmxA==
-X-Received: by 2002:a17:90a:f311:: with SMTP id
- ca17mr12070981pjb.112.1571420699116; 
- Fri, 18 Oct 2019 10:44:59 -0700 (PDT)
-Received: from localhost.localdomain (97-113-7-119.tukw.qwest.net.
- [97.113.7.119])
- by smtp.gmail.com with ESMTPSA id d20sm7857534pfq.88.2019.10.18.10.44.57
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=lKt53I7f/6CmozSTncyZXV9A7UBvRK9P650MPucCeC4=;
+ b=kPdT4N6KHyCDBPw3HsmAONNIvRFYGmCJq/E4vME/oHFuXohlxI6VcmEpo4WRkEikvZ
+ 7AJDgVAc2N/Caq/7yGC3tmelLCzMSB5tJLyp9conA1naj5bxwM5f7U2dau10yRedAAMk
+ PBm3LTWYobRmXyp6k7P1AjzHMtxnEU4YRN+v8hcsYqHGHZP32vUJuPiJ2G1duYteCou9
+ HJICx1x0GMSsB+j7Xr7nThOjFqAZGtYAvUKa4LiAJmBTNz2yScd8RmqF/LUf05QSHUCr
+ skmpD48o6iXfVXHEY/WL0mEvL+owNfCjhzCe7PLgJfEVDs9T5rINWN3B9rCLjWeZMsB+
+ 7KJw==
+X-Gm-Message-State: APjAAAWvQuArVU/wFSdG10WEbkb8bwYvpuGGAQw7gNMRrAWBFwoYELEJ
+ ORqkJ2kyd+7NkC4CD8D8RWuWzg==
+X-Google-Smtp-Source: APXvYqxC/6hQ1ihONVT4MwfAtZnbSHG2BSdEJxErkUBrgNbxlaghlnfTOu168SE6HO8LPck42J8nDg==
+X-Received: by 2002:adf:e5cc:: with SMTP id a12mr9157997wrn.258.1571421504665; 
+ Fri, 18 Oct 2019 10:58:24 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id p68sm3167756wme.0.2019.10.18.10.58.23
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 18 Oct 2019 10:44:57 -0700 (PDT)
-From: Richard Henderson <richard.henderson@linaro.org>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v8 21/22] target/arm: Rebuild hflags for M-profile NVIC
-Date: Fri, 18 Oct 2019 10:44:30 -0700
-Message-Id: <20191018174431.1784-22-richard.henderson@linaro.org>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20191018174431.1784-1-richard.henderson@linaro.org>
-References: <20191018174431.1784-1-richard.henderson@linaro.org>
+ Fri, 18 Oct 2019 10:58:23 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 567891FF87;
+ Fri, 18 Oct 2019 18:58:23 +0100 (BST)
+References: <20191017044232.27601-1-richard.henderson@linaro.org>
+User-agent: mu4e 1.3.5; emacs 27.0.50
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: qemu-arm@nongnu.org
+Subject: Re: [PATCH 0/4] target/arm vector improvements
+In-reply-to: <20191017044232.27601-1-richard.henderson@linaro.org>
+Date: Fri, 18 Oct 2019 18:58:23 +0100
+Message-ID: <87sgnqndfk.fsf@linaro.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::441
+X-Received-From: 2a00:1450:4864:20::442
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,93 +95,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, qemu-arm@nongnu.org
+Cc: peter.maydell@linaro.org, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Continue setting, but not relying upon, env->hflags.
 
-Suggested-by: Peter Maydell <peter.maydell@linaro.org>
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
----
- hw/intc/armv7m_nvic.c | 22 +++++++++++++---------
- 1 file changed, 13 insertions(+), 9 deletions(-)
+Richard Henderson <richard.henderson@linaro.org> writes:
 
-diff --git a/hw/intc/armv7m_nvic.c b/hw/intc/armv7m_nvic.c
-index 8e93e51e81..e8c74f9eba 100644
---- a/hw/intc/armv7m_nvic.c
-+++ b/hw/intc/armv7m_nvic.c
-@@ -2251,7 +2251,7 @@ static MemTxResult nvic_sysreg_write(void *opaque, hwaddr addr,
-             }
-         }
-         nvic_irq_update(s);
--        return MEMTX_OK;
-+        goto exit_ok;
-     case 0x200 ... 0x23f: /* NVIC Set pend */
-         /* the special logic in armv7m_nvic_set_pending()
-          * is not needed since IRQs are never escalated
-@@ -2269,9 +2269,9 @@ static MemTxResult nvic_sysreg_write(void *opaque, hwaddr addr,
-             }
-         }
-         nvic_irq_update(s);
--        return MEMTX_OK;
-+        goto exit_ok;
-     case 0x300 ... 0x33f: /* NVIC Active */
--        return MEMTX_OK; /* R/O */
-+        goto exit_ok; /* R/O */
-     case 0x400 ... 0x5ef: /* NVIC Priority */
-         startvec = (offset - 0x400) + NVIC_FIRST_IRQ; /* vector # */
- 
-@@ -2281,10 +2281,10 @@ static MemTxResult nvic_sysreg_write(void *opaque, hwaddr addr,
-             }
-         }
-         nvic_irq_update(s);
--        return MEMTX_OK;
-+        goto exit_ok;
-     case 0xd18 ... 0xd1b: /* System Handler Priority (SHPR1) */
-         if (!arm_feature(&s->cpu->env, ARM_FEATURE_M_MAIN)) {
--            return MEMTX_OK;
-+            goto exit_ok;
-         }
-         /* fall through */
-     case 0xd1c ... 0xd23: /* System Handler Priority (SHPR2, SHPR3) */
-@@ -2299,10 +2299,10 @@ static MemTxResult nvic_sysreg_write(void *opaque, hwaddr addr,
-             set_prio(s, hdlidx, sbank, newprio);
-         }
-         nvic_irq_update(s);
--        return MEMTX_OK;
-+        goto exit_ok;
-     case 0xd28 ... 0xd2b: /* Configurable Fault Status (CFSR) */
-         if (!arm_feature(&s->cpu->env, ARM_FEATURE_M_MAIN)) {
--            return MEMTX_OK;
-+            goto exit_ok;
-         }
-         /* All bits are W1C, so construct 32 bit value with 0s in
-          * the parts not written by the access size
-@@ -2322,15 +2322,19 @@ static MemTxResult nvic_sysreg_write(void *opaque, hwaddr addr,
-              */
-             s->cpu->env.v7m.cfsr[M_REG_NS] &= ~(value & R_V7M_CFSR_BFSR_MASK);
-         }
--        return MEMTX_OK;
-+        goto exit_ok;
-     }
-     if (size == 4) {
-         nvic_writel(s, offset, value, attrs);
--        return MEMTX_OK;
-+        goto exit_ok;
-     }
-     qemu_log_mask(LOG_GUEST_ERROR,
-                   "NVIC: Bad write of size %d at offset 0x%x\n", size, offset);
-     /* This is UNPREDICTABLE; treat as RAZ/WI */
-+
-+ exit_ok:
-+    /* Ensure any changes made are reflected in the cached hflags.  */
-+    arm_rebuild_hflags(&s->cpu->env);
-     return MEMTX_OK;
- }
- 
--- 
-2.17.1
+> The first patch has been seen before.
+>
+>   https://patchwork.ozlabs.org/patch/1115039/
+>
+> It had a bug and I didn't fix it right away and then forgot.
+> Fixed now; I had mixed up the operand ordering for aarch32.
+>
+> The next 3 are something that I noticed while doing other stuff.
+>
+> In particular, pmull is used heavily during https transfers.
+> While cloning a repository, the old code peaks at 27% of the
+> total runtime, as measured by perf top.  The new code does
+> not quite reach 3% repeating the same clone.
+>
+> In addition, the new helper functions are in the form that
+> will be required for the implementation of SVE2.
+>
+> The comment in patch 2 about ARMv8.4-DIT is perhaps a stretch,
+> but re-reading the pmull instruction description in the current
+> ARM ARM brought it to mind.
+>
+> Since TCG is officially not in the security domain, it's
+> probably not a bug to just claim to support DIT without
+> actually doing anything to ensure the algorithms used are in
+> fact timing independent of the data.
+>
+> On the other hand, I expect the bit distribution of stuff
+> going through these sort of hashing algorithms to approach
+> 50% 1's and 0's, so I also don't think we gain anything on
+> average to terminate the loop early.
+>
+> Thoughts on DIT specifically?
 
+It would be an interesting academic exercise to see if someone could
+exploit the JIT from the guest but as you say not a security domain
+so....
+
+>
+>
+> r~
+>
+>
+> Richard Henderson (4):
+>   target/arm: Vectorize USHL and SSHL
+>   target/arm: Convert PMUL.8 to gvec
+>   target/arm: Convert PMULL.64 to gvec
+>   target/arm: Convert PMULL.8 to gvec
+>
+>  target/arm/helper-sve.h    |   2 +
+>  target/arm/helper.h        |  21 ++-
+>  target/arm/translate.h     |   6 +
+>  target/arm/neon_helper.c   | 117 -------------
+>  target/arm/translate-a64.c |  83 ++++-----
+>  target/arm/translate.c     | 350 ++++++++++++++++++++++++++++++++-----
+>  target/arm/vec_helper.c    | 211 ++++++++++++++++++++++
+>  7 files changed, 562 insertions(+), 228 deletions(-)
+
+
+--
+Alex Benn=C3=A9e
 
