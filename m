@@ -6,54 +6,54 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4D639CA9EA1
-	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 14:01:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9DC38CA9EA1
+	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 14:02:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0B67420854
-	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 14:01:25 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0B67420854
+	by mail.kernel.org (Postfix) with ESMTPS id 7232E21925
+	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 14:02:00 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7232E21925
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40490 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40494 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iLSom-0000tT-03
-	for qemu-devel@archiver.kernel.org; Fri, 18 Oct 2019 10:01:24 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55200)
+	id 1iLSpL-0001Vq-Fh
+	for qemu-devel@archiver.kernel.org; Fri, 18 Oct 2019 10:01:59 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55433)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1iLSe6-0005cs-DW
- for qemu-devel@nongnu.org; Fri, 18 Oct 2019 09:50:24 -0400
+ (envelope-from <philmd@redhat.com>) id 1iLSfI-00073x-ME
+ for qemu-devel@nongnu.org; Fri, 18 Oct 2019 09:51:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1iLSe4-0006ZU-HH
- for qemu-devel@nongnu.org; Fri, 18 Oct 2019 09:50:22 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:57058)
+ (envelope-from <philmd@redhat.com>) id 1iLSfG-00075m-Gl
+ for qemu-devel@nongnu.org; Fri, 18 Oct 2019 09:51:35 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:51400)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iLSe4-0006Yx-8h
- for qemu-devel@nongnu.org; Fri, 18 Oct 2019 09:50:20 -0400
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iLSfG-00075T-8t
+ for qemu-devel@nongnu.org; Fri, 18 Oct 2019 09:51:34 -0400
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
  [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 69BB73175295;
- Fri, 18 Oct 2019 13:50:19 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 5F55F3073880;
+ Fri, 18 Oct 2019 13:51:33 +0000 (UTC)
 Received: from x1w.redhat.com (unknown [10.40.205.74])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 3C4C760BF1;
- Fri, 18 Oct 2019 13:50:02 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id E3F5560BF1;
+ Fri, 18 Oct 2019 13:51:23 +0000 (UTC)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 12/20] hw/i386: Remove obsolete
- LoadStateHandler::load_state_old handlers
-Date: Fri, 18 Oct 2019 15:47:46 +0200
-Message-Id: <20191018134754.16362-13-philmd@redhat.com>
+Subject: [PATCH v2 19/20] hw/pci-host: Rename incorrectly named 'piix' as
+ 'i440fx'
+Date: Fri, 18 Oct 2019 15:47:53 +0200
+Message-Id: <20191018134754.16362-20-philmd@redhat.com>
 In-Reply-To: <20191018134754.16362-1-philmd@redhat.com>
 References: <20191018134754.16362-1-philmd@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.49]); Fri, 18 Oct 2019 13:50:19 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.40]); Fri, 18 Oct 2019 13:51:33 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
@@ -69,9 +69,9 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Stefano Stabellini <sstabellini@kernel.org>,
+Cc: Stefano Stabellini <sstabellini@kernel.org>,
  "Michael S. Tsirkin" <mst@redhat.com>, Paul Durrant <paul@xen.org>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
  Paolo Bonzini <pbonzini@redhat.com>,
  =?UTF-8?q?Herv=C3=A9=20Poussineau?= <hpoussin@reactos.org>,
  Aleksandar Markovic <amarkovic@wavecomp.com>,
@@ -85,285 +85,79 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-These devices implemented their load_state_old() handler 10 years
-ago, previous to QEMU v0.12.
-Since commit cc425b5ddf removed the pc-0.10 and pc-0.11 machines,
-we can drop this code.
+From: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 
-Note: the mips_r4k machine started to use the i8254 device just
-after QEMU v0.5.0, but the MIPS machine types are not versioned,
-so there is no migration compatibility issue removing this handler.
+We moved all the PIIX3 southbridge code out of hw/pci-host/piix.c,
+it now only contains i440FX northbridge code.
+Rename it to match the chipset modelled.
 
-Suggested-by: Peter Maydell <peter.maydell@linaro.org>
 Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 ---
- hw/acpi/piix4.c         | 40 ---------------------------------
- hw/intc/apic_common.c   | 49 -----------------------------------------
- hw/pci-host/piix.c      | 25 ---------------------
- hw/timer/i8254_common.c | 40 ---------------------------------
- 4 files changed, 154 deletions(-)
+ MAINTAINERS                      | 2 +-
+ hw/i386/Kconfig                  | 2 +-
+ hw/pci-host/Kconfig              | 2 +-
+ hw/pci-host/Makefile.objs        | 2 +-
+ hw/pci-host/{piix.c =3D> i440fx.c} | 0
+ 5 files changed, 4 insertions(+), 4 deletions(-)
+ rename hw/pci-host/{piix.c =3D> i440fx.c} (100%)
 
-diff --git a/hw/acpi/piix4.c b/hw/acpi/piix4.c
-index 2efd1605b8..93aec2dd2c 100644
---- a/hw/acpi/piix4.c
-+++ b/hw/acpi/piix4.c
-@@ -41,7 +41,6 @@
- #include "hw/acpi/memory_hotplug.h"
- #include "hw/acpi/acpi_dev_interface.h"
- #include "hw/xen/xen.h"
--#include "migration/qemu-file-types.h"
- #include "migration/vmstate.h"
- #include "hw/core/cpu.h"
- #include "trace.h"
-@@ -204,43 +203,6 @@ static const VMStateDescription vmstate_pci_status =3D=
- {
-     }
- };
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 4845f47d93..1bc9959b8a 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -1225,7 +1225,7 @@ M: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+ S: Supported
+ F: include/hw/i386/
+ F: hw/i386/
+-F: hw/pci-host/piix.c
++F: hw/pci-host/i440fx.c
+ F: hw/pci-host/q35.c
+ F: hw/pci-host/pam.c
+ F: include/hw/pci-host/i440fx.h
+diff --git a/hw/i386/Kconfig b/hw/i386/Kconfig
+index 589d75e26a..cfe94aede7 100644
+--- a/hw/i386/Kconfig
++++ b/hw/i386/Kconfig
+@@ -60,7 +60,7 @@ config I440FX
+     select PC_PCI
+     select PC_ACPI
+     select ACPI_SMBUS
+-    select PCI_PIIX
++    select PCI_I440FX
+     select PIIX3
+     select IDE_PIIX
+     select DIMM
+diff --git a/hw/pci-host/Kconfig b/hw/pci-host/Kconfig
+index 397043b289..b0aa8351c4 100644
+--- a/hw/pci-host/Kconfig
++++ b/hw/pci-host/Kconfig
+@@ -28,7 +28,7 @@ config PCI_SABRE
+     select PCI
+     bool
 =20
--static int acpi_load_old(QEMUFile *f, void *opaque, int version_id)
--{
--    PIIX4PMState *s =3D opaque;
--    int ret, i;
--    uint16_t temp;
--
--    ret =3D pci_device_load(PCI_DEVICE(s), f);
--    if (ret < 0) {
--        return ret;
--    }
--    qemu_get_be16s(f, &s->ar.pm1.evt.sts);
--    qemu_get_be16s(f, &s->ar.pm1.evt.en);
--    qemu_get_be16s(f, &s->ar.pm1.cnt.cnt);
--
--    ret =3D vmstate_load_state(f, &vmstate_apm, &s->apm, 1);
--    if (ret) {
--        return ret;
--    }
--
--    timer_get(f, s->ar.tmr.timer);
--    qemu_get_sbe64s(f, &s->ar.tmr.overflow_time);
--
--    qemu_get_be16s(f, (uint16_t *)s->ar.gpe.sts);
--    for (i =3D 0; i < 3; i++) {
--        qemu_get_be16s(f, &temp);
--    }
--
--    qemu_get_be16s(f, (uint16_t *)s->ar.gpe.en);
--    for (i =3D 0; i < 3; i++) {
--        qemu_get_be16s(f, &temp);
--    }
--
--    ret =3D vmstate_load_state(f, &vmstate_pci_status,
--        &s->acpi_pci_hotplug.acpi_pcihp_pci_status[ACPI_PCIHP_BSEL_DEFAU=
-LT], 1);
--    return ret;
--}
--
- static bool vmstate_test_use_acpi_pci_hotplug(void *opaque, int version_=
-id)
- {
-     PIIX4PMState *s =3D opaque;
-@@ -312,8 +274,6 @@ static const VMStateDescription vmstate_acpi =3D {
-     .name =3D "piix4_pm",
-     .version_id =3D 3,
-     .minimum_version_id =3D 3,
--    .minimum_version_id_old =3D 1,
--    .load_state_old =3D acpi_load_old,
-     .post_load =3D vmstate_acpi_post_load,
-     .fields =3D (VMStateField[]) {
-         VMSTATE_PCI_DEVICE(parent_obj, PIIX4PMState),
-diff --git a/hw/intc/apic_common.c b/hw/intc/apic_common.c
-index aafd8e0e33..375cb6abe9 100644
---- a/hw/intc/apic_common.c
-+++ b/hw/intc/apic_common.c
-@@ -31,7 +31,6 @@
- #include "sysemu/kvm.h"
- #include "hw/qdev-properties.h"
- #include "hw/sysbus.h"
--#include "migration/qemu-file-types.h"
- #include "migration/vmstate.h"
+-config PCI_PIIX
++config PCI_I440FX
+     bool
+     select PCI
+     select PAM
+diff --git a/hw/pci-host/Makefile.objs b/hw/pci-host/Makefile.objs
+index a9cd3e022d..efd752b766 100644
+--- a/hw/pci-host/Makefile.objs
++++ b/hw/pci-host/Makefile.objs
+@@ -13,7 +13,7 @@ common-obj-$(CONFIG_VERSATILE_PCI) +=3D versatile.o
 =20
- static int apic_irq_delivered;
-@@ -262,52 +261,6 @@ static void apic_reset_common(DeviceState *dev)
-     apic_init_reset(dev);
- }
-=20
--/* This function is only used for old state version 1 and 2 */
--static int apic_load_old(QEMUFile *f, void *opaque, int version_id)
--{
--    APICCommonState *s =3D opaque;
--    APICCommonClass *info =3D APIC_COMMON_GET_CLASS(s);
--    int i;
--
--    if (version_id > 2) {
--        return -EINVAL;
--    }
--
--    /* XXX: what if the base changes? (registered memory regions) */
--    qemu_get_be32s(f, &s->apicbase);
--    qemu_get_8s(f, &s->id);
--    qemu_get_8s(f, &s->arb_id);
--    qemu_get_8s(f, &s->tpr);
--    qemu_get_be32s(f, &s->spurious_vec);
--    qemu_get_8s(f, &s->log_dest);
--    qemu_get_8s(f, &s->dest_mode);
--    for (i =3D 0; i < 8; i++) {
--        qemu_get_be32s(f, &s->isr[i]);
--        qemu_get_be32s(f, &s->tmr[i]);
--        qemu_get_be32s(f, &s->irr[i]);
--    }
--    for (i =3D 0; i < APIC_LVT_NB; i++) {
--        qemu_get_be32s(f, &s->lvt[i]);
--    }
--    qemu_get_be32s(f, &s->esr);
--    qemu_get_be32s(f, &s->icr[0]);
--    qemu_get_be32s(f, &s->icr[1]);
--    qemu_get_be32s(f, &s->divide_conf);
--    s->count_shift =3D qemu_get_be32(f);
--    qemu_get_be32s(f, &s->initial_count);
--    s->initial_count_load_time =3D qemu_get_be64(f);
--    s->next_time =3D qemu_get_be64(f);
--
--    if (version_id >=3D 2) {
--        s->timer_expiry =3D qemu_get_be64(f);
--    }
--
--    if (info->post_load) {
--        info->post_load(s);
--    }
--    return 0;
--}
--
- static const VMStateDescription vmstate_apic_common;
-=20
- static void apic_common_realize(DeviceState *dev, Error **errp)
-@@ -408,8 +361,6 @@ static const VMStateDescription vmstate_apic_common =3D=
- {
-     .name =3D "apic",
-     .version_id =3D 3,
-     .minimum_version_id =3D 3,
--    .minimum_version_id_old =3D 1,
--    .load_state_old =3D apic_load_old,
-     .pre_load =3D apic_pre_load,
-     .pre_save =3D apic_dispatch_pre_save,
-     .post_load =3D apic_dispatch_post_load,
-diff --git a/hw/pci-host/piix.c b/hw/pci-host/piix.c
-index 135c645535..2f4cbcbfe9 100644
---- a/hw/pci-host/piix.c
-+++ b/hw/pci-host/piix.c
-@@ -33,7 +33,6 @@
- #include "qapi/error.h"
- #include "qemu/range.h"
- #include "hw/xen/xen.h"
--#include "migration/qemu-file-types.h"
- #include "migration/vmstate.h"
- #include "hw/pci-host/pam.h"
- #include "sysemu/reset.h"
-@@ -174,28 +173,6 @@ static void i440fx_write_config(PCIDevice *dev,
-     }
- }
-=20
--static int i440fx_load_old(QEMUFile* f, void *opaque, int version_id)
--{
--    PCII440FXState *d =3D opaque;
--    PCIDevice *pd =3D PCI_DEVICE(d);
--    int ret, i;
--    uint8_t smm_enabled;
--
--    ret =3D pci_device_load(pd, f);
--    if (ret < 0)
--        return ret;
--    i440fx_update_memory_mappings(d);
--    qemu_get_8s(f, &smm_enabled);
--
--    if (version_id =3D=3D 2) {
--        for (i =3D 0; i < PIIX_NUM_PIRQS; i++) {
--            qemu_get_be32(f); /* dummy load for compatibility */
--        }
--    }
--
--    return 0;
--}
--
- static int i440fx_post_load(void *opaque, int version_id)
- {
-     PCII440FXState *d =3D opaque;
-@@ -208,8 +185,6 @@ static const VMStateDescription vmstate_i440fx =3D {
-     .name =3D "I440FX",
-     .version_id =3D 3,
-     .minimum_version_id =3D 3,
--    .minimum_version_id_old =3D 1,
--    .load_state_old =3D i440fx_load_old,
-     .post_load =3D i440fx_post_load,
-     .fields =3D (VMStateField[]) {
-         VMSTATE_PCI_DEVICE(parent_obj, PCII440FXState),
-diff --git a/hw/timer/i8254_common.c b/hw/timer/i8254_common.c
-index 57bf10cc94..050875b497 100644
---- a/hw/timer/i8254_common.c
-+++ b/hw/timer/i8254_common.c
-@@ -29,7 +29,6 @@
- #include "qemu/timer.h"
- #include "hw/timer/i8254.h"
- #include "hw/timer/i8254_internal.h"
--#include "migration/qemu-file-types.h"
- #include "migration/vmstate.h"
-=20
- /* val must be 0 or 1 */
-@@ -202,43 +201,6 @@ static const VMStateDescription vmstate_pit_channel =
-=3D {
-     }
- };
-=20
--static int pit_load_old(QEMUFile *f, void *opaque, int version_id)
--{
--    PITCommonState *pit =3D opaque;
--    PITCommonClass *c =3D PIT_COMMON_GET_CLASS(pit);
--    PITChannelState *s;
--    int i;
--
--    if (version_id !=3D 1) {
--        return -EINVAL;
--    }
--
--    for (i =3D 0; i < 3; i++) {
--        s =3D &pit->channels[i];
--        s->count =3D qemu_get_be32(f);
--        qemu_get_be16s(f, &s->latched_count);
--        qemu_get_8s(f, &s->count_latched);
--        qemu_get_8s(f, &s->status_latched);
--        qemu_get_8s(f, &s->status);
--        qemu_get_8s(f, &s->read_state);
--        qemu_get_8s(f, &s->write_state);
--        qemu_get_8s(f, &s->write_latch);
--        qemu_get_8s(f, &s->rw_mode);
--        qemu_get_8s(f, &s->mode);
--        qemu_get_8s(f, &s->bcd);
--        qemu_get_8s(f, &s->gate);
--        s->count_load_time =3D qemu_get_be64(f);
--        s->irq_disabled =3D 0;
--        if (i =3D=3D 0) {
--            s->next_transition_time =3D qemu_get_be64(f);
--        }
--    }
--    if (c->post_load) {
--        c->post_load(pit);
--    }
--    return 0;
--}
--
- static int pit_dispatch_pre_save(void *opaque)
- {
-     PITCommonState *s =3D opaque;
-@@ -266,8 +228,6 @@ static const VMStateDescription vmstate_pit_common =3D=
- {
-     .name =3D "i8254",
-     .version_id =3D 3,
-     .minimum_version_id =3D 2,
--    .minimum_version_id_old =3D 1,
--    .load_state_old =3D pit_load_old,
-     .pre_save =3D pit_dispatch_pre_save,
-     .post_load =3D pit_dispatch_post_load,
-     .fields =3D (VMStateField[]) {
+ common-obj-$(CONFIG_PCI_SABRE) +=3D sabre.o
+ common-obj-$(CONFIG_FULONG) +=3D bonito.o
+-common-obj-$(CONFIG_PCI_PIIX) +=3D piix.o
++common-obj-$(CONFIG_PCI_I440FX) +=3D i440fx.o
+ common-obj-$(CONFIG_PCI_EXPRESS_Q35) +=3D q35.o
+ common-obj-$(CONFIG_PCI_EXPRESS_GENERIC_BRIDGE) +=3D gpex.o
+ common-obj-$(CONFIG_PCI_EXPRESS_XILINX) +=3D xilinx-pcie.o
+diff --git a/hw/pci-host/piix.c b/hw/pci-host/i440fx.c
+similarity index 100%
+rename from hw/pci-host/piix.c
+rename to hw/pci-host/i440fx.c
 --=20
 2.21.0
 
