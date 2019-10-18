@@ -2,58 +2,64 @@ Return-Path: <SRS0=ht5U=YL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CDC93CA9EA0
-	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 14:06:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7B529CA9EA1
+	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 14:06:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9FBC121925
-	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 14:06:12 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9FBC121925
+	by mail.kernel.org (Postfix) with ESMTPS id 4F60E21925
+	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 14:06:29 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4F60E21925
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40556 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40558 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iLStP-0006WQ-5c
-	for qemu-devel@archiver.kernel.org; Fri, 18 Oct 2019 10:06:11 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56890)
+	id 1iLStf-0006wB-US
+	for qemu-devel@archiver.kernel.org; Fri, 18 Oct 2019 10:06:27 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57786)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1iLSnN-0008Rm-48
- for qemu-devel@nongnu.org; Fri, 18 Oct 2019 09:59:58 -0400
+ (envelope-from <eblake@redhat.com>) id 1iLSs2-000542-5V
+ for qemu-devel@nongnu.org; Fri, 18 Oct 2019 10:04:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1iLSnL-0001vf-Vk
- for qemu-devel@nongnu.org; Fri, 18 Oct 2019 09:59:57 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60732)
+ (envelope-from <eblake@redhat.com>) id 1iLSs0-00045k-PO
+ for qemu-devel@nongnu.org; Fri, 18 Oct 2019 10:04:46 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43658)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iLSnL-0001vS-Nl
- for qemu-devel@nongnu.org; Fri, 18 Oct 2019 09:59:55 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
+ (Exim 4.71) (envelope-from <eblake@redhat.com>)
+ id 1iLSry-00044E-2I; Fri, 18 Oct 2019 10:04:42 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id EBD2A18C4287;
- Fri, 18 Oct 2019 13:59:54 +0000 (UTC)
-Received: from x1w.redhat.com (unknown [10.40.205.74])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 8320A60566;
- Fri, 18 Oct 2019 13:59:51 +0000 (UTC)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH 4/5] hw/i386/pc: Extract pc_i8259_create()
-Date: Fri, 18 Oct 2019 15:59:09 +0200
-Message-Id: <20191018135910.24286-5-philmd@redhat.com>
-In-Reply-To: <20191018135910.24286-1-philmd@redhat.com>
-References: <20191018135910.24286-1-philmd@redhat.com>
+ by mx1.redhat.com (Postfix) with ESMTPS id 31EB9881363;
+ Fri, 18 Oct 2019 14:04:41 +0000 (UTC)
+Received: from [10.3.116.168] (ovpn-116-168.phx2.redhat.com [10.3.116.168])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 9330210013A1;
+ Fri, 18 Oct 2019 14:04:40 +0000 (UTC)
+Subject: Re: [PATCH v8 3/3] docs: qcow2: introduce compression type feature
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-block@nongnu.org
+References: <20191018094758.7124-1-vsementsov@virtuozzo.com>
+ <20191018094758.7124-4-vsementsov@virtuozzo.com>
+From: Eric Blake <eblake@redhat.com>
+Organization: Red Hat, Inc.
+Message-ID: <29df7fb8-8218-2228-9575-e84e369a7d9a@redhat.com>
+Date: Fri, 18 Oct 2019 09:04:40 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+In-Reply-To: <20191018094758.7124-4-vsementsov@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.62]); Fri, 18 Oct 2019 13:59:55 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
+ (mx1.redhat.com [10.5.110.69]); Fri, 18 Oct 2019 14:04:41 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 209.132.183.28
@@ -68,133 +74,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Huth <thuth@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>,
- "Michael S. Tsirkin" <mst@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Richard Henderson <rth@twiddle.net>
+Cc: kwolf@redhat.com, qemu-devel@nongnu.org, armbru@redhat.com,
+ dplotnikov@virtuozzo.com, den@openvz.org, mreitz@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The i8259 creation code is common to all PC machines, extract the
-common code.
+On 10/18/19 4:47 AM, Vladimir Sementsov-Ogievskiy wrote:
+> The patch add new additional field to qcow2 header: compression_type,
+> which specifies compression type. If field is absent or zero, default
+> compression type is set: ZLIB, which corresponds to current behavior.
+> 
+> New compression type (ZSTD) is to be added in further commit.
+> 
+> Suggested-by: Denis Plotnikov <dplotnikov@virtuozzo.com>
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> ---
+>   docs/interop/qcow2.txt | 19 ++++++++++++++++++-
+>   1 file changed, 18 insertions(+), 1 deletion(-)
+> 
+> diff --git a/docs/interop/qcow2.txt b/docs/interop/qcow2.txt
+> index b971e59b1a..4eabd81363 100644
+> --- a/docs/interop/qcow2.txt
+> +++ b/docs/interop/qcow2.txt
+> @@ -109,6 +109,12 @@ least next five fields, up to the @header_length field.
+>                                   An External Data File Name header extension may
+>                                   be present if this bit is set.
+>   
+> +                    Bit 3:      Compression type bit.  If this bit is set,
+> +                                non-default compression is used for compressed
+> +                                clusters. In this case, @header_length must
+> +                                be at least 105 and @compression_type field
+> +                                must be non-zero.
 
-Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
----
- hw/i386/pc.c         | 19 +++++++++++++++++++
- hw/i386/pc_piix.c    | 13 +------------
- hw/i386/pc_q35.c     | 14 +-------------
- include/hw/i386/pc.h |  1 +
- 4 files changed, 22 insertions(+), 25 deletions(-)
+I want to insist on 8-byte alignment, so this should be at least 112.
 
-diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-index 21efde33a5..16703c5edb 100644
---- a/hw/i386/pc.c
-+++ b/hw/i386/pc.c
-@@ -1981,6 +1981,25 @@ void pc_nic_init(PCMachineClass *pcmc, ISABus *isa=
-_bus, PCIBus *pci_bus)
-     rom_reset_order_override();
- }
-=20
-+void pc_i8259_create(ISABus *isa_bus, qemu_irq *i8259_irqs)
-+{
-+    qemu_irq *i8259;
-+
-+    if (kvm_pic_in_kernel()) {
-+        i8259 =3D kvm_i8259_init(isa_bus);
-+    } else if (xen_enabled()) {
-+        i8259 =3D xen_interrupt_controller_init();
-+    } else {
-+        i8259 =3D i8259_init(isa_bus, pc_allocate_cpu_irq());
-+    }
-+
-+    for (size_t i =3D 0; i < ISA_NUM_IRQS; i++) {
-+        i8259_irqs[i] =3D i8259[i];
-+    }
-+
-+    g_free(i8259);
-+}
-+
- void ioapic_init_gsi(GSIState *gsi_state, const char *parent_name)
- {
-     DeviceState *dev;
-diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
-index 47bdc64f64..1200ac6c0b 100644
---- a/hw/i386/pc_piix.c
-+++ b/hw/i386/pc_piix.c
-@@ -82,7 +82,6 @@ static void pc_init1(MachineState *machine,
-     ISABus *isa_bus;
-     PCII440FXState *i440fx_state;
-     int piix3_devfn =3D -1;
--    qemu_irq *i8259;
-     qemu_irq smi_irq;
-     GSIState *gsi_state;
-     DriveInfo *hd[MAX_IDE_BUS * MAX_IDE_DEVS];
-@@ -215,18 +214,8 @@ static void pc_init1(MachineState *machine,
-     }
-     isa_bus_irqs(isa_bus, pcms->gsi);
-=20
--    if (kvm_pic_in_kernel()) {
--        i8259 =3D kvm_i8259_init(isa_bus);
--    } else if (xen_enabled()) {
--        i8259 =3D xen_interrupt_controller_init();
--    } else {
--        i8259 =3D i8259_init(isa_bus, pc_allocate_cpu_irq());
--    }
-+    pc_i8259_create(isa_bus, gsi_state->i8259_irq);
-=20
--    for (i =3D 0; i < ISA_NUM_IRQS; i++) {
--        gsi_state->i8259_irq[i] =3D i8259[i];
--    }
--    g_free(i8259);
-     if (pcmc->pci_enabled) {
-         ioapic_init_gsi(gsi_state, "i440fx");
-     }
-diff --git a/hw/i386/pc_q35.c b/hw/i386/pc_q35.c
-index 6d096eff28..f4fb9a02ba 100644
---- a/hw/i386/pc_q35.c
-+++ b/hw/i386/pc_q35.c
-@@ -128,7 +128,6 @@ static void pc_q35_init(MachineState *machine)
-     MemoryRegion *ram_memory;
-     GSIState *gsi_state;
-     ISABus *isa_bus;
--    qemu_irq *i8259;
-     int i;
-     ICH9LPCState *ich9_lpc;
-     PCIDevice *ahci;
-@@ -255,18 +254,7 @@ static void pc_q35_init(MachineState *machine)
-     pci_bus_set_route_irq_fn(host_bus, ich9_route_intx_pin_to_irq);
-     isa_bus =3D ich9_lpc->isa_bus;
-=20
--    if (kvm_pic_in_kernel()) {
--        i8259 =3D kvm_i8259_init(isa_bus);
--    } else if (xen_enabled()) {
--        i8259 =3D xen_interrupt_controller_init();
--    } else {
--        i8259 =3D i8259_init(isa_bus, pc_allocate_cpu_irq());
--    }
--
--    for (i =3D 0; i < ISA_NUM_IRQS; i++) {
--        gsi_state->i8259_irq[i] =3D i8259[i];
--    }
--    g_free(i8259);
-+    pc_i8259_create(isa_bus, gsi_state->i8259_irq);
-=20
-     if (pcmc->pci_enabled) {
-         ioapic_init_gsi(gsi_state, "q35");
-diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
-index 9ad417cef0..06126034ae 100644
---- a/include/hw/i386/pc.h
-+++ b/include/hw/i386/pc.h
-@@ -239,6 +239,7 @@ void pc_pci_device_init(PCIBus *pci_bus);
-=20
- typedef void (*cpu_set_smm_t)(int smm, void *arg);
-=20
-+void pc_i8259_create(ISABus *isa_bus, qemu_irq *i8259_irqs);
- void ioapic_init_gsi(GSIState *gsi_state, const char *parent_name);
-=20
- ISADevice *pc_find_fdc0(void);
---=20
-2.21.0
+Also, as pointed out in v7, use of the decoration '@header_length' and 
+'@compression_type' is not consistent with the rest of the document. 
+Drop the @.
 
+> +
+>                       Bits 3-63:  Reserved (set to 0)
+>   
+>            80 -  87:  compatible_features
+> @@ -183,7 +189,18 @@ It's allowed for the header end to cut some field in the middle (in this case
+>   the field is considered as absent), but in this case the part of the field
+>   which is covered by @header_length must be zeroed.
+>   
+> -        < ... No additional fields in the header currently ... >
+> +              104:  compression_type
+> +                    Defines the compression method used for compressed clusters.
+> +                    A single compression type is applied to all compressed image
+> +                    clusters.
+> +                    If incompatible compression type bit is set: the field must
+> +                    exist (i.e. @header_length >= 105) and must be non-zero (
+> +                    which means non-zlib compression type)
+> +                    If incompatible compression type bit is unset: the field
+> +                    may not exist (if @header_length < 105) or it must be zero
+> +                    (which means zlib).
+> +                    Available compression type values:
+> +                        0: zlib <https://www.zlib.net/>
+>   
+
+One byte for the field is fine, but I'd still explicitly document 7 
+bytes of unused padding, since I want to insist on an 8-byte multiple.
+
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
 
