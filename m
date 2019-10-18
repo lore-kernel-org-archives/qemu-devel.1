@@ -2,51 +2,53 @@ Return-Path: <SRS0=ht5U=YL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 803FECA9EA0
-	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 11:41:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3B6E0CA9EA0
+	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 11:44:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5577121D7C
-	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 11:41:47 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5577121D7C
+	by mail.kernel.org (Postfix) with ESMTPS id 0238C21D7C
+	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 11:44:22 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0238C21D7C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38298 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38320 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iLQde-0007oD-EG
-	for qemu-devel@archiver.kernel.org; Fri, 18 Oct 2019 07:41:46 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35392)
+	id 1iLQg9-0000T1-5z
+	for qemu-devel@archiver.kernel.org; Fri, 18 Oct 2019 07:44:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35666)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <thuth@redhat.com>) id 1iLQcW-0007C3-KD
- for qemu-devel@nongnu.org; Fri, 18 Oct 2019 07:40:37 -0400
+ (envelope-from <thuth@redhat.com>) id 1iLQfQ-0008RK-9g
+ for qemu-devel@nongnu.org; Fri, 18 Oct 2019 07:43:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <thuth@redhat.com>) id 1iLQcV-0002ER-AE
- for qemu-devel@nongnu.org; Fri, 18 Oct 2019 07:40:36 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:37064)
+ (envelope-from <thuth@redhat.com>) id 1iLQfO-0003rQ-P1
+ for qemu-devel@nongnu.org; Fri, 18 Oct 2019 07:43:36 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:57506)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <thuth@redhat.com>)
- id 1iLQcV-0002E3-2e; Fri, 18 Oct 2019 07:40:35 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ id 1iLQfL-0003p7-De; Fri, 18 Oct 2019 07:43:31 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 557653090FEC;
- Fri, 18 Oct 2019 11:40:34 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 564C53078468;
+ Fri, 18 Oct 2019 11:43:30 +0000 (UTC)
 Received: from thuth.remote.csb (dhcp-200-228.str.redhat.com [10.33.200.228])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 23CDA5D713;
- Fri, 18 Oct 2019 11:40:33 +0000 (UTC)
-Subject: Re: [PATCH] Do not use %m in common code to print error messages
-To: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>
-References: <20191018104438.6158-1-thuth@redhat.com>
- <20191018105710.GD28271@redhat.com>
- <4bb84a56-30b1-72e7-7df1-770505744b39@redhat.com>
- <20191018113703.GE28271@redhat.com>
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 473EE600C4;
+ Fri, 18 Oct 2019 11:43:29 +0000 (UTC)
+Subject: Re: iotest failure -- test possibly not using sufficiently unique
+ temp filename?
+To: Max Reitz <mreitz@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
+References: <CAFEAcA8fwM03PXzkMvLdOWAL0R1Mq8hLmt8O-+NFSri6oHun1w@mail.gmail.com>
+ <010553d9-9dc6-907f-fc74-4cd5614f4a0e@redhat.com>
+ <CAFEAcA89CTV2jfv5chWH3fdCFS55CqMjqQ4MwFGwFumaqig6RA@mail.gmail.com>
+ <22502e83-f630-f9a6-8099-2373a52c6873@redhat.com>
+ <95fd1227-e733-92b1-787b-7682b0f4d1cc@redhat.com>
 From: Thomas Huth <thuth@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=thuth@redhat.com; prefer-encrypt=mutual; keydata=
@@ -92,18 +94,18 @@ Autocrypt: addr=thuth@redhat.com; prefer-encrypt=mutual; keydata=
  IQu4bBP2GxiRQ+NV3iV/KU3ebMRzqIC//DCOxzQNFNJAKldPe/bKZMCxEqtVoRkuJtNdp/5a
  yXFZ6TfE1hGKrDBYAm4vrnZ4CXFSBDllL59cFFOJCkn4Xboj/aVxxJxF30bn
 Organization: Red Hat
-Message-ID: <431ee20e-6a30-e002-ad8d-de3ff7b38c48@redhat.com>
-Date: Fri, 18 Oct 2019 13:40:32 +0200
+Message-ID: <81650b78-17f7-9301-67d7-1789969cdfe5@redhat.com>
+Date: Fri, 18 Oct 2019 13:43:24 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.9.0
 MIME-Version: 1.0
-In-Reply-To: <20191018113703.GE28271@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+In-Reply-To: <95fd1227-e733-92b1-787b-7682b0f4d1cc@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="O9yseHu9qpPvE3jx0wQvABNNl3M1VPbiP"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.43]); Fri, 18 Oct 2019 11:40:34 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
+ (mx1.redhat.com [10.5.110.41]); Fri, 18 Oct 2019 11:43:30 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 209.132.183.28
@@ -118,86 +120,206 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-trivial@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
- Kamil Rytarowski <kamil@netbsd.org>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>,
+ Qemu-block <qemu-block@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 18/10/2019 13.37, Daniel P. Berrang=C3=A9 wrote:
-> On Fri, Oct 18, 2019 at 01:31:34PM +0200, Thomas Huth wrote:
->> On 18/10/2019 12.57, Daniel P. Berrang=C3=A9 wrote:
->>> On Fri, Oct 18, 2019 at 12:44:38PM +0200, Thomas Huth wrote:
->>>> The %m format specifier is an extension from glibc - and when compil=
-ing
->>>> QEMU for NetBSD, the compiler correctly complains, e.g.:
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--O9yseHu9qpPvE3jx0wQvABNNl3M1VPbiP
+Content-Type: multipart/mixed; boundary="fYg6baLNmFFW6mQerpbttHHuY536YgoyH";
+ protected-headers="v1"
+From: Thomas Huth <thuth@redhat.com>
+To: Max Reitz <mreitz@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>,
+ Qemu-block <qemu-block@nongnu.org>, Kevin Wolf <kwolf@redhat.com>
+Message-ID: <81650b78-17f7-9301-67d7-1789969cdfe5@redhat.com>
+Subject: Re: iotest failure -- test possibly not using sufficiently unique
+ temp filename?
+References: <CAFEAcA8fwM03PXzkMvLdOWAL0R1Mq8hLmt8O-+NFSri6oHun1w@mail.gmail.com>
+ <010553d9-9dc6-907f-fc74-4cd5614f4a0e@redhat.com>
+ <CAFEAcA89CTV2jfv5chWH3fdCFS55CqMjqQ4MwFGwFumaqig6RA@mail.gmail.com>
+ <22502e83-f630-f9a6-8099-2373a52c6873@redhat.com>
+ <95fd1227-e733-92b1-787b-7682b0f4d1cc@redhat.com>
+In-Reply-To: <95fd1227-e733-92b1-787b-7682b0f4d1cc@redhat.com>
+
+--fYg6baLNmFFW6mQerpbttHHuY536YgoyH
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+
+On 18/10/2019 10.42, Max Reitz wrote:
+> On 18.10.19 08:20, Thomas Huth wrote:
+>> On 17/10/2019 18.41, Peter Maydell wrote:
+>>> On Fri, 27 Sep 2019 at 17:44, Max Reitz <mreitz@redhat.com> wrote:
 >>>>
->>>> /home/qemu/qemu-test.ELjfrQ/src/util/main-loop.c: In function 'sigfd=
-_handler':
->>>> /home/qemu/qemu-test.ELjfrQ/src/util/main-loop.c:64:13: warning: %m =
-is only
->>>>  allowed in syslog(3) like functions [-Wformat=3D]
->>>>              printf("read from sigfd returned %zd: %m\n", len);
->>>>              ^
->>>> Let's use g_strerror() here instead, which is an easy-to-use wrapper
->>>> around the thread-safe strerror_r() function.
+>>>> On 27.09.19 18:39, Peter Maydell wrote:
+>>>>> Hi; I just saw this iotest failure (on an s390x box, as it happens)=
+:
+>>>>>
+>>>>>   TEST    iotest-qcow2: 130 [fail]
+>>>>> QEMU          --
+>>>>> "/home/linux1/qemu/build/all/tests/qemu-iotests/../../s390x-softmmu=
+/qemu-system-s390x"
+>>>>> -nodefaults -display none -machine accel=3Dqtest
+>>>>> QEMU_IMG      -- "/home/linux1/qemu/build/all/tests/qemu-iotests/..=
+/../qemu-img"
+>>>>> QEMU_IO       --
+>>>>> "/home/linux1/qemu/build/all/tests/qemu-iotests/../../qemu-io"
+>>>>> --cache writeback -f qcow2
+>>>>> QEMU_NBD      -- "/home/linux1/qemu/build/all/tests/qemu-iotests/..=
+/../qemu-nbd"
+>>>>> IMGFMT        -- qcow2 (compat=3D1.1)
+>>>>> IMGPROTO      -- file
+>>>>> PLATFORM      -- Linux/s390x lxub05 4.15.0-58-generic
+>>>>> TEST_DIR      -- /home/linux1/qemu/build/all/tests/qemu-iotests/scr=
+atch
+>>>>> SOCKET_SCM_HELPER --
+>>>>> /home/linux1/qemu/build/all/tests/qemu-iotests/socket_scm_helper
+>>>>>
+>>>>> --- /home/linux1/qemu/tests/qemu-iotests/130.out        2019-05-10
+>>>>> 12:27:16.948075733 -0400
+>>>>> +++ /home/linux1/qemu/build/all/tests/qemu-iotests/130.out.bad
+>>>>> 2019-09-27 12:01:23.649722655 -0400
+>>>>> @@ -18,20 +18,22 @@
+>>>>>  QEMU X.Y.Z monitor - type 'help' for more information
+>>>>>  (qemu) commit testdisk
+>>>>>  (qemu)
+>>>>> -image: TEST_DIR/t.IMGFMT
+>>>>> -file format: IMGFMT
+>>>>> -virtual size: 64 MiB (67108864 bytes)
+>>>>> -backing file: TEST_DIR/t.IMGFMT.orig
+>>>>> -backing file format: raw
+>>>>> +qemu-img: Could not open 'TEST_DIR/t.IMGFMT': Failed to get shared=
+ "write" lock
+>>>>> +Is another process using the image [TEST_DIR/t.IMGFMT]?
+>>>>>
+>>>>>  =3D=3D=3D Marking image dirty (lazy refcounts) =3D=3D=3D
+>>>>>
+>>>>> +qemu-img: TEST_DIR/t.IMGFMT: Failed to get "write" lock
+>>>>> +Is another process using the image [TEST_DIR/t.IMGFMT]?
+>>>>>  Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D67108864
+>>>>> -wrote 4096/4096 bytes at offset 0
+>>>>> -4 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+>>>>> +qemu-io: can't open device
+>>>>> /home/linux1/qemu/build/all/tests/qemu-iotests/scratch/t.qcow2: Fai=
+led
+>>>>> to get "write" lock
+>>>>> +Is another process using the image
+>>>>> [/home/linux1/qemu/build/all/tests/qemu-iotests/scratch/t.qcow2]?
+>>>>> +no file open, try 'help open'
+>>>>>  image: TEST_DIR/t.IMGFMT
+>>>>>  file format: IMGFMT
+>>>>>  virtual size: 64 MiB (67108864 bytes)
+>>>>> +backing file: TEST_DIR/t.IMGFMT.orig
+>>>>> +backing file format: raw
+>>>>>  Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D67108864
+>>>>> backing_file=3DTEST_DIR/t.IMGFMT.orig backing_fmt=3Draw
+>>>>>  wrote 4096/4096 bytes at offset 0
+>>>>>  4 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+>>>>>
+>>>>>
+>>>>>
+>>>>> This looks suspiciously like the test isn't using a unique
+>>>>> filename for its disk image: "qemu-iotests/scratch/t.qcow2"
+>>>>> in the build directory, and so perhaps it has collided with
+>>>>> another iotest ?
+>>>>>
+>>>>> If we run 'make check' with a -j<something> option do the
+>>>>> iotests all get run serially anyway, or do they run in
+>>>>> parallel against each other ?
 >>>>
->>>> While we're at it, also convert the "printf()" in main-loop.c into
->>>> the preferred "error_report()".
+>>>> As far as I know, all iotests are executed serially.  Anything else
+>>>> would not work with the same scratch directory.
 >>>>
->>>> Signed-off-by: Thomas Huth <thuth@redhat.com>
->>>> ---
->>>>  hw/misc/tmp421.c | 8 ++++++--
->>>>  util/main-loop.c | 4 +++-
->>>>  util/systemd.c   | 5 +++--
->>>>  3 files changed, 12 insertions(+), 5 deletions(-)
->>>>
->>>> diff --git a/hw/misc/tmp421.c b/hw/misc/tmp421.c
->>>> index 9f044705fa..f23c46a40a 100644
->>>> --- a/hw/misc/tmp421.c
->>>> +++ b/hw/misc/tmp421.c
->>>> @@ -120,7 +120,9 @@ static void tmp421_get_temperature(Object *obj, =
-Visitor *v, const char *name,
->>>>      int tempid;
->>>> =20
->>>>      if (sscanf(name, "temperature%d", &tempid) !=3D 1) {
->>>> -        error_setg(errp, "error reading %s: %m", name);
->>>> +        const char *errmsg =3D g_strerror(errno);
->>>> +        error_setg(errp, "error reading %s: %s", name, errmsg);
->>>> +        g_free((gpointer)errmsg);
+>>>> The only thing I suspect is that some tool has been accidentally lef=
+t
+>>>> running by some previous test that still accesses its own image.  Bu=
+t I
+>>>> don=E2=80=99t know.
 >>>
->>> Kaboom crash. This is trying to free a const string that is the calle=
-r
->>> doesn't own. It remains under ownership of g_strerror forever.
+>>> Just saw this one again with the same iotest 130 on the same
+>>> s390 box; only difference is that the log this time around
+>>> has the first part where qemu-img fails, but not the second part
+>>> where qemu-io fails:
+>>>
+>>> --- /home/linux1/qemu/tests/qemu-iotests/130.out        2019-05-10
+>>> 12:27:16.948075733 -0400
+>>> +++ /home/linux1/qemu/build/all/tests/qemu-iotests/130.out.bad
+>>> 2019-10-17 11:56:43.450750873 -0400
+>>> @@ -18,11 +18,8 @@
+>>>  QEMU X.Y.Z monitor - type 'help' for more information
+>>>  (qemu) commit testdisk
+>>>  (qemu)
+>>> -image: TEST_DIR/t.IMGFMT
+>>> -file format: IMGFMT
+>>> -virtual size: 64 MiB (67108864 bytes)
+>>> -backing file: TEST_DIR/t.IMGFMT.orig
+>>> -backing file format: raw
+>>> +qemu-img: Could not open 'TEST_DIR/t.IMGFMT': Failed to get shared "=
+write" lock
+>>> +Is another process using the image [TEST_DIR/t.IMGFMT]?
+>>>
+>>>  =3D=3D=3D Marking image dirty (lazy refcounts) =3D=3D=3D
+>>>
+>>> On the host machine there don't seem to be any stray
+>>> processes which might have held the file open, and
+>>> indeed the file doesn't exist at all, so it got removed
+>>> by some cleanup or other.
 >>
->> Well, if you look at the implementation of g_strerror(), you can see
->> that glib returns allocated memory here (with g_strdup() for example).
->> So if we don't free, this will leak memory over time.
+>> Ok, so unless someone has a clue what might be going on here (is there=
+ a
+>> race in the test?), I'd suggest that we simply remove 130 from the aut=
+o
+>> group again. Shall I send a patch?
 >=20
-> This is *not* a leak, it is a cache.
+> I don=E2=80=99t have much of an idea.  It looks like maybe the qemu pro=
+cess
+> (which dos the commit) is lingering, but that shouldn=E2=80=99t be beca=
+use
+> _cleanup_qemu always waits for it.  (Also, I can=E2=80=99t reproduce th=
+e problem
+> on my system.)
 >=20
-> It is maintaining a static hash table that caches the mapping from
-> errno -> string. So many calls all with the same errno value will
-> return the same cached string. So by free'ing the string you're
-> causing a use-after-free flaw the next time the same errno is
-> passed to g_strerror. The memory usage here is finite, bounded
-> by the number of possible errnos that we see.
->=20
->> But you're right, the "const" and documentation of the function indica=
-te
->> that the caller should rather not free the memory. What a bummer, soun=
-ds
->> like g_strerror() is pretty much useless unless you immediately exit()
->> afterwards (and you care about not leaking memory).
->>
->> I guess we have to implement our own wrapper, qemu_strerror() instead?
->=20
-> No, g_strerror is working fine without free'ing the result.
+> The only hunch that I have is that 130 seems to be the only test that
+> uses _cleanup_qemu to kill a qemu process (i.e. without wait=3D1) while=
+ it
+> has taken locks on an image and then still uses the image afterwards.
+> Maybe making it quit qemu through HMP would fix the problem.  But
+> knowing is difficult because I can=E2=80=99t reproduce it.
 
-Ah, well, thanks for the explanation, not sure how I could have missed
-that when looking at the source code :-/ Time for weekend, I guess...
+I also can't reproduce the problem. I've now run 130 several hundred
+times in a loop on a s390x box and never saw the problem.
 
-So g_strerror should be fine, and I'll respin the patch without g_free.
+I think we should disable it for the time being.
 
  Thomas
+
+
+--fYg6baLNmFFW6mQerpbttHHuY536YgoyH--
+
+--O9yseHu9qpPvE3jx0wQvABNNl3M1VPbiP
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEJ7iIR+7gJQEY8+q5LtnXdP5wLbUFAl2ppVwACgkQLtnXdP5w
+LbXd4hAAnOfd3mn6LHCQ0AT4CczVEHCv+TpJqZJvk35KOzG3SoPd2Rwe5eo81+0N
+baV9wbMYAv2nSkwcZ+J1t9o+MuLrTkz0YgCQWWkBmLh7dmxDCLrr9bFedeTCUMZd
+wkACDGa3BR3+u1Qb2AJluItJ9Xf9skzxAqVZGpeObXZWGNtwU+s2GvypoLuXxkEL
+SYoqJD+qfJGbAO3nl6oqk8BF3x768vUxyfMTUkbrDqyNdvPHzTv9dzXk/xucKJ6n
+KUVRqQlzIi4BJaZ2LJfNtF3g+0gBIwW3Q63v+HirBgev6Ag2YHD+xO9/YuzTJEWX
+9KkXtqpo19Bf9+Oqx99TviSr/zTC7hdwNGXs1zV7xIn63pZHFbNkjXpAo62sackx
+eAwBoUsXpjN4yqGS8XEc5vRLKD0XVjERCvaBbdRO6bsaldQWtJc/jPUHmlda517s
+/GLUqsvaNbIJQLL2Wuy043vbGhwihPdTvbjR7esihzi4RNUeRCIn3IptQ+3buuZJ
++OJpe0zzLiBMUoxjOpRnQIULmjl7RMzFd/zVYNfYdM7omMb7e7hSw/gi4yJy3JkG
+afZfSDK3ZNpGyZNwo7opJWWpoN2QVjMwuZBIVtppFJcT2wH+jAOLwhQnoNPC2EUY
+BY/44NKLBWoaItdrws/qYH1nA8rkSWz4vSMwVCnNk6JRdF59XBA=
+=gdyy
+-----END PGP SIGNATURE-----
+
+--O9yseHu9qpPvE3jx0wQvABNNl3M1VPbiP--
 
