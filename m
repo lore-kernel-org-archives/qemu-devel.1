@@ -3,64 +3,67 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 260DCCA9EA9
-	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 22:16:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A1F5DCA9EA0
+	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 23:30:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EA6AA21852
-	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 22:16:32 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EA6AA21852
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 6CD3A2089C
+	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 23:30:00 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6CD3A2089C
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46306 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46562 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iLaXw-0003Kc-0U
-	for qemu-devel@archiver.kernel.org; Fri, 18 Oct 2019 18:16:32 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58526)
+	id 1iLbh1-0007re-Kb
+	for qemu-devel@archiver.kernel.org; Fri, 18 Oct 2019 19:29:59 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35406)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <quintela@redhat.com>) id 1iLaWg-0002Qn-HO
- for qemu-devel@nongnu.org; Fri, 18 Oct 2019 18:15:15 -0400
+ (envelope-from <no-reply@patchew.org>) id 1iLbgP-0007RT-Ij
+ for qemu-devel@nongnu.org; Fri, 18 Oct 2019 19:29:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <quintela@redhat.com>) id 1iLaWd-00063Y-My
- for qemu-devel@nongnu.org; Fri, 18 Oct 2019 18:15:12 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:39456)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <quintela@redhat.com>) id 1iLaWd-0005zy-Eb
- for qemu-devel@nongnu.org; Fri, 18 Oct 2019 18:15:11 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 265A33086E23;
- Fri, 18 Oct 2019 22:15:09 +0000 (UTC)
-Received: from redhat.com (ovpn-116-49.ams2.redhat.com [10.36.116.49])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 991EE79AD;
- Fri, 18 Oct 2019 22:15:08 +0000 (UTC)
-From: Juan Quintela <quintela@redhat.com>
-To: Scott Cheloha <cheloha@linux.vnet.ibm.com>
-Subject: Re: [PATCH] migration: savevm_state_insert_handler: constant-time
- element insertion
-In-Reply-To: <20191017192508.nwa2a34hzen3xgnr@rascal.austin.ibm.com> (Scott
- Cheloha's message of "Thu, 17 Oct 2019 14:25:08 -0500")
-References: <20191016164156.4506-1-cheloha@linux.vnet.ibm.com>
- <87lftjpxsz.fsf@trasno.org>
- <20191017192508.nwa2a34hzen3xgnr@rascal.austin.ibm.com>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.2 (gnu/linux)
-Date: Sat, 19 Oct 2019 00:15:07 +0200
-Message-ID: <87pnit7las.fsf@trasno.org>
+ (envelope-from <no-reply@patchew.org>) id 1iLbgM-00017h-L0
+ for qemu-devel@nongnu.org; Fri, 18 Oct 2019 19:29:21 -0400
+Resent-Date: Fri, 18 Oct 2019 19:29:21 -0400
+Resent-Message-Id: <E1iLbgM-00017h-L0@eggs.gnu.org>
+Received: from sender4-of-o54.zoho.com ([136.143.188.54]:21469)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <no-reply@patchew.org>)
+ id 1iLbgM-00015n-Dj; Fri, 18 Oct 2019 19:29:18 -0400
+ARC-Seal: i=1; a=rsa-sha256; t=1571441347; cv=none; 
+ d=zohomail.com; s=zohoarc; 
+ b=cTAWMD0Cr9Hu628ohSRUu+0aRtw/TClkionHtAjUIq9a2fPT6HylgNjnGng5HG/WYwjh7WOtz+TLdTEk9ZQKJFmN8wY5X5trbisHaOkP1iJaAxo25jAIr73GjIkD4RSJ6o0phJuBJOXqo7sgV4181Ami3R8IFssNzQmxJGkB4y4=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
+ s=zohoarc; t=1571441347;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
+ bh=f4yjxkBtH8jFEhclGK1E8gCwxE+9aToprEElST0s8sI=; 
+ b=gvEAcIsyicRdMGFhLJyCNbnSjwJFGlHjI7Frx2h4EusIY6NldLOI1/2BZBCt1ka3Te4X2914r3WrWESSNPvy/9Ps82kOS2TLK8dQ4R3UdWChR8MJfAVZm/x0ffWaWffb+2/VMB4Wa5Ni7jYipi4lXajHWHz9hulF3sfCfCQl5mk=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+ dkim=pass  header.i=patchew.org;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 1571441346092100.56928968137242;
+ Fri, 18 Oct 2019 16:29:06 -0700 (PDT)
+In-Reply-To: <20191018104438.6158-1-thuth@redhat.com>
+Subject: Re: [PATCH] Do not use %m in common code to print error messages
+Message-ID: <157144134474.24734.7450116290823922069@37313f22b938>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.44]); Fri, 18 Oct 2019 22:15:09 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: thuth@redhat.com
+Date: Fri, 18 Oct 2019 16:29:06 -0700 (PDT)
+X-ZohoMailClient: External
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 209.132.183.28
+X-Received-From: 136.143.188.54
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -72,113 +75,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: quintela@redhat.com
-Cc: qemu-devel@nongnu.org, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+Reply-To: qemu-devel@nongnu.org
+Cc: qemu-trivial@nongnu.org, pbonzini@redhat.com, kamil@netbsd.org,
+ berrange@redhat.com, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Scott Cheloha <cheloha@linux.vnet.ibm.com> wrote:
-> On Thu, Oct 17, 2019 at 10:43:08AM +0200, Juan Quintela wrote:
->> Scott Cheloha <cheloha@linux.vnet.ibm.com> wrote:
->> 
->> > Registering a SaveStateEntry object via savevm_state_insert_handler()
->> > is an O(n) operation because the list is a priority queue maintained by
->> > walking the list from head to tail to find a suitable insertion point.
->> >
->> > This adds considerable overhead for VMs with many such objects.  For
->> > instance, ppc64 machines with large maxmem (8T+) spend ~10% or more of
->> > their CPU time in savevm_state_insert_handler() before attempting to
->> > boot a kernel.
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MTAxODEwNDQzOC42MTU4
+LTEtdGh1dGhAcmVkaGF0LmNvbS8KCgoKSGksCgpUaGlzIHNlcmllcyBmYWlsZWQgdGhlIGRvY2tl
+ci1xdWlja0BjZW50b3M3IGJ1aWxkIHRlc3QuIFBsZWFzZSBmaW5kIHRoZSB0ZXN0aW5nIGNvbW1h
+bmRzIGFuZAp0aGVpciBvdXRwdXQgYmVsb3cuIElmIHlvdSBoYXZlIERvY2tlciBpbnN0YWxsZWQs
+IHlvdSBjYW4gcHJvYmFibHkgcmVwcm9kdWNlIGl0CmxvY2FsbHkuCgo9PT0gVEVTVCBTQ1JJUFQg
+QkVHSU4gPT09CiMhL2Jpbi9iYXNoCm1ha2UgZG9ja2VyLWltYWdlLWNlbnRvczcgVj0xIE5FVFdP
+Uks9MQp0aW1lIG1ha2UgZG9ja2VyLXRlc3QtcXVpY2tAY2VudG9zNyBTSE9XX0VOVj0xIEo9MTQg
+TkVUV09SSz0xCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgogIENDICAgICAgaHcvbWlzYy9pbXg2
+X2NjbS5vCiAgQ0MgICAgICBody9taXNjL2lteDZ1bF9jY20ubwovdG1wL3FlbXUtdGVzdC9zcmMv
+aHcvbWlzYy90bXA0MjEuYzogSW4gZnVuY3Rpb24gJ3RtcDQyMV9zZXRfdGVtcGVyYXR1cmUnOgov
+dG1wL3FlbXUtdGVzdC9zcmMvaHcvbWlzYy90bXA0MjEuYzoxNjY6OTogZXJyb3I6IGZvcm1hdCAn
+JXMnIGV4cGVjdHMgYSBtYXRjaGluZyAnY2hhciAqJyBhcmd1bWVudCBbLVdlcnJvcj1mb3JtYXQ9
+XQogICAgICAgICBlcnJvcl9zZXRnKGVycnAsICJlcnJvciByZWFkaW5nICVzOiAlcyIsIGVycm1z
+Zyk7CiAgICAgICAgIF4KY2MxOiBhbGwgd2FybmluZ3MgYmVpbmcgdHJlYXRlZCBhcyBlcnJvcnMK
+ICBDQyAgICAgIGh3L21pc2MvaW14N19jY20ubwogIENDICAgICAgaHcvbWlzYy9pbXgyX3dkdC5v
+Cm1ha2U6ICoqKiBbaHcvbWlzYy90bXA0MjEub10gRXJyb3IgMQptYWtlOiAqKiogV2FpdGluZyBm
+b3IgdW5maW5pc2hlZCBqb2JzLi4uLgpUcmFjZWJhY2sgKG1vc3QgcmVjZW50IGNhbGwgbGFzdCk6
+CiAgRmlsZSAiLi90ZXN0cy9kb2NrZXIvZG9ja2VyLnB5IiwgbGluZSA2NjIsIGluIDxtb2R1bGU+
+Ci0tLQogICAgcmFpc2UgQ2FsbGVkUHJvY2Vzc0Vycm9yKHJldGNvZGUsIGNtZCkKc3VicHJvY2Vz
+cy5DYWxsZWRQcm9jZXNzRXJyb3I6IENvbW1hbmQgJ1snc3VkbycsICctbicsICdkb2NrZXInLCAn
+cnVuJywgJy0tbGFiZWwnLCAnY29tLnFlbXUuaW5zdGFuY2UudXVpZD1lYWUwNTQ0MzIyOTA0NTg0
+YjMwZDNjZTdiY2I3N2E4MicsICctdScsICcxMDAxJywgJy0tc2VjdXJpdHktb3B0JywgJ3NlY2Nv
+bXA9dW5jb25maW5lZCcsICctLXJtJywgJy1lJywgJ1RBUkdFVF9MSVNUPScsICctZScsICdFWFRS
+QV9DT05GSUdVUkVfT1BUUz0nLCAnLWUnLCAnVj0nLCAnLWUnLCAnSj0xNCcsICctZScsICdERUJV
+Rz0nLCAnLWUnLCAnU0hPV19FTlY9MScsICctZScsICdDQ0FDSEVfRElSPS92YXIvdG1wL2NjYWNo
+ZScsICctdicsICcvaG9tZS9wYXRjaGV3Ly5jYWNoZS9xZW11LWRvY2tlci1jY2FjaGU6L3Zhci90
+bXAvY2NhY2hlOnonLCAnLXYnLCAnL3Zhci90bXAvcGF0Y2hldy10ZXN0ZXItdG1wLTc4Nm5zcmlx
+L3NyYy9kb2NrZXItc3JjLjIwMTktMTAtMTgtMTkuMjYuNTkuMTA2ODE6L3Zhci90bXAvcWVtdTp6
+LHJvJywgJ3FlbXU6Y2VudG9zNycsICcvdmFyL3RtcC9xZW11L3J1bicsICd0ZXN0LXF1aWNrJ10n
+IHJldHVybmVkIG5vbi16ZXJvIGV4aXQgc3RhdHVzIDIuCmZpbHRlcj0tLWZpbHRlcj1sYWJlbD1j
+b20ucWVtdS5pbnN0YW5jZS51dWlkPWVhZTA1NDQzMjI5MDQ1ODRiMzBkM2NlN2JjYjc3YTgyCm1h
+a2VbMV06ICoqKiBbZG9ja2VyLXJ1bl0gRXJyb3IgMQptYWtlWzFdOiBMZWF2aW5nIGRpcmVjdG9y
+eSBgL3Zhci90bXAvcGF0Y2hldy10ZXN0ZXItdG1wLTc4Nm5zcmlxL3NyYycKbWFrZTogKioqIFtk
+b2NrZXItcnVuLXRlc3QtcXVpY2tAY2VudG9zN10gRXJyb3IgMgoKcmVhbCAgICAybTUuNTc4cwp1
+c2VyICAgIDBtNy41MjJzCgoKVGhlIGZ1bGwgbG9nIGlzIGF2YWlsYWJsZSBhdApodHRwOi8vcGF0
+Y2hldy5vcmcvbG9ncy8yMDE5MTAxODEwNDQzOC42MTU4LTEtdGh1dGhAcmVkaGF0LmNvbS90ZXN0
+aW5nLmRvY2tlci1xdWlja0BjZW50b3M3Lz90eXBlPW1lc3NhZ2UuCi0tLQpFbWFpbCBnZW5lcmF0
+ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwczovL3BhdGNoZXcub3JnL10uClBsZWFz
+ZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
 
-> I was trying to avoid churning the file more than absolutely
-> necessary.  There are 18 QTAILQ_FOREACH() loops in savevm.c right now.
-> Making ~15 of them double-loops doesn't make the code easier to read.
-
-Change thecode to be something different, I agree that is more churn,
-but ...
-
->
-> I think incurring slight complexity on insertion/removal to make
-> insertion fast is well worth the conceptual simplicity of addressing
-> one big list of elements for every other operation.
->
->> savevm_state_handler_insert() for instance becomes even easier, just a
->> QTALIQ_INSERT_TAIL() in the proper queue, right?
->
-> Yes, insertion becomes extremely obvious: you just append the element
-> to the tail of its priority queue, which must already exist.
->
-> But see above for the cost.
->
->> I agree with the idea of the patch.  Especially when you told us how bad
->> the performance of the current code is.
->> 
->> Out of curiosity, how many objects are we talking about?
->
-> At maxmem=8T I'm seeing about 40000 elements in that list.  At
-> maxmem=64T I'm seeing around 262000.  The vast majority of these
-> elements are "spapr_drc" objects, each of which (IIRC) corresponds to
-> a 256MB chunk of address space.
-
-We are having trouble because we have too many objects.  So, the right
-approach IMHO is just to add the list of queueue.  Looking into the
-functions:
-
-static int calculate_new_instance_id(const char *idstr)
-static int calculate_compat_instance_id(const char *idstr)
-   * We can call QTAILQ_FOREACH in the propper subqueue
-
-static void savevm_state_handler_insert(SaveStateEntry *nse)
-   * We don't need the call if we do propper subqueues array
-
-void unregister_savevm(DeviceState *dev, const char *idstr, void
-   *opaque)
-   * We can use the propper subqueue
-
-vmstate_unregister
-   * We can use the propper subqueue
-
-bool qemu_savevm_state_blocked(Error **errp)
-  * We need to loop over all queues
-
-void qemu_savevm_state_setup(QEMUFile *f)
-int qemu_savevm_state_resume_prepare(MigrationState *s)
-int qemu_savevm_state_iterate(QEMUFile *f, bool postcopy)
-void qemu_savevm_state_complete_postcopy(QEMUFile *f)
-int qemu_savevm_state_complete_precopy_iterable(QEMUFile *f, bool
-  in_postcopy)
-int qemu_savevm_state_complete_precopy_non_iterable(QEMUFile *f,
-void qemu_savevm_state_pending(QEMUFile *f, uint64_t threshold_size,
-void qemu_savevm_state_cleanup(void)
-int qemu_save_device_state(QEMUFile *f)
-static int qemu_loadvm_state_setup(QEMUFile *f)
-void qemu_loadvm_state_cleanup(void)
- * Loop over all queues
-
-static SaveStateEntry *find_se(const char *idstr, int instance_id)
-qemu_loadvm_section_part_end(QEMUFile *f, MigrationIncomingState *mis)
-* we know the propper queue
-
-
-But basically all the ones that we need to loop over all queues don't
-have local state, so we can create a
-
-loop_over_all_handlers() function that takes a callback and does all the
-work.  They don't share states between iterations.
-
-What do you think?
-My problem with your appreach is that it makes insertion/removal more
-expensive, that is where you are showing performance problems.  In the
-places where we need to loop over all queues, we need to do it over all
-elements anyways, so the performance difference is going to be
-negigible.
-
-Once told that, having 40000 elements on that queue, it will make
-"downtime" for migration "interesting", to say the least, no?  How much
-size are we talking about?  Should we consider moving it to a live
-section?
-
-
-Later, Juan.
 
