@@ -2,66 +2,65 @@ Return-Path: <SRS0=ht5U=YL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 79B20CA9EA0
-	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 09:44:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A40CCA9EA1
+	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 09:46:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4E35020820
-	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 09:44:55 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4E35020820
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 1C9CF222BD
+	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 09:46:04 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1C9CF222BD
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37172 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37192 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iLOoY-0004Aa-Fe
-	for qemu-devel@archiver.kernel.org; Fri, 18 Oct 2019 05:44:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48352)
+	id 1iLOpf-0005Wf-A5
+	for qemu-devel@archiver.kernel.org; Fri, 18 Oct 2019 05:46:03 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48528)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgilbert@redhat.com>) id 1iLOnf-0003Bb-LN
- for qemu-devel@nongnu.org; Fri, 18 Oct 2019 05:44:01 -0400
+ (envelope-from <clg@kaod.org>) id 1iLOoX-0004QY-Nl
+ for qemu-devel@nongnu.org; Fri, 18 Oct 2019 05:44:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgilbert@redhat.com>) id 1iLOnd-0003BC-OS
- for qemu-devel@nongnu.org; Fri, 18 Oct 2019 05:43:58 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:37128)
+ (envelope-from <clg@kaod.org>) id 1iLOoV-0003fG-RS
+ for qemu-devel@nongnu.org; Fri, 18 Oct 2019 05:44:53 -0400
+Received: from 20.mo1.mail-out.ovh.net ([188.165.45.168]:49740)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1iLOnd-0003Aj-Io
- for qemu-devel@nongnu.org; Fri, 18 Oct 2019 05:43:57 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 7654A18CB916;
- Fri, 18 Oct 2019 09:43:56 +0000 (UTC)
-Received: from work-vm (unknown [10.36.118.42])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 201B71001B33;
- Fri, 18 Oct 2019 09:43:54 +0000 (UTC)
-Date: Fri, 18 Oct 2019 10:43:52 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: Laurent Vivier <lvivier@redhat.com>
-Subject: Re: [PATCH v2 2/2] migration: savevm_state_handler_insert:
- constant-time element insertion
-Message-ID: <20191018094352.GC2990@work-vm>
-References: <20191017205953.13122-1-cheloha@linux.vnet.ibm.com>
- <20191017205953.13122-3-cheloha@linux.vnet.ibm.com>
- <20191018081625.GA2990@work-vm>
- <351dca8e-e77c-c450-845b-d78ba621156a@redhat.com>
+ (Exim 4.71) (envelope-from <clg@kaod.org>) id 1iLOoV-0003e2-JG
+ for qemu-devel@nongnu.org; Fri, 18 Oct 2019 05:44:51 -0400
+Received: from player758.ha.ovh.net (unknown [10.109.160.76])
+ by mo1.mail-out.ovh.net (Postfix) with ESMTP id 880C2192DD8
+ for <qemu-devel@nongnu.org>; Fri, 18 Oct 2019 11:44:49 +0200 (CEST)
+Received: from kaod.org (lfbn-1-2229-223.w90-76.abo.wanadoo.fr [90.76.50.223])
+ (Authenticated sender: clg@kaod.org)
+ by player758.ha.ovh.net (Postfix) with ESMTPSA id 732B4B28C2D0;
+ Fri, 18 Oct 2019 09:44:45 +0000 (UTC)
+Subject: Re: [PATCH 1/2] spapr: Introduce a interrupt presenter reset handler
+To: David Gibson <david@gibson.dropbear.id.au>
+References: <20191017144241.12522-1-clg@kaod.org>
+ <20191017144241.12522-2-clg@kaod.org> <20191018024707.GB2000@umbus.fritz.box>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <e0e0140f-2d2d-c647-7167-8e95f01282fa@kaod.org>
+Date: Fri, 18 Oct 2019 11:44:44 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <351dca8e-e77c-c450-845b-d78ba621156a@redhat.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.63]); Fri, 18 Oct 2019 09:43:56 +0000 (UTC)
+In-Reply-To: <20191018024707.GB2000@umbus.fritz.box>
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
+X-Ovh-Tracer-Id: 9912704259065940889
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrjeelgddujecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 209.132.183.28
+X-Received-From: 188.165.45.168
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -73,59 +72,293 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Michael Roth <mdroth@linux.vnet.ibm.com>,
- Juan Quintela <quintela@redhat.com>,
- Scott Cheloha <cheloha@linux.vnet.ibm.com>, qemu-devel@nongnu.org,
- david@gibson.dropbear.id.au
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Greg Kurz <groug@kaod.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-* Laurent Vivier (lvivier@redhat.com) wrote:
-> On 18/10/2019 10:16, Dr. David Alan Gilbert wrote:
-> > * Scott Cheloha (cheloha@linux.vnet.ibm.com) wrote:
-> >> savevm_state's SaveStateEntry TAILQ is a priority queue.  Priority
-> >> sorting is maintained by searching from head to tail for a suitable
-> >> insertion spot.  Insertion is thus an O(n) operation.
-> >>
-> >> If we instead keep track of the head of each priority's subqueue
-> >> within that larger queue we can reduce this operation to O(1) time.
-> >>
-> >> savevm_state_handler_remove() becomes slightly more complex to
-> >> accomodate these gains: we need to replace the head of a priority's
-> >> subqueue when removing it.
-> >>
-> >> With O(1) insertion, booting VMs with many SaveStateEntry objects is
-> >> more plausible.  For example, a ppc64 VM with maxmem=8T has 40000 such
-> >> objects to insert.
-> > 
-> > Separate from reviewing this patch, I'd like to understand why you've
-> > got 40000 objects.  This feels very very wrong and is likely to cause
-> > problems to random other bits of qemu as well.
-> 
-> I think the 40000 objects are the "dr-connectors" that are used to plug
-> peripherals (memory, pci card, cpus, ...).
+On 18/10/2019 04:47, David Gibson wrote:
+> On Thu, Oct 17, 2019 at 04:42:40PM +0200, C=E9dric Le Goater wrote:
+>> The interrupt presenters are not reseted today.
+>=20
+> I don't think that's accurate.  We register reset handlers for both
+> ICP and TCTX already.  We might not be resetting in quite the right
+> order, but this will need a clearer description of what's changing.
+>=20
+> Also, with this patch as is, I think we'll reset twice (once from the
+> registered handler, once via the cpu).
 
-Yes, Scott confirmed that in the reply to the previous version.
-IMHO nothing in qemu is designed to deal with that many devices/objects
-- I'm sure that something other than the migration code is going to get upset.
+Unless the CPU is hotplugged, in which case it is only called once
+in the realize handler ...
 
-Is perhaps the structure wrong somewhere - should there be a single DRC
-device that knows about all DRCs?
+C.=20
 
-Dave
+>=20
+>> Extend the sPAPR IRQ
+>> backend with a new cpu_intc_reset() handler which will be called by
+>> the CPU reset handler.
+>>
+>> spapr_realize_vcpu() is modified to call the CPU reset only after the
+>> the intc presenter has been created.
+>>
+>> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
+>> ---
+>>  include/hw/ppc/spapr_irq.h |  4 ++++
+>>  include/hw/ppc/xics.h      |  1 +
+>>  include/hw/ppc/xive.h      |  1 +
+>>  hw/intc/spapr_xive.c       |  8 ++++++++
+>>  hw/intc/xics.c             |  5 +++++
+>>  hw/intc/xics_spapr.c       |  8 ++++++++
+>>  hw/intc/xive.c             | 11 ++++++++---
+>>  hw/ppc/spapr_cpu_core.c    |  8 ++++++--
+>>  hw/ppc/spapr_irq.c         | 21 +++++++++++++++++++++
+>>  9 files changed, 62 insertions(+), 5 deletions(-)
+>>
+>> diff --git a/include/hw/ppc/spapr_irq.h b/include/hw/ppc/spapr_irq.h
+>> index 5e150a667902..78327496c102 100644
+>> --- a/include/hw/ppc/spapr_irq.h
+>> +++ b/include/hw/ppc/spapr_irq.h
+>> @@ -52,6 +52,8 @@ typedef struct SpaprInterruptControllerClass {
+>>       */
+>>      int (*cpu_intc_create)(SpaprInterruptController *intc,
+>>                              PowerPCCPU *cpu, Error **errp);
+>> +    int (*cpu_intc_reset)(SpaprInterruptController *intc, PowerPCCPU =
+*cpu,
+>> +                          Error **errp);
+>>      int (*claim_irq)(SpaprInterruptController *intc, int irq, bool ls=
+i,
+>>                       Error **errp);
+>>      void (*free_irq)(SpaprInterruptController *intc, int irq);
+>> @@ -68,6 +70,8 @@ void spapr_irq_update_active_intc(SpaprMachineState =
+*spapr);
+>> =20
+>>  int spapr_irq_cpu_intc_create(SpaprMachineState *spapr,
+>>                                PowerPCCPU *cpu, Error **errp);
+>> +int spapr_irq_cpu_intc_reset(SpaprMachineState *spapr,
+>> +                             PowerPCCPU *cpu, Error **errp);
+>>  void spapr_irq_print_info(SpaprMachineState *spapr, Monitor *mon);
+>>  void spapr_irq_dt(SpaprMachineState *spapr, uint32_t nr_servers,
+>>                    void *fdt, uint32_t phandle);
+>> diff --git a/include/hw/ppc/xics.h b/include/hw/ppc/xics.h
+>> index 1e6a9300eb2b..602173c12250 100644
+>> --- a/include/hw/ppc/xics.h
+>> +++ b/include/hw/ppc/xics.h
+>> @@ -161,6 +161,7 @@ void icp_set_mfrr(ICPState *icp, uint8_t mfrr);
+>>  uint32_t icp_accept(ICPState *ss);
+>>  uint32_t icp_ipoll(ICPState *ss, uint32_t *mfrr);
+>>  void icp_eoi(ICPState *icp, uint32_t xirr);
+>> +void icp_reset(ICPState *icp);
+>> =20
+>>  void ics_write_xive(ICSState *ics, int nr, int server,
+>>                      uint8_t priority, uint8_t saved_priority);
+>> diff --git a/include/hw/ppc/xive.h b/include/hw/ppc/xive.h
+>> index fd3319bd3202..99381639f50c 100644
+>> --- a/include/hw/ppc/xive.h
+>> +++ b/include/hw/ppc/xive.h
+>> @@ -415,6 +415,7 @@ uint64_t xive_tctx_tm_read(XiveTCTX *tctx, hwaddr =
+offset, unsigned size);
+>> =20
+>>  void xive_tctx_pic_print_info(XiveTCTX *tctx, Monitor *mon);
+>>  Object *xive_tctx_create(Object *cpu, XiveRouter *xrtr, Error **errp)=
+;
+>> +void xive_tctx_reset(XiveTCTX *tctx);
+>> =20
+>>  static inline uint32_t xive_nvt_cam_line(uint8_t nvt_blk, uint32_t nv=
+t_idx)
+>>  {
+>> diff --git a/hw/intc/spapr_xive.c b/hw/intc/spapr_xive.c
+>> index ba32d2cc5b0f..0c3acf1a4192 100644
+>> --- a/hw/intc/spapr_xive.c
+>> +++ b/hw/intc/spapr_xive.c
+>> @@ -553,6 +553,13 @@ static int spapr_xive_cpu_intc_create(SpaprInterr=
+uptController *intc,
+>>      return 0;
+>>  }
+>> =20
+>> +static int spapr_xive_cpu_intc_reset(SpaprInterruptController *intc,
+>> +                                     PowerPCCPU *cpu, Error **errp)
+>> +{
+>> +    xive_tctx_reset(spapr_cpu_state(cpu)->tctx);
+>> +    return 0;
+>> +}
+>> +
+>>  static void spapr_xive_set_irq(SpaprInterruptController *intc, int ir=
+q, int val)
+>>  {
+>>      SpaprXive *xive =3D SPAPR_XIVE(intc);
+>> @@ -697,6 +704,7 @@ static void spapr_xive_class_init(ObjectClass *kla=
+ss, void *data)
+>>      sicc->activate =3D spapr_xive_activate;
+>>      sicc->deactivate =3D spapr_xive_deactivate;
+>>      sicc->cpu_intc_create =3D spapr_xive_cpu_intc_create;
+>> +    sicc->cpu_intc_reset =3D spapr_xive_cpu_intc_reset;
+>>      sicc->claim_irq =3D spapr_xive_claim_irq;
+>>      sicc->free_irq =3D spapr_xive_free_irq;
+>>      sicc->set_irq =3D spapr_xive_set_irq;
+>> diff --git a/hw/intc/xics.c b/hw/intc/xics.c
+>> index b5ac408f7b74..652771d6a5a5 100644
+>> --- a/hw/intc/xics.c
+>> +++ b/hw/intc/xics.c
+>> @@ -295,6 +295,11 @@ static void icp_reset_handler(void *dev)
+>>      }
+>>  }
+>> =20
+>> +void icp_reset(ICPState *icp)
+>> +{
+>> +    icp_reset_handler(icp);
+>> +}
+>> +
+>>  static void icp_realize(DeviceState *dev, Error **errp)
+>>  {
+>>      ICPState *icp =3D ICP(dev);
+>> diff --git a/hw/intc/xics_spapr.c b/hw/intc/xics_spapr.c
+>> index 4f64b9a9fc66..c0b2a576effe 100644
+>> --- a/hw/intc/xics_spapr.c
+>> +++ b/hw/intc/xics_spapr.c
+>> @@ -346,6 +346,13 @@ static int xics_spapr_cpu_intc_create(SpaprInterr=
+uptController *intc,
+>>      return 0;
+>>  }
+>> =20
+>> +static int xics_spapr_cpu_intc_reset(SpaprInterruptController *intc,
+>> +                                     PowerPCCPU *cpu, Error **errp)
+>> +{
+>> +    icp_reset(spapr_cpu_state(cpu)->icp);
+>> +    return 0;
+>> +}
+>> +
+>>  static int xics_spapr_claim_irq(SpaprInterruptController *intc, int i=
+rq,
+>>                                  bool lsi, Error **errp)
+>>  {
+>> @@ -433,6 +440,7 @@ static void ics_spapr_class_init(ObjectClass *klas=
+s, void *data)
+>>      sicc->activate =3D xics_spapr_activate;
+>>      sicc->deactivate =3D xics_spapr_deactivate;
+>>      sicc->cpu_intc_create =3D xics_spapr_cpu_intc_create;
+>> +    sicc->cpu_intc_reset =3D xics_spapr_cpu_intc_reset;
+>>      sicc->claim_irq =3D xics_spapr_claim_irq;
+>>      sicc->free_irq =3D xics_spapr_free_irq;
+>>      sicc->set_irq =3D xics_spapr_set_irq;
+>> diff --git a/hw/intc/xive.c b/hw/intc/xive.c
+>> index d420c6571e14..0ae3f9b1efe4 100644
+>> --- a/hw/intc/xive.c
+>> +++ b/hw/intc/xive.c
+>> @@ -547,7 +547,7 @@ void xive_tctx_pic_print_info(XiveTCTX *tctx, Moni=
+tor *mon)
+>>      }
+>>  }
+>> =20
+>> -static void xive_tctx_reset(void *dev)
+>> +static void xive_tctx_reset_handler(void *dev)
+>>  {
+>>      XiveTCTX *tctx =3D XIVE_TCTX(dev);
+>> =20
+>> @@ -568,6 +568,11 @@ static void xive_tctx_reset(void *dev)
+>>          ipb_to_pipr(tctx->regs[TM_QW3_HV_PHYS + TM_IPB]);
+>>  }
+>> =20
+>> +void xive_tctx_reset(XiveTCTX *tctx)
+>> +{
+>> +    xive_tctx_reset_handler(tctx);
+>> +}
+>> +
+>>  static void xive_tctx_realize(DeviceState *dev, Error **errp)
+>>  {
+>>      XiveTCTX *tctx =3D XIVE_TCTX(dev);
+>> @@ -608,12 +613,12 @@ static void xive_tctx_realize(DeviceState *dev, =
+Error **errp)
+>>          }
+>>      }
+>> =20
+>> -    qemu_register_reset(xive_tctx_reset, dev);
+>> +    qemu_register_reset(xive_tctx_reset_handler, dev);
+>>  }
+>> =20
+>>  static void xive_tctx_unrealize(DeviceState *dev, Error **errp)
+>>  {
+>> -    qemu_unregister_reset(xive_tctx_reset, dev);
+>> +    qemu_unregister_reset(xive_tctx_reset_handler, dev);
+>>  }
+>> =20
+>>  static int vmstate_xive_tctx_pre_save(void *opaque)
+>> diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
+>> index 3e4302c7d596..416aa75e5fba 100644
+>> --- a/hw/ppc/spapr_cpu_core.c
+>> +++ b/hw/ppc/spapr_cpu_core.c
+>> @@ -33,6 +33,7 @@ static void spapr_cpu_reset(void *opaque)
+>>      PowerPCCPUClass *pcc =3D POWERPC_CPU_GET_CLASS(cpu);
+>>      SpaprCpuState *spapr_cpu =3D spapr_cpu_state(cpu);
+>>      target_ulong lpcr;
+>> +    SpaprMachineState *spapr =3D SPAPR_MACHINE(qdev_get_machine());
+>> =20
+>>      cpu_reset(cs);
+>> =20
+>> @@ -77,9 +78,11 @@ static void spapr_cpu_reset(void *opaque)
+>>      spapr_cpu->dtl_addr =3D 0;
+>>      spapr_cpu->dtl_size =3D 0;
+>> =20
+>> -    spapr_caps_cpu_apply(SPAPR_MACHINE(qdev_get_machine()), cpu);
+>> +    spapr_caps_cpu_apply(spapr, cpu);
+>> =20
+>>      kvm_check_mmu(cpu, &error_fatal);
+>> +
+>> +    spapr_irq_cpu_intc_reset(spapr, cpu, &error_fatal);
+>>  }
+>> =20
+>>  void spapr_cpu_set_entry_state(PowerPCCPU *cpu, target_ulong nip, tar=
+get_ulong r3)
+>> @@ -235,12 +238,13 @@ static void spapr_realize_vcpu(PowerPCCPU *cpu, =
+SpaprMachineState *spapr,
+>>      kvmppc_set_papr(cpu);
+>> =20
+>>      qemu_register_reset(spapr_cpu_reset, cpu);
+>> -    spapr_cpu_reset(cpu);
+>> =20
+>>      if (spapr_irq_cpu_intc_create(spapr, cpu, &local_err) < 0) {
+>>          goto error_unregister;
+>>      }
+>> =20
+>> +    spapr_cpu_reset(cpu);
+>> +
+>>      if (!sc->pre_3_0_migration) {
+>>          vmstate_register(NULL, cs->cpu_index, &vmstate_spapr_cpu_stat=
+e,
+>>                           cpu->machine_data);
+>> diff --git a/hw/ppc/spapr_irq.c b/hw/ppc/spapr_irq.c
+>> index bb91c61fa000..5d2b64029cd5 100644
+>> --- a/hw/ppc/spapr_irq.c
+>> +++ b/hw/ppc/spapr_irq.c
+>> @@ -220,6 +220,27 @@ int spapr_irq_cpu_intc_create(SpaprMachineState *=
+spapr,
+>>      return 0;
+>>  }
+>> =20
+>> +int spapr_irq_cpu_intc_reset(SpaprMachineState *spapr,
+>> +                             PowerPCCPU *cpu, Error **errp)
+>> +{
+>> +    SpaprInterruptController *intcs[] =3D ALL_INTCS(spapr);
+>> +    int i;
+>> +    int rc;
+>> +
+>> +    for (i =3D 0; i < ARRAY_SIZE(intcs); i++) {
+>> +        SpaprInterruptController *intc =3D intcs[i];
+>> +        if (intc) {
+>> +            SpaprInterruptControllerClass *sicc =3D SPAPR_INTC_GET_CL=
+ASS(intc);
+>> +            rc =3D sicc->cpu_intc_reset(intc, cpu, errp);
+>> +            if (rc < 0) {
+>> +                return rc;
+>> +            }
+>> +        }
+>> +    }
+>> +
+>> +    return 0;
+>> +}
+>> +
+>>  static void spapr_set_irq(void *opaque, int irq, int level)
+>>  {
+>>      SpaprMachineState *spapr =3D SPAPR_MACHINE(opaque);
+>=20
 
-
-> https://github.com/qemu/qemu/blob/master/hw/ppc/spapr_drc.c
-> 
-> They are part of SPAPR specification.
-> 
-> https://raw.githubusercontent.com/qemu/qemu/master/docs/specs/ppc-spapr-hotplug.txt
-> 
-> CC Michael Roth
-> 
-> Thanks,
-> Laurent
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
