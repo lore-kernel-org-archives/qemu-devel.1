@@ -3,69 +3,68 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A177CA9EA9
-	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 16:43:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A1929CA9EA0
+	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 16:51:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D3DC42082C
-	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 16:43:01 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D3DC42082C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 755F020854
+	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 16:51:20 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 755F020854
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43186 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43260 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iLVLB-00008I-0f
-	for qemu-devel@archiver.kernel.org; Fri, 18 Oct 2019 12:43:01 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52579)
+	id 1iLVTD-00032M-I1
+	for qemu-devel@archiver.kernel.org; Fri, 18 Oct 2019 12:51:19 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53611)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <ehabkost@redhat.com>) id 1iLVK7-0007m2-7P
- for qemu-devel@nongnu.org; Fri, 18 Oct 2019 12:41:56 -0400
+ (envelope-from <no-reply@patchew.org>) id 1iLVSL-00026n-Pv
+ for qemu-devel@nongnu.org; Fri, 18 Oct 2019 12:50:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <ehabkost@redhat.com>) id 1iLVK6-0005lD-4U
- for qemu-devel@nongnu.org; Fri, 18 Oct 2019 12:41:55 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:39922)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1iLVK5-0005jX-Gx
- for qemu-devel@nongnu.org; Fri, 18 Oct 2019 12:41:54 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id B5B4AC049E12;
- Fri, 18 Oct 2019 16:41:52 +0000 (UTC)
-Received: from localhost (ovpn-116-20.phx2.redhat.com [10.3.116.20])
- by smtp.corp.redhat.com (Postfix) with ESMTP id B9C713DB4;
- Fri, 18 Oct 2019 16:41:44 +0000 (UTC)
-Date: Fri, 18 Oct 2019 13:41:43 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-To: Samuel Thibault <samuel.thibault@gnu.org>
-Subject: Re: Python 2 and test/vm/netbsd
-Message-ID: <20191018164143.GP4084@habkost.net>
-References: <20191016030021.GD4084@habkost.net>
- <a83d518a-6e39-0017-203d-2ee3d61935ca@redhat.com>
- <20191016224124.GF4084@habkost.net>
- <20191017220541.GJ4084@habkost.net>
- <20191017225548.GL4084@habkost.net>
- <20191018104439.c2tojlvi2c5zzesi@sirius.home.kraxel.org>
- <20191018142940.GN4084@habkost.net>
- <a0c2df74-360b-79de-132e-f4d5be5bfc12@redhat.com>
- <20191018160019.he52tpvjqolzgswg@function>
+ (envelope-from <no-reply@patchew.org>) id 1iLVSJ-0000fA-GW
+ for qemu-devel@nongnu.org; Fri, 18 Oct 2019 12:50:24 -0400
+Resent-Date: Fri, 18 Oct 2019 12:50:24 -0400
+Resent-Message-Id: <E1iLVSJ-0000fA-GW@eggs.gnu.org>
+Received: from sender4-of-o54.zoho.com ([136.143.188.54]:21425)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <no-reply@patchew.org>)
+ id 1iLVSJ-0000ea-96
+ for qemu-devel@nongnu.org; Fri, 18 Oct 2019 12:50:23 -0400
+ARC-Seal: i=1; a=rsa-sha256; t=1571417406; cv=none; 
+ d=zohomail.com; s=zohoarc; 
+ b=ah1BBq2sj6uq9yyjUeqgU1zB+o7dgN88hiSp7hfyc2W1NRYKtJ43phIMG9OcEUL3+mp263WRVAi1q/7AknOY4BIeSuYpzkL6zQ23XFLynabUV888rNigxIqgU9NjxmR6RVfkmWS104ApNJlK3yGS4MePSNASCljE3C2dcRJD/y0=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
+ s=zohoarc; t=1571417406;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
+ bh=lCRxQndVMWw580CPFSP2puM0BF6Sa+i89VhFf4OZrDE=; 
+ b=mngBavJdA7mzgZLSllpuOfjCC6mxAL91tXP8Nqj64y7OkWEG6QRMb5PmIYpLQCqtG4xtsIOtY9TKnuAszwRaodaMiDEqpqLOhpSO7v7ZiUC+QzawRKWJOdY8l4ElpA+6B2knm2wVG+bABG9YGYZWI8jZr9EyUwlkBtx8xTiIj1w=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+ dkim=pass  header.i=patchew.org;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 1571417405255312.60141177390335;
+ Fri, 18 Oct 2019 09:50:05 -0700 (PDT)
+In-Reply-To: <20191018004850.9888-1-richardw.yang@linux.intel.com>
+Subject: Re: [PATCH 0/6] migration/postcopy: enable compress during postcopy
+Message-ID: <157141740394.24734.9600428911119666435@37313f22b938>
 MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="5uO961YFyoDlzFnP"
-Content-Disposition: inline
-In-Reply-To: <20191018160019.he52tpvjqolzgswg@function>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.31]); Fri, 18 Oct 2019 16:41:52 +0000 (UTC)
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: richardw.yang@linux.intel.com
+Date: Fri, 18 Oct 2019 09:50:05 -0700 (PDT)
+X-ZohoMailClient: External
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 209.132.183.28
+X-Received-From: 136.143.188.54
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -77,120 +76,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Peter Maydell <peter.maydell@linaro.org>,
- Thomas Huth <thuth@redhat.com>,
- Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>,
- QEMU Developers <qemu-devel@nongnu.org>, John Snow <jsnow@redhat.com>,
- Kamil Rytarowski <kamil@netbsd.org>, Gerd Hoffmann <kraxel@redhat.com>,
- Kevin Wolf <kwolf@redhat.com>, Cleber Rosa <crosa@redhat.com>,
- =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>,
- Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
+Reply-To: qemu-devel@nongnu.org
+Cc: qemu-devel@nongnu.org, richardw.yang@linux.intel.com, dgilbert@redhat.com,
+ quintela@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MTAxODAwNDg1MC45ODg4
+LTEtcmljaGFyZHcueWFuZ0BsaW51eC5pbnRlbC5jb20vCgoKCkhpLAoKVGhpcyBzZXJpZXMgZmFp
+bGVkIHRoZSBkb2NrZXItbWluZ3dAZmVkb3JhIGJ1aWxkIHRlc3QuIFBsZWFzZSBmaW5kIHRoZSB0
+ZXN0aW5nIGNvbW1hbmRzIGFuZAp0aGVpciBvdXRwdXQgYmVsb3cuIElmIHlvdSBoYXZlIERvY2tl
+ciBpbnN0YWxsZWQsIHlvdSBjYW4gcHJvYmFibHkgcmVwcm9kdWNlIGl0CmxvY2FsbHkuCgo9PT0g
+VEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhIC9iaW4vYmFzaApleHBvcnQgQVJDSD14ODZfNjQKbWFr
+ZSBkb2NrZXItaW1hZ2UtZmVkb3JhIFY9MSBORVRXT1JLPTEKdGltZSBtYWtlIGRvY2tlci10ZXN0
+LW1pbmd3QGZlZG9yYSBKPTE0IE5FVFdPUks9MQo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKICBD
+QyAgICAgIGFhcmNoNjQtc29mdG1tdS9ody90aW1lci9hbGx3aW5uZXItYTEwLXBpdC5vCkluIGZp
+bGUgaW5jbHVkZWQgZnJvbSAvdG1wL3FlbXUtdGVzdC9zcmMvbWlncmF0aW9uL3JhbS5jOjI5Ogov
+dG1wL3FlbXUtdGVzdC9zcmMvbWlncmF0aW9uL3JhbS5jOiBJbiBmdW5jdGlvbiAncmFtX2xvYWRf
+cG9zdGNvcHknOgovdG1wL3FlbXUtdGVzdC9zcmMvbWlncmF0aW9uL3JhbS5jOjQxNzc6NTY6IGVy
+cm9yOiBjYXN0IGZyb20gcG9pbnRlciB0byBpbnRlZ2VyIG9mIGRpZmZlcmVudCBzaXplIFstV2Vy
+cm9yPXBvaW50ZXItdG8taW50LWNhc3RdCiAgICAgICAgICAgICB2b2lkICpwbGFjZV9kZXN0ID0g
+KHZvaWQgKilRRU1VX0FMSUdOX0RPV04oKHVuc2lnbmVkIGxvbmcpaG9zdCwKICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBeCi90bXAvcWVtdS10
+ZXN0L3NyYy9pbmNsdWRlL3FlbXUvb3NkZXAuaDoyNjg6MzM6IG5vdGU6IGluIGRlZmluaXRpb24g
+b2YgbWFjcm8gJ1FFTVVfQUxJR05fRE9XTicKICNkZWZpbmUgUUVNVV9BTElHTl9ET1dOKG4sIG0p
+ICgobikgLyAobSkgKiAobSkpCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIF4KY2Mx
+OiBhbGwgd2FybmluZ3MgYmVpbmcgdHJlYXRlZCBhcyBlcnJvcnMKbWFrZVsxXTogKioqIFsvdG1w
+L3FlbXUtdGVzdC9zcmMvcnVsZXMubWFrOjY5OiBtaWdyYXRpb24vcmFtLm9dIEVycm9yIDEKbWFr
+ZVsxXTogKioqIFdhaXRpbmcgZm9yIHVuZmluaXNoZWQgam9icy4uLi4KICBDQyAgICAgIHg4Nl82
+NC1zb2Z0bW11L3RhcmdldC9pMzg2L2FyY2hfZHVtcC5vCiAgQ0MgICAgICBhYXJjaDY0LXNvZnRt
+bXUvaHcvdXNiL3R1c2I2MDEwLm8KLS0tCiAgQ0MgICAgICBhYXJjaDY0LXNvZnRtbXUvaHcvYXJt
+L3hsbngtenlucW1wLm8KSW4gZmlsZSBpbmNsdWRlZCBmcm9tIC90bXAvcWVtdS10ZXN0L3NyYy9t
+aWdyYXRpb24vcmFtLmM6Mjk6Ci90bXAvcWVtdS10ZXN0L3NyYy9taWdyYXRpb24vcmFtLmM6IElu
+IGZ1bmN0aW9uICdyYW1fbG9hZF9wb3N0Y29weSc6Ci90bXAvcWVtdS10ZXN0L3NyYy9taWdyYXRp
+b24vcmFtLmM6NDE3Nzo1NjogZXJyb3I6IGNhc3QgZnJvbSBwb2ludGVyIHRvIGludGVnZXIgb2Yg
+ZGlmZmVyZW50IHNpemUgWy1XZXJyb3I9cG9pbnRlci10by1pbnQtY2FzdF0KICAgICAgICAgICAg
+IHZvaWQgKnBsYWNlX2Rlc3QgPSAodm9pZCAqKVFFTVVfQUxJR05fRE9XTigodW5zaWduZWQgbG9u
+Zylob3N0LAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgIF4KL3RtcC9xZW11LXRlc3Qvc3JjL2luY2x1ZGUvcWVtdS9vc2RlcC5oOjI2ODozMzog
+bm90ZTogaW4gZGVmaW5pdGlvbiBvZiBtYWNybyAnUUVNVV9BTElHTl9ET1dOJwogI2RlZmluZSBR
+RU1VX0FMSUdOX0RPV04obiwgbSkgKChuKSAvIChtKSAqIChtKSkKICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgXgpjYzE6IGFsbCB3YXJuaW5ncyBiZWluZyB0cmVhdGVkIGFzIGVycm9y
+cwptYWtlWzFdOiAqKiogWy90bXAvcWVtdS10ZXN0L3NyYy9ydWxlcy5tYWs6Njk6IG1pZ3JhdGlv
+bi9yYW0ub10gRXJyb3IgMQptYWtlWzFdOiAqKiogV2FpdGluZyBmb3IgdW5maW5pc2hlZCBqb2Jz
+Li4uLgptYWtlOiAqKiogW01ha2VmaWxlOjQ4MjogYWFyY2g2NC1zb2Z0bW11L2FsbF0gRXJyb3Ig
+MgptYWtlOiAqKiogV2FpdGluZyBmb3IgdW5maW5pc2hlZCBqb2JzLi4uLgptYWtlOiAqKiogW01h
+a2VmaWxlOjQ4MjogeDg2XzY0LXNvZnRtbXUvYWxsXSBFcnJvciAyClRyYWNlYmFjayAobW9zdCBy
+ZWNlbnQgY2FsbCBsYXN0KToKICBGaWxlICIuL3Rlc3RzL2RvY2tlci9kb2NrZXIucHkiLCBsaW5l
+IDY2MiwgaW4gPG1vZHVsZT4KICAgIHN5cy5leGl0KG1haW4oKSkKLS0tCiAgICByYWlzZSBDYWxs
+ZWRQcm9jZXNzRXJyb3IocmV0Y29kZSwgY21kKQpzdWJwcm9jZXNzLkNhbGxlZFByb2Nlc3NFcnJv
+cjogQ29tbWFuZCAnWydzdWRvJywgJy1uJywgJ2RvY2tlcicsICdydW4nLCAnLS1sYWJlbCcsICdj
+b20ucWVtdS5pbnN0YW5jZS51dWlkPTkwNTcwNDM0ODgwMzQ0MjQ5Y2ZmNzAxYmFhMTg4MTYzJywg
+Jy11JywgJzEwMDEnLCAnLS1zZWN1cml0eS1vcHQnLCAnc2VjY29tcD11bmNvbmZpbmVkJywgJy0t
+cm0nLCAnLWUnLCAnVEFSR0VUX0xJU1Q9JywgJy1lJywgJ0VYVFJBX0NPTkZJR1VSRV9PUFRTPScs
+ICctZScsICdWPScsICctZScsICdKPTE0JywgJy1lJywgJ0RFQlVHPScsICctZScsICdTSE9XX0VO
+Vj0nLCAnLWUnLCAnQ0NBQ0hFX0RJUj0vdmFyL3RtcC9jY2FjaGUnLCAnLXYnLCAnL2hvbWUvcGF0
+Y2hldy8uY2FjaGUvcWVtdS1kb2NrZXItY2NhY2hlOi92YXIvdG1wL2NjYWNoZTp6JywgJy12Jywg
+Jy92YXIvdG1wL3BhdGNoZXctdGVzdGVyLXRtcC1kaDhwNmYyNy9zcmMvZG9ja2VyLXNyYy4yMDE5
+LTEwLTE4LTEyLjQ3LjE5LjQxNjQ6L3Zhci90bXAvcWVtdTp6LHJvJywgJ3FlbXU6ZmVkb3JhJywg
+Jy92YXIvdG1wL3FlbXUvcnVuJywgJ3Rlc3QtbWluZ3cnXScgcmV0dXJuZWQgbm9uLXplcm8gZXhp
+dCBzdGF0dXMgMi4KZmlsdGVyPS0tZmlsdGVyPWxhYmVsPWNvbS5xZW11Lmluc3RhbmNlLnV1aWQ9
+OTA1NzA0MzQ4ODAzNDQyNDljZmY3MDFiYWExODgxNjMKbWFrZVsxXTogKioqIFtkb2NrZXItcnVu
+XSBFcnJvciAxCm1ha2VbMV06IExlYXZpbmcgZGlyZWN0b3J5IGAvdmFyL3RtcC9wYXRjaGV3LXRl
+c3Rlci10bXAtZGg4cDZmMjcvc3JjJwptYWtlOiAqKiogW2RvY2tlci1ydW4tdGVzdC1taW5nd0Bm
+ZWRvcmFdIEVycm9yIDIKCnJlYWwgICAgMm00NS42OTFzCnVzZXIgICAgMG04LjM5MHMKCgpUaGUg
+ZnVsbCBsb2cgaXMgYXZhaWxhYmxlIGF0Cmh0dHA6Ly9wYXRjaGV3Lm9yZy9sb2dzLzIwMTkxMDE4
+MDA0ODUwLjk4ODgtMS1yaWNoYXJkdy55YW5nQGxpbnV4LmludGVsLmNvbS90ZXN0aW5nLmRvY2tl
+ci1taW5nd0BmZWRvcmEvP3R5cGU9bWVzc2FnZS4KLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0
+aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHBzOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91
+ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
 
---5uO961YFyoDlzFnP
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Fri, Oct 18, 2019 at 06:00:19PM +0200, Samuel Thibault wrote:
-> Philippe Mathieu-Daud=E9, le ven. 18 oct. 2019 16:58:00 +0200, a ecrit:
-> > On 10/18/19 4:29 PM, Eduardo Habkost wrote:
-> > > On Fri, Oct 18, 2019 at 12:44:39PM +0200, Gerd Hoffmann wrote:
-> > > >    Hi,
-> > > >=20
-> > > > > > Running with V=3D1, I see packages being downloaded at reason=
-able speeds, but
-> > > > > > there's a huge interval (of various minutes) between each pac=
-kage download.
-> > > > >=20
-> > > > > I've found the cause for the slowness I'm seeing: for each file
-> > > > > being downloaded, the guest spents at least 75 seconds trying t=
-o
-> > > > > connect to the IPv6 address of ftp.NetBSD.org, before trying
-> > > > > IPv4.
-> > > >=20
-> > > > Ah, that nicely explains why it worked just fine for me.  First, =
-I have
-> > > > a local proxy configured so the installer isn't going to connect =
-to
-> > > > ftp.NetBSD.org directly.  Second I have IPv6 connectivity.
-> > > >=20
-> > > > > I don't know if this is a NetBSD bug, or a slirp bug.
-> > > >=20
-> > > > Both I'd say ...
-> > > >=20
-> > > > First, by default slirp should not send IPv6 router announcements
-> > > > to the user network if the host has no IPv6 connectivity.
-> > > >=20
-> > > > Second, the recommended way to connect is to try ipv4 and ipv6 in
-> > > > parallel, then use whatever connects first.  Web browsers typical=
-ly
-> > > > do it that way.  wget and curl don't do that though, they try one
-> > > > address after the other, and I guess this is where the delay come=
-s
-> > > > from ...
-> > >=20
-> > > In addition to that, the connect() error should be generating a
-> > > ICMP6_UNREACH message, and I'd expect the NetBSD guest to notice
-> > > it instead of waiting for timeout.
-> >=20
-> > Is this missing in SLiRP?
->=20
-> It was implemented at the time of introduction of IPv6 in SLIRP. Perhap=
-s
-> NetBSD has a slightly different behavior which makes the implementation
-> fail to notice the error.
-
-If anybody is interested in investigating it, a network traffic
-dump generated by `-object filter-dump` is attached.
-
---=20
-Eduardo
-
---5uO961YFyoDlzFnP
-Content-Type: application/gzip
-Content-Disposition: attachment; filename="dump.pcap.gz"
-Content-Transfer-Encoding: base64
-
-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
-bpl2wediFHZ/Aje85bc5HQAA
-
---5uO961YFyoDlzFnP--
 
