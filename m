@@ -3,55 +3,55 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C47BDCA9EA9
-	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 18:21:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CD983CA9EA9
+	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 18:22:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9A38D20820
-	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 18:21:50 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9A38D20820
+	by mail.kernel.org (Postfix) with ESMTPS id A73E320820
+	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 18:22:56 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A73E320820
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44886 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44900 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iLWsn-0004q8-BX
-	for qemu-devel@archiver.kernel.org; Fri, 18 Oct 2019 14:21:49 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34756)
+	id 1iLWtr-0006NP-K5
+	for qemu-devel@archiver.kernel.org; Fri, 18 Oct 2019 14:22:55 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34734)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <ehabkost@redhat.com>) id 1iLWoc-0007Fb-V7
- for qemu-devel@nongnu.org; Fri, 18 Oct 2019 14:17:31 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <ehabkost@redhat.com>) id 1iLWob-0001Vx-UP
- for qemu-devel@nongnu.org; Fri, 18 Oct 2019 14:17:30 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46108)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1iLWob-0001VT-P1
+ (envelope-from <ehabkost@redhat.com>) id 1iLWoa-0007Cu-QY
  for qemu-devel@nongnu.org; Fri, 18 Oct 2019 14:17:29 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+ (envelope-from <ehabkost@redhat.com>) id 1iLWoZ-0001Ta-RT
+ for qemu-devel@nongnu.org; Fri, 18 Oct 2019 14:17:28 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:50454)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1iLWoZ-0001Sr-Ld
+ for qemu-devel@nongnu.org; Fri, 18 Oct 2019 14:17:27 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id F2BB518C8906;
- Fri, 18 Oct 2019 18:17:28 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id C54453175295;
+ Fri, 18 Oct 2019 18:17:26 +0000 (UTC)
 Received: from localhost (ovpn-116-20.phx2.redhat.com [10.3.116.20])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 86C18600C1;
- Fri, 18 Oct 2019 18:17:28 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 9BA255D713;
+ Fri, 18 Oct 2019 18:17:21 +0000 (UTC)
 From: Eduardo Habkost <ehabkost@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v5 3/3] tests/vm/netbsd: Disable IPv6
-Date: Fri, 18 Oct 2019 15:17:05 -0300
-Message-Id: <20191018181705.17957-4-ehabkost@redhat.com>
+Subject: [PATCH v5 2/3] tests/vm: Let subclasses disable IPv6
+Date: Fri, 18 Oct 2019 15:17:04 -0300
+Message-Id: <20191018181705.17957-3-ehabkost@redhat.com>
 In-Reply-To: <20191018181705.17957-1-ehabkost@redhat.com>
 References: <20191018181705.17957-1-ehabkost@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.70]); Fri, 18 Oct 2019 18:17:29 +0000 (UTC)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.49]); Fri, 18 Oct 2019 18:17:26 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
@@ -77,31 +77,38 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Workaround for issues when the host has no IPv6 connectivity.
+The mechanism will be used to work around issues related to IPv6
+on the netbsd image builder.
 
 Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 ---
- tests/vm/netbsd | 7 +++++++
- 1 file changed, 7 insertions(+)
+ tests/vm/basevm.py | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
-diff --git a/tests/vm/netbsd b/tests/vm/netbsd
-index 49a99477f4..5e04dcd9b1 100755
---- a/tests/vm/netbsd
-+++ b/tests/vm/netbsd
-@@ -62,6 +62,13 @@ class NetBSDVM(basevm.BaseVM):
-     """
-     poweroff =3D "/sbin/poweroff"
-=20
-+    # Workaround for NetBSD + IPv6 + slirp issues.
-+    # NetBSD seems to ignore the ICMPv6 Destination Unreachable
-+    # messages generated by slirp.  When the host has no IPv6
-+    # connectivity, this causes every connection to ftp.NetBSD.org
-+    # take more than a minute to be established.
-+    ipv6 =3D False
-+
-     def build_image(self, img):
-         cimg =3D self._download_with_cache(self.link)
-         img_tmp =3D img + ".tmp"
+diff --git a/tests/vm/basevm.py b/tests/vm/basevm.py
+index b5d1479bee..2929de23aa 100755
+--- a/tests/vm/basevm.py
++++ b/tests/vm/basevm.py
+@@ -57,6 +57,8 @@ class BaseVM(object):
+     arch =3D "#arch"
+     # command to halt the guest, can be overridden by subclasses
+     poweroff =3D "poweroff"
++    # enable IPv6 networking
++    ipv6 =3D True
+     def __init__(self, debug=3DFalse, vcpus=3DNone):
+         self._guest =3D None
+         self._tmpdir =3D os.path.realpath(tempfile.mkdtemp(prefix=3D"vm-=
+test-",
+@@ -81,7 +83,8 @@ class BaseVM(object):
+         self._args =3D [ \
+             "-nodefaults", "-m", "4G",
+             "-cpu", "max",
+-            "-netdev", "user,id=3Dvnet,hostfwd=3D:127.0.0.1:0-:22",
++            "-netdev", "user,id=3Dvnet,hostfwd=3D:127.0.0.1:0-:22" +
++                       (",ipv6=3Dno" if not self.ipv6 else ""),
+             "-device", "virtio-net-pci,netdev=3Dvnet",
+             "-vnc", "127.0.0.1:0,to=3D20"]
+         if vcpus and vcpus > 1:
 --=20
 2.21.0
 
