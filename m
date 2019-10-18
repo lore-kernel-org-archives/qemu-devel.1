@@ -2,59 +2,65 @@ Return-Path: <SRS0=ht5U=YL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3D12BCA9EB3
-	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 00:54:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0906ECA9EB3
+	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 01:01:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 181AA21852
-	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 00:54:00 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 181AA21852
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id D4D3A2064A
+	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 01:01:51 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D4D3A2064A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34452 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34470 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iLGWl-0001Te-8Q
-	for qemu-devel@archiver.kernel.org; Thu, 17 Oct 2019 20:53:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49283)
+	id 1iLGeM-0003gq-QC
+	for qemu-devel@archiver.kernel.org; Thu, 17 Oct 2019 21:01:50 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50238)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richardw.yang@linux.intel.com>) id 1iLGSL-0004QS-36
- for qemu-devel@nongnu.org; Thu, 17 Oct 2019 20:49:26 -0400
+ (envelope-from <tao3.xu@intel.com>) id 1iLGdg-0003Fi-AU
+ for qemu-devel@nongnu.org; Thu, 17 Oct 2019 21:01:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richardw.yang@linux.intel.com>) id 1iLGSJ-00019x-Uo
- for qemu-devel@nongnu.org; Thu, 17 Oct 2019 20:49:25 -0400
-Received: from mga06.intel.com ([134.134.136.31]:15620)
+ (envelope-from <tao3.xu@intel.com>) id 1iLGde-0007h7-Cy
+ for qemu-devel@nongnu.org; Thu, 17 Oct 2019 21:01:07 -0400
+Received: from mga04.intel.com ([192.55.52.120]:34671)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <richardw.yang@linux.intel.com>)
- id 1iLGSJ-00010g-M9
- for qemu-devel@nongnu.org; Thu, 17 Oct 2019 20:49:23 -0400
+ (Exim 4.71) (envelope-from <tao3.xu@intel.com>) id 1iLGde-0007dr-5c
+ for qemu-devel@nongnu.org; Thu, 17 Oct 2019 21:01:06 -0400
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
-Received: from orsmga003.jf.intel.com ([10.7.209.27])
- by orsmga104.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
- 17 Oct 2019 17:49:23 -0700
+Received: from orsmga004.jf.intel.com ([10.7.209.38])
+ by fmsmga104.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
+ 17 Oct 2019 18:00:55 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.67,309,1566889200"; d="scan'208";a="199552637"
-Received: from richard.sh.intel.com (HELO localhost) ([10.239.159.54])
- by orsmga003.jf.intel.com with ESMTP; 17 Oct 2019 17:49:22 -0700
-From: Wei Yang <richardw.yang@linux.intel.com>
-To: quintela@redhat.com,
-	dgilbert@redhat.com
-Subject: [PATCH 5/6] migration/postcopy: enable random order target page
- arrival
-Date: Fri, 18 Oct 2019 08:48:49 +0800
-Message-Id: <20191018004850.9888-6-richardw.yang@linux.intel.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20191018004850.9888-1-richardw.yang@linux.intel.com>
-References: <20191018004850.9888-1-richardw.yang@linux.intel.com>
+X-IronPort-AV: E=Sophos;i="5.67,309,1566889200"; d="scan'208";a="347933114"
+Received: from txu2-mobl.ccr.corp.intel.com (HELO [10.239.196.130])
+ ([10.239.196.130])
+ by orsmga004.jf.intel.com with ESMTP; 17 Oct 2019 18:00:09 -0700
+Subject: Re: [PATCH RESEND v6 1/2] x86/cpu: Add support for
+ UMONITOR/UMWAIT/TPAUSE
+From: Tao Xu <tao3.xu@intel.com>
+To: "pbonzini@redhat.com" <pbonzini@redhat.com>
+References: <20191011074103.30393-1-tao3.xu@intel.com>
+ <20191011074103.30393-2-tao3.xu@intel.com>
+ <1731d87f-f07a-916f-90a7-346b593d821e@intel.com>
+Message-ID: <60857ac6-ec04-2197-235c-d20600001a02@intel.com>
+Date: Fri, 18 Oct 2019 09:00:08 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
+MIME-Version: 1.0
+In-Reply-To: <1731d87f-f07a-916f-90a7-346b593d821e@intel.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 134.134.136.31
+X-Received-From: 192.55.52.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -66,79 +72,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org, Wei Yang <richardw.yang@linux.intel.com>
+Cc: "ehabkost@redhat.com" <ehabkost@redhat.com>,
+ "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "Liu,
+ Jingqi" <jingqi.liu@intel.com>, "mtosatti@redhat.com" <mtosatti@redhat.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "rth@twiddle.net" <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-After using number of target page received to track one host page, we
-could have the capability to handle random order target page arrival in
-one host page.
-
-This is a preparation for enabling compress during postcopy.
-
-Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
----
- migration/ram.c | 16 +++-------------
- 1 file changed, 3 insertions(+), 13 deletions(-)
-
-diff --git a/migration/ram.c b/migration/ram.c
-index b5759793a9..da0596411c 100644
---- a/migration/ram.c
-+++ b/migration/ram.c
-@@ -4015,7 +4015,6 @@ static int ram_load_postcopy(QEMUFile *f)
-     MigrationIncomingState *mis = migration_incoming_get_current();
-     /* Temporary page that is later 'placed' */
-     void *postcopy_host_page = mis->postcopy_tmp_page;
--    void *last_host = NULL;
-     bool all_zero = false;
-     int target_pages = 0;
- 
-@@ -4062,24 +4061,15 @@ static int ram_load_postcopy(QEMUFile *f)
-              * that's moved into place later.
-              * The migration protocol uses,  possibly smaller, target-pages
-              * however the source ensures it always sends all the components
--             * of a host page in order.
-+             * of a host page in one chunk.
-              */
-             page_buffer = postcopy_host_page +
-                           ((uintptr_t)host & (block->page_size - 1));
-             /* If all TP are zero then we can optimise the place */
-             if (target_pages == 1) {
-                 all_zero = true;
--            } else {
--                /* not the 1st TP within the HP */
--                if (host != (last_host + TARGET_PAGE_SIZE)) {
--                    error_report("Non-sequential target page %p/%p",
--                                  host, last_host);
--                    ret = -EINVAL;
--                    break;
--                }
-             }
- 
--
-             /*
-              * If it's the last part of a host page then we place the host
-              * page
-@@ -4090,7 +4080,6 @@ static int ram_load_postcopy(QEMUFile *f)
-             }
-             place_source = postcopy_host_page;
-         }
--        last_host = host;
- 
-         switch (flags & ~RAM_SAVE_FLAG_CONTINUE) {
-         case RAM_SAVE_FLAG_ZERO:
-@@ -4143,7 +4132,8 @@ static int ram_load_postcopy(QEMUFile *f)
- 
-         if (!ret && place_needed) {
-             /* This gets called at the last target page in the host page */
--            void *place_dest = host + TARGET_PAGE_SIZE - block->page_size;
-+            void *place_dest = (void *)QEMU_ALIGN_DOWN((unsigned long)host,
-+                                                       block->page_size);
- 
-             if (all_zero) {
-                 ret = postcopy_place_page_zero(mis, place_dest,
--- 
-2.17.1
+Hi Paolo,
+Ping :)
+On 10/11/2019 3:49 PM, Tao Xu wrote:
+> On 10/11/2019 3:41 PM, Xu, Tao3 wrote:
+> [...]
+>> diff --git a/target/i386/kvm.c b/target/i386/kvm.c
+>> index 11b9c854b5..a465c893b5 100644
+>> --- a/target/i386/kvm.c
+>> +++ b/target/i386/kvm.c
+>> @@ -401,6 +401,12 @@ uint32_t kvm_arch_get_supported_cpuid(KVMState 
+>> *s, uint32_t function,
+>>           if (host_tsx_blacklisted()) {
+>>               ret &= ~(CPUID_7_0_EBX_RTM | CPUID_7_0_EBX_HLE);
+>>           }
+>> +    } else if (function == 7 && index == 0 && reg == R_ECX) {
+>> +        if (enable_cpu_pm) {
+>> +            ret |= CPUID_7_0_ECX_WAITPKG;
+>> +        } else {
+>> +            ret &= ~CPUID_7_0_ECX_WAITPKG;
+>> +        }
+> 
+> Hi Paolo,
+> 
+> I am sorry because I realize in KVM side, I keep cpuid mask WAITPKG as 0:
+> 
+> F(CLDEMOTE) | F(MOVDIRI) | F(MOVDIR64B) | 0 /*WAITPKG*/;
+> 
+> Therefore in QEMU side, we need to add CPUID_7_0_ECX_WAITPKG when 
+> enable_cpu_pm is on. Otherwise, QEMU can't get this CPUID.
+> 
+> Could you review this part again? Thank you very much!
+> 
+> Tao
 
 
