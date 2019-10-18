@@ -2,91 +2,88 @@ Return-Path: <SRS0=ht5U=YL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C947ACA9EA1
-	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 10:09:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9E9FDCA9EA0
+	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 10:14:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 977C4222CE
-	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 10:09:54 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DF2FV5kU"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 977C4222CE
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 785AC21D7C
+	for <qemu-devel@archiver.kernel.org>; Fri, 18 Oct 2019 10:14:24 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 785AC21D7C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37498 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37512 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iLPCj-0002lK-PZ
-	for qemu-devel@archiver.kernel.org; Fri, 18 Oct 2019 06:09:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52332)
+	id 1iLPH5-0004OD-M8
+	for qemu-devel@archiver.kernel.org; Fri, 18 Oct 2019 06:14:23 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52905)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <stefanha@gmail.com>) id 1iLPC6-0002JF-Ji
- for qemu-devel@nongnu.org; Fri, 18 Oct 2019 06:09:15 -0400
+ (envelope-from <philmd@redhat.com>) id 1iLPGK-0003uc-DW
+ for qemu-devel@nongnu.org; Fri, 18 Oct 2019 06:13:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <stefanha@gmail.com>) id 1iLPC5-0007rd-La
- for qemu-devel@nongnu.org; Fri, 18 Oct 2019 06:09:14 -0400
-Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:38964)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1iLPC5-0007rG-FL
- for qemu-devel@nongnu.org; Fri, 18 Oct 2019 06:09:13 -0400
-Received: by mail-wr1-x441.google.com with SMTP id r3so5606714wrj.6
- for <qemu-devel@nongnu.org>; Fri, 18 Oct 2019 03:09:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:in-reply-to:user-agent;
- bh=Jlq9FZcvZf1xuE9ojcvY5JlBHqwm16Z+6mIUoj9IPzM=;
- b=DF2FV5kUcyitm5oZPiUc2ykgH0BQy8b0fX7wXHXDgYvAiUuhxxBpi0KJsjt57Tpban
- 0hWI8ILTGkrl4whQuwNi/QBoV5mApDPxyiAHGRV1CnkvBToqNfeId622UWt6dp2ps59j
- E8kBZKnkjAvuBxwj3SGQLonltN0a5hUowxJDk/4kIk6n2Wcx+wa7iXMrzK0tOBlT6nZ7
- VzfATyh4BcrKfAYrpvfXudNXU7hM/Xcs/PABv/8ZOgy22VAjyWaxa21oJavO6jLE0b6W
- OXxvJgCU56Sd60esaDUDQPbVRMgyaM0yo2P3CTmUiUwgQSJZEP2yJuVSpnFhSHvI9Hqb
- pkng==
+ (envelope-from <philmd@redhat.com>) id 1iLPGF-0000qy-Dj
+ for qemu-devel@nongnu.org; Fri, 18 Oct 2019 06:13:32 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43592)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iLPGD-0000qZ-Hc
+ for qemu-devel@nongnu.org; Fri, 18 Oct 2019 06:13:31 -0400
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id DBA9F81F0E
+ for <qemu-devel@nongnu.org>; Fri, 18 Oct 2019 10:13:27 +0000 (UTC)
+Received: by mail-wr1-f72.google.com with SMTP id v7so464222wrf.4
+ for <qemu-devel@nongnu.org>; Fri, 18 Oct 2019 03:13:27 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to:user-agent;
- bh=Jlq9FZcvZf1xuE9ojcvY5JlBHqwm16Z+6mIUoj9IPzM=;
- b=XwK7lEpj0q2R7Ux+RyB5rY7bE6XPk3Z5t0SdfeXaYlROF2AwBlt+DtTmvCdnO/t3HL
- yuGHcH7t/dClgw/98tt/Kas8zAGHJnqOz0BWOs3KkaB/XCCjpVwRCdMTstd1qwuZRJjB
- swJVw1agFhI9HkmW61gPiHOclodINgW66jjHaw9jOE7Qpd9MQVX9as5GLBZCo78nIWtx
- 3DEEcfEfUwilIEZRFvgcrMkO21GFo9wXq3zS/X5pmNBrrTahAf9R7IFQ2+X012WjCdDY
- CcowVCtzQ97zHqiciredLpfYMF6VjD8jyhF+qsPTvCFfpc/m8vAG4ntsg0hHA0mTWij5
- YoNg==
-X-Gm-Message-State: APjAAAUv9QhktjQsE42NZ89bYP3gTVKx0DmYvgscmXJ25hqPy6cXoK2K
- s0iThbTgMFL8t6V3k8JjYyI=
-X-Google-Smtp-Source: APXvYqyt9B0RBlUcRDg7Gx/W7jLab4kkuohNtIpTuUqeEzV5piRUdi7bKuBQaXI/1Vc4iRpRmJ7HyA==
-X-Received: by 2002:adf:9c81:: with SMTP id d1mr6779098wre.238.1571393352116; 
- Fri, 18 Oct 2019 03:09:12 -0700 (PDT)
-Received: from localhost ([51.15.41.238])
- by smtp.gmail.com with ESMTPSA id v11sm4474454wml.30.2019.10.18.03.09.10
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 18 Oct 2019 03:09:11 -0700 (PDT)
-Date: Fri, 18 Oct 2019 11:09:09 +0100
-From: Stefan Hajnoczi <stefanha@gmail.com>
-To: Miklos Szeredi <mszeredi@redhat.com>
-Subject: Re: [Virtio-fs] [PATCH 0/2] virtiofsd: Two fix for xattr operation
-Message-ID: <20191018100909.GB9360@stefanha-x1.localdomain>
-References: <20191016103754.2047-1-misono.tomohiro@jp.fujitsu.com>
- <20191017100528.GA24790@stefanha-x1.localdomain>
- <CAOssrKfR=sfE1RzOXzvPbdQg-g7i5-f8W9y8bWFnO=gyJ2VMsg@mail.gmail.com>
- <20191017160953.GC1266@stefanha-x1.localdomain>
- <CAOssrKejcfVWXw6Nu1owyEeofTdVp6BNx4bL91ma2g7bg9-nmg@mail.gmail.com>
- <CAOssrKdbAT5s=CYG6PBtE6OYdqgwG8vp9T6QMJpwZ7X3tKjPmg@mail.gmail.com>
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=TtpeVOU0CB3Z5Pi14TfQb3eoNoka1C+7OsdVoDAEyJQ=;
+ b=QimlzNV6h1866NCfinJiBfnG95Eyn2ClH6E2IbYOCPYbE31vhqSGnS5OOCNYzKeK7F
+ wGsrYI8gAueKjIN6kiFmmduqwhDiCYgkWBhuUF0abMtAduZSB1Ob8Cy0P8q/mChQxS8h
+ malrRs4Nt8N+gnQHp20H2J76MCGtimXRcTj5gFr3Oifz9EAh8kvWb+USyGljJ4K3oGoq
+ 7ipBVqlbGpiCjxMrBgnfqJMbEy3Zl9lTAJ/T5IfH7Ikd8MRHR3EOnOsqS9lofKzV53mg
+ wtFLcSlnI2ifjc4QpqQMN1oUPqokKvDLk1z9FoXy9PdhxzFsfv12hRWflwVUDAsOn3v2
+ 4Ogw==
+X-Gm-Message-State: APjAAAW7Rsz9v4mpzv1ThmoK6G7AgzkpG23dGVMq8xWO3KfApPMOHScm
+ ta2HjUAsspcoYHcYrJxck41tvqzSYy2VQnOPTvkZhlFRJhHNcDcebt+E/T1vl1JalDK3bk75cNn
+ by/eDJtpdMhvc6aE=
+X-Received: by 2002:adf:f342:: with SMTP id e2mr7526501wrp.61.1571393606554;
+ Fri, 18 Oct 2019 03:13:26 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqz+3NzNQn9FvsIQOtta1OOWdkuNxGj4MR/rBLllahR05nKUHca1ThqhXDg1PMLWRrtb4OsFgQ==
+X-Received: by 2002:adf:f342:: with SMTP id e2mr7526470wrp.61.1571393606316;
+ Fri, 18 Oct 2019 03:13:26 -0700 (PDT)
+Received: from [192.168.1.36] (14.red-88-21-201.staticip.rima-tde.net.
+ [88.21.201.14])
+ by smtp.gmail.com with ESMTPSA id y3sm9244642wro.36.2019.10.18.03.13.24
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Fri, 18 Oct 2019 03:13:25 -0700 (PDT)
+Subject: Re: [PATCH 26/32] hw/pci-host/piix: Move RCR_IOPORT register
+ definition
+To: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+References: <20191015162705.28087-1-philmd@redhat.com>
+ <20191015162705.28087-27-philmd@redhat.com>
+ <CAL1e-=jVr+idQKNdOGSrODeq7XU-0JcCFTwapqk9-JvAKxk6Pw@mail.gmail.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <e149d24f-8d77-4126-8fc8-012b114dfe37@redhat.com>
+Date: Fri, 18 Oct 2019 12:13:23 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.1
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="lEGEL1/lMxI0MVQ2"
-Content-Disposition: inline
-In-Reply-To: <CAOssrKdbAT5s=CYG6PBtE6OYdqgwG8vp9T6QMJpwZ7X3tKjPmg@mail.gmail.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::441
+In-Reply-To: <CAL1e-=jVr+idQKNdOGSrODeq7XU-0JcCFTwapqk9-JvAKxk6Pw@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,60 +95,127 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: virtio-fs@redhat.com, Misono Tomohiro <misono.tomohiro@jp.fujitsu.com>,
- Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
+Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
+ Stefano Stabellini <sstabellini@kernel.org>,
+ Eduardo Habkost <ehabkost@redhat.com>,
+ "kvm@vger.kernel.org" <kvm@vger.kernel.org>, Paul Durrant <paul@xen.org>,
+ "Michael S. Tsirkin" <mst@redhat.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
+ Igor Mammedov <imammedo@redhat.com>,
+ =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>,
+ Aleksandar Markovic <amarkovic@wavecomp.com>,
+ "xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>,
+ Anthony Perard <anthony.perard@citrix.com>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
+ Aurelien Jarno <aurelien@aurel32.net>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-
---lEGEL1/lMxI0MVQ2
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Fri, Oct 18, 2019 at 09:16:36AM +0200, Miklos Szeredi wrote:
-> On Thu, Oct 17, 2019 at 6:48 PM Miklos Szeredi <mszeredi@redhat.com> wrot=
-e:
+On 10/18/19 11:19 AM, Aleksandar Markovic wrote:
+> On Tuesday, October 15, 2019, Philippe Mathieu-Daud=C3=A9 <philmd@redha=
+t.com=20
+> <mailto:philmd@redhat.com>> wrote:
 >=20
-> > Even simpler: allow O_PATH descriptors for f*xattr().
+>     From: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org <mailto:f4bug@am=
+sat.org>>
 >=20
-> Attached patch.  Will post shortly.
+>     The RCR_IOPORT register belongs to the PIIX chipset.
+>     Move the definition to "piix.h".
 >=20
-> However, I think it would make sense to fix virtiofsd as well, as this
-> will take time to percolate down, even if Al doesn't find anything
-> wrong with it.
+>     Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com
+>     <mailto:philmd@redhat.com>>
+>     ---
+>      =C2=A0hw/pci-host/piix.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+| 1 +
+>      =C2=A0include/hw/i386/pc.h=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 | 6 -=
+-----
+>      =C2=A0include/hw/southbridge/piix.h | 6 ++++++
+>      =C2=A03 files changed, 7 insertions(+), 6 deletions(-)
 >=20
-> Doing unshare(CLONE_FS) after thread startup seems safe, though must
-> be careful to change the working directory to the root of the mount
-> *before* starting any threads.
+>=20
+> Does it make sense to add prefix PIIX_ or a similar one to the register=
+=20
+> name?
 
-Thank you for extending O_PATH, that's great!  This will be the cleanest
-way to perform xattr operations.
+Good idea, it will make the comment in hw/i386/acpi-build.c:213 cleaner:
 
-If your patch is accepted I will send a man-pages.git patch to update
-the open(2) O_PATH documentation (with a minimum kernel version).
+     /* The above need not be conditional on machine type because the=20
+reset port
+      * happens to be the same on PIIX (pc) and ICH9 (q35). */
+     QEMU_BUILD_BUG_ON(ICH9_RST_CNT_IOPORT !=3D RCR_IOPORT);
 
-I've added the unshare(CLONE_FS) task to my todo list in case no one
-else gets to it first.  I may not have time to work on it before
-Novemeber though.
+>=20
+> In any case:
+>=20
+> Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com=20
+> <mailto:amarkovic@wavecomp.com>>
 
-Stefan
+Thanks!
 
---lEGEL1/lMxI0MVQ2
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl2pj0UACgkQnKSrs4Gr
-c8ihKAf9HtkKCMKQu3EvE+nGschLd/P5PZJdPs1o2ZmGG6yHO5lSlBMt8eNF5frd
-58XBP5jHk/0ii88ZFSXYXcvm+MaMIuEPKTfZSKY91vkjmp45NGqkLeq83F1wMoXE
-LDZCgba/h8ZTY6e/g0WrNUyNywUvqhOcvl7Fk9NfIjaMNtNl7U/IewiETe+ekY68
-4WMdHFOCjqkmwZZ+VowJTtiofRWAGlqn98IJA08qE3jTTtONVGxNge/CmHqkihEa
-oLLleTxItT++w1Vh0gvqQWLUPr/QQEy2ZyMr8zOuAy85mytJZu7XhFx15orpr6Ul
-awL/0E+Ek2F1tDbq+PFNcAX4SwEnmQ==
-=bw0r
------END PGP SIGNATURE-----
-
---lEGEL1/lMxI0MVQ2--
+>=20
+>     diff --git a/hw/pci-host/piix.c b/hw/pci-host/piix.c
+>     index 3292703de7..3770575c1a 100644
+>     --- a/hw/pci-host/piix.c
+>     +++ b/hw/pci-host/piix.c
+>     @@ -27,6 +27,7 @@
+>      =C2=A0#include "hw/irq.h"
+>      =C2=A0#include "hw/pci/pci.h"
+>      =C2=A0#include "hw/pci/pci_host.h"
+>     +#include "hw/southbridge/piix.h"
+>      =C2=A0#include "hw/qdev-properties.h"
+>      =C2=A0#include "hw/isa/isa.h"
+>      =C2=A0#include "hw/sysbus.h"
+>     diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
+>     index 183326d9fe..1c20b96571 100644
+>     --- a/include/hw/i386/pc.h
+>     +++ b/include/hw/i386/pc.h
+>     @@ -257,12 +257,6 @@ typedef struct PCII440FXState PCII440FXState;
+>=20
+>      =C2=A0#define TYPE_IGD_PASSTHROUGH_I440FX_PCI_DEVICE
+>     "igd-passthrough-i440FX"
+>=20
+>     -/*
+>     - * Reset Control Register: PCI-accessible ISA-Compatible Register
+>     at address
+>     - * 0xcf9, provided by the PCI/ISA bridge (PIIX3 PCI function 0,
+>     8086:7000).
+>     - */
+>     -#define RCR_IOPORT 0xcf9
+>     -
+>      =C2=A0PCIBus *i440fx_init(const char *host_type, const char *pci_t=
+ype,
+>      =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0PCII440FXState **pi440fx_state, int *piix_devfn,
+>      =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0ISABus **isa_bus, qemu_irq *pic,
+>     diff --git a/include/hw/southbridge/piix.h
+>     b/include/hw/southbridge/piix.h
+>     index add352456b..79ebe0089b 100644
+>     --- a/include/hw/southbridge/piix.h
+>     +++ b/include/hw/southbridge/piix.h
+>     @@ -18,6 +18,12 @@ I2CBus *piix4_pm_init(PCIBus *bus, int devfn,
+>     uint32_t smb_io_base,
+>      =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0qemu_irq sci_irq, qemu_irq smi_irq,
+>      =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0int smm_enabled, DeviceState **piix4_pm);
+>=20
+>     +/*
+>     + * Reset Control Register: PCI-accessible ISA-Compatible Register
+>     at address
+>     + * 0xcf9, provided by the PCI/ISA bridge (PIIX3 PCI function 0,
+>     8086:7000).
+>     + */
+>     +#define RCR_IOPORT 0xcf9
+>     +
+>      =C2=A0extern PCIDevice *piix4_dev;
+>=20
+>      =C2=A0DeviceState *piix4_create(PCIBus *pci_bus, ISABus **isa_bus,
+>     --=20
+>     2.21.0
+>=20
+>=20
 
