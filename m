@@ -2,97 +2,85 @@ Return-Path: <SRS0=F+Q9=YM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,FROM_LOCAL_NOVOWEL,
+	HEADER_FROM_DIFFERENT_DOMAINS,HK_RANDOM_FROM,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C0759CA9EAC
-	for <qemu-devel@archiver.kernel.org>; Sat, 19 Oct 2019 03:38:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 17342CA9EAC
+	for <qemu-devel@archiver.kernel.org>; Sat, 19 Oct 2019 03:42:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 86B78222C5
-	for <qemu-devel@archiver.kernel.org>; Sat, 19 Oct 2019 03:38:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B8300222C5
+	for <qemu-devel@archiver.kernel.org>; Sat, 19 Oct 2019 03:42:14 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JetWt7N8"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 86B78222C5
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KpmnjFFA"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B8300222C5
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47974 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48004 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iLfZ6-0001us-MH
-	for qemu-devel@archiver.kernel.org; Fri, 18 Oct 2019 23:38:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49520)
+	id 1iLfd7-0003LB-T0
+	for qemu-devel@archiver.kernel.org; Fri, 18 Oct 2019 23:42:13 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49717)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peterx@redhat.com>) id 1iLfYH-0001TS-9w
- for qemu-devel@nongnu.org; Fri, 18 Oct 2019 23:37:15 -0400
+ (envelope-from <jcmvbkbc@gmail.com>) id 1iLfcR-0002vo-0t
+ for qemu-devel@nongnu.org; Fri, 18 Oct 2019 23:41:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peterx@redhat.com>) id 1iLfYE-0002VH-NP
- for qemu-devel@nongnu.org; Fri, 18 Oct 2019 23:37:12 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:47576
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <peterx@redhat.com>) id 1iLfYE-0002Tj-B9
- for qemu-devel@nongnu.org; Fri, 18 Oct 2019 23:37:10 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1571456225;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=ckGVdbjKZ9e89LIkDI68z6En2vDhdAR8jIu752L2up0=;
- b=JetWt7N81goWzk5Uej8OYxdzfjkR7+O8kTuZd/ahPDCWripnViiLZnB4yjH1bHVnGoQjEY
- 7rX32nWuQzGj2x4sP5KFNa7fyn4hX1lbSbqBomUzQoI3i+h1r8RSijAHddN8omqHY4npyl
- WstxikBFv/xf8C2xMOraXDiczx5uwm8=
-Received: from mail-pg1-f200.google.com (mail-pg1-f200.google.com
- [209.85.215.200]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-366-v_MgnS0fPaWqyNs9n42T3g-1; Fri, 18 Oct 2019 23:37:03 -0400
-Received: by mail-pg1-f200.google.com with SMTP id d3so5604045pgv.9
- for <qemu-devel@nongnu.org>; Fri, 18 Oct 2019 20:37:03 -0700 (PDT)
+ (envelope-from <jcmvbkbc@gmail.com>) id 1iLfcO-00052R-Uf
+ for qemu-devel@nongnu.org; Fri, 18 Oct 2019 23:41:30 -0400
+Received: from mail-lj1-x229.google.com ([2a00:1450:4864:20::229]:36876)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <jcmvbkbc@gmail.com>) id 1iLfcO-00051z-Hu
+ for qemu-devel@nongnu.org; Fri, 18 Oct 2019 23:41:28 -0400
+Received: by mail-lj1-x229.google.com with SMTP id l21so8106249lje.4
+ for <qemu-devel@nongnu.org>; Fri, 18 Oct 2019 20:41:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=NT76k4fAQO9YCxSXlYiFQXtcTrsn8lT6JV4xg1L/w8g=;
+ b=KpmnjFFAmqFgPah6stt9Za+OTXi0uc9Q5Kp9tGYOIM5YyujtSRC1jKwVSvb/3Hl2N/
+ zEZW4WDPXwwuilBtG7aFDf3Gu+vt6R8C2E2YMoORmTMdt27PYMGYU6yWyjnLnMv4+jZY
+ fSXC6jW5sY+ZhMLz+/0Yr7CQTUyKQ0LJIMrnFKPDTIeZLRez7JLnfpeIWtjgSZqZrIHw
+ Rc97w84eM8GWRYuL3AashWyL4Rie2EzUozvZ8ibfol45OYxxQEhY2EZtnxeoizGWjeXd
+ hIUcasNEp7MKWJVqSiatU7Z5DJ3/qQUVfc4B1e3nX3EOySvF71RotAOo3aBB9GKXKuLh
+ 3HoQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to:user-agent;
- bh=HacGt9Y6DJpD7oTGq5KC678ilrZfUKzrBrh06SWM+KE=;
- b=lCRAe7/PaexJ/Ihp6lMdcxBzrga/7K2cauv3Wn7KZbKQA/fjH5PpT3S1hdOPfYBfCc
- Tpcp90SMxQIcdnWMe+oyI6Tz3LkpTw7R5MD0L73R/dtVlqQFeizZ7gzpSAZRxtt6syoN
- NI1mKxOL+MUs3I4bA4gvX3QLeki46nuyAaohItz1n6XhXr3/rcBAwpMugJYP3GNmL2iA
- QfvyyHD+pt4t7Vc7Pjlf8xruuRIEcYE5iksWQU2OdprfDDW5GKYf6QdzsZI1fYV3Gu1q
- YBNFfc9vFcY/qGZu04xNh5Yme7z4UI3D4f/4mcMf8BexC/eB4UroAesd789Qk1dKyWtW
- 0iPg==
-X-Gm-Message-State: APjAAAUc1Mi23yfgrVS4Ktx6X4pjpWftu5eCdS9r3XyJWSgr2MZqAxIn
- dhrm25aiE1Qe3vmL/pk1NHcTgWKZdJnwqmDqs6LOA2Y9AvKGZhyfh173H8bqhp5sSaA52+VimiN
- 4EHHGV0qT9rXPl+A=
-X-Received: by 2002:a63:394:: with SMTP id 142mr13439463pgd.375.1571456222296; 
- Fri, 18 Oct 2019 20:37:02 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqxcgxCemckuuEDZXDU3P1uwDvF6/qDcyMgBza7Emy9r3hXl/WChhjvO6S4kE1CuFKu/yVdWZg==
-X-Received: by 2002:a63:394:: with SMTP id 142mr13439431pgd.375.1571456221865; 
- Fri, 18 Oct 2019 20:37:01 -0700 (PDT)
-Received: from xz-x1 ([209.132.188.80])
- by smtp.gmail.com with ESMTPSA id o64sm16189258pjb.24.2019.10.18.20.36.59
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=NT76k4fAQO9YCxSXlYiFQXtcTrsn8lT6JV4xg1L/w8g=;
+ b=a/OXEvLnmEMY3iq2FGylspdL51PvLidWaPIAXeF1hNiSbKKJRpNc2eW2HeJidAu12H
+ EyFC9CARDnbNwzYF/BE7i7xWFVm2fbwEl1UoQEVAw8sWEybnAsT+zmq74ySYq1yqlo7L
+ 6s9ahUNgkJ5cXFnB6GW/ovnFxuhIwT0icVLXVajmgB93DpYiG2r3+isuALnJQq1Ouwwx
+ mpB6RUk1T0JeFOJqUcf/xPjO8g5uTfVnfiQdvi0fyYSBbdFXw+G3kFK3Zv74Bmu5T52C
+ bX29MuPg/VT+GcNLGtrumEW6gTceZiLHoc1eqW2ZutuszwvcuCe1pCyQh095bi2IdiD5
+ CrPw==
+X-Gm-Message-State: APjAAAWqchxqKqvAL3RCSMLlhxA5qLRWlvdfgCbNhSIKz85seB47+Q8c
+ o5Qx8cDa77LUyxpZieDsDk8+FNrr
+X-Google-Smtp-Source: APXvYqxO2jkNt9LP1t1NhfCp2NrSxL69kUXdW5KjfzSIcsHS9nfAv9Jof7+bKbUe3c48rmpk3n7Oeg==
+X-Received: by 2002:a05:651c:1068:: with SMTP id
+ y8mr4252074ljm.223.1571456485957; 
+ Fri, 18 Oct 2019 20:41:25 -0700 (PDT)
+Received: from octofox.cadence.com
+ (jcmvbkbc-1-pt.tunnel.tserv24.sto1.ipv6.he.net. [2001:470:27:1fa::2])
+ by smtp.gmail.com with ESMTPSA id 3sm5543770ljs.20.2019.10.18.20.41.24
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 18 Oct 2019 20:37:00 -0700 (PDT)
-Date: Sat, 19 Oct 2019 11:36:51 +0800
-From: Peter Xu <peterx@redhat.com>
-To: Jintack Lim <incredible.tack@gmail.com>
-Subject: Re: Using virtual IOMMU in guest hypervisors other than KVM and Xen?
-Message-ID: <20191019033651.GA9478@xz-x1>
-References: <CAHyh4xisBvQ+-p5R6Wj0po17-3EOkKsALzRysHU+R=mprbdjtg@mail.gmail.com>
- <20191015024947.GC8666@xz-x1>
- <CAHyh4xgzqMuWR7moxPfWZarED5HtPcu3LmnTHMe7CpwScHa4Eg@mail.gmail.com>
+ Fri, 18 Oct 2019 20:41:25 -0700 (PDT)
+From: Max Filippov <jcmvbkbc@gmail.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH] hw/xtensa: add virt machine
+Date: Fri, 18 Oct 2019 20:41:05 -0700
+Message-Id: <20191019034105.17523-1-jcmvbkbc@gmail.com>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-In-Reply-To: <CAHyh4xgzqMuWR7moxPfWZarED5HtPcu3LmnTHMe7CpwScHa4Eg@mail.gmail.com>
-User-Agent: Mutt/1.11.4 (2019-03-13)
-X-MC-Unique: v_MgnS0fPaWqyNs9n42T3g-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 205.139.110.120
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::229
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -104,98 +92,350 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Devel Mailing List <qemu-devel@nongnu.org>
+Cc: Max Filippov <jcmvbkbc@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, Oct 16, 2019 at 03:01:22PM -0700, Jintack Lim wrote:
-> On Mon, Oct 14, 2019 at 7:50 PM Peter Xu <peterx@redhat.com> wrote:
-> >
-> > On Mon, Oct 14, 2019 at 01:28:49PM -0700, Jintack Lim wrote:
-> > > Hi,
-> >
-> > Hello, Jintack,
-> >
-> Hi Peter,
->=20
-> > >
-> > > I'm trying to pass through a physical network device to a nested VM
-> > > using virtual IOMMU. While I was able to do it successfully using KVM
-> > > and Xen guest hypervisors running in a VM respectively, I couldn't do
-> > > it with Hyper-V as I described below. I wonder if anyone have
-> > > successfully used virtual IOMMU in other hypervisors other than KVM
-> > > and Xen? (like Hyper-V or VMware)
-> > >
-> > > The issue I have with Hyper-V is that Hyper-V gives an error that the
-> > > underlying hardware is not capable of doing passthrough. The exact
-> > > error message is as follows.
-> > >
-> > > Windows Power-shell > (Get-VMHost).IovSupportReasons
-> > > The chipset on the system does not do DMA remapping, without which
-> > > SR-IOV cannot be supported.
-> > >
-> > > I'm pretty sure that Hyper-V recognizes virtual IOMMU, though; I have
-> > > enabled iommu in windows boot loader[1], and I see differences when
-> > > booing a Windows VM with and without virtual IOMMU. I also checked
-> > > that virtual IOMMU traces are printed.
-> >
-> > What traces have you checked?  More explicitly, have you seen DMAR
-> > enabled and page table setup for that specific device to be
-> > pass-throughed?
->=20
-> Thanks for the pointers. I checked that DMAR is NOT enabled. The only
-> registers that Windows guest accessed were Version Register,
-> Capability Register, and Extended Capability Register. On the other
-> hand, a Linux guest accessed other registers and enabled DMAR.
-> Here's a link to the trace I got using QEMU 4.1.0. Do you see anything
-> interesting there?
-> http://paste.ubuntu.com/p/YcSyxG9Z3x/
+virt machine is a sim machine with generic PCI host controller.
+Make common parts of sim machine initialization reusable.
+Add PCI controller at 0xf0000000 with PIO space at its base address,
+ECAM space at base address + 1M and MMIO space at base address + 64M.
+Connect IRQ lines to consecutive CPU external IRQ pins starting from 0.
+Instantiate network interfaces on virt machine.
 
-Then I feel like Windows is reluctant to enable DMAR due to lacking of
-some caps.
+Xtensa linux kernel configuration virt_defconfig can successfully boot
+on this machine.
 
->=20
-> >
-> > >
-> > > I have tried multiple KVM/QEMU versions including the latest ones
-> > > (kernel v5.3, QEMU 4.1.0) as well as two different Windows servers
-> > > (2016 and 2019), but I see the same result. [4]
-> > >
-> > > I'd love to hear if somebody is using virtual IOMMU in Hyper-V or
-> > > VMware successfully, especially for passthrough. I also appreciate if
-> > > somebody can point out any configuration errors I have.
-> > >
-> > > Here's the qemu command line I use, basically from the QEMU vt-d
-> > > page[2] and Hyper-v on KVM from kvmforum [3].
-> > >
-> > > ./qemu/x86_64-softmmu/qemu-system-x86_64 -device
-> > > intel-iommu,intremap=3Don,caching-mode=3Don -smp 6 -m 24G -M
-> >
-> > Have you tried to use 4-level IOMMU page table (aw-bits=3D48 on latest
-> > QEMU, or x-aw-bits=3D48 on some old ones)?  IIRC we've encountered
-> > issues when trying to pass the SVVP Windows test with this, in which
-> > 4-level is required.  I'm not sure whether whether that is required in
-> > general usages of vIOMMU in Windows.
->=20
-> I just tried the option you mentioned, but it didn't change anything.
-> BTW, what version of Windows was it?
+Signed-off-by: Max Filippov <jcmvbkbc@gmail.com>
+---
+ MAINTAINERS                        |   5 ++
+ default-configs/xtensa-softmmu.mak |   1 +
+ hw/xtensa/Kconfig                  |   6 ++
+ hw/xtensa/Makefile.objs            |   1 +
+ hw/xtensa/sim.c                    |  41 +++++----
+ hw/xtensa/virt.c                   | 135 +++++++++++++++++++++++++++++
+ hw/xtensa/xtensa_sim.h             |  34 ++++++++
+ 7 files changed, 208 insertions(+), 15 deletions(-)
+ create mode 100644 hw/xtensa/virt.c
+ create mode 100644 hw/xtensa/xtensa_sim.h
 
-Sorry I don't remember that. I didn't do the test but I was just
-acknowledged that with it the test passed.  I assume you're using the
-latest QEMU here because I know Windows could require another
-capability (DMA draining) and it should be on by default in latest
-qemu master.
-
-At that time the complete cmdline to pass the test should be:
-
-  -device intel-iommu,intremap=3Don,aw-bits=3D48,caching-mode=3Doff,eim=3Do=
-n
-
-I also don't remember on why caching-mode needs to be off at that
-time (otherwise SVVP fails too).
-
---=20
-Peter Xu
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 50eaf005f40e..7c2f35a2320f 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -1302,6 +1302,11 @@ M: Max Filippov <jcmvbkbc@gmail.com>
+ S: Maintained
+ F: hw/xtensa/sim.c
+ 
++virt
++M: Max Filippov <jcmvbkbc@gmail.com>
++S: Maintained
++F: hw/xtensa/virt.c
++
+ XTFPGA (LX60, LX200, ML605, KC705)
+ M: Max Filippov <jcmvbkbc@gmail.com>
+ S: Maintained
+diff --git a/default-configs/xtensa-softmmu.mak b/default-configs/xtensa-softmmu.mak
+index 3aa20a47a7fb..4fe1bf00c94b 100644
+--- a/default-configs/xtensa-softmmu.mak
++++ b/default-configs/xtensa-softmmu.mak
+@@ -5,4 +5,5 @@ CONFIG_SEMIHOSTING=y
+ # Boards:
+ #
+ CONFIG_XTENSA_SIM=y
++CONFIG_XTENSA_VIRT=y
+ CONFIG_XTENSA_XTFPGA=y
+diff --git a/hw/xtensa/Kconfig b/hw/xtensa/Kconfig
+index d72817d012e3..0740657ea58f 100644
+--- a/hw/xtensa/Kconfig
++++ b/hw/xtensa/Kconfig
+@@ -1,6 +1,12 @@
+ config XTENSA_SIM
+     bool
+ 
++config XTENSA_VIRT
++    bool
++    select XTENSA_SIM
++    select PCI_EXPRESS_GENERIC_BRIDGE
++    select PCI_DEVICES
++
+ config XTENSA_XTFPGA
+     bool
+     select OPENCORES_ETH
+diff --git a/hw/xtensa/Makefile.objs b/hw/xtensa/Makefile.objs
+index 0bbfccd6deae..2b40e1b60a0e 100644
+--- a/hw/xtensa/Makefile.objs
++++ b/hw/xtensa/Makefile.objs
+@@ -2,4 +2,5 @@ obj-y += mx_pic.o
+ obj-y += pic_cpu.o
+ obj-y += xtensa_memory.o
+ obj-$(CONFIG_XTENSA_SIM) += sim.o
++obj-$(CONFIG_XTENSA_VIRT) += virt.o
+ obj-$(CONFIG_XTENSA_XTFPGA) += xtfpga.o
+diff --git a/hw/xtensa/sim.c b/hw/xtensa/sim.c
+index 981dbb7bbebb..a22743a3d61c 100644
+--- a/hw/xtensa/sim.c
++++ b/hw/xtensa/sim.c
+@@ -37,6 +37,7 @@
+ #include "exec/address-spaces.h"
+ #include "qemu/error-report.h"
+ #include "xtensa_memory.h"
++#include "xtensa_sim.h"
+ 
+ static uint64_t translate_phys_addr(void *opaque, uint64_t addr)
+ {
+@@ -52,12 +53,11 @@ static void sim_reset(void *opaque)
+     cpu_reset(CPU(cpu));
+ }
+ 
+-static void xtensa_sim_init(MachineState *machine)
++XtensaCPU *xtensa_sim_common_init(MachineState *machine)
+ {
+     XtensaCPU *cpu = NULL;
+     CPUXtensaState *env = NULL;
+     ram_addr_t ram_size = machine->ram_size;
+-    const char *kernel_filename = machine->kernel_filename;
+     int n;
+ 
+     for (n = 0; n < machine->smp.cpus; n++) {
+@@ -89,30 +89,41 @@ static void xtensa_sim_init(MachineState *machine)
+         xtensa_create_memory_regions(&sysram, "xtensa.sysram",
+                                      get_system_memory());
+     }
+-
+     if (serial_hd(0)) {
+         xtensa_sim_open_console(serial_hd(0));
+     }
+-    if (kernel_filename) {
+-        uint64_t elf_entry;
+-        uint64_t elf_lowaddr;
++    return cpu;
++}
++
++void xtensa_sim_load_kernel(XtensaCPU *cpu, MachineState *machine)
++{
++    const char *kernel_filename = machine->kernel_filename;
+ #ifdef TARGET_WORDS_BIGENDIAN
+-        int success = load_elf(kernel_filename, NULL,
+-                               translate_phys_addr, cpu,
+-                               &elf_entry, &elf_lowaddr,
+-                               NULL, 1, EM_XTENSA, 0, 0);
++    int big_endian = true;
+ #else
+-        int success = load_elf(kernel_filename, NULL,
+-                               translate_phys_addr, cpu,
+-                               &elf_entry, &elf_lowaddr,
+-                               NULL, 0, EM_XTENSA, 0, 0);
++    int big_endian = false;
+ #endif
++
++    if (kernel_filename) {
++        uint64_t elf_entry;
++        uint64_t elf_lowaddr;
++        int success = load_elf(kernel_filename, NULL, translate_phys_addr, cpu,
++                               &elf_entry, &elf_lowaddr, NULL, big_endian,
++                               EM_XTENSA, 0, 0);
++
+         if (success > 0) {
+-            env->pc = elf_entry;
++            cpu->env.pc = elf_entry;
+         }
+     }
+ }
+ 
++static void xtensa_sim_init(MachineState *machine)
++{
++    XtensaCPU *cpu = xtensa_sim_common_init(machine);
++
++    xtensa_sim_load_kernel(cpu, machine);
++}
++
+ static void xtensa_sim_machine_init(MachineClass *mc)
+ {
+     mc->desc = "sim machine (" XTENSA_DEFAULT_CPU_MODEL ")";
+diff --git a/hw/xtensa/virt.c b/hw/xtensa/virt.c
+new file mode 100644
+index 000000000000..b22dcf938a16
+--- /dev/null
++++ b/hw/xtensa/virt.c
+@@ -0,0 +1,135 @@
++/*
++ * Copyright (c) 2019, Max Filippov, Open Source and Linux Lab.
++ * All rights reserved.
++ *
++ * Redistribution and use in source and binary forms, with or without
++ * modification, are permitted provided that the following conditions are met:
++ *     * Redistributions of source code must retain the above copyright
++ *       notice, this list of conditions and the following disclaimer.
++ *     * Redistributions in binary form must reproduce the above copyright
++ *       notice, this list of conditions and the following disclaimer in the
++ *       documentation and/or other materials provided with the distribution.
++ *     * Neither the name of the Open Source and Linux Lab nor the
++ *       names of its contributors may be used to endorse or promote products
++ *       derived from this software without specific prior written permission.
++ *
++ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
++ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
++ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
++ * ARE DISCLAIMED. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY
++ * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
++ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
++ * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
++ * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
++ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
++ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
++ */
++
++#include "qemu/osdep.h"
++#include "qapi/error.h"
++#include "cpu.h"
++#include "sysemu/reset.h"
++#include "sysemu/sysemu.h"
++#include "hw/boards.h"
++#include "hw/loader.h"
++#include "hw/pci-host/gpex.h"
++#include "net/net.h"
++#include "elf.h"
++#include "exec/memory.h"
++#include "exec/address-spaces.h"
++#include "qemu/error-report.h"
++#include "xtensa_memory.h"
++#include "xtensa_sim.h"
++
++static void create_pcie(CPUXtensaState *env, int irq_base, hwaddr addr_base)
++{
++    hwaddr base_ecam = addr_base + 0x00100000;
++    hwaddr size_ecam =             0x03f00000;
++    hwaddr base_pio  = addr_base + 0x00000000;
++    hwaddr size_pio  =             0x00010000;
++    hwaddr base_mmio = addr_base + 0x04000000;
++    hwaddr size_mmio =             0x08000000;
++
++    MemoryRegion *ecam_alias;
++    MemoryRegion *ecam_reg;
++    MemoryRegion *pio_alias;
++    MemoryRegion *pio_reg;
++    MemoryRegion *mmio_alias;
++    MemoryRegion *mmio_reg;
++
++    DeviceState *dev;
++    PCIHostState *pci;
++    qemu_irq *extints;
++    int i;
++
++    dev = qdev_create(NULL, TYPE_GPEX_HOST);
++    qdev_init_nofail(dev);
++
++    /* Map only the first size_ecam bytes of ECAM space. */
++    ecam_alias = g_new0(MemoryRegion, 1);
++    ecam_reg = sysbus_mmio_get_region(SYS_BUS_DEVICE(dev), 0);
++    memory_region_init_alias(ecam_alias, OBJECT(dev), "pcie-ecam",
++                             ecam_reg, 0, size_ecam);
++    memory_region_add_subregion(get_system_memory(), base_ecam, ecam_alias);
++
++    /*
++     * Map the MMIO window into system address space so as to expose
++     * the section of PCI MMIO space which starts at the same base address
++     * (ie 1:1 mapping for that part of PCI MMIO space visible through
++     * the window).
++     */
++    mmio_alias = g_new0(MemoryRegion, 1);
++    mmio_reg = sysbus_mmio_get_region(SYS_BUS_DEVICE(dev), 1);
++    memory_region_init_alias(mmio_alias, OBJECT(dev), "pcie-mmio",
++                             mmio_reg, base_mmio, size_mmio);
++    memory_region_add_subregion(get_system_memory(), base_mmio, mmio_alias);
++
++    /* Map IO port space. */
++    pio_alias = g_new0(MemoryRegion, 1);
++    pio_reg = sysbus_mmio_get_region(SYS_BUS_DEVICE(dev), 2);
++    memory_region_init_alias(pio_alias, OBJECT(dev), "pcie-pio",
++                             pio_reg, 0, size_pio);
++    memory_region_add_subregion(get_system_memory(), base_pio, pio_alias);
++
++    /* Connect IRQ lines. */
++    extints = xtensa_get_extints(env);
++
++    for (i = 0; i < GPEX_NUM_IRQS; i++) {
++        void *q = extints[irq_base + i];
++
++        sysbus_connect_irq(SYS_BUS_DEVICE(dev), i, q);
++        gpex_set_irq_num(GPEX_HOST(dev), i, irq_base + i);
++    }
++
++    pci = PCI_HOST_BRIDGE(dev);
++    if (pci->bus) {
++        for (i = 0; i < nb_nics; i++) {
++            NICInfo *nd = &nd_table[i];
++
++            if (!nd->model) {
++                nd->model = g_strdup("virtio");
++            }
++
++            pci_nic_init_nofail(nd, pci->bus, nd->model, NULL);
++        }
++    }
++}
++
++static void xtensa_virt_init(MachineState *machine)
++{
++    XtensaCPU *cpu = xtensa_sim_common_init(machine);
++    CPUXtensaState *env = &cpu->env;
++
++    create_pcie(env, 0, 0xf0000000);
++    xtensa_sim_load_kernel(cpu, machine);
++}
++
++static void xtensa_virt_machine_init(MachineClass *mc)
++{
++    mc->desc = "virt machine (" XTENSA_DEFAULT_CPU_MODEL ")";
++    mc->init = xtensa_virt_init;
++    mc->max_cpus = 32;
++    mc->default_cpu_type = XTENSA_DEFAULT_CPU_TYPE;
++}
++
++DEFINE_MACHINE("virt", xtensa_virt_machine_init)
+diff --git a/hw/xtensa/xtensa_sim.h b/hw/xtensa/xtensa_sim.h
+new file mode 100644
+index 000000000000..bdc92f3d2c39
+--- /dev/null
++++ b/hw/xtensa/xtensa_sim.h
+@@ -0,0 +1,34 @@
++/*
++ * Copyright (c) 2019, Max Filippov, Open Source and Linux Lab.
++ * All rights reserved.
++ *
++ * Redistribution and use in source and binary forms, with or without
++ * modification, are permitted provided that the following conditions are met:
++ *     * Redistributions of source code must retain the above copyright
++ *       notice, this list of conditions and the following disclaimer.
++ *     * Redistributions in binary form must reproduce the above copyright
++ *       notice, this list of conditions and the following disclaimer in the
++ *       documentation and/or other materials provided with the distribution.
++ *     * Neither the name of the Open Source and Linux Lab nor the
++ *       names of its contributors may be used to endorse or promote products
++ *       derived from this software without specific prior written permission.
++ *
++ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
++ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
++ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
++ * ARE DISCLAIMED. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY
++ * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
++ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
++ * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
++ * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
++ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
++ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
++ */
++
++#ifndef XTENSA_SIM_H
++#define XTENSA_SIM_H
++
++XtensaCPU *xtensa_sim_common_init(MachineState *machine);
++void xtensa_sim_load_kernel(XtensaCPU *cpu, MachineState *machine);
++
++#endif
+-- 
+2.20.1
 
 
