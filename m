@@ -2,75 +2,62 @@ Return-Path: <SRS0=F+Q9=YM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_2 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C37FBCA9EAB
-	for <qemu-devel@archiver.kernel.org>; Sat, 19 Oct 2019 11:39:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EB100CA9EAC
+	for <qemu-devel@archiver.kernel.org>; Sat, 19 Oct 2019 12:28:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 95DF121D7C
-	for <qemu-devel@archiver.kernel.org>; Sat, 19 Oct 2019 11:39:10 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 95DF121D7C
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=tuxfamily.org
+	by mail.kernel.org (Postfix) with ESMTPS id B764821925
+	for <qemu-devel@archiver.kernel.org>; Sat, 19 Oct 2019 12:28:56 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=startmail.com header.i=@startmail.com header.b="nGhG3qVF"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B764821925
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=startmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53350 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54060 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iLn4f-0004VJ-Jm
-	for qemu-devel@archiver.kernel.org; Sat, 19 Oct 2019 07:39:09 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57788)
+	id 1iLnqp-0005Oa-M6
+	for qemu-devel@archiver.kernel.org; Sat, 19 Oct 2019 08:28:55 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33755)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <th.huth@gmail.com>) id 1iLn3y-0003z3-50
- for qemu-devel@nongnu.org; Sat, 19 Oct 2019 07:38:27 -0400
+ (envelope-from <hanetzer@startmail.com>) id 1iLnq4-0004kt-Bx
+ for qemu-devel@nongnu.org; Sat, 19 Oct 2019 08:28:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <th.huth@gmail.com>) id 1iLn3w-0006VL-Vn
- for qemu-devel@nongnu.org; Sat, 19 Oct 2019 07:38:26 -0400
-Received: from mail-wr1-f67.google.com ([209.85.221.67]:46092)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <th.huth@gmail.com>) id 1iLn3w-0006Ui-Px
- for qemu-devel@nongnu.org; Sat, 19 Oct 2019 07:38:24 -0400
-Received: by mail-wr1-f67.google.com with SMTP id o18so8809686wrv.13
- for <qemu-devel@nongnu.org>; Sat, 19 Oct 2019 04:38:24 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=PoAT52G3J2ya2EFlG9Oj1RsHPUVUSmRTq3hL5B3Gcws=;
- b=K9jMni6JQ71NPjq7Jud4L+CTjHKa61wnSHnDJk1/MUVuiVnmUjQUDAG3+u4cKdy23Z
- qzvxBNt++v4+qKZc4rK3IHqS/LSyHdhn0f+N+QC1G3K3eQKUevrDlSqWUIfA4FsgNrAF
- shyBCQKVrI1uWV3J+nd6WkccwPN3bRvQBieGcMMHwBRq/3IL+wrPA1R50N56QqesrRwQ
- UmfxVWH4T22eZXPLrnvG2nwPTbHH2EZ9LRO1oPZW7ayp1RAFHEkSisEXe5fxA6Tla86F
- y1taRP26XN4/hbdule044yQvTgUXGPeQWRzoOHPXattVYNHTLsnmBG62GpJwXRqu91Ds
- PKMA==
-X-Gm-Message-State: APjAAAUOJS0YueGDnhohagcsFoI3/Tw0dAkwT7aPFlnX1JQIFAJuNDa0
- goPksCxNEZlU4iIJwgfiq1o=
-X-Google-Smtp-Source: APXvYqycZALyOBocp03Qs8yF6OCnG+v5DC8lNNydK0l7g9ywLIwLZaOouVb47MCO2t/ku1+rdiDUIQ==
-X-Received: by 2002:a5d:5444:: with SMTP id w4mr11236821wrv.18.1571485103707; 
- Sat, 19 Oct 2019 04:38:23 -0700 (PDT)
-Received: from thl530 (x2f7f4ae.dyn.telefonica.de. [2.247.244.174])
- by smtp.gmail.com with ESMTPSA id g185sm8241356wme.10.2019.10.19.04.38.22
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sat, 19 Oct 2019 04:38:23 -0700 (PDT)
-Date: Sat, 19 Oct 2019 13:38:21 +0200
-From: Thomas Huth <huth@tuxfamily.org>
-To: Peter Maydell <peter.maydell@linaro.org>
-Subject: Re: [PATCH 7/8] hw/m68k/mcf5206.c: Switch to transaction-based
- ptimer API
-Message-ID: <20191019133821.645ecbe3@thl530>
-In-Reply-To: <20191019131027.018dc911@thl530>
-References: <20191017132905.5604-1-peter.maydell@linaro.org>
- <20191017132905.5604-8-peter.maydell@linaro.org>
- <20191019124859.6a85e220@thl530> <20191019131027.018dc911@thl530>
-X-Mailer: Claws Mail 3.17.3 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+ (envelope-from <hanetzer@startmail.com>) id 1iLnq3-0002Dx-2y
+ for qemu-devel@nongnu.org; Sat, 19 Oct 2019 08:28:08 -0400
+Received: from mx-out1.startmail.com ([145.131.90.139]:45478)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <hanetzer@startmail.com>)
+ id 1iLnq2-0002DT-SW; Sat, 19 Oct 2019 08:28:07 -0400
+Date: Sat, 19 Oct 2019 07:28:01 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=startmail.com;
+ s=2017-11; t=1571488085;
+ bh=acvzxAoRFxn0+hEbhF3XzF6Vj8uOKj9kiowHmZvb27o=;
+ h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+ b=nGhG3qVFzYQ6kiGCGtG+eS7ItVWb4+ALTYvD0I4n6NjgK4atteRhXE0QeYXnV/yL4
+ NfQYIMHXIE+2C3bH/vyQ4MaC4fUodIQmkKbcS1UqOnSToVnj6nRNsBpjDL/tBOZiuh
+ SkD17fLCRspLerh14K3aVVLlQIArJ7zUUOnu/trATFSk4KrknrfgjIXgYrB2AuFbn8
+ MMkbiqFQ6JIZv+CMIvCHXumfW//BkeHSew0+P5EhlBzZCcJqWoFHTHC5MpNIlX37OD
+ 95AjsYmkf7egHBzxGNtZ+wIs4Apmx0QaBPRyZ0lF1SfSPupXNYi8H9uuJwXO3rjkqz
+ wNbcdgs4dP9Gw==
+From: "Marty E. Plummer" <hanetzer@startmail.com>
+To: David Gibson <david@gibson.dropbear.id.au>
+Subject: Re: qemu/powernv: coreboot support?
+Message-ID: <20191019122800.m6cmdj7ywazqc7ei@proprietary-killer>
+References: <20191018172622.kz4smemh5cwesfit@proprietary-killer>
+ <20191019111519.GE1960@umbus.fritz.box>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20191019111519.GE1960@umbus.fritz.box>
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 209.85.221.67
+X-Received-From: 145.131.90.139
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -82,56 +69,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
- Michael Walle <michael@walle.cc>, Guan Xuetao <gxt@mprc.pku.edu.cn>,
- Magnus Damm <magnus.damm@gmail.com>, qemu-devel@nongnu.org
+Cc: qemu-ppc@nongnu.org, =?utf-8?Q?C=C3=A9dric?= Le Goater <clg@kaod.org>,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Am Sat, 19 Oct 2019 13:10:27 +0200
-schrieb Thomas Huth <huth@tuxfamily.org>:
-
-> Am Sat, 19 Oct 2019 12:48:59 +0200
-> schrieb Thomas Huth <huth@tuxfamily.org>:
+On Sat, Oct 19, 2019 at 10:15:19PM +1100, David Gibson wrote:
+> On Fri, Oct 18, 2019 at 12:28:29PM -0500, Marty E. Plummer wrote:
+> > Hello,
+> > 
+> > First off, thank you for the work you've done on the ppc64 support, it
+> > has been very useful. I'm currently working on a coreboot port for the
+> > talos ii line of systems (which means more ppc64 support, support
+> > specifically for the power9 sforza chip, and specific mainboard support.
+> > My plate is very full lol) and have been using qemu to debug the
+> > bootblock.
 > 
-> > Am Thu, 17 Oct 2019 14:29:04 +0100
-> > schrieb Peter Maydell <peter.maydell@linaro.org>:
-> > 
-> > > Switch the mcf5206 code away from bottom-half based ptimers to
-> > > the new transaction-based ptimer API.  This just requires adding
-> > > begin/commit calls around the various places that modify the
-> > > ptimer state, and using the new ptimer_init() function to create
-> > > the timer.
-> > > 
-> > > Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-> > > ---
-> > >  hw/m68k/mcf5206.c | 9 +++++----
-> > >  1 file changed, 5 insertions(+), 4 deletions(-)  
-> > 
-> > After applying the patch, I now get an assertion:
-> > 
-> > $ qemu-system-m68k -nographic -kernel
-> > ~/tmp/images/image-an5206-big-20000706.bin -M an5206
-> > 
-> > uClinux/COLDFIRE(m5206)
-> > COLDFIRE port done by Greg Ungerer, gerg@moreton.com.au
-> > Flat model support (C) 1998,1999 Kenneth Albanowski, D. Jeff Dionne
-> > KERNEL -> TEXT=0x010000-0x077cb8 DATA=0x077cb8-0x08b0d0
-> > BSS=0x08b0d0-0x0a2d58 KERNEL -> ROMFS=0x0a2d58-0x183b10
-> > MEM=0x183b10-0x1fff000 STACK=0x1fff000-0x2000000 qemu-system-m68k:
-> > hw/core/ptimer.c:410: ptimer_transaction_begin: Assertion
-> > `!s->in_transaction || !s->callback' failed.
-> > 
-> > Looks like something is still wrong here...
+> Ok.  I'm assuming that's with the powernv machine type?
+> 
+Assuming you mean the hardware, yes, the kernel for it is configured
+with the powernv_defconfig.
 
-Looking at the code a little bit, I think you missed the early return
-in m5206_timer_recalibrate() :
+Assuming that you mean how I call qemu, yes, also powernv: my full
+command is:
 
-    if ((s->tmr & TMR_RST) == 0)
-        return;
+qemu-system-ppc64 -cpu power9 -M powernv -m 4G -s -S \
+-chardev socket,id=qemu-monitor,host=localhost,port=7777,server,nowait,telnet \
+-mon qemu-monitor,mode=readline -nographic -bios build/cbfs/fallback/bootblock.bin
+> > It has been very useful for that, but I'm now at the point where I need
+> > to jump to romstage, and that's where it gets tricky. qemu parses the rom
+> > image and looks for a ffs header, locates skiboot on it, and jumps straight
+> > to that. Not exactly ideal for debugging something not produced from
+> > op-build.
+> 
+> Um.. I'm not sure what code you're talking about.  AFAICT the pnv code
+> just starts the cpus at address 0x10.
+> 
+If I pass it the full coreboot.rom file via
+`-drive file=./build/coreboot.rom,format=raw,if=mtd` it returns this error:
+'qemu-system-ppc64: Initialization of device pnv-pnor failed: bad header'
+which arises in hw/ppc/pnv_pnor.c:136-140 using legoater's powernv-4.2
+branch.
 
-That needs a ptimer_transaction_commit() now, too.
+Ah, so I wasn't going crazy and it was skipping the first four instructions,
+how odd. Any particular reason the first four instruction are skipped?
+On hostboot that's setting up the msr; on skiboot that seems to be the
+fdt_entry branch to boot_entry.
+> > Do you think it would be within your wheelhouse to provide a generic, non-ffs
+> > pnor interface for loading arbitary rom images? It would be of great help if
+> > you could. (This would still hopefully have the bmc support code as
+> > well, as I'm still needing to support a system using one).
+> 
+> Uh.. and I'm not really sure what you're asking for here.
+> 
+Basically not have to have a pnor-style image for mtd devices, and not
+immidiatly jump to skiboot.
+> -- 
+> David Gibson			| I'll have my music baroque, and my code
+> david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+> 				| _way_ _around_!
+> http://www.ozlabs.org/~dgibson
 
- Thomas
+
 
