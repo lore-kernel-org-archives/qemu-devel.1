@@ -7,75 +7,75 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A3404CA9EAB
-	for <qemu-devel@archiver.kernel.org>; Sat, 19 Oct 2019 23:54:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BCEDCCA9EAC
+	for <qemu-devel@archiver.kernel.org>; Sat, 19 Oct 2019 23:55:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6CA6C20678
-	for <qemu-devel@archiver.kernel.org>; Sat, 19 Oct 2019 23:54:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 74FC020678
+	for <qemu-devel@archiver.kernel.org>; Sat, 19 Oct 2019 23:55:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="T1lrTj2R"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6CA6C20678
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Y/ucdF6+"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 74FC020678
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42196 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42198 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iLyYk-0001Tu-76
-	for qemu-devel@archiver.kernel.org; Sat, 19 Oct 2019 19:54:58 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34578)
+	id 1iLyZD-0002HB-35
+	for qemu-devel@archiver.kernel.org; Sat, 19 Oct 2019 19:55:27 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34603)
  by lists.gnu.org with esmtp (Exim 4.90_1)
  (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1iLyRa-0000Hv-R4
- for qemu-devel@nongnu.org; Sat, 19 Oct 2019 19:47:35 -0400
+ id 1iLyRc-0000L9-Um
+ for qemu-devel@nongnu.org; Sat, 19 Oct 2019 19:47:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
  (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1iLyRZ-0005aj-GR
- for qemu-devel@nongnu.org; Sat, 19 Oct 2019 19:47:34 -0400
-Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:54733)
+ id 1iLyRb-0005bu-9P
+ for qemu-devel@nongnu.org; Sat, 19 Oct 2019 19:47:36 -0400
+Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:54735)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1iLyRZ-0005aI-A6; Sat, 19 Oct 2019 19:47:33 -0400
-Received: by mail-wm1-x342.google.com with SMTP id p7so9571402wmp.4;
- Sat, 19 Oct 2019 16:47:33 -0700 (PDT)
+ id 1iLyRb-0005bT-2s; Sat, 19 Oct 2019 19:47:35 -0400
+Received: by mail-wm1-x344.google.com with SMTP id p7so9571458wmp.4;
+ Sat, 19 Oct 2019 16:47:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=sY2Qm/7hhsy40ev21MwjtX91xjLeIkmxivxQSpr/t90=;
- b=T1lrTj2RJSL9BB2q5MOVKZ3X9M1rtnTr1KmNPwsF69GyFv+AJuwy5Kxf6117NvJlOK
- e2qbUoJws8VW/KfOzd9q/CiY1SD3ebPCr73+4/aXgWhFslTSr1uI+uf3vhWo3vABZs21
- QXzvSsEG97hxVKmsECfpB7wtOqjfPV8m9cAm2FFyDKnf0U7UlBcsTKuKIdVnUMD/UP2W
- P6PP7GpYYyAT+vKr7TDnzJyQCDJIySP8OEOxVp0QoFHvSiNCZvxA35RldVAmecnQTqxo
- ZasoQFDTIB/+Bzl3BY2AYBGYRUgjHOKCHTMwBJVMwe26LBP0xGCEmKEHu5GGf8MysHkO
- ZTZQ==
+ bh=hzx2Z74qGFZSNpjuH9vOZR/ojrt91Hb2qK0YE066IUA=;
+ b=Y/ucdF6+qGousf4AIhsskoRpKkJYMA27c3fnwTLNX7M6LpBoWOMvMakyouDmgiVd96
+ DAJuC4OY5Y0YQlyO7AxRLtF/3/lGO5FHQFTz78oSeqq2XnSMMMY9hL+kG2jWKUxITpPE
+ 39IRbchR2vMbsvlLv0v2nO9mXFxFcHMfunjT9MZ1SaGBaLUpH8ch+kYnoUSxfxuFRAcL
+ hgJVZrrbazlZdt+tK64BhnYyh9Fwuqil1JzCbZA1/FXBhFzdmtkSaznPzzLU58kHUmeK
+ DsQdFIcLWS0eCwc5/qXsAS0Hm+dMAJUosG+Hw03dqa71W78MOcKoY7xcrTEsGVjmT11S
+ O3Eg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=sY2Qm/7hhsy40ev21MwjtX91xjLeIkmxivxQSpr/t90=;
- b=VPkflCDXId98cUxTZtvqg2SqTF6Xyuou9cDpiaBu6RXWPyLQfwEpoZ0sq5P96bmSho
- YZMvWPY3ZSHc7GmVq7/7fddnk8U//fiMZ/8wqF5XyGapTwTjq2JCA7Bw8om94rGuSD4e
- 2nze/1XUMosBlfrfQfc14wdw/CMPhsbMbIfGUkmnVxP4eTYiF2eexw1H6Eha1hHTq2Bv
- yoMe2R7bUwNURjMV1D4jMUjFv/zrq0rpL1wFtyl8mAYrzH9oRHL+EKvZO0neLANggd/w
- HSgp5sjlMyGM3espVwW+gxcrsYc+XuOGxrLJA5Kqfdzqx1m92TxadIFYFZZcBR7ekRf3
- 9Rsw==
-X-Gm-Message-State: APjAAAXNhfUodtjNlwAThs1cRXhb8rOcYnkCoXLLQqOqLgS6PisodIE2
- 913ZV/ja89Yavdr851zT5uusrwVj
-X-Google-Smtp-Source: APXvYqyb0//kYGhlwEdU9EHV1PpGryY1SwKqPkHIye2dI840AR9BHV0SVxY3mHas/TkQkAcIcJTLug==
-X-Received: by 2002:a7b:c34a:: with SMTP id l10mr9293880wmj.110.1571528852212; 
- Sat, 19 Oct 2019 16:47:32 -0700 (PDT)
+ bh=hzx2Z74qGFZSNpjuH9vOZR/ojrt91Hb2qK0YE066IUA=;
+ b=DO01LkkBPbGuJKdUbKqWA2fWTCotXEPhNyjYTR4r3JRGP2pqOJvkxf8Z1R2gp05p8V
+ 1yzdwSVBNsDrNohhfH3PC7FRVvCQdr7LYmSObYc92W7ezXklcmFDDEL1GF7nLSNWk3PD
+ 1vS5UaubC4DZOa/O6I0IneSus4/7M8inh1RnU3mUF56y96PMFEMh31TL44zIcm7NUk/2
+ qMOd8dVWsCL50LURDhAyHg2PFVUn6B7Pv47fgk0wlJfUQR7KaklfeUW86pyYoSpj1pOR
+ rQfhmfmMv0f+RxINbnWq4Fc6kp3bMvF6f97whAriwRVPsJrA5zdRk+23+bOx/mczXrWS
+ E/fg==
+X-Gm-Message-State: APjAAAWPJPOqXVL5o/g09AbI2QM2gT9LHYPeZwCNHZH6XgRFFBicxYpY
+ RrXMZqgrv36ypl/04qMkxQWv5xZF
+X-Google-Smtp-Source: APXvYqwh90RX58ttTpJRcyt40w6Qt8HzyUzCbLKwZ4kTfmxPneV9ScNXcdjxrx30GOTfPhiws2C0ZQ==
+X-Received: by 2002:a1c:1d48:: with SMTP id d69mr1046207wmd.160.1571528853837; 
+ Sat, 19 Oct 2019 16:47:33 -0700 (PDT)
 Received: from x1w.redhat.com (14.red-88-21-201.staticip.rima-tde.net.
  [88.21.201.14])
- by smtp.gmail.com with ESMTPSA id u1sm10433763wrp.56.2019.10.19.16.47.30
+ by smtp.gmail.com with ESMTPSA id u1sm10433763wrp.56.2019.10.19.16.47.32
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sat, 19 Oct 2019 16:47:31 -0700 (PDT)
+ Sat, 19 Oct 2019 16:47:33 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v3 08/16] hw/arm/bcm2835_peripherals: Add const link property
- in realize()
-Date: Sun, 20 Oct 2019 01:47:07 +0200
-Message-Id: <20191019234715.25750-9-f4bug@amsat.org>
+Subject: [PATCH v3 09/16] hw/arm/bcm2836: Create VideoCore address space in
+ the SoC
+Date: Sun, 20 Oct 2019 01:47:08 +0200
+Message-Id: <20191019234715.25750-10-f4bug@amsat.org>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20191019234715.25750-1-f4bug@amsat.org>
 References: <20191019234715.25750-1-f4bug@amsat.org>
@@ -85,7 +85,7 @@ Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::342
+X-Received-From: 2a00:1450:4864:20::344
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -113,95 +113,199 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The VideoCore GPU is indenpendant from the Peripheral block. In
-the next commit, we will move its instantiation to the SoC block.
-The "gpu-bus" object will not be accessible in init() but later
-in realize(). As a preliminary step to keep the diff clearer, move
-the const link property creation from init() to realize().
+Currently the VideoCore is created in the Peripheral container
+as the 'GPU bus'. It is created there because the peripherals
+using DMA use physical addresses from the VideoCore bus.
+However the VideoCore is a GPU core placed at the same
+hierarchical level than the ARM cores.
+
+To match the datasheet design, create the VideoCore container
+in the SoC, and link it to the peripheral container.
+
+The VideoCore bus is 1GiB wide, accessible at 4 regions in
+different cache configurations. Add the full mapping.
+
+Before this commit the memory tree is:
+
+  (qemu) info mtree
+  address-space: bcm2835-dma-memory
+    0000000000000000-00000000ffffffff (prio 0, i/o): bcm2835-gpu
+      0000000000000000-000000003fffffff (prio 0, i/o): alias bcm2835-gpu-ram-alias[*] @ram 0000000000000000-000000003fffffff
+      0000000040000000-000000007fffffff (prio 0, i/o): alias bcm2835-gpu-ram-alias[*] @ram 0000000000000000-000000003fffffff
+      000000007e000000-000000007effffff (prio 1, i/o): alias bcm2835-peripherals @bcm2835-peripherals 0000000000000000-0000000000ffffff
+      0000000080000000-00000000bfffffff (prio 0, i/o): alias bcm2835-gpu-ram-alias[*] @ram 0000000000000000-000000003fffffff
+      00000000c0000000-00000000ffffffff (prio 0, i/o): alias bcm2835-gpu-ram-alias[*] @ram 0000000000000000-000000003fffffff
+
+After:
+
+  address-space: bcm2835-dma-memory
+    0000000000000000-00000000ffffffff (prio 0, i/o): gpu-bus
+      0000000000000000-000000003fffffff (prio 0, i/o): alias l1-l2-cached @videocore 0000000000000000-000000003fffffff
+      0000000040000000-000000007fffffff (prio 0, i/o): alias l2-cached-coherent @videocore 0000000000000000-000000003fffffff
+      0000000080000000-00000000bfffffff (prio 0, i/o): alias l2-cached @videocore 0000000000000000-000000003fffffff
+      00000000c0000000-00000000ffffffff (prio 0, i/o): alias direct-uncached @videocore 0000000000000000-000000003fffffff
+
+  memory-region: videocore
+    0000000000000000-000000003fffffff (prio 0, i/o): videocore
+      0000000000000000-000000003fffffff (prio 0, i/o): alias vc-ram @ram 0000000000000000-000000003fffffff
+      000000003e000000-000000003effffff (prio 1, i/o): alias vc-peripherals @bcm2835-peripherals 0000000000000000-0000000000ffffff
+
+Now the periferals are accessible from the uncached region too.
 
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- hw/arm/bcm2835_peripherals.c | 25 +++++++++++++++++--------
- 1 file changed, 17 insertions(+), 8 deletions(-)
+ hw/arm/bcm2835_peripherals.c         | 25 +++++-------------
+ hw/arm/bcm2836.c                     | 38 ++++++++++++++++++++++++++++
+ include/hw/arm/bcm2835_peripherals.h |  4 +--
+ include/hw/arm/bcm2836.h             |  7 +++++
+ 4 files changed, 53 insertions(+), 21 deletions(-)
 
 diff --git a/hw/arm/bcm2835_peripherals.c b/hw/arm/bcm2835_peripherals.c
-index 17207ae07e..d51e9c8def 100644
+index d51e9c8def..5da310efb1 100644
 --- a/hw/arm/bcm2835_peripherals.c
 +++ b/hw/arm/bcm2835_peripherals.c
-@@ -82,9 +82,6 @@ static void bcm2835_peripherals_init(Object *obj)
-     object_property_add_alias(obj, "vcram-size", OBJECT(&s->fb), "vcram-size",
-                               &error_abort);
+@@ -9,6 +9,7 @@
+  */
  
--    object_property_add_const_link(OBJECT(&s->fb), "dma-mr",
--                                   OBJECT(&s->gpu_bus_mr), &error_abort);
+ #include "qemu/osdep.h"
++#include "qemu/units.h"
+ #include "qapi/error.h"
+ #include "qemu/module.h"
+ #include "hw/arm/bcm2835_peripherals.h"
+@@ -45,10 +46,6 @@ static void bcm2835_peripherals_init(Object *obj)
+     object_property_add_child(obj, "peripheral-io", OBJECT(&s->peri_mr), NULL);
+     sysbus_init_mmio(SYS_BUS_DEVICE(s), &s->peri_mr);
+ 
+-    /* Internal memory region for peripheral bus addresses (not exported) */
+-    memory_region_init(&s->gpu_bus_mr, obj, "bcm2835-gpu", (uint64_t)1 << 32);
+-    object_property_add_child(obj, "gpu-bus", OBJECT(&s->gpu_bus_mr), NULL);
 -
-     /* Property channel */
-     sysbus_init_child_obj(obj, "property", &s->property, sizeof(s->property),
-                           TYPE_BCM2835_PROPERTY);
-@@ -93,8 +90,6 @@ static void bcm2835_peripherals_init(Object *obj)
+     /* Internal memory region for request/response communication with
+      * mailbox-addressable peripherals (not exported)
+      */
+@@ -140,21 +137,11 @@ static void bcm2835_peripherals_realize(DeviceState *dev, Error **errp)
+     ram = MEMORY_REGION(obj);
+     ram_size = memory_region_size(ram);
  
-     object_property_add_const_link(OBJECT(&s->property), "fb",
-                                    OBJECT(&s->fb), &error_abort);
--    object_property_add_const_link(OBJECT(&s->property), "dma-mr",
--                                   OBJECT(&s->gpu_bus_mr), &error_abort);
- 
-     /* Random Number Generator */
-     sysbus_init_child_obj(obj, "rng", &s->rng, sizeof(s->rng),
-@@ -112,9 +107,6 @@ static void bcm2835_peripherals_init(Object *obj)
-     sysbus_init_child_obj(obj, "dma", &s->dma, sizeof(s->dma),
-                           TYPE_BCM2835_DMA);
- 
--    object_property_add_const_link(OBJECT(&s->dma), "dma-mr",
--                                   OBJECT(&s->gpu_bus_mr), &error_abort);
+-    /* Map peripherals and RAM into the GPU address space. */
+-    memory_region_init_alias(&s->peri_mr_alias, OBJECT(s),
+-                             "bcm2835-peripherals", &s->peri_mr, 0,
+-                             memory_region_size(&s->peri_mr));
 -
-     /* Thermal */
-     sysbus_init_child_obj(obj, "thermal", &s->thermal, sizeof(s->thermal),
-                           TYPE_BCM2835_THERMAL);
-@@ -156,6 +148,7 @@ static void bcm2835_peripherals_realize(DeviceState *dev, Error **errp)
-     memory_region_add_subregion_overlap(&s->gpu_bus_mr, BCM2835_VC_PERI_BASE,
-                                         &s->peri_mr_alias, 1);
- 
-+    obj = OBJECT(&s->gpu_bus_mr);
-     /* RAM is aliased four times (different cache configurations) on the GPU */
-     for (n = 0; n < 4; n++) {
-         memory_region_init_alias(&s->ram_alias[n], OBJECT(s),
-@@ -236,6 +229,12 @@ static void bcm2835_peripherals_realize(DeviceState *dev, Error **errp)
-         return;
+-    memory_region_add_subregion_overlap(&s->gpu_bus_mr, BCM2835_VC_PERI_BASE,
+-                                        &s->peri_mr_alias, 1);
+-
+-    obj = OBJECT(&s->gpu_bus_mr);
+-    /* RAM is aliased four times (different cache configurations) on the GPU */
+-    for (n = 0; n < 4; n++) {
+-        memory_region_init_alias(&s->ram_alias[n], OBJECT(s),
+-                                 "bcm2835-gpu-ram-alias[*]", ram, 0, ram_size);
+-        memory_region_add_subregion_overlap(&s->gpu_bus_mr, (hwaddr)n << 30,
+-                                            &s->ram_alias[n], 0);
++    obj = object_property_get_link(OBJECT(dev), "videocore-bus", &err);
++    if (obj == NULL) {
++        error_setg(errp, "%s: required videocore-bus link not found: %s",
++                   __func__, error_get_pretty(err));
++        return;
      }
  
-+    object_property_add_const_link(OBJECT(&s->fb), "dma-mr", obj, &err);
+     /* Interrupt Controller */
+diff --git a/hw/arm/bcm2836.c b/hw/arm/bcm2836.c
+index 374a44b38c..ada35e5620 100644
+--- a/hw/arm/bcm2836.c
++++ b/hw/arm/bcm2836.c
+@@ -51,6 +51,14 @@ static void bcm2836_init(Object *obj)
+     const BCM283XInfo *info = bc->info;
+     int n;
+ 
++    /* VideoCore memory region */
++    memory_region_init(&s->vc.gpu, obj, "videocore", 1 * GiB);
++    object_property_add_child(obj, "videocore", OBJECT(&s->vc.gpu), NULL);
++
++    /* Internal memory region for peripheral bus addresses (not exported) */
++    memory_region_init(&s->vc.bus, obj, "gpu-bus", 4 * GiB);
++    object_property_add_child(obj, "gpu-bus", OBJECT(&s->vc.bus), NULL);
++
+     for (n = 0; n < BCM283X_NCPUS; n++) {
+         memory_region_init(&s->cpu[n].container, obj, "cpu-bus", 4 * GiB);
+ 
+@@ -97,6 +105,12 @@ static void bcm2836_realize(DeviceState *dev, Error **errp)
+         error_propagate(errp, err);
+         return;
+     }
++    object_property_add_const_link(OBJECT(&s->peripherals), "videocore-bus",
++                                   OBJECT(&s->vc.bus), &err);
 +    if (err) {
 +        error_propagate(errp, err);
 +        return;
++    }
+     object_property_set_bool(OBJECT(&s->peripherals), true, "realized", &err);
+     if (err) {
+         error_propagate(errp, err);
+@@ -112,6 +126,30 @@ static void bcm2836_realize(DeviceState *dev, Error **errp)
+ 
+     peri_mr = sysbus_mmio_get_region(SYS_BUS_DEVICE(&s->peripherals), 0);
+ 
++    /* Map peripherals and RAM into the GPU address space. */
++    memory_region_init_alias(&s->vc.peri_alias, OBJECT(s),
++                             "vc-peripherals", peri_mr, 0,
++                             memory_region_size(peri_mr));
++    memory_region_add_subregion_overlap(&s->vc.gpu, 0x3e000000,
++                                        &s->vc.peri_alias, 1);
++    memory_region_init_alias(&s->vc.ram_alias, OBJECT(s),
++                             "vc-ram", ram_mr, 0, ram_size);
++    memory_region_add_subregion(&s->vc.gpu, 0,
++                                &s->vc.ram_alias);
++    static const char * const bus_alias_name[] = {
++        "l1-l2-cached",
++        "l2-cached-coherent",
++        "l2-cached",
++        "direct-uncached"
++    };
++    /* Alias different cache configurations on the GPU */
++    for (n = 0; n < ARRAY_SIZE(bus_alias_name); n++) {
++        memory_region_init_alias(&s->vc.gpu_alias[n], OBJECT(s),
++                                 bus_alias_name[n], &s->vc.gpu, 0, 1 * GiB);
++        memory_region_add_subregion(&s->vc.bus, n * GiB,
++                                    &s->vc.gpu_alias[n]);
 +    }
 +
-     object_property_set_uint(OBJECT(&s->fb), ram_size - vcram_size,
-                              "vcram-base", &err);
+     /* bcm2836 interrupt controller (and mailboxes, etc.) */
+     object_property_set_bool(OBJECT(&s->control), true, "realized", &err);
      if (err) {
-@@ -255,6 +254,11 @@ static void bcm2835_peripherals_realize(DeviceState *dev, Error **errp)
-                        qdev_get_gpio_in(DEVICE(&s->mboxes), MBOX_CHAN_FB));
+diff --git a/include/hw/arm/bcm2835_peripherals.h b/include/hw/arm/bcm2835_peripherals.h
+index 7859281e11..fb6d84ec50 100644
+--- a/include/hw/arm/bcm2835_peripherals.h
++++ b/include/hw/arm/bcm2835_peripherals.h
+@@ -36,8 +36,8 @@ typedef struct BCM2835PeripheralState {
+     SysBusDevice parent_obj;
+     /*< public >*/
  
-     /* Property channel */
-+    object_property_add_const_link(OBJECT(&s->property), "dma-mr", obj, &err);
-+    if (err) {
-+        error_propagate(errp, err);
-+        return;
-+    }
-     object_property_set_bool(OBJECT(&s->property), true, "realized", &err);
-     if (err) {
-         error_propagate(errp, err);
-@@ -323,6 +327,11 @@ static void bcm2835_peripherals_realize(DeviceState *dev, Error **errp)
-                                INTERRUPT_SDIO));
+-    MemoryRegion peri_mr, peri_mr_alias, gpu_bus_mr, mbox_mr;
+-    MemoryRegion ram_alias[4];
++    MemoryRegion peri_mr, mbox_mr;
++
+     qemu_irq irq, fiq;
  
-     /* DMA Channels */
-+    object_property_add_const_link(OBJECT(&s->dma), "dma-mr", obj, &err);
-+    if (err) {
-+        error_propagate(errp, err);
-+        return;
-+    }
-     object_property_set_bool(OBJECT(&s->dma), true, "realized", &err);
-     if (err) {
-         error_propagate(errp, err);
+     BCM2835SystemTimerState systmr;
+diff --git a/include/hw/arm/bcm2836.h b/include/hw/arm/bcm2836.h
+index e3498cb861..787ab76738 100644
+--- a/include/hw/arm/bcm2836.h
++++ b/include/hw/arm/bcm2836.h
+@@ -35,6 +35,13 @@ typedef struct BCM283XState {
+     char *cpu_type;
+     uint32_t enabled_cpus;
+ 
++    struct {
++        MemoryRegion bus;
++        MemoryRegion gpu;
++        MemoryRegion peri_alias;
++        MemoryRegion ram_alias;
++        MemoryRegion gpu_alias[4];
++    } vc;
+     struct {
+         ARMCPU core;
+         MemoryRegion container;
 -- 
 2.21.0
 
