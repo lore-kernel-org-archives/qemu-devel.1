@@ -6,52 +6,52 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 79C17CA9EAC
-	for <qemu-devel@archiver.kernel.org>; Sat, 19 Oct 2019 06:51:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 13C4ACA9EAB
+	for <qemu-devel@archiver.kernel.org>; Sat, 19 Oct 2019 06:53:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4B77020854
-	for <qemu-devel@archiver.kernel.org>; Sat, 19 Oct 2019 06:51:58 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4B77020854
+	by mail.kernel.org (Postfix) with ESMTPS id DC05D20854
+	for <qemu-devel@archiver.kernel.org>; Sat, 19 Oct 2019 06:53:14 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DC05D20854
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50012 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50024 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iLiaj-0000KP-FK
-	for qemu-devel@archiver.kernel.org; Sat, 19 Oct 2019 02:51:57 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59935)
+	id 1iLiby-0001br-49
+	for qemu-devel@archiver.kernel.org; Sat, 19 Oct 2019 02:53:14 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60026)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <stefanha@redhat.com>) id 1iLiP6-0003yZ-6T
- for qemu-devel@nongnu.org; Sat, 19 Oct 2019 02:39:57 -0400
+ (envelope-from <stefanha@redhat.com>) id 1iLiPS-0004ap-7S
+ for qemu-devel@nongnu.org; Sat, 19 Oct 2019 02:40:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <stefanha@redhat.com>) id 1iLiP4-0004KO-QQ
- for qemu-devel@nongnu.org; Sat, 19 Oct 2019 02:39:56 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:50664)
+ (envelope-from <stefanha@redhat.com>) id 1iLiPQ-0004cD-Vu
+ for qemu-devel@nongnu.org; Sat, 19 Oct 2019 02:40:18 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:45154)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <stefanha@redhat.com>)
- id 1iLiP1-0004IH-WC; Sat, 19 Oct 2019 02:39:52 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ id 1iLiPN-0004ZC-95; Sat, 19 Oct 2019 02:40:13 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 333418535D;
- Sat, 19 Oct 2019 06:39:51 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 7CD6618C427B;
+ Sat, 19 Oct 2019 06:40:12 +0000 (UTC)
 Received: from localhost (ovpn-116-50.ams2.redhat.com [10.36.116.50])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 8D6F45D717;
- Sat, 19 Oct 2019 06:39:42 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 1101A5D9CC;
+ Sat, 19 Oct 2019 06:40:11 +0000 (UTC)
 From: Stefan Hajnoczi <stefanha@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v3 12/16] libqos: add MSI-X callbacks to QVirtioPCIDevice
-Date: Sat, 19 Oct 2019 07:38:06 +0100
-Message-Id: <20191019063810.6944-13-stefanha@redhat.com>
+Subject: [PATCH v3 15/16] libqos: extract Legacy virtio-pci.c code
+Date: Sat, 19 Oct 2019 07:38:09 +0100
+Message-Id: <20191019063810.6944-16-stefanha@redhat.com>
 In-Reply-To: <20191019063810.6944-1-stefanha@redhat.com>
 References: <20191019063810.6944-1-stefanha@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.25]); Sat, 19 Oct 2019 06:39:51 +0000 (UTC)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.62]); Sat, 19 Oct 2019 06:40:12 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
@@ -75,141 +75,105 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The MSI-X vectors are programmed differently in the VIRTIO 1.0 and
-Legacy interfaces.  Introduce callbacks so different implementations can
-be used depending on the interface version.
+The current libqos virtio-pci.c code implements the VIRTIO Legacy
+interface.  Extract existing code in preparation for VIRTIO 1.0 support.
 
 Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
 Reviewed-by: Sergio Lopez <slp@redhat.com>
 Reviewed-by: Thomas Huth <thuth@redhat.com>
 ---
- tests/libqos/virtio-pci.h | 12 ++++++++++++
- tests/libqos/virtio-pci.c | 37 ++++++++++++++++++++++++++++---------
- 2 files changed, 40 insertions(+), 9 deletions(-)
+ tests/libqos/virtio-pci.h |  2 --
+ tests/libqos/virtio-pci.c | 29 ++++++++++++-----------------
+ 2 files changed, 12 insertions(+), 19 deletions(-)
 
 diff --git a/tests/libqos/virtio-pci.h b/tests/libqos/virtio-pci.h
-index 728b4715f1..4299efc023 100644
+index 78a1c15c2a..6b3a385b06 100644
 --- a/tests/libqos/virtio-pci.h
 +++ b/tests/libqos/virtio-pci.h
-@@ -14,16 +14,28 @@
- #include "libqos/pci.h"
- #include "libqos/qgraph.h"
+@@ -45,8 +45,6 @@ typedef struct QVirtQueuePCI {
+     uint32_t msix_data;
+ } QVirtQueuePCI;
 =20
-+typedef struct QVirtioPCIMSIXOps QVirtioPCIMSIXOps;
-+
- typedef struct QVirtioPCIDevice {
-     QOSGraphObject obj;
-     QVirtioDevice vdev;
-     QPCIDevice *pdev;
-     QPCIBar bar;
-+    const QVirtioPCIMSIXOps *msix_ops;
-     uint16_t config_msix_entry;
-     uint64_t config_msix_addr;
-     uint32_t config_msix_data;
- } QVirtioPCIDevice;
+-extern const QVirtioBus qvirtio_pci;
+-
+ void virtio_pci_init(QVirtioPCIDevice *dev, QPCIBus *bus, QPCIAddress * =
+addr);
+ QVirtioPCIDevice *virtio_pci_new(QPCIBus *bus, QPCIAddress * addr);
 =20
-+struct QVirtioPCIMSIXOps {
-+    /* Set the Configuration Vector for MSI-X */
-+    void (*set_config_vector)(QVirtioPCIDevice *d, uint16_t entry);
-+
-+    /* Set the Queue Vector for MSI-X */
-+    void (*set_queue_vector)(QVirtioPCIDevice *d, uint16_t vq_idx,
-+                             uint16_t entry);
-+};
-+
- typedef struct QVirtQueuePCI {
-     QVirtQueue vq;
-     uint16_t msix_entry;
 diff --git a/tests/libqos/virtio-pci.c b/tests/libqos/virtio-pci.c
-index e4fa318dcc..0725777a8d 100644
+index e9595603f5..11866f7772 100644
 --- a/tests/libqos/virtio-pci.c
 +++ b/tests/libqos/virtio-pci.c
-@@ -281,6 +281,31 @@ const QVirtioBus qvirtio_pci =3D {
-     .virtqueue_kick =3D qvirtio_pci_virtqueue_kick,
- };
+@@ -35,14 +35,6 @@
+  * original qvirtio_pci_destructor and qvirtio_pci_start_hw.
+  */
 =20
-+static void qvirtio_pci_set_config_vector(QVirtioPCIDevice *d, uint16_t =
-entry)
-+{
-+    uint16_t vector;
-+
-+    qpci_io_writew(d->pdev, d->bar, VIRTIO_MSI_CONFIG_VECTOR, entry);
-+    vector =3D qpci_io_readw(d->pdev, d->bar, VIRTIO_MSI_CONFIG_VECTOR);
-+    g_assert_cmphex(vector, !=3D, VIRTIO_MSI_NO_VECTOR);
-+}
-+
-+static void qvirtio_pci_set_queue_vector(QVirtioPCIDevice *d, uint16_t v=
-q_idx,
-+                                         uint16_t entry)
-+{
-+    uint16_t vector;
-+
-+    qvirtio_pci_queue_select(&d->vdev, vq_idx);
-+    qpci_io_writew(d->pdev, d->bar, VIRTIO_MSI_QUEUE_VECTOR, entry);
-+    vector =3D qpci_io_readw(d->pdev, d->bar, VIRTIO_MSI_QUEUE_VECTOR);
-+    g_assert_cmphex(vector, !=3D, VIRTIO_MSI_NO_VECTOR);
-+}
-+
-+static const QVirtioPCIMSIXOps qvirtio_pci_msix_ops_legacy =3D {
-+    .set_config_vector =3D qvirtio_pci_set_config_vector,
-+    .set_queue_vector =3D qvirtio_pci_set_queue_vector,
-+};
-+
- void qvirtio_pci_device_enable(QVirtioPCIDevice *d)
- {
-     qpci_device_enable(d->pdev);
-@@ -295,7 +320,6 @@ void qvirtio_pci_device_disable(QVirtioPCIDevice *d)
- void qvirtqueue_pci_msix_setup(QVirtioPCIDevice *d, QVirtQueuePCI *vqpci=
-,
-                                         QGuestAllocator *alloc, uint16_t=
- entry)
- {
--    uint16_t vector;
-     uint32_t control;
-     uint64_t off;
+-static inline bool qvirtio_pci_is_big_endian(QVirtioPCIDevice *dev)
+-{
+-    QPCIBus *bus =3D dev->pdev->bus;
+-
+-    /* FIXME: virtio 1.0 is always little-endian */
+-    return qtest_big_endian(bus->qts);
+-}
+-
+ #define CONFIG_BASE(dev) (VIRTIO_PCI_CONFIG_OFF((dev)->pdev->msix_enable=
+d))
 =20
-@@ -321,16 +345,12 @@ void qvirtqueue_pci_msix_setup(QVirtioPCIDevice *d,=
- QVirtQueuePCI *vqpci,
-                    off + PCI_MSIX_ENTRY_VECTOR_CTRL,
-                    control & ~PCI_MSIX_ENTRY_CTRL_MASKBIT);
+ static uint8_t qvirtio_pci_config_readb(QVirtioDevice *d, uint64_t off)
+@@ -55,8 +47,7 @@ static uint8_t qvirtio_pci_config_readb(QVirtioDevice *=
+d, uint64_t off)
+  * but virtio ( < 1.0) is in guest order
+  * so with a big-endian guest the order has been reversed,
+  * reverse it again
+- * virtio-1.0 is always little-endian, like PCI, but this
+- * case will be managed inside qvirtio_pci_is_big_endian()
++ * virtio-1.0 is always little-endian, like PCI
+  */
 =20
--    qvirtio_pci_queue_select(&d->vdev, vqpci->vq.index);
--    qpci_io_writew(d->pdev, d->bar, VIRTIO_MSI_QUEUE_VECTOR, entry);
--    vector =3D qpci_io_readw(d->pdev, d->bar, VIRTIO_MSI_QUEUE_VECTOR);
--    g_assert_cmphex(vector, !=3D, VIRTIO_MSI_NO_VECTOR);
-+    d->msix_ops->set_queue_vector(d, vqpci->vq.index, entry);
+ static uint16_t qvirtio_pci_config_readw(QVirtioDevice *d, uint64_t off)
+@@ -262,7 +253,7 @@ static void qvirtio_pci_virtqueue_kick(QVirtioDevice =
+*d, QVirtQueue *vq)
+     qpci_io_writew(dev->pdev, dev->bar, VIRTIO_PCI_QUEUE_NOTIFY, vq->ind=
+ex);
  }
 =20
- void qvirtio_pci_set_msix_configuration_vector(QVirtioPCIDevice *d,
-                                         QGuestAllocator *alloc, uint16_t=
- entry)
- {
--    uint16_t vector;
-     uint32_t control;
-     uint64_t off;
-=20
-@@ -358,9 +378,7 @@ void qvirtio_pci_set_msix_configuration_vector(QVirti=
-oPCIDevice *d,
-                    off + PCI_MSIX_ENTRY_VECTOR_CTRL,
-                    control & ~PCI_MSIX_ENTRY_CTRL_MASKBIT);
-=20
--    qpci_io_writew(d->pdev, d->bar, VIRTIO_MSI_CONFIG_VECTOR, entry);
--    vector =3D qpci_io_readw(d->pdev, d->bar, VIRTIO_MSI_CONFIG_VECTOR);
--    g_assert_cmphex(vector, !=3D, VIRTIO_MSI_NO_VECTOR);
-+    d->msix_ops->set_config_vector(d, entry);
+-const QVirtioBus qvirtio_pci =3D {
++static const QVirtioBus qvirtio_pci_legacy =3D {
+     .config_readb =3D qvirtio_pci_config_readb,
+     .config_readw =3D qvirtio_pci_config_readw,
+     .config_readl =3D qvirtio_pci_config_readl,
+@@ -396,17 +387,21 @@ void qvirtio_pci_start_hw(QOSGraphObject *obj)
+     qvirtio_start_device(&dev->vdev);
  }
 =20
- void qvirtio_pci_destructor(QOSGraphObject *obj)
-@@ -383,6 +401,7 @@ static void qvirtio_pci_init_from_pcidev(QVirtioPCIDe=
-vice *dev, QPCIDevice *pci_
-     dev->vdev.device_type =3D qpci_config_readw(pci_dev, PCI_SUBSYSTEM_I=
-D);
-=20
-     dev->config_msix_entry =3D -1;
++static void qvirtio_pci_init_legacy(QVirtioPCIDevice *dev)
++{
++    dev->vdev.device_type =3D qpci_config_readw(dev->pdev, PCI_SUBSYSTEM=
+_ID);
++    dev->bar_idx =3D 0;
++    dev->vdev.bus =3D &qvirtio_pci_legacy;
 +    dev->msix_ops =3D &qvirtio_pci_msix_ops_legacy;
++    dev->vdev.big_endian =3D qtest_big_endian(dev->pdev->bus->qts);
++}
++
+ static void qvirtio_pci_init_from_pcidev(QVirtioPCIDevice *dev, QPCIDevi=
+ce *pci_dev)
+ {
+     dev->pdev =3D pci_dev;
+-    dev->vdev.device_type =3D qpci_config_readw(pci_dev, PCI_SUBSYSTEM_I=
+D);
+-    dev->bar_idx =3D 0;
+-
+     dev->config_msix_entry =3D -1;
+-    dev->msix_ops =3D &qvirtio_pci_msix_ops_legacy;
 =20
-     dev->vdev.bus =3D &qvirtio_pci;
-     dev->vdev.big_endian =3D qvirtio_pci_is_big_endian(dev);
+-    dev->vdev.bus =3D &qvirtio_pci;
+-    dev->vdev.big_endian =3D qvirtio_pci_is_big_endian(dev);
++    qvirtio_pci_init_legacy(dev);
+=20
+     /* each virtio-xxx-pci device should override at least this function=
+ */
+     dev->obj.get_driver =3D NULL;
 --=20
 2.21.0
 
