@@ -2,68 +2,67 @@ Return-Path: <SRS0=F+Q9=YM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B0F40CA9EAC
-	for <qemu-devel@archiver.kernel.org>; Sat, 19 Oct 2019 09:03:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3566CCA9EAB
+	for <qemu-devel@archiver.kernel.org>; Sat, 19 Oct 2019 10:47:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 84145222BD
-	for <qemu-devel@archiver.kernel.org>; Sat, 19 Oct 2019 09:03:05 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 84145222BD
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id E90D521D7C
+	for <qemu-devel@archiver.kernel.org>; Sat, 19 Oct 2019 10:47:44 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="oZO5hQPx"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E90D521D7C
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51438 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53002 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iLkdc-0007ny-NG
-	for qemu-devel@archiver.kernel.org; Sat, 19 Oct 2019 05:03:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41811)
+	id 1iLmGu-00005V-12
+	for qemu-devel@archiver.kernel.org; Sat, 19 Oct 2019 06:47:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52488)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <no-reply@patchew.org>) id 1iLkcl-0006uX-T9
- for qemu-devel@nongnu.org; Sat, 19 Oct 2019 05:02:13 -0400
+ (envelope-from <dgibson@ozlabs.org>) id 1iLmFh-0007uI-15
+ for qemu-devel@nongnu.org; Sat, 19 Oct 2019 06:46:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <no-reply@patchew.org>) id 1iLkck-0005TR-8y
- for qemu-devel@nongnu.org; Sat, 19 Oct 2019 05:02:11 -0400
-Resent-Date: Sat, 19 Oct 2019 05:02:11 -0400
-Resent-Message-Id: <E1iLkck-0005TR-8y@eggs.gnu.org>
-Received: from sender4-of-o54.zoho.com ([136.143.188.54]:21489)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <no-reply@patchew.org>)
- id 1iLkck-0005QY-1D; Sat, 19 Oct 2019 05:02:10 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1571475701; cv=none; 
- d=zohomail.com; s=zohoarc; 
- b=aN4+8qeXT97KPqUKLCaBQHtvOJNKNXWaHtHPEn3TD7/w/jgW3e0+JzRhjXSu34cvgVm+j8EUtJQ4ntmEMOR5ldg6AiwW/yBEK9E3bR+MEX5fmE7U5row9pU7u/0uHVFU73AILHAUzS3Mm5xz1tQIpVKbtXjNthasiALDCvpV6T0=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
- s=zohoarc; t=1571475701;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
- bh=hRIcVZIEvWDn2fYENHObfrF0v5OD4n9uHLFvjrEYVTc=; 
- b=OtWlvNa+Ds9TQCClI7AGmH1SVsykD0ITgATZAV4HlaiegGRaymthNrSHxchQVBKo1wlQd4OxanzsOhIuUBw1qt8RNcSsw3Fuc6hTnpd02dEf0DWmapMJtA+WN4hYH3o4s8XGTMdqbavPkEHno+aAxBPSu1eitvrnZC/Gl4+V/MU=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
- dkim=pass  header.i=patchew.org;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1571475699351546.2778899745565;
- Sat, 19 Oct 2019 02:01:39 -0700 (PDT)
-In-Reply-To: <20191018150630.31099-1-damien.hedde@greensocs.com>
-Subject: Re: [PATCH v5 00/13] Multi-phase reset mechanism
-Message-ID: <157147569728.24734.4597793654597373097@37313f22b938>
+ (envelope-from <dgibson@ozlabs.org>) id 1iLmFe-0001gh-Mu
+ for qemu-devel@nongnu.org; Sat, 19 Oct 2019 06:46:28 -0400
+Received: from bilbo.ozlabs.org ([2401:3900:2:1::2]:59067 helo=ozlabs.org)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <dgibson@ozlabs.org>) id 1iLmFd-0001bO-M0
+ for qemu-devel@nongnu.org; Sat, 19 Oct 2019 06:46:26 -0400
+Received: by ozlabs.org (Postfix, from userid 1007)
+ id 46wKMD3cM3z9sPW; Sat, 19 Oct 2019 21:46:16 +1100 (AEDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+ d=gibson.dropbear.id.au; s=201602; t=1571481976;
+ bh=aHBKOQppKPMT+GKlL3+rQ+PfjiSJs5ACH1nYwCEeEts=;
+ h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+ b=oZO5hQPxoL+s8ffkUTry653Em9EAq4ZtqWQQ3K2lnb45NZeuz//h6UBdoTkur09fJ
+ IxINYWF1j4MjpILffmpOFBQEgDCAblu5S4MRL4XSu+hrMvJE4t5zVMfpQv8cLR6vEg
+ Es7JCwvrDef4RxWZ8W+8JAWe085mchN9sQAyhzW0=
+Date: Sat, 19 Oct 2019 21:12:23 +1100
+From: David Gibson <david@gibson.dropbear.id.au>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Subject: Re: [PATCH v2 2/2] migration: savevm_state_handler_insert:
+ constant-time element insertion
+Message-ID: <20191019101223.GD1960@umbus.fritz.box>
+References: <20191017205953.13122-1-cheloha@linux.vnet.ibm.com>
+ <20191017205953.13122-3-cheloha@linux.vnet.ibm.com>
+ <20191018081625.GA2990@work-vm>
+ <351dca8e-e77c-c450-845b-d78ba621156a@redhat.com>
+ <20191018094352.GC2990@work-vm>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: damien.hedde@greensocs.com
-Date: Sat, 19 Oct 2019 02:01:39 -0700 (PDT)
-X-ZohoMailClient: External
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 136.143.188.54
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="mJm6k4Vb/yFcL9ZU"
+Content-Disposition: inline
+In-Reply-To: <20191018094352.GC2990@work-vm>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2401:3900:2:1::2
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -75,53 +74,91 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: damien.hedde@greensocs.com, peter.maydell@linaro.org, berrange@redhat.com,
- ehabkost@redhat.com, cohuck@redhat.com, mark.burton@greensocs.com,
- qemu-devel@nongnu.org, qemu-s390x@nongnu.org, qemu-arm@nongnu.org,
- pbonzini@redhat.com, philmd@redhat.com, edgari@xilinx.com,
- david@gibson.dropbear.id.au
+Cc: Laurent Vivier <lvivier@redhat.com>,
+ Michael Roth <mdroth@linux.vnet.ibm.com>,
+ Scott Cheloha <cheloha@linux.vnet.ibm.com>, qemu-devel@nongnu.org,
+ Juan Quintela <quintela@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MTAxODE1MDYzMC4zMTA5
-OS0xLWRhbWllbi5oZWRkZUBncmVlbnNvY3MuY29tLwoKCgpIaSwKClRoaXMgc2VyaWVzIGZhaWxl
-ZCB0aGUgZG9ja2VyLW1pbmd3QGZlZG9yYSBidWlsZCB0ZXN0LiBQbGVhc2UgZmluZCB0aGUgdGVz
-dGluZyBjb21tYW5kcyBhbmQKdGhlaXIgb3V0cHV0IGJlbG93LiBJZiB5b3UgaGF2ZSBEb2NrZXIg
-aW5zdGFsbGVkLCB5b3UgY2FuIHByb2JhYmx5IHJlcHJvZHVjZSBpdApsb2NhbGx5LgoKPT09IFRF
-U1QgU0NSSVBUIEJFR0lOID09PQojISAvYmluL2Jhc2gKZXhwb3J0IEFSQ0g9eDg2XzY0Cm1ha2Ug
-ZG9ja2VyLWltYWdlLWZlZG9yYSBWPTEgTkVUV09SSz0xCnRpbWUgbWFrZSBkb2NrZXItdGVzdC1t
-aW5nd0BmZWRvcmEgSj0xNCBORVRXT1JLPTEKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KCiAgQ0Mg
-ICAgICBody92aXJ0aW8vdHJhY2UubwogIENDICAgICAgaHcvd2F0Y2hkb2cvdHJhY2UubwoKV2Fy
-bmluZywgdHJlYXRlZCBhcyBlcnJvcjoKL3RtcC9xZW11LXRlc3Qvc3JjL2RvY3MvZGV2ZWwvcmVz
-ZXQucnN0OmRvY3VtZW50IGlzbid0IGluY2x1ZGVkIGluIGFueSB0b2N0cmVlCiAgQ0MgICAgICBo
-dy94ZW4vdHJhY2UubwogIENDICAgICAgaHcvZ3Bpby90cmFjZS5vCi0tLQogIENDICAgICAgc3R1
-YnMvYmRydi1uZXh0LW1vbml0b3Itb3duZWQubwogIENDICAgICAgc3R1YnMvYmxrLWNvbW1pdC1h
-bGwubwogIENDICAgICAgc3R1YnMvYmxvY2tkZXYtY2xvc2UtYWxsLWJkcnYtc3RhdGVzLm8KbWFr
-ZTogKioqIFtNYWtlZmlsZTo5OTQ6IGRvY3MvZGV2ZWwvaW5kZXguaHRtbF0gRXJyb3IgMgptYWtl
-OiAqKiogV2FpdGluZyBmb3IgdW5maW5pc2hlZCBqb2JzLi4uLgogIENDICAgICAgc3R1YnMvY2xv
-Y2std2FycC5vClRyYWNlYmFjayAobW9zdCByZWNlbnQgY2FsbCBsYXN0KToKLS0tCiAgICByYWlz
-ZSBDYWxsZWRQcm9jZXNzRXJyb3IocmV0Y29kZSwgY21kKQpzdWJwcm9jZXNzLkNhbGxlZFByb2Nl
-c3NFcnJvcjogQ29tbWFuZCAnWydzdWRvJywgJy1uJywgJ2RvY2tlcicsICdydW4nLCAnLS1sYWJl
-bCcsICdjb20ucWVtdS5pbnN0YW5jZS51dWlkPWQwMjYxMzhlMTk2NTRlM2M4MGQxNjUwZDY4MzE2
-YmQwJywgJy11JywgJzEwMDMnLCAnLS1zZWN1cml0eS1vcHQnLCAnc2VjY29tcD11bmNvbmZpbmVk
-JywgJy0tcm0nLCAnLWUnLCAnVEFSR0VUX0xJU1Q9JywgJy1lJywgJ0VYVFJBX0NPTkZJR1VSRV9P
-UFRTPScsICctZScsICdWPScsICctZScsICdKPTE0JywgJy1lJywgJ0RFQlVHPScsICctZScsICdT
-SE9XX0VOVj0nLCAnLWUnLCAnQ0NBQ0hFX0RJUj0vdmFyL3RtcC9jY2FjaGUnLCAnLXYnLCAnL2hv
-bWUvcGF0Y2hldzIvLmNhY2hlL3FlbXUtZG9ja2VyLWNjYWNoZTovdmFyL3RtcC9jY2FjaGU6eics
-ICctdicsICcvdmFyL3RtcC9wYXRjaGV3LXRlc3Rlci10bXAtaWY3dnJ2eGQvc3JjL2RvY2tlci1z
-cmMuMjAxOS0xMC0xOS0wNC41OS41Mi4xMTExMTovdmFyL3RtcC9xZW11Onoscm8nLCAncWVtdTpm
-ZWRvcmEnLCAnL3Zhci90bXAvcWVtdS9ydW4nLCAndGVzdC1taW5ndyddJyByZXR1cm5lZCBub24t
-emVybyBleGl0IHN0YXR1cyAyLgpmaWx0ZXI9LS1maWx0ZXI9bGFiZWw9Y29tLnFlbXUuaW5zdGFu
-Y2UudXVpZD1kMDI2MTM4ZTE5NjU0ZTNjODBkMTY1MGQ2ODMxNmJkMAptYWtlWzFdOiAqKiogW2Rv
-Y2tlci1ydW5dIEVycm9yIDEKbWFrZVsxXTogTGVhdmluZyBkaXJlY3RvcnkgYC92YXIvdG1wL3Bh
-dGNoZXctdGVzdGVyLXRtcC1pZjd2cnZ4ZC9zcmMnCm1ha2U6ICoqKiBbZG9ja2VyLXJ1bi10ZXN0
-LW1pbmd3QGZlZG9yYV0gRXJyb3IgMgoKcmVhbCAgICAxbTQ0LjQyMnMKdXNlciAgICAwbTcuNjY0
-cwoKClRoZSBmdWxsIGxvZyBpcyBhdmFpbGFibGUgYXQKaHR0cDovL3BhdGNoZXcub3JnL2xvZ3Mv
-MjAxOTEwMTgxNTA2MzAuMzEwOTktMS1kYW1pZW4uaGVkZGVAZ3JlZW5zb2NzLmNvbS90ZXN0aW5n
-LmRvY2tlci1taW5nd0BmZWRvcmEvP3R5cGU9bWVzc2FnZS4KLS0tCkVtYWlsIGdlbmVyYXRlZCBh
-dXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHBzOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNl
-bmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
 
+--mJm6k4Vb/yFcL9ZU
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Fri, Oct 18, 2019 at 10:43:52AM +0100, Dr. David Alan Gilbert wrote:
+> * Laurent Vivier (lvivier@redhat.com) wrote:
+> > On 18/10/2019 10:16, Dr. David Alan Gilbert wrote:
+> > > * Scott Cheloha (cheloha@linux.vnet.ibm.com) wrote:
+> > >> savevm_state's SaveStateEntry TAILQ is a priority queue.  Priority
+> > >> sorting is maintained by searching from head to tail for a suitable
+> > >> insertion spot.  Insertion is thus an O(n) operation.
+> > >>
+> > >> If we instead keep track of the head of each priority's subqueue
+> > >> within that larger queue we can reduce this operation to O(1) time.
+> > >>
+> > >> savevm_state_handler_remove() becomes slightly more complex to
+> > >> accomodate these gains: we need to replace the head of a priority's
+> > >> subqueue when removing it.
+> > >>
+> > >> With O(1) insertion, booting VMs with many SaveStateEntry objects is
+> > >> more plausible.  For example, a ppc64 VM with maxmem=3D8T has 40000 =
+such
+> > >> objects to insert.
+> > >=20
+> > > Separate from reviewing this patch, I'd like to understand why you've
+> > > got 40000 objects.  This feels very very wrong and is likely to cause
+> > > problems to random other bits of qemu as well.
+> >=20
+> > I think the 40000 objects are the "dr-connectors" that are used to plug
+> > peripherals (memory, pci card, cpus, ...).
+>=20
+> Yes, Scott confirmed that in the reply to the previous version.
+> IMHO nothing in qemu is designed to deal with that many devices/objects
+> - I'm sure that something other than the migration code is going to
+> get upset.
+
+It kind of did.  Particularly when there was n^2 and n^3 cubed
+behaviour in the property stuff we had some ludicrously long startup
+times (hours) with large maxmem values.
+
+Fwiw, the DRCs for PCI slots, DRCs and PHBs aren't really a problem.
+The problem is the memory DRCs, there's one for each LMB - each 256MiB
+chunk of memory (or possible memory).
+
+> Is perhaps the structure wrong somewhere - should there be a single DRC
+> device that knows about all DRCs?
+
+Maybe.  The tricky bit is how to get there from here without breaking
+migration or something else along the way.
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--mJm6k4Vb/yFcL9ZU
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl2q4YUACgkQbDjKyiDZ
+s5KP7A//Tboy3KjmlC25gZc4ZZsbS+xNaXLWS5eH+ZBk57pA9iDkYlBxUrfFBVm+
+I08/Yur8Ap1DACUNFbDvDI6M9ifiqo9yN6rBMJle8Ey8Yqhq+IUQBaDycjM2AY/Z
+8tpNiOOtf0WukDUhk/su0o2+LwoVGhoZR4xC0dnxu8jwGEo+fvtJssSM947O1P7K
+AfFhMro+rpRztyRSWl+IdORWJLn4Ougz3LSsu2yqmnq3XgA3TVBuNjF3UQ2IPIgA
+qEcQbc4vv5q0226rSSfWmwATugLglSAlO+dp35HnA8c1W8OJemIX/4mIOs2dQi/l
+N7YCSw2b/qX/1TjGqKx3nEkb/pfS+xVnQDC8bw48RBsXLqC1bR6kGDg8S4vz6pk8
+DNR3aqJgS1elyAaPGov00gHx/9m9AkO4Sn/8Okxo5gXfI8EBqPwt/ozbpts+0WxW
+Y7kfXcWALtu+u7gXbpU1ZTIeYGSnus/xAJgnVDcm5zh+OM1utYjwryvx9yqFrt9h
+xcSP6UV582BqAIScrKhpTgb6pzkss6+qrrzEGX6WvsKuRj8hjJ3w7Ciow/eYKQk4
+VPcx0MiCYsn+jSD8MWjdnnc57drSQVqLskapGJUEtK/UrC8KV7bunbauXf6WnP9z
+V6ea9phH0mIcwA692EvV7+NCfsLx9d4GPL8avJNLl14Vqq7fNg8=
+=Jmin
+-----END PGP SIGNATURE-----
+
+--mJm6k4Vb/yFcL9ZU--
 
