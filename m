@@ -7,76 +7,75 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 09600CA9EAB
-	for <qemu-devel@archiver.kernel.org>; Sat, 19 Oct 2019 23:57:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D92DCA9EAC
+	for <qemu-devel@archiver.kernel.org>; Sat, 19 Oct 2019 23:58:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C88BF20872
-	for <qemu-devel@archiver.kernel.org>; Sat, 19 Oct 2019 23:57:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 645F020872
+	for <qemu-devel@archiver.kernel.org>; Sat, 19 Oct 2019 23:58:42 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BFiqlYfH"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C88BF20872
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hSEyfflr"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 645F020872
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42238 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42294 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iLyb2-00058N-TM
-	for qemu-devel@archiver.kernel.org; Sat, 19 Oct 2019 19:57:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34615)
+	id 1iLycK-0006Kp-Hx
+	for qemu-devel@archiver.kernel.org; Sat, 19 Oct 2019 19:58:41 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34670)
  by lists.gnu.org with esmtp (Exim 4.90_1)
  (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1iLyRe-0000N2-2U
- for qemu-devel@nongnu.org; Sat, 19 Oct 2019 19:47:39 -0400
+ id 1iLyRh-0000SH-6L
+ for qemu-devel@nongnu.org; Sat, 19 Oct 2019 19:47:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
  (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1iLyRc-0005cg-RU
- for qemu-devel@nongnu.org; Sat, 19 Oct 2019 19:47:37 -0400
-Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:39022)
+ id 1iLyRg-0005f1-1T
+ for qemu-devel@nongnu.org; Sat, 19 Oct 2019 19:47:41 -0400
+Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:53231)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1iLyRc-0005cR-LS; Sat, 19 Oct 2019 19:47:36 -0400
-Received: by mail-wm1-x344.google.com with SMTP id v17so9293640wml.4;
- Sat, 19 Oct 2019 16:47:36 -0700 (PDT)
+ id 1iLyRf-0005ef-PY; Sat, 19 Oct 2019 19:47:39 -0400
+Received: by mail-wm1-x343.google.com with SMTP id r19so9572273wmh.2;
+ Sat, 19 Oct 2019 16:47:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=t7hE2pbrub3AVEyc/oyjS4UfKKd4rj51NgMEOKFwXuo=;
- b=BFiqlYfHurAD4oF18R9w4sddxFJxMhYyTp07v52acGbmFLL6ijI/6Qxnuf6WJ6eYXh
- xvIaYeou6w2D87k7Bn8lAG/i2pzPQ9NaSyIahJB8nR3OT2xujB4hWoQjoqwtzVg4TqgB
- 9tDeY/fj7y+byjBTPsnZyS992eUUJ9VfDktMXN6wy7jmsj8AvqGoJoKdBtC3OaBg+8Jk
- aBhgZp57FTLnjD8nI+lYD+7jRePVrXMGS8j3ElSAmqLWrb1CEzP+cwDCry8hlK4EMyHl
- Fpvfg+J4Zfq+Z6fKcQai4qlPK6r/sNMFkFUKed2lUCYFQJ63WeGzJegOZG8fT/1eWxoD
- OgtA==
+ bh=O5oiXx5QsqcxjGrnz0sfvOqjkOSxCB/5RAZrFYtWlbA=;
+ b=hSEyfflrQ3eukOQaelqiuw7eyOdcySc7vTMK2pnmAvEE7J1zsr9JlhoMrJoMDunNbM
+ 5GDZNNr15LpFVXKt+vJJDjWu7wT42+PZJqSyeoBPEdsAgTEUQRUrUOi/3EXNgwdO5Jcb
+ w40OPmiaSfd7NJrYoxTbfBvk48iL/mU5Q9+qeOCGjskdY7fxmPCfMsTANaPmoLbFW5Xh
+ xonxBvtxotLD5L/CXpfgQ/nlNUpt927sZFnnykOTAn3/1Owpf8rbWwiXbkXqq/cEl41H
+ 3M8ZEAQAZcxouQfiS7S3zox0l7m/rUQUZFkts13pOI37QJvOYVx8X1JbFHkuiFET875N
+ /aCA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=t7hE2pbrub3AVEyc/oyjS4UfKKd4rj51NgMEOKFwXuo=;
- b=hjZmr4QRIh0YEuLlzlz077I4lXo1Y7OCblWEhGdt8lPQ9RsZrS8muZw545i8slcaaZ
- WasCJL/jJWW0S/B6tqsLc1orLWKW2RMLiJrGLqS/Ez7rxDEguDEzFRRB4SralKFeoBXr
- Un25aLQWMj1WtwwXdL8tdwb2BZeTxM/vcTqa5cZuh4gTJOHbG+dYI7bG+kYnH0C1ojjc
- jbWZjeg95JBVvqPOljxkcZQueVaQx5AsqsvceJP5mjsPV9GVxx7xXjQ8IabXcDqDJQwf
- JvJBJqZ/7/7NCQ/nBgZbfRyvk2sPoUtDv9lr2BtUeIBrvsFs9OimBmKzDFXLRV8yQXs9
- 9Mkg==
-X-Gm-Message-State: APjAAAVT0jYWjwV0YtOYZXlKw+7W2WZejM4iDyjirFABKBkbqVNBYcCS
- NMnixOQeD4WU2PK7sAvpPXa2m0OF
-X-Google-Smtp-Source: APXvYqzpWnjlcXtzlmFfKR1N9DGo6jcA7bC2qkg2M9spZoNI+9M3hXPwPeA3U5WPALFqe5Z7w6sSIQ==
-X-Received: by 2002:a1c:658a:: with SMTP id
- z132mr12769528wmb.174.1571528855548; 
- Sat, 19 Oct 2019 16:47:35 -0700 (PDT)
+ bh=O5oiXx5QsqcxjGrnz0sfvOqjkOSxCB/5RAZrFYtWlbA=;
+ b=D94CEFB/WuzNm2mP3dW2RniE5O1GPNQlNfn7BxjdmS6BnH8l28ZEizpW+b7waOrsk5
+ btfOsHNAKT6iNoF85w6/8wyg29e/ShAjuZjgYTjTxWy0JJrlPFSfHxP7AOCqveEYWKT9
+ cP7AgbNwB4thG/EKHt2pGvntJ/fbnEmPwbhwC9TI9jRuEzZNbqWIoKgN6x9UTOAcLinW
+ BtTWrquKedwyYkvEteiCLRyI5ke3M+m3ZtJpC7QbaN4emnX4xZZbUdPKf1/V1L9LaL8S
+ +dAFJIniNs7avhuA0MvuVn72H/S1Q3seAapiENBoF7FEmtQY2nHknpBgHsNPqS+FKMSg
+ 5s1g==
+X-Gm-Message-State: APjAAAVSkTeQE37C4ZfdAf+ZLU/5+Vfi63M1zfwvx/L3Nyjak9uwjsQ1
+ 7qnK7UE+VQT0voMysAPMPbtry0M0
+X-Google-Smtp-Source: APXvYqzVf2SptqGe6/JPvUC2cTQYj6I9cxO0T0camCpOVKQUvO4gEWq/6Bi0zHYk/Kkbj3noXHD+Vg==
+X-Received: by 2002:a05:600c:2908:: with SMTP id
+ i8mr12735560wmd.20.1571528858686; 
+ Sat, 19 Oct 2019 16:47:38 -0700 (PDT)
 Received: from x1w.redhat.com (14.red-88-21-201.staticip.rima-tde.net.
  [88.21.201.14])
- by smtp.gmail.com with ESMTPSA id u1sm10433763wrp.56.2019.10.19.16.47.33
+ by smtp.gmail.com with ESMTPSA id u1sm10433763wrp.56.2019.10.19.16.47.37
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sat, 19 Oct 2019 16:47:34 -0700 (PDT)
+ Sat, 19 Oct 2019 16:47:38 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v3 10/16] hw/arm/raspi: Use AddressSpace when using
- arm_boot::write_secondary_boot
-Date: Sun, 20 Oct 2019 01:47:09 +0200
-Message-Id: <20191019234715.25750-11-f4bug@amsat.org>
+Subject: [PATCH v3 12/16] hw/arm/bcm2836: Rename enabled_cpus -> enabled_cores
+Date: Sun, 20 Oct 2019 01:47:11 +0200
+Message-Id: <20191019234715.25750-13-f4bug@amsat.org>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20191019234715.25750-1-f4bug@amsat.org>
 References: <20191019234715.25750-1-f4bug@amsat.org>
@@ -86,7 +85,7 @@ Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::344
+X-Received-From: 2a00:1450:4864:20::343
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -114,53 +113,65 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-write_secondary_boot() is used in SMP configurations where the
-CPU address space might not be the main System Bus.
-The rom_add_blob_fixed_as() function allow us to specify an
-address space. Use it to write each boot blob in the corresponding
-CPU address space.
+We now use -smp cores=<n> to limit the number of cores powered
+on reset. Rename the 'enabled_cpus' variable as 'enabled_cores'
+to better match the new use. No functional changes.
 
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- hw/arm/raspi.c | 14 ++++++++------
- 1 file changed, 8 insertions(+), 6 deletions(-)
+ hw/arm/bcm2836.c         | 4 ++--
+ hw/arm/raspi.c           | 2 +-
+ include/hw/arm/bcm2836.h | 2 +-
+ 3 files changed, 4 insertions(+), 4 deletions(-)
 
+diff --git a/hw/arm/bcm2836.c b/hw/arm/bcm2836.c
+index ada35e5620..e3cef69687 100644
+--- a/hw/arm/bcm2836.c
++++ b/hw/arm/bcm2836.c
+@@ -202,7 +202,7 @@ static void bcm2836_realize(DeviceState *dev, Error **errp)
+         }
+ 
+         /* start powered off if not enabled */
+-        object_property_set_bool(OBJECT(&s->cpu[n].core), n >= s->enabled_cpus,
++        object_property_set_bool(OBJECT(&s->cpu[n].core), n >= s->enabled_cores,
+                                  "start-powered-off", &err);
+         if (err) {
+             error_propagate(errp, err);
+@@ -235,7 +235,7 @@ static void bcm2836_realize(DeviceState *dev, Error **errp)
+ }
+ 
+ static Property bcm2836_props[] = {
+-    DEFINE_PROP_UINT32("enabled-cpus", BCM283XState, enabled_cpus,
++    DEFINE_PROP_UINT32("enabled-cores", BCM283XState, enabled_cores,
+                        BCM283X_NCPUS),
+     DEFINE_PROP_END_OF_LIST()
+ };
 diff --git a/hw/arm/raspi.c b/hw/arm/raspi.c
-index a12459bc41..569d85c11a 100644
+index 45d3f91f95..b1b488ca53 100644
 --- a/hw/arm/raspi.c
 +++ b/hw/arm/raspi.c
-@@ -60,12 +60,14 @@ static void write_smpboot(ARMCPU *cpu, const struct arm_boot_info *info)
-     QEMU_BUILD_BUG_ON((BOARDSETUP_ADDR & 0xf) != 0
-                       || (BOARDSETUP_ADDR >> 4) >= 0x100);
+@@ -191,7 +191,7 @@ static void raspi_init(MachineState *machine, int version)
+     object_property_add_const_link(OBJECT(&s->soc), "ram", OBJECT(&s->ram),
+                                    &error_abort);
+     object_property_set_int(OBJECT(&s->soc), machine->smp.cores,
+-                            "enabled-cpus", &error_abort);
++                            "enabled-cores", &error_abort);
+     int board_rev = version == 3 ? 0xa02082 : 0xa21041;
+     object_property_set_int(OBJECT(&s->soc), board_rev, "board-rev",
+                             &error_abort);
+diff --git a/include/hw/arm/bcm2836.h b/include/hw/arm/bcm2836.h
+index 787ab76738..2c3f1e6c6a 100644
+--- a/include/hw/arm/bcm2836.h
++++ b/include/hw/arm/bcm2836.h
+@@ -33,7 +33,7 @@ typedef struct BCM283XState {
+     /*< public >*/
  
--    rom_add_blob_fixed("raspi_smpboot", smpboot, sizeof(smpboot),
--                       info->smp_loader_start);
-+    rom_add_blob_fixed_as("raspi_smpboot", smpboot, sizeof(smpboot),
-+                          info->smp_loader_start,
-+                          arm_boot_address_space(cpu, info));
- }
+     char *cpu_type;
+-    uint32_t enabled_cpus;
++    uint32_t enabled_cores;
  
- static void write_smpboot64(ARMCPU *cpu, const struct arm_boot_info *info)
- {
-+    AddressSpace *as = arm_boot_address_space(cpu, info);
-     /* Unlike the AArch32 version we don't need to call the board setup hook.
-      * The mechanism for doing the spin-table is also entirely different.
-      * We must have four 64-bit fields at absolute addresses
-@@ -92,10 +94,10 @@ static void write_smpboot64(ARMCPU *cpu, const struct arm_boot_info *info)
-         0, 0, 0, 0
-     };
- 
--    rom_add_blob_fixed("raspi_smpboot", smpboot, sizeof(smpboot),
--                       info->smp_loader_start);
--    rom_add_blob_fixed("raspi_spintables", spintables, sizeof(spintables),
--                       SPINTABLE_ADDR);
-+    rom_add_blob_fixed_as("raspi_smpboot", smpboot, sizeof(smpboot),
-+                          info->smp_loader_start, as);
-+    rom_add_blob_fixed_as("raspi_spintables", spintables, sizeof(spintables),
-+                          SPINTABLE_ADDR, as);
- }
- 
- static void write_board_setup(ARMCPU *cpu, const struct arm_boot_info *info)
+     struct {
+         MemoryRegion bus;
 -- 
 2.21.0
 
