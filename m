@@ -7,76 +7,75 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 602B0CA9EAC
-	for <qemu-devel@archiver.kernel.org>; Sat, 19 Oct 2019 15:42:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D57FCA9EAB
+	for <qemu-devel@archiver.kernel.org>; Sat, 19 Oct 2019 15:42:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 29E1A20854
-	for <qemu-devel@archiver.kernel.org>; Sat, 19 Oct 2019 15:42:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 28FC420854
+	for <qemu-devel@archiver.kernel.org>; Sat, 19 Oct 2019 15:42:21 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="X78yY+/F"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 29E1A20854
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iDUCYG0H"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 28FC420854
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57024 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57042 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iLqrr-0005XD-TZ
-	for qemu-devel@archiver.kernel.org; Sat, 19 Oct 2019 11:42:11 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47433)
+	id 1iLqrz-0005hj-Tp
+	for qemu-devel@archiver.kernel.org; Sat, 19 Oct 2019 11:42:19 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47461)
  by lists.gnu.org with esmtp (Exim 4.90_1)
  (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1iLqki-0005Bd-Pn
- for qemu-devel@nongnu.org; Sat, 19 Oct 2019 11:34:49 -0400
+ id 1iLqkl-0005FO-Po
+ for qemu-devel@nongnu.org; Sat, 19 Oct 2019 11:34:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
  (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1iLqkh-0002sz-BD
- for qemu-devel@nongnu.org; Sat, 19 Oct 2019 11:34:48 -0400
-Received: from mail-wm1-x32e.google.com ([2a00:1450:4864:20::32e]:50672)
+ id 1iLqkk-0002vE-UZ
+ for qemu-devel@nongnu.org; Sat, 19 Oct 2019 11:34:51 -0400
+Received: from mail-wr1-x429.google.com ([2a00:1450:4864:20::429]:33838)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1iLqkh-0002sY-5d
- for qemu-devel@nongnu.org; Sat, 19 Oct 2019 11:34:47 -0400
-Received: by mail-wm1-x32e.google.com with SMTP id 5so9006499wmg.0
- for <qemu-devel@nongnu.org>; Sat, 19 Oct 2019 08:34:47 -0700 (PDT)
+ id 1iLqkk-0002ue-PC
+ for qemu-devel@nongnu.org; Sat, 19 Oct 2019 11:34:50 -0400
+Received: by mail-wr1-x429.google.com with SMTP id t16so4098249wrr.1
+ for <qemu-devel@nongnu.org>; Sat, 19 Oct 2019 08:34:50 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=sj0gWaKf7F1u1yqYOnBP1Je+BdxFG+7SDe9DUcADRaE=;
- b=X78yY+/FiWu/vOU/BzjaO1Lj3RdJ6U4spA9vfenAsWU+tEHPNheaHkma1GV9ZUftw5
- DKuy8vaqNGR7TMTc5MwYjiHN07QJHF/TM4QrYKB1JBHZPhQEYEAlETU3fQv62ajMOs4f
- zP3U1Pq8N8/Vevx8PmyCllsle2Ij3OPHJONTgoF6yi0gnq3kbWrDQRg5CLYFzTScsh09
- EbYzpOwrSINsXEunu+wGx1I0bQLXivOR/51AWqdjttC3DmSiV3k9ZBW5wUSCdgfFoKun
- v/b/b16r87NUmsdqnaLM7EX/ypsG2AN1YcXHZhnS8ICV8SudvHYWNuCSid29hj7SiWRV
- nsRg==
+ bh=TPCN4WzRP9NgdoqPPa5MaOK6LcXOEN/F7yGRSMuex64=;
+ b=iDUCYG0HBFIrl9z6+Tn9dOLjMVypliSGEhIg6ZV1UedvGmX0MTw3fcw3z3Uy+3kkuW
+ C0DsH9lQ26d+snHCskPFPRdvGYdtRLfBf7/+iEJdSKNitG9SEAsEmvaYHqnZFBECdYLz
+ ZCCgQrsjoGm4qwjO+g5lOeFK3eMW/FbXPOJxr2QjIkAp5+5Hg9sThb/dXoJMXRc32gSS
+ Muw5OztJiQUV+i0xwUMtBA7/vEU3KSmH4oK/RSXtRC2pgBQWsM+6o/efwMbbhq0Dia9d
+ hZ+l8maVuck9/NEKtSg2MOj2kfBlGVbpQh3cYMj+jGMpB1P2F5bjnDgDxFU/B6+x9IVo
+ 43kA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=sj0gWaKf7F1u1yqYOnBP1Je+BdxFG+7SDe9DUcADRaE=;
- b=l+fOrMiiRQP6UuB2KVykhdYcdSmBbtV/kTlYWRcGBXHhu4ElcGN2eDtYeSVan6G/1K
- f0oI9RuSOsgiLbObKWBzGOMjZ8+GAaPTBk6swywRLP2/AGsCykM2Y2of5BY3VCeKOYxX
- OB99D68jsewv8zSQTBJvRfprMoyYajCP4iMs5Y2QaZ6ztDEipnWVd7Ob1zDjxtEpmQN3
- kRWA9pmnWdmYSqrAaybXH0iK/e4DbGDiXsHmnSnlsKy9IzR80Y6ZjiaoxWqr5kw89QX8
- YKMK9EcKBI3rJSt74oSk1Ye9Ue2MZEovO3q1H35RCfjjGeTNnON6iBoYiCRJsKgrKAlT
- TuiA==
-X-Gm-Message-State: APjAAAWeYKPD/lWUwpHuGsumFEUMcC4BhDx3MyetN75wCtPSnoP/ppPy
- nx/xuhIrknu13+x+dtL/nnirr2o8
-X-Google-Smtp-Source: APXvYqylPMfVMJ+dH0bEqzzD4kSX+qnclFbot7J8nW0lPj4HKPmFofkyBC3JHgnV17tPzoCDTh+TuA==
-X-Received: by 2002:a7b:cf0e:: with SMTP id l14mr12368753wmg.46.1571499286024; 
- Sat, 19 Oct 2019 08:34:46 -0700 (PDT)
+ bh=TPCN4WzRP9NgdoqPPa5MaOK6LcXOEN/F7yGRSMuex64=;
+ b=ByukUcQWypHXI/s8GeAkF41HzqMdOssG8xZaMkhQXMtZokP6i9PEZ78lHIDeYpA6HY
+ 1Bb66U6ucj6L+4l2K9haZV3fxvlWTIO9BVEI5n7uCoGMy6w3RR3/BDfCfFZ2ZoEUBv4t
+ Y7BBhHE2UEZ+gPxbbxtXddqF31m1ocYSFC4LeYBqMjv0nsPIlgxcuMmJYgERiMJqR32s
+ vPjsczkayqdv7bcLcoiuFXqWUe1t+wLFVa7rkMAjq0UwEpHvkf8SehCu+gyIpkXp5e1c
+ i3dsT6rxX3PkTbKkcwlMLJhraT0Cvt1hYx3WTdS6h7u3ptiBmzvaxz14v0R64rMr4cOM
+ zJ5g==
+X-Gm-Message-State: APjAAAWDR2YcaUv51Oh+sOVOxPExYttHDuvyTUJS2KCZQ8QYNY16hc3c
+ PtBhGuBLx7eLs1Fj14x3SAvDbZ9R
+X-Google-Smtp-Source: APXvYqzzvGYGHVrIJKUk6NIx1g8IHytGpnlmQPJtH2f8s9YCTiG07fRcMkTniPIcpOHtngdXjvifWQ==
+X-Received: by 2002:a5d:5704:: with SMTP id a4mr11078654wrv.281.1571499289652; 
+ Sat, 19 Oct 2019 08:34:49 -0700 (PDT)
 Received: from x1w.redhat.com (14.red-88-21-201.staticip.rima-tde.net.
  [88.21.201.14])
- by smtp.gmail.com with ESMTPSA id j19sm15245605wre.0.2019.10.19.08.34.45
+ by smtp.gmail.com with ESMTPSA id j19sm15245605wre.0.2019.10.19.08.34.48
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sat, 19 Oct 2019 08:34:45 -0700 (PDT)
+ Sat, 19 Oct 2019 08:34:49 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 05/11] tests/boot_linux_console: Use Avocado
- archive::gzip_uncompress()
-Date: Sat, 19 Oct 2019 17:34:31 +0200
-Message-Id: <20191019153437.9820-6-f4bug@amsat.org>
+Subject: [PATCH v2 08/11] tests/ssh_linux_malta: Remove duplicated test
+Date: Sat, 19 Oct 2019 17:34:34 +0200
+Message-Id: <20191019153437.9820-9-f4bug@amsat.org>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20191019153437.9820-1-f4bug@amsat.org>
 References: <20191019153437.9820-1-f4bug@amsat.org>
@@ -86,7 +85,7 @@ Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::32e
+X-Received-From: 2a00:1450:4864:20::429
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -107,35 +106,28 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Avocado 67.0 [*] introduced the avocado.utils.archive module which
-provides handling of gzip files. Use the gzip_uncompress() method.
+Remove duplicated test (probably copy/paste error in
+commit 9090d3332cdcc).
 
-[*] https://avocado-framework.readthedocs.io/en/67.0/api/utils/avocado.utils.html#avocado.utils.archive.gzip_uncompress
-
-Suggested-by: Cleber Rosa <crosa@redhat.com>
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
-v2: New patch replacing the gunzip() refactor
----
- tests/acceptance/boot_linux_console.py | 5 +----
- 1 file changed, 1 insertion(+), 4 deletions(-)
+ tests/acceptance/linux_ssh_mips_malta.py | 3 ---
+ 1 file changed, 3 deletions(-)
 
-diff --git a/tests/acceptance/boot_linux_console.py b/tests/acceptance/boot_linux_console.py
-index 4b419b0559..67d7e96d98 100644
---- a/tests/acceptance/boot_linux_console.py
-+++ b/tests/acceptance/boot_linux_console.py
-@@ -145,10 +145,7 @@ class BootLinuxConsole(Test):
-         initrd_hash = 'bf806e17009360a866bf537f6de66590de349a99'
-         initrd_path_gz = self.fetch_asset(initrd_url, asset_hash=initrd_hash)
-         initrd_path = self.workdir + "rootfs.cpio"
--
--        with gzip.open(initrd_path_gz, 'rb') as f_in:
--            with open(initrd_path, 'wb') as f_out:
--                shutil.copyfileobj(f_in, f_out)
-+        archive.gzip_uncompress(initrd_path_gz, initrd_path)
- 
-         self.vm.set_machine('malta')
-         self.vm.set_console()
+diff --git a/tests/acceptance/linux_ssh_mips_malta.py b/tests/acceptance/linux_ssh_mips_malta.py
+index 27907e8fbd..5523ae2144 100644
+--- a/tests/acceptance/linux_ssh_mips_malta.py
++++ b/tests/acceptance/linux_ssh_mips_malta.py
+@@ -140,9 +140,6 @@ class LinuxSSH(Test):
+         self.ssh_command_output_contains(
+             'cat /proc/interrupts',
+             'eth0')
+-        self.ssh_command_output_contains(
+-            'cat /proc/interrupts',
+-            'eth0')
+         self.ssh_command_output_contains(
+             'cat /proc/devices',
+             'input')
 -- 
 2.21.0
 
