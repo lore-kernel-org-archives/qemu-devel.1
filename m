@@ -8,78 +8,77 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B89E6CA9EAC
-	for <qemu-devel@archiver.kernel.org>; Sat, 19 Oct 2019 19:25:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F2DFECA9EAC
+	for <qemu-devel@archiver.kernel.org>; Sat, 19 Oct 2019 19:42:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 70C4721925
-	for <qemu-devel@archiver.kernel.org>; Sat, 19 Oct 2019 19:25:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id AA1F4222BD
+	for <qemu-devel@archiver.kernel.org>; Sat, 19 Oct 2019 19:42:25 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="r6I6l52n"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 70C4721925
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SsbnmSJv"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AA1F4222BD
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35346 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35806 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iLuLz-0001Hv-Gk
-	for qemu-devel@archiver.kernel.org; Sat, 19 Oct 2019 15:25:31 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45152)
+	id 1iLucK-0005Uh-R9
+	for qemu-devel@archiver.kernel.org; Sat, 19 Oct 2019 15:42:24 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46593)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <aleksandar.m.mail@gmail.com>) id 1iLuL3-0000Ii-KC
- for qemu-devel@nongnu.org; Sat, 19 Oct 2019 15:24:35 -0400
+ (envelope-from <aleksandar.m.mail@gmail.com>) id 1iLubK-000549-T5
+ for qemu-devel@nongnu.org; Sat, 19 Oct 2019 15:41:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aleksandar.m.mail@gmail.com>) id 1iLuL0-0007Ya-UL
- for qemu-devel@nongnu.org; Sat, 19 Oct 2019 15:24:33 -0400
-Received: from mail-oi1-x244.google.com ([2607:f8b0:4864:20::244]:44984)
+ (envelope-from <aleksandar.m.mail@gmail.com>) id 1iLubI-0000Zd-Od
+ for qemu-devel@nongnu.org; Sat, 19 Oct 2019 15:41:22 -0400
+Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:42143)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
- id 1iLuL0-0007Y5-NV
- for qemu-devel@nongnu.org; Sat, 19 Oct 2019 15:24:30 -0400
-Received: by mail-oi1-x244.google.com with SMTP id w6so7925157oie.11
- for <qemu-devel@nongnu.org>; Sat, 19 Oct 2019 12:24:30 -0700 (PDT)
+ id 1iLubI-0000ZF-G6
+ for qemu-devel@nongnu.org; Sat, 19 Oct 2019 15:41:20 -0400
+Received: by mail-ot1-x342.google.com with SMTP id c10so7794964otd.9
+ for <qemu-devel@nongnu.org>; Sat, 19 Oct 2019 12:41:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=mime-version:in-reply-to:references:from:date:message-id:subject:to
- :cc; bh=ItH6FOsiu6rZgBrHhkOlXaQbEZbOVFpWA+Kbsvowz5o=;
- b=r6I6l52nR1xBLtsB1c8qZ6XPLUL7tQENvxgoNaPbA9jwxZ/BwPdxh7g8/0BA1mWvsT
- Cbnnt7ZwXXLEdjhOdRMFdBCgPlb06+FGDfV4CHvzxCEaXPspGcl4E6lzlz7uBQ5k5gvg
- LYi/S4dgXVZfAP//ZfxREsmc9iM3Ig0v0jMqOyZCzn4B6PUTCbQ1um/a0d8ypKjqRLWO
- VQHSmWIpvsFFYk8aEpD8E6dOIdv9sqzjpHsqq1ywGVHYs9AgZ/GMnESNpkfx9QMaUofF
- QxR5fzOWyPnXiG3h/JvdnHRpnP0p2Qv6Phzad5O4831wMLBJttce0UG8NzdmsNJFVKPz
- NvIA==
+ :cc; bh=JoXbuRtJMuh9bzaaCAfaXGIC5I4Cr8tB63KIZkkOi8c=;
+ b=SsbnmSJvzPqOOCNt5V6k6LUIhQr15aF+f56Hgbm1QMpUX75nBpRX8wFH8RWhFHReZl
+ rYfZhA1x3MnhjKykyHS2H3A7UTAGJSSb1XTbip5CBrygK3bmk0NFpQMFRIEsK4GXkpFB
+ 5Ak4dY1p1IPmerxUcSjkiH+gs9R26NCxb7DtqoHKTc9nrsjONNPkkSAgw0YDIePN3Sd9
+ ND5R/noKqhXak2fbP/Xk0ANAod/cMd6v7b6Y1/FiNIHbRB8ojqajfG/m0+pXYcQqxK4l
+ N6cbTRMKwIVKUgOsZQzhNleeiWNUwpJbgCk8bj+lqyRkBu0h8Md+w26Bi42thUOjc4WS
+ LTJQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:in-reply-to:references:from:date
  :message-id:subject:to:cc;
- bh=ItH6FOsiu6rZgBrHhkOlXaQbEZbOVFpWA+Kbsvowz5o=;
- b=aqH/Kd8nHvQBuzDd9oSb+SVUhCkg5dK36+ziAWEA/NMjecoATJTgFmhnnFobZVq0HR
- 4bZ7PfGeXDMKUrYpwmMF0PXnChE0p5BXG4OcozAjcKF32iM1sYQeqkSAajViUlVUuczV
- Doi43Ak40w7GUOBdbG4jD1yJ//xOzOMUdiZNfs77/WQv1IVOc310TNnqOy1HxzDlRKWv
- sN7lMw8+AY0V18cs8DbMrbTa1fogGWjjGQRIIPMqjsLfjAIeqtv62Je//X1w3mXhNPO6
- sV3ryHgE/rjK8Y4xzt+w4a8eCWmfltxrO50MWx4RCtrG47bJHGKaGW66oz3cEGzKC/fv
- A94g==
-X-Gm-Message-State: APjAAAX/ggHtDbTELfyzlz/LkzLOjygYcgjX/kI//0uW+LLy186SdfIG
- E2JU9pUv93AhTc2AQjox2rLqMyWKjX/63V9ISTUd/A==
-X-Google-Smtp-Source: APXvYqxNgtqTBLowKBxyTTdzeBA3QOd2cl3BX47kRHTPz5bMng4VUKGSNtRtOkZsHfVqTSzvzIkCXJDS/awfoTgwxCc=
-X-Received: by 2002:aca:4e56:: with SMTP id c83mr13061669oib.53.1571513069645; 
- Sat, 19 Oct 2019 12:24:29 -0700 (PDT)
+ bh=JoXbuRtJMuh9bzaaCAfaXGIC5I4Cr8tB63KIZkkOi8c=;
+ b=Tu3gV5RnqlaosZ9Q95ZY19e+C7xfjfUNmgWmMqXSzMn4mhMTtkG/NozNpGWw+40M4u
+ 6JMPHa0BgEUfkmXS731q0c4G5qN07e8sGBgBlSDFD8gisOK1Az0d6IpjcLRcOIHyzjy+
+ FN3tmPu8ebrwvC7UhQJfTSx6gWXy8HNoc06KzrHRGeP2VM8EQIfdP17RlVUtVuEqWRsI
+ s3tLx+tkiK0/hrt3ALauOq+xOn3utGSFYvoE7WT4MXdJXQBjGkSMNfllo/azT1flH+p1
+ lK30T7kwPL77wHz7xLlKIK1kjIN+U+I1ta7RGAFjWQqOCOwd3gD8GzRi73tC9WxEvEL2
+ KT1w==
+X-Gm-Message-State: APjAAAV/9zrxYYKW3zagHJ+5MtiilpYSYl3KO/Cxb606zAdlwBMioIiL
+ tGqotgk6CcWkt49nQiS6IyFDC817nXfchDGU5tQ=
+X-Google-Smtp-Source: APXvYqyUjTsG0W9S4wQnOrKdYZWClT0ePp9FKj6UQ50jYsplY5aORDjVbDhTPsjoY9/jIhTFTtalWln8crJOeAZ/gpc=
+X-Received: by 2002:a9d:5914:: with SMTP id t20mr12515237oth.306.1571513741680; 
+ Sat, 19 Oct 2019 12:35:41 -0700 (PDT)
 MIME-Version: 1.0
-Received: by 2002:a9d:340a:0:0:0:0:0 with HTTP; Sat, 19 Oct 2019 12:24:29
+Received: by 2002:a9d:340a:0:0:0:0:0 with HTTP; Sat, 19 Oct 2019 12:35:41
  -0700 (PDT)
-In-Reply-To: <1571311659-15556-4-git-send-email-stefan.brankovic@rt-rk.com>
+In-Reply-To: <1571311659-15556-3-git-send-email-stefan.brankovic@rt-rk.com>
 References: <1571311659-15556-1-git-send-email-stefan.brankovic@rt-rk.com>
- <1571311659-15556-4-git-send-email-stefan.brankovic@rt-rk.com>
+ <1571311659-15556-3-git-send-email-stefan.brankovic@rt-rk.com>
 From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
-Date: Sat, 19 Oct 2019 21:24:29 +0200
-Message-ID: <CAL1e-=iMZKrwZmmbNtCaSLcK74_f4muo+ZJ28o6SRktv5CJXnQ@mail.gmail.com>
-Subject: Re: [PATCH v7 3/3] target/ppc: Optimize emulation of vupkhpx and
- vupklpx instructions
+Date: Sat, 19 Oct 2019 21:35:41 +0200
+Message-ID: <CAL1e-=iZAxe3em_HOjhSVNSs_p8tP9X05Y4peteSai1yQFeVqA@mail.gmail.com>
+Subject: Re: [PATCH v7 2/3] target/ppc: Optimize emulation of vpkpx instruction
 To: Stefan Brankovic <stefan.brankovic@rt-rk.com>
-Content-Type: multipart/alternative; boundary="00000000000046b32d059548664f"
+Content-Type: multipart/alternative; boundary="0000000000005522530595488eba"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::244
+X-Received-From: 2607:f8b0:4864:20::342
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,507 +97,487 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---00000000000046b32d059548664f
+--0000000000005522530595488eba
 Content-Type: text/plain; charset="UTF-8"
 
 On Thursday, October 17, 2019, Stefan Brankovic <stefan.brankovic@rt-rk.com>
 wrote:
 
-> 'trans_vupkpx' function implements both vupkhpx and vupklpx instructions
-> with
+> Optimize altivec instruction vpkpx (Vector Pack Pixel).
+> Rearranges 8 pixels coded in 6-5-5 pattern (4 from each source register)
+> into contigous array of bits in the destination register.
+>
+> In each iteration of outer loop, the instruction is to be done with
+> the 6-5-5 pack for 2 pixels of each doubleword element of each
+> source register. The first thing to be done in outer loop is
+> choosing which doubleword element of which register is to be used
+> in current iteration and it is to be placed in avr variable. The
+> next step is to perform 6-5-5 pack of pixels on avr variable in inner
+> for loop(2 iterations, 1 for each pixel) and save result in tmp variable.
+> In the end of outer for loop, the result is merged in variable called
+> result and saved in appropriate doubleword element of vD if the whole
+> doubleword is finished(every second iteration). The outer loop has 4
+> iterations.
+>
+>
+Check spelling.
 
+Use single quotation marks around variavle names and other code elements.
 
-implements both -> implements emulation of both
-
-with -> , while its
-
-argument 'high' determine which
-
-
-determine -> determines
-
-
-> instruction is processed. Instructions are
-> implemented in two 'for' loops. Outer 'for' loop repeats unpacking two
-> times,
-> since both doubleword elements of destination register are formed the same
-> way.
-> It also stores result of every iteration in temporary register, that is
-> later
-> transferred to destination register. Inner 'for' loop does unpacking of
-> pixels
-> and forms resulting doubleword 32 by 32 bits.
-
-
-temporary register -> a temporary variable
-
-destination register -> the destination register
-
-'forms resulting doubleword 32 by 32 bits' is unclear, reword.
+avr variable-> variable 'avr' (and several similar instances)
 
 
 > Signed-off-by: Stefan Brankovic <stefan.brankovic@rt-rk.com>
 > ---
->  target/ppc/helper.h                 |  2 -
->  target/ppc/int_helper.c             | 20 --------
->  target/ppc/translate/vmx-impl.inc.c | 91 ++++++++++++++++++++++++++++++
+>  target/ppc/helper.h                 |  1 -
+>  target/ppc/int_helper.c             | 21 --------
+>  target/ppc/translate/vmx-impl.inc.c | 99 ++++++++++++++++++++++++++++++
 > ++++++-
->  3 files changed, 89 insertions(+), 24 deletions(-)
+>  3 files changed, 98 insertions(+), 23 deletions(-)
 >
 > diff --git a/target/ppc/helper.h b/target/ppc/helper.h
-> index b489b38..fd06b56 100644
+> index 281e54f..b489b38 100644
 > --- a/target/ppc/helper.h
 > +++ b/target/ppc/helper.h
-> @@ -233,8 +233,6 @@ DEF_HELPER_2(vextsh2d, void, avr, avr)
->  DEF_HELPER_2(vextsw2d, void, avr, avr)
->  DEF_HELPER_2(vnegw, void, avr, avr)
->  DEF_HELPER_2(vnegd, void, avr, avr)
-> -DEF_HELPER_2(vupkhpx, void, avr, avr)
-> -DEF_HELPER_2(vupklpx, void, avr, avr)
->  DEF_HELPER_2(vupkhsb, void, avr, avr)
->  DEF_HELPER_2(vupkhsh, void, avr, avr)
->  DEF_HELPER_2(vupkhsw, void, avr, avr)
+> @@ -258,7 +258,6 @@ DEF_HELPER_4(vpkudus, void, env, avr, avr, avr)
+>  DEF_HELPER_4(vpkuhum, void, env, avr, avr, avr)
+>  DEF_HELPER_4(vpkuwum, void, env, avr, avr, avr)
+>  DEF_HELPER_4(vpkudum, void, env, avr, avr, avr)
+> -DEF_HELPER_3(vpkpx, void, avr, avr, avr)
+>  DEF_HELPER_5(vmhaddshs, void, env, avr, avr, avr, avr)
+>  DEF_HELPER_5(vmhraddshs, void, env, avr, avr, avr, avr)
+>  DEF_HELPER_5(vmsumuhm, void, env, avr, avr, avr, avr)
 > diff --git a/target/ppc/int_helper.c b/target/ppc/int_helper.c
-> index f910c11..9ee667d 100644
+> index cd00f5e..f910c11 100644
 > --- a/target/ppc/int_helper.c
 > +++ b/target/ppc/int_helper.c
-> @@ -1737,26 +1737,6 @@ void helper_vsum4ubs(CPUPPCState *env, ppc_avr_t
-> *r, ppc_avr_t *a, ppc_avr_t *b)
->  #define UPKHI 0
->  #define UPKLO 1
+> @@ -1262,27 +1262,6 @@ void helper_vpmsumd(ppc_avr_t *r, ppc_avr_t *a,
+> ppc_avr_t *b)
+>  #else
+>  #define PKBIG 0
 >  #endif
-> -#define VUPKPX(suffix, hi)                                              \
-> -    void helper_vupk##suffix(ppc_avr_t *r, ppc_avr_t *b)                \
-> -    {                                                                   \
-> -        int i;                                                          \
-> -        ppc_avr_t result;                                               \
-> -                                                                        \
-> -        for (i = 0; i < ARRAY_SIZE(r->u32); i++) {                      \
-> -            uint16_t e = b->u16[hi ? i : i + 4];                        \
-> -            uint8_t a = (e >> 15) ? 0xff : 0;                           \
-> -            uint8_t r = (e >> 10) & 0x1f;                               \
-> -            uint8_t g = (e >> 5) & 0x1f;                                \
-> -            uint8_t b = e & 0x1f;                                       \
-> -                                                                        \
-> -            result.u32[i] = (a << 24) | (r << 16) | (g << 8) | b;       \
-> -        }                                                               \
-> -        *r = result;                                                    \
+> -void helper_vpkpx(ppc_avr_t *r, ppc_avr_t *a, ppc_avr_t *b)
+> -{
+> -    int i, j;
+> -    ppc_avr_t result;
+> -#if defined(HOST_WORDS_BIGENDIAN)
+> -    const ppc_avr_t *x[2] = { a, b };
+> -#else
+> -    const ppc_avr_t *x[2] = { b, a };
+> -#endif
+> -
+> -    VECTOR_FOR_INORDER_I(i, u64) {
+> -        VECTOR_FOR_INORDER_I(j, u32) {
+> -            uint32_t e = x[i]->u32[j];
+> -
+> -            result.u16[4 * i + j] = (((e >> 9) & 0xfc00) |
+> -                                     ((e >> 6) & 0x3e0) |
+> -                                     ((e >> 3) & 0x1f));
+> -        }
 > -    }
-> -VUPKPX(lpx, UPKLO)
-> -VUPKPX(hpx, UPKHI)
-> -#undef VUPKPX
+> -    *r = result;
+> -}
 >
->  #define VUPK(suffix, unpacked, packee, hi)                              \
->      void helper_vupk##suffix(ppc_avr_t *r, ppc_avr_t *b)                \
+>  #define VPK(suffix, from, to, cvt, dosat)                               \
+>      void helper_vpk##suffix(CPUPPCState *env, ppc_avr_t *r,             \
 > diff --git a/target/ppc/translate/vmx-impl.inc.c
 > b/target/ppc/translate/vmx-impl.inc.c
-> index 3550ffa..09d80d6 100644
+> index a428ef3..3550ffa 100644
 > --- a/target/ppc/translate/vmx-impl.inc.c
 > +++ b/target/ppc/translate/vmx-impl.inc.c
-> @@ -1031,6 +1031,95 @@ static void trans_vclzd(DisasContext *ctx)
->      tcg_temp_free_i64(avr);
+> @@ -579,6 +579,103 @@ static void trans_lvsr(DisasContext *ctx)
 >  }
 >
-> +/*
-> + * vupkhpx VRT,VRB - Vector Unpack High Pixel
-> + * vupklpx VRT,VRB - Vector Unpack Low Pixel
+>  /*
+> + * vpkpx VRT,VRA,VRB - Vector Pack Pixel
 > + *
-> + * Unpacks 4 pixels coded in 1-5-5-5 pattern from high/low doubleword
-> element
-> + * of source register into contigous array of bits in the destination
-> register.
-> + * Argument 'high' determines if high or low doubleword element of source
-> + * register is processed.
+> + * Rearranges 8 pixels coded in 6-5-5 pattern (4 from each source
+> register)
+> + * into contigous array of bits in the destination register.
 > + */
-> +static void trans_vupkpx(DisasContext *ctx, int high)
+> +static void trans_vpkpx(DisasContext *ctx)
 > +{
 > +    int VT = rD(ctx->opcode);
+> +    int VA = rA(ctx->opcode);
 > +    int VB = rB(ctx->opcode);
 > +    TCGv_i64 tmp = tcg_temp_new_i64();
+> +    TCGv_i64 shifted = tcg_temp_new_i64();
 > +    TCGv_i64 avr = tcg_temp_new_i64();
 > +    TCGv_i64 result = tcg_temp_new_i64();
 > +    TCGv_i64 result1 = tcg_temp_new_i64();
 > +    TCGv_i64 result2 = tcg_temp_new_i64();
+
+
+'result2' is not needed, 'result' can be used in the final half instead all
+the way up to the coping to the destination.
+
+
 > +    int64_t mask1 = 0x1fULL;
-> +    int64_t mask2 = 0x1fULL << 8;
-> +    int64_t mask3 = 0x1fULL << 16;
-> +    int64_t mask4 = 0xffULL << 56;
-
-+    int i, j;
-> +
-> +    if (high == 1) {
-> +        get_avr64(avr, VB, true);
-
-
-before this line, insert comment: /* vupkhpx */
-
-
-> +    } else {
-> +        get_avr64(avr, VB, false);
-
-
-before this line, insert comment: /* vupklpx */
-
-
-> +    }
-> +
-> +    tcg_gen_movi_i64(result, 0x0ULL);
-> +    for (i = 0; i < 2; i++) {
-> +        for (j = 0; j < 2; j++) {
-> +            tcg_gen_shli_i64(tmp, avr, (j * 16));
-> +            tcg_gen_andi_i64(tmp, tmp, mask1 << (j * 32));
-> +            tcg_gen_or_i64(result, result, tmp);
-> +
-> +            tcg_gen_shli_i64(tmp, avr, 3 + (j * 16));
-> +            tcg_gen_andi_i64(tmp, tmp, mask2 << (j * 32));
-> +            tcg_gen_or_i64(result, result, tmp);
-> +
-> +            tcg_gen_shli_i64(tmp, avr, 6 + (j * 16));
-> +            tcg_gen_andi_i64(tmp, tmp, mask3 << (j * 32));
-> +            tcg_gen_or_i64(result, result, tmp);
-> +
-> +            tcg_gen_shri_i64(tmp, avr, (j * 16));
-> +            tcg_gen_ext16s_i64(tmp, tmp);
-> +            tcg_gen_andi_i64(tmp, tmp, mask4);
-> +            tcg_gen_shri_i64(tmp, tmp, (32 * (1 - j)));
-> +            tcg_gen_or_i64(result, result, tmp);
-> +        }
-> +        if (i == 0) {
-> +            tcg_gen_mov_i64(result1, result);
+> +    int64_t mask2 = 0x1fULL << 5;
+> +    int64_t mask3 = 0x3fULL << 10;
+> +    int i, j;
+> +    /*
+> +     * In each iteration do the 6-5-5 pack for 2 pixels of each doubleword
+> +     * element of each source register.
+> +     */
+> +    for (i = 0; i < 4; i++) {
+> +        switch (i) {
+> +        case 0:
+> +            /*
+> +             * Get high doubleword of vA to perform 6-5-5 pack of pixels
+> +             * 1 and 2.
+> +             */
+> +            get_avr64(avr, VA, true);
 > +            tcg_gen_movi_i64(result, 0x0ULL);
-> +            tcg_gen_shri_i64(avr, avr, 32);
+> +            break;
+> +        case 1:
+> +            /*
+> +             * Get low doubleword of vA to perform 6-5-5 pack of pixels
+> +             * 3 and 4.
+> +             */
+> +            get_avr64(avr, VA, false);
+> +            break;
+> +        case 2:
+> +            /*
+> +             * Get high doubleword of vB to perform 6-5-5 pack of pixels
+> +             * 5 and 6.
+> +             */
+> +            get_avr64(avr, VB, true);
+> +            tcg_gen_movi_i64(result, 0x0ULL);
+> +            break;
+> +        case 3:
+> +            /*
+> +             * Get low doubleword of vB to perform 6-5-5 pack of pixels
+> +             * 7 and 8.
+> +             */
+> +            get_avr64(avr, VB, false);
+> +            break;
 > +        }
+> +        /* Perform the packing for 2 pixels(each iteration for 1). */
+> +        tcg_gen_movi_i64(tmp, 0x0ULL);
+> +        for (j = 0; j < 2; j++) {
+> +            tcg_gen_shri_i64(shifted, avr, (j * 16 + 3));
+> +            tcg_gen_andi_i64(shifted, shifted, mask1 << (j * 16));
+> +            tcg_gen_or_i64(tmp, tmp, shifted);
+> +
+> +            tcg_gen_shri_i64(shifted, avr, (j * 16 + 6));
+> +            tcg_gen_andi_i64(shifted, shifted, mask2 << (j * 16));
+> +            tcg_gen_or_i64(tmp, tmp, shifted);
+> +
+> +            tcg_gen_shri_i64(shifted, avr, (j * 16 + 9));
+> +            tcg_gen_andi_i64(shifted, shifted, mask3 << (j * 16));
+> +            tcg_gen_or_i64(tmp, tmp, shifted);
+> +        }
+> +        if ((i == 0) || (i == 2)) {
+> +            tcg_gen_shli_i64(tmp, tmp, 32);
+> +        }
+> +        tcg_gen_or_i64(result, result, tmp);
 > +        if (i == 1) {
+> +            /* Place packed pixels 1:4 to high doubleword of vD. */
+> +            tcg_gen_mov_i64(result1, result);
+> +        }
+> +        if (i == 3) {
+> +            /* Place packed pixels 5:8 to low doubleword of vD. */
 > +            tcg_gen_mov_i64(result2, result);
 > +        }
+
+
+If 'result2' is removed, the last tcg movement is not needed...
+
+
 > +    }
-> +
-> +    set_avr64(VT, result1, false);
-> +    set_avr64(VT, result2, true);
-> +
+> +    set_avr64(VT, result1, true);
+> +    set_avr64(VT, result2, false);
+
+
+... and here 'result' should be instead of  'result2'.
+
+A.
+
+
+    +
+
 > +    tcg_temp_free_i64(tmp);
+> +    tcg_temp_free_i64(shifted);
 > +    tcg_temp_free_i64(avr);
 > +    tcg_temp_free_i64(result);
 > +    tcg_temp_free_i64(result1);
 > +    tcg_temp_free_i64(result2);
 > +}
 > +
-> +static void gen_vupkhpx(DisasContext *ctx)
-
-+{
-> +    if (unlikely(!ctx->altivec_enabled)) {
-> +        gen_exception(ctx, POWERPC_EXCP_VPU);
-> +        return;
-> +    }
-> +    trans_vupkpx(ctx, 1);
-> +}
-> +
-> +static void gen_vupklpx(DisasContext *ctx)
-
-    +{
-
-> +    if (unlikely(!ctx->altivec_enabled)) {
-> +        gen_exception(ctx, POWERPC_EXCP_VPU);
-> +        return;
-> +    }
-> +    trans_vupkpx(ctx, 0);
-> +}
-> +
->  GEN_VXFORM(vmuloub, 4, 0);
->  GEN_VXFORM(vmulouh, 4, 1);
->  GEN_VXFORM(vmulouw, 4, 2);
-> @@ -1348,8 +1437,6 @@ GEN_VXFORM_NOA(vupkhsw, 7, 25);
->  GEN_VXFORM_NOA(vupklsb, 7, 10);
->  GEN_VXFORM_NOA(vupklsh, 7, 11);
->  GEN_VXFORM_NOA(vupklsw, 7, 27);
-> -GEN_VXFORM_NOA(vupkhpx, 7, 13);
-> -GEN_VXFORM_NOA(vupklpx, 7, 15);
-
- GEN_VXFORM_NOA_ENV(vrefp, 5, 4);
->  GEN_VXFORM_NOA_ENV(vrsqrtefp, 5, 5);
->  GEN_VXFORM_NOA_ENV(vexptefp, 5, 6);
+> +/*
+>   * vsl VRT,VRA,VRB - Vector Shift Left
+>   *
+>   * Shifting left 128 bit value of vA by value specified in bits 125-127
+> of vB.
+> @@ -1063,7 +1160,7 @@ GEN_VXFORM_ENV(vpksdus, 7, 21);
+>  GEN_VXFORM_ENV(vpkshss, 7, 6);
+>  GEN_VXFORM_ENV(vpkswss, 7, 7);
+>  GEN_VXFORM_ENV(vpksdss, 7, 23);
+> -GEN_VXFORM(vpkpx, 7, 12);
+> +GEN_VXFORM_TRANS(vpkpx, 7, 12);
+>  GEN_VXFORM_ENV(vsum4ubs, 4, 24);
+>  GEN_VXFORM_ENV(vsum4sbs, 4, 28);
+>  GEN_VXFORM_ENV(vsum4shs, 4, 25);
 > --
 > 2.7.4
 >
 >
 >
 
---00000000000046b32d059548664f
+--0000000000005522530595488eba
 Content-Type: text/html; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
 <br><br>On Thursday, October 17, 2019, Stefan Brankovic &lt;<a href=3D"mail=
 to:stefan.brankovic@rt-rk.com">stefan.brankovic@rt-rk.com</a>&gt; wrote:<br=
 ><blockquote class=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;border-left:1=
-px #ccc solid;padding-left:1ex">&#39;trans_vupkpx&#39; function implements =
-both vupkhpx and vupklpx instructions with</blockquote><div><br></div><div>=
-implements both -&gt; implements emulation of both</div><div>=C2=A0<br></di=
-v><div>with -&gt; , while its</div><div><br></div><blockquote class=3D"gmai=
-l_quote" style=3D"margin:0 0 0 .8ex;border-left:1px #ccc solid;padding-left=
-:1ex">
-argument &#39;high&#39; determine which=C2=A0</blockquote><div><br></div><d=
-iv>determine -&gt; determines</div><div>=C2=A0</div><blockquote class=3D"gm=
-ail_quote" style=3D"margin:0 0 0 .8ex;border-left:1px #ccc solid;padding-le=
-ft:1ex">instruction is processed. Instructions are<br>
-implemented in two &#39;for&#39; loops. Outer &#39;for&#39; loop repeats un=
-packing two times,<br>
-since both doubleword elements of destination register are formed the same =
-way.<br>
-It also stores result of every iteration in temporary register, that is lat=
-er<br>
-transferred to destination register. Inner &#39;for&#39; loop does unpackin=
-g of pixels<br>
-and forms resulting doubleword 32 by 32 bits.</blockquote><div><br></div><d=
-iv>temporary register -&gt; a temporary variable</div><div><br></div><div>d=
-estination register -&gt; the destination register</div><div><br></div><div=
->&#39;forms resulting doubleword 32 by 32 bits&#39; is unclear, reword.<br>=
-</div><div><br></div><blockquote class=3D"gmail_quote" style=3D"margin:0 0 =
-0 .8ex;border-left:1px #ccc solid;padding-left:1ex">
+px #ccc solid;padding-left:1ex">Optimize altivec instruction vpkpx (Vector =
+Pack Pixel).<br>
+Rearranges 8 pixels coded in 6-5-5 pattern (4 from each source register)<br=
+>
+into contigous array of bits in the destination register.<br>
 <br>
+In each iteration of outer loop, the instruction is to be done with<br>
+the 6-5-5 pack for 2 pixels of each doubleword element of each<br>
+source register. The first thing to be done in outer loop is<br>
+choosing which doubleword element of which register is to be used<br>
+in current iteration and it is to be placed in avr variable. The<br>
+next step is to perform 6-5-5 pack of pixels on avr variable in inner<br>
+for loop(2 iterations, 1 for each pixel) and save result in tmp variable.<b=
+r>
+In the end of outer for loop, the result is merged in variable called<br>
+result and saved in appropriate doubleword element of vD if the whole<br>
+doubleword is finished(every second iteration). The outer loop has 4<br>
+iterations.<br>
+<br></blockquote><div><br></div><div>Check spelling.</div><div><br></div><d=
+iv>Use single quotation marks around variavle names and other code elements=
+.</div><div><br></div><div>avr variable-&gt; variable &#39;avr&#39; (and se=
+veral similar instances)</div><div>=C2=A0</div><blockquote class=3D"gmail_q=
+uote" style=3D"margin:0 0 0 .8ex;border-left:1px #ccc solid;padding-left:1e=
+x">
 Signed-off-by: Stefan Brankovic &lt;<a href=3D"mailto:stefan.brankovic@rt-r=
 k.com">stefan.brankovic@rt-rk.com</a>&gt;<br>
 ---<br>
 =C2=A0target/ppc/helper.h=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 =C2=A0|=C2=A0 2 -<br>
+=C2=A0 =C2=A0|=C2=A0 1 -<br>
 =C2=A0target/ppc/int_helper.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0| 20 --------<br>
-=C2=A0target/ppc/translate/vmx-impl.<wbr>inc.c | 91 +++++++++++++++++++++++=
+=A0| 21 --------<br>
+=C2=A0target/ppc/translate/vmx-impl.<wbr>inc.c | 99 +++++++++++++++++++++++=
 +++++++<wbr>++++++-<br>
-=C2=A03 files changed, 89 insertions(+), 24 deletions(-)<br>
+=C2=A03 files changed, 98 insertions(+), 23 deletions(-)<br>
 <br>
 diff --git a/target/ppc/helper.h b/target/ppc/helper.h<br>
-index b489b38..fd06b56 100644<br>
+index 281e54f..b489b38 100644<br>
 --- a/target/ppc/helper.h<br>
 +++ b/target/ppc/helper.h<br>
-@@ -233,8 +233,6 @@ DEF_HELPER_2(vextsh2d, void, avr, avr)<br>
-=C2=A0DEF_HELPER_2(vextsw2d, void, avr, avr)<br>
-=C2=A0DEF_HELPER_2(vnegw, void, avr, avr)<br>
-=C2=A0DEF_HELPER_2(vnegd, void, avr, avr)<br>
--DEF_HELPER_2(vupkhpx, void, avr, avr)<br>
--DEF_HELPER_2(vupklpx, void, avr, avr)<br>
-=C2=A0DEF_HELPER_2(vupkhsb, void, avr, avr)<br>
-=C2=A0DEF_HELPER_2(vupkhsh, void, avr, avr)<br>
-=C2=A0DEF_HELPER_2(vupkhsw, void, avr, avr)<br>
+@@ -258,7 +258,6 @@ DEF_HELPER_4(vpkudus, void, env, avr, avr, avr)<br>
+=C2=A0DEF_HELPER_4(vpkuhum, void, env, avr, avr, avr)<br>
+=C2=A0DEF_HELPER_4(vpkuwum, void, env, avr, avr, avr)<br>
+=C2=A0DEF_HELPER_4(vpkudum, void, env, avr, avr, avr)<br>
+-DEF_HELPER_3(vpkpx, void, avr, avr, avr)<br>
+=C2=A0DEF_HELPER_5(vmhaddshs, void, env, avr, avr, avr, avr)<br>
+=C2=A0DEF_HELPER_5(vmhraddshs, void, env, avr, avr, avr, avr)<br>
+=C2=A0DEF_HELPER_5(vmsumuhm, void, env, avr, avr, avr, avr)<br>
 diff --git a/target/ppc/int_helper.c b/target/ppc/int_helper.c<br>
-index f910c11..9ee667d 100644<br>
+index cd00f5e..f910c11 100644<br>
 --- a/target/ppc/int_helper.c<br>
 +++ b/target/ppc/int_helper.c<br>
-@@ -1737,26 +1737,6 @@ void helper_vsum4ubs(CPUPPCState *env, ppc_avr_t *r,=
- ppc_avr_t *a, ppc_avr_t *b)<br>
-=C2=A0#define UPKHI 0<br>
-=C2=A0#define UPKLO 1<br>
+@@ -1262,27 +1262,6 @@ void helper_vpmsumd(ppc_avr_t *r, ppc_avr_t *a, ppc_=
+avr_t *b)<br>
+=C2=A0#else<br>
+=C2=A0#define PKBIG 0<br>
 =C2=A0#endif<br>
--#define VUPKPX(suffix, hi)=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 \<br>
--=C2=A0 =C2=A0 void helper_vupk##suffix(ppc_avr_t *r, ppc_avr_t *b)=C2=A0 =
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 \<br>
--=C2=A0 =C2=A0 {=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0\<br>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0 int i;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 \<br>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0 ppc_avr_t result;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0\<br>
+-void helper_vpkpx(ppc_avr_t *r, ppc_avr_t *a, ppc_avr_t *b)<br>
+-{<br>
+-=C2=A0 =C2=A0 int i, j;<br>
+-=C2=A0 =C2=A0 ppc_avr_t result;<br>
+-#if defined(HOST_WORDS_BIGENDIAN)<br>
+-=C2=A0 =C2=A0 const ppc_avr_t *x[2] =3D { a, b };<br>
+-#else<br>
+-=C2=A0 =C2=A0 const ppc_avr_t *x[2] =3D { b, a };<br>
+-#endif<br>
+-<br>
+-=C2=A0 =C2=A0 VECTOR_FOR_INORDER_I(i, u64) {<br>
+-=C2=A0 =C2=A0 =C2=A0 =C2=A0 VECTOR_FOR_INORDER_I(j, u32) {<br>
+-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 uint32_t e =3D x[i]-&gt;u32[j];<=
+br>
+-<br>
+-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 result.u16[4 * i + j] =3D (((e &=
+gt;&gt; 9) &amp; 0xfc00) |<br>
 -=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 \<br>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0 for (i =3D 0; i &lt; ARRAY_SIZE(r-&gt;u32); i+=
-+) {=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 \<br>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 uint16_t e =3D b-&gt;u16[hi ? i =
-: i + 4];=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 \<br>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 uint8_t a =3D (e &gt;&gt; 15) ? =
-0xff : 0;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0\<br>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 uint8_t r =3D (e &gt;&gt; 10) &a=
-mp; 0x1f;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0\<br>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 uint8_t g =3D (e &gt;&gt; 5) &am=
-p; 0x1f;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 \<br>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 uint8_t b =3D e &amp; 0x1f;=C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0\<br>
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0((e &gt;&gt; 6) =
+&amp; 0x3e0) |<br>
 -=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 \<br>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 result.u32[i] =3D (a &lt;&lt; 24=
-) | (r &lt;&lt; 16) | (g &lt;&lt; 8) | b;=C2=A0 =C2=A0 =C2=A0 =C2=A0\<br>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0 }=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0\<br>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0 *r =3D result;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 \<br>
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0((e &gt;&gt; 3) =
+&amp; 0x1f));<br>
+-=C2=A0 =C2=A0 =C2=A0 =C2=A0 }<br>
 -=C2=A0 =C2=A0 }<br>
--VUPKPX(lpx, UPKLO)<br>
--VUPKPX(hpx, UPKHI)<br>
--#undef VUPKPX<br>
+-=C2=A0 =C2=A0 *r =3D result;<br>
+-}<br>
 <br>
-=C2=A0#define VUPK(suffix, unpacked, packee, hi)=C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 \<br>
-=C2=A0 =C2=A0 =C2=A0void helper_vupk##suffix(ppc_avr_t *r, ppc_avr_t *b)=C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 \<br>
+=C2=A0#define VPK(suffix, from, to, cvt, dosat)=C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0\<br>
+=C2=A0 =C2=A0 =C2=A0void helper_vpk##suffix(CPUPPCState *env, ppc_avr_t *r,=
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0\<br>
 diff --git a/target/ppc/translate/vmx-<wbr>impl.inc.c b/target/ppc/translat=
 e/vmx-<wbr>impl.inc.c<br>
-index 3550ffa..09d80d6 100644<br>
+index a428ef3..3550ffa 100644<br>
 --- a/target/ppc/translate/vmx-<wbr>impl.inc.c<br>
 +++ b/target/ppc/translate/vmx-<wbr>impl.inc.c<br>
-@@ -1031,6 +1031,95 @@ static void trans_vclzd(DisasContext *ctx)<br>
-=C2=A0 =C2=A0 =C2=A0tcg_temp_free_i64(avr);<br>
+@@ -579,6 +579,103 @@ static void trans_lvsr(DisasContext *ctx)<br>
 =C2=A0}<br>
 <br>
-+/*<br>
-+ * vupkhpx VRT,VRB - Vector Unpack High Pixel<br>
-+ * vupklpx VRT,VRB - Vector Unpack Low Pixel<br>
+=C2=A0/*<br>
++ * vpkpx VRT,VRA,VRB - Vector Pack Pixel<br>
 + *<br>
-+ * Unpacks 4 pixels coded in 1-5-5-5 pattern from high/low doubleword elem=
-ent<br>
-+ * of source register into contigous array of bits in the destination regi=
-ster.<br>
-+ * Argument &#39;high&#39; determines if high or low doubleword element of=
- source<br>
-+ * register is processed.<br>
++ * Rearranges 8 pixels coded in 6-5-5 pattern (4 from each source register=
+)<br>
++ * into contigous array of bits in the destination register.<br>
 + */<br>
-+static void trans_vupkpx(DisasContext *ctx, int high)<br>
++static void trans_vpkpx(DisasContext *ctx)<br>
 +{<br>
 +=C2=A0 =C2=A0 int VT =3D rD(ctx-&gt;opcode);<br>
++=C2=A0 =C2=A0 int VA =3D rA(ctx-&gt;opcode);<br>
 +=C2=A0 =C2=A0 int VB =3D rB(ctx-&gt;opcode);<br>
 +=C2=A0 =C2=A0 TCGv_i64 tmp =3D tcg_temp_new_i64();<br>
++=C2=A0 =C2=A0 TCGv_i64 shifted =3D tcg_temp_new_i64();<br>
 +=C2=A0 =C2=A0 TCGv_i64 avr =3D tcg_temp_new_i64();<br>
 +=C2=A0 =C2=A0 TCGv_i64 result =3D tcg_temp_new_i64();<br>
 +=C2=A0 =C2=A0 TCGv_i64 result1 =3D tcg_temp_new_i64();<br>
-+=C2=A0 =C2=A0 TCGv_i64 result2 =3D tcg_temp_new_i64();<br>
++=C2=A0 =C2=A0 TCGv_i64 result2 =3D tcg_temp_new_i64();</blockquote><div><b=
+r></div><div>&#39;result2&#39; is not needed, &#39;result&#39; can be used =
+in the final half instead all the way up to the coping to the destination.<=
+/div><div>=C2=A0</div><blockquote class=3D"gmail_quote" style=3D"margin:0 0=
+ 0 .8ex;border-left:1px #ccc solid;padding-left:1ex">
 +=C2=A0 =C2=A0 int64_t mask1 =3D 0x1fULL;<br>
-+=C2=A0 =C2=A0 int64_t mask2 =3D 0x1fULL &lt;&lt; 8;<br>
-+=C2=A0 =C2=A0 int64_t mask3 =3D 0x1fULL &lt;&lt; 16;<br>
-+=C2=A0 =C2=A0 int64_t mask4 =3D 0xffULL &lt;&lt; 56;</blockquote><blockquo=
-te class=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;border-left:1px #ccc so=
-lid;padding-left:1ex">
++=C2=A0 =C2=A0 int64_t mask2 =3D 0x1fULL &lt;&lt; 5;<br>
++=C2=A0 =C2=A0 int64_t mask3 =3D 0x3fULL &lt;&lt; 10;<br>
 +=C2=A0 =C2=A0 int i, j;<br>
-+<br>
-+=C2=A0 =C2=A0 if (high =3D=3D 1) {<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 get_avr64(avr, VB, true);</blockquote><div><br=
-></div><div>before this line, insert comment: /* vupkhpx */</div><div>=C2=
-=A0<br></div><blockquote class=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;b=
-order-left:1px #ccc solid;padding-left:1ex">
-+=C2=A0 =C2=A0 } else {<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 get_avr64(avr, VB, false);</blockquote><div><b=
-r></div><div>before this line, insert comment: /* vupklpx */</div><div>=C2=
-=A0<br></div><blockquote class=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;b=
-order-left:1px #ccc solid;padding-left:1ex">
-+=C2=A0 =C2=A0 }<br>
-+<br>
-+=C2=A0 =C2=A0 tcg_gen_movi_i64(result, 0x0ULL);<br>
-+=C2=A0 =C2=A0 for (i =3D 0; i &lt; 2; i++) {<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 for (j =3D 0; j &lt; 2; j++) {<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 tcg_gen_shli_i64(tmp, avr, (j * =
-16));<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 tcg_gen_andi_i64(tmp, tmp, mask1=
- &lt;&lt; (j * 32));<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 tcg_gen_or_i64(result, result, t=
-mp);<br>
-+<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 tcg_gen_shli_i64(tmp, avr, 3 + (=
-j * 16));<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 tcg_gen_andi_i64(tmp, tmp, mask2=
- &lt;&lt; (j * 32));<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 tcg_gen_or_i64(result, result, t=
-mp);<br>
-+<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 tcg_gen_shli_i64(tmp, avr, 6 + (=
-j * 16));<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 tcg_gen_andi_i64(tmp, tmp, mask3=
- &lt;&lt; (j * 32));<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 tcg_gen_or_i64(result, result, t=
-mp);<br>
-+<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 tcg_gen_shri_i64(tmp, avr, (j * =
-16));<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 tcg_gen_ext16s_i64(tmp, tmp);<br=
->
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 tcg_gen_andi_i64(tmp, tmp, mask4=
-);<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 tcg_gen_shri_i64(tmp, tmp, (32 *=
- (1 - j)));<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 tcg_gen_or_i64(result, result, t=
-mp);<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 }<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 if (i =3D=3D 0) {<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 tcg_gen_mov_i64(result1, result)=
-;<br>
++=C2=A0 =C2=A0 /*<br>
++=C2=A0 =C2=A0 =C2=A0* In each iteration do the 6-5-5 pack for 2 pixels of =
+each doubleword<br>
++=C2=A0 =C2=A0 =C2=A0* element of each source register.<br>
++=C2=A0 =C2=A0 =C2=A0*/<br>
++=C2=A0 =C2=A0 for (i =3D 0; i &lt; 4; i++) {<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 switch (i) {<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 case 0:<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 /*<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0* Get high doubleword of v=
+A to perform 6-5-5 pack of pixels<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0* 1 and 2.<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0*/<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 get_avr64(avr, VA, true);<br>
 +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 tcg_gen_movi_i64(result, 0x0ULL)=
 ;<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 tcg_gen_shri_i64(avr, avr, 32);<=
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 break;<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 case 1:<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 /*<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0* Get low doubleword of vA=
+ to perform 6-5-5 pack of pixels<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0* 3 and 4.<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0*/<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 get_avr64(avr, VA, false);<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 break;<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 case 2:<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 /*<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0* Get high doubleword of v=
+B to perform 6-5-5 pack of pixels<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0* 5 and 6.<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0*/<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 get_avr64(avr, VB, true);<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 tcg_gen_movi_i64(result, 0x0ULL)=
+;<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 break;<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 case 3:<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 /*<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0* Get low doubleword of vB=
+ to perform 6-5-5 pack of pixels<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0* 7 and 8.<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0*/<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 get_avr64(avr, VB, false);<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 break;<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 }<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 /* Perform the packing for 2 pixels(each itera=
+tion for 1). */<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 tcg_gen_movi_i64(tmp, 0x0ULL);<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 for (j =3D 0; j &lt; 2; j++) {<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 tcg_gen_shri_i64(shifted, avr, (=
+j * 16 + 3));<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 tcg_gen_andi_i64(shifted, shifte=
+d, mask1 &lt;&lt; (j * 16));<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 tcg_gen_or_i64(tmp, tmp, shifted=
+);<br>
++<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 tcg_gen_shri_i64(shifted, avr, (=
+j * 16 + 6));<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 tcg_gen_andi_i64(shifted, shifte=
+d, mask2 &lt;&lt; (j * 16));<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 tcg_gen_or_i64(tmp, tmp, shifted=
+);<br>
++<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 tcg_gen_shri_i64(shifted, avr, (=
+j * 16 + 9));<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 tcg_gen_andi_i64(shifted, shifte=
+d, mask3 &lt;&lt; (j * 16));<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 tcg_gen_or_i64(tmp, tmp, shifted=
+);<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 }<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 if ((i =3D=3D 0) || (i =3D=3D 2)) {<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 tcg_gen_shli_i64(tmp, tmp, 32);<=
 br>
 +=C2=A0 =C2=A0 =C2=A0 =C2=A0 }<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 tcg_gen_or_i64(result, result, tmp);<br>
 +=C2=A0 =C2=A0 =C2=A0 =C2=A0 if (i =3D=3D 1) {<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 tcg_gen_mov_i64(result2, result)=
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 /* Place packed pixels 1:4 to hi=
+gh doubleword of vD. */<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 tcg_gen_mov_i64(result1, result)=
 ;<br>
 +=C2=A0 =C2=A0 =C2=A0 =C2=A0 }<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 if (i =3D=3D 3) {<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 /* Place packed pixels 5:8 to lo=
+w doubleword of vD. */<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 tcg_gen_mov_i64(result2, result)=
+;<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 }</blockquote><div><br></div><div>If &#39;resu=
+lt2&#39; is removed, the last tcg movement is not needed...</div><div>=C2=
+=A0</div><blockquote class=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;borde=
+r-left:1px #ccc solid;padding-left:1ex">
 +=C2=A0 =C2=A0 }<br>
-+<br>
-+=C2=A0 =C2=A0 set_avr64(VT, result1, false);<br>
-+=C2=A0 =C2=A0 set_avr64(VT, result2, true);<br>
-+<br>
++=C2=A0 =C2=A0 set_avr64(VT, result1, true);<br>
++=C2=A0 =C2=A0 set_avr64(VT, result2, false);</blockquote><div><br></div><d=
+iv>... and here &#39;result&#39; should be instead of=C2=A0=C2=A0&#39;resul=
+t2&#39;.</div><div><br></div><div>A.</div><div><br></div><div><br></div><di=
+v>=C2=A0 =C2=A0 +</div><blockquote class=3D"gmail_quote" style=3D"margin:0 =
+0 0 .8ex;border-left:1px #ccc solid;padding-left:1ex">
 +=C2=A0 =C2=A0 tcg_temp_free_i64(tmp);<br>
++=C2=A0 =C2=A0 tcg_temp_free_i64(shifted);<br>
 +=C2=A0 =C2=A0 tcg_temp_free_i64(avr);<br>
 +=C2=A0 =C2=A0 tcg_temp_free_i64(result);<br>
 +=C2=A0 =C2=A0 tcg_temp_free_i64(result1);<br>
 +=C2=A0 =C2=A0 tcg_temp_free_i64(result2);<br>
 +}<br>
 +<br>
-+static void gen_vupkhpx(DisasContext *ctx)</blockquote><blockquote class=
-=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;border-left:1px #ccc solid;padd=
-ing-left:1ex">
-+{<br>
-+=C2=A0 =C2=A0 if (unlikely(!ctx-&gt;altivec_<wbr>enabled)) {<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 gen_exception(ctx, POWERPC_EXCP_VPU);<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 return;<br>
-+=C2=A0 =C2=A0 }<br>
-+=C2=A0 =C2=A0 trans_vupkpx(ctx, 1);<br>
-+}<br>
-+<br>
-+static void gen_vupklpx(DisasContext *ctx)</blockquote><div>=C2=A0 =C2=A0 =
-+{<br></div><blockquote class=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;bo=
-rder-left:1px #ccc solid;padding-left:1ex">
-+=C2=A0 =C2=A0 if (unlikely(!ctx-&gt;altivec_<wbr>enabled)) {<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 gen_exception(ctx, POWERPC_EXCP_VPU);<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 return;<br>
-+=C2=A0 =C2=A0 }<br>
-+=C2=A0 =C2=A0 trans_vupkpx(ctx, 0);<br>
-+}<br>
-+<br>
-=C2=A0GEN_VXFORM(vmuloub, 4, 0);<br>
-=C2=A0GEN_VXFORM(vmulouh, 4, 1);<br>
-=C2=A0GEN_VXFORM(vmulouw, 4, 2);<br>
-@@ -1348,8 +1437,6 @@ GEN_VXFORM_NOA(vupkhsw, 7, 25);<br>
-=C2=A0GEN_VXFORM_NOA(vupklsb, 7, 10);<br>
-=C2=A0GEN_VXFORM_NOA(vupklsh, 7, 11);<br>
-=C2=A0GEN_VXFORM_NOA(vupklsw, 7, 27);<br>
--GEN_VXFORM_NOA(vupkhpx, 7, 13);<br>
--GEN_VXFORM_NOA(vupklpx, 7, 15);</blockquote><blockquote class=3D"gmail_quo=
-te" style=3D"margin:0 0 0 .8ex;border-left:1px #ccc solid;padding-left:1ex"=
->
-=C2=A0GEN_VXFORM_NOA_ENV(vrefp, 5, 4);<br>
-=C2=A0GEN_VXFORM_NOA_ENV(vrsqrtefp, 5, 5);<br>
-=C2=A0GEN_VXFORM_NOA_ENV(vexptefp, 5, 6);<br>
++/*<br>
+=C2=A0 * vsl VRT,VRA,VRB - Vector Shift Left<br>
+=C2=A0 *<br>
+=C2=A0 * Shifting left 128 bit value of vA by value specified in bits 125-1=
+27 of vB.<br>
+@@ -1063,7 +1160,7 @@ GEN_VXFORM_ENV(vpksdus, 7, 21);<br>
+=C2=A0GEN_VXFORM_ENV(vpkshss, 7, 6);<br>
+=C2=A0GEN_VXFORM_ENV(vpkswss, 7, 7);<br>
+=C2=A0GEN_VXFORM_ENV(vpksdss, 7, 23);<br>
+-GEN_VXFORM(vpkpx, 7, 12);<br>
++GEN_VXFORM_TRANS(vpkpx, 7, 12);<br>
+=C2=A0GEN_VXFORM_ENV(vsum4ubs, 4, 24);<br>
+=C2=A0GEN_VXFORM_ENV(vsum4sbs, 4, 28);<br>
+=C2=A0GEN_VXFORM_ENV(vsum4shs, 4, 25);<br>
 -- <br>
 2.7.4<br>
 <br>
 <br>
 </blockquote>
 
---00000000000046b32d059548664f--
+--0000000000005522530595488eba--
 
