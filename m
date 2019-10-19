@@ -2,64 +2,84 @@ Return-Path: <SRS0=F+Q9=YM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 59D4ECA9EAC
-	for <qemu-devel@archiver.kernel.org>; Sat, 19 Oct 2019 13:48:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 68495CA9EAB
+	for <qemu-devel@archiver.kernel.org>; Sat, 19 Oct 2019 13:51:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2D79A205C9
-	for <qemu-devel@archiver.kernel.org>; Sat, 19 Oct 2019 13:48:29 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2D79A205C9
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id 2E757205C9
+	for <qemu-devel@archiver.kernel.org>; Sat, 19 Oct 2019 13:51:49 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=kambanaria-org.20150623.gappssmtp.com header.i=@kambanaria-org.20150623.gappssmtp.com header.b="gPgVTb81"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2E757205C9
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kambanaria.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55156 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55206 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iLp5o-0001Ix-9I
-	for qemu-devel@archiver.kernel.org; Sat, 19 Oct 2019 09:48:28 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39338)
+	id 1iLp92-0003K3-5j
+	for qemu-devel@archiver.kernel.org; Sat, 19 Oct 2019 09:51:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60139)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <clg@kaod.org>) id 1iLp4g-0000fw-Lp
- for qemu-devel@nongnu.org; Sat, 19 Oct 2019 09:47:19 -0400
+ (envelope-from <ash@kambanaria.org>) id 1iLnUT-0006TQ-9m
+ for qemu-devel@nongnu.org; Sat, 19 Oct 2019 08:05:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <clg@kaod.org>) id 1iLp4f-0008H2-L5
- for qemu-devel@nongnu.org; Sat, 19 Oct 2019 09:47:18 -0400
-Received: from 4.mo2.mail-out.ovh.net ([87.98.172.75]:51978)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <clg@kaod.org>) id 1iLp4f-0008Du-FH
- for qemu-devel@nongnu.org; Sat, 19 Oct 2019 09:47:17 -0400
-Received: from player796.ha.ovh.net (unknown [10.108.57.153])
- by mo2.mail-out.ovh.net (Postfix) with ESMTP id 59B341AFB9F
- for <qemu-devel@nongnu.org>; Sat, 19 Oct 2019 15:47:07 +0200 (CEST)
-Received: from kaod.org (lfbn-1-2229-223.w90-76.abo.wanadoo.fr [90.76.50.223])
- (Authenticated sender: clg@kaod.org)
- by player796.ha.ovh.net (Postfix) with ESMTPSA id C3959B080104;
- Sat, 19 Oct 2019 13:47:01 +0000 (UTC)
-Subject: Re: qemu/powernv: coreboot support?
-To: "Marty E. Plummer" <hanetzer@startmail.com>,
- David Gibson <david@gibson.dropbear.id.au>
-References: <20191018172622.kz4smemh5cwesfit@proprietary-killer>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <21ba3404-dcd3-fe06-7725-d58e249f9fd2@kaod.org>
-Date: Sat, 19 Oct 2019 15:46:59 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.1
+ (envelope-from <ash@kambanaria.org>) id 1iLnUS-0002sA-CU
+ for qemu-devel@nongnu.org; Sat, 19 Oct 2019 08:05:49 -0400
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:39483)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <ash@kambanaria.org>) id 1iLnUR-0002r5-Va
+ for qemu-devel@nongnu.org; Sat, 19 Oct 2019 08:05:48 -0400
+Received: by mail-wr1-x444.google.com with SMTP id r3so8895250wrj.6
+ for <qemu-devel@nongnu.org>; Sat, 19 Oct 2019 05:05:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=kambanaria-org.20150623.gappssmtp.com; s=20150623;
+ h=from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=D6rBFCWd7TXy/HRgb/86qSVMzCfvtlb6XwpaugqYJio=;
+ b=gPgVTb81Pw3us9IJhAlVxhPES+J2Sl85nnxVQXqggsBUMQNdtCNqhCRcbzDHy7edGe
+ aACLUSzrgxJwvqQ30nhdtFlfFVch1Q0+sZpGr07SLr34esmVF6j6M85IzjSj6g20HvP1
+ R6mlJpk+07cLJhNOLM/jx8zhmpd8mVO7RHisXLXlXiS26ANxw51eFHI14xcPIuQDP+EI
+ O8ROEQtEagGdXlZ2aAHIsKTWdmsfyTxns+1xBQBw6sb8Hx18lcCJOqp/S8chMiIfqm+Q
+ 2YNX4Qp9hox/Km6uxIuvGSwBtouWV/aAPC3ySE96gSHkiHLwchVo3L+eHqzaI5IVX7mj
+ T0dQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=D6rBFCWd7TXy/HRgb/86qSVMzCfvtlb6XwpaugqYJio=;
+ b=MFZ3gONlpCEP8m0duRi6PDgLvUDlnbE+ua9mvYVYWXmcF5sDVYtkcUvN/8b/nKsQQM
+ Lo/VmIR20ajAVvTyMzh+m4mszDJnGi7VquGsyPAMOJZdEJVqw7S1bIu3HeAiw5AdGvZC
+ j2KN7N1ynArLfeTy0HgdHKeZqRGcIT075pfqrnRte5evmwS6z61oGBTLsrvm46RhZ1OU
+ ouT4PEOfqEJzULkkEYQbksIrGCR5npgNQ757JE4oN3PGqfTyfKu/g/klnkqrangkXpSb
+ T7j70uP+d4XRod7PQhrBleQ9BgytZurtwrg0N89zocptF6pDljaHwZposUeHu1HWqjcN
+ sc3g==
+X-Gm-Message-State: APjAAAUkf/9b9VBQMb7nVTAKWa04rZARfVJSJmSsMJtEk+zOGk7gA2qG
+ fieKAwUrOuIZ7NNBBr1lE0rkIa0brKYwaw==
+X-Google-Smtp-Source: APXvYqyQel5+wKejBxzlwC+ekLa/M6cOwuskAAo3G3tGR8HRJmTCYAPd0v/I0aNjSAXxs6U2T77JQA==
+X-Received: by 2002:a5d:66c1:: with SMTP id k1mr6674234wrw.73.1571486746077;
+ Sat, 19 Oct 2019 05:05:46 -0700 (PDT)
+Received: from ashopov-C02X544YJHD3.home (ip4da0f75a.direct-adsl.nl.
+ [77.160.247.90])
+ by smtp.gmail.com with ESMTPSA id z22sm9249550wmf.2.2019.10.19.05.05.45
+ (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+ Sat, 19 Oct 2019 05:05:45 -0700 (PDT)
+From: Alexander Shopov <ash@kambanaria.org>
+To: qemu-devel@nongnu.org
+Subject: [PATCH 0/1] Update Bulgarian translation
+Date: Sat, 19 Oct 2019 14:05:33 +0200
+Message-Id: <20191019120534.27479-1-ash@kambanaria.org>
+X-Mailer: git-send-email 2.23.0
 MIME-Version: 1.0
-In-Reply-To: <20191018172622.kz4smemh5cwesfit@proprietary-killer>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Ovh-Tracer-Id: 1430455833884265427
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrkedugddtvdcutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 87.98.172.75
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::444
+X-Mailman-Approved-At: Sat, 19 Oct 2019 09:51:04 -0400
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -71,53 +91,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Joel Stanley <joel@jms.id.au>
+Cc: Kevin Wolf <kwolf@redhat.com>, Anthony Liguori <aliguori@us.ibm.com>,
+ Fam Zheng <famz@redhat.com>, Wei Huang <wehuang@redhat.com>,
+ Pino Toscano <ptoscano@redhat.com>, qemu-trivial@nongnu.org,
+ Laszlo Ersek <lersek@redhat.com>, Alexander Shopov <ash@kambanaria.org>,
+ Laurent Vivier <laurent@vivier.eu>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
+ Christian Borntraeger <borntraeger@de.ibm.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>, Stefan Weil <sw@weilnetz.de>,
+ Thomas Huth <thuth@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Amos Kong <akong@redhat.com>, Dongsheng Song <songdongsheng@live.cn>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 18/10/2019 19:28, Marty E. Plummer wrote:
-> Hello,
-> 
-> First off, thank you for the work you've done on the ppc64 support, it
-> has been very useful. I'm currently working on a coreboot port for the
-> talos ii line of systems (which means more ppc64 support, support
-> specifically for the power9 sforza chip, and specific mainboard support.
-> My plate is very full lol) and have been using qemu to debug the
-> bootblock.
-> 
-> It has been very useful for that, but I'm now at the point where I need
-> to jump to romstage, and that's where it gets tricky. qemu parses the rom
-> image and looks for a ffs header, locates skiboot on it, and jumps straight
-> to that. Not exactly ideal for debugging something not produced from op-build.
+This is the updated Bulgarian translation of Qemu
 
-yes. I suppose you are using my branch powernv-4.2 which adds PNOR support
-and a way to boot directly from PNOR. In that case, QEMU parses the PNOR
-file to extract the PAYLOAD partition (skiboot). skiboot also detects the
-flash and extract the kernel and initramfs from the PNOR.
+It has 1 new message translated and corresponds to v 4.1.0 and up
+I am sending to the devel list, the trivial patch list and
+all people listes as CC, Tested-By, Approved-By in the po dir
+Please ping if that is too wide an audience and point me to
+the right targets
 
-However, you can bypass all this internal boot process by simply passing
-a -bios option and not passing a MTD device.
 
-I haven't published the PNOR support and the boot from PNOR yet. Lack
-of time and because sPAPR is the priority.
+Alexander Shopov (1):
+  Updated Bulgarian translation (19) - 4.1.0
 
-> Do you think it would be within your wheelhouse to provide a generic, non-ffs
-> pnor interface for loading arbitary rom images? 
+ po/bg.po | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
 
-I should probably send the PNOR patchset now so that we can discuss on 
-a better way to satisfy all needs.  
-
-> It would be of great help if
-> you could. (This would still hopefully have the bmc support code as
-> well, as I'm still needing to support a system using one).
-
-We have support for Aspeed machines AST2400, AST2500 and AST2600. It 
-is possible to interconnect them through the BT device. Or you can use
-the IPMI BT simulator of QEMU on the PowerNV machine
-
-Thanks,
-
-C. 
+-- 
+2.23.0
 
 
