@@ -6,49 +6,49 @@ X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C650CA9EAB
-	for <qemu-devel@archiver.kernel.org>; Sat, 19 Oct 2019 18:52:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 557C2CA9EAB
+	for <qemu-devel@archiver.kernel.org>; Sat, 19 Oct 2019 19:24:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EC05A21925
-	for <qemu-devel@archiver.kernel.org>; Sat, 19 Oct 2019 18:52:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 234C621925
+	for <qemu-devel@archiver.kernel.org>; Sat, 19 Oct 2019 19:24:20 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=startmail.com header.i=@startmail.com header.b="VVIsko+1"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EC05A21925
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=startmail.com header.i=@startmail.com header.b="aGMqtv4A"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 234C621925
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=startmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34462 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35316 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iLtq4-000130-3Q
-	for qemu-devel@archiver.kernel.org; Sat, 19 Oct 2019 14:52:32 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42055)
+	id 1iLuKp-0008KA-8M
+	for qemu-devel@archiver.kernel.org; Sat, 19 Oct 2019 15:24:19 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45011)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <hanetzer@startmail.com>) id 1iLtpB-0000Sx-2k
- for qemu-devel@nongnu.org; Sat, 19 Oct 2019 14:51:38 -0400
+ (envelope-from <hanetzer@startmail.com>) id 1iLuJv-0007tN-Qw
+ for qemu-devel@nongnu.org; Sat, 19 Oct 2019 15:23:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <hanetzer@startmail.com>) id 1iLtp9-0007Sz-U0
- for qemu-devel@nongnu.org; Sat, 19 Oct 2019 14:51:36 -0400
-Received: from mx-out2.startmail.com ([145.131.90.155]:41604)
+ (envelope-from <hanetzer@startmail.com>) id 1iLuJu-0006fP-Nt
+ for qemu-devel@nongnu.org; Sat, 19 Oct 2019 15:23:23 -0400
+Received: from mx-out2.startmail.com ([145.131.90.155]:51566)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <hanetzer@startmail.com>)
- id 1iLtp9-0007Rg-N4; Sat, 19 Oct 2019 14:51:35 -0400
-Date: Sat, 19 Oct 2019 13:51:29 -0500
+ id 1iLuJu-0006dR-HS; Sat, 19 Oct 2019 15:23:22 -0400
+Date: Sat, 19 Oct 2019 14:23:16 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=startmail.com;
- s=2017-11; t=1571511093;
- bh=Gl5j5LRTfp0jAe8emUAtJiAA1572oRRSEPGnl8r9oWo=;
+ s=2017-11; t=1571512999;
+ bh=sHxKJDEZvOFh+wkazSKFKpPewUpeuVrmWUHTJG2Pyv0=;
  h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=VVIsko+1d6br60B2jM8LO+kp0QlQ2zkMTQ6co25kV5xQyicGUXuF6R5srpHi8p4vJ
- EEI2xYy5VnSakP3/Pe0PKULxk0PD7vzWbuHO49sM+14zx5HgdpiF9aikAgtGXYxpJm
- xSCblQYlTXormwnSiisBv2dJwT9SxkvHskw5e8UmV8uLptN9bEv2JnYnTTjwl9da+W
- DuCGzVk7v4GJhj1OsU36731EhXMXjSTflw4Mi/JMtDON1szsypCK9IaQbLHU5/wBXi
- GhfboyMsop16YYfZd1I4ISZwWpcYk0PFsAcmgzDMETuuXaIrjAnqhhqDytdj2JPOEu
- XXW1Ah+9cwsJA==
+ b=aGMqtv4AsDv5QzR/7IlN9CWkCbKLRbx9WDK8VzGQkLLHPNi3SvZdFx6AWNqXRYT8s
+ AWBcFW1vED4tBH4QU22J3smvdGIRhZi8L5eKiCZmbVK2Mpe12YN46Yjco8beOQ5k5B
+ JHNBKs6nv8sbIIG32AQ2k5eMaWhOi6BawZZg3y6DThrULFBSpR2KI46klcvIfup0Rf
+ ptAv5mZq7z84RY1x34JUfkQ8gFneS613MkHfxhisW9gJlIURI2slg4Jn6xY3XneZkL
+ VwTH3/1+DASg20HJ7xu/JieZaCRzUMUz/llXDNV3iDtOqEnXGWJgqkDfhXea+ZLJ9L
+ zm11oXaLlvofg==
 From: "Marty E. Plummer" <hanetzer@startmail.com>
 To: =?utf-8?Q?C=C3=A9dric?= Le Goater <clg@kaod.org>
 Subject: Re: qemu/powernv: coreboot support?
-Message-ID: <20191019185128.g7pea3thtp3enhfi@proprietary-killer>
+Message-ID: <20191019192315.c3jzj3nbvpfjydsw@proprietary-killer>
 References: <20191018172622.kz4smemh5cwesfit@proprietary-killer>
  <21ba3404-dcd3-fe06-7725-d58e249f9fd2@kaod.org>
  <20191019153108.gkupn3tnihspq7th@proprietary-killer>
@@ -119,10 +119,12 @@ sing
 > > qemu-system-ppc64: Could not load OPAL firmware 'build/coreboot.rom'
 > > (this is after I patched the 4mb size limit up)
 >=20
+Oof. My bad, I had only patched the 4.1.0 package, not the live sources
+from your tree.
 > Could you make that rom available ?=20
 >=20
-Sent it, but the ml kicked back a 'hey, that's not a normal text file'
-error, could you confirm if you personally got it?
+Turns out the 'not text' warning came from lists.sr.ht, I wonder why
+that mailed me.
 > Thanks,
 >=20
 > C.=20
