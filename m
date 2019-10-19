@@ -6,44 +6,44 @@ X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D7A4DCA9EAC
-	for <qemu-devel@archiver.kernel.org>; Sat, 19 Oct 2019 04:27:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 28ED6CA9EAC
+	for <qemu-devel@archiver.kernel.org>; Sat, 19 Oct 2019 04:28:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AC9AC222C2
-	for <qemu-devel@archiver.kernel.org>; Sat, 19 Oct 2019 04:27:53 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AC9AC222C2
+	by mail.kernel.org (Postfix) with ESMTPS id 00696222C2
+	for <qemu-devel@archiver.kernel.org>; Sat, 19 Oct 2019 04:28:02 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 00696222C2
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48596 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48594 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iLgKz-0006F3-VC
-	for qemu-devel@archiver.kernel.org; Sat, 19 Oct 2019 00:27:33 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51875)
+	id 1iLgKt-00069R-3q
+	for qemu-devel@archiver.kernel.org; Sat, 19 Oct 2019 00:27:27 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51863)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1iLgJQ-0004N5-P3
- for qemu-devel@nongnu.org; Sat, 19 Oct 2019 00:25:57 -0400
+ (envelope-from <bounces@canonical.com>) id 1iLgJN-0004JT-C4
+ for qemu-devel@nongnu.org; Sat, 19 Oct 2019 00:25:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1iLgJO-000589-J6
- for qemu-devel@nongnu.org; Sat, 19 Oct 2019 00:25:56 -0400
-Received: from indium.canonical.com ([91.189.90.7]:37616)
+ (envelope-from <bounces@canonical.com>) id 1iLgJM-00054M-28
+ for qemu-devel@nongnu.org; Sat, 19 Oct 2019 00:25:53 -0400
+Received: from indium.canonical.com ([91.189.90.7]:37456)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1iLgJO-00056p-DI
- for qemu-devel@nongnu.org; Sat, 19 Oct 2019 00:25:54 -0400
+ id 1iLgJL-00053J-TA
+ for qemu-devel@nongnu.org; Sat, 19 Oct 2019 00:25:52 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
  by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1iLgJM-00057s-B2
- for <qemu-devel@nongnu.org>; Sat, 19 Oct 2019 04:25:52 +0000
+ id 1iLgJJ-00058A-UD
+ for <qemu-devel@nongnu.org>; Sat, 19 Oct 2019 04:25:50 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 281C42E80D3
- for <qemu-devel@nongnu.org>; Sat, 19 Oct 2019 04:25:52 +0000 (UTC)
+ by loganberry.canonical.com (Postfix) with ESMTP id B25072E80D0
+ for <qemu-devel@nongnu.org>; Sat, 19 Oct 2019 04:25:49 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Sat, 19 Oct 2019 04:17:32 -0000
+Date: Sat, 19 Oct 2019 04:17:31 -0000
 From: Launchpad Bug Tracker <1834113@bugs.launchpad.net>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
@@ -61,7 +61,7 @@ X-Launchpad-Bug-Commenters: bryce ikes73 janitor paelzer rafaeldtinoco
 X-Launchpad-Bug-Reporter: Avi Eis (ikes73)
 X-Launchpad-Bug-Modifier: Launchpad Janitor (janitor)
 References: <156142437029.30985.13623507391124028236.malonedeb@soybean.canonical.com>
-Message-Id: <157145865314.12302.6194390295045973853.malone@loganberry.canonical.com>
+Message-Id: <157145865173.12302.8924632073282955055.malone@loganberry.canonical.com>
 Subject: [Bug 1834113] Re: QEMU touchpad input erratic after wakeup from sleep
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
 X-Launchpad-Message-For: qemu-devel-ml
@@ -69,7 +69,7 @@ Precedence: bulk
 X-Generated-By: Launchpad (canonical.com);
  Revision="186023fa645d8be19d403a76064f0643f510db2f";
  Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: f7a1fa6faaa7bc34d2825c0a0f189a95f94df928
+X-Launchpad-Hash: bd2715d6696b8e85021185a631ebbb72d399e60d
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 91.189.90.7
@@ -88,10 +88,10 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-[Expired for qemu (Ubuntu) because there has been no activity for 60
+[Expired for libvirt (Ubuntu) because there has been no activity for 60
 days.]
 
-** Changed in: qemu (Ubuntu)
+** Changed in: libvirt (Ubuntu)
        Status: Incomplete =3D> Expired
 
 -- =
