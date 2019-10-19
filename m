@@ -2,85 +2,91 @@ Return-Path: <SRS0=F+Q9=YM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 03D43CA9EAB
-	for <qemu-devel@archiver.kernel.org>; Sat, 19 Oct 2019 14:02:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D21B1CA9EAB
+	for <qemu-devel@archiver.kernel.org>; Sat, 19 Oct 2019 15:13:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C50E121835
-	for <qemu-devel@archiver.kernel.org>; Sat, 19 Oct 2019 14:02:37 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C50E121835
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 9A85C222CD
+	for <qemu-devel@archiver.kernel.org>; Sat, 19 Oct 2019 15:13:49 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cdvTdsHL"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9A85C222CD
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55340 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56534 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iLpJU-00071r-Tr
-	for qemu-devel@archiver.kernel.org; Sat, 19 Oct 2019 10:02:36 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40208)
+	id 1iLqQF-0002wr-Ib
+	for qemu-devel@archiver.kernel.org; Sat, 19 Oct 2019 11:13:39 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45647)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <sgarzare@redhat.com>) id 1iLpHa-0006Qd-Rk
- for qemu-devel@nongnu.org; Sat, 19 Oct 2019 10:00:41 -0400
+ (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1iLqNn-0001BV-JD
+ for qemu-devel@nongnu.org; Sat, 19 Oct 2019 11:11:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <sgarzare@redhat.com>) id 1iLpHW-0007DS-Q0
- for qemu-devel@nongnu.org; Sat, 19 Oct 2019 10:00:35 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60878)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <sgarzare@redhat.com>) id 1iLpHW-0007Bm-Gy
- for qemu-devel@nongnu.org; Sat, 19 Oct 2019 10:00:34 -0400
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70])
- (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 14730368B1
- for <qemu-devel@nongnu.org>; Sat, 19 Oct 2019 14:00:32 +0000 (UTC)
-Received: by mail-wm1-f70.google.com with SMTP id k9so4081416wmb.0
- for <qemu-devel@nongnu.org>; Sat, 19 Oct 2019 07:00:32 -0700 (PDT)
+ (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1iLqNm-0006wl-J2
+ for qemu-devel@nongnu.org; Sat, 19 Oct 2019 11:11:07 -0400
+Received: from mail-wm1-x32e.google.com ([2a00:1450:4864:20::32e]:33770)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1iLqNm-0006vx-DM
+ for qemu-devel@nongnu.org; Sat, 19 Oct 2019 11:11:06 -0400
+Received: by mail-wm1-x32e.google.com with SMTP id r17so11356179wme.0
+ for <qemu-devel@nongnu.org>; Sat, 19 Oct 2019 08:11:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=L17Gkpekc5/KDSlV7uWJjFxc0f5cH+nD4BY7UX0P8ME=;
+ b=cdvTdsHLJ9xm713HYol6fuZg3dwqzEwv2lt/uVKRv2cQXDtsSqCzZRvxWsSoMoz73Q
+ 86Uqh6GDgMDwM2k4IMj8CWwRcfRufCzbkk8Q8Y8Xp0rX9jhHhLkFoiHKN4NA8T1fGJej
+ 9CqgSWbGQDEsoL43yf/J/4pv3P+jTpchbwnf329qOdbm6lffePCO6R6MV8TJ4lP8U9eA
+ saQBCCcWiZB0LDKa+8pqAGH9c8CdcqPLFWJ/9iAlI94swRdLd+ulnbNHxm/4Ei+FCmuw
+ YTsANHOX+GRv2TF19ffFAjgOo+5rxBK8jxFuFUZ+O7uqOZ3oWhZFkc/tbB3Muvbltwxl
+ j5Og==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to:user-agent;
- bh=KP3vwjUBEB84k8OE1O8olnCOg3vO9FYTOfM95m1nWOY=;
- b=WdgU1USiv866JNA6RLzVl6FldNGYo0KX5vc/nKRfDgiq6z8M8x3QAkv4Q4IsCamVLv
- +NuzlE2IzhUU6i2V8FGqlWkqj0esIPb9Q2hLh0c8h2hnCF6ozQr0YpXTIl61b9AGSEFk
- aYS3H9n1zOhyNYAPkBbZ4v6ETjVkfouoUY2zdg8fbhPip8RtS3n05EvUOBLRnYTns6P1
- cWGI5mZCcvapezUcazV8Ak7U4yjkGPHRjKA7eO7NDzAJ6bYW1r8JSOoRAAOeAIzXujO/
- UeEI2bbEt6MMeKb0vdSe8noqHVZCrUm1VEH9huZ04FTOx13ZdF42CoAOhERmN0eCqfd4
- /UKw==
-X-Gm-Message-State: APjAAAUyMdEVLQvOBYZizTWjlfAzE2vfGGKLxPiXd/2jIhj//GwiIgLk
- 9p94BEbu7YWIkJpTfAQcRfflMs/s0G2HQ1PcQHJcrdYS9y+qCHezcrBh4tcYqci4PtrU7NeW/pI
- 2KhT2MPJUAZAdPCo=
-X-Received: by 2002:a1c:4c03:: with SMTP id z3mr12338756wmf.174.1571493630783; 
- Sat, 19 Oct 2019 07:00:30 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqyV6qcwnkahEIWdsQ2Aqhq4hVfSdpKgV9ufvq3gfQC4GHf1PMG3zkzKP41gmyc3E9bkyT3n7w==
-X-Received: by 2002:a1c:4c03:: with SMTP id z3mr12338734wmf.174.1571493630437; 
- Sat, 19 Oct 2019 07:00:30 -0700 (PDT)
-Received: from steredhat (host93-199-dynamic.52-79-r.retail.telecomitalia.it.
- [79.52.199.93])
- by smtp.gmail.com with ESMTPSA id z13sm9500067wrm.64.2019.10.19.07.00.29
+ h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
+ :in-reply-to:references:mime-version:content-transfer-encoding;
+ bh=L17Gkpekc5/KDSlV7uWJjFxc0f5cH+nD4BY7UX0P8ME=;
+ b=Whqgz/qqaCBVZAwDajfVs6FqdwMdSxvNvxT/zIAAvUl5SIlwWgWJGXUk5AATb0zZ+I
+ Zsv9WbnLizlmatAQh0I/Ht8QNrn3bEeQiCVlXRvF92l26tAT6dOzHijH9DV3dlxS00Gg
+ NwqXCpcCNCWjK+TsO7kCwhQwHEs9sg1pA5LRRHP17oqCuWsi2/Lr0dNU1B6zHlmJmotX
+ YKqqC+zLxD/72e4OB2io+V0zi4D1f0QTVGySBeE1Ipd4hPPAQ0ywLXbWRGK+mwXwR+sg
+ BLksWGnyAkrRxm4nd0a2G0kXP6NwcB8EKsZPXVFGTOUcOccZkrVOLy8YVbz+Y8PbhYvT
+ JeQA==
+X-Gm-Message-State: APjAAAVICbGexYRoytUPPvpTtHI1JGm3g4tLfBe0p5qKGV0aqtw2BCXx
+ f+SLqueOcnAfwOdfoN5Xw8VEf/GF
+X-Google-Smtp-Source: APXvYqyOL9OvMOahIfKpTn7TTLB+igP5pLZuuf2G6z3XYDavh2IbDeHUpp2qW53qdzuHaRHOWDO1Aw==
+X-Received: by 2002:a05:600c:143:: with SMTP id
+ w3mr11172913wmm.35.1571497865239; 
+ Sat, 19 Oct 2019 08:11:05 -0700 (PDT)
+Received: from x1w.redhat.com (14.red-88-21-201.staticip.rima-tde.net.
+ [88.21.201.14])
+ by smtp.gmail.com with ESMTPSA id t13sm10753964wra.70.2019.10.19.08.11.03
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sat, 19 Oct 2019 07:00:29 -0700 (PDT)
-Date: Sat, 19 Oct 2019 16:00:27 +0200
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: Thomas Huth <thuth@redhat.com>
-Subject: Re: [PATCH v2] Do not use %m in common code to print error messages
-Message-ID: <20191019140027.yzr6ccalmu6nmz53@steredhat>
-References: <20191018130716.25438-1-thuth@redhat.com>
- <20191018134215.u6psfffrrxlsa2ns@steredhat>
- <1f36c112-fabb-df41-e01d-476e4c86186e@gmx.com>
- <f8fc0de2-b4b0-a75a-a00f-c6bca6914159@redhat.com>
+ Sat, 19 Oct 2019 08:11:04 -0700 (PDT)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+To: qemu-devel@nongnu.org
+Subject: [PATCH 03/11] tests/acceptance: Send <carriage return> on serial lines
+Date: Sat, 19 Oct 2019 17:10:50 +0200
+Message-Id: <20191019151058.31733-4-f4bug@amsat.org>
+X-Mailer: git-send-email 2.21.0
+In-Reply-To: <20191019151058.31733-1-f4bug@amsat.org>
+References: <20191019151058.31733-1-f4bug@amsat.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <f8fc0de2-b4b0-a75a-a00f-c6bca6914159@redhat.com>
-User-Agent: NeoMutt/20180716
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.132.183.28
+Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::32e
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -92,57 +98,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: berrange@redhat.com, qemu-trivial@nongnu.org, qemu-devel@nongnu.org,
- Kamil Rytarowski <kamil@netbsd.org>, Paolo Bonzini <pbonzini@redhat.com>,
- Kamil Rytarowski <n54@gmx.com>
+Cc: Eduardo Habkost <ehabkost@redhat.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
+ Aleksandar Markovic <amarkovic@wavecomp.com>, Cleber Rosa <crosa@redhat.com>,
+ Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
+ Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, Oct 18, 2019 at 06:01:22PM +0200, Thomas Huth wrote:
-> On 18/10/2019 15.49, Kamil Rytarowski wrote:
-> > On 18.10.2019 15:42, Stefano Garzarella wrote:
-> >> On Fri, Oct 18, 2019 at 03:07:16PM +0200, Thomas Huth wrote:
-> >>> The %m format specifier is an extension from glibc - and when compiling
-> >>> QEMU for NetBSD, the compiler correctly complains, e.g.:
-> >>>
-> >>> /home/qemu/qemu-test.ELjfrQ/src/util/main-loop.c: In function 'sigfd_handler':
-> >>> /home/qemu/qemu-test.ELjfrQ/src/util/main-loop.c:64:13: warning: %m is only
-> >>>  allowed in syslog(3) like functions [-Wformat=]
-> >>>              printf("read from sigfd returned %zd: %m\n", len);
-> >>>              ^
-> >>> Let's use g_strerror() here instead, which is an easy-to-use wrapper
-> >>> around the thread-safe strerror_r() function.
-> >>>
-> >>> While we're at it, also convert the "printf()" in main-loop.c into
-> >>> the preferred "error_report()".
-> >>>
-> >>> Signed-off-by: Thomas Huth <thuth@redhat.com>
-> >>> ---
-> >>>  v2: Do not try to g_free() the strings
-> >>>
-> >>>  hw/misc/tmp421.c | 4 ++--
-> >>>  util/main-loop.c | 3 ++-
-> >>>  util/systemd.c   | 4 ++--
-> >>>  3 files changed, 6 insertions(+), 5 deletions(-)
-> >>
-> >> There are many uses of %m also in hw/vfio/ but that's Linux stuff.
-> >> Should we change those too or it doesn't matter since it never really
-> >> compiled on NetBSD?
-> > 
-> > It's a gnu (glibc) extension and linux can use alternative libc
-> > implementations. Probably most of them capable to host qemu use %m.
-> 
-> I think I read somewhere that other libcs on Linux also support %m (like
+Some firmwares don't parse the <Newline> control character and
+expect a <carriage return>.
 
-Good to know!
+Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+---
+ tests/acceptance/boot_linux_console.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-> musl), but I just can't find that reference anymore. Anyway, we can
-> still fix that later in case someone hits the issue.
-> 
+diff --git a/tests/acceptance/boot_linux_console.py b/tests/acceptance/boot_linux_console.py
+index 8897e0c253..497faa4f7f 100644
+--- a/tests/acceptance/boot_linux_console.py
++++ b/tests/acceptance/boot_linux_console.py
+@@ -34,7 +34,7 @@ class BootLinuxConsole(Test):
+                                  failure_message='Kernel panic - not syncing')
+ 
+     def exec_command_and_wait_for_pattern(self, command, success_message):
+-        command += '\n'
++        command += '\r\n'
+         self.vm.console_socket.sendall(command.encode())
+         wait_for_console_pattern(self, success_message)
+ 
+-- 
+2.21.0
 
-Yes, make sense to me.
-
-Thanks,
-Stefano
 
