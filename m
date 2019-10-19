@@ -2,70 +2,74 @@ Return-Path: <SRS0=F+Q9=YM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_2 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C101FCA9EAB
-	for <qemu-devel@archiver.kernel.org>; Sat, 19 Oct 2019 10:52:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E350CA9EAB
+	for <qemu-devel@archiver.kernel.org>; Sat, 19 Oct 2019 10:55:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 968A321D7C
-	for <qemu-devel@archiver.kernel.org>; Sat, 19 Oct 2019 10:52:32 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 968A321D7C
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id DFD5721D7C
+	for <qemu-devel@archiver.kernel.org>; Sat, 19 Oct 2019 10:55:02 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DFD5721D7C
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=tuxfamily.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53058 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53072 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iLmLW-00026t-Pf
-	for qemu-devel@archiver.kernel.org; Sat, 19 Oct 2019 06:52:30 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52810)
+	id 1iLmNy-0003QY-2h
+	for qemu-devel@archiver.kernel.org; Sat, 19 Oct 2019 06:55:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52897)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <no-reply@patchew.org>) id 1iLmKB-0001V9-Ml
- for qemu-devel@nongnu.org; Sat, 19 Oct 2019 06:51:09 -0400
+ (envelope-from <th.huth@gmail.com>) id 1iLmM7-0002Ve-6R
+ for qemu-devel@nongnu.org; Sat, 19 Oct 2019 06:53:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <no-reply@patchew.org>) id 1iLmK7-0005Rt-B7
- for qemu-devel@nongnu.org; Sat, 19 Oct 2019 06:51:06 -0400
-Resent-Date: Sat, 19 Oct 2019 06:51:05 -0400
-Resent-Message-Id: <E1iLmK7-0005Rt-B7@eggs.gnu.org>
-Received: from sender4-of-o54.zoho.com ([136.143.188.54]:21405)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <no-reply@patchew.org>)
- id 1iLmK7-0005Qu-5J
- for qemu-devel@nongnu.org; Sat, 19 Oct 2019 06:51:03 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1571482203; cv=none; 
- d=zohomail.com; s=zohoarc; 
- b=PcrQEe6XES5O9lGA1e2TuvuSolSuOAwj4uULu9jvePOm99kCY+S1/TfwpBylJJhCANUXWhUphpHKl3aRjl+hnzSF2+PWuAlHyqwmE6xifirLFf+lolykZK/wRxr1saav2qQj8jIb22alSG1eCJqmLWIsw0Fph5kZP31lXZkdASc=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
- s=zohoarc; t=1571482203;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
- bh=EIrE5QTrOeO607HBMcjqU+++srWvwPyhOuSID/dAQg4=; 
- b=Snj+keIR7Ur9xnFZjqFLXMaWk/1NZ0MBNfd39yK2VyP2xhyiGJy57oA8sSBx5OFz2y65D9bBc+056kemWTxgnNv7uSmgUjevpw1XPHQLVmgeD0kjHUR+WnhEJt+D9EfZ1lPiD9loTpi4vHZ7S20i7wgnBf+VodVF05+4zPUu4ig=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
- dkim=pass  header.i=patchew.org;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1571482202575492.45665706715226;
- Sat, 19 Oct 2019 03:50:02 -0700 (PDT)
-In-Reply-To: <20191018134754.16362-1-philmd@redhat.com>
-Subject: Re: [PATCH v2 00/20] hw/i386/pc: Split PIIX3 southbridge from i440FX
- northbridge
-Message-ID: <157148220023.24734.7968862883597580449@37313f22b938>
+ (envelope-from <th.huth@gmail.com>) id 1iLmM1-000711-QP
+ for qemu-devel@nongnu.org; Sat, 19 Oct 2019 06:53:05 -0400
+Received: from mail-wr1-f67.google.com ([209.85.221.67]:42634)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <th.huth@gmail.com>) id 1iLmM0-0006zT-Cw
+ for qemu-devel@nongnu.org; Sat, 19 Oct 2019 06:53:00 -0400
+Received: by mail-wr1-f67.google.com with SMTP id n14so8759740wrw.9
+ for <qemu-devel@nongnu.org>; Sat, 19 Oct 2019 03:52:59 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=W2X2+p4yXGg673dZzLo4v5KRbArsIomA3vjkmTiCugk=;
+ b=nBU87U3ZarfmZwJRZH6qD8W/GQkNuapdQTRNOZKmNkytLvfkdqhZ6OnsHDjL22OcUD
+ UU5rNKroPy279nh/JjAcb+QXzrmh7ktf5VRMmt+VocHiFXyKyFtwUv9vmPkHsl9zeo8I
+ DzMu0+OphCK6/TRjsGuWWTT6+aLRh8i3+4uhgVDclNObcDtdizt1O7TJXo1Wmn9qqCGC
+ v8UangmkpRlS9oV7BiYi3m2wkSxcS0ehNCwD+abxOjliMh20Q/4ZCIAJ0V6Y2tbPdZa8
+ YhWw2APKG40mt9ch+rBB8ehP0uXpeH3gJm6DQJz4f6G1xilhSwQUz/zI2hdW6u6ounTN
+ fC7A==
+X-Gm-Message-State: APjAAAUENeoaclmsVlqMxTFWZ0Fodh4C17Dg+Sclnju1d+zKL3NngEm0
+ fKssJABxlvEURhzFoG/u590ACgssjDAnOA==
+X-Google-Smtp-Source: APXvYqxea+z9D17dwkqlqCYDS/QxSXM9w6m0IZ8TcSilq2g2hgvNXovfv7UJZLkUfAfkI10kX4Rq0w==
+X-Received: by 2002:a5d:46ca:: with SMTP id g10mr11805856wrs.193.1571482378372; 
+ Sat, 19 Oct 2019 03:52:58 -0700 (PDT)
+Received: from thl530 (x2f7f4ae.dyn.telefonica.de. [2.247.244.174])
+ by smtp.gmail.com with ESMTPSA id u25sm7512310wml.4.2019.10.19.03.52.57
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Sat, 19 Oct 2019 03:52:57 -0700 (PDT)
+Date: Sat, 19 Oct 2019 12:52:51 +0200
+From: Thomas Huth <huth@tuxfamily.org>
+To: Peter Maydell <peter.maydell@linaro.org>
+Subject: Re: [PATCH 8/8] hw/m68k/mcf5208.c: Switch to transaction-based
+ ptimer API
+Message-ID: <20191019125251.360db802@thl530>
+In-Reply-To: <20191017132905.5604-9-peter.maydell@linaro.org>
+References: <20191017132905.5604-1-peter.maydell@linaro.org>
+ <20191017132905.5604-9-peter.maydell@linaro.org>
+X-Mailer: Claws Mail 3.17.3 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: philmd@redhat.com
-Date: Sat, 19 Oct 2019 03:50:02 -0700 (PDT)
-X-ZohoMailClient: External
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 136.143.188.54
+X-Received-From: 209.85.221.67
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -77,113 +81,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: sstabellini@kernel.org, xen-devel@lists.xenproject.org, paul@xen.org,
- mst@redhat.com, qemu-devel@nongnu.org, ehabkost@redhat.com,
- hpoussin@reactos.org, amarkovic@wavecomp.com, imammedo@redhat.com,
- anthony.perard@citrix.com, pbonzini@redhat.com, aleksandar.rikalo@rt-rk.com,
- philmd@redhat.com, aurelien@aurel32.net, rth@twiddle.net
+Cc: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
+ Michael Walle <michael@walle.cc>, Guan Xuetao <gxt@mprc.pku.edu.cn>,
+ Magnus Damm <magnus.damm@gmail.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MTAxODEzNDc1NC4xNjM2
-Mi0xLXBoaWxtZEByZWRoYXQuY29tLwoKCgpIaSwKClRoaXMgc2VyaWVzIHNlZW1zIHRvIGhhdmUg
-c29tZSBjb2Rpbmcgc3R5bGUgcHJvYmxlbXMuIFNlZSBvdXRwdXQgYmVsb3cgZm9yCm1vcmUgaW5m
-b3JtYXRpb246CgpTdWJqZWN0OiBbUEFUQ0ggdjIgMDAvMjBdIGh3L2kzODYvcGM6IFNwbGl0IFBJ
-SVgzIHNvdXRoYnJpZGdlIGZyb20gaTQ0MEZYIG5vcnRoYnJpZGdlClR5cGU6IHNlcmllcwpNZXNz
-YWdlLWlkOiAyMDE5MTAxODEzNDc1NC4xNjM2Mi0xLXBoaWxtZEByZWRoYXQuY29tCgo9PT0gVEVT
-VCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCmdpdCByZXYtcGFyc2UgYmFzZSA+IC9kZXYv
-bnVsbCB8fCBleGl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQg
-Y29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYu
-YWxnb3JpdGhtIGhpc3RvZ3JhbQouL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIGJh
-c2UuLgo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIx
-NjRkMWRlZjdmNDRiZDg4ODcxMzM4NApTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCjFm
-ODRmMTAgaHcvcGNpLWhvc3QvaTQ0MGZ4OiBSZW1vdmUgdGhlIGxhc3QgUElJWDMgdHJhY2VzCjcx
-N2EwYTQgaHcvcGNpLWhvc3Q6IFJlbmFtZSBpbmNvcnJlY3RseSBuYW1lZCAncGlpeCcgYXMgJ2k0
-NDBmeCcKMTI5NGI3YyBody9wY2ktaG9zdC9waWl4OiBFeHRyYWN0IFBJSVgzIGZ1bmN0aW9ucyB0
-byBody9pc2EvcGlpeDMuYwoyM2Q0M2QwIGh3L3BjaS1ob3N0L3BpaXg6IEZpeCBjb2RlIHN0eWxl
-IGlzc3Vlcwo2ZTBjZTQ5IGh3L3BjaS1ob3N0L3BpaXg6IE1vdmUgaTQ0MEZYIGRlY2xhcmF0aW9u
-cyB0byBody9wY2ktaG9zdC9pNDQwZnguaApkMWFjNGI2IGh3L3BjaS1ob3N0L3BpaXg6IERlZmlu
-ZSBhbmQgdXNlIHRoZSBQSUlYIElSUSBSb3V0ZSBDb250cm9sIFJlZ2lzdGVycwpjYjUyNDNlIGh3
-L3BjaS1ob3N0L3BpaXg6IE1vdmUgUkNSX0lPUE9SVCByZWdpc3RlciBkZWZpbml0aW9uCmQ1ZTEy
-MmYgaHcvcGNpLWhvc3QvcGlpeDogRXh0cmFjdCBwaWl4M19jcmVhdGUoKQpjNTQ0ZmI5IGh3L2kz
-ODY6IFJlbW92ZSBvYnNvbGV0ZSBMb2FkU3RhdGVIYW5kbGVyOjpsb2FkX3N0YXRlX29sZCBoYW5k
-bGVycwpjM2M3MDZlIGh3L2lzYS9waWl4NDogTW92ZSBwaWl4NF9jcmVhdGUoKSB0byBody9pc2Ev
-cGlpeDQuYwo3ZmFkM2YyIGh3L21pcHMvbWlwc19tYWx0YTogRXh0cmFjdCB0aGUgUElJWDQgY3Jl
-YXRpb24gY29kZSBhcyBwaWl4NF9jcmVhdGUoKQpkZGU4ZjQyIGh3L21pcHMvbWlwc19tYWx0YTog
-Q3JlYXRlIElERSBoYXJkIGRyaXZlIGFycmF5IGR5bmFtaWNhbGx5CjM0OWE4ZGUgcGlpeDQ6IEFk
-ZCBhIE1DMTQ2ODE4IFJUQyBDb250cm9sbGVyIGFzIHNwZWNpZmllZCBpbiBkYXRhc2hlZXQKMmFk
-MTMzMyBwaWl4NDogQWRkIGEgaTgyNTQgUElUIENvbnRyb2xsZXIgYXMgc3BlY2lmaWVkIGluIGRh
-dGFzaGVldAowNDFmNDIwIHBpaXg0OiBBZGQgYSBpODI1NyBETUEgQ29udHJvbGxlciBhcyBzcGVj
-aWZpZWQgaW4gZGF0YXNoZWV0CjljZjM2NTEgcGlpeDQ6IFJlbmFtZSBQSUlYNCBvYmplY3QgdG8g
-cGlpeDQtaXNhCmEyNzg0MWUgUmV2ZXJ0ICJpcnE6IGludHJvZHVjZSBxZW11X2lycV9wcm94eSgp
-Igo3ZDk1MzRhIHBpaXg0OiBBZGQgYSBpODI1OSBJbnRlcnJ1cHQgQ29udHJvbGxlciBhcyBzcGVj
-aWZpZWQgaW4gZGF0YXNoZWV0CjY0OTg5MzAgcGlpeDQ6IEFkZCB0aGUgUmVzZXQgQ29udHJvbCBS
-ZWdpc3Rlcgo5MGNkN2Q0IE1BSU5UQUlORVJTOiBLZWVwIFBJSVg0IFNvdXRoIEJyaWRnZSBzZXBh
-cmF0ZSBmcm9tIFBDIENoaXBzZXRzCgo9PT0gT1VUUFVUIEJFR0lOID09PQoxLzIwIENoZWNraW5n
-IGNvbW1pdCA5MGNkN2Q0ZjVlYjUgKE1BSU5UQUlORVJTOiBLZWVwIFBJSVg0IFNvdXRoIEJyaWRn
-ZSBzZXBhcmF0ZSBmcm9tIFBDIENoaXBzZXRzKQoyLzIwIENoZWNraW5nIGNvbW1pdCA2NDk4OTMw
-OWE5YjUgKHBpaXg0OiBBZGQgdGhlIFJlc2V0IENvbnRyb2wgUmVnaXN0ZXIpCjMvMjAgQ2hlY2tp
-bmcgY29tbWl0IDdkOTUzNGEyODRlOSAocGlpeDQ6IEFkZCBhIGk4MjU5IEludGVycnVwdCBDb250
-cm9sbGVyIGFzIHNwZWNpZmllZCBpbiBkYXRhc2hlZXQpCjQvMjAgQ2hlY2tpbmcgY29tbWl0IGEy
-Nzg0MWUyYjNjYSAoUmV2ZXJ0ICJpcnE6IGludHJvZHVjZSBxZW11X2lycV9wcm94eSgpIikKNS8y
-MCBDaGVja2luZyBjb21taXQgOWNmMzY1MWY3N2UyIChwaWl4NDogUmVuYW1lIFBJSVg0IG9iamVj
-dCB0byBwaWl4NC1pc2EpCjYvMjAgQ2hlY2tpbmcgY29tbWl0IDA0MWY0MjA1NzgzZCAocGlpeDQ6
-IEFkZCBhIGk4MjU3IERNQSBDb250cm9sbGVyIGFzIHNwZWNpZmllZCBpbiBkYXRhc2hlZXQpCjcv
-MjAgQ2hlY2tpbmcgY29tbWl0IDJhZDEzMzNhM2E1ZiAocGlpeDQ6IEFkZCBhIGk4MjU0IFBJVCBD
-b250cm9sbGVyIGFzIHNwZWNpZmllZCBpbiBkYXRhc2hlZXQpCjgvMjAgQ2hlY2tpbmcgY29tbWl0
-IDM0OWE4ZGVhYjY4NiAocGlpeDQ6IEFkZCBhIE1DMTQ2ODE4IFJUQyBDb250cm9sbGVyIGFzIHNw
-ZWNpZmllZCBpbiBkYXRhc2hlZXQpCldBUk5JTkc6IGFkZGVkLCBtb3ZlZCBvciBkZWxldGVkIGZp
-bGUocyksIGRvZXMgTUFJTlRBSU5FUlMgbmVlZCB1cGRhdGluZz8KIzE5NDogCmRlbGV0ZWQgZmls
-ZSBtb2RlIDEwMDY0NAoKdG90YWw6IDAgZXJyb3JzLCAxIHdhcm5pbmdzLCAxNjYgbGluZXMgY2hl
-Y2tlZAoKUGF0Y2ggOC8yMCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBh
-bnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhl
-IG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgo5LzIwIENoZWNraW5n
-IGNvbW1pdCBkZGU4ZjQyMzAyZGYgKGh3L21pcHMvbWlwc19tYWx0YTogQ3JlYXRlIElERSBoYXJk
-IGRyaXZlIGFycmF5IGR5bmFtaWNhbGx5KQoxMC8yMCBDaGVja2luZyBjb21taXQgN2ZhZDNmMjhh
-YTg2IChody9taXBzL21pcHNfbWFsdGE6IEV4dHJhY3QgdGhlIFBJSVg0IGNyZWF0aW9uIGNvZGUg
-YXMgcGlpeDRfY3JlYXRlKCkpCjExLzIwIENoZWNraW5nIGNvbW1pdCBjM2M3MDZlNzk0MDMgKGh3
-L2lzYS9waWl4NDogTW92ZSBwaWl4NF9jcmVhdGUoKSB0byBody9pc2EvcGlpeDQuYykKMTIvMjAg
-Q2hlY2tpbmcgY29tbWl0IGM1NDRmYjk4YWE2NyAoaHcvaTM4NjogUmVtb3ZlIG9ic29sZXRlIExv
-YWRTdGF0ZUhhbmRsZXI6OmxvYWRfc3RhdGVfb2xkIGhhbmRsZXJzKQoxMy8yMCBDaGVja2luZyBj
-b21taXQgZDVlMTIyZjI4NmU0IChody9wY2ktaG9zdC9waWl4OiBFeHRyYWN0IHBpaXgzX2NyZWF0
-ZSgpKQoxNC8yMCBDaGVja2luZyBjb21taXQgY2I1MjQzZThiNGEwIChody9wY2ktaG9zdC9waWl4
-OiBNb3ZlIFJDUl9JT1BPUlQgcmVnaXN0ZXIgZGVmaW5pdGlvbikKMTUvMjAgQ2hlY2tpbmcgY29t
-bWl0IGQxYWM0YjYwYzU1YyAoaHcvcGNpLWhvc3QvcGlpeDogRGVmaW5lIGFuZCB1c2UgdGhlIFBJ
-SVggSVJRIFJvdXRlIENvbnRyb2wgUmVnaXN0ZXJzKQoxNi8yMCBDaGVja2luZyBjb21taXQgNmUw
-Y2U0OWM2ZmI2IChody9wY2ktaG9zdC9waWl4OiBNb3ZlIGk0NDBGWCBkZWNsYXJhdGlvbnMgdG8g
-aHcvcGNpLWhvc3QvaTQ0MGZ4LmgpCldBUk5JTkc6IGFkZGVkLCBtb3ZlZCBvciBkZWxldGVkIGZp
-bGUocyksIGRvZXMgTUFJTlRBSU5FUlMgbmVlZCB1cGRhdGluZz8KIzk5OiAKbmV3IGZpbGUgbW9k
-ZSAxMDA2NDQKCnRvdGFsOiAwIGVycm9ycywgMSB3YXJuaW5ncywgMTAxIGxpbmVzIGNoZWNrZWQK
-ClBhdGNoIDE2LzIwIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBv
-ZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFp
-bnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCjE3LzIwIENoZWNraW5nIGNv
-bW1pdCAyM2Q0M2QwM2QwNTcgKGh3L3BjaS1ob3N0L3BpaXg6IEZpeCBjb2RlIHN0eWxlIGlzc3Vl
-cykKMTgvMjAgQ2hlY2tpbmcgY29tbWl0IDEyOTRiN2M5NjFkMyAoaHcvcGNpLWhvc3QvcGlpeDog
-RXh0cmFjdCBQSUlYMyBmdW5jdGlvbnMgdG8gaHcvaXNhL3BpaXgzLmMpCldBUk5JTkc6IGFkZGVk
-LCBtb3ZlZCBvciBkZWxldGVkIGZpbGUocyksIGRvZXMgTUFJTlRBSU5FUlMgbmVlZCB1cGRhdGlu
-Zz8KIzY2OiAKbmV3IGZpbGUgbW9kZSAxMDA2NDQKCkVSUk9SOiBzcGFjZXMgcmVxdWlyZWQgYXJv
-dW5kIHRoYXQgJyonIChjdHg6VnhWKQojMzE1OiBGSUxFOiBody9pc2EvcGlpeDMuYzoyNDU6Cisg
-ICAgLnN1YnNlY3Rpb25zID0gKGNvbnN0IFZNU3RhdGVEZXNjcmlwdGlvbipbXSkgewogICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBeCgp0b3RhbDogMSBlcnJvcnMs
-IDEgd2FybmluZ3MsIDkzNyBsaW5lcyBjaGVja2VkCgpQYXRjaCAxOC8yMCBoYXMgc3R5bGUgcHJv
-YmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBw
-b3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGlu
-IE1BSU5UQUlORVJTLgoKMTkvMjAgQ2hlY2tpbmcgY29tbWl0IDcxN2EwYTQ3Zjg5YSAoaHcvcGNp
-LWhvc3Q6IFJlbmFtZSBpbmNvcnJlY3RseSBuYW1lZCAncGlpeCcgYXMgJ2k0NDBmeCcpCldBUk5J
-Tkc6IGFkZGVkLCBtb3ZlZCBvciBkZWxldGVkIGZpbGUocyksIGRvZXMgTUFJTlRBSU5FUlMgbmVl
-ZCB1cGRhdGluZz8KIzcwOiAKcmVuYW1lIGZyb20gaHcvcGNpLWhvc3QvcGlpeC5jCgp0b3RhbDog
-MCBlcnJvcnMsIDEgd2FybmluZ3MsIDMyIGxpbmVzIGNoZWNrZWQKClBhdGNoIDE5LzIwIGhhcyBz
-dHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJl
-IGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNL
-UEFUQ0ggaW4gTUFJTlRBSU5FUlMuCjIwLzIwIENoZWNraW5nIGNvbW1pdCAxZjg0ZjEwM2M5YjIg
-KGh3L3BjaS1ob3N0L2k0NDBmeDogUmVtb3ZlIHRoZSBsYXN0IFBJSVgzIHRyYWNlcykKPT09IE9V
-VFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKClRoZSBmdWxs
-IGxvZyBpcyBhdmFpbGFibGUgYXQKaHR0cDovL3BhdGNoZXcub3JnL2xvZ3MvMjAxOTEwMTgxMzQ3
-NTQuMTYzNjItMS1waGlsbWRAcmVkaGF0LmNvbS90ZXN0aW5nLmNoZWNrcGF0Y2gvP3R5cGU9bWVz
-c2FnZS4KLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHBz
-Oi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRl
-dmVsQHJlZGhhdC5jb20=
+Am Thu, 17 Oct 2019 14:29:05 +0100
+schrieb Peter Maydell <peter.maydell@linaro.org>:
 
+> Switch the mcf5208 code away from bottom-half based ptimers to
+> the new transaction-based ptimer API.  This just requires adding
+> begin/commit calls around the various places that modify the ptimer
+> state, and using the new ptimer_init() function to create the timer.
+> 
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> ---
+>  hw/m68k/mcf5208.c | 9 +++++----
+>  1 file changed, 5 insertions(+), 4 deletions(-)
+
+This patch seems to work fine.
+
+Tested-by: Thomas Huth <huth@tuxfamily.org>
 
