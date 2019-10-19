@@ -2,91 +2,95 @@ Return-Path: <SRS0=F+Q9=YM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BF5A0CA9EAC
-	for <qemu-devel@archiver.kernel.org>; Sat, 19 Oct 2019 15:22:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 425C1CA9EAB
+	for <qemu-devel@archiver.kernel.org>; Sat, 19 Oct 2019 15:24:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8DD30222BD
-	for <qemu-devel@archiver.kernel.org>; Sat, 19 Oct 2019 15:22:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0D6CD222BD
+	for <qemu-devel@archiver.kernel.org>; Sat, 19 Oct 2019 15:24:20 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Kbe6W6Hm"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8DD30222BD
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ldxqJHeu"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0D6CD222BD
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56637 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56664 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iLqZ1-0003Vc-MO
-	for qemu-devel@archiver.kernel.org; Sat, 19 Oct 2019 11:22:43 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45751)
+	id 1iLqaY-0005kA-VQ
+	for qemu-devel@archiver.kernel.org; Sat, 19 Oct 2019 11:24:19 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46490)
  by lists.gnu.org with esmtp (Exim 4.90_1)
  (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1iLqNy-0001KA-SS
- for qemu-devel@nongnu.org; Sat, 19 Oct 2019 11:11:20 -0400
+ id 1iLqZF-0004PP-Vr
+ for qemu-devel@nongnu.org; Sat, 19 Oct 2019 11:22:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
  (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1iLqNw-00077H-VN
- for qemu-devel@nongnu.org; Sat, 19 Oct 2019 11:11:18 -0400
-Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:43872)
+ id 1iLqZE-0004gQ-IQ
+ for qemu-devel@nongnu.org; Sat, 19 Oct 2019 11:22:57 -0400
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:43956)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1iLqNw-00075w-Fp
- for qemu-devel@nongnu.org; Sat, 19 Oct 2019 11:11:16 -0400
-Received: by mail-wr1-x441.google.com with SMTP id c2so3948662wrr.10
- for <qemu-devel@nongnu.org>; Sat, 19 Oct 2019 08:11:16 -0700 (PDT)
+ id 1iLqZE-0004fo-BP
+ for qemu-devel@nongnu.org; Sat, 19 Oct 2019 11:22:56 -0400
+Received: by mail-wr1-x442.google.com with SMTP id c2so3967679wrr.10
+ for <qemu-devel@nongnu.org>; Sat, 19 Oct 2019 08:22:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=IrxCFtZN7IWMU6h2qOEBlnQRpVoXjxguCXHm8vL6MOI=;
- b=Kbe6W6HmdS+fWJQDjRBnkcyA22Z71off/MNopVmr33yzT/vr3VDiUEChO9R4faNU2w
- foK9Eu+onYZw9llsLkml6R7KJuWYyFZRxk1s427pStiv29LQ6tB8VC1QDu06W9obpF42
- KwTQKEZkIc7bnl2aA+C5Czt9Z48Ga/sY89gxNJsq7fx8hpwUbCvWbxvDRccHgI4Uum6l
- M/fZQTh6qgQCGiTrgtV4Mh7SDZ1fQ6DTc9SjbqGcCMwhsWo9+ArfW6Yd2WfTGw/6+Oco
- qFEqmsdrISx0JagmVcUfgb9+gV9uGjdjXgjAi1SXOO24avsZOQRWn7JeixrrtpRVoCpQ
- 2Riw==
+ h=sender:subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=pKp5LIfFO72lH7LZCj9kR6HteTkZAhFNV7prdXzOlWM=;
+ b=ldxqJHeuaNN7+YlU2kMnGCkcdHmjrY4qnO48KYC++INsfVFAmVnJcU1GHi0Nd9f76T
+ vPrAQ4fae4a9xQu5DnPpwCMlxxA7+PV4X5OX89sT9108ul1NrPuQ4mZfbM8qAmEDOofr
+ 5/LNac5qBdNj5B8+h32kWobLKJWzwkP1EKfekvj55PtGzqqXfCiu4qXqYhAalGQXtBu1
+ nVxoYntvadZW83gQicndSZ/hYekD3YoG8m7u9fyJyvKhw8sv6aFVx7fZwZ3B1OF/PWPc
+ iKWK7A3B3oUyclrX7nfKyj8y5r6ETmT9JlyxmZtSnIAceMJQcfVDs/V6dq4cNBJMfO8q
+ U+oQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
- :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=IrxCFtZN7IWMU6h2qOEBlnQRpVoXjxguCXHm8vL6MOI=;
- b=EiteRxy4YqjfgxN+QdMRzkFu9RzzU+PvEDtgfEV1OfjJTL6t8euhY5h3fF04SEWMvF
- azVFqBnUu/bo3qGq2DrMoQ7OaDyoNjUwbjDQXdf3SbIAnZ4A851X/JPSgGVhISm94vQe
- Y2FmFU+hUiJM+h8yY1+d/WF8QdMqe3cA7mWWrDbOHbvWvsUTgoSL5MEO+jLEBiw70Ika
- pCS6wTGG9TpCV4Ny5oJfL1JNX1amUAYnFXX3lbc6SeZ1FUFfRoJbJ0V6XOe4C/KpLM4B
- Hwu3n4nWe0NOeZ6CrfIA1Yd2LS3aRXhFqM6QHrlL54IH26m/xoD6S0eGQnfOVTk2Ey+T
- nmJQ==
-X-Gm-Message-State: APjAAAWsEggzHszBy4CtAGOHbkoeNuYOqggc2PnqX8WtYVn2x4BJtoVU
- 5jITIkn49raC8+wm3oxxxjQKbvnS
-X-Google-Smtp-Source: APXvYqzIqkc1+/1rmHXfLUTaYeNF7Q9ko6dkLFDuG0FA2P7sMdWLUgTSnjjbc/wfrniQRBJAeItUow==
-X-Received: by 2002:adf:a506:: with SMTP id i6mr11985631wrb.159.1571497874934; 
- Sat, 19 Oct 2019 08:11:14 -0700 (PDT)
-Received: from x1w.redhat.com (14.red-88-21-201.staticip.rima-tde.net.
+ h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=pKp5LIfFO72lH7LZCj9kR6HteTkZAhFNV7prdXzOlWM=;
+ b=U2cOdMr+xtE/Z8tVsgutipDENs97xg9bFLTu4vENZ7NlFJB62+zi+DI/8wWgEsP5er
+ fAiy/rSwQwqB1T3OKqD/9A/kyBd83//GGJLPrNaa2Y9r7Z3etqQ4MKbJQcOW1Yd1nU6C
+ GKEAmdbCnNXxUsttRphbz/sV64JNdljvzRG4QTH1XP35GM+h42uhgAiJScLv8W13a94l
+ KmS/aJbwgy3mB7h7Dc8q6EgIRsMEKsi3YfLIYqG2aDNnQ0jiCwCN6Jlz6KHBVvPSRKwQ
+ FoV0EFMUbNusTE02pX4H4TGILIBn4ezlueVDslSIR+PhNdcIW0Rkzfq6eBON3syOng4E
+ dTvw==
+X-Gm-Message-State: APjAAAVLkDCnphORUUEXuuIG6fvJcTIgd+BX8DqRrbDVV/FpzOlQRNvD
+ 331+JBOCuume0xlECWt6fQg=
+X-Google-Smtp-Source: APXvYqx6O2WT34D+UITlBeedUzfs+xf5uJzp5VIHvaMis7BnwDWrCEy8LdtApQd0zYZnG2uIDg5AoA==
+X-Received: by 2002:a5d:6992:: with SMTP id g18mr12957485wru.237.1571498575080; 
+ Sat, 19 Oct 2019 08:22:55 -0700 (PDT)
+Received: from [192.168.1.36] (14.red-88-21-201.staticip.rima-tde.net.
  [88.21.201.14])
- by smtp.gmail.com with ESMTPSA id t13sm10753964wra.70.2019.10.19.08.11.13
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sat, 19 Oct 2019 08:11:14 -0700 (PDT)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-To: qemu-devel@nongnu.org
-Subject: [PATCH 10/11] tests/ssh_linux_malta: Refactor how to get image/kernel
- info
-Date: Sat, 19 Oct 2019 17:10:57 +0200
-Message-Id: <20191019151058.31733-11-f4bug@amsat.org>
-X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20191019151058.31733-1-f4bug@amsat.org>
-References: <20191019151058.31733-1-f4bug@amsat.org>
+ by smtp.gmail.com with ESMTPSA id q66sm9782097wme.39.2019.10.19.08.22.53
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Sat, 19 Oct 2019 08:22:54 -0700 (PDT)
+Subject: Re: [PATCH v2 20/20] hw/pci-host/i440fx: Remove the last PIIX3 traces
+To: Aleksandar Markovic <aleksandar.m.mail@gmail.com>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+References: <20191018134754.16362-1-philmd@redhat.com>
+ <20191018134754.16362-21-philmd@redhat.com>
+ <CAL1e-=gHBfvchVaAbus+GVaSVUFyae41iCB3i5HGhyLTvOr2Ew@mail.gmail.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <d98cad41-2e7e-e36d-9b1e-e1293c2197fc@amsat.org>
+Date: Sat, 19 Oct 2019 17:22:52 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <CAL1e-=gHBfvchVaAbus+GVaSVUFyae41iCB3i5HGhyLTvOr2Ew@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::441
+X-Received-From: 2a00:1450:4864:20::442
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,153 +102,157 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Eduardo Habkost <ehabkost@redhat.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
- Aleksandar Markovic <amarkovic@wavecomp.com>, Cleber Rosa <crosa@redhat.com>,
+Cc: Stefano Stabellini <sstabellini@kernel.org>,
+ Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>,
+ Paul Durrant <paul@xen.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>,
+ Aleksandar Markovic <amarkovic@wavecomp.com>,
+ Igor Mammedov <imammedo@redhat.com>,
+ Anthony Perard <anthony.perard@citrix.com>,
+ "xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>,
  Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
- Aurelien Jarno <aurelien@aurel32.net>
+ Aurelien Jarno <aurelien@aurel32.net>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The qcow and kernel images use a similar pattern regarding they
-are for big/little endianess, or 32/64 bit.
-Refactor using more dictionary keys.
+Hi Aleksandar,
 
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
----
- tests/acceptance/linux_ssh_mips_malta.py | 75 ++++++++++++++----------
- 1 file changed, 44 insertions(+), 31 deletions(-)
+On 10/18/19 7:04 PM, Aleksandar Markovic wrote:
+> 
+> 
+> On Friday, October 18, 2019, Philippe Mathieu-Daudé <philmd@redhat.com 
+> <mailto:philmd@redhat.com>> wrote:
+> 
+>     The PIIX3 is not tied to the i440FX and can even be used without it.
+>     Move its creation to the machine code (pc_piix.c).
+>     We have now removed the last trace of southbridge code in the i440FX
+>     northbridge.
+> 
+>     Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com
+>     <mailto:philmd@redhat.com>>
+>     ---
+>       hw/i386/pc_piix.c            | 8 +++++++-
+>       hw/pci-host/i440fx.c         | 8 --------
+>       include/hw/pci-host/i440fx.h | 3 +--
+>       3 files changed, 8 insertions(+), 11 deletions(-)
+> 
+> 
+> Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com 
+> <mailto:amarkovic@wavecomp.com>>
+> 
+> Philippe, I don't have any test equipment available at the moment, did 
+> you do some smoke tests with new v2 of the series (like booting a Malta 
+> board, or other relevant scenario)?
 
-diff --git a/tests/acceptance/linux_ssh_mips_malta.py b/tests/acceptance/linux_ssh_mips_malta.py
-index 822b0553ff..2139c80f5f 100644
---- a/tests/acceptance/linux_ssh_mips_malta.py
-+++ b/tests/acceptance/linux_ssh_mips_malta.py
-@@ -26,15 +26,44 @@ class LinuxSSH(Test):
-     KERNEL_COMMON_COMMAND_LINE = 'printk.time=0 '
-     VM_IP = '127.0.0.1'
- 
-+    BASE_URL = 'https://people.debian.org/~aurel32/qemu/'
-     IMAGE_INFO = {
--        'be': {'image_url': ('https://people.debian.org/~aurel32/qemu/mips/'
--                             'debian_wheezy_mips_standard.qcow2'),
--               'image_hash': '8987a63270df67345b2135a6b7a4885a35e392d5'},
--        'le': {'image_url': ('https://people.debian.org/~aurel32/qemu/mipsel/'
--                             'debian_wheezy_mipsel_standard.qcow2'),
--               'image_hash': '7866764d9de3ef536ffca24c9fb9f04ffdb45802'}
-+        'be': {'base_url': 'mips',
-+               'image_name': 'debian_wheezy_mips_standard.qcow2',
-+               'image_hash': '8987a63270df67345b2135a6b7a4885a35e392d5',
-+               'kernel_hash': {
-+                   32: '592e384a4edc16dade52a6cd5c785c637bcbc9ad',
-+                   64: 'db6eea7de35d36c77d8c165b6bcb222e16eb91db'}
-+              },
-+        'le': {'base_url': 'mipsel',
-+               'image_name': 'debian_wheezy_mipsel_standard.qcow2',
-+               'image_hash': '7866764d9de3ef536ffca24c9fb9f04ffdb45802',
-+               'kernel_hash': {
-+                   32: 'a66bea5a8adaa2cb3d36a1d4e0ccdb01be8f6c2a',
-+                   64: '6a7f77245acf231415a0e8b725d91ed2f3487794'}
-+              }
-+        }
-+    CPU_INFO = {
-+        32: {'kernel_release': '3.2.0-4-4kc-malta'},
-+        64: {'kernel_release': '3.2.0-4-5kc-malta'}
-         }
- 
-+    def get_url(self, endianess, path=''):
-+        qkey = {'le': 'el', 'be': ''}
-+        return '%s/mips%s/%s' % (self.BASE_URL, qkey[endianess], path)
-+
-+    def get_image_info(self, endianess):
-+        dinfo = self.IMAGE_INFO[endianess]
-+        image_url = self.get_url(endianess, dinfo['image_name'])
-+        image_hash = dinfo['image_hash']
-+        return (image_url, image_hash)
-+
-+    def get_kernel_info(self, endianess, wordsize):
-+        minfo = self.CPU_INFO[wordsize]
-+        kernel_url = self.get_url(endianess,
-+                                  'vmlinux-%s' % minfo['kernel_release'])
-+        kernel_hash = self.IMAGE_INFO[endianess]['kernel_hash'][wordsize]
-+        return kernel_url, kernel_hash
- 
-     @skipUnless(ssh.SSH_CLIENT_BINARY, 'No SSH client available')
-     @skipUnless(os.getenv('AVOCADO_TIMEOUT_EXPECTED'), 'Test might timeout')
-@@ -79,8 +108,7 @@ class LinuxSSH(Test):
-         return stdout_lines, stderr_lines
- 
-     def boot_debian_wheezy_image_and_ssh_login(self, endianess, kernel_path):
--        image_url = self.IMAGE_INFO[endianess]['image_url']
--        image_hash = self.IMAGE_INFO[endianess]['image_hash']
-+        image_url, image_hash = self.get_image_info(endianess)
-         image_path = self.fetch_asset(image_url, asset_hash=image_hash)
- 
-         self.vm.set_machine('malta')
-@@ -172,7 +200,10 @@ class LinuxSSH(Test):
-             'md5sum /dev/mtd2ro',
-             '0dfbe8aa4c20b52e1b8bf3cb6cbdf193')
- 
--    def check_mips_malta(self, endianess, kernel_path, uname_m):
-+    def check_mips_malta(self, uname_m, endianess):
-+        wordsize = 64 if '64' in uname_m else 32
-+        kernel_url, kernel_hash = self.get_kernel_info(endianess, wordsize)
-+        kernel_path = self.fetch_asset(kernel_url, asset_hash=kernel_hash)
-         self.boot_debian_wheezy_image_and_ssh_login(endianess, kernel_path)
- 
-         stdout, _ = self.ssh_command('uname -a')
-@@ -188,12 +219,7 @@ class LinuxSSH(Test):
-         :avocado: tags=endian:big
-         :avocado: tags=device:pcnet32
-         """
--        kernel_url = ('https://people.debian.org/~aurel32/qemu/mips/'
--                      'vmlinux-3.2.0-4-4kc-malta')
--        kernel_hash = '592e384a4edc16dade52a6cd5c785c637bcbc9ad'
--        kernel_path = self.fetch_asset(kernel_url, asset_hash=kernel_hash)
--
--        self.check_mips_malta('be', kernel_path, 'mips')
-+        self.check_mips_malta('mips', 'be')
- 
-     def test_mips_malta32el_kernel3_2_0(self):
-         """
-@@ -202,12 +228,7 @@ class LinuxSSH(Test):
-         :avocado: tags=endian:little
-         :avocado: tags=device:pcnet32
-         """
--        kernel_url = ('https://people.debian.org/~aurel32/qemu/mipsel/'
--                      'vmlinux-3.2.0-4-4kc-malta')
--        kernel_hash = 'a66bea5a8adaa2cb3d36a1d4e0ccdb01be8f6c2a'
--        kernel_path = self.fetch_asset(kernel_url, asset_hash=kernel_hash)
--
--        self.check_mips_malta('le', kernel_path, 'mips')
-+        self.check_mips_malta('mips', 'le')
- 
-     def test_mips_malta64eb_kernel3_2_0(self):
-         """
-@@ -216,11 +237,7 @@ class LinuxSSH(Test):
-         :avocado: tags=endian:big
-         :avocado: tags=device:pcnet32
-         """
--        kernel_url = ('https://people.debian.org/~aurel32/qemu/mips/'
--                      'vmlinux-3.2.0-4-5kc-malta')
--        kernel_hash = 'db6eea7de35d36c77d8c165b6bcb222e16eb91db'
--        kernel_path = self.fetch_asset(kernel_url, asset_hash=kernel_hash)
--        self.check_mips_malta('be', kernel_path, 'mips64')
-+        self.check_mips_malta('mips64', 'be')
- 
-     def test_mips_malta64el_kernel3_2_0(self):
-         """
-@@ -229,8 +246,4 @@ class LinuxSSH(Test):
-         :avocado: tags=endian:little
-         :avocado: tags=device:pcnet32
-         """
--        kernel_url = ('https://people.debian.org/~aurel32/qemu/mipsel/'
--                      'vmlinux-3.2.0-4-5kc-malta')
--        kernel_hash = '6a7f77245acf231415a0e8b725d91ed2f3487794'
--        kernel_path = self.fetch_asset(kernel_url, asset_hash=kernel_hash)
--        self.check_mips_malta('le', kernel_path, 'mips64')
-+        self.check_mips_malta('mips64', 'le')
--- 
-2.21.0
+This series pass all 32-bit Avocado tests, and if you apply
+"tests/acceptance: Fix 64-bit MIPS target tests" I just sent [*],
+all the tests pass.
 
+AVOCADO_TIMEOUT_EXPECTED=1 avocado \
+   --show=app,ssh,console \
+   run \
+   -t arch:mipsel -t arch:mips -t arch:mips64el -t arch:mips64 \
+   tests/acceptance/
+
+[*] mid.mail-archive.com/20191019151058.31733-1-f4bug@amsat.org
+
+> Veuillez agréer, Monsieur Philippe, l'assurance de mon parfaite 
+> considération.
+
+Merci ;)
+
+> Aleksandar
+> 
+>     diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
+>     index 11b8de049f..f6e7196a82 100644
+>     --- a/hw/i386/pc_piix.c
+>     +++ b/hw/i386/pc_piix.c
+>     @@ -199,14 +199,20 @@ static void pc_init1(MachineState *machine,
+>           }
+> 
+>           if (pcmc->pci_enabled) {
+>     +        PIIX3State *piix3;
+>     +
+>               pci_bus = i440fx_init(host_type,
+>                                     pci_type,
+>     -                              &i440fx_state, &piix3_devfn,
+>     &isa_bus, pcms->gsi,
+>     +                              &i440fx_state,
+>                                     system_memory, system_io,
+>     machine->ram_size,
+>                                     pcms->below_4g_mem_size,
+>                                     pcms->above_4g_mem_size,
+>                                     pci_memory, ram_memory);
+>               pcms->bus = pci_bus;
+>     +
+>     +        piix3 = piix3_create(pci_bus, &isa_bus);
+>     +        piix3->pic = pcms->gsi;
+>     +        piix3_devfn = piix3->dev.devfn;
+>           } else {
+>               pci_bus = NULL;
+>               i440fx_state = NULL;
+>     diff --git a/hw/pci-host/i440fx.c b/hw/pci-host/i440fx.c
+>     index 79ecd58a2b..f27131102d 100644
+>     --- a/hw/pci-host/i440fx.c
+>     +++ b/hw/pci-host/i440fx.c
+>     @@ -27,7 +27,6 @@
+>       #include "hw/pci/pci.h"
+>       #include "hw/pci/pci_host.h"
+>       #include "hw/pci-host/i440fx.h"
+>     -#include "hw/southbridge/piix.h"
+>       #include "hw/qdev-properties.h"
+>       #include "hw/sysbus.h"
+>       #include "qapi/error.h"
+>     @@ -272,8 +271,6 @@ static void i440fx_realize(PCIDevice *dev, Error
+>     **errp)
+> 
+>       PCIBus *i440fx_init(const char *host_type, const char *pci_type,
+>                           PCII440FXState **pi440fx_state,
+>     -                    int *piix3_devfn,
+>     -                    ISABus **isa_bus, qemu_irq *pic,
+>                           MemoryRegion *address_space_mem,
+>                           MemoryRegion *address_space_io,
+>                           ram_addr_t ram_size,
+>     @@ -286,7 +283,6 @@ PCIBus *i440fx_init(const char *host_type, const
+>     char *pci_type,
+>           PCIBus *b;
+>           PCIDevice *d;
+>           PCIHostState *s;
+>     -    PIIX3State *piix3;
+>           PCII440FXState *f;
+>           unsigned i;
+>           I440FXState *i440fx;
+>     @@ -339,10 +335,6 @@ PCIBus *i440fx_init(const char *host_type,
+>     const char *pci_type,
+>                        PAM_EXPAN_SIZE);
+>           }
+> 
+>     -    piix3 = piix3_create(b, isa_bus);
+>     -    piix3->pic = pic;
+>     -    *piix3_devfn = piix3->dev.devfn;
+>     -
+>           ram_size = ram_size / 8 / 1024 / 1024;
+>           if (ram_size > 255) {
+>               ram_size = 255;
+>     diff --git a/include/hw/pci-host/i440fx.h b/include/hw/pci-host/i440fx.h
+>     index e327f9bf87..f54e6466e4 100644
+>     --- a/include/hw/pci-host/i440fx.h
+>     +++ b/include/hw/pci-host/i440fx.h
+>     @@ -22,8 +22,7 @@ typedef struct PCII440FXState PCII440FXState;
+>       #define TYPE_IGD_PASSTHROUGH_I440FX_PCI_DEVICE
+>     "igd-passthrough-i440FX"
+> 
+>       PCIBus *i440fx_init(const char *host_type, const char *pci_type,
+>     -                    PCII440FXState **pi440fx_state, int *piix_devfn,
+>     -                    ISABus **isa_bus, qemu_irq *pic,
+>     +                    PCII440FXState **pi440fx_state,
+>                           MemoryRegion *address_space_mem,
+>                           MemoryRegion *address_space_io,
+>                           ram_addr_t ram_size,
+>     -- 
+>     2.21.0
+> 
+> 
 
