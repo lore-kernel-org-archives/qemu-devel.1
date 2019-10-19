@@ -8,77 +8,77 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E1E0CA9EAC
-	for <qemu-devel@archiver.kernel.org>; Sat, 19 Oct 2019 15:52:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1FFBACA9EAB
+	for <qemu-devel@archiver.kernel.org>; Sat, 19 Oct 2019 15:53:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 485FB21925
-	for <qemu-devel@archiver.kernel.org>; Sat, 19 Oct 2019 15:52:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E32D721925
+	for <qemu-devel@archiver.kernel.org>; Sat, 19 Oct 2019 15:53:15 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jaA5KH52"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 485FB21925
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="b3Q+/OFt"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E32D721925
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57430 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57435 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iLr25-00034o-5h
-	for qemu-devel@archiver.kernel.org; Sat, 19 Oct 2019 11:52:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48922)
+	id 1iLr2Y-0003mj-SI
+	for qemu-devel@archiver.kernel.org; Sat, 19 Oct 2019 11:53:14 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48899)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <aleksandar.m.mail@gmail.com>) id 1iLr0V-0001wl-3K
- for qemu-devel@nongnu.org; Sat, 19 Oct 2019 11:51:08 -0400
+ (envelope-from <aleksandar.m.mail@gmail.com>) id 1iLr08-0001Zp-4Y
+ for qemu-devel@nongnu.org; Sat, 19 Oct 2019 11:50:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aleksandar.m.mail@gmail.com>) id 1iLr0U-0003my-1d
- for qemu-devel@nongnu.org; Sat, 19 Oct 2019 11:51:07 -0400
-Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:34218)
+ (envelope-from <aleksandar.m.mail@gmail.com>) id 1iLr06-0003cL-Qi
+ for qemu-devel@nongnu.org; Sat, 19 Oct 2019 11:50:44 -0400
+Received: from mail-oi1-x241.google.com ([2607:f8b0:4864:20::241]:38371)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
- id 1iLr0T-0003m9-P8
- for qemu-devel@nongnu.org; Sat, 19 Oct 2019 11:51:05 -0400
-Received: by mail-ot1-x342.google.com with SMTP id m19so7561709otp.1
- for <qemu-devel@nongnu.org>; Sat, 19 Oct 2019 08:51:04 -0700 (PDT)
+ id 1iLr06-0003cF-LT
+ for qemu-devel@nongnu.org; Sat, 19 Oct 2019 11:50:42 -0400
+Received: by mail-oi1-x241.google.com with SMTP id d140so3399957oib.5
+ for <qemu-devel@nongnu.org>; Sat, 19 Oct 2019 08:50:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=mime-version:in-reply-to:references:from:date:message-id:subject:to
- :cc; bh=4ItKQVWZu6nJ0t/d3+CFdPWYbQyOtjqoxx1KzN3wEt8=;
- b=jaA5KH52tsIN5zguws+MYw9Z4rQvvKV4dbxwo49Ni2v3bzjZiQsaviX+3FH5TXErA5
- +ZMoTORM4iVcMgtKF6LP7Q4g5Q37v27Jtx3uQfdV3Ptbqq7c1V5hRbqANaop92ExJkSZ
- UAUXN3Qznn4a73c7gU1PyrW2Xe9bxXctkNo90lfUo/aWNRzYJuyZd3KtEgkWEmOlUVQJ
- EY+4ebw7nVaOJBWPSRr4xKF6GlNBNO9j0CRbQ+ZDcyfvzJoQqZaBtD4x1reo7D2XgKDG
- ja87S5qHcCFYxnShYsgTCscQgReLquL2CeGp+PlypH+7Li6Q8vyI4wRMYCefbxDCfxsu
- OO+g==
+ :cc; bh=Vp0nySnYUjEDYRGvqDuCiKgcnjpgHeMd55ERJNAxMk0=;
+ b=b3Q+/OFtizYbPTwc8zCm4mmSMmHpfPNioKGzfYuZpo3MebtU6ZfdcpB3qCJK6PmDF7
+ 3wBsG/IAM0oxbT/iow8icPDOwS9teu9E6/CRaRUxCp6PutQEB7CK5NcBHoYnd4cWthsP
+ GNQeyKEz/ExOvcZsiEQSpxZwuUN2l+Jn1ewGgiw7dx5MzpEeg31Se5pU4jqL0pQKeG8o
+ LfL3HO7aOa3NhTrvAVYRfb5BuI0/F/zCHUqPTZD7eVSHyyN9xqas4sAgOyzJWQjEB1lv
+ 48YMheTNkbS7XrAKMhTjxNLJ48v8A5tnNvne/iMTm4tPISvL0fVQ1e2mfKUz/EX/AP+z
+ QRIw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:in-reply-to:references:from:date
  :message-id:subject:to:cc;
- bh=4ItKQVWZu6nJ0t/d3+CFdPWYbQyOtjqoxx1KzN3wEt8=;
- b=DIbewkiubSMAq8GeWLpQhI7jALKNCQFb2dqJQb1Sa+ZNm85aLBRCwxk7n3rJTGdZi5
- iRkNVK1mQ1T+VKthAgZaQmFcFRHu9LHevZsoFKdai/+l4wht23fYD58eOjPsyTePvvPF
- QkrqPwoSE+sCKlDdnd5CtVCfIL9VRohmvBMG2Nmv0MQ+N0uIC2q87wxcLpEw1L5XNGwf
- OIFDSDbVSvPJHaRzJ8OHei3SwVtm4oUc9tDWYlfPeC0XW6zeHDpHImUkLsQH0BhTSkIW
- JfSRAXTs/VhsPKEWRls4kksIUSWv0oeYTUcTJB+TyQoOqfn7w2BkMz7gF3JKFsGDWaK4
- O+Tg==
-X-Gm-Message-State: APjAAAWMOdEc8wD5BLT3cIQtjOzUTx0V8xPozW8826awaMaJu9KJlUR+
- RmqC//71XyWTwAUoneYB4qOVFGxz1KoAAXSw3pQ=
-X-Google-Smtp-Source: APXvYqyucmEaAX/URE1AYVhO0YhAmPWLK6bgd52bsGx/FGZQB6qrjL1EADhDwQuPTUPf/oL6oi4YQBHhttNxUKBX4WE=
-X-Received: by 2002:a9d:5914:: with SMTP id t20mr11954525oth.306.1571500263353; 
- Sat, 19 Oct 2019 08:51:03 -0700 (PDT)
+ bh=Vp0nySnYUjEDYRGvqDuCiKgcnjpgHeMd55ERJNAxMk0=;
+ b=mq3GGu9Hhb6sy/WfLv6svl8T+9gR9gUzHghvFnveTF0ssVvMpO7nyM8qr970QbCN6N
+ UXvAIfIj1cMVDTV+ydIosfPsOw/5wtCxlts3iyOhcqBa+m9K8LqDBLxysRwaGnYbhNiJ
+ kRYkuj+w8I8uETzc3v6tso/vcxGGifaKeNn4a98Gr/pbAWGji8lfyqJTjrtXeFRVAhU0
+ HaGC2J+veL0UVSpMrTttqByBqQLuwIeUR7GVyHi7t30DjStj0F2sYxyf1FzGqhIthyjX
+ gKqi5q4pn9wGwfgMn5Adty1ij2xMm/iabARnWHBNy9MknThSSy2dNlhdvJaBZA8CaxHq
+ +uLA==
+X-Gm-Message-State: APjAAAWorLXSFVFLHmtU9agsXwdjzvpAa1HAdPiruLAWbIgQ+ZjursS8
+ YesYSQkCqECbT/IR2KIg8ZZ1vVgnC9mgabIM8YI=
+X-Google-Smtp-Source: APXvYqxtOFuI4Q010eJeOYvykqVFBliN7QxahjJ3YvSN2a4CSzirrF32x6P/Q0CxebVhhyR83BgcAhWqXSe2r0wfucw=
+X-Received: by 2002:aca:4d12:: with SMTP id a18mr11916627oib.79.1571500241908; 
+ Sat, 19 Oct 2019 08:50:41 -0700 (PDT)
 MIME-Version: 1.0
-Received: by 2002:a9d:340a:0:0:0:0:0 with HTTP; Sat, 19 Oct 2019 08:51:03
+Received: by 2002:a9d:340a:0:0:0:0:0 with HTTP; Sat, 19 Oct 2019 08:50:41
  -0700 (PDT)
-In-Reply-To: <20191019153437.9820-9-f4bug@amsat.org>
+In-Reply-To: <20191019153437.9820-12-f4bug@amsat.org>
 References: <20191019153437.9820-1-f4bug@amsat.org>
- <20191019153437.9820-9-f4bug@amsat.org>
+ <20191019153437.9820-12-f4bug@amsat.org>
 From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
-Date: Sat, 19 Oct 2019 17:51:03 +0200
-Message-ID: <CAL1e-=hWwmSBTZW5SRs7TzxEtyUFu-gep9-zfptZOn1c0vXZ0g@mail.gmail.com>
-Subject: Re: [PATCH v2 08/11] tests/ssh_linux_malta: Remove duplicated test
+Date: Sat, 19 Oct 2019 17:50:41 +0200
+Message-ID: <CAL1e-=gBnztxV95V_BM5-7roLwr=TPrRmYizqi+YX2PbanwrAw@mail.gmail.com>
+Subject: Re: [PATCH v2 11/11] tests/ssh_linux_malta: Fix 64-bit target tests
 To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
-Content-Type: multipart/alternative; boundary="000000000000f632650595456a67"
+Content-Type: multipart/alternative; boundary="000000000000aef78305954569ad"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::342
+X-Received-From: 2607:f8b0:4864:20::241
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,7 +99,7 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---000000000000f632650595456a67
+--000000000000aef78305954569ad
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
@@ -107,13 +107,17 @@ On Saturday, October 19, 2019, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org=
 >
 wrote:
 
-> Remove duplicated test (probably copy/paste error in
-> commit 9090d3332cdcc).
+> Commit 9090d3332cdcc added tests for specific to the 32-bit
+> machines, which inadvertently make the 64-bit tests failing.
+> Now than we have this information available in the CPU_INFO
+> array, use it to have the 64-bit tests back.
 >
 > Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 > ---
->  tests/acceptance/linux_ssh_mips_malta.py | 3 ---
->  1 file changed, 3 deletions(-)
+> v2: do not include Aleksandar Rikalo mailmap change
+> ---
+>  tests/acceptance/linux_ssh_mips_malta.py | 12 ++++++------
+>  1 file changed, 6 insertions(+), 6 deletions(-)
 >
 >
 Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
@@ -121,41 +125,76 @@ Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 
 > diff --git a/tests/acceptance/linux_ssh_mips_malta.py
 > b/tests/acceptance/linux_ssh_mips_malta.py
-> index 27907e8fbd..5523ae2144 100644
+> index 2139c80f5f..fc13f9e4d4 100644
 > --- a/tests/acceptance/linux_ssh_mips_malta.py
 > +++ b/tests/acceptance/linux_ssh_mips_malta.py
-> @@ -140,9 +140,6 @@ class LinuxSSH(Test):
+> @@ -44,8 +44,8 @@ class LinuxSSH(Test):
+>                }
+>          }
+>      CPU_INFO =3D {
+> -        32: {'kernel_release': '3.2.0-4-4kc-malta'},
+> -        64: {'kernel_release': '3.2.0-4-5kc-malta'}
+> +        32: {'cpu': 'MIPS 24Kc', 'kernel_release': '3.2.0-4-4kc-malta'},
+> +        64: {'cpu': 'MIPS 20Kc', 'kernel_release': '3.2.0-4-5kc-malta'}
+>          }
+>
+>      def get_url(self, endianess, path=3D''):
+> @@ -143,16 +143,16 @@ class LinuxSSH(Test):
+>          else:
+>              self.fail('"%s" output does not contain "%s"' % (cmd, exp))
+>
+> -    def run_common_commands(self):
+> +    def run_common_commands(self, wordsize):
+>          self.ssh_command_output_contains(
+>              'cat /proc/cpuinfo',
+> -            '24Kc')
+> +            self.CPU_INFO[wordsize]['cpu'])
+>          self.ssh_command_output_contains(
+>              'uname -m',
+>              'mips')
+>          self.ssh_command_output_contains(
+>              'uname -r',
+> -            '3.2.0-4-4kc-malta')
+> +            self.CPU_INFO[wordsize]['kernel_release'])
 >          self.ssh_command_output_contains(
 >              'cat /proc/interrupts',
->              'eth0')
-> -        self.ssh_command_output_contains(
-> -            'cat /proc/interrupts',
-> -            'eth0')
->          self.ssh_command_output_contains(
->              'cat /proc/devices',
->              'input')
+>              'XT-PIC  timer')
+> @@ -209,7 +209,7 @@ class LinuxSSH(Test):
+>          stdout, _ =3D self.ssh_command('uname -a')
+>          self.assertIn(True, [uname_m + " GNU/Linux" in line for line in
+> stdout])
+>
+> -        self.run_common_commands()
+> +        self.run_common_commands(wordsize)
+>          self.shutdown_via_ssh()
+>
+>      def test_mips_malta32eb_kernel3_2_0(self):
 > --
 > 2.21.0
 >
 >
 >
 
---000000000000f632650595456a67
+--000000000000aef78305954569ad
 Content-Type: text/html; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
 <br><br>On Saturday, October 19, 2019, Philippe Mathieu-Daud=C3=A9 &lt;<a h=
 ref=3D"mailto:f4bug@amsat.org">f4bug@amsat.org</a>&gt; wrote:<br><blockquot=
 e class=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;border-left:1px #ccc sol=
-id;padding-left:1ex">Remove duplicated test (probably copy/paste error in<b=
-r>
-commit 9090d3332cdcc).<br>
+id;padding-left:1ex">Commit 9090d3332cdcc added tests for specific to the 3=
+2-bit<br>
+machines, which inadvertently make the 64-bit tests failing.<br>
+Now than we have this information available in the CPU_INFO<br>
+array, use it to have the 64-bit tests back.<br>
 <br>
 Signed-off-by: Philippe Mathieu-Daud=C3=A9 &lt;<a href=3D"mailto:f4bug@amsa=
 t.org">f4bug@amsat.org</a>&gt;<br>
 ---<br>
-=C2=A0tests/acceptance/linux_ssh_<wbr>mips_malta.py | 3 ---<br>
-=C2=A01 file changed, 3 deletions(-)<br>
+v2: do not include Aleksandar Rikalo mailmap change<br>
+---<br>
+=C2=A0tests/acceptance/linux_ssh_<wbr>mips_malta.py | 12 ++++++------<br>
+=C2=A01 file changed, 6 insertions(+), 6 deletions(-)<br>
 <br></blockquote><div><br></div><div><span style=3D"color:rgb(34,34,34);fon=
 t-size:14px;line-height:22.1200008392334px">Reviewed-by: Aleksandar Markovi=
 c &lt;</span><a href=3D"mailto:amarkovic@wavecomp.com" style=3D"font-size:1=
@@ -165,29 +204,70 @@ c &lt;</span><a href=3D"mailto:amarkovic@wavecomp.com" style=3D"font-size:1=
 =3D"margin:0 0 0 .8ex;border-left:1px #ccc solid;padding-left:1ex">
 diff --git a/tests/acceptance/linux_ssh_<wbr>mips_malta.py b/tests/acceptan=
 ce/linux_ssh_<wbr>mips_malta.py<br>
-index 27907e8fbd..5523ae2144 100644<br>
+index 2139c80f5f..fc13f9e4d4 100644<br>
 --- a/tests/acceptance/linux_ssh_<wbr>mips_malta.py<br>
 +++ b/tests/acceptance/linux_ssh_<wbr>mips_malta.py<br>
-@@ -140,9 +140,6 @@ class LinuxSSH(Test):<br>
+@@ -44,8 +44,8 @@ class LinuxSSH(Test):<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0}<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0}<br>
+=C2=A0 =C2=A0 =C2=A0CPU_INFO =3D {<br>
+-=C2=A0 =C2=A0 =C2=A0 =C2=A0 32: {&#39;kernel_release&#39;: &#39;3.2.0-4-4k=
+c-malta&#39;},<br>
+-=C2=A0 =C2=A0 =C2=A0 =C2=A0 64: {&#39;kernel_release&#39;: &#39;3.2.0-4-5k=
+c-malta&#39;}<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 32: {&#39;cpu&#39;: &#39;MIPS 24Kc&#39;, &#39;=
+kernel_release&#39;: &#39;3.2.0-4-4kc-malta&#39;},<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 64: {&#39;cpu&#39;: &#39;MIPS 20Kc&#39;, &#39;=
+kernel_release&#39;: &#39;3.2.0-4-5kc-malta&#39;}<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0}<br>
+<br>
+=C2=A0 =C2=A0 =C2=A0def get_url(self, endianess, path=3D&#39;&#39;):<br>
+@@ -143,16 +143,16 @@ class LinuxSSH(Test):<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0else:<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0self.fail(&#39;&quot;%s&quo=
+t; output does not contain &quot;%s&quot;&#39; % (cmd, exp))<br>
+<br>
+-=C2=A0 =C2=A0 def run_common_commands(self):<br>
++=C2=A0 =C2=A0 def run_common_commands(self, wordsize):<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0self.ssh_command_output_<wbr>contains(<br=
+>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0&#39;cat /proc/cpuinfo&#39;=
+,<br>
+-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 &#39;24Kc&#39;)<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 self.CPU_INFO[wordsize][&#39;cpu=
+&#39;]<wbr>)<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0self.ssh_command_output_<wbr>contains(<br=
+>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0&#39;uname -m&#39;,<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0&#39;mips&#39;)<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0self.ssh_command_output_<wbr>contains(<br=
+>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0&#39;uname -r&#39;,<br>
+-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 &#39;3.2.0-4-4kc-malta&#39;)<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 self.CPU_INFO[wordsize][&#39;<wb=
+r>kernel_release&#39;])<br>
 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0self.ssh_command_output_<wbr>contains(<br=
 >
 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0&#39;cat /proc/interrupts&#=
 39;,<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0&#39;eth0&#39;)<br>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0 self.ssh_command_output_<wbr>contains(<br>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 &#39;cat /proc/interrupts&#39;,<=
-br>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 &#39;eth0&#39;)<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0self.ssh_command_output_<wbr>contains(<br=
->
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0&#39;cat /proc/devices&#39;=
-,<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0&#39;input&#39;)<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0&#39;XT-PIC=C2=A0 timer&#39=
+;)<br>
+@@ -209,7 +209,7 @@ class LinuxSSH(Test):<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0stdout, _ =3D self.ssh_command(&#39;uname=
+ -a&#39;)<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0self.assertIn(True, [uname_m + &quot; GNU=
+/Linux&quot; in line for line in stdout])<br>
+<br>
+-=C2=A0 =C2=A0 =C2=A0 =C2=A0 self.run_common_commands()<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 self.run_common_commands(<wbr>wordsize)<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0self.shutdown_via_ssh()<br>
+<br>
+=C2=A0 =C2=A0 =C2=A0def test_mips_malta32eb_kernel3_2_<wbr>0(self):<br>
 -- <br>
 2.21.0<br>
 <br>
 <br>
 </blockquote>
 
---000000000000f632650595456a67--
+--000000000000aef78305954569ad--
 
