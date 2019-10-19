@@ -2,87 +2,90 @@ Return-Path: <SRS0=F+Q9=YM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-14.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8F8F5CA9EAC
-	for <qemu-devel@archiver.kernel.org>; Sat, 19 Oct 2019 23:49:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 51D74CA9EAC
+	for <qemu-devel@archiver.kernel.org>; Sat, 19 Oct 2019 23:49:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 554E720820
-	for <qemu-devel@archiver.kernel.org>; Sat, 19 Oct 2019 23:49:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1FC0020820
+	for <qemu-devel@archiver.kernel.org>; Sat, 19 Oct 2019 23:49:15 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aSOCS5Oo"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 554E720820
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VNkiDQlK"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1FC0020820
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42116 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42120 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iLyT7-0001hM-NL
-	for qemu-devel@archiver.kernel.org; Sat, 19 Oct 2019 19:49:09 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34416)
+	id 1iLyTB-0001mj-T2
+	for qemu-devel@archiver.kernel.org; Sat, 19 Oct 2019 19:49:13 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34431)
  by lists.gnu.org with esmtp (Exim 4.90_1)
  (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1iLyRN-0008SU-Qz
- for qemu-devel@nongnu.org; Sat, 19 Oct 2019 19:47:23 -0400
+ id 1iLyRP-0008SY-2z
+ for qemu-devel@nongnu.org; Sat, 19 Oct 2019 19:47:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
  (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1iLyRM-0005T4-8P
- for qemu-devel@nongnu.org; Sat, 19 Oct 2019 19:47:21 -0400
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:37044)
+ id 1iLyRN-0005Th-Hx
+ for qemu-devel@nongnu.org; Sat, 19 Oct 2019 19:47:23 -0400
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:41605)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1iLyRM-0005Sf-0N; Sat, 19 Oct 2019 19:47:20 -0400
-Received: by mail-wr1-x443.google.com with SMTP id e11so1154492wrv.4;
- Sat, 19 Oct 2019 16:47:19 -0700 (PDT)
+ id 1iLyRN-0005TC-B8; Sat, 19 Oct 2019 19:47:21 -0400
+Received: by mail-wr1-x442.google.com with SMTP id p4so9863026wrm.8;
+ Sat, 19 Oct 2019 16:47:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=S1Bv5ZADtudIK2ckQmSIBf7nainSPHA/IK2m+tVYRJY=;
- b=aSOCS5Oo17NjIycLdhbIShZFmWY1mLyfM3OkGYGxu5ivna9vtDu5qkQBtOKL91AFxs
- NYIN6nKDOROYX9UzOYLcY93KeHMpAE5GHZMwkmF5ys07RG6PdmyRZ+bycQ3EXoYk3Xm6
- dNdThf3H2qeAMYPerXmAplOEVoh0Upe/iyPxbyObg3hE5ChQAaMgdtWXgV/lUdRjn08T
- z4dBYlpKONL2eVX8mAaz47LQwZCf0Z+vtYrLSEqSbcR5EK5+wee7XHH+Xb+v/DctSRLT
- TzKcFnVc8pHGykekhBI1zAXHY0CK0LwzVrUcRSGZG0tCbK/m9yMEgPpcET2Fv3wc/4LJ
- AjrA==
+ h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=nOKNgWomZ9lXuw/D4odL98GxIJfJYjVtBJTZV5RcceI=;
+ b=VNkiDQlKDwkYqAIQOJN1QERDdWHXI9l2RRngztlUPvL+ZknRouJ6JBWN7eO/wTYdRH
+ gtUjVJ3ln+StsqnrTIPv1rvxkNGmyc6SaqWE91Y2Vi96cklbjlU0ndSu2mBWJ5kP8LTn
+ hrJCfnYpEozuDt6CPVatfgBmLOSJGofLREqMsDl0Qilz50on0VL6uwgvuOJTT6V4yUa/
+ xhdqVP9HKYRl/NEpVH4jXzZ+o7D6hWkHQw+T2NsHuS42oAfEUI+ctlubJtg2C0S0D5I4
+ FDuUg95EsTkL6GRLlCcR130y8vC8tIEh9hTRydZweUkZ3WSERnJgu8W4CwgZ623/JI+D
+ JX1A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
- :mime-version:content-transfer-encoding;
- bh=S1Bv5ZADtudIK2ckQmSIBf7nainSPHA/IK2m+tVYRJY=;
- b=V0FQscq188ZuFR5cVlQFqDFYBE6TjQVOAk370wis6TTAnCyjCewU63nTpL29bRcv13
- gF5t84wFMuFi++1F1Sa8yC0Ch9SXjclBEmtQXxFo4Kurn09XrUdf9WOEZP+8C8G44wsV
- h/12YEB4CKjKnVgsNZAebS3tJidSmZWOBIBPnvGudvessRWpvMX2Xrbw1QZ3BIWPKiIg
- CqHOndKXbi+1g9yVBiD7wLw60AL49nyMy4Z1sYlXLNyUmSb/Rt8kFJP//SOKpFOnk07k
- IGW8bcaZMjt8i3MYV8be5FmdKfAx24jNEs4jULhYFSxhFT+Sw1oW2HBq1MTzknPClW+V
- ZGfA==
-X-Gm-Message-State: APjAAAU38wNNJp2hrPzgr4OL+h/VY15pmB/itZjURZGt3hnMzTDBjlkh
- ROuGNpwEo/gy4yGSHg8CFmxFox+y
-X-Google-Smtp-Source: APXvYqwTK2KJgvQdmVBK69k+bjXHu25Yne39oYMDoQCSYWZc0PxhOq1FRrcHphNnBAK+AAMtaQ09Pw==
-X-Received: by 2002:a5d:538e:: with SMTP id d14mr10975826wrv.86.1571528838381; 
- Sat, 19 Oct 2019 16:47:18 -0700 (PDT)
+ :in-reply-to:references:mime-version:content-transfer-encoding;
+ bh=nOKNgWomZ9lXuw/D4odL98GxIJfJYjVtBJTZV5RcceI=;
+ b=TN3t5KDtP7nSAXuNwhxYDFktkL6Lq6evBa+Wr0Qq7TbIw1BXS5xLEuG0dH0+MBUyrj
+ JCX51s9Bd9YusbpB4g0VPOcdYBg7urtHnS8QeIZctk9gurkhbqEKJ2G3A4iV4igg82Kw
+ ZRJTgPYRUeCTwTPnL9dery7lf+v1nVgHl/Rd21IHgHuj0bPeGV7vM35s/TYcegvoH5nU
+ fSeqa5fOt9nl3nsCuUGrqhE/3i8FaCKZvWdZvceakSflacdo3Sryem9hxiP2T3s1v9+4
+ dnjSrstZ/pjA3kMVaTgjDZKqNeqr3Z8dp0vqpW3WUy6wunjgIcHllYDFwq7V5ex8asuw
+ y5RA==
+X-Gm-Message-State: APjAAAVAKvRXaKA5nj8q7UrDorE+cjwXa4WVwWAU35+ud4tyFt+fvxgj
+ hgZ1K1mWqGqlOIgd+VIXjQosniFL
+X-Google-Smtp-Source: APXvYqw9VXMpT/HVWXxv9tl6LUTuXascJP8p/cMJH+JCdo9jXLStX3cNDs9QL3SbshbtjVuOKCetzQ==
+X-Received: by 2002:adf:a4ce:: with SMTP id h14mr1411068wrb.263.1571528840035; 
+ Sat, 19 Oct 2019 16:47:20 -0700 (PDT)
 Received: from x1w.redhat.com (14.red-88-21-201.staticip.rima-tde.net.
  [88.21.201.14])
- by smtp.gmail.com with ESMTPSA id u1sm10433763wrp.56.2019.10.19.16.47.15
+ by smtp.gmail.com with ESMTPSA id u1sm10433763wrp.56.2019.10.19.16.47.18
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sat, 19 Oct 2019 16:47:17 -0700 (PDT)
+ Sat, 19 Oct 2019 16:47:19 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v3 00/16] hw/arm/raspi: Add thermal/timer,
- improve address space, run U-boot
-Date: Sun, 20 Oct 2019 01:46:59 +0200
-Message-Id: <20191019234715.25750-1-f4bug@amsat.org>
+Subject: [PATCH v3 01/16] hw/misc/bcm2835_thermal: Add a dummy BCM2835 thermal
+ sensor
+Date: Sun, 20 Oct 2019 01:47:00 +0200
+Message-Id: <20191019234715.25750-2-f4bug@amsat.org>
 X-Mailer: git-send-email 2.21.0
+In-Reply-To: <20191019234715.25750-1-f4bug@amsat.org>
+References: <20191019234715.25750-1-f4bug@amsat.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::443
+X-Received-From: 2a00:1450:4864:20::442
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -110,97 +113,220 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Since v2:
-- fixed issue in videocore address space
-- allow to start with some cores OFF (to boot firmwares)
-- add proof-of-concept test for '-smp cores=1' and U-boot
-- fixed my email setup
+We will soon implement the SYS_timer. This timer is used by Linux
+in the thermal subsystem, so once available, the subsystem will be
+enabled and poll the temperature sensors. We need to provide the
+minimum required to keep Linux booting.
 
-Previous cover:
+Add a dummy thermal sensor returning ~25°C based on:
+https://github.com/raspberrypi/linux/blob/rpi-5.3.y/drivers/thermal/broadcom/bcm2835_thermal.c
 
-Hi,
+Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+---
+v2:
+- Explicit g_assert_not_reached() with comment (Alex)
+- Add vmstate and reset handler (Peter)
 
-Some patches from v1 are already merged. This v2 addresses the
-review comment from v1, and add patches to clean the memory
-space when using multiple cores.
+checkpatch warning:
+WARNING: added, moved or deleted file(s), does MAINTAINERS need updating?
+This is OK because the regex are:
 
-Laurent, if you test U-Boot with this patchset again, do you mind
-replying with a "Tested-by:" tag?
-
-The next patchset is probably about the interrupt controller blocks,
-then will come another one about the MBox/Properties.
-
-The last patch is unrelated to the series, but since I cleaned this
-for the raspi and the highbank is the only board with the same issue,
-I included the patch in this series.
-
-Please review.
-
-Regards,
-
-Phil.
-
-$ git backport-diff -u v2
-001/16:[----] [--] 'hw/misc/bcm2835_thermal: Add a dummy BCM2835 thermal sensor'
-002/16:[----] [--] 'hw/arm/bcm2835_peripherals: Use the thermal sensor block'
-003/16:[----] [--] 'hw/timer/bcm2835: Add the BCM2835 SYS_timer'
-004/16:[----] [--] 'hw/arm/bcm2835_peripherals: Use the SYS_timer'
-005/16:[----] [--] 'hw/arm/bcm2836: Make the SoC code modular'
-006/16:[down] 'hw/arm/bcm2836: Rename cpus[] as cpu[].core'
-007/16:[0053] [FC] 'hw/arm/bcm2836: Use per CPU address spaces'
-008/16:[down] 'hw/arm/bcm2835_peripherals: Add const link property in realize()'
-009/16:[0105] [FC] 'hw/arm/bcm2836: Create VideoCore address space in the SoC'
-010/16:[----] [--] 'hw/arm/raspi: Use AddressSpace when using arm_boot::write_secondary_boot'
-011/16:[down] 'hw/arm/raspi: Use -smp cores=<N> option to restrict enabled cores'
-012/16:[down] 'hw/arm/bcm2836: Rename enabled_cpus -> enabled_cores'
-013/16:[----] [-C] 'hw/arm/raspi: Make the board code modular'
-014/16:[----] [--] 'hw/arm/highbank: Use AddressSpace when using write_secondary_boot()'
-015/16:[down] 'python/qemu/machine: Allow to use other serial consoles than default'
-016/16:[down] 'NOTFORMERGE tests/acceptance: Test U-boot on the Raspberry Pi 3'
-
-v2: https://lists.gnu.org/archive/html/qemu-devel/2019-10/msg04474.html
-
-Philippe Mathieu-Daudé (16):
-  hw/misc/bcm2835_thermal: Add a dummy BCM2835 thermal sensor
-  hw/arm/bcm2835_peripherals: Use the thermal sensor block
-  hw/timer/bcm2835: Add the BCM2835 SYS_timer
-  hw/arm/bcm2835_peripherals: Use the SYS_timer
-  hw/arm/bcm2836: Make the SoC code modular
-  hw/arm/bcm2836: Rename cpus[] as cpu[].core
-  hw/arm/bcm2836: Use per CPU address spaces
-  hw/arm/bcm2835_peripherals: Add const link property in realize()
-  hw/arm/bcm2836: Create VideoCore address space in the SoC
-  hw/arm/raspi: Use AddressSpace when using
-    arm_boot::write_secondary_boot
-  hw/arm/raspi: Use -smp cores=<N> option to restrict enabled cores
-  hw/arm/bcm2836: Rename enabled_cpus -> enabled_cores
-  hw/arm/raspi: Make the board code modular
-  hw/arm/highbank: Use AddressSpace when using write_secondary_boot()
-  python/qemu/machine: Allow to use other serial consoles than default
-  NOTFORMERGE tests/acceptance: Test U-boot on the Raspberry Pi 3
-
- hw/arm/bcm2835_peripherals.c           |  76 +++++++----
- hw/arm/bcm2836.c                       | 119 ++++++++++++++----
- hw/arm/highbank.c                      |   3 +-
- hw/arm/raspi.c                         | 127 +++++++++++++++----
- hw/misc/Makefile.objs                  |   1 +
- hw/misc/bcm2835_thermal.c              | 135 ++++++++++++++++++++
- hw/timer/Makefile.objs                 |   1 +
- hw/timer/bcm2835_systmr.c              | 166 +++++++++++++++++++++++++
- hw/timer/trace-events                  |   5 +
- include/hw/arm/bcm2835_peripherals.h   |   9 +-
- include/hw/arm/bcm2836.h               |  17 ++-
- include/hw/arm/raspi_platform.h        |   1 +
- include/hw/misc/bcm2835_thermal.h      |  27 ++++
- include/hw/timer/bcm2835_systmr.h      |  33 +++++
- python/qemu/machine.py                 |   9 +-
- tests/acceptance/boot_linux_console.py |  23 ++++
- 16 files changed, 671 insertions(+), 81 deletions(-)
+  F: hw/*/bcm283*
+  F: include/hw/*/bcm283*
+---
+ hw/misc/Makefile.objs             |   1 +
+ hw/misc/bcm2835_thermal.c         | 135 ++++++++++++++++++++++++++++++
+ include/hw/misc/bcm2835_thermal.h |  27 ++++++
+ 3 files changed, 163 insertions(+)
  create mode 100644 hw/misc/bcm2835_thermal.c
- create mode 100644 hw/timer/bcm2835_systmr.c
  create mode 100644 include/hw/misc/bcm2835_thermal.h
- create mode 100644 include/hw/timer/bcm2835_systmr.h
 
+diff --git a/hw/misc/Makefile.objs b/hw/misc/Makefile.objs
+index a150680966..c89f3816a5 100644
+--- a/hw/misc/Makefile.objs
++++ b/hw/misc/Makefile.objs
+@@ -53,6 +53,7 @@ common-obj-$(CONFIG_OMAP) += omap_tap.o
+ common-obj-$(CONFIG_RASPI) += bcm2835_mbox.o
+ common-obj-$(CONFIG_RASPI) += bcm2835_property.o
+ common-obj-$(CONFIG_RASPI) += bcm2835_rng.o
++common-obj-$(CONFIG_RASPI) += bcm2835_thermal.o
+ common-obj-$(CONFIG_SLAVIO) += slavio_misc.o
+ common-obj-$(CONFIG_ZYNQ) += zynq_slcr.o
+ common-obj-$(CONFIG_ZYNQ) += zynq-xadc.o
+diff --git a/hw/misc/bcm2835_thermal.c b/hw/misc/bcm2835_thermal.c
+new file mode 100644
+index 0000000000..c6f3b1ad60
+--- /dev/null
++++ b/hw/misc/bcm2835_thermal.c
+@@ -0,0 +1,135 @@
++/*
++ * BCM2835 dummy thermal sensor
++ *
++ * Copyright (C) 2019 Philippe Mathieu-Daudé <f4bug@amsat.org>
++ *
++ * SPDX-License-Identifier: GPL-2.0-or-later
++ */
++
++#include "qemu/osdep.h"
++#include "qemu/log.h"
++#include "qapi/error.h"
++#include "hw/misc/bcm2835_thermal.h"
++#include "hw/registerfields.h"
++#include "migration/vmstate.h"
++
++REG32(CTL, 0)
++FIELD(CTL, POWER_DOWN, 0, 1)
++FIELD(CTL, RESET, 1, 1)
++FIELD(CTL, BANDGAP_CTRL, 2, 3)
++FIELD(CTL, INTERRUPT_ENABLE, 5, 1)
++FIELD(CTL, DIRECT, 6, 1)
++FIELD(CTL, INTERRUPT_CLEAR, 7, 1)
++FIELD(CTL, HOLD, 8, 10)
++FIELD(CTL, RESET_DELAY, 18, 8)
++FIELD(CTL, REGULATOR_ENABLE, 26, 1)
++
++REG32(STAT, 4)
++FIELD(STAT, DATA, 0, 10)
++FIELD(STAT, VALID, 10, 1)
++FIELD(STAT, INTERRUPT, 11, 1)
++
++#define THERMAL_OFFSET_C 412
++#define THERMAL_COEFF  (-0.538f)
++
++static uint16_t bcm2835_thermal_temp2adc(int temp_C)
++{
++    return (temp_C - THERMAL_OFFSET_C) / THERMAL_COEFF;
++}
++
++static uint64_t bcm2835_thermal_read(void *opaque, hwaddr addr, unsigned size)
++{
++    Bcm2835ThermalState *s = BCM2835_THERMAL(opaque);
++    uint32_t val = 0;
++
++    switch (addr) {
++    case A_CTL:
++        val = s->ctl;
++        break;
++    case A_STAT:
++        /* Temperature is constantly 25°C. */
++        val = FIELD_DP32(bcm2835_thermal_temp2adc(25), STAT, VALID, true);
++        break;
++    default:
++        /* MemoryRegionOps are aligned, so this can not happen. */
++        g_assert_not_reached();
++    }
++    return val;
++}
++
++static void bcm2835_thermal_write(void *opaque, hwaddr addr,
++                                  uint64_t value, unsigned size)
++{
++    Bcm2835ThermalState *s = BCM2835_THERMAL(opaque);
++
++    switch (addr) {
++    case A_CTL:
++        s->ctl = value;
++        break;
++    case A_STAT:
++        qemu_log_mask(LOG_GUEST_ERROR, "%s: write 0x%" PRIx64
++                                       " to 0x%" HWADDR_PRIx "\n",
++                       __func__, value, addr);
++        break;
++    default:
++        /* MemoryRegionOps are aligned, so this can not happen. */
++        g_assert_not_reached();
++    }
++}
++
++static const MemoryRegionOps bcm2835_thermal_ops = {
++    .read = bcm2835_thermal_read,
++    .write = bcm2835_thermal_write,
++    .impl.max_access_size = 4,
++    .valid.min_access_size = 4,
++    .endianness = DEVICE_NATIVE_ENDIAN,
++};
++
++static void bcm2835_thermal_reset(DeviceState *dev)
++{
++    Bcm2835ThermalState *s = BCM2835_THERMAL(dev);
++
++    s->ctl = 0;
++}
++
++static void bcm2835_thermal_realize(DeviceState *dev, Error **errp)
++{
++    Bcm2835ThermalState *s = BCM2835_THERMAL(dev);
++
++    memory_region_init_io(&s->iomem, OBJECT(s), &bcm2835_thermal_ops,
++                          s, TYPE_BCM2835_THERMAL, 8);
++    sysbus_init_mmio(SYS_BUS_DEVICE(s), &s->iomem);
++}
++
++static const VMStateDescription bcm2835_thermal_vmstate = {
++    .name = "bcm2835_thermal",
++    .version_id = 1,
++    .minimum_version_id = 1,
++    .fields = (VMStateField[]) {
++        VMSTATE_UINT32(ctl, Bcm2835ThermalState),
++        VMSTATE_END_OF_LIST()
++    }
++};
++
++static void bcm2835_thermal_class_init(ObjectClass *klass, void *data)
++{
++    DeviceClass *dc = DEVICE_CLASS(klass);
++
++    dc->realize = bcm2835_thermal_realize;
++    dc->reset = bcm2835_thermal_reset;
++    dc->vmsd = &bcm2835_thermal_vmstate;
++}
++
++static const TypeInfo bcm2835_thermal_info = {
++    .name = TYPE_BCM2835_THERMAL,
++    .parent = TYPE_SYS_BUS_DEVICE,
++    .instance_size = sizeof(Bcm2835ThermalState),
++    .class_init = bcm2835_thermal_class_init,
++};
++
++static void bcm2835_thermal_register_types(void)
++{
++    type_register_static(&bcm2835_thermal_info);
++}
++
++type_init(bcm2835_thermal_register_types)
+diff --git a/include/hw/misc/bcm2835_thermal.h b/include/hw/misc/bcm2835_thermal.h
+new file mode 100644
+index 0000000000..c3651b27ec
+--- /dev/null
++++ b/include/hw/misc/bcm2835_thermal.h
+@@ -0,0 +1,27 @@
++/*
++ * BCM2835 dummy thermal sensor
++ *
++ * Copyright (C) 2019 Philippe Mathieu-Daudé <f4bug@amsat.org>
++ *
++ * SPDX-License-Identifier: GPL-2.0-or-later
++ */
++
++#ifndef HW_MISC_BCM2835_THERMAL_H
++#define HW_MISC_BCM2835_THERMAL_H
++
++#include "hw/sysbus.h"
++
++#define TYPE_BCM2835_THERMAL "bcm2835-thermal"
++
++#define BCM2835_THERMAL(obj) \
++    OBJECT_CHECK(Bcm2835ThermalState, (obj), TYPE_BCM2835_THERMAL)
++
++typedef struct {
++    /*< private >*/
++    SysBusDevice parent_obj;
++    /*< public >*/
++    MemoryRegion iomem;
++    uint32_t ctl;
++} Bcm2835ThermalState;
++
++#endif
 -- 
 2.21.0
 
