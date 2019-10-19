@@ -7,75 +7,75 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C949CA9EAC
-	for <qemu-devel@archiver.kernel.org>; Sat, 19 Oct 2019 15:16:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 56D9FCA9EAC
+	for <qemu-devel@archiver.kernel.org>; Sat, 19 Oct 2019 15:16:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EAD642064A
-	for <qemu-devel@archiver.kernel.org>; Sat, 19 Oct 2019 15:16:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 24CF32064A
+	for <qemu-devel@archiver.kernel.org>; Sat, 19 Oct 2019 15:16:24 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="abiqNl25"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EAD642064A
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="uznfB4XJ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 24CF32064A
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56572 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56576 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iLqSq-0006KU-Ry
-	for qemu-devel@archiver.kernel.org; Sat, 19 Oct 2019 11:16:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45651)
+	id 1iLqSs-0006Oq-MD
+	for qemu-devel@archiver.kernel.org; Sat, 19 Oct 2019 11:16:22 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45717)
  by lists.gnu.org with esmtp (Exim 4.90_1)
  (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1iLqNn-0001BW-S2
- for qemu-devel@nongnu.org; Sat, 19 Oct 2019 11:11:09 -0400
+ id 1iLqNv-0001Gl-6R
+ for qemu-devel@nongnu.org; Sat, 19 Oct 2019 11:11:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
  (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1iLqNm-0006wZ-Dz
- for qemu-devel@nongnu.org; Sat, 19 Oct 2019 11:11:07 -0400
-Received: from mail-wm1-x329.google.com ([2a00:1450:4864:20::329]:35006)
+ id 1iLqNt-00073v-En
+ for qemu-devel@nongnu.org; Sat, 19 Oct 2019 11:11:15 -0400
+Received: from mail-wr1-x429.google.com ([2a00:1450:4864:20::429]:40887)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1iLqNl-0006tx-UH
- for qemu-devel@nongnu.org; Sat, 19 Oct 2019 11:11:06 -0400
-Received: by mail-wm1-x329.google.com with SMTP id 14so2069870wmu.0
- for <qemu-devel@nongnu.org>; Sat, 19 Oct 2019 08:11:03 -0700 (PDT)
+ id 1iLqNt-00071v-5R
+ for qemu-devel@nongnu.org; Sat, 19 Oct 2019 11:11:13 -0400
+Received: by mail-wr1-x429.google.com with SMTP id o28so9193399wro.7
+ for <qemu-devel@nongnu.org>; Sat, 19 Oct 2019 08:11:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=w2ENnodrkebcANajyxBbU6bIiMWLNySDu9Cotb19W1w=;
- b=abiqNl25RX3y8Pe4qxEujhmQkC+ZRwdCye23N7LWvU7tmXrmB0M3G361o3KHxWL0aO
- RYGBRMf7GzoVpYblyASAOmM/zz9xX8YA0JhlLOAodBMnJOwCdbI9uE+rXdhD2kmpfaw9
- +mtNcfzyuKFe4hrrIVY5y8EZ2A+j75jI/59iwQL+HxUnxiTJClp1OAUX+X01jPt04Z7P
- W/LySH1AsU12XGEEmZLeKLZjW8LhnEltOeRWh6U8vPeETMjh1uNJFU6fGi+Ny/WGLOTn
- 0Cc6FKKYU1FJZbe+NnJILow3KO4Rhe7hymTs/DbtklF1EGNSROad7GTAwwAsbo1c9821
- 4aUg==
+ bh=8KsmRbilP8bTZKqxOfgUbDMH68hI/j6t6Vn/sO5YZF0=;
+ b=uznfB4XJD+NpZQv6j7m3WRlhlt5eDIhOdZEzz/XoSJGxlz02S0S73ZMhnsL+wlfw5B
+ A//UiretDOPWmb3xO8qPaw5VTj8GcPc1JLmCIvrdy9v+UFe4K7F+MF2WXQDxozhrLC0p
+ twJ+IKNoWChywO20NKuHwna5m6gyeHdEt3hd6GITncsrWptrEJ11BZbwF/8obZ/a/qww
+ O1upyNJkbugzmvDCcmWGHLOlLVg2ri5LSGU2gzub83Bl/DHazxhTlTsYM0n2ceEyMcFZ
+ 0iIRayUDRhCKO31/Omsadf8DfObXjE9mrb9lRgDS2UjcpagWsV98YDpkWYBFlTCOUF3w
+ u1hQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=w2ENnodrkebcANajyxBbU6bIiMWLNySDu9Cotb19W1w=;
- b=aTaR2olOqno7GfJPKRh857w1D7aLZ3KnBL9mf7UAnduKBmG8Vst5s3XEVCpmWvIVif
- W3K+a3t5h0URLlgpwLivyWpmsExO+lwuXY1kumant81Rg5qtfdKB+l4usttsSBX//bbg
- dtZC0BA2o2/g00zZsRCIjfuldCkztE9GajmPJfqgSWjaZgn8PNdXkDQk26MEDdYlaTo7
- 82odnNkXMnP3UCVFmToqPNta2wA9dtjFzjvhrClp9B/mk8RQCgteA9ez0ik6QB1Hgz6B
- DROy+sWyrRbtA3GO2wrFB4MHlzHHb2uWofcOaSEKWl0fGwoDH6T6mmZFukQC9wU2pvYc
- woVQ==
-X-Gm-Message-State: APjAAAXgWbHA/5TXa+P1cHV5H1TQ3vcZrQPIEMy3AicQBHL1U0BPF/cW
- +FBkClEFTB0avI94NuEWrAxNIUnA
-X-Google-Smtp-Source: APXvYqzO6IX/iBoc7c2OnYnAbmq6nBSOJ2X0MuUVnVsiO5/eolUNoSn98q6XfvGMhPOZQmnOL5714Q==
-X-Received: by 2002:a1c:7401:: with SMTP id p1mr6712090wmc.144.1571497862235; 
- Sat, 19 Oct 2019 08:11:02 -0700 (PDT)
+ bh=8KsmRbilP8bTZKqxOfgUbDMH68hI/j6t6Vn/sO5YZF0=;
+ b=c4fg28p/AkEGFD79pYlA8luI2Ydxu0y3kE8Ip8KsnsYETPI15PsbQuqxQxSGUwRqd+
+ nW/jCLB2L7aAKW7K4JnUElZg25i19DdV2Us5+lHagjMJUkQmFZZ1PUQamCXazSU9gTBJ
+ s+vzYcGkF6RsGN4Fx9L9j3fysrAVFhvxo2HPhboVu741Iyynx8WANYjs7o6g0cji382I
+ mRKyQz6nhyF46lcR+QZiwujfVxKglZQwAUlsO8gci3zSz5JJMmet0NUP7lPgeH0vDuiy
+ X5pTe1IgqoD1d28mMTHy1Qe+SNLNsE/6E7NFw83p3cAJMMZUOIrHV0yHrK42By/OiU4u
+ ppgQ==
+X-Gm-Message-State: APjAAAUpgUQYXo//VWuxsjmOqrhFD7/vO46FuNEumUXlDJe+d26CEdQE
+ 5l8lnsbzY/4yFcVn5Ae2Vcl7LZdj
+X-Google-Smtp-Source: APXvYqxFGrYIYyRQ9f/yO2mcZclEnvfgW0FnUoitnvbzAXWcjYb9PKWwr4f66Cb5/olfbTTtptghBA==
+X-Received: by 2002:adf:e80b:: with SMTP id o11mr12463828wrm.231.1571497870948; 
+ Sat, 19 Oct 2019 08:11:10 -0700 (PDT)
 Received: from x1w.redhat.com (14.red-88-21-201.staticip.rima-tde.net.
  [88.21.201.14])
- by smtp.gmail.com with ESMTPSA id t13sm10753964wra.70.2019.10.19.08.11.00
+ by smtp.gmail.com with ESMTPSA id t13sm10753964wra.70.2019.10.19.08.11.09
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sat, 19 Oct 2019 08:11:01 -0700 (PDT)
+ Sat, 19 Oct 2019 08:11:10 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 01/11] Acceptance tests: refactor wait_for_console_pattern
-Date: Sat, 19 Oct 2019 17:10:48 +0200
-Message-Id: <20191019151058.31733-2-f4bug@amsat.org>
+Subject: [PATCH 07/11] tests/ssh_linux_malta: Run tests using a snapshot image
+Date: Sat, 19 Oct 2019 17:10:54 +0200
+Message-Id: <20191019151058.31733-8-f4bug@amsat.org>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20191019151058.31733-1-f4bug@amsat.org>
 References: <20191019151058.31733-1-f4bug@amsat.org>
@@ -85,7 +85,7 @@ Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::329
+X-Received-From: 2a00:1450:4864:20::429
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,177 +98,36 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Eduardo Habkost <ehabkost@redhat.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
  Aleksandar Markovic <amarkovic@wavecomp.com>, Cleber Rosa <crosa@redhat.com>,
  Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
  Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Cleber Rosa <crosa@redhat.com>
+If a test fails, it can corrupt the underlying QCow2 image,
+making further tests failing.
+Fix this by running each test with a snapshot.
 
-The same utility method is already present in two different test
-files, so let's consolidate it into a single utility function.
-
-Signed-off-by: Cleber Rosa <crosa@redhat.com>
-Message-Id: <20190916164011.7653-1-crosa@redhat.com>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-[PMD: failure_message is optional]
-Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- tests/acceptance/avocado_qemu/__init__.py | 25 +++++++++++++++++++++
- tests/acceptance/boot_linux_console.py    | 27 +++++------------------
- tests/acceptance/linux_ssh_mips_malta.py  | 18 +++------------
- 3 files changed, 33 insertions(+), 37 deletions(-)
+ tests/acceptance/linux_ssh_mips_malta.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/tests/acceptance/avocado_qemu/__init__.py b/tests/acceptance/avocado_qemu/__init__.py
-index bd41e0443c..e3101cba30 100644
---- a/tests/acceptance/avocado_qemu/__init__.py
-+++ b/tests/acceptance/avocado_qemu/__init__.py
-@@ -8,6 +8,7 @@
- # This work is licensed under the terms of the GNU GPL, version 2 or
- # later.  See the COPYING file in the top-level directory.
- 
-+import logging
- import os
- import sys
- import uuid
-@@ -53,6 +54,30 @@ def pick_default_qemu_bin(arch=None):
-         return qemu_bin_from_src_dir_path
- 
- 
-+def wait_for_console_pattern(test, success_message, failure_message=None):
-+    """
-+    Waits for messages to appear on the console, while logging the content
-+
-+    :param test: an Avocado test containing a VM that will have its console
-+                 read and probed for a success or failure message
-+    :type test: :class:`avocado_qemu.Test`
-+    :param success_message: if this message appears, test succeeds
-+    :param failure_message: if this message appears, test fails
-+    """
-+    console = test.vm.console_socket.makefile()
-+    console_logger = logging.getLogger('console')
-+    while True:
-+        msg = console.readline().strip()
-+        if not msg:
-+            continue
-+        console_logger.debug(msg)
-+        if success_message in msg:
-+            break
-+        if failure_message and failure_message in msg:
-+            fail = 'Failure message found in console: %s' % failure_message
-+            test.fail(fail)
-+
-+
- class Test(avocado.Test):
-     def setUp(self):
-         self._vms = {}
-diff --git a/tests/acceptance/boot_linux_console.py b/tests/acceptance/boot_linux_console.py
-index 8a9a314ab4..8897e0c253 100644
---- a/tests/acceptance/boot_linux_console.py
-+++ b/tests/acceptance/boot_linux_console.py
-@@ -9,12 +9,12 @@
- # later.  See the COPYING file in the top-level directory.
- 
- import os
--import logging
- import lzma
- import gzip
- import shutil
- 
- from avocado_qemu import Test
-+from avocado_qemu import wait_for_console_pattern
- from avocado.utils import process
- from avocado.utils import archive
- 
-@@ -29,31 +29,14 @@ class BootLinuxConsole(Test):
- 
-     KERNEL_COMMON_COMMAND_LINE = 'printk.time=0 '
- 
--    def wait_for_console_pattern(self, success_message,
--                                 failure_message='Kernel panic - not syncing'):
--        """
--        Waits for messages to appear on the console, while logging the content
--
--        :param success_message: if this message appears, test succeeds
--        :param failure_message: if this message appears, test fails
--        """
--        console = self.vm.console_socket.makefile()
--        console_logger = logging.getLogger('console')
--        while True:
--            msg = console.readline().strip()
--            if not msg:
--                continue
--            console_logger.debug(msg)
--            if success_message in msg:
--                break
--            if failure_message in msg:
--                fail = 'Failure message found in console: %s' % failure_message
--                self.fail(fail)
-+    def wait_for_console_pattern(self, success_message):
-+        wait_for_console_pattern(self, success_message,
-+                                 failure_message='Kernel panic - not syncing')
- 
-     def exec_command_and_wait_for_pattern(self, command, success_message):
-         command += '\n'
-         self.vm.console_socket.sendall(command.encode())
--        self.wait_for_console_pattern(success_message)
-+        wait_for_console_pattern(self, success_message)
- 
-     def extract_from_deb(self, deb, path):
-         """
 diff --git a/tests/acceptance/linux_ssh_mips_malta.py b/tests/acceptance/linux_ssh_mips_malta.py
-index 25a1df5098..ffbb06f846 100644
+index ffbb06f846..27907e8fbd 100644
 --- a/tests/acceptance/linux_ssh_mips_malta.py
 +++ b/tests/acceptance/linux_ssh_mips_malta.py
-@@ -13,6 +13,7 @@ import time
- 
- from avocado import skipUnless
- from avocado_qemu import Test
-+from avocado_qemu import wait_for_console_pattern
- from avocado.utils import process
- from avocado.utils import archive
- from avocado.utils import ssh
-@@ -40,19 +41,6 @@ class LinuxSSH(Test):
-     def setUp(self):
-         super(LinuxSSH, self).setUp()
- 
--    def wait_for_console_pattern(self, success_message,
--                                 failure_message='Oops'):
--        console = self.vm.console_socket.makefile()
--        console_logger = logging.getLogger('console')
--        while True:
--            msg = console.readline()
--            console_logger.debug(msg.strip())
--            if success_message in msg:
--                break
--            if failure_message in msg:
--                fail = 'Failure message found in console: %s' % failure_message
--                self.fail(fail)
--
-     def get_portfwd(self):
-         res = self.vm.command('human-monitor-command',
-                               command_line='info usernet')
-@@ -109,7 +97,7 @@ class LinuxSSH(Test):
- 
-         self.log.info('VM launched, waiting for sshd')
-         console_pattern = 'Starting OpenBSD Secure Shell server: sshd'
--        self.wait_for_console_pattern(console_pattern)
-+        wait_for_console_pattern(self, console_pattern, 'Oops')
-         self.log.info('sshd ready')
- 
-         self.ssh_connect('root', 'root')
-@@ -117,7 +105,7 @@ class LinuxSSH(Test):
-     def shutdown_via_ssh(self):
-         self.ssh_command('poweroff')
-         self.ssh_disconnect_vm()
--        self.wait_for_console_pattern('Power down')
-+        wait_for_console_pattern(self, 'Power down', 'Oops')
- 
-     def ssh_command_output_contains(self, cmd, exp):
-         stdout, _ = self.ssh_command(cmd)
+@@ -90,7 +90,7 @@ class LinuxSSH(Test):
+         self.vm.add_args('-no-reboot',
+                          '-kernel', kernel_path,
+                          '-append', kernel_command_line,
+-                         '-hda', image_path,
++                         '-drive', 'file=%s,snapshot=on' % image_path,
+                          '-netdev', 'user,id=vnet,hostfwd=:127.0.0.1:0-:22',
+                          '-device', 'pcnet,netdev=vnet')
+         self.vm.launch()
 -- 
 2.21.0
 
