@@ -2,135 +2,63 @@ Return-Path: <SRS0=F+Q9=YM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_2 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9CF62CA9EAB
-	for <qemu-devel@archiver.kernel.org>; Sat, 19 Oct 2019 04:34:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CDA14CA9EAB
+	for <qemu-devel@archiver.kernel.org>; Sat, 19 Oct 2019 06:03:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 539D020872
-	for <qemu-devel@archiver.kernel.org>; Sat, 19 Oct 2019 04:34:35 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="iXmwC3PE";
-	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="TCTRX7WK"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 539D020872
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=wdc.com
+	by mail.kernel.org (Postfix) with ESMTPS id 8F63120854
+	for <qemu-devel@archiver.kernel.org>; Sat, 19 Oct 2019 06:03:46 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8F63120854
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48730 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49706 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iLgRm-0000I5-CL
-	for qemu-devel@archiver.kernel.org; Sat, 19 Oct 2019 00:34:34 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52254)
+	id 1iLhq5-0000h2-JU
+	for qemu-devel@archiver.kernel.org; Sat, 19 Oct 2019 02:03:45 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56648)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <prvs=188b0f19c=Anup.Patel@wdc.com>)
- id 1iLgQi-0008HA-Et
- for qemu-devel@nongnu.org; Sat, 19 Oct 2019 00:33:30 -0400
+ (envelope-from <groug@kaod.org>) id 1iLhp7-00009g-Nv
+ for qemu-devel@nongnu.org; Sat, 19 Oct 2019 02:02:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <prvs=188b0f19c=Anup.Patel@wdc.com>)
- id 1iLgQg-0001Xz-0B
- for qemu-devel@nongnu.org; Sat, 19 Oct 2019 00:33:28 -0400
-Received: from esa1.hgst.iphmx.com ([68.232.141.245]:48572)
+ (envelope-from <groug@kaod.org>) id 1iLhp5-0004Zs-MH
+ for qemu-devel@nongnu.org; Sat, 19 Oct 2019 02:02:45 -0400
+Received: from 15.mo1.mail-out.ovh.net ([188.165.38.232]:59711)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <prvs=188b0f19c=Anup.Patel@wdc.com>)
- id 1iLgQa-0001Un-BG; Sat, 19 Oct 2019 00:33:20 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
- d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
- t=1571459600; x=1602995600;
- h=from:to:cc:subject:date:message-id:references:
- in-reply-to:content-transfer-encoding:mime-version;
- bh=xfBywno+12WM4oX07+N9YWsCnDNDrybrHhEbtSaj60I=;
- b=iXmwC3PEqiS2vWyXK6/84gQETWkY/jCQQh5tHTGqCz22vJT7UJ28uclA
- IrwE4j/gWwoD8Te2wbPw5JPg9M+SHQkMbMOKk6QdPVJHRGFNcL3jXLHNV
- /2weda3fSq0yJwyi49YdWB9c21xXvsgmwZ7AKhWOiAAr3NQpiGY9+/2Rs
- +WMX3WbFytMFWgDu9ubqLxrAdVDfraZdC3+M9HEEcKnfMjeJUkkkqJJUa
- OU+W4Z6NAFvGpfWwKWRxcWrkDVNdKGNF1lYDTScuMTnxZKf8V+Bup+Bb0
- He4Vr39Nj4CuPoh5ZXAfcoAkpxG5ptPJ9tYZ0dvj82dEVwxlgiR8Gy/ge w==;
-IronPort-SDR: 5roGtE12we24Jzsv81L6Z2lwuMbBf9hUzj625oTwA/z2XJ3XklTySgwsUQyMgN5tZLacOrRRdW
- Ddlokht9yDH98l3Fq0EGzlAwooYEw0OIdvrCMglKYYPbAkaH5qw0JD5gNeENkivP6K9FW+d6jq
- dP9lCnv+mqIG4DzfQafXf5UKnLHwe59JwOQdLndJuoN2MkOGa6OqjpSnjFnYnGGxAfr7oEZPZ9
- oLGEGn6myqwGb9arUCaKeji/I4kxt8AkiO/uRCO8dhtzMg+GDFkJNbRqzOmZnoCqxBE4SJiotn
- vho=
-X-IronPort-AV: E=Sophos;i="5.67,314,1566835200"; d="scan'208";a="227964127"
-Received: from mail-bn3nam01lp2056.outbound.protection.outlook.com (HELO
- NAM01-BN3-obe.outbound.protection.outlook.com) ([104.47.33.56])
- by ob1.hgst.iphmx.com with ESMTP; 19 Oct 2019 12:33:16 +0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=mEOMa2blEtOF9WZafEncYluqoRNsDUUiBt+Qdtn5wBCFMfye9BbG1yTQJjtbxWA94MsQTavHMkHI+MY6lzHhYFzDEgxqxgBC5pq+eUKhG9TqFZUanbMW6owU8VC1yPFpwFK/K/k3OYqrLodkBvQNqRXlmq/09Tn17UhtG+JC8UuhOcwi5fCZszVfhyAzKKvB3rSS06UXvjAVYXWQPpgRkCvz5+spYgNEWB2VIdpSjUjF1I0Kmc9TwDjGxGH2U36nC+57C4hCuK6/aTTpsP+fACw8CI/ujFvxVzx0PEeoG8mShxFzVryCONKnNJgbm76TE0zYTiPyxuY1LIh9aIkbHg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=xfBywno+12WM4oX07+N9YWsCnDNDrybrHhEbtSaj60I=;
- b=DUjsSQqzp3pO8gIfFxUsb7A9x0NIDX8JF+UNNdqlPNrEeHZrqb3CmsWSx0kBK1xmHhPeznyqPND0lMOitVVXGaY4dqyUTLX8zYWyeWYJ12MU63uz+vwpmHqj2hlmPUwXajZd7GTCepyuqs+/ptmfswdMf0pHF+EyK46QmaHhtE+92jKyFpzJJrd9cAF9aCbNoEzRhS6QL5w3QdaHPxE/2fh0HnGKpgdA4artPhbtvdT11SuJhBgh0DmzXq+L6phfGAjWEI8YoygDP9oGCKb7TQLoLXBxFYzr6Kbrw+FlnRdUN1YeUU8eBJwwxyHYORker7pDdmtrHPxe6N7LEJ1HEQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
- header.d=wdc.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=xfBywno+12WM4oX07+N9YWsCnDNDrybrHhEbtSaj60I=;
- b=TCTRX7WKsxtVvx/8Yxgs21F4ECuaQzOijJCt6B9rEsoI/WwQX1S7BkIIRpXl5JbWEdgwI6mN5SH2bGE0ahQb3Szp/32jaiJ2q0JqRG6aYHzFwhFZJnBumO75LqhE3XrkCALmFLOxAEoz+eBHQ7xWEhl0PzS1J/0ali+sNqu1E2s=
-Received: from MN2PR04MB6061.namprd04.prod.outlook.com (20.178.246.15) by
- MN2PR04MB6654.namprd04.prod.outlook.com (10.141.117.214) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2367.21; Sat, 19 Oct 2019 04:33:14 +0000
-Received: from MN2PR04MB6061.namprd04.prod.outlook.com
- ([fe80::1454:87a:13b0:d3a]) by MN2PR04MB6061.namprd04.prod.outlook.com
- ([fe80::1454:87a:13b0:d3a%7]) with mapi id 15.20.2347.023; Sat, 19 Oct 2019
- 04:33:14 +0000
-From: Anup Patel <Anup.Patel@wdc.com>
-To: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
-Subject: RE: [PATCH v3 1/2] hw: timer: Add Goldfish RTC device
-Thread-Topic: [PATCH v3 1/2] hw: timer: Add Goldfish RTC device
-Thread-Index: AQHVgzOBWMKi/ApwYEm2Tq90mJ++Nqdg696AgAB3FzA=
-Date: Sat, 19 Oct 2019 04:33:13 +0000
-Message-ID: <MN2PR04MB60610CF742179D43C1A5712B8D6F0@MN2PR04MB6061.namprd04.prod.outlook.com>
-References: <20191015083459.76959-1-anup.patel@wdc.com>
- <20191015083459.76959-2-anup.patel@wdc.com>
- <CAL1e-=guhS+vf4v7Mg6byZWEpuFuGXX3td4+0=wv1ypPs5wAEw@mail.gmail.com>
-In-Reply-To: <CAL1e-=guhS+vf4v7Mg6byZWEpuFuGXX3td4+0=wv1ypPs5wAEw@mail.gmail.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=Anup.Patel@wdc.com; 
-x-originating-ip: [106.51.21.244]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: d43f2796-307d-46e6-1483-08d7544d74a1
-x-ms-office365-filtering-ht: Tenant
-x-ms-traffictypediagnostic: MN2PR04MB6654:
-x-ms-exchange-purlcount: 2
-x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <MN2PR04MB6654C8898AD8D16E11C4A1728D6F0@MN2PR04MB6654.namprd04.prod.outlook.com>
-wdcipoutbound: EOP-TRUE
-x-ms-oob-tlc-oobclassifiers: OLM:913;
-x-forefront-prvs: 01952C6E96
-x-forefront-antispam-report: SFV:NSPM;
- SFS:(10019020)(4636009)(396003)(376002)(39860400002)(346002)(136003)(366004)(199004)(189003)(229853002)(81156014)(14454004)(8676002)(81166006)(966005)(9456002)(25786009)(478600001)(6916009)(8936002)(7736002)(74316002)(316002)(54906003)(33656002)(305945005)(9686003)(6306002)(6246003)(4326008)(66066001)(86362001)(6436002)(55016002)(66476007)(66556008)(66946007)(66446008)(76116006)(64756008)(99286004)(30864003)(476003)(486006)(6116002)(3846002)(55236004)(6506007)(53546011)(256004)(14444005)(446003)(11346002)(186003)(76176011)(7696005)(52536014)(71200400001)(5660300002)(71190400001)(2906002)(26005)(102836004)(2004002);
- DIR:OUT; SFP:1102; SCL:1; SRVR:MN2PR04MB6654;
- H:MN2PR04MB6061.namprd04.prod.outlook.com; FPR:; SPF:None; LANG:en;
- PTR:InfoNoRecords; A:1; MX:1; 
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: d1HJZGS/eWVtJcTW/TWETp40BGxOJVpJQU1gUf3r++CV4NVXI3uFznzqkh8Xn3SIwgbSUcfW3O/xj6xCx4fGckZ0HPwJJOoFIjf5eJVxH9CElj3X+uh1xJpyoaPQTeKehOFyv2bokxnHl8oMbhju0g8mFphryL3P3eUbQb6CaOMx4I4sshAmwLOG/znfQaRnIyS0ZfS9To0nLwkvLF2KKjo2zXsCU6e525GS2syLrsDwez+ydsI+lui1sHx3PObcuj2JDxv1laa2kyPz3jyUuhnibydM9pbqUCWeLyFyJVMWOunTVWsNlUvM5dkFLFLt/QPj1fqsz5PhTWm9B2ps3biFUxY4vOhkRtkkOn2BiNqVLpxLSOXsmwE2TZv2CX2Fjm6j7hqLHZ5OrINpF5Oygna9r92FLYgCh3g5DI3/ShDs/Ush4d/cNPUdgiaEg6IgA0vZfTKeFmUs/nqu1ZjhO8XQgjV9mv0TosQB8hnFYAE=
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+ (Exim 4.71) (envelope-from <groug@kaod.org>) id 1iLhp5-0004Yn-Fb
+ for qemu-devel@nongnu.org; Sat, 19 Oct 2019 02:02:43 -0400
+Received: from player778.ha.ovh.net (unknown [10.109.160.5])
+ by mo1.mail-out.ovh.net (Postfix) with ESMTP id 08D6F194B8F
+ for <qemu-devel@nongnu.org>; Sat, 19 Oct 2019 08:02:40 +0200 (CEST)
+Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
+ [82.253.208.248]) (Authenticated sender: groug@kaod.org)
+ by player778.ha.ovh.net (Postfix) with ESMTPSA id BE3C6B1781CE;
+ Sat, 19 Oct 2019 06:02:36 +0000 (UTC)
+Date: Sat, 19 Oct 2019 08:02:35 +0200
+From: Greg Kurz <groug@kaod.org>
+To: =?UTF-8?B?Q8OpZHJpYw==?= Le Goater <clg@kaod.org>
+Subject: Re: [PATCH v2 1/2] spapr: Introduce a interrupt presenter reset
+ handler
+Message-ID: <20191019080235.7f32dc25@bahia.lan>
+In-Reply-To: <20191018172219.10039-2-clg@kaod.org>
+References: <20191018172219.10039-1-clg@kaod.org>
+ <20191018172219.10039-2-clg@kaod.org>
+X-Mailer: Claws Mail 3.17.4 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-X-OriginatorOrg: wdc.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: d43f2796-307d-46e6-1483-08d7544d74a1
-X-MS-Exchange-CrossTenant-originalarrivaltime: 19 Oct 2019 04:33:13.6466 (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: NhAfMCMqB2higXOmwv/xdg68WlK1wAcLTOKoKJnhaEFevYtHC1dceYMCC/bKfnQMQVJNW7eyoeU1MTzyoQ87Dw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR04MB6654
-X-detected-operating-system: by eggs.gnu.org: FreeBSD 9.x [fuzzy]
-X-Received-From: 68.232.141.245
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-Ovh-Tracer-Id: 12033618204931758475
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrkedtgddutdefucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddm
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 188.165.38.232
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -142,271 +70,318 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- "qemu-riscv@nongnu.org" <qemu-riscv@nongnu.org>,
- Sagar Karandikar <sagark@eecs.berkeley.edu>,
- Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
- Palmer Dabbelt <palmer@sifive.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- Atish Patra <Atish.Patra@wdc.com>, Alistair Francis <Alistair.Francis@wdc.com>,
- Anup Patel <anup@brainfault.org>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org,
+ David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-SGksDQoNCkZyb206IEFsZWtzYW5kYXIgTWFya292aWMgPGFsZWtzYW5kYXIubS5tYWlsQGdtYWls
-LmNvbT4gDQpTZW50OiBTYXR1cmRheSwgT2N0b2JlciAxOSwgMjAxOSAyOjQ1IEFNDQpUbzogQW51
-cCBQYXRlbCA8QW51cC5QYXRlbEB3ZGMuY29tPg0KQ2M6IFBldGVyIE1heWRlbGwgPHBldGVyLm1h
-eWRlbGxAbGluYXJvLm9yZz47IFBhbG1lciBEYWJiZWx0IDxwYWxtZXJAc2lmaXZlLmNvbT47IEFs
-aXN0YWlyIEZyYW5jaXMgPEFsaXN0YWlyLkZyYW5jaXNAd2RjLmNvbT47IFNhZ2FyIEthcmFuZGlr
-YXIgPHNhZ2Fya0BlZWNzLmJlcmtlbGV5LmVkdT47IEJhc3RpYW4gS29wcGVsbWFubiA8a2Jhc3Rp
-YW5AbWFpbC51bmktcGFkZXJib3JuLmRlPjsgQXRpc2ggUGF0cmEgPEF0aXNoLlBhdHJhQHdkYy5j
-b20+OyBxZW11LXJpc2N2QG5vbmdudS5vcmc7IHFlbXUtZGV2ZWxAbm9uZ251Lm9yZzsgQW51cCBQ
-YXRlbCA8YW51cEBicmFpbmZhdWx0Lm9yZz4NClN1YmplY3Q6IFJlOiBbUEFUQ0ggdjMgMS8yXSBo
-dzogdGltZXI6IEFkZCBHb2xkZmlzaCBSVEMgZGV2aWNlDQoNCsWrDQoNCk9uIFR1ZXNkYXksIE9j
-dG9iZXIgMTUsIDIwMTksIEFudXAgUGF0ZWwgPG1haWx0bzpBbnVwLlBhdGVsQHdkYy5jb20+IHdy
-b3RlOg0KVGhpcyBwYXRjaCBhZGRzIG1vZGVsIGZvciBHb29nbGUgR29sZGZpc2ggdmlydHVhbCBw
-bGF0Zm9ybSBSVEMgZGV2aWNlLg0KDQpXZSB3aWxsIGJlIGFkZGluZyBHb2xkZmlzaCBSVEMgZGV2
-aWNlIHRvIHRoZSBRRU1VIFJJU0MtViB2aXJ0IG1hY2hpbmUNCmZvciBwcm92aWRpbmcgcmVhbCBk
-YXRlLXRpbWUgdG8gR3Vlc3QgTGludXguIFRoZSBjb3JyZXNwb25kaW5nIExpbnV4DQpkcml2ZXIg
-Zm9yIEdvbGRmaXNoIFJUQyBkZXZpY2UgaXMgYWxyZWFkeSBhdmFpbGFibGUgaW4gdXBzdHJlYW0g
-TGludXguDQoNCkZvciBub3csIFZNIG1pZ3JhdGlvbiBzdXBwb3J0IGlzIGF2YWlsYWJsZSBidXQg
-dW50ZXN0ZWQgZm9yIEdvbGRmaXNoIFJUQw0KZGV2aWNlLiBJdCB3aWxsIGJlIGhhcmRlbmVkIGlu
-LWZ1dHVyZSB3aGVuIHdlIGltcGxlbWVudCBWTSBtaWdyYXRpb24gZm9yDQpLVk0gUklTQy1WLg0K
-DQpTaWduZWQtb2ZmLWJ5OiBBbnVwIFBhdGVsIDxtYWlsdG86YW51cC5wYXRlbEB3ZGMuY29tPg0K
-LS0tDQrCoGh3L3J0Yy9LY29uZmlnwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgfMKgIMKgMyAr
-DQrCoGh3L3J0Yy9NYWtlZmlsZS5vYmpzwqAgwqAgwqAgwqAgwqAgwqAgfMKgIMKgMSArDQrCoGh3
-L3J0Yy9nb2xkZmlzaF9ydGMuY8KgIMKgIMKgIMKgIMKgIMKgfCAyNzggKysrKysrKysrKysrKysr
-KysrKysrKysrKysrKysrKysNCsKgaW5jbHVkZS9ody90aW1lci9nb2xkZmlzaF9ydGMuaCB8wqAg
-NDYgKysrKysrDQrCoDQgZmlsZXMgY2hhbmdlZCwgMzI4IGluc2VydGlvbnMoKykNCsKgY3JlYXRl
-IG1vZGUgMTAwNjQ0IGh3L3J0Yy9nb2xkZmlzaF9ydGMuYw0KwqBjcmVhdGUgbW9kZSAxMDA2NDQg
-aW5jbHVkZS9ody90aW1lci9nb2xkZmlzaF9ydGMuaA0KDQpEbyB5b3UgcGxhbiB0byBhZGQgc29t
-ZSBvdGhlciBkZXZpY2VzIGZyb20gR29sZGZpc2ggcGxhdGZvcm0/DQoNCltBbnVwXSBOb3Blcywg
-d2UganVzdCBuZWVkZWQgYSBzaW1wbGUgUlRDIGRldmljZSBmb3IgUklTQy1WDQpbQW51cF0gdmly
-dCBtYWNoaW5lIGhlbmNlIHRoaXMgcGF0Y2guIA0KDQpbQW51cF0gTW9zdCBvZiB0aGUgcmVxdWly
-ZWQgZGV2aWNlcyBhcmUgYWxyZWFkeSB0aGVyZSBpbg0KW0FudXBdIHRoZSBWaXJ0SU8gc3BlYy4g
-VGhlIFJUQyBkZXZpY2Ugd2FzIG1pc3NpbmcgaW4NCltBbnVwXSBWaXJ0SU8gc3BlYyBzbyBpbnN0
-ZWFkIG9mIGNyZWF0aW5nIG5ldyB2aXJ0dWFsIFJUQw0KW0FudXBdIGRldmljZSB3ZSBqdXN0IHJl
-LXVzZSBHb2xkZmlzaCBSVEMuIFRoaXMgaGVscCB1cw0KW0FudXBdIHJlLXVzZSB0aGUgTGludXgg
-R29sZGZpc2ggUlRDIGRyaXZlci4NCg0KRGlkIHlvdSBiYXNlIHlvdXIgY29kZSBvbiBBbmRyb2lk
-IGVtdWxhdG9yIGNvZGU/DQoNCltBbnVwXSBOb3BlcywgdGhlIGFuZHJvaWQgZW11bGF0b3IgY29k
-ZSBzZWVtZWQgdG9vIHNpbXBsZQ0KW0FudXBdIGFuZCBsYWNraW5nLiBJbiBmYWN0LCB0aGUgTGlu
-dXggR29sZGZpc2ggUlRDIGRyaXZlciBkb2VzDQpbQW51cF0gbXVjaCBtb3JlLg0KDQpbQW51cF0g
-QmFzZWQgb24gdGhlIGRvY3VtZW50YXRpb24gYW5kIExpbnV4IEdvbGRmaXNoIFJUQw0KW0FudXBd
-IGRyaXZlciwgSSB3cm90ZSBpdCBmcm9tIHNjcmF0Y2guDQoNCltBbnVwXSBJIGZpcnN0IGFkZGVk
-IEdvbGRmaXNoIFJUQyBlbXVsYXRvciB0byBYdmlzb3IgUklTQy1WDQpbQW51cF0gdmlydCBtYWNo
-aW5lLiBHb3QgaXQgd29ya2luZyBvdmVyIHRoZXJlIGFuZCB0aGVuDQpbQW51cF0gcG9ydGVkIGl0
-IHRvIFFFTVUuIEZvciBxZW11IGVtdWxhdGlvbiwgSSBsb29rZWQNCltBbnVwXSBhdCBleGlzdGlu
-ZyBSVEMgZW11bGF0b3JzIChzdWNoIGFzIFBMMDMxKSBmb3IgUUVNVQ0KW0FudXBdIEFQSSB1c2Fn
-ZS4NCg0KUmVsYXRlZCB0byB0aGUgcHJldmlvdXMgcXVlc3Rpb24sIGFyZSB5b3Ugc3VyZSB0aGUg
-Y29weXJpZ2h0IGxpbmUgc2hvdWxkIGdvIHRvIFdlc3Rlcm4gRGlnaXRhbCBvbmx5Pw0KDQpbQW51
-cF0gSSB0aG91Z2h0IGNvcHlyaWdodCB3aWxsIGJlIG9mIGltcGxlbWVudGVyIGhlbmNlIEkNCltB
-bnVwXSBwdXQgV2VzdGVybiBEaWdpdGFsIG9ubHkuIFRoZSBzcGVjIGFuZCBMaW51eCBkcml2ZXIN
-CltBbnVwXSBjYW4gYmUgd3JpdHRlbiBieSB0b3RhbGx5IGRpZmZlcmVudCBmb2xrcy4NCg0KUmVn
-YXJkcywNCkFudXANCsKgDQpkaWZmIC0tZ2l0IGEvaHcvcnRjL0tjb25maWcgYi9ody9ydGMvS2Nv
-bmZpZw0KaW5kZXggNDVkYWE4ZDY1NS4uYmFmZTZhYzJjOSAxMDA2NDQNCi0tLSBhL2h3L3J0Yy9L
-Y29uZmlnDQorKysgYi9ody9ydGMvS2NvbmZpZw0KQEAgLTIxLDMgKzIxLDYgQEAgY29uZmlnIE1D
-MTQ2ODE4UlRDDQoNCsKgY29uZmlnIFNVTjRWX1JUQw0KwqAgwqAgwqBib29sDQorDQorY29uZmln
-IEdPTERGSVNIX1JUQw0KK8KgIMKgIGJvb2wNCmRpZmYgLS1naXQgYS9ody9ydGMvTWFrZWZpbGUu
-b2JqcyBiL2h3L3J0Yy9NYWtlZmlsZS5vYmpzDQppbmRleCA4ZGM5ZmNkM2E5Li5hYTIwOGQwZDEw
-IDEwMDY0NA0KLS0tIGEvaHcvcnRjL01ha2VmaWxlLm9ianMNCisrKyBiL2h3L3J0Yy9NYWtlZmls
-ZS5vYmpzDQpAQCAtMTEsMyArMTEsNCBAQCBjb21tb24tb2JqLSQoQ09ORklHX0VYWU5PUzQpICs9
-IGV4eW5vczQyMTBfcnRjLm8NCsKgb2JqLSQoQ09ORklHX01DMTQ2ODE4UlRDKSArPSBtYzE0Njgx
-OHJ0Yy5vDQrCoGNvbW1vbi1vYmotJChDT05GSUdfU1VONFZfUlRDKSArPSBzdW40di1ydGMubw0K
-wqBjb21tb24tb2JqLSQoQ09ORklHX0FTUEVFRF9TT0MpICs9IGFzcGVlZF9ydGMubw0KK2NvbW1v
-bi1vYmotJChDT05GSUdfR09MREZJU0hfUlRDKSArPSBnb2xkZmlzaF9ydGMubw0KZGlmZiAtLWdp
-dCBhL2h3L3J0Yy9nb2xkZmlzaF9ydGMuYyBiL2h3L3J0Yy9nb2xkZmlzaF9ydGMuYw0KbmV3IGZp
-bGUgbW9kZSAxMDA2NDQNCmluZGV4IDAwMDAwMDAwMDAuLjIyMzYxNmVkNzUNCi0tLSAvZGV2L251
-bGwNCisrKyBiL2h3L3J0Yy9nb2xkZmlzaF9ydGMuYw0KQEAgLTAsMCArMSwyNzggQEANCisvKg0K
-KyAqIEdvbGRmaXNoIHZpcnR1YWwgcGxhdGZvcm0gUlRDDQorICoNCisgKiBDb3B5cmlnaHQgKEMp
-IDIwMTkgV2VzdGVybiBEaWdpdGFsIENvcnBvcmF0aW9uIG9yIGl0cyBhZmZpbGlhdGVzLg0KKyAq
-DQorICogRm9yIG1vcmUgZGV0YWlscyBvbiBHb29nbGUgR29sZGZpc2ggdmlydHVhbCBwbGF0Zm9y
-bSByZWZlcjoNCisgKiBodHRwczovL2FuZHJvaWQuZ29vZ2xlc291cmNlLmNvbS9wbGF0Zm9ybS9l
-eHRlcm5hbC9xZW11LysvbWFzdGVyL2RvY3MvR09MREZJU0gtVklSVFVBTC1IQVJEV0FSRS5UWFQN
-CisgKg0KKyAqIFRoaXMgcHJvZ3JhbSBpcyBmcmVlIHNvZnR3YXJlOyB5b3UgY2FuIHJlZGlzdHJp
-YnV0ZSBpdCBhbmQvb3IgbW9kaWZ5IGl0DQorICogdW5kZXIgdGhlIHRlcm1zIGFuZCBjb25kaXRp
-b25zIG9mIHRoZSBHTlUgR2VuZXJhbCBQdWJsaWMgTGljZW5zZSwNCisgKiB2ZXJzaW9uIDIgb3Ig
-bGF0ZXIsIGFzIHB1Ymxpc2hlZCBieSB0aGUgRnJlZSBTb2Z0d2FyZSBGb3VuZGF0aW9uLg0KKyAq
-DQorICogVGhpcyBwcm9ncmFtIGlzIGRpc3RyaWJ1dGVkIGluIHRoZSBob3BlIGl0IHdpbGwgYmUg
-dXNlZnVsLCBidXQgV0lUSE9VVA0KKyAqIEFOWSBXQVJSQU5UWTsgd2l0aG91dCBldmVuIHRoZSBp
-bXBsaWVkIHdhcnJhbnR5IG9mIE1FUkNIQU5UQUJJTElUWSBvcg0KKyAqIEZJVE5FU1MgRk9SIEEg
-UEFSVElDVUxBUiBQVVJQT1NFLsKgIFNlZSB0aGUgR05VIEdlbmVyYWwgUHVibGljIExpY2Vuc2Ug
-Zm9yDQorICogbW9yZSBkZXRhaWxzLg0KKyAqDQorICogWW91IHNob3VsZCBoYXZlIHJlY2VpdmVk
-IGEgY29weSBvZiB0aGUgR05VIEdlbmVyYWwgUHVibGljIExpY2Vuc2UgYWxvbmcgd2l0aA0KKyAq
-IHRoaXMgcHJvZ3JhbS7CoCBJZiBub3QsIHNlZSA8aHR0cDovL3d3dy5nbnUub3JnL2xpY2Vuc2Vz
-Lz4uDQorICovDQorDQorI2luY2x1ZGUgInFlbXUvb3NkZXAuaCINCisjaW5jbHVkZSAicWVtdS1j
-b21tb24uaCINCisjaW5jbHVkZSAiaHcvdGltZXIvZ29sZGZpc2hfcnRjLmgiDQorI2luY2x1ZGUg
-Im1pZ3JhdGlvbi92bXN0YXRlLmgiDQorI2luY2x1ZGUgImh3L2lycS5oIg0KKyNpbmNsdWRlICJo
-dy9xZGV2LXByb3BlcnRpZXMuaCINCisjaW5jbHVkZSAiaHcvc3lzYnVzLmgiDQorI2luY2x1ZGUg
-InFlbXUvdGltZXIuaCINCisjaW5jbHVkZSAic3lzZW11L3N5c2VtdS5oIg0KKyNpbmNsdWRlICJx
-ZW11L2N1dGlscy5oIg0KKyNpbmNsdWRlICJxZW11L2xvZy5oIg0KKw0KKyNkZWZpbmUgUlRDX1RJ
-TUVfTE9XwqAgwqAgwqAgwqAgwqAgwqAgMHgwMA0KKyNkZWZpbmUgUlRDX1RJTUVfSElHSMKgIMKg
-IMKgIMKgIMKgIMKgMHgwNA0KKyNkZWZpbmUgUlRDX0FMQVJNX0xPV8KgIMKgIMKgIMKgIMKgIMKg
-MHgwOA0KKyNkZWZpbmUgUlRDX0FMQVJNX0hJR0jCoCDCoCDCoCDCoCDCoCAweDBjDQorI2RlZmlu
-ZSBSVENfSVJRX0VOQUJMRUTCoCDCoCDCoCDCoCDCoDB4MTANCisjZGVmaW5lIFJUQ19DTEVBUl9B
-TEFSTcKgIMKgIMKgIMKgIMKgMHgxNA0KKyNkZWZpbmUgUlRDX0FMQVJNX1NUQVRVU8KgIMKgIMKg
-IMKgIDB4MTgNCisjZGVmaW5lIFJUQ19DTEVBUl9JTlRFUlJVUFTCoCDCoCDCoDB4MWMNCisNCitz
-dGF0aWMgdm9pZCBnb2xkZmlzaF9ydGNfdXBkYXRlKEdvbGRmaXNoUlRDU3RhdGUgKnMpDQorew0K
-K8KgIMKgIHFlbXVfc2V0X2lycShzLT5pcnEsIChzLT5pcnFfcGVuZGluZyAmIHMtPmlycV9lbmFi
-bGVkKSA/IDEgOiAwKTsNCit9DQorDQorc3RhdGljIHZvaWQgZ29sZGZpc2hfcnRjX2ludGVycnVw
-dCh2b2lkICpvcGFxdWUpDQorew0KK8KgIMKgIEdvbGRmaXNoUlRDU3RhdGUgKnMgPSAoR29sZGZp
-c2hSVENTdGF0ZSAqKW9wYXF1ZTsNCisNCivCoCDCoCBzLT5hbGFybV9ydW5uaW5nID0gMDsNCivC
-oCDCoCBzLT5pcnFfcGVuZGluZyA9IDE7DQorwqAgwqAgZ29sZGZpc2hfcnRjX3VwZGF0ZShzKTsN
-Cit9DQorDQorc3RhdGljIHVpbnQ2NF90IGdvbGRmaXNoX3J0Y19nZXRfY291bnQoR29sZGZpc2hS
-VENTdGF0ZSAqcykNCit7DQorwqAgwqAgcmV0dXJuIHMtPnRpY2tfb2Zmc2V0ICsgKHVpbnQ2NF90
-KXFlbXVfY2xvY2tfZ2V0X25zKHJ0Y19jbG9jayk7DQorfQ0KKw0KK3N0YXRpYyB2b2lkIGdvbGRm
-aXNoX3J0Y19jbGVhcl9hbGFybShHb2xkZmlzaFJUQ1N0YXRlICpzKQ0KK3sNCivCoCDCoCB0aW1l
-cl9kZWwocy0+dGltZXIpOw0KK8KgIMKgIHMtPmFsYXJtX3J1bm5pbmcgPSAwOw0KK30NCisNCitz
-dGF0aWMgdm9pZCBnb2xkZmlzaF9ydGNfc2V0X2FsYXJtKEdvbGRmaXNoUlRDU3RhdGUgKnMpDQor
-ew0KK8KgIMKgIHVpbnQ2NF90IHRpY2tzID0gZ29sZGZpc2hfcnRjX2dldF9jb3VudChzKTsNCivC
-oCDCoCB1aW50NjRfdCBldmVudCA9IHMtPmFsYXJtX25leHQ7DQorDQorwqAgwqAgaWYgKGV2ZW50
-IDw9IHRpY2tzKSB7DQorwqAgwqAgwqAgwqAgZ29sZGZpc2hfcnRjX2NsZWFyX2FsYXJtKHMpOw0K
-K8KgIMKgIMKgIMKgIGdvbGRmaXNoX3J0Y19pbnRlcnJ1cHQocyk7DQorwqAgwqAgfSBlbHNlIHsN
-CivCoCDCoCDCoCDCoCBpbnQ2NF90IG5vdyA9IHFlbXVfY2xvY2tfZ2V0X25zKHJ0Y19jbG9jayk7
-DQorwqAgwqAgwqAgwqAgdGltZXJfbW9kKHMtPnRpbWVyLCBub3cgKyAoZXZlbnQgLSB0aWNrcykp
-Ow0KK8KgIMKgIMKgIMKgIHMtPmFsYXJtX3J1bm5pbmcgPSAxOw0KK8KgIMKgIH0NCit9DQorDQor
-c3RhdGljIHVpbnQ2NF90IGdvbGRmaXNoX3J0Y19yZWFkKHZvaWQgKm9wYXF1ZSwgaHdhZGRyIG9m
-ZnNldCwNCivCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDC
-oCB1bnNpZ25lZCBzaXplKQ0KK3sNCivCoCDCoCBHb2xkZmlzaFJUQ1N0YXRlICpzID0gKEdvbGRm
-aXNoUlRDU3RhdGUgKilvcGFxdWU7DQorwqAgwqAgdWludDY0X3QgcjsNCisNCivCoCDCoCBzd2l0
-Y2ggKG9mZnNldCkgew0KK8KgIMKgIGNhc2UgUlRDX1RJTUVfTE9XOg0KK8KgIMKgIMKgIMKgIHIg
-PSBnb2xkZmlzaF9ydGNfZ2V0X2NvdW50KHMpICYgMHhmZmZmZmZmZjsNCivCoCDCoCDCoCDCoCBi
-cmVhazsNCivCoCDCoCBjYXNlIFJUQ19USU1FX0hJR0g6DQorwqAgwqAgwqAgwqAgciA9IGdvbGRm
-aXNoX3J0Y19nZXRfY291bnQocykgPj4gMzI7DQorwqAgwqAgwqAgwqAgYnJlYWs7DQorwqAgwqAg
-Y2FzZSBSVENfQUxBUk1fTE9XOg0KK8KgIMKgIMKgIMKgIHIgPSBzLT5hbGFybV9uZXh0ICYgMHhm
-ZmZmZmZmZjsNCivCoCDCoCDCoCDCoCBicmVhazsNCivCoCDCoCBjYXNlIFJUQ19BTEFSTV9ISUdI
-Og0KK8KgIMKgIMKgIMKgIHIgPSBzLT5hbGFybV9uZXh0ID4+IDMyOw0KK8KgIMKgIMKgIMKgIGJy
-ZWFrOw0KK8KgIMKgIGNhc2UgUlRDX0lSUV9FTkFCTEVEOg0KK8KgIMKgIMKgIMKgIHIgPSBzLT5p
-cnFfZW5hYmxlZDsNCivCoCDCoCDCoCDCoCBicmVhazsNCivCoCDCoCBjYXNlIFJUQ19BTEFSTV9T
-VEFUVVM6DQorwqAgwqAgwqAgwqAgciA9IHMtPmFsYXJtX3J1bm5pbmc7DQorwqAgwqAgwqAgwqAg
-YnJlYWs7DQorwqAgwqAgZGVmYXVsdDoNCivCoCDCoCDCoCDCoCBxZW11X2xvZ19tYXNrKExPR19H
-VUVTVF9FUlJPUiwNCivCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCAiZ29sZGZpc2hf
-cnRjX3JlYWQ6IEJhZCBvZmZzZXQgMHgleFxuIiwgKGludClvZmZzZXQpOw0KK8KgIMKgIMKgIMKg
-IHIgPSAwOw0KK8KgIMKgIMKgIMKgIGJyZWFrOw0KK8KgIMKgIH0NCisNCivCoCDCoCByZXR1cm4g
-cjsNCit9DQorDQorc3RhdGljIHZvaWQgZ29sZGZpc2hfcnRjX3dyaXRlKHZvaWQgKm9wYXF1ZSwg
-aHdhZGRyIG9mZnNldCwNCivCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDC
-oCDCoCDCoHVpbnQ2NF90IHZhbHVlLCB1bnNpZ25lZCBzaXplKQ0KK3sNCivCoCDCoCB1aW50NjRf
-dCBjdXJyZW50X3RpY2ssIG5ld190aWNrOw0KK8KgIMKgIEdvbGRmaXNoUlRDU3RhdGUgKnMgPSAo
-R29sZGZpc2hSVENTdGF0ZSAqKW9wYXF1ZTsNCisNCivCoCDCoCBzd2l0Y2ggKG9mZnNldCkgew0K
-K8KgIMKgIGNhc2UgUlRDX1RJTUVfTE9XOg0KK8KgIMKgIMKgIMKgIGN1cnJlbnRfdGljayA9IGdv
-bGRmaXNoX3J0Y19nZXRfY291bnQocyk7DQorwqAgwqAgwqAgwqAgbmV3X3RpY2sgPSBjdXJyZW50
-X3RpY2sgJiAoMHhmZmZmZmZmZlVMTCA8PCAzMik7DQorwqAgwqAgwqAgwqAgbmV3X3RpY2sgfD0g
-dmFsdWU7DQorwqAgwqAgwqAgwqAgcy0+dGlja19vZmZzZXQgKz0gbmV3X3RpY2sgLSBjdXJyZW50
-X3RpY2s7DQorwqAgwqAgwqAgwqAgYnJlYWs7DQorwqAgwqAgY2FzZSBSVENfVElNRV9ISUdIOg0K
-K8KgIMKgIMKgIMKgIGN1cnJlbnRfdGljayA9IGdvbGRmaXNoX3J0Y19nZXRfY291bnQocyk7DQor
-wqAgwqAgwqAgwqAgbmV3X3RpY2sgPSBjdXJyZW50X3RpY2sgJiAweGZmZmZmZmZmVUxMOw0KK8Kg
-IMKgIMKgIMKgIG5ld190aWNrIHw9ICh2YWx1ZSA8PCAzMik7DQorwqAgwqAgwqAgwqAgcy0+dGlj
-a19vZmZzZXQgKz0gbmV3X3RpY2sgLSBjdXJyZW50X3RpY2s7DQorwqAgwqAgwqAgwqAgYnJlYWs7
-DQorwqAgwqAgY2FzZSBSVENfQUxBUk1fTE9XOg0KK8KgIMKgIMKgIMKgIHMtPmFsYXJtX25leHQg
-Jj0gKDB4ZmZmZmZmZmZVTEwgPDwgMzIpOw0KK8KgIMKgIMKgIMKgIHMtPmFsYXJtX25leHQgfD0g
-dmFsdWU7DQorwqAgwqAgwqAgwqAgZ29sZGZpc2hfcnRjX3NldF9hbGFybShzKTsNCivCoCDCoCDC
-oCDCoCBicmVhazsNCivCoCDCoCBjYXNlIFJUQ19BTEFSTV9ISUdIOg0KK8KgIMKgIMKgIMKgIHMt
-PmFsYXJtX25leHQgJj0gMHhmZmZmZmZmZlVMTDsNCivCoCDCoCDCoCDCoCBzLT5hbGFybV9uZXh0
-IHw9ICh2YWx1ZSA8PCAzMik7DQorwqAgwqAgwqAgwqAgYnJlYWs7DQorwqAgwqAgY2FzZSBSVENf
-SVJRX0VOQUJMRUQ6DQorwqAgwqAgwqAgwqAgcy0+aXJxX2VuYWJsZWQgPSAodWludDMyX3QpKHZh
-bHVlICYgMHgxKTsNCivCoCDCoCDCoCDCoCBnb2xkZmlzaF9ydGNfdXBkYXRlKHMpOw0KK8KgIMKg
-IMKgIMKgIGJyZWFrOw0KK8KgIMKgIGNhc2UgUlRDX0NMRUFSX0FMQVJNOg0KK8KgIMKgIMKgIMKg
-IGdvbGRmaXNoX3J0Y19jbGVhcl9hbGFybShzKTsNCivCoCDCoCDCoCDCoCBicmVhazsNCivCoCDC
-oCBjYXNlIFJUQ19DTEVBUl9JTlRFUlJVUFQ6DQorwqAgwqAgwqAgwqAgcy0+aXJxX3BlbmRpbmcg
-PSAwOw0KK8KgIMKgIMKgIMKgIGdvbGRmaXNoX3J0Y191cGRhdGUocyk7DQorwqAgwqAgwqAgwqAg
-YnJlYWs7DQorwqAgwqAgZGVmYXVsdDoNCivCoCDCoCDCoCDCoCBxZW11X2xvZ19tYXNrKExPR19H
-VUVTVF9FUlJPUiwNCivCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCAiZ29sZGZpc2hf
-cnRjX3dyaXRlOiBCYWQgb2Zmc2V0IDB4JXhcbiIsIChpbnQpb2Zmc2V0KTsNCivCoCDCoCDCoCDC
-oCBicmVhazsNCivCoCDCoCB9DQorfQ0KKw0KK3N0YXRpYyBpbnQgZ29sZGZpc2hfcnRjX3ByZV9z
-YXZlKHZvaWQgKm9wYXF1ZSkNCit7DQorwqAgwqAgdWludDY0X3QgZGVsdGE7DQorwqAgwqAgR29s
-ZGZpc2hSVENTdGF0ZSAqcyA9IG9wYXF1ZTsNCisNCivCoCDCoCAvKg0KK8KgIMKgIMKgKiBXZSB3
-YW50IHRvIG1pZ3JhdGUgdGhpcyBvZmZzZXQsIHdoaWNoIHNvdW5kcyBzdHJhaWdodGZvcndhcmQu
-DQorwqAgwqAgwqAqIFVuZm9ydHVuYXRlbHksIHdlIGNhbm5vdCBkaXJlY3RseSBwYXNzIHRpY2tf
-b2Zmc2V0IGJlY2F1c2UNCivCoCDCoCDCoCogcnRjX2Nsb2NrIG9uIGRlc3RpbmV0aW9uIEhvc3Qg
-bWlnaHQgbm90IGJlIHNhbWUgc291cmNlIEhvc3QuDQorwqAgwqAgwqAqDQorwqAgwqAgwqAqIFRv
-IHRhY2tsZSwgdGhpcyB3ZSBwYXNzIHRpY2tfb2Zmc2V0IHJlbGF0aXZlIHRvIHZtX2Nsb2NrIGZy
-b20NCivCoCDCoCDCoCogc291cmNlIEhvc3QgYW5kIG1ha2UgaXQgcmVsYXRpdmUgdG8gcnRjX2Ns
-b2NrIGF0IGRlc3RpbmV0aW9uIEhvc3QuDQorwqAgwqAgwqAqLw0KK8KgIMKgIGRlbHRhID0gcWVt
-dV9jbG9ja19nZXRfbnMocnRjX2Nsb2NrKSAtDQorwqAgwqAgwqAgwqAgwqAgwqAgcWVtdV9jbG9j
-a19nZXRfbnMoUUVNVV9DTE9DS19WSVJUVUFMKTsNCivCoCDCoCBzLT50aWNrX29mZnNldF92bXN0
-YXRlID0gcy0+dGlja19vZmZzZXQgKyBkZWx0YTsNCisNCivCoCDCoCByZXR1cm4gMDsNCit9DQor
-DQorc3RhdGljIGludCBnb2xkZmlzaF9ydGNfcG9zdF9sb2FkKHZvaWQgKm9wYXF1ZSwgaW50IHZl
-cnNpb25faWQpDQorew0KK8KgIMKgIHVpbnQ2NF90IGRlbHRhOw0KK8KgIMKgIEdvbGRmaXNoUlRD
-U3RhdGUgKnMgPSBvcGFxdWU7DQorDQorwqAgwqAgLyoNCivCoCDCoCDCoCogV2UgZXh0cmFjdCB0
-aWNrX29mZnNldCBmcm9tIHRpY2tfb2Zmc2V0X3Ztc3RhdGUgYnkgZG9pbmcNCivCoCDCoCDCoCog
-cmV2ZXJzZSBtYXRoIGNvbXBhcmVkIHRvIHByZV9zYXZlKCkgZnVuY3Rpb24uDQorwqAgwqAgwqAq
-Lw0KK8KgIMKgIGRlbHRhID0gcWVtdV9jbG9ja19nZXRfbnMocnRjX2Nsb2NrKSAtDQorwqAgwqAg
-wqAgwqAgwqAgwqAgcWVtdV9jbG9ja19nZXRfbnMoUUVNVV9DTE9DS19WSVJUVUFMKTsNCivCoCDC
-oCBzLT50aWNrX29mZnNldCA9IHMtPnRpY2tfb2Zmc2V0X3Ztc3RhdGUgLSBkZWx0YTsNCisNCivC
-oCDCoCByZXR1cm4gMDsNCit9DQorDQorc3RhdGljIGNvbnN0IE1lbW9yeVJlZ2lvbk9wcyBnb2xk
-ZmlzaF9ydGNfb3BzID0gew0KK8KgIMKgIC5yZWFkID0gZ29sZGZpc2hfcnRjX3JlYWQsDQorwqAg
-wqAgLndyaXRlID0gZ29sZGZpc2hfcnRjX3dyaXRlLA0KK8KgIMKgIC5lbmRpYW5uZXNzID0gREVW
-SUNFX0xJVFRMRV9FTkRJQU4sDQorwqAgwqAgLnZhbGlkID0gew0KK8KgIMKgIMKgIMKgIC5taW5f
-YWNjZXNzX3NpemUgPSA0LA0KK8KgIMKgIMKgIMKgIC5tYXhfYWNjZXNzX3NpemUgPSA0DQorwqAg
-wqAgfQ0KK307DQorDQorc3RhdGljIGNvbnN0IFZNU3RhdGVEZXNjcmlwdGlvbiBnb2xkZmlzaF9y
-dGNfdm1zdGF0ZSA9IHsNCivCoCDCoCAubmFtZSA9IFRZUEVfR09MREZJU0hfUlRDLA0KK8KgIMKg
-IC52ZXJzaW9uX2lkID0gMSwNCivCoCDCoCAucHJlX3NhdmUgPSBnb2xkZmlzaF9ydGNfcHJlX3Nh
-dmUsDQorwqAgwqAgLnBvc3RfbG9hZCA9IGdvbGRmaXNoX3J0Y19wb3N0X2xvYWQsDQorwqAgwqAg
-LmZpZWxkcyA9IChWTVN0YXRlRmllbGRbXSkgew0KK8KgIMKgIMKgIMKgIFZNU1RBVEVfVUlOVDY0
-KHRpY2tfb2Zmc2V0X3Ztc3RhdGUsIEdvbGRmaXNoUlRDU3RhdGUpLA0KK8KgIMKgIMKgIMKgIFZN
-U1RBVEVfVUlOVDY0KGFsYXJtX25leHQsIEdvbGRmaXNoUlRDU3RhdGUpLA0KK8KgIMKgIMKgIMKg
-IFZNU1RBVEVfVUlOVDMyKGFsYXJtX3J1bm5pbmcsIEdvbGRmaXNoUlRDU3RhdGUpLA0KK8KgIMKg
-IMKgIMKgIFZNU1RBVEVfVUlOVDMyKGlycV9wZW5kaW5nLCBHb2xkZmlzaFJUQ1N0YXRlKSwNCivC
-oCDCoCDCoCDCoCBWTVNUQVRFX1VJTlQzMihpcnFfZW5hYmxlZCwgR29sZGZpc2hSVENTdGF0ZSks
-DQorwqAgwqAgwqAgwqAgVk1TVEFURV9FTkRfT0ZfTElTVCgpDQorwqAgwqAgfQ0KK307DQorDQor
-c3RhdGljIHZvaWQgZ29sZGZpc2hfcnRjX3Jlc2V0KERldmljZVN0YXRlICpkZXYpDQorew0KK8Kg
-IMKgIEdvbGRmaXNoUlRDU3RhdGUgKnMgPSBHT0xERklTSF9SVEMoZGV2KTsNCivCoCDCoCBzdHJ1
-Y3QgdG0gdG07DQorDQorwqAgwqAgdGltZXJfZGVsKHMtPnRpbWVyKTsNCisNCivCoCDCoCBxZW11
-X2dldF90aW1lZGF0ZSgmdG0sIDApOw0KK8KgIMKgIHMtPnRpY2tfb2Zmc2V0ID0gbWt0aW1lZ20o
-JnRtKTsNCivCoCDCoCBzLT50aWNrX29mZnNldCAqPSBOQU5PU0VDT05EU19QRVJfU0VDT05EOw0K
-K8KgIMKgIHMtPnRpY2tfb2Zmc2V0IC09IHFlbXVfY2xvY2tfZ2V0X25zKHJ0Y19jbG9jayk7DQor
-wqAgwqAgcy0+dGlja19vZmZzZXRfdm1zdGF0ZSA9IDA7DQorwqAgwqAgcy0+YWxhcm1fbmV4dCA9
-IDA7DQorwqAgwqAgcy0+YWxhcm1fcnVubmluZyA9IDA7DQorwqAgwqAgcy0+aXJxX3BlbmRpbmcg
-PSAwOw0KK8KgIMKgIHMtPmlycV9lbmFibGVkID0gMDsNCit9DQorDQorc3RhdGljIHZvaWQgZ29s
-ZGZpc2hfcnRjX3JlYWxpemUoRGV2aWNlU3RhdGUgKmQsIEVycm9yICoqZXJycCkNCit7DQorwqAg
-wqAgU3lzQnVzRGV2aWNlICpkZXYgPSBTWVNfQlVTX0RFVklDRShkKTsNCivCoCDCoCBHb2xkZmlz
-aFJUQ1N0YXRlICpzID0gR09MREZJU0hfUlRDKGQpOw0KKw0KK8KgIMKgIG1lbW9yeV9yZWdpb25f
-aW5pdF9pbygmcy0+aW9tZW0sIE9CSkVDVChzKSwgJmdvbGRmaXNoX3J0Y19vcHMsIHMsDQorwqAg
-wqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgImdvbGRmaXNoX3J0YyIsIDB4MTAw
-MCk7DQorwqAgwqAgc3lzYnVzX2luaXRfbW1pbyhkZXYsICZzLT5pb21lbSk7DQorDQorwqAgwqAg
-c3lzYnVzX2luaXRfaXJxKGRldiwgJnMtPmlycSk7DQorDQorwqAgwqAgcy0+dGltZXIgPSB0aW1l
-cl9uZXdfbnMocnRjX2Nsb2NrLCBnb2xkZmlzaF9ydGNfaW50ZXJydXB0LCBzKTsNCit9DQorDQor
-c3RhdGljIHZvaWQgZ29sZGZpc2hfcnRjX2NsYXNzX2luaXQoT2JqZWN0Q2xhc3MgKmtsYXNzLCB2
-b2lkICpkYXRhKQ0KK3sNCivCoCDCoCBEZXZpY2VDbGFzcyAqZGMgPSBERVZJQ0VfQ0xBU1Moa2xh
-c3MpOw0KKw0KK8KgIMKgIGRjLT5yZWFsaXplID0gZ29sZGZpc2hfcnRjX3JlYWxpemU7DQorwqAg
-wqAgZGMtPnJlc2V0ID0gZ29sZGZpc2hfcnRjX3Jlc2V0Ow0KK8KgIMKgIGRjLT52bXNkID0gJmdv
-bGRmaXNoX3J0Y192bXN0YXRlOw0KK30NCisNCitzdGF0aWMgY29uc3QgVHlwZUluZm8gZ29sZGZp
-c2hfcnRjX2luZm8gPSB7DQorwqAgwqAgLm5hbWXCoCDCoCDCoCDCoCDCoCA9IFRZUEVfR09MREZJ
-U0hfUlRDLA0KK8KgIMKgIC5wYXJlbnTCoCDCoCDCoCDCoCA9IFRZUEVfU1lTX0JVU19ERVZJQ0Us
-DQorwqAgwqAgLmluc3RhbmNlX3NpemUgPSBzaXplb2YoR29sZGZpc2hSVENTdGF0ZSksDQorwqAg
-wqAgLmNsYXNzX2luaXTCoCDCoCA9IGdvbGRmaXNoX3J0Y19jbGFzc19pbml0LA0KK307DQorDQor
-c3RhdGljIHZvaWQgZ29sZGZpc2hfcnRjX3JlZ2lzdGVyX3R5cGVzKHZvaWQpDQorew0KK8KgIMKg
-IHR5cGVfcmVnaXN0ZXJfc3RhdGljKCZnb2xkZmlzaF9ydGNfaW5mbyk7DQorfQ0KKw0KK3R5cGVf
-aW5pdChnb2xkZmlzaF9ydGNfcmVnaXN0ZXJfdHlwZXMpDQpkaWZmIC0tZ2l0IGEvaW5jbHVkZS9o
-dy90aW1lci9nb2xkZmlzaF9ydGMuaCBiL2luY2x1ZGUvaHcvdGltZXIvZ29sZGZpc2hfcnRjLmgN
-Cm5ldyBmaWxlIG1vZGUgMTAwNjQ0DQppbmRleCAwMDAwMDAwMDAwLi5kZmI2ZDcwYjg2DQotLS0g
-L2Rldi9udWxsDQorKysgYi9pbmNsdWRlL2h3L3RpbWVyL2dvbGRmaXNoX3J0Yy5oDQpAQCAtMCww
-ICsxLDQ2IEBADQorLyoNCisgKiBHb2xkZmlzaCB2aXJ0dWFsIHBsYXRmb3JtIFJUQw0KKyAqDQor
-ICogQ29weXJpZ2h0IChDKSAyMDE5IFdlc3Rlcm4gRGlnaXRhbCBDb3Jwb3JhdGlvbiBvciBpdHMg
-YWZmaWxpYXRlcy4NCisgKg0KKyAqIEZvciBtb3JlIGRldGFpbHMgb24gR29vZ2xlIEdvbGRmaXNo
-IHZpcnR1YWwgcGxhdGZvcm0gcmVmZXI6DQorICogaHR0cHM6Ly9hbmRyb2lkLmdvb2dsZXNvdXJj
-ZS5jb20vcGxhdGZvcm0vZXh0ZXJuYWwvcWVtdS8rL21hc3Rlci9kb2NzL0dPTERGSVNILVZJUlRV
-QUwtSEFSRFdBUkUuVFhUDQorICoNCisgKiBUaGlzIHByb2dyYW0gaXMgZnJlZSBzb2Z0d2FyZTsg
-eW91IGNhbiByZWRpc3RyaWJ1dGUgaXQgYW5kL29yIG1vZGlmeSBpdA0KKyAqIHVuZGVyIHRoZSB0
-ZXJtcyBhbmQgY29uZGl0aW9ucyBvZiB0aGUgR05VIEdlbmVyYWwgUHVibGljIExpY2Vuc2UsDQor
-ICogdmVyc2lvbiAyIG9yIGxhdGVyLCBhcyBwdWJsaXNoZWQgYnkgdGhlIEZyZWUgU29mdHdhcmUg
-Rm91bmRhdGlvbi4NCisgKg0KKyAqIFRoaXMgcHJvZ3JhbSBpcyBkaXN0cmlidXRlZCBpbiB0aGUg
-aG9wZSBpdCB3aWxsIGJlIHVzZWZ1bCwgYnV0IFdJVEhPVVQNCisgKiBBTlkgV0FSUkFOVFk7IHdp
-dGhvdXQgZXZlbiB0aGUgaW1wbGllZCB3YXJyYW50eSBvZiBNRVJDSEFOVEFCSUxJVFkgb3INCisg
-KiBGSVRORVNTIEZPUiBBIFBBUlRJQ1VMQVIgUFVSUE9TRS7CoCBTZWUgdGhlIEdOVSBHZW5lcmFs
-IFB1YmxpYyBMaWNlbnNlIGZvcg0KKyAqIG1vcmUgZGV0YWlscy4NCisgKg0KKyAqIFlvdSBzaG91
-bGQgaGF2ZSByZWNlaXZlZCBhIGNvcHkgb2YgdGhlIEdOVSBHZW5lcmFsIFB1YmxpYyBMaWNlbnNl
-IGFsb25nIHdpdGgNCisgKiB0aGlzIHByb2dyYW0uwqAgSWYgbm90LCBzZWUgPGh0dHA6Ly93d3cu
-Z251Lm9yZy9saWNlbnNlcy8+Lg0KKyAqLw0KKw0KKyNpZm5kZWYgSFdfVElNRVJfR09MREZJU0hf
-UlRDX0gNCisjZGVmaW5lIEhXX1RJTUVSX0dPTERGSVNIX1JUQ19IDQorDQorI2luY2x1ZGUgImh3
-L3N5c2J1cy5oIg0KKw0KKyNkZWZpbmUgVFlQRV9HT0xERklTSF9SVEMgImdvbGRmaXNoX3J0YyIN
-CisjZGVmaW5lIEdPTERGSVNIX1JUQyhvYmopIFwNCitPQkpFQ1RfQ0hFQ0soR29sZGZpc2hSVENT
-dGF0ZSwgKG9iaiksIFRZUEVfR09MREZJU0hfUlRDKQ0KKw0KK3R5cGVkZWYgc3RydWN0IEdvbGRm
-aXNoUlRDU3RhdGUgew0KK8KgIMKgIFN5c0J1c0RldmljZSBwYXJlbnRfb2JqOw0KKw0KK8KgIMKg
-IE1lbW9yeVJlZ2lvbiBpb21lbTsNCivCoCDCoCBRRU1VVGltZXIgKnRpbWVyOw0KK8KgIMKgIHFl
-bXVfaXJxIGlycTsNCisNCivCoCDCoCB1aW50NjRfdCB0aWNrX29mZnNldDsNCivCoCDCoCB1aW50
-NjRfdCB0aWNrX29mZnNldF92bXN0YXRlOw0KK8KgIMKgIHVpbnQ2NF90IGFsYXJtX25leHQ7DQor
-wqAgwqAgdWludDMyX3QgYWxhcm1fcnVubmluZzsNCivCoCDCoCB1aW50MzJfdCBpcnFfcGVuZGlu
-ZzsNCivCoCDCoCB1aW50MzJfdCBpcnFfZW5hYmxlZDsNCit9IEdvbGRmaXNoUlRDU3RhdGU7DQor
-DQorI2VuZGlmDQotLSANCjIuMTcuMQ0KDQo=
+On Fri, 18 Oct 2019 19:22:18 +0200
+C=C3=A9dric Le Goater <clg@kaod.org> wrote:
+
+> The interrupt presenters are created by a machine handler at the core
+> level and are reseted independently. This is not consistent and it
+> raises some issues when it comes to handle hot-plugged CPUs. These are
+> reseted from the realize handler of the core and the presenters are
+> not. This is less of an issue in XICS, although a zero MFFR could be a
+> concern, but in XIVE, the OS CAM line is not set and this breaks the
+> presenting algorithm. The current code has workarounds which need a
+> global cleanup.
+>=20
+> Extend the sPAPR IRQ backend with a new cpu_intc_reset() handler which
+> will be called by the CPU reset handler and remove the XiveTCTX reset
+> handler which is redundant.
+>=20
+> spapr_realize_vcpu() is modified to call the CPU reset only after the
+> intc presenter has been created.
+>=20
+> Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
+> ---
+>=20
+>  The change of order of the CPU reset and the intc creation could be
+>  in its own patch for bisect. This is fragile.
+> =20
+
+And there's a nit. See below.
+
+Otherwise, LGTM.
+
+>  include/hw/ppc/spapr_irq.h |  2 ++
+>  include/hw/ppc/xics.h      |  1 +
+>  include/hw/ppc/xive.h      |  1 +
+>  hw/intc/spapr_xive.c       |  7 +++++++
+>  hw/intc/xics.c             |  8 ++------
+>  hw/intc/xics_spapr.c       |  7 +++++++
+>  hw/intc/xive.c             | 12 +-----------
+>  hw/ppc/spapr_cpu_core.c    | 14 ++++++++++----
+>  hw/ppc/spapr_irq.c         | 14 ++++++++++++++
+>  9 files changed, 45 insertions(+), 21 deletions(-)
+>=20
+> diff --git a/include/hw/ppc/spapr_irq.h b/include/hw/ppc/spapr_irq.h
+> index 5e150a667902..09232999b07e 100644
+> --- a/include/hw/ppc/spapr_irq.h
+> +++ b/include/hw/ppc/spapr_irq.h
+> @@ -52,6 +52,7 @@ typedef struct SpaprInterruptControllerClass {
+>       */
+>      int (*cpu_intc_create)(SpaprInterruptController *intc,
+>                              PowerPCCPU *cpu, Error **errp);
+> +    void (*cpu_intc_reset)(SpaprInterruptController *intc, PowerPCCPU *c=
+pu);
+>      int (*claim_irq)(SpaprInterruptController *intc, int irq, bool lsi,
+>                       Error **errp);
+>      void (*free_irq)(SpaprInterruptController *intc, int irq);
+> @@ -68,6 +69,7 @@ void spapr_irq_update_active_intc(SpaprMachineState *sp=
+apr);
+> =20
+>  int spapr_irq_cpu_intc_create(SpaprMachineState *spapr,
+>                                PowerPCCPU *cpu, Error **errp);
+> +void spapr_irq_cpu_intc_reset(SpaprMachineState *spapr, PowerPCCPU *cpu);
+>  void spapr_irq_print_info(SpaprMachineState *spapr, Monitor *mon);
+>  void spapr_irq_dt(SpaprMachineState *spapr, uint32_t nr_servers,
+>                    void *fdt, uint32_t phandle);
+> diff --git a/include/hw/ppc/xics.h b/include/hw/ppc/xics.h
+> index 1e6a9300eb2b..602173c12250 100644
+> --- a/include/hw/ppc/xics.h
+> +++ b/include/hw/ppc/xics.h
+> @@ -161,6 +161,7 @@ void icp_set_mfrr(ICPState *icp, uint8_t mfrr);
+>  uint32_t icp_accept(ICPState *ss);
+>  uint32_t icp_ipoll(ICPState *ss, uint32_t *mfrr);
+>  void icp_eoi(ICPState *icp, uint32_t xirr);
+> +void icp_reset(ICPState *icp);
+> =20
+>  void ics_write_xive(ICSState *ics, int nr, int server,
+>                      uint8_t priority, uint8_t saved_priority);
+> diff --git a/include/hw/ppc/xive.h b/include/hw/ppc/xive.h
+> index fd3319bd3202..99381639f50c 100644
+> --- a/include/hw/ppc/xive.h
+> +++ b/include/hw/ppc/xive.h
+> @@ -415,6 +415,7 @@ uint64_t xive_tctx_tm_read(XiveTCTX *tctx, hwaddr off=
+set, unsigned size);
+> =20
+>  void xive_tctx_pic_print_info(XiveTCTX *tctx, Monitor *mon);
+>  Object *xive_tctx_create(Object *cpu, XiveRouter *xrtr, Error **errp);
+> +void xive_tctx_reset(XiveTCTX *tctx);
+> =20
+>  static inline uint32_t xive_nvt_cam_line(uint8_t nvt_blk, uint32_t nvt_i=
+dx)
+>  {
+> diff --git a/hw/intc/spapr_xive.c b/hw/intc/spapr_xive.c
+> index ba32d2cc5b0f..258b1c5fb5ff 100644
+> --- a/hw/intc/spapr_xive.c
+> +++ b/hw/intc/spapr_xive.c
+> @@ -553,6 +553,12 @@ static int spapr_xive_cpu_intc_create(SpaprInterrupt=
+Controller *intc,
+>      return 0;
+>  }
+> =20
+> +static void spapr_xive_cpu_intc_reset(SpaprInterruptController *intc,
+> +                                     PowerPCCPU *cpu)
+> +{
+> +    xive_tctx_reset(spapr_cpu_state(cpu)->tctx);
+> +}
+> +
+>  static void spapr_xive_set_irq(SpaprInterruptController *intc, int irq, =
+int val)
+>  {
+>      SpaprXive *xive =3D SPAPR_XIVE(intc);
+> @@ -697,6 +703,7 @@ static void spapr_xive_class_init(ObjectClass *klass,=
+ void *data)
+>      sicc->activate =3D spapr_xive_activate;
+>      sicc->deactivate =3D spapr_xive_deactivate;
+>      sicc->cpu_intc_create =3D spapr_xive_cpu_intc_create;
+> +    sicc->cpu_intc_reset =3D spapr_xive_cpu_intc_reset;
+>      sicc->claim_irq =3D spapr_xive_claim_irq;
+>      sicc->free_irq =3D spapr_xive_free_irq;
+>      sicc->set_irq =3D spapr_xive_set_irq;
+> diff --git a/hw/intc/xics.c b/hw/intc/xics.c
+> index b5ac408f7b74..6da05763f9db 100644
+> --- a/hw/intc/xics.c
+> +++ b/hw/intc/xics.c
+> @@ -274,10 +274,8 @@ static const VMStateDescription vmstate_icp_server =
+=3D {
+>      },
+>  };
+> =20
+> -static void icp_reset_handler(void *dev)
+> +void icp_reset(ICPState *icp)
+>  {
+> -    ICPState *icp =3D ICP(dev);
+> -
+>      icp->xirr =3D 0;
+>      icp->pending_priority =3D 0xff;
+>      icp->mfrr =3D 0xff;
+> @@ -288,7 +286,7 @@ static void icp_reset_handler(void *dev)
+>      if (kvm_irqchip_in_kernel()) {
+>          Error *local_err =3D NULL;
+> =20
+> -        icp_set_kvm_state(ICP(dev), &local_err);
+> +        icp_set_kvm_state(icp, &local_err);
+>          if (local_err) {
+>              error_report_err(local_err);
+>          }
+> @@ -351,7 +349,6 @@ static void icp_realize(DeviceState *dev, Error **err=
+p)
+>          }
+>      }
+> =20
+> -    qemu_register_reset(icp_reset_handler, dev);
+>      vmstate_register(NULL, icp->cs->cpu_index, &vmstate_icp_server, icp);
+>  }
+> =20
+> @@ -360,7 +357,6 @@ static void icp_unrealize(DeviceState *dev, Error **e=
+rrp)
+>      ICPState *icp =3D ICP(dev);
+> =20
+>      vmstate_unregister(NULL, &vmstate_icp_server, icp);
+> -    qemu_unregister_reset(icp_reset_handler, dev);
+>  }
+> =20
+>  static void icp_class_init(ObjectClass *klass, void *data)
+> diff --git a/hw/intc/xics_spapr.c b/hw/intc/xics_spapr.c
+> index 4f64b9a9fc66..7418fb9f370c 100644
+> --- a/hw/intc/xics_spapr.c
+> +++ b/hw/intc/xics_spapr.c
+> @@ -346,6 +346,12 @@ static int xics_spapr_cpu_intc_create(SpaprInterrupt=
+Controller *intc,
+>      return 0;
+>  }
+> =20
+> +static void xics_spapr_cpu_intc_reset(SpaprInterruptController *intc,
+> +                                     PowerPCCPU *cpu)
+> +{
+> +    icp_reset(spapr_cpu_state(cpu)->icp);
+> +}
+> +
+>  static int xics_spapr_claim_irq(SpaprInterruptController *intc, int irq,
+>                                  bool lsi, Error **errp)
+>  {
+> @@ -433,6 +439,7 @@ static void ics_spapr_class_init(ObjectClass *klass, =
+void *data)
+>      sicc->activate =3D xics_spapr_activate;
+>      sicc->deactivate =3D xics_spapr_deactivate;
+>      sicc->cpu_intc_create =3D xics_spapr_cpu_intc_create;
+> +    sicc->cpu_intc_reset =3D xics_spapr_cpu_intc_reset;
+>      sicc->claim_irq =3D xics_spapr_claim_irq;
+>      sicc->free_irq =3D xics_spapr_free_irq;
+>      sicc->set_irq =3D xics_spapr_set_irq;
+> diff --git a/hw/intc/xive.c b/hw/intc/xive.c
+> index d420c6571e14..f066be5eb5e3 100644
+> --- a/hw/intc/xive.c
+> +++ b/hw/intc/xive.c
+> @@ -547,10 +547,8 @@ void xive_tctx_pic_print_info(XiveTCTX *tctx, Monito=
+r *mon)
+>      }
+>  }
+> =20
+> -static void xive_tctx_reset(void *dev)
+> +void xive_tctx_reset(XiveTCTX *tctx)
+>  {
+> -    XiveTCTX *tctx =3D XIVE_TCTX(dev);
+> -
+>      memset(tctx->regs, 0, sizeof(tctx->regs));
+> =20
+>      /* Set some defaults */
+> @@ -607,13 +605,6 @@ static void xive_tctx_realize(DeviceState *dev, Erro=
+r **errp)
+>              return;
+>          }
+>      }
+> -
+> -    qemu_register_reset(xive_tctx_reset, dev);
+> -}
+> -
+> -static void xive_tctx_unrealize(DeviceState *dev, Error **errp)
+> -{
+> -    qemu_unregister_reset(xive_tctx_reset, dev);
+>  }
+> =20
+>  static int vmstate_xive_tctx_pre_save(void *opaque)
+> @@ -668,7 +659,6 @@ static void xive_tctx_class_init(ObjectClass *klass, =
+void *data)
+> =20
+>      dc->desc =3D "XIVE Interrupt Thread Context";
+>      dc->realize =3D xive_tctx_realize;
+> -    dc->unrealize =3D xive_tctx_unrealize;
+>      dc->vmsd =3D &vmstate_xive_tctx;
+>      /*
+>       * Reason: part of XIVE interrupt controller, needs to be wired up
+> diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
+> index 3e4302c7d596..d04baa7cde4f 100644
+> --- a/hw/ppc/spapr_cpu_core.c
+> +++ b/hw/ppc/spapr_cpu_core.c
+> @@ -33,6 +33,7 @@ static void spapr_cpu_reset(void *opaque)
+>      PowerPCCPUClass *pcc =3D POWERPC_CPU_GET_CLASS(cpu);
+>      SpaprCpuState *spapr_cpu =3D spapr_cpu_state(cpu);
+>      target_ulong lpcr;
+> +    SpaprMachineState *spapr =3D SPAPR_MACHINE(qdev_get_machine());
+> =20
+>      cpu_reset(cs);
+> =20
+> @@ -77,9 +78,11 @@ static void spapr_cpu_reset(void *opaque)
+>      spapr_cpu->dtl_addr =3D 0;
+>      spapr_cpu->dtl_size =3D 0;
+> =20
+> -    spapr_caps_cpu_apply(SPAPR_MACHINE(qdev_get_machine()), cpu);
+> +    spapr_caps_cpu_apply(spapr, cpu);
+> =20
+>      kvm_check_mmu(cpu, &error_fatal);
+> +
+> +    spapr_irq_cpu_intc_reset(spapr, cpu);
+>  }
+> =20
+>  void spapr_cpu_set_entry_state(PowerPCCPU *cpu, target_ulong nip, target=
+_ulong r3)
+> @@ -234,13 +237,16 @@ static void spapr_realize_vcpu(PowerPCCPU *cpu, Spa=
+prMachineState *spapr,
+>      cpu_ppc_set_vhyp(cpu, PPC_VIRTUAL_HYPERVISOR(spapr));
+>      kvmppc_set_papr(cpu);
+> =20
+> -    qemu_register_reset(spapr_cpu_reset, cpu);
+> -    spapr_cpu_reset(cpu);
+> -
+>      if (spapr_irq_cpu_intc_create(spapr, cpu, &local_err) < 0) {
+>          goto error_unregister;
+
+We no longer need to call qemu_unregister_reset() on rollback then.
+Maybe rename the label as well.
+
+>      }
+> =20
+> +    /*
+> +     * Hot-plugged CPUs are not reseted. Do it here.
+> +     */
+> +    qemu_register_reset(spapr_cpu_reset, cpu);
+> +    spapr_cpu_reset(cpu);
+> +
+>      if (!sc->pre_3_0_migration) {
+>          vmstate_register(NULL, cs->cpu_index, &vmstate_spapr_cpu_state,
+>                           cpu->machine_data);
+> diff --git a/hw/ppc/spapr_irq.c b/hw/ppc/spapr_irq.c
+> index 234d1073e518..b941608b69ba 100644
+> --- a/hw/ppc/spapr_irq.c
+> +++ b/hw/ppc/spapr_irq.c
+> @@ -220,6 +220,20 @@ int spapr_irq_cpu_intc_create(SpaprMachineState *spa=
+pr,
+>      return 0;
+>  }
+> =20
+> +void spapr_irq_cpu_intc_reset(SpaprMachineState *spapr, PowerPCCPU *cpu)
+> +{
+> +    SpaprInterruptController *intcs[] =3D ALL_INTCS(spapr);
+> +    int i;
+> +
+> +    for (i =3D 0; i < ARRAY_SIZE(intcs); i++) {
+> +        SpaprInterruptController *intc =3D intcs[i];
+> +        if (intc) {
+> +            SpaprInterruptControllerClass *sicc =3D SPAPR_INTC_GET_CLASS=
+(intc);
+> +            sicc->cpu_intc_reset(intc, cpu);
+> +        }
+> +    }
+> +}
+> +
+>  static void spapr_set_irq(void *opaque, int irq, int level)
+>  {
+>      SpaprMachineState *spapr =3D SPAPR_MACHINE(opaque);
+
 
