@@ -2,81 +2,81 @@ Return-Path: <SRS0=F+Q9=YM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-14.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,PDS_BTC_ID,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 25C70CA9EAC
-	for <qemu-devel@archiver.kernel.org>; Sat, 19 Oct 2019 15:37:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B8DA3CA9EAC
+	for <qemu-devel@archiver.kernel.org>; Sat, 19 Oct 2019 15:37:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E5F9B2082C
-	for <qemu-devel@archiver.kernel.org>; Sat, 19 Oct 2019 15:37:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 87D812082C
+	for <qemu-devel@archiver.kernel.org>; Sat, 19 Oct 2019 15:37:07 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eL91lvr1"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E5F9B2082C
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HJ+3sZ1o"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 87D812082C
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56954 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56956 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iLqmr-0006zK-LU
-	for qemu-devel@archiver.kernel.org; Sat, 19 Oct 2019 11:37:01 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47423)
+	id 1iLqmw-00075O-9a
+	for qemu-devel@archiver.kernel.org; Sat, 19 Oct 2019 11:37:06 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47449)
  by lists.gnu.org with esmtp (Exim 4.90_1)
  (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1iLqkh-00059L-Do
- for qemu-devel@nongnu.org; Sat, 19 Oct 2019 11:34:48 -0400
+ id 1iLqkk-0005Dw-9u
+ for qemu-devel@nongnu.org; Sat, 19 Oct 2019 11:34:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
  (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1iLqkg-0002sB-2s
- for qemu-devel@nongnu.org; Sat, 19 Oct 2019 11:34:47 -0400
-Received: from mail-wm1-x333.google.com ([2a00:1450:4864:20::333]:37054)
+ id 1iLqki-0002tw-O9
+ for qemu-devel@nongnu.org; Sat, 19 Oct 2019 11:34:50 -0400
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:38281)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1iLqkf-0002rw-Ti
- for qemu-devel@nongnu.org; Sat, 19 Oct 2019 11:34:46 -0400
-Received: by mail-wm1-x333.google.com with SMTP id f22so8753641wmc.2
- for <qemu-devel@nongnu.org>; Sat, 19 Oct 2019 08:34:45 -0700 (PDT)
+ id 1iLqki-0002tM-I1
+ for qemu-devel@nongnu.org; Sat, 19 Oct 2019 11:34:48 -0400
+Received: by mail-wr1-x444.google.com with SMTP id o15so8802102wru.5
+ for <qemu-devel@nongnu.org>; Sat, 19 Oct 2019 08:34:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=l2a+TCqZPYf8Fdku0JFcZTliUzkB7c4m1IgL3Bv67Zg=;
- b=eL91lvr1o7Kg+wOKDN8X3IJ7Xkcx4yhEg7uXfWnOxQ4ySTyO1IpVxhXqBnIOfWhy+t
- rBa+kChJMwlryj8epNZFktmaCS2QcNwUTVwZR9jb0joc30ULEFKSYY4r0CMf41+XUltM
- BvShJYu6lRUGVVVUwj9elHaJxBID/bgfw6JgDR3Omo9STh7NhWy6pz3+MfeTQkHKpC5Z
- FDA7vCjGkSvDwfqvkqRTHaLNfpVy9lY+rlkb64lfIQeu/eZBQXTGoPy5y7nxoWRlSrrx
- 6Q8bGvEQFdzkoLowLkNX/8OuWxGRh2x+iZYA4MlEVOvhsqbLUyiNzqzeBNNlqgjjOGf9
- 8ALA==
+ bh=QBTrUBOd5GMcqdYIUb+wluk81oA9TycjHbQQeiTj8kE=;
+ b=HJ+3sZ1oqiasnuOlFbQYJCm9vU7tr816YZcAElZMG8QWhN8KGivj3wTWxrMbCJqw4C
+ fXMKcyFXKe5h/zWocjQISFxBD2TQ0GLSocZ2+tJpvpK0u+lcN2Ml/QSROuVCSc5lOXng
+ VSvmTPibf6sk9l52Avjyw1kwIscSH3qeLXCfp58RjdjrUvI44z9ar62fQ2AlrDLgA1vK
+ g4l2VRhaFUqMLkz8B/Y3aFivWNko4kPFtlJV2LWSG4ZPnfDV/aqlDTsryaHkqqqVwrCf
+ IBK94o2Yf+sZfQ7+cdmLqtPNEXR1WN4+1yzPoJ6v7Ezkkhc+x2TR8iQVZQhN4Vgn6Zd4
+ 9k7Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=l2a+TCqZPYf8Fdku0JFcZTliUzkB7c4m1IgL3Bv67Zg=;
- b=TsAeFRbTiHQSVjVt1wfko3avXLYUbbrjALcgC4OQmp3WoiRL0IBjYl4s6Xxnf2idi2
- 5l+/6iE7wQ0YS8zu6k15Hz9B6K++jdT6r6ooVv8njDrX9cqLeMr1hxDkvxRAeLmCIAlV
- aTDevAtrVb9NIilo1cxNsIqnB1qVduJLbA7Q8ln4zVUi0wetOjKHYooCAsOpp1uM3XKF
- ZErRFOgzEOrLls1NjgwJhXQ/FuNZiEr1VuY++6OaZOcuS+PqYi0dfF7wnFDslesbVEYZ
- iUQINz349Tx90NTdwz1BLmb4L0T8xZQkz1zilTbpyf2aNJviOvMjpdlVbeRDlsu9ZaNT
- kEAw==
-X-Gm-Message-State: APjAAAXvL7gbKOP9kAJOkYum7pHtUbHmpDxGejptMNvxq893joFdoRvQ
- q2wKIjt186xo7zQtQ082f0pAfuco
-X-Google-Smtp-Source: APXvYqxFnHkP56/IBULT5vzXpkrkh6hmUd7Rs0z883K54SntiBLeB1rb6f5NmeaIMaBgh9KYIpJTPQ==
-X-Received: by 2002:a1c:5946:: with SMTP id n67mr12569560wmb.93.1571499284716; 
- Sat, 19 Oct 2019 08:34:44 -0700 (PDT)
+ bh=QBTrUBOd5GMcqdYIUb+wluk81oA9TycjHbQQeiTj8kE=;
+ b=GzpPfUJfoz5tEvJgy7CnB7jg70EaGhYsIB1JwrslZMKUh7CoWfcwQ9xz6glg1kpEte
+ YhJUsz0a14IGD/4FDOIpW1s9gHAewuse1O2w5nkb5ZOw3aeKFvFDhZhqusmfX1nzdo25
+ fJGKB1elCJ7zo6ENHunBPlntO2L1g8HfkiZCIzH+GG9hSULkhfIBg9rMhqcsAf2AHFKK
+ JmH7AksWG1TLGbDcAivEpXANI0R3su04/1R2w7XAtW/jODeltvczCo2o47sQMwItRLOW
+ +9jioAi7x9eUzKh4l3xA8hcFCfEFBxPc5Cv1DFVplp4qClozj9kGIVY6/BUpejf2N9aA
+ TZcQ==
+X-Gm-Message-State: APjAAAWZmGQQjaJcw9YiGrV+dzp2Dtmy44Z3SXuHswszW9ZvNsSucY2k
+ leQfwFUKVdbNyOOTVRwk1NQMVeFw
+X-Google-Smtp-Source: APXvYqzr+mfdeupUQVZggAj7YHBlI7jj3pw790Jy08IvYdI3zHfb4kojZ+hWNL9zUELiSdaiog+SoA==
+X-Received: by 2002:adf:a54e:: with SMTP id j14mr9859289wrb.265.1571499287173; 
+ Sat, 19 Oct 2019 08:34:47 -0700 (PDT)
 Received: from x1w.redhat.com (14.red-88-21-201.staticip.rima-tde.net.
  [88.21.201.14])
- by smtp.gmail.com with ESMTPSA id j19sm15245605wre.0.2019.10.19.08.34.43
+ by smtp.gmail.com with ESMTPSA id j19sm15245605wre.0.2019.10.19.08.34.46
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sat, 19 Oct 2019 08:34:44 -0700 (PDT)
+ Sat, 19 Oct 2019 08:34:46 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 04/11] tests/acceptance: Refactor
- exec_command_and_wait_for_pattern()
-Date: Sat, 19 Oct 2019 17:34:30 +0200
-Message-Id: <20191019153437.9820-5-f4bug@amsat.org>
+Subject: [PATCH v2 06/11] tests/boot_linux_console: Run BusyBox on 5KEc 64-bit
+ cpu
+Date: Sat, 19 Oct 2019 17:34:32 +0200
+Message-Id: <20191019153437.9820-7-f4bug@amsat.org>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20191019153437.9820-1-f4bug@amsat.org>
 References: <20191019153437.9820-1-f4bug@amsat.org>
@@ -86,7 +86,7 @@ Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::333
+X-Received-From: 2a00:1450:4864:20::444
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,100 +99,124 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Eduardo Habkost <ehabkost@redhat.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
  Aleksandar Markovic <amarkovic@wavecomp.com>, Cleber Rosa <crosa@redhat.com>,
  Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
  Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Philippe Mathieu-Daudé <philmd@redhat.com>
+This tests boots a Linux kernel on a Malta machine up to a
+busybox shell on the serial console. Few commands are executed
+before halting the machine (via reboot).
 
-The same utility method is already present in two different test
-files, so let's consolidate it into a single utility function.
+We use the Fedora 24 kernel extracted from the image at:
+https://fedoraproject.org/wiki/Architectures/MIPS
+and the initrd cpio image from the kerneltests project:
+https://kerneltests.org/
 
-Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+If MIPS is a target being built, "make check-acceptance" will
+automatically include this test by the use of the "arch:mips" tags.
+
+Alternatively, this test can be run using:
+
+  $ avocado --show=console run -t arch:mips64el tests/acceptance/boot_linux_console.py
+  console: [    0.000000] Linux version 3.19.3.mtoman.20150408 (mtoman@debian-co3-1) (gcc version 5.0.0 20150316 (Red Hat 5.0.0-0.20) (GCC) ) #3 Wed Apr 8 14:32:50 UTC 2015
+  console: [    0.000000] Early serial console at I/O port 0x3f8 (options '38400n8')
+  console: [    0.000000] bootconsole [uart0] enabled
+  console: [    0.000000] CPU0 revision is: 00018900 (MIPS 5KE)
+  console: [    0.000000] Checking for the multiply/shift bug... no.
+  console: [    0.000000] Checking for the daddiu bug... no.
+  [...]
+  console: Boot successful.
+  console: cat /proc/cpuinfo
+  console: / # cat /proc/cpuinfo
+  console: system type            : MIPS Malta
+  console: machine                        : Unknown
+  console: processor              : 0
+  console: cpu model              : MIPS 5KE V0.0
+  console: : 1616.89
+  console: wait instruction       : nouname -a
+  console: microsecond timers     : yes
+  console: tlb_entries            : 32
+  console: extra interrupt vector : yes
+  console: hardware watchpoint    : yes, count: 1, address/irw mask: [0x0ff8]
+  console: isa                    : mips1 mips2 mips3 mips4 mips5 mips32r1 mips32r2 mips64r1 mips64r2
+  console: ASEs implemented       :
+  console: shadow register sets   : 1
+  console: kscratch registers     : 0
+  console: package                        : 0
+  console: core                   : 0
+  console: VCED exceptions                : not available
+  console: VCEI exceptions                : not available
+  console: / #
+  console: / # uname -a
+  console: Linux buildroot 3.19.3.mtoman.20150408 #3 Wed Apr 8 14:32:50 UTC 2015 mips64 GNU/Linux
+  console: reboot
+  console: / #
+  console: / # reboot
+  console: / #
+  console: / # reboot: Restarting system
+  PASS (7.04 s)
+  JOB TIME   : 7.20 s
+
+Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
-v2: fix self -> test, failure_message is optional, added doc
----
- tests/acceptance/avocado_qemu/__init__.py | 19 +++++++++++++++++++
- tests/acceptance/boot_linux_console.py    | 18 +++++++-----------
- 2 files changed, 26 insertions(+), 11 deletions(-)
+ tests/acceptance/boot_linux_console.py | 40 ++++++++++++++++++++++++++
+ 1 file changed, 40 insertions(+)
 
-diff --git a/tests/acceptance/avocado_qemu/__init__.py b/tests/acceptance/avocado_qemu/__init__.py
-index a0450e5263..7bc77118dd 100644
---- a/tests/acceptance/avocado_qemu/__init__.py
-+++ b/tests/acceptance/avocado_qemu/__init__.py
-@@ -79,6 +79,25 @@ def wait_for_console_pattern(test, success_message, failure_message=None):
-             test.fail(fail)
- 
- 
-+def exec_command_and_wait_for_pattern(test, command,
-+                                      success_message, failure_message=None):
-+    """
-+    Send a command to a console (appending CRLF characters), then wait
-+    for success_message to appear on the console, while logging the.
-+    content. Mark the test as failed if failure_message is found instead.
-+
-+    :param test: an Avocado test containing a VM that will have its console
-+                 read and probed for a success or failure message
-+    :type test: :class:`avocado_qemu.Test`
-+    :param command: the command to send
-+    :param success_message: if this message appears, test succeeds
-+    :param failure_message: if this message appears, test fails
-+    """
-+    command += '\r\n'
-+    test.vm.console_socket.sendall(command.encode())
-+    wait_for_console_pattern(test, success_message, failure_message)
-+
-+
- class Test(avocado.Test):
-     def setUp(self):
-         self._vms = {}
 diff --git a/tests/acceptance/boot_linux_console.py b/tests/acceptance/boot_linux_console.py
-index 497faa4f7f..4b419b0559 100644
+index 67d7e96d98..e505a41eed 100644
 --- a/tests/acceptance/boot_linux_console.py
 +++ b/tests/acceptance/boot_linux_console.py
-@@ -14,6 +14,7 @@ import gzip
- import shutil
+@@ -166,6 +166,46 @@ class BootLinuxConsole(Test):
+         exec_command_and_wait_for_pattern(self, 'reboot',
+                                                 'reboot: Restarting system')
  
- from avocado_qemu import Test
-+from avocado_qemu import exec_command_and_wait_for_pattern
- from avocado_qemu import wait_for_console_pattern
- from avocado.utils import process
- from avocado.utils import archive
-@@ -33,11 +34,6 @@ class BootLinuxConsole(Test):
-         wait_for_console_pattern(self, success_message,
-                                  failure_message='Kernel panic - not syncing')
- 
--    def exec_command_and_wait_for_pattern(self, command, success_message):
--        command += '\r\n'
--        self.vm.console_socket.sendall(command.encode())
--        wait_for_console_pattern(self, success_message)
--
-     def extract_from_deb(self, deb, path):
-         """
-         Extracts a file from a deb package into the test workdir
-@@ -166,12 +162,12 @@ class BootLinuxConsole(Test):
-         self.vm.launch()
-         self.wait_for_console_pattern('Boot successful.')
- 
--        self.exec_command_and_wait_for_pattern('cat /proc/cpuinfo',
--                                               'BogoMIPS')
--        self.exec_command_and_wait_for_pattern('uname -a',
--                                               'Debian')
--        self.exec_command_and_wait_for_pattern('reboot',
--                                               'reboot: Restarting system')
++    def test_mips64el_malta_5KEc_cpio(self):
++        """
++        :avocado: tags=arch:mips64el
++        :avocado: tags=machine:malta
++        :avocado: tags=endian:little
++        """
++        kernel_url = ('https://github.com/philmd/qemu-testing-blob/'
++                      'raw/9ad2df38/mips/malta/mips64el/'
++                      'vmlinux-3.19.3.mtoman.20150408')
++        kernel_hash = '00d1d268fb9f7d8beda1de6bebcc46e884d71754'
++        kernel_path = self.fetch_asset(kernel_url, asset_hash=kernel_hash)
++        initrd_url = ('https://github.com/groeck/linux-build-test/'
++                      'raw/8584a59e/rootfs/'
++                      'mipsel64/rootfs.mipsel64r1.cpio.gz')
++        initrd_hash = '1dbb8a396e916847325284dbe2151167'
++        initrd_path_gz = self.fetch_asset(initrd_url, algorithm='md5',
++                                          asset_hash=initrd_hash)
++        initrd_path = self.workdir + "rootfs.cpio"
++        archive.gzip_uncompress(initrd_path_gz, initrd_path)
++
++        self.vm.set_machine('malta')
++        self.vm.set_console()
++        kernel_command_line = (self.KERNEL_COMMON_COMMAND_LINE
++                               + 'console=ttyS0 console=tty '
++                               + 'rdinit=/sbin/init noreboot')
++        self.vm.add_args('-cpu', '5KEc',
++                         '-kernel', kernel_path,
++                         '-initrd', initrd_path,
++                         '-append', kernel_command_line,
++                         '-no-reboot')
++        self.vm.launch()
++        wait_for_console_pattern(self, 'Boot successful.')
++
 +        exec_command_and_wait_for_pattern(self, 'cat /proc/cpuinfo',
-+                                                'BogoMIPS')
++                                                'MIPS 5KE')
 +        exec_command_and_wait_for_pattern(self, 'uname -a',
-+                                                'Debian')
++                                                '3.19.3.mtoman.20150408')
 +        exec_command_and_wait_for_pattern(self, 'reboot',
 +                                                'reboot: Restarting system')
- 
++
      def do_test_mips_malta32el_nanomips(self, kernel_url, kernel_hash):
          kernel_path_xz = self.fetch_asset(kernel_url, asset_hash=kernel_hash)
+         kernel_path = self.workdir + "kernel"
 -- 
 2.21.0
 
