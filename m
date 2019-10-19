@@ -2,85 +2,68 @@ Return-Path: <SRS0=F+Q9=YM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EC139CA9EAC
-	for <qemu-devel@archiver.kernel.org>; Sat, 19 Oct 2019 20:41:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C77D6CA9EAC
+	for <qemu-devel@archiver.kernel.org>; Sat, 19 Oct 2019 22:31:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9DC6521D7C
-	for <qemu-devel@archiver.kernel.org>; Sat, 19 Oct 2019 20:41:42 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="E3PlLBDU"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9DC6521D7C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 9371121897
+	for <qemu-devel@archiver.kernel.org>; Sat, 19 Oct 2019 22:31:20 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9371121897
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37476 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40006 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iLvXh-0006aZ-Rb
-	for qemu-devel@archiver.kernel.org; Sat, 19 Oct 2019 16:41:41 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51918)
+	id 1iLxFn-00084n-JG
+	for qemu-devel@archiver.kernel.org; Sat, 19 Oct 2019 18:31:19 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58905)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <aleksandar.m.mail@gmail.com>) id 1iLvWy-00067b-5F
- for qemu-devel@nongnu.org; Sat, 19 Oct 2019 16:40:58 -0400
+ (envelope-from <no-reply@patchew.org>) id 1iLxED-0007Ia-MM
+ for qemu-devel@nongnu.org; Sat, 19 Oct 2019 18:29:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aleksandar.m.mail@gmail.com>) id 1iLvWv-0004Gz-LV
- for qemu-devel@nongnu.org; Sat, 19 Oct 2019 16:40:56 -0400
-Received: from mail-oi1-x244.google.com ([2607:f8b0:4864:20::244]:34411)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
- id 1iLvWv-0004GX-Co
- for qemu-devel@nongnu.org; Sat, 19 Oct 2019 16:40:53 -0400
-Received: by mail-oi1-x244.google.com with SMTP id 83so8064103oii.1
- for <qemu-devel@nongnu.org>; Sat, 19 Oct 2019 13:40:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:in-reply-to:references:from:date:message-id:subject:to
- :cc; bh=Q42cFN3FIB6M48/IeeZ8XgxcSEFcwbKGu4YPq71rB4U=;
- b=E3PlLBDUtDPZEfbIZytcqa3T0J+9puF8ZrPckoNN69CdVk5cD5M/kp/ZrqnkvD99L1
- 9A5GJ7LJxAtmATDKiTRjYmk8LaE8EX8zT87oyanmTHol3qyYpIfhQK3Uo9ld5PBK81vi
- wbLqezY1oOGYiLtkgEfGOX+QEUZjypPRpAXwCJWJf2naTehQWK+AXf98zh4CGiFNE92r
- bp6kRakz0fYuf/OyCLOX2smIhHlDATBiUWIQuIAeOKuct0I/VmDFlAPo+hA8Y6OHGbY9
- Fp7r1OXhb08p2qNKGm0UIGcqutkXeDzX4VpnuW+OPGJjjqeWIyNQTtZVgduBaGFO9/rr
- ossg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:in-reply-to:references:from:date
- :message-id:subject:to:cc;
- bh=Q42cFN3FIB6M48/IeeZ8XgxcSEFcwbKGu4YPq71rB4U=;
- b=RvR82PDXJZLzIuubEYmBm8ypCC4a2BgsYvGFTO/ND9wxR8u9ixvwnXREIwZDQVNQi3
- PgJ8CrTh9ckOjguzy/RyrA+gxod6jurqoy7NhHX9TdNIr/xpP3Ct64dtlglQgZYLbr+2
- J9act8snSdqypPgB4HpFuVg0uBpnwesKw+qsPb8NCWHv42wqTELuRdmtRQ4glaUnIjO+
- XhyAKMLB0fHb1qwTnhJ19SC2M6FlU3WVvbVPT1m8q71dt9dcWg3Bgxcjr7GYWRo2rD+M
- CoQLCsLGvfWq2ajJEv2eKIDuIokvZpxXfgMzty3P9wEj6aH9V7kDNweJLf+9TuDbm6pn
- yRxA==
-X-Gm-Message-State: APjAAAWSF8MN0HWu5ZWDj182087PNEbTExkKZq2gJ13d8lMKv5MK/0ZA
- 7AjetNIbOJrkKO0dZo/fMvcQeELKhps+cGb1VMDqHw==
-X-Google-Smtp-Source: APXvYqz+CpQ8YelBeGQ5jY0flcUC4V322gfBFfZ3knGpxFctHzDm83PNvx0pjqbIjmLjaPPYKSf9vMVl5cO/TZ+97EU=
-X-Received: by 2002:aca:62d5:: with SMTP id
- w204mr13181225oib.136.1571517652353; 
- Sat, 19 Oct 2019 13:40:52 -0700 (PDT)
+ (envelope-from <no-reply@patchew.org>) id 1iLxEC-0005Ig-5G
+ for qemu-devel@nongnu.org; Sat, 19 Oct 2019 18:29:41 -0400
+Resent-Date: Sat, 19 Oct 2019 18:29:41 -0400
+Resent-Message-Id: <E1iLxEC-0005Ig-5G@eggs.gnu.org>
+Received: from sender4-of-o54.zoho.com ([136.143.188.54]:21432)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <no-reply@patchew.org>)
+ id 1iLxEB-0005HI-U5; Sat, 19 Oct 2019 18:29:40 -0400
+ARC-Seal: i=1; a=rsa-sha256; t=1571524155; cv=none; 
+ d=zohomail.com; s=zohoarc; 
+ b=LEqnfpZmXcVNtr0DbffUECqaAV2xOUhxGkQUQ+Z76mQ7ANZFFB6LxINvKvXWoTeCFKTV+Q2C3VsV+calrMyFQM2+q+on2+rsEmZQys4ng+90Ubn7EfbcU7iHvOjRK1yXztTy3bB2BPuSoO1JzaKKMYAmqgB7Rn9WPkjEFTaxf4k=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
+ s=zohoarc; t=1571524155;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
+ bh=KntkT2pXd8PWpcjJErkspS/55HinzpvkLAqVuF+UpaM=; 
+ b=e5vPCCpvWkmkOj181VnI3h8QUMKqdiGrwU8BrZtQDUvK9LVPd2iWoudZrYikJz4tagmmoRZfGRA6Toy7/4FUEjp309B3xll2GHjW2p0OUvRsppkWrXeeAhS2LnJHYFRD92Amw9Hk+3PouypHNv99a56EuG4VGWX6z9WiVKnJ5i4=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+ dkim=pass  header.i=patchew.org;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 157152415376265.17164592501274;
+ Sat, 19 Oct 2019 15:29:13 -0700 (PDT)
+In-Reply-To: <20191019120534.27479-1-ash@kambanaria.org>
+Subject: Re: [PATCH 0/1] Update Bulgarian translation
+Message-ID: <157152415144.24734.16743337712381592547@37313f22b938>
 MIME-Version: 1.0
-Received: by 2002:a9d:340a:0:0:0:0:0 with HTTP; Sat, 19 Oct 2019 13:40:51
- -0700 (PDT)
-In-Reply-To: <1571311659-15556-4-git-send-email-stefan.brankovic@rt-rk.com>
-References: <1571311659-15556-1-git-send-email-stefan.brankovic@rt-rk.com>
- <1571311659-15556-4-git-send-email-stefan.brankovic@rt-rk.com>
-From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
-Date: Sat, 19 Oct 2019 22:40:51 +0200
-Message-ID: <CAL1e-=i5rySJ=uq=Jc+cH-HqtkTO6ZoagXwQNShLTieyGYcuag@mail.gmail.com>
-Subject: Re: [PATCH v7 3/3] target/ppc: Optimize emulation of vupkhpx and
- vupklpx instructions
-To: Stefan Brankovic <stefan.brankovic@rt-rk.com>
-Content-Type: multipart/alternative; boundary="0000000000006d474805954977b1"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::244
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: ash@kambanaria.org
+Date: Sat, 19 Oct 2019 15:29:13 -0700 (PDT)
+X-ZohoMailClient: External
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 136.143.188.54
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -92,463 +75,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "richard.henderson@linaro.org" <richard.henderson@linaro.org>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "david@gibson.dropbear.id.au" <david@gibson.dropbear.id.au>
+Reply-To: qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, aliguori@us.ibm.com, famz@redhat.com, f4bug@amsat.org,
+ qemu-trivial@nongnu.org, ash@kambanaria.org, stefanha@redhat.com,
+ qemu-devel@nongnu.org, ptoscano@redhat.com, borntraeger@de.ibm.com,
+ wehuang@redhat.com, sw@weilnetz.de, thuth@redhat.com, pbonzini@redhat.com,
+ akong@redhat.com, lersek@redhat.com, songdongsheng@live.cn, laurent@vivier.eu
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---0000000000006d474805954977b1
-Content-Type: text/plain; charset="UTF-8"
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MTAxOTEyMDUzNC4yNzQ3
+OS0xLWFzaEBrYW1iYW5hcmlhLm9yZy8KCgoKSGksCgpUaGlzIHNlcmllcyBmYWlsZWQgdGhlIGRv
+Y2tlci1xdWlja0BjZW50b3M3IGJ1aWxkIHRlc3QuIFBsZWFzZSBmaW5kIHRoZSB0ZXN0aW5nIGNv
+bW1hbmRzIGFuZAp0aGVpciBvdXRwdXQgYmVsb3cuIElmIHlvdSBoYXZlIERvY2tlciBpbnN0YWxs
+ZWQsIHlvdSBjYW4gcHJvYmFibHkgcmVwcm9kdWNlIGl0CmxvY2FsbHkuCgo9PT0gVEVTVCBTQ1JJ
+UFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCm1ha2UgZG9ja2VyLWltYWdlLWNlbnRvczcgVj0xIE5F
+VFdPUks9MQp0aW1lIG1ha2UgZG9ja2VyLXRlc3QtcXVpY2tAY2VudG9zNyBTSE9XX0VOVj0xIEo9
+MTQgTkVUV09SSz0xCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgogIFRFU1QgICAgaW90ZXN0LXFj
+b3cyOiAwMTAKICBURVNUICAgIGNoZWNrLXF0ZXN0LXg4Nl82NDogdGVzdHMvYWhjaS10ZXN0CnRl
+c3QtYWlvLW11bHRpdGhyZWFkOiAvdG1wL3FlbXUtdGVzdC9zcmMvdXRpbC9hc3luYy5jOjI4Mzog
+YWlvX2N0eF9maW5hbGl6ZTogQXNzZXJ0aW9uIGAhcWVtdV9sb2NrY250X2NvdW50KCZjdHgtPmxp
+c3RfbG9jayknIGZhaWxlZC4KRVJST1IgLSB0b28gZmV3IHRlc3RzIHJ1biAoZXhwZWN0ZWQgNiwg
+Z290IDIpCm1ha2U6ICoqKiBbY2hlY2stdW5pdF0gRXJyb3IgMQptYWtlOiAqKiogV2FpdGluZyBm
+b3IgdW5maW5pc2hlZCBqb2JzLi4uLgogIFRFU1QgICAgaW90ZXN0LXFjb3cyOiAwMTEKICBURVNU
+ICAgIGlvdGVzdC1xY293MjogMDEyCi0tLQogICAgcmFpc2UgQ2FsbGVkUHJvY2Vzc0Vycm9yKHJl
+dGNvZGUsIGNtZCkKc3VicHJvY2Vzcy5DYWxsZWRQcm9jZXNzRXJyb3I6IENvbW1hbmQgJ1snc3Vk
+bycsICctbicsICdkb2NrZXInLCAncnVuJywgJy0tbGFiZWwnLCAnY29tLnFlbXUuaW5zdGFuY2Uu
+dXVpZD0zMTM1Mjc3ZGY2ZGU0NTRkODhiZjZjMDk1OTkwNzkxYicsICctdScsICcxMDAxJywgJy0t
+c2VjdXJpdHktb3B0JywgJ3NlY2NvbXA9dW5jb25maW5lZCcsICctLXJtJywgJy1lJywgJ1RBUkdF
+VF9MSVNUPScsICctZScsICdFWFRSQV9DT05GSUdVUkVfT1BUUz0nLCAnLWUnLCAnVj0nLCAnLWUn
+LCAnSj0xNCcsICctZScsICdERUJVRz0nLCAnLWUnLCAnU0hPV19FTlY9MScsICctZScsICdDQ0FD
+SEVfRElSPS92YXIvdG1wL2NjYWNoZScsICctdicsICcvaG9tZS9wYXRjaGV3Ly5jYWNoZS9xZW11
+LWRvY2tlci1jY2FjaGU6L3Zhci90bXAvY2NhY2hlOnonLCAnLXYnLCAnL3Zhci90bXAvcGF0Y2hl
+dy10ZXN0ZXItdG1wLXpqOXJsdHZsL3NyYy9kb2NrZXItc3JjLjIwMTktMTAtMTktMTguMTcuMzQu
+MjU2OTI6L3Zhci90bXAvcWVtdTp6LHJvJywgJ3FlbXU6Y2VudG9zNycsICcvdmFyL3RtcC9xZW11
+L3J1bicsICd0ZXN0LXF1aWNrJ10nIHJldHVybmVkIG5vbi16ZXJvIGV4aXQgc3RhdHVzIDIuCmZp
+bHRlcj0tLWZpbHRlcj1sYWJlbD1jb20ucWVtdS5pbnN0YW5jZS51dWlkPTMxMzUyNzdkZjZkZTQ1
+NGQ4OGJmNmMwOTU5OTA3OTFiCm1ha2VbMV06ICoqKiBbZG9ja2VyLXJ1bl0gRXJyb3IgMQptYWtl
+WzFdOiBMZWF2aW5nIGRpcmVjdG9yeSBgL3Zhci90bXAvcGF0Y2hldy10ZXN0ZXItdG1wLXpqOXJs
+dHZsL3NyYycKbWFrZTogKioqIFtkb2NrZXItcnVuLXRlc3QtcXVpY2tAY2VudG9zN10gRXJyb3Ig
+MgoKcmVhbCAgICAxMW0zNy4zOThzCnVzZXIgICAgMG05LjgxMXMKCgpUaGUgZnVsbCBsb2cgaXMg
+YXZhaWxhYmxlIGF0Cmh0dHA6Ly9wYXRjaGV3Lm9yZy9sb2dzLzIwMTkxMDE5MTIwNTM0LjI3NDc5
+LTEtYXNoQGthbWJhbmFyaWEub3JnL3Rlc3RpbmcuZG9ja2VyLXF1aWNrQGNlbnRvczcvP3R5cGU9
+bWVzc2FnZS4KLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0
+dHBzOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3
+LWRldmVsQHJlZGhhdC5jb20=
 
-On Thursday, October 17, 2019, Stefan Brankovic <stefan.brankovic@rt-rk.com>
-wrote:
-
-> 'trans_vupkpx' function implements both vupkhpx and vupklpx instructions
-> with
-> argument 'high' determine which instruction is processed. Instructions are
-> implemented in two 'for' loops. Outer 'for' loop repeats unpacking two
-> times,
-> since both doubleword elements of destination register are formed the same
-> way.
-> It also stores result of every iteration in temporary register, that is
-> later
-> transferred to destination register. Inner 'for' loop does unpacking of
-> pixels
-> and forms resulting doubleword 32 by 32 bits.
->
-> Signed-off-by: Stefan Brankovic <stefan.brankovic@rt-rk.com>
-> ---
->  target/ppc/helper.h                 |  2 -
->  target/ppc/int_helper.c             | 20 --------
->  target/ppc/translate/vmx-impl.inc.c | 91 ++++++++++++++++++++++++++++++
-> ++++++-
->  3 files changed, 89 insertions(+), 24 deletions(-)
->
-> diff --git a/target/ppc/helper.h b/target/ppc/helper.h
-> index b489b38..fd06b56 100644
-> --- a/target/ppc/helper.h
-> +++ b/target/ppc/helper.h
-> @@ -233,8 +233,6 @@ DEF_HELPER_2(vextsh2d, void, avr, avr)
->  DEF_HELPER_2(vextsw2d, void, avr, avr)
->  DEF_HELPER_2(vnegw, void, avr, avr)
->  DEF_HELPER_2(vnegd, void, avr, avr)
-> -DEF_HELPER_2(vupkhpx, void, avr, avr)
-> -DEF_HELPER_2(vupklpx, void, avr, avr)
->  DEF_HELPER_2(vupkhsb, void, avr, avr)
->  DEF_HELPER_2(vupkhsh, void, avr, avr)
->  DEF_HELPER_2(vupkhsw, void, avr, avr)
-> diff --git a/target/ppc/int_helper.c b/target/ppc/int_helper.c
-> index f910c11..9ee667d 100644
-> --- a/target/ppc/int_helper.c
-> +++ b/target/ppc/int_helper.c
-> @@ -1737,26 +1737,6 @@ void helper_vsum4ubs(CPUPPCState *env, ppc_avr_t
-> *r, ppc_avr_t *a, ppc_avr_t *b)
->  #define UPKHI 0
->  #define UPKLO 1
->  #endif
-> -#define VUPKPX(suffix, hi)                                              \
-> -    void helper_vupk##suffix(ppc_avr_t *r, ppc_avr_t *b)                \
-> -    {                                                                   \
-> -        int i;                                                          \
-> -        ppc_avr_t result;                                               \
-> -                                                                        \
-> -        for (i = 0; i < ARRAY_SIZE(r->u32); i++) {                      \
-> -            uint16_t e = b->u16[hi ? i : i + 4];                        \
-> -            uint8_t a = (e >> 15) ? 0xff : 0;                           \
-> -            uint8_t r = (e >> 10) & 0x1f;                               \
-> -            uint8_t g = (e >> 5) & 0x1f;                                \
-> -            uint8_t b = e & 0x1f;                                       \
-> -                                                                        \
-> -            result.u32[i] = (a << 24) | (r << 16) | (g << 8) | b;       \
-> -        }                                                               \
-> -        *r = result;                                                    \
-> -    }
-> -VUPKPX(lpx, UPKLO)
-> -VUPKPX(hpx, UPKHI)
-> -#undef VUPKPX
->
->  #define VUPK(suffix, unpacked, packee, hi)                              \
->      void helper_vupk##suffix(ppc_avr_t *r, ppc_avr_t *b)                \
-> diff --git a/target/ppc/translate/vmx-impl.inc.c
-> b/target/ppc/translate/vmx-impl.inc.c
-> index 3550ffa..09d80d6 100644
-> --- a/target/ppc/translate/vmx-impl.inc.c
-> +++ b/target/ppc/translate/vmx-impl.inc.c
-> @@ -1031,6 +1031,95 @@ static void trans_vclzd(DisasContext *ctx)
->      tcg_temp_free_i64(avr);
->  }
->
-> +/*
-> + * vupkhpx VRT,VRB - Vector Unpack High Pixel
-> + * vupklpx VRT,VRB - Vector Unpack Low Pixel
-> + *
-> + * Unpacks 4 pixels coded in 1-5-5-5 pattern from high/low doubleword
-> element
-> + * of source register into contigous array of bits in the destination
-> register.
-> + * Argument 'high' determines if high or low doubleword element of source
-> + * register is processed.
-> + */
-> +static void trans_vupkpx(DisasContext *ctx, int high)
-
-
-The last argument should be boolean.
-
-
-> +{
-> +    int VT = rD(ctx->opcode);
-> +    int VB = rB(ctx->opcode);
-> +    TCGv_i64 tmp = tcg_temp_new_i64();
-> +    TCGv_i64 avr = tcg_temp_new_i64();
-> +    TCGv_i64 result = tcg_temp_new_i64();
-> +    TCGv_i64 result1 = tcg_temp_new_i64();
-> +    TCGv_i64 result2 = tcg_temp_new_i64();
-> +    int64_t mask1 = 0x1fULL;
-> +    int64_t mask2 = 0x1fULL << 8;
-> +    int64_t mask3 = 0x1fULL << 16;
-> +    int64_t mask4 = 0xffULL << 56;
-> +    int i, j;
-> +
-> +    if (high == 1) {
-> +        get_avr64(avr, VB, true);
-> +    } else {
-> +        get_avr64(avr, VB, false);
-> +    }
-> +
-> +    tcg_gen_movi_i64(result, 0x0ULL);
-> +    for (i = 0; i < 2; i++) {
-> +        for (j = 0; j < 2; j++) {
-> +            tcg_gen_shli_i64(tmp, avr, (j * 16));
-> +            tcg_gen_andi_i64(tmp, tmp, mask1 << (j * 32));
-> +            tcg_gen_or_i64(result, result, tmp);
-> +
-> +            tcg_gen_shli_i64(tmp, avr, 3 + (j * 16));
-> +            tcg_gen_andi_i64(tmp, tmp, mask2 << (j * 32));
-> +            tcg_gen_or_i64(result, result, tmp);
-> +
-> +            tcg_gen_shli_i64(tmp, avr, 6 + (j * 16));
-> +            tcg_gen_andi_i64(tmp, tmp, mask3 << (j * 32));
-> +            tcg_gen_or_i64(result, result, tmp);
-> +
-> +            tcg_gen_shri_i64(tmp, avr, (j * 16));
-> +            tcg_gen_ext16s_i64(tmp, tmp);
-> +            tcg_gen_andi_i64(tmp, tmp, mask4);
-> +            tcg_gen_shri_i64(tmp, tmp, (32 * (1 - j)));
-> +            tcg_gen_or_i64(result, result, tmp);
-> +        }
-> +        if (i == 0) {
-> +            tcg_gen_mov_i64(result1, result);
-> +            tcg_gen_movi_i64(result, 0x0ULL);
-> +            tcg_gen_shri_i64(avr, avr, 32);
-> +        }
-> +        if (i == 1) {
-> +            tcg_gen_mov_i64(result2, result);
-> +        }
-> +    }
-> +
-> +    set_avr64(VT, result1, false);
-> +    set_avr64(VT, result2, true);
-> +
-> +    tcg_temp_free_i64(tmp);
-> +    tcg_temp_free_i64(avr);
-> +    tcg_temp_free_i64(result);
-> +    tcg_temp_free_i64(result1);
-> +    tcg_temp_free_i64(result2);
-> +}
-> +
-> +static void gen_vupkhpx(DisasContext *ctx)
-> +{
-> +    if (unlikely(!ctx->altivec_enabled)) {
-> +        gen_exception(ctx, POWERPC_EXCP_VPU);
-> +        return;
-> +    }
-> +    trans_vupkpx(ctx, 1);
-> +}
-> +
-> +static void gen_vupklpx(DisasContext *ctx)
-> +{
-> +    if (unlikely(!ctx->altivec_enabled)) {
-> +        gen_exception(ctx, POWERPC_EXCP_VPU);
-> +        return;
-> +    }
-> +    trans_vupkpx(ctx, 0);
-> +}
-> +
->  GEN_VXFORM(vmuloub, 4, 0);
->  GEN_VXFORM(vmulouh, 4, 1);
->  GEN_VXFORM(vmulouw, 4, 2);
-> @@ -1348,8 +1437,6 @@ GEN_VXFORM_NOA(vupkhsw, 7, 25);
->  GEN_VXFORM_NOA(vupklsb, 7, 10);
->  GEN_VXFORM_NOA(vupklsh, 7, 11);
->  GEN_VXFORM_NOA(vupklsw, 7, 27);
-> -GEN_VXFORM_NOA(vupkhpx, 7, 13);
-> -GEN_VXFORM_NOA(vupklpx, 7, 15);
->  GEN_VXFORM_NOA_ENV(vrefp, 5, 4);
->  GEN_VXFORM_NOA_ENV(vrsqrtefp, 5, 5);
->  GEN_VXFORM_NOA_ENV(vexptefp, 5, 6);
-> --
-> 2.7.4
->
->
->
-
---0000000000006d474805954977b1
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-<br><br>On Thursday, October 17, 2019, Stefan Brankovic &lt;<a href=3D"mail=
-to:stefan.brankovic@rt-rk.com">stefan.brankovic@rt-rk.com</a>&gt; wrote:<br=
-><blockquote class=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;border-left:1=
-px #ccc solid;padding-left:1ex">&#39;trans_vupkpx&#39; function implements =
-both vupkhpx and vupklpx instructions with<br>
-argument &#39;high&#39; determine which instruction is processed. Instructi=
-ons are<br>
-implemented in two &#39;for&#39; loops. Outer &#39;for&#39; loop repeats un=
-packing two times,<br>
-since both doubleword elements of destination register are formed the same =
-way.<br>
-It also stores result of every iteration in temporary register, that is lat=
-er<br>
-transferred to destination register. Inner &#39;for&#39; loop does unpackin=
-g of pixels<br>
-and forms resulting doubleword 32 by 32 bits.<br>
-<br>
-Signed-off-by: Stefan Brankovic &lt;<a href=3D"mailto:stefan.brankovic@rt-r=
-k.com">stefan.brankovic@rt-rk.com</a>&gt;<br>
----<br>
-=C2=A0target/ppc/helper.h=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 =C2=A0|=C2=A0 2 -<br>
-=C2=A0target/ppc/int_helper.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0| 20 --------<br>
-=C2=A0target/ppc/translate/vmx-impl.<wbr>inc.c | 91 +++++++++++++++++++++++=
-+++++++<wbr>++++++-<br>
-=C2=A03 files changed, 89 insertions(+), 24 deletions(-)<br>
-<br>
-diff --git a/target/ppc/helper.h b/target/ppc/helper.h<br>
-index b489b38..fd06b56 100644<br>
---- a/target/ppc/helper.h<br>
-+++ b/target/ppc/helper.h<br>
-@@ -233,8 +233,6 @@ DEF_HELPER_2(vextsh2d, void, avr, avr)<br>
-=C2=A0DEF_HELPER_2(vextsw2d, void, avr, avr)<br>
-=C2=A0DEF_HELPER_2(vnegw, void, avr, avr)<br>
-=C2=A0DEF_HELPER_2(vnegd, void, avr, avr)<br>
--DEF_HELPER_2(vupkhpx, void, avr, avr)<br>
--DEF_HELPER_2(vupklpx, void, avr, avr)<br>
-=C2=A0DEF_HELPER_2(vupkhsb, void, avr, avr)<br>
-=C2=A0DEF_HELPER_2(vupkhsh, void, avr, avr)<br>
-=C2=A0DEF_HELPER_2(vupkhsw, void, avr, avr)<br>
-diff --git a/target/ppc/int_helper.c b/target/ppc/int_helper.c<br>
-index f910c11..9ee667d 100644<br>
---- a/target/ppc/int_helper.c<br>
-+++ b/target/ppc/int_helper.c<br>
-@@ -1737,26 +1737,6 @@ void helper_vsum4ubs(CPUPPCState *env, ppc_avr_t *r,=
- ppc_avr_t *a, ppc_avr_t *b)<br>
-=C2=A0#define UPKHI 0<br>
-=C2=A0#define UPKLO 1<br>
-=C2=A0#endif<br>
--#define VUPKPX(suffix, hi)=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 \<br>
--=C2=A0 =C2=A0 void helper_vupk##suffix(ppc_avr_t *r, ppc_avr_t *b)=C2=A0 =
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 \<br>
--=C2=A0 =C2=A0 {=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0\<br>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0 int i;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 \<br>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0 ppc_avr_t result;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0\<br>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 \<br>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0 for (i =3D 0; i &lt; ARRAY_SIZE(r-&gt;u32); i+=
-+) {=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 \<br>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 uint16_t e =3D b-&gt;u16[hi ? i =
-: i + 4];=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 \<br>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 uint8_t a =3D (e &gt;&gt; 15) ? =
-0xff : 0;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0\<br>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 uint8_t r =3D (e &gt;&gt; 10) &a=
-mp; 0x1f;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0\<br>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 uint8_t g =3D (e &gt;&gt; 5) &am=
-p; 0x1f;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 \<br>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 uint8_t b =3D e &amp; 0x1f;=C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0\<br>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 \<br>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 result.u32[i] =3D (a &lt;&lt; 24=
-) | (r &lt;&lt; 16) | (g &lt;&lt; 8) | b;=C2=A0 =C2=A0 =C2=A0 =C2=A0\<br>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0 }=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0\<br>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0 *r =3D result;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 \<br>
--=C2=A0 =C2=A0 }<br>
--VUPKPX(lpx, UPKLO)<br>
--VUPKPX(hpx, UPKHI)<br>
--#undef VUPKPX<br>
-<br>
-=C2=A0#define VUPK(suffix, unpacked, packee, hi)=C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 \<br>
-=C2=A0 =C2=A0 =C2=A0void helper_vupk##suffix(ppc_avr_t *r, ppc_avr_t *b)=C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 \<br>
-diff --git a/target/ppc/translate/vmx-<wbr>impl.inc.c b/target/ppc/translat=
-e/vmx-<wbr>impl.inc.c<br>
-index 3550ffa..09d80d6 100644<br>
---- a/target/ppc/translate/vmx-<wbr>impl.inc.c<br>
-+++ b/target/ppc/translate/vmx-<wbr>impl.inc.c<br>
-@@ -1031,6 +1031,95 @@ static void trans_vclzd(DisasContext *ctx)<br>
-=C2=A0 =C2=A0 =C2=A0tcg_temp_free_i64(avr);<br>
-=C2=A0}<br>
-<br>
-+/*<br>
-+ * vupkhpx VRT,VRB - Vector Unpack High Pixel<br>
-+ * vupklpx VRT,VRB - Vector Unpack Low Pixel<br>
-+ *<br>
-+ * Unpacks 4 pixels coded in 1-5-5-5 pattern from high/low doubleword elem=
-ent<br>
-+ * of source register into contigous array of bits in the destination regi=
-ster.<br>
-+ * Argument &#39;high&#39; determines if high or low doubleword element of=
- source<br>
-+ * register is processed.<br>
-+ */<br>
-+static void trans_vupkpx(DisasContext *ctx, int high)</blockquote><div><br=
-></div><div>The last argument should be boolean.</div><div>=C2=A0</div><blo=
-ckquote class=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;border-left:1px #c=
-cc solid;padding-left:1ex">
-+{<br>
-+=C2=A0 =C2=A0 int VT =3D rD(ctx-&gt;opcode);<br>
-+=C2=A0 =C2=A0 int VB =3D rB(ctx-&gt;opcode);<br>
-+=C2=A0 =C2=A0 TCGv_i64 tmp =3D tcg_temp_new_i64();<br>
-+=C2=A0 =C2=A0 TCGv_i64 avr =3D tcg_temp_new_i64();<br>
-+=C2=A0 =C2=A0 TCGv_i64 result =3D tcg_temp_new_i64();<br>
-+=C2=A0 =C2=A0 TCGv_i64 result1 =3D tcg_temp_new_i64();<br>
-+=C2=A0 =C2=A0 TCGv_i64 result2 =3D tcg_temp_new_i64();<br>
-+=C2=A0 =C2=A0 int64_t mask1 =3D 0x1fULL;<br>
-+=C2=A0 =C2=A0 int64_t mask2 =3D 0x1fULL &lt;&lt; 8;<br>
-+=C2=A0 =C2=A0 int64_t mask3 =3D 0x1fULL &lt;&lt; 16;<br>
-+=C2=A0 =C2=A0 int64_t mask4 =3D 0xffULL &lt;&lt; 56;<br>
-+=C2=A0 =C2=A0 int i, j;<br>
-+<br>
-+=C2=A0 =C2=A0 if (high =3D=3D 1) {<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 get_avr64(avr, VB, true);<br>
-+=C2=A0 =C2=A0 } else {<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 get_avr64(avr, VB, false);<br>
-+=C2=A0 =C2=A0 }<br>
-+<br>
-+=C2=A0 =C2=A0 tcg_gen_movi_i64(result, 0x0ULL);<br>
-+=C2=A0 =C2=A0 for (i =3D 0; i &lt; 2; i++) {<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 for (j =3D 0; j &lt; 2; j++) {<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 tcg_gen_shli_i64(tmp, avr, (j * =
-16));<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 tcg_gen_andi_i64(tmp, tmp, mask1=
- &lt;&lt; (j * 32));<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 tcg_gen_or_i64(result, result, t=
-mp);<br>
-+<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 tcg_gen_shli_i64(tmp, avr, 3 + (=
-j * 16));<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 tcg_gen_andi_i64(tmp, tmp, mask2=
- &lt;&lt; (j * 32));<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 tcg_gen_or_i64(result, result, t=
-mp);<br>
-+<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 tcg_gen_shli_i64(tmp, avr, 6 + (=
-j * 16));<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 tcg_gen_andi_i64(tmp, tmp, mask3=
- &lt;&lt; (j * 32));<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 tcg_gen_or_i64(result, result, t=
-mp);<br>
-+<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 tcg_gen_shri_i64(tmp, avr, (j * =
-16));<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 tcg_gen_ext16s_i64(tmp, tmp);<br=
->
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 tcg_gen_andi_i64(tmp, tmp, mask4=
-);<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 tcg_gen_shri_i64(tmp, tmp, (32 *=
- (1 - j)));<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 tcg_gen_or_i64(result, result, t=
-mp);<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 }<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 if (i =3D=3D 0) {<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 tcg_gen_mov_i64(result1, result)=
-;<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 tcg_gen_movi_i64(result, 0x0ULL)=
-;<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 tcg_gen_shri_i64(avr, avr, 32);<=
-br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 }<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 if (i =3D=3D 1) {<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 tcg_gen_mov_i64(result2, result)=
-;<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 }<br>
-+=C2=A0 =C2=A0 }<br>
-+<br>
-+=C2=A0 =C2=A0 set_avr64(VT, result1, false);<br>
-+=C2=A0 =C2=A0 set_avr64(VT, result2, true);<br>
-+<br>
-+=C2=A0 =C2=A0 tcg_temp_free_i64(tmp);<br>
-+=C2=A0 =C2=A0 tcg_temp_free_i64(avr);<br>
-+=C2=A0 =C2=A0 tcg_temp_free_i64(result);<br>
-+=C2=A0 =C2=A0 tcg_temp_free_i64(result1);<br>
-+=C2=A0 =C2=A0 tcg_temp_free_i64(result2);<br>
-+}<br>
-+<br>
-+static void gen_vupkhpx(DisasContext *ctx)<br>
-+{<br>
-+=C2=A0 =C2=A0 if (unlikely(!ctx-&gt;altivec_<wbr>enabled)) {<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 gen_exception(ctx, POWERPC_EXCP_VPU);<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 return;<br>
-+=C2=A0 =C2=A0 }<br>
-+=C2=A0 =C2=A0 trans_vupkpx(ctx, 1);<br>
-+}<br>
-+<br>
-+static void gen_vupklpx(DisasContext *ctx)<br>
-+{<br>
-+=C2=A0 =C2=A0 if (unlikely(!ctx-&gt;altivec_<wbr>enabled)) {<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 gen_exception(ctx, POWERPC_EXCP_VPU);<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 return;<br>
-+=C2=A0 =C2=A0 }<br>
-+=C2=A0 =C2=A0 trans_vupkpx(ctx, 0);<br>
-+}<br>
-+<br>
-=C2=A0GEN_VXFORM(vmuloub, 4, 0);<br>
-=C2=A0GEN_VXFORM(vmulouh, 4, 1);<br>
-=C2=A0GEN_VXFORM(vmulouw, 4, 2);<br>
-@@ -1348,8 +1437,6 @@ GEN_VXFORM_NOA(vupkhsw, 7, 25);<br>
-=C2=A0GEN_VXFORM_NOA(vupklsb, 7, 10);<br>
-=C2=A0GEN_VXFORM_NOA(vupklsh, 7, 11);<br>
-=C2=A0GEN_VXFORM_NOA(vupklsw, 7, 27);<br>
--GEN_VXFORM_NOA(vupkhpx, 7, 13);<br>
--GEN_VXFORM_NOA(vupklpx, 7, 15);<br>
-=C2=A0GEN_VXFORM_NOA_ENV(vrefp, 5, 4);<br>
-=C2=A0GEN_VXFORM_NOA_ENV(vrsqrtefp, 5, 5);<br>
-=C2=A0GEN_VXFORM_NOA_ENV(vexptefp, 5, 6);<br>
--- <br>
-2.7.4<br>
-<br>
-<br>
-</blockquote>
-
---0000000000006d474805954977b1--
 
