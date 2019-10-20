@@ -2,56 +2,56 @@ Return-Path: <SRS0=HPkn=YN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A2065CA9EA0
-	for <qemu-devel@archiver.kernel.org>; Sun, 20 Oct 2019 20:52:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1308ECA9EAD
+	for <qemu-devel@archiver.kernel.org>; Sun, 20 Oct 2019 20:53:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 491F12089C
-	for <qemu-devel@archiver.kernel.org>; Sun, 20 Oct 2019 20:52:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id AE1E22089C
+	for <qemu-devel@archiver.kernel.org>; Sun, 20 Oct 2019 20:53:42 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=duncanthrax.net header.i=@duncanthrax.net header.b="VzYFXHZ9"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 491F12089C
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=duncanthrax.net header.i=@duncanthrax.net header.b="H3SXh5+X"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AE1E22089C
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=stackframe.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47462 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47494 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iMIBO-0000To-Ge
-	for qemu-devel@archiver.kernel.org; Sun, 20 Oct 2019 16:52:10 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52521)
+	id 1iMICr-0001Pk-Qa
+	for qemu-devel@archiver.kernel.org; Sun, 20 Oct 2019 16:53:41 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52523)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <svens@stackframe.org>) id 1iMI6w-0003Xw-Bx
- for qemu-devel@nongnu.org; Sun, 20 Oct 2019 16:47:38 -0400
+ (envelope-from <svens@stackframe.org>) id 1iMI6w-0003YK-MK
+ for qemu-devel@nongnu.org; Sun, 20 Oct 2019 16:47:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <svens@stackframe.org>) id 1iMI6s-0001Ak-B2
+ (envelope-from <svens@stackframe.org>) id 1iMI6s-0001Ae-6O
  for qemu-devel@nongnu.org; Sun, 20 Oct 2019 16:47:34 -0400
-Received: from smtp.duncanthrax.net ([2001:470:70c5:1111::170]:38628)
+Received: from smtp.duncanthrax.net ([2001:470:70c5:1111::170]:59625)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <svens@stackframe.org>)
- id 1iMI6r-0001A0-Ud
+ id 1iMI6r-00019e-Os
  for qemu-devel@nongnu.org; Sun, 20 Oct 2019 16:47:30 -0400
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
  d=duncanthrax.net; s=dkim; h=Content-Transfer-Encoding:MIME-Version:
  References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From;
- bh=V2EI5+LE3lMJk2jhp7ltVa/rV/guviEU9BbOII5IiS4=; b=VzYFXHZ90w83sfrTDWSZPGkBzY
- epo0U65HN2+99PjjggXuBwaBFzYHu1xezKXggu9JTIWFh5r2Uiv63mwdqdJLn/ZS5lKnElx3oS8Xt
- 7yCZ6dkLJCYSem3PTfN2oRrKzyKOw7WxBs7s4PwTnU7yRhrS1Z4q2D9k8usmRQG5LDwE=;
+ bh=JH20qBQJmNGB6M1p6KsME4MOobA/2ww0jckNB/G2OyY=; b=H3SXh5+XFbc9kLlwWI98K7JQy2
+ RMgRNof8V13y5GKf3bBX0L7ygAKkdH7FiHdyYI9dGkCazBGuVIJeRbKFyMcN3BrjeJTFTZ2TFln0W
+ y2jEz5SD67+89HlbgcksfLFwpu7MZRgjONAzU+7kRv+v/qbWN9v7MjpIHb/Y0no2rHQU=;
 Received: from hsi-kbw-046-005-233-221.hsi8.kabel-badenwuerttemberg.de
  ([46.5.233.221] helo=x280.stackframe.org)
  by smtp.eurescom.eu with esmtpsa (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.86_2) (envelope-from <svens@stackframe.org>)
- id 1iMI6q-0002cH-RX; Sun, 20 Oct 2019 22:47:29 +0200
+ id 1iMI6p-0002cH-5U; Sun, 20 Oct 2019 22:47:27 +0200
 From: Sven Schnelle <svens@stackframe.org>
 To: Richard Henderson <rth@twiddle.net>
-Subject: [PATCH 6/7] hppa: Add emulation of Artist graphics
-Date: Sun, 20 Oct 2019 22:47:23 +0200
-Message-Id: <20191020204724.31537-7-svens@stackframe.org>
+Subject: [PATCH 2/7] hppa: Add support for LASI chip with i82596 NIC
+Date: Sun, 20 Oct 2019 22:47:19 +0200
+Message-Id: <20191020204724.31537-3-svens@stackframe.org>
 X-Mailer: git-send-email 2.23.0
 In-Reply-To: <20191020204724.31537-1-svens@stackframe.org>
 References: <20191020204724.31537-1-svens@stackframe.org>
@@ -71,1469 +71,1587 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Helge Deller <deller@gmx.de>, Sven Schnelle <svens@stackframe.org>,
- qemu-devel@nongnu.org
+Cc: Jason Wang <jasowang@redhat.com>, Helge Deller <deller@gmx.de>,
+ Sven Schnelle <svens@stackframe.org>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This adds emulation of Artist graphics good enough
-to get a Text console on both Linux and HP-UX. The
-X11 server from HP-UX also works.
+From: Helge Deller <deller@gmx.de>
 
+LASI is a built-in multi-I/O chip which supports serial, parallel,
+network (Intel i82596 Apricot), sound and other functionalities.
+LASI has been used in many HP PARISC machines.
+This patch adds the necessary parts to allow Linux and HP-UX to detect
+LASI and the network card.
+
+Signed-off-by: Helge Deller <deller@gmx.de>
 Signed-off-by: Sven Schnelle <svens@stackframe.org>
 ---
- hw/display/Kconfig       |    3 +
- hw/display/Makefile.objs |    1 +
- hw/display/artist.c      | 1336 ++++++++++++++++++++++++++++++++++++++
- hw/display/trace-events  |    9 +
- hw/hppa/Kconfig          |    1 +
- hw/hppa/hppa_hardware.h  |    1 +
- hw/hppa/machine.c        |   10 +
- 7 files changed, 1361 insertions(+)
- create mode 100644 hw/display/artist.c
+ MAINTAINERS                 |   2 +
+ hw/hppa/Kconfig             |   1 +
+ hw/hppa/Makefile.objs       |   2 +-
+ hw/hppa/hppa_sys.h          |   2 +
+ hw/hppa/lasi.c              | 360 ++++++++++++++++++
+ hw/hppa/machine.c           |   8 +-
+ hw/hppa/trace-events        |   5 +
+ hw/net/Kconfig              |   7 +
+ hw/net/Makefile.objs        |   2 +
+ hw/net/i82596.c             | 734 ++++++++++++++++++++++++++++++++++++
+ hw/net/i82596.h             |  55 +++
+ hw/net/lasi_i82596.c        | 188 +++++++++
+ hw/net/trace-events         |  13 +
+ include/hw/net/lasi_82596.h |  29 ++
+ 14 files changed, 1406 insertions(+), 2 deletions(-)
+ create mode 100644 hw/hppa/lasi.c
+ create mode 100644 hw/net/i82596.c
+ create mode 100644 hw/net/i82596.h
+ create mode 100644 hw/net/lasi_i82596.c
+ create mode 100644 include/hw/net/lasi_82596.h
 
-diff --git a/hw/display/Kconfig b/hw/display/Kconfig
-index cbdf7b1a67..953631afb6 100644
---- a/hw/display/Kconfig
-+++ b/hw/display/Kconfig
-@@ -91,6 +91,9 @@ config TCX
- config CG3
-     bool
+diff --git a/MAINTAINERS b/MAINTAINERS
+index f9541c3305..91e9e8ceac 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -178,6 +178,8 @@ S: Maintained
+ F: target/hppa/
+ F: hw/hppa/
+ F: disas/hppa.c
++F: hw/net/*i82596*
++F: include/hw/net/lasi_82596.h
  
-+config ARTIST
-+    bool
-+
- config VGA
-     bool
+ LM32 TCG CPUs
+ M: Michael Walle <michael@walle.cc>
+diff --git a/hw/hppa/Kconfig b/hw/hppa/Kconfig
+index 6e5d74a825..2a7b38d6d6 100644
+--- a/hw/hppa/Kconfig
++++ b/hw/hppa/Kconfig
+@@ -10,3 +10,4 @@ config DINO
+     select IDE_CMD646
+     select MC146818RTC
+     select LSI_SCSI_PCI
++    select LASI_82596
+diff --git a/hw/hppa/Makefile.objs b/hw/hppa/Makefile.objs
+index 67838f50a3..eac3467d8a 100644
+--- a/hw/hppa/Makefile.objs
++++ b/hw/hppa/Makefile.objs
+@@ -1 +1 @@
+-obj-$(CONFIG_DINO) += pci.o machine.o dino.o
++obj-$(CONFIG_DINO) += pci.o machine.o dino.o lasi.o
+diff --git a/hw/hppa/hppa_sys.h b/hw/hppa/hppa_sys.h
+index 43d25d21fc..d99b5dd87b 100644
+--- a/hw/hppa/hppa_sys.h
++++ b/hw/hppa/hppa_sys.h
+@@ -11,6 +11,8 @@
+ #include "hppa_hardware.h"
  
-diff --git a/hw/display/Makefile.objs b/hw/display/Makefile.objs
-index 5a4066383b..5f63294149 100644
---- a/hw/display/Makefile.objs
-+++ b/hw/display/Makefile.objs
-@@ -39,6 +39,7 @@ common-obj-$(CONFIG_SM501) += sm501.o
- common-obj-$(CONFIG_TCX) += tcx.o
- common-obj-$(CONFIG_CG3) += cg3.o
- common-obj-$(CONFIG_NEXTCUBE) += next-fb.o
-+common-obj-$(CONFIG_ARTIST) += artist.o
+ PCIBus *dino_init(MemoryRegion *, qemu_irq *, qemu_irq *);
++DeviceState *lasi_init(MemoryRegion *);
++#define enable_lasi_lan()       0
  
- obj-$(CONFIG_VGA) += vga.o
+ #define TYPE_DINO_PCI_HOST_BRIDGE "dino-pcihost"
  
-diff --git a/hw/display/artist.c b/hw/display/artist.c
+diff --git a/hw/hppa/lasi.c b/hw/hppa/lasi.c
 new file mode 100644
-index 0000000000..9b285b3993
+index 0000000000..51752589f3
 --- /dev/null
-+++ b/hw/display/artist.c
-@@ -0,0 +1,1336 @@
++++ b/hw/hppa/lasi.c
+@@ -0,0 +1,360 @@
 +/*
-+ * QEMU HP Artist Emulation
++ * HP-PARISC Lasi chipset emulation.
 + *
-+ * Copyright (c) 2019 Sven Schnelle <svens@stackframe.org>
++ * (C) 2019 by Helge Deller <deller@gmx.de>
 + *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or later.
++ * This work is licensed under the GNU GPL license version 2 or later.
++ *
++ * Documentation available at:
++ * https://parisc.wiki.kernel.org/images-parisc/7/79/Lasi_ers.pdf
 + */
 +
 +#include "qemu/osdep.h"
-+#include "qemu-common.h"
-+#include "qemu/error-report.h"
-+#include "qemu/typedefs.h"
-+#include "qemu/log.h"
-+#include "qemu/module.h"
++#include "qemu/units.h"
 +#include "qapi/error.h"
-+#include "hw/sysbus.h"
-+#include "hw/loader.h"
-+#include "hw/qdev-core.h"
-+#include "hw/qdev-properties.h"
-+#include "migration/vmstate.h"
-+#include "ui/console.h"
++#include "cpu.h"
 +#include "trace.h"
++#include "hw/hw.h"
++#include "hw/irq.h"
++#include "sysemu/sysemu.h"
++#include "sysemu/runstate.h"
++#include "hppa_sys.h"
++#include "hw/net/lasi_82596.h"
++#include "hw/char/parallel.h"
++#include "hw/char/serial.h"
++#include "exec/address-spaces.h"
++#include "migration/vmstate.h"
 +
-+#define TYPE_ARTIST "artist"
-+#define ARTIST(obj) OBJECT_CHECK(ARTISTState, (obj), TYPE_ARTIST)
++#define TYPE_LASI_CHIP "lasi-chip"
 +
-+struct vram_buffer {
-+    uint8_t *data;
-+    int size;
-+    int width;
-+    int height;
-+};
++#define LASI_IRR        0x00    /* RO */
++#define LASI_IMR        0x04
++#define LASI_IPR        0x08
++#define LASI_ICR        0x0c
++#define LASI_IAR        0x10
 +
-+typedef struct ARTISTState {
-+    SysBusDevice parent_obj;
++#define LASI_PCR        0x0C000 /* LASI Power Control register */
++#define LASI_ERRLOG     0x0C004 /* LASI Error Logging register */
++#define LASI_VER        0x0C008 /* LASI Version Control register */
++#define LASI_IORESET    0x0C00C /* LASI I/O Reset register */
++#define LASI_AMR        0x0C010 /* LASI Arbitration Mask register */
++#define LASI_IO_CONF    0x7FFFE /* LASI primary configuration register */
++#define LASI_IO_CONF2   0x7FFFF /* LASI secondary configuration register */
 +
-+    QemuConsole *con;
-+    MemoryRegion vram_mem;
-+    MemoryRegion reg;
-+    uint8_t *vram;
++#define LASI_BIT(x)     (1ul << (x))
++#define LASI_IRQ_BITS   (LASI_BIT(5) | LASI_BIT(7) | LASI_BIT(8) | LASI_BIT(9) \
++            | LASI_BIT(13) | LASI_BIT(14) | LASI_BIT(16) | LASI_BIT(17) \
++            | LASI_BIT(18) | LASI_BIT(19) | LASI_BIT(20) | LASI_BIT(21) \
++            | LASI_BIT(26))
 +
-+    struct vram_buffer vram_buffer[16];
++#define ICR_BUS_ERROR_BIT  LASI_BIT(8)  /* bit 8 in ICR */
++#define ICR_TOC_BIT        LASI_BIT(1)  /* bit 1 in ICR */
 +
-+    uint16_t width;
-+    uint16_t height;
-+    uint16_t depth;
++#define LASI_CHIP(obj) \
++    OBJECT_CHECK(LasiState, (obj), TYPE_LASI_CHIP)
 +
-+    uint32_t fg_color;
-+    uint32_t bg_color;
++#define LASI_RTC_HPA    (LASI_HPA + 0x9000)
 +
-+    uint32_t vram_char_y;
-+    uint32_t vram_bitmask;
++typedef struct LasiState {
++    PCIHostState parent_obj;
 +
-+    uint32_t vram_start;
-+    uint32_t vram_pos;
++    uint32_t irr;
++    uint32_t imr;
++    uint32_t ipr;
++    uint32_t icr;
++    uint32_t iar;
 +
-+    uint32_t vram_size;
++    uint32_t errlog;
++    uint32_t amr;
++    uint32_t rtc;
++    time_t rtc_ref;
 +
-+    uint32_t blockmove_source;
-+    uint32_t blockmove_dest;
-+    uint32_t blockmove_size;
++    MemoryRegion this_mem;
++} LasiState;
 +
-+    uint32_t line_size;
-+    uint32_t line_end;
-+    uint32_t line_xy;
-+    uint32_t line_pattern_start;
-+    uint32_t line_pattern_skip;
-+
-+    uint32_t cursor_pos;
-+
-+    uint32_t cursor_height;
-+    uint32_t cursor_width;
-+
-+    uint32_t plane_mask;
-+
-+    uint32_t reg_100080;
-+    uint32_t reg_300200;
-+    uint32_t reg_300208;
-+    uint32_t reg_300218;
-+
-+    uint32_t cmap_bm_access;
-+    uint32_t dst_bm_access;
-+    uint32_t src_bm_access;
-+    uint32_t control_plane;
-+    uint32_t transfer_data;
-+    uint32_t image_bitmap_op;
-+
-+    uint32_t font_write1;
-+    uint32_t font_write2;
-+    uint32_t font_write_pos_y;
-+
-+    int draw_line_pattern;
-+} ARTISTState;
-+
-+typedef enum {
-+    ARTIST_BUFFER_AP = 1,
-+    ARTIST_BUFFER_OVERLAY = 2,
-+    ARTIST_BUFFER_CURSOR1 = 6,
-+    ARTIST_BUFFER_CURSOR2 = 7,
-+    ARTIST_BUFFER_ATTRIBUTE = 13,
-+    ARTIST_BUFFER_CMAP = 15,
-+} artist_buffer_t;
-+
-+typedef enum {
-+    VRAM_IDX = 0x1004a0,
-+    VRAM_BITMASK = 0x1005a0,
-+    VRAM_WRITE_INCR_X = 0x100600,
-+    VRAM_WRITE_INCR_X2 = 0x100604,
-+    VRAM_WRITE_INCR_Y = 0x100620,
-+    VRAM_START = 0x100800,
-+    BLOCK_MOVE_SIZE = 0x100804,
-+    BLOCK_MOVE_SOURCE = 0x100808,
-+    TRANSFER_DATA = 0x100820,
-+    FONT_WRITE_INCR_Y = 0x1008a0,
-+    VRAM_START_TRIGGER = 0x100a00,
-+    VRAM_SIZE_TRIGGER = 0x100a04,
-+    FONT_WRITE_START = 0x100aa0,
-+    BLOCK_MOVE_DEST_TRIGGER = 0x100b00,
-+    BLOCK_MOVE_SIZE_TRIGGER = 0x100b04,
-+    LINE_XY = 0x100ccc,
-+    PATTERN_LINE_START = 0x100ecc,
-+    LINE_SIZE = 0x100e04,
-+    LINE_END = 0x100e44,
-+    CMAP_BM_ACCESS = 0x118000,
-+    DST_BM_ACCESS = 0x118004,
-+    SRC_BM_ACCESS = 0x118008,
-+    CONTROL_PLANE = 0x11800c,
-+    FG_COLOR = 0x118010,
-+    BG_COLOR = 0x118014,
-+    PLANE_MASK = 0x118018,
-+    IMAGE_BITMAP_OP = 0x11801c,
-+    CURSOR_POS = 0x300100,
-+    CURSOR_CTRL = 0x300104,
-+} artist_reg_t;
-+
-+typedef enum {
-+    ARTIST_ROP_CLEAR = 0,
-+    ARTIST_ROP_COPY = 3,
-+    ARTIST_ROP_XOR = 6,
-+    ARTIST_ROP_NOT_DST = 10,
-+    ARTIST_ROP_SET = 15,
-+} artist_rop_t;
-+
-+#define REG_NAME(_x) case _x: return " "#_x;
-+static const char *artist_reg_name(uint64_t addr)
++static bool lasi_chip_mem_valid(void *opaque, hwaddr addr,
++                                unsigned size, bool is_write,
++                                MemTxAttrs attrs)
 +{
-+    switch ((artist_reg_t)addr) {
-+    REG_NAME(VRAM_IDX);
-+    REG_NAME(VRAM_BITMASK);
-+    REG_NAME(VRAM_WRITE_INCR_X);
-+    REG_NAME(VRAM_WRITE_INCR_X2);
-+    REG_NAME(VRAM_WRITE_INCR_Y);
-+    REG_NAME(VRAM_START);
-+    REG_NAME(BLOCK_MOVE_SIZE);
-+    REG_NAME(BLOCK_MOVE_SOURCE);
-+    REG_NAME(FG_COLOR);
-+    REG_NAME(BG_COLOR);
-+    REG_NAME(PLANE_MASK);
-+    REG_NAME(VRAM_START_TRIGGER);
-+    REG_NAME(VRAM_SIZE_TRIGGER);
-+    REG_NAME(BLOCK_MOVE_DEST_TRIGGER);
-+    REG_NAME(BLOCK_MOVE_SIZE_TRIGGER);
-+    REG_NAME(TRANSFER_DATA);
-+    REG_NAME(CONTROL_PLANE);
-+    REG_NAME(IMAGE_BITMAP_OP);
-+    REG_NAME(CMAP_BM_ACCESS);
-+    REG_NAME(DST_BM_ACCESS);
-+    REG_NAME(SRC_BM_ACCESS);
-+    REG_NAME(CURSOR_POS);
-+    REG_NAME(CURSOR_CTRL);
-+    REG_NAME(LINE_XY);
-+    REG_NAME(PATTERN_LINE_START);
-+    REG_NAME(LINE_SIZE);
-+    REG_NAME(LINE_END);
-+    REG_NAME(FONT_WRITE_INCR_Y);
-+    REG_NAME(FONT_WRITE_START);
-+    }
-+    return "";
-+}
++    bool ret = false;
 +
-+static int16_t artist_get_x(uint32_t reg)
-+{
-+    return reg >> 16;
-+}
++    switch (addr) {
++    case LASI_IRR:
++    case LASI_IMR:
++    case LASI_IPR:
++    case LASI_ICR:
++    case LASI_IAR:
 +
-+static int16_t artist_get_y(uint32_t reg)
-+{
-+    return reg & 0xffff;
-+}
++    case (LASI_LAN_HPA - LASI_HPA):
++    case (LASI_LPT_HPA - LASI_HPA):
++    case (LASI_UART_HPA - LASI_HPA):
++    case (LASI_RTC_HPA - LASI_HPA):
 +
-+static void artist_draw_cursor(ARTISTState *s)
-+{
-+    DisplaySurface *surface = qemu_console_surface(s->con);
-+    uint32_t *data = (uint32_t *)surface_data(surface);
-+    struct vram_buffer *cursor0, *cursor1 , *buf;
-+    int cx, cy, cursor_pos_x, cursor_pos_y;
-+
-+    cursor0 = &s->vram_buffer[ARTIST_BUFFER_CURSOR1];
-+    cursor1 = &s->vram_buffer[ARTIST_BUFFER_CURSOR2];
-+    buf = &s->vram_buffer[ARTIST_BUFFER_AP];
-+
-+    /*
-+     * Don't know whether these magic offset values are configurable via
-+     * some register. They are the same for all resolutions, so don't
-+     * bother about it.
-+     */
-+    cursor_pos_y = 0x47a - artist_get_y(s->cursor_pos);
-+    cursor_pos_x = ((artist_get_x(s->cursor_pos) - 338) / 2);
-+
-+    for (cy = 0; cy < s->cursor_height; cy++) {
-+
-+        for (cx = 0; cx < s->cursor_width; cx++) {
-+
-+            if (cursor_pos_y + cy < 0 ||
-+                cursor_pos_x + cx < 0 ||
-+                cursor_pos_y + cy > buf->height - 1 ||
-+                cursor_pos_x + cx > buf->width) {
-+                continue;
-+            }
-+
-+            int dstoffset = (cursor_pos_y + cy) * s->width +
-+                 (cursor_pos_x + cx);
-+
-+            if (cursor0->data[cy * cursor0->width + cx]) {
-+                data[dstoffset] = 0;
-+            } else {
-+                if (cursor1->data[cy * cursor1->width + cx]) {
-+                    data[dstoffset] = 0xffffff;
-+                }
-+            }
-+        }
-+    }
-+}
-+
-+static void artist_update_display(void *opaque)
-+{
-+    ARTISTState *s = opaque;
-+    DisplaySurface *surface = qemu_console_surface(s->con);
-+    const uint8_t *pix;
-+    uint32_t *data, *cmap;
-+    int x, y;
-+
-+    if (surface_bits_per_pixel(surface) != 32) {
-+        return;
++    case LASI_PCR ... LASI_AMR:
++        ret = true;
 +    }
 +
-+    pix = s->vram_buffer[ARTIST_BUFFER_AP].data;
-+    cmap = (uint32_t *)(s->vram_buffer[ARTIST_BUFFER_CMAP].data + 0x400);
-+    data = (uint32_t *)surface_data(surface);
-+
-+    for (y = 0; y < s->height; y++) {
-+        for (x = 0; x < s->width; x++) {
-+            *data++ = cmap[*pix++];
-+        }
-+    }
-+    artist_draw_cursor(s);
-+    dpy_gfx_update(s->con, 0, 0, s->width, s->height);
-+
++    trace_lasi_chip_mem_valid(addr, ret);
++    return ret;
 +}
 +
-+static int vram_write_pix_per_transfer(ARTISTState *s)
++static MemTxResult lasi_chip_read_with_attrs(void *opaque, hwaddr addr,
++                                             uint64_t *data, unsigned size,
++                                             MemTxAttrs attrs)
 +{
-+    if (s->cmap_bm_access) {
-+        return 1 << ((s->cmap_bm_access >> 27) & 0x0f);
-+    } else {
-+        return 1 << ((s->dst_bm_access >> 27) & 0x0f);
-+    }
-+}
++    LasiState *s = opaque;
++    MemTxResult ret = MEMTX_OK;
++    uint32_t val;
 +
-+static int vram_pixel_length(ARTISTState *s)
-+{
-+    if (s->cmap_bm_access) {
-+        return (s->cmap_bm_access >> 24) & 0x07;
-+    } else {
-+        return (s->dst_bm_access >> 24) & 0x07;
-+    }
-+}
-+
-+
-+static int vram_write_bufidx(ARTISTState *s)
-+{
-+    if (s->cmap_bm_access) {
-+        return (s->cmap_bm_access >> 12) & 0x0f;
-+    } else {
-+        return (s->dst_bm_access >> 12) & 0x0f;
-+    }
-+}
-+
-+static int vram_read_bufidx(ARTISTState *s)
-+{
-+    if (s->cmap_bm_access) {
-+        return (s->cmap_bm_access >> 12) & 0x0f;
-+    } else {
-+        return (s->src_bm_access >> 12) & 0x0f;
-+    }
-+}
-+
-+static struct vram_buffer *vram_read_buffer(ARTISTState *s)
-+{
-+    return &s->vram_buffer[vram_read_bufidx(s)];
-+}
-+
-+static struct vram_buffer *vram_write_buffer(ARTISTState *s)
-+{
-+    return &s->vram_buffer[vram_write_bufidx(s)];
-+}
-+
-+static uint8_t artist_get_color(ARTISTState *s)
-+{
-+    if (s->image_bitmap_op & 2) {
-+        return s->fg_color;
-+    } else {
-+        return s->bg_color;
-+    }
-+}
-+
-+static artist_rop_t artist_get_op(ARTISTState *s)
-+{
-+    return (s->image_bitmap_op >> 8) & 0xf;
-+}
-+
-+static void artist_rop8(ARTISTState *s, uint8_t *dst, uint8_t val)
-+{
-+
-+    const artist_rop_t op = artist_get_op(s);
-+    uint8_t plane_mask = s->plane_mask & 0xff;
-+
-+    switch (op) {
-+    case ARTIST_ROP_CLEAR:
-+        *dst &= ~plane_mask;
++    switch (addr) {
++    case LASI_IRR:
++        val = s->irr;
++        break;
++    case LASI_IMR:
++        val = s->imr;
++        break;
++    case LASI_IPR:
++        val = s->ipr;
++        /* Any read to IPR clears the register.  */
++        s->ipr = 0;
++        break;
++    case LASI_ICR:
++        val = s->icr & ICR_BUS_ERROR_BIT; /* bus_error */
++        break;
++    case LASI_IAR:
++        val = s->iar;
 +        break;
 +
-+    case ARTIST_ROP_COPY:
-+        *dst &= ~plane_mask;
-+        *dst |= val & plane_mask;
++    case (LASI_LAN_HPA - LASI_HPA):
++    case (LASI_LPT_HPA - LASI_HPA):
++    case (LASI_UART_HPA - LASI_HPA):
++        val = 0;
++        break;
++    case (LASI_RTC_HPA - LASI_HPA):
++        val = time(NULL);
++        val += s->rtc_ref;
 +        break;
 +
-+    case ARTIST_ROP_XOR:
-+        *dst ^= val & plane_mask;
++    case LASI_PCR:
++    case LASI_VER:      /* only version 0 existed. */
++    case LASI_IORESET:
++        val = 0;
 +        break;
-+
-+    case ARTIST_ROP_NOT_DST:
-+        *dst ^= plane_mask;
++    case LASI_ERRLOG:
++        val = s->errlog;
 +        break;
-+
-+    case ARTIST_ROP_SET:
-+        *dst |= plane_mask;
++    case LASI_AMR:
++        val = s->amr;
 +        break;
 +
 +    default:
-+        qemu_log_mask(LOG_UNIMP, "%s: unsupported rop %d\n", __func__, op);
-+        break;
++        /* Controlled by lasi_chip_mem_valid above. */
++        g_assert_not_reached();
 +    }
++
++    trace_lasi_chip_read(addr, val);
++
++    *data = val;
++    return ret;
 +}
 +
-+static void vram_bit_write(ARTISTState *s, int posx, int posy, bool incr_x,
-+                           int size, uint32_t data)
++static MemTxResult lasi_chip_write_with_attrs(void *opaque, hwaddr addr,
++                                              uint64_t val, unsigned size,
++                                              MemTxAttrs attrs)
 +{
-+    struct vram_buffer *buf;
-+    uint32_t vram_bitmask = s->vram_bitmask;
-+    int mask, i, pix_count, pix_length, offset, height, width;
-+    uint8_t *data8, *p;
++    LasiState *s = opaque;
 +
-+    pix_count = vram_write_pix_per_transfer(s);
-+    pix_length = vram_pixel_length(s);
++    trace_lasi_chip_write(addr, val);
 +
-+    buf = vram_write_buffer(s);
-+    height = buf->height;
-+    width = buf->width;
-+
-+    if (s->cmap_bm_access) {
-+        offset = s->vram_pos;
-+    } else {
-+        offset = posy * width + posx;
-+    }
-+
-+    if (!buf->size) {
-+        qemu_log("write to non-existent buffer\n");
-+        return;
-+    }
-+
-+    if (posy * width + posx > buf->size) {
-+        qemu_log("write outside bounds: wants %dx%d, max size %dx%d\n",
-+                posx, posy, width, height);
-+        return;
-+    }
-+
-+    p = buf->data;
-+
-+    if (pix_count > size * 8) {
-+        pix_count = size * 8;
-+    }
-+
-+    switch (pix_length) {
-+    case 0:
-+        if (s->image_bitmap_op & 0x20000000) {
-+                data &= vram_bitmask;
-+        }
-+
-+        for (i = 0; i < pix_count; i++) {
-+            artist_rop8(s, p + offset + pix_count - 1 - i,
-+                (data & 1) ? (s->plane_mask >> 24) : 0);
-+            data >>= 1;
-+        }
++    switch (addr) {
++    case LASI_IRR:
++        /* read-only.  */
++        break;
++    case LASI_IMR:
++        s->imr = val;  /* 0x20 ?? */
++        assert((val & LASI_IRQ_BITS) == val);
++        break;
++    case LASI_IPR:
++        /* Any write to IPR clears the register. */
++        s->ipr = 0;
++        break;
++    case LASI_ICR:
++        s->icr = val;
++        /* if (val & ICR_TOC_BIT) issue_toc(); */
++        break;
++    case LASI_IAR:
++        s->iar = val;
 +        break;
 +
-+    case 3:
-+        if (s->cmap_bm_access) {
-+            *(uint32_t *)(p + offset) = data;
-+            break;
-+        }
-+        data8 = (uint8_t *)&data;
-+
-+        for (i = 3; i >= 0; i--) {
-+            if (!(s->image_bitmap_op & 0x20000000) ||
-+                    s->vram_bitmask & (1 << (28 + i))) {
-+#ifdef HOST_WORDS_BIGENDIAN
-+                artist_rop8(s, p + offset + 3 - i, data8[3 - i]);
-+#else
-+                artist_rop8(s, p + offset + 3 - i, data8[i]);
-+#endif
-+            }
-+        }
++    case (LASI_LAN_HPA - LASI_HPA):
++        /* XXX: reset LAN card */
++        break;
++    case (LASI_LPT_HPA - LASI_HPA):
++        /* XXX: reset parallel port */
++        break;
++    case (LASI_UART_HPA - LASI_HPA):
++        /* XXX: reset serial port */
++        break;
++    case (LASI_RTC_HPA - LASI_HPA):
++        s->rtc_ref = val - time(NULL);
 +        break;
 +
-+    case 6:
-+        switch (size) {
-+        default:
-+        case 4:
-+            vram_bitmask = s->vram_bitmask;
-+            break;
-+
-+        case 2:
-+            vram_bitmask = s->vram_bitmask >> 16;
-+            break;
-+
-+        case 1:
-+            vram_bitmask = s->vram_bitmask >> 24;
-+            break;
-+        }
-+
-+        for (i = 0; i < pix_count; i++) {
-+            mask = 1 << (pix_count - 1 - i);
-+
-+            if (!(s->image_bitmap_op & 0x20000000) ||
-+                 (vram_bitmask & mask)) {
-+                if (data & mask) {
-+                    artist_rop8(s, p + offset + i, s->fg_color);
-+                } else {
-+                   if (!(s->image_bitmap_op & 0x10000002)) {
-+                        artist_rop8(s, p + offset + i, s->bg_color);
-+                    }
-+                }
-+            }
-+        }
++    case LASI_PCR:
++        if (val == 0x02) /* immediately power off */
++            qemu_system_shutdown_request(SHUTDOWN_CAUSE_GUEST_SHUTDOWN);
++        break;
++    case LASI_ERRLOG:
++        s->errlog = val;
++        break;
++    case LASI_VER:
++        /* read-only.  */
++        break;
++    case LASI_IORESET:
++        break;  /* XXX: TODO: Reset various devices. */
++    case LASI_AMR:
++        s->amr = val;
 +        break;
 +
 +    default:
-+        qemu_log_mask(LOG_UNIMP, "%s: unknown pixel length %d\n",
-+            __func__, pix_length);
-+        break;
++        /* Controlled by lasi_chip_mem_valid above. */
++        g_assert_not_reached();
 +    }
-+
-+    if (incr_x) {
-+        if (s->cmap_bm_access) {
-+            s->vram_pos += 4;
-+        } else {
-+            s->vram_pos += pix_count << 2;
-+        }
-+    }
++    return MEMTX_OK;
 +}
 +
-+static void block_move(ARTISTState *s, int source_x, int source_y, int dest_x,
-+                    int dest_y, int width, int height)
-+{
-+    struct vram_buffer *buf;
-+    int line, endline, lineincr, startcolumn, endcolumn, columnincr, column;
-+    uint32_t dst, src;
-+
-+    trace_artist_block_move(source_x, source_y, dest_x, dest_y, width, height);
-+
-+    if (s->control_plane != 0) {
-+        qemu_log_mask(LOG_UNIMP, "%s: CONTROL_PLANE: %08x\n", __func__,
-+            s->control_plane);
-+        return;
-+    }
-+
-+    buf = &s->vram_buffer[ARTIST_BUFFER_AP];
-+
-+    if (dest_y > source_y) {
-+        /* move down */
-+        line = height - 1;
-+        endline = -1;
-+        lineincr = -1;
-+    } else {
-+        /* move up */
-+        line = 0;
-+        endline = height;
-+        lineincr = 1;
-+    }
-+
-+    if (dest_x > source_x) {
-+        /* move right */
-+        startcolumn = width - 1;
-+        endcolumn = -1;
-+        columnincr = -1;
-+    } else {
-+        /* move left */
-+        startcolumn = 0;
-+        endcolumn = width;
-+        columnincr = 1;
-+    }
-+
-+    for ( ; line != endline; line += lineincr) {
-+        src = source_x + ((line + source_y) * buf->width);
-+        dst = dest_x + ((line + dest_y) * buf->width);
-+
-+        for (column = startcolumn; column != endcolumn; column += columnincr) {
-+            artist_rop8(s, buf->data + dst + column, buf->data[src + column]);
-+        }
-+    }
-+}
-+
-+static void fill_window(ARTISTState *s, int startx, int starty,
-+                        int width, int height)
-+{
-+    uint32_t offset;
-+    uint8_t color = artist_get_color(s);
-+    uint8_t *buf;
-+    int x, y;
-+
-+    trace_artist_fill_window(startx, starty, width, height,
-+        s->image_bitmap_op, s->control_plane);
-+
-+    if (s->control_plane != 0) {
-+        qemu_log_mask(LOG_UNIMP, "%s: CONTROL_PLANE: %08x\n", __func__,
-+            s->control_plane);
-+        return;
-+    }
-+
-+    if (s->reg_100080 == 0x7d) {
-+        height = artist_get_y(s->blockmove_size);
-+        s->vram_start += height;
-+    }
-+
-+    buf = s->vram_buffer[ARTIST_BUFFER_AP].data;
-+
-+    for (y = starty; y < starty + height; y++) {
-+        offset = y * s->width;
-+
-+        for (x = startx; x < startx + width; x++) {
-+            artist_rop8(s, buf + offset + x, color);
-+        }
-+    }
-+}
-+
-+static void draw_line(ARTISTState *s, int x1, int y1, int x2, int y2,
-+        bool update_start, int skip_pix, int max_pix)
-+{
-+    uint8_t color = artist_get_color(s);
-+    int dx, dy, t, e, x, y, incy, diago, horiz;
-+    bool c1;
-+    uint8_t *buf, *p;
-+
-+
-+    if (update_start) {
-+        s->vram_start = (x2 << 16) | y2;
-+    }
-+
-+    buf = s->vram_buffer[ARTIST_BUFFER_AP].data;
-+
-+    c1 = false;
-+    incy = 1;
-+
-+    if (x2 > x1) {
-+        dx = x2 - x1;
-+    } else {
-+        dx = x1 - x2;
-+    }
-+    if (y2 > y1) {
-+        dy = y2 - y1;
-+    } else {
-+        dy = y1 - y2;
-+    }
-+    if (dy > dx) {
-+        t = y2;
-+        y2 = x2;
-+        x2 = t;
-+
-+        t = y1;
-+        y1 = x1;
-+        x1 = t;
-+
-+        t = dx;
-+        dx = dy;
-+        dy = t;
-+
-+        c1 = true;
-+    }
-+
-+    if (x1 > x2) {
-+        t = y2;
-+        y2 = y1;
-+        y1 = t;
-+
-+        t = x1;
-+        x1 = x2;
-+        x2 = t;
-+    }
-+
-+    horiz = dy << 1;
-+    diago = (dy - dx) << 1;
-+    e = (dy << 1) - dx;
-+
-+    if (y1 <= y2) {
-+        incy = 1;
-+    } else {
-+        incy = -1;
-+    }
-+    x = x1;
-+    y = y1;
-+
-+    do {
-+        if (c1) {
-+            p = buf + x * s->width + y;
-+       } else {
-+            p = buf + y * s->width + x;
-+       }
-+
-+        if (skip_pix > 0) {
-+            skip_pix--;
-+        } else {
-+            artist_rop8(s, p, color);
-+        }
-+
-+        if (e > 0) {
-+            y  += incy;
-+            e  += diago;
-+        } else {
-+            e += horiz;
-+        }
-+        x++;
-+    } while (x <= x2 && (max_pix == -1 || --max_pix > 0));
-+}
-+
-+static void draw_line_pattern_start(ARTISTState *s)
-+{
-+
-+    int startx = artist_get_x(s->vram_start);
-+    int starty = artist_get_y(s->vram_start);
-+    int endx = artist_get_x(s->blockmove_size);
-+    int endy = artist_get_y(s->blockmove_size);
-+    int pstart = s->line_pattern_start >> 16;
-+
-+    trace_artist_draw_line(startx, starty, endx, endy);
-+    draw_line(s, startx, starty, endx, endy, false, -1, pstart);
-+    s->line_pattern_skip = pstart;
-+}
-+
-+static void draw_line_pattern_next(ARTISTState *s)
-+{
-+
-+    int startx = artist_get_x(s->vram_start);
-+    int starty = artist_get_y(s->vram_start);
-+    int endx = artist_get_x(s->blockmove_size);
-+    int endy = artist_get_y(s->blockmove_size);
-+    int line_xy = s->line_xy >> 16;
-+
-+    trace_artist_draw_line(startx, starty, endx, endy);
-+    draw_line(s, startx, starty, endx, endy, false, s->line_pattern_skip,
-+        s->line_pattern_skip + line_xy);
-+    s->line_pattern_skip += line_xy;
-+    s->image_bitmap_op ^= 2;
-+}
-+
-+
-+static void draw_line_size(ARTISTState *s, bool update_start)
-+{
-+
-+    int startx = artist_get_x(s->vram_start);
-+    int starty = artist_get_y(s->vram_start);
-+    int endx = artist_get_x(s->line_size);
-+    int endy = artist_get_y(s->line_size);
-+
-+    trace_artist_draw_line(startx, starty, endx, endy);
-+    draw_line(s, startx, starty, endx, endy, update_start, -1, -1);
-+}
-+
-+static void draw_line_xy(ARTISTState *s, bool update_start)
-+{
-+
-+    int startx = artist_get_x(s->vram_start);
-+    int starty = artist_get_y(s->vram_start);
-+    int sizex = artist_get_x(s->blockmove_size);
-+    int sizey = artist_get_y(s->blockmove_size);
-+    int linexy = s->line_xy >> 16;
-+    int endx, endy;
-+
-+    endx = startx;
-+    endy = starty;
-+
-+    if (sizex > 0) {
-+        endx = startx + linexy;
-+    }
-+
-+    if (sizex < 0) {
-+        endx = startx;
-+        startx -= linexy;
-+    }
-+
-+    if (sizey > 0) {
-+        endy = starty + linexy;
-+    }
-+
-+    if (sizey < 0) {
-+        endy = starty;
-+        starty -= linexy;
-+    }
-+
-+    if (startx < 0) {
-+        startx = 0;
-+    }
-+
-+    if (endx < 0) {
-+        endx = 0;
-+    }
-+
-+    if (starty < 0) {
-+        starty = 0;
-+    }
-+
-+    if (endy < 0) {
-+        endy = 0;
-+    }
-+
-+
-+    if (endx < 0) {
-+        return;
-+    }
-+
-+    if (endy < 0) {
-+        return;
-+    }
-+
-+    trace_artist_draw_line(startx, starty, endx, endy);
-+    draw_line(s, startx, starty, endx, endy, false, -1, -1);
-+}
-+
-+static void draw_line_end(ARTISTState *s, bool update_start)
-+{
-+
-+    int startx = artist_get_x(s->vram_start);
-+    int starty = artist_get_y(s->vram_start);
-+    int endx = artist_get_x(s->line_end);
-+    int endy = artist_get_y(s->line_end);
-+
-+    trace_artist_draw_line(startx, starty, endx, endy);
-+    draw_line(s, startx, starty, endx, endy, update_start, -1, -1);
-+}
-+
-+static void font_write16(ARTISTState *s, uint16_t val)
-+{
-+    uint32_t color = (s->image_bitmap_op & 2) ? s->fg_color : s->bg_color;
-+    uint8_t *buf;
-+    uint16_t mask;
-+    int i;
-+
-+    int startx = artist_get_x(s->vram_start);
-+    int starty = artist_get_y(s->vram_start) + s->font_write_pos_y;
-+    int offset = starty * s->width + startx;
-+
-+    buf = s->vram_buffer[ARTIST_BUFFER_AP].data;
-+
-+    for (i = 0; i < 16; i++) {
-+        mask = 1 << (15 - i);
-+        if (val & mask) {
-+            artist_rop8(s, buf + offset + i, color);
-+        } else {
-+            if (!(s->image_bitmap_op & 0x20000000)) {
-+                artist_rop8(s, buf + offset + i, s->bg_color);
-+            }
-+        }
-+    }
-+}
-+
-+static void font_write(ARTISTState *s, uint32_t val)
-+{
-+    font_write16(s, val >> 16);
-+    if (++s->font_write_pos_y == artist_get_y(s->blockmove_size)) {
-+        s->vram_start += (s->blockmove_size & 0xffff0000);
-+        return;
-+    }
-+
-+    font_write16(s, val & 0xffff);
-+    if (++s->font_write_pos_y == artist_get_y(s->blockmove_size)) {
-+        s->vram_start += (s->blockmove_size & 0xffff0000);
-+        return;
-+    }
-+}
-+
-+static void combine_write_reg(hwaddr addr, uint64_t val, int size, void *out)
-+{
-+    /*
-+     * FIXME: is there a qemu helper for this?
-+     */
-+
-+#ifndef HOST_WORDS_BIGENDIAN
-+    addr ^= 3;
-+#endif
-+
-+    switch (size) {
-+    case 1:
-+        *(uint8_t *)(out + (addr & 3)) = val;
-+        break;
-+
-+    case 2:
-+        *(uint16_t *)(out + (addr & 2)) = val;
-+        break;
-+
-+    case 4:
-+        *(uint32_t *)out = val;
-+        break;
-+
-+    default:
-+        qemu_log_mask(LOG_UNIMP, "unsupported write size: %d\n", size);
-+    }
-+}
-+
-+static void artist_reg_write(void *opaque, hwaddr addr, uint64_t val,
-+        unsigned size)
-+{
-+    ARTISTState *s = opaque;
-+    int posx, posy;
-+    int width, height;
-+
-+    trace_artist_reg_write(size, addr, artist_reg_name(addr & ~3ULL), val);
-+
-+    switch (addr & ~3ULL) {
-+    case 0x100080:
-+        combine_write_reg(addr, val, size, &s->reg_100080);
-+        break;
-+
-+    case FG_COLOR:
-+        combine_write_reg(addr, val, size, &s->fg_color);
-+        break;
-+
-+    case BG_COLOR:
-+        combine_write_reg(addr, val, size, &s->bg_color);
-+        break;
-+
-+    case VRAM_BITMASK:
-+        combine_write_reg(addr, val, size, &s->vram_bitmask);
-+        break;
-+
-+    case VRAM_WRITE_INCR_Y:
-+        posx = (s->vram_pos >> 2) & 0x7ff;
-+        posy = (s->vram_pos >> 13) & 0x3ff;
-+        vram_bit_write(s, posx, posy + s->vram_char_y++, false, size, val);
-+        break;
-+
-+    case VRAM_WRITE_INCR_X:
-+    case VRAM_WRITE_INCR_X2:
-+        posx = (s->vram_pos >> 2) & 0x7ff;
-+        posy = (s->vram_pos >> 13) & 0x3ff;
-+        vram_bit_write(s, posx, posy + s->vram_char_y, true, size, val);
-+        break;
-+
-+    case VRAM_IDX:
-+        combine_write_reg(addr, val, size, &s->vram_pos);
-+        s->vram_char_y = 0;
-+        s->draw_line_pattern = 0;
-+        break;
-+
-+    case VRAM_START:
-+        combine_write_reg(addr, val, size, &s->vram_start);
-+        s->draw_line_pattern = 0;
-+        break;
-+
-+    case VRAM_START_TRIGGER:
-+        combine_write_reg(addr, val, size, &s->vram_start);
-+        fill_window(s, artist_get_x(s->vram_start),
-+                    artist_get_y(s->vram_start),
-+                    artist_get_x(s->blockmove_size),
-+                    artist_get_y(s->blockmove_size));
-+        break;
-+
-+    case VRAM_SIZE_TRIGGER:
-+        combine_write_reg(addr, val, size, &s->vram_size);
-+
-+        if (size == 2 && !(addr & 2)) {
-+            height = artist_get_y(s->blockmove_size);
-+        } else {
-+            height = artist_get_y(s->vram_size);
-+        }
-+
-+        if (size == 2 && (addr & 2)) {
-+            width = artist_get_x(s->blockmove_size);
-+        } else {
-+            width = artist_get_x(s->vram_size);
-+        }
-+
-+        fill_window(s, artist_get_x(s->vram_start),
-+                    artist_get_y(s->vram_start),
-+                    width, height);
-+        break;
-+
-+    case LINE_XY:
-+        combine_write_reg(addr, val, size, &s->line_xy);
-+        if (s->draw_line_pattern) {
-+            draw_line_pattern_next(s);
-+        } else {
-+            draw_line_xy(s, true);
-+        }
-+        break;
-+
-+    case PATTERN_LINE_START:
-+        combine_write_reg(addr, val, size, &s->line_pattern_start);
-+        s->draw_line_pattern = 1;
-+        draw_line_pattern_start(s);
-+        break;
-+
-+    case LINE_SIZE:
-+        combine_write_reg(addr, val, size, &s->line_size);
-+        draw_line_size(s, true);
-+        break;
-+
-+    case LINE_END:
-+        combine_write_reg(addr, val, size, &s->line_end);
-+        draw_line_end(s, true);
-+        break;
-+
-+    case BLOCK_MOVE_SIZE:
-+        combine_write_reg(addr, val, size, &s->blockmove_size);
-+        break;
-+
-+    case BLOCK_MOVE_SOURCE:
-+        combine_write_reg(addr, val, size, &s->blockmove_source);
-+        break;
-+
-+    case BLOCK_MOVE_DEST_TRIGGER:
-+        combine_write_reg(addr, val, size, &s->blockmove_dest);
-+
-+        block_move(s, artist_get_x(s->blockmove_source),
-+                artist_get_y(s->blockmove_source),
-+                artist_get_x(s->blockmove_dest),
-+                artist_get_y(s->blockmove_dest),
-+                artist_get_x(s->blockmove_size),
-+                artist_get_y(s->blockmove_size));
-+        break;
-+
-+    case BLOCK_MOVE_SIZE_TRIGGER:
-+        combine_write_reg(addr, val, size, &s->blockmove_size);
-+
-+        block_move(s,
-+                artist_get_x(s->blockmove_source),
-+                artist_get_y(s->blockmove_source),
-+                artist_get_x(s->vram_start),
-+                artist_get_y(s->vram_start),
-+                artist_get_x(s->blockmove_size),
-+                artist_get_y(s->blockmove_size));
-+        break;
-+
-+    case PLANE_MASK:
-+        combine_write_reg(addr, val, size, &s->plane_mask);
-+        break;
-+
-+    case CMAP_BM_ACCESS:
-+        combine_write_reg(addr, val, size, &s->cmap_bm_access);
-+        break;
-+
-+    case DST_BM_ACCESS:
-+        combine_write_reg(addr, val, size, &s->dst_bm_access);
-+        s->cmap_bm_access = 0;
-+        break;
-+
-+    case SRC_BM_ACCESS:
-+        combine_write_reg(addr, val, size, &s->src_bm_access);
-+        s->cmap_bm_access = 0;
-+        break;
-+
-+    case CONTROL_PLANE:
-+        combine_write_reg(addr, val, size, &s->control_plane);
-+        break;
-+
-+    case TRANSFER_DATA:
-+        combine_write_reg(addr, val, size, &s->transfer_data);
-+        break;
-+
-+    case 0x300200:
-+        combine_write_reg(addr, val, size, &s->reg_300200);
-+        break;
-+
-+    case 0x300208:
-+        combine_write_reg(addr, val, size, &s->reg_300208);
-+        break;
-+
-+    case 0x300218:
-+        combine_write_reg(addr, val, size, &s->reg_300218);
-+        break;
-+
-+    case CURSOR_POS:
-+        combine_write_reg(addr, val, size, &s->cursor_pos);
-+        break;
-+
-+    case CURSOR_CTRL:
-+        break;
-+
-+    case IMAGE_BITMAP_OP:
-+        combine_write_reg(addr, val, size, &s->image_bitmap_op);
-+        break;
-+
-+    case FONT_WRITE_INCR_Y:
-+        combine_write_reg(addr, val, size, &s->font_write1);
-+        font_write(s, s->font_write1);
-+        break;
-+
-+    case FONT_WRITE_START:
-+        combine_write_reg(addr, val, size, &s->font_write2);
-+        s->font_write_pos_y = 0;
-+        font_write(s, s->font_write2);
-+        break;
-+
-+    case 300104:
-+        break;
-+
-+    default:
-+        qemu_log_mask(LOG_UNIMP, "%s: unknown register: reg=%08lx val=%08lx"
-+                " size=%d\n", __func__, addr, val, size);
-+        break;
-+    }
-+}
-+
-+static uint64_t combine_read_reg(hwaddr addr, int size, void *in)
-+{
-+    /*
-+     * FIXME: is there a qemu helper for this?
-+     */
-+
-+#ifndef HOST_WORDS_BIGENDIAN
-+    addr ^= 3;
-+#endif
-+
-+    switch (size) {
-+    case 1:
-+        return *(uint8_t *)(in + (addr & 3));
-+
-+    case 2:
-+        return *(uint16_t *)(in + (addr & 2));
-+
-+    case 4:
-+        return *(uint32_t *)in;
-+
-+    default:
-+        qemu_log_mask(LOG_UNIMP, "unsupported read size: %d\n", size);
-+        return 0;
-+    }
-+}
-+
-+
-+static uint64_t artist_reg_read(void *opaque, hwaddr addr, unsigned size)
-+{
-+    ARTISTState *s = opaque;
-+    uint32_t val = 0;
-+
-+    switch (addr & ~3ULL) {
-+        /* Unknown status registers */
-+    case 0:
-+        break;
-+
-+    case 0x211110:
-+        val = (s->width << 16) | s->height;
-+        if (s->depth == 1) {
-+            val |= 1 << 31;
-+        }
-+        break;
-+
-+    case 0x100000:
-+    case 0x300000:
-+    case 0x300004:
-+    case 0x300308:
-+    case 0x380000:
-+        break;
-+
-+    case 0x300008:
-+    case 0x380008:
-+        /*
-+         * FIFO ready flag. we're not emulating the FIFOs
-+         * so we're always ready
-+         */
-+        val = 0x10;
-+        break;
-+
-+    case 0x300200:
-+        val = s->reg_300200;
-+        break;
-+
-+    case 0x300208:
-+        val = s->reg_300208;
-+        break;
-+
-+    case 0x300218:
-+        val = s->reg_300218;
-+        break;
-+
-+    case 0x30023c:
-+        val = 0xac4ffdac;
-+        break;
-+
-+    case 0x380004:
-+        /* 0x02000000 Buserror */
-+        val = 0x6dc20006;
-+        break;
-+
-+    default:
-+        qemu_log("%s: unknown register: %08lx size %d\n", __func__, addr, size);
-+    }
-+    val = combine_read_reg(addr, size, &val);
-+    trace_artist_reg_read(size, addr, artist_reg_name(addr & ~3ULL), val);
-+    return val;
-+}
-+
-+
-+static void artist_vram_write(void *opaque, hwaddr addr, uint64_t val,
-+        unsigned size)
-+{
-+    ARTISTState *s = opaque;
-+    struct vram_buffer *buf;
-+    int posy = (addr >> 11) & 0x3ff;
-+    int posx = addr & 0x7ff;
-+
-+    trace_artist_vram_write(size, addr, val);
-+
-+    if (s->cmap_bm_access) {
-+        buf = &s->vram_buffer[ARTIST_BUFFER_CMAP];
-+        *(uint32_t *)(buf->data + addr) = val;
-+        return;
-+    }
-+
-+    buf = vram_write_buffer(s);
-+    if (!buf->size) {
-+        return;
-+    }
-+
-+    switch (size) {
-+    case 4:
-+        *(uint32_t *)(buf->data + posy * buf->width + posx) = be32_to_cpu(val);
-+        break;
-+    case 2:
-+        *(uint16_t *)(buf->data + posy * buf->width + posx) = be16_to_cpu(val);
-+        break;
-+    case 1:
-+        *(uint8_t *)(buf->data + posy * buf->width + posx) = val;
-+        break;
-+    default:
-+        break;
-+    }
-+}
-+
-+static uint64_t artist_vram_read(void *opaque, hwaddr addr, unsigned size)
-+{
-+    ARTISTState *s = opaque;
-+    struct vram_buffer *buf;
-+    uint64_t val;
-+    int posy, posx;
-+
-+    if (s->cmap_bm_access) {
-+        buf = &s->vram_buffer[ARTIST_BUFFER_CMAP];
-+        val = *(uint32_t *)(buf->data + addr);
-+        trace_artist_vram_read(size, addr, 0, 0, val);
-+        return 0;
-+    }
-+
-+    buf = vram_read_buffer(s);
-+    if (!buf->size) {
-+            return 0;
-+    }
-+
-+    posy = (addr >> 13) & 0x3ff;
-+    posx = (addr >> 2) & 0x7ff;
-+    val = cpu_to_be32(*(uint32_t *)(buf->data + posy * buf->width + posx));
-+    trace_artist_vram_read(size, addr, posx, posy, val);
-+    return val;
-+}
-+
-+static const MemoryRegionOps artist_reg_ops = {
-+    .read = artist_reg_read,
-+    .write = artist_reg_write,
-+    .endianness = DEVICE_NATIVE_ENDIAN,
++static const MemoryRegionOps lasi_chip_ops = {
++    .read_with_attrs = lasi_chip_read_with_attrs,
++    .write_with_attrs = lasi_chip_write_with_attrs,
++    .endianness = DEVICE_BIG_ENDIAN,
 +    .valid = {
++        .min_access_size = 1,
++        .max_access_size = 4,
++        .accepts = lasi_chip_mem_valid,
++    },
++    .impl = {
 +        .min_access_size = 1,
 +        .max_access_size = 4,
 +    },
 +};
 +
-+static const MemoryRegionOps artist_vram_ops = {
-+    .read = artist_vram_read,
-+    .write = artist_vram_write,
-+    .endianness = DEVICE_NATIVE_ENDIAN,
-+    .valid = {
-+        .min_access_size = 1,
-+        .max_access_size = 4,
-+    },
-+};
-+
-+static const GraphicHwOps artist_ops = {
-+    .gfx_update = artist_update_display,
-+};
-+
-+static void artist_initfn(Object *obj)
-+{
-+    SysBusDevice *sbd = SYS_BUS_DEVICE(obj);
-+    ARTISTState *s = ARTIST(obj);
-+
-+    memory_region_init_io(&s->reg, obj, &artist_reg_ops, s, "artist.reg",
-+            0x400000);
-+    memory_region_init_io(&s->vram_mem, obj, &artist_vram_ops, s, "artist.vram",
-+            0x800000);
-+    sysbus_init_mmio(sbd, &s->reg);
-+    sysbus_init_mmio(sbd, &s->vram_mem);
-+}
-+
-+static void artist_set_buffer(ARTISTState *s, uint8_t **vram, unsigned int idx,
-+                              int width, int height)
-+{
-+    struct vram_buffer *buf = s->vram_buffer + idx;
-+
-+    buf->data = *vram;
-+    buf->size = height * width;
-+    buf->width = width;
-+    buf->height = height;
-+    *vram = *vram + buf->size;
-+}
-+
-+static void artist_realizefn(DeviceState *dev, Error **errp)
-+{
-+    uint8_t *vram;
-+
-+    ARTISTState *s = ARTIST(dev);
-+
-+    vram = g_malloc0(4 * 1048576);
-+    s->vram = vram;
-+    artist_set_buffer(s, &vram, ARTIST_BUFFER_CMAP, 2048, 4);
-+    artist_set_buffer(s, &vram, ARTIST_BUFFER_AP, s->width, s->height);
-+    artist_set_buffer(s, &vram, ARTIST_BUFFER_CURSOR1, 64, 64);
-+    artist_set_buffer(s, &vram, ARTIST_BUFFER_CURSOR2, 64, 64);
-+    artist_set_buffer(s, &vram, ARTIST_BUFFER_ATTRIBUTE, 64, 64);
-+
-+    /*
-+     * no idea whether the cursor is fixed size or not, so assume 32x32 which
-+     * seems sufficient for HP-UX X11.
-+     */
-+    s->cursor_height = 32;
-+    s->cursor_width = 32;
-+
-+    s->con = graphic_console_init(DEVICE(dev), 0, &artist_ops, s);
-+    qemu_console_resize(s->con, s->width, s->height);
-+}
-+
-+static int vmstate_artist_post_load(void *opaque, int version_id)
-+{
-+    return 0;
-+}
-+
-+static const VMStateDescription vmstate_artist = {
-+    .name = "artist",
++static const VMStateDescription vmstate_lasi = {
++    .name = "Lasi",
 +    .version_id = 1,
 +    .minimum_version_id = 1,
-+    .post_load = vmstate_artist_post_load,
 +    .fields = (VMStateField[]) {
-+        VMSTATE_UINT16(height, ARTISTState),
-+        VMSTATE_UINT16(width, ARTISTState),
-+        VMSTATE_UINT16(depth, ARTISTState),
-+        VMSTATE_UINT32(fg_color, ARTISTState),
-+        VMSTATE_UINT32(bg_color, ARTISTState),
-+        VMSTATE_UINT32(vram_char_y, ARTISTState),
-+        VMSTATE_UINT32(vram_bitmask, ARTISTState),
-+        VMSTATE_UINT32(vram_start, ARTISTState),
-+        VMSTATE_UINT32(vram_pos, ARTISTState),
-+        VMSTATE_UINT32(vram_size, ARTISTState),
-+        VMSTATE_UINT32(blockmove_source, ARTISTState),
-+        VMSTATE_UINT32(blockmove_dest, ARTISTState),
-+        VMSTATE_UINT32(blockmove_size, ARTISTState),
-+        VMSTATE_UINT32(line_size, ARTISTState),
-+        VMSTATE_UINT32(line_end, ARTISTState),
-+        VMSTATE_UINT32(line_xy, ARTISTState),
-+        VMSTATE_UINT32(cursor_pos, ARTISTState),
-+        VMSTATE_UINT32(cursor_height, ARTISTState),
-+        VMSTATE_UINT32(cursor_width, ARTISTState),
-+        VMSTATE_UINT32(plane_mask, ARTISTState),
-+        VMSTATE_UINT32(reg_100080, ARTISTState),
-+        VMSTATE_UINT32(reg_300200, ARTISTState),
-+        VMSTATE_UINT32(reg_300208, ARTISTState),
-+        VMSTATE_UINT32(reg_300218, ARTISTState),
-+        VMSTATE_UINT32(cmap_bm_access, ARTISTState),
-+        VMSTATE_UINT32(dst_bm_access, ARTISTState),
-+        VMSTATE_UINT32(src_bm_access, ARTISTState),
-+        VMSTATE_UINT32(control_plane, ARTISTState),
-+        VMSTATE_UINT32(transfer_data, ARTISTState),
-+        VMSTATE_UINT32(image_bitmap_op, ARTISTState),
-+        VMSTATE_UINT32(font_write1, ARTISTState),
-+        VMSTATE_UINT32(font_write2, ARTISTState),
-+        VMSTATE_UINT32(font_write_pos_y, ARTISTState),
++        VMSTATE_UINT32(irr, LasiState),
++        VMSTATE_UINT32(imr, LasiState),
++        VMSTATE_UINT32(ipr, LasiState),
++        VMSTATE_UINT32(icr, LasiState),
++        VMSTATE_UINT32(iar, LasiState),
++        VMSTATE_UINT32(errlog, LasiState),
++        VMSTATE_UINT32(amr, LasiState),
 +        VMSTATE_END_OF_LIST()
 +    }
 +};
 +
-+static Property artist_properties[] = {
-+    DEFINE_PROP_UINT16("width",        ARTISTState, width, 1280),
-+    DEFINE_PROP_UINT16("height",       ARTISTState, height, 1024),
-+    DEFINE_PROP_UINT16("depth",        ARTISTState, depth, 8),
-+    DEFINE_PROP_END_OF_LIST(),
-+};
 +
-+static void artist_class_init(ObjectClass *klass, void *data)
++static void lasi_set_irq(void *opaque, int irq, int level)
++{
++    LasiState *s = opaque;
++    uint32_t bit = 1u << irq;
++
++    if (level) {
++        s->ipr |= bit;
++        if (bit & s->imr) {
++            uint32_t iar = s->iar;
++            s->irr |= bit;
++            if ((s->icr & ICR_BUS_ERROR_BIT) == 0) {
++                stl_be_phys(&address_space_memory, iar & -32, iar & 31);
++            }
++        }
++    }
++}
++
++static int lasi_get_irq(unsigned long hpa)
++{
++    switch (hpa) {
++    case LASI_HPA:
++        return 14;
++    case LASI_UART_HPA:
++        return 5;
++    case LASI_LPT_HPA:
++        return 7;
++    case LASI_LAN_HPA:
++        return 8;
++    case LASI_SCSI_HPA:
++        return 9;
++    case LASI_AUDIO_HPA:
++        return 13;
++    case LASI_PS2KBD_HPA:
++    case LASI_PS2MOU_HPA:
++        return 26;
++    default:
++        g_assert_not_reached();
++    }
++}
++
++DeviceState *lasi_init(MemoryRegion *address_space)
++{
++    DeviceState *dev;
++    LasiState *s;
++
++    dev = qdev_create(NULL, TYPE_LASI_CHIP);
++    s = LASI_CHIP(dev);
++    s->iar = CPU_HPA + 3;
++
++    /* Lasi access from main memory.  */
++    memory_region_init_io(&s->this_mem, OBJECT(s), &lasi_chip_ops,
++                          s, "lasi", 0x100000);
++    memory_region_add_subregion(address_space, LASI_HPA, &s->this_mem);
++
++    qdev_init_nofail(dev);
++
++    /* LAN */
++    if (enable_lasi_lan()) {
++        qemu_irq lan_irq = qemu_allocate_irq(lasi_set_irq, s,
++                lasi_get_irq(LASI_LAN_HPA));
++        lasi_82596_init(address_space, LASI_LAN_HPA, lan_irq);
++    }
++
++    /* Parallel port */
++    qemu_irq lpt_irq = qemu_allocate_irq(lasi_set_irq, s,
++            lasi_get_irq(LASI_LPT_HPA));
++    parallel_mm_init(address_space, LASI_LPT_HPA + 0x800, 0,
++                     lpt_irq, parallel_hds[0]);
++
++    /* Real time clock (RTC), it's only one 32-bit counter @9000 */
++    s->rtc = time(NULL);
++    s->rtc_ref = 0;
++
++    if (serial_hd(1)) {
++        /* Serial port */
++        qemu_irq serial_irq = qemu_allocate_irq(lasi_set_irq, s,
++                lasi_get_irq(LASI_UART_HPA));
++        serial_mm_init(address_space, LASI_UART_HPA + 0x800, 0,
++                serial_irq, 8000000 / 16,
++                serial_hd(1), DEVICE_NATIVE_ENDIAN);
++    }
++    return dev;
++}
++
++static void lasi_class_init(ObjectClass *klass, void *data)
 +{
 +    DeviceClass *dc = DEVICE_CLASS(klass);
 +
-+    dc->realize = artist_realizefn;
-+    dc->vmsd = &vmstate_artist;
-+    dc->props = artist_properties;
++    dc->vmsd = &vmstate_lasi;
 +}
 +
-+static const TypeInfo artist_info = {
-+    .name          = TYPE_ARTIST,
++static const TypeInfo lasi_pcihost_info = {
++    .name          = TYPE_LASI_CHIP,
 +    .parent        = TYPE_SYS_BUS_DEVICE,
-+    .instance_size = sizeof(ARTISTState),
-+    .instance_init = artist_initfn,
-+    .class_init    = artist_class_init,
++    .instance_size = sizeof(LasiState),
++    .class_init    = lasi_class_init,
 +};
 +
-+static void artist_register_types(void)
++static void lasi_register_types(void)
 +{
-+    type_register_static(&artist_info);
++    type_register_static(&lasi_pcihost_info);
 +}
 +
-+type_init(artist_register_types)
-diff --git a/hw/display/trace-events b/hw/display/trace-events
-index ba7787b180..e6e22bef88 100644
---- a/hw/display/trace-events
-+++ b/hw/display/trace-events
-@@ -142,3 +142,12 @@ sii9022_switch_mode(const char *mode) "mode: %s"
- # ati.c
- ati_mm_read(unsigned int size, uint64_t addr, const char *name, uint64_t val) "%u 0x%"PRIx64 " %s -> 0x%"PRIx64
- ati_mm_write(unsigned int size, uint64_t addr, const char *name, uint64_t val) "%u 0x%"PRIx64 " %s <- 0x%"PRIx64
-+
-+# artist.c
-+artist_reg_read(unsigned int size, uint64_t addr, const char *name, uint64_t val) "%u 0x%"PRIx64 "%s -> 0x%"PRIx64
-+artist_reg_write(unsigned int size, uint64_t addr, const char *name, uint64_t val) "%u 0x%"PRIx64 "%s <- 0x%"PRIx64
-+artist_vram_read(unsigned int size, uint64_t addr, int posx, int posy, uint64_t val) "%u 0x%"PRIx64 " %ux%u-> 0x%"PRIx64
-+artist_vram_write(unsigned int size, uint64_t addr, uint64_t val) "%u 0x%"PRIx64 " <- 0x%"PRIx64
-+artist_fill_window(unsigned int start_x, unsigned int start_y, unsigned int width, unsigned int height, uint32_t op, uint32_t ctlpln) "start=%ux%u length=%ux%u op=0x%08x ctlpln=0x%08x"
-+artist_block_move(unsigned int start_x, unsigned int start_y, unsigned int dest_x, unsigned int dest_y, unsigned int width, unsigned int height) "source %ux%u -> dest %ux%u size %ux%u"
-+artist_draw_line(unsigned int start_x, unsigned int start_y, unsigned int end_x, unsigned int end_y) "%ux%u %ux%u"
-diff --git a/hw/hppa/Kconfig b/hw/hppa/Kconfig
-index 7f9be7f25c..82178c7dcb 100644
---- a/hw/hppa/Kconfig
-+++ b/hw/hppa/Kconfig
-@@ -12,3 +12,4 @@ config DINO
-     select LSI_SCSI_PCI
-     select LASI_82596
-     select LASIPS2
-+    select ARTIST
-diff --git a/hw/hppa/hppa_hardware.h b/hw/hppa/hppa_hardware.h
-index ce59cbbf94..5716c80da9 100644
---- a/hw/hppa/hppa_hardware.h
-+++ b/hw/hppa/hppa_hardware.h
-@@ -22,6 +22,7 @@
- #define LASI_PS2KBD_HPA 0xffd08000
- #define LASI_PS2MOU_HPA 0xffd08100
- #define LASI_GFX_HPA    0xf8000000
-+#define ARTIST_FB_ADDR  0xf9000000
- #define CPU_HPA         0xfffb0000
- #define MEMORY_HPA      0xfffbf000
- 
++type_init(lasi_register_types)
 diff --git a/hw/hppa/machine.c b/hw/hppa/machine.c
-index 542faae9be..ec519c1a44 100644
+index 7e23675429..65fc20ebed 100644
 --- a/hw/hppa/machine.c
 +++ b/hw/hppa/machine.c
-@@ -21,6 +21,7 @@
+@@ -16,6 +16,7 @@
+ #include "hw/ide.h"
+ #include "hw/timer/i8254.h"
+ #include "hw/char/serial.h"
++#include "hw/net/lasi_82596.h"
+ #include "hppa_sys.h"
  #include "qemu/units.h"
  #include "qapi/error.h"
- #include "qemu/log.h"
-+#include "hw/usb.h"
+@@ -100,6 +101,9 @@ static void machine_hppa_init(MachineState *machine)
+                                          "ram", ram_size);
+     memory_region_add_subregion(addr_space, 0, ram_region);
  
- static uint64_t cpu_hppa_to_phys(void *opaque, uint64_t addr)
- {
-@@ -49,6 +50,7 @@ static void machine_hppa_init(MachineState *machine)
-     MemoryRegion *cpu_region;
-     long i;
-     unsigned int smp_cpus = machine->smp.cpus;
-+    SysBusDevice *s;
- 
-     ram_size = machine->ram_size;
- 
-@@ -94,6 +96,14 @@ static void machine_hppa_init(MachineState *machine)
-     dev = DEVICE(pci_create_simple(pci_bus, -1, "lsi53c895a"));
-     lsi53c8xx_handle_legacy_cmdline(dev);
- 
-+    if (vga_interface_type != VGA_NONE) {
-+        dev = qdev_create(NULL, "artist");
-+        qdev_init_nofail(dev);
-+        s = SYS_BUS_DEVICE(dev);
-+        sysbus_mmio_map(s, 0, LASI_GFX_HPA);
-+        sysbus_mmio_map(s, 1, ARTIST_FB_ADDR);
-+    }
++    /* Init Lasi chip */
++    lasi_init(addr_space);
 +
+     /* Init Dino (PCI host bus chip).  */
+     pci_bus = dino_init(addr_space, &rtc_irq, &serial_irq);
+     assert(pci_bus);
+@@ -124,7 +128,9 @@ static void machine_hppa_init(MachineState *machine)
+ 
      /* Network setup.  e1000 is good enough, failing Tulip support.  */
      for (i = 0; i < nb_nics; i++) {
-         if (!enable_lasi_lan()) {
+-        pci_nic_init_nofail(&nd_table[i], pci_bus, "e1000", NULL);
++        if (!enable_lasi_lan()) {
++            pci_nic_init_nofail(&nd_table[i], pci_bus, "e1000", NULL);
++        }
+     }
+ 
+     /* Load firmware.  Given that this is not "real" firmware,
+diff --git a/hw/hppa/trace-events b/hw/hppa/trace-events
+index f943b16c4e..3ff620319a 100644
+--- a/hw/hppa/trace-events
++++ b/hw/hppa/trace-events
+@@ -7,3 +7,8 @@ hppa_pci_iack_write(void) ""
+ dino_chip_mem_valid(uint64_t addr, uint32_t val) "access to addr 0x%"PRIx64" is %d"
+ dino_chip_read(uint64_t addr, uint32_t val) "addr 0x%"PRIx64" val 0x%08x"
+ dino_chip_write(uint64_t addr, uint32_t val) "addr 0x%"PRIx64" val 0x%08x"
++
++# lasi.c
++lasi_chip_mem_valid(uint64_t addr, uint32_t val) "access to addr 0x%"PRIx64" is %d"
++lasi_chip_read(uint64_t addr, uint32_t val) "addr 0x%"PRIx64" val 0x%08x"
++lasi_chip_write(uint64_t addr, uint32_t val) "addr 0x%"PRIx64" val 0x%08x"
+diff --git a/hw/net/Kconfig b/hw/net/Kconfig
+index 4ef86dc3a5..a38f9adaeb 100644
+--- a/hw/net/Kconfig
++++ b/hw/net/Kconfig
+@@ -24,6 +24,9 @@ config PCNET_PCI
+ config PCNET_COMMON
+     bool
+ 
++config I82596_COMMON
++    bool
++
+ config E1000_PCI
+     bool
+     default y if PCI_DEVICES
+@@ -82,6 +85,10 @@ config LANCE
+     bool
+     select PCNET_COMMON
+ 
++config LASI_82596
++    bool
++    select I82596_COMMON
++
+ config SUNHME
+     bool
+ 
+diff --git a/hw/net/Makefile.objs b/hw/net/Makefile.objs
+index 9904273b06..f3ef9ffe9b 100644
+--- a/hw/net/Makefile.objs
++++ b/hw/net/Makefile.objs
+@@ -27,6 +27,8 @@ common-obj-$(CONFIG_IMX_FEC) += imx_fec.o
+ common-obj-$(CONFIG_CADENCE) += cadence_gem.o
+ common-obj-$(CONFIG_STELLARIS_ENET) += stellaris_enet.o
+ common-obj-$(CONFIG_LANCE) += lance.o
++common-obj-$(CONFIG_LASI_82596) += lasi_i82596.o
++common-obj-$(CONFIG_I82596_COMMON) += i82596.o
+ common-obj-$(CONFIG_SUNHME) += sunhme.o
+ common-obj-$(CONFIG_FTGMAC100) += ftgmac100.o
+ common-obj-$(CONFIG_SUNGEM) += sungem.o
+diff --git a/hw/net/i82596.c b/hw/net/i82596.c
+new file mode 100644
+index 0000000000..ce1cc18b93
+--- /dev/null
++++ b/hw/net/i82596.c
+@@ -0,0 +1,734 @@
++/*
++ * QEMU Intel i82596 (Apricot) emulation
++ *
++ * Copyright (c) 2019 Helge Deller <deller@gmx.de>
++ * This work is licensed under the GNU GPL license version 2 or later.
++ *
++ * This software was written to be compatible with the specification:
++ * https://www.intel.com/assets/pdf/general/82596ca.pdf
++ */
++
++#include "qemu/osdep.h"
++#include "qemu/timer.h"
++#include "net/net.h"
++#include "net/eth.h"
++#include "sysemu/sysemu.h"
++#include "hw/irq.h"
++#include "hw/qdev-properties.h"
++#include "migration/vmstate.h"
++#include "qemu/module.h"
++#include "trace.h"
++#include "i82596.h"
++#include <zlib.h>       /* For crc32 */
++
++#if defined(ENABLE_DEBUG)
++#define DBG(x)          x
++#else
++#define DBG(x)          do { } while (0)
++#endif
++
++#define USE_TIMER       0
++
++#define BITS(n, m) (((0xffffffffU << (31 - n)) >> (31 - n + m)) << m)
++
++#define PKT_BUF_SZ      1536
++#define MAX_MC_CNT      64
++
++#define ISCP_BUSY       0x0001
++
++#define I596_NULL       ((uint32_t)0xffffffff)
++
++#define SCB_STATUS_CX   0x8000 /* CU finished command with I bit */
++#define SCB_STATUS_FR   0x4000 /* RU finished receiving a frame */
++#define SCB_STATUS_CNA  0x2000 /* CU left active state */
++#define SCB_STATUS_RNR  0x1000 /* RU left active state */
++
++#define CU_IDLE         0
++#define CU_SUSPENDED    1
++#define CU_ACTIVE       2
++
++#define RX_IDLE         0
++#define RX_SUSPENDED    1
++#define RX_READY        4
++
++#define CMD_EOL         0x8000  /* The last command of the list, stop. */
++#define CMD_SUSP        0x4000  /* Suspend after doing cmd. */
++#define CMD_INTR        0x2000  /* Interrupt after doing cmd. */
++
++#define CMD_FLEX        0x0008  /* Enable flexible memory model */
++
++enum commands {
++        CmdNOp = 0, CmdSASetup = 1, CmdConfigure = 2, CmdMulticastList = 3,
++        CmdTx = 4, CmdTDR = 5, CmdDump = 6, CmdDiagnose = 7
++};
++
++#define STAT_C          0x8000  /* Set to 0 after execution */
++#define STAT_B          0x4000  /* Command being executed */
++#define STAT_OK         0x2000  /* Command executed ok */
++#define STAT_A          0x1000  /* Command aborted */
++
++#define I596_EOF        0x8000
++#define SIZE_MASK       0x3fff
++
++#define ETHER_TYPE_LEN 2
++#define VLAN_TCI_LEN 2
++#define VLAN_HLEN (ETHER_TYPE_LEN + VLAN_TCI_LEN)
++
++/* various flags in the chip config registers */
++#define I596_PREFETCH   (s->config[0] & 0x80)
++#define I596_PROMISC    (s->config[8] & 0x01)
++#define I596_BC_DISABLE (s->config[8] & 0x02) /* broadcast disable */
++#define I596_NOCRC_INS  (s->config[8] & 0x08)
++#define I596_CRCINM     (s->config[11] & 0x04) /* CRC appended */
++#define I596_MC_ALL     (s->config[11] & 0x20)
++#define I596_MULTIIA    (s->config[13] & 0x40)
++
++
++static uint8_t get_byte(uint32_t addr)
++{
++    return ldub_phys(&address_space_memory, addr);
++}
++
++static void set_byte(uint32_t addr, uint8_t c)
++{
++    return stb_phys(&address_space_memory, addr, c);
++}
++
++static uint16_t get_uint16(uint32_t addr)
++{
++    return lduw_be_phys(&address_space_memory, addr);
++}
++
++static void set_uint16(uint32_t addr, uint16_t w)
++{
++    return stw_be_phys(&address_space_memory, addr, w);
++}
++
++static uint32_t get_uint32(uint32_t addr)
++{
++    uint32_t lo = lduw_be_phys(&address_space_memory, addr);
++    uint32_t hi = lduw_be_phys(&address_space_memory, addr + 2);
++    return (hi << 16) | lo;
++}
++
++static void set_uint32(uint32_t addr, uint32_t val)
++{
++    set_uint16(addr, (uint16_t) val);
++    set_uint16(addr + 2, val >> 16);
++}
++
++
++struct qemu_ether_header {
++    uint8_t ether_dhost[6];
++    uint8_t ether_shost[6];
++    uint16_t ether_type;
++};
++
++#define PRINT_PKTHDR(txt, BUF) do {                  \
++    struct qemu_ether_header *hdr = (void *)(BUF); \
++    printf(txt ": packet dhost=" MAC_FMT ", shost=" MAC_FMT ", type=0x%04x\n",\
++           MAC_ARG(hdr->ether_dhost), MAC_ARG(hdr->ether_shost),        \
++           be16_to_cpu(hdr->ether_type));       \
++} while (0)
++
++static void i82596_transmit(I82596State *s, uint32_t addr)
++{
++    uint32_t tdb_p; /* Transmit Buffer Descriptor */
++
++    /* TODO: Check flexible mode */
++    tdb_p = get_uint32(addr + 8);
++    while (tdb_p != I596_NULL) {
++        uint16_t size, len;
++        uint32_t tba;
++
++        size = get_uint16(tdb_p);
++        len = size & SIZE_MASK;
++        tba = get_uint32(tdb_p + 8);
++        trace_i82596_transmit(len, tba);
++
++        if (s->nic && len) {
++            assert(len <= sizeof(s->tx_buffer));
++            address_space_rw(&address_space_memory, tba,
++                MEMTXATTRS_UNSPECIFIED, s->tx_buffer, len, 0);
++            DBG(PRINT_PKTHDR("Send", &s->tx_buffer));
++            DBG(printf("Sending %d bytes\n", len));
++            qemu_send_packet(qemu_get_queue(s->nic), s->tx_buffer, len);
++        }
++
++        /* was this the last package? */
++        if (size & I596_EOF) {
++            break;
++        }
++
++        /* get next buffer pointer */
++        tdb_p = get_uint32(tdb_p + 4);
++    }
++}
++
++static void set_individual_address(I82596State *s, uint32_t addr)
++{
++    NetClientState *nc;
++    uint8_t *m;
++
++    nc = qemu_get_queue(s->nic);
++    m = s->conf.macaddr.a;
++    address_space_rw(&address_space_memory, addr + 8,
++        MEMTXATTRS_UNSPECIFIED, m, ETH_ALEN, 0);
++    qemu_format_nic_info_str(nc, m);
++    trace_i82596_new_mac(nc->info_str);
++}
++
++static void set_multicast_list(I82596State *s, uint32_t addr)
++{
++    uint16_t mc_count, i;
++
++    memset(&s->mult[0], 0, sizeof(s->mult));
++    mc_count = get_uint16(addr + 8) / ETH_ALEN;
++    addr += 10;
++    if (mc_count > MAX_MC_CNT) {
++        mc_count = MAX_MC_CNT;
++    }
++    for (i = 0; i < mc_count; i++) {
++        uint8_t multicast_addr[ETH_ALEN];
++        address_space_rw(&address_space_memory,
++            addr + i * ETH_ALEN, MEMTXATTRS_UNSPECIFIED,
++            multicast_addr, ETH_ALEN, 0);
++        DBG(printf("Add multicast entry " MAC_FMT "\n",
++                    MAC_ARG(multicast_addr)));
++        unsigned mcast_idx = (net_crc32(multicast_addr, ETH_ALEN) &
++                              BITS(7, 2)) >> 2;
++        assert(mcast_idx < 8 * sizeof(s->mult));
++        s->mult[mcast_idx >> 3] |= (1 << (mcast_idx & 7));
++    }
++    trace_i82596_set_multicast(mc_count);
++}
++
++void i82596_set_link_status(NetClientState *nc)
++{
++    I82596State *d = qemu_get_nic_opaque(nc);
++
++    d->lnkst = nc->link_down ? 0 : 0x8000;
++}
++
++static void update_scb_status(I82596State *s)
++{
++    s->scb_status = (s->scb_status & 0xf000)
++        | (s->cu_status << 8) | (s->rx_status << 4);
++    set_uint16(s->scb, s->scb_status);
++}
++
++
++static void i82596_s_reset(I82596State *s)
++{
++    trace_i82596_s_reset(s);
++    s->scp = 0;
++    s->scb_status = 0;
++    s->cu_status = CU_IDLE;
++    s->rx_status = RX_SUSPENDED;
++    s->cmd_p = I596_NULL;
++    s->lnkst = 0x8000; /* initial link state: up */
++    s->ca = s->ca_active = 0;
++    s->send_irq = 0;
++}
++
++
++static void command_loop(I82596State *s)
++{
++    uint16_t cmd;
++    uint16_t status;
++    uint8_t byte_cnt;
++
++    DBG(printf("STARTING COMMAND LOOP cmd_p=%08x\n", s->cmd_p));
++
++    while (s->cmd_p != I596_NULL) {
++        /* set status */
++        status = STAT_B;
++        set_uint16(s->cmd_p, status);
++        status = STAT_C | STAT_OK; /* update, but write later */
++
++        cmd = get_uint16(s->cmd_p + 2);
++        DBG(printf("Running command %04x at %08x\n", cmd, s->cmd_p));
++
++        switch (cmd & 0x07) {
++        case CmdNOp:
++            break;
++        case CmdSASetup:
++            set_individual_address(s, s->cmd_p);
++            break;
++        case CmdConfigure:
++            byte_cnt = get_byte(s->cmd_p + 8) & 0x0f;
++            byte_cnt = MAX(byte_cnt, 4);
++            byte_cnt = MIN(byte_cnt, sizeof(s->config));
++            /* copy byte_cnt max. */
++            address_space_rw(&address_space_memory, s->cmd_p + 8,
++                MEMTXATTRS_UNSPECIFIED, s->config, byte_cnt, 0);
++            /* config byte according to page 35ff */
++            s->config[2] &= 0x82; /* mask valid bits */
++            s->config[2] |= 0x40;
++            s->config[7]  &= 0xf7; /* clear zero bit */
++            assert(I596_NOCRC_INS == 0); /* do CRC insertion */
++            s->config[10] = MAX(s->config[10], 5); /* min frame length */
++            s->config[12] &= 0x40; /* only full duplex field valid */
++            s->config[13] |= 0x3f; /* set ones in byte 13 */
++            break;
++        case CmdTDR:
++            /* get signal LINK */
++            set_uint32(s->cmd_p + 8, s->lnkst);
++            break;
++        case CmdTx:
++            i82596_transmit(s, s->cmd_p);
++            break;
++        case CmdMulticastList:
++            set_multicast_list(s, s->cmd_p);
++            break;
++        case CmdDump:
++        case CmdDiagnose:
++            printf("FIXME Command %d !!\n", cmd & 7);
++            assert(0);
++        }
++
++        /* update status */
++        set_uint16(s->cmd_p, status);
++
++        s->cmd_p = get_uint32(s->cmd_p + 4); /* get link address */
++        DBG(printf("NEXT addr would be %08x\n", s->cmd_p));
++        if (s->cmd_p == 0) {
++            s->cmd_p = I596_NULL;
++        }
++
++        /* Stop when last command of the list. */
++        if (cmd & CMD_EOL) {
++            s->cmd_p = I596_NULL;
++        }
++        /* Suspend after doing cmd? */
++        if (cmd & CMD_SUSP) {
++            s->cu_status = CU_SUSPENDED;
++            printf("FIXME SUSPEND !!\n");
++        }
++        /* Interrupt after doing cmd? */
++        if (cmd & CMD_INTR) {
++            s->scb_status |= SCB_STATUS_CX;
++        } else {
++            s->scb_status &= ~SCB_STATUS_CX;
++        }
++        update_scb_status(s);
++
++        /* Interrupt after doing cmd? */
++        if (cmd & CMD_INTR) {
++            s->send_irq = 1;
++        }
++
++        if (s->cu_status != CU_ACTIVE) {
++            break;
++        }
++    }
++    DBG(printf("FINISHED COMMAND LOOP\n"));
++    qemu_flush_queued_packets(qemu_get_queue(s->nic));
++}
++
++static void i82596_flush_queue_timer(void *opaque)
++{
++    I82596State *s = opaque;
++    if (0) {
++        timer_del(s->flush_queue_timer);
++        qemu_flush_queued_packets(qemu_get_queue(s->nic));
++        timer_mod(s->flush_queue_timer,
++              qemu_clock_get_ms(QEMU_CLOCK_VIRTUAL) + 1000);
++    }
++}
++
++static void examine_scb(I82596State *s)
++{
++    uint16_t command, cuc, ruc;
++
++    /* get the scb command word */
++    command = get_uint16(s->scb + 2);
++    cuc = (command >> 8) & 0x7;
++    ruc = (command >> 4) & 0x7;
++    DBG(printf("MAIN COMMAND %04x  cuc %02x ruc %02x\n", command, cuc, ruc));
++    /* and clear the scb command word */
++    set_uint16(s->scb + 2, 0);
++
++    if (command & BIT(31))      /* ACK-CX */
++        s->scb_status &= ~SCB_STATUS_CX;
++    if (command & BIT(30))      /*ACK-FR */
++        s->scb_status &= ~SCB_STATUS_FR;
++    if (command & BIT(29))      /*ACK-CNA */
++        s->scb_status &= ~SCB_STATUS_CNA;
++    if (command & BIT(28))      /*ACK-RNR */
++        s->scb_status &= ~SCB_STATUS_RNR;
++
++    switch (cuc) {
++    case 0:     /* no change */
++        break;
++    case 1:     /* CUC_START */
++        s->cu_status = CU_ACTIVE;
++        break;
++    case 4:     /* CUC_ABORT */
++        s->cu_status = CU_SUSPENDED;
++        s->scb_status |= SCB_STATUS_CNA; /* CU left active state */
++        break;
++    default:
++        printf("WARNING: Unknown CUC %d!\n", cuc);
++    }
++
++    switch (ruc) {
++    case 0:     /* no change */
++        break;
++    case 1:     /* RX_START */
++    case 2:     /* RX_RESUME */
++        s->rx_status = RX_IDLE;
++        if (USE_TIMER) {
++            timer_mod(s->flush_queue_timer, qemu_clock_get_ms(
++                                QEMU_CLOCK_VIRTUAL) + 1000);
++        }
++        break;
++    case 3:     /* RX_SUSPEND */
++    case 4:     /* RX_ABORT */
++        s->rx_status = RX_SUSPENDED;
++        s->scb_status |= SCB_STATUS_RNR; /* RU left active state */
++        break;
++    default:
++        printf("WARNING: Unknown RUC %d!\n", ruc);
++    }
++
++    if (command & 0x80) { /* reset bit set? */
++        i82596_s_reset(s);
++    }
++
++    /* execute commands from SCBL */
++    if (s->cu_status != CU_SUSPENDED) {
++        if (s->cmd_p == I596_NULL) {
++            s->cmd_p = get_uint32(s->scb + 4);
++        }
++    }
++
++    /* update scb status */
++    update_scb_status(s);
++
++    command_loop(s);
++}
++
++static void signal_ca(I82596State *s)
++{
++    uint32_t iscp = 0;
++
++    /* trace_i82596_channel_attention(s); */
++    if (s->scp) {
++        /* CA after reset -> do init with new scp. */
++        s->sysbus = get_byte(s->scp + 3); /* big endian */
++        DBG(printf("SYSBUS = %08x\n", s->sysbus));
++        if (((s->sysbus >> 1) & 0x03) != 2) {
++            printf("WARNING: NO LINEAR MODE !!\n");
++        }
++        if ((s->sysbus >> 7)) {
++            printf("WARNING: 32BIT LINMODE IN B-STEPPING NOT SUPPORTED !!\n");
++        }
++        iscp = get_uint32(s->scp + 8);
++        s->scb = get_uint32(iscp + 4);
++        set_byte(iscp + 1, 0); /* clear BUSY flag in iscp */
++        s->scp = 0;
++    }
++
++    s->ca++;    /* count ca() */
++    if (!s->ca_active) {
++        s->ca_active = 1;
++        while (s->ca)   {
++            examine_scb(s);
++            s->ca--;
++        }
++        s->ca_active = 0;
++    }
++
++    if (s->send_irq) {
++        s->send_irq = 0;
++        qemu_set_irq(s->irq, 1);
++    }
++}
++
++void i82596_ioport_writew(void *opaque, uint32_t addr, uint32_t val)
++{
++    I82596State *s = opaque;
++    /* printf("i82596_ioport_writew addr=0x%08x val=0x%04x\n", addr, val); */
++    switch (addr) {
++    case PORT_RESET: /* Reset */
++        i82596_s_reset(s);
++        break;
++    case PORT_ALTSCP:
++        s->scp = val;
++        break;
++    case PORT_CA:
++        signal_ca(s);
++        break;
++    }
++}
++
++uint32_t i82596_ioport_readw(void *opaque, uint32_t addr)
++{
++    return -1;
++}
++
++void i82596_h_reset(void *opaque)
++{
++    I82596State *s = opaque;
++
++    i82596_s_reset(s);
++}
++
++int i82596_can_receive(NetClientState *nc)
++{
++    I82596State *s = qemu_get_nic_opaque(nc);
++
++    if (s->rx_status == RX_SUSPENDED) {
++        return 0;
++    }
++
++    if (!s->lnkst) {
++        return 0;
++    }
++
++    if (USE_TIMER && !timer_pending(s->flush_queue_timer)) {
++        return 1;
++    }
++
++    return 1;
++}
++
++#define MIN_BUF_SIZE 60
++
++ssize_t i82596_receive(NetClientState *nc, const uint8_t *buf, size_t sz)
++{
++    I82596State *s = qemu_get_nic_opaque(nc);
++    uint32_t rfd_p;
++    uint32_t rbd;
++    uint16_t is_broadcast = 0;
++    size_t len = sz;
++    uint32_t crc;
++    uint8_t *crc_ptr;
++    uint8_t buf1[MIN_BUF_SIZE + VLAN_HLEN];
++    static const uint8_t broadcast_macaddr[6] = {
++                0xff, 0xff, 0xff, 0xff, 0xff, 0xff };
++
++    DBG(printf("i82596_receive() start\n"));
++
++    if (USE_TIMER && timer_pending(s->flush_queue_timer)) {
++        return 0;
++    }
++
++    /* first check if receiver is enabled */
++    if (s->rx_status == RX_SUSPENDED) {
++        trace_i82596_receive_analysis(">>> Receiving suspended");
++        return -1;
++    }
++
++    if (!s->lnkst) {
++        trace_i82596_receive_analysis(">>> Link down");
++        return -1;
++    }
++
++    /* Received frame smaller than configured "min frame len"? */
++    if (sz < s->config[10]) {
++        printf("Received frame too small, %lu vs. %u bytes\n",
++            sz, s->config[10]);
++        return -1;
++    }
++
++    DBG(printf("Received %lu bytes\n", sz));
++
++    if (I596_PROMISC) {
++
++        /* promiscuous: receive all */
++        trace_i82596_receive_analysis(
++                ">>> packet received in promiscuous mode");
++
++    } else {
++
++        if (!memcmp(buf,  broadcast_macaddr, 6)) {
++            /* broadcast address */
++            if (I596_BC_DISABLE) {
++                trace_i82596_receive_analysis(">>> broadcast packet rejected");
++
++                return len;
++            }
++
++            trace_i82596_receive_analysis(">>> broadcast packet received");
++            is_broadcast = 1;
++
++        } else if (buf[0] & 0x01) {
++            /* multicast */
++            if (!I596_MC_ALL) {
++                trace_i82596_receive_analysis(">>> multicast packet rejected");
++
++                return len;
++            }
++
++            int mcast_idx = (net_crc32(buf, ETH_ALEN) & BITS(7, 2)) >> 2;
++            assert(mcast_idx < 8 * sizeof(s->mult));
++
++            if (!(s->mult[mcast_idx >> 3] & (1 << (mcast_idx & 7)))) {
++                trace_i82596_receive_analysis(">>> multicast address mismatch");
++
++                return len;
++            }
++
++            trace_i82596_receive_analysis(">>> multicast packet received");
++            is_broadcast = 1;
++
++        } else if (!memcmp(s->conf.macaddr.a, buf, 6)) {
++
++            /* match */
++            trace_i82596_receive_analysis(
++                    ">>> physical address matching packet received");
++
++        } else {
++
++            trace_i82596_receive_analysis(">>> unknown packet");
++
++            return len;
++        }
++    }
++
++    /* if too small buffer, then expand it */
++    if (len < MIN_BUF_SIZE + VLAN_HLEN) {
++        memcpy(buf1, buf, len);
++        memset(buf1 + len, 0, MIN_BUF_SIZE + VLAN_HLEN - len);
++        buf = buf1;
++        if (len < MIN_BUF_SIZE) {
++            len = MIN_BUF_SIZE;
++        }
++    }
++
++    /* Calculate the ethernet checksum (4 bytes) */
++    len += 4;
++    crc = cpu_to_be32(crc32(~0, buf, sz));
++    crc_ptr = (uint8_t *) &crc;
++
++    rfd_p = get_uint32(s->scb + 8); /* get Receive Frame Descriptor */
++    assert(rfd_p && rfd_p != I596_NULL);
++
++    /* get first Receive Buffer Descriptor Address */
++    rbd = get_uint32(rfd_p + 8);
++    assert(rbd && rbd != I596_NULL);
++
++    trace_i82596_receive_packet(len);
++    /* PRINT_PKTHDR("Receive", buf); */
++
++    while (len) {
++        uint16_t command, status;
++        uint32_t next_rfd;
++
++        command = get_uint16(rfd_p + 2);
++        assert(command & CMD_FLEX); /* assert Flex Mode */
++        /* get first Receive Buffer Descriptor Address */
++        rbd = get_uint32(rfd_p + 8);
++        assert(get_uint16(rfd_p + 14) == 0);
++
++        /* printf("Receive: rfd is %08x\n", rfd_p); */
++
++        while (len) {
++            uint16_t buffer_size, num;
++            uint32_t rba;
++
++            /* printf("Receive: rbd is %08x\n", rbd); */
++            buffer_size = get_uint16(rbd + 12);
++            /* printf("buffer_size is 0x%x\n", buffer_size); */
++            assert(buffer_size != 0);
++
++            num = buffer_size & SIZE_MASK;
++            if (num > len) {
++                num = len;
++            }
++            rba = get_uint32(rbd + 8);
++            /* printf("rba is 0x%x\n", rba); */
++            address_space_rw(&address_space_memory, rba,
++                MEMTXATTRS_UNSPECIFIED, (void *)buf, num, 1);
++            rba += num;
++            buf += num;
++            len -= num;
++            if (len == 0) { /* copy crc */
++                address_space_rw(&address_space_memory, rba - 4,
++                    MEMTXATTRS_UNSPECIFIED, crc_ptr, 4, 1);
++            }
++
++            num |= 0x4000; /* set F BIT */
++            if (len == 0) {
++                num |= I596_EOF; /* set EOF BIT */
++            }
++            set_uint16(rbd + 0, num); /* write actual count with flags */
++
++            /* get next rbd */
++            rbd = get_uint32(rbd + 4);
++            /* printf("Next Receive: rbd is %08x\n", rbd); */
++
++            if (buffer_size & I596_EOF) /* last entry */
++                break;
++        }
++
++        /* Housekeeping, see pg. 18 */
++        next_rfd = get_uint32(rfd_p + 4);
++        set_uint32(next_rfd + 8, rbd);
++
++        status = STAT_C | STAT_OK | is_broadcast;
++        set_uint16(rfd_p, status);
++
++        if (command & CMD_SUSP) {  /* suspend after command? */
++            s->rx_status = RX_SUSPENDED;
++            s->scb_status |= SCB_STATUS_RNR; /* RU left active state */
++            break;
++        }
++        if (command & CMD_EOL) /* was it last Frame Descriptor? */
++            break;
++
++        assert(len == 0);
++    }
++
++    assert(len == 0);
++
++    s->scb_status |= SCB_STATUS_FR; /* set "RU finished receiving frame" bit. */
++    update_scb_status(s);
++
++    /* send IRQ that we received data */
++    qemu_set_irq(s->irq, 1);
++    /* s->send_irq = 1; */
++
++    if (0) {
++        DBG(printf("Checking:\n"));
++        rfd_p = get_uint32(s->scb + 8); /* get Receive Frame Descriptor */
++        DBG(printf("Next Receive: rfd is %08x\n", rfd_p));
++        rfd_p = get_uint32(rfd_p + 4); /* get Next Receive Frame Descriptor */
++        DBG(printf("Next Receive: rfd is %08x\n", rfd_p));
++        /* get first Receive Buffer Descriptor Address */
++        rbd = get_uint32(rfd_p + 8);
++        DBG(printf("Next Receive: rbd is %08x\n", rbd));
++    }
++
++    return sz;
++}
++
++
++const VMStateDescription vmstate_i82596 = {
++    .name = "i82596",
++    .version_id = 1,
++    .minimum_version_id = 1,
++    .fields = (VMStateField[]) {
++        VMSTATE_UINT16(lnkst, I82596State),
++        VMSTATE_TIMER_PTR(flush_queue_timer, I82596State),
++        VMSTATE_END_OF_LIST()
++    }
++};
++
++void i82596_common_init(DeviceState *dev, I82596State *s, NetClientInfo *info)
++{
++    if (s->conf.macaddr.a[0] == 0) {
++        qemu_macaddr_default_if_unset(&s->conf.macaddr);
++    }
++    s->nic = qemu_new_nic(info, &s->conf, object_get_typename(OBJECT(dev)),
++                dev->id, s);
++    qemu_format_nic_info_str(qemu_get_queue(s->nic), s->conf.macaddr.a);
++
++    if (USE_TIMER) {
++        s->flush_queue_timer = timer_new_ns(QEMU_CLOCK_VIRTUAL,
++                                    i82596_flush_queue_timer, s);
++    }
++    s->lnkst = 0x8000; /* initial link state: up */
++}
+diff --git a/hw/net/i82596.h b/hw/net/i82596.h
+new file mode 100644
+index 0000000000..1238ac11f8
+--- /dev/null
++++ b/hw/net/i82596.h
+@@ -0,0 +1,55 @@
++#ifndef HW_I82596_H
++#define HW_I82596_H
++
++#define I82596_IOPORT_SIZE       0x20
++
++#include "exec/memory.h"
++#include "exec/address-spaces.h"
++
++#define PORT_RESET              0x00    /* reset 82596 */
++#define PORT_SELFTEST           0x01    /* selftest */
++#define PORT_ALTSCP             0x02    /* alternate SCB address */
++#define PORT_ALTDUMP            0x03    /* Alternate DUMP address */
++#define PORT_CA                 0x10    /* QEMU-internal CA signal */
++
++typedef struct I82596State_st I82596State;
++
++struct I82596State_st {
++    MemoryRegion mmio;
++    MemoryRegion *as;
++    qemu_irq irq;
++    NICState *nic;
++    NICConf conf;
++    QEMUTimer *flush_queue_timer;
++
++    hwaddr scp;         /* pointer to SCP */
++    uint8_t sysbus;
++    uint32_t scb;       /* SCB */
++    uint16_t scb_status;
++    uint8_t cu_status, rx_status;
++    uint16_t lnkst;
++
++    uint32_t cmd_p;     /* addr of current command */
++    int ca;
++    int ca_active;
++    int send_irq;
++
++    /* Hash register (multicast mask array, multiple individual addresses). */
++    uint8_t mult[8];
++    uint8_t config[14]; /* config bytes from CONFIGURE command */
++
++    uint8_t tx_buffer[0x4000];
++};
++
++void i82596_h_reset(void *opaque);
++void i82596_ioport_writew(void *opaque, uint32_t addr, uint32_t val);
++uint32_t i82596_ioport_readw(void *opaque, uint32_t addr);
++void i82596_ioport_writel(void *opaque, uint32_t addr, uint32_t val);
++uint32_t i82596_ioport_readl(void *opaque, uint32_t addr);
++uint32_t i82596_bcr_readw(I82596State *s, uint32_t rap);
++ssize_t i82596_receive(NetClientState *nc, const uint8_t *buf, size_t size_);
++int i82596_can_receive(NetClientState *nc);
++void i82596_set_link_status(NetClientState *nc);
++void i82596_common_init(DeviceState *dev, I82596State *s, NetClientInfo *info);
++extern const VMStateDescription vmstate_i82596;
++#endif
+diff --git a/hw/net/lasi_i82596.c b/hw/net/lasi_i82596.c
+new file mode 100644
+index 0000000000..9629ba189d
+--- /dev/null
++++ b/hw/net/lasi_i82596.c
+@@ -0,0 +1,188 @@
++/*
++ * QEMU LASI NIC i82596 emulation
++ *
++ * Copyright (c) 2019 Helge Deller <deller@gmx.de>
++ * This work is licensed under the GNU GPL license version 2 or later.
++ *
++ *
++ * On PA-RISC, this is the Network part of LASI chip.
++ * See:
++ * https://parisc.wiki.kernel.org/images-parisc/7/79/Lasi_ers.pdf
++ */
++
++#include "qemu/osdep.h"
++#include "qemu/timer.h"
++#include "hw/sysbus.h"
++#include "net/eth.h"
++#include "hw/net/lasi_82596.h"
++#include "hw/net/i82596.h"
++#include "trace.h"
++#include "sysemu/sysemu.h"
++#include "hw/qdev-properties.h"
++#include "migration/vmstate.h"
++
++#define PA_I82596_RESET         0       /* Offsets relative to LASI-LAN-Addr.*/
++#define PA_CPU_PORT_L_ACCESS    4
++#define PA_CHANNEL_ATTENTION    8
++#define PA_GET_MACADDR          12
++
++#define SWAP32(x)   (((uint32_t)(x) << 16) | ((((uint32_t)(x))) >> 16))
++
++static void lasi_82596_mem_write(void *opaque, hwaddr addr,
++                            uint64_t val, unsigned size)
++{
++    SysBusI82596State *d = opaque;
++
++    trace_lasi_82596_mem_writew(addr, val);
++    switch (addr) {
++    case PA_I82596_RESET:
++        i82596_h_reset(&d->state);
++        break;
++    case PA_CPU_PORT_L_ACCESS:
++        d->val_index++;
++        if (d->val_index == 0) {
++            uint32_t v = d->last_val | (val << 16);
++            v = v & ~0xff;
++            i82596_ioport_writew(&d->state, d->last_val & 0xff, v);
++        }
++        d->last_val = val;
++        break;
++    case PA_CHANNEL_ATTENTION:
++        i82596_ioport_writew(&d->state, PORT_CA, val);
++        break;
++    case PA_GET_MACADDR:
++        /*
++         * Provided for SeaBIOS only. Write MAC of Network card to addr @val.
++         * Needed for the PDC_LAN_STATION_ID_READ PDC call.
++         */
++        address_space_rw(&address_space_memory, val,
++            MEMTXATTRS_UNSPECIFIED, d->state.conf.macaddr.a, ETH_ALEN, 1);
++        break;
++    }
++}
++
++static uint64_t lasi_82596_mem_read(void *opaque, hwaddr addr,
++                               unsigned size)
++{
++    SysBusI82596State *d = opaque;
++    uint32_t val;
++
++    if (addr == PA_GET_MACADDR) {
++        val = 0xBEEFBABE;
++    } else {
++        val = i82596_ioport_readw(&d->state, addr);
++    }
++    trace_lasi_82596_mem_readw(addr, val);
++    return val;
++}
++
++static const MemoryRegionOps lasi_82596_mem_ops = {
++    .read = lasi_82596_mem_read,
++    .write = lasi_82596_mem_write,
++    .endianness = DEVICE_BIG_ENDIAN,
++    .valid = {
++        .min_access_size = 4,
++        .max_access_size = 4,
++    },
++};
++
++static NetClientInfo net_lasi_82596_info = {
++    .type = NET_CLIENT_DRIVER_NIC,
++    .size = sizeof(NICState),
++    .can_receive = i82596_can_receive,
++    .receive = i82596_receive,
++    .link_status_changed = i82596_set_link_status,
++};
++
++static const VMStateDescription vmstate_lasi_82596 = {
++    .name = "i82596",
++    .version_id = 1,
++    .minimum_version_id = 1,
++    .fields = (VMStateField[]) {
++        VMSTATE_STRUCT(state, SysBusI82596State, 0, vmstate_i82596,
++                I82596State),
++        VMSTATE_END_OF_LIST()
++    }
++};
++
++static void lasi_82596_realize(DeviceState *dev, Error **errp)
++{
++    SysBusI82596State *d = SYSBUS_I82596(dev);
++    I82596State *s = &d->state;
++
++    memory_region_init_io(&s->mmio, OBJECT(d), &lasi_82596_mem_ops, d,
++                "lasi_82596-mmio", PA_GET_MACADDR + 4);
++
++    i82596_common_init(dev, s, &net_lasi_82596_info);
++}
++
++SysBusI82596State *lasi_82596_init(MemoryRegion *addr_space,
++                  hwaddr hpa, qemu_irq lan_irq)
++{
++    DeviceState *dev;
++    SysBusI82596State *s;
++    static const MACAddr HP_MAC = {
++        .a = { 0x08, 0x00, 0x09, 0xef, 0x34, 0xf6 } };
++
++    qemu_check_nic_model(&nd_table[0], TYPE_LASI_82596);
++    dev = qdev_create(NULL, TYPE_LASI_82596);
++    s = SYSBUS_I82596(dev);
++    s->state.irq = lan_irq;
++    qdev_set_nic_properties(dev, &nd_table[0]);
++    qdev_init_nofail(dev);
++    s->state.conf.macaddr = HP_MAC; /* set HP MAC prefix */
++
++    /* LASI 82596 ports in main memory. */
++    memory_region_add_subregion(addr_space, hpa, &s->state.mmio);
++    return s;
++}
++
++static void lasi_82596_reset(DeviceState *dev)
++{
++    SysBusI82596State *d = SYSBUS_I82596(dev);
++
++    i82596_h_reset(&d->state);
++}
++
++static void lasi_82596_instance_init(Object *obj)
++{
++    SysBusI82596State *d = SYSBUS_I82596(obj);
++    I82596State *s = &d->state;
++
++    device_add_bootindex_property(obj, &s->conf.bootindex,
++                                  "bootindex", "/ethernet-phy@0",
++                                  DEVICE(obj), NULL);
++}
++
++static Property lasi_82596_properties[] = {
++    DEFINE_NIC_PROPERTIES(SysBusI82596State, state.conf),
++    DEFINE_PROP_END_OF_LIST(),
++};
++
++static void lasi_82596_class_init(ObjectClass *klass, void *data)
++{
++    DeviceClass *dc = DEVICE_CLASS(klass);
++
++    dc->realize = lasi_82596_realize;
++    set_bit(DEVICE_CATEGORY_NETWORK, dc->categories);
++    dc->fw_name = "ethernet";
++    dc->reset = lasi_82596_reset;
++    dc->vmsd = &vmstate_lasi_82596;
++    dc->props = lasi_82596_properties;
++    dc->user_creatable = false;
++}
++
++static const TypeInfo lasi_82596_info = {
++    .name          = TYPE_LASI_82596,
++    .parent        = TYPE_SYS_BUS_DEVICE,
++    .instance_size = sizeof(SysBusI82596State),
++    .class_init    = lasi_82596_class_init,
++    .instance_init = lasi_82596_instance_init,
++};
++
++static void lasi_82596_register_types(void)
++{
++    type_register_static(&lasi_82596_info);
++}
++
++type_init(lasi_82596_register_types)
+diff --git a/hw/net/trace-events b/hw/net/trace-events
+index 58665655cc..abb71a6a9a 100644
+--- a/hw/net/trace-events
++++ b/hw/net/trace-events
+@@ -367,3 +367,16 @@ virtio_net_announce_notify(void) ""
+ virtio_net_announce_timer(int round) "%d"
+ virtio_net_handle_announce(int round) "%d"
+ virtio_net_post_load_device(void)
++
++# lasi_i82596.c
++lasi_82596_mem_readw(uint64_t addr, uint32_t ret) "addr=0x%"PRIx64" val=0x%04x"
++lasi_82596_mem_writew(uint64_t addr, uint32_t val) "addr=0x%"PRIx64" val=0x%04x"
++
++# i82596.c
++i82596_s_reset(void *s) "%p Reset chip"
++i82596_transmit(uint32_t size, uint32_t addr) "size %u from addr 0x%04x"
++i82596_receive_analysis(const char *s) "%s"
++i82596_receive_packet(size_t sz) "len=%zu"
++i82596_new_mac(const char *id_with_mac) "New MAC for: %s"
++i82596_set_multicast(uint16_t count) "Added %d multicast entries"
++i82596_channel_attention(void *s) "%p: Received CHANNEL ATTENTION"
+diff --git a/include/hw/net/lasi_82596.h b/include/hw/net/lasi_82596.h
+new file mode 100644
+index 0000000000..e76ef8308e
+--- /dev/null
++++ b/include/hw/net/lasi_82596.h
+@@ -0,0 +1,29 @@
++/*
++ * QEMU LASI i82596 device emulation
++ *
++ * Copyright (c) 201 Helge Deller <deller@gmx.de>
++ *
++ */
++
++#ifndef LASI_82596_H
++#define LASI_82596_H
++
++#include "net/net.h"
++#include "hw/net/i82596.h"
++
++#define TYPE_LASI_82596 "lasi_82596"
++#define SYSBUS_I82596(obj) \
++    OBJECT_CHECK(SysBusI82596State, (obj), TYPE_LASI_82596)
++
++typedef struct {
++    SysBusDevice parent_obj;
++
++    I82596State state;
++    uint16_t last_val;
++    int val_index:1;
++} SysBusI82596State;
++
++SysBusI82596State *lasi_82596_init(MemoryRegion *addr_space,
++                                    hwaddr hpa, qemu_irq irq);
++
++#endif
 -- 
 2.23.0
 
