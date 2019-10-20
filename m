@@ -2,93 +2,73 @@ Return-Path: <SRS0=HPkn=YN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 76B8CCA9EAC
-	for <qemu-devel@archiver.kernel.org>; Sun, 20 Oct 2019 00:00:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 78584CA9EAC
+	for <qemu-devel@archiver.kernel.org>; Sun, 20 Oct 2019 01:56:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3EB3321925
-	for <qemu-devel@archiver.kernel.org>; Sun, 20 Oct 2019 00:00:51 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bHIT9ZPO"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3EB3321925
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
+	by mail.kernel.org (Postfix) with ESMTPS id 450B421897
+	for <qemu-devel@archiver.kernel.org>; Sun, 20 Oct 2019 01:56:50 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 450B421897
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42386 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45432 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iLyeP-0000Zl-RJ
-	for qemu-devel@archiver.kernel.org; Sat, 19 Oct 2019 20:00:50 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34739)
+	id 1iM0Sf-0004MN-DU
+	for qemu-devel@archiver.kernel.org; Sat, 19 Oct 2019 21:56:49 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39622)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1iLyRm-0000aq-Cm
- for qemu-devel@nongnu.org; Sat, 19 Oct 2019 19:47:47 -0400
+ (envelope-from <bounces@canonical.com>) id 1iM0RX-0003ss-7W
+ for qemu-devel@nongnu.org; Sat, 19 Oct 2019 21:55:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1iLyRl-0005iD-7F
- for qemu-devel@nongnu.org; Sat, 19 Oct 2019 19:47:46 -0400
-Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:56110)
+ (envelope-from <bounces@canonical.com>) id 1iM0RV-0004ys-HB
+ for qemu-devel@nongnu.org; Sat, 19 Oct 2019 21:55:39 -0400
+Received: from indium.canonical.com ([91.189.90.7]:47564)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1iLyRl-0005hf-1O; Sat, 19 Oct 2019 19:47:45 -0400
-Received: by mail-wm1-x341.google.com with SMTP id g24so376098wmh.5;
- Sat, 19 Oct 2019 16:47:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=sDpiMGEUPQUF/TV44CGVPcZd/e7Sj4qme0DvnCotwpc=;
- b=bHIT9ZPOmznRUfoWaH671prkuZ3TyavtCuD+zujvrT3wUiMjdvalUWu8kMv5szr7T3
- fL4Hn0gBiDKjRyYoqGR58yvT9C8ekSLKxOLF4NuX1ixATEDq0qPnY+4xLMzMpNZLcN1h
- Vo++HuZCdBaOTQ3Q9s974+73NWFpz4KcMY3xlFeyglAnrV0+EdCQn9wcGSZWmMiyfVeH
- EbTXbqWcfMGZ1Z4RNhhZoWOsPGOzlDsom+FXq2JhI1E0X0QZ5lc16KHXV+/HAizh5W+h
- 9jaGJD7V+mo69tATxfSHq4EMewuxi4I23RbwlwYknt0XRME/+tIW6JTmbKboO4tYp2OW
- wCHw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
- :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=sDpiMGEUPQUF/TV44CGVPcZd/e7Sj4qme0DvnCotwpc=;
- b=YsnG+aJD42aLA01mDDKjgi7AEgEtX2S9u3ZaFWqZEuvE9mBoYJ9czMFGbJilfv97EV
- vdHQPh05vfWnqy9ta+fAfCqJQpVoGzP261TVpsnos6f4YjifYotMgofTtz7YaRSytVsG
- oZSV4vjx4Z87RIBAG2wDRnwYviWIIvkBwRUHfMf0YsF2r+JsTpbdxb4r06Cq3BZCyirP
- pMaFCX4cKgS1FJJemCYfYU13ZGZKvWO6j5oge0IdCmovQIpQA97Hvz/faW+J+HGgzLWr
- WocdePhccWwuVDQbAlQvf3eFz6Zq/MYaPXd8sfAzmpZjBksKlpLiRnY6NvCafy5QBnpH
- ojKw==
-X-Gm-Message-State: APjAAAU25XzbmjZHg+IHNmT24N4opMK23OCyH7xKWPa4XBe/KkIVmtVo
- WRXLO9W8CdNmI38FS8+39duqDIhj
-X-Google-Smtp-Source: APXvYqwDfG0U3ptzDATMLEzP27Ht6FTTvadMTeCt1yV+TwIA4oRNgobrRnxJk+d7hewkohdZYptc0Q==
-X-Received: by 2002:a7b:ce89:: with SMTP id q9mr13124748wmj.2.1571528863895;
- Sat, 19 Oct 2019 16:47:43 -0700 (PDT)
-Received: from x1w.redhat.com (14.red-88-21-201.staticip.rima-tde.net.
- [88.21.201.14])
- by smtp.gmail.com with ESMTPSA id u1sm10433763wrp.56.2019.10.19.16.47.42
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sat, 19 Oct 2019 16:47:43 -0700 (PDT)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v3 15/16] python/qemu/machine: Allow to use other serial
- consoles than default
-Date: Sun, 20 Oct 2019 01:47:14 +0200
-Message-Id: <20191019234715.25750-16-f4bug@amsat.org>
-X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20191019234715.25750-1-f4bug@amsat.org>
-References: <20191019234715.25750-1-f4bug@amsat.org>
+ (Exim 4.71) (envelope-from <bounces@canonical.com>)
+ id 1iM0RV-0004xQ-BI
+ for qemu-devel@nongnu.org; Sat, 19 Oct 2019 21:55:37 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1iM0RT-0006wd-FX
+ for <qemu-devel@nongnu.org>; Sun, 20 Oct 2019 01:55:35 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 707DD2E80C8
+ for <qemu-devel@nongnu.org>; Sun, 20 Oct 2019 01:55:35 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::341
+Content-Transfer-Encoding: quoted-printable
+Date: Sun, 20 Oct 2019 01:50:24 -0000
+From: "P.O." <1848901@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: d33m0n
+X-Launchpad-Bug-Reporter: P.O. (d33m0n)
+X-Launchpad-Bug-Modifier: P.O. (d33m0n)
+Message-Id: <157153622475.25094.3691269102491613645.malonedeb@chaenomeles.canonical.com>
+Subject: [Bug 1848901] [NEW] kvm_mem_ioeventfd_add: error adding ioeventfd: No
+ space left on device (28)
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="186023fa645d8be19d403a76064f0643f510db2f";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: 2c9b9adbf396b8110997246f68852bbab60eeaa4
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 91.189.90.7
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -97,82 +77,164 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Matthias Brugger <mbrugger@suse.com>, Rob Herring <robh@kernel.org>,
- Alistair Francis <alistair@alistair23.me>,
- Richard Henderson <richard.henderson@linaro.org>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
- Andrew Baumann <Andrew.Baumann@microsoft.com>,
- Esteban Bosse <estebanbosse@gmail.com>, "Emilio G . Cota" <cota@braap.org>,
- Clement Deschamps <clement.deschamps@antfield.fr>, qemu-arm@nongnu.org,
- Cleber Rosa <crosa@redhat.com>, Laurent Bonnans <laurent.bonnans@here.com>,
- Cheng Xiang <ext-cheng.xiang@here.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Pekka Enberg <penberg@iki.fi>, Pete Batard <pete@akeo.ie>
+Reply-To: Bug 1848901 <1848901@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Currently the QEMU Python module limits the QEMUMachine class to
-use the first serial console.
+Public bug reported:
 
-Some machines/guest might use another console than the first one as
-the 'boot console'. For example the Raspberry Pi uses the second
-(AUX) console.
+=3D> QEMU process has stopped, return code: -6
 
-To be able to use the Nth console as default, we simply need to
-connect all the N - 1 consoles to the null chardev.
+Start QEMU with /usr/bin/qemu-system-x86_64 -name CiscoASAv9.8.1-1 -m
+2048M -smp cpus=3D1 -enable-kvm -machine smm=3Doff -boot order=3Dc -drive
+'file=3D/home/deemon/GNS3/projects/ASAv my ass/project-files/qemu
+/7725cdea-5e66-4777-b4dd-
+c3905f258394/hda_disk.qcow2,if=3Dvirtio,index=3D0,media=3Ddisk,id=3Ddrive0'
+-uuid 7725cdea-5e66-4777-b4dd-c3905f258394 -serial
+telnet:127.0.0.1:5000,server,nowait -monitor
+tcp:127.0.0.1:44629,server,nowait -net none -device
+e1000,mac=3D0c:7a:1d:83:94:00,netdev=3Dgns3-0 -netdev
+socket,id=3Dgns3-0,udp=3D127.0.0.1:10001,localaddr=3D127.0.0.1:10000 -device
+e1000,mac=3D0c:7a:1d:83:94:01,netdev=3Dgns3-1 -netdev
+socket,id=3Dgns3-1,udp=3D127.0.0.1:10003,localaddr=3D127.0.0.1:10002 -device
+e1000,mac=3D0c:7a:1d:83:94:02,netdev=3Dgns3-2 -netdev
+socket,id=3Dgns3-2,udp=3D127.0.0.1:10005,localaddr=3D127.0.0.1:10004 -device
+e1000,mac=3D0c:7a:1d:83:94:03,netdev=3Dgns3-3 -netdev
+socket,id=3Dgns3-3,udp=3D127.0.0.1:10007,localaddr=3D127.0.0.1:10006 -device
+e1000,mac=3D0c:7a:1d:83:94:04,netdev=3Dgns3-4 -netdev
+socket,id=3Dgns3-4,udp=3D127.0.0.1:10009,localaddr=3D127.0.0.1:10008 -device
+e1000,mac=3D0c:7a:1d:83:94:05,netdev=3Dgns3-5 -netdev
+socket,id=3Dgns3-5,udp=3D127.0.0.1:10011,localaddr=3D127.0.0.1:10010 -device
+e1000,mac=3D0c:7a:1d:83:94:06,netdev=3Dgns3-6 -netdev
+socket,id=3Dgns3-6,udp=3D127.0.0.1:10013,localaddr=3D127.0.0.1:10012 -device
+e1000,mac=3D0c:7a:1d:83:94:07,netdev=3Dgns3-7 -netdev
+socket,id=3Dgns3-7,udp=3D127.0.0.1:10015,localaddr=3D127.0.0.1:10014
+-nographic
 
-Add an index argument, so we can use a specific serial console as
-default.
+ =
 
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
----
-v2:
-- renamed 'console_index', added docstring (Cleber)
-- reworded description (pm215)
----
- python/qemu/machine.py | 9 ++++++++-
- 1 file changed, 8 insertions(+), 1 deletion(-)
+Execution log:
+kvm_mem_ioeventfd_add: error adding ioeventfd: No space left on device (28)
 
-diff --git a/python/qemu/machine.py b/python/qemu/machine.py
-index 128a3d1dc2..6fa68fa35a 100644
---- a/python/qemu/machine.py
-+++ b/python/qemu/machine.py
-@@ -235,6 +235,8 @@ class QEMUMachine(object):
-                 '-display', 'none', '-vga', 'none']
-         if self._machine is not None:
-             args.extend(['-machine', self._machine])
-+        for i in range(self._console_index):
-+            args.extend(['-serial', 'null'])
-         if self._console_set:
-             self._console_address = os.path.join(self._temp_dir,
-                                                  self._name + "-console.sock")
-@@ -495,7 +497,7 @@ class QEMUMachine(object):
-         """
-         self._machine = machine_type
- 
--    def set_console(self, device_type=None):
-+    def set_console(self, device_type=None, console_index=0):
-         """
-         Sets the device type for a console device
- 
-@@ -516,9 +518,14 @@ class QEMUMachine(object):
-                             chardev:console" command line argument will
-                             be used instead, resorting to the machine's
-                             default device type.
-+        @param console_index: the index of the console device to use.
-+                              If not zero, the command line will create
-+                              'index - 1' consoles and connect them to
-+                              the 'null' backing character device.
-         """
-         self._console_set = True
-         self._console_device_type = device_type
-+        self._console_index = console_index
- 
-     @property
-     def console_socket(self):
--- 
-2.21.0
+and then it just closes...
 
+
+[deemon@Zen ~]$ coredumpctl info 8638
+           PID: 8638 (qemu-system-x86)
+           UID: 1000 (deemon)
+           GID: 1000 (deemon)
+        Signal: 6 (ABRT)
+     Timestamp: Sun 2019-10-20 04:27:29 EEST (5min ago)
+  Command Line: /usr/bin/qemu-system-x86_64 -name CiscoASAv9.8.1-1 -m 2048M=
+ -smp cpus=3D1 -enable-kvm -machine smm=3Doff -boot order=3Dc -drive file=
+=3D/home/deemon/GNS3/projects/ASAv my ass/project-files/qemu>
+    Executable: /usr/bin/qemu-system-x86_64
+ Control Group: /user.slice/user-1000.slice/session-2.scope
+          Unit: session-2.scope
+         Slice: user-1000.slice
+       Session: 2
+     Owner UID: 1000 (deemon)
+       Boot ID: cd30f69a8d194359a31889dc7b6b026c
+    Machine ID: d0a2d74a5cd9430797d902f5237c448d
+      Hostname: Zen
+       Storage: /var/lib/systemd/coredump/core.qemu-system-x86.1000.cd30f69=
+a8d194359a31889dc7b6b026c.8638.1571534849000000.lz4 (truncated)
+       Message: Process 8638 (qemu-system-x86) of user 1000 dumped core.
+                =
+
+                Stack trace of thread 8642:
+                #0  0x00007f1a33609f25 n/a (n/a)
+
+** Affects: qemu
+     Importance: Undecided
+         Status: New
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1848901
+
+Title:
+  kvm_mem_ioeventfd_add: error adding ioeventfd: No space left on device
+  (28)
+
+Status in QEMU:
+  New
+
+Bug description:
+  =3D> QEMU process has stopped, return code: -6
+
+  Start QEMU with /usr/bin/qemu-system-x86_64 -name CiscoASAv9.8.1-1 -m
+  2048M -smp cpus=3D1 -enable-kvm -machine smm=3Doff -boot order=3Dc -drive
+  'file=3D/home/deemon/GNS3/projects/ASAv my ass/project-files/qemu
+  /7725cdea-5e66-4777-b4dd-
+  c3905f258394/hda_disk.qcow2,if=3Dvirtio,index=3D0,media=3Ddisk,id=3Ddrive=
+0'
+  -uuid 7725cdea-5e66-4777-b4dd-c3905f258394 -serial
+  telnet:127.0.0.1:5000,server,nowait -monitor
+  tcp:127.0.0.1:44629,server,nowait -net none -device
+  e1000,mac=3D0c:7a:1d:83:94:00,netdev=3Dgns3-0 -netdev
+  socket,id=3Dgns3-0,udp=3D127.0.0.1:10001,localaddr=3D127.0.0.1:10000 -dev=
+ice
+  e1000,mac=3D0c:7a:1d:83:94:01,netdev=3Dgns3-1 -netdev
+  socket,id=3Dgns3-1,udp=3D127.0.0.1:10003,localaddr=3D127.0.0.1:10002 -dev=
+ice
+  e1000,mac=3D0c:7a:1d:83:94:02,netdev=3Dgns3-2 -netdev
+  socket,id=3Dgns3-2,udp=3D127.0.0.1:10005,localaddr=3D127.0.0.1:10004 -dev=
+ice
+  e1000,mac=3D0c:7a:1d:83:94:03,netdev=3Dgns3-3 -netdev
+  socket,id=3Dgns3-3,udp=3D127.0.0.1:10007,localaddr=3D127.0.0.1:10006 -dev=
+ice
+  e1000,mac=3D0c:7a:1d:83:94:04,netdev=3Dgns3-4 -netdev
+  socket,id=3Dgns3-4,udp=3D127.0.0.1:10009,localaddr=3D127.0.0.1:10008 -dev=
+ice
+  e1000,mac=3D0c:7a:1d:83:94:05,netdev=3Dgns3-5 -netdev
+  socket,id=3Dgns3-5,udp=3D127.0.0.1:10011,localaddr=3D127.0.0.1:10010 -dev=
+ice
+  e1000,mac=3D0c:7a:1d:83:94:06,netdev=3Dgns3-6 -netdev
+  socket,id=3Dgns3-6,udp=3D127.0.0.1:10013,localaddr=3D127.0.0.1:10012 -dev=
+ice
+  e1000,mac=3D0c:7a:1d:83:94:07,netdev=3Dgns3-7 -netdev
+  socket,id=3Dgns3-7,udp=3D127.0.0.1:10015,localaddr=3D127.0.0.1:10014
+  -nographic
+
+   =
+
+  Execution log:
+  kvm_mem_ioeventfd_add: error adding ioeventfd: No space left on device (2=
+8)
+
+  and then it just closes...
+
+
+  [deemon@Zen ~]$ coredumpctl info 8638
+             PID: 8638 (qemu-system-x86)
+             UID: 1000 (deemon)
+             GID: 1000 (deemon)
+          Signal: 6 (ABRT)
+       Timestamp: Sun 2019-10-20 04:27:29 EEST (5min ago)
+    Command Line: /usr/bin/qemu-system-x86_64 -name CiscoASAv9.8.1-1 -m 204=
+8M -smp cpus=3D1 -enable-kvm -machine smm=3Doff -boot order=3Dc -drive file=
+=3D/home/deemon/GNS3/projects/ASAv my ass/project-files/qemu>
+      Executable: /usr/bin/qemu-system-x86_64
+   Control Group: /user.slice/user-1000.slice/session-2.scope
+            Unit: session-2.scope
+           Slice: user-1000.slice
+         Session: 2
+       Owner UID: 1000 (deemon)
+         Boot ID: cd30f69a8d194359a31889dc7b6b026c
+      Machine ID: d0a2d74a5cd9430797d902f5237c448d
+        Hostname: Zen
+         Storage: /var/lib/systemd/coredump/core.qemu-system-x86.1000.cd30f=
+69a8d194359a31889dc7b6b026c.8638.1571534849000000.lz4 (truncated)
+         Message: Process 8638 (qemu-system-x86) of user 1000 dumped core.
+                  =
+
+                  Stack trace of thread 8642:
+                  #0  0x00007f1a33609f25 n/a (n/a)
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1848901/+subscriptions
 
