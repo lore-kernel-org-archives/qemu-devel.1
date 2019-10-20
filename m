@@ -2,74 +2,69 @@ Return-Path: <SRS0=HPkn=YN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 32ECACA9EAB
-	for <qemu-devel@archiver.kernel.org>; Sun, 20 Oct 2019 02:32:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9261DCA9EA0
+	for <qemu-devel@archiver.kernel.org>; Sun, 20 Oct 2019 06:36:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F27E021897
-	for <qemu-devel@archiver.kernel.org>; Sun, 20 Oct 2019 02:31:59 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F27E021897
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 5613920679
+	for <qemu-devel@archiver.kernel.org>; Sun, 20 Oct 2019 06:36:02 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="FxypJSqH"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5613920679
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46296 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52002 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iM10h-0004nq-3C
-	for qemu-devel@archiver.kernel.org; Sat, 19 Oct 2019 22:31:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41279)
+	id 1iM4or-0005m8-Fd
+	for qemu-devel@archiver.kernel.org; Sun, 20 Oct 2019 02:36:01 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49895)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1iM0zU-0004IO-Bs
- for qemu-devel@nongnu.org; Sat, 19 Oct 2019 22:30:45 -0400
+ (envelope-from <dgibson@ozlabs.org>) id 1iM4nu-0004sW-QM
+ for qemu-devel@nongnu.org; Sun, 20 Oct 2019 02:35:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1iM0zT-0005DR-0l
- for qemu-devel@nongnu.org; Sat, 19 Oct 2019 22:30:44 -0400
-Received: from indium.canonical.com ([91.189.90.7]:49076)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1iM0zS-0005Co-RN
- for qemu-devel@nongnu.org; Sat, 19 Oct 2019 22:30:42 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1iM0zQ-00006n-HN
- for <qemu-devel@nongnu.org>; Sun, 20 Oct 2019 02:30:40 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 561242E80C8
- for <qemu-devel@nongnu.org>; Sun, 20 Oct 2019 02:30:40 +0000 (UTC)
+ (envelope-from <dgibson@ozlabs.org>) id 1iM4nt-0004WT-9E
+ for qemu-devel@nongnu.org; Sun, 20 Oct 2019 02:35:02 -0400
+Received: from ozlabs.org ([203.11.71.1]:44149)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
+ id 1iM4nr-0004UM-WA; Sun, 20 Oct 2019 02:35:01 -0400
+Received: by ozlabs.org (Postfix, from userid 1007)
+ id 46wqkl5slrz9sPT; Sun, 20 Oct 2019 17:34:55 +1100 (AEDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+ d=gibson.dropbear.id.au; s=201602; t=1571553295;
+ bh=Y9Kinyu4YS3CXYCcjqqh3GY7//daIEzxbjexgBgq9jM=;
+ h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+ b=FxypJSqHYzFoGm0MFS32niQBauQUO5rDbsyKLcCtHV8wAOYfhO2rH8rWgOcIJ/S+T
+ d0uhQBTH0OQada92GkSRcCln7Hu06NHFgrAwq06J+b+oQbFi0DlIANrwv3JR+jZc3M
+ f/JROmWf0voCGv6NS/cwWBHgdtdbmxS3qQvYuVIg=
+Date: Sun, 20 Oct 2019 17:28:42 +1100
+From: David Gibson <david@gibson.dropbear.id.au>
+To: "Marty E. Plummer" <hanetzer@startmail.com>
+Subject: Re: qemu/powernv: coreboot support?
+Message-ID: <20191020062842.GI1960@umbus.fritz.box>
+References: <20191018172622.kz4smemh5cwesfit@proprietary-killer>
+ <21ba3404-dcd3-fe06-7725-d58e249f9fd2@kaod.org>
+ <20191019153108.gkupn3tnihspq7th@proprietary-killer>
+ <1cbd1882-15c8-5471-cd65-1c84c2920ba8@kaod.org>
+ <20191019160933.fizoc6tpu5jday4o@proprietary-killer>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Sun, 20 Oct 2019 02:24:07 -0000
-From: "P.O." <1848901@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: d33m0n
-X-Launchpad-Bug-Reporter: P.O. (d33m0n)
-X-Launchpad-Bug-Modifier: P.O. (d33m0n)
-References: <157153622475.25094.3691269102491613645.malonedeb@chaenomeles.canonical.com>
-Message-Id: <157153824820.25921.5045128872156738620.malone@chaenomeles.canonical.com>
-Subject: [Bug 1848901] Re: kvm_mem_ioeventfd_add: error adding ioeventfd: No
- space left on device (28)
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="186023fa645d8be19d403a76064f0643f510db2f";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 404c1d18e5998b9729d6263164c1ed8ac752f2fe
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="lqaZmxkhekPBfBzr"
+Content-Disposition: inline
+In-Reply-To: <20191019160933.fizoc6tpu5jday4o@proprietary-killer>
+User-Agent: Mutt/1.12.1 (2019-06-15)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 91.189.90.7
+X-Received-From: 203.11.71.1
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -78,98 +73,105 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1848901 <1848901@bugs.launchpad.net>
+Cc: Joel Stanley <joel@jms.id.au>, qemu-ppc@nongnu.org,
+ =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-QEMU 4.1.0 btw.
 
--- =
+--lqaZmxkhekPBfBzr
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1848901
+On Sat, Oct 19, 2019 at 11:09:34AM -0500, Marty E. Plummer wrote:
+> On Sat, Oct 19, 2019 at 05:53:12PM +0200, C=E9dric Le Goater wrote:
+> > On 19/10/2019 17:31, Marty E. Plummer wrote:
+> > > On Sat, Oct 19, 2019 at 03:46:59PM +0200, C=E9dric Le Goater wrote:
+> > >> On 18/10/2019 19:28, Marty E. Plummer wrote:
+> > >>> Hello,
+> > >>>
+> > >>> First off, thank you for the work you've done on the ppc64 support,=
+ it
+> > >>> has been very useful. I'm currently working on a coreboot port for =
+the
+> > >>> talos ii line of systems (which means more ppc64 support, support
+> > >>> specifically for the power9 sforza chip, and specific mainboard sup=
+port.
+> > >>> My plate is very full lol) and have been using qemu to debug the
+> > >>> bootblock.
+> > >>>
+> > >>> It has been very useful for that, but I'm now at the point where I =
+need
+> > >>> to jump to romstage, and that's where it gets tricky. qemu parses t=
+he rom
+> > >>> image and looks for a ffs header, locates skiboot on it, and jumps =
+straight
+> > >>> to that. Not exactly ideal for debugging something not produced fro=
+m op-build.
+> > >>
+> > >> yes. I suppose you are using my branch powernv-4.2 which adds PNOR s=
+upport
+> > >> and a way to boot directly from PNOR. In that case, QEMU parses the =
+PNOR
+> > >> file to extract the PAYLOAD partition (skiboot). skiboot also detect=
+s the
+> > >> flash and extract the kernel and initramfs from the PNOR.
+> > >>
+> > >> However, you can bypass all this internal boot process by simply pas=
+sing
+> > >> a -bios option and not passing a MTD device.
+> > >>
+> > > Doing so gives me the following error:
+> > > qemu-system-ppc64: Could not load OPAL firmware 'build/coreboot.rom'
+> > > (this is after I patched the 4mb size limit up)
+> >=20
+> > Could you make that rom available ?=20
+> >=20
+> Sure, I think. Not sure about how sending files works in my current mail
+> client but will see. Its more or less a 'stock' (as stock as can be for
+> a new coreboot target) coreboot.rom file, but I've added some logic into
+> the build to fake a pnor ffs header at the end in order to trick hostboot
+> bootloader into loading it.
 
-Title:
-  kvm_mem_ioeventfd_add: error adding ioeventfd: No space left on device
-  (28)
+Ok.  Note that the qemu emulated machine doesn't model the hardware
+right down to the level of hostboot.  That's wy we're just loading
+skiboot and jumping straight into it usually.  I guess clg's stuff to
+load pnor images gets us a little closer to the hardware behaviour,
+but I think it's still only a rough approximation.
 
-Status in QEMU:
-  New
-
-Bug description:
-  =3D> QEMU process has stopped, return code: -6
-
-  Start QEMU with /usr/bin/qemu-system-x86_64 -name CiscoASAv9.8.1-1 -m
-  2048M -smp cpus=3D1 -enable-kvm -machine smm=3Doff -boot order=3Dc -drive
-  'file=3D/home/deemon/GNS3/projects/ASAv my ass/project-files/qemu
-  /7725cdea-5e66-4777-b4dd-
-  c3905f258394/hda_disk.qcow2,if=3Dvirtio,index=3D0,media=3Ddisk,id=3Ddrive=
-0'
-  -uuid 7725cdea-5e66-4777-b4dd-c3905f258394 -serial
-  telnet:127.0.0.1:5000,server,nowait -monitor
-  tcp:127.0.0.1:44629,server,nowait -net none -device
-  e1000,mac=3D0c:7a:1d:83:94:00,netdev=3Dgns3-0 -netdev
-  socket,id=3Dgns3-0,udp=3D127.0.0.1:10001,localaddr=3D127.0.0.1:10000 -dev=
-ice
-  e1000,mac=3D0c:7a:1d:83:94:01,netdev=3Dgns3-1 -netdev
-  socket,id=3Dgns3-1,udp=3D127.0.0.1:10003,localaddr=3D127.0.0.1:10002 -dev=
-ice
-  e1000,mac=3D0c:7a:1d:83:94:02,netdev=3Dgns3-2 -netdev
-  socket,id=3Dgns3-2,udp=3D127.0.0.1:10005,localaddr=3D127.0.0.1:10004 -dev=
-ice
-  e1000,mac=3D0c:7a:1d:83:94:03,netdev=3Dgns3-3 -netdev
-  socket,id=3Dgns3-3,udp=3D127.0.0.1:10007,localaddr=3D127.0.0.1:10006 -dev=
-ice
-  e1000,mac=3D0c:7a:1d:83:94:04,netdev=3Dgns3-4 -netdev
-  socket,id=3Dgns3-4,udp=3D127.0.0.1:10009,localaddr=3D127.0.0.1:10008 -dev=
-ice
-  e1000,mac=3D0c:7a:1d:83:94:05,netdev=3Dgns3-5 -netdev
-  socket,id=3Dgns3-5,udp=3D127.0.0.1:10011,localaddr=3D127.0.0.1:10010 -dev=
-ice
-  e1000,mac=3D0c:7a:1d:83:94:06,netdev=3Dgns3-6 -netdev
-  socket,id=3Dgns3-6,udp=3D127.0.0.1:10013,localaddr=3D127.0.0.1:10012 -dev=
-ice
-  e1000,mac=3D0c:7a:1d:83:94:07,netdev=3Dgns3-7 -netdev
-  socket,id=3Dgns3-7,udp=3D127.0.0.1:10015,localaddr=3D127.0.0.1:10014
-  -nographic
-
-   =
-
-  Execution log:
-  kvm_mem_ioeventfd_add: error adding ioeventfd: No space left on device (2=
-8)
-
-  and then it just closes...
+> > Thanks,
+> >=20
+> > C.=20
 
 
-  [deemon@Zen ~]$ coredumpctl info 8638
-             PID: 8638 (qemu-system-x86)
-             UID: 1000 (deemon)
-             GID: 1000 (deemon)
-          Signal: 6 (ABRT)
-       Timestamp: Sun 2019-10-20 04:27:29 EEST (5min ago)
-    Command Line: /usr/bin/qemu-system-x86_64 -name CiscoASAv9.8.1-1 -m 204=
-8M -smp cpus=3D1 -enable-kvm -machine smm=3Doff -boot order=3Dc -drive file=
-=3D/home/deemon/GNS3/projects/ASAv my ass/project-files/qemu>
-      Executable: /usr/bin/qemu-system-x86_64
-   Control Group: /user.slice/user-1000.slice/session-2.scope
-            Unit: session-2.scope
-           Slice: user-1000.slice
-         Session: 2
-       Owner UID: 1000 (deemon)
-         Boot ID: cd30f69a8d194359a31889dc7b6b026c
-      Machine ID: d0a2d74a5cd9430797d902f5237c448d
-        Hostname: Zen
-         Storage: /var/lib/systemd/coredump/core.qemu-system-x86.1000.cd30f=
-69a8d194359a31889dc7b6b026c.8638.1571534849000000.lz4 (truncated)
-         Message: Process 8638 (qemu-system-x86) of user 1000 dumped core.
-                  =
 
-                  Stack trace of thread 8642:
-                  #0  0x00007f1a33609f25 n/a (n/a)
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
 
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1848901/+subscriptions
+--lqaZmxkhekPBfBzr
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl2r/poACgkQbDjKyiDZ
+s5JOrhAA0t7ORYZwo4AhTgHq7deWPvzmUfM6w3Ll3ESO2TCtj2ubVJmbwCLDWsW0
+HUFCxq859dRc20jf+8NEFNnXkm61RjsJKJRSgwGPD3tWd+lE08lK9XgJYStRMeS5
+VvAlEqpTlHaQtoFcbGz5DIeCCgQbBqzfXc1hLuaBS4ellopogi5M8M4/CH28nO3A
+8b/HJS6hgT4miDYlVSLUJtwoW65MyAjUzB/Ldj8K4nGvOia95L5reeGe8EwC+T5M
+zo7QNnmiEo6kha1FiU1Y0jz+XbAanL00A5vIz8DZqJU/amgAs80yTBVr+o7XE5ho
+Z+npa9MU9PP3POYts6aQtP/bf3vZMiN5j9MI/9+TpFaLRVTEasQK1tiGNMbn92ni
+FtqGdHFhTxm69F4IZi4kZP3ZtLTPVRMlfWxPz9N+Bg8MCKzqWAdXrw6BjOOx8jKA
+OO7WtU0i2+HGh5eY1QWwIn1fakv8hkgGoL+vHi67xpomiu1ZJatSAQp5K7Vcp6e7
+3M89q1lX19eYjLYEwOp+SLSoCGsMzKyOSaWUHe8shtaoXHMH4lQ3edpFeGiDkjQg
+6gkiiAj8IF5B1NA58Hj83CYsQI4sr+Z9By8FWZevoVBOjITpsQEQQ+wvdxBCAnnh
+AdnXNudK3Ie0P6yr3H0H1XNLboeNk0tFc22RrsQ89qZ6mtV0OIs=
+=sI1C
+-----END PGP SIGNATURE-----
+
+--lqaZmxkhekPBfBzr--
 
