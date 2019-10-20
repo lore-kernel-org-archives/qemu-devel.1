@@ -6,42 +6,43 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 709CACA9EAE
-	for <qemu-devel@archiver.kernel.org>; Sun, 20 Oct 2019 20:38:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6CD6CCA9EAD
+	for <qemu-devel@archiver.kernel.org>; Sun, 20 Oct 2019 20:40:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 46C9E21928
-	for <qemu-devel@archiver.kernel.org>; Sun, 20 Oct 2019 20:38:54 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 46C9E21928
+	by mail.kernel.org (Postfix) with ESMTPS id 3E28021928
+	for <qemu-devel@archiver.kernel.org>; Sun, 20 Oct 2019 20:40:18 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3E28021928
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47090 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47140 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iMHyX-0007DH-Ct
-	for qemu-devel@archiver.kernel.org; Sun, 20 Oct 2019 16:38:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51654)
+	id 1iMHzt-0000uc-CV
+	for qemu-devel@archiver.kernel.org; Sun, 20 Oct 2019 16:40:17 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51658)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <andrey.shinkevich@virtuozzo.com>) id 1iMHx7-0005vO-5N
+ (envelope-from <andrey.shinkevich@virtuozzo.com>) id 1iMHx7-0005vQ-6i
  for qemu-devel@nongnu.org; Sun, 20 Oct 2019 16:37:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <andrey.shinkevich@virtuozzo.com>) id 1iMHx5-0006Xf-J6
+ (envelope-from <andrey.shinkevich@virtuozzo.com>) id 1iMHx5-0006Xy-MC
  for qemu-devel@nongnu.org; Sun, 20 Oct 2019 16:37:24 -0400
-Received: from relay.sw.ru ([185.231.240.75]:58844)
+Received: from relay.sw.ru ([185.231.240.75]:58842)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <andrey.shinkevich@virtuozzo.com>)
- id 1iMHx5-0006Wu-Bn; Sun, 20 Oct 2019 16:37:23 -0400
+ id 1iMHx5-0006Ww-EF; Sun, 20 Oct 2019 16:37:23 -0400
 Received: from [172.16.25.136] (helo=dhcp-172-16-25-136.sw.ru)
  by relay.sw.ru with esmtp (Exim 4.92.2)
  (envelope-from <andrey.shinkevich@virtuozzo.com>)
- id 1iMHx1-00089m-Py; Sun, 20 Oct 2019 23:37:19 +0300
+ id 1iMHx1-00089m-Hz; Sun, 20 Oct 2019 23:37:19 +0300
 From: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
 To: qemu-devel@nongnu.org,
 	qemu-block@nongnu.org
-Subject: [PATCH v5 4/4] tests/qemu-iotests: add case for block-stream compress
-Date: Sun, 20 Oct 2019 23:37:08 +0300
-Message-Id: <1571603828-185910-5-git-send-email-andrey.shinkevich@virtuozzo.com>
+Subject: [PATCH v5 3/4] tests/qemu-iotests: add case to write compressed data
+ of multiple clusters
+Date: Sun, 20 Oct 2019 23:37:07 +0300
+Message-Id: <1571603828-185910-4-git-send-email-andrey.shinkevich@virtuozzo.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1571603828-185910-1-git-send-email-andrey.shinkevich@virtuozzo.com>
 References: <1571603828-185910-1-git-send-email-andrey.shinkevich@virtuozzo.com>
@@ -65,79 +66,94 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Add a case to the iotest #030 that tests the 'compress' option for a
-block-stream job.
+Add the test case to the iotest #214 that checks possibility of writing
+compressed data of more than one cluster size.
 
 Signed-off-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
 ---
- tests/qemu-iotests/030     | 34 +++++++++++++++++++++++++++++++++-
- tests/qemu-iotests/030.out |  4 ++--
- 2 files changed, 35 insertions(+), 3 deletions(-)
+ tests/qemu-iotests/214     | 45 +++++++++++++++++++++++++++++++++++++++++++++
+ tests/qemu-iotests/214.out | 14 ++++++++++++++
+ 2 files changed, 59 insertions(+)
 
-diff --git a/tests/qemu-iotests/030 b/tests/qemu-iotests/030
-index f3766f2..f33fd21 100755
---- a/tests/qemu-iotests/030
-+++ b/tests/qemu-iotests/030
-@@ -21,7 +21,8 @@
- import time
- import os
- import iotests
--from iotests import qemu_img, qemu_io
-+from iotests import qemu_img, qemu_io, qemu_img_pipe
-+import json
+diff --git a/tests/qemu-iotests/214 b/tests/qemu-iotests/214
+index 21ec8a2..ab9b862 100755
+--- a/tests/qemu-iotests/214
++++ b/tests/qemu-iotests/214
+@@ -89,6 +89,51 @@ _check_test_img -r all
+ $QEMU_IO -c "read  -P 0x11  0 4M" "$TEST_IMG" 2>&1 | _filter_qemu_io | _filter_testdir
+ $QEMU_IO -c "read  -P 0x22 4M 4M" "$TEST_IMG" 2>&1 | _filter_qemu_io | _filter_testdir
  
- backing_img = os.path.join(iotests.test_dir, 'backing.img')
- mid_img = os.path.join(iotests.test_dir, 'mid.img')
-@@ -956,6 +957,37 @@ class TestSetSpeed(iotests.QMPTestCase):
- 
-         self.cancel_and_wait(resume=True)
- 
-+class TestCompressed(iotests.QMPTestCase):
-+    allocated_clusters = 8
++echo
++echo "=== Write compressed data of multiple clusters ==="
++echo
++cluster_size=0x10000
++_make_test_img 2M -o cluster_size=$cluster_size
 +
-+    def setUp(self):
-+        qemu_img('create', '-f', iotests.imgfmt, backing_img, '1M')
-+        qemu_img('create', '-f', iotests.imgfmt, '-o',
-+                 'backing_file={}'.format(backing_img), test_img)
-+        cluster_size = 0x10000
-+        data_size = self.allocated_clusters * cluster_size
-+        qemu_io('-c', 'write -P 0x1 0 {}'.format(data_size), backing_img)
-+        self.vm = iotests.VM().add_drive(test_img, "compress=on")
-+        self.vm.launch()
++echo "Write uncompressed data:"
++let data_size="8 * $cluster_size"
++$QEMU_IO -c "write -P 0xaa 0 $data_size" "$TEST_IMG" \
++         2>&1 | _filter_qemu_io | _filter_testdir
++sizeA=$($QEMU_IMG info --output=json "$TEST_IMG" |
++        sed -n '/"actual-size":/ s/[^0-9]//gp')
 +
-+    def tearDown(self):
-+        self.vm.shutdown()
-+        os.remove(test_img)
-+        os.remove(backing_img)
++_make_test_img 2M -o cluster_size=$cluster_size
++echo "Write compressed data:"
++let data_size="3 * $cluster_size + ($cluster_size / 2)"
++# Set compress=on. That will align the written data
++# by the cluster size and will write them compressed.
++QEMU_IO_OPTIONS=$QEMU_IO_OPTIONS_NO_FMT \
++$QEMU_IO -c "write -P 0xbb 0 $data_size" --image-opts \
++         driver=$IMGFMT,compress=on,file.filename=$TEST_IMG \
++         2>&1 | _filter_qemu_io | _filter_testdir
 +
-+    def test_stream_compress(self):
-+        self.assert_no_active_block_jobs()
++let offset="4 * $cluster_size"
++QEMU_IO_OPTIONS=$QEMU_IO_OPTIONS_NO_FMT \
++$QEMU_IO -c "write -P 0xcc $offset $data_size" "json:{\
++    'driver': '$IMGFMT',
++    'file': {
++        'driver': 'file',
++        'filename': '$TEST_IMG'
++    },
++    'compress': true
++}" | _filter_qemu_io | _filter_testdir
 +
-+        result = self.vm.qmp('block-stream', device='drive0')
-+        self.assert_qmp(result, 'return', {})
++sizeB=$($QEMU_IMG info --output=json "$TEST_IMG" |
++        sed -n '/"actual-size":/ s/[^0-9]//gp')
 +
-+        match = {'data': {'type': 'stream', 'device': 'drive0'}}
-+        self.vm.event_wait(name='BLOCK_JOB_COMPLETED', match=match)
-+        self.vm.shutdown()
++if [ $sizeA -le $sizeB ]
++then
++    echo "Compression ERROR"
++fi
 +
-+        top = json.loads(qemu_img_pipe('check', '--output=json', test_img))
-+        self.assertEqual(top['compressed-clusters'], self.allocated_clusters)
++$QEMU_IMG check --output=json "$TEST_IMG" |
++          sed -n 's/,$//; /"compressed-clusters":/ s/^ *//p'
 +
- if __name__ == '__main__':
-     iotests.main(supported_fmts=['qcow2', 'qed'],
-                  supported_protocols=['file'])
-diff --git a/tests/qemu-iotests/030.out b/tests/qemu-iotests/030.out
-index 6d9bee1..af8dac1 100644
---- a/tests/qemu-iotests/030.out
-+++ b/tests/qemu-iotests/030.out
-@@ -1,5 +1,5 @@
--...........................
-+............................
- ----------------------------------------------------------------------
--Ran 27 tests
-+Ran 28 tests
- 
- OK
+ # success, all done
+ echo '*** done'
+ rm -f $seq.full
+diff --git a/tests/qemu-iotests/214.out b/tests/qemu-iotests/214.out
+index 0fcd8dc..4a2ec33 100644
+--- a/tests/qemu-iotests/214.out
++++ b/tests/qemu-iotests/214.out
+@@ -32,4 +32,18 @@ read 4194304/4194304 bytes at offset 0
+ 4 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+ read 4194304/4194304 bytes at offset 4194304
+ 4 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++
++=== Write compressed data of multiple clusters ===
++
++Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=2097152
++Write uncompressed data:
++wrote 524288/524288 bytes at offset 0
++512 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=2097152
++Write compressed data:
++wrote 229376/229376 bytes at offset 0
++224 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++wrote 229376/229376 bytes at offset 262144
++224 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++"compressed-clusters": 8
+ *** done
 -- 
 1.8.3.1
 
