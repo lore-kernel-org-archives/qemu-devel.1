@@ -2,65 +2,60 @@ Return-Path: <SRS0=HPkn=YN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EE4DECA9EAD
-	for <qemu-devel@archiver.kernel.org>; Sun, 20 Oct 2019 10:12:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E9E52CA9EAD
+	for <qemu-devel@archiver.kernel.org>; Sun, 20 Oct 2019 11:14:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BCDEA2190F
-	for <qemu-devel@archiver.kernel.org>; Sun, 20 Oct 2019 10:12:05 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="MzoM4Bd7"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BCDEA2190F
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
+	by mail.kernel.org (Postfix) with ESMTPS id B6E3521928
+	for <qemu-devel@archiver.kernel.org>; Sun, 20 Oct 2019 11:14:38 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B6E3521928
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57702 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59340 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iM8Bw-0004fw-Qt
-	for qemu-devel@archiver.kernel.org; Sun, 20 Oct 2019 06:12:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59710)
+	id 1iM9AT-0004LD-26
+	for qemu-devel@archiver.kernel.org; Sun, 20 Oct 2019 07:14:37 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35696)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgibson@ozlabs.org>) id 1iM8Aq-0003iG-8G
- for qemu-devel@nongnu.org; Sun, 20 Oct 2019 06:10:58 -0400
+ (envelope-from <tao3.xu@intel.com>) id 1iM97a-0002dn-8R
+ for qemu-devel@nongnu.org; Sun, 20 Oct 2019 07:11:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1iM8Ao-0007ce-SU
- for qemu-devel@nongnu.org; Sun, 20 Oct 2019 06:10:56 -0400
-Received: from ozlabs.org ([2401:3900:2:1::2]:52125)
+ (envelope-from <tao3.xu@intel.com>) id 1iM97Y-0002xC-Lc
+ for qemu-devel@nongnu.org; Sun, 20 Oct 2019 07:11:38 -0400
+Received: from mga12.intel.com ([192.55.52.136]:63374)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1iM8An-0007bh-RY; Sun, 20 Oct 2019 06:10:54 -0400
-Received: by ozlabs.org (Postfix, from userid 1007)
- id 46wwWq6RhVz9sPL; Sun, 20 Oct 2019 21:10:47 +1100 (AEDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1571566247;
- bh=7CBNMcBDnTXvffqhMk/9asi+7R3TiM4uROmh+pnwUxg=;
- h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=MzoM4Bd7b7ZV2oyQfYxCnBbiYbSy87fH3jdo7HpXygr718I6slayUPzk88C7HJaO7
- 7BtVHN37x4kvdvAfJaQFxYN8itrZfzu3PpusQMszII08YvY51v49/XjFxztLEATs18
- k8epnODrCiZXHpAku5WAtzkY2hBWBj3c89W2WnMs=
-Date: Sun, 20 Oct 2019 21:09:06 +1100
-From: David Gibson <david@gibson.dropbear.id.au>
-To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
-Subject: Re: [PATCH v3 3/9] tests/acceptance: Send <carriage return> on
- serial lines
-Message-ID: <20191020100906.GL1960@umbus.fritz.box>
-References: <20191017165239.30159-1-f4bug@amsat.org>
- <20191017165239.30159-4-f4bug@amsat.org>
+ (Exim 4.71) (envelope-from <tao3.xu@intel.com>) id 1iM97Y-0002wA-CK
+ for qemu-devel@nongnu.org; Sun, 20 Oct 2019 07:11:36 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga005.jf.intel.com ([10.7.209.41])
+ by fmsmga106.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
+ 20 Oct 2019 04:11:35 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.67,319,1566889200"; d="scan'208";a="371917551"
+Received: from tao-optiplex-7060.sh.intel.com ([10.239.159.36])
+ by orsmga005.jf.intel.com with ESMTP; 20 Oct 2019 04:11:33 -0700
+From: Tao Xu <tao3.xu@intel.com>
+To: imammedo@redhat.com,
+	eblake@redhat.com,
+	ehabkost@redhat.com
+Subject: [PATCH v13 03/12] qapi: Add builtin type time
+Date: Sun, 20 Oct 2019 19:11:16 +0800
+Message-Id: <20191020111125.27659-4-tao3.xu@intel.com>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20191020111125.27659-1-tao3.xu@intel.com>
+References: <20191020111125.27659-1-tao3.xu@intel.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="c8JyeaiReRNoiMDS"
-Content-Disposition: inline
-In-Reply-To: <20191017165239.30159-4-f4bug@amsat.org>
-User-Agent: Mutt/1.12.1 (2019-06-15)
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2401:3900:2:1::2
+X-Received-From: 192.55.52.136
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -72,80 +67,188 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Eduardo Habkost <ehabkost@redhat.com>,
- Aleksandar Rikalo <arikalo@wavecomp.com>, qemu-devel@nongnu.org,
- Kamil Rytarowski <kamil@netbsd.org>, qemu-ppc@nongnu.org,
- Artyom Tarasenko <atar4qemu@gmail.com>, Cleber Rosa <crosa@redhat.com>,
- =?iso-8859-1?Q?Herv=E9?= Poussineau <hpoussin@reactos.org>,
- Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>,
- Aurelien Jarno <aurelien@aurel32.net>
+Cc: jingqi.liu@intel.com, tao3.xu@intel.com, fan.du@intel.com,
+ qemu-devel@nongnu.org, jonathan.cameron@huawei.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Add optional builtin type time, fallback is uint64. This type use
+qemu_strtotime_ps() for pre-converting time suffix to numbers.
 
---c8JyeaiReRNoiMDS
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Signed-off-by: Tao Xu <tao3.xu@intel.com>
+---
 
-On Thu, Oct 17, 2019 at 06:52:33PM +0200, Philippe Mathieu-Daud=E9 wrote:
-> Some firmwares don't parse the <Newline> control character and
-> expect a <carriage return>.
->=20
-> Signed-off-by: Philippe Mathieu-Daud=E9 <f4bug@amsat.org>
-> ---
->  tests/acceptance/boot_linux_console.py | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->=20
-> diff --git a/tests/acceptance/boot_linux_console.py b/tests/acceptance/bo=
-ot_linux_console.py
-> index 9ff2213874..bf9861296a 100644
-> --- a/tests/acceptance/boot_linux_console.py
-> +++ b/tests/acceptance/boot_linux_console.py
-> @@ -30,7 +30,7 @@ class BootLinuxConsole(Test):
->      KERNEL_COMMON_COMMAND_LINE =3D 'printk.time=3D0 '
-> =20
->      def exec_command_and_wait_for_pattern(self, command, success_message=
-):
-> -        command +=3D '\n'
-> +        command +=3D '\r\n'
+No changes in v13.
+---
+ include/qapi/visitor-impl.h  |  4 ++++
+ include/qapi/visitor.h       |  9 +++++++++
+ qapi/opts-visitor.c          | 22 ++++++++++++++++++++++
+ qapi/qapi-visit-core.c       | 12 ++++++++++++
+ qapi/qobject-input-visitor.c | 18 ++++++++++++++++++
+ qapi/trace-events            |  1 +
+ scripts/qapi/common.py       |  1 +
+ 7 files changed, 67 insertions(+)
 
-I'm actually wondering if '\r' alone is really what we should be using
-here.  Isn't that usually the character that actually pressing the
-Enter key generates (on an old school tty)?  IIRC it's the thing on
-the other side of the console that echoes back a \r and \n in order to
-reposition the cursor on the next line.
+diff --git a/include/qapi/visitor-impl.h b/include/qapi/visitor-impl.h
+index 8ccb3b6c20..e0979563c7 100644
+--- a/include/qapi/visitor-impl.h
++++ b/include/qapi/visitor-impl.h
+@@ -88,6 +88,10 @@ struct Visitor
+     void (*type_size)(Visitor *v, const char *name, uint64_t *obj,
+                       Error **errp);
+ 
++    /* Optional; fallback is type_uint64() */
++    void (*type_time)(Visitor *v, const char *name, uint64_t *obj,
++                      Error **errp);
++
+     /* Must be set */
+     void (*type_bool)(Visitor *v, const char *name, bool *obj, Error **errp);
+ 
+diff --git a/include/qapi/visitor.h b/include/qapi/visitor.h
+index c5b23851a1..62565f4cb5 100644
+--- a/include/qapi/visitor.h
++++ b/include/qapi/visitor.h
+@@ -554,6 +554,15 @@ void visit_type_int64(Visitor *v, const char *name, int64_t *obj,
+ void visit_type_size(Visitor *v, const char *name, uint64_t *obj,
+                      Error **errp);
+ 
++/*
++ * Visit a uint64_t value.
++ * Like visit_type_uint64(), except that some visitors may choose to
++ * recognize numbers with timeunit suffix, such as "ps", "ns", "us"
++ * "ms" and "s".
++ */
++void visit_type_time(Visitor *v, const char *name, uint64_t *obj,
++                     Error **errp);
++
+ /*
+  * Visit a boolean value.
+  *
+diff --git a/qapi/opts-visitor.c b/qapi/opts-visitor.c
+index 5fe0276c1c..e289c63b52 100644
+--- a/qapi/opts-visitor.c
++++ b/qapi/opts-visitor.c
+@@ -526,6 +526,27 @@ opts_type_size(Visitor *v, const char *name, uint64_t *obj, Error **errp)
+     processed(ov, name);
+ }
+ 
++static void
++opts_type_time(Visitor *v, const char *name, uint64_t *obj, Error **errp)
++{
++    OptsVisitor *ov = to_ov(v);
++    const QemuOpt *opt;
++    int err;
++
++    opt = lookup_scalar(ov, name, errp);
++    if (!opt) {
++        return;
++    }
++
++    err = qemu_strtotime_ps(opt->str ? opt->str : "", NULL, obj);
++    if (err < 0) {
++        error_setg(errp, QERR_INVALID_PARAMETER_VALUE, opt->name,
++                   "a time value");
++        return;
++    }
++
++    processed(ov, name);
++}
+ 
+ static void
+ opts_optional(Visitor *v, const char *name, bool *present)
+@@ -573,6 +594,7 @@ opts_visitor_new(const QemuOpts *opts)
+     ov->visitor.type_int64  = &opts_type_int64;
+     ov->visitor.type_uint64 = &opts_type_uint64;
+     ov->visitor.type_size   = &opts_type_size;
++    ov->visitor.type_time   = &opts_type_time;
+     ov->visitor.type_bool   = &opts_type_bool;
+     ov->visitor.type_str    = &opts_type_str;
+ 
+diff --git a/qapi/qapi-visit-core.c b/qapi/qapi-visit-core.c
+index 5365561b07..ac8896455c 100644
+--- a/qapi/qapi-visit-core.c
++++ b/qapi/qapi-visit-core.c
+@@ -277,6 +277,18 @@ void visit_type_size(Visitor *v, const char *name, uint64_t *obj,
+     }
+ }
+ 
++void visit_type_time(Visitor *v, const char *name, uint64_t *obj,
++                     Error **errp)
++{
++    assert(obj);
++    trace_visit_type_time(v, name, obj);
++    if (v->type_time) {
++        v->type_time(v, name, obj, errp);
++    } else {
++        v->type_uint64(v, name, obj, errp);
++    }
++}
++
+ void visit_type_bool(Visitor *v, const char *name, bool *obj, Error **errp)
+ {
+     assert(obj);
+diff --git a/qapi/qobject-input-visitor.c b/qapi/qobject-input-visitor.c
+index 32236cbcb1..9b66941d8a 100644
+--- a/qapi/qobject-input-visitor.c
++++ b/qapi/qobject-input-visitor.c
+@@ -627,6 +627,23 @@ static void qobject_input_type_size_keyval(Visitor *v, const char *name,
+     }
+ }
+ 
++static void qobject_input_type_time_keyval(Visitor *v, const char *name,
++                                           uint64_t *obj, Error **errp)
++{
++    QObjectInputVisitor *qiv = to_qiv(v);
++    const char *str = qobject_input_get_keyval(qiv, name, errp);
++
++    if (!str) {
++        return;
++    }
++
++    if (qemu_strtotime_ps(str, NULL, obj) < 0) {
++        /* TODO report -ERANGE more nicely */
++        error_setg(errp, QERR_INVALID_PARAMETER_VALUE,
++                   full_name(qiv, name), "time");
++    }
++}
++
+ static void qobject_input_optional(Visitor *v, const char *name, bool *present)
+ {
+     QObjectInputVisitor *qiv = to_qiv(v);
+@@ -708,6 +725,7 @@ Visitor *qobject_input_visitor_new_keyval(QObject *obj)
+     v->visitor.type_any = qobject_input_type_any;
+     v->visitor.type_null = qobject_input_type_null;
+     v->visitor.type_size = qobject_input_type_size_keyval;
++    v->visitor.type_time = qobject_input_type_time_keyval;
+     v->keyval = true;
+ 
+     return &v->visitor;
+diff --git a/qapi/trace-events b/qapi/trace-events
+index 5eb4afa110..c4605a7ccc 100644
+--- a/qapi/trace-events
++++ b/qapi/trace-events
+@@ -29,6 +29,7 @@ visit_type_int16(void *v, const char *name, int16_t *obj) "v=%p name=%s obj=%p"
+ visit_type_int32(void *v, const char *name, int32_t *obj) "v=%p name=%s obj=%p"
+ visit_type_int64(void *v, const char *name, int64_t *obj) "v=%p name=%s obj=%p"
+ visit_type_size(void *v, const char *name, uint64_t *obj) "v=%p name=%s obj=%p"
++visit_type_time(void *v, const char *name, uint64_t *obj) "v=%p name=%s obj=%p"
+ visit_type_bool(void *v, const char *name, bool *obj) "v=%p name=%s obj=%p"
+ visit_type_str(void *v, const char *name, char **obj) "v=%p name=%s obj=%p"
+ visit_type_number(void *v, const char *name, void *obj) "v=%p name=%s obj=%p"
+diff --git a/scripts/qapi/common.py b/scripts/qapi/common.py
+index d6e00c80ea..20c47bae95 100644
+--- a/scripts/qapi/common.py
++++ b/scripts/qapi/common.py
+@@ -1822,6 +1822,7 @@ class QAPISchema(object):
+                   ('uint32', 'int',     'uint32_t'),
+                   ('uint64', 'int',     'uint64_t'),
+                   ('size',   'int',     'uint64_t'),
++                  ('time',   'int',     'uint64_t'),
+                   ('bool',   'boolean', 'bool'),
+                   ('any',    'value',   'QObject' + pointer_suffix),
+                   ('null',   'null',    'QNull' + pointer_suffix)]:
+-- 
+2.20.1
 
->          self.vm.console_socket.sendall(command.encode())
->          wait_for_console_pattern(self, success_message)
-> =20
-
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---c8JyeaiReRNoiMDS
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl2sMkIACgkQbDjKyiDZ
-s5J5GxAA30cQi7XN06LXpQYJbWAm5iVryebzz4BEL6lB6W10jxg37SECNC5EwfTI
-9WisKJWGEFornvmQliDhxVg7UqJePxvg/vMucGkIAZ55LrDwLfX9cy5TVocXiSPP
-68WDUCsHZ8ax8IjTX9P7AQFKltKYzPA66GCuYtr/JJWzfbzgrSHLOvkj8IlOIN3e
-zAh/rDu100QUrmAMajg9HEXU6xHy3iZi+h71y0yuuPG8AQcQW+29lLMOa+2NkmeU
-34cBwVdPbzYweS7myPRTAE3fZ36EhK0HRYJonOhZILHp9LyeGm42dFerKisQ4gzM
-8onHHYwZG8wjEhI15XboG34PN9teBbTIvaYLGdx8/3Kix9+kg0Qao9SFgqROP24E
-eS6+2SYAjred20wpGbbY+YJr80dj83sNSrjYQpy6ujGLu/hLdzDE6GYU7X9w2Ex7
-7ZJ4gHtBIJedNMmyGbkTBSigoYH4UudeDqTaPh5w4koRxZ6OceJ0UZpDBODasu+d
-cMaIwkD++yM+8HTEcXfIuZkHmzIPvzfwc+rz9Il9cRCEL3deLcXMytTHa0mvZSn8
-qObbVRDA/QL51pez124QaEBB/rG1XrCiLYijH9CoqTo6eaS6dReiX2q9NtDkgduq
-thutXZ6IQgJhCG6dIKDTFOOoHlM39fin+odugKaLcmxyVtkgLKc=
-=cEAB
------END PGP SIGNATURE-----
-
---c8JyeaiReRNoiMDS--
 
