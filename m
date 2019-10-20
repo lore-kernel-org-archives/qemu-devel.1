@@ -6,43 +6,42 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6CD6CCA9EAD
-	for <qemu-devel@archiver.kernel.org>; Sun, 20 Oct 2019 20:40:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D852BCA9EAD
+	for <qemu-devel@archiver.kernel.org>; Sun, 20 Oct 2019 20:41:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3E28021928
-	for <qemu-devel@archiver.kernel.org>; Sun, 20 Oct 2019 20:40:18 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3E28021928
+	by mail.kernel.org (Postfix) with ESMTPS id AAD7A21928
+	for <qemu-devel@archiver.kernel.org>; Sun, 20 Oct 2019 20:41:13 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AAD7A21928
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47140 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47164 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iMHzt-0000uc-CV
-	for qemu-devel@archiver.kernel.org; Sun, 20 Oct 2019 16:40:17 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51658)
+	id 1iMI0m-0001sK-Re
+	for qemu-devel@archiver.kernel.org; Sun, 20 Oct 2019 16:41:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51667)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <andrey.shinkevich@virtuozzo.com>) id 1iMHx7-0005vQ-6i
- for qemu-devel@nongnu.org; Sun, 20 Oct 2019 16:37:26 -0400
+ (envelope-from <andrey.shinkevich@virtuozzo.com>) id 1iMHx7-0005vS-Ea
+ for qemu-devel@nongnu.org; Sun, 20 Oct 2019 16:37:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <andrey.shinkevich@virtuozzo.com>) id 1iMHx5-0006Xy-MC
- for qemu-devel@nongnu.org; Sun, 20 Oct 2019 16:37:24 -0400
-Received: from relay.sw.ru ([185.231.240.75]:58842)
+ (envelope-from <andrey.shinkevich@virtuozzo.com>) id 1iMHx5-0006Xs-Kb
+ for qemu-devel@nongnu.org; Sun, 20 Oct 2019 16:37:25 -0400
+Received: from relay.sw.ru ([185.231.240.75]:58838)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <andrey.shinkevich@virtuozzo.com>)
- id 1iMHx5-0006Ww-EF; Sun, 20 Oct 2019 16:37:23 -0400
+ id 1iMHx5-0006Wv-CV; Sun, 20 Oct 2019 16:37:23 -0400
 Received: from [172.16.25.136] (helo=dhcp-172-16-25-136.sw.ru)
  by relay.sw.ru with esmtp (Exim 4.92.2)
  (envelope-from <andrey.shinkevich@virtuozzo.com>)
- id 1iMHx1-00089m-Hz; Sun, 20 Oct 2019 23:37:19 +0300
+ id 1iMHx1-00089m-6B; Sun, 20 Oct 2019 23:37:19 +0300
 From: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
 To: qemu-devel@nongnu.org,
 	qemu-block@nongnu.org
-Subject: [PATCH v5 3/4] tests/qemu-iotests: add case to write compressed data
- of multiple clusters
-Date: Sun, 20 Oct 2019 23:37:07 +0300
-Message-Id: <1571603828-185910-4-git-send-email-andrey.shinkevich@virtuozzo.com>
+Subject: [PATCH v5 1/4] block: support compressed write at generic layer
+Date: Sun, 20 Oct 2019 23:37:05 +0300
+Message-Id: <1571603828-185910-2-git-send-email-andrey.shinkevich@virtuozzo.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1571603828-185910-1-git-send-email-andrey.shinkevich@virtuozzo.com>
 References: <1571603828-185910-1-git-send-email-andrey.shinkevich@virtuozzo.com>
@@ -66,94 +65,243 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Add the test case to the iotest #214 that checks possibility of writing
-compressed data of more than one cluster size.
+To inform the block layer about writing all the data compressed, we
+introduce the 'compress' command line option. Based on that option, the
+written data will be aligned by the cluster size at the generic layer.
 
+Suggested-by: Roman Kagan <rkagan@virtuozzo.com>
+Suggested-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 Signed-off-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 ---
- tests/qemu-iotests/214     | 45 +++++++++++++++++++++++++++++++++++++++++++++
- tests/qemu-iotests/214.out | 14 ++++++++++++++
- 2 files changed, 59 insertions(+)
+ block.c                   | 20 +++++++++++++++++++-
+ block/io.c                | 13 +++++++++----
+ block/qcow2.c             |  4 ++++
+ blockdev.c                |  9 ++++++++-
+ include/block/block.h     |  1 +
+ include/block/block_int.h |  2 ++
+ qapi/block-core.json      |  5 ++++-
+ qemu-options.hx           |  6 ++++--
+ 8 files changed, 51 insertions(+), 9 deletions(-)
 
-diff --git a/tests/qemu-iotests/214 b/tests/qemu-iotests/214
-index 21ec8a2..ab9b862 100755
---- a/tests/qemu-iotests/214
-+++ b/tests/qemu-iotests/214
-@@ -89,6 +89,51 @@ _check_test_img -r all
- $QEMU_IO -c "read  -P 0x11  0 4M" "$TEST_IMG" 2>&1 | _filter_qemu_io | _filter_testdir
- $QEMU_IO -c "read  -P 0x22 4M 4M" "$TEST_IMG" 2>&1 | _filter_qemu_io | _filter_testdir
+diff --git a/block.c b/block.c
+index 1946fc6..a674920 100644
+--- a/block.c
++++ b/block.c
+@@ -1418,6 +1418,11 @@ QemuOptsList bdrv_runtime_opts = {
+             .type = QEMU_OPT_BOOL,
+             .help = "always accept other writers (default: off)",
+         },
++        {
++            .name = BDRV_OPT_COMPRESS,
++            .type = QEMU_OPT_BOOL,
++            .help = "compress all writes to the image (default: off)",
++        },
+         { /* end of list */ }
+     },
+ };
+@@ -1545,6 +1550,14 @@ static int bdrv_open_common(BlockDriverState *bs, BlockBackend *file,
+     }
+     pstrcpy(bs->exact_filename, sizeof(bs->exact_filename), bs->filename);
  
-+echo
-+echo "=== Write compressed data of multiple clusters ==="
-+echo
-+cluster_size=0x10000
-+_make_test_img 2M -o cluster_size=$cluster_size
++    if (bs->all_write_compressed && !drv->bdrv_co_pwritev_compressed_part) {
++        error_setg(errp, "Compression is not supported for the driver '%s'",
++                   drv->format_name);
++        bs->all_write_compressed = false;
++        ret = -ENOTSUP;
++        goto fail_opts;
++    }
 +
-+echo "Write uncompressed data:"
-+let data_size="8 * $cluster_size"
-+$QEMU_IO -c "write -P 0xaa 0 $data_size" "$TEST_IMG" \
-+         2>&1 | _filter_qemu_io | _filter_testdir
-+sizeA=$($QEMU_IMG info --output=json "$TEST_IMG" |
-+        sed -n '/"actual-size":/ s/[^0-9]//gp')
+     /* Open the image, either directly or using a protocol */
+     open_flags = bdrv_open_flags(bs, bs->open_flags);
+     node_name = qemu_opt_get(opts, "node-name");
+@@ -2983,6 +2996,11 @@ static BlockDriverState *bdrv_open_inherit(const char *filename,
+         flags &= ~BDRV_O_RDWR;
+     }
+ 
++    if (!g_strcmp0(qdict_get_try_str(options, BDRV_OPT_COMPRESS), "on") ||
++        qdict_get_try_bool(options, BDRV_OPT_COMPRESS, false)) {
++        bs->all_write_compressed = true;
++    }
 +
-+_make_test_img 2M -o cluster_size=$cluster_size
-+echo "Write compressed data:"
-+let data_size="3 * $cluster_size + ($cluster_size / 2)"
-+# Set compress=on. That will align the written data
-+# by the cluster size and will write them compressed.
-+QEMU_IO_OPTIONS=$QEMU_IO_OPTIONS_NO_FMT \
-+$QEMU_IO -c "write -P 0xbb 0 $data_size" --image-opts \
-+         driver=$IMGFMT,compress=on,file.filename=$TEST_IMG \
-+         2>&1 | _filter_qemu_io | _filter_testdir
-+
-+let offset="4 * $cluster_size"
-+QEMU_IO_OPTIONS=$QEMU_IO_OPTIONS_NO_FMT \
-+$QEMU_IO -c "write -P 0xcc $offset $data_size" "json:{\
-+    'driver': '$IMGFMT',
-+    'file': {
-+        'driver': 'file',
-+        'filename': '$TEST_IMG'
-+    },
-+    'compress': true
-+}" | _filter_qemu_io | _filter_testdir
-+
-+sizeB=$($QEMU_IMG info --output=json "$TEST_IMG" |
-+        sed -n '/"actual-size":/ s/[^0-9]//gp')
-+
-+if [ $sizeA -le $sizeB ]
-+then
-+    echo "Compression ERROR"
-+fi
-+
-+$QEMU_IMG check --output=json "$TEST_IMG" |
-+          sed -n 's/,$//; /"compressed-clusters":/ s/^ *//p'
-+
- # success, all done
- echo '*** done'
- rm -f $seq.full
-diff --git a/tests/qemu-iotests/214.out b/tests/qemu-iotests/214.out
-index 0fcd8dc..4a2ec33 100644
---- a/tests/qemu-iotests/214.out
-+++ b/tests/qemu-iotests/214.out
-@@ -32,4 +32,18 @@ read 4194304/4194304 bytes at offset 0
- 4 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
- read 4194304/4194304 bytes at offset 4194304
- 4 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+
-+=== Write compressed data of multiple clusters ===
-+
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=2097152
-+Write uncompressed data:
-+wrote 524288/524288 bytes at offset 0
-+512 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=2097152
-+Write compressed data:
-+wrote 229376/229376 bytes at offset 0
-+224 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+wrote 229376/229376 bytes at offset 262144
-+224 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+"compressed-clusters": 8
- *** done
+     if (flags & BDRV_O_SNAPSHOT) {
+         snapshot_options = qdict_new();
+         bdrv_temp_snapshot_options(&snapshot_flags, snapshot_options,
+@@ -3208,7 +3226,7 @@ static int bdrv_reset_options_allowed(BlockDriverState *bs,
+      * in bdrv_reopen_prepare() so they can be left out of @new_opts */
+     const char *const common_options[] = {
+         "node-name", "discard", "cache.direct", "cache.no-flush",
+-        "read-only", "auto-read-only", "detect-zeroes", NULL
++        "read-only", "auto-read-only", "detect-zeroes", "compress", NULL
+     };
+ 
+     for (e = qdict_first(bs->options); e; e = qdict_next(bs->options, e)) {
+diff --git a/block/io.c b/block/io.c
+index f0b86c1..eb2ed36 100644
+--- a/block/io.c
++++ b/block/io.c
+@@ -1360,9 +1360,14 @@ static int coroutine_fn bdrv_co_do_copy_on_readv(BdrvChild *child,
+                 /* This does not change the data on the disk, it is not
+                  * necessary to flush even in cache=writethrough mode.
+                  */
+-                ret = bdrv_driver_pwritev(bs, cluster_offset, pnum,
+-                                          &local_qiov, 0,
+-                                          BDRV_REQ_WRITE_UNCHANGED);
++                if (bs->all_write_compressed) {
++                    ret = bdrv_driver_pwritev_compressed(bs, cluster_offset,
++                                                         pnum, &local_qiov, 0);
++                } else {
++                    ret = bdrv_driver_pwritev(bs, cluster_offset, pnum,
++                                              &local_qiov, 0,
++                                              BDRV_REQ_WRITE_UNCHANGED);
++                }
+             }
+ 
+             if (ret < 0) {
+@@ -1954,7 +1959,7 @@ static int coroutine_fn bdrv_aligned_pwritev(BdrvChild *child,
+     } else if (flags & BDRV_REQ_ZERO_WRITE) {
+         bdrv_debug_event(bs, BLKDBG_PWRITEV_ZERO);
+         ret = bdrv_co_do_pwrite_zeroes(bs, offset, bytes, flags);
+-    } else if (flags & BDRV_REQ_WRITE_COMPRESSED) {
++    } else if (flags & BDRV_REQ_WRITE_COMPRESSED || bs->all_write_compressed) {
+         ret = bdrv_driver_pwritev_compressed(bs, offset, bytes,
+                                              qiov, qiov_offset);
+     } else if (bytes <= max_transfer) {
+diff --git a/block/qcow2.c b/block/qcow2.c
+index 7961c05..6b29e16 100644
+--- a/block/qcow2.c
++++ b/block/qcow2.c
+@@ -1787,6 +1787,10 @@ static void qcow2_refresh_limits(BlockDriverState *bs, Error **errp)
+         /* Encryption works on a sector granularity */
+         bs->bl.request_alignment = qcrypto_block_get_sector_size(s->crypto);
+     }
++    if (bs->all_write_compressed) {
++        bs->bl.request_alignment = MAX(bs->bl.request_alignment,
++                                       s->cluster_size);
++    }
+     bs->bl.pwrite_zeroes_alignment = s->cluster_size;
+     bs->bl.pdiscard_alignment = s->cluster_size;
+ }
+diff --git a/blockdev.c b/blockdev.c
+index f89e48f..0c0b398 100644
+--- a/blockdev.c
++++ b/blockdev.c
+@@ -471,7 +471,7 @@ static BlockBackend *blockdev_init(const char *file, QDict *bs_opts,
+     int bdrv_flags = 0;
+     int on_read_error, on_write_error;
+     bool account_invalid, account_failed;
+-    bool writethrough, read_only;
++    bool writethrough, read_only, compress;
+     BlockBackend *blk;
+     BlockDriverState *bs;
+     ThrottleConfig cfg;
+@@ -570,6 +570,7 @@ static BlockBackend *blockdev_init(const char *file, QDict *bs_opts,
+     }
+ 
+     read_only = qemu_opt_get_bool(opts, BDRV_OPT_READ_ONLY, false);
++    compress = qemu_opt_get_bool(opts, BDRV_OPT_COMPRESS, false);
+ 
+     /* init */
+     if ((!file || !*file) && !qdict_size(bs_opts)) {
+@@ -595,6 +596,8 @@ static BlockBackend *blockdev_init(const char *file, QDict *bs_opts,
+         qdict_set_default_str(bs_opts, BDRV_OPT_READ_ONLY,
+                               read_only ? "on" : "off");
+         qdict_set_default_str(bs_opts, BDRV_OPT_AUTO_READ_ONLY, "on");
++        qdict_set_default_str(bs_opts, BDRV_OPT_COMPRESS,
++                              compress ? "on" : "off");
+         assert((bdrv_flags & BDRV_O_CACHE_MASK) == 0);
+ 
+         if (runstate_check(RUN_STATE_INMIGRATE)) {
+@@ -4683,6 +4686,10 @@ QemuOptsList qemu_common_drive_opts = {
+             .name = BDRV_OPT_READ_ONLY,
+             .type = QEMU_OPT_BOOL,
+             .help = "open drive file as read-only",
++        },{
++            .name = BDRV_OPT_COMPRESS,
++            .type = QEMU_OPT_BOOL,
++            .help = "compress all writes to image",
+         },
+ 
+         THROTTLE_OPTS,
+diff --git a/include/block/block.h b/include/block/block.h
+index 792bb82..7e0a927 100644
+--- a/include/block/block.h
++++ b/include/block/block.h
+@@ -139,6 +139,7 @@ typedef struct HDGeometry {
+ #define BDRV_OPT_AUTO_READ_ONLY "auto-read-only"
+ #define BDRV_OPT_DISCARD        "discard"
+ #define BDRV_OPT_FORCE_SHARE    "force-share"
++#define BDRV_OPT_COMPRESS       "compress"
+ 
+ 
+ #define BDRV_SECTOR_BITS   9
+diff --git a/include/block/block_int.h b/include/block/block_int.h
+index 05056b3..3fe8923 100644
+--- a/include/block/block_int.h
++++ b/include/block/block_int.h
+@@ -923,6 +923,8 @@ struct BlockDriverState {
+ 
+     /* BdrvChild links to this node may never be frozen */
+     bool never_freeze;
++    /* Compress all writes to the image */
++    bool all_write_compressed;
+ };
+ 
+ struct BlockBackendRootState {
+diff --git a/qapi/block-core.json b/qapi/block-core.json
+index f66553a..d57064a 100644
+--- a/qapi/block-core.json
++++ b/qapi/block-core.json
+@@ -4013,6 +4013,8 @@
+ #                 (default: off)
+ # @force-share:   force share all permission on added nodes.
+ #                 Requires read-only=true. (Since 2.10)
++# @compress:      compress all writes to the image (Since 4.2)
++#                 (default: false)
+ #
+ # Remaining options are determined by the block driver.
+ #
+@@ -4026,7 +4028,8 @@
+             '*read-only': 'bool',
+             '*auto-read-only': 'bool',
+             '*force-share': 'bool',
+-            '*detect-zeroes': 'BlockdevDetectZeroesOptions' },
++            '*detect-zeroes': 'BlockdevDetectZeroesOptions',
++            '*compress': 'bool' },
+   'discriminator': 'driver',
+   'data': {
+       'blkdebug':   'BlockdevOptionsBlkdebug',
+diff --git a/qemu-options.hx b/qemu-options.hx
+index 793d70f..1bfbf1a 100644
+--- a/qemu-options.hx
++++ b/qemu-options.hx
+@@ -850,7 +850,7 @@ DEF("blockdev", HAS_ARG, QEMU_OPTION_blockdev,
+     "-blockdev [driver=]driver[,node-name=N][,discard=ignore|unmap]\n"
+     "          [,cache.direct=on|off][,cache.no-flush=on|off]\n"
+     "          [,read-only=on|off][,detect-zeroes=on|off|unmap]\n"
+-    "          [,driver specific parameters...]\n"
++    "          [,compress=on|off][,driver specific parameters...]\n"
+     "                configure a block backend\n", QEMU_ARCH_ALL)
+ STEXI
+ @item -blockdev @var{option}[,@var{option}[,@var{option}[,...]]]
+@@ -905,6 +905,8 @@ discard requests.
+ conversion of plain zero writes by the OS to driver specific optimized
+ zero write commands. You may even choose "unmap" if @var{discard} is set
+ to "unmap" to allow a zero write to be converted to an @code{unmap} operation.
++@item compress
++Compress all writes to the image.
+ @end table
+ 
+ @item Driver-specific options for @code{file}
+@@ -1026,7 +1028,7 @@ DEF("drive", HAS_ARG, QEMU_OPTION_drive,
+     "       [,cache=writethrough|writeback|none|directsync|unsafe][,format=f]\n"
+     "       [,snapshot=on|off][,rerror=ignore|stop|report]\n"
+     "       [,werror=ignore|stop|report|enospc][,id=name][,aio=threads|native]\n"
+-    "       [,readonly=on|off][,copy-on-read=on|off]\n"
++    "       [,readonly=on|off][,copy-on-read=on|off][,compress=on|off]\n"
+     "       [,discard=ignore|unmap][,detect-zeroes=on|off|unmap]\n"
+     "       [[,bps=b]|[[,bps_rd=r][,bps_wr=w]]]\n"
+     "       [[,iops=i]|[[,iops_rd=r][,iops_wr=w]]]\n"
 -- 
 1.8.3.1
 
