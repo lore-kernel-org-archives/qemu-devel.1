@@ -6,76 +6,76 @@ X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 458C4CA9EAD
-	for <qemu-devel@archiver.kernel.org>; Sun, 20 Oct 2019 23:19:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 01012CA9EA0
+	for <qemu-devel@archiver.kernel.org>; Sun, 20 Oct 2019 23:20:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0F9F0218BA
-	for <qemu-devel@archiver.kernel.org>; Sun, 20 Oct 2019 23:19:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B9A77218BA
+	for <qemu-devel@archiver.kernel.org>; Sun, 20 Oct 2019 23:20:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UPIWQCRL"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0F9F0218BA
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TzrlqVDR"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B9A77218BA
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51418 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51472 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iMKTU-0002Cn-60
-	for qemu-devel@archiver.kernel.org; Sun, 20 Oct 2019 19:19:00 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35231)
+	id 1iMKVG-0004FI-Rk
+	for qemu-devel@archiver.kernel.org; Sun, 20 Oct 2019 19:20:50 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35308)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1iMKD0-0002PE-Hm
- for qemu-devel@nongnu.org; Sun, 20 Oct 2019 19:01:59 -0400
+ (envelope-from <philmd@redhat.com>) id 1iMKDO-0002w5-ST
+ for qemu-devel@nongnu.org; Sun, 20 Oct 2019 19:02:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1iMKCz-00029l-86
- for qemu-devel@nongnu.org; Sun, 20 Oct 2019 19:01:58 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:31723
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <philmd@redhat.com>) id 1iMKDN-0002L6-QZ
+ for qemu-devel@nongnu.org; Sun, 20 Oct 2019 19:02:22 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:56832
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iMKCz-00029M-2l
- for qemu-devel@nongnu.org; Sun, 20 Oct 2019 19:01:57 -0400
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iMKDN-0002Ku-N1
+ for qemu-devel@nongnu.org; Sun, 20 Oct 2019 19:02:21 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1571612516;
+ s=mimecast20190719; t=1571612541;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=oJns0xteOCGMi06yvZdYLF3R/VWIFKcbGV5jx0ClKro=;
- b=UPIWQCRL1/ZPSpNnAi9ODqZn5gJbaUR8EFh200KIsdYzwd5cWFIcROPlmSnK+Q3iCJGUDA
- c89bNYTEpG8qiAcVO3spdafx7wpUWzpZvM2kFRJ0Oj0psxSARk/tMoYa2c3cyewSfuSuUQ
- kLS4lMX6Qgj2JX94ZJMHkFVAWAU8GAA=
+ bh=KljiBr4SuG5p1A2LyoXGC8Cv9qdC6k/aXNJ3K9l1ji4=;
+ b=TzrlqVDRLdgOqq6ZPXDiNQWRCfbzT2vZ6kkOZu55oC6UIyrmmRF66FlVCj82e3XXcCNT4R
+ 1eOQk6PVlPHynq6Qj5Z22nhI7WeC74GwYFdmXrSsjQ0n9qWzY43j3dxXDdQ4xhUUzJ3gic
+ B6S8HHKEsN3EwFfsmbop8nLXM6A15OM=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-96-yEmcAGV6Na2E9zoDVAEETA-1; Sun, 20 Oct 2019 19:01:52 -0400
+ us-mta-78-c9Bqdc6zNTygslosY0WXxQ-1; Sun, 20 Oct 2019 19:02:12 -0400
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
  [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id F03731005509;
- Sun, 20 Oct 2019 23:01:48 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0A07D800D41;
+ Sun, 20 Oct 2019 23:02:09 +0000 (UTC)
 Received: from x1w.redhat.com (ovpn-204-40.brq.redhat.com [10.40.204.40])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 0C4EB60C18;
- Sun, 20 Oct 2019 23:01:29 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 86A0A60C18;
+ Sun, 20 Oct 2019 23:01:49 +0000 (UTC)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 To: Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>,
  qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>,
  Eduardo Habkost <ehabkost@redhat.com>
-Subject: [PATCH 14/21] hw/hppa: Let the machine be the owner of the system
+Subject: [PATCH 15/21] hw/i386: Let the machine be the owner of the system
  memory
-Date: Mon, 21 Oct 2019 00:56:43 +0200
-Message-Id: <20191020225650.3671-15-philmd@redhat.com>
+Date: Mon, 21 Oct 2019 00:56:44 +0200
+Message-Id: <20191020225650.3671-16-philmd@redhat.com>
 In-Reply-To: <20191020225650.3671-1-philmd@redhat.com>
 References: <20191020225650.3671-1-philmd@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-MC-Unique: yEmcAGV6Na2E9zoDVAEETA-1
+X-MC-Unique: c9Bqdc6zNTygslosY0WXxQ-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.120
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -119,22 +119,22 @@ Sender: "Qemu-devel"
 
 Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 ---
- hw/hppa/machine.c | 2 +-
+ hw/i386/pc.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/hw/hppa/machine.c b/hw/hppa/machine.c
-index dbe1ff0fe5..6703bfd351 100644
---- a/hw/hppa/machine.c
-+++ b/hw/hppa/machine.c
-@@ -96,7 +96,7 @@ static void machine_hppa_init(MachineState *machine)
-=20
-     /* Main memory region. */
-     ram_region =3D g_new(MemoryRegion, 1);
--    memory_region_allocate_system_memory(ram_region, NULL,
-+    memory_region_allocate_system_memory(ram_region, machine,
-                                          "ram", ram_size);
-     memory_region_add_subregion(addr_space, 0, ram_region);
-=20
+diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+index 4b1904237e..3414dc423a 100644
+--- a/hw/i386/pc.c
++++ b/hw/i386/pc.c
+@@ -1655,7 +1655,7 @@ void pc_memory_init(PCMachineState *pcms,
+      * with older qemus that used qemu_ram_alloc().
+      */
+     ram =3D g_malloc(sizeof(*ram));
+-    memory_region_allocate_system_memory(ram, NULL, "pc.ram",
++    memory_region_allocate_system_memory(ram, machine, "pc.ram",
+                                          machine->ram_size);
+     *ram_memory =3D ram;
+     ram_below_4g =3D g_malloc(sizeof(*ram_below_4g));
 --=20
 2.21.0
 
