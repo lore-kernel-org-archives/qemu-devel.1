@@ -6,65 +6,74 @@ X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CF63CCA9EAD
-	for <qemu-devel@archiver.kernel.org>; Sun, 20 Oct 2019 14:35:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 314ACCA9EAD
+	for <qemu-devel@archiver.kernel.org>; Sun, 20 Oct 2019 14:39:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9BD2E21897
-	for <qemu-devel@archiver.kernel.org>; Sun, 20 Oct 2019 14:35:00 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9BD2E21897
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id F235E21897
+	for <qemu-devel@archiver.kernel.org>; Sun, 20 Oct 2019 14:39:47 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F235E21897
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36508 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36710 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iMCIN-0005Wp-JN
-	for qemu-devel@archiver.kernel.org; Sun, 20 Oct 2019 10:34:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50845)
+	id 1iMCN1-0000nu-5b
+	for qemu-devel@archiver.kernel.org; Sun, 20 Oct 2019 10:39:47 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51169)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <no-reply@patchew.org>) id 1iMCHF-0004Tv-Q1
- for qemu-devel@nongnu.org; Sun, 20 Oct 2019 10:33:50 -0400
+ (envelope-from <pmathieu@redhat.com>) id 1iMCLg-0008Bg-G5
+ for qemu-devel@nongnu.org; Sun, 20 Oct 2019 10:38:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <no-reply@patchew.org>) id 1iMCHE-00053c-7U
- for qemu-devel@nongnu.org; Sun, 20 Oct 2019 10:33:49 -0400
-Resent-Date: Sun, 20 Oct 2019 10:33:49 -0400
-Resent-Message-Id: <E1iMCHE-00053c-7U@eggs.gnu.org>
-Received: from sender4-of-o56.zoho.com ([136.143.188.56]:21660)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <no-reply@patchew.org>)
- id 1iMCHC-000515-Mf
- for qemu-devel@nongnu.org; Sun, 20 Oct 2019 10:33:46 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1571582006; cv=none; 
- d=zohomail.com; s=zohoarc; 
- b=ifmr7R6OyBTuQ0s8yGGVeXiNY1O8yT5WGjg15iNxfSf3/1BrN2zqZhMDk4MxoCPK7WkYHYXc/C6HStyo3xm2okqvA4iXM3XcSW8sYZi1e4jSCsRbD1PaStxEM3QR10rL+AMqOaaZm8J+Y1vX9XjanjBip9SV4rJSoN+SylnO0CE=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
- s=zohoarc; t=1571582006;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
- bh=a9Xdko9DUlVX9SvWXalB5bn4F2GDHr0Lkxph0vso+VE=; 
- b=C/46+5/W/lg/hJIYOKGe+yfpT1+TBbPlMXyKK/XRHKozFXFTv7SsQN6eg3FNsLn6ddZ62SjEeimFlmFDonmQZyS4TRfMnoh06jFoWu/d8H71t/YQAi0VZ4/M1QcTC573eOdI+1ymZSUKJtqEZi+NKqFWQXXehuqpLhaAKfeeSBk=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
- dkim=pass  header.i=patchew.org;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1571582005932930.6814308052217;
- Sun, 20 Oct 2019 07:33:25 -0700 (PDT)
-In-Reply-To: <20191020135628.16255-1-dietmar@proxmox.com>
-Subject: Re: [PATCH ] yield_until_fd_readable: make it work with any AioContect
-Message-ID: <157158200489.24734.4969096704390911333@37313f22b938>
+ (envelope-from <pmathieu@redhat.com>) id 1iMCLe-0006bG-6L
+ for qemu-devel@nongnu.org; Sun, 20 Oct 2019 10:38:23 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:36840)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <pmathieu@redhat.com>) id 1iMCLe-0006ar-0O
+ for qemu-devel@nongnu.org; Sun, 20 Oct 2019 10:38:22 -0400
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 5F58B4E4E6
+ for <qemu-devel@nongnu.org>; Sun, 20 Oct 2019 14:38:19 +0000 (UTC)
+Received: by mail-wr1-f71.google.com with SMTP id p5so1110077wru.8
+ for <qemu-devel@nongnu.org>; Sun, 20 Oct 2019 07:38:19 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=O+rVKb+kZ+Zq/2UXbCQSDJsujZ2v2ovcuOiXqrLYI10=;
+ b=SnP3k/Qj4N7Rke6tXlMeVKc93uPtrohql8spx4ATQ5hoi+L5APQ1f2sjEcOJRF6bXP
+ xNwF2ZjG9bAoz/GCcwxEqPHQV9jw+JixB7/hF66hg9wE+82XeE9XFjkdMooXrLyJsDel
+ xBG3zgUyWcn11+lLiloSWVGHmsZjgP5rXqnsFKGVfmwXPSLkAdVbxSQg3oQQVAI3YT/G
+ jcN1NLm7RviuYD0lijEwPFq02e35TWqLSvMSkczC44NoFX9mu1G9uW15perheS71NNmZ
+ JFtCcUYHENCmTteuvjGv/lbYK6Y2Tz9h3dglVDqbKzA11iWyDh+/nUh6d2o2Luyq104D
+ cyZw==
+X-Gm-Message-State: APjAAAU05IUrtKO2xz5SNCiYuqd1abdMvjUZ3srOHjbS5BNhAw0ZDNz3
+ ef1UqYBOfkgq8r82a6Ww9RJ46SHWFiHzzJeg/CSRMkLj9FHX82ksPIBjbcC8Mk9i+dYfiPkPYd9
+ /uqY8wYO0zJ2NT+xSa+J3xD9ed2jO1yo=
+X-Received: by 2002:adf:e302:: with SMTP id b2mr14863965wrj.298.1571582298154; 
+ Sun, 20 Oct 2019 07:38:18 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqx64YNtMbDw4l8nS7RZi43ayCMm8PDwizi1uBt75D5pUqITZYIzhK0I2cW9tYgkb1/pqExMIuVnjPPSmxcprYA=
+X-Received: by 2002:adf:e302:: with SMTP id b2mr14863941wrj.298.1571582297856; 
+ Sun, 20 Oct 2019 07:38:17 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: dietmar@proxmox.com
-Date: Sun, 20 Oct 2019 07:33:25 -0700 (PDT)
-X-ZohoMailClient: External
+References: <20191008113318.7012-1-imammedo@redhat.com>
+ <20191010193503.097548e4@Igors-MacBook-Pro>
+ <20191011172310.19fc5d93@redhat.com>
+In-Reply-To: <20191011172310.19fc5d93@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
+Date: Sun, 20 Oct 2019 16:38:06 +0200
+Message-ID: <CAP+75-W5HD37gA2JOpniQKMqnVf5z+U6RQT8YZT9TtdDyz3d5g@mail.gmail.com>
+Subject: Re: [PATCH 0/3] eliminate remaining places that abuse
+ memory_region_allocate_system_memory()
+To: Igor Mammedov <imammedo@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 136.143.188.56
+X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -76,38 +85,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: qemu-devel@nongnu.org, stefanha@redhat.com, dietmar@proxmox.com
+Cc: Helge Deller <deller@gmx.de>,
+ Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
+ QEMU Developers <qemu-devel@nongnu.org>,
+ "open list:sPAPR" <qemu-ppc@nongnu.org>,
+ =?UTF-8?Q?Herv=C3=A9_Poussineau?= <hpoussin@reactos.org>,
+ David Gibson <david@gibson.dropbear.id.au>,
+ Artyom Tarasenko <atar4qemu@gmail.com>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MTAyMDEzNTYyOC4xNjI1
-NS0xLWRpZXRtYXJAcHJveG1veC5jb20vCgoKCkhpLAoKVGhpcyBzZXJpZXMgc2VlbXMgdG8gaGF2
-ZSBzb21lIGNvZGluZyBzdHlsZSBwcm9ibGVtcy4gU2VlIG91dHB1dCBiZWxvdyBmb3IKbW9yZSBp
-bmZvcm1hdGlvbjoKClN1YmplY3Q6IFtQQVRDSCBdIHlpZWxkX3VudGlsX2ZkX3JlYWRhYmxlOiBt
-YWtlIGl0IHdvcmsgd2l0aCBhbnkgQWlvQ29udGVjdApUeXBlOiBzZXJpZXMKTWVzc2FnZS1pZDog
-MjAxOTEwMjAxMzU2MjguMTYyNTUtMS1kaWV0bWFyQHByb3htb3guY29tCgo9PT0gVEVTVCBTQ1JJ
-UFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCmdpdCByZXYtcGFyc2UgYmFzZSA+IC9kZXYvbnVsbCB8
-fCBleGl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmln
-IC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYuYWxnb3Jp
-dGhtIGhpc3RvZ3JhbQouL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIGJhc2UuLgo9
-PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRl
-ZjdmNDRiZDg4ODcxMzM4NApTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCmVhZDRiNWYg
-eWllbGRfdW50aWxfZmRfcmVhZGFibGU6IG1ha2UgaXQgd29yayB3aXRoIGFueSBBaW9Db250ZWN0
-Cgo9PT0gT1VUUFVUIEJFR0lOID09PQpFUlJPUjogbGluZSBvdmVyIDkwIGNoYXJhY3RlcnMKIzQx
-OiBGSUxFOiB1dGlsL3FlbXUtY29yb3V0aW5lLWlvLmM6NzM6CisgICAgYWlvX3NldF9mZF9oYW5k
-bGVyKGN0eCwgZmQsIGZhbHNlLCBOVUxMLCAodm9pZCAoKikodm9pZCAqKSlxZW11X2Nvcm91dGlu
-ZV9lbnRlciwgTlVMTCwgcWVtdV9jb3JvdXRpbmVfc2VsZigpKTsKCnRvdGFsOiAxIGVycm9ycywg
-MCB3YXJuaW5ncywgMjggbGluZXMgY2hlY2tlZAoKQ29tbWl0IGVhZDRiNWZjODE3MyAoeWllbGRf
-dW50aWxfZmRfcmVhZGFibGU6IG1ha2UgaXQgd29yayB3aXRoIGFueSBBaW9Db250ZWN0KSBoYXMg
-c3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFy
-ZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVD
-S1BBVENIIGluIE1BSU5UQUlORVJTLgo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFuZCBl
-eGl0ZWQgd2l0aCBjb2RlOiAxCgoKVGhlIGZ1bGwgbG9nIGlzIGF2YWlsYWJsZSBhdApodHRwOi8v
-cGF0Y2hldy5vcmcvbG9ncy8yMDE5MTAyMDEzNTYyOC4xNjI1NS0xLWRpZXRtYXJAcHJveG1veC5j
-b20vdGVzdGluZy5jaGVja3BhdGNoLz90eXBlPW1lc3NhZ2UuCi0tLQpFbWFpbCBnZW5lcmF0ZWQg
-YXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwczovL3BhdGNoZXcub3JnL10uClBsZWFzZSBz
-ZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
+Ping?
 
+On Fri, Oct 11, 2019 at 5:23 PM Igor Mammedov <imammedo@redhat.com> wrote:
+> On Thu, 10 Oct 2019 19:35:03 +0200
+> Igor Mammedov <imammedo@redhat.com> wrote:
+>
+> Forgot to actually CC Eduardo,
+>
+> > On Tue,  8 Oct 2019 07:33:15 -0400
+> > Igor Mammedov <imammedo@redhat.com> wrote:
+> ...
+> > Eduardo,
+> >
+> > This patches are fixing various machines across tree, so series does not belong
+> > to any particular arch specific tree, can you merge it via generic machine tree?
+>
+>
+> > >
+> > >
+> > > Igor Mammedov (3):
+> > >   sparc64: use memory_region_allocate_system_memory() only for '-m'
+> > >     specified RAM
+> > >   ppc: rs6000_mc: drop usage of memory_region_allocate_system_memory()
+> > >   hppa: drop usage of memory_region_allocate_system_memory() for ROM
+> > >
+> > >  hw/hppa/machine.c    |  5 ++---
+> > >  hw/ppc/rs6000_mc.c   | 15 ++++++++++-----
+> > >  hw/sparc64/niagara.c | 25 +++++++++++++------------
+> > >  3 files changed, 25 insertions(+), 20 deletions(-)
+> > >
 
