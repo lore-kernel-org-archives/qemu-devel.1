@@ -2,122 +2,73 @@ Return-Path: <SRS0=HPkn=YN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 31FF5CA9EAD
-	for <qemu-devel@archiver.kernel.org>; Sun, 20 Oct 2019 18:24:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B8718CA9EAD
+	for <qemu-devel@archiver.kernel.org>; Sun, 20 Oct 2019 18:32:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EDF5C218BA
-	for <qemu-devel@archiver.kernel.org>; Sun, 20 Oct 2019 18:24:25 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="WIpnMX/f"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EDF5C218BA
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	by mail.kernel.org (Postfix) with ESMTPS id 8A5B721897
+	for <qemu-devel@archiver.kernel.org>; Sun, 20 Oct 2019 18:32:03 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8A5B721897
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43210 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43366 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iMFsP-0007OA-3n
-	for qemu-devel@archiver.kernel.org; Sun, 20 Oct 2019 14:24:25 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42080)
+	id 1iMFzm-0002Z2-LH
+	for qemu-devel@archiver.kernel.org; Sun, 20 Oct 2019 14:32:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42688)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <andrey.shinkevich@virtuozzo.com>) id 1iMFre-0006ue-3o
- for qemu-devel@nongnu.org; Sun, 20 Oct 2019 14:23:39 -0400
+ (envelope-from <bounces@canonical.com>) id 1iMFyj-000264-5i
+ for qemu-devel@nongnu.org; Sun, 20 Oct 2019 14:30:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <andrey.shinkevich@virtuozzo.com>) id 1iMFrd-0006xx-42
- for qemu-devel@nongnu.org; Sun, 20 Oct 2019 14:23:38 -0400
-Received: from mail-eopbgr60135.outbound.protection.outlook.com
- ([40.107.6.135]:31759 helo=EUR04-DB3-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <andrey.shinkevich@virtuozzo.com>)
- id 1iMFrZ-0006vY-F3; Sun, 20 Oct 2019 14:23:33 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=DyrGYgiskop/vq+NjbfgILdvR/GmKwoN9ky82ihct+vc1PV8LcHIeGoZNnooEkRNUjC+82Xan4N8c3ssCWGKW8DFPL9k4wjxtIcuWTh2jBzIqpZEOqSWWh+BGFqsrofEhzqTGcSF4g6nQDTRt6IeKMJHGo5su6a+oLj5tmAzcTZuLfm/oJZfqCrI+jsYyVnNDDPVcI2/ILyXqK+qT8tuTYvmMfb0EC8etz1Vnb091y4P9PHImaVQ/lwjIxco6coz/xxnKjPmgNv3gw8Ntjte1d5eXPgqEH/qL7fkqoMAMszi8DxwyPG8HPQy3n282Zaeuaw2jUTAHB6y44qlLQ6onw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=TeKC4MvA6y6Nb32cHQGz0PV2EKtB8cS1RwQWuHu8tkg=;
- b=VTgJpczIcUEX57kFMS93PeoLeXB4NReAtiXlLnTZ71V2mgRxteZbGRfLmkwxNt62W8se+KYvJPhF0wZjtFguhq3pSAHqnVd8fF6NXtkjBRXOdQ+qZ369wBE+14TLf+j7sPlMcZE8Jj3TKzJIvtmHH/ItCWe7L17QCoBZO63cNkf9nSCcrJJvz5u0mWKZjt21cdGV9xt5w8J2o5+p/1xmEfiV91HrcI8iceK2NVwm76IqtL+FSQlpK0QC2DgoQqEkz0jIEfkGASrjsHsOFFxguRIpxsBfIfKkkatNYzP0vxqJXvwF7Ncb168ABRdrZNzgLfZHza21tu7yURbTaEsGgA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=TeKC4MvA6y6Nb32cHQGz0PV2EKtB8cS1RwQWuHu8tkg=;
- b=WIpnMX/fT47jr6LflGb/bNekFY969nQRd8eeFsc+cPl7p9CoCsC8y0dVA55g65VYSt9YCBpyfOTdrIOY66JQ1tTHNUJqZzWbOBJ2LEcPG5nTG0rtQKnRleYD856jGl0MqVRNhJyOFObaOOuMnCbmLM3AfKuvVaKeYaiaotRLgIY=
-Received: from DB6PR08MB2757.eurprd08.prod.outlook.com (10.170.220.33) by
- DB6PR08MB2936.eurprd08.prod.outlook.com (10.175.235.32) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2347.21; Sun, 20 Oct 2019 18:23:29 +0000
-Received: from DB6PR08MB2757.eurprd08.prod.outlook.com
- ([fe80::a1ee:668f:c3a5:87b]) by DB6PR08MB2757.eurprd08.prod.outlook.com
- ([fe80::a1ee:668f:c3a5:87b%4]) with mapi id 15.20.2367.021; Sun, 20 Oct 2019
- 18:23:28 +0000
-From: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org"
- <qemu-block@nongnu.org>
-Subject: Re: [PATCH v4 3/4] tests/qemu-iotests: add case to write compressed
- data of multiple clusters
-Thread-Topic: [PATCH v4 3/4] tests/qemu-iotests: add case to write compressed
- data of multiple clusters
-Thread-Index: AQHVhD7YVM+4B+JXqkKgQCwHJhQxUKdfFSkAgATJRYA=
-Date: Sun, 20 Oct 2019 18:23:28 +0000
-Message-ID: <0dd21cbc-601c-358e-3dc2-c7871731246a@virtuozzo.com>
-References: <1571243333-882302-1-git-send-email-andrey.shinkevich@virtuozzo.com>
- <1571243333-882302-4-git-send-email-andrey.shinkevich@virtuozzo.com>
- <2385abe2-cfd0-4d13-ce6a-bde10a884381@virtuozzo.com>
-In-Reply-To: <2385abe2-cfd0-4d13-ce6a-bde10a884381@virtuozzo.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-clientproxiedby: HE1PR1001CA0004.EURPRD10.PROD.OUTLOOK.COM
- (2603:10a6:3:f7::14) To DB6PR08MB2757.eurprd08.prod.outlook.com
- (2603:10a6:6:18::33)
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=andrey.shinkevich@virtuozzo.com; 
-x-ms-exchange-messagesentrepresentingtype: 1
-x-originating-ip: [185.231.240.5]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 08662049-60ad-41fe-7c23-08d7558a9a79
-x-ms-traffictypediagnostic: DB6PR08MB2936:
-x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <DB6PR08MB2936E4D7B40313B3BDC0030FF46E0@DB6PR08MB2936.eurprd08.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:288;
-x-forefront-prvs: 0196A226D1
-x-forefront-antispam-report: SFV:NSPM;
- SFS:(10019020)(39840400004)(376002)(136003)(346002)(366004)(396003)(189003)(199004)(8936002)(31696002)(486006)(54906003)(86362001)(25786009)(256004)(6512007)(305945005)(31686004)(7736002)(186003)(478600001)(110136005)(11346002)(476003)(2616005)(102836004)(5660300002)(2906002)(6506007)(386003)(44832011)(316002)(66066001)(26005)(446003)(71200400001)(71190400001)(6486002)(81156014)(81166006)(8676002)(3846002)(66556008)(66476007)(229853002)(6116002)(14454004)(6436002)(2201001)(36756003)(107886003)(66946007)(52116002)(76176011)(4326008)(2501003)(66446008)(64756008)(6246003)(99286004);
- DIR:OUT; SFP:1102; SCL:1; SRVR:DB6PR08MB2936;
- H:DB6PR08MB2757.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
- PTR:InfoNoRecords; MX:1; A:1; 
-received-spf: None (protection.outlook.com: virtuozzo.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: QKe2SANqHhvsr22zoiId6P8ONGCrNrOb+wjx36xy6VRSxPvP3JyN52Y6uS/9FtDrUPvySFJWIq3WOkwnKbo6DEeB9ymt6/1pwLPwQKC6/aGbWUxz6JsAEufgr6qXYShPHbvboNv7srbr9/sttVfUqiEFatxE+doz8lWpAvzYqPLwokC2lksoIPI3PpVbo6gxodEY5iu52y+v2c+bNO+iiFMDIk9FXxNfKPMoWNjXd4rgGCqv2IUDEh/qoZMX2MR8kGGUW100ugarZB5Wg5k/Pi50/xJpHNPaM8rPxvw/zDuA566aBUP/mmH6xZxUYclMOgB+Dbq3x4bWQlr1q1+SnQ0V7gUQpP37tftt6NTToIwNPDbwL7leqy07u8z26A7p0hhJroS8eQqYZ2yOUHJM6QvyYdrurRoPmRzUx2MmqEg=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <81573A7E80B55A41937FDD7F58513AE1@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+ (envelope-from <bounces@canonical.com>) id 1iMFyh-0000Kf-Mb
+ for qemu-devel@nongnu.org; Sun, 20 Oct 2019 14:30:57 -0400
+Received: from indium.canonical.com ([91.189.90.7]:41846)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <bounces@canonical.com>)
+ id 1iMFyh-0000JJ-H6
+ for qemu-devel@nongnu.org; Sun, 20 Oct 2019 14:30:55 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1iMFyg-00043j-2U
+ for <qemu-devel@nongnu.org>; Sun, 20 Oct 2019 18:30:54 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 0F61E2E80CC
+ for <qemu-devel@nongnu.org>; Sun, 20 Oct 2019 18:30:54 +0000 (UTC)
 MIME-Version: 1.0
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 08662049-60ad-41fe-7c23-08d7558a9a79
-X-MS-Exchange-CrossTenant-originalarrivaltime: 20 Oct 2019 18:23:28.4213 (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: vDJ4JjzatBp/V0aDgr/27BzRvHnyoJIPNhfqkMck/uup/6HLvQOTNliGr0BTH8ITIQIJ4OqH7ngUMIOfhtu/GdovhD8dCcUie904aiY9dhk=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB6PR08MB2936
-X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
-X-Received-From: 40.107.6.135
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Sun, 20 Oct 2019 18:17:14 -0000
+From: Simon John <1846427@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: dgilbert-h lersek michael-weiser psyhomb sej7278
+X-Launchpad-Bug-Reporter: Michael Weiser (michael-weiser)
+X-Launchpad-Bug-Modifier: Simon John (sej7278)
+References: <157005622285.15919.12087374175062502233.malonedeb@gac.canonical.com>
+Message-Id: <157159543462.9599.16307802414235195665.malone@soybean.canonical.com>
+Subject: [Bug 1846427] Re: 4.1.0: qcow2 corruption on savevm/quit/loadvm cycle
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="186023fa645d8be19d403a76064f0643f510db2f";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: 5bc7e859e1e87e8a8f7c19d9368e884d2bd5af82
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 91.189.90.7
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -126,44 +77,140 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "kwolf@redhat.com" <kwolf@redhat.com>, "fam@euphon.net" <fam@euphon.net>,
- Denis Lunev <den@virtuozzo.com>, "armbru@redhat.com" <armbru@redhat.com>,
- "mreitz@redhat.com" <mreitz@redhat.com>,
- "stefanha@redhat.com" <stefanha@redhat.com>
+Reply-To: Bug 1846427 <1846427@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Pj4gKyMgU2V0IGNvbXByZXNzPW9uLiBUaGF0IHdpbGwgYWxpZ24gdGhlIHdyaXR0ZW4gZGF0YQ0K
-Pj4gKyMgYnkgdGhlIGNsdXN0ZXIgc2l6ZSBhbmQgd2lsbCB3cml0ZSB0aGVtIGNvbXByZXNzZWQu
-DQo+PiArUUVNVV9JT19PUFRJT05TPSRRRU1VX0lPX09QVElPTlNfTk9fRk1UIFwNCj4+ICskUUVN
-VV9JTyAtYyAid3JpdGUgLVAgMHhiYiAwICRkYXRhX3NpemUiIC0taW1hZ2Utb3B0cyBcDQo+PiAr
-ICAgICAgICAgZHJpdmVyPSRJTUdGTVQsY29tcHJlc3M9b24sZmlsZS5maWxlbmFtZT0kVEVTVF9J
-TUcgXA0KPj4gKyAgICAgICAgIDI+JjEgfCBfZmlsdGVyX3FlbXVfaW8gfCBfZmlsdGVyX3Rlc3Rk
-aXINCj4+ICsNCj4+ICtsZXQgb2Zmc2V0PSI0ICogJGNsdXN0ZXJfc2l6ZSINCj4+ICtRRU1VX0lP
-X09QVElPTlM9JFFFTVVfSU9fT1BUSU9OU19OT19GTVQgXA0KPj4gKyRRRU1VX0lPIC1jICJ3cml0
-ZSAtUCAweGNjICRvZmZzZXQgJGRhdGFfc2l6ZSIgImpzb246e1wNCj4+ICsgICAgJ2RyaXZlcic6
-ICckSU1HRk1UJywNCj4+ICsgICAgJ2ZpbGUnOiB7DQo+PiArICAgICAgICAnZHJpdmVyJzogJ2Zp
-bGUnLA0KPj4gKyAgICAgICAgJ2ZpbGVuYW1lJzogJyRURVNUX0lNRycNCj4+ICsgICAgfSwNCj4+
-ICsgICAgJ2NvbXByZXNzJzogdHJ1ZQ0KPj4gK30iIHwgX2ZpbHRlcl9xZW11X2lvIHwgX2ZpbHRl
-cl90ZXN0ZGlyDQo+PiArDQo+IA0KPiBJdCB3b3VsZCBiZSBnb29kIHRvIGFkZCBjYXNlIHdpdGgg
-dW5hbGlnbmVkIG9mZnNldCBhcyB3ZWxsLiBBbmQsIG1heWJlLCINCj4gY2hlY2sgdGhhdCB3ZSBk
-b24ndCByZXdyaXRlIGV4aXN0aW5nIGRhdGEgaW4gcGFydGlhbCBjbHVzdGVycyB3aGVuIHdyaXRp
-bmcNCj4gdW5hbGlnbmVkIGNvbXByZXNzZWQgZGF0YSBvdmVyIGl0Lg0KPiANCg0KVGhlIEkvTyBl
-cnJvciBpcyByYWlzZWQgaW4gdGhhdCBjYXNlIChzZWUgDQpxY293Ml9hbGxvY19jb21wcmVzc2Vk
-X2NsdXN0ZXJfb2Zmc2V0KCkpOg0KIkNvbXByZXNzaW9uIGNhbid0IG92ZXJ3cml0ZSBhbnl0aGlu
-Zy4gRmFpbCBpZiB0aGUgY2x1c3RlciB3YXMgYWxyZWFkeSANCmFsbG9jYXRlZC4iDQoNCiMwICBx
-Y293Ml9hbGxvY19jb21wcmVzc2VkX2NsdXN0ZXJfb2Zmc2V0IChicz0weDU2NDY2OTE0MzM5MCwg
-DQpvZmZzZXQ9MzkzMjE2LCBjb21wcmVzc2VkX3NpemU9NzksIGhvc3Rfb2Zmc2V0PTB4N2Y0NTI4
-OWQ5ZjAwKSBhdCANCmJsb2NrL3Fjb3cyLWNsdXN0ZXIuYzo3NjcNCiMxICAweDAwMDA1NjQ2Njcw
-M2RhN2YgaW4gcWNvdzJfY29fcHdyaXRldl9jb21wcmVzc2VkX3Rhc2sgDQooYnM9MHg1NjQ2Njkx
-NDMzOTAsIG9mZnNldD0zOTMyMTYsIGJ5dGVzPTY1NTM2LCBxaW92PTB4N2Y0NTI4ZGRkZWMwLCAN
-CnFpb3Zfb2Zmc2V0PTE5NjYwOCkgYXQgYmxvY2svcWNvdzIuYzo0MTk4DQojMiAgMHgwMDAwNTY0
-NjY3MDNkYzBjIGluIHFjb3cyX2NvX3B3cml0ZXZfY29tcHJlc3NlZF90YXNrX2VudHJ5IA0KKHRh
-c2s9MHg1NjQ2NjkxNTJhYzApIGF0IGJsb2NrL3Fjb3cyLmM6NDIzMA0KIzMgIDB4MDAwMDU2NDY2
-NzBhNjlkMCBpbiBhaW9fdGFza19jbyAob3BhcXVlPTB4NTY0NjY5MTUyYWMwKSBhdCANCmJsb2Nr
-L2Fpb190YXNrLmM6NDUNCiM0ICAweDAwMDA1NjQ2NjcxNDdhODcgaW4gY29yb3V0aW5lX3RyYW1w
-b2xpbmUgKGkwPTE3NjI5OTQ5NzYsIGkxPTIyMDg2KSANCmF0IHV0aWwvY29yb3V0aW5lLXVjb250
-ZXh0LmM6MTE1DQoNCkFuZHJleQ0KLS0gDQpXaXRoIHRoZSBiZXN0IHJlZ2FyZHMsDQpBbmRyZXkg
-U2hpbmtldmljaA0K
+Can't seem to reproduce if I convert the qcow2 image to raw+sparse.
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1846427
+
+Title:
+  4.1.0: qcow2 corruption on savevm/quit/loadvm cycle
+
+Status in QEMU:
+  New
+
+Bug description:
+  I'm seeing massive corruption of qcow2 images with qemu 4.1.0 and git
+  master as of 7f21573c822805a8e6be379d9bcf3ad9effef3dc after a few
+  savevm/quit/loadvm cycles. I've narrowed it down to the following
+  reproducer (further notes below):
+
+  # qemu-img check debian.qcow2
+  No errors were found on the image.
+  251601/327680 =3D 76.78% allocated, 1.63% fragmented, 0.00% compressed cl=
+usters
+  Image end offset: 18340446208
+  # bin/qemu/bin/qemu-system-x86_64 -machine pc-q35-4.0.1,accel=3Dkvm -m 40=
+96 -chardev stdio,id=3Dcharmonitor -mon chardev=3Dcharmonitor -drive file=
+=3Ddebian.qcow2,id=3Dd -S
+  qemu-system-x86_64: warning: dbind: Couldn't register with accessibility =
+bus: Did not receive a reply. Possible causes include: the remote applicati=
+on did not send a reply, the message bus security policy blocked the reply,=
+ the reply timeout expired, or the network connection was broken.
+  QEMU 4.1.50 monitor - type 'help' for more information
+  (qemu) loadvm foo
+  (qemu) c
+  (qemu) qcow2_free_clusters failed: Invalid argument
+  qcow2_free_clusters failed: Invalid argument
+  qcow2_free_clusters failed: Invalid argument
+  qcow2_free_clusters failed: Invalid argument
+  quit
+  [m@nargothrond:~] qemu-img check debian.qcow2
+  Leaked cluster 85179 refcount=3D2 reference=3D1
+  Leaked cluster 85180 refcount=3D2 reference=3D1
+  ERROR cluster 266150 refcount=3D0 reference=3D2
+  [...]
+  ERROR OFLAG_COPIED data cluster: l2_entry=3D422840000 refcount=3D1
+
+  9493 errors were found on the image.
+  Data may be corrupted, or further writes to the image may corrupt it.
+
+  2 leaked clusters were found on the image.
+  This means waste of disk space, but no harm to data.
+  259266/327680 =3D 79.12% allocated, 1.67% fragmented, 0.00% compressed cl=
+usters
+  Image end offset: 18340446208
+
+  This is on a x86_64 Linux 5.3.1 Gentoo host with qemu-system-x86_64
+  and accel=3Dkvm. The compiler is gcc-9.2.0 with the rest of the system
+  similarly current.
+
+  Reproduced with qemu-4.1.0 from distribution package as well as
+  vanilla git checkout of tag v4.1.0 and commit
+  7f21573c822805a8e6be379d9bcf3ad9effef3dc (today's master). Does not
+  happen with qemu compiled from vanilla checkout of tag v4.0.0. Build
+  sequence:
+
+  ./configure --prefix=3D$HOME/bin/qemu-bisect --target-list=3Dx86_64-softm=
+mu --disable-werror --disable-docs
+  [...]
+  CFLAGS            -O2 -U_FORTIFY_SOURCE -D_FORTIFY_SOURCE=3D2 -g
+  [...] (can provide full configure output if helpful)
+  make -j8 install
+
+  The kind of guest OS does not matter: seen with Debian testing 64bit,
+  Windows 7 x86/x64 BIOS and Windows 7 x64 EFI.
+
+  The virtual storage controller does not seem to matter: seen with
+  VirtIO SCSI, emulated SCSI and emulated SATA AHCI.
+
+  Caching modes (none, directsync, writeback), aio mode (threads,
+  native) or discard (ignore, unmap) or detect-zeroes (off, unmap) does
+  not influence occurence either.
+
+  Having more RAM in the guest seems to increase odds of corruption:
+  With 512MB to the Debian guest problem hardly occurs at all, with 4GB
+  RAM it happens almost instantly.
+
+  An automated reproducer works as follows:
+
+  - the guest *does* mount its root fs and swap with option discard and
+  my testing leaves me with the impression that file deletion rather
+  than reading is causing the issue
+
+  - foo is a snapshot of the running Debian VM which is already running
+  command
+
+  # while true ; do dd if=3D/dev/zero of=3Dfoo bs=3D10240k count=3D400 ; do=
+ne
+
+  to produce some I/O to the disk (4GB file with 4GB of RAM).
+
+  - on the host a loop continuously resumes and saves the guest state
+  and quits qemu inbetween:
+
+  # while true ; do (echo loadvm foo ; echo c ; sleep 10 ; echo stop ;
+  echo savevm foo ; echo quit ) | bin/qemu-bisect/bin/qemu-system-x86_64
+  -machine pc-q35-3.1,accel=3Dkvm -m 4096 -chardev stdio,id=3Dcharmonitor
+  -mon chardev=3Dcharmonitor -drive file=3Ddebian.qcow2,id=3Dd -S -display
+  none ; done
+
+  - quitting qemu inbetween saves and loads seems to be necessary for
+  the problem to occur. Just continusouly in one session saving and
+  loading guest state does not trigger it.
+
+  - For me, after about 2 to 6 iterations of above loop the image is
+  corrupted.
+
+  - corruption manifests with other messages from qemu as well, e.g.:
+
+  (qemu) loadvm foo
+  Error: Device 'd' does not have the requested snapshot 'foo'
+
+  Using above reproducer I have to the be best of my ability bisected
+  the introduction of the problem to commit
+  69f47505ee66afaa513305de0c1895a224e52c45 (block: avoid recursive
+  block_status call if possible). qemu compiled from the commit before
+  does not exhibit the issue, from that commit on it does and reverting
+  the commit off of current master makes it disappear.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1846427/+subscriptions
 
