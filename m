@@ -6,76 +6,76 @@ X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 46C02CA9EA0
-	for <qemu-devel@archiver.kernel.org>; Sun, 20 Oct 2019 23:21:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 65B11CA9EA0
+	for <qemu-devel@archiver.kernel.org>; Sun, 20 Oct 2019 23:22:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 10966218BA
-	for <qemu-devel@archiver.kernel.org>; Sun, 20 Oct 2019 23:21:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2D1A0218BA
+	for <qemu-devel@archiver.kernel.org>; Sun, 20 Oct 2019 23:22:53 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SAds2F/c"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 10966218BA
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OUqYV38C"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2D1A0218BA
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51480 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51516 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iMKVl-0004uH-9C
-	for qemu-devel@archiver.kernel.org; Sun, 20 Oct 2019 19:21:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35483)
+	id 1iMKXD-0006cR-CP
+	for qemu-devel@archiver.kernel.org; Sun, 20 Oct 2019 19:22:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35740)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1iMKDu-0003Uk-VB
- for qemu-devel@nongnu.org; Sun, 20 Oct 2019 19:02:56 -0400
+ (envelope-from <philmd@redhat.com>) id 1iMKF8-0004ea-L2
+ for qemu-devel@nongnu.org; Sun, 20 Oct 2019 19:04:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1iMKDt-0002Wj-V5
- for qemu-devel@nongnu.org; Sun, 20 Oct 2019 19:02:54 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:33831
+ (envelope-from <philmd@redhat.com>) id 1iMKF7-0002wY-EE
+ for qemu-devel@nongnu.org; Sun, 20 Oct 2019 19:04:10 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:45078
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iMKDs-0002Vu-7Z
- for qemu-devel@nongnu.org; Sun, 20 Oct 2019 19:02:53 -0400
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iMKF7-0002wC-AU
+ for qemu-devel@nongnu.org; Sun, 20 Oct 2019 19:04:09 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1571612571;
+ s=mimecast20190719; t=1571612648;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=PnBCoSNSCKRtt+NC5OSwF3Y1UP3u5PcBNfHOXHNcJVc=;
- b=SAds2F/cbKzUGjVcO4SlRj1x+pLeD2ATH+pvnH7n3Mn9jODBa6PRmDWlliFgiPTFCrXdkt
- Z2GcmBFRd1bnJqITx2mDVDcy6bkr7D5HJlOtfegiQxm/Wpi29B5O3bSMpPyJ+w4RlQhOeD
- 3B8p9xRPebndWT8N0q8L4hdyUEeG4Wc=
+ bh=Jjri3ozqyIA7pC6fyQCHJXD213k68SJrwDbSmMBjY3Q=;
+ b=OUqYV38C65PlrrxWwI6Gi7hS4UNqiuqWpjec2waZQ6cd2ip+FT486lztgXnVmg8mPIdZjr
+ cc9zBI9gQUt8AByCGxWAc75b5tklKomAtP9VGEWAEHCNXAahsymDAF9yzpxB0ExaiuJoO4
+ K8HjIH4nCYrFKQGvlIswtpI3ZEP8QWc=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-344-B9DL2hqtPbyycJCqfC9sCA-1; Sun, 20 Oct 2019 19:02:47 -0400
+ us-mta-235-0Z60vgfLOp2K7RkyzB4Ntw-1; Sun, 20 Oct 2019 19:04:01 -0400
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
  [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3EA0C1005509;
- Sun, 20 Oct 2019 23:02:43 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C1D0D1005509;
+ Sun, 20 Oct 2019 23:03:57 +0000 (UTC)
 Received: from x1w.redhat.com (ovpn-204-40.brq.redhat.com [10.40.204.40])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 547F460C18;
- Sun, 20 Oct 2019 23:02:27 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 6808060C18;
+ Sun, 20 Oct 2019 23:03:39 +0000 (UTC)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 To: Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>,
  qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>,
  Eduardo Habkost <ehabkost@redhat.com>
-Subject: [PATCH 17/21] hw/m68k: Let the machine be the owner of the system
- memory
-Date: Mon, 21 Oct 2019 00:56:46 +0200
-Message-Id: <20191020225650.3671-18-philmd@redhat.com>
+Subject: [PATCH 21/21] hw/core: Assert memory_region_allocate_system_memory
+ has machine owner
+Date: Mon, 21 Oct 2019 00:56:50 +0200
+Message-Id: <20191020225650.3671-22-philmd@redhat.com>
 In-Reply-To: <20191020225650.3671-1-philmd@redhat.com>
 References: <20191020225650.3671-1-philmd@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-MC-Unique: B9DL2hqtPbyycJCqfC9sCA-1
+X-MC-Unique: 0Z60vgfLOp2K7RkyzB4Ntw-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.61
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -117,57 +117,47 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+All the memory_region_allocate_system_memory() pass a MachineState
+argument. Add an assertion to ensure the new boards/machines added
+set this argument, so all system memory object have the machine as
+its QOM owner.
+
 Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 ---
- hw/m68k/an5206.c    | 2 +-
- hw/m68k/mcf5208.c   | 2 +-
- hw/m68k/next-cube.c | 2 +-
- 3 files changed, 3 insertions(+), 3 deletions(-)
+ hw/core/numa.c      | 4 +---
+ include/hw/boards.h | 2 +-
+ 2 files changed, 2 insertions(+), 4 deletions(-)
 
-diff --git a/hw/m68k/an5206.c b/hw/m68k/an5206.c
-index 54ccbe1a82..fb045c2436 100644
---- a/hw/m68k/an5206.c
-+++ b/hw/m68k/an5206.c
-@@ -46,7 +46,7 @@ static void an5206_init(MachineState *machine)
-     env->rambar0 =3D AN5206_RAMBAR_ADDR | 1;
+diff --git a/hw/core/numa.c b/hw/core/numa.c
+index 2e29e4bfe0..3e07e94d00 100644
+--- a/hw/core/numa.c
++++ b/hw/core/numa.c
+@@ -527,9 +527,7 @@ void memory_region_allocate_system_memory(MemoryRegion =
+*mr, MachineState *ms,
+     uint64_t addr =3D 0;
+     int i;
 =20
-     /* DRAM at address zero */
--    memory_region_allocate_system_memory(ram, NULL, "an5206.ram", ram_size=
-);
-+    memory_region_allocate_system_memory(ram, machine, "an5206.ram", ram_s=
-ize);
-     memory_region_add_subregion(address_space_mem, 0, ram);
+-    if (!ms) {
+-        ms =3D MACHINE(qdev_get_machine());
+-    }
++    g_assert(ms);
 =20
-     /* Internal SRAM.  */
-diff --git a/hw/m68k/mcf5208.c b/hw/m68k/mcf5208.c
-index 34d34eba17..8e8c8ef349 100644
---- a/hw/m68k/mcf5208.c
-+++ b/hw/m68k/mcf5208.c
-@@ -248,7 +248,7 @@ static void mcf5208evb_init(MachineState *machine)
-     memory_region_add_subregion(address_space_mem, 0x00000000, rom);
-=20
-     /* DRAM at 0x40000000 */
--    memory_region_allocate_system_memory(ram, NULL, "mcf5208.ram", ram_siz=
-e);
-+    memory_region_allocate_system_memory(ram, machine, "mcf5208.ram", ram_=
-size);
-     memory_region_add_subregion(address_space_mem, 0x40000000, ram);
-=20
-     /* Internal SRAM.  */
-diff --git a/hw/m68k/next-cube.c b/hw/m68k/next-cube.c
-index e5343348d0..6aed9376f3 100644
---- a/hw/m68k/next-cube.c
-+++ b/hw/m68k/next-cube.c
-@@ -893,7 +893,7 @@ static void next_cube_init(MachineState *machine)
-     memcpy(ns->rtc.ram, rtc_ram2, 32);
-=20
-     /* 64MB RAM starting at 0x04000000  */
--    memory_region_allocate_system_memory(ram, NULL, "next.ram", ram_size);
-+    memory_region_allocate_system_memory(ram, machine, "next.ram", ram_siz=
-e);
-     memory_region_add_subregion(sysmem, 0x04000000, ram);
-=20
-     /* Framebuffer */
+     if (ms->numa_state =3D=3D NULL ||
+         ms->numa_state->num_nodes =3D=3D 0 || !have_memdevs) {
+diff --git a/include/hw/boards.h b/include/hw/boards.h
+index 3b6cb82b6c..31ab6e7586 100644
+--- a/include/hw/boards.h
++++ b/include/hw/boards.h
+@@ -14,7 +14,7 @@
+ /**
+  * memory_region_allocate_system_memory - Allocate a board's main memory
+  * @mr: the #MemoryRegion to be initialized
+- * @ms: the #MachineState object that own the system memory
++ * @ms: the #MachineState object that own the system memory (must not be N=
+ULL)
+  * @name: name of the memory region
+  * @ram_size: size of the region in bytes
+  *
 --=20
 2.21.0
 
