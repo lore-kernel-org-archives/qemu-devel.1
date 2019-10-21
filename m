@@ -6,40 +6,40 @@ X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C4F70CA9EAF
-	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 13:27:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7B96CCA9EB9
+	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 13:29:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9498A20873
-	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 13:27:42 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9498A20873
+	by mail.kernel.org (Postfix) with ESMTPS id 528EB214AE
+	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 13:29:03 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 528EB214AE
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41578 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41628 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iMXin-0001R3-NU
-	for qemu-devel@archiver.kernel.org; Mon, 21 Oct 2019 09:27:41 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38357)
+	id 1iMXk6-0002tf-E4
+	for qemu-devel@archiver.kernel.org; Mon, 21 Oct 2019 09:29:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38434)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <laurent@vivier.eu>) id 1iMXhX-0000YA-Gp
- for qemu-devel@nongnu.org; Mon, 21 Oct 2019 09:26:24 -0400
+ (envelope-from <laurent@vivier.eu>) id 1iMXiY-0001gV-8L
+ for qemu-devel@nongnu.org; Mon, 21 Oct 2019 09:27:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <laurent@vivier.eu>) id 1iMXhS-0003YM-HD
- for qemu-devel@nongnu.org; Mon, 21 Oct 2019 09:26:23 -0400
-Received: from mout.kundenserver.de ([212.227.126.133]:44931)
+ (envelope-from <laurent@vivier.eu>) id 1iMXiX-0003wn-0v
+ for qemu-devel@nongnu.org; Mon, 21 Oct 2019 09:27:26 -0400
+Received: from mout.kundenserver.de ([212.227.126.131]:44257)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1iMXhS-0003Xy-82
- for qemu-devel@nongnu.org; Mon, 21 Oct 2019 09:26:18 -0400
+ (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1iMXiW-0003w7-Nh
+ for qemu-devel@nongnu.org; Mon, 21 Oct 2019 09:27:24 -0400
 Received: from [192.168.100.1] ([78.238.229.36]) by mrelayeu.kundenserver.de
- (mreue011 [213.165.67.103]) with ESMTPSA (Nemesis) id
- 1M2NqA-1iJo8x1VJ0-003usW; Mon, 21 Oct 2019 15:26:13 +0200
-Subject: Re: [PATCH v8 4/9] linux-user/syscall: Introduce target_sockaddr_nl
+ (mreue009 [213.165.67.103]) with ESMTPSA (Nemesis) id
+ 1M597s-1iLRml0kYG-0019UW; Mon, 21 Oct 2019 15:27:19 +0200
+Subject: Re: [PATCH v8 6/9] linux-user/strace: Add print_sockfd()
 To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
  qemu-devel@nongnu.org
 References: <20191021114857.20538-1-f4bug@amsat.org>
- <20191021114857.20538-5-f4bug@amsat.org>
+ <20191021114857.20538-7-f4bug@amsat.org>
 From: Laurent Vivier <laurent@vivier.eu>
 Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  mQINBFYFJhkBEAC2me7w2+RizYOKZM+vZCx69GTewOwqzHrrHSG07MUAxJ6AY29/+HYf6EY2
@@ -83,36 +83,36 @@ Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  OpKgu3nD0ahBDqANU/ZmNNarBJEwvM2vfusmNnWm3QMIwxNuJghRyuFfx694Im1js0ZY3LEU
  JGSHFG4ZynA+ZFUPA6Xf0wHeJOxGKCGIyeKORsteIqgnkINW9fnKJw2pgk8qHkwVc3Vu+wGS
  ZiJK0xFusPQehjWTHn9WjMG1zvQ5TQQHxau/2FkP45+nRPco6vVFQe8JmgtRF8WFJA==
-Message-ID: <511f29d8-b9d7-f6c8-e60d-4bcb4e089ad6@vivier.eu>
-Date: Mon, 21 Oct 2019 15:26:12 +0200
+Message-ID: <92cc1cf5-98ea-51cc-ac1c-535fa1ecadb9@vivier.eu>
+Date: Mon, 21 Oct 2019 15:27:18 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.1.0
 MIME-Version: 1.0
-In-Reply-To: <20191021114857.20538-5-f4bug@amsat.org>
+In-Reply-To: <20191021114857.20538-7-f4bug@amsat.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: fr
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:DUp7b1UZ/pMXYbaRgduBh6dwCM9RL0p/BfseHCj4xwPR7ZB8j8l
- PCI1rEpplW+8MtOFPH29z59a9/lYHfpzyrfg2PVmeDJG+jZxjc7Rrik25r5s0qiDHi3R6RE
- S5PqlZMRdk0Zn8aFeGlsbheKIkfazR9afrOAqqOjRuZeHhdQFyhf/qgj0ykP90Qo5OwGWIN
- sIxtLvENhVRBiFxLR50uQ==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:XgdviKMJ0c0=:uCT7sjYZDMh89fQMhlfKJt
- sEOh8/cmlOKGH2qnIHI3OO6q7n/IY7nJ4dJOlHVX9gLRM6WZnjFOb3KHB3KIKIbo8X/059ske
- /uDWBhRzynx3ObpIuuWfj4L3gGCZh1R3maXuMp51nWgoij6zk9wNTUfvocwZTJgZd5XyEu+gt
- Mq0FmQNryjn/we/7VWIbcA2dcMqXujnmmJhfyFf2UV+QavTXbL5dDVvz4DBu0Hdn6DYOyUtc+
- OntSkwuNMmCd47rqeG0V/6ppZrfvxZC25ClzmlWZ/RlqJIHJoWfnVBFDvqKS18syWRUeym+e3
- kv2eKzYgY++1wLz608BPWVwZ6U4swl1/Rgqzn0kKLukQhEXyCoDjLaDjAraoF4ugYoF1a2Rfi
- npx+h9bmi6ngeT/WEhwoFZ7+kYjrbMeppeKb7TapgI0X+HG6bq6js3CMx4x7c7VYJkhjps/UX
- ddabpppVQc1lmTNg/USSQ2y6yKcP/1OVZWAhLbsF3Uc4bOdKCbihxUStMksCMpglP93aj19GW
- aWWwKpyZ47QsOPOwMblmq8spuolsLfV9Y06KygsPE0rA4iOsycYkyDwt0Q2lyag2QP4qgkf5s
- 2yzZtOJRRuXw5/ud/9KxbabOY+UPxpmMpIkDzcRuIeNKiFSHRBnwJXqAClhLUr6jva2Mt5jJU
- XY6eiUc601pfb+4LmvOZ9hImMoabDayTranquCGa56YSY7OQP/c6Qt7bJ9/Fzstr/Bu1FsXof
- W3jbFLeLasSRUqWKztnbqjh04NtAnQkp5DXbs2uz7f32INFN0qNZy7f82dl6kGZs8yLblM5uC
- 1NxSnsBFRxSioQd5K4I1wAHfFZdUcLxHBZQO8sA+3FN9fd1nZy1VBu8ZLqR9pB3sFcnTikcPp
- Ucft02ctvGnmr6lr15XbG3zm+mgXYrTDXn40x6rXY=
+X-Provags-ID: V03:K1:sDeef4MdxhuBamNDdM4Rfg/2cDDvndpyQ4JOHNknL7YHycXSrI4
+ MCU7N36VntzoiZUFWRwgKET3GGiD5MEoblvCFP/jsyiju0mEdw9tt4nW+WwAXVONwHG6aGX
+ jg+C8x90lpqOIpwehfyE6grxlHvd6flKs08DPEYLBvEN8rtbSPljdo+OBToRRAZkMPQol4G
+ +0jZw7GwR24aGHazH4nnw==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:w46G41wCDWw=:zbfMWUIIxDwCU73klNtPFs
+ 5/Gl73/Tk+3tkbcoBOb9d5CWPylEIKmmVIgcBu4xVAs8PHA6FY6DM85quVKZSXWuDCdMNCQbD
+ 40JoeO0nCDMQYiWqVeSGbvha0N7Q2yiMTW7AGxaKEWSTL1lxM1BHS7c2ztIntYlsUymj8tnav
+ +v8Aa1OienUqEzTJEHdNsA2iXYX7WPgBqnarJ+mJUfWOhQv4LugwY4DxB93K05/KeP+X3Sf+Q
+ I+YMUS3OiYDRJ2YYAs2JWq7q1Hn6eePq3yFBfxcGRnawKLAAzT9aHyihQyLkV2ML4Y7PiouB2
+ dyTcVmJiapoHITRtVCm/liMUOTLO0OBQhu8JDFtOa/OScff7ZuNa8kcWNvKGTrA7BbzpjJnyI
+ zXdTjHmrBzCYDhMQRlB0ddu1DOVKdCWtneo13+/8PelLow1zoQRRsttw4bI1UByKcsJzQssK7
+ S8YF+S7PxIa/BAWsIYzNcOQBIm3DAHLOU73B4vUJihvdRIpL58sWcWbSoGEaMXyXXmrlxLCRF
+ q7VQmTzlRedYeB4LaKiQtUZM2IIL8TfNZKFG6qdfIjFcIVVuXrod/C5GW9EpCe2+zTRFETipA
+ FK5fc4LrRIDDBuwLQZ2GCR0dFJlPo6Nx+XgKXIRSMgCJUKn4kYIaca5z3P+vv/ihZmoqEiQHf
+ 0Bm1oZ3oD/V20vJ4m/L7dLnX5H+pFsiGNCX8Y19uuvvYx5h4njVHCQGFcTpQlGHJ0Hlwc6VOF
+ F9b5Nye6A3otbUDzjghf9I0Pzm3nVqjxTZ2xWLSR6toPX9Mn1b7g5v0rU3B7Y8EFSX3X0YiW/
+ r3vSNayBR0Z6VTEiyxYzxWdrfWqx2M4HW2QAxY43QOuBH0omYSX6GiBjANvVLzs4XYe8SAT2Z
+ Hpk79rG3oa6ybW12OOFJsNcWKWHukmKPk+/2bCwVM=
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 212.227.126.133
+X-Received-From: 212.227.126.131
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -124,58 +124,105 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?Q?Guido_G=c3=bcnther?= <agx@sigxcpu.org>,
- Riku Voipio <riku.voipio@iki.fi>
+Cc: Riku Voipio <riku.voipio@iki.fi>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 Le 21/10/2019 à 13:48, Philippe Mathieu-Daudé a écrit :
-> Tested-By: Guido Günther <agx@sigxcpu.org>
+> Extract common print_sockfd() from various socket related syscalls.
+> 
 > Reviewed-by: Laurent Vivier <laurent@vivier.eu>
 > Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 > ---
-> v7: use abi_ushort and abi_uint to keep alignments good (lvivier)
+> v6: use another ifdef TARGET_NR_socketcall
 > ---
->  linux-user/syscall.c      | 6 ++++--
->  linux-user/syscall_defs.h | 7 +++++++
->  2 files changed, 11 insertions(+), 2 deletions(-)
+>  linux-user/strace.c | 23 ++++++++++++++++-------
+>  1 file changed, 16 insertions(+), 7 deletions(-)
 > 
-> diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-> index e2af3c1494..f1ab81b917 100644
-> --- a/linux-user/syscall.c
-> +++ b/linux-user/syscall.c
-> @@ -1496,8 +1496,10 @@ static inline abi_long host_to_target_sockaddr(abi_ulong target_addr,
->          sizeof(target_saddr->sa_family)) {
->          target_saddr->sa_family = tswap16(addr->sa_family);
->      }
-> -    if (addr->sa_family == AF_NETLINK && len >= sizeof(struct sockaddr_nl)) {
-> -        struct sockaddr_nl *target_nl = (struct sockaddr_nl *)target_saddr;
-> +    if (addr->sa_family == AF_NETLINK &&
-> +        len >= sizeof(struct target_sockaddr_nl)) {
-> +        struct target_sockaddr_nl *target_nl =
-> +               (struct target_sockaddr_nl *)target_saddr;
->          target_nl->nl_pid = tswap32(target_nl->nl_pid);
->          target_nl->nl_groups = tswap32(target_nl->nl_groups);
->      } else if (addr->sa_family == AF_PACKET) {
-> diff --git a/linux-user/syscall_defs.h b/linux-user/syscall_defs.h
-> index fa69c6ab8d..7694d72446 100644
-> --- a/linux-user/syscall_defs.h
-> +++ b/linux-user/syscall_defs.h
-> @@ -153,6 +153,13 @@ struct target_sockaddr_un {
->      uint8_t sun_path[108];
->  };
+> diff --git a/linux-user/strace.c b/linux-user/strace.c
+> index 5fa7748427..0ce2b658a5 100644
+> --- a/linux-user/strace.c
+> +++ b/linux-user/strace.c
+> @@ -1709,6 +1709,15 @@ print_socket(const struct syscallname *name,
 >  
-> +struct target_sockaddr_nl {
-> +    abi_ushort nl_family;   /* AF_NETLINK */
-> +    abi_ushort __pad;
-> +    abi_uint nl_pid;
-> +    abi_uint nl_groups;
-> +};
+>  #if defined(TARGET_NR_socketcall)
+>  
+> +static void print_sockfd(abi_long sockfd, int last)
+> +{
+> +    print_raw_param(TARGET_ABI_FMT_ld, sockfd, last);
+> +}
 > +
->  struct target_in_addr {
->      uint32_t s_addr; /* big endian */
->  };
+> +#endif
+> +
+> +#if defined(TARGET_NR_socketcall)
+> +
+>  #define get_user_ualx(x, gaddr, idx) \
+>          get_user_ual(x, (gaddr) + (idx) * sizeof(abi_long))
+>  
+> @@ -1741,7 +1750,7 @@ static void do_print_sockaddr(const char *name, abi_long arg1)
+>      get_user_ualx(addrlen, arg1, 2);
+>  
+>      gemu_log("%s(", name);
+> -    print_raw_param(TARGET_ABI_FMT_ld, sockfd, 0);
+> +    print_sockfd(sockfd, 0);
+>      print_sockaddr(addr, addrlen);
+>      gemu_log(")");
+>  }
+> @@ -1754,7 +1763,7 @@ static void do_print_listen(const char *name, abi_long arg1)
+>      get_user_ualx(backlog, arg1, 1);
+>  
+>      gemu_log("%s(", name);
+> -    print_raw_param(TARGET_ABI_FMT_ld, sockfd, 0);
+> +    print_sockfd(sockfd, 0);
+>      print_raw_param(TARGET_ABI_FMT_ld, backlog, 1);
+>      gemu_log(")");
+>  }
+> @@ -1789,7 +1798,7 @@ static void do_print_sendrecv(const char *name, abi_long arg1)
+>      get_user_ualx(flags, arg1, 3);
+>  
+>      gemu_log("%s(", name);
+> -    print_raw_param(TARGET_ABI_FMT_ld, sockfd, 0);
+> +    print_sockfd(sockfd, 0);
+>      print_buf(msg, len, 0);
+>      print_raw_param(TARGET_ABI_FMT_ld, len, 0);
+>      print_flags(msg_flags, flags, 1);
+> @@ -1808,7 +1817,7 @@ static void do_print_msgaddr(const char *name, abi_long arg1)
+>      get_user_ualx(addrlen, arg1, 5);
+>  
+>      gemu_log("%s(", name);
+> -    print_raw_param(TARGET_ABI_FMT_ld, sockfd, 0);
+> +    print_sockfd(sockfd, 0);
+>      print_buf(msg, len, 0);
+>      print_raw_param(TARGET_ABI_FMT_ld, len, 0);
+>      print_flags(msg_flags, flags, 0);
+> @@ -1824,7 +1833,7 @@ static void do_print_shutdown(const char *name, abi_long arg1)
+>      get_user_ualx(how, arg1, 1);
+>  
+>      gemu_log("shutdown(");
+> -    print_raw_param(TARGET_ABI_FMT_ld, sockfd, 0);
+> +    print_sockfd(sockfd, 0);
+>      switch (how) {
+>      case SHUT_RD:
+>          gemu_log("SHUT_RD");
+> @@ -1851,7 +1860,7 @@ static void do_print_msg(const char *name, abi_long arg1)
+>      get_user_ualx(flags, arg1, 2);
+>  
+>      gemu_log("%s(", name);
+> -    print_raw_param(TARGET_ABI_FMT_ld, sockfd, 0);
+> +    print_sockfd(sockfd, 0);
+>      print_pointer(msg, 0);
+>      print_flags(msg_flags, flags, 1);
+>      gemu_log(")");
+> @@ -1868,7 +1877,7 @@ static void do_print_sockopt(const char *name, abi_long arg1)
+>      get_user_ualx(optlen, arg1, 4);
+>  
+>      gemu_log("%s(", name);
+> -    print_raw_param(TARGET_ABI_FMT_ld, sockfd, 0);
+> +    print_sockfd(sockfd, 0);
+>      switch (level) {
+>      case SOL_TCP:
+>          gemu_log("SOL_TCP,");
 > 
 
 Applied to my linux-user branch.
