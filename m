@@ -2,125 +2,83 @@ Return-Path: <SRS0=8ZcK=YO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C3BFC47E49
-	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 09:22:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4ECB5CA9EB9
+	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 09:23:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 19DA620B7C
-	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 09:22:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1C3E420684
+	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 09:23:36 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FYABgoGI"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 19DA620B7C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="K0rfojov"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1C3E420684
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36476 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36518 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iMTtO-00020e-BF
-	for qemu-devel@archiver.kernel.org; Mon, 21 Oct 2019 05:22:22 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34561)
+	id 1iMTuZ-0003NZ-8d
+	for qemu-devel@archiver.kernel.org; Mon, 21 Oct 2019 05:23:35 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34769)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <thuth@redhat.com>) id 1iMTsi-0001ar-Rp
- for qemu-devel@nongnu.org; Mon, 21 Oct 2019 05:21:41 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1iMTts-0002oD-DZ
+ for qemu-devel@nongnu.org; Mon, 21 Oct 2019 05:22:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <thuth@redhat.com>) id 1iMTsh-000280-Tx
- for qemu-devel@nongnu.org; Mon, 21 Oct 2019 05:21:40 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:21930
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <thuth@redhat.com>) id 1iMTsh-00027g-Qd
- for qemu-devel@nongnu.org; Mon, 21 Oct 2019 05:21:39 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1571649699;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:openpgp:openpgp:autocrypt:autocrypt;
- bh=WB2VbmEIGtZ0FB7aV2YWvg5z/ukt2prygTFFsPaR5Yw=;
- b=FYABgoGIZCVJtdH2N5lW98mc6kzWFE5FqGmRaAQXfdTFYCe14UZ7gXTj4o+BCbwXjWvVKt
- 5AdyaHjq5mFRMy26ciMMKEHUKtAkDSC7qbpLea0F1tAnfxWxbnYfXAwXh/E2b+HfFUEgdo
- r2CnqMvV+ISNEUeLc3dWheQm0OAk/Lk=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-178-mskdr-9qN6mVwpnVlxqY-A-1; Mon, 21 Oct 2019 05:21:34 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7FF768017CC;
- Mon, 21 Oct 2019 09:21:33 +0000 (UTC)
-Received: from thuth.remote.csb (dhcp-200-228.str.redhat.com [10.33.200.228])
- by smtp.corp.redhat.com (Postfix) with ESMTP id C2B3E6012A;
- Mon, 21 Oct 2019 09:21:24 +0000 (UTC)
-Subject: Re: [PATCH v3 03/16] libqos: extend feature bits to 64-bit
-To: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
-References: <20191019063810.6944-1-stefanha@redhat.com>
- <20191019063810.6944-4-stefanha@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=thuth@redhat.com; prefer-encrypt=mutual; keydata=
- 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
-Organization: Red Hat
-Message-ID: <244bd780-0788-cbdc-4a34-ad3ba25d65b9@redhat.com>
-Date: Mon, 21 Oct 2019 11:21:24 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+ (envelope-from <peter.maydell@linaro.org>) id 1iMTtr-0002fD-32
+ for qemu-devel@nongnu.org; Mon, 21 Oct 2019 05:22:52 -0400
+Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:35606)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1iMTtq-0002ee-Ry
+ for qemu-devel@nongnu.org; Mon, 21 Oct 2019 05:22:51 -0400
+Received: by mail-oi1-x243.google.com with SMTP id x3so10462827oig.2
+ for <qemu-devel@nongnu.org>; Mon, 21 Oct 2019 02:22:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=szG+1UapO55MI4I3VrImIiZ0ELN8Poyvt1pm837MU30=;
+ b=K0rfojov9wjax38D4q2fCYsnLT9GerreAwYJT/m5qYqXIoJFBimByxZeo1JGX7xb74
+ DFOFp8Fn6b+PU7hjJ5K9t8n7NhT1oO49GnGz1x5AnYFJ/RQ3Vjeg5U+INDZrQrmlC/ci
+ DABFass3wwAZTHgm/8s07Y+bwb5F3DypSzjBKVbAcYVTq8OX5qd+1OPqie+cHxFx+vLC
+ c9P6MlXAB0XGCWNebG6pA07vUVi0XUvyd8qQP6cVqbOEp3LCZqR/TfkyOTdFABpO/UA3
+ nD25rP6AUWrSzC3L7o3ImAScrh7HWQ8Ye6ALSMVchdftvF21ouOSHB8E5pjDx0b/33Sk
+ vK6g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=szG+1UapO55MI4I3VrImIiZ0ELN8Poyvt1pm837MU30=;
+ b=kXFRoEZSlLWrG9RhxH2NS7qt/MFjlrl5/gaIWTqHqObR9XP4gze9vkimI5SeJHB1ym
+ Z/s/fQY+vlA78K4pNCnrJZqJbjz5dLIaaR14iCuNms5DSzKdlirxjfb7cAthOZjRyxPw
+ d5xhoxYkwjsc0uqGMf85i4d6JPsFKy0V9tXl5WZCi/XMZJsif1KGz0JZebEL6yMNpCzL
+ h3SCC3U5raSDjYIlfejAM4E1gHVwFVaavnoY0z64q4cr3wcgvnGBjFYThMdcBbMEQ+UP
+ XVtyFONjaMZXCN2oJuwl15aUGbf8arxSrS9PRCxjXgLZibwUE9cxhe4f7cxftg3TE5oX
+ SF9A==
+X-Gm-Message-State: APjAAAUyAMY6eugJFpxXm41DYvozjFCxDi4SIOV3Lqklv4liKTNEbQBl
+ CpOvNWq2FxsK/nChIqPEd0j+ubYrOzENHGoR0OFAiA==
+X-Google-Smtp-Source: APXvYqzZ9nNe8u/ur3gZOkymEs7QjF8bcz8dgBp8gUSCp0BdtUFXXgAQ4mrn3ygvzrhqg8KpPoV76i86d/ZzhbZk75o=
+X-Received: by 2002:aca:49c2:: with SMTP id
+ w185mr18595718oia.163.1571649769769; 
+ Mon, 21 Oct 2019 02:22:49 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20191019063810.6944-4-stefanha@redhat.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-MC-Unique: mskdr-9qN6mVwpnVlxqY-A-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=UTF-8
+References: <20191020225650.3671-1-philmd@redhat.com>
+ <20191020225650.3671-13-philmd@redhat.com>
+In-Reply-To: <20191020225650.3671-13-philmd@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 21 Oct 2019 10:22:39 +0100
+Message-ID: <CAFEAcA8bhP9X-2AaTus9=GtEAqmnNA9me6hv8U=vXYwjQp_CnA@mail.gmail.com>
+Subject: Re: [PATCH 12/21] hw/arm: Let the machine be the owner of the system
+ memory
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 205.139.110.120
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::243
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -132,31 +90,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Laurent Vivier <lvivier@redhat.com>,
- slp@redhat.com, qemu-block@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>
+Cc: Paul Burton <pburton@wavecomp.com>, "Michael S. Tsirkin" <mst@redhat.com>,
+ Leif Lindholm <leif.lindholm@linaro.org>,
+ Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
+ QEMU Developers <qemu-devel@nongnu.org>,
+ KONRAD Frederic <frederic.konrad@adacore.com>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Rob Herring <robh@kernel.org>,
+ Andrey Smirnov <andrew.smirnov@gmail.com>, Helge Deller <deller@gmx.de>,
+ Markus Armbruster <armbru@redhat.com>,
+ =?UTF-8?Q?Herv=C3=A9_Poussineau?= <hpoussin@reactos.org>,
+ Joel Stanley <joel@jms.id.au>, Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
+ Richard Henderson <rth@twiddle.net>, Artyom Tarasenko <atar4qemu@gmail.com>,
+ Antony Pavlov <antonynpavlov@gmail.com>, Eduardo Habkost <ehabkost@redhat.com>,
+ Alistair Francis <alistair@alistair23.me>,
+ Fabien Chouteau <chouteau@adacore.com>,
+ Beniamino Galvani <b.galvani@gmail.com>, qemu-arm <qemu-arm@nongnu.org>,
+ Jan Kiszka <jan.kiszka@web.de>,
+ =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>,
+ Igor Mammedov <imammedo@redhat.com>,
+ David Gibson <david@gibson.dropbear.id.au>,
+ Radoslaw Biernacki <radoslaw.biernacki@linaro.org>,
+ Thomas Huth <huth@tuxfamily.org>,
+ Andrew Baumann <Andrew.Baumann@microsoft.com>,
+ Jean-Christophe Dubois <jcd@tribudubois.net>, Andrew Jeffery <andrew@aj.id.au>,
+ Michael Walle <michael@walle.cc>, qemu-ppc <qemu-ppc@nongnu.org>,
+ Aleksandar Markovic <amarkovic@wavecomp.com>,
+ Peter Chubb <peter.chubb@nicta.com.au>, Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 19/10/2019 08.37, Stefan Hajnoczi wrote:
-> In VIRTIO 1.0 feature bits changed from 32-bit to 64-bit.  (In fact, the
-> transports allow even more feature bits but nothing uses more than 64
-> bits today.)
->=20
-> Add 64-bit feature bit support to virtio-mmio and virtio-pci.  This will
-> be necessary for VIRTIO 1.0 support.
->=20
-> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+On Mon, 21 Oct 2019 at 00:01, Philippe Mathieu-Daud=C3=A9 <philmd@redhat.co=
+m> wrote:
+>
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 > ---
->  tests/libqos/virtio.h      | 12 ++++++------
->  tests/libqos/virtio-mmio.c | 28 ++++++++++++++++++++++------
->  tests/libqos/virtio-net.c  |  6 +++---
->  tests/libqos/virtio-pci.c  | 12 ++++++------
->  tests/libqos/virtio.c      |  4 ++--
->  tests/virtio-blk-test.c    |  8 ++++----
->  6 files changed, 43 insertions(+), 27 deletions(-)
 
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+>  hw/arm/virt.c             | 2 +-
 
+I think from a quick code scan that this is ok, but did
+you test that migration compat from old to new still works?
+I vaguely recall that there are some cases when adding an
+owner to a memory region changes the name string used for
+identifying the ramblock in migration.
+
+thanks
+-- PMM
 
