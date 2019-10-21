@@ -2,126 +2,90 @@ Return-Path: <SRS0=8ZcK=YO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BCB18CA9EB5
-	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 08:29:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1AE99CA9EB5
+	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 08:33:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 885C72064A
-	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 08:29:50 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KXwM/LsV"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 885C72064A
+	by mail.kernel.org (Postfix) with ESMTPS id D2019214AE
+	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 08:33:20 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D2019214AE
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35804 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35830 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iMT4X-0003PD-Nx
-	for qemu-devel@archiver.kernel.org; Mon, 21 Oct 2019 04:29:49 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53929)
+	id 1iMT7w-0004nr-3A
+	for qemu-devel@archiver.kernel.org; Mon, 21 Oct 2019 04:33:20 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54308)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <thuth@redhat.com>) id 1iMT3f-0002Tf-DB
- for qemu-devel@nongnu.org; Mon, 21 Oct 2019 04:28:56 -0400
+ (envelope-from <philmd@redhat.com>) id 1iMT6y-0004Dg-Da
+ for qemu-devel@nongnu.org; Mon, 21 Oct 2019 04:32:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <thuth@redhat.com>) id 1iMT3e-0005dj-C8
- for qemu-devel@nongnu.org; Mon, 21 Oct 2019 04:28:55 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:54947
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <philmd@redhat.com>) id 1iMT6x-0006bj-6g
+ for qemu-devel@nongnu.org; Mon, 21 Oct 2019 04:32:20 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:35106)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <thuth@redhat.com>) id 1iMT3e-0005de-7P
- for qemu-devel@nongnu.org; Mon, 21 Oct 2019 04:28:54 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1571646533;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:openpgp:openpgp:autocrypt:autocrypt;
- bh=mle+4nAU0L2hKdK+993i5M4JDtHZ6xmI+sBsc7svpQo=;
- b=KXwM/LsVPX26I6++oLHUvcpAXs9zJ9Nc3mhWhkvyXwGmN2TWKlQfGZlma/PTh1PWUjqh/t
- VJQ98WIx3zZ2mFlni5tOPcpz3IDFviWzSD/gVwdg1dsRTTJHkRURaF4w754JvAw57t31Qr
- sTT1UCB4t/lWCgP06gnOAhDOHIFH5WY=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-377-5vA1asFtMb61KOyyJvyTDg-1; Mon, 21 Oct 2019 04:28:49 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iMT6w-0006bL-VL
+ for qemu-devel@nongnu.org; Mon, 21 Oct 2019 04:32:19 -0400
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 247B11800DCA;
- Mon, 21 Oct 2019 08:28:48 +0000 (UTC)
-Received: from thuth.remote.csb (dhcp-200-228.str.redhat.com [10.33.200.228])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 79A3810016EB;
- Mon, 21 Oct 2019 08:28:40 +0000 (UTC)
-Subject: Re: [PATCH v5 3/3] tests/vm/netbsd: Disable IPv6
-To: Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org
-References: <20191018181705.17957-1-ehabkost@redhat.com>
- <20191018181705.17957-4-ehabkost@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=thuth@redhat.com; prefer-encrypt=mutual; keydata=
- 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
-Organization: Red Hat
-Message-ID: <4694e904-631a-fd3b-0213-aff06937d19d@redhat.com>
-Date: Mon, 21 Oct 2019 10:28:40 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+ by mx1.redhat.com (Postfix) with ESMTPS id 63C4A81DF1
+ for <qemu-devel@nongnu.org>; Mon, 21 Oct 2019 08:32:17 +0000 (UTC)
+Received: by mail-wr1-f71.google.com with SMTP id c6so6853493wrp.3
+ for <qemu-devel@nongnu.org>; Mon, 21 Oct 2019 01:32:17 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=22+CB66Y9RaGS1ZyijtNkan4x13wL2aw4SDXEvK9Bb8=;
+ b=ktMpk80B5j79o39MABSNDAXXRevgAOQ90U/CiebtN57csz1fDyZABUluOdpmEDhVAC
+ OY1eJDYfE925n2sOv5xBn9PKclsibo/ASG3LQ8bsXBDdRiLeRgoalhMN3F4sT1yykhtA
+ BiiVfH4kT52DZHy5ezzW14jMEFBcu8uKDSRP2b0Yph2EOctY6RI4syjMvzpIEZVmcFMK
+ O/fQZaJH8EGtDfLXzijHU5rK0P+9eLiKJ1dsmxVyd94Q7bOqwGfRRfXuj9L4kPHcVJLI
+ vsQxSaBvPi18VH4YPI+g2c6jFRxfYqHU9jFbHwbNzw3S+2sIO3PIMonkTAjq/XsuQ73a
+ +yFw==
+X-Gm-Message-State: APjAAAWD1GeH8lFX/cOs4bg/22P0e+lTZvCg6BSLXWxjVEv1e0EgUusF
+ tYvtqaMSMngA6HHeQs0Y05huQBNS34wfk0O01WiqzmJqcaBRFoigY50XV8XtWKcuf5yW4MYpmNr
+ FsqCI38jPSeCGotE=
+X-Received: by 2002:a1c:9ecf:: with SMTP id h198mr17766641wme.45.1571646735973; 
+ Mon, 21 Oct 2019 01:32:15 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqxiUgMnKvh05tfMegjr0956v//uObdMr3nrXhSJfSfS7i1kWinKYnb312ScQGxagqQwjl1z3g==
+X-Received: by 2002:a1c:9ecf:: with SMTP id h198mr17766581wme.45.1571646735627; 
+ Mon, 21 Oct 2019 01:32:15 -0700 (PDT)
+Received: from [192.168.1.41] (129.red-83-57-174.dynamicip.rima-tde.net.
+ [83.57.174.129])
+ by smtp.gmail.com with ESMTPSA id u68sm17803100wmu.12.2019.10.21.01.32.12
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Mon, 21 Oct 2019 01:32:15 -0700 (PDT)
+Subject: Re: [PATCH 09/21] hw: Let memory_region_allocate_system_memory take
+ MachineState argument
+To: Thomas Huth <th.huth@posteo.de>, Paolo Bonzini <pbonzini@redhat.com>,
+ Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org,
+ Markus Armbruster <armbru@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
+References: <20191020225650.3671-1-philmd@redhat.com>
+ <20191020225650.3671-10-philmd@redhat.com>
+ <bccd05a8-43e1-e094-3e6c-e7df24cc843f@posteo.de>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <d089a702-a458-eb46-1e66-4eb6abfb2ced@redhat.com>
+Date: Mon, 21 Oct 2019 10:32:11 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.1
 MIME-Version: 1.0
-In-Reply-To: <20191018181705.17957-4-ehabkost@redhat.com>
+In-Reply-To: <bccd05a8-43e1-e094-3e6c-e7df24cc843f@posteo.de>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-MC-Unique: 5vA1asFtMb61KOyyJvyTDg-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.81
+X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -133,43 +97,135 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Peter Maydell <peter.maydell@linaro.org>,
- =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- Kamil Rytarowski <kamil@netbsd.org>, Gerd Hoffmann <kraxel@redhat.com>,
- =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+Cc: Paul Burton <pburton@wavecomp.com>,
+ Peter Maydell <peter.maydell@linaro.org>,
+ "Michael S. Tsirkin" <mst@redhat.com>,
+ Leif Lindholm <leif.lindholm@linaro.org>,
+ Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
+ KONRAD Frederic <frederic.konrad@adacore.com>,
+ "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Rob Herring <robh@kernel.org>,
+ Andrey Smirnov <andrew.smirnov@gmail.com>, Helge Deller <deller@gmx.de>,
+ =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>,
+ Joel Stanley <joel@jms.id.au>, Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
+ Richard Henderson <rth@twiddle.net>, Artyom Tarasenko <atar4qemu@gmail.com>,
+ Antony Pavlov <antonynpavlov@gmail.com>,
+ Alistair Francis <alistair@alistair23.me>,
+ Fabien Chouteau <chouteau@adacore.com>,
+ Beniamino Galvani <b.galvani@gmail.com>, qemu-arm@nongnu.org,
+ Peter Chubb <peter.chubb@nicta.com.au>,
+ =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>,
+ David Gibson <david@gibson.dropbear.id.au>,
+ Radoslaw Biernacki <radoslaw.biernacki@linaro.org>,
+ Thomas Huth <huth@tuxfamily.org>,
+ Andrew Baumann <Andrew.Baumann@microsoft.com>,
+ Jean-Christophe Dubois <jcd@tribudubois.net>, Andrew Jeffery <andrew@aj.id.au>,
+ Michael Walle <michael@walle.cc>, qemu-ppc@nongnu.org,
+ Aleksandar Markovic <amarkovic@wavecomp.com>, Jan Kiszka <jan.kiszka@web.de>,
+ Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 18/10/2019 20.17, Eduardo Habkost wrote:
-> Workaround for issues when the host has no IPv6 connectivity.
+On 10/21/19 9:27 AM, Thomas Huth wrote:
+> On 21/10/2019 00.56, Philippe Mathieu-Daud=C3=A9 wrote:
+>> All the codebase calls memory_region_allocate_system_memory() with
+>> a NULL 'owner' from the board_init() function.
 >=20
-> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-> ---
->  tests/vm/netbsd | 7 +++++++
->  1 file changed, 7 insertions(+)
->=20
-> diff --git a/tests/vm/netbsd b/tests/vm/netbsd
-> index 49a99477f4..5e04dcd9b1 100755
-> --- a/tests/vm/netbsd
-> +++ b/tests/vm/netbsd
-> @@ -62,6 +62,13 @@ class NetBSDVM(basevm.BaseVM):
->      """
->      poweroff =3D "/sbin/poweroff"
-> =20
-> +    # Workaround for NetBSD + IPv6 + slirp issues.
-> +    # NetBSD seems to ignore the ICMPv6 Destination Unreachable
-> +    # messages generated by slirp.  When the host has no IPv6
-> +    # connectivity, this causes every connection to ftp.NetBSD.org
-> +    # take more than a minute to be established.
-> +    ipv6 =3D False
-> +
->      def build_image(self, img):
->          cimg =3D self._download_with_cache(self.link)
->          img_tmp =3D img + ".tmp"
->=20
+> It's a little bit weird that you first changed the owner to NULL in
+> patch 7, just to change the type of the parameter here and then change
+> the parameter back to the machine afterwards. I think I'd rather squash
+> pash 7 (and the follow-up patches like 14) into this one here - it's
+> just four files that need to be adapted, so I think that's still fine,
+> and finally that's less churn to be reviewed.
 
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+I haven't thought of it and like your suggestion :)
 
+>> Let pass a MachineState argument, and enforce the QOM ownership of
+>> the system memory.
+>=20
+> BTW, good idea!
+
+Thanks :)
+
+>=20
+>> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+>> ---
+>>   hw/core/numa.c      | 11 +++++++----
+>>   include/hw/boards.h |  6 ++++--
+>>   2 files changed, 11 insertions(+), 6 deletions(-)
+>>
+>> diff --git a/hw/core/numa.c b/hw/core/numa.c
+>> index 038c96d4ab..2e29e4bfe0 100644
+>> --- a/hw/core/numa.c
+>> +++ b/hw/core/numa.c
+>> @@ -520,21 +520,24 @@ static void allocate_system_memory_nonnuma(Memor=
+yRegion *mr, Object *owner,
+>>       vmstate_register_ram_global(mr);
+>>   }
+>>  =20
+>> -void memory_region_allocate_system_memory(MemoryRegion *mr, Object *o=
+wner,
+>> +void memory_region_allocate_system_memory(MemoryRegion *mr, MachineSt=
+ate *ms,
+>>                                             const char *name,
+>>                                             uint64_t ram_size)
+>>   {
+>>       uint64_t addr =3D 0;
+>>       int i;
+>> -    MachineState *ms =3D MACHINE(qdev_get_machine());
+>> +
+>> +    if (!ms) {
+>> +        ms =3D MACHINE(qdev_get_machine());
+>> +    }
+>>  =20
+>>       if (ms->numa_state =3D=3D NULL ||
+>>           ms->numa_state->num_nodes =3D=3D 0 || !have_memdevs) {
+>> -        allocate_system_memory_nonnuma(mr, owner, name, ram_size);
+>> +        allocate_system_memory_nonnuma(mr, OBJECT(ms), name, ram_size=
+);
+>>           return;
+>>       }
+>>  =20
+>> -    memory_region_init(mr, owner, name, ram_size);
+>> +    memory_region_init(mr, OBJECT(ms), name, ram_size);
+>>       for (i =3D 0; i < ms->numa_state->num_nodes; i++) {
+>>           uint64_t size =3D ms->numa_state->nodes[i].node_mem;
+>>           HostMemoryBackend *backend =3D ms->numa_state->nodes[i].node=
+_memdev;
+>> diff --git a/include/hw/boards.h b/include/hw/boards.h
+>> index de45087f34..3b6cb82b6c 100644
+>> --- a/include/hw/boards.h
+>> +++ b/include/hw/boards.h
+>> @@ -14,7 +14,7 @@
+>>   /**
+>>    * memory_region_allocate_system_memory - Allocate a board's main me=
+mory
+>>    * @mr: the #MemoryRegion to be initialized
+>> - * @owner: the object that tracks the region's reference count
+>> + * @ms: the #MachineState object that own the system memory
+>=20
+> s/own/owns/
+>=20
+>>    * @name: name of the memory region
+>>    * @ram_size: size of the region in bytes
+>>    *
+>> @@ -38,8 +38,10 @@
+>>    * Smaller pieces of memory (display RAM, static RAMs, etc) don't ne=
+ed
+>>    * to be backed via the -mem-path memory backend and can simply
+>>    * be created via memory_region_init_ram().
+>> + *
+>> + * The #MachineState object will track the region's reference count.
+>>    */
+>> -void memory_region_allocate_system_memory(MemoryRegion *mr, Object *o=
+wner,
+>> +void memory_region_allocate_system_memory(MemoryRegion *mr, MachineSt=
+ate *ms,
+>>                                             const char *name,
+>>                                             uint64_t ram_size);
+>>  =20
+>>
+>=20
+>   Thomas
+>=20
 
