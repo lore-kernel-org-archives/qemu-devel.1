@@ -8,77 +8,77 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 51D1ACA9EAF
-	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 23:26:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E873ACA9EAF
+	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 23:27:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1A5D22077C
-	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 23:26:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id AB90820882
+	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 23:27:00 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eiaTSOMq"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1A5D22077C
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZSSKKzPs"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AB90820882
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48722 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48732 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iMh3o-0007hz-8D
-	for qemu-devel@archiver.kernel.org; Mon, 21 Oct 2019 19:26:01 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56012)
+	id 1iMh4l-0000R1-Tt
+	for qemu-devel@archiver.kernel.org; Mon, 21 Oct 2019 19:26:59 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56156)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alistair23@gmail.com>) id 1iMh2M-0006dW-LP
- for qemu-devel@nongnu.org; Mon, 21 Oct 2019 19:24:31 -0400
+ (envelope-from <alistair23@gmail.com>) id 1iMh3Z-0007lE-SL
+ for qemu-devel@nongnu.org; Mon, 21 Oct 2019 19:25:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alistair23@gmail.com>) id 1iMh2L-0000w4-GS
- for qemu-devel@nongnu.org; Mon, 21 Oct 2019 19:24:30 -0400
-Received: from mail-lf1-x142.google.com ([2a00:1450:4864:20::142]:41074)
+ (envelope-from <alistair23@gmail.com>) id 1iMh3Y-0001He-Ph
+ for qemu-devel@nongnu.org; Mon, 21 Oct 2019 19:25:45 -0400
+Received: from mail-lj1-x242.google.com ([2a00:1450:4864:20::242]:42536)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <alistair23@gmail.com>)
- id 1iMh2L-0000vU-8e; Mon, 21 Oct 2019 19:24:29 -0400
-Received: by mail-lf1-x142.google.com with SMTP id x4so5185281lfn.8;
- Mon, 21 Oct 2019 16:24:29 -0700 (PDT)
+ id 1iMh3Y-0001HM-Ij; Mon, 21 Oct 2019 19:25:44 -0400
+Received: by mail-lj1-x242.google.com with SMTP id u4so1003197ljj.9;
+ Mon, 21 Oct 2019 16:25:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
  :cc:content-transfer-encoding;
- bh=CDR0nIHZNYeOYi81Mdnyq5M6nwo5PBTk5UyDeGY7B40=;
- b=eiaTSOMqApMCmJjpUN+Jp97wSj1Bi0nE3hkyrPV73yyKHAprQAiaBU50ywpbAZdE93
- jKSB2T2WQfh8Cn/fljbcmVuCz9PznUBRI1+mNzmZui4O0njGeiCF1g5J1nQgYW0HwzUc
- V+xeGcxh+/Wr91FwRFlf0hOOYhPNbw2cZMJt5GXrvAB9mimmsZouTGooVBfrO5DeBPXn
- Q4yTZkDWBZJAra0AU4+Eq7IsuqPoIHnh2fMrnFnr8s0xdSsy355l1lg7qIdufs/ENYv4
- 1gjzRnLzFKGESTNy+DJDH+9gZBisVMX60i5RwDOmnXrDeR99draiHm5FKNVlGiE73Ucy
- e7jA==
+ bh=GaEgKiOTRPFRJ37OiN1hvkJxw/u1/Kb5MqxlT0C/VMI=;
+ b=ZSSKKzPsxHR5c2WGJH1+TUWql6nPtQkxaideGD7J/Lw5Dl2+Srg+c3xiHuTO70agfY
+ rbcP/Faa55qYgs2+uOoPdf5A+SY7JQNOxYfHv87D97ng8PnldR2qUmQ9/oJ6ym4RukYS
+ P0csxAmOPMSG2Rv561ymDDuTvW6wdst+Gs1x2pT9Lt1y6UDQUOHEegSjYRT0aQEcpRdo
+ isdJcORSw3kg5ms6qCj9A4JCUuFzmE/sqaAi9YH1JCMwWzSUjJrqYc4GpGsUXr5ztHKe
+ uBX3wcGj4VlaqWpnH6lj2qfimH5PCoF0w7eiQB/auJPz9YvroNORqcvzDUoc6ViMcbza
+ xhjg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc:content-transfer-encoding;
- bh=CDR0nIHZNYeOYi81Mdnyq5M6nwo5PBTk5UyDeGY7B40=;
- b=Pf897513UI/RGactI8GUT3Mr+3/zzXkFLV3BcPmOX1XdFLAUEP8km98nm2P6GmDWbw
- C/f+EhWKJNzop8yZuCESXeWbY5vMrLdR2gmEIVEq/+OHYknYzCgexZ5+MIzQczeHkUmA
- lD4BrO+tIhl44NQoHJ1xHER0AI7eHOmUBanbHDeLzmNULlzjGsO3fi75nHO/LXUq+43+
- XXJ/8IVeUpizXz+jVk5Vw7piuhQyVo4UrjnZDemlaiT/dAfKwrXcLvDeJqte9xWHT0Iv
- uEWv2uvWmuknnGpp7o+BqItWA9jlmv/0Rm2Bu2JSYB27ry4GmCDKvhkOnmE+a/mQXtyJ
- 6htw==
-X-Gm-Message-State: APjAAAUUi8BiU0pJjxv15dHsf/DoEG/y2ZhRFISrS5MsmJ4OaK1LaSyD
- w+/pnuPe/0PNzaXkueJbpZy5WMroZZqUl4poCfw=
-X-Google-Smtp-Source: APXvYqxpK7IamAAJ6E7YiI1R4MAqwdNm3l/FV+GjCNBIblki2LePXobaicICLJz65c4w7HR36IRedCnx3ooXImx77QE=
-X-Received: by 2002:ac2:5de9:: with SMTP id z9mr7979973lfq.5.1571700267854;
- Mon, 21 Oct 2019 16:24:27 -0700 (PDT)
+ bh=GaEgKiOTRPFRJ37OiN1hvkJxw/u1/Kb5MqxlT0C/VMI=;
+ b=PN/FDBD2RKsIwo6UltgtS4uN5/1esj8cgL5f/ueJIcRXpIzBgYmQYCBAMT6QPRBnQN
+ 50147cTHxlKoStHIumtqp/2c/sdEGEXkwY/BaIAanVIrK5I7QL/1bQW1js3lB1Gth6NY
+ QxoNiUJwRk+CmrmjNmTfBUCxf7O26yxsbkrC1jQf+yg9SXph0AScc/pO8rKzMudtN6Tn
+ cq/ZzV/WZ7SU61DnxrSPuBu8q8bQSldOSbzHqT1c9D9sjfwla+2JjjtVBx3Jhj1tqk0K
+ KVl35wLzL1IC9a2N4JmjsvOt4PtgLe4Y/bBiW4hYZJI9r4DqR1r4woTIi/xrriZA5v2f
+ MqHQ==
+X-Gm-Message-State: APjAAAW1wZfwFeJK+4qHm1W/wDO1Gd4eEWiPD2q8qQTYdYL+yCNFSEZw
+ Eog53mZJ5bllDdAXX3w8WfX77xKrxBr/IkGPbxQ=
+X-Google-Smtp-Source: APXvYqwUEM+ZxdaiBmSHdpQo/YhTgt7ftRSH7egIuG643Tsxz74DwCtvlIYpwDFBnlDRKW+i0RvCH4Thyb1HM0h3N98=
+X-Received: by 2002:a2e:894b:: with SMTP id b11mr16472078ljk.152.1571700343037; 
+ Mon, 21 Oct 2019 16:25:43 -0700 (PDT)
 MIME-Version: 1.0
 References: <20191020225650.3671-1-philmd@redhat.com>
- <20191020225650.3671-10-philmd@redhat.com>
-In-Reply-To: <20191020225650.3671-10-philmd@redhat.com>
+ <20191020225650.3671-11-philmd@redhat.com>
+In-Reply-To: <20191020225650.3671-11-philmd@redhat.com>
 From: Alistair Francis <alistair23@gmail.com>
-Date: Mon, 21 Oct 2019 16:19:12 -0700
-Message-ID: <CAKmqyKP-XsjkzAkXzs1AK9rfec=SK_gijbd6J4CLwK08DGQYFw@mail.gmail.com>
-Subject: Re: [PATCH 09/21] hw: Let memory_region_allocate_system_memory take
- MachineState argument
+Date: Mon, 21 Oct 2019 16:20:27 -0700
+Message-ID: <CAKmqyKNhMo5jBh=y_F+-M+J+AHp+k=AtYsVMCFZbhfrCR0dqCQ@mail.gmail.com>
+Subject: Re: [PATCH 10/21] hw/core: Let the machine be the owner of the system
+ memory
 To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::142
+X-Received-From: 2a00:1450:4864:20::242
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -121,13 +121,8 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Sun, Oct 20, 2019 at 4:12 PM Philippe Mathieu-Daud=C3=A9
+On Sun, Oct 20, 2019 at 4:07 PM Philippe Mathieu-Daud=C3=A9
 <philmd@redhat.com> wrote:
->
-> All the codebase calls memory_region_allocate_system_memory() with
-> a NULL 'owner' from the board_init() function.
-> Let pass a MachineState argument, and enforce the QOM ownership of
-> the system memory.
 >
 > Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 
@@ -136,73 +131,23 @@ Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 Alistair
 
 > ---
->  hw/core/numa.c      | 11 +++++++----
->  include/hw/boards.h |  6 ++++--
->  2 files changed, 11 insertions(+), 6 deletions(-)
+>  hw/core/null-machine.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 >
-> diff --git a/hw/core/numa.c b/hw/core/numa.c
-> index 038c96d4ab..2e29e4bfe0 100644
-> --- a/hw/core/numa.c
-> +++ b/hw/core/numa.c
-> @@ -520,21 +520,24 @@ static void allocate_system_memory_nonnuma(MemoryRe=
-gion *mr, Object *owner,
->      vmstate_register_ram_global(mr);
->  }
+> diff --git a/hw/core/null-machine.c b/hw/core/null-machine.c
+> index 1aa0a9a01a..16546c8140 100644
+> --- a/hw/core/null-machine.c
+> +++ b/hw/core/null-machine.c
+> @@ -35,7 +35,7 @@ static void machine_none_init(MachineState *mch)
+>      if (mch->ram_size) {
+>          MemoryRegion *ram =3D g_new(MemoryRegion, 1);
 >
-> -void memory_region_allocate_system_memory(MemoryRegion *mr, Object *owne=
-r,
-> +void memory_region_allocate_system_memory(MemoryRegion *mr, MachineState=
- *ms,
->                                            const char *name,
->                                            uint64_t ram_size)
->  {
->      uint64_t addr =3D 0;
->      int i;
-> -    MachineState *ms =3D MACHINE(qdev_get_machine());
-> +
-> +    if (!ms) {
-> +        ms =3D MACHINE(qdev_get_machine());
-> +    }
->
->      if (ms->numa_state =3D=3D NULL ||
->          ms->numa_state->num_nodes =3D=3D 0 || !have_memdevs) {
-> -        allocate_system_memory_nonnuma(mr, owner, name, ram_size);
-> +        allocate_system_memory_nonnuma(mr, OBJECT(ms), name, ram_size);
->          return;
+> -        memory_region_allocate_system_memory(ram, NULL, "ram", mch->ram_=
+size);
+> +        memory_region_allocate_system_memory(ram, mch, "ram", mch->ram_s=
+ize);
+>          memory_region_add_subregion(get_system_memory(), 0, ram);
 >      }
->
-> -    memory_region_init(mr, owner, name, ram_size);
-> +    memory_region_init(mr, OBJECT(ms), name, ram_size);
->      for (i =3D 0; i < ms->numa_state->num_nodes; i++) {
->          uint64_t size =3D ms->numa_state->nodes[i].node_mem;
->          HostMemoryBackend *backend =3D ms->numa_state->nodes[i].node_mem=
-dev;
-> diff --git a/include/hw/boards.h b/include/hw/boards.h
-> index de45087f34..3b6cb82b6c 100644
-> --- a/include/hw/boards.h
-> +++ b/include/hw/boards.h
-> @@ -14,7 +14,7 @@
->  /**
->   * memory_region_allocate_system_memory - Allocate a board's main memory
->   * @mr: the #MemoryRegion to be initialized
-> - * @owner: the object that tracks the region's reference count
-> + * @ms: the #MachineState object that own the system memory
->   * @name: name of the memory region
->   * @ram_size: size of the region in bytes
->   *
-> @@ -38,8 +38,10 @@
->   * Smaller pieces of memory (display RAM, static RAMs, etc) don't need
->   * to be backed via the -mem-path memory backend and can simply
->   * be created via memory_region_init_ram().
-> + *
-> + * The #MachineState object will track the region's reference count.
->   */
-> -void memory_region_allocate_system_memory(MemoryRegion *mr, Object *owne=
-r,
-> +void memory_region_allocate_system_memory(MemoryRegion *mr, MachineState=
- *ms,
->                                            const char *name,
->                                            uint64_t ram_size);
 >
 > --
 > 2.21.0
