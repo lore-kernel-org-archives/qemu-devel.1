@@ -7,76 +7,75 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 135DFCA9EAF
-	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 11:52:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5DDB9CA9EAF
+	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 11:54:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D2242206C2
-	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 11:52:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 277B7206C2
+	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 11:54:10 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WXlnwYB5"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D2242206C2
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dk8w9heP"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 277B7206C2
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38994 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39018 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iMWEX-00006z-Gk
-	for qemu-devel@archiver.kernel.org; Mon, 21 Oct 2019 07:52:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52786)
+	id 1iMWGG-0002Jd-RK
+	for qemu-devel@archiver.kernel.org; Mon, 21 Oct 2019 07:54:08 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52793)
  by lists.gnu.org with esmtp (Exim 4.90_1)
  (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1iMWBb-0005VR-Kh
- for qemu-devel@nongnu.org; Mon, 21 Oct 2019 07:49:21 -0400
+ id 1iMWBb-0005Vf-O7
+ for qemu-devel@nongnu.org; Mon, 21 Oct 2019 07:49:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
  (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1iMWBZ-0003Bv-F6
+ id 1iMWBZ-0003Bx-F9
  for qemu-devel@nongnu.org; Mon, 21 Oct 2019 07:49:19 -0400
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:34580)
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:43419)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1iMWBY-0003Ac-Fk
+ id 1iMWBY-0003AH-H8
  for qemu-devel@nongnu.org; Mon, 21 Oct 2019 07:49:17 -0400
-Received: by mail-wr1-x443.google.com with SMTP id t16so8471560wrr.1
- for <qemu-devel@nongnu.org>; Mon, 21 Oct 2019 04:49:15 -0700 (PDT)
+Received: by mail-wr1-x441.google.com with SMTP id c2so8366713wrr.10
+ for <qemu-devel@nongnu.org>; Mon, 21 Oct 2019 04:49:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=DHS2SKkFIjzeTftKW046CihOKHK4sJ21ouhmUQVVWVk=;
- b=WXlnwYB5TO5sc5oj7MWKLEmf9dMi9e/Pa+hDs/EOgCXlfMCJtLrMO4R0gexqV+E6Vu
- xir/fHW6ERSIja+E6Kh0bHQz4UBS4JY5k5T15OCqP5+ok7LiRFR2wccUoDP5mLQyRjJW
- vao5mjh29l0aE2aAf8kmQGKpXISGvu2knqcuBIjRpQZVS2tyI+fRxJ701BVsi1pmgojh
- TOiYE0lj2B0jBLMuFFGmEO6PZQ8Eba5QLbl+qBo3uyC6/DEH+2EI+HC3fsha999rF4lU
- LWlz6++gNnbxPHI5MBzoF4zSOObkrD8Avk05TsyVmkj2yRBb8DhHGqLwM647/O8WkugU
- QIKw==
+ bh=7PzhWDBr2TcCErcmKtgx3wheeZHdViTC2eISH3wD2UY=;
+ b=dk8w9hePxNkOKwNpLUhu6Towyzx2uLJfblQUVXUARx7NMmTDwkm++HEiRpPdDRzRJI
+ nN3mErDQsO+gYGhWXJ3bkNJf5L+a5HaAWI9BIPcR6tBecuBxm5kcc4XYWKGZhzgxW57M
+ SLL2ohdfoZK8NIC6drmN2jEYv1IK91AxP57Oj1Kt6NZLxe4wFa5v621oyisalKwaXO4A
+ +HVj1f94ydYTS6H/+YLmhAidxB7u1I41TqR8azBS2j0WuKVB8o/lGF9WY4IUT6IeMmZ3
+ YJ8uv9lpde+Wd7V7950dRrUneOwRdrflN4ttFQTB9+csF/kzV4NpjxYw5z3a/w5lP8NZ
+ KMmg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=DHS2SKkFIjzeTftKW046CihOKHK4sJ21ouhmUQVVWVk=;
- b=jMhY05pRW4z4l/rTGgCVDEdZXLSL0KphyWBwTqix+9jlU5CvFF1fqGhv94V+a/S4M9
- lRH15QgZ3A3+Um069XdYWri1dkSfcUf7pl15qUdpnM3leT+roRhQCUveeDtga+0+Y4lV
- ZS/RpDD4DZybCY0j6P1/1+ov+SjP9boM6nLf2Lt7D5SKhx1OFBRJKRqeD16gNLF/q8G9
- rQxvA+A6CKvKT7CUy3HNSlkfx5cHswV2PJRa5qegg4WoukTUBfxWfoIPw1dLG75B/Fds
- 2aROyZzx/jTMAptS72ReehUKgr0EaIvjwJx/VWgogp8dKerrbuj6O1jYUj3Tj/ieKP0V
- dhSw==
-X-Gm-Message-State: APjAAAUQZs4OhCQvhW5keA39tub9nHSDq6V08JoV8FYCpcFhjR5Ua4+a
- so67w0+K1+meLZscOTJqkKbMUBri
-X-Google-Smtp-Source: APXvYqx6rfoIDlDSRqAjNEeojfpztr0NuoFOjQd8tKdCWqpu0bAHuh7pslWOtAD1XhCk+s5lT4xltQ==
-X-Received: by 2002:a5d:4b51:: with SMTP id w17mr2932131wrs.357.1571658553659; 
- Mon, 21 Oct 2019 04:49:13 -0700 (PDT)
+ bh=7PzhWDBr2TcCErcmKtgx3wheeZHdViTC2eISH3wD2UY=;
+ b=QWir43sCpKP80SHOYfA3YWWWvGF7E6W86ZcDyZo4OrUUxljNbbcg1malgbZe3DQBR3
+ KUAe5Daaq3qj7L+/KsNomoE7NAInDd4X+WwwR37TgJgD43KIdmkcR+ycXeca0h1/wQ6h
+ g2hqsa3f9fX93hb8GcDLSC5daAxuF1xGpTRY0YgN+MjQxd8sa2L1fqp3FqPqWExyP6//
+ o1kaZo+RMFy9huLh/sRZg/AAL1tLg9LQz1luRHJZ8lgJFgd9UVULEQKL9Kj8RiQgdEV4
+ 9QRvs77lONzwX/mP5giNaVIwtKsS8p82JiwUMvnBIXmFH+o8COhL6wcucHA8Hy5m13nT
+ cWSQ==
+X-Gm-Message-State: APjAAAXYCAlgBy76+20bGWPwlfUrR4iMo9HqWMEtBZ49s/MfxDAlWaDc
+ uDyaEhFxGIZgLJxVkE8Ag5wWlN/m
+X-Google-Smtp-Source: APXvYqziiHIr8QyYjiYEWS+bR7m1eROI0BOYgDA0cPB70Ywo+HVr8tgMhlvdLGNpJ4z4VvtSARw/Zg==
+X-Received: by 2002:adf:91e1:: with SMTP id 88mr7748134wri.16.1571658551794;
+ Mon, 21 Oct 2019 04:49:11 -0700 (PDT)
 Received: from localhost.localdomain
  (129.red-83-57-174.dynamicip.rima-tde.net. [83.57.174.129])
- by smtp.gmail.com with ESMTPSA id x5sm17156137wrt.75.2019.10.21.04.49.12
+ by smtp.gmail.com with ESMTPSA id x5sm17156137wrt.75.2019.10.21.04.49.10
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 21 Oct 2019 04:49:12 -0700 (PDT)
+ Mon, 21 Oct 2019 04:49:10 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v8 8/9] linux-user/strace: Let print_sockaddr() have a 'last'
- argument
-Date: Mon, 21 Oct 2019 13:48:56 +0200
-Message-Id: <20191021114857.20538-9-f4bug@amsat.org>
+Subject: [PATCH v8 7/9] linux-user/strace: Improve bind() output
+Date: Mon, 21 Oct 2019 13:48:55 +0200
+Message-Id: <20191021114857.20538-8-f4bug@amsat.org>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20191021114857.20538-1-f4bug@amsat.org>
 References: <20191021114857.20538-1-f4bug@amsat.org>
@@ -86,7 +85,7 @@ Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::443
+X-Received-From: 2a00:1450:4864:20::441
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,76 +97,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>,
+Cc: =?UTF-8?q?Guido=20G=C3=BCnther?= <agx@sigxcpu.org>,
+ Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>,
  =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-If the format is not the syscall last argument, a comma is append.
-
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Tested-By: Guido Günther <agx@sigxcpu.org>
 Reviewed-by: Laurent Vivier <laurent@vivier.eu>
+Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
-v8: do not name prototype arguments
-
-checkpatch error:
- ERROR: storage class should be at the beginning of the declaration
- #10: FILE: linux-user/strace.c:70:
- +UNUSED static void print_sockaddr(abi_ulong, abi_long, int);
+v6: use TARGET_NR_socketcall || TARGET_NR_bind (lvivier)
 ---
- linux-user/strace.c | 10 +++++-----
- 1 file changed, 5 insertions(+), 5 deletions(-)
+ linux-user/strace.c    | 15 ++++++++++++++-
+ linux-user/strace.list |  2 +-
+ 2 files changed, 15 insertions(+), 2 deletions(-)
 
 diff --git a/linux-user/strace.c b/linux-user/strace.c
-index cd92c77d33..3d4d684450 100644
+index 0ce2b658a5..cd92c77d33 100644
 --- a/linux-user/strace.c
 +++ b/linux-user/strace.c
-@@ -67,7 +67,7 @@ UNUSED static void print_timeval(abi_ulong, int);
- UNUSED static void print_timezone(abi_ulong, int);
- UNUSED static void print_number(abi_long, int);
- UNUSED static void print_signal(abi_ulong, int);
--UNUSED static void print_sockaddr(abi_ulong addr, abi_long addrlen);
-+UNUSED static void print_sockaddr(abi_ulong, abi_long, int);
- UNUSED static void print_socket_domain(int domain);
- UNUSED static void print_socket_type(int type);
- UNUSED static void print_socket_protocol(int domain, int type, int protocol);
-@@ -336,7 +336,7 @@ static void print_siginfo(const target_siginfo_t *tinfo)
- }
+@@ -1707,7 +1707,7 @@ print_socket(const struct syscallname *name,
  
- static void
--print_sockaddr(abi_ulong addr, abi_long addrlen)
-+print_sockaddr(abi_ulong addr, abi_long addrlen, int last)
+ #endif
+ 
+-#if defined(TARGET_NR_socketcall)
++#if defined(TARGET_NR_socketcall) || defined(TARGET_NR_bind)
+ 
+ static void print_sockfd(abi_long sockfd, int last)
  {
-     struct target_sockaddr *sa;
-     int i;
-@@ -418,7 +418,7 @@ print_sockaddr(abi_ulong addr, abi_long addrlen)
-     } else {
-         print_raw_param("0x"TARGET_ABI_FMT_lx, addr, 0);
-     }
--    gemu_log(", "TARGET_ABI_FMT_ld, addrlen);
-+    gemu_log(", "TARGET_ABI_FMT_ld"%s", addrlen, get_comma(last));
+@@ -2054,6 +2054,19 @@ print_socketcall(const struct syscallname *name,
  }
+ #endif
  
++#if defined(TARGET_NR_bind)
++static void
++print_bind(const struct syscallname *name,
++           abi_long arg0, abi_long arg1, abi_long arg2,
++           abi_long arg3, abi_long arg4, abi_long arg5)
++{
++    print_syscall_prologue(name);
++    print_sockfd(arg0, 0);
++    print_sockaddr(arg1, arg2, 1);
++    print_syscall_epilogue(name);
++}
++#endif
++
+ #if defined(TARGET_NR_stat) || defined(TARGET_NR_stat64) || \
+     defined(TARGET_NR_lstat) || defined(TARGET_NR_lstat64)
  static void
-@@ -1751,7 +1751,7 @@ static void do_print_sockaddr(const char *name, abi_long arg1)
- 
-     gemu_log("%s(", name);
-     print_sockfd(sockfd, 0);
--    print_sockaddr(addr, addrlen);
-+    print_sockaddr(addr, addrlen, 0);
-     gemu_log(")");
- }
- 
-@@ -1821,7 +1821,7 @@ static void do_print_msgaddr(const char *name, abi_long arg1)
-     print_buf(msg, len, 0);
-     print_raw_param(TARGET_ABI_FMT_ld, len, 0);
-     print_flags(msg_flags, flags, 0);
--    print_sockaddr(addr, addrlen);
-+    print_sockaddr(addr, addrlen, 0);
-     gemu_log(")");
- }
- 
+diff --git a/linux-user/strace.list b/linux-user/strace.list
+index 1ff9168369..957aa720af 100644
+--- a/linux-user/strace.list
++++ b/linux-user/strace.list
+@@ -41,7 +41,7 @@
+ { TARGET_NR_bdflush, "bdflush" , NULL, NULL, NULL },
+ #endif
+ #ifdef TARGET_NR_bind
+-{ TARGET_NR_bind, "bind" , NULL, NULL, NULL },
++{ TARGET_NR_bind, "bind" , NULL, print_bind, NULL },
+ #endif
+ #ifdef TARGET_NR_bpf
+ { TARGET_NR_bpf, "bpf" , NULL, NULL, NULL },
 -- 
 2.21.0
 
