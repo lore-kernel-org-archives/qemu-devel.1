@@ -2,85 +2,84 @@ Return-Path: <SRS0=8ZcK=YO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EB0ADCA9EB5
-	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 08:15:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C061CA9EB5
+	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 08:20:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B7C392089C
-	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 08:15:39 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Qiu9RSB0"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B7C392089C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 309E920640
+	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 08:20:48 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 309E920640
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35746 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35758 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iMSqo-0006jv-Uh
-	for qemu-devel@archiver.kernel.org; Mon, 21 Oct 2019 04:15:38 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52376)
+	id 1iMSvn-0008Cf-9k
+	for qemu-devel@archiver.kernel.org; Mon, 21 Oct 2019 04:20:47 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52951)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgilbert@redhat.com>) id 1iMSq7-00069R-GR
- for qemu-devel@nongnu.org; Mon, 21 Oct 2019 04:14:56 -0400
+ (envelope-from <changpeng.liu@intel.com>) id 1iMSv9-0007g1-Ui
+ for qemu-devel@nongnu.org; Mon, 21 Oct 2019 04:20:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgilbert@redhat.com>) id 1iMSq6-0007pN-4A
- for qemu-devel@nongnu.org; Mon, 21 Oct 2019 04:14:55 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:21202
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <changpeng.liu@intel.com>) id 1iMSv8-00015Z-2I
+ for qemu-devel@nongnu.org; Mon, 21 Oct 2019 04:20:07 -0400
+Received: from mga07.intel.com ([134.134.136.100]:3199)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1iMSq5-0007p9-WC
- for qemu-devel@nongnu.org; Mon, 21 Oct 2019 04:14:54 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1571645692;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=OzK/4nctRAaV+syYjU5OYtfFvO5YBSSukT3jt6s2JGk=;
- b=Qiu9RSB0htmRDYhcuHxLndEMekHCXfX7nKRaGRa/CCHZVYWmT0oYCsfMnTSwtegMqxIhqz
- dbYqoNairn6LlKOcnBH2N9zVppsXa+aEzAw7eCRiHhnhoO7z+vInQhDWsPnvSCmE54CQ51
- HQDDENFRqd/7NhIWCs5Ee4nj953Dod0=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-168-IXdYZ8AkNwaj_RtvKMXHMg-1; Mon, 21 Oct 2019 04:14:50 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 094A41800D79;
- Mon, 21 Oct 2019 08:14:49 +0000 (UTC)
-Received: from work-vm (ovpn-117-232.ams2.redhat.com [10.36.117.232])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 866B4196AE;
- Mon, 21 Oct 2019 08:14:47 +0000 (UTC)
-Date: Mon, 21 Oct 2019 09:14:44 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: David Gibson <david@gibson.dropbear.id.au>
-Subject: Re: [PATCH v2 2/2] migration: savevm_state_handler_insert:
- constant-time element insertion
-Message-ID: <20191021081444.GA2934@work-vm>
-References: <20191017205953.13122-1-cheloha@linux.vnet.ibm.com>
- <20191017205953.13122-3-cheloha@linux.vnet.ibm.com>
- <20191018081625.GA2990@work-vm>
- <351dca8e-e77c-c450-845b-d78ba621156a@redhat.com>
- <20191018094352.GC2990@work-vm>
- <20191019101223.GD1960@umbus.fritz.box>
-MIME-Version: 1.0
-In-Reply-To: <20191019101223.GD1960@umbus.fritz.box>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-MC-Unique: IXdYZ8AkNwaj_RtvKMXHMg-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=WINDOWS-1252
+ (Exim 4.71) (envelope-from <changpeng.liu@intel.com>)
+ id 1iMSv7-00014R-QP
+ for qemu-devel@nongnu.org; Mon, 21 Oct 2019 04:20:06 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga001.fm.intel.com ([10.253.24.23])
+ by orsmga105.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
+ 21 Oct 2019 01:20:01 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.67,322,1566889200"; d="scan'208";a="209397386"
+Received: from fmsmsx105.amr.corp.intel.com ([10.18.124.203])
+ by fmsmga001.fm.intel.com with ESMTP; 21 Oct 2019 01:20:01 -0700
+Received: from fmsmsx123.amr.corp.intel.com (10.18.125.38) by
+ FMSMSX105.amr.corp.intel.com (10.18.124.203) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Mon, 21 Oct 2019 01:20:01 -0700
+Received: from shsmsx101.ccr.corp.intel.com (10.239.4.153) by
+ fmsmsx123.amr.corp.intel.com (10.18.125.38) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Mon, 21 Oct 2019 01:20:01 -0700
+Received: from shsmsx103.ccr.corp.intel.com ([169.254.4.165]) by
+ SHSMSX101.ccr.corp.intel.com ([169.254.1.96]) with mapi id 14.03.0439.000;
+ Mon, 21 Oct 2019 16:19:59 +0800
+From: "Liu, Changpeng" <changpeng.liu@intel.com>
+To: Felipe Franciosi <felipe@nutanix.com>, Yongji Xie <elohimes@gmail.com>
+Subject: RE: [PATCH] vhost-user-scsi: implement handle_output
+Thread-Topic: [PATCH] vhost-user-scsi: implement handle_output
+Thread-Index: AQHVhQl71p+KRszYckq7k3pyTpDK5adftgOAgACKQACABD4KgIAAQsUAgAADQWA=
+Date: Mon, 21 Oct 2019 08:19:59 +0000
+Message-ID: <FF7FC980937D6342B9D289F5F3C7C2625B873307@SHSMSX103.ccr.corp.intel.com>
+References: <20191017163859.23184-1-felipe@nutanix.com>
+ <CAONzpcbR+OjcrfavTnFXVopG-YsTdnFCT=no0eFei4oanfmj1Q@mail.gmail.com>
+ <17B5A7A6-F790-4D10-8921-06A83DA18077@nutanix.com>
+ <CAONzpcYDDUde0PLVtGYuwGm79RvU-VubXqDs=4F_8yp+-pz-Zg@mail.gmail.com>
+ <B53729BD-5A55-4D27-88BE-F8ED2A39D41F@nutanix.com>
+In-Reply-To: <B53729BD-5A55-4D27-88BE-F8ED2A39D41F@nutanix.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-titus-metadata-40: eyJDYXRlZ29yeUxhYmVscyI6IiIsIk1ldGFkYXRhIjp7Im5zIjoiaHR0cDpcL1wvd3d3LnRpdHVzLmNvbVwvbnNcL0ludGVsMyIsImlkIjoiYzFjOGYwMmYtMWM3Ny00Y2NiLTllYjQtODdiNzQ5NjQ4NGFjIiwicHJvcHMiOlt7Im4iOiJDVFBDbGFzc2lmaWNhdGlvbiIsInZhbHMiOlt7InZhbHVlIjoiQ1RQX05UIn1dfV19LCJTdWJqZWN0TGFiZWxzIjpbXSwiVE1DVmVyc2lvbiI6IjE3LjEwLjE4MDQuNDkiLCJUcnVzdGVkTGFiZWxIYXNoIjoiUE5VZHR6bzVac1RDdHJURElQd3JQbENEQ1JBNjRrdmF3TUFxaWozQUs1dzJ4SUxWeVl0aVo2akJUWVBiMkZHbCJ9
+x-ctpclassification: CTP_NT
+dlp-product: dlpe-windows
+dlp-version: 11.2.0.6
+dlp-reaction: no-action
+x-originating-ip: [10.239.127.40]
+Content-Type: text/plain; charset="Windows-1252"
 Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 205.139.110.120
+MIME-Version: 1.0
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 134.134.136.100
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -92,87 +91,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>,
- Michael Roth <mdroth@linux.vnet.ibm.com>,
- Scott Cheloha <cheloha@linux.vnet.ibm.com>, qemu-devel@nongnu.org,
- Juan Quintela <quintela@redhat.com>
+Cc: Alex Williamson <alex.williamson@redhat.com>,
+ "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-* David Gibson (david@gibson.dropbear.id.au) wrote:
-> On Fri, Oct 18, 2019 at 10:43:52AM +0100, Dr. David Alan Gilbert wrote:
-> > * Laurent Vivier (lvivier@redhat.com) wrote:
-> > > On 18/10/2019 10:16, Dr. David Alan Gilbert wrote:
-> > > > * Scott Cheloha (cheloha@linux.vnet.ibm.com) wrote:
-> > > >> savevm_state's SaveStateEntry TAILQ is a priority queue.  Priority
-> > > >> sorting is maintained by searching from head to tail for a suitabl=
+There is some logic in vhost_user_blk_handle_output() for now, it's not emp=
+ty as vhost-user-scsi.
+There should be other issue if it can't start from SeaBIOS.
+
+> -----Original Message-----
+> From: Felipe Franciosi [mailto:felipe@nutanix.com]
+> Sent: Monday, October 21, 2019 4:00 PM
+> To: Yongji Xie <elohimes@gmail.com>; Liu, Changpeng
+> <changpeng.liu@intel.com>
+> Cc: Stefan Hajnoczi <stefanha@redhat.com>; Alex Williamson
+> <alex.williamson@redhat.com>; Dr . David Alan Gilbert <dgilbert@redhat.co=
+m>;
+> qemu-devel@nongnu.org
+> Subject: Re: [PATCH] vhost-user-scsi: implement handle_output
+>=20
+>=20
+>=20
+> > On Oct 21, 2019, at 5:01 AM, Yongji Xie <elohimes@gmail.com> wrote:
+> >
+> > On Fri, 18 Oct 2019 at 19:14, Felipe Franciosi <felipe@nutanix.com> wro=
+te:
+> >>
+> >>
+> >>
+> >>> On Oct 18, 2019, at 3:59 AM, Yongji Xie <elohimes@gmail.com> wrote:
+> >>>
+> >>> On Fri, 18 Oct 2019 at 01:17, Felipe Franciosi <felipe@nutanix.com> w=
+rote:
+> >>>>
+> >>>> Originally, vhost-user-scsi did not implement a handle_output callba=
+ck
+> >>>> as that didn't seem necessary. Turns out it is.
+> >>>>
+> >>>> Depending on which other devices are presented to a VM, SeaBIOS may
+> >>>> decide to map vhost-user-scsi devices on the 64-bit range of the add=
+ress
+> >>>> space. As a result, SeaBIOS will kick VQs via the config space. Thos=
 e
-> > > >> insertion spot.  Insertion is thus an O(n) operation.
-> > > >>
-> > > >> If we instead keep track of the head of each priority's subqueue
-> > > >> within that larger queue we can reduce this operation to O(1) time=
-.
-> > > >>
-> > > >> savevm_state_handler_remove() becomes slightly more complex to
-> > > >> accomodate these gains: we need to replace the head of a priority'=
-s
-> > > >> subqueue when removing it.
-> > > >>
-> > > >> With O(1) insertion, booting VMs with many SaveStateEntry objects =
-is
-> > > >> more plausible.  For example, a ppc64 VM with maxmem=3D8T has 4000=
-0 such
-> > > >> objects to insert.
-> > > >=20
-> > > > Separate from reviewing this patch, I'd like to understand why you'=
-ve
-> > > > got 40000 objects.  This feels very very wrong and is likely to cau=
-se
-> > > > problems to random other bits of qemu as well.
-> > >=20
-> > > I think the 40000 objects are the "dr-connectors" that are used to pl=
-ug
-> > > peripherals (memory, pci card, cpus, ...).
-> >=20
-> > Yes, Scott confirmed that in the reply to the previous version.
-> > IMHO nothing in qemu is designed to deal with that many devices/objects
-> > - I'm sure that something other than the migration code is going to
-> > get upset.
+> >>>> land on Qemu (not the vhost backend) and are missed, causing the VM =
+not
+> >>>> to boot. This fixes the issue by getting Qemu to post the notificati=
+on.
+> >>>>
+> >>> Should we fix this in vhost-user-blk too?
+> >>
+> >> I'm not sure vhost-user-blk suffers from the same problem. Certainly
+> >
+> > Actually I found vhost-user-blk has the same problem in a mutilple
+> > GPUs passthough environment.
 >=20
-> It kind of did.  Particularly when there was n^2 and n^3 cubed
-> behaviour in the property stuff we had some ludicrously long startup
-> times (hours) with large maxmem values.
+> Let's Cc Changpeng for comments. I'm not familiar with that code.
 >=20
-> Fwiw, the DRCs for PCI slots, DRCs and PHBs aren't really a problem.
-> The problem is the memory DRCs, there's one for each LMB - each 256MiB
-> chunk of memory (or possible memory).
+> In any case, I still think we should merge this and fix other
+> implementations separately. That allows us to revert patches
+> individually if anything else breaks.
 >=20
-> > Is perhaps the structure wrong somewhere - should there be a single DRC
-> > device that knows about all DRCs?
+> F.
 >=20
-> Maybe.  The tricky bit is how to get there from here without breaking
-> migration or something else along the way.
-
-Switch on the next machine type version - it doesn't matter if migration
-is incompatible then.
-
-Without knowing anything about the innards of DRCs, I suggest a=20
-DRCMulti that takes a parameter and represents 'n' DRCs at consecutive
-chunks of memory.  Then use one DRCMulti for each RAMBlock or DIMM or
-other convenient sized thing.
-
-Dave
-
-> --=20
-> David Gibson=09=09=09| I'll have my music baroque, and my code
-> david AT gibson.dropbear.id.au=09| minimalist, thank you.  NOT _the_ _oth=
-er_
-> =09=09=09=09| _way_ _around_!
-> http://www.ozlabs.org/~dgibson
-
-
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> >
+> > Thanks,
+> > Yongji
 
 
