@@ -6,77 +6,76 @@ X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E420CA9EAF
-	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 13:03:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 951ADCA9EAF
+	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 13:05:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5572C20679
-	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 13:03:19 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5572C20679
+	by mail.kernel.org (Postfix) with ESMTPS id 69AA620679
+	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 13:05:01 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 69AA620679
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40666 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40710 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iMXLC-0004wX-F0
-	for qemu-devel@archiver.kernel.org; Mon, 21 Oct 2019 09:03:18 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:32986)
+	id 1iMXMq-0006hZ-Iz
+	for qemu-devel@archiver.kernel.org; Mon, 21 Oct 2019 09:05:00 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33390)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1iMXI2-0002tG-HU
- for qemu-devel@nongnu.org; Mon, 21 Oct 2019 09:00:03 -0400
+ (envelope-from <philmd@redhat.com>) id 1iMXLU-0005gt-R7
+ for qemu-devel@nongnu.org; Mon, 21 Oct 2019 09:03:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1iMXHy-0007KE-Rj
- for qemu-devel@nongnu.org; Mon, 21 Oct 2019 09:00:01 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:49766)
+ (envelope-from <philmd@redhat.com>) id 1iMXLS-0000G4-Hf
+ for qemu-devel@nongnu.org; Mon, 21 Oct 2019 09:03:36 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:56968)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iMXHy-0007Js-JX
- for qemu-devel@nongnu.org; Mon, 21 Oct 2019 08:59:58 -0400
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69])
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iMXLS-0000FQ-96
+ for qemu-devel@nongnu.org; Mon, 21 Oct 2019 09:03:34 -0400
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72])
  (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 93896C04AC69
- for <qemu-devel@nongnu.org>; Mon, 21 Oct 2019 12:59:57 +0000 (UTC)
-Received: by mail-wr1-f69.google.com with SMTP id 7so7306605wrl.2
- for <qemu-devel@nongnu.org>; Mon, 21 Oct 2019 05:59:57 -0700 (PDT)
+ by mx1.redhat.com (Postfix) with ESMTPS id 42BCC51EE4
+ for <qemu-devel@nongnu.org>; Mon, 21 Oct 2019 13:03:33 +0000 (UTC)
+Received: by mail-wr1-f72.google.com with SMTP id r8so24319wrx.8
+ for <qemu-devel@nongnu.org>; Mon, 21 Oct 2019 06:03:33 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:message-id:date
  :user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=VLObdgGCBHKd4NyKqw1nb9Ft4ivPz1Wm47y/KgC4Yfo=;
- b=ct5p9TfHM27CzGVpjE1USaOpUlfECsJYpeOLsPUBLPSh685AxC6RnaLcopRviCC8H0
- 6AIFiS2KYOtNVxC4/qsCxGleCd+JVn6DOZCXHrrVzfAEr2qmD/W+IoR1GJyLg+n2OD+v
- ftzKb9mxp8o+g3yy600ZJ3i3ZxYtibKad+d1eVaSSo5xYF5TKC24tWwAkFq9v4BRff7X
- SK4yiKgq+JVca0nGpWbzFVijardaVS9IBalBAF5x/PBKtoqXWqrUipToUftDzGi5oXZ9
- KnkTQHq7qc6O+wyjxOL8o6Ii7aAjSU113L0qs8J1MfjDBrhrXztU80pUnQvgk8b8HTdU
- huTQ==
-X-Gm-Message-State: APjAAAWiqNOyyTFOuC0sIbfrJ47cYnxzxKcGxJ81D2oqwp4PITFzxVkt
- 5pKbSTA4MzATR52iUhQNjnQGOVM6X1BEHGbZn1BUBKSMaobsrWOMmJc1IX0s9e9F56Ksb8QEL10
- upp9IOaNAYaAcdMo=
-X-Received: by 2002:a5d:4644:: with SMTP id j4mr20193605wrs.355.1571662796354; 
- Mon, 21 Oct 2019 05:59:56 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqy9a4mBGzc4Atj27HBMDjG+ZXbuXSzITmVipWUvlu1WEC85D5/kswe/8fIndQB2FRYUdSQ8KA==
-X-Received: by 2002:a5d:4644:: with SMTP id j4mr20193582wrs.355.1571662796132; 
- Mon, 21 Oct 2019 05:59:56 -0700 (PDT)
+ bh=oCfX4ZbLl/VpPe3SOuBn44okEfk1S7DeI/N6cBUnuT4=;
+ b=dGc+4EKwufNYh/+FpOxz6fNnLwaQBi6ixRa/FpVCIwowXpo2QGbxKzCjs0ZL9cEqiu
+ oD5b/jRvLPN3xqwZT/4O09b9JDjyaGwiu7e9Oh0apk9v+GFhOpfKC9CU3NyZyJ1vYczF
+ GAMrtGOrzbReCibe2xabs/3VzSyHCirtdWi+KUu2C1Tc5PLPXfG34S46goHr+Q5ukmZd
+ Vma7qz04PJZ5meCD+7gnMajjTI4Lg6u73vuLlRzPdBAhPXQ2mbt/cT9P7inQ6yeCOfGM
+ fN790VB3ObHVIWjZY4VgxiwpXMjtXn0o9p+oEmOTLf3LfygR4ce5YubBnwvLLRG72rZW
+ 9Uxw==
+X-Gm-Message-State: APjAAAW0Lip32xPjkJ2TnMfWA/uy4ZXE8lHSn1kFvDHE5canR6p74J9+
+ 1qlFdCMoXNl2LqlrJqq/p2ZbCzAFL8L1WeIbA4PR8SCFTxQAHel+1LHVx3nRoFXnnmhMGmTeaje
+ mXBq3TS0lLhvhNNQ=
+X-Received: by 2002:a1c:a546:: with SMTP id o67mr19378845wme.57.1571663011767; 
+ Mon, 21 Oct 2019 06:03:31 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqyB6OBiHsdkX7JE/2z2kgjIcjJzFoMlZwG/SwlCfthWkeGk8FXRIfN70z2c0bOa7ChQBAglpg==
+X-Received: by 2002:a1c:a546:: with SMTP id o67mr19378824wme.57.1571663011533; 
+ Mon, 21 Oct 2019 06:03:31 -0700 (PDT)
 Received: from [192.168.1.41] (129.red-83-57-174.dynamicip.rima-tde.net.
  [83.57.174.129])
- by smtp.gmail.com with ESMTPSA id j19sm28075358wre.0.2019.10.21.05.59.54
+ by smtp.gmail.com with ESMTPSA id h18sm13539835wrr.78.2019.10.21.06.03.30
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Mon, 21 Oct 2019 05:59:54 -0700 (PDT)
-Subject: Re: [PATCH v3 11/16] libqos: pass full QVirtQueue to
- set_queue_address()
+ Mon, 21 Oct 2019 06:03:30 -0700 (PDT)
+Subject: Re: [PATCH v3 15/16] libqos: extract Legacy virtio-pci.c code
 To: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
 References: <20191019063810.6944-1-stefanha@redhat.com>
- <20191019063810.6944-12-stefanha@redhat.com>
+ <20191019063810.6944-16-stefanha@redhat.com>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <0c13b978-9998-cba4-dffb-b76795553398@redhat.com>
-Date: Mon, 21 Oct 2019 14:59:53 +0200
+Message-ID: <d1969941-bb1f-b34e-d86e-ecaf811df377@redhat.com>
+Date: Mon, 21 Oct 2019 15:03:29 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.1.1
 MIME-Version: 1.0
-In-Reply-To: <20191019063810.6944-12-stefanha@redhat.com>
+In-Reply-To: <20191019063810.6944-16-stefanha@redhat.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
@@ -101,101 +100,111 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+
 On 10/19/19 8:38 AM, Stefan Hajnoczi wrote:
-> Instead of just passing the vring page frame number, pass the full
-> QVirtQueue.  This will allow the VIRTIO 1.0 transport to program the
-> fine-grained vring address registers in the future.
+> The current libqos virtio-pci.c code implements the VIRTIO Legacy
+> interface.  Extract existing code in preparation for VIRTIO 1.0 support=
+.
 >=20
 > Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
 > Reviewed-by: Sergio Lopez <slp@redhat.com>
 > Reviewed-by: Thomas Huth <thuth@redhat.com>
-
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-
 > ---
->   tests/libqos/virtio.h      | 2 +-
->   tests/libqos/virtio-mmio.c | 6 ++++--
->   tests/libqos/virtio-pci.c  | 6 ++++--
->   3 files changed, 9 insertions(+), 5 deletions(-)
+>   tests/libqos/virtio-pci.h |  2 --
+>   tests/libqos/virtio-pci.c | 29 ++++++++++++-----------------
+>   2 files changed, 12 insertions(+), 19 deletions(-)
 >=20
-> diff --git a/tests/libqos/virtio.h b/tests/libqos/virtio.h
-> index 5777683a2a..407d8fc088 100644
-> --- a/tests/libqos/virtio.h
-> +++ b/tests/libqos/virtio.h
-> @@ -80,7 +80,7 @@ struct QVirtioBus {
->       uint16_t (*get_queue_size)(QVirtioDevice *d);
+> diff --git a/tests/libqos/virtio-pci.h b/tests/libqos/virtio-pci.h
+> index 78a1c15c2a..6b3a385b06 100644
+> --- a/tests/libqos/virtio-pci.h
+> +++ b/tests/libqos/virtio-pci.h
+> @@ -45,8 +45,6 @@ typedef struct QVirtQueuePCI {
+>       uint32_t msix_data;
+>   } QVirtQueuePCI;
 >  =20
->       /* Set the address of the selected queue */
-> -    void (*set_queue_address)(QVirtioDevice *d, uint32_t pfn);
-> +    void (*set_queue_address)(QVirtioDevice *d, QVirtQueue *vq);
+> -extern const QVirtioBus qvirtio_pci;
+> -
+>   void virtio_pci_init(QVirtioPCIDevice *dev, QPCIBus *bus, QPCIAddress=
+ * addr);
+>   QVirtioPCIDevice *virtio_pci_new(QPCIBus *bus, QPCIAddress * addr);
 >  =20
->       /* Setup the virtqueue specified by index */
->       QVirtQueue *(*virtqueue_setup)(QVirtioDevice *d, QGuestAllocator =
-*alloc,
-> diff --git a/tests/libqos/virtio-mmio.c b/tests/libqos/virtio-mmio.c
-> index 4db1f1b8bc..e0a2bd7bc6 100644
-> --- a/tests/libqos/virtio-mmio.c
-> +++ b/tests/libqos/virtio-mmio.c
-> @@ -143,9 +143,11 @@ static uint16_t qvirtio_mmio_get_queue_size(QVirti=
-oDevice *d)
->       return (uint16_t)qtest_readl(dev->qts, dev->addr + QVIRTIO_MMIO_Q=
-UEUE_NUM_MAX);
->   }
->  =20
-> -static void qvirtio_mmio_set_queue_address(QVirtioDevice *d, uint32_t =
-pfn)
-> +static void qvirtio_mmio_set_queue_address(QVirtioDevice *d, QVirtQueu=
-e *vq)
->   {
->       QVirtioMMIODevice *dev =3D container_of(d, QVirtioMMIODevice, vde=
-v);
-> +    uint64_t pfn =3D vq->desc / dev->page_size;
-> +
->       qtest_writel(dev->qts, dev->addr + QVIRTIO_MMIO_QUEUE_PFN, pfn);
->   }
->  =20
-> @@ -179,7 +181,7 @@ static QVirtQueue *qvirtio_mmio_virtqueue_setup(QVi=
-rtioDevice *d,
->  =20
->       addr =3D guest_alloc(alloc, qvring_size(vq->size, dev->page_size)=
-);
->       qvring_init(dev->qts, alloc, vq, addr);
-> -    qvirtio_mmio_set_queue_address(d, vq->desc / dev->page_size);
-> +    qvirtio_mmio_set_queue_address(d, vq);
->  =20
->       return vq;
->   }
 > diff --git a/tests/libqos/virtio-pci.c b/tests/libqos/virtio-pci.c
-> index 7ecf5d0a52..e4fa318dcc 100644
+> index e9595603f5..11866f7772 100644
 > --- a/tests/libqos/virtio-pci.c
 > +++ b/tests/libqos/virtio-pci.c
-> @@ -199,9 +199,11 @@ static uint16_t qvirtio_pci_get_queue_size(QVirtio=
-Device *d)
->       return qpci_io_readw(dev->pdev, dev->bar, VIRTIO_PCI_QUEUE_NUM);
+> @@ -35,14 +35,6 @@
+>    * original qvirtio_pci_destructor and qvirtio_pci_start_hw.
+>    */
+>  =20
+> -static inline bool qvirtio_pci_is_big_endian(QVirtioPCIDevice *dev)
+> -{
+> -    QPCIBus *bus =3D dev->pdev->bus;
+> -
+> -    /* FIXME: virtio 1.0 is always little-endian */
+> -    return qtest_big_endian(bus->qts);
+> -}
+> -
+>   #define CONFIG_BASE(dev) (VIRTIO_PCI_CONFIG_OFF((dev)->pdev->msix_ena=
+bled))
+>  =20
+>   static uint8_t qvirtio_pci_config_readb(QVirtioDevice *d, uint64_t of=
+f)
+> @@ -55,8 +47,7 @@ static uint8_t qvirtio_pci_config_readb(QVirtioDevice=
+ *d, uint64_t off)
+>    * but virtio ( < 1.0) is in guest order
+>    * so with a big-endian guest the order has been reversed,
+>    * reverse it again
+> - * virtio-1.0 is always little-endian, like PCI, but this
+> - * case will be managed inside qvirtio_pci_is_big_endian()
+> + * virtio-1.0 is always little-endian, like PCI
+>    */
+>  =20
+>   static uint16_t qvirtio_pci_config_readw(QVirtioDevice *d, uint64_t o=
+ff)
+> @@ -262,7 +253,7 @@ static void qvirtio_pci_virtqueue_kick(QVirtioDevic=
+e *d, QVirtQueue *vq)
+>       qpci_io_writew(dev->pdev, dev->bar, VIRTIO_PCI_QUEUE_NOTIFY, vq->=
+index);
 >   }
 >  =20
-> -static void qvirtio_pci_set_queue_address(QVirtioDevice *d, uint32_t p=
-fn)
-> +static void qvirtio_pci_set_queue_address(QVirtioDevice *d, QVirtQueue=
- *vq)
->   {
->       QVirtioPCIDevice *dev =3D container_of(d, QVirtioPCIDevice, vdev)=
-;
-> +    uint64_t pfn =3D vq->desc / VIRTIO_PCI_VRING_ALIGN;
+> -const QVirtioBus qvirtio_pci =3D {
+> +static const QVirtioBus qvirtio_pci_legacy =3D {
+>       .config_readb =3D qvirtio_pci_config_readb,
+>       .config_readw =3D qvirtio_pci_config_readw,
+>       .config_readl =3D qvirtio_pci_config_readl,
+> @@ -396,17 +387,21 @@ void qvirtio_pci_start_hw(QOSGraphObject *obj)
+>       qvirtio_start_device(&dev->vdev);
+>   }
+>  =20
+> +static void qvirtio_pci_init_legacy(QVirtioPCIDevice *dev)
+> +{
+> +    dev->vdev.device_type =3D qpci_config_readw(dev->pdev, PCI_SUBSYST=
+EM_ID);
+> +    dev->bar_idx =3D 0;
+> +    dev->vdev.bus =3D &qvirtio_pci_legacy;
+> +    dev->msix_ops =3D &qvirtio_pci_msix_ops_legacy;
+> +    dev->vdev.big_endian =3D qtest_big_endian(dev->pdev->bus->qts);
+> +}
 > +
->       qpci_io_writel(dev->pdev, dev->bar, VIRTIO_PCI_QUEUE_PFN, pfn);
->   }
+>   static void qvirtio_pci_init_from_pcidev(QVirtioPCIDevice *dev, QPCID=
+evice *pci_dev)
+>   {
+>       dev->pdev =3D pci_dev;
+> -    dev->vdev.device_type =3D qpci_config_readw(pci_dev, PCI_SUBSYSTEM=
+_ID);
+> -    dev->bar_idx =3D 0;
+> -
+>       dev->config_msix_entry =3D -1;
+> -    dev->msix_ops =3D &qvirtio_pci_msix_ops_legacy;
 >  =20
-> @@ -239,7 +241,7 @@ static QVirtQueue *qvirtio_pci_virtqueue_setup(QVir=
-tioDevice *d,
->       addr =3D guest_alloc(alloc, qvring_size(vqpci->vq.size,
->                                             VIRTIO_PCI_VRING_ALIGN));
->       qvring_init(qvpcidev->pdev->bus->qts, alloc, &vqpci->vq, addr);
-> -    qvirtio_pci_set_queue_address(d, vqpci->vq.desc / VIRTIO_PCI_VRING=
-_ALIGN);
-> +    qvirtio_pci_set_queue_address(d, &vqpci->vq);
+> -    dev->vdev.bus =3D &qvirtio_pci;
+> -    dev->vdev.big_endian =3D qvirtio_pci_is_big_endian(dev);
+> +    qvirtio_pci_init_legacy(dev);
 >  =20
->       return &vqpci->vq;
->   }
+>       /* each virtio-xxx-pci device should override at least this funct=
+ion */
+>       dev->obj.get_driver =3D NULL;
 >=20
+
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 
