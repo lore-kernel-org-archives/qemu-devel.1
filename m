@@ -5,81 +5,80 @@ X-Spam-Level:
 X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D2F5CA9EAF
-	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 22:40:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 25ED2CA9EAF
+	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 22:41:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 287A72089C
-	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 22:40:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D167920882
+	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 22:41:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="qchYu9mh"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 287A72089C
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ABwcW+KM"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D167920882
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48524 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48544 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iMgLZ-0004ja-OH
-	for qemu-devel@archiver.kernel.org; Mon, 21 Oct 2019 18:40:17 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51941)
+	id 1iMgMy-0006hd-19
+	for qemu-devel@archiver.kernel.org; Mon, 21 Oct 2019 18:41:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51880)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mrolnik@gmail.com>) id 1iMgJE-0001l6-FM
- for qemu-devel@nongnu.org; Mon, 21 Oct 2019 18:37:53 -0400
+ (envelope-from <mrolnik@gmail.com>) id 1iMgJ4-0001X7-V6
+ for qemu-devel@nongnu.org; Mon, 21 Oct 2019 18:37:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mrolnik@gmail.com>) id 1iMgJD-00010o-2O
- for qemu-devel@nongnu.org; Mon, 21 Oct 2019 18:37:52 -0400
-Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:45191)
+ (envelope-from <mrolnik@gmail.com>) id 1iMgJ2-0000xy-Nb
+ for qemu-devel@nongnu.org; Mon, 21 Oct 2019 18:37:42 -0400
+Received: from mail-wr1-x42f.google.com ([2a00:1450:4864:20::42f]:39303)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <mrolnik@gmail.com>) id 1iMgJC-00010e-PJ
- for qemu-devel@nongnu.org; Mon, 21 Oct 2019 18:37:50 -0400
-Received: by mail-wr1-x441.google.com with SMTP id q13so10761044wrs.12
- for <qemu-devel@nongnu.org>; Mon, 21 Oct 2019 15:37:50 -0700 (PDT)
+ (Exim 4.71) (envelope-from <mrolnik@gmail.com>) id 1iMgJ2-0000xn-GY
+ for qemu-devel@nongnu.org; Mon, 21 Oct 2019 18:37:40 -0400
+Received: by mail-wr1-x42f.google.com with SMTP id c6so3531631wrm.6
+ for <qemu-devel@nongnu.org>; Mon, 21 Oct 2019 15:37:40 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=BGvkLFU66e7VXKZNz1ZYyyXcitOZp+YBucUP/E/zH5s=;
- b=qchYu9mhAwdsaLK5ICZRfxnLwH8pcbX+ayXs+7jprEYlsWf1LLoptrIbHMnD0H5RRH
- zUhHsYf5f3/5h8PbLtH1HJeqz59WufzBLGnXizrJqSnH85vS0WzRWRsok6Wl9SKnyeMY
- O6RerpeKtiECGyQ/BBpvyFKAKsuQN3+31ZkIKA265yFE4Ry9V17RGsDkm2qn/TkQEGhl
- zzThETMuPXuNFZaiBdX4GQErrHRcmxIZZmV7gLwxUZKuP28PM+JzNDkPpPfrP9AxkHUc
- e6TGEnv0Xef3Mcz1JYwQia+RHiWZpd2zSCkZFAJmweN7wkL5o9ykfoG3Rv8qDov0lWb+
- zisw==
+ bh=Wrb/eh//pKqC5sqQg+JmF7gLP8TvTzApdrnvwmESS9w=;
+ b=ABwcW+KMU2nT8/mlKWDjkD5s407n7XhLnFVsYS7wm6NFekXiTIuT4Pu87FltJY0iP1
+ ooo/tHGQtALDsxLrJfHaV0XxfOnAP7w4T+JfkkaYSw8rFPHACO97xuXUzzz2R1+M/FXr
+ 9GipzwXlW3DMQ0qhJZ4oGCBqHPT0nzSprySCZAMLKAhE3nVJZBAUBqb1lquVxJ3mAvlR
+ SHSgFFzc/2jZEk+NZtA/mNdxNJKZr3+XT0fh+9fkUetp2j9BD+5KZ4PsiFc/QoVYSML5
+ ZzJwgYga0a+rhME75yNQHhsyhYU0IKZk8uixfw3C2SS5bN1DQE0TuvsxcDK3j36uWnQA
+ 0yGw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references;
- bh=BGvkLFU66e7VXKZNz1ZYyyXcitOZp+YBucUP/E/zH5s=;
- b=d49jrcQ2kWXJYFK03nVYbj4SSYQ4qqFLPZMWxW0fcvGbc9lUTdVBmEykpBcXPkFHvJ
- w1Q5lmjHWQJKpY+kz2bVgmiAMTeR2UHcIO3JhN+i1RYq3iT3xTlt2zfrHUK6ycXsEYOB
- C81hL++vYK9TH1VeMF5dH1RmVu4e+eYkUzVImdVAb0Urdtydv5GCbND6K8g4xF94FG1f
- 66rkI2fOWjPeyxG3MrsxR6SAj68azVJ1d8mNApQqbX6B2BwSbxak2KkPPtDaxtFp0F9U
- 7AlM1eyT7C7t39TjCUPt0tzVXrzlxZBQ+vmkqFZqO0ab2hIn7Zk+CbuVuqiLrHDxR4CA
- nDVg==
-X-Gm-Message-State: APjAAAVawSZ4EYJcOtPZrmDcONuZ7RuuHxeH3OH7taGrh19S/xAKZpuq
- iJ6Y1XCh/tQd3CzVlJF2O1KQ4PvAwQhvPQ==
-X-Google-Smtp-Source: APXvYqzyGDOpVaJhvxrtAVgPUPCmGpqywZUnKOyC3uqdn3Wna6XWSDYwNbdR8HI3oqcpQpVpN9PUrw==
-X-Received: by 2002:a5d:4b42:: with SMTP id w2mr449115wrs.360.1571697469318;
- Mon, 21 Oct 2019 15:37:49 -0700 (PDT)
+ bh=Wrb/eh//pKqC5sqQg+JmF7gLP8TvTzApdrnvwmESS9w=;
+ b=tbCZ6wWwZHPeMZ5aC4gXbH5XcD6gRsuBg1usyQ8OP9wglJkhs91XCfyK1B8e1oJry7
+ 8SKpHE6FmMaDbb2W8G/tsLXrUC5Dw7zP5xFGpmEyUVRs79dXWkQjQ6eERZnBG+l3ef7R
+ w/5ajXombsYDk8orsxAJ+58LaWQsiwzemACiWOZR4kL5A+z2P1DU9Ba2RomRe8o3K+Nz
+ NrcbgE+0kHkV556uDXIfgz5KMRiRxv1cdqRBkfUHu6dm88Za/DawYyCJuw8ffL1GrOks
+ Ru7FVj4ycDO+tnGCM4NKrtW4b+HbTspcStW4h5lQm9Jyj2g8ZFAG6kb3zotN63w0RpdF
+ YLUA==
+X-Gm-Message-State: APjAAAVlSGtpMsDEg3yJdxfDbE79I/Cg3eh6x28iQLD3r6D+vdAiNkUD
+ PrhnVWiiscOOjYHIP1n2YMsWNfud8kC8Sg==
+X-Google-Smtp-Source: APXvYqyP/mLqDyzhkcFyo4OD3+yRMSYYknDGP4UndDjziNieY/vxIMr2OKhUw1Hyhs268Rctehzgaw==
+X-Received: by 2002:a5d:4382:: with SMTP id i2mr447098wrq.387.1571697458910;
+ Mon, 21 Oct 2019 15:37:38 -0700 (PDT)
 Received: from 8c859074c0ff.ant.amazon.com.com
  (bzq-109-65-50-254.red.bezeqint.net. [109.65.50.254])
- by smtp.gmail.com with ESMTPSA id q66sm16951271wme.39.2019.10.21.15.37.47
+ by smtp.gmail.com with ESMTPSA id q66sm16951271wme.39.2019.10.21.15.37.37
  (version=TLS1_2 cipher=ECDHE-RSA-AES128-SHA bits=128/128);
- Mon, 21 Oct 2019 15:37:48 -0700 (PDT)
+ Mon, 21 Oct 2019 15:37:38 -0700 (PDT)
 From: Michael Rolnik <mrolnik@gmail.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v33 08/13] target/avr: Add instruction translation - MCU
- Control Instructions
-Date: Tue, 22 Oct 2019 01:37:06 +0300
-Message-Id: <20191021223711.66955-9-mrolnik@gmail.com>
+Subject: [PATCH v33 02/13] target/avr: Add instruction helpers
+Date: Tue, 22 Oct 2019 01:37:00 +0300
+Message-Id: <20191021223711.66955-3-mrolnik@gmail.com>
 X-Mailer: git-send-email 2.17.2 (Apple Git-113)
 In-Reply-To: <20191021223711.66955-1-mrolnik@gmail.com>
 References: <20191021223711.66955-1-mrolnik@gmail.com>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::441
+X-Received-From: 2a00:1450:4864:20::42f
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,206 +97,414 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This includes:
-    - BREAK
-    - NOP
-    - SLEEP
-    - WDR
+Stubs for unimplemented instructions and helpers for instructions that need to interact with QEMU.
+SPM and WDR are unimplemented because they require emulation of complex peripherals.
+The implementation of SLEEP is very limited due to the lack of peripherals to generate wake interrupts.
+Memory access instructions are implemented here because some address ranges actually refer to CPU registers.
 
 Signed-off-by: Michael Rolnik <mrolnik@gmail.com>
 ---
- target/avr/translate.c | 174 +++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 174 insertions(+)
+ target/avr/helper.c | 354 ++++++++++++++++++++++++++++++++++++++++++++
+ target/avr/helper.h |  29 ++++
+ 2 files changed, 383 insertions(+)
+ create mode 100644 target/avr/helper.c
+ create mode 100644 target/avr/helper.h
 
-diff --git a/target/avr/translate.c b/target/avr/translate.c
-index 19540634df..21ba6004ee 100644
---- a/target/avr/translate.c
-+++ b/target/avr/translate.c
-@@ -368,6 +368,115 @@ static bool trans_ADC(DisasContext *ctx, arg_ADC *a)
- }
- 
- 
-+static void gen_jmp_ez(DisasContext *ctx)
-+{
-+    tcg_gen_deposit_tl(cpu_pc, cpu_r[30], cpu_r[31], 8, 8);
-+    tcg_gen_or_tl(cpu_pc, cpu_pc, cpu_eind);
-+    ctx->bstate = DISAS_LOOKUP;
-+}
-+
-+
-+static void gen_jmp_z(DisasContext *ctx)
-+{
-+    tcg_gen_deposit_tl(cpu_pc, cpu_r[30], cpu_r[31], 8, 8);
-+    ctx->bstate = DISAS_LOOKUP;
-+}
-+
-+
+diff --git a/target/avr/helper.c b/target/avr/helper.c
+new file mode 100644
+index 0000000000..f0f0d4f15a
+--- /dev/null
++++ b/target/avr/helper.c
+@@ -0,0 +1,354 @@
 +/*
-+ *  in the gen_set_addr & gen_get_addr functions
-+ *  H assumed to be in 0x00ff0000 format
-+ *  M assumed to be in 0x000000ff format
-+ *  L assumed to be in 0x000000ff format
++ * QEMU AVR CPU
++ *
++ * Copyright (c) 2019 Michael Rolnik
++ *
++ * This library is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU Lesser General Public
++ * License as published by the Free Software Foundation; either
++ * version 2.1 of the License, or (at your option) any later version.
++ *
++ * This library is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * Lesser General Public License for more details.
++ *
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with this library; if not, see
++ * <http://www.gnu.org/licenses/lgpl-2.1.html>
 + */
-+static void gen_set_addr(TCGv addr, TCGv H, TCGv M, TCGv L)
++
++#include "qemu/osdep.h"
++
++#include "cpu.h"
++#include "hw/irq.h"
++#include "hw/sysbus.h"
++#include "sysemu/sysemu.h"
++#include "exec/exec-all.h"
++#include "exec/cpu_ldst.h"
++#include "exec/helper-proto.h"
++#include "exec/ioport.h"
++#include "qemu/host-utils.h"
++#include "qemu/error-report.h"
++
++bool avr_cpu_exec_interrupt(CPUState *cs, int interrupt_request)
 +{
++    bool ret = false;
++    CPUClass *cc = CPU_GET_CLASS(cs);
++    AVRCPU *cpu = AVR_CPU(cs);
++    CPUAVRState *env = &cpu->env;
 +
-+    tcg_gen_andi_tl(L, addr, 0x000000ff);
++    if (interrupt_request & CPU_INTERRUPT_RESET) {
++        if (cpu_interrupts_enabled(env)) {
++            cs->exception_index = EXCP_RESET;
++            cc->do_interrupt(cs);
 +
-+    tcg_gen_andi_tl(M, addr, 0x0000ff00);
-+    tcg_gen_shri_tl(M, M, 8);
++            cs->interrupt_request &= ~CPU_INTERRUPT_RESET;
 +
-+    tcg_gen_andi_tl(H, addr, 0x00ff0000);
++            ret = true;
++        }
++    }
++    if (interrupt_request & CPU_INTERRUPT_HARD) {
++        if (cpu_interrupts_enabled(env) && env->intsrc != 0) {
++            int index = ctz32(env->intsrc);
++            cs->exception_index = EXCP_INT(index);
++            cc->do_interrupt(cs);
++
++            env->intsrc &= env->intsrc - 1; /* clear the interrupt */
++            cs->interrupt_request &= ~CPU_INTERRUPT_HARD;
++
++            ret = true;
++        }
++    }
++    return ret;
 +}
 +
-+
-+static void gen_set_xaddr(TCGv addr)
++void avr_cpu_do_interrupt(CPUState *cs)
 +{
-+    gen_set_addr(addr, cpu_rampX, cpu_r[27], cpu_r[26]);
-+}
++    AVRCPU *cpu = AVR_CPU(cs);
++    CPUAVRState *env = &cpu->env;
 +
++    uint32_t ret = env->pc_w;
++    int vector = 0;
++    int size = avr_feature(env, AVR_FEATURE_JMP_CALL) ? 2 : 1;
++    int base = 0;
 +
-+static void gen_set_yaddr(TCGv addr)
-+{
-+    gen_set_addr(addr, cpu_rampY, cpu_r[29], cpu_r[28]);
-+}
++    if (cs->exception_index == EXCP_RESET) {
++        vector = 0;
++    } else if (env->intsrc != 0) {
++        vector = ctz32(env->intsrc) + 1;
++    }
 +
-+
-+static void gen_set_zaddr(TCGv addr)
-+{
-+    gen_set_addr(addr, cpu_rampZ, cpu_r[31], cpu_r[30]);
-+}
-+
-+
-+static TCGv gen_get_addr(TCGv H, TCGv M, TCGv L)
-+{
-+    TCGv addr = tcg_temp_new_i32();
-+
-+    tcg_gen_deposit_tl(addr, M, H, 8, 8);
-+    tcg_gen_deposit_tl(addr, L, addr, 8, 16);
-+
-+    return addr;
-+}
-+
-+
-+static TCGv gen_get_xaddr(void)
-+{
-+    return gen_get_addr(cpu_rampX, cpu_r[27], cpu_r[26]);
-+}
-+
-+
-+static TCGv gen_get_yaddr(void)
-+{
-+    return gen_get_addr(cpu_rampY, cpu_r[29], cpu_r[28]);
-+}
-+
-+
-+static TCGv gen_get_zaddr(void)
-+{
-+    return gen_get_addr(cpu_rampZ, cpu_r[31], cpu_r[30]);
-+}
-+
-+
-+/*
-+ *  Load one byte indirect from data space to register and stores an clear
-+ *  the bits in data space specified by the register. The instruction can only
-+ *  be used towards internal SRAM.  The data location is pointed to by the Z (16
-+ *  bits) Pointer Register in the Register File. Memory access is limited to the
-+ *  current data segment of 64KB. To access another data segment in devices with
-+ *  more than 64KB data space, the RAMPZ in register in the I/O area has to be
-+ *  changed.  The Z-pointer Register is left unchanged by the operation. This
-+ *  instruction is especially suited for clearing status bits stored in SRAM.
-+ */
-+static void gen_data_store(DisasContext *ctx, TCGv data, TCGv addr)
-+{
-+    if (ctx->tb->flags & TB_FLAGS_FULL_ACCESS) {
-+        gen_helper_fullwr(cpu_env, data, addr);
++    if (avr_feature(env, AVR_FEATURE_3_BYTE_PC)) {
++        cpu_stb_data(env, env->sp--, (ret & 0x0000ff));
++        cpu_stb_data(env, env->sp--, (ret & 0x00ff00) >> 8);
++        cpu_stb_data(env, env->sp--, (ret & 0xff0000) >> 16);
++    } else if (avr_feature(env, AVR_FEATURE_2_BYTE_PC)) {
++        cpu_stb_data(env, env->sp--, (ret & 0x0000ff));
++        cpu_stb_data(env, env->sp--, (ret & 0x00ff00) >> 8);
 +    } else {
-+        tcg_gen_qemu_st8(data, addr, MMU_DATA_IDX); /* mem[addr] = data */
++        cpu_stb_data(env, env->sp--, (ret & 0x0000ff));
 +    }
++
++    env->pc_w = base + vector * size;
++    env->sregI = 0; /* clear Global Interrupt Flag */
++
++    cs->exception_index = -1;
 +}
 +
-+static void gen_data_load(DisasContext *ctx, TCGv data, TCGv addr)
++int avr_cpu_memory_rw_debug(CPUState *cs, vaddr addr, uint8_t *buf,
++                                int len, bool is_write)
 +{
-+    if (ctx->tb->flags & TB_FLAGS_FULL_ACCESS) {
-+        gen_helper_fullrd(data, cpu_env, addr);
++    return cpu_memory_rw_debug(cs, addr, buf, len, is_write);
++}
++
++hwaddr avr_cpu_get_phys_page_debug(CPUState *cs, vaddr addr)
++{
++    return addr; /* I assume 1:1 address correspondance */
++}
++
++int avr_cpu_handle_mmu_fault(
++    CPUState *cs, vaddr address, int size, int rw, int mmu_idx)
++{
++    /* currently it's assumed that this will never happen */
++    cs->exception_index = EXCP_DEBUG;
++    cpu_dump_state(cs, stderr, 0);
++    return 1;
++}
++
++bool avr_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
++                        MMUAccessType access_type, int mmu_idx,
++                        bool probe, uintptr_t retaddr)
++{
++    int prot = 0;
++    MemTxAttrs attrs = {};
++    uint32_t paddr;
++
++    address &= TARGET_PAGE_MASK;
++
++    if (mmu_idx == MMU_CODE_IDX) {
++        /* access to code in flash */
++        paddr = OFFSET_CODE + address;
++        prot = PAGE_READ | PAGE_EXEC;
++        if (paddr + TARGET_PAGE_SIZE > OFFSET_DATA) {
++            error_report("execution left flash memory");
++            exit(1);
++        }
++    } else if (address < NO_CPU_REGISTERS + NO_IO_REGISTERS) {
++        /*
++         * access to CPU registers, exit and rebuilt this TB to use full access
++         * incase it touches specially handled registers like SREG or SP
++         */
++        AVRCPU *cpu = AVR_CPU(cs);
++        CPUAVRState *env = &cpu->env;
++        env->fullacc = 1;
++        cpu_loop_exit_restore(cs, retaddr);
 +    } else {
-+        tcg_gen_qemu_ld8u(data, addr, MMU_DATA_IDX); /* data = mem[addr] */
++        /* access to memory. nothing special */
++        paddr = OFFSET_DATA + address;
++        prot = PAGE_READ | PAGE_WRITE;
++    }
++
++    tlb_set_page_with_attrs(
++        cs, address, paddr, attrs, prot, mmu_idx, TARGET_PAGE_SIZE);
++
++    return true;
++}
++
++void helper_sleep(CPUAVRState *env)
++{
++    CPUState *cs = env_cpu(env);
++
++    cs->exception_index = EXCP_HLT;
++    cpu_loop_exit(cs);
++}
++
++void helper_unsupported(CPUAVRState *env)
++{
++    CPUState *cs = env_cpu(env);
++
++    /*
++     *  I count not find what happens on the real platform, so
++     *  it's EXCP_DEBUG for meanwhile
++     */
++    cs->exception_index = EXCP_DEBUG;
++    if (qemu_loglevel_mask(LOG_UNIMP)) {
++        qemu_log("UNSUPPORTED\n");
++        cpu_dump_state(cs, qemu_logfile, 0);
++    }
++    cpu_loop_exit(cs);
++}
++
++void helper_debug(CPUAVRState *env)
++{
++    CPUState *cs = env_cpu(env);
++
++    cs->exception_index = EXCP_DEBUG;
++    cpu_loop_exit(cs);
++}
++
++void helper_break(CPUAVRState *env)
++{
++    CPUState *cs = env_cpu(env);
++
++    cs->exception_index = EXCP_DEBUG;
++    cpu_loop_exit(cs);
++}
++
++void helper_wdr(CPUAVRState *env)
++{
++    CPUState *cs = env_cpu(env);
++
++    /* WD is not implemented yet, placeholder */
++    cs->exception_index = EXCP_DEBUG;
++    cpu_loop_exit(cs);
++}
++
++/*
++ * This function implements IN instruction
++ *
++ * It does the following
++ * a.  if an IO register belongs to CPU, its value is read and returned
++ * b.  otherwise io address is translated to mem address and physical memory
++ *     is read.
++ * c.  it caches the value for sake of SBI, SBIC, SBIS & CBI implementation
++ *
++ */
++target_ulong helper_inb(CPUAVRState *env, uint32_t port)
++{
++    target_ulong data = 0;
++
++    switch (port) {
++    case 0x38: /* RAMPD */
++        data = 0xff & (env->rampD >> 16);
++        break;
++    case 0x39: /* RAMPX */
++        data = 0xff & (env->rampX >> 16);
++        break;
++    case 0x3a: /* RAMPY */
++        data = 0xff & (env->rampY >> 16);
++        break;
++    case 0x3b: /* RAMPZ */
++        data = 0xff & (env->rampZ >> 16);
++        break;
++    case 0x3c: /* EIND */
++        data = 0xff & (env->eind >> 16);
++        break;
++    case 0x3d: /* SPL */
++        data = env->sp & 0x00ff;
++        break;
++    case 0x3e: /* SPH */
++        data = env->sp >> 8;
++        break;
++    case 0x3f: /* SREG */
++        data = cpu_get_sreg(env);
++        break;
++    default:
++        /* not a special register, pass to normal memory access */
++        cpu_physical_memory_read(OFFSET_IO_REGISTERS + port, &data, 1);
++    }
++
++    return data;
++}
++
++/*
++ *  This function implements OUT instruction
++ *
++ *  It does the following
++ *  a.  if an IO register belongs to CPU, its value is written into the register
++ *  b.  otherwise io address is translated to mem address and physical memory
++ *      is written.
++ *  c.  it caches the value for sake of SBI, SBIC, SBIS & CBI implementation
++ *
++ */
++void helper_outb(CPUAVRState *env, uint32_t port, uint32_t data)
++{
++    data &= 0x000000ff;
++
++    switch (port) {
++    case 0x38: /* RAMPD */
++        if (avr_feature(env, AVR_FEATURE_RAMPD)) {
++            env->rampD = (data & 0xff) << 16;
++        }
++        break;
++    case 0x39: /* RAMPX */
++        if (avr_feature(env, AVR_FEATURE_RAMPX)) {
++            env->rampX = (data & 0xff) << 16;
++        }
++        break;
++    case 0x3a: /* RAMPY */
++        if (avr_feature(env, AVR_FEATURE_RAMPY)) {
++            env->rampY = (data & 0xff) << 16;
++        }
++        break;
++    case 0x3b: /* RAMPZ */
++        if (avr_feature(env, AVR_FEATURE_RAMPZ)) {
++            env->rampZ = (data & 0xff) << 16;
++        }
++        break;
++    case 0x3c: /* EIDN */
++        env->eind = (data & 0xff) << 16;
++        break;
++    case 0x3d: /* SPL */
++        env->sp = (env->sp & 0xff00) | (data);
++        break;
++    case 0x3e: /* SPH */
++        if (avr_feature(env, AVR_FEATURE_2_BYTE_SP)) {
++            env->sp = (env->sp & 0x00ff) | (data << 8);
++        }
++        break;
++    case 0x3f: /* SREG */
++        cpu_set_sreg(env, data);
++        break;
++    default:
++        /* not a special register, pass to normal memory access */
++        cpu_physical_memory_write(OFFSET_IO_REGISTERS + port, &data, 1);
 +    }
 +}
 +
-+
- /*
-  *  Subtracts an immediate value (0-63) from a register pair and places the
-  *  result in the register pair. This instruction operates on the upper four
-@@ -2606,3 +2715,68 @@ static bool trans_BCLR(DisasContext *ctx, arg_BCLR *a)
- 
-     return true;
- }
-+
-+
 +/*
-+ *  The BREAK instruction is used by the On-chip Debug system, and is
-+ *  normally not used in the application software. When the BREAK instruction is
-+ *  executed, the AVR CPU is set in the Stopped Mode. This gives the On-chip
-+ *  Debugger access to internal resources.  If any Lock bits are set, or either
-+ *  the JTAGEN or OCDEN Fuses are unprogrammed, the CPU will treat the BREAK
-+ *  instruction as a NOP and will not enter the Stopped mode.  This instruction
-+ *  is not available in all devices. Refer to the device specific instruction
-+ *  set summary.
++ *  this function implements LD instruction when there is a posibility to read
++ *  from a CPU register
 + */
-+static bool trans_BREAK(DisasContext *ctx, arg_BREAK *a)
++target_ulong helper_fullrd(CPUAVRState *env, uint32_t addr)
 +{
-+    if (!avr_have_feature(ctx, AVR_FEATURE_BREAK)) {
-+        return true;
++    uint8_t data;
++
++    env->fullacc = false;
++
++    if (addr < NO_CPU_REGISTERS) {
++        /* CPU registers */
++        data = env->r[addr];
++    } else if (addr < NO_CPU_REGISTERS + NO_IO_REGISTERS) {
++        /* IO registers */
++        data = helper_inb(env, addr - NO_CPU_REGISTERS);
++    } else {
++        /* memory */
++        cpu_physical_memory_read(OFFSET_DATA + addr, &data, 1);
 +    }
-+
-+#ifdef BREAKPOINT_ON_BREAK
-+    tcg_gen_movi_tl(cpu_pc, ctx->npc - 1);
-+    gen_helper_debug(cpu_env);
-+    ctx->bstate = DISAS_EXIT;
-+#else
-+    /* NOP */
-+#endif
-+
-+    return true;
++    return data;
 +}
-+
 +
 +/*
-+ *  This instruction performs a single cycle No Operation.
++ *  this function implements ST instruction when there is a posibility to write
++ *  into a CPU register
 + */
-+static bool trans_NOP(DisasContext *ctx, arg_NOP *a)
++void helper_fullwr(CPUAVRState *env, uint32_t data, uint32_t addr)
 +{
++    env->fullacc = false;
 +
-+    /* NOP */
++    /* Following logic assumes this: */
++    assert(OFFSET_CPU_REGISTERS == OFFSET_DATA);
++    assert(OFFSET_IO_REGISTERS == OFFSET_CPU_REGISTERS + NO_CPU_REGISTERS);
 +
-+    return true;
++    if (addr < NO_CPU_REGISTERS) {
++        /* CPU registers */
++        env->r[addr] = data;
++    } else if (addr < NO_CPU_REGISTERS + NO_IO_REGISTERS) {
++        /* IO registers */
++        helper_outb(env, addr - NO_CPU_REGISTERS, data);
++    } else {
++        /* memory */
++        cpu_physical_memory_write(OFFSET_DATA + addr, &data, 1);
++    }
 +}
-+
-+
+diff --git a/target/avr/helper.h b/target/avr/helper.h
+new file mode 100644
+index 0000000000..bf087504a8
+--- /dev/null
++++ b/target/avr/helper.h
+@@ -0,0 +1,29 @@
 +/*
-+ *  This instruction sets the circuit in sleep mode defined by the MCU
-+ *  Control Register.
++ * QEMU AVR CPU
++ *
++ * Copyright (c) 2019 Michael Rolnik
++ *
++ * This library is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU Lesser General Public
++ * License as published by the Free Software Foundation; either
++ * version 2.1 of the License, or (at your option) any later version.
++ *
++ * This library is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * Lesser General Public License for more details.
++ *
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with this library; if not, see
++ * <http://www.gnu.org/licenses/lgpl-2.1.html>
 + */
-+static bool trans_SLEEP(DisasContext *ctx, arg_SLEEP *a)
-+{
-+    gen_helper_sleep(cpu_env);
-+    ctx->bstate = DISAS_NORETURN;
-+    return true;
-+}
 +
-+
-+/*
-+ *  This instruction resets the Watchdog Timer. This instruction must be
-+ *  executed within a limited time given by the WD prescaler. See the Watchdog
-+ *  Timer hardware specification.
-+ */
-+static bool trans_WDR(DisasContext *ctx, arg_WDR *a)
-+{
-+    gen_helper_wdr(cpu_env);
-+
-+    return true;
-+}
++DEF_HELPER_1(wdr, void, env)
++DEF_HELPER_1(debug, void, env)
++DEF_HELPER_1(break, void, env)
++DEF_HELPER_1(sleep, void, env)
++DEF_HELPER_1(unsupported, void, env)
++DEF_HELPER_3(outb, void, env, i32, i32)
++DEF_HELPER_2(inb, tl, env, i32)
++DEF_HELPER_3(fullwr, void, env, i32, i32)
++DEF_HELPER_2(fullrd, tl, env, i32)
 -- 
 2.17.2 (Apple Git-113)
 
