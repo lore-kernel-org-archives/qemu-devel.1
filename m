@@ -3,48 +3,48 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A154EC49EA8
-	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 04:31:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7339DCA9EB5
+	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 05:42:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2A5AF205ED
-	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 04:23:54 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2A5AF205ED
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 46B2E2089C
+	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 05:42:22 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 46B2E2089C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.vnet.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59650 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33414 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iMPEX-0000gq-AD
-	for qemu-devel@archiver.kernel.org; Mon, 21 Oct 2019 00:23:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59341)
+	id 1iMQST-0007dw-Cc
+	for qemu-devel@archiver.kernel.org; Mon, 21 Oct 2019 01:42:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37895)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1iMPDg-0000EF-3T
- for qemu-devel@nongnu.org; Mon, 21 Oct 2019 00:23:01 -0400
+ (envelope-from <bounces@canonical.com>) id 1iMQRA-0007Ap-D8
+ for qemu-devel@nongnu.org; Mon, 21 Oct 2019 01:41:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1iMPDe-0007w9-FJ
- for qemu-devel@nongnu.org; Mon, 21 Oct 2019 00:23:00 -0400
-Received: from indium.canonical.com ([91.189.90.7]:48768)
+ (envelope-from <bounces@canonical.com>) id 1iMQR8-0004a2-Bh
+ for qemu-devel@nongnu.org; Mon, 21 Oct 2019 01:41:00 -0400
+Received: from indium.canonical.com ([91.189.90.7]:58916)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1iMPDe-0007vX-9V
- for qemu-devel@nongnu.org; Mon, 21 Oct 2019 00:22:58 -0400
+ id 1iMQR8-0004Za-3h
+ for qemu-devel@nongnu.org; Mon, 21 Oct 2019 01:40:58 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
  by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1iMPDa-0000Y4-8K
- for <qemu-devel@nongnu.org>; Mon, 21 Oct 2019 04:22:54 +0000
+ id 1iMQR6-0003sJ-IK
+ for <qemu-devel@nongnu.org>; Mon, 21 Oct 2019 05:40:56 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 1316B2E80D1
- for <qemu-devel@nongnu.org>; Mon, 21 Oct 2019 04:22:49 +0000 (UTC)
+ by loganberry.canonical.com (Postfix) with ESMTP id 898D12E80C7
+ for <qemu-devel@nongnu.org>; Mon, 21 Oct 2019 05:40:56 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Mon, 21 Oct 2019 04:07:21 -0000
-From: Alexey Kardashevskiy <1847440@bugs.launchpad.net>
+Date: Mon, 21 Oct 2019 05:35:25 -0000
+From: Satheesh Rajendran <sathnaga@linux.vnet.ibm.com>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
 X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
@@ -54,9 +54,9 @@ X-Launchpad-Bug-Private: no
 X-Launchpad-Bug-Security-Vulnerability: no
 X-Launchpad-Bug-Commenters: aik-ozlabs dwg sathnaga
 X-Launchpad-Bug-Reporter: Satheesh Rajendran (sathnaga)
-X-Launchpad-Bug-Modifier: Alexey Kardashevskiy (aik-ozlabs)
+X-Launchpad-Bug-Modifier: Satheesh Rajendran (sathnaga)
 References: <157061153044.21976.18153238088035049329.malonedeb@gac.canonical.com>
-Message-Id: <157163084133.25998.1771560482937917213.malone@chaenomeles.canonical.com>
+Message-Id: <157163612550.19689.3698871930027214627.malone@gac.canonical.com>
 Subject: [Bug 1847440] Re: ppc64le: KVM guest fails to boot with an error
  `virtio_scsi: probe of virtio1 failed with error -22` on master
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
@@ -65,7 +65,7 @@ Precedence: bulk
 X-Generated-By: Launchpad (canonical.com);
  Revision="186023fa645d8be19d403a76064f0643f510db2f";
  Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 2d12fa71b955c0a993f38827c144a52e7c4df787
+X-Launchpad-Hash: 5e2632d718897b4af5751503979d78ead8b61a94
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 91.189.90.7
@@ -84,8 +84,7 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Please provide the entire guest booting output, from slof till it is stuck.
-Also please try with -smp 1. Thanks.
+Same observation with smp 1 even.
 
 -- =
 
