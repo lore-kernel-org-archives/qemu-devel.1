@@ -2,81 +2,80 @@ Return-Path: <SRS0=8ZcK=YO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3253ACA9EAF
-	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 15:21:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F54BCA9EAF
+	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 15:23:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F15552084B
-	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 15:21:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3A3212053B
+	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 15:23:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="f/Y2aOs1"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F15552084B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DfhIuGJE"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3A3212053B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43998 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44030 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iMZUx-0001to-8j
-	for qemu-devel@archiver.kernel.org; Mon, 21 Oct 2019 11:21:33 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56195)
+	id 1iMZWj-0003o9-EM
+	for qemu-devel@archiver.kernel.org; Mon, 21 Oct 2019 11:23:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56267)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.williamson@redhat.com>) id 1iMZT6-0000Nl-7C
- for qemu-devel@nongnu.org; Mon, 21 Oct 2019 11:19:37 -0400
+ (envelope-from <liq3ea@gmail.com>) id 1iMZTH-0000cD-Un
+ for qemu-devel@nongnu.org; Mon, 21 Oct 2019 11:19:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.williamson@redhat.com>) id 1iMZT4-0004LR-T3
- for qemu-devel@nongnu.org; Mon, 21 Oct 2019 11:19:36 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:22167
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
- id 1iMZT4-0004LL-PU
- for qemu-devel@nongnu.org; Mon, 21 Oct 2019 11:19:34 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1571671173;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=fswZIzCqGLQWPwFHQbdsSE4XbUo+SGhfJVvuhPzqMFE=;
- b=f/Y2aOs1lW5hQEJFRB+4Mv8ZjWoPpZxI8cStxLqKijtGR/71qV8u+sDBaGoJ18gHPU6PyS
- pL9EXUFns8/AtDmIVfLDTa0ipNld+zPTrvIjRgkRpECzFJv66Hb8vxhjBODkyCIviXNhQB
- SbLhJohb8CKbWfPJVGtCHIx8zcmbPPY=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-227-n6h5IikvOVqaPjAqOcgwkA-1; Mon, 21 Oct 2019 11:19:30 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6496347B;
- Mon, 21 Oct 2019 15:19:29 +0000 (UTC)
-Received: from x1.home (ovpn-118-102.phx2.redhat.com [10.3.118.102])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 2A1295C28C;
- Mon, 21 Oct 2019 15:19:21 +0000 (UTC)
-Date: Mon, 21 Oct 2019 09:19:20 -0600
-From: Alex Williamson <alex.williamson@redhat.com>
-To: Jens Freimann <jfreimann@redhat.com>, parav@mellanox.com
-Subject: Re: [PATCH 11/11] vfio: unplug failover primary device before
- migration
-Message-ID: <20191021091920.308e7454@x1.home>
-In-Reply-To: <20191018202040.30349-12-jfreimann@redhat.com>
-References: <20191018202040.30349-1-jfreimann@redhat.com>
- <20191018202040.30349-12-jfreimann@redhat.com>
-Organization: Red Hat
+ (envelope-from <liq3ea@gmail.com>) id 1iMZTG-0004OM-H6
+ for qemu-devel@nongnu.org; Mon, 21 Oct 2019 11:19:47 -0400
+Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:43569)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <liq3ea@gmail.com>) id 1iMZTG-0004O7-9r
+ for qemu-devel@nongnu.org; Mon, 21 Oct 2019 11:19:46 -0400
+Received: by mail-ot1-x344.google.com with SMTP id o44so11311430ota.10
+ for <qemu-devel@nongnu.org>; Mon, 21 Oct 2019 08:19:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=tz6w0C48MWIa2WMtQyrTIW8Jxx5xZ4x8upKdmxdEPCc=;
+ b=DfhIuGJEx+vfA13FAI+Kr0BxOUsjcfZvOgUyPWuZkigj8gPhZEalxZXBA/x+e6emuc
+ rOgs59mC5Ge+/sLvorLtiX0L8qAuVzhoPI9V+20I9MfDKmoPMB1HLBRkOrY5Ewvs0lfF
+ CsMV7W6SfU5her6r6hJc62PsM12uQJvqpJ8SSlwXVBAZ97W2akETwHqxHl2CULSpna5p
+ DWV3IMoG/CNE2QCzY4MlJZ3hoCwCZH5gmcC1BSiCfXKgtJ4JBWZJbJy14mvhXmOQMrJJ
+ v9uY0BB0Lg/xP9qd0HqQ6ppAuveWyTIojQW+YORWGQl29zMQyZrjiyCMocSOaA5nMz/T
+ 0EPA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=tz6w0C48MWIa2WMtQyrTIW8Jxx5xZ4x8upKdmxdEPCc=;
+ b=RMMDq7P0E1unQ6kFqftdl4ZyRSZ5FefuBg40DG9ZjVbKNm4NMcIiQ0KOHBrE6owK25
+ QShdjn1gYVZueyfXFPgqWSoeNwbXh9Y7j811evANRhCZdbZVizux884UgPKBBrYyK7UA
+ k5b9+7Ar1AaEewzYkMLHanr06L4+VWGeCij3aqrURM2ThmbUVG27PzFql3s6zK4YFjsG
+ ma+i74APIABlsDnbGPsjOcQ3h7kFsqKo1BVB9P4EhwA0WJx2SYnPs0hZ+MkDBGRu/p4E
+ VJX00IDEdPn8AmH6RzrLGuWsUN68ZxZtpSd5k5CUlvXiXe2lHZ1HMUBbU2cRxL5Ilh6D
+ W+kg==
+X-Gm-Message-State: APjAAAVI/1bRT6iWk/kNkEN6dTnQPiiZl8Cj/pSkn6W51AzpC1LcWk+/
+ UjhE2dmB+Ik6gS9i9URQDsPImMBPTB5cmXfcpmycjslkk6I=
+X-Google-Smtp-Source: APXvYqy5B/+fp2AkMQJfPvSCGas9eFYhRWvfZlNsu8RTN1A3+HXPZLn2tBpGzNIYeEMNTibUlnYoA0vhzkxd2+pIJ3k=
+X-Received: by 2002:a9d:3ec:: with SMTP id f99mr17836427otf.353.1571671185421; 
+ Mon, 21 Oct 2019 08:19:45 -0700 (PDT)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-MC-Unique: n6h5IikvOVqaPjAqOcgwkA-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=WINDOWS-1252
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.81
+References: <20191018134754.16362-1-philmd@redhat.com>
+ <20191018134754.16362-6-philmd@redhat.com>
+In-Reply-To: <20191018134754.16362-6-philmd@redhat.com>
+From: Li Qiang <liq3ea@gmail.com>
+Date: Mon, 21 Oct 2019 23:19:08 +0800
+Message-ID: <CAKXe6SJOgYN-FeDw8O-e7iBta+OztK4OxJJ73ESmnY+wDB6jAw@mail.gmail.com>
+Subject: Re: [PATCH v2 05/20] piix4: Rename PIIX4 object to piix4-isa
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
+Content-Type: multipart/alternative; boundary="000000000000b61af105956d3602"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::344
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,146 +87,186 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: pkrempa@redhat.com, berrange@redhat.com, ehabkost@redhat.com,
- mst@redhat.com, aadam@redhat.com, qemu-devel@nongnu.org, dgilbert@redhat.com,
- laine@redhat.com, ailan@redhat.com
+Cc: Stefano Stabellini <sstabellini@kernel.org>, xen-devel@lists.xenproject.org,
+ Paul Durrant <paul@xen.org>, "Michael S. Tsirkin" <mst@redhat.com>,
+ =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>,
+ Eduardo Habkost <ehabkost@redhat.com>, Qemu Developers <qemu-devel@nongnu.org>,
+ =?UTF-8?Q?Herv=C3=A9_Poussineau?= <hpoussin@reactos.org>,
+ Aleksandar Markovic <amarkovic@wavecomp.com>,
+ Igor Mammedov <imammedo@redhat.com>,
+ Anthony Perard <anthony.perard@citrix.com>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
+ Aurelien Jarno <aurelien@aurel32.net>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, 18 Oct 2019 22:20:40 +0200
-Jens Freimann <jfreimann@redhat.com> wrote:
+--000000000000b61af105956d3602
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-> As usual block all vfio-pci devices from being migrated, but make an
-> exception for failover primary devices. This is achieved by setting
-> unmigratable to 0 but also add a migration blocker for all vfio-pci
-> devices except failover primary devices. These will be unplugged before
-> migration happens by the migration handler of the corresponding
-> virtio-net standby device.
->=20
-> Signed-off-by: Jens Freimann <jfreimann@redhat.com>
+Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> =E4=BA=8E2019=E5=B9=B410=E6=
+=9C=8818=E6=97=A5=E5=91=A8=E4=BA=94 =E4=B8=8B=E5=8D=889:53=E5=86=99=E9=81=
+=93=EF=BC=9A
+
+> From: Herv=C3=A9 Poussineau <hpoussin@reactos.org>
+>
+> Other piix4 parts are already named piix4-ide and piix4-usb-uhci.
+>
+> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+> Acked-by: Michael S. Tsirkin <mst@redhat.com>
+> Acked-by: Paolo Bonzini <pbonzini@redhat.com>
+> Signed-off-by: Herv=C3=A9 Poussineau <hpoussin@reactos.org>
+> Message-Id: <20171216090228.28505-15-hpoussin@reactos.org>
+> Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+> [PMD: rebased]
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+>
+
+
+Reviewed-by: Li Qiang <liq3ea@gmail.com>
+
+
 > ---
->  hw/vfio/pci.c | 31 +++++++++++++++++++++++++------
->  hw/vfio/pci.h |  1 +
->  2 files changed, 26 insertions(+), 6 deletions(-)
->=20
-> diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
-> index 12fac39804..a15b83c6b6 100644
-> --- a/hw/vfio/pci.c
-> +++ b/hw/vfio/pci.c
-> @@ -40,6 +40,9 @@
->  #include "pci.h"
->  #include "trace.h"
->  #include "qapi/error.h"
-> +#include "migration/blocker.h"
-> +#include "qemu/option.h"
-> +#include "qemu/option_int.h"
-> =20
->  #define TYPE_VFIO_PCI "vfio-pci"
->  #define PCI_VFIO(obj)    OBJECT_CHECK(VFIOPCIDevice, obj, TYPE_VFIO_PCI)
-> @@ -2712,12 +2715,26 @@ static void vfio_realize(PCIDevice *pdev, Error *=
-*errp)
->      int i, ret;
->      bool is_mdev;
-> =20
-> +    if (!pdev->net_failover_pair_id) {
-> +        error_setg(&vdev->migration_blocker,
-> +                "VFIO device doesn't support migration");
-> +        ret =3D migrate_add_blocker(vdev->migration_blocker, &err);
-> +        if (err) {
-> +            error_propagate(errp, err);
-> +            goto error;
-> +        }
-> +    } else {
-> +            pdev->qdev.allow_unplug_during_migration =3D true;
-
-Why is this unique to vfio-pci, shouldn't any device set as the primary
-for a failover allow unplug during migration, and therefore should it
-be done in the core code rather than device driver?  With the
-net_failover_pair_id set in PCIDevice, I should be able to test with an
-e1000e NIC as primary, but this suggests they wouldn't be handled
-identically elsewhere.  Thanks,
-
-Alex
-
-> +    }
-> +
->      if (!vdev->vbasedev.sysfsdev) {
->          if (!(~vdev->host.domain || ~vdev->host.bus ||
->                ~vdev->host.slot || ~vdev->host.function)) {
->              error_setg(errp, "No provided host device");
->              error_append_hint(errp, "Use -device vfio-pci,host=3DDDDD:BB=
-:DD.F "
->                                "or -device vfio-pci,sysfsdev=3DPATH_TO_DE=
-VICE\n");
-> +            migrate_del_blocker(vdev->migration_blocker);
-> +            error_free(vdev->migration_blocker);
->              return;
->          }
->          vdev->vbasedev.sysfsdev =3D
-> @@ -2729,6 +2746,8 @@ static void vfio_realize(PCIDevice *pdev, Error **e=
-rrp)
->      if (stat(vdev->vbasedev.sysfsdev, &st) < 0) {
->          error_setg_errno(errp, errno, "no such host device");
->          error_prepend(errp, VFIO_MSG_PREFIX, vdev->vbasedev.sysfsdev);
-> +        migrate_del_blocker(vdev->migration_blocker);
-> +        error_free(vdev->migration_blocker);
->          return;
->      }
-> =20
-> @@ -3008,6 +3027,8 @@ out_teardown:
->      vfio_bars_exit(vdev);
->  error:
->      error_prepend(errp, VFIO_MSG_PREFIX, vdev->vbasedev.name);
-> +    migrate_del_blocker(vdev->migration_blocker);
-> +    error_free(vdev->migration_blocker);
+>  hw/isa/piix4.c       | 1 -
+>  hw/mips/mips_malta.c | 2 +-
+>  include/hw/isa/isa.h | 2 ++
+>  3 files changed, 3 insertions(+), 2 deletions(-)
+>
+> diff --git a/hw/isa/piix4.c b/hw/isa/piix4.c
+> index 9c37c85ae2..ac9383a658 100644
+> --- a/hw/isa/piix4.c
+> +++ b/hw/isa/piix4.c
+> @@ -45,7 +45,6 @@ typedef struct PIIX4State {
+>      uint8_t rcr;
+>  } PIIX4State;
+>
+> -#define TYPE_PIIX4_PCI_DEVICE "PIIX4"
+>  #define PIIX4_PCI_DEVICE(obj) \
+>      OBJECT_CHECK(PIIX4State, (obj), TYPE_PIIX4_PCI_DEVICE)
+>
+> diff --git a/hw/mips/mips_malta.c b/hw/mips/mips_malta.c
+> index 7d25ab6c23..e499b7a6bb 100644
+> --- a/hw/mips/mips_malta.c
+> +++ b/hw/mips/mips_malta.c
+> @@ -1414,7 +1414,7 @@ void mips_malta_init(MachineState *machine)
+>      ide_drive_get(hd, ARRAY_SIZE(hd));
+>
+>      pci =3D pci_create_simple_multifunction(pci_bus, PCI_DEVFN(10, 0),
+> -                                          true, "PIIX4");
+> +                                          true, TYPE_PIIX4_PCI_DEVICE);
+>      dev =3D DEVICE(pci);
+>      isa_bus =3D ISA_BUS(qdev_get_child_bus(dev, "isa.0"));
+>      piix4_devfn =3D pci->devfn;
+> diff --git a/include/hw/isa/isa.h b/include/hw/isa/isa.h
+> index 018ada4f6f..79f703fd6c 100644
+> --- a/include/hw/isa/isa.h
+> +++ b/include/hw/isa/isa.h
+> @@ -147,4 +147,6 @@ static inline ISABus *isa_bus_from_device(ISADevice *=
+d)
+>      return ISA_BUS(qdev_get_parent_bus(DEVICE(d)));
 >  }
-> =20
->  static void vfio_instance_finalize(Object *obj)
-> @@ -3019,6 +3040,10 @@ static void vfio_instance_finalize(Object *obj)
->      vfio_bars_finalize(vdev);
->      g_free(vdev->emulated_config_bits);
->      g_free(vdev->rom);
-> +    if (vdev->migration_blocker) {
-> +        migrate_del_blocker(vdev->migration_blocker);
-> +        error_free(vdev->migration_blocker);
-> +    }
->      /*
->       * XXX Leaking igd_opregion is not an oversight, we can't remove the
->       * fw_cfg entry therefore leaking this allocation seems like the saf=
-est
-> @@ -3151,11 +3176,6 @@ static Property vfio_pci_dev_properties[] =3D {
->      DEFINE_PROP_END_OF_LIST(),
->  };
-> =20
-> -static const VMStateDescription vfio_pci_vmstate =3D {
-> -    .name =3D "vfio-pci",
-> -    .unmigratable =3D 1,
-> -};
-> -
->  static void vfio_pci_dev_class_init(ObjectClass *klass, void *data)
->  {
->      DeviceClass *dc =3D DEVICE_CLASS(klass);
-> @@ -3163,7 +3183,6 @@ static void vfio_pci_dev_class_init(ObjectClass *kl=
-ass, void *data)
-> =20
->      dc->reset =3D vfio_pci_reset;
->      dc->props =3D vfio_pci_dev_properties;
-> -    dc->vmsd =3D &vfio_pci_vmstate;
->      dc->desc =3D "VFIO-based PCI device assignment";
->      set_bit(DEVICE_CATEGORY_MISC, dc->categories);
->      pdc->realize =3D vfio_realize;
-> diff --git a/hw/vfio/pci.h b/hw/vfio/pci.h
-> index 834a90d646..b329d50338 100644
-> --- a/hw/vfio/pci.h
-> +++ b/hw/vfio/pci.h
-> @@ -168,6 +168,7 @@ typedef struct VFIOPCIDevice {
->      bool no_vfio_ioeventfd;
->      bool enable_ramfb;
->      VFIODisplay *dpy;
-> +    Error *migration_blocker;
->  } VFIOPCIDevice;
-> =20
->  uint32_t vfio_pci_read_config(PCIDevice *pdev, uint32_t addr, int len);
+>
+> +#define TYPE_PIIX4_PCI_DEVICE "piix4-isa"
+> +
+>  #endif
+> --
+> 2.21.0
+>
+>
+>
 
+--000000000000b61af105956d3602
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+<div dir=3D"ltr"><div dir=3D"ltr"><br></div><br><div class=3D"gmail_quote">=
+<div dir=3D"ltr" class=3D"gmail_attr">Philippe Mathieu-Daud=C3=A9 &lt;<a hr=
+ef=3D"mailto:philmd@redhat.com">philmd@redhat.com</a>&gt; =E4=BA=8E2019=E5=
+=B9=B410=E6=9C=8818=E6=97=A5=E5=91=A8=E4=BA=94 =E4=B8=8B=E5=8D=889:53=E5=86=
+=99=E9=81=93=EF=BC=9A<br></div><blockquote class=3D"gmail_quote" style=3D"m=
+argin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left=
+:1ex">From: Herv=C3=A9 Poussineau &lt;<a href=3D"mailto:hpoussin@reactos.or=
+g" target=3D"_blank">hpoussin@reactos.org</a>&gt;<br>
+<br>
+Other piix4 parts are already named piix4-ide and piix4-usb-uhci.<br>
+<br>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 &lt;<a href=3D"mailto:f4bug@amsat.=
+org" target=3D"_blank">f4bug@amsat.org</a>&gt;<br>
+Acked-by: Michael S. Tsirkin &lt;<a href=3D"mailto:mst@redhat.com" target=
+=3D"_blank">mst@redhat.com</a>&gt;<br>
+Acked-by: Paolo Bonzini &lt;<a href=3D"mailto:pbonzini@redhat.com" target=
+=3D"_blank">pbonzini@redhat.com</a>&gt;<br>
+Signed-off-by: Herv=C3=A9 Poussineau &lt;<a href=3D"mailto:hpoussin@reactos=
+.org" target=3D"_blank">hpoussin@reactos.org</a>&gt;<br>
+Message-Id: &lt;<a href=3D"mailto:20171216090228.28505-15-hpoussin@reactos.=
+org" target=3D"_blank">20171216090228.28505-15-hpoussin@reactos.org</a>&gt;=
+<br>
+Reviewed-by: Aleksandar Markovic &lt;<a href=3D"mailto:amarkovic@wavecomp.c=
+om" target=3D"_blank">amarkovic@wavecomp.com</a>&gt;<br>
+[PMD: rebased]<br>
+Signed-off-by: Philippe Mathieu-Daud=C3=A9 &lt;<a href=3D"mailto:philmd@red=
+hat.com" target=3D"_blank">philmd@redhat.com</a>&gt;<br></blockquote><div><=
+br></div><div><br></div><div>Reviewed-by: Li Qiang &lt;<a href=3D"mailto:li=
+q3ea@gmail.com">liq3ea@gmail.com</a>&gt;<br></div><div>=C2=A0</div><blockqu=
+ote class=3D"gmail_quote" style=3D"margin:0px 0px 0px 0.8ex;border-left:1px=
+ solid rgb(204,204,204);padding-left:1ex">
+---<br>
+=C2=A0hw/isa/piix4.c=C2=A0 =C2=A0 =C2=A0 =C2=A0| 1 -<br>
+=C2=A0hw/mips/mips_malta.c | 2 +-<br>
+=C2=A0include/hw/isa/isa.h | 2 ++<br>
+=C2=A03 files changed, 3 insertions(+), 2 deletions(-)<br>
+<br>
+diff --git a/hw/isa/piix4.c b/hw/isa/piix4.c<br>
+index 9c37c85ae2..ac9383a658 100644<br>
+--- a/hw/isa/piix4.c<br>
++++ b/hw/isa/piix4.c<br>
+@@ -45,7 +45,6 @@ typedef struct PIIX4State {<br>
+=C2=A0 =C2=A0 =C2=A0uint8_t rcr;<br>
+=C2=A0} PIIX4State;<br>
+<br>
+-#define TYPE_PIIX4_PCI_DEVICE &quot;PIIX4&quot;<br>
+=C2=A0#define PIIX4_PCI_DEVICE(obj) \<br>
+=C2=A0 =C2=A0 =C2=A0OBJECT_CHECK(PIIX4State, (obj), TYPE_PIIX4_PCI_DEVICE)<=
+br>
+<br>
+diff --git a/hw/mips/mips_malta.c b/hw/mips/mips_malta.c<br>
+index 7d25ab6c23..e499b7a6bb 100644<br>
+--- a/hw/mips/mips_malta.c<br>
++++ b/hw/mips/mips_malta.c<br>
+@@ -1414,7 +1414,7 @@ void mips_malta_init(MachineState *machine)<br>
+=C2=A0 =C2=A0 =C2=A0ide_drive_get(hd, ARRAY_SIZE(hd));<br>
+<br>
+=C2=A0 =C2=A0 =C2=A0pci =3D pci_create_simple_multifunction(pci_bus, PCI_DE=
+VFN(10, 0),<br>
+-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 t=
+rue, &quot;PIIX4&quot;);<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 t=
+rue, TYPE_PIIX4_PCI_DEVICE);<br>
+=C2=A0 =C2=A0 =C2=A0dev =3D DEVICE(pci);<br>
+=C2=A0 =C2=A0 =C2=A0isa_bus =3D ISA_BUS(qdev_get_child_bus(dev, &quot;isa.0=
+&quot;));<br>
+=C2=A0 =C2=A0 =C2=A0piix4_devfn =3D pci-&gt;devfn;<br>
+diff --git a/include/hw/isa/isa.h b/include/hw/isa/isa.h<br>
+index 018ada4f6f..79f703fd6c 100644<br>
+--- a/include/hw/isa/isa.h<br>
++++ b/include/hw/isa/isa.h<br>
+@@ -147,4 +147,6 @@ static inline ISABus *isa_bus_from_device(ISADevice *d)=
+<br>
+=C2=A0 =C2=A0 =C2=A0return ISA_BUS(qdev_get_parent_bus(DEVICE(d)));<br>
+=C2=A0}<br>
+<br>
++#define TYPE_PIIX4_PCI_DEVICE &quot;piix4-isa&quot;<br>
++<br>
+=C2=A0#endif<br>
+-- <br>
+2.21.0<br>
+<br>
+<br>
+</blockquote></div></div>
+
+--000000000000b61af105956d3602--
 
