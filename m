@@ -2,81 +2,96 @@ Return-Path: <SRS0=8ZcK=YO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,NUMERIC_HTTP_ADDR,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 08F44CA9EAF
-	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 15:33:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8F81BCA9EAF
+	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 15:33:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D30C92089C
-	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 15:33:32 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D30C92089C
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 592E02089C
+	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 15:33:50 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="CMdupyrN"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 592E02089C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44172 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44180 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iMZgZ-0002rf-RP
-	for qemu-devel@archiver.kernel.org; Mon, 21 Oct 2019 11:33:31 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58375)
+	id 1iMZgq-0003Gn-Pi
+	for qemu-devel@archiver.kernel.org; Mon, 21 Oct 2019 11:33:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57356)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1iMZeC-0001VT-Np
- for qemu-devel@nongnu.org; Mon, 21 Oct 2019 11:31:06 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1iMZXP-0004WV-Dd
+ for qemu-devel@nongnu.org; Mon, 21 Oct 2019 11:24:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1iMZeB-0000b9-7z
- for qemu-devel@nongnu.org; Mon, 21 Oct 2019 11:31:04 -0400
-Received: from indium.canonical.com ([91.189.90.7]:44138)
+ (envelope-from <richard.henderson@linaro.org>) id 1iMZXO-0005lT-C5
+ for qemu-devel@nongnu.org; Mon, 21 Oct 2019 11:24:03 -0400
+Received: from mail-pg1-x544.google.com ([2607:f8b0:4864:20::544]:35560)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1iMZeA-0000aw-P5
- for qemu-devel@nongnu.org; Mon, 21 Oct 2019 11:31:03 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1iMZe7-0000HR-4F
- for <qemu-devel@nongnu.org>; Mon, 21 Oct 2019 15:30:59 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id AFD802E80E3
- for <qemu-devel@nongnu.org>; Mon, 21 Oct 2019 15:30:58 +0000 (UTC)
+ (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+ id 1iMZXO-0005lD-6h
+ for qemu-devel@nongnu.org; Mon, 21 Oct 2019 11:24:02 -0400
+Received: by mail-pg1-x544.google.com with SMTP id c8so3203078pgb.2
+ for <qemu-devel@nongnu.org>; Mon, 21 Oct 2019 08:24:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=NJIe63cJZXocRBQ8ED1V/Xsp1zrK5+aJicKvT16YnS4=;
+ b=CMdupyrNybic58U22upNlK+hehuI2m/HYhBwjzRcBhfF+ndQYXYXogzM6VUR7MS3Sl
+ LGxB8b7mxs5Q//i6MWCD6cSVSndnA9U5rT1yfx0rL5fGoILr82sL2CtRPNLnoDvg/6dT
+ 2RufQDYH3dND6qCFTpgn2BVfn3y7PEGdQt5G/XeWKowELZ8Ake0XyDA8uUFcf47joCq4
+ nlRjORtqV5t0bmB/UM3Dx0HHlMV9ryC8VdxWENZ9ZQr3QWb3tnwPOt1OMHY9KJayEgLn
+ a8GJwUYiXBVLwyZqBPnmUfWat4rdIU5PCyXACM1Gb1hxCRAZfyO3ZtVPiPfGhDxeojwG
+ M6iQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=NJIe63cJZXocRBQ8ED1V/Xsp1zrK5+aJicKvT16YnS4=;
+ b=CtrdvcHi/88ginbf/7X7JtXMaXbTQxG8H5D4wCJAMO1cSnqHRmDISk1eUtRnjDwaB4
+ Ui9yhomih77PS88oCabiE3MSz4FQCI9DMpG7zeNJYnn2o66hYNkuX9COR6d6bH33SE22
+ pmJZ3jCjfEjIZtNTUoGdpogO+R36h9vEHaXGsv3YwiusiSq7gbPtp3HccSlXErBcnkKS
+ HY5r8PYcXzaJC2nEQWmiMUTnTk0nWXHZU7AIdKwcwZl+zj6NHIgIBeUIwECf8/hx5jyZ
+ joA/KcWAMiXRH2rZziLrtE+xp0ERbpNYKmYBpojmt4lEQwmRADhKJqENvnJJl1IbibBI
+ F91A==
+X-Gm-Message-State: APjAAAXBaMuusvzmKINXXbD1D7UX3poCrtinGh8fQteh/+ZZaSQDwv+3
+ b4z1azPIXxBGy+2lDUByYo3TkA==
+X-Google-Smtp-Source: APXvYqxN7BerMRx0qEROjXxQOZA1nX5TrFNQyhMDqTmdld3QKTvkH8lKC3S7K0+N7gwsDpSKJ3mLVg==
+X-Received: by 2002:a17:90a:b003:: with SMTP id
+ x3mr30008332pjq.101.1571671441105; 
+ Mon, 21 Oct 2019 08:24:01 -0700 (PDT)
+Received: from [192.168.1.11] (97-113-7-119.tukw.qwest.net. [97.113.7.119])
+ by smtp.gmail.com with ESMTPSA id y8sm20285220pgs.34.2019.10.21.08.23.59
+ (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+ Mon, 21 Oct 2019 08:24:00 -0700 (PDT)
+Subject: Re: [PATCH v2 5/6] s390x/tcg: Fix VECTOR SUBTRACT WITH BORROW
+ INDICATION
+To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
+References: <20191021085715.3797-1-david@redhat.com>
+ <20191021085715.3797-6-david@redhat.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Openpgp: preference=signencrypt
+Message-ID: <ca80ddc4-81ae-ee33-f100-577ae3db20b8@linaro.org>
+Date: Mon, 21 Oct 2019 08:23:58 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 21 Oct 2019 15:15:47 -0000
-From: Launchpad Bug Tracker <1848556@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=Fix Released; importance=Undecided;
- assignee=None; 
-X-Launchpad-Bug: distribution=ubuntu; sourcepackage=qemu; component=main;
- status=Triaged; importance=Medium; assignee=None; 
-X-Launchpad-Bug: distribution=ubuntu; distroseries=eoan; sourcepackage=qemu;
- component=main; status=Triaged; importance=Medium; assignee=None; 
-X-Launchpad-Bug: distribution=ubuntu; distroseries=focal; sourcepackage=qemu; 
- component=main; status=Triaged; importance=Medium;
- assignee=None; 
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: paelzer rodsmith xanclic
-X-Launchpad-Bug-Reporter: Rod Smith (rodsmith)
-X-Launchpad-Bug-Modifier: Launchpad Janitor (janitor)
-References: <157133449178.19203.719001918774596241.malonedeb@gac.canonical.com>
-Message-Id: <157167094911.14154.9833273695722950803.launchpad@ackee.canonical.com>
-Subject: [Bug 1848556] Re: qemu-img check failing on remote image in Eoan
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="186023fa645d8be19d403a76064f0643f510db2f";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 74c66369aca83e50a66c8d139a20dd64189f7c5a
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 91.189.90.7
+In-Reply-To: <20191021085715.3797-6-david@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::544
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -85,94 +100,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1848556 <1848556@bugs.launchpad.net>
+Cc: Ivan Warren <ivan@vmfacility.fr>, qemu-s390x@nongnu.org,
+ Cornelia Huck <cohuck@redhat.com>, Thomas Huth <thuth@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-** Merge proposal linked:
-   https://code.launchpad.net/~paelzer/ubuntu/+source/qemu/+git/qemu/+merge=
-/374447
+On 10/21/19 1:57 AM, David Hildenbrand wrote:
+> Testing this, there seems to be something messed up. We are dealing with
+> unsigned numbers. "Each operand is treated as an unsigned binary integer."
+> Let's just implement as written in the PoP:
+> 
+> "A subtraction is performed by adding the contents of
+>  the second operand with the bitwise complement of
+>  the third operand along with a borrow indication from
+>  the rightmost bit position of the fourth operand and
+>  the result is placed in the first operand."
+> 
+> We can reuse gen_ac2_i64().
+> 
+> Fixes: 48390a7c2716 ("s390x/tcg: Implement VECTOR SUBTRACT WITH BORROW INDICATION")
+> Signed-off-by: David Hildenbrand <david@redhat.com>
+> ---
+>  target/s390x/translate_vx.inc.c | 10 +++++-----
+>  1 file changed, 5 insertions(+), 5 deletions(-)
 
--- =
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1848556
 
-Title:
-  qemu-img check failing on remote image in Eoan
+r~
 
-Status in QEMU:
-  Fix Released
-Status in qemu package in Ubuntu:
-  Triaged
-Status in qemu source package in Eoan:
-  Triaged
-Status in qemu source package in Focal:
-  Triaged
-
-Bug description:
-  Ubuntu SRU Template:
-
-  [Impact]
-
-   * There is fallout due to changes in libcurl that affect qemu and might =
-
-     lead to a hang.
-
-   * Fix by backporting the upstream fix
-
-  [Test Case]
-
-   * If you have network just run
-     $ qemu-img check http://10.193.37.117/cloud/eoan-server-cloudimg-amd64=
-.img
-
-   * Without network, install apache2, and get a complex qemu file (like a =
-
-     cloud image) onto the system. Then access the file via apache http but =
-
-     not localhost (that would work)
-
-  [Regression Potential]
-
-   * The change is local to the libcurl usage of qemu, so that could be =
-
-     affected. But then this is what has been found to not work here, so I'=
-d =
-
-     expect not too much trouble. But if so then in the curl usage (which =
-
-     means disks on http)
-
-  [Other Info]
-   =
-
-   * n/a
-
-  ---
-
-  The "qemu-img check" function is failing on remote (HTTP-hosted)
-  images, beginning with Ubuntu 19.10 (qemu-utils version 1:4.0+dfsg-
-  0ubuntu9). With previous versions, through Ubuntu 19.04/qemu-utils
-  version 1:3.1+dfsg-2ubuntu3.5, the following worked:
-
-  $ /usr/bin/qemu-img check  http://10.193.37.117/cloud/eoan-server-cloudim=
-g-amd64.img
-  No errors were found on the image.
-  19778/36032 =3D 54.89% allocated, 90.34% fragmented, 89.90% compressed cl=
-usters
-  Image end offset: 514064384
-
-  The 10.193.37.117 server holds an Apache server that hosts the cloud
-  images on a LAN. Beginning with Ubuntu 19.10/qemu-utils 1:4.0+dfsg-
-  0ubuntu9, the same command never returns. (I've left it for up to an
-  hour with no change.) I'm able to wget the image from the same server
-  and installation on which qemu-img check fails. I've tried several
-  .img files on the server, ranging from Bionic to Eoan, with the same
-  results with all of them.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1848556/+subscriptions
 
