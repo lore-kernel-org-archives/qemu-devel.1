@@ -7,74 +7,74 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 309C4CA9EB7
-	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 10:56:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 39E2BCA9EB7
+	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 10:56:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EF9CF2084C
-	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 10:56:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 07C0020873
+	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 10:56:12 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="O9CNyl2t"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EF9CF2084C
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ETlLvDsp"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 07C0020873
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37702 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37706 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iMVM3-0006Ip-Nr
-	for qemu-devel@archiver.kernel.org; Mon, 21 Oct 2019 06:56:03 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45762)
+	id 1iMVMB-0006Sv-2W
+	for qemu-devel@archiver.kernel.org; Mon, 21 Oct 2019 06:56:11 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45689)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <thuth@redhat.com>) id 1iMVKK-0004Dq-Lx
- for qemu-devel@nongnu.org; Mon, 21 Oct 2019 06:54:17 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <thuth@redhat.com>) id 1iMVKJ-0001kN-DJ
- for qemu-devel@nongnu.org; Mon, 21 Oct 2019 06:54:16 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:35401
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <thuth@redhat.com>) id 1iMVKJ-0001k8-90
+ (envelope-from <thuth@redhat.com>) id 1iMVKI-0004CR-4C
  for qemu-devel@nongnu.org; Mon, 21 Oct 2019 06:54:15 -0400
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+ (envelope-from <thuth@redhat.com>) id 1iMVKF-0001hP-Ud
+ for qemu-devel@nongnu.org; Mon, 21 Oct 2019 06:54:13 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:38188
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <thuth@redhat.com>) id 1iMVKD-0001f2-QY
+ for qemu-devel@nongnu.org; Mon, 21 Oct 2019 06:54:10 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1571655254;
+ s=mimecast20190719; t=1571655249;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=ChAKUyJC7iiVoJsEwLh+lO4vhVCdqQ6OROJITLpnBN8=;
- b=O9CNyl2tZFJie0Cr4Omml1TcR0eD9Gm5r+5OgqKtj9GlXEjXLk9G24RMgmwX2NJsNnPYli
- cF5x6Rjp7w+aiigev74t3YupXkLhPUrGDPNecwr+6vCZyTyE8dU+9bE+d/OinxwU1NiBLs
- MQ1YoAXT0ldp2KdOAriC36B6XcJCXME=
+ bh=ifHsHTBcMhSqGAy591LJdMSm21J89JLOA6i3bO9Pwso=;
+ b=ETlLvDspKQXhvBibm7JeztfzPnASF7z0uHFDZQkbGc3AEWZtzXB1KnxpkK0E3ISMngwdvb
+ /u8zZlMznDPsIP5PsM4Up7grXQ9Yqwb2+mi5Vm9SZV2rcrdD93eHDEKCsCPkvKMikHNd+z
+ IScJsogp+3YU6w+Gjw85zN004cJXPN0=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-178-y56AF-2RMEKKMEoJPbXKDw-1; Mon, 21 Oct 2019 06:54:13 -0400
+ us-mta-67-8rBsMvk6NpWwA3bqoVFs8Q-1; Mon, 21 Oct 2019 06:54:06 -0400
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
  [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4E438107AD31;
- Mon, 21 Oct 2019 10:54:12 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0CE20107AD31;
+ Mon, 21 Oct 2019 10:54:06 +0000 (UTC)
 Received: from thuth.com (dhcp-200-228.str.redhat.com [10.33.200.228])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 20EAC60BE2;
- Mon, 21 Oct 2019 10:54:08 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id E4DD360BE2;
+ Mon, 21 Oct 2019 10:54:01 +0000 (UTC)
 From: Thomas Huth <thuth@redhat.com>
 To: Max Reitz <mreitz@redhat.com>,
 	qemu-block@nongnu.org
-Subject: [PATCH v2 4/6] iotests: Skip "make check-block" if QEMU does not
- support virtio-blk
-Date: Mon, 21 Oct 2019 12:53:48 +0200
-Message-Id: <20191021105350.1710-5-thuth@redhat.com>
+Subject: [PATCH v2 1/6] iotests: remove 'linux' from default supported
+ platforms
+Date: Mon, 21 Oct 2019 12:53:45 +0200
+Message-Id: <20191021105350.1710-2-thuth@redhat.com>
 In-Reply-To: <20191021105350.1710-1-thuth@redhat.com>
 References: <20191021105350.1710-1-thuth@redhat.com>
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-MC-Unique: y56AF-2RMEKKMEoJPbXKDw-1
+X-MC-Unique: 8rBsMvk6NpWwA3bqoVFs8Q-1
 X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=WINDOWS-1252
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.120
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -92,55 +92,78 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The next patch is going to add some python-based tests to the "auto"
-group, and these tests require virtio-blk to work properly. Running
-iotests without virtio-blk likely does not make too much sense anyway,
-so instead of adding a check for the availability of virtio-blk to each
-and every test (which does not sound very appealing), let's rather add
-a check for this at the top level in the check-block.sh script instead
-(so that it is possible to run "make check" without the "check-block"
-part for qemu-system-tricore for example).
+From: John Snow <jsnow@redhat.com>
+
+verify_platform will check an explicit whitelist and blacklist instead.
+The default will now be assumed to be allowed to run anywhere.
+
+For tests that do not specify their platforms explicitly, this has the effe=
+ct of
+enabling these tests on non-linux platforms. For tests that always specifie=
+d
+linux explicitly, there is no change.
+
+For Python tests on FreeBSD at least; only seven python tests fail:
+045 147 149 169 194 199 211
+
+045 and 149 appear to be misconfigurations,
+147 and 194 are the AF_UNIX path too long error,
+169 and 199 are bitmap migration bugs, and
+211 is a bug that shows up on Linux platforms, too.
+
+This is at least good evidence that these tests are not Linux-only. If
+they aren't suitable for other platforms, they should be disabled on a
+per-platform basis as appropriate.
+
+Therefore, let's switch these on and deal with the failures.
 
 Reviewed-by: Max Reitz <mreitz@redhat.com>
-Signed-off-by: Thomas Huth <thuth@redhat.com>
+Signed-off-by: John Snow <jsnow@redhat.com>
 ---
- tests/check-block.sh | 16 +++++++++++++++-
- 1 file changed, 15 insertions(+), 1 deletion(-)
+ tests/qemu-iotests/iotests.py | 16 +++++++++++-----
+ 1 file changed, 11 insertions(+), 5 deletions(-)
 
-diff --git a/tests/check-block.sh b/tests/check-block.sh
-index 679aedec50..e9e2978818 100755
---- a/tests/check-block.sh
-+++ b/tests/check-block.sh
-@@ -26,10 +26,24 @@ if grep -q "CFLAGS.*-fsanitize" config-host.mak 2>/dev/=
-null ; then
-     exit 0
- fi
+diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotests.py
+index 5373149ae1..7d6c2d3641 100644
+--- a/tests/qemu-iotests/iotests.py
++++ b/tests/qemu-iotests/iotests.py
+@@ -871,9 +871,14 @@ def verify_protocol(supported=3D[], unsupported=3D[]):
+     if not_sup or (imgproto in unsupported):
+         notrun('not suitable for this protocol: %s' % imgproto)
 =20
--if [ -z "$(find . -name 'qemu-system-*' -print)" ]; then
-+if [ -n "$QEMU_PROG" ]; then
-+    qemu_prog=3D"$QEMU_PROG"
-+else
-+    for binary in *-softmmu/qemu-system-* ; do
-+        if [ -x "$binary" ]; then
-+            qemu_prog=3D"$binary"
-+            break
-+        fi
-+    done
-+fi
-+if [ -z "$qemu_prog" ]; then
-     echo "No qemu-system binary available =3D=3D> Not running the qemu-iot=
-ests."
-     exit 0
- fi
-+if ! "$qemu_prog" -M none -device help | grep -q virtio-blk >/dev/null 2>&=
-1 ; then
-+    echo "$qemu_prog does not support virtio-blk =3D=3D> Not running the q=
-emu-iotests."
-+    exit 0
-+fi
+-def verify_platform(supported_oses=3D['linux']):
+-    if True not in [sys.platform.startswith(x) for x in supported_oses]:
+-        notrun('not suitable for this OS: %s' % sys.platform)
++def verify_platform(supported=3DNone, unsupported=3DNone):
++    if unsupported is not None:
++        if any((sys.platform.startswith(x) for x in unsupported)):
++            notrun('not suitable for this OS: %s' % sys.platform)
++
++    if supported is not None:
++        if not any((sys.platform.startswith(x) for x in supported)):
++            notrun('not suitable for this OS: %s' % sys.platform)
 =20
- if ! command -v bash >/dev/null 2>&1 ; then
-     echo "bash not available =3D=3D> Not running the qemu-iotests."
+ def verify_cache_mode(supported_cache_modes=3D[]):
+     if supported_cache_modes and (cachemode not in supported_cache_modes):
+@@ -935,7 +940,8 @@ def execute_unittest(output, verbosity, debug):
+                                     r'Ran \1 tests', output.getvalue()))
+=20
+ def execute_test(test_function=3DNone,
+-                 supported_fmts=3D[], supported_oses=3D['linux'],
++                 supported_fmts=3D[],
++                 supported_platforms=3DNone,
+                  supported_cache_modes=3D[], unsupported_fmts=3D[],
+                  supported_protocols=3D[], unsupported_protocols=3D[]):
+     """Run either unittest or script-style tests."""
+@@ -952,7 +958,7 @@ def execute_test(test_function=3DNone,
+     verbosity =3D 1
+     verify_image_format(supported_fmts, unsupported_fmts)
+     verify_protocol(supported_protocols, unsupported_protocols)
+-    verify_platform(supported_oses)
++    verify_platform(supported=3Dsupported_platforms)
+     verify_cache_mode(supported_cache_modes)
+=20
+     if debug:
 --=20
 2.18.1
 
