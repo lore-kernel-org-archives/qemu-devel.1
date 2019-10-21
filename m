@@ -2,74 +2,77 @@ Return-Path: <SRS0=8ZcK=YO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 57C02CA9EAF
-	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 21:01:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 41FF0CA9EAF
+	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 21:02:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 211A22086D
-	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 21:01:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id ED0EB2086D
+	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 21:02:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Z3LiAsQs"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 211A22086D
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ctU1m9KV"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ED0EB2086D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47870 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47890 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iMens-0005o4-Ak
-	for qemu-devel@archiver.kernel.org; Mon, 21 Oct 2019 17:01:24 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42679)
+	id 1iMepO-0007EA-4A
+	for qemu-devel@archiver.kernel.org; Mon, 21 Oct 2019 17:02:58 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42925)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alistair23@gmail.com>) id 1iMemP-0004q9-F9
- for qemu-devel@nongnu.org; Mon, 21 Oct 2019 16:59:54 -0400
+ (envelope-from <alistair23@gmail.com>) id 1iMent-00065c-EK
+ for qemu-devel@nongnu.org; Mon, 21 Oct 2019 17:01:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alistair23@gmail.com>) id 1iMemO-0006jg-83
- for qemu-devel@nongnu.org; Mon, 21 Oct 2019 16:59:53 -0400
-Received: from mail-lj1-x244.google.com ([2a00:1450:4864:20::244]:36542)
+ (envelope-from <alistair23@gmail.com>) id 1iMens-0007pJ-Fy
+ for qemu-devel@nongnu.org; Mon, 21 Oct 2019 17:01:25 -0400
+Received: from mail-lj1-x244.google.com ([2a00:1450:4864:20::244]:41719)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <alistair23@gmail.com>)
- id 1iMemN-0006iv-Us; Mon, 21 Oct 2019 16:59:52 -0400
-Received: by mail-lj1-x244.google.com with SMTP id v24so14851374ljj.3;
- Mon, 21 Oct 2019 13:59:51 -0700 (PDT)
+ id 1iMens-0007on-8E; Mon, 21 Oct 2019 17:01:24 -0400
+Received: by mail-lj1-x244.google.com with SMTP id f5so14849594ljg.8;
+ Mon, 21 Oct 2019 14:01:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
  :cc:content-transfer-encoding;
- bh=IRfRBhOJ4tK/eyaHwLIDarS0P0zdVadV9K948uMtz8s=;
- b=Z3LiAsQs+IjfGkUKDDbF1Eh8jAjin6+rbCAjr13gMH1+O4756chEphzWBHW9KhkTtg
- Vfy4zZyDaC9qftuuzmvNtKt2WE8Em1b8pbfBpqfrLM7dth2Aoe90Q3RRB7zMUP1Ut/Od
- 1WH7lO5CsnMBEaA6wN6y4VsmP6vpShbUVWx0zPP55QBigdf6Xsgo+wCNSNUfjGxpbaXi
- TQLnni6KVPzDgcRQQj23rZbgPKUsI7OFOrlngOmPjBYdwoK5jV+/GSAkQIMjuM89n/w4
- Ei0OlHSptGIj8vdcHSujJryJ8JjnsHUcGw6gQBlSS5Up6POKEeWfAkwemZgCkhFBhSvx
- +4Hw==
+ bh=l6feAducb9HP2EHxfy6KvJwhq5UptNWBlDOmDMww3+g=;
+ b=ctU1m9KV7t5bvq4xtAJt0jYd12N46Eb9qz8l2berU+51rkGzFBSPAmkmpOd7sRy7+N
+ 6qLpNSqgjiIzRraO2VErI7kmHqAjkjQCXv5n/b1/Cd5Adw1pau6758sTQOfe1Cfsj8fa
+ nBOwmxDV6LtsnF1OeV7ceHsbP6YKbqr5jUwk2LQqlnUak2JNz8/pqHPzJD5cyPEx2SmX
+ MR6wjdalT+gAKqsp7ksJSnGU+rRYEXJgVpoN+RtxnYmUEx9XeFsR7GRvNimHOT45GFfi
+ yu17FwRiYzmfliR2kfQT4jcKklHaZQ2TOiKQ6K0e1SYqRrRUzJLHbfBtS0umeP52kcTQ
+ m+1Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc:content-transfer-encoding;
- bh=IRfRBhOJ4tK/eyaHwLIDarS0P0zdVadV9K948uMtz8s=;
- b=MB9m3aaTlgcaWuOeGxrdfnC5xMZHa3JykpRrBXe+TJRtNAHTlGuAGngSp99jicTZQo
- WqQxvPBcMstDJQKNkOCIDY91XYCTtDRg3fTPHMVsPJ11dRSBlZy2hQwy7Km09+TD114C
- 4xdsN5343LyxmuO4hdm7jk4B4E5k1r2Iq5d0LUpfm4OepEfOkrlQy8CXd9giA/R1bof4
- OmhYZNrbtokPLfVvuPSIE/ZAq51kAq93zYFIVgahzPFt2OmBpvK/vzB8yPC+T2w9T1sq
- tl1qq7f2wWWnFHufNOOzhp6SDWCcnzGuqcu55W/p4zbgqBw7/D3KXN7iWNTtdJDrqzGI
- oYsQ==
-X-Gm-Message-State: APjAAAVnGdLZNOoqsC5RU9xCZf3gtOesCF9hdHGRLYiUh+GGQlheTRbW
- Z9USg7NOEIEJkzypLgQKz6fAxPlLtgzHSxhfiB0=
-X-Google-Smtp-Source: APXvYqzCsBN2hgXsSagcEg7xuOuPSWgFcZItyVs84/ugaZX9X+dVHN4bfw1ifOXY6SWgD1xysyceg6Ckd6dmomQzKYI=
-X-Received: by 2002:a2e:894b:: with SMTP id b11mr16221475ljk.152.1571691590645; 
- Mon, 21 Oct 2019 13:59:50 -0700 (PDT)
+ bh=l6feAducb9HP2EHxfy6KvJwhq5UptNWBlDOmDMww3+g=;
+ b=ehnj6hB2mACGu6hnqFH94w6cl84IytQLtwAaeF/RhNrZ/bn6yjIzQux+xTLQxHdT9l
+ WFYa10klQhPlDAI52wgBJd0P+jiiA2rYWRFVquzlG7ZQ8JJDTKOlvi0QX2cBmuk7J2ra
+ tmbvGDsTilJcSoRAHh+y4t7R2FKMzF+aH3IOs5I3I7KrfJJlitt+SG6UdVEu4rvXfluW
+ NCK8YA8u78efWf4yZ6hvUByvwejnBFgjd7jSQzFSWALPuSutmTplXPRP0c0f6l7RsZgG
+ QlH4IrmMev/q6iAFRD8fkdzC6xTKbUPEemFi93B7jWvJyC5aMaRknQqd21DXspLoB2k7
+ S0Dg==
+X-Gm-Message-State: APjAAAVDAEZzQaKsu5a3XnVH3kqH+6wlo4ESw3Gt/3GJdVxNNDEzCyu8
+ YtxB1FzMzAHZWE4CtR7FLBP0nIhEYUb3VfWk5t0=
+X-Google-Smtp-Source: APXvYqzcmM/4+fYn13mYHt/UBDfefHIrBFLee8DN1MXJQPbRHtlsl/dRc5kZpPHxcghGxrKVZ5xXl4XjNYG8Yvm4OvY=
+X-Received: by 2002:a2e:420a:: with SMTP id p10mr16799111lja.16.1571691683152; 
+ Mon, 21 Oct 2019 14:01:23 -0700 (PDT)
 MIME-Version: 1.0
-References: <20191021190653.9511-1-philmd@redhat.com>
-In-Reply-To: <20191021190653.9511-1-philmd@redhat.com>
+References: <20191020225650.3671-1-philmd@redhat.com>
+ <20191020225650.3671-14-philmd@redhat.com>
+In-Reply-To: <20191020225650.3671-14-philmd@redhat.com>
 From: Alistair Francis <alistair23@gmail.com>
-Date: Mon, 21 Oct 2019 13:54:35 -0700
-Message-ID: <CAKmqyKO7HrqwTkXVadKikT_+2e2BfW2uevQV0UFm0_ZYnZfCLg@mail.gmail.com>
-Subject: Re: [PATCH v2 0/6] hw/arm: Create the RAM in the board
+Date: Mon, 21 Oct 2019 13:56:07 -0700
+Message-ID: <CAKmqyKMJXP8a-29LtZ8ydzLXbOSX27Jw9_JcLUV+iz7TxvE=JQ@mail.gmail.com>
+Subject: Re: [PATCH 13/21] hw/cris: Let the machine be the owner of the system
+ memory
 To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
@@ -87,65 +90,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Alistair Francis <alistair@alistair23.me>,
- Richard Henderson <richard.henderson@linaro.org>,
+Cc: Paul Burton <pburton@wavecomp.com>, Jan Kiszka <jan.kiszka@web.de>,
+ Peter Maydell <peter.maydell@linaro.org>,
+ Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
  "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
- qemu-arm <qemu-arm@nongnu.org>, Antony Pavlov <antonynpavlov@gmail.com>,
- "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
+ KONRAD Frederic <frederic.konrad@adacore.com>,
+ "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Rob Herring <robh@kernel.org>,
+ Andrey Smirnov <andrew.smirnov@gmail.com>, Helge Deller <deller@gmx.de>,
+ "Michael S. Tsirkin" <mst@redhat.com>, Markus Armbruster <armbru@redhat.com>,
+ =?UTF-8?Q?Herv=C3=A9_Poussineau?= <hpoussin@reactos.org>,
+ Antony Pavlov <antonynpavlov@gmail.com>,
+ Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
+ David Gibson <david@gibson.dropbear.id.au>,
+ Artyom Tarasenko <atar4qemu@gmail.com>, Joel Stanley <joel@jms.id.au>,
+ Eduardo Habkost <ehabkost@redhat.com>,
+ Alistair Francis <alistair@alistair23.me>,
+ Leif Lindholm <leif.lindholm@linaro.org>,
+ Beniamino Galvani <b.galvani@gmail.com>, qemu-arm <qemu-arm@nongnu.org>,
+ Peter Chubb <peter.chubb@nicta.com.au>, Fabien Chouteau <chouteau@adacore.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>,
+ Radoslaw Biernacki <radoslaw.biernacki@linaro.org>,
+ Thomas Huth <huth@tuxfamily.org>,
+ Andrew Baumann <Andrew.Baumann@microsoft.com>,
+ Jean-Christophe Dubois <jcd@tribudubois.net>, Andrew Jeffery <andrew@aj.id.au>,
+ Michael Walle <michael@walle.cc>, "open list:New World" <qemu-ppc@nongnu.org>,
+ Aleksandar Markovic <amarkovic@wavecomp.com>,
+ Igor Mammedov <imammedo@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>,
+ =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, Oct 21, 2019 at 12:07 PM Philippe Mathieu-Daud=C3=A9
+On Sun, Oct 20, 2019 at 4:14 PM Philippe Mathieu-Daud=C3=A9
 <philmd@redhat.com> wrote:
 >
-> Hi Peter,
->
-> This series contains the ARM patches extracted from the
-> "Let the machine be the owner of the system memory" series [1]
-> reviewed by Richard.
->
-> These are cleanups moving the creation of the system ram at
-> the board level. The other series will enforce
-> memory_region_allocate_system_memory() get called with a
-> MachineState argument, this preliminary cleanup is required.
-
-For the whole series:
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 
 Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 
 Alistair
 
+> ---
+>  hw/cris/axis_dev88.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 >
-> Regard,
+> diff --git a/hw/cris/axis_dev88.c b/hw/cris/axis_dev88.c
+> index 940c7dd122..faa7058733 100644
+> --- a/hw/cris/axis_dev88.c
+> +++ b/hw/cris/axis_dev88.c
+> @@ -270,7 +270,7 @@ void axisdev88_init(MachineState *machine)
+>      env =3D &cpu->env;
 >
-> Phil.
->
-> [1] https://lists.gnu.org/archive/html/qemu-devel/2019-10/msg05085.html
->
-> Philippe Mathieu-Daud=C3=A9 (6):
->   hw/arm/xilinx_zynq: Use the IEC binary prefix definitions
->   hw/arm/mps2: Use the IEC binary prefix definitions
->   hw/arm/collie: Create the RAM in the board
->   hw/arm/omap2: Create the RAM in the board
->   hw/arm/omap1: Create the RAM in the board
->   hw/arm/digic4: Inline digic4_board_setup_ram() function
->
->  hw/arm/collie.c       |  8 ++++++--
->  hw/arm/digic_boards.c |  9 ++-------
->  hw/arm/mps2-tz.c      |  3 ++-
->  hw/arm/mps2.c         |  3 ++-
->  hw/arm/nseries.c      | 10 +++++++---
->  hw/arm/omap1.c        | 12 +++++-------
->  hw/arm/omap2.c        | 13 +++++--------
->  hw/arm/omap_sx1.c     |  8 ++++++--
->  hw/arm/palm.c         |  8 ++++++--
->  hw/arm/strongarm.c    |  7 +------
->  hw/arm/strongarm.h    |  4 +---
->  hw/arm/xilinx_zynq.c  |  3 ++-
->  include/hw/arm/omap.h | 10 +++-------
->  13 files changed, 48 insertions(+), 50 deletions(-)
+>      /* allocate RAM */
+> -    memory_region_allocate_system_memory(phys_ram, NULL, "axisdev88.ram"=
+,
+> +    memory_region_allocate_system_memory(phys_ram, machine, "axisdev88.r=
+am",
+>                                           ram_size);
+>      memory_region_add_subregion(address_space_mem, 0x40000000, phys_ram)=
+;
 >
 > --
 > 2.21.0
