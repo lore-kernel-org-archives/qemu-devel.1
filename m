@@ -7,90 +7,91 @@ X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D937CA9EAF
-	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 17:36:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D063CA9EAF
+	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 17:36:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E662D2077C
-	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 17:36:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4B82620873
+	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 17:36:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="FRr2bw20"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E662D2077C
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="v4HENVO6"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4B82620873
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46344 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46358 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iMbbW-0005B7-PT
-	for qemu-devel@archiver.kernel.org; Mon, 21 Oct 2019 13:36:26 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46236)
+	id 1iMbbq-0005ex-B3
+	for qemu-devel@archiver.kernel.org; Mon, 21 Oct 2019 13:36:46 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46153)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1iMbWY-0000UQ-3a
- for qemu-devel@nongnu.org; Mon, 21 Oct 2019 13:31:18 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1iMbW8-0008VO-LA
+ for qemu-devel@nongnu.org; Mon, 21 Oct 2019 13:30:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1iMbWW-0006ZY-Mv
- for qemu-devel@nongnu.org; Mon, 21 Oct 2019 13:31:18 -0400
-Received: from mail-pg1-x542.google.com ([2607:f8b0:4864:20::542]:46209)
+ (envelope-from <richard.henderson@linaro.org>) id 1iMbW5-0006Oj-Aw
+ for qemu-devel@nongnu.org; Mon, 21 Oct 2019 13:30:52 -0400
+Received: from mail-pg1-x544.google.com ([2607:f8b0:4864:20::544]:42550)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1iMbWW-0006Z8-G7
- for qemu-devel@nongnu.org; Mon, 21 Oct 2019 13:31:16 -0400
-Received: by mail-pg1-x542.google.com with SMTP id e15so8194016pgu.13
- for <qemu-devel@nongnu.org>; Mon, 21 Oct 2019 10:31:16 -0700 (PDT)
+ id 1iMbW5-0006O1-5J
+ for qemu-devel@nongnu.org; Mon, 21 Oct 2019 13:30:49 -0400
+Received: by mail-pg1-x544.google.com with SMTP id f14so8201120pgi.9
+ for <qemu-devel@nongnu.org>; Mon, 21 Oct 2019 10:30:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
  :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=C8YxFo44lgzelGc8Uh/dW4ixatwCpU/rHF3sHuxs5+0=;
- b=FRr2bw20T5D3SbsAatVsvN6ELHn/VXkEdYvF5yx/PGsY9nnAGk8IDO4Fa0aKPZlC1y
- ujQjZ/A0MwDzHpYBnp+8nJIlwcKRIVtf5uWFlpwHzmzFFknPcSvEOLnqYjCc/lg1eTBO
- 1NDtGzDhrQuCEiYX/0xxM093JuWuL/ZFTIRYCJC/gWdbe0rcdTwxvhkeGPIlXv9K0Rgc
- MayeT7t5sLIWXBHELOTFVLdG2ACpAG1tr6/i+fpx2KTt9umaUB/9n1jZ5SRWcefmv0vT
- Fr3c3380lQIarO2S0UOBdpApWGgVHF9+liYhYMd6v1l/PcnHVlcPNW0Tk9awE6B/deOd
- jp7A==
+ bh=iWFNgivYLuuN+/YyhYyGxqv53+ldRK3tdcD/5ti+nwU=;
+ b=v4HENVO6DnPDLHvtOZdmOPDcllhmBzqj0Kgvw88k4J7251GWn5JKWpxAe7gL5sWUmn
+ 1CVL98J7x31Adk5MYM1cg9RuPDMnQ+0+HfC1E2zHvjRMkyDGw3yKMNdZGtfs5KBvAu2S
+ DcV1OM6W6GMJPi9nfiMQl14YXv+v0iDFlKlYQ7Wfklu/boTHxlsBGNrQ5I7HNBm0cBg0
+ jMlOregu5npBz8tEaPbY6wzyt1la2VZTPTiNLvDD2rKE6PAV3vs/PvW1GnIt37H4KB79
+ Dv24EZDkuA2CH8Xk4gQCL9lg93OqtYebD0wlMToJIbCsSnEZkq7JVar6GsM5gb8d8Sa/
+ fYNA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
  :date:user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=C8YxFo44lgzelGc8Uh/dW4ixatwCpU/rHF3sHuxs5+0=;
- b=PSn5uwXMx7ZyzFe/8kuc5sAxvQkGR/qV+Kqv3GYbi3KXvtqZR9GgXX6gT/lJJGJLBp
- mMkK+aEGsgW0vfr4q8B873YLXPU2aKy0XW6HX64FGnbVY2Ud7H9Yy31ECfVRrsJ+ORRV
- Ati7Iv6pkYdQ4JJQngdRXgQp8nhUf5h92Xkv+BRMgUVsZTo1x/O8ahl0vto+IwOIntIP
- nYhPaa/YwL3dHoPxmAiqsz3N4+hWmZUmwMWqo8q0ZGeiUN7kDlqk1AHlIx2GaK7Bt4pL
- KrL0Kn1xa33MUj7dwk3vZAA1q5Jig+NoiDEeEY3sGK4MY/wWvu6K+mpmdJOlSeBB3lV0
- d0Pg==
-X-Gm-Message-State: APjAAAVmjA9VoSJq+4RqCelOmPRZYpGqJJW+vc3gbrhc+h2o66wvdO9X
- uLjbwW/zk0hRTZtyJVY3NcWu5Q==
-X-Google-Smtp-Source: APXvYqxMNA0USrAZgor9he10TENDVdit9cFIDrjMpkYplBZNy70M3eN6M6Xlw3xiKNcO4Pw8zchD4w==
-X-Received: by 2002:a63:fd4b:: with SMTP id m11mr26779826pgj.452.1571679075508; 
- Mon, 21 Oct 2019 10:31:15 -0700 (PDT)
+ bh=iWFNgivYLuuN+/YyhYyGxqv53+ldRK3tdcD/5ti+nwU=;
+ b=n4OAo1ISsk0KmC+JODtrsFLNI73sb9solWtGUlNeOes1RWtOTrG6n5r/bz4XwVt5qO
+ QxOQiMeN4GiJYSKVgUFcGbM09jFJTUTAuHYh/Fiy9u/1GNo6ax4NSPS28geW9V6fFmWY
+ a7B5skMm8dVYuEZz0i73pUT+7Huz72uAIGUC0kla+35eK7/evCfBEaz8aC3kFVtaircZ
+ vvLAHM5FsltgYSApW6k/Z+HPlZzFKm57IDrJJ5yqVEMmsSStGu0GFV/BnwUKo+g2keWE
+ rmQzufdhdAy91Gs6f/By4dP6PTbxUH4YbnX34XnwBGNpOfQ/I9hQYpg9IkGyXXficpRk
+ 3wSA==
+X-Gm-Message-State: APjAAAXmlDc46fmg62kMTY85UfVfQbqPFWvJxJfoOIqyuVZmHWrVzyjX
+ 7nW9d9PEMZCuhgvvC7uH7t/Giw==
+X-Google-Smtp-Source: APXvYqx+kf+uXXJFgZFdL7BFfgJHJ4cdxWJLT++yzSk86FAEv+w5dHZjSbLALwRDOM3e7ZujBxabJQ==
+X-Received: by 2002:a17:90a:8d13:: with SMTP id
+ c19mr30200034pjo.136.1571679047734; 
+ Mon, 21 Oct 2019 10:30:47 -0700 (PDT)
 Received: from [192.168.1.11] (97-113-7-119.tukw.qwest.net. [97.113.7.119])
- by smtp.gmail.com with ESMTPSA id k8sm13362395pgm.14.2019.10.21.10.31.13
+ by smtp.gmail.com with ESMTPSA id h6sm21836474pfg.123.2019.10.21.10.30.46
  (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Mon, 21 Oct 2019 10:31:14 -0700 (PDT)
-Subject: Re: [PATCH 17/21] hw/m68k: Let the machine be the owner of the system
+ Mon, 21 Oct 2019 10:30:47 -0700 (PDT)
+Subject: Re: [PATCH 16/21] hw/lm32: Let the machine be the owner of the system
  memory
 To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
  Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>,
  qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>,
  Eduardo Habkost <ehabkost@redhat.com>
 References: <20191020225650.3671-1-philmd@redhat.com>
- <20191020225650.3671-18-philmd@redhat.com>
+ <20191020225650.3671-17-philmd@redhat.com>
 From: Richard Henderson <richard.henderson@linaro.org>
 Openpgp: preference=signencrypt
-Message-ID: <8e9725f7-6076-262c-2998-9bc9b9f1f2d9@linaro.org>
-Date: Mon, 21 Oct 2019 10:31:11 -0700
+Message-ID: <19f107f4-e450-24cf-ba40-2107ddb9bad3@linaro.org>
+Date: Mon, 21 Oct 2019 10:30:44 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.9.0
 MIME-Version: 1.0
-In-Reply-To: <20191020225650.3671-18-philmd@redhat.com>
+In-Reply-To: <20191020225650.3671-17-philmd@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::542
+X-Received-From: 2607:f8b0:4864:20::544
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -133,10 +134,9 @@ Sender: "Qemu-devel"
 On 10/20/19 3:56 PM, Philippe Mathieu-Daudé wrote:
 > Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 > ---
->  hw/m68k/an5206.c    | 2 +-
->  hw/m68k/mcf5208.c   | 2 +-
->  hw/m68k/next-cube.c | 2 +-
->  3 files changed, 3 insertions(+), 3 deletions(-)
+>  hw/lm32/lm32_boards.c | 4 ++--
+>  hw/lm32/milkymist.c   | 2 +-
+>  2 files changed, 3 insertions(+), 3 deletions(-)
 
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
