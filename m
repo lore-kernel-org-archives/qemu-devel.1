@@ -2,118 +2,88 @@ Return-Path: <SRS0=8ZcK=YO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7F64BCA9EAF
-	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 13:34:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7CD61CA9EAF
+	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 13:36:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 594FF20873
-	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 13:34:15 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 594FF20873
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
+	by mail.kernel.org (Postfix) with ESMTPS id 4643320873
+	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 13:36:18 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="YjUXeX6r"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4643320873
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41798 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41874 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iMXp8-0006gd-6U
-	for qemu-devel@archiver.kernel.org; Mon, 21 Oct 2019 09:34:14 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38733)
+	id 1iMXr7-0000mA-Ai
+	for qemu-devel@archiver.kernel.org; Mon, 21 Oct 2019 09:36:17 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38809)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <laurent@vivier.eu>) id 1iMXjy-000300-0Y
- for qemu-devel@nongnu.org; Mon, 21 Oct 2019 09:28:55 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1iMXkZ-0003ph-A8
+ for qemu-devel@nongnu.org; Mon, 21 Oct 2019 09:29:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <laurent@vivier.eu>) id 1iMXjw-0004TS-Pk
- for qemu-devel@nongnu.org; Mon, 21 Oct 2019 09:28:53 -0400
-Received: from mout.kundenserver.de ([212.227.126.133]:34515)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1iMXjw-0004TF-G6
- for qemu-devel@nongnu.org; Mon, 21 Oct 2019 09:28:52 -0400
-Received: from [192.168.100.1] ([78.238.229.36]) by mrelayeu.kundenserver.de
- (mreue011 [213.165.67.103]) with ESMTPSA (Nemesis) id
- 1MlwJv-1heeDK2RYB-00iykt; Mon, 21 Oct 2019 15:28:41 +0200
-Subject: Re: [PATCH v8 8/9] linux-user/strace: Let print_sockaddr() have a
- 'last' argument
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
- qemu-devel@nongnu.org
-References: <20191021114857.20538-1-f4bug@amsat.org>
- <20191021114857.20538-9-f4bug@amsat.org>
-From: Laurent Vivier <laurent@vivier.eu>
-Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
- 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
-Message-ID: <e210a127-6e2b-8f32-01b6-e09c36ba31a4@vivier.eu>
-Date: Mon, 21 Oct 2019 15:28:40 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.0
+ (envelope-from <alex.bennee@linaro.org>) id 1iMXkX-0004cQ-Nq
+ for qemu-devel@nongnu.org; Mon, 21 Oct 2019 09:29:31 -0400
+Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:39674)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1iMXkX-0004bo-HV
+ for qemu-devel@nongnu.org; Mon, 21 Oct 2019 09:29:29 -0400
+Received: by mail-wm1-x341.google.com with SMTP id r141so3227015wme.4
+ for <qemu-devel@nongnu.org>; Mon, 21 Oct 2019 06:29:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=9ZNzgEh1353JaRCW8MG0bRTeX0T0SnVqDPL3qldPvKI=;
+ b=YjUXeX6rJ1DyLXvVWACBhfzTbn8wq4PPhnS6YpTF1tQ4Qz25kL8sVnkyG81RFeMKgh
+ BHDgsYUhzxyAeCAChQBTuiSYe0isokJeluvW0jtpp8uZQItFc5OvSlIhBLYYdm39Dogq
+ Ge0UYa91GV4if/3Jy8pep11au40Mi1woqhu8rkGqUXM47nFdrjCkDuqrBFVq7nTgp7Fw
+ 3hHFYUgU1Vf5UOvbzYW3heFKZofuowkycIOwDZy3qGeEjzKzvdUqYIVfxPBsn9RS2weG
+ 9TeYKIQ7PbERm1eNT+i34/2o9gBZY4DLISo1tUZhnXnReoldYaQN+XajGi4dyv9yyVJw
+ kdmQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=9ZNzgEh1353JaRCW8MG0bRTeX0T0SnVqDPL3qldPvKI=;
+ b=qr2x7XEvWJIs9ws4Q4i76XEBV7MToOWqm2KPhbjWcrhlCjJqNnZI+byQxZHwA0Z4w4
+ XDQXvP36T6dY+/favocJoCtE9seUcLXc5MLyJe94FaW8/qlAqVRXJQRRp9g8fLriAg/w
+ eS3WaXNh9y6d8PHFmpMiO+gd+rDeDXevUdlgqKp3b6h1ueAyYDjSOgp3R5WCSNSbcxoo
+ jIBr4uSGMY4V7EFWrqeEm+IEjTtsjL3RwF6BNWe2Qh13s5wH5+YKhheW1bvsgL067g6W
+ amjoQAPQ7qYxhDckyb32f1Y54eEtn4Ld9+87RI5X7gysStiFVCmJ0yUpm5fclXKRBkRE
+ lTGw==
+X-Gm-Message-State: APjAAAV3zjS7hTqt/lG2YHDBN8ujYTIz+GGo0g42u9D2gZgV7+6ynmKT
+ F0Qi12reIT27v2Xzb8SBYqjr0Q==
+X-Google-Smtp-Source: APXvYqx/ZN8PKn5lSIBwzr66JR2Eh46+Ltmpx/usEaasXFy8jo3zuGiLtiAEWkoGSHhNqyD8DIAaZw==
+X-Received: by 2002:a7b:c74a:: with SMTP id w10mr14568121wmk.30.1571664566731; 
+ Mon, 21 Oct 2019 06:29:26 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id l18sm19168713wrn.48.2019.10.21.06.29.25
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 21 Oct 2019 06:29:26 -0700 (PDT)
+Received: from zen.lan (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 547B61FF87;
+ Mon, 21 Oct 2019 14:29:25 +0100 (BST)
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: qemu-devel@nongnu.org
+Subject: [PATCH] cputlb: ensure _cmmu helper functions follow the naming
+ standard
+Date: Mon, 21 Oct 2019 14:29:16 +0100
+Message-Id: <20191021132916.27818-1-alex.bennee@linaro.org>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-In-Reply-To: <20191021114857.20538-9-f4bug@amsat.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: fr
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:yOY2KcwYtBtilH9wfIOLu28fwx2wgTZ2kDMRxvZySWUhA9OGuu3
- 96boMNhSLR+Z+fBh55uvHb7Q8HKvKVwWySeUJKqZ1xnb6qrYlv1AhddH3y9tCR/6wpPK4/b
- 8MTmfXHohz1/KILMxVMLKHSxugv8jbHqmYDlix8uiSRIxWFtTWeaDbEvd3ZyUc74vqHVVTM
- +v6LtriiMGDPFyoFcE8Ng==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:b+0CHg9XuTo=:a0ZdVTIMR5RNcUbm2o07xE
- 7SBnwaZbdY69mWv6p8WBl9FafBxMnlLaaGSoejW4lnJp87fHhlUwAX+Gvm5dgGj77ucHDJ1iH
- IrMV7+OcMJt703g3anKbPMueeOqbNiz/KXTb8yjVv46M7SuA7634OagZcHeensOGwTH/FZ4JO
- KH1OE18hMMmE7XwknRsby9SDpU4qX7s5t3mUZFg01aW8nU6sjq6EI2pTwfC2xrEwj/ZdhW0aN
- ZmbpWuNx5nETUi0pFuN+B4UkcBHSxyJq4f4n8O/5hOrzkqwdoX8aG0lg8A1mpH8Y9m3wPq0WL
- PUlL2FhbgSTJxChDynpJgAMMbwRISl6OlmlO0LAuhsMvg2uDcqOJ/Ux9gKudtdJ0ubBMQ6rBj
- X46usjEXTrF/qBPbB2HrJ4dpVMtArJAz6BHKfWCLS1SNv1M9KsHMVaO8afghto6ebbAOlx7Dr
- pQIXDBN80AVg4chMfYJdJ3VRQMoUOZllhtKm4xLaxRRXkWDwd0rxEAQwWT75p4fZJaYFQsRUc
- 1mVYwdMoSN4YSI2XSuxKyiEdldTeCKRwx8heBSqG6kE+02OmmkzkposeIg+HU/LKzsSN0ocuS
- vnIEyEAl9lIQLWXpA3WjQkunHtjvfyBZ0LcDQXyaN+R7kolbmLq0ef6l5Ggrp3NXLD5S5XCtx
- 3+AbchMuqTKd5GSI4h7XyCwuLWJsQxeEOMHfzamZ8YFHvQ1KT0LLFflZG4kkrphqFhWL3RElS
- jW8gE4Xua7saCJK8rVQtXrtoCnxz0jWOQnSagyQZSeRGnIiwemBlrsPmWayg1Sc/0PnEX0HXH
- r/cgtkLj4xCKSI+9xrFkklhKUkDycIQAQTOlytA0l/qn4Mh5YJ7eyOXfK3j6DPqaUpaXBED8n
- 1y1SVaX1/8tW42UDeuC6nPOAgzeod62UsD33EKBTE=
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 212.227.126.133
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::341
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -125,80 +95,210 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Riku Voipio <riku.voipio@iki.fi>
+Cc: peter.maydell@linaro.org, Eduardo Habkost <ehabkost@redhat.com>,
+ "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Le 21/10/2019 à 13:48, Philippe Mathieu-Daudé a écrit :
-> If the format is not the syscall last argument, a comma is append.
-> 
-> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-> Reviewed-by: Laurent Vivier <laurent@vivier.eu>
-> ---
-> v8: do not name prototype arguments
-> 
-> checkpatch error:
->  ERROR: storage class should be at the beginning of the declaration
->  #10: FILE: linux-user/strace.c:70:
->  +UNUSED static void print_sockaddr(abi_ulong, abi_long, int);
-> ---
->  linux-user/strace.c | 10 +++++-----
->  1 file changed, 5 insertions(+), 5 deletions(-)
-> 
-> diff --git a/linux-user/strace.c b/linux-user/strace.c
-> index cd92c77d33..3d4d684450 100644
-> --- a/linux-user/strace.c
-> +++ b/linux-user/strace.c
-> @@ -67,7 +67,7 @@ UNUSED static void print_timeval(abi_ulong, int);
->  UNUSED static void print_timezone(abi_ulong, int);
->  UNUSED static void print_number(abi_long, int);
->  UNUSED static void print_signal(abi_ulong, int);
-> -UNUSED static void print_sockaddr(abi_ulong addr, abi_long addrlen);
-> +UNUSED static void print_sockaddr(abi_ulong, abi_long, int);
->  UNUSED static void print_socket_domain(int domain);
->  UNUSED static void print_socket_type(int type);
->  UNUSED static void print_socket_protocol(int domain, int type, int protocol);
-> @@ -336,7 +336,7 @@ static void print_siginfo(const target_siginfo_t *tinfo)
->  }
->  
->  static void
-> -print_sockaddr(abi_ulong addr, abi_long addrlen)
-> +print_sockaddr(abi_ulong addr, abi_long addrlen, int last)
->  {
->      struct target_sockaddr *sa;
->      int i;
-> @@ -418,7 +418,7 @@ print_sockaddr(abi_ulong addr, abi_long addrlen)
->      } else {
->          print_raw_param("0x"TARGET_ABI_FMT_lx, addr, 0);
->      }
-> -    gemu_log(", "TARGET_ABI_FMT_ld, addrlen);
-> +    gemu_log(", "TARGET_ABI_FMT_ld"%s", addrlen, get_comma(last));
->  }
->  
->  static void
-> @@ -1751,7 +1751,7 @@ static void do_print_sockaddr(const char *name, abi_long arg1)
->  
->      gemu_log("%s(", name);
->      print_sockfd(sockfd, 0);
-> -    print_sockaddr(addr, addrlen);
-> +    print_sockaddr(addr, addrlen, 0);
->      gemu_log(")");
->  }
->  
-> @@ -1821,7 +1821,7 @@ static void do_print_msgaddr(const char *name, abi_long arg1)
->      print_buf(msg, len, 0);
->      print_raw_param(TARGET_ABI_FMT_ld, len, 0);
->      print_flags(msg_flags, flags, 0);
-> -    print_sockaddr(addr, addrlen);
-> +    print_sockaddr(addr, addrlen, 0);
->      gemu_log(")");
->  }
->  
-> 
+We document this in docs/devel/load-stores.rst so lets follow it. The
+32 bit and 64 bit access functions have historically not included the
+sign so we leave those as is.
 
-Applied to my linux-user branch.
+The few places that use signed code loads are fixed up to do the
+casting themselves.
 
-Thanks,
-Laurent
+Fixes: 282dffc8
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+---
+ accel/tcg/cputlb.c               |  6 +++---
+ include/exec/cpu_ldst_template.h | 12 +++++++-----
+ target/cris/translate.c          |  4 ++--
+ target/cris/translate_v10.inc.c  |  7 +++----
+ target/i386/translate.c          |  2 +-
+ tcg/tcg.h                        | 14 +++++++-------
+ 6 files changed, 23 insertions(+), 22 deletions(-)
+
+diff --git a/accel/tcg/cputlb.c b/accel/tcg/cputlb.c
+index defc8d59292..0c3f5d3027b 100644
+--- a/accel/tcg/cputlb.c
++++ b/accel/tcg/cputlb.c
+@@ -1862,7 +1862,7 @@ static uint64_t full_ldub_cmmu(CPUArchState *env, target_ulong addr,
+     return load_helper(env, addr, oi, retaddr, MO_8, true, full_ldub_cmmu);
+ }
+ 
+-uint8_t helper_ret_ldb_cmmu(CPUArchState *env, target_ulong addr,
++uint8_t helper_ret_ldub_cmmu(CPUArchState *env, target_ulong addr,
+                             TCGMemOpIdx oi, uintptr_t retaddr)
+ {
+     return full_ldub_cmmu(env, addr, oi, retaddr);
+@@ -1875,7 +1875,7 @@ static uint64_t full_le_lduw_cmmu(CPUArchState *env, target_ulong addr,
+                        full_le_lduw_cmmu);
+ }
+ 
+-uint16_t helper_le_ldw_cmmu(CPUArchState *env, target_ulong addr,
++uint16_t helper_le_lduw_cmmu(CPUArchState *env, target_ulong addr,
+                             TCGMemOpIdx oi, uintptr_t retaddr)
+ {
+     return full_le_lduw_cmmu(env, addr, oi, retaddr);
+@@ -1888,7 +1888,7 @@ static uint64_t full_be_lduw_cmmu(CPUArchState *env, target_ulong addr,
+                        full_be_lduw_cmmu);
+ }
+ 
+-uint16_t helper_be_ldw_cmmu(CPUArchState *env, target_ulong addr,
++uint16_t helper_be_lduw_cmmu(CPUArchState *env, target_ulong addr,
+                             TCGMemOpIdx oi, uintptr_t retaddr)
+ {
+     return full_be_lduw_cmmu(env, addr, oi, retaddr);
+diff --git a/include/exec/cpu_ldst_template.h b/include/exec/cpu_ldst_template.h
+index af7e0b49f2d..ddfb85da02f 100644
+--- a/include/exec/cpu_ldst_template.h
++++ b/include/exec/cpu_ldst_template.h
+@@ -65,8 +65,12 @@
+ #ifdef SOFTMMU_CODE_ACCESS
+ #define ADDR_READ addr_code
+ #define MMUSUFFIX _cmmu
+-#define URETSUFFIX SUFFIX
+-#define SRETSUFFIX SUFFIX
++#define URETSUFFIX USUFFIX
++/*
++ * All code access functions are unsigned, I could poison this but it
++ * it would break further inclusions of this template.
++ */
++#define SRETSUFFIX _unused_
+ #else
+ #define ADDR_READ addr_read
+ #define MMUSUFFIX _mmu
+@@ -114,7 +118,7 @@ glue(glue(cpu_ld, USUFFIX), MEMSUFFIX)(CPUArchState *env, target_ulong ptr)
+     return glue(glue(glue(cpu_ld, USUFFIX), MEMSUFFIX), _ra)(env, ptr, 0);
+ }
+ 
+-#if DATA_SIZE <= 2
++#if DATA_SIZE <= 2 && !defined(SOFTMMU_CODE_ACCESS)
+ static inline int
+ glue(glue(glue(cpu_lds, SUFFIX), MEMSUFFIX), _ra)(CPUArchState *env,
+                                                   target_ulong ptr,
+@@ -126,11 +130,9 @@ glue(glue(glue(cpu_lds, SUFFIX), MEMSUFFIX), _ra)(CPUArchState *env,
+     int mmu_idx;
+     TCGMemOpIdx oi;
+ 
+-#if !defined(SOFTMMU_CODE_ACCESS)
+     trace_guest_mem_before_exec(
+         env_cpu(env), ptr,
+         trace_mem_build_info(SHIFT, true, MO_TE, false));
+-#endif
+ 
+     addr = ptr;
+     mmu_idx = CPU_MMU_INDEX;
+diff --git a/target/cris/translate.c b/target/cris/translate.c
+index e752bd06093..f7d3b3e4fdc 100644
+--- a/target/cris/translate.c
++++ b/target/cris/translate.c
+@@ -231,7 +231,7 @@ static int cris_fetch(CPUCRISState *env, DisasContext *dc, uint32_t addr,
+     case 2:
+     {
+         if (sign) {
+-            r = cpu_ldsw_code(env, addr);
++            r = (int16_t) cpu_lduw_code(env, addr);
+         } else {
+             r = cpu_lduw_code(env, addr);
+         }
+@@ -240,7 +240,7 @@ static int cris_fetch(CPUCRISState *env, DisasContext *dc, uint32_t addr,
+     case 1:
+     {
+         if (sign) {
+-            r = cpu_ldsb_code(env, addr);
++            r = (int8_t) cpu_ldub_code(env, addr);
+         } else {
+             r = cpu_ldub_code(env, addr);
+         }
+diff --git a/target/cris/translate_v10.inc.c b/target/cris/translate_v10.inc.c
+index a87b8bb2813..0dd77368836 100644
+--- a/target/cris/translate_v10.inc.c
++++ b/target/cris/translate_v10.inc.c
+@@ -183,9 +183,9 @@ static int dec10_prep_move_m(CPUCRISState *env, DisasContext *dc,
+         if (memsize != 4) {
+             if (s_ext) {
+                 if (memsize == 1)
+-                    imm = cpu_ldsb_code(env, dc->pc + 2);
++                    imm = (int8_t) cpu_ldub_code(env, dc->pc + 2);
+                 else
+-                    imm = cpu_ldsw_code(env, dc->pc + 2);
++                    imm = (int16_t) cpu_lduw_code(env, dc->pc + 2);
+             } else {
+                 if (memsize == 1)
+                     imm = cpu_ldub_code(env, dc->pc + 2);
+@@ -1202,8 +1202,7 @@ static unsigned int dec10_ind(CPUCRISState *env, DisasContext *dc)
+         case CRISV10_IND_BCC_M:
+ 
+             cris_cc_mask(dc, 0);
+-            imm = cpu_ldsw_code(env, dc->pc + 2);
+-            simm = (int16_t)imm;
++            simm = (int16_t) cpu_lduw_code(env, dc->pc + 2);
+             simm += 4;
+ 
+             LOG_DIS("bcc_m: b%s %x\n", cc_name(dc->cond), dc->pc + simm);
+diff --git a/target/i386/translate.c b/target/i386/translate.c
+index 868b0acafe8..edc915dcfd3 100644
+--- a/target/i386/translate.c
++++ b/target/i386/translate.c
+@@ -1930,7 +1930,7 @@ static inline uint8_t x86_ldub_code(CPUX86State *env, DisasContext *s)
+ 
+ static inline int16_t x86_ldsw_code(CPUX86State *env, DisasContext *s)
+ {
+-    return cpu_ldsw_code(env, advance_pc(env, s, 2));
++    return (int16_t) cpu_lduw_code(env, advance_pc(env, s, 2));
+ }
+ 
+ static inline uint16_t x86_lduw_code(CPUX86State *env, DisasContext *s)
+diff --git a/tcg/tcg.h b/tcg/tcg.h
+index a37181c8998..a5388b89827 100644
+--- a/tcg/tcg.h
++++ b/tcg/tcg.h
+@@ -1269,16 +1269,16 @@ void helper_be_stl_mmu(CPUArchState *env, target_ulong addr, uint32_t val,
+ void helper_be_stq_mmu(CPUArchState *env, target_ulong addr, uint64_t val,
+                        TCGMemOpIdx oi, uintptr_t retaddr);
+ 
+-uint8_t helper_ret_ldb_cmmu(CPUArchState *env, target_ulong addr,
+-                            TCGMemOpIdx oi, uintptr_t retaddr);
+-uint16_t helper_le_ldw_cmmu(CPUArchState *env, target_ulong addr,
++uint8_t helper_ret_ldub_cmmu(CPUArchState *env, target_ulong addr,
+                             TCGMemOpIdx oi, uintptr_t retaddr);
++uint16_t helper_le_lduw_cmmu(CPUArchState *env, target_ulong addr,
++                             TCGMemOpIdx oi, uintptr_t retaddr);
+ uint32_t helper_le_ldl_cmmu(CPUArchState *env, target_ulong addr,
+                             TCGMemOpIdx oi, uintptr_t retaddr);
+ uint64_t helper_le_ldq_cmmu(CPUArchState *env, target_ulong addr,
+                             TCGMemOpIdx oi, uintptr_t retaddr);
+-uint16_t helper_be_ldw_cmmu(CPUArchState *env, target_ulong addr,
+-                            TCGMemOpIdx oi, uintptr_t retaddr);
++uint16_t helper_be_lduw_cmmu(CPUArchState *env, target_ulong addr,
++                             TCGMemOpIdx oi, uintptr_t retaddr);
+ uint32_t helper_be_ldl_cmmu(CPUArchState *env, target_ulong addr,
+                             TCGMemOpIdx oi, uintptr_t retaddr);
+ uint64_t helper_be_ldq_cmmu(CPUArchState *env, target_ulong addr,
+@@ -1295,7 +1295,7 @@ uint64_t helper_be_ldq_cmmu(CPUArchState *env, target_ulong addr,
+ # define helper_ret_stw_mmu   helper_be_stw_mmu
+ # define helper_ret_stl_mmu   helper_be_stl_mmu
+ # define helper_ret_stq_mmu   helper_be_stq_mmu
+-# define helper_ret_ldw_cmmu  helper_be_ldw_cmmu
++# define helper_ret_lduw_cmmu  helper_be_lduw_cmmu
+ # define helper_ret_ldl_cmmu  helper_be_ldl_cmmu
+ # define helper_ret_ldq_cmmu  helper_be_ldq_cmmu
+ #else
+@@ -1308,7 +1308,7 @@ uint64_t helper_be_ldq_cmmu(CPUArchState *env, target_ulong addr,
+ # define helper_ret_stw_mmu   helper_le_stw_mmu
+ # define helper_ret_stl_mmu   helper_le_stl_mmu
+ # define helper_ret_stq_mmu   helper_le_stq_mmu
+-# define helper_ret_ldw_cmmu  helper_le_ldw_cmmu
++# define helper_ret_lduw_cmmu  helper_le_lduw_cmmu
+ # define helper_ret_ldl_cmmu  helper_le_ldl_cmmu
+ # define helper_ret_ldq_cmmu  helper_le_ldq_cmmu
+ #endif
+-- 
+2.20.1
+
 
