@@ -2,82 +2,81 @@ Return-Path: <SRS0=8ZcK=YO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3285CCA9EAF
-	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 10:03:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 81245CA9EAF
+	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 10:06:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E6AD520684
-	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 10:03:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 497CC2166E
+	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 10:06:15 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="P993QeFs"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E6AD520684
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="oddKX0qT"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 497CC2166E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36964 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37052 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iMUWl-0007OK-3U
-	for qemu-devel@archiver.kernel.org; Mon, 21 Oct 2019 06:03:03 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39391)
+	id 1iMUZq-00011P-Az
+	for qemu-devel@archiver.kernel.org; Mon, 21 Oct 2019 06:06:14 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39894)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <cohuck@redhat.com>) id 1iMUVT-0006CK-4o
- for qemu-devel@nongnu.org; Mon, 21 Oct 2019 06:01:44 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1iMUYy-00006K-Eb
+ for qemu-devel@nongnu.org; Mon, 21 Oct 2019 06:05:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <cohuck@redhat.com>) id 1iMUVO-00008K-B8
- for qemu-devel@nongnu.org; Mon, 21 Oct 2019 06:01:43 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:43797
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1iMUVO-00007W-6s
- for qemu-devel@nongnu.org; Mon, 21 Oct 2019 06:01:38 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1571652096;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=3mvXCDSA+f5gIlB/2sbNJxvBl3iNdUuyEhWwp2M9wIg=;
- b=P993QeFsY57HPsZdfamraHfRuQcJEmSfQw/bQhHo5oqj8jmB18iLiEbkIW9/fPPtUCH1Ux
- 66Vb4TBP6hH0XoyZfHF5/19/6itqJgj9kZUXafzWiMn1CvyNylPLKO/HXk9Lj+6SI6G+pb
- Bzh/XUYa1Kvamunx82ORCVJvw9XJY2A=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-218-KahwqqlCPQieVeqVKL5ZOQ-1; Mon, 21 Oct 2019 06:01:32 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A34C8100550E;
- Mon, 21 Oct 2019 10:01:31 +0000 (UTC)
-Received: from gondolin (dhcp-192-218.str.redhat.com [10.33.192.218])
- by smtp.corp.redhat.com (Postfix) with ESMTP id DF5CC1001938;
- Mon, 21 Oct 2019 10:01:27 +0000 (UTC)
-Date: Mon, 21 Oct 2019 12:01:25 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-To: David Hildenbrand <david@redhat.com>
-Subject: Re: [PATCH v1] s390x/kvm: Set default cpu model for all machine
- classes
-Message-ID: <20191021120125.19ca110f.cohuck@redhat.com>
-In-Reply-To: <6404748d-1711-b6d7-f13b-10250d74dc92@redhat.com>
-References: <20191021093456.6168-1-david@redhat.com>
- <96381cf8-a6cf-9583-7eb2-92ad9d333c1b@redhat.com>
- <e8ef32ee-de10-0015-6a45-de3d5bba4ff8@redhat.com>
- <6404748d-1711-b6d7-f13b-10250d74dc92@redhat.com>
-Organization: Red Hat GmbH
+ (envelope-from <peter.maydell@linaro.org>) id 1iMUYt-0002A7-GG
+ for qemu-devel@nongnu.org; Mon, 21 Oct 2019 06:05:20 -0400
+Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:33347)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1iMUYt-00029g-AM
+ for qemu-devel@nongnu.org; Mon, 21 Oct 2019 06:05:15 -0400
+Received: by mail-ot1-x341.google.com with SMTP id 60so10483410otu.0
+ for <qemu-devel@nongnu.org>; Mon, 21 Oct 2019 03:05:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=dT7v0dc2XmlbOSGjc2YcIFbasuyFnV2qK9cc5zJHHOg=;
+ b=oddKX0qTpgHt+ktzDfZO29chm44hHpCAN9OxkMdr01CLwHge1yzw2wBpCuPIjZBq2i
+ eciyfy21ImtLIFeKgtK90Jk1k90LVVpWGFMCaCKjxTGOokZ1iWyBgb8VAGsXyd1q6WiO
+ h14MOyhEcyuywwV7b8LG0iTfTdT77vMYU98vJlSrUfFbM0ZSxQ3FAmJxhgSz/KihJpQ6
+ AgkMajOQPkKsr2WDVxuaIfZ/CP763Jf1v3Ug3RRJOF5d13yR/fWzPq8pNFPt47svIiYA
+ esbAP2mbs/4Lm/Da8Vtm8BhgjPNJXRHZlyFoK8+6JyxJjrltHbH5sLa2oC0Kk1Y0XdRz
+ Rz9A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=dT7v0dc2XmlbOSGjc2YcIFbasuyFnV2qK9cc5zJHHOg=;
+ b=JxDA1zN17NT0Cvntc2nknom3SqzXt3fu7wjjKm2dCrmaEE1017pWe+eTKpL0Usr395
+ 0C3EULXJBmaujiL7+HssctDOS+kGfpljk8vSKEcGxMKr/j5BmZ/6F84GiPO71vPvGKCU
+ oexT8W08eMy/BMJDnrvn9pJsHXGH3Bzsxm4GXYMJ3Ln/Kaf9kURuLAfXNln8Iyvl1LOX
+ IrwvoQ1PDQjLYOekaG4otaFU+GqMpIziTsbiFGVF7pjuO+CKw5OEUowyNmeaShgferqa
+ 5WgJwo//c0Wa+uPfKogBpImRi/J8ufjTKYLwX/pAkN6p5M1O7n9WUmyIjzO7TbOyiYeY
+ SGIQ==
+X-Gm-Message-State: APjAAAX1e1VvXqwOQ8LONEwg9Yd6yGq9cUyDrJX10jJr9vvgpwAul23b
+ tzBBVnPACYEe1SYqSOT58z5AQGBGjoFq9+EzqIFMKQ==
+X-Google-Smtp-Source: APXvYqxTfM2CeQFg85GiwAb/IALNo1UZDC/NnkmezwLOsPulKPPj0QMOd60WvWFUaU+FEtHso5QMx1C3FKlWyWmG7sI=
+X-Received: by 2002:a9d:398a:: with SMTP id y10mr17111943otb.97.1571652314434; 
+ Mon, 21 Oct 2019 03:05:14 -0700 (PDT)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-MC-Unique: KahwqqlCPQieVeqVKL5ZOQ-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=WINDOWS-1252
+References: <20191018154212.13458-1-marcandre.lureau@redhat.com>
+ <20191018154212.13458-4-marcandre.lureau@redhat.com>
+In-Reply-To: <20191018154212.13458-4-marcandre.lureau@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 21 Oct 2019 11:05:03 +0100
+Message-ID: <CAFEAcA8a-B7O31MQosSX5kjVZi=1NCr0+=62j6n1DU+ewuN-kA@mail.gmail.com>
+Subject: Re: [PATCH 03/14] lance: replace PROP_PTR with PROP_LINK
+To: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 205.139.110.120
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::341
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,43 +88,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Huth <thuth@redhat.com>, Janosch Frank <frankja@linux.ibm.com>,
- Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org,
- Halil Pasic <pasic@linux.ibm.com>,
- Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org,
- Igor Mammedov <imammedo@redhat.com>, Jiri Denemark <jdenemar@redhat.com>
+Cc: Corey Minyard <cminyard@mvista.com>, "Michael S. Tsirkin" <mst@redhat.com>,
+ Jason Wang <jasowang@redhat.com>,
+ Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
+ QEMU Developers <qemu-devel@nongnu.org>,
+ KONRAD Frederic <frederic.konrad@adacore.com>,
+ "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
+ Aleksandar Rikalo <arikalo@wavecomp.com>, Magnus Damm <magnus.damm@gmail.com>,
+ =?UTF-8?Q?Herv=C3=A9_Poussineau?= <hpoussin@reactos.org>,
+ Artyom Tarasenko <atar4qemu@gmail.com>, Eduardo Habkost <ehabkost@redhat.com>,
+ Fabien Chouteau <chouteau@adacore.com>, qemu-arm <qemu-arm@nongnu.org>,
+ Richard Henderson <rth@twiddle.net>,
+ =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>,
+ qemu-ppc <qemu-ppc@nongnu.org>, Aleksandar Markovic <amarkovic@wavecomp.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, 21 Oct 2019 11:58:35 +0200
-David Hildenbrand <david@redhat.com> wrote:
+On Fri, 18 Oct 2019 at 16:42, Marc-Andr=C3=A9 Lureau
+<marcandre.lureau@redhat.com> wrote:
+>
+> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> ---
+>  hw/dma/sparc32_dma.c | 2 +-
+>  hw/net/lance.c       | 5 ++---
+>  hw/net/pcnet-pci.c   | 2 +-
+>  hw/net/pcnet.h       | 2 +-
+>  4 files changed, 5 insertions(+), 6 deletions(-)
 
-> > query-machines probes with the "none" machine all other machines.
-> > Current code only fixes up the active machine.
-> >  =20
->=20
-> To be more precise, libvirt probes with "-machine none,accel=3Dkvm:tcg"=
-=20
-> all other machines.
+I feel like there's probably a way to be more type-safe here
+(eg for the lance.c property we know the linked device must
+be TYPE_SPARC32_LEDMA_DEVICE, not just TYPE_DEVICE), but I guess
+this will do.
 
-Add that to the patch description?
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 
->=20
-> > (that's why you won't notice when starting a machine - you will always
-> > get "host" for the active one)
-> >  =20
-> >>
-> >> Anyway, your patch sounds fine, so (with "klass" replaced by "oc"):
-
-Respin with that? Makes it easier to pick up :)
-
-> >>
-> >> Reviewed-by: Thomas Huth <thuth@redhat.com>
-> >> =20
-> >=20
-> >  =20
->=20
->=20
-
+thanks
+-- PMM
 
