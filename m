@@ -2,55 +2,82 @@ Return-Path: <SRS0=8ZcK=YO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AB87BCA9EAF
-	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 19:29:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0815FCA9EAF
+	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 19:53:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 72EF3205ED
-	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 19:29:08 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 72EF3205ED
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=rt-rk.com
+	by mail.kernel.org (Postfix) with ESMTPS id C965C2086D
+	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 19:53:44 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="APrjY/jS"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C965C2086D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47194 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47350 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iMdMZ-0001Zt-MB
-	for qemu-devel@archiver.kernel.org; Mon, 21 Oct 2019 15:29:07 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58776)
+	id 1iMdkO-0007dy-1o
+	for qemu-devel@archiver.kernel.org; Mon, 21 Oct 2019 15:53:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36157)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <aleksandar.markovic@rt-rk.com>) id 1iMd75-0001XV-50
- for qemu-devel@nongnu.org; Mon, 21 Oct 2019 15:13:10 -0400
+ (envelope-from <ard.biesheuvel@linaro.org>) id 1iMdjZ-0007Cb-LJ
+ for qemu-devel@nongnu.org; Mon, 21 Oct 2019 15:52:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aleksandar.markovic@rt-rk.com>) id 1iMd70-0004I0-Tv
- for qemu-devel@nongnu.org; Mon, 21 Oct 2019 15:13:06 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:53951 helo=mail.rt-rk.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
- id 1iMd70-0004GA-CX
- for qemu-devel@nongnu.org; Mon, 21 Oct 2019 15:13:02 -0400
-Received: from localhost (localhost [127.0.0.1])
- by mail.rt-rk.com (Postfix) with ESMTP id 116DE1A219A;
- Mon, 21 Oct 2019 21:11:56 +0200 (CEST)
-X-Virus-Scanned: amavisd-new at rt-rk.com
-Received: from rtrkw774-lin.domain.local (rtrkw774.domain.local [10.10.14.106])
- by mail.rt-rk.com (Postfix) with ESMTPSA id BA0E51A217A;
- Mon, 21 Oct 2019 21:11:55 +0200 (CEST)
-From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v6 06/12] target/mips: msa: Split helpers for
- ILV<EV|OD|L|R>.<B|H|W|D>
-Date: Mon, 21 Oct 2019 21:11:31 +0200
-Message-Id: <1571685097-15175-7-git-send-email-aleksandar.markovic@rt-rk.com>
-X-Mailer: git-send-email 2.7.4
-In-Reply-To: <1571685097-15175-1-git-send-email-aleksandar.markovic@rt-rk.com>
-References: <1571685097-15175-1-git-send-email-aleksandar.markovic@rt-rk.com>
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [fuzzy]
-X-Received-From: 89.216.37.149
+ (envelope-from <ard.biesheuvel@linaro.org>) id 1iMdjY-0007Bm-68
+ for qemu-devel@nongnu.org; Mon, 21 Oct 2019 15:52:53 -0400
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:34088)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <ard.biesheuvel@linaro.org>)
+ id 1iMdjX-0007AE-Rh
+ for qemu-devel@nongnu.org; Mon, 21 Oct 2019 15:52:52 -0400
+Received: by mail-wr1-x444.google.com with SMTP id t16so10224494wrr.1
+ for <qemu-devel@nongnu.org>; Mon, 21 Oct 2019 12:52:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=L8JyvHPMyMhokVDTc8Pc971XAPX78Th+iT+yI4+u0UY=;
+ b=APrjY/jSckFYKLgpAX/7sJUP1WMpbrV1cTOjIVLwWFRriqn+UB7xnrivIEdKaUR4ax
+ uA72TabmxaWe/edxMyyI1/wP6BxNsIpsAcCbeXUXOsti0mS3D/XYUhJJ7Cexze5HhO5t
+ FjVontdhT2ObBctqG6Opgf/I+iGZU535YEcBpo/77PJmQ60PZo5kiMmBiuBej2inOLpB
+ PiIsEJa+X0jP/XK7PUMkAJGaXTAUS5DS2TJAI8utjYMhDvEtAISzgCAlO0ii5lDe99qa
+ b6uWFsP8DPQRP0e3zFilGb9pN5qKfXoVbtfIE50XDA73baCX2Lf3/0OqUYiUOvNuUx/z
+ Z2Pg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=L8JyvHPMyMhokVDTc8Pc971XAPX78Th+iT+yI4+u0UY=;
+ b=a4qi/imRqwlg0fgyRun4vVMGROV+ieG7GJf922jGBIoOgH+sn7PeRyrcpGExiXYBzm
+ qfomPQFhJgktl+WPwlzyXPI+ac5CaSZOCDT4ZrhA2t8RP2CBlzEr7SSbbMPCeQlwwq3g
+ GT4XE6jvihHgjw4BvXrF0Ng7zbHqAQe74BMUKF06poIBYn8nc5niBLsAKBLhwGwGSCF4
+ oXKdKVlFPjggLT/rSDfoIO2JkQ0j0dIdD1ocn89yQw6lHrECvYjGOJ/RYNMWfnPOzffQ
+ ug+RKz634FLycS89fGKTObKWTQ7zHBcZMU3VgGY7CeLXSU8cnPeBLjJ0+zKh399mFSEv
+ DhHA==
+X-Gm-Message-State: APjAAAXBIg/zA1t+bbPqYWKSkPkN4KowdAqsEbOdm0/el0X9EZ3JUKm8
+ 6eGWZ+IDw/v6QeD4H8UKC4G5vgZtSqZF3PTTkjdifQ==
+X-Google-Smtp-Source: APXvYqwcugT//qnqufmXFYv7mzW6pXLJFnsI9RIJJUQFrtvIRLaGeVUrR5fl8Axh/4r7ZFcA/B5qxBZnIVYs8fJOW4o=
+X-Received: by 2002:adf:9f08:: with SMTP id l8mr20361667wrf.325.1571687568411; 
+ Mon, 21 Oct 2019 12:52:48 -0700 (PDT)
+MIME-Version: 1.0
+References: <20191021145839.12684-1-peter.maydell@linaro.org>
+ <06e15851-0b4e-63c3-001d-dd7ea5855872@linaro.org>
+ <5dc0737a-f1b0-24aa-015a-1806a6d61e69@redhat.com>
+In-Reply-To: <5dc0737a-f1b0-24aa-015a-1806a6d61e69@redhat.com>
+From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Date: Mon, 21 Oct 2019 21:52:42 +0200
+Message-ID: <CAKv+Gu-QkvyLoJ6jW7eMm48hKKO9pf6r53m6Qi1cvCDt9WJx5g@mail.gmail.com>
+Subject: Re: [PATCH] tcg/LICENSE: Remove no-longer-true statement that TCG is
+ BSD-licensed
+To: Laszlo Ersek <lersek@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::444
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -62,946 +89,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: aleksandar.rikalo@rt-rk.com, Aleksandar Markovic <amarkovic@wavecomp.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Claudio Fontana <claudio.fontana@gmail.com>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ Markus Armbruster <armbru@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>,
+ Alexander Graf <agraf@suse.de>, Stefan Hajnoczi <stefanha@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Aleksandar Markovic <amarkovic@wavecomp.com>
+On Mon, 21 Oct 2019 at 19:57, Laszlo Ersek <lersek@redhat.com> wrote:
+>
+> (+Ard, Alex)
+>
+> On 10/21/19 17:52, Richard Henderson wrote:
+> > On 10/21/19 7:58 AM, Peter Maydell wrote:
+> >> Since 2008 the tcg/LICENSE file has not changed: it claims that
+> >> everything under tcg/ is BSD-licensed.
+> >>
+> >> This is not true and hasn't been true for years: in 2013 we
+> >> accepted the tcg/aarch64 target code under a GPLv2-or-later
+> >> license statement. We don't really consider the tcg
+> >> subdirectory to be a distinct part of QEMU anyway.
+> >>
+> >> Remove the LICENSE file, since claiming false information
+> >> about the license of the code is confusing, and update
+> >> the main project LICENSE file also to be clearer about
+> >> the license used by TCG.
+> >>
+> >> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> >> ---
+> >> This patch takes the simple approach of just documenting
+> >> the de-facto current reality; does anybody want to argue
+> >> for something else? Other possibilities I guess would be
+> >> specifically documenting tcg/aarch64 as an accidental
+> >> exception to the general licensing rule for tcg/, or even
+> >> trying to get it relicensed.
+> >>
+> >> Does having tcg/ be BSD-licensed gain the project anything?
+> >> From my point of view I don't really see it as a cleanly
+> >> separable module of code -- it's quite tightly integrated
+> >> with the rest of QEMU, including code in accel/tcg which
+> >> is variously GPL or LGPL.
+> >
+> > I think this is the best solution.  I've never been convinced that TCG can
+> > usefully be extracted and reused for something else.
+>
+> Side comment:
+>
+> Ard and Alex extracted TCG to run x86 PCIe UEFI option ROMs on aarch64
+> hardware.
+>
+> https://github.com/ardbiesheuvel/X86EmulatorPkg
+> https://kvmforum2017.sched.com/event/Bo0S/qemu-in-uefi-alexander-graf-suse
+> https://www.youtube.com/watch?v=uxvAH1Q4Mx0
+>
+> If I remember correctly, they specifically picked a git commit hash that
+> was still purely BSD licensed.
+>
+> FWIW,
+> <https://github.com/ardbiesheuvel/X86EmulatorPkg/blob/master/LICENSE> is
+> not any BSD license, so I'm almost surely out of date on that aspect;
+> just wanted to confirm that TCG has been usefully extracted.
+>
 
-Achieves clearer code and slightly better performance.
-
-Reviewed-by: Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>
-Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
----
- target/mips/helper.h     |  21 +-
- target/mips/msa_helper.c | 768 +++++++++++++++++++++++++----------------------
- target/mips/translate.c  |  76 ++++-
- 3 files changed, 496 insertions(+), 369 deletions(-)
-
-diff --git a/target/mips/helper.h b/target/mips/helper.h
-index 6419bb8..f3df187 100644
---- a/target/mips/helper.h
-+++ b/target/mips/helper.h
-@@ -912,6 +912,23 @@ DEF_HELPER_4(msa_mod_s_h, void, env, i32, i32, i32)
- DEF_HELPER_4(msa_mod_s_w, void, env, i32, i32, i32)
- DEF_HELPER_4(msa_mod_s_d, void, env, i32, i32, i32)
- 
-+DEF_HELPER_4(msa_ilvev_b, void, env, i32, i32, i32)
-+DEF_HELPER_4(msa_ilvev_h, void, env, i32, i32, i32)
-+DEF_HELPER_4(msa_ilvev_w, void, env, i32, i32, i32)
-+DEF_HELPER_4(msa_ilvev_d, void, env, i32, i32, i32)
-+DEF_HELPER_4(msa_ilvod_b, void, env, i32, i32, i32)
-+DEF_HELPER_4(msa_ilvod_h, void, env, i32, i32, i32)
-+DEF_HELPER_4(msa_ilvod_w, void, env, i32, i32, i32)
-+DEF_HELPER_4(msa_ilvod_d, void, env, i32, i32, i32)
-+DEF_HELPER_4(msa_ilvl_b, void, env, i32, i32, i32)
-+DEF_HELPER_4(msa_ilvl_h, void, env, i32, i32, i32)
-+DEF_HELPER_4(msa_ilvl_w, void, env, i32, i32, i32)
-+DEF_HELPER_4(msa_ilvl_d, void, env, i32, i32, i32)
-+DEF_HELPER_4(msa_ilvr_b, void, env, i32, i32, i32)
-+DEF_HELPER_4(msa_ilvr_h, void, env, i32, i32, i32)
-+DEF_HELPER_4(msa_ilvr_w, void, env, i32, i32, i32)
-+DEF_HELPER_4(msa_ilvr_d, void, env, i32, i32, i32)
-+
- DEF_HELPER_4(msa_and_v, void, env, i32, i32, i32)
- DEF_HELPER_4(msa_nor_v, void, env, i32, i32, i32)
- DEF_HELPER_4(msa_or_v, void, env, i32, i32, i32)
-@@ -984,10 +1001,6 @@ DEF_HELPER_5(msa_sld_df, void, env, i32, i32, i32, i32)
- DEF_HELPER_5(msa_splat_df, void, env, i32, i32, i32, i32)
- DEF_HELPER_5(msa_pckev_df, void, env, i32, i32, i32, i32)
- DEF_HELPER_5(msa_pckod_df, void, env, i32, i32, i32, i32)
--DEF_HELPER_5(msa_ilvl_df, void, env, i32, i32, i32, i32)
--DEF_HELPER_5(msa_ilvr_df, void, env, i32, i32, i32, i32)
--DEF_HELPER_5(msa_ilvev_df, void, env, i32, i32, i32, i32)
--DEF_HELPER_5(msa_ilvod_df, void, env, i32, i32, i32, i32)
- DEF_HELPER_5(msa_vshf_df, void, env, i32, i32, i32, i32)
- DEF_HELPER_5(msa_srar_df, void, env, i32, i32, i32, i32)
- DEF_HELPER_5(msa_srlr_df, void, env, i32, i32, i32, i32)
-diff --git a/target/mips/msa_helper.c b/target/mips/msa_helper.c
-index 65df15d..499fcde 100644
---- a/target/mips/msa_helper.c
-+++ b/target/mips/msa_helper.c
-@@ -2432,7 +2432,421 @@ void helper_msa_mod_u_d(CPUMIPSState *env,
-  * +---------------+----------------------------------------------------------+
-  */
- 
--/* TODO: insert Interleave group helpers here */
-+
-+void helper_msa_ilvev_b(CPUMIPSState *env,
-+                        uint32_t wd, uint32_t ws, uint32_t wt)
-+{
-+    wr_t *pwd = &(env->active_fpu.fpr[wd].wr);
-+    wr_t *pws = &(env->active_fpu.fpr[ws].wr);
-+    wr_t *pwt = &(env->active_fpu.fpr[wt].wr);
-+
-+#if defined(HOST_WORDS_BIGENDIAN)
-+    pwd->b[8]  = pws->b[9];
-+    pwd->b[9]  = pwt->b[9];
-+    pwd->b[10] = pws->b[11];
-+    pwd->b[11] = pwt->b[11];
-+    pwd->b[12] = pws->b[13];
-+    pwd->b[13] = pwt->b[13];
-+    pwd->b[14] = pws->b[15];
-+    pwd->b[15] = pwt->b[15];
-+    pwd->b[0]  = pws->b[1];
-+    pwd->b[1]  = pwt->b[1];
-+    pwd->b[2]  = pws->b[3];
-+    pwd->b[3]  = pwt->b[3];
-+    pwd->b[4]  = pws->b[5];
-+    pwd->b[5]  = pwt->b[5];
-+    pwd->b[6]  = pws->b[7];
-+    pwd->b[7]  = pwt->b[7];
-+#else
-+    pwd->b[15] = pws->b[14];
-+    pwd->b[14] = pwt->b[14];
-+    pwd->b[13] = pws->b[12];
-+    pwd->b[12] = pwt->b[12];
-+    pwd->b[11] = pws->b[10];
-+    pwd->b[10] = pwt->b[10];
-+    pwd->b[9]  = pws->b[8];
-+    pwd->b[8]  = pwt->b[8];
-+    pwd->b[7]  = pws->b[6];
-+    pwd->b[6]  = pwt->b[6];
-+    pwd->b[5]  = pws->b[4];
-+    pwd->b[4]  = pwt->b[4];
-+    pwd->b[3]  = pws->b[2];
-+    pwd->b[2]  = pwt->b[2];
-+    pwd->b[1]  = pws->b[0];
-+    pwd->b[0]  = pwt->b[0];
-+#endif
-+}
-+
-+void helper_msa_ilvev_h(CPUMIPSState *env,
-+                        uint32_t wd, uint32_t ws, uint32_t wt)
-+{
-+    wr_t *pwd = &(env->active_fpu.fpr[wd].wr);
-+    wr_t *pws = &(env->active_fpu.fpr[ws].wr);
-+    wr_t *pwt = &(env->active_fpu.fpr[wt].wr);
-+
-+#if defined(HOST_WORDS_BIGENDIAN)
-+    pwd->h[4] = pws->h[5];
-+    pwd->h[5] = pwt->h[5];
-+    pwd->h[6] = pws->h[7];
-+    pwd->h[7] = pwt->h[7];
-+    pwd->h[0] = pws->h[1];
-+    pwd->h[1] = pwt->h[1];
-+    pwd->h[2] = pws->h[3];
-+    pwd->h[3] = pwt->h[3];
-+#else
-+    pwd->h[7] = pws->h[6];
-+    pwd->h[6] = pwt->h[6];
-+    pwd->h[5] = pws->h[4];
-+    pwd->h[4] = pwt->h[4];
-+    pwd->h[3] = pws->h[2];
-+    pwd->h[2] = pwt->h[2];
-+    pwd->h[1] = pws->h[0];
-+    pwd->h[0] = pwt->h[0];
-+#endif
-+}
-+
-+void helper_msa_ilvev_w(CPUMIPSState *env,
-+                        uint32_t wd, uint32_t ws, uint32_t wt)
-+{
-+    wr_t *pwd = &(env->active_fpu.fpr[wd].wr);
-+    wr_t *pws = &(env->active_fpu.fpr[ws].wr);
-+    wr_t *pwt = &(env->active_fpu.fpr[wt].wr);
-+
-+#if defined(HOST_WORDS_BIGENDIAN)
-+    pwd->w[2] = pws->w[3];
-+    pwd->w[3] = pwt->w[3];
-+    pwd->w[0] = pws->w[1];
-+    pwd->w[1] = pwt->w[1];
-+#else
-+    pwd->w[3] = pws->w[2];
-+    pwd->w[2] = pwt->w[2];
-+    pwd->w[1] = pws->w[0];
-+    pwd->w[0] = pwt->w[0];
-+#endif
-+}
-+
-+void helper_msa_ilvev_d(CPUMIPSState *env,
-+                        uint32_t wd, uint32_t ws, uint32_t wt)
-+{
-+    wr_t *pwd = &(env->active_fpu.fpr[wd].wr);
-+    wr_t *pws = &(env->active_fpu.fpr[ws].wr);
-+    wr_t *pwt = &(env->active_fpu.fpr[wt].wr);
-+
-+    pwd->d[1] = pws->d[0];
-+    pwd->d[0] = pwt->d[0];
-+}
-+
-+
-+void helper_msa_ilvod_b(CPUMIPSState *env,
-+                        uint32_t wd, uint32_t ws, uint32_t wt)
-+{
-+    wr_t *pwd = &(env->active_fpu.fpr[wd].wr);
-+    wr_t *pws = &(env->active_fpu.fpr[ws].wr);
-+    wr_t *pwt = &(env->active_fpu.fpr[wt].wr);
-+
-+#if defined(HOST_WORDS_BIGENDIAN)
-+    pwd->b[7]  = pwt->b[6];
-+    pwd->b[6]  = pws->b[6];
-+    pwd->b[5]  = pwt->b[4];
-+    pwd->b[4]  = pws->b[4];
-+    pwd->b[3]  = pwt->b[2];
-+    pwd->b[2]  = pws->b[2];
-+    pwd->b[1]  = pwt->b[0];
-+    pwd->b[0]  = pws->b[0];
-+    pwd->b[15] = pwt->b[14];
-+    pwd->b[14] = pws->b[14];
-+    pwd->b[13] = pwt->b[12];
-+    pwd->b[12] = pws->b[12];
-+    pwd->b[11] = pwt->b[10];
-+    pwd->b[10] = pws->b[10];
-+    pwd->b[9]  = pwt->b[8];
-+    pwd->b[8]  = pws->b[8];
-+#else
-+    pwd->b[0]  = pwt->b[1];
-+    pwd->b[1]  = pws->b[1];
-+    pwd->b[2]  = pwt->b[3];
-+    pwd->b[3]  = pws->b[3];
-+    pwd->b[4]  = pwt->b[5];
-+    pwd->b[5]  = pws->b[5];
-+    pwd->b[6]  = pwt->b[7];
-+    pwd->b[7]  = pws->b[7];
-+    pwd->b[8]  = pwt->b[9];
-+    pwd->b[9]  = pws->b[9];
-+    pwd->b[10] = pwt->b[11];
-+    pwd->b[11] = pws->b[11];
-+    pwd->b[12] = pwt->b[13];
-+    pwd->b[13] = pws->b[13];
-+    pwd->b[14] = pwt->b[15];
-+    pwd->b[15] = pws->b[15];
-+#endif
-+}
-+
-+void helper_msa_ilvod_h(CPUMIPSState *env,
-+                        uint32_t wd, uint32_t ws, uint32_t wt)
-+{
-+    wr_t *pwd = &(env->active_fpu.fpr[wd].wr);
-+    wr_t *pws = &(env->active_fpu.fpr[ws].wr);
-+    wr_t *pwt = &(env->active_fpu.fpr[wt].wr);
-+
-+#if defined(HOST_WORDS_BIGENDIAN)
-+    pwd->h[3] = pwt->h[2];
-+    pwd->h[2] = pws->h[2];
-+    pwd->h[1] = pwt->h[0];
-+    pwd->h[0] = pws->h[0];
-+    pwd->h[7] = pwt->h[6];
-+    pwd->h[6] = pws->h[6];
-+    pwd->h[5] = pwt->h[4];
-+    pwd->h[4] = pws->h[4];
-+#else
-+    pwd->h[0] = pwt->h[1];
-+    pwd->h[1] = pws->h[1];
-+    pwd->h[2] = pwt->h[3];
-+    pwd->h[3] = pws->h[3];
-+    pwd->h[4] = pwt->h[5];
-+    pwd->h[5] = pws->h[5];
-+    pwd->h[6] = pwt->h[7];
-+    pwd->h[7] = pws->h[7];
-+#endif
-+}
-+
-+void helper_msa_ilvod_w(CPUMIPSState *env,
-+                        uint32_t wd, uint32_t ws, uint32_t wt)
-+{
-+    wr_t *pwd = &(env->active_fpu.fpr[wd].wr);
-+    wr_t *pws = &(env->active_fpu.fpr[ws].wr);
-+    wr_t *pwt = &(env->active_fpu.fpr[wt].wr);
-+
-+#if defined(HOST_WORDS_BIGENDIAN)
-+    pwd->w[1] = pwt->w[0];
-+    pwd->w[0] = pws->w[0];
-+    pwd->w[3] = pwt->w[2];
-+    pwd->w[2] = pws->w[2];
-+#else
-+    pwd->w[0] = pwt->w[1];
-+    pwd->w[1] = pws->w[1];
-+    pwd->w[2] = pwt->w[3];
-+    pwd->w[3] = pws->w[3];
-+#endif
-+}
-+
-+void helper_msa_ilvod_d(CPUMIPSState *env,
-+                        uint32_t wd, uint32_t ws, uint32_t wt)
-+{
-+    wr_t *pwd = &(env->active_fpu.fpr[wd].wr);
-+    wr_t *pws = &(env->active_fpu.fpr[ws].wr);
-+    wr_t *pwt = &(env->active_fpu.fpr[wt].wr);
-+
-+    pwd->d[0] = pwt->d[1];
-+    pwd->d[1] = pws->d[1];
-+}
-+
-+
-+void helper_msa_ilvl_b(CPUMIPSState *env,
-+                       uint32_t wd, uint32_t ws, uint32_t wt)
-+{
-+    wr_t *pwd = &(env->active_fpu.fpr[wd].wr);
-+    wr_t *pws = &(env->active_fpu.fpr[ws].wr);
-+    wr_t *pwt = &(env->active_fpu.fpr[wt].wr);
-+
-+#if defined(HOST_WORDS_BIGENDIAN)
-+    pwd->b[7]  = pwt->b[15];
-+    pwd->b[6]  = pws->b[15];
-+    pwd->b[5]  = pwt->b[14];
-+    pwd->b[4]  = pws->b[14];
-+    pwd->b[3]  = pwt->b[13];
-+    pwd->b[2]  = pws->b[13];
-+    pwd->b[1]  = pwt->b[12];
-+    pwd->b[0]  = pws->b[12];
-+    pwd->b[15] = pwt->b[11];
-+    pwd->b[14] = pws->b[11];
-+    pwd->b[13] = pwt->b[10];
-+    pwd->b[12] = pws->b[10];
-+    pwd->b[11] = pwt->b[9];
-+    pwd->b[10] = pws->b[9];
-+    pwd->b[9]  = pwt->b[8];
-+    pwd->b[8]  = pws->b[8];
-+#else
-+    pwd->b[0]  = pwt->b[8];
-+    pwd->b[1]  = pws->b[8];
-+    pwd->b[2]  = pwt->b[9];
-+    pwd->b[3]  = pws->b[9];
-+    pwd->b[4]  = pwt->b[10];
-+    pwd->b[5]  = pws->b[10];
-+    pwd->b[6]  = pwt->b[11];
-+    pwd->b[7]  = pws->b[11];
-+    pwd->b[8]  = pwt->b[12];
-+    pwd->b[9]  = pws->b[12];
-+    pwd->b[10] = pwt->b[13];
-+    pwd->b[11] = pws->b[13];
-+    pwd->b[12] = pwt->b[14];
-+    pwd->b[13] = pws->b[14];
-+    pwd->b[14] = pwt->b[15];
-+    pwd->b[15] = pws->b[15];
-+#endif
-+}
-+
-+void helper_msa_ilvl_h(CPUMIPSState *env,
-+                       uint32_t wd, uint32_t ws, uint32_t wt)
-+{
-+    wr_t *pwd = &(env->active_fpu.fpr[wd].wr);
-+    wr_t *pws = &(env->active_fpu.fpr[ws].wr);
-+    wr_t *pwt = &(env->active_fpu.fpr[wt].wr);
-+
-+#if defined(HOST_WORDS_BIGENDIAN)
-+    pwd->h[3] = pwt->h[7];
-+    pwd->h[2] = pws->h[7];
-+    pwd->h[1] = pwt->h[6];
-+    pwd->h[0] = pws->h[6];
-+    pwd->h[7] = pwt->h[5];
-+    pwd->h[6] = pws->h[5];
-+    pwd->h[5] = pwt->h[4];
-+    pwd->h[4] = pws->h[4];
-+#else
-+    pwd->h[0] = pwt->h[4];
-+    pwd->h[1] = pws->h[4];
-+    pwd->h[2] = pwt->h[5];
-+    pwd->h[3] = pws->h[5];
-+    pwd->h[4] = pwt->h[6];
-+    pwd->h[5] = pws->h[6];
-+    pwd->h[6] = pwt->h[7];
-+    pwd->h[7] = pws->h[7];
-+#endif
-+}
-+
-+void helper_msa_ilvl_w(CPUMIPSState *env,
-+                       uint32_t wd, uint32_t ws, uint32_t wt)
-+{
-+    wr_t *pwd = &(env->active_fpu.fpr[wd].wr);
-+    wr_t *pws = &(env->active_fpu.fpr[ws].wr);
-+    wr_t *pwt = &(env->active_fpu.fpr[wt].wr);
-+
-+#if defined(HOST_WORDS_BIGENDIAN)
-+    pwd->w[1] = pwt->w[3];
-+    pwd->w[0] = pws->w[3];
-+    pwd->w[3] = pwt->w[2];
-+    pwd->w[2] = pws->w[2];
-+#else
-+    pwd->w[0] = pwt->w[2];
-+    pwd->w[1] = pws->w[2];
-+    pwd->w[2] = pwt->w[3];
-+    pwd->w[3] = pws->w[3];
-+#endif
-+}
-+
-+void helper_msa_ilvl_d(CPUMIPSState *env,
-+                       uint32_t wd, uint32_t ws, uint32_t wt)
-+{
-+    wr_t *pwd = &(env->active_fpu.fpr[wd].wr);
-+    wr_t *pws = &(env->active_fpu.fpr[ws].wr);
-+    wr_t *pwt = &(env->active_fpu.fpr[wt].wr);
-+
-+    pwd->d[0] = pwt->d[1];
-+    pwd->d[1] = pws->d[1];
-+}
-+
-+
-+void helper_msa_ilvr_b(CPUMIPSState *env,
-+                       uint32_t wd, uint32_t ws, uint32_t wt)
-+{
-+    wr_t *pwd = &(env->active_fpu.fpr[wd].wr);
-+    wr_t *pws = &(env->active_fpu.fpr[ws].wr);
-+    wr_t *pwt = &(env->active_fpu.fpr[wt].wr);
-+
-+#if defined(HOST_WORDS_BIGENDIAN)
-+    pwd->b[8]  = pws->b[0];
-+    pwd->b[9]  = pwt->b[0];
-+    pwd->b[10] = pws->b[1];
-+    pwd->b[11] = pwt->b[1];
-+    pwd->b[12] = pws->b[2];
-+    pwd->b[13] = pwt->b[2];
-+    pwd->b[14] = pws->b[3];
-+    pwd->b[15] = pwt->b[3];
-+    pwd->b[0]  = pws->b[4];
-+    pwd->b[1]  = pwt->b[4];
-+    pwd->b[2]  = pws->b[5];
-+    pwd->b[3]  = pwt->b[5];
-+    pwd->b[4]  = pws->b[6];
-+    pwd->b[5]  = pwt->b[6];
-+    pwd->b[6]  = pws->b[7];
-+    pwd->b[7]  = pwt->b[7];
-+#else
-+    pwd->b[15] = pws->b[7];
-+    pwd->b[14] = pwt->b[7];
-+    pwd->b[13] = pws->b[6];
-+    pwd->b[12] = pwt->b[6];
-+    pwd->b[11] = pws->b[5];
-+    pwd->b[10] = pwt->b[5];
-+    pwd->b[9]  = pws->b[4];
-+    pwd->b[8]  = pwt->b[4];
-+    pwd->b[7]  = pws->b[3];
-+    pwd->b[6]  = pwt->b[3];
-+    pwd->b[5]  = pws->b[2];
-+    pwd->b[4]  = pwt->b[2];
-+    pwd->b[3]  = pws->b[1];
-+    pwd->b[2]  = pwt->b[1];
-+    pwd->b[1]  = pws->b[0];
-+    pwd->b[0]  = pwt->b[0];
-+#endif
-+}
-+
-+void helper_msa_ilvr_h(CPUMIPSState *env,
-+                       uint32_t wd, uint32_t ws, uint32_t wt)
-+{
-+    wr_t *pwd = &(env->active_fpu.fpr[wd].wr);
-+    wr_t *pws = &(env->active_fpu.fpr[ws].wr);
-+    wr_t *pwt = &(env->active_fpu.fpr[wt].wr);
-+
-+#if defined(HOST_WORDS_BIGENDIAN)
-+    pwd->h[4] = pws->h[0];
-+    pwd->h[5] = pwt->h[0];
-+    pwd->h[6] = pws->h[1];
-+    pwd->h[7] = pwt->h[1];
-+    pwd->h[0] = pws->h[2];
-+    pwd->h[1] = pwt->h[2];
-+    pwd->h[2] = pws->h[3];
-+    pwd->h[3] = pwt->h[3];
-+#else
-+    pwd->h[7] = pws->h[3];
-+    pwd->h[6] = pwt->h[3];
-+    pwd->h[5] = pws->h[2];
-+    pwd->h[4] = pwt->h[2];
-+    pwd->h[3] = pws->h[1];
-+    pwd->h[2] = pwt->h[1];
-+    pwd->h[1] = pws->h[0];
-+    pwd->h[0] = pwt->h[0];
-+#endif
-+}
-+
-+void helper_msa_ilvr_w(CPUMIPSState *env,
-+                       uint32_t wd, uint32_t ws, uint32_t wt)
-+{
-+    wr_t *pwd = &(env->active_fpu.fpr[wd].wr);
-+    wr_t *pws = &(env->active_fpu.fpr[ws].wr);
-+    wr_t *pwt = &(env->active_fpu.fpr[wt].wr);
-+
-+#if defined(HOST_WORDS_BIGENDIAN)
-+    pwd->w[2] = pws->w[0];
-+    pwd->w[3] = pwt->w[0];
-+    pwd->w[0] = pws->w[1];
-+    pwd->w[1] = pwt->w[1];
-+#else
-+    pwd->w[3] = pws->w[1];
-+    pwd->w[2] = pwt->w[1];
-+    pwd->w[1] = pws->w[0];
-+    pwd->w[0] = pwt->w[0];
-+#endif
-+}
-+
-+void helper_msa_ilvr_d(CPUMIPSState *env,
-+                       uint32_t wd, uint32_t ws, uint32_t wt)
-+{
-+    wr_t *pwd = &(env->active_fpu.fpr[wd].wr);
-+    wr_t *pws = &(env->active_fpu.fpr[ws].wr);
-+    wr_t *pwt = &(env->active_fpu.fpr[wt].wr);
-+
-+    pwd->d[1] = pws->d[0];
-+    pwd->d[0] = pwt->d[0];
-+}
- 
- 
- /*
-@@ -3522,358 +3936,6 @@ MSA_FN_DF(vshf_df)
- #undef MSA_FN_DF
- 
- 
--void helper_msa_ilvev_df(CPUMIPSState *env, uint32_t df, uint32_t wd,
--                         uint32_t ws, uint32_t wt)
--{
--    wr_t *pwd = &(env->active_fpu.fpr[wd].wr);
--    wr_t *pws = &(env->active_fpu.fpr[ws].wr);
--    wr_t *pwt = &(env->active_fpu.fpr[wt].wr);
--
--    switch (df) {
--    case DF_BYTE:
--#if defined(HOST_WORDS_BIGENDIAN)
--        pwd->b[8]  = pws->b[9];
--        pwd->b[9]  = pwt->b[9];
--        pwd->b[10] = pws->b[11];
--        pwd->b[11] = pwt->b[11];
--        pwd->b[12] = pws->b[13];
--        pwd->b[13] = pwt->b[13];
--        pwd->b[14] = pws->b[15];
--        pwd->b[15] = pwt->b[15];
--        pwd->b[0]  = pws->b[1];
--        pwd->b[1]  = pwt->b[1];
--        pwd->b[2]  = pws->b[3];
--        pwd->b[3]  = pwt->b[3];
--        pwd->b[4]  = pws->b[5];
--        pwd->b[5]  = pwt->b[5];
--        pwd->b[6]  = pws->b[7];
--        pwd->b[7]  = pwt->b[7];
--#else
--        pwd->b[15] = pws->b[14];
--        pwd->b[14] = pwt->b[14];
--        pwd->b[13] = pws->b[12];
--        pwd->b[12] = pwt->b[12];
--        pwd->b[11] = pws->b[10];
--        pwd->b[10] = pwt->b[10];
--        pwd->b[9]  = pws->b[8];
--        pwd->b[8]  = pwt->b[8];
--        pwd->b[7]  = pws->b[6];
--        pwd->b[6]  = pwt->b[6];
--        pwd->b[5]  = pws->b[4];
--        pwd->b[4]  = pwt->b[4];
--        pwd->b[3]  = pws->b[2];
--        pwd->b[2]  = pwt->b[2];
--        pwd->b[1]  = pws->b[0];
--        pwd->b[0]  = pwt->b[0];
--#endif
--        break;
--    case DF_HALF:
--#if defined(HOST_WORDS_BIGENDIAN)
--        pwd->h[4] = pws->h[5];
--        pwd->h[5] = pwt->h[5];
--        pwd->h[6] = pws->h[7];
--        pwd->h[7] = pwt->h[7];
--        pwd->h[0] = pws->h[1];
--        pwd->h[1] = pwt->h[1];
--        pwd->h[2] = pws->h[3];
--        pwd->h[3] = pwt->h[3];
--#else
--        pwd->h[7] = pws->h[6];
--        pwd->h[6] = pwt->h[6];
--        pwd->h[5] = pws->h[4];
--        pwd->h[4] = pwt->h[4];
--        pwd->h[3] = pws->h[2];
--        pwd->h[2] = pwt->h[2];
--        pwd->h[1] = pws->h[0];
--        pwd->h[0] = pwt->h[0];
--#endif
--        break;
--    case DF_WORD:
--#if defined(HOST_WORDS_BIGENDIAN)
--        pwd->w[2] = pws->w[3];
--        pwd->w[3] = pwt->w[3];
--        pwd->w[0] = pws->w[1];
--        pwd->w[1] = pwt->w[1];
--#else
--        pwd->w[3] = pws->w[2];
--        pwd->w[2] = pwt->w[2];
--        pwd->w[1] = pws->w[0];
--        pwd->w[0] = pwt->w[0];
--#endif
--        break;
--    case DF_DOUBLE:
--        pwd->d[1] = pws->d[0];
--        pwd->d[0] = pwt->d[0];
--        break;
--    default:
--        assert(0);
--    }
--}
--
--void helper_msa_ilvod_df(CPUMIPSState *env, uint32_t df, uint32_t wd,
--                         uint32_t ws, uint32_t wt)
--{
--    wr_t *pwd = &(env->active_fpu.fpr[wd].wr);
--    wr_t *pws = &(env->active_fpu.fpr[ws].wr);
--    wr_t *pwt = &(env->active_fpu.fpr[wt].wr);
--
--    switch (df) {
--    case DF_BYTE:
--#if defined(HOST_WORDS_BIGENDIAN)
--        pwd->b[7]  = pwt->b[6];
--        pwd->b[6]  = pws->b[6];
--        pwd->b[5]  = pwt->b[4];
--        pwd->b[4]  = pws->b[4];
--        pwd->b[3]  = pwt->b[2];
--        pwd->b[2]  = pws->b[2];
--        pwd->b[1]  = pwt->b[0];
--        pwd->b[0]  = pws->b[0];
--        pwd->b[15] = pwt->b[14];
--        pwd->b[14] = pws->b[14];
--        pwd->b[13] = pwt->b[12];
--        pwd->b[12] = pws->b[12];
--        pwd->b[11] = pwt->b[10];
--        pwd->b[10] = pws->b[10];
--        pwd->b[9]  = pwt->b[8];
--        pwd->b[8]  = pws->b[8];
--#else
--        pwd->b[0]  = pwt->b[1];
--        pwd->b[1]  = pws->b[1];
--        pwd->b[2]  = pwt->b[3];
--        pwd->b[3]  = pws->b[3];
--        pwd->b[4]  = pwt->b[5];
--        pwd->b[5]  = pws->b[5];
--        pwd->b[6]  = pwt->b[7];
--        pwd->b[7]  = pws->b[7];
--        pwd->b[8]  = pwt->b[9];
--        pwd->b[9]  = pws->b[9];
--        pwd->b[10] = pwt->b[11];
--        pwd->b[11] = pws->b[11];
--        pwd->b[12] = pwt->b[13];
--        pwd->b[13] = pws->b[13];
--        pwd->b[14] = pwt->b[15];
--        pwd->b[15] = pws->b[15];
--#endif
--        break;
--    case DF_HALF:
--#if defined(HOST_WORDS_BIGENDIAN)
--        pwd->h[3] = pwt->h[2];
--        pwd->h[2] = pws->h[2];
--        pwd->h[1] = pwt->h[0];
--        pwd->h[0] = pws->h[0];
--        pwd->h[7] = pwt->h[6];
--        pwd->h[6] = pws->h[6];
--        pwd->h[5] = pwt->h[4];
--        pwd->h[4] = pws->h[4];
--#else
--        pwd->h[0] = pwt->h[1];
--        pwd->h[1] = pws->h[1];
--        pwd->h[2] = pwt->h[3];
--        pwd->h[3] = pws->h[3];
--        pwd->h[4] = pwt->h[5];
--        pwd->h[5] = pws->h[5];
--        pwd->h[6] = pwt->h[7];
--        pwd->h[7] = pws->h[7];
--#endif
--        break;
--    case DF_WORD:
--#if defined(HOST_WORDS_BIGENDIAN)
--        pwd->w[1] = pwt->w[0];
--        pwd->w[0] = pws->w[0];
--        pwd->w[3] = pwt->w[2];
--        pwd->w[2] = pws->w[2];
--#else
--        pwd->w[0] = pwt->w[1];
--        pwd->w[1] = pws->w[1];
--        pwd->w[2] = pwt->w[3];
--        pwd->w[3] = pws->w[3];
--#endif
--        break;
--    case DF_DOUBLE:
--        pwd->d[0] = pwt->d[1];
--        pwd->d[1] = pws->d[1];
--        break;
--    default:
--        assert(0);
--    }
--}
--
--void helper_msa_ilvl_df(CPUMIPSState *env, uint32_t df, uint32_t wd,
--                        uint32_t ws, uint32_t wt)
--{
--    wr_t *pwd = &(env->active_fpu.fpr[wd].wr);
--    wr_t *pws = &(env->active_fpu.fpr[ws].wr);
--    wr_t *pwt = &(env->active_fpu.fpr[wt].wr);
--
--    switch (df) {
--    case DF_BYTE:
--#if defined(HOST_WORDS_BIGENDIAN)
--        pwd->b[7]  = pwt->b[15];
--        pwd->b[6]  = pws->b[15];
--        pwd->b[5]  = pwt->b[14];
--        pwd->b[4]  = pws->b[14];
--        pwd->b[3]  = pwt->b[13];
--        pwd->b[2]  = pws->b[13];
--        pwd->b[1]  = pwt->b[12];
--        pwd->b[0]  = pws->b[12];
--        pwd->b[15] = pwt->b[11];
--        pwd->b[14] = pws->b[11];
--        pwd->b[13] = pwt->b[10];
--        pwd->b[12] = pws->b[10];
--        pwd->b[11] = pwt->b[9];
--        pwd->b[10] = pws->b[9];
--        pwd->b[9]  = pwt->b[8];
--        pwd->b[8]  = pws->b[8];
--#else
--        pwd->b[0]  = pwt->b[8];
--        pwd->b[1]  = pws->b[8];
--        pwd->b[2]  = pwt->b[9];
--        pwd->b[3]  = pws->b[9];
--        pwd->b[4]  = pwt->b[10];
--        pwd->b[5]  = pws->b[10];
--        pwd->b[6]  = pwt->b[11];
--        pwd->b[7]  = pws->b[11];
--        pwd->b[8]  = pwt->b[12];
--        pwd->b[9]  = pws->b[12];
--        pwd->b[10] = pwt->b[13];
--        pwd->b[11] = pws->b[13];
--        pwd->b[12] = pwt->b[14];
--        pwd->b[13] = pws->b[14];
--        pwd->b[14] = pwt->b[15];
--        pwd->b[15] = pws->b[15];
--#endif
--        break;
--    case DF_HALF:
--#if defined(HOST_WORDS_BIGENDIAN)
--        pwd->h[3] = pwt->h[7];
--        pwd->h[2] = pws->h[7];
--        pwd->h[1] = pwt->h[6];
--        pwd->h[0] = pws->h[6];
--        pwd->h[7] = pwt->h[5];
--        pwd->h[6] = pws->h[5];
--        pwd->h[5] = pwt->h[4];
--        pwd->h[4] = pws->h[4];
--#else
--        pwd->h[0] = pwt->h[4];
--        pwd->h[1] = pws->h[4];
--        pwd->h[2] = pwt->h[5];
--        pwd->h[3] = pws->h[5];
--        pwd->h[4] = pwt->h[6];
--        pwd->h[5] = pws->h[6];
--        pwd->h[6] = pwt->h[7];
--        pwd->h[7] = pws->h[7];
--#endif
--        break;
--    case DF_WORD:
--#if defined(HOST_WORDS_BIGENDIAN)
--        pwd->w[1] = pwt->w[3];
--        pwd->w[0] = pws->w[3];
--        pwd->w[3] = pwt->w[2];
--        pwd->w[2] = pws->w[2];
--#else
--        pwd->w[0] = pwt->w[2];
--        pwd->w[1] = pws->w[2];
--        pwd->w[2] = pwt->w[3];
--        pwd->w[3] = pws->w[3];
--#endif
--        break;
--    case DF_DOUBLE:
--        pwd->d[0] = pwt->d[1];
--        pwd->d[1] = pws->d[1];
--        break;
--    default:
--        assert(0);
--    }
--}
--
--void helper_msa_ilvr_df(CPUMIPSState *env, uint32_t df, uint32_t wd,
--                        uint32_t ws, uint32_t wt)
--{
--    wr_t *pwd = &(env->active_fpu.fpr[wd].wr);
--    wr_t *pws = &(env->active_fpu.fpr[ws].wr);
--    wr_t *pwt = &(env->active_fpu.fpr[wt].wr);
--
--    switch (df) {
--    case DF_BYTE:
--#if defined(HOST_WORDS_BIGENDIAN)
--        pwd->b[8]  = pws->b[0];
--        pwd->b[9]  = pwt->b[0];
--        pwd->b[10] = pws->b[1];
--        pwd->b[11] = pwt->b[1];
--        pwd->b[12] = pws->b[2];
--        pwd->b[13] = pwt->b[2];
--        pwd->b[14] = pws->b[3];
--        pwd->b[15] = pwt->b[3];
--        pwd->b[0]  = pws->b[4];
--        pwd->b[1]  = pwt->b[4];
--        pwd->b[2]  = pws->b[5];
--        pwd->b[3]  = pwt->b[5];
--        pwd->b[4]  = pws->b[6];
--        pwd->b[5]  = pwt->b[6];
--        pwd->b[6]  = pws->b[7];
--        pwd->b[7]  = pwt->b[7];
--#else
--        pwd->b[15] = pws->b[7];
--        pwd->b[14] = pwt->b[7];
--        pwd->b[13] = pws->b[6];
--        pwd->b[12] = pwt->b[6];
--        pwd->b[11] = pws->b[5];
--        pwd->b[10] = pwt->b[5];
--        pwd->b[9]  = pws->b[4];
--        pwd->b[8]  = pwt->b[4];
--        pwd->b[7]  = pws->b[3];
--        pwd->b[6]  = pwt->b[3];
--        pwd->b[5]  = pws->b[2];
--        pwd->b[4]  = pwt->b[2];
--        pwd->b[3]  = pws->b[1];
--        pwd->b[2]  = pwt->b[1];
--        pwd->b[1]  = pws->b[0];
--        pwd->b[0]  = pwt->b[0];
--#endif
--        break;
--    case DF_HALF:
--#if defined(HOST_WORDS_BIGENDIAN)
--        pwd->h[4] = pws->h[0];
--        pwd->h[5] = pwt->h[0];
--        pwd->h[6] = pws->h[1];
--        pwd->h[7] = pwt->h[1];
--        pwd->h[0] = pws->h[2];
--        pwd->h[1] = pwt->h[2];
--        pwd->h[2] = pws->h[3];
--        pwd->h[3] = pwt->h[3];
--#else
--        pwd->h[7] = pws->h[3];
--        pwd->h[6] = pwt->h[3];
--        pwd->h[5] = pws->h[2];
--        pwd->h[4] = pwt->h[2];
--        pwd->h[3] = pws->h[1];
--        pwd->h[2] = pwt->h[1];
--        pwd->h[1] = pws->h[0];
--        pwd->h[0] = pwt->h[0];
--#endif
--        break;
--    case DF_WORD:
--#if defined(HOST_WORDS_BIGENDIAN)
--        pwd->w[2] = pws->w[0];
--        pwd->w[3] = pwt->w[0];
--        pwd->w[0] = pws->w[1];
--        pwd->w[1] = pwt->w[1];
--#else
--        pwd->w[3] = pws->w[1];
--        pwd->w[2] = pwt->w[1];
--        pwd->w[1] = pws->w[0];
--        pwd->w[0] = pwt->w[0];
--#endif
--        break;
--    case DF_DOUBLE:
--        pwd->d[1] = pws->d[0];
--        pwd->d[0] = pwt->d[0];
--        break;
--    default:
--        assert(0);
--    }
--}
--
- void helper_msa_pckev_df(CPUMIPSState *env, uint32_t df, uint32_t wd,
-                          uint32_t ws, uint32_t wt)
- {
-diff --git a/target/mips/translate.c b/target/mips/translate.c
-index 7a35c26..ea8b8f4 100644
---- a/target/mips/translate.c
-+++ b/target/mips/translate.c
-@@ -28770,6 +28770,70 @@ static void gen_msa_3r(CPUMIPSState *env, DisasContext *ctx)
-             break;
-         }
-         break;
-+    case OPC_ILVEV_df:
-+        switch (df) {
-+        case DF_BYTE:
-+            gen_helper_msa_ilvev_b(cpu_env, twd, tws, twt);
-+            break;
-+        case DF_HALF:
-+            gen_helper_msa_ilvev_h(cpu_env, twd, tws, twt);
-+            break;
-+        case DF_WORD:
-+            gen_helper_msa_ilvev_w(cpu_env, twd, tws, twt);
-+            break;
-+        case DF_DOUBLE:
-+            gen_helper_msa_ilvev_d(cpu_env, twd, tws, twt);
-+            break;
-+        }
-+        break;
-+    case OPC_ILVOD_df:
-+        switch (df) {
-+        case DF_BYTE:
-+            gen_helper_msa_ilvod_b(cpu_env, twd, tws, twt);
-+            break;
-+        case DF_HALF:
-+            gen_helper_msa_ilvod_h(cpu_env, twd, tws, twt);
-+            break;
-+        case DF_WORD:
-+            gen_helper_msa_ilvod_w(cpu_env, twd, tws, twt);
-+            break;
-+        case DF_DOUBLE:
-+            gen_helper_msa_ilvod_d(cpu_env, twd, tws, twt);
-+            break;
-+        }
-+        break;
-+    case OPC_ILVL_df:
-+        switch (df) {
-+        case DF_BYTE:
-+            gen_helper_msa_ilvl_b(cpu_env, twd, tws, twt);
-+            break;
-+        case DF_HALF:
-+            gen_helper_msa_ilvl_h(cpu_env, twd, tws, twt);
-+            break;
-+        case DF_WORD:
-+            gen_helper_msa_ilvl_w(cpu_env, twd, tws, twt);
-+            break;
-+        case DF_DOUBLE:
-+            gen_helper_msa_ilvl_d(cpu_env, twd, tws, twt);
-+            break;
-+        }
-+        break;
-+    case OPC_ILVR_df:
-+        switch (df) {
-+        case DF_BYTE:
-+            gen_helper_msa_ilvr_b(cpu_env, twd, tws, twt);
-+            break;
-+        case DF_HALF:
-+            gen_helper_msa_ilvr_h(cpu_env, twd, tws, twt);
-+            break;
-+        case DF_WORD:
-+            gen_helper_msa_ilvr_w(cpu_env, twd, tws, twt);
-+            break;
-+        case DF_DOUBLE:
-+            gen_helper_msa_ilvr_d(cpu_env, twd, tws, twt);
-+            break;
-+        }
-+        break;
-     case OPC_SLL_df:
-         gen_helper_msa_sll_df(cpu_env, tdf, twd, tws, twt);
-         break;
-@@ -28842,21 +28906,9 @@ static void gen_msa_3r(CPUMIPSState *env, DisasContext *ctx)
-     case OPC_ASUB_S_df:
-         gen_helper_msa_asub_s_df(cpu_env, tdf, twd, tws, twt);
-         break;
--    case OPC_ILVL_df:
--        gen_helper_msa_ilvl_df(cpu_env, tdf, twd, tws, twt);
--        break;
-     case OPC_ASUB_U_df:
-         gen_helper_msa_asub_u_df(cpu_env, tdf, twd, tws, twt);
-         break;
--    case OPC_ILVR_df:
--        gen_helper_msa_ilvr_df(cpu_env, tdf, twd, tws, twt);
--        break;
--    case OPC_ILVEV_df:
--        gen_helper_msa_ilvev_df(cpu_env, tdf, twd, tws, twt);
--        break;
--    case OPC_ILVOD_df:
--        gen_helper_msa_ilvod_df(cpu_env, tdf, twd, tws, twt);
--        break;
- 
-     case OPC_DOTP_S_df:
-     case OPC_DOTP_U_df:
--- 
-2.7.4
-
+This commit has the background info
+https://github.com/ardbiesheuvel/X86EmulatorPkg/commit/552c44d2cbc778f3e53d6d3985a8787c7df99733
 
