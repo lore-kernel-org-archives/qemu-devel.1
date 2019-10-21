@@ -2,77 +2,75 @@ Return-Path: <SRS0=8ZcK=YO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CFD35CA9EAF
-	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 21:29:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3A609CA9EAF
+	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 21:45:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A3EEF2084B
-	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 21:29:56 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A3EEF2084B
+	by mail.kernel.org (Postfix) with ESMTPS id 049182084B
+	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 21:45:12 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Mtb7Ypmo"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 049182084B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48112 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48250 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iMfFT-0002Sc-R3
-	for qemu-devel@archiver.kernel.org; Mon, 21 Oct 2019 17:29:55 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45563)
+	id 1iMfUF-0008Ct-65
+	for qemu-devel@archiver.kernel.org; Mon, 21 Oct 2019 17:45:11 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47344)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mlureau@redhat.com>) id 1iMfEf-0001me-JM
- for qemu-devel@nongnu.org; Mon, 21 Oct 2019 17:29:06 -0400
+ (envelope-from <ehabkost@redhat.com>) id 1iMfSv-0007h0-2U
+ for qemu-devel@nongnu.org; Mon, 21 Oct 2019 17:43:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mlureau@redhat.com>) id 1iMfEd-0008Mz-Tr
- for qemu-devel@nongnu.org; Mon, 21 Oct 2019 17:29:05 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:38924)
+ (envelope-from <ehabkost@redhat.com>) id 1iMfSu-0003yJ-58
+ for qemu-devel@nongnu.org; Mon, 21 Oct 2019 17:43:49 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:25792
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mlureau@redhat.com>) id 1iMfEd-0008MT-KQ
- for qemu-devel@nongnu.org; Mon, 21 Oct 2019 17:29:03 -0400
-Received: from mail-ot1-f70.google.com (mail-ot1-f70.google.com
- [209.85.210.70])
- (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+ (Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1iMfSu-0003yD-27
+ for qemu-devel@nongnu.org; Mon, 21 Oct 2019 17:43:48 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1571694227;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=q+Nx2C88Wh27y9fAFoQWqvREh2MN8i0sIAWasA8cMu4=;
+ b=Mtb7Ypmof/tLxBJxlAXpfHSWwm8o8R2wZfKDBKqCdxJ5KwrUgPTZohyhwuIRw/cdnYpQyw
+ r7tIrxcX0h76svP0f4mpte5nZ72zaKTJ+sw5/NuyswEGHuF7p04ooijWWudk5Szk3ZAYkA
+ VqS7FOuP8KiC80NqVmTp+0WXV5Hk8ik=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-269-uTGHIcO6M1WX0wAh-MQFDw-1; Mon, 21 Oct 2019 17:43:43 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id EFD6D2A09A8
- for <qemu-devel@nongnu.org>; Mon, 21 Oct 2019 21:29:01 +0000 (UTC)
-Received: by mail-ot1-f70.google.com with SMTP id f11so888499otf.9
- for <qemu-devel@nongnu.org>; Mon, 21 Oct 2019 14:29:01 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=wvHv4/pASEk9u1Yc3VAQShnjIXIMbC1uUMd2o+6Ac5w=;
- b=nPTytQcb4aGfJTDA+DzxF1IlhNi+hxFlSXfWU4qhe8xia05L2RcWdR9WWqotyPAsbu
- wVjfPvQHN6CiNTHriwKvKr5Dp1pCPXd8nACLd/2nn5OccnjO0Ajysb/PWFUeqHpJRhL4
- ZReibjUthYaEn2CAERf/mHV8MHIFPr3XoTjsVPle+vVL3DaKThyLpclwjx7b1Vdn21gu
- b/5Z52OmJtRwkUgj2SyReqYNZ6p+cXkpIqJscvEBhh0UVGWmrPHtFrakuSZ4sqblkHJb
- hdEuD926tAi7ByzEr5RGKR5qaI/DTH6KEWjhy03QIBVuunpqiyLqDFGWBvkeZq83/art
- GCpQ==
-X-Gm-Message-State: APjAAAXvLShkiU36Pm/7RnwQKTLRM4SiV2Km0Qg/NwORp5nOjvpm4ikb
- cMDlmyXQcVULLPmtzppdxHZj8PoVjr3umbaKyZfs96eLqXdAgMpVu7ASxTWTh7ZuAXyMDAAVcWI
- AeYXdd5FuIhPo8vKSmphDB6fDLhXRNKI=
-X-Received: by 2002:a9d:7147:: with SMTP id y7mr37840otj.62.1571693341137;
- Mon, 21 Oct 2019 14:29:01 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqwbAtfOc03Xkqpm3Yi8fNLmWyop4d8OWUEWn8zd6prTXJTnETmc4GnIwQNgiB6YCjJDS5HmmDOfTkmsqZbJgrk=
-X-Received: by 2002:a9d:7147:: with SMTP id y7mr37815otj.62.1571693340887;
- Mon, 21 Oct 2019 14:29:00 -0700 (PDT)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 079401800D79;
+ Mon, 21 Oct 2019 21:43:43 +0000 (UTC)
+Received: from localhost (ovpn-116-7.gru2.redhat.com [10.97.116.7])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 5C1F119C4F;
+ Mon, 21 Oct 2019 21:43:34 +0000 (UTC)
+From: Eduardo Habkost <ehabkost@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH] image-fuzzer: Use OSerror.strerror instead of tuple subscript
+Date: Mon, 21 Oct 2019 18:41:17 -0300
+Message-Id: <20191021214117.18091-1-ehabkost@redhat.com>
 MIME-Version: 1.0
-References: <20191018154212.13458-1-marcandre.lureau@redhat.com>
- <20191018154212.13458-10-marcandre.lureau@redhat.com>
-In-Reply-To: <20191018154212.13458-10-marcandre.lureau@redhat.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
-Date: Mon, 21 Oct 2019 23:28:49 +0200
-Message-ID: <CAMxuvazBjHBB+ZBcx4Rfk2N2WNjGqmjiLEiwB7x_5-oBF4JPWg@mail.gmail.com>
-Subject: Re: [PATCH 09/14] smbus-eeprom: remove PROP_PTR
-To: qemu-devel <qemu-devel@nongnu.org>
-Content-Type: text/plain; charset="UTF-8"
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-MC-Unique: uTGHIcO6M1WX0wAh-MQFDw-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=WINDOWS-1252
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 209.132.183.28
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -84,101 +82,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Corey Minyard <cminyard@mvista.com>,
- Peter Maydell <peter.maydell@linaro.org>,
- "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
- Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
- KONRAD Frederic <frederic.konrad@adacore.com>,
- "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
- Aleksandar Rikalo <arikalo@wavecomp.com>, Magnus Damm <magnus.damm@gmail.com>,
- =?UTF-8?Q?Herv=C3=A9_Poussineau?= <hpoussin@reactos.org>,
- Artyom Tarasenko <atar4qemu@gmail.com>, Eduardo Habkost <ehabkost@redhat.com>,
- Fabien Chouteau <chouteau@adacore.com>, qemu-arm <qemu-arm@nongnu.org>,
- Richard Henderson <rth@twiddle.net>,
- =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>,
- qemu-ppc <qemu-ppc@nongnu.org>, Aleksandar Markovic <amarkovic@wavecomp.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>
+Cc: John Snow <jsnow@redhat.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ qemu-block@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi
+OSError can't be used like a tuple on Python 3, so change the
+code to use `e.sterror` instead of `e[1]`.
 
-On Fri, Oct 18, 2019 at 5:43 PM Marc-Andr=C3=A9 Lureau
-<marcandre.lureau@redhat.com> wrote:
->
-> Instead, set the initial data field directly. Since it is only 256
-> bytes, let's simply copy it to avoid invalid pointers issues.
+Reported-by: John Snow <jsnow@redhat.com>
+Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+---
+ tests/image-fuzzer/runner.py | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-Actually, the commit message is wrong. The patch used to introduce a
-init_data[256] array, and copy initial data there, but I changed my
-mind because of the risk to introduce regression as the original
-buffer may have changed.
+diff --git a/tests/image-fuzzer/runner.py b/tests/image-fuzzer/runner.py
+index 95d84f38f3..1eb2138f94 100755
+--- a/tests/image-fuzzer/runner.py
++++ b/tests/image-fuzzer/runner.py
+@@ -159,7 +159,7 @@ class TestEnv(object):
+             os.makedirs(self.current_dir)
+         except OSError as e:
+             print("Error: The working directory '%s' cannot be used. Reaso=
+n: %s"\
+-                % (self.work_dir, e[1]), file=3Dsys.stderr)
++                % (self.work_dir, e.strerror), file=3Dsys.stderr)
+             raise TestException
+         self.log =3D open(os.path.join(self.current_dir, "test.log"), "w")
+         self.parent_log =3D open(run_log, "a")
+@@ -246,7 +246,7 @@ class TestEnv(object):
+             except OSError as e:
+                 multilog("%sError: Start of '%s' failed. Reason: %s\n\n"
+                          % (test_summary, os.path.basename(current_cmd[0])=
+,
+-                            e[1]),
++                            e.strerror),
+                          sys.stderr, self.log, self.parent_log)
+                 raise TestException
+=20
+--=20
+2.21.0
 
-I will rephrase.
-
->
-> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> ---
->  hw/i2c/smbus_eeprom.c | 17 ++++++++---------
->  1 file changed, 8 insertions(+), 9 deletions(-)
->
-> diff --git a/hw/i2c/smbus_eeprom.c b/hw/i2c/smbus_eeprom.c
-> index 54c86a0112..533c728b3b 100644
-> --- a/hw/i2c/smbus_eeprom.c
-> +++ b/hw/i2c/smbus_eeprom.c
-> @@ -44,7 +44,7 @@
->  typedef struct SMBusEEPROMDevice {
->      SMBusDevice smbusdev;
->      uint8_t data[SMBUS_EEPROM_SIZE];
-> -    void *init_data;
-> +    uint8_t *init_data;
->      uint8_t offset;
->      bool accessed;
->  } SMBusEEPROMDevice;
-> @@ -129,14 +129,14 @@ static void smbus_eeprom_reset(DeviceState *dev)
->
->  static void smbus_eeprom_realize(DeviceState *dev, Error **errp)
->  {
-> +    SMBusEEPROMDevice *eeprom =3D SMBUS_EEPROM(dev);
-> +
->      smbus_eeprom_reset(dev);
-> +    if (eeprom->init_data =3D=3D NULL) {
-> +        error_setg(errp, "init_data cannot be NULL");
-> +    }
->  }
->
-> -static Property smbus_eeprom_properties[] =3D {
-> -    DEFINE_PROP_PTR("data", SMBusEEPROMDevice, init_data),
-> -    DEFINE_PROP_END_OF_LIST(),
-> -};
-> -
->  static void smbus_eeprom_class_initfn(ObjectClass *klass, void *data)
->  {
->      DeviceClass *dc =3D DEVICE_CLASS(klass);
-> @@ -146,9 +146,8 @@ static void smbus_eeprom_class_initfn(ObjectClass *kl=
-ass, void *data)
->      dc->reset =3D smbus_eeprom_reset;
->      sc->receive_byte =3D eeprom_receive_byte;
->      sc->write_data =3D eeprom_write_data;
-> -    dc->props =3D smbus_eeprom_properties;
->      dc->vmsd =3D &vmstate_smbus_eeprom;
-> -    /* Reason: pointer property "data" */
-> +    /* Reason: init_data */
->      dc->user_creatable =3D false;
->  }
->
-> @@ -172,7 +171,7 @@ void smbus_eeprom_init_one(I2CBus *smbus, uint8_t add=
-ress, uint8_t *eeprom_buf)
->
->      dev =3D qdev_create((BusState *) smbus, TYPE_SMBUS_EEPROM);
->      qdev_prop_set_uint8(dev, "address", address);
-> -    qdev_prop_set_ptr(dev, "data", eeprom_buf);
-> +    SMBUS_EEPROM(dev)->init_data =3D eeprom_buf;
->      qdev_init_nofail(dev);
->  }
->
-> --
-> 2.23.0.606.g08da6496b6
->
 
