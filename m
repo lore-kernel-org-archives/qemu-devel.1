@@ -2,82 +2,82 @@ Return-Path: <SRS0=8ZcK=YO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CA3A4CA9EAF
-	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 16:41:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 15D98CA9EAF
+	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 16:47:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 94FA220659
-	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 16:41:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D42AF2086D
+	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 16:47:16 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="qBXGcRJn"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 94FA220659
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="U/pUrc/q"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D42AF2086D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45274 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45310 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iMake-0003ce-RI
-	for qemu-devel@archiver.kernel.org; Mon, 21 Oct 2019 12:41:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39182)
+	id 1iMapw-0005RG-1L
+	for qemu-devel@archiver.kernel.org; Mon, 21 Oct 2019 12:47:16 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39920)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1iMajc-0002ei-QF
- for qemu-devel@nongnu.org; Mon, 21 Oct 2019 12:40:45 -0400
+ (envelope-from <berrange@redhat.com>) id 1iMapF-00051y-Fb
+ for qemu-devel@nongnu.org; Mon, 21 Oct 2019 12:46:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1iMajb-0004kZ-KP
- for qemu-devel@nongnu.org; Mon, 21 Oct 2019 12:40:44 -0400
-Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:46844)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1iMajb-0004jK-Fa
- for qemu-devel@nongnu.org; Mon, 21 Oct 2019 12:40:43 -0400
-Received: by mail-oi1-x243.google.com with SMTP id k25so11564808oiw.13
- for <qemu-devel@nongnu.org>; Mon, 21 Oct 2019 09:40:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=Frybj9IsGbOQcU/DpPzTqp/1SYmu7NsvsEffHw12Xlk=;
- b=qBXGcRJnELvsZXORBcinwvvHhQgD8ip4RmuNVzZY6yYsB3yoV2c8Q2TCKF7rS2S4Gi
- 3lbD9uadBe/zB9pCyIw0qf0IxZlpOwjVjauicel0ARTNvBbcalC/WU6D4/mFsa15ySas
- U0AB6ZuZb7QnpM+aKwhTAMil87ERHzzBNSzejot05WM5NB+1QuzWh5NX+wIgKBz7brRi
- dWi21W6jCsqFyKDWwE2jYcNSGCpgP/XueAy0xN4mGXt3LNrrLJdWwhHcXCS8jN5QJKH3
- 3Y3yg9/ekYl9xCDZWo7NozY3DsU6iHtD8azrUv5f+wiWkvrUvd2WFAhEjBJaOZkvU1zF
- 00Kg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=Frybj9IsGbOQcU/DpPzTqp/1SYmu7NsvsEffHw12Xlk=;
- b=NWABGlpDFDKaf9K62UQsYEMyU65571uobAdW4SvgcyBg2cEHvi96VYUBJgc/Y8AOp3
- J2TF9RJIcrIbPFfhat3l+V1mHpF9i0HxijoZ+RsevumisSY94RzE8Jjn4LdrHlwpqNs2
- zPMUCX9Nh56PWuPBPbwLRiT2moDFESr4UIdJhkpR+tqbqlgvw+7J+8vTaVqQZK7tqVBq
- o2V31lAA3IXPCuzoNhNxUHAYoaMRNY2gX0n36j4lXj0BwEPjdt3+l+8fsMaegtdZgSo7
- zRpUsGyhz8+OVXdCApeZZfjSh+RhyjO3VvqFv+eUB+NPDbu6uyG579Jbop6rBP5Sso4/
- FC5w==
-X-Gm-Message-State: APjAAAVqmkPYnfKQE6feCwYMbShaV6rolEnIRu9MOjYyHI3AaCRZE0Pf
- k7laOb0xiNW46V/J0mn+GAaBuKxEZsVjkCPa2D5PMGJiMIs=
-X-Google-Smtp-Source: APXvYqxaukc2NYLksMQj6F8WyrnsKTY0FbM+8D8JL0E3NNi+egnXS5+fXqlHDhDqb47vkoN5UxpdzNLyMeQLedVKUSI=
-X-Received: by 2002:a05:6808:9:: with SMTP id u9mr20087568oic.98.1571676042324; 
- Mon, 21 Oct 2019 09:40:42 -0700 (PDT)
+ (envelope-from <berrange@redhat.com>) id 1iMapD-0006tX-Bh
+ for qemu-devel@nongnu.org; Mon, 21 Oct 2019 12:46:32 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:46473
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <berrange@redhat.com>) id 1iMapC-0006sH-Tw
+ for qemu-devel@nongnu.org; Mon, 21 Oct 2019 12:46:31 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1571676389;
+ h=from:from:reply-to:reply-to:subject:subject:date:date:
+ message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+ content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=jxcAVeDjK8RGEMGztLDfjGqv6UpWVgUd96+0FlM46eI=;
+ b=U/pUrc/qt8rFc7Hg8yGB3u5wT88o9OCLoj/GPhnmSJT83xC0+2AVkp+toa8nMYELg3fdh5
+ P5JDUhYuYP1qKD6UhCjygGL+jROkfPtqu4v9/zJT/xTR+0FiDVyJBpA3AdIDbFbu9C58Ep
+ OdzB+N8MqtHvKW7mABbWltkbeZUss5Q=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-64-TJW1OtLhPQusismJ4p6gUw-1; Mon, 21 Oct 2019 12:46:18 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4D58B476;
+ Mon, 21 Oct 2019 16:46:17 +0000 (UTC)
+Received: from redhat.com (unknown [10.42.16.231])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 658E019C58;
+ Mon, 21 Oct 2019 16:46:13 +0000 (UTC)
+Date: Mon, 21 Oct 2019 17:46:11 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Subject: Re: [PATCH] tcg/LICENSE: Remove no-longer-true statement that TCG is
+ BSD-licensed
+Message-ID: <20191021164611.GT4336@redhat.com>
+References: <20191021145839.12684-1-peter.maydell@linaro.org>
+ <CAFEAcA_PO7vaxGVpfW2bqRvB9XtDA8uk_6Tw7SauwrbHfJOjxw@mail.gmail.com>
 MIME-Version: 1.0
-References: <60a0d510-b693-0ed7-560f-e70904d9574d@redhat.com>
- <9925b761-6d9b-2361-1697-a8a726b2ef21@redhat.com>
- <2848d03e-4aa6-d74e-14fe-afa9fd107171@linaro.org>
-In-Reply-To: <2848d03e-4aa6-d74e-14fe-afa9fd107171@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 21 Oct 2019 17:40:31 +0100
-Message-ID: <CAFEAcA9g3W23krU8yiuYrfVp7CVGEoBDuQofoLYcoo=Cqi48KQ@mail.gmail.com>
-Subject: Re: s390x/qemu-user: TODO /home/dhildenb/git/qemu/tcg/tci.c:859:
- tcg_qemu_tb_exec()
-To: Richard Henderson <richard.henderson@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::243
+In-Reply-To: <CAFEAcA_PO7vaxGVpfW2bqRvB9XtDA8uk_6Tw7SauwrbHfJOjxw@mail.gmail.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-MC-Unique: TJW1OtLhPQusismJ4p6gUw-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,45 +89,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-s390x <qemu-s390x@nongnu.org>, Stefan Weil <sw@weilnetz.de>,
- Thomas Huth <thuth@redhat.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- David Hildenbrand <david@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Cc: Claudio Fontana <claudio.fontana@gmail.com>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ QEMU Developers <qemu-devel@nongnu.org>, Markus Armbruster <armbru@redhat.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, 21 Oct 2019 at 17:39, Richard Henderson
-<richard.henderson@linaro.org> wrote:
->
-> On 10/17/19 4:01 AM, Thomas Huth wrote:
-> > On 17/10/2019 12.02, David Hildenbrand wrote:
-> >> Hi,
-> >>
-> >> I'm currently trying to run Fedora 31 under qemu-user
-> >> (https://github.com/fedora-cloud/docker-brew-fedora/tree/8a81f67271e959dfc8f8a888b161bbd540b7a83b/s390x)
-> >> in order to debug  a vector instruction issue.
-> >>
-> >> Strangely, when trying to chroot into above rootfs and running
-> >> /bin/bash, I get
-> >>
-> >> t460s: ~/f31  $ sudo chroot . ./qemu-s390x  /bin/bash
-> >> TODO /home/dhildenb/git/qemu/tcg/tci.c:859: tcg_qemu_tb_exec()
-> >> /home/dhildenb/git/qemu/tcg/tci.c:859: tcg fatal error
-> >> Aborted
+On Mon, Oct 21, 2019 at 05:36:49PM +0100, Peter Maydell wrote:
+> On Mon, 21 Oct 2019 at 15:58, Peter Maydell <peter.maydell@linaro.org> wr=
+ote:
+> > Since 2008 the tcg/LICENSE file has not changed: it claims that
+> > everything under tcg/ is BSD-licensed.
 > >
-> > That's likely the issue which might be fixed by Stefan's patch here:
-> >
-> > https://patchwork.ozlabs.org/patch/1083601/
-> >
-> > ... unfortunately, this has never been merged into master. Stefan, any
-> > chance that you could finally get this upstream?
->
-> Oops.  Sorry about that.  Queued.
+> > This is not true and hasn't been true for years: in 2013 we
+> > accepted the tcg/aarch64 target code under a GPLv2-or-later
+> > license statement. We don't really consider the tcg
+> > subdirectory to be a distinct part of QEMU anyway.
+>=20
+> This commit message misses the other not-BSD bits of code in tcg/:
+> tcg/tci.c is GPL-2-or-later
+> tcg/tcg-gvec-desc.h, tcg/tcg-op-gvec.[ch], tcg-op-vec.c are LGPL2.1-or-la=
+ter
+>=20
+> Horse has clearly bolted further from the stable than
+> I had first thought.
 
-Er, you had review comments on it the first time round.
-Doesn't it need a v2 to be posted with those fixed ?
+No matter what text we put in the top LICENSE file is always going to be
+rather vague because of the many different licenses scattered across the
+codebase.
 
-thanks
--- PMM
+We really ought to make an effort to add SPDX tags to every file in the
+source tree & have checkpatch.pl enforce that all new files come with
+SPDX tags too. Identifying licenses for code then becomes a trivial grep.
+
+NB, I'm only suggesting add SPDX /in addition/ to the current license
+boilerplate, as removing existing boilerplate license text from a file
+can only be done by agreement with the copyright holder(s).
+
+Regards,
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange=
+ :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com=
+ :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange=
+ :|
+
 
