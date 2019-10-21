@@ -2,78 +2,76 @@ Return-Path: <SRS0=8ZcK=YO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+X-Spam-Status: No, score=-5.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 62641C47E49
-	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 10:58:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 72BC3CA9EAF
+	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 11:01:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 306EC2089C
-	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 10:58:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3C7FD2084C
+	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 11:01:21 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="W0FQs+Vq"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 306EC2089C
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="L9zKWFIU"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3C7FD2084C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37770 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37838 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iMVO8-00017z-Ay
-	for qemu-devel@archiver.kernel.org; Mon, 21 Oct 2019 06:58:12 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45808)
+	id 1iMVR9-0003tJ-Gv
+	for qemu-devel@archiver.kernel.org; Mon, 21 Oct 2019 07:01:19 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46197)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <thuth@redhat.com>) id 1iMVKP-0004NM-Jn
- for qemu-devel@nongnu.org; Mon, 21 Oct 2019 06:54:22 -0400
+ (envelope-from <dgilbert@redhat.com>) id 1iMVOl-0002F6-0m
+ for qemu-devel@nongnu.org; Mon, 21 Oct 2019 06:58:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <thuth@redhat.com>) id 1iMVKO-0001pg-Bk
- for qemu-devel@nongnu.org; Mon, 21 Oct 2019 06:54:21 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:24450
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <dgilbert@redhat.com>) id 1iMVOj-0003b9-Fg
+ for qemu-devel@nongnu.org; Mon, 21 Oct 2019 06:58:50 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:27478
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <thuth@redhat.com>) id 1iMVKO-0001pU-8E
- for qemu-devel@nongnu.org; Mon, 21 Oct 2019 06:54:20 -0400
+ (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1iMVOj-0003av-C1
+ for qemu-devel@nongnu.org; Mon, 21 Oct 2019 06:58:49 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1571655259;
+ s=mimecast20190719; t=1571655529;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=EWEY4b6PjdseCjRZ6lS/PKvEvsNUldXSh2Vzzbk2YUI=;
- b=W0FQs+VqIUB4JcHmHqjSPC6pTG3cjZRK3dD7mX2Ym0ND6FfDPzvR3Av/FuLCJ/ruOrA7yB
- UDEt9u4r3Rrq5H9U6wHnJ3wbZUWF6VqucGtOYPKhwrK1a37499I0IcqwSiwcOqW/Ecsih4
- iD979yCxW13AOO2mbycZIw6+/rCpO0w=
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=7cBNVOKZJmQsyh/mjpJ98sFmElIR99SNuhmANipUhdA=;
+ b=L9zKWFIUWHFAB32GlG7h4Q9rUidYK/2JT7OfG8EhCVbP6pLvaWmZXTCGsttOdFhknBQIMT
+ +Ugugm0jsZDPTjx04BVfdz+8VZ4W7XsJ+Gw5n4XSBhMZ4jN2BEN/kVVaBT9gdvp76KZcZ3
+ QMEOiYpWLNm8IsrVhximhm6ZpxczzSY=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-177-uajou6qzP_KSOFcec3-lFw-1; Mon, 21 Oct 2019 06:54:16 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
+ us-mta-211-eLhU_7KQMGifBGmaBLZhEA-1; Mon, 21 Oct 2019 06:58:45 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0023480183E;
- Mon, 21 Oct 2019 10:54:16 +0000 (UTC)
-Received: from thuth.com (dhcp-200-228.str.redhat.com [10.33.200.228])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 85D2C60BE2;
- Mon, 21 Oct 2019 10:54:12 +0000 (UTC)
-From: Thomas Huth <thuth@redhat.com>
-To: Max Reitz <mreitz@redhat.com>,
-	qemu-block@nongnu.org
-Subject: [PATCH v2 5/6] iotests: Enable more tests in the 'auto' group to
- improve test coverage
-Date: Mon, 21 Oct 2019 12:53:49 +0200
-Message-Id: <20191021105350.1710-6-thuth@redhat.com>
-In-Reply-To: <20191021105350.1710-1-thuth@redhat.com>
-References: <20191021105350.1710-1-thuth@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-MC-Unique: uajou6qzP_KSOFcec3-lFw-1
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id ECF81100551E;
+ Mon, 21 Oct 2019 10:58:43 +0000 (UTC)
+Received: from dgilbert-t580.localhost (ovpn-117-232.ams2.redhat.com
+ [10.36.117.232])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 02B8B6060D;
+ Mon, 21 Oct 2019 10:58:34 +0000 (UTC)
+From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
+To: qemu-devel@nongnu.org, mst@redhat.com, marcandre.lureau@redhat.com,
+ stefanha@redhat.com
+Subject: [PATCH 00/30] virtiofs daemon (base)
+Date: Mon, 21 Oct 2019 11:58:02 +0100
+Message-Id: <20191021105832.36574-1-dgilbert@redhat.com>
+MIME-Version: 1.0
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-MC-Unique: eLhU_7KQMGifBGmaBLZhEA-1
 X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=WINDOWS-1252
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.120
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -85,100 +83,149 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, John Snow <jsnow@redhat.com>,
- qemu-devel@nongnu.org
+Cc: piaojun@huawei.com, eguan@linux.alibaba.com, vgoyal@Redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-According to Kevin, tests 030, 040 and 041 are among the most valuable
-tests that we have, so we should always run them if possible, even if
-they take a little bit longer.
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-According to Max, it would be good to have a test for iothreads and
-migration. 127 and 256 seem to be good candidates for iothreads. For
-migration, let's enable 091, 181, 183, and 203 (which also tests
-iothreads).
+Hi,
+  This is the 1st set for the virtiofsd - a daemon
+that implements the user space side of virtiofs.
 
-Reviewed-by: Max Reitz <mreitz@redhat.com>
-Signed-off-by: Thomas Huth <thuth@redhat.com>
----
- tests/qemu-iotests/group | 18 +++++++++---------
- 1 file changed, 9 insertions(+), 9 deletions(-)
+  The kernel and qemu device parts recently went in,
+so the daemon is the only thing missing to have a working
+set.
 
-diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
-index a73df279e5..2dd671b82e 100644
---- a/tests/qemu-iotests/group
-+++ b/tests/qemu-iotests/group
-@@ -51,7 +51,7 @@
- 027 rw auto quick
- 028 rw backing quick
- 029 rw auto quick
--030 rw backing
-+030 rw auto backing
- 031 rw auto quick
- 032 rw auto quick
- 033 rw auto quick
-@@ -61,8 +61,8 @@
- 037 rw auto backing quick
- 038 rw auto backing quick
- 039 rw auto quick
--040 rw
--041 rw backing
-+040 rw auto
-+041 rw auto backing
- 042 rw auto quick
- 043 rw auto backing
- 044 rw
-@@ -112,7 +112,7 @@
- 088 rw quick
- 089 rw auto quick
- 090 rw auto quick
--091 rw migration
-+091 rw auto migration
- 092 rw quick
- 093 throttle
- 094 rw quick
-@@ -148,7 +148,7 @@
- 124 rw backing
- 125 rw
- 126 rw auto backing
--127 rw backing quick
-+127 rw auto backing quick
- 128 rw quick
- 129 rw quick
- 130 rw auto quick
-@@ -197,9 +197,9 @@
- 177 rw auto quick
- 178 img
- 179 rw auto quick
--181 rw migration
-+181 rw auto migration
- 182 rw quick
--183 rw migration
-+183 rw auto migration
- 184 rw auto quick
- 185 rw
- 186 rw auto
-@@ -218,7 +218,7 @@
- 200 rw
- 201 rw migration
- 202 rw quick
--203 rw migration
-+203 rw auto migration
- 204 rw quick
- 205 rw quick
- 206 rw
-@@ -270,7 +270,7 @@
- 253 rw quick
- 254 rw backing quick
- 255 rw quick
--256 rw quick
-+256 rw auto quick
- 257 rw
- 258 rw quick
- 260 rw quick
+  This set is the absolute minimal base set of patches;
+it's not yet safe to use (from security or correctness);
+
+I'll follow up with ~3 more series in the next few days
+with:
+
+    a) Security patches that add sandboxing and checking
+       compared with normal fuse - that makes it safe.
+    b) Performance improvements including threading
+    c) Other fixes, including correctness.
+
+but, this is a good start and gets things rolling.
+
+The set pulls in a big chunk of the upstream libfuse library
+(unmodified so that it's easy to check it really is upstream),
+chops all the stuff out we don't need and then adds the
+new transport we need.
+
+For new files I've formatted the code according to qemu
+standards; for files that are from upstream libfuse
+I've kept with their standards for ease of future updating.
+
+We can't just link with libfuse, since we have to make ABI incompatible
+changes for the new transport.
+
+Running this daemon is typically done with:
+
+   ./virtiofsd -o vhost_user_socket=3D/path/socket -o source=3D/path/to/fs
+
+connected to a qemu that's then started with:
+   -chardev socket,id=3Dchar0,path=3D/path/socket -device vhost-user-fs-pci=
+,queue-size=3D1024,chardev=3Dchar0,tag=3Dmyfs
+
+and then in the guest mount with:
+   mount -t virtiofs myfs /mnt
+
+Our development branch is: https://gitlab.com/virtio-fs/qemu/tree/virtio-fs=
+-dev
+
+Dave
+
+
+Dr. David Alan Gilbert (22):
+  virtiofsd: Pull in upstream headers
+  virtiofsd: Pull in kernel's fuse.h
+  virtiofsd: Add auxiliary .c's
+  virtiofsd: Add fuse_lowlevel.c
+  virtiofsd: Add passthrough_ll
+  virtiofsd: Trim down imported files
+  virtiofsd: Fix fuse_daemonize ignored return values
+  virtiofsd: Fix common header and define for QEMU builds
+  virtiofsd: fuse: Make iov_length usable outside fuse_lowlevel.c
+  virtiofsd: Add options for virtio
+  virtiofsd: Open vhost connection instead of mounting
+  virtiofsd: Start wiring up vhost-user
+  virtiofsd: Add main virtio loop
+  virtiofsd: get/set features callbacks
+  virtiofsd: Start queue threads
+  virtiofsd: Poll kick_fd for queue
+  virtiofsd: Start reading commands from queue
+  virtiofsd: Send replies to messages
+  virtiofsd: Keep track of replies
+  virtiofsd: Add Makefile wiring for virtiofsd contrib
+  virtiofsd: Fast path for virtio read
+  virtiofs: Add maintainers entry
+
+Stefan Hajnoczi (7):
+  virtiofsd: remove mountpoint dummy argument
+  virtiofsd: remove unused notify reply support
+  virtiofsd: add -o source=3DPATH to help output
+  virtiofsd: add --fd=3DFDNUM fd passing option
+  virtiofsd: make -f (foreground) the default
+  virtiofsd: add vhost-user.json file
+  virtiofsd: add --print-capabilities option
+
+Vivek Goyal (1):
+  virtiofsd: Make fsync work even if only inode is passed in
+
+ .gitignore                                  |    1 +
+ MAINTAINERS                                 |    8 +
+ Makefile                                    |    9 +
+ Makefile.objs                               |    1 +
+ contrib/virtiofsd/50-qemu-virtiofsd.json.in |    5 +
+ contrib/virtiofsd/Makefile.objs             |   10 +
+ contrib/virtiofsd/buffer.c                  |  318 +++
+ contrib/virtiofsd/fuse.h                    | 1268 ++++++++++
+ contrib/virtiofsd/fuse_common.h             |  823 +++++++
+ contrib/virtiofsd/fuse_i.h                  |  131 ++
+ contrib/virtiofsd/fuse_kernel.h             |  858 +++++++
+ contrib/virtiofsd/fuse_log.c                |   40 +
+ contrib/virtiofsd/fuse_log.h                |   82 +
+ contrib/virtiofsd/fuse_loop_mt.c            |   54 +
+ contrib/virtiofsd/fuse_lowlevel.c           | 2302 +++++++++++++++++++
+ contrib/virtiofsd/fuse_lowlevel.h           | 2024 ++++++++++++++++
+ contrib/virtiofsd/fuse_misc.h               |   59 +
+ contrib/virtiofsd/fuse_opt.c                |  422 ++++
+ contrib/virtiofsd/fuse_opt.h                |  271 +++
+ contrib/virtiofsd/fuse_signals.c            |   90 +
+ contrib/virtiofsd/fuse_virtio.c             |  717 ++++++
+ contrib/virtiofsd/fuse_virtio.h             |   33 +
+ contrib/virtiofsd/helper.c                  |  300 +++
+ contrib/virtiofsd/passthrough_helpers.h     |   76 +
+ contrib/virtiofsd/passthrough_ll.c          | 1341 +++++++++++
+ docs/interop/vhost-user.json                |    4 +-
+ 26 files changed, 11246 insertions(+), 1 deletion(-)
+ create mode 100644 contrib/virtiofsd/50-qemu-virtiofsd.json.in
+ create mode 100644 contrib/virtiofsd/Makefile.objs
+ create mode 100644 contrib/virtiofsd/buffer.c
+ create mode 100644 contrib/virtiofsd/fuse.h
+ create mode 100644 contrib/virtiofsd/fuse_common.h
+ create mode 100644 contrib/virtiofsd/fuse_i.h
+ create mode 100644 contrib/virtiofsd/fuse_kernel.h
+ create mode 100644 contrib/virtiofsd/fuse_log.c
+ create mode 100644 contrib/virtiofsd/fuse_log.h
+ create mode 100644 contrib/virtiofsd/fuse_loop_mt.c
+ create mode 100644 contrib/virtiofsd/fuse_lowlevel.c
+ create mode 100644 contrib/virtiofsd/fuse_lowlevel.h
+ create mode 100644 contrib/virtiofsd/fuse_misc.h
+ create mode 100644 contrib/virtiofsd/fuse_opt.c
+ create mode 100644 contrib/virtiofsd/fuse_opt.h
+ create mode 100644 contrib/virtiofsd/fuse_signals.c
+ create mode 100644 contrib/virtiofsd/fuse_virtio.c
+ create mode 100644 contrib/virtiofsd/fuse_virtio.h
+ create mode 100644 contrib/virtiofsd/helper.c
+ create mode 100644 contrib/virtiofsd/passthrough_helpers.h
+ create mode 100644 contrib/virtiofsd/passthrough_ll.c
+
 --=20
-2.18.1
+2.23.0
 
 
