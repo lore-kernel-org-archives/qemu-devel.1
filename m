@@ -2,81 +2,77 @@ Return-Path: <SRS0=8ZcK=YO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	HTML_MESSAGE,INCLUDES_PATCH,MAILING_LIST_MULTI,MIME_BOUND_DIGITS_15,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5583ECA9EA0
-	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 00:56:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EAC32CA9EAE
+	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 01:07:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 16A9120663
-	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 00:56:22 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IlyOPFM+"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 16A9120663
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id BD43420679
+	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 01:07:44 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BD43420679
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54192 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54446 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iMLzh-00047h-6y
-	for qemu-devel@archiver.kernel.org; Sun, 20 Oct 2019 20:56:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44022)
+	id 1iMMAh-0000M2-RH
+	for qemu-devel@archiver.kernel.org; Sun, 20 Oct 2019 21:07:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45092)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <liq3ea@gmail.com>) id 1iMLyx-0003hv-Ld
- for qemu-devel@nongnu.org; Sun, 20 Oct 2019 20:55:36 -0400
+ (envelope-from <hhan@redhat.com>) id 1iMM9E-00082k-7o
+ for qemu-devel@nongnu.org; Sun, 20 Oct 2019 21:06:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <liq3ea@gmail.com>) id 1iMLyw-000358-BB
- for qemu-devel@nongnu.org; Sun, 20 Oct 2019 20:55:35 -0400
-Received: from mail-oi1-x244.google.com ([2607:f8b0:4864:20::244]:46205)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <liq3ea@gmail.com>) id 1iMLyw-00034m-4J
- for qemu-devel@nongnu.org; Sun, 20 Oct 2019 20:55:34 -0400
-Received: by mail-oi1-x244.google.com with SMTP id k25so9589838oiw.13
- for <qemu-devel@nongnu.org>; Sun, 20 Oct 2019 17:55:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=Px+dFPcwELRuXJvQgwLp4nDQ4IO/i1z6c3QaH8sRTMk=;
- b=IlyOPFM+cffb/t4/WyKQo+ToXKvEs61aANkYZ6FJB1TBiQBZQIbGPRyHOke7tW9NAE
- j59xhPjvSiprIkl0tNATiDuUTy9oFcgwNV/GzKYCVunV46ZQ5OrWQfj/mpBfrBfbPppj
- rp3gS2jOLILeizXDlhc+m9RkOMvRn/X64LDPkc4S5k2W9YHIGg7UqwZo87hqYvN+RT9s
- VUB3IicIuRbpn0Xj+6mBGKCVqTbGC3TeYW+tmg6b1YtQ64ra5E4PpHpKFHwjYmK1CcMO
- DBrxAS+9/fOUjM3xxLYdgEv+7d9g4Uj7KHIwZ4ncdfaL2fEV8do4WCVbH7gwVIr8gMDV
- 4Wwg==
+ (envelope-from <hhan@redhat.com>) id 1iMM9B-0000jZ-6B
+ for qemu-devel@nongnu.org; Sun, 20 Oct 2019 21:06:11 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37444)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <hhan@redhat.com>) id 1iMM99-0000dt-5H
+ for qemu-devel@nongnu.org; Sun, 20 Oct 2019 21:06:09 -0400
+Received: from mail-oi1-f199.google.com (mail-oi1-f199.google.com
+ [209.85.167.199])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 0FC35C04959E
+ for <qemu-devel@nongnu.org>; Mon, 21 Oct 2019 01:06:03 +0000 (UTC)
+Received: by mail-oi1-f199.google.com with SMTP id f80so6757008oig.8
+ for <qemu-devel@nongnu.org>; Sun, 20 Oct 2019 18:06:03 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=Px+dFPcwELRuXJvQgwLp4nDQ4IO/i1z6c3QaH8sRTMk=;
- b=BJ8qlDJ9Y766mYEN8Po+v9m3G9gz20c0gJWDy16PpFu3nopoHOUY/A51poXNaknPLa
- U9N7HNDmY/Gw514j4zUWZTNcmqkc0jtNEAeyrikRW5jl2NMxicFe5MOWviscF4Wm5Fxj
- HvrpAUjIGIFah1fpTewYWZ9mhp37cGng0/t31SiWvjbSAbd29F+3MYgpYJY/L4sAPyeK
- S9x+C7DeFL36NilvG1FW0nQEbLe7s2ylNElakUj15wtTePMz2R1lCXONe/Q+Foq7LHM+
- qkxwWfu0vCM2r7cicYRfc7dSYTTo+peOWCf40Ci3hPX0apz0DCmbb3bhmvug3LAZYfXZ
- gnqg==
-X-Gm-Message-State: APjAAAVUcyg5ThjnM0Nn/JqRDae/blFI6DTQkVe3tTlHryVXnDji1mj7
- wfLKNFC/Ci9qOxU6kGro/wYvSRQOa2saBdyNIrg=
-X-Google-Smtp-Source: APXvYqzCXkWP7wOeHO66a0D3ZD2TyEEIN4dX82WdcLESzy5DfLyI5AVxJvb0zf8PQaqGqHI5yAd7wFS3j47uVIBWseQ=
-X-Received: by 2002:aca:280e:: with SMTP id 14mr16953796oix.129.1571619333032; 
- Sun, 20 Oct 2019 17:55:33 -0700 (PDT)
+ bh=n9WichSB2x9qjHeFGEDl17oZygTE95Ex5x3JdCOL9Yc=;
+ b=Ho2PB7j3pnElJNHLfb4X+o8WPs4DNKd84bqawWLXj0Y5ZqsMw2cM0mabUXDDf/Gshp
+ X2lK6Yhb9HPZuVat442twfNNRAJ64sCpQqG7klOClsK0mLkux5KFhBfJ0bdF3Wck4Ran
+ YpMZUDRkj54xZJKZ3T38Pj7ECXfghqM7xDsb+BbeXu94PTV1wwfktKajkgQ9Y25bkTWg
+ tuXadaORxaKCk9tAjD5japCahGH6wAn7bm+1JdKLo3hg6oC4ShmAyvZBHwrBpFeqfy+6
+ KdS2h2cs8h6P6V033Kv74qgFtcqT7iCD6224MBdJIiC2BALZSVCcPGduyyE2CqTHsaap
+ GUhQ==
+X-Gm-Message-State: APjAAAWJKIPMHfEYRbCp2/zC2p9fcipj2tC+Uc9fKhZBRHlWDmGSgWlh
+ y0gRNiO6bslyaxctGb7Vafp2PbI2rYHGYQBXzQOB849p0lxM5UlGCE/OfpZ4r++J+tv/t/lu2Zv
+ iVKpEO/gxMtBPEzH3DlTTf/Vha8Ioh5Q=
+X-Received: by 2002:a9d:5f93:: with SMTP id g19mr17347541oti.260.1571619962418; 
+ Sun, 20 Oct 2019 18:06:02 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqxlFpedo1Cx0Ulthh322PQvg0wN+7guWiQcWHiryPbRsV+E7es3AA9CpQLg3VhHnALYkuPtVs3EG30UZo1NCzw=
+X-Received: by 2002:a9d:5f93:: with SMTP id g19mr17347526oti.260.1571619962187; 
+ Sun, 20 Oct 2019 18:06:02 -0700 (PDT)
 MIME-Version: 1.0
-References: <20191018134754.16362-1-philmd@redhat.com>
- <20191018134754.16362-2-philmd@redhat.com>
-In-Reply-To: <20191018134754.16362-2-philmd@redhat.com>
-From: Li Qiang <liq3ea@gmail.com>
-Date: Mon, 21 Oct 2019 08:54:57 +0800
-Message-ID: <CAKXe6S+hmwVbszWT4ALmh+TnKZ=0hPLQbT+hHiUEG-r8EZM1Nw@mail.gmail.com>
-Subject: Re: [PATCH v2 01/20] MAINTAINERS: Keep PIIX4 South Bridge separate
- from PC Chipsets
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
-Content-Type: multipart/alternative; boundary="000000000000114f4e05956124e5"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::244
+References: <20191018095924.4409-1-hhan@redhat.com>
+ <39bde897-fd65-582d-7d2e-8aec27254898@redhat.com>
+In-Reply-To: <39bde897-fd65-582d-7d2e-8aec27254898@redhat.com>
+From: Han Han <hhan@redhat.com>
+Date: Mon, 21 Oct 2019 09:06:15 +0800
+Message-ID: <CAHjf+S9nvqz=rVSzp-5L9iKnbNA8aeOANhq5=Em4kafVQ2Cgaw@mail.gmail.com>
+Subject: Re: [PATCH] qemu-img.texi: Describe data_file and data_file_raw
+To: John Snow <jsnow@redhat.com>
+Content-Type: multipart/alternative; boundary="0000000000009191340595614940"
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,143 +84,146 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Stefano Stabellini <sstabellini@kernel.org>, xen-devel@lists.xenproject.org,
- Paul Durrant <paul@xen.org>, "Michael S. Tsirkin" <mst@redhat.com>,
- =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>,
- Eduardo Habkost <ehabkost@redhat.com>, Qemu Developers <qemu-devel@nongnu.org>,
- =?UTF-8?Q?Herv=C3=A9_Poussineau?= <hpoussin@reactos.org>,
- Aleksandar Markovic <amarkovic@wavecomp.com>,
- Igor Mammedov <imammedo@redhat.com>,
- Anthony Perard <anthony.perard@citrix.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
- Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
- Aurelien Jarno <aurelien@aurel32.net>, Richard Henderson <rth@twiddle.net>
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org,
+ Qemu-block <qemu-block@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---000000000000114f4e05956124e5
+--0000000000009191340595614940
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> =E4=BA=8E2019=E5=B9=B410=E6=
-=9C=8818=E6=97=A5=E5=91=A8=E4=BA=94 =E4=B8=8B=E5=8D=889:50=E5=86=99=E9=81=
-=93=EF=BC=9A
+On Sat, Oct 19, 2019 at 4:58 AM John Snow <jsnow@redhat.com> wrote:
 
-> From: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+> CC qemu-block
 >
-> The PIIX4 Southbridge is not used by the PC machine,
-> but by the Malta board (MIPS). Add a new section to
-> keep it covered.
+> On 10/18/19 5:59 AM, Han Han wrote:
+> > https://bugzilla.redhat.com/show_bug.cgi?id=1763105
+> >
+> > Signed-off-by: Han Han <hhan@redhat.com>
+> > ---
+> >  qemu-img.texi | 10 ++++++++++
+> >  1 file changed, 10 insertions(+)
+> >
+> > diff --git a/qemu-img.texi b/qemu-img.texi
+> > index b5156d6316..44596c2d93 100644
+> > --- a/qemu-img.texi
+> > +++ b/qemu-img.texi
+> > @@ -763,6 +763,16 @@ file which is COW and has data blocks already, it
+> couldn't be changed to NOCOW
+> >  by setting @code{nocow=on}. One can issue @code{lsattr filename} to
+> check if
+> >  the NOCOW flag is set or not (Capital 'C' is NOCOW flag).
+> >
+> > +@item data_file
+> > +File name of data file that is stored in the image and used as a
+> default for
+> > +opening the image. If the option is used, qcow2 file only stores the
+> metadata
+> > +of the image.
+> > +
 >
-> Suggested-by: Michael S. Tsirkin <mst@redhat.com>
-> Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+> This is a little unclear, and seems to imply the data file is stored
+> *IN* the image.
 >
+> "Optional filename to be used as a data store for this qcow2 file. If
+> this option is used, the qcow2 file only stores metadata for this image."
+>
+Thanks for your advice. I will update it in v2.
 
-Reviewed-by: Li Qiang <liq3ea@163.com>
-
-
-> ---
->  MAINTAINERS | 7 ++++++-
->  1 file changed, 6 insertions(+), 1 deletion(-)
 >
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index fe4dc51b08..c9f625fc2e 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -1230,7 +1230,6 @@ F: hw/pci-host/q35.c
->  F: hw/pci-host/pam.c
->  F: include/hw/pci-host/q35.h
->  F: include/hw/pci-host/pam.h
-> -F: hw/isa/piix4.c
->  F: hw/isa/lpc_ich9.c
->  F: hw/i2c/smbus_ich9.c
->  F: hw/acpi/piix4.c
-> @@ -1716,6 +1715,12 @@ F: hw/display/edid*
->  F: include/hw/display/edid.h
->  F: qemu-edid.c
->
-> +PIIX4 South Bridge (i82371AB)
-> +M: Herv=C3=A9 Poussineau <hpoussin@reactos.org>
-> +M: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-> +S: Maintained
-> +F: hw/isa/piix4.c
-> +
->  Firmware configuration (fw_cfg)
->  M: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
->  R: Laszlo Ersek <lersek@redhat.com>
-> --
-> 2.21.0
->
+> > +@item data_file_raw
+> > +This option requires @option{data_file}. If this option is set to
+> @code{on},
+> > +qemu will always keep the external data file consistent as a standalone
+> > +read-only raw image. Default value is @code{off}.
+> > +
+> >  @end table
+> >
+> >  @item Other
+> >
 >
 >
 
---000000000000114f4e05956124e5
+-- 
+Best regards,
+-----------------------------------
+Han Han
+Quality Engineer
+Redhat.
+
+Email: hhan@redhat.com
+Phone: +861065339333
+
+--0000000000009191340595614940
 Content-Type: text/html; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
 <div dir=3D"ltr"><div dir=3D"ltr"><br></div><br><div class=3D"gmail_quote">=
-<div dir=3D"ltr" class=3D"gmail_attr">Philippe Mathieu-Daud=C3=A9 &lt;<a hr=
-ef=3D"mailto:philmd@redhat.com">philmd@redhat.com</a>&gt; =E4=BA=8E2019=E5=
-=B9=B410=E6=9C=8818=E6=97=A5=E5=91=A8=E4=BA=94 =E4=B8=8B=E5=8D=889:50=E5=86=
-=99=E9=81=93=EF=BC=9A<br></div><blockquote class=3D"gmail_quote" style=3D"m=
-argin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left=
-:1ex">From: Philippe Mathieu-Daud=C3=A9 &lt;<a href=3D"mailto:f4bug@amsat.o=
-rg" target=3D"_blank">f4bug@amsat.org</a>&gt;<br>
+<div dir=3D"ltr" class=3D"gmail_attr">On Sat, Oct 19, 2019 at 4:58 AM John =
+Snow &lt;<a href=3D"mailto:jsnow@redhat.com">jsnow@redhat.com</a>&gt; wrote=
+:<br></div><blockquote class=3D"gmail_quote" style=3D"margin:0px 0px 0px 0.=
+8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex">CC qemu-block<=
+br>
 <br>
-The PIIX4 Southbridge is not used by the PC machine,<br>
-but by the Malta board (MIPS). Add a new section to<br>
-keep it covered.<br>
+On 10/18/19 5:59 AM, Han Han wrote:<br>
+&gt; <a href=3D"https://bugzilla.redhat.com/show_bug.cgi?id=3D1763105" rel=
+=3D"noreferrer" target=3D"_blank">https://bugzilla.redhat.com/show_bug.cgi?=
+id=3D1763105</a><br>
+&gt; <br>
+&gt; Signed-off-by: Han Han &lt;<a href=3D"mailto:hhan@redhat.com" target=
+=3D"_blank">hhan@redhat.com</a>&gt;<br>
+&gt; ---<br>
+&gt;=C2=A0 qemu-img.texi | 10 ++++++++++<br>
+&gt;=C2=A0 1 file changed, 10 insertions(+)<br>
+&gt; <br>
+&gt; diff --git a/qemu-img.texi b/qemu-img.texi<br>
+&gt; index b5156d6316..44596c2d93 100644<br>
+&gt; --- a/qemu-img.texi<br>
+&gt; +++ b/qemu-img.texi<br>
+&gt; @@ -763,6 +763,16 @@ file which is COW and has data blocks already, it=
+ couldn&#39;t be changed to NOCOW<br>
+&gt;=C2=A0 by setting @code{nocow=3Don}. One can issue @code{lsattr filenam=
+e} to check if<br>
+&gt;=C2=A0 the NOCOW flag is set or not (Capital &#39;C&#39; is NOCOW flag)=
+.<br>
+&gt;=C2=A0 <br>
+&gt; +@item data_file<br>
+&gt; +File name of data file that is stored in the image and used as a defa=
+ult for<br>
+&gt; +opening the image. If the option is used, qcow2 file only stores the =
+metadata<br>
+&gt; +of the image.<br>
+&gt; +<br>
 <br>
-Suggested-by: Michael S. Tsirkin &lt;<a href=3D"mailto:mst@redhat.com" targ=
-et=3D"_blank">mst@redhat.com</a>&gt;<br>
-Reviewed-by: Aleksandar Markovic &lt;<a href=3D"mailto:amarkovic@wavecomp.c=
-om" target=3D"_blank">amarkovic@wavecomp.com</a>&gt;<br>
-Signed-off-by: Philippe Mathieu-Daud=C3=A9 &lt;<a href=3D"mailto:f4bug@amsa=
-t.org" target=3D"_blank">f4bug@amsat.org</a>&gt;<br></blockquote><div><br><=
-/div><div>Reviewed-by: Li Qiang &lt;<a href=3D"mailto:liq3ea@163.com">liq3e=
-a@163.com</a>&gt;<br></div><div>=C2=A0</div><blockquote class=3D"gmail_quot=
-e" style=3D"margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204)=
-;padding-left:1ex">
----<br>
-=C2=A0MAINTAINERS | 7 ++++++-<br>
-=C2=A01 file changed, 6 insertions(+), 1 deletion(-)<br>
+This is a little unclear, and seems to imply the data file is stored<br>
+*IN* the image.<br>
 <br>
-diff --git a/MAINTAINERS b/MAINTAINERS<br>
-index fe4dc51b08..c9f625fc2e 100644<br>
---- a/MAINTAINERS<br>
-+++ b/MAINTAINERS<br>
-@@ -1230,7 +1230,6 @@ F: hw/pci-host/q35.c<br>
-=C2=A0F: hw/pci-host/pam.c<br>
-=C2=A0F: include/hw/pci-host/q35.h<br>
-=C2=A0F: include/hw/pci-host/pam.h<br>
--F: hw/isa/piix4.c<br>
-=C2=A0F: hw/isa/lpc_ich9.c<br>
-=C2=A0F: hw/i2c/smbus_ich9.c<br>
-=C2=A0F: hw/acpi/piix4.c<br>
-@@ -1716,6 +1715,12 @@ F: hw/display/edid*<br>
-=C2=A0F: include/hw/display/edid.h<br>
-=C2=A0F: qemu-edid.c<br>
+&quot;Optional filename to be used as a data store for this qcow2 file. If<=
+br>
+this option is used, the qcow2 file only stores metadata for this image.&qu=
+ot;<br></blockquote><div>Thanks for your advice. I will update it in v2. <b=
+r></div><blockquote class=3D"gmail_quote" style=3D"margin:0px 0px 0px 0.8ex=
+;border-left:1px solid rgb(204,204,204);padding-left:1ex">
 <br>
-+PIIX4 South Bridge (i82371AB)<br>
-+M: Herv=C3=A9 Poussineau &lt;<a href=3D"mailto:hpoussin@reactos.org" targe=
-t=3D"_blank">hpoussin@reactos.org</a>&gt;<br>
-+M: Philippe Mathieu-Daud=C3=A9 &lt;<a href=3D"mailto:f4bug@amsat.org" targ=
-et=3D"_blank">f4bug@amsat.org</a>&gt;<br>
-+S: Maintained<br>
-+F: hw/isa/piix4.c<br>
-+<br>
-=C2=A0Firmware configuration (fw_cfg)<br>
-=C2=A0M: Philippe Mathieu-Daud=C3=A9 &lt;<a href=3D"mailto:philmd@redhat.co=
-m" target=3D"_blank">philmd@redhat.com</a>&gt;<br>
-=C2=A0R: Laszlo Ersek &lt;<a href=3D"mailto:lersek@redhat.com" target=3D"_b=
-lank">lersek@redhat.com</a>&gt;<br>
--- <br>
-2.21.0<br>
+&gt; +@item data_file_raw<br>
+&gt; +This option requires @option{data_file}. If this option is set to @co=
+de{on},<br>
+&gt; +qemu will always keep the external data file consistent as a standalo=
+ne<br>
+&gt; +read-only raw image. Default value is @code{off}.<br>
+&gt; +<br>
+&gt;=C2=A0 @end table<br>
+&gt;=C2=A0 <br>
+&gt;=C2=A0 @item Other<br>
+&gt; <br>
 <br>
-<br>
-</blockquote></div></div>
+</blockquote></div><br clear=3D"all"><br>-- <br><div dir=3D"ltr" class=3D"g=
+mail_signature"><div dir=3D"ltr"><div><div dir=3D"ltr"><div><div dir=3D"ltr=
+">Best regards,</div><div dir=3D"ltr">-----------------------------------<b=
+r></div><div dir=3D"ltr">Han Han<br>Quality Engineer<br>Redhat.<br><br>Emai=
+l: <a href=3D"mailto:hhan@redhat.com" target=3D"_blank">hhan@redhat.com</a>=
+<br>Phone: +861065339333<br></div></div></div></div></div></div></div>
 
---000000000000114f4e05956124e5--
+--0000000000009191340595614940--
 
