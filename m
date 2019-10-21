@@ -2,126 +2,104 @@ Return-Path: <SRS0=8ZcK=YO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9E70ECA9EB0
-	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 13:39:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A6A80CA9EB7
+	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 13:39:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6865421A4A
-	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 13:39:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 75F9521928
+	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 13:39:17 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EON+HjXx"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6865421A4A
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="E2ogAuIV"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 75F9521928
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41982 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41984 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iMXtw-0004NB-Do
-	for qemu-devel@archiver.kernel.org; Mon, 21 Oct 2019 09:39:12 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40754)
+	id 1iMXu0-0004Sf-JX
+	for qemu-devel@archiver.kernel.org; Mon, 21 Oct 2019 09:39:16 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39640)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <thuth@redhat.com>) id 1iMXt0-0003GL-OC
- for qemu-devel@nongnu.org; Mon, 21 Oct 2019 09:38:15 -0400
+ (envelope-from <mreitz@redhat.com>) id 1iMXoF-0005uX-85
+ for qemu-devel@nongnu.org; Mon, 21 Oct 2019 09:33:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <thuth@redhat.com>) id 1iMXsz-0007QN-MU
- for qemu-devel@nongnu.org; Mon, 21 Oct 2019 09:38:14 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:26254
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <mreitz@redhat.com>) id 1iMXoD-0005uo-W9
+ for qemu-devel@nongnu.org; Mon, 21 Oct 2019 09:33:19 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:25361
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <thuth@redhat.com>) id 1iMXsz-0007Q1-Ja
- for qemu-devel@nongnu.org; Mon, 21 Oct 2019 09:38:13 -0400
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1iMXoC-0005uN-9h
+ for qemu-devel@nongnu.org; Mon, 21 Oct 2019 09:33:16 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1571665093;
+ s=mimecast20190719; t=1571664795;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:openpgp:openpgp:autocrypt:autocrypt;
- bh=piHNtD8sbyUq0U1GD1DmWXGUaiJDw2PzY2ldegnRkmU=;
- b=EON+HjXxHBNWaGxRzW4sNWRZLrj4HEdYPuiuJZzd//rBDP+tiZUz1esMbkbcDx/PuGjxr3
- 6XITm/MXgOYBPQVtaHvecI5oWkLKJNwL1UCqbZWHTbilKlYjbG8qpNUnVkk8aOBJBNjwMI
- zBR4h1yn03bUgL7So9X2EPwU1UMs8Bc=
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=2zOs54GWIpJ+9iiNt+YidpFvyAt/nvOeRB3QqH1ACPQ=;
+ b=E2ogAuIVCgLj5L5VFk/g0KJfQ1vab7I/WwSPZvGJTd0QdN2uPqX0Su9gfJvMmuJlrju6jV
+ Jfx1ojY5eOwQJBYf8oV+s9L4zszG9G+x7oye9l7M+AsZnHCWzHvM77G4ouPOvLBeePw4Jx
+ ErzXPzT2SoZV+KjduyoqsYtfNFztmtc=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-161-tEat5rFGOjW3vNGE0PWc-g-1; Mon, 21 Oct 2019 09:38:07 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ us-mta-356-8DkFH3hXP8aIphCbxIFFsw-1; Mon, 21 Oct 2019 09:33:10 -0400
+X-MC-Unique: 8DkFH3hXP8aIphCbxIFFsw-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 47CA91005500;
- Mon, 21 Oct 2019 13:38:06 +0000 (UTC)
-Received: from thuth.remote.csb (dhcp-200-228.str.redhat.com [10.33.200.228])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 1848E5D70E;
- Mon, 21 Oct 2019 13:37:59 +0000 (UTC)
-Subject: Re: [PATCH] iotests: Remove 130 from the "auto" group
-To: Bruce Rogers <BROGERS@suse.com>, "mreitz@redhat.com" <mreitz@redhat.com>, 
- "qemu-block@nongnu.org" <qemu-block@nongnu.org>
-References: <20191018161008.17140-1-thuth@redhat.com>
- <a79d17cdbb61168d9d71defe0868784b656377f0.camel@suse.com>
-From: Thomas Huth <thuth@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=thuth@redhat.com; prefer-encrypt=mutual; keydata=
- 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
-Organization: Red Hat
-Message-ID: <34153a18-ccea-2136-d9d6-4a6218251dab@redhat.com>
-Date: Mon, 21 Oct 2019 15:37:59 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2D7931005500;
+ Mon, 21 Oct 2019 13:33:09 +0000 (UTC)
+Received: from dresden.str.redhat.com (ovpn-117-17.ams2.redhat.com
+ [10.36.117.17])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id C8EA55C207;
+ Mon, 21 Oct 2019 13:33:07 +0000 (UTC)
+Subject: Re: Problems with c8bb23cbdbe3 on ppc64le
+From: Max Reitz <mreitz@redhat.com>
+To: Qemu-block <qemu-block@nongnu.org>
+References: <2e7d321c-89f4-f3fd-8331-6bc276880de2@redhat.com>
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <120ab7dc-17dd-2796-95a3-8492ca40339e@redhat.com>
+Date: Mon, 21 Oct 2019 15:33:06 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.0
 MIME-Version: 1.0
-In-Reply-To: <a79d17cdbb61168d9d71defe0868784b656377f0.camel@suse.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-MC-Unique: tEat5rFGOjW3vNGE0PWc-g-1
+In-Reply-To: <2e7d321c-89f4-f3fd-8331-6bc276880de2@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="etKYolLmOmDC1DMzJB9CpfzGcmqSKr0f7"
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.120
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -133,44 +111,132 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "kwolf@redhat.com" <kwolf@redhat.com>,
- "peter.maydell@linaro.org" <peter.maydell@linaro.org>,
+Cc: Alberto Garcia <berto@igalia.com>,
+ Anton Nefedov <anton.nefedov@virtuozzo.com>,
+ Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
  "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 18/10/2019 18.51, Bruce Rogers wrote:
-> On Fri, 2019-10-18 at 18:10 +0200, Thomas Huth wrote:
->> Peter hit a "Could not open 'TEST_DIR/t.IMGFMT': Failed to get shared
->> 'write' lock - Is another process using the image
->> [TEST_DIR/t.IMGFMT]?"
->> error with 130 already twice. Looks like this test is a little bit
->> shaky, and currently nobody has a real clue what could be causing
->> this
->> issue, so for the time being, let's disable it from the "auto" group
->> so
->> that it does not gate the pull requests.
->>
->=20
-> For some time I've also needed to work around issues running 130. I
-> either disabled it, or I found a few properly placed sleeps got it to
-> reliably pass. Last week I finally got around to investigating it a bit
-> more and discovered that the failure was related to my using --enable-
-> membarrier in my configure.
->=20
-> I didn't investigate whether the block io tests' _cleanup_qemu using
-> kill -KILL was being relied on in some way by some tests, or if that is
-> simply a way to speed the testing along, or what, but I've gotten test
-> 130 to reliably pass by changing the test to quit properly via the
-> monitor, and by adding a wait=3D1 so that _cleanup_qemu doesn't simply
-> kill qemu.
->=20
-> I believe 153 and 161 also suffer in a similar way.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--etKYolLmOmDC1DMzJB9CpfzGcmqSKr0f7
+Content-Type: multipart/mixed; boundary="mqYP4s28Zx8gFOTHykpWLjVXDRkUSsl8g"
 
-Ok, thanks for the heads-up! 153 is not in the "auto" group, but 161 is,
-so we definitely keep that in mind if we see failure here...
+--mqYP4s28Zx8gFOTHykpWLjVXDRkUSsl8g
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
- Thomas
+On 10.10.19 17:17, Max Reitz wrote:
+> Hi everyone,
+>=20
+> (CCs just based on tags in the commit in question)
+>=20
+> I have two bug reports which claim problems of qcow2 on XFS on ppc64le
+> machines since qemu 4.1.0.  One of those is about bad performance
+> (sorry, is isn=E2=80=99t public :-/), the other about data corruption
+> (https://bugzilla.redhat.com/show_bug.cgi?id=3D1751934).
+>=20
+> It looks like in both cases reverting c8bb23cbdbe3 solves the problem
+> (which optimized COW of unallocated areas).
+>=20
+> I think I=E2=80=99ve looked at every angle but can=E2=80=98t find what co=
+uld be wrong
+> with it.  Do any of you have any idea? :-/
+
+I now have a reproducer with CentOS, so it=E2=80=99s actually useful outsid=
+e of
+Red Hat:
+
+$ cd $TEST_DIR
+
+(Download CentOS-8-x86_64-1905-dvd1.iso here, e.g. from
+http://mirror1.hs-esslingen.de/pub/Mirrors/centos/8.0.1905/isos/x86_64/Cent=
+OS-8-x86_64-1905-dvd1.torrent
+)
+
+$ wget
+http://mirror1.hs-esslingen.de/pub/Mirrors/centos/8.0.1905/BaseOS/x86_64/os=
+/isolinux/vmlinuz
+$ wget
+http://mirror1.hs-esslingen.de/pub/Mirrors/centos/8.0.1905/BaseOS/x86_64/os=
+/isolinux/initrd.img
+
+$ mkdir ks
+$ cat > ks/ks.cfg <<EOF
+rootpw 123456
+install
+keyboard us
+lang en_US.UTF-8
+rootpw 123456
+zerombr
+autopart
+clearpart --all --initlabel
+
+%packages --default
+@core
+%end
+EOF
+
+$ $QEMU_BUILD_DIR/qemu-img create -f qcow2 disk.qcow2 30G
+$ $QEMU_BUILD_DIR/x86_64-softmmu/qemu-system-x86_64 \
+    -name 'centos' \
+    -machine pc \
+    -nodefaults \
+    -vga std \
+    -display gtk \
+    -serial stdio \
+    -device virtio-scsi-pci,id=3Dvirtio_scsi_pci0,bus=3Dpci.0 \
+    -blockdev "{'node-name': 'target-disk',
+                'driver': 'qcow2',
+                'file': {
+                    'driver': 'file',
+                    'filename': 'disk.qcow2',
+                    'cache': {
+                        'direct': true
+                    },
+                    'aio': 'native'
+                } }" \
+    -device scsi-hd,id=3Dimage1,drive=3Dtarget-disk \
+    -blockdev \
+     file,node-name=3Dinstall-cd,filename=3DCentOS-8-x86_64-1905-dvd1.iso \
+    -device scsi-cd,drive=3Dinstall-cd \
+    -blockdev vvfat,node-name=3Dkscfg,dir=3Dks,label=3DOEMDRV,read-only=3Do=
+n \
+    -device scsi-hd,drive=3Dkscfg \
+    -kernel vmlinuz \
+    -append 'ks=3Dhd:LABEL=3DOEMDRV:/ks.cfg delay=3D60 console=3DttyS0' \
+    -initrd initrd.img \
+    -boot order=3Dcd,menu=3Doff,strict=3Doff \
+    -m 2048 \
+    -enable-kvm
+
+This installation fails about 50/50 for me.  To retry, just run the last
+two steps (qemu-img create and the installation itself).
+
+Max
+
+
+--mqYP4s28Zx8gFOTHykpWLjVXDRkUSsl8g--
+
+--etKYolLmOmDC1DMzJB9CpfzGcmqSKr0f7
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl2ts5IACgkQ9AfbAGHV
+z0CtvQf/ZzbbQ4V2CT02lssT2yTA5Owg3Xrx5du+l6Sa8/Nv9O/T61RcJ65bqIdQ
+5E24fGGH4W0yM5wYlEsvGHQ08X/MuMtRm92LJkooAm6Tn2BwRtR+9PKCvb7V6lSY
+XWHFKX4uK/o5x7NFq1UUyp2OKLX0xeKEb2ArkH1xOs6xaWqGp29bThCZH+0urYQL
+iyuDJT5nkUA08prWUWf65IWWFvKbRhBaMjuE7uPzo/DXkoMrXdXs5K8aD3WoJq1A
+fn9h7Qcw6GFYJ1Z5uixK7cnaUxG9HcANgM3yfDa2zrnvgTRrddZOJGDfV6XNL0YR
+Elq2s70oOfCcg5A/jGtksnaexJ8Xlg==
+=Y1X8
+-----END PGP SIGNATURE-----
+
+--etKYolLmOmDC1DMzJB9CpfzGcmqSKr0f7--
 
 
