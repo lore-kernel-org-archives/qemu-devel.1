@@ -2,95 +2,116 @@ Return-Path: <SRS0=8ZcK=YO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0633CCA9EAF
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4717FCA9EB7
 	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 16:39:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C28132053B
-	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 16:39:26 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ipdvKGbr"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C28132053B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 1FAAE2053B
+	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 16:39:27 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1FAAE2053B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45212 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45217 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iMaiK-0000ue-O6
-	for qemu-devel@archiver.kernel.org; Mon, 21 Oct 2019 12:39:24 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38884)
+	id 1iMaiM-0000z6-3F
+	for qemu-devel@archiver.kernel.org; Mon, 21 Oct 2019 12:39:26 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38604)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1iMagk-0007qZ-6I
- for qemu-devel@nongnu.org; Mon, 21 Oct 2019 12:37:47 -0400
+ (envelope-from <laurent@vivier.eu>) id 1iMaeU-0005dF-O3
+ for qemu-devel@nongnu.org; Mon, 21 Oct 2019 12:35:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1iMagi-0003zo-09
- for qemu-devel@nongnu.org; Mon, 21 Oct 2019 12:37:45 -0400
-Received: from mail-pl1-x641.google.com ([2607:f8b0:4864:20::641]:39216)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1iMagh-0003zP-R4
- for qemu-devel@nongnu.org; Mon, 21 Oct 2019 12:37:43 -0400
-Received: by mail-pl1-x641.google.com with SMTP id s17so6873659plp.6
- for <qemu-devel@nongnu.org>; Mon, 21 Oct 2019 09:37:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:references:from:openpgp:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=yyBsV81B9TiiGOGFut9ASC+PoAWiM5D6xCvxrOZRGAs=;
- b=ipdvKGbrDH9LyzdiuPKW9Rl0imPmc4UhcQB4f6EZaZ2oQNH6ys9nD5gC7F3oLROKKl
- JGJN0ch0EqrEguxF3PmGCfDOWKoMWyW1CpQT1gKN++/ztuNorzK3ZCvTZlK8b3IqP5d8
- rAaIqLWv2MWieGey75O3nLTtAxju0uvQzGYwDUGCgHs6V3DLuwd4Z7x4d/Eek7H87pYL
- T846er3g25nHd8QMeQf2kRaH0Emmub7rWoSPvNvMlR/IUdKXusFha9B0bMGdKOVFCpFo
- S7yHrJFUbgKjULWJdQyEx0WPxU0JYvzYdrDZTxjy6iVpUE7ce4O2YrtxHimVyVtsRG2T
- yB9w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:references:from:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=yyBsV81B9TiiGOGFut9ASC+PoAWiM5D6xCvxrOZRGAs=;
- b=K7EHcXluxT8HeW3QaV88+Lz/S/RitP/+CFdK89MWz4uXiiJVgqXuQ0W0UPSfXvfYeT
- YEDod6IduC97DY35OeHmxPADYJym8Nv+XJRzINGji1VWTupjbXHKoqcAgsiQmUm+/BV5
- 7ApCHj33FTG/ncbKCglQgyFsCEHyV+QIayzLf45T1Oiuu8CjIUl5P69CCx7y/Xl+IC+o
- UEOvKVxJL7Dit1vsTYa64DHYdhJcfzCM/LbVNiKF524wPuwc4F8jmLLz8FiW4FBX0yN7
- swpg5GYNmJgG11EIAXQAVSXJ2xCHSDWpMJ1cxYYfRwBz1n/wo118l+pFVvmmCiI7ltZM
- /ubA==
-X-Gm-Message-State: APjAAAVkzUPUIl+kblF97EJt317BtL6xubCrhhrkMKP5s0NILvxvh3oe
- 8CZGcQQvsBP2ML51u3Qi4t9+fQ==
-X-Google-Smtp-Source: APXvYqzvTHyLpwVCORXdoA0tmwYmyAqYFgyeqPwoQCoZ6WOKbQ1/qaf0h/+LzBAOPaG2YTLchC9WTA==
-X-Received: by 2002:a17:902:fe04:: with SMTP id
- g4mr14039888plj.58.1571675861465; 
- Mon, 21 Oct 2019 09:37:41 -0700 (PDT)
-Received: from [192.168.1.11] (97-113-7-119.tukw.qwest.net. [97.113.7.119])
- by smtp.gmail.com with ESMTPSA id w12sm19274847pfq.138.2019.10.21.09.37.40
- (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Mon, 21 Oct 2019 09:37:40 -0700 (PDT)
-Subject: Re: s390x/qemu-user: TODO /home/dhildenb/git/qemu/tcg/tci.c:859:
- tcg_qemu_tb_exec()
-To: Thomas Huth <thuth@redhat.com>, David Hildenbrand <david@redhat.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- qemu-s390x <qemu-s390x@nongnu.org>, Stefan Weil <sw@weilnetz.de>
-References: <60a0d510-b693-0ed7-560f-e70904d9574d@redhat.com>
- <9925b761-6d9b-2361-1697-a8a726b2ef21@redhat.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Openpgp: preference=signencrypt
-Message-ID: <2848d03e-4aa6-d74e-14fe-afa9fd107171@linaro.org>
-Date: Mon, 21 Oct 2019 09:37:38 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+ (envelope-from <laurent@vivier.eu>) id 1iMaeT-0003fL-EU
+ for qemu-devel@nongnu.org; Mon, 21 Oct 2019 12:35:26 -0400
+Received: from mout.kundenserver.de ([212.227.126.134]:42743)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <laurent@vivier.eu>)
+ id 1iMaeT-0003fC-54; Mon, 21 Oct 2019 12:35:25 -0400
+Received: from [192.168.100.1] ([78.238.229.36]) by mrelayeu.kundenserver.de
+ (mreue010 [213.165.67.103]) with ESMTPSA (Nemesis) id
+ 1M2etD-1iJYFM2ipL-004Eah; Mon, 21 Oct 2019 18:35:19 +0200
+Subject: Re: [PATCH v2] Do not use %m in common code to print error messages
+From: Laurent Vivier <laurent@vivier.eu>
+To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
+References: <20191018130716.25438-1-thuth@redhat.com>
+ <5996ace1-f288-2fe7-95a1-86455df4cdc0@vivier.eu>
+Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
+ 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
+Message-ID: <30ed1114-2220-7517-c651-59565ba34775@vivier.eu>
+Date: Mon, 21 Oct 2019 18:35:18 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.0
 MIME-Version: 1.0
-In-Reply-To: <9925b761-6d9b-2361-1697-a8a726b2ef21@redhat.com>
+In-Reply-To: <5996ace1-f288-2fe7-95a1-86455df4cdc0@vivier.eu>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Language: fr
 Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::641
+X-Provags-ID: V03:K1:s5ftosXzyj0w4BwenamHLgVTrOESvvrnw1V3aFCOy50Lf3Jvy4d
+ WwJAKvjN7T3zCiHyBPxo5HZGlRGVaWUmu1HfvOLOhu1XaohAT4B0PWz6lrdq8yetoBeNf8G
+ lSPXfxllJ9m5V7Uuo1wfCIHs7BKgCGWPubbiRUAlad/akM48t1YRsXuSQuuGnGyZYXxZNv5
+ nuZ9HMgSc9RNzslwmCHgA==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:BfEmfF2yNNo=:15xt5rbONKHiY2fdJWqjai
+ PslgJ4Xut/sp7QA78oZN3YRO5/nQ86aLkOyus4mbMzniaAPiPOetVwfD2tFE82KeXerTXVYe0
+ WEiExoDNbZwfBPyUmlrxbp16WL6tJ2MeUfg+JtXu6YDvBg4WtXhxqULZrca2e1yifknrMGFSo
+ wrgmUXOnqbP3P4Wl/y1xZDb1LFmoKIkFQMguhUJViK+0AM4KRG7JHmFn2VnRsgH5jHsZgigSI
+ YMwj5yBCJzNHAN6mvYWPQwtXqdTmEWxxceKNNNnWyLp4jILZfEyL5EfMGVEJVPNBkJ4OeyPtF
+ mERTtd35Ee8bfmJO5URcabovtguhF/nTeRE3u/vTqYQ1suONKMgVb2XnOKlEylsbX44bZ6vaS
+ qkZTfs0+l4EgSj5dWOj18lUnO0hkvAOLyA0MtmWbn/og0UJJsxWvg7oZlFHYKBC1qKEI4sy9w
+ dCtevpQXtw8HtWd+86ow1cVAyhuGBywaDT961PpKYtW/ljUok+r3e54N9X5gxh8pjQeqjGbGw
+ 5m2yf6dqA/HlcGOvhHGcQP1xo3tf6L9UmJoLUYGmXYjbhbox+C6UxBV7Ni9NabVkCClK6rx3j
+ i2ZeXhLFD0qD7iBk+77VLUlywucKvSJXQPI8zm2tml65MXBQacJQBSmSmuMOt8ekxOnuwbM1c
+ uSYo2+Eo/kJZug+1P7gakjtgX6CVW4mhKoxskUgxh9nWWKxS9JHdI73LbZZCQaWn38qfWNeYy
+ VwGCzEay8OD/3H6A8lg/onXvluuKfIOOHWJpwNWLNKbWmV23+25ewvh2udL0rsXU7hjvLW+vs
+ O0tYm4+PWjoBRHwKO0X45yHO1jXZ3wMaVF5K4KcE/3M65fgHrqIxQ/JSVZ0IgTjok+Tjf7PRz
+ YDLkP9nRbcNDYAPFkMs+7mtwZ/iYHd0+8Lv74tvsk=
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 212.227.126.134
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -102,36 +123,95 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: qemu-trivial@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
+ Kamil Rytarowski <kamil@netbsd.org>, berrange@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 10/17/19 4:01 AM, Thomas Huth wrote:
-> On 17/10/2019 12.02, David Hildenbrand wrote:
->> Hi,
+Le 21/10/2019 à 18:29, Laurent Vivier a écrit :
+> Le 18/10/2019 à 15:07, Thomas Huth a écrit :
+>> The %m format specifier is an extension from glibc - and when compiling
+>> QEMU for NetBSD, the compiler correctly complains, e.g.:
 >>
->> I'm currently trying to run Fedora 31 under qemu-user
->> (https://github.com/fedora-cloud/docker-brew-fedora/tree/8a81f67271e959dfc8f8a888b161bbd540b7a83b/s390x)
->> in order to debug  a vector instruction issue.
+>> /home/qemu/qemu-test.ELjfrQ/src/util/main-loop.c: In function 'sigfd_handler':
+>> /home/qemu/qemu-test.ELjfrQ/src/util/main-loop.c:64:13: warning: %m is only
+>>  allowed in syslog(3) like functions [-Wformat=]
+>>              printf("read from sigfd returned %zd: %m\n", len);
+>>              ^
+>> Let's use g_strerror() here instead, which is an easy-to-use wrapper
+>> around the thread-safe strerror_r() function.
 >>
->> Strangely, when trying to chroot into above rootfs and running
->> /bin/bash, I get
+>> While we're at it, also convert the "printf()" in main-loop.c into
+>> the preferred "error_report()".
 >>
->> t460s: ~/f31  $ sudo chroot . ./qemu-s390x  /bin/bash
->> TODO /home/dhildenb/git/qemu/tcg/tci.c:859: tcg_qemu_tb_exec()
->> /home/dhildenb/git/qemu/tcg/tci.c:859: tcg fatal error
->> Aborted
+>> Signed-off-by: Thomas Huth <thuth@redhat.com>
+>> ---
+>>  v2: Do not try to g_free() the strings
+>>
+>>  hw/misc/tmp421.c | 4 ++--
+>>  util/main-loop.c | 3 ++-
+>>  util/systemd.c   | 4 ++--
+>>  3 files changed, 6 insertions(+), 5 deletions(-)
+>>
+>> diff --git a/hw/misc/tmp421.c b/hw/misc/tmp421.c
+>> index 9f044705fa..c0bc150bca 100644
+>> --- a/hw/misc/tmp421.c
+>> +++ b/hw/misc/tmp421.c
+>> @@ -120,7 +120,7 @@ static void tmp421_get_temperature(Object *obj, Visitor *v, const char *name,
+>>      int tempid;
+>>  
+>>      if (sscanf(name, "temperature%d", &tempid) != 1) {
+>> -        error_setg(errp, "error reading %s: %m", name);
+>> +        error_setg(errp, "error reading %s: %s", name, g_strerror(errno));
+>>          return;
+>>      }
+>>  
+>> @@ -160,7 +160,7 @@ static void tmp421_set_temperature(Object *obj, Visitor *v, const char *name,
+>>      }
+>>  
+>>      if (sscanf(name, "temperature%d", &tempid) != 1) {
+>> -        error_setg(errp, "error reading %s: %m", name);
+>> +        error_setg(errp, "error reading %s: %s", name, g_strerror(errno));
+>>          return;
+>>      }
+>>  
+>> diff --git a/util/main-loop.c b/util/main-loop.c
+>> index e3eaa55866..eda63fe4e0 100644
+>> --- a/util/main-loop.c
+>> +++ b/util/main-loop.c
+>> @@ -61,7 +61,8 @@ static void sigfd_handler(void *opaque)
+>>          }
+>>  
+>>          if (len != sizeof(info)) {
+>> -            printf("read from sigfd returned %zd: %m\n", len);
+>> +            error_report("read from sigfd returned %zd: %s", len,
+>> +                         g_strerror(errno));
+>>              return;
+>>          }
+>>  
+>> diff --git a/util/systemd.c b/util/systemd.c
+>> index d22e86c707..1dd0367d9a 100644
+>> --- a/util/systemd.c
+>> +++ b/util/systemd.c
+>> @@ -60,8 +60,8 @@ unsigned int check_socket_activation(void)
+>>               * and we should exit.
+>>               */
+>>              error_report("Socket activation failed: "
+>> -                         "invalid file descriptor fd = %d: %m",
+>> -                         fd);
+>> +                         "invalid file descriptor fd = %d: %s",
+>> +                         fd, g_strerror(errno));
+>>              exit(EXIT_FAILURE);
+>>          }
+>>      }
+>>
 > 
-> That's likely the issue which might be fixed by Stefan's patch here:
-> 
-> https://patchwork.ozlabs.org/patch/1083601/
-> 
-> ... unfortunately, this has never been merged into master. Stefan, any
-> chance that you could finally get this upstream?
+> Applied to my trivial-patches branch.
 
-Oops.  Sorry about that.  Queued.
+As Paolo has already queued it, I remove it from my queue.
 
-
-r~
+Thanks,
+Laurent
 
 
