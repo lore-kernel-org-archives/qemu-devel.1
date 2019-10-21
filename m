@@ -2,60 +2,74 @@ Return-Path: <SRS0=8ZcK=YO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 87354CA9EB9
-	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 15:05:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8B202CA9EB0
+	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 15:05:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 18B3820684
-	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 15:05:09 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 18B3820684
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=rt-rk.com
+	by mail.kernel.org (Postfix) with ESMTPS id 579AD20679
+	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 15:05:39 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="C/KdxSDl"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 579AD20679
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43742 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43744 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iMZF4-0004zi-MN
-	for qemu-devel@archiver.kernel.org; Mon, 21 Oct 2019 11:05:07 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54106)
+	id 1iMZFa-0005hX-EW
+	for qemu-devel@archiver.kernel.org; Mon, 21 Oct 2019 11:05:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54445)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <aleksandar.rikalo@rt-rk.com>) id 1iMZC4-0001U0-OV
- for qemu-devel@nongnu.org; Mon, 21 Oct 2019 11:02:02 -0400
+ (envelope-from <stefanha@redhat.com>) id 1iMZE1-00040S-32
+ for qemu-devel@nongnu.org; Mon, 21 Oct 2019 11:04:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aleksandar.rikalo@rt-rk.com>) id 1iMZC2-0006QD-Dl
- for qemu-devel@nongnu.org; Mon, 21 Oct 2019 11:01:59 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:59219 helo=mail.rt-rk.com)
+ (envelope-from <stefanha@redhat.com>) id 1iMZDz-0007aA-1a
+ for qemu-devel@nongnu.org; Mon, 21 Oct 2019 11:04:00 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:60725
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <aleksandar.rikalo@rt-rk.com>)
- id 1iMZC2-0005vk-1X
- for qemu-devel@nongnu.org; Mon, 21 Oct 2019 11:01:58 -0400
-Received: from localhost (localhost [127.0.0.1])
- by mail.rt-rk.com (Postfix) with ESMTP id B817F1A1DFE;
- Mon, 21 Oct 2019 17:00:52 +0200 (CEST)
-X-Virus-Scanned: amavisd-new at rt-rk.com
-Received: from [10.10.14.141] (rtrkw304-lin.domain.local [10.10.14.141])
- by mail.rt-rk.com (Postfix) with ESMTPSA id 9E4701A1DE3;
- Mon, 21 Oct 2019 17:00:52 +0200 (CEST)
-Subject: Re: [PATCH v5 00/10] target/mips: Misc cleanups for September/October
- 2019
-To: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>, qemu-devel@nongnu.org
-References: <1571592258-27994-1-git-send-email-aleksandar.markovic@rt-rk.com>
-From: Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>
-Message-ID: <c4eaaa81-7675-0ec9-d89a-de77a277243d@rt-rk.com>
-Date: Mon, 21 Oct 2019 17:00:53 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ (Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1iMZDy-0007Zh-IR
+ for qemu-devel@nongnu.org; Mon, 21 Oct 2019 11:03:58 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1571670237;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=p/FkbIruihCuB2dCbzP3Kozlt1WA3tFVLFKrWZ6zeT0=;
+ b=C/KdxSDlApViV8w4f9+DHP5QrQ0LQoObNjn+JP77pxyZd9XpHoSzDOc5tdpu+S+od/ODn9
+ woiLakyzx9+iLaePpTLH93yrnWZkno3GGo1QXtvc0NZ8u3EvclZMESAy+EnJO4Wp9Hk+1w
+ DLq9A81NMJXSo3f/KBC24J+pX321QFo=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-351-TebYvb7gPN2qwE8zIdADWg-1; Mon, 21 Oct 2019 11:03:56 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A1F31800D41
+ for <qemu-devel@nongnu.org>; Mon, 21 Oct 2019 15:03:55 +0000 (UTC)
+Received: from localhost (ovpn-116-128.ams2.redhat.com [10.36.116.128])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id BD3971001DC2;
+ Mon, 21 Oct 2019 15:03:44 +0000 (UTC)
+From: Stefan Hajnoczi <stefanha@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH] virtio: drop unused virtio_device_stop_ioeventfd() function
+Date: Mon, 21 Oct 2019 16:03:43 +0100
+Message-Id: <20191021150343.30742-1-stefanha@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <1571592258-27994-1-git-send-email-aleksandar.markovic@rt-rk.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-MC-Unique: TebYvb7gPN2qwE8zIdADWg-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=WINDOWS-1252
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [fuzzy]
-X-Received-From: 89.216.37.149
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -67,66 +81,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
- > From: Aleksandar Markovic <amarkovic@wavecomp.com>
- >
- > Mostly cosmetic changes.
- >
- > v4->v5:
- >
- >=C2=A0=C2=A0 - minor correction in patch on helper.c
- >=C2=A0=C2=A0 - added patches 9 and 10
- >
- > v3->v4:
- >
- >=C2=A0=C2=A0 - added patches 7 and 8
- >
- > v2->v3:
- >
- >=C2=A0=C2=A0 - removed all patches that were already integrated
- >=C2=A0=C2=A0 - patches 1 and 2 are improved from v2
- >=C2=A0=C2=A0 - added patches 3-6
- >
- > v1->v2:
- >
- >=C2=A0=C2=A0 - minor corrections to satisfy reviews
- >=C2=A0=C2=A0 - added several more patches
- >
- > Aleksandar Markovic (10):
- >=C2=A0=C2=A0 target/mips: Clean up helper.c
- >=C2=A0=C2=A0 target/mips: Clean up op_helper.c
- >=C2=A0=C2=A0 MAINTAINERS: Update mail address of Aleksandar Rikalo
- >=C2=A0=C2=A0 target/mips: msa: Split helpers for <MAX|MIN>_A.<B|H|W|D>
- >=C2=A0=C2=A0 target/mips: msa: Split helpers for <MAX|MIN>_<S|U>.<B|H|W=
-|D>
- >=C2=A0=C2=A0 target/mips: msa: Split helpers for ILV<EV|OD|L|R>.<B|H|W|=
-D>
- >=C2=A0=C2=A0 target/mips: msa: Split helpers for ADD<_A|S_A|S_S|S_U|V>.=
-<B|H|W|D>
- >=C2=A0=C2=A0 target/mips: msa: Split helpers for HADD_<S|U>.<H|W|D>
- >=C2=A0=C2=A0 target/mips: msa: Split helpers for S<LL|RA|RAR|RL|RLR>.<B=
-|H|W|D>
- >=C2=A0=C2=A0 target/mips: msa: Split helpers for PCK<EV|OD>.<B|H|W|D>
- >
- >=C2=A0 .mailmap=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0=C2=A0=C2=A0 5 +-
- >=C2=A0 MAINTAINERS=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0=C2=A0 18 +-
- >=C2=A0 target/mips/helper.c=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0 123 +-
- >=C2=A0 target/mips/helper.h=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0 133 +-
- >=C2=A0 target/mips/msa_helper.c | 4244=20
-+++++++++++++++++++++++++++++-----------------
- >=C2=A0 target/mips/op_helper.c=C2=A0 | 1010 +++++++----
- >=C2=A0 target/mips/translate.c=C2=A0 |=C2=A0 442 ++++-
- >=C2=A0 7 files changed, 3966 insertions(+), 2009 deletions(-)
- >
+virtio_device_stop_ioeventfd() has not been used since commit
+310837de6c1e0badfd736b1b316b1698c53120a7 ("virtio: introduce
+grab/release_ioeventfd to fix vhost") in 2016.
 
+Nowadays ioeventfd is stopped implicitly by the virtio transport when
+lifecycle events such as the VM pausing or device unplug occur.
 
-For the whole series:
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+---
+ include/hw/virtio/virtio.h | 1 -
+ hw/virtio/virtio.c         | 8 --------
+ 2 files changed, 9 deletions(-)
 
-Reviewed-by: Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>
+diff --git a/include/hw/virtio/virtio.h b/include/hw/virtio/virtio.h
+index 48e8d04ff6..14660ea30a 100644
+--- a/include/hw/virtio/virtio.h
++++ b/include/hw/virtio/virtio.h
+@@ -302,7 +302,6 @@ EventNotifier *virtio_queue_get_guest_notifier(VirtQueu=
+e *vq);
+ void virtio_queue_set_guest_notifier_fd_handler(VirtQueue *vq, bool assign=
+,
+                                                 bool with_irqfd);
+ int virtio_device_start_ioeventfd(VirtIODevice *vdev);
+-void virtio_device_stop_ioeventfd(VirtIODevice *vdev);
+ int virtio_device_grab_ioeventfd(VirtIODevice *vdev);
+ void virtio_device_release_ioeventfd(VirtIODevice *vdev);
+ bool virtio_device_ioeventfd_enabled(VirtIODevice *vdev);
+diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
+index 527df03bfd..05186a531c 100644
+--- a/hw/virtio/virtio.c
++++ b/hw/virtio/virtio.c
+@@ -2773,14 +2773,6 @@ static void virtio_device_stop_ioeventfd_impl(VirtIO=
+Device *vdev)
+     }
+ }
+=20
+-void virtio_device_stop_ioeventfd(VirtIODevice *vdev)
+-{
+-    BusState *qbus =3D qdev_get_parent_bus(DEVICE(vdev));
+-    VirtioBusState *vbus =3D VIRTIO_BUS(qbus);
+-
+-    virtio_bus_stop_ioeventfd(vbus);
+-}
+-
+ int virtio_device_grab_ioeventfd(VirtIODevice *vdev)
+ {
+     BusState *qbus =3D qdev_get_parent_bus(DEVICE(vdev));
+--=20
+2.21.0
 
 
