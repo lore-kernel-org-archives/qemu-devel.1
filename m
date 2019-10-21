@@ -2,80 +2,84 @@ Return-Path: <SRS0=8ZcK=YO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F0762CA9EAF
-	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 15:00:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E326CA9EAF
+	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 15:02:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B79012064B
-	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 15:00:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 448E220679
+	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 15:02:06 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dgFl+hIz"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B79012064B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="nYoJFQLN"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 448E220679
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43636 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43668 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iMZAe-00081h-Oc
-	for qemu-devel@archiver.kernel.org; Mon, 21 Oct 2019 11:00:32 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53442)
+	id 1iMZC8-00018H-MV
+	for qemu-devel@archiver.kernel.org; Mon, 21 Oct 2019 11:02:04 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53404)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.williamson@redhat.com>) id 1iMZ9D-0006e6-1K
- for qemu-devel@nongnu.org; Mon, 21 Oct 2019 10:59:04 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1iMZ8v-0006Cg-SF
+ for qemu-devel@nongnu.org; Mon, 21 Oct 2019 10:58:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.williamson@redhat.com>) id 1iMZ9B-000540-UN
- for qemu-devel@nongnu.org; Mon, 21 Oct 2019 10:59:02 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:37527
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
- id 1iMZ9B-00053N-R7
- for qemu-devel@nongnu.org; Mon, 21 Oct 2019 10:59:01 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1571669940;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=ZwxjcHK8GW3s9FpwNH5AWR75uHG+TIGtw4yLVxfxZUM=;
- b=dgFl+hIzKlGAc74S9G35Y5+9J6Q9JVzx/6Smf/BFYQtMEV4kS/1pxOitVN0jvanpmEWltP
- 66OrApJE/QdW99K6pLxz2EApagPyf/RFs1gy+biyaXXifoUjUVimcolT0Rs9SJ2YGqHgYU
- dH8YSbhULkps+F8UBAt3seNUHk3rtwA=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-4-oAcpccw-PD-a-aQTw3zp2w-1; Mon, 21 Oct 2019 10:58:58 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id AEE401800D79;
- Mon, 21 Oct 2019 14:58:57 +0000 (UTC)
-Received: from x1.home (ovpn-118-102.phx2.redhat.com [10.3.118.102])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 46F3260606;
- Mon, 21 Oct 2019 14:58:24 +0000 (UTC)
-Date: Mon, 21 Oct 2019 08:58:23 -0600
-From: Alex Williamson <alex.williamson@redhat.com>
-To: Jens Freimann <jfreimann@redhat.com>
-Subject: Re: [PATCH 02/11] pci: add option for net failover
-Message-ID: <20191021085823.72ac4b37@x1.home>
-In-Reply-To: <20191018202040.30349-3-jfreimann@redhat.com>
-References: <20191018202040.30349-1-jfreimann@redhat.com>
- <20191018202040.30349-3-jfreimann@redhat.com>
-Organization: Red Hat
+ (envelope-from <peter.maydell@linaro.org>) id 1iMZ8u-0004vn-JD
+ for qemu-devel@nongnu.org; Mon, 21 Oct 2019 10:58:45 -0400
+Received: from mail-wm1-x331.google.com ([2a00:1450:4864:20::331]:52236)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1iMZ8u-0004vF-BY
+ for qemu-devel@nongnu.org; Mon, 21 Oct 2019 10:58:44 -0400
+Received: by mail-wm1-x331.google.com with SMTP id r19so13718315wmh.2
+ for <qemu-devel@nongnu.org>; Mon, 21 Oct 2019 07:58:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=XxSQ2VYSXmZOnya65BQ3cEjKFTIeVI7kTuPBxhyJuKM=;
+ b=nYoJFQLNGIsxktPiogLnpGMBPBzBkaziVjN0bI2KCEdkT0VGNGX3SC0gpUpQfkaH5e
+ Dog3ilZZjGR9LXgatoW2VUTz+sBvzDQ6vcAfQiP+CayMuzjlDq//H8iiKqgrrRIfFYpa
+ O4UQ0+K4bRdOR3N68aQPVg6ryTA1FQpuiC4dKJQYq9T3/uve470IhQAVFTvJZjBy4RYm
+ P6SotitC75zoyTPv1bkjiCpUSPqMpb5XeeSukgxkZw5u/A1dD6EQqH8qyY1RGXY+OsxF
+ NYMn9dZIs06cxiDXD8Gy12iDsBUbddZw9+6F/ftbyrIofRBGhk910y8qJg7L1gTQg81K
+ 6ytQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=XxSQ2VYSXmZOnya65BQ3cEjKFTIeVI7kTuPBxhyJuKM=;
+ b=Un76rH0p1NofZh4adkTtT27NfhjFahe4FN0CQc6PXAbbBXGt1Gisjq6UdXa6XfAaYy
+ +2eRHlXlAIsKkStFmi+m+yfR5zVmnYJ1UcOZyTIGIVVa98qAS6kAihjmAnLhNfJZCiLL
+ 4S0nBTeRnSUy2JbDzso3YuANewO5DLETQk2G3wl408BvFYKGaBLVI1jbEBAlQZ6OdYyM
+ ohwp55AGP1XF3TMcwvg7gZIJo4MUS5F5J0H3kgvcjDA/FMErzGtp1jAUYMFoG8bve9SD
+ cyj7sPFu8OBLM08siuiPXZEk8QoilhGpnZt7TuMF205P9AnbPHWyIGdC5e505j5ot/NC
+ uF/w==
+X-Gm-Message-State: APjAAAUCTdfs9xXbsJL9Kyq5djZL0Pe+YIdR6xzqjZ3QMjh6II8+XCOp
+ iwMIYC+EzH311ww0MmKfoEnL/8h4eF4=
+X-Google-Smtp-Source: APXvYqw/tT4S68tlubWMU2+bX5ARBm1Hgo397bNhNduQyXzy6F6eARcnO6zfwkrD1piUUs/c8FNaOA==
+X-Received: by 2002:a7b:c7d4:: with SMTP id z20mr19108109wmk.135.1571669922152; 
+ Mon, 21 Oct 2019 07:58:42 -0700 (PDT)
+Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
+ by smtp.gmail.com with ESMTPSA id w9sm8271122wrt.85.2019.10.21.07.58.40
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 21 Oct 2019 07:58:41 -0700 (PDT)
+From: Peter Maydell <peter.maydell@linaro.org>
+To: qemu-devel@nongnu.org
+Subject: [PATCH] tcg/LICENSE: Remove no-longer-true statement that TCG is
+ BSD-licensed
+Date: Mon, 21 Oct 2019 15:58:39 +0100
+Message-Id: <20191021145839.12684-1-peter.maydell@linaro.org>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-MC-Unique: oAcpccw-PD-a-aQTw3zp2w-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=WINDOWS-1252
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 205.139.110.120
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::331
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,96 +91,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: pkrempa@redhat.com, berrange@redhat.com, ehabkost@redhat.com,
- mst@redhat.com, aadam@redhat.com, qemu-devel@nongnu.org, dgilbert@redhat.com,
- laine@redhat.com, ailan@redhat.com, parav@mellanox.com
+Cc: Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ Markus Armbruster <armbru@redhat.com>,
+ Claudio Fontana <claudio.fontana@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, 18 Oct 2019 22:20:31 +0200
-Jens Freimann <jfreimann@redhat.com> wrote:
 
-> This patch adds a net_failover_pair_id property to PCIDev which is
-> used to link the primary device in a failover pair (the PCI dev) to
-> a standby (a virtio-net-pci) device.
->=20
-> It only supports ethernet devices. Also currently it only supports
-> PCIe devices. QEMU will exit with an error message otherwise.
+Since 2008 the tcg/LICENSE file has not changed: it claims that
+everything under tcg/ is BSD-licensed.
 
-Doesn't the PCIe device also need to be hotpluggable?  We can have PCIe
-devices attached to the root bus where we don't currently support
-hotplug.  Thanks,
+This is not true and hasn't been true for years: in 2013 we
+accepted the tcg/aarch64 target code under a GPLv2-or-later
+license statement. We don't really consider the tcg
+subdirectory to be a distinct part of QEMU anyway.
 
-Alex
-=20
-> Signed-off-by: Jens Freimann <jfreimann@redhat.com>
-> ---
->  hw/pci/pci.c         | 17 +++++++++++++++++
->  include/hw/pci/pci.h |  3 +++
->  2 files changed, 20 insertions(+)
->=20
-> diff --git a/hw/pci/pci.c b/hw/pci/pci.c
-> index aa05c2b9b2..fa9b5219f8 100644
-> --- a/hw/pci/pci.c
-> +++ b/hw/pci/pci.c
-> @@ -75,6 +75,8 @@ static Property pci_props[] =3D {
->                      QEMU_PCIE_LNKSTA_DLLLA_BITNR, true),
->      DEFINE_PROP_BIT("x-pcie-extcap-init", PCIDevice, cap_present,
->                      QEMU_PCIE_EXTCAP_INIT_BITNR, true),
-> +    DEFINE_PROP_STRING("net_failover_pair_id", PCIDevice,
-> +            net_failover_pair_id),
->      DEFINE_PROP_END_OF_LIST()
->  };
-> =20
-> @@ -2077,6 +2079,7 @@ static void pci_qdev_realize(DeviceState *qdev, Err=
-or **errp)
->      ObjectClass *klass =3D OBJECT_CLASS(pc);
->      Error *local_err =3D NULL;
->      bool is_default_rom;
-> +    uint16_t class_id;
-> =20
->      /* initialize cap_present for pci_is_express() and pci_config_size()=
-,
->       * Note that hybrid PCIs are not set automatically and need to manag=
-e
-> @@ -2101,6 +2104,20 @@ static void pci_qdev_realize(DeviceState *qdev, Er=
-ror **errp)
->          }
->      }
-> =20
-> +    if (pci_dev->net_failover_pair_id) {
-> +        if (!pci_is_express(pci_dev)) {
-> +            error_setg(errp, "failover device is not a PCIExpress device=
-");
-> +            error_propagate(errp, local_err);
-> +            return;
-> +        }
-> +        class_id =3D pci_get_word(pci_dev->config + PCI_CLASS_DEVICE);
-> +        if (class_id !=3D PCI_CLASS_NETWORK_ETHERNET) {
-> +            error_setg(errp, "failover device is not an Ethernet device"=
-);
-> +            error_propagate(errp, local_err);
-> +            return;
-> +        }
-> +    }
-> +
->      /* rom loading */
->      is_default_rom =3D false;
->      if (pci_dev->romfile =3D=3D NULL && pc->romfile !=3D NULL) {
-> diff --git a/include/hw/pci/pci.h b/include/hw/pci/pci.h
-> index f3f0ffd5fb..def5435685 100644
-> --- a/include/hw/pci/pci.h
-> +++ b/include/hw/pci/pci.h
-> @@ -352,6 +352,9 @@ struct PCIDevice {
->      MSIVectorUseNotifier msix_vector_use_notifier;
->      MSIVectorReleaseNotifier msix_vector_release_notifier;
->      MSIVectorPollNotifier msix_vector_poll_notifier;
-> +
-> +    /* ID of standby device in net_failover pair */
-> +    char *net_failover_pair_id;
->  };
-> =20
->  void pci_register_bar(PCIDevice *pci_dev, int region_num,
+Remove the LICENSE file, since claiming false information
+about the license of the code is confusing, and update
+the main project LICENSE file also to be clearer about
+the license used by TCG.
+
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+---
+This patch takes the simple approach of just documenting
+the de-facto current reality; does anybody want to argue
+for something else? Other possibilities I guess would be
+specifically documenting tcg/aarch64 as an accidental
+exception to the general licensing rule for tcg/, or even
+trying to get it relicensed.
+
+Does having tcg/ be BSD-licensed gain the project anything?
+From my point of view I don't really see it as a cleanly
+separable module of code -- it's quite tightly integrated
+with the rest of QEMU, including code in accel/tcg which
+is variously GPL or LGPL.
+
+ LICENSE     | 4 ++--
+ tcg/LICENSE | 3 ---
+ 2 files changed, 2 insertions(+), 5 deletions(-)
+ delete mode 100644 tcg/LICENSE
+
+diff --git a/LICENSE b/LICENSE
+index 9389ba614f8..e916360844f 100644
+--- a/LICENSE
++++ b/LICENSE
+@@ -18,8 +18,8 @@ As of July 2013, contributions under version 2 of the GNU General Public
+ License (and no later version) are only accepted for the following files
+ or directories: bsd-user/, linux-user/, hw/vfio/, hw/xen/xen_pt*.
+ 
+-3) The Tiny Code Generator (TCG) is released under the BSD license
+-   (see license headers in files).
++3) The Tiny Code Generator (TCG) is mostly under the BSD license;
++   but some parts may be GPLv2 (see license headers in files).
+ 
+ 4) QEMU is a trademark of Fabrice Bellard.
+ 
+diff --git a/tcg/LICENSE b/tcg/LICENSE
+deleted file mode 100644
+index be817fa1625..00000000000
+--- a/tcg/LICENSE
++++ /dev/null
+@@ -1,3 +0,0 @@
+-All the files in this directory and subdirectories are released under
+-a BSD like license (see header in each file). No other license is
+-accepted.
+-- 
+2.20.1
 
 
