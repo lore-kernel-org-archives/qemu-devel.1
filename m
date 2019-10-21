@@ -2,95 +2,68 @@ Return-Path: <SRS0=8ZcK=YO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D705CA9EAF
-	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 17:06:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6EE6CCA9EAF
+	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 17:06:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 27A512064B
-	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 17:06:09 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="S0Ku+pq5"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 27A512064B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 441A32064B
+	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 17:06:57 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 441A32064B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45700 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45716 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iMb8B-0002kc-Ca
-	for qemu-devel@archiver.kernel.org; Mon, 21 Oct 2019 13:06:07 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42153)
+	id 1iMb8y-0003uC-Ey
+	for qemu-devel@archiver.kernel.org; Mon, 21 Oct 2019 13:06:56 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42045)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1iMb6l-0001GS-FC
- for qemu-devel@nongnu.org; Mon, 21 Oct 2019 13:04:40 -0400
+ (envelope-from <no-reply@patchew.org>) id 1iMb68-0000QQ-2w
+ for qemu-devel@nongnu.org; Mon, 21 Oct 2019 13:04:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1iMb6k-0004H0-EH
- for qemu-devel@nongnu.org; Mon, 21 Oct 2019 13:04:39 -0400
-Received: from mail-pf1-x441.google.com ([2607:f8b0:4864:20::441]:46765)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1iMb6k-0004Gd-63
- for qemu-devel@nongnu.org; Mon, 21 Oct 2019 13:04:38 -0400
-Received: by mail-pf1-x441.google.com with SMTP id q5so8786545pfg.13
- for <qemu-devel@nongnu.org>; Mon, 21 Oct 2019 10:04:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=sk2t83DjkVWnrtVbQf47uSIW5xeeBnZ573CRkaV10g0=;
- b=S0Ku+pq5NlWbBoNo2FojBvVxjVFT8KjyO0EzQ1JMqCjGJBiaOxtCYVKfj00/CDGtCL
- Ze536vX9i8Ub9XXWEcQIStEfnOAgC6GmHACwstfl94FhSkUENCiYSjH/fDgJmsTLsvYC
- lbWu/haXJqQFsa7zvliY4LI58lPWjuTsYCi/6IHSL6sb2E/C4pPXj2KSmp41tm6caG68
- WHAYktSXFRhcEb5G3SqlH7bpFFXb7EBkHeaCfVDfKwrJq+JS1XKKvaKMpV0+Y39zLnk1
- Z6RHNsjiBMNijSlizPwu9pUQXwL1qpO2ZFcuQTw+oc4TN6lJkVK+CNEg0uiuQg26qYw7
- 9GCg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=sk2t83DjkVWnrtVbQf47uSIW5xeeBnZ573CRkaV10g0=;
- b=DJNHOX/D2TmmXfL0imnyptKiSqi9kwaTVgXwRT3o6DsewV1gCAcMhr44z3gEyN/+tq
- 1YqrN0QlWXR6JFyqUkeJgoS8s6Pzg7JlQCpkCoPH1vO+C6TXXt74GmDZwTHeMFqJQ/ms
- /GhMm2cPL3wHamBFxtVzLU1a9DAXy7+rDhJS8o++jZCshMuCdVoWKdTbo1RsAWWjqqgr
- sYVpLvKpLBPhjOSpR2vp25D+WEDkhpR4fnlfUwCkBXe7yPhrZoDgV49oeBiols8qOTCm
- sOB+J+IJoXNw6rLPzVcNIc0qpz5caM/8S97xFrXuk8Z5AexqQrefkUdmMae6c9Qej70c
- xbVg==
-X-Gm-Message-State: APjAAAVOWcz018CW1K5jz/z4T38gzdBCSjRHnIxWZfs8zIuEFX9Qvskh
- sZAsvJaABIt6iGl7UcR8O38Jrw==
-X-Google-Smtp-Source: APXvYqxlbxQO5DONqV4XwcPtgzRUI9gs88526kuUY4KJ1RGOtY+sdrwah6fdbmQfWtH7xGtbjeN88w==
-X-Received: by 2002:a65:64da:: with SMTP id t26mr26521521pgv.180.1571677476828; 
- Mon, 21 Oct 2019 10:04:36 -0700 (PDT)
-Received: from [192.168.1.11] (97-113-7-119.tukw.qwest.net. [97.113.7.119])
- by smtp.gmail.com with ESMTPSA id s3sm14619998pjq.32.2019.10.21.10.04.34
- (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Mon, 21 Oct 2019 10:04:36 -0700 (PDT)
-Subject: Re: [PATCH 06/21] hw/arm/digic4: Inline digic4_board_setup_ram()
- function
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>,
- qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>
-References: <20191020225650.3671-1-philmd@redhat.com>
- <20191020225650.3671-7-philmd@redhat.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Openpgp: preference=signencrypt
-Message-ID: <2c557278-8696-3e6b-31ef-00850f48a224@linaro.org>
-Date: Mon, 21 Oct 2019 10:04:32 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+ (envelope-from <no-reply@patchew.org>) id 1iMb66-0003hr-3d
+ for qemu-devel@nongnu.org; Mon, 21 Oct 2019 13:03:59 -0400
+Resent-Date: Mon, 21 Oct 2019 13:03:59 -0400
+Resent-Message-Id: <E1iMb66-0003hr-3d@eggs.gnu.org>
+Received: from sender4-of-o54.zoho.com ([136.143.188.54]:21434)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <no-reply@patchew.org>)
+ id 1iMb60-0003dM-6s; Mon, 21 Oct 2019 13:03:52 -0400
+ARC-Seal: i=1; a=rsa-sha256; t=1571677418; cv=none; 
+ d=zohomail.com; s=zohoarc; 
+ b=Qc+UmjQUtpPsk0lsNxoAE0Xw/eUe5MUYWbMYgLaBk37RDCSVXF0WBK7nfq03ENAB+C3MK5Y91iaGDvQp1vPChPSCdPFl8CFbp+thvJfytEQgsAuHgvnMtF/P4hYiQTf2IeBX3hDenZc7dBKm4vZDVAlryVXvOf/pjm+p9tWO9DI=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
+ s=zohoarc; t=1571677418;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
+ bh=x8PhomlkcZdsfUe1Qix0job82w2xWEuKybRDOwGwbdU=; 
+ b=fTb1kcHatiKIEZdV1x4xE4ke4Gi+TzNLlsdZ/d4iPfsrUHe8X5Lm0p+TfBltTbJWxJhJsYuBoF6jMYY9BwKqV/3RoGLzumlfLZfCqi3HJ1b+c/oH3gAD3nejbv8n6odY69G00S80T6r6YL8z2c7WF+Z0OT77JrAO2zyGPIiRACs=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+ dkim=pass  header.i=patchew.org;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 157167741687699.73257232055425;
+ Mon, 21 Oct 2019 10:03:36 -0700 (PDT)
+In-Reply-To: <20191021105350.1710-1-thuth@redhat.com>
+Subject: Re: [PATCH v2 0/6] Enable more iotests during "make check-block"
+Message-ID: <157167741552.7343.12701515937803148890@37313f22b938>
 MIME-Version: 1.0
-In-Reply-To: <20191020225650.3671-7-philmd@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::441
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: thuth@redhat.com
+Date: Mon, 21 Oct 2019 10:03:36 -0700 (PDT)
+X-ZohoMailClient: External
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 136.143.188.54
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -102,47 +75,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paul Burton <pburton@wavecomp.com>, "Michael S. Tsirkin" <mst@redhat.com>,
- Leif Lindholm <leif.lindholm@linaro.org>, Andrew Jeffery <andrew@aj.id.au>,
- Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
- KONRAD Frederic <frederic.konrad@adacore.com>,
- "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Rob Herring <robh@kernel.org>,
- Peter Maydell <peter.maydell@linaro.org>, Helge Deller <deller@gmx.de>,
- =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>,
- Antony Pavlov <antonynpavlov@gmail.com>,
- Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
- David Gibson <david@gibson.dropbear.id.au>,
- Artyom Tarasenko <atar4qemu@gmail.com>, Joel Stanley <joel@jms.id.au>,
- Alistair Francis <alistair@alistair23.me>,
- Fabien Chouteau <chouteau@adacore.com>,
- Beniamino Galvani <b.galvani@gmail.com>, qemu-arm@nongnu.org,
- Peter Chubb <peter.chubb@nicta.com.au>,
- =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>,
- Richard Henderson <rth@twiddle.net>,
- Radoslaw Biernacki <radoslaw.biernacki@linaro.org>,
- Thomas Huth <huth@tuxfamily.org>,
- Andrew Baumann <Andrew.Baumann@microsoft.com>,
- Jean-Christophe Dubois <jcd@tribudubois.net>,
- Andrey Smirnov <andrew.smirnov@gmail.com>, Michael Walle <michael@walle.cc>,
- qemu-ppc@nongnu.org, Aleksandar Markovic <amarkovic@wavecomp.com>,
- Jan Kiszka <jan.kiszka@web.de>, Aurelien Jarno <aurelien@aurel32.net>
+Reply-To: qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, jsnow@redhat.com, qemu-devel@nongnu.org,
+ qemu-block@nongnu.org, mreitz@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 10/20/19 3:56 PM, Philippe Mathieu-Daudé wrote:
-> Having the RAM creation code in a separate function is not
-> very helpful. Move this code directly inside the board_init()
-> function, this will later allow the board to have the QOM
-> ownership of the RAM.
-> 
-> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-> ---
->  hw/arm/digic_boards.c | 9 ++-------
->  1 file changed, 2 insertions(+), 7 deletions(-)
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MTAyMTEwNTM1MC4xNzEw
+LTEtdGh1dGhAcmVkaGF0LmNvbS8KCgoKSGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNv
+bWUgY29kaW5nIHN0eWxlIHByb2JsZW1zLiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9y
+bWF0aW9uOgoKU3ViamVjdDogW1BBVENIIHYyIDAvNl0gRW5hYmxlIG1vcmUgaW90ZXN0cyBkdXJp
+bmcgIm1ha2UgY2hlY2stYmxvY2siClR5cGU6IHNlcmllcwpNZXNzYWdlLWlkOiAyMDE5MTAyMTEw
+NTM1MC4xNzEwLTEtdGh1dGhAcmVkaGF0LmNvbQoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQoj
+IS9iaW4vYmFzaApnaXQgcmV2LXBhcnNlIGJhc2UgPiAvZGV2L251bGwgfHwgZXhpdCAwCmdpdCBj
+b25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYu
+cmVuYW1lcyBUcnVlCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLmFsZ29yaXRobSBoaXN0b2dyYW0K
+Li9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFjayBiYXNlLi4KPT09IFRFU1QgU0NSSVBU
+IEVORCA9PT0KClVwZGF0aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMz
+ODQKZmF0YWw6IGdpdCBmZXRjaF9wYWNrOiBleHBlY3RlZCBBQ0svTkFLLCBnb3QgJ0VSUiB1cGxv
+YWQtcGFjazogbm90IG91ciByZWYgYTRlN2YzOWMzYTlmMmViN2U1ZmRjYTZiZmE2YWJiODJlMTJl
+ZTQyYicKZmF0YWw6IFRoZSByZW1vdGUgZW5kIGh1bmcgdXAgdW5leHBlY3RlZGx5CmVycm9yOiBD
+b3VsZCBub3QgZmV0Y2ggM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApU
+cmFjZWJhY2sgKG1vc3QgcmVjZW50IGNhbGwgbGFzdCk6CiAgRmlsZSAicGF0Y2hldy10ZXN0ZXIv
+c3JjL3BhdGNoZXctY2xpIiwgbGluZSA1MjEsIGluIHRlc3Rfb25lCiAgICBnaXRfY2xvbmVfcmVw
+byhjbG9uZSwgclsicmVwbyJdLCByWyJoZWFkIl0sIGxvZ2YsIFRydWUpCiAgRmlsZSAicGF0Y2hl
+dy10ZXN0ZXIvc3JjL3BhdGNoZXctY2xpIiwgbGluZSA0OCwgaW4gZ2l0X2Nsb25lX3JlcG8KICAg
+IHN0ZG91dD1sb2dmLCBzdGRlcnI9bG9nZikKICBGaWxlICIvb3B0L3JoL3JoLXB5dGhvbjM2L3Jv
+b3QvdXNyL2xpYjY0L3B5dGhvbjMuNi9zdWJwcm9jZXNzLnB5IiwgbGluZSAyOTEsIGluIGNoZWNr
+X2NhbGwKICAgIHJhaXNlIENhbGxlZFByb2Nlc3NFcnJvcihyZXRjb2RlLCBjbWQpCnN1YnByb2Nl
+c3MuQ2FsbGVkUHJvY2Vzc0Vycm9yOiBDb21tYW5kICdbJ2dpdCcsICdyZW1vdGUnLCAnYWRkJywg
+Jy1mJywgJy0tbWlycm9yPWZldGNoJywgJzNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4
+ODg3MTMzODQnLCAnaHR0cHM6Ly9naXRodWIuY29tL3BhdGNoZXctcHJvamVjdC9xZW11J10nIHJl
+dHVybmVkIG5vbi16ZXJvIGV4aXQgc3RhdHVzIDEuCgoKClRoZSBmdWxsIGxvZyBpcyBhdmFpbGFi
+bGUgYXQKaHR0cDovL3BhdGNoZXcub3JnL2xvZ3MvMjAxOTEwMjExMDUzNTAuMTcxMC0xLXRodXRo
+QHJlZGhhdC5jb20vdGVzdGluZy5jaGVja3BhdGNoLz90eXBlPW1lc3NhZ2UuCi0tLQpFbWFpbCBn
+ZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwczovL3BhdGNoZXcub3JnL10u
+ClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-
-
-r~
 
