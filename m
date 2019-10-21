@@ -2,94 +2,68 @@ Return-Path: <SRS0=8ZcK=YO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 23F79CA9EAF
-	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 17:04:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 42650CA9EAF
+	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 17:04:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E40262064B
-	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 17:04:49 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="GeN9REyz"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E40262064B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 188802064B
+	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 17:04:59 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 188802064B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45656 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45660 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iMb6u-00011r-8F
-	for qemu-devel@archiver.kernel.org; Mon, 21 Oct 2019 13:04:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41872)
+	id 1iMb73-0001EP-M3
+	for qemu-devel@archiver.kernel.org; Mon, 21 Oct 2019 13:04:57 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41922)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1iMb5W-0008D7-P3
- for qemu-devel@nongnu.org; Mon, 21 Oct 2019 13:03:23 -0400
+ (envelope-from <no-reply@patchew.org>) id 1iMb5h-0008PN-6x
+ for qemu-devel@nongnu.org; Mon, 21 Oct 2019 13:03:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1iMb5V-0003Om-R5
- for qemu-devel@nongnu.org; Mon, 21 Oct 2019 13:03:22 -0400
-Received: from mail-pg1-x542.google.com ([2607:f8b0:4864:20::542]:47009)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1iMb5V-0003OR-Kn
- for qemu-devel@nongnu.org; Mon, 21 Oct 2019 13:03:21 -0400
-Received: by mail-pg1-x542.google.com with SMTP id e15so8149825pgu.13
- for <qemu-devel@nongnu.org>; Mon, 21 Oct 2019 10:03:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=YretDNAG4e9jCKQB17m7IqnbbDa7fHH/XpvR5+yujK8=;
- b=GeN9REyzUZMAWGm1Li5nAHqXE5nS/4D3iLAHkgCHctHgnojs0QdFhoVyDJCH7F2gtv
- 6EtwfHv27A23T+JMAMqQROw7uJFnJsu4uQVJcYl0AhB3mqKz6OVfCHzDNlHStUE2SF26
- px6mGQVS19qvVGi8bIXrgISBudaAc5faqTcJOkLzXTL+39SBEqHpatrbMcMy4jUibZx4
- 8wd/cKJ8CVGYfsogRX/ViPE0eRjvAL1KuxpFuKn/lGbTFsN4KB0J7G5P76kbvaTlUo2Y
- BWWz2CvuGtyTTyZvsdBWsPCJQ4Zg9aa/mYvi4gznHuDGr7zW5tGTCJOZgzDt5DyAmHZI
- VHWQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=YretDNAG4e9jCKQB17m7IqnbbDa7fHH/XpvR5+yujK8=;
- b=HFC5InwibgSxrjOBWJf8HH8INOm0Qh1fSiXEqKSMm1QybK6tVZdIVBnKAcW1nzdIpE
- Rbs0dQB2CvBkDHHRX22Onlk6sq7gH4G5MsCEQ3NRtIFbna8Vy/sdaGdHWzVNpL499/3Y
- Gh1E8tMlWEJ9kScm/O+Argb14T1mDAKs6cCAZmh00yAvebbkndrr0nauqlKkP17XV/8r
- HFS2ACXeIrQyprvXt9mO3yc3jdLBkbn2d4J5uMF1zi2XPM1DpA7/byXJq5eLAcwiCmt/
- 2jOBes6F38JDhaA+nf1+B88nXXLEeLvKKr2JWKL/rBHzlxhNuf32Q52FriBXNS6zq6VR
- dtwA==
-X-Gm-Message-State: APjAAAVa5b0qWHKh0PiPm6rGDuCcrfS/KrX70TNbJ6JYJ9eXY1TFK0xd
- uTpJZXshfGb1cnU95Fyf46EHcQ==
-X-Google-Smtp-Source: APXvYqzZQJ43+eWSvu/2dajUVT1rywM7T1++XS0NMq6+urFdaI5On6DeqpolyDyeBr3m/KhV5lgmNQ==
-X-Received: by 2002:aa7:838f:: with SMTP id u15mr23260134pfm.13.1571677400333; 
- Mon, 21 Oct 2019 10:03:20 -0700 (PDT)
-Received: from [192.168.1.11] (97-113-7-119.tukw.qwest.net. [97.113.7.119])
- by smtp.gmail.com with ESMTPSA id g9sm14362541pjl.20.2019.10.21.10.03.17
- (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Mon, 21 Oct 2019 10:03:18 -0700 (PDT)
-Subject: Re: [PATCH 05/21] hw/arm/omap1: Create the RAM in the board
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>,
- qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>
-References: <20191020225650.3671-1-philmd@redhat.com>
- <20191020225650.3671-6-philmd@redhat.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Openpgp: preference=signencrypt
-Message-ID: <47214ca3-0fb1-f181-a32e-12eebeb49a29@linaro.org>
-Date: Mon, 21 Oct 2019 10:03:15 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+ (envelope-from <no-reply@patchew.org>) id 1iMb5g-0003Ru-0g
+ for qemu-devel@nongnu.org; Mon, 21 Oct 2019 13:03:33 -0400
+Resent-Date: Mon, 21 Oct 2019 13:03:33 -0400
+Resent-Message-Id: <E1iMb5g-0003Ru-0g@eggs.gnu.org>
+Received: from sender4-of-o54.zoho.com ([136.143.188.54]:21414)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <no-reply@patchew.org>)
+ id 1iMb5c-0003Qd-VY; Mon, 21 Oct 2019 13:03:29 -0400
+ARC-Seal: i=1; a=rsa-sha256; t=1571677394; cv=none; 
+ d=zohomail.com; s=zohoarc; 
+ b=LbSb6l+Mhn6eXS1ScRSrGABF6P732tOxd7yGrNWeY+A3a7oCutIrmlCvEAWeSikmOLp1Ai1UjCYYg1Ns56ctmhgYMRedaEg0lMepQ9mucVYUnqjpRhlJWTHDth4mYNaYbNDR0thEjNDIsTsBcvg0eT3kV2VC1f8czyvhXgbez5Y=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
+ s=zohoarc; t=1571677394;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
+ bh=LJb0aNTo1hJ6FnN6xa1+Yi1HwHsc4jFMva4adOqv/qo=; 
+ b=M1o9EIC+ISqsB0uHKAcH0uu0YZskzTy5rYsk3qs14AgcMr1/b2y1yLiSh5tnmFF6zZl8IsFwEbZ95X/S2BYMtbPDyv9K0SuE7A5iYYstboiJQHrRO3i794G/VUcLfGjCFz/CVH3MiEJ7W3m+gxpOvN7x/oB9gMwcUCGERL/U1Rw=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+ dkim=pass  header.i=patchew.org;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 157167739277215.007938976982246;
+ Mon, 21 Oct 2019 10:03:12 -0700 (PDT)
+In-Reply-To: <20191021105350.1710-1-thuth@redhat.com>
+Subject: Re: [PATCH v2 0/6] Enable more iotests during "make check-block"
+Message-ID: <157167739144.7343.14577648798855987773@37313f22b938>
 MIME-Version: 1.0
-In-Reply-To: <20191020225650.3671-6-philmd@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::542
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: thuth@redhat.com
+Date: Mon, 21 Oct 2019 10:03:12 -0700 (PDT)
+X-ZohoMailClient: External
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 136.143.188.54
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -101,51 +75,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paul Burton <pburton@wavecomp.com>, "Michael S. Tsirkin" <mst@redhat.com>,
- Leif Lindholm <leif.lindholm@linaro.org>, Andrew Jeffery <andrew@aj.id.au>,
- Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
- KONRAD Frederic <frederic.konrad@adacore.com>,
- "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Rob Herring <robh@kernel.org>,
- Peter Maydell <peter.maydell@linaro.org>, Helge Deller <deller@gmx.de>,
- =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>,
- Antony Pavlov <antonynpavlov@gmail.com>,
- Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
- David Gibson <david@gibson.dropbear.id.au>,
- Artyom Tarasenko <atar4qemu@gmail.com>, Joel Stanley <joel@jms.id.au>,
- Alistair Francis <alistair@alistair23.me>,
- Fabien Chouteau <chouteau@adacore.com>,
- Beniamino Galvani <b.galvani@gmail.com>, qemu-arm@nongnu.org,
- Peter Chubb <peter.chubb@nicta.com.au>,
- =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>,
- Richard Henderson <rth@twiddle.net>,
- Radoslaw Biernacki <radoslaw.biernacki@linaro.org>,
- Thomas Huth <huth@tuxfamily.org>,
- Andrew Baumann <Andrew.Baumann@microsoft.com>,
- Jean-Christophe Dubois <jcd@tribudubois.net>,
- Andrey Smirnov <andrew.smirnov@gmail.com>, Michael Walle <michael@walle.cc>,
- qemu-ppc@nongnu.org, Aleksandar Markovic <amarkovic@wavecomp.com>,
- Jan Kiszka <jan.kiszka@web.de>, Aurelien Jarno <aurelien@aurel32.net>
+Reply-To: qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, jsnow@redhat.com, qemu-devel@nongnu.org,
+ qemu-block@nongnu.org, mreitz@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 10/20/19 3:56 PM, Philippe Mathieu-Daudé wrote:
-> The SDRAM is incorrectly created in the OMAP310 SoC.
-> Move its creation in the board code, this will later allow the
-> board to have the QOM ownership of the RAM.
-> 
-> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-> ---
->  hw/arm/omap1.c        | 12 +++++-------
->  hw/arm/omap_sx1.c     |  8 ++++++--
->  hw/arm/palm.c         |  8 ++++++--
->  include/hw/arm/omap.h |  6 ++----
->  4 files changed, 19 insertions(+), 15 deletions(-)
-
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-
-
-r~
-
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MTAyMTEwNTM1MC4xNzEw
+LTEtdGh1dGhAcmVkaGF0LmNvbS8KCgoKSGksCgpUaGlzIHNlcmllcyBmYWlsZWQgdGhlIGRvY2tl
+ci1xdWlja0BjZW50b3M3IGJ1aWxkIHRlc3QuIFBsZWFzZSBmaW5kIHRoZSB0ZXN0aW5nIGNvbW1h
+bmRzIGFuZAp0aGVpciBvdXRwdXQgYmVsb3cuIElmIHlvdSBoYXZlIERvY2tlciBpbnN0YWxsZWQs
+IHlvdSBjYW4gcHJvYmFibHkgcmVwcm9kdWNlIGl0CmxvY2FsbHkuCgo9PT0gVEVTVCBTQ1JJUFQg
+QkVHSU4gPT09CiMhL2Jpbi9iYXNoCm1ha2UgZG9ja2VyLWltYWdlLWNlbnRvczcgVj0xIE5FVFdP
+Uks9MQp0aW1lIG1ha2UgZG9ja2VyLXRlc3QtcXVpY2tAY2VudG9zNyBTSE9XX0VOVj0xIEo9MTQg
+TkVUV09SSz0xCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgogIFRFU1QgICAgaW90ZXN0LXFjb3cy
+OiAyNjcKRmFpbHVyZXM6IDE4MwpGYWlsZWQgMSBvZiAxMTYgaW90ZXN0cwptYWtlOiAqKiogW2No
+ZWNrLXRlc3RzL2NoZWNrLWJsb2NrLnNoXSBFcnJvciAxClRyYWNlYmFjayAobW9zdCByZWNlbnQg
+Y2FsbCBsYXN0KToKICBGaWxlICIuL3Rlc3RzL2RvY2tlci9kb2NrZXIucHkiLCBsaW5lIDY2Miwg
+aW4gPG1vZHVsZT4KICAgIHN5cy5leGl0KG1haW4oKSkKLS0tCiAgICByYWlzZSBDYWxsZWRQcm9j
+ZXNzRXJyb3IocmV0Y29kZSwgY21kKQpzdWJwcm9jZXNzLkNhbGxlZFByb2Nlc3NFcnJvcjogQ29t
+bWFuZCAnWydzdWRvJywgJy1uJywgJ2RvY2tlcicsICdydW4nLCAnLS1sYWJlbCcsICdjb20ucWVt
+dS5pbnN0YW5jZS51dWlkPTIxZTRlMDQ1ZmIxOTRkMzU4MmRlYzNhYzVjZGNlZDQxJywgJy11Jywg
+JzEwMDEnLCAnLS1zZWN1cml0eS1vcHQnLCAnc2VjY29tcD11bmNvbmZpbmVkJywgJy0tcm0nLCAn
+LWUnLCAnVEFSR0VUX0xJU1Q9JywgJy1lJywgJ0VYVFJBX0NPTkZJR1VSRV9PUFRTPScsICctZScs
+ICdWPScsICctZScsICdKPTE0JywgJy1lJywgJ0RFQlVHPScsICctZScsICdTSE9XX0VOVj0xJywg
+Jy1lJywgJ0NDQUNIRV9ESVI9L3Zhci90bXAvY2NhY2hlJywgJy12JywgJy9ob21lL3BhdGNoZXcv
+LmNhY2hlL3FlbXUtZG9ja2VyLWNjYWNoZTovdmFyL3RtcC9jY2FjaGU6eicsICctdicsICcvdmFy
+L3RtcC9wYXRjaGV3LXRlc3Rlci10bXAtdm54NHBuMWovc3JjL2RvY2tlci1zcmMuMjAxOS0xMC0y
+MS0xMi40OC4wNi41NTg1Oi92YXIvdG1wL3FlbXU6eixybycsICdxZW11OmNlbnRvczcnLCAnL3Zh
+ci90bXAvcWVtdS9ydW4nLCAndGVzdC1xdWljayddJyByZXR1cm5lZCBub24temVybyBleGl0IHN0
+YXR1cyAyLgpmaWx0ZXI9LS1maWx0ZXI9bGFiZWw9Y29tLnFlbXUuaW5zdGFuY2UudXVpZD0yMWU0
+ZTA0NWZiMTk0ZDM1ODJkZWMzYWM1Y2RjZWQ0MQptYWtlWzFdOiAqKiogW2RvY2tlci1ydW5dIEVy
+cm9yIDEKbWFrZVsxXTogTGVhdmluZyBkaXJlY3RvcnkgYC92YXIvdG1wL3BhdGNoZXctdGVzdGVy
+LXRtcC12bng0cG4xai9zcmMnCm1ha2U6ICoqKiBbZG9ja2VyLXJ1bi10ZXN0LXF1aWNrQGNlbnRv
+czddIEVycm9yIDIKCnJlYWwgICAgMTVtNS42NTFzCnVzZXIgICAgMG04LjMwOHMKCgpUaGUgZnVs
+bCBsb2cgaXMgYXZhaWxhYmxlIGF0Cmh0dHA6Ly9wYXRjaGV3Lm9yZy9sb2dzLzIwMTkxMDIxMTA1
+MzUwLjE3MTAtMS10aHV0aEByZWRoYXQuY29tL3Rlc3RpbmcuZG9ja2VyLXF1aWNrQGNlbnRvczcv
+P3R5cGU9bWVzc2FnZS4KLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNo
+ZXcgW2h0dHBzOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBw
+YXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
 
 
