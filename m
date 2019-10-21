@@ -2,79 +2,94 @@ Return-Path: <SRS0=8ZcK=YO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4646BCA9EAF
-	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 11:30:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 79954CA9EAF
+	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 11:30:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1193920684
-	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 11:30:05 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Dg18EybC"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1193920684
+	by mail.kernel.org (Postfix) with ESMTPS id 3C7ED20684
+	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 11:30:48 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3C7ED20684
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38344 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38354 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iMVsy-0003f3-RH
-	for qemu-devel@archiver.kernel.org; Mon, 21 Oct 2019 07:30:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46644)
+	id 1iMVte-0004PJ-Re
+	for qemu-devel@archiver.kernel.org; Mon, 21 Oct 2019 07:30:46 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49924)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgilbert@redhat.com>) id 1iMVQl-00047e-As
- for qemu-devel@nongnu.org; Mon, 21 Oct 2019 07:00:56 -0400
+ (envelope-from <philmd@redhat.com>) id 1iMVrt-0002cA-OJ
+ for qemu-devel@nongnu.org; Mon, 21 Oct 2019 07:29:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgilbert@redhat.com>) id 1iMVQf-0004K4-9j
- for qemu-devel@nongnu.org; Mon, 21 Oct 2019 07:00:55 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:26034
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <philmd@redhat.com>) id 1iMVrr-0003XF-4r
+ for qemu-devel@nongnu.org; Mon, 21 Oct 2019 07:28:57 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:36014)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1iMVQd-0004J5-BM
- for qemu-devel@nongnu.org; Mon, 21 Oct 2019 07:00:49 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1571655646;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=3Dr6fsxLlWo66vt0ZJ7H8FDSelETVJXpGSfFe9MgsrY=;
- b=Dg18EybCXsiPGYXJxMOOi5efJN1dhyx2YmPmZwiynzC9qAQ9v2WmJmWL4chm0XeSc4Tkes
- 1c5kkvnv9Oc2Y0qY/xMscldGASBqhJpwueUmyju7Sb47WOPbgSIYOmBcoMe+rxN/I8VMtM
- 5RXXQMSz+CJt3xmY7MV5jyKmUcQmNUA=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-190-50Bnr8ceO567ZsmN9gAgQg-1; Mon, 21 Oct 2019 07:00:41 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iMVrq-0003WR-Ss
+ for qemu-devel@nongnu.org; Mon, 21 Oct 2019 07:28:55 -0400
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3DAE647B;
- Mon, 21 Oct 2019 11:00:40 +0000 (UTC)
-Received: from dgilbert-t580.localhost (ovpn-117-232.ams2.redhat.com
- [10.36.117.232])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 2A3EE6060D;
- Mon, 21 Oct 2019 11:00:35 +0000 (UTC)
-From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-To: qemu-devel@nongnu.org, mst@redhat.com, marcandre.lureau@redhat.com,
- stefanha@redhat.com
-Subject: [PATCH 24/30] virtiofsd: Add Makefile wiring for virtiofsd contrib
-Date: Mon, 21 Oct 2019 11:58:26 +0100
-Message-Id: <20191021105832.36574-25-dgilbert@redhat.com>
-In-Reply-To: <20191021105832.36574-1-dgilbert@redhat.com>
-References: <20191021105832.36574-1-dgilbert@redhat.com>
+ by mx1.redhat.com (Postfix) with ESMTPS id 802EB85536
+ for <qemu-devel@nongnu.org>; Mon, 21 Oct 2019 11:28:53 +0000 (UTC)
+Received: by mail-wr1-f71.google.com with SMTP id f4so7106815wrj.12
+ for <qemu-devel@nongnu.org>; Mon, 21 Oct 2019 04:28:53 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=OgiB5TfMg4bzzxEaQjuoES0Iavr8ZNMReSonWz0Vk4Y=;
+ b=pb0ny0hRbngvwpKdnlwoF6iJaGtEMa/RorLtGD8vLPGRsohPHYxaChiLsi6Kt8a0Sl
+ 3UPgJyFYhXjBnO8uGJNm6mvubLsuktxAxDV1u6UcCDYYhuuNkgk+6TjI8sZCtmwNwoUX
+ lvHqd5DqHUkmfiEaeoBjXIseNlSmXd5Cs6YwvHDcGRp0Vj3dokDkO1j+MBK2ZaKJTBU/
+ Nr4OeEgGBGhbkve+vmOUExbLfydv4o99nQiqtkwIz2ct12oNqIhO0y9xCWHwGmObNRMp
+ qtsqpw4wO32LabREaRCAzGk8A1XOu9OieH04TNGujg4cR05RRx4GP9u0YfEwn1UlPAaq
+ Mj9A==
+X-Gm-Message-State: APjAAAXZioF8b+cfvhH0Ps4Gmtt4OTmrnie0jsH/BCY0tGZj5kQEtD4s
+ itSUKQHn9pfRnoDiniSygtdLGv/+j8/iVLT224dHbM90g2DQZ9wiaba7voWq+FTBk+HaoJcUzXC
+ V3iGquGdVfUb7Fug=
+X-Received: by 2002:a1c:99cd:: with SMTP id
+ b196mr18902824wme.105.1571657332188; 
+ Mon, 21 Oct 2019 04:28:52 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqwboFtjsMHFxgPZuxiwbU8EdBVYZo2nwtg6gl7n5JYb/ZQKD/9qgcgS67u5Zsjn6RAcvLB+gg==
+X-Received: by 2002:a1c:99cd:: with SMTP id
+ b196mr18902763wme.105.1571657331913; 
+ Mon, 21 Oct 2019 04:28:51 -0700 (PDT)
+Received: from [192.168.1.41] (129.red-83-57-174.dynamicip.rima-tde.net.
+ [83.57.174.129])
+ by smtp.gmail.com with ESMTPSA id e3sm13442899wme.39.2019.10.21.04.28.48
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Mon, 21 Oct 2019 04:28:51 -0700 (PDT)
+Subject: Re: [PATCH 18/21] hw/mips: Let the machine be the owner of the system
+ memory
+To: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+References: <20191020225650.3671-1-philmd@redhat.com>
+ <20191020225650.3671-19-philmd@redhat.com>
+ <CAL1e-=ivk8phw5SOd=a6SO8RJ4E=9kN8hN0tocQYcb7AEKeyEA@mail.gmail.com>
+ <698bde03-02a9-be5e-2aff-4e8d50508222@redhat.com>
+ <CAL1e-=jtavWvWaajrdTmapFgLfXXhfH8nuWCxY-z8+oMGsOAGA@mail.gmail.com>
+ <d92fc466-9327-04ef-22b9-857d4f18b976@redhat.com>
+ <CAL1e-=gbwabWNm1GyzG2K4Y+7dseUMpsj8+cpzNgJ5NT1P+SLQ@mail.gmail.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <3780f13b-8c03-fd96-47e3-1e1da3ecde2a@redhat.com>
+Date: Mon, 21 Oct 2019 13:28:48 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.1
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-MC-Unique: 50Bnr8ceO567ZsmN9gAgQg-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <CAL1e-=gbwabWNm1GyzG2K4Y+7dseUMpsj8+cpzNgJ5NT1P+SLQ@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.120
+X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,95 +101,348 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: piaojun@huawei.com, eguan@linux.alibaba.com, vgoyal@Redhat.com
+Cc: Paul Burton <pburton@wavecomp.com>, Jan Kiszka <jan.kiszka@web.de>,
+ Peter Maydell <peter.maydell@linaro.org>,
+ Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ KONRAD Frederic <frederic.konrad@adacore.com>,
+ "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Rob Herring <robh@kernel.org>,
+ Andrey Smirnov <andrew.smirnov@gmail.com>, Helge Deller <deller@gmx.de>,
+ "Michael S. Tsirkin" <mst@redhat.com>, Markus Armbruster <armbru@redhat.com>,
+ =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>,
+ Antony Pavlov <antonynpavlov@gmail.com>,
+ Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
+ David Gibson <david@gibson.dropbear.id.au>,
+ Artyom Tarasenko <atar4qemu@gmail.com>, Joel Stanley <joel@jms.id.au>,
+ Eduardo Habkost <ehabkost@redhat.com>,
+ Alistair Francis <alistair@alistair23.me>,
+ Leif Lindholm <leif.lindholm@linaro.org>,
+ Beniamino Galvani <b.galvani@gmail.com>,
+ "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>,
+ Peter Chubb <peter.chubb@nicta.com.au>, Fabien Chouteau <chouteau@adacore.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>,
+ Radoslaw Biernacki <radoslaw.biernacki@linaro.org>,
+ Thomas Huth <huth@tuxfamily.org>,
+ Andrew Baumann <Andrew.Baumann@microsoft.com>,
+ Jean-Christophe Dubois <jcd@tribudubois.net>, Andrew Jeffery <andrew@aj.id.au>,
+ Michael Walle <michael@walle.cc>, "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>,
+ Aleksandar Markovic <amarkovic@wavecomp.com>,
+ Igor Mammedov <imammedo@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>,
+ =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+On 10/21/19 1:10 PM, Aleksandar Markovic wrote:
+> On Monday, October 21, 2019, Philippe Mathieu-Daud=C3=A9 <philmd@redhat=
+.com=20
+> <mailto:philmd@redhat.com>> wrote:
+>=20
+>     On 10/21/19 12:56 PM, Aleksandar Markovic wrote:
+>=20
+>=20
+>=20
+>         On Monday, October 21, 2019, Philippe Mathieu-Daud=C3=A9
+>         <philmd@redhat.com <mailto:philmd@redhat.com>
+>         <mailto:philmd@redhat.com <mailto:philmd@redhat.com>>> wrote:
+>=20
+>          =C2=A0 =C2=A0 Hi Aleksandar,
+>=20
+>          =C2=A0 =C2=A0 On 10/21/19 8:25 AM, Aleksandar Markovic wrote:
+>=20
+>=20
+>=20
+>          =C2=A0 =C2=A0 =C2=A0 =C2=A0 On Monday, October 21, 2019, Phili=
+ppe Mathieu-Daud=C3=A9
+>          =C2=A0 =C2=A0 =C2=A0 =C2=A0 <philmd@redhat.com <mailto:philmd@=
+redhat.com>
+>         <mailto:philmd@redhat.com <mailto:philmd@redhat.com>>
+>          =C2=A0 =C2=A0 =C2=A0 =C2=A0 <mailto:philmd@redhat.com <mailto:=
+philmd@redhat.com>
+>         <mailto:philmd@redhat.com <mailto:philmd@redhat.com>>>> wrote:
+>=20
+>          =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=C2=A0 =C2=A0 Signed-off-by:=
+ Philippe Mathieu-Daud=C3=A9
+>         <philmd@redhat.com <mailto:philmd@redhat.com>
+>          =C2=A0 =C2=A0 =C2=A0 =C2=A0 <mailto:philmd@redhat.com <mailto:=
+philmd@redhat.com>>
+>          =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=C2=A0 =C2=A0 <mailto:philmd=
+@redhat.com
+>         <mailto:philmd@redhat.com> <mailto:philmd@redhat.com
+>         <mailto:philmd@redhat.com>>>>
+>          =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=C2=A0 =C2=A0 ---
+>          =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=C2=A0 =C2=A0 =C2=A0=C2=A0hw=
+/mips/boston.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 | 2 +-
+>          =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=C2=A0 =C2=A0 =C2=A0=C2=A0hw=
+/mips/mips_fulong2e.c | 3 ++-
+>          =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=C2=A0 =C2=A0 =C2=A0=C2=A0hw=
+/mips/mips_jazz.c=C2=A0 =C2=A0 =C2=A0| 2 +-
+>          =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=C2=A0 =C2=A0 =C2=A0=C2=A0hw=
+/mips/mips_malta.c=C2=A0 =C2=A0 | 2 +-
+>          =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=C2=A0 =C2=A0 =C2=A0=C2=A0hw=
+/mips/mips_mipssim.c=C2=A0 | 2 +-
+>          =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=C2=A0 =C2=A0 =C2=A0=C2=A0hw=
+/mips/mips_r4k.c=C2=A0 =C2=A0 =C2=A0 | 3 ++-
+>          =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=C2=A0 =C2=A0 =C2=A0=C2=A06 =
+files changed, 8 insertions(+), 6 deletions(-)
+>=20
+>=20
+>          =C2=A0 =C2=A0 =C2=A0 =C2=A0 Philippe, can this patch be applie=
+d independently (on other
+>          =C2=A0 =C2=A0 =C2=A0 =C2=A0 patches of this series)?
+>=20
+>=20
+>          =C2=A0 =C2=A0 Unfortunately not because patch #9 changed the p=
+rototype of
+>          =C2=A0 =C2=A0 memory_region_allocate_system_memory() so this p=
+atch alone
+>          =C2=A0 =C2=A0 won't build.
+>=20
+>          =C2=A0 =C2=A0 I rather expect this series goes as a whole via =
+the
+>         machine-next
+>          =C2=A0 =C2=A0 tree.
+>=20
+>          =C2=A0 =C2=A0 Do you mind giving your Acked-by tag to this pat=
+ch?
+>=20
+>=20
+>         I can't, sorry, for MIPS target, we don't accept patches with
+>         empty commit messages.
+>=20
+>=20
+>     I see, I'v been wondering what to do, if simply repeating the patch
+>     subject or the cover, but since the series applies to all targets,
+>     this seems overkill. I think I'll simply repeat the subject then.
+>=20
+>=20
+> Can't you at least add a sentence on why is this needed, or what is=20
+> achieved?
 
-Wire up the building of the virtiofsd in contrib.
+You are alright, I'll do.
 
-virtiofsd relies on Linux-specific system calls and seccomp.  Anyone
-wishing to port it to other host operating systems should do so
-carefully and without reducing security.
-
-Only allow building on Linux hosts.
-
-Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
----
- Makefile                        |  8 ++++++++
- Makefile.objs                   |  1 +
- contrib/virtiofsd/Makefile.objs | 10 ++++++++++
- 3 files changed, 19 insertions(+)
- create mode 100644 contrib/virtiofsd/Makefile.objs
-
-diff --git a/Makefile b/Makefile
-index d20e7ffce3..694a871384 100644
---- a/Makefile
-+++ b/Makefile
-@@ -316,6 +316,8 @@ HELPERS-y =3D
- HELPERS-$(call land,$(CONFIG_SOFTMMU),$(CONFIG_LINUX)) =3D qemu-bridge-hel=
-per$(EXESUF)
-=20
- ifdef CONFIG_LINUX
-+HELPERS-y +=3D virtiofsd$(EXESUF)
-+
- ifdef CONFIG_VIRGL
- ifdef CONFIG_GBM
- HELPERS-y +=3D vhost-user-gpu$(EXESUF)
-@@ -423,6 +425,7 @@ dummy :=3D $(call unnest-vars,, \
-                 elf2dmp-obj-y \
-                 ivshmem-client-obj-y \
-                 ivshmem-server-obj-y \
-+                virtiofsd-obj-y \
-                 rdmacm-mux-obj-y \
-                 libvhost-user-obj-y \
-                 vhost-user-scsi-obj-y \
-@@ -658,6 +661,11 @@ rdmacm-mux$(EXESUF): LIBS +=3D "-libumad"
- rdmacm-mux$(EXESUF): $(rdmacm-mux-obj-y) $(COMMON_LDADDS)
- =09$(call LINK, $^)
-=20
-+ifdef CONFIG_LINUX # relies on Linux-specific syscalls
-+virtiofsd$(EXESUF): $(virtiofsd-obj-y) libvhost-user.a $(COMMON_LDADDS)
-+=09$(call LINK, $^)
-+endif
-+
- vhost-user-gpu$(EXESUF): $(vhost-user-gpu-obj-y) $(libvhost-user-obj-y) li=
-bqemuutil.a libqemustub.a
- =09$(call LINK, $^)
-=20
-diff --git a/Makefile.objs b/Makefile.objs
-index abcbd89654..24d0b56f1f 100644
---- a/Makefile.objs
-+++ b/Makefile.objs
-@@ -125,6 +125,7 @@ vhost-user-blk-obj-y =3D contrib/vhost-user-blk/
- rdmacm-mux-obj-y =3D contrib/rdmacm-mux/
- vhost-user-input-obj-y =3D contrib/vhost-user-input/
- vhost-user-gpu-obj-y =3D contrib/vhost-user-gpu/
-+virtiofsd-obj-y =3D contrib/virtiofsd/
-=20
- ######################################################################
- trace-events-subdirs =3D
-diff --git a/contrib/virtiofsd/Makefile.objs b/contrib/virtiofsd/Makefile.o=
-bjs
-new file mode 100644
-index 0000000000..67be16332c
---- /dev/null
-+++ b/contrib/virtiofsd/Makefile.objs
-@@ -0,0 +1,10 @@
-+virtiofsd-obj-y =3D buffer.o \
-+                  fuse_opt.o \
-+                  fuse_log.o \
-+                  fuse_loop_mt.o \
-+                  fuse_lowlevel.o \
-+                  fuse_signals.o \
-+                  fuse_virtio.o \
-+                  helper.o \
-+                  passthrough_ll.o
-+
---=20
-2.23.0
-
+>=20
+> Thanks,
+>=20
+> A.
+>=20
+>=20
+>         A.
+>=20
+>=20
+>          =C2=A0 =C2=A0 Thanks,
+>=20
+>          =C2=A0 =C2=A0 Phil.
+>=20
+>=20
+>=20
+>          =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=C2=A0 =C2=A0 diff --git a/h=
+w/mips/boston.c b/hw/mips/boston.c
+>          =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=C2=A0 =C2=A0 index ca7d813a=
+52..8445fee0f1 100644
+>          =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=C2=A0 =C2=A0 --- a/hw/mips/=
+boston.c
+>          =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=C2=A0 =C2=A0 +++ b/hw/mips/=
+boston.c
+>          =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=C2=A0 =C2=A0 @@ -474,7 +474=
+,7 @@ static void
+>          =C2=A0 =C2=A0 =C2=A0 =C2=A0 boston_mach_init(MachineState *mac=
+hine)
+>          =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=C2=A0 =C2=A0 =C2=A0=C2=A0 =C2=
+=A0 =C2=A0memory_region_add_subregion_overlap(sys_mem,
+>         0x18000000,
+>          =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=C2=A0 =C2=A0 flash, 0);
+>=20
+>          =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=C2=A0 =C2=A0 =C2=A0=C2=A0 =C2=
+=A0 =C2=A0ddr =3D g_new(MemoryRegion, 1);
+>          =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=C2=A0 =C2=A0 -=C2=A0 =C2=A0=
+ memory_region_allocate_system_memory(ddr, NULL,
+>          =C2=A0 =C2=A0 =C2=A0 =C2=A0 "boston.ddr",
+>          =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=C2=A0 =C2=A0 +=C2=A0 =C2=A0=
+ memory_region_allocate_system_memory(ddr,
+>         machine,
+>          =C2=A0 =C2=A0 =C2=A0 =C2=A0 "boston.ddr",
+>                                                                =20
+>         machine->ram_size);
+>          =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=C2=A0 =C2=A0 =C2=A0=C2=A0 =C2=
+=A0 =C2=A0memory_region_add_subregion_overlap(sys_mem,
+>          =C2=A0 =C2=A0 =C2=A0 =C2=A0 0x80000000, ddr, 0);
+>=20
+>          =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=C2=A0 =C2=A0 diff --git a/h=
+w/mips/mips_fulong2e.c
+>         b/hw/mips/mips_fulong2e.c
+>          =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=C2=A0 =C2=A0 index cf537dd7=
+e6..d5a5cef619 100644
+>          =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=C2=A0 =C2=A0 --- a/hw/mips/=
+mips_fulong2e.c
+>          =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=C2=A0 =C2=A0 +++ b/hw/mips/=
+mips_fulong2e.c
+>          =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=C2=A0 =C2=A0 @@ -318,7 +318=
+,8 @@ static void
+>         mips_fulong2e_init(MachineState
+>          =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=C2=A0 =C2=A0 *machine)
+>          =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=C2=A0 =C2=A0 =C2=A0=C2=A0 =C2=
+=A0 =C2=A0ram_size =3D 256 * MiB;
+>=20
+>          =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=C2=A0 =C2=A0 =C2=A0=C2=A0 =C2=
+=A0 =C2=A0/* allocate RAM */
+>          =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=C2=A0 =C2=A0 -=C2=A0 =C2=A0=
+ memory_region_allocate_system_memory(ram, NULL,
+>          =C2=A0 =C2=A0 =C2=A0 =C2=A0 "fulong2e.ram",
+>          =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=C2=A0 =C2=A0 ram_size);
+>          =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=C2=A0 =C2=A0 +=C2=A0 =C2=A0=
+ memory_region_allocate_system_memory(ram,
+>         machine,
+>          =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=C2=A0 =C2=A0 +             =
+                         =20
+>          =C2=A0"fulong2e.ram",
+>          =C2=A0 =C2=A0 =C2=A0 =C2=A0 ram_size);
+>          =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=C2=A0 =C2=A0 =C2=A0=C2=A0 =C2=
+=A0 =C2=A0memory_region_init_ram(bios, NULL,
+>         "fulong2e.bios",
+>          =C2=A0 =C2=A0 =C2=A0 =C2=A0 BIOS_SIZE,
+>          =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=C2=A0 =C2=A0 =C2=A0=C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 =C2=A0 &error_fatal);
+>          =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=C2=A0 =C2=A0 =C2=A0=C2=A0 =C2=
+=A0 =C2=A0memory_region_set_readonly(bios, true);
+>          =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=C2=A0 =C2=A0 diff --git a/h=
+w/mips/mips_jazz.c b/hw/mips/mips_jazz.c
+>          =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=C2=A0 =C2=A0 index 8d010a0b=
+6e..88b125855f 100644
+>          =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=C2=A0 =C2=A0 --- a/hw/mips/=
+mips_jazz.c
+>          =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=C2=A0 =C2=A0 +++ b/hw/mips/=
+mips_jazz.c
+>          =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=C2=A0 =C2=A0 @@ -188,7 +188=
+,7 @@ static void
+>         mips_jazz_init(MachineState
+>          =C2=A0 =C2=A0 =C2=A0 =C2=A0 *machine,
+>          =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=C2=A0 =C2=A0 =C2=A0=C2=A0 =C2=
+=A0 =C2=A0cc->do_transaction_failed =3D
+>          =C2=A0 =C2=A0 =C2=A0 =C2=A0 mips_jazz_do_transaction_failed;
+>=20
+>          =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=C2=A0 =C2=A0 =C2=A0=C2=A0 =C2=
+=A0 =C2=A0/* allocate RAM */
+>          =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=C2=A0 =C2=A0 -=C2=A0 =C2=A0=
+ memory_region_allocate_system_memory(ram, NULL,
+>          =C2=A0 =C2=A0 =C2=A0 =C2=A0 "mips_jazz.ram",
+>          =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=C2=A0 =C2=A0 +=C2=A0 =C2=A0=
+ memory_region_allocate_system_memory(ram,
+>         machine,
+>          =C2=A0 =C2=A0 =C2=A0 =C2=A0 "mips_jazz.ram",
+>                                                                =20
+>         machine->ram_size);
+>          =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=C2=A0 =C2=A0 =C2=A0=C2=A0 =C2=
+=A0 =C2=A0memory_region_add_subregion(address_space,
+>         0, ram);
+>=20
+>          =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=C2=A0 =C2=A0 diff --git a/h=
+w/mips/mips_malta.c
+>         b/hw/mips/mips_malta.c
+>          =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=C2=A0 =C2=A0 index 4d9c64b3=
+6a..af56a29ccb 100644
+>          =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=C2=A0 =C2=A0 --- a/hw/mips/=
+mips_malta.c
+>          =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=C2=A0 =C2=A0 +++ b/hw/mips/=
+mips_malta.c
+>          =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=C2=A0 =C2=A0 @@ -1267,7 +12=
+67,7 @@ void
+>         mips_malta_init(MachineState
+>          =C2=A0 =C2=A0 =C2=A0 =C2=A0 *machine)
+>          =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=C2=A0 =C2=A0 =C2=A0=C2=A0 =C2=
+=A0 =C2=A0}
+>=20
+>          =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=C2=A0 =C2=A0 =C2=A0=C2=A0 =C2=
+=A0 =C2=A0/* register RAM at high address where it is
+>          =C2=A0 =C2=A0 =C2=A0 =C2=A0 undisturbed by IO */
+>          =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=C2=A0 =C2=A0 -  =20
+>         memory_region_allocate_system_memory(ram_high, NULL,
+>          =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=C2=A0 =C2=A0 "mips_malta.ra=
+m",
+>          =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=C2=A0 =C2=A0 +  =20
+>         memory_region_allocate_system_memory(ram_high, machine,
+>          =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=C2=A0 =C2=A0 "mips_malta.ra=
+m",
+>          =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=C2=A0 =C2=A0 =C2=A0=C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 ram_size)=
+;
+>          =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=C2=A0 =C2=A0 =C2=A0=C2=A0 =C2=
+=A0 =C2=A0memory_region_add_subregion(system_memory,
+>          =C2=A0 =C2=A0 =C2=A0 =C2=A0 0x80000000, ram_high);
+>=20
+>          =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=C2=A0 =C2=A0 diff --git a/h=
+w/mips/mips_mipssim.c
+>         b/hw/mips/mips_mipssim.c
+>          =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=C2=A0 =C2=A0 index 282bbecb=
+24..c1933231e2 100644
+>          =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=C2=A0 =C2=A0 --- a/hw/mips/=
+mips_mipssim.c
+>          =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=C2=A0 =C2=A0 +++ b/hw/mips/=
+mips_mipssim.c
+>          =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=C2=A0 =C2=A0 @@ -166,7 +166=
+,7 @@ mips_mipssim_init(MachineState
+>         *machine)
+>          =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=C2=A0 =C2=A0 =C2=A0=C2=A0 =C2=
+=A0 =C2=A0qemu_register_reset(main_cpu_reset, reset_info);
+>=20
+>          =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=C2=A0 =C2=A0 =C2=A0=C2=A0 =C2=
+=A0 =C2=A0/* Allocate RAM. */
+>          =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=C2=A0 =C2=A0 -=C2=A0 =C2=A0=
+ memory_region_allocate_system_memory(ram, NULL,
+>          =C2=A0 =C2=A0 =C2=A0 =C2=A0 "mips_mipssim.ram",
+>          =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=C2=A0 =C2=A0 +=C2=A0 =C2=A0=
+ memory_region_allocate_system_memory(ram,
+>         machine,
+>          =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=C2=A0 =C2=A0 "mips_mipssim.=
+ram",
+>          =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=C2=A0 =C2=A0 =C2=A0=C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 ram_size)=
+;
+>          =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=C2=A0 =C2=A0 =C2=A0=C2=A0 =C2=
+=A0 =C2=A0memory_region_init_ram(bios, NULL,
+>          =C2=A0 =C2=A0 =C2=A0 =C2=A0 "mips_mipssim.bios", BIOS_SIZE,
+>          =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=C2=A0 =C2=A0 =C2=A0=C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 =C2=A0 &error_fatal);
+>          =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=C2=A0 =C2=A0 diff --git a/h=
+w/mips/mips_r4k.c b/hw/mips/mips_r4k.c
+>          =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=C2=A0 =C2=A0 index bc0be265=
+44..59f8cacfb6 100644
+>          =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=C2=A0 =C2=A0 --- a/hw/mips/=
+mips_r4k.c
+>          =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=C2=A0 =C2=A0 +++ b/hw/mips/=
+mips_r4k.c
+>          =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=C2=A0 =C2=A0 @@ -203,7 +203=
+,8 @@ void
+>         mips_r4k_init(MachineState *machine)
+>          =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=C2=A0 =C2=A0 =C2=A0=C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 " maxi=
+mum 256MB", ram_size
+>         / MiB);
+>          =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=C2=A0 =C2=A0 =C2=A0=C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0exit(1);
+>          =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=C2=A0 =C2=A0 =C2=A0=C2=A0 =C2=
+=A0 =C2=A0}
+>          =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=C2=A0 =C2=A0 -=C2=A0 =C2=A0=
+ memory_region_allocate_system_memory(ram, NULL,
+>          =C2=A0 =C2=A0 =C2=A0 =C2=A0 "mips_r4k.ram",
+>          =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=C2=A0 =C2=A0 ram_size);
+>          =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=C2=A0 =C2=A0 +=C2=A0 =C2=A0=
+ memory_region_allocate_system_memory(ram,
+>         machine,
+>          =C2=A0 =C2=A0 =C2=A0 =C2=A0 "mips_r4k.ram",
+>          =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=C2=A0 =C2=A0 +=C2=A0 =C2=A0=
+ =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0ram_size);
+>=20
+>                          =20
+>          =C2=A0memory_region_add_subregion(address_space_mem, 0, ram);
+>=20
+>          =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=C2=A0 =C2=A0 --=C2=A0 =C2=A0=
+ =C2=A02.21.0
+>=20
+>=20
 
