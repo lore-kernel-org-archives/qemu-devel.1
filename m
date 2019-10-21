@@ -2,52 +2,83 @@ Return-Path: <SRS0=8ZcK=YO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0C30DCA9EAF
-	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 19:22:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 395B5CA9EAF
+	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 19:23:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D625420873
-	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 19:22:00 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D625420873
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=rt-rk.com
+	by mail.kernel.org (Postfix) with ESMTPS id F1E2820873
+	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 19:23:51 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QZYyQ3Fg"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F1E2820873
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47080 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47108 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iMdFf-000269-T8
-	for qemu-devel@archiver.kernel.org; Mon, 21 Oct 2019 15:21:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58654)
+	id 1iMdHS-0003iD-Vr
+	for qemu-devel@archiver.kernel.org; Mon, 21 Oct 2019 15:23:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59266)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <aleksandar.markovic@rt-rk.com>) id 1iMd71-0001Qw-72
- for qemu-devel@nongnu.org; Mon, 21 Oct 2019 15:13:04 -0400
+ (envelope-from <jfreimann@redhat.com>) id 1iMdAx-0005ZY-Jw
+ for qemu-devel@nongnu.org; Mon, 21 Oct 2019 15:17:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aleksandar.markovic@rt-rk.com>) id 1iMd6z-0004Fu-9p
- for qemu-devel@nongnu.org; Mon, 21 Oct 2019 15:13:02 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:50848 helo=mail.rt-rk.com)
+ (envelope-from <jfreimann@redhat.com>) id 1iMdAu-0005yy-4F
+ for qemu-devel@nongnu.org; Mon, 21 Oct 2019 15:17:05 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:60367
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
- id 1iMd6z-0003rk-2j
- for qemu-devel@nongnu.org; Mon, 21 Oct 2019 15:13:01 -0400
-Received: from localhost (localhost [127.0.0.1])
- by mail.rt-rk.com (Postfix) with ESMTP id 94FF11A215C;
- Mon, 21 Oct 2019 21:11:55 +0200 (CEST)
-X-Virus-Scanned: amavisd-new at rt-rk.com
-Received: from rtrkw774-lin.domain.local (rtrkw774.domain.local [10.10.14.106])
- by mail.rt-rk.com (Postfix) with ESMTPSA id 7212E1A1E02;
- Mon, 21 Oct 2019 21:11:55 +0200 (CEST)
-From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v6 00/12] target/mips: Misc cleanups for September/October 2019
-Date: Mon, 21 Oct 2019 21:11:25 +0200
-Message-Id: <1571685097-15175-1-git-send-email-aleksandar.markovic@rt-rk.com>
-X-Mailer: git-send-email 2.7.4
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [fuzzy]
-X-Received-From: 89.216.37.149
+ (Exim 4.71) (envelope-from <jfreimann@redhat.com>)
+ id 1iMdAq-0005w8-6w
+ for qemu-devel@nongnu.org; Mon, 21 Oct 2019 15:17:03 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1571685418;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=aX6ZPFoNaRLKITOC+REMrKx5rivFbXNml+IsX4XN8U8=;
+ b=QZYyQ3FgjqU2LyqQcfsBCDCK3YNy5Ckb/NqoexhfEZ+lXbOpycgzTCIvWoW+P9DfWAJffs
+ LawehN4KBPQZkICyq+oZQRfblfY/+eM+30q7A/wDWv2HmlG2Sta2UJ6e4+QAfEWvQ8djUL
+ Il3NW/CeySMmSp1hjGVI5mVWNnnlxL8=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-240-zWjXGDjhPvC2hmvLgnkOYQ-1; Mon, 21 Oct 2019 15:16:54 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BDB8E107AD31;
+ Mon, 21 Oct 2019 19:16:53 +0000 (UTC)
+Received: from localhost (ovpn-116-91.ams2.redhat.com [10.36.116.91])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id DF81160126;
+ Mon, 21 Oct 2019 19:16:45 +0000 (UTC)
+Date: Mon, 21 Oct 2019 21:16:43 +0200
+From: Jens Freimann <jfreimann@redhat.com>
+To: Alex Williamson <alex.williamson@redhat.com>
+Subject: Re: [PATCH 11/11] vfio: unplug failover primary device before
+ migration
+Message-ID: <20191021191643.4stait5u76wijwca@jenstp.localdomain>
+References: <20191018202040.30349-1-jfreimann@redhat.com>
+ <20191018202040.30349-12-jfreimann@redhat.com>
+ <20191021091920.308e7454@x1.home>
+MIME-Version: 1.0
+In-Reply-To: <20191021091920.308e7454@x1.home>
+User-Agent: NeoMutt/20180716-1376-5d6ed1
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-MC-Unique: zWjXGDjhPvC2hmvLgnkOYQ-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=WINDOWS-1252; format=flowed
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -59,64 +90,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: aleksandar.rikalo@rt-rk.com, Aleksandar Markovic <amarkovic@wavecomp.com>
+Cc: pkrempa@redhat.com, berrange@redhat.com, parav@mellanox.com, mst@redhat.com,
+ aadam@redhat.com, qemu-devel@nongnu.org, dgilbert@redhat.com, laine@redhat.com,
+ ailan@redhat.com, ehabkost@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Aleksandar Markovic <amarkovic@wavecomp.com>
+On Mon, Oct 21, 2019 at 09:19:20AM -0600, Alex Williamson wrote:
+>On Fri, 18 Oct 2019 22:20:40 +0200
+>Jens Freimann <jfreimann@redhat.com> wrote:
+[...]
+>> +    if (!pdev->net_failover_pair_id) {
+>> +        error_setg(&vdev->migration_blocker,
+>> +                "VFIO device doesn't support migration");
+>> +        ret =3D migrate_add_blocker(vdev->migration_blocker, &err);
+>> +        if (err) {
+>> +            error_propagate(errp, err);
+>> +            goto error;
+>> +        }
+>> +    } else {
+>> +            pdev->qdev.allow_unplug_during_migration =3D true;
+>
+>Why is this unique to vfio-pci, shouldn't any device set as the primary
+>for a failover allow unplug during migration, and therefore should it
+>be done in the core code rather than device driver?  With the
+>net_failover_pair_id set in PCIDevice, I should be able to test with an
+>e1000e NIC as primary, but this suggests they wouldn't be handled
+>identically elsewhere.  Thanks,
 
-Mostly cosmetic changes.
+I assume you're talking about pci core code not qdev core. Failover is
+pci specific at this time (only the part to hide devices is more
+generic and is in qdev code). I can set the flag to allow migration in
+pci_qdev_realize().
 
-v5->v6:
-
-  - minor corrections (r-b, t-b marks) in commit messages
-  - added patches 11 and 12
-
-v4->v5:
-
-  - minor correction in patch on helper.c
-  - added patches 9 and 10
-
-v3->v4:
-
-  - added patches 7 and 8
-
-v2->v3:
-
-  - removed all patches that were already integrated
-  - patches 1 and 2 are improved from v2
-  - added patches 3-6
-
-v1->v2:
-
-  - minor corrections to satisfy reviews
-  - added several more patches
-
-Aleksandar Markovic (12):
-  target/mips: Clean up helper.c
-  target/mips: Clean up op_helper.c
-  MAINTAINERS: Update mail address of Aleksandar Rikalo
-  target/mips: msa: Split helpers for <MAX|MIN>_A.<B|H|W|D>
-  target/mips: msa: Split helpers for <MAX|MIN>_<S|U>.<B|H|W|D>
-  target/mips: msa: Split helpers for ILV<EV|OD|L|R>.<B|H|W|D>
-  target/mips: msa: Split helpers for ADD<_A|S_A|S_S|S_U|V>.<B|H|W|D>
-  target/mips: msa: Split helpers for HADD_<S|U>.<H|W|D>
-  target/mips: msa: Split helpers for S<LL|RA|RAR|RL|RLR>.<B|H|W|D>
-  target/mips: msa: Split helpers for PCK<EV|OD>.<B|H|W|D>
-  target/mips: msa: Split helpers for HSUB_<S|U>.<H|W|D>
-  target/mips: msa: Split helpers for ASUB_<S|U>.<B|H|W|D>
-
- .mailmap                 |    5 +-
- MAINTAINERS              |   18 +-
- target/mips/helper.c     |  123 +-
- target/mips/helper.h     |  155 +-
- target/mips/msa_helper.c | 4583 ++++++++++++++++++++++++++++++----------------
- target/mips/op_helper.c  | 1010 ++++++----
- target/mips/translate.c  |  512 +++++-
- 7 files changed, 4319 insertions(+), 2087 deletions(-)
-
--- 
-2.7.4
+regards,
+Jens=20
 
 
