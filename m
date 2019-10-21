@@ -2,83 +2,155 @@ Return-Path: <SRS0=8ZcK=YO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 41FF0CA9EAF
-	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 21:02:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C21D5CA9EAF
+	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 21:05:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id ED0EB2086D
-	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 21:02:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8C5082086D
+	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 21:05:43 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ctU1m9KV"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ED0EB2086D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ekq3HcaF"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8C5082086D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47890 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47922 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iMepO-0007EA-4A
-	for qemu-devel@archiver.kernel.org; Mon, 21 Oct 2019 17:02:58 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42925)
+	id 1iMes2-0000UM-Nz
+	for qemu-devel@archiver.kernel.org; Mon, 21 Oct 2019 17:05:42 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43126)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alistair23@gmail.com>) id 1iMent-00065c-EK
- for qemu-devel@nongnu.org; Mon, 21 Oct 2019 17:01:26 -0400
+ (envelope-from <jsnow@redhat.com>) id 1iMepN-0007VG-SU
+ for qemu-devel@nongnu.org; Mon, 21 Oct 2019 17:02:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alistair23@gmail.com>) id 1iMens-0007pJ-Fy
- for qemu-devel@nongnu.org; Mon, 21 Oct 2019 17:01:25 -0400
-Received: from mail-lj1-x244.google.com ([2a00:1450:4864:20::244]:41719)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alistair23@gmail.com>)
- id 1iMens-0007on-8E; Mon, 21 Oct 2019 17:01:24 -0400
-Received: by mail-lj1-x244.google.com with SMTP id f5so14849594ljg.8;
- Mon, 21 Oct 2019 14:01:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=l6feAducb9HP2EHxfy6KvJwhq5UptNWBlDOmDMww3+g=;
- b=ctU1m9KV7t5bvq4xtAJt0jYd12N46Eb9qz8l2berU+51rkGzFBSPAmkmpOd7sRy7+N
- 6qLpNSqgjiIzRraO2VErI7kmHqAjkjQCXv5n/b1/Cd5Adw1pau6758sTQOfe1Cfsj8fa
- nBOwmxDV6LtsnF1OeV7ceHsbP6YKbqr5jUwk2LQqlnUak2JNz8/pqHPzJD5cyPEx2SmX
- MR6wjdalT+gAKqsp7ksJSnGU+rRYEXJgVpoN+RtxnYmUEx9XeFsR7GRvNimHOT45GFfi
- yu17FwRiYzmfliR2kfQT4jcKklHaZQ2TOiKQ6K0e1SYqRrRUzJLHbfBtS0umeP52kcTQ
- m+1Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=l6feAducb9HP2EHxfy6KvJwhq5UptNWBlDOmDMww3+g=;
- b=ehnj6hB2mACGu6hnqFH94w6cl84IytQLtwAaeF/RhNrZ/bn6yjIzQux+xTLQxHdT9l
- WFYa10klQhPlDAI52wgBJd0P+jiiA2rYWRFVquzlG7ZQ8JJDTKOlvi0QX2cBmuk7J2ra
- tmbvGDsTilJcSoRAHh+y4t7R2FKMzF+aH3IOs5I3I7KrfJJlitt+SG6UdVEu4rvXfluW
- NCK8YA8u78efWf4yZ6hvUByvwejnBFgjd7jSQzFSWALPuSutmTplXPRP0c0f6l7RsZgG
- QlH4IrmMev/q6iAFRD8fkdzC6xTKbUPEemFi93B7jWvJyC5aMaRknQqd21DXspLoB2k7
- S0Dg==
-X-Gm-Message-State: APjAAAVDAEZzQaKsu5a3XnVH3kqH+6wlo4ESw3Gt/3GJdVxNNDEzCyu8
- YtxB1FzMzAHZWE4CtR7FLBP0nIhEYUb3VfWk5t0=
-X-Google-Smtp-Source: APXvYqzcmM/4+fYn13mYHt/UBDfefHIrBFLee8DN1MXJQPbRHtlsl/dRc5kZpPHxcghGxrKVZ5xXl4XjNYG8Yvm4OvY=
-X-Received: by 2002:a2e:420a:: with SMTP id p10mr16799111lja.16.1571691683152; 
- Mon, 21 Oct 2019 14:01:23 -0700 (PDT)
+ (envelope-from <jsnow@redhat.com>) id 1iMepL-00005z-Lm
+ for qemu-devel@nongnu.org; Mon, 21 Oct 2019 17:02:56 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:20133
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1iMepL-0008Uy-Ew
+ for qemu-devel@nongnu.org; Mon, 21 Oct 2019 17:02:55 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1571691773;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=tlRb+WjE6RL6gq/aHrTM7rJ6SLStRFT0cwxULgsX9Ic=;
+ b=Ekq3HcaFxG/vWV5fw4+Wzn9rmuIHEjQqGhKMszoUW7c8p5pglqrcFZExB8eSOJXpc7iyXA
+ pvK9VuK/N2s0imrzh1WQ+6DImVZPwJWxLsyY01fSZbzFIsiISVJpN8ChX7buti1ZC13wJ9
+ L9jCK+iAAiVunV7yI0SCL6b/zbPVz7E=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-325-inAcOljBPb6b_yhmOT-Vsg-1; Mon, 21 Oct 2019 17:02:49 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 070C4100550E;
+ Mon, 21 Oct 2019 21:02:48 +0000 (UTC)
+Received: from [10.18.17.145] (dhcp-17-145.bos.redhat.com [10.18.17.145])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 326665C207;
+ Mon, 21 Oct 2019 21:02:41 +0000 (UTC)
+Subject: Re: [PATCH v8 0/8] Add Qemu to SeaBIOS LCHS interface
+To: Sam Eiderman <sameid@google.com>, qemu-devel@nongnu.org
+References: <20191016164145.115898-1-sameid@google.com>
+From: John Snow <jsnow@redhat.com>
+Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+Message-ID: <2a7bc7a1-da2b-44f4-74fa-1ac4cc17ef67@redhat.com>
+Date: Mon, 21 Oct 2019 17:02:41 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.1
 MIME-Version: 1.0
-References: <20191020225650.3671-1-philmd@redhat.com>
- <20191020225650.3671-14-philmd@redhat.com>
-In-Reply-To: <20191020225650.3671-14-philmd@redhat.com>
-From: Alistair Francis <alistair23@gmail.com>
-Date: Mon, 21 Oct 2019 13:56:07 -0700
-Message-ID: <CAKmqyKMJXP8a-29LtZ8ydzLXbOSX27Jw9_JcLUV+iz7TxvE=JQ@mail.gmail.com>
-Subject: Re: [PATCH 13/21] hw/cris: Let the machine be the owner of the system
- memory
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <20191016164145.115898-1-sameid@google.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-MC-Unique: inAcOljBPb6b_yhmOT-Vsg-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::244
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,68 +162,112 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paul Burton <pburton@wavecomp.com>, Jan Kiszka <jan.kiszka@web.de>,
- Peter Maydell <peter.maydell@linaro.org>,
- Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
- "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
- KONRAD Frederic <frederic.konrad@adacore.com>,
- "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Rob Herring <robh@kernel.org>,
- Andrey Smirnov <andrew.smirnov@gmail.com>, Helge Deller <deller@gmx.de>,
- "Michael S. Tsirkin" <mst@redhat.com>, Markus Armbruster <armbru@redhat.com>,
- =?UTF-8?Q?Herv=C3=A9_Poussineau?= <hpoussin@reactos.org>,
- Antony Pavlov <antonynpavlov@gmail.com>,
- Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
- David Gibson <david@gibson.dropbear.id.au>,
- Artyom Tarasenko <atar4qemu@gmail.com>, Joel Stanley <joel@jms.id.au>,
- Eduardo Habkost <ehabkost@redhat.com>,
- Alistair Francis <alistair@alistair23.me>,
- Leif Lindholm <leif.lindholm@linaro.org>,
- Beniamino Galvani <b.galvani@gmail.com>, qemu-arm <qemu-arm@nongnu.org>,
- Peter Chubb <peter.chubb@nicta.com.au>, Fabien Chouteau <chouteau@adacore.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>,
- Radoslaw Biernacki <radoslaw.biernacki@linaro.org>,
- Thomas Huth <huth@tuxfamily.org>,
- Andrew Baumann <Andrew.Baumann@microsoft.com>,
- Jean-Christophe Dubois <jcd@tribudubois.net>, Andrew Jeffery <andrew@aj.id.au>,
- Michael Walle <michael@walle.cc>, "open list:New World" <qemu-ppc@nongnu.org>,
- Aleksandar Markovic <amarkovic@wavecomp.com>,
- Igor Mammedov <imammedo@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>,
- =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>
+Cc: kwolf@redhat.com, qemu-block@nongnu.org, arbel.moshe@oracle.com,
+ philmd@redhat.com, seabios@seabios.org, kevin@koconnor.net,
+ liran.alon@oracle.com, kraxel@redhat.com, lersek@redhat.com,
+ karl.heubaum@oracle.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Sun, Oct 20, 2019 at 4:14 PM Philippe Mathieu-Daud=C3=A9
-<philmd@redhat.com> wrote:
->
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 
-Alistair
+On 10/16/19 12:41 PM, Sam Eiderman wrote:
+>=20
+> v1:
+>=20
+> Non-standard logical geometries break under QEMU.
+>=20
+> A virtual disk which contains an operating system which depends on
+> logical geometries (consistent values being reported from BIOS INT13
+> AH=3D08) will most likely break under QEMU/SeaBIOS if it has non-standard
+> logical geometries - for example 56 SPT (sectors per track).
+> No matter what QEMU will guess - SeaBIOS, for large enough disks - will
+> use LBA translation, which will report 63 SPT instead.
+>=20
+> In addition we can not enforce SeaBIOS to rely on phyiscal geometries at
+> all. A virtio-blk-pci virtual disk with 255 phyiscal heads can not
+> report more than 16 physical heads when moved to an IDE controller, the
+> ATA spec allows a maximum of 16 heads - this is an artifact of
+> virtualization.
+>=20
+> By supplying the logical geometies directly we are able to support such
+> "exotic" disks.
+>=20
+> We will use fw_cfg to do just that.
+>=20
+> v2:
+>=20
+> Fix missing parenthesis check in
+>     "hd-geo-test: Add tests for lchs override"
+>=20
+> v3:
+>=20
+> * Rename fw_cfg key to "bios-geometry".
+> * Remove "extendible" interface.
+> * Add cpu_to_le32 fix as Laszlo suggested or big endian hosts
+> * Fix last qtest commit - automatic docker tester for some reason does no=
+t have qemu-img set
+>=20
+> v4:
+>=20
+> * Change fw_cfg interface from mixed textual/binary to textual only
+>=20
+> v5:
+>=20
+> * Fix line > 80 chars in tests/hd-geo-test.c
+>=20
+> v6:
+>=20
+> * Small fixes for issues pointed by Max
+> * (&conf->conf)->lcyls to conf->conf.lcyls and so on
+> * Remove scsi_unrealize from everything other than scsi-hd
+> * Add proper include to sysemu.h
+> * scsi_device_unrealize() after scsi_device_purge_requests()
+>=20
+> v7:
+>=20
+> * Adapted last commit (tests) to changes in qtest
+>=20
+> v8:
+>=20
+> * Fixed BE issue with tests by using qfw_cfg_get_file() instead of
+>   read_fw_cfg_file(), thanks Laszlo.
+> * Removed incorrect comment in 7/8.
+>=20
+> Sam Eiderman (8):
+>   block: Refactor macros - fix tabbing
+>   block: Support providing LCHS from user
+>   bootdevice: Add interface to gather LCHS
+>   scsi: Propagate unrealize() callback to scsi-hd
+>   bootdevice: Gather LCHS from all relevant devices
+>   bootdevice: Refactor get_boot_devices_list
+>   bootdevice: FW_CFG interface for LCHS values
+>   hd-geo-test: Add tests for lchs override
+>=20
+>  bootdevice.c             | 147 +++++++++--
+>  hw/block/virtio-blk.c    |   6 +
+>  hw/ide/qdev.c            |   7 +-
+>  hw/nvram/fw_cfg.c        |  14 +-
+>  hw/scsi/scsi-bus.c       |  16 ++
+>  hw/scsi/scsi-disk.c      |  12 +
+>  include/hw/block/block.h |  22 +-
+>  include/hw/scsi/scsi.h   |   1 +
+>  include/sysemu/sysemu.h  |   4 +
+>  tests/Makefile.include   |   2 +-
+>  tests/hd-geo-test.c      | 551 +++++++++++++++++++++++++++++++++++++++
+>  11 files changed, 741 insertions(+), 41 deletions(-)
+>=20
 
-> ---
->  hw/cris/axis_dev88.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/hw/cris/axis_dev88.c b/hw/cris/axis_dev88.c
-> index 940c7dd122..faa7058733 100644
-> --- a/hw/cris/axis_dev88.c
-> +++ b/hw/cris/axis_dev88.c
-> @@ -270,7 +270,7 @@ void axisdev88_init(MachineState *machine)
->      env =3D &cpu->env;
->
->      /* allocate RAM */
-> -    memory_region_allocate_system_memory(phys_ram, NULL, "axisdev88.ram"=
-,
-> +    memory_region_allocate_system_memory(phys_ram, machine, "axisdev88.r=
-am",
->                                           ram_size);
->      memory_region_add_subregion(address_space_mem, 0x40000000, phys_ram)=
-;
->
-> --
-> 2.21.0
->
->
+Thanks, applied to my IDE tree:
+
+https://github.com/jnsnow/qemu/commits/ide
+https://github.com/jnsnow/qemu.git
+
+--js
+
+
+(Philippe, you have a few days to check that I didn't snub your reviews
+if you want to look ...!)
+
 
