@@ -2,96 +2,90 @@ Return-Path: <SRS0=8ZcK=YO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D063CA9EAF
-	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 17:36:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A9759CA9EAF
+	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 17:37:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4B82620873
-	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 17:36:47 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="v4HENVO6"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4B82620873
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 7DE3120873
+	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 17:37:30 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7DE3120873
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46358 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46374 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iMbbq-0005ex-B3
-	for qemu-devel@archiver.kernel.org; Mon, 21 Oct 2019 13:36:46 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46153)
+	id 1iMbcX-0006jB-7U
+	for qemu-devel@archiver.kernel.org; Mon, 21 Oct 2019 13:37:29 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46748)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1iMbW8-0008VO-LA
- for qemu-devel@nongnu.org; Mon, 21 Oct 2019 13:30:53 -0400
+ (envelope-from <philmd@redhat.com>) id 1iMbZi-0003My-KL
+ for qemu-devel@nongnu.org; Mon, 21 Oct 2019 13:34:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1iMbW5-0006Oj-Aw
- for qemu-devel@nongnu.org; Mon, 21 Oct 2019 13:30:52 -0400
-Received: from mail-pg1-x544.google.com ([2607:f8b0:4864:20::544]:42550)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1iMbW5-0006O1-5J
- for qemu-devel@nongnu.org; Mon, 21 Oct 2019 13:30:49 -0400
-Received: by mail-pg1-x544.google.com with SMTP id f14so8201120pgi.9
- for <qemu-devel@nongnu.org>; Mon, 21 Oct 2019 10:30:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=iWFNgivYLuuN+/YyhYyGxqv53+ldRK3tdcD/5ti+nwU=;
- b=v4HENVO6DnPDLHvtOZdmOPDcllhmBzqj0Kgvw88k4J7251GWn5JKWpxAe7gL5sWUmn
- 1CVL98J7x31Adk5MYM1cg9RuPDMnQ+0+HfC1E2zHvjRMkyDGw3yKMNdZGtfs5KBvAu2S
- DcV1OM6W6GMJPi9nfiMQl14YXv+v0iDFlKlYQ7Wfklu/boTHxlsBGNrQ5I7HNBm0cBg0
- jMlOregu5npBz8tEaPbY6wzyt1la2VZTPTiNLvDD2rKE6PAV3vs/PvW1GnIt37H4KB79
- Dv24EZDkuA2CH8Xk4gQCL9lg93OqtYebD0wlMToJIbCsSnEZkq7JVar6GsM5gb8d8Sa/
- fYNA==
+ (envelope-from <philmd@redhat.com>) id 1iMbZh-0007zf-0M
+ for qemu-devel@nongnu.org; Mon, 21 Oct 2019 13:34:34 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:44834)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iMbZg-0007ys-OB
+ for qemu-devel@nongnu.org; Mon, 21 Oct 2019 13:34:32 -0400
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 3F643C057F2E
+ for <qemu-devel@nongnu.org>; Mon, 21 Oct 2019 17:34:31 +0000 (UTC)
+Received: by mail-wr1-f70.google.com with SMTP id 7so7727824wrl.2
+ for <qemu-devel@nongnu.org>; Mon, 21 Oct 2019 10:34:31 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=iWFNgivYLuuN+/YyhYyGxqv53+ldRK3tdcD/5ti+nwU=;
- b=n4OAo1ISsk0KmC+JODtrsFLNI73sb9solWtGUlNeOes1RWtOTrG6n5r/bz4XwVt5qO
- QxOQiMeN4GiJYSKVgUFcGbM09jFJTUTAuHYh/Fiy9u/1GNo6ax4NSPS28geW9V6fFmWY
- a7B5skMm8dVYuEZz0i73pUT+7Huz72uAIGUC0kla+35eK7/evCfBEaz8aC3kFVtaircZ
- vvLAHM5FsltgYSApW6k/Z+HPlZzFKm57IDrJJ5yqVEMmsSStGu0GFV/BnwUKo+g2keWE
- rmQzufdhdAy91Gs6f/By4dP6PTbxUH4YbnX34XnwBGNpOfQ/I9hQYpg9IkGyXXficpRk
- 3wSA==
-X-Gm-Message-State: APjAAAXmlDc46fmg62kMTY85UfVfQbqPFWvJxJfoOIqyuVZmHWrVzyjX
- 7nW9d9PEMZCuhgvvC7uH7t/Giw==
-X-Google-Smtp-Source: APXvYqx+kf+uXXJFgZFdL7BFfgJHJ4cdxWJLT++yzSk86FAEv+w5dHZjSbLALwRDOM3e7ZujBxabJQ==
-X-Received: by 2002:a17:90a:8d13:: with SMTP id
- c19mr30200034pjo.136.1571679047734; 
- Mon, 21 Oct 2019 10:30:47 -0700 (PDT)
-Received: from [192.168.1.11] (97-113-7-119.tukw.qwest.net. [97.113.7.119])
- by smtp.gmail.com with ESMTPSA id h6sm21836474pfg.123.2019.10.21.10.30.46
- (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Mon, 21 Oct 2019 10:30:47 -0700 (PDT)
-Subject: Re: [PATCH 16/21] hw/lm32: Let the machine be the owner of the system
- memory
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ bh=7lse3x6VVCkZ89VC6I/ZT2DFeIUQ17kfqYdXAgVb6M4=;
+ b=caKh3YWimCdc8WZqREnF5TnsMQveDWPhMXdWLJIgU4MG/37+gRWv9b4IPG6LR5PoJX
+ 5Wi/Jg60nBrdnrmQrRNat5YiDqLvAXzAIBgtD7xDWhOcn/4l0y6RudboZSTSBcMCSw/t
+ EOfbduTjwYRdCikegolF9S+jJBKIvJUcXwSHAahL5DoSteomJbv3je3TDfymxlTAh3E2
+ occduwaiLUKvmQSjCfWanyK3wtQ1QYV1yj9rt+p1TVhxH2P63A7MKZZiUXnuw6quKebu
+ f14GTx4ayHcKP7EeooxMrOxEQg4cn6XGtnvOKT43dKSwH0D+xQT9ZDB4tgNp99ZIag65
+ FQWQ==
+X-Gm-Message-State: APjAAAVHRThK9isv6aGFRPrfKLLrS7M04XGX05DRdbZaxOrAx0VeLmyu
+ g/jMrUE4YkWa2C4WdI00xaZ4DB3AcZL+AczNVR/sLmvZt/WyB18ZUFnSJ5oFSmlRH9AhTEJZyVX
+ EWqkkU87BXlcS+Kk=
+X-Received: by 2002:adf:e446:: with SMTP id t6mr1290758wrm.7.1571679269880;
+ Mon, 21 Oct 2019 10:34:29 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqz7dvWoJp9Q4tKiypvhN4TViEm0eaHK816K9xSl175nZslmMzpz0oTLORXpjWLtWCeaCVs0RQ==
+X-Received: by 2002:adf:e446:: with SMTP id t6mr1290703wrm.7.1571679269629;
+ Mon, 21 Oct 2019 10:34:29 -0700 (PDT)
+Received: from [192.168.1.41] (129.red-83-57-174.dynamicip.rima-tde.net.
+ [83.57.174.129])
+ by smtp.gmail.com with ESMTPSA id p12sm2168306wrt.7.2019.10.21.10.34.26
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Mon, 21 Oct 2019 10:34:28 -0700 (PDT)
+Subject: Re: [PATCH 08/21] hw/alpha/dp264: Create the RAM in the board
+To: Richard Henderson <richard.henderson@linaro.org>,
  Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>,
  qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>,
  Eduardo Habkost <ehabkost@redhat.com>
 References: <20191020225650.3671-1-philmd@redhat.com>
- <20191020225650.3671-17-philmd@redhat.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Openpgp: preference=signencrypt
-Message-ID: <19f107f4-e450-24cf-ba40-2107ddb9bad3@linaro.org>
-Date: Mon, 21 Oct 2019 10:30:44 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+ <20191020225650.3671-9-philmd@redhat.com>
+ <708cda0d-4e05-4f15-5131-288567e91a4d@linaro.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <d46d1607-eec1-814d-1a02-2100429e198f@redhat.com>
+Date: Mon, 21 Oct 2019 19:34:25 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.1
 MIME-Version: 1.0
-In-Reply-To: <20191020225650.3671-17-philmd@redhat.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <708cda0d-4e05-4f15-5131-288567e91a4d@linaro.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::544
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -131,15 +125,53 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 10/20/19 3:56 PM, Philippe Mathieu-Daudé wrote:
-> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-> ---
->  hw/lm32/lm32_boards.c | 4 ++--
->  hw/lm32/milkymist.c   | 2 +-
->  2 files changed, 3 insertions(+), 3 deletions(-)
+On 10/21/19 7:27 PM, Richard Henderson wrote:
+> On 10/20/19 3:56 PM, Philippe Mathieu-Daud=C3=A9 wrote:
+>> @@ -73,8 +74,16 @@ static void clipper_init(MachineState *machine)
+>>       cpus[0]->env.trap_arg1 =3D 0;
+>>       cpus[0]->env.trap_arg2 =3D smp_cpus;
+>>  =20
+>> +    /*
+>> +     * Main memory region, 0x00.0000.0000.  Real hardware supports 32=
+GB,
+>> +     * but the address space hole reserved at this point is 8TB.
+>> +     */
+>> +    memory_region_allocate_system_memory(&ram_region, NULL, "ram",
+>> +                                         ram_size);
+>> +    memory_region_add_subregion(get_system_memory(), 0, &ram_region);
+>=20
+> The thing that I don't like about this is that ...
+>=20
+>> @@ -849,12 +848,6 @@ PCIBus *typhoon_init(ram_addr_t ram_size, ISABus =
+**isa_bus,
+>>  =20
+>>       *p_rtc_irq =3D qemu_allocate_irq(typhoon_set_timer_irq, s, 0);
+>>  =20
+>> -    /* Main memory region, 0x00.0000.0000.  Real hardware supports 32=
+GB,
+>> -       but the address space hole reserved at this point is 8TB.  */
+>> -    memory_region_allocate_system_memory(&s->ram_region, NULL, "ram",
+>> -                                         ram_size);
+>> -    memory_region_add_subregion(addr_space, 0, &s->ram_region);
+>> -
+>>       /* TIGbus, 0x801.0000.0000, 1GB.  */
+>>       /* ??? The TIGbus is used for delivering interrupts, and access =
+to
+>>          the flash ROM.  I'm not sure that we need to implement it at =
+all.  */
+>=20
+> ... previously, it was clear that Typhoon owns the entire address space=
+ layout.
+>   With this moved to dp264.c, the "address space hole" comment is out o=
+f context
+> and makes no sense.
+>=20
+> Would it be too weird to pass in a MemoryRegion* to typhoon_init and le=
+ave the
+> memory_region_add_subregion() call where it is?
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-
-
-r~
+Yes, this will also better match the hardware.
+I have a WiP series that first QOM'ify the CY82C693UB southbridge then=20
+the Typhoon northbridge and pass the DRAM MemoryRegion* as a link, so in=20
+the non-QOM form your suggestion is the same. I'll do your change.
 
