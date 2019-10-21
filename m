@@ -2,68 +2,96 @@ Return-Path: <SRS0=8ZcK=YO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9E189CA9EAF
-	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 13:11:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 51E36CA9EB7
+	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 13:14:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7472E2089C
-	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 13:11:33 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7472E2089C
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id 254D02089C
+	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 13:14:19 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 254D02089C
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40828 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40870 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iMXTA-00046A-93
-	for qemu-devel@archiver.kernel.org; Mon, 21 Oct 2019 09:11:32 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34180)
+	id 1iMXVp-0006en-Vz
+	for qemu-devel@archiver.kernel.org; Mon, 21 Oct 2019 09:14:18 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34465)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <no-reply@patchew.org>) id 1iMXSH-0003cw-S3
- for qemu-devel@nongnu.org; Mon, 21 Oct 2019 09:10:39 -0400
+ (envelope-from <clg@kaod.org>) id 1iMXUA-0005Nf-Nz
+ for qemu-devel@nongnu.org; Mon, 21 Oct 2019 09:12:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <no-reply@patchew.org>) id 1iMXSG-0002zL-M5
- for qemu-devel@nongnu.org; Mon, 21 Oct 2019 09:10:37 -0400
-Resent-Date: Mon, 21 Oct 2019 09:10:37 -0400
-Resent-Message-Id: <E1iMXSG-0002zL-M5@eggs.gnu.org>
-Received: from sender4-of-o56.zoho.com ([136.143.188.56]:21676)
+ (envelope-from <clg@kaod.org>) id 1iMXU8-0003oS-GO
+ for qemu-devel@nongnu.org; Mon, 21 Oct 2019 09:12:34 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:50228
+ helo=mx0a-001b2d01.pphosted.com)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <no-reply@patchew.org>)
- id 1iMXSD-0002xZ-Id; Mon, 21 Oct 2019 09:10:33 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1571663399; cv=none; 
- d=zohomail.com; s=zohoarc; 
- b=J1eCu50UXxj64RaIVuPDXLAZbbqZ0FhNtdQ+anxkhLhDcMMhDzR04FYsoydwgLFhCQtgILKWfmlnlILwccT4enrrSRdBMrPrTFHew/JmMSzDSlBmISIOSEofFr9nMG6xY7fopJ9hoY+1iQFqp8geeCdq6j0QsAT5Z3rf4NLsPMI=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
- s=zohoarc; t=1571663399;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
- bh=D4DzRp+bvoddYhF+UhE4ymOGIRSvuLlB6SsPMmsKmC0=; 
- b=BH1nqYerGYaIa5EgY5OObTPWMAy2JDC/RadsN8cSTKVFqqDh/cz2itLOkYgaekfjVAhbrnEsuEejYYvz/0T8aTSnyYj/PQnB/c/oD0PAMTMVK/aR4TLB5kRpfZd1ECQY/gE0xI99GGr3xNQ0FWdiRj3NJJhxKvuStdEbP55iH2o=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
- dkim=pass  header.i=patchew.org;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1571663397864350.48431652757677;
- Mon, 21 Oct 2019 06:09:57 -0700 (PDT)
-In-Reply-To: <20191021105350.1710-1-thuth@redhat.com>
-Subject: Re: [PATCH v2 0/6] Enable more iotests during "make check-block"
-Message-ID: <157166339664.24734.15529210930104297381@37313f22b938>
+ (Exim 4.71) (envelope-from <clg@kaod.org>) id 1iMXU7-0003nN-GE
+ for qemu-devel@nongnu.org; Mon, 21 Oct 2019 09:12:32 -0400
+Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
+ x9LD8YsQ087721
+ for <qemu-devel@nongnu.org>; Mon, 21 Oct 2019 09:12:29 -0400
+Received: from e06smtp07.uk.ibm.com (e06smtp07.uk.ibm.com [195.75.94.103])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 2vsc733a98-1
+ (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+ for <qemu-devel@nongnu.org>; Mon, 21 Oct 2019 09:12:28 -0400
+Received: from localhost
+ by e06smtp07.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+ Violators will be prosecuted
+ for <qemu-devel@nongnu.org> from <clg@kaod.org>;
+ Mon, 21 Oct 2019 14:12:27 +0100
+Received: from b06cxnps4075.portsmouth.uk.ibm.com (9.149.109.197)
+ by e06smtp07.uk.ibm.com (192.168.101.137) with IBM ESMTP SMTP Gateway:
+ Authorized Use Only! Violators will be prosecuted; 
+ (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+ Mon, 21 Oct 2019 14:12:24 +0100
+Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com
+ [9.149.105.232])
+ by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ x9LDCNmt59637962
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Mon, 21 Oct 2019 13:12:23 GMT
+Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 044515205A;
+ Mon, 21 Oct 2019 13:12:23 +0000 (GMT)
+Received: from smtp.tls.ibm.com (unknown [9.101.4.1])
+ by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id E564152054;
+ Mon, 21 Oct 2019 13:12:22 +0000 (GMT)
+Received: from yukon.kaod.org.ibmuc.com (sig-9-145-86-58.uk.ibm.com
+ [9.145.86.58])
+ by smtp.tls.ibm.com (Postfix) with ESMTP id 412AA22016B;
+ Mon, 21 Oct 2019 15:12:22 +0200 (CEST)
+From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
+To: David Gibson <david@gibson.dropbear.id.au>
+Subject: [PATCH 0/5] ppc/pnv: Add PNOR support
+Date: Mon, 21 Oct 2019 15:12:10 +0200
+X-Mailer: git-send-email 2.21.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: thuth@redhat.com
-Date: Mon, 21 Oct 2019 06:09:57 -0700 (PDT)
-X-ZohoMailClient: External
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 136.143.188.56
+Content-Type: text/plain; charset=UTF-8
+X-TM-AS-GCONF: 00
+x-cbid: 19102113-0028-0000-0000-000003ACEB4C
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19102113-0029-0000-0000-0000246F1276
+Message-Id: <20191021131215.3693-1-clg@kaod.org>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
+ definitions=2019-10-21_04:, , signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ priorityscore=1501
+ malwarescore=0 suspectscore=2 phishscore=0 bulkscore=0 spamscore=0
+ clxscore=1034 lowpriorityscore=0 mlxscore=0 impostorscore=0
+ mlxlogscore=969 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.0.1-1908290000 definitions=main-1910210128
+Content-Transfer-Encoding: quoted-printable
+X-MIME-Autoconverted: from 8bit to quoted-printable by
+ mx0a-001b2d01.pphosted.com id x9LD8YsQ087721
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
+X-Received-From: 148.163.158.5
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -75,45 +103,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, jsnow@redhat.com, qemu-devel@nongnu.org,
- qemu-block@nongnu.org, mreitz@redhat.com
+Cc: qemu-devel@nongnu.org, Greg Kurz <groug@kaod.org>, qemu-ppc@nongnu.org,
+ Joel Stanley <joel@jms.id.au>, "Marty E . Plummer" <hanetzer@startmail.com>,
+ =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MTAyMTEwNTM1MC4xNzEw
-LTEtdGh1dGhAcmVkaGF0LmNvbS8KCgoKSGksCgpUaGlzIHNlcmllcyBmYWlsZWQgdGhlIGRvY2tl
-ci1xdWlja0BjZW50b3M3IGJ1aWxkIHRlc3QuIFBsZWFzZSBmaW5kIHRoZSB0ZXN0aW5nIGNvbW1h
-bmRzIGFuZAp0aGVpciBvdXRwdXQgYmVsb3cuIElmIHlvdSBoYXZlIERvY2tlciBpbnN0YWxsZWQs
-IHlvdSBjYW4gcHJvYmFibHkgcmVwcm9kdWNlIGl0CmxvY2FsbHkuCgo9PT0gVEVTVCBTQ1JJUFQg
-QkVHSU4gPT09CiMhL2Jpbi9iYXNoCm1ha2UgZG9ja2VyLWltYWdlLWNlbnRvczcgVj0xIE5FVFdP
-Uks9MQp0aW1lIG1ha2UgZG9ja2VyLXRlc3QtcXVpY2tAY2VudG9zNyBTSE9XX0VOVj0xIEo9MTQg
-TkVUV09SSz0xCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgogIFRFU1QgICAgaW90ZXN0LXFjb3cy
-OiAyNjcKRmFpbHVyZXM6IDE4MwpGYWlsZWQgMSBvZiAxMTYgaW90ZXN0cwptYWtlOiAqKiogW2No
-ZWNrLXRlc3RzL2NoZWNrLWJsb2NrLnNoXSBFcnJvciAxClRyYWNlYmFjayAobW9zdCByZWNlbnQg
-Y2FsbCBsYXN0KToKICBGaWxlICIuL3Rlc3RzL2RvY2tlci9kb2NrZXIucHkiLCBsaW5lIDY2Miwg
-aW4gPG1vZHVsZT4KICAgIHN5cy5leGl0KG1haW4oKSkKLS0tCiAgICByYWlzZSBDYWxsZWRQcm9j
-ZXNzRXJyb3IocmV0Y29kZSwgY21kKQpzdWJwcm9jZXNzLkNhbGxlZFByb2Nlc3NFcnJvcjogQ29t
-bWFuZCAnWydzdWRvJywgJy1uJywgJ2RvY2tlcicsICdydW4nLCAnLS1sYWJlbCcsICdjb20ucWVt
-dS5pbnN0YW5jZS51dWlkPWY2NGEzY2YyYjllMDRkZTNiM2VhZjFlZGEzMWQ1YjMyJywgJy11Jywg
-JzEwMDMnLCAnLS1zZWN1cml0eS1vcHQnLCAnc2VjY29tcD11bmNvbmZpbmVkJywgJy0tcm0nLCAn
-LWUnLCAnVEFSR0VUX0xJU1Q9JywgJy1lJywgJ0VYVFJBX0NPTkZJR1VSRV9PUFRTPScsICctZScs
-ICdWPScsICctZScsICdKPTE0JywgJy1lJywgJ0RFQlVHPScsICctZScsICdTSE9XX0VOVj0xJywg
-Jy1lJywgJ0NDQUNIRV9ESVI9L3Zhci90bXAvY2NhY2hlJywgJy12JywgJy9ob21lL3BhdGNoZXcy
-Ly5jYWNoZS9xZW11LWRvY2tlci1jY2FjaGU6L3Zhci90bXAvY2NhY2hlOnonLCAnLXYnLCAnL3Zh
-ci90bXAvcGF0Y2hldy10ZXN0ZXItdG1wLWxoMl84Ym0zL3NyYy9kb2NrZXItc3JjLjIwMTktMTAt
-MjEtMDguNTQuNTIuMTg1MDE6L3Zhci90bXAvcWVtdTp6LHJvJywgJ3FlbXU6Y2VudG9zNycsICcv
-dmFyL3RtcC9xZW11L3J1bicsICd0ZXN0LXF1aWNrJ10nIHJldHVybmVkIG5vbi16ZXJvIGV4aXQg
-c3RhdHVzIDIuCmZpbHRlcj0tLWZpbHRlcj1sYWJlbD1jb20ucWVtdS5pbnN0YW5jZS51dWlkPWY2
-NGEzY2YyYjllMDRkZTNiM2VhZjFlZGEzMWQ1YjMyCm1ha2VbMV06ICoqKiBbZG9ja2VyLXJ1bl0g
-RXJyb3IgMQptYWtlWzFdOiBMZWF2aW5nIGRpcmVjdG9yeSBgL3Zhci90bXAvcGF0Y2hldy10ZXN0
-ZXItdG1wLWxoMl84Ym0zL3NyYycKbWFrZTogKioqIFtkb2NrZXItcnVuLXRlc3QtcXVpY2tAY2Vu
-dG9zN10gRXJyb3IgMgoKcmVhbCAgICAxNW00LjA4MXMKdXNlciAgICAwbTguNzUycwoKClRoZSBm
-dWxsIGxvZyBpcyBhdmFpbGFibGUgYXQKaHR0cDovL3BhdGNoZXcub3JnL2xvZ3MvMjAxOTEwMjEx
-MDUzNTAuMTcxMC0xLXRodXRoQHJlZGhhdC5jb20vdGVzdGluZy5kb2NrZXItcXVpY2tAY2VudG9z
-Ny8/dHlwZT1tZXNzYWdlLgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0
-Y2hldyBbaHR0cHM6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRv
-IHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
+Hello,
+
+On a POWERPC PowerNV system, the host firmware is stored in a PNOR
+flash chip which contents is mapped on the LPC bus. This model adds a
+simple dummy device to map the contents of a block device in the host
+address space and activates HIOMAP support on the QEMU PowerNV machine
+to let the host negotiate with the BMC the access to the mapping.
+
+The command options to activate these models in QEMU:
+
+  -device ipmi-bmc-sim,id=3Dbmc0 -device isa-ipmi-bt,bmc=3Dbmc0,irq=3D10 =
+\
+  -drive file=3D./witherspoon.pnor,format=3Draw,if=3Dmtd
+
+The last two patches add the logic to load in the machine memory the
+PAYLOAD partition (skiboot) from an OpenPOWER firmware file. These
+should be considered as RFCs as the firmware file could have a
+different format. Something to discuss.
+
+
+Thanks,
+
+C.=20
+
+C=C3=A9dric Le Goater (5):
+  ppc/pnv: Add a PNOR model
+  ipmi: Add support to customize OEM functions
+  ppc/pnv: Add HIOMAP commands
+  libxz: Add XZ Embedded library for PPC
+  ppc/pnv: Read the PNOR partition table
+
+ include/hw/ipmi/ipmi.h    |   36 ++
+ include/hw/ppc/ffs.h      |  150 +++++
+ include/hw/ppc/pnv.h      |    4 +
+ include/hw/ppc/pnv_pnor.h |   36 ++
+ libxz/xz.h                |  304 ++++++++++
+ libxz/xz_config.h         |  124 ++++
+ libxz/xz_lzma2.h          |  204 +++++++
+ libxz/xz_private.h        |  156 +++++
+ libxz/xz_stream.h         |   62 ++
+ hw/ipmi/ipmi_bmc_sim.c    |   41 +-
+ hw/ppc/pnv.c              |   48 +-
+ hw/ppc/pnv_bmc.c          |  101 ++++
+ hw/ppc/pnv_lpc.c          |   13 +
+ hw/ppc/pnv_pnor.c         |  291 +++++++++
+ libxz/xz_crc32.c          |   59 ++
+ libxz/xz_dec_lzma2.c      | 1171 +++++++++++++++++++++++++++++++++++++
+ libxz/xz_dec_stream.c     |  847 +++++++++++++++++++++++++++
+ hw/ppc/Makefile.objs      |    4 +-
+ libxz/Makefile.objs       |    1 +
+ target/ppc/Makefile.objs  |    1 +
+ 20 files changed, 3606 insertions(+), 47 deletions(-)
+ create mode 100644 include/hw/ppc/ffs.h
+ create mode 100644 include/hw/ppc/pnv_pnor.h
+ create mode 100644 libxz/xz.h
+ create mode 100644 libxz/xz_config.h
+ create mode 100644 libxz/xz_lzma2.h
+ create mode 100644 libxz/xz_private.h
+ create mode 100644 libxz/xz_stream.h
+ create mode 100644 hw/ppc/pnv_pnor.c
+ create mode 100644 libxz/xz_crc32.c
+ create mode 100644 libxz/xz_dec_lzma2.c
+ create mode 100644 libxz/xz_dec_stream.c
+ create mode 100644 libxz/Makefile.objs
+
+--=20
+2.21.0
 
 
