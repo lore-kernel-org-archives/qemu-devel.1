@@ -2,83 +2,115 @@ Return-Path: <SRS0=8ZcK=YO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4ECB5CA9EB9
-	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 09:23:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D4687CA9EB5
+	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 09:31:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1C3E420684
-	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 09:23:36 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="K0rfojov"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1C3E420684
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id ACBF2206C2
+	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 09:31:36 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ACBF2206C2
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36518 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36586 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iMTuZ-0003NZ-8d
-	for qemu-devel@archiver.kernel.org; Mon, 21 Oct 2019 05:23:35 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34769)
+	id 1iMU2J-000672-O8
+	for qemu-devel@archiver.kernel.org; Mon, 21 Oct 2019 05:31:35 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35720)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1iMTts-0002oD-DZ
- for qemu-devel@nongnu.org; Mon, 21 Oct 2019 05:22:53 -0400
+ (envelope-from <laurent@vivier.eu>) id 1iMU1I-0005Gm-Pt
+ for qemu-devel@nongnu.org; Mon, 21 Oct 2019 05:30:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1iMTtr-0002fD-32
- for qemu-devel@nongnu.org; Mon, 21 Oct 2019 05:22:52 -0400
-Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:35606)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1iMTtq-0002ee-Ry
- for qemu-devel@nongnu.org; Mon, 21 Oct 2019 05:22:51 -0400
-Received: by mail-oi1-x243.google.com with SMTP id x3so10462827oig.2
- for <qemu-devel@nongnu.org>; Mon, 21 Oct 2019 02:22:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=szG+1UapO55MI4I3VrImIiZ0ELN8Poyvt1pm837MU30=;
- b=K0rfojov9wjax38D4q2fCYsnLT9GerreAwYJT/m5qYqXIoJFBimByxZeo1JGX7xb74
- DFOFp8Fn6b+PU7hjJ5K9t8n7NhT1oO49GnGz1x5AnYFJ/RQ3Vjeg5U+INDZrQrmlC/ci
- DABFass3wwAZTHgm/8s07Y+bwb5F3DypSzjBKVbAcYVTq8OX5qd+1OPqie+cHxFx+vLC
- c9P6MlXAB0XGCWNebG6pA07vUVi0XUvyd8qQP6cVqbOEp3LCZqR/TfkyOTdFABpO/UA3
- nD25rP6AUWrSzC3L7o3ImAScrh7HWQ8Ye6ALSMVchdftvF21ouOSHB8E5pjDx0b/33Sk
- vK6g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=szG+1UapO55MI4I3VrImIiZ0ELN8Poyvt1pm837MU30=;
- b=kXFRoEZSlLWrG9RhxH2NS7qt/MFjlrl5/gaIWTqHqObR9XP4gze9vkimI5SeJHB1ym
- Z/s/fQY+vlA78K4pNCnrJZqJbjz5dLIaaR14iCuNms5DSzKdlirxjfb7cAthOZjRyxPw
- d5xhoxYkwjsc0uqGMf85i4d6JPsFKy0V9tXl5WZCi/XMZJsif1KGz0JZebEL6yMNpCzL
- h3SCC3U5raSDjYIlfejAM4E1gHVwFVaavnoY0z64q4cr3wcgvnGBjFYThMdcBbMEQ+UP
- XVtyFONjaMZXCN2oJuwl15aUGbf8arxSrS9PRCxjXgLZibwUE9cxhe4f7cxftg3TE5oX
- SF9A==
-X-Gm-Message-State: APjAAAUyAMY6eugJFpxXm41DYvozjFCxDi4SIOV3Lqklv4liKTNEbQBl
- CpOvNWq2FxsK/nChIqPEd0j+ubYrOzENHGoR0OFAiA==
-X-Google-Smtp-Source: APXvYqzZ9nNe8u/ur3gZOkymEs7QjF8bcz8dgBp8gUSCp0BdtUFXXgAQ4mrn3ygvzrhqg8KpPoV76i86d/ZzhbZk75o=
-X-Received: by 2002:aca:49c2:: with SMTP id
- w185mr18595718oia.163.1571649769769; 
- Mon, 21 Oct 2019 02:22:49 -0700 (PDT)
+ (envelope-from <laurent@vivier.eu>) id 1iMU1H-0005GR-Mv
+ for qemu-devel@nongnu.org; Mon, 21 Oct 2019 05:30:32 -0400
+Received: from mout.kundenserver.de ([212.227.126.130]:37343)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1iMU1H-0005FJ-Dj
+ for qemu-devel@nongnu.org; Mon, 21 Oct 2019 05:30:31 -0400
+Received: from [192.168.100.1] ([78.238.229.36]) by mrelayeu.kundenserver.de
+ (mreue012 [213.165.67.103]) with ESMTPSA (Nemesis) id
+ 1MG90u-1iEjAy2Grs-00Ga5Y; Mon, 21 Oct 2019 11:30:24 +0200
+Subject: Re: [PATCH] linux-user: add strace for dup3
+To: Andreas Schwab <schwab@suse.de>, qemu-devel@nongnu.org
+References: <mvmsgoe17l5.fsf@suse.de>
+From: Laurent Vivier <laurent@vivier.eu>
+Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
+ 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
+Message-ID: <8bb89a03-47b6-b5c9-7c19-42584c6f09c8@vivier.eu>
+Date: Mon, 21 Oct 2019 11:30:22 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.0
 MIME-Version: 1.0
-References: <20191020225650.3671-1-philmd@redhat.com>
- <20191020225650.3671-13-philmd@redhat.com>
-In-Reply-To: <20191020225650.3671-13-philmd@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 21 Oct 2019 10:22:39 +0100
-Message-ID: <CAFEAcA8bhP9X-2AaTus9=GtEAqmnNA9me6hv8U=vXYwjQp_CnA@mail.gmail.com>
-Subject: Re: [PATCH 12/21] hw/arm: Let the machine be the owner of the system
- memory
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::243
+In-Reply-To: <mvmsgoe17l5.fsf@suse.de>
+Content-Type: text/plain; charset=utf-8
+Content-Language: fr
+Content-Transfer-Encoding: 8bit
+X-Provags-ID: V03:K1:yLWq69hbjzuIhGaiZ2xjW/j96IFakesRQz1SbQA9amNqvFQoaq2
+ iW+2QK5tZhfyoHKgVA2Z2IBhc9/vctBoqRdEJnvlutt0hHYs20Vw/7H0O7K+NVcLFk+x7Cz
+ CPr/6oWOxhfiLL7WYH4EcvCP/1a5/eUh6KKdVAO6jbztRyMBoRuhfCvOSLSnOrKy6MAkgvb
+ JE4lC1Q1Rp8ARiH/z+iNA==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:cPuFAsJFY3A=:F1Fqtk84hLjWDzwnUn4WLo
+ AZ0ZwVZ1tWSpR1kOfPtNFSAxrh6iHLQh6HoyKgtlCDbNdtqtdKxac1mNBLrQ+6nEinyKSvnEU
+ c4Vziqjo7pC5CvyZOZz24pyIwoi8t663Ua4FFp6Fpd6SOCdA5d4p3V+CzooOPC39nN679+JVg
+ sN/7E3g7S8fTbt1TUYh+kihNUv3LKKIO+wEekILAFvQWsRmMTdNLP7Rt0ZVvs7+G3OPSdu4Dm
+ dQMjcPaEnOdPB2a3ILS+LvTriYWfmwBimYjbhbZAdXAoHRInnUhMjl/c8ptkaDu5VGp6SPLwD
+ VSb0dnlKC/nGJ0wkmsgylr3HTiQVg8xlZEFVB2qFCZk483kGEDGEp8ighnioDVZF0+8wTo0en
+ KaGwWxYMPW9atFCtNFxBdyPyXeckVUeqaTy9yV4+tLXF+dn4cSDrKm8lbwk7CBs76E75CTWPK
+ oxH7UTknrg3EMbjkbNYKeiz8Pck5oNCNzXY8sgzNpac1YZjlhBfPm7gi8izvP1CJJmeKXeWQv
+ epfaciEDKAg2YKI6+80Kra4cHPAGzxg8OwP/hRWgmzWyaOAZLI7CgHhsIQExSNVwsTNBvOL6N
+ zep5ZPAftBECi/3GP/JyFNg9BBMWKpJ2ArOjUU5JaY9xYeO1fCFLMYtVCiVN1g2n5h8K9a6dA
+ IDfxtHPvW2gRdr2rRRxHaK5UFtUdAbk0cWZhnytqw6br0APyDfIWJRgt1dzfhCrbSJWgCKcDi
+ H4vULbB6DmYw+ajLCBsXlJNjWTpnyU2Uqibu4nFWPO+VPCO0HGyibRwUBHqVGNZ80AzeVUbM9
+ GCLLYs5L2xZPBJEPsEifu6FSNg+Ow+wM7grwqZE9JFfu/hRTOlopqeVmwDnncVxh6rvjrCPX0
+ j5R83gRRNoZJnYuIjb06CVQHDcufAdqXS5oVC6Q4Y=
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 212.227.126.130
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,51 +122,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paul Burton <pburton@wavecomp.com>, "Michael S. Tsirkin" <mst@redhat.com>,
- Leif Lindholm <leif.lindholm@linaro.org>,
- Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
- QEMU Developers <qemu-devel@nongnu.org>,
- KONRAD Frederic <frederic.konrad@adacore.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
- "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Rob Herring <robh@kernel.org>,
- Andrey Smirnov <andrew.smirnov@gmail.com>, Helge Deller <deller@gmx.de>,
- Markus Armbruster <armbru@redhat.com>,
- =?UTF-8?Q?Herv=C3=A9_Poussineau?= <hpoussin@reactos.org>,
- Joel Stanley <joel@jms.id.au>, Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
- Richard Henderson <rth@twiddle.net>, Artyom Tarasenko <atar4qemu@gmail.com>,
- Antony Pavlov <antonynpavlov@gmail.com>, Eduardo Habkost <ehabkost@redhat.com>,
- Alistair Francis <alistair@alistair23.me>,
- Fabien Chouteau <chouteau@adacore.com>,
- Beniamino Galvani <b.galvani@gmail.com>, qemu-arm <qemu-arm@nongnu.org>,
- Jan Kiszka <jan.kiszka@web.de>,
- =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>,
- Igor Mammedov <imammedo@redhat.com>,
- David Gibson <david@gibson.dropbear.id.au>,
- Radoslaw Biernacki <radoslaw.biernacki@linaro.org>,
- Thomas Huth <huth@tuxfamily.org>,
- Andrew Baumann <Andrew.Baumann@microsoft.com>,
- Jean-Christophe Dubois <jcd@tribudubois.net>, Andrew Jeffery <andrew@aj.id.au>,
- Michael Walle <michael@walle.cc>, qemu-ppc <qemu-ppc@nongnu.org>,
- Aleksandar Markovic <amarkovic@wavecomp.com>,
- Peter Chubb <peter.chubb@nicta.com.au>, Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, 21 Oct 2019 at 00:01, Philippe Mathieu-Daud=C3=A9 <philmd@redhat.co=
-m> wrote:
->
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Le 30/09/2019 à 11:01, Andreas Schwab a écrit :
+> Signed-off-by: Andreas Schwab <schwab@suse.de>
 > ---
+>  linux-user/strace.list | 3 +++
+>  1 file changed, 3 insertions(+)
+> 
+> diff --git a/linux-user/strace.list b/linux-user/strace.list
+> index 63a946642d..863283418e 100644
+> --- a/linux-user/strace.list
+> +++ b/linux-user/strace.list
+> @@ -121,6 +121,9 @@
+>  #ifdef TARGET_NR_dup2
+>  { TARGET_NR_dup2, "dup2" , NULL, NULL, NULL },
+>  #endif
+> +#ifdef TARGET_NR_dup3
+> +{ TARGET_NR_dup3, "dup3" , NULL, NULL, NULL },
+> +#endif
+>  #ifdef TARGET_NR_epoll_create
+>  { TARGET_NR_epoll_create, "epoll_create" , NULL, NULL, NULL },
+>  #endif
+> 
 
->  hw/arm/virt.c             | 2 +-
+Applied to my linux-user branch.
 
-I think from a quick code scan that this is ok, but did
-you test that migration compat from old to new still works?
-I vaguely recall that there are some cases when adding an
-owner to a memory region changes the name string used for
-identifying the ramblock in migration.
-
-thanks
--- PMM
+Thanks,
+Laurent
 
