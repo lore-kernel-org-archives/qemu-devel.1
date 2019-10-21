@@ -2,84 +2,118 @@ Return-Path: <SRS0=8ZcK=YO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C485CA9EB5
-	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 09:56:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CBAEECA9EB9
+	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 09:57:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 47A292070B
-	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 09:56:21 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RptpwOJb"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 47A292070B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id A4B142070B
+	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 09:57:35 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A4B142070B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36876 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36888 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iMUQG-0001vk-GV
-	for qemu-devel@archiver.kernel.org; Mon, 21 Oct 2019 05:56:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38687)
+	id 1iMURS-00039c-P5
+	for qemu-devel@archiver.kernel.org; Mon, 21 Oct 2019 05:57:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38831)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <david@redhat.com>) id 1iMUOw-00019p-3G
- for qemu-devel@nongnu.org; Mon, 21 Oct 2019 05:54:59 -0400
+ (envelope-from <laurent@vivier.eu>) id 1iMUQl-0002PC-St
+ for qemu-devel@nongnu.org; Mon, 21 Oct 2019 05:56:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <david@redhat.com>) id 1iMUOu-000618-W8
- for qemu-devel@nongnu.org; Mon, 21 Oct 2019 05:54:58 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:46712
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <david@redhat.com>) id 1iMUOu-00060m-Rr
- for qemu-devel@nongnu.org; Mon, 21 Oct 2019 05:54:56 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1571651696;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=GFmur51y2TEPYGEBGid+K4QwtArQy0CFPL/V1kxr6io=;
- b=RptpwOJbGgHcfEMFeHIc9hrZUIhWqU9EUFwquV1pRH5FyoWRgawZBweOR8ie0XSk+BpnCZ
- pIyEWY6Q5A/1CoxUGrYS3xFNOwz/HohIyTSDIkhozjitlECsp0ixDhkkBWzhHb7i/zkaO+
- 4WflROA6XCCuWJpJtguMrEx6J2U5LsI=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-329-JuonsR8tMiyKNKxgOJHdzA-1; Mon, 21 Oct 2019 05:54:50 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7AF59107AD31;
- Mon, 21 Oct 2019 09:54:49 +0000 (UTC)
-Received: from [10.36.116.198] (ovpn-116-198.ams2.redhat.com [10.36.116.198])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 80C2260606;
- Mon, 21 Oct 2019 09:54:47 +0000 (UTC)
-Subject: Re: [PATCH v1] s390x/kvm: Set default cpu model for all machine
- classes
-To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
-References: <20191021093456.6168-1-david@redhat.com>
- <96381cf8-a6cf-9583-7eb2-92ad9d333c1b@redhat.com>
-From: David Hildenbrand <david@redhat.com>
-Organization: Red Hat GmbH
-Message-ID: <e8ef32ee-de10-0015-6a45-de3d5bba4ff8@redhat.com>
-Date: Mon, 21 Oct 2019 11:54:46 +0200
+ (envelope-from <laurent@vivier.eu>) id 1iMUQk-0006vd-Pc
+ for qemu-devel@nongnu.org; Mon, 21 Oct 2019 05:56:51 -0400
+Received: from mout.kundenserver.de ([212.227.126.187]:42113)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1iMUQk-0006v4-G0
+ for qemu-devel@nongnu.org; Mon, 21 Oct 2019 05:56:50 -0400
+Received: from [192.168.100.1] ([78.238.229.36]) by mrelayeu.kundenserver.de
+ (mreue011 [213.165.67.103]) with ESMTPSA (Nemesis) id
+ 1Mz9lL-1i9W4o1T1f-00wGQy; Mon, 21 Oct 2019 11:56:33 +0200
+Subject: Re: [PATCH v7 8/9] linux-user/strace: Let print_sockaddr() have a
+ 'last' argument
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
+ qemu-devel@nongnu.org
+References: <20190915213924.22223-1-f4bug@amsat.org>
+ <20190915213924.22223-9-f4bug@amsat.org>
+From: Laurent Vivier <laurent@vivier.eu>
+Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
+ 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
+Message-ID: <1f0f7a14-e80a-07b8-92d1-21eb026f208b@vivier.eu>
+Date: Mon, 21 Oct 2019 11:56:32 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.1
+ Thunderbird/68.1.0
 MIME-Version: 1.0
-In-Reply-To: <96381cf8-a6cf-9583-7eb2-92ad9d333c1b@redhat.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-MC-Unique: JuonsR8tMiyKNKxgOJHdzA-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20190915213924.22223-9-f4bug@amsat.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: fr
+Content-Transfer-Encoding: 8bit
+X-Provags-ID: V03:K1:bQngamyCqTHhvlhiKTeVJvDovr1JB0eOEFM8WvpcAME7a1CydU9
+ UfbUPxpj8qpfEfNlwV3/Y4yrdG+D2hFNS5diZDtqmkhgEsnAVLRTy3UN/4dnMXAiC9Bk4JS
+ FZU4/KteTkLCQ7NC2my45RuwSW8PeYW1qXSLTlMC6q/yXA1YMq4L219Y396niA8nBzf+8I1
+ 1TSdTAS1v1exdzxKcG6uQ==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:02qhVMXDxds=:9E7MFNBwnqETIokG17HyHH
+ 0eINs1DgCh0Elh0LNOr33Pp+do2A2TH4l0vyNO+O8o282MNv0gYQNBLxPzzht7vEqNl6K1pjc
+ unYu/KHwNr80vK4IrGhAkPLRrcgNXXRyM4XURvT+EIWJipjcEpwzkQEuXlUfx9WTr9rzscuX5
+ OobxZHAf4iWhtW8oRi1FUeF3bzhU4EFfVJAWMEUJUIeb9/poVxk79q2YblZEoVdXk0H1BVklW
+ 7RI8/ewuposzAmXsi1RbF6J6P3UlxvSaHee1D6PfWAJupJsbaluBMNvuoEHzv5A5AbbRZO2U6
+ h4sJ7NKxEt8pS2QCZUzpmBekPohYENr1rv634jKZkL5VrOhSVUqyCF1ys2u/kc8oV3isJCuyh
+ arlTy2GikloFLpsbefcjA7qzuqRuxlecKOCnLxzhZsvNGMX7aSc1m7Uq9J+/EyhNTh55gwn9r
+ b6nX45m3szejH8MBGLrWHR71Ry63Fz8ZsNuKGZYZy5hm7Z1U/kppMuYDwoOu3jnR9jBaq3u6g
+ WQQAizaqLCeGgiklfG3hr4DBdGFgfQ9nWRpBMK7nLdF9vW6Rk4mnUtxjG/dE8S9EHtAHe5Ow7
+ LmL7D47cFwXsaOzpoloZ87se1BE1lTPpgqCFaPLALLUZzmn7KNtHalCkTEUYp3+RTE8Iom4Bo
+ aZTYmfamiwqFcitr9sAyMUe8rhVDkE73iuKns6g7s4hatUIKJdw7dujOU2gc0D5rKS43AJErp
+ Fkyi54hk3gU4jqiHRxSpL0AjRpJAtIdUDv2KeYxWvcndJsQcW8VPI25M1CKjOFqWiKZzuUiQQ
+ LC7lm1kPbtCrN5U8AUcjHmUvUR/oXvmZ4Fn+kwsn8ohmZn8tIirBVFZzpo1XNeWPnOAe1JDkU
+ K85Xy3Cb8WjBCOqzeTg3TQwTfKn6PEy24259VhdM8=
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.120
+X-Received-From: 212.227.126.187
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,115 +125,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Janosch Frank <frankja@linux.ibm.com>, Cornelia Huck <cohuck@redhat.com>,
- Richard Henderson <richard.henderson@linaro.org>,
- Halil Pasic <pasic@linux.ibm.com>,
- Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org,
- Igor Mammedov <imammedo@redhat.com>, Jiri Denemark <jdenemar@redhat.com>
+Cc: Riku Voipio <riku.voipio@iki.fi>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 21.10.19 11:52, Thomas Huth wrote:
-> On 21/10/2019 11.34, David Hildenbrand wrote:
->> We have to set the default model of all machine classes, not just for
->> the active one. Otherwise, "query-machines" will indicate the wrong
->> CPU model ("qemu-s390x-cpu" instead of "host-s390x-cpu") as
->> "default-cpu-type".
->>
->> Doing a
->>      {"execute":"query-machines"}
->> under KVM now results in
->>      {"return": [
->>          {
->>              "hotpluggable-cpus": true,
->>              "name": "s390-ccw-virtio-4.0",
->>              "numa-mem-supported": false,
->>              "default-cpu-type": "host-s390x-cpu",
->>              "cpu-max": 248,
->>              "deprecated": false},
->>          {
->>              "hotpluggable-cpus": true,
->>              "name": "s390-ccw-virtio-2.7",
->>              "numa-mem-supported": false,
->>              "default-cpu-type": "host-s390x-cpu",
->>              "cpu-max": 248,
->>              "deprecated": false
->>          } ...
->>
->> Reported-by: Jiri Denemark <jdenemar@redhat.com>
->> Fixes: b6805e127c6b ("s390x: use generic cpu_model parsing")
->> Cc: Igor Mammedov <imammedo@redhat.com>
->> Signed-off-by: David Hildenbrand <david@redhat.com>
->> ---
->>   target/s390x/kvm.c | 10 ++++++++--
->>   1 file changed, 8 insertions(+), 2 deletions(-)
->>
->> diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
->> index c24c869e77..5966ab0d37 100644
->> --- a/target/s390x/kvm.c
->> +++ b/target/s390x/kvm.c
->> @@ -320,11 +320,17 @@ void kvm_s390_set_max_pagesize(uint64_t pagesize, =
-Error **errp)
->>       cap_hpage_1m =3D 1;
->>   }
->>  =20
->> -int kvm_arch_init(MachineState *ms, KVMState *s)
->> +static void ccw_machine_class_foreach(ObjectClass *klass, void *opaque)
->>   {
->> -    MachineClass *mc =3D MACHINE_GET_CLASS(ms);
->> +    MachineClass *mc =3D MACHINE_CLASS(klass);
->=20
-> I think we rather wanted to avoid using "klass" in new code... maybe use
-> "oc" instead of "klass" ?
+Le 15/09/2019 à 23:39, Philippe Mathieu-Daudé a écrit :
+> If the format is not the syscall last argument, a comma is append.
+> 
+> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+> Reviewed-by: Laurent Vivier <laurent@vivier.eu>
+> ---
+> checkpatch error:
+> ERROR: storage class should be at the beginning of the declaration
+> ---
+>  linux-user/strace.c | 10 +++++-----
+>  1 file changed, 5 insertions(+), 5 deletions(-)
+> 
+> diff --git a/linux-user/strace.c b/linux-user/strace.c
+> index 6e82f6197a..3ccefb9839 100644
+> --- a/linux-user/strace.c
+> +++ b/linux-user/strace.c
+> @@ -67,7 +67,7 @@ UNUSED static void print_timeval(abi_ulong, int);
+>  UNUSED static void print_timezone(abi_ulong, int);
+>  UNUSED static void print_number(abi_long, int);
+>  UNUSED static void print_signal(abi_ulong, int);
+> -UNUSED static void print_sockaddr(abi_ulong addr, abi_long addrlen);
+> +UNUSED static void print_sockaddr(abi_ulong addr, abi_long addrlen, int);
 
-Can do, this was a copy and paste :)
-
->=20
->>       mc->default_cpu_type =3D S390_CPU_TYPE_NAME("host");
->> +}
->> +
->> +int kvm_arch_init(MachineState *ms, KVMState *s)
->> +{
->> +    object_class_foreach(ccw_machine_class_foreach, TYPE_S390_CCW_MACHI=
-NE,
->> +                         false, NULL);
->>  =20
->>       if (!kvm_check_extension(kvm_state, KVM_CAP_DEVICE_CTRL)) {
->>           error_report("KVM is missing capability KVM_CAP_DEVICE_CTRL - =
-"
->>
->=20
-> Weird, if you start an older machine, you still get the "host" CPU
-> without your patch, too:
->=20
-> echo -e "info qom-tree \n quit" | \
->   qemu-system-s390x -display none -monitor stdio -no-shutdown \
->     -accel kvm -M s390-ccw-virtio-3.0 | grep s390x-cpu
->=20
-> Results in:
->=20
->      /device[0] (host-s390x-cpu)
->=20
-> ... so I wonder why that differs from the "query-machines" command?
-
-query-machines probes with the "none" machine all other machines.=20
-Current code only fixes up the active machine.
-
-(that's why you won't notice when starting a machine - you will always=20
-get "host" for the active one)
-
->=20
-> Anyway, your patch sounds fine, so (with "klass" replaced by "oc"):
->=20
-> Reviewed-by: Thomas Huth <thuth@redhat.com>
->=20
-
-
---=20
+You mix argument declaration with a name and without a name, make choice.
 
 Thanks,
+Laurent
 
-David / dhildenb
 
 
