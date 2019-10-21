@@ -6,44 +6,44 @@ X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,NUMERIC_HTTP_ADDR,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 62EB0CA9EB5
-	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 09:37:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 20AE2CA9EB5
+	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 09:39:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 38EE3206C2
-	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 09:37:37 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 38EE3206C2
+	by mail.kernel.org (Postfix) with ESMTPS id E8D6C206C2
+	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 09:39:08 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E8D6C206C2
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36654 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36685 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iMU88-0001jH-Bz
-	for qemu-devel@archiver.kernel.org; Mon, 21 Oct 2019 05:37:36 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36333)
+	id 1iMU9b-00049M-VA
+	for qemu-devel@archiver.kernel.org; Mon, 21 Oct 2019 05:39:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36359)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1iMU6D-0000AM-6P
- for qemu-devel@nongnu.org; Mon, 21 Oct 2019 05:35:38 -0400
+ (envelope-from <bounces@canonical.com>) id 1iMU6H-0000BG-6o
+ for qemu-devel@nongnu.org; Mon, 21 Oct 2019 05:35:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1iMU6B-0006ph-9J
- for qemu-devel@nongnu.org; Mon, 21 Oct 2019 05:35:37 -0400
-Received: from indium.canonical.com ([91.189.90.7]:43712)
+ (envelope-from <bounces@canonical.com>) id 1iMU6F-0006qa-5w
+ for qemu-devel@nongnu.org; Mon, 21 Oct 2019 05:35:41 -0400
+Received: from indium.canonical.com ([91.189.90.7]:43782)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1iMU6B-0006pC-3j
- for qemu-devel@nongnu.org; Mon, 21 Oct 2019 05:35:35 -0400
+ id 1iMU6D-0006pg-5u
+ for qemu-devel@nongnu.org; Mon, 21 Oct 2019 05:35:37 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
  by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1iMU68-0000oB-S9
- for <qemu-devel@nongnu.org>; Mon, 21 Oct 2019 09:35:32 +0000
+ id 1iMU6A-0000rx-I4
+ for <qemu-devel@nongnu.org>; Mon, 21 Oct 2019 09:35:34 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id D0E992E80CB
- for <qemu-devel@nongnu.org>; Mon, 21 Oct 2019 09:35:32 +0000 (UTC)
+ by loganberry.canonical.com (Postfix) with ESMTP id 7285C2E80CF
+ for <qemu-devel@nongnu.org>; Mon, 21 Oct 2019 09:35:34 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Mon, 21 Oct 2019 09:23:58 -0000
+Date: Mon, 21 Oct 2019 09:27:21 -0000
 From: Max Reitz <1848556@bugs.launchpad.net>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
@@ -63,7 +63,7 @@ X-Launchpad-Bug-Commenters: paelzer rodsmith xanclic
 X-Launchpad-Bug-Reporter: Rod Smith (rodsmith)
 X-Launchpad-Bug-Modifier: Max Reitz (xanclic)
 References: <157133449178.19203.719001918774596241.malonedeb@gac.canonical.com>
-Message-Id: <157164983850.25467.7439664287249222468.malone@chaenomeles.canonical.com>
+Message-Id: <157165004114.25130.7538260496480349761.malone@chaenomeles.canonical.com>
 Subject: [Bug 1848556] Re: qemu-img check failing on remote image in Eoan
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
 X-Launchpad-Message-For: qemu-devel-ml
@@ -71,7 +71,7 @@ Precedence: bulk
 X-Generated-By: Launchpad (canonical.com);
  Revision="186023fa645d8be19d403a76064f0643f510db2f";
  Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 757d05538ba1cfc522f69b7db2078da03fafbdfc
+X-Launchpad-Hash: 8bd5759af4a805eca86664eae9cba8fb54862844
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 91.189.90.7
@@ -90,12 +90,12 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Christian,
+Hi Rod,
 
-I don=E2=80=99t see any issue but the fact that the whole series should be
-backported (0487861685294660b23bc146e1ebd5304aa8bbe0 through
-bfb23b480a49114315877aacf700b49453e0f9d9, maybe also c34dc07f9f01cf686,
-but that isn=E2=80=99t strictly necessary).
+You don=E2=80=99t need to add anything, but maybe there=E2=80=99s some libr=
+ary missing.
+--enable-curl should force support and then tell you whether there=E2=80=99s
+something missing.
 
 Max
 
