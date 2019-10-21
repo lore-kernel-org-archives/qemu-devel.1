@@ -2,80 +2,80 @@ Return-Path: <SRS0=8ZcK=YO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 08F4BCA9EAF
-	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 11:57:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 004EBCA9EAF
+	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 11:58:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C5B7820640
-	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 11:57:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id BC4D520640
+	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 11:58:36 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LZRyyZdw"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C5B7820640
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SwEWUgt4"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BC4D520640
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39096 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39116 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iMWJ9-0005v2-0j
-	for qemu-devel@archiver.kernel.org; Mon, 21 Oct 2019 07:57:07 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52727)
+	id 1iMWKZ-00073w-Ut
+	for qemu-devel@archiver.kernel.org; Mon, 21 Oct 2019 07:58:36 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52788)
  by lists.gnu.org with esmtp (Exim 4.90_1)
  (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1iMWBX-0005UK-FV
- for qemu-devel@nongnu.org; Mon, 21 Oct 2019 07:49:19 -0400
+ id 1iMWBb-0005VV-Kv
+ for qemu-devel@nongnu.org; Mon, 21 Oct 2019 07:49:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
  (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1iMWBV-0003AT-H9
- for qemu-devel@nongnu.org; Mon, 21 Oct 2019 07:49:15 -0400
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:37654)
+ id 1iMWBX-0003BD-F9
+ for qemu-devel@nongnu.org; Mon, 21 Oct 2019 07:49:19 -0400
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:34577)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1iMWBR-00038H-Pg
- for qemu-devel@nongnu.org; Mon, 21 Oct 2019 07:49:12 -0400
-Received: by mail-wm1-x343.google.com with SMTP id f22so12459462wmc.2
- for <qemu-devel@nongnu.org>; Mon, 21 Oct 2019 04:49:04 -0700 (PDT)
+ id 1iMWBW-00039m-Hi
+ for qemu-devel@nongnu.org; Mon, 21 Oct 2019 07:49:15 -0400
+Received: by mail-wr1-x441.google.com with SMTP id t16so8471319wrr.1
+ for <qemu-devel@nongnu.org>; Mon, 21 Oct 2019 04:49:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=8NQh2EnS1JgP+wDg616iXQrQceQKStyvquiY+j2RVrE=;
- b=LZRyyZdwseS7+zVS+ewx1DMbss0zeH8x4kMndWUwewVGpkooXJdLhKtYUO+EXxG3o6
- Wx9cbGv52MF20MvlFdCaGDWI/xxByiRokPQsCMw6hhL+5xphf08s1KPN4ZRO/OgZRrGo
- nSVVZrs6o2sXO+l62a36lESrzcIrxrf7N47ifpyPGVpYidkUxmiAAVjqLLNS2XLmJHoz
- IVj4uXI1puPT6yaOx0fPuroMYhrMeUvVnKwBFPUWUobJDkNt3Qux4OMYh1JrvZNPgHVX
- jc3TjjJydswOtjdQjm5WlPjRPxarIzq/HIxoJwf7Lm1DYIRlP3Z3ZFtz8m6M2hUWq45K
- 1L9w==
+ bh=2SbHTSN9heUjHZHZr60mvvzx0DMavYLdULN0Nc21EaA=;
+ b=SwEWUgt4cjSVAgyd/Slb9Q/7XdBThBAZUJfMlFg3HtV+A3anxFf6y3+pWYdeUVNqZy
+ aBrRq1WlgozbG0bNV2GBPedKUMR8PSW5JsZK0UWAmbV2I/0L7di4TrZjbh1gOFNGfCPZ
+ hF1NQpXUgrMPQHFCzkZV0CWAVwAcktOkAwUGK7+FtPB7JKFnJtXcYGK0Z0+9yCYewdnr
+ f5CT+geenw8mbXctqD8qIrwnJhxFTPGqT8lnZiZvtxLD8TsZa6amh2Exsn6ojtIgEunU
+ XHuxc2C74593g3dTdxHJ7jq0hgDOFpr9S0fR8KEPwtsR2G2AXsiAYCOiv2BwqlhYUi17
+ KwoQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=8NQh2EnS1JgP+wDg616iXQrQceQKStyvquiY+j2RVrE=;
- b=DwnZPdm2/2MHsSNB6lHX+tf8Vf6GHd0geiRZA/VoJn7t/z5ImB7QnqZUqruD6Bxgv7
- gVfk/Z4KRudoXu6RnNtO1goOqsnVw0NIfAN8hPpFkilYC2pJwfy1XwDfqCvSaOH9C/nk
- Ln1WSb6fqNf9qdH4tSItVGS0lmMWOMJXsZ7SBF93mJZVRAIYP5tkQQdlqY6vuHcZEBDl
- 65J3gN17YEnqG5uZj0+uq3GNYKloE9u9YWM48kbLNzfMG8tMPMCk+yvMwtJIqfVKrlWQ
- +zH6Si6StvgYxTGd9b6g3sWTkOEHymqk/m3YDBgpM4BIA9allytMdX2kRHJO/W2a2UJG
- Z4QQ==
-X-Gm-Message-State: APjAAAXqYbUxmncVM/g9V1KK3g8aWWBfm0//oCFiJ92FRTJiqEQuC5MA
- N7BYq9HckZruVeDFlVF7NnejQS/3
-X-Google-Smtp-Source: APXvYqx20xKnmyWBhq/jF7o50m+V4hM/+XJ98M+7wgwfjssqrnqwa7RPAwoOaPRyjKVdQySnJr9lLA==
-X-Received: by 2002:a7b:cb0a:: with SMTP id u10mr19518924wmj.48.1571658543471; 
- Mon, 21 Oct 2019 04:49:03 -0700 (PDT)
+ bh=2SbHTSN9heUjHZHZr60mvvzx0DMavYLdULN0Nc21EaA=;
+ b=Xr/MerggoXjA33McDWveVxjCG3kKQ49DzBBdWAnU2PPxVF2ew5R5ky0DAbwGV/ptGE
+ lOLdrQ5kiyhzkpFUx5skym4/RgsOOA3YkIa6X7lQE71ACUb1MS9vw0w0X8kmCSrEUUXc
+ AGnpEIW67ZuSFR+F4RVmnbbFlJuZEUQEq3i0RTJ6UA8m577GVLqFLb0H9qxYsr5gve0i
+ gBSrJy6g9zCA1f7cDs/gWSC9uC7IN2cAZF8UMNxs/71+BjcqhUUVhP/q+pBnsmuUIVwt
+ VdZHskFa7LR9g4UNOqBXcoohHqdkDerwuK4vAGRN7WrcAoTz87T5JeSHadLYymD7F6MQ
+ qp2g==
+X-Gm-Message-State: APjAAAVNfFilxKjCFisZPexrdEo57dWV1E7BTeXG282uEJcQSxCajM71
+ ZfDcja2U+jo3z8Rmm5a9hRTlH7Ai
+X-Google-Smtp-Source: APXvYqxLrWSAVOP3pSpEsoOOzcX6QOi9oISCevAkDQPhs5fesW+Kc0O27HltHPdicW5rJGCfgogDpA==
+X-Received: by 2002:a5d:4b8b:: with SMTP id b11mr5069585wrt.78.1571658550029; 
+ Mon, 21 Oct 2019 04:49:10 -0700 (PDT)
 Received: from localhost.localdomain
  (129.red-83-57-174.dynamicip.rima-tde.net. [83.57.174.129])
- by smtp.gmail.com with ESMTPSA id x5sm17156137wrt.75.2019.10.21.04.49.02
+ by smtp.gmail.com with ESMTPSA id x5sm17156137wrt.75.2019.10.21.04.49.08
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 21 Oct 2019 04:49:02 -0700 (PDT)
+ Mon, 21 Oct 2019 04:49:09 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v8 2/9] linux-user/strace: Add print_timezone()
-Date: Mon, 21 Oct 2019 13:48:50 +0200
-Message-Id: <20191021114857.20538-3-f4bug@amsat.org>
+Subject: [PATCH v8 6/9] linux-user/strace: Add print_sockfd()
+Date: Mon, 21 Oct 2019 13:48:54 +0200
+Message-Id: <20191021114857.20538-7-f4bug@amsat.org>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20191021114857.20538-1-f4bug@amsat.org>
 References: <20191021114857.20538-1-f4bug@amsat.org>
@@ -85,7 +85,7 @@ Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::343
+X-Received-From: 2a00:1450:4864:20::441
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -103,58 +103,99 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Suggested-by: Laurent Vivier <laurent@vivier.eu>
+Extract common print_sockfd() from various socket related syscalls.
+
 Reviewed-by: Laurent Vivier <laurent@vivier.eu>
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
-v7: tz_minuteswest and tz_dsttime are abi_int -> %d/tswap32 (lvivier)
-
-checkpatch error:
- ERROR: storage class should be at the beginning of the declaration
- #9: FILE: linux-user/strace.c:66:
- +UNUSED static void print_timezone(abi_ulong, int);
+v6: use another ifdef TARGET_NR_socketcall
 ---
- linux-user/strace.c | 20 ++++++++++++++++++++
- 1 file changed, 20 insertions(+)
+ linux-user/strace.c | 23 ++++++++++++++++-------
+ 1 file changed, 16 insertions(+), 7 deletions(-)
 
 diff --git a/linux-user/strace.c b/linux-user/strace.c
-index f326c357a2..2cd6687cd9 100644
+index 5fa7748427..0ce2b658a5 100644
 --- a/linux-user/strace.c
 +++ b/linux-user/strace.c
-@@ -63,6 +63,7 @@ UNUSED static void print_string(abi_long, int);
- UNUSED static void print_buf(abi_long addr, abi_long len, int last);
- UNUSED static void print_raw_param(const char *, abi_long, int);
- UNUSED static void print_timeval(abi_ulong, int);
-+UNUSED static void print_timezone(abi_ulong, int);
- UNUSED static void print_number(abi_long, int);
- UNUSED static void print_signal(abi_ulong, int);
- UNUSED static void print_sockaddr(abi_ulong addr, abi_long addrlen);
-@@ -1254,6 +1255,25 @@ print_timeval(abi_ulong tv_addr, int last)
-         gemu_log("NULL%s", get_comma(last));
- }
+@@ -1709,6 +1709,15 @@ print_socket(const struct syscallname *name,
  
-+static void
-+print_timezone(abi_ulong tz_addr, int last)
+ #if defined(TARGET_NR_socketcall)
+ 
++static void print_sockfd(abi_long sockfd, int last)
 +{
-+    if (tz_addr) {
-+        struct target_timezone *tz;
-+
-+        tz = lock_user(VERIFY_READ, tz_addr, sizeof(*tz), 1);
-+        if (!tz) {
-+            print_pointer(tz_addr, last);
-+            return;
-+        }
-+        gemu_log("{%d,%d}%s", tswap32(tz->tz_minuteswest),
-+                 tswap32(tz->tz_dsttime), get_comma(last));
-+        unlock_user(tz, tz_addr, 0);
-+    } else {
-+        gemu_log("NULL%s", get_comma(last));
-+    }
++    print_raw_param(TARGET_ABI_FMT_ld, sockfd, last);
 +}
 +
- #undef UNUSED
++#endif
++
++#if defined(TARGET_NR_socketcall)
++
+ #define get_user_ualx(x, gaddr, idx) \
+         get_user_ual(x, (gaddr) + (idx) * sizeof(abi_long))
  
- #ifdef TARGET_NR_accept
+@@ -1741,7 +1750,7 @@ static void do_print_sockaddr(const char *name, abi_long arg1)
+     get_user_ualx(addrlen, arg1, 2);
+ 
+     gemu_log("%s(", name);
+-    print_raw_param(TARGET_ABI_FMT_ld, sockfd, 0);
++    print_sockfd(sockfd, 0);
+     print_sockaddr(addr, addrlen);
+     gemu_log(")");
+ }
+@@ -1754,7 +1763,7 @@ static void do_print_listen(const char *name, abi_long arg1)
+     get_user_ualx(backlog, arg1, 1);
+ 
+     gemu_log("%s(", name);
+-    print_raw_param(TARGET_ABI_FMT_ld, sockfd, 0);
++    print_sockfd(sockfd, 0);
+     print_raw_param(TARGET_ABI_FMT_ld, backlog, 1);
+     gemu_log(")");
+ }
+@@ -1789,7 +1798,7 @@ static void do_print_sendrecv(const char *name, abi_long arg1)
+     get_user_ualx(flags, arg1, 3);
+ 
+     gemu_log("%s(", name);
+-    print_raw_param(TARGET_ABI_FMT_ld, sockfd, 0);
++    print_sockfd(sockfd, 0);
+     print_buf(msg, len, 0);
+     print_raw_param(TARGET_ABI_FMT_ld, len, 0);
+     print_flags(msg_flags, flags, 1);
+@@ -1808,7 +1817,7 @@ static void do_print_msgaddr(const char *name, abi_long arg1)
+     get_user_ualx(addrlen, arg1, 5);
+ 
+     gemu_log("%s(", name);
+-    print_raw_param(TARGET_ABI_FMT_ld, sockfd, 0);
++    print_sockfd(sockfd, 0);
+     print_buf(msg, len, 0);
+     print_raw_param(TARGET_ABI_FMT_ld, len, 0);
+     print_flags(msg_flags, flags, 0);
+@@ -1824,7 +1833,7 @@ static void do_print_shutdown(const char *name, abi_long arg1)
+     get_user_ualx(how, arg1, 1);
+ 
+     gemu_log("shutdown(");
+-    print_raw_param(TARGET_ABI_FMT_ld, sockfd, 0);
++    print_sockfd(sockfd, 0);
+     switch (how) {
+     case SHUT_RD:
+         gemu_log("SHUT_RD");
+@@ -1851,7 +1860,7 @@ static void do_print_msg(const char *name, abi_long arg1)
+     get_user_ualx(flags, arg1, 2);
+ 
+     gemu_log("%s(", name);
+-    print_raw_param(TARGET_ABI_FMT_ld, sockfd, 0);
++    print_sockfd(sockfd, 0);
+     print_pointer(msg, 0);
+     print_flags(msg_flags, flags, 1);
+     gemu_log(")");
+@@ -1868,7 +1877,7 @@ static void do_print_sockopt(const char *name, abi_long arg1)
+     get_user_ualx(optlen, arg1, 4);
+ 
+     gemu_log("%s(", name);
+-    print_raw_param(TARGET_ABI_FMT_ld, sockfd, 0);
++    print_sockfd(sockfd, 0);
+     switch (level) {
+     case SOL_TCP:
+         gemu_log("SOL_TCP,");
 -- 
 2.21.0
 
