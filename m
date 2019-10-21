@@ -2,68 +2,126 @@ Return-Path: <SRS0=8ZcK=YO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 203B9CA9EB5
-	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 07:35:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D9333CA9EB5
+	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 08:01:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DB3BB2086D
-	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 07:35:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A663620684
+	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 08:01:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="Xbk/0FFI"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DB3BB2086D
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=nutanix.com header.i=@nutanix.com header.b="G+cSDemV"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A663620684
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=nutanix.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35538 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35652 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iMSEL-0004YG-2Q
-	for qemu-devel@archiver.kernel.org; Mon, 21 Oct 2019 03:35:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48566)
+	id 1iMSdV-0001LY-Ky
+	for qemu-devel@archiver.kernel.org; Mon, 21 Oct 2019 04:01:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50886)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgibson@ozlabs.org>) id 1iMSCU-0003rc-Ma
- for qemu-devel@nongnu.org; Mon, 21 Oct 2019 03:34:00 -0400
+ (envelope-from <felipe@nutanix.com>) id 1iMSc8-0000tu-Iz
+ for qemu-devel@nongnu.org; Mon, 21 Oct 2019 04:00:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1iMSCS-0002j7-NA
- for qemu-devel@nongnu.org; Mon, 21 Oct 2019 03:33:58 -0400
-Received: from ozlabs.org ([2401:3900:2:1::2]:55445)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgibson@ozlabs.org>) id 1iMSCR-0002gy-Jc
- for qemu-devel@nongnu.org; Mon, 21 Oct 2019 03:33:56 -0400
-Received: by ozlabs.org (Postfix, from userid 1007)
- id 46xT0G48L6z9sP3; Mon, 21 Oct 2019 18:33:50 +1100 (AEDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1571643230;
- bh=C+rKBUAUF0JM5jiIFzaTr3wC3Ip8hsexJY0BFhNGdE4=;
- h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=Xbk/0FFIyiaa4B2OTawUAnvIjBY03M0YPlA6xgNPgVQjUw7UL9sc0bqsCh6UHBHfi
- jrzWiDs4a5qnogzHFJtqA0KK76Z1ZQJi6x6EmMCk6BHeUR9t/iShONfRjssWRjWD2P
- ty9axe1IQ2UOLQ0kYufypQRzViiV6LIxG+nNyQZw=
-Date: Mon, 21 Oct 2019 18:33:44 +1100
-From: David Gibson <david@gibson.dropbear.id.au>
-To: Michael Roth <mdroth@linux.vnet.ibm.com>
-Subject: Re: [PATCH v2 2/2] migration: savevm_state_handler_insert:
- constant-time element insertion
-Message-ID: <20191021073344.GF6439@umbus.fritz.box>
-References: <20191017205953.13122-1-cheloha@linux.vnet.ibm.com>
- <20191017205953.13122-3-cheloha@linux.vnet.ibm.com>
- <20191018081625.GA2990@work-vm>
- <351dca8e-e77c-c450-845b-d78ba621156a@redhat.com>
- <20191018094352.GC2990@work-vm>
- <157141671749.15348.15966144834012002565@sif>
+ (envelope-from <felipe@nutanix.com>) id 1iMSc6-0003y6-8K
+ for qemu-devel@nongnu.org; Mon, 21 Oct 2019 04:00:28 -0400
+Received: from mx0b-002c1b01.pphosted.com ([148.163.155.12]:20190)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <felipe@nutanix.com>) id 1iMSc6-0003x7-1b
+ for qemu-devel@nongnu.org; Mon, 21 Oct 2019 04:00:26 -0400
+Received: from pps.filterd (m0127843.ppops.net [127.0.0.1])
+ by mx0b-002c1b01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ x9L7t1G2029797; Mon, 21 Oct 2019 01:00:20 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nutanix.com;
+ h=from : to : cc :
+ subject : date : message-id : references : in-reply-to : content-type :
+ content-id : content-transfer-encoding : mime-version;
+ s=proofpoint20171006; bh=SWjUzbIcDxuMz4ut8QVHxsnBXc4r/9hhg9vdq2MjmlA=;
+ b=G+cSDemVuf/QMWhrNmcn3Mq631glwmUY2gjus9QR066MpKS+ZTQO9LjS6fayVNnVww2H
+ 5zLxhEF6BBqDNgnYYgLs40dWzxD99Wb8NIpspWbkXAerSAm2C6MLXcrWAbS/0wmnWLLA
+ NzDpoR6pPHQPI8bfvaaNN8soLvrzZIbTBEf6DmF74JLopHVa/ClRY/jagFkVydAedHof
+ siVDPYHU6wEZyTmayPvishtMKWRzzs0X5KTB1u7XdFvBlnY0T8y87LLzPrIwdp3Je9zl
+ DYee2EuuwbwVfX2+rQ6UUMGywsUXok1k8sE0GF9arLQR4otbu23mIG5YgHpZvwMoIlQq Vw== 
+Received: from nam04-bn3-obe.outbound.protection.outlook.com
+ (mail-bn3nam04lp2051.outbound.protection.outlook.com [104.47.46.51])
+ by mx0b-002c1b01.pphosted.com with ESMTP id 2vr0kj2qb3-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Mon, 21 Oct 2019 01:00:20 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=kIauZVk7628+s9bJ8MKt10J/0QNMy6/i4L2d2hOkS/R9E+BacaGZidHfbYuhzdBY9cPkGuihTFVy306sLbDj8hsyAiZRmr0PRWc0LRwKGSuGLaZw/et47kaQpX6BIIHdzXf3SL1EWHO7IKKZY9yH1G85M8LnR8GW3udn7cchL4W4WpadV0ziPOLxvL4pucwDU/viA0bwtbUorZAYoYtwP7lqSpqhfoqpXkHHJlhITmUMJK55fB4pz5aLyTFaFIvMnV9BKFUZOLAyxmAJEpzUq7w0inEfZlciF83ZjPBXIgwO0BHE3xHGJxRYxS4PGhF5miG6iqOXFiHfH/71hndTtQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=SWjUzbIcDxuMz4ut8QVHxsnBXc4r/9hhg9vdq2MjmlA=;
+ b=MOdD31/scw3aP55EvPSOLv4AkC/GcfMPWtHQjS1+9S7E06zGdL5seuPQEGoplYtIRRpYsbwA9lixMrjWpaX1o009nQq9Mc2YPudA12LJSgJ1pm9EPKvy7ZYWNOyMxkKLr3sbQCGCfcRCDNc2+qCyYXEXLu/JoKZRq0g2J11mAZCn2DYpmNcNXIv3boRa1ycJjqdsqVjYaX2AH2GK+V2R4rjeuIebBnEPmhHHxJsGhPA8hFxXzT7ANKfA9NLfL5MQgqkTDHn6Pm/fIt+NqE+v92sDwG8vsj2kz/q6vlQL4oyuP/JLFKyll64QffU2kzUgsqol1Tlj7GPzQqPpEfFTbg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nutanix.com; dmarc=pass action=none header.from=nutanix.com;
+ dkim=pass header.d=nutanix.com; arc=none
+Received: from MWHPR02MB2656.namprd02.prod.outlook.com (10.168.206.142) by
+ MWHPR02MB2654.namprd02.prod.outlook.com (10.168.206.16) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2347.16; Mon, 21 Oct 2019 08:00:18 +0000
+Received: from MWHPR02MB2656.namprd02.prod.outlook.com
+ ([fe80::7ca0:95fd:4b35:3435]) by MWHPR02MB2656.namprd02.prod.outlook.com
+ ([fe80::7ca0:95fd:4b35:3435%6]) with mapi id 15.20.2347.029; Mon, 21 Oct 2019
+ 08:00:18 +0000
+From: Felipe Franciosi <felipe@nutanix.com>
+To: Yongji Xie <elohimes@gmail.com>, Changpeng Liu <changpeng.liu@intel.com>
+Subject: Re: [PATCH] vhost-user-scsi: implement handle_output
+Thread-Topic: [PATCH] vhost-user-scsi: implement handle_output
+Thread-Index: AQHVhQl71p+KRszYckq7k3pyTpDK5adftgOAgACKQACABD4KgIAAQsUA
+Date: Mon, 21 Oct 2019 08:00:17 +0000
+Message-ID: <B53729BD-5A55-4D27-88BE-F8ED2A39D41F@nutanix.com>
+References: <20191017163859.23184-1-felipe@nutanix.com>
+ <CAONzpcbR+OjcrfavTnFXVopG-YsTdnFCT=no0eFei4oanfmj1Q@mail.gmail.com>
+ <17B5A7A6-F790-4D10-8921-06A83DA18077@nutanix.com>
+ <CAONzpcYDDUde0PLVtGYuwGm79RvU-VubXqDs=4F_8yp+-pz-Zg@mail.gmail.com>
+In-Reply-To: <CAONzpcYDDUde0PLVtGYuwGm79RvU-VubXqDs=4F_8yp+-pz-Zg@mail.gmail.com>
+Accept-Language: en-GB, en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [62.254.189.133]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 08774767-a4e7-404e-47bd-08d755fcb69e
+x-ms-traffictypediagnostic: MWHPR02MB2654:
+x-microsoft-antispam-prvs: <MWHPR02MB2654A4702D89710DE70ED63FD7690@MWHPR02MB2654.namprd02.prod.outlook.com>
+x-proofpoint-crosstenant: true
+x-ms-oob-tlc-oobclassifiers: OLM:8882;
+x-forefront-prvs: 0197AFBD92
+x-forefront-antispam-report: SFV:NSPM;
+ SFS:(10019020)(39860400002)(376002)(346002)(136003)(396003)(366004)(199004)(189003)(64756008)(66446008)(33656002)(25786009)(66556008)(91956017)(76116006)(66476007)(66946007)(36756003)(14454004)(71190400001)(71200400001)(5660300002)(54906003)(110136005)(478600001)(316002)(53546011)(102836004)(186003)(6486002)(2906002)(66066001)(26005)(6436002)(6246003)(81156014)(7736002)(305945005)(81166006)(8936002)(86362001)(76176011)(6506007)(6512007)(99286004)(8676002)(229853002)(4326008)(446003)(2616005)(486006)(3846002)(256004)(6116002)(14444005)(11346002)(476003)(64030200001);
+ DIR:OUT; SFP:1102; SCL:1; SRVR:MWHPR02MB2654;
+ H:MWHPR02MB2656.namprd02.prod.outlook.com; FPR:; SPF:None; LANG:en;
+ PTR:InfoNoRecords; A:1; MX:1; 
+received-spf: None (protection.outlook.com: nutanix.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: nfq/Q5BPDCoAHgMcvjtYn9/lQi4B2hdHtnw+KFmc+HymOdmdsASdAaWNOduaG17H7jkuj3ArX5IL2iD3rrOfO5M8UHzQnKq7FpHtSdJnOMp/pZviJTKt8mwJXNiQWdI8gTvwkxjwt2HkC0Ch+XsaR8nZ4lItvJlxbQO2BEiGkFp/JaELBXUWny9pM/YVcdci3wJW153jwPJKCglLp/saoiD0Exus2IiPZ7huztrUSb7Pad68TdlAF9qeevAQe8k1RA6gJnmsbM0e2XTDHQHSSswiVkut3M3JoShDR81VKSRULFWvu0qXdtKJbTjcmDYRY6+Ql7mFc7gZYQb2h41LCqKDAKvNnlLBKWsKDh3kyVn9GwKK1fmdYlkjO0vAa92+yqVjsSkZVJMxBYkKXnY7lamtiUpQjU8yu/eemU5UiGlkJFQc2Hv/VbEToCvJToxN
+x-ms-exchange-transport-forked: True
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <AEB5ABB79BB398489627BBE23BADF8F3@namprd02.prod.outlook.com>
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="SnV5plBeK2Ge1I9g"
-Content-Disposition: inline
-In-Reply-To: <157141671749.15348.15966144834012002565@sif>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2401:3900:2:1::2
+X-OriginatorOrg: nutanix.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 08774767-a4e7-404e-47bd-08d755fcb69e
+X-MS-Exchange-CrossTenant-originalarrivaltime: 21 Oct 2019 08:00:17.7621 (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: bb047546-786f-4de1-bd75-24e5b6f79043
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: k7cg7pOo/VSYKFw89qHEjnxzfzTgODj/ZXJelJxZBW4YflarTIiSCmmpC2p2m9KTKJSvagMd/AOrgmEv5OMm0YGl6EXZCQZNJHcbXfM7k64=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MWHPR02MB2654
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.95,1.0.8
+ definitions=2019-10-21_02:2019-10-18,2019-10-21 signatures=0
+X-Proofpoint-Spam-Reason: safe
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
+X-Received-From: 148.163.155.12
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -75,151 +133,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>, qemu-devel@nongnu.org,
- Scott Cheloha <cheloha@linux.vnet.ibm.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Juan Quintela <quintela@redhat.com>
+Cc: Alex Williamson <alex.williamson@redhat.com>,
+ "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
---SnV5plBeK2Ge1I9g
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
 
-On Fri, Oct 18, 2019 at 11:38:37AM -0500, Michael Roth wrote:
-> Quoting Dr. David Alan Gilbert (2019-10-18 04:43:52)
-> > * Laurent Vivier (lvivier@redhat.com) wrote:
-> > > On 18/10/2019 10:16, Dr. David Alan Gilbert wrote:
-> > > > * Scott Cheloha (cheloha@linux.vnet.ibm.com) wrote:
-> > > >> savevm_state's SaveStateEntry TAILQ is a priority queue.  Priority
-> > > >> sorting is maintained by searching from head to tail for a suitable
-> > > >> insertion spot.  Insertion is thus an O(n) operation.
-> > > >>
-> > > >> If we instead keep track of the head of each priority's subqueue
-> > > >> within that larger queue we can reduce this operation to O(1) time.
-> > > >>
-> > > >> savevm_state_handler_remove() becomes slightly more complex to
-> > > >> accomodate these gains: we need to replace the head of a priority's
-> > > >> subqueue when removing it.
-> > > >>
-> > > >> With O(1) insertion, booting VMs with many SaveStateEntry objects =
-is
-> > > >> more plausible.  For example, a ppc64 VM with maxmem=3D8T has 4000=
-0 such
-> > > >> objects to insert.
-> > > >=20
-> > > > Separate from reviewing this patch, I'd like to understand why you'=
-ve
-> > > > got 40000 objects.  This feels very very wrong and is likely to cau=
-se
-> > > > problems to random other bits of qemu as well.
-> > >=20
-> > > I think the 40000 objects are the "dr-connectors" that are used to pl=
-ug
-> > > peripherals (memory, pci card, cpus, ...).
-> >=20
-> > Yes, Scott confirmed that in the reply to the previous version.
-> > IMHO nothing in qemu is designed to deal with that many devices/objects
-> > - I'm sure that something other than the migration code is going to get=
- upset.
+> On Oct 21, 2019, at 5:01 AM, Yongji Xie <elohimes@gmail.com> wrote:
 >=20
-> The device/object management aspect seems to handle things *mostly* okay,=
- at
-> least ever since QOM child properties started being tracked by a hash tab=
-le
-> instead of a linked list. It's worth noting that that change (b604a854) w=
-as
-> done to better handle IRQ pins for ARM guests with lots of CPUs. I think =
-it is
-> inevitable that certain machine types/configurations will call for large
-> numbers of objects and I think it is fair to improve things to allow for =
-this
-> sort of scalability.
+> On Fri, 18 Oct 2019 at 19:14, Felipe Franciosi <felipe@nutanix.com> wrote=
+:
+>>=20
+>>=20
+>>=20
+>>> On Oct 18, 2019, at 3:59 AM, Yongji Xie <elohimes@gmail.com> wrote:
+>>>=20
+>>> On Fri, 18 Oct 2019 at 01:17, Felipe Franciosi <felipe@nutanix.com> wro=
+te:
+>>>>=20
+>>>> Originally, vhost-user-scsi did not implement a handle_output callback
+>>>> as that didn't seem necessary. Turns out it is.
+>>>>=20
+>>>> Depending on which other devices are presented to a VM, SeaBIOS may
+>>>> decide to map vhost-user-scsi devices on the 64-bit range of the addre=
+ss
+>>>> space. As a result, SeaBIOS will kick VQs via the config space. Those
+>>>> land on Qemu (not the vhost backend) and are missed, causing the VM no=
+t
+>>>> to boot. This fixes the issue by getting Qemu to post the notification=
+.
+>>>>=20
+>>> Should we fix this in vhost-user-blk too?
+>>=20
+>> I'm not sure vhost-user-blk suffers from the same problem. Certainly
 >=20
-> But I agree it shouldn't be abused, and you're right that there are some
-> problem areas that arise. Trying to outline them:
->=20
->  a) introspection commands like 'info qom-tree' become pretty unwieldly,
->     and with large enough numbers of objects might even break things (QMP
->     response size limits maybe?)
->  b) various related lists like reset handlers, vmstate/savevm handlers mi=
-ght
->     grow quite large
->=20
-> I think we could work around a) with maybe flagging certain
-> "internally-only" objects as 'hidden'. Introspection routines could then
-> filter these out, and routines like qom-set/qom-get could return report
-> something similar to EACCESS so they are never used/useful to management
-> tools.
->=20
-> In cases like b) we can optimize things where it makes sense like with
-> Scott's patch here. In most cases these lists need to be walked one way
-> or another, whether it's done internally by the object or through common
-> interfaces provided by QEMU. It's really just the O(n^2) type handling
-> where relying on common interfaces becomes drastically less efficient,
-> but I think we should avoid implementing things in that way anyway, or
-> improve them as needed.
->=20
-> >=20
-> > Is perhaps the structure wrong somewhere - should there be a single DRC
-> > device that knows about all DRCs?
->=20
-> That's an interesting proposition, I think it's worth exploring further,
-> but from a high level:
->=20
->  - each SpaprDrc has migration state, and some sub-classes SpaprDrc (e.g.
->    SpaprDrcPhysical) have additional migration state. These are sent
->    as-needed as separate VMState entries in the migration stream.
->    Moving to a single DRC means we're either sending them as an flat
->    array or a sparse list, which would put just as much load on the
->    migration code (at least, with Scott's changes in place). It would
->    also be difficult to do all this in a way which maintains migration
->    compatibility with older machine types.
->  - other aspects of modeling these as QOM objects, such as look-ups,
->    reset-handling, and memory allocations, wouldn't be dramatically
->    improved upon by handling it all internally within the object
->=20
-> AFAICT the biggest issue with modeling the DRCs as individual objects
-> is actually how we deal with introspection, and we should try to
-> improve. What do you think of the alternative suggestion above of
-> marking certain objects as 'hidden' from various introspection
-> interfaces?
+> Actually I found vhost-user-blk has the same problem in a mutilple
+> GPUs passthough environment.
 
-So, that's not something I'd considered particularly in this context,
-but it has bothered me in other contexts.  The fact that all the QOM
-interfaces are freely user-inspectable, but are also used for a bunch
-of interaction between qemu components means that we (arguably)
-routinely make a bunch of stuff into user-visible API which we
-probably don't really need or want to.
+Let's Cc Changpeng for comments. I'm not familiar with that code.
 
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
+In any case, I still think we should merge this and fix other
+implementations separately. That allows us to revert patches
+individually if anything else breaks.
 
---SnV5plBeK2Ge1I9g
-Content-Type: application/pgp-signature; name="signature.asc"
+F.
 
------BEGIN PGP SIGNATURE-----
+>=20
+> Thanks,
+> Yongji
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl2tX1cACgkQbDjKyiDZ
-s5JK7A/+OtvPrLjjpv65pV7U+h9D/atQh/+OtIobhdZ4oZx0Ak5jPytDgwA7ii0+
-hGkTChbZMIlBX/7A3HmEryFpwkE631QPeJ+VxxuTyVmekG7m6bvkCeAI5pRSj8Th
-6YRK7k8hQg2b9137boTdFuKm5krtIsFiLIkHMYRD1Y1UqTR+5i1uFtOLi1S4K+2G
-cgGqrcX2OKahzvSOwdXfsoa92/hO28VkoNXLPQkM+mJa3uOn9yYGq+v5ZuOW1NYV
-xJIn0AJQY9xpg/YVVoRlm5a72l9Jc6WWIAHTYxzpZvAO+ep6k5mXIcBKswASd2sz
-YdP6HMKhwpbvVOLHR9JAYjy6OyeK2JGh9KQPmIB0cJw5PoBfnHYVMsmdGX9f1iNx
-jmdBAVbh2lhkcgIDgANcvtGwppO5xnXL6P3IfM5XPI6/uarkO68tayFf82R0Xg42
-hkES5iZ0SK/Bj804HG57EhcpAir6IeI3fesJzE45+TK3Ye94kraBhDwK7670YncH
-YiNj4jpzUtOx/vNyOBvekc35t8l+6aPKSNEI4UAOhXnS9l9Mc2WG/bl1Iwvf8VGM
-n5Efg6MYgXYF43zNasfag+pkHF6Op1jAYEJxg4bXkZ2w87j//YJV9Ul3/eQIuC1t
-jegArkbf2HDKTuLO4b5QJxLwdvSxv2saJ324yqDSnv51QGHqucc=
-=hL4M
------END PGP SIGNATURE-----
-
---SnV5plBeK2Ge1I9g--
 
