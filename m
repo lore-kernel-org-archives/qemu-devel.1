@@ -2,84 +2,85 @@ Return-Path: <SRS0=8ZcK=YO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A54FFCA9EB5
-	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 09:42:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A30D4CA9EB5
+	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 09:43:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7107D2089C
-	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 09:42:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6D43A2089C
+	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 09:43:24 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="B7TsH4xQ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7107D2089C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="x7UBR0Wu"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6D43A2089C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36744 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36746 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iMUCz-0007uG-Hb
-	for qemu-devel@archiver.kernel.org; Mon, 21 Oct 2019 05:42:37 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37248)
+	id 1iMUDj-0000SZ-Eh
+	for qemu-devel@archiver.kernel.org; Mon, 21 Oct 2019 05:43:23 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36897)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <stefanha@redhat.com>) id 1iMUBQ-0006XU-JX
- for qemu-devel@nongnu.org; Mon, 21 Oct 2019 05:41:01 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1iMU9n-0004k1-Tb
+ for qemu-devel@nongnu.org; Mon, 21 Oct 2019 05:39:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <stefanha@redhat.com>) id 1iMUBO-00016J-Qd
- for qemu-devel@nongnu.org; Mon, 21 Oct 2019 05:40:59 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:57726
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1iMUBO-00015L-EI
- for qemu-devel@nongnu.org; Mon, 21 Oct 2019 05:40:58 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1571650856;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=qbaFTQYHaKC6G5ZmcDhxlD+UXt6aA534AGHUiDHB7tg=;
- b=B7TsH4xQFKmzyxhDbfgm18o6bO1tDbNka8XYqqnCq+1TEMFZHhc1TWnTdFZE4fiCir0sOx
- jyPBLWzcJV/wyDr6Jen/zzgvHmDXKwKRKhogPatR56j9Po34XZd6tqwo5X5/8bDT5FuRoF
- k3mn2Ga5R3vl2Hof87y/P5eC0YrMZcA=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-314-pqlboy_xOAG5VbLs08ONsg-1; Mon, 21 Oct 2019 05:40:53 -0400
-X-MC-Unique: pqlboy_xOAG5VbLs08ONsg-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3F358476;
- Mon, 21 Oct 2019 09:40:52 +0000 (UTC)
-Received: from localhost (ovpn-116-128.ams2.redhat.com [10.36.116.128])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 509605C240;
- Mon, 21 Oct 2019 09:40:49 +0000 (UTC)
-Date: Mon, 21 Oct 2019 10:40:47 +0100
-From: Stefan Hajnoczi <stefanha@redhat.com>
-To: "misono.tomohiro@fujitsu.com" <misono.tomohiro@fujitsu.com>
-Subject: Re: [Virtio-fs] [PATCH 0/2] virtiofsd: Two fix for xattr operation
-Message-ID: <20191021094047.GF22659@stefanha-x1.localdomain>
-References: <20191016103754.2047-1-misono.tomohiro@jp.fujitsu.com>
- <20191017100528.GA24790@stefanha-x1.localdomain>
- <CAOssrKfR=sfE1RzOXzvPbdQg-g7i5-f8W9y8bWFnO=gyJ2VMsg@mail.gmail.com>
- <20191017160953.GC1266@stefanha-x1.localdomain>
- <CAOssrKejcfVWXw6Nu1owyEeofTdVp6BNx4bL91ma2g7bg9-nmg@mail.gmail.com>
- <CAOssrKdbAT5s=CYG6PBtE6OYdqgwG8vp9T6QMJpwZ7X3tKjPmg@mail.gmail.com>
- <OSBPR01MB37835DC3A2F179AFD3A9074BE56C0@OSBPR01MB3783.jpnprd01.prod.outlook.com>
+ (envelope-from <peter.maydell@linaro.org>) id 1iMU9m-0000Aq-Qh
+ for qemu-devel@nongnu.org; Mon, 21 Oct 2019 05:39:19 -0400
+Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:39553)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1iMU9m-00008X-AC
+ for qemu-devel@nongnu.org; Mon, 21 Oct 2019 05:39:18 -0400
+Received: by mail-ot1-x344.google.com with SMTP id s22so10403407otr.6
+ for <qemu-devel@nongnu.org>; Mon, 21 Oct 2019 02:39:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=MtHnke2bzns6MDeKr83foHZX1HR+Uo5i8lrNykscWLo=;
+ b=x7UBR0Wu+o7Obcts6e3og/3YhlVdIChRP/0n1lJN4/hkfCoKHczbBk91e7PCzc8Mbp
+ w/emH/xMqZvByceXTZMNMNV9EuL3k0W6asvsX0IzZCeJ7brTHAwLbxtsosLhsWDYbAD8
+ PuASEAQYchwdNc5ihq9OE/Djk1zWhh2A+DrDoGkNbO/xGJQMkTXcA1V1/U0B7TA1NcUp
+ gPlShpGNGHA6aVeW8kJbhQPY3xAWsuRYUTL0OLM1ayJHYB7HW+WFEKvqboAKDg320t6x
+ iJKS/w/LfWRTjKaveaSOkeVnblRTxjmuno7zQnCKqOxGH41tPGwNw0tOYG/2b46nN96a
+ r/iQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=MtHnke2bzns6MDeKr83foHZX1HR+Uo5i8lrNykscWLo=;
+ b=idWGJk0ZZvqHEeyVGwdty5hJha5CCVHJ4Kn9oGNCLS4A0p+CRYueVABlUvrE8qU8WW
+ U73sazoTZ4v0fqgT0LWfhQkBCdYmY/oMI8uT4/MsFTfksmU3KFia94jmOHQvvsDkIKD2
+ X6o/QShqUO+4MrYd5Jrqaf3fbD3SNOAHfP1glrhxycg6zw/bj+fHL6xJWp0dy9x7EkRZ
+ xjW5Cm/ggsG9wWOttzQJPwisUjA+SAemcLoVG15dLn+QEpmAFwzkv/rlKT1zy0URVBO8
+ nVAw/sAc2Ie75Mu4k9Y9TGwFsBua8/YIzvvJ7EY4e35eEep8BWZ9PMg4kkloOoa09YJ4
+ ZVSQ==
+X-Gm-Message-State: APjAAAX+fSJCJb/MGj7EdglGjxsLaKsaGlVAZHaqoYF9P0JAkIYQudDP
+ DstqAB5n418kyjCBlyXJpoXfp0h4SGosmKpVGACFZQ==
+X-Google-Smtp-Source: APXvYqw7uwp6+Xd5H4pb0Q+y8R92zR985sbQmILVjM3Yq1Bz8dYQxMu36jMzMjhLyQdKTUBI/CrCNI89J4kxID8syLQ=
+X-Received: by 2002:a05:6830:ca:: with SMTP id
+ x10mr16984090oto.221.1571650757149; 
+ Mon, 21 Oct 2019 02:39:17 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <OSBPR01MB37835DC3A2F179AFD3A9074BE56C0@OSBPR01MB3783.jpnprd01.prod.outlook.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Mimecast-Spam-Score: 0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="rMWmSaSbD7nr+du9"
-Content-Disposition: inline
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 205.139.110.61
+References: <20191020225650.3671-1-philmd@redhat.com>
+ <20191020225650.3671-13-philmd@redhat.com>
+ <CAFEAcA8bhP9X-2AaTus9=GtEAqmnNA9me6hv8U=vXYwjQp_CnA@mail.gmail.com>
+ <42944bea-4b15-7bdf-61a7-f1c73f5f7c2b@redhat.com>
+In-Reply-To: <42944bea-4b15-7bdf-61a7-f1c73f5f7c2b@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 21 Oct 2019 10:39:06 +0100
+Message-ID: <CAFEAcA8hJ7bQeQNdWB6Rg4P7RzYmcXZmQKm7pnDAOutADHe9jA@mail.gmail.com>
+Subject: Re: [PATCH 12/21] hw/arm: Let the machine be the owner of the system
+ memory
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::344
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,71 +92,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "virtio-fs@redhat.com" <virtio-fs@redhat.com>,
- 'Miklos Szeredi' <mszeredi@redhat.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: Paul Burton <pburton@wavecomp.com>, "Michael S. Tsirkin" <mst@redhat.com>,
+ Leif Lindholm <leif.lindholm@linaro.org>,
+ Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
+ QEMU Developers <qemu-devel@nongnu.org>,
+ KONRAD Frederic <frederic.konrad@adacore.com>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Rob Herring <robh@kernel.org>,
+ Andrey Smirnov <andrew.smirnov@gmail.com>, Helge Deller <deller@gmx.de>,
+ Markus Armbruster <armbru@redhat.com>,
+ =?UTF-8?Q?Herv=C3=A9_Poussineau?= <hpoussin@reactos.org>,
+ Joel Stanley <joel@jms.id.au>, Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
+ Richard Henderson <rth@twiddle.net>, Artyom Tarasenko <atar4qemu@gmail.com>,
+ Antony Pavlov <antonynpavlov@gmail.com>, Eduardo Habkost <ehabkost@redhat.com>,
+ Alistair Francis <alistair@alistair23.me>,
+ Fabien Chouteau <chouteau@adacore.com>,
+ Beniamino Galvani <b.galvani@gmail.com>, qemu-arm <qemu-arm@nongnu.org>,
+ Jan Kiszka <jan.kiszka@web.de>,
+ =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>,
+ Igor Mammedov <imammedo@redhat.com>,
+ David Gibson <david@gibson.dropbear.id.au>,
+ Radoslaw Biernacki <radoslaw.biernacki@linaro.org>,
+ Thomas Huth <huth@tuxfamily.org>,
+ Andrew Baumann <Andrew.Baumann@microsoft.com>,
+ Jean-Christophe Dubois <jcd@tribudubois.net>, Andrew Jeffery <andrew@aj.id.au>,
+ Michael Walle <michael@walle.cc>, qemu-ppc <qemu-ppc@nongnu.org>,
+ Aleksandar Markovic <amarkovic@wavecomp.com>,
+ Peter Chubb <peter.chubb@nicta.com.au>, Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---rMWmSaSbD7nr+du9
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+On Mon, 21 Oct 2019 at 10:34, Philippe Mathieu-Daud=C3=A9 <philmd@redhat.co=
+m> wrote:
+>
+> On 10/21/19 11:22 AM, Peter Maydell wrote:
+> > On Mon, 21 Oct 2019 at 00:01, Philippe Mathieu-Daud=C3=A9 <philmd@redha=
+t.com> wrote:
+> >>
+> >> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+> >> ---
+> >
+> >>   hw/arm/virt.c             | 2 +-
+> >
+> > I think from a quick code scan that this is ok, but did
+> > you test that migration compat from old to new still works?
+> > I vaguely recall that there are some cases when adding an
+> > owner to a memory region changes the name string used for
+> > identifying the ramblock in migration.
+>
+> It seems to still works:
+>
+> $ make check-qtest-aarch64 V=3D1
 
-On Fri, Oct 18, 2019 at 08:51:20AM +0000, misono.tomohiro@fujitsu.com wrote=
-:
-> > Doing unshare(CLONE_FS) after thread startup seems safe, though must be=
- careful to change the working directory to the root of
-> > the mount
-> > *before* starting any threads.
->=20
-> I think working directry is changed in setup_sandbox() -> setup_mount_nam=
-espace() -> setup_pivot_root().
-> So, can we just add unshare(CLONE_FS) in fv_queue_worker()?
+> This test migrate the virt machine.
+>
+> Is this enough?
 
-fv_queue_worker() is the thread pool worker function that is called for
-each request.  Calling unshare(CLONE_FS) for each request is not
-necessary and will reduce performance.
+No, you need to test migration from a QEMU binary without
+this patchset to a QEMU binary that has it. Otherwise you're
+only checking that the new version can migrate from itself
+to itself. I find the easiest way to test this is just to
+use the 'savevm' command to save a state snapshot to a
+qcow2 disk image while running the old binary, and then run
+'loadvm' with the new binary and check it restored OK.
 
-A thread-local variable can be used to avoid repeated calls to
-unshare(CLONE_FS) from the same worker thread:
-
-  static __thread bool clone_fs_called;
-
-  static void fv_queue_worker(gpointer data, gpointer user_data)
-  {
-      ...
-      if (!clone_fs_called) {
-          int ret;
-
-=09  ret =3D unshare(CLONE_FS);
-=09  assert(ret =3D=3D 0); /* errors not expected according to man page */
-
-=09  clone_fs_called =3D true;
-      }
-
-Another issue is the seccomp policy.  Since worker threads are spawned
-at runtime it is necessary to add the unshare(2) syscall to the seccomp
-whitelist in contrib/virtiofsd/seccomp.c.
-
-Stefan
-
---rMWmSaSbD7nr+du9
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl2tfR8ACgkQnKSrs4Gr
-c8izkQf9HxlTQy7DcT+pdpRQd6UUnU5d8j/LAJQKySzzdGOYE6xf84D/YZy2AevH
-rJOFV20qZJxzDWUvlSrLD9se98SE6pcnBSTAom+RR+XOjZm4/+9pzax5Ss3vbgqK
-74hv+d7rLPwNEqs/CZMzt1GaM7YyRycTGzbTosRwVfpBOO5oAcjHGjco2TelyrsF
-kdjvSgTd+jTfr+KdUbB0NOX+58RpiA4Yn1MQpEctkh0wOJZdL2kSqpTiwiRu5qDm
-jqPlPsIpdkCRxbvzn4bcEWfoRchgvtJ/L3CQJ1zHL14IJ3LmG5wat0Bn0tMdH/eU
-Tq37p22dYRjkN3twX6S/+Tmu+PlfMQ==
-=u3k2
------END PGP SIGNATURE-----
-
---rMWmSaSbD7nr+du9--
-
+thanks
+-- PMM
 
