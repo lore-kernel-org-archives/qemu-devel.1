@@ -6,39 +6,41 @@ X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 09113CA9EAF
-	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 13:57:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 69033CA9EAF
+	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 14:00:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D1CF4214B2
-	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 13:57:39 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D1CF4214B2
+	by mail.kernel.org (Postfix) with ESMTPS id 306E2214B2
+	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 14:00:53 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 306E2214B2
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42506 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42606 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iMYBn-0003RM-0s
-	for qemu-devel@archiver.kernel.org; Mon, 21 Oct 2019 09:57:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43452)
+	id 1iMYEu-0006VQ-9J
+	for qemu-devel@archiver.kernel.org; Mon, 21 Oct 2019 10:00:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43874)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <laurent@vivier.eu>) id 1iMY8h-0000xh-Dr
- for qemu-devel@nongnu.org; Mon, 21 Oct 2019 09:54:28 -0400
+ (envelope-from <laurent@vivier.eu>) id 1iMYAs-00036T-89
+ for qemu-devel@nongnu.org; Mon, 21 Oct 2019 09:56:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <laurent@vivier.eu>) id 1iMY8f-00059g-5z
- for qemu-devel@nongnu.org; Mon, 21 Oct 2019 09:54:27 -0400
-Received: from mout.kundenserver.de ([212.227.126.131]:34921)
+ (envelope-from <laurent@vivier.eu>) id 1iMYAq-0005y0-M9
+ for qemu-devel@nongnu.org; Mon, 21 Oct 2019 09:56:42 -0400
+Received: from mout.kundenserver.de ([212.227.126.187]:46649)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <laurent@vivier.eu>)
- id 1iMY8e-00059B-T7; Mon, 21 Oct 2019 09:54:25 -0400
+ id 1iMYAo-0005xC-E3; Mon, 21 Oct 2019 09:56:38 -0400
 Received: from [192.168.100.1] ([78.238.229.36]) by mrelayeu.kundenserver.de
  (mreue009 [213.165.67.103]) with ESMTPSA (Nemesis) id
- 1N6srH-1hxPAZ3Hmp-018KzF; Mon, 21 Oct 2019 15:53:25 +0200
+ 1MK3eI-1ibSxh25gU-00LZhb; Mon, 21 Oct 2019 15:56:35 +0200
+Subject: Re: [Qemu-devel] [PATCH v1 3/4] elf: move elf_ops.h into include/elf/
+ and rename
 To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
  peter.maydell@linaro.org
 References: <20190910193408.28917-1-alex.bennee@linaro.org>
- <20190910193408.28917-3-alex.bennee@linaro.org>
+ <20190910193408.28917-4-alex.bennee@linaro.org>
 From: Laurent Vivier <laurent@vivier.eu>
 Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  mQINBFYFJhkBEAC2me7w2+RizYOKZM+vZCx69GTewOwqzHrrHSG07MUAxJ6AY29/+HYf6EY2
@@ -82,38 +84,36 @@ Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  OpKgu3nD0ahBDqANU/ZmNNarBJEwvM2vfusmNnWm3QMIwxNuJghRyuFfx694Im1js0ZY3LEU
  JGSHFG4ZynA+ZFUPA6Xf0wHeJOxGKCGIyeKORsteIqgnkINW9fnKJw2pgk8qHkwVc3Vu+wGS
  ZiJK0xFusPQehjWTHn9WjMG1zvQ5TQQHxau/2FkP45+nRPco6vVFQe8JmgtRF8WFJA==
-Subject: Re: [Qemu-devel] [PATCH v1 2/4] elf: move elf.h to elf/elf.h and
- split out types
-Message-ID: <5be164f7-6a8a-07b8-8d16-18300638f9b5@vivier.eu>
-Date: Mon, 21 Oct 2019 15:53:10 +0200
+Message-ID: <504e63b8-da0a-ff2b-d768-e268f016afb4@vivier.eu>
+Date: Mon, 21 Oct 2019 15:56:32 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.1.0
 MIME-Version: 1.0
-In-Reply-To: <20190910193408.28917-3-alex.bennee@linaro.org>
+In-Reply-To: <20190910193408.28917-4-alex.bennee@linaro.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: fr
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:UrU9uY7OIujC5YaRN0E+fwNBpa9rYt+PYXlbhF9qVKMBOHWLOP1
- zWsNRkxT+bWLlU1QfbgEOtA+VLiJRKxpCJLaF7EJYURyhDuwlkWBaguE+o+OIU+RRDx27Sf
- dsX3tkB9pgtkmmnP639kmtmQBHp8lGlrOgMi1zj8SCcTVsxQjF9LF69e7YLL05EcgsR9DJo
- /iiTXNtd+FOjLRuEJpblA==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:DzSdzy6Va90=:ZVRekwCtg0CmfWqxqJWxUT
- 8easAEPESeDT5hC2WHzYOQQZ54Q3WcilnXtvqTj/Vl7hZvv6fsgJS5o6oRHchUyAZN2pV35+j
- q9P0r0lz3ulO4kB9QIDYy1TvtIJG9mYNPMOOsqBwRWCeyCcUCnNUDiHeaOwUYIxddQMi63kQ2
- euAq+DGKRWXDIKgCqJAQ1EbOSa/jHJKAZN1/nbDXwLXy4gvcrq1htHGbhquweZ9B6ug98wqy2
- punZB77rczxCXVwrEQN7Er+2Mg12QBdCSeggFV8Gg5bM+GTZOsNJty5K5QkXhJbZoRDW1EjFM
- xeUPY/2kVwvfMUMKxfamnn30vFSPJgAgMHmkWLoSvHiyB90cWt/ndku8a1Dobhl7vUs69h4K8
- uDQu8KZKNzNGRDm9ORWCCmUnzmIcLBNEPv1gvj7hUQjoCUnJpBd9fiOiTBOtTnO1Z15ybYO97
- xKRyV9YchZodQ5VmUM4OUMq4fZNSvbbUBPjQg7gR0LNC1rX//e2Aw4G4NQKFmlYH5VznKLXXR
- My9gBKta46aZTzS9Gtp4SrBCyzqxMP592Czcfh2mZIdbIzxR3bZdSKPBh+WZWq20eCSt2GMJM
- qB0WlZajd3eJ6gkzM1nG1Je+dZEej4MD+n+QJtr2SIvHeTmN80zmtoeS0jViW/E3UxczOAOt0
- cok+mLM4RoZ7oUFYBTyZrMW4JgO2XVo/o1y/J0rCx/OcJmEfzqS5Ut6YTreyRV9dDOut3iYf2
- RzqoHUF45MvegOGPmswirhUXisvdVgu5Gctvj2C52RuPN0A/IIprrWSCXeRSYUEvAcIlDrD3J
- 41dq0T8W+l2/aXjzgNb4Nua1AHUdblctqusp/60BHpmTWoxpNhwDwPUn497K6lS2daQ83ebpz
- r4FJiUkg3qJ83XCCtTSqEhikMVriqA38S90uPfcjw=
+X-Provags-ID: V03:K1:PLOCpTZlJ8SG9/8bc+7OMb0pwx3IndN2+fy5xyPNIBDU76AN0QF
+ UkHyC6+tReFR0ZhHrtB3E/nCqq6boAczrJKWERmCM2iPhd5kLIMiypPJgj3+4xrY+bkTh+5
+ F+X2+c3IqMCc+3dB/FFJJ+EkUOwqsVn8NKEYkY2yoRFRKYbzgrFfFI4guN1LUYeuzGpLLdQ
+ hKNP3k7nMh2ZhW7x8UJyQ==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:ggnkFmVbEsU=:FwoRN64t7Lfc3CwTdvfPpW
+ xQJYHVQTCBeLnugp3QiXnhy8HP+99PC7uoLE4BxQU5njNbmUjkPjynHGPAPX1ISClcjpyUJGo
+ YbFb2V22VTDLrPQn23ejDkRZ3P8p4llETAR+eCxuLYJeLPztHgE2qSCOoMsUVU2OkIvedhDeO
+ zIHCztnhfVuUmACfTKMMQFfty2KMGYkASjbTJE57+OKr7ELpQCPh2vMAHnfjuzOROibqfhCl4
+ l3kAy+dnrb3D/s5FJYWMypb7j/TRzOttO0Eq0XkP1mEHjFQDg9OJW0FbQg5NDifWsQflEU1/8
+ aqXIaMdefriyjMRtbcvKyYzcOeDlxxiSHgGwTNwkJXXGWLcHsb+Y6muDXL13Jm0+xpz1/2Tlm
+ 2AXLR3y+mLtSZqCu5h9PpKSGmlIJzANDG/ZcSchB26G/B/b6/o+WTcmRYBnvZAuG2xzqL7O6P
+ QEz9Z6+0nM5Vht09qIqfax0ynIAyXoDtvOc/yD5jAIHphyczGf9HGmMAJKQBDQEfkJ8nfc0Xz
+ G2Pq/x0JUaGoQ2bwHLPeuF4PUE5HJqscME3CiQ1nwNVJASIVI5WKjAxlaYrf2KHv7UBoIaHQi
+ GwBYH8Lv5AVnmg7/xQ8qaZQO/3yqAsMo0cOj1rSjVgNFNPBJkYU6X4+df2/492Tz22t5yOYQG
+ qjLESzmUpFGl6s8CUA/HIZuwZBzDtzBjSLw/XumO7uLr66XQ1uK5mM06+1HS9XInuo6uRFJMG
+ UKYG05iN57LLpMeX4ZrV8cHa9vnkkjAllTXDqPHM3/nu0zsjZoYOEN2RjKU40p94ZHbM69mPT
+ F1JTCEyq3Ob4vMnmRpOReWy0Y/nPLrneJ8wSOB89hvzZpOgQ3/6AYIoRt4W+e07A7STUw5LaT
+ Tf14jbjv+oHuGp2/Uc2MRy5+nJfU5rRWd2j71gPaM=
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 212.227.126.131
+X-Received-From: 212.227.126.187
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -125,117 +125,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Chris Wulff <crwulff@gmail.com>,
- Sagar Karandikar <sagark@eecs.berkeley.edu>,
- "Michael S. Tsirkin" <mst@redhat.com>, Anthony Green <green@moxielogic.com>,
- Palmer Dabbelt <palmer@sifive.com>,
- Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org,
- Max Filippov <jcmvbkbc@gmail.com>,
- KONRAD Frederic <frederic.konrad@adacore.com>,
- Alistair Francis <Alistair.Francis@wdc.com>,
- "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Marek Vasut <marex@denx.de>,
- Jia Liu <proljc@gmail.com>, Aleksandar Rikalo <arikalo@wavecomp.com>,
- Helge Deller <deller@gmx.de>, David Hildenbrand <david@redhat.com>,
- Halil Pasic <pasic@linux.ibm.com>,
- Christian Borntraeger <borntraeger@de.ibm.com>,
- =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>,
- =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
- Richard Henderson <rth@twiddle.net>, Artyom Tarasenko <atar4qemu@gmail.com>,
- Eduardo Habkost <ehabkost@redhat.com>, Riku Voipio <riku.voipio@iki.fi>,
- Fabien Chouteau <chouteau@adacore.com>,
- "open list:S390-ccw boot" <qemu-s390x@nongnu.org>, qemu-arm@nongnu.org,
- Stafford Horne <shorne@gmail.com>, David Gibson <david@gibson.dropbear.id.au>,
- "open list:RISC-V TCG CPUs" <qemu-riscv@nongnu.org>,
- Viktor Prutyanov <viktor.prutyanov@phystech.edu>,
- Thomas Huth <huth@tuxfamily.org>,
- Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
- Cornelia Huck <cohuck@redhat.com>, Michael Walle <michael@walle.cc>,
- "open list:PReP" <qemu-ppc@nongnu.org>,
- Aleksandar Markovic <amarkovic@wavecomp.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>
+Cc: qemu-arm@nongnu.org, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 Le 10/09/2019 à 21:34, Alex Bennée a écrit :
-> Most of the users of elf.h just want the standard Elf definitions. The
-> couple that want more than that want an expansion based on ELF_CLASS
-> which can be used for size agnostic code. The later is moved into
-> elf/elf-types.inc.h to make it clearer what it is for. While doing
-> that I also removed the whitespace damage.
+> Lets keep all the Elf manipulation bits together. Also rename the file
+> to better reflect how it is used and add a little header to the file.
 > 
 > Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 > ---
->  bsd-user/elfload.c               |  2 +-
->  contrib/elf2dmp/qemu_elf.h       |  2 +-
->  disas.c                          |  2 +-
->  dump/dump.c                      |  2 +-
->  dump/win_dump.c                  |  2 +-
->  hw/alpha/dp264.c                 |  2 +-
->  hw/arm/armv7m.c                  |  2 +-
->  hw/arm/boot.c                    |  2 +-
->  hw/core/loader.c                 |  3 +-
->  hw/cris/axis_dev88.c             |  2 +-
->  hw/cris/boot.c                   |  2 +-
->  hw/hppa/machine.c                |  2 +-
->  hw/i386/multiboot.c              |  2 +-
->  hw/i386/pc.c                     |  2 +-
->  hw/lm32/lm32_boards.c            |  2 +-
->  hw/lm32/milkymist.c              |  2 +-
->  hw/m68k/an5206.c                 |  2 +-
->  hw/m68k/mcf5208.c                |  2 +-
->  hw/microblaze/boot.c             |  2 +-
->  hw/mips/mips_fulong2e.c          |  2 +-
->  hw/mips/mips_malta.c             |  2 +-
->  hw/mips/mips_mipssim.c           |  2 +-
->  hw/mips/mips_r4k.c               |  2 +-
->  hw/moxie/moxiesim.c              |  2 +-
->  hw/nios2/boot.c                  |  2 +-
->  hw/openrisc/openrisc_sim.c       |  2 +-
->  hw/pci-host/prep.c               |  2 +-
->  hw/ppc/e500.c                    |  2 +-
->  hw/ppc/mac_newworld.c            |  2 +-
->  hw/ppc/mac_oldworld.c            |  2 +-
->  hw/ppc/ppc440_bamboo.c           |  2 +-
->  hw/ppc/prep.c                    |  2 +-
->  hw/ppc/sam460ex.c                |  2 +-
->  hw/ppc/spapr.c                   |  2 +-
->  hw/ppc/spapr_vio.c               |  2 +-
->  hw/ppc/virtex_ml507.c            |  2 +-
->  hw/riscv/boot.c                  |  2 +-
->  hw/s390x/ipl.c                   |  2 +-
->  hw/sparc/leon3.c                 |  2 +-
->  hw/sparc/sun4m.c                 |  2 +-
->  hw/sparc64/sun4u.c               |  2 +-
->  hw/tricore/tricore_testboard.c   |  2 +-
->  hw/xtensa/sim.c                  |  2 +-
->  hw/xtensa/xtfpga.c               |  2 +-
->  include/elf/elf-types.inc.h      | 63 ++++++++++++++++++++++++++++++++
->  include/{ => elf}/elf.h          | 42 ---------------------
->  include/hw/core/generic-loader.h |  2 +-
->  linux-user/arm/cpu_loop.c        |  2 +-
->  linux-user/elfload.c             |  5 +--
->  linux-user/main.c                |  2 +-
->  linux-user/mips/cpu_loop.c       |  2 +-
->  linux-user/riscv/cpu_loop.c      |  2 +-
->  target/arm/arch_dump.c           |  2 +-
->  target/i386/arch_dump.c          |  2 +-
->  target/ppc/arch_dump.c           |  2 +-
->  target/ppc/kvm.c                 |  2 +-
->  target/s390x/arch_dump.c         |  2 +-
->  tcg/arm/tcg-target.inc.c         |  2 +-
->  tcg/ppc/tcg-target.inc.c         |  2 +-
->  tcg/s390/tcg-target.inc.c        |  2 +-
->  tcg/tcg.c                        |  5 ++-
->  util/getauxval.c                 |  2 +-
->  62 files changed, 128 insertions(+), 104 deletions(-)
->  create mode 100644 include/elf/elf-types.inc.h
+>  hw/core/loader.c                            | 4 ++--
+>  include/{hw/elf_ops.h => elf/elf_ops.inc.h} | 9 +++++++++
+>  2 files changed, 11 insertions(+), 2 deletions(-)
+>  rename include/{hw/elf_ops.h => elf/elf_ops.inc.h} (98%)
 
-The patch looks good, but why did you call the file "elf-types.inc.h"
-and not "elf-types.h"?
-
-Reviewed-by: Laurent Vivier <laurent@vivier.eu>
+So the question is: what the ".inc" reflects for a ".h" file?
 
 Thanks,
-LAurent
+Laurent
+
 
