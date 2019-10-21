@@ -6,41 +6,41 @@ X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 69033CA9EAF
-	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 14:00:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 554F4CA9EAF
+	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 14:04:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 306E2214B2
-	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 14:00:53 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 306E2214B2
+	by mail.kernel.org (Postfix) with ESMTPS id 290142084C
+	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 14:04:45 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 290142084C
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42606 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42706 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iMYEu-0006VQ-9J
-	for qemu-devel@archiver.kernel.org; Mon, 21 Oct 2019 10:00:52 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43874)
+	id 1iMYId-0000E4-FQ
+	for qemu-devel@archiver.kernel.org; Mon, 21 Oct 2019 10:04:43 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44574)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <laurent@vivier.eu>) id 1iMYAs-00036T-89
- for qemu-devel@nongnu.org; Mon, 21 Oct 2019 09:56:44 -0400
+ (envelope-from <laurent@vivier.eu>) id 1iMYHE-0007lu-1s
+ for qemu-devel@nongnu.org; Mon, 21 Oct 2019 10:03:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <laurent@vivier.eu>) id 1iMYAq-0005y0-M9
- for qemu-devel@nongnu.org; Mon, 21 Oct 2019 09:56:42 -0400
-Received: from mout.kundenserver.de ([212.227.126.187]:46649)
+ (envelope-from <laurent@vivier.eu>) id 1iMYHD-0000a8-39
+ for qemu-devel@nongnu.org; Mon, 21 Oct 2019 10:03:15 -0400
+Received: from mout.kundenserver.de ([212.227.126.133]:52161)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <laurent@vivier.eu>)
- id 1iMYAo-0005xC-E3; Mon, 21 Oct 2019 09:56:38 -0400
+ id 1iMYHA-0000YX-Nh; Mon, 21 Oct 2019 10:03:12 -0400
 Received: from [192.168.100.1] ([78.238.229.36]) by mrelayeu.kundenserver.de
- (mreue009 [213.165.67.103]) with ESMTPSA (Nemesis) id
- 1MK3eI-1ibSxh25gU-00LZhb; Mon, 21 Oct 2019 15:56:35 +0200
-Subject: Re: [Qemu-devel] [PATCH v1 3/4] elf: move elf_ops.h into include/elf/
- and rename
+ (mreue011 [213.165.67.103]) with ESMTPSA (Nemesis) id
+ 1MOzCW-1ifIXY261M-00PQ4b; Mon, 21 Oct 2019 16:03:08 +0200
+Subject: Re: [Qemu-devel] [PATCH v1 4/4] elf: move ELF_ARCH definition to
+ elf-arch.h
 To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
  peter.maydell@linaro.org
 References: <20190910193408.28917-1-alex.bennee@linaro.org>
- <20190910193408.28917-4-alex.bennee@linaro.org>
+ <20190910193408.28917-5-alex.bennee@linaro.org>
 From: Laurent Vivier <laurent@vivier.eu>
 Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  mQINBFYFJhkBEAC2me7w2+RizYOKZM+vZCx69GTewOwqzHrrHSG07MUAxJ6AY29/+HYf6EY2
@@ -84,36 +84,36 @@ Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  OpKgu3nD0ahBDqANU/ZmNNarBJEwvM2vfusmNnWm3QMIwxNuJghRyuFfx694Im1js0ZY3LEU
  JGSHFG4ZynA+ZFUPA6Xf0wHeJOxGKCGIyeKORsteIqgnkINW9fnKJw2pgk8qHkwVc3Vu+wGS
  ZiJK0xFusPQehjWTHn9WjMG1zvQ5TQQHxau/2FkP45+nRPco6vVFQe8JmgtRF8WFJA==
-Message-ID: <504e63b8-da0a-ff2b-d768-e268f016afb4@vivier.eu>
-Date: Mon, 21 Oct 2019 15:56:32 +0200
+Message-ID: <1b03edeb-6290-d792-5c91-b37726e18a2d@vivier.eu>
+Date: Mon, 21 Oct 2019 16:03:05 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.1.0
 MIME-Version: 1.0
-In-Reply-To: <20190910193408.28917-4-alex.bennee@linaro.org>
+In-Reply-To: <20190910193408.28917-5-alex.bennee@linaro.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: fr
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:PLOCpTZlJ8SG9/8bc+7OMb0pwx3IndN2+fy5xyPNIBDU76AN0QF
- UkHyC6+tReFR0ZhHrtB3E/nCqq6boAczrJKWERmCM2iPhd5kLIMiypPJgj3+4xrY+bkTh+5
- F+X2+c3IqMCc+3dB/FFJJ+EkUOwqsVn8NKEYkY2yoRFRKYbzgrFfFI4guN1LUYeuzGpLLdQ
- hKNP3k7nMh2ZhW7x8UJyQ==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:ggnkFmVbEsU=:FwoRN64t7Lfc3CwTdvfPpW
- xQJYHVQTCBeLnugp3QiXnhy8HP+99PC7uoLE4BxQU5njNbmUjkPjynHGPAPX1ISClcjpyUJGo
- YbFb2V22VTDLrPQn23ejDkRZ3P8p4llETAR+eCxuLYJeLPztHgE2qSCOoMsUVU2OkIvedhDeO
- zIHCztnhfVuUmACfTKMMQFfty2KMGYkASjbTJE57+OKr7ELpQCPh2vMAHnfjuzOROibqfhCl4
- l3kAy+dnrb3D/s5FJYWMypb7j/TRzOttO0Eq0XkP1mEHjFQDg9OJW0FbQg5NDifWsQflEU1/8
- aqXIaMdefriyjMRtbcvKyYzcOeDlxxiSHgGwTNwkJXXGWLcHsb+Y6muDXL13Jm0+xpz1/2Tlm
- 2AXLR3y+mLtSZqCu5h9PpKSGmlIJzANDG/ZcSchB26G/B/b6/o+WTcmRYBnvZAuG2xzqL7O6P
- QEz9Z6+0nM5Vht09qIqfax0ynIAyXoDtvOc/yD5jAIHphyczGf9HGmMAJKQBDQEfkJ8nfc0Xz
- G2Pq/x0JUaGoQ2bwHLPeuF4PUE5HJqscME3CiQ1nwNVJASIVI5WKjAxlaYrf2KHv7UBoIaHQi
- GwBYH8Lv5AVnmg7/xQ8qaZQO/3yqAsMo0cOj1rSjVgNFNPBJkYU6X4+df2/492Tz22t5yOYQG
- qjLESzmUpFGl6s8CUA/HIZuwZBzDtzBjSLw/XumO7uLr66XQ1uK5mM06+1HS9XInuo6uRFJMG
- UKYG05iN57LLpMeX4ZrV8cHa9vnkkjAllTXDqPHM3/nu0zsjZoYOEN2RjKU40p94ZHbM69mPT
- F1JTCEyq3Ob4vMnmRpOReWy0Y/nPLrneJ8wSOB89hvzZpOgQ3/6AYIoRt4W+e07A7STUw5LaT
- Tf14jbjv+oHuGp2/Uc2MRy5+nJfU5rRWd2j71gPaM=
+X-Provags-ID: V03:K1:zJ+nKdSdQcUCS/Gr1zXTn/4Emt3ltwAD3jDjqVxeVU03O6kPtf0
+ fOCAuRHkDyZ0vlx7nXeM3qFux8+vsArKnWMQu6EWRxE8W/m0Dovg0Y+EoBdqg/dRDDT6v+r
+ YAl+mu6RfDPAsNu5yIA3Gr/8n41UKpaMP1eCtJdXJJj/Rf8xKS/z2b05DT453cLQr7A8v1d
+ q+JWo/KrECvVIQ0hnkTzQ==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:q2bovp6D+KE=:r2AyfRsO3WcbDhd0uQ8ehM
+ hVaK6l2557POmIf7/QfNfMz+AaIpjKw9oDTLfC0Nd4mtnEz9Lp8PRtz9g6nLZExgNz972bgZX
+ /8kD3buP7SItHRpyBIYp29/4t7DJUqYfxbNp2YnvVwME3C1GJwdDkEUp14Y+O6SyiU2GQVPwO
+ m6ExttcWZPj/FG5zExMbUCvegJ/th/DlzhcRDUy/EuUSJeN+BUsGKc3LRxVX8Y1edY7atN1mm
+ 9Nc/lu5nXrp+1L5Blki09K4qjHDPdHabKiaUZDf7AckicdPEK3GUzlz/ORazymQK5DKhZpW/L
+ z24fr/HZVJFfBDc7AXeua6tX7X3kjV/7+to650bXqQXOG0YxGU/b6C7iSq94BtkmKXmiY+Zwx
+ Axq7hi8EbujtWDGWrYLc3+Q9yC4yMSgUtfOlvFKKXs83UH/w/sCDeVRFfPcIiq/MGSmlewEnm
+ xezEnSIl08xKRCKLLGHiFS0RMo5o+RwessKjVdwn1++iMcvtQ/yiFWa81QHx2B8Os8PfOapP8
+ KzYjAYLXxtbqwq22b0+vr+W1o/EsVLby7BuT01y5QQzNgo6EmdLSCmEHCut191aRp2q6cK9Xx
+ SKRoH7PKO9AVMFWfAc2XVP2z/dAktobqjvgB2pCyKREYNU4R+0zOuNjI7lRx68/W4jXnEpf0z
+ OEg/YaOiUWJV5vrkqDknsrnvoGdt/ig7RkBmENSjZJ8MU+M2zlYb7Tu7YCcR9xpoJ/cB0goH7
+ NPRsWBj6ERIVt6qTNlAEJ9LDAXFo3p6xEEdS5JxvMR7zhfP3+JcFOJOrIAu9KI59yng2oqxKA
+ rsd4Z7sdxuGbm6aX24u7aOlHjeQ4oc4UDHsuTn+MpOpDQA2QIUa47B+BnlAuToJ3iD+o3kwWn
+ EhxbQqbLLOKmiHe3xdJjbe7NN3jvzL+KfSa21fmm8=
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 212.227.126.187
+X-Received-From: 212.227.126.133
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -125,25 +125,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-arm@nongnu.org, qemu-devel@nongnu.org
+Cc: Riku Voipio <riku.voipio@iki.fi>, qemu-devel@nongnu.org,
+ qemu-arm@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 Le 10/09/2019 à 21:34, Alex Bennée a écrit :
-> Lets keep all the Elf manipulation bits together. Also rename the file
-> to better reflect how it is used and add a little header to the file.
+> This is preparatory for plugins which will want to report the
+> architecture to plugins. Move the ELF_ARCH definition out of the
+> loader and into its own header.
 > 
 > Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 > ---
->  hw/core/loader.c                            | 4 ++--
->  include/{hw/elf_ops.h => elf/elf_ops.inc.h} | 9 +++++++++
->  2 files changed, 11 insertions(+), 2 deletions(-)
->  rename include/{hw/elf_ops.h => elf/elf_ops.inc.h} (98%)
+>  bsd-user/elfload.c     |  13 +----
+>  include/elf/elf-arch.h | 109 +++++++++++++++++++++++++++++++++++++++++
 
-So the question is: what the ".inc" reflects for a ".h" file?
+Your file should be split across "linux-user/$(TARGET_ABI_DIR)/elf-arch.h"
 
 Thanks,
 Laurent
-
 
