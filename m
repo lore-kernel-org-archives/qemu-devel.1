@@ -2,80 +2,81 @@ Return-Path: <SRS0=8ZcK=YO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D055CA9EAF
-	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 11:54:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C4F6CCA9EAF
+	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 11:55:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 49DF4206C2
-	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 11:54:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4DF19206C2
+	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 11:55:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Hw5E9q12"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 49DF4206C2
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CU09G/Hs"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4DF19206C2
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39024 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39086 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iMWGM-0002Sy-5i
-	for qemu-devel@archiver.kernel.org; Mon, 21 Oct 2019 07:54:14 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52787)
+	id 1iMWHi-0004m9-AE
+	for qemu-devel@archiver.kernel.org; Mon, 21 Oct 2019 07:55:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52745)
  by lists.gnu.org with esmtp (Exim 4.90_1)
  (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1iMWBb-0005VS-KZ
- for qemu-devel@nongnu.org; Mon, 21 Oct 2019 07:49:21 -0400
+ id 1iMWBZ-0005UX-FS
+ for qemu-devel@nongnu.org; Mon, 21 Oct 2019 07:49:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
  (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1iMWBX-0003B1-EE
- for qemu-devel@nongnu.org; Mon, 21 Oct 2019 07:49:19 -0400
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:38209)
+ id 1iMWBX-0003B0-E2
+ for qemu-devel@nongnu.org; Mon, 21 Oct 2019 07:49:17 -0400
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:41673)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1iMWBR-00038j-Po
+ id 1iMWBR-000392-Qg
  for qemu-devel@nongnu.org; Mon, 21 Oct 2019 07:49:14 -0400
-Received: by mail-wr1-x442.google.com with SMTP id v9so2350152wrq.5
- for <qemu-devel@nongnu.org>; Mon, 21 Oct 2019 04:49:07 -0700 (PDT)
+Received: by mail-wr1-x444.google.com with SMTP id p4so13598282wrm.8
+ for <qemu-devel@nongnu.org>; Mon, 21 Oct 2019 04:49:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=L1ZRC5xfl7LAc8y7XcDjWKXdgHuMKTnYncwldrjeKoE=;
- b=Hw5E9q123R3Tvz1vaTdDmL8+/eQKpTsEt3Qgu1/klh48i+Z9puQ/jxBxlIBNIJiJAD
- XLSla8eh1r0PXmCUAlSDKSB3Q649GBdIXDqIl5V7M38uGtS0Jx+dHMXIdZ7ncLHqiqvq
- vaze0JZa9fANNtde143lXJ6Q466W87v1gwbL66k3R0gwaXdSRDjVj8+s0XS69PsnhixP
- H25q1qxm7MJ91L6OvN+BxG6cRDW+v9KbHR72tKnyW8wYTi/hIcMeJ2eo45ZyC+WYByyv
- ckqhtNyKw9fqVBx07N8LaqBvq+zrTNUVAORn+vFyKHYuZshJgLuccqAZWqcBeDjk/Vyb
- Dc0g==
+ bh=dMQ78h47SvHockU3ttNHy6APkGlBQkuPUPTng3logyU=;
+ b=CU09G/Hsz+sEJQ4zDhaleaQtFCLKtZyWf2IxCk2Pd2PpNwBI/PW9odvVSXiKSmoFAl
+ DisrriQ/tcL5Ys5WnhhrweMZl1PnUAIUqmzrgMQJmr6U7LU8N6fPLlZKbZTwSeEB0IYr
+ bY93wmdotRZoKOBmz6Tun8TlTzMh3Y/t4gtgrnuRSZ+m7TPw6MOYmSMra7U0xFnRyi3u
+ AezRa/iTZCSoYeT8rwRUcaZpzdpEId0QrzA5zTOCL4ByMEV2Ej43eaNO2uLkQtquABdR
+ stvcLDNr771yn3E6gD3FDI302jyi8E3BCxdrZgua4DBDgijQy7/5ZvbpXg4hQpwTXn1Y
+ /6AA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=L1ZRC5xfl7LAc8y7XcDjWKXdgHuMKTnYncwldrjeKoE=;
- b=Xb54AYDarHtRqRvftP6qrTBBm1T+Zq+Tw89BXfwY9WJGEdiS3P5isCj0kYyWH4guGg
- cx4zslK2VMgPSWG9NexOOOiPT0ZN8Ellagkz+7dwVQzjYicsFSUshJsM0CqQ0ClIx6ND
- g53UoZlT+/YJ63Qkmci+VbhWvxLBCnhPdLvJqoRsn2c3i8U1dPgtEBtgOo+ipXfEN/Ca
- B4XhCKLC+SDcGYmOSDvxqd01HoI/EyCtVQX50ksrJ3x4mDDxi0QZK6A7k1dqgAYG/Fwa
- acj0YBiX3OpSnngKnR1jGR2ASFUUYoa7dLnn4LmgwQhuX+96RRVj0k5jiABIG5KudZQz
- sHfw==
-X-Gm-Message-State: APjAAAVUVAD8/SDbc5GcHtBjUfUkUlSwnOLozrLvzjAcnM4HKlg2RtSI
- ahSvpsdrUDF6kbUk3lacSrqnwPDR
-X-Google-Smtp-Source: APXvYqyhC2xqhen9lmC1sFAEfA0NBjNDe8SFmARNqljeJrKlGw0ydnjwfWaWvLqNIpG74ouKi+C2zA==
-X-Received: by 2002:adf:91e1:: with SMTP id 88mr7747800wri.16.1571658546821;
- Mon, 21 Oct 2019 04:49:06 -0700 (PDT)
+ bh=dMQ78h47SvHockU3ttNHy6APkGlBQkuPUPTng3logyU=;
+ b=kF+WrSOsBX39FXQFNl5NxXXvdkaX3n0stD+1x7/a7K/UNF4dCAs/a+55uAyi3yZSjJ
+ MnNOgWt73eojNKvcvME9Rl0wS4sgM8sqqiSfyEg8C8LgSINZUmWHG6BFttqyqU6sPuTD
+ Fhp2x/bqmT4PdHbYsxsIHcM6EMqj33iyNpMjRA9W2rQ0+PZ6YiLBkOyZyXp9Unp6jQSW
+ Sdw347zNiRfpfSfQeI8ghdaoei4QSqd+I7bVZPNAmsqK8PgSR1g9aqYKcHu9rd/TrnNn
+ 49JbjM11OxCn8vYQVryf1E50MzwYAfmcRDQE6tjZGYnYqLda9rcvvYVMnkiPm6LPqfWb
+ TeSA==
+X-Gm-Message-State: APjAAAXXdlIumKJ2/YYVaZLiWOwjkTpNMOaX1ifWpYT6aOxrap3vIoxM
+ +3y6GOPAc8/MClR67rfpJXLB331c
+X-Google-Smtp-Source: APXvYqyOd0DZ4TR3zHbiiTzi2IM9Yd6tWSY7M8I5q95YpamU4jVWm6UZsvz6ADUFWOjShSrAHGOXAA==
+X-Received: by 2002:a05:6000:149:: with SMTP id
+ r9mr14753989wrx.90.1571658548392; 
+ Mon, 21 Oct 2019 04:49:08 -0700 (PDT)
 Received: from localhost.localdomain
  (129.red-83-57-174.dynamicip.rima-tde.net. [83.57.174.129])
- by smtp.gmail.com with ESMTPSA id x5sm17156137wrt.75.2019.10.21.04.49.05
+ by smtp.gmail.com with ESMTPSA id x5sm17156137wrt.75.2019.10.21.04.49.07
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 21 Oct 2019 04:49:06 -0700 (PDT)
+ Mon, 21 Oct 2019 04:49:07 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v8 4/9] linux-user/syscall: Introduce target_sockaddr_nl
-Date: Mon, 21 Oct 2019 13:48:52 +0200
-Message-Id: <20191021114857.20538-5-f4bug@amsat.org>
+Subject: [PATCH v8 5/9] linux-user/strace: Dump AF_NETLINK sockaddr content
+Date: Mon, 21 Oct 2019 13:48:53 +0200
+Message-Id: <20191021114857.20538-6-f4bug@amsat.org>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20191021114857.20538-1-f4bug@amsat.org>
 References: <20191021114857.20538-1-f4bug@amsat.org>
@@ -85,7 +86,7 @@ Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::442
+X-Received-From: 2a00:1450:4864:20::444
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -104,51 +105,83 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Tested-By: Guido Günther <agx@sigxcpu.org>
-Reviewed-by: Laurent Vivier <laurent@vivier.eu>
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Tested-By: Guido Günther <agx@sigxcpu.org>
 ---
-v7: use abi_ushort and abi_uint to keep alignments good (lvivier)
+v8: use tswap32 (lvivier)
 ---
- linux-user/syscall.c      | 6 ++++--
- linux-user/syscall_defs.h | 7 +++++++
- 2 files changed, 11 insertions(+), 2 deletions(-)
+ linux-user/strace.c | 37 +++++++++++++++++++++++++++++++++++++
+ 1 file changed, 37 insertions(+)
 
-diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-index e2af3c1494..f1ab81b917 100644
---- a/linux-user/syscall.c
-+++ b/linux-user/syscall.c
-@@ -1496,8 +1496,10 @@ static inline abi_long host_to_target_sockaddr(abi_ulong target_addr,
-         sizeof(target_saddr->sa_family)) {
-         target_saddr->sa_family = tswap16(addr->sa_family);
-     }
--    if (addr->sa_family == AF_NETLINK && len >= sizeof(struct sockaddr_nl)) {
--        struct sockaddr_nl *target_nl = (struct sockaddr_nl *)target_saddr;
-+    if (addr->sa_family == AF_NETLINK &&
-+        len >= sizeof(struct target_sockaddr_nl)) {
-+        struct target_sockaddr_nl *target_nl =
-+               (struct target_sockaddr_nl *)target_saddr;
-         target_nl->nl_pid = tswap32(target_nl->nl_pid);
-         target_nl->nl_groups = tswap32(target_nl->nl_groups);
-     } else if (addr->sa_family == AF_PACKET) {
-diff --git a/linux-user/syscall_defs.h b/linux-user/syscall_defs.h
-index fa69c6ab8d..7694d72446 100644
---- a/linux-user/syscall_defs.h
-+++ b/linux-user/syscall_defs.h
-@@ -153,6 +153,13 @@ struct target_sockaddr_un {
-     uint8_t sun_path[108];
- };
+diff --git a/linux-user/strace.c b/linux-user/strace.c
+index fd5596a640..5fa7748427 100644
+--- a/linux-user/strace.c
++++ b/linux-user/strace.c
+@@ -8,6 +8,7 @@
+ #include <arpa/inet.h>
+ #include <netinet/tcp.h>
+ #include <linux/if_packet.h>
++#include <linux/netlink.h>
+ #include <sched.h>
+ #include "qemu.h"
  
-+struct target_sockaddr_nl {
-+    abi_ushort nl_family;   /* AF_NETLINK */
-+    abi_ushort __pad;
-+    abi_uint nl_pid;
-+    abi_uint nl_groups;
-+};
+@@ -398,6 +399,12 @@ print_sockaddr(abi_ulong addr, abi_long addrlen)
+             gemu_log("}");
+             break;
+         }
++        case AF_NETLINK: {
++            struct target_sockaddr_nl *nl = (struct target_sockaddr_nl *)sa;
++            gemu_log("{nl_family=AF_NETLINK,nl_pid=%u,nl_groups=%u}",
++                     tswap32(nl->nl_pid), tswap32(nl->nl_groups));
++            break;
++        }
+         default:
+             gemu_log("{sa_family=%d, sa_data={", sa->sa_family);
+             for (i = 0; i < 13; i++) {
+@@ -424,6 +431,9 @@ print_socket_domain(int domain)
+     case PF_INET:
+         gemu_log("PF_INET");
+         break;
++    case PF_NETLINK:
++        gemu_log("PF_NETLINK");
++        break;
+     case PF_PACKET:
+         gemu_log("PF_PACKET");
+         break;
+@@ -473,6 +483,33 @@ print_socket_protocol(int domain, int type, int protocol)
+         return;
+     }
+ 
++    if (domain == PF_NETLINK) {
++        switch (protocol) {
++        case NETLINK_ROUTE:
++            gemu_log("NETLINK_ROUTE");
++            break;
++        case NETLINK_AUDIT:
++            gemu_log("NETLINK_AUDIT");
++            break;
++        case NETLINK_NETFILTER:
++            gemu_log("NETLINK_NETFILTER");
++            break;
++        case NETLINK_KOBJECT_UEVENT:
++            gemu_log("NETLINK_KOBJECT_UEVENT");
++            break;
++        case NETLINK_RDMA:
++            gemu_log("NETLINK_RDMA");
++            break;
++        case NETLINK_CRYPTO:
++            gemu_log("NETLINK_CRYPTO");
++            break;
++        default:
++            gemu_log("%d", protocol);
++            break;
++        }
++        return;
++    }
 +
- struct target_in_addr {
-     uint32_t s_addr; /* big endian */
- };
+     switch (protocol) {
+     case IPPROTO_IP:
+         gemu_log("IPPROTO_IP");
 -- 
 2.21.0
 
