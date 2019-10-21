@@ -2,87 +2,84 @@ Return-Path: <SRS0=8ZcK=YO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7BF06CA9EB0
-	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 22:43:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1FA65CA9EAF
+	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 22:44:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 48EF520882
-	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 22:43:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id CB93020882
+	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 22:44:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kyHt3QJu"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 48EF520882
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NMCXz3Yu"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CB93020882
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48550 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48568 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iMgON-0008GV-Ca
-	for qemu-devel@archiver.kernel.org; Mon, 21 Oct 2019 18:43:11 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52014)
+	id 1iMgPh-0001tQ-P7
+	for qemu-devel@archiver.kernel.org; Mon, 21 Oct 2019 18:44:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51925)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mrolnik@gmail.com>) id 1iMgJQ-0001wr-Us
- for qemu-devel@nongnu.org; Mon, 21 Oct 2019 18:38:06 -0400
+ (envelope-from <mrolnik@gmail.com>) id 1iMgJB-0001h0-Tj
+ for qemu-devel@nongnu.org; Mon, 21 Oct 2019 18:37:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mrolnik@gmail.com>) id 1iMgJO-00018Q-Sr
- for qemu-devel@nongnu.org; Mon, 21 Oct 2019 18:38:04 -0400
-Received: from mail-wr1-x42a.google.com ([2a00:1450:4864:20::42a]:35692)
+ (envelope-from <mrolnik@gmail.com>) id 1iMgJ9-0000zt-OC
+ for qemu-devel@nongnu.org; Mon, 21 Oct 2019 18:37:49 -0400
+Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:55724)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <mrolnik@gmail.com>) id 1iMgJM-00016h-Tn
- for qemu-devel@nongnu.org; Mon, 21 Oct 2019 18:38:02 -0400
-Received: by mail-wr1-x42a.google.com with SMTP id l10so15320807wrb.2
- for <qemu-devel@nongnu.org>; Mon, 21 Oct 2019 15:38:00 -0700 (PDT)
+ (Exim 4.71) (envelope-from <mrolnik@gmail.com>) id 1iMgJ9-0000zf-HE
+ for qemu-devel@nongnu.org; Mon, 21 Oct 2019 18:37:47 -0400
+Received: by mail-wm1-x341.google.com with SMTP id g24so5864187wmh.5
+ for <qemu-devel@nongnu.org>; Mon, 21 Oct 2019 15:37:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=9d/uDGv85dLEv33nEDGWywNGXN8GQJeP0QFNxDLvG8o=;
- b=kyHt3QJu3Snzhu/9s52UEXkULD6ZWlIbn19KWhov1JGlpBpI9vLH8dxEeB5jbtKsbm
- Xm3r7j9sJP/E0oi6urTcPSYkjfewqdGVwNHibw4MwYYkjcU7bTpicjhYkSUa4+Os+7kz
- +BLthlSew+1a4S56Z9okmn7bFCCStJBOs7DCWdrfykALDXV6Q4X1TLv7Ho6HXY9FNNOb
- 2XbJYnuq0uD/0oSqY5C2ooGFW+knKx7dF5DkEjtcopYS0WqzB1UKKLmrHSVZCFzJaU6u
- R0sVLR3UViknFAwz1OT3oxUwk/DmyCxXMFGcLNZaejcFspzVEpxQ/OhHoqOUUNQT4SQ4
- ttqw==
+ h=from:to:cc:subject:date:message-id:in-reply-to:references;
+ bh=YKsFM0oxxSLBfiVZuIx8TDBtf3x+c2wKOGsJcqKU8dY=;
+ b=NMCXz3Yu3R2X3ecsveyydEH/HwPbf/DyXNc+yQT+zvlliNurNPPlr4Fx167Qlzc/LS
+ SYw4FLv1nulPqBkFUfHPth+WENs+aOAP+UM9SeFD9pxMbf2viOeXZ/9x2t2HXtT+lahr
+ t51tKxHlfZRcA0IOLC39rI1jPRmIzOiJ3je8el36SdrRZmdkYYG5WvRivQhQV/iX7+JP
+ 2MmAztL6d15VVZef3ALMyD9mYhq8/W0Nukf8RlprrKGa/QDw8monzYNEXOV2pRkqUNEA
+ qXQ96ZQaSDiA8VTdFYha/ys/qjn+5E6dHbGVOnNiEmOc6tkkSrIFH1r/tWQEjUWteqoO
+ 8z1w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=9d/uDGv85dLEv33nEDGWywNGXN8GQJeP0QFNxDLvG8o=;
- b=hTQHwKiDMxJENLZAT/VYn17Vow08RtIhPaeTis9yJ7ZHsOaASxxKfkKQic2McgGTrS
- S1GQLgBFbgonlGWLf2BqwchLDhcFUqmkOMBUpOl7Rck+P5bHI2RLyOzE4Lze9610NBsf
- B04qUs0/vWVssV6PHqka/G1tSqzh8A7Es3HDRjjXX23iKCi0qP/MI0o5EsmZHDWTWyNO
- EFLfWe/W+1ps0TB1JTTMPHKs5AME/dNibyBHQ4vdWZv13kVudVyWfy1pbBg/IuE8J7T2
- HgrLjYCWeoxpzQuvVMgtjnrJCaRRQKs06OBHrClxrYigums2P+XqCH9TTpLeTBuYLm2Q
- KP7g==
-X-Gm-Message-State: APjAAAUZysDOwMF/rD1gyJ2uKA+prdxbBe3r9rhDD/5bV7cz4iS61K7v
- ouDIzswUWFyiKu+pc46LNQlvWRrB+ZFhkw==
-X-Google-Smtp-Source: APXvYqwJLNjlnOGe4dlWGGacczlSrFoGKhJPfqPpP1b5SXDuYw9GnpIwy7S9LN4yXECGGE1knTGuhg==
-X-Received: by 2002:adf:fe90:: with SMTP id l16mr443970wrr.81.1571697478664;
- Mon, 21 Oct 2019 15:37:58 -0700 (PDT)
+ :references;
+ bh=YKsFM0oxxSLBfiVZuIx8TDBtf3x+c2wKOGsJcqKU8dY=;
+ b=OTrxjPkgs+f/ZwxFJXT1OgllOWVz1IHesgWIYsVfUGUzohw71kDLqVs+S0oviBLvqW
+ PZpWE2OPuQk+OatlzrefMPS2JOV6tWuibL+E2a24l+SAQqXGGQWU8RkFtEI6+X5fDFID
+ PF7iaB9wT6v2FqsRAv5s56mu9ocVzaUkPDWEvizAXIwvq1eJ6rB56gmqSR4LyEqYB4PC
+ xBmsqGcLf7XH6rqRRtHz1yZqid58Pmz3XsqMZ8lZ6nr98YscdTkfskEipup+Xxpj6En/
+ 7pRf6oJbNdgh2T76jyYawdh0w0fD721biUczeW/PcTgVGrk8+4k9Lkl2+UmrWWhLdxqW
+ cUyw==
+X-Gm-Message-State: APjAAAXh01vFnLPKRhRWtveOOYiWRmRI7x/YpUejAfbyP58biNu+QhO+
+ WVAMKmYee66yGlKLZfDy4Q25UlhYzCD6jA==
+X-Google-Smtp-Source: APXvYqwS4G+ZC4kOC8sw7z7ggvVlNRhBlw1XAkdMOfyb5un/2c6ISLXd4uv1IFQb63XZBYt/XHKLcg==
+X-Received: by 2002:a1c:6487:: with SMTP id y129mr200890wmb.15.1571697465907; 
+ Mon, 21 Oct 2019 15:37:45 -0700 (PDT)
 Received: from 8c859074c0ff.ant.amazon.com.com
  (bzq-109-65-50-254.red.bezeqint.net. [109.65.50.254])
- by smtp.gmail.com with ESMTPSA id q66sm16951271wme.39.2019.10.21.15.37.56
+ by smtp.gmail.com with ESMTPSA id q66sm16951271wme.39.2019.10.21.15.37.44
  (version=TLS1_2 cipher=ECDHE-RSA-AES128-SHA bits=128/128);
- Mon, 21 Oct 2019 15:37:58 -0700 (PDT)
+ Mon, 21 Oct 2019 15:37:45 -0700 (PDT)
 From: Michael Rolnik <mrolnik@gmail.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v33 13/13] target/avr: Add tests
-Date: Tue, 22 Oct 2019 01:37:11 +0300
-Message-Id: <20191021223711.66955-14-mrolnik@gmail.com>
+Subject: [PATCH v33 06/13] target/avr: Add instruction translation - Branch
+ Instructions
+Date: Tue, 22 Oct 2019 01:37:04 +0300
+Message-Id: <20191021223711.66955-7-mrolnik@gmail.com>
 X-Mailer: git-send-email 2.17.2 (Apple Git-113)
 In-Reply-To: <20191021223711.66955-1-mrolnik@gmail.com>
 References: <20191021223711.66955-1-mrolnik@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::42a
+X-Received-From: 2a00:1450:4864:20::341
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -101,109 +98,576 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-1. Avocado test
-    The test is based on
-    https://github.com/seharris/qemu-avr-tests/tree/master/free-rtos/Demo
-    demo which. If working correctly, prints 'ABCDEFGHIJKLMNOPQRSTUVWX' out.
-    it also demostrates that timer and IRQ are working
-
-2. Boot serial test
-    Print out 'T' through serial port
+This includes:
+    - RJMP, IJMP, EIJMP, JMP
+    - RCALL, ICALL, EICALL, CALL
+    - RET, RETI
+    - CPSE, CP, CPC, CPI
+    - SBRC, SBRS, SBIC, SBIS
+    - BRBC, BRBS
 
 Signed-off-by: Michael Rolnik <mrolnik@gmail.com>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Acked-by: Thomas Huth <thuth@redhat.com>
 ---
- tests/Makefile.include           |  2 ++
- tests/acceptance/machine_avr6.py | 36 ++++++++++++++++++++++++++++++++
- tests/boot-serial-test.c         | 10 +++++++++
- 3 files changed, 48 insertions(+)
- create mode 100644 tests/acceptance/machine_avr6.py
+ target/avr/translate.c | 542 +++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 542 insertions(+)
 
-diff --git a/tests/Makefile.include b/tests/Makefile.include
-index 3543451ed3..376d7dfea3 100644
---- a/tests/Makefile.include
-+++ b/tests/Makefile.include
-@@ -199,6 +199,8 @@ check-qtest-i386-y += tests/test-x86-cpuid-compat$(EXESUF)
- check-qtest-i386-y += tests/numa-test$(EXESUF)
- check-qtest-x86_64-y += $(check-qtest-i386-y)
+diff --git a/target/avr/translate.c b/target/avr/translate.c
+index 3eaa3e5099..3afd686ee8 100644
+--- a/target/avr/translate.c
++++ b/target/avr/translate.c
+@@ -224,6 +224,86 @@ static void gen_ZNSf(TCGv R)
+ }
  
-+check-qtest-avr-y += tests/boot-serial-test$(EXESUF)
-+
- check-qtest-alpha-y += tests/boot-serial-test$(EXESUF)
- check-qtest-alpha-$(CONFIG_VGA) += tests/display-vga-test$(EXESUF)
  
-diff --git a/tests/acceptance/machine_avr6.py b/tests/acceptance/machine_avr6.py
-new file mode 100644
-index 0000000000..0601080b01
---- /dev/null
-+++ b/tests/acceptance/machine_avr6.py
-@@ -0,0 +1,36 @@
-+import logging
-+import time
-+import distutils.spawn
++static void gen_push_ret(DisasContext *ctx, int ret)
++{
++    if (avr_feature(ctx->env, AVR_FEATURE_1_BYTE_PC)) {
 +
-+from avocado import skipUnless
-+from avocado_qemu import Test
-+from avocado.utils import process
++        TCGv t0 = tcg_const_i32((ret & 0x0000ff));
 +
-+class AVR6Machine(Test):
-+    timeout = 5
++        tcg_gen_qemu_st_tl(t0, cpu_sp, MMU_DATA_IDX, MO_UB);
++        tcg_gen_subi_tl(cpu_sp, cpu_sp, 1);
 +
-+    def test_freertos(self):
-+        """
-+        :avocado: tags=arch:avr
-+        :avocado: tags=machine:sample
-+        """
-+        """
-+        https://github.com/seharris/qemu-avr-tests/raw/master/free-rtos/Demo/AVR_ATMega2560_GCC/demo.elf
-+        constantly prints out 'ABCDEFGHIJKLMNOPQRSTUVWXABCDEFGHIJKLMNOPQRSTUVWX'
-+        """
-+        rom_url = 'https://github.com/seharris/qemu-avr-tests'
-+        rom_url += '/raw/master/free-rtos/Demo/AVR_ATMega2560_GCC/demo.elf'
-+        rom_hash = '7eb521f511ca8f2622e0a3c5e8dd686efbb911d4'
-+        rom_path = self.fetch_asset(rom_url, asset_hash=rom_hash)
++        tcg_temp_free_i32(t0);
++    } else if (avr_feature(ctx->env, AVR_FEATURE_2_BYTE_PC)) {
 +
-+        self.vm.set_machine('sample')
-+        self.vm.add_args('-bios', rom_path)
-+        self.vm.add_args('-nographic')
-+        self.vm.launch()
++        TCGv t0 = tcg_const_i32((ret & 0x00ffff));
 +
-+        time.sleep(2)
-+        self.vm.shutdown()
++        tcg_gen_subi_tl(cpu_sp, cpu_sp, 1);
++        tcg_gen_qemu_st_tl(t0, cpu_sp, MMU_DATA_IDX, MO_BEUW);
++        tcg_gen_subi_tl(cpu_sp, cpu_sp, 1);
 +
-+        match = 'ABCDEFGHIJKLMNOPQRSTUVWXABCDEFGHIJKLMNOPQRSTUVWX'
++        tcg_temp_free_i32(t0);
 +
-+        self.assertIn(match, self.vm.get_log())
-diff --git a/tests/boot-serial-test.c b/tests/boot-serial-test.c
-index d3a54a0ba5..1121ed0db2 100644
---- a/tests/boot-serial-test.c
-+++ b/tests/boot-serial-test.c
-@@ -16,6 +16,15 @@
- #include "qemu/osdep.h"
- #include "libqtest.h"
++    } else if (avr_feature(ctx->env, AVR_FEATURE_3_BYTE_PC)) {
++
++        TCGv lo = tcg_const_i32((ret & 0x0000ff));
++        TCGv hi = tcg_const_i32((ret & 0xffff00) >> 8);
++
++        tcg_gen_qemu_st_tl(lo, cpu_sp, MMU_DATA_IDX, MO_UB);
++        tcg_gen_subi_tl(cpu_sp, cpu_sp, 2);
++        tcg_gen_qemu_st_tl(hi, cpu_sp, MMU_DATA_IDX, MO_BEUW);
++        tcg_gen_subi_tl(cpu_sp, cpu_sp, 1);
++
++        tcg_temp_free_i32(lo);
++        tcg_temp_free_i32(hi);
++    }
++}
++
++
++static void gen_pop_ret(DisasContext *ctx, TCGv ret)
++{
++    if (avr_feature(ctx->env, AVR_FEATURE_1_BYTE_PC)) {
++        tcg_gen_addi_tl(cpu_sp, cpu_sp, 1);
++        tcg_gen_qemu_ld_tl(ret, cpu_sp, MMU_DATA_IDX, MO_UB);
++    } else if (avr_feature(ctx->env, AVR_FEATURE_2_BYTE_PC)) {
++        tcg_gen_addi_tl(cpu_sp, cpu_sp, 1);
++        tcg_gen_qemu_ld_tl(ret, cpu_sp, MMU_DATA_IDX, MO_BEUW);
++        tcg_gen_addi_tl(cpu_sp, cpu_sp, 1);
++    } else if (avr_feature(ctx->env, AVR_FEATURE_3_BYTE_PC)) {
++        TCGv lo = tcg_temp_new_i32();
++        TCGv hi = tcg_temp_new_i32();
++
++        tcg_gen_addi_tl(cpu_sp, cpu_sp, 1);
++        tcg_gen_qemu_ld_tl(hi, cpu_sp, MMU_DATA_IDX, MO_BEUW);
++
++        tcg_gen_addi_tl(cpu_sp, cpu_sp, 2);
++        tcg_gen_qemu_ld_tl(lo, cpu_sp, MMU_DATA_IDX, MO_UB);
++
++        tcg_gen_deposit_tl(ret, lo, hi, 8, 16);
++
++        tcg_temp_free_i32(lo);
++        tcg_temp_free_i32(hi);
++    }
++}
++
++
++static void gen_goto_tb(DisasContext *ctx, int n, target_ulong dest)
++{
++    TranslationBlock *tb = ctx->tb;
++
++    if (ctx->singlestep == 0) {
++        tcg_gen_goto_tb(n);
++        tcg_gen_movi_i32(cpu_pc, dest);
++        tcg_gen_exit_tb(tb, n);
++    } else {
++        tcg_gen_movi_i32(cpu_pc, dest);
++        gen_helper_debug(cpu_env);
++        tcg_gen_exit_tb(NULL, 0);
++    }
++    ctx->bstate = DISAS_NORETURN;
++}
++
++
+ /*
+  *  Adds two registers without the C Flag and places the result in the
+  *  destination register Rd.
+@@ -941,3 +1021,465 @@ static bool trans_DES(DisasContext *ctx, arg_DES *a)
  
-+static const uint8_t bios_avr[] = {
-+    0x88, 0xe0,             /* ldi r24, 0x08   */
-+    0x80, 0x93, 0xc1, 0x00, /* sts 0x00C1, r24 ; Enable tx */
-+    0x86, 0xe0,             /* ldi r24, 0x06   */
-+    0x80, 0x93, 0xc2, 0x00, /* sts 0x00C2, r24 ; Set the data bits to 8 */
-+    0x84, 0xe5,             /* ldi r24, 0x54   */
-+    0x80, 0x93, 0xc6, 0x00, /* sts 0x00C6, r24 ; Output 'T' */
-+};
+     return true;
+ }
 +
- static const uint8_t kernel_mcf5208[] = {
-     0x41, 0xf9, 0xfc, 0x06, 0x00, 0x00,     /* lea 0xfc060000,%a0 */
-     0x10, 0x3c, 0x00, 0x54,                 /* move.b #'T',%d0 */
-@@ -103,6 +112,7 @@ typedef struct testdef {
- 
- static testdef_t tests[] = {
-     { "alpha", "clipper", "", "PCI:" },
-+    { "avr", "sample", "", "T", sizeof(bios_avr), NULL, bios_avr },
-     { "ppc", "ppce500", "", "U-Boot" },
-     { "ppc", "40p", "-vga none -boot d", "Trying cd:," },
-     { "ppc", "g3beige", "", "PowerPC,750" },
++
++/*
++ *  Relative jump to an address within PC - 2K +1 and PC + 2K (words). For
++ *  AVR microcontrollers with Program memory not exceeding 4K words (8KB) this
++ *  instruction can address the entire memory from every address location. See
++ *  also JMP.
++ */
++static bool trans_RJMP(DisasContext *ctx, arg_RJMP *a)
++{
++    int dst = ctx->npc + a->imm;
++
++    gen_goto_tb(ctx, 0, dst);
++
++    return true;
++}
++
++
++/*
++ *  Indirect jump to the address pointed to by the Z (16 bits) Pointer
++ *  Register in the Register File. The Z-pointer Register is 16 bits wide and
++ *  allows jump within the lowest 64K words (128KB) section of Program memory.
++ *  This instruction is not available in all devices. Refer to the device
++ *  specific instruction set summary.
++ */
++static bool trans_IJMP(DisasContext *ctx, arg_IJMP *a)
++{
++    if (!avr_have_feature(ctx, AVR_FEATURE_IJMP_ICALL)) {
++        return true;
++    }
++
++    gen_jmp_z(ctx);
++
++    return true;
++}
++
++
++/*
++ *  Indirect jump to the address pointed to by the Z (16 bits) Pointer
++ *  Register in the Register File and the EIND Register in the I/O space. This
++ *  instruction allows for indirect jumps to the entire 4M (words) Program
++ *  memory space. See also IJMP.  This instruction is not available in all
++ *  devices. Refer to the device specific instruction set summary.
++ */
++static bool trans_EIJMP(DisasContext *ctx, arg_EIJMP *a)
++{
++    if (!avr_have_feature(ctx, AVR_FEATURE_EIJMP_EICALL)) {
++        return true;
++    }
++
++    gen_jmp_ez(ctx);
++    return true;
++}
++
++
++/*
++ *  Jump to an address within the entire 4M (words) Program memory. See also
++ *  RJMP.  This instruction is not available in all devices. Refer to the device
++ *  specific instruction set summary.0
++ */
++static bool trans_JMP(DisasContext *ctx, arg_JMP *a)
++{
++    if (!avr_have_feature(ctx, AVR_FEATURE_JMP_CALL)) {
++        return true;
++    }
++
++    gen_goto_tb(ctx, 0, a->imm);
++
++    return true;
++}
++
++
++/*
++ *  Relative call to an address within PC - 2K + 1 and PC + 2K (words). The
++ *  return address (the instruction after the RCALL) is stored onto the Stack.
++ *  See also CALL. For AVR microcontrollers with Program memory not exceeding 4K
++ *  words (8KB) this instruction can address the entire memory from every
++ *  address location. The Stack Pointer uses a post-decrement scheme during
++ *  RCALL.
++ */
++static bool trans_RCALL(DisasContext *ctx, arg_RCALL *a)
++{
++    int ret = ctx->npc;
++    int dst = ctx->npc + a->imm;
++
++    gen_push_ret(ctx, ret);
++    gen_goto_tb(ctx, 0, dst);
++
++    return true;
++}
++
++
++/*
++ *  Calls to a subroutine within the entire 4M (words) Program memory. The
++ *  return address (to the instruction after the CALL) will be stored onto the
++ *  Stack. See also RCALL. The Stack Pointer uses a post-decrement scheme during
++ *  CALL.  This instruction is not available in all devices. Refer to the device
++ *  specific instruction set summary.
++ */
++static bool trans_ICALL(DisasContext *ctx, arg_ICALL *a)
++{
++    if (!avr_have_feature(ctx, AVR_FEATURE_IJMP_ICALL)) {
++        return true;
++    }
++
++    int ret = ctx->npc;
++
++    gen_push_ret(ctx, ret);
++    gen_jmp_z(ctx);
++
++    return true;
++}
++
++
++/*
++ *  Indirect call of a subroutine pointed to by the Z (16 bits) Pointer
++ *  Register in the Register File and the EIND Register in the I/O space. This
++ *  instruction allows for indirect calls to the entire 4M (words) Program
++ *  memory space. See also ICALL. The Stack Pointer uses a post-decrement scheme
++ *  during EICALL.  This instruction is not available in all devices. Refer to
++ *  the device specific instruction set summary.
++ */
++static bool trans_EICALL(DisasContext *ctx, arg_EICALL *a)
++{
++    if (!avr_have_feature(ctx, AVR_FEATURE_EIJMP_EICALL)) {
++        return true;
++    }
++
++    int ret = ctx->npc;
++
++    gen_push_ret(ctx, ret);
++    gen_jmp_ez(ctx);
++    return true;
++}
++
++
++/*
++ *  Calls to a subroutine within the entire Program memory. The return
++ *  address (to the instruction after the CALL) will be stored onto the Stack.
++ *  (See also RCALL). The Stack Pointer uses a post-decrement scheme during
++ *  CALL.  This instruction is not available in all devices. Refer to the device
++ *  specific instruction set summary.
++ */
++static bool trans_CALL(DisasContext *ctx, arg_CALL *a)
++{
++    if (!avr_have_feature(ctx, AVR_FEATURE_JMP_CALL)) {
++        return true;
++    }
++
++    int Imm = a->imm;
++    int ret = ctx->npc;
++
++    gen_push_ret(ctx, ret);
++    gen_goto_tb(ctx, 0, Imm);
++
++    return true;
++}
++
++
++/*
++ *  Returns from subroutine. The return address is loaded from the STACK.
++ *  The Stack Pointer uses a preincrement scheme during RET.
++ */
++static bool trans_RET(DisasContext *ctx, arg_RET *a)
++{
++    gen_pop_ret(ctx, cpu_pc);
++
++    ctx->bstate = DISAS_LOOKUP;
++    return true;
++}
++
++
++/*
++ *  Returns from interrupt. The return address is loaded from the STACK and
++ *  the Global Interrupt Flag is set.  Note that the Status Register is not
++ *  automatically stored when entering an interrupt routine, and it is not
++ *  restored when returning from an interrupt routine. This must be handled by
++ *  the application program. The Stack Pointer uses a pre-increment scheme
++ *  during RETI.
++ */
++static bool trans_RETI(DisasContext *ctx, arg_RETI *a)
++{
++    gen_pop_ret(ctx, cpu_pc);
++    tcg_gen_movi_tl(cpu_If, 1);
++
++    /* Need to return to main loop to re-evaluate interrupts.  */
++    ctx->bstate = DISAS_EXIT;
++    return true;
++}
++
++
++/*
++ *  This instruction performs a compare between two registers Rd and Rr, and
++ *  skips the next instruction if Rd = Rr.
++ */
++static bool trans_CPSE(DisasContext *ctx, arg_CPSE *a)
++{
++    ctx->skip_cond = TCG_COND_EQ;
++    ctx->skip_var0 = cpu_r[a->rd];
++    ctx->skip_var1 = cpu_r[a->rr];
++    return true;
++}
++
++
++/*
++ *  This instruction performs a compare between two registers Rd and Rr.
++ *  None of the registers are changed. All conditional branches can be used
++ *  after this instruction.
++ */
++static bool trans_CP(DisasContext *ctx, arg_CP *a)
++{
++    TCGv Rd = cpu_r[a->rd];
++    TCGv Rr = cpu_r[a->rr];
++    TCGv R = tcg_temp_new_i32();
++
++    /* op */
++    tcg_gen_sub_tl(R, Rd, Rr); /* R = Rd - Rr */
++    tcg_gen_andi_tl(R, R, 0xff); /* make it 8 bits */
++
++    gen_sub_CHf(R, Rd, Rr);
++    gen_sub_Vf(R, Rd, Rr);
++    gen_ZNSf(R);
++
++    tcg_temp_free_i32(R);
++
++    return true;
++}
++
++
++/*
++ *  This instruction performs a compare between two registers Rd and Rr and
++ *  also takes into account the previous carry. None of the registers are
++ *  changed. All conditional branches can be used after this instruction.
++ */
++static bool trans_CPC(DisasContext *ctx, arg_CPC *a)
++{
++    TCGv Rd = cpu_r[a->rd];
++    TCGv Rr = cpu_r[a->rr];
++    TCGv R = tcg_temp_new_i32();
++
++    /* op */
++    tcg_gen_sub_tl(R, Rd, Rr); /* R = Rd - Rr - Cf */
++    tcg_gen_sub_tl(R, R, cpu_Cf);
++    tcg_gen_andi_tl(R, R, 0xff); /* make it 8 bits */
++
++    gen_sub_CHf(R, Rd, Rr);
++    gen_sub_Vf(R, Rd, Rr);
++    gen_NSf(R);
++
++    /*
++     * Previous value remains unchanged when the result is zero;
++     * cleared otherwise.
++     */
++    tcg_gen_or_tl(cpu_Zf, cpu_Zf, R);
++
++    tcg_temp_free_i32(R);
++
++    return true;
++}
++
++
++/*
++ *  This instruction performs a compare between register Rd and a constant.
++ *  The register is not changed. All conditional branches can be used after this
++ *  instruction.
++ */
++static bool trans_CPI(DisasContext *ctx, arg_CPI *a)
++{
++    TCGv Rd = cpu_r[a->rd];
++    int Imm = a->imm;
++    TCGv Rr = tcg_const_i32(Imm);
++    TCGv R = tcg_temp_new_i32();
++
++    /* op */
++    tcg_gen_sub_tl(R, Rd, Rr); /* R = Rd - Rr */
++    tcg_gen_andi_tl(R, R, 0xff); /* make it 8 bits */
++
++    gen_sub_CHf(R, Rd, Rr);
++    gen_sub_Vf(R, Rd, Rr);
++    gen_ZNSf(R);
++
++    tcg_temp_free_i32(R);
++    tcg_temp_free_i32(Rr);
++
++    return true;
++}
++
++
++/*
++ *  This instruction tests a single bit in a register and skips the next
++ *  instruction if the bit is cleared.
++ */
++static bool trans_SBRC(DisasContext *ctx, arg_SBRC *a)
++{
++    TCGv Rr = cpu_r[a->rr];
++
++    ctx->skip_cond = TCG_COND_EQ;
++    ctx->skip_var0 = tcg_temp_new();
++    ctx->free_skip_var0 = true;
++
++    tcg_gen_andi_tl(ctx->skip_var0, Rr, 1 << a->bit);
++    return true;
++}
++
++
++/*
++ *  This instruction tests a single bit in a register and skips the next
++ *  instruction if the bit is set.
++ */
++static bool trans_SBRS(DisasContext *ctx, arg_SBRS *a)
++{
++    TCGv Rr = cpu_r[a->rr];
++
++    ctx->skip_cond = TCG_COND_NE;
++    ctx->skip_var0 = tcg_temp_new();
++    ctx->free_skip_var0 = true;
++
++    tcg_gen_andi_tl(ctx->skip_var0, Rr, 1 << a->bit);
++    return true;
++}
++
++
++/*
++ *  This instruction tests a single bit in an I/O Register and skips the
++ *  next instruction if the bit is cleared. This instruction operates on the
++ *  lower 32 I/O Registers -- addresses 0-31.
++ */
++static bool trans_SBIC(DisasContext *ctx, arg_SBIC *a)
++{
++    TCGv temp = tcg_const_i32(a->reg);
++
++    gen_helper_inb(temp, cpu_env, temp);
++    tcg_gen_andi_tl(temp, temp, 1 << a->bit);
++    ctx->skip_cond = TCG_COND_EQ;
++    ctx->skip_var0 = temp;
++    ctx->free_skip_var0 = true;
++
++    return true;
++}
++
++
++/*
++ *  This instruction tests a single bit in an I/O Register and skips the
++ *  next instruction if the bit is set. This instruction operates on the lower
++ *  32 I/O Registers -- addresses 0-31.
++ */
++static bool trans_SBIS(DisasContext *ctx, arg_SBIS *a)
++{
++    TCGv temp = tcg_const_i32(a->reg);
++
++    gen_helper_inb(temp, cpu_env, temp);
++    tcg_gen_andi_tl(temp, temp, 1 << a->bit);
++    ctx->skip_cond = TCG_COND_NE;
++    ctx->skip_var0 = temp;
++    ctx->free_skip_var0 = true;
++
++    return true;
++}
++
++
++/*
++ *  Conditional relative branch. Tests a single bit in SREG and branches
++ *  relatively to PC if the bit is cleared. This instruction branches relatively
++ *  to PC in either direction (PC - 63 < = destination <= PC + 64). The
++ *  parameter k is the offset from PC and is represented in two's complement
++ *  form.
++ */
++static bool trans_BRBC(DisasContext *ctx, arg_BRBC *a)
++{
++    TCGLabel *not_taken = gen_new_label();
++    TCGCond cond = TCG_COND_EQ;
++    TCGv var;
++
++    switch (a->bit) {
++    case 0x00:
++        var = cpu_Cf;
++        break;
++    case 0x01:
++        cond = TCG_COND_NE;
++        var = cpu_Zf;
++        break;
++    case 0x02:
++        var = cpu_Nf;
++        break;
++    case 0x03:
++        var = cpu_Vf;
++        break;
++    case 0x04:
++        var = cpu_Sf;
++        break;
++    case 0x05:
++        var = cpu_Hf;
++        break;
++    case 0x06:
++        var = cpu_Tf;
++        break;
++    case 0x07:
++        var = cpu_If;
++        break;
++    default:
++        g_assert_not_reached();
++    }
++
++    tcg_gen_brcondi_i32(tcg_invert_cond(cond), var, 0, not_taken);
++    gen_goto_tb(ctx, 0, ctx->npc + a->imm);
++    gen_set_label(not_taken);
++
++    ctx->bstate = DISAS_CHAIN;
++    return true;
++}
++
++
++/*
++ *  Conditional relative branch. Tests a single bit in SREG and branches
++ *  relatively to PC if the bit is set. This instruction branches relatively to
++ *  PC in either direction (PC - 63 < = destination <= PC + 64). The parameter k
++ *  is the offset from PC and is represented in two's complement form.
++ */
++static bool trans_BRBS(DisasContext *ctx, arg_BRBS *a)
++{
++    TCGLabel *not_taken = gen_new_label();
++    TCGCond cond = TCG_COND_NE;
++    TCGv var;
++
++    switch (a->bit) {
++    case 0x00:
++        var = cpu_Cf;
++        break;
++    case 0x01:
++        cond = TCG_COND_EQ;
++        var = cpu_Zf;
++        break;
++    case 0x02:
++        var = cpu_Nf;
++        break;
++    case 0x03:
++        var = cpu_Vf;
++        break;
++    case 0x04:
++        var = cpu_Sf;
++        break;
++    case 0x05:
++        var = cpu_Hf;
++        break;
++    case 0x06:
++        var = cpu_Tf;
++        break;
++    case 0x07:
++        var = cpu_If;
++        break;
++    default:
++        g_assert_not_reached();
++    }
++
++    tcg_gen_brcondi_i32(tcg_invert_cond(cond), var, 0, not_taken);
++    gen_goto_tb(ctx, 0, ctx->npc + a->imm);
++    gen_set_label(not_taken);
++
++    ctx->bstate = DISAS_CHAIN;
++    return true;
++}
++
 -- 
 2.17.2 (Apple Git-113)
 
