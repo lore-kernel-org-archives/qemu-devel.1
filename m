@@ -6,80 +6,80 @@ X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1AE99CA9EB5
-	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 08:33:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7DE4FCA9EB5
+	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 08:35:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D2019214AE
-	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 08:33:20 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D2019214AE
+	by mail.kernel.org (Postfix) with ESMTPS id 539ED214AE
+	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 08:35:40 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 539ED214AE
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35830 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35850 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iMT7w-0004nr-3A
-	for qemu-devel@archiver.kernel.org; Mon, 21 Oct 2019 04:33:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54308)
+	id 1iMTAB-00069K-GR
+	for qemu-devel@archiver.kernel.org; Mon, 21 Oct 2019 04:35:39 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54523)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1iMT6y-0004Dg-Da
- for qemu-devel@nongnu.org; Mon, 21 Oct 2019 04:32:21 -0400
+ (envelope-from <philmd@redhat.com>) id 1iMT9N-0005Wf-2e
+ for qemu-devel@nongnu.org; Mon, 21 Oct 2019 04:34:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1iMT6x-0006bj-6g
- for qemu-devel@nongnu.org; Mon, 21 Oct 2019 04:32:20 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:35106)
+ (envelope-from <philmd@redhat.com>) id 1iMT9L-0007XI-RK
+ for qemu-devel@nongnu.org; Mon, 21 Oct 2019 04:34:49 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:32816)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iMT6w-0006bL-VL
- for qemu-devel@nongnu.org; Mon, 21 Oct 2019 04:32:19 -0400
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71])
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iMT9L-0007Wo-J8
+ for qemu-devel@nongnu.org; Mon, 21 Oct 2019 04:34:47 -0400
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69])
  (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 63C4A81DF1
- for <qemu-devel@nongnu.org>; Mon, 21 Oct 2019 08:32:17 +0000 (UTC)
-Received: by mail-wr1-f71.google.com with SMTP id c6so6853493wrp.3
- for <qemu-devel@nongnu.org>; Mon, 21 Oct 2019 01:32:17 -0700 (PDT)
+ by mx1.redhat.com (Postfix) with ESMTPS id 72F60C054C52
+ for <qemu-devel@nongnu.org>; Mon, 21 Oct 2019 08:34:46 +0000 (UTC)
+Received: by mail-wr1-f69.google.com with SMTP id s17so1198329wrp.17
+ for <qemu-devel@nongnu.org>; Mon, 21 Oct 2019 01:34:46 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:message-id:date
  :user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=22+CB66Y9RaGS1ZyijtNkan4x13wL2aw4SDXEvK9Bb8=;
- b=ktMpk80B5j79o39MABSNDAXXRevgAOQ90U/CiebtN57csz1fDyZABUluOdpmEDhVAC
- OY1eJDYfE925n2sOv5xBn9PKclsibo/ASG3LQ8bsXBDdRiLeRgoalhMN3F4sT1yykhtA
- BiiVfH4kT52DZHy5ezzW14jMEFBcu8uKDSRP2b0Yph2EOctY6RI4syjMvzpIEZVmcFMK
- O/fQZaJH8EGtDfLXzijHU5rK0P+9eLiKJ1dsmxVyd94Q7bOqwGfRRfXuj9L4kPHcVJLI
- vsQxSaBvPi18VH4YPI+g2c6jFRxfYqHU9jFbHwbNzw3S+2sIO3PIMonkTAjq/XsuQ73a
- +yFw==
-X-Gm-Message-State: APjAAAWD1GeH8lFX/cOs4bg/22P0e+lTZvCg6BSLXWxjVEv1e0EgUusF
- tYvtqaMSMngA6HHeQs0Y05huQBNS34wfk0O01WiqzmJqcaBRFoigY50XV8XtWKcuf5yW4MYpmNr
- FsqCI38jPSeCGotE=
-X-Received: by 2002:a1c:9ecf:: with SMTP id h198mr17766641wme.45.1571646735973; 
- Mon, 21 Oct 2019 01:32:15 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqxiUgMnKvh05tfMegjr0956v//uObdMr3nrXhSJfSfS7i1kWinKYnb312ScQGxagqQwjl1z3g==
-X-Received: by 2002:a1c:9ecf:: with SMTP id h198mr17766581wme.45.1571646735627; 
- Mon, 21 Oct 2019 01:32:15 -0700 (PDT)
+ bh=TCn+Qdz00SV7XMFoUhfjz0N726xchFWUp1tXh0p0n0Q=;
+ b=Y6bxxO1xCSEzunXKd09UGsew0GU4ouKwczmSu3+vT/vfVIXm3HlNBYKG82HVfdjpsU
+ OjL5q/jOgvL9kcVSGtnPURk/6idbOJbv6Q0fLOE94ATnXEVAGcM12lKQU1MQDH9byaYr
+ r5KrbM4HnI7hqOTSv9Xts8BB+sQGTn8kGqrb5WjSLWfo3J+DYAA3TrDVSBBozM/uTJaF
+ rflKFQo94bYiKy9dQNRF3mO6x3VmWjQdW2ER/pgghOcgYxSJm+K6rXRSrXeWbSd0wJ+M
+ pNZGLA81e4FFcb5qhQrG4vU27he8BsMEfqaByoT3fEyhSMvAyOmV4zcanrVh/hYNW7mZ
+ GbNw==
+X-Gm-Message-State: APjAAAWm/AaQBEiu+MhOcnTJMEWrFSRflBZSbzqnh7UvRmCQOml6E0HG
+ 8G+6JTsP5ET3P/OXhKOI1KrjwybrBQiuWmAa9AkoiEAdDN0bReD4Iy0O0yVaVNINSMGiCXSSMUw
+ AxCmzu7zz5u4aqO4=
+X-Received: by 2002:a05:600c:21c8:: with SMTP id
+ x8mr16839648wmj.123.1571646885086; 
+ Mon, 21 Oct 2019 01:34:45 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqw81gplkeWzcy+uHOpRKzKgROW67o6ELb5nVOEl3L/JAzZK9u0xgCv/l5ekZMHqIou5GwNIeg==
+X-Received: by 2002:a05:600c:21c8:: with SMTP id
+ x8mr16839621wmj.123.1571646884843; 
+ Mon, 21 Oct 2019 01:34:44 -0700 (PDT)
 Received: from [192.168.1.41] (129.red-83-57-174.dynamicip.rima-tde.net.
  [83.57.174.129])
- by smtp.gmail.com with ESMTPSA id u68sm17803100wmu.12.2019.10.21.01.32.12
+ by smtp.gmail.com with ESMTPSA id y3sm24539770wro.36.2019.10.21.01.34.41
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Mon, 21 Oct 2019 01:32:15 -0700 (PDT)
-Subject: Re: [PATCH 09/21] hw: Let memory_region_allocate_system_memory take
- MachineState argument
-To: Thomas Huth <th.huth@posteo.de>, Paolo Bonzini <pbonzini@redhat.com>,
- Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org,
- Markus Armbruster <armbru@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
+ Mon, 21 Oct 2019 01:34:44 -0700 (PDT)
+Subject: Re: [PATCH 18/21] hw/mips: Let the machine be the owner of the system
+ memory
+To: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
 References: <20191020225650.3671-1-philmd@redhat.com>
- <20191020225650.3671-10-philmd@redhat.com>
- <bccd05a8-43e1-e094-3e6c-e7df24cc843f@posteo.de>
+ <20191020225650.3671-19-philmd@redhat.com>
+ <CAL1e-=ivk8phw5SOd=a6SO8RJ4E=9kN8hN0tocQYcb7AEKeyEA@mail.gmail.com>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <d089a702-a458-eb46-1e66-4eb6abfb2ced@redhat.com>
-Date: Mon, 21 Oct 2019 10:32:11 +0200
+Message-ID: <698bde03-02a9-be5e-2aff-4e8d50508222@redhat.com>
+Date: Mon, 21 Oct 2019 10:34:40 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.1.1
 MIME-Version: 1.0
-In-Reply-To: <bccd05a8-43e1-e094-3e6c-e7df24cc843f@posteo.de>
+In-Reply-To: <CAL1e-=ivk8phw5SOd=a6SO8RJ4E=9kN8hN0tocQYcb7AEKeyEA@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
@@ -97,135 +97,202 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paul Burton <pburton@wavecomp.com>,
+Cc: Paul Burton <pburton@wavecomp.com>, Jan Kiszka <jan.kiszka@web.de>,
  Peter Maydell <peter.maydell@linaro.org>,
- "Michael S. Tsirkin" <mst@redhat.com>,
- Leif Lindholm <leif.lindholm@linaro.org>,
  Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
  KONRAD Frederic <frederic.konrad@adacore.com>,
  "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Rob Herring <robh@kernel.org>,
  Andrey Smirnov <andrew.smirnov@gmail.com>, Helge Deller <deller@gmx.de>,
+ "Michael S. Tsirkin" <mst@redhat.com>, Markus Armbruster <armbru@redhat.com>,
  =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>,
- Joel Stanley <joel@jms.id.au>, Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
- Richard Henderson <rth@twiddle.net>, Artyom Tarasenko <atar4qemu@gmail.com>,
  Antony Pavlov <antonynpavlov@gmail.com>,
- Alistair Francis <alistair@alistair23.me>,
- Fabien Chouteau <chouteau@adacore.com>,
- Beniamino Galvani <b.galvani@gmail.com>, qemu-arm@nongnu.org,
- Peter Chubb <peter.chubb@nicta.com.au>,
- =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>,
+ Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
  David Gibson <david@gibson.dropbear.id.au>,
+ Artyom Tarasenko <atar4qemu@gmail.com>, Joel Stanley <joel@jms.id.au>,
+ Eduardo Habkost <ehabkost@redhat.com>,
+ Alistair Francis <alistair@alistair23.me>,
+ Leif Lindholm <leif.lindholm@linaro.org>,
+ Beniamino Galvani <b.galvani@gmail.com>,
+ "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>,
+ Peter Chubb <peter.chubb@nicta.com.au>, Fabien Chouteau <chouteau@adacore.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>,
  Radoslaw Biernacki <radoslaw.biernacki@linaro.org>,
  Thomas Huth <huth@tuxfamily.org>,
  Andrew Baumann <Andrew.Baumann@microsoft.com>,
  Jean-Christophe Dubois <jcd@tribudubois.net>, Andrew Jeffery <andrew@aj.id.au>,
- Michael Walle <michael@walle.cc>, qemu-ppc@nongnu.org,
- Aleksandar Markovic <amarkovic@wavecomp.com>, Jan Kiszka <jan.kiszka@web.de>,
- Aurelien Jarno <aurelien@aurel32.net>
+ Michael Walle <michael@walle.cc>, "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>,
+ Aleksandar Markovic <amarkovic@wavecomp.com>,
+ Igor Mammedov <imammedo@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>,
+ =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 10/21/19 9:27 AM, Thomas Huth wrote:
-> On 21/10/2019 00.56, Philippe Mathieu-Daud=C3=A9 wrote:
->> All the codebase calls memory_region_allocate_system_memory() with
->> a NULL 'owner' from the board_init() function.
+Hi Aleksandar,
+
+On 10/21/19 8:25 AM, Aleksandar Markovic wrote:
 >=20
-> It's a little bit weird that you first changed the owner to NULL in
-> patch 7, just to change the type of the parameter here and then change
-> the parameter back to the machine afterwards. I think I'd rather squash
-> pash 7 (and the follow-up patches like 14) into this one here - it's
-> just four files that need to be adapted, so I think that's still fine,
-> and finally that's less churn to be reviewed.
-
-I haven't thought of it and like your suggestion :)
-
->> Let pass a MachineState argument, and enforce the QOM ownership of
->> the system memory.
 >=20
-> BTW, good idea!
+> On Monday, October 21, 2019, Philippe Mathieu-Daud=C3=A9 <philmd@redhat=
+.com=20
+> <mailto:philmd@redhat.com>> wrote:
+>=20
+>     Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com
+>     <mailto:philmd@redhat.com>>
+>     ---
+>      =C2=A0hw/mips/boston.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 | 2 +-
+>      =C2=A0hw/mips/mips_fulong2e.c | 3 ++-
+>      =C2=A0hw/mips/mips_jazz.c=C2=A0 =C2=A0 =C2=A0| 2 +-
+>      =C2=A0hw/mips/mips_malta.c=C2=A0 =C2=A0 | 2 +-
+>      =C2=A0hw/mips/mips_mipssim.c=C2=A0 | 2 +-
+>      =C2=A0hw/mips/mips_r4k.c=C2=A0 =C2=A0 =C2=A0 | 3 ++-
+>      =C2=A06 files changed, 8 insertions(+), 6 deletions(-)
+>=20
+>=20
+> Philippe, can this patch be applied independently (on other patches of=20
+> this series)?
 
-Thanks :)
+Unfortunately not because patch #9 changed the prototype of
+memory_region_allocate_system_memory() so this patch alone
+won't build.
+
+I rather expect this series goes as a whole via the machine-next
+tree.
+
+Do you mind giving your Acked-by tag to this patch?
+
+Thanks,
+
+Phil.
 
 >=20
->> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
->> ---
->>   hw/core/numa.c      | 11 +++++++----
->>   include/hw/boards.h |  6 ++++--
->>   2 files changed, 11 insertions(+), 6 deletions(-)
->>
->> diff --git a/hw/core/numa.c b/hw/core/numa.c
->> index 038c96d4ab..2e29e4bfe0 100644
->> --- a/hw/core/numa.c
->> +++ b/hw/core/numa.c
->> @@ -520,21 +520,24 @@ static void allocate_system_memory_nonnuma(Memor=
-yRegion *mr, Object *owner,
->>       vmstate_register_ram_global(mr);
->>   }
->>  =20
->> -void memory_region_allocate_system_memory(MemoryRegion *mr, Object *o=
-wner,
->> +void memory_region_allocate_system_memory(MemoryRegion *mr, MachineSt=
-ate *ms,
->>                                             const char *name,
->>                                             uint64_t ram_size)
->>   {
->>       uint64_t addr =3D 0;
->>       int i;
->> -    MachineState *ms =3D MACHINE(qdev_get_machine());
->> +
->> +    if (!ms) {
->> +        ms =3D MACHINE(qdev_get_machine());
->> +    }
->>  =20
->>       if (ms->numa_state =3D=3D NULL ||
->>           ms->numa_state->num_nodes =3D=3D 0 || !have_memdevs) {
->> -        allocate_system_memory_nonnuma(mr, owner, name, ram_size);
->> +        allocate_system_memory_nonnuma(mr, OBJECT(ms), name, ram_size=
+>=20
+>     diff --git a/hw/mips/boston.c b/hw/mips/boston.c
+>     index ca7d813a52..8445fee0f1 100644
+>     --- a/hw/mips/boston.c
+>     +++ b/hw/mips/boston.c
+>     @@ -474,7 +474,7 @@ static void boston_mach_init(MachineState *mach=
+ine)
+>      =C2=A0 =C2=A0 =C2=A0memory_region_add_subregion_overlap(sys_mem, 0=
+x18000000,
+>     flash, 0);
+>=20
+>      =C2=A0 =C2=A0 =C2=A0ddr =3D g_new(MemoryRegion, 1);
+>     -=C2=A0 =C2=A0 memory_region_allocate_system_memory(ddr, NULL, "bos=
+ton.ddr",
+>     +=C2=A0 =C2=A0 memory_region_allocate_system_memory(ddr, machine, "=
+boston.ddr",
+>      =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 machine->ram_size);
+>      =C2=A0 =C2=A0 =C2=A0memory_region_add_subregion_overlap(sys_mem, 0=
+x80000000, ddr, 0);
+>=20
+>     diff --git a/hw/mips/mips_fulong2e.c b/hw/mips/mips_fulong2e.c
+>     index cf537dd7e6..d5a5cef619 100644
+>     --- a/hw/mips/mips_fulong2e.c
+>     +++ b/hw/mips/mips_fulong2e.c
+>     @@ -318,7 +318,8 @@ static void mips_fulong2e_init(MachineState
+>     *machine)
+>      =C2=A0 =C2=A0 =C2=A0ram_size =3D 256 * MiB;
+>=20
+>      =C2=A0 =C2=A0 =C2=A0/* allocate RAM */
+>     -=C2=A0 =C2=A0 memory_region_allocate_system_memory(ram, NULL, "ful=
+ong2e.ram",
+>     ram_size);
+>     +=C2=A0 =C2=A0 memory_region_allocate_system_memory(ram, machine,
+>     +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0"fulong2e.ram", ram_size);
+>      =C2=A0 =C2=A0 =C2=A0memory_region_init_ram(bios, NULL, "fulong2e.b=
+ios", BIOS_SIZE,
+>      =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 &error_fatal);
+>      =C2=A0 =C2=A0 =C2=A0memory_region_set_readonly(bios, true);
+>     diff --git a/hw/mips/mips_jazz.c b/hw/mips/mips_jazz.c
+>     index 8d010a0b6e..88b125855f 100644
+>     --- a/hw/mips/mips_jazz.c
+>     +++ b/hw/mips/mips_jazz.c
+>     @@ -188,7 +188,7 @@ static void mips_jazz_init(MachineState *machin=
+e,
+>      =C2=A0 =C2=A0 =C2=A0cc->do_transaction_failed =3D mips_jazz_do_tra=
+nsaction_failed;
+>=20
+>      =C2=A0 =C2=A0 =C2=A0/* allocate RAM */
+>     -=C2=A0 =C2=A0 memory_region_allocate_system_memory(ram, NULL, "mip=
+s_jazz.ram",
+>     +=C2=A0 =C2=A0 memory_region_allocate_system_memory(ram, machine, "=
+mips_jazz.ram",
+>      =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 machine->ram_size);
+>      =C2=A0 =C2=A0 =C2=A0memory_region_add_subregion(address_space, 0, =
+ram);
+>=20
+>     diff --git a/hw/mips/mips_malta.c b/hw/mips/mips_malta.c
+>     index 4d9c64b36a..af56a29ccb 100644
+>     --- a/hw/mips/mips_malta.c
+>     +++ b/hw/mips/mips_malta.c
+>     @@ -1267,7 +1267,7 @@ void mips_malta_init(MachineState *machine)
+>      =C2=A0 =C2=A0 =C2=A0}
+>=20
+>      =C2=A0 =C2=A0 =C2=A0/* register RAM at high address where it is un=
+disturbed by IO */
+>     -=C2=A0 =C2=A0 memory_region_allocate_system_memory(ram_high, NULL,
+>     "mips_malta.ram",
+>     +=C2=A0 =C2=A0 memory_region_allocate_system_memory(ram_high, machi=
+ne,
+>     "mips_malta.ram",
+>      =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 ram_size);
+>      =C2=A0 =C2=A0 =C2=A0memory_region_add_subregion(system_memory, 0x8=
+0000000, ram_high);
+>=20
+>     diff --git a/hw/mips/mips_mipssim.c b/hw/mips/mips_mipssim.c
+>     index 282bbecb24..c1933231e2 100644
+>     --- a/hw/mips/mips_mipssim.c
+>     +++ b/hw/mips/mips_mipssim.c
+>     @@ -166,7 +166,7 @@ mips_mipssim_init(MachineState *machine)
+>      =C2=A0 =C2=A0 =C2=A0qemu_register_reset(main_cpu_reset, reset_info=
 );
->>           return;
->>       }
->>  =20
->> -    memory_region_init(mr, owner, name, ram_size);
->> +    memory_region_init(mr, OBJECT(ms), name, ram_size);
->>       for (i =3D 0; i < ms->numa_state->num_nodes; i++) {
->>           uint64_t size =3D ms->numa_state->nodes[i].node_mem;
->>           HostMemoryBackend *backend =3D ms->numa_state->nodes[i].node=
-_memdev;
->> diff --git a/include/hw/boards.h b/include/hw/boards.h
->> index de45087f34..3b6cb82b6c 100644
->> --- a/include/hw/boards.h
->> +++ b/include/hw/boards.h
->> @@ -14,7 +14,7 @@
->>   /**
->>    * memory_region_allocate_system_memory - Allocate a board's main me=
-mory
->>    * @mr: the #MemoryRegion to be initialized
->> - * @owner: the object that tracks the region's reference count
->> + * @ms: the #MachineState object that own the system memory
 >=20
-> s/own/owns/
+>      =C2=A0 =C2=A0 =C2=A0/* Allocate RAM. */
+>     -=C2=A0 =C2=A0 memory_region_allocate_system_memory(ram, NULL, "mip=
+s_mipssim.ram",
+>     +=C2=A0 =C2=A0 memory_region_allocate_system_memory(ram, machine,
+>     "mips_mipssim.ram",
+>      =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 ram_size);
+>      =C2=A0 =C2=A0 =C2=A0memory_region_init_ram(bios, NULL, "mips_mipss=
+im.bios", BIOS_SIZE,
+>      =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 &error_fatal);
+>     diff --git a/hw/mips/mips_r4k.c b/hw/mips/mips_r4k.c
+>     index bc0be26544..59f8cacfb6 100644
+>     --- a/hw/mips/mips_r4k.c
+>     +++ b/hw/mips/mips_r4k.c
+>     @@ -203,7 +203,8 @@ void mips_r4k_init(MachineState *machine)
+>      =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 " maximum 256MB", ram_size / MiB);
+>      =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0exit(1);
+>      =C2=A0 =C2=A0 =C2=A0}
+>     -=C2=A0 =C2=A0 memory_region_allocate_system_memory(ram, NULL, "mip=
+s_r4k.ram",
+>     ram_size);
+>     +=C2=A0 =C2=A0 memory_region_allocate_system_memory(ram, machine, "=
+mips_r4k.ram",
+>     +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0ram_size);
 >=20
->>    * @name: name of the memory region
->>    * @ram_size: size of the region in bytes
->>    *
->> @@ -38,8 +38,10 @@
->>    * Smaller pieces of memory (display RAM, static RAMs, etc) don't ne=
-ed
->>    * to be backed via the -mem-path memory backend and can simply
->>    * be created via memory_region_init_ram().
->> + *
->> + * The #MachineState object will track the region's reference count.
->>    */
->> -void memory_region_allocate_system_memory(MemoryRegion *mr, Object *o=
-wner,
->> +void memory_region_allocate_system_memory(MemoryRegion *mr, MachineSt=
-ate *ms,
->>                                             const char *name,
->>                                             uint64_t ram_size);
->>  =20
->>
+>      =C2=A0 =C2=A0 =C2=A0memory_region_add_subregion(address_space_mem,=
+ 0, ram);
 >=20
->   Thomas
+>     --=20
+>     2.21.0
+>=20
 >=20
 
