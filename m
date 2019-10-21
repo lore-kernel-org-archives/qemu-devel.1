@@ -6,40 +6,40 @@ X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7B96CCA9EB9
-	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 13:29:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 31354CA9EAF
+	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 13:29:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 528EB214AE
-	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 13:29:03 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 528EB214AE
+	by mail.kernel.org (Postfix) with ESMTPS id B710E20873
+	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 13:29:46 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B710E20873
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41628 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41646 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iMXk6-0002tf-E4
-	for qemu-devel@archiver.kernel.org; Mon, 21 Oct 2019 09:29:02 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38434)
+	id 1iMXkn-0003pS-HT
+	for qemu-devel@archiver.kernel.org; Mon, 21 Oct 2019 09:29:45 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38296)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <laurent@vivier.eu>) id 1iMXiY-0001gV-8L
- for qemu-devel@nongnu.org; Mon, 21 Oct 2019 09:27:28 -0400
+ (envelope-from <laurent@vivier.eu>) id 1iMXgr-0008O7-6t
+ for qemu-devel@nongnu.org; Mon, 21 Oct 2019 09:25:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <laurent@vivier.eu>) id 1iMXiX-0003wn-0v
- for qemu-devel@nongnu.org; Mon, 21 Oct 2019 09:27:26 -0400
-Received: from mout.kundenserver.de ([212.227.126.131]:44257)
+ (envelope-from <laurent@vivier.eu>) id 1iMXgq-0003NR-43
+ for qemu-devel@nongnu.org; Mon, 21 Oct 2019 09:25:41 -0400
+Received: from mout.kundenserver.de ([212.227.126.134]:52303)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1iMXiW-0003w7-Nh
- for qemu-devel@nongnu.org; Mon, 21 Oct 2019 09:27:24 -0400
+ (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1iMXgp-0003N6-Qy
+ for qemu-devel@nongnu.org; Mon, 21 Oct 2019 09:25:40 -0400
 Received: from [192.168.100.1] ([78.238.229.36]) by mrelayeu.kundenserver.de
- (mreue009 [213.165.67.103]) with ESMTPSA (Nemesis) id
- 1M597s-1iLRml0kYG-0019UW; Mon, 21 Oct 2019 15:27:19 +0200
-Subject: Re: [PATCH v8 6/9] linux-user/strace: Add print_sockfd()
+ (mreue011 [213.165.67.103]) with ESMTPSA (Nemesis) id
+ 1MIdNt-1iGig23yUP-00EbBp; Mon, 21 Oct 2019 15:25:32 +0200
+Subject: Re: [PATCH v8 3/9] linux-user/strace: Improve settimeofday()
 To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
  qemu-devel@nongnu.org
 References: <20191021114857.20538-1-f4bug@amsat.org>
- <20191021114857.20538-7-f4bug@amsat.org>
+ <20191021114857.20538-4-f4bug@amsat.org>
 From: Laurent Vivier <laurent@vivier.eu>
 Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  mQINBFYFJhkBEAC2me7w2+RizYOKZM+vZCx69GTewOwqzHrrHSG07MUAxJ6AY29/+HYf6EY2
@@ -83,36 +83,36 @@ Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  OpKgu3nD0ahBDqANU/ZmNNarBJEwvM2vfusmNnWm3QMIwxNuJghRyuFfx694Im1js0ZY3LEU
  JGSHFG4ZynA+ZFUPA6Xf0wHeJOxGKCGIyeKORsteIqgnkINW9fnKJw2pgk8qHkwVc3Vu+wGS
  ZiJK0xFusPQehjWTHn9WjMG1zvQ5TQQHxau/2FkP45+nRPco6vVFQe8JmgtRF8WFJA==
-Message-ID: <92cc1cf5-98ea-51cc-ac1c-535fa1ecadb9@vivier.eu>
-Date: Mon, 21 Oct 2019 15:27:18 +0200
+Message-ID: <26a8cc88-ba17-73d0-0edc-c73389a35088@vivier.eu>
+Date: Mon, 21 Oct 2019 15:25:29 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.1.0
 MIME-Version: 1.0
-In-Reply-To: <20191021114857.20538-7-f4bug@amsat.org>
+In-Reply-To: <20191021114857.20538-4-f4bug@amsat.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: fr
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:sDeef4MdxhuBamNDdM4Rfg/2cDDvndpyQ4JOHNknL7YHycXSrI4
- MCU7N36VntzoiZUFWRwgKET3GGiD5MEoblvCFP/jsyiju0mEdw9tt4nW+WwAXVONwHG6aGX
- jg+C8x90lpqOIpwehfyE6grxlHvd6flKs08DPEYLBvEN8rtbSPljdo+OBToRRAZkMPQol4G
- +0jZw7GwR24aGHazH4nnw==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:w46G41wCDWw=:zbfMWUIIxDwCU73klNtPFs
- 5/Gl73/Tk+3tkbcoBOb9d5CWPylEIKmmVIgcBu4xVAs8PHA6FY6DM85quVKZSXWuDCdMNCQbD
- 40JoeO0nCDMQYiWqVeSGbvha0N7Q2yiMTW7AGxaKEWSTL1lxM1BHS7c2ztIntYlsUymj8tnav
- +v8Aa1OienUqEzTJEHdNsA2iXYX7WPgBqnarJ+mJUfWOhQv4LugwY4DxB93K05/KeP+X3Sf+Q
- I+YMUS3OiYDRJ2YYAs2JWq7q1Hn6eePq3yFBfxcGRnawKLAAzT9aHyihQyLkV2ML4Y7PiouB2
- dyTcVmJiapoHITRtVCm/liMUOTLO0OBQhu8JDFtOa/OScff7ZuNa8kcWNvKGTrA7BbzpjJnyI
- zXdTjHmrBzCYDhMQRlB0ddu1DOVKdCWtneo13+/8PelLow1zoQRRsttw4bI1UByKcsJzQssK7
- S8YF+S7PxIa/BAWsIYzNcOQBIm3DAHLOU73B4vUJihvdRIpL58sWcWbSoGEaMXyXXmrlxLCRF
- q7VQmTzlRedYeB4LaKiQtUZM2IIL8TfNZKFG6qdfIjFcIVVuXrod/C5GW9EpCe2+zTRFETipA
- FK5fc4LrRIDDBuwLQZ2GCR0dFJlPo6Nx+XgKXIRSMgCJUKn4kYIaca5z3P+vv/ihZmoqEiQHf
- 0Bm1oZ3oD/V20vJ4m/L7dLnX5H+pFsiGNCX8Y19uuvvYx5h4njVHCQGFcTpQlGHJ0Hlwc6VOF
- F9b5Nye6A3otbUDzjghf9I0Pzm3nVqjxTZ2xWLSR6toPX9Mn1b7g5v0rU3B7Y8EFSX3X0YiW/
- r3vSNayBR0Z6VTEiyxYzxWdrfWqx2M4HW2QAxY43QOuBH0omYSX6GiBjANvVLzs4XYe8SAT2Z
- Hpk79rG3oa6ybW12OOFJsNcWKWHukmKPk+/2bCwVM=
+X-Provags-ID: V03:K1:rSkWak3L9zfyJq2+HbxJKfy/66EsINGk3Hr3BQGAgUxd+5SigdY
+ 9co8qJ98Tg9sYijMLQp6K4Aty7QI7zz2leUP0p9WA95gcmqk2NCifoVyVc9O2YP8GzHvcs2
+ 4lr9kKVOgb50ci2sbHO4Erff7VAsiv5mA93TZU0m8BmyIefmzHM5ZpJHxtxFk9fPdC74Uum
+ sRU5+wwbIoSlTIeXrz2/Q==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:U9xKvUOm52Q=:5KSnI0HKyuDCMNX4Am5x+o
+ 4VdIUusI+bPqTvwbzis3V0taI4HCEDqvyEK1hqXDiMa1vkiGFiB1JiUXydiUe1jW0aGht6aiQ
+ lzmxBH7KneXnnZnCB8IF7Y61qQz0q1oCbI/zYjV/R2wOBPVF8oo/hlZHiOz09O/4skrh+LB91
+ +nnFBRuBFKHYwF2a5eQo5imr6x1d2HdX04TG6lKqWWH5l3xZWkhCxUnoLIan/8LDP3AUbxd0p
+ 8PgnafeX51m92qZNFlduy7LkMynjNmRm/f9e//Y4M5xdEPbPsnqAKivuAJWMdzIeseGx2u7ue
+ LU8VWjAdHW4hrwqm7vqKEshAtzbI8ihEjepu/2/CleDJiAzcmDVh8G/pN/eHLdcep6uHTZi2H
+ 6f5j76ZP9XhehlwaVEIVMbdPGldnsrF1XXMrL/kaLQ+rlCMdgWdnE0pD9J7U0+BRZXlHPsiYx
+ bo6T92bCyGXg3kwgmIFvh2uc2TK1Gv0QKJXgQ8KAKf6NDDTyxV8KJ4+c54ojcoybR82aux70j
+ o7l3BOk47IOiCrjAVahMg23GgsRJOd6p/LOpCgu+nxKlaSDu5mRbCpfGh/UQnbB++Z3F9tn8Y
+ WJzoR9E6WvyKV86AMPbAWb3SdzM5zi2PlauCmzm8MftdeEmszWcfpcxQaMxU8p7JIMYG+Yjmt
+ ktAGM/QE+BFMPnEDWlB/nWKPcM5h+eyfsQJS+pO7o34HNupvBft59+d5Uz0/lf10vd6AUZje1
+ ihmddunhHYmsalV/tXCyZX/8zyc42OROGQDhfLmvpsyJZM0DucQmXQtK7yrmJC+TW1THdmoZK
+ QLFmb/qa5yl/MklqtgdrB3uB5rkzWzQcF84UQCR/j8mS/jyrqdEf+LpPHGqOiaZ4k9bKncKx9
+ +MFJTEfmZ8AAWCSrqjxgugF3iboylQsRtoewsPKFY=
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 212.227.126.131
+X-Received-From: 212.227.126.134
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -124,105 +124,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Riku Voipio <riku.voipio@iki.fi>
+Cc: =?UTF-8?Q?Guido_G=c3=bcnther?= <agx@sigxcpu.org>,
+ Riku Voipio <riku.voipio@iki.fi>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 Le 21/10/2019 à 13:48, Philippe Mathieu-Daudé a écrit :
-> Extract common print_sockfd() from various socket related syscalls.
-> 
-> Reviewed-by: Laurent Vivier <laurent@vivier.eu>
 > Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+> Tested-By: Guido Günther <agx@sigxcpu.org>
+> Reviewed-by: Laurent Vivier <laurent@vivier.eu>
 > ---
-> v6: use another ifdef TARGET_NR_socketcall
-> ---
->  linux-user/strace.c | 23 ++++++++++++++++-------
->  1 file changed, 16 insertions(+), 7 deletions(-)
+>  linux-user/strace.c    | 13 +++++++++++++
+>  linux-user/strace.list |  2 +-
+>  2 files changed, 14 insertions(+), 1 deletion(-)
 > 
 > diff --git a/linux-user/strace.c b/linux-user/strace.c
-> index 5fa7748427..0ce2b658a5 100644
+> index 2cd6687cd9..fd5596a640 100644
 > --- a/linux-user/strace.c
 > +++ b/linux-user/strace.c
-> @@ -1709,6 +1709,15 @@ print_socket(const struct syscallname *name,
+> @@ -1583,6 +1583,19 @@ print_futimesat(const struct syscallname *name,
+>  }
+>  #endif
 >  
->  #if defined(TARGET_NR_socketcall)
->  
-> +static void print_sockfd(abi_long sockfd, int last)
+> +#ifdef TARGET_NR_settimeofday
+> +static void
+> +print_settimeofday(const struct syscallname *name,
+> +                abi_long arg0, abi_long arg1, abi_long arg2,
+> +                abi_long arg3, abi_long arg4, abi_long arg5)
 > +{
-> +    print_raw_param(TARGET_ABI_FMT_ld, sockfd, last);
+> +    print_syscall_prologue(name);
+> +    print_timeval(arg0, 0);
+> +    print_timezone(arg1, 1);
+> +    print_syscall_epilogue(name);
 > +}
-> +
 > +#endif
 > +
-> +#if defined(TARGET_NR_socketcall)
-> +
->  #define get_user_ualx(x, gaddr, idx) \
->          get_user_ual(x, (gaddr) + (idx) * sizeof(abi_long))
->  
-> @@ -1741,7 +1750,7 @@ static void do_print_sockaddr(const char *name, abi_long arg1)
->      get_user_ualx(addrlen, arg1, 2);
->  
->      gemu_log("%s(", name);
-> -    print_raw_param(TARGET_ABI_FMT_ld, sockfd, 0);
-> +    print_sockfd(sockfd, 0);
->      print_sockaddr(addr, addrlen);
->      gemu_log(")");
->  }
-> @@ -1754,7 +1763,7 @@ static void do_print_listen(const char *name, abi_long arg1)
->      get_user_ualx(backlog, arg1, 1);
->  
->      gemu_log("%s(", name);
-> -    print_raw_param(TARGET_ABI_FMT_ld, sockfd, 0);
-> +    print_sockfd(sockfd, 0);
->      print_raw_param(TARGET_ABI_FMT_ld, backlog, 1);
->      gemu_log(")");
->  }
-> @@ -1789,7 +1798,7 @@ static void do_print_sendrecv(const char *name, abi_long arg1)
->      get_user_ualx(flags, arg1, 3);
->  
->      gemu_log("%s(", name);
-> -    print_raw_param(TARGET_ABI_FMT_ld, sockfd, 0);
-> +    print_sockfd(sockfd, 0);
->      print_buf(msg, len, 0);
->      print_raw_param(TARGET_ABI_FMT_ld, len, 0);
->      print_flags(msg_flags, flags, 1);
-> @@ -1808,7 +1817,7 @@ static void do_print_msgaddr(const char *name, abi_long arg1)
->      get_user_ualx(addrlen, arg1, 5);
->  
->      gemu_log("%s(", name);
-> -    print_raw_param(TARGET_ABI_FMT_ld, sockfd, 0);
-> +    print_sockfd(sockfd, 0);
->      print_buf(msg, len, 0);
->      print_raw_param(TARGET_ABI_FMT_ld, len, 0);
->      print_flags(msg_flags, flags, 0);
-> @@ -1824,7 +1833,7 @@ static void do_print_shutdown(const char *name, abi_long arg1)
->      get_user_ualx(how, arg1, 1);
->  
->      gemu_log("shutdown(");
-> -    print_raw_param(TARGET_ABI_FMT_ld, sockfd, 0);
-> +    print_sockfd(sockfd, 0);
->      switch (how) {
->      case SHUT_RD:
->          gemu_log("SHUT_RD");
-> @@ -1851,7 +1860,7 @@ static void do_print_msg(const char *name, abi_long arg1)
->      get_user_ualx(flags, arg1, 2);
->  
->      gemu_log("%s(", name);
-> -    print_raw_param(TARGET_ABI_FMT_ld, sockfd, 0);
-> +    print_sockfd(sockfd, 0);
->      print_pointer(msg, 0);
->      print_flags(msg_flags, flags, 1);
->      gemu_log(")");
-> @@ -1868,7 +1877,7 @@ static void do_print_sockopt(const char *name, abi_long arg1)
->      get_user_ualx(optlen, arg1, 4);
->  
->      gemu_log("%s(", name);
-> -    print_raw_param(TARGET_ABI_FMT_ld, sockfd, 0);
-> +    print_sockfd(sockfd, 0);
->      switch (level) {
->      case SOL_TCP:
->          gemu_log("SOL_TCP,");
+>  #ifdef TARGET_NR_link
+>  static void
+>  print_link(const struct syscallname *name,
+> diff --git a/linux-user/strace.list b/linux-user/strace.list
+> index 63a946642d..1ff9168369 100644
+> --- a/linux-user/strace.list
+> +++ b/linux-user/strace.list
+> @@ -1345,7 +1345,7 @@
+>  { TARGET_NR_set_tid_address, "set_tid_address" , NULL, NULL, NULL },
+>  #endif
+>  #ifdef TARGET_NR_settimeofday
+> -{ TARGET_NR_settimeofday, "settimeofday" , NULL, NULL, NULL },
+> +{ TARGET_NR_settimeofday, "settimeofday" , NULL, print_settimeofday, NULL },
+>  #endif
+>  #ifdef TARGET_NR_setuid
+>  { TARGET_NR_setuid, "setuid" , NULL, NULL, NULL },
 > 
 
 Applied to my linux-user branch.
