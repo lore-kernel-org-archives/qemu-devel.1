@@ -2,44 +2,45 @@ Return-Path: <SRS0=8ZcK=YO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-5.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+	UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 42914CA9EB5
-	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 09:44:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EDB17CA9EB5
+	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 09:50:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 17A0B2089C
-	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 09:44:03 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 17A0B2089C
+	by mail.kernel.org (Postfix) with ESMTPS id BEFA52070B
+	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 09:50:00 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BEFA52070B
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36766 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36798 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iMUEM-0001XW-76
-	for qemu-devel@archiver.kernel.org; Mon, 21 Oct 2019 05:44:02 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37398)
+	id 1iMUK7-00048A-T2
+	for qemu-devel@archiver.kernel.org; Mon, 21 Oct 2019 05:49:59 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37888)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <laurent@vivier.eu>) id 1iMUCl-0008Dn-KV
- for qemu-devel@nongnu.org; Mon, 21 Oct 2019 05:42:24 -0400
+ (envelope-from <laurent@vivier.eu>) id 1iMUIT-0003NR-0o
+ for qemu-devel@nongnu.org; Mon, 21 Oct 2019 05:48:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <laurent@vivier.eu>) id 1iMUCk-0001a2-2p
- for qemu-devel@nongnu.org; Mon, 21 Oct 2019 05:42:23 -0400
-Received: from mout.kundenserver.de ([212.227.126.133]:41445)
+ (envelope-from <laurent@vivier.eu>) id 1iMUIR-00034N-VL
+ for qemu-devel@nongnu.org; Mon, 21 Oct 2019 05:48:16 -0400
+Received: from mout.kundenserver.de ([212.227.126.135]:35273)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1iMUCj-0001Zi-Pq
- for qemu-devel@nongnu.org; Mon, 21 Oct 2019 05:42:22 -0400
+ (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1iMUIR-000340-MO
+ for qemu-devel@nongnu.org; Mon, 21 Oct 2019 05:48:15 -0400
 Received: from [192.168.100.1] ([78.238.229.36]) by mrelayeu.kundenserver.de
- (mreue010 [213.165.67.103]) with ESMTPSA (Nemesis) id
- 1M27Bp-1iK0AC1d1t-002ZyG; Mon, 21 Oct 2019 11:42:09 +0200
-Subject: Re: [PATCH v7 4/9] linux-user/syscall: Introduce target_sockaddr_nl
+ (mreue011 [213.165.67.103]) with ESMTPSA (Nemesis) id
+ 1My2lr-1i6Igf3wGl-00zaAc; Mon, 21 Oct 2019 11:48:03 +0200
+Subject: Re: [PATCH v7 5/9] linux-user/strace: Dump AF_NETLINK sockaddr content
 To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
  qemu-devel@nongnu.org
 References: <20190915213924.22223-1-f4bug@amsat.org>
- <20190915213924.22223-5-f4bug@amsat.org>
+ <20190915213924.22223-6-f4bug@amsat.org>
 From: Laurent Vivier <laurent@vivier.eu>
 Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  mQINBFYFJhkBEAC2me7w2+RizYOKZM+vZCx69GTewOwqzHrrHSG07MUAxJ6AY29/+HYf6EY2
@@ -83,36 +84,36 @@ Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  OpKgu3nD0ahBDqANU/ZmNNarBJEwvM2vfusmNnWm3QMIwxNuJghRyuFfx694Im1js0ZY3LEU
  JGSHFG4ZynA+ZFUPA6Xf0wHeJOxGKCGIyeKORsteIqgnkINW9fnKJw2pgk8qHkwVc3Vu+wGS
  ZiJK0xFusPQehjWTHn9WjMG1zvQ5TQQHxau/2FkP45+nRPco6vVFQe8JmgtRF8WFJA==
-Message-ID: <f1beaa1c-8cbf-7e22-a612-8881ffaf00b5@vivier.eu>
-Date: Mon, 21 Oct 2019 11:42:06 +0200
+Message-ID: <d739bd1b-94ee-dffd-511b-36c2d56a4cfa@vivier.eu>
+Date: Mon, 21 Oct 2019 11:48:00 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.1.0
 MIME-Version: 1.0
-In-Reply-To: <20190915213924.22223-5-f4bug@amsat.org>
+In-Reply-To: <20190915213924.22223-6-f4bug@amsat.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: fr
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:GCuTiymO/cKIfFRqyElk7uWc2sZ9uIMoJ5x25muejFXdf45CG3n
- aPC+yBiZGxRiFB/HQbL5ESWUMe78zo1KrG++k1GMNYJDzLD8/ICNVO3nvnzbJKbAmkocmLk
- 70SucMebPkIOKGf177Q4xoEp8fjeYZBOVHcfkRJx/vkfoixd3zZXq7xJlf3w3DxL36Lyx8I
- hGqY1+rnlhX6KS2cak5wQ==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:LcnF701ZLdM=:JeM/4Mvh61cjMpICfd5Tid
- SVCsBen1Tv/aepEdk0dYqMku6IA4paeaJciKEEOvXg84gZYhFgdCPOSwiTQwSeK8qPoPfGvrx
- 8rOjNNPmiuSnSqZ6OEGE9jHHY1+6FCRJj2B0PkftNBs3NaFgAAcIQ2lZIGzqu1dJRtttxfvEJ
- sExkza4EnCOMgRAFngxdsUNK6GvS5hrr/3MTu0RtUcg1DIdUClqJdV457wLK4tZVfxdBcTslx
- meRHtRvW+LCcoyL+ndPlChu1OVoU1ynLDjZswQqlL0nuHe6dFj4gB4tzQGhSFtrUCK1sg6KZi
- Ey1nRxHuKFS3BncFJ1CpF6Ob4LIa5FEillVpkpeX6O/2bXJ/0zVLQj+vhliVGJKmXBT/fAe8N
- VXcu51bgFF4nwrPByzue73GWJJiBaZ6IAzZpJJhvVr9Y4qBi9ve4GSYKtYx19XxeaCAmv3l6J
- +dDH8iUIPh5tmOZYt3w/2VaxLyEUYX0mYM//FWzjuhC5CBIg0slkT9HVaCh28soFC4SrdbMni
- 97n4e+uyXS/zUbHLBja2ySvumEd5A0nxMSSZkBpOh/rh1zBHoQE6p7gAfpodDxUFyHa8mm5qY
- 25AlqIgIvJFw6j3JFXm266exXX2IUAQGyLdDV+S0+b4l92ZbaLNaum3vHYEdYEL+xmPCvjj8C
- fQL7MOsuaFnEVxmlvS3WufKcAeGOvBO18CtNiDSBGMArVsmRSL/piuEtnNkAwFc7pyglfbkT0
- VOuaXleQ2atgLgB+GqZote8ZVyMj5afiq8PGj6VAHN1y5oaupjuBL5+LOHyuaftr1kgx2cLW5
- jUik3H9wIqpOF5MZbXFJA/ORVkffDpzwQzCalpgc7zmD75Fmu0d0Hw7z5EM7EgMsq35doI71n
- ThECnKFyCGOYKXSSe/Fcha0KSSBD7wCSgK2ngDrV8=
+X-Provags-ID: V03:K1:sco2yNuu0ZeANoYLxEaKaX+uFiRZnUbmbjEeaxlmAypqPHTy2uQ
+ qlWAJ4SHnjduo6ddGET/Irdiev1BGMDiCSh6VZ1s0hyjXO9D9Ph4w2JAHkyOOWJbXOYC78k
+ oRvf9CyWLkpBMt99oQQceiIieuLXjpRQF2dxKYAWB8J/jLZ1olDbBMdEHME3USYaiKe5uuU
+ HGJzvDdHekqMU2eG4miHw==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:LVkxXTcvesU=:3K4DqY5REqp9fXgBZSItzQ
+ HUe2JLMbgqUoDcsdQhxdg+cTywL3oAk0QdyK8uWtfJ62jDdlVj++v3ZgFAOM9l8m7g73/EFxQ
+ aCXJzrFMg85CBkRCMW3BVPfUi6eJjTgdK0PTFEnQecsAmhafiUPLQAc8r7ov/JOBS/HowaGmH
+ bGoSZP4+CexI44LXsZ+qT2O7o4+is7ro8v4sL7skMC27RLev+e0fVIHGSS6ae9htzMms448Yt
+ OXrCfJebA5WEPuvxLnE4451MptrdJPkcOcJVkzvmydXnxP7HinbSIro/UOY0TnglUCRtZ3Q2W
+ Siptq4JqBZUhiMfUqlsvHTMIc7GSayXUaNZqjAmtYhdXZMsutFrTtZf43SVp/umms90hWmios
+ 8xbKsxIN7rDHJ/TbK4PH8Zng9WAz0Im6DKVP0WxrgaNdJxf79Xq2Cr6UssTB7UKy2U4RuzeIW
+ mo5hsCYt1Gqv1r40XJQPiMn8rN1J9OhMBSXvQ7JEEsev0ImYOYW+zJUa00GBI5f+NDfnKz0d7
+ aTVnyHjOyP4VTnQ784027VlWlw/N7+OqE7bMYpLawiaorLwZXFfAI/sf6caD1DXMzMK5jpDv9
+ E3klaGpEzMGlQFPnknvG7XWYbqB+ok1ZVafItDp2/yriuNeodlL768Nb+VWtj6qruLHqj6AmE
+ EstmklZFUXSd3gOsypWVXXMOY2CPg1Uce1jrsHdMV69SlwPMOtiOLtTiLbo7jHFXGPFdxaR9C
+ +FWmLEYDKdl1HJo7ysS/gt4dnqMs+hpLtVmaa9NTJaPp6QPr4pGIbbcaLvfawKaiD1pv1j5nI
+ yvwvnuNcuFTjaU1H5U4U2YQo5lmYYGFkGvPXnxqvITJK1YOPLdBk5FYtLWoI+MOY+lmneURVC
+ hfUa5fAHaaaEu+6yDzvrrbcv8d73H0K4fvgllTB0o=
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 212.227.126.133
+X-Received-From: 212.227.126.135
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -134,48 +135,32 @@ Le 15/09/2019 à 23:39, Philippe Mathieu-Daudé a écrit :
 > Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 > Tested-By: Guido Günther <agx@sigxcpu.org>
 > ---
-> v7: use abi_ushort and abi_uint to keep alignments good (lvivier)
-> ---
->  linux-user/syscall.c      | 6 ++++--
->  linux-user/syscall_defs.h | 7 +++++++
->  2 files changed, 11 insertions(+), 2 deletions(-)
+>  linux-user/strace.c | 37 +++++++++++++++++++++++++++++++++++++
+>  1 file changed, 37 insertions(+)
 > 
-> diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-> index e2af3c1494..f1ab81b917 100644
-> --- a/linux-user/syscall.c
-> +++ b/linux-user/syscall.c
-> @@ -1496,8 +1496,10 @@ static inline abi_long host_to_target_sockaddr(abi_ulong target_addr,
->          sizeof(target_saddr->sa_family)) {
->          target_saddr->sa_family = tswap16(addr->sa_family);
->      }
-> -    if (addr->sa_family == AF_NETLINK && len >= sizeof(struct sockaddr_nl)) {
-> -        struct sockaddr_nl *target_nl = (struct sockaddr_nl *)target_saddr;
-> +    if (addr->sa_family == AF_NETLINK &&
-> +        len >= sizeof(struct target_sockaddr_nl)) {
-> +        struct target_sockaddr_nl *target_nl =
-> +               (struct target_sockaddr_nl *)target_saddr;
->          target_nl->nl_pid = tswap32(target_nl->nl_pid);
->          target_nl->nl_groups = tswap32(target_nl->nl_groups);
->      } else if (addr->sa_family == AF_PACKET) {
-> diff --git a/linux-user/syscall_defs.h b/linux-user/syscall_defs.h
-> index fa69c6ab8d..7694d72446 100644
-> --- a/linux-user/syscall_defs.h
-> +++ b/linux-user/syscall_defs.h
-> @@ -153,6 +153,13 @@ struct target_sockaddr_un {
->      uint8_t sun_path[108];
->  };
+> diff --git a/linux-user/strace.c b/linux-user/strace.c
+> index fd5596a640..22dd453d26 100644
+> --- a/linux-user/strace.c
+> +++ b/linux-user/strace.c
+> @@ -8,6 +8,7 @@
+>  #include <arpa/inet.h>
+>  #include <netinet/tcp.h>
+>  #include <linux/if_packet.h>
+> +#include <linux/netlink.h>
+>  #include <sched.h>
+>  #include "qemu.h"
 >  
-> +struct target_sockaddr_nl {
-> +    abi_ushort nl_family;   /* AF_NETLINK */
-> +    abi_ushort __pad;
-> +    abi_uint nl_pid;
-> +    abi_uint nl_groups;
-> +};
-> +
->  struct target_in_addr {
->      uint32_t s_addr; /* big endian */
->  };
-> 
+> @@ -398,6 +399,12 @@ print_sockaddr(abi_ulong addr, abi_long addrlen)
+>              gemu_log("}");
+>              break;
+>          }
+> +        case AF_NETLINK: {
+> +            struct target_sockaddr_nl *nl = (struct target_sockaddr_nl *)sa;
+> +            gemu_log("{nl_family=AF_NETLINK,nl_pid=%u,nl_groups=%u}",
+> +                     nl->nl_pid, nl->nl_groups);
 
-Reviewed-by: Laurent Vivier <laurent@vivier.eu>
+You need to use tswap32() here.
+
+Thanks,
+Laurent
 
