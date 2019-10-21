@@ -2,134 +2,82 @@ Return-Path: <SRS0=8ZcK=YO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 31F32CA9EAF
-	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 15:28:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 88B66CA9EB0
+	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 15:29:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id ECC13206C2
-	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 15:28:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 56122206C2
+	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 15:29:03 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gmx.net header.i=@gmx.net header.b="iWehB+qF"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ECC13206C2
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gmx.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aa+EFLP6"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 56122206C2
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44102 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44122 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iMZbC-000624-Im
-	for qemu-devel@archiver.kernel.org; Mon, 21 Oct 2019 11:27:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56696)
+	id 1iMZcD-0007j6-HX
+	for qemu-devel@archiver.kernel.org; Mon, 21 Oct 2019 11:29:01 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57743)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <n54@gmx.com>) id 1iMZUh-00028k-QT
- for qemu-devel@nongnu.org; Mon, 21 Oct 2019 11:21:17 -0400
+ (envelope-from <liq3ea@gmail.com>) id 1iMZZL-0005xC-MG
+ for qemu-devel@nongnu.org; Mon, 21 Oct 2019 11:26:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <n54@gmx.com>) id 1iMZUf-0004q3-Bj
- for qemu-devel@nongnu.org; Mon, 21 Oct 2019 11:21:15 -0400
-Received: from mout.gmx.net ([212.227.15.19]:47981)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <n54@gmx.com>) id 1iMZUd-0004oz-66
- for qemu-devel@nongnu.org; Mon, 21 Oct 2019 11:21:13 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=gmx.net;
- s=badeba3b8450; t=1571671248;
- bh=/EU04Mhh/5Y1QsB+4SJ1Sv6E6htHv1FAz6NmCP+zf/k=;
- h=X-UI-Sender-Class:Subject:To:Cc:References:From:Date:In-Reply-To;
- b=iWehB+qF/5WJN2AGv9RjetHA33MC4fM4ZkF5hV/P9Yo6dcx5d+UsbWjKNK8fPkmzC
- We7mn/XEe4hLYjcwOjD8OyeuksqOrtjM+mrQJY9bKAbi0BAPRHwFm8CkMT+45yMONN
- yP+0dlV/8W6ArtMJFEaZQueC7egQXeoUsbP2hwzQ=
-X-UI-Sender-Class: 01bb95c1-4bf8-414a-932a-4f6e2808ef9c
-Received: from [192.168.0.241] ([89.71.135.231]) by mail.gmx.com (mrgmx004
- [212.227.17.184]) with ESMTPSA (Nemesis) id 1MuDc7-1i1B9h1NAD-00uXdm; Mon, 21
- Oct 2019 17:20:48 +0200
-Subject: Re: [PATCH v5 0/3] tests/vm: netbsd autoinstall, with IPv6 disabled
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
- Eduardo Habkost <ehabkost@redhat.com>
-References: <20191018181705.17957-1-ehabkost@redhat.com>
- <87r236w6qo.fsf@linaro.org>
-From: Kamil Rytarowski <n54@gmx.com>
-Autocrypt: addr=n54@gmx.com; prefer-encrypt=mutual; keydata=
- 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
- 4XSbcg==
-Message-ID: <a327a8fc-336c-47e6-30fe-760e0aa9f5d3@gmx.com>
-Date: Mon, 21 Oct 2019 17:21:05 +0200
-User-Agent: Mozilla/5.0 (X11; NetBSD amd64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.2
+ (envelope-from <liq3ea@gmail.com>) id 1iMZZJ-0006ra-7p
+ for qemu-devel@nongnu.org; Mon, 21 Oct 2019 11:26:03 -0400
+Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:39940)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <liq3ea@gmail.com>) id 1iMZZI-0006rJ-Nw
+ for qemu-devel@nongnu.org; Mon, 21 Oct 2019 11:26:00 -0400
+Received: by mail-ot1-x344.google.com with SMTP id d8so134083otc.7
+ for <qemu-devel@nongnu.org>; Mon, 21 Oct 2019 08:26:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=AuNxnGWn8X0PxSvJlJqm2uFtgDgOD38CuqTHbrJoTSY=;
+ b=aa+EFLP6jCMuv0fhI0twVdL9qcfu+V8QKOOmkXTXx/qp1CVxud/rgNpdNnE30dhHyw
+ Uv9xtst/Vaf5RgvfRzNWsf6J2jlcNMBadOCBeRH50FqE+zSvSBY55hzF6+Ah4EBnAogc
+ eF9/rSw6LkxAo/VV42y+7q7Vo6ADwT3cf/RPJEb2z1ce6qoeC0JZN2TjoZdeJDHYTqyH
+ 96jckxIa/fsxuvzblP3ngStbycys5c7pFSgwny6jlro9bB51vrlycITG/qbIGGiA7qI7
+ 73bfsS4ISNEQlF4PzF79p1VtvCmdfurWjXZa6RgQwrBu0dih3PK88yhSvQrB1VqiRLM2
+ XzAw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=AuNxnGWn8X0PxSvJlJqm2uFtgDgOD38CuqTHbrJoTSY=;
+ b=ZYo593n8rJOS65gvFHDdSjWJDYsDwyKEN1aQft30L7VPDyb13DQqOlcghBId/yEcKl
+ kv5WUYBzY3vXLWTsrl4XzRgNHvfOKMg59pkdfp7NJp5YnsY6sn+Rex6Pec+tgKLhV9eL
+ M7gEZ07ey4Axr6aiOW2pFZPrXzYCIMewq3CM4u0jIyEnqcHiYADkFM6jS5z3OQjtBdFx
+ M4ix86uTaAKI03DTY+132SWtatrmHQy97jxZmojKvfkl4eWWckDXaySZ0byoeCveLtQZ
+ wEggIdz3hwS4JewjfjBy3sS4Z23h43U7eDXfhH3gZxGrGODX96DNOczrsj7/GS9tj0ZH
+ gjjA==
+X-Gm-Message-State: APjAAAWV5FzCMm2e6dqrCt5Uhux2CV8OiqEGoK+xqJ+nIA8bm6T0FrfE
+ 8L6XvgCHeJUpEorYwInsLVPM4hz8Qo8ojOZwVWw=
+X-Google-Smtp-Source: APXvYqz9JaqT4XppLLuL4kNDVb70Himar5+EsE4iUfaMlCtaKhyb30Z0+PWGsHHCljDadvkaDLfgLifFtxBekC+R008=
+X-Received: by 2002:a05:6830:159a:: with SMTP id
+ i26mr18158173otr.149.1571671559928; 
+ Mon, 21 Oct 2019 08:25:59 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <87r236w6qo.fsf@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:BagIxZCbjTwhYBndaAUWlXXDkrhybqzwlU40MHdKXbhjMqi11ML
- QKFiGTOuUq1GkmwyMnYuyX3N1MWQkAu9UUeIXSEV9gld/hy/5CKzMHXzSHZMTwlJsTG6lyx
- XydaWl28mUmEzq+ZtapKKTfihfQsH0pJTP3iWtBUnDX4mWqMMlT9kjjdS0zZUoHYYHKfc2Y
- D2t0aRmORpjnv1EEdIijg==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:IAdRyGSn6Mk=:Dt2Vxx5SWi9Oa5Nx616fzO
- 0qOJrye58g0K816UaGrVTlcmdAYrGoVhrTk47SUWrA0ONdshWfZ/oSFAUhxg81mNSriMJqhfA
- SbyWm/WPs15AbKRJ023rr1vW7vIP6h0HK7kBbMoO8r1ouyJSmoX91bRVfzBZ5+7GkJH+pg1lu
- njj86nxcIts3jDknbhRiNFU/zM4u+826W+DJTT2QYAo/rCIP+Qlb/N8xV3NjxuKv5ee9U7L20
- 2oscUeqzrvFFEfgs37JpTJU2p6AW0m4UyevNQOhHDxWJk+TevaNZdOn7nvjqbb1T5ulsfVSds
- 8cmX8RFkxlk+FZ3rHIW39upNwSw9C+a4dqqC+kHdqG9QhB7vKMwJYP0P4XOWqAGzl8Bj+Evig
- BXT0MqGZkfK+zza5vprdcpOwG68rAtXtdG6H9nq+Gdm/djNO49MR4fgAB4q22x4OmcsDVFmjr
- NGgc9TLp7Vhm20mw5vU1YvRrhKBHphwo7RKnwOsh17v4KxwoARSPxcwtyxNd9GyNcOYBHLNDC
- GQZ5dkGHQfvm2HMQJI7awNIyLMCNpnfDIy8DPU2zc5BuS1gPdVA0tVRbOwDR77SD9wZrJg/ZY
- WHpWz+nR+kd7/OD8hsHukHZRB8BRYaiLFZSRBRv/nbZyUZ0jqcmYJkLVq2PFtpp4IneJTk1dn
- 7WSE28nwCK9RG3H1dgtsjdCrS3QgQ7LocgYlOxpxAeQjn52pEAij8P6m/OfWZwj3G39hdMrnm
- h/sRiIKURGpT3t64bnxZ6ZYf294HbjFTvrD4u/uw2VYhrUkFexjGCcY2UCB5hFzMYtLHD2evD
- g7LiyhY7FVzEh9rSaT7lJEHRGS6oxRnGsJQfzBXguqYLMIxtYjx9nCXbmVAgjy6vxZH/TqjQt
- uyI8U+50WNpWut/xUVVhOk4o5yKDVx0DtJtrd5JBUx9gUBiDjd9KldwXkfDOLjv5ym/Lmfmak
- Oig5OmAvuWw9MQ9AUFYFEK7CTwjXD91yL9n4qK4Oli19LHIXcKsUx0fOG35pmqSYOQNDNCmMc
- KgPtFjSAQHRt8aekVADpGwJqWXB6Hij0ew/uqr9Rzod/KZ/L/SW/ZXIZOb7jmuU499Jwn1cxa
- 5JRU/MLCfHoYzAi+F6f+rcaBzt0+bzsK6gLi9TW+PHrYDfz6qwTkBh56OlPvsFPNQUzHxaZLP
- 19ttSPtAKIdo4b2PYiv8vGKH0kzknwAhinX8/Yjf9q9aRd3nzBf3jN8XNXgMnSsVgXeamwn+2
- Pv5w39Q8CVJG7ZlhS1D99UsiQx3BrwE0eDykShQ==
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 212.227.15.19
+References: <20191018134754.16362-1-philmd@redhat.com>
+ <20191018134754.16362-7-philmd@redhat.com>
+In-Reply-To: <20191018134754.16362-7-philmd@redhat.com>
+From: Li Qiang <liq3ea@gmail.com>
+Date: Mon, 21 Oct 2019 23:25:19 +0800
+Message-ID: <CAKXe6SL6GX_eL4yXfmdbGaYd0=Pbpo1vx1P+NbWM_eZ3GCYgBA@mail.gmail.com>
+Subject: Re: [PATCH v2 06/20] piix4: Add a i8257 DMA Controller as specified
+ in datasheet
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
+Content-Type: multipart/alternative; boundary="0000000000000880cd05956d4d5e"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::344
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -141,59 +89,197 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Peter Maydell <peter.maydell@linaro.org>,
- Thomas Huth <thuth@redhat.com>,
- =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
- qemu-devel@nongnu.org, Kamil Rytarowski <kamil@netbsd.org>,
- Gerd Hoffmann <kraxel@redhat.com>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Cc: Stefano Stabellini <sstabellini@kernel.org>, xen-devel@lists.xenproject.org,
+ Paul Durrant <paul@xen.org>, "Michael S. Tsirkin" <mst@redhat.com>,
+ Qemu Developers <qemu-devel@nongnu.org>, Eduardo Habkost <ehabkost@redhat.com>,
+ =?UTF-8?Q?Herv=C3=A9_Poussineau?= <hpoussin@reactos.org>,
+ Aleksandar Markovic <amarkovic@wavecomp.com>,
+ Igor Mammedov <imammedo@redhat.com>,
+ Anthony Perard <anthony.perard@citrix.com>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
+ Aurelien Jarno <aurelien@aurel32.net>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 21.10.2019 15:47, Alex Benn=C3=A9e wrote:
->
-> Eduardo Habkost <ehabkost@redhat.com> writes:
->
->> I'm numbering this series v5 because it's a new version of the
->> patch sent by Gerd, at:
->>
->>   Date: Mon, 17 Jun 2019 06:38:56 +0200
->>   Message-Id: <20190617043858.8290-10-kraxel@redhat.com>
->>   Subject: [PATCH v4 09/11] tests/vm: netbsd autoinstall, using serial
->>   console
->
-> Queued to testing/next, thanks. I've made the changes Thomas suggested
-> in his review.
->
->>
->> Changes v4 -> v5:
->> * Rebase to latest qemu.git master
->> * Disable IPv6 by default (see
->>   https://lore.kernel.org/qemu-devel/20191017225548.GL4084@habkost.net/=
- for context)
->>
->> Eduardo Habkost (2):
->>   tests/vm: Let subclasses disable IPv6
->>   tests/vm/netbsd: Disable IPv6
->>
+--0000000000000880cd05956d4d5e
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-I'm going to report this one to other NetBSD developers and hopefully
-the problem will go away in future.
+Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> =E4=BA=8E2019=E5=B9=B410=E6=
+=9C=8818=E6=97=A5=E5=91=A8=E4=BA=94 =E4=B8=8B=E5=8D=889:55=E5=86=99=E9=81=
+=93=EF=BC=9A
 
-I have faced such problems in the past myself but didn't know what and
-who is culprit.
-
->> Gerd Hoffmann (1):
->>   tests/vm: netbsd autoinstall, using serial console
->>
->>  tests/vm/basevm.py |   5 +-
->>  tests/vm/netbsd    | 196 ++++++++++++++++++++++++++++++++++++++++++---
->>  2 files changed, 190 insertions(+), 11 deletions(-)
+> From: Herv=C3=A9 Poussineau <hpoussin@reactos.org>
+>
+> Remove i8257 instantiated in malta board, to not have it twice.
+>
+> Acked-by: Michael S. Tsirkin <mst@redhat.com>
+> Acked-by: Paolo Bonzini <pbonzini@redhat.com>
+> Signed-off-by: Herv=C3=A9 Poussineau <hpoussin@reactos.org>
+> Message-Id: <20171216090228.28505-9-hpoussin@reactos.org>
+> Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+> [PMD: rebased]
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+> ---
+>  hw/isa/piix4.c       | 4 ++++
+>  hw/mips/mips_malta.c | 2 --
+>  2 files changed, 4 insertions(+), 2 deletions(-)
+>
+> diff --git a/hw/isa/piix4.c b/hw/isa/piix4.c
+> index ac9383a658..0b24d8323c 100644
+> --- a/hw/isa/piix4.c
+> +++ b/hw/isa/piix4.c
+> @@ -29,6 +29,7 @@
+>  #include "hw/pci/pci.h"
+>  #include "hw/isa/isa.h"
+>  #include "hw/sysbus.h"
+> +#include "hw/dma/i8257.h"
+>  #include "migration/vmstate.h"
+>  #include "sysemu/reset.h"
+>  #include "sysemu/runstate.h"
+> @@ -167,6 +168,9 @@ static void piix4_realize(PCIDevice *dev, Error **err=
+p)
+>      /* initialize ISA irqs */
+>      isa_bus_irqs(isa_bus, s->isa);
+>
+> +    /* DMA */
+> +    i8257_dma_init(isa_bus, 0);
+> +
+>      piix4_dev =3D dev;
+>  }
 >
 >
+Could you please explain why this is better calling 'i8257_dma_init' in
+piix4 realize function
+instead of calling it in mips_malta_init.
+
+I'm still a little of which things should be done in realize and which
+should be done in qom instance init function.
+
+Thanks,
+Li Qiang
+
+
+
+> diff --git a/hw/mips/mips_malta.c b/hw/mips/mips_malta.c
+> index e499b7a6bb..df247177ca 100644
+> --- a/hw/mips/mips_malta.c
+> +++ b/hw/mips/mips_malta.c
+> @@ -28,7 +28,6 @@
+>  #include "cpu.h"
+>  #include "hw/i386/pc.h"
+>  #include "hw/isa/superio.h"
+> -#include "hw/dma/i8257.h"
+>  #include "hw/char/serial.h"
+>  #include "net/net.h"
+>  #include "hw/boards.h"
+> @@ -1430,7 +1429,6 @@ void mips_malta_init(MachineState *machine)
+>      smbus =3D piix4_pm_init(pci_bus, piix4_devfn + 3, 0x1100,
+>                            isa_get_irq(NULL, 9), NULL, 0, NULL);
+>      pit =3D i8254_pit_init(isa_bus, 0x40, 0, NULL);
+> -    i8257_dma_init(isa_bus, 0);
+>      mc146818_rtc_init(isa_bus, 2000, NULL);
+>
+>      /* generate SPD EEPROM data */
 > --
-> Alex Benn=C3=A9e
+> 2.21.0
+>
+>
 >
 
+--0000000000000880cd05956d4d5e
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+<div dir=3D"ltr"><div dir=3D"ltr"><br></div><br><div class=3D"gmail_quote">=
+<div dir=3D"ltr" class=3D"gmail_attr">Philippe Mathieu-Daud=C3=A9 &lt;<a hr=
+ef=3D"mailto:philmd@redhat.com">philmd@redhat.com</a>&gt; =E4=BA=8E2019=E5=
+=B9=B410=E6=9C=8818=E6=97=A5=E5=91=A8=E4=BA=94 =E4=B8=8B=E5=8D=889:55=E5=86=
+=99=E9=81=93=EF=BC=9A<br></div><blockquote class=3D"gmail_quote" style=3D"m=
+argin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left=
+:1ex">From: Herv=C3=A9 Poussineau &lt;<a href=3D"mailto:hpoussin@reactos.or=
+g" target=3D"_blank">hpoussin@reactos.org</a>&gt;<br>
+<br>
+Remove i8257 instantiated in malta board, to not have it twice.<br>
+<br>
+Acked-by: Michael S. Tsirkin &lt;<a href=3D"mailto:mst@redhat.com" target=
+=3D"_blank">mst@redhat.com</a>&gt;<br>
+Acked-by: Paolo Bonzini &lt;<a href=3D"mailto:pbonzini@redhat.com" target=
+=3D"_blank">pbonzini@redhat.com</a>&gt;<br>
+Signed-off-by: Herv=C3=A9 Poussineau &lt;<a href=3D"mailto:hpoussin@reactos=
+.org" target=3D"_blank">hpoussin@reactos.org</a>&gt;<br>
+Message-Id: &lt;<a href=3D"mailto:20171216090228.28505-9-hpoussin@reactos.o=
+rg" target=3D"_blank">20171216090228.28505-9-hpoussin@reactos.org</a>&gt;<b=
+r>
+Reviewed-by: Aleksandar Markovic &lt;<a href=3D"mailto:amarkovic@wavecomp.c=
+om" target=3D"_blank">amarkovic@wavecomp.com</a>&gt;<br>
+[PMD: rebased]<br>
+Signed-off-by: Philippe Mathieu-Daud=C3=A9 &lt;<a href=3D"mailto:philmd@red=
+hat.com" target=3D"_blank">philmd@redhat.com</a>&gt;<br>
+---<br>
+=C2=A0hw/isa/piix4.c=C2=A0 =C2=A0 =C2=A0 =C2=A0| 4 ++++<br>
+=C2=A0hw/mips/mips_malta.c | 2 --<br>
+=C2=A02 files changed, 4 insertions(+), 2 deletions(-)<br>
+<br>
+diff --git a/hw/isa/piix4.c b/hw/isa/piix4.c<br>
+index ac9383a658..0b24d8323c 100644<br>
+--- a/hw/isa/piix4.c<br>
++++ b/hw/isa/piix4.c<br>
+@@ -29,6 +29,7 @@<br>
+=C2=A0#include &quot;hw/pci/pci.h&quot;<br>
+=C2=A0#include &quot;hw/isa/isa.h&quot;<br>
+=C2=A0#include &quot;hw/sysbus.h&quot;<br>
++#include &quot;hw/dma/i8257.h&quot;<br>
+=C2=A0#include &quot;migration/vmstate.h&quot;<br>
+=C2=A0#include &quot;sysemu/reset.h&quot;<br>
+=C2=A0#include &quot;sysemu/runstate.h&quot;<br>
+@@ -167,6 +168,9 @@ static void piix4_realize(PCIDevice *dev, Error **errp)=
+<br>
+=C2=A0 =C2=A0 =C2=A0/* initialize ISA irqs */<br>
+=C2=A0 =C2=A0 =C2=A0isa_bus_irqs(isa_bus, s-&gt;isa);<br>
+<br>
++=C2=A0 =C2=A0 /* DMA */<br>
++=C2=A0 =C2=A0 i8257_dma_init(isa_bus, 0);<br>
++<br>
+=C2=A0 =C2=A0 =C2=A0piix4_dev =3D dev;<br>
+=C2=A0}<br>
+<br></blockquote><div><br></div><div>Could you please explain why this is b=
+etter calling &#39;i8257_dma_init&#39; in piix4 realize function</div><div>=
+instead of calling it in mips_malta_init.=C2=A0</div><div><br></div><div>I&=
+#39;m still a little of which things should be done in realize and which sh=
+ould be done in qom instance init function.</div><div><br></div><div>Thanks=
+,</div><div>Li Qiang=C2=A0</div><div><br></div><div>=C2=A0</div><blockquote=
+ class=3D"gmail_quote" style=3D"margin:0px 0px 0px 0.8ex;border-left:1px so=
+lid rgb(204,204,204);padding-left:1ex">
+diff --git a/hw/mips/mips_malta.c b/hw/mips/mips_malta.c<br>
+index e499b7a6bb..df247177ca 100644<br>
+--- a/hw/mips/mips_malta.c<br>
++++ b/hw/mips/mips_malta.c<br>
+@@ -28,7 +28,6 @@<br>
+=C2=A0#include &quot;cpu.h&quot;<br>
+=C2=A0#include &quot;hw/i386/pc.h&quot;<br>
+=C2=A0#include &quot;hw/isa/superio.h&quot;<br>
+-#include &quot;hw/dma/i8257.h&quot;<br>
+=C2=A0#include &quot;hw/char/serial.h&quot;<br>
+=C2=A0#include &quot;net/net.h&quot;<br>
+=C2=A0#include &quot;hw/boards.h&quot;<br>
+@@ -1430,7 +1429,6 @@ void mips_malta_init(MachineState *machine)<br>
+=C2=A0 =C2=A0 =C2=A0smbus =3D piix4_pm_init(pci_bus, piix4_devfn + 3, 0x110=
+0,<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0isa_get_irq(NULL, 9), NULL, 0, NULL);<br>
+=C2=A0 =C2=A0 =C2=A0pit =3D i8254_pit_init(isa_bus, 0x40, 0, NULL);<br>
+-=C2=A0 =C2=A0 i8257_dma_init(isa_bus, 0);<br>
+=C2=A0 =C2=A0 =C2=A0mc146818_rtc_init(isa_bus, 2000, NULL);<br>
+<br>
+=C2=A0 =C2=A0 =C2=A0/* generate SPD EEPROM data */<br>
+-- <br>
+2.21.0<br>
+<br>
+<br>
+</blockquote></div></div>
+
+--0000000000000880cd05956d4d5e--
 
