@@ -2,82 +2,86 @@ Return-Path: <SRS0=8ZcK=YO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 44FFDCA9EAF
-	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 14:59:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DB343CA9EAF
+	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 15:00:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 100CA2064B
-	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 14:59:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 672BF20656
+	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 15:00:07 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EPspGTeM"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 100CA2064B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Yev1s37r"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 672BF20656
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43606 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43614 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iMZ9I-0006Nf-7n
-	for qemu-devel@archiver.kernel.org; Mon, 21 Oct 2019 10:59:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53262)
+	id 1iMZAE-0007In-25
+	for qemu-devel@archiver.kernel.org; Mon, 21 Oct 2019 11:00:06 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53337)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <marcandre.lureau@gmail.com>) id 1iMZ8N-0005ZB-HY
- for qemu-devel@nongnu.org; Mon, 21 Oct 2019 10:58:12 -0400
+ (envelope-from <dgilbert@redhat.com>) id 1iMZ8i-0005pS-6J
+ for qemu-devel@nongnu.org; Mon, 21 Oct 2019 10:58:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <marcandre.lureau@gmail.com>) id 1iMZ8M-0004hG-0Y
- for qemu-devel@nongnu.org; Mon, 21 Oct 2019 10:58:11 -0400
-Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:35859)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
- id 1iMZ8L-0004gW-LY
- for qemu-devel@nongnu.org; Mon, 21 Oct 2019 10:58:09 -0400
-Received: by mail-wm1-x342.google.com with SMTP id c22so4034228wmd.1
- for <qemu-devel@nongnu.org>; Mon, 21 Oct 2019 07:58:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=GV8VBCAu2JxgCRGqtCKdh8Aky8ZmilATmKzlv8Gfcns=;
- b=EPspGTeMLbJNPycsq2lEoKVxSzjKyosLsMTlkg5KQefDu8wrgnOjs1uGgAvpTkAQoz
- GMj7ylmcXPtj4DzmofcQaLDT6OvlEODleQQ/HOxhp/4pQ7M3wcaRUaFd2hofZ4eTsUYS
- SAk6x8CbLyEAln2Qv8Yd7riQiHa5ZtPnFxPBcln70uhb5par5RcDLPoKZUHprnnyRAW8
- SOSFIqg93GIVjh0HLO6Khnea7ic/tzTdb7MIi6UcnV7ubgzaLAjWXAKzGFo2LyvPLMFe
- Mng2RKSC4Qmd+TBhrWau6kgwanILnoEeeK/FcJeSyjLWOraaTp2iBCotpZePI9Q+FcUq
- eY+g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=GV8VBCAu2JxgCRGqtCKdh8Aky8ZmilATmKzlv8Gfcns=;
- b=ffmpmvclKGaIQ7b38/Fyr6Ek5EGChzeIezbeDEsZSeAvQqA9kTeNsTbXBSYzSq1Mtx
- 9oDgQ1tiCetpj+saRL/W4WR3/KHNMhdezINPhzXLi2T3CvmFr4CbSLRGwG2HL2zd1BNG
- 12eQzFwDGkmY+dgfBHE+Cvk4A+Qm/6JjroUe8ItQ6g9+mCwp7ZcyO0Yy41oOQKToS3bM
- I/9lnQsl7s5bNeoqt4yGPkytC9QhuMODY/0QytD5IxiTAklanlJdA2wRePnBy0uytxzj
- glBtA4BIS0SDmmSzzSfohvUO3+J5X2ESLNna6MzbfdXVAhxC1L227zabtH+4cX4cHVgx
- sZvg==
-X-Gm-Message-State: APjAAAXTxSjTUg5PJ+M0QO4o14MqR1ZiXczXobrMBrS/9MzUaM1x3GIy
- O1HdLO539JnIkGPNJT9WISMW3q6E6Cgn3WKzLnc=
-X-Google-Smtp-Source: APXvYqzl4HMDn5lyIA3s+Ymia28qjTQyeh3xESC/e8aplo1s2P5yXMd+vY1exHeUz9z3fFamsQfSJHeUuCwZ0Cz9Wqc=
-X-Received: by 2002:a7b:c631:: with SMTP id p17mr19880066wmk.5.1571669887957; 
- Mon, 21 Oct 2019 07:58:07 -0700 (PDT)
+ (envelope-from <dgilbert@redhat.com>) id 1iMZ8f-0004os-KA
+ for qemu-devel@nongnu.org; Mon, 21 Oct 2019 10:58:30 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:60773
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1iMZ8f-0004oM-CG
+ for qemu-devel@nongnu.org; Mon, 21 Oct 2019 10:58:29 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1571669908;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=6abUmKP/NmKNmjhVzPa7Sp7wiDwQ32hBBylFGoOY8wk=;
+ b=Yev1s37r3T24JVLdvd5WiIb+0Y46jE6/6K/T3Iba89YGgDG/XAApWMoADBPjQiIJtz9KSs
+ XjhmyCBjt2pLFBHsEknWlJRGZYi5t1IP8gvyvfh/UVucPWPSwhxBvV1Rs7pu+Mt/I+Shvy
+ A0WM8fFAbWmvXGY3NC3AG/etrjDfH8Y=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-269-kfAcDzWyOuik_j-T6uwnuw-1; Mon, 21 Oct 2019 10:58:26 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1943F107AD31;
+ Mon, 21 Oct 2019 14:57:56 +0000 (UTC)
+Received: from work-vm (ovpn-117-232.ams2.redhat.com [10.36.117.232])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 7C4184B5;
+ Mon, 21 Oct 2019 14:57:31 +0000 (UTC)
+Date: Mon, 21 Oct 2019 15:57:29 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
+Subject: Re: [PATCH 12/21] hw/arm: Let the machine be the owner of the system
+ memory
+Message-ID: <20191021145729.GC5837@work-vm>
+References: <20191020225650.3671-1-philmd@redhat.com>
+ <20191020225650.3671-13-philmd@redhat.com>
+ <CAFEAcA8bhP9X-2AaTus9=GtEAqmnNA9me6hv8U=vXYwjQp_CnA@mail.gmail.com>
+ <42944bea-4b15-7bdf-61a7-f1c73f5f7c2b@redhat.com>
+ <CAFEAcA8hJ7bQeQNdWB6Rg4P7RzYmcXZmQKm7pnDAOutADHe9jA@mail.gmail.com>
+ <20804096-7b34-9d79-1d93-fa9a31bbfd66@redhat.com>
 MIME-Version: 1.0
-References: <20191021105832.36574-1-dgilbert@redhat.com>
- <20191021105832.36574-22-dgilbert@redhat.com>
-In-Reply-To: <20191021105832.36574-22-dgilbert@redhat.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Mon, 21 Oct 2019 16:57:56 +0200
-Message-ID: <CAJ+F1CJ+P2Um+SGFu4dMoxcgWXTq3ZXqeTBjW01hgaJS3V2s-g@mail.gmail.com>
-Subject: Re: [PATCH 21/30] virtiofsd: Start reading commands from queue
-To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <20804096-7b34-9d79-1d93-fa9a31bbfd66@redhat.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-MC-Unique: kfAcDzWyOuik_j-T6uwnuw-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=WINDOWS-1252
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::342
+Content-Disposition: inline
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,207 +93,104 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, QEMU <qemu-devel@nongnu.org>,
- piaojun@huawei.com, Stefan Hajnoczi <stefanha@redhat.com>,
- eguan@linux.alibaba.com, vgoyal@redhat.com
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Igor Mammedov <imammedo@redhat.com>, Leif Lindholm <leif.lindholm@linaro.org>,
+ Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
+ QEMU Developers <qemu-devel@nongnu.org>,
+ KONRAD Frederic <frederic.konrad@adacore.com>,
+ "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
+ Paul Burton <pburton@wavecomp.com>, Rob Herring <robh@kernel.org>,
+ Andrey Smirnov <andrew.smirnov@gmail.com>, Helge Deller <deller@gmx.de>,
+ "Michael S. Tsirkin" <mst@redhat.com>, Markus Armbruster <armbru@redhat.com>,
+ =?iso-8859-1?Q?Herv=E9?= Poussineau <hpoussin@reactos.org>,
+ Joel Stanley <joel@jms.id.au>, Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
+ Richard Henderson <rth@twiddle.net>, Artyom Tarasenko <atar4qemu@gmail.com>,
+ Antony Pavlov <antonynpavlov@gmail.com>, Eduardo Habkost <ehabkost@redhat.com>,
+ Alistair Francis <alistair@alistair23.me>,
+ Fabien Chouteau <chouteau@adacore.com>,
+ Beniamino Galvani <b.galvani@gmail.com>, qemu-arm <qemu-arm@nongnu.org>,
+ Jan Kiszka <jan.kiszka@web.de>,
+ =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ David Gibson <david@gibson.dropbear.id.au>, patchew-devel@redhat.com,
+ Radoslaw Biernacki <radoslaw.biernacki@linaro.org>,
+ Thomas Huth <huth@tuxfamily.org>,
+ Andrew Baumann <Andrew.Baumann@microsoft.com>,
+ Jean-Christophe Dubois <jcd@tribudubois.net>, Andrew Jeffery <andrew@aj.id.au>,
+ Michael Walle <michael@walle.cc>, qemu-ppc <qemu-ppc@nongnu.org>,
+ Aleksandar Markovic <amarkovic@wavecomp.com>,
+ Peter Chubb <peter.chubb@nicta.com.au>, Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, Oct 21, 2019 at 1:09 PM Dr. David Alan Gilbert (git)
-<dgilbert@redhat.com> wrote:
->
-> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
->
-> Pop queue elements off queues, copy the data from them and
-> pass that to fuse.
->
->   Note: 'out' in a VuVirtqElement is from QEMU
->         'in' in libfuse is into the daemon
->
->   So we read from the out iov's to get a fuse_in_header
->
-> When we get a kick we've got to read all the elements until the queue
-> is empty.
->
-> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> ---
->  contrib/virtiofsd/fuse_i.h      |  2 +
->  contrib/virtiofsd/fuse_virtio.c | 99 ++++++++++++++++++++++++++++++++-
->  2 files changed, 98 insertions(+), 3 deletions(-)
->
-> diff --git a/contrib/virtiofsd/fuse_i.h b/contrib/virtiofsd/fuse_i.h
-> index ea55f618a5..5b6ef09df5 100644
-> --- a/contrib/virtiofsd/fuse_i.h
-> +++ b/contrib/virtiofsd/fuse_i.h
-> @@ -14,6 +14,7 @@
->  #include "fuse_lowlevel.h"
->
->  struct fv_VuDev;
-> +struct fv_QueueInfo;
->
->  struct fuse_req {
->         struct fuse_session *se;
-> @@ -75,6 +76,7 @@ struct fuse_chan {
->         pthread_mutex_t lock;
->         int ctr;
->         int fd;
-> +       struct fv_QueueInfo *qi;
->  };
->
->  /**
-> diff --git a/contrib/virtiofsd/fuse_virtio.c b/contrib/virtiofsd/fuse_vir=
-tio.c
-> index 0513531c13..e189511729 100644
-> --- a/contrib/virtiofsd/fuse_virtio.c
-> +++ b/contrib/virtiofsd/fuse_virtio.c
-> @@ -32,6 +32,7 @@
->
->  #include "contrib/libvhost-user/libvhost-user.h"
->
-> +struct fv_VuDev;
->  struct fv_QueueInfo {
->      pthread_t thread;
->      struct fv_VuDev *virtio_dev;
-> @@ -101,10 +102,42 @@ static void fv_panic(VuDev *dev, const char *err)
->      exit(EXIT_FAILURE);
->  }
->
-> +/*
-> + * Copy from an iovec into a fuse_buf (memory only)
-> + * Caller must ensure there is space
-> + */
-> +static void copy_from_iov(struct fuse_buf *buf, size_t out_num,
-> +                          const struct iovec *out_sg)
-> +{
-> +    void *dest =3D buf->mem;
-> +
-> +    while (out_num) {
-> +        size_t onelen =3D out_sg->iov_len;
-> +        memcpy(dest, out_sg->iov_base, onelen);
-> +        dest +=3D onelen;
-> +        out_sg++;
-> +        out_num--;
-> +    }
-> +}
+* Philippe Mathieu-Daud=E9 (philmd@redhat.com) wrote:
+> Cc'ing Paolo/David.
+>=20
+> On 10/21/19 11:39 AM, Peter Maydell wrote:
+> > On Mon, 21 Oct 2019 at 10:34, Philippe Mathieu-Daud=E9 <philmd@redhat.c=
+om> wrote:
+> > >=20
+> > > On 10/21/19 11:22 AM, Peter Maydell wrote:
+> > > > On Mon, 21 Oct 2019 at 00:01, Philippe Mathieu-Daud=E9 <philmd@redh=
+at.com> wrote:
+> > > > >=20
+> > > > > Signed-off-by: Philippe Mathieu-Daud=E9 <philmd@redhat.com>
+> > > > > ---
+> > > >=20
+> > > > >    hw/arm/virt.c             | 2 +-
+> > > >=20
+> > > > I think from a quick code scan that this is ok, but did
+> > > > you test that migration compat from old to new still works?
+> > > > I vaguely recall that there are some cases when adding an
+> > > > owner to a memory region changes the name string used for
+> > > > identifying the ramblock in migration.
+> > >=20
+> > > It seems to still works:
+> > >=20
+> > > $ make check-qtest-aarch64 V=3D1
+> >=20
+> > > This test migrate the virt machine.
+> > >=20
+> > > Is this enough?
+> >=20
+> > No, you need to test migration from a QEMU binary without
+> > this patchset to a QEMU binary that has it. Otherwise you're
+> > only checking that the new version can migrate from itself
+> > to itself. I find the easiest way to test this is just to
+> > use the 'savevm' command to save a state snapshot to a
+> > qcow2 disk image while running the old binary, and then run
+> > 'loadvm' with the new binary and check it restored OK.
+>=20
+> I did not think if this case.
+>=20
+> I followed your blog post [*] and tested the migration works OK.
+>=20
+> Paolo, now thinking about regular testing, we should add this testing to
+> patchew too. Something like:
+>=20
+> - when mainstream/master is updated, patchew build QEMU (it should be
+> already mostly ccached) and generate some vm dumps with 'savevm'.
+>=20
+> - build/test the series
+>=20
+> - if series succeeded testing, run 'loadvm' tests
+>=20
+> [*] https://translatedcode.wordpress.com/2015/07/06/tricks-for-debugging-=
+qemu-savevm-snapshots/
 
-Or iov_to_buf()
+Avocado certainly already has an option for specifying source and
+destination qemu separately; I've used that for testing
+cross version in the past.
 
-Just found out that vhost-user-blk.c should probably link too with
-util/iov.o, instead of copying the code.
+The challenge is finding a command line/set of devices for each
+architecture that's expected to be stable.
+You want a command line with as big a set of devices as possible (for
+coverage) yet really is tied to machine type.
 
-> +
->  /* Thread function for individual queues, created when a queue is 'start=
-ed' */
->  static void *fv_queue_thread(void *opaque)
->  {
->      struct fv_QueueInfo *qi =3D opaque;
-> +    struct VuDev *dev =3D &qi->virtio_dev->dev;
-> +    struct VuVirtq *q =3D vu_get_queue(dev, qi->qidx);
-> +    struct fuse_session *se =3D qi->virtio_dev->se;
-> +    struct fuse_chan ch;
-> +    struct fuse_buf fbuf;
-> +
-> +    fbuf.mem =3D NULL;
-> +    fbuf.flags =3D 0;
-> +
-> +    fuse_mutex_init(&ch.lock);
-> +    ch.fd =3D (int)0xdaff0d111;
-> +    ch.ctr =3D 1;
-> +    ch.qi =3D qi;
-> +
->      fuse_log(FUSE_LOG_INFO, "%s: Start for queue %d kick_fd %d\n", __fun=
-c__,
->               qi->qidx, qi->kick_fd);
->      while (1) {
-> @@ -141,11 +174,71 @@ static void *fv_queue_thread(void *opaque)
->              fuse_log(FUSE_LOG_ERR, "Eventfd_read for queue: %m\n");
->              break;
->          }
-> -        if (qi->virtio_dev->se->debug) {
-> -            fprintf(stderr, "%s: Queue %d gave evalue: %zx\n", __func__,
-> -                    qi->qidx, (size_t)evalue);
-> +        /* out is from guest, in is too guest */
-> +        unsigned int in_bytes, out_bytes;
-> +        vu_queue_get_avail_bytes(dev, q, &in_bytes, &out_bytes, ~0, ~0);
-> +
-> +        fuse_log(FUSE_LOG_DEBUG,
-> +                 "%s: Queue %d gave evalue: %zx available: in: %u out: %=
-u\n",
-> +                 __func__, qi->qidx, (size_t)evalue, in_bytes, out_bytes=
-);
-> +
-> +        while (1) {
-> +            /*
-> +             * An element contains one request and the space to send our
-> +             * response They're spread over multiple descriptors in a
-> +             * scatter/gather set and we can't trust the guest to keep t=
-hem
-> +             * still; so copy in/out.
-> +             */
-> +            VuVirtqElement *elem =3D vu_queue_pop(dev, q, sizeof(VuVirtq=
-Element));
-> +            if (!elem) {
-> +                break;
-> +            }
-> +
-> +            if (!fbuf.mem) {
-> +                fbuf.mem =3D malloc(se->bufsize);
-> +                assert(fbuf.mem);
-> +                assert(se->bufsize > sizeof(struct fuse_in_header));
-> +            }
-> +            /* The 'out' part of the elem is from qemu */
-> +            unsigned int out_num =3D elem->out_num;
-> +            struct iovec *out_sg =3D elem->out_sg;
-> +            size_t out_len =3D iov_length(out_sg, out_num);
-> +            fuse_log(FUSE_LOG_DEBUG,
-> +                     "%s: elem %d: with %d out desc of length %zd\n", __=
-func__,
-> +                     elem->index, out_num, out_len);
-> +
-> +            /*
-> +             * The elem should contain a 'fuse_in_header' (in to fuse)
-> +             * plus the data based on the len in the header.
-> +             */
-> +            if (out_len < sizeof(struct fuse_in_header)) {
-> +                fuse_log(FUSE_LOG_ERR, "%s: elem %d too short for in_hea=
-der\n",
-> +                         __func__, elem->index);
-> +                assert(0); /* TODO */
-> +            }
-> +            if (out_len > se->bufsize) {
-> +                fuse_log(FUSE_LOG_ERR, "%s: elem %d too large for buffer=
-\n",
-> +                         __func__, elem->index);
-> +                assert(0); /* TODO */
-> +            }
-> +            copy_from_iov(&fbuf, out_num, out_sg);
-> +            fbuf.size =3D out_len;
-> +
-> +            /* TODO! Endianness of header */
-> +
-> +            /* TODO: Fixup fuse_send_msg */
-> +            /* TODO: Add checks for fuse_session_exited */
-> +            fuse_session_process_buf_int(se, &fbuf, &ch);
-> +
-> +            /* TODO: vu_queue_push(dev, q, elem, qi->write_count); */
-> +            vu_queue_notify(dev, q);
-> +
-> +            free(elem);
-> +            elem =3D NULL;
->          }
->      }
-> +    pthread_mutex_destroy(&ch.lock);
-> +    free(fbuf.mem);
->
->      return NULL;
->  }
-> --
-> 2.23.0
->
->
+Dave
 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
---=20
-Marc-Andr=C3=A9 Lureau
 
