@@ -7,78 +7,77 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 75BB5CA9EAF
-	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 14:50:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5CB95CA9EAF
+	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 14:52:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3E1442053B
-	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 14:50:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2B6DE2053B
+	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 14:52:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="X9b2o53x"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3E1442053B
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="H7Apc1Nu"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2B6DE2053B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43416 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43452 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iMZ0d-0000Mk-Cn
-	for qemu-devel@archiver.kernel.org; Mon, 21 Oct 2019 10:50:11 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50614)
+	id 1iMZ2p-0002rr-BQ
+	for qemu-devel@archiver.kernel.org; Mon, 21 Oct 2019 10:52:27 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51185)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <marcandre.lureau@gmail.com>) id 1iMYxt-0006Er-0v
- for qemu-devel@nongnu.org; Mon, 21 Oct 2019 10:47:23 -0400
+ (envelope-from <marcandre.lureau@gmail.com>) id 1iMZ22-00023O-Pi
+ for qemu-devel@nongnu.org; Mon, 21 Oct 2019 10:51:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <marcandre.lureau@gmail.com>) id 1iMYxq-0000Jp-V1
- for qemu-devel@nongnu.org; Mon, 21 Oct 2019 10:47:20 -0400
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:33800)
+ (envelope-from <marcandre.lureau@gmail.com>) id 1iMZ21-00020p-JC
+ for qemu-devel@nongnu.org; Mon, 21 Oct 2019 10:51:38 -0400
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:35664)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
- id 1iMYxq-0000J9-Os
- for qemu-devel@nongnu.org; Mon, 21 Oct 2019 10:47:18 -0400
-Received: by mail-wr1-x442.google.com with SMTP id t16so9193567wrr.1
- for <qemu-devel@nongnu.org>; Mon, 21 Oct 2019 07:47:16 -0700 (PDT)
+ id 1iMZ21-00020a-Ce
+ for qemu-devel@nongnu.org; Mon, 21 Oct 2019 10:51:37 -0400
+Received: by mail-wr1-x443.google.com with SMTP id l10so13926873wrb.2
+ for <qemu-devel@nongnu.org>; Mon, 21 Oct 2019 07:51:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
  :cc:content-transfer-encoding;
- bh=QBVqk96yakyIO7lRg5p1MStudpPIX7PizoBwPozLgSI=;
- b=X9b2o53xVGc0hVel6JO3Kh6TizpmqpvnVUpY1dtUmFZbVFhpetF/FtXefe/W/hMbSd
- 2O5DdWQmDK1TghYNskh/wHc75wBzDH15WWVqJ82dKl8mCQLE91CVwfL5b3vT0NCyN69k
- 8Mh4Y5pufwt0tun5eOKD4ZbNtBrdPgFqCdeGG0eUAwbzwePziZCVO5WaJt0wI+f3RcWc
- PO+VzRNTvxpxz5WivVQTA9MJymuOl2muSsJYyXOOMwzbbV6MscSBT5AEqE2oEujB45t7
- lAHuVXDBKySTrx5fHN+3dVDvRc56OPwjTrRExLyxmxFuJ1jpwdFSykU+RYcWVKskzG8S
- dEcA==
+ bh=DhsjBZc8iNnKkZFyzeJie8+WMmdsSJO96MsKf975bA0=;
+ b=H7Apc1Nu/1Qxa/lVspC+6XRZ6JcEPYT4J51Tx44rvXAaOBYJqu0+n0yWjLf8jG+4Nz
+ xDGiSWmIX2HmH2qID1SOA+yJAx3C6CTeELFE2WZPMyuHWv65TQFtpQDOR1t//CswM4n/
+ NRRcO49ttu2+bHpONMZN9lf50+OSBMJ0+KnEiXYZdknPWlzWzlC/if2oPKpxIpLWc8sJ
+ 8x7yLhNhUFXMGt8gw14RWl3i6fUHJNXtFysruZMMadiiSvN7Izq6eOcKiq+ClAlkN7uo
+ j/QVaqMMAfy/YYFIJbvfdAmJViXzSOqZihlGbCtFWOwlTYz2chuaXbM20JOyXAXFggJG
+ 4eSQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc:content-transfer-encoding;
- bh=QBVqk96yakyIO7lRg5p1MStudpPIX7PizoBwPozLgSI=;
- b=H1nLh8qqYRu1j5x2H8BRfGXMz/N0pmgCtfV0ZMEj2J2PeZzDpBDgNz5Am8k0gFDgTj
- jkWE+NcJ1YBqkNEYEfAeX54qBqagr+++/AkNTRZ5gKqFjs7ilTWkiaginFhkn5KYn/c5
- YH4TpRXQyx1rlIbKSlo/FnMLyfSdE7gpIFrwDrC8xRsfIlL/dL1WLejBixbapjXmOc1S
- Lecwo8aFwWp5x6mZ4rsFttkzgUM4XzWe5u6VxznhAqj/XkKxevi8cw8GCdnPrnp9IksB
- dJmEa8japiLEe2sNZ9wEtUSBzMJnnIHzMkKHyAB2pISteaGtUXF8RCAoC5PFqIaCubdf
- C0/Q==
-X-Gm-Message-State: APjAAAXaYSXQdTBtXeCdgSGnB0OuSuLLG5Z8OdsCj0QlU6LaMTin3Rt+
- ePA0caBxTNURFPNZNB4T82wO7zP849GdBrbAXvQ=
-X-Google-Smtp-Source: APXvYqzaQTM5iUyI81GMC3IfqcW5upDO3dvNx3ONQntEPfgaOdLOFkH5DXLlI3K/9W6CBx1yQMpKvG5s5iJsA1dGnQA=
-X-Received: by 2002:a5d:6cc3:: with SMTP id c3mr14197093wrc.202.1571669234999; 
- Mon, 21 Oct 2019 07:47:14 -0700 (PDT)
+ bh=DhsjBZc8iNnKkZFyzeJie8+WMmdsSJO96MsKf975bA0=;
+ b=RZ10fWe46W9Lb89A7JtmP0zS+O3zzEO7sghxmsnuEvoexmajknRdCFvmJGlDwSGGV2
+ LEaPvZtlPts9d/a89eqgMenU0qCW56BwgCrtXAK3Yv+c7Ivm8/6RMzuk4Ij0B//FKzmz
+ IaTNREgPowhO3uq6q+SidR4ie1qNdPXugw1h7H8nkzrB4XDsJymZHy8Jn/FWsmaaPSAA
+ PgY7NDdnLyuyDejb+5Y/BcZieFn7C7+c4Cz7GZya6N8ZCWkPwhByVpebOZZE4GADC21+
+ C0o8V16KFSDfiIkhvxrmhSHcMnxiBqWl7Bjb6x1QBJi3YJC/xMohR2k35QVU+uiuG3YL
+ N5Lw==
+X-Gm-Message-State: APjAAAVAh1u/21RyLTmatPv8e/v7kKOEIZ7zQG9+nsWBoUpTYkaoO2EV
+ UEMcEQIEh5+bIXjUWuoJlkdvrGB5nbVpfmcktJ5vMS1W
+X-Google-Smtp-Source: APXvYqzWRZzDAHLMwyxyCGChzZJe+eabA5GMATOP6UveFsXg44hCW2od8zP5FMY7B7LU4bKDmF3wn3zorYX5OhK8Kc4=
+X-Received: by 2002:a5d:6cc3:: with SMTP id c3mr14213594wrc.202.1571669496091; 
+ Mon, 21 Oct 2019 07:51:36 -0700 (PDT)
 MIME-Version: 1.0
 References: <20191021105832.36574-1-dgilbert@redhat.com>
- <20191021105832.36574-12-dgilbert@redhat.com>
-In-Reply-To: <20191021105832.36574-12-dgilbert@redhat.com>
+ <20191021105832.36574-18-dgilbert@redhat.com>
+In-Reply-To: <20191021105832.36574-18-dgilbert@redhat.com>
 From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Mon, 21 Oct 2019 16:47:03 +0200
-Message-ID: <CAJ+F1CKqbj-FgfyFTwDwwQgrE-D-UJJd4wHT2KjZ1HmrqHbNRw@mail.gmail.com>
-Subject: Re: [PATCH 11/30] virtiofsd: fuse: Make iov_length usable outside
- fuse_lowlevel.c
+Date: Mon, 21 Oct 2019 16:51:23 +0200
+Message-ID: <CAJ+F1CKmujLfL=n-UPLeps7BcQ=WcibHzsCWt+Pff3zLbSwvYA@mail.gmail.com>
+Subject: Re: [PATCH 17/30] virtiofsd: Add main virtio loop
 To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::442
+X-Received-From: 2a00:1450:4864:20::443
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,64 +96,98 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi
-
-On Mon, Oct 21, 2019 at 1:24 PM Dr. David Alan Gilbert (git)
+On Mon, Oct 21, 2019 at 1:26 PM Dr. David Alan Gilbert (git)
 <dgilbert@redhat.com> wrote:
 >
 > From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 >
+> Processes incoming requests on the vhost-user fd.
+
+Is there a reason to avoid using glib & its main loop?
+
+>
 > Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-
-Similar function already exists in util/iov.c, iov_size()
-
-Perhaps you could link with util/iov.o and others to avoid code duplication=
-.
-
-
 > ---
->  contrib/virtiofsd/fuse_lowlevel.c | 2 +-
->  contrib/virtiofsd/fuse_lowlevel.h | 9 +++++++++
->  2 files changed, 10 insertions(+), 1 deletion(-)
+>  contrib/virtiofsd/fuse_virtio.c | 42 ++++++++++++++++++++++++++++++---
+>  1 file changed, 39 insertions(+), 3 deletions(-)
 >
-> diff --git a/contrib/virtiofsd/fuse_lowlevel.c b/contrib/virtiofsd/fuse_l=
-owlevel.c
-> index 5ea113ab49..ff68ec0c9d 100644
-> --- a/contrib/virtiofsd/fuse_lowlevel.c
-> +++ b/contrib/virtiofsd/fuse_lowlevel.c
-> @@ -74,7 +74,7 @@ static void convert_attr(const struct fuse_setattr_in *=
-attr, struct stat *stbuf)
->         ST_CTIM_NSEC_SET(stbuf, attr->ctimensec);
->  }
->
-> -static size_t iov_length(const struct iovec *iov, size_t count)
-> +size_t iov_length(const struct iovec *iov, size_t count)
->  {
->         size_t seg;
->         size_t ret =3D 0;
-> diff --git a/contrib/virtiofsd/fuse_lowlevel.h b/contrib/virtiofsd/fuse_l=
-owlevel.h
-> index 018e7c0be0..84379a4761 100644
-> --- a/contrib/virtiofsd/fuse_lowlevel.h
-> +++ b/contrib/virtiofsd/fuse_lowlevel.h
-> @@ -2000,6 +2000,15 @@ void fuse_session_process_buf(struct fuse_session =
-*se,
+> diff --git a/contrib/virtiofsd/fuse_virtio.c b/contrib/virtiofsd/fuse_vir=
+tio.c
+> index 22f71d260f..9c58f11634 100644
+> --- a/contrib/virtiofsd/fuse_virtio.c
+> +++ b/contrib/virtiofsd/fuse_virtio.c
+> @@ -11,12 +11,14 @@
+>   * See the file COPYING.LIB
 >   */
->  int fuse_session_receive_buf(struct fuse_session *se, struct fuse_buf *b=
-uf);
 >
-> +/**
-> + * General utility to get the length of an iov, not Fuse specific
-> + *
-> + * @param iov The iovec to get the length of
-> + * @param count Number of entries in the iovec
-> + * @return the total length of iov in bytes
+> +#include "fuse_virtio.h"
+>  #include "fuse_i.h"
+>  #include "fuse_kernel.h"
+>  #include "fuse_misc.h"
+>  #include "fuse_opt.h"
+> -#include "fuse_virtio.h"
+>
+> +#include <assert.h>
+> +#include <errno.h>
+>  #include <stdint.h>
+>  #include <stdio.h>
+>  #include <stdlib.h>
+> @@ -80,15 +82,49 @@ static const VuDevIface fv_iface =3D {
+>      .queue_is_processed_in_order =3D fv_queue_order,
+>  };
+>
+> +/*
+> + * Main loop; this mostly deals with events on the vhost-user
+> + * socket itself, and not actual fuse data.
 > + */
-> +size_t iov_length(const struct iovec *iov, size_t count);
+>  int virtio_loop(struct fuse_session *se)
+>  {
+>      fuse_log(FUSE_LOG_INFO, "%s: Entry\n", __func__);
+>
+> -    while (1) {
+> -        /* TODO: Add stuffing */
+> +    while (!fuse_session_exited(se)) {
+> +        struct pollfd pf[1];
+> +        pf[0].fd =3D se->vu_socketfd;
+> +        pf[0].events =3D POLLIN;
+> +        pf[0].revents =3D 0;
 > +
->  #ifdef __cplusplus
+> +        fuse_log(FUSE_LOG_DEBUG, "%s: Waiting for VU event\n", __func__)=
+;
+> +        int poll_res =3D ppoll(pf, 1, NULL, NULL);
+> +
+> +        if (poll_res =3D=3D -1) {
+> +            if (errno =3D=3D EINTR) {
+> +                fuse_log(FUSE_LOG_INFO, "%s: ppoll interrupted, going ar=
+ound\n",
+> +                         __func__);
+> +                continue;
+> +            }
+> +            fuse_log(FUSE_LOG_ERR, "virtio_loop ppoll: %m\n");
+> +            break;
+> +        }
+> +        assert(poll_res =3D=3D 1);
+> +        if (pf[0].revents & (POLLERR | POLLHUP | POLLNVAL)) {
+> +            fuse_log(FUSE_LOG_ERR, "%s: Unexpected poll revents %x\n", _=
+_func__,
+> +                     pf[0].revents);
+> +            break;
+> +        }
+> +        assert(pf[0].revents & POLLIN);
+> +        fuse_log(FUSE_LOG_DEBUG, "%s: Got VU event\n", __func__);
+> +        if (!vu_dispatch(&se->virtio_dev->dev)) {
+> +            fuse_log(FUSE_LOG_ERR, "%s: vu_dispatch failed\n", __func__)=
+;
+> +            break;
+> +        }
+>      }
+>
+>      fuse_log(FUSE_LOG_INFO, "%s: Exit\n", __func__);
+> +
+> +    return 0;
 >  }
->  #endif
+>
+>  int virtio_session_mount(struct fuse_session *se)
 > --
 > 2.23.0
 >
