@@ -6,62 +6,62 @@ X-Spam-Status: No, score=-5.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
 	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E7D8FCA9EAF
-	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 12:52:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B3888CA9EAF
+	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 12:54:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B272B20679
-	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 12:52:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7DF9C20679
+	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 12:54:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="P0iADo2f"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B272B20679
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="G77d0t/L"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7DF9C20679
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40470 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40480 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iMXAx-0002M0-TG
-	for qemu-devel@archiver.kernel.org; Mon, 21 Oct 2019 08:52:43 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59933)
+	id 1iMXCD-0003Z4-OO
+	for qemu-devel@archiver.kernel.org; Mon, 21 Oct 2019 08:54:01 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60083)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <thuth@redhat.com>) id 1iMX82-0007st-KD
- for qemu-devel@nongnu.org; Mon, 21 Oct 2019 08:49:44 -0400
+ (envelope-from <thuth@redhat.com>) id 1iMX96-0000Ug-Lr
+ for qemu-devel@nongnu.org; Mon, 21 Oct 2019 08:50:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <thuth@redhat.com>) id 1iMX81-00052i-KJ
- for qemu-devel@nongnu.org; Mon, 21 Oct 2019 08:49:42 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:52083
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <thuth@redhat.com>) id 1iMX93-0005Hx-QM
+ for qemu-devel@nongnu.org; Mon, 21 Oct 2019 08:50:46 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:36142
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <thuth@redhat.com>) id 1iMX81-00052b-Gw
- for qemu-devel@nongnu.org; Mon, 21 Oct 2019 08:49:41 -0400
+ (Exim 4.71) (envelope-from <thuth@redhat.com>) id 1iMX93-0005Hl-FR
+ for qemu-devel@nongnu.org; Mon, 21 Oct 2019 08:50:45 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1571662181;
+ s=mimecast20190719; t=1571662244;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references:openpgp:openpgp:autocrypt:autocrypt;
- bh=6mqKTULk0N7LL45qtq97ljqqIa9MDJNIXf4mKz7rFgY=;
- b=P0iADo2fr3tPjNQz16n1YhjvVV8cjeWiE8FwpXBx6GvA3qY34xP6RiFlQ2mGH+M6kUK18V
- zKq47pduj+k4Yn5C0Mid1a4t+vpMFramupAY2cwdW1TxDQAqFjVU8lauu0d4pLojgbOduD
- eC2q28UKtKzJaz4EDlOPUrLB1p7bW1w=
+ bh=F6kw5Pg9WXuLciCfbrcGShJ/TZIe1uRObZuG8HzIir8=;
+ b=G77d0t/LOOYV81nlofpT6uBpWCyeClbNiXVyRrqL/zVPuUZLXyZi1alW0PEd3CFVNTD5b2
+ kSiHu+n5yMDWCvRTSUWpvClBpUFAhbmYCXGYrOiYMjeNBES5PG7FMugwZc7/N+ZRr106sD
+ OxL9erlfTdEtzsb1oH/AcD7XWfhHoX8=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-207-FQbrpascO1imY6F3UKKJ4w-1; Mon, 21 Oct 2019 08:49:39 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
+ us-mta-106-fW7csGzaP6aFGS9rZwrdqQ-1; Mon, 21 Oct 2019 08:50:41 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7B3A45E4;
- Mon, 21 Oct 2019 12:49:38 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7ABCD800D41;
+ Mon, 21 Oct 2019 12:50:40 +0000 (UTC)
 Received: from thuth.remote.csb (dhcp-200-228.str.redhat.com [10.33.200.228])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 0900B60606;
- Mon, 21 Oct 2019 12:49:28 +0000 (UTC)
-Subject: Re: [PATCH v3 10/16] libqos: add iteration support to
- qpci_find_capability()
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 33D88196AE;
+ Mon, 21 Oct 2019 12:50:31 +0000 (UTC)
+Subject: Re: [PATCH v3 14/16] libqos: make the virtio-pci BAR index
+ configurable
 To: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
 References: <20191019063810.6944-1-stefanha@redhat.com>
- <20191019063810.6944-11-stefanha@redhat.com>
+ <20191019063810.6944-15-stefanha@redhat.com>
 From: Thomas Huth <thuth@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=thuth@redhat.com; prefer-encrypt=mutual; keydata=
@@ -107,21 +107,21 @@ Autocrypt: addr=thuth@redhat.com; prefer-encrypt=mutual; keydata=
  IQu4bBP2GxiRQ+NV3iV/KU3ebMRzqIC//DCOxzQNFNJAKldPe/bKZMCxEqtVoRkuJtNdp/5a
  yXFZ6TfE1hGKrDBYAm4vrnZ4CXFSBDllL59cFFOJCkn4Xboj/aVxxJxF30bn
 Organization: Red Hat
-Message-ID: <54d743a1-2f68-f32d-f84c-c397ef448a21@redhat.com>
-Date: Mon, 21 Oct 2019 14:49:28 +0200
+Message-ID: <7a03f2c3-590a-8b46-896f-a0045ae69e0e@redhat.com>
+Date: Mon, 21 Oct 2019 14:50:30 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.9.0
 MIME-Version: 1.0
-In-Reply-To: <20191019063810.6944-11-stefanha@redhat.com>
+In-Reply-To: <20191019063810.6944-15-stefanha@redhat.com>
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-MC-Unique: FQbrpascO1imY6F3UKKJ4w-1
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-MC-Unique: fW7csGzaP6aFGS9rZwrdqQ-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.81
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -141,18 +141,17 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 On 19/10/2019 08.38, Stefan Hajnoczi wrote:
-> VIRTIO 1.0 PCI devices have multiple PCI_CAP_ID_VNDR capabilities so we
-> need a way to iterate over them.  Extend qpci_find_capability() to take
-> the last address.
+> The Legacy virtio-pci interface always uses BAR 0.  VIRTIO 1.0 may need
+> to use a different BAR index, so make it configurable.
 >=20
 > Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
-> --
-> v3:
->  * Document qpci_find_capability()
 > ---
->  tests/libqos/pci.h |  2 +-
->  tests/libqos/pci.c | 30 ++++++++++++++++++++++++------
->  2 files changed, 25 insertions(+), 7 deletions(-)
+> v3:
+>  * Change uint8_t bar_idx to int [Thomas]
+> ---
+>  tests/libqos/virtio-pci.h | 2 ++
+>  tests/libqos/virtio-pci.c | 3 ++-
+>  2 files changed, 4 insertions(+), 1 deletion(-)
 
 Reviewed-by: Thomas Huth <thuth@redhat.com>
 
