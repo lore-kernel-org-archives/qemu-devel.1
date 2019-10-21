@@ -2,87 +2,88 @@ Return-Path: <SRS0=8ZcK=YO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 78EC9CA9EAF
-	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 13:48:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 26207CA9EAF
+	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 13:49:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 430402053B
-	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 13:48:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E58FC20679
+	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 13:49:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="N/t+f1kx"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 430402053B
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="aiKh7KB1"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E58FC20679
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42266 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42298 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iMY2i-0003Ys-3x
-	for qemu-devel@archiver.kernel.org; Mon, 21 Oct 2019 09:48:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41496)
+	id 1iMY3v-0004ot-Jn
+	for qemu-devel@archiver.kernel.org; Mon, 21 Oct 2019 09:49:31 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42031)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1iMXye-0007vR-AZ
- for qemu-devel@nongnu.org; Mon, 21 Oct 2019 09:44:05 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1iMY1j-0002jn-Ow
+ for qemu-devel@nongnu.org; Mon, 21 Oct 2019 09:47:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1iMXyd-0000lN-74
- for qemu-devel@nongnu.org; Mon, 21 Oct 2019 09:44:04 -0400
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:38184)
+ (envelope-from <alex.bennee@linaro.org>) id 1iMY1i-000281-II
+ for qemu-devel@nongnu.org; Mon, 21 Oct 2019 09:47:15 -0400
+Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:35376)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1iMXyd-0000l0-1R
- for qemu-devel@nongnu.org; Mon, 21 Oct 2019 09:44:03 -0400
-Received: by mail-wm1-x343.google.com with SMTP id 3so12873879wmi.3
- for <qemu-devel@nongnu.org>; Mon, 21 Oct 2019 06:44:02 -0700 (PDT)
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1iMY1i-00027W-BX
+ for qemu-devel@nongnu.org; Mon, 21 Oct 2019 09:47:14 -0400
+Received: by mail-wm1-x344.google.com with SMTP id 14so6223187wmu.0
+ for <qemu-devel@nongnu.org>; Mon, 21 Oct 2019 06:47:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=NNjgD+GMiDONMUPjFkwhkEedG5MwQW3b1aiW+hJXhJM=;
- b=N/t+f1kxwHRhc3Ul+j00FsXHLTaQ8Op0R/eO+UlTIUYNP2BOqepg29BeALVA6eTtZm
- +drJXtNSwBGQGBg0dIDsaD+1wNwSDXqk5bqrAI+k2LQ6mFksMlbEcBs/SidsPYYtEDcg
- UbfFEz6ehGctKvOKh36RzyOomKTq0MYaMqjEpHekYSStu/VjYSA5W7qhvOu7UfODiJ3q
- dRmO1YUbL2jh2GGn8qc3+roNw0eVHV1UmNdP9we2uP4PBX95cNZo1pliwON0BQDycCDS
- YQfKV30nf+vhafow+B4oK7SjukN8Ql5xK4LkBszNPd+kTLZPRF6f2Dar0ERdRlhNmlgu
- +ksw==
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=Btc3sos3iY3Gks2aBAC+2g9Mg/KU69zi9wiSZYCLEwU=;
+ b=aiKh7KB13kdPbxOWwA6ZPS9FwU316rJ6tEOD0xcC0j/GsDMExE77TkyHUoM/TOVL/h
+ PYzYSIDmlJ8ot5McMrrpJcMHeK3foaWlECWH3rB1FPCqsU+n5JAGgkQIXf5i9EsG9GlC
+ UP6Zt7PiKzmDsYFKprU2tlYAG6JR+Xz/ENHxKPNJuRB43ANzB8vP0fm0FJnGI/C246Qp
+ mhq34ImCyH/Z0xJ5zAFNSSRJQKy1x5365JJJ1W8DMSy924Ss301f/E7lKZkZ0y1XkoC2
+ 3bdxx4ldSbdb404jVVgnRK1MtkeTjTkGCAVkwKfbGDG6eLBqtuZ83AbEtSczTdi6U8mc
+ IHCQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=NNjgD+GMiDONMUPjFkwhkEedG5MwQW3b1aiW+hJXhJM=;
- b=k1dfh1hHsyrIo1UJXWVoV2lSWHxMeDXjtYonqtZBZ51xOhLuQQuMqKRNPwSCeCgefq
- KXQKtVMGTYgJVPGCsRGOys8nHw7E5U1NWvcIhr0apJAzUqpPXjLavpze8G8y/VvjTSEX
- 9qaCbEPbk1tWS0BoJCuwQfo2RPAP1FdIBAnsWkasX1QWGYxhwH+YXxDCGEPJDfybl8bH
- VINd1y1c2ha3xAjVGYpq5DB4AiweeJ1jx8vzU9AgiIGKKFkp28qF632HZL5q0PpVG/Fv
- N/SJiehKjWUYjSh96WYdO8lCZZKEPg9xcVUyBq1h1dpoI4PPv3i5B4zbxyu2v/jIuG9T
- jDkg==
-X-Gm-Message-State: APjAAAUiUUKb08QRy70c13OPqvMrFORTGsmK1u7dpCHpn47al7eLUrF4
- jslAo/Mo39lQ93V+nRprOqsh3dh7Tqk=
-X-Google-Smtp-Source: APXvYqxGyTnCS52dxqs4VzTzYLDqIXGCAq+liZ9wFZhp1LniQxoGEnhDJxgG03P/DWYLmRHqXCB3dw==
-X-Received: by 2002:a05:600c:214:: with SMTP id
- 20mr19890800wmi.45.1571665441708; 
- Mon, 21 Oct 2019 06:44:01 -0700 (PDT)
-Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id q196sm10443689wme.23.2019.10.21.06.44.00
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=Btc3sos3iY3Gks2aBAC+2g9Mg/KU69zi9wiSZYCLEwU=;
+ b=bRC0rzNBvqF9Ki9HU1FbDoe917PZsj20bmxcSVWC8amtD2grVLinClcTBXqWetd4iE
+ ZF/dhOK5VzBL4Z+e4LGeNOIimi6DDqkNnuc40FwEOO7jOLFY2/q3M/zm/Ltup6YrhF1Q
+ XMWYzUV2xbXJJTavrzIcxypG1DnWWaMh1q9P4CySmi8w4f2xc0YLGo8kktFN6qFaspaI
+ IW1FgSAjpE1loVMo47VxDO3mV/0WL3dqtaRHxnDx4AUCTiq538lFU6O+3b4HtCsyRwtE
+ c0MnXHprGpUEa9FV+hYEdCFxV3skIUgmRsFTWRb/b5GHCF3XQs0pqf/JWqo5hDKZL1/8
+ C5rQ==
+X-Gm-Message-State: APjAAAUrmAK5LzNhDTMazyDqoTCcGLLBBh3GemqzmBhbg3PDHNeTwIoG
+ 7zNm9jfTwP+co8d1zW9DqOhKrw==
+X-Google-Smtp-Source: APXvYqz+/mXRUpMaYU389E06LpVY7p5ifINs3N4pBcP3XaY5b2+YNrsp+zdadzOYLxvOPAfcEHGGCg==
+X-Received: by 2002:a1c:4c02:: with SMTP id z2mr5583663wmf.78.1571665632773;
+ Mon, 21 Oct 2019 06:47:12 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id x2sm14385913wrn.81.2019.10.21.06.47.12
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 21 Oct 2019 06:44:01 -0700 (PDT)
-From: Peter Maydell <peter.maydell@linaro.org>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v2 1/3] hw/timer/slavio_timer: Remove useless check for NULL
- t->timer
-Date: Mon, 21 Oct 2019 14:43:55 +0100
-Message-Id: <20191021134357.14266-2-peter.maydell@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20191021134357.14266-1-peter.maydell@linaro.org>
-References: <20191021134357.14266-1-peter.maydell@linaro.org>
+ Mon, 21 Oct 2019 06:47:12 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 9070D1FF87;
+ Mon, 21 Oct 2019 14:47:11 +0100 (BST)
+References: <20191018181705.17957-1-ehabkost@redhat.com>
+User-agent: mu4e 1.3.5; emacs 27.0.50
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Eduardo Habkost <ehabkost@redhat.com>
+Subject: Re: [PATCH v5 0/3] tests/vm: netbsd autoinstall, with IPv6 disabled
+In-reply-to: <20191018181705.17957-1-ehabkost@redhat.com>
+Date: Mon, 21 Oct 2019 14:47:11 +0100
+Message-ID: <87r236w6qo.fsf@linaro.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::343
+X-Received-From: 2a00:1450:4864:20::344
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,52 +95,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- KONRAD Frederic <frederic.konrad@adacore.com>,
- Richard Henderson <richard.henderson@linaro.org>,
- Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
- Fabien Chouteau <chouteau@adacore.com>
+Cc: Fam Zheng <fam@euphon.net>, Peter Maydell <peter.maydell@linaro.org>,
+ Thomas Huth <thuth@redhat.com>,
+ =?utf-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>,
+ qemu-devel@nongnu.org, Kamil Rytarowski <kamil@netbsd.org>,
+ Gerd Hoffmann <kraxel@redhat.com>,
+ Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-In the slavio timer devcie, the ptimer TimerContext::timer is
-always created by slavio_timer_init(), so there's no need to
-check it for NULL; remove the single unneeded NULL check.
 
-This will be useful to avoid compiler/Coverity errors when
-a subsequent change adds a use of t->timer before the location
-we currently do the NULL check.
+Eduardo Habkost <ehabkost@redhat.com> writes:
 
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
----
- hw/timer/slavio_timer.c | 12 +++++-------
- 1 file changed, 5 insertions(+), 7 deletions(-)
+> I'm numbering this series v5 because it's a new version of the
+> patch sent by Gerd, at:
+>
+>   Date: Mon, 17 Jun 2019 06:38:56 +0200
+>   Message-Id: <20190617043858.8290-10-kraxel@redhat.com>
+>   Subject: [PATCH v4 09/11] tests/vm: netbsd autoinstall, using serial
+>   console
 
-diff --git a/hw/timer/slavio_timer.c b/hw/timer/slavio_timer.c
-index 692d213897d..890dd53f8d8 100644
---- a/hw/timer/slavio_timer.c
-+++ b/hw/timer/slavio_timer.c
-@@ -227,13 +227,11 @@ static void slavio_timer_mem_writel(void *opaque, hwaddr addr,
-             // set limit, reset counter
-             qemu_irq_lower(t->irq);
-             t->limit = val & TIMER_MAX_COUNT32;
--            if (t->timer) {
--                if (t->limit == 0) { /* free-run */
--                    ptimer_set_limit(t->timer,
--                                     LIMIT_TO_PERIODS(TIMER_MAX_COUNT32), 1);
--                } else {
--                    ptimer_set_limit(t->timer, LIMIT_TO_PERIODS(t->limit), 1);
--                }
-+            if (t->limit == 0) { /* free-run */
-+                ptimer_set_limit(t->timer,
-+                                 LIMIT_TO_PERIODS(TIMER_MAX_COUNT32), 1);
-+            } else {
-+                ptimer_set_limit(t->timer, LIMIT_TO_PERIODS(t->limit), 1);
-             }
-         }
-         break;
--- 
-2.20.1
+Queued to testing/next, thanks. I've made the changes Thomas suggested
+in his review.
 
+>
+> Changes v4 -> v5:
+> * Rebase to latest qemu.git master
+> * Disable IPv6 by default (see
+>   https://lore.kernel.org/qemu-devel/20191017225548.GL4084@habkost.net/ f=
+or context)
+>
+> Eduardo Habkost (2):
+>   tests/vm: Let subclasses disable IPv6
+>   tests/vm/netbsd: Disable IPv6
+>
+> Gerd Hoffmann (1):
+>   tests/vm: netbsd autoinstall, using serial console
+>
+>  tests/vm/basevm.py |   5 +-
+>  tests/vm/netbsd    | 196 ++++++++++++++++++++++++++++++++++++++++++---
+>  2 files changed, 190 insertions(+), 11 deletions(-)
+
+
+--
+Alex Benn=C3=A9e
 
