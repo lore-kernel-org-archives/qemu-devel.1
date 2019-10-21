@@ -2,82 +2,82 @@ Return-Path: <SRS0=8ZcK=YO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A2461CA9EB5
-	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 08:53:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E7195CA9EB5
+	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 08:54:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 731D42067B
-	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 08:53:26 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 731D42067B
+	by mail.kernel.org (Postfix) with ESMTPS id AB24A2067B
+	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 08:54:39 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AB24A2067B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35974 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35992 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iMTRN-0004W5-Ks
-	for qemu-devel@archiver.kernel.org; Mon, 21 Oct 2019 04:53:25 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58363)
+	id 1iMTSY-00062S-NR
+	for qemu-devel@archiver.kernel.org; Mon, 21 Oct 2019 04:54:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58675)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1iMTQR-0003Pb-Me
- for qemu-devel@nongnu.org; Mon, 21 Oct 2019 04:52:29 -0400
+ (envelope-from <philmd@redhat.com>) id 1iMTRT-0004mz-P3
+ for qemu-devel@nongnu.org; Mon, 21 Oct 2019 04:53:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1iMTQQ-0005mB-An
- for qemu-devel@nongnu.org; Mon, 21 Oct 2019 04:52:27 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:33652)
+ (envelope-from <philmd@redhat.com>) id 1iMTRS-00069I-Hf
+ for qemu-devel@nongnu.org; Mon, 21 Oct 2019 04:53:31 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47978)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iMTQQ-0005lf-38
- for qemu-devel@nongnu.org; Mon, 21 Oct 2019 04:52:26 -0400
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70])
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iMTRS-00068w-A9
+ for qemu-devel@nongnu.org; Mon, 21 Oct 2019 04:53:30 -0400
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72])
  (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 09D813B70E
- for <qemu-devel@nongnu.org>; Mon, 21 Oct 2019 08:52:25 +0000 (UTC)
-Received: by mail-wm1-f70.google.com with SMTP id k65so1998346wma.3
- for <qemu-devel@nongnu.org>; Mon, 21 Oct 2019 01:52:24 -0700 (PDT)
+ by mx1.redhat.com (Postfix) with ESMTPS id 479F12A09A3
+ for <qemu-devel@nongnu.org>; Mon, 21 Oct 2019 08:53:29 +0000 (UTC)
+Received: by mail-wr1-f72.google.com with SMTP id f15so3243521wrs.13
+ for <qemu-devel@nongnu.org>; Mon, 21 Oct 2019 01:53:29 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:message-id:date
  :user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=oV4ge5qxJiVtfmz8+Jt95uPQU/0vGeF4cLF7Tfjen+Q=;
- b=rXzb76DUFFFgcWuZbEHt6noQcdO9B6PTeEfTgzHWnqHSwee91kNatPRWluFSFM6Qc9
- Dccyx0DuHxyPoJYNocV3CWicxpgHsIaCt3eR4u2dnxd1RZNEn3MrKFpP9BOanCfwEFK7
- uO4KEuYGaCyFll7zvnApufwO2vLGgCu6rbvv4ORmpfL3FApNG4D24TI1x4Mtg+Dkf+P+
- LNDPAziom6mBcDgFOwTww6doUUtaF+rS1AlNFMqgT6E7iUlaUgKLpP9XTZNthCxN7Yun
- YNfYGHzyJEInE7V2+4/8SSw2aWKKmFDIlRQoE4JtOwp5BNZJXd3HbEfE/XK7+0Zgr5w5
- dKzg==
-X-Gm-Message-State: APjAAAXdw+fqNCzT/YZ97poMsfw6y6BApBQmqjEc+Qx9zQTIlY87M4eg
- kl4sDQ9x4/+X//8fD/UjXD6pmRXvp5kMkdQObC28gSMJRuhGYgGdfY3zy9zFWn9uTmAxMHzxbPH
- lp2bN2fZHITXxqo8=
-X-Received: by 2002:adf:e512:: with SMTP id j18mr8443537wrm.291.1571647943634; 
- Mon, 21 Oct 2019 01:52:23 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqxL0jYglI7EAYJk47HpS+dvaOsHHrRDOfdUpZbtLUDXpk+wQrmCFCK+nurhB4pCj1rJxTwHTw==
-X-Received: by 2002:adf:e512:: with SMTP id j18mr8443496wrm.291.1571647943407; 
- Mon, 21 Oct 2019 01:52:23 -0700 (PDT)
+ bh=HivAmxqA2j3HXuc//40uMNnGkk+nuXZXKO8fWW22gsk=;
+ b=dAw+sU75ufTeBHvAtYeTcibHRcIR/ZlqtueI6TZYxcaM1Fp4tFGz6dItA5qWvsWrc7
+ akwuOgrfVLxsz3j+8g03tKXw80YNu7rFXSceqsWJnBqTVI1bL8jnKms0DwLbpnX8vGar
+ zq3SjGrpH8B9AdC6Mj5aagk1cj+IyphazwlLsORqTBssGcuVnUMlYODlcShwrBwla3Zg
+ 3fpRjIihTgi51koXKqNceEqLW6RyFbgpDGqSJ8zGFQYIpyFbldUx5XuGjO6hDIW1Ocyr
+ OpfQIjCewimBfxGk+WUxGZJgtZ+elKuSffChdDhb7d9d9Iwh5sVIS+HT+ZocfcHNxuc1
+ grhg==
+X-Gm-Message-State: APjAAAU6d5hSb/utBHBpRVs1PS7UiifP5+B3AhHxgK8ByjNr3TdQbwR/
+ CBYsn97X8wJa/s+lOqXVvtqZaKy3IUHU+VTEh9P4urv4W+8DdOBSeU/17g++lNggQuRIw5DEfHO
+ Q/4MLIgo9gO2SlFo=
+X-Received: by 2002:a7b:cb0a:: with SMTP id u10mr18831641wmj.48.1571648007914; 
+ Mon, 21 Oct 2019 01:53:27 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqzeG9luQxsaHA7dDg5sBXih2GttedvPjG+9W/k0TEQA9TyIfKmOPr0dak5XFxPBGA7619J41A==
+X-Received: by 2002:a7b:cb0a:: with SMTP id u10mr18831574wmj.48.1571648007531; 
+ Mon, 21 Oct 2019 01:53:27 -0700 (PDT)
 Received: from [192.168.1.41] (129.red-83-57-174.dynamicip.rima-tde.net.
  [83.57.174.129])
- by smtp.gmail.com with ESMTPSA id z125sm20278358wme.37.2019.10.21.01.52.20
+ by smtp.gmail.com with ESMTPSA id x5sm16649919wrt.75.2019.10.21.01.53.24
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Mon, 21 Oct 2019 01:52:22 -0700 (PDT)
-Subject: Re: [PATCH 00/21] hw: Let the machine be the owner of the system
- memory
+ Mon, 21 Oct 2019 01:53:26 -0700 (PDT)
+Subject: Re: [PATCH 08/21] hw/alpha/dp264: Create the RAM in the board
 To: Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>, 
  qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>,
  Eduardo Habkost <ehabkost@redhat.com>
 References: <20191020225650.3671-1-philmd@redhat.com>
+ <20191020225650.3671-9-philmd@redhat.com>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <aad956d5-986c-bb9f-7735-cf18796b986e@redhat.com>
-Date: Mon, 21 Oct 2019 10:52:19 +0200
+Message-ID: <0f9f9f84-bc62-2612-0f5e-d173c09ecb02@redhat.com>
+Date: Mon, 21 Oct 2019 10:53:23 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.1.1
 MIME-Version: 1.0
-In-Reply-To: <20191020225650.3671-1-philmd@redhat.com>
+In-Reply-To: <20191020225650.3671-9-philmd@redhat.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
@@ -125,75 +125,109 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 On 10/21/19 12:56 AM, Philippe Mathieu-Daud=C3=A9 wrote:
-> Hi,
+> The SDRAM is incorrectly created in the Tyohoon northbridge ASIC.
+> Move its creation in the board code, this will later allow the
+> board to have the QOM ownership of the RAM.
 >=20
-> This series is based on Igor's "eliminate remaining places that
-> abuse memory_region_allocate_system_memory()":
-> https://lists.gnu.org/archive/html/qemu-devel/2019-10/msg01601.html
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+> ---
+> checkpatch complains:
 >=20
-> It is quite simple, we enforce all machines to be the QOM owner
-> of the system memory.
+>   ERROR: spaces required around that '*' (ctx:WxV)
+>   #10: FILE: hw/alpha/alpha_sys.h:13:
+>   +PCIBus *typhoon_init(ISABus **, qemu_irq *, AlphaCPU *[4],
+>                                                         ^
+> ---
+>   hw/alpha/alpha_sys.h |  2 +-
+>   hw/alpha/dp264.c     | 11 ++++++++++-
+>   hw/alpha/typhoon.c   |  9 +--------
+>   3 files changed, 12 insertions(+), 10 deletions(-)
 >=20
-> This changes the memory tree from:
->=20
->    (qemu) info mtree -o
->    memory-region: pc.ram
->      0000000000000000-0000000007ffffff (prio 0, ram): pc.ram parent:{ob=
-j path=3D/machine/unattached}
->=20
-> to:
->=20
->    (qemu) info mtree -o
->    memory-region: pc.ram
->      0000000000000000-0000000007ffffff (prio 0, ram): pc.ram owner:{obj=
- path=3D/machine}
->=20
-> Few patches are required to clean the codebase first, to unify the
-> creation of the system memory in the board/machine code. Mostly some
-> old ARM machines (pre-QOM) were affected.
->=20
-> Please review (as a generic codebase cleanup).
->=20
-> Regards,
->=20
-> Phil.
->=20
-> Based-on: <20191008113318.7012-1-imammedo@redhat.com>
->=20
-> Philippe Mathieu-Daud=C3=A9 (21):
->    hw/arm/xilinx_zynq: Use the IEC binary prefix definitions
->    hw/arm/mps2: Use the IEC binary prefix definitions
->    hw/arm/collie: Create the RAM in the board
->    hw/arm/omap2: Create the RAM in the board
->    hw/arm/omap1: Create the RAM in the board
->    hw/arm/digic4: Inline digic4_board_setup_ram() function
->    hw: Drop QOM ownership on memory_region_allocate_system_memory() cal=
-ls
->    hw/alpha/dp264: Create the RAM in the board
->    hw: Let memory_region_allocate_system_memory take MachineState
->      argument
->    hw/core: Let the machine be the owner of the system memory
->    hw/alpha: Let the machine be the owner of the system memory
->    hw/arm: Let the machine be the owner of the system memory
->    hw/cris: Let the machine be the owner of the system memory
->    hw/hppa: Let the machine be the owner of the system memory
->    hw/i386: Let the machine be the owner of the system memory
->    hw/lm32: Let the machine be the owner of the system memory
->    hw/m68k: Let the machine be the owner of the system memory
->    hw/mips: Let the machine be the owner of the system memory
->    hw/ppc: Let the machine be the owner of the system memory
->    hw/sparc: Let the machine be the owner of the system memory
->    hw/core: Assert memory_region_allocate_system_memory has machine own=
-er
+> diff --git a/hw/alpha/alpha_sys.h b/hw/alpha/alpha_sys.h
+> index 4e127a6de8..17f97e1bfe 100644
+> --- a/hw/alpha/alpha_sys.h
+> +++ b/hw/alpha/alpha_sys.h
+> @@ -10,7 +10,7 @@
+>   #include "hw/i386/pc.h"
+>  =20
+>  =20
+> -PCIBus *typhoon_init(ram_addr_t, ISABus **, qemu_irq *, AlphaCPU *[4],
+> +PCIBus *typhoon_init(ISABus **, qemu_irq *, AlphaCPU *[4],
+>                        pci_map_irq_fn);
+>  =20
+>   /* alpha_pci.c.  */
+> diff --git a/hw/alpha/dp264.c b/hw/alpha/dp264.c
+> index 51feee8558..ddc249261c 100644
+> --- a/hw/alpha/dp264.c
+> +++ b/hw/alpha/dp264.c
+> @@ -62,6 +62,7 @@ static void clipper_init(MachineState *machine)
+>       uint64_t palcode_entry, palcode_low, palcode_high;
+>       uint64_t kernel_entry, kernel_low, kernel_high;
+>       unsigned int smp_cpus =3D machine->smp.cpus;
+> +    MemoryRegion ram_region;
 
-I forgot 4 other calls:
+This is incorrect, this variable should be in .heap, not stack.
 
-hw/ppc/ppc4xx_devs.c:708:    memory_region_allocate_system_memory(ram,=20
-NULL, "ppc4xx.sdram", ram_size);
-hw/s390x/s390-virtio-ccw.c:164:=20
-memory_region_allocate_system_memory(ram, NULL, "s390.ram", mem_size);
-hw/sparc/sun4m.c:791:    memory_region_allocate_system_memory(&d->ram,=20
-NULL, "sun4m.ram",
-hw/sparc64/niagara.c:114:=20
-memory_region_allocate_system_memory(&s->partition_ram, NULL,
+>  =20
+>       /* Create up to 4 cpus.  */
+>       memset(cpus, 0, sizeof(cpus));
+> @@ -73,8 +74,16 @@ static void clipper_init(MachineState *machine)
+>       cpus[0]->env.trap_arg1 =3D 0;
+>       cpus[0]->env.trap_arg2 =3D smp_cpus;
+>  =20
+> +    /*
+> +     * Main memory region, 0x00.0000.0000.  Real hardware supports 32G=
+B,
+> +     * but the address space hole reserved at this point is 8TB.
+> +     */
+> +    memory_region_allocate_system_memory(&ram_region, NULL, "ram",
+> +                                         ram_size);
+> +    memory_region_add_subregion(get_system_memory(), 0, &ram_region);
+> +
+>       /* Init the chipset.  */
+> -    pci_bus =3D typhoon_init(ram_size, &isa_bus, &rtc_irq, cpus,
+> +    pci_bus =3D typhoon_init(&isa_bus, &rtc_irq, cpus,
+>                              clipper_pci_map_irq);
+>  =20
+>       /* Since we have an SRM-compatible PALcode, use the SRM epoch.  *=
+/
+> diff --git a/hw/alpha/typhoon.c b/hw/alpha/typhoon.c
+> index 8489ec335c..12589ef331 100644
+> --- a/hw/alpha/typhoon.c
+> +++ b/hw/alpha/typhoon.c
+> @@ -58,7 +58,6 @@ typedef struct TyphoonState {
+>       TyphoonCchip cchip;
+>       TyphoonPchip pchip;
+>       MemoryRegion dchip_region;
+> -    MemoryRegion ram_region;
+>   } TyphoonState;
+>  =20
+>   /* Called when one of DRIR or DIM changes.  */
+> @@ -817,7 +816,7 @@ static void typhoon_alarm_timer(void *opaque)
+>       cpu_interrupt(CPU(s->cchip.cpu[cpu]), CPU_INTERRUPT_TIMER);
+>   }
+>  =20
+> -PCIBus *typhoon_init(ram_addr_t ram_size, ISABus **isa_bus,
+> +PCIBus *typhoon_init(ISABus **isa_bus,
+>                        qemu_irq *p_rtc_irq,
+>                        AlphaCPU *cpus[4], pci_map_irq_fn sys_map_irq)
+>   {
+> @@ -849,12 +848,6 @@ PCIBus *typhoon_init(ram_addr_t ram_size, ISABus *=
+*isa_bus,
+>  =20
+>       *p_rtc_irq =3D qemu_allocate_irq(typhoon_set_timer_irq, s, 0);
+>  =20
+> -    /* Main memory region, 0x00.0000.0000.  Real hardware supports 32G=
+B,
+> -       but the address space hole reserved at this point is 8TB.  */
+> -    memory_region_allocate_system_memory(&s->ram_region, NULL, "ram",
+> -                                         ram_size);
+> -    memory_region_add_subregion(addr_space, 0, &s->ram_region);
+> -
+>       /* TIGbus, 0x801.0000.0000, 1GB.  */
+>       /* ??? The TIGbus is used for delivering interrupts, and access t=
+o
+>          the flash ROM.  I'm not sure that we need to implement it at a=
+ll.  */
+>=20
 
