@@ -2,77 +2,94 @@ Return-Path: <SRS0=8ZcK=YO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 68E42CA9EAF
-	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 10:06:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 592E4CA9EAF
+	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 10:07:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 355CA2089C
-	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 10:06:22 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KpM30X29"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 355CA2089C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 29FDF20684
+	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 10:07:44 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 29FDF20684
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ubuntu.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37056 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37090 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iMUZx-0001BM-5z
-	for qemu-devel@archiver.kernel.org; Mon, 21 Oct 2019 06:06:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39926)
+	id 1iMUbH-0002ve-Bv
+	for qemu-devel@archiver.kernel.org; Mon, 21 Oct 2019 06:07:43 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40177)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <david@redhat.com>) id 1iMUZ6-0000H8-6G
- for qemu-devel@nongnu.org; Mon, 21 Oct 2019 06:05:29 -0400
+ (envelope-from <bounces@canonical.com>) id 1iMUaY-0002Hx-No
+ for qemu-devel@nongnu.org; Mon, 21 Oct 2019 06:06:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <david@redhat.com>) id 1iMUZ4-0002LX-SM
- for qemu-devel@nongnu.org; Mon, 21 Oct 2019 06:05:27 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:45173
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <david@redhat.com>) id 1iMUZ4-0002JD-OI
- for qemu-devel@nongnu.org; Mon, 21 Oct 2019 06:05:26 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1571652326;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding;
- bh=2mrKDmz69yJr3uvYYgibrixmhFJSC2qc9XXLpvPVEqg=;
- b=KpM30X29fQT+rk9O9Rw5uhHds66a9KTFOLQBgjhfUJneoQshAFd5Ra0lKCCg83SS7SNWQs
- oSS44jdHuhLOA8HQORId7b1v/E+srxZtjZ6s498oUHfyYdZo+cP3QKzqPDeW2ADF50CJtS
- usy6JI6furfioUjl5X9NTujkkxbbFHM=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-62-QDoneGu1OFSScEHDnVeo7w-1; Mon, 21 Oct 2019 06:05:22 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 70FCF800D41;
- Mon, 21 Oct 2019 10:05:21 +0000 (UTC)
-Received: from t460s.redhat.com (ovpn-116-198.ams2.redhat.com [10.36.116.198])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 9B6C7F6F0;
- Mon, 21 Oct 2019 10:05:16 +0000 (UTC)
-From: David Hildenbrand <david@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v2] s390x/kvm: Set default cpu model for all machine classes
-Date: Mon, 21 Oct 2019 12:05:15 +0200
-Message-Id: <20191021100515.6978-1-david@redhat.com>
+ (envelope-from <bounces@canonical.com>) id 1iMUaX-00034v-FF
+ for qemu-devel@nongnu.org; Mon, 21 Oct 2019 06:06:58 -0400
+Received: from indium.canonical.com ([91.189.90.7]:55252)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <bounces@canonical.com>)
+ id 1iMUaX-00034e-9M
+ for qemu-devel@nongnu.org; Mon, 21 Oct 2019 06:06:57 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1iMUaV-0007EJ-UX
+ for <qemu-devel@nongnu.org>; Mon, 21 Oct 2019 10:06:55 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id E5BCD2E8037
+ for <qemu-devel@nongnu.org>; Mon, 21 Oct 2019 10:06:55 +0000 (UTC)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-MC-Unique: QDoneGu1OFSScEHDnVeo7w-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=WINDOWS-1252
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
+Date: Mon, 21 Oct 2019 09:52:24 -0000
+From: Timo Aaltonen <tjaalton@ubuntu.com>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=mesa; status=Won't Fix; importance=High; assignee=None;
+X-Launchpad-Bug: product=qemu; status=Fix Released; importance=Undecided;
+ assignee=None; 
+X-Launchpad-Bug: distribution=ubuntu; sourcepackage=mesa; component=main;
+ milestone=ubuntu-19.04; status=Triaged; importance=Medium;
+ assignee=tjaalton@ubuntu.com; 
+X-Launchpad-Bug: distribution=ubuntu; sourcepackage=qemu; component=main;
+ status=Invalid; importance=Undecided; assignee=None; 
+X-Launchpad-Bug: distribution=ubuntu; distroseries=disco; sourcepackage=mesa; 
+ component=main; milestone=ubuntu-19.04; status=Fix Released;
+ importance=Medium; assignee=tjaalton@ubuntu.com; 
+X-Launchpad-Bug: distribution=ubuntu; distroseries=eoan; sourcepackage=mesa;
+ component=main; status=Triaged; importance=Undecided;
+ assignee=tjaalton@ubuntu.com; 
+X-Launchpad-Bug: distribution=ubuntu; distroseries=eoan; sourcepackage=qemu;
+ component=main; status=Fix Released; importance=Undecided;
+ assignee=christian.ehrhardt@canonical.com; 
+X-Launchpad-Bug-Tags: amd64 apport-crash apport-failed-retrace disco
+ qemu-19.10 wayland-session
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: ahzo alexdeucher apport baker-dylan-c berrange
+ dan-freedesktop janitor jokx maraeo marcandre-lureau michel-daenzer paelzer
+ seb128 tjaalton willcooke
+X-Launchpad-Bug-Reporter: Joseph Maillardet (jokx)
+X-Launchpad-Bug-Modifier: Timo Aaltonen (tjaalton)
+References: <155014036044.634.15252078016929169795.malonedeb@gac.canonical.com>
+Message-Id: <157165154578.18968.18344717728120464999.malone@gac.canonical.com>
+Subject: [Bug 1815889] Re: qemu-system-x86_64 crashed with signal 31 in
+ __pthread_setaffinity_new()
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="186023fa645d8be19d403a76064f0643f510db2f";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: 6c0fc3f9ca0592d00a4c4daa03351b95ea60ac30
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.120
+X-Received-From: 91.189.90.7
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -81,85 +98,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Huth <thuth@redhat.com>, Janosch Frank <frankja@linux.ibm.com>,
- David Hildenbrand <david@redhat.com>, Cornelia Huck <cohuck@redhat.com>,
- Richard Henderson <richard.henderson@linaro.org>,
- Halil Pasic <pasic@linux.ibm.com>,
- Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org,
- Igor Mammedov <imammedo@redhat.com>, Jiri Denemark <jdenemar@redhat.com>
+Reply-To: Bug 1815889 <1815889@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-We have to set the default model of all machine classes, not just for
-the active one. Otherwise, "query-machines" will indicate the wrong
-CPU model ("qemu-s390x-cpu" instead of "host-s390x-cpu") as
-"default-cpu-type".
+I believe this was fixed by qemu 4.0 in eoan.
 
-Doing a
-    {"execute":"query-machines"}
-under KVM now results in
-    {"return": [
-        {
-            "hotpluggable-cpus": true,
-            "name": "s390-ccw-virtio-4.0",
-            "numa-mem-supported": false,
-            "default-cpu-type": "host-s390x-cpu",
-            "cpu-max": 248,
-            "deprecated": false},
-        {
-            "hotpluggable-cpus": true,
-            "name": "s390-ccw-virtio-2.7",
-            "numa-mem-supported": false,
-            "default-cpu-type": "host-s390x-cpu",
-            "cpu-max": 248,
-            "deprecated": false
-        } ...
+** Changed in: qemu (Ubuntu Eoan)
+       Status: Triaged =3D> Fix Released
 
-Libvirt probes all machines via "-machine none,accel=3Dkvm:tcg" and will
-currently see the wrong CPU model under KVM.
+-- =
 
-Reported-by: Jiri Denemark <jdenemar@redhat.com>
-Reviewed-by: Thomas Huth <thuth@redhat.com>
-Fixes: b6805e127c6b ("s390x: use generic cpu_model parsing")
-Cc: Igor Mammedov <imammedo@redhat.com>
-Signed-off-by: David Hildenbrand <david@redhat.com>
----
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1815889
 
-v1 -> v2:
-- Added a sentence how libvirt probes the machines/default cpu models
-- klass -> oc
+Title:
+  qemu-system-x86_64 crashed with signal 31 in
+  __pthread_setaffinity_new()
 
----
- target/s390x/kvm.c | 10 ++++++++--
- 1 file changed, 8 insertions(+), 2 deletions(-)
+Status in Mesa:
+  Won't Fix
+Status in QEMU:
+  Fix Released
+Status in mesa package in Ubuntu:
+  Triaged
+Status in qemu package in Ubuntu:
+  Invalid
+Status in mesa source package in Disco:
+  Fix Released
+Status in mesa source package in Eoan:
+  Triaged
+Status in qemu source package in Eoan:
+  Fix Released
 
-diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
-index c24c869e77..0c9d14b4b1 100644
---- a/target/s390x/kvm.c
-+++ b/target/s390x/kvm.c
-@@ -320,11 +320,17 @@ void kvm_s390_set_max_pagesize(uint64_t pagesize, Err=
-or **errp)
-     cap_hpage_1m =3D 1;
- }
-=20
--int kvm_arch_init(MachineState *ms, KVMState *s)
-+static void ccw_machine_class_foreach(ObjectClass *oc, void *opaque)
- {
--    MachineClass *mc =3D MACHINE_GET_CLASS(ms);
-+    MachineClass *mc =3D MACHINE_CLASS(oc);
-=20
-     mc->default_cpu_type =3D S390_CPU_TYPE_NAME("host");
-+}
-+
-+int kvm_arch_init(MachineState *ms, KVMState *s)
-+{
-+    object_class_foreach(ccw_machine_class_foreach, TYPE_S390_CCW_MACHINE,
-+                         false, NULL);
-=20
-     if (!kvm_check_extension(kvm_state, KVM_CAP_DEVICE_CTRL)) {
-         error_report("KVM is missing capability KVM_CAP_DEVICE_CTRL - "
---=20
-2.21.0
+Bug description:
+  Unable to launch Default Fedora 29 images in gnome-boxes
 
+  ProblemType: Crash
+  DistroRelease: Ubuntu 19.04
+  Package: qemu-system-x86 1:3.1+dfsg-2ubuntu1
+  ProcVersionSignature: Ubuntu 4.19.0-12.13-generic 4.19.18
+  Uname: Linux 4.19.0-12-generic x86_64
+  ApportVersion: 2.20.10-0ubuntu20
+  Architecture: amd64
+  Date: Thu Feb 14 11:00:45 2019
+  ExecutablePath: /usr/bin/qemu-system-x86_64
+  KvmCmdLine: COMMAND         STAT  EUID  RUID   PID  PPID %CPU COMMAND
+  MachineType: Dell Inc. Precision T3610
+  ProcEnviron: PATH=3D(custom, user)
+  ProcKernelCmdLine: BOOT_IMAGE=3D/boot/vmlinuz-4.19.0-12-generic root=3DUU=
+ID=3D939b509b-d627-4642-a655-979b44972d17 ro splash quiet vt.handoff=3D1
+  Signal: 31
+  SourcePackage: qemu
+  StacktraceTop:
+   __pthread_setaffinity_new (th=3D<optimized out>, cpusetsize=3D128, cpuse=
+t=3D0x7f5771fbf680) at ../sysdeps/unix/sysv/linux/pthread_setaffinity.c:34
+   () at /usr/lib/x86_64-linux-gnu/dri/radeonsi_dri.so
+   () at /usr/lib/x86_64-linux-gnu/dri/radeonsi_dri.so
+   start_thread (arg=3D<optimized out>) at pthread_create.c:486
+   clone () at ../sysdeps/unix/sysv/linux/x86_64/clone.S:95
+  Title: qemu-system-x86_64 crashed with signal 31 in __pthread_setaffinity=
+_new()
+  UpgradeStatus: Upgraded to disco on 2018-11-14 (91 days ago)
+  UserGroups: adm cdrom dip lpadmin plugdev sambashare sudo video
+  dmi.bios.date: 11/14/2018
+  dmi.bios.vendor: Dell Inc.
+  dmi.bios.version: A18
+  dmi.board.name: 09M8Y8
+  dmi.board.vendor: Dell Inc.
+  dmi.board.version: A01
+  dmi.chassis.type: 7
+  dmi.chassis.vendor: Dell Inc.
+  dmi.modalias: dmi:bvnDellInc.:bvrA18:bd11/14/2018:svnDellInc.:pnPrecision=
+T3610:pvr00:rvnDellInc.:rn09M8Y8:rvrA01:cvnDellInc.:ct7:cvr:
+  dmi.product.name: Precision T3610
+  dmi.product.sku: 05D2
+  dmi.product.version: 00
+  dmi.sys.vendor: Dell Inc.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/mesa/+bug/1815889/+subscriptions
 
