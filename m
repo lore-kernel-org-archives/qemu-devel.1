@@ -8,77 +8,77 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E04C3CA9EAF
-	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 23:22:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 04F42CA9EAF
+	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 23:24:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A8BDB20882
-	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 23:22:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id BFED020882
+	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 23:24:07 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XeIusKIi"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A8BDB20882
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iJQf7u7D"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BFED020882
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48692 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48706 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iMh0b-000526-OW
-	for qemu-devel@archiver.kernel.org; Mon, 21 Oct 2019 19:22:41 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55664)
+	id 1iMh1z-00069E-0A
+	for qemu-devel@archiver.kernel.org; Mon, 21 Oct 2019 19:24:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55879)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alistair23@gmail.com>) id 1iMgzt-0004Hc-4o
- for qemu-devel@nongnu.org; Mon, 21 Oct 2019 19:21:58 -0400
+ (envelope-from <alistair23@gmail.com>) id 1iMh1F-0005YR-NJ
+ for qemu-devel@nongnu.org; Mon, 21 Oct 2019 19:23:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alistair23@gmail.com>) id 1iMgzr-0008G4-S6
- for qemu-devel@nongnu.org; Mon, 21 Oct 2019 19:21:57 -0400
-Received: from mail-lj1-x241.google.com ([2a00:1450:4864:20::241]:38338)
+ (envelope-from <alistair23@gmail.com>) id 1iMh1E-0000Ca-F0
+ for qemu-devel@nongnu.org; Mon, 21 Oct 2019 19:23:21 -0400
+Received: from mail-lj1-x242.google.com ([2a00:1450:4864:20::242]:40703)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <alistair23@gmail.com>)
- id 1iMgzr-0008EO-Kb; Mon, 21 Oct 2019 19:21:55 -0400
-Received: by mail-lj1-x241.google.com with SMTP id q78so2266lje.5;
- Mon, 21 Oct 2019 16:21:55 -0700 (PDT)
+ id 1iMh1E-0000CQ-7c; Mon, 21 Oct 2019 19:23:20 -0400
+Received: by mail-lj1-x242.google.com with SMTP id 7so15138909ljw.7;
+ Mon, 21 Oct 2019 16:23:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
  :cc:content-transfer-encoding;
- bh=ymyDcWCkCuddsYs1BhHDz4vL8exwnWFox1xI8IHDN1I=;
- b=XeIusKIiDRvYnncKObsPUUarrnjjnidqAoUrGBzEvvKxP3dP7Y2GIghAINcZNxIKNn
- PezvDUo2hhV00kui/LyWjTPrih+Hb414XiJD+2WICgz19ja9EGP5qasrqEIYC85bSmnU
- XJbrE9glPdRC+Yrio83gv2aSTeWvqhRte0NqfemJWRNoL2FoalpBYOucl93y6QtRkEDb
- aT0HIp8nON8hS+2hG5gJnlRCcAH23vP2r90ibE5YAZekBOqsvYkMjSEmjm8SrB3ErAgP
- TXeyuAc1dGm8dExe0EXVYNwGLelJPeazujhkV/ztf+WzfMdxshUGV+dAqKoMTYDnFYIs
- 7f1g==
+ bh=dgUkIB8/YzWd0SWap+/I+S+e7T1LE2dVCo/cEbyNYTk=;
+ b=iJQf7u7D0EWwGlVS8ZOB0rCKcyTMuiEB0HYgyY0Li76M6QrO4RiSVYVlYNJa6MPGeM
+ CGegG5J5eOPSjKtWtXRIf37n7f+Koot+YWKE9QM3x05EIpHR5yB+yPcnzMAfQWzlgkZ+
+ hrKHicEIXb1JT9F2wQbjkxhoX8mrL3KDzvrF1roEKnUgiCo7NtN6ykkWGGmX/2xBbaGp
+ /baqXIWyDr8vvJcqVTNheTWEvUdorcCJNV9aRkSUzrOBRXS5Vw/y3TJdISsq0ruRupjK
+ j51dLBKzsB29Pd+dD9Ogdb8xk6p0H0u6b1inZbThPi3xHUelxmt62p5Us1lreLvGYj//
+ ElWA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc:content-transfer-encoding;
- bh=ymyDcWCkCuddsYs1BhHDz4vL8exwnWFox1xI8IHDN1I=;
- b=SP9ixbNTF5FeUG7GqQ7H6l3lLB4v3RPV3+rZvqQFYAw4mXTqONn58VR8+/icaeK+Pa
- hIMar1FTKpp69ExpLT+X6YqebD2Wuhv0zRz3nfqJrsxUrvo8os+WaDtv77yDzUo59KhI
- 1bVlfvAy9FwJ6li/SnCl4lineDea+tV9Po2acScrHr5g2k49kDGhJIou5Mz80PWJ7KvT
- ztJPNF0ItYGYoZeoEZwpJd9mjwfR+ukXj4Hn2Dux7ey10vCj1pqsfCht+mjwbnpUhNSh
- N7mTHkRESH+MtDXn6IoK5ED+GgVumJ1AlXtI4cFBWvOA5Ed9+aPUWZTvFrNxZTb4vJrS
- GlUw==
-X-Gm-Message-State: APjAAAV5wF3w8kx1pwalnNObTKPbZQTm6lhN0pJrG4EmCqA7dLbf9IK8
- U3j0KEMK28jKk8xwuDzspuqoNX9UQQOyToRfDzE=
-X-Google-Smtp-Source: APXvYqwNssyYWW0ZVtpPtmiNqlO7FT+mopgIOh4Mzf8UOZEK2ilNcQN3sfo1naG5bUQcPbFinK7z2/pbQ1kp9ebf/H0=
-X-Received: by 2002:a2e:b17b:: with SMTP id a27mr16370839ljm.7.1571700114294; 
- Mon, 21 Oct 2019 16:21:54 -0700 (PDT)
+ bh=dgUkIB8/YzWd0SWap+/I+S+e7T1LE2dVCo/cEbyNYTk=;
+ b=Sfa3e0yoxToxnsR30MSFyi5Haj6J3yj8rmq1wNBIeQxvAbTuJAmAM4YnCepk85nm/y
+ bwxc+JNcSO3+I8+zW2mJ2fnACo5U0uZPevXnRW/N0Yx9Blb9q7JnSAns3vsQYgh0ExSC
+ CssJvMbB2FpaZYcOOYZino6lI0wcNZqTihbGYZH3LdoPuhT+cXTDCLkPQgrqwpIlQa+6
+ GJQjsHJq5KhfwooFEgs9U2TBWXWE+8ZjmDvF9EIgtnne32Uy1YszFkpn/6N66xbAJ81I
+ +iPo5y8TdQyWzXFfRIK3QFeoCJ5Ar7jydDBegDs3MwMtDnfwfpb8Z1TPYNVIqsaHObX4
+ NZNw==
+X-Gm-Message-State: APjAAAVg9mbFGfOizaSjLXRPjm4df5N2dmk48W5JRsQIvXCX/8WDjTNq
+ ClEs+Ucyd5g21cUN0sXomAitSknBBoeGfwLme1Q=
+X-Google-Smtp-Source: APXvYqxRW9LaYMuFl+JfjCMGn5u0GB6cS6DAob2Ni6WfOcpDn6toCTpiUlcRJ+rorSIf2RygrjM1owKmSuihc7ySb5E=
+X-Received: by 2002:a2e:420a:: with SMTP id p10mr17053306lja.16.1571700198810; 
+ Mon, 21 Oct 2019 16:23:18 -0700 (PDT)
 MIME-Version: 1.0
-References: <20191019234715.25750-1-f4bug@amsat.org>
- <20191019234715.25750-9-f4bug@amsat.org>
-In-Reply-To: <20191019234715.25750-9-f4bug@amsat.org>
+References: <20191020225650.3671-1-philmd@redhat.com>
+ <20191020225650.3671-8-philmd@redhat.com>
+In-Reply-To: <20191020225650.3671-8-philmd@redhat.com>
 From: Alistair Francis <alistair23@gmail.com>
-Date: Mon, 21 Oct 2019 16:16:38 -0700
-Message-ID: <CAKmqyKOP_ufTVnEBxKc2ZKALpYc2A=qi0A40Xv0C2bCOKA1-zg@mail.gmail.com>
-Subject: Re: [PATCH v3 08/16] hw/arm/bcm2835_peripherals: Add const link
- property in realize()
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+Date: Mon, 21 Oct 2019 16:18:03 -0700
+Message-ID: <CAKmqyKM23N2GFiLOtLtkoK=WnjkEzynj6ctHZgqYQZB87OiCeQ@mail.gmail.com>
+Subject: Re: [PATCH 07/21] hw: Drop QOM ownership on
+ memory_region_allocate_system_memory() calls
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::241
+X-Received-From: 2a00:1450:4864:20::242
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,136 +90,123 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Matthias Brugger <mbrugger@suse.com>, Rob Herring <robh@kernel.org>,
- Alistair Francis <alistair@alistair23.me>,
- Richard Henderson <richard.henderson@linaro.org>,
+Cc: Paul Burton <pburton@wavecomp.com>, Jan Kiszka <jan.kiszka@web.de>,
+ Peter Maydell <peter.maydell@linaro.org>,
+ Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
  "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
+ KONRAD Frederic <frederic.konrad@adacore.com>,
+ "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Rob Herring <robh@kernel.org>,
+ Andrey Smirnov <andrew.smirnov@gmail.com>, Helge Deller <deller@gmx.de>,
+ "Michael S. Tsirkin" <mst@redhat.com>, Markus Armbruster <armbru@redhat.com>,
+ =?UTF-8?Q?Herv=C3=A9_Poussineau?= <hpoussin@reactos.org>,
+ Antony Pavlov <antonynpavlov@gmail.com>,
+ Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
+ David Gibson <david@gibson.dropbear.id.au>,
+ Artyom Tarasenko <atar4qemu@gmail.com>, Joel Stanley <joel@jms.id.au>,
+ Eduardo Habkost <ehabkost@redhat.com>,
+ Alistair Francis <alistair@alistair23.me>,
+ Leif Lindholm <leif.lindholm@linaro.org>,
+ Beniamino Galvani <b.galvani@gmail.com>, qemu-arm <qemu-arm@nongnu.org>,
+ Peter Chubb <peter.chubb@nicta.com.au>, Fabien Chouteau <chouteau@adacore.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>,
+ Radoslaw Biernacki <radoslaw.biernacki@linaro.org>,
+ Thomas Huth <huth@tuxfamily.org>,
  Andrew Baumann <Andrew.Baumann@microsoft.com>,
- Esteban Bosse <estebanbosse@gmail.com>, "Emilio G . Cota" <cota@braap.org>,
- Clement Deschamps <clement.deschamps@antfield.fr>,
- qemu-arm <qemu-arm@nongnu.org>, Cleber Rosa <crosa@redhat.com>,
- Laurent Bonnans <laurent.bonnans@here.com>,
- Cheng Xiang <ext-cheng.xiang@here.com>,
- =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
- Pekka Enberg <penberg@iki.fi>, Pete Batard <pete@akeo.ie>
+ Jean-Christophe Dubois <jcd@tribudubois.net>, Andrew Jeffery <andrew@aj.id.au>,
+ Michael Walle <michael@walle.cc>, "open list:New World" <qemu-ppc@nongnu.org>,
+ Aleksandar Markovic <amarkovic@wavecomp.com>,
+ Igor Mammedov <imammedo@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>,
+ =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Sat, Oct 19, 2019 at 4:53 PM Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.or=
-g> wrote:
+On Sun, Oct 20, 2019 at 4:10 PM Philippe Mathieu-Daud=C3=A9
+<philmd@redhat.com> wrote:
 >
-> The VideoCore GPU is indenpendant from the Peripheral block. In
-> the next commit, we will move its instantiation to the SoC block.
-> The "gpu-bus" object will not be accessible in init() but later
-> in realize(). As a preliminary step to keep the diff clearer, move
-> the const link property creation from init() to realize().
+> All the memory_region_allocate_system_memory() calls are in the
+> board_init() code.  From the 58 calls in the repository, only
+> 4 set the 'owner' parameter. It is obvious we want the Machine
+> to be the owner of the RAM, so we want to use OBJECT(machine)
+> as owner. We can simplify a bit by passing MachineState to
+> memory_region_allocate_system_memory(). In preparation of this
+> refactor, first drop the 'owner' argument from these 4 uses.
 >
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+>   $ git grep memory_region_allocate_system_memory hw/ | wc -l
+>   58
+>
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 
 Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 
 Alistair
 
 > ---
->  hw/arm/bcm2835_peripherals.c | 25 +++++++++++++++++--------
->  1 file changed, 17 insertions(+), 8 deletions(-)
+>  hw/alpha/typhoon.c | 2 +-
+>  hw/arm/raspi.c     | 2 +-
+>  hw/hppa/machine.c  | 2 +-
+>  hw/sparc/sun4m.c   | 2 +-
+>  4 files changed, 4 insertions(+), 4 deletions(-)
 >
-> diff --git a/hw/arm/bcm2835_peripherals.c b/hw/arm/bcm2835_peripherals.c
-> index 17207ae07e..d51e9c8def 100644
-> --- a/hw/arm/bcm2835_peripherals.c
-> +++ b/hw/arm/bcm2835_peripherals.c
-> @@ -82,9 +82,6 @@ static void bcm2835_peripherals_init(Object *obj)
->      object_property_add_alias(obj, "vcram-size", OBJECT(&s->fb), "vcram-=
-size",
->                                &error_abort);
+> diff --git a/hw/alpha/typhoon.c b/hw/alpha/typhoon.c
+> index 179e1f7658..8489ec335c 100644
+> --- a/hw/alpha/typhoon.c
+> +++ b/hw/alpha/typhoon.c
+> @@ -851,7 +851,7 @@ PCIBus *typhoon_init(ram_addr_t ram_size, ISABus **is=
+a_bus,
 >
-> -    object_property_add_const_link(OBJECT(&s->fb), "dma-mr",
-> -                                   OBJECT(&s->gpu_bus_mr), &error_abort)=
-;
-> -
->      /* Property channel */
->      sysbus_init_child_obj(obj, "property", &s->property, sizeof(s->prope=
-rty),
->                            TYPE_BCM2835_PROPERTY);
-> @@ -93,8 +90,6 @@ static void bcm2835_peripherals_init(Object *obj)
+>      /* Main memory region, 0x00.0000.0000.  Real hardware supports 32GB,
+>         but the address space hole reserved at this point is 8TB.  */
+> -    memory_region_allocate_system_memory(&s->ram_region, OBJECT(s), "ram=
+",
+> +    memory_region_allocate_system_memory(&s->ram_region, NULL, "ram",
+>                                           ram_size);
+>      memory_region_add_subregion(addr_space, 0, &s->ram_region);
 >
->      object_property_add_const_link(OBJECT(&s->property), "fb",
->                                     OBJECT(&s->fb), &error_abort);
-> -    object_property_add_const_link(OBJECT(&s->property), "dma-mr",
-> -                                   OBJECT(&s->gpu_bus_mr), &error_abort)=
-;
+> diff --git a/hw/arm/raspi.c b/hw/arm/raspi.c
+> index 615d755879..f76b6eaad3 100644
+> --- a/hw/arm/raspi.c
+> +++ b/hw/arm/raspi.c
+> @@ -182,7 +182,7 @@ static void raspi_init(MachineState *machine, int ver=
+sion)
+>                              &error_abort, NULL);
 >
->      /* Random Number Generator */
->      sysbus_init_child_obj(obj, "rng", &s->rng, sizeof(s->rng),
-> @@ -112,9 +107,6 @@ static void bcm2835_peripherals_init(Object *obj)
->      sysbus_init_child_obj(obj, "dma", &s->dma, sizeof(s->dma),
->                            TYPE_BCM2835_DMA);
+>      /* Allocate and map RAM */
+> -    memory_region_allocate_system_memory(&s->ram, OBJECT(machine), "ram"=
+,
+> +    memory_region_allocate_system_memory(&s->ram, NULL, "ram",
+>                                           machine->ram_size);
+>      /* FIXME: Remove when we have custom CPU address space support */
+>      memory_region_add_subregion_overlap(get_system_memory(), 0, &s->ram,=
+ 0);
+> diff --git a/hw/hppa/machine.c b/hw/hppa/machine.c
+> index 953d454f48..dbe1ff0fe5 100644
+> --- a/hw/hppa/machine.c
+> +++ b/hw/hppa/machine.c
+> @@ -96,7 +96,7 @@ static void machine_hppa_init(MachineState *machine)
 >
-> -    object_property_add_const_link(OBJECT(&s->dma), "dma-mr",
-> -                                   OBJECT(&s->gpu_bus_mr), &error_abort)=
-;
-> -
->      /* Thermal */
->      sysbus_init_child_obj(obj, "thermal", &s->thermal, sizeof(s->thermal=
-),
->                            TYPE_BCM2835_THERMAL);
-> @@ -156,6 +148,7 @@ static void bcm2835_peripherals_realize(DeviceState *=
-dev, Error **errp)
->      memory_region_add_subregion_overlap(&s->gpu_bus_mr, BCM2835_VC_PERI_=
-BASE,
->                                          &s->peri_mr_alias, 1);
+>      /* Main memory region. */
+>      ram_region =3D g_new(MemoryRegion, 1);
+> -    memory_region_allocate_system_memory(ram_region, OBJECT(machine),
+> +    memory_region_allocate_system_memory(ram_region, NULL,
+>                                           "ram", ram_size);
+>      memory_region_add_subregion(addr_space, 0, ram_region);
 >
-> +    obj =3D OBJECT(&s->gpu_bus_mr);
->      /* RAM is aliased four times (different cache configurations) on the=
- GPU */
->      for (n =3D 0; n < 4; n++) {
->          memory_region_init_alias(&s->ram_alias[n], OBJECT(s),
-> @@ -236,6 +229,12 @@ static void bcm2835_peripherals_realize(DeviceState =
-*dev, Error **errp)
->          return;
->      }
+> diff --git a/hw/sparc/sun4m.c b/hw/sparc/sun4m.c
+> index 6c5a17a020..0bb7524655 100644
+> --- a/hw/sparc/sun4m.c
+> +++ b/hw/sparc/sun4m.c
+> @@ -788,7 +788,7 @@ static void ram_realize(DeviceState *dev, Error **err=
+p)
+>      RamDevice *d =3D SUN4M_RAM(dev);
+>      SysBusDevice *sbd =3D SYS_BUS_DEVICE(dev);
 >
-> +    object_property_add_const_link(OBJECT(&s->fb), "dma-mr", obj, &err);
-> +    if (err) {
-> +        error_propagate(errp, err);
-> +        return;
-> +    }
-> +
->      object_property_set_uint(OBJECT(&s->fb), ram_size - vcram_size,
->                               "vcram-base", &err);
->      if (err) {
-> @@ -255,6 +254,11 @@ static void bcm2835_peripherals_realize(DeviceState =
-*dev, Error **errp)
->                         qdev_get_gpio_in(DEVICE(&s->mboxes), MBOX_CHAN_FB=
-));
->
->      /* Property channel */
-> +    object_property_add_const_link(OBJECT(&s->property), "dma-mr", obj, =
-&err);
-> +    if (err) {
-> +        error_propagate(errp, err);
-> +        return;
-> +    }
->      object_property_set_bool(OBJECT(&s->property), true, "realized", &er=
-r);
->      if (err) {
->          error_propagate(errp, err);
-> @@ -323,6 +327,11 @@ static void bcm2835_peripherals_realize(DeviceState =
-*dev, Error **errp)
->                                 INTERRUPT_SDIO));
->
->      /* DMA Channels */
-> +    object_property_add_const_link(OBJECT(&s->dma), "dma-mr", obj, &err)=
-;
-> +    if (err) {
-> +        error_propagate(errp, err);
-> +        return;
-> +    }
->      object_property_set_bool(OBJECT(&s->dma), true, "realized", &err);
->      if (err) {
->          error_propagate(errp, err);
+> -    memory_region_allocate_system_memory(&d->ram, OBJECT(d), "sun4m.ram"=
+,
+> +    memory_region_allocate_system_memory(&d->ram, NULL, "sun4m.ram",
+>                                           d->size);
+>      sysbus_init_mmio(sbd, &d->ram);
+>  }
 > --
 > 2.21.0
 >
