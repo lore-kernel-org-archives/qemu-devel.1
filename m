@@ -2,67 +2,80 @@ Return-Path: <SRS0=8ZcK=YO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 48F7DCA9EAF
-	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 20:59:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 57C02CA9EAF
+	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 21:01:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 067D62086D
-	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 20:59:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 211A22086D
+	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 21:01:25 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=duncanthrax.net header.i=@duncanthrax.net header.b="riIeVtwI"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 067D62086D
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=stackframe.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Z3LiAsQs"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 211A22086D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47852 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47870 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iMemS-0004jY-7g
-	for qemu-devel@archiver.kernel.org; Mon, 21 Oct 2019 16:59:56 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42575)
+	id 1iMens-0005o4-Ak
+	for qemu-devel@archiver.kernel.org; Mon, 21 Oct 2019 17:01:24 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42679)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <svens@stackframe.org>) id 1iMelg-0004Hx-HF
- for qemu-devel@nongnu.org; Mon, 21 Oct 2019 16:59:09 -0400
+ (envelope-from <alistair23@gmail.com>) id 1iMemP-0004q9-F9
+ for qemu-devel@nongnu.org; Mon, 21 Oct 2019 16:59:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <svens@stackframe.org>) id 1iMelf-0006O7-99
- for qemu-devel@nongnu.org; Mon, 21 Oct 2019 16:59:08 -0400
-Received: from smtp.duncanthrax.net ([89.31.1.170]:38465)
+ (envelope-from <alistair23@gmail.com>) id 1iMemO-0006jg-83
+ for qemu-devel@nongnu.org; Mon, 21 Oct 2019 16:59:53 -0400
+Received: from mail-lj1-x244.google.com ([2a00:1450:4864:20::244]:36542)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <svens@stackframe.org>)
- id 1iMele-0006K9-NW
- for qemu-devel@nongnu.org; Mon, 21 Oct 2019 16:59:07 -0400
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
- d=duncanthrax.net; s=dkim; h=In-Reply-To:Content-Type:MIME-Version:References
- :Message-ID:Subject:Cc:To:From:Date;
- bh=p7oRawM6YBdZk9l6LpW8iJfrVMOvcWy9PPJ5azRCP7w=; b=riIeVtwIM4vMf2NgHQyt88ok72
- H5oaKu/8Qxfr78o+5E2qV4mL2JNTDMOwl3TCP/vIw7Rkq2GrzSKDeZPnim50FpD7TgJ7VgGFrFcMz
- loAL6DVrltzYZpxIpwlXHcisVdYzvWBc0aXnhO8+D6PIpDeKzW0gJPWdp+qLVeev2dDg=;
-Received: from hsi-kbw-046-005-233-221.hsi8.kabel-badenwuerttemberg.de
- ([46.5.233.221] helo=t470p.stackframe.org)
- by smtp.eurescom.eu with esmtpa (Exim 4.86_2)
- (envelope-from <svens@stackframe.org>)
- id 1iMelV-00035D-VB; Mon, 21 Oct 2019 22:58:58 +0200
-Date: Mon, 21 Oct 2019 22:58:57 +0200
-From: Sven Schnelle <svens@stackframe.org>
-To: Richard Henderson <richard.henderson@linaro.org>
-Subject: Re: [PATCH 3/7] hppa: remove ISA region
-Message-ID: <20191021205857.GB1439@t470p.stackframe.org>
-References: <20191020204724.31537-1-svens@stackframe.org>
- <20191020204724.31537-4-svens@stackframe.org>
- <284a4bcc-a076-2b94-86e0-0bffbe3e61a0@linaro.org>
+ (Exim 4.71) (envelope-from <alistair23@gmail.com>)
+ id 1iMemN-0006iv-Us; Mon, 21 Oct 2019 16:59:52 -0400
+Received: by mail-lj1-x244.google.com with SMTP id v24so14851374ljj.3;
+ Mon, 21 Oct 2019 13:59:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=IRfRBhOJ4tK/eyaHwLIDarS0P0zdVadV9K948uMtz8s=;
+ b=Z3LiAsQs+IjfGkUKDDbF1Eh8jAjin6+rbCAjr13gMH1+O4756chEphzWBHW9KhkTtg
+ Vfy4zZyDaC9qftuuzmvNtKt2WE8Em1b8pbfBpqfrLM7dth2Aoe90Q3RRB7zMUP1Ut/Od
+ 1WH7lO5CsnMBEaA6wN6y4VsmP6vpShbUVWx0zPP55QBigdf6Xsgo+wCNSNUfjGxpbaXi
+ TQLnni6KVPzDgcRQQj23rZbgPKUsI7OFOrlngOmPjBYdwoK5jV+/GSAkQIMjuM89n/w4
+ Ei0OlHSptGIj8vdcHSujJryJ8JjnsHUcGw6gQBlSS5Up6POKEeWfAkwemZgCkhFBhSvx
+ +4Hw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=IRfRBhOJ4tK/eyaHwLIDarS0P0zdVadV9K948uMtz8s=;
+ b=MB9m3aaTlgcaWuOeGxrdfnC5xMZHa3JykpRrBXe+TJRtNAHTlGuAGngSp99jicTZQo
+ WqQxvPBcMstDJQKNkOCIDY91XYCTtDRg3fTPHMVsPJ11dRSBlZy2hQwy7Km09+TD114C
+ 4xdsN5343LyxmuO4hdm7jk4B4E5k1r2Iq5d0LUpfm4OepEfOkrlQy8CXd9giA/R1bof4
+ OmhYZNrbtokPLfVvuPSIE/ZAq51kAq93zYFIVgahzPFt2OmBpvK/vzB8yPC+T2w9T1sq
+ tl1qq7f2wWWnFHufNOOzhp6SDWCcnzGuqcu55W/p4zbgqBw7/D3KXN7iWNTtdJDrqzGI
+ oYsQ==
+X-Gm-Message-State: APjAAAVnGdLZNOoqsC5RU9xCZf3gtOesCF9hdHGRLYiUh+GGQlheTRbW
+ Z9USg7NOEIEJkzypLgQKz6fAxPlLtgzHSxhfiB0=
+X-Google-Smtp-Source: APXvYqzCsBN2hgXsSagcEg7xuOuPSWgFcZItyVs84/ugaZX9X+dVHN4bfw1ifOXY6SWgD1xysyceg6Ckd6dmomQzKYI=
+X-Received: by 2002:a2e:894b:: with SMTP id b11mr16221475ljk.152.1571691590645; 
+ Mon, 21 Oct 2019 13:59:50 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <284a4bcc-a076-2b94-86e0-0bffbe3e61a0@linaro.org>
-User-Agent: Mutt/1.10.1 (2018-07-13)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 89.31.1.170
+References: <20191021190653.9511-1-philmd@redhat.com>
+In-Reply-To: <20191021190653.9511-1-philmd@redhat.com>
+From: Alistair Francis <alistair23@gmail.com>
+Date: Mon, 21 Oct 2019 13:54:35 -0700
+Message-ID: <CAKmqyKO7HrqwTkXVadKikT_+2e2BfW2uevQV0UFm0_ZYnZfCLg@mail.gmail.com>
+Subject: Re: [PATCH v2 0/6] hw/arm: Create the RAM in the board
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::244
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -74,38 +87,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Helge Deller <deller@gmx.de>, qemu-devel@nongnu.org,
- Richard Henderson <rth@twiddle.net>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Alistair Francis <alistair@alistair23.me>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
+ qemu-arm <qemu-arm@nongnu.org>, Antony Pavlov <antonynpavlov@gmail.com>,
+ "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Richard,
+On Mon, Oct 21, 2019 at 12:07 PM Philippe Mathieu-Daud=C3=A9
+<philmd@redhat.com> wrote:
+>
+> Hi Peter,
+>
+> This series contains the ARM patches extracted from the
+> "Let the machine be the owner of the system memory" series [1]
+> reviewed by Richard.
+>
+> These are cleanups moving the creation of the system ram at
+> the board level. The other series will enforce
+> memory_region_allocate_system_memory() get called with a
+> MachineState argument, this preliminary cleanup is required.
 
-On Mon, Oct 21, 2019 at 11:17:24AM -0700, Richard Henderson wrote:
-> On 10/20/19 1:47 PM, Sven Schnelle wrote:
-> > B160L doesn't have an ISA bus, and we no longer need it to
-> > workaround missing hardware, so remove it.
-> > 
-> > Signed-off-by: Sven Schnelle <svens@stackframe.org>
-> > ---
-> >  hw/hppa/hppa_hardware.h |  1 -
-> >  hw/hppa/machine.c       | 32 --------------------------------
-> >  2 files changed, 33 deletions(-)
-> 
-> This should remove ISA_BUS from hw/hppa/Kconfig as well.
+For the whole series:
 
-Right. I thought to do so is easy, but that turned out to reveal a lot
-of other issues:
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 
-- hppa is using the I8259 code, which relies on ISA
-- hw/hppa/pci.c seems to only contain unused stuff
-- LASI use hw/char/parallel.c, which relies on ISA. parallel.c could
-  propably be split up into a ISA dependent part and a generic part
+Alistair
 
-So it is more work to remove ISA completely, therefore i'll drop that
-patch for now and submit it later again.
-
-Thanks
-Sven
+>
+> Regard,
+>
+> Phil.
+>
+> [1] https://lists.gnu.org/archive/html/qemu-devel/2019-10/msg05085.html
+>
+> Philippe Mathieu-Daud=C3=A9 (6):
+>   hw/arm/xilinx_zynq: Use the IEC binary prefix definitions
+>   hw/arm/mps2: Use the IEC binary prefix definitions
+>   hw/arm/collie: Create the RAM in the board
+>   hw/arm/omap2: Create the RAM in the board
+>   hw/arm/omap1: Create the RAM in the board
+>   hw/arm/digic4: Inline digic4_board_setup_ram() function
+>
+>  hw/arm/collie.c       |  8 ++++++--
+>  hw/arm/digic_boards.c |  9 ++-------
+>  hw/arm/mps2-tz.c      |  3 ++-
+>  hw/arm/mps2.c         |  3 ++-
+>  hw/arm/nseries.c      | 10 +++++++---
+>  hw/arm/omap1.c        | 12 +++++-------
+>  hw/arm/omap2.c        | 13 +++++--------
+>  hw/arm/omap_sx1.c     |  8 ++++++--
+>  hw/arm/palm.c         |  8 ++++++--
+>  hw/arm/strongarm.c    |  7 +------
+>  hw/arm/strongarm.h    |  4 +---
+>  hw/arm/xilinx_zynq.c  |  3 ++-
+>  include/hw/arm/omap.h | 10 +++-------
+>  13 files changed, 48 insertions(+), 50 deletions(-)
+>
+> --
+> 2.21.0
+>
+>
 
