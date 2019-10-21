@@ -2,115 +2,54 @@ Return-Path: <SRS0=8ZcK=YO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BAD2FCA9EAF
-	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 19:25:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E828CA9EAF
+	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 19:26:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7731520873
-	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 19:25:55 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=wavecomp.com header.i=@wavecomp.com header.b="vm9HarLw"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7731520873
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=wavecomp.com
+	by mail.kernel.org (Postfix) with ESMTPS id 549632084C
+	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 19:26:07 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 549632084C
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=rt-rk.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47144 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47146 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iMdJS-0006eC-IA
-	for qemu-devel@archiver.kernel.org; Mon, 21 Oct 2019 15:25:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60843)
+	id 1iMdJe-0006zK-Al
+	for qemu-devel@archiver.kernel.org; Mon, 21 Oct 2019 15:26:06 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58743)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <amarkovic@wavecomp.com>) id 1iMdI1-0004rV-8U
- for qemu-devel@nongnu.org; Mon, 21 Oct 2019 15:24:26 -0400
+ (envelope-from <aleksandar.markovic@rt-rk.com>) id 1iMd73-0001VM-Q6
+ for qemu-devel@nongnu.org; Mon, 21 Oct 2019 15:13:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <amarkovic@wavecomp.com>) id 1iMdHz-0001ec-Sc
- for qemu-devel@nongnu.org; Mon, 21 Oct 2019 15:24:25 -0400
-Received: from mail-eopbgr790129.outbound.protection.outlook.com
- ([40.107.79.129]:51055 helo=NAM03-CO1-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <amarkovic@wavecomp.com>)
- id 1iMdHz-0001dy-FZ; Mon, 21 Oct 2019 15:24:23 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=i3WsG0hXi5IHWWtXmhr+La3bme+guKPu6nHewO5tU/1DVPDvWlgjeIsF63YOdp6KaE/SDZhapdQeRulVAPVfWvw2GtELXke2/yyl5JF1f8eiSUIQGoegubQr2oMM9cS9NtDiqnVUISWYCF3R/t1C19f+iPL1X/QpJhia+D4hp0BmKXVlP/+7nkcMVQia0s+Ihc5SxOHS5/8+8LisR02h8j6mYFjRYx7wARzvVkIpek1KW9mx118elbauz6SkSZDdIxwe7FBxV8DGUH17+tZxAhcxRFq01YDUcAGR9O0UM5kzkt57aOJIY88zOIpzBw4kUKdWGlsCWQWeULl64vw97w==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=73H29hOaq20Z0USTOfWYxLEfqab4x4mR7l1SWJ7ADtA=;
- b=hViqvG0DdKEGJXk5JKgdob4rCtx644T2otbOT3WV4DJSs75Ilk9Sn1f77BG6ksbNrqAE5cKHB/3hhP6+cMsRw6OVi7Z14NaUT4o3GpTt9IwSoRS2jr+J42FZcT/gYL3IgazSsSVoS8IrFOA9oTRDHxqsBqWCtAhFJrKPMg32bTwV8RkujfK5BRp4CznH9niLkZ0uk6jY3nvaEnB3SK+sqJE/ZYioLCu1gAqZqjgDoGL2NWCiR2JUUj/Rgy33KJ4ODCp88ORPKWoS/mpaYLMXiJDoYjxntUXtUB8e0CsToZQgw7XaWkg5oML7RyLjnzhAwsk0llKUkPeLc9zGy9pZhA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=wavecomp.com; dmarc=pass action=none header.from=wavecomp.com;
- dkim=pass header.d=wavecomp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=wavecomp.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=73H29hOaq20Z0USTOfWYxLEfqab4x4mR7l1SWJ7ADtA=;
- b=vm9HarLw4KI6XmGqMOp7rwglOZ80pVjmGnSYoXfPhxGHvT8qXaR1rAWt2sSRcCCC6DKMxU1SRoVk0/vwBcCoSbflTju7O9WFo8sy38Ibfwl/dCwB+vuIsaH6fHU06E/YhonJ8BlRwTRqBfBDFAkN9Jz7+jOLmEFdZNoXDKR4wdc=
-Received: from BN6PR2201MB1251.namprd22.prod.outlook.com (10.174.81.139) by
- BN6PR2201MB1442.namprd22.prod.outlook.com (10.174.91.11) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2347.17; Mon, 21 Oct 2019 19:24:11 +0000
-Received: from BN6PR2201MB1251.namprd22.prod.outlook.com
- ([fe80::850f:a4cc:f2f8:364a]) by BN6PR2201MB1251.namprd22.prod.outlook.com
- ([fe80::850f:a4cc:f2f8:364a%11]) with mapi id 15.20.2347.029; Mon, 21 Oct
- 2019 19:24:11 +0000
-From: Aleksandar Markovic <amarkovic@wavecomp.com>
-To: =?iso-8859-1?Q?Philippe_Mathieu-Daud=E9?= <philmd@redhat.com>, Paolo
- Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Markus Armbruster
- <armbru@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
-Subject: Re: [EXTERNAL][PATCH 18/21] hw/mips: Let the machine be the owner of
- the system memory
-Thread-Topic: [EXTERNAL][PATCH 18/21] hw/mips: Let the machine be the owner of
- the system memory
-Thread-Index: AQHVh5qMTYYCsmPPxUOCxUGGTGsiZ6dleo5T
-Date: Mon, 21 Oct 2019 19:24:11 +0000
-Message-ID: <BN6PR2201MB12510A0641A2D00A823312B8C6690@BN6PR2201MB1251.namprd22.prod.outlook.com>
-References: <20191020225650.3671-1-philmd@redhat.com>,
- <20191020225650.3671-19-philmd@redhat.com>
-In-Reply-To: <20191020225650.3671-19-philmd@redhat.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=amarkovic@wavecomp.com; 
-x-originating-ip: [82.117.201.26]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 994070a8-3dcf-47ab-d111-08d7565c407a
-x-ms-traffictypediagnostic: BN6PR2201MB1442:
-x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <BN6PR2201MB144262DEC457862B9E0DA909C6690@BN6PR2201MB1442.namprd22.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:113;
-x-forefront-prvs: 0197AFBD92
-x-forefront-antispam-report: SFV:NSPM;
- SFS:(10019020)(396003)(136003)(366004)(39840400004)(376002)(346002)(189003)(199004)(7736002)(305945005)(6246003)(2906002)(6436002)(86362001)(4326008)(7406005)(7416002)(74316002)(229853002)(478600001)(256004)(14454004)(53546011)(64756008)(66556008)(66476007)(66446008)(91956017)(186003)(476003)(71200400001)(54906003)(66946007)(71190400001)(486006)(99286004)(11346002)(52536014)(33656002)(446003)(316002)(102836004)(2501003)(76116006)(81156014)(55016002)(66066001)(81166006)(9686003)(25786009)(3846002)(6116002)(8936002)(110136005)(55236004)(76176011)(7696005)(8676002)(5660300002)(6506007)(26005);
- DIR:OUT; SFP:1102; SCL:1; SRVR:BN6PR2201MB1442;
- H:BN6PR2201MB1251.namprd22.prod.outlook.com; FPR:; SPF:None; LANG:en;
- PTR:InfoNoRecords; MX:1; A:1; 
-received-spf: None (protection.outlook.com: wavecomp.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: fHmP45t8iJ/Z2hWAHdaiQG0fw7/wQJHUtt3KCbKy1sYhfCpYPaVXuCxVMl31l3RQBUUIFpd99byQUp/eyFAf7uIlR66VA7pqOaJbhdWQOw91f0Dliw3QEDZLrTEYHd7xuT/WGj+k27JC9p03joddkGJoErrw03h2UgxLrsQqzJTdtjg5iSoHNOWznlaTUzuJcUpre8c+FVF3t1VqmvcbnmI9p6PMIV6QLe/TAfR22ayuSsGvr3jbYLBl7y1BMPPDaPtVqY56yAgkSig7zb+HMqPy04ZVOgzGloFrNLZqTZh7cGi1RwgO2GLNaGaL0FVVohU2Kfnxrr5ssl50nYhJ1Mf0hZWw61RYZTMlcFhFa7RCGPMKyD4JOxhnWmOZMAdkwEnC9amoEpy1rkzoqFHEr7ky1hqeIMi2AJwuJrDH891YsyOg6U0XDJala0HahH4l
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
-MIME-Version: 1.0
-X-OriginatorOrg: wavecomp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 994070a8-3dcf-47ab-d111-08d7565c407a
-X-MS-Exchange-CrossTenant-originalarrivaltime: 21 Oct 2019 19:24:11.0807 (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 463607d3-1db3-40a0-8a29-970c56230104
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: SiY4zIta3YoXAYsj+AF0/bGakAC2uBWSbKXm0637OZxcdI2ZYKQwCF3UH9NkQYyFasvQlgRMxdN9qqzcFNGBoQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN6PR2201MB1442
-X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
-X-Received-From: 40.107.79.129
+ (envelope-from <aleksandar.markovic@rt-rk.com>) id 1iMd6z-0004Gq-Le
+ for qemu-devel@nongnu.org; Mon, 21 Oct 2019 15:13:04 -0400
+Received: from mx2.rt-rk.com ([89.216.37.149]:50851 helo=mail.rt-rk.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
+ id 1iMd6z-0003rl-2s
+ for qemu-devel@nongnu.org; Mon, 21 Oct 2019 15:13:01 -0400
+Received: from localhost (localhost [127.0.0.1])
+ by mail.rt-rk.com (Postfix) with ESMTP id AC5441A2178;
+ Mon, 21 Oct 2019 21:11:55 +0200 (CEST)
+X-Virus-Scanned: amavisd-new at rt-rk.com
+Received: from rtrkw774-lin.domain.local (rtrkw774.domain.local [10.10.14.106])
+ by mail.rt-rk.com (Postfix) with ESMTPSA id 835AE1A1FA5;
+ Mon, 21 Oct 2019 21:11:55 +0200 (CEST)
+From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v6 01/12] target/mips: Clean up helper.c
+Date: Mon, 21 Oct 2019 21:11:26 +0200
+Message-Id: <1571685097-15175-2-git-send-email-aleksandar.markovic@rt-rk.com>
+X-Mailer: git-send-email 2.7.4
+In-Reply-To: <1571685097-15175-1-git-send-email-aleksandar.markovic@rt-rk.com>
+References: <1571685097-15175-1-git-send-email-aleksandar.markovic@rt-rk.com>
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [fuzzy]
+X-Received-From: 89.216.37.149
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -122,160 +61,336 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paul Burton <pburton@wavecomp.com>,
- Peter Maydell <peter.maydell@linaro.org>,
- "Michael S. Tsirkin" <mst@redhat.com>,
- Leif Lindholm <leif.lindholm@linaro.org>,
- Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
- KONRAD Frederic <frederic.konrad@adacore.com>,
- "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Rob Herring <robh@kernel.org>,
- Andrey Smirnov <andrew.smirnov@gmail.com>, Helge Deller <deller@gmx.de>,
- =?iso-8859-1?Q?Herv=E9_Poussineau?= <hpoussin@reactos.org>,
- Joel Stanley <joel@jms.id.au>, Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
- Richard Henderson <rth@twiddle.net>, Artyom Tarasenko <atar4qemu@gmail.com>,
- Antony Pavlov <antonynpavlov@gmail.com>,
- Alistair Francis <alistair@alistair23.me>,
- Fabien Chouteau <chouteau@adacore.com>,
- Beniamino Galvani <b.galvani@gmail.com>,
- "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>,
- Peter Chubb <peter.chubb@nicta.com.au>,
- =?iso-8859-1?Q?C=E9dric_Le_Goater?= <clg@kaod.org>,
- David Gibson <david@gibson.dropbear.id.au>,
- Radoslaw Biernacki <radoslaw.biernacki@linaro.org>,
- Thomas Huth <huth@tuxfamily.org>,
- Andrew Baumann <Andrew.Baumann@microsoft.com>,
- Jean-Christophe Dubois <jcd@tribudubois.net>, Andrew Jeffery <andrew@aj.id.au>,
- Michael Walle <michael@walle.cc>, "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>,
- Jan Kiszka <jan.kiszka@web.de>, Aurelien Jarno <aurelien@aurel32.net>
+Cc: aleksandar.rikalo@rt-rk.com, Markus Armbruster <armbru@redhat.com>,
+ Aleksandar Markovic <amarkovic@wavecomp.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-> Signed-off-by: Philippe Mathieu-Daud=E9 <philmd@redhat.com>
-> ---
->  hw/mips/boston.c        | 2 +-
->  hw/mips/mips_fulong2e.c | 3 ++-
->  hw/mips/mips_jazz.c     | 2 +-
->  hw/mips/mips_malta.c    | 2 +-
->  hw/mips/mips_mipssim.c  | 2 +-
->  hw/mips/mips_r4k.c      | 3 ++-
->  6 files changed, 8 insertions(+), 6 deletions(-)
+From: Aleksandar Markovic <amarkovic@wavecomp.com>
 
-When the commit message is completed:
+Mostly fix errors and warnings reported by 'checkpatch.pl -f'.
 
-Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
-
-________________________________________
-From: Philippe Mathieu-Daud=E9 <philmd@redhat.com>
-Sent: Monday, October 21, 2019 12:56 AM
-To: Paolo Bonzini; Igor Mammedov; qemu-devel@nongnu.org; Markus Armbruster;=
- Eduardo Habkost
-Cc: Thomas Huth; Antony Pavlov; Michael Walle; David Gibson; qemu-arm@nongn=
-u.org; KONRAD Frederic; C=E9dric Le Goater; Fabien Chouteau; Andrey Smirnov=
-; Joel Stanley; Peter Chubb; Andrew Jeffery; Helge Deller; Aurelien Jarno; =
-Jean-Christophe Dubois; Jan Kiszka; Paul Burton; qemu-ppc@nongnu.org; Herv=
-=E9 Poussineau; Andrew Baumann; Mark Cave-Ayland; Beniamino Galvani; Artyom=
- Tarasenko; Edgar E. Iglesias; Leif Lindholm; Aleksandar Markovic; Michael =
-S. Tsirkin; Radoslaw Biernacki; Rob Herring; Richard Henderson; Alistair Fr=
-ancis; Andrzej Zaborowski; Marcel Apfelbaum; Philippe Mathieu-Daud=E9; Alek=
-sandar Rikalo; Peter Maydell
-Subject: [EXTERNAL][PATCH 18/21] hw/mips: Let the machine be the owner of t=
-he system memory
-
-Signed-off-by: Philippe Mathieu-Daud=E9 <philmd@redhat.com>
+Cc: Markus Armbruster <armbru@redhat.com>
+Reviewed-by: Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>
+Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 ---
- hw/mips/boston.c        | 2 +-
- hw/mips/mips_fulong2e.c | 3 ++-
- hw/mips/mips_jazz.c     | 2 +-
- hw/mips/mips_malta.c    | 2 +-
- hw/mips/mips_mipssim.c  | 2 +-
- hw/mips/mips_r4k.c      | 3 ++-
- 6 files changed, 8 insertions(+), 6 deletions(-)
+ target/mips/helper.c | 123 +++++++++++++++++++++++++++++++--------------------
+ 1 file changed, 74 insertions(+), 49 deletions(-)
 
-diff --git a/hw/mips/boston.c b/hw/mips/boston.c
-index ca7d813a52..8445fee0f1 100644
---- a/hw/mips/boston.c
-+++ b/hw/mips/boston.c
-@@ -474,7 +474,7 @@ static void boston_mach_init(MachineState *machine)
-     memory_region_add_subregion_overlap(sys_mem, 0x18000000, flash, 0);
-
-     ddr =3D g_new(MemoryRegion, 1);
--    memory_region_allocate_system_memory(ddr, NULL, "boston.ddr",
-+    memory_region_allocate_system_memory(ddr, machine, "boston.ddr",
-                                          machine->ram_size);
-     memory_region_add_subregion_overlap(sys_mem, 0x80000000, ddr, 0);
-
-diff --git a/hw/mips/mips_fulong2e.c b/hw/mips/mips_fulong2e.c
-index cf537dd7e6..d5a5cef619 100644
---- a/hw/mips/mips_fulong2e.c
-+++ b/hw/mips/mips_fulong2e.c
-@@ -318,7 +318,8 @@ static void mips_fulong2e_init(MachineState *machine)
-     ram_size =3D 256 * MiB;
-
-     /* allocate RAM */
--    memory_region_allocate_system_memory(ram, NULL, "fulong2e.ram", ram_si=
-ze);
-+    memory_region_allocate_system_memory(ram, machine,
-+                                         "fulong2e.ram", ram_size);
-     memory_region_init_ram(bios, NULL, "fulong2e.bios", BIOS_SIZE,
-                            &error_fatal);
-     memory_region_set_readonly(bios, true);
-diff --git a/hw/mips/mips_jazz.c b/hw/mips/mips_jazz.c
-index 8d010a0b6e..88b125855f 100644
---- a/hw/mips/mips_jazz.c
-+++ b/hw/mips/mips_jazz.c
-@@ -188,7 +188,7 @@ static void mips_jazz_init(MachineState *machine,
-     cc->do_transaction_failed =3D mips_jazz_do_transaction_failed;
-
-     /* allocate RAM */
--    memory_region_allocate_system_memory(ram, NULL, "mips_jazz.ram",
-+    memory_region_allocate_system_memory(ram, machine, "mips_jazz.ram",
-                                          machine->ram_size);
-     memory_region_add_subregion(address_space, 0, ram);
-
-diff --git a/hw/mips/mips_malta.c b/hw/mips/mips_malta.c
-index 4d9c64b36a..af56a29ccb 100644
---- a/hw/mips/mips_malta.c
-+++ b/hw/mips/mips_malta.c
-@@ -1267,7 +1267,7 @@ void mips_malta_init(MachineState *machine)
+diff --git a/target/mips/helper.c b/target/mips/helper.c
+index a2b6459..781930a 100644
+--- a/target/mips/helper.c
++++ b/target/mips/helper.c
+@@ -39,8 +39,8 @@ enum {
+ #if !defined(CONFIG_USER_ONLY)
+ 
+ /* no MMU emulation */
+-int no_mmu_map_address (CPUMIPSState *env, hwaddr *physical, int *prot,
+-                        target_ulong address, int rw, int access_type)
++int no_mmu_map_address(CPUMIPSState *env, hwaddr *physical, int *prot,
++                       target_ulong address, int rw, int access_type)
+ {
+     *physical = address;
+     *prot = PAGE_READ | PAGE_WRITE | PAGE_EXEC;
+@@ -48,26 +48,28 @@ int no_mmu_map_address (CPUMIPSState *env, hwaddr *physical, int *prot,
+ }
+ 
+ /* fixed mapping MMU emulation */
+-int fixed_mmu_map_address (CPUMIPSState *env, hwaddr *physical, int *prot,
+-                           target_ulong address, int rw, int access_type)
++int fixed_mmu_map_address(CPUMIPSState *env, hwaddr *physical, int *prot,
++                          target_ulong address, int rw, int access_type)
+ {
+     if (address <= (int32_t)0x7FFFFFFFUL) {
+-        if (!(env->CP0_Status & (1 << CP0St_ERL)))
++        if (!(env->CP0_Status & (1 << CP0St_ERL))) {
+             *physical = address + 0x40000000UL;
+-        else
++        } else {
+             *physical = address;
+-    } else if (address <= (int32_t)0xBFFFFFFFUL)
++        }
++    } else if (address <= (int32_t)0xBFFFFFFFUL) {
+         *physical = address & 0x1FFFFFFF;
+-    else
++    } else {
+         *physical = address;
++    }
+ 
+     *prot = PAGE_READ | PAGE_WRITE | PAGE_EXEC;
+     return TLBRET_MATCH;
+ }
+ 
+ /* MIPS32/MIPS64 R4000-style MMU emulation */
+-int r4k_map_address (CPUMIPSState *env, hwaddr *physical, int *prot,
+-                     target_ulong address, int rw, int access_type)
++int r4k_map_address(CPUMIPSState *env, hwaddr *physical, int *prot,
++                    target_ulong address, int rw, int access_type)
+ {
+     uint16_t ASID = env->CP0_EntryHi & env->CP0_EntryHi_ASID_mask;
+     int i;
+@@ -99,8 +101,9 @@ int r4k_map_address (CPUMIPSState *env, hwaddr *physical, int *prot,
+             if (rw != MMU_DATA_STORE || (n ? tlb->D1 : tlb->D0)) {
+                 *physical = tlb->PFN[n] | (address & (mask >> 1));
+                 *prot = PAGE_READ;
+-                if (n ? tlb->D1 : tlb->D0)
++                if (n ? tlb->D1 : tlb->D0) {
+                     *prot |= PAGE_WRITE;
++                }
+                 if (!(n ? tlb->XI1 : tlb->XI0)) {
+                     *prot |= PAGE_EXEC;
+                 }
+@@ -130,7 +133,7 @@ static int is_seg_am_mapped(unsigned int am, bool eu, int mmu_idx)
+     int32_t adetlb_mask;
+ 
+     switch (mmu_idx) {
+-    case 3 /* ERL */:
++    case 3: /* ERL */
+         /* If EU is set, always unmapped */
+         if (eu) {
+             return 0;
+@@ -204,7 +207,7 @@ static int get_segctl_physical_address(CPUMIPSState *env, hwaddr *physical,
+                                     pa & ~(hwaddr)segmask);
+ }
+ 
+-static int get_physical_address (CPUMIPSState *env, hwaddr *physical,
++static int get_physical_address(CPUMIPSState *env, hwaddr *physical,
+                                 int *prot, target_ulong real_address,
+                                 int rw, int access_type, int mmu_idx)
+ {
+@@ -252,14 +255,15 @@ static int get_physical_address (CPUMIPSState *env, hwaddr *physical,
+         } else {
+             segctl = env->CP0_SegCtl2 >> 16;
+         }
+-        ret = get_segctl_physical_address(env, physical, prot, real_address, rw,
+-                                          access_type, mmu_idx, segctl,
+-                                          0x3FFFFFFF);
++        ret = get_segctl_physical_address(env, physical, prot,
++                                          real_address, rw, access_type,
++                                          mmu_idx, segctl, 0x3FFFFFFF);
+ #if defined(TARGET_MIPS64)
+     } else if (address < 0x4000000000000000ULL) {
+         /* xuseg */
+         if (UX && address <= (0x3FFFFFFFFFFFFFFFULL & env->SEGMask)) {
+-            ret = env->tlb->map_address(env, physical, prot, real_address, rw, access_type);
++            ret = env->tlb->map_address(env, physical, prot,
++                                        real_address, rw, access_type);
+         } else {
+             ret = TLBRET_BADADDR;
+         }
+@@ -267,7 +271,8 @@ static int get_physical_address (CPUMIPSState *env, hwaddr *physical,
+         /* xsseg */
+         if ((supervisor_mode || kernel_mode) &&
+             SX && address <= (0x7FFFFFFFFFFFFFFFULL & env->SEGMask)) {
+-            ret = env->tlb->map_address(env, physical, prot, real_address, rw, access_type);
++            ret = env->tlb->map_address(env, physical, prot,
++                                        real_address, rw, access_type);
+         } else {
+             ret = TLBRET_BADADDR;
+         }
+@@ -307,7 +312,8 @@ static int get_physical_address (CPUMIPSState *env, hwaddr *physical,
+         /* xkseg */
+         if (kernel_mode && KX &&
+             address <= (0xFFFFFFFF7FFFFFFFULL & env->SEGMask)) {
+-            ret = env->tlb->map_address(env, physical, prot, real_address, rw, access_type);
++            ret = env->tlb->map_address(env, physical, prot,
++                                        real_address, rw, access_type);
+         } else {
+             ret = TLBRET_BADADDR;
+         }
+@@ -328,8 +334,10 @@ static int get_physical_address (CPUMIPSState *env, hwaddr *physical,
+                                           access_type, mmu_idx,
+                                           env->CP0_SegCtl0 >> 16, 0x1FFFFFFF);
+     } else {
+-        /* kseg3 */
+-        /* XXX: debug segment is not emulated */
++        /*
++         * kseg3
++         * XXX: debug segment is not emulated
++         */
+         ret = get_segctl_physical_address(env, physical, prot, real_address, rw,
+                                           access_type, mmu_idx,
+                                           env->CP0_SegCtl0, 0x1FFFFFFF);
+@@ -515,9 +523,9 @@ static void raise_mmu_exception(CPUMIPSState *env, target_ulong address,
+ #if defined(TARGET_MIPS64)
+     env->CP0_EntryHi &= env->SEGMask;
+     env->CP0_XContext =
+-        /* PTEBase */   (env->CP0_XContext & ((~0ULL) << (env->SEGBITS - 7))) |
+-        /* R */         (extract64(address, 62, 2) << (env->SEGBITS - 9)) |
+-        /* BadVPN2 */   (extract64(address, 13, env->SEGBITS - 13) << 4);
++        (env->CP0_XContext & ((~0ULL) << (env->SEGBITS - 7))) | /* PTEBase */
++        (extract64(address, 62, 2) << (env->SEGBITS - 9)) |     /* R       */
++        (extract64(address, 13, env->SEGBITS - 13) << 4);       /* BadVPN2 */
+ #endif
+     cs->exception_index = exception;
+     env->error_code = error_code;
+@@ -945,7 +953,8 @@ bool mips_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
+ }
+ 
+ #ifndef CONFIG_USER_ONLY
+-hwaddr cpu_mips_translate_address(CPUMIPSState *env, target_ulong address, int rw)
++hwaddr cpu_mips_translate_address(CPUMIPSState *env, target_ulong address,
++                                  int rw)
+ {
+     hwaddr physical;
+     int prot;
+@@ -1005,7 +1014,7 @@ static const char * const excp_names[EXCP_LAST + 1] = {
+ };
+ #endif
+ 
+-target_ulong exception_resume_pc (CPUMIPSState *env)
++target_ulong exception_resume_pc(CPUMIPSState *env)
+ {
+     target_ulong bad_pc;
+     target_ulong isa_mode;
+@@ -1013,8 +1022,10 @@ target_ulong exception_resume_pc (CPUMIPSState *env)
+     isa_mode = !!(env->hflags & MIPS_HFLAG_M16);
+     bad_pc = env->active_tc.PC | isa_mode;
+     if (env->hflags & MIPS_HFLAG_BMASK) {
+-        /* If the exception was raised from a delay slot, come back to
+-           the jump.  */
++        /*
++         * If the exception was raised from a delay slot, come back to
++         * the jump.
++         */
+         bad_pc -= (env->hflags & MIPS_HFLAG_B16 ? 2 : 4);
      }
-
-     /* register RAM at high address where it is undisturbed by IO */
--    memory_region_allocate_system_memory(ram_high, NULL, "mips_malta.ram",
-+    memory_region_allocate_system_memory(ram_high, machine, "mips_malta.ra=
-m",
-                                          ram_size);
-     memory_region_add_subregion(system_memory, 0x80000000, ram_high);
-
-diff --git a/hw/mips/mips_mipssim.c b/hw/mips/mips_mipssim.c
-index 282bbecb24..c1933231e2 100644
---- a/hw/mips/mips_mipssim.c
-+++ b/hw/mips/mips_mipssim.c
-@@ -166,7 +166,7 @@ mips_mipssim_init(MachineState *machine)
-     qemu_register_reset(main_cpu_reset, reset_info);
-
-     /* Allocate RAM. */
--    memory_region_allocate_system_memory(ram, NULL, "mips_mipssim.ram",
-+    memory_region_allocate_system_memory(ram, machine, "mips_mipssim.ram",
-                                          ram_size);
-     memory_region_init_ram(bios, NULL, "mips_mipssim.bios", BIOS_SIZE,
-                            &error_fatal);
-diff --git a/hw/mips/mips_r4k.c b/hw/mips/mips_r4k.c
-index bc0be26544..59f8cacfb6 100644
---- a/hw/mips/mips_r4k.c
-+++ b/hw/mips/mips_r4k.c
-@@ -203,7 +203,8 @@ void mips_r4k_init(MachineState *machine)
-                      " maximum 256MB", ram_size / MiB);
-         exit(1);
+ 
+@@ -1022,14 +1033,14 @@ target_ulong exception_resume_pc (CPUMIPSState *env)
+ }
+ 
+ #if !defined(CONFIG_USER_ONLY)
+-static void set_hflags_for_handler (CPUMIPSState *env)
++static void set_hflags_for_handler(CPUMIPSState *env)
+ {
+     /* Exception handlers are entered in 32-bit mode.  */
+     env->hflags &= ~(MIPS_HFLAG_M16);
+     /* ...except that microMIPS lets you choose.  */
+     if (env->insn_flags & ASE_MICROMIPS) {
+-        env->hflags |= (!!(env->CP0_Config3
+-                           & (1 << CP0C3_ISA_ON_EXC))
++        env->hflags |= (!!(env->CP0_Config3 &
++                           (1 << CP0C3_ISA_ON_EXC))
+                         << MIPS_HFLAG_M16_SHIFT);
      }
--    memory_region_allocate_system_memory(ram, NULL, "mips_r4k.ram", ram_si=
-ze);
-+    memory_region_allocate_system_memory(ram, machine, "mips_r4k.ram",
-+                                         ram_size);
-
-     memory_region_add_subregion(address_space_mem, 0, ram);
-
---
-2.21.0
+ }
+@@ -1096,10 +1107,12 @@ void mips_cpu_do_interrupt(CPUState *cs)
+     switch (cs->exception_index) {
+     case EXCP_DSS:
+         env->CP0_Debug |= 1 << CP0DB_DSS;
+-        /* Debug single step cannot be raised inside a delay slot and
+-           resume will always occur on the next instruction
+-           (but we assume the pc has always been updated during
+-           code translation). */
++        /*
++         * Debug single step cannot be raised inside a delay slot and
++         * resume will always occur on the next instruction
++         * (but we assume the pc has always been updated during
++         * code translation).
++         */
+         env->CP0_DEPC = env->active_tc.PC | !!(env->hflags & MIPS_HFLAG_M16);
+         goto enter_debug_mode;
+     case EXCP_DINT:
+@@ -1111,7 +1124,8 @@ void mips_cpu_do_interrupt(CPUState *cs)
+     case EXCP_DBp:
+         env->CP0_Debug |= 1 << CP0DB_DBp;
+         /* Setup DExcCode - SDBBP instruction */
+-        env->CP0_Debug = (env->CP0_Debug & ~(0x1fULL << CP0DB_DEC)) | 9 << CP0DB_DEC;
++        env->CP0_Debug = (env->CP0_Debug & ~(0x1fULL << CP0DB_DEC)) |
++                         (9 << CP0DB_DEC);
+         goto set_DEPC;
+     case EXCP_DDBS:
+         env->CP0_Debug |= 1 << CP0DB_DDBS;
+@@ -1132,8 +1146,9 @@ void mips_cpu_do_interrupt(CPUState *cs)
+         env->hflags |= MIPS_HFLAG_DM | MIPS_HFLAG_CP0;
+         env->hflags &= ~(MIPS_HFLAG_KSU);
+         /* EJTAG probe trap enable is not implemented... */
+-        if (!(env->CP0_Status & (1 << CP0St_EXL)))
++        if (!(env->CP0_Status & (1 << CP0St_EXL))) {
+             env->CP0_Cause &= ~(1U << CP0Ca_BD);
++        }
+         env->active_tc.PC = env->exception_base + 0x480;
+         set_hflags_for_handler(env);
+         break;
+@@ -1159,8 +1174,9 @@ void mips_cpu_do_interrupt(CPUState *cs)
+         }
+         env->hflags |= MIPS_HFLAG_CP0;
+         env->hflags &= ~(MIPS_HFLAG_KSU);
+-        if (!(env->CP0_Status & (1 << CP0St_EXL)))
++        if (!(env->CP0_Status & (1 << CP0St_EXL))) {
+             env->CP0_Cause &= ~(1U << CP0Ca_BD);
++        }
+         env->active_tc.PC = env->exception_base;
+         set_hflags_for_handler(env);
+         break;
+@@ -1176,12 +1192,16 @@ void mips_cpu_do_interrupt(CPUState *cs)
+                 uint32_t pending = (env->CP0_Cause & CP0Ca_IP_mask) >> CP0Ca_IP;
+ 
+                 if (env->CP0_Config3 & (1 << CP0C3_VEIC)) {
+-                    /* For VEIC mode, the external interrupt controller feeds
+-                     * the vector through the CP0Cause IP lines.  */
++                    /*
++                     * For VEIC mode, the external interrupt controller feeds
++                     * the vector through the CP0Cause IP lines.
++                     */
+                     vector = pending;
+                 } else {
+-                    /* Vectored Interrupts
+-                     * Mask with Status.IM7-IM0 to get enabled interrupts. */
++                    /*
++                     * Vectored Interrupts
++                     * Mask with Status.IM7-IM0 to get enabled interrupts.
++                     */
+                     pending &= (env->CP0_Status >> CP0St_IM) & 0xff;
+                     /* Find the highest-priority interrupt. */
+                     while (pending >>= 1) {
+@@ -1354,7 +1374,8 @@ void mips_cpu_do_interrupt(CPUState *cs)
+ 
+         env->active_tc.PC += offset;
+         set_hflags_for_handler(env);
+-        env->CP0_Cause = (env->CP0_Cause & ~(0x1f << CP0Ca_EC)) | (cause << CP0Ca_EC);
++        env->CP0_Cause = (env->CP0_Cause & ~(0x1f << CP0Ca_EC)) |
++                         (cause << CP0Ca_EC);
+         break;
+     default:
+         abort();
+@@ -1390,7 +1411,7 @@ bool mips_cpu_exec_interrupt(CPUState *cs, int interrupt_request)
+ }
+ 
+ #if !defined(CONFIG_USER_ONLY)
+-void r4k_invalidate_tlb (CPUMIPSState *env, int idx, int use_extra)
++void r4k_invalidate_tlb(CPUMIPSState *env, int idx, int use_extra)
+ {
+     CPUState *cs = env_cpu(env);
+     r4k_tlb_t *tlb;
+@@ -1400,16 +1421,20 @@ void r4k_invalidate_tlb (CPUMIPSState *env, int idx, int use_extra)
+     target_ulong mask;
+ 
+     tlb = &env->tlb->mmu.r4k.tlb[idx];
+-    /* The qemu TLB is flushed when the ASID changes, so no need to
+-       flush these entries again.  */
++    /*
++     * The qemu TLB is flushed when the ASID changes, so no need to
++     * flush these entries again.
++     */
+     if (tlb->G == 0 && tlb->ASID != ASID) {
+         return;
+     }
+ 
+     if (use_extra && env->tlb->tlb_in_use < MIPS_TLB_MAX) {
+-        /* For tlbwr, we can shadow the discarded entry into
+-           a new (fake) TLB entry, as long as the guest can not
+-           tell that it's there.  */
++        /*
++         * For tlbwr, we can shadow the discarded entry into
++         * a new (fake) TLB entry, as long as the guest can not
++         * tell that it's there.
++         */
+         env->tlb->mmu.r4k.tlb[env->tlb->tlb_in_use] = *tlb;
+         env->tlb->tlb_in_use++;
+         return;
+-- 
+2.7.4
 
 
