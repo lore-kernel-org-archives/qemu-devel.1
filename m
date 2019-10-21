@@ -8,77 +8,77 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1A7E8CA9EAF
-	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 21:07:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ED6E3CA9EAF
+	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 21:08:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DAE6E2086D
-	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 21:07:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B6AE120873
+	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 21:08:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SWEvK1J9"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DAE6E2086D
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="niHm7hn1"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B6AE120873
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47940 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47970 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iMetW-0002Cy-2n
-	for qemu-devel@archiver.kernel.org; Mon, 21 Oct 2019 17:07:14 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42972)
+	id 1iMev7-0003vk-UJ
+	for qemu-devel@archiver.kernel.org; Mon, 21 Oct 2019 17:08:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43019)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alistair23@gmail.com>) id 1iMeoK-0006Zg-Aj
- for qemu-devel@nongnu.org; Mon, 21 Oct 2019 17:01:53 -0400
+ (envelope-from <alistair23@gmail.com>) id 1iMeoi-0006nY-18
+ for qemu-devel@nongnu.org; Mon, 21 Oct 2019 17:02:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alistair23@gmail.com>) id 1iMeoJ-00080I-83
- for qemu-devel@nongnu.org; Mon, 21 Oct 2019 17:01:52 -0400
-Received: from mail-lf1-x143.google.com ([2a00:1450:4864:20::143]:39906)
+ (envelope-from <alistair23@gmail.com>) id 1iMeof-0008Cm-Oa
+ for qemu-devel@nongnu.org; Mon, 21 Oct 2019 17:02:15 -0400
+Received: from mail-lf1-x142.google.com ([2a00:1450:4864:20::142]:45554)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <alistair23@gmail.com>)
- id 1iMeoJ-0007zk-0b; Mon, 21 Oct 2019 17:01:51 -0400
-Received: by mail-lf1-x143.google.com with SMTP id 195so11247356lfj.6;
- Mon, 21 Oct 2019 14:01:50 -0700 (PDT)
+ id 1iMeof-0008C9-Hp; Mon, 21 Oct 2019 17:02:13 -0400
+Received: by mail-lf1-x142.google.com with SMTP id v8so10670358lfa.12;
+ Mon, 21 Oct 2019 14:02:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
  :cc:content-transfer-encoding;
- bh=ooguhNRX2r9YbvJtC1Q7wtQv8RPkIuUAM30NOTdaMDo=;
- b=SWEvK1J930fJUVflAZS8jonqNaGxGogybqkrT0rrxvc3vJAAanCrVsuo7VpSzACpC1
- Iy8rlLmJ87pQtGKZYWzFasPL9HX8A6rvT7+/4FvTqqocUt7YlBfrmo3bS/DLAFacsmxb
- r+NpPoNX/1skQ8KvFxw5hvYReYJpqtUObvhEsah436C/zEacRE/GS+hbVPS3jvmnH44+
- mqfLkwQQHO84bOseu8UqaES0b0XupLHoxIxRY1Ne1fafbOe55iwbF7XUn4p+21MmAGl6
- 3Odi9yQV31F4VxQPgPmE2IZ7t3Nh5yQScRqupUk8JKeGxNWrulYiTjPAo8d8toe5CZHf
- CAvg==
+ bh=Qv1NKUmzdvo7SX8jW6Fbq0tCALDaC3eNuZxIeGztedo=;
+ b=niHm7hn1qymTPjlhrt37yYbHowu+e3/obEAQvnRCPaWVyU2z2OyXYo5dWJ6dqhCGhd
+ tkW9suQonN4Be+sR5so39vZBW8xIX1G6EzJaPTZdguRS3ewCwBFIWxg7ZILZjfE9rI7G
+ eJCToL0nmmsei2vs01sQ9mH3RQVAvLSBSJd2GJzoUsc3JAvhJrJUkgxHcTJ3/p73vbnV
+ o4ps6F70yg3wFs9EJKjkOoown0Vy4/JWp+ALpeYXZr2LXGOcXyxUXt1TtgGg9guveLBn
+ iG9a9hCPwAWsL3MzdvYvEZ0H4ZLfuZ74zKcpR/RekEjlrKT5aA5Tju8G8cBlTt1ENR9A
+ EvjQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc:content-transfer-encoding;
- bh=ooguhNRX2r9YbvJtC1Q7wtQv8RPkIuUAM30NOTdaMDo=;
- b=TP+Rn3O07Ozj6pN5etoil+h+bcWBFsqQ5NjfyKHzMWKUMfV8JN0IVHtEvjhfNuEXAN
- P5Ep8XaV7HnPJH55PC9PrSL2+tkQN6TIST3NQot91lbzsNhRPWrC9akQFJQPa0wDefhg
- WkoXXTP9dSOQiZBxh5Ce0dW4rGD4uJu8fDkZdwhC92MMOYcBmSjO/wwnJaGuOvVVyquE
- RGluUso6YsCAPzOMVuQCXfNlgpyYLp7D08Xn+uyAq4mPUpS7LTfe3ui39e+9QoPOP314
- 6Kg+p7XHsunNGOUSqc8na9Jp2p+pMgLN6e/WdC3eQcjxzCC/Y/IJ4VuN1ifKpXKOmUeP
- bVhg==
-X-Gm-Message-State: APjAAAXo5fyL+bn09FDG8k8wxx9IJ2bmTm/dRnmZGeeBVuh/9v7cfXAO
- oNESQJzwsA40yiZDBRKy2Vz5dgHSS4YdiXgMwcQ=
-X-Google-Smtp-Source: APXvYqy5JLik6nUve7G70xgdpz+t0qCjVO6+mi6EaM1DEanZ8dm8aHU4iOshNzXVBAxEh2eorg8+8eM1YwjD9fNMrxI=
-X-Received: by 2002:a19:ac01:: with SMTP id g1mr16437498lfc.141.1571691709644; 
- Mon, 21 Oct 2019 14:01:49 -0700 (PDT)
+ bh=Qv1NKUmzdvo7SX8jW6Fbq0tCALDaC3eNuZxIeGztedo=;
+ b=oqIqZKaDcHOg9q79emshH6Ai7MlZzE1T2SY32oSqFp9ocUydN7FcPy2ZU3FNbeANgd
+ mJbSx6jqyC7iq/4f3HqcXhab4zuKYXj+3Lq64oNvERbjp1PDXQVKvdgoE9ZRCQx+Gnv3
+ wB3oZAzHVZLn6TbsUCypKZCCdXzXj54MNUmtHw+xxPm7RhDQi/7QTt0ShVrkeyR+XZfa
+ Utbcgd6tvlvHStbbxfikVjmnWGwr0HrD00Zn5jHHMcx67FBm6EuHZ/I2yrL6uQkgLGta
+ p+lBYQgQ4G2EEJwuHuXvhdswjBULZxvxDXDRNNSn7coLaF+wCZghLXueRPtcz6RORjFx
+ nouQ==
+X-Gm-Message-State: APjAAAXIGFku5N40XUPmKLdSgVz0cKQoj4If79MVnzD2Vw8+12bDaDk6
+ CcJfthvH2omCYzg3qWE44h9UepFIjEWS56b1Z2Q=
+X-Google-Smtp-Source: APXvYqxwA0aMyaDVVXY99k/K5mEHvqZ42MNhRQP6rbzug4Q6OjBX4Nn2qSeD+fL4LGnQwz3dhVVEvxKrzv8FC0dbNXM=
+X-Received: by 2002:ac2:447b:: with SMTP id y27mr5633374lfl.135.1571691731895; 
+ Mon, 21 Oct 2019 14:02:11 -0700 (PDT)
 MIME-Version: 1.0
 References: <20191020225650.3671-1-philmd@redhat.com>
- <20191020225650.3671-15-philmd@redhat.com>
-In-Reply-To: <20191020225650.3671-15-philmd@redhat.com>
+ <20191020225650.3671-16-philmd@redhat.com>
+In-Reply-To: <20191020225650.3671-16-philmd@redhat.com>
 From: Alistair Francis <alistair23@gmail.com>
-Date: Mon, 21 Oct 2019 13:56:34 -0700
-Message-ID: <CAKmqyKMZQevuhDrbq72uSA589HMoae_Jm9HeGt-EOY--M6wfFw@mail.gmail.com>
-Subject: Re: [PATCH 14/21] hw/hppa: Let the machine be the owner of the system
+Date: Mon, 21 Oct 2019 13:56:56 -0700
+Message-ID: <CAKmqyKM1xniqr7F1oUYUVdko=c8vux3xvft0WKBx38WN8xhJFg@mail.gmail.com>
+Subject: Re: [PATCH 15/21] hw/i386: Let the machine be the owner of the system
  memory
 To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::143
+X-Received-From: 2a00:1450:4864:20::142
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -121,7 +121,7 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Sun, Oct 20, 2019 at 4:17 PM Philippe Mathieu-Daud=C3=A9
+On Sun, Oct 20, 2019 at 4:20 PM Philippe Mathieu-Daud=C3=A9
 <philmd@redhat.com> wrote:
 >
 > Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
@@ -131,22 +131,22 @@ Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 Alistair
 
 > ---
->  hw/hppa/machine.c | 2 +-
+>  hw/i386/pc.c | 2 +-
 >  1 file changed, 1 insertion(+), 1 deletion(-)
 >
-> diff --git a/hw/hppa/machine.c b/hw/hppa/machine.c
-> index dbe1ff0fe5..6703bfd351 100644
-> --- a/hw/hppa/machine.c
-> +++ b/hw/hppa/machine.c
-> @@ -96,7 +96,7 @@ static void machine_hppa_init(MachineState *machine)
->
->      /* Main memory region. */
->      ram_region =3D g_new(MemoryRegion, 1);
-> -    memory_region_allocate_system_memory(ram_region, NULL,
-> +    memory_region_allocate_system_memory(ram_region, machine,
->                                           "ram", ram_size);
->      memory_region_add_subregion(addr_space, 0, ram_region);
->
+> diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+> index 4b1904237e..3414dc423a 100644
+> --- a/hw/i386/pc.c
+> +++ b/hw/i386/pc.c
+> @@ -1655,7 +1655,7 @@ void pc_memory_init(PCMachineState *pcms,
+>       * with older qemus that used qemu_ram_alloc().
+>       */
+>      ram =3D g_malloc(sizeof(*ram));
+> -    memory_region_allocate_system_memory(ram, NULL, "pc.ram",
+> +    memory_region_allocate_system_memory(ram, machine, "pc.ram",
+>                                           machine->ram_size);
+>      *ram_memory =3D ram;
+>      ram_below_4g =3D g_malloc(sizeof(*ram_below_4g));
 > --
 > 2.21.0
 >
