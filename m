@@ -2,86 +2,118 @@ Return-Path: <SRS0=8ZcK=YO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6AD80CA9EAF
-	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 12:58:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6D4B2CA9EAF
+	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 12:59:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 30483214B2
-	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 12:58:48 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 30483214B2
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 4101820B7C
+	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 12:59:31 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4101820B7C
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40546 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40550 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iMXGp-0000yV-7k
-	for qemu-devel@archiver.kernel.org; Mon, 21 Oct 2019 08:58:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60939)
+	id 1iMXHW-0001pT-CF
+	for qemu-devel@archiver.kernel.org; Mon, 21 Oct 2019 08:59:30 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60812)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1iMXFM-00088x-Sm
- for qemu-devel@nongnu.org; Mon, 21 Oct 2019 08:57:18 -0400
+ (envelope-from <laurent@vivier.eu>) id 1iMXD2-00054y-9n
+ for qemu-devel@nongnu.org; Mon, 21 Oct 2019 08:54:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1iMXFK-0006hZ-K0
- for qemu-devel@nongnu.org; Mon, 21 Oct 2019 08:57:16 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54450)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iMXFI-0006gh-9X
- for qemu-devel@nongnu.org; Mon, 21 Oct 2019 08:57:12 -0400
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72])
- (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id EF262368FF
- for <qemu-devel@nongnu.org>; Mon, 21 Oct 2019 12:57:09 +0000 (UTC)
-Received: by mail-wr1-f72.google.com with SMTP id c6so7276613wrp.3
- for <qemu-devel@nongnu.org>; Mon, 21 Oct 2019 05:57:09 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=rQcJwWKrimHInNtfGwNWgZ1EIrZZcdziVm1tGcHXJdI=;
- b=aPeAIvkqq6GmK+1tsX59keY6KcBW4lqxp9gZcHwxh/8O5QC9zzb6KHFSLYCwcc0/bd
- 8fBQAy7468RT//JtK3EdeBjWpHKz8/rYzgsKnYwgq5RMVsNOEx81DYdUNEF+y2P4VJ6G
- kWWQ7H62jmVzytDUTu23RtMUvVtQ8N6gJgNp78SDzfGziOmNkLTyvSQKr2iIbnFMUGg4
- hznrYt0HZ0UvuySLiPfxG/kfFmmZ+SmKJ49ak2ekba8W/PA/nSAKpCXl7RhFaoGmridG
- 2LrocS6XmtO2UcD/0jOas1b9lzaXwR3a9WTCGEdVbcgZIV8v4xQeRJxULYEnAfQrYnSv
- ob/Q==
-X-Gm-Message-State: APjAAAX8nKcpJRxXYkFsenQ384o5f8Af8G+HOWylgM5groMBjoNE+G2E
- 6uWQeFIIlvbZQFDb0KQXxk6cdM7JWjKD6px0K7U4L7EgbeKh5FT90NLFVuy71uPvAtXyc7KPj42
- 6dCDs6HfqNBMoV/U=
-X-Received: by 2002:a5d:66c6:: with SMTP id k6mr12337205wrw.152.1571662628611; 
- Mon, 21 Oct 2019 05:57:08 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqzJFNVUYsZgbVLg3uv0E2wzyygv3IE0hhRAvMPq7R14iBpuoZHJawbwLs257+g0yi1cmUFCyg==
-X-Received: by 2002:a5d:66c6:: with SMTP id k6mr12337183wrw.152.1571662628291; 
- Mon, 21 Oct 2019 05:57:08 -0700 (PDT)
-Received: from [192.168.1.41] (129.red-83-57-174.dynamicip.rima-tde.net.
- [83.57.174.129])
- by smtp.gmail.com with ESMTPSA id x12sm5141632wru.93.2019.10.21.05.57.07
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Mon, 21 Oct 2019 05:57:07 -0700 (PDT)
-Subject: Re: [PATCH v3 03/16] libqos: extend feature bits to 64-bit
-To: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
-References: <20191019063810.6944-1-stefanha@redhat.com>
- <20191019063810.6944-4-stefanha@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <e2b1c922-e872-7eb4-886e-dc1d0aed693a@redhat.com>
-Date: Mon, 21 Oct 2019 14:57:06 +0200
+ (envelope-from <laurent@vivier.eu>) id 1iMXD1-0006AQ-0P
+ for qemu-devel@nongnu.org; Mon, 21 Oct 2019 08:54:52 -0400
+Received: from mout.kundenserver.de ([212.227.126.187]:42465)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1iMXD0-0006A4-NS
+ for qemu-devel@nongnu.org; Mon, 21 Oct 2019 08:54:50 -0400
+Received: from [192.168.100.1] ([78.238.229.36]) by mrelayeu.kundenserver.de
+ (mreue011 [213.165.67.103]) with ESMTPSA (Nemesis) id
+ 1McXs5-1hjcY60XKn-00cwhF; Mon, 21 Oct 2019 14:54:39 +0200
+Subject: Re: [PATCH v8 8/9] linux-user/strace: Let print_sockaddr() have a
+ 'last' argument
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
+ qemu-devel@nongnu.org
+References: <20191021114857.20538-1-f4bug@amsat.org>
+ <20191021114857.20538-9-f4bug@amsat.org>
+From: Laurent Vivier <laurent@vivier.eu>
+Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
+ mQINBFYFJhkBEAC2me7w2+RizYOKZM+vZCx69GTewOwqzHrrHSG07MUAxJ6AY29/+HYf6EY2
+ WoeuLWDmXE7A3oJoIsRecD6BXHTb0OYS20lS608anr3B0xn5g0BX7es9Mw+hV/pL+63EOCVm
+ SUVTEQwbGQN62guOKnJJJfphbbv82glIC/Ei4Ky8BwZkUuXd7d5NFJKC9/GDrbWdj75cDNQx
+ UZ9XXbXEKY9MHX83Uy7JFoiFDMOVHn55HnncflUncO0zDzY7CxFeQFwYRbsCXOUL9yBtqLer
+ Ky8/yjBskIlNrp0uQSt9LMoMsdSjYLYhvk1StsNPg74+s4u0Q6z45+l8RAsgLw5OLtTa+ePM
+ JyS7OIGNYxAX6eZk1+91a6tnqfyPcMbduxyBaYXn94HUG162BeuyBkbNoIDkB7pCByed1A7q
+ q9/FbuTDwgVGVLYthYSfTtN0Y60OgNkWCMtFwKxRaXt1WFA5ceqinN/XkgA+vf2Ch72zBkJL
+ RBIhfOPFv5f2Hkkj0MvsUXpOWaOjatiu0fpPo6Hw14UEpywke1zN4NKubApQOlNKZZC4hu6/
+ 8pv2t4HRi7s0K88jQYBRPObjrN5+owtI51xMaYzvPitHQ2053LmgsOdN9EKOqZeHAYG2SmRW
+ LOxYWKX14YkZI5j/TXfKlTpwSMvXho+efN4kgFvFmP6WT+tPnwARAQABtCJMYXVyZW50IFZp
+ dmllciA8bGF1cmVudEB2aXZpZXIuZXU+iQI4BBMBAgAiBQJWBTDeAhsDBgsJCAcDAgYVCAIJ
+ CgsEFgIDAQIeAQIXgAAKCRDzDDi9Py++PCEdD/oD8LD5UWxhQrMQCsUgLlXCSM7sxGLkwmmF
+ ozqSSljEGRhffxZvO35wMFcdX9Z0QOabVoFTKrT04YmvbjsErh/dP5zeM/4EhUByeOS7s6Yl
+ HubMXVQTkak9Wa9Eq6irYC6L41QNzz/oTwNEqL1weV1+XC3TNnht9B76lIaELyrJvRfgsp9M
+ rE+PzGPo5h7QHWdL/Cmu8yOtPLa8Y6l/ywEJ040IoiAUfzRoaJs2csMXf0eU6gVBhCJ4bs91
+ jtWTXhkzdl4tdV+NOwj3j0ukPy+RjqeL2Ej+bomnPTOW8nAZ32dapmu7Fj7VApuQO/BSIHyO
+ NkowMMjB46yohEepJaJZkcgseaus0x960c4ua/SUm/Nm6vioRsxyUmWd2nG0m089pp8LPopq
+ WfAk1l4GciiMepp1Cxn7cnn1kmG6fhzedXZ/8FzsKjvx/aVeZwoEmucA42uGJ3Vk9TiVdZes
+ lqMITkHqDIpHjC79xzlWkXOsDbA2UY/P18AtgJEZQPXbcrRBtdSifCuXdDfHvI+3exIdTpvj
+ BfbgZAar8x+lcsQBugvktlQWPfAXZu4Shobi3/mDYMEDOE92dnNRD2ChNXg2IuvAL4OW40wh
+ gXlkHC1ZgToNGoYVvGcZFug1NI+vCeCFchX+L3bXyLMg3rAfWMFPAZLzn42plIDMsBs+x2yP
+ +bkCDQRWBSYZARAAvFJBFuX9A6eayxUPFaEczlMbGXugs0mazbOYGlyaWsiyfyc3PStHLFPj
+ rSTaeJpPCjBJErwpZUN4BbpkBpaJiMuVO6egrC8Xy8/cnJakHPR2JPEvmj7Gm/L9DphTcE15
+ 92rxXLesWzGBbuYxKsj8LEnrrvLyi3kNW6B5LY3Id+ZmU8YTQ2zLuGV5tLiWKKxc6s3eMXNq
+ wrJTCzdVd6ThXrmUfAHbcFXOycUyf9vD+s+WKpcZzCXwKgm7x1LKsJx3UhuzT8ier1L363RW
+ ZaJBZ9CTPiu8R5NCSn9V+BnrP3wlFbtLqXp6imGhazT9nJF86b5BVKpF8Vl3F0/Y+UZ4gUwL
+ d9cmDKBcmQU/JaRUSWvvolNu1IewZZu3rFSVgcpdaj7F/1aC0t5vLdx9KQRyEAKvEOtCmP4m
+ 38kU/6r33t3JuTJnkigda4+Sfu5kYGsogeYG6dNyjX5wpK5GJIJikEhdkwcLM+BUOOTi+I9u
+ tX03BGSZo7FW/J7S9y0l5a8nooDs2gBRGmUgYKqQJHCDQyYut+hmcr+BGpUn9/pp2FTWijrP
+ inb/Pc96YDQLQA1q2AeAFv3Rx3XoBTGl0RCY4KZ02c0kX/dm3eKfMX40XMegzlXCrqtzUk+N
+ 8LeipEsnOoAQcEONAWWo1HcgUIgCjhJhBEF0AcELOQzitbJGG5UAEQEAAYkCHwQYAQIACQUC
+ VgUmGQIbDAAKCRDzDDi9Py++PCD3D/9VCtydWDdOyMTJvEMRQGbx0GacqpydMEWbE3kUW0ha
+ US5jz5gyJZHKR3wuf1En/3z+CEAEfP1M3xNGjZvpaKZXrgWaVWfXtGLoWAVTfE231NMQKGoB
+ w2Dzx5ivIqxikXB6AanBSVpRpoaHWb06tPNxDL6SVV9lZpUn03DSR6gZEZvyPheNWkvz7bE6
+ FcqszV/PNvwm0C5Ju7NlJA8PBAQjkIorGnvN/vonbVh5GsRbhYPOc/JVwNNr63P76rZL8Gk/
+ hb3xtcIEi5CCzab45+URG/lzc6OV2nTj9Lg0SNcRhFZ2ILE3txrmI+aXmAu26+EkxLLfqCVT
+ ohb2SffQha5KgGlOSBXustQSGH0yzzZVZb+HZPEvx6d/HjQ+t9sO1bCpEgPdZjyMuuMp9N1H
+ ctbwGdQM2Qb5zgXO+8ZSzwC+6rHHIdtcB8PH2j+Nd88dVGYlWFKZ36ELeZxD7iJflsE8E8yg
+ OpKgu3nD0ahBDqANU/ZmNNarBJEwvM2vfusmNnWm3QMIwxNuJghRyuFfx694Im1js0ZY3LEU
+ JGSHFG4ZynA+ZFUPA6Xf0wHeJOxGKCGIyeKORsteIqgnkINW9fnKJw2pgk8qHkwVc3Vu+wGS
+ ZiJK0xFusPQehjWTHn9WjMG1zvQ5TQQHxau/2FkP45+nRPco6vVFQe8JmgtRF8WFJA==
+Message-ID: <4419e079-a578-b7f4-ea6e-d4b763329287@vivier.eu>
+Date: Mon, 21 Oct 2019 14:54:36 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.1
+ Thunderbird/68.1.0
 MIME-Version: 1.0
-In-Reply-To: <20191019063810.6944-4-stefanha@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20191021114857.20538-9-f4bug@amsat.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: fr
+Content-Transfer-Encoding: 8bit
+X-Provags-ID: V03:K1:eCqyHUeNqnyNldiXKyA7IRY6IW9pyWqOddytJ/jOaE4Xf2Ru38m
+ 1cIP7a2qpv5DS+8k13VknZC8swW3ieju0Ty/PzQ6uMgGSlz2by6/7B6z6UOLmS2d+wr2pGy
+ TpZeKZICNtbXN8x2guq1wVRBLO+eaId+mO/kIkJ4j/uN8Gs+I9jLZW/SlUyDg5J43/Hlu7E
+ Qaw43kJpDjq7ShdK9PkEQ==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:NeKn8V5rE8M=:TEuhXxMVXHPaDMX71Di2BW
+ I6hsvCmh4zsvVu3cdpfdUJeQFkNDbZYP7R7Ude8marjbQOtb2RJjok5zekBUGQ7oHDFNYE0T0
+ CYISUHNv9BztBxMJ7jZ+1/1HhThsY+0ZLSaXtiPF/EnnAdjt7+MKSZgxs94KA8G/7gnlUPL1R
+ 8XsY7iQ0EmsbqnAlNPdJ6O98ANHgBy4PcR+XiTMsmE153tv58hA2NM7iH+NFhb/WkZLERDpm7
+ 2+GV8DWmuInCqZfSJx3XdX5DIKRzpmGwwekzmexJIqWoiK1AxlEV4StkFwE/u82aaWysMH6lS
+ stooLKisk0hFI3nkTLzZbYTd0FMhWq07Fj8NmmkP3sPfAUvATrf7QM2H06R+AAheN8LaFSJCJ
+ Bt94ywEdhf7JE7/9RJMCuHVeCpaK27W03Dq384x+L7fLw5YyGrTIjr8WxVd4Wp4Hpw3ckZtJt
+ V378r13gzW9/oPODh1wKylmlOKFPak/ou5O5LbXTKxFPvBcGrRncft3fLM73DdtaoHQQa5kf0
+ Gm6D5V8JYNAul/sesKCBOwyJkgZURq9yhP7EFgit5xo/qhGeaR/K/GPp+7j6htaoT7Zyz0B6p
+ eIgHIsZPQh7yEyNEYmdT7mS9p2ZkBbO5Ig0xbhxeVZnFFoeQdsQlWXuuxqAKD/88BPRw4L9rK
+ 54j4782mEDIcQ4uwP7KVJl741hbzPTKhDTWWtZ+SdklC+tVq97+0ojzvngadcgtK9t5v8uei8
+ ZCTdKRP80Z1dLT3RNPWvp4ZVRKwYWBRvfhwbjj6gDNVaxMKBY5CclXVDWIF+cShuKsEecJWQc
+ pAolGvbq82p6wu0AhUUOd5m5+hpMTu8WDI7lQW6e5IzzDBuY+zMbjvU8fC0C28N9T9Ln5OGyN
+ QfQdr/Mpq6G/kVnywX6qbQgh5En0Yv2hqAKnwHWUg=
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 209.132.183.28
+X-Received-From: 212.227.126.187
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -93,301 +125,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Laurent Vivier <lvivier@redhat.com>,
- Thomas Huth <thuth@redhat.com>, qemu-block@nongnu.org, slp@redhat.com,
- "Michael S. Tsirkin" <mst@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: Riku Voipio <riku.voipio@iki.fi>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 10/19/19 8:37 AM, Stefan Hajnoczi wrote:
-> In VIRTIO 1.0 feature bits changed from 32-bit to 64-bit.  (In fact, th=
-e
-> transports allow even more feature bits but nothing uses more than 64
-> bits today.)
->=20
-> Add 64-bit feature bit support to virtio-mmio and virtio-pci.  This wil=
-l
-> be necessary for VIRTIO 1.0 support.
->=20
-> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+Le 21/10/2019 à 13:48, Philippe Mathieu-Daudé a écrit :
+> If the format is not the syscall last argument, a comma is append.
+> 
+> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+> Reviewed-by: Laurent Vivier <laurent@vivier.eu>
 > ---
->   tests/libqos/virtio.h      | 12 ++++++------
->   tests/libqos/virtio-mmio.c | 28 ++++++++++++++++++++++------
->   tests/libqos/virtio-net.c  |  6 +++---
->   tests/libqos/virtio-pci.c  | 12 ++++++------
->   tests/libqos/virtio.c      |  4 ++--
->   tests/virtio-blk-test.c    |  8 ++++----
->   6 files changed, 43 insertions(+), 27 deletions(-)
->=20
-> diff --git a/tests/libqos/virtio.h b/tests/libqos/virtio.h
-> index 2cb2448f46..a5c99fb3c9 100644
-> --- a/tests/libqos/virtio.h
-> +++ b/tests/libqos/virtio.h
-> @@ -13,7 +13,7 @@
->   #include "libqos/malloc.h"
->   #include "standard-headers/linux/virtio_ring.h"
->  =20
-> -#define QVIRTIO_F_BAD_FEATURE           0x40000000
-> +#define QVIRTIO_F_BAD_FEATURE           0x40000000ull
->  =20
->   typedef struct QVirtioBus QVirtioBus;
->  =20
-> @@ -52,13 +52,13 @@ struct QVirtioBus {
->       uint64_t (*config_readq)(QVirtioDevice *d, uint64_t addr);
->  =20
->       /* Get features of the device */
-> -    uint32_t (*get_features)(QVirtioDevice *d);
-> +    uint64_t (*get_features)(QVirtioDevice *d);
->  =20
->       /* Set features of the device */
-> -    void (*set_features)(QVirtioDevice *d, uint32_t features);
-> +    void (*set_features)(QVirtioDevice *d, uint64_t features);
->  =20
->       /* Get features of the guest */
-> -    uint32_t (*get_guest_features)(QVirtioDevice *d);
-> +    uint64_t (*get_guest_features)(QVirtioDevice *d);
->  =20
->       /* Get status of the device */
->       uint8_t (*get_status)(QVirtioDevice *d);
-> @@ -103,8 +103,8 @@ uint8_t qvirtio_config_readb(QVirtioDevice *d, uint=
-64_t addr);
->   uint16_t qvirtio_config_readw(QVirtioDevice *d, uint64_t addr);
->   uint32_t qvirtio_config_readl(QVirtioDevice *d, uint64_t addr);
->   uint64_t qvirtio_config_readq(QVirtioDevice *d, uint64_t addr);
-> -uint32_t qvirtio_get_features(QVirtioDevice *d);
-> -void qvirtio_set_features(QVirtioDevice *d, uint32_t features);
-> +uint64_t qvirtio_get_features(QVirtioDevice *d);
-> +void qvirtio_set_features(QVirtioDevice *d, uint64_t features);
->   bool qvirtio_is_big_endian(QVirtioDevice *d);
->  =20
->   void qvirtio_reset(QVirtioDevice *d);
-> diff --git a/tests/libqos/virtio-mmio.c b/tests/libqos/virtio-mmio.c
-> index 7154b03c1d..78066e6e05 100644
-> --- a/tests/libqos/virtio-mmio.c
-> +++ b/tests/libqos/virtio-mmio.c
-> @@ -40,22 +40,38 @@ static uint64_t qvirtio_mmio_config_readq(QVirtioDe=
-vice *d, uint64_t off)
->       return qtest_readq(dev->qts, dev->addr + QVIRTIO_MMIO_DEVICE_SPEC=
-IFIC + off);
->   }
->  =20
-> -static uint32_t qvirtio_mmio_get_features(QVirtioDevice *d)
-> +static uint64_t qvirtio_mmio_get_features(QVirtioDevice *d)
->   {
->       QVirtioMMIODevice *dev =3D container_of(d, QVirtioMMIODevice, vde=
-v);
-> +    uint64_t lo;
-> +    uint64_t hi =3D 0;
-> +
->       qtest_writel(dev->qts, dev->addr + QVIRTIO_MMIO_HOST_FEATURES_SEL=
-, 0);
-> -    return qtest_readl(dev->qts, dev->addr + QVIRTIO_MMIO_HOST_FEATURE=
-S);
-> +    lo =3D qtest_readl(dev->qts, dev->addr + QVIRTIO_MMIO_HOST_FEATURE=
-S);
-> +
-> +    if (dev->version >=3D 2) {
-> +        qtest_writel(dev->qts, dev->addr + QVIRTIO_MMIO_HOST_FEATURES_=
-SEL, 1);
-> +        hi =3D qtest_readl(dev->qts, dev->addr + QVIRTIO_MMIO_HOST_FEA=
-TURES);
-> +    }
-> +
-> +    return (hi << 32) | lo;
->   }
->  =20
-> -static void qvirtio_mmio_set_features(QVirtioDevice *d, uint32_t featu=
-res)
-> +static void qvirtio_mmio_set_features(QVirtioDevice *d, uint64_t featu=
-res)
->   {
->       QVirtioMMIODevice *dev =3D container_of(d, QVirtioMMIODevice, vde=
-v);
->       dev->features =3D features;
->       qtest_writel(dev->qts, dev->addr + QVIRTIO_MMIO_GUEST_FEATURES_SE=
-L, 0);
->       qtest_writel(dev->qts, dev->addr + QVIRTIO_MMIO_GUEST_FEATURES, f=
-eatures);
-> +
-> +    if (dev->version >=3D 2) {
-> +        qtest_writel(dev->qts, dev->addr + QVIRTIO_MMIO_GUEST_FEATURES=
-_SEL, 1);
-> +        qtest_writel(dev->qts, dev->addr + QVIRTIO_MMIO_GUEST_FEATURES=
-,
-> +                     features >> 32);
-> +    }
->   }
->  =20
-> -static uint32_t qvirtio_mmio_get_guest_features(QVirtioDevice *d)
-> +static uint64_t qvirtio_mmio_get_guest_features(QVirtioDevice *d)
->   {
->       QVirtioMMIODevice *dev =3D container_of(d, QVirtioMMIODevice, vde=
-v);
->       return dev->features;
-> @@ -149,8 +165,8 @@ static QVirtQueue *qvirtio_mmio_virtqueue_setup(QVi=
-rtioDevice *d,
->       vq->free_head =3D 0;
->       vq->num_free =3D vq->size;
->       vq->align =3D dev->page_size;
-> -    vq->indirect =3D (dev->features & (1u << VIRTIO_RING_F_INDIRECT_DE=
-SC)) !=3D 0;
-> -    vq->event =3D (dev->features & (1u << VIRTIO_RING_F_EVENT_IDX)) !=3D=
- 0;
-> +    vq->indirect =3D dev->features & (1ull << VIRTIO_RING_F_INDIRECT_D=
-ESC);
-> +    vq->event =3D dev->features & (1ull << VIRTIO_RING_F_EVENT_IDX);
->  =20
->       qtest_writel(dev->qts, dev->addr + QVIRTIO_MMIO_QUEUE_NUM, vq->si=
-ze);
->  =20
-> diff --git a/tests/libqos/virtio-net.c b/tests/libqos/virtio-net.c
-> index 6567beb553..710d440c3d 100644
-> --- a/tests/libqos/virtio-net.c
-> +++ b/tests/libqos/virtio-net.c
-> @@ -44,11 +44,11 @@ static void virtio_net_setup(QVirtioNet *interface)
->  =20
->       features =3D qvirtio_get_features(vdev);
->       features &=3D ~(QVIRTIO_F_BAD_FEATURE |
-> -                  (1u << VIRTIO_RING_F_INDIRECT_DESC) |
-> -                  (1u << VIRTIO_RING_F_EVENT_IDX));
-> +                  (1ull << VIRTIO_RING_F_INDIRECT_DESC) |
-> +                  (1ull << VIRTIO_RING_F_EVENT_IDX));
->       qvirtio_set_features(vdev, features);
->  =20
-> -    if (features & (1u << VIRTIO_NET_F_MQ)) {
-> +    if (features & (1ull << VIRTIO_NET_F_MQ)) {
->           interface->n_queues =3D qvirtio_config_readw(vdev, 8) * 2;
->       } else {
->           interface->n_queues =3D 2;
-> diff --git a/tests/libqos/virtio-pci.c b/tests/libqos/virtio-pci.c
-> index 50499e75ef..1b6b760fc6 100644
-> --- a/tests/libqos/virtio-pci.c
-> +++ b/tests/libqos/virtio-pci.c
-> @@ -96,19 +96,19 @@ static uint64_t qvirtio_pci_config_readq(QVirtioDev=
-ice *d, uint64_t off)
->       return val;
->   }
->  =20
-> -static uint32_t qvirtio_pci_get_features(QVirtioDevice *d)
-> +static uint64_t qvirtio_pci_get_features(QVirtioDevice *d)
->   {
->       QVirtioPCIDevice *dev =3D container_of(d, QVirtioPCIDevice, vdev)=
-;
->       return qpci_io_readl(dev->pdev, dev->bar, VIRTIO_PCI_HOST_FEATURE=
-S);
->   }
->  =20
-> -static void qvirtio_pci_set_features(QVirtioDevice *d, uint32_t featur=
-es)
-> +static void qvirtio_pci_set_features(QVirtioDevice *d, uint64_t featur=
-es)
->   {
->       QVirtioPCIDevice *dev =3D container_of(d, QVirtioPCIDevice, vdev)=
-;
->       qpci_io_writel(dev->pdev, dev->bar, VIRTIO_PCI_GUEST_FEATURES, fe=
-atures);
->   }
->  =20
-> -static uint32_t qvirtio_pci_get_guest_features(QVirtioDevice *d)
-> +static uint64_t qvirtio_pci_get_guest_features(QVirtioDevice *d)
->   {
->       QVirtioPCIDevice *dev =3D container_of(d, QVirtioPCIDevice, vdev)=
-;
->       return qpci_io_readl(dev->pdev, dev->bar, VIRTIO_PCI_GUEST_FEATUR=
-ES);
-> @@ -208,7 +208,7 @@ static void qvirtio_pci_set_queue_address(QVirtioDe=
-vice *d, uint32_t pfn)
->   static QVirtQueue *qvirtio_pci_virtqueue_setup(QVirtioDevice *d,
->                                           QGuestAllocator *alloc, uint1=
-6_t index)
->   {
-> -    uint32_t feat;
-> +    uint64_t feat;
->       uint64_t addr;
->       QVirtQueuePCI *vqpci;
->       QVirtioPCIDevice *qvpcidev =3D container_of(d, QVirtioPCIDevice, =
-vdev);
-> @@ -222,8 +222,8 @@ static QVirtQueue *qvirtio_pci_virtqueue_setup(QVir=
-tioDevice *d,
->       vqpci->vq.free_head =3D 0;
->       vqpci->vq.num_free =3D vqpci->vq.size;
->       vqpci->vq.align =3D VIRTIO_PCI_VRING_ALIGN;
-> -    vqpci->vq.indirect =3D (feat & (1u << VIRTIO_RING_F_INDIRECT_DESC)=
-) !=3D 0;
-> -    vqpci->vq.event =3D (feat & (1u << VIRTIO_RING_F_EVENT_IDX)) !=3D =
-0;
-> +    vqpci->vq.indirect =3D feat & (1ull << VIRTIO_RING_F_INDIRECT_DESC=
-);
-> +    vqpci->vq.event =3D feat & (1ull << VIRTIO_RING_F_EVENT_IDX);
->  =20
->       vqpci->msix_entry =3D -1;
->       vqpci->msix_addr =3D 0;
-> diff --git a/tests/libqos/virtio.c b/tests/libqos/virtio.c
-> index 0ae9956fc8..4f7e6bb8a1 100644
-> --- a/tests/libqos/virtio.c
-> +++ b/tests/libqos/virtio.c
-> @@ -33,12 +33,12 @@ uint64_t qvirtio_config_readq(QVirtioDevice *d, uin=
-t64_t addr)
->       return d->bus->config_readq(d, addr);
->   }
->  =20
-> -uint32_t qvirtio_get_features(QVirtioDevice *d)
-> +uint64_t qvirtio_get_features(QVirtioDevice *d)
->   {
->       return d->bus->get_features(d);
->   }
->  =20
-> -void qvirtio_set_features(QVirtioDevice *d, uint32_t features)
-> +void qvirtio_set_features(QVirtioDevice *d, uint64_t features)
->   {
->       d->features =3D features;
->       d->bus->set_features(d, features);
-> diff --git a/tests/virtio-blk-test.c b/tests/virtio-blk-test.c
-> index f6674fb233..31680cc159 100644
-> --- a/tests/virtio-blk-test.c
-> +++ b/tests/virtio-blk-test.c
-> @@ -119,7 +119,7 @@ static void test_basic(QVirtioDevice *dev, QGuestAl=
-locator *alloc,
->       QVirtioBlkReq req;
->       uint64_t req_addr;
->       uint64_t capacity;
-> -    uint32_t features;
-> +    uint64_t features;
->       uint32_t free_head;
->       uint8_t status;
->       char *data;
-> @@ -352,7 +352,7 @@ static void indirect(void *obj, void *u_data, QGues=
-tAllocator *t_alloc)
->       QVRingIndirectDesc *indirect;
->       uint64_t req_addr;
->       uint64_t capacity;
-> -    uint32_t features;
-> +    uint64_t features;
->       uint32_t free_head;
->       uint8_t status;
->       char *data;
-> @@ -467,7 +467,7 @@ static void msix(void *obj, void *u_data, QGuestAll=
-ocator *t_alloc)
->       int n_size =3D TEST_IMAGE_SIZE / 2;
->       uint64_t req_addr;
->       uint64_t capacity;
-> -    uint32_t features;
-> +    uint64_t features;
->       uint32_t free_head;
->       uint8_t status;
->       char *data;
-> @@ -574,7 +574,7 @@ static void idx(void *obj, void *u_data, QGuestAllo=
-cator *t_alloc)
->       QVirtioBlkReq req;
->       uint64_t req_addr;
->       uint64_t capacity;
-> -    uint32_t features;
-> +    uint64_t features;
->       uint32_t free_head;
->       uint32_t write_head;
->       uint32_t desc_idx;
->=20
+> v8: do not name prototype arguments
+> 
+> checkpatch error:
+>  ERROR: storage class should be at the beginning of the declaration
+>  #10: FILE: linux-user/strace.c:70:
+>  +UNUSED static void print_sockaddr(abi_ulong, abi_long, int);
+> ---
+>  linux-user/strace.c | 10 +++++-----
+>  1 file changed, 5 insertions(+), 5 deletions(-)
+> 
+> diff --git a/linux-user/strace.c b/linux-user/strace.c
+> index cd92c77d33..3d4d684450 100644
+> --- a/linux-user/strace.c
+> +++ b/linux-user/strace.c
+> @@ -67,7 +67,7 @@ UNUSED static void print_timeval(abi_ulong, int);
+>  UNUSED static void print_timezone(abi_ulong, int);
+>  UNUSED static void print_number(abi_long, int);
+>  UNUSED static void print_signal(abi_ulong, int);
+> -UNUSED static void print_sockaddr(abi_ulong addr, abi_long addrlen);
+> +UNUSED static void print_sockaddr(abi_ulong, abi_long, int);
+>  UNUSED static void print_socket_domain(int domain);
+>  UNUSED static void print_socket_type(int type);
+>  UNUSED static void print_socket_protocol(int domain, int type, int protocol);
+> @@ -336,7 +336,7 @@ static void print_siginfo(const target_siginfo_t *tinfo)
+>  }
+>  
+>  static void
+> -print_sockaddr(abi_ulong addr, abi_long addrlen)
+> +print_sockaddr(abi_ulong addr, abi_long addrlen, int last)
+>  {
+>      struct target_sockaddr *sa;
+>      int i;
+> @@ -418,7 +418,7 @@ print_sockaddr(abi_ulong addr, abi_long addrlen)
+>      } else {
+>          print_raw_param("0x"TARGET_ABI_FMT_lx, addr, 0);
+>      }
+> -    gemu_log(", "TARGET_ABI_FMT_ld, addrlen);
+> +    gemu_log(", "TARGET_ABI_FMT_ld"%s", addrlen, get_comma(last));
+>  }
+>  
+>  static void
+> @@ -1751,7 +1751,7 @@ static void do_print_sockaddr(const char *name, abi_long arg1)
+>  
+>      gemu_log("%s(", name);
+>      print_sockfd(sockfd, 0);
+> -    print_sockaddr(addr, addrlen);
+> +    print_sockaddr(addr, addrlen, 0);
+>      gemu_log(")");
+>  }
+>  
+> @@ -1821,7 +1821,7 @@ static void do_print_msgaddr(const char *name, abi_long arg1)
+>      print_buf(msg, len, 0);
+>      print_raw_param(TARGET_ABI_FMT_ld, len, 0);
+>      print_flags(msg_flags, flags, 0);
+> -    print_sockaddr(addr, addrlen);
+> +    print_sockaddr(addr, addrlen, 0);
+>      gemu_log(")");
+>  }
+>  
+> 
 
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Reviewed-by: Laurent Vivier <laurent@vivier.eu>
+
 
