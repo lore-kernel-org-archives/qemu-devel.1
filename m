@@ -2,84 +2,85 @@ Return-Path: <SRS0=8ZcK=YO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E3C1ACA9EAF
-	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 14:11:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 48A7BCA9EAF
+	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 14:12:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AF0112070B
-	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 14:11:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1677A2070B
+	for <qemu-devel@archiver.kernel.org>; Mon, 21 Oct 2019 14:12:07 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QCqTPMUQ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AF0112070B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="SggkvzFB"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1677A2070B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42926 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42928 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iMYPX-0008Th-E6
-	for qemu-devel@archiver.kernel.org; Mon, 21 Oct 2019 10:11:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45313)
+	id 1iMYPm-0000MW-0T
+	for qemu-devel@archiver.kernel.org; Mon, 21 Oct 2019 10:12:06 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45461)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jfreimann@redhat.com>) id 1iMYNQ-0006FW-0c
- for qemu-devel@nongnu.org; Mon, 21 Oct 2019 10:09:42 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1iMYOU-0007Zr-5d
+ for qemu-devel@nongnu.org; Mon, 21 Oct 2019 10:10:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jfreimann@redhat.com>) id 1iMYNN-0003dj-PG
- for qemu-devel@nongnu.org; Mon, 21 Oct 2019 10:09:39 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:54165
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jfreimann@redhat.com>)
- id 1iMYNN-0003dX-LU
- for qemu-devel@nongnu.org; Mon, 21 Oct 2019 10:09:37 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1571666977;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=nEE8xrlk1LOkLllgW0pYJmvd8i9ffzrkime+vGkNz2k=;
- b=QCqTPMUQ0x4AM9y/gwzjPupnU1kbds00TOQziVzQwLOU+UbGT0qBW+KZd7jy/wO0huaGkl
- m7NPZNMxT6Gt8eYGs9kLLGqR3ZlWCuDOQOMN3P/3W7QdDj4B4CRHkfOCFK3ER9THWvTW6N
- 3iHmb3YCU0bFJDQcMFE/ZXLBz+eBT00=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-261-7BA9M7d2MMeQrj-arNCAAg-1; Mon, 21 Oct 2019 10:09:35 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BCDA747B;
- Mon, 21 Oct 2019 14:09:34 +0000 (UTC)
-Received: from localhost (dhcp-192-217.str.redhat.com [10.33.192.217])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 3452398A9;
- Mon, 21 Oct 2019 14:09:34 +0000 (UTC)
-Date: Mon, 21 Oct 2019 16:09:32 +0200
-From: Jens Freimann <jfreimann@redhat.com>
-To: Cornelia Huck <cohuck@redhat.com>
-Subject: Re: [PATCH 11/11] vfio: unplug failover primary device before
- migration
-Message-ID: <20191021140932.hufkcin75lhbfakf@jenstp.localdomain>
-References: <20191018202040.30349-1-jfreimann@redhat.com>
- <20191018202040.30349-12-jfreimann@redhat.com>
- <20191021154504.0fbebf39.cohuck@redhat.com>
+ (envelope-from <peter.maydell@linaro.org>) id 1iMYOS-0003zp-Og
+ for qemu-devel@nongnu.org; Mon, 21 Oct 2019 10:10:45 -0400
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:46071)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1iMYOS-0003zF-ER
+ for qemu-devel@nongnu.org; Mon, 21 Oct 2019 10:10:44 -0400
+Received: by mail-wr1-x442.google.com with SMTP id q13so9201743wrs.12
+ for <qemu-devel@nongnu.org>; Mon, 21 Oct 2019 07:10:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=z7+hfJklYjk2jKatwzbiHbly9fCbMxtArXfoBZjya8Q=;
+ b=SggkvzFBjELMzsGUEwMaLO8jftWtQqDcdPoOAPDAjAUEuTeAZXQv/Nw5ZtF5etmo2d
+ +YQp9zI0/VbXPI2foSNqxlarsaYlGrO1rhsKkwLkTqpxpTxprvYnRqG6C9PKp71WO0C0
+ BqRNLEoswji3x9RrVuyF2YYyk/7vd4txfqd7O1F4vD2redxgL/LFv+T2ZnTzHGtUZG6X
+ /WP/D/mDhDmuT1citwAp2t8gpzHVCEsjDenT0REGq6O71E9/8/PfwhxS7qQx2WaqUn9p
+ JfZyulEER4hdqn+l7rWI6cHL5cyTThW6RIuzNifZCJS8SC89Xx67KskuQ8JLJ2fKXIL3
+ dHbA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=z7+hfJklYjk2jKatwzbiHbly9fCbMxtArXfoBZjya8Q=;
+ b=GqFPEtg25/IdIdl1j9E76qKUlqrYBkt2noqmtT6I8rdoee2pc7aiVH4xUZLemuRgs0
+ FQRyp6D86CwfCZ+94ijEY5cx2rQPKZFUe5AmE3G21iThGd3DAk8a50QIzx5RvZhVT1KW
+ wbLxdjt3lhjDOZeFAR+QeMIX41m9BQtEba8KNWV5dcO5A9Z9QLn+QS8SRuNZBVJengsi
+ hs1Kyr5XG3OMhREWaPXbM5CxRdj7p2BxX40AC0J7sAx7hqMovMelChU4RHaPEcMnda69
+ 0sb1NW8ZFk+y03akVavRS7zSGL7m3RH2/zz+dAF+NgkNCbimWlFFOhv0v58/iX1d3q6I
+ x3rA==
+X-Gm-Message-State: APjAAAXhZDL7oGgOE46EjogHDPPeR0PBJqvJtWNulyI5ck25NBgSSthp
+ KmcCBAWEDjAc3w0vStO0UIriwnCSIM4=
+X-Google-Smtp-Source: APXvYqzEzYLn2+NIdYnAM4OSAxrc5/wE7frCw7V/rwG9DEShUU4QKVHGIlsyvvGjbKs8/XyomgcRZw==
+X-Received: by 2002:adf:cd87:: with SMTP id q7mr10440930wrj.216.1571667042587; 
+ Mon, 21 Oct 2019 07:10:42 -0700 (PDT)
+Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
+ by smtp.gmail.com with ESMTPSA id g17sm14515155wrq.58.2019.10.21.07.10.41
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 21 Oct 2019 07:10:41 -0700 (PDT)
+From: Peter Maydell <peter.maydell@linaro.org>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v2] hw/watchdog/milkymist-sysctl.c: Switch to
+ transaction-based ptimer API
+Date: Mon, 21 Oct 2019 15:10:40 +0100
+Message-Id: <20191021141040.11007-1-peter.maydell@linaro.org>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-In-Reply-To: <20191021154504.0fbebf39.cohuck@redhat.com>
-User-Agent: NeoMutt/20180716-1376-5d6ed1
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-MC-Unique: 7BA9M7d2MMeQrj-arNCAAg-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=WINDOWS-1252; format=flowed
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.120
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::442
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,117 +92,127 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: pkrempa@redhat.com, berrange@redhat.com, ehabkost@redhat.com,
- mst@redhat.com, aadam@redhat.com, qemu-devel@nongnu.org, dgilbert@redhat.com,
- alex.williamson@redhat.com, laine@redhat.com, ailan@redhat.com,
- parav@mellanox.com
+Cc: Richard Henderson <richard.henderson@linaro.org>,
+ Michael Walle <michael@walle.cc>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, Oct 21, 2019 at 03:45:04PM +0200, Cornelia Huck wrote:
->On Fri, 18 Oct 2019 22:20:40 +0200
->Jens Freimann <jfreimann@redhat.com> wrote:
->
->> As usual block all vfio-pci devices from being migrated, but make an
->> exception for failover primary devices. This is achieved by setting
->> unmigratable to 0 but also add a migration blocker for all vfio-pci
->> devices except failover primary devices. These will be unplugged before
->> migration happens by the migration handler of the corresponding
->> virtio-net standby device.
->>
->> Signed-off-by: Jens Freimann <jfreimann@redhat.com>
->> ---
->>  hw/vfio/pci.c | 31 +++++++++++++++++++++++++------
->>  hw/vfio/pci.h |  1 +
->>  2 files changed, 26 insertions(+), 6 deletions(-)
->>
->> diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
->> index 12fac39804..a15b83c6b6 100644
->> --- a/hw/vfio/pci.c
->> +++ b/hw/vfio/pci.c
->> @@ -40,6 +40,9 @@
->>  #include "pci.h"
->>  #include "trace.h"
->>  #include "qapi/error.h"
->> +#include "migration/blocker.h"
->> +#include "qemu/option.h"
->> +#include "qemu/option_int.h"
->>
->>  #define TYPE_VFIO_PCI "vfio-pci"
->>  #define PCI_VFIO(obj)    OBJECT_CHECK(VFIOPCIDevice, obj, TYPE_VFIO_PCI=
-)
->> @@ -2712,12 +2715,26 @@ static void vfio_realize(PCIDevice *pdev, Error =
-**errp)
->>      int i, ret;
->>      bool is_mdev;
->>
->> +    if (!pdev->net_failover_pair_id) {
->> +        error_setg(&vdev->migration_blocker,
->> +                "VFIO device doesn't support migration");
->> +        ret =3D migrate_add_blocker(vdev->migration_blocker, &err);
->> +        if (err) {
->> +            error_propagate(errp, err);
->> +            goto error;
->
->This looks wrong, you haven't set up vbasedev.name yet.
+Switch the milkymist-sysctl code away from bottom-half based
+ptimers to the new transaction-based ptimer API.  This just requires
+adding begin/commit calls around the various places that modify the
+ptimer state, and using the new ptimer_init() function to create the
+timer.
 
-You're right.
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+---
+Changes v1->v2: begin/commit s->ptimer1 in the code for
+writes to R_TIMER1_CONTROL, not s->ptimer0...
 
->> +        }
->> +    } else {
->> +            pdev->qdev.allow_unplug_during_migration =3D true;
->> +    }
->> +
->>      if (!vdev->vbasedev.sysfsdev) {
->>          if (!(~vdev->host.domain || ~vdev->host.bus ||
->>                ~vdev->host.slot || ~vdev->host.function)) {
->>              error_setg(errp, "No provided host device");
->>              error_append_hint(errp, "Use -device vfio-pci,host=3DDDDD:B=
-B:DD.F "
->>                                "or -device vfio-pci,sysfsdev=3DPATH_TO_D=
-EVICE\n");
->> +            migrate_del_blocker(vdev->migration_blocker);
->> +            error_free(vdev->migration_blocker);
->>              return;
->>          }
->>          vdev->vbasedev.sysfsdev =3D
->> @@ -2729,6 +2746,8 @@ static void vfio_realize(PCIDevice *pdev, Error **=
-errp)
->>      if (stat(vdev->vbasedev.sysfsdev, &st) < 0) {
->>          error_setg_errno(errp, errno, "no such host device");
->>          error_prepend(errp, VFIO_MSG_PREFIX, vdev->vbasedev.sysfsdev);
->> +        migrate_del_blocker(vdev->migration_blocker);
->> +        error_free(vdev->migration_blocker);
->>          return;
->>      }
->
->Might be a bit easier cleanup-wise if you set up the blocker resp.
->allow unplug during migration only here. The only difference is that
->you'll get a different error message when trying to set up a
->non-failover device with invalid specs on a migratable-only setup.
+I'm not resending the whole of the v1 8-patch series as
+only a couple of patches had issues, they're all
+independent changes, and I'm planning to take the patches
+through my tree anyway.
+---
+ hw/timer/milkymist-sysctl.c | 25 ++++++++++++++++++-------
+ 1 file changed, 18 insertions(+), 7 deletions(-)
 
-Yes, so I moved it to this place now. This saves me cleanup up the
-migration blocker in the above two cases. I don't jump to error if
-adding the migration blocker failed, I just have to free the blocker
-Error and can return.
->
->>
->> @@ -3008,6 +3027,8 @@ out_teardown:
->>      vfio_bars_exit(vdev);
->>  error:
->>      error_prepend(errp, VFIO_MSG_PREFIX, vdev->vbasedev.name);
->> +    migrate_del_blocker(vdev->migration_blocker);
->> +    error_free(vdev->migration_blocker);
->
->Shouldn't you check whether migration_block has been set up, like in
->the finalize routine?
-
-yes, added the same check here.
-
-Thanks Conny!
-
-regards,
-Jens=20
+diff --git a/hw/timer/milkymist-sysctl.c b/hw/timer/milkymist-sysctl.c
+index 5193c038501..7a62e212c35 100644
+--- a/hw/timer/milkymist-sysctl.c
++++ b/hw/timer/milkymist-sysctl.c
+@@ -31,7 +31,6 @@
+ #include "hw/ptimer.h"
+ #include "hw/qdev-properties.h"
+ #include "qemu/error-report.h"
+-#include "qemu/main-loop.h"
+ #include "qemu/module.h"
+ 
+ enum {
+@@ -71,8 +70,6 @@ struct MilkymistSysctlState {
+ 
+     MemoryRegion regs_region;
+ 
+-    QEMUBH *bh0;
+-    QEMUBH *bh1;
+     ptimer_state *ptimer0;
+     ptimer_state *ptimer1;
+ 
+@@ -161,14 +158,19 @@ static void sysctl_write(void *opaque, hwaddr addr, uint64_t value,
+         s->regs[addr] = value;
+         break;
+     case R_TIMER0_COMPARE:
++        ptimer_transaction_begin(s->ptimer0);
+         ptimer_set_limit(s->ptimer0, value, 0);
+         s->regs[addr] = value;
++        ptimer_transaction_commit(s->ptimer0);
+         break;
+     case R_TIMER1_COMPARE:
++        ptimer_transaction_begin(s->ptimer1);
+         ptimer_set_limit(s->ptimer1, value, 0);
+         s->regs[addr] = value;
++        ptimer_transaction_commit(s->ptimer1);
+         break;
+     case R_TIMER0_CONTROL:
++        ptimer_transaction_begin(s->ptimer0);
+         s->regs[addr] = value;
+         if (s->regs[R_TIMER0_CONTROL] & CTRL_ENABLE) {
+             trace_milkymist_sysctl_start_timer0();
+@@ -179,8 +181,10 @@ static void sysctl_write(void *opaque, hwaddr addr, uint64_t value,
+             trace_milkymist_sysctl_stop_timer0();
+             ptimer_stop(s->ptimer0);
+         }
++        ptimer_transaction_commit(s->ptimer0);
+         break;
+     case R_TIMER1_CONTROL:
++        ptimer_transaction_begin(s->ptimer1);
+         s->regs[addr] = value;
+         if (s->regs[R_TIMER1_CONTROL] & CTRL_ENABLE) {
+             trace_milkymist_sysctl_start_timer1();
+@@ -191,6 +195,7 @@ static void sysctl_write(void *opaque, hwaddr addr, uint64_t value,
+             trace_milkymist_sysctl_stop_timer1();
+             ptimer_stop(s->ptimer1);
+         }
++        ptimer_transaction_commit(s->ptimer1);
+         break;
+     case R_ICAP:
+         sysctl_icap_write(s, value);
+@@ -263,8 +268,12 @@ static void milkymist_sysctl_reset(DeviceState *d)
+         s->regs[i] = 0;
+     }
+ 
++    ptimer_transaction_begin(s->ptimer0);
+     ptimer_stop(s->ptimer0);
++    ptimer_transaction_commit(s->ptimer0);
++    ptimer_transaction_begin(s->ptimer1);
+     ptimer_stop(s->ptimer1);
++    ptimer_transaction_commit(s->ptimer1);
+ 
+     /* defaults */
+     s->regs[R_ICAP] = ICAP_READY;
+@@ -292,13 +301,15 @@ static void milkymist_sysctl_realize(DeviceState *dev, Error **errp)
+ {
+     MilkymistSysctlState *s = MILKYMIST_SYSCTL(dev);
+ 
+-    s->bh0 = qemu_bh_new(timer0_hit, s);
+-    s->bh1 = qemu_bh_new(timer1_hit, s);
+-    s->ptimer0 = ptimer_init_with_bh(s->bh0, PTIMER_POLICY_DEFAULT);
+-    s->ptimer1 = ptimer_init_with_bh(s->bh1, PTIMER_POLICY_DEFAULT);
++    s->ptimer0 = ptimer_init(timer0_hit, s, PTIMER_POLICY_DEFAULT);
++    s->ptimer1 = ptimer_init(timer1_hit, s, PTIMER_POLICY_DEFAULT);
+ 
++    ptimer_transaction_begin(s->ptimer0);
+     ptimer_set_freq(s->ptimer0, s->freq_hz);
++    ptimer_transaction_commit(s->ptimer0);
++    ptimer_transaction_begin(s->ptimer1);
+     ptimer_set_freq(s->ptimer1, s->freq_hz);
++    ptimer_transaction_commit(s->ptimer1);
+ }
+ 
+ static const VMStateDescription vmstate_milkymist_sysctl = {
+-- 
+2.20.1
 
 
