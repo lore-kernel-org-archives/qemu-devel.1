@@ -2,101 +2,85 @@ Return-Path: <SRS0=tSBD=YP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F0ADDCA9EA0
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 09:09:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3FB4ACA9EA0
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 09:11:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A79F620663
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 09:09:44 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dh+rqrcj"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A79F620663
+	by mail.kernel.org (Postfix) with ESMTPS id 0561E20663
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 09:11:22 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0561E20663
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52014 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52036 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iMqAh-0004ua-S7
-	for qemu-devel@archiver.kernel.org; Tue, 22 Oct 2019 05:09:43 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51611)
+	id 1iMqCH-0006LM-5j
+	for qemu-devel@archiver.kernel.org; Tue, 22 Oct 2019 05:11:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51886)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1iMq9G-0003kT-O0
- for qemu-devel@nongnu.org; Tue, 22 Oct 2019 05:08:20 -0400
+ (envelope-from <tgolembi@redhat.com>) id 1iMqBX-0005vj-Tc
+ for qemu-devel@nongnu.org; Tue, 22 Oct 2019 05:10:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1iMq9D-0004zf-SW
- for qemu-devel@nongnu.org; Tue, 22 Oct 2019 05:08:13 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:28299
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <tgolembi@redhat.com>) id 1iMqBV-0005dE-UA
+ for qemu-devel@nongnu.org; Tue, 22 Oct 2019 05:10:35 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42960)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iMq9D-0004yy-FA
- for qemu-devel@nongnu.org; Tue, 22 Oct 2019 05:08:11 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1571735290;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=2Qmr0cakZzBarEdXDZsybZJcNJAGJ0COby9J9kh15SI=;
- b=dh+rqrcjCtyub/UA4nU9Lowzs2pQOPkpJ13Eez+KanL+W9SC6oR4wxwBGBUjAldYq2S9sW
- ZxRf9u7KpS9zh/DU8kedXJ2bW0eNBW1LW2vkxCnHsAJJGEE6wVxvSajC9dx/++WsgVu8f1
- /rqAuYLXOUOxOHG4eJBFyrMg1+0Sna8=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-194-k9OfEV6GOtqAcIZeE7RyYA-1; Tue, 22 Oct 2019 05:08:08 -0400
-Received: by mail-wr1-f69.google.com with SMTP id i10so723903wrp.7
- for <qemu-devel@nongnu.org>; Tue, 22 Oct 2019 02:08:08 -0700 (PDT)
+ (Exim 4.71) (envelope-from <tgolembi@redhat.com>) id 1iMqBV-0005co-Kl
+ for qemu-devel@nongnu.org; Tue, 22 Oct 2019 05:10:33 -0400
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 67F8A7BDA1
+ for <qemu-devel@nongnu.org>; Tue, 22 Oct 2019 09:10:31 +0000 (UTC)
+Received: by mail-wm1-f69.google.com with SMTP id z5so4127273wma.5
+ for <qemu-devel@nongnu.org>; Tue, 22 Oct 2019 02:10:31 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=hu1g2MQgs/v19frqdJmck9Wv0qplrG+z/eF0qIu/NfI=;
- b=SBjbOUidJzKmohhl6XJ/pWHj1Tm2Gy7R2Mw2DUFtVGQIF7OB7OlnZl4f/8W+hoSSyF
- l5gQRudnsivHGUGybQAVJD3hyTGHbA+34HPxOxt1EaB5l1A0QriPt9vRsqnkB0v7M7+v
- ZfG0Cq/xT9jsTdSPAcxpZep4KR2RFtg4DxEnZJiarOR+6Wr8K+vqF6LMfr9f5XyIoh9R
- DxFniMXQvA4BUgvTReIPAlAUY4Xsom3ZgLmm+wstGB9NYP0xzOYNHrNkGKF+/G1dMfJ6
- Wh3CbL0NVZVbcj+jzIxrE24pRkALVlM4TY64tp4pcBUY4edWmRIEyUU0OPGJ58rwL3lo
- wSvg==
-X-Gm-Message-State: APjAAAVU6gGWYDgmGdUpj57KHmIwQNQh3IAMZ6jXiyoX9p3Fi9acV4E5
- zHRuINsxgC4wmQ1FDdCtqCJfC6imUdGa2+7i7HWvs5ZueYoKvtgUT1kPU+rR5k8lTkQbDcD5QCn
- XzyTvQAq3PKyWDQA=
-X-Received: by 2002:adf:9bdc:: with SMTP id e28mr2339524wrc.309.1571735287373; 
- Tue, 22 Oct 2019 02:08:07 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqxMk40sAkxrr11XLXrxAHbxDQ7hRgfEaQxG9rtOhYr7NKMj8kYGg1ACjyi+vNilI6i+u3wMHw==
-X-Received: by 2002:adf:9bdc:: with SMTP id e28mr2339491wrc.309.1571735286927; 
- Tue, 22 Oct 2019 02:08:06 -0700 (PDT)
-Received: from [192.168.1.41] (129.red-83-57-174.dynamicip.rima-tde.net.
- [83.57.174.129])
- by smtp.gmail.com with ESMTPSA id b1sm10087640wru.83.2019.10.22.02.08.05
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 22 Oct 2019 02:08:06 -0700 (PDT)
-Subject: Re: [PATCH v3 3/4] ppc: reset the interrupt presenter from the CPU
- reset handler
-To: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>,
- David Gibson <david@gibson.dropbear.id.au>
-References: <20191022072246.9200-1-clg@kaod.org>
- <20191022072246.9200-4-clg@kaod.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <acd04341-45dc-aa67-2412-f428f9f06054@redhat.com>
-Date: Tue, 22 Oct 2019 11:08:05 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.1
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:content-transfer-encoding
+ :in-reply-to:user-agent;
+ bh=UWbqWRkDLI/5gS2WIFOiL9e11J8H2WBBIWCNwKLTnxM=;
+ b=PeqwhUgEdkZy15RKs9Duni7IwaNbKnUiit2WHI33URTQ4oJBiBFah1bfgmgpOYUWcQ
+ nn3YC3+sJnITe9zZ0esaowfghcSOJ4vw5aw28+dA0Pb850DlCES1jgvxm+3AP9eSM8Qm
+ /BWiagZq5eXkL6E6buwXtBekf0osTT5u4EDK+KcSxy4CXxNSsV05JrXhvqd9zkggKMTP
+ 7jGf6fjZ1rRHV2l9oYB6/1iwG7OQkxbBcdkvPoVkrjafQLZgOw9+BZv5Z4GE0jX/p+76
+ xDnORfS5C/oPTgWNh4YxNyO8mwqkDDX1oZbA4Rl4ki7+inJQPOWwPV/rtLsYsILbnycp
+ RQrQ==
+X-Gm-Message-State: APjAAAUHUT53Rx+qtojEoesQdsE/sQ6nGpZtPCb7HwgN57Biwk+bhEvC
+ h5wfQlitwcmOhkHA/pZ5b80VPL1bTPXwgh3HaVJKgvPWc9sov/PZT0VQuADhuRHQBAMsUYydDZs
+ eOGlZ3df9crbE2cw=
+X-Received: by 2002:adf:9044:: with SMTP id h62mr2539001wrh.91.1571735429994; 
+ Tue, 22 Oct 2019 02:10:29 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqw/4RkMwEVkHIo2gf0O2cffJDa4A91h0sqeJcnLykq8iIRZYVF8MTzcToHiXx9+qEVZl7iRrQ==
+X-Received: by 2002:adf:9044:: with SMTP id h62mr2538968wrh.91.1571735429608; 
+ Tue, 22 Oct 2019 02:10:29 -0700 (PDT)
+Received: from auriga.localdomain (nat-pool-brq-t.redhat.com. [213.175.37.10])
+ by smtp.gmail.com with ESMTPSA id
+ q25sm558621wra.3.2019.10.22.02.10.28
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 22 Oct 2019 02:10:28 -0700 (PDT)
+Date: Tue, 22 Oct 2019 11:10:28 +0200
+From: =?utf-8?B?VG9tw6HFoSBHb2xlbWJpb3Zza8O9?= <tgolembi@redhat.com>
+To: Michael Roth <mdroth@linux.vnet.ibm.com>
+Subject: Re: [PATCH v4] qga: add command guest-get-devices for reporting
+ VirtIO devices
+Message-ID: <20191022091027.lqbeg5nllpmdp3ad@auriga.localdomain>
+References: <76c63f3fd5e36dcfdd8fff5158a12c8955130103.1569445431.git.tgolembi@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20191022072246.9200-4-clg@kaod.org>
-Content-Language: en-US
-X-MC-Unique: k9OfEV6GOtqAcIZeE7RyYA-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <76c63f3fd5e36dcfdd8fff5158a12c8955130103.1569445431.git.tgolembi@redhat.com>
+User-Agent: NeoMutt/20180716
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.61
+X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -108,419 +92,358 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Greg Kurz <groug@kaod.org>
+Cc: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi C=C3=A9dric,
+Ping, Michael, would be nice if we could get this in 4.2.
 
-On 10/22/19 9:22 AM, C=C3=A9dric Le Goater wrote:
-> On the sPAPR machine and PowerNV machine, the interrupt presenters are
-> created by a machine handler at the core level and are reseted
+    Tomas
 
-Typo "reset"
-
-> independently. This is not consistent and it raises issues when it
-> comes to handle hot-plugged CPUs. In that case, the presenters are not
-> reseted. This is less of an issue in XICS, although a zero MFFR could
-
-Same typo.
-
-> be a concern, but in XIVE, the OS CAM line is not set and this breaks
-> the presenting algorithm. The current code has workarounds which need
-> a global cleanup.
+On Wed, Sep 25, 2019 at 11:03:58PM +0200, Tom=C3=A1=C5=A1 Golembiovsk=C3=BD=
+ wrote:
+> Add command for reporting devices on Windows guest. The intent is not s=
+o
+> much to report the devices but more importantly the driver (and its
+> version) that is assigned to the device. This gives caller the
+> information whether VirtIO drivers are installed and/or whether
+> inadequate driver is used on a device (e.g. QXL device with base VGA
+> driver).
 >=20
-> Extend the sPAPR IRQ backend and the PowerNV Chip class with a new
-> cpu_intc_reset() handler called by the CPU reset handler and remove
-> the XiveTCTX reset handler which is now redundant.
->=20
-> Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
+> Signed-off-by: Tom=C3=A1=C5=A1 Golembiovsk=C3=BD <tgolembi@redhat.com>
 > ---
->   include/hw/ppc/pnv.h       |  1 +
->   include/hw/ppc/spapr_irq.h |  2 ++
->   include/hw/ppc/xics.h      |  1 +
->   include/hw/ppc/xive.h      |  1 +
->   hw/intc/spapr_xive.c       |  9 +++++++++
->   hw/intc/xics.c             |  8 ++------
->   hw/intc/xics_spapr.c       |  7 +++++++
->   hw/intc/xive.c             | 12 +-----------
->   hw/ppc/pnv.c               | 18 ++++++++++++++++++
->   hw/ppc/pnv_core.c          |  8 ++++++++
->   hw/ppc/spapr_cpu_core.c    |  5 ++++-
->   hw/ppc/spapr_irq.c         | 14 ++++++++++++++
->   12 files changed, 68 insertions(+), 18 deletions(-)
+>  qga/commands-posix.c |   9 ++
+>  qga/commands-win32.c | 204 ++++++++++++++++++++++++++++++++++++++++++-
+>  qga/qapi-schema.json |  32 +++++++
+>  3 files changed, 244 insertions(+), 1 deletion(-)
 >=20
-> diff --git a/include/hw/ppc/pnv.h b/include/hw/ppc/pnv.h
-> index 1cdbe55bf86c..2a780e633f23 100644
-> --- a/include/hw/ppc/pnv.h
-> +++ b/include/hw/ppc/pnv.h
-> @@ -111,6 +111,7 @@ typedef struct PnvChipClass {
->  =20
->       uint32_t (*core_pir)(PnvChip *chip, uint32_t core_id);
->       void (*intc_create)(PnvChip *chip, PowerPCCPU *cpu, Error **errp);
-> +    void (*intc_reset)(PnvChip *chip, PowerPCCPU *cpu);
->       ISABus *(*isa_create)(PnvChip *chip, Error **errp);
->       void (*dt_populate)(PnvChip *chip, void *fdt);
->       void (*pic_print_info)(PnvChip *chip, Monitor *mon);
-> diff --git a/include/hw/ppc/spapr_irq.h b/include/hw/ppc/spapr_irq.h
-> index 5e150a667902..09232999b07e 100644
-> --- a/include/hw/ppc/spapr_irq.h
-> +++ b/include/hw/ppc/spapr_irq.h
-> @@ -52,6 +52,7 @@ typedef struct SpaprInterruptControllerClass {
->        */
->       int (*cpu_intc_create)(SpaprInterruptController *intc,
->                               PowerPCCPU *cpu, Error **errp);
-> +    void (*cpu_intc_reset)(SpaprInterruptController *intc, PowerPCCPU *c=
-pu);
->       int (*claim_irq)(SpaprInterruptController *intc, int irq, bool lsi,
->                        Error **errp);
->       void (*free_irq)(SpaprInterruptController *intc, int irq);
-> @@ -68,6 +69,7 @@ void spapr_irq_update_active_intc(SpaprMachineState *sp=
-apr);
->  =20
->   int spapr_irq_cpu_intc_create(SpaprMachineState *spapr,
->                                 PowerPCCPU *cpu, Error **errp);
-> +void spapr_irq_cpu_intc_reset(SpaprMachineState *spapr, PowerPCCPU *cpu)=
-;
->   void spapr_irq_print_info(SpaprMachineState *spapr, Monitor *mon);
->   void spapr_irq_dt(SpaprMachineState *spapr, uint32_t nr_servers,
->                     void *fdt, uint32_t phandle);
-> diff --git a/include/hw/ppc/xics.h b/include/hw/ppc/xics.h
-> index 1e6a9300eb2b..602173c12250 100644
-> --- a/include/hw/ppc/xics.h
-> +++ b/include/hw/ppc/xics.h
-> @@ -161,6 +161,7 @@ void icp_set_mfrr(ICPState *icp, uint8_t mfrr);
->   uint32_t icp_accept(ICPState *ss);
->   uint32_t icp_ipoll(ICPState *ss, uint32_t *mfrr);
->   void icp_eoi(ICPState *icp, uint32_t xirr);
-> +void icp_reset(ICPState *icp);
->  =20
->   void ics_write_xive(ICSState *ics, int nr, int server,
->                       uint8_t priority, uint8_t saved_priority);
-> diff --git a/include/hw/ppc/xive.h b/include/hw/ppc/xive.h
-> index fd3319bd3202..99381639f50c 100644
-> --- a/include/hw/ppc/xive.h
-> +++ b/include/hw/ppc/xive.h
-> @@ -415,6 +415,7 @@ uint64_t xive_tctx_tm_read(XiveTCTX *tctx, hwaddr off=
-set, unsigned size);
->  =20
->   void xive_tctx_pic_print_info(XiveTCTX *tctx, Monitor *mon);
->   Object *xive_tctx_create(Object *cpu, XiveRouter *xrtr, Error **errp);
-> +void xive_tctx_reset(XiveTCTX *tctx);
->  =20
->   static inline uint32_t xive_nvt_cam_line(uint8_t nvt_blk, uint32_t nvt_=
-idx)
->   {
-> diff --git a/hw/intc/spapr_xive.c b/hw/intc/spapr_xive.c
-> index ba32d2cc5b0f..20a8d8285f64 100644
-> --- a/hw/intc/spapr_xive.c
-> +++ b/hw/intc/spapr_xive.c
-> @@ -553,6 +553,14 @@ static int spapr_xive_cpu_intc_create(SpaprInterrupt=
-Controller *intc,
->       return 0;
->   }
->  =20
-> +static void spapr_xive_cpu_intc_reset(SpaprInterruptController *intc,
-> +                                     PowerPCCPU *cpu)
+> diff --git a/qga/commands-posix.c b/qga/commands-posix.c
+> index dfc05f5b8a..58e93feef9 100644
+> --- a/qga/commands-posix.c
+> +++ b/qga/commands-posix.c
+> @@ -2757,6 +2757,8 @@ GList *ga_command_blacklist_init(GList *blacklist=
+)
+>      blacklist =3D g_list_append(blacklist, g_strdup("guest-fstrim"));
+>  #endif
+> =20
+> +    blacklist =3D g_list_append(blacklist, g_strdup("guest-get-devices=
+"));
+> +
+>      return blacklist;
+>  }
+> =20
+> @@ -2977,3 +2979,10 @@ GuestOSInfo *qmp_guest_get_osinfo(Error **errp)
+> =20
+>      return info;
+>  }
+> +
+> +GuestDeviceInfoList *qmp_guest_get_devices(Error **errp)
 > +{
-> +    XiveTCTX *tctx =3D spapr_cpu_state(cpu)->tctx;
+> +    error_setg(errp, QERR_UNSUPPORTED);
 > +
-> +    xive_tctx_reset(tctx);
+> +    return NULL;
 > +}
-> +
->   static void spapr_xive_set_irq(SpaprInterruptController *intc, int irq,=
- int val)
->   {
->       SpaprXive *xive =3D SPAPR_XIVE(intc);
-> @@ -697,6 +705,7 @@ static void spapr_xive_class_init(ObjectClass *klass,=
- void *data)
->       sicc->activate =3D spapr_xive_activate;
->       sicc->deactivate =3D spapr_xive_deactivate;
->       sicc->cpu_intc_create =3D spapr_xive_cpu_intc_create;
-> +    sicc->cpu_intc_reset =3D spapr_xive_cpu_intc_reset;
->       sicc->claim_irq =3D spapr_xive_claim_irq;
->       sicc->free_irq =3D spapr_xive_free_irq;
->       sicc->set_irq =3D spapr_xive_set_irq;
-> diff --git a/hw/intc/xics.c b/hw/intc/xics.c
-> index b5ac408f7b74..6da05763f9db 100644
-> --- a/hw/intc/xics.c
-> +++ b/hw/intc/xics.c
-> @@ -274,10 +274,8 @@ static const VMStateDescription vmstate_icp_server =
-=3D {
->       },
->   };
->  =20
-> -static void icp_reset_handler(void *dev)
-> +void icp_reset(ICPState *icp)
->   {
-> -    ICPState *icp =3D ICP(dev);
-> -
->       icp->xirr =3D 0;
->       icp->pending_priority =3D 0xff;
->       icp->mfrr =3D 0xff;
-> @@ -288,7 +286,7 @@ static void icp_reset_handler(void *dev)
->       if (kvm_irqchip_in_kernel()) {
->           Error *local_err =3D NULL;
->  =20
-> -        icp_set_kvm_state(ICP(dev), &local_err);
-> +        icp_set_kvm_state(icp, &local_err);
->           if (local_err) {
->               error_report_err(local_err);
->           }
-> @@ -351,7 +349,6 @@ static void icp_realize(DeviceState *dev, Error **err=
-p)
->           }
->       }
->  =20
-> -    qemu_register_reset(icp_reset_handler, dev);
->       vmstate_register(NULL, icp->cs->cpu_index, &vmstate_icp_server, icp=
-);
->   }
->  =20
-> @@ -360,7 +357,6 @@ static void icp_unrealize(DeviceState *dev, Error **e=
-rrp)
->       ICPState *icp =3D ICP(dev);
->  =20
->       vmstate_unregister(NULL, &vmstate_icp_server, icp);
-> -    qemu_unregister_reset(icp_reset_handler, dev);
->   }
->  =20
->   static void icp_class_init(ObjectClass *klass, void *data)
-> diff --git a/hw/intc/xics_spapr.c b/hw/intc/xics_spapr.c
-> index 4f64b9a9fc66..7418fb9f370c 100644
-> --- a/hw/intc/xics_spapr.c
-> +++ b/hw/intc/xics_spapr.c
-> @@ -346,6 +346,12 @@ static int xics_spapr_cpu_intc_create(SpaprInterrupt=
-Controller *intc,
->       return 0;
->   }
->  =20
-> +static void xics_spapr_cpu_intc_reset(SpaprInterruptController *intc,
-> +                                     PowerPCCPU *cpu)
-> +{
-> +    icp_reset(spapr_cpu_state(cpu)->icp);
-> +}
-> +
->   static int xics_spapr_claim_irq(SpaprInterruptController *intc, int irq=
+> diff --git a/qga/commands-win32.c b/qga/commands-win32.c
+> index 6b67f16faf..ec07a5b3ef 100644
+> --- a/qga/commands-win32.c
+> +++ b/qga/commands-win32.c
+> @@ -21,10 +21,11 @@
+>  #ifdef CONFIG_QGA_NTDDSCSI
+>  #include <winioctl.h>
+>  #include <ntddscsi.h>
+> +#endif
+>  #include <setupapi.h>
+>  #include <cfgmgr32.h>
+>  #include <initguid.h>
+> -#endif
+> +#include <devpropdef.h>
+>  #include <lm.h>
+>  #include <wtsapi32.h>
+>  #include <wininet.h>
+> @@ -38,6 +39,36 @@
+>  #include "qemu/host-utils.h"
+>  #include "qemu/base64.h"
+> =20
+> +/*
+> + * The following should be in devpkey.h, but it isn't. The key names w=
+ere
+> + * prefixed to avoid (future) name clashes. Once the definitions get i=
+nto
+> + * mingw the following lines can be removed.
+> + */
+> +DEFINE_DEVPROPKEY(qga_DEVPKEY_NAME, 0xb725f130, 0x47ef, 0x101a, 0xa5,
+> +    0xf1, 0x02, 0x60, 0x8c, 0x9e, 0xeb, 0xac, 10);
+> +    /* DEVPROP_TYPE_STRING */
+> +DEFINE_DEVPROPKEY(qga_DEVPKEY_Device_HardwareIds, 0xa45c254e, 0xdf1c,
+> +    0x4efd, 0x80, 0x20, 0x67, 0xd1, 0x46, 0xa8, 0x50, 0xe0, 3);
+> +    /* DEVPROP_TYPE_STRING_LIST */
+> +DEFINE_DEVPROPKEY(qga_DEVPKEY_Device_DriverDate, 0xa8b865dd, 0x2e3d,
+> +    0x4094, 0xad, 0x97, 0xe5, 0x93, 0xa7, 0xc, 0x75, 0xd6, 2);
+> +    /* DEVPROP_TYPE_FILETIME */
+> +DEFINE_DEVPROPKEY(qga_DEVPKEY_Device_DriverVersion, 0xa8b865dd, 0x2e3d=
 ,
->                                   bool lsi, Error **errp)
->   {
-> @@ -433,6 +439,7 @@ static void ics_spapr_class_init(ObjectClass *klass, =
-void *data)
->       sicc->activate =3D xics_spapr_activate;
->       sicc->deactivate =3D xics_spapr_deactivate;
->       sicc->cpu_intc_create =3D xics_spapr_cpu_intc_create;
-> +    sicc->cpu_intc_reset =3D xics_spapr_cpu_intc_reset;
->       sicc->claim_irq =3D xics_spapr_claim_irq;
->       sicc->free_irq =3D xics_spapr_free_irq;
->       sicc->set_irq =3D xics_spapr_set_irq;
-> diff --git a/hw/intc/xive.c b/hw/intc/xive.c
-> index d420c6571e14..f066be5eb5e3 100644
-> --- a/hw/intc/xive.c
-> +++ b/hw/intc/xive.c
-> @@ -547,10 +547,8 @@ void xive_tctx_pic_print_info(XiveTCTX *tctx, Monito=
-r *mon)
->       }
->   }
->  =20
-> -static void xive_tctx_reset(void *dev)
-> +void xive_tctx_reset(XiveTCTX *tctx)
->   {
-> -    XiveTCTX *tctx =3D XIVE_TCTX(dev);
-> -
->       memset(tctx->regs, 0, sizeof(tctx->regs));
->  =20
->       /* Set some defaults */
-> @@ -607,13 +605,6 @@ static void xive_tctx_realize(DeviceState *dev, Erro=
-r **errp)
->               return;
->           }
->       }
-> -
-> -    qemu_register_reset(xive_tctx_reset, dev);
-> -}
-> -
-> -static void xive_tctx_unrealize(DeviceState *dev, Error **errp)
-> -{
-> -    qemu_unregister_reset(xive_tctx_reset, dev);
->   }
->  =20
->   static int vmstate_xive_tctx_pre_save(void *opaque)
-> @@ -668,7 +659,6 @@ static void xive_tctx_class_init(ObjectClass *klass, =
-void *data)
->  =20
->       dc->desc =3D "XIVE Interrupt Thread Context";
->       dc->realize =3D xive_tctx_realize;
-> -    dc->unrealize =3D xive_tctx_unrealize;
->       dc->vmsd =3D &vmstate_xive_tctx;
->       /*
->        * Reason: part of XIVE interrupt controller, needs to be wired up
-> diff --git a/hw/ppc/pnv.c b/hw/ppc/pnv.c
-> index 7cf64b6d2533..4a51fb65a834 100644
-> --- a/hw/ppc/pnv.c
-> +++ b/hw/ppc/pnv.c
-> @@ -778,6 +778,13 @@ static void pnv_chip_power8_intc_create(PnvChip *chi=
-p, PowerPCCPU *cpu,
->       pnv_cpu->intc =3D obj;
->   }
->  =20
-> +static void pnv_chip_power8_intc_reset(PnvChip *chip, PowerPCCPU *cpu)
+> +    0x4094, 0xad, 0x97, 0xe5, 0x93, 0xa7, 0xc, 0x75, 0xd6, 3);
+> +    /* DEVPROP_TYPE_STRING */
+> +/* The following shoud be in cfgmgr32.h, but it isn't */
+> +#ifndef CM_Get_DevNode_Property
+> +CMAPI CONFIGRET WINAPI CM_Get_DevNode_PropertyW(
+> +    DEVINST          dnDevInst,
+> +    CONST DEVPROPKEY * PropertyKey,
+> +    DEVPROPTYPE      * PropertyType,
+> +    PBYTE            PropertyBuffer,
+> +    PULONG           PropertyBufferSize,
+> +    ULONG            ulFlags
+> +);
+> +#define CM_Get_DevNode_Property CM_Get_DevNode_PropertyW
+> +#endif
+> +
+>  #ifndef SHTDN_REASON_FLAG_PLANNED
+>  #define SHTDN_REASON_FLAG_PLANNED 0x80000000
+>  #endif
+> @@ -92,6 +123,8 @@ static OpenFlags guest_file_open_modes[] =3D {
+>      g_free(suffix); \
+>  } while (0)
+> =20
+> +G_DEFINE_AUTOPTR_CLEANUP_FUNC(GuestDeviceInfo, qapi_free_GuestDeviceIn=
+fo)
+> +
+>  static OpenFlags *find_open_flag(const char *mode_str)
+>  {
+>      int mode;
+> @@ -2234,3 +2267,172 @@ GuestOSInfo *qmp_guest_get_osinfo(Error **errp)
+> =20
+>      return info;
+>  }
+> +
+> +/*
+> + * Safely get device property. Returned strings are using wide charact=
+ers.
+> + * Caller is responsible for freeing the buffer.
+> + */
+> +static LPBYTE cm_get_property(DEVINST devInst, const DEVPROPKEY *propN=
+ame,
+> +    PDEVPROPTYPE propType)
 > +{
-> +    PnvCPUState *pnv_cpu =3D pnv_cpu_state(cpu);
+> +    CONFIGRET cr;
+> +    g_autofree LPBYTE buffer =3D NULL;
+> +    ULONG buffer_len =3D 0;
 > +
-> +    icp_reset(ICP(pnv_cpu->intc));
-> +}
+> +    /* First query for needed space */
+> +    cr =3D CM_Get_DevNode_PropertyW(devInst, propName, propType,
+> +        buffer, &buffer_len, 0);
+> +    if (cr !=3D CR_SUCCESS && cr !=3D CR_BUFFER_SMALL) {
 > +
->   /*
->    *    0:48  Reserved - Read as zeroes
->    *   49:52  Node ID
-> @@ -815,6 +822,13 @@ static void pnv_chip_power9_intc_create(PnvChip *chi=
-p, PowerPCCPU *cpu,
->       pnv_cpu->intc =3D obj;
->   }
->  =20
-> +static void pnv_chip_power9_intc_reset(PnvChip *chip, PowerPCCPU *cpu)
-> +{
-> +    PnvCPUState *pnv_cpu =3D pnv_cpu_state(cpu);
-> +
-> +    xive_tctx_reset(XIVE_TCTX(pnv_cpu->intc));
-> +}
-> +
->   /*
->    * Allowed core identifiers on a POWER8 Processor Chip :
->    *
-> @@ -984,6 +998,7 @@ static void pnv_chip_power8e_class_init(ObjectClass *=
-klass, void *data)
->       k->cores_mask =3D POWER8E_CORE_MASK;
->       k->core_pir =3D pnv_chip_core_pir_p8;
->       k->intc_create =3D pnv_chip_power8_intc_create;
-> +    k->intc_reset =3D pnv_chip_power8_intc_reset;
->       k->isa_create =3D pnv_chip_power8_isa_create;
->       k->dt_populate =3D pnv_chip_power8_dt_populate;
->       k->pic_print_info =3D pnv_chip_power8_pic_print_info;
-> @@ -1003,6 +1018,7 @@ static void pnv_chip_power8_class_init(ObjectClass =
-*klass, void *data)
->       k->cores_mask =3D POWER8_CORE_MASK;
->       k->core_pir =3D pnv_chip_core_pir_p8;
->       k->intc_create =3D pnv_chip_power8_intc_create;
-> +    k->intc_reset =3D pnv_chip_power8_intc_reset;
->       k->isa_create =3D pnv_chip_power8_isa_create;
->       k->dt_populate =3D pnv_chip_power8_dt_populate;
->       k->pic_print_info =3D pnv_chip_power8_pic_print_info;
-> @@ -1022,6 +1038,7 @@ static void pnv_chip_power8nvl_class_init(ObjectCla=
-ss *klass, void *data)
->       k->cores_mask =3D POWER8_CORE_MASK;
->       k->core_pir =3D pnv_chip_core_pir_p8;
->       k->intc_create =3D pnv_chip_power8_intc_create;
-> +    k->intc_reset =3D pnv_chip_power8_intc_reset;
->       k->isa_create =3D pnv_chip_power8nvl_isa_create;
->       k->dt_populate =3D pnv_chip_power8_dt_populate;
->       k->pic_print_info =3D pnv_chip_power8_pic_print_info;
-> @@ -1191,6 +1208,7 @@ static void pnv_chip_power9_class_init(ObjectClass =
-*klass, void *data)
->       k->cores_mask =3D POWER9_CORE_MASK;
->       k->core_pir =3D pnv_chip_core_pir_p9;
->       k->intc_create =3D pnv_chip_power9_intc_create;
-> +    k->intc_reset =3D pnv_chip_power9_intc_reset;
->       k->isa_create =3D pnv_chip_power9_isa_create;
->       k->dt_populate =3D pnv_chip_power9_dt_populate;
->       k->pic_print_info =3D pnv_chip_power9_pic_print_info;
-> diff --git a/hw/ppc/pnv_core.c b/hw/ppc/pnv_core.c
-> index b1a7489e7abf..f36cb39dbf77 100644
-> --- a/hw/ppc/pnv_core.c
-> +++ b/hw/ppc/pnv_core.c
-> @@ -45,6 +45,8 @@ static void pnv_cpu_reset(void *opaque)
->       PowerPCCPU *cpu =3D opaque;
->       CPUState *cs =3D CPU(cpu);
->       CPUPPCState *env =3D &cpu->env;
-> +    PnvChipClass *pcc;
-> +    Object *chip;
->  =20
->       cpu_reset(cs);
->  =20
-> @@ -55,6 +57,10 @@ static void pnv_cpu_reset(void *opaque)
->       env->gpr[3] =3D PNV_FDT_ADDR;
->       env->nip =3D 0x10;
->       env->msr |=3D MSR_HVB; /* Hypervisor mode */
-> +
-> +    chip =3D object_property_get_link(OBJECT(cpu), "chip", &error_fatal)=
-;
-
-Why not add a PnvChip *chip field in PnvCore?
-Then you only get it in realize() and it is available in reset().
-
-Rest of your patch looks OK from a QOM PoV.
-
-> +    pcc =3D PNV_CHIP_GET_CLASS(chip);
-> +    pcc->intc_reset(PNV_CHIP(chip), cpu);
->   }
->  =20
->   /*
-> @@ -169,6 +175,8 @@ static void pnv_realize_vcpu(PowerPCCPU *cpu, PnvChip=
- *chip, Error **errp)
->       Error *local_err =3D NULL;
->       PnvChipClass *pcc =3D PNV_CHIP_GET_CLASS(chip);
->  =20
-> +    object_property_add_const_link(OBJECT(cpu), "chip",
-> +                                   OBJECT(chip), &error_fatal);
->       object_property_set_bool(OBJECT(cpu), true, "realized", &local_err)=
-;
->       if (local_err) {
->           error_propagate(errp, local_err);
-> diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
-> index 5947e39b36ad..d2903c2d0f22 100644
-> --- a/hw/ppc/spapr_cpu_core.c
-> +++ b/hw/ppc/spapr_cpu_core.c
-> @@ -32,6 +32,7 @@ static void spapr_reset_vcpu(PowerPCCPU *cpu)
->       PowerPCCPUClass *pcc =3D POWERPC_CPU_GET_CLASS(cpu);
->       SpaprCpuState *spapr_cpu =3D spapr_cpu_state(cpu);
->       target_ulong lpcr;
-> +    SpaprMachineState *spapr =3D SPAPR_MACHINE(qdev_get_machine());
->  =20
->       cpu_reset(cs);
->  =20
-> @@ -76,9 +77,11 @@ static void spapr_reset_vcpu(PowerPCCPU *cpu)
->       spapr_cpu->dtl_addr =3D 0;
->       spapr_cpu->dtl_size =3D 0;
->  =20
-> -    spapr_caps_cpu_apply(SPAPR_MACHINE(qdev_get_machine()), cpu);
-> +    spapr_caps_cpu_apply(spapr, cpu);
->  =20
->       kvm_check_mmu(cpu, &error_fatal);
-> +
-> +    spapr_irq_cpu_intc_reset(spapr, cpu);
->   }
->  =20
->   void spapr_cpu_set_entry_state(PowerPCCPU *cpu, target_ulong nip, targe=
-t_ulong r3)
-> diff --git a/hw/ppc/spapr_irq.c b/hw/ppc/spapr_irq.c
-> index 234d1073e518..b941608b69ba 100644
-> --- a/hw/ppc/spapr_irq.c
-> +++ b/hw/ppc/spapr_irq.c
-> @@ -220,6 +220,20 @@ int spapr_irq_cpu_intc_create(SpaprMachineState *spa=
-pr,
->       return 0;
->   }
->  =20
-> +void spapr_irq_cpu_intc_reset(SpaprMachineState *spapr, PowerPCCPU *cpu)
-> +{
-> +    SpaprInterruptController *intcs[] =3D ALL_INTCS(spapr);
-> +    int i;
-> +
-> +    for (i =3D 0; i < ARRAY_SIZE(intcs); i++) {
-> +        SpaprInterruptController *intc =3D intcs[i];
-> +        if (intc) {
-> +            SpaprInterruptControllerClass *sicc =3D SPAPR_INTC_GET_CLASS=
-(intc);
-> +            sicc->cpu_intc_reset(intc, cpu);
-> +        }
+> +        slog("failed to get property size, error=3D0x%lx", cr);
+> +        return NULL;
 > +    }
+> +    buffer =3D g_new0(BYTE, buffer_len + 1);
+> +    cr =3D CM_Get_DevNode_PropertyW(devInst, propName, propType,
+> +        buffer, &buffer_len, 0);
+> +    if (cr !=3D CR_SUCCESS) {
+> +        slog("failed to get device property, error=3D0x%lx", cr);
+> +        return NULL;
+> +    }
+> +    return g_steal_pointer(&buffer);
 > +}
 > +
->   static void spapr_set_irq(void *opaque, int irq, int level)
->   {
->       SpaprMachineState *spapr =3D SPAPR_MACHINE(opaque);
+> +static GStrv ga_get_hardware_ids(DEVINST devInstance)
+> +{
+> +    GStrv hw_ids =3D NULL;
+> +    GArray *values =3D NULL;
+> +    DEVPROPTYPE cm_type;
+> +    LPWSTR id;
+> +    g_autofree LPWSTR property =3D (LPWSTR)cm_get_property(devInstance=
+,
+> +        &qga_DEVPKEY_Device_HardwareIds, &cm_type);
+> +    if (property =3D=3D NULL) {
+> +        slog("failed to get hardware IDs");
+> +        return NULL;
+> +    }
+> +    if (*property =3D=3D '\0') {
+> +        /* empty list */
+> +        return NULL;
+> +    }
+> +    values =3D g_array_new(TRUE, TRUE, sizeof(gchar *));
+> +    for (id =3D property; '\0' !=3D *id; id +=3D lstrlenW(id) + 1) {
+> +        gchar *id8 =3D g_utf16_to_utf8(id, -1, NULL, NULL, NULL);
+> +        g_array_append_val(values, id8);
+> +    }
+> +    hw_ids =3D (GStrv)g_array_free(values, FALSE);
+> +    values =3D NULL;
+> +    return hw_ids;
+> +}
+> +
+> +/*
+> + * https://docs.microsoft.com/en-us/windows-hardware/drivers/install/i=
+dentifiers-for-pci-devices
+> + */
+> +#define DEVICE_PCI_RE "PCI\\\\VEN_(1AF4|1B36)&DEV_([0-9A-B]{4})(&|$)"
+> +
+> +GuestDeviceInfoList *qmp_guest_get_devices(Error **errp)
+> +{
+> +    GuestDeviceInfoList *head =3D NULL, *cur_item =3D NULL, *item =3D =
+NULL;
+> +    HDEVINFO dev_info =3D INVALID_HANDLE_VALUE;
+> +    SP_DEVINFO_DATA dev_info_data;
+> +    int i, j;
+> +    GError *gerr =3D NULL;
+> +    g_autoptr(GRegex) device_pci_re =3D NULL;
+> +    DEVPROPTYPE cm_type;
+> +
+> +    device_pci_re =3D g_regex_new(DEVICE_PCI_RE,
+> +        G_REGEX_ANCHORED | G_REGEX_OPTIMIZE, 0,
+> +        &gerr);
+> +    g_assert(device_pci_re !=3D NULL);
+> +
+> +    dev_info_data.cbSize =3D sizeof(SP_DEVINFO_DATA);
+> +    dev_info =3D SetupDiGetClassDevs(0, 0, 0, DIGCF_PRESENT | DIGCF_AL=
+LCLASSES);
+> +    if (dev_info =3D=3D INVALID_HANDLE_VALUE) {
+> +        error_setg(errp, "failed to get device tree");
+> +        return NULL;
+> +    }
+> +
+> +    slog("enumerating devices");
+> +    for (i =3D 0; SetupDiEnumDeviceInfo(dev_info, i, &dev_info_data); =
+i++) {
+> +        bool skip =3D true;
+> +        SYSTEMTIME utc_date;
+> +        g_autofree LPWSTR name =3D NULL;
+> +        g_autofree LPFILETIME date =3D NULL;
+> +        g_autofree LPWSTR version =3D NULL;
+> +        g_auto(GStrv) hw_ids =3D NULL;
+> +        g_autoptr(GuestDeviceInfo) device =3D g_new0(GuestDeviceInfo, =
+1);
+> +        g_autofree char *vendor_id =3D NULL;
+> +        g_autofree char *device_id =3D NULL;
+> +
+> +        name =3D (LPWSTR)cm_get_property(dev_info_data.DevInst,
+> +            &qga_DEVPKEY_NAME, &cm_type);
+> +        if (name =3D=3D NULL) {
+> +            slog("failed to get device description");
+> +            continue;
+> +        }
+> +        device->driver_name =3D g_utf16_to_utf8(name, -1, NULL, NULL, =
+NULL);
+> +        if (device->driver_name =3D=3D NULL) {
+> +            error_setg(errp, "conversion to utf8 failed (driver name)"=
+);
+> +            goto out;
+> +        }
+> +        slog("querying device: %s", device->driver_name);
+> +        hw_ids =3D ga_get_hardware_ids(dev_info_data.DevInst);
+> +        if (hw_ids =3D=3D NULL) {
+> +            continue;
+> +        }
+> +        for (j =3D 0; hw_ids[j] !=3D NULL; j++) {
+> +            GMatchInfo *match_info;
+> +            if (!g_regex_match(device_pci_re, hw_ids[j], 0, &match_inf=
+o)) {
+> +                continue;
+> +            }
+> +            skip =3D false;
+> +            vendor_id =3D g_match_info_fetch(match_info, 1);
+> +            device_id =3D g_match_info_fetch(match_info, 2);
+> +            device->vendor_id =3D g_ascii_strtoull(vendor_id, NULL, 16=
+);
+> +            device->device_id =3D g_ascii_strtoull(device_id, NULL, 16=
+);
+> +            g_match_info_free(match_info);
+> +        }
+> +        if (skip) {
+> +            continue;
+> +        }
+> +
+> +        version =3D (LPWSTR)cm_get_property(dev_info_data.DevInst,
+> +            &qga_DEVPKEY_Device_DriverVersion, &cm_type);
+> +        if (version =3D=3D NULL) {
+> +            slog("failed to get driver version");
+> +            continue;
+> +        }
+> +        device->driver_version =3D g_utf16_to_utf8(version, -1, NULL,
+> +            NULL, NULL);
+> +        if (device->driver_version =3D=3D NULL) {
+> +            error_setg(errp, "conversion to utf8 failed (driver versio=
+n)");
+> +            goto out;
+> +        }
+> +
+> +        date =3D (LPFILETIME)cm_get_property(dev_info_data.DevInst,
+> +            &qga_DEVPKEY_Device_DriverDate, &cm_type);
+> +        if (date =3D=3D NULL) {
+> +            slog("failed to get driver date");
+> +            continue;
+> +        }
+> +        FileTimeToSystemTime(date, &utc_date);
+> +        device->driver_date =3D g_strdup_printf("%04d-%02d-%02d",
+> +            utc_date.wYear, utc_date.wMonth, utc_date.wDay);
+> +
+> +        slog("driver: %s\ndriver version: %s,%s\n", device->driver_nam=
+e,
+> +            device->driver_date, device->driver_version);
+> +        item =3D g_new0(GuestDeviceInfoList, 1);
+> +        item->value =3D g_steal_pointer(&device);
+> +        if (!cur_item) {
+> +            head =3D cur_item =3D item;
+> +        } else {
+> +            cur_item->next =3D item;
+> +            cur_item =3D item;
+> +        }
+> +        continue;
+> +    }
+> +
+> +out:
+> +    if (dev_info !=3D INVALID_HANDLE_VALUE) {
+> +        SetupDiDestroyDeviceInfoList(dev_info);
+> +    }
+> +    return head;
+> +}
+> diff --git a/qga/qapi-schema.json b/qga/qapi-schema.json
+> index fb4605cc19..fe04ff2f39 100644
+> --- a/qga/qapi-schema.json
+> +++ b/qga/qapi-schema.json
+> @@ -1242,3 +1242,35 @@
+>  ##
+>  { 'command': 'guest-get-osinfo',
+>    'returns': 'GuestOSInfo' }
+> +
+> +##
+> +# @GuestDeviceInfo:
+> +#
+> +# @vendor-id: vendor ID
+> +# @device-id: device ID
+> +# @driver-name: name of the associated driver
+> +# @driver-date: driver release date in format YYYY-MM-DD
+> +# @driver-version: driver version
+> +#
+> +# Since: 4.2
+> +##
+> +{ 'struct': 'GuestDeviceInfo',
+> +  'data': {
+> +      'vendor-id': 'uint16',
+> +      'device-id': 'uint16',
+> +      'driver-name': 'str',
+> +      'driver-date': 'str',
+> +      'driver-version': 'str'
+> +      } }
+> +
+> +##
+> +# @guest-get-devices:
+> +#
+> +# Retrieve information about device drivers in Windows guest
+> +#
+> +# Returns: @GuestDeviceInfo
+> +#
+> +# Since: 4.2
+> +##
+> +{ 'command': 'guest-get-devices',
+> +  'returns': ['GuestDeviceInfo'] }
+> --=20
+> 2.23.0
 >=20
 
+--=20
+Tom=C3=A1=C5=A1 Golembiovsk=C3=BD <tgolembi@redhat.com>
 
