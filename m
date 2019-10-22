@@ -2,52 +2,80 @@ Return-Path: <SRS0=tSBD=YP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 23750CA9EA0
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 13:13:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 366EACA9EA0
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 13:14:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F03E82184C
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 13:13:14 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F03E82184C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	by mail.kernel.org (Postfix) with ESMTPS id 8D9EC2184C
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 13:14:20 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="D9L6aHsp"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8D9EC2184C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56304 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56308 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iMtyM-0005jw-5I
-	for qemu-devel@archiver.kernel.org; Tue, 22 Oct 2019 09:13:14 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58618)
+	id 1iMtzP-0006W3-IE
+	for qemu-devel@archiver.kernel.org; Tue, 22 Oct 2019 09:14:19 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59880)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iMtkW-0006zz-Pb
- for qemu-devel@nongnu.org; Tue, 22 Oct 2019 08:58:59 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1iMtrr-0005l8-8C
+ for qemu-devel@nongnu.org; Tue, 22 Oct 2019 09:06:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iMtkV-0006Sw-H8
- for qemu-devel@nongnu.org; Tue, 22 Oct 2019 08:58:56 -0400
-Received: from relay.sw.ru ([185.231.240.75]:55212)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1iMtkM-0006KJ-Kp; Tue, 22 Oct 2019 08:58:47 -0400
-Received: from [10.94.3.0] (helo=kvm.qa.sw.ru)
- by relay.sw.ru with esmtp (Exim 4.92.2)
- (envelope-from <vsementsov@virtuozzo.com>)
- id 1iMtkI-0003xx-KY; Tue, 22 Oct 2019 15:58:42 +0300
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-To: qemu-block@nongnu.org
-Subject: [PATCH v2 09/10] nbd/server: use bdrv_dirty_bitmap_next_dirty_area
-Date: Tue, 22 Oct 2019 15:58:38 +0300
-Message-Id: <20191022125839.12633-10-vsementsov@virtuozzo.com>
-X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20191022125839.12633-1-vsementsov@virtuozzo.com>
-References: <20191022125839.12633-1-vsementsov@virtuozzo.com>
+ (envelope-from <peter.maydell@linaro.org>) id 1iMtrq-00012r-24
+ for qemu-devel@nongnu.org; Tue, 22 Oct 2019 09:06:31 -0400
+Received: from mail-io1-xd42.google.com ([2607:f8b0:4864:20::d42]:33924)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1iMtro-0000zh-QL
+ for qemu-devel@nongnu.org; Tue, 22 Oct 2019 09:06:29 -0400
+Received: by mail-io1-xd42.google.com with SMTP id q1so20324524ion.1
+ for <qemu-devel@nongnu.org>; Tue, 22 Oct 2019 06:06:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=a1wBe3lyQqhBm3Tp9rzRkxx4ysHQSccZ1HHlopvQIzk=;
+ b=D9L6aHspB6jWau/6264gkuHedDFsFVTJSw9C6UY1K4MeZl0fBET3ZFZr/+wDbfOTuV
+ qCzmoP4bHYV3wyrnu4GcmqsYQF8hkC6eIF7X0NVQ9JKcGPSdGEgECQx3rdV430oNONh6
+ wIxmDzVqFdNeJghLhadQFpnh39C9pm2SWd6QrWidhmAiQXFTuA3jpaXDOQs4xD4h6U69
+ XDAqOrFCPUnPUo5b/tSxHD2nyhA+ryBIlBF/WXfQZM8jsuJCPNXxn2Vy2u/44k8a4H/F
+ hmf56XeyIIW8MZbDjrjF3x4nW8m3IvVFG6eUNvWufz+l9FN7LfeziQNDPkx7D1jaYe+O
+ CmAg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=a1wBe3lyQqhBm3Tp9rzRkxx4ysHQSccZ1HHlopvQIzk=;
+ b=hJtfe8aPa+ZyPfKBBGaPbMf3i/WoH9j9aY3zluLBCviEoefWr2FaBk7DitxG6lMVGi
+ ZEssWiwnVzR0EdXAJGghO3M4tHs9smJVTq+1tdaN0DmDFIqeDz48babIb/qki6zNETNv
+ lfopawY71/AwjvcNwCjTip3+5+Ftlh098ge9QaT02R20NkDQVaNs7wyITmHOkzQNf3D3
+ HBMNpzft9sfP3dlHGlRvfehys/J4xTAL1DyuNbSfE5sBhdcAX+4W0flAqJAsAMTbW7q3
+ SREnZEtjX+Q9U08RKPQvULMhhrSiOewjrILuHErXrANTxstZvo7P/3q89AUbBxgMRbBX
+ eybA==
+X-Gm-Message-State: APjAAAWqZ0yqjyAGUad72yRxyW8qva8nXZyhU57XdiorxTOFqwXJVn2Z
+ ArnOuyIxPcZTFb2XtTmiF9xfDodYmo9NeRh8l6dmeg==
+X-Google-Smtp-Source: APXvYqzxAhpVbm6h3FDW/rdsy/7JIdLidDl17CFvER2ADRhGAKbLtxjUw0qK9B60dfmh+XsuKX6g3wzn3fTFkN/eeCw=
+X-Received: by 2002:a02:7f57:: with SMTP id r84mr3723672jac.69.1571749574568; 
+ Tue, 22 Oct 2019 06:06:14 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [fuzzy]
-X-Received-From: 185.231.240.75
+References: <20191021190653.9511-1-philmd@redhat.com>
+In-Reply-To: <20191021190653.9511-1-philmd@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 22 Oct 2019 14:06:02 +0100
+Message-ID: <CAFEAcA-85Yd+qCFa8CoWayYsd9F9C+NmZksMnhx=dAsjt+BUjg@mail.gmail.com>
+Subject: Re: [PATCH v2 0/6] hw/arm: Create the RAM in the board
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::d42
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -59,114 +87,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, vsementsov@virtuozzo.com, qemu-devel@nongnu.org,
- mreitz@redhat.com, den@openvz.org, jsnow@redhat.com
+Cc: Alistair Francis <alistair@alistair23.me>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>,
+ Antony Pavlov <antonynpavlov@gmail.com>,
+ "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Use bdrv_dirty_bitmap_next_dirty_area for bitmap_to_extents. Since
-bdrv_dirty_bitmap_next_dirty_area is very accurate in its interface,
-we'll never exceed requested region with last chunk. So, we don't need
-dont_fragment, and bitmap_to_extents() interface becomes clean enough
-to not require any comment.
+On Mon, 21 Oct 2019 at 20:07, Philippe Mathieu-Daud=C3=A9 <philmd@redhat.co=
+m> wrote:
+>
+> Hi Peter,
+>
+> This series contains the ARM patches extracted from the
+> "Let the machine be the owner of the system memory" series [1]
+> reviewed by Richard.
+>
+> These are cleanups moving the creation of the system ram at
+> the board level. The other series will enforce
+> memory_region_allocate_system_memory() get called with a
+> MachineState argument, this preliminary cleanup is required.
+>
+> Regard,
+>
+> Phil.
+>
+> [1] https://lists.gnu.org/archive/html/qemu-devel/2019-10/msg05085.html
+>
+> Philippe Mathieu-Daud=C3=A9 (6):
+>   hw/arm/xilinx_zynq: Use the IEC binary prefix definitions
+>   hw/arm/mps2: Use the IEC binary prefix definitions
+>   hw/arm/collie: Create the RAM in the board
+>   hw/arm/omap2: Create the RAM in the board
+>   hw/arm/omap1: Create the RAM in the board
+>   hw/arm/digic4: Inline digic4_board_setup_ram() function
 
-Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
----
- nbd/server.c | 59 +++++++++++++++++-----------------------------------
- 1 file changed, 19 insertions(+), 40 deletions(-)
 
-diff --git a/nbd/server.c b/nbd/server.c
-index 650eebcfff..5a6aa6376a 100644
---- a/nbd/server.c
-+++ b/nbd/server.c
-@@ -2044,57 +2044,36 @@ static int nbd_co_send_block_status(NBDClient *client, uint64_t handle,
-     return nbd_co_send_extents(client, handle, ea, last, context_id, errp);
- }
- 
--/*
-- * Populate @ea from a dirty bitmap. Unless @dont_fragment, the
-- * final extent may exceed the original @length.
-- */
-+/* Populate @ea from a dirty bitmap. */
- static void bitmap_to_extents(BdrvDirtyBitmap *bitmap,
-                               uint64_t offset, uint64_t length,
--                              NBDExtentArray *ea, bool dont_fragment)
-+                              NBDExtentArray *es)
- {
--    uint64_t begin = offset, end = offset;
--    uint64_t overall_end = offset + length;
--    BdrvDirtyBitmapIter *it;
--    bool dirty;
-+    int64_t start, dirty_start, dirty_count;
-+    int64_t end = offset + length;
-+    bool full = false;
- 
-     bdrv_dirty_bitmap_lock(bitmap);
- 
--    it = bdrv_dirty_iter_new(bitmap);
--    dirty = bdrv_dirty_bitmap_get_locked(bitmap, offset);
--
--    while (begin < overall_end) {
--        bool next_dirty = !dirty;
--
--        if (dirty) {
--            end = bdrv_dirty_bitmap_next_zero(bitmap, begin, INT64_MAX);
--        } else {
--            bdrv_set_dirty_iter(it, begin);
--            end = bdrv_dirty_iter_next(it);
--        }
--        if (end == -1 || end - begin > UINT32_MAX) {
--            /* Cap to an aligned value < 4G beyond begin. */
--            end = MIN(bdrv_dirty_bitmap_size(bitmap),
--                      begin + UINT32_MAX + 1 -
--                      bdrv_dirty_bitmap_granularity(bitmap));
--            next_dirty = dirty;
--        }
--        if (dont_fragment && end > overall_end) {
--            end = overall_end;
--        }
--
--        if (nbd_extent_array_add(ea, end - begin,
--                                 dirty ? NBD_STATE_DIRTY : 0) < 0) {
-+    for (start = offset;
-+         bdrv_dirty_bitmap_next_dirty_area(bitmap, start, end, INT32_MAX,
-+                                           &dirty_start, &dirty_count);
-+         start = dirty_start + dirty_count)
-+    {
-+        if ((nbd_extent_array_add(es, dirty_start - start, 0) < 0) ||
-+            (nbd_extent_array_add(es, dirty_count, NBD_STATE_DIRTY) < 0))
-+        {
-+            full = true;
-             break;
-         }
--        begin = end;
--        dirty = next_dirty;
-     }
- 
--    bdrv_dirty_iter_free(it);
-+    if (!full) {
-+        /* last non dirty extent */
-+        nbd_extent_array_add(es, end - start, 0);
-+    }
- 
-     bdrv_dirty_bitmap_unlock(bitmap);
--
--    assert(offset < end);
- }
- 
- static int nbd_co_send_bitmap(NBDClient *client, uint64_t handle,
-@@ -2105,7 +2084,7 @@ static int nbd_co_send_bitmap(NBDClient *client, uint64_t handle,
-     unsigned int nb_extents = dont_fragment ? 1 : NBD_MAX_BLOCK_STATUS_EXTENTS;
-     g_autoptr(NBDExtentArray) ea = nbd_extent_array_new(nb_extents);
- 
--    bitmap_to_extents(bitmap, offset, length, ea, dont_fragment);
-+    bitmap_to_extents(bitmap, offset, length, ea);
- 
-     return nbd_co_send_extents(client, handle, ea, last, context_id, errp);
- }
--- 
-2.21.0
 
+Applied to target-arm.next, thanks.
+
+-- PMM
 
