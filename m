@@ -2,62 +2,83 @@ Return-Path: <SRS0=tSBD=YP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_2 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 66F87CA9EA0
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 15:25:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 510F3CA9EA0
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 15:35:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3A0B7218AE
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 15:25:43 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3A0B7218AE
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id 1D44A2084B
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 15:35:32 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="C3bE1am7"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1D44A2084B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:32968 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33302 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iMw2Y-0007l3-DK
-	for qemu-devel@archiver.kernel.org; Tue, 22 Oct 2019 11:25:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56168)
+	id 1iMwC3-0002tx-7r
+	for qemu-devel@archiver.kernel.org; Tue, 22 Oct 2019 11:35:31 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57528)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <groug@kaod.org>) id 1iMw1O-00075u-U2
- for qemu-devel@nongnu.org; Tue, 22 Oct 2019 11:24:32 -0400
+ (envelope-from <stefanha@redhat.com>) id 1iMwAz-00026b-WF
+ for qemu-devel@nongnu.org; Tue, 22 Oct 2019 11:34:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <groug@kaod.org>) id 1iMw1N-0004q1-LL
- for qemu-devel@nongnu.org; Tue, 22 Oct 2019 11:24:30 -0400
-Received: from 8.mo4.mail-out.ovh.net ([188.165.33.112]:47884)
+ (envelope-from <stefanha@redhat.com>) id 1iMwAx-00026z-Eq
+ for qemu-devel@nongnu.org; Tue, 22 Oct 2019 11:34:24 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:47252
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <groug@kaod.org>) id 1iMw1N-0004op-EI
- for qemu-devel@nongnu.org; Tue, 22 Oct 2019 11:24:29 -0400
-Received: from player795.ha.ovh.net (unknown [10.109.146.166])
- by mo4.mail-out.ovh.net (Postfix) with ESMTP id EB7D820CB3B
- for <qemu-devel@nongnu.org>; Tue, 22 Oct 2019 17:24:26 +0200 (CEST)
-Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
- [82.253.208.248]) (Authenticated sender: groug@kaod.org)
- by player795.ha.ovh.net (Postfix) with ESMTPSA id 8E97DB15D98E;
- Tue, 22 Oct 2019 15:24:21 +0000 (UTC)
-Date: Tue, 22 Oct 2019 17:24:18 +0200
-From: Greg Kurz <groug@kaod.org>
-To: =?UTF-8?B?Q8OpZHJpYw==?= Le Goater <clg@kaod.org>
-Subject: Re: [PATCH v4 3/7] ppc/pnv: Introduce a PnvCore reset handler
-Message-ID: <20191022172418.57811758@bahia.lan>
-In-Reply-To: <20191022134632.29098-4-clg@kaod.org>
-References: <20191022134632.29098-1-clg@kaod.org>
- <20191022134632.29098-4-clg@kaod.org>
-X-Mailer: Claws Mail 3.17.4 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+ (Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1iMwAx-00025r-0I
+ for qemu-devel@nongnu.org; Tue, 22 Oct 2019 11:34:23 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1571758461;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=TXj/iPyhWiM5jQxHtiCk1al0+4goGyb5lNbZvAQxEEw=;
+ b=C3bE1am7nhGIFKdEUyndJgMuXFf8uZBzigO9ul1TOPQCHBDAViVhcKNtmeYOs6yXzIVcxf
+ dfuTdni9gx0zEGYxjTx6Qm94GoEiazRgQCY78b/se66wl/tvYM509jQjJAqfAv614hj0SK
+ KIfCTZyQG8XgNPMxJjO9zAaJfcAyG+U=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-138-dCoiFZQtPxmE52j5anrcJA-1; Tue, 22 Oct 2019 11:34:13 -0400
+X-MC-Unique: dCoiFZQtPxmE52j5anrcJA-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 44CAC800D49;
+ Tue, 22 Oct 2019 15:34:12 +0000 (UTC)
+Received: from localhost (ovpn-117-153.ams2.redhat.com [10.36.117.153])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 625DE60A9F;
+ Tue, 22 Oct 2019 15:34:08 +0000 (UTC)
+Date: Tue, 22 Oct 2019 16:34:07 +0100
+From: Stefan Hajnoczi <stefanha@redhat.com>
+To: "Liu, Changpeng" <changpeng.liu@intel.com>
+Subject: Re: [PATCH] vhost-user-scsi: implement handle_output
+Message-ID: <20191022153407.GC32186@stefanha-x1.localdomain>
+References: <20191017163859.23184-1-felipe@nutanix.com>
+ <CAONzpcbR+OjcrfavTnFXVopG-YsTdnFCT=no0eFei4oanfmj1Q@mail.gmail.com>
+ <17B5A7A6-F790-4D10-8921-06A83DA18077@nutanix.com>
+ <CAONzpcYDDUde0PLVtGYuwGm79RvU-VubXqDs=4F_8yp+-pz-Zg@mail.gmail.com>
+ <B53729BD-5A55-4D27-88BE-F8ED2A39D41F@nutanix.com>
+ <FF7FC980937D6342B9D289F5F3C7C2625B873307@SHSMSX103.ccr.corp.intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-Ovh-Tracer-Id: 2245607366571563403
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrkeejgdekjecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
+In-Reply-To: <FF7FC980937D6342B9D289F5F3C7C2625B873307@SHSMSX103.ccr.corp.intel.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Mimecast-Spam-Score: 0
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="69pVuxX8awAiJ7fD"
+Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 188.165.33.112
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -69,90 +90,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <philmd@redhat.com>,
- qemu-ppc@nongnu.org, qemu-devel@nongnu.org,
- David Gibson <david@gibson.dropbear.id.au>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ Yongji Xie <elohimes@gmail.com>, Alex Williamson <alex.williamson@redhat.com>,
+ "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
+ Felipe Franciosi <felipe@nutanix.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 22 Oct 2019 15:46:28 +0200
-C=C3=A9dric Le Goater <clg@kaod.org> wrote:
+--69pVuxX8awAiJ7fD
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-> in which individual CPUs are reset. It will ease the introduction of
-> future change reseting the interrupt presenter from the CPU reset
-> handler.
->=20
-> Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
-> ---
+On Mon, Oct 21, 2019 at 08:19:59AM +0000, Liu, Changpeng wrote:
+> There is some logic in vhost_user_blk_handle_output() for now, it's not empty as vhost-user-scsi.
 
-Reviewed-by: Greg Kurz <groug@kaod.org>
+The purpose of the vhost_user_blk_handle_output() code is to deal with
+legacy drivers that violate the VIRTIO spec by accessing virtqueues
+before VIRTIO Device Initialization is complete.  It needs to stay.
 
->  hw/ppc/pnv_core.c | 19 +++++++++++++++----
->  1 file changed, 15 insertions(+), 4 deletions(-)
->=20
-> diff --git a/hw/ppc/pnv_core.c b/hw/ppc/pnv_core.c
-> index b1a7489e7abf..9f981a4940e6 100644
-> --- a/hw/ppc/pnv_core.c
-> +++ b/hw/ppc/pnv_core.c
-> @@ -40,9 +40,8 @@ static const char *pnv_core_cpu_typename(PnvCore *pc)
->      return cpu_type;
->  }
-> =20
-> -static void pnv_cpu_reset(void *opaque)
-> +static void pnv_core_cpu_reset(PowerPCCPU *cpu)
->  {
-> -    PowerPCCPU *cpu =3D opaque;
->      CPUState *cs =3D CPU(cpu);
->      CPUPPCState *env =3D &cpu->env;
-> =20
-> @@ -192,8 +191,17 @@ static void pnv_realize_vcpu(PowerPCCPU *cpu, PnvChi=
-p *chip, Error **errp)
-> =20
->      /* Set time-base frequency to 512 MHz */
->      cpu_ppc_tb_init(env, PNV_TIMEBASE_FREQ);
-> +}
-> +
-> +static void pnv_core_reset(void *dev)
-> +{
-> +    CPUCore *cc =3D CPU_CORE(dev);
-> +    PnvCore *pc =3D PNV_CORE(dev);
-> +    int i;
-> =20
-> -    qemu_register_reset(pnv_cpu_reset, cpu);
-> +    for (i =3D 0; i < cc->nr_threads; i++) {
-> +        pnv_core_cpu_reset(pc->threads[i]);
-> +    }
->  }
-> =20
->  static void pnv_core_realize(DeviceState *dev, Error **errp)
-> @@ -244,6 +252,8 @@ static void pnv_core_realize(DeviceState *dev, Error =
-**errp)
->      snprintf(name, sizeof(name), "xscom-core.%d", cc->core_id);
->      pnv_xscom_region_init(&pc->xscom_regs, OBJECT(dev), pcc->xscom_ops,
->                            pc, name, PNV_XSCOM_EX_SIZE);
-> +
-> +    qemu_register_reset(pnv_core_reset, pc);
->      return;
-> =20
->  err:
-> @@ -259,7 +269,6 @@ static void pnv_unrealize_vcpu(PowerPCCPU *cpu)
->  {
->      PnvCPUState *pnv_cpu =3D pnv_cpu_state(cpu);
-> =20
-> -    qemu_unregister_reset(pnv_cpu_reset, cpu);
->      object_unparent(OBJECT(pnv_cpu_state(cpu)->intc));
->      cpu_remove_sync(CPU(cpu));
->      cpu->machine_data =3D NULL;
-> @@ -273,6 +282,8 @@ static void pnv_core_unrealize(DeviceState *dev, Erro=
-r **errp)
->      CPUCore *cc =3D CPU_CORE(dev);
->      int i;
-> =20
-> +    qemu_unregister_reset(pnv_core_reset, pc);
-> +
->      for (i =3D 0; i < cc->nr_threads; i++) {
->          pnv_unrealize_vcpu(pc->threads[i]);
->      }
+The patch I posted should work together with
+vhost_user_blk_handle_output() though and handle the case that Felipe
+discovered.
+
+Stefan
+
+--69pVuxX8awAiJ7fD
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl2vIW8ACgkQnKSrs4Gr
+c8i7/Af/etq9TWOdabUfTlbjSqg4uSWqITpN4wwR9AVES13HxdBmiEp6eYUInVjX
+JhP1Ja942vjcq3vlw5M9t72iZDf2R2YbuL10hU19S71RxoLQZAijLbETWdqu9a03
+r8EpG63FbVmw70LqiPzw8PhwTYTN+1m/5HZPKUCDLwa826sSjB7QQBnk5e7gfBYl
+TJKTHCHbAUuZT2N6Bc96etKq2Y2eu7LCb8GUqyePpcY2mz1s+YzacRHMZowndAJF
+uQlPnrEuNhkfqDgXwd8OCvh5skCAJXEuoAqqyV+ZiiZFezhDYwMJ0znvJdqkMItj
+OMUHHsE6JRFGjZI402AFCzUbVZ/3wA==
+=4IRO
+-----END PGP SIGNATURE-----
+
+--69pVuxX8awAiJ7fD--
 
 
