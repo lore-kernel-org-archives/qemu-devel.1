@@ -2,63 +2,79 @@ Return-Path: <SRS0=tSBD=YP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4BFE3CA9EB7
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 07:57:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 377B2CA9EA0
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 07:57:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1A7F320B7C
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 07:57:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0174F20B7C
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 07:57:50 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="ckXaX6Ah"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1A7F320B7C
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Hbg5EuNc"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0174F20B7C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51246 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51250 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iMp2g-0003sQ-Pl
-	for qemu-devel@archiver.kernel.org; Tue, 22 Oct 2019 03:57:22 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42336)
+	id 1iMp36-0004d7-Md
+	for qemu-devel@archiver.kernel.org; Tue, 22 Oct 2019 03:57:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42428)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgibson@ozlabs.org>) id 1iMp1K-0002Bu-9h
- for qemu-devel@nongnu.org; Tue, 22 Oct 2019 03:55:59 -0400
+ (envelope-from <armbru@redhat.com>) id 1iMp1j-0002iX-6w
+ for qemu-devel@nongnu.org; Tue, 22 Oct 2019 03:56:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1iMp1I-0005Zr-93
- for qemu-devel@nongnu.org; Tue, 22 Oct 2019 03:55:58 -0400
-Received: from ozlabs.org ([203.11.71.1]:43201)
+ (envelope-from <armbru@redhat.com>) id 1iMp1i-0005s0-3V
+ for qemu-devel@nongnu.org; Tue, 22 Oct 2019 03:56:23 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:27664
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1iMp1E-0005Vw-Ib; Tue, 22 Oct 2019 03:55:55 -0400
-Received: by ozlabs.org (Postfix, from userid 1007)
- id 46y5R84lHlz9sPh; Tue, 22 Oct 2019 18:55:48 +1100 (AEDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1571730948;
- bh=vAp2gikRTBrPeicF8J5RuD9SmmwGPyNfU4muzDVBqP0=;
- h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=ckXaX6AhN8gaFyNwkueeUkmVFSDPkKZ5ZLVOLOB4Rf7SibzCavEAoAmONQBeQUF6/
- Rq8yWOx6zN8ync8nodzRITi1PlX94dv76gm5ea2to+5KEAqHIiQqNcCksxph5uq3O4
- j4LbAYjnU2a+oEDWYZzWe5RWn/4yDNOO+2Jv2j+M=
-Date: Tue, 22 Oct 2019 18:41:15 +1100
-From: David Gibson <david@gibson.dropbear.id.au>
-To: Alexey Kardashevskiy <aik@ozlabs.ru>
-Subject: Re: [GIT PULL for qemu-pseries] pseries: Update SLOF firmware image
-Message-ID: <20191022074115.GJ6439@umbus.fritz.box>
-References: <20191022040945.35730-1-aik@ozlabs.ru>
+ (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1iMp1h-0005pP-Ul
+ for qemu-devel@nongnu.org; Tue, 22 Oct 2019 03:56:22 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1571730980;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=Lnu+O8bz7gJa5hQzmmGc8TgKxI9BbXzl9kBoZ8kZQBE=;
+ b=Hbg5EuNcSoPkIxcA+DAAj+BrRcJmleAZxzPfiZK6SIsLAdeWJWolif8QvILDBVqpNVv1cq
+ wnXC64JFL5uweyVr5IrQb8S/20PllQ7od5ffR8dChwwQ9FNmDuvSdtH1PGmiHktKvvIglv
+ 1XvU8MzP392DP0anWo1cOitNmQtiMC0=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-232-WbSwAS4MPTqYpTKlW4H-yA-1; Tue, 22 Oct 2019 03:56:18 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3175A1800D79
+ for <qemu-devel@nongnu.org>; Tue, 22 Oct 2019 07:56:17 +0000 (UTC)
+Received: from blackfin.pond.sub.org (unknown [10.36.118.123])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id F3CEC60C4E;
+ Tue, 22 Oct 2019 07:56:16 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id 6C3571132D6D; Tue, 22 Oct 2019 09:56:15 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PULL 03/12] qapi: Eliminate accidental global frontend state
+Date: Tue, 22 Oct 2019 09:56:06 +0200
+Message-Id: <20191022075615.956-4-armbru@redhat.com>
+In-Reply-To: <20191022075615.956-1-armbru@redhat.com>
+References: <20191022075615.956-1-armbru@redhat.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="Z8yxTSU1mh2gsre7"
-Content-Disposition: inline
-In-Reply-To: <20191022040945.35730-1-aik@ozlabs.ru>
-User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-MC-Unique: WbSwAS4MPTqYpTKlW4H-yA-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 203.11.71.1
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -70,73 +86,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+The frontend can't be run more than once due to its global state.
+A future commit will want to do that.
 
---Z8yxTSU1mh2gsre7
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+The only global frontend state remaining is accidental:
+QAPISchemaParser.__init__()'s parameter previously_included=3D[].
+Python evaluates the default once, at definition time.  Any
+modifications to it are visible in subsequent calls.  Well-known
+Python trap.  Change the default to None and replace it by the real
+default in the function body.  Use the opportunity to convert
+previously_included to a set.
 
-On Tue, Oct 22, 2019 at 03:09:45PM +1100, Alexey Kardashevskiy wrote:
-> The following changes since commit 7cff77c24d8f5e558cef3538a44044d66aa225=
-a5:
->=20
->   spapr: Move SpaprIrq::nr_xirqs to SpaprMachineClass (2019-10-16 12:01:4=
-1 +1100)
->=20
-> are available in the Git repository at:
->=20
->   git@github.com:aik/qemu.git tags/qemu-slof-20191022
->=20
-> for you to fetch changes up to 8e59d05f71ae783e12a8eb7eb582e0a86ba3d6dc:
->=20
->   pseries: Update SLOF firmware image (2019-10-22 15:05:36 +1100)
+Signed-off-by: Markus Armbruster <armbru@redhat.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+Message-Id: <20191018074345.24034-4-armbru@redhat.com>
+---
+ scripts/qapi/common.py | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
-Applied to ppc-for-4.2, thanks.
-
->=20
-> ----------------------------------------------------------------
-> Alexey Kardashevskiy (1):
->       pseries: Update SLOF firmware image
->=20
->  pc-bios/README   |   2 +-
->  pc-bios/slof.bin | Bin 930640 -> 928552 bytes
->  roms/SLOF        |   2 +-
->  3 files changed, 2 insertions(+), 2 deletions(-)
->=20
->=20
-> *** Note: this is not for master, this is for pseries
->=20
-
+diff --git a/scripts/qapi/common.py b/scripts/qapi/common.py
+index 5abab44302..9d5c05f6a1 100644
+--- a/scripts/qapi/common.py
++++ b/scripts/qapi/common.py
+@@ -391,8 +391,9 @@ class QAPIDoc(object):
+=20
+ class QAPISchemaParser(object):
+=20
+-    def __init__(self, fname, previously_included=3D[], incl_info=3DNone):
+-        previously_included.append(os.path.abspath(fname))
++    def __init__(self, fname, previously_included=3DNone, incl_info=3DNone=
+):
++        previously_included =3D previously_included or set()
++        previously_included.add(os.path.abspath(fname))
+=20
+         try:
+             if sys.version_info[0] >=3D 3:
 --=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
+2.21.0
 
---Z8yxTSU1mh2gsre7
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl2uspkACgkQbDjKyiDZ
-s5IZ7A/9F72VCqamzQUP+p8QQcLGqMCtv0QOYnqu33S/3UyASAuDgaAFD03S6qx1
-Y9BcbVSXFobN9lDU7sKtrZlVNlMehmdcoedMCmMW02Oz4deZzzcVrxSOg4Lkhaq0
-K/IPzhrxKPKl+TcwKAhiQ0ohn08B9TvF3IwO0gvZXhDRclvXtRLRdQVdg5RbP6gi
-aeUiulT7j40IUkmBKys+bjD259ptqdgW8hGtg1RKZkBOxJNNj6gOnTXPdo8sZ0uV
-9ReMgqNqjCEgPK+PrFvEZSGR2wZajf2rl8flqRR+2jZoEyKfOo+J0B9zrWV8y8GP
-MQLXDUM3HhAxq7h+OTcOrr5782q//8UjyvGDgW2Eck7eRac0PY+sn4W+8KuRPwTn
-0vuxQ47ATzHocRpYUcbNGj6Rcr7wv4Od5BhSkXXx5z57D1J/TvAeq8UBNJcc+u/4
-pSxt1eAzCOXSo2A4Jq12rcYOVn8teHvOtImlEASXXszPE9xWsXhSUtZqvMxmVVJ8
-/L38anPmAnEQrxQkDtrCTHtJpF/qBk0/Tq2G9z2nov6VsFu+J3qpX9jN63DLl/50
-akywRcTlizaIVHch9hKyiAyx5Zgk+J1uQ3UAKf8y00RDbmKB5Vgcf3LGos3erS6x
-dBX7ZH3TnPiKUegJVRQl9xGzLtYt57Nn+vMD6j1wcQwP9qVFKmQ=
-=i66+
------END PGP SIGNATURE-----
-
---Z8yxTSU1mh2gsre7--
 
