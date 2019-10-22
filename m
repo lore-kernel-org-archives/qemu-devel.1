@@ -2,89 +2,79 @@ Return-Path: <SRS0=tSBD=YP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 034F2CA9EA0
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 14:29:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 75D95CA9EA0
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 14:31:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C0D1F20700
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 14:29:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3E557205C9
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 14:31:15 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XKVVaf9d"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C0D1F20700
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ZV6DI2kX"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3E557205C9
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59086 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59122 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iMv9u-0006E8-Jx
-	for qemu-devel@archiver.kernel.org; Tue, 22 Oct 2019 10:29:14 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39432)
+	id 1iMvBp-0007sA-Ts
+	for qemu-devel@archiver.kernel.org; Tue, 22 Oct 2019 10:31:13 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47105)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <drjones@redhat.com>) id 1iMuRd-00089u-0C
- for qemu-devel@nongnu.org; Tue, 22 Oct 2019 09:43:30 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1iMv9k-0006LN-Fv
+ for qemu-devel@nongnu.org; Tue, 22 Oct 2019 10:29:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <drjones@redhat.com>) id 1iMuRb-0005sT-Sr
- for qemu-devel@nongnu.org; Tue, 22 Oct 2019 09:43:28 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:24656
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <drjones@redhat.com>) id 1iMuRb-0005sE-O9
- for qemu-devel@nongnu.org; Tue, 22 Oct 2019 09:43:27 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1571751807;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=/W4zpMPfxin2/+pblGLbLKG/XhDmRWhzIIgHVdIhsBk=;
- b=XKVVaf9d4NAdFgvRrj4ASK8dt3nbtVHtmI1Ozp3osO00njoOZt8kAsdIKADgrZt28iMSRK
- a72FZ/6jFqhzYQmOAdorMscjOQIbvAQDDti5iquZCGZZ2XaNToT4hWDR8In3kpySR5STGf
- gadepr1wEF+IdXsk0Rkf94z/bJSKiGo=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-243--gAuC4VSMHON04l7XP0aUg-1; Tue, 22 Oct 2019 09:43:22 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 97C681800D79;
- Tue, 22 Oct 2019 13:43:21 +0000 (UTC)
-Received: from kamzik.brq.redhat.com (unknown [10.43.2.160])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 6F83960C5E;
- Tue, 22 Oct 2019 13:43:17 +0000 (UTC)
-Date: Tue, 22 Oct 2019 15:43:15 +0200
-From: Andrew Jones <drjones@redhat.com>
-To: Beata Michalska <beata.michalska@linaro.org>
-Subject: Re: [PATCH v5 1/9] target/arm/monitor: Introduce
- qmp_query_cpu_model_expansion
-Message-ID: <20191022134315.fuz6dou5f3pxtfte@kamzik.brq.redhat.com>
-References: <20191001125845.8793-1-drjones@redhat.com>
- <20191001125845.8793-2-drjones@redhat.com>
- <CADSWDztJDUEd+_7XnBPWL1bk5Xh=V_aLc1+VrP97_Ycbe3489A@mail.gmail.com>
- <20191015105628.7ln6ph5s3vpsyfuw@kamzik.brq.redhat.com>
- <CADSWDzsKx7+4mR4pmsqi0+rddUv47q=UKwVt509B8g68UoRiMA@mail.gmail.com>
- <CADSWDzs9sdjE+-1AedPnU6o7U5XjTk=dcHf-BXQXQQkrp2O=Bw@mail.gmail.com>
- <20191016135025.k4szpqwgkhfnd6dl@kamzik.brq.redhat.com>
- <CADSWDzuXpTHDtRmTL41CXbk9GmDHO5iEgpiRgnD=buQU+nnXcg@mail.gmail.com>
- <20191016161628.rf752xuu6fzkihun@kamzik.brq.redhat.com>
- <CADSWDzvT7E9P3uEJDV9z+L=HEBuDRwQ904-GG0M9T-NUz+OsoQ@mail.gmail.com>
+ (envelope-from <peter.maydell@linaro.org>) id 1iMv9j-0004qN-6f
+ for qemu-devel@nongnu.org; Tue, 22 Oct 2019 10:29:04 -0400
+Received: from mail-ot1-x32e.google.com ([2607:f8b0:4864:20::32e]:35998)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1iMv9i-0004pb-T8
+ for qemu-devel@nongnu.org; Tue, 22 Oct 2019 10:29:03 -0400
+Received: by mail-ot1-x32e.google.com with SMTP id c7so3569480otm.3
+ for <qemu-devel@nongnu.org>; Tue, 22 Oct 2019 07:29:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=21QePouUgHt/oRxem3nbzuQBIZQnjGNbRt6axQbekyg=;
+ b=ZV6DI2kX8hRYyJFdKMJK4j7oYVcF9+ExSN6Lrihp8YGyfUrufrn7zeGUDyACCKQGcr
+ aukVPQKv43ZjB1hOncwBwssrRK8jQpQIGtMYFwz9IfWDTLVfxDKhWNzjYnXrplLW3tFN
+ 3kV4il9zWWRbTrJMtEWZ9tdYwhnJw5VyudEPq/h9JdMqEVKmjTFNfmBWAWC9LNEw2CFE
+ bQ41I1bD32yMgGRm1nmXqxU/ITK9kcF/gfb9wEclU+g8A8JMKSFBSuRQqBkIgZiHG3IS
+ M97+V+m6XLCG29HCwriV8zY62C1Mk99zl9c/7gjEzZYdkv5XC/sD0GAXm9iwawTx6CYm
+ s73g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=21QePouUgHt/oRxem3nbzuQBIZQnjGNbRt6axQbekyg=;
+ b=DEoJKFVr1651tYCraKCXHDAY/5X3DqVblWahaPw8ty/PGOJkNBAXTBGiacdoq6JQed
+ OeAbDPz6OXrGlpqM9iTmyC7vvtHYEjtZZl2oMIKb/nsx59GYH4y3yaJzPGtwKNiEJ+1p
+ IK9ZrubpSP1bKCEB4DnUTuogzuWNaXxqao6ewk/+SP6v+/Eo4xvZ/DUBOWj6uUnnU3GY
+ Ao0S3kRJYrCtaos2+etWAfBSmzV3F5zUtd4RQy0q8BRh/Fv/cuqzbyWXwZ/p5a7MDsgo
+ IEyAXtEe4w1sj+Pcwi82RJTdq4eoeY/3ot+tQKYInvKz+UP7kWNJzjgmOyHeg8HrE+Vo
+ 4VZQ==
+X-Gm-Message-State: APjAAAVPdHY+sdoUw/nYMLHOfUz9IwqHcRfPt9uaefuja1nCcECy8gVz
+ +wNaaFfL5RbrUH/epw11Qm1gFFRr98OMLwtxmrQZKg==
+X-Google-Smtp-Source: APXvYqznb9r20ockMqyjq1cV+iipowxz6f7jJfK/X3z81jRpyoN8BIi/PEspMLAMvp8RCcPcO7oKdjmsHPdHSoBVCvw=
+X-Received: by 2002:a9d:398a:: with SMTP id y10mr2814807otb.97.1571754541944; 
+ Tue, 22 Oct 2019 07:29:01 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <CADSWDzvT7E9P3uEJDV9z+L=HEBuDRwQ904-GG0M9T-NUz+OsoQ@mail.gmail.com>
-User-Agent: NeoMutt/20180716
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-MC-Unique: -gAuC4VSMHON04l7XP0aUg-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=WINDOWS-1252
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.81
+References: <20191022122145.27792-1-armbru@redhat.com>
+In-Reply-To: <20191022122145.27792-1-armbru@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 22 Oct 2019 15:28:50 +0100
+Message-ID: <CAFEAcA-nZW+RkkRKrfZQ9_nFi7y=wCjciqgFqV5c+8PWeG3Ztg@mail.gmail.com>
+Subject: Re: [PULL v2 00/12] QAPI patches for 2019-10-22
+To: Markus Armbruster <armbru@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::32e
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,52 +86,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org,
- armbru@redhat.com, eric.auger@redhat.com, qemu-arm@nongnu.org,
- imammedo@redhat.com, Dave.Martin@arm.com
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, Oct 21, 2019 at 04:07:14PM +0100, Beata Michalska wrote:
-> Indeed, the patch got bit messed-up. Apologies for that as well.
-> I have been testing manually but I did try the test you have provided
-> and yes it fails - there is a slight problem with the case when qdict_in
-> is empty,but this can be easily solved still keeping the single loop.
-> Otherwise I have seen you have posted a new patchest so I guess we  are
-> dropping the idea of refactoring ?
+On Tue, 22 Oct 2019 at 13:25, Markus Armbruster <armbru@redhat.com> wrote:
+>
+> The following changes since commit e9d42461920f6f40f4d847a5ba18e90d095ed0b9:
+>
+>   Merge remote-tracking branch 'remotes/kraxel/tags/audio-20191018-pull-request' into staging (2019-10-18 14:13:11 +0100)
+>
+> are available in the Git repository at:
+>
+>   git://repo.or.cz/qemu/armbru.git tags/pull-qapi-2019-10-22
+>
+> for you to fetch changes up to 0582bce69e8688fd7dd5501d352695e5c675b89b:
+>
+>   qapi: Allow introspecting fix for savevm's cooperation with blockdev (2019-10-22 09:28:11 +0200)
+>
+> ----------------------------------------------------------------
+> QAPI patches for 2019-10-22
+>
+> v2:
+> * PATCH 6: Add "# -*- coding: utf-8 -*-" lines
+>
 
-Well, without a patch that applies, I couldn't really evaluate your
-proposal. And, TBH, I'd rather not hold this series up on a refactoring
-that doesn't provide measurable performance improvements, especially when
-it's not in a performance critical path. Indeed, I'd like to get this
-series merged as soon as possible, which is why I posted v6 with your
-visit_free() fix already.
+Still fails, same way. Both your pullreq emails have the same
+"changes up to 0582bce69e8688fd7d" line -- did you forget
+to push the changed patches or something ?
 
->=20
-> One more question: in case of querying a property which is not supported
-> by given cpu model - we are returning properties that are actually valid
-> (the test case for cortex-a15 and aarch64 prop).
-> Shouldn't we return an error there? I honestly must admit I do not know
-> what is the expected behaviour for the qmp query in such cases.
-
-We do generate an error for that case:
-
-(QEMU) query-cpu-model-expansion type=3Dfull model=3D{"name":"cortex-a15"}
-{"return": {"model": {"name": "cortex-a15", "props": {"pmu": true}}}}
-
-(QEMU) query-cpu-model-expansion type=3Dfull model=3D{"name":"cortex-a15","=
-props":{"aarch64":false}}
-{"error": {"class": "GenericError", "desc": "Property '.aarch64' not found"=
-}}
-
-
-If you have any more comments on the series, please send them right away.
-I'd like Peter to be able to merge this soon, and I understand that he's
-waiting on your review.
-
-Thanks,
-drew
-
+thanks
+-- PMM
 
