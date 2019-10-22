@@ -2,63 +2,82 @@ Return-Path: <SRS0=tSBD=YP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_2 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 96654CA9EA0
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 20:28:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7668FCA9EA0
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 20:36:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4D511214B2
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 20:28:30 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4D511214B2
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id 39CAD21848
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 20:36:44 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DFR/6zoe"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 39CAD21848
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43906 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44120 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iN0lZ-0002PN-Fh
-	for qemu-devel@archiver.kernel.org; Tue, 22 Oct 2019 16:28:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45525)
+	id 1iN0tX-0005Ml-BP
+	for qemu-devel@archiver.kernel.org; Tue, 22 Oct 2019 16:36:43 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46335)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <groug@kaod.org>) id 1iN0kF-0001Vj-31
- for qemu-devel@nongnu.org; Tue, 22 Oct 2019 16:27:09 -0400
+ (envelope-from <aleksandar.m.mail@gmail.com>) id 1iN0sl-0004nK-8C
+ for qemu-devel@nongnu.org; Tue, 22 Oct 2019 16:35:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <groug@kaod.org>) id 1iN0kC-0007QB-SV
- for qemu-devel@nongnu.org; Tue, 22 Oct 2019 16:27:06 -0400
-Received: from 9.mo173.mail-out.ovh.net ([46.105.72.44]:51830)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <groug@kaod.org>) id 1iN0kC-0007PE-JE
- for qemu-devel@nongnu.org; Tue, 22 Oct 2019 16:27:04 -0400
-Received: from player729.ha.ovh.net (unknown [10.108.42.239])
- by mo173.mail-out.ovh.net (Postfix) with ESMTP id 3EE6E11CE0F
- for <qemu-devel@nongnu.org>; Tue, 22 Oct 2019 22:27:02 +0200 (CEST)
-Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
- [82.253.208.248]) (Authenticated sender: groug@kaod.org)
- by player729.ha.ovh.net (Postfix) with ESMTPSA id 72232B6FDA9E;
- Tue, 22 Oct 2019 20:26:56 +0000 (UTC)
-Date: Tue, 22 Oct 2019 22:26:54 +0200
-From: Greg Kurz <groug@kaod.org>
-To: =?UTF-8?B?Q8OpZHJpYw==?= Le Goater <clg@kaod.org>
-Subject: Re: [PATCH v5 5/7] ppc: Reset the interrupt presenter from the CPU
- reset handler
-Message-ID: <20191022222654.33c936ae@bahia.lan>
-In-Reply-To: <20191022163812.330-6-clg@kaod.org>
-References: <20191022163812.330-1-clg@kaod.org>
- <20191022163812.330-6-clg@kaod.org>
-X-Mailer: Claws Mail 3.17.4 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+ (envelope-from <aleksandar.m.mail@gmail.com>) id 1iN0sj-0001yM-Cf
+ for qemu-devel@nongnu.org; Tue, 22 Oct 2019 16:35:54 -0400
+Received: from mail-oi1-x22c.google.com ([2607:f8b0:4864:20::22c]:40489)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
+ id 1iN0sj-0001yI-59; Tue, 22 Oct 2019 16:35:53 -0400
+Received: by mail-oi1-x22c.google.com with SMTP id b25so3774390oib.7;
+ Tue, 22 Oct 2019 13:35:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:in-reply-to:references:from:date:message-id:subject:to
+ :cc; bh=YPmj/nroWY0pTnSVHHA4UhdKmPCO0A3bdgtwqRgYaGo=;
+ b=DFR/6zoeVy6/EZZquIR4CKBenL9MCjSYmfcOatm/SFh2JfvsQGJJtk3gsSqYiNWPim
+ sTPbyTIrJb726fC/REzZmiYwFN3v2MuL55rQT4GRi3uA4nEzlQzTiuA4AgyfKOXleEd3
+ 9itqkBs//KECiYMu2XsU5YCSpuUwrQiDEtcKkRzz0SlGH04PqcsVJ8deKupznYK7ZEaM
+ kPG3mjObZgidxuX60sdZfcp/0iFNNFgjgo7T9LSnjEXDt9jUIOtWa8VyJm+Jzsbsdc2U
+ cHBJMU0SbzJwSsGaC57gPeRYgQA4engp4TZoBd0cIR7wYK296eyBRNLjJR6VP7ISsZnw
+ G5eg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:in-reply-to:references:from:date
+ :message-id:subject:to:cc;
+ bh=YPmj/nroWY0pTnSVHHA4UhdKmPCO0A3bdgtwqRgYaGo=;
+ b=hfHxaj2QgRRYDcyTnJQ05avruiB/pNZJSZ/AuOzeyf1qpgl9l7V4Xrw0d4aghKI6cR
+ m3l7Y+5DlJSwYE7LV/cZrmb0nMGOaXH2YF1FRTOMS3LRhl9SJwq+ysH1LgfMpdakj2OI
+ 7wnXsaUGtTwVj0/107KbBnFQGuicutywe4F+c28+WnqwXrrt1sjQEWdRxM0HLv2+DXyp
+ I56IxjEglHW+939xS5OfmweCGCtx0h4zA7U/tuznV5c1bVEdRAc247wYGyo/OnEO3/Wk
+ 2D5BFG4zCnqpTwNwcCIE35x+/NOYyFOBvOfWxrfjl2sEXVMOAmM1k/hIUCbjUL0tAPxY
+ mUEw==
+X-Gm-Message-State: APjAAAXZF3LGXMyDaTQbxew1pdBC1u/KliStAUwzDDkmZTPkPaJLjDPh
+ 4l4Ru1s+l07VpUapjSgNxoHf+1SdewApxCvI2nM=
+X-Google-Smtp-Source: APXvYqy5CEdCgvPAm5uRl5gixuERACt1C00QNn6PxVDKprY7gloOD6Eyig0YnOSySs1jluNMdMT0SF/eIW3hBkJljFs=
+X-Received: by 2002:aca:4d12:: with SMTP id a18mr4382186oib.79.1571776552341; 
+ Tue, 22 Oct 2019 13:35:52 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-Ovh-Tracer-Id: 7355785568373283211
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrkeejgdduhedtucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddm
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 46.105.72.44
+Received: by 2002:a9d:340a:0:0:0:0:0 with HTTP; Tue, 22 Oct 2019 13:35:51
+ -0700 (PDT)
+In-Reply-To: <20191008082815.8267-1-thuth@redhat.com>
+References: <20191008082815.8267-1-thuth@redhat.com>
+From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+Date: Tue, 22 Oct 2019 22:35:51 +0200
+Message-ID: <CAL1e-=ihiQiFptBKHyVEo_DZv5xHwa7eGuM7UFLo_c5DbYtxhA@mail.gmail.com>
+Subject: Re: [PATCH v2] Makefile: Remove generated files when doing
+ 'distclean' (and 'clean')
+To: Thomas Huth <thuth@redhat.com>
+Content-Type: multipart/alternative; boundary="000000000000119323059585bf78"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::22c
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -70,407 +89,231 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <philmd@redhat.com>,
- qemu-ppc@nongnu.org, qemu-devel@nongnu.org,
- David Gibson <david@gibson.dropbear.id.au>
+Cc: "qemu-trivial@nongnu.org" <qemu-trivial@nongnu.org>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 22 Oct 2019 18:38:10 +0200
-C=C3=A9dric Le Goater <clg@kaod.org> wrote:
+--000000000000119323059585bf78
+Content-Type: text/plain; charset="UTF-8"
 
-> On the sPAPR machine and PowerNV machine, the interrupt presenters are
-> created by a machine handler at the core level and are reset
-> independently. This is not consistent and it raises issues when it
-> comes to handle hot-plugged CPUs. In that case, the presenters are not
-> reset. This is less of an issue in XICS, although a zero MFFR could
-> be a concern, but in XIVE, the OS CAM line is not set and this breaks
-> the presenting algorithm. The current code has workarounds which need
-> a global cleanup.
->=20
-> Extend the sPAPR IRQ backend and the PowerNV Chip class with a new
-> cpu_intc_reset() handler called by the CPU reset handler and remove
-> the XiveTCTX reset handler which is now redundant.
->=20
-> Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
+On Tuesday, October 8, 2019, Thomas Huth <thuth@redhat.com> wrote:
+
+> When running "make distclean" we currently leave a lot of generated
+> files in the build directory. These should be completely removed.
+> Some of the generated files are removed in the "clean" target (which
+> is a prerequisite for the "distclean" target), since binary files
+> should be removed in this step already.
+>
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
 > ---
+>  v2:
+>  - Remove tests/qemu-iotests/common.env in "distclean", not in "clean"
+>  - Improved patch description
+>
+>  Makefile               |  6 +++---
+>  tests/Makefile.include | 12 +++++++++++-
+>  2 files changed, 14 insertions(+), 4 deletions(-)
+>
+> Hello, Thomas,
 
-Reviewed-by: Greg Kurz <groug@kaod.org>
+Do you intend to send a new version of this patch?
 
->  include/hw/ppc/pnv.h       |  1 +
->  include/hw/ppc/spapr_irq.h |  2 ++
->  include/hw/ppc/xics.h      |  1 +
->  include/hw/ppc/xive.h      |  1 +
->  hw/intc/spapr_xive.c       |  9 +++++++++
->  hw/intc/xics.c             |  8 ++------
->  hw/intc/xics_spapr.c       |  7 +++++++
->  hw/intc/xive.c             | 12 +-----------
->  hw/ppc/pnv.c               | 18 ++++++++++++++++++
->  hw/ppc/pnv_core.c          |  7 +++++--
->  hw/ppc/spapr_cpu_core.c    |  5 ++++-
->  hw/ppc/spapr_irq.c         | 14 ++++++++++++++
->  12 files changed, 65 insertions(+), 20 deletions(-)
->=20
-> diff --git a/include/hw/ppc/pnv.h b/include/hw/ppc/pnv.h
-> index 1cdbe55bf86c..2a780e633f23 100644
-> --- a/include/hw/ppc/pnv.h
-> +++ b/include/hw/ppc/pnv.h
-> @@ -111,6 +111,7 @@ typedef struct PnvChipClass {
-> =20
->      uint32_t (*core_pir)(PnvChip *chip, uint32_t core_id);
->      void (*intc_create)(PnvChip *chip, PowerPCCPU *cpu, Error **errp);
-> +    void (*intc_reset)(PnvChip *chip, PowerPCCPU *cpu);
->      ISABus *(*isa_create)(PnvChip *chip, Error **errp);
->      void (*dt_populate)(PnvChip *chip, void *fdt);
->      void (*pic_print_info)(PnvChip *chip, Monitor *mon);
-> diff --git a/include/hw/ppc/spapr_irq.h b/include/hw/ppc/spapr_irq.h
-> index 5e150a667902..09232999b07e 100644
-> --- a/include/hw/ppc/spapr_irq.h
-> +++ b/include/hw/ppc/spapr_irq.h
-> @@ -52,6 +52,7 @@ typedef struct SpaprInterruptControllerClass {
->       */
->      int (*cpu_intc_create)(SpaprInterruptController *intc,
->                              PowerPCCPU *cpu, Error **errp);
-> +    void (*cpu_intc_reset)(SpaprInterruptController *intc, PowerPCCPU *c=
-pu);
->      int (*claim_irq)(SpaprInterruptController *intc, int irq, bool lsi,
->                       Error **errp);
->      void (*free_irq)(SpaprInterruptController *intc, int irq);
-> @@ -68,6 +69,7 @@ void spapr_irq_update_active_intc(SpaprMachineState *sp=
-apr);
-> =20
->  int spapr_irq_cpu_intc_create(SpaprMachineState *spapr,
->                                PowerPCCPU *cpu, Error **errp);
-> +void spapr_irq_cpu_intc_reset(SpaprMachineState *spapr, PowerPCCPU *cpu);
->  void spapr_irq_print_info(SpaprMachineState *spapr, Monitor *mon);
->  void spapr_irq_dt(SpaprMachineState *spapr, uint32_t nr_servers,
->                    void *fdt, uint32_t phandle);
-> diff --git a/include/hw/ppc/xics.h b/include/hw/ppc/xics.h
-> index 1e6a9300eb2b..602173c12250 100644
-> --- a/include/hw/ppc/xics.h
-> +++ b/include/hw/ppc/xics.h
-> @@ -161,6 +161,7 @@ void icp_set_mfrr(ICPState *icp, uint8_t mfrr);
->  uint32_t icp_accept(ICPState *ss);
->  uint32_t icp_ipoll(ICPState *ss, uint32_t *mfrr);
->  void icp_eoi(ICPState *icp, uint32_t xirr);
-> +void icp_reset(ICPState *icp);
-> =20
->  void ics_write_xive(ICSState *ics, int nr, int server,
->                      uint8_t priority, uint8_t saved_priority);
-> diff --git a/include/hw/ppc/xive.h b/include/hw/ppc/xive.h
-> index fd3319bd3202..99381639f50c 100644
-> --- a/include/hw/ppc/xive.h
-> +++ b/include/hw/ppc/xive.h
-> @@ -415,6 +415,7 @@ uint64_t xive_tctx_tm_read(XiveTCTX *tctx, hwaddr off=
-set, unsigned size);
-> =20
->  void xive_tctx_pic_print_info(XiveTCTX *tctx, Monitor *mon);
->  Object *xive_tctx_create(Object *cpu, XiveRouter *xrtr, Error **errp);
-> +void xive_tctx_reset(XiveTCTX *tctx);
-> =20
->  static inline uint32_t xive_nvt_cam_line(uint8_t nvt_blk, uint32_t nvt_i=
-dx)
->  {
-> diff --git a/hw/intc/spapr_xive.c b/hw/intc/spapr_xive.c
-> index ba32d2cc5b0f..20a8d8285f64 100644
-> --- a/hw/intc/spapr_xive.c
-> +++ b/hw/intc/spapr_xive.c
-> @@ -553,6 +553,14 @@ static int spapr_xive_cpu_intc_create(SpaprInterrupt=
-Controller *intc,
->      return 0;
->  }
-> =20
-> +static void spapr_xive_cpu_intc_reset(SpaprInterruptController *intc,
-> +                                     PowerPCCPU *cpu)
-> +{
-> +    XiveTCTX *tctx =3D spapr_cpu_state(cpu)->tctx;
-> +
-> +    xive_tctx_reset(tctx);
-> +}
-> +
->  static void spapr_xive_set_irq(SpaprInterruptController *intc, int irq, =
-int val)
->  {
->      SpaprXive *xive =3D SPAPR_XIVE(intc);
-> @@ -697,6 +705,7 @@ static void spapr_xive_class_init(ObjectClass *klass,=
- void *data)
->      sicc->activate =3D spapr_xive_activate;
->      sicc->deactivate =3D spapr_xive_deactivate;
->      sicc->cpu_intc_create =3D spapr_xive_cpu_intc_create;
-> +    sicc->cpu_intc_reset =3D spapr_xive_cpu_intc_reset;
->      sicc->claim_irq =3D spapr_xive_claim_irq;
->      sicc->free_irq =3D spapr_xive_free_irq;
->      sicc->set_irq =3D spapr_xive_set_irq;
-> diff --git a/hw/intc/xics.c b/hw/intc/xics.c
-> index b5ac408f7b74..6da05763f9db 100644
-> --- a/hw/intc/xics.c
-> +++ b/hw/intc/xics.c
-> @@ -274,10 +274,8 @@ static const VMStateDescription vmstate_icp_server =
-=3D {
->      },
->  };
-> =20
-> -static void icp_reset_handler(void *dev)
-> +void icp_reset(ICPState *icp)
->  {
-> -    ICPState *icp =3D ICP(dev);
-> -
->      icp->xirr =3D 0;
->      icp->pending_priority =3D 0xff;
->      icp->mfrr =3D 0xff;
-> @@ -288,7 +286,7 @@ static void icp_reset_handler(void *dev)
->      if (kvm_irqchip_in_kernel()) {
->          Error *local_err =3D NULL;
-> =20
-> -        icp_set_kvm_state(ICP(dev), &local_err);
-> +        icp_set_kvm_state(icp, &local_err);
->          if (local_err) {
->              error_report_err(local_err);
->          }
-> @@ -351,7 +349,6 @@ static void icp_realize(DeviceState *dev, Error **err=
-p)
->          }
->      }
-> =20
-> -    qemu_register_reset(icp_reset_handler, dev);
->      vmstate_register(NULL, icp->cs->cpu_index, &vmstate_icp_server, icp);
->  }
-> =20
-> @@ -360,7 +357,6 @@ static void icp_unrealize(DeviceState *dev, Error **e=
-rrp)
->      ICPState *icp =3D ICP(dev);
-> =20
->      vmstate_unregister(NULL, &vmstate_icp_server, icp);
-> -    qemu_unregister_reset(icp_reset_handler, dev);
->  }
-> =20
->  static void icp_class_init(ObjectClass *klass, void *data)
-> diff --git a/hw/intc/xics_spapr.c b/hw/intc/xics_spapr.c
-> index 4f64b9a9fc66..7418fb9f370c 100644
-> --- a/hw/intc/xics_spapr.c
-> +++ b/hw/intc/xics_spapr.c
-> @@ -346,6 +346,12 @@ static int xics_spapr_cpu_intc_create(SpaprInterrupt=
-Controller *intc,
->      return 0;
->  }
-> =20
-> +static void xics_spapr_cpu_intc_reset(SpaprInterruptController *intc,
-> +                                     PowerPCCPU *cpu)
-> +{
-> +    icp_reset(spapr_cpu_state(cpu)->icp);
-> +}
-> +
->  static int xics_spapr_claim_irq(SpaprInterruptController *intc, int irq,
->                                  bool lsi, Error **errp)
->  {
-> @@ -433,6 +439,7 @@ static void ics_spapr_class_init(ObjectClass *klass, =
-void *data)
->      sicc->activate =3D xics_spapr_activate;
->      sicc->deactivate =3D xics_spapr_deactivate;
->      sicc->cpu_intc_create =3D xics_spapr_cpu_intc_create;
-> +    sicc->cpu_intc_reset =3D xics_spapr_cpu_intc_reset;
->      sicc->claim_irq =3D xics_spapr_claim_irq;
->      sicc->free_irq =3D xics_spapr_free_irq;
->      sicc->set_irq =3D xics_spapr_set_irq;
-> diff --git a/hw/intc/xive.c b/hw/intc/xive.c
-> index d420c6571e14..f066be5eb5e3 100644
-> --- a/hw/intc/xive.c
-> +++ b/hw/intc/xive.c
-> @@ -547,10 +547,8 @@ void xive_tctx_pic_print_info(XiveTCTX *tctx, Monito=
-r *mon)
->      }
->  }
-> =20
-> -static void xive_tctx_reset(void *dev)
-> +void xive_tctx_reset(XiveTCTX *tctx)
->  {
-> -    XiveTCTX *tctx =3D XIVE_TCTX(dev);
-> -
->      memset(tctx->regs, 0, sizeof(tctx->regs));
-> =20
->      /* Set some defaults */
-> @@ -607,13 +605,6 @@ static void xive_tctx_realize(DeviceState *dev, Erro=
-r **errp)
->              return;
->          }
->      }
-> -
-> -    qemu_register_reset(xive_tctx_reset, dev);
-> -}
-> -
-> -static void xive_tctx_unrealize(DeviceState *dev, Error **errp)
-> -{
-> -    qemu_unregister_reset(xive_tctx_reset, dev);
->  }
-> =20
->  static int vmstate_xive_tctx_pre_save(void *opaque)
-> @@ -668,7 +659,6 @@ static void xive_tctx_class_init(ObjectClass *klass, =
-void *data)
-> =20
->      dc->desc =3D "XIVE Interrupt Thread Context";
->      dc->realize =3D xive_tctx_realize;
-> -    dc->unrealize =3D xive_tctx_unrealize;
->      dc->vmsd =3D &vmstate_xive_tctx;
->      /*
->       * Reason: part of XIVE interrupt controller, needs to be wired up
-> diff --git a/hw/ppc/pnv.c b/hw/ppc/pnv.c
-> index 7cf64b6d2533..4a51fb65a834 100644
-> --- a/hw/ppc/pnv.c
-> +++ b/hw/ppc/pnv.c
-> @@ -778,6 +778,13 @@ static void pnv_chip_power8_intc_create(PnvChip *chi=
-p, PowerPCCPU *cpu,
->      pnv_cpu->intc =3D obj;
->  }
-> =20
-> +static void pnv_chip_power8_intc_reset(PnvChip *chip, PowerPCCPU *cpu)
-> +{
-> +    PnvCPUState *pnv_cpu =3D pnv_cpu_state(cpu);
-> +
-> +    icp_reset(ICP(pnv_cpu->intc));
-> +}
-> +
->  /*
->   *    0:48  Reserved - Read as zeroes
->   *   49:52  Node ID
-> @@ -815,6 +822,13 @@ static void pnv_chip_power9_intc_create(PnvChip *chi=
-p, PowerPCCPU *cpu,
->      pnv_cpu->intc =3D obj;
->  }
-> =20
-> +static void pnv_chip_power9_intc_reset(PnvChip *chip, PowerPCCPU *cpu)
-> +{
-> +    PnvCPUState *pnv_cpu =3D pnv_cpu_state(cpu);
-> +
-> +    xive_tctx_reset(XIVE_TCTX(pnv_cpu->intc));
-> +}
-> +
->  /*
->   * Allowed core identifiers on a POWER8 Processor Chip :
->   *
-> @@ -984,6 +998,7 @@ static void pnv_chip_power8e_class_init(ObjectClass *=
-klass, void *data)
->      k->cores_mask =3D POWER8E_CORE_MASK;
->      k->core_pir =3D pnv_chip_core_pir_p8;
->      k->intc_create =3D pnv_chip_power8_intc_create;
-> +    k->intc_reset =3D pnv_chip_power8_intc_reset;
->      k->isa_create =3D pnv_chip_power8_isa_create;
->      k->dt_populate =3D pnv_chip_power8_dt_populate;
->      k->pic_print_info =3D pnv_chip_power8_pic_print_info;
-> @@ -1003,6 +1018,7 @@ static void pnv_chip_power8_class_init(ObjectClass =
-*klass, void *data)
->      k->cores_mask =3D POWER8_CORE_MASK;
->      k->core_pir =3D pnv_chip_core_pir_p8;
->      k->intc_create =3D pnv_chip_power8_intc_create;
-> +    k->intc_reset =3D pnv_chip_power8_intc_reset;
->      k->isa_create =3D pnv_chip_power8_isa_create;
->      k->dt_populate =3D pnv_chip_power8_dt_populate;
->      k->pic_print_info =3D pnv_chip_power8_pic_print_info;
-> @@ -1022,6 +1038,7 @@ static void pnv_chip_power8nvl_class_init(ObjectCla=
-ss *klass, void *data)
->      k->cores_mask =3D POWER8_CORE_MASK;
->      k->core_pir =3D pnv_chip_core_pir_p8;
->      k->intc_create =3D pnv_chip_power8_intc_create;
-> +    k->intc_reset =3D pnv_chip_power8_intc_reset;
->      k->isa_create =3D pnv_chip_power8nvl_isa_create;
->      k->dt_populate =3D pnv_chip_power8_dt_populate;
->      k->pic_print_info =3D pnv_chip_power8_pic_print_info;
-> @@ -1191,6 +1208,7 @@ static void pnv_chip_power9_class_init(ObjectClass =
-*klass, void *data)
->      k->cores_mask =3D POWER9_CORE_MASK;
->      k->core_pir =3D pnv_chip_core_pir_p9;
->      k->intc_create =3D pnv_chip_power9_intc_create;
-> +    k->intc_reset =3D pnv_chip_power9_intc_reset;
->      k->isa_create =3D pnv_chip_power9_isa_create;
->      k->dt_populate =3D pnv_chip_power9_dt_populate;
->      k->pic_print_info =3D pnv_chip_power9_pic_print_info;
-> diff --git a/hw/ppc/pnv_core.c b/hw/ppc/pnv_core.c
-> index cc17bbfed829..be0310ac0340 100644
-> --- a/hw/ppc/pnv_core.c
-> +++ b/hw/ppc/pnv_core.c
-> @@ -40,10 +40,11 @@ static const char *pnv_core_cpu_typename(PnvCore *pc)
->      return cpu_type;
->  }
-> =20
-> -static void pnv_core_cpu_reset(PowerPCCPU *cpu)
-> +static void pnv_core_cpu_reset(PowerPCCPU *cpu, PnvChip *chip)
->  {
->      CPUState *cs =3D CPU(cpu);
->      CPUPPCState *env =3D &cpu->env;
-> +    PnvChipClass *pcc =3D PNV_CHIP_GET_CLASS(chip);
-> =20
->      cpu_reset(cs);
-> =20
-> @@ -54,6 +55,8 @@ static void pnv_core_cpu_reset(PowerPCCPU *cpu)
->      env->gpr[3] =3D PNV_FDT_ADDR;
->      env->nip =3D 0x10;
->      env->msr |=3D MSR_HVB; /* Hypervisor mode */
-> +
-> +    pcc->intc_reset(chip, cpu);
->  }
-> =20
->  /*
-> @@ -200,7 +203,7 @@ static void pnv_core_reset(void *dev)
->      int i;
-> =20
->      for (i =3D 0; i < cc->nr_threads; i++) {
-> -        pnv_core_cpu_reset(pc->threads[i]);
-> +        pnv_core_cpu_reset(pc->threads[i], pc->chip);
->      }
->  }
-> =20
-> diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
-> index 2e34832d0ea2..ef7b27a66d56 100644
-> --- a/hw/ppc/spapr_cpu_core.c
-> +++ b/hw/ppc/spapr_cpu_core.c
-> @@ -32,6 +32,7 @@ static void spapr_reset_vcpu(PowerPCCPU *cpu)
->      PowerPCCPUClass *pcc =3D POWERPC_CPU_GET_CLASS(cpu);
->      SpaprCpuState *spapr_cpu =3D spapr_cpu_state(cpu);
->      target_ulong lpcr;
-> +    SpaprMachineState *spapr =3D SPAPR_MACHINE(qdev_get_machine());
-> =20
->      cpu_reset(cs);
-> =20
-> @@ -76,9 +77,11 @@ static void spapr_reset_vcpu(PowerPCCPU *cpu)
->      spapr_cpu->dtl_addr =3D 0;
->      spapr_cpu->dtl_size =3D 0;
-> =20
-> -    spapr_caps_cpu_apply(SPAPR_MACHINE(qdev_get_machine()), cpu);
-> +    spapr_caps_cpu_apply(spapr, cpu);
-> =20
->      kvm_check_mmu(cpu, &error_fatal);
-> +
-> +    spapr_irq_cpu_intc_reset(spapr, cpu);
->  }
-> =20
->  void spapr_cpu_set_entry_state(PowerPCCPU *cpu, target_ulong nip, target=
-_ulong r3)
-> diff --git a/hw/ppc/spapr_irq.c b/hw/ppc/spapr_irq.c
-> index 234d1073e518..b941608b69ba 100644
-> --- a/hw/ppc/spapr_irq.c
-> +++ b/hw/ppc/spapr_irq.c
-> @@ -220,6 +220,20 @@ int spapr_irq_cpu_intc_create(SpaprMachineState *spa=
-pr,
->      return 0;
->  }
-> =20
-> +void spapr_irq_cpu_intc_reset(SpaprMachineState *spapr, PowerPCCPU *cpu)
-> +{
-> +    SpaprInterruptController *intcs[] =3D ALL_INTCS(spapr);
-> +    int i;
-> +
-> +    for (i =3D 0; i < ARRAY_SIZE(intcs); i++) {
-> +        SpaprInterruptController *intc =3D intcs[i];
-> +        if (intc) {
-> +            SpaprInterruptControllerClass *sicc =3D SPAPR_INTC_GET_CLASS=
-(intc);
-> +            sicc->cpu_intc_reset(intc, cpu);
-> +        }
-> +    }
-> +}
-> +
->  static void spapr_set_irq(void *opaque, int irq, int level)
->  {
->      SpaprMachineState *spapr =3D SPAPR_MACHINE(opaque);
+It looks to me this is a very nice clean up that definitely should go into
+4.2, no?
 
+Aleksandat
+
+
+
+> diff --git a/Makefile b/Makefile
+> index 30f0abfb42..767b1ffb25 100644
+> --- a/Makefile
+> +++ b/Makefile
+> @@ -696,14 +696,14 @@ clean: recurse-clean
+>                 -exec rm {} +
+>         rm -f $(edk2-decompressed)
+>         rm -f $(filter-out %.tlb,$(TOOLS)) $(HELPERS-y) TAGS cscope.*
+> *.pod *~ */*~
+> -       rm -f fsdev/*.pod scsi/*.pod
+> +       rm -f fsdev/*.pod scsi/*.pod docs/*.pod docs/*/*.pod
+> docs/*/.buildinfo
+>         rm -f qemu-img-cmds.h
+>         rm -f ui/shader/*-vert.h ui/shader/*-frag.h
+>         @# May not be present in generated-files-y
+>         rm -f trace/generated-tracers-dtrace.dtrace*
+>         rm -f trace/generated-tracers-dtrace.h*
+>         rm -f $(foreach f,$(generated-files-y),$(f) $(f)-timestamp)
+> -       rm -f qapi-gen-timestamp
+> +       rm -f qapi-gen-timestamp vhost-user-input
+>         rm -rf qga/qapi-generated
+>         rm -f config-all-devices.mak
+>
+> @@ -724,7 +724,7 @@ distclean: clean
+>         rm -f tests/tcg/config-*.mak
+>         rm -f config-all-devices.mak config-all-disas.mak config.status
+>         rm -f $(SUBDIR_DEVICES_MAK)
+> -       rm -f po/*.mo tests/qemu-iotests/common.env
+> +       rm -f po/*.mo
+>         rm -f roms/seabios/config.mak roms/vgabios/config.mak
+>         rm -f qemu-doc.info qemu-doc.aux qemu-doc.cp qemu-doc.cps
+>         rm -f qemu-doc.fn qemu-doc.fns qemu-doc.info qemu-doc.ky
+> qemu-doc.kys
+> diff --git a/tests/Makefile.include b/tests/Makefile.include
+> index 3543451ed3..694f193fb6 100644
+> --- a/tests/Makefile.include
+> +++ b/tests/Makefile.include
+> @@ -1176,11 +1176,21 @@ check: check-block check-qapi-schema check-unit
+> check-softfloat check-qtest chec
+>  check-clean:
+>         rm -rf $(check-unit-y) tests/*.o $(QEMU_IOTESTS_HELPERS-y)
+>         rm -rf $(sort $(foreach target,$(SYSEMU_TARGET_LIST),
+> $(check-qtest-$(target)-y)) $(check-qtest-generic-y))
+> -       rm -f tests/test-qapi-gen-timestamp
+>         rm -rf $(TESTS_VENV_DIR) $(TESTS_RESULTS_DIR)
+> +       rm -f tests/test-qapi-gen-timestamp tests/qht-bench$(EXESUF) \
+> +               tests/fp/fp-test tests/fp/*.out tests/qapi-schema/*.test.*
+>
+>  clean: check-clean
+>
+> +check-distclean:
+> +       rm -f tests/qemu-iotests/common.env tests/qemu-iotests/check.*
+> +       rm -f tests/test-qapi-types*.c tests/test-qapi-visit*.c \
+> +               tests/test-qapi-commands*.c tests/test-qapi-events*.c \
+> +               tests/test-qapi-emit-events.[ch]
+> tests/test-qapi-introspect.c \
+> +               tests/include/test-qapi-*.c
+> +
+> +distclean: check-distclean
+> +
+>  # Build the help program automatically
+>
+>  all: $(QEMU_IOTESTS_HELPERS-y)
+> --
+> 2.18.1
+>
+>
+>
+
+--000000000000119323059585bf78
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+<br><br>On Tuesday, October 8, 2019, Thomas Huth &lt;<a href=3D"mailto:thut=
+h@redhat.com">thuth@redhat.com</a>&gt; wrote:<br><blockquote class=3D"gmail=
+_quote" style=3D"margin:0 0 0 .8ex;border-left:1px #ccc solid;padding-left:=
+1ex">When running &quot;make distclean&quot; we currently leave a lot of ge=
+nerated<br>
+files in the build directory. These should be completely removed.<br>
+Some of the generated files are removed in the &quot;clean&quot; target (wh=
+ich<br>
+is a prerequisite for the &quot;distclean&quot; target), since binary files=
+<br>
+should be removed in this step already.<br>
+<br>
+Signed-off-by: Thomas Huth &lt;<a href=3D"mailto:thuth@redhat.com">thuth@re=
+dhat.com</a>&gt;<br>
+---<br>
+=C2=A0v2:<br>
+=C2=A0- Remove tests/qemu-iotests/common.env in &quot;distclean&quot;, not =
+in &quot;clean&quot;<br>
+=C2=A0- Improved patch description<br>
+<br>
+=C2=A0Makefile=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0|=C2=
+=A0 6 +++---<br>
+=C2=A0tests/Makefile.include | 12 +++++++++++-<br>
+=C2=A02 files changed, 14 insertions(+), 4 deletions(-)<br>
+<br></blockquote><div>Hello, Thomas,</div><div><br></div><div>Do you intend=
+ to send a new version of this patch?</div><div><br></div><div>It looks to =
+me this is a very nice clean up that definitely should go into 4.2, no?</di=
+v><div><br></div><div>Aleksandat</div><div><br></div><div>=C2=A0</div><bloc=
+kquote class=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;border-left:1px #cc=
+c solid;padding-left:1ex">
+diff --git a/Makefile b/Makefile<br>
+index 30f0abfb42..767b1ffb25 100644<br>
+--- a/Makefile<br>
++++ b/Makefile<br>
+@@ -696,14 +696,14 @@ clean: recurse-clean<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 -exec rm {} +<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 rm -f $(edk2-decompressed)<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 rm -f $(filter-out %.tlb,$(TOOLS)) $(HELPERS-y)=
+ TAGS cscope.* *.pod *~ */*~<br>
+-=C2=A0 =C2=A0 =C2=A0 =C2=A0rm -f fsdev/*.pod scsi/*.pod<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0rm -f fsdev/*.pod scsi/*.pod docs/*.pod docs/*/=
+*.pod docs/*/.buildinfo<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 rm -f qemu-img-cmds.h<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 rm -f ui/shader/*-vert.h ui/shader/*-frag.h<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 @# May not be present in generated-files-y<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 rm -f trace/generated-tracers-<wbr>dtrace.dtrac=
+e*<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 rm -f trace/generated-tracers-<wbr>dtrace.h*<br=
+>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 rm -f $(foreach f,$(generated-files-y),$(f) $(f=
+)-timestamp)<br>
+-=C2=A0 =C2=A0 =C2=A0 =C2=A0rm -f qapi-gen-timestamp<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0rm -f qapi-gen-timestamp vhost-user-input<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 rm -rf qga/qapi-generated<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 rm -f config-all-devices.mak<br>
+<br>
+@@ -724,7 +724,7 @@ distclean: clean<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 rm -f tests/tcg/config-*.mak<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 rm -f config-all-devices.mak config-all-disas.m=
+ak config.status<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 rm -f $(SUBDIR_DEVICES_MAK)<br>
+-=C2=A0 =C2=A0 =C2=A0 =C2=A0rm -f po/*.mo tests/qemu-iotests/common.env<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0rm -f po/*.mo<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 rm -f roms/seabios/config.mak roms/vgabios/conf=
+ig.mak<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 rm -f <a href=3D"http://qemu-doc.info" target=
+=3D"_blank">qemu-doc.info</a> qemu-doc.aux qemu-doc.cp qemu-doc.cps<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 rm -f qemu-doc.fn qemu-doc.fns <a href=3D"http:=
+//qemu-doc.info" target=3D"_blank">qemu-doc.info</a> <a href=3D"http://qemu=
+-doc.ky" target=3D"_blank">qemu-doc.ky</a> qemu-doc.kys<br>
+diff --git a/tests/Makefile.include b/tests/Makefile.include<br>
+index 3543451ed3..694f193fb6 100644<br>
+--- a/tests/Makefile.include<br>
++++ b/tests/Makefile.include<br>
+@@ -1176,11 +1176,21 @@ check: check-block check-qapi-schema check-unit che=
+ck-softfloat check-qtest chec<br>
+=C2=A0check-clean:<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 rm -rf $(check-unit-y) tests/*.o $(QEMU_IOTESTS=
+_HELPERS-y)<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 rm -rf $(sort $(foreach target,$(SYSEMU_TARGET_=
+LIST), $(check-qtest-$(target)-y)) $(check-qtest-generic-y))<br>
+-=C2=A0 =C2=A0 =C2=A0 =C2=A0rm -f tests/test-qapi-gen-timestamp<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 rm -rf $(TESTS_VENV_DIR) $(TESTS_RESULTS_DIR)<b=
+r>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0rm -f tests/test-qapi-gen-timestamp tests/qht-b=
+ench$(EXESUF) \<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0tests/fp/fp-test te=
+sts/fp/*.out tests/qapi-schema/*.test.*<br>
+<br>
+=C2=A0clean: check-clean<br>
+<br>
++check-distclean:<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0rm -f tests/qemu-iotests/common.env tests/qemu-=
+iotests/check.*<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0rm -f tests/test-qapi-types*.c tests/test-qapi-=
+visit*.c \<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0tests/test-qapi-com=
+mands*.c tests/test-qapi-events*.c \<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0tests/test-qapi-emi=
+t-events.[<wbr>ch] tests/test-qapi-introspect.c \<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0tests/include/test-=
+qapi-*.c<br>
++<br>
++distclean: check-distclean<br>
++<br>
+=C2=A0# Build the help program automatically<br>
+<br>
+=C2=A0all: $(QEMU_IOTESTS_HELPERS-y)<br>
+-- <br>
+2.18.1<br>
+<br>
+<br>
+</blockquote>
+
+--000000000000119323059585bf78--
 
