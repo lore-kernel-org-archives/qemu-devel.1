@@ -3,48 +3,48 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4F6E0CA9EA0
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 23:17:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 440B3CA9EA0
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 23:42:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2642F206C2
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 23:17:00 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2642F206C2
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=weiser.dinsnail.net
+	by mail.kernel.org (Postfix) with ESMTPS id 196ED2064B
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 23:42:05 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 196ED2064B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48680 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49042 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iN3Od-0000WR-Aa
-	for qemu-devel@archiver.kernel.org; Tue, 22 Oct 2019 19:16:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33500)
+	id 1iN3mu-0007hT-A0
+	for qemu-devel@archiver.kernel.org; Tue, 22 Oct 2019 19:42:04 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35352)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1iN3Nh-0008UY-5S
- for qemu-devel@nongnu.org; Tue, 22 Oct 2019 19:16:03 -0400
+ (envelope-from <bounces@canonical.com>) id 1iN3lp-00072x-Nx
+ for qemu-devel@nongnu.org; Tue, 22 Oct 2019 19:40:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1iN3Nf-0002zR-Lr
- for qemu-devel@nongnu.org; Tue, 22 Oct 2019 19:16:01 -0400
-Received: from indium.canonical.com ([91.189.90.7]:53310)
+ (envelope-from <bounces@canonical.com>) id 1iN3lo-0007AF-2i
+ for qemu-devel@nongnu.org; Tue, 22 Oct 2019 19:40:57 -0400
+Received: from indium.canonical.com ([91.189.90.7]:57486)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1iN3Nf-0002yZ-GY
- for qemu-devel@nongnu.org; Tue, 22 Oct 2019 19:15:59 -0400
+ id 1iN3ln-0007A1-TZ
+ for qemu-devel@nongnu.org; Tue, 22 Oct 2019 19:40:56 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
  by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1iN3Nd-0004zV-N4
- for <qemu-devel@nongnu.org>; Tue, 22 Oct 2019 23:15:57 +0000
+ id 1iN3ll-0007Jq-NM
+ for <qemu-devel@nongnu.org>; Tue, 22 Oct 2019 23:40:53 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 7FB092E80D2
- for <qemu-devel@nongnu.org>; Tue, 22 Oct 2019 23:15:57 +0000 (UTC)
+ by loganberry.canonical.com (Postfix) with ESMTP id 8D2192E80CD
+ for <qemu-devel@nongnu.org>; Tue, 22 Oct 2019 23:40:53 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Tue, 22 Oct 2019 23:04:59 -0000
-From: Michael Weiser <michael@weiser.dinsnail.net>
+Date: Tue, 22 Oct 2019 23:32:39 -0000
+From: "Laszlo Ersek \(Red Hat\)" <lersek@redhat.com>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
 X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
@@ -54,9 +54,9 @@ X-Launchpad-Bug-Security-Vulnerability: no
 X-Launchpad-Bug-Commenters: dgilbert-h kwolf-redhat lersek michael-weiser
  psyhomb sej7278
 X-Launchpad-Bug-Reporter: Michael Weiser (michael-weiser)
-X-Launchpad-Bug-Modifier: Michael Weiser (michael-weiser)
+X-Launchpad-Bug-Modifier: Laszlo Ersek (Red Hat) (lersek)
 References: <157005622285.15919.12087374175062502233.malonedeb@gac.canonical.com>
-Message-Id: <157178549975.9806.12417580339880233334.malone@soybean.canonical.com>
+Message-Id: <157178716000.25620.3439258257105816871.malone@chaenomeles.canonical.com>
 Subject: [Bug 1846427] Re: 4.1.0: qcow2 corruption on savevm/quit/loadvm cycle
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
 X-Launchpad-Message-For: qemu-devel-ml
@@ -64,7 +64,7 @@ Precedence: bulk
 X-Generated-By: Launchpad (canonical.com);
  Revision="186023fa645d8be19d403a76064f0643f510db2f";
  Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: d572e9414766175c524b6c512c80f76922731320
+X-Launchpad-Hash: 40493ffff40418195d0d9de937d0d83ae2cf7402
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 91.189.90.7
@@ -83,10 +83,15 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Please ignore the stuff about (!is_zero_cow(bs, m) || true) being
-optimized out. Of course it isn't. And corruption still occurs with that
-way of calling only is_zero_cow(). Dunno what I did there. It seems to
-be even later than I thought. The rest of my testing holds true though.
+In reply to <https://bugs.launchpad.net/qemu/+bug/1846427/comments/18>:
+
+> Is it possible that we're talking about some kind of miscompilation
+> here, maybe because gcc-9.2.0 is just that tiny bit too spanking
+> current?
+
+I'm riding the trailing edge here (gcc-4.8 in RHEL7) :)
+
+[...]
 
 -- =
 
