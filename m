@@ -2,74 +2,77 @@ Return-Path: <SRS0=tSBD=YP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5FCB7CA9EA0
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 07:23:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F8AACA9EA0
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 07:23:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 26EBD2064B
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 07:23:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id EAD7C2064B
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 07:23:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FZNmDwQi"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 26EBD2064B
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Xao+E5RH"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EAD7C2064B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50977 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50980 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iMoVf-00069c-1S
-	for qemu-devel@archiver.kernel.org; Tue, 22 Oct 2019 03:23:15 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39049)
+	id 1iMoVs-0006TX-3s
+	for qemu-devel@archiver.kernel.org; Tue, 22 Oct 2019 03:23:28 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39061)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <thuth@redhat.com>) id 1iMoUH-000502-Qf
- for qemu-devel@nongnu.org; Tue, 22 Oct 2019 03:21:50 -0400
+ (envelope-from <thuth@redhat.com>) id 1iMoUP-00058t-1I
+ for qemu-devel@nongnu.org; Tue, 22 Oct 2019 03:21:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <thuth@redhat.com>) id 1iMoUG-0005B7-Ka
- for qemu-devel@nongnu.org; Tue, 22 Oct 2019 03:21:49 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:25708
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <thuth@redhat.com>) id 1iMoUN-0005EN-TB
+ for qemu-devel@nongnu.org; Tue, 22 Oct 2019 03:21:56 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:51721)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <thuth@redhat.com>) id 1iMoUG-0005Aj-HK
- for qemu-devel@nongnu.org; Tue, 22 Oct 2019 03:21:48 -0400
+ (Exim 4.71) (envelope-from <thuth@redhat.com>) id 1iMoUN-0005Cv-Q8
+ for qemu-devel@nongnu.org; Tue, 22 Oct 2019 03:21:55 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1571728907;
+ s=mimecast20190719; t=1571728914;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding;
- bh=3jwGoqu3/nXzNy6jQFWzPQQB4qY5jxDakNr6tPeKyNE=;
- b=FZNmDwQipy6ZlT4Mk31FqWbo2GqTkPF73XdWCOJKzvPeLNBLqlhDM1HmAwrZiuJwF3YOrP
- Fws+FKAcBoATErxn0ZnKe1CoJfEhbRVabG8EpF+vcgOVVYrb7YK+5V2GK2PkK+Kue/fn1q
- TpkAKeKQ7At7Z3HkxfIybjzLoirZmSQ=
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=ifHsHTBcMhSqGAy591LJdMSm21J89JLOA6i3bO9Pwso=;
+ b=Xao+E5RHFNAiJmVbAKVybPdFHaAWCk9wlyPn6OvQVXqRUmHDM0lZCiLbT3BsJzfKPa9oLu
+ krklQKqNC2eZcs9AT0K61iCCxRRZRTzydm3rK06HnbXE7PV+x1zRk5IxHs6OCaynOEZQeT
+ u9RLmAMee5KHYsyfZgsAhc+8GBcc01I=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-234-haIZN31DMCmtmESlISe55Q-1; Tue, 22 Oct 2019 03:21:44 -0400
+ us-mta-12-M2H9-JgvMzePIV6wdD9clw-1; Tue, 22 Oct 2019 03:21:52 -0400
 Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
  [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D0FBC1005509;
- Tue, 22 Oct 2019 07:21:43 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D1B32801E66;
+ Tue, 22 Oct 2019 07:21:51 +0000 (UTC)
 Received: from thuth.com (dhcp-200-228.str.redhat.com [10.33.200.228])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 46F141B465;
- Tue, 22 Oct 2019 07:21:39 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 575EB1B5B8;
+ Tue, 22 Oct 2019 07:21:43 +0000 (UTC)
 From: Thomas Huth <thuth@redhat.com>
 To: Max Reitz <mreitz@redhat.com>,
 	qemu-block@nongnu.org
-Subject: [PATCH v3 0/6] Enable more iotests during "make check-block"
-Date: Tue, 22 Oct 2019 09:21:29 +0200
-Message-Id: <20191022072135.11188-1-thuth@redhat.com>
+Subject: [PATCH v3 1/6] iotests: remove 'linux' from default supported
+ platforms
+Date: Tue, 22 Oct 2019 09:21:30 +0200
+Message-Id: <20191022072135.11188-2-thuth@redhat.com>
+In-Reply-To: <20191022072135.11188-1-thuth@redhat.com>
+References: <20191022072135.11188-1-thuth@redhat.com>
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-MC-Unique: haIZN31DMCmtmESlISe55Q-1
+X-MC-Unique: M2H9-JgvMzePIV6wdD9clw-1
 X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=WINDOWS-1252
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.120
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,61 +90,78 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-As discussed here:
+From: John Snow <jsnow@redhat.com>
 
- https://lists.gnu.org/archive/html/qemu-devel/2019-10/msg00697.html
+verify_platform will check an explicit whitelist and blacklist instead.
+The default will now be assumed to be allowed to run anywhere.
 
-and here:
+For tests that do not specify their platforms explicitly, this has the effe=
+ct of
+enabling these tests on non-linux platforms. For tests that always specifie=
+d
+linux explicitly, there is no change.
 
- https://lists.gnu.org/archive/html/qemu-devel/2019-10/msg01388.html
+For Python tests on FreeBSD at least; only seven python tests fail:
+045 147 149 169 194 199 211
 
-it would be good to have some more valuable iotests enabled in the
-"auto" group to get better iotest coverage during "make check".
+045 and 149 appear to be misconfigurations,
+147 and 194 are the AF_UNIX path too long error,
+169 and 199 are bitmap migration bugs, and
+211 is a bug that shows up on Linux platforms, too.
 
-And once Max' "iotests: Add and use $SOCK_DIR" patch series has been
-merged, we can indeed enable these Python-based tests, too.
+This is at least good evidence that these tests are not Linux-only. If
+they aren't suitable for other platforms, they should be disabled on a
+per-platform basis as appropriate.
 
-There is just one small downside: Since these tests require a QEMU
-that features a 'virtio-blk' device, we cannot run the iotests
-with binaries like qemu-system-tricore anymore. But since the iotests
-were not very useful with such binaries anyway, I think it's ok now
-if we skip them there.
+Therefore, let's switch these on and deal with the failures.
 
-I've also added a patch that removes test 130 from the "auto" group
-instead. Test 130 has been reported to fail intermittently, so we
-should not use it in "make check" block until it is fixed.
-
-Based-on: 20191010152457.17713-1-mreitz@redhat.com
-
-v3:
- - Test 183 fails on Patchew, so I removed it from the "auto" group
-   again
-
-v2:
- - Checked the iotests with NetBSD, too (now that Eduardo has
-   re-activated Gerd's patches for creating NetBSD VM images)
- - Use 'openbsd' instead of 'openbsd6'
- - Use 'grep -q' instead of 'grep' for grep'ing silently
- - Added the patch to disable 130 from the "auto" group
-
-John Snow (1):
-  iotests: remove 'linux' from default supported platforms
-
-Thomas Huth (5):
-  iotests: Test 041 only works on certain systems
-  iotests: Test 183 does not work on macOS and OpenBSD
-  iotests: Skip "make check-block" if QEMU does not support virtio-blk
-  iotests: Enable more tests in the 'auto' group to improve test
-    coverage
-  iotests: Remove 130 from the "auto" group
-
- tests/check-block.sh          | 16 +++++++++++++++-
- tests/qemu-iotests/041        |  3 ++-
- tests/qemu-iotests/183        |  1 +
- tests/qemu-iotests/group      | 18 +++++++++---------
+Reviewed-by: Max Reitz <mreitz@redhat.com>
+Signed-off-by: John Snow <jsnow@redhat.com>
+---
  tests/qemu-iotests/iotests.py | 16 +++++++++++-----
- 5 files changed, 38 insertions(+), 16 deletions(-)
+ 1 file changed, 11 insertions(+), 5 deletions(-)
 
+diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotests.py
+index 5373149ae1..7d6c2d3641 100644
+--- a/tests/qemu-iotests/iotests.py
++++ b/tests/qemu-iotests/iotests.py
+@@ -871,9 +871,14 @@ def verify_protocol(supported=3D[], unsupported=3D[]):
+     if not_sup or (imgproto in unsupported):
+         notrun('not suitable for this protocol: %s' % imgproto)
+=20
+-def verify_platform(supported_oses=3D['linux']):
+-    if True not in [sys.platform.startswith(x) for x in supported_oses]:
+-        notrun('not suitable for this OS: %s' % sys.platform)
++def verify_platform(supported=3DNone, unsupported=3DNone):
++    if unsupported is not None:
++        if any((sys.platform.startswith(x) for x in unsupported)):
++            notrun('not suitable for this OS: %s' % sys.platform)
++
++    if supported is not None:
++        if not any((sys.platform.startswith(x) for x in supported)):
++            notrun('not suitable for this OS: %s' % sys.platform)
+=20
+ def verify_cache_mode(supported_cache_modes=3D[]):
+     if supported_cache_modes and (cachemode not in supported_cache_modes):
+@@ -935,7 +940,8 @@ def execute_unittest(output, verbosity, debug):
+                                     r'Ran \1 tests', output.getvalue()))
+=20
+ def execute_test(test_function=3DNone,
+-                 supported_fmts=3D[], supported_oses=3D['linux'],
++                 supported_fmts=3D[],
++                 supported_platforms=3DNone,
+                  supported_cache_modes=3D[], unsupported_fmts=3D[],
+                  supported_protocols=3D[], unsupported_protocols=3D[]):
+     """Run either unittest or script-style tests."""
+@@ -952,7 +958,7 @@ def execute_test(test_function=3DNone,
+     verbosity =3D 1
+     verify_image_format(supported_fmts, unsupported_fmts)
+     verify_protocol(supported_protocols, unsupported_protocols)
+-    verify_platform(supported_oses)
++    verify_platform(supported=3Dsupported_platforms)
+     verify_cache_mode(supported_cache_modes)
+=20
+     if debug:
 --=20
 2.18.1
 
