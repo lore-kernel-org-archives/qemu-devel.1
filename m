@@ -3,47 +3,47 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3BCD8CA9EA0
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 23:01:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4F6E0CA9EA0
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 23:17:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F3FBF20700
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 23:01:51 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F3FBF20700
+	by mail.kernel.org (Postfix) with ESMTPS id 2642F206C2
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 23:17:00 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2642F206C2
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=weiser.dinsnail.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48434 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48680 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iN39y-0005LB-Vi
-	for qemu-devel@archiver.kernel.org; Tue, 22 Oct 2019 19:01:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60526)
+	id 1iN3Od-0000WR-Aa
+	for qemu-devel@archiver.kernel.org; Tue, 22 Oct 2019 19:16:59 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33500)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1iN397-0004nx-9e
- for qemu-devel@nongnu.org; Tue, 22 Oct 2019 19:00:59 -0400
+ (envelope-from <bounces@canonical.com>) id 1iN3Nh-0008UY-5S
+ for qemu-devel@nongnu.org; Tue, 22 Oct 2019 19:16:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1iN395-0003vb-7D
- for qemu-devel@nongnu.org; Tue, 22 Oct 2019 19:00:57 -0400
-Received: from indium.canonical.com ([91.189.90.7]:47934)
+ (envelope-from <bounces@canonical.com>) id 1iN3Nf-0002zR-Lr
+ for qemu-devel@nongnu.org; Tue, 22 Oct 2019 19:16:01 -0400
+Received: from indium.canonical.com ([91.189.90.7]:53310)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1iN395-0003uF-0s
- for qemu-devel@nongnu.org; Tue, 22 Oct 2019 19:00:55 -0400
+ id 1iN3Nf-0002yZ-GY
+ for qemu-devel@nongnu.org; Tue, 22 Oct 2019 19:15:59 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
  by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1iN393-00030c-Ar
- for <qemu-devel@nongnu.org>; Tue, 22 Oct 2019 23:00:53 +0000
+ id 1iN3Nd-0004zV-N4
+ for <qemu-devel@nongnu.org>; Tue, 22 Oct 2019 23:15:57 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 4F8CF2E80C0
- for <qemu-devel@nongnu.org>; Tue, 22 Oct 2019 23:00:53 +0000 (UTC)
+ by loganberry.canonical.com (Postfix) with ESMTP id 7FB092E80D2
+ for <qemu-devel@nongnu.org>; Tue, 22 Oct 2019 23:15:57 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Tue, 22 Oct 2019 22:47:28 -0000
+Date: Tue, 22 Oct 2019 23:04:59 -0000
 From: Michael Weiser <michael@weiser.dinsnail.net>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
@@ -56,7 +56,7 @@ X-Launchpad-Bug-Commenters: dgilbert-h kwolf-redhat lersek michael-weiser
 X-Launchpad-Bug-Reporter: Michael Weiser (michael-weiser)
 X-Launchpad-Bug-Modifier: Michael Weiser (michael-weiser)
 References: <157005622285.15919.12087374175062502233.malonedeb@gac.canonical.com>
-Message-Id: <157178444824.19048.3845514982635724694.malone@gac.canonical.com>
+Message-Id: <157178549975.9806.12417580339880233334.malone@soybean.canonical.com>
 Subject: [Bug 1846427] Re: 4.1.0: qcow2 corruption on savevm/quit/loadvm cycle
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
 X-Launchpad-Message-For: qemu-devel-ml
@@ -64,7 +64,7 @@ Precedence: bulk
 X-Generated-By: Launchpad (canonical.com);
  Revision="186023fa645d8be19d403a76064f0643f510db2f";
  Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: db1bca1eb8e083693424c76d0300a8a4b3753cdb
+X-Launchpad-Hash: d572e9414766175c524b6c512c80f76922731320
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 91.189.90.7
@@ -83,137 +83,10 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-> I tried to reproduce the problem locally, on the same commit, with the
-> steps you described, but I wasn't lucky. I tried keeping the image on my
-> home directory (XFS), on tmpfs, and finally on a newly created ext4
-> filesystem on a spare LVM volume, but the image just wouldn't break even
-> after letting the loop run for a quite a while.
-
-That's certainly an important data point. Is it possible that we're
-talking about some kind of miscompilation here, maybe because gcc-9.2.0
-is just that tiny bit too spanking current?
-
-> So as the next step I would like to test my theory that the problem
-> isn't bdrv_co_block_status() returning a different value after the
-> commit, but that qcow2_detect_metadata_preallocation() even runs. I
-> think the easiest way to do this would be modifying handle_alloc_space()
-> so that it performs the checks, but skips its optimisation regardless of
-> the is_zero_cow() return value:
-
->         if (!is_zero_cow(bs, m) || true) {
->             continue;
->         }
-
-I made the change and the problem went away.
-
-Then, extrapolating the jest of your methodology :), I went ahead and
-disabled only bdrv_co_pwrite_zeroes() by placing a continue in front of
-it but let qcow2_pre_write_overlap_check() execute and the problem
-reappeared. I certainly did not expect that to happen because the
-function name ends in _check(), suggesting read-only access. And it's
-not even touched by the commit.
-
-This had me so rattled that I revalidated that the problem does indeed
-not occur with the commit before. And it does not. I left it running for
-about half an hour without problems.
-
-After some more tests I finally figured out that even with -g and no -O
-gcc is smart enough to optimize out (!is_zero_cow() || true) and that
-corruption only happens if is_zero_cow() is actually called. Corruption
-also does not occur if I make is_zero_cow() or is_unallocated() return 0
-always.
-
-So my first guess was that is_unallocated() sometimes returns false
-positives, making is_zero_cow() report false positives which is not
-caught by qcow2_pre_write_overlap_check() and causes
-bdrv_co_pwrite_zeroes() to zero out actual data. That seemed a bit
-convoluted to me.
-
-But then I realized that corruption still occurs if the rest of
-handle_alloc_space() is disabled like so:
-
---- a/block/qcow2.c
-+++ b/block/qcow2.c
-@@ -2185,9 +2185,8 @@ static int handle_alloc_space(BlockDriverState *bs, Q=
-CowL2Meta *l2meta)
-             continue;
-         }
- =
-
--        if (!is_zero_cow(bs, m)) {
--            continue;
--        }
-+        is_zero_cow(bs, m);
-+        continue;
- =
-
-         /*
-          * instead of writing zero COW buffers,
-
-So it's much more likely that is_zero_cow() has a side-effect that
-somehow causes corruption later on even without handle_alloc_space()
-ever calling bdrv_co_pwrite_zeroes(). That would also explain why
-qcow2_pre_write_overlap_check() does not catch those false positives
-overwriting metadata because there simply are none.
-
-Putting a breakpoint on handle_alloc_space() and single stepping into
-is_zero_cow() I do indeed end up in bdrv_co_block_status():
-
-gdb) bt
-#0  0x0000555555d610fd in bdrv_co_block_status (bs=3D0x5555567c69e0, want_z=
-ero=3Dfalse, offset=3D5242880, bytes=3D12288, pnum=3D0x7ffedffd7b28, map=3D=
-0x0, file=3D0x0)
-    at block/io.c:2048
-#1  0x0000555555d6167e in bdrv_co_block_status_above
-    (bs=3D0x5555567c69e0, base=3D0x0, want_zero=3Dfalse, offset=3D5242880, =
-bytes=3D12288, pnum=3D0x7ffedffd7b28, map=3D0x0, file=3D0x0) at block/io.c:=
-2190
-#2  0x0000555555d61764 in bdrv_block_status_above_co_entry (opaque=3D0x7ffe=
-dffd7a10) at block/io.c:2220
-#3  0x0000555555d6188f in bdrv_common_block_status_above
-    (bs=3D0x5555567c69e0, base=3D0x0, want_zero=3Dfalse, offset=3D5242880, =
-bytes=3D12288, pnum=3D0x7ffedffd7b28, map=3D0x0, file=3D0x0) at block/io.c:=
-2255
-#4  0x0000555555d61afa in bdrv_is_allocated (bs=3D0x5555567c69e0, offset=3D=
-5242880, bytes=3D12288, pnum=3D0x7ffedffd7b28) at block/io.c:2285
-#5  0x0000555555d61b8c in bdrv_is_allocated_above (top=3D0x5555567c69e0, ba=
-se=3D0x0, offset=3D5242880, bytes=3D12288, pnum=3D0x7ffedffd7b80) at block/=
-io.c:2323
-#6  0x0000555555d12d48 in is_unallocated (bs=3D0x5555567c69e0, offset=3D524=
-2880, bytes=3D12288) at block/qcow2.c:2151
-#7  0x0000555555d12dbc in is_zero_cow (bs=3D0x5555567c69e0, m=3D0x5555569d3=
-5b0) at block/qcow2.c:2162
-#8  0x0000555555d12e9c in handle_alloc_space (bs=3D0x5555567c69e0, l2meta=
-=3D0x5555569d35b0) at block/qcow2.c:2188
-#9  0x0000555555d13321 in qcow2_co_pwritev (bs=3D0x5555567c69e0, offset=3D5=
-255168, bytes=3D4096, qiov=3D0x7fffe82ec310, flags=3D0) at block/qcow2.c:23=
-02
-#10 0x0000555555d5e6d5 in bdrv_driver_pwritev (bs=3D0x5555567c69e0, offset=
-=3D5255168, bytes=3D4096, qiov=3D0x7fffe82ec310, flags=3D0) at block/io.c:1=
-043
-#11 0x0000555555d6014b in bdrv_aligned_pwritev (child=3D0x55555675cf80, req=
-=3D0x7ffedffd7e50, offset=3D5255168, bytes=3D4096, align=3D1, qiov=3D0x7fff=
-e82ec310, flags=3D0)
-    at block/io.c:1670
-#12 0x0000555555d60d77 in bdrv_co_pwritev (child=3D0x55555675cf80, offset=
-=3D5255168, bytes=3D4096, qiov=3D0x7fffe82ec310, flags=3D0) at block/io.c:1=
-897
-#13 0x0000555555d47cc7 in blk_co_pwritev (blk=3D0x5555567c6730, offset=3D52=
-55168, bytes=3D4096, qiov=3D0x7fffe82ec310, flags=3D0) at block/block-backe=
-nd.c:1183
-#14 0x0000555555d484aa in blk_aio_write_entry (opaque=3D0x7fffe823f920) at =
-block/block-backend.c:1382
-#15 0x0000555555e3ff91 in coroutine_trampoline (i0=3D-399759776, i1=3D32767=
-) at util/coroutine-ucontext.c:116
-#16 0x00007ffff5fc61a0 in  () at /lib64/libc.so.6
-#17 0x00007ffff17c5920 in  ()
-#18 0x0000000000000000 in  ()
-
-At that point it had gotten too late to even attempt to wrap my brain
-around the whole BDRV_BLOCK_RECURSE logic. But I think the above gives a
-strong(er|ish) connection between the change and the corruption and how
-handle_alloc_space() ties into it. Let me know what else I could check
-to help track this down.
+Please ignore the stuff about (!is_zero_cow(bs, m) || true) being
+optimized out. Of course it isn't. And corruption still occurs with that
+way of calling only is_zero_cow(). Dunno what I did there. It seems to
+be even later than I thought. The rest of my testing holds true though.
 
 -- =
 
