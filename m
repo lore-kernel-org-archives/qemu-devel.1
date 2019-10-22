@@ -2,86 +2,77 @@ Return-Path: <SRS0=tSBD=YP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4AC36CA9EA0
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 12:22:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EB3AACA9EA0
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 12:25:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0E4A72184C
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 12:22:43 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0E4A72184C
+	by mail.kernel.org (Postfix) with ESMTPS id 936EC2184C
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 12:25:19 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dnwvfgD1"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 936EC2184C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54798 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54848 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iMtBS-0004OL-7o
-	for qemu-devel@archiver.kernel.org; Tue, 22 Oct 2019 08:22:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51824)
+	id 1iMtDy-0006xl-I5
+	for qemu-devel@archiver.kernel.org; Tue, 22 Oct 2019 08:25:18 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51942)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1iMtA4-0003Z2-Qm
- for qemu-devel@nongnu.org; Tue, 22 Oct 2019 08:21:19 -0400
+ (envelope-from <armbru@redhat.com>) id 1iMtAh-0004Ho-3d
+ for qemu-devel@nongnu.org; Tue, 22 Oct 2019 08:21:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1iMtA0-00078c-VY
- for qemu-devel@nongnu.org; Tue, 22 Oct 2019 08:21:15 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:50580)
+ (envelope-from <armbru@redhat.com>) id 1iMtAd-0007Lv-0a
+ for qemu-devel@nongnu.org; Tue, 22 Oct 2019 08:21:55 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:30061
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iMtA0-00078N-M1
- for qemu-devel@nongnu.org; Tue, 22 Oct 2019 08:21:12 -0400
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71])
- (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+ (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1iMtAc-0007Lc-PH
+ for qemu-devel@nongnu.org; Tue, 22 Oct 2019 08:21:50 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1571746909;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=Uvb/AWDvZzFHhq4Ps9RGmsQO2HjDWdi/N05Cxs/6sOI=;
+ b=dnwvfgD1ZCfqwZ1HbIJm638rY8hRcTEMLnsA7Ed3S2EBLJfv+ndCHkuf9DHK+mB/KWPvfs
+ yvGmgeGHKh7WC5ulbw3SoZRHHf+E2/70Av4GAz4n8qyElIJ43F4YN3vjk7LveaZPvhxHoZ
+ 5HUrbXLirelf8J8Xfp/jztW8xfzGoow=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-168-EUqdPt22PaG-3U1bfUflWw-1; Tue, 22 Oct 2019 08:21:48 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 1A7803DE0F
- for <qemu-devel@nongnu.org>; Tue, 22 Oct 2019 12:21:11 +0000 (UTC)
-Received: by mail-wr1-f71.google.com with SMTP id v7so7182998wrf.4
- for <qemu-devel@nongnu.org>; Tue, 22 Oct 2019 05:21:11 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=Gd7iwK4NCoTtKvb2KiVmztnUi/ou4tk/Go2A3iolqkQ=;
- b=Zb/cnm7XJfwf1hfb6qLbguQkD/xYfFGFE2h1BMKZOIBhOsJzU4ZI320Pj1eu0lmgih
- heunoPj9C1pS7Q6/y1o6m279x4UhBDvBx465mGTfzzM/T2LIx8naMYfG6avTHAFCG4XW
- jVFBQhrXyCMVkxL9GiHLMVqACk2UxmctlZ+8V+GiVSHY3vHAWHQgpPluM0EjLDqIf4/s
- SquM50J8v9d5SueoQUmX+pDdN8MiiEqBZmLFp1jV5ACFv6MYxYsIAYs6BBeRotXThQC5
- AHzNf9ParZtUV5zjKeRmx3XpdYvhwB0HP0QRcNKGoThHA2Vv22MNlXn/JmCg0b7v/Vkl
- J8nQ==
-X-Gm-Message-State: APjAAAV+JWmxzMcy6b6m7YlFsmhZ+Ecc+5gToMjr3kJ1F/kNOJbXzXQv
- U5HCt4yvQLI22TbZkhYLZyiyn4yPtgWEEhwfaZoADgvfFjOXVzHS/JNUT3+/VFtBoYwcH+0W4tQ
- V9Zvg036Zf4zrIWc=
-X-Received: by 2002:a5d:4285:: with SMTP id k5mr3197066wrq.344.1571746869586; 
- Tue, 22 Oct 2019 05:21:09 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqxybwNCK9AOOkVbwPgygpyPWcVG9jQNoSh0qN6N33SV0i7Y8KSe5S+kUWA/m1P/dgp7EpgY0w==
-X-Received: by 2002:a5d:4285:: with SMTP id k5mr3197028wrq.344.1571746869102; 
- Tue, 22 Oct 2019 05:21:09 -0700 (PDT)
-Received: from [192.168.1.41] (129.red-83-57-174.dynamicip.rima-tde.net.
- [83.57.174.129])
- by smtp.gmail.com with ESMTPSA id g17sm17700505wrq.58.2019.10.22.05.21.07
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 22 Oct 2019 05:21:08 -0700 (PDT)
-Subject: Re: [PATCH v14 1/9] esp: add pseudo-DMA as used by Macintosh
-To: Laurent Vivier <laurent@vivier.eu>, qemu-devel@nongnu.org
-References: <20191022111738.20803-1-laurent@vivier.eu>
- <20191022111738.20803-2-laurent@vivier.eu>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <815dc0fe-02e1-fb75-9012-fe0378bd0fee@redhat.com>
-Date: Tue, 22 Oct 2019 14:21:06 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.1
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 56B8A800D4E
+ for <qemu-devel@nongnu.org>; Tue, 22 Oct 2019 12:21:47 +0000 (UTC)
+Received: from blackfin.pond.sub.org (unknown [10.36.118.123])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 9E38E60C57
+ for <qemu-devel@nongnu.org>; Tue, 22 Oct 2019 12:21:46 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id 05D391138619; Tue, 22 Oct 2019 14:21:45 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PULL v2 00/12] QAPI patches for 2019-10-22
+Date: Tue, 22 Oct 2019 14:21:43 +0200
+Message-Id: <20191022122145.27792-1-armbru@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20191022111738.20803-2-laurent@vivier.eu>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-MC-Unique: EUqdPt22PaG-3U1bfUflWw-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=WINDOWS-1252
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 209.132.183.28
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -93,608 +84,638 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
- qemu-block@nongnu.org, Thomas Huth <huth@tuxfamily.org>,
- Jason Wang <jasowang@redhat.com>,
- Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
- "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Max Reitz <mreitz@redhat.com>,
- =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>,
- Gerd Hoffmann <kraxel@redhat.com>,
- =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Laurent,
+The following changes since commit e9d42461920f6f40f4d847a5ba18e90d095ed0b9=
+:
 
-On 10/22/19 1:17 PM, Laurent Vivier wrote:
-> There is no DMA in Quadra 800, so the CPU reads/writes the data from the
-> PDMA register (offset 0x100, ESP_PDMA in hw/m68k/q800.c) and copies them
-> to/from the memory.
-> 
-> There is a nice assembly loop in the kernel to do that, see
-> linux/drivers/scsi/mac_esp.c:MAC_ESP_PDMA_LOOP().
-> 
-> The start of the transfer is triggered by the DREQ interrupt (see linux
-> mac_esp_send_pdma_cmd()), the CPU polls on the IRQ flag to start the
-> transfer after a SCSI command has been sent (in Quadra 800 it goes
-> through the VIA2, the via2-irq line and the vIFR register)
-> 
-> The Macintosh hardware includes hardware handshaking to prevent the CPU
-> from reading invalid data or writing data faster than the peripheral
-> device can accept it.
-> 
-> This is the "blind mode", and from the doc:
-> "Approximate maximum SCSI transfer rates within a blocks are 1.4 MB per
-> second for blind transfers in the Macintosh II"
-> 
-> Some references can be found in:
->    Apple Macintosh Family Hardware Reference, ISBN 0-201-19255-1
->    Guide to the Macintosh Family Hardware, ISBN-0-201-52405-8
-> 
-> Acked-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> Co-developed-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-> Signed-off-by: Laurent Vivier <laurent@vivier.eu>
-> ---
->   include/hw/scsi/esp.h |  15 ++
->   hw/scsi/esp.c         | 338 ++++++++++++++++++++++++++++++++++++++----
->   2 files changed, 324 insertions(+), 29 deletions(-)
-> 
-> diff --git a/include/hw/scsi/esp.h b/include/hw/scsi/esp.h
-> index adab63d1c9..6ba47dac41 100644
-> --- a/include/hw/scsi/esp.h
-> +++ b/include/hw/scsi/esp.h
-> @@ -14,10 +14,18 @@ typedef void (*ESPDMAMemoryReadWriteFunc)(void *opaque, uint8_t *buf, int len);
->   
->   typedef struct ESPState ESPState;
->   
-> +enum pdma_origin_id {
-> +    PDMA,
-> +    TI,
-> +    CMD,
-> +    ASYNC,
-> +};
-> +
->   struct ESPState {
->       uint8_t rregs[ESP_REGS];
->       uint8_t wregs[ESP_REGS];
->       qemu_irq irq;
-> +    qemu_irq irq_data;
->       uint8_t chip_id;
->       bool tchi_written;
->       int32_t ti_size;
-> @@ -48,6 +56,12 @@ struct ESPState {
->       ESPDMAMemoryReadWriteFunc dma_memory_write;
->       void *dma_opaque;
->       void (*dma_cb)(ESPState *s);
-> +    uint8_t pdma_buf[32];
-> +    int pdma_origin;
-> +    uint32_t pdma_len;
-> +    uint32_t pdma_start;
-> +    uint32_t pdma_cur;
-> +    void (*pdma_cb)(ESPState *s);
->   };
->   
->   #define TYPE_ESP "esp"
-> @@ -59,6 +73,7 @@ typedef struct {
->       /*< public >*/
->   
->       MemoryRegion iomem;
-> +    MemoryRegion pdma;
->       uint32_t it_shift;
->       ESPState esp;
->   } SysBusESPState;
-> diff --git a/hw/scsi/esp.c b/hw/scsi/esp.c
-> index 841d79b60e..90b40c4cb5 100644
-> --- a/hw/scsi/esp.c
-> +++ b/hw/scsi/esp.c
-> @@ -38,6 +38,8 @@
->    * http://www.ibiblio.org/pub/historic-linux/early-ports/Sparc/NCR/NCR89C100.txt
->    * and
->    * http://www.ibiblio.org/pub/historic-linux/early-ports/Sparc/NCR/NCR53C9X.txt
-> + *
-> + * On Macintosh Quadra it is a NCR53C96.
->    */
->   
->   static void esp_raise_irq(ESPState *s)
-> @@ -58,6 +60,16 @@ static void esp_lower_irq(ESPState *s)
->       }
->   }
->   
-> +static void esp_raise_drq(ESPState *s)
-> +{
-> +    qemu_irq_raise(s->irq_data);
-> +}
-> +
-> +static void esp_lower_drq(ESPState *s)
-> +{
-> +    qemu_irq_lower(s->irq_data);
-> +}
-> +
->   void esp_dma_enable(ESPState *s, int irq, int level)
->   {
->       if (level) {
-> @@ -84,29 +96,35 @@ void esp_request_cancelled(SCSIRequest *req)
->       }
->   }
->   
-> -static uint32_t get_cmd(ESPState *s, uint8_t *buf, uint8_t buflen)
-> +static void set_pdma(ESPState *s, enum pdma_origin_id origin,
-> +                     uint32_t index, uint32_t len)
-> +{
-> +    s->pdma_origin = origin;
-> +    s->pdma_start = index;
-> +    s->pdma_cur = index;
-> +    s->pdma_len = len;
+  Merge remote-tracking branch 'remotes/kraxel/tags/audio-20191018-pull-req=
+uest' into staging (2019-10-18 14:13:11 +0100)
 
-Can you pass the pdma_cb to this function, and:
+are available in the Git repository at:
 
-        s->pdma_cb = pdma_cb;
+  git://repo.or.cz/qemu/armbru.git tags/pull-qapi-2019-10-22
 
-> +}
-> +
-> +static uint8_t *get_pdma_buf(ESPState *s)
-> +{
-> +    switch (s->pdma_origin) {
-> +    case PDMA:
-> +        return s->pdma_buf;
-> +    case TI:
-> +        return s->ti_buf;
-> +    case CMD:
-> +        return s->cmdbuf;
-> +    case ASYNC:
-> +        return s->async_buf;
-> +    }
-> +    return NULL;
-> +}
-> +
-> +static int get_cmd_cb(ESPState *s)
->   {
-> -    uint32_t dmalen;
->       int target;
->   
->       target = s->wregs[ESP_WBUSID] & BUSID_DID;
-> -    if (s->dma) {
-> -        dmalen = s->rregs[ESP_TCLO];
-> -        dmalen |= s->rregs[ESP_TCMID] << 8;
-> -        dmalen |= s->rregs[ESP_TCHI] << 16;
-> -        if (dmalen > buflen) {
-> -            return 0;
-> -        }
-> -        s->dma_memory_read(s->dma_opaque, buf, dmalen);
-> -    } else {
-> -        dmalen = s->ti_size;
-> -        if (dmalen > TI_BUFSZ) {
-> -            return 0;
-> -        }
-> -        memcpy(buf, s->ti_buf, dmalen);
-> -        buf[0] = buf[2] >> 5;
-> -    }
-> -    trace_esp_get_cmd(dmalen, target);
->   
->       s->ti_size = 0;
->       s->ti_rptr = 0;
-> @@ -125,8 +143,46 @@ static uint32_t get_cmd(ESPState *s, uint8_t *buf, uint8_t buflen)
->           s->rregs[ESP_RINTR] = INTR_DC;
->           s->rregs[ESP_RSEQ] = SEQ_0;
->           esp_raise_irq(s);
-> +        return -1;
-> +    }
-> +    return 0;
-> +}
-> +
-> +static uint32_t get_cmd(ESPState *s, uint8_t *buf, uint8_t buflen)
-> +{
-> +    int target;
-> +    uint32_t dmalen;
-> +
-> +    target = s->wregs[ESP_WBUSID] & BUSID_DID;
-> +    if (s->dma) {
-> +        dmalen = s->rregs[ESP_TCLO];
-> +        dmalen |= s->rregs[ESP_TCMID] << 8;
-> +        dmalen |= s->rregs[ESP_TCHI] << 16;
-> +        if (dmalen > buflen) {
-> +            return 0;
-> +        }
-> +        if (s->dma_memory_read) {
-> +            s->dma_memory_read(s->dma_opaque, buf, dmalen);
-> +        } else {
-> +            memcpy(s->pdma_buf, buf, dmalen);
-> +            set_pdma(s, PDMA, 0, dmalen);
-> +            esp_raise_drq(s);
-> +            return 0;
-> +        }
-> +    } else {
-> +        dmalen = s->ti_size;
-> +        if (dmalen > TI_BUFSZ) {
-> +            return 0;
-> +        }
-> +        memcpy(buf, s->ti_buf, dmalen);
-> +        buf[0] = buf[2] >> 5;
-> +    }
-> +    trace_esp_get_cmd(dmalen, target);
-> +
-> +    if (get_cmd_cb(s) < 0) {
->           return 0;
->       }
-> +
->       return dmalen;
->   }
->   
-> @@ -165,6 +221,16 @@ static void do_cmd(ESPState *s, uint8_t *buf)
->       do_busid_cmd(s, &buf[1], busid);
->   }
->   
-> +static void satn_pdma_cb(ESPState *s)
-> +{
-> +    if (get_cmd_cb(s) < 0) {
-> +        return;
-> +    }
-> +    if (s->pdma_cur != s->pdma_start) {
-> +        do_cmd(s, get_pdma_buf(s) + s->pdma_start);
-> +    }
-> +}
-> +
->   static void handle_satn(ESPState *s)
->   {
->       uint8_t buf[32];
-> @@ -174,11 +240,22 @@ static void handle_satn(ESPState *s)
->           s->dma_cb = handle_satn;
->           return;
->       }
-> +    s->pdma_cb = satn_pdma_cb;
->       len = get_cmd(s, buf, sizeof(buf));
->       if (len)
->           do_cmd(s, buf);
->   }
->   
-> +static void s_without_satn_pdma_cb(ESPState *s)
-> +{
-> +    if (get_cmd_cb(s) < 0) {
-> +        return;
-> +    }
-> +    if (s->pdma_cur != s->pdma_start) {
-> +        do_busid_cmd(s, get_pdma_buf(s) + s->pdma_start, 0);
-> +    }
-> +}
-> +
->   static void handle_s_without_atn(ESPState *s)
->   {
->       uint8_t buf[32];
-> @@ -188,18 +265,36 @@ static void handle_s_without_atn(ESPState *s)
->           s->dma_cb = handle_s_without_atn;
->           return;
->       }
-> +    s->pdma_cb = s_without_satn_pdma_cb;
->       len = get_cmd(s, buf, sizeof(buf));
->       if (len) {
->           do_busid_cmd(s, buf, 0);
->       }
->   }
->   
-> +static void satn_stop_pdma_cb(ESPState *s)
-> +{
-> +    if (get_cmd_cb(s) < 0) {
-> +        return;
-> +    }
-> +    s->cmdlen = s->pdma_cur - s->pdma_start;
-> +    if (s->cmdlen) {
-> +        trace_esp_handle_satn_stop(s->cmdlen);
-> +        s->do_cmd = 1;
-> +        s->rregs[ESP_RSTAT] = STAT_TC | STAT_CD;
-> +        s->rregs[ESP_RINTR] = INTR_BS | INTR_FC;
-> +        s->rregs[ESP_RSEQ] = SEQ_CD;
-> +        esp_raise_irq(s);
-> +    }
-> +}
-> +
->   static void handle_satn_stop(ESPState *s)
->   {
->       if (s->dma && !s->dma_enabled) {
->           s->dma_cb = handle_satn_stop;
->           return;
->       }
-> +    s->pdma_cb = satn_stop_pdma_cb;;
->       s->cmdlen = get_cmd(s, s->cmdbuf, sizeof(s->cmdbuf));
->       if (s->cmdlen) {
->           trace_esp_handle_satn_stop(s->cmdlen);
-> @@ -211,16 +306,31 @@ static void handle_satn_stop(ESPState *s)
->       }
->   }
->   
-> +static void write_response_pdma_cb(ESPState *s)
-> +{
-> +    s->rregs[ESP_RSTAT] = STAT_TC | STAT_ST;
-> +    s->rregs[ESP_RINTR] = INTR_BS | INTR_FC;
-> +    s->rregs[ESP_RSEQ] = SEQ_CD;
-> +    esp_raise_irq(s);
-> +}
-> +
->   static void write_response(ESPState *s)
->   {
->       trace_esp_write_response(s->status);
->       s->ti_buf[0] = s->status;
->       s->ti_buf[1] = 0;
->       if (s->dma) {
-> -        s->dma_memory_write(s->dma_opaque, s->ti_buf, 2);
-> -        s->rregs[ESP_RSTAT] = STAT_TC | STAT_ST;
-> -        s->rregs[ESP_RINTR] = INTR_BS | INTR_FC;
-> -        s->rregs[ESP_RSEQ] = SEQ_CD;
-> +        if (s->dma_memory_write) {
-> +            s->dma_memory_write(s->dma_opaque, s->ti_buf, 2);
-> +            s->rregs[ESP_RSTAT] = STAT_TC | STAT_ST;
-> +            s->rregs[ESP_RINTR] = INTR_BS | INTR_FC;
-> +            s->rregs[ESP_RSEQ] = SEQ_CD;
-> +        } else {
-> +            set_pdma(s, TI, 0, 2);
-> +            s->pdma_cb = write_response_pdma_cb;
-> +            esp_raise_drq(s);
-> +            return;
-> +        }
->       } else {
->           s->ti_size = 2;
->           s->ti_rptr = 0;
-> @@ -242,6 +352,41 @@ static void esp_dma_done(ESPState *s)
->       esp_raise_irq(s);
->   }
->   
-> +static void do_dma_pdma_cb(ESPState *s)
-> +{
-> +    int to_device = (s->ti_size < 0);
-> +    int len = s->pdma_cur - s->pdma_start;
-> +    if (s->do_cmd) {
-> +        s->ti_size = 0;
-> +        s->cmdlen = 0;
-> +        s->do_cmd = 0;
-> +        do_cmd(s, s->cmdbuf);
-> +        return;
-> +    }
-> +    s->dma_left -= len;
-> +    s->async_buf += len;
-> +    s->async_len -= len;
-> +    if (to_device) {
-> +        s->ti_size += len;
-> +    } else {
-> +        s->ti_size -= len;
-> +    }
-> +    if (s->async_len == 0) {
-> +        scsi_req_continue(s->current_req);
-> +        /*
-> +         * If there is still data to be read from the device then
-> +         * complete the DMA operation immediately.  Otherwise defer
-> +         * until the scsi layer has completed.
-> +         */
-> +        if (to_device || s->dma_left != 0 || s->ti_size == 0) {
-> +            return;
-> +        }
-> +    }
-> +
-> +    /* Partially filled a scsi buffer. Complete immediately.  */
-> +    esp_dma_done(s);
-> +}
-> +
->   static void esp_do_dma(ESPState *s)
->   {
->       uint32_t len;
-> @@ -252,10 +397,25 @@ static void esp_do_dma(ESPState *s)
->           trace_esp_do_dma(s->cmdlen, len);
->           assert (s->cmdlen <= sizeof(s->cmdbuf) &&
->                   len <= sizeof(s->cmdbuf) - s->cmdlen);
-> -        s->dma_memory_read(s->dma_opaque, &s->cmdbuf[s->cmdlen], len);
-> +        if (s->dma_memory_read) {
-> +            s->dma_memory_read(s->dma_opaque, &s->cmdbuf[s->cmdlen], len);
-> +        } else {
-> +            set_pdma(s, CMD, s->cmdlen, len);
-> +            s->pdma_cb = do_dma_pdma_cb;
-> +            esp_raise_drq(s);
-> +            return;
-> +        }
-> +        trace_esp_handle_ti_cmd(s->cmdlen);
-> +        s->ti_size = 0;
-> +        s->cmdlen = 0;
-> +        s->do_cmd = 0;
-> +        do_cmd(s, s->cmdbuf);
->           return;
->       }
->       if (s->async_len == 0) {
-> +        if (s->dma_left == 0) {
-> +            esp_dma_done(s);
-> +        }
+for you to fetch changes up to 0582bce69e8688fd7dd5501d352695e5c675b89b:
 
-This change seems unrelated to PDMA, is this a fix?
+  qapi: Allow introspecting fix for savevm's cooperation with blockdev (201=
+9-10-22 09:28:11 +0200)
 
->           /* Defer until data is available.  */
->           return;
->       }
-> @@ -264,9 +424,23 @@ static void esp_do_dma(ESPState *s)
->       }
->       to_device = (s->ti_size < 0);
->       if (to_device) {
-> -        s->dma_memory_read(s->dma_opaque, s->async_buf, len);
-> +        if (s->dma_memory_read) {
-> +            s->dma_memory_read(s->dma_opaque, s->async_buf, len);
-> +        } else {
-> +            set_pdma(s, ASYNC, 0, len);
-> +            s->pdma_cb = do_dma_pdma_cb;
-> +            esp_raise_drq(s);
-> +            return;
-> +        }
->       } else {
-> -        s->dma_memory_write(s->dma_opaque, s->async_buf, len);
-> +        if (s->dma_memory_write) {
-> +            s->dma_memory_write(s->dma_opaque, s->async_buf, len);
-> +        } else {
-> +            set_pdma(s, ASYNC, 0, len);
-> +            s->pdma_cb = do_dma_pdma_cb;
-> +            esp_raise_drq(s);
-> +            return;
-> +        }
->       }
->       s->dma_left -= len;
->       s->async_buf += len;
-> @@ -373,8 +547,7 @@ static void handle_ti(ESPState *s)
->           s->dma_left = minlen;
->           s->rregs[ESP_RSTAT] &= ~STAT_TC;
->           esp_do_dma(s);
-> -    }
-> -    if (s->do_cmd) {
-> +    } else if (s->do_cmd) {
+----------------------------------------------------------------
+QAPI patches for 2019-10-22
 
-Hmmm, unrelated too?
+v2:
+* PATCH 6: Add "# -*- coding: utf-8 -*-" lines
 
->           trace_esp_handle_ti_cmd(s->cmdlen);
->           s->ti_size = 0;
->           s->cmdlen = 0;
-> @@ -401,6 +574,7 @@ void esp_hard_reset(ESPState *s)
->   static void esp_soft_reset(ESPState *s)
->   {
->       qemu_irq_lower(s->irq);
-> +    qemu_irq_lower(s->irq_data);
->       esp_hard_reset(s);
->   }
->   
-> @@ -590,6 +764,28 @@ static bool esp_mem_accepts(void *opaque, hwaddr addr,
->       return (size == 1) || (is_write && size == 4);
->   }
->   
-> +static bool esp_pdma_needed(void *opaque)
-> +{
-> +    ESPState *s = opaque;
-> +    return s->dma_memory_read == NULL && s->dma_memory_write == NULL &&
-> +           s->dma_enabled;
-> +}
-> +
-> +static const VMStateDescription vmstate_esp_pdma = {
-> +    .name = "esp/pdma",
-> +    .version_id = 1,
-> +    .minimum_version_id = 1,
-> +    .needed = esp_pdma_needed,
-> +    .fields = (VMStateField[]) {
-> +        VMSTATE_BUFFER(pdma_buf, ESPState),
-> +        VMSTATE_INT32(pdma_origin, ESPState),
-> +        VMSTATE_UINT32(pdma_len, ESPState),
-> +        VMSTATE_UINT32(pdma_start, ESPState),
-> +        VMSTATE_UINT32(pdma_cur, ESPState),
-> +        VMSTATE_END_OF_LIST()
-> +    }
-> +};
-> +
->   const VMStateDescription vmstate_esp = {
->       .name ="esp",
->       .version_id = 4,
-> @@ -611,6 +807,10 @@ const VMStateDescription vmstate_esp = {
->           VMSTATE_UINT32(do_cmd, ESPState),
->           VMSTATE_UINT32(dma_left, ESPState),
->           VMSTATE_END_OF_LIST()
-> +    },
-> +    .subsections = (const VMStateDescription * []) {
-> +        &vmstate_esp_pdma,
-> +        NULL
->       }
->   };
->   
-> @@ -641,6 +841,82 @@ static const MemoryRegionOps sysbus_esp_mem_ops = {
->       .valid.accepts = esp_mem_accepts,
->   };
->   
-> +static void sysbus_esp_pdma_write(void *opaque, hwaddr addr,
-> +                                  uint64_t val, unsigned int size)
-> +{
-> +    SysBusESPState *sysbus = opaque;
-> +    ESPState *s = &sysbus->esp;
-> +    uint32_t dmalen;
-> +    uint8_t *buf = get_pdma_buf(s);
-> +
-> +    dmalen = s->rregs[ESP_TCLO];
-> +    dmalen |= s->rregs[ESP_TCMID] << 8;
-> +    dmalen |= s->rregs[ESP_TCHI] << 16;
-> +    if (dmalen == 0 || s->pdma_len == 0) {
-> +        return;
-> +    }
-> +    switch (size) {
-> +    case 1:
-> +        buf[s->pdma_cur++] = val;
-> +        s->pdma_len--;
-> +        dmalen--;
-> +        break;
-> +    case 2:
-> +        buf[s->pdma_cur++] = val >> 8;
-> +        buf[s->pdma_cur++] = val;
-> +        s->pdma_len -= 2;
-> +        dmalen -= 2;
-> +        break;
-> +    }
-> +    s->rregs[ESP_TCLO] = dmalen & 0xff;
-> +    s->rregs[ESP_TCMID] = dmalen >> 8;
-> +    s->rregs[ESP_TCHI] = dmalen >> 16;
-> +    if (s->pdma_len == 0 && s->pdma_cb) {
-> +        esp_lower_drq(s);
-> +        s->pdma_cb(s);
-> +        s->pdma_cb = NULL;
-> +    }
-> +}
-> +
-> +static uint64_t sysbus_esp_pdma_read(void *opaque, hwaddr addr,
-> +                                     unsigned int size)
-> +{
-> +    SysBusESPState *sysbus = opaque;
-> +    ESPState *s = &sysbus->esp;
-> +    uint8_t *buf = get_pdma_buf(s);
-> +    uint64_t val = 0;
-> +
-> +    if (s->pdma_len == 0) {
-> +        return 0;
-> +    }
-> +    switch (size) {
-> +    case 1:
-> +        val = buf[s->pdma_cur++];
-> +        s->pdma_len--;
-> +        break;
-> +    case 2:
-> +        val = buf[s->pdma_cur++];
-> +        val = (val << 8) | buf[s->pdma_cur++];
-> +        s->pdma_len -= 2;
-> +        break;
-> +    }
-> +
-> +    if (s->pdma_len == 0 && s->pdma_cb) {
-> +        esp_lower_drq(s);
-> +        s->pdma_cb(s);
-> +        s->pdma_cb = NULL;
-> +    }
-> +    return val;
-> +}
-> +
-> +static const MemoryRegionOps sysbus_esp_pdma_ops = {
-> +    .read = sysbus_esp_pdma_read,
-> +    .write = sysbus_esp_pdma_write,
-> +    .endianness = DEVICE_NATIVE_ENDIAN,
-> +    .valid.min_access_size = 1,
-> +    .valid.max_access_size = 2,
-> +};
-> +
->   static const struct SCSIBusInfo esp_scsi_info = {
->       .tcq = false,
->       .max_target = ESP_MAX_DEVS,
-> @@ -673,12 +949,16 @@ static void sysbus_esp_realize(DeviceState *dev, Error **errp)
->       ESPState *s = &sysbus->esp;
->   
->       sysbus_init_irq(sbd, &s->irq);
-> +    sysbus_init_irq(sbd, &s->irq_data);
->       assert(sysbus->it_shift != -1);
->   
->       s->chip_id = TCHI_FAS100A;
->       memory_region_init_io(&sysbus->iomem, OBJECT(sysbus), &sysbus_esp_mem_ops,
-> -                          sysbus, "esp", ESP_REGS << sysbus->it_shift);
-> +                          sysbus, "esp-regs", ESP_REGS << sysbus->it_shift);
->       sysbus_init_mmio(sbd, &sysbus->iomem);
-> +    memory_region_init_io(&sysbus->pdma, OBJECT(sysbus), &sysbus_esp_pdma_ops,
-> +                          sysbus, "esp-pdma", 2);
-> +    sysbus_init_mmio(sbd, &sysbus->pdma);
->   
->       qdev_init_gpio_in(dev, sysbus_esp_gpio_demux, 2);
->   
-> 
+----------------------------------------------------------------
+Markus Armbruster (9):
+      qapi: Don't suppress doc generation without pragma doc-required
+      qapi: Store pragma state in QAPISourceInfo, not global state
+      qapi: Eliminate accidental global frontend state
+      qapi: Speed up frontend tests
+      qapi: Move gen_enum(), gen_enum_lookup() back to qapi/types.py
+      qapi: Split up scripts/qapi/common.py
+      qapi: Clear scripts/qapi/doc.py executable bits again
+      tests/qapi-schema: Tidy up test output indentation
+      tests/qapi-schema: Cover feature documentation comments
+
+Peter Krempa (3):
+      qapi: Add feature flags to commands
+      tests: qapi: Test 'features' of commands
+      qapi: Allow introspecting fix for savevm's cooperation with blockdev
+
+ docs/devel/qapi-code-gen.txt                       |   10 +-
+ tests/qapi-schema/doc-good.texi                    |   22 +
+ Makefile                                           |   13 +-
+ qapi/introspect.json                               |    6 +-
+ qapi/misc.json                                     |    9 +-
+ tests/test-qmp-cmds.c                              |   24 +
+ scripts/qapi-gen.py                                |   10 +-
+ scripts/qapi/commands.py                           |    4 +-
+ scripts/qapi/common.py                             | 2377 ----------------=
+----
+ scripts/qapi/doc.py                                |   14 +-
+ scripts/qapi/error.py                              |   42 +
+ scripts/qapi/events.py                             |    3 +
+ scripts/qapi/expr.py                               |  382 ++++
+ scripts/qapi/gen.py                                |  290 +++
+ scripts/qapi/introspect.py                         |   12 +-
+ scripts/qapi/parser.py                             |  569 +++++
+ scripts/qapi/schema.py                             | 1056 +++++++++
+ scripts/qapi/source.py                             |   67 +
+ scripts/qapi/types.py                              |   61 +
+ scripts/qapi/visit.py                              |    2 +
+ tests/Makefile.include                             |   30 +-
+ tests/qapi-schema/allow-preconfig-test.err         |    4 +-
+ tests/qapi-schema/allow-preconfig-test.exit        |    1 -
+ tests/qapi-schema/alternate-any.err                |    4 +-
+ tests/qapi-schema/alternate-any.exit               |    1 -
+ tests/qapi-schema/alternate-array.err              |    4 +-
+ tests/qapi-schema/alternate-array.exit             |    1 -
+ tests/qapi-schema/alternate-base.err               |    4 +-
+ tests/qapi-schema/alternate-base.exit              |    1 -
+ tests/qapi-schema/alternate-branch-if-invalid.err  |    4 +-
+ tests/qapi-schema/alternate-branch-if-invalid.exit |    1 -
+ tests/qapi-schema/alternate-clash.err              |    4 +-
+ tests/qapi-schema/alternate-clash.exit             |    1 -
+ .../qapi-schema/alternate-conflict-bool-string.err |    4 +-
+ .../alternate-conflict-bool-string.exit            |    1 -
+ tests/qapi-schema/alternate-conflict-dict.err      |    4 +-
+ tests/qapi-schema/alternate-conflict-dict.exit     |    1 -
+ tests/qapi-schema/alternate-conflict-enum-bool.err |    4 +-
+ .../qapi-schema/alternate-conflict-enum-bool.exit  |    1 -
+ tests/qapi-schema/alternate-conflict-enum-int.err  |    4 +-
+ tests/qapi-schema/alternate-conflict-enum-int.exit |    1 -
+ .../qapi-schema/alternate-conflict-num-string.err  |    4 +-
+ .../qapi-schema/alternate-conflict-num-string.exit |    1 -
+ tests/qapi-schema/alternate-conflict-string.err    |    4 +-
+ tests/qapi-schema/alternate-conflict-string.exit   |    1 -
+ tests/qapi-schema/alternate-empty.err              |    4 +-
+ tests/qapi-schema/alternate-empty.exit             |    1 -
+ tests/qapi-schema/alternate-invalid-dict.err       |    4 +-
+ tests/qapi-schema/alternate-invalid-dict.exit      |    1 -
+ tests/qapi-schema/alternate-nested.err             |    4 +-
+ tests/qapi-schema/alternate-nested.exit            |    1 -
+ tests/qapi-schema/alternate-unknown.err            |    4 +-
+ tests/qapi-schema/alternate-unknown.exit           |    1 -
+ tests/qapi-schema/args-alternate.err               |    4 +-
+ tests/qapi-schema/args-alternate.exit              |    1 -
+ tests/qapi-schema/args-any.err                     |    4 +-
+ tests/qapi-schema/args-any.exit                    |    1 -
+ tests/qapi-schema/args-array-empty.err             |    4 +-
+ tests/qapi-schema/args-array-empty.exit            |    1 -
+ tests/qapi-schema/args-array-unknown.err           |    4 +-
+ tests/qapi-schema/args-array-unknown.exit          |    1 -
+ tests/qapi-schema/args-bad-boxed.err               |    4 +-
+ tests/qapi-schema/args-bad-boxed.exit              |    1 -
+ tests/qapi-schema/args-boxed-anon.err              |    4 +-
+ tests/qapi-schema/args-boxed-anon.exit             |    1 -
+ tests/qapi-schema/args-boxed-string.err            |    4 +-
+ tests/qapi-schema/args-boxed-string.exit           |    1 -
+ tests/qapi-schema/args-int.err                     |    4 +-
+ tests/qapi-schema/args-int.exit                    |    1 -
+ tests/qapi-schema/args-invalid.err                 |    4 +-
+ tests/qapi-schema/args-invalid.exit                |    1 -
+ tests/qapi-schema/args-member-array-bad.err        |    4 +-
+ tests/qapi-schema/args-member-array-bad.exit       |    1 -
+ tests/qapi-schema/args-member-case.err             |    4 +-
+ tests/qapi-schema/args-member-case.exit            |    1 -
+ tests/qapi-schema/args-member-unknown.err          |    4 +-
+ tests/qapi-schema/args-member-unknown.exit         |    1 -
+ tests/qapi-schema/args-name-clash.err              |    4 +-
+ tests/qapi-schema/args-name-clash.exit             |    1 -
+ tests/qapi-schema/args-union.err                   |    4 +-
+ tests/qapi-schema/args-union.exit                  |    1 -
+ tests/qapi-schema/args-unknown.err                 |    4 +-
+ tests/qapi-schema/args-unknown.exit                |    1 -
+ tests/qapi-schema/bad-base.err                     |    4 +-
+ tests/qapi-schema/bad-base.exit                    |    1 -
+ tests/qapi-schema/bad-data.err                     |    4 +-
+ tests/qapi-schema/bad-data.exit                    |    1 -
+ tests/qapi-schema/bad-ident.err                    |    4 +-
+ tests/qapi-schema/bad-ident.exit                   |    1 -
+ tests/qapi-schema/bad-if-empty-list.err            |    4 +-
+ tests/qapi-schema/bad-if-empty-list.exit           |    1 -
+ tests/qapi-schema/bad-if-empty.err                 |    4 +-
+ tests/qapi-schema/bad-if-empty.exit                |    1 -
+ tests/qapi-schema/bad-if-list.err                  |    4 +-
+ tests/qapi-schema/bad-if-list.exit                 |    1 -
+ tests/qapi-schema/bad-if.err                       |    4 +-
+ tests/qapi-schema/bad-if.exit                      |    1 -
+ tests/qapi-schema/bad-type-bool.err                |    2 +-
+ tests/qapi-schema/bad-type-bool.exit               |    1 -
+ tests/qapi-schema/bad-type-dict.err                |    2 +-
+ tests/qapi-schema/bad-type-dict.exit               |    1 -
+ tests/qapi-schema/bad-type-int.err                 |    2 +-
+ tests/qapi-schema/bad-type-int.exit                |    1 -
+ tests/qapi-schema/base-cycle-direct.err            |    4 +-
+ tests/qapi-schema/base-cycle-direct.exit           |    1 -
+ tests/qapi-schema/base-cycle-indirect.err          |    4 +-
+ tests/qapi-schema/base-cycle-indirect.exit         |    1 -
+ tests/qapi-schema/command-int.err                  |    4 +-
+ tests/qapi-schema/command-int.exit                 |    1 -
+ tests/qapi-schema/comments.exit                    |    1 -
+ tests/qapi-schema/doc-bad-alternate-member.err     |    2 +-
+ tests/qapi-schema/doc-bad-alternate-member.exit    |    1 -
+ tests/qapi-schema/doc-bad-command-arg.err          |    2 +-
+ tests/qapi-schema/doc-bad-command-arg.exit         |    1 -
+ tests/qapi-schema/doc-bad-section.exit             |    1 -
+ tests/qapi-schema/doc-bad-symbol.err               |    4 +-
+ tests/qapi-schema/doc-bad-symbol.exit              |    1 -
+ tests/qapi-schema/doc-bad-union-member.err         |    2 +-
+ tests/qapi-schema/doc-bad-union-member.exit        |    1 -
+ tests/qapi-schema/doc-before-include.err           |    2 +-
+ tests/qapi-schema/doc-before-include.exit          |    1 -
+ tests/qapi-schema/doc-before-pragma.err            |    2 +-
+ tests/qapi-schema/doc-before-pragma.exit           |    1 -
+ tests/qapi-schema/doc-duplicated-arg.err           |    2 +-
+ tests/qapi-schema/doc-duplicated-arg.exit          |    1 -
+ tests/qapi-schema/doc-duplicated-return.err        |    2 +-
+ tests/qapi-schema/doc-duplicated-return.exit       |    1 -
+ tests/qapi-schema/doc-duplicated-since.err         |    2 +-
+ tests/qapi-schema/doc-duplicated-since.exit        |    1 -
+ tests/qapi-schema/doc-empty-arg.err                |    2 +-
+ tests/qapi-schema/doc-empty-arg.exit               |    1 -
+ tests/qapi-schema/doc-empty-section.err            |    2 +-
+ tests/qapi-schema/doc-empty-section.exit           |    1 -
+ tests/qapi-schema/doc-empty-symbol.err             |    2 +-
+ tests/qapi-schema/doc-empty-symbol.exit            |    1 -
+ tests/qapi-schema/doc-good.exit                    |    1 -
+ tests/qapi-schema/doc-good.json                    |   17 +-
+ tests/qapi-schema/doc-good.out                     |    9 +-
+ tests/qapi-schema/doc-interleaved-section.err      |    2 +-
+ tests/qapi-schema/doc-interleaved-section.exit     |    1 -
+ tests/qapi-schema/doc-invalid-end.err              |    2 +-
+ tests/qapi-schema/doc-invalid-end.exit             |    1 -
+ tests/qapi-schema/doc-invalid-end2.err             |    2 +-
+ tests/qapi-schema/doc-invalid-end2.exit            |    1 -
+ tests/qapi-schema/doc-invalid-return.err           |    2 +-
+ tests/qapi-schema/doc-invalid-return.exit          |    1 -
+ tests/qapi-schema/doc-invalid-section.err          |    2 +-
+ tests/qapi-schema/doc-invalid-section.exit         |    1 -
+ tests/qapi-schema/doc-invalid-start.err            |    2 +-
+ tests/qapi-schema/doc-invalid-start.exit           |    1 -
+ tests/qapi-schema/doc-missing-colon.err            |    2 +-
+ tests/qapi-schema/doc-missing-colon.exit           |    1 -
+ tests/qapi-schema/doc-missing-expr.err             |    2 +-
+ tests/qapi-schema/doc-missing-expr.exit            |    1 -
+ tests/qapi-schema/doc-missing-space.err            |    2 +-
+ tests/qapi-schema/doc-missing-space.exit           |    1 -
+ tests/qapi-schema/doc-missing.err                  |    4 +-
+ tests/qapi-schema/doc-missing.exit                 |    1 -
+ tests/qapi-schema/doc-no-symbol.err                |    2 +-
+ tests/qapi-schema/doc-no-symbol.exit               |    1 -
+ tests/qapi-schema/double-type.err                  |    4 +-
+ tests/qapi-schema/double-type.exit                 |    1 -
+ tests/qapi-schema/duplicate-key.err                |    2 +-
+ tests/qapi-schema/duplicate-key.exit               |    1 -
+ tests/qapi-schema/empty.exit                       |    1 -
+ tests/qapi-schema/enum-bad-member.err              |    4 +-
+ tests/qapi-schema/enum-bad-member.exit             |    1 -
+ tests/qapi-schema/enum-bad-name.err                |    4 +-
+ tests/qapi-schema/enum-bad-name.exit               |    1 -
+ tests/qapi-schema/enum-bad-prefix.err              |    4 +-
+ tests/qapi-schema/enum-bad-prefix.exit             |    1 -
+ tests/qapi-schema/enum-clash-member.err            |    4 +-
+ tests/qapi-schema/enum-clash-member.exit           |    1 -
+ tests/qapi-schema/enum-dict-member-unknown.err     |    4 +-
+ tests/qapi-schema/enum-dict-member-unknown.exit    |    1 -
+ tests/qapi-schema/enum-if-invalid.err              |    4 +-
+ tests/qapi-schema/enum-if-invalid.exit             |    1 -
+ tests/qapi-schema/enum-int-member.err              |    2 +-
+ tests/qapi-schema/enum-int-member.exit             |    1 -
+ tests/qapi-schema/enum-member-case.err             |    4 +-
+ tests/qapi-schema/enum-member-case.exit            |    1 -
+ tests/qapi-schema/enum-missing-data.err            |    4 +-
+ tests/qapi-schema/enum-missing-data.exit           |    1 -
+ tests/qapi-schema/enum-wrong-data.err              |    4 +-
+ tests/qapi-schema/enum-wrong-data.exit             |    1 -
+ tests/qapi-schema/escape-outside-string.err        |    2 +-
+ tests/qapi-schema/event-boxed-empty.err            |    4 +-
+ tests/qapi-schema/event-boxed-empty.exit           |    1 -
+ tests/qapi-schema/event-case.exit                  |    1 -
+ tests/qapi-schema/event-case.out                   |    2 +-
+ tests/qapi-schema/event-member-invalid-dict.err    |    4 +-
+ tests/qapi-schema/event-member-invalid-dict.exit   |    1 -
+ tests/qapi-schema/event-nest-struct.err            |    4 +-
+ tests/qapi-schema/event-nest-struct.exit           |    1 -
+ tests/qapi-schema/features-bad-type.err            |    4 +-
+ tests/qapi-schema/features-bad-type.exit           |    1 -
+ tests/qapi-schema/features-duplicate-name.err      |    4 +-
+ tests/qapi-schema/features-duplicate-name.exit     |    1 -
+ tests/qapi-schema/features-if-invalid.err          |    4 +-
+ tests/qapi-schema/features-if-invalid.exit         |    1 -
+ tests/qapi-schema/features-missing-name.err        |    4 +-
+ tests/qapi-schema/features-missing-name.exit       |    1 -
+ tests/qapi-schema/features-name-bad-type.err       |    4 +-
+ tests/qapi-schema/features-name-bad-type.exit      |    1 -
+ tests/qapi-schema/features-no-list.err             |    4 +-
+ tests/qapi-schema/features-no-list.exit            |    1 -
+ tests/qapi-schema/features-unknown-key.err         |    4 +-
+ tests/qapi-schema/features-unknown-key.exit        |    1 -
+ tests/qapi-schema/flat-union-array-branch.err      |    4 +-
+ tests/qapi-schema/flat-union-array-branch.exit     |    1 -
+ tests/qapi-schema/flat-union-bad-base.err          |    4 +-
+ tests/qapi-schema/flat-union-bad-base.exit         |    1 -
+ tests/qapi-schema/flat-union-bad-discriminator.err |    4 +-
+ .../qapi-schema/flat-union-bad-discriminator.exit  |    1 -
+ tests/qapi-schema/flat-union-base-any.err          |    4 +-
+ tests/qapi-schema/flat-union-base-any.exit         |    1 -
+ tests/qapi-schema/flat-union-base-union.err        |    4 +-
+ tests/qapi-schema/flat-union-base-union.exit       |    1 -
+ tests/qapi-schema/flat-union-clash-member.err      |    4 +-
+ tests/qapi-schema/flat-union-clash-member.exit     |    1 -
+ .../flat-union-discriminator-bad-name.err          |    4 +-
+ .../flat-union-discriminator-bad-name.exit         |    1 -
+ tests/qapi-schema/flat-union-empty.err             |    4 +-
+ tests/qapi-schema/flat-union-empty.exit            |    1 -
+ .../qapi-schema/flat-union-inline-invalid-dict.err |    4 +-
+ .../flat-union-inline-invalid-dict.exit            |    1 -
+ tests/qapi-schema/flat-union-inline.err            |    4 +-
+ tests/qapi-schema/flat-union-inline.exit           |    1 -
+ tests/qapi-schema/flat-union-int-branch.err        |    4 +-
+ tests/qapi-schema/flat-union-int-branch.exit       |    1 -
+ .../qapi-schema/flat-union-invalid-branch-key.err  |    4 +-
+ .../qapi-schema/flat-union-invalid-branch-key.exit |    1 -
+ .../flat-union-invalid-discriminator.err           |    4 +-
+ .../flat-union-invalid-discriminator.exit          |    1 -
+ .../flat-union-invalid-if-discriminator.err        |    4 +-
+ .../flat-union-invalid-if-discriminator.exit       |    1 -
+ tests/qapi-schema/flat-union-no-base.err           |    4 +-
+ tests/qapi-schema/flat-union-no-base.exit          |    1 -
+ .../flat-union-optional-discriminator.err          |    4 +-
+ .../flat-union-optional-discriminator.exit         |    1 -
+ .../flat-union-string-discriminator.err            |    4 +-
+ .../flat-union-string-discriminator.exit           |    1 -
+ tests/qapi-schema/funny-char.err                   |    2 +-
+ tests/qapi-schema/funny-char.exit                  |    1 -
+ tests/qapi-schema/funny-word.err                   |    2 +-
+ tests/qapi-schema/funny-word.exit                  |    1 -
+ tests/qapi-schema/ident-with-escape.err            |    2 +-
+ tests/qapi-schema/ident-with-escape.exit           |    1 -
+ tests/qapi-schema/include-before-err.err           |    2 +-
+ tests/qapi-schema/include-before-err.exit          |    1 -
+ tests/qapi-schema/include-cycle.err                |    6 +-
+ tests/qapi-schema/include-cycle.exit               |    1 -
+ tests/qapi-schema/include-extra-junk.err           |    2 +-
+ tests/qapi-schema/include-extra-junk.exit          |    1 -
+ tests/qapi-schema/include-nested-err.err           |    4 +-
+ tests/qapi-schema/include-nested-err.exit          |    1 -
+ tests/qapi-schema/include-no-file.err              |    2 +-
+ tests/qapi-schema/include-no-file.exit             |    1 -
+ tests/qapi-schema/include-non-file.err             |    2 +-
+ tests/qapi-schema/include-non-file.exit            |    1 -
+ tests/qapi-schema/include-repetition.exit          |    1 -
+ tests/qapi-schema/include-self-cycle.err           |    2 +-
+ tests/qapi-schema/include-self-cycle.exit          |    1 -
+ tests/qapi-schema/include-simple.exit              |    1 -
+ tests/qapi-schema/indented-expr.exit               |    1 -
+ tests/qapi-schema/indented-expr.out                |    4 +-
+ tests/qapi-schema/leading-comma-list.err           |    2 +-
+ tests/qapi-schema/leading-comma-list.exit          |    1 -
+ tests/qapi-schema/leading-comma-object.err         |    2 +-
+ tests/qapi-schema/leading-comma-object.exit        |    1 -
+ tests/qapi-schema/missing-colon.err                |    2 +-
+ tests/qapi-schema/missing-colon.exit               |    1 -
+ tests/qapi-schema/missing-comma-list.err           |    2 +-
+ tests/qapi-schema/missing-comma-list.exit          |    1 -
+ tests/qapi-schema/missing-comma-object.err         |    2 +-
+ tests/qapi-schema/missing-comma-object.exit        |    1 -
+ tests/qapi-schema/missing-type.err                 |    2 +-
+ tests/qapi-schema/missing-type.exit                |    1 -
+ .../nested-struct-data-invalid-dict.err            |    4 +-
+ .../nested-struct-data-invalid-dict.exit           |    1 -
+ tests/qapi-schema/nested-struct-data.err           |    4 +-
+ tests/qapi-schema/nested-struct-data.exit          |    1 -
+ tests/qapi-schema/non-objects.err                  |    2 +-
+ tests/qapi-schema/non-objects.exit                 |    1 -
+ tests/qapi-schema/oob-test.err                     |    4 +-
+ tests/qapi-schema/oob-test.exit                    |    1 -
+ tests/qapi-schema/pragma-doc-required-crap.err     |    2 +-
+ tests/qapi-schema/pragma-doc-required-crap.exit    |    1 -
+ tests/qapi-schema/pragma-extra-junk.err            |    2 +-
+ tests/qapi-schema/pragma-extra-junk.exit           |    1 -
+ .../pragma-name-case-whitelist-crap.err            |    2 +-
+ .../pragma-name-case-whitelist-crap.exit           |    1 -
+ tests/qapi-schema/pragma-non-dict.err              |    2 +-
+ tests/qapi-schema/pragma-non-dict.exit             |    1 -
+ .../qapi-schema/pragma-returns-whitelist-crap.err  |    2 +-
+ .../qapi-schema/pragma-returns-whitelist-crap.exit |    1 -
+ tests/qapi-schema/pragma-unknown.err               |    2 +-
+ tests/qapi-schema/pragma-unknown.exit              |    1 -
+ tests/qapi-schema/qapi-schema-test.exit            |    1 -
+ tests/qapi-schema/qapi-schema-test.json            |   18 +
+ tests/qapi-schema/qapi-schema-test.out             |   75 +-
+ tests/qapi-schema/quoted-structural-chars.err      |    2 +-
+ tests/qapi-schema/quoted-structural-chars.exit     |    1 -
+ tests/qapi-schema/redefined-builtin.err            |    4 +-
+ tests/qapi-schema/redefined-builtin.exit           |    1 -
+ tests/qapi-schema/redefined-command.err            |    8 +-
+ tests/qapi-schema/redefined-command.exit           |    1 -
+ tests/qapi-schema/redefined-event.err              |    8 +-
+ tests/qapi-schema/redefined-event.exit             |    1 -
+ tests/qapi-schema/redefined-type.err               |    8 +-
+ tests/qapi-schema/redefined-type.exit              |    1 -
+ tests/qapi-schema/reserved-command-q.err           |    4 +-
+ tests/qapi-schema/reserved-command-q.exit          |    1 -
+ tests/qapi-schema/reserved-enum-q.err              |    4 +-
+ tests/qapi-schema/reserved-enum-q.exit             |    1 -
+ tests/qapi-schema/reserved-member-has.err          |    4 +-
+ tests/qapi-schema/reserved-member-has.exit         |    1 -
+ tests/qapi-schema/reserved-member-q.err            |    4 +-
+ tests/qapi-schema/reserved-member-q.exit           |    1 -
+ tests/qapi-schema/reserved-member-u.err            |    4 +-
+ tests/qapi-schema/reserved-member-u.exit           |    1 -
+ tests/qapi-schema/reserved-member-underscore.err   |    4 +-
+ tests/qapi-schema/reserved-member-underscore.exit  |    1 -
+ tests/qapi-schema/reserved-type-kind.err           |    4 +-
+ tests/qapi-schema/reserved-type-kind.exit          |    1 -
+ tests/qapi-schema/reserved-type-list.err           |    4 +-
+ tests/qapi-schema/reserved-type-list.exit          |    1 -
+ tests/qapi-schema/returns-alternate.err            |    4 +-
+ tests/qapi-schema/returns-alternate.exit           |    1 -
+ tests/qapi-schema/returns-array-bad.err            |    4 +-
+ tests/qapi-schema/returns-array-bad.exit           |    1 -
+ tests/qapi-schema/returns-dict.err                 |    4 +-
+ tests/qapi-schema/returns-dict.exit                |    1 -
+ tests/qapi-schema/returns-unknown.err              |    4 +-
+ tests/qapi-schema/returns-unknown.exit             |    1 -
+ tests/qapi-schema/returns-whitelist.err            |    4 +-
+ tests/qapi-schema/returns-whitelist.exit           |    1 -
+ tests/qapi-schema/string-code-point-127.err        |    2 +-
+ tests/qapi-schema/string-code-point-127.exit       |    1 -
+ tests/qapi-schema/string-code-point-31.err         |    2 +-
+ tests/qapi-schema/string-code-point-31.exit        |    1 -
+ tests/qapi-schema/struct-base-clash-deep.err       |    4 +-
+ tests/qapi-schema/struct-base-clash-deep.exit      |    1 -
+ tests/qapi-schema/struct-base-clash.err            |    4 +-
+ tests/qapi-schema/struct-base-clash.exit           |    1 -
+ tests/qapi-schema/struct-data-invalid.err          |    4 +-
+ tests/qapi-schema/struct-data-invalid.exit         |    1 -
+ tests/qapi-schema/struct-member-if-invalid.err     |    4 +-
+ tests/qapi-schema/struct-member-if-invalid.exit    |    1 -
+ tests/qapi-schema/struct-member-invalid-dict.err   |    4 +-
+ tests/qapi-schema/struct-member-invalid-dict.exit  |    1 -
+ tests/qapi-schema/struct-member-invalid.err        |    4 +-
+ tests/qapi-schema/struct-member-invalid.exit       |    1 -
+ tests/qapi-schema/test-qapi.py                     |  145 +-
+ tests/qapi-schema/trailing-comma-list.err          |    2 +-
+ tests/qapi-schema/trailing-comma-list.exit         |    1 -
+ tests/qapi-schema/trailing-comma-object.err        |    2 +-
+ tests/qapi-schema/trailing-comma-object.exit       |    1 -
+ tests/qapi-schema/type-bypass-bad-gen.err          |    4 +-
+ tests/qapi-schema/type-bypass-bad-gen.exit         |    1 -
+ tests/qapi-schema/unclosed-list.err                |    2 +-
+ tests/qapi-schema/unclosed-list.exit               |    1 -
+ tests/qapi-schema/unclosed-object.err              |    2 +-
+ tests/qapi-schema/unclosed-object.exit             |    1 -
+ tests/qapi-schema/unclosed-string.err              |    2 +-
+ tests/qapi-schema/unclosed-string.exit             |    1 -
+ tests/qapi-schema/union-base-empty.err             |    4 +-
+ tests/qapi-schema/union-base-empty.exit            |    1 -
+ tests/qapi-schema/union-base-no-discriminator.err  |    4 +-
+ tests/qapi-schema/union-base-no-discriminator.exit |    1 -
+ tests/qapi-schema/union-branch-case.err            |    4 +-
+ tests/qapi-schema/union-branch-case.exit           |    1 -
+ tests/qapi-schema/union-branch-if-invalid.err      |    4 +-
+ tests/qapi-schema/union-branch-if-invalid.exit     |    1 -
+ tests/qapi-schema/union-branch-invalid-dict.err    |    4 +-
+ tests/qapi-schema/union-branch-invalid-dict.exit   |    1 -
+ tests/qapi-schema/union-clash-branches.err         |    4 +-
+ tests/qapi-schema/union-clash-branches.exit        |    1 -
+ tests/qapi-schema/union-empty.err                  |    4 +-
+ tests/qapi-schema/union-empty.exit                 |    1 -
+ tests/qapi-schema/union-invalid-base.err           |    4 +-
+ tests/qapi-schema/union-invalid-base.exit          |    1 -
+ tests/qapi-schema/union-optional-branch.err        |    4 +-
+ tests/qapi-schema/union-optional-branch.exit       |    1 -
+ tests/qapi-schema/union-unknown.err                |    4 +-
+ tests/qapi-schema/union-unknown.exit               |    1 -
+ tests/qapi-schema/unknown-escape.err               |    2 +-
+ tests/qapi-schema/unknown-escape.exit              |    1 -
+ tests/qapi-schema/unknown-expr-key.err             |    4 +-
+ tests/qapi-schema/unknown-expr-key.exit            |    1 -
+ 390 files changed, 3108 insertions(+), 2958 deletions(-)
+ mode change 100755 =3D> 100644 scripts/qapi/doc.py
+ create mode 100644 scripts/qapi/error.py
+ create mode 100644 scripts/qapi/expr.py
+ create mode 100644 scripts/qapi/gen.py
+ create mode 100644 scripts/qapi/parser.py
+ create mode 100644 scripts/qapi/schema.py
+ create mode 100644 scripts/qapi/source.py
+ delete mode 100644 tests/qapi-schema/allow-preconfig-test.exit
+ delete mode 100644 tests/qapi-schema/alternate-any.exit
+ delete mode 100644 tests/qapi-schema/alternate-array.exit
+ delete mode 100644 tests/qapi-schema/alternate-base.exit
+ delete mode 100644 tests/qapi-schema/alternate-branch-if-invalid.exit
+ delete mode 100644 tests/qapi-schema/alternate-clash.exit
+ delete mode 100644 tests/qapi-schema/alternate-conflict-bool-string.exit
+ delete mode 100644 tests/qapi-schema/alternate-conflict-dict.exit
+ delete mode 100644 tests/qapi-schema/alternate-conflict-enum-bool.exit
+ delete mode 100644 tests/qapi-schema/alternate-conflict-enum-int.exit
+ delete mode 100644 tests/qapi-schema/alternate-conflict-num-string.exit
+ delete mode 100644 tests/qapi-schema/alternate-conflict-string.exit
+ delete mode 100644 tests/qapi-schema/alternate-empty.exit
+ delete mode 100644 tests/qapi-schema/alternate-invalid-dict.exit
+ delete mode 100644 tests/qapi-schema/alternate-nested.exit
+ delete mode 100644 tests/qapi-schema/alternate-unknown.exit
+ delete mode 100644 tests/qapi-schema/args-alternate.exit
+ delete mode 100644 tests/qapi-schema/args-any.exit
+ delete mode 100644 tests/qapi-schema/args-array-empty.exit
+ delete mode 100644 tests/qapi-schema/args-array-unknown.exit
+ delete mode 100644 tests/qapi-schema/args-bad-boxed.exit
+ delete mode 100644 tests/qapi-schema/args-boxed-anon.exit
+ delete mode 100644 tests/qapi-schema/args-boxed-string.exit
+ delete mode 100644 tests/qapi-schema/args-int.exit
+ delete mode 100644 tests/qapi-schema/args-invalid.exit
+ delete mode 100644 tests/qapi-schema/args-member-array-bad.exit
+ delete mode 100644 tests/qapi-schema/args-member-case.exit
+ delete mode 100644 tests/qapi-schema/args-member-unknown.exit
+ delete mode 100644 tests/qapi-schema/args-name-clash.exit
+ delete mode 100644 tests/qapi-schema/args-union.exit
+ delete mode 100644 tests/qapi-schema/args-unknown.exit
+ delete mode 100644 tests/qapi-schema/bad-base.exit
+ delete mode 100644 tests/qapi-schema/bad-data.exit
+ delete mode 100644 tests/qapi-schema/bad-ident.exit
+ delete mode 100644 tests/qapi-schema/bad-if-empty-list.exit
+ delete mode 100644 tests/qapi-schema/bad-if-empty.exit
+ delete mode 100644 tests/qapi-schema/bad-if-list.exit
+ delete mode 100644 tests/qapi-schema/bad-if.exit
+ delete mode 100644 tests/qapi-schema/bad-type-bool.exit
+ delete mode 100644 tests/qapi-schema/bad-type-dict.exit
+ delete mode 100644 tests/qapi-schema/bad-type-int.exit
+ delete mode 100644 tests/qapi-schema/base-cycle-direct.exit
+ delete mode 100644 tests/qapi-schema/base-cycle-indirect.exit
+ delete mode 100644 tests/qapi-schema/command-int.exit
+ delete mode 100644 tests/qapi-schema/comments.exit
+ delete mode 100644 tests/qapi-schema/doc-bad-alternate-member.exit
+ delete mode 100644 tests/qapi-schema/doc-bad-command-arg.exit
+ delete mode 100644 tests/qapi-schema/doc-bad-section.exit
+ delete mode 100644 tests/qapi-schema/doc-bad-symbol.exit
+ delete mode 100644 tests/qapi-schema/doc-bad-union-member.exit
+ delete mode 100644 tests/qapi-schema/doc-before-include.exit
+ delete mode 100644 tests/qapi-schema/doc-before-pragma.exit
+ delete mode 100644 tests/qapi-schema/doc-duplicated-arg.exit
+ delete mode 100644 tests/qapi-schema/doc-duplicated-return.exit
+ delete mode 100644 tests/qapi-schema/doc-duplicated-since.exit
+ delete mode 100644 tests/qapi-schema/doc-empty-arg.exit
+ delete mode 100644 tests/qapi-schema/doc-empty-section.exit
+ delete mode 100644 tests/qapi-schema/doc-empty-symbol.exit
+ delete mode 100644 tests/qapi-schema/doc-good.exit
+ delete mode 100644 tests/qapi-schema/doc-interleaved-section.exit
+ delete mode 100644 tests/qapi-schema/doc-invalid-end.exit
+ delete mode 100644 tests/qapi-schema/doc-invalid-end2.exit
+ delete mode 100644 tests/qapi-schema/doc-invalid-return.exit
+ delete mode 100644 tests/qapi-schema/doc-invalid-section.exit
+ delete mode 100644 tests/qapi-schema/doc-invalid-start.exit
+ delete mode 100644 tests/qapi-schema/doc-missing-colon.exit
+ delete mode 100644 tests/qapi-schema/doc-missing-expr.exit
+ delete mode 100644 tests/qapi-schema/doc-missing-space.exit
+ delete mode 100644 tests/qapi-schema/doc-missing.exit
+ delete mode 100644 tests/qapi-schema/doc-no-symbol.exit
+ delete mode 100644 tests/qapi-schema/double-type.exit
+ delete mode 100644 tests/qapi-schema/duplicate-key.exit
+ delete mode 100644 tests/qapi-schema/empty.exit
+ delete mode 100644 tests/qapi-schema/enum-bad-member.exit
+ delete mode 100644 tests/qapi-schema/enum-bad-name.exit
+ delete mode 100644 tests/qapi-schema/enum-bad-prefix.exit
+ delete mode 100644 tests/qapi-schema/enum-clash-member.exit
+ delete mode 100644 tests/qapi-schema/enum-dict-member-unknown.exit
+ delete mode 100644 tests/qapi-schema/enum-if-invalid.exit
+ delete mode 100644 tests/qapi-schema/enum-int-member.exit
+ delete mode 100644 tests/qapi-schema/enum-member-case.exit
+ delete mode 100644 tests/qapi-schema/enum-missing-data.exit
+ delete mode 100644 tests/qapi-schema/enum-wrong-data.exit
+ delete mode 100644 tests/qapi-schema/event-boxed-empty.exit
+ delete mode 100644 tests/qapi-schema/event-case.exit
+ delete mode 100644 tests/qapi-schema/event-member-invalid-dict.exit
+ delete mode 100644 tests/qapi-schema/event-nest-struct.exit
+ delete mode 100644 tests/qapi-schema/features-bad-type.exit
+ delete mode 100644 tests/qapi-schema/features-duplicate-name.exit
+ delete mode 100644 tests/qapi-schema/features-if-invalid.exit
+ delete mode 100644 tests/qapi-schema/features-missing-name.exit
+ delete mode 100644 tests/qapi-schema/features-name-bad-type.exit
+ delete mode 100644 tests/qapi-schema/features-no-list.exit
+ delete mode 100644 tests/qapi-schema/features-unknown-key.exit
+ delete mode 100644 tests/qapi-schema/flat-union-array-branch.exit
+ delete mode 100644 tests/qapi-schema/flat-union-bad-base.exit
+ delete mode 100644 tests/qapi-schema/flat-union-bad-discriminator.exit
+ delete mode 100644 tests/qapi-schema/flat-union-base-any.exit
+ delete mode 100644 tests/qapi-schema/flat-union-base-union.exit
+ delete mode 100644 tests/qapi-schema/flat-union-clash-member.exit
+ delete mode 100644 tests/qapi-schema/flat-union-discriminator-bad-name.exi=
+t
+ delete mode 100644 tests/qapi-schema/flat-union-empty.exit
+ delete mode 100644 tests/qapi-schema/flat-union-inline-invalid-dict.exit
+ delete mode 100644 tests/qapi-schema/flat-union-inline.exit
+ delete mode 100644 tests/qapi-schema/flat-union-int-branch.exit
+ delete mode 100644 tests/qapi-schema/flat-union-invalid-branch-key.exit
+ delete mode 100644 tests/qapi-schema/flat-union-invalid-discriminator.exit
+ delete mode 100644 tests/qapi-schema/flat-union-invalid-if-discriminator.e=
+xit
+ delete mode 100644 tests/qapi-schema/flat-union-no-base.exit
+ delete mode 100644 tests/qapi-schema/flat-union-optional-discriminator.exi=
+t
+ delete mode 100644 tests/qapi-schema/flat-union-string-discriminator.exit
+ delete mode 100644 tests/qapi-schema/funny-char.exit
+ delete mode 100644 tests/qapi-schema/funny-word.exit
+ delete mode 100644 tests/qapi-schema/ident-with-escape.exit
+ delete mode 100644 tests/qapi-schema/include-before-err.exit
+ delete mode 100644 tests/qapi-schema/include-cycle.exit
+ delete mode 100644 tests/qapi-schema/include-extra-junk.exit
+ delete mode 100644 tests/qapi-schema/include-nested-err.exit
+ delete mode 100644 tests/qapi-schema/include-no-file.exit
+ delete mode 100644 tests/qapi-schema/include-non-file.exit
+ delete mode 100644 tests/qapi-schema/include-repetition.exit
+ delete mode 100644 tests/qapi-schema/include-self-cycle.exit
+ delete mode 100644 tests/qapi-schema/include-simple.exit
+ delete mode 100644 tests/qapi-schema/indented-expr.exit
+ delete mode 100644 tests/qapi-schema/leading-comma-list.exit
+ delete mode 100644 tests/qapi-schema/leading-comma-object.exit
+ delete mode 100644 tests/qapi-schema/missing-colon.exit
+ delete mode 100644 tests/qapi-schema/missing-comma-list.exit
+ delete mode 100644 tests/qapi-schema/missing-comma-object.exit
+ delete mode 100644 tests/qapi-schema/missing-type.exit
+ delete mode 100644 tests/qapi-schema/nested-struct-data-invalid-dict.exit
+ delete mode 100644 tests/qapi-schema/nested-struct-data.exit
+ delete mode 100644 tests/qapi-schema/non-objects.exit
+ delete mode 100644 tests/qapi-schema/oob-test.exit
+ delete mode 100644 tests/qapi-schema/pragma-doc-required-crap.exit
+ delete mode 100644 tests/qapi-schema/pragma-extra-junk.exit
+ delete mode 100644 tests/qapi-schema/pragma-name-case-whitelist-crap.exit
+ delete mode 100644 tests/qapi-schema/pragma-non-dict.exit
+ delete mode 100644 tests/qapi-schema/pragma-returns-whitelist-crap.exit
+ delete mode 100644 tests/qapi-schema/pragma-unknown.exit
+ delete mode 100644 tests/qapi-schema/qapi-schema-test.exit
+ delete mode 100644 tests/qapi-schema/quoted-structural-chars.exit
+ delete mode 100644 tests/qapi-schema/redefined-builtin.exit
+ delete mode 100644 tests/qapi-schema/redefined-command.exit
+ delete mode 100644 tests/qapi-schema/redefined-event.exit
+ delete mode 100644 tests/qapi-schema/redefined-type.exit
+ delete mode 100644 tests/qapi-schema/reserved-command-q.exit
+ delete mode 100644 tests/qapi-schema/reserved-enum-q.exit
+ delete mode 100644 tests/qapi-schema/reserved-member-has.exit
+ delete mode 100644 tests/qapi-schema/reserved-member-q.exit
+ delete mode 100644 tests/qapi-schema/reserved-member-u.exit
+ delete mode 100644 tests/qapi-schema/reserved-member-underscore.exit
+ delete mode 100644 tests/qapi-schema/reserved-type-kind.exit
+ delete mode 100644 tests/qapi-schema/reserved-type-list.exit
+ delete mode 100644 tests/qapi-schema/returns-alternate.exit
+ delete mode 100644 tests/qapi-schema/returns-array-bad.exit
+ delete mode 100644 tests/qapi-schema/returns-dict.exit
+ delete mode 100644 tests/qapi-schema/returns-unknown.exit
+ delete mode 100644 tests/qapi-schema/returns-whitelist.exit
+ delete mode 100644 tests/qapi-schema/string-code-point-127.exit
+ delete mode 100644 tests/qapi-schema/string-code-point-31.exit
+ delete mode 100644 tests/qapi-schema/struct-base-clash-deep.exit
+ delete mode 100644 tests/qapi-schema/struct-base-clash.exit
+ delete mode 100644 tests/qapi-schema/struct-data-invalid.exit
+ delete mode 100644 tests/qapi-schema/struct-member-if-invalid.exit
+ delete mode 100644 tests/qapi-schema/struct-member-invalid-dict.exit
+ delete mode 100644 tests/qapi-schema/struct-member-invalid.exit
+ mode change 100644 =3D> 100755 tests/qapi-schema/test-qapi.py
+ delete mode 100644 tests/qapi-schema/trailing-comma-list.exit
+ delete mode 100644 tests/qapi-schema/trailing-comma-object.exit
+ delete mode 100644 tests/qapi-schema/type-bypass-bad-gen.exit
+ delete mode 100644 tests/qapi-schema/unclosed-list.exit
+ delete mode 100644 tests/qapi-schema/unclosed-object.exit
+ delete mode 100644 tests/qapi-schema/unclosed-string.exit
+ delete mode 100644 tests/qapi-schema/union-base-empty.exit
+ delete mode 100644 tests/qapi-schema/union-base-no-discriminator.exit
+ delete mode 100644 tests/qapi-schema/union-branch-case.exit
+ delete mode 100644 tests/qapi-schema/union-branch-if-invalid.exit
+ delete mode 100644 tests/qapi-schema/union-branch-invalid-dict.exit
+ delete mode 100644 tests/qapi-schema/union-clash-branches.exit
+ delete mode 100644 tests/qapi-schema/union-empty.exit
+ delete mode 100644 tests/qapi-schema/union-invalid-base.exit
+ delete mode 100644 tests/qapi-schema/union-optional-branch.exit
+ delete mode 100644 tests/qapi-schema/union-unknown.exit
+ delete mode 100644 tests/qapi-schema/unknown-escape.exit
+ delete mode 100644 tests/qapi-schema/unknown-expr-key.exit
+
+--=20
+2.21.0
+
 
