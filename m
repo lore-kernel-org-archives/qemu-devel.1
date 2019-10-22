@@ -2,84 +2,86 @@ Return-Path: <SRS0=tSBD=YP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 337B0CA9EA0
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 10:30:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 035C2CA9EA0
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 10:31:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EF6BD21783
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 10:30:21 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Y9155m/v"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EF6BD21783
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id CC52B20B7C
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 10:31:58 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CC52B20B7C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52991 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53014 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iMrQj-0002yO-59
-	for qemu-devel@archiver.kernel.org; Tue, 22 Oct 2019 06:30:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37413)
+	id 1iMrSH-0004FP-Rq
+	for qemu-devel@archiver.kernel.org; Tue, 22 Oct 2019 06:31:57 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37526)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1iMrPj-0001to-UC
- for qemu-devel@nongnu.org; Tue, 22 Oct 2019 06:29:21 -0400
+ (envelope-from <philmd@redhat.com>) id 1iMrQg-0003D6-ER
+ for qemu-devel@nongnu.org; Tue, 22 Oct 2019 06:30:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1iMrPi-0005RF-Fm
- for qemu-devel@nongnu.org; Tue, 22 Oct 2019 06:29:19 -0400
-Received: from mail-oi1-x241.google.com ([2607:f8b0:4864:20::241]:38702)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1iMrPi-0005Qe-7Y
- for qemu-devel@nongnu.org; Tue, 22 Oct 2019 06:29:18 -0400
-Received: by mail-oi1-x241.google.com with SMTP id v186so912458oie.5
- for <qemu-devel@nongnu.org>; Tue, 22 Oct 2019 03:29:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=f9SpE5RTTZ9ZFtnVBG8aQnaKHU7QG2XbFcYcpWytK8s=;
- b=Y9155m/vcXFPXIMF+Bpf1+RO1U45HDCFyjok1dDav+gTgGhT0AcDOsMJcZEo8SpvdF
- I60Vi5ALZ3w5dJ9s50osXofurJVtTLV3/H94ouYzIW0Zwk5blEEFW9XhXzIHYcjLLL4a
- bLbmZ0A64mGP1HC6HfPXQvCrxhHDeb2Ae6BJdYF1wC9Ba34Cj1Z8GDDE82EKGsvcJ3iV
- DoaFWbuhDoBBHumFjsu/PVLz1X7616jeiVIYPf6OxvFaPWrVhqyr9m6Ec2FCZTAF5Mgk
- XLfxxOcCS0Rf4ZwcM25rT1IVUHr4AR/YK4xF6AGgnF8yg9+dDI0y1pdHux0C9yIK+Jrx
- TciQ==
+ (envelope-from <philmd@redhat.com>) id 1iMrQf-00063A-2c
+ for qemu-devel@nongnu.org; Tue, 22 Oct 2019 06:30:18 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:29832)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iMrQe-00062k-Qc
+ for qemu-devel@nongnu.org; Tue, 22 Oct 2019 06:30:17 -0400
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 8497085537
+ for <qemu-devel@nongnu.org>; Tue, 22 Oct 2019 10:30:15 +0000 (UTC)
+Received: by mail-wr1-f72.google.com with SMTP id n18so8907873wro.11
+ for <qemu-devel@nongnu.org>; Tue, 22 Oct 2019 03:30:15 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=f9SpE5RTTZ9ZFtnVBG8aQnaKHU7QG2XbFcYcpWytK8s=;
- b=A2ZGXMEwBAtUjmeWijhP1aF3IDlUjNV5v2l5kCSLwnBCs+UzqRlJBQbvT5oYj6M+YY
- TWbd0cz2hOwO5I1hKZMaEoZHxZS/Tt5nVm4syJwf3YlbYtDJeRNWtV51rzRqFVRMMuSH
- qusLnWykayaJgSKZjPsNG1m/EuDapuDkMwDLYdOEZxGYy41QhEQS21CGCg69H7N7hDj1
- irUL8Ni2aueL+xg0L+v8NYyqixaABolIXe0kE2TFlwHB5lFY7G6ZPPep5mlsIKo6C4t2
- sXHU6Sb6/3zcDlPcGpMuzjm2Es72uuVRzYaqT5LvSNIVypUdsmi7SwLniHW/AwjIgNmO
- BlfQ==
-X-Gm-Message-State: APjAAAUSPZbiSN7T9KmYJHyD0hKehaIo7OOqxGp9J7QLL/IRqbJHWEDZ
- fhr2GDnfyxVC8pZDe3aj4wdCa0xJh9eNeUp0w9kMGg==
-X-Google-Smtp-Source: APXvYqyVvBpryFNHl2V2uDrohuAXnWC9ZE3495cppPYaUgJ+hfuqsDdi1143t+oqAtc4dbplC23m7ANLgG3LXjIWt/M=
-X-Received: by 2002:a05:6808:9:: with SMTP id u9mr2339378oic.98.1571740157184; 
- Tue, 22 Oct 2019 03:29:17 -0700 (PDT)
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=kWFx4GJHHX1unc3yl5qkieSTvZybA3YQ8dkUz1v3gfQ=;
+ b=fveMpxWMomssxTp79AULrMqAkkr31fDmGV/ziHVG3UwSKvQtdBvOQ1e7DszxBGIPuY
+ AeFQ/KPPjHBotIKus1M8j2zhXeMdhdTi4BxeqHwwtIPyKhUeo0Xx1KaytzF2b5FYwQL8
+ qMOQwQEbhSzI7V22pZWShp/jVXtKEzWYCrqv3VvM4slKdoWFCU4o5207wYn8GrU4pGG1
+ hclHf+UFE60/Fc53SI/hyvuIrTDe8fjSjpx7kGeFKg+2tkUtzTRDfjqcMN6MsOx3VwA5
+ r/wWfO++iRRRdenUAJhIusJHE/kndaR54++ntHTR5mOaCYcpOhkIhX2CVIEFift95LvG
+ KEyQ==
+X-Gm-Message-State: APjAAAVltGJA8tbpIuBviKZltz0UXdpwua5r0We9RctzhRgR1nWCbvCc
+ qmat4qcAuowKf3fS/wwnzD+I6rGa+dA0Nvulrg1AkxWVZyt9x8RcdOpLfHn2tBpSaH8xU0E8bbl
+ pgaUMIHfm6lXdrd4=
+X-Received: by 2002:a1c:2c88:: with SMTP id s130mr2465031wms.66.1571740214253; 
+ Tue, 22 Oct 2019 03:30:14 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqwiM/ZLGIHbn43oGUu3rgNG8VB1ifjrhkAXBJLknYGCj3yP+s5p6LPQsaG398agXldXKyxnuQ==
+X-Received: by 2002:a1c:2c88:: with SMTP id s130mr2464987wms.66.1571740213867; 
+ Tue, 22 Oct 2019 03:30:13 -0700 (PDT)
+Received: from [192.168.1.41] (129.red-83-57-174.dynamicip.rima-tde.net.
+ [83.57.174.129])
+ by smtp.gmail.com with ESMTPSA id q66sm18760474wme.39.2019.10.22.03.30.12
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Tue, 22 Oct 2019 03:30:13 -0700 (PDT)
+Subject: Re: [PATCH v8 5/8] bootdevice: Gather LCHS from all relevant devices
+To: Sam Eiderman <sameid@google.com>, qemu-devel@nongnu.org
+References: <20191016164145.115898-1-sameid@google.com>
+ <20191016164145.115898-7-sameid@google.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <f2c3ddad-06c4-3c5c-3064-e80e94f9727c@redhat.com>
+Date: Tue, 22 Oct 2019 12:30:11 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.1
 MIME-Version: 1.0
-References: <20191016085408.24360-1-drjones@redhat.com>
- <CAFEAcA8pV5batrPk+J6RLU2rv9SNAmL8JS9Kd9tWP3pD-m29eA@mail.gmail.com>
- <3f54f759-9d6d-bf04-85aa-59c1cac31044@redhat.com>
- <20191021142336.e4xekqlmqv5txu5w@kamzik.brq.redhat.com>
- <CAFEAcA-bezS5tSVB+N223+N+xoYYYHuSJmDTaRCJgO+4Y=VjdQ@mail.gmail.com>
- <20191021161226.mnm6eomghb37xlby@kamzik.brq.redhat.com>
- <CAFEAcA-vHmtCi3HGqpu34sAaNxGeQwS_+0yZ5Hr4SbnGm+rjYA@mail.gmail.com>
-In-Reply-To: <CAFEAcA-vHmtCi3HGqpu34sAaNxGeQwS_+0yZ5Hr4SbnGm+rjYA@mail.gmail.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 22 Oct 2019 11:29:05 +0100
-Message-ID: <CAFEAcA9o4G5yn0GzgdwvUnT_fEwRA7DChuV=miZaEvgavoU5xg@mail.gmail.com>
-Subject: Re: [PATCH v6 0/9] target/arm/kvm: enable SVE in guests
-To: Andrew Jones <drjones@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::241
+In-Reply-To: <20191016164145.115898-7-sameid@google.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,114 +93,126 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
- Richard Henderson <richard.henderson@linaro.org>,
- QEMU Developers <qemu-devel@nongnu.org>, Markus Armbruster <armbru@redhat.com>,
- Eric Auger <eric.auger@redhat.com>, qemu-arm <qemu-arm@nongnu.org>,
- Igor Mammedov <imammedo@redhat.com>,
- =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
- Dave P Martin <Dave.Martin@arm.com>
+Cc: kwolf@redhat.com, qemu-block@nongnu.org, arbel.moshe@oracle.com,
+ jsnow@redhat.com, seabios@seabios.org, kevin@koconnor.net,
+ liran.alon@oracle.com, kraxel@redhat.com,
+ Sam Eiderman <shmuel.eiderman@oracle.com>, lersek@redhat.com,
+ karl.heubaum@oracle.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, 21 Oct 2019 at 17:18, Peter Maydell <peter.maydell@linaro.org> wrote:
->
-> On Mon, 21 Oct 2019 at 17:12, Andrew Jones <drjones@redhat.com> wrote:
-> >
-> > On Mon, Oct 21, 2019 at 04:43:22PM +0100, Peter Maydell wrote:
-> > > On Mon, 21 Oct 2019 at 15:23, Andrew Jones <drjones@redhat.com> wrote:
-> > > > Peter, would you mind running your test on the kvm32 machine with this
-> > > > change before I send a v7?
-> > >
-> > > Still fails:
-> > >
-> > > pm215@pm-ct:~/qemu/build/arm$
-> > > QTEST_QEMU_BINARY=arm-softmmu/qemu-system-arm tests/arm-cpu-features
-> > > /arm/arm/query-cpu-model-expansion: OK
-> > > /arm/arm/kvm/query-cpu-model-expansion: **
-> > > ERROR:/home/pm215/qemu/tests/arm-cpu-features.c:498:test_query_cpu_model_expansion_kvm:
-> > > assertion failed: (resp_has_props(_resp))
-> > > Aborted
-> > >
-> > > This is asserting on the line:
-> > > 498             assert_has_not_feature(qts, "host", "sve");
-> > >
-> >
-> > Oh, I see. It's not failing the specific absence of 'sve', but the test
-> > code (assert_has_not_feature()) is assuming at least one property is
-> > present. This isn't the case for kvm32 'host' cpus. They apparently
-> > have none. We need this patch too, then
-> >
-> > diff --git a/tests/arm-cpu-features.c b/tests/arm-cpu-features.c
-> > index 14100ebd8521..9aa728ed8469 100644
-> > --- a/tests/arm-cpu-features.c
-> > +++ b/tests/arm-cpu-features.c
-> > @@ -136,8 +136,8 @@ static bool resp_get_feature(QDict *resp, const char *feature)
-> >  ({                                                                     \
-> >      QDict *_resp = do_query_no_props(qts, cpu_type);                   \
-> >      g_assert(_resp);                                                   \
-> > -    g_assert(resp_has_props(_resp));                                   \
-> > -    g_assert(!qdict_get(resp_get_props(_resp), feature));              \
-> > +    g_assert(!resp_has_props(_resp) ||                                 \
-> > +             !qdict_get(resp_get_props(_resp), feature));              \
-> >      qobject_unref(_resp);                                              \
-> >  })
->
-> Yep, with that extra the test passes. I'm just rerunning the
-> full 'make check'...
-
-...which passed OK. For the record, the changes on top of the
-patchset were:
-
-diff --git a/tests/arm-cpu-features.c b/tests/arm-cpu-features.c
-index 92668efb8f5..9aa728ed846 100644
---- a/tests/arm-cpu-features.c
-+++ b/tests/arm-cpu-features.c
-@@ -136,8 +136,8 @@ static bool resp_get_feature(QDict *resp, const
-char *feature)
- ({                                                                     \
-     QDict *_resp = do_query_no_props(qts, cpu_type);                   \
-     g_assert(_resp);                                                   \
--    g_assert(resp_has_props(_resp));                                   \
--    g_assert(!qdict_get(resp_get_props(_resp), feature));              \
-+    g_assert(!resp_has_props(_resp) ||                                 \
-+             !qdict_get(resp_get_props(_resp), feature));              \
-     qobject_unref(_resp);                                              \
- })
-
-@@ -417,8 +417,6 @@ static void
-test_query_cpu_model_expansion_kvm(const void *data)
-
-     qts = qtest_init(MACHINE "-accel kvm -cpu host");
-
--    assert_has_feature(qts, "host", "pmu");
+On 10/16/19 6:41 PM, Sam Eiderman wrote:
+> From: Sam Eiderman <shmuel.eiderman@oracle.com>
+>=20
+> Relevant devices are:
+>      * ide-hd (and ide-cd, ide-drive)
+>      * scsi-hd (and scsi-cd, scsi-disk, scsi-block)
+>      * virtio-blk-pci
+>=20
+> We do not call del_boot_device_lchs() for ide-* since we don't need to =
 -
-     if (g_str_equal(qtest_get_arch(), "aarch64")) {
-         bool kvm_supports_sve;
-         char max_name[8], name[8];
-@@ -428,6 +426,7 @@ static void
-test_query_cpu_model_expansion_kvm(const void *data)
-         char *error;
+> IDE block devices do not support unplugging.
+>=20
+> Reviewed-by: Karl Heubaum <karl.heubaum@oracle.com>
+> Reviewed-by: Arbel Moshe <arbel.moshe@oracle.com>
+> Signed-off-by: Sam Eiderman <shmuel.eiderman@oracle.com>
+> Signed-off-by: Sam Eiderman <sameid@google.com>
+> ---
+>   hw/block/virtio-blk.c |  6 ++++++
+>   hw/ide/qdev.c         |  5 +++++
+>   hw/scsi/scsi-disk.c   | 12 ++++++++++++
+>   3 files changed, 23 insertions(+)
+>=20
+> diff --git a/hw/block/virtio-blk.c b/hw/block/virtio-blk.c
+> index ed2ddebd2b..c56e905f80 100644
+> --- a/hw/block/virtio-blk.c
+> +++ b/hw/block/virtio-blk.c
+> @@ -1200,6 +1200,11 @@ static void virtio_blk_device_realize(DeviceStat=
+e *dev, Error **errp)
+>       blk_set_guest_block_size(s->blk, s->conf.conf.logical_block_size)=
+;
+>  =20
+>       blk_iostatus_enable(s->blk);
+> +
+> +    add_boot_device_lchs(dev, "/disk@0,0",
+> +                         conf->conf.lcyls,
+> +                         conf->conf.lheads,
+> +                         conf->conf.lsecs);
+>   }
+>  =20
+>   static void virtio_blk_device_unrealize(DeviceState *dev, Error **err=
+p)
+> @@ -1207,6 +1212,7 @@ static void virtio_blk_device_unrealize(DeviceSta=
+te *dev, Error **errp)
+>       VirtIODevice *vdev =3D VIRTIO_DEVICE(dev);
+>       VirtIOBlock *s =3D VIRTIO_BLK(dev);
+>  =20
+> +    del_boot_device_lchs(dev, "/disk@0,0");
+>       virtio_blk_data_plane_destroy(s->dataplane);
+>       s->dataplane =3D NULL;
+>       qemu_del_vm_change_state_handler(s->change);
+> diff --git a/hw/ide/qdev.c b/hw/ide/qdev.c
+> index 6dd219944f..2ffd387a73 100644
+> --- a/hw/ide/qdev.c
+> +++ b/hw/ide/qdev.c
+> @@ -220,6 +220,11 @@ static void ide_dev_initfn(IDEDevice *dev, IDEDriv=
+eKind kind, Error **errp)
+>  =20
+>       add_boot_device_path(dev->conf.bootindex, &dev->qdev,
+>                            dev->unit ? "/disk@1" : "/disk@0");
+> +
+> +    add_boot_device_lchs(&dev->qdev, dev->unit ? "/disk@1" : "/disk@0"=
+,
+> +                         dev->conf.lcyls,
+> +                         dev->conf.lheads,
+> +                         dev->conf.lsecs);
+>   }
+>  =20
+>   static void ide_dev_get_bootindex(Object *obj, Visitor *v, const char=
+ *name,
+> diff --git a/hw/scsi/scsi-disk.c b/hw/scsi/scsi-disk.c
+> index 68b1675fd9..07fb5ebdf1 100644
+> --- a/hw/scsi/scsi-disk.c
+> +++ b/hw/scsi/scsi-disk.c
+> @@ -35,6 +35,7 @@
+>   #include "hw/block/block.h"
+>   #include "hw/qdev-properties.h"
+>   #include "sysemu/dma.h"
+> +#include "sysemu/sysemu.h"
+>   #include "qemu/cutils.h"
+>   #include "trace.h"
+>  =20
+> @@ -2414,6 +2415,16 @@ static void scsi_realize(SCSIDevice *dev, Error =
+**errp)
+>       blk_set_guest_block_size(s->qdev.conf.blk, s->qdev.blocksize);
+>  =20
+>       blk_iostatus_enable(s->qdev.conf.blk);
+> +
+> +    add_boot_device_lchs(&dev->qdev, NULL,
+> +                         dev->conf.lcyls,
+> +                         dev->conf.lheads,
+> +                         dev->conf.lsecs);
+> +}
+> +
+> +static void scsi_unrealize(SCSIDevice *dev, Error **errp)
+> +{
+> +    del_boot_device_lchs(&dev->qdev, NULL);
+>   }
+>  =20
+>   static void scsi_hd_realize(SCSIDevice *dev, Error **errp)
+> @@ -3018,6 +3029,7 @@ static void scsi_hd_class_initfn(ObjectClass *kla=
+ss, void *data)
+>       SCSIDeviceClass *sc =3D SCSI_DEVICE_CLASS(klass);
+>  =20
+>       sc->realize      =3D scsi_hd_realize;
+> +    sc->unrealize    =3D scsi_unrealize;
+>       sc->alloc_req    =3D scsi_new_request;
+>       sc->unit_attention_reported =3D scsi_disk_unit_attention_reported=
+;
+>       dc->desc =3D "virtual SCSI disk";
+>=20
 
-         assert_has_feature(qts, "host", "aarch64");
-+        assert_has_feature(qts, "host", "pmu");
-
-         assert_error(qts, "cortex-a15",
-             "We cannot guarantee the CPU type 'cortex-a15' works "
-@@ -497,9 +496,6 @@ static void
-test_query_cpu_model_expansion_kvm(const void *data)
-         }
-     } else {
-         assert_has_not_feature(qts, "host", "sve");
--        assert_error(qts, "host",
--                     "'pmu' feature not supported by KVM on this host",
--                     "{ 'pmu': true }");
-     }
-
-     qtest_quit(qts);
-
-
-thanks
--- PMM
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 
