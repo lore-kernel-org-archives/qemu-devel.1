@@ -2,83 +2,64 @@ Return-Path: <SRS0=tSBD=YP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0C723CA9EA0
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 20:41:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 25B56CA9EA0
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 21:02:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C574820640
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 20:41:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D66C7214B2
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 21:02:08 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dKyjJMVa"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C574820640
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=duncanthrax.net header.i=@duncanthrax.net header.b="ZzIW/Aek"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D66C7214B2
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=stackframe.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44224 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44870 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iN0y0-0007Rz-Tq
-	for qemu-devel@archiver.kernel.org; Tue, 22 Oct 2019 16:41:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46790)
+	id 1iN1I7-0005dG-N2
+	for qemu-devel@archiver.kernel.org; Tue, 22 Oct 2019 17:02:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49515)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eblake@redhat.com>) id 1iN0wx-0006bE-EZ
- for qemu-devel@nongnu.org; Tue, 22 Oct 2019 16:40:16 -0400
+ (envelope-from <svens@stackframe.org>) id 1iN1G6-0004Ud-7I
+ for qemu-devel@nongnu.org; Tue, 22 Oct 2019 17:00:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eblake@redhat.com>) id 1iN0wv-0003EC-KT
- for qemu-devel@nongnu.org; Tue, 22 Oct 2019 16:40:14 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:43342
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1iN0wv-0003Dv-D7
- for qemu-devel@nongnu.org; Tue, 22 Oct 2019 16:40:13 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1571776811;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=1FfLdU1bYtMC5WDl8iivrnpDaIU5b/Yck0Rr/byTFAs=;
- b=dKyjJMVaCCl/a0otNOfeBP8kx2a1nOzCENygNR4fPe6uIEjntakXbc6QwRtZbkFn9xUjnf
- Liq1LTxny/W/5Xp2/EaIDd29WKCsz7ZmiohXXsL9gK3vgHval0Q7UkAF2SnyWScT8TgHUi
- gfDBpCutTzks46rF5nd5ABBpUcOogYw=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-176-TmzJscmtN_yNcXV4BToUww-1; Tue, 22 Oct 2019 16:40:09 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9D0E247B;
- Tue, 22 Oct 2019 20:40:08 +0000 (UTC)
-Received: from [10.3.117.0] (ovpn-117-0.phx2.redhat.com [10.3.117.0])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id EB5C85D6A9;
- Tue, 22 Oct 2019 20:40:04 +0000 (UTC)
-Subject: Re: [RFC PATCH] iothread: add set_iothread_poll_* commands
-To: "yezhenyu (A)" <yezhenyu2@huawei.com>, stefanha@redhat.com,
- pbonzini@redhat.com, dgilbert@redhat.com
-References: <5DAEB9D3.3080503@huawei.com>
-From: Eric Blake <eblake@redhat.com>
-Organization: Red Hat, Inc.
-Message-ID: <95fde68e-9730-ce22-b59d-c5e20f86d0c1@redhat.com>
-Date: Tue, 22 Oct 2019 15:40:03 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.1
+ (envelope-from <svens@stackframe.org>) id 1iN1G4-0002O2-Un
+ for qemu-devel@nongnu.org; Tue, 22 Oct 2019 17:00:01 -0400
+Received: from [2001:470:70c5:1111::170] (port=35702 helo=smtp.duncanthrax.net)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <svens@stackframe.org>)
+ id 1iN1G4-0002NF-CU
+ for qemu-devel@nongnu.org; Tue, 22 Oct 2019 17:00:00 -0400
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+ d=duncanthrax.net; s=dkim; h=Content-Transfer-Encoding:MIME-Version:
+ References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From;
+ bh=gRbcSzey3dSXQeXN0mr7MHcT6NTA3Gd8ep8Zv0V1oEc=; b=ZzIW/Aek0erYRBSHM+Tbejz+rb
+ kFMrSOhc6V/zDJ0v5vos+f8wpkbaMtsFmKaC51DkUN9IBKgIku/iadjBqinjx7cY4ZIRcTfzfhRIR
+ 8IBtfFqzJX+ZsPc7x+EBVaX6AF1lPwqK5x0GsYhTqv5VUFEu6ak2tuL2ZxLrsnTgjdUc=;
+Received: from hsi-kbw-046-005-233-221.hsi8.kabel-badenwuerttemberg.de
+ ([46.5.233.221] helo=x280.stackframe.org)
+ by smtp.eurescom.eu with esmtpa (Exim 4.86_2)
+ (envelope-from <svens@stackframe.org>)
+ id 1iN1Fz-0004eI-RX; Tue, 22 Oct 2019 22:59:55 +0200
+From: Sven Schnelle <svens@stackframe.org>
+To: Richard Henderson <rth@twiddle.net>
+Subject: [PATCH v3 3/6] ps2: accept 'Set Key Make and Break' commands
+Date: Tue, 22 Oct 2019 22:59:38 +0200
+Message-Id: <20191022205941.23152-4-svens@stackframe.org>
+X-Mailer: git-send-email 2.23.0
+In-Reply-To: <20191022205941.23152-1-svens@stackframe.org>
+References: <20191022205941.23152-1-svens@stackframe.org>
 MIME-Version: 1.0
-In-Reply-To: <5DAEB9D3.3080503@huawei.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-MC-Unique: TmzJscmtN_yNcXV4BToUww-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 205.139.110.120
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2001:470:70c5:1111::170
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,84 +71,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: jiangyiwen <jiangyiwen@huawei.com>, qemu-devel@nongnu.org,
- xiexiangyou@huawei.com
+Cc: Helge Deller <deller@gmx.de>, Sven Schnelle <svens@stackframe.org>,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 10/22/19 3:12 AM, yezhenyu (A) wrote:
-> Since qemu2.9, QEMU added three AioContext poll parameters to struct
-> IOThread: poll_max_ns, poll_grow and poll_shrink. These properties are
-> used to control iothread polling time.
->=20
-> However, there isn't properly hmp commands to adjust them when the VM is
-> alive. It's useful to adjust them online when observing the impact of
-> different property value on performance.
->=20
-> This patch add three hmp commands to adjust iothread poll-* properties
-> for special iothread:
->=20
-> set_iothread_poll_max_ns: set the maximum polling time in ns;
-> set_iothread_poll_grow: set how many ns will be added to polling time;
-> set_iothread_poll_shrink: set how many ns will be removed from polling
-> time.
->=20
-> Signed-off-by: Zhenyu Ye <yezhenyu2@huawei.com>
-> ---
-> hmp-commands.hx | 42 ++++++++++++++++++++
-> hmp.c | 30 +++++++++++++++
-> hmp.h | 3 ++
-> include/sysemu/iothread.h | 6 +++
-> iothread.c | 80 +++++++++++++++++++++++++++++++++++++++
-> qapi/misc.json | 23 +++++++++++
-> 6 files changed, 184 insertions(+)
+HP-UX sends both the 'Set key make and break (0xfc) and
+'Set all key typematic make and break' (0xfa). QEMU response
+with 'Resend' as it doesn't handle these commands. HP-UX than
+reports an PS/2 max retransmission exceeded error. Add these
+commands and just reply with ACK.
 
-Looking at just the QMP...
+Signed-off-by: Sven Schnelle <svens@stackframe.org>
+---
+ hw/input/ps2.c | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
 
-> +++ b/qapi/misc.json
-> @@ -675,6 +675,29 @@
-> { 'command': 'query-iothreads', 'returns': ['IOThreadInfo'],
-> 'allow-preconfig': true }
->=20
-> +##
-> +# @set-iothread-poll-param:
-> +#
-> +# Set poll-* properties for a special iothread.
-> +# The poll-* name can be poll_max_ns/poll_grow/poll_shrink.
-
-This should be an enum.
-
-> +#
-> +# Notes: can not set the QEMU main loop thread, which is not declared
-> +# using the -object iothread command-line option. The poll_ns property c=
-an not
-> +# be set manually, which is auto-adjust.
-
-You failed to document the parameters (iothread_id, name, value).
-
-> +#
-> +# Example:
-> +#
-> +# -> { "execute": "set-iothread-poll-param",
-> +# "arguments": { "iothread_id": "1",
-> +# "name": "poll_max_ns",
-> +# "value": 1000 } }
-> +# <- { "return": {} }
-> +#
-> +# Since 3.0
-
-4.2 is the earliest this can make it in.
-
-> +##
-> +{ 'command': 'set-iothread-poll-param',
-> + 'data': {'iothread_id': 'str', 'name': 'str', 'value': 'int'} }
-
-Our naming convention prefers 'iothread-id'.
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
+diff --git a/hw/input/ps2.c b/hw/input/ps2.c
+index 67f92f6112..0b671b6339 100644
+--- a/hw/input/ps2.c
++++ b/hw/input/ps2.c
+@@ -49,6 +49,8 @@
+ #define KBD_CMD_RESET_DISABLE	0xF5	/* reset and disable scanning */
+ #define KBD_CMD_RESET_ENABLE   	0xF6    /* reset and enable scanning */
+ #define KBD_CMD_RESET		0xFF	/* Reset */
++#define KBD_CMD_SET_MAKE_BREAK  0xFC    /* Set Make and Break mode */
++#define KBD_CMD_SET_TYPEMATIC   0xFA    /* Set Typematic Make and Break mode */
+ 
+ /* Keyboard Replies */
+ #define KBD_REPLY_POR		0xAA	/* Power on reset */
+@@ -573,6 +575,7 @@ void ps2_write_keyboard(void *opaque, int val)
+         case KBD_CMD_SCANCODE:
+         case KBD_CMD_SET_LEDS:
+         case KBD_CMD_SET_RATE:
++        case KBD_CMD_SET_MAKE_BREAK:
+             s->common.write_cmd = val;
+             ps2_queue(&s->common, KBD_REPLY_ACK);
+             break;
+@@ -592,11 +595,18 @@ void ps2_write_keyboard(void *opaque, int val)
+                 KBD_REPLY_ACK,
+                 KBD_REPLY_POR);
+             break;
++        case KBD_CMD_SET_TYPEMATIC:
++            ps2_queue(&s->common, KBD_REPLY_ACK);
++            break;
+         default:
+             ps2_queue(&s->common, KBD_REPLY_RESEND);
+             break;
+         }
+         break;
++    case KBD_CMD_SET_MAKE_BREAK:
++        ps2_queue(&s->common, KBD_REPLY_ACK);
++        s->common.write_cmd = -1;
++        break;
+     case KBD_CMD_SCANCODE:
+         if (val == 0) {
+             if (s->common.queue.count <= PS2_QUEUE_SIZE - 2) {
+-- 
+2.23.0
 
 
