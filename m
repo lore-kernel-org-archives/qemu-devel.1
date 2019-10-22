@@ -2,68 +2,67 @@ Return-Path: <SRS0=tSBD=YP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A8519CA9EA0
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 18:50:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D2113CA9EA0
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 18:55:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6F27520B7C
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 18:50:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9763F21872
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 18:55:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZYn2mOnb"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6F27520B7C
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TByGlQMm"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9763F21872
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40986 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41202 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iMzF8-0001oC-KU
-	for qemu-devel@archiver.kernel.org; Tue, 22 Oct 2019 14:50:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60951)
+	id 1iMzJq-0004fH-QY
+	for qemu-devel@archiver.kernel.org; Tue, 22 Oct 2019 14:55:46 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33548)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <thuth@redhat.com>) id 1iMzD9-0000IQ-QZ
- for qemu-devel@nongnu.org; Tue, 22 Oct 2019 14:48:52 -0400
+ (envelope-from <thuth@redhat.com>) id 1iMzIi-0003fv-Rz
+ for qemu-devel@nongnu.org; Tue, 22 Oct 2019 14:54:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <thuth@redhat.com>) id 1iMzD7-0002Ku-RH
- for qemu-devel@nongnu.org; Tue, 22 Oct 2019 14:48:51 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:39559
+ (envelope-from <thuth@redhat.com>) id 1iMzIh-0005nt-ON
+ for qemu-devel@nongnu.org; Tue, 22 Oct 2019 14:54:36 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:22985
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <thuth@redhat.com>) id 1iMzD7-0002Ki-Nu
- for qemu-devel@nongnu.org; Tue, 22 Oct 2019 14:48:49 -0400
+ (Exim 4.71) (envelope-from <thuth@redhat.com>) id 1iMzIh-0005m4-L5
+ for qemu-devel@nongnu.org; Tue, 22 Oct 2019 14:54:35 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1571770129;
+ s=mimecast20190719; t=1571770474;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references:openpgp:openpgp:autocrypt:autocrypt;
- bh=gbWjBgjfc8fPWeM3ZW8VDDv2tygekyoIfvU0TAHbjAk=;
- b=ZYn2mOnby9/WS/dSQzWSROEvbCQeMyzcLoM3X+Hpe+YfNICyk0SRIEe09i6FExusUn6Yy/
- NefiRR0XuRlx8mOMDNXNSBlia1xOVt7Wy7mzYj8GHHy7Q5+b2y8pDnIg5Fdm/pOiDkX+dD
- fT+dcKt0ma+sIV+uSCDZFRboMzKKkJY=
+ bh=+fuioZZg1VJoky7Ji+KkZYxqs/azRGQ9eA5yTajy7Ns=;
+ b=TByGlQMmlbSO2dyqoTsUcC9otto8HYqcLorXEE6UUbB/FMnH13rgm4BSW0CoLB/Suwp3N7
+ g2PsAEXgQEt9WgP4FKOe788HCDkxA15r8yWwqS7377p1UcYF0v616wYD5VlOFimx+zj2au
+ Fh6w5TBRQ0W71v12J+xXlQVXKfdSVKQ=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-368-rOq8bXsTMVSmrQsmE2mUxw-1; Tue, 22 Oct 2019 14:48:45 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
+ us-mta-324-wvdGBs4MNeuXJnXD1odXBA-1; Tue, 22 Oct 2019 14:54:27 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 712BE107AD31;
- Tue, 22 Oct 2019 18:48:43 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 945FC1800D6A;
+ Tue, 22 Oct 2019 18:54:26 +0000 (UTC)
 Received: from thuth.remote.csb (ovpn-116-34.ams2.redhat.com [10.36.116.34])
- by smtp.corp.redhat.com (Postfix) with ESMTP id D915D60126;
- Tue, 22 Oct 2019 18:48:32 +0000 (UTC)
-Subject: Re: [PATCH v3 07/16] libqos: enforce Device Initialization order
-To: Stefan Hajnoczi <stefanha@redhat.com>
-References: <20191019063810.6944-1-stefanha@redhat.com>
- <20191019063810.6944-8-stefanha@redhat.com>
- <158ef0b2-c478-1304-3128-8feb7cd943d4@redhat.com>
- <20191022154840.GE32186@stefanha-x1.localdomain>
+ by smtp.corp.redhat.com (Postfix) with ESMTP id BCFB85C219;
+ Tue, 22 Oct 2019 18:54:21 +0000 (UTC)
+Subject: Re: [PATCH v3 0/6] Enable more iotests during "make check-block"
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ Max Reitz <mreitz@redhat.com>
+References: <20191022072135.11188-1-thuth@redhat.com>
+ <87a79sx6uc.fsf@linaro.org> <123b2e94-3f43-1a8e-2420-12ae09483e2f@redhat.com>
+ <877e4wx55f.fsf@linaro.org>
 From: Thomas Huth <thuth@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=thuth@redhat.com; prefer-encrypt=mutual; keydata=
@@ -109,15 +108,15 @@ Autocrypt: addr=thuth@redhat.com; prefer-encrypt=mutual; keydata=
  IQu4bBP2GxiRQ+NV3iV/KU3ebMRzqIC//DCOxzQNFNJAKldPe/bKZMCxEqtVoRkuJtNdp/5a
  yXFZ6TfE1hGKrDBYAm4vrnZ4CXFSBDllL59cFFOJCkn4Xboj/aVxxJxF30bn
 Organization: Red Hat
-Message-ID: <a2c46a4f-7c60-f6ef-06b6-1e283053ea9f@redhat.com>
-Date: Tue, 22 Oct 2019 20:48:31 +0200
+Message-ID: <dcbf2d6d-f7df-7bcf-78a0-bf1964663d3b@redhat.com>
+Date: Tue, 22 Oct 2019 20:54:20 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.9.0
 MIME-Version: 1.0
-In-Reply-To: <20191022154840.GE32186@stefanha-x1.localdomain>
+In-Reply-To: <877e4wx55f.fsf@linaro.org>
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-MC-Unique: rOq8bXsTMVSmrQsmE2mUxw-1
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-MC-Unique: wvdGBs4MNeuXJnXD1odXBA-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
@@ -135,49 +134,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Laurent Vivier <lvivier@redhat.com>,
- slp@redhat.com, qemu-block@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>,
- qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, John Snow <jsnow@redhat.com>,
+ qemu-devel@nongnu.org, qemu-block@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 22/10/2019 17.48, Stefan Hajnoczi wrote:
-> On Mon, Oct 21, 2019 at 02:15:53PM +0200, Thomas Huth wrote:
->> On 19/10/2019 08.38, Stefan Hajnoczi wrote:
->>> According to VIRTIO 1.1 "3.1.1 Driver Requirements: Device
->>> Initialization", configuration space and virtqueues cannot be accessed
->>> before features have been negotiated.  Enforce this requirement.
->>>
->>> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
->>> ---
->>>  tests/libqos/virtio.c | 11 +++++++++++
->>>  1 file changed, 11 insertions(+)
->>>
->>> diff --git a/tests/libqos/virtio.c b/tests/libqos/virtio.c
->>> index 4f7e6bb8a1..2593996c98 100644
->>> --- a/tests/libqos/virtio.c
->>> +++ b/tests/libqos/virtio.c
->>> @@ -13,23 +13,33 @@
->>>  #include "standard-headers/linux/virtio_config.h"
->>>  #include "standard-headers/linux/virtio_ring.h"
->>> =20
->>> +/* Features must be negotiated before config space or virtqueue access=
- */
->>> +static void check_features_negotiated(QVirtioDevice *d)
->>> +{
->>> +    g_assert_cmphex(d->features, !=3D, 0);
->>> +}
->>
->> Isn't it "legal" to negotiate 0 feature bits, too (for legacy devices)?
+On 22/10/2019 15.48, Alex Benn=C3=A9e wrote:
 >=20
-> Yes, it's possible for Legacy devices.  If someone ever does that
-> they'll need to extend this code, but it's unlikely so I'd rather not
-> complicate this.
+> Max Reitz <mreitz@redhat.com> writes:
+>=20
+>> On 22.10.19 15:11, Alex Benn=C3=A9e wrote:
+>>>
+>>> Thomas Huth <thuth@redhat.com> writes:
+>>>
+>>>> As discussed here:
+>>>>
+>>>>  https://lists.gnu.org/archive/html/qemu-devel/2019-10/msg00697.html
+>>>>
+>>>> and here:
+>>>>
+>>>>  https://lists.gnu.org/archive/html/qemu-devel/2019-10/msg01388.html
+>>>
+>>> Queued to testing/next, thanks.
+>>
+>> It should be noted that this series depends on my SOCK_DIR series (which
+>> I have in my block branch), or the newly added tests are likely to fail
+>> in the CI environment.
+>=20
+> Ahh I misread....
+> <snip>
+>=20
+>>>> it would be good to have some more valuable iotests enabled in the
+>>>> "auto" group to get better iotest coverage during "make check".
+>>>>
+>>>> And once Max' "iotests: Add and use $SOCK_DIR" patch series has been
+>>>> merged, we can indeed enable these Python-based tests, too.
+>=20
+> I though these weren't enabled in this series. Do I need to drop all the
+> patches?
 
-Could you please add at least a comment here with that explanation?
+I think it's better if the iotest patches go through Max' or Kevin's
+block tree.
 
- Thanks,
-  Thomas
+ Thomas
 
 
