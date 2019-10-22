@@ -2,79 +2,78 @@ Return-Path: <SRS0=tSBD=YP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY autolearn=ham
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2FE1ACA9EA0
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 16:39:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A656CA9EA0
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 16:41:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EE7AF205ED
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 16:39:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5E3FC205ED
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 16:41:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DSNKM2Zk"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EE7AF205ED
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CKwf8aH2"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5E3FC205ED
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35922 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35944 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iMxBh-0000Ys-Dn
-	for qemu-devel@archiver.kernel.org; Tue, 22 Oct 2019 12:39:13 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38688)
+	id 1iMxDP-0002ha-Rh
+	for qemu-devel@archiver.kernel.org; Tue, 22 Oct 2019 12:40:59 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38484)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <marcandre.lureau@redhat.com>) id 1iMwxD-0008Bx-D5
- for qemu-devel@nongnu.org; Tue, 22 Oct 2019 12:24:16 -0400
+ (envelope-from <marcandre.lureau@redhat.com>) id 1iMwwr-0007r9-D9
+ for qemu-devel@nongnu.org; Tue, 22 Oct 2019 12:23:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <marcandre.lureau@redhat.com>) id 1iMwxB-0007se-Tu
- for qemu-devel@nongnu.org; Tue, 22 Oct 2019 12:24:15 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:56279
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <marcandre.lureau@redhat.com>) id 1iMwwp-0007fq-Ld
+ for qemu-devel@nongnu.org; Tue, 22 Oct 2019 12:23:53 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:25536
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
- id 1iMwxB-0007sO-Pw
- for qemu-devel@nongnu.org; Tue, 22 Oct 2019 12:24:13 -0400
+ id 1iMwwo-0007cb-I2
+ for qemu-devel@nongnu.org; Tue, 22 Oct 2019 12:23:51 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1571761453;
+ s=mimecast20190719; t=1571761424;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=NTsqm6EGzYbEhal4RyEW+fMR+YdqVobEJtdxNWuQUac=;
- b=DSNKM2ZkzQZcPzFIkEl3eFn1ixGxAtWXhJu7LQy7hqiUveKpvd85D4/kNm+UrWnQS4lhW0
- LsFOh/KyzD26KDYOlwu0t0+j9CpZ16TD98AZ+bcCZ4k701P1+wvHisXASs5ZtjFx3sOoAJ
- 4eX+5f/9hkfY2rhXLSXR+1gRMu5YxSM=
+ bh=cvW8O4w4nSst42OPRRnCUY6S8iQXMXf/aoih94+NQuE=;
+ b=CKwf8aH2FieIpahUt34WMr+9JKa67PGf6qiub/pGu2i4wbaoXi4NGgnh4vbW5eKckTa6GU
+ EyeiyhkIW7IfT9UTI73fnbnCOnadP2HIoURBlY3RNzNVCICvFjqhPE5rKaBYXn5eAFazag
+ EdL/B58zTU8bmbnjyWMeoMCj1jLo2+c=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-304-NQ1U3zqVMNm1PWmQVGn_qQ-1; Tue, 22 Oct 2019 12:24:11 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ us-mta-212-p6jhXBRGN56sAzq-_RFqWQ-1; Tue, 22 Oct 2019 12:23:40 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 67F4F107AD31;
- Tue, 22 Oct 2019 16:24:09 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1A276800D53;
+ Tue, 22 Oct 2019 16:23:38 +0000 (UTC)
 Received: from localhost (ovpn-112-21.ams2.redhat.com [10.36.112.21])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 66AF05D6A9;
- Tue, 22 Oct 2019 16:24:02 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id D97125DC18;
+ Tue, 22 Oct 2019 16:23:26 +0000 (UTC)
 From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 20/28] sparc: move PIL irq handling to cpu.c
-Date: Tue, 22 Oct 2019 18:21:29 +0200
-Message-Id: <20191022162137.27161-21-marcandre.lureau@redhat.com>
+Subject: [PATCH v2 15/28] vmmouse: replace PROP_PTR with PROP_LINK
+Date: Tue, 22 Oct 2019 18:21:24 +0200
+Message-Id: <20191022162137.27161-16-marcandre.lureau@redhat.com>
 In-Reply-To: <20191022162137.27161-1-marcandre.lureau@redhat.com>
 References: <20191022162137.27161-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-MC-Unique: NQ1U3zqVMNm1PWmQVGn_qQ-1
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-MC-Unique: p6jhXBRGN56sAzq-_RFqWQ-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.61
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -105,176 +104,123 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Rather than tweaking CPU bits from leon3 machine, move it to cpu.c.
+While at it, use the expected type.
 
-Suggested-by: Peter Maydell <peter.maydell@linaro.org>
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- hw/sparc/leon3.c          | 37 -------------------------------------
- hw/sparc/trace-events     |  4 ----
- target/sparc/cpu.c        | 39 +++++++++++++++++++++++++++++++++++++++
- target/sparc/trace-events |  4 ++++
- 4 files changed, 43 insertions(+), 41 deletions(-)
+ hw/i386/pc.c             | 6 +++---
+ hw/i386/vmmouse.c        | 8 +++-----
+ hw/input/pckbd.c         | 8 +++-----
+ include/hw/input/i8042.h | 4 +++-
+ 4 files changed, 12 insertions(+), 14 deletions(-)
 
-diff --git a/hw/sparc/leon3.c b/hw/sparc/leon3.c
-index 6db6ea9b5c..fec460f524 100644
---- a/hw/sparc/leon3.c
-+++ b/hw/sparc/leon3.c
-@@ -38,7 +38,6 @@
- #include "hw/boards.h"
- #include "hw/loader.h"
- #include "elf.h"
--#include "trace.h"
- #include "exec/address-spaces.h"
+diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+index 4b1904237e..ada1ea8802 100644
+--- a/hw/i386/pc.c
++++ b/hw/i386/pc.c
+@@ -1861,9 +1861,9 @@ static void pc_superio_init(ISABus *isa_bus, bool cre=
+ate_fdctrl, bool no_vmport)
+         vmmouse =3D NULL;
+     }
+     if (vmmouse) {
+-        DeviceState *dev =3D DEVICE(vmmouse);
+-        qdev_prop_set_ptr(dev, "ps2_mouse", i8042);
+-        qdev_init_nofail(dev);
++        object_property_set_link(OBJECT(vmmouse), OBJECT(i8042),
++                                 "i8042", &error_abort);
++        qdev_init_nofail(DEVICE(vmmouse));
+     }
+     port92 =3D isa_create_simple(isa_bus, "port92");
 =20
- #include "hw/sparc/grlib.h"
-@@ -143,41 +142,6 @@ void leon3_irq_ack(void *irq_manager, int intno)
-     grlib_irqmp_ack((DeviceState *)irq_manager, intno);
+diff --git a/hw/i386/vmmouse.c b/hw/i386/vmmouse.c
+index 41ad91ad53..c0c329f817 100644
+--- a/hw/i386/vmmouse.c
++++ b/hw/i386/vmmouse.c
+@@ -66,7 +66,7 @@ typedef struct VMMouseState
+     uint16_t status;
+     uint8_t absolute;
+     QEMUPutMouseEntry *entry;
+-    void *ps2_mouse;
++    ISAKBDState *i8042;
+ } VMMouseState;
+=20
+ static uint32_t vmmouse_get_status(VMMouseState *s)
+@@ -105,7 +105,7 @@ static void vmmouse_mouse_event(void *opaque, int x, in=
+t y, int dz, int buttons_
+=20
+     /* need to still generate PS2 events to notify driver to
+        read from queue */
+-    i8042_isa_mouse_fake_event(s->ps2_mouse);
++    i8042_isa_mouse_fake_event(s->i8042);
  }
 =20
--static void leon3_set_pil_in(void *opaque, int n, int level)
--{
--    CPUSPARCState *env =3D opaque;
--    uint32_t pil_in =3D level;
--    CPUState *cs;
--
--    assert(env !=3D NULL);
--
--    env->pil_in =3D pil_in;
--
--    if (env->pil_in && (env->interrupt_index =3D=3D 0 ||
--                        (env->interrupt_index & ~15) =3D=3D TT_EXTINT)) {
--        unsigned int i;
--
--        for (i =3D 15; i > 0; i--) {
--            if (env->pil_in & (1 << i)) {
--                int old_interrupt =3D env->interrupt_index;
--
--                env->interrupt_index =3D TT_EXTINT | i;
--                if (old_interrupt !=3D env->interrupt_index) {
--                    cs =3D env_cpu(env);
--                    trace_leon3_set_irq(i);
--                    cpu_interrupt(cs, CPU_INTERRUPT_HARD);
--                }
--                break;
--            }
--        }
--    } else if (!env->pil_in && (env->interrupt_index & ~15) =3D=3D TT_EXTI=
-NT) {
--        cs =3D env_cpu(env);
--        trace_leon3_reset_irq(env->interrupt_index & 15);
--        env->interrupt_index =3D 0;
--        cpu_reset_interrupt(cs, CPU_INTERRUPT_HARD);
--    }
--}
--
- static void leon3_generic_hw_init(MachineState *machine)
- {
-     ram_addr_t ram_size =3D machine->ram_size;
-@@ -226,7 +190,6 @@ static void leon3_generic_hw_init(MachineState *machine=
-)
+ static void vmmouse_remove_handler(VMMouseState *s)
+@@ -275,7 +275,7 @@ static void vmmouse_realizefn(DeviceState *dev, Error *=
+*errp)
+ }
 =20
-     /* Allocate IRQ manager */
-     dev =3D qdev_create(NULL, TYPE_GRLIB_IRQMP);
--    env->pil_irq =3D qemu_allocate_irq(leon3_set_pil_in, env, 0);
-     qdev_connect_gpio_out_named(dev, "grlib-irq", 0, env->pil_irq);
-     qdev_init_nofail(dev);
-     sysbus_mmio_map(SYS_BUS_DEVICE(dev), 0, LEON3_IRQMP_OFFSET);
-diff --git a/hw/sparc/trace-events b/hw/sparc/trace-events
-index 355b07ae05..0299df24d4 100644
---- a/hw/sparc/trace-events
-+++ b/hw/sparc/trace-events
-@@ -15,7 +15,3 @@ sun4m_iommu_mem_writel_pgflush(uint32_t val) "page flush =
-0x%x"
- sun4m_iommu_page_get_flags(uint64_t pa, uint64_t iopte, uint32_t ret) "get=
- flags addr 0x%"PRIx64" =3D> pte 0x%"PRIx64", *pte =3D 0x%x"
- sun4m_iommu_translate_pa(uint64_t addr, uint64_t pa, uint32_t iopte) "xlat=
-e dva 0x%"PRIx64" =3D> pa 0x%"PRIx64" iopte =3D 0x%x"
- sun4m_iommu_bad_addr(uint64_t addr) "bad addr 0x%"PRIx64
--
--# leon3.c
--leon3_set_irq(int intno) "Set CPU IRQ %d"
--leon3_reset_irq(int intno) "Reset CPU IRQ %d"
-diff --git a/target/sparc/cpu.c b/target/sparc/cpu.c
-index bc65929552..693ffef3d1 100644
---- a/target/sparc/cpu.c
-+++ b/target/sparc/cpu.c
-@@ -25,6 +25,8 @@
- #include "exec/exec-all.h"
- #include "hw/qdev-properties.h"
- #include "qapi/visitor.h"
-+#include "trace.h"
-+#include "hw/irq.h"
-=20
- //#define DEBUG_FEATURES
-=20
-@@ -540,6 +542,41 @@ static const sparc_def_t sparc_defs[] =3D {
- #endif
+ static Property vmmouse_properties[] =3D {
+-    DEFINE_PROP_PTR("ps2_mouse", VMMouseState, ps2_mouse),
++    DEFINE_PROP_LINK("i8042", VMMouseState, i8042, TYPE_I8042, ISAKBDState=
+ *),
+     DEFINE_PROP_END_OF_LIST(),
  };
 =20
-+static void sparc_set_pil_in(void *opaque, int n, int level)
-+{
-+    CPUSPARCState *env =3D opaque;
-+    uint32_t pil_in =3D level;
-+    CPUState *cs;
-+
-+    assert(env !=3D NULL);
-+
-+    env->pil_in =3D pil_in;
-+
-+    if (env->pil_in && (env->interrupt_index =3D=3D 0 ||
-+                        (env->interrupt_index & ~15) =3D=3D TT_EXTINT)) {
-+        unsigned int i;
-+
-+        for (i =3D 15; i > 0; i--) {
-+            if (env->pil_in & (1 << i)) {
-+                int old_interrupt =3D env->interrupt_index;
-+
-+                env->interrupt_index =3D TT_EXTINT | i;
-+                if (old_interrupt !=3D env->interrupt_index) {
-+                    cs =3D env_cpu(env);
-+                    trace_sparc_set_irq(i);
-+                    cpu_interrupt(cs, CPU_INTERRUPT_HARD);
-+                }
-+                break;
-+            }
-+        }
-+    } else if (!env->pil_in && (env->interrupt_index & ~15) =3D=3D TT_EXTI=
-NT) {
-+        cs =3D env_cpu(env);
-+        trace_sparc_reset_irq(env->interrupt_index & 15);
-+        env->interrupt_index =3D 0;
-+        cpu_reset_interrupt(cs, CPU_INTERRUPT_HARD);
-+    }
-+}
-+
- static const char * const feature_name[] =3D {
-     "float",
-     "float128",
-@@ -762,6 +799,8 @@ static void sparc_cpu_realizefn(DeviceState *dev, Error=
- **errp)
-     env->version |=3D env->def.nwindows - 1;
- #endif
+@@ -287,8 +287,6 @@ static void vmmouse_class_initfn(ObjectClass *klass, vo=
+id *data)
+     dc->reset =3D vmmouse_reset;
+     dc->vmsd =3D &vmstate_vmmouse;
+     dc->props =3D vmmouse_properties;
+-    /* Reason: pointer property "ps2_mouse" */
+-    dc->user_creatable =3D false;
+ }
 =20
-+    env->pil_irq =3D qemu_allocate_irq(sparc_set_pil_in, env, 0);
+ static const TypeInfo vmmouse_info =3D {
+diff --git a/hw/input/pckbd.c b/hw/input/pckbd.c
+index f0acfd86f7..9b641021c9 100644
+--- a/hw/input/pckbd.c
++++ b/hw/input/pckbd.c
+@@ -483,17 +483,15 @@ void i8042_mm_init(qemu_irq kbd_irq, qemu_irq mouse_i=
+rq,
+=20
+ #define I8042(obj) OBJECT_CHECK(ISAKBDState, (obj), TYPE_I8042)
+=20
+-typedef struct ISAKBDState {
++struct ISAKBDState {
+     ISADevice parent_obj;
+=20
+     KBDState kbd;
+     MemoryRegion io[2];
+-} ISAKBDState;
++};
+=20
+-void i8042_isa_mouse_fake_event(void *opaque)
++void i8042_isa_mouse_fake_event(ISAKBDState *isa)
+ {
+-    ISADevice *dev =3D opaque;
+-    ISAKBDState *isa =3D I8042(dev);
+     KBDState *s =3D &isa->kbd;
+=20
+     ps2_mouse_fake_event(s->mouse);
+diff --git a/include/hw/input/i8042.h b/include/hw/input/i8042.h
+index 246e6f3335..8eaebf50ce 100644
+--- a/include/hw/input/i8042.h
++++ b/include/hw/input/i8042.h
+@@ -14,10 +14,12 @@
+=20
+ #define I8042_A20_LINE "a20"
+=20
++typedef struct ISAKBDState ISAKBDState;
 +
-     cpu_exec_realizefn(cs, &local_err);
-     if (local_err !=3D NULL) {
-         error_propagate(errp, local_err);
-diff --git a/target/sparc/trace-events b/target/sparc/trace-events
-index 6a064e2327..01c3174067 100644
---- a/target/sparc/trace-events
-+++ b/target/sparc/trace-events
-@@ -26,3 +26,7 @@ win_helper_no_switch_pstate(uint32_t new_pstate_regs) "ch=
-ange_pstate: regs new=3D0
- win_helper_wrpil(uint32_t psrpil, uint32_t new_pil) "old=3D0x%x new=3D0x%x=
-"
- win_helper_done(uint32_t tl) "tl=3D%d"
- win_helper_retry(uint32_t tl) "tl=3D%d"
-+
-+# cpu.c
-+sparc_set_irq(int intno) "Set CPU IRQ %d"
-+sparc_reset_irq(int intno) "Reset CPU IRQ %d"
+ void i8042_mm_init(qemu_irq kbd_irq, qemu_irq mouse_irq,
+                    MemoryRegion *region, ram_addr_t size,
+                    hwaddr mask);
+-void i8042_isa_mouse_fake_event(void *opaque);
++void i8042_isa_mouse_fake_event(ISAKBDState *isa);
+ void i8042_setup_a20_line(ISADevice *dev, qemu_irq a20_out);
+=20
+ #endif /* HW_INPUT_I8042_H */
 --=20
 2.23.0.606.g08da6496b6
 
