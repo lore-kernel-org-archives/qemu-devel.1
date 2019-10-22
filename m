@@ -2,87 +2,61 @@ Return-Path: <SRS0=tSBD=YP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E7043CA9EA0
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 14:12:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B6A57CA9EA0
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 14:14:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 693EC21783
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 14:12:00 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="GwZdJvg5"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 693EC21783
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 8FB1021872
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 14:14:50 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8FB1021872
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58262 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58326 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iMutD-0000Hk-0o
-	for qemu-devel@archiver.kernel.org; Tue, 22 Oct 2019 10:11:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37235)
+	id 1iMuvw-00043g-Nv
+	for qemu-devel@archiver.kernel.org; Tue, 22 Oct 2019 10:14:49 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40299)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1iMuHX-0003VL-Tt
- for qemu-devel@nongnu.org; Tue, 22 Oct 2019 09:33:06 -0400
+ (envelope-from <clg@kaod.org>) id 1iMuVo-0004nP-SH
+ for qemu-devel@nongnu.org; Tue, 22 Oct 2019 09:47:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1iMuHW-0001co-D4
- for qemu-devel@nongnu.org; Tue, 22 Oct 2019 09:33:03 -0400
-Received: from mail-wm1-x32e.google.com ([2a00:1450:4864:20::32e]:33271)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1iMuHV-0001cZ-Jd
- for qemu-devel@nongnu.org; Tue, 22 Oct 2019 09:33:01 -0400
-Received: by mail-wm1-x32e.google.com with SMTP id 6so3708024wmf.0
- for <qemu-devel@nongnu.org>; Tue, 22 Oct 2019 06:33:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:subject:date:message-id:in-reply-to:references:mime-version
- :content-transfer-encoding;
- bh=Jd3gjjSWtiLGtLKohxwgc1UFQoof9TDDl8oztxXNFqQ=;
- b=GwZdJvg5FUQVJs1LfZXvvJwFzBJPINVeTHUqKabr2umrRLjo0Sf4iolcKZSUyevr0M
- 0SGrwt37ht94rEC9M8AcpnP6lM5JIpJzOFVsMrf3kd/bRu0RQ6kVi+Ecd7cXzcUA5zow
- j2KHR5BAbzmuHjToVfU1aj7p2YJ7D1zw7v4E8J88pSMYo8KoA7bgCWqtG5B1C6R8rR9K
- 9uBSdi8IyZCz78CDIq6uSoVaRYOwPxlxBIe3ewyfCyKRr60G2I5BJINDrXL4RpRFRH/b
- zmt0UHhTs5XE+w3fDE5QgZlfPjvi+cXsPjZVpxD3SAVSeNw0JtRLU1zriey9bh0ypU78
- oJmw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=Jd3gjjSWtiLGtLKohxwgc1UFQoof9TDDl8oztxXNFqQ=;
- b=Mw3SeyFxKCvWE+Hor/rKdDNhLh7/h36HjrHjJzaInOqN1KTg5saTqVc1SO30JcE/I/
- V+9C/sNVqtXPnqHyN1jGLBtg0KYI0SFu7S0IBGvCl8vjVGIxATXmy2aLdI7g/Gqt+XAJ
- dVSAezyukfDTBL6Frm5+9iTf/BNqB8RsMROhOOn1oUQMnWV7iHeajGbT4ZnzZGlMW5Xg
- mcIsT9qeFL8SJ+UJ16x73KOuzgJtyufF9ItbhRZWZxGZJxKXN2fN+wGo47/QxSjcZqB1
- YgDH1J6EwwsqK01n6OqbWiOMxZuKZ+b10c+Jzl8LurB9dN4mSjRL295kCtkHHO198geM
- ZxEQ==
-X-Gm-Message-State: APjAAAXULv8/ddHzLiovjAYd9UczKim0ycBX7DWUqd3sLA4L8IWEPFWc
- rcWPpJXUkNkqOA/JtkQ/7wIr22bs+og=
-X-Google-Smtp-Source: APXvYqz/ld1ZMXJNy9SHnmM5pQInHhxitRPBUaUOuYXTNkrTHnZw67sS+M+TqW43DhaLzZ4foZa34g==
-X-Received: by 2002:a1c:7d95:: with SMTP id y143mr3202507wmc.143.1571751179739; 
- Tue, 22 Oct 2019 06:32:59 -0700 (PDT)
-Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id r2sm20263856wma.1.2019.10.22.06.32.57
- for <qemu-devel@nongnu.org>
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 22 Oct 2019 06:32:57 -0700 (PDT)
-From: Peter Maydell <peter.maydell@linaro.org>
-To: qemu-devel@nongnu.org
-Subject: [PULL 36/41] hw/arm/xilinx_zynq: Use the IEC binary prefix definitions
-Date: Tue, 22 Oct 2019 14:31:29 +0100
-Message-Id: <20191022133134.14487-37-peter.maydell@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20191022133134.14487-1-peter.maydell@linaro.org>
-References: <20191022133134.14487-1-peter.maydell@linaro.org>
+ (envelope-from <clg@kaod.org>) id 1iMuVj-0008SM-ON
+ for qemu-devel@nongnu.org; Tue, 22 Oct 2019 09:47:48 -0400
+Received: from 20.mo6.mail-out.ovh.net ([178.32.124.17]:46917)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <clg@kaod.org>) id 1iMuVj-0008RP-I6
+ for qemu-devel@nongnu.org; Tue, 22 Oct 2019 09:47:43 -0400
+Received: from player772.ha.ovh.net (unknown [10.109.143.232])
+ by mo6.mail-out.ovh.net (Postfix) with ESMTP id 40AB01E6CB6
+ for <qemu-devel@nongnu.org>; Tue, 22 Oct 2019 15:47:41 +0200 (CEST)
+Received: from kaod.org (deibp9eh1--blueice1n4.emea.ibm.com [195.212.29.166])
+ (Authenticated sender: clg@kaod.org)
+ by player772.ha.ovh.net (Postfix) with ESMTPSA id 8734FB3F35DA;
+ Tue, 22 Oct 2019 13:47:34 +0000 (UTC)
+From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
+To: David Gibson <david@gibson.dropbear.id.au>
+Subject: [PATCH v4 7/7] spapr/xive: Set the OS CAM line at reset
+Date: Tue, 22 Oct 2019 15:46:32 +0200
+Message-Id: <20191022134632.29098-8-clg@kaod.org>
+X-Mailer: git-send-email 2.21.0
+In-Reply-To: <20191022134632.29098-1-clg@kaod.org>
+References: <20191022134632.29098-1-clg@kaod.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::32e
+X-Ovh-Tracer-Id: 611645125904075750
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrkeejgdeikecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 178.32.124.17
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,45 +68,132 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>, qemu-ppc@nongnu.org,
+ qemu-devel@nongnu.org, Greg Kurz <groug@kaod.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Philippe Mathieu-Daudé <philmd@redhat.com>
+When a Virtual Processor is scheduled to run on a HW thread, the
+hypervisor pushes its identifier in the OS CAM line. When running with
+kernel_irqchip=3Doff, QEMU needs to emulate the same behavior.
 
-IEC binary prefixes ease code review: the unit is explicit.
+Set the OS CAM line when the interrupt presenter of the sPAPR core is
+reset. This will also cover the case of hot-plugged CPUs.
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
-Message-id: 20191021190653.9511-2-philmd@redhat.com
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+This change also has the benefit to remove the use of CPU_FOREACH()
+which can be unsafe.
+
+Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
+Reviewed-by: Greg Kurz <groug@kaod.org>
+Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
 ---
- hw/arm/xilinx_zynq.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ include/hw/ppc/spapr_xive.h |  1 -
+ hw/intc/spapr_xive.c        | 48 +++++++++++++------------------------
+ 2 files changed, 17 insertions(+), 32 deletions(-)
 
-diff --git a/hw/arm/xilinx_zynq.c b/hw/arm/xilinx_zynq.c
-index c14774e542c..3a0fa5b23f7 100644
---- a/hw/arm/xilinx_zynq.c
-+++ b/hw/arm/xilinx_zynq.c
-@@ -16,6 +16,7 @@
-  */
- 
- #include "qemu/osdep.h"
-+#include "qemu/units.h"
- #include "qapi/error.h"
- #include "cpu.h"
- #include "hw/sysbus.h"
-@@ -194,7 +195,7 @@ static void zynq_init(MachineState *machine)
-     memory_region_add_subregion(address_space_mem, 0, ext_ram);
- 
-     /* 256K of on-chip memory */
--    memory_region_init_ram(ocm_ram, NULL, "zynq.ocm_ram", 256 << 10,
-+    memory_region_init_ram(ocm_ram, NULL, "zynq.ocm_ram", 256 * KiB,
-                            &error_fatal);
-     memory_region_add_subregion(address_space_mem, 0xFFFC0000, ocm_ram);
- 
--- 
-2.20.1
+diff --git a/include/hw/ppc/spapr_xive.h b/include/hw/ppc/spapr_xive.h
+index d84bd5c229f0..742b7e834f2a 100644
+--- a/include/hw/ppc/spapr_xive.h
++++ b/include/hw/ppc/spapr_xive.h
+@@ -57,7 +57,6 @@ typedef struct SpaprXive {
+ void spapr_xive_pic_print_info(SpaprXive *xive, Monitor *mon);
+=20
+ void spapr_xive_hcall_init(SpaprMachineState *spapr);
+-void spapr_xive_set_tctx_os_cam(XiveTCTX *tctx);
+ void spapr_xive_mmio_set_enabled(SpaprXive *xive, bool enable);
+ void spapr_xive_map_mmio(SpaprXive *xive);
+=20
+diff --git a/hw/intc/spapr_xive.c b/hw/intc/spapr_xive.c
+index 20a8d8285f64..d8e1291905c3 100644
+--- a/hw/intc/spapr_xive.c
++++ b/hw/intc/spapr_xive.c
+@@ -205,23 +205,6 @@ void spapr_xive_mmio_set_enabled(SpaprXive *xive, bo=
+ol enable)
+     memory_region_set_enabled(&xive->end_source.esb_mmio, false);
+ }
+=20
+-/*
+- * When a Virtual Processor is scheduled to run on a HW thread, the
+- * hypervisor pushes its identifier in the OS CAM line. Emulate the
+- * same behavior under QEMU.
+- */
+-void spapr_xive_set_tctx_os_cam(XiveTCTX *tctx)
+-{
+-    uint8_t  nvt_blk;
+-    uint32_t nvt_idx;
+-    uint32_t nvt_cam;
+-
+-    spapr_xive_cpu_to_nvt(POWERPC_CPU(tctx->cs), &nvt_blk, &nvt_idx);
+-
+-    nvt_cam =3D cpu_to_be32(TM_QW1W2_VO | xive_nvt_cam_line(nvt_blk, nvt=
+_idx));
+-    memcpy(&tctx->regs[TM_QW1_OS + TM_WORD2], &nvt_cam, 4);
+-}
+-
+ static void spapr_xive_end_reset(XiveEND *end)
+ {
+     memset(end, 0, sizeof(*end));
+@@ -544,21 +527,32 @@ static int spapr_xive_cpu_intc_create(SpaprInterrup=
+tController *intc,
+     }
+=20
+     spapr_cpu->tctx =3D XIVE_TCTX(obj);
+-
+-    /*
+-     * (TCG) Early setting the OS CAM line for hotplugged CPUs as they
+-     * don't beneficiate from the reset of the XIVE IRQ backend
+-     */
+-    spapr_xive_set_tctx_os_cam(spapr_cpu->tctx);
+     return 0;
+ }
+=20
++static void xive_tctx_set_os_cam(XiveTCTX *tctx, uint32_t os_cam)
++{
++    uint32_t qw1w2 =3D cpu_to_be32(TM_QW1W2_VO | os_cam);
++    memcpy(&tctx->regs[TM_QW1_OS + TM_WORD2], &qw1w2, 4);
++}
++
+ static void spapr_xive_cpu_intc_reset(SpaprInterruptController *intc,
+                                      PowerPCCPU *cpu)
+ {
+     XiveTCTX *tctx =3D spapr_cpu_state(cpu)->tctx;
++    uint8_t  nvt_blk;
++    uint32_t nvt_idx;
+=20
+     xive_tctx_reset(tctx);
++
++    /*
++     * When a Virtual Processor is scheduled to run on a HW thread,
++     * the hypervisor pushes its identifier in the OS CAM line.
++     * Emulate the same behavior under QEMU.
++     */
++    spapr_xive_cpu_to_nvt(cpu, &nvt_blk, &nvt_idx);
++
++    xive_tctx_set_os_cam(tctx, xive_nvt_cam_line(nvt_blk, nvt_idx));
+ }
+=20
+ static void spapr_xive_set_irq(SpaprInterruptController *intc, int irq, =
+int val)
+@@ -651,14 +645,6 @@ static void spapr_xive_dt(SpaprInterruptController *=
+intc, uint32_t nr_servers,
+ static int spapr_xive_activate(SpaprInterruptController *intc, Error **e=
+rrp)
+ {
+     SpaprXive *xive =3D SPAPR_XIVE(intc);
+-    CPUState *cs;
+-
+-    CPU_FOREACH(cs) {
+-        PowerPCCPU *cpu =3D POWERPC_CPU(cs);
+-
+-        /* (TCG) Set the OS CAM line of the thread interrupt context. */
+-        spapr_xive_set_tctx_os_cam(spapr_cpu_state(cpu)->tctx);
+-    }
+=20
+     if (kvm_enabled()) {
+         int rc =3D spapr_irq_init_kvm(kvmppc_xive_connect, intc, errp);
+--=20
+2.21.0
 
 
