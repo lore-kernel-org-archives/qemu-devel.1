@@ -2,74 +2,89 @@ Return-Path: <SRS0=tSBD=YP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 66E8BCA9EA0
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 14:23:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 32AFFCA9EA0
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 14:24:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3686D20700
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 14:23:38 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3686D20700
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id EAD2120700
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 14:24:10 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ELNUak0z"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EAD2120700
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58794 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58820 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iMv4S-0006LK-W2
-	for qemu-devel@archiver.kernel.org; Tue, 22 Oct 2019 10:23:37 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39055)
+	id 1iMv4z-0007D2-Up
+	for qemu-devel@archiver.kernel.org; Tue, 22 Oct 2019 10:24:09 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40746)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1iMuPn-0006Sz-4R
- for qemu-devel@nongnu.org; Tue, 22 Oct 2019 09:41:37 -0400
+ (envelope-from <drjones@redhat.com>) id 1iMuY4-0006iQ-0p
+ for qemu-devel@nongnu.org; Tue, 22 Oct 2019 09:50:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1iMuPl-0004nX-5W
- for qemu-devel@nongnu.org; Tue, 22 Oct 2019 09:41:35 -0400
-Received: from indium.canonical.com ([91.189.90.7]:60532)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1iMuPj-0004kT-Ns
- for qemu-devel@nongnu.org; Tue, 22 Oct 2019 09:41:33 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1iMuPf-0001So-Rw
- for <qemu-devel@nongnu.org>; Tue, 22 Oct 2019 13:41:27 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id D254C2E80C3
- for <qemu-devel@nongnu.org>; Tue, 22 Oct 2019 13:41:27 +0000 (UTC)
+ (envelope-from <drjones@redhat.com>) id 1iMuY0-0001RA-Sk
+ for qemu-devel@nongnu.org; Tue, 22 Oct 2019 09:50:07 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:37589
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <drjones@redhat.com>) id 1iMuXy-0001Pb-RE
+ for qemu-devel@nongnu.org; Tue, 22 Oct 2019 09:50:03 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1571752202;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=X8qYxAI0WgSx6/CqYTtmZjD3iL28I4NbYPq9pRIVPNU=;
+ b=ELNUak0znVNM9ZiOVIYhtcv70rqhEKh34YLfgmGahuYts1JtEIdQehtYGyzgfFwEKlnG7t
+ qht6RqXwJolV8VJbFDFIaqcevRgRJmyc26bY3Rzd9pLTib1SxgCBUKJQYheY3WWr4ibwFt
+ hUxT275i1BHRvD6+43cH1PjpuWKD/h0=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-17-T-zk6OqVOVC4BXtf4backQ-1; Tue, 22 Oct 2019 09:50:00 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0275D800D4E;
+ Tue, 22 Oct 2019 13:49:59 +0000 (UTC)
+Received: from kamzik.brq.redhat.com (unknown [10.43.2.160])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 2EAAB4503;
+ Tue, 22 Oct 2019 13:49:54 +0000 (UTC)
+Date: Tue, 22 Oct 2019 15:49:51 +0200
+From: Andrew Jones <drjones@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Subject: Re: [PATCH v6 0/9] target/arm/kvm: enable SVE in guests
+Message-ID: <20191022134951.znjbk4piuiqwbveb@kamzik.brq.redhat.com>
+References: <20191016085408.24360-1-drjones@redhat.com>
+ <CAFEAcA8pV5batrPk+J6RLU2rv9SNAmL8JS9Kd9tWP3pD-m29eA@mail.gmail.com>
+ <3f54f759-9d6d-bf04-85aa-59c1cac31044@redhat.com>
+ <20191021142336.e4xekqlmqv5txu5w@kamzik.brq.redhat.com>
+ <CAFEAcA-bezS5tSVB+N223+N+xoYYYHuSJmDTaRCJgO+4Y=VjdQ@mail.gmail.com>
+ <20191021161226.mnm6eomghb37xlby@kamzik.brq.redhat.com>
+ <CAFEAcA-vHmtCi3HGqpu34sAaNxGeQwS_+0yZ5Hr4SbnGm+rjYA@mail.gmail.com>
+ <CAFEAcA9o4G5yn0GzgdwvUnT_fEwRA7DChuV=miZaEvgavoU5xg@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <CAFEAcA9o4G5yn0GzgdwvUnT_fEwRA7DChuV=miZaEvgavoU5xg@mail.gmail.com>
+User-Agent: NeoMutt/20180716
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-MC-Unique: T-zk6OqVOVC4BXtf4backQ-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=WINDOWS-1252
 Content-Transfer-Encoding: quoted-printable
-Date: Tue, 22 Oct 2019 13:27:36 -0000
-From: Kevin Wolf <1846427@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: dgilbert-h kwolf-redhat lersek michael-weiser
- psyhomb sej7278
-X-Launchpad-Bug-Reporter: Michael Weiser (michael-weiser)
-X-Launchpad-Bug-Modifier: Kevin Wolf (kwolf-redhat)
-References: <157005622285.15919.12087374175062502233.malonedeb@gac.canonical.com>
-Message-Id: <157175085638.21792.15363523124548485446.malone@wampee.canonical.com>
-Subject: [Bug 1846427] Re: 4.1.0: qcow2 corruption on savevm/quit/loadvm cycle
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="186023fa645d8be19d403a76064f0643f510db2f";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: b29260d61468ea9121f54ecab210a22e28c77fc3
+Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 91.189.90.7
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -78,182 +93,152 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1846427 <1846427@bugs.launchpad.net>
+Cc: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ QEMU Developers <qemu-devel@nongnu.org>, Markus Armbruster <armbru@redhat.com>,
+ Eric Auger <eric.auger@redhat.com>, qemu-arm <qemu-arm@nongnu.org>,
+ Igor Mammedov <imammedo@redhat.com>,
+ Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ Dave P Martin <Dave.Martin@arm.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-> To avoid any suspicion as to what that may have brought with it in
-> breakage I just created a fresh image using this command: [...]
+On Tue, Oct 22, 2019 at 11:29:05AM +0100, Peter Maydell wrote:
+> On Mon, 21 Oct 2019 at 17:18, Peter Maydell <peter.maydell@linaro.org> wr=
+ote:
+> >
+> > On Mon, 21 Oct 2019 at 17:12, Andrew Jones <drjones@redhat.com> wrote:
+> > >
+> > > On Mon, Oct 21, 2019 at 04:43:22PM +0100, Peter Maydell wrote:
+> > > > On Mon, 21 Oct 2019 at 15:23, Andrew Jones <drjones@redhat.com> wro=
+te:
+> > > > > Peter, would you mind running your test on the kvm32 machine with=
+ this
+> > > > > change before I send a v7?
+> > > >
+> > > > Still fails:
+> > > >
+> > > > pm215@pm-ct:~/qemu/build/arm$
+> > > > QTEST_QEMU_BINARY=3Darm-softmmu/qemu-system-arm tests/arm-cpu-featu=
+res
+> > > > /arm/arm/query-cpu-model-expansion: OK
+> > > > /arm/arm/kvm/query-cpu-model-expansion: **
+> > > > ERROR:/home/pm215/qemu/tests/arm-cpu-features.c:498:test_query_cpu_=
+model_expansion_kvm:
+> > > > assertion failed: (resp_has_props(_resp))
+> > > > Aborted
+> > > >
+> > > > This is asserting on the line:
+> > > > 498             assert_has_not_feature(qts, "host", "sve");
+> > > >
+> > >
+> > > Oh, I see. It's not failing the specific absence of 'sve', but the te=
+st
+> > > code (assert_has_not_feature()) is assuming at least one property is
+> > > present. This isn't the case for kvm32 'host' cpus. They apparently
+> > > have none. We need this patch too, then
+> > >
+> > > diff --git a/tests/arm-cpu-features.c b/tests/arm-cpu-features.c
+> > > index 14100ebd8521..9aa728ed8469 100644
+> > > --- a/tests/arm-cpu-features.c
+> > > +++ b/tests/arm-cpu-features.c
+> > > @@ -136,8 +136,8 @@ static bool resp_get_feature(QDict *resp, const c=
+har *feature)
+> > >  ({                                                                  =
+   \
+> > >      QDict *_resp =3D do_query_no_props(qts, cpu_type);              =
+     \
+> > >      g_assert(_resp);                                                =
+   \
+> > > -    g_assert(resp_has_props(_resp));                                =
+   \
+> > > -    g_assert(!qdict_get(resp_get_props(_resp), feature));           =
+   \
+> > > +    g_assert(!resp_has_props(_resp) ||                              =
+   \
+> > > +             !qdict_get(resp_get_props(_resp), feature));           =
+   \
+> > >      qobject_unref(_resp);                                           =
+   \
+> > >  })
+> >
+> > Yep, with that extra the test passes. I'm just rerunning the
+> > full 'make check'...
+>=20
+> ...which passed OK. For the record, the changes on top of the
+> patchset were:
+>=20
+> diff --git a/tests/arm-cpu-features.c b/tests/arm-cpu-features.c
+> index 92668efb8f5..9aa728ed846 100644
+> --- a/tests/arm-cpu-features.c
+> +++ b/tests/arm-cpu-features.c
+> @@ -136,8 +136,8 @@ static bool resp_get_feature(QDict *resp, const
+> char *feature)
+>  ({                                                                     \
+>      QDict *_resp =3D do_query_no_props(qts, cpu_type);                  =
+ \
+>      g_assert(_resp);                                                   \
+> -    g_assert(resp_has_props(_resp));                                   \
+> -    g_assert(!qdict_get(resp_get_props(_resp), feature));              \
+> +    g_assert(!resp_has_props(_resp) ||                                 \
+> +             !qdict_get(resp_get_props(_resp), feature));              \
+>      qobject_unref(_resp);                                              \
+>  })
+>=20
+> @@ -417,8 +417,6 @@ static void
+> test_query_cpu_model_expansion_kvm(const void *data)
+>=20
+>      qts =3D qtest_init(MACHINE "-accel kvm -cpu host");
+>=20
+> -    assert_has_feature(qts, "host", "pmu");
+> -
+>      if (g_str_equal(qtest_get_arch(), "aarch64")) {
+>          bool kvm_supports_sve;
+>          char max_name[8], name[8];
+> @@ -428,6 +426,7 @@ static void
+> test_query_cpu_model_expansion_kvm(const void *data)
+>          char *error;
+>=20
+>          assert_has_feature(qts, "host", "aarch64");
+> +        assert_has_feature(qts, "host", "pmu");
+>=20
+>          assert_error(qts, "cortex-a15",
+>              "We cannot guarantee the CPU type 'cortex-a15' works "
+> @@ -497,9 +496,6 @@ static void
+> test_query_cpu_model_expansion_kvm(const void *data)
+>          }
+>      } else {
+>          assert_has_not_feature(qts, "host", "sve");
+> -        assert_error(qts, "host",
+> -                     "'pmu' feature not supported by KVM on this host",
+> -                     "{ 'pmu': true }");
+>      }
+>=20
+>      qtest_quit(qts);
+>
 
-I tried to reproduce the problem locally, on the same commit, with the
-steps you described, but I wasn't lucky. I tried keeping the image on my
-home directory (XFS), on tmpfs, and finally on a newly created ext4
-filesystem on a spare LVM volume, but the image just wouldn't break even
-after letting the loop run for a quite a while.
+Thanks Peter!
 
-> So I'd postulate that discard does at most play an aggravating role here
-> but is not necessary for the problem to occur.
+The changes look good to me. If we wanted to, we could also add
 
-That makes sense to me because you have internal snapshots. Both discard
-and snapshots mean that the next write to the block will trigger a
-cluster allocation (and with it a handle_alloc_space() call) again.
+ assert_has_not_feature(qts, "host", "pmu");
 
-> So I guess it's safe to say that the bug occurs in the
-> handle_alloc_space() codepath.
+in that kvm32 block where we have the
 
-This is an important finding.
+ assert_has_not_feature(qts, "host", "sve");
 
-It's a bit odd because the only related thing handle_alloc_space() calls
-is bdrv_is_allocated_above(), which only cares about
-BDRV_BLOCK_ALLOCATED. I don't think the commit in question should make
-any difference as to whether this flag is set or cleared. The only
-possible difference should be BDRV_BLOCK_ZERO, and we don't even check
-that flag.
+and we could even add
 
-So as the next step I would like to test my theory that the problem
-isn't bdrv_co_block_status() returning a different value after the
-commit, but that qcow2_detect_metadata_preallocation() even runs. I
-think the easiest way to do this would be modifying handle_alloc_space()
-so that it performs the checks, but skips its optimisation regardless of
-the is_zero_cow() return value:
+ assert_has_not_feature(qts, "host", "aarch64");
 
-        if (!is_zero_cow(bs, m) || true) {
-            continue;
-        }
+there as well.
 
-Unfortunately, as long as I can't reproduce the problem, I'll have to
-rely on you to actually run the tests I come up with after each step. If
-you'd prefer some more real-time interaction, feel free to ping me on
-IRC (kwolf on OFTC or Freenode).
+If I need to spin a v7, then I'll do that. I could also submit just those
+additions as another patch, though, or even just not worry too much about
+those cases and not add the tests...
 
--- =
+Thanks,
+drew
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1846427
-
-Title:
-  4.1.0: qcow2 corruption on savevm/quit/loadvm cycle
-
-Status in QEMU:
-  New
-
-Bug description:
-  I'm seeing massive corruption of qcow2 images with qemu 4.1.0 and git
-  master as of 7f21573c822805a8e6be379d9bcf3ad9effef3dc after a few
-  savevm/quit/loadvm cycles. I've narrowed it down to the following
-  reproducer (further notes below):
-
-  # qemu-img check debian.qcow2
-  No errors were found on the image.
-  251601/327680 =3D 76.78% allocated, 1.63% fragmented, 0.00% compressed cl=
-usters
-  Image end offset: 18340446208
-  # bin/qemu/bin/qemu-system-x86_64 -machine pc-q35-4.0.1,accel=3Dkvm -m 40=
-96 -chardev stdio,id=3Dcharmonitor -mon chardev=3Dcharmonitor -drive file=
-=3Ddebian.qcow2,id=3Dd -S
-  qemu-system-x86_64: warning: dbind: Couldn't register with accessibility =
-bus: Did not receive a reply. Possible causes include: the remote applicati=
-on did not send a reply, the message bus security policy blocked the reply,=
- the reply timeout expired, or the network connection was broken.
-  QEMU 4.1.50 monitor - type 'help' for more information
-  (qemu) loadvm foo
-  (qemu) c
-  (qemu) qcow2_free_clusters failed: Invalid argument
-  qcow2_free_clusters failed: Invalid argument
-  qcow2_free_clusters failed: Invalid argument
-  qcow2_free_clusters failed: Invalid argument
-  quit
-  [m@nargothrond:~] qemu-img check debian.qcow2
-  Leaked cluster 85179 refcount=3D2 reference=3D1
-  Leaked cluster 85180 refcount=3D2 reference=3D1
-  ERROR cluster 266150 refcount=3D0 reference=3D2
-  [...]
-  ERROR OFLAG_COPIED data cluster: l2_entry=3D422840000 refcount=3D1
-
-  9493 errors were found on the image.
-  Data may be corrupted, or further writes to the image may corrupt it.
-
-  2 leaked clusters were found on the image.
-  This means waste of disk space, but no harm to data.
-  259266/327680 =3D 79.12% allocated, 1.67% fragmented, 0.00% compressed cl=
-usters
-  Image end offset: 18340446208
-
-  This is on a x86_64 Linux 5.3.1 Gentoo host with qemu-system-x86_64
-  and accel=3Dkvm. The compiler is gcc-9.2.0 with the rest of the system
-  similarly current.
-
-  Reproduced with qemu-4.1.0 from distribution package as well as
-  vanilla git checkout of tag v4.1.0 and commit
-  7f21573c822805a8e6be379d9bcf3ad9effef3dc (today's master). Does not
-  happen with qemu compiled from vanilla checkout of tag v4.0.0. Build
-  sequence:
-
-  ./configure --prefix=3D$HOME/bin/qemu-bisect --target-list=3Dx86_64-softm=
-mu --disable-werror --disable-docs
-  [...]
-  CFLAGS            -O2 -U_FORTIFY_SOURCE -D_FORTIFY_SOURCE=3D2 -g
-  [...] (can provide full configure output if helpful)
-  make -j8 install
-
-  The kind of guest OS does not matter: seen with Debian testing 64bit,
-  Windows 7 x86/x64 BIOS and Windows 7 x64 EFI.
-
-  The virtual storage controller does not seem to matter: seen with
-  VirtIO SCSI, emulated SCSI and emulated SATA AHCI.
-
-  Caching modes (none, directsync, writeback), aio mode (threads,
-  native) or discard (ignore, unmap) or detect-zeroes (off, unmap) does
-  not influence occurence either.
-
-  Having more RAM in the guest seems to increase odds of corruption:
-  With 512MB to the Debian guest problem hardly occurs at all, with 4GB
-  RAM it happens almost instantly.
-
-  An automated reproducer works as follows:
-
-  - the guest *does* mount its root fs and swap with option discard and
-  my testing leaves me with the impression that file deletion rather
-  than reading is causing the issue
-
-  - foo is a snapshot of the running Debian VM which is already running
-  command
-
-  # while true ; do dd if=3D/dev/zero of=3Dfoo bs=3D10240k count=3D400 ; do=
-ne
-
-  to produce some I/O to the disk (4GB file with 4GB of RAM).
-
-  - on the host a loop continuously resumes and saves the guest state
-  and quits qemu inbetween:
-
-  # while true ; do (echo loadvm foo ; echo c ; sleep 10 ; echo stop ;
-  echo savevm foo ; echo quit ) | bin/qemu-bisect/bin/qemu-system-x86_64
-  -machine pc-q35-3.1,accel=3Dkvm -m 4096 -chardev stdio,id=3Dcharmonitor
-  -mon chardev=3Dcharmonitor -drive file=3Ddebian.qcow2,id=3Dd -S -display
-  none ; done
-
-  - quitting qemu inbetween saves and loads seems to be necessary for
-  the problem to occur. Just continusouly in one session saving and
-  loading guest state does not trigger it.
-
-  - For me, after about 2 to 6 iterations of above loop the image is
-  corrupted.
-
-  - corruption manifests with other messages from qemu as well, e.g.:
-
-  (qemu) loadvm foo
-  Error: Device 'd' does not have the requested snapshot 'foo'
-
-  Using above reproducer I have to the be best of my ability bisected
-  the introduction of the problem to commit
-  69f47505ee66afaa513305de0c1895a224e52c45 (block: avoid recursive
-  block_status call if possible). qemu compiled from the commit before
-  does not exhibit the issue, from that commit on it does and reverting
-  the commit off of current master makes it disappear.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1846427/+subscriptions
 
