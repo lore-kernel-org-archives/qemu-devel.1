@@ -2,95 +2,95 @@ Return-Path: <SRS0=tSBD=YP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-12.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6710DCA9EA0
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 08:35:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B7554CA9EA0
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 08:51:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 34A2020659
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 08:35:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 80C0D20679
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 08:51:14 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GcXgWYAV"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 34A2020659
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MegfBaR6"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 80C0D20679
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51660 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51845 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iMpe2-00038x-DL
-	for qemu-devel@archiver.kernel.org; Tue, 22 Oct 2019 04:35:58 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46879)
+	id 1iMpsn-0001fc-MC
+	for qemu-devel@archiver.kernel.org; Tue, 22 Oct 2019 04:51:13 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49043)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <pbonzini@redhat.com>) id 1iMpcQ-00021J-Kb
- for qemu-devel@nongnu.org; Tue, 22 Oct 2019 04:34:20 -0400
+ (envelope-from <philmd@redhat.com>) id 1iMprj-0008SX-QV
+ for qemu-devel@nongnu.org; Tue, 22 Oct 2019 04:50:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pbonzini@redhat.com>) id 1iMpcP-0007DV-8Q
- for qemu-devel@nongnu.org; Tue, 22 Oct 2019 04:34:18 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:34136
+ (envelope-from <philmd@redhat.com>) id 1iMpri-0005Kr-Np
+ for qemu-devel@nongnu.org; Tue, 22 Oct 2019 04:50:07 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:33862
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1iMpcO-0007C5-1K
- for qemu-devel@nongnu.org; Tue, 22 Oct 2019 04:34:17 -0400
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iMpri-0005KQ-JP
+ for qemu-devel@nongnu.org; Tue, 22 Oct 2019 04:50:06 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1571733253;
+ s=mimecast20190719; t=1571734205;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:openpgp:openpgp;
- bh=EoYrb2qtL19XBGGIWYU+vJio620TxOIYm0uiqYTeKSc=;
- b=GcXgWYAVhftyPQ7fCKpSKP9ZJFk0ltaGnS5IVIZl+Wqa222ddPtGCWdqBjCULqQ34IFMTN
- b4YspnxnAzbgwSDcTTU6v9jU+cOSXiWEoajZtJv6sc9HjH5i2iSXVmuahiG2nbKDVwfUsH
- 33PDJjozbRiIZ+QDeHDjOVT8Lb1qJZs=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-266-C5XLpxxlP06ckDoAfZIzNQ-1; Tue, 22 Oct 2019 04:34:12 -0400
-Received: by mail-wm1-f70.google.com with SMTP id o188so7088539wmo.5
- for <qemu-devel@nongnu.org>; Tue, 22 Oct 2019 01:34:12 -0700 (PDT)
+ in-reply-to:in-reply-to:references:references;
+ bh=m83BXJXtRumeztxB1T8OWFTzQeDHyCuUriLWc5iQYJQ=;
+ b=MegfBaR6AoNs1WEXqyDKB4/KFSs0vvSsZ/tqh6w6bum+ouZuZ2fWvnu17WFhntbx8Oqi8E
+ xZyscMvARv5O9lF8qwKYBvxRuinnsZEe0bK8YIfOtcgzsfMqXX4PsryWflRRfxpTUiRrAU
+ /qBSiDL1DreP+G3wjpD4yzYwLsh6NeI=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-134-K4-Je6ZaMRafk3nsDZaZ_g-1; Tue, 22 Oct 2019 04:50:02 -0400
+Received: by mail-wm1-f71.google.com with SMTP id g13so167946wme.0
+ for <qemu-devel@nongnu.org>; Tue, 22 Oct 2019 01:50:02 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=6wbpy6sfnJTNjtUXNQcI+hAzgAqW8DDHA9ysT8boTQU=;
- b=JN8tVwZ7cABmJ5t/CXL4wJYrqfyxwTNASPKdO3W0j8BLo6+g8+LQBZPQAwalcs9+jv
- LEod1xujk4SaNKnx8n+tHDvuBXcyrwxa3mhvDo+DQhxQT/+cIFmRrl98xiPlLpc2WcNY
- CqEfp5HMQ5tDsCcA5ZL4VMIjnF3TQOAWsPe99C0nEnrYwMicu4Agde55w0y9kHeS/nXC
- eQ4/FjFkupi/P7EW4+IelW9q1MqocxiN3WQneVafmO0ewzjJ/UX2UCFzw7qAZ9pVk/EA
- 9tC0XwKa72H5bqv5gGgjI4UpE/PAw21Zpndao3+1TP0AWsAirz0TtcF0EDnmkCT1zXRY
- pMFQ==
-X-Gm-Message-State: APjAAAUH6JA7EbUU78WIf99+oXYwpSuBIBzWSGZj2Y3coXDFlplFUFAC
- jBUMuUQLSeSP1qLZ0IS9Vtu5fPdWMv0RZUo9q+gTsrSytoRxckbVmPhHQGcfKsEwnCOoNsp0LJR
- MfQOkgTvUN3eHb1Y=
-X-Received: by 2002:adf:a157:: with SMTP id r23mr2244948wrr.51.1571733250726; 
- Tue, 22 Oct 2019 01:34:10 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqyIic1u9i+Jsae1+KZcYsVK0fK2qhcDhGwWaMZYC6ZtH+pUhrYuQyNkbrI/OJoYjr7B8kKhcQ==
-X-Received: by 2002:adf:a157:: with SMTP id r23mr2244914wrr.51.1571733250340; 
- Tue, 22 Oct 2019 01:34:10 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:566:fc24:94f2:2f13?
- ([2001:b07:6468:f312:566:fc24:94f2:2f13])
- by smtp.gmail.com with ESMTPSA id 37sm28128625wrc.96.2019.10.22.01.34.08
+ bh=Ei81U+a7i0jHxzrWjOPIbP4KsEGz9Gogem/Q9h4pGMY=;
+ b=PD9PVfipu0myAF+sC1tOgRSbkE6UcqmaryiQ9nPduEVITM7wP8nWKWRlTPVvko2wqp
+ yNa057xKOzhK/QvuibDV1lnqM3/IYbq0BZXDS6BtnHzht57tW7jtuEGX4yzOAMRaKspd
+ oSmBN/aIo6VG0NJLFzqPkFZanGgB58t8nH7YLLGMZIwYHTiu/SQbUtg/uAgK9fwEzabl
+ NgdQ3uzza86bB3L6y95/0cSYWcwTHgfk+WZioPu8hqRyn2tv+uxC6EBnmNsthaWjM6W5
+ DTqrcTKLsRwEA4rsiGEVa0GB6Xf/QJXzUihPC1ofY/6lZ4A+7CCN7C1f/0Yq/PPkTIsy
+ bU+A==
+X-Gm-Message-State: APjAAAWZkBV8iW6ycuzUy5/oOkZ1eAR/W03Nz/Z3Gy0nVleYmDzaYT96
+ 62ca9OF2nwcEb9HjSHlEOGveteJketraf5hK5Bf0j39kBnqbPlvmovpuhj+BYKTNsTW82UOOHdY
+ espeSAD/oZd87SZQ=
+X-Received: by 2002:a7b:cb86:: with SMTP id m6mr1859957wmi.43.1571734201133;
+ Tue, 22 Oct 2019 01:50:01 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqx+NDX95Qc/lqBp7NuR+Fz6v1bnFbNe54mS+kJw5+ma1haIbwWFRF5glhigKQnDOgDvDQTVgw==
+X-Received: by 2002:a7b:cb86:: with SMTP id m6mr1859933wmi.43.1571734200798;
+ Tue, 22 Oct 2019 01:50:00 -0700 (PDT)
+Received: from [192.168.1.41] (129.red-83-57-174.dynamicip.rima-tde.net.
+ [83.57.174.129])
+ by smtp.gmail.com with ESMTPSA id 36sm21063042wrp.30.2019.10.22.01.49.59
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 22 Oct 2019 01:34:09 -0700 (PDT)
-Subject: Re: [PATCH] Semihost SYS_READC implementation
-To: Keith Packard <keithp@keithp.com>, qemu-devel@nongnu.org
-References: <20191022031335.9880-1-keithp@keithp.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Openpgp: preference=signencrypt
-Message-ID: <d7470bfa-ba4e-3287-326f-ee63c5d76407@redhat.com>
-Date: Tue, 22 Oct 2019 10:34:08 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ Tue, 22 Oct 2019 01:50:00 -0700 (PDT)
+Subject: Re: [GIT PULL for qemu-pseries] pseries: Update SLOF firmware image
+To: Alexey Kardashevskiy <aik@ozlabs.ru>,
+ David Gibson <david@gibson.dropbear.id.au>
+References: <20191022040945.35730-1-aik@ozlabs.ru>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <1c3c1b36-a355-9ebb-9c68-8ae1af268fff@redhat.com>
+Date: Tue, 22 Oct 2019 10:49:58 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.1
 MIME-Version: 1.0
-In-Reply-To: <20191022031335.9880-1-keithp@keithp.com>
+In-Reply-To: <20191022040945.35730-1-aik@ozlabs.ru>
 Content-Language: en-US
-X-MC-Unique: C5XLpxxlP06ckDoAfZIzNQ-1
+X-MC-Unique: K4-Je6ZaMRafk3nsDZaZ_g-1
 X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
@@ -106,220 +106,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org,
- =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 22/10/19 05:13, Keith Packard wrote:
-> Provides a blocking call to read a character from the console by hooking
-> into the console input chain. This happens *after* any uart has hooked in=
-,
-> so specifying -semihost overrides input to any emulated uarts.
+Hi Alekey,
+
+On 10/22/19 6:09 AM, Alexey Kardashevskiy wrote:
+> The following changes since commit 7cff77c24d8f5e558cef3538a44044d66aa225=
+a5:
 >=20
-> Signed-off-by: Keith Packard <keithp@keithp.com>
-
-I'm a bit confused, why is it not using semihosting_get_chardev?  That
-would be
-
-=09-chardev stdio,id=3Dsemihost
-=09-semihosting-config on,chardev=3Dsemihost
-
-Paolo
-
-> ---
->  hw/semihosting/console.c          | 92 +++++++++++++++++++++++++++++++
->  include/hw/semihosting/console.h  | 12 ++++
->  include/hw/semihosting/semihost.h |  1 +
->  stubs/semihost.c                  |  4 ++
->  target/arm/arm-semi.c             |  3 +-
->  vl.c                              |  3 +
->  6 files changed, 113 insertions(+), 2 deletions(-)
+>    spapr: Move SpaprIrq::nr_xirqs to SpaprMachineClass (2019-10-16 12:01:=
+41 +1100)
 >=20
-> diff --git a/hw/semihosting/console.c b/hw/semihosting/console.c
-> index b4b17c8afb..7345e2cce0 100644
-> --- a/hw/semihosting/console.c
-> +++ b/hw/semihosting/console.c
-> @@ -98,3 +98,95 @@ void qemu_semihosting_console_outc(CPUArchState *env, =
-target_ulong addr)
->                        __func__, addr);
->      }
->  }
-> +
-> +#include <pthread.h>
-> +#include "chardev/char-fe.h"
-> +#include "sysemu/sysemu.h"
-> +#include "qemu/main-loop.h"
-> +#include "qapi/error.h"
-> +
-> +#define FIFO_SIZE   1024
-> +
-> +typedef struct SemihostingFifo {
-> +    unsigned int     insert, remove;
-> +
-> +    uint8_t fifo[FIFO_SIZE];
-> +} SemihostingFifo;
-> +
-> +#define fifo_insert(f, c) do { \
-> +    (f)->fifo[(f)->insert] =3D (c); \
-> +    (f)->insert =3D ((f)->insert + 1) & (FIFO_SIZE - 1); \
-> +} while (0)
-> +
-> +#define fifo_remove(f, c) do {\
-> +    c =3D (f)->fifo[(f)->remove]; \
-> +    (f)->remove =3D ((f)->remove + 1) & (FIFO_SIZE - 1); \
-> +} while (0)
-> +
-> +#define fifo_full(f)        ((((f)->insert + 1) & (FIFO_SIZE - 1)) =3D=
-=3D \
-> +                             (f)->remove)
-> +#define fifo_empty(f)       ((f)->insert =3D=3D (f)->remove)
-> +#define fifo_space(f)       (((f)->remove - ((f)->insert + 1)) & \
-> +                             (FIFO_SIZE - 1))
-> +
-> +typedef struct SemihostingConsole {
-> +    CharBackend         backend;
-> +    pthread_mutex_t     mutex;
-> +    pthread_cond_t      cond;
-> +    bool                got;
-> +    SemihostingFifo     fifo;
-> +} SemihostingConsole;
-> +
-> +static SemihostingConsole console =3D {
-> +    .mutex =3D PTHREAD_MUTEX_INITIALIZER,
-> +    .cond =3D PTHREAD_COND_INITIALIZER
-> +};
-> +
-> +static int console_can_read(void *opaque)
-> +{
-> +    SemihostingConsole *c =3D opaque;
-> +    int ret;
-> +    pthread_mutex_lock(&c->mutex);
-> +    ret =3D fifo_space(&c->fifo);
-> +    pthread_mutex_unlock(&c->mutex);
-> +    return ret;
-> +}
-> +
-> +static void console_read(void *opaque, const uint8_t *buf, int size)
-> +{
-> +    SemihostingConsole *c =3D opaque;
-> +    pthread_mutex_lock(&c->mutex);
-> +    while (size-- && !fifo_full(&c->fifo)) {
-> +        fifo_insert(&c->fifo, *buf++);
-> +    }
-> +    pthread_cond_broadcast(&c->cond);
-> +    pthread_mutex_unlock(&c->mutex);
-> +}
-> +
-> +target_ulong qemu_semihosting_console_inc(CPUArchState *env)
-> +{
-> +    (void) env;
-> +    SemihostingConsole *c =3D &console;
-> +    qemu_mutex_unlock_iothread();
-> +    pthread_mutex_lock(&c->mutex);
-> +    while (fifo_empty(&c->fifo)) {
-> +        pthread_cond_wait(&c->cond, &c->mutex);
-> +    }
-> +    uint8_t ch;
-> +    fifo_remove(&c->fifo, ch);
-> +    pthread_mutex_unlock(&c->mutex);
-> +    qemu_mutex_lock_iothread();
-> +    return (target_ulong) ch;
-> +}
-> +
-> +void qemu_semihosting_console_init(void)
-> +{
-> +    if (semihosting_enabled()) {
-> +        qemu_chr_fe_init(&console.backend, serial_hd(0), &error_abort);
-> +        qemu_chr_fe_set_handlers(&console.backend,
-> +                                 console_can_read,
-> +                                 console_read,
-> +                                 NULL, NULL, &console,
-> +                                 NULL, true);
-> +    }
-> +}
-> diff --git a/include/hw/semihosting/console.h b/include/hw/semihosting/co=
-nsole.h
-> index 9be9754bcd..56f3606a2a 100644
-> --- a/include/hw/semihosting/console.h
-> +++ b/include/hw/semihosting/console.h
-> @@ -37,6 +37,18 @@ int qemu_semihosting_console_outs(CPUArchState *env, t=
-arget_ulong s);
->   */
->  void qemu_semihosting_console_outc(CPUArchState *env, target_ulong c);
-> =20
-> +/**
-> + * qemu_semihosting_console_outc:
-> + * @env: CPUArchState
-> + *
-> + * Receive single character from debug console. This
-> + * may be the remote gdb session if a softmmu guest is currently being
-> + * debugged.
-> + *
-> + * Returns: character read or -1 on error
-> + */
-> +target_ulong qemu_semihosting_console_inc(CPUArchState *env);
-> +
->  /**
->   * qemu_semihosting_log_out:
->   * @s: pointer to string
-> diff --git a/include/hw/semihosting/semihost.h b/include/hw/semihosting/s=
-emihost.h
-> index 60fc42d851..a13d17c087 100644
-> --- a/include/hw/semihosting/semihost.h
-> +++ b/include/hw/semihosting/semihost.h
-> @@ -68,6 +68,7 @@ Chardev *semihosting_get_chardev(void);
->  void qemu_semihosting_enable(void);
->  int qemu_semihosting_config_options(const char *opt);
->  void qemu_semihosting_connect_chardevs(void);
-> +void qemu_semihosting_console_init(void);
->  #endif /* CONFIG_USER_ONLY */
-> =20
->  #endif /* SEMIHOST_H */
-> diff --git a/stubs/semihost.c b/stubs/semihost.c
-> index f90589259c..1d8b37f7b2 100644
-> --- a/stubs/semihost.c
-> +++ b/stubs/semihost.c
-> @@ -69,3 +69,7 @@ void semihosting_arg_fallback(const char *file, const c=
-har *cmd)
->  void qemu_semihosting_connect_chardevs(void)
->  {
->  }
-> +
-> +void qemu_semihosting_console_init(void)
-> +{
-> +}
-> diff --git a/target/arm/arm-semi.c b/target/arm/arm-semi.c
-> index 6f7b6d801b..47d61f6fe1 100644
-> --- a/target/arm/arm-semi.c
-> +++ b/target/arm/arm-semi.c
-> @@ -802,8 +802,7 @@ target_ulong do_arm_semihosting(CPUARMState *env)
-> =20
->          return guestfd_fns[gf->type].readfn(cpu, gf, arg1, len);
->      case TARGET_SYS_READC:
-> -        qemu_log_mask(LOG_UNIMP, "%s: SYS_READC not implemented", __func=
-__);
-> -        return 0;
-> +        return qemu_semihosting_console_inc(env);
->      case TARGET_SYS_ISTTY:
->          GET_ARG(0);
-> =20
-> diff --git a/vl.c b/vl.c
-> index 4489cfb2bb..ac584d97ea 100644
-> --- a/vl.c
-> +++ b/vl.c
-> @@ -4381,6 +4381,9 @@ int main(int argc, char **argv, char **envp)
->      ds =3D init_displaystate();
->      qemu_display_init(ds, &dpy);
-> =20
-> +    /* connect semihosting console input if requested */
-> +    qemu_semihosting_console_init();
-> +
->      /* must be after terminal init, SDL library changes signal handlers =
-*/
->      os_setup_signal_handling();
-> =20
+> are available in the Git repository at:
 >=20
+>    git@github.com:aik/qemu.git tags/qemu-slof-20191022
+>=20
+> for you to fetch changes up to 8e59d05f71ae783e12a8eb7eb582e0a86ba3d6dc:
+>=20
+>    pseries: Update SLOF firmware image (2019-10-22 15:05:36 +1100)
+>=20
+> ----------------------------------------------------------------
+> Alexey Kardashevskiy (1):
+>        pseries: Update SLOF firmware image
+>=20
+>   pc-bios/README   |   2 +-
+>   pc-bios/slof.bin | Bin 930640 -> 928552 bytes
+>   roms/SLOF        |   2 +-
+>   3 files changed, 2 insertions(+), 2 deletions(-)
+
+Looking at commit 8e59d05f71ae which update the SLOF submodule,
+in your future updates can you include the git shortlog in the
+commit description?
+
+Simply:
+
+   $ git shortlog qemu-slof-20190911..qemu-slof-20191022
+   Alexey Kardashevskiy (3):
+         pci: Align PCI node names with QEMU
+         libusb: Fix compiler warnings with gcc9
+         version: update to 20191022
+
+   Thomas Huth (1):
+         ipv6: Fix gcc9 warnings
+
+Thanks,
+
+Phil.
 
 
