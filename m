@@ -6,73 +6,73 @@ X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1114BCA9EA0
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 07:25:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 61CC0CA9EA0
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 07:26:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CF17C2064B
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 07:25:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2B13C2064B
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 07:26:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VEUsCTzY"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CF17C2064B
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XPNQv9eB"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2B13C2064B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51008 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51012 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iMoYC-0001l1-Q1
-	for qemu-devel@archiver.kernel.org; Tue, 22 Oct 2019 03:25:52 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39167)
+	id 1iMoYO-00027X-7z
+	for qemu-devel@archiver.kernel.org; Tue, 22 Oct 2019 03:26:04 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39135)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <thuth@redhat.com>) id 1iMoUg-0005Z1-8T
- for qemu-devel@nongnu.org; Tue, 22 Oct 2019 03:22:15 -0400
+ (envelope-from <thuth@redhat.com>) id 1iMoUV-0005Hx-H2
+ for qemu-devel@nongnu.org; Tue, 22 Oct 2019 03:22:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <thuth@redhat.com>) id 1iMoUf-0005L9-9u
- for qemu-devel@nongnu.org; Tue, 22 Oct 2019 03:22:14 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:20006
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <thuth@redhat.com>) id 1iMoUU-0005Ha-DS
+ for qemu-devel@nongnu.org; Tue, 22 Oct 2019 03:22:03 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:58003
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <thuth@redhat.com>) id 1iMoUf-0005Ks-5S
- for qemu-devel@nongnu.org; Tue, 22 Oct 2019 03:22:13 -0400
+ (Exim 4.71) (envelope-from <thuth@redhat.com>) id 1iMoUU-0005HO-AH
+ for qemu-devel@nongnu.org; Tue, 22 Oct 2019 03:22:02 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1571728932;
+ s=mimecast20190719; t=1571728921;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=gFfpjxekHST6uwbNE0nULW3Vo8TkWtQwwVYbEy8y9PI=;
- b=VEUsCTzYPfd3EB+NxN31N2yvnyVuXcfA0Ceq0gYiGFhmWP5DzyET6yMRsUQjnMboQ8pPP2
- L525uMRozM2x+8dTR2PRNeNZ8UUhJVbhK+6ubHHTCUiJEo4HtiTBXgSC28Vf/XvIjC/D8j
- TAiZchm6WaMcxKXKU8e9BPU2gTAyx8c=
+ bh=O2Z3+As+UUjZZvK4a3KeXRi6hSKm32Oq0U6w7Ks/Y0U=;
+ b=XPNQv9eBoof4SeG7K1RZH7Rxe10VvyqaB4TaR771i7GCbphCRQx5KBHAHSSKJVI5cxD+u/
+ IGbefIWjAh0d4Hd82cjKJbH8SDOwtfAFzJwmzsen5NLga73KoZuA0YHG5ndelNWPgebxBZ
+ HEBTzOrv1aLzAlFdbL/9cvCbPlPXPW0=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-224-MBWIknRvPvy3StnlBFaiPw-1; Tue, 22 Oct 2019 03:22:10 -0400
+ us-mta-176-BDyTGkvSMput6CWI5Y_VRQ-1; Tue, 22 Oct 2019 03:21:57 -0400
 Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
  [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A5551476;
- Tue, 22 Oct 2019 07:22:09 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 19BA61005509;
+ Tue, 22 Oct 2019 07:21:56 +0000 (UTC)
 Received: from thuth.com (dhcp-200-228.str.redhat.com [10.33.200.228])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 963B92965D;
- Tue, 22 Oct 2019 07:22:08 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 0E9C61B465;
+ Tue, 22 Oct 2019 07:21:54 +0000 (UTC)
 From: Thomas Huth <thuth@redhat.com>
 To: Max Reitz <mreitz@redhat.com>,
 	qemu-block@nongnu.org
-Subject: [PATCH v3 6/6] iotests: Remove 130 from the "auto" group
-Date: Tue, 22 Oct 2019 09:21:35 +0200
-Message-Id: <20191022072135.11188-7-thuth@redhat.com>
+Subject: [PATCH v3 3/6] iotests: Test 183 does not work on macOS and OpenBSD
+Date: Tue, 22 Oct 2019 09:21:32 +0200
+Message-Id: <20191022072135.11188-4-thuth@redhat.com>
 In-Reply-To: <20191022072135.11188-1-thuth@redhat.com>
 References: <20191022072135.11188-1-thuth@redhat.com>
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-MC-Unique: MBWIknRvPvy3StnlBFaiPw-1
+X-MC-Unique: BDyTGkvSMput6CWI5Y_VRQ-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=WINDOWS-1252
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.61
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,31 +90,32 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Peter hit a "Could not open 'TEST_DIR/t.IMGFMT': Failed to get shared
-'write' lock - Is another process using the image [TEST_DIR/t.IMGFMT]?"
-error with 130 already twice. Looks like this test is a little bit
-shaky, so for the time being, let's disable it from the "auto" group so
-that it does not gate the pull requests.
+In the long term, we might want to add test 183 to the "auto" group
+(but it still fails occasionally, so we cannot do that yet). However,
+when running 183 in Cirrus-CI on macOS, or with our vm-build-openbsd
+target, it currently always fails with an "Timeout waiting for return
+on handle 0" error.
 
-Reviewed-by: John Snow <jsnow@redhat.com>
+Let's mark it as supported only on systems where the test is working
+fine (i.e. Linux, FreeBSD and NetBSD).
+
 Signed-off-by: Thomas Huth <thuth@redhat.com>
 ---
- tests/qemu-iotests/group | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ tests/qemu-iotests/183 | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
-index 33b499ed41..4596497bce 100644
---- a/tests/qemu-iotests/group
-+++ b/tests/qemu-iotests/group
-@@ -151,7 +151,7 @@
- 127 rw auto backing quick
- 128 rw quick
- 129 rw quick
--130 rw auto quick
-+130 rw quick
- 131 rw quick
- 132 rw quick
- 133 auto quick
+diff --git a/tests/qemu-iotests/183 b/tests/qemu-iotests/183
+index bced83fae0..0bbae13647 100755
+--- a/tests/qemu-iotests/183
++++ b/tests/qemu-iotests/183
+@@ -42,6 +42,7 @@ trap "_cleanup; exit \$status" 0 1 2 3 15
+ . ./common.filter
+ . ./common.qemu
+=20
++_supported_os Linux FreeBSD NetBSD
+ _supported_fmt qcow2 raw qed quorum
+ _supported_proto file
+=20
 --=20
 2.18.1
 
