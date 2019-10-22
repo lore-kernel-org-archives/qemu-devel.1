@@ -2,61 +2,78 @@ Return-Path: <SRS0=tSBD=YP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D11AECA9EA0
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 16:58:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 69632CA9EA0
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 17:01:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A15412084B
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 16:58:33 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A15412084B
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id 3787521783
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 17:01:08 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LkJIrAsL"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3787521783
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36445 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36558 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iMxU6-00065Q-QK
-	for qemu-devel@archiver.kernel.org; Tue, 22 Oct 2019 12:58:14 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41235)
+	id 1iMxWt-0001K9-2G
+	for qemu-devel@archiver.kernel.org; Tue, 22 Oct 2019 13:01:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39006)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <clg@kaod.org>) id 1iMxBm-0001Mk-BZ
- for qemu-devel@nongnu.org; Tue, 22 Oct 2019 12:39:19 -0400
+ (envelope-from <marcandre.lureau@redhat.com>) id 1iMwy2-00010o-0C
+ for qemu-devel@nongnu.org; Tue, 22 Oct 2019 12:25:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <clg@kaod.org>) id 1iMxBl-0006oU-6u
- for qemu-devel@nongnu.org; Tue, 22 Oct 2019 12:39:18 -0400
-Received: from 7.mo2.mail-out.ovh.net ([188.165.48.182]:34113)
+ (envelope-from <marcandre.lureau@redhat.com>) id 1iMwy0-0008AL-CU
+ for qemu-devel@nongnu.org; Tue, 22 Oct 2019 12:25:05 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:26771
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <clg@kaod.org>) id 1iMxBl-0006ns-0B
- for qemu-devel@nongnu.org; Tue, 22 Oct 2019 12:39:17 -0400
-Received: from player688.ha.ovh.net (unknown [10.109.143.18])
- by mo2.mail-out.ovh.net (Postfix) with ESMTP id 20B871B01B9
- for <qemu-devel@nongnu.org>; Tue, 22 Oct 2019 18:39:15 +0200 (CEST)
-Received: from kaod.org (lfbn-1-2229-223.w90-76.abo.wanadoo.fr [90.76.50.223])
- (Authenticated sender: clg@kaod.org)
- by player688.ha.ovh.net (Postfix) with ESMTPSA id 1D9E2B32C394;
- Tue, 22 Oct 2019 16:39:07 +0000 (UTC)
-From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
-To: David Gibson <david@gibson.dropbear.id.au>
-Subject: [PATCH v5 3/7] ppc/pnv: Introduce a PnvCore reset handler
-Date: Tue, 22 Oct 2019 18:38:08 +0200
-Message-Id: <20191022163812.330-4-clg@kaod.org>
-X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20191022163812.330-1-clg@kaod.org>
-References: <20191022163812.330-1-clg@kaod.org>
+ (Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
+ id 1iMwy0-0008A3-9B
+ for qemu-devel@nongnu.org; Tue, 22 Oct 2019 12:25:04 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1571761503;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=OWXPuZe/N59AA+45n08Y6AMqBs3KXImECglmyR34SnU=;
+ b=LkJIrAsLxhH0sIKI7pjFMABVoma/lFG5ueQnBWE1zgaQNSbuttWI8nhvz+s7jkx2YaeB5O
+ iri8kBGddsdjGGFu1yO5etA+AxZBtnyP3c4U2hjVs2XNtcFU6BY3/jXH8Qwlzqd6wVeMHB
+ h8NhivgKxW+IUXKJ+/KRyiLuhImUAPo=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-174-RHzneXQmMjqukV0TqwtQ0w-1; Tue, 22 Oct 2019 12:24:59 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5E31680183D;
+ Tue, 22 Oct 2019 16:24:57 +0000 (UTC)
+Received: from localhost (ovpn-112-21.ams2.redhat.com [10.36.112.21])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 6B0C45C219;
+ Tue, 22 Oct 2019 16:24:54 +0000 (UTC)
+From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v2 26/28] omap-gpio: remove PROP_PTR
+Date: Tue, 22 Oct 2019 18:21:35 +0200
+Message-Id: <20191022162137.27161-27-marcandre.lureau@redhat.com>
+In-Reply-To: <20191022162137.27161-1-marcandre.lureau@redhat.com>
+References: <20191022162137.27161-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-MC-Unique: RHzneXQmMjqukV0TqwtQ0w-1
+X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=UTF-8
-X-Ovh-Tracer-Id: 3509148538540035046
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrkeejgddutdefucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddm
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 188.165.48.182
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -68,87 +85,222 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>, qemu-ppc@nongnu.org,
- qemu-devel@nongnu.org, Greg Kurz <groug@kaod.org>
+Cc: Corey Minyard <cminyard@mvista.com>,
+ Peter Maydell <peter.maydell@linaro.org>,
+ "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
+ Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
+ KONRAD Frederic <frederic.konrad@adacore.com>,
+ "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
+ Aleksandar Rikalo <arikalo@wavecomp.com>, Magnus Damm <magnus.damm@gmail.com>,
+ =?UTF-8?q?Herv=C3=A9=20Poussineau?= <hpoussin@reactos.org>,
+ =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
+ Artyom Tarasenko <atar4qemu@gmail.com>, Eduardo Habkost <ehabkost@redhat.com>,
+ Fabien Chouteau <chouteau@adacore.com>, qemu-arm@nongnu.org,
+ Richard Henderson <rth@twiddle.net>,
+ =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
+ qemu-ppc@nongnu.org, Aleksandar Markovic <amarkovic@wavecomp.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-in which individual CPUs are reset. It will ease the introduction of
-future change reseting the interrupt presenter from the CPU reset
-handler.
+Since clocks are not QOM objects, replace PROP_PTR of clocks with
+setters methods.
 
-Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
-Reviewed-by: Greg Kurz <groug@kaod.org>
+Move/adapt the existing TODO comment about a clock framework.
+
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 ---
- hw/ppc/pnv_core.c | 19 +++++++++++++++----
- 1 file changed, 15 insertions(+), 4 deletions(-)
+ hw/arm/omap1.c        |  2 +-
+ hw/arm/omap2.c        | 13 +++++++------
+ hw/gpio/omap_gpio.c   | 42 +++++++++++++++---------------------------
+ include/hw/arm/omap.h | 33 +++++++++++++++++++++++++++++----
+ 4 files changed, 52 insertions(+), 38 deletions(-)
 
-diff --git a/hw/ppc/pnv_core.c b/hw/ppc/pnv_core.c
-index b1a7489e7abf..9f981a4940e6 100644
---- a/hw/ppc/pnv_core.c
-+++ b/hw/ppc/pnv_core.c
-@@ -40,9 +40,8 @@ static const char *pnv_core_cpu_typename(PnvCore *pc)
-     return cpu_type;
+diff --git a/hw/arm/omap1.c b/hw/arm/omap1.c
+index fe55c44c7e..f13d46afaa 100644
+--- a/hw/arm/omap1.c
++++ b/hw/arm/omap1.c
+@@ -4014,7 +4014,7 @@ struct omap_mpu_state_s *omap310_mpu_init(MemoryRegio=
+n *system_memory,
+=20
+     s->gpio =3D qdev_create(NULL, "omap-gpio");
+     qdev_prop_set_int32(s->gpio, "mpu_model", s->mpu_model);
+-    qdev_prop_set_ptr(s->gpio, "clk", omap_findclk(s, "arm_gpio_ck"));
++    omap_gpio_set_clk(OMAP1_GPIO(s->gpio), omap_findclk(s, "arm_gpio_ck"))=
+;
+     qdev_init_nofail(s->gpio);
+     sysbus_connect_irq(SYS_BUS_DEVICE(s->gpio), 0,
+                        qdev_get_gpio_in(s->ih[0], OMAP_INT_GPIO_BANK1));
+diff --git a/hw/arm/omap2.c b/hw/arm/omap2.c
+index 046fb6ffb5..d5c20f6486 100644
+--- a/hw/arm/omap2.c
++++ b/hw/arm/omap2.c
+@@ -2452,13 +2452,14 @@ struct omap_mpu_state_s *omap2420_mpu_init(MemoryRe=
+gion *sysmem,
+=20
+     s->gpio =3D qdev_create(NULL, "omap2-gpio");
+     qdev_prop_set_int32(s->gpio, "mpu_model", s->mpu_model);
+-    qdev_prop_set_ptr(s->gpio, "iclk", omap_findclk(s, "gpio_iclk"));
+-    qdev_prop_set_ptr(s->gpio, "fclk0", omap_findclk(s, "gpio1_dbclk"));
+-    qdev_prop_set_ptr(s->gpio, "fclk1", omap_findclk(s, "gpio2_dbclk"));
+-    qdev_prop_set_ptr(s->gpio, "fclk2", omap_findclk(s, "gpio3_dbclk"));
+-    qdev_prop_set_ptr(s->gpio, "fclk3", omap_findclk(s, "gpio4_dbclk"));
++    omap2_gpio_set_iclk(OMAP2_GPIO(s->gpio), omap_findclk(s, "gpio_iclk"))=
+;
++    omap2_gpio_set_fclk(OMAP2_GPIO(s->gpio), 0, omap_findclk(s, "gpio1_dbc=
+lk"));
++    omap2_gpio_set_fclk(OMAP2_GPIO(s->gpio), 1, omap_findclk(s, "gpio2_dbc=
+lk"));
++    omap2_gpio_set_fclk(OMAP2_GPIO(s->gpio), 2, omap_findclk(s, "gpio3_dbc=
+lk"));
++    omap2_gpio_set_fclk(OMAP2_GPIO(s->gpio), 3, omap_findclk(s, "gpio4_dbc=
+lk"));
+     if (s->mpu_model =3D=3D omap2430) {
+-        qdev_prop_set_ptr(s->gpio, "fclk4", omap_findclk(s, "gpio5_dbclk")=
+);
++        omap2_gpio_set_fclk(OMAP2_GPIO(s->gpio), 4,
++                            omap_findclk(s, "gpio5_dbclk"));
+     }
+     qdev_init_nofail(s->gpio);
+     busdev =3D SYS_BUS_DEVICE(s->gpio);
+diff --git a/hw/gpio/omap_gpio.c b/hw/gpio/omap_gpio.c
+index 41e1aa798c..85c16897ae 100644
+--- a/hw/gpio/omap_gpio.c
++++ b/hw/gpio/omap_gpio.c
+@@ -40,10 +40,6 @@ struct omap_gpio_s {
+     uint16_t pins;
+ };
+=20
+-#define TYPE_OMAP1_GPIO "omap-gpio"
+-#define OMAP1_GPIO(obj) \
+-    OBJECT_CHECK(struct omap_gpif_s, (obj), TYPE_OMAP1_GPIO)
+-
+ struct omap_gpif_s {
+     SysBusDevice parent_obj;
+=20
+@@ -212,10 +208,6 @@ struct omap2_gpio_s {
+     uint8_t delay;
+ };
+=20
+-#define TYPE_OMAP2_GPIO "omap2-gpio"
+-#define OMAP2_GPIO(obj) \
+-    OBJECT_CHECK(struct omap2_gpif_s, (obj), TYPE_OMAP2_GPIO)
+-
+ struct omap2_gpif_s {
+     SysBusDevice parent_obj;
+=20
+@@ -747,21 +739,13 @@ static void omap2_gpio_realize(DeviceState *dev, Erro=
+r **errp)
+     }
  }
 =20
--static void pnv_cpu_reset(void *opaque)
-+static void pnv_core_cpu_reset(PowerPCCPU *cpu)
- {
--    PowerPCCPU *cpu =3D opaque;
-     CPUState *cs =3D CPU(cpu);
-     CPUPPCState *env =3D &cpu->env;
+-/* Using qdev pointer properties for the clocks is not ideal.
+- * qdev should support a generic means of defining a 'port' with
+- * an arbitrary interface for connecting two devices. Then we
+- * could reframe the omap clock API in terms of clock ports,
+- * and get some type safety. For now the best qdev provides is
+- * passing an arbitrary pointer.
+- * (It's not possible to pass in the string which is the clock
+- * name, because this device does not have the necessary information
+- * (ie the struct omap_mpu_state_s*) to do the clockname to pointer
+- * translation.)
+- */
++void omap_gpio_set_clk(omap_gpif *gpio, omap_clk clk)
++{
++    gpio->clk =3D clk;
++}
 =20
-@@ -192,8 +191,17 @@ static void pnv_realize_vcpu(PowerPCCPU *cpu, PnvChi=
-p *chip, Error **errp)
+ static Property omap_gpio_properties[] =3D {
+     DEFINE_PROP_INT32("mpu_model", struct omap_gpif_s, mpu_model, 0),
+-    DEFINE_PROP_PTR("clk", struct omap_gpif_s, clk),
+     DEFINE_PROP_END_OF_LIST(),
+ };
 =20
-     /* Set time-base frequency to 512 MHz */
-     cpu_ppc_tb_init(env, PNV_TIMEBASE_FREQ);
+@@ -784,15 +768,19 @@ static const TypeInfo omap_gpio_info =3D {
+     .class_init    =3D omap_gpio_class_init,
+ };
+=20
++void omap2_gpio_set_iclk(omap2_gpif *gpio, omap_clk clk)
++{
++    gpio->iclk =3D clk;
 +}
 +
-+static void pnv_core_reset(void *dev)
++void omap2_gpio_set_fclk(omap2_gpif *gpio, uint8_t i, omap_clk clk)
 +{
-+    CPUCore *cc =3D CPU_CORE(dev);
-+    PnvCore *pc =3D PNV_CORE(dev);
-+    int i;
-=20
--    qemu_register_reset(pnv_cpu_reset, cpu);
-+    for (i =3D 0; i < cc->nr_threads; i++) {
-+        pnv_core_cpu_reset(pc->threads[i]);
-+    }
- }
-=20
- static void pnv_core_realize(DeviceState *dev, Error **errp)
-@@ -244,6 +252,8 @@ static void pnv_core_realize(DeviceState *dev, Error =
-**errp)
-     snprintf(name, sizeof(name), "xscom-core.%d", cc->core_id);
-     pnv_xscom_region_init(&pc->xscom_regs, OBJECT(dev), pcc->xscom_ops,
-                           pc, name, PNV_XSCOM_EX_SIZE);
++    assert(i <=3D 5);
++    gpio->fclk[i] =3D clk;
++}
 +
-+    qemu_register_reset(pnv_core_reset, pc);
-     return;
+ static Property omap2_gpio_properties[] =3D {
+     DEFINE_PROP_INT32("mpu_model", struct omap2_gpif_s, mpu_model, 0),
+-    DEFINE_PROP_PTR("iclk", struct omap2_gpif_s, iclk),
+-    DEFINE_PROP_PTR("fclk0", struct omap2_gpif_s, fclk[0]),
+-    DEFINE_PROP_PTR("fclk1", struct omap2_gpif_s, fclk[1]),
+-    DEFINE_PROP_PTR("fclk2", struct omap2_gpif_s, fclk[2]),
+-    DEFINE_PROP_PTR("fclk3", struct omap2_gpif_s, fclk[3]),
+-    DEFINE_PROP_PTR("fclk4", struct omap2_gpif_s, fclk[4]),
+-    DEFINE_PROP_PTR("fclk5", struct omap2_gpif_s, fclk[5]),
+     DEFINE_PROP_END_OF_LIST(),
+ };
 =20
- err:
-@@ -259,7 +269,6 @@ static void pnv_unrealize_vcpu(PowerPCCPU *cpu)
- {
-     PnvCPUState *pnv_cpu =3D pnv_cpu_state(cpu);
+diff --git a/include/hw/arm/omap.h b/include/hw/arm/omap.h
+index 19fc442c45..acc4ef3d9f 100644
+--- a/include/hw/arm/omap.h
++++ b/include/hw/arm/omap.h
+@@ -77,6 +77,16 @@ typedef struct omap_intr_handler_s omap_intr_handler;
+ /*
+  * TODO: Ideally we should have a clock framework that
+  * let us wire these clocks up with QOM properties or links.
++ *
++ * qdev should support a generic means of defining a 'port' with
++ * an arbitrary interface for connecting two devices. Then we
++ * could reframe the omap clock API in terms of clock ports,
++ * and get some type safety. For now the best qdev provides is
++ * passing an arbitrary pointer.
++ * (It's not possible to pass in the string which is the clock
++ * name, because this device does not have the necessary information
++ * (ie the struct omap_mpu_state_s*) to do the clockname to pointer
++ * translation.)
+  */
+ void omap_intc_set_iclk(omap_intr_handler *intc, omap_clk clk);
+ void omap_intc_set_fclk(omap_intr_handler *intc, omap_clk clk);
+@@ -87,13 +97,28 @@ void omap_intc_set_fclk(omap_intr_handler *intc, omap_c=
+lk clk);
 =20
--    qemu_unregister_reset(pnv_cpu_reset, cpu);
-     object_unparent(OBJECT(pnv_cpu_state(cpu)->intc));
-     cpu_remove_sync(CPU(cpu));
-     cpu->machine_data =3D NULL;
-@@ -273,6 +282,8 @@ static void pnv_core_unrealize(DeviceState *dev, Erro=
-r **errp)
-     CPUCore *cc =3D CPU_CORE(dev);
-     int i;
+ typedef struct OMAPI2CState OMAPI2CState;
 =20
-+    qemu_unregister_reset(pnv_core_reset, pc);
+-/*
+- * TODO: Ideally we should have a clock framework that
+- * let us wire these clocks up with QOM properties or links.
+- */
++/* TODO: clock framework (see above) */
+ void omap_i2c_set_iclk(OMAPI2CState *i2c, omap_clk clk);
+ void omap_i2c_set_fclk(OMAPI2CState *i2c, omap_clk clk);
+=20
++/* omap_gpio.c */
++#define TYPE_OMAP1_GPIO "omap-gpio"
++#define OMAP1_GPIO(obj)                                         \
++    OBJECT_CHECK(struct omap_gpif_s, (obj), TYPE_OMAP1_GPIO)
 +
-     for (i =3D 0; i < cc->nr_threads; i++) {
-         pnv_unrealize_vcpu(pc->threads[i]);
-     }
++#define TYPE_OMAP2_GPIO "omap2-gpio"
++#define OMAP2_GPIO(obj)                                         \
++    OBJECT_CHECK(struct omap2_gpif_s, (obj), TYPE_OMAP2_GPIO)
++
++typedef struct omap_gpif_s omap_gpif;
++typedef struct omap2_gpif_s omap2_gpif;
++
++/* TODO: clock framework (see above) */
++void omap_gpio_set_clk(omap_gpif *gpio, omap_clk clk);
++
++void omap2_gpio_set_iclk(omap2_gpif *gpio, omap_clk clk);
++void omap2_gpio_set_fclk(omap2_gpif *gpio, uint8_t i, omap_clk clk);
++
+ /* OMAP2 l4 Interconnect */
+ struct omap_l4_s;
+ struct omap_l4_region_s {
 --=20
-2.21.0
+2.23.0.606.g08da6496b6
 
 
