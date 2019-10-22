@@ -2,79 +2,88 @@ Return-Path: <SRS0=tSBD=YP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 75DF1CA9EA0
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 14:09:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3E8D2CA9EA0
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 14:11:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3C31021783
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 14:09:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 09ABC21783
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 14:11:20 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ub/YGZBb"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3C31021783
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="OmebtgvY"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 09ABC21783
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58180 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58216 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iMur6-0005aa-LK
-	for qemu-devel@archiver.kernel.org; Tue, 22 Oct 2019 10:09:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41033)
+	id 1iMusY-0007di-P5
+	for qemu-devel@archiver.kernel.org; Tue, 22 Oct 2019 10:11:18 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37268)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1iMua8-0000Ri-V0
- for qemu-devel@nongnu.org; Tue, 22 Oct 2019 09:52:18 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1iMuHk-0003YB-4G
+ for qemu-devel@nongnu.org; Tue, 22 Oct 2019 09:33:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1iMua7-0002x5-T3
- for qemu-devel@nongnu.org; Tue, 22 Oct 2019 09:52:16 -0400
-Received: from mail-oi1-x235.google.com ([2607:f8b0:4864:20::235]:44013)
+ (envelope-from <peter.maydell@linaro.org>) id 1iMuHc-0001eb-Ja
+ for qemu-devel@nongnu.org; Tue, 22 Oct 2019 09:33:12 -0400
+Received: from mail-wm1-x32d.google.com ([2a00:1450:4864:20::32d]:55029)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1iMua7-0002wR-ON
- for qemu-devel@nongnu.org; Tue, 22 Oct 2019 09:52:15 -0400
-Received: by mail-oi1-x235.google.com with SMTP id t84so14185666oih.10
- for <qemu-devel@nongnu.org>; Tue, 22 Oct 2019 06:52:15 -0700 (PDT)
+ id 1iMuHY-0001dC-Tp
+ for qemu-devel@nongnu.org; Tue, 22 Oct 2019 09:33:06 -0400
+Received: by mail-wm1-x32d.google.com with SMTP id p7so17325574wmp.4
+ for <qemu-devel@nongnu.org>; Tue, 22 Oct 2019 06:33:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=TVirM9N+z9auapfxL//WdfFc5Vp5MVTgfhrL8YaxCe8=;
- b=ub/YGZBbgTMud+yLVTMWhbndQQc24tkMpF9JtiY0/l0FnnHdaU14J5d0L+uMpR4lxp
- ZLyaTiP/0QkI9K1SuR3DPs+WxJtSQZEh9j3P7ZCtLcy7JBaeet6WXUFNxGB+XwpI5s7q
- gRw3M6VWQT92F4R5Ddugc00M+BA+tAdIZxeErd+JiM2s7Ag682v8AcjOoweQuf6TUgME
- WZK0GGQXS55pNRHTfTphFfGb2RV/dEc2kBFGQy2XEYtJfBqvgMFLOZ4V+/YxtRJmWQjI
- k2WwVXO6Rk9zzarP6vcGwyYXzMo5Ane6o0OzLCgUeyMh77XkxPyGlffM7xQ4AJbYtIgm
- Y9ZQ==
+ h=from:to:subject:date:message-id:in-reply-to:references:mime-version
+ :content-transfer-encoding;
+ bh=IoXcmOl+RMmkT7xPfub9s2J7YQU8S0ooN19xanzMCEA=;
+ b=OmebtgvYfFM4G3zMSBEEYA9Etqke1bPa1zLFy6PcQKqN0ojX9UXs8KFWEa3mt2E3n5
+ wqhodWjJaQOAvRhAiNFA197qw+S1LgSY+SDy1WNFMpI/VxrKqXIv1HzBMUyB+IB2fEOY
+ C6D73JvNeBO2AC+Ky/+AHtXM2CdURi6kyQddELiZslB+6nrDcSM+rbA6ebX8BSUbLLCK
+ oIX0q+7qhPylaxQnSq98Ne5OJHINHS/kjAveeriaQDikkux405GKRKlRFxaR0QMD2z8g
+ FSU23T76IunPp2WVNay+dajnvMPyOAp6vRPjuXPZBU199pYX6YHruBTAqMIT3YejsVFH
+ XgpA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=TVirM9N+z9auapfxL//WdfFc5Vp5MVTgfhrL8YaxCe8=;
- b=Tm9PQBcvP/Si8ka5KKm++5nKFysPolrjk73w4Mg9T5bGUSQ61Ul1cLLRbEO/Pp0JDy
- EBKjX9H9yGZOR/Ww7Y2P+pmK1BX8h296KEyX4ROb4C6rjnTrWPx0D9Gi2qBjMWqONfzH
- Oel2QDysmErakyveb9SHrEJMDP4iaFr06rIA0qybZAXS0tanJU+5lfRS7mRj5cDspjAD
- HK1JcJ0RhXG7TBH2CctOiuMbxtdEASlCw97SDo349MSFH/M9ISajp4+7N6v21h9ckCsa
- Lq4R4D2nN4jI3xcT/aSmWwuAoeSc0QokLPN8ood4lbBviXbPfZ5teK+qUyebC0mNjvU/
- D7AA==
-X-Gm-Message-State: APjAAAWyZ/Sk1PSt2UOhv4e9bEOyOHU11VECrGa2/wa8jIfF65FD2XuT
- dEZhLCOa/qBNujtgBA/3b67NV+QrWEeYq/jcpp37vM+pqlY=
-X-Google-Smtp-Source: APXvYqxggEb137VxG4G7QMYi3vbxA7OBgAq77uThIO1FWeduXSaAMUrhG+gfsgPyo/MpGd4jmE1a5mQMRz46dKYSPCo=
-X-Received: by 2002:aca:2b08:: with SMTP id i8mr2948411oik.146.1571752334606; 
- Tue, 22 Oct 2019 06:52:14 -0700 (PDT)
-MIME-Version: 1.0
-References: <20191022095428.20780-1-cohuck@redhat.com>
-In-Reply-To: <20191022095428.20780-1-cohuck@redhat.com>
+ h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=IoXcmOl+RMmkT7xPfub9s2J7YQU8S0ooN19xanzMCEA=;
+ b=DKuPQr3rh+ZQ6w+uhEhv2AhJBuULzGHha3364jPrsvEjXtjK0wlBFlBsGgqazKS8pP
+ Goiu0MI0lA3mjx9cHfxSO0CnCqoCaDMeSd8mKUX8Q/U36+QyJORVp3fHdG8NVFZnoJEf
+ cOBcf/Bms8z5mAv8nAD08B/IuhoAxIRztc4WEbrzkt4KK0M5KWXWNdR3yEXP2VcsVivK
+ oXRzwAsN3VUA7vOYVfSeMHQlITmUhon4g26lub/4ftpPA5VOgqn3FG2wji3VGRh1ImMe
+ 3VFLwn9cR+Q/IIH6lgFH8EEHbM0V8uCYiESXZKVOSEbOwcLOmUgN482v+Z1I2UU4RDqc
+ hEEA==
+X-Gm-Message-State: APjAAAUOyNnSjCv73bobdN+rLLg7qI1aUvPIYJ8SdS5mn15GWcPIi1Xc
+ 265Cuho62pmAMLL8u4O+ErA73/r71Ew=
+X-Google-Smtp-Source: APXvYqyXTfOk3hgQWVxA9NU2IlEy9XlKXsor8G+O26cLhvF4+nKMr7YOkf1GVoTYKcCqThcoqcDSWA==
+X-Received: by 2002:a05:600c:214:: with SMTP id
+ 20mr3183868wmi.45.1571751182209; 
+ Tue, 22 Oct 2019 06:33:02 -0700 (PDT)
+Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
+ by smtp.gmail.com with ESMTPSA id r2sm20263856wma.1.2019.10.22.06.32.59
+ for <qemu-devel@nongnu.org>
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 22 Oct 2019 06:33:00 -0700 (PDT)
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 22 Oct 2019 14:52:03 +0100
-Message-ID: <CAFEAcA_GrAdAtOnn3DKqSJcdWaNM3+8FZdiWpdZOY0N-cDdnfg@mail.gmail.com>
-Subject: Re: [PULL 0/9] more s390x fixes
-To: Cornelia Huck <cohuck@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
+To: qemu-devel@nongnu.org
+Subject: [PULL 37/41] hw/arm/mps2: Use the IEC binary prefix definitions
+Date: Tue, 22 Oct 2019 14:31:30 +0100
+Message-Id: <20191022133134.14487-38-peter.maydell@linaro.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20191022133134.14487-1-peter.maydell@linaro.org>
+References: <20191022133134.14487-1-peter.maydell@linaro.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::235
+X-Received-From: 2a00:1450:4864:20::32d
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,35 +95,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-s390x <qemu-s390x@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 22 Oct 2019 at 10:54, Cornelia Huck <cohuck@redhat.com> wrote:
->
-> The following changes since commit e9d42461920f6f40f4d847a5ba18e90d095ed0b9:
->
->   Merge remote-tracking branch 'remotes/kraxel/tags/audio-20191018-pull-request' into staging (2019-10-18 14:13:11 +0100)
->
-> are available in the Git repository at:
->
->   https://github.com/cohuck/qemu tags/s390x-20191022
->
-> for you to fetch changes up to de60a92ea7b7977854420c58fd98f38cb6de6de6:
->
->   s390x/kvm: Set default cpu model for all machine classes (2019-10-21 18:03:08 +0200)
->
-> ----------------------------------------------------------------
-> s390x fixes in tcg vector instruction handling and in the
-> cpu model code
->
+From: Philippe Mathieu-Daudé <philmd@redhat.com>
 
+IEC binary prefixes ease code review: the unit is explicit.
 
-Applied, thanks.
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+Message-id: 20191021190653.9511-3-philmd@redhat.com
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+---
+ hw/arm/mps2-tz.c | 3 ++-
+ hw/arm/mps2.c    | 3 ++-
+ 2 files changed, 4 insertions(+), 2 deletions(-)
 
-Please update the changelog at https://wiki.qemu.org/ChangeLog/4.2
-for any user-visible changes.
+diff --git a/hw/arm/mps2-tz.c b/hw/arm/mps2-tz.c
+index 6b24aaacded..f8b620bcc65 100644
+--- a/hw/arm/mps2-tz.c
++++ b/hw/arm/mps2-tz.c
+@@ -38,6 +38,7 @@
+  */
+ 
+ #include "qemu/osdep.h"
++#include "qemu/units.h"
+ #include "qapi/error.h"
+ #include "qemu/error-report.h"
+ #include "hw/arm/boot.h"
+@@ -458,7 +459,7 @@ static void mps2tz_common_init(MachineState *machine)
+      * call the 16MB our "system memory", as it's the largest lump.
+      */
+     memory_region_allocate_system_memory(&mms->psram,
+-                                         NULL, "mps.ram", 0x01000000);
++                                         NULL, "mps.ram", 16 * MiB);
+     memory_region_add_subregion(system_memory, 0x80000000, &mms->psram);
+ 
+     /* The overflow IRQs for all UARTs are ORed together.
+diff --git a/hw/arm/mps2.c b/hw/arm/mps2.c
+index 10efff36b23..d002b126d39 100644
+--- a/hw/arm/mps2.c
++++ b/hw/arm/mps2.c
+@@ -23,6 +23,7 @@
+  */
+ 
+ #include "qemu/osdep.h"
++#include "qemu/units.h"
+ #include "qapi/error.h"
+ #include "qemu/error-report.h"
+ #include "hw/arm/boot.h"
+@@ -146,7 +147,7 @@ static void mps2_common_init(MachineState *machine)
+      * zbt_boot_ctrl is always zero).
+      */
+     memory_region_allocate_system_memory(&mms->psram,
+-                                         NULL, "mps.ram", 0x1000000);
++                                         NULL, "mps.ram", 16 * MiB);
+     memory_region_add_subregion(system_memory, 0x21000000, &mms->psram);
+ 
+     switch (mmc->fpga_type) {
+-- 
+2.20.1
 
--- PMM
 
