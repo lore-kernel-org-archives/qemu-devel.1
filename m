@@ -2,77 +2,60 @@ Return-Path: <SRS0=tSBD=YP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 61CC0CA9EA0
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 07:26:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9FC63CA9EA0
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 07:27:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2B13C2064B
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 07:26:05 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XPNQv9eB"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2B13C2064B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 745A22064B
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 07:27:45 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 745A22064B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51012 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51038 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iMoYO-00027X-7z
-	for qemu-devel@archiver.kernel.org; Tue, 22 Oct 2019 03:26:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39135)
+	id 1iMoa0-0004b5-P7
+	for qemu-devel@archiver.kernel.org; Tue, 22 Oct 2019 03:27:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39305)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <thuth@redhat.com>) id 1iMoUV-0005Hx-H2
- for qemu-devel@nongnu.org; Tue, 22 Oct 2019 03:22:04 -0400
+ (envelope-from <clg@kaod.org>) id 1iMoVZ-0006U3-4x
+ for qemu-devel@nongnu.org; Tue, 22 Oct 2019 03:23:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <thuth@redhat.com>) id 1iMoUU-0005Ha-DS
- for qemu-devel@nongnu.org; Tue, 22 Oct 2019 03:22:03 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:58003
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <clg@kaod.org>) id 1iMoVW-0005gs-Ql
+ for qemu-devel@nongnu.org; Tue, 22 Oct 2019 03:23:08 -0400
+Received: from 1.mo68.mail-out.ovh.net ([46.105.41.146]:41663)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <thuth@redhat.com>) id 1iMoUU-0005HO-AH
- for qemu-devel@nongnu.org; Tue, 22 Oct 2019 03:22:02 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1571728921;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=O2Z3+As+UUjZZvK4a3KeXRi6hSKm32Oq0U6w7Ks/Y0U=;
- b=XPNQv9eBoof4SeG7K1RZH7Rxe10VvyqaB4TaR771i7GCbphCRQx5KBHAHSSKJVI5cxD+u/
- IGbefIWjAh0d4Hd82cjKJbH8SDOwtfAFzJwmzsen5NLga73KoZuA0YHG5ndelNWPgebxBZ
- HEBTzOrv1aLzAlFdbL/9cvCbPlPXPW0=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-176-BDyTGkvSMput6CWI5Y_VRQ-1; Tue, 22 Oct 2019 03:21:57 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 19BA61005509;
- Tue, 22 Oct 2019 07:21:56 +0000 (UTC)
-Received: from thuth.com (dhcp-200-228.str.redhat.com [10.33.200.228])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 0E9C61B465;
- Tue, 22 Oct 2019 07:21:54 +0000 (UTC)
-From: Thomas Huth <thuth@redhat.com>
-To: Max Reitz <mreitz@redhat.com>,
-	qemu-block@nongnu.org
-Subject: [PATCH v3 3/6] iotests: Test 183 does not work on macOS and OpenBSD
-Date: Tue, 22 Oct 2019 09:21:32 +0200
-Message-Id: <20191022072135.11188-4-thuth@redhat.com>
-In-Reply-To: <20191022072135.11188-1-thuth@redhat.com>
-References: <20191022072135.11188-1-thuth@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-MC-Unique: BDyTGkvSMput6CWI5Y_VRQ-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=WINDOWS-1252
+ (Exim 4.71) (envelope-from <clg@kaod.org>) id 1iMoVV-0005dS-D7
+ for qemu-devel@nongnu.org; Tue, 22 Oct 2019 03:23:06 -0400
+Received: from player786.ha.ovh.net (unknown [10.109.146.211])
+ by mo68.mail-out.ovh.net (Postfix) with ESMTP id BF419147834
+ for <qemu-devel@nongnu.org>; Tue, 22 Oct 2019 09:23:02 +0200 (CEST)
+Received: from kaod.org (lfbn-1-2229-223.w90-76.abo.wanadoo.fr [90.76.50.223])
+ (Authenticated sender: clg@kaod.org)
+ by player786.ha.ovh.net (Postfix) with ESMTPSA id 9FEE9B5189F0;
+ Tue, 22 Oct 2019 07:22:57 +0000 (UTC)
+From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
+To: David Gibson <david@gibson.dropbear.id.au>
+Subject: [PATCH v3 0/4] ppc: reset the interrupt presenter from the CPU reset
+ handler
+Date: Tue, 22 Oct 2019 09:22:42 +0200
+Message-Id: <20191022072246.9200-1-clg@kaod.org>
+X-Mailer: git-send-email 2.21.0
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+X-Ovh-Tracer-Id: 12562228212996869094
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrkeeigdduudelucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddm
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.120
+X-Received-From: 46.105.41.146
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -84,39 +67,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, John Snow <jsnow@redhat.com>,
- qemu-devel@nongnu.org
+Cc: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>, qemu-ppc@nongnu.org,
+ qemu-devel@nongnu.org, Greg Kurz <groug@kaod.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-In the long term, we might want to add test 183 to the "auto" group
-(but it still fails occasionally, so we cannot do that yet). However,
-when running 183 in Cirrus-CI on macOS, or with our vm-build-openbsd
-target, it currently always fails with an "Timeout waiting for return
-on handle 0" error.
+Hello,
 
-Let's mark it as supported only on systems where the test is working
-fine (i.e. Linux, FreeBSD and NetBSD).
+On the sPAPR machine and PowerNV machine, the interrupt presenters are
+created by a machine handler at the core level and are reseted
+independently. This is not consistent and it raises issues when it
+comes to handle hot-plugged CPUs. In that case, the presenters are not
+reseted. This is less of an issue in XICS, although a zero MFFR could
+be a concern, but in XIVE, the OS CAM line is not set and this breaks
+the presenting algorithm. The current code has workarounds which need
+a global cleanup.
 
-Signed-off-by: Thomas Huth <thuth@redhat.com>
----
- tests/qemu-iotests/183 | 1 +
- 1 file changed, 1 insertion(+)
+Extend the sPAPR IRQ backend and the PowerNV Chip class with a new
+cpu_intc_reset() handler called by the CPU reset handler and remove
+the XiveTCTX reset handler which is now redundant.
 
-diff --git a/tests/qemu-iotests/183 b/tests/qemu-iotests/183
-index bced83fae0..0bbae13647 100755
---- a/tests/qemu-iotests/183
-+++ b/tests/qemu-iotests/183
-@@ -42,6 +42,7 @@ trap "_cleanup; exit \$status" 0 1 2 3 15
- . ./common.filter
- . ./common.qemu
+Set the OS CAM line when the interrupt presenter of the sPAPR core is
+reseted. This will also cover the case of hot-plugged CPUs.
+
+Thanks,
+
+C.
+
+Changes in v3:
+
+ - Introduced a DeviceClass::reset for the CPU (Greg)
+ - add support for PowerNV
 =20
-+_supported_os Linux FreeBSD NetBSD
- _supported_fmt qcow2 raw qed quorum
- _supported_proto file
-=20
+Changes in v2:
+
+ - removed property
+ - simplified reset handlers
+
+C=C3=A9dric Le Goater (3):
+  spapr: move CPU reset after presenter creation
+  ppc: reset the interrupt presenter from the CPU reset handler
+  spapr/xive: Set the OS CAM line at reset
+
+Greg Kurz (1):
+  spapr_cpu_core: Implement DeviceClass::reset
+
+ include/hw/ppc/pnv.h        |  1 +
+ include/hw/ppc/spapr_irq.h  |  2 ++
+ include/hw/ppc/spapr_xive.h |  1 -
+ include/hw/ppc/xics.h       |  1 +
+ include/hw/ppc/xive.h       |  1 +
+ hw/intc/spapr_xive.c        | 53 +++++++++++++++++--------------------
+ hw/intc/xics.c              |  8 ++----
+ hw/intc/xics_spapr.c        |  7 +++++
+ hw/intc/xive.c              | 12 +--------
+ hw/ppc/pnv.c                | 18 +++++++++++++
+ hw/ppc/pnv_core.c           |  8 ++++++
+ hw/ppc/spapr_cpu_core.c     | 38 +++++++++++++++++++-------
+ hw/ppc/spapr_irq.c          | 14 ++++++++++
+ 13 files changed, 107 insertions(+), 57 deletions(-)
+
 --=20
-2.18.1
+2.21.0
 
 
