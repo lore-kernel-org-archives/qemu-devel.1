@@ -3,83 +3,81 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A0862CA9EA0
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 21:45:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B622CA9EA0
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 22:11:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 54B2D20679
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 21:45:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 612662084B
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 22:11:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aFCksAJE"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 54B2D20679
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GzTTZG61"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 612662084B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46072 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47010 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iN1xs-0000aO-EU
-	for qemu-devel@archiver.kernel.org; Tue, 22 Oct 2019 17:45:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53944)
+	id 1iN2Mu-0000ZH-Ht
+	for qemu-devel@archiver.kernel.org; Tue, 22 Oct 2019 18:11:08 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56830)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <ehabkost@redhat.com>) id 1iN1x5-00006J-UL
- for qemu-devel@nongnu.org; Tue, 22 Oct 2019 17:44:29 -0400
+ (envelope-from <ehabkost@redhat.com>) id 1iN2Lh-0007mg-Uk
+ for qemu-devel@nongnu.org; Tue, 22 Oct 2019 18:09:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <ehabkost@redhat.com>) id 1iN1x3-0007RJ-9a
- for qemu-devel@nongnu.org; Tue, 22 Oct 2019 17:44:26 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:26765
+ (envelope-from <ehabkost@redhat.com>) id 1iN2Lf-0001uB-J6
+ for qemu-devel@nongnu.org; Tue, 22 Oct 2019 18:09:52 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:35035
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1iN1x3-0007Qn-5W
- for qemu-devel@nongnu.org; Tue, 22 Oct 2019 17:44:25 -0400
+ (Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1iN2Lf-0001tx-Fl
+ for qemu-devel@nongnu.org; Tue, 22 Oct 2019 18:09:51 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1571780664;
+ s=mimecast20190719; t=1571782190;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=PKEnwwvZkBoKQkKjGLBuPW/9OyQ9zYCnXgLkDtHA/wU=;
- b=aFCksAJEuXcAYCOB/HflqKJ99Q9hnQunhOv5UOimbRnSlYV2FHp6nO9buk326Y62Biq/xS
- BI/6w8JYgfmpQ7cGiWkPTuurcXLJhwOTytO4R3QFgU9IbkjTl7iuyLRIfblD+X8JWdRsyc
- CCJbgexCpUObpBYosM9pa/WKkoQ1VYU=
+ bh=AbJX8WkuwtZCUjwdmHq6trYNYsCr8F5Tbj9f/oZDWPM=;
+ b=GzTTZG61zImIztuFJev8TZIia3pTU/Ca022m63BBLkLycXWeYdgofHVqqfe7NEr1DJhxPq
+ LEB5OAUAGxzcnSxlVq/pu/jQ7IjGsBhUKIF8Y8Uxj/+CKMYajcxKSMLx61QSYs0WwHtki9
+ Vkc1chbkqKeg8hPi6ZL4RG4ep8Caaa0=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-342-BzegCTQAPeCZk_lTI7ZwPA-1; Tue, 22 Oct 2019 17:44:20 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ us-mta-353-36UyoW5IMpGcpY5TrN_QDg-1; Tue, 22 Oct 2019 18:09:48 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2A938476;
- Tue, 22 Oct 2019 21:44:19 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C44A2107AD31;
+ Tue, 22 Oct 2019 22:09:46 +0000 (UTC)
 Received: from localhost (ovpn-116-104.gru2.redhat.com [10.97.116.104])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 807745DA32;
- Tue, 22 Oct 2019 21:44:18 +0000 (UTC)
-Date: Tue, 22 Oct 2019 18:44:17 -0300
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 3D6CB194BB;
+ Tue, 22 Oct 2019 22:09:42 +0000 (UTC)
+Date: Tue, 22 Oct 2019 19:09:41 -0300
 From: Eduardo Habkost <ehabkost@redhat.com>
-To: "Kang, Luwei" <luwei.kang@intel.com>
-Subject: Re: [PATCH v4 2/2] i386: Add support to get/set/migrate Intel
- Processor Trace feature
-Message-ID: <20191022214416.GA21651@habkost.net>
-References: <1520182116-16485-1-git-send-email-luwei.kang@intel.com>
- <1520182116-16485-2-git-send-email-luwei.kang@intel.com>
- <20191012031407.GK4084@habkost.net>
- <82D7661F83C1A047AF7DC287873BF1E17382A209@SHSMSX104.ccr.corp.intel.com>
- <20191015132929.GY4084@habkost.net>
- <82D7661F83C1A047AF7DC287873BF1E17382BB76@SHSMSX104.ccr.corp.intel.com>
+To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
+Subject: Re: [PATCH 0/3] eliminate remaining places that abuse
+ memory_region_allocate_system_memory()
+Message-ID: <20191022220941.GD4084@habkost.net>
+References: <20191008113318.7012-1-imammedo@redhat.com>
+ <20191010193503.097548e4@Igors-MacBook-Pro>
+ <20191011172310.19fc5d93@redhat.com>
+ <CAP+75-W5HD37gA2JOpniQKMqnVf5z+U6RQT8YZT9TtdDyz3d5g@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <82D7661F83C1A047AF7DC287873BF1E17382BB76@SHSMSX104.ccr.corp.intel.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-MC-Unique: BzegCTQAPeCZk_lTI7ZwPA-1
+In-Reply-To: <CAP+75-W5HD37gA2JOpniQKMqnVf5z+U6RQT8YZT9TtdDyz3d5g@mail.gmail.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-MC-Unique: 36UyoW5IMpGcpY5TrN_QDg-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=WINDOWS-1252
 Content-Transfer-Encoding: quoted-printable
 Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.120
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,98 +89,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
- "mtosatti@redhat.com" <mtosatti@redhat.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- Chao Peng <chao.p.peng@linux.intel.com>,
- "pbonzini@redhat.com" <pbonzini@redhat.com>,
- "rth@twiddle.net" <rth@twiddle.net>
+Cc: Helge Deller <deller@gmx.de>,
+ Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
+ QEMU Developers <qemu-devel@nongnu.org>,
+ "open list:sPAPR" <qemu-ppc@nongnu.org>,
+ David Gibson <david@gibson.dropbear.id.au>,
+ Igor Mammedov <imammedo@redhat.com>, Richard Henderson <rth@twiddle.net>,
+ Artyom Tarasenko <atar4qemu@gmail.com>,
+ =?iso-8859-1?Q?Herv=E9?= Poussineau <hpoussin@reactos.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, Oct 21, 2019 at 06:02:28AM +0000, Kang, Luwei wrote:
-> > > > > f9f4cd1..097c953 100644
-> > > > > --- a/target/i386/kvm.c
-> > > > > +++ b/target/i386/kvm.c
-> > > > > @@ -1811,6 +1811,25 @@ static int kvm_put_msrs(X86CPU *cpu, int l=
-evel)
-> > > > >                  kvm_msr_entry_add(cpu, MSR_MTRRphysMask(i), mask=
-);
-> > > > >              }
-> > > > >          }
-> > > > > +        if (env->features[FEAT_7_0_EBX] & CPUID_7_0_EBX_INTEL_PT=
-) {
-> > > > > +            int addr_num =3D kvm_arch_get_supported_cpuid(kvm_st=
-ate,
-> > > > > +                                                    0x14, 1,
-> > > > > + R_EAX) & 0x7;
-> > > > > +
-> > > > > +            kvm_msr_entry_add(cpu, MSR_IA32_RTIT_CTL,
-> > > > > +                            env->msr_rtit_ctrl);
-> > > > > +            kvm_msr_entry_add(cpu, MSR_IA32_RTIT_STATUS,
-> > > > > +                            env->msr_rtit_status);
-> > > > > +            kvm_msr_entry_add(cpu, MSR_IA32_RTIT_OUTPUT_BASE,
-> > > > > +                            env->msr_rtit_output_base);
-> > > >
-> > > > This causes the following crash on some hosts:
-> > > >
-> > > >   qemu-system-x86_64: error: failed to set MSR 0x560 to 0x0
-> > > >   qemu-system-x86_64: target/i386/kvm.c:2673: kvm_put_msrs: Asserti=
-on `ret =3D=3D cpu->kvm_msr_buf->nmsrs' failed.
-> > > >
-> > > > Checking for CPUID_7_0_EBX_INTEL_PT is not enough: KVM has
-> > > > additional conditions that might prevent writing to this MSR (PT_CA=
-P_topa_output && PT_CAP_single_range_output).  This
-> > causes QEMU to crash if some of the conditions aren't met.
-> > > >
-> > > > Writing and reading this MSR (and the ones below) need to be condit=
-ional on KVM_GET_MSR_INDEX_LIST.
-> > > >
-> > >
-> > > Hi Eduardo,
-> > >     I found this issue can't be reproduced in upstream source code bu=
-t can be reproduced on RHEL8.1. I haven't got the qemu source
-> > code of RHEL8.1. But after adding some trace in KVM, I found the KVM ha=
-s reported the complete Intel PT CPUID information to qemu
-> > but the Intel PT CPUID (0x14) is lost when qemu setting the CPUID to KV=
-M (cpuid level is 0xd). It looks like lost the below patch.
-> > >
-> > > commit f24c3a79a415042f6dc195f029a2ba7247d14cac
-> > > Author: Luwei Kang <luwei.kang@intel.com>
-> > > Date:   Tue Jan 29 18:52:59 2019 -0500
-> > >     i386: extended the cpuid_level when Intel PT is enabled
-> > >
-> > >     Intel Processor Trace required CPUID[0x14] but the cpuid_level
-> > >     have no change when create a kvm guest with
-> > >     e.g. "-cpu qemu64,+intel-pt".
-> >=20
-> > Thanks for the pointer.  This may avoid triggering the bug in the defau=
-lt configuration, but we still need to make the MSR writing
-> > conditional on KVM_GET_MSR_INDEX_LIST.  Older machine-types have x-inte=
-l-pt-auto-level=3Doff, and the user may set `level`
-> > manually.
+On Sun, Oct 20, 2019 at 04:38:06PM +0200, Philippe Mathieu-Daud=E9 wrote:
+> Ping?
+
+Sorry, missed this.  queued on machine-next.  Pull request will
+be submitted today or tomorrow.
+
 >=20
-> Hi Eduardo,
-> Sorry for a delay reply because my mail filter. I tried with
-> the Q35 machine type and default, all looks work well (With
-> some old cpu type + "intel_pt" also work well).  KVM will check
-> the Intel PT work mode and HW to decide if Intel PT can be
-> exposed to guest, only extended the CPUID level is useless. If
-> the guest doesn't support Intel PT, any MSR read or write will
-> cause #GP. Please remind me if I lost something.
-
-I understand you have tried q35 and pc, but have you tried with
-older machine-type versions?
-
-Commit f24c3a79a415 doesn't change behavior on pc-*-3.1 and
-older, so it only avoids triggering the crash in the default
-case.  Doesn't QEMU crash if running:
-"-cpu qemu64,+intel-pt -machine pc-i440fx-3.1"?
-
-KVM rejecting MSR writes when something is missing is correct.
-QEMU trying to write the MSR when something is missing (and
-crashing because of that) is a bug.
+> On Fri, Oct 11, 2019 at 5:23 PM Igor Mammedov <imammedo@redhat.com> wrote=
+:
+> > On Thu, 10 Oct 2019 19:35:03 +0200
+> > Igor Mammedov <imammedo@redhat.com> wrote:
+> >
+> > Forgot to actually CC Eduardo,
+> >
+> > > On Tue,  8 Oct 2019 07:33:15 -0400
+> > > Igor Mammedov <imammedo@redhat.com> wrote:
+> > ...
+> > > Eduardo,
+> > >
+> > > This patches are fixing various machines across tree, so series does =
+not belong
+> > > to any particular arch specific tree, can you merge it via generic ma=
+chine tree?
+> >
+> >
+> > > >
+> > > >
+> > > > Igor Mammedov (3):
+> > > >   sparc64: use memory_region_allocate_system_memory() only for '-m'
+> > > >     specified RAM
+> > > >   ppc: rs6000_mc: drop usage of memory_region_allocate_system_memor=
+y()
+> > > >   hppa: drop usage of memory_region_allocate_system_memory() for RO=
+M
+> > > >
+> > > >  hw/hppa/machine.c    |  5 ++---
+> > > >  hw/ppc/rs6000_mc.c   | 15 ++++++++++-----
+> > > >  hw/sparc64/niagara.c | 25 +++++++++++++------------
+> > > >  3 files changed, 25 insertions(+), 20 deletions(-)
+> > > >
 
 --=20
 Eduardo
