@@ -2,60 +2,78 @@ Return-Path: <SRS0=tSBD=YP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9FC63CA9EA0
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 07:27:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B9ABECA9EA0
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 07:28:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 745A22064B
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 07:27:45 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 745A22064B
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id 8399F2064B
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 07:28:09 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Gte1KvYq"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8399F2064B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51038 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51040 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iMoa0-0004b5-P7
-	for qemu-devel@archiver.kernel.org; Tue, 22 Oct 2019 03:27:44 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39305)
+	id 1iMoaO-0004wf-IM
+	for qemu-devel@archiver.kernel.org; Tue, 22 Oct 2019 03:28:08 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39169)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <clg@kaod.org>) id 1iMoVZ-0006U3-4x
- for qemu-devel@nongnu.org; Tue, 22 Oct 2019 03:23:10 -0400
+ (envelope-from <thuth@redhat.com>) id 1iMoUg-0005ZE-CQ
+ for qemu-devel@nongnu.org; Tue, 22 Oct 2019 03:22:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <clg@kaod.org>) id 1iMoVW-0005gs-Ql
- for qemu-devel@nongnu.org; Tue, 22 Oct 2019 03:23:08 -0400
-Received: from 1.mo68.mail-out.ovh.net ([46.105.41.146]:41663)
+ (envelope-from <thuth@redhat.com>) id 1iMoUf-0005L5-9q
+ for qemu-devel@nongnu.org; Tue, 22 Oct 2019 03:22:14 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:24737
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <clg@kaod.org>) id 1iMoVV-0005dS-D7
- for qemu-devel@nongnu.org; Tue, 22 Oct 2019 03:23:06 -0400
-Received: from player786.ha.ovh.net (unknown [10.109.146.211])
- by mo68.mail-out.ovh.net (Postfix) with ESMTP id BF419147834
- for <qemu-devel@nongnu.org>; Tue, 22 Oct 2019 09:23:02 +0200 (CEST)
-Received: from kaod.org (lfbn-1-2229-223.w90-76.abo.wanadoo.fr [90.76.50.223])
- (Authenticated sender: clg@kaod.org)
- by player786.ha.ovh.net (Postfix) with ESMTPSA id 9FEE9B5189F0;
- Tue, 22 Oct 2019 07:22:57 +0000 (UTC)
-From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
-To: David Gibson <david@gibson.dropbear.id.au>
-Subject: [PATCH v3 0/4] ppc: reset the interrupt presenter from the CPU reset
- handler
-Date: Tue, 22 Oct 2019 09:22:42 +0200
-Message-Id: <20191022072246.9200-1-clg@kaod.org>
-X-Mailer: git-send-email 2.21.0
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-X-Ovh-Tracer-Id: 12562228212996869094
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrkeeigdduudelucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddm
+ (Exim 4.71) (envelope-from <thuth@redhat.com>) id 1iMoUf-0005Ku-5l
+ for qemu-devel@nongnu.org; Tue, 22 Oct 2019 03:22:13 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1571728932;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=W/3jEa0khY8EIsvamGoGXV0Y4SSFZ2VbgKsJcLDSgeg=;
+ b=Gte1KvYqP9CygaoKifNYfa3VVUjJN438PgjK8Ya1RXUpS3OJsn0oHy3Eh6hxqo3Aue0i3z
+ JJXWa/HAB/AK2sOAc8s1jcCubAOZuk19+niLydhswmOTn+kzZ3eWyMRt4jt4P0F21weYEM
+ u//ES4jEe3qUWVR203YIN747G8gP6OA=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-264-Dn9t54yaO2-3ghxvc8YNtw-1; Tue, 22 Oct 2019 03:22:09 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 554251800D6A;
+ Tue, 22 Oct 2019 07:22:08 +0000 (UTC)
+Received: from thuth.com (dhcp-200-228.str.redhat.com [10.33.200.228])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id DB2942965D;
+ Tue, 22 Oct 2019 07:21:57 +0000 (UTC)
+From: Thomas Huth <thuth@redhat.com>
+To: Max Reitz <mreitz@redhat.com>,
+	qemu-block@nongnu.org
+Subject: [PATCH v3 5/6] iotests: Enable more tests in the 'auto' group to
+ improve test coverage
+Date: Tue, 22 Oct 2019 09:21:34 +0200
+Message-Id: <20191022072135.11188-6-thuth@redhat.com>
+In-Reply-To: <20191022072135.11188-1-thuth@redhat.com>
+References: <20191022072135.11188-1-thuth@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-MC-Unique: Dn9t54yaO2-3ghxvc8YNtw-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=WINDOWS-1252
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 46.105.41.146
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -67,68 +85,96 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>, qemu-ppc@nongnu.org,
- qemu-devel@nongnu.org, Greg Kurz <groug@kaod.org>
+Cc: Kevin Wolf <kwolf@redhat.com>, John Snow <jsnow@redhat.com>,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hello,
+According to Kevin, tests 030, 040 and 041 are among the most valuable
+tests that we have, so we should always run them if possible, even if
+they take a little bit longer.
 
-On the sPAPR machine and PowerNV machine, the interrupt presenters are
-created by a machine handler at the core level and are reseted
-independently. This is not consistent and it raises issues when it
-comes to handle hot-plugged CPUs. In that case, the presenters are not
-reseted. This is less of an issue in XICS, although a zero MFFR could
-be a concern, but in XIVE, the OS CAM line is not set and this breaks
-the presenting algorithm. The current code has workarounds which need
-a global cleanup.
+According to Max, it would be good to have a test for iothreads and
+migration. 127 and 256 seem to be good candidates for iothreads. For
+migration, let's enable 091, 181, and 203 (which also tests iothreads).
 
-Extend the sPAPR IRQ backend and the PowerNV Chip class with a new
-cpu_intc_reset() handler called by the CPU reset handler and remove
-the XiveTCTX reset handler which is now redundant.
+Reviewed-by: Max Reitz <mreitz@redhat.com>
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+---
+ tests/qemu-iotests/group | 16 ++++++++--------
+ 1 file changed, 8 insertions(+), 8 deletions(-)
 
-Set the OS CAM line when the interrupt presenter of the sPAPR core is
-reseted. This will also cover the case of hot-plugged CPUs.
-
-Thanks,
-
-C.
-
-Changes in v3:
-
- - Introduced a DeviceClass::reset for the CPU (Greg)
- - add support for PowerNV
-=20
-Changes in v2:
-
- - removed property
- - simplified reset handlers
-
-C=C3=A9dric Le Goater (3):
-  spapr: move CPU reset after presenter creation
-  ppc: reset the interrupt presenter from the CPU reset handler
-  spapr/xive: Set the OS CAM line at reset
-
-Greg Kurz (1):
-  spapr_cpu_core: Implement DeviceClass::reset
-
- include/hw/ppc/pnv.h        |  1 +
- include/hw/ppc/spapr_irq.h  |  2 ++
- include/hw/ppc/spapr_xive.h |  1 -
- include/hw/ppc/xics.h       |  1 +
- include/hw/ppc/xive.h       |  1 +
- hw/intc/spapr_xive.c        | 53 +++++++++++++++++--------------------
- hw/intc/xics.c              |  8 ++----
- hw/intc/xics_spapr.c        |  7 +++++
- hw/intc/xive.c              | 12 +--------
- hw/ppc/pnv.c                | 18 +++++++++++++
- hw/ppc/pnv_core.c           |  8 ++++++
- hw/ppc/spapr_cpu_core.c     | 38 +++++++++++++++++++-------
- hw/ppc/spapr_irq.c          | 14 ++++++++++
- 13 files changed, 107 insertions(+), 57 deletions(-)
-
+diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
+index a73df279e5..33b499ed41 100644
+--- a/tests/qemu-iotests/group
++++ b/tests/qemu-iotests/group
+@@ -51,7 +51,7 @@
+ 027 rw auto quick
+ 028 rw backing quick
+ 029 rw auto quick
+-030 rw backing
++030 rw auto backing
+ 031 rw auto quick
+ 032 rw auto quick
+ 033 rw auto quick
+@@ -61,8 +61,8 @@
+ 037 rw auto backing quick
+ 038 rw auto backing quick
+ 039 rw auto quick
+-040 rw
+-041 rw backing
++040 rw auto
++041 rw auto backing
+ 042 rw auto quick
+ 043 rw auto backing
+ 044 rw
+@@ -112,7 +112,7 @@
+ 088 rw quick
+ 089 rw auto quick
+ 090 rw auto quick
+-091 rw migration
++091 rw auto migration
+ 092 rw quick
+ 093 throttle
+ 094 rw quick
+@@ -148,7 +148,7 @@
+ 124 rw backing
+ 125 rw
+ 126 rw auto backing
+-127 rw backing quick
++127 rw auto backing quick
+ 128 rw quick
+ 129 rw quick
+ 130 rw auto quick
+@@ -197,7 +197,7 @@
+ 177 rw auto quick
+ 178 img
+ 179 rw auto quick
+-181 rw migration
++181 rw auto migration
+ 182 rw quick
+ 183 rw migration
+ 184 rw auto quick
+@@ -218,7 +218,7 @@
+ 200 rw
+ 201 rw migration
+ 202 rw quick
+-203 rw migration
++203 rw auto migration
+ 204 rw quick
+ 205 rw quick
+ 206 rw
+@@ -270,7 +270,7 @@
+ 253 rw quick
+ 254 rw backing quick
+ 255 rw quick
+-256 rw quick
++256 rw auto quick
+ 257 rw
+ 258 rw quick
+ 260 rw quick
 --=20
-2.21.0
+2.18.1
 
 
