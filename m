@@ -2,84 +2,79 @@ Return-Path: <SRS0=tSBD=YP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2CC50CA9EA0
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 17:21:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 93EDECA9EA0
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 17:23:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AB49B20679
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 17:21:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6660E20679
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 17:23:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Yhk6ETxr"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AB49B20679
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RHaG1F24"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6660E20679
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37424 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37508 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iMxr3-00074q-De
-	for qemu-devel@archiver.kernel.org; Tue, 22 Oct 2019 13:21:57 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48119)
+	id 1iMxs8-00005P-J0
+	for qemu-devel@archiver.kernel.org; Tue, 22 Oct 2019 13:23:04 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43564)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1iMxpq-0005mP-2I
- for qemu-devel@nongnu.org; Tue, 22 Oct 2019 13:20:43 -0400
+ (envelope-from <dinechin@redhat.com>) id 1iMxOE-0007yb-Ri
+ for qemu-devel@nongnu.org; Tue, 22 Oct 2019 12:52:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1iMxpp-0002Us-3x
- for qemu-devel@nongnu.org; Tue, 22 Oct 2019 13:20:41 -0400
-Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:42412)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1iMxpo-0002U2-Uj
- for qemu-devel@nongnu.org; Tue, 22 Oct 2019 13:20:41 -0400
-Received: by mail-oi1-x243.google.com with SMTP id i185so14855682oif.9
- for <qemu-devel@nongnu.org>; Tue, 22 Oct 2019 10:20:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=0La5A2pXgYdYZprUXZS7B3dH09V7aLZ8RTJlRKFlNoY=;
- b=Yhk6ETxrdaUM2oJ+DtchYQZhE3pWS71TXPp0pu4KdJQzXxHLxt47qxXFNobSG/XOZn
- lDV/bRQ0ZIUYyfZ/OSjc43OxtvlkOnYr6WAjrI6z5nD8+iHJsekiiHkxeKxBhC8Bbo8x
- augR3pitXD3WmUaFREDO9mVHDn5jlo4vjQRenR7t1ut+KmrWQSrWo4r9Qd+R7YhpF2Mg
- Fh3rgVFX2tMuYxOQ4w5kqb9vN60t5F50EP1/XmEnprbILtk9qTCJFMv+ybLQ16/SC07U
- Bq3eOxQTc0ya9boSk75NZjv05W7vqYWP85UiMwlow0Flhvx6KxZPR6Y+gBzEMPTMGyUk
- tJXA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=0La5A2pXgYdYZprUXZS7B3dH09V7aLZ8RTJlRKFlNoY=;
- b=b/5Z7gM3eSMEM/XIJffbzvWKTl3pSMK+traX/8yWZ0iCOcuKSivX+UPPHhnYzeKkML
- P99LY1BIpxK3pP/mGcTw+kxw4MACfGKzW4eO0e874auprGRSMvy6zURuXG5jgVxpJfA/
- jHYjLjLydHAPI5j1cpmlRnez2cc147Zi2fwrKqlWyR5UANFcseLtWhdbMcF7+SzKhJdg
- noE1hoDNGk0VrQON0eJK0R/9fbFQ3AZJ5ZeIpMBdRVc+TGA2uYokgE0Cd3ooAxfCX7eA
- BCkz6fYf+ydulULX5aDFyt0BC6xVrhOyFOrkJEip7NT+cRdltrTgtBBDXKAegTo7tIDt
- RO6Q==
-X-Gm-Message-State: APjAAAWVceXq5RB6T8OCRcxOe+fiL/v5Nh7bfop7k7/u3y4jwJOZYaol
- 9SK93AM2yLM/3gQknL7CGONffAqCRLkTqhxSycoFlw==
-X-Google-Smtp-Source: APXvYqxfACClC+BQM2b9C8yyLX8XftMPWXxeLdChl8HF8hLN7tpdtXoJUc4CJBjC5zsAMfg81Bl498W9yrqc+UspKzA=
-X-Received: by 2002:aca:49c2:: with SMTP id w185mr3959708oia.163.1571764839900; 
- Tue, 22 Oct 2019 10:20:39 -0700 (PDT)
+ (envelope-from <dinechin@redhat.com>) id 1iMxOD-00037D-QM
+ for qemu-devel@nongnu.org; Tue, 22 Oct 2019 12:52:10 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:39222
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <dinechin@redhat.com>) id 1iMxOD-000374-N9
+ for qemu-devel@nongnu.org; Tue, 22 Oct 2019 12:52:09 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1571763129;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=FP9OfujuMXPnc05uatDJDsk9/3Ngir+jIMpvI0HfuFo=;
+ b=RHaG1F24PrcKN5Gq0qgStaJ6InDuTVhMQmN5tK95XLsJSKb9y5hItcmOCSIYVLhNClcDIN
+ 0jIAb98owyBz1ptZNICYeF3hI/9SBwIhCBUyHDZ37+FBkUDZWDR8e7l7JMWud+3meOR5N7
+ eyL2eQq8ffOdDusk3projuPCmrrUpk0=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-262-V6OQk6rVP0W6XMLYqII2ZA-1; Tue, 22 Oct 2019 12:52:05 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 741D3800D49;
+ Tue, 22 Oct 2019 16:52:04 +0000 (UTC)
+Received: from ptitpuce (ovpn-117-172.ams2.redhat.com [10.36.117.172])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 6E45C19C69;
+ Tue, 22 Oct 2019 16:51:48 +0000 (UTC)
+References: <20191019063810.6944-1-stefanha@redhat.com>
+ <20191019063810.6944-10-stefanha@redhat.com>
+User-agent: mu4e 1.3.2; emacs 26.2
+From: Christophe de Dinechin <dinechin@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: Re: [PATCH v3 09/16] libqos: access VIRTIO 1.0 vring in little-endian
+In-reply-to: <20191019063810.6944-10-stefanha@redhat.com>
+Date: Tue, 22 Oct 2019 18:51:39 +0200
+Message-ID: <m136fkoh9g.fsf@redhat.com>
 MIME-Version: 1.0
-References: <20191016090745.15334-1-clg@kaod.org>
- <CACPK8XdT0_JCxzfxd4dCafK0Ae9+18ZWcusuXV+d4eEmwwBnkA@mail.gmail.com>
- <CAFEAcA_6yxaanT2N6Twos_FxjJNgvVKShwgq=pR4fqmcZUsQFA@mail.gmail.com>
- <CAFEAcA8py1obBXc1o02wTRkXms9NwCnCT6Q9ZZ-4W=NzNocLrQ@mail.gmail.com>
- <a0b2779c-bcd5-0fe9-ff3f-d4254aba8805@kaod.org>
-In-Reply-To: <a0b2779c-bcd5-0fe9-ff3f-d4254aba8805@kaod.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 22 Oct 2019 18:20:28 +0100
-Message-ID: <CAFEAcA9nymSxBkEm8GcJm9p4Y_obmK-fbojFEi+Et52H-mPFdA@mail.gmail.com>
-Subject: Re: [PATCH] aspeed: Add an AST2600 eval board
-To: =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>
-Content-Type: text/plain; charset="UTF-8"
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-MC-Unique: V6OQk6rVP0W6XMLYqII2ZA-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=WINDOWS-1252
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::243
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,21 +86,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Andrew Jeffery <andrew@aj.id.au>, qemu-arm <qemu-arm@nongnu.org>,
- Joel Stanley <joel@jms.id.au>, QEMU Developers <qemu-devel@nongnu.org>
+Cc: Fam Zheng <fam@euphon.net>, Laurent Vivier <lvivier@redhat.com>,
+ Thomas Huth <thuth@redhat.com>, qemu-block@nongnu.org, slp@redhat.com,
+ "Michael S. Tsirkin" <mst@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 22 Oct 2019 at 18:16, C=C3=A9dric Le Goater <clg@kaod.org> wrote:
-> Is it time for me to install an OSX system for dev and tests or is there
-> a way to reproduce the issue ? no errors spotted in valgrind.
 
-I dunno. You could have a look to see if you can repro
-it with the travis builds. I would investigate but I
-don't have time this week given impending softfreeze
-and KVM Forum next week.
+Stefan Hajnoczi writes:
+[...]
+> +static uint16_t qvirtio_readw(QVirtioDevice *d, QTestState *qts, uint64_=
+t addr)
+> +{
+> +    uint16_t val =3D qtest_readw(qts, addr);
+> +
+> +    if (d->features & (1ull << VIRTIO_F_VERSION_1) && qtest_big_endian(q=
+ts)) {
 
-thanks
--- PMM
+For my education, I was wondering why tests use the (1ull << FEATURE)
+notation and not an equivalent of virtio_has_feature()? Is this
+intentional, or just legacy?
+
+
+--
+Cheers,
+Christophe de Dinechin (IRC c3d)
+
 
