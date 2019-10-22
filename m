@@ -2,66 +2,68 @@ Return-Path: <SRS0=tSBD=YP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 161BACA9EA0
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 18:48:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A8519CA9EA0
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 18:50:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D288420B7C
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 18:48:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6F27520B7C
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 18:50:55 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NualhHnQ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D288420B7C
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZYn2mOnb"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6F27520B7C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40882 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40986 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iMzCZ-00088w-0l
-	for qemu-devel@archiver.kernel.org; Tue, 22 Oct 2019 14:48:15 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60627)
+	id 1iMzF8-0001oC-KU
+	for qemu-devel@archiver.kernel.org; Tue, 22 Oct 2019 14:50:54 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60951)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <thuth@redhat.com>) id 1iMzBF-0007Eq-Cr
- for qemu-devel@nongnu.org; Tue, 22 Oct 2019 14:46:54 -0400
+ (envelope-from <thuth@redhat.com>) id 1iMzD9-0000IQ-QZ
+ for qemu-devel@nongnu.org; Tue, 22 Oct 2019 14:48:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <thuth@redhat.com>) id 1iMzBC-0001Ya-VC
- for qemu-devel@nongnu.org; Tue, 22 Oct 2019 14:46:51 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:32637
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <thuth@redhat.com>) id 1iMzD7-0002Ku-RH
+ for qemu-devel@nongnu.org; Tue, 22 Oct 2019 14:48:51 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:39559
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <thuth@redhat.com>) id 1iMzBC-0001YT-SL
- for qemu-devel@nongnu.org; Tue, 22 Oct 2019 14:46:50 -0400
+ (Exim 4.71) (envelope-from <thuth@redhat.com>) id 1iMzD7-0002Ki-Nu
+ for qemu-devel@nongnu.org; Tue, 22 Oct 2019 14:48:49 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1571770010;
+ s=mimecast20190719; t=1571770129;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references:openpgp:openpgp:autocrypt:autocrypt;
- bh=fmoRbokTzcQJYy92SaO28li82e/6f808CEsITKNSQoo=;
- b=NualhHnQ1DGCCvhd5mGhRo5+Ao3P64p4mz/zU/56vRJLPD7DjAGalfbw1kxSMx161jbQY7
- t9p7z2wKR/fyGI/j1zebT/lb9AGCDYHVoS3hnWZsx6mYpLm4oQoDEQDUqVxsVbpY+VxKck
- iGayIggHWx9pfuJVOQYh4BMqF2YfVEM=
+ bh=gbWjBgjfc8fPWeM3ZW8VDDv2tygekyoIfvU0TAHbjAk=;
+ b=ZYn2mOnby9/WS/dSQzWSROEvbCQeMyzcLoM3X+Hpe+YfNICyk0SRIEe09i6FExusUn6Yy/
+ NefiRR0XuRlx8mOMDNXNSBlia1xOVt7Wy7mzYj8GHHy7Q5+b2y8pDnIg5Fdm/pOiDkX+dD
+ fT+dcKt0ma+sIV+uSCDZFRboMzKKkJY=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-221-Ikjfa0WyMdarj9WHdseUDg-1; Tue, 22 Oct 2019 14:46:47 -0400
+ us-mta-368-rOq8bXsTMVSmrQsmE2mUxw-1; Tue, 22 Oct 2019 14:48:45 -0400
 Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
  [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 356E71800D6A;
- Tue, 22 Oct 2019 18:46:46 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 712BE107AD31;
+ Tue, 22 Oct 2019 18:48:43 +0000 (UTC)
 Received: from thuth.remote.csb (ovpn-116-34.ams2.redhat.com [10.36.116.34])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 555DB60126;
- Tue, 22 Oct 2019 18:46:44 +0000 (UTC)
-Subject: Re: Missing PVR setting capability
-To: Wayne Li <waynli329@gmail.com>
-References: <CAM2K0np63wni3G7GNWPxTq40Kb1VeTN7Ocn=E=BqSmd+pDsX9A@mail.gmail.com>
- <7e2a821c-ed6b-ccb1-f517-405359358a26@redhat.com>
- <CAM2K0nox06JcmjfM20G1-p2Vwq5Xb7hRAX0DVBfdCepnqUiZQg@mail.gmail.com>
+ by smtp.corp.redhat.com (Postfix) with ESMTP id D915D60126;
+ Tue, 22 Oct 2019 18:48:32 +0000 (UTC)
+Subject: Re: [PATCH v3 07/16] libqos: enforce Device Initialization order
+To: Stefan Hajnoczi <stefanha@redhat.com>
+References: <20191019063810.6944-1-stefanha@redhat.com>
+ <20191019063810.6944-8-stefanha@redhat.com>
+ <158ef0b2-c478-1304-3128-8feb7cd943d4@redhat.com>
+ <20191022154840.GE32186@stefanha-x1.localdomain>
 From: Thomas Huth <thuth@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=thuth@redhat.com; prefer-encrypt=mutual; keydata=
@@ -107,21 +109,21 @@ Autocrypt: addr=thuth@redhat.com; prefer-encrypt=mutual; keydata=
  IQu4bBP2GxiRQ+NV3iV/KU3ebMRzqIC//DCOxzQNFNJAKldPe/bKZMCxEqtVoRkuJtNdp/5a
  yXFZ6TfE1hGKrDBYAm4vrnZ4CXFSBDllL59cFFOJCkn4Xboj/aVxxJxF30bn
 Organization: Red Hat
-Message-ID: <b6ef8a2d-04aa-aa73-a8f3-ef649786a163@redhat.com>
-Date: Tue, 22 Oct 2019 20:46:42 +0200
+Message-ID: <a2c46a4f-7c60-f6ef-06b6-1e283053ea9f@redhat.com>
+Date: Tue, 22 Oct 2019 20:48:31 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.9.0
 MIME-Version: 1.0
-In-Reply-To: <CAM2K0nox06JcmjfM20G1-p2Vwq5Xb7hRAX0DVBfdCepnqUiZQg@mail.gmail.com>
+In-Reply-To: <20191022154840.GE32186@stefanha-x1.localdomain>
 Content-Language: en-US
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-MC-Unique: Ikjfa0WyMdarj9WHdseUDg-1
+X-MC-Unique: rOq8bXsTMVSmrQsmE2mUxw-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.81
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -133,48 +135,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: KONRAD Frederic <frederic.konrad@adacore.com>, qemu-ppc@nongnu.org,
- qemu-devel@nongnu.org
+Cc: Fam Zheng <fam@euphon.net>, Laurent Vivier <lvivier@redhat.com>,
+ slp@redhat.com, qemu-block@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>,
+ qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 22/10/2019 18.24, Wayne Li wrote:
-> If I run "lsmod | grep kvm" nothing shows up but if I just do a "find .
-> -name "kvm"" I get the following:
-[...]
-> ./sys/devices/virtual/misc/kvm
-> ./sys/class/misc/kvm
-> ./sys/kernel/debug/kvm
-> ./sys/module/kvm
+On 22/10/2019 17.48, Stefan Hajnoczi wrote:
+> On Mon, Oct 21, 2019 at 02:15:53PM +0200, Thomas Huth wrote:
+>> On 19/10/2019 08.38, Stefan Hajnoczi wrote:
+>>> According to VIRTIO 1.1 "3.1.1 Driver Requirements: Device
+>>> Initialization", configuration space and virtqueues cannot be accessed
+>>> before features have been negotiated.  Enforce this requirement.
+>>>
+>>> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+>>> ---
+>>>  tests/libqos/virtio.c | 11 +++++++++++
+>>>  1 file changed, 11 insertions(+)
+>>>
+>>> diff --git a/tests/libqos/virtio.c b/tests/libqos/virtio.c
+>>> index 4f7e6bb8a1..2593996c98 100644
+>>> --- a/tests/libqos/virtio.c
+>>> +++ b/tests/libqos/virtio.c
+>>> @@ -13,23 +13,33 @@
+>>>  #include "standard-headers/linux/virtio_config.h"
+>>>  #include "standard-headers/linux/virtio_ring.h"
+>>> =20
+>>> +/* Features must be negotiated before config space or virtqueue access=
+ */
+>>> +static void check_features_negotiated(QVirtioDevice *d)
+>>> +{
+>>> +    g_assert_cmphex(d->features, !=3D, 0);
+>>> +}
+>>
+>> Isn't it "legal" to negotiate 0 feature bits, too (for legacy devices)?
 >=20
-> I guess this shows my OS does have KVM on it?
+> Yes, it's possible for Legacy devices.  If someone ever does that
+> they'll need to extend this code, but it's unlikely so I'd rather not
+> complicate this.
 
-Alright, I guess that means that KVM compiled into the kernel ... should
-be fine, I think.
+Could you please add at least a comment here with that explanation?
 
->=C2=A0 I added the two flags you
-> mentioned when running QEMU (the -cpu and the -machine flags) but the
-> -cpu flag doesn't seem like it's doing anything as even when I put a
-> clearly wrong argument after the flag no error related to the cpu is
-> thrown.=C2=A0 Also it says ppce500 is not a machine type and that the
-> supported machines are:
->=20
-> bamboo =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 bamboo
-> boeing-machine =C2=A0 =C2=A0 =C2=A0 Boeing Machine
-> none =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 empty machin=
-e
-> ref405ep =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 ref405ep
-> taihu =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0taihu
-> virtex-ml507 =C2=A0 =C2=A0 =C2=A0 =C2=A0 Xilinx Virtex ML507 reference de=
-sign
-
-Oh, are you running qemu-system-ppc instead of qemu-system-ppc64? I
-thought these e*500 CPUs are 64-bit? Is your host kernel 64-bit or 32-bit?
-
-Anyway, if you're using a modified version of QEMU, you should
-definitely ask the people who did the modifications there.
-
- Thomas
+ Thanks,
+  Thomas
 
 
