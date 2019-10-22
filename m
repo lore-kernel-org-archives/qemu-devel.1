@@ -7,75 +7,73 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E5D0ACA9EA0
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 13:39:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 12042CA9EB9
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 13:42:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B0CD32064B
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 13:39:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D45B420700
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 13:41:59 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="xRrPIVPZ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B0CD32064B
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="BVHjo1Ol"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D45B420700
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57504 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57556 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iMuOB-0003vL-QC
-	for qemu-devel@archiver.kernel.org; Tue, 22 Oct 2019 09:39:55 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36682)
+	id 1iMuQA-00063K-C3
+	for qemu-devel@archiver.kernel.org; Tue, 22 Oct 2019 09:41:58 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36719)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1iMuGZ-0002QE-6t
- for qemu-devel@nongnu.org; Tue, 22 Oct 2019 09:32:04 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1iMuGg-0002XM-3i
+ for qemu-devel@nongnu.org; Tue, 22 Oct 2019 09:32:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1iMuGX-0001EM-SC
- for qemu-devel@nongnu.org; Tue, 22 Oct 2019 09:32:03 -0400
-Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:51970)
+ (envelope-from <peter.maydell@linaro.org>) id 1iMuGe-0001Fn-Hx
+ for qemu-devel@nongnu.org; Tue, 22 Oct 2019 09:32:09 -0400
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:38233)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1iMuGX-0001E5-MJ
- for qemu-devel@nongnu.org; Tue, 22 Oct 2019 09:32:01 -0400
-Received: by mail-wm1-x344.google.com with SMTP id q70so10126193wme.1
- for <qemu-devel@nongnu.org>; Tue, 22 Oct 2019 06:32:01 -0700 (PDT)
+ id 1iMuGe-0001Fc-Bj
+ for qemu-devel@nongnu.org; Tue, 22 Oct 2019 09:32:08 -0400
+Received: by mail-wr1-x442.google.com with SMTP id v9so6838331wrq.5
+ for <qemu-devel@nongnu.org>; Tue, 22 Oct 2019 06:32:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:subject:date:message-id:in-reply-to:references:mime-version
  :content-transfer-encoding;
- bh=S/QCyLDKmYi4qFNoLejQGFlQ6w8d+jjMc7szR08wghI=;
- b=xRrPIVPZ492raVhjOCqPdOZNBB/RY8d64YbKQqsI629hGWLCQWpb8W4TZ8gz/PG0pS
- 3gPZySL0YJxTfJ+OMxEmjEZI8xi4vZVKuIYZ6ABssfJ9l5jKwhC/Iwik59mCf28yQYb/
- fQx8ElmIIQA9EE8e3BPpEBouW2kN1NPgN+CRpOuSb/gaBkFw04u60H9X5CAuFIUxqmu5
- SQ4XvFeRuXoeG32e3FGtc64Q4+33WV6AW9bmJI7KA/5N6253uz56a7i5qH+poDfRpao5
- SxhOKnLXEA22oN969Kh6jX5fhuVWbdcoROfZVtDOljlzs8uMTNRwOkfafgqyS8FT4U6W
- os7g==
+ bh=emBzWLxUZK2MevrSuS1VObn1t11YZXLXP0lH9BsVSFU=;
+ b=BVHjo1Oloy6sCd8UKYexxGd1dVWnEkA80TmiEPmlRxBm4AIE/ckE8T9sKeJDJcPY6C
+ LR3PsCItfmB4Grf5ERu0sv1AYz3oun9RQ6Ljd0hQMRDpiPxXCOwCxxq+qMuCI/RLdXEc
+ wxjJ4ZbKkxeOL9R4gr8TGXvLhDFeEppVMqxabIfmJcPuWhUZz2al2nj97IsP+lrBV+Fy
+ rhwMwHLSc1y8UKyODhfv/uAOTKR0s7H+xV/eEZHm3wCH8AzvbzIlAmpGAO1qBcYygNRe
+ +q22AWsWQ6qkyeiz/Pur6floxIUUSCTV5N4K8CWcD0EuRy2NIYich+a1kbAdL4qmgil3
+ 3OJw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=S/QCyLDKmYi4qFNoLejQGFlQ6w8d+jjMc7szR08wghI=;
- b=HBI0vTXPN9Z/2I1nAoyCqI4cjplfNPeTWyj6hKV28YvNxkSlZ8ZGAkkm5Kdm1jyp+/
- eTSu1dB9nLC6uoeylKxZBVl+1+ryt9XJYpz+1neZipXbnkWtriaVG5J4wMyfw3ahk2dL
- 6J/A67gHgtoX0un8P5oxsqSFr+R2smQHb53hA95os132zE51TIAZTmWYzGYLVf+pJEnJ
- gR9ia0WdEqwlFnSGNyoROwtKl4bA16JJP1Ly5b91qmxrJAbBHfaecVmx+bju2yKh7ZzQ
- enuHeWMhwphBRrEitnr8CwJWigu49Tms02IL6Cpi2dpoL7/pXJoLSaOVfDn3FcHJz7Up
- 1iMQ==
-X-Gm-Message-State: APjAAAVFz2Uz9YTkCzC4VKJcNL8gx70Ct9lJA2CD7FIgggGmVK/SheCS
- ZdKlYcd2gOSu4PosqCdirIXvov4N+mc=
-X-Google-Smtp-Source: APXvYqxkNNaDQuxYfNlqOi/fKGugdAK6m2Xono5C8gVB4Nn/7itB+etuw1JruDEhhgc/+Ms8ef220g==
-X-Received: by 2002:a05:600c:225a:: with SMTP id
- a26mr3110214wmm.73.1571751120082; 
- Tue, 22 Oct 2019 06:32:00 -0700 (PDT)
+ bh=emBzWLxUZK2MevrSuS1VObn1t11YZXLXP0lH9BsVSFU=;
+ b=ZAcFH8TDmmeyOzIgAf2ihpYmMGJeO1qNmh5lImP8zVl6vmBGyX5Ka9oCpWpMxr/gGV
+ m3qNhCkqDAOTHW7Q+cdxhoYwtCsxSRw8cr+/kBHzcS/s4ZEhX+btmqFKHlMNc7uMNTgt
+ z/qAZ0KDhZUO44petWrPgKPKr0zJ91gDEk4syDXWEVYLTYAcW7Qg9pgmxpvJj0Qhl0z2
+ GXx/zluCWwIz/xKW3F7CxGnnp3PjvL4Im+AUJ/xWxSG/TArzoVp8MKAKUBexXvBrvUTV
+ dI1USpJmzBKZ0K0CBar/r47kdIH20aoc42DqMy5I6urRFHll/YrYtU8y+KjFB1nhOA/P
+ DFQQ==
+X-Gm-Message-State: APjAAAXSZZAupqIhlTgex7Pnrh2LUfkizeLqATa2pp/OlOx1GvmXPuoF
+ 0YH+/TDRs77nmzodQzTpKqoNxhMkHTk=
+X-Google-Smtp-Source: APXvYqww/FAofBTRxtxI51XLRPs6o08V9UuZrNEX5NzdaaqkT6up1UMPcl2+62R+WMO3eKWl4RdrIg==
+X-Received: by 2002:adf:f60a:: with SMTP id t10mr2972990wrp.35.1571751126344; 
+ Tue, 22 Oct 2019 06:32:06 -0700 (PDT)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id r2sm20263856wma.1.2019.10.22.06.31.58
+ by smtp.gmail.com with ESMTPSA id r2sm20263856wma.1.2019.10.22.06.32.04
  for <qemu-devel@nongnu.org>
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 22 Oct 2019 06:31:58 -0700 (PDT)
+ Tue, 22 Oct 2019 06:32:04 -0700 (PDT)
 From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PULL 08/41] hw/timer/altera_timer.c: Switch to transaction-based
- ptimer API
-Date: Tue, 22 Oct 2019 14:31:01 +0100
-Message-Id: <20191022133134.14487-9-peter.maydell@linaro.org>
+Subject: [PULL 11/41] target/arm: Split out rebuild_hflags_common
+Date: Tue, 22 Oct 2019 14:31:04 +0100
+Message-Id: <20191022133134.14487-12-peter.maydell@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20191022133134.14487-1-peter.maydell@linaro.org>
 References: <20191022133134.14487-1-peter.maydell@linaro.org>
@@ -84,7 +82,7 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::344
+X-Received-From: 2a00:1450:4864:20::442
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -100,92 +98,163 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Switch the altera_timer code away from bottom-half based ptimers to
-the new transaction-based ptimer API.  This just requires adding
-begin/commit calls around the various places that modify the ptimer
-state, and using the new ptimer_init() function to create the timer.
+From: Richard Henderson <richard.henderson@linaro.org>
 
+Create a function to compute the values of the TBFLAG_ANY bits
+that will be cached.  For now, the env->hflags variable is not
+used, and the results are fed back to cpu_get_tb_cpu_state.
+
+Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+Message-id: 20191018174431.1784-2-richard.henderson@linaro.org
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Message-id: 20191017132905.5604-6-peter.maydell@linaro.org
 ---
- hw/timer/altera_timer.c | 13 +++++++++----
- 1 file changed, 9 insertions(+), 4 deletions(-)
+ target/arm/cpu.h    | 29 ++++++++++++++++++-----------
+ target/arm/helper.c | 26 +++++++++++++++++++-------
+ 2 files changed, 37 insertions(+), 18 deletions(-)
 
-diff --git a/hw/timer/altera_timer.c b/hw/timer/altera_timer.c
-index ee32e0ec1ff..79fc381252d 100644
---- a/hw/timer/altera_timer.c
-+++ b/hw/timer/altera_timer.c
-@@ -19,7 +19,6 @@
+diff --git a/target/arm/cpu.h b/target/arm/cpu.h
+index 297ad5e47ad..ad79a6153bb 100644
+--- a/target/arm/cpu.h
++++ b/target/arm/cpu.h
+@@ -231,6 +231,9 @@ typedef struct CPUARMState {
+     uint32_t pstate;
+     uint32_t aarch64; /* 1 if CPU is in aarch64 state; inverse of PSTATE.nRW */
+ 
++    /* Cached TBFLAGS state.  See below for which bits are included.  */
++    uint32_t hflags;
++
+     /* Frequently accessed CPSR bits are stored separately for efficiency.
+        This contains all the other bits.  Use cpsr_{read,write} to access
+        the whole CPSR.  */
+@@ -3140,15 +3143,18 @@ typedef ARMCPU ArchCPU;
+ 
+ #include "exec/cpu-all.h"
+ 
+-/* Bit usage in the TB flags field: bit 31 indicates whether we are
++/*
++ * Bit usage in the TB flags field: bit 31 indicates whether we are
+  * in 32 or 64 bit mode. The meaning of the other bits depends on that.
+  * We put flags which are shared between 32 and 64 bit mode at the top
+  * of the word, and flags which apply to only one mode at the bottom.
++ *
++ * Unless otherwise noted, these bits are cached in env->hflags.
   */
+ FIELD(TBFLAG_ANY, AARCH64_STATE, 31, 1)
+ FIELD(TBFLAG_ANY, MMUIDX, 28, 3)
+ FIELD(TBFLAG_ANY, SS_ACTIVE, 27, 1)
+-FIELD(TBFLAG_ANY, PSTATE_SS, 26, 1)
++FIELD(TBFLAG_ANY, PSTATE_SS, 26, 1)     /* Not cached. */
+ /* Target EL if we take a floating-point-disabled exception */
+ FIELD(TBFLAG_ANY, FPEXC_EL, 24, 2)
+ FIELD(TBFLAG_ANY, BE_DATA, 23, 1)
+@@ -3159,13 +3165,14 @@ FIELD(TBFLAG_ANY, BE_DATA, 23, 1)
+ FIELD(TBFLAG_ANY, DEBUG_TARGET_EL, 21, 2)
  
- #include "qemu/osdep.h"
--#include "qemu/main-loop.h"
- #include "qemu/module.h"
- #include "qapi/error.h"
+ /* Bit usage when in AArch32 state: */
+-FIELD(TBFLAG_A32, THUMB, 0, 1)
+-FIELD(TBFLAG_A32, VECLEN, 1, 3)
+-FIELD(TBFLAG_A32, VECSTRIDE, 4, 2)
++FIELD(TBFLAG_A32, THUMB, 0, 1)          /* Not cached. */
++FIELD(TBFLAG_A32, VECLEN, 1, 3)         /* Not cached. */
++FIELD(TBFLAG_A32, VECSTRIDE, 4, 2)      /* Not cached. */
+ /*
+  * We store the bottom two bits of the CPAR as TB flags and handle
+  * checks on the other bits at runtime. This shares the same bits as
+  * VECSTRIDE, which is OK as no XScale CPU has VFP.
++ * Not cached, because VECLEN+VECSTRIDE are not cached.
+  */
+ FIELD(TBFLAG_A32, XSCALE_CPAR, 4, 2)
+ /*
+@@ -3174,15 +3181,15 @@ FIELD(TBFLAG_A32, XSCALE_CPAR, 4, 2)
+  * the same thing as the current security state of the processor!
+  */
+ FIELD(TBFLAG_A32, NS, 6, 1)
+-FIELD(TBFLAG_A32, VFPEN, 7, 1)
+-FIELD(TBFLAG_A32, CONDEXEC, 8, 8)
++FIELD(TBFLAG_A32, VFPEN, 7, 1)          /* Not cached. */
++FIELD(TBFLAG_A32, CONDEXEC, 8, 8)       /* Not cached. */
+ FIELD(TBFLAG_A32, SCTLR_B, 16, 1)
+ /* For M profile only, set if FPCCR.LSPACT is set */
+-FIELD(TBFLAG_A32, LSPACT, 18, 1)
++FIELD(TBFLAG_A32, LSPACT, 18, 1)        /* Not cached. */
+ /* For M profile only, set if we must create a new FP context */
+-FIELD(TBFLAG_A32, NEW_FP_CTXT_NEEDED, 19, 1)
++FIELD(TBFLAG_A32, NEW_FP_CTXT_NEEDED, 19, 1) /* Not cached. */
+ /* For M profile only, set if FPCCR.S does not match current security state */
+-FIELD(TBFLAG_A32, FPCCR_S_WRONG, 20, 1)
++FIELD(TBFLAG_A32, FPCCR_S_WRONG, 20, 1) /* Not cached. */
+ /* For M profile only, Handler (ie not Thread) mode */
+ FIELD(TBFLAG_A32, HANDLER, 21, 1)
+ /* For M profile only, whether we should generate stack-limit checks */
+@@ -3194,7 +3201,7 @@ FIELD(TBFLAG_A64, SVEEXC_EL, 2, 2)
+ FIELD(TBFLAG_A64, ZCR_LEN, 4, 4)
+ FIELD(TBFLAG_A64, PAUTH_ACTIVE, 8, 1)
+ FIELD(TBFLAG_A64, BT, 9, 1)
+-FIELD(TBFLAG_A64, BTYPE, 10, 2)
++FIELD(TBFLAG_A64, BTYPE, 10, 2)         /* Not cached. */
+ FIELD(TBFLAG_A64, TBID, 12, 2)
  
-@@ -53,7 +52,6 @@ typedef struct AlteraTimer {
-     MemoryRegion  mmio;
-     qemu_irq      irq;
-     uint32_t      freq_hz;
--    QEMUBH       *bh;
-     ptimer_state *ptimer;
-     uint32_t      regs[R_MAX];
- } AlteraTimer;
-@@ -105,6 +103,7 @@ static void timer_write(void *opaque, hwaddr addr,
-         break;
+ static inline bool bswap_code(bool sctlr_b)
+diff --git a/target/arm/helper.c b/target/arm/helper.c
+index 0d9a2d2ab74..8829d91ae1d 100644
+--- a/target/arm/helper.c
++++ b/target/arm/helper.c
+@@ -11054,6 +11054,22 @@ ARMMMUIdx arm_stage1_mmu_idx(CPUARMState *env)
+ }
+ #endif
  
-     case R_CONTROL:
-+        ptimer_transaction_begin(t->ptimer);
-         t->regs[R_CONTROL] = value & (CONTROL_ITO | CONTROL_CONT);
-         if ((value & CONTROL_START) &&
-             !(t->regs[R_STATUS] & STATUS_RUN)) {
-@@ -115,10 +114,12 @@ static void timer_write(void *opaque, hwaddr addr,
-             ptimer_stop(t->ptimer);
-             t->regs[R_STATUS] &= ~STATUS_RUN;
++static uint32_t rebuild_hflags_common(CPUARMState *env, int fp_el,
++                                      ARMMMUIdx mmu_idx, uint32_t flags)
++{
++    flags = FIELD_DP32(flags, TBFLAG_ANY, FPEXC_EL, fp_el);
++    flags = FIELD_DP32(flags, TBFLAG_ANY, MMUIDX,
++                       arm_to_core_mmu_idx(mmu_idx));
++
++    if (arm_cpu_data_is_big_endian(env)) {
++        flags = FIELD_DP32(flags, TBFLAG_ANY, BE_DATA, 1);
++    }
++    if (arm_singlestep_active(env)) {
++        flags = FIELD_DP32(flags, TBFLAG_ANY, SS_ACTIVE, 1);
++    }
++    return flags;
++}
++
+ void cpu_get_tb_cpu_state(CPUARMState *env, target_ulong *pc,
+                           target_ulong *cs_base, uint32_t *pflags)
+ {
+@@ -11145,7 +11161,7 @@ void cpu_get_tb_cpu_state(CPUARMState *env, target_ulong *pc,
          }
-+        ptimer_transaction_commit(t->ptimer);
-         break;
- 
-     case R_PERIODL:
-     case R_PERIODH:
-+        ptimer_transaction_begin(t->ptimer);
-         t->regs[addr] = value & 0xFFFF;
-         if (t->regs[R_STATUS] & STATUS_RUN) {
-             ptimer_stop(t->ptimer);
-@@ -126,6 +127,7 @@ static void timer_write(void *opaque, hwaddr addr,
-         }
-         tvalue = (t->regs[R_PERIODH] << 16) | t->regs[R_PERIODL];
-         ptimer_set_limit(t->ptimer, tvalue + 1, 1);
-+        ptimer_transaction_commit(t->ptimer);
-         break;
- 
-     case R_SNAPL:
-@@ -183,9 +185,10 @@ static void altera_timer_realize(DeviceState *dev, Error **errp)
-         return;
      }
  
--    t->bh = qemu_bh_new(timer_hit, t);
--    t->ptimer = ptimer_init_with_bh(t->bh, PTIMER_POLICY_DEFAULT);
-+    t->ptimer = ptimer_init(timer_hit, t, PTIMER_POLICY_DEFAULT);
-+    ptimer_transaction_begin(t->ptimer);
-     ptimer_set_freq(t->ptimer, t->freq_hz);
-+    ptimer_transaction_commit(t->ptimer);
+-    flags = FIELD_DP32(flags, TBFLAG_ANY, MMUIDX, arm_to_core_mmu_idx(mmu_idx));
++    flags = rebuild_hflags_common(env, fp_el, mmu_idx, flags);
  
-     memory_region_init_io(&t->mmio, OBJECT(t), &timer_ops, t,
-                           TYPE_ALTERA_TIMER, R_MAX * sizeof(uint32_t));
-@@ -204,8 +207,10 @@ static void altera_timer_reset(DeviceState *dev)
- {
-     AlteraTimer *t = ALTERA_TIMER(dev);
+     /* The SS_ACTIVE and PSTATE_SS bits correspond to the state machine
+      * states defined in the ARM ARM for software singlestep:
+@@ -11153,9 +11169,9 @@ void cpu_get_tb_cpu_state(CPUARMState *env, target_ulong *pc,
+      *     0            x       Inactive (the TB flag for SS is always 0)
+      *     1            0       Active-pending
+      *     1            1       Active-not-pending
++     * SS_ACTIVE is set in hflags; PSTATE_SS is computed every TB.
+      */
+-    if (arm_singlestep_active(env)) {
+-        flags = FIELD_DP32(flags, TBFLAG_ANY, SS_ACTIVE, 1);
++    if (FIELD_EX32(flags, TBFLAG_ANY, SS_ACTIVE)) {
+         if (is_a64(env)) {
+             if (env->pstate & PSTATE_SS) {
+                 flags = FIELD_DP32(flags, TBFLAG_ANY, PSTATE_SS, 1);
+@@ -11166,10 +11182,6 @@ void cpu_get_tb_cpu_state(CPUARMState *env, target_ulong *pc,
+             }
+         }
+     }
+-    if (arm_cpu_data_is_big_endian(env)) {
+-        flags = FIELD_DP32(flags, TBFLAG_ANY, BE_DATA, 1);
+-    }
+-    flags = FIELD_DP32(flags, TBFLAG_ANY, FPEXC_EL, fp_el);
  
-+    ptimer_transaction_begin(t->ptimer);
-     ptimer_stop(t->ptimer);
-     ptimer_set_limit(t->ptimer, 0xffffffff, 1);
-+    ptimer_transaction_commit(t->ptimer);
-     memset(t->regs, 0, sizeof(t->regs));
- }
- 
+     if (arm_v7m_is_handler_mode(env)) {
+         flags = FIELD_DP32(flags, TBFLAG_A32, HANDLER, 1);
 -- 
 2.20.1
 
