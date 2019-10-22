@@ -2,77 +2,122 @@ Return-Path: <SRS0=tSBD=YP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EB3AACA9EA0
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 12:25:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E10B6CA9EA0
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 12:25:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 936EC2184C
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 12:25:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9A9D52184C
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 12:25:24 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dnwvfgD1"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 936EC2184C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="bheiIPsl"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9A9D52184C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54848 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54854 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iMtDy-0006xl-I5
-	for qemu-devel@archiver.kernel.org; Tue, 22 Oct 2019 08:25:18 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51942)
+	id 1iMtE3-00076D-Im
+	for qemu-devel@archiver.kernel.org; Tue, 22 Oct 2019 08:25:23 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52183)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <armbru@redhat.com>) id 1iMtAh-0004Ho-3d
- for qemu-devel@nongnu.org; Tue, 22 Oct 2019 08:21:59 -0400
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iMtCL-0005aP-Dj
+ for qemu-devel@nongnu.org; Tue, 22 Oct 2019 08:23:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1iMtAd-0007Lv-0a
- for qemu-devel@nongnu.org; Tue, 22 Oct 2019 08:21:55 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:30061
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1iMtAc-0007Lc-PH
- for qemu-devel@nongnu.org; Tue, 22 Oct 2019 08:21:50 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1571746909;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding;
- bh=Uvb/AWDvZzFHhq4Ps9RGmsQO2HjDWdi/N05Cxs/6sOI=;
- b=dnwvfgD1ZCfqwZ1HbIJm638rY8hRcTEMLnsA7Ed3S2EBLJfv+ndCHkuf9DHK+mB/KWPvfs
- yvGmgeGHKh7WC5ulbw3SoZRHHf+E2/70Av4GAz4n8qyElIJ43F4YN3vjk7LveaZPvhxHoZ
- 5HUrbXLirelf8J8Xfp/jztW8xfzGoow=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-168-EUqdPt22PaG-3U1bfUflWw-1; Tue, 22 Oct 2019 08:21:48 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 56B8A800D4E
- for <qemu-devel@nongnu.org>; Tue, 22 Oct 2019 12:21:47 +0000 (UTC)
-Received: from blackfin.pond.sub.org (unknown [10.36.118.123])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 9E38E60C57
- for <qemu-devel@nongnu.org>; Tue, 22 Oct 2019 12:21:46 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 05D391138619; Tue, 22 Oct 2019 14:21:45 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PULL v2 00/12] QAPI patches for 2019-10-22
-Date: Tue, 22 Oct 2019 14:21:43 +0200
-Message-Id: <20191022122145.27792-1-armbru@redhat.com>
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iMtCJ-0007qa-AK
+ for qemu-devel@nongnu.org; Tue, 22 Oct 2019 08:23:37 -0400
+Received: from mail-eopbgr50132.outbound.protection.outlook.com
+ ([40.107.5.132]:20548 helo=EUR03-VE1-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1iMtCD-0007nc-SE; Tue, 22 Oct 2019 08:23:30 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=GN3vuF5RzXD6+UisNl5BelxnYvsf52j0bNq1M1buL7z5ve5QgVJaxyau5HVgiJ8BpNNX07GTR8KiC/QcFeB/03Y5zSWZzIfsHRLTa21fyCrsLMfshG0wyOIQS4bGkx5mHzzvHAE1P3kJ3hjsjeKEzCmDGJLSEkc2nv+q36PXBvFyaBp645ooxqQvt7w6fU6WkIRuIRUoDfVElWxTL2QItrg7kelBjdnxO/9zHLk3E41Y6kHXWFoNDVBQnkTMMGO7EOYy7bH/3xJM+fDQuGoLlezenndrLldftTxRBu5cjiN/GfFz6zMD9zVfn3i/xw2zYep4OeXy2oCVcxxsikXZMA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=u9+Hfxt0JWYVNekx2YUVyHxqwa9NgQLbLRSS7K21YD8=;
+ b=hC7HFN5bK7H7ZZRd819QaQdPETZ0BB7kcsujTM2Dtxnx/4KDMp1aNW577pDT0CuHd7nZX+cAp+X3lUDmnbK4rJPgoievTOddR7ayVH5FV4TbwntksNzvFXI9TNqF1RmB8HukrdrgRUc474UUuH+dvUF+NJhokDEb+1t507C9FTxEzfi4bpPmHHUgBfQW6svofWBFs5+FcoIN+ud+kWXCyRFeqlTYMB0XLgfM6ibHXxPEQPm7ldXUb1k03brpyOJfqMdJ4IPcVifyxnBjBKIymkN9czJvValvvHAFXyxWk5AKXeK1Q6/AgYSuqzVMhoDxUaodsf9PmSMKC7+B3DBwZg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=u9+Hfxt0JWYVNekx2YUVyHxqwa9NgQLbLRSS7K21YD8=;
+ b=bheiIPsl5cKkrRW9U65/73sfelfSugUNe+qPFmCwHa/h2MOmyEzwxatw84ju1kEpLxlp2B41ldX1XfX4MB9me+RXPhCCbB77549FQXdIFuhFnOJZz9aooLIEHFbc29EX+QjWeFaRUCNvvY3HY3dK5dgL+IecJcg6mNxxaPGCMQ8=
+Received: from AM0PR08MB4435.eurprd08.prod.outlook.com (20.179.35.83) by
+ AM0PR08MB4163.eurprd08.prod.outlook.com (20.178.119.204) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2367.24; Tue, 22 Oct 2019 12:23:26 +0000
+Received: from AM0PR08MB4435.eurprd08.prod.outlook.com
+ ([fe80::4461:dd32:b358:110c]) by AM0PR08MB4435.eurprd08.prod.outlook.com
+ ([fe80::4461:dd32:b358:110c%7]) with mapi id 15.20.2367.022; Tue, 22 Oct 2019
+ 12:23:26 +0000
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+To: Max Reitz <mreitz@redhat.com>, Andrey Shinkevich
+ <andrey.shinkevich@virtuozzo.com>, "qemu-devel@nongnu.org"
+ <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+Subject: Re: [PATCH v5 1/4] block: support compressed write at generic layer
+Thread-Topic: [PATCH v5 1/4] block: support compressed write at generic layer
+Thread-Index: AQHVh4YxmUtdFYq2BEKkM8Mgtnynq6dmZxIAgAAO34CAADksgP//2jqAgAAOnAA=
+Date: Tue, 22 Oct 2019 12:23:26 +0000
+Message-ID: <ae5bc00f-e65e-8c33-2620-a9147e48ea78@virtuozzo.com>
+References: <1571603828-185910-1-git-send-email-andrey.shinkevich@virtuozzo.com>
+ <1571603828-185910-2-git-send-email-andrey.shinkevich@virtuozzo.com>
+ <408ef2ab-1f6c-2c9f-ad50-92269c20fb27@redhat.com>
+ <eece4ca2-7c40-cae6-b15f-beed73830fd8@virtuozzo.com>
+ <cc3f87c2-3ad5-da4e-4750-27a48bce1ee6@virtuozzo.com>
+ <787da788-9aca-2110-a092-b63ef498a9fa@redhat.com>
+In-Reply-To: <787da788-9aca-2110-a092-b63ef498a9fa@redhat.com>
+Accept-Language: ru-RU, en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-clientproxiedby: HE1PR0701CA0081.eurprd07.prod.outlook.com
+ (2603:10a6:3:64::25) To AM0PR08MB4435.eurprd08.prod.outlook.com
+ (2603:10a6:208:144::19)
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=vsementsov@virtuozzo.com; 
+x-ms-exchange-messagesentrepresentingtype: 1
+x-tagtoolbar-keys: D20191022152323993
+x-originating-ip: [185.231.240.5]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 9a11f52e-ffe3-4ad0-f9ce-08d756eaa3b8
+x-ms-traffictypediagnostic: AM0PR08MB4163:
+x-ms-exchange-transport-forked: True
+x-microsoft-antispam-prvs: <AM0PR08MB41639473E9B46F30D64CCF3EC1680@AM0PR08MB4163.eurprd08.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:2657;
+x-forefront-prvs: 01986AE76B
+x-forefront-antispam-report: SFV:NSPM;
+ SFS:(10019020)(376002)(39840400004)(346002)(136003)(366004)(396003)(189003)(199004)(4326008)(86362001)(2201001)(6246003)(11346002)(26005)(102836004)(305945005)(54906003)(110136005)(8936002)(31696002)(107886003)(7736002)(486006)(2501003)(2616005)(446003)(6116002)(66476007)(66556008)(64756008)(66446008)(316002)(229853002)(66066001)(36756003)(3846002)(66946007)(186003)(30864003)(5660300002)(386003)(6506007)(53546011)(81166006)(5024004)(478600001)(81156014)(6512007)(14454004)(256004)(8676002)(99286004)(71190400001)(71200400001)(6486002)(25786009)(2906002)(476003)(6436002)(14444005)(76176011)(31686004)(52116002)(41533002);
+ DIR:OUT; SFP:1102; SCL:1; SRVR:AM0PR08MB4163;
+ H:AM0PR08MB4435.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
+ PTR:InfoNoRecords; MX:1; A:1; 
+received-spf: None (protection.outlook.com: virtuozzo.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: tYVNkaP7RvunqsqbxAaLuQrOiw/U2U+kmG3739KXM4m87C/KlfSV75UXfl72wqWshJSCshWDjpBhW3PLxqrD9HddzZ5zi/Q2VFkhr/CGzRYiRbjtiA8MFaACxCfVkUXgIHFlif51fOz/r/NnJhfV+MCV1s6pA5G9NXu/jDRw8IX1E2kvDJN4kPagXM6yd3Q5AQJQIV/dJkvoRsakBIkibaQYb9V3km+MsQzUg0vf69zGVw8fRKXJDfjezFnlwJHSwTGtvm2eVQF8Kx/+nOqdciLmb151Dh2hJA6yVJLdjvW2vGfU6N/Gljo8BF+gf5CNgZjJ00WVqmmYDA/3QT8KF4xOqvPgXg/1wWWPNpKFYjduhFqsz/LGpfXPuRFah1bUjTRqtf7UJdrgQ0NpHc0ktaBD5djjkuzV4x8FBicpb7zxqIOXG/OsAssBuPrFZObY
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <7B3F082C8B88EE409A79D112871EF40A@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-MC-Unique: EUqdPt22PaG-3U1bfUflWw-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=WINDOWS-1252
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 205.139.110.120
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 9a11f52e-ffe3-4ad0-f9ce-08d756eaa3b8
+X-MS-Exchange-CrossTenant-originalarrivaltime: 22 Oct 2019 12:23:26.7438 (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: arvAVzGcbDEyLxZf0GorSXb3NzUkVueEsa/wWH5egdv7OwrZirbYVEAzWSJvZOjyazXW6jDIJWYXNfCKnFsJuXFfSetnTkP4AxKh1WDUXRs=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM0PR08MB4163
+X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
+X-Received-From: 40.107.5.132
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -84,638 +129,207 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: "kwolf@redhat.com" <kwolf@redhat.com>, "fam@euphon.net" <fam@euphon.net>,
+ Denis Lunev <den@virtuozzo.com>, "armbru@redhat.com" <armbru@redhat.com>,
+ "stefanha@redhat.com" <stefanha@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The following changes since commit e9d42461920f6f40f4d847a5ba18e90d095ed0b9=
-:
-
-  Merge remote-tracking branch 'remotes/kraxel/tags/audio-20191018-pull-req=
-uest' into staging (2019-10-18 14:13:11 +0100)
-
-are available in the Git repository at:
-
-  git://repo.or.cz/qemu/armbru.git tags/pull-qapi-2019-10-22
-
-for you to fetch changes up to 0582bce69e8688fd7dd5501d352695e5c675b89b:
-
-  qapi: Allow introspecting fix for savevm's cooperation with blockdev (201=
-9-10-22 09:28:11 +0200)
-
-----------------------------------------------------------------
-QAPI patches for 2019-10-22
-
-v2:
-* PATCH 6: Add "# -*- coding: utf-8 -*-" lines
-
-----------------------------------------------------------------
-Markus Armbruster (9):
-      qapi: Don't suppress doc generation without pragma doc-required
-      qapi: Store pragma state in QAPISourceInfo, not global state
-      qapi: Eliminate accidental global frontend state
-      qapi: Speed up frontend tests
-      qapi: Move gen_enum(), gen_enum_lookup() back to qapi/types.py
-      qapi: Split up scripts/qapi/common.py
-      qapi: Clear scripts/qapi/doc.py executable bits again
-      tests/qapi-schema: Tidy up test output indentation
-      tests/qapi-schema: Cover feature documentation comments
-
-Peter Krempa (3):
-      qapi: Add feature flags to commands
-      tests: qapi: Test 'features' of commands
-      qapi: Allow introspecting fix for savevm's cooperation with blockdev
-
- docs/devel/qapi-code-gen.txt                       |   10 +-
- tests/qapi-schema/doc-good.texi                    |   22 +
- Makefile                                           |   13 +-
- qapi/introspect.json                               |    6 +-
- qapi/misc.json                                     |    9 +-
- tests/test-qmp-cmds.c                              |   24 +
- scripts/qapi-gen.py                                |   10 +-
- scripts/qapi/commands.py                           |    4 +-
- scripts/qapi/common.py                             | 2377 ----------------=
-----
- scripts/qapi/doc.py                                |   14 +-
- scripts/qapi/error.py                              |   42 +
- scripts/qapi/events.py                             |    3 +
- scripts/qapi/expr.py                               |  382 ++++
- scripts/qapi/gen.py                                |  290 +++
- scripts/qapi/introspect.py                         |   12 +-
- scripts/qapi/parser.py                             |  569 +++++
- scripts/qapi/schema.py                             | 1056 +++++++++
- scripts/qapi/source.py                             |   67 +
- scripts/qapi/types.py                              |   61 +
- scripts/qapi/visit.py                              |    2 +
- tests/Makefile.include                             |   30 +-
- tests/qapi-schema/allow-preconfig-test.err         |    4 +-
- tests/qapi-schema/allow-preconfig-test.exit        |    1 -
- tests/qapi-schema/alternate-any.err                |    4 +-
- tests/qapi-schema/alternate-any.exit               |    1 -
- tests/qapi-schema/alternate-array.err              |    4 +-
- tests/qapi-schema/alternate-array.exit             |    1 -
- tests/qapi-schema/alternate-base.err               |    4 +-
- tests/qapi-schema/alternate-base.exit              |    1 -
- tests/qapi-schema/alternate-branch-if-invalid.err  |    4 +-
- tests/qapi-schema/alternate-branch-if-invalid.exit |    1 -
- tests/qapi-schema/alternate-clash.err              |    4 +-
- tests/qapi-schema/alternate-clash.exit             |    1 -
- .../qapi-schema/alternate-conflict-bool-string.err |    4 +-
- .../alternate-conflict-bool-string.exit            |    1 -
- tests/qapi-schema/alternate-conflict-dict.err      |    4 +-
- tests/qapi-schema/alternate-conflict-dict.exit     |    1 -
- tests/qapi-schema/alternate-conflict-enum-bool.err |    4 +-
- .../qapi-schema/alternate-conflict-enum-bool.exit  |    1 -
- tests/qapi-schema/alternate-conflict-enum-int.err  |    4 +-
- tests/qapi-schema/alternate-conflict-enum-int.exit |    1 -
- .../qapi-schema/alternate-conflict-num-string.err  |    4 +-
- .../qapi-schema/alternate-conflict-num-string.exit |    1 -
- tests/qapi-schema/alternate-conflict-string.err    |    4 +-
- tests/qapi-schema/alternate-conflict-string.exit   |    1 -
- tests/qapi-schema/alternate-empty.err              |    4 +-
- tests/qapi-schema/alternate-empty.exit             |    1 -
- tests/qapi-schema/alternate-invalid-dict.err       |    4 +-
- tests/qapi-schema/alternate-invalid-dict.exit      |    1 -
- tests/qapi-schema/alternate-nested.err             |    4 +-
- tests/qapi-schema/alternate-nested.exit            |    1 -
- tests/qapi-schema/alternate-unknown.err            |    4 +-
- tests/qapi-schema/alternate-unknown.exit           |    1 -
- tests/qapi-schema/args-alternate.err               |    4 +-
- tests/qapi-schema/args-alternate.exit              |    1 -
- tests/qapi-schema/args-any.err                     |    4 +-
- tests/qapi-schema/args-any.exit                    |    1 -
- tests/qapi-schema/args-array-empty.err             |    4 +-
- tests/qapi-schema/args-array-empty.exit            |    1 -
- tests/qapi-schema/args-array-unknown.err           |    4 +-
- tests/qapi-schema/args-array-unknown.exit          |    1 -
- tests/qapi-schema/args-bad-boxed.err               |    4 +-
- tests/qapi-schema/args-bad-boxed.exit              |    1 -
- tests/qapi-schema/args-boxed-anon.err              |    4 +-
- tests/qapi-schema/args-boxed-anon.exit             |    1 -
- tests/qapi-schema/args-boxed-string.err            |    4 +-
- tests/qapi-schema/args-boxed-string.exit           |    1 -
- tests/qapi-schema/args-int.err                     |    4 +-
- tests/qapi-schema/args-int.exit                    |    1 -
- tests/qapi-schema/args-invalid.err                 |    4 +-
- tests/qapi-schema/args-invalid.exit                |    1 -
- tests/qapi-schema/args-member-array-bad.err        |    4 +-
- tests/qapi-schema/args-member-array-bad.exit       |    1 -
- tests/qapi-schema/args-member-case.err             |    4 +-
- tests/qapi-schema/args-member-case.exit            |    1 -
- tests/qapi-schema/args-member-unknown.err          |    4 +-
- tests/qapi-schema/args-member-unknown.exit         |    1 -
- tests/qapi-schema/args-name-clash.err              |    4 +-
- tests/qapi-schema/args-name-clash.exit             |    1 -
- tests/qapi-schema/args-union.err                   |    4 +-
- tests/qapi-schema/args-union.exit                  |    1 -
- tests/qapi-schema/args-unknown.err                 |    4 +-
- tests/qapi-schema/args-unknown.exit                |    1 -
- tests/qapi-schema/bad-base.err                     |    4 +-
- tests/qapi-schema/bad-base.exit                    |    1 -
- tests/qapi-schema/bad-data.err                     |    4 +-
- tests/qapi-schema/bad-data.exit                    |    1 -
- tests/qapi-schema/bad-ident.err                    |    4 +-
- tests/qapi-schema/bad-ident.exit                   |    1 -
- tests/qapi-schema/bad-if-empty-list.err            |    4 +-
- tests/qapi-schema/bad-if-empty-list.exit           |    1 -
- tests/qapi-schema/bad-if-empty.err                 |    4 +-
- tests/qapi-schema/bad-if-empty.exit                |    1 -
- tests/qapi-schema/bad-if-list.err                  |    4 +-
- tests/qapi-schema/bad-if-list.exit                 |    1 -
- tests/qapi-schema/bad-if.err                       |    4 +-
- tests/qapi-schema/bad-if.exit                      |    1 -
- tests/qapi-schema/bad-type-bool.err                |    2 +-
- tests/qapi-schema/bad-type-bool.exit               |    1 -
- tests/qapi-schema/bad-type-dict.err                |    2 +-
- tests/qapi-schema/bad-type-dict.exit               |    1 -
- tests/qapi-schema/bad-type-int.err                 |    2 +-
- tests/qapi-schema/bad-type-int.exit                |    1 -
- tests/qapi-schema/base-cycle-direct.err            |    4 +-
- tests/qapi-schema/base-cycle-direct.exit           |    1 -
- tests/qapi-schema/base-cycle-indirect.err          |    4 +-
- tests/qapi-schema/base-cycle-indirect.exit         |    1 -
- tests/qapi-schema/command-int.err                  |    4 +-
- tests/qapi-schema/command-int.exit                 |    1 -
- tests/qapi-schema/comments.exit                    |    1 -
- tests/qapi-schema/doc-bad-alternate-member.err     |    2 +-
- tests/qapi-schema/doc-bad-alternate-member.exit    |    1 -
- tests/qapi-schema/doc-bad-command-arg.err          |    2 +-
- tests/qapi-schema/doc-bad-command-arg.exit         |    1 -
- tests/qapi-schema/doc-bad-section.exit             |    1 -
- tests/qapi-schema/doc-bad-symbol.err               |    4 +-
- tests/qapi-schema/doc-bad-symbol.exit              |    1 -
- tests/qapi-schema/doc-bad-union-member.err         |    2 +-
- tests/qapi-schema/doc-bad-union-member.exit        |    1 -
- tests/qapi-schema/doc-before-include.err           |    2 +-
- tests/qapi-schema/doc-before-include.exit          |    1 -
- tests/qapi-schema/doc-before-pragma.err            |    2 +-
- tests/qapi-schema/doc-before-pragma.exit           |    1 -
- tests/qapi-schema/doc-duplicated-arg.err           |    2 +-
- tests/qapi-schema/doc-duplicated-arg.exit          |    1 -
- tests/qapi-schema/doc-duplicated-return.err        |    2 +-
- tests/qapi-schema/doc-duplicated-return.exit       |    1 -
- tests/qapi-schema/doc-duplicated-since.err         |    2 +-
- tests/qapi-schema/doc-duplicated-since.exit        |    1 -
- tests/qapi-schema/doc-empty-arg.err                |    2 +-
- tests/qapi-schema/doc-empty-arg.exit               |    1 -
- tests/qapi-schema/doc-empty-section.err            |    2 +-
- tests/qapi-schema/doc-empty-section.exit           |    1 -
- tests/qapi-schema/doc-empty-symbol.err             |    2 +-
- tests/qapi-schema/doc-empty-symbol.exit            |    1 -
- tests/qapi-schema/doc-good.exit                    |    1 -
- tests/qapi-schema/doc-good.json                    |   17 +-
- tests/qapi-schema/doc-good.out                     |    9 +-
- tests/qapi-schema/doc-interleaved-section.err      |    2 +-
- tests/qapi-schema/doc-interleaved-section.exit     |    1 -
- tests/qapi-schema/doc-invalid-end.err              |    2 +-
- tests/qapi-schema/doc-invalid-end.exit             |    1 -
- tests/qapi-schema/doc-invalid-end2.err             |    2 +-
- tests/qapi-schema/doc-invalid-end2.exit            |    1 -
- tests/qapi-schema/doc-invalid-return.err           |    2 +-
- tests/qapi-schema/doc-invalid-return.exit          |    1 -
- tests/qapi-schema/doc-invalid-section.err          |    2 +-
- tests/qapi-schema/doc-invalid-section.exit         |    1 -
- tests/qapi-schema/doc-invalid-start.err            |    2 +-
- tests/qapi-schema/doc-invalid-start.exit           |    1 -
- tests/qapi-schema/doc-missing-colon.err            |    2 +-
- tests/qapi-schema/doc-missing-colon.exit           |    1 -
- tests/qapi-schema/doc-missing-expr.err             |    2 +-
- tests/qapi-schema/doc-missing-expr.exit            |    1 -
- tests/qapi-schema/doc-missing-space.err            |    2 +-
- tests/qapi-schema/doc-missing-space.exit           |    1 -
- tests/qapi-schema/doc-missing.err                  |    4 +-
- tests/qapi-schema/doc-missing.exit                 |    1 -
- tests/qapi-schema/doc-no-symbol.err                |    2 +-
- tests/qapi-schema/doc-no-symbol.exit               |    1 -
- tests/qapi-schema/double-type.err                  |    4 +-
- tests/qapi-schema/double-type.exit                 |    1 -
- tests/qapi-schema/duplicate-key.err                |    2 +-
- tests/qapi-schema/duplicate-key.exit               |    1 -
- tests/qapi-schema/empty.exit                       |    1 -
- tests/qapi-schema/enum-bad-member.err              |    4 +-
- tests/qapi-schema/enum-bad-member.exit             |    1 -
- tests/qapi-schema/enum-bad-name.err                |    4 +-
- tests/qapi-schema/enum-bad-name.exit               |    1 -
- tests/qapi-schema/enum-bad-prefix.err              |    4 +-
- tests/qapi-schema/enum-bad-prefix.exit             |    1 -
- tests/qapi-schema/enum-clash-member.err            |    4 +-
- tests/qapi-schema/enum-clash-member.exit           |    1 -
- tests/qapi-schema/enum-dict-member-unknown.err     |    4 +-
- tests/qapi-schema/enum-dict-member-unknown.exit    |    1 -
- tests/qapi-schema/enum-if-invalid.err              |    4 +-
- tests/qapi-schema/enum-if-invalid.exit             |    1 -
- tests/qapi-schema/enum-int-member.err              |    2 +-
- tests/qapi-schema/enum-int-member.exit             |    1 -
- tests/qapi-schema/enum-member-case.err             |    4 +-
- tests/qapi-schema/enum-member-case.exit            |    1 -
- tests/qapi-schema/enum-missing-data.err            |    4 +-
- tests/qapi-schema/enum-missing-data.exit           |    1 -
- tests/qapi-schema/enum-wrong-data.err              |    4 +-
- tests/qapi-schema/enum-wrong-data.exit             |    1 -
- tests/qapi-schema/escape-outside-string.err        |    2 +-
- tests/qapi-schema/event-boxed-empty.err            |    4 +-
- tests/qapi-schema/event-boxed-empty.exit           |    1 -
- tests/qapi-schema/event-case.exit                  |    1 -
- tests/qapi-schema/event-case.out                   |    2 +-
- tests/qapi-schema/event-member-invalid-dict.err    |    4 +-
- tests/qapi-schema/event-member-invalid-dict.exit   |    1 -
- tests/qapi-schema/event-nest-struct.err            |    4 +-
- tests/qapi-schema/event-nest-struct.exit           |    1 -
- tests/qapi-schema/features-bad-type.err            |    4 +-
- tests/qapi-schema/features-bad-type.exit           |    1 -
- tests/qapi-schema/features-duplicate-name.err      |    4 +-
- tests/qapi-schema/features-duplicate-name.exit     |    1 -
- tests/qapi-schema/features-if-invalid.err          |    4 +-
- tests/qapi-schema/features-if-invalid.exit         |    1 -
- tests/qapi-schema/features-missing-name.err        |    4 +-
- tests/qapi-schema/features-missing-name.exit       |    1 -
- tests/qapi-schema/features-name-bad-type.err       |    4 +-
- tests/qapi-schema/features-name-bad-type.exit      |    1 -
- tests/qapi-schema/features-no-list.err             |    4 +-
- tests/qapi-schema/features-no-list.exit            |    1 -
- tests/qapi-schema/features-unknown-key.err         |    4 +-
- tests/qapi-schema/features-unknown-key.exit        |    1 -
- tests/qapi-schema/flat-union-array-branch.err      |    4 +-
- tests/qapi-schema/flat-union-array-branch.exit     |    1 -
- tests/qapi-schema/flat-union-bad-base.err          |    4 +-
- tests/qapi-schema/flat-union-bad-base.exit         |    1 -
- tests/qapi-schema/flat-union-bad-discriminator.err |    4 +-
- .../qapi-schema/flat-union-bad-discriminator.exit  |    1 -
- tests/qapi-schema/flat-union-base-any.err          |    4 +-
- tests/qapi-schema/flat-union-base-any.exit         |    1 -
- tests/qapi-schema/flat-union-base-union.err        |    4 +-
- tests/qapi-schema/flat-union-base-union.exit       |    1 -
- tests/qapi-schema/flat-union-clash-member.err      |    4 +-
- tests/qapi-schema/flat-union-clash-member.exit     |    1 -
- .../flat-union-discriminator-bad-name.err          |    4 +-
- .../flat-union-discriminator-bad-name.exit         |    1 -
- tests/qapi-schema/flat-union-empty.err             |    4 +-
- tests/qapi-schema/flat-union-empty.exit            |    1 -
- .../qapi-schema/flat-union-inline-invalid-dict.err |    4 +-
- .../flat-union-inline-invalid-dict.exit            |    1 -
- tests/qapi-schema/flat-union-inline.err            |    4 +-
- tests/qapi-schema/flat-union-inline.exit           |    1 -
- tests/qapi-schema/flat-union-int-branch.err        |    4 +-
- tests/qapi-schema/flat-union-int-branch.exit       |    1 -
- .../qapi-schema/flat-union-invalid-branch-key.err  |    4 +-
- .../qapi-schema/flat-union-invalid-branch-key.exit |    1 -
- .../flat-union-invalid-discriminator.err           |    4 +-
- .../flat-union-invalid-discriminator.exit          |    1 -
- .../flat-union-invalid-if-discriminator.err        |    4 +-
- .../flat-union-invalid-if-discriminator.exit       |    1 -
- tests/qapi-schema/flat-union-no-base.err           |    4 +-
- tests/qapi-schema/flat-union-no-base.exit          |    1 -
- .../flat-union-optional-discriminator.err          |    4 +-
- .../flat-union-optional-discriminator.exit         |    1 -
- .../flat-union-string-discriminator.err            |    4 +-
- .../flat-union-string-discriminator.exit           |    1 -
- tests/qapi-schema/funny-char.err                   |    2 +-
- tests/qapi-schema/funny-char.exit                  |    1 -
- tests/qapi-schema/funny-word.err                   |    2 +-
- tests/qapi-schema/funny-word.exit                  |    1 -
- tests/qapi-schema/ident-with-escape.err            |    2 +-
- tests/qapi-schema/ident-with-escape.exit           |    1 -
- tests/qapi-schema/include-before-err.err           |    2 +-
- tests/qapi-schema/include-before-err.exit          |    1 -
- tests/qapi-schema/include-cycle.err                |    6 +-
- tests/qapi-schema/include-cycle.exit               |    1 -
- tests/qapi-schema/include-extra-junk.err           |    2 +-
- tests/qapi-schema/include-extra-junk.exit          |    1 -
- tests/qapi-schema/include-nested-err.err           |    4 +-
- tests/qapi-schema/include-nested-err.exit          |    1 -
- tests/qapi-schema/include-no-file.err              |    2 +-
- tests/qapi-schema/include-no-file.exit             |    1 -
- tests/qapi-schema/include-non-file.err             |    2 +-
- tests/qapi-schema/include-non-file.exit            |    1 -
- tests/qapi-schema/include-repetition.exit          |    1 -
- tests/qapi-schema/include-self-cycle.err           |    2 +-
- tests/qapi-schema/include-self-cycle.exit          |    1 -
- tests/qapi-schema/include-simple.exit              |    1 -
- tests/qapi-schema/indented-expr.exit               |    1 -
- tests/qapi-schema/indented-expr.out                |    4 +-
- tests/qapi-schema/leading-comma-list.err           |    2 +-
- tests/qapi-schema/leading-comma-list.exit          |    1 -
- tests/qapi-schema/leading-comma-object.err         |    2 +-
- tests/qapi-schema/leading-comma-object.exit        |    1 -
- tests/qapi-schema/missing-colon.err                |    2 +-
- tests/qapi-schema/missing-colon.exit               |    1 -
- tests/qapi-schema/missing-comma-list.err           |    2 +-
- tests/qapi-schema/missing-comma-list.exit          |    1 -
- tests/qapi-schema/missing-comma-object.err         |    2 +-
- tests/qapi-schema/missing-comma-object.exit        |    1 -
- tests/qapi-schema/missing-type.err                 |    2 +-
- tests/qapi-schema/missing-type.exit                |    1 -
- .../nested-struct-data-invalid-dict.err            |    4 +-
- .../nested-struct-data-invalid-dict.exit           |    1 -
- tests/qapi-schema/nested-struct-data.err           |    4 +-
- tests/qapi-schema/nested-struct-data.exit          |    1 -
- tests/qapi-schema/non-objects.err                  |    2 +-
- tests/qapi-schema/non-objects.exit                 |    1 -
- tests/qapi-schema/oob-test.err                     |    4 +-
- tests/qapi-schema/oob-test.exit                    |    1 -
- tests/qapi-schema/pragma-doc-required-crap.err     |    2 +-
- tests/qapi-schema/pragma-doc-required-crap.exit    |    1 -
- tests/qapi-schema/pragma-extra-junk.err            |    2 +-
- tests/qapi-schema/pragma-extra-junk.exit           |    1 -
- .../pragma-name-case-whitelist-crap.err            |    2 +-
- .../pragma-name-case-whitelist-crap.exit           |    1 -
- tests/qapi-schema/pragma-non-dict.err              |    2 +-
- tests/qapi-schema/pragma-non-dict.exit             |    1 -
- .../qapi-schema/pragma-returns-whitelist-crap.err  |    2 +-
- .../qapi-schema/pragma-returns-whitelist-crap.exit |    1 -
- tests/qapi-schema/pragma-unknown.err               |    2 +-
- tests/qapi-schema/pragma-unknown.exit              |    1 -
- tests/qapi-schema/qapi-schema-test.exit            |    1 -
- tests/qapi-schema/qapi-schema-test.json            |   18 +
- tests/qapi-schema/qapi-schema-test.out             |   75 +-
- tests/qapi-schema/quoted-structural-chars.err      |    2 +-
- tests/qapi-schema/quoted-structural-chars.exit     |    1 -
- tests/qapi-schema/redefined-builtin.err            |    4 +-
- tests/qapi-schema/redefined-builtin.exit           |    1 -
- tests/qapi-schema/redefined-command.err            |    8 +-
- tests/qapi-schema/redefined-command.exit           |    1 -
- tests/qapi-schema/redefined-event.err              |    8 +-
- tests/qapi-schema/redefined-event.exit             |    1 -
- tests/qapi-schema/redefined-type.err               |    8 +-
- tests/qapi-schema/redefined-type.exit              |    1 -
- tests/qapi-schema/reserved-command-q.err           |    4 +-
- tests/qapi-schema/reserved-command-q.exit          |    1 -
- tests/qapi-schema/reserved-enum-q.err              |    4 +-
- tests/qapi-schema/reserved-enum-q.exit             |    1 -
- tests/qapi-schema/reserved-member-has.err          |    4 +-
- tests/qapi-schema/reserved-member-has.exit         |    1 -
- tests/qapi-schema/reserved-member-q.err            |    4 +-
- tests/qapi-schema/reserved-member-q.exit           |    1 -
- tests/qapi-schema/reserved-member-u.err            |    4 +-
- tests/qapi-schema/reserved-member-u.exit           |    1 -
- tests/qapi-schema/reserved-member-underscore.err   |    4 +-
- tests/qapi-schema/reserved-member-underscore.exit  |    1 -
- tests/qapi-schema/reserved-type-kind.err           |    4 +-
- tests/qapi-schema/reserved-type-kind.exit          |    1 -
- tests/qapi-schema/reserved-type-list.err           |    4 +-
- tests/qapi-schema/reserved-type-list.exit          |    1 -
- tests/qapi-schema/returns-alternate.err            |    4 +-
- tests/qapi-schema/returns-alternate.exit           |    1 -
- tests/qapi-schema/returns-array-bad.err            |    4 +-
- tests/qapi-schema/returns-array-bad.exit           |    1 -
- tests/qapi-schema/returns-dict.err                 |    4 +-
- tests/qapi-schema/returns-dict.exit                |    1 -
- tests/qapi-schema/returns-unknown.err              |    4 +-
- tests/qapi-schema/returns-unknown.exit             |    1 -
- tests/qapi-schema/returns-whitelist.err            |    4 +-
- tests/qapi-schema/returns-whitelist.exit           |    1 -
- tests/qapi-schema/string-code-point-127.err        |    2 +-
- tests/qapi-schema/string-code-point-127.exit       |    1 -
- tests/qapi-schema/string-code-point-31.err         |    2 +-
- tests/qapi-schema/string-code-point-31.exit        |    1 -
- tests/qapi-schema/struct-base-clash-deep.err       |    4 +-
- tests/qapi-schema/struct-base-clash-deep.exit      |    1 -
- tests/qapi-schema/struct-base-clash.err            |    4 +-
- tests/qapi-schema/struct-base-clash.exit           |    1 -
- tests/qapi-schema/struct-data-invalid.err          |    4 +-
- tests/qapi-schema/struct-data-invalid.exit         |    1 -
- tests/qapi-schema/struct-member-if-invalid.err     |    4 +-
- tests/qapi-schema/struct-member-if-invalid.exit    |    1 -
- tests/qapi-schema/struct-member-invalid-dict.err   |    4 +-
- tests/qapi-schema/struct-member-invalid-dict.exit  |    1 -
- tests/qapi-schema/struct-member-invalid.err        |    4 +-
- tests/qapi-schema/struct-member-invalid.exit       |    1 -
- tests/qapi-schema/test-qapi.py                     |  145 +-
- tests/qapi-schema/trailing-comma-list.err          |    2 +-
- tests/qapi-schema/trailing-comma-list.exit         |    1 -
- tests/qapi-schema/trailing-comma-object.err        |    2 +-
- tests/qapi-schema/trailing-comma-object.exit       |    1 -
- tests/qapi-schema/type-bypass-bad-gen.err          |    4 +-
- tests/qapi-schema/type-bypass-bad-gen.exit         |    1 -
- tests/qapi-schema/unclosed-list.err                |    2 +-
- tests/qapi-schema/unclosed-list.exit               |    1 -
- tests/qapi-schema/unclosed-object.err              |    2 +-
- tests/qapi-schema/unclosed-object.exit             |    1 -
- tests/qapi-schema/unclosed-string.err              |    2 +-
- tests/qapi-schema/unclosed-string.exit             |    1 -
- tests/qapi-schema/union-base-empty.err             |    4 +-
- tests/qapi-schema/union-base-empty.exit            |    1 -
- tests/qapi-schema/union-base-no-discriminator.err  |    4 +-
- tests/qapi-schema/union-base-no-discriminator.exit |    1 -
- tests/qapi-schema/union-branch-case.err            |    4 +-
- tests/qapi-schema/union-branch-case.exit           |    1 -
- tests/qapi-schema/union-branch-if-invalid.err      |    4 +-
- tests/qapi-schema/union-branch-if-invalid.exit     |    1 -
- tests/qapi-schema/union-branch-invalid-dict.err    |    4 +-
- tests/qapi-schema/union-branch-invalid-dict.exit   |    1 -
- tests/qapi-schema/union-clash-branches.err         |    4 +-
- tests/qapi-schema/union-clash-branches.exit        |    1 -
- tests/qapi-schema/union-empty.err                  |    4 +-
- tests/qapi-schema/union-empty.exit                 |    1 -
- tests/qapi-schema/union-invalid-base.err           |    4 +-
- tests/qapi-schema/union-invalid-base.exit          |    1 -
- tests/qapi-schema/union-optional-branch.err        |    4 +-
- tests/qapi-schema/union-optional-branch.exit       |    1 -
- tests/qapi-schema/union-unknown.err                |    4 +-
- tests/qapi-schema/union-unknown.exit               |    1 -
- tests/qapi-schema/unknown-escape.err               |    2 +-
- tests/qapi-schema/unknown-escape.exit              |    1 -
- tests/qapi-schema/unknown-expr-key.err             |    4 +-
- tests/qapi-schema/unknown-expr-key.exit            |    1 -
- 390 files changed, 3108 insertions(+), 2958 deletions(-)
- mode change 100755 =3D> 100644 scripts/qapi/doc.py
- create mode 100644 scripts/qapi/error.py
- create mode 100644 scripts/qapi/expr.py
- create mode 100644 scripts/qapi/gen.py
- create mode 100644 scripts/qapi/parser.py
- create mode 100644 scripts/qapi/schema.py
- create mode 100644 scripts/qapi/source.py
- delete mode 100644 tests/qapi-schema/allow-preconfig-test.exit
- delete mode 100644 tests/qapi-schema/alternate-any.exit
- delete mode 100644 tests/qapi-schema/alternate-array.exit
- delete mode 100644 tests/qapi-schema/alternate-base.exit
- delete mode 100644 tests/qapi-schema/alternate-branch-if-invalid.exit
- delete mode 100644 tests/qapi-schema/alternate-clash.exit
- delete mode 100644 tests/qapi-schema/alternate-conflict-bool-string.exit
- delete mode 100644 tests/qapi-schema/alternate-conflict-dict.exit
- delete mode 100644 tests/qapi-schema/alternate-conflict-enum-bool.exit
- delete mode 100644 tests/qapi-schema/alternate-conflict-enum-int.exit
- delete mode 100644 tests/qapi-schema/alternate-conflict-num-string.exit
- delete mode 100644 tests/qapi-schema/alternate-conflict-string.exit
- delete mode 100644 tests/qapi-schema/alternate-empty.exit
- delete mode 100644 tests/qapi-schema/alternate-invalid-dict.exit
- delete mode 100644 tests/qapi-schema/alternate-nested.exit
- delete mode 100644 tests/qapi-schema/alternate-unknown.exit
- delete mode 100644 tests/qapi-schema/args-alternate.exit
- delete mode 100644 tests/qapi-schema/args-any.exit
- delete mode 100644 tests/qapi-schema/args-array-empty.exit
- delete mode 100644 tests/qapi-schema/args-array-unknown.exit
- delete mode 100644 tests/qapi-schema/args-bad-boxed.exit
- delete mode 100644 tests/qapi-schema/args-boxed-anon.exit
- delete mode 100644 tests/qapi-schema/args-boxed-string.exit
- delete mode 100644 tests/qapi-schema/args-int.exit
- delete mode 100644 tests/qapi-schema/args-invalid.exit
- delete mode 100644 tests/qapi-schema/args-member-array-bad.exit
- delete mode 100644 tests/qapi-schema/args-member-case.exit
- delete mode 100644 tests/qapi-schema/args-member-unknown.exit
- delete mode 100644 tests/qapi-schema/args-name-clash.exit
- delete mode 100644 tests/qapi-schema/args-union.exit
- delete mode 100644 tests/qapi-schema/args-unknown.exit
- delete mode 100644 tests/qapi-schema/bad-base.exit
- delete mode 100644 tests/qapi-schema/bad-data.exit
- delete mode 100644 tests/qapi-schema/bad-ident.exit
- delete mode 100644 tests/qapi-schema/bad-if-empty-list.exit
- delete mode 100644 tests/qapi-schema/bad-if-empty.exit
- delete mode 100644 tests/qapi-schema/bad-if-list.exit
- delete mode 100644 tests/qapi-schema/bad-if.exit
- delete mode 100644 tests/qapi-schema/bad-type-bool.exit
- delete mode 100644 tests/qapi-schema/bad-type-dict.exit
- delete mode 100644 tests/qapi-schema/bad-type-int.exit
- delete mode 100644 tests/qapi-schema/base-cycle-direct.exit
- delete mode 100644 tests/qapi-schema/base-cycle-indirect.exit
- delete mode 100644 tests/qapi-schema/command-int.exit
- delete mode 100644 tests/qapi-schema/comments.exit
- delete mode 100644 tests/qapi-schema/doc-bad-alternate-member.exit
- delete mode 100644 tests/qapi-schema/doc-bad-command-arg.exit
- delete mode 100644 tests/qapi-schema/doc-bad-section.exit
- delete mode 100644 tests/qapi-schema/doc-bad-symbol.exit
- delete mode 100644 tests/qapi-schema/doc-bad-union-member.exit
- delete mode 100644 tests/qapi-schema/doc-before-include.exit
- delete mode 100644 tests/qapi-schema/doc-before-pragma.exit
- delete mode 100644 tests/qapi-schema/doc-duplicated-arg.exit
- delete mode 100644 tests/qapi-schema/doc-duplicated-return.exit
- delete mode 100644 tests/qapi-schema/doc-duplicated-since.exit
- delete mode 100644 tests/qapi-schema/doc-empty-arg.exit
- delete mode 100644 tests/qapi-schema/doc-empty-section.exit
- delete mode 100644 tests/qapi-schema/doc-empty-symbol.exit
- delete mode 100644 tests/qapi-schema/doc-good.exit
- delete mode 100644 tests/qapi-schema/doc-interleaved-section.exit
- delete mode 100644 tests/qapi-schema/doc-invalid-end.exit
- delete mode 100644 tests/qapi-schema/doc-invalid-end2.exit
- delete mode 100644 tests/qapi-schema/doc-invalid-return.exit
- delete mode 100644 tests/qapi-schema/doc-invalid-section.exit
- delete mode 100644 tests/qapi-schema/doc-invalid-start.exit
- delete mode 100644 tests/qapi-schema/doc-missing-colon.exit
- delete mode 100644 tests/qapi-schema/doc-missing-expr.exit
- delete mode 100644 tests/qapi-schema/doc-missing-space.exit
- delete mode 100644 tests/qapi-schema/doc-missing.exit
- delete mode 100644 tests/qapi-schema/doc-no-symbol.exit
- delete mode 100644 tests/qapi-schema/double-type.exit
- delete mode 100644 tests/qapi-schema/duplicate-key.exit
- delete mode 100644 tests/qapi-schema/empty.exit
- delete mode 100644 tests/qapi-schema/enum-bad-member.exit
- delete mode 100644 tests/qapi-schema/enum-bad-name.exit
- delete mode 100644 tests/qapi-schema/enum-bad-prefix.exit
- delete mode 100644 tests/qapi-schema/enum-clash-member.exit
- delete mode 100644 tests/qapi-schema/enum-dict-member-unknown.exit
- delete mode 100644 tests/qapi-schema/enum-if-invalid.exit
- delete mode 100644 tests/qapi-schema/enum-int-member.exit
- delete mode 100644 tests/qapi-schema/enum-member-case.exit
- delete mode 100644 tests/qapi-schema/enum-missing-data.exit
- delete mode 100644 tests/qapi-schema/enum-wrong-data.exit
- delete mode 100644 tests/qapi-schema/event-boxed-empty.exit
- delete mode 100644 tests/qapi-schema/event-case.exit
- delete mode 100644 tests/qapi-schema/event-member-invalid-dict.exit
- delete mode 100644 tests/qapi-schema/event-nest-struct.exit
- delete mode 100644 tests/qapi-schema/features-bad-type.exit
- delete mode 100644 tests/qapi-schema/features-duplicate-name.exit
- delete mode 100644 tests/qapi-schema/features-if-invalid.exit
- delete mode 100644 tests/qapi-schema/features-missing-name.exit
- delete mode 100644 tests/qapi-schema/features-name-bad-type.exit
- delete mode 100644 tests/qapi-schema/features-no-list.exit
- delete mode 100644 tests/qapi-schema/features-unknown-key.exit
- delete mode 100644 tests/qapi-schema/flat-union-array-branch.exit
- delete mode 100644 tests/qapi-schema/flat-union-bad-base.exit
- delete mode 100644 tests/qapi-schema/flat-union-bad-discriminator.exit
- delete mode 100644 tests/qapi-schema/flat-union-base-any.exit
- delete mode 100644 tests/qapi-schema/flat-union-base-union.exit
- delete mode 100644 tests/qapi-schema/flat-union-clash-member.exit
- delete mode 100644 tests/qapi-schema/flat-union-discriminator-bad-name.exi=
-t
- delete mode 100644 tests/qapi-schema/flat-union-empty.exit
- delete mode 100644 tests/qapi-schema/flat-union-inline-invalid-dict.exit
- delete mode 100644 tests/qapi-schema/flat-union-inline.exit
- delete mode 100644 tests/qapi-schema/flat-union-int-branch.exit
- delete mode 100644 tests/qapi-schema/flat-union-invalid-branch-key.exit
- delete mode 100644 tests/qapi-schema/flat-union-invalid-discriminator.exit
- delete mode 100644 tests/qapi-schema/flat-union-invalid-if-discriminator.e=
-xit
- delete mode 100644 tests/qapi-schema/flat-union-no-base.exit
- delete mode 100644 tests/qapi-schema/flat-union-optional-discriminator.exi=
-t
- delete mode 100644 tests/qapi-schema/flat-union-string-discriminator.exit
- delete mode 100644 tests/qapi-schema/funny-char.exit
- delete mode 100644 tests/qapi-schema/funny-word.exit
- delete mode 100644 tests/qapi-schema/ident-with-escape.exit
- delete mode 100644 tests/qapi-schema/include-before-err.exit
- delete mode 100644 tests/qapi-schema/include-cycle.exit
- delete mode 100644 tests/qapi-schema/include-extra-junk.exit
- delete mode 100644 tests/qapi-schema/include-nested-err.exit
- delete mode 100644 tests/qapi-schema/include-no-file.exit
- delete mode 100644 tests/qapi-schema/include-non-file.exit
- delete mode 100644 tests/qapi-schema/include-repetition.exit
- delete mode 100644 tests/qapi-schema/include-self-cycle.exit
- delete mode 100644 tests/qapi-schema/include-simple.exit
- delete mode 100644 tests/qapi-schema/indented-expr.exit
- delete mode 100644 tests/qapi-schema/leading-comma-list.exit
- delete mode 100644 tests/qapi-schema/leading-comma-object.exit
- delete mode 100644 tests/qapi-schema/missing-colon.exit
- delete mode 100644 tests/qapi-schema/missing-comma-list.exit
- delete mode 100644 tests/qapi-schema/missing-comma-object.exit
- delete mode 100644 tests/qapi-schema/missing-type.exit
- delete mode 100644 tests/qapi-schema/nested-struct-data-invalid-dict.exit
- delete mode 100644 tests/qapi-schema/nested-struct-data.exit
- delete mode 100644 tests/qapi-schema/non-objects.exit
- delete mode 100644 tests/qapi-schema/oob-test.exit
- delete mode 100644 tests/qapi-schema/pragma-doc-required-crap.exit
- delete mode 100644 tests/qapi-schema/pragma-extra-junk.exit
- delete mode 100644 tests/qapi-schema/pragma-name-case-whitelist-crap.exit
- delete mode 100644 tests/qapi-schema/pragma-non-dict.exit
- delete mode 100644 tests/qapi-schema/pragma-returns-whitelist-crap.exit
- delete mode 100644 tests/qapi-schema/pragma-unknown.exit
- delete mode 100644 tests/qapi-schema/qapi-schema-test.exit
- delete mode 100644 tests/qapi-schema/quoted-structural-chars.exit
- delete mode 100644 tests/qapi-schema/redefined-builtin.exit
- delete mode 100644 tests/qapi-schema/redefined-command.exit
- delete mode 100644 tests/qapi-schema/redefined-event.exit
- delete mode 100644 tests/qapi-schema/redefined-type.exit
- delete mode 100644 tests/qapi-schema/reserved-command-q.exit
- delete mode 100644 tests/qapi-schema/reserved-enum-q.exit
- delete mode 100644 tests/qapi-schema/reserved-member-has.exit
- delete mode 100644 tests/qapi-schema/reserved-member-q.exit
- delete mode 100644 tests/qapi-schema/reserved-member-u.exit
- delete mode 100644 tests/qapi-schema/reserved-member-underscore.exit
- delete mode 100644 tests/qapi-schema/reserved-type-kind.exit
- delete mode 100644 tests/qapi-schema/reserved-type-list.exit
- delete mode 100644 tests/qapi-schema/returns-alternate.exit
- delete mode 100644 tests/qapi-schema/returns-array-bad.exit
- delete mode 100644 tests/qapi-schema/returns-dict.exit
- delete mode 100644 tests/qapi-schema/returns-unknown.exit
- delete mode 100644 tests/qapi-schema/returns-whitelist.exit
- delete mode 100644 tests/qapi-schema/string-code-point-127.exit
- delete mode 100644 tests/qapi-schema/string-code-point-31.exit
- delete mode 100644 tests/qapi-schema/struct-base-clash-deep.exit
- delete mode 100644 tests/qapi-schema/struct-base-clash.exit
- delete mode 100644 tests/qapi-schema/struct-data-invalid.exit
- delete mode 100644 tests/qapi-schema/struct-member-if-invalid.exit
- delete mode 100644 tests/qapi-schema/struct-member-invalid-dict.exit
- delete mode 100644 tests/qapi-schema/struct-member-invalid.exit
- mode change 100644 =3D> 100755 tests/qapi-schema/test-qapi.py
- delete mode 100644 tests/qapi-schema/trailing-comma-list.exit
- delete mode 100644 tests/qapi-schema/trailing-comma-object.exit
- delete mode 100644 tests/qapi-schema/type-bypass-bad-gen.exit
- delete mode 100644 tests/qapi-schema/unclosed-list.exit
- delete mode 100644 tests/qapi-schema/unclosed-object.exit
- delete mode 100644 tests/qapi-schema/unclosed-string.exit
- delete mode 100644 tests/qapi-schema/union-base-empty.exit
- delete mode 100644 tests/qapi-schema/union-base-no-discriminator.exit
- delete mode 100644 tests/qapi-schema/union-branch-case.exit
- delete mode 100644 tests/qapi-schema/union-branch-if-invalid.exit
- delete mode 100644 tests/qapi-schema/union-branch-invalid-dict.exit
- delete mode 100644 tests/qapi-schema/union-clash-branches.exit
- delete mode 100644 tests/qapi-schema/union-empty.exit
- delete mode 100644 tests/qapi-schema/union-invalid-base.exit
- delete mode 100644 tests/qapi-schema/union-optional-branch.exit
- delete mode 100644 tests/qapi-schema/union-unknown.exit
- delete mode 100644 tests/qapi-schema/unknown-escape.exit
- delete mode 100644 tests/qapi-schema/unknown-expr-key.exit
-
---=20
-2.21.0
-
+MjIuMTAuMjAxOSAxNDozMSwgTWF4IFJlaXR6IHdyb3RlOg0KPiBPbiAyMi4xMC4xOSAxMjo0Niwg
+VmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSB3cm90ZToNCj4+IDIyLjEwLjIwMTkgMTM6MjEs
+IEFuZHJleSBTaGlua2V2aWNoIHdyb3RlOg0KPj4+DQo+Pj4gT24gMjIvMTAvMjAxOSAxMjoyOCwg
+TWF4IFJlaXR6IHdyb3RlOg0KPj4+PiBPbiAyMC4xMC4xOSAyMjozNywgQW5kcmV5IFNoaW5rZXZp
+Y2ggd3JvdGU6DQo+Pj4+PiBUbyBpbmZvcm0gdGhlIGJsb2NrIGxheWVyIGFib3V0IHdyaXRpbmcg
+YWxsIHRoZSBkYXRhIGNvbXByZXNzZWQsIHdlDQo+Pj4+PiBpbnRyb2R1Y2UgdGhlICdjb21wcmVz
+cycgY29tbWFuZCBsaW5lIG9wdGlvbi4gQmFzZWQgb24gdGhhdCBvcHRpb24sIHRoZQ0KPj4+Pj4g
+d3JpdHRlbiBkYXRhIHdpbGwgYmUgYWxpZ25lZCBieSB0aGUgY2x1c3RlciBzaXplIGF0IHRoZSBn
+ZW5lcmljIGxheWVyLg0KPj4+Pj4NCj4+Pj4+IFN1Z2dlc3RlZC1ieTogUm9tYW4gS2FnYW4gPHJr
+YWdhbkB2aXJ0dW96em8uY29tPg0KPj4+Pj4gU3VnZ2VzdGVkLWJ5OiBWbGFkaW1pciBTZW1lbnRz
+b3YtT2dpZXZza2l5IDx2c2VtZW50c292QHZpcnR1b3p6by5jb20+DQo+Pj4+PiBTaWduZWQtb2Zm
+LWJ5OiBBbmRyZXkgU2hpbmtldmljaCA8YW5kcmV5LnNoaW5rZXZpY2hAdmlydHVvenpvLmNvbT4N
+Cj4+Pj4+IFJldmlld2VkLWJ5OiBWbGFkaW1pciBTZW1lbnRzb3YtT2dpZXZza2l5IDx2c2VtZW50
+c292QHZpcnR1b3p6by5jb20+DQo+Pj4+PiAtLS0NCj4+Pj4+ICAgICBibG9jay5jICAgICAgICAg
+ICAgICAgICAgIHwgMjAgKysrKysrKysrKysrKysrKysrKy0NCj4+Pj4+ICAgICBibG9jay9pby5j
+ICAgICAgICAgICAgICAgIHwgMTMgKysrKysrKysrLS0tLQ0KPj4+Pj4gICAgIGJsb2NrL3Fjb3cy
+LmMgICAgICAgICAgICAgfCAgNCArKysrDQo+Pj4+PiAgICAgYmxvY2tkZXYuYyAgICAgICAgICAg
+ICAgICB8ICA5ICsrKysrKysrLQ0KPj4+Pj4gICAgIGluY2x1ZGUvYmxvY2svYmxvY2suaCAgICAg
+fCAgMSArDQo+Pj4+PiAgICAgaW5jbHVkZS9ibG9jay9ibG9ja19pbnQuaCB8ICAyICsrDQo+Pj4+
+PiAgICAgcWFwaS9ibG9jay1jb3JlLmpzb24gICAgICB8ICA1ICsrKystDQo+Pj4+PiAgICAgcWVt
+dS1vcHRpb25zLmh4ICAgICAgICAgICB8ICA2ICsrKystLQ0KPj4+Pj4gICAgIDggZmlsZXMgY2hh
+bmdlZCwgNTEgaW5zZXJ0aW9ucygrKSwgOSBkZWxldGlvbnMoLSkNCj4+Pj4NCj4+Pj4gVGhlIHBy
+b2JsZW0gd2l0aCBjb21wcmVzc2lvbiBpcyB0aGF0IHRoZXJlIGFyZSBzdWNoIHRpZ2h0IGNvbnN0
+cmFpbnRzIG9uDQo+Pj4+IGl0IHRoYXQgaXQgY2FuIHJlYWxseSBvbmx5IHdvcmsgZm9yIHZlcnkg
+ZGVmaW5lZCB1c2UgY2FzZXMuICBUaG9zZQ0KPj4+PiBjb25zdHJhaW50cyBhcmU6DQo+Pj4+DQo+
+Pj4+IC0gT25seSB3cml0ZSB3aG9sZSBjbHVzdGVycywNCj4+Pj4gLSBDbHVzdGVycyBjYW4gYmUg
+d3JpdHRlbiB0byBvbmx5IG9uY2UuDQo+Pj4+DQo+Pj4+IFRoZSBmaXJzdCBwb2ludCBpcyBhZGRy
+ZXNzZWQgaW4gdGhpcyBwYXRjaCBieSBzZXR0aW5nIHJlcXVlc3RfYWxpZ25tZW50Lg0KPj4+PiAg
+ICAgQnV0IEkgZG9u4oCZdCBzZWUgaG93IHRoZSBzZWNvbmQgb25lIGNhbiBiZSBhZGRyZXNzZWQu
+ICBXZWxsLCBtYXliZSBieQ0KPj4+PiBhbGxvd2luZyBpdCBpbiBhbGwgZHJpdmVycyB0aGF0IHN1
+cHBvcnQgY29tcHJlc3Npb24uICBCdXQgaWYgSSBqdXN0IGxvb2sNCj4+Pj4gYXQgcWNvdzIsIHRo
+YXQgaXNu4oCZdCBnb2luZyB0byBiZSB0cml2aWFsOiBZb3UgbmVlZCB0byBhbGxvY2F0ZSBhDQo+
+Pj4+IGNvbXBsZXRlbHkgbmV3IGNsdXN0ZXIgd2hlcmUgeW91IHdyaXRlIHRoZSBkYXRhIChpbiBj
+YXNlIGl0IGdyb3dzKSwgYW5kDQo+Pj4+IHRodXMgeW91IGxlYXZlIGJlaGluZCBhIGhvbGUsIHdo
+aWNoIGtpbmQgb2YgZGVmZWF0cyB0aGUgcHVycG9zZSBvZg0KPj4+PiBjb21wcmVzc2lvbi4NCj4+
+Pj4NCj4+Pj4gKEZvciBkZW1vbnN0cmF0aW9uOg0KPj4+Pg0KPj4+PiAkIC4vcWVtdS1pbWcgY3Jl
+YXRlIC1mIHFjb3cyIHRlc3QucWNvdzIgNjRNDQo+Pj4+IEZvcm1hdHRpbmcgJ3Rlc3QucWNvdzIn
+LCBmbXQ9cWNvdzIgc2l6ZT02NzEwODg2NCBjbHVzdGVyX3NpemU9NjU1MzYNCj4+Pj4gbGF6eV9y
+ZWZjb3VudHM9b2ZmIHJlZmNvdW50X2JpdHM9MTYNCj4+Pj4gJCB4ODZfNjQtc29mdG1tdS9xZW11
+LXN5c3RlbS14ODZfNjQgXA0KPj4+PiAgICAgICAgLWJsb2NrZGV2ICJ7J25vZGUtbmFtZSc6ICdk
+cnYwJywgJ2RyaXZlcic6ICdxY293MicsDQo+Pj4+ICAgICAgICAgICAgICAgICAgICAnY29tcHJl
+c3MnOiB0cnVlLA0KPj4+PiAgICAgICAgICAgICAgICAgICAgJ2ZpbGUnOiB7J2RyaXZlcic6ICdm
+aWxlJywgJ2ZpbGVuYW1lJzogJ3Rlc3QucWNvdzInfX0iIFwNCj4+Pj4gICAgICAgIC1tb25pdG9y
+IHN0ZGlvDQo+Pj4+IFFFTVUgNC4xLjUwIG1vbml0b3IgLSB0eXBlICdoZWxwJyBmb3IgbW9yZSBp
+bmZvcm1hdGlvbg0KPj4+PiAocWVtdSkgcWVtdS1pbyBkcnYwICJ3cml0ZSAtUCA0MiAwIDY0ayIN
+Cj4+Pj4gd3JvdGUgNjU1MzYvNjU1MzYgYnl0ZXMgYXQgb2Zmc2V0IDANCj4+Pj4gNjQgS2lCLCAx
+IG9wczsgMDAuMDIgc2VjICg0LjA1NSBNaUIvc2VjIGFuZCA2NC44NzkzIG9wcy9zZWMpDQo+Pj4+
+IChxZW11KSBxZW11LWlvIGRydjAgIndyaXRlIC1QIDIzIDAgNjRrIg0KPj4+PiB3cml0ZSBmYWls
+ZWQ6IElucHV0L291dHB1dCBlcnJvcg0KPj4+Pg0KPj4+PiApDQo+Pj4+DQo+Pj4+IENvbXByZXNz
+aW9uIHJlYWxseSBvbmx5IHdvcmtzIHdoZW4geW91IGZ1bGx5IHdyaXRlIGFsbCBvZiBhbiBpbWFn
+ZQ0KPj4+PiBleGFjdGx5IG9uY2U7IGkuZS4gYXMgdGhlIHFlbXUtaW1nIGNvbnZlcnQgb3IgYXMg
+YSBiYWNrdXAgdGFyZ2V0LiAgRm9yDQo+Pj4+IGJvdGggY2FzZXMgd2UgYWxyZWFkeSBoYXZlIGEg
+Y29tcHJlc3Npb24gb3B0aW9uLiAgU28gSeKAmW0gd29uZGVyaW5nIHdoZXJlDQo+Pj4+IHRoaXMg
+bmV3IG9wdGlvbiBpcyByZWFsbHkgdXNlZnVsLg0KPj4+Pg0KPj4+PiAoWW91IGRvIGFkZCBhIHRl
+c3QgZm9yIHN0cmVhbSwgYnV0IEkgZG9u4oCZdCBrbm93IHdoZXRoZXIgdGhhdOKAmXMgcmVhbGx5
+IGENCj4+Pj4gZ29vZCBleGFtcGxlLCBzZWUgbXkgcmVzcG9uc2UgdGhlcmUuKQ0KPj4+Pg0KPj4+
+PiBNYXgNCj4+Pj4NCj4+Pg0KPj4+IFRoYW5rIHlvdSB2ZXJ5IG11Y2ggTWF4IGZvciB5b3VyIGRl
+dGFpbGVkIHJlc3BvbnNlLg0KPj4+DQo+Pj4gMSkgWW91IGFyZSByaWdodCB0aGF0IGNvbXByZXNz
+aW9uIGlzIHVzZWQgd2l0aCB0aGUgYmFja3VwIG1vc3RseS4gVGhlDQo+Pj4gb3B0aW9uIGZvciB0
+aGUgY29tcHJlc3Npb24gd2l0aCBiYWNrdXAgd291bGQgYmUgcmVwbGFjZWQgYnkgdXNhZ2UgYXQg
+dGhlDQo+Pj4gYmxvY2sgbGF5ZXIsIHdpdGggbm8gZHVwbGljYXRpb24uIEFsc28sIGl0IGNhbiBi
+ZSB1c2VmdWwgZm9yIE5CRCBmb3INCj4+PiBpbnN0YW5jZSwNCj4+Pg0KPj4+ICQgLi9xZW11LWlt
+ZyBjcmVhdGUgLWYgcWNvdzIgLW8gc2l6ZT0xMEcgLi9pbWFnZS5xY293Mg0KPj4+ICQgc3VkbyAu
+L3FlbXUtbmJkIC1jIC9kZXYvbmJkMCAuL2ltYWdlLnFjb3cyDQo+Pj4gJCBzdWRvIGRkIGlmPS9k
+ZXYvc2RhMSBvZj0vZGV2L25iZDAgYnM9MTBNIGNvdW50PTEwDQo+Pj4gMTArMCByZWNvcmRzIGlu
+DQo+Pj4gMTArMCByZWNvcmRzIG91dA0KPj4+IDEwNDg1NzYwMCBieXRlcyAoMTA1IE1CKSBjb3Bp
+ZWQsIDAsMDg5MDU4MSBzLCAxLDIgR0Ivcw0KPj4+ICQgc3VkbyAuL3FlbXUtbmJkIC1kIC9kZXYv
+bmJkMA0KPj4+ICQgZHUgLXNoIC4vaW1hZ2UucWNvdzINCj4+PiAxMDFNICAgIC4vaW1hZ2UucWNv
+dzINCj4+Pg0KPj4+IGFuZCB3aXRoIHRoZSBjb21wcmVzc2lvbg0KPj4+DQo+Pj4gJCAuL3FlbXUt
+aW1nIGNyZWF0ZSAtZiBxY293MiAtbyBzaXplPTEwRyAuL2ltYWdlLnFjb3cyDQo+Pj4gJCBzdWRv
+IC4vcWVtdS1uYmQgLUMgLWMgL2Rldi9uYmQwIC4vaW1hZ2UucWNvdzINCj4+PiAkIHN1ZG8gZGQg
+aWY9L2Rldi9zZGExIG9mPS9kZXYvbmJkMCBicz0xME0gY291bnQ9MTANCj4+PiAxMCswIHJlY29y
+ZHMgaW4NCj4+PiAxMCswIHJlY29yZHMgb3V0DQo+Pj4gMTA0ODU3NjAwIGJ5dGVzICgxMDUgTUIp
+IGNvcGllZCwgMCwwNzYwNDYgcywgMSw0IEdCL3MNCj4+PiAkIHN1ZG8gLi9xZW11LW5iZCAtZCAv
+ZGV2L25iZDANCj4+PiAkIGR1IC1zaCAuL2ltYWdlLnFjb3cyDQo+Pj4gNSwzTSAgICAuL2ltYWdl
+LnFjb3cyDQo+IA0KPiBUaGF0IHNlZW1zIHdyb25nIHRvIG1lLiAgV2h5IG5vdCB1c2UgcWVtdS1p
+bWcgY29udmVydCBmb3IgdGhpcyBjYXNlPw0KPiANCj4gQXR0YWNoaW5nIGFuIE5CRCBzZXJ2ZXIg
+dG8gYSBjb21wcmVzc2VkIGRpc2sgaGFzIGV4YWN0bHkgdGhlIHNhbWUNCj4gcHJvYmxlbSBhcyBh
+dHRhY2hpbmcgYSBjb21wcmVzc2VkIGRpc2sgdG8gYSBWTS4gIEl0IHdvbuKAmXQgd29yayB1bmxl
+c3MNCj4gdGhlIGNsaWVudC9ndWVzdCBpcyBhd2FyZSBvZiB0aGUgbGltaXRhdGlvbnMuDQo+IA0K
+Pj4+IFRoZSBpZGVhIGJlaGluZCBpbnRyb2R1Y2luZyB0aGUgbmV3ICdjb21wcmVzcycgb3B0aW9u
+IGlzIHRvIHVzZSB0aGF0DQo+Pj4gb25seSBvbmUgaW5zdGVhZCBvZiBtYW55IG90aGVyIG9uZXMg
+b2Ygc3VjaCBhIGtpbmQuDQo+Pj4NCj4+PiAyKSBZb3UgYXJlIHJpZ2h0IGFsc28gdGhhdCAiQ29t
+cHJlc3Npb24gY2FuJ3Qgb3ZlcndyaXRlIGFueXRoaW5nLi4uIg0KPj4+IEl0IGNhbiBiZSBzZWVu
+IGluIHRoZSBjb21taXQgbWVzc2FnZQ0KPj4+IGIwYjY4NjJlNWUxYTEzOTRlMGFiM2Q1ZGE5NGJh
+OGIwZGE4NjY0ZTINCj4+Pg0KPj4+IEkgYW0gbm90IHN1cmUgaWYgZGF0YSBzaG91bGQgYmUgd3Jp
+dHRlbiBjb21wcmVzc2VkIHRvIHRoZSBhY3RpdmUgbGF5ZXIuDQo+Pj4gSSBtYWRlIHRoZSB0ZXN0
+cyB3aXRoIHRoZSBpZGVhIG9mIGJyaW5naW5nIGV4YW1wbGVzIG9mIHVzYWdlIHRoZQ0KPj4+ICdj
+b21wcmVzcycgb3B0aW9uIGJlY2F1c2UgcGFzc2luZyBhbiBvcHRpb24gaXMgYSB0cmlja3kgdGhp
+bmcgaW4gUUVNVS4NCj4+PiBCdXQgdGhlIGlzc3VlIHRha2VzIHBsYWNlIGFueXdheSBpZiB3ZSB3
+YW50IHRvIHJld3JpdGUgdG8gYWxsb2NhdGVkDQo+Pj4gY2x1c3RlcnMuDQo+Pj4gSSB3b3VsZCBs
+aWtlIHRvIGludmVzdGlnYXRlIHRoZSBtYXR0ZXIgYW5kIG1ha2UgYSBwYXRjaCB0aGF0IHJlc29s
+dmVzDQo+Pj4gdGhhdCBpc3N1ZS4NCj4+PiBEbyB5b3UgYWdyZWUgd2l0aCB0aGF0Pw0KPiANCj4g
+V2hhdCBzZWVtcyB3cm9uZyB0byBtZSBpcyB0aGF0IHRoaXMgc2VyaWVzIGp1c3QgYWRkcyBhIGdl
+bmVyaWMgY29tcHJlc3MNCj4gb3B0aW9uIHdpdGhvdXQgZW5zdXJpbmcgdGhhdCBpdCB3b3JrcyBn
+ZW5lcmljYWxseS4NCj4gDQo+IEVpdGhlciAoMSkgaXQgb25seSB3b3JrcyBpbiB3ZWxsLWRlZmlu
+ZWQgY2FzZXMsIHRoZW4gZWl0aGVyICgxQSkgd2UgaGF2ZQ0KPiB0byBlbnN1cmUgdGhhdCB3ZSBv
+bmx5IGFsbG93IGl0IHRoZW4gKGFzIHdlIGRvIG5vdywgYmVjYXVzZSBvbmx5DQo+IHFlbXUtaW1n
+IGNvbnZlcnQgYW5kIHRoZSBiYWNrdXAgam9iIGhhdmUgc3VjaCBhbiBvcHRpb247IGFuZCB0aG9z
+ZSB0d28NCj4gYXJlIHNhZmUpLCBvciAoMUIpIHdlIGhhdmUgdG8gY2xlYXJseSBnaXZlIGEgYmln
+IHdhcm5pbmcgZm9yIHRoZSBuZXcNCj4gb3B0aW9uIHRoYXQgaXQgZG9lc27igJl0IHdvcmsgY29y
+cmVjdGx5LiAgSSBkb27igJl0IGtub3cgd2hldGhlciBzdWNoIGENCj4gd2FybmluZyBpcyBldmVu
+IHBvc3NpYmxlIHdpdGgganVzdCBhIGdlbmVyaWMgbm9kZS1sZXZlbCBvcHRpb24uDQo+IA0KPiBP
+ciAoMikgd2UgbWFrZSBpdCB3b3JrIGluIGdlbmVyaWMgY2FzZXMuICBXZWxsLCB0aGF0IG1pZ2h0
+IGJlIHBvc3NpYmxlDQo+IGZvciBxY293MiwgYnV0IHdob+KAmXMgZ29pbmcgdG8gbWFrZSBpdCB3
+b3JrIGZvciBWTURL4oCZcyBzdHJlYW1PcHRpbWl6ZWQNCj4gc3ViZm9ybWF0Pw0KPiANCj4gTW9y
+ZSBvbiBhbGwgb2YgdGhhdCBiZWxvdy4NCj4gDQo+PiBZZXMsIHdlIHdhbnQgdGhpcyBvcHRpb24g
+bm90IHRvIGFsbG93IGNvbXByZXNzZWQgd3JpdGVzIGZvciBndWVzdHMsIGJ1dCB0bw0KPj4gYWxs
+b3cNCj4+IC0gc3RyZWFtIHdpdGggY29tcHJlc3Npb24gKHVzZWQgdG8gcmVtb3ZlIGNvbXByZXNz
+ZWQgaW5jcmVtZW50YWwgYmFja3VwLCB3ZQ0KPj4gbmVlZCB0byBtZXJnZSBpdCB0byB0aGUgbmV4
+dCBpbmNyZW1lbnRhbCkNCj4gDQo+IEJhc2VkIG9uIHRoZSBhc3N1bXB0aW9uIHRoYXQgb25lIHNo
+b3VsZG7igJl0IGF0dGFjaCBhIGNvbXByZXNzZWQgZGlzayB0byBhDQo+IFZNLCBJIGRvbuKAmXQg
+c2VlIGhvdyBzdHJlYW1pbmcgbWFrZXMgc2Vuc2UgdGhlbi4gIFdlbGwsIEkgc3VwcG9zZQ0KPiBp
+bnRlcm1lZGlhdGUgc3RyZWFtaW5nIHdvdWxkIHdvcmsuDQo+IA0KPj4gLSBiYWNrdXAgd2l0aCBj
+b21wcmVzc2lvbiAod2UgaGF2ZSBhbiBvcHRpb25hbCBhbHJlYWR5LCBzbyBpdCB3b3JrcykNCj4+
+IC0gYmFja3VwIHRvIG5iZCBzZXJ2ZXIgd2l0aCBjb21wcmVzc2lvbjogZW5hYmxlIGNvbXByZXNz
+aW9uIG9uIG5iZCBzZXJ2ZXINCj4gDQo+IFRoZSBwcm9ibGVtIGlzIGNsZWFybHkgdGhhdCBpZiBh
+IGdlbmVyaWMgY2xpZW50IHdlcmUgdG8gY29ubmVjdCB0byB0aGUNCj4gTkJEIHNlcnZlciwgaXQg
+d291bGRu4oCZdCB3b3JrLiAgSW4gdGhpcyBjYXNlLCBjb21wcmVzc2lvbiB3aWxsIHdvcmsgb25s
+eQ0KPiBpZiB0aGUgY2xpZW50cyB1bmRlcnN0YW5kcyB0aGUgbGltaXRhdGlvbi4NCj4gDQo+IChU
+aGUgc2FmZSB3YXkgd291bGQgYmUgdG8gbWFrZSB0aGUgTkJEIHNlcnZlciBwcm92aWRlIGFuIG9w
+dGlvbiB0aGF0DQo+IGNsaWVudHMgY2FuIHNlZSBzbyB0aGV5IGtub3cgdGhpcyBsaW1pdGF0aW9u
+IGFuZCBhZ3JlZSB0aGV54oCZbGwgYWRoZXJlIHRvDQo+IGl0LiAgSXTigJlzIGFsc28gYSBzdHVw
+aWQgd2F5LikNCj4gDQo+PiBTbyBpbnN0ZWFkIG9mIGFkZGluZyB0d28gb3B0aW9ucyAoZm9yIHN0
+cmVhbSBhbmQgZm9yIG5iZCksIGl0IHNlZW1zIGJldHRlciB0bw0KPj4gYWRkIG9ubHkgb25lIGZv
+ciBnZW5lcmljIGxheWVyLg0KPiANCj4gSSBkb27igJl0IGtub3cuICBJdCBkb2VzbuKAmXQgd29y
+ayBnZW5lcmljYWxseSwgc28gSSBkb27igJl0IGtub3cgd2hldGhlciBpdA0KPiBzaG91bGQgYmUg
+YSBnZW5lcmljIG9wdGlvbi4NCj4gDQo+PiBUaGVuLCBpdCBiZWNvbWVzIHBvc3NpYmxlIHRvIHJ1
+biBndWVzdCBvbiBpbWFnZSB3aXRoIGNvbXByZXNzPW9uLiBJdCdzIGEgc2lkZQ0KPj4gZWZmZWN0
+LCBidXQgc3RpbGwgaXQgc2hvdWxkIHdvcmsgY29ycmVjdGx5Lg0KPiANCj4gSG93IHNvPyAgY29t
+cHJlc3M9b24gb25seSB3b3JrcyBpZiBldmVyeSBwYXJ0eSBpbnZvbHZlZCBvbmx5IHdyaXRlcyB0
+bw0KPiBhbnkgY2x1c3RlciBvZiB0aGUgaW1hZ2UgZXhhY3RseSBvbmNlLiAgVGhhdCBpcyBqdXN0
+IG5vdCB0aGUgY2FzZSBmb3INCj4gZ3Vlc3RzIHVubGVzcyB0aGV5IGtub3cgdGhpcyBsaW1pdGF0
+aW9uLCBhbmQgZXZlbiBJIGRvbuKAmXQgc2VlIGEgdXNlIGNhc2UuDQo+IA0KPj4gSSB0aGluayB0
+aGUgc2ltcGxlc3QgdGhpbmcgaXMgdG8ganVzdCBydW4gbm9ybWFsIHdyaXRlLCBpZiBjb21wcmVz
+c2VkIHdyaXRlDQo+PiBmYWlsZWQgYmVjYXVzZSBvZiByZWFsbG9jYXRpb24uIFdlIHNob3VsZCBj
+aGVjayB0aGF0IG9uIHRoYXQgZmFpbHVyZS1wYXRoDQo+PiBFTk9UU1VQIGlzIHJldHVybmVkIGFu
+ZCBoYW5kbGUgaXQgZm9yIGNvbXByZXNzPW9uIG9wdGlvbiBieSBmYWxsYmFjayB0bw0KPj4gbm9y
+bWFsIHdyaXRlIGluIGdlbmVyaWMgYmxvY2svaW8uYw0KPiANCj4gSXQgc2VlbXMgd3JvbmcgdG8g
+bm90IGNvbXByZXNzIGRhdGEgd2l0aCBjb21wcmVzcz1vbi4NCg0KV2UgYWxyZWFkeSBmYWxsYmFj
+ayB0byBub3JtYWwgd3JpdGUgaWYgY2FuJ3QgY29tcHJlc3MgaW4gcWNvdzIuDQoNCj4gDQo+PiAo
+Tm90ZSwgdGhhdCBpbiBjYXNlIHdpdGggc3RyZWFtIHdlIHJld3JpdGUgb25seSB1bmFsbG9jYXRl
+ZCBjbHVzdGVycykNCj4gDQo+IFllcywgYnV0IGlmIHRoZSBzdHJlYW0gam9iIHdyaXRlcyB0aGUg
+Y2x1c3RlciBiZWZvcmUgdGhlIGd1ZXN0LCB0aGUNCj4gZ3Vlc3QgZ2V0cyBhbiBJL08gZXJyb3Iu
+DQoNCkkgZG9uJ3QgdGhpbmsgdGhhdCB1c2luZyBjb21wcmVzc2VkIHdyaXRlcyBieSBndWVzdCBp
+cyByZWFsbHkgdXNhYmxlIHRoaW5nLg0KSW4gb3VyIGNhc2Ugd2l0aCBzdHJlYW0gdGhlcmUgaXMg
+bm8gZ3Vlc3QgKGp1c3QgdXNlIHFlbXUgYmluYXJ5IHRvIG9wZXJhdGUNCm9uIGJsb2NrIGxheWVy
+KQ0KDQo+IA0KPiANCj4gQnkgdGhlIHdheSwgdGhlIG90aGVyIHRoaW5nIEkgd29uZGVyZWQgd2Fz
+IHdoZXRoZXIgdGhpcyBzaG91bGQgYmUgYQ0KPiBmaWx0ZXIgZHJpdmVyIGluc3RlYWQgKGlmIGl0
+IG1ha2VzIHNlbnNlIGF0IGFsbCkuICBTdWNoIGEgZmlsdGVyIGRyaXZlcg0KPiB3b3VsZCBhdCBs
+ZWFzdCBiZSBzdWZmaWNpZW50bHkgY3VtYmVyc29tZSB0byB1c2UgdGhhdCBwcm9iYWJseSBvbmx5
+DQo+IHVzZXJzIHdobyB1bmRlcnN0YW5kIHRoZSBpbXBsaWNhdGlvbnMgd291bGQgbWFrZSB1c2Ug
+b2YgaXQgKDFCIGFib3ZlKS4NCj4gDQo+IA0KPiBJ4oCZbSBub3QgYWdhaW5zdCBhZGRpbmcgYSBn
+ZW5lcmljIGNvbXByZXNzPW9uIG9wdGlvbiBpZiB3ZSBlbnN1cmUgdGhhdCBpdA0KPiBhY3R1YWxs
+eSB3b3JrcyBnZW5lcmljYWxseSAoMiBhYm92ZSkuICBJdCBkb2VzbuKAmXQgcmlnaHQgbm93LCBz
+byBJIGRvbuKAmXQNCj4gdGhpbmsgdGhpcyBpcyByaWdodC4NCj4gDQo+IEnigJltIGFscmVhZHkg
+bm90IHN1cmUgd2hldGhlciBpdOKAmXMgcmVhbGx5IHBvc3NpYmxlIHRvIHN1cHBvcnQgZ2VuZXJp
+Yw0KPiBjb21wcmVzc2VkIHdyaXRlcyBpbiBxY293Mi4gIEkgc3VwcG9zZSBpdOKAmWQgYmUgYXQg
+bGVhc3QgYXdrd2FyZC4gIEluDQo+IHRoZW9yeSBpdCBzaG91bGQgd29yaywgaXTigJlzIGp1c3Qg
+dGhhdCB3ZSBjYW7igJl0IGtlZXAgdHJhY2sgb2Ygc3ViY2x1c3Rlcg0KPiBhbGxvY2F0aW9ucywg
+d2hpY2ggaW4gdGhlIHdvcnN0IGNhc2UgbWVhbnMgdGhhdCBzb21lIGNvbXByZXNzZWQgY2x1c3Rl
+cnMNCj4gdGFrZSB1cCBhIHdob2xlIGNsdXN0ZXIgb2Ygc3BhY2UuDQo+IA0KPiBGb3IgVk1ESy4u
+LiAgSSBzdXBwb3NlIHdlIGNvdWxkIGNvbnNpZGVyIGEgbmV3IGZsYWcgZm9yIGJsb2NrIGRyaXZl
+cnMNCj4gdGhhdCBmbGFncyB3aGV0aGVyIGEgZHJpdmVyIHN1cHBvcnRzIGFyYml0cmFyeSBjb21w
+cmVzc2VkIHdyaXRlcyBvciBoYXMNCj4gdGhlIG9sZCBsaW1pdGF0aW9ucy4gIGNvbXByZXNzPW9u
+IGNvdWxkIHRoZW4gcmVmdXNlIHRvIHdvcmsgb24gYW55IGJsb2NrDQo+IGRyaXZlciBidXQgdGhl
+IG9uZXMgdGhhdCBzdXBwb3J0IGFyYml0cmFyeSBjb21wcmVzc2VkIHdyaXRlcy4NCj4gDQo+IA0K
+PiBPdXIgY3VycmVudCBtb2RlbCAoMUEpIGlzIHNpbXBseSB0byBlbnN1cmUgdGhhdCBhbGwgY29t
+cHJlc3NlZCB3cml0ZXMNCj4gY2FuIGFkaGVyZSB0byB0aGUgbGltaXRhdGlvbnMuICBBcyBJ4oCZ
+dmUgc2FpZCBhYm92ZSwgZXh0ZW5kaW5nIHRoaXMgdG8NCj4gTkJEIHdvdWxkIG1lYW4gYWRkaW5n
+IHNvbWUgTkJEIG5lZ290aWF0aW9uIHNvIGJvdGggY2xpZW50IGFuZCBzZXJ2ZXINCj4gYWdyZWUg
+b24gdGhpcyBsaW1pdGF0aW9uLg0KDQpJbiB0aGlzIGNhc2UsIEknZCBwcmVmZXJlIHNpbXBsZSBj
+bWRsaW5lIG9wdGlvbiBmcm8gcWVtdS1uYmQuDQoNCj4gVGhhdCBzZWVtcyBraW5kIG9mIHJlYXNv
+bmFibGUgZnJvbSB0aGUgcWVtdQ0KPiBzaWRlLCBidXQgcHJvYmFibHkgdmVyeSB1bnJlYXNvbmFi
+bGUgZnJvbSBhbiBOQkQgc2lkZS4gIFdoeSB3b3VsZCBOQkQNCj4gYm90aGVyIHRvIHJlcHJvZHVj
+ZSBxZW114oCZcyBsaW1pdGF0aW9ucz8NCj4gDQo+IA0KPiBTbyB0aGVzZSBhcmUgdGhlIHRocmVl
+IHdheXMgKDFBLCAxQiwgMikgSSBjYW4gaW1hZ2luZS4gIEJ1dCBqdXN0IGFkZGluZw0KPiBhIGdl
+bmVyaWMgb3B0aW9uIHRoYXQgdW5zdXNwZWN0aW5nIHVzZXJzIGFyZSBub3QgdW5saWtlbHkgdG8g
+dXNlIGJ1dA0KPiB0aGF0IHNpbXBseSBkb2VzbuKAmXQgd29yayBnZW5lcmljYWxseSBkb2VzbuKA
+mXQgc2VlbSByaWdodCB0byBtZS4NCj4gDQoNCkZpcnN0bHksIDFBIGFscmVhZHkgZG9lc24ndCB3
+b3JrIGNvcnJlY3RseTogd2UgaGF2ZSBjb21wcmVzcyBvcHRpb24gZm9yIGJhY2t1cC4NClNvLCBp
+dCB3aWxsIG5vdCB3b3JrIGlmIGJhY2t1cCB0YXJnZXQgaXMgbm90IGVtcHR5Lg0KU28sIDFBIGlz
+IGltcG9zc2libGUsIGFzIGl0J3MgYWxyZWFkeSBicm9rZW4sIGFkZGluZyBzZXBhcmF0ZSBvcHRp
+b25zIGZvciBzdHJlYW0NCmFuZCBxZW11LW5iZCBpcyBub3QgYmV0dGVyIHRoYW4ganVzdCBhZGQg
+b25lIGdlbmVyaWMgb3B0aW9uLg0KDQpJIGRvbid0IGxpa2UgKDIpIGFzIGl0IG1lYW5zIGEgbG90
+IG9mIGVmZm9ydCB0byBzdXBwb3J0IGFjdHVhbGx5IG5vdCBuZWVkZWQgY2FzZS4NCg0KSSBkb24n
+dCByZWFsbHkgbGlrZSBmaWx0ZXIgc29sdXRpb24gKGFzIGF0IHNlZW1zIHRvbyBtdWNoIHRvIGFk
+ZCBhIGZpbHRlciBmb3Igc2ltcGxlDQpib29sZWFuIG9wdGlvbiksIGJ1dCBJIHRoaW5rLCB3ZSBj
+YW4gbGl2ZSB3aXRoIGl0Lg0KDQoxQiBpcyBPSyBmb3IgbWUsIHRoYXQgaXMsIGp1c3QgZG9jdW1l
+bnQgd2hhdCB0aGUgb3B0aW9uIGRvZXMgaW4gZmFjdC4NCg0KTWF5IGJlLCBuYW1lIHRoZSBvcHRp
+b24gImNvbXByZXNzLW5ldy13cml0ZXMiIGluc3RlYWQgb2YganVzdCAiY29tcHJlc3MiPw0KQW5k
+IGRvY3VtZW50LCB0aGF0IHdyaXRlcyB0byBjbHVzdGVycywgd2hpY2ggd2FzIG5vdCB3cml0dGVu
+IGJlZm9yZSB3aWxsIGJlDQpjb21wcmVzc2VkPw0KDQpPciBtYWtlIHRoZSBvcHRpb24gdG8gYmUg
+Y29tcHJlc3M9PHg+LCB3aGVyZSB4IG1heSBiZSAnbm8nIG9yICduZXctd3JpdGVzJywNCnJlc2Vy
+dmluZyAnYWxsLXdyaXRlcycgZm9yIGZ1dHVyZT8NCg0KDQotLSANCkJlc3QgcmVnYXJkcywNClZs
+YWRpbWlyDQo=
 
