@@ -2,70 +2,111 @@ Return-Path: <SRS0=tSBD=YP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E781ECA9EA0
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 11:31:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 13384CA9EA0
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 11:33:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AFB6321872
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 11:31:32 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AFB6321872
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
+	by mail.kernel.org (Postfix) with ESMTPS id C61992075A
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 11:33:03 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eICyS+Pj"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C61992075A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53600 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53636 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iMsNv-00046X-DD
-	for qemu-devel@archiver.kernel.org; Tue, 22 Oct 2019 07:31:31 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44207)
+	id 1iMsPO-0005j7-Tp
+	for qemu-devel@archiver.kernel.org; Tue, 22 Oct 2019 07:33:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45852)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <laurent@vivier.eu>) id 1iMsBQ-0004jH-NX
- for qemu-devel@nongnu.org; Tue, 22 Oct 2019 07:18:45 -0400
+ (envelope-from <mreitz@redhat.com>) id 1iMsNp-0004Ri-C4
+ for qemu-devel@nongnu.org; Tue, 22 Oct 2019 07:31:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <laurent@vivier.eu>) id 1iMsBN-0007qb-BH
- for qemu-devel@nongnu.org; Tue, 22 Oct 2019 07:18:36 -0400
-Received: from mout.kundenserver.de ([212.227.17.10]:44003)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <laurent@vivier.eu>)
- id 1iMsBM-0007pG-EP; Tue, 22 Oct 2019 07:18:33 -0400
-Received: from localhost.localdomain ([78.238.229.36]) by
- mrelayeu.kundenserver.de (mreue109 [212.227.15.183]) with ESMTPSA (Nemesis)
- id 1MOiLp-1ifFZl3dmx-00Q9ab; Tue, 22 Oct 2019 13:17:55 +0200
-From: Laurent Vivier <laurent@vivier.eu>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v14 1/9] esp: add pseudo-DMA as used by Macintosh
-Date: Tue, 22 Oct 2019 13:17:30 +0200
-Message-Id: <20191022111738.20803-2-laurent@vivier.eu>
-X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20191022111738.20803-1-laurent@vivier.eu>
-References: <20191022111738.20803-1-laurent@vivier.eu>
+ (envelope-from <mreitz@redhat.com>) id 1iMsNm-0004y0-U7
+ for qemu-devel@nongnu.org; Tue, 22 Oct 2019 07:31:24 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:43287
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1iMsNm-0004xO-OJ
+ for qemu-devel@nongnu.org; Tue, 22 Oct 2019 07:31:22 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1571743881;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=HnPyeR2vqKEpSRtReB454uLrxdgPmUfsiihUOydoSyY=;
+ b=eICyS+PjkmkKQHynK2rK3CKxHO4kJma+vOZ9j/QPYPAwHZaep0u/yFgQ4n6+ORCZVbMpKm
+ cktFKHsUT63vkmgBwY6DttXm7zODfWSd/ViGlPRYrDlUblNrZoN/CT4zdmae2IgURraGiZ
+ qpk2dTDiOXqMz/WFCOGuxaI8kJm+Jo0=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-233-IersrsR-Pumpu9oUwzGssg-1; Tue, 22 Oct 2019 07:31:14 -0400
+X-MC-Unique: IersrsR-Pumpu9oUwzGssg-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3AC2C1800DFA;
+ Tue, 22 Oct 2019 11:31:13 +0000 (UTC)
+Received: from dresden.str.redhat.com (ovpn-117-215.ams2.redhat.com
+ [10.36.117.215])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id C8E7060161;
+ Tue, 22 Oct 2019 11:31:08 +0000 (UTC)
+Subject: Re: [PATCH v5 1/4] block: support compressed write at generic layer
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+References: <1571603828-185910-1-git-send-email-andrey.shinkevich@virtuozzo.com>
+ <1571603828-185910-2-git-send-email-andrey.shinkevich@virtuozzo.com>
+ <408ef2ab-1f6c-2c9f-ad50-92269c20fb27@redhat.com>
+ <eece4ca2-7c40-cae6-b15f-beed73830fd8@virtuozzo.com>
+ <cc3f87c2-3ad5-da4e-4750-27a48bce1ee6@virtuozzo.com>
+From: Max Reitz <mreitz@redhat.com>
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <787da788-9aca-2110-a092-b63ef498a9fa@redhat.com>
+Date: Tue, 22 Oct 2019 13:31:07 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.1
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:6yDDqwImp2tvGc9FClAzX7hkotG8MVMGSxfyXSDzT6rx5sMhMDV
- TR6A0Vq80iifi80dDexvOm9ruCb5G2wDXHJOv/hzW8gHuZDiu8crm98c9y+5oy9nkTo/gr7
- nTZggMIBWSQPJOqREhDFv6iDevp7RFHUbvt2qhKN6s+G3PFunUY+Ta3ZPDc4qMQfkyTOsvw
- B/GrlqyAOa8GtRTDBKaJQ==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:cDDsbyVVmkg=:SxOWIXesToNxQeziKvHSYW
- o+vt915hzu0reyQ5buo3TBnVDq3vsZFrTr8rFgkZAtUyFvxaZ850YHvQ0yMkOZrtp/Te+FlpR
- L+v3vxkbFR80CtRgR7sC9y03CmyPqREU4f0Qo6esJ6jjjmsE8DtEHpI4mtpdG6dVQAiNfgkgl
- q70DrQHgXiaceU439mF38eNWaQM8Kq7rFOHK+NEp/PwsWGtTA50j10+QCVYHuxtD1wMWkGJ/A
- XJq8iZVckn3nOCIFQlE5zO/9SjBBDVYGt9UBNWFLzgU6ZxE7S7IEV5UvmJNDaEFRCA7j1wFV7
- g98dNaWmL0EgTyfESn6lMp6a0IB6+NqwSnAk39dme15IzdH1ZgGUHUHlOCHyJrRUc4YCCOqva
- FnWrx2WStUyux96A4RLYSNPMM8bdqtShaomOMENdXHV0+luEUgAptX2CHUim1hmb4q0YUT7YZ
- M2S0ZYq2kY6UoynlEpyBX8JVWH5jJisb1RR9mXxIRUWa8LK39eWVgxZViLriWfhdkxbhlGuKv
- olumqRVubSoA3ESkVL2pvZAzj5GaNiw5n7zAPwuh2vdmfiYWbBIyMwAdH0P55qKjIsviyvqGQ
- FD/KoKg3q/SH971Jv55p7IQkeQqZ0SB4eCJB/qdCVCTzY+17sdyztJ0oMy5lIyRnx3tKpgFU5
- r8nGpniBcREegymOFfhylQqXIb5c2kNnmVJB6ZLMTvK9s5GO8om5y4rRReqmFFZRzPtjlJ1ka
- gbmdgXwMYNcuF9SZTFV+RtibOC3RJwhVG4oRjcLGlRAlEdCKBnzdehanv5O6IhYFck0Z6Ph8w
- Me8s51yGCZkGIaDW1Rj8GOW4QQDi17g3VAFRL76md3+iO9pRN3+wFryK8HIoU/Mf80XoVo8Mu
- be5SJoV47DVY1dagu3KQ==
+In-Reply-To: <cc3f87c2-3ad5-da4e-4750-27a48bce1ee6@virtuozzo.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Mimecast-Spam-Score: 0
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="gWzTNzs3fTcBwvKluYrzQ3vCI04jfEH27"
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 212.227.17.10
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -77,599 +118,290 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
- qemu-block@nongnu.org, Thomas Huth <huth@tuxfamily.org>,
- Jason Wang <jasowang@redhat.com>,
- Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
- "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
- Laurent Vivier <laurent@vivier.eu>,
- =?UTF-8?q?Herv=C3=A9=20Poussineau?= <hpoussin@reactos.org>,
- Gerd Hoffmann <kraxel@redhat.com>,
- =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Max Reitz <mreitz@redhat.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Aurelien Jarno <aurelien@aurel32.net>
+Cc: "kwolf@redhat.com" <kwolf@redhat.com>, "fam@euphon.net" <fam@euphon.net>,
+ Denis Lunev <den@virtuozzo.com>, "armbru@redhat.com" <armbru@redhat.com>,
+ "stefanha@redhat.com" <stefanha@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-There is no DMA in Quadra 800, so the CPU reads/writes the data from the
-PDMA register (offset 0x100, ESP_PDMA in hw/m68k/q800.c) and copies them
-to/from the memory.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--gWzTNzs3fTcBwvKluYrzQ3vCI04jfEH27
+Content-Type: multipart/mixed; boundary="0ntlWQojfiabiKVugCSuF331LVIvB3f4H"
 
-There is a nice assembly loop in the kernel to do that, see
-linux/drivers/scsi/mac_esp.c:MAC_ESP_PDMA_LOOP().
+--0ntlWQojfiabiKVugCSuF331LVIvB3f4H
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
-The start of the transfer is triggered by the DREQ interrupt (see linux
-mac_esp_send_pdma_cmd()), the CPU polls on the IRQ flag to start the
-transfer after a SCSI command has been sent (in Quadra 800 it goes
-through the VIA2, the via2-irq line and the vIFR register)
+On 22.10.19 12:46, Vladimir Sementsov-Ogievskiy wrote:
+> 22.10.2019 13:21, Andrey Shinkevich wrote:
+>>
+>> On 22/10/2019 12:28, Max Reitz wrote:
+>>> On 20.10.19 22:37, Andrey Shinkevich wrote:
+>>>> To inform the block layer about writing all the data compressed, we
+>>>> introduce the 'compress' command line option. Based on that option, th=
+e
+>>>> written data will be aligned by the cluster size at the generic layer.
+>>>>
+>>>> Suggested-by: Roman Kagan <rkagan@virtuozzo.com>
+>>>> Suggested-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+>>>> Signed-off-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+>>>> Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+>>>> ---
+>>>>    block.c                   | 20 +++++++++++++++++++-
+>>>>    block/io.c                | 13 +++++++++----
+>>>>    block/qcow2.c             |  4 ++++
+>>>>    blockdev.c                |  9 ++++++++-
+>>>>    include/block/block.h     |  1 +
+>>>>    include/block/block_int.h |  2 ++
+>>>>    qapi/block-core.json      |  5 ++++-
+>>>>    qemu-options.hx           |  6 ++++--
+>>>>    8 files changed, 51 insertions(+), 9 deletions(-)
+>>>
+>>> The problem with compression is that there are such tight constraints o=
+n
+>>> it that it can really only work for very defined use cases.  Those
+>>> constraints are:
+>>>
+>>> - Only write whole clusters,
+>>> - Clusters can be written to only once.
+>>>
+>>> The first point is addressed in this patch by setting request_alignment=
+.
+>>>    But I don=E2=80=99t see how the second one can be addressed.  Well, =
+maybe by
+>>> allowing it in all drivers that support compression.  But if I just loo=
+k
+>>> at qcow2, that isn=E2=80=99t going to be trivial: You need to allocate =
+a
+>>> completely new cluster where you write the data (in case it grows), and
+>>> thus you leave behind a hole, which kind of defeats the purpose of
+>>> compression.
+>>>
+>>> (For demonstration:
+>>>
+>>> $ ./qemu-img create -f qcow2 test.qcow2 64M
+>>> Formatting 'test.qcow2', fmt=3Dqcow2 size=3D67108864 cluster_size=3D655=
+36
+>>> lazy_refcounts=3Doff refcount_bits=3D16
+>>> $ x86_64-softmmu/qemu-system-x86_64 \
+>>>       -blockdev "{'node-name': 'drv0', 'driver': 'qcow2',
+>>>                   'compress': true,
+>>>                   'file': {'driver': 'file', 'filename': 'test.qcow2'}}=
+" \
+>>>       -monitor stdio
+>>> QEMU 4.1.50 monitor - type 'help' for more information
+>>> (qemu) qemu-io drv0 "write -P 42 0 64k"
+>>> wrote 65536/65536 bytes at offset 0
+>>> 64 KiB, 1 ops; 00.02 sec (4.055 MiB/sec and 64.8793 ops/sec)
+>>> (qemu) qemu-io drv0 "write -P 23 0 64k"
+>>> write failed: Input/output error
+>>>
+>>> )
+>>>
+>>> Compression really only works when you fully write all of an image
+>>> exactly once; i.e. as the qemu-img convert or as a backup target.  For
+>>> both cases we already have a compression option.  So I=E2=80=99m wonder=
+ing where
+>>> this new option is really useful.
+>>>
+>>> (You do add a test for stream, but I don=E2=80=99t know whether that=E2=
+=80=99s really a
+>>> good example, see my response there.)
+>>>
+>>> Max
+>>>
+>>
+>> Thank you very much Max for your detailed response.
+>>
+>> 1) You are right that compression is used with the backup mostly. The
+>> option for the compression with backup would be replaced by usage at the
+>> block layer, with no duplication. Also, it can be useful for NBD for
+>> instance,
+>>
+>> $ ./qemu-img create -f qcow2 -o size=3D10G ./image.qcow2
+>> $ sudo ./qemu-nbd -c /dev/nbd0 ./image.qcow2
+>> $ sudo dd if=3D/dev/sda1 of=3D/dev/nbd0 bs=3D10M count=3D10
+>> 10+0 records in
+>> 10+0 records out
+>> 104857600 bytes (105 MB) copied, 0,0890581 s, 1,2 GB/s
+>> $ sudo ./qemu-nbd -d /dev/nbd0
+>> $ du -sh ./image.qcow2
+>> 101M    ./image.qcow2
+>>
+>> and with the compression
+>>
+>> $ ./qemu-img create -f qcow2 -o size=3D10G ./image.qcow2
+>> $ sudo ./qemu-nbd -C -c /dev/nbd0 ./image.qcow2
+>> $ sudo dd if=3D/dev/sda1 of=3D/dev/nbd0 bs=3D10M count=3D10
+>> 10+0 records in
+>> 10+0 records out
+>> 104857600 bytes (105 MB) copied, 0,076046 s, 1,4 GB/s
+>> $ sudo ./qemu-nbd -d /dev/nbd0
+>> $ du -sh ./image.qcow2
+>> 5,3M    ./image.qcow2
 
-The Macintosh hardware includes hardware handshaking to prevent the CPU
-from reading invalid data or writing data faster than the peripheral
-device can accept it.
+That seems wrong to me.  Why not use qemu-img convert for this case?
 
-This is the "blind mode", and from the doc:
-"Approximate maximum SCSI transfer rates within a blocks are 1.4 MB per
-second for blind transfers in the Macintosh II"
+Attaching an NBD server to a compressed disk has exactly the same
+problem as attaching a compressed disk to a VM.  It won=E2=80=99t work unle=
+ss
+the client/guest is aware of the limitations.
 
-Some references can be found in:
-  Apple Macintosh Family Hardware Reference, ISBN 0-201-19255-1
-  Guide to the Macintosh Family Hardware, ISBN-0-201-52405-8
+>> The idea behind introducing the new 'compress' option is to use that
+>> only one instead of many other ones of such a kind.
+>>
+>> 2) You are right also that "Compression can't overwrite anything..."
+>> It can be seen in the commit message
+>> b0b6862e5e1a1394e0ab3d5da94ba8b0da8664e2
+>>
+>> I am not sure if data should be written compressed to the active layer.
+>> I made the tests with the idea of bringing examples of usage the
+>> 'compress' option because passing an option is a tricky thing in QEMU.
+>> But the issue takes place anyway if we want to rewrite to allocated
+>> clusters.
+>> I would like to investigate the matter and make a patch that resolves
+>> that issue.
+>> Do you agree with that?
 
-Acked-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-Co-developed-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Signed-off-by: Laurent Vivier <laurent@vivier.eu>
----
- include/hw/scsi/esp.h |  15 ++
- hw/scsi/esp.c         | 338 ++++++++++++++++++++++++++++++++++++++----
- 2 files changed, 324 insertions(+), 29 deletions(-)
+What seems wrong to me is that this series just adds a generic compress
+option without ensuring that it works generically.
 
-diff --git a/include/hw/scsi/esp.h b/include/hw/scsi/esp.h
-index adab63d1c9..6ba47dac41 100644
---- a/include/hw/scsi/esp.h
-+++ b/include/hw/scsi/esp.h
-@@ -14,10 +14,18 @@ typedef void (*ESPDMAMemoryReadWriteFunc)(void *opaque, uint8_t *buf, int len);
- 
- typedef struct ESPState ESPState;
- 
-+enum pdma_origin_id {
-+    PDMA,
-+    TI,
-+    CMD,
-+    ASYNC,
-+};
-+
- struct ESPState {
-     uint8_t rregs[ESP_REGS];
-     uint8_t wregs[ESP_REGS];
-     qemu_irq irq;
-+    qemu_irq irq_data;
-     uint8_t chip_id;
-     bool tchi_written;
-     int32_t ti_size;
-@@ -48,6 +56,12 @@ struct ESPState {
-     ESPDMAMemoryReadWriteFunc dma_memory_write;
-     void *dma_opaque;
-     void (*dma_cb)(ESPState *s);
-+    uint8_t pdma_buf[32];
-+    int pdma_origin;
-+    uint32_t pdma_len;
-+    uint32_t pdma_start;
-+    uint32_t pdma_cur;
-+    void (*pdma_cb)(ESPState *s);
- };
- 
- #define TYPE_ESP "esp"
-@@ -59,6 +73,7 @@ typedef struct {
-     /*< public >*/
- 
-     MemoryRegion iomem;
-+    MemoryRegion pdma;
-     uint32_t it_shift;
-     ESPState esp;
- } SysBusESPState;
-diff --git a/hw/scsi/esp.c b/hw/scsi/esp.c
-index 841d79b60e..90b40c4cb5 100644
---- a/hw/scsi/esp.c
-+++ b/hw/scsi/esp.c
-@@ -38,6 +38,8 @@
-  * http://www.ibiblio.org/pub/historic-linux/early-ports/Sparc/NCR/NCR89C100.txt
-  * and
-  * http://www.ibiblio.org/pub/historic-linux/early-ports/Sparc/NCR/NCR53C9X.txt
-+ *
-+ * On Macintosh Quadra it is a NCR53C96.
-  */
- 
- static void esp_raise_irq(ESPState *s)
-@@ -58,6 +60,16 @@ static void esp_lower_irq(ESPState *s)
-     }
- }
- 
-+static void esp_raise_drq(ESPState *s)
-+{
-+    qemu_irq_raise(s->irq_data);
-+}
-+
-+static void esp_lower_drq(ESPState *s)
-+{
-+    qemu_irq_lower(s->irq_data);
-+}
-+
- void esp_dma_enable(ESPState *s, int irq, int level)
- {
-     if (level) {
-@@ -84,29 +96,35 @@ void esp_request_cancelled(SCSIRequest *req)
-     }
- }
- 
--static uint32_t get_cmd(ESPState *s, uint8_t *buf, uint8_t buflen)
-+static void set_pdma(ESPState *s, enum pdma_origin_id origin,
-+                     uint32_t index, uint32_t len)
-+{
-+    s->pdma_origin = origin;
-+    s->pdma_start = index;
-+    s->pdma_cur = index;
-+    s->pdma_len = len;
-+}
-+
-+static uint8_t *get_pdma_buf(ESPState *s)
-+{
-+    switch (s->pdma_origin) {
-+    case PDMA:
-+        return s->pdma_buf;
-+    case TI:
-+        return s->ti_buf;
-+    case CMD:
-+        return s->cmdbuf;
-+    case ASYNC:
-+        return s->async_buf;
-+    }
-+    return NULL;
-+}
-+
-+static int get_cmd_cb(ESPState *s)
- {
--    uint32_t dmalen;
-     int target;
- 
-     target = s->wregs[ESP_WBUSID] & BUSID_DID;
--    if (s->dma) {
--        dmalen = s->rregs[ESP_TCLO];
--        dmalen |= s->rregs[ESP_TCMID] << 8;
--        dmalen |= s->rregs[ESP_TCHI] << 16;
--        if (dmalen > buflen) {
--            return 0;
--        }
--        s->dma_memory_read(s->dma_opaque, buf, dmalen);
--    } else {
--        dmalen = s->ti_size;
--        if (dmalen > TI_BUFSZ) {
--            return 0;
--        }
--        memcpy(buf, s->ti_buf, dmalen);
--        buf[0] = buf[2] >> 5;
--    }
--    trace_esp_get_cmd(dmalen, target);
- 
-     s->ti_size = 0;
-     s->ti_rptr = 0;
-@@ -125,8 +143,46 @@ static uint32_t get_cmd(ESPState *s, uint8_t *buf, uint8_t buflen)
-         s->rregs[ESP_RINTR] = INTR_DC;
-         s->rregs[ESP_RSEQ] = SEQ_0;
-         esp_raise_irq(s);
-+        return -1;
-+    }
-+    return 0;
-+}
-+
-+static uint32_t get_cmd(ESPState *s, uint8_t *buf, uint8_t buflen)
-+{
-+    int target;
-+    uint32_t dmalen;
-+
-+    target = s->wregs[ESP_WBUSID] & BUSID_DID;
-+    if (s->dma) {
-+        dmalen = s->rregs[ESP_TCLO];
-+        dmalen |= s->rregs[ESP_TCMID] << 8;
-+        dmalen |= s->rregs[ESP_TCHI] << 16;
-+        if (dmalen > buflen) {
-+            return 0;
-+        }
-+        if (s->dma_memory_read) {
-+            s->dma_memory_read(s->dma_opaque, buf, dmalen);
-+        } else {
-+            memcpy(s->pdma_buf, buf, dmalen);
-+            set_pdma(s, PDMA, 0, dmalen);
-+            esp_raise_drq(s);
-+            return 0;
-+        }
-+    } else {
-+        dmalen = s->ti_size;
-+        if (dmalen > TI_BUFSZ) {
-+            return 0;
-+        }
-+        memcpy(buf, s->ti_buf, dmalen);
-+        buf[0] = buf[2] >> 5;
-+    }
-+    trace_esp_get_cmd(dmalen, target);
-+
-+    if (get_cmd_cb(s) < 0) {
-         return 0;
-     }
-+
-     return dmalen;
- }
- 
-@@ -165,6 +221,16 @@ static void do_cmd(ESPState *s, uint8_t *buf)
-     do_busid_cmd(s, &buf[1], busid);
- }
- 
-+static void satn_pdma_cb(ESPState *s)
-+{
-+    if (get_cmd_cb(s) < 0) {
-+        return;
-+    }
-+    if (s->pdma_cur != s->pdma_start) {
-+        do_cmd(s, get_pdma_buf(s) + s->pdma_start);
-+    }
-+}
-+
- static void handle_satn(ESPState *s)
- {
-     uint8_t buf[32];
-@@ -174,11 +240,22 @@ static void handle_satn(ESPState *s)
-         s->dma_cb = handle_satn;
-         return;
-     }
-+    s->pdma_cb = satn_pdma_cb;
-     len = get_cmd(s, buf, sizeof(buf));
-     if (len)
-         do_cmd(s, buf);
- }
- 
-+static void s_without_satn_pdma_cb(ESPState *s)
-+{
-+    if (get_cmd_cb(s) < 0) {
-+        return;
-+    }
-+    if (s->pdma_cur != s->pdma_start) {
-+        do_busid_cmd(s, get_pdma_buf(s) + s->pdma_start, 0);
-+    }
-+}
-+
- static void handle_s_without_atn(ESPState *s)
- {
-     uint8_t buf[32];
-@@ -188,18 +265,36 @@ static void handle_s_without_atn(ESPState *s)
-         s->dma_cb = handle_s_without_atn;
-         return;
-     }
-+    s->pdma_cb = s_without_satn_pdma_cb;
-     len = get_cmd(s, buf, sizeof(buf));
-     if (len) {
-         do_busid_cmd(s, buf, 0);
-     }
- }
- 
-+static void satn_stop_pdma_cb(ESPState *s)
-+{
-+    if (get_cmd_cb(s) < 0) {
-+        return;
-+    }
-+    s->cmdlen = s->pdma_cur - s->pdma_start;
-+    if (s->cmdlen) {
-+        trace_esp_handle_satn_stop(s->cmdlen);
-+        s->do_cmd = 1;
-+        s->rregs[ESP_RSTAT] = STAT_TC | STAT_CD;
-+        s->rregs[ESP_RINTR] = INTR_BS | INTR_FC;
-+        s->rregs[ESP_RSEQ] = SEQ_CD;
-+        esp_raise_irq(s);
-+    }
-+}
-+
- static void handle_satn_stop(ESPState *s)
- {
-     if (s->dma && !s->dma_enabled) {
-         s->dma_cb = handle_satn_stop;
-         return;
-     }
-+    s->pdma_cb = satn_stop_pdma_cb;;
-     s->cmdlen = get_cmd(s, s->cmdbuf, sizeof(s->cmdbuf));
-     if (s->cmdlen) {
-         trace_esp_handle_satn_stop(s->cmdlen);
-@@ -211,16 +306,31 @@ static void handle_satn_stop(ESPState *s)
-     }
- }
- 
-+static void write_response_pdma_cb(ESPState *s)
-+{
-+    s->rregs[ESP_RSTAT] = STAT_TC | STAT_ST;
-+    s->rregs[ESP_RINTR] = INTR_BS | INTR_FC;
-+    s->rregs[ESP_RSEQ] = SEQ_CD;
-+    esp_raise_irq(s);
-+}
-+
- static void write_response(ESPState *s)
- {
-     trace_esp_write_response(s->status);
-     s->ti_buf[0] = s->status;
-     s->ti_buf[1] = 0;
-     if (s->dma) {
--        s->dma_memory_write(s->dma_opaque, s->ti_buf, 2);
--        s->rregs[ESP_RSTAT] = STAT_TC | STAT_ST;
--        s->rregs[ESP_RINTR] = INTR_BS | INTR_FC;
--        s->rregs[ESP_RSEQ] = SEQ_CD;
-+        if (s->dma_memory_write) {
-+            s->dma_memory_write(s->dma_opaque, s->ti_buf, 2);
-+            s->rregs[ESP_RSTAT] = STAT_TC | STAT_ST;
-+            s->rregs[ESP_RINTR] = INTR_BS | INTR_FC;
-+            s->rregs[ESP_RSEQ] = SEQ_CD;
-+        } else {
-+            set_pdma(s, TI, 0, 2);
-+            s->pdma_cb = write_response_pdma_cb;
-+            esp_raise_drq(s);
-+            return;
-+        }
-     } else {
-         s->ti_size = 2;
-         s->ti_rptr = 0;
-@@ -242,6 +352,41 @@ static void esp_dma_done(ESPState *s)
-     esp_raise_irq(s);
- }
- 
-+static void do_dma_pdma_cb(ESPState *s)
-+{
-+    int to_device = (s->ti_size < 0);
-+    int len = s->pdma_cur - s->pdma_start;
-+    if (s->do_cmd) {
-+        s->ti_size = 0;
-+        s->cmdlen = 0;
-+        s->do_cmd = 0;
-+        do_cmd(s, s->cmdbuf);
-+        return;
-+    }
-+    s->dma_left -= len;
-+    s->async_buf += len;
-+    s->async_len -= len;
-+    if (to_device) {
-+        s->ti_size += len;
-+    } else {
-+        s->ti_size -= len;
-+    }
-+    if (s->async_len == 0) {
-+        scsi_req_continue(s->current_req);
-+        /*
-+         * If there is still data to be read from the device then
-+         * complete the DMA operation immediately.  Otherwise defer
-+         * until the scsi layer has completed.
-+         */
-+        if (to_device || s->dma_left != 0 || s->ti_size == 0) {
-+            return;
-+        }
-+    }
-+
-+    /* Partially filled a scsi buffer. Complete immediately.  */
-+    esp_dma_done(s);
-+}
-+
- static void esp_do_dma(ESPState *s)
- {
-     uint32_t len;
-@@ -252,10 +397,25 @@ static void esp_do_dma(ESPState *s)
-         trace_esp_do_dma(s->cmdlen, len);
-         assert (s->cmdlen <= sizeof(s->cmdbuf) &&
-                 len <= sizeof(s->cmdbuf) - s->cmdlen);
--        s->dma_memory_read(s->dma_opaque, &s->cmdbuf[s->cmdlen], len);
-+        if (s->dma_memory_read) {
-+            s->dma_memory_read(s->dma_opaque, &s->cmdbuf[s->cmdlen], len);
-+        } else {
-+            set_pdma(s, CMD, s->cmdlen, len);
-+            s->pdma_cb = do_dma_pdma_cb;
-+            esp_raise_drq(s);
-+            return;
-+        }
-+        trace_esp_handle_ti_cmd(s->cmdlen);
-+        s->ti_size = 0;
-+        s->cmdlen = 0;
-+        s->do_cmd = 0;
-+        do_cmd(s, s->cmdbuf);
-         return;
-     }
-     if (s->async_len == 0) {
-+        if (s->dma_left == 0) {
-+            esp_dma_done(s);
-+        }
-         /* Defer until data is available.  */
-         return;
-     }
-@@ -264,9 +424,23 @@ static void esp_do_dma(ESPState *s)
-     }
-     to_device = (s->ti_size < 0);
-     if (to_device) {
--        s->dma_memory_read(s->dma_opaque, s->async_buf, len);
-+        if (s->dma_memory_read) {
-+            s->dma_memory_read(s->dma_opaque, s->async_buf, len);
-+        } else {
-+            set_pdma(s, ASYNC, 0, len);
-+            s->pdma_cb = do_dma_pdma_cb;
-+            esp_raise_drq(s);
-+            return;
-+        }
-     } else {
--        s->dma_memory_write(s->dma_opaque, s->async_buf, len);
-+        if (s->dma_memory_write) {
-+            s->dma_memory_write(s->dma_opaque, s->async_buf, len);
-+        } else {
-+            set_pdma(s, ASYNC, 0, len);
-+            s->pdma_cb = do_dma_pdma_cb;
-+            esp_raise_drq(s);
-+            return;
-+        }
-     }
-     s->dma_left -= len;
-     s->async_buf += len;
-@@ -373,8 +547,7 @@ static void handle_ti(ESPState *s)
-         s->dma_left = minlen;
-         s->rregs[ESP_RSTAT] &= ~STAT_TC;
-         esp_do_dma(s);
--    }
--    if (s->do_cmd) {
-+    } else if (s->do_cmd) {
-         trace_esp_handle_ti_cmd(s->cmdlen);
-         s->ti_size = 0;
-         s->cmdlen = 0;
-@@ -401,6 +574,7 @@ void esp_hard_reset(ESPState *s)
- static void esp_soft_reset(ESPState *s)
- {
-     qemu_irq_lower(s->irq);
-+    qemu_irq_lower(s->irq_data);
-     esp_hard_reset(s);
- }
- 
-@@ -590,6 +764,28 @@ static bool esp_mem_accepts(void *opaque, hwaddr addr,
-     return (size == 1) || (is_write && size == 4);
- }
- 
-+static bool esp_pdma_needed(void *opaque)
-+{
-+    ESPState *s = opaque;
-+    return s->dma_memory_read == NULL && s->dma_memory_write == NULL &&
-+           s->dma_enabled;
-+}
-+
-+static const VMStateDescription vmstate_esp_pdma = {
-+    .name = "esp/pdma",
-+    .version_id = 1,
-+    .minimum_version_id = 1,
-+    .needed = esp_pdma_needed,
-+    .fields = (VMStateField[]) {
-+        VMSTATE_BUFFER(pdma_buf, ESPState),
-+        VMSTATE_INT32(pdma_origin, ESPState),
-+        VMSTATE_UINT32(pdma_len, ESPState),
-+        VMSTATE_UINT32(pdma_start, ESPState),
-+        VMSTATE_UINT32(pdma_cur, ESPState),
-+        VMSTATE_END_OF_LIST()
-+    }
-+};
-+
- const VMStateDescription vmstate_esp = {
-     .name ="esp",
-     .version_id = 4,
-@@ -611,6 +807,10 @@ const VMStateDescription vmstate_esp = {
-         VMSTATE_UINT32(do_cmd, ESPState),
-         VMSTATE_UINT32(dma_left, ESPState),
-         VMSTATE_END_OF_LIST()
-+    },
-+    .subsections = (const VMStateDescription * []) {
-+        &vmstate_esp_pdma,
-+        NULL
-     }
- };
- 
-@@ -641,6 +841,82 @@ static const MemoryRegionOps sysbus_esp_mem_ops = {
-     .valid.accepts = esp_mem_accepts,
- };
- 
-+static void sysbus_esp_pdma_write(void *opaque, hwaddr addr,
-+                                  uint64_t val, unsigned int size)
-+{
-+    SysBusESPState *sysbus = opaque;
-+    ESPState *s = &sysbus->esp;
-+    uint32_t dmalen;
-+    uint8_t *buf = get_pdma_buf(s);
-+
-+    dmalen = s->rregs[ESP_TCLO];
-+    dmalen |= s->rregs[ESP_TCMID] << 8;
-+    dmalen |= s->rregs[ESP_TCHI] << 16;
-+    if (dmalen == 0 || s->pdma_len == 0) {
-+        return;
-+    }
-+    switch (size) {
-+    case 1:
-+        buf[s->pdma_cur++] = val;
-+        s->pdma_len--;
-+        dmalen--;
-+        break;
-+    case 2:
-+        buf[s->pdma_cur++] = val >> 8;
-+        buf[s->pdma_cur++] = val;
-+        s->pdma_len -= 2;
-+        dmalen -= 2;
-+        break;
-+    }
-+    s->rregs[ESP_TCLO] = dmalen & 0xff;
-+    s->rregs[ESP_TCMID] = dmalen >> 8;
-+    s->rregs[ESP_TCHI] = dmalen >> 16;
-+    if (s->pdma_len == 0 && s->pdma_cb) {
-+        esp_lower_drq(s);
-+        s->pdma_cb(s);
-+        s->pdma_cb = NULL;
-+    }
-+}
-+
-+static uint64_t sysbus_esp_pdma_read(void *opaque, hwaddr addr,
-+                                     unsigned int size)
-+{
-+    SysBusESPState *sysbus = opaque;
-+    ESPState *s = &sysbus->esp;
-+    uint8_t *buf = get_pdma_buf(s);
-+    uint64_t val = 0;
-+
-+    if (s->pdma_len == 0) {
-+        return 0;
-+    }
-+    switch (size) {
-+    case 1:
-+        val = buf[s->pdma_cur++];
-+        s->pdma_len--;
-+        break;
-+    case 2:
-+        val = buf[s->pdma_cur++];
-+        val = (val << 8) | buf[s->pdma_cur++];
-+        s->pdma_len -= 2;
-+        break;
-+    }
-+
-+    if (s->pdma_len == 0 && s->pdma_cb) {
-+        esp_lower_drq(s);
-+        s->pdma_cb(s);
-+        s->pdma_cb = NULL;
-+    }
-+    return val;
-+}
-+
-+static const MemoryRegionOps sysbus_esp_pdma_ops = {
-+    .read = sysbus_esp_pdma_read,
-+    .write = sysbus_esp_pdma_write,
-+    .endianness = DEVICE_NATIVE_ENDIAN,
-+    .valid.min_access_size = 1,
-+    .valid.max_access_size = 2,
-+};
-+
- static const struct SCSIBusInfo esp_scsi_info = {
-     .tcq = false,
-     .max_target = ESP_MAX_DEVS,
-@@ -673,12 +949,16 @@ static void sysbus_esp_realize(DeviceState *dev, Error **errp)
-     ESPState *s = &sysbus->esp;
- 
-     sysbus_init_irq(sbd, &s->irq);
-+    sysbus_init_irq(sbd, &s->irq_data);
-     assert(sysbus->it_shift != -1);
- 
-     s->chip_id = TCHI_FAS100A;
-     memory_region_init_io(&sysbus->iomem, OBJECT(sysbus), &sysbus_esp_mem_ops,
--                          sysbus, "esp", ESP_REGS << sysbus->it_shift);
-+                          sysbus, "esp-regs", ESP_REGS << sysbus->it_shift);
-     sysbus_init_mmio(sbd, &sysbus->iomem);
-+    memory_region_init_io(&sysbus->pdma, OBJECT(sysbus), &sysbus_esp_pdma_ops,
-+                          sysbus, "esp-pdma", 2);
-+    sysbus_init_mmio(sbd, &sysbus->pdma);
- 
-     qdev_init_gpio_in(dev, sysbus_esp_gpio_demux, 2);
- 
--- 
-2.21.0
+Either (1) it only works in well-defined cases, then either (1A) we have
+to ensure that we only allow it then (as we do now, because only
+qemu-img convert and the backup job have such an option; and those two
+are safe), or (1B) we have to clearly give a big warning for the new
+option that it doesn=E2=80=99t work correctly.  I don=E2=80=99t know whethe=
+r such a
+warning is even possible with just a generic node-level option.
+
+Or (2) we make it work in generic cases.  Well, that might be possible
+for qcow2, but who=E2=80=99s going to make it work for VMDK=E2=80=99s strea=
+mOptimized
+subformat?
+
+More on all of that below.
+
+> Yes, we want this option not to allow compressed writes for guests, but t=
+o
+> allow
+> - stream with compression (used to remove compressed incremental backup, =
+we
+> need to merge it to the next incremental)
+
+Based on the assumption that one shouldn=E2=80=99t attach a compressed disk=
+ to a
+VM, I don=E2=80=99t see how streaming makes sense then.  Well, I suppose
+intermediate streaming would work.
+
+> - backup with compression (we have an optional already, so it works)
+> - backup to nbd server with compression: enable compression on nbd server
+
+The problem is clearly that if a generic client were to connect to the
+NBD server, it wouldn=E2=80=99t work.  In this case, compression will work =
+only
+if the clients understands the limitation.
+
+(The safe way would be to make the NBD server provide an option that
+clients can see so they know this limitation and agree they=E2=80=99ll adhe=
+re to
+it.  It=E2=80=99s also a stupid way.)
+
+> So instead of adding two options (for stream and for nbd), it seems bette=
+r to
+> add only one for generic layer.
+
+I don=E2=80=99t know.  It doesn=E2=80=99t work generically, so I don=E2=80=
+=99t know whether it
+should be a generic option.
+
+> Then, it becomes possible to run guest on image with compress=3Don. It's =
+a side
+> effect, but still it should work correctly.
+
+How so?  compress=3Don only works if every party involved only writes to
+any cluster of the image exactly once.  That is just not the case for
+guests unless they know this limitation, and even I don=E2=80=99t see a use=
+ case.
+
+> I think the simplest thing is to just run normal write, if compressed wri=
+te
+> failed because of reallocation. We should check that on that failure-path
+> ENOTSUP is returned and handle it for compress=3Don option by fallback to
+> normal write in generic block/io.c
+
+It seems wrong to not compress data with compress=3Don.
+
+> (Note, that in case with stream we rewrite only unallocated clusters)
+
+Yes, but if the stream job writes the cluster before the guest, the
+guest gets an I/O error.
+
+
+By the way, the other thing I wondered was whether this should be a
+filter driver instead (if it makes sense at all).  Such a filter driver
+would at least be sufficiently cumbersome to use that probably only
+users who understand the implications would make use of it (1B above).
+
+
+I=E2=80=99m not against adding a generic compress=3Don option if we ensure =
+that it
+actually works generically (2 above).  It doesn=E2=80=99t right now, so I d=
+on=E2=80=99t
+think this is right.
+
+I=E2=80=99m already not sure whether it=E2=80=99s really possible to suppor=
+t generic
+compressed writes in qcow2.  I suppose it=E2=80=99d be at least awkward.  I=
+n
+theory it should work, it=E2=80=99s just that we can=E2=80=99t keep track o=
+f subcluster
+allocations, which in the worst case means that some compressed clusters
+take up a whole cluster of space.
+
+For VMDK...  I suppose we could consider a new flag for block drivers
+that flags whether a driver supports arbitrary compressed writes or has
+the old limitations.  compress=3Don could then refuse to work on any block
+driver but the ones that support arbitrary compressed writes.
+
+
+Our current model (1A) is simply to ensure that all compressed writes
+can adhere to the limitations.  As I=E2=80=99ve said above, extending this =
+to
+NBD would mean adding some NBD negotiation so both client and server
+agree on this limitation.  That seems kind of reasonable from the qemu
+side, but probably very unreasonable from an NBD side.  Why would NBD
+bother to reproduce qemu=E2=80=99s limitations?
+
+
+So these are the three ways (1A, 1B, 2) I can imagine.  But just adding
+a generic option that unsuspecting users are not unlikely to use but
+that simply doesn=E2=80=99t work generically doesn=E2=80=99t seem right to =
+me.
+
+Max
+
+
+--0ntlWQojfiabiKVugCSuF331LVIvB3f4H--
+
+--gWzTNzs3fTcBwvKluYrzQ3vCI04jfEH27
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl2u6HsACgkQ9AfbAGHV
+z0Cjlgf8DoqguJa3ACImgMNAeCuO2pCPVTkgCmDUybeF8S72GsWt3S86p+eXmyqB
+MKQBwxx4+VglB8JV2l4C44+5OtjyKS+QdVZ+nKUasXwbPw8HlmrW3siypTR3MS0f
+Kg6LpmR8AyA+k9KwQOywgqIY82rAqYPi3tW3YDV4A7WLPdp+KO16RdTju71SKwa7
+CBlF/z5HJSHNsub7royX2UQKE6epSDOCR0P/B/YJfrBrlC4hp3MzD5Kkd9Hf5+bg
+QVcnCHV4uX5I352++AKeGL17fRSlNrhp9uhvK+z3T4ckshIDbxYAt5kNAgYp2Cj8
+mrKXsjjuKFeNLfS7E7VxXuqJU4Bt5w==
+=x86d
+-----END PGP SIGNATURE-----
+
+--gWzTNzs3fTcBwvKluYrzQ3vCI04jfEH27--
 
 
