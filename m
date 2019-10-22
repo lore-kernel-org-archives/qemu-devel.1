@@ -4,87 +4,86 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 07D62CA9EA0
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 19:34:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A7EBCA9EA0
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 19:34:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BE19620B7C
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 19:34:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2C63C20B7C
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 19:34:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="QP6x4850"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BE19620B7C
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="C6ZOa74E"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2C63C20B7C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42528 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42540 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iMzuq-0004VJ-RP
-	for qemu-devel@archiver.kernel.org; Tue, 22 Oct 2019 15:34:00 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37531)
+	id 1iMzvh-0005QZ-83
+	for qemu-devel@archiver.kernel.org; Tue, 22 Oct 2019 15:34:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37490)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1iMznU-0004wu-R0
- for qemu-devel@nongnu.org; Tue, 22 Oct 2019 15:26:25 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1iMznT-00026i-Mt
+ (envelope-from <alex.bennee@linaro.org>) id 1iMznT-0004uu-VV
  for qemu-devel@nongnu.org; Tue, 22 Oct 2019 15:26:24 -0400
-Received: from mail-wr1-x436.google.com ([2a00:1450:4864:20::436]:38868)
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+ (envelope-from <alex.bennee@linaro.org>) id 1iMznS-00025t-Ph
+ for qemu-devel@nongnu.org; Tue, 22 Oct 2019 15:26:23 -0400
+Received: from mail-wm1-x336.google.com ([2a00:1450:4864:20::336]:55491)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1iMznT-00025p-Ci
- for qemu-devel@nongnu.org; Tue, 22 Oct 2019 15:26:23 -0400
-Received: by mail-wr1-x436.google.com with SMTP id v9so8087385wrq.5
- for <qemu-devel@nongnu.org>; Tue, 22 Oct 2019 12:26:23 -0700 (PDT)
+ id 1iMznS-00025H-Jb
+ for qemu-devel@nongnu.org; Tue, 22 Oct 2019 15:26:22 -0400
+Received: by mail-wm1-x336.google.com with SMTP id g24so9415493wmh.5
+ for <qemu-devel@nongnu.org>; Tue, 22 Oct 2019 12:26:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=FAqFQJqp9wB9CdQPIdWZc2GaC2MYvXPxclSsx2WiX5w=;
- b=QP6x4850OFgTIOy7Fxl414ti+BsoxT3yD3P+RDuaAWsoIAAmC9urz5YJq7m1I3irTo
- bb7NQeb4+9pNS6uUSiGMdZtomQ6r4bFO2SapJrvAoXX9gY7+susFDjwEQJCAYO0sgRWr
- aXBihF84rl9aVjlKVHmjf+ZVw6NdmIn41X3ygRYq//x2HPGLYlKHnl7FSSyHw03m6JQc
- dgyeqPi/Bida5zs3x0ldhYv1mFTxhQc0k8C87Qga4jTvWVH+0dglCqhn1dLhwNuReavf
- HgqDgnzv536VDKB7eJWk63/4oLAeHPyuoE3QbRFeOYU2myx5dqM/EOqktptgr8o8rkGG
- xQeA==
+ bh=CR15GmJcpTxUHSy0ueYvJce2z343jSaRkeBQ2QiDxqA=;
+ b=C6ZOa74EIOFdkz6DKBKo/YIFzj6BOKROAT4nnwiWM71zgqs8IiNsiCzoDtZvMlHxW9
+ g8hKE3D5C/OLbKfW8naUSl9aWxo44MbNEXRkmZQRX5/vnT9dSOYA3ORMuyDUgBrpdiG4
+ A+2tRZ5vKD+fu+6nHmnI0AenXp7MNqXpvDsV63f2J5tESleaYewu9c4jBm4lY2G3iQnY
+ uWOPcEL1SLJAHkaIdUSvcttgtnWe/+15JZJ+ETkQPLVsgzUxXIfM7TqR8Oc+kYLeY6eQ
+ F5Ucyc0ZeKA6DXX2ptUwiBbOXO+Q+XWREgA8faNB+Un8M0RNPagBW29aKHL36Y97WlrM
+ Enpw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=FAqFQJqp9wB9CdQPIdWZc2GaC2MYvXPxclSsx2WiX5w=;
- b=ipuq0D7DgVwx5U+ulT6+RhyTn43Kcqk9TSc84TNIz7dHTD+zo2QXzDDsZ6TqSsNAJ6
- s/4+CTA1mhmCMPBNP8p19rtvuqpO0b7Z5EidV1eJck6rUZR0L0cRr3R3Lpj6cq3WkqSF
- 4t7m59ymD7JifiGhfiS2pMMsH+Iu1PjCHe4/FoV3AH4L1pP0Ogpn07w4g7pl3VSQ7buQ
- HX2E9c+0//OhtO5BG+PxRWZ1Rp4NCoUTdm1nPktvYotZjQHKq76cACVqAt/DQwFIuCDy
- KrSIBCXQY0BlINxxGC8k+qMatV8nqBjfhta/kZ4E/xmz10kRgr+5qN7S1ORYq0FXJHQr
- H/qw==
-X-Gm-Message-State: APjAAAVIzyaOpK078TUdyqYJcjwpSxXxQmrOyPc/lgs+eTehuZyrkmLf
- zMQsBiRYB2tZIU3MjGZuaV04yA==
-X-Google-Smtp-Source: APXvYqwB3kPAvgN9apQXs3bY0grYqLcRaTmppWfewT8VyHWtoxXd8L9v+5OGsVrU/3Gy2EfnUA7qWw==
-X-Received: by 2002:adf:9b9d:: with SMTP id d29mr4943460wrc.293.1571772382229; 
- Tue, 22 Oct 2019 12:26:22 -0700 (PDT)
+ bh=CR15GmJcpTxUHSy0ueYvJce2z343jSaRkeBQ2QiDxqA=;
+ b=XTKpwnI7JEQCAfjlHzQ5P3VWZZhTZpZnYaTg/cLhwvqGdWLi87qR7EIQiJ+4CvMV9p
+ AJ/ShXPxKpk2zJ773ymNVbDK+qZgVtfbKu2CgtOYAcJkC18d5URBpyRixfUFkxk0EaAE
+ ZX3YQrqkhmNuGbONxUWXwyZ35LYwCN4pcbiTYd67kF4nmpXcHmhbue4mrO1ZMLtQ1oOQ
+ ThE0eEdJMm+6/+SC317/pPgHiB5N9ZXld8LpQ0gA1xiykLwnf5OWn2K7h0PZIfn2LKy7
+ KQzZzJQqsYBSE6+1SiW9Nz6o+Hb+dZIKUXqfXEFhQt6V82MNUYK5hGuDDhyB37zoArT0
+ ANOg==
+X-Gm-Message-State: APjAAAU1S+gZFy0UgeQQxrTo8xWX+ecT2f0XJlCblXdID1eqUP0MMCRV
+ Xd2HsP6NzSF5v9FMCaakAlkhTA==
+X-Google-Smtp-Source: APXvYqzUTrHi1MiGsp2DEk4PxGSNBMDpTamEghgokyd8bFeOa4lJkxLPQPusnBF05ELsRV66qG/0Tg==
+X-Received: by 2002:a7b:cf05:: with SMTP id l5mr4278222wmg.119.1571772381393; 
+ Tue, 22 Oct 2019 12:26:21 -0700 (PDT)
 Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id z142sm19702344wmc.24.2019.10.22.12.26.18
+ by smtp.gmail.com with ESMTPSA id h17sm20578690wme.6.2019.10.22.12.26.18
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
  Tue, 22 Oct 2019 12:26:19 -0700 (PDT)
 Received: from zen.lan (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 5570A1FF9C;
+ by zen.linaroharston (Postfix) with ESMTP id F14421FF8C;
  Tue, 22 Oct 2019 20:17:05 +0100 (BST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH  v1 12/19] tests/vm/netbsd: Disable IPv6
-Date: Tue, 22 Oct 2019 20:16:57 +0100
-Message-Id: <20191022191704.6134-13-alex.bennee@linaro.org>
+Subject: [PATCH  v1 19/19] iotests: Remove 130 from the "auto" group
+Date: Tue, 22 Oct 2019 20:17:04 +0100
+Message-Id: <20191022191704.6134-20-alex.bennee@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20191022191704.6134-1-alex.bennee@linaro.org>
 References: <20191022191704.6134-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::436
+X-Received-From: 2a00:1450:4864:20::336
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,47 +95,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: fam@euphon.net, Thomas Huth <thuth@redhat.com>, berrange@redhat.com,
- Eduardo Habkost <ehabkost@redhat.com>, stefanb@linux.vnet.ibm.com,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
- richard.henderson@linaro.org, f4bug@amsat.org,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Kamil Rytarowski <kamil@netbsd.org>, cota@braap.org, stefanha@redhat.com,
- marcandre.lureau@redhat.com, pbonzini@redhat.com, aurelien@aurel32.net
+Cc: fam@euphon.net, Kevin Wolf <kwolf@redhat.com>,
+ Thomas Huth <thuth@redhat.com>, berrange@redhat.com,
+ "open list:Block layer core" <qemu-block@nongnu.org>,
+ stefanb@linux.vnet.ibm.com, John Snow <jsnow@redhat.com>,
+ richard.henderson@linaro.org, f4bug@amsat.org, Max Reitz <mreitz@redhat.com>,
+ cota@braap.org, stefanha@redhat.com, marcandre.lureau@redhat.com,
+ pbonzini@redhat.com, aurelien@aurel32.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Eduardo Habkost <ehabkost@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
 
-Workaround for issues when the host has no IPv6 connectivity.
+Peter hit a "Could not open 'TEST_DIR/t.IMGFMT': Failed to get shared
+'write' lock - Is another process using the image [TEST_DIR/t.IMGFMT]?"
+error with 130 already twice. Looks like this test is a little bit
+shaky, so for the time being, let's disable it from the "auto" group so
+that it does not gate the pull requests.
 
-Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-Reviewed-by: Thomas Huth <thuth@redhat.com>
-Message-Id: <20191018181705.17957-4-ehabkost@redhat.com>
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+Reviewed-by: John Snow <jsnow@redhat.com>
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+Message-Id: <20191022072135.11188-7-thuth@redhat.com>
 ---
- tests/vm/netbsd | 7 +++++++
- 1 file changed, 7 insertions(+)
+ tests/qemu-iotests/group | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/tests/vm/netbsd b/tests/vm/netbsd
-index 9558a672efa..d4dd1929f2d 100755
---- a/tests/vm/netbsd
-+++ b/tests/vm/netbsd
-@@ -63,6 +63,13 @@ class NetBSDVM(basevm.BaseVM):
-     """
-     poweroff = "/sbin/poweroff"
- 
-+    # Workaround for NetBSD + IPv6 + slirp issues.
-+    # NetBSD seems to ignore the ICMPv6 Destination Unreachable
-+    # messages generated by slirp.  When the host has no IPv6
-+    # connectivity, this causes every connection to ftp.NetBSD.org
-+    # take more than a minute to be established.
-+    ipv6 = False
-+
-     def build_image(self, img):
-         cimg = self._download_with_cache(self.link, sha512sum=self.csum)
-         img_tmp = img + ".tmp"
+diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
+index 33b499ed410..4596497bced 100644
+--- a/tests/qemu-iotests/group
++++ b/tests/qemu-iotests/group
+@@ -151,7 +151,7 @@
+ 127 rw auto backing quick
+ 128 rw quick
+ 129 rw quick
+-130 rw auto quick
++130 rw quick
+ 131 rw quick
+ 132 rw quick
+ 133 auto quick
 -- 
 2.20.1
 
