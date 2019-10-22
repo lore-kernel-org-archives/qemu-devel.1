@@ -2,125 +2,81 @@ Return-Path: <SRS0=tSBD=YP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 779E4CA9EA0
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 06:02:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F0F6CCA9EA0
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 06:19:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4211021783
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 06:02:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B685F20B7C
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 06:19:30 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WVrEP71B"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4211021783
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="etJfERM1"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B685F20B7C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50470 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50572 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iMnFM-0007D4-Eq
-	for qemu-devel@archiver.kernel.org; Tue, 22 Oct 2019 02:02:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59362)
+	id 1iMnVx-00022S-Tv
+	for qemu-devel@archiver.kernel.org; Tue, 22 Oct 2019 02:19:29 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60749)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <thuth@redhat.com>) id 1iMnDX-0006H1-4p
- for qemu-devel@nongnu.org; Tue, 22 Oct 2019 02:00:28 -0400
+ (envelope-from <armbru@redhat.com>) id 1iMnUo-0001Rt-Cj
+ for qemu-devel@nongnu.org; Tue, 22 Oct 2019 02:18:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <thuth@redhat.com>) id 1iMnDU-0001Cu-Ku
- for qemu-devel@nongnu.org; Tue, 22 Oct 2019 02:00:25 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:49889
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <armbru@redhat.com>) id 1iMnUn-0006fo-9I
+ for qemu-devel@nongnu.org; Tue, 22 Oct 2019 02:18:18 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:36238
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <thuth@redhat.com>) id 1iMnDU-0001CP-8W
- for qemu-devel@nongnu.org; Tue, 22 Oct 2019 02:00:24 -0400
+ (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1iMnUn-0006fi-63
+ for qemu-devel@nongnu.org; Tue, 22 Oct 2019 02:18:17 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1571724022;
+ s=mimecast20190719; t=1571725096;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:openpgp:openpgp:autocrypt:autocrypt;
- bh=mVbuDN9y++JC+aRmrI3HgUAR84LyI5uon/HYR2jwkTE=;
- b=WVrEP71BUmjMH1Q2LF1UcwS+l7l/2mxUAv7u0PrLIrM0xcCWz8ELE8a9BJxbLHOQurh9hA
- 7FM4ei3gEvV929zL5CCDrDQENzE6U4IZrevqfk+hyWkYmB6yfjrOw/lz+owcNlZ4ADCeZv
- mF3fcKCeWAV+0fDFXUjnOFbK0S/Th5E=
+ in-reply-to:in-reply-to:references:references;
+ bh=Y9t4ZYoitCThfCu83qRbjYr4evCXjg2uqwFMRmx+seY=;
+ b=etJfERM1H4ZfaUQTuzPxTy6vtHIx8+/XAkA0V+shoNtVKHlmMZMUgo+IYg3amMfjL2k3Am
+ dGB0ZDQ0hRu07iOpNEP0/WVDrQmdXU2MZSKeoYxvyhDNMZXHkJx8jYofYePhPreaQGUcnx
+ Jeq1HiwkiITSC//obAzt1rxbWNB9mFI=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-234-Du4ry-enNCWe9GmdoOiLqg-1; Tue, 22 Oct 2019 02:00:21 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
+ us-mta-336-vYKR9QsGPia8jk2di8H2IA-1; Tue, 22 Oct 2019 02:18:13 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 38B631800D6A
- for <qemu-devel@nongnu.org>; Tue, 22 Oct 2019 06:00:20 +0000 (UTC)
-Received: from thuth.remote.csb (dhcp-200-228.str.redhat.com [10.33.200.228])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 711FB60623;
- Tue, 22 Oct 2019 06:00:16 +0000 (UTC)
-Subject: Re: [PATCH] memory-device: simplify Makefile.objs conditions
-To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
-References: <20191021171120.17947-1-pbonzini@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=thuth@redhat.com; prefer-encrypt=mutual; keydata=
- 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
-Organization: Red Hat
-Message-ID: <69ad3113-8fc5-43c4-e8ac-12582bdeaf80@redhat.com>
-Date: Tue, 22 Oct 2019 08:00:16 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B3848107AD31;
+ Tue, 22 Oct 2019 06:18:12 +0000 (UTC)
+Received: from blackfin.pond.sub.org (unknown [10.36.118.123])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id ABF921001E75;
+ Tue, 22 Oct 2019 06:18:09 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id 110461138619; Tue, 22 Oct 2019 08:18:08 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: Han Han <hhan@redhat.com>
+Subject: Re: [PATCH] qemu-options.hx: Update for reboot-timeout parameter
+References: <20191015151451.727323-1-hhan@redhat.com>
+Date: Tue, 22 Oct 2019 08:18:08 +0200
+In-Reply-To: <20191015151451.727323-1-hhan@redhat.com> (Han Han's message of
+ "Tue, 15 Oct 2019 23:14:51 +0800")
+Message-ID: <87d0epqp5r.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.2 (gnu/linux)
 MIME-Version: 1.0
-In-Reply-To: <20191021171120.17947-1-pbonzini@redhat.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-MC-Unique: Du4ry-enNCWe9GmdoOiLqg-1
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-MC-Unique: vYKR9QsGPia8jk2di8H2IA-1
 X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=WINDOWS-1252
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.61
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -132,31 +88,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: philmd@redhat.com
+Cc: qemu-trivial@nongnu.org, philmd@redhat.com, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 21/10/2019 19.11, Paolo Bonzini wrote:
-> hw/mem/ is only included if CONFIG_MEM_DEVICE is true, so we need not
-> specify the condition again in hw/mem/Makefile.objs.
->=20
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> ---
->  hw/mem/Makefile.objs | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->=20
-> diff --git a/hw/mem/Makefile.objs b/hw/mem/Makefile.objs
-> index 3e2f7c5ca2..56345befd0 100644
-> --- a/hw/mem/Makefile.objs
-> +++ b/hw/mem/Makefile.objs
-> @@ -1,3 +1,3 @@
->  common-obj-$(CONFIG_DIMM) +=3D pc-dimm.o
-> -common-obj-$(CONFIG_MEM_DEVICE) +=3D memory-device.o
-> +common-obj-y +=3D memory-device.o
->  common-obj-$(CONFIG_NVDIMM) +=3D nvdimm.o
->=20
+Han Han <hhan@redhat.com> writes:
 
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+> Since ee5d0f89d, -1 is not valid for the value of reboot-timeout. Update
+> that in qemu-options doc.
+>
+> Signed-off-by: Han Han <hhan@redhat.com>
+> ---
+>  qemu-options.hx | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+>
+> diff --git a/qemu-options.hx b/qemu-options.hx
+> index 793d70ff..6b92a916 100644
+> --- a/qemu-options.hx
+> +++ b/qemu-options.hx
+> @@ -327,8 +327,8 @@ format(true color). The resolution should be supporte=
+d by the SVGA mode, so
+   A splash picture could be passed to bios, enabling user to show it as lo=
+go,
+   when option splash=3D@var{sp_name} is given and menu=3Don, If firmware/B=
+IOS
+   supports them. Currently Seabios for X86 system support it.
+   limitation: The splash file could be a jpeg file or a BMP file in 24 BPP
+   format(true color). The resolution should be supported by the SVGA mode,=
+ so
+>  the recommended is 320x240, 640x480, 800x640.
+> =20
+>  A timeout could be passed to bios, guest will pause for @var{rb_timeout}=
+ ms
+> -when boot failed, then reboot. If @var{rb_timeout} is '-1', guest will n=
+ot
+> -reboot, qemu passes '-1' to bios by default. Currently Seabios for X86
+> +when boot failed, then reboot. If @option{reboot-timeout} is not set,
+> +guest will not reboot by default. Currently Seabios for X86
+>  system support it.
+> =20
+>  Do strict boot via @option{strict=3Don} as far as firmware/BIOS
+
+Preexisting: "could be passed" sounds awkward.  Same in the previous
+paragraph.  Not this patch's problem, so:
+
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
 
 
