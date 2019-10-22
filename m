@@ -2,60 +2,106 @@ Return-Path: <SRS0=tSBD=YP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BBAC6CA9EA0
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 14:20:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 86C09CA9EA0
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 14:21:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7E0D020700
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 14:20:29 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7E0D020700
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTPS id 5256F20684
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 14:21:25 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iIccvc5q"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5256F20684
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58658 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58660 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iMv1P-0001zj-Mc
-	for qemu-devel@archiver.kernel.org; Tue, 22 Oct 2019 10:20:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45265)
+	id 1iMv2K-00039n-32
+	for qemu-devel@archiver.kernel.org; Tue, 22 Oct 2019 10:21:24 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38662)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <yezhenyu2@huawei.com>) id 1iMuzT-0000FQ-Sz
- for qemu-devel@nongnu.org; Tue, 22 Oct 2019 10:18:29 -0400
+ (envelope-from <mreitz@redhat.com>) id 1iMuOD-0004Zs-5n
+ for qemu-devel@nongnu.org; Tue, 22 Oct 2019 09:39:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <yezhenyu2@huawei.com>) id 1iMuzR-00008p-SW
- for qemu-devel@nongnu.org; Tue, 22 Oct 2019 10:18:27 -0400
-Received: from szxga06-in.huawei.com ([45.249.212.32]:60584 helo=huawei.com)
+ (envelope-from <mreitz@redhat.com>) id 1iMuO9-0003wa-Ug
+ for qemu-devel@nongnu.org; Tue, 22 Oct 2019 09:39:55 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:45164
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <yezhenyu2@huawei.com>)
- id 1iMuzR-00007W-7X
- for qemu-devel@nongnu.org; Tue, 22 Oct 2019 10:18:25 -0400
-Received: from DGGEMS411-HUB.china.huawei.com (unknown [172.30.72.60])
- by Forcepoint Email with ESMTP id AB5748DAC510D990A9A1;
- Tue, 22 Oct 2019 22:18:20 +0800 (CST)
-Received: from [127.0.0.1] (10.173.223.212) by DGGEMS411-HUB.china.huawei.com
- (10.3.19.211) with Microsoft SMTP Server id 14.3.439.0;
- Tue, 22 Oct 2019 22:18:12 +0800
-Subject: Re: [RFC PATCH] iothread: add set_iothread_poll_* commands
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-References: <5DAEB9D3.3080503@huawei.com> <20191022085119.GB2815@work-vm>
-From: Zhenyu Ye <yezhenyu2@huawei.com>
-Message-ID: <5DAF0FA3.1070309@huawei.com>
-Date: Tue, 22 Oct 2019 22:18:11 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:38.0) Gecko/20100101
- Thunderbird/38.1.0
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1iMuO8-0003vR-23
+ for qemu-devel@nongnu.org; Tue, 22 Oct 2019 09:39:52 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1571751589;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=6SRV+Mpnhv3z+Om1pNCATXglDUtLD57sseRA3Ougm9c=;
+ b=iIccvc5qB+G/S2DlbC3WP284dHYWdPpBJOhDZhp5E5m7s0XeVLuqgD4oNELC6Ddz5Uf0AM
+ +xez7+JZ6dwMmKXIj/fahS/2u1q4GcWxIBk7zUBI0orEqAlnKNcGLwpfIAuw6ntGbFCCBa
+ GvZKE+VdRNWyOH6ah9d9myFCM8OD6aM=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-353-AcXC4-98PsqafSbDAIRCtQ-1; Tue, 22 Oct 2019 09:39:45 -0400
+X-MC-Unique: AcXC4-98PsqafSbDAIRCtQ-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BF3A1107AD35;
+ Tue, 22 Oct 2019 13:39:44 +0000 (UTC)
+Received: from dresden.str.redhat.com (ovpn-117-215.ams2.redhat.com
+ [10.36.117.215])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 901BB52CD;
+ Tue, 22 Oct 2019 13:39:40 +0000 (UTC)
+Subject: Re: [PATCH v3 0/6] Enable more iotests during "make check-block"
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ qemu-devel@nongnu.org
+References: <20191022072135.11188-1-thuth@redhat.com>
+ <87a79sx6uc.fsf@linaro.org>
+From: Max Reitz <mreitz@redhat.com>
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <123b2e94-3f43-1a8e-2420-12ae09483e2f@redhat.com>
+Date: Tue, 22 Oct 2019 15:39:39 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.1
 MIME-Version: 1.0
-In-Reply-To: <20191022085119.GB2815@work-vm>
-Content-Type: text/plain; charset="UTF-8"
-X-Originating-IP: [10.173.223.212]
-X-CFilter-Loop: Reflected
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <87a79sx6uc.fsf@linaro.org>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Mimecast-Spam-Score: 0
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="YxcntaNPeOxoFfrgmP2P5OApgSq2yQU06"
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 45.249.212.32
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -67,362 +113,115 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org, xiexiangyou@huawei.com,
- jiangyiwen <jiangyiwen@huawei.com>, stefanha@redhat.com, pbonzini@redhat.com
+Cc: Kevin Wolf <kwolf@redhat.com>, John Snow <jsnow@redhat.com>,
+ qemu-block@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--YxcntaNPeOxoFfrgmP2P5OApgSq2yQU06
+Content-Type: multipart/mixed; boundary="5Ut9mTq8xYUNMjmBMGDfcHHbz5wH4Faaj"
 
+--5Ut9mTq8xYUNMjmBMGDfcHHbz5wH4Faaj
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
-On 2019/10/22 16:51, Dr. David Alan Gilbert wrote:
-> * yezhenyu (A) (yezhenyu2@huawei.com) wrote:
->> Since qemu2.9, QEMU added three AioContext poll parameters to struct
->> IOThread: poll_max_ns, poll_grow and poll_shrink. These properties are
->> used to control iothread polling time.
+On 22.10.19 15:11, Alex Benn=C3=A9e wrote:
+>=20
+> Thomas Huth <thuth@redhat.com> writes:
+>=20
+>> As discussed here:
 >>
->> However, there isn't properly hmp commands to adjust them when the VM =
-is
->> alive. It's useful to adjust them online when observing the impact of
->> different property value on performance.
+>>  https://lists.gnu.org/archive/html/qemu-devel/2019-10/msg00697.html
 >>
->> This patch add three hmp commands to adjust iothread poll-* properties
->> for special iothread:
+>> and here:
 >>
->> set_iothread_poll_max_ns: set the maximum polling time in ns;
->> set_iothread_poll_grow: set how many ns will be added to polling time;
->> set_iothread_poll_shrink: set how many ns will be removed from polling
->> time.
+>>  https://lists.gnu.org/archive/html/qemu-devel/2019-10/msg01388.html
 >=20
-> Thanks;  I don't know much about iothread, so I'll answer just from the
-> HMP side.
->=20
+> Queued to testing/next, thanks.
 
-Thanks for your review. I will update my patch according to your advice, =
-and
-submit a NEW PATCH. Some of my answers are below...
+It should be noted that this series depends on my SOCK_DIR series (which
+I have in my block branch), or the newly added tests are likely to fail
+in the CI environment.
 
->> Signed-off-by: Zhenyu Ye <yezhenyu2@huawei.com>
->> ---
->> hmp-commands.hx | 42 ++++++++++++++++++++
->> hmp.c | 30 +++++++++++++++
->> hmp.h | 3 ++
->> include/sysemu/iothread.h | 6 +++
->> iothread.c | 80 +++++++++++++++++++++++++++++++++++++++
->> qapi/misc.json | 23 +++++++++++
->> 6 files changed, 184 insertions(+)
+Max
+
 >>
->> diff --git a/hmp-commands.hx b/hmp-commands.hx
->> index a2c3ffc218..6fa0c5227a 100644
->> --- a/hmp-commands.hx
->> +++ b/hmp-commands.hx
->> @@ -74,6 +74,48 @@ VM initialization using configuration data provided=
- on the command line
->> and via the QMP monitor during the preconfig state. The command is onl=
-y
->> available during the preconfig state (i.e. when the --preconfig comman=
-d
->> line option was in use).
->> +ETEXI
->> +
->> + {
->> + .name =3D "set_iothread_poll_max_ns",
->> + .args_type =3D "iothread_id:s,poll_max_ns:i",
->> + .params =3D "iothread_id poll_max_ns",
->> + .help =3D "set poll_max_ns for a special iothread",
->> + .cmd =3D hmp_set_iothread_poll_max_ns,
->> + },
->> +
->> +STEXI
->> +@item set_iothread_poll_max_ns
->> +@findex set_iothread_poll_max_ns
->> +set poll_max_ns property for a special iothread.
->> +ETEXI
->> +
->> + {
->> + .name =3D "set_iothread_poll_grow",
->> + .args_type =3D "iothread_id:s,poll_grow:i",
->> + .params =3D "iothread_id poll_grow",
->> + .help =3D "set poll_grow for a special iothread",
->> + .cmd =3D hmp_set_iothread_poll_grow,
->> + },
->> +
->> +STEXI
->> +@item set_iothread_poll_grow
->> +@findex set_iothread_poll_grow
->> +set poll_grow property for a special iothread.
->> +ETEXI
->> +
->> + {
->> + .name =3D "set_iothread_poll_shrink",
->> + .args_type =3D "iothread_id:s,poll_shrink:i",
->> + .params =3D "iothread_id poll_shrink",
->> + .help =3D "set poll_shrink for a special iothread",
->> + .cmd =3D hmp_set_iothread_poll_shrink,
->> + },
->> +
->> +STEXI
->> +@item set_iothread_poll_shrink
->> +@findex set_iothread_poll_shrink
->> +set poll_shrink property for a special iothread.
->> ETEXI
->=20
-> I think I'd prefer one command with a parameter to select
-> the value to be set;   in migration we used to have lots of commands
-> but are moving to migrate_set_parameter which then handles all of them.
->=20
-> So something like,
->=20
->     iothread set_parameter poll_shrink 10
->=20
-> The code is a little more complex, but a lot less repetative!
->=20
-
-OK=EF=BC=8C I will combine these in one command such as,
-
-    set_iothread_parameter iothread_id parameter_name value
-
->> {
->> diff --git a/hmp.c b/hmp.c
->> index 56a3ed7375..87520bcc85 100644
->> --- a/hmp.c
->> +++ b/hmp.c
->> @@ -2711,6 +2711,36 @@ void hmp_info_iothreads(Monitor *mon, const QDi=
-ct *qdict)
->> qapi_free_IOThreadInfoList(info_list);
->> }
+>> it would be good to have some more valuable iotests enabled in the
+>> "auto" group to get better iotest coverage during "make check".
 >>
->> +void hmp_set_iothread_poll_max_ns(Monitor *mon, const QDict *qdict)
->> +{
->> + const char *iothread_id =3D qdict_get_str(qdict, "iothread_id");
->> + int64_t poll_max_ns =3D qdict_get_int(qdict, "poll_max_ns");
->> + Error *err =3D NULL;
->> +
->> + qmp_set_iothread_poll_param(iothread_id, "poll_max_ns", poll_max_ns,=
- &err);
->> + hmp_handle_error(mon, &err);
->> +}
->> +
->> +void hmp_set_iothread_poll_grow(Monitor *mon, const QDict *qdict)
->> +{
->> + const char *iothread_id =3D qdict_get_str(qdict, "iothread_id");
->> + int64_t poll_grow =3D qdict_get_int(qdict, "poll_grow");
->> + Error *err =3D NULL;
->> +
->> + qmp_set_iothread_poll_param(iothread_id, "poll_grow", poll_grow, &er=
-r);
->> + hmp_handle_error(mon, &err);
->> +}
->> +
->> +void hmp_set_iothread_poll_shrink(Monitor *mon, const QDict *qdict)
->> +{
->> + const char *iothread_id =3D qdict_get_str(qdict, "iothread_id");
->> + int64_t poll_shrink =3D qdict_get_int(qdict, "poll_shrink");
->> + Error *err =3D NULL;
->> +
->> + qmp_set_iothread_poll_param(iothread_id, "poll_shrink", poll_shrink,=
- &err);
->> + hmp_handle_error(mon, &err);
->> +}
->> +
->> void hmp_qom_list(Monitor *mon, const QDict *qdict)
->> {
->> const char *path =3D qdict_get_try_str(qdict, "path");
->> diff --git a/hmp.h b/hmp.h
->> index 43617f2646..8ce3b53556 100644
->> --- a/hmp.h
->> +++ b/hmp.h
->> @@ -41,6 +41,9 @@ void hmp_info_pci(Monitor *mon, const QDict *qdict);
->> void hmp_info_block_jobs(Monitor *mon, const QDict *qdict);
->> void hmp_info_tpm(Monitor *mon, const QDict *qdict);
->> void hmp_info_iothreads(Monitor *mon, const QDict *qdict);
->> +void hmp_set_iothread_poll_max_ns(Monitor *mon, const QDict *qdict);
->> +void hmp_set_iothread_poll_grow(Monitor *mon, const QDict *qdict);
->> +void hmp_set_iothread_poll_shrink(Monitor *mon, const QDict *qdict);
->> void hmp_quit(Monitor *mon, const QDict *qdict);
->> void hmp_stop(Monitor *mon, const QDict *qdict);
->> void hmp_sync_profile(Monitor *mon, const QDict *qdict);
->> diff --git a/include/sysemu/iothread.h b/include/sysemu/iothread.h
->> index 5f6240d5cb..7ebeb51f37 100644
->> --- a/include/sysemu/iothread.h
->> +++ b/include/sysemu/iothread.h
->> @@ -45,6 +45,12 @@ char *iothread_get_id(IOThread *iothread);
->> IOThread *iothread_by_id(const char *id);
->> AioContext *iothread_get_aio_context(IOThread *iothread);
->> GMainContext *iothread_get_g_main_context(IOThread *iothread);
->> +void iothread_set_poll_max_ns(IOThread *iothread, int64_t poll_max_ns=
-);
->> +int64_t iothread_get_poll_max_ns(IOThread *iothread);
->> +void iothread_set_poll_grow(IOThread *iothread, int64_t poll_grow);
->> +int64_t iothread_get_poll_grow(IOThread *iothread);
->> +void iothread_set_poll_shrink(IOThread *iothread, int64_t poll_shrink=
-);
->> +int64_t iothread_get_poll_shrink(IOThread *iothread);
+>> And once Max' "iotests: Add and use $SOCK_DIR" patch series has been
+>> merged, we can indeed enable these Python-based tests, too.
 >>
->> /*
->> * Helpers used to allocate iothreads for internal use. These
->> diff --git a/iothread.c b/iothread.c
->> index 7130be58e3..4ab6128c5f 100644
->> --- a/iothread.c
->> +++ b/iothread.c
->> @@ -384,3 +384,83 @@ IOThread *iothread_by_id(const char *id)
->> {
->> return IOTHREAD(object_resolve_path_type(id, TYPE_IOTHREAD, NULL));
->> }
->> +
->> +void iothread_set_poll_max_ns(IOThread *iothread, int64_t poll_max_ns=
-)
->> +{
->> + iothread->poll_max_ns =3D poll_max_ns;
->> +}
->=20
-> Is the indentation correct here? It looks a bit off.
->=20
-
-I will correct this.
-
->> +int64_t iothread_get_poll_max_ns(IOThread *iothread)
->> +{
->> + return iothread->poll_max_ns;
->> +}
->> +
->> +void iothread_set_poll_grow(IOThread *iothread, int64_t poll_grow)
->> +{
->> + iothread->poll_grow =3D poll_grow;
->> +}
->> +
->> +int64_t iothread_get_poll_grow(IOThread *iothread)
->> +{
->> + return iothread->poll_grow;
->> +}
->> +
->> +void iothread_set_poll_shrink(IOThread *iothread, int64_t poll_shrink=
-)
->> +{
->> + iothread->poll_shrink =3D poll_shrink;
->> +}
->> +
->> +int64_t iothread_get_poll_shrink(IOThread *iothread)
->> +{
->> + return iothread->poll_shrink;
->> +}
->> +
->> +void qmp_set_iothread_poll_param(const char *iothread_id, const char =
-*name,
->> + int64_t value, Error **errp)
->=20
-> OK, so you should split the patch into a qmp patch and and then an HMP
-> patch.
-> I'll leave the QMP review to others, but I'm guessing they'd prefer
-> to take a QAPI enum here rather than the name.
->=20
-
-I will split the patch according your advice.
-
-> Are there some docs somewhere that describe what grow and shrink
-> actually are - are they % ?  If so, then you should range check
-> them to make sure someone doesn't set them to something silly like -5.
->=20
->=20
-
-They should be positive number. I will add type check in function.
-
->> +{
->> + Error *local_error =3D NULL;
->> + int64_t old_value =3D 0;
->> + IOThread *iothread =3D iothread_by_id(iothread_id);
->> + if (!iothread) {
->> + error_setg(errp, "can not find iothread: %s", iothread_id);
->> + return;
->> + }
->> +
->> + if (strcmp(name, "poll_max_ns") =3D=3D 0) {
->> + old_value =3D iothread_get_poll_max_ns(iothread);
->> + iothread_set_poll_max_ns(iothread, value);
->> + } else if (strcmp(name, "poll_grow") =3D=3D 0) {
->> + old_value =3D iothread_get_poll_grow(iothread);
->> + iothread_set_poll_grow(iothread, value);
->> + } else if (strcmp(name, "poll_shrink") =3D=3D 0) {
->> + old_value =3D iothread_get_poll_shrink(iothread);
->> + iothread_set_poll_shrink(iothread, value);
->> + } else {
->> + error_setg(errp, "can not find param name: %s", name);
->> + return;
->> + }
->> +
->> + /* update the value in context */
->> + aio_context_set_poll_params(iothread->ctx,
->> + iothread->poll_max_ns,
->> + iothread->poll_grow,
->> + iothread->poll_shrink,
->> + &local_error);
->> +
->> + if (local_error) {
->> + error_propagate(errp, local_error);
->> +
->> + /* reset the property to old value */
->> + if (strcmp(name, "poll_max_ns") =3D=3D 0) {
->> + iothread_set_poll_max_ns(iothread, old_value);
->> + } else if (strcmp(name, "poll_grow") =3D=3D 0) {
->> + iothread_set_poll_grow(iothread, old_value);
->> + } else if (strcmp(name, "poll_shrink") =3D=3D 0) {
->> + iothread_set_poll_shrink(iothread, old_value);
->> + }
->> +
->> + return;
->> + }
->> +
->> + return;
->> +}
->> diff --git a/qapi/misc.json b/qapi/misc.json
->> index 8b3ca4fdd3..43d3f4351c 100644
->> --- a/qapi/misc.json
->> +++ b/qapi/misc.json
->> @@ -675,6 +675,29 @@
->> { 'command': 'query-iothreads', 'returns': ['IOThreadInfo'],
->> 'allow-preconfig': true }
+>> There is just one small downside: Since these tests require a QEMU
+>> that features a 'virtio-blk' device, we cannot run the iotests
+>> with binaries like qemu-system-tricore anymore. But since the iotests
+>> were not very useful with such binaries anyway, I think it's ok now
+>> if we skip them there.
 >>
->> +##
->> +# @set-iothread-poll-param:
->> +#
->> +# Set poll-* properties for a special iothread.
->> +# The poll-* name can be poll_max_ns/poll_grow/poll_shrink.
->> +#
->> +# Notes: can not set the QEMU main loop thread, which is not declared
->> +# using the -object iothread command-line option. The poll_ns propert=
-y can not
->> +# be set manually, which is auto-adjust.
->> +#
->> +# Example:
->> +#
->> +# -> { "execute": "set-iothread-poll-param",
->> +# "arguments": { "iothread_id": "1",
->> +# "name": "poll_max_ns",
->> +# "value": 1000 } }
->> +# <- { "return": {} }
->> +#
->> +# Since 3.0
->=20
-> 3.0 was long long ago; needs updating.
->=20
-
-I will update this to 4.1.0
-
->> +##
->> +{ 'command': 'set-iothread-poll-param',
->> + 'data': {'iothread_id': 'str', 'name': 'str', 'value': 'int'} }
->> +
->> ##
->> # @BalloonInfo:
->> #
->> --=20
->> 2.22.0.windows.1
+>> I've also added a patch that removes test 130 from the "auto" group
+>> instead. Test 130 has been reported to fail intermittently, so we
+>> should not use it in "make check" block until it is fixed.
 >>
+>> Based-on: 20191010152457.17713-1-mreitz@redhat.com
+>>
+>> v3:
+>>  - Test 183 fails on Patchew, so I removed it from the "auto" group
+>>    again
+>>
+>> v2:
+>>  - Checked the iotests with NetBSD, too (now that Eduardo has
+>>    re-activated Gerd's patches for creating NetBSD VM images)
+>>  - Use 'openbsd' instead of 'openbsd6'
+>>  - Use 'grep -q' instead of 'grep' for grep'ing silently
+>>  - Added the patch to disable 130 from the "auto" group
+>>
+>> John Snow (1):
+>>   iotests: remove 'linux' from default supported platforms
+>>
+>> Thomas Huth (5):
+>>   iotests: Test 041 only works on certain systems
+>>   iotests: Test 183 does not work on macOS and OpenBSD
+>>   iotests: Skip "make check-block" if QEMU does not support virtio-blk
+>>   iotests: Enable more tests in the 'auto' group to improve test
+>>     coverage
+>>   iotests: Remove 130 from the "auto" group
+>>
+>>  tests/check-block.sh          | 16 +++++++++++++++-
+>>  tests/qemu-iotests/041        |  3 ++-
+>>  tests/qemu-iotests/183        |  1 +
+>>  tests/qemu-iotests/group      | 18 +++++++++---------
+>>  tests/qemu-iotests/iotests.py | 16 +++++++++++-----
+>>  5 files changed, 38 insertions(+), 16 deletions(-)
+>=20
+>=20
 > --
-> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> Alex Benn=C3=A9e
 >=20
->=20
-> .
->=20
+
+
+
+--5Ut9mTq8xYUNMjmBMGDfcHHbz5wH4Faaj--
+
+--YxcntaNPeOxoFfrgmP2P5OApgSq2yQU06
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl2vBpsACgkQ9AfbAGHV
+z0B8aAf/dDq13AYyvVZGJE/uHIxVIzWkU7IlTodunbC7NvE0XiV52TXNL2rS1SSG
+ns2ytwQ3Pc/xiF2H5hOTbQtZD+MHB9J9TM25yKGKZKSGBi5z+/8z/6yjRM3wDHw8
+hMh/KBcXiA5lgFqmDJsG/yrjLwOBoOMHAGVltKFewbpc73EH3kJ/sIXoIm9lBkqV
+hu/vzhgvc/kkVgtJHswlEVDZ5BUOnE5dOGekhKQD54VXb8U6gxKGZ4QtgeRyqCmf
+4F6CW0r3qzpoLO5CdrBO38YSusbNgB9TN+edOgIGrA5HqzYDGylMhAcULtRRKuFf
+ttiTze+hfO6eOzU/6lrc2m3OZSt3OQ==
+=uhry
+-----END PGP SIGNATURE-----
+
+--YxcntaNPeOxoFfrgmP2P5OApgSq2yQU06--
 
 
