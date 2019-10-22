@@ -2,75 +2,63 @@ Return-Path: <SRS0=tSBD=YP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B8A94CA9EA0
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 04:31:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 95211CA9EB9
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 04:51:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8872B20700
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 04:31:36 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8872B20700
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 6D3972184C
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 04:51:19 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6D3972184C
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=keithp.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50116 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50250 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iMlpX-0001S4-OU
-	for qemu-devel@archiver.kernel.org; Tue, 22 Oct 2019 00:31:35 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52782)
+	id 1iMm8c-0006f9-Fs
+	for qemu-devel@archiver.kernel.org; Tue, 22 Oct 2019 00:51:18 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45989)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1iMlop-0000ze-Eo
- for qemu-devel@nongnu.org; Tue, 22 Oct 2019 00:30:52 -0400
+ (envelope-from <keithp@keithp.com>) id 1iMkcR-0003as-2X
+ for qemu-devel@nongnu.org; Mon, 21 Oct 2019 23:14:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1iMlon-0002bG-TC
- for qemu-devel@nongnu.org; Tue, 22 Oct 2019 00:30:51 -0400
-Received: from indium.canonical.com ([91.189.90.7]:37672)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1iMlon-0002am-NY
- for qemu-devel@nongnu.org; Tue, 22 Oct 2019 00:30:49 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1iMlol-0007yB-Ca
- for <qemu-devel@nongnu.org>; Tue, 22 Oct 2019 04:30:47 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 5E3602E80C9
- for <qemu-devel@nongnu.org>; Tue, 22 Oct 2019 04:30:47 +0000 (UTC)
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 22 Oct 2019 04:24:26 -0000
-From: Alexey Kardashevskiy <1847440@bugs.launchpad.net>
+ (envelope-from <keithp@keithp.com>) id 1iMkcP-0004cS-JB
+ for qemu-devel@nongnu.org; Mon, 21 Oct 2019 23:13:59 -0400
+Received: from home.keithp.com ([63.227.221.253]:60146 helo=elaine.keithp.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <keithp@keithp.com>)
+ id 1iMkcM-0004aI-7P; Mon, 21 Oct 2019 23:13:54 -0400
+Received: from localhost (localhost [127.0.0.1])
+ by elaine.keithp.com (Postfix) with ESMTP id 718A43F21CC4;
+ Mon, 21 Oct 2019 20:13:50 -0700 (PDT)
+X-Virus-Scanned: Debian amavisd-new at keithp.com
+Received: from elaine.keithp.com ([127.0.0.1])
+ by localhost (elaine.keithp.com [127.0.0.1]) (amavisd-new, port 10024)
+ with LMTP id D560BGZa7Q4f; Mon, 21 Oct 2019 20:13:50 -0700 (PDT)
+Received: from keithp.com (koto.keithp.com [10.0.0.2])
+ by elaine.keithp.com (Postfix) with ESMTPSA id DDEBB3F21BD9;
+ Mon, 21 Oct 2019 20:13:49 -0700 (PDT)
+Received: by keithp.com (Postfix, from userid 1000)
+ id 7D0A11582187; Mon, 21 Oct 2019 20:13:49 -0700 (PDT)
+From: Keith Packard <keithp@keithp.com>
 To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Tags: kvm powerpcm qemu
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: aik-ozlabs dwg sathnaga
-X-Launchpad-Bug-Reporter: Satheesh Rajendran (sathnaga)
-X-Launchpad-Bug-Modifier: Alexey Kardashevskiy (aik-ozlabs)
-References: <157061153044.21976.18153238088035049329.malonedeb@gac.canonical.com>
-Message-Id: <157171826646.25130.14670979880925714962.malone@chaenomeles.canonical.com>
-Subject: [Bug 1847440] Re: ppc64le: KVM guest fails to boot with an error
- `virtio_scsi: probe of virtio1 failed with error -22` on master
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="186023fa645d8be19d403a76064f0643f510db2f";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 28b2aafacfabe2e086b7bd946ebfd0a9abee64cb
+Subject: [PATCH] Semihost SYS_READC implementation
+Date: Mon, 21 Oct 2019 20:13:35 -0700
+Message-Id: <20191022031335.9880-1-keithp@keithp.com>
+X-Mailer: git-send-email 2.23.0
+MIME-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 91.189.90.7
+X-Received-From: 63.227.221.253
+X-Mailman-Approved-At: Tue, 22 Oct 2019 00:50:14 -0400
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -79,134 +67,212 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1847440 <1847440@bugs.launchpad.net>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Keith Packard <keithp@keithp.com>,
+ qemu-arm@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ Peter Maydell <peter.maydell@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-https://patchwork.ozlabs.org/patch/1180363/ should fix it, a SLOF update fo=
-r QEMU is also posted
-https://github.com/aik/qemu/tree/qemu-slof-20191022-branch
+Provides a blocking call to read a character from the console by hooking
+into the console input chain. This happens *after* any uart has hooked in=
+,
+so specifying -semihost overrides input to any emulated uarts.
 
--- =
+Signed-off-by: Keith Packard <keithp@keithp.com>
+---
+ hw/semihosting/console.c          | 92 +++++++++++++++++++++++++++++++
+ include/hw/semihosting/console.h  | 12 ++++
+ include/hw/semihosting/semihost.h |  1 +
+ stubs/semihost.c                  |  4 ++
+ target/arm/arm-semi.c             |  3 +-
+ vl.c                              |  3 +
+ 6 files changed, 113 insertions(+), 2 deletions(-)
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1847440
+diff --git a/hw/semihosting/console.c b/hw/semihosting/console.c
+index b4b17c8afb..7345e2cce0 100644
+--- a/hw/semihosting/console.c
++++ b/hw/semihosting/console.c
+@@ -98,3 +98,95 @@ void qemu_semihosting_console_outc(CPUArchState *env, =
+target_ulong addr)
+                       __func__, addr);
+     }
+ }
++
++#include <pthread.h>
++#include "chardev/char-fe.h"
++#include "sysemu/sysemu.h"
++#include "qemu/main-loop.h"
++#include "qapi/error.h"
++
++#define FIFO_SIZE   1024
++
++typedef struct SemihostingFifo {
++    unsigned int     insert, remove;
++
++    uint8_t fifo[FIFO_SIZE];
++} SemihostingFifo;
++
++#define fifo_insert(f, c) do { \
++    (f)->fifo[(f)->insert] =3D (c); \
++    (f)->insert =3D ((f)->insert + 1) & (FIFO_SIZE - 1); \
++} while (0)
++
++#define fifo_remove(f, c) do {\
++    c =3D (f)->fifo[(f)->remove]; \
++    (f)->remove =3D ((f)->remove + 1) & (FIFO_SIZE - 1); \
++} while (0)
++
++#define fifo_full(f)        ((((f)->insert + 1) & (FIFO_SIZE - 1)) =3D=3D=
+ \
++                             (f)->remove)
++#define fifo_empty(f)       ((f)->insert =3D=3D (f)->remove)
++#define fifo_space(f)       (((f)->remove - ((f)->insert + 1)) & \
++                             (FIFO_SIZE - 1))
++
++typedef struct SemihostingConsole {
++    CharBackend         backend;
++    pthread_mutex_t     mutex;
++    pthread_cond_t      cond;
++    bool                got;
++    SemihostingFifo     fifo;
++} SemihostingConsole;
++
++static SemihostingConsole console =3D {
++    .mutex =3D PTHREAD_MUTEX_INITIALIZER,
++    .cond =3D PTHREAD_COND_INITIALIZER
++};
++
++static int console_can_read(void *opaque)
++{
++    SemihostingConsole *c =3D opaque;
++    int ret;
++    pthread_mutex_lock(&c->mutex);
++    ret =3D fifo_space(&c->fifo);
++    pthread_mutex_unlock(&c->mutex);
++    return ret;
++}
++
++static void console_read(void *opaque, const uint8_t *buf, int size)
++{
++    SemihostingConsole *c =3D opaque;
++    pthread_mutex_lock(&c->mutex);
++    while (size-- && !fifo_full(&c->fifo)) {
++        fifo_insert(&c->fifo, *buf++);
++    }
++    pthread_cond_broadcast(&c->cond);
++    pthread_mutex_unlock(&c->mutex);
++}
++
++target_ulong qemu_semihosting_console_inc(CPUArchState *env)
++{
++    (void) env;
++    SemihostingConsole *c =3D &console;
++    qemu_mutex_unlock_iothread();
++    pthread_mutex_lock(&c->mutex);
++    while (fifo_empty(&c->fifo)) {
++        pthread_cond_wait(&c->cond, &c->mutex);
++    }
++    uint8_t ch;
++    fifo_remove(&c->fifo, ch);
++    pthread_mutex_unlock(&c->mutex);
++    qemu_mutex_lock_iothread();
++    return (target_ulong) ch;
++}
++
++void qemu_semihosting_console_init(void)
++{
++    if (semihosting_enabled()) {
++        qemu_chr_fe_init(&console.backend, serial_hd(0), &error_abort);
++        qemu_chr_fe_set_handlers(&console.backend,
++                                 console_can_read,
++                                 console_read,
++                                 NULL, NULL, &console,
++                                 NULL, true);
++    }
++}
+diff --git a/include/hw/semihosting/console.h b/include/hw/semihosting/co=
+nsole.h
+index 9be9754bcd..56f3606a2a 100644
+--- a/include/hw/semihosting/console.h
++++ b/include/hw/semihosting/console.h
+@@ -37,6 +37,18 @@ int qemu_semihosting_console_outs(CPUArchState *env, t=
+arget_ulong s);
+  */
+ void qemu_semihosting_console_outc(CPUArchState *env, target_ulong c);
+=20
++/**
++ * qemu_semihosting_console_outc:
++ * @env: CPUArchState
++ *
++ * Receive single character from debug console. This
++ * may be the remote gdb session if a softmmu guest is currently being
++ * debugged.
++ *
++ * Returns: character read or -1 on error
++ */
++target_ulong qemu_semihosting_console_inc(CPUArchState *env);
++
+ /**
+  * qemu_semihosting_log_out:
+  * @s: pointer to string
+diff --git a/include/hw/semihosting/semihost.h b/include/hw/semihosting/s=
+emihost.h
+index 60fc42d851..a13d17c087 100644
+--- a/include/hw/semihosting/semihost.h
++++ b/include/hw/semihosting/semihost.h
+@@ -68,6 +68,7 @@ Chardev *semihosting_get_chardev(void);
+ void qemu_semihosting_enable(void);
+ int qemu_semihosting_config_options(const char *opt);
+ void qemu_semihosting_connect_chardevs(void);
++void qemu_semihosting_console_init(void);
+ #endif /* CONFIG_USER_ONLY */
+=20
+ #endif /* SEMIHOST_H */
+diff --git a/stubs/semihost.c b/stubs/semihost.c
+index f90589259c..1d8b37f7b2 100644
+--- a/stubs/semihost.c
++++ b/stubs/semihost.c
+@@ -69,3 +69,7 @@ void semihosting_arg_fallback(const char *file, const c=
+har *cmd)
+ void qemu_semihosting_connect_chardevs(void)
+ {
+ }
++
++void qemu_semihosting_console_init(void)
++{
++}
+diff --git a/target/arm/arm-semi.c b/target/arm/arm-semi.c
+index 6f7b6d801b..47d61f6fe1 100644
+--- a/target/arm/arm-semi.c
++++ b/target/arm/arm-semi.c
+@@ -802,8 +802,7 @@ target_ulong do_arm_semihosting(CPUARMState *env)
+=20
+         return guestfd_fns[gf->type].readfn(cpu, gf, arg1, len);
+     case TARGET_SYS_READC:
+-        qemu_log_mask(LOG_UNIMP, "%s: SYS_READC not implemented", __func=
+__);
+-        return 0;
++        return qemu_semihosting_console_inc(env);
+     case TARGET_SYS_ISTTY:
+         GET_ARG(0);
+=20
+diff --git a/vl.c b/vl.c
+index 4489cfb2bb..ac584d97ea 100644
+--- a/vl.c
++++ b/vl.c
+@@ -4381,6 +4381,9 @@ int main(int argc, char **argv, char **envp)
+     ds =3D init_displaystate();
+     qemu_display_init(ds, &dpy);
+=20
++    /* connect semihosting console input if requested */
++    qemu_semihosting_console_init();
++
+     /* must be after terminal init, SDL library changes signal handlers =
+*/
+     os_setup_signal_handling();
+=20
+--=20
+2.23.0
 
-Title:
-  ppc64le: KVM guest fails to boot with an error `virtio_scsi: probe of
-  virtio1 failed with error -22` on master
-
-Status in QEMU:
-  New
-
-Bug description:
-  PowerPC KVM Guest fails to boot on current qemu master, bad commit:
-  e68cd0cb5cf49d334abe17231a1d2c28b846afa2
-
-  Env:
-  HW: IBM Power9
-  Host Kernel: 5.4.0-rc2-00038-ge3280b54afed
-  Guest Kernel: 4.13.9-300.fc27.ppc64le
-  Qemu: https://github.com/qemu/qemu.git (master)
-  Libvirt: 5.4.0
-
-  Guest boot gets stuck:
-  ...
-  [  OK  ] Mounted Kernel Configuration File System.
-  [    7.598740] virtio-pci 0000:00:01.0: enabling device (0000 -> 0003)
-  [    7.598828] virtio-pci 0000:00:01.0: virtio_pci: leaving for legacy dr=
-iver
-  [    7.598957] virtio-pci 0000:00:02.0: enabling device (0000 -> 0003)
-  [    7.599017] virtio-pci 0000:00:02.0: virtio_pci: leaving for legacy dr=
-iver
-  [    7.599123] virtio-pci 0000:00:04.0: enabling device (0000 -> 0003)
-  [    7.599182] virtio-pci 0000:00:04.0: virtio_pci: leaving for legacy dr=
-iver
-  [    7.620620] synth uevent: /devices/vio: failed to send uevent
-  [    7.620624] vio vio: uevent: failed to send synthetic uevent
-  [  OK  ] Started udev Coldplug all Devices.
-  [    7.624559] audit: type=3D1130 audit(1570610300.990:5): pid=3D1 uid=3D=
-0 auid=3D4294967295 ses=3D4294967295 subj=3Dkernel msg=3D'unit=3Dsystemd-ud=
-ev-trigger comm=3D"systemd" exe=3D"/usr/lib/systemd/systemd" hostname=3D? a=
-ddr=3D? terminal=3D? res=3Dsuccess'
-  [  OK  ] Reached target System Initialization.
-  [  OK  ] Reached target Basic System.
-  [  OK  ] Reached target Remote File Systems (Pre).
-  [  OK  ] Reached target Remote File Systems.
-  [    7.642961] virtio_scsi: probe of virtio1 failed with error -22
-  [ ***  ] A start job is running for dev-disk=E2=80=A621b3519a80.device (1=
-4s / no limit)
-  ...
-
-  git bisect, yielded a bad commit
-  [e68cd0cb5cf49d334abe17231a1d2c28b846afa2] spapr: Render full FDT on
-  ibm,client-architecture-support, reverting this commit boot the guest
-  properly.
-
-  git bisect start
-  # good: [9e06029aea3b2eca1d5261352e695edc1e7d7b8b] Update version for v4.=
-1.0 release
-  git bisect good 9e06029aea3b2eca1d5261352e695edc1e7d7b8b
-  # bad: [98b2e3c9ab3abfe476a2b02f8f51813edb90e72d] Merge remote-tracking b=
-ranch 'remotes/stefanha/tags/block-pull-request' into staging
-  git bisect bad 98b2e3c9ab3abfe476a2b02f8f51813edb90e72d
-  # good: [56e6250ede81b4e4b4ddb623874d6c3cdad4a96d] target/arm: Convert T1=
-6, nop hints
-  git bisect good 56e6250ede81b4e4b4ddb623874d6c3cdad4a96d
-  # good: [5d69cbdfdd5cd6dadc9f0c986899844a0e4de703] tests/tcg: target/s390=
-x: Test MVC
-  git bisect good 5d69cbdfdd5cd6dadc9f0c986899844a0e4de703
-  # good: [88112488cf228df8b7588c8aa38e16ecd0dff48e] qapi: Make check_type(=
-)'s array case a bit more obvious
-  git bisect good 88112488cf228df8b7588c8aa38e16ecd0dff48e
-  # good: [972bd57689f1e11311d86b290134ea2ed9c7c11e] ppc/kvm: Skip writing =
-DPDES back when in run time state
-  git bisect good 972bd57689f1e11311d86b290134ea2ed9c7c11e
-  # bad: [1aba8716c8335e88b8c358002a6e1ac89f7dd258] ppc/pnv: Remove the XIC=
-SFabric Interface from the POWER9 machine
-  git bisect bad 1aba8716c8335e88b8c358002a6e1ac89f7dd258
-  # bad: [00ed3da9b5c2e66e796a172df3e19545462b9c90] xics: Minor fixes for X=
-ICSFabric interface
-  git bisect bad 00ed3da9b5c2e66e796a172df3e19545462b9c90
-  # good: [33432d7737b53c92791f90ece5dbe3b7bb1c79f5] target/ppc: introduce =
-set_dfp{64,128}() helper functions
-  git bisect good 33432d7737b53c92791f90ece5dbe3b7bb1c79f5
-  # good: [f6d4c423a222f02bfa84a49c3d306d7341ec9bab] target/ppc: remove unn=
-ecessary if() around calls to set_dfp{64,128}() in DFP macros
-  git bisect good f6d4c423a222f02bfa84a49c3d306d7341ec9bab
-  # bad: [e68cd0cb5cf49d334abe17231a1d2c28b846afa2] spapr: Render full FDT =
-on ibm,client-architecture-support
-  git bisect bad e68cd0cb5cf49d334abe17231a1d2c28b846afa2
-  # good: [c4ec08ab70bab90685d1443d6da47293e3aa312a] spapr-pci: Stop provid=
-ing assigned-addresses
-  git bisect good c4ec08ab70bab90685d1443d6da47293e3aa312a
-  # first bad commit: [e68cd0cb5cf49d334abe17231a1d2c28b846afa2] spapr: Ren=
-der full FDT on ibm,client-architecture-support
-
-  attached vmxml.
-
-  qemu commandline:
-  /home/sath/qemu/ppc64-softmmu/qemu-system-ppc64 -name guest=3Dvm1,debug-t=
-hreads=3Don -S -object secret,id=3DmasterKey0,format=3Draw,file=3D/var/lib/=
-libvirt/qemu/domain-19-vm1/master-key.aes -machine pseries-4.2,accel=3Dkvm,=
-usb=3Doff,dump-guest-core=3Doff -m 81920 -overcommit mem-lock=3Doff -smp 51=
-2,sockets=3D1,cores=3D128,threads=3D4 -uuid fd4a5d54-0216-490e-82d2-1d4e896=
-83b3d -display none -no-user-config -nodefaults -chardev socket,id=3Dcharmo=
-nitor,fd=3D24,server,nowait -mon chardev=3Dcharmonitor,id=3Dmonitor,mode=3D=
-control -rtc base=3Dutc -no-shutdown -boot strict=3Don -device qemu-xhci,id=
-=3Dusb,bus=3Dpci.0,addr=3D0x3 -device virtio-scsi-pci,id=3Dscsi0,bus=3Dpci.=
-0,addr=3D0x2 -drive file=3D/home/sath/tests/data/avocado-vt/images/jeos-27-=
-ppc64le_vm1.qcow2,format=3Dqcow2,if=3Dnone,id=3Ddrive-scsi0-0-0-0 -device s=
-csi-hd,bus=3Dscsi0.0,channel=3D0,scsi-id=3D0,lun=3D0,device_id=3Ddrive-scsi=
-0-0-0-0,drive=3Ddrive-scsi0-0-0-0,id=3Dscsi0-0-0-0,bootindex=3D1 -netdev ta=
-p,fd=3D26,id=3Dhostnet0,vhost=3Don,vhostfd=3D27 -device virtio-net-pci,netd=
-ev=3Dhostnet0,id=3Dnet0,mac=3D52:54:00:e6:df:24,bus=3Dpci.0,addr=3D0x1 -cha=
-rdev pty,id=3Dcharserial0 -device spapr-vty,chardev=3Dcharserial0,id=3Dseri=
-al0,reg=3D0x30000000 -device virtio-balloon-pci,id=3Dballoon0,bus=3Dpci.0,a=
-ddr=3D0x4 -M pseries,ic-mode=3Dxics -msg timestamp=3Don
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1847440/+subscriptions
 
