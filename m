@@ -2,79 +2,79 @@ Return-Path: <SRS0=tSBD=YP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8971CCA9EA0
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 12:46:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E6449CA9EA0
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 12:48:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5177B2075A
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 12:46:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B1BC02075A
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 12:48:33 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="laaLpwQi"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5177B2075A
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="mdkCE2+r"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B1BC02075A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55492 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55588 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iMtY4-000871-Fc
-	for qemu-devel@archiver.kernel.org; Tue, 22 Oct 2019 08:46:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55537)
+	id 1iMtaS-000116-TV
+	for qemu-devel@archiver.kernel.org; Tue, 22 Oct 2019 08:48:32 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56067)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1iMtWx-0007SL-Ap
- for qemu-devel@nongnu.org; Tue, 22 Oct 2019 08:44:56 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1iMtZX-0000V0-JR
+ for qemu-devel@nongnu.org; Tue, 22 Oct 2019 08:47:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1iMtWv-0000bP-Mw
- for qemu-devel@nongnu.org; Tue, 22 Oct 2019 08:44:54 -0400
-Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:43691)
+ (envelope-from <peter.maydell@linaro.org>) id 1iMtZW-0001da-I6
+ for qemu-devel@nongnu.org; Tue, 22 Oct 2019 08:47:35 -0400
+Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:45430)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1iMtWv-0000b7-I2
- for qemu-devel@nongnu.org; Tue, 22 Oct 2019 08:44:53 -0400
-Received: by mail-ot1-x344.google.com with SMTP id o44so14015527ota.10
- for <qemu-devel@nongnu.org>; Tue, 22 Oct 2019 05:44:53 -0700 (PDT)
+ id 1iMtZW-0001dH-Av
+ for qemu-devel@nongnu.org; Tue, 22 Oct 2019 08:47:34 -0400
+Received: by mail-oi1-x243.google.com with SMTP id o205so14000689oib.12
+ for <qemu-devel@nongnu.org>; Tue, 22 Oct 2019 05:47:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=MQMQS9X8FxXUakL8jBDxQ5LiW7Ue2emV11Dz8Ypfc5E=;
- b=laaLpwQiHvtQa1wZOicEwrzJf9XiQTTPE6hfl8iT6tnzAC0RlpaAFhKPY4aWeOo3uJ
- k72qOQ/RzY1swhpJ5TqSR64MY63mhdoFvprHdYbRA2di+AZYDdOA2SAzkI3zO78DRt9Y
- WcxnlFhS4KyBdeuvhr83wbXGPvVzT48BVAFUgHefO+Yw3lqqCaIjxp5pEdEilYEyqOB6
- di6CSRd/GMqRnfYrG+LZlO0KXWVYsGgZCuAxmmtD/Daoj/oxPp9wScEhz4g14vEs+WGh
- U/EcdLLVljEXxAHL45HFOHSZomuM3Ga0F/tnXjSqT16a45AQNgdKQvZyWNXQhq+ICGJs
- +KoQ==
+ :cc; bh=1OweYMXpkSlcHwkbtejrWkUiib29y0AOj+d1bjILcpo=;
+ b=mdkCE2+rejlb6OkJOL64fc7ajE61s+m1Ki9M/WNHbVizLExNifmarOirN80KiF2MgV
+ GK+L8cWf8e7I7K3KoH4lPLh2uXuxmT/Xsj3UQiUPgGnwWvXkqrI46eI0XS+k6wPz8f6O
+ Rqwr0VcTmV3Jw1GVLUky8P1qAskY/BOHfe7ePzM9kwgNuh0Akx85IiS7cz4bCvOIwvMn
+ VxZtsnaSfZFITWX1HxBQtMWk/uttnPv88U/2sBVbelVltrTuFQ0lIE0bxI9SGqgZz00H
+ J7SmdPlxp/l+8sx8aZDRfU+562LbU4zAi+8AKHaYYI5xHkVxyudlLPG8vfCai3erUoa/
+ mbuQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=MQMQS9X8FxXUakL8jBDxQ5LiW7Ue2emV11Dz8Ypfc5E=;
- b=ee0HVqzQVVKylPqoCTtftwliqtX0dz8lYcFWzFL3tB02xhZfOcWU5L2PqWV5Vt4n1L
- DAKerNFU2357oEa1wkq/jXEG037eeXCz+GpHdohuqvqCOHOCrJloiC2hUFxnfPfZlUTb
- zkHdtk9kBqN3humEqQhHj8yc9bqie/ejfaJ+kno8/4kvYthZRgKnC9EFMl/Q+pSg/VIO
- MRZMGvyc76EzcSMmzOx74bdh+l1sirI9u26LB6YsWy4vMUUVXwHY7ZRoswIBxJXwMI6X
- HiOYI7CRryYuTHnXh02lxv+mkgfUfHRjwIm6ceLnB5cSpJaFT4sGu16TbHPy+cZpdzSj
- ppyA==
-X-Gm-Message-State: APjAAAX57Ermn+FyI6i5oqaiRY8RGoT7V5IyVaXqeARJ5pTgxs+OWmxs
- 4M9b6hSxyCeOhGHI4a6EVn/gAxYs6rhL4LeuKpa4/O4TFzc=
-X-Google-Smtp-Source: APXvYqwqKdJt+UjX3zBntFKUDBA2bJ1iRmCGTuwDiaOD8SCYfwHJ7mucLXRrA8mkLDizhtmd31cDH3abrQN1SPdiW6g=
-X-Received: by 2002:a9d:708e:: with SMTP id l14mr2558424otj.135.1571748292171; 
- Tue, 22 Oct 2019 05:44:52 -0700 (PDT)
+ bh=1OweYMXpkSlcHwkbtejrWkUiib29y0AOj+d1bjILcpo=;
+ b=NRcxNZUB7HV3cO2+gNHyBTGA13DShSX+3fHMgg/UXc3EEs8mM2Z+px5BH6HOrKBPsc
+ jWqmhRo8hpCwLwDyJOinOCC9hkJfaTYozRR80o9GVgcwPen1ChdzHLxEFTVMdBit7Qmd
+ HgiOp+IUMC6eFqR0h4wBrky7BgbM6z36/z8ME6j1zfQa7w0rikbDd0GQ68gKLWUmB4AW
+ XpcXMkFgXMYhkI5kIQ1oPPGDKxW1V+rtyitesZ54tCDpy4cec5ixybKgEiI8Z9ZRK7gc
+ k++jilHD+K9fksbhhs04m4/me/1AImLeF7X6t7oTUdt6sDOuT3c0RKvCb/9cs9XPFhDF
+ ASmA==
+X-Gm-Message-State: APjAAAW6owhEaSXqW6WdE6oZbVewko/SFAJvqtnPlefL+OLaSAeThs9w
+ rfZwq8uyPs5B9HoA6QYre1kuXdqO5s6bxTgzjOlWjQ==
+X-Google-Smtp-Source: APXvYqyTUjBRJQSQvS2zu+aCJts4DNgy+k5qRDfoqIlG8MwuEVA5OxCTCnGlBP1Q8W+pHNHM90qCj23Ayi49e/CJN5U=
+X-Received: by 2002:a05:6808:9:: with SMTP id u9mr2849839oic.98.1571748453478; 
+ Tue, 22 Oct 2019 05:47:33 -0700 (PDT)
 MIME-Version: 1.0
-References: <20191022082553.10204-1-laurent@vivier.eu>
-In-Reply-To: <20191022082553.10204-1-laurent@vivier.eu>
+References: <20191018174431.1784-1-richard.henderson@linaro.org>
+In-Reply-To: <20191018174431.1784-1-richard.henderson@linaro.org>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 22 Oct 2019 13:44:40 +0100
-Message-ID: <CAFEAcA8HQ=MeU=gayhsrCrO4EZgkP-Frd4HvZvcz+FuVV=wiqg@mail.gmail.com>
-Subject: Re: [PULL 0/2] Trivial branch patches
-To: Laurent Vivier <laurent@vivier.eu>
+Date: Tue, 22 Oct 2019 13:47:22 +0100
+Message-ID: <CAFEAcA-MyKoA63UF6DYQ6J-dKihYn9iyG09eFCgWT8j4OqsQnw@mail.gmail.com>
+Subject: Re: [PATCH v8 00/22] target/arm: Reduce overhead of
+ cpu_get_tb_cpu_state
+To: Richard Henderson <richard.henderson@linaro.org>
 Content-Type: text/plain; charset="UTF-8"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::344
+X-Received-From: 2607:f8b0:4864:20::243
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,47 +86,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Trivial <qemu-trivial@nongnu.org>, Michael Tokarev <mjt@tls.msk.ru>,
- QEMU Developers <qemu-devel@nongnu.org>
+Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 22 Oct 2019 at 09:27, Laurent Vivier <laurent@vivier.eu> wrote:
+On Fri, 18 Oct 2019 at 18:44, Richard Henderson
+<richard.henderson@linaro.org> wrote:
 >
-> The following changes since commit e9d42461920f6f40f4d847a5ba18e90d095ed0b9:
+> Changes since v7:
+>   * Rebuild hflags for all successful nvic writes (Peter).
+>   * Rebuild hflags for Xscale sctlr writes (Peter).
 >
->   Merge remote-tracking branch 'remotes/kraxel/tags/audio-20191018-pull-request' into staging (2019-10-18 14:13:11 +0100)
+> Changes since v6:
+>   * Regen hflags in two more places for m-profile (patch 19).
 >
-> are available in the Git repository at:
+> Changes since v5:
+>   * Fix the debug assertion ifdef in the final patch.
+>   * Add more calls to arm_rebuild_hflags: CPSR and M-profile
+>     These become two new patches, 18 & 19.
+>   * Update some comments per review. (Alex)
 >
->   git://github.com/vivier/qemu.git tags/trivial-branch-pull-request
+> Changes since v4:
+>   * Split patch 1 into 15 smaller patches.
+>   * Cache the new DEBUG_TARGET_EL field.
+>   * Split out m-profile hflags separately from a-profile 32-bit.
+>   * Move around non-cached tb flags as well, avoiding repetitive
+>     checks for m-profile or other mutually exclusive conditions.
 >
-> for you to fetch changes up to 81864c2e6166c015d30b8d8ae998a5a1238a68e9:
+>   I haven't officially re-run the performance test quoted in the
+>   last patch, but I have eyeballed "perf top", and have dug into
+>   the compiled code a bit, which resulted in a few of the new
+>   cleanup patches (e.g. cs_base, arm_mmu_idx_el, and
+>   arm_cpu_data_is_big_endian).
+> ...
 >
->   tests/migration: fix a typo in comment (2019-10-21 18:14:43 +0200)
 >
-> ----------------------------------------------------------------
-> Documentation update and a typo fix
->
-> ----------------------------------------------------------------
->
-> Mao Zhongyi (1):
->   tests/migration: fix a typo in comment
->
-> Thomas Huth (1):
->   qemu-doc: Remove paragraph about requiring a HD image with -kernel
->
->  qemu-doc.texi            | 4 ----
->  tests/migration/stress.c | 2 +-
->  2 files changed, 1 insertion(+), 5 deletions(-)
->
+> r~
 
 
-Applied, thanks.
 
-Please update the changelog at https://wiki.qemu.org/ChangeLog/4.2
-for any user-visible changes.
+Applied to target-arm.next, thanks.
 
 -- PMM
 
