@@ -2,85 +2,80 @@ Return-Path: <SRS0=tSBD=YP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3B2A3CA9EA0
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 15:59:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B037CCA9EB7
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 16:02:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 05D62214B2
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 15:59:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7F71D214E0
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 16:02:43 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="rLpIgDmo"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 05D62214B2
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SjH7AXSb"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7F71D214E0
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34312 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34528 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iMwYp-0005OT-1K
-	for qemu-devel@archiver.kernel.org; Tue, 22 Oct 2019 11:59:03 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33578)
+	id 1iMwcG-0007dJ-HG
+	for qemu-devel@archiver.kernel.org; Tue, 22 Oct 2019 12:02:36 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33180)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1iMwWv-0004Td-8h
- for qemu-devel@nongnu.org; Tue, 22 Oct 2019 11:57:06 -0400
+ (envelope-from <stefanha@redhat.com>) id 1iMwTb-0001kH-JU
+ for qemu-devel@nongnu.org; Tue, 22 Oct 2019 11:53:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1iMwWt-0001Ja-UQ
- for qemu-devel@nongnu.org; Tue, 22 Oct 2019 11:57:05 -0400
-Received: from mail-wm1-x32e.google.com ([2a00:1450:4864:20::32e]:32998)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1iMwWt-0001Hm-NC
- for qemu-devel@nongnu.org; Tue, 22 Oct 2019 11:57:03 -0400
-Received: by mail-wm1-x32e.google.com with SMTP id 6so3983371wmf.0
- for <qemu-devel@nongnu.org>; Tue, 22 Oct 2019 08:57:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=TGso5ABDkcNKxlbR6FgRltGA0d4knGh6DjdcFkIjQgU=;
- b=rLpIgDmo9ndaB26xzSeOiMCwb2FcT7s3gC0QD7zwHRfAYS1gdTNZekhQJF33xEXTV/
- wTns5eNjuHFMoG/UNeeY/hXCMEpUpIh6Uh5OpS3TWkMRDMFAb7pvYfz7kF5KZZm8oytC
- tokZwgSV+BNtZkrigb8zsJkr+5DLGPMmbDNiobB1dbnoPEIC8EbaoQtX3vy5Ogm7M14n
- dDDlEUUHAcV3VDWjWOzogyvw+zmQFjLEtCyAkj4d09FUcSAyCokKaaMhHjs/kBQcBzrQ
- VPQXT5J7j0YiVUGlEqpDxGQQ+MzzuHqytFngzuNJQftEy2jbKXX9T1mLJL+g8V8NIrfI
- yscg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=TGso5ABDkcNKxlbR6FgRltGA0d4knGh6DjdcFkIjQgU=;
- b=EdBPyASkmV7+DoVJGkSvwyYcTB9wgDx2kym5UNY8Enj8/TOwC7FIMyhsBe14BUc+PI
- LNjmlj29YLqYg8vSyLcI4GIV/aj1undlGoNKzeYe5jX8wqYURbqx6h67wXvv/NHqZN1Q
- G2EBtl9+yCPJko3Xr0Cu/5ghwvLPOJXZZTwm8w4PaF6Bt838Z7YagT0XgRmPxFoHjoiV
- DaNQKs4hcQHeZbS7sNC3WXndV7BelAalmmP0+/bL9FOqmwjj07CcPoy11epdoCCL6q5v
- JAKGUCyBAt2AfVCFgH8HbUdoUnkjUWCkUpB0ITfATQYHq5Zr5wo4kPyFyqGZSE8I7+Bz
- CUkw==
-X-Gm-Message-State: APjAAAX+2DXmNc1drSTyRcTnB0SyO/fm9ZpJ/0Q6qKQfv8twuZqKkkOb
- J74eaBCp1DuJZju6no5bUqBSU16xWOk=
-X-Google-Smtp-Source: APXvYqxh4k2Kf9yJ7Zyz+tloyUBI7jMEmpdE8uBkKHGdI1bNwugFz800OlSsQv309p7eiioS9PBItA==
-X-Received: by 2002:a1c:f210:: with SMTP id s16mr3369133wmc.24.1571759820665; 
- Tue, 22 Oct 2019 08:57:00 -0700 (PDT)
-Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id z125sm25937907wme.37.2019.10.22.08.56.59
- for <qemu-devel@nongnu.org>
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 22 Oct 2019 08:56:59 -0700 (PDT)
-From: Peter Maydell <peter.maydell@linaro.org>
-To: qemu-devel@nongnu.org
-Subject: [PULL v2 00/19] target-arm queue
-Date: Tue, 22 Oct 2019 16:56:58 +0100
-Message-Id: <20191022155658.18323-1-peter.maydell@linaro.org>
-X-Mailer: git-send-email 2.20.1
+ (envelope-from <stefanha@redhat.com>) id 1iMwTa-0007mI-Hk
+ for qemu-devel@nongnu.org; Tue, 22 Oct 2019 11:53:39 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:23682
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1iMwTa-0007m1-EQ
+ for qemu-devel@nongnu.org; Tue, 22 Oct 2019 11:53:38 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1571759618;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=ArwMaoRC0hgUN93qlGTDlTqURBIccWxVn4qFKwIzex8=;
+ b=SjH7AXSbUeP28x9R3OV0ytoTL5pxtf4PbCWV8WYaqQgGr2a+teBhMpJuNrMnyUmAtpGO7h
+ F78plkFAZd6tCIj93DrmuA9zwnX8/4UMj9EiszIbABfC5nCRJT0jhKE6t/it42mp05EHe/
+ 3H2Ah3Nf4VtKA9kCn4iWRobVh/+jWNc=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-213-Yfyh4Wr2P8mGsqTrynzL1w-1; Tue, 22 Oct 2019 11:53:34 -0400
+X-MC-Unique: Yfyh4Wr2P8mGsqTrynzL1w-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7FD851005500;
+ Tue, 22 Oct 2019 15:53:33 +0000 (UTC)
+Received: from localhost (ovpn-117-153.ams2.redhat.com [10.36.117.153])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 24FF31001B09;
+ Tue, 22 Oct 2019 15:53:27 +0000 (UTC)
+Date: Tue, 22 Oct 2019 16:53:26 +0100
+From: Stefan Hajnoczi <stefanha@redhat.com>
+To: Thomas Huth <thuth@redhat.com>
+Subject: Re: [PATCH v3 08/16] libqos: implement VIRTIO 1.0 FEATURES_OK step
+Message-ID: <20191022155326.GF32186@stefanha-x1.localdomain>
+References: <20191019063810.6944-1-stefanha@redhat.com>
+ <20191019063810.6944-9-stefanha@redhat.com>
+ <9306a847-d4a4-7503-0682-8c75522e57f1@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::32e
+In-Reply-To: <9306a847-d4a4-7503-0682-8c75522e57f1@redhat.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Mimecast-Spam-Score: 0
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="sDKAb4OeUBrWWL6P"
+Content-Disposition: inline
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -92,94 +87,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Fam Zheng <fam@euphon.net>, Laurent Vivier <lvivier@redhat.com>,
+ slp@redhat.com, qemu-block@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>,
+ qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Changes v1->v2: dropped rth's patchset as it causes an
-assert with the qemu-armeb binary.
+--sDKAb4OeUBrWWL6P
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-I expect I'll do another pullreq at the end of the week.
+On Mon, Oct 21, 2019 at 02:23:15PM +0200, Thomas Huth wrote:
+> On 19/10/2019 08.38, Stefan Hajnoczi wrote:
+> > Device initialization has an extra step in VIRTIO 1.0.  The FEATURES_OK
+> > status bit is set to indicate that feature negotiation has completed.
+> > The driver then reads the status register again to check that the devic=
+e
+> > agrees with the final features.
+> >=20
+> > Implement this step as part of qvirtio_set_features() instead of
+> > introducing a separate function.  This way all existing code works
+> > without modifications.
+> >=20
+> > Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+> > ---
+> >  tests/libqos/virtio.c | 20 +++++++++++++++++---
+> >  1 file changed, 17 insertions(+), 3 deletions(-)
+> [...]
+> > @@ -88,9 +101,10 @@ void qvirtio_set_driver(QVirtioDevice *d)
+> > =20
+> >  void qvirtio_set_driver_ok(QVirtioDevice *d)
+> >  {
+> > -    d->bus->set_status(d, d->bus->get_status(d) | VIRTIO_CONFIG_S_DRIV=
+ER_OK);
+> > -    g_assert_cmphex(d->bus->get_status(d), =3D=3D, VIRTIO_CONFIG_S_DRI=
+VER_OK |
+> > -                    VIRTIO_CONFIG_S_DRIVER | VIRTIO_CONFIG_S_ACKNOWLED=
+GE);
+> > +    uint8_t status =3D d->bus->get_status(d) | VIRTIO_CONFIG_S_DRIVER_=
+OK;
+> > +
+> > +    d->bus->set_status(d, status);
+> > +    g_assert_cmphex(d->bus->get_status(d), =3D=3D, status);
+> >  }
+>=20
+> The changes to qvirtio_set_driver_ok() are not mentioned in the patch
+> description. Please either mention them there, or move this to a
+> separate patch.
 
-thanks
--- PMM
+Will fix in v4.
 
-The following changes since commit f9bec781379dd7ccf9d01b4b6a79a9ec82c192e5:
+We can no longer hardcode the status register value for DRIVER_OK since
+it now depends on whether VIRTIO 1.0 is used or not.
 
-  Merge remote-tracking branch 'remotes/cohuck/tags/s390x-20191022' into staging (2019-10-22 13:45:09 +0100)
+Here is an alternative that is smaller and makes the VIRTIO 1.0
+dependency obvious:
 
-are available in the Git repository at:
+  -    g_assert_cmphex(d->bus->get_status(d), =3D=3D, VIRTIO_CONFIG_S_DRIVE=
+R_OK |
+  -                    VIRTIO_CONFIG_S_DRIVER | VIRTIO_CONFIG_S_ACKNOWLEDGE=
+);
+  +    g_assert_cmphex(d->bus->get_status(d), =3D=3D, VIRTIO_CONFIG_S_DRIVE=
+R_OK |
+  +                    VIRTIO_CONFIG_S_DRIVER | VIRTIO_CONFIG_S_ACKNOWLEDGE=
+ |
+  +                    (d->features & (1ull << VIRTIO_F_VERSION_1) ?
+  +                     VIRTIO_CONFIG_S_FEATURES_OK : 0));
 
-  https://git.linaro.org/people/pmaydell/qemu-arm.git tags/pull-target-arm-20191022-1
+Stefan
 
-for you to fetch changes up to f9c1fe62a16f32c3d6fe34c2856475052b7efdaf:
+--sDKAb4OeUBrWWL6P
+Content-Type: application/pgp-signature; name="signature.asc"
 
-  hw/arm/digic4: Inline digic4_board_setup_ram() function (2019-10-22 16:50:38 +0100)
+-----BEGIN PGP SIGNATURE-----
 
-----------------------------------------------------------------
-target-arm queue:
- * Fix sign-extension for SMLAL* instructions
- * aspeed: Add an AST2600 eval board
- * Various ptimer device conversions to new transaction API
- * Add a dummy Samsung SDHCI controller model to exynos4 boards
- * Minor refactorings of RAM creation for some arm boards
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl2vJfYACgkQnKSrs4Gr
+c8ihfQgAuBVksV9rNH9gP8551ClMyHkK8CQ6L3nFo6brgqYxQRDKoQbwF16Ph6O1
+cRzNWoygeMW2F7aoMipYQ8R/tCsrjxtFd9HFpn/QWDgsyD8ZtR4sm9VKt4qi9z0N
+K5a7qpHJO3SAggezsc6XPNXpMZwsZusheMmew6qJjImVDIcm8rdXDMA72FXlLg8G
+UPOE/+y0Er7tb2Z/GuG8vY8gUnnJCbrIdyT3KCnpHFPoWVMNQ41DdaPg7TgYWhV9
+bvHSde6SNPHf7bUxHm/TFR0fp0lmJB8Io5edV8ciYYmwFjzQsUtRGtKN6pjpQeVP
+8m43CscRe8mzxVTCp/8DuLf58H06ZA==
+=a30T
+-----END PGP SIGNATURE-----
 
-----------------------------------------------------------------
-Cédric Le Goater (1):
-      aspeed: Add an AST2600 eval board
+--sDKAb4OeUBrWWL6P--
 
-Guenter Roeck (1):
-      hw/timer/exynos4210_mct: Initialize ptimer before starting it
-
-Peter Maydell (7):
-      hw/timer/arm_mptimer.c: Undo accidental rename of arm_mptimer_init()
-      hw/timer/puv3_ost.c: Switch to transaction-based ptimer API
-      hw/timer/sh_timer: Switch to transaction-based ptimer API
-      hw/timer/lm32_timer: Switch to transaction-based ptimer API
-      hw/timer/altera_timer.c: Switch to transaction-based ptimer API
-      hw/watchdog/etraxfs_timer.c: Switch to transaction-based ptimer API
-      hw/m68k/mcf5208.c: Switch to transaction-based ptimer API
-
-Philippe Mathieu-Daudé (9):
-      hw/sd/sdhci: Add a comment to distinct the i.MX eSDHC functions
-      hw/sd/sdhci: Add dummy Samsung SDHCI controller
-      hw/arm/exynos4210: Use the Samsung s3c SDHCI controller
-      hw/arm/xilinx_zynq: Use the IEC binary prefix definitions
-      hw/arm/mps2: Use the IEC binary prefix definitions
-      hw/arm/collie: Create the RAM in the board
-      hw/arm/omap2: Create the RAM in the board
-      hw/arm/omap1: Create the RAM in the board
-      hw/arm/digic4: Inline digic4_board_setup_ram() function
-
-Richard Henderson (1):
-      target/arm: Fix sign-extension for SMLAL*
-
- hw/arm/strongarm.h        |  4 +--
- include/hw/arm/aspeed.h   |  1 +
- include/hw/arm/omap.h     | 10 +++----
- include/hw/sd/sdhci.h     |  2 ++
- hw/arm/aspeed.c           | 23 ++++++++++++++++
- hw/arm/collie.c           |  8 ++++--
- hw/arm/digic_boards.c     |  9 ++-----
- hw/arm/exynos4210.c       |  2 +-
- hw/arm/mps2-tz.c          |  3 ++-
- hw/arm/mps2.c             |  3 ++-
- hw/arm/nseries.c          | 10 ++++---
- hw/arm/omap1.c            | 12 ++++-----
- hw/arm/omap2.c            | 13 ++++-----
- hw/arm/omap_sx1.c         |  8 ++++--
- hw/arm/palm.c             |  8 ++++--
- hw/arm/strongarm.c        |  7 +----
- hw/arm/xilinx_zynq.c      |  3 ++-
- hw/m68k/mcf5208.c         |  9 ++++---
- hw/sd/sdhci.c             | 68 ++++++++++++++++++++++++++++++++++++++++++++++-
- hw/timer/altera_timer.c   | 13 ++++++---
- hw/timer/arm_mptimer.c    |  4 +--
- hw/timer/etraxfs_timer.c  | 23 +++++++++-------
- hw/timer/exynos4210_mct.c |  2 +-
- hw/timer/lm32_timer.c     | 13 ++++++---
- hw/timer/puv3_ost.c       |  9 ++++---
- hw/timer/sh_timer.c       | 13 ++++++---
- target/arm/translate.c    |  4 ++-
- 27 files changed, 198 insertions(+), 86 deletions(-)
 
