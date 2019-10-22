@@ -2,63 +2,79 @@ Return-Path: <SRS0=tSBD=YP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_2 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D3242CA9EA0
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 16:52:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 810ADCA9EA0
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 16:52:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A95A82084B
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 16:52:47 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A95A82084B
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id 452112084B
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 16:52:57 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ejDvWSbN"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 452112084B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36286 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36290 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iMxOn-0008H8-LU
-	for qemu-devel@archiver.kernel.org; Tue, 22 Oct 2019 12:52:46 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39295)
+	id 1iMxOx-0008Va-TL
+	for qemu-devel@archiver.kernel.org; Tue, 22 Oct 2019 12:52:55 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38659)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <groug@kaod.org>) id 1iMwzW-0003PO-Fj
- for qemu-devel@nongnu.org; Tue, 22 Oct 2019 12:26:39 -0400
+ (envelope-from <marcandre.lureau@redhat.com>) id 1iMwxB-00088B-5X
+ for qemu-devel@nongnu.org; Tue, 22 Oct 2019 12:24:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <groug@kaod.org>) id 1iMwzV-0000NO-1u
- for qemu-devel@nongnu.org; Tue, 22 Oct 2019 12:26:38 -0400
-Received: from 5.mo6.mail-out.ovh.net ([46.105.54.31]:36286)
+ (envelope-from <marcandre.lureau@redhat.com>) id 1iMwx9-0007rp-RR
+ for qemu-devel@nongnu.org; Tue, 22 Oct 2019 12:24:13 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:28570
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <groug@kaod.org>) id 1iMwzU-0000KY-P7
- for qemu-devel@nongnu.org; Tue, 22 Oct 2019 12:26:36 -0400
-Received: from player691.ha.ovh.net (unknown [10.108.42.145])
- by mo6.mail-out.ovh.net (Postfix) with ESMTP id 7C9CE1E486A
- for <qemu-devel@nongnu.org>; Tue, 22 Oct 2019 18:26:34 +0200 (CEST)
-Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
- [82.253.208.248]) (Authenticated sender: groug@kaod.org)
- by player691.ha.ovh.net (Postfix) with ESMTPSA id 02300B5DA191;
- Tue, 22 Oct 2019 16:26:27 +0000 (UTC)
-Date: Tue, 22 Oct 2019 18:26:26 +0200
-From: Greg Kurz <groug@kaod.org>
-To: =?UTF-8?B?Q8OpZHJpYw==?= Le Goater <clg@kaod.org>
-Subject: Re: [PATCH v4 5/7] ppc: Reset the interrupt presenter from the CPU
- reset handler
-Message-ID: <20191022182626.7204a3b2@bahia.lan>
-In-Reply-To: <20191022134632.29098-6-clg@kaod.org>
-References: <20191022134632.29098-1-clg@kaod.org>
- <20191022134632.29098-6-clg@kaod.org>
-X-Mailer: Claws Mail 3.17.4 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+ (Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
+ id 1iMwx9-0007rR-NV
+ for qemu-devel@nongnu.org; Tue, 22 Oct 2019 12:24:11 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1571761451;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=JJt9Sa9skKiK7edLIsleYQhCTRfndzE6Q5jXitwYJIw=;
+ b=ejDvWSbN8axj6W0OrsxjsVvh3OJOz0WiTGAjXU+rT4GPMA4F+z3LrzbB+51BVh9ICt15Yf
+ x8ImCLcUCWcTY84nwvVsiG5YOAxO45mxjrLca9go3Ep7gVWl0CgDWGm80bErGDI0+HUUs4
+ JIv2Rd05yMv9yeQ95eMpF6GmBdNENlo=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-216-JyNuDFn4M1-6B15wHL6wHQ-1; Tue, 22 Oct 2019 12:24:08 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C6F7D476;
+ Tue, 22 Oct 2019 16:24:00 +0000 (UTC)
+Received: from localhost (ovpn-112-21.ams2.redhat.com [10.36.112.21])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 56D4D60856;
+ Tue, 22 Oct 2019 16:23:55 +0000 (UTC)
+From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v2 19/28] leon3: use qemu_irq framework instead of callback as
+ property
+Date: Tue, 22 Oct 2019 18:21:28 +0200
+Message-Id: <20191022162137.27161-20-marcandre.lureau@redhat.com>
+In-Reply-To: <20191022162137.27161-1-marcandre.lureau@redhat.com>
+References: <20191022162137.27161-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-MC-Unique: JyNuDFn4M1-6B15wHL6wHQ-1
+X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-X-Ovh-Tracer-Id: 3294946078789769611
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrkeejgddutdduucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddm
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 46.105.54.31
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -70,127 +86,168 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <philmd@redhat.com>,
- qemu-ppc@nongnu.org, qemu-devel@nongnu.org,
- David Gibson <david@gibson.dropbear.id.au>
+Cc: Corey Minyard <cminyard@mvista.com>,
+ Peter Maydell <peter.maydell@linaro.org>,
+ "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
+ Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
+ KONRAD Frederic <frederic.konrad@adacore.com>,
+ "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
+ Aleksandar Rikalo <arikalo@wavecomp.com>, Magnus Damm <magnus.damm@gmail.com>,
+ =?UTF-8?q?Herv=C3=A9=20Poussineau?= <hpoussin@reactos.org>,
+ =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
+ Artyom Tarasenko <atar4qemu@gmail.com>, Eduardo Habkost <ehabkost@redhat.com>,
+ Fabien Chouteau <chouteau@adacore.com>, qemu-arm@nongnu.org,
+ Richard Henderson <rth@twiddle.net>,
+ =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
+ qemu-ppc@nongnu.org, Aleksandar Markovic <amarkovic@wavecomp.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 22 Oct 2019 15:46:30 +0200
-C=C3=A9dric Le Goater <clg@kaod.org> wrote:
+"set_pin_in" property is used to define a callback mechanism where the
+device says "call the callback function, passing it an opaque cookie
+and a 32-bit value". We already have a generic mechanism for doing
+that, which is the qemu_irq. So we should just use that.
 
-> On the sPAPR machine and PowerNV machine, the interrupt presenters are
-> created by a machine handler at the core level and are reset
-> independently. This is not consistent and it raises issues when it
-> comes to handle hot-plugged CPUs. In that case, the presenters are not
-> reset. This is less of an issue in XICS, although a zero MFFR could
-> be a concern, but in XIVE, the OS CAM line is not set and this breaks
-> the presenting algorithm. The current code has workarounds which need
-> a global cleanup.
->=20
-> Extend the sPAPR IRQ backend and the PowerNV Chip class with a new
-> cpu_intc_reset() handler called by the CPU reset handler and remove
-> the XiveTCTX reset handler which is now redundant.
->=20
-> Reviewed-by: Greg Kurz <groug@kaod.org>
-> Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
-> ---
+Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+---
+ hw/intc/grlib_irqmp.c | 35 ++++-------------------------------
+ hw/sparc/leon3.c      |  9 +++++----
+ target/sparc/cpu.h    |  1 +
+ 3 files changed, 10 insertions(+), 35 deletions(-)
 
-Just one nit caused by the changes from patch 3.
-
->  [...]
-> diff --git a/hw/ppc/pnv_core.c b/hw/ppc/pnv_core.c
-> index cc17bbfed829..127107ab7c63 100644
-> --- a/hw/ppc/pnv_core.c
-> +++ b/hw/ppc/pnv_core.c
-> @@ -40,10 +40,11 @@ static const char *pnv_core_cpu_typename(PnvCore *pc)
->      return cpu_type;
->  }
-> =20
-> -static void pnv_core_cpu_reset(PowerPCCPU *cpu)
-> +static void pnv_core_cpu_reset(PowerPCCPU *cpu, PnvChip *chip)
->  {
->      CPUState *cs =3D CPU(cpu);
->      CPUPPCState *env =3D &cpu->env;
-> +    PnvChipClass *pcc;
-> =20
->      cpu_reset(cs);
-> =20
-> @@ -54,6 +55,9 @@ static void pnv_core_cpu_reset(PowerPCCPU *cpu)
->      env->gpr[3] =3D PNV_FDT_ADDR;
->      env->nip =3D 0x10;
->      env->msr |=3D MSR_HVB; /* Hypervisor mode */
-> +
-> +    pcc =3D PNV_CHIP_GET_CLASS(chip);
-> +    pcc->intc_reset(PNV_CHIP(chip), cpu);
-
-chip is already of type PnvChip *, no need to cast.
-
->  }
-> =20
->  /*
-> @@ -200,7 +204,7 @@ static void pnv_core_reset(void *dev)
->      int i;
-> =20
->      for (i =3D 0; i < cc->nr_threads; i++) {
-> -        pnv_core_cpu_reset(pc->threads[i]);
-> +        pnv_core_cpu_reset(pc->threads[i], pc->chip);
->      }
->  }
-> =20
-> diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
-> index 2e34832d0ea2..ef7b27a66d56 100644
-> --- a/hw/ppc/spapr_cpu_core.c
-> +++ b/hw/ppc/spapr_cpu_core.c
-> @@ -32,6 +32,7 @@ static void spapr_reset_vcpu(PowerPCCPU *cpu)
->      PowerPCCPUClass *pcc =3D POWERPC_CPU_GET_CLASS(cpu);<
->      SpaprCpuState *spapr_cpu =3D spapr_cpu_state(cpu);
->      target_ulong lpcr;
-> +    SpaprMachineState *spapr =3D SPAPR_MACHINE(qdev_get_machine());
-> =20
->      cpu_reset(cs);
-> =20
-> @@ -76,9 +77,11 @@ static void spapr_reset_vcpu(PowerPCCPU *cpu)
->      spapr_cpu->dtl_addr =3D 0;
->      spapr_cpu->dtl_size =3D 0;
-> =20
-> -    spapr_caps_cpu_apply(SPAPR_MACHINE(qdev_get_machine()), cpu);
-> +    spapr_caps_cpu_apply(spapr, cpu);
-> =20
->      kvm_check_mmu(cpu, &error_fatal);
-> +
-> +    spapr_irq_cpu_intc_reset(spapr, cpu);
->  }
-> =20
->  void spapr_cpu_set_entry_state(PowerPCCPU *cpu, target_ulong nip, target=
-_ulong r3)
-> diff --git a/hw/ppc/spapr_irq.c b/hw/ppc/spapr_irq.c
-> index 234d1073e518..b941608b69ba 100644
-> --- a/hw/ppc/spapr_irq.c
-> +++ b/hw/ppc/spapr_irq.c
-> @@ -220,6 +220,20 @@ int spapr_irq_cpu_intc_create(SpaprMachineState *spa=
-pr,
->      return 0;
->  }
-> =20
-> +void spapr_irq_cpu_intc_reset(SpaprMachineState *spapr, PowerPCCPU *cpu)
-> +{
-> +    SpaprInterruptController *intcs[] =3D ALL_INTCS(spapr);
-> +    int i;
-> +
-> +    for (i =3D 0; i < ARRAY_SIZE(intcs); i++) {
-> +        SpaprInterruptController *intc =3D intcs[i];
-> +        if (intc) {
-> +            SpaprInterruptControllerClass *sicc =3D SPAPR_INTC_GET_CLASS=
-(intc);
-> +            sicc->cpu_intc_reset(intc, cpu);
-> +        }
-> +    }
-> +}
-> +
->  static void spapr_set_irq(void *opaque, int irq, int level)
->  {
->      SpaprMachineState *spapr =3D SPAPR_MACHINE(opaque);
+diff --git a/hw/intc/grlib_irqmp.c b/hw/intc/grlib_irqmp.c
+index bc78e1a14f..794c643af2 100644
+--- a/hw/intc/grlib_irqmp.c
++++ b/hw/intc/grlib_irqmp.c
+@@ -25,6 +25,7 @@
+  */
+=20
+ #include "qemu/osdep.h"
++#include "hw/irq.h"
+ #include "hw/sysbus.h"
+ #include "cpu.h"
+=20
+@@ -58,10 +59,8 @@ typedef struct IRQMP {
+=20
+     MemoryRegion iomem;
+=20
+-    void *set_pil_in;
+-    void *set_pil_in_opaque;
+-
+     IRQMPState *state;
++    qemu_irq irq;
+ } IRQMP;
+=20
+ struct IRQMPState {
+@@ -82,7 +81,6 @@ static void grlib_irqmp_check_irqs(IRQMPState *state)
+     uint32_t      pend   =3D 0;
+     uint32_t      level0 =3D 0;
+     uint32_t      level1 =3D 0;
+-    set_pil_in_fn set_pil_in;
+=20
+     assert(state !=3D NULL);
+     assert(state->parent !=3D NULL);
+@@ -97,14 +95,8 @@ static void grlib_irqmp_check_irqs(IRQMPState *state)
+     trace_grlib_irqmp_check_irqs(state->pending, state->force[0],
+                                  state->mask[0], level1, level0);
+=20
+-    set_pil_in =3D (set_pil_in_fn)state->parent->set_pil_in;
+-
+     /* Trigger level1 interrupt first and level0 if there is no level1 */
+-    if (level1 !=3D 0) {
+-        set_pil_in(state->parent->set_pil_in_opaque, level1);
+-    } else {
+-        set_pil_in(state->parent->set_pil_in_opaque, level0);
+-    }
++    qemu_set_irq(state->parent->irq, level1 ?: level0);
+ }
+=20
+ static void grlib_irqmp_ack_mask(IRQMPState *state, uint32_t mask)
+@@ -335,6 +327,7 @@ static void grlib_irqmp_init(Object *obj)
+     IRQMP *irqmp =3D GRLIB_IRQMP(obj);
+     SysBusDevice *dev =3D SYS_BUS_DEVICE(obj);
+=20
++    qdev_init_gpio_out_named(DEVICE(obj), &irqmp->irq, "grlib-irq", 1);
+     memory_region_init_io(&irqmp->iomem, obj, &grlib_irqmp_ops, irqmp,
+                           "irqmp", IRQMP_REG_SIZE);
+=20
+@@ -343,31 +336,11 @@ static void grlib_irqmp_init(Object *obj)
+     sysbus_init_mmio(dev, &irqmp->iomem);
+ }
+=20
+-static void grlib_irqmp_realize(DeviceState *dev, Error **errp)
+-{
+-    IRQMP *irqmp =3D GRLIB_IRQMP(dev);
+-
+-        /* Check parameters */
+-    if (irqmp->set_pil_in =3D=3D NULL) {
+-        error_setg(errp, "set_pil_in cannot be NULL.");
+-    }
+-}
+-
+-static Property grlib_irqmp_properties[] =3D {
+-    DEFINE_PROP_PTR("set_pil_in", IRQMP, set_pil_in),
+-    DEFINE_PROP_PTR("set_pil_in_opaque", IRQMP, set_pil_in_opaque),
+-    DEFINE_PROP_END_OF_LIST(),
+-};
+-
+ static void grlib_irqmp_class_init(ObjectClass *klass, void *data)
+ {
+     DeviceClass *dc =3D DEVICE_CLASS(klass);
+=20
+     dc->reset =3D grlib_irqmp_reset;
+-    dc->props =3D grlib_irqmp_properties;
+-    /* Reason: pointer properties "set_pil_in", "set_pil_in_opaque" */
+-    dc->user_creatable =3D false;
+-    dc->realize =3D grlib_irqmp_realize;
+ }
+=20
+ static const TypeInfo grlib_irqmp_info =3D {
+diff --git a/hw/sparc/leon3.c b/hw/sparc/leon3.c
+index c5f1b1ee72..6db6ea9b5c 100644
+--- a/hw/sparc/leon3.c
++++ b/hw/sparc/leon3.c
+@@ -143,9 +143,10 @@ void leon3_irq_ack(void *irq_manager, int intno)
+     grlib_irqmp_ack((DeviceState *)irq_manager, intno);
+ }
+=20
+-static void leon3_set_pil_in(void *opaque, uint32_t pil_in)
++static void leon3_set_pil_in(void *opaque, int n, int level)
+ {
+-    CPUSPARCState *env =3D (CPUSPARCState *)opaque;
++    CPUSPARCState *env =3D opaque;
++    uint32_t pil_in =3D level;
+     CPUState *cs;
+=20
+     assert(env !=3D NULL);
+@@ -225,8 +226,8 @@ static void leon3_generic_hw_init(MachineState *machine=
+)
+=20
+     /* Allocate IRQ manager */
+     dev =3D qdev_create(NULL, TYPE_GRLIB_IRQMP);
+-    qdev_prop_set_ptr(dev, "set_pil_in", leon3_set_pil_in);
+-    qdev_prop_set_ptr(dev, "set_pil_in_opaque", env);
++    env->pil_irq =3D qemu_allocate_irq(leon3_set_pil_in, env, 0);
++    qdev_connect_gpio_out_named(dev, "grlib-irq", 0, env->pil_irq);
+     qdev_init_nofail(dev);
+     sysbus_mmio_map(SYS_BUS_DEVICE(dev), 0, LEON3_IRQMP_OFFSET);
+     env->irq_manager =3D dev;
+diff --git a/target/sparc/cpu.h b/target/sparc/cpu.h
+index 778aa8e073..709215f8c1 100644
+--- a/target/sparc/cpu.h
++++ b/target/sparc/cpu.h
+@@ -508,6 +508,7 @@ struct CPUSPARCState {
+ #endif
+     sparc_def_t def;
+=20
++    qemu_irq pil_irq;
+     void *irq_manager;
+     void (*qemu_irq_ack)(CPUSPARCState *env, void *irq_manager, int intno)=
+;
+=20
+--=20
+2.23.0.606.g08da6496b6
 
 
