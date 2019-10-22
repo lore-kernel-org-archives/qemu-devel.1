@@ -2,69 +2,68 @@ Return-Path: <SRS0=tSBD=YP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8C14BCA9EA0
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 09:29:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8B4CACA9EA0
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 09:29:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 54F2E2084B
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 09:29:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5572A2064B
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 09:29:48 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cP6puUVH"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 54F2E2084B
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eVjIdfDs"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5572A2064B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52182 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52184 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iMqTx-0005Iy-Cz
-	for qemu-devel@archiver.kernel.org; Tue, 22 Oct 2019 05:29:37 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54149)
+	id 1iMqU7-0005V4-Gu
+	for qemu-devel@archiver.kernel.org; Tue, 22 Oct 2019 05:29:47 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54164)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1iMqT2-0004Qq-V0
+ (envelope-from <mreitz@redhat.com>) id 1iMqT3-0004Qr-Hu
  for qemu-devel@nongnu.org; Tue, 22 Oct 2019 05:28:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1iMqT0-0002hc-FQ
- for qemu-devel@nongnu.org; Tue, 22 Oct 2019 05:28:40 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:39580
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <mreitz@redhat.com>) id 1iMqT2-0002im-EL
+ for qemu-devel@nongnu.org; Tue, 22 Oct 2019 05:28:41 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:35657
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1iMqT0-0002h0-44
- for qemu-devel@nongnu.org; Tue, 22 Oct 2019 05:28:38 -0400
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1iMqT2-0002ht-9N
+ for qemu-devel@nongnu.org; Tue, 22 Oct 2019 05:28:40 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1571736516;
+ s=mimecast20190719; t=1571736518;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=FD1alTZMj9lSgS/9kAWhN36C1BGxCnGHb/CAdOfOrJ8=;
- b=cP6puUVHfwnzpLaiqY295VSyKe3qcIuSdGO5x5sCNSSaCSu3YXgcSRt7ldZtHZCTSR50aD
- yyPbDcboGd5agfL1GsP06eOrIOZ6vSX6NDdrlVhMtKv0B/q2M9aGbsDqv2WxzHgnW57+R4
- waOydykxUlR+befXcngQ4sVealz1uWs=
+ bh=EQR9nG4elJz+4QBIcXjW+L7/ihX1GDQURAjCVrYlfC8=;
+ b=eVjIdfDs2xmLnQfZq6QkZcEeg+GF3Ir1JbEHiPok1/71vl0idKivBU1WjfnTKMJ0Y8rztK
+ 3lqOxsM5X+0ZrCJ/IEKD+YoTc1TXqh8Cpw3Hwdp//QuQwwj1PIoD3RmYx6AEGwvUASwfom
+ LuZNbGqgaaDayCVFIwiI8fv1SgmM8Ys=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-22-qsTNNn3TPy-NULVHRp82Rw-1; Tue, 22 Oct 2019 05:28:35 -0400
-X-MC-Unique: qsTNNn3TPy-NULVHRp82Rw-1
+ us-mta-71-jhbhz5-ZMyqJTNYsZbPJvg-1; Tue, 22 Oct 2019 05:28:36 -0400
+X-MC-Unique: jhbhz5-ZMyqJTNYsZbPJvg-1
 Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
  [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0A0201005512;
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 299B6476;
  Tue, 22 Oct 2019 09:28:34 +0000 (UTC)
 Received: from dresden.str.redhat.com (ovpn-117-215.ams2.redhat.com
  [10.36.117.215])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 2A28E5DA8D;
- Tue, 22 Oct 2019 09:28:31 +0000 (UTC)
-Subject: Re: [PATCH v5 4/4] tests/qemu-iotests: add case for block-stream
- compress
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 65A345DE5B;
+ Tue, 22 Oct 2019 09:28:29 +0000 (UTC)
+Subject: Re: [PATCH v5 1/4] block: support compressed write at generic layer
 To: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>,
  qemu-devel@nongnu.org, qemu-block@nongnu.org
 References: <1571603828-185910-1-git-send-email-andrey.shinkevich@virtuozzo.com>
- <1571603828-185910-5-git-send-email-andrey.shinkevich@virtuozzo.com>
+ <1571603828-185910-2-git-send-email-andrey.shinkevich@virtuozzo.com>
 From: Max Reitz <mreitz@redhat.com>
 Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
  mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
@@ -90,20 +89,20 @@ Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
  /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
  bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
  R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <b707d68c-f9c0-2264-04ac-2070c969770f@redhat.com>
-Date: Tue, 22 Oct 2019 11:28:29 +0200
+Message-ID: <408ef2ab-1f6c-2c9f-ad50-92269c20fb27@redhat.com>
+Date: Tue, 22 Oct 2019 11:28:28 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.1.1
 MIME-Version: 1.0
-In-Reply-To: <1571603828-185910-5-git-send-email-andrey.shinkevich@virtuozzo.com>
+In-Reply-To: <1571603828-185910-2-git-send-email-andrey.shinkevich@virtuozzo.com>
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 X-Mimecast-Spam-Score: 0
 Content-Type: multipart/signed; micalg=pgp-sha256;
  protocol="application/pgp-signature";
- boundary="TtRsnYoRsuv2o8nnHHx9C5zvrn6tusF2s"
+ boundary="PWMb4ANxS6m6ixz3dh6bEPayGQxa0TtMM"
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.120
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -122,132 +121,101 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---TtRsnYoRsuv2o8nnHHx9C5zvrn6tusF2s
-Content-Type: multipart/mixed; boundary="xmCNGnNnlgoq3M63tI8vhAC31g5lrKWsH"
+--PWMb4ANxS6m6ixz3dh6bEPayGQxa0TtMM
+Content-Type: multipart/mixed; boundary="YnjNuAkRS1GPyADfgxoltB5BdrVBvl4VT"
 
---xmCNGnNnlgoq3M63tI8vhAC31g5lrKWsH
+--YnjNuAkRS1GPyADfgxoltB5BdrVBvl4VT
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
 On 20.10.19 22:37, Andrey Shinkevich wrote:
-> Add a case to the iotest #030 that tests the 'compress' option for a
-> block-stream job.
+> To inform the block layer about writing all the data compressed, we
+> introduce the 'compress' command line option. Based on that option, the
+> written data will be aligned by the cluster size at the generic layer.
 >=20
+> Suggested-by: Roman Kagan <rkagan@virtuozzo.com>
+> Suggested-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 > Signed-off-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+> Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 > ---
->  tests/qemu-iotests/030     | 34 +++++++++++++++++++++++++++++++++-
->  tests/qemu-iotests/030.out |  4 ++--
->  2 files changed, 35 insertions(+), 3 deletions(-)
->=20
-> diff --git a/tests/qemu-iotests/030 b/tests/qemu-iotests/030
-> index f3766f2..f33fd21 100755
-> --- a/tests/qemu-iotests/030
-> +++ b/tests/qemu-iotests/030
-> @@ -21,7 +21,8 @@
->  import time
->  import os
->  import iotests
-> -from iotests import qemu_img, qemu_io
-> +from iotests import qemu_img, qemu_io, qemu_img_pipe
-> +import json
-> =20
->  backing_img =3D os.path.join(iotests.test_dir, 'backing.img')
->  mid_img =3D os.path.join(iotests.test_dir, 'mid.img')
-> @@ -956,6 +957,37 @@ class TestSetSpeed(iotests.QMPTestCase):
-> =20
->          self.cancel_and_wait(resume=3DTrue)
-> =20
-> +class TestCompressed(iotests.QMPTestCase):
-> +    allocated_clusters =3D 8
-> +
-> +    def setUp(self):
-> +        qemu_img('create', '-f', iotests.imgfmt, backing_img, '1M')
-> +        qemu_img('create', '-f', iotests.imgfmt, '-o',
-> +                 'backing_file=3D{}'.format(backing_img), test_img)
-> +        cluster_size =3D 0x10000
-> +        data_size =3D self.allocated_clusters * cluster_size
-> +        qemu_io('-c', 'write -P 0x1 0 {}'.format(data_size), backing_img=
+>  block.c                   | 20 +++++++++++++++++++-
+>  block/io.c                | 13 +++++++++----
+>  block/qcow2.c             |  4 ++++
+>  blockdev.c                |  9 ++++++++-
+>  include/block/block.h     |  1 +
+>  include/block/block_int.h |  2 ++
+>  qapi/block-core.json      |  5 ++++-
+>  qemu-options.hx           |  6 ++++--
+>  8 files changed, 51 insertions(+), 9 deletions(-)
+
+The problem with compression is that there are such tight constraints on
+it that it can really only work for very defined use cases.  Those
+constraints are:
+
+- Only write whole clusters,
+- Clusters can be written to only once.
+
+The first point is addressed in this patch by setting request_alignment.
+ But I don=E2=80=99t see how the second one can be addressed.  Well, maybe =
+by
+allowing it in all drivers that support compression.  But if I just look
+at qcow2, that isn=E2=80=99t going to be trivial: You need to allocate a
+completely new cluster where you write the data (in case it grows), and
+thus you leave behind a hole, which kind of defeats the purpose of
+compression.
+
+(For demonstration:
+
+$ ./qemu-img create -f qcow2 test.qcow2 64M
+Formatting 'test.qcow2', fmt=3Dqcow2 size=3D67108864 cluster_size=3D65536
+lazy_refcounts=3Doff refcount_bits=3D16
+$ x86_64-softmmu/qemu-system-x86_64 \
+    -blockdev "{'node-name': 'drv0', 'driver': 'qcow2',
+                'compress': true,
+                'file': {'driver': 'file', 'filename': 'test.qcow2'}}" \
+    -monitor stdio
+QEMU 4.1.50 monitor - type 'help' for more information
+(qemu) qemu-io drv0 "write -P 42 0 64k"
+wrote 65536/65536 bytes at offset 0
+64 KiB, 1 ops; 00.02 sec (4.055 MiB/sec and 64.8793 ops/sec)
+(qemu) qemu-io drv0 "write -P 23 0 64k"
+write failed: Input/output error
+
 )
-> +        self.vm =3D iotests.VM().add_drive(test_img, "compress=3Don")
 
-I don=E2=80=99t think it makes sense to add a drive with compress=3Don to a=
- VM.
-If the VM writes to any cluster more than once, the request will fail.
+Compression really only works when you fully write all of an image
+exactly once; i.e. as the qemu-img convert or as a backup target.  For
+both cases we already have a compression option.  So I=E2=80=99m wondering =
+where
+this new option is really useful.
 
-> +        self.vm.launch()
-> +
-> +    def tearDown(self):
-> +        self.vm.shutdown()
-> +        os.remove(test_img)
-> +        os.remove(backing_img)
-> +
-> +    def test_stream_compress(self):
-> +        self.assert_no_active_block_jobs()
-> +
-> +        result =3D self.vm.qmp('block-stream', device=3D'drive0')
-> +        self.assert_qmp(result, 'return', {})
-
-In this example, it=E2=80=99s actually even a bit worse: The VM might be aw=
-are
-that it may only write to each cluster exactly once.  But if it writes
-to any of the first eight clusters after the stream job as done so
-(invisibly to the VM guest), it will get an error.
-
-You could see that by adding a qemu-io write here and see that it fails.
- (In practice you won=E2=80=99t because the error goes to stdout and that i=
-s
-lost in Python tests).
+(You do add a test for stream, but I don=E2=80=99t know whether that=E2=80=
+=99s really a
+good example, see my response there.)
 
 Max
 
-> +        match =3D {'data': {'type': 'stream', 'device': 'drive0'}}
-> +        self.vm.event_wait(name=3D'BLOCK_JOB_COMPLETED', match=3Dmatch)
-> +        self.vm.shutdown()
-> +
-> +        top =3D json.loads(qemu_img_pipe('check', '--output=3Djson', tes=
-t_img))
-> +        self.assertEqual(top['compressed-clusters'], self.allocated_clus=
-ters)
-> +
->  if __name__ =3D=3D '__main__':
->      iotests.main(supported_fmts=3D['qcow2', 'qed'],
->                   supported_protocols=3D['file'])
-> diff --git a/tests/qemu-iotests/030.out b/tests/qemu-iotests/030.out
-> index 6d9bee1..af8dac1 100644
-> --- a/tests/qemu-iotests/030.out
-> +++ b/tests/qemu-iotests/030.out
-> @@ -1,5 +1,5 @@
-> -...........................
-> +............................
->  ----------------------------------------------------------------------
-> -Ran 27 tests
-> +Ran 28 tests
-> =20
->  OK
->=20
 
+--YnjNuAkRS1GPyADfgxoltB5BdrVBvl4VT--
 
-
---xmCNGnNnlgoq3M63tI8vhAC31g5lrKWsH--
-
---TtRsnYoRsuv2o8nnHHx9C5zvrn6tusF2s
+--PWMb4ANxS6m6ixz3dh6bEPayGQxa0TtMM
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl2uy70ACgkQ9AfbAGHV
-z0ApVQf/ZYvd5N89IBoQ7WJNlsMin7tuua5l54S+kWnarWJNUEtOvM3W2Xez1zzC
-S1p3o0Lae23AUj0bTLlQYOKyz5dw+Qbhqt1/kg6xnZixbMn6dMMDQjhnPDpJggdm
-1F1q39O4lcIW5OitwC+0jFdFETh9IrJ5OLC18KbmZE3/WfXbJatngK5tEkrVR63c
-Urbyl1Gg9aHRCY0wXe3/4EXH0sbkRWqFgRDSps4V1X6XV2MIIfRVEDsk33rMge0p
-2YM0tvzr7m0llFc2/Q5ptPi5SClsqITuETth0CFeOURbTjcg64w+LSeVEMhZlhY3
-FPfVsjaytnpvEPUGnBpVm8Q7oWbM7w==
-=K2La
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl2uy7wACgkQ9AfbAGHV
+z0BRrggAiuA7CbJH3w0BnvVDSkvEh4TUeO+/dWH7siApjaT4MAFswz54YklVEDhD
+INdNQnMqJabbjacSKDBpZlHBTZ+/+vJ7gKMh5Maa8A0oT7VTVMxI3kXpexrieAIb
++DKfscmHafaqv2F1hFxHVbnRfXZdN6L+K0q1xMsXSO+Qc371oDDVNIuMHMhW7byc
+qL48KoaMqrE33FKsPix+ezxgOfXPnVM1Qylr9qkRVOd92jebTzJTYdfmnOlZc7Ad
+bsFIqMtb5dEKgq7jYrvYF5hlM9H8juVWySfsEPX5IpqsiMDx2DYfpCm+a59YCT8D
+w4tCBVYPu2ya40T3l9ugNK+sCgtnog==
+=j8Hc
 -----END PGP SIGNATURE-----
 
---TtRsnYoRsuv2o8nnHHx9C5zvrn6tusF2s--
+--PWMb4ANxS6m6ixz3dh6bEPayGQxa0TtMM--
 
 
