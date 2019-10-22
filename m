@@ -2,62 +2,87 @@ Return-Path: <SRS0=tSBD=YP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 278BBCA9EA0
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 14:17:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C72FECA9EA0
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 14:18:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D476A20700
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 14:17:34 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D476A20700
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id 90F9720700
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 14:18:10 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="hT31gfl9"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 90F9720700
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58528 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58532 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iMuyb-0007Bt-Oz
-	for qemu-devel@archiver.kernel.org; Tue, 22 Oct 2019 10:17:33 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39521)
+	id 1iMuzB-0007sG-KQ
+	for qemu-devel@archiver.kernel.org; Tue, 22 Oct 2019 10:18:09 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37330)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <clg@kaod.org>) id 1iMuRs-00008D-O6
- for qemu-devel@nongnu.org; Tue, 22 Oct 2019 09:43:46 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1iMuHq-0003Zs-DD
+ for qemu-devel@nongnu.org; Tue, 22 Oct 2019 09:33:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <clg@kaod.org>) id 1iMuRq-000607-LD
- for qemu-devel@nongnu.org; Tue, 22 Oct 2019 09:43:44 -0400
-Received: from 1.mo68.mail-out.ovh.net ([46.105.41.146]:51129)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <clg@kaod.org>) id 1iMuRq-0005yF-BW
- for qemu-devel@nongnu.org; Tue, 22 Oct 2019 09:43:42 -0400
-Received: from player761.ha.ovh.net (unknown [10.109.143.238])
- by mo68.mail-out.ovh.net (Postfix) with ESMTP id 94FEC1446E4
- for <qemu-devel@nongnu.org>; Tue, 22 Oct 2019 15:43:40 +0200 (CEST)
-Received: from kaod.org (deibp9eh1--blueice1n4.emea.ibm.com [195.212.29.166])
- (Authenticated sender: clg@kaod.org)
- by player761.ha.ovh.net (Postfix) with ESMTPSA id 52818B476192;
- Tue, 22 Oct 2019 13:43:31 +0000 (UTC)
-From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
-To: David Gibson <david@gibson.dropbear.id.au>
-Subject: [PATCH v4 4/6] ppc: Reset the interrupt presenter from the CPU reset
- handler
-Date: Tue, 22 Oct 2019 15:42:52 +0200
-Message-Id: <20191022134254.28692-5-clg@kaod.org>
-X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20191022134254.28692-1-clg@kaod.org>
-References: <20191022134254.28692-1-clg@kaod.org>
+ (envelope-from <peter.maydell@linaro.org>) id 1iMuHo-0001hp-AC
+ for qemu-devel@nongnu.org; Tue, 22 Oct 2019 09:33:22 -0400
+Received: from mail-wr1-x42c.google.com ([2a00:1450:4864:20::42c]:46977)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1iMuHo-0001f4-3e
+ for qemu-devel@nongnu.org; Tue, 22 Oct 2019 09:33:20 -0400
+Received: by mail-wr1-x42c.google.com with SMTP id n15so7303500wrw.13
+ for <qemu-devel@nongnu.org>; Tue, 22 Oct 2019 06:33:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:subject:date:message-id:in-reply-to:references:mime-version
+ :content-transfer-encoding;
+ bh=35JGdkX+Qbs+3j0Y2Ds4qNx/4PsRHF6QNmtmflqtCQ0=;
+ b=hT31gfl90dmpUk4jbJJ54inUhmDZn0UyovEp/TFIhF20BPiQGYATjaAoI+Dx3sEZ7T
+ rNs82uCPbpuD+NK2JuMhT5Em50N4b80Wggx4zXr0LlYYvGgngieZ2hvzWpEvNAjzaWHw
+ 7JO+FBOgs5skcyehvzdXxwnun2HVHowtnbPbUmK1tM+tgb8RYqvwmeDcH7DktERf4puR
+ gZ5l6N809MDG5gigXwNIK1go3hIUYgioYaN7TaEYt9I1ZBTVZu+3HGgOJBIwrhwrYoz2
+ 3GkluQjLUrrJeb32tojhKFruqzmiyB0BKJTYmonjZ5L55kxcTkAOetGyjQDjhuZG+CK6
+ DpCg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=35JGdkX+Qbs+3j0Y2Ds4qNx/4PsRHF6QNmtmflqtCQ0=;
+ b=B+Y4BT4+AxIWPx/QG+my7/Sj+/Gm2phjSTUZ8DYOMJlrZrc5jN6+U9BbwL983O/EVj
+ wDRGSmIXq1A1dwdI7nUJ/NVyJs82TN+33xXD/9ZmESatKFvCdiiOWPuojg7TAueSUhBL
+ QwIwK4wYz9wiPmL8o2nbFAsMi2GQsjBB0TsC7ent+Ky1rEtzqWaCP/EtlVeylEctG93l
+ WPnR4HuBzWNkBmYKZ8kx76GrlAEPT7PaTyCla9UG8CBVaz3ewaiywBR28j/YgVm9Kc0n
+ qGTZuqSFVZCixIck52nyNz+UkdobG1fDiz2XU4ToFqc7yDRYSSuvpOatYr/KMeWHI7ri
+ DLMg==
+X-Gm-Message-State: APjAAAUMN2mF7ybqUfzKja8qgwf3tecyiPvctWp9uWVxw/zBKoOCHLBx
+ /Ku2d8YcbGu+HX1EV+IiCNYGyYsDKWA=
+X-Google-Smtp-Source: APXvYqzValH3fzpPKicGwfeWlUa8gQ2KZYOl1f5JKHtlJ5lt6TgFb6ArjcklTdr9PaiqatSieehEeQ==
+X-Received: by 2002:a5d:5392:: with SMTP id d18mr3859854wrv.382.1571751188590; 
+ Tue, 22 Oct 2019 06:33:08 -0700 (PDT)
+Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
+ by smtp.gmail.com with ESMTPSA id r2sm20263856wma.1.2019.10.22.06.33.06
+ for <qemu-devel@nongnu.org>
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 22 Oct 2019 06:33:07 -0700 (PDT)
+From: Peter Maydell <peter.maydell@linaro.org>
+To: qemu-devel@nongnu.org
+Subject: [PULL 40/41] hw/arm/omap1: Create the RAM in the board
+Date: Tue, 22 Oct 2019 14:31:33 +0100
+Message-Id: <20191022133134.14487-41-peter.maydell@linaro.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20191022133134.14487-1-peter.maydell@linaro.org>
+References: <20191022133134.14487-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-X-Ovh-Tracer-Id: 543809655257074662
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrkeejgdeijecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 46.105.41.146
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::42c
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -69,407 +94,168 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>, qemu-ppc@nongnu.org,
- qemu-devel@nongnu.org, Greg Kurz <groug@kaod.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On the sPAPR machine and PowerNV machine, the interrupt presenters are
-created by a machine handler at the core level and are reset
-independently. This is not consistent and it raises issues when it
-comes to handle hot-plugged CPUs. In that case, the presenters are not
-reset. This is less of an issue in XICS, although a zero MFFR could
-be a concern, but in XIVE, the OS CAM line is not set and this breaks
-the presenting algorithm. The current code has workarounds which need
-a global cleanup.
+From: Philippe Mathieu-Daudé <philmd@redhat.com>
 
-Extend the sPAPR IRQ backend and the PowerNV Chip class with a new
-cpu_intc_reset() handler called by the CPU reset handler and remove
-the XiveTCTX reset handler which is now redundant.
+The SDRAM is incorrectly created in the OMAP310 SoC.
+Move its creation in the board code, this will later allow the
+board to have the QOM ownership of the RAM.
 
-Reviewed-by: Greg Kurz <groug@kaod.org>
-Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+Message-id: 20191021190653.9511-6-philmd@redhat.com
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- include/hw/ppc/pnv.h       |  1 +
- include/hw/ppc/spapr_irq.h |  2 ++
- include/hw/ppc/xics.h      |  1 +
- include/hw/ppc/xive.h      |  1 +
- hw/intc/spapr_xive.c       |  9 +++++++++
- hw/intc/xics.c             |  8 ++------
- hw/intc/xics_spapr.c       |  7 +++++++
- hw/intc/xive.c             | 12 +-----------
- hw/ppc/pnv.c               | 18 ++++++++++++++++++
- hw/ppc/pnv_core.c          |  8 ++++++--
- hw/ppc/spapr_cpu_core.c    |  5 ++++-
- hw/ppc/spapr_irq.c         | 14 ++++++++++++++
- 12 files changed, 66 insertions(+), 20 deletions(-)
+ include/hw/arm/omap.h |  6 ++----
+ hw/arm/omap1.c        | 12 +++++-------
+ hw/arm/omap_sx1.c     |  8 ++++++--
+ hw/arm/palm.c         |  8 ++++++--
+ 4 files changed, 19 insertions(+), 15 deletions(-)
 
-diff --git a/include/hw/ppc/pnv.h b/include/hw/ppc/pnv.h
-index 1cdbe55bf86c..2a780e633f23 100644
---- a/include/hw/ppc/pnv.h
-+++ b/include/hw/ppc/pnv.h
-@@ -111,6 +111,7 @@ typedef struct PnvChipClass {
-=20
-     uint32_t (*core_pir)(PnvChip *chip, uint32_t core_id);
-     void (*intc_create)(PnvChip *chip, PowerPCCPU *cpu, Error **errp);
-+    void (*intc_reset)(PnvChip *chip, PowerPCCPU *cpu);
-     ISABus *(*isa_create)(PnvChip *chip, Error **errp);
-     void (*dt_populate)(PnvChip *chip, void *fdt);
-     void (*pic_print_info)(PnvChip *chip, Monitor *mon);
-diff --git a/include/hw/ppc/spapr_irq.h b/include/hw/ppc/spapr_irq.h
-index 5e150a667902..09232999b07e 100644
---- a/include/hw/ppc/spapr_irq.h
-+++ b/include/hw/ppc/spapr_irq.h
-@@ -52,6 +52,7 @@ typedef struct SpaprInterruptControllerClass {
-      */
-     int (*cpu_intc_create)(SpaprInterruptController *intc,
-                             PowerPCCPU *cpu, Error **errp);
-+    void (*cpu_intc_reset)(SpaprInterruptController *intc, PowerPCCPU *c=
-pu);
-     int (*claim_irq)(SpaprInterruptController *intc, int irq, bool lsi,
-                      Error **errp);
-     void (*free_irq)(SpaprInterruptController *intc, int irq);
-@@ -68,6 +69,7 @@ void spapr_irq_update_active_intc(SpaprMachineState *sp=
-apr);
-=20
- int spapr_irq_cpu_intc_create(SpaprMachineState *spapr,
-                               PowerPCCPU *cpu, Error **errp);
-+void spapr_irq_cpu_intc_reset(SpaprMachineState *spapr, PowerPCCPU *cpu)=
-;
- void spapr_irq_print_info(SpaprMachineState *spapr, Monitor *mon);
- void spapr_irq_dt(SpaprMachineState *spapr, uint32_t nr_servers,
-                   void *fdt, uint32_t phandle);
-diff --git a/include/hw/ppc/xics.h b/include/hw/ppc/xics.h
-index 1e6a9300eb2b..602173c12250 100644
---- a/include/hw/ppc/xics.h
-+++ b/include/hw/ppc/xics.h
-@@ -161,6 +161,7 @@ void icp_set_mfrr(ICPState *icp, uint8_t mfrr);
- uint32_t icp_accept(ICPState *ss);
- uint32_t icp_ipoll(ICPState *ss, uint32_t *mfrr);
- void icp_eoi(ICPState *icp, uint32_t xirr);
-+void icp_reset(ICPState *icp);
-=20
- void ics_write_xive(ICSState *ics, int nr, int server,
-                     uint8_t priority, uint8_t saved_priority);
-diff --git a/include/hw/ppc/xive.h b/include/hw/ppc/xive.h
-index fd3319bd3202..99381639f50c 100644
---- a/include/hw/ppc/xive.h
-+++ b/include/hw/ppc/xive.h
-@@ -415,6 +415,7 @@ uint64_t xive_tctx_tm_read(XiveTCTX *tctx, hwaddr off=
-set, unsigned size);
-=20
- void xive_tctx_pic_print_info(XiveTCTX *tctx, Monitor *mon);
- Object *xive_tctx_create(Object *cpu, XiveRouter *xrtr, Error **errp);
-+void xive_tctx_reset(XiveTCTX *tctx);
-=20
- static inline uint32_t xive_nvt_cam_line(uint8_t nvt_blk, uint32_t nvt_i=
-dx)
- {
-diff --git a/hw/intc/spapr_xive.c b/hw/intc/spapr_xive.c
-index ba32d2cc5b0f..20a8d8285f64 100644
---- a/hw/intc/spapr_xive.c
-+++ b/hw/intc/spapr_xive.c
-@@ -553,6 +553,14 @@ static int spapr_xive_cpu_intc_create(SpaprInterrupt=
-Controller *intc,
-     return 0;
- }
-=20
-+static void spapr_xive_cpu_intc_reset(SpaprInterruptController *intc,
-+                                     PowerPCCPU *cpu)
-+{
-+    XiveTCTX *tctx =3D spapr_cpu_state(cpu)->tctx;
-+
-+    xive_tctx_reset(tctx);
-+}
-+
- static void spapr_xive_set_irq(SpaprInterruptController *intc, int irq, =
-int val)
- {
-     SpaprXive *xive =3D SPAPR_XIVE(intc);
-@@ -697,6 +705,7 @@ static void spapr_xive_class_init(ObjectClass *klass,=
- void *data)
-     sicc->activate =3D spapr_xive_activate;
-     sicc->deactivate =3D spapr_xive_deactivate;
-     sicc->cpu_intc_create =3D spapr_xive_cpu_intc_create;
-+    sicc->cpu_intc_reset =3D spapr_xive_cpu_intc_reset;
-     sicc->claim_irq =3D spapr_xive_claim_irq;
-     sicc->free_irq =3D spapr_xive_free_irq;
-     sicc->set_irq =3D spapr_xive_set_irq;
-diff --git a/hw/intc/xics.c b/hw/intc/xics.c
-index b5ac408f7b74..6da05763f9db 100644
---- a/hw/intc/xics.c
-+++ b/hw/intc/xics.c
-@@ -274,10 +274,8 @@ static const VMStateDescription vmstate_icp_server =3D=
- {
-     },
+diff --git a/include/hw/arm/omap.h b/include/hw/arm/omap.h
+index 763d8eab4fa..f3aa6700361 100644
+--- a/include/hw/arm/omap.h
++++ b/include/hw/arm/omap.h
+@@ -823,7 +823,6 @@ struct omap_mpu_state_s {
+     MemoryRegion mpui_io_iomem;
+     MemoryRegion tap_iomem;
+     MemoryRegion imif_ram;
+-    MemoryRegion emiff_ram;
+     MemoryRegion sram;
+ 
+     struct omap_dma_port_if_s {
+@@ -835,7 +834,7 @@ struct omap_mpu_state_s {
+                         hwaddr addr);
+     } port[__omap_dma_port_last];
+ 
+-    unsigned long sdram_size;
++    uint64_t sdram_size;
+     unsigned long sram_size;
+ 
+     /* MPUI-TIPB peripherals */
+@@ -932,8 +931,7 @@ struct omap_mpu_state_s {
  };
-=20
--static void icp_reset_handler(void *dev)
-+void icp_reset(ICPState *icp)
+ 
+ /* omap1.c */
+-struct omap_mpu_state_s *omap310_mpu_init(MemoryRegion *system_memory,
+-                unsigned long sdram_size,
++struct omap_mpu_state_s *omap310_mpu_init(MemoryRegion *sdram,
+                 const char *core);
+ 
+ /* omap2.c */
+diff --git a/hw/arm/omap1.c b/hw/arm/omap1.c
+index 0400593805e..6ce038a4535 100644
+--- a/hw/arm/omap1.c
++++ b/hw/arm/omap1.c
+@@ -23,6 +23,7 @@
+ #include "qapi/error.h"
+ #include "qemu-common.h"
+ #include "cpu.h"
++#include "exec/address-spaces.h"
+ #include "hw/boards.h"
+ #include "hw/hw.h"
+ #include "hw/irq.h"
+@@ -3858,8 +3859,7 @@ static int omap_validate_tipb_mpui_addr(struct omap_mpu_state_s *s,
+     return range_covers_byte(0xe1010000, 0xe1020004 - 0xe1010000, addr);
+ }
+ 
+-struct omap_mpu_state_s *omap310_mpu_init(MemoryRegion *system_memory,
+-                unsigned long sdram_size,
++struct omap_mpu_state_s *omap310_mpu_init(MemoryRegion *dram,
+                 const char *cpu_type)
  {
--    ICPState *icp =3D ICP(dev);
--
-     icp->xirr =3D 0;
-     icp->pending_priority =3D 0xff;
-     icp->mfrr =3D 0xff;
-@@ -288,7 +286,7 @@ static void icp_reset_handler(void *dev)
-     if (kvm_irqchip_in_kernel()) {
-         Error *local_err =3D NULL;
-=20
--        icp_set_kvm_state(ICP(dev), &local_err);
-+        icp_set_kvm_state(icp, &local_err);
-         if (local_err) {
-             error_report_err(local_err);
-         }
-@@ -351,7 +349,6 @@ static void icp_realize(DeviceState *dev, Error **err=
-p)
-         }
-     }
-=20
--    qemu_register_reset(icp_reset_handler, dev);
-     vmstate_register(NULL, icp->cs->cpu_index, &vmstate_icp_server, icp)=
-;
- }
-=20
-@@ -360,7 +357,6 @@ static void icp_unrealize(DeviceState *dev, Error **e=
-rrp)
-     ICPState *icp =3D ICP(dev);
-=20
-     vmstate_unregister(NULL, &vmstate_icp_server, icp);
--    qemu_unregister_reset(icp_reset_handler, dev);
- }
-=20
- static void icp_class_init(ObjectClass *klass, void *data)
-diff --git a/hw/intc/xics_spapr.c b/hw/intc/xics_spapr.c
-index 4f64b9a9fc66..7418fb9f370c 100644
---- a/hw/intc/xics_spapr.c
-+++ b/hw/intc/xics_spapr.c
-@@ -346,6 +346,12 @@ static int xics_spapr_cpu_intc_create(SpaprInterrupt=
-Controller *intc,
-     return 0;
- }
-=20
-+static void xics_spapr_cpu_intc_reset(SpaprInterruptController *intc,
-+                                     PowerPCCPU *cpu)
-+{
-+    icp_reset(spapr_cpu_state(cpu)->icp);
-+}
-+
- static int xics_spapr_claim_irq(SpaprInterruptController *intc, int irq,
-                                 bool lsi, Error **errp)
- {
-@@ -433,6 +439,7 @@ static void ics_spapr_class_init(ObjectClass *klass, =
-void *data)
-     sicc->activate =3D xics_spapr_activate;
-     sicc->deactivate =3D xics_spapr_deactivate;
-     sicc->cpu_intc_create =3D xics_spapr_cpu_intc_create;
-+    sicc->cpu_intc_reset =3D xics_spapr_cpu_intc_reset;
-     sicc->claim_irq =3D xics_spapr_claim_irq;
-     sicc->free_irq =3D xics_spapr_free_irq;
-     sicc->set_irq =3D xics_spapr_set_irq;
-diff --git a/hw/intc/xive.c b/hw/intc/xive.c
-index d420c6571e14..f066be5eb5e3 100644
---- a/hw/intc/xive.c
-+++ b/hw/intc/xive.c
-@@ -547,10 +547,8 @@ void xive_tctx_pic_print_info(XiveTCTX *tctx, Monito=
-r *mon)
-     }
- }
-=20
--static void xive_tctx_reset(void *dev)
-+void xive_tctx_reset(XiveTCTX *tctx)
- {
--    XiveTCTX *tctx =3D XIVE_TCTX(dev);
--
-     memset(tctx->regs, 0, sizeof(tctx->regs));
-=20
-     /* Set some defaults */
-@@ -607,13 +605,6 @@ static void xive_tctx_realize(DeviceState *dev, Erro=
-r **errp)
-             return;
-         }
-     }
--
--    qemu_register_reset(xive_tctx_reset, dev);
--}
--
--static void xive_tctx_unrealize(DeviceState *dev, Error **errp)
--{
--    qemu_unregister_reset(xive_tctx_reset, dev);
- }
-=20
- static int vmstate_xive_tctx_pre_save(void *opaque)
-@@ -668,7 +659,6 @@ static void xive_tctx_class_init(ObjectClass *klass, =
-void *data)
-=20
-     dc->desc =3D "XIVE Interrupt Thread Context";
-     dc->realize =3D xive_tctx_realize;
--    dc->unrealize =3D xive_tctx_unrealize;
-     dc->vmsd =3D &vmstate_xive_tctx;
-     /*
-      * Reason: part of XIVE interrupt controller, needs to be wired up
-diff --git a/hw/ppc/pnv.c b/hw/ppc/pnv.c
-index 7cf64b6d2533..4a51fb65a834 100644
---- a/hw/ppc/pnv.c
-+++ b/hw/ppc/pnv.c
-@@ -778,6 +778,13 @@ static void pnv_chip_power8_intc_create(PnvChip *chi=
-p, PowerPCCPU *cpu,
-     pnv_cpu->intc =3D obj;
- }
-=20
-+static void pnv_chip_power8_intc_reset(PnvChip *chip, PowerPCCPU *cpu)
-+{
-+    PnvCPUState *pnv_cpu =3D pnv_cpu_state(cpu);
-+
-+    icp_reset(ICP(pnv_cpu->intc));
-+}
-+
- /*
-  *    0:48  Reserved - Read as zeroes
-  *   49:52  Node ID
-@@ -815,6 +822,13 @@ static void pnv_chip_power9_intc_create(PnvChip *chi=
-p, PowerPCCPU *cpu,
-     pnv_cpu->intc =3D obj;
- }
-=20
-+static void pnv_chip_power9_intc_reset(PnvChip *chip, PowerPCCPU *cpu)
-+{
-+    PnvCPUState *pnv_cpu =3D pnv_cpu_state(cpu);
-+
-+    xive_tctx_reset(XIVE_TCTX(pnv_cpu->intc));
-+}
-+
- /*
-  * Allowed core identifiers on a POWER8 Processor Chip :
-  *
-@@ -984,6 +998,7 @@ static void pnv_chip_power8e_class_init(ObjectClass *=
-klass, void *data)
-     k->cores_mask =3D POWER8E_CORE_MASK;
-     k->core_pir =3D pnv_chip_core_pir_p8;
-     k->intc_create =3D pnv_chip_power8_intc_create;
-+    k->intc_reset =3D pnv_chip_power8_intc_reset;
-     k->isa_create =3D pnv_chip_power8_isa_create;
-     k->dt_populate =3D pnv_chip_power8_dt_populate;
-     k->pic_print_info =3D pnv_chip_power8_pic_print_info;
-@@ -1003,6 +1018,7 @@ static void pnv_chip_power8_class_init(ObjectClass =
-*klass, void *data)
-     k->cores_mask =3D POWER8_CORE_MASK;
-     k->core_pir =3D pnv_chip_core_pir_p8;
-     k->intc_create =3D pnv_chip_power8_intc_create;
-+    k->intc_reset =3D pnv_chip_power8_intc_reset;
-     k->isa_create =3D pnv_chip_power8_isa_create;
-     k->dt_populate =3D pnv_chip_power8_dt_populate;
-     k->pic_print_info =3D pnv_chip_power8_pic_print_info;
-@@ -1022,6 +1038,7 @@ static void pnv_chip_power8nvl_class_init(ObjectCla=
-ss *klass, void *data)
-     k->cores_mask =3D POWER8_CORE_MASK;
-     k->core_pir =3D pnv_chip_core_pir_p8;
-     k->intc_create =3D pnv_chip_power8_intc_create;
-+    k->intc_reset =3D pnv_chip_power8_intc_reset;
-     k->isa_create =3D pnv_chip_power8nvl_isa_create;
-     k->dt_populate =3D pnv_chip_power8_dt_populate;
-     k->pic_print_info =3D pnv_chip_power8_pic_print_info;
-@@ -1191,6 +1208,7 @@ static void pnv_chip_power9_class_init(ObjectClass =
-*klass, void *data)
-     k->cores_mask =3D POWER9_CORE_MASK;
-     k->core_pir =3D pnv_chip_core_pir_p9;
-     k->intc_create =3D pnv_chip_power9_intc_create;
-+    k->intc_reset =3D pnv_chip_power9_intc_reset;
-     k->isa_create =3D pnv_chip_power9_isa_create;
-     k->dt_populate =3D pnv_chip_power9_dt_populate;
-     k->pic_print_info =3D pnv_chip_power9_pic_print_info;
-diff --git a/hw/ppc/pnv_core.c b/hw/ppc/pnv_core.c
-index cc17bbfed829..127107ab7c63 100644
---- a/hw/ppc/pnv_core.c
-+++ b/hw/ppc/pnv_core.c
-@@ -40,10 +40,11 @@ static const char *pnv_core_cpu_typename(PnvCore *pc)
-     return cpu_type;
- }
-=20
--static void pnv_core_cpu_reset(PowerPCCPU *cpu)
-+static void pnv_core_cpu_reset(PowerPCCPU *cpu, PnvChip *chip)
- {
-     CPUState *cs =3D CPU(cpu);
-     CPUPPCState *env =3D &cpu->env;
-+    PnvChipClass *pcc;
-=20
-     cpu_reset(cs);
-=20
-@@ -54,6 +55,9 @@ static void pnv_core_cpu_reset(PowerPCCPU *cpu)
-     env->gpr[3] =3D PNV_FDT_ADDR;
-     env->nip =3D 0x10;
-     env->msr |=3D MSR_HVB; /* Hypervisor mode */
-+
-+    pcc =3D PNV_CHIP_GET_CLASS(chip);
-+    pcc->intc_reset(PNV_CHIP(chip), cpu);
- }
-=20
- /*
-@@ -200,7 +204,7 @@ static void pnv_core_reset(void *dev)
      int i;
-=20
-     for (i =3D 0; i < cc->nr_threads; i++) {
--        pnv_core_cpu_reset(pc->threads[i]);
-+        pnv_core_cpu_reset(pc->threads[i], pc->chip);
-     }
- }
-=20
-diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
-index 2e34832d0ea2..ef7b27a66d56 100644
---- a/hw/ppc/spapr_cpu_core.c
-+++ b/hw/ppc/spapr_cpu_core.c
-@@ -32,6 +32,7 @@ static void spapr_reset_vcpu(PowerPCCPU *cpu)
-     PowerPCCPUClass *pcc =3D POWERPC_CPU_GET_CLASS(cpu);
-     SpaprCpuState *spapr_cpu =3D spapr_cpu_state(cpu);
-     target_ulong lpcr;
-+    SpaprMachineState *spapr =3D SPAPR_MACHINE(qdev_get_machine());
-=20
-     cpu_reset(cs);
-=20
-@@ -76,9 +77,11 @@ static void spapr_reset_vcpu(PowerPCCPU *cpu)
-     spapr_cpu->dtl_addr =3D 0;
-     spapr_cpu->dtl_size =3D 0;
-=20
--    spapr_caps_cpu_apply(SPAPR_MACHINE(qdev_get_machine()), cpu);
-+    spapr_caps_cpu_apply(spapr, cpu);
-=20
-     kvm_check_mmu(cpu, &error_fatal);
-+
-+    spapr_irq_cpu_intc_reset(spapr, cpu);
- }
-=20
- void spapr_cpu_set_entry_state(PowerPCCPU *cpu, target_ulong nip, target=
-_ulong r3)
-diff --git a/hw/ppc/spapr_irq.c b/hw/ppc/spapr_irq.c
-index 234d1073e518..b941608b69ba 100644
---- a/hw/ppc/spapr_irq.c
-+++ b/hw/ppc/spapr_irq.c
-@@ -220,6 +220,20 @@ int spapr_irq_cpu_intc_create(SpaprMachineState *spa=
-pr,
-     return 0;
- }
-=20
-+void spapr_irq_cpu_intc_reset(SpaprMachineState *spapr, PowerPCCPU *cpu)
-+{
-+    SpaprInterruptController *intcs[] =3D ALL_INTCS(spapr);
-+    int i;
-+
-+    for (i =3D 0; i < ARRAY_SIZE(intcs); i++) {
-+        SpaprInterruptController *intc =3D intcs[i];
-+        if (intc) {
-+            SpaprInterruptControllerClass *sicc =3D SPAPR_INTC_GET_CLASS=
-(intc);
-+            sicc->cpu_intc_reset(intc, cpu);
-+        }
-+    }
-+}
-+
- static void spapr_set_irq(void *opaque, int irq, int level)
+@@ -3867,11 +3867,12 @@ struct omap_mpu_state_s *omap310_mpu_init(MemoryRegion *system_memory,
+     qemu_irq dma_irqs[6];
+     DriveInfo *dinfo;
+     SysBusDevice *busdev;
++    MemoryRegion *system_memory = get_system_memory();
+ 
+     /* Core */
+     s->mpu_model = omap310;
+     s->cpu = ARM_CPU(cpu_create(cpu_type));
+-    s->sdram_size = sdram_size;
++    s->sdram_size = memory_region_size(dram);
+     s->sram_size = OMAP15XX_SRAM_SIZE;
+ 
+     s->wakeup = qemu_allocate_irq(omap_mpu_wakeup, s, 0);
+@@ -3880,9 +3881,6 @@ struct omap_mpu_state_s *omap310_mpu_init(MemoryRegion *system_memory,
+     omap_clk_init(s);
+ 
+     /* Memory-mapped stuff */
+-    memory_region_allocate_system_memory(&s->emiff_ram, NULL, "omap1.dram",
+-                                         s->sdram_size);
+-    memory_region_add_subregion(system_memory, OMAP_EMIFF_BASE, &s->emiff_ram);
+     memory_region_init_ram(&s->imif_ram, NULL, "omap1.sram", s->sram_size,
+                            &error_fatal);
+     memory_region_add_subregion(system_memory, OMAP_IMIF_BASE, &s->imif_ram);
+@@ -3925,7 +3923,7 @@ struct omap_mpu_state_s *omap310_mpu_init(MemoryRegion *system_memory,
+     s->port[tipb_mpui].addr_valid = omap_validate_tipb_mpui_addr;
+ 
+     /* Register SDRAM and SRAM DMA ports for fast transfers.  */
+-    soc_dma_port_add_mem(s->dma, memory_region_get_ram_ptr(&s->emiff_ram),
++    soc_dma_port_add_mem(s->dma, memory_region_get_ram_ptr(dram),
+                          OMAP_EMIFF_BASE, s->sdram_size);
+     soc_dma_port_add_mem(s->dma, memory_region_get_ram_ptr(&s->imif_ram),
+                          OMAP_IMIF_BASE, s->sram_size);
+diff --git a/hw/arm/omap_sx1.c b/hw/arm/omap_sx1.c
+index c071197be7f..be245714dbb 100644
+--- a/hw/arm/omap_sx1.c
++++ b/hw/arm/omap_sx1.c
+@@ -103,6 +103,7 @@ static void sx1_init(MachineState *machine, const int version)
  {
-     SpaprMachineState *spapr =3D SPAPR_MACHINE(opaque);
---=20
-2.21.0
+     struct omap_mpu_state_s *mpu;
+     MemoryRegion *address_space = get_system_memory();
++    MemoryRegion *dram = g_new(MemoryRegion, 1);
+     MemoryRegion *flash = g_new(MemoryRegion, 1);
+     MemoryRegion *cs = g_new(MemoryRegion, 4);
+     static uint32_t cs0val = 0x00213090;
+@@ -118,8 +119,11 @@ static void sx1_init(MachineState *machine, const int version)
+         flash_size = flash2_size;
+     }
+ 
+-    mpu = omap310_mpu_init(address_space, sx1_binfo.ram_size,
+-                           machine->cpu_type);
++    memory_region_allocate_system_memory(dram, NULL, "omap1.dram",
++                                         sx1_binfo.ram_size);
++    memory_region_add_subregion(address_space, OMAP_EMIFF_BASE, dram);
++
++    mpu = omap310_mpu_init(dram, machine->cpu_type);
+ 
+     /* External Flash (EMIFS) */
+     memory_region_init_ram(flash, NULL, "omap_sx1.flash0-0", flash_size,
+diff --git a/hw/arm/palm.c b/hw/arm/palm.c
+index 02a3a82b9b5..72eca8cc556 100644
+--- a/hw/arm/palm.c
++++ b/hw/arm/palm.c
+@@ -190,16 +190,20 @@ static void palmte_init(MachineState *machine)
+     MemoryRegion *address_space_mem = get_system_memory();
+     struct omap_mpu_state_s *mpu;
+     int flash_size = 0x00800000;
+-    int sdram_size = palmte_binfo.ram_size;
+     static uint32_t cs0val = 0xffffffff;
+     static uint32_t cs1val = 0x0000e1a0;
+     static uint32_t cs2val = 0x0000e1a0;
+     static uint32_t cs3val = 0xe1a0e1a0;
+     int rom_size, rom_loaded = 0;
++    MemoryRegion *dram = g_new(MemoryRegion, 1);
+     MemoryRegion *flash = g_new(MemoryRegion, 1);
+     MemoryRegion *cs = g_new(MemoryRegion, 4);
+ 
+-    mpu = omap310_mpu_init(address_space_mem, sdram_size, machine->cpu_type);
++    memory_region_allocate_system_memory(dram, NULL, "omap1.dram",
++                                         palmte_binfo.ram_size);
++    memory_region_add_subregion(address_space_mem, OMAP_EMIFF_BASE, dram);
++
++    mpu = omap310_mpu_init(dram, machine->cpu_type);
+ 
+     /* External Flash (EMIFS) */
+     memory_region_init_ram(flash, NULL, "palmte.flash", flash_size,
+-- 
+2.20.1
 
 
