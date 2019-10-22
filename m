@@ -2,127 +2,68 @@ Return-Path: <SRS0=tSBD=YP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D2113CA9EA0
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 18:55:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7431FCA9EA0
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 19:04:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9763F21872
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 18:55:47 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TByGlQMm"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9763F21872
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 43F5721783
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 19:04:16 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 43F5721783
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41202 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41506 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iMzJq-0004fH-QY
-	for qemu-devel@archiver.kernel.org; Tue, 22 Oct 2019 14:55:46 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33548)
+	id 1iMzS3-0007cy-FB
+	for qemu-devel@archiver.kernel.org; Tue, 22 Oct 2019 15:04:15 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34530)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <thuth@redhat.com>) id 1iMzIi-0003fv-Rz
- for qemu-devel@nongnu.org; Tue, 22 Oct 2019 14:54:37 -0400
+ (envelope-from <no-reply@patchew.org>) id 1iMzQa-00074Y-2h
+ for qemu-devel@nongnu.org; Tue, 22 Oct 2019 15:02:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <thuth@redhat.com>) id 1iMzIh-0005nt-ON
- for qemu-devel@nongnu.org; Tue, 22 Oct 2019 14:54:36 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:22985
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <thuth@redhat.com>) id 1iMzIh-0005m4-L5
- for qemu-devel@nongnu.org; Tue, 22 Oct 2019 14:54:35 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1571770474;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:openpgp:openpgp:autocrypt:autocrypt;
- bh=+fuioZZg1VJoky7Ji+KkZYxqs/azRGQ9eA5yTajy7Ns=;
- b=TByGlQMmlbSO2dyqoTsUcC9otto8HYqcLorXEE6UUbB/FMnH13rgm4BSW0CoLB/Suwp3N7
- g2PsAEXgQEt9WgP4FKOe788HCDkxA15r8yWwqS7377p1UcYF0v616wYD5VlOFimx+zj2au
- Fh6w5TBRQ0W71v12J+xXlQVXKfdSVKQ=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-324-wvdGBs4MNeuXJnXD1odXBA-1; Tue, 22 Oct 2019 14:54:27 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 945FC1800D6A;
- Tue, 22 Oct 2019 18:54:26 +0000 (UTC)
-Received: from thuth.remote.csb (ovpn-116-34.ams2.redhat.com [10.36.116.34])
- by smtp.corp.redhat.com (Postfix) with ESMTP id BCFB85C219;
- Tue, 22 Oct 2019 18:54:21 +0000 (UTC)
-Subject: Re: [PATCH v3 0/6] Enable more iotests during "make check-block"
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
- Max Reitz <mreitz@redhat.com>
-References: <20191022072135.11188-1-thuth@redhat.com>
- <87a79sx6uc.fsf@linaro.org> <123b2e94-3f43-1a8e-2420-12ae09483e2f@redhat.com>
- <877e4wx55f.fsf@linaro.org>
-From: Thomas Huth <thuth@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=thuth@redhat.com; prefer-encrypt=mutual; keydata=
- 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
-Organization: Red Hat
-Message-ID: <dcbf2d6d-f7df-7bcf-78a0-bf1964663d3b@redhat.com>
-Date: Tue, 22 Oct 2019 20:54:20 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+ (envelope-from <no-reply@patchew.org>) id 1iMzQX-0000IB-R1
+ for qemu-devel@nongnu.org; Tue, 22 Oct 2019 15:02:43 -0400
+Resent-Date: Tue, 22 Oct 2019 15:02:43 -0400
+Resent-Message-Id: <E1iMzQX-0000IB-R1@eggs.gnu.org>
+Received: from sender4-of-o54.zoho.com ([136.143.188.54]:21468)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <no-reply@patchew.org>)
+ id 1iMzQX-0000Hl-ET; Tue, 22 Oct 2019 15:02:41 -0400
+ARC-Seal: i=1; a=rsa-sha256; t=1571770932; cv=none; 
+ d=zohomail.com; s=zohoarc; 
+ b=HlVe8mti7whsOfzYxKWZAwz0SQs2vA0CnbepQmJWS7ApTBheS9Qm9AxdabrJP0wsm40Wb9reJWa/DnwqPu8HPFDC80N7X0nsWR9BP03iV06RMfTDxhSIjngWv7r4AbnIMjXXdNzChk7wgBpVCPSp0gtoQAy6+Ob4If2b61/R5Y8=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
+ s=zohoarc; t=1571770932;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
+ bh=6aFQURCgMk4UGFShsJp9H33SSNHFid2bawIVpZQs22w=; 
+ b=L7RcdcF+5nTC/ZKaWbEtfwJRPnCjuMJugmQTMSBZ8+YkNEdHEGznbdXT/WvUSQDT/AntP/6/xkuCaxHQYETrocRDCZi4RqDPa4/o/3GRRLXBkK5gDKVWxx0hZJG8dYBxdDl8Spo+yYMMO35XrRSafhIymtxn0IiEhTrdLwAD190=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+ dkim=pass  header.i=patchew.org;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 1571770930359371.31486011532695;
+ Tue, 22 Oct 2019 12:02:10 -0700 (PDT)
+In-Reply-To: <20191022111738.20803-1-laurent@vivier.eu>
+Subject: Re: [PATCH v14 0/9] hw/m68k: add Apple Machintosh Quadra 800 machine
+Message-ID: <157177092820.12860.9657269944687850302@37313f22b938>
 MIME-Version: 1.0
-In-Reply-To: <877e4wx55f.fsf@linaro.org>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-MC-Unique: wvdGBs4MNeuXJnXD1odXBA-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: laurent@vivier.eu
+Date: Tue, 22 Oct 2019 12:02:10 -0700 (PDT)
+X-ZohoMailClient: External
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.120
+X-Received-From: 136.143.188.54
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -134,49 +75,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, John Snow <jsnow@redhat.com>,
- qemu-devel@nongnu.org, qemu-block@nongnu.org
+Reply-To: qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, fam@euphon.net, qemu-block@nongnu.org, huth@tuxfamily.org,
+ jasowang@redhat.com, mark.cave-ayland@ilande.co.uk, qemu-devel@nongnu.org,
+ dgilbert@redhat.com, hpoussin@reactos.org, kraxel@redhat.com,
+ pbonzini@redhat.com, marcandre.lureau@redhat.com, mreitz@redhat.com,
+ philmd@redhat.com, aurelien@aurel32.net, laurent@vivier.eu
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 22/10/2019 15.48, Alex Benn=C3=A9e wrote:
->=20
-> Max Reitz <mreitz@redhat.com> writes:
->=20
->> On 22.10.19 15:11, Alex Benn=C3=A9e wrote:
->>>
->>> Thomas Huth <thuth@redhat.com> writes:
->>>
->>>> As discussed here:
->>>>
->>>>  https://lists.gnu.org/archive/html/qemu-devel/2019-10/msg00697.html
->>>>
->>>> and here:
->>>>
->>>>  https://lists.gnu.org/archive/html/qemu-devel/2019-10/msg01388.html
->>>
->>> Queued to testing/next, thanks.
->>
->> It should be noted that this series depends on my SOCK_DIR series (which
->> I have in my block branch), or the newly added tests are likely to fail
->> in the CI environment.
->=20
-> Ahh I misread....
-> <snip>
->=20
->>>> it would be good to have some more valuable iotests enabled in the
->>>> "auto" group to get better iotest coverage during "make check".
->>>>
->>>> And once Max' "iotests: Add and use $SOCK_DIR" patch series has been
->>>> merged, we can indeed enable these Python-based tests, too.
->=20
-> I though these weren't enabled in this series. Do I need to drop all the
-> patches?
-
-I think it's better if the iotest patches go through Max' or Kevin's
-block tree.
-
- Thomas
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MTAyMjExMTczOC4yMDgw
+My0xLWxhdXJlbnRAdml2aWVyLmV1LwoKCgpIaSwKClRoaXMgc2VyaWVzIHNlZW1zIHRvIGhhdmUg
+c29tZSBjb2Rpbmcgc3R5bGUgcHJvYmxlbXMuIFNlZSBvdXRwdXQgYmVsb3cgZm9yCm1vcmUgaW5m
+b3JtYXRpb246CgpTdWJqZWN0OiBbUEFUQ0ggdjE0IDAvOV0gaHcvbTY4azogYWRkIEFwcGxlIE1h
+Y2hpbnRvc2ggUXVhZHJhIDgwMCBtYWNoaW5lClR5cGU6IHNlcmllcwpNZXNzYWdlLWlkOiAyMDE5
+MTAyMjExMTczOC4yMDgwMy0xLWxhdXJlbnRAdml2aWVyLmV1Cgo9PT0gVEVTVCBTQ1JJUFQgQkVH
+SU4gPT09CiMhL2Jpbi9iYXNoCmdpdCByZXYtcGFyc2UgYmFzZSA+IC9kZXYvbnVsbCB8fCBleGl0
+IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9j
+YWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYuYWxnb3JpdGhtIGhp
+c3RvZ3JhbQouL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIGJhc2UuLgo9PT0gVEVT
+VCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRi
+ZDg4ODcxMzM4NApTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCjk1MjNiNGUgQm9vdExp
+bnV4Q29uc29sZVRlc3Q6IFRlc3QgdGhlIFF1YWRyYSA4MDAKNmMxMjU5ZCBody9tNjhrOiBkZWZp
+bmUgTWFjaW50b3NoIFF1YWRyYSA4MDAKYWQ2ZjA3YSBody9tNjhrOiBhZGQgYSBkdW1teSBTV0lN
+IGZsb3BweSBjb250cm9sbGVyCjA1M2VlOWMgaHcvbTY4azogYWRkIE51YnVzIG1hY2ZiIHZpZGVv
+IGNhcmQKMzdmMmUwMyBody9tNjhrOiBhZGQgTnVidXMgc3VwcG9ydAo0MDkyOGRlIGh3L202OGs6
+IGltcGxlbWVudCBBREIgYnVzIHN1cHBvcnQgZm9yIHZpYQo2M2ZiNjhkIGh3L202OGs6IGFkZCBW
+SUEgc3VwcG9ydAo3Mjg1NWY5IGRwODM5M3g6IG1hbmFnZSBiaWcgZW5kaWFuIGJ1cwpjM2E2NzNh
+IGVzcDogYWRkIHBzZXVkby1ETUEgYXMgdXNlZCBieSBNYWNpbnRvc2gKCj09PSBPVVRQVVQgQkVH
+SU4gPT09CjEvOSBDaGVja2luZyBjb21taXQgYzNhNjczYTI3YzcyIChlc3A6IGFkZCBwc2V1ZG8t
+RE1BIGFzIHVzZWQgYnkgTWFjaW50b3NoKQoyLzkgQ2hlY2tpbmcgY29tbWl0IDcyODU1ZjliNzRj
+NCAoZHA4MzkzeDogbWFuYWdlIGJpZyBlbmRpYW4gYnVzKQozLzkgQ2hlY2tpbmcgY29tbWl0IDYz
+ZmI2OGRjYzNlMiAoaHcvbTY4azogYWRkIFZJQSBzdXBwb3J0KQpXQVJOSU5HOiBhZGRlZCwgbW92
+ZWQgb3IgZGVsZXRlZCBmaWxlKHMpLCBkb2VzIE1BSU5UQUlORVJTIG5lZWQgdXBkYXRpbmc/CiM4
+MzogCm5ldyBmaWxlIG1vZGUgMTAwNjQ0CgpFUlJPUjogc3BhY2UgcHJvaGliaXRlZCBhZnRlciB0
+aGF0ICcmJicgKGN0eDpXeFcpCiM0NTU6IEZJTEU6IGh3L21pc2MvbWFjX3ZpYS5jOjM2ODoKKyAg
+ICAgICAgaWYgKCEodjFzLT5sYXN0X2IgJiBWSUExQl92UlRDQ2xrKSAmJiAocy0+YiAmIFZJQTFC
+X3ZSVENDbGspKSB7CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+XgoKdG90YWw6IDEgZXJyb3JzLCAxIHdhcm5pbmdzLCA5MTIgbGluZXMgY2hlY2tlZAoKUGF0Y2gg
+My85IGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBl
+cnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwg
+c2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgo0LzkgQ2hlY2tpbmcgY29tbWl0IDQwOTI4
+ZGViZTRlYiAoaHcvbTY4azogaW1wbGVtZW50IEFEQiBidXMgc3VwcG9ydCBmb3IgdmlhKQo1Lzkg
+Q2hlY2tpbmcgY29tbWl0IDM3ZjJlMDMzZTNlNiAoaHcvbTY4azogYWRkIE51YnVzIHN1cHBvcnQp
+CldBUk5JTkc6IGFkZGVkLCBtb3ZlZCBvciBkZWxldGVkIGZpbGUocyksIGRvZXMgTUFJTlRBSU5F
+UlMgbmVlZCB1cGRhdGluZz8KIzY0OiAKbmV3IGZpbGUgbW9kZSAxMDA2NDQKCnRvdGFsOiAwIGVy
+cm9ycywgMSB3YXJuaW5ncywgNTMxIGxpbmVzIGNoZWNrZWQKClBhdGNoIDUvOSBoYXMgc3R5bGUg
+cHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxz
+ZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENI
+IGluIE1BSU5UQUlORVJTLgo2LzkgQ2hlY2tpbmcgY29tbWl0IDA1M2VlOWM2NTcwNSAoaHcvbTY4
+azogYWRkIE51YnVzIG1hY2ZiIHZpZGVvIGNhcmQpCldBUk5JTkc6IGFkZGVkLCBtb3ZlZCBvciBk
+ZWxldGVkIGZpbGUocyksIGRvZXMgTUFJTlRBSU5FUlMgbmVlZCB1cGRhdGluZz8KIzc1OiAKbmV3
+IGZpbGUgbW9kZSAxMDA2NDQKCnRvdGFsOiAwIGVycm9ycywgMSB3YXJuaW5ncywgNTk3IGxpbmVz
+IGNoZWNrZWQKClBhdGNoIDYvOSBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJ
+ZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8g
+dGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgo3LzkgQ2hlY2tp
+bmcgY29tbWl0IGFkNmYwN2FiNjE2YiAoaHcvbTY4azogYWRkIGEgZHVtbXkgU1dJTSBmbG9wcHkg
+Y29udHJvbGxlcikKV0FSTklORzogYWRkZWQsIG1vdmVkIG9yIGRlbGV0ZWQgZmlsZShzKSwgZG9l
+cyBNQUlOVEFJTkVSUyBuZWVkIHVwZGF0aW5nPwojNjI6IApuZXcgZmlsZSBtb2RlIDEwMDY0NAoK
+dG90YWw6IDAgZXJyb3JzLCAxIHdhcm5pbmdzLCA1OTMgbGluZXMgY2hlY2tlZAoKUGF0Y2ggNy85
+IGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJv
+cnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2Vl
+CkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCjgvOSBDaGVja2luZyBjb21taXQgNmMxMjU5ZDUy
+ZjY1IChody9tNjhrOiBkZWZpbmUgTWFjaW50b3NoIFF1YWRyYSA4MDApCldBUk5JTkc6IGFkZGVk
+LCBtb3ZlZCBvciBkZWxldGVkIGZpbGUocyksIGRvZXMgTUFJTlRBSU5FUlMgbmVlZCB1cGRhdGlu
+Zz8KIzcxOiAKbmV3IGZpbGUgbW9kZSAxMDA2NDQKCnRvdGFsOiAwIGVycm9ycywgMSB3YXJuaW5n
+cywgNTMwIGxpbmVzIGNoZWNrZWQKClBhdGNoIDgvOSBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFz
+ZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVw
+b3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJT
+Lgo5LzkgQ2hlY2tpbmcgY29tbWl0IDk1MjNiNGViODkyNyAoQm9vdExpbnV4Q29uc29sZVRlc3Q6
+IFRlc3QgdGhlIFF1YWRyYSA4MDApCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4
+aXRlZCB3aXRoIGNvZGU6IDEKCgpUaGUgZnVsbCBsb2cgaXMgYXZhaWxhYmxlIGF0Cmh0dHA6Ly9w
+YXRjaGV3Lm9yZy9sb2dzLzIwMTkxMDIyMTExNzM4LjIwODAzLTEtbGF1cmVudEB2aXZpZXIuZXUv
+dGVzdGluZy5jaGVja3BhdGNoLz90eXBlPW1lc3NhZ2UuCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0
+b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwczovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5k
+IHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
 
 
