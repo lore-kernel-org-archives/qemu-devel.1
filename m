@@ -6,76 +6,81 @@ X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E5D87CA9EA0
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 08:11:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 28E09CA9EA0
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 08:11:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BA7BB2184C
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 08:11:26 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BA7BB2184C
+	by mail.kernel.org (Postfix) with ESMTPS id F12EB2184C
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 08:11:42 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F12EB2184C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51382 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51384 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iMpGH-00028q-Dx
-	for qemu-devel@archiver.kernel.org; Tue, 22 Oct 2019 04:11:25 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43191)
+	id 1iMpGX-0002Yk-Nx
+	for qemu-devel@archiver.kernel.org; Tue, 22 Oct 2019 04:11:41 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43096)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <sgarzare@redhat.com>) id 1iMp7g-0001TJ-W4
- for qemu-devel@nongnu.org; Tue, 22 Oct 2019 04:02:34 -0400
+ (envelope-from <pbonzini@redhat.com>) id 1iMp6n-000151-7z
+ for qemu-devel@nongnu.org; Tue, 22 Oct 2019 04:01:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <sgarzare@redhat.com>) id 1iMp7e-0000iY-8w
- for qemu-devel@nongnu.org; Tue, 22 Oct 2019 04:02:32 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:35024)
+ (envelope-from <pbonzini@redhat.com>) id 1iMp6m-0000KJ-1r
+ for qemu-devel@nongnu.org; Tue, 22 Oct 2019 04:01:37 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:48656)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <sgarzare@redhat.com>) id 1iMp7e-0000gb-0Q
- for qemu-devel@nongnu.org; Tue, 22 Oct 2019 04:02:30 -0400
+ (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1iMp6l-0000Jk-KV
+ for qemu-devel@nongnu.org; Tue, 22 Oct 2019 04:01:35 -0400
 Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
  [209.85.128.72])
  (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 9F3CD85365
- for <qemu-devel@nongnu.org>; Tue, 22 Oct 2019 08:02:25 +0000 (UTC)
-Received: by mail-wm1-f72.google.com with SMTP id m16so5482442wmg.8
- for <qemu-devel@nongnu.org>; Tue, 22 Oct 2019 01:02:25 -0700 (PDT)
+ by mx1.redhat.com (Postfix) with ESMTPS id AC3B13295
+ for <qemu-devel@nongnu.org>; Tue, 22 Oct 2019 08:01:33 +0000 (UTC)
+Received: by mail-wm1-f72.google.com with SMTP id g67so5489750wmg.4
+ for <qemu-devel@nongnu.org>; Tue, 22 Oct 2019 01:01:33 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to:user-agent;
- bh=d84Rak+kkOEUj0XncSQ1btqVylzhM3RhKlS4WYFM0y4=;
- b=Fl0hKE7AUt6RUBtM9OcI2+b58i9D78CTSSD0NY6YW7UnusEFS4MHGvP6o3NOJ+PkDe
- JImes7QsPAMLwdoWTp80u6q+8RmJ9C7d2oDChoTYLLTfkOIUcZJKXprUzcRr7NGNmxiL
- uEkcXA9Lt+UprGZ8OVL0o9Tc/ABeJ98LfAESnwXg9+3l2suabeoBvFWvXsNoRRORKzow
- dOV3q5aaYCzrcUNvWqHxcH8ol+3f5RBGIysg5P0qwGUawwbo/uox6mpb6Bk0mwQwfKGN
- A89xNutzNlxVDktIclhWyI9WydMqnWRFW7EHLi+vwjBNxtydeGDE1CK6wEAtIxSUFkFy
- We1w==
-X-Gm-Message-State: APjAAAXBFhogkC2LU5m6Z9SZoMraR9hASSzRp3bhEQM6n4ezfgg40ugA
- s+iqw11jZMn3nG5TU1LuGZ7bHaae+jNET1dzPbSVtn2rSECjP/Spq6PtGeatj/KZzPyhiafiMnX
- bYHnh8Yof18MbbXQ=
-X-Received: by 2002:a5d:5544:: with SMTP id g4mr2282613wrw.72.1571731344315;
- Tue, 22 Oct 2019 01:02:24 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqxEbni/3G6ORby2jGjEE1lUnv8FJ0FGKT7BdbvpExyU9JATweylC4XauhsCZHHQcvTUDeLiKg==
-X-Received: by 2002:a5d:5544:: with SMTP id g4mr2282584wrw.72.1571731343945;
- Tue, 22 Oct 2019 01:02:23 -0700 (PDT)
-Received: from steredhat (host174-200-dynamic.52-79-r.retail.telecomitalia.it.
- [79.52.200.174])
- by smtp.gmail.com with ESMTPSA id s10sm21033715wrr.5.2019.10.22.01.02.23
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 22 Oct 2019 01:02:23 -0700 (PDT)
-Date: Tue, 22 Oct 2019 10:02:21 +0200
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Subject: Re: [PATCH] virtio: drop unused virtio_device_stop_ioeventfd()
- function
-Message-ID: <20191022080221.pkpasulvg45rny2i@steredhat>
-References: <20191021150343.30742-1-stefanha@redhat.com>
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=HXXN+3kDcWAOSZ1ZWAzAQgSOSkw6dc0GHqeq50N84fk=;
+ b=OswKW57qvbWWxAY15L2Ba3RBqbPCb2qHcgt6BQ9rHn7VasrAgdLD1RU8Kcv5aAYcKr
+ QAMY5m9y0QUF/kifpUGKCvOoTlmZaRvI2F/XCHbQkvppE+VeUx1jEwVTYa/YfH7gAl5y
+ keb+4/yqVjbaYrrsiOSQQQGux3D+o3gWwkHTIfDlonec5GfOYEYkMdaQqk0x5vJNXm81
+ tFjlD3YupqOf7gO1ciUHlbGvJMx9g1Okyp4hF6MmuUL/hX9J0l+chsdta8WYC+P82ahH
+ 5ImKbJ7A6ZiegDnikfW8m4S67yqLTQ9H53L+yOZOC7Ky3YBdF1q+VTzBHXRlQO8vv/sW
+ zMjA==
+X-Gm-Message-State: APjAAAXHvgd7/Ye3A9N5ckzVEPukiPQe0n/z+4uYkoGYBftZb/T6u4vt
+ DbV0q1G9RKCk5aojtxeryfUELRm3J7njjbOPhhkJHGSjcmxem0PQWIr0l4T0sc8lW07vK0IcDJ1
+ MKnD82wyJ4X9/DOA=
+X-Received: by 2002:a05:600c:1107:: with SMTP id
+ b7mr1825805wma.151.1571731292256; 
+ Tue, 22 Oct 2019 01:01:32 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqwmhy302UpITXow3hJ1E+BmaT4sTUOadqADMJWakV9Xnhq2XXwrJOMQo4pCShYFu0u8iZC7AA==
+X-Received: by 2002:a05:600c:1107:: with SMTP id
+ b7mr1825775wma.151.1571731291971; 
+ Tue, 22 Oct 2019 01:01:31 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:566:fc24:94f2:2f13?
+ ([2001:b07:6468:f312:566:fc24:94f2:2f13])
+ by smtp.gmail.com with ESMTPSA id z13sm20395954wrm.64.2019.10.22.01.01.22
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Tue, 22 Oct 2019 01:01:31 -0700 (PDT)
+Subject: Re: [PATCH] runstate: ignore exit request in finish migrate state
+To: Laurent Vivier <lvivier@redhat.com>, qemu-devel@nongnu.org
+References: <20191017101806.3644-1-lvivier@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Openpgp: preference=signencrypt
+Message-ID: <ac941d4f-fd24-a84c-05d9-c0770a2fb088@redhat.com>
+Date: Tue, 22 Oct 2019 10:01:22 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20191021150343.30742-1-stefanha@redhat.com>
-User-Agent: NeoMutt/20180716
+In-Reply-To: <20191017101806.3644-1-lvivier@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 209.132.183.28
@@ -90,65 +95,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org,
- "Michael S. Tsirkin" <mst@redhat.com>
+Cc: =?UTF-8?B?THVrw6HFoSBEb2t0b3I=?= <ldoktor@redhat.com>,
+ Igor Mammedov <imammedo@redhat.com>,
+ "Dr . David Alan Gilbert" <dgilbert@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, Oct 21, 2019 at 04:03:43PM +0100, Stefan Hajnoczi wrote:
-> virtio_device_stop_ioeventfd() has not been used since commit
-> 310837de6c1e0badfd736b1b316b1698c53120a7 ("virtio: introduce
-> grab/release_ioeventfd to fix vhost") in 2016.
-> 
-> Nowadays ioeventfd is stopped implicitly by the virtio transport when
-> lifecycle events such as the VM pausing or device unplug occur.
-> 
-> Cc: Paolo Bonzini <pbonzini@redhat.com>
-> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+On 17/10/19 12:18, Laurent Vivier wrote:
+> Trying to reboot a VM while a migration is running can
+> move to the prelaunch state (because of the reset) while
+> the runstate is in finish migrate state.
+> As the logical step after the finish migrate is postmigrate,
+> this can create an invalid state transition from prelaunch state
+> to postmigrate state and this raises an error and aborts:
+>=20
+>     invalid runstate transition: 'prelaunch' -> 'postmigrate'
+>=20
+> As we are not able to manage reset in finish migrate state the
+> best we can do is to ignore any changes and delay them until
+> the next state which should be postmigrate and which should allow
+> this kind of transition.
+>=20
+> Reported-by: Luk=C3=A1=C5=A1 Doktor <ldoktor@redhat.com>
+> Suggested-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> Signed-off-by: Laurent Vivier <lvivier@redhat.com>
 > ---
->  include/hw/virtio/virtio.h | 1 -
->  hw/virtio/virtio.c         | 8 --------
->  2 files changed, 9 deletions(-)
+>  vl.c | 3 +++
+>  1 file changed, 3 insertions(+)
+>=20
+> diff --git a/vl.c b/vl.c
+> index 0a295e5d77d6..dc71c822ba24 100644
+> --- a/vl.c
+> +++ b/vl.c
+> @@ -1744,6 +1744,9 @@ static bool main_loop_should_exit(void)
+>      RunState r;
+>      ShutdownCause request;
+> =20
+> +    if (runstate_check(RUN_STATE_FINISH_MIGRATE)) {
+> +        return false;
+> +    }
+>      if (preconfig_exit_requested) {
+>          if (runstate_check(RUN_STATE_PRECONFIG)) {
+>              runstate_set(RUN_STATE_PRELAUNCH);
+>=20
 
-Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
+Your patch makes sense, but I don't understand this function very much.
+ In particular I don't understand why it returns true when
+preconfig_exit_requested is true.  Wouldn't that cause main_loop() and
+thus QEMU to exit?  Igor, can you help?
 
-> 
-> diff --git a/include/hw/virtio/virtio.h b/include/hw/virtio/virtio.h
-> index 48e8d04ff6..14660ea30a 100644
-> --- a/include/hw/virtio/virtio.h
-> +++ b/include/hw/virtio/virtio.h
-> @@ -302,7 +302,6 @@ EventNotifier *virtio_queue_get_guest_notifier(VirtQueue *vq);
->  void virtio_queue_set_guest_notifier_fd_handler(VirtQueue *vq, bool assign,
->                                                  bool with_irqfd);
->  int virtio_device_start_ioeventfd(VirtIODevice *vdev);
-> -void virtio_device_stop_ioeventfd(VirtIODevice *vdev);
->  int virtio_device_grab_ioeventfd(VirtIODevice *vdev);
->  void virtio_device_release_ioeventfd(VirtIODevice *vdev);
->  bool virtio_device_ioeventfd_enabled(VirtIODevice *vdev);
-> diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
-> index 527df03bfd..05186a531c 100644
-> --- a/hw/virtio/virtio.c
-> +++ b/hw/virtio/virtio.c
-> @@ -2773,14 +2773,6 @@ static void virtio_device_stop_ioeventfd_impl(VirtIODevice *vdev)
->      }
->  }
->  
-> -void virtio_device_stop_ioeventfd(VirtIODevice *vdev)
-> -{
-> -    BusState *qbus = qdev_get_parent_bus(DEVICE(vdev));
-> -    VirtioBusState *vbus = VIRTIO_BUS(qbus);
-> -
-> -    virtio_bus_stop_ioeventfd(vbus);
-> -}
-> -
->  int virtio_device_grab_ioeventfd(VirtIODevice *vdev)
->  {
->      BusState *qbus = qdev_get_parent_bus(DEVICE(vdev));
-> -- 
-> 2.21.0
-> 
-> 
-
--- 
+Paolo
 
