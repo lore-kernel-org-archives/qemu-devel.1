@@ -2,78 +2,79 @@ Return-Path: <SRS0=tSBD=YP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CE65BCA9EA0
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 13:57:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 67D4BCA9EA0
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 13:59:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 96DFB2184C
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 13:57:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2F1AA21906
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 13:59:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="LgDtlhSZ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 96DFB2184C
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Cw0FXpfY"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2F1AA21906
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57850 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57892 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iMufS-0006Vc-Ct
-	for qemu-devel@archiver.kernel.org; Tue, 22 Oct 2019 09:57:46 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37270)
+	id 1iMugd-0008BF-Rv
+	for qemu-devel@archiver.kernel.org; Tue, 22 Oct 2019 09:58:59 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36985)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1iMuHk-0003YD-4c
- for qemu-devel@nongnu.org; Tue, 22 Oct 2019 09:33:19 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1iMuH8-00038C-7q
+ for qemu-devel@nongnu.org; Tue, 22 Oct 2019 09:32:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1iMuHc-0001ej-Km
- for qemu-devel@nongnu.org; Tue, 22 Oct 2019 09:33:12 -0400
-Received: from mail-wm1-x32e.google.com ([2a00:1450:4864:20::32e]:36789)
+ (envelope-from <peter.maydell@linaro.org>) id 1iMuH5-0001Q8-Vz
+ for qemu-devel@nongnu.org; Tue, 22 Oct 2019 09:32:37 -0400
+Received: from mail-wr1-x42e.google.com ([2a00:1450:4864:20::42e]:44015)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1iMuHa-0001dl-L9
- for qemu-devel@nongnu.org; Tue, 22 Oct 2019 09:33:08 -0400
-Received: by mail-wm1-x32e.google.com with SMTP id c22so7082397wmd.1
- for <qemu-devel@nongnu.org>; Tue, 22 Oct 2019 06:33:05 -0700 (PDT)
+ id 1iMuH5-0001PZ-Pq
+ for qemu-devel@nongnu.org; Tue, 22 Oct 2019 09:32:35 -0400
+Received: by mail-wr1-x42e.google.com with SMTP id c2so12855883wrr.10
+ for <qemu-devel@nongnu.org>; Tue, 22 Oct 2019 06:32:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:subject:date:message-id:in-reply-to:references:mime-version
  :content-transfer-encoding;
- bh=bRVLYeRm52S1+mDtVEVVM44iNY6mCQd1H1UdrE+pTLs=;
- b=LgDtlhSZioQxUUTVC1mfFG86hTFQAyL6xIokL7y8ZSzU4DyCWYPAjkB8kj/yLJL+9Q
- veRnnNdKfF4Eef0g+MOsWuG/NwTyhK7J+UyLdjHCtIig76QRRNhATxHXabVB2SLFlIrN
- Hj9vRaYDghamRHpXUO+bBHhknMD4m04mfpFe+KCNsqAses9MABB2zQaPkn+s0ECoaFyp
- h8agvjWdLiGE+Dui8R1aSRicWvJL9W5EQpVWeE/FV8kLENn/69qb/w9GLRbglhFitkfX
- P7kRQ0jR/iucIXIJPM8GoG4g2STmOJeyWyjOP95e/tDZZZegY04bP/mKIoyJbn4Gc6n+
- D/8w==
+ bh=XIcMLgLOy6AOjihetZxPEvZlo29WPIvHIy0xHe5Xspw=;
+ b=Cw0FXpfYiZ0MB8qI9iXrI5B0xjpmT94qfAYKX5hbnRaV+gxwEvRLw7xxFPix9GkBGK
+ v2SixdegqgmQONCeazgzWtw32b2akft8j1k7MX0r6usDCiwmYCmii4odkYvLDEX4YIU0
+ EI+vl2lfTt28+lfiqbE4hhS59jW/xoG8mB6+olZHfn90FU1k9xuQrfql16/yyey3r2Qi
+ IV0yErEgKOOYUBY0ITgJka7IH2xJcg0djOHYpd2shJq3cpOjbWwrET+1oLNh0812Xqfm
+ PbD7JjnNcEVAM7PUYUd41UUmyz70zNjm/HaZIIyUqiIa1VFJk/HXGpEeEvivsdK+OzPo
+ gOjw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=bRVLYeRm52S1+mDtVEVVM44iNY6mCQd1H1UdrE+pTLs=;
- b=dVXyOcA0mBJm52i4dtwIjLSRueh1cubWCVCopKyJA5vLSdsYS3EcGe7muyTfY4SAIN
- 8yGvVADFudjnC74CZXEoJFUuSnuH1nSgKVyG3jNsyh16hOyVxWhyyba0x1ydo3IyayY0
- tf4zI5DVhMXJvOlc8Y2eepQaxnnin74ySsvWMiwyjOKHe3+E8vr62SPMrrta+BsuZMZr
- wHCGF/lmHBUPbe4/lyz0thXtGQ8g+Rj16wAyIWUmDqowJeFBsXZd/EwLFBVNsbNRjEwT
- m6K5JL6LSRoy7DrQG4gz63kvK7Mws7fdFMojj4/UB7Bqgwcu4BdpkPk1B8hhfzyBJNoF
- Ty/g==
-X-Gm-Message-State: APjAAAXKHryWp8FMX8NNyRVygK2ySquH+MaPoMPWr3gugOMc3WZPpoz5
- VLX9KAPedkdDFfHcQiEVF2dg1dUDtsI=
-X-Google-Smtp-Source: APXvYqzPTqVXxjA58+KIfjw82PbGByEnf/dXl5hOh0oMVAtmYSMCUsOP7+yIUxADILGTKnD9/AeFJA==
-X-Received: by 2002:a7b:c186:: with SMTP id y6mr3252813wmi.67.1571751184274;
- Tue, 22 Oct 2019 06:33:04 -0700 (PDT)
+ bh=XIcMLgLOy6AOjihetZxPEvZlo29WPIvHIy0xHe5Xspw=;
+ b=CpXk5a5qHokQEJ+0eX9xDkd96p7WWQjYZge6qW4pmY+qMNSmFaCtrvqZ8aZ2kAGONT
+ vpxZFHvGr3XE5b0+WS+JytRjf7l1/sJKOQG6JvY0KM5QCJsiVfspMP/nVkr613kn8h96
+ ovCqlrH8xrvhJCYpneU2/Vl3U7sWUJD3oiqTQP+bDPbRsgy6qwORF1CsJ0K2mbCjpLWQ
+ KwDedR5pqQeVqpal0C0EZgmck+pKo1eYXHBmvC4VIq38jfAoeiTLDwTX3nje128T7IFA
+ LAdFDyC8s6yuZRg3HhsCL37rOsrgDf4WPKaSb6CK6ENg/ofNG2ilsyH35eCNUT6EDgeM
+ WWPQ==
+X-Gm-Message-State: APjAAAXl2tSLL18ye+Jqa0lVgrku/rPgX9AoCcvuqKDiDbj2nqTpzruv
+ ykOb9iQJMKi4yXb2VJ+pDezbuZ8ljG0=
+X-Google-Smtp-Source: APXvYqwt7TVu0nuElov9iGVoNVfyW9Oe1UJ2PJmOtjSLNSLJ91uFfreIW07trc4SX8l//IYcgI1XrA==
+X-Received: by 2002:a5d:6a02:: with SMTP id m2mr3807170wru.304.1571751154248; 
+ Tue, 22 Oct 2019 06:32:34 -0700 (PDT)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id r2sm20263856wma.1.2019.10.22.06.33.02
+ by smtp.gmail.com with ESMTPSA id r2sm20263856wma.1.2019.10.22.06.32.32
  for <qemu-devel@nongnu.org>
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 22 Oct 2019 06:33:02 -0700 (PDT)
+ Tue, 22 Oct 2019 06:32:33 -0700 (PDT)
 From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PULL 38/41] hw/arm/collie: Create the RAM in the board
-Date: Tue, 22 Oct 2019 14:31:31 +0100
-Message-Id: <20191022133134.14487-39-peter.maydell@linaro.org>
+Subject: [PULL 24/41] target/arm: Hoist store to cs_base in
+ cpu_get_tb_cpu_state
+Date: Tue, 22 Oct 2019 14:31:17 +0100
+Message-Id: <20191022133134.14487-25-peter.maydell@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20191022133134.14487-1-peter.maydell@linaro.org>
 References: <20191022133134.14487-1-peter.maydell@linaro.org>
@@ -82,7 +83,7 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::32e
+X-Received-From: 2a00:1450:4864:20::42e
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,89 +99,39 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Philippe Mathieu-Daudé <philmd@redhat.com>
+From: Richard Henderson <richard.henderson@linaro.org>
 
-The SDRAM is incorrectly created in the SA1110 SoC.
-Move its creation in the board code, this will later allow the
-board to have the QOM ownership of the RAM.
+By performing this store early, we avoid having to save and restore
+the register holding the address around any function calls.
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
-Message-id: 20191021190653.9511-4-philmd@redhat.com
+Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+Message-id: 20191018174431.1784-15-richard.henderson@linaro.org
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- hw/arm/strongarm.h | 4 +---
- hw/arm/collie.c    | 8 ++++++--
- hw/arm/strongarm.c | 7 +------
- 3 files changed, 8 insertions(+), 11 deletions(-)
+ target/arm/helper.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/hw/arm/strongarm.h b/hw/arm/strongarm.h
-index e98840b461a..192821f6aab 100644
---- a/hw/arm/strongarm.h
-+++ b/hw/arm/strongarm.h
-@@ -55,7 +55,6 @@ enum {
- 
- typedef struct {
-     ARMCPU *cpu;
--    MemoryRegion sdram;
-     DeviceState *pic;
-     DeviceState *gpio;
-     DeviceState *ppc;
-@@ -63,7 +62,6 @@ typedef struct {
-     SSIBus *ssp_bus;
- } StrongARMState;
- 
--StrongARMState *sa1110_init(MemoryRegion *sysmem,
--                            unsigned int sdram_size, const char *rev);
-+StrongARMState *sa1110_init(const char *cpu_type);
- 
- #endif
-diff --git a/hw/arm/collie.c b/hw/arm/collie.c
-index b1288ccea80..970a4405ccf 100644
---- a/hw/arm/collie.c
-+++ b/hw/arm/collie.c
-@@ -27,9 +27,13 @@ static void collie_init(MachineState *machine)
+diff --git a/target/arm/helper.c b/target/arm/helper.c
+index 3f7d3f257d8..37424e3d4dd 100644
+--- a/target/arm/helper.c
++++ b/target/arm/helper.c
+@@ -11225,6 +11225,7 @@ void cpu_get_tb_cpu_state(CPUARMState *env, target_ulong *pc,
  {
-     StrongARMState *s;
-     DriveInfo *dinfo;
--    MemoryRegion *sysmem = get_system_memory();
-+    MemoryRegion *sdram = g_new(MemoryRegion, 1);
+     uint32_t flags, pstate_for_ss;
  
--    s = sa1110_init(sysmem, collie_binfo.ram_size, machine->cpu_type);
-+    s = sa1110_init(machine->cpu_type);
-+
-+    memory_region_allocate_system_memory(sdram, NULL, "strongarm.sdram",
-+                                         collie_binfo.ram_size);
-+    memory_region_add_subregion(get_system_memory(), SA_SDCS0, sdram);
++    *cs_base = 0;
+     flags = rebuild_hflags_internal(env);
  
-     dinfo = drive_get(IF_PFLASH, 0, 0);
-     pflash_cfi01_register(SA_CS0, "collie.fl1", 0x02000000,
-diff --git a/hw/arm/strongarm.c b/hw/arm/strongarm.c
-index dc65d88a657..6bee0349149 100644
---- a/hw/arm/strongarm.c
-+++ b/hw/arm/strongarm.c
-@@ -1586,8 +1586,7 @@ static const TypeInfo strongarm_ssp_info = {
- };
+     if (is_a64(env)) {
+@@ -11298,7 +11299,6 @@ void cpu_get_tb_cpu_state(CPUARMState *env, target_ulong *pc,
+     }
  
- /* Main CPU functions */
--StrongARMState *sa1110_init(MemoryRegion *sysmem,
--                            unsigned int sdram_size, const char *cpu_type)
-+StrongARMState *sa1110_init(const char *cpu_type)
- {
-     StrongARMState *s;
-     int i;
-@@ -1601,10 +1600,6 @@ StrongARMState *sa1110_init(MemoryRegion *sysmem,
+     *pflags = flags;
+-    *cs_base = 0;
+ }
  
-     s->cpu = ARM_CPU(cpu_create(cpu_type));
- 
--    memory_region_allocate_system_memory(&s->sdram, NULL, "strongarm.sdram",
--                                         sdram_size);
--    memory_region_add_subregion(sysmem, SA_SDCS0, &s->sdram);
--
-     s->pic = sysbus_create_varargs("strongarm_pic", 0x90050000,
-                     qdev_get_gpio_in(DEVICE(s->cpu), ARM_CPU_IRQ),
-                     qdev_get_gpio_in(DEVICE(s->cpu), ARM_CPU_FIQ),
+ #ifdef TARGET_AARCH64
 -- 
 2.20.1
 
