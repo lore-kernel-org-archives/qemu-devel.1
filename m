@@ -4,69 +4,50 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 131E4CA9EA0
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 11:26:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 193BDCA9EA0
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 11:26:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DB8EF214B2
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 11:26:29 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DB8EF214B2
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
+	by mail.kernel.org (Postfix) with ESMTPS id E0E67214B2
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 11:26:36 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E0E67214B2
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53528 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53530 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iMsJ2-00069W-RY
-	for qemu-devel@archiver.kernel.org; Tue, 22 Oct 2019 07:26:28 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44289)
+	id 1iMsJ9-0006LO-TB
+	for qemu-devel@archiver.kernel.org; Tue, 22 Oct 2019 07:26:35 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44069)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <laurent@vivier.eu>) id 1iMsBb-0004qZ-TY
- for qemu-devel@nongnu.org; Tue, 22 Oct 2019 07:18:49 -0400
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iMsB5-0004Cq-Q7
+ for qemu-devel@nongnu.org; Tue, 22 Oct 2019 07:18:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <laurent@vivier.eu>) id 1iMsBZ-0007xb-HB
- for qemu-devel@nongnu.org; Tue, 22 Oct 2019 07:18:47 -0400
-Received: from mout.kundenserver.de ([217.72.192.74]:42835)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <laurent@vivier.eu>)
- id 1iMsBK-0007oH-3O; Tue, 22 Oct 2019 07:18:30 -0400
-Received: from localhost.localdomain ([78.238.229.36]) by
- mrelayeu.kundenserver.de (mreue109 [212.227.15.183]) with ESMTPSA (Nemesis)
- id 1M9npT-1iQSXp2pcb-005rqt; Tue, 22 Oct 2019 13:17:56 +0200
-From: Laurent Vivier <laurent@vivier.eu>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v14 2/9] dp8393x: manage big endian bus
-Date: Tue, 22 Oct 2019 13:17:31 +0200
-Message-Id: <20191022111738.20803-3-laurent@vivier.eu>
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iMsB4-0007iI-2V
+ for qemu-devel@nongnu.org; Tue, 22 Oct 2019 07:18:15 -0400
+Received: from relay.sw.ru ([185.231.240.75]:51906)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1iMsB0-0007dp-Hl; Tue, 22 Oct 2019 07:18:10 -0400
+Received: from [10.94.3.0] (helo=kvm.qa.sw.ru)
+ by relay.sw.ru with esmtp (Exim 4.92.2)
+ (envelope-from <vsementsov@virtuozzo.com>)
+ id 1iMsAw-0003JX-J8; Tue, 22 Oct 2019 14:18:06 +0300
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+To: qemu-block@nongnu.org
+Subject: [PATCH v3 3/6] block/block-copy: refactor copying
+Date: Tue, 22 Oct 2019 14:18:02 +0300
+Message-Id: <20191022111805.3432-4-vsementsov@virtuozzo.com>
 X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20191022111738.20803-1-laurent@vivier.eu>
-References: <20191022111738.20803-1-laurent@vivier.eu>
+In-Reply-To: <20191022111805.3432-1-vsementsov@virtuozzo.com>
+References: <20191022111805.3432-1-vsementsov@virtuozzo.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:zZa0r8Bj/1Is2Hv0Jeq/Pd2J6JdPAlZqjZyGh3tN0gdbt3PDOam
- ySqEj+J4CLJe3+Yc9U8Bhglts9Uq4+xOvBLKAHMC/ZqEeamN4tXQvVgZ4mow4ElJr2vvcew
- kyKSIDWHaXRBMT7F1I6g1tio0qgkEw4DoeLmAcQ0u5Lnea4Db6Ucpcyom6XSx7XQ5jwH0t4
- DVli5TZiTxNedkY+QKXdg==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:S9YVdV7r+v8=:UgkgVhKiqogcqZ98noaAKP
- 03wn6jz4E4vyeKNIUTIf/rv8Aur1VTvuM3gDXqR7KKS3hqE7J3eO/wFXujBHr8yzjDwl2vYA3
- zNikooRWHopmuNfBncY0wuUfYpk+sjAq47RhjivcQRlfyOC0ziDzCCGePJPlHJJ4QHBkG29bv
- W4LL5ouVkXVQ81BI5KmZYUJOm68Sa/virAXGkOLMgKDHBGjU3a5r8egc4C8TbZUeEo0TxV4qB
- bzEK/U15x8mZwa3rskfpMHdZf9pRnIubXnWU24Elrp6WrPsvGob/Rjm8B9knq3w0BFqP1fIYS
- 62J5KSuCyEA8d/hbeBzkqg2CU0PHQImwHtEQaSlfBFKJ98Ys/8Fl4bU+Na2AyJl+0shbYWSKs
- F+YQZZQmLwpXOmAFlzQ/RvjZWnpeRBdaJ5QBxcYYxU4KNkNwgAtxWKAB/nvV23vd15I8nx7gO
- fUmxeznve1OvsBl9+As73WoaSQetyWmzsJmTJ9SZqprVES/YpxB1UmBa7Z7pe5E4qtVpY/cs1
- 2vSmMsiNm3sPYZm7OB6CNoRlPzEpnnv5Om/8h/p7VHNuVLLV/QZZYEVp1IFSO0tBuTXhLanCy
- /h9av0g062HUyAgQcmCtHJK0Y1l1OBbiMTPwU8hJv2KlKddGwfJ/Hnd4pssA/Lu7steTRf21n
- Tzluz4Km+xpvL6jY8mOWtXjqg/r98BenxZ654iDnYzdnqa4bcRXopXXbuTL4PGgu+dcDc0WD2
- TIIfQ4lEwRhZMPMnrG7G/lXhkgaUdaoVhALv7z8b4ae6UhQsYXuO7kDe0cpoolxLqAlqdIlXe
- nso9uG+mnKFCUKICma/hwUsgqPCPLIXjNKrljrRqCU9SqwrvA7sB+gn1lvCp8WYHCxXHykWQG
- mKcuIvYqwnGO8u/VR3TsEWUm+HsXJFJIKJvJ31MC4=
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 217.72.192.74
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [fuzzy]
+X-Received-From: 185.231.240.75
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -78,221 +59,235 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
- qemu-block@nongnu.org, Thomas Huth <huth@tuxfamily.org>,
- Jason Wang <jasowang@redhat.com>,
- Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
- "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
- Laurent Vivier <laurent@vivier.eu>,
- =?UTF-8?q?Herv=C3=A9=20Poussineau?= <hpoussin@reactos.org>,
- Gerd Hoffmann <kraxel@redhat.com>,
- =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Max Reitz <mreitz@redhat.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Aurelien Jarno <aurelien@aurel32.net>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Cc: kwolf@redhat.com, vsementsov@virtuozzo.com, qemu-devel@nongnu.org,
+ mreitz@redhat.com, den@openvz.org, jsnow@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is needed by Quadra 800, this card can run on little-endian
-or big-endian bus.
+Merge copying code into one function block_copy_do_copy, which only
+calls bdrv_ io functions and don't do any synchronization (like dirty
+bitmap set/reset).
 
-Signed-off-by: Laurent Vivier <laurent@vivier.eu>
-Tested-by: Hervé Poussineau <hpoussin@reactos.org>
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Reviewed-by: Hervé Poussineau <hpoussin@reactos.org>
+Refactor block_copy() function so that it takes full decision about
+size of chunk to be copied and does all the synchronization (checking
+intersecting requests, set/reset dirty bitmaps).
+
+It will help:
+ - introduce parallel processing of block_copy iterations: we need to
+   calculate chunk size, start async chunk copying and go to the next
+   iteration
+ - simplify synchronization improvement (like memory limiting in
+   further commit and reducing critical section (now we lock the whole
+   requested range, when actually we need to lock only dirty region
+   which we handle at the moment))
+
+Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Reviewed-by: Max Reitz <mreitz@redhat.com>
 ---
- hw/net/dp8393x.c | 88 +++++++++++++++++++++++++++++++-----------------
- 1 file changed, 57 insertions(+), 31 deletions(-)
+ block/block-copy.c | 118 ++++++++++++++++++++-------------------------
+ block/trace-events |   6 +--
+ 2 files changed, 54 insertions(+), 70 deletions(-)
 
-diff --git a/hw/net/dp8393x.c b/hw/net/dp8393x.c
-index a5678e11fa..693e244ce6 100644
---- a/hw/net/dp8393x.c
-+++ b/hw/net/dp8393x.c
-@@ -153,6 +153,7 @@ typedef struct dp8393xState {
- 
-     /* Hardware */
-     uint8_t it_shift;
-+    bool big_endian;
-     qemu_irq irq;
- #ifdef DEBUG_SONIC
-     int irq_level;
-@@ -223,6 +224,29 @@ static uint32_t dp8393x_wt(dp8393xState *s)
-     return s->regs[SONIC_WT1] << 16 | s->regs[SONIC_WT0];
+diff --git a/block/block-copy.c b/block/block-copy.c
+index cd45b373a9..845b2423dc 100644
+--- a/block/block-copy.c
++++ b/block/block-copy.c
+@@ -126,79 +126,64 @@ void block_copy_set_callbacks(
  }
  
-+static uint16_t dp8393x_get(dp8393xState *s, int width, uint16_t *base,
-+                            int offset)
-+{
-+    uint16_t val;
-+
-+    if (s->big_endian) {
-+        val = be16_to_cpu(base[offset * width + width - 1]);
-+    } else {
-+        val = le16_to_cpu(base[offset * width]);
-+    }
-+    return val;
-+}
-+
-+static void dp8393x_put(dp8393xState *s, int width, uint16_t *base, int offset,
-+                        uint16_t val)
-+{
-+    if (s->big_endian) {
-+        base[offset * width + width - 1] = cpu_to_be16(val);
-+    } else {
-+        base[offset * width] = cpu_to_le16(val);
-+    }
-+}
-+
- static void dp8393x_update_irq(dp8393xState *s)
+ /*
+- * Copy range to target with a bounce buffer and return the bytes copied. If
+- * error occurred, return a negative error number
++ * block_copy_do_copy
++ *
++ * Do copy of cluser-aligned chunk. @end is allowed to exceed s->len only to
++ * cover last cluster when s->len is not aligned to clusters.
++ *
++ * No sync here: nor bitmap neighter intersecting requests handling, only copy.
++ *
++ * Returns 0 on success.
+  */
+-static int coroutine_fn block_copy_with_bounce_buffer(BlockCopyState *s,
+-                                                      int64_t start,
+-                                                      int64_t end,
+-                                                      bool *error_is_read)
++static int coroutine_fn block_copy_do_copy(BlockCopyState *s,
++                                           int64_t start, int64_t end,
++                                           bool *error_is_read)
  {
-     int level = (s->regs[SONIC_IMR] & s->regs[SONIC_ISR]) ? 1 : 0;
-@@ -254,12 +278,12 @@ static void dp8393x_do_load_cam(dp8393xState *s)
-         /* Fill current entry */
-         address_space_rw(&s->as, dp8393x_cdp(s),
-             MEMTXATTRS_UNSPECIFIED, (uint8_t *)data, size, 0);
--        s->cam[index][0] = data[1 * width] & 0xff;
--        s->cam[index][1] = data[1 * width] >> 8;
--        s->cam[index][2] = data[2 * width] & 0xff;
--        s->cam[index][3] = data[2 * width] >> 8;
--        s->cam[index][4] = data[3 * width] & 0xff;
--        s->cam[index][5] = data[3 * width] >> 8;
-+        s->cam[index][0] = dp8393x_get(s, width, data, 1) & 0xff;
-+        s->cam[index][1] = dp8393x_get(s, width, data, 1) >> 8;
-+        s->cam[index][2] = dp8393x_get(s, width, data, 2) & 0xff;
-+        s->cam[index][3] = dp8393x_get(s, width, data, 2) >> 8;
-+        s->cam[index][4] = dp8393x_get(s, width, data, 3) & 0xff;
-+        s->cam[index][5] = dp8393x_get(s, width, data, 3) >> 8;
-         DPRINTF("load cam[%d] with %02x%02x%02x%02x%02x%02x\n", index,
-             s->cam[index][0], s->cam[index][1], s->cam[index][2],
-             s->cam[index][3], s->cam[index][4], s->cam[index][5]);
-@@ -272,7 +296,7 @@ static void dp8393x_do_load_cam(dp8393xState *s)
-     /* Read CAM enable */
-     address_space_rw(&s->as, dp8393x_cdp(s),
-         MEMTXATTRS_UNSPECIFIED, (uint8_t *)data, size, 0);
--    s->regs[SONIC_CE] = data[0 * width];
-+    s->regs[SONIC_CE] = dp8393x_get(s, width, data, 0);
-     DPRINTF("load cam done. cam enable mask 0x%04x\n", s->regs[SONIC_CE]);
+     int ret;
+-    int nbytes;
+-    void *bounce_buffer = qemu_blockalign(s->source->bs, s->cluster_size);
++    int nbytes = MIN(end, s->len) - start;
++    void *bounce_buffer = NULL;
  
-     /* Done */
-@@ -293,10 +317,10 @@ static void dp8393x_do_read_rra(dp8393xState *s)
-         MEMTXATTRS_UNSPECIFIED, (uint8_t *)data, size, 0);
+     assert(QEMU_IS_ALIGNED(start, s->cluster_size));
+-    bdrv_reset_dirty_bitmap(s->copy_bitmap, start, s->cluster_size);
+-    nbytes = MIN(s->cluster_size, s->len - start);
++    assert(QEMU_IS_ALIGNED(end, s->cluster_size));
++    assert(end < s->len || end == QEMU_ALIGN_UP(s->len, s->cluster_size));
++
++    if (s->use_copy_range) {
++        ret = bdrv_co_copy_range(s->source, start, s->target, start, nbytes,
++                                 0, s->write_flags);
++        if (ret < 0) {
++            trace_block_copy_copy_range_fail(s, start, ret);
++            s->use_copy_range = false;
++            /* Fallback to read+write with allocated buffer */
++        } else {
++            goto out;
++        }
++    }
++
++    bounce_buffer = qemu_blockalign(s->source->bs, nbytes);
  
-     /* Update SONIC registers */
--    s->regs[SONIC_CRBA0] = data[0 * width];
--    s->regs[SONIC_CRBA1] = data[1 * width];
--    s->regs[SONIC_RBWC0] = data[2 * width];
--    s->regs[SONIC_RBWC1] = data[3 * width];
-+    s->regs[SONIC_CRBA0] = dp8393x_get(s, width, data, 0);
-+    s->regs[SONIC_CRBA1] = dp8393x_get(s, width, data, 1);
-+    s->regs[SONIC_RBWC0] = dp8393x_get(s, width, data, 2);
-+    s->regs[SONIC_RBWC1] = dp8393x_get(s, width, data, 3);
-     DPRINTF("CRBA0/1: 0x%04x/0x%04x, RBWC0/1: 0x%04x/0x%04x\n",
-         s->regs[SONIC_CRBA0], s->regs[SONIC_CRBA1],
-         s->regs[SONIC_RBWC0], s->regs[SONIC_RBWC1]);
-@@ -411,12 +435,12 @@ static void dp8393x_do_transmit_packets(dp8393xState *s)
-         tx_len = 0;
+     ret = bdrv_co_pread(s->source, start, nbytes, bounce_buffer, 0);
+     if (ret < 0) {
+-        trace_block_copy_with_bounce_buffer_read_fail(s, start, ret);
++        trace_block_copy_read_fail(s, start, ret);
+         if (error_is_read) {
+             *error_is_read = true;
+         }
+-        goto fail;
++        goto out;
+     }
  
-         /* Update registers */
--        s->regs[SONIC_TCR] = data[0 * width] & 0xf000;
--        s->regs[SONIC_TPS] = data[1 * width];
--        s->regs[SONIC_TFC] = data[2 * width];
--        s->regs[SONIC_TSA0] = data[3 * width];
--        s->regs[SONIC_TSA1] = data[4 * width];
--        s->regs[SONIC_TFS] = data[5 * width];
-+        s->regs[SONIC_TCR] = dp8393x_get(s, width, data, 0) & 0xf000;
-+        s->regs[SONIC_TPS] = dp8393x_get(s, width, data, 1);
-+        s->regs[SONIC_TFC] = dp8393x_get(s, width, data, 2);
-+        s->regs[SONIC_TSA0] = dp8393x_get(s, width, data, 3);
-+        s->regs[SONIC_TSA1] = dp8393x_get(s, width, data, 4);
-+        s->regs[SONIC_TFS] = dp8393x_get(s, width, data, 5);
+     ret = bdrv_co_pwrite(s->target, start, nbytes, bounce_buffer,
+                          s->write_flags);
+     if (ret < 0) {
+-        trace_block_copy_with_bounce_buffer_write_fail(s, start, ret);
++        trace_block_copy_write_fail(s, start, ret);
+         if (error_is_read) {
+             *error_is_read = false;
+         }
+-        goto fail;
++        goto out;
+     }
  
-         /* Handle programmable interrupt */
-         if (s->regs[SONIC_TCR] & SONIC_TCR_PINT) {
-@@ -442,9 +466,9 @@ static void dp8393x_do_transmit_packets(dp8393xState *s)
-                 address_space_rw(&s->as,
-                     dp8393x_ttda(s) + sizeof(uint16_t) * (4 + 3 * i) * width,
-                     MEMTXATTRS_UNSPECIFIED, (uint8_t *)data, size, 0);
--                s->regs[SONIC_TSA0] = data[0 * width];
--                s->regs[SONIC_TSA1] = data[1 * width];
--                s->regs[SONIC_TFS] = data[2 * width];
-+                s->regs[SONIC_TSA0] = dp8393x_get(s, width, data, 0);
-+                s->regs[SONIC_TSA1] = dp8393x_get(s, width, data, 1);
-+                s->regs[SONIC_TFS] = dp8393x_get(s, width, data, 2);
-             }
++out:
+     qemu_vfree(bounce_buffer);
+ 
+-    return nbytes;
+-fail:
+-    qemu_vfree(bounce_buffer);
+-    bdrv_set_dirty_bitmap(s->copy_bitmap, start, s->cluster_size);
+     return ret;
+-
+-}
+-
+-/*
+- * Copy range to target and return the bytes copied. If error occurred, return a
+- * negative error number.
+- */
+-static int coroutine_fn block_copy_with_offload(BlockCopyState *s,
+-                                                int64_t start,
+-                                                int64_t end)
+-{
+-    int ret;
+-    int nr_clusters;
+-    int nbytes;
+-
+-    assert(QEMU_IS_ALIGNED(s->copy_range_size, s->cluster_size));
+-    assert(QEMU_IS_ALIGNED(start, s->cluster_size));
+-    nbytes = MIN(s->copy_range_size, MIN(end, s->len) - start);
+-    nr_clusters = DIV_ROUND_UP(nbytes, s->cluster_size);
+-    bdrv_reset_dirty_bitmap(s->copy_bitmap, start,
+-                            s->cluster_size * nr_clusters);
+-    ret = bdrv_co_copy_range(s->source, start, s->target, start, nbytes,
+-                             0, s->write_flags);
+-    if (ret < 0) {
+-        trace_block_copy_with_offload_fail(s, start, ret);
+-        bdrv_set_dirty_bitmap(s->copy_bitmap, start,
+-                              s->cluster_size * nr_clusters);
+-        return ret;
+-    }
+-
+-    return nbytes;
+ }
+ 
+ /*
+@@ -294,7 +279,7 @@ int coroutine_fn block_copy(BlockCopyState *s,
+     block_copy_inflight_req_begin(s, &req, start, end);
+ 
+     while (start < end) {
+-        int64_t dirty_end;
++        int64_t next_zero, chunk_end;
+ 
+         if (!bdrv_dirty_bitmap_get(s->copy_bitmap, start)) {
+             trace_block_copy_skip(s, start);
+@@ -302,10 +287,15 @@ int coroutine_fn block_copy(BlockCopyState *s,
+             continue; /* already copied */
          }
  
-@@ -471,7 +495,8 @@ static void dp8393x_do_transmit_packets(dp8393xState *s)
-         s->regs[SONIC_TCR] |= SONIC_TCR_PTX;
+-        dirty_end = bdrv_dirty_bitmap_next_zero(s->copy_bitmap, start,
+-                                                (end - start));
+-        if (dirty_end < 0) {
+-            dirty_end = end;
++        chunk_end = MIN(end, start + (s->use_copy_range ?
++                                      s->copy_range_size : s->cluster_size));
++
++        next_zero = bdrv_dirty_bitmap_next_zero(s->copy_bitmap, start,
++                                                chunk_end - start);
++        if (next_zero >= 0) {
++            assert(next_zero > start); /* start is dirty */
++            assert(next_zero < chunk_end); /* no need to do MIN() */
++            chunk_end = next_zero;
+         }
  
-         /* Write status */
--        data[0 * width] = s->regs[SONIC_TCR] & 0x0fff; /* status */
-+        dp8393x_put(s, width, data, 0,
-+                    s->regs[SONIC_TCR] & 0x0fff); /* status */
-         size = sizeof(uint16_t) * width;
-         address_space_rw(&s->as,
-             dp8393x_ttda(s),
-@@ -485,8 +510,8 @@ static void dp8393x_do_transmit_packets(dp8393xState *s)
-                              sizeof(uint16_t) *
-                              (4 + 3 * s->regs[SONIC_TFC]) * width,
-                 MEMTXATTRS_UNSPECIFIED, (uint8_t *)data, size, 0);
--            s->regs[SONIC_CTDA] = data[0 * width] & ~0x1;
--            if (data[0 * width] & 0x1) {
-+            s->regs[SONIC_CTDA] = dp8393x_get(s, width, data, 0) & ~0x1;
-+            if (dp8393x_get(s, width, data, 0) & 0x1) {
-                 /* EOL detected */
-                 break;
+         if (s->skip_unallocated) {
+@@ -316,27 +306,21 @@ int coroutine_fn block_copy(BlockCopyState *s,
+                 continue;
              }
-@@ -749,7 +774,7 @@ static ssize_t dp8393x_receive(NetClientState *nc, const uint8_t * buf,
-         address = dp8393x_crda(s) + sizeof(uint16_t) * 5 * width;
-         address_space_rw(&s->as, address, MEMTXATTRS_UNSPECIFIED,
-                          (uint8_t *)data, size, 0);
--        if (data[0 * width] & 0x1) {
-+        if (dp8393x_get(s, width, data, 0) & 0x1) {
-             /* Still EOL ; stop reception */
-             return -1;
-         } else {
-@@ -793,11 +818,11 @@ static ssize_t dp8393x_receive(NetClientState *nc, const uint8_t * buf,
+             /* Clamp to known allocated region */
+-            dirty_end = MIN(dirty_end, start + status_bytes);
++            chunk_end = MIN(chunk_end, start + status_bytes);
+         }
  
-     /* Write status to memory */
-     DPRINTF("Write status at %08x\n", dp8393x_crda(s));
--    data[0 * width] = s->regs[SONIC_RCR]; /* status */
--    data[1 * width] = rx_len; /* byte count */
--    data[2 * width] = s->regs[SONIC_TRBA0]; /* pkt_ptr0 */
--    data[3 * width] = s->regs[SONIC_TRBA1]; /* pkt_ptr1 */
--    data[4 * width] = s->regs[SONIC_RSC]; /* seq_no */
-+    dp8393x_put(s, width, data, 0, s->regs[SONIC_RCR]); /* status */
-+    dp8393x_put(s, width, data, 1, rx_len); /* byte count */
-+    dp8393x_put(s, width, data, 2, s->regs[SONIC_TRBA0]); /* pkt_ptr0 */
-+    dp8393x_put(s, width, data, 3, s->regs[SONIC_TRBA1]); /* pkt_ptr1 */
-+    dp8393x_put(s, width, data, 4, s->regs[SONIC_RSC]); /* seq_no */
-     size = sizeof(uint16_t) * 5 * width;
-     address_space_rw(&s->as, dp8393x_crda(s),
-         MEMTXATTRS_UNSPECIFIED, (uint8_t *)data, size, 1);
-@@ -806,12 +831,12 @@ static ssize_t dp8393x_receive(NetClientState *nc, const uint8_t * buf,
-     size = sizeof(uint16_t) * width;
-     address_space_rw(&s->as, dp8393x_crda(s) + sizeof(uint16_t) * 5 * width,
-         MEMTXATTRS_UNSPECIFIED, (uint8_t *)data, size, 0);
--    s->regs[SONIC_LLFA] = data[0 * width];
-+    s->regs[SONIC_LLFA] = dp8393x_get(s, width, data, 0);
-     if (s->regs[SONIC_LLFA] & 0x1) {
-         /* EOL detected */
-         s->regs[SONIC_ISR] |= SONIC_ISR_RDE;
-     } else {
--        data[0 * width] = 0; /* in_use */
-+        dp8393x_put(s, width, data, 0, 0); /* in_use */
-         address_space_rw(&s->as, dp8393x_crda(s) + sizeof(uint16_t) * 6 * width,
-             MEMTXATTRS_UNSPECIFIED, (uint8_t *)data, sizeof(uint16_t), 1);
-         s->regs[SONIC_CRDA] = s->regs[SONIC_LLFA];
-@@ -924,6 +949,7 @@ static Property dp8393x_properties[] = {
-     DEFINE_NIC_PROPERTIES(dp8393xState, conf),
-     DEFINE_PROP_PTR("dma_mr", dp8393xState, dma_mr),
-     DEFINE_PROP_UINT8("it_shift", dp8393xState, it_shift, 0),
-+    DEFINE_PROP_BOOL("big_endian", dp8393xState, big_endian, false),
-     DEFINE_PROP_END_OF_LIST(),
- };
+         trace_block_copy_process(s, start);
  
+-        if (s->use_copy_range) {
+-            ret = block_copy_with_offload(s, start, dirty_end);
+-            if (ret < 0) {
+-                s->use_copy_range = false;
+-            }
+-        }
+-        if (!s->use_copy_range) {
+-            ret = block_copy_with_bounce_buffer(s, start, dirty_end,
+-                                                error_is_read);
+-        }
++        bdrv_reset_dirty_bitmap(s->copy_bitmap, start, chunk_end - start);
++
++        ret = block_copy_do_copy(s, start, chunk_end, error_is_read);
+         if (ret < 0) {
++            bdrv_set_dirty_bitmap(s->copy_bitmap, start, chunk_end - start);
+             break;
+         }
+ 
+-        start += ret;
+-        s->progress_bytes_callback(ret, s->progress_opaque);
++        s->progress_bytes_callback(chunk_end - start, s->progress_opaque);
++        start = chunk_end;
+         ret = 0;
+     }
+ 
+diff --git a/block/trace-events b/block/trace-events
+index b8d70f5242..ccde15a14c 100644
+--- a/block/trace-events
++++ b/block/trace-events
+@@ -45,9 +45,9 @@ backup_do_cow_return(void *job, int64_t offset, uint64_t bytes, int ret) "job %p
+ block_copy_skip(void *bcs, int64_t start) "bcs %p start %"PRId64
+ block_copy_skip_range(void *bcs, int64_t start, uint64_t bytes) "bcs %p start %"PRId64" bytes %"PRId64
+ block_copy_process(void *bcs, int64_t start) "bcs %p start %"PRId64
+-block_copy_with_bounce_buffer_read_fail(void *bcs, int64_t start, int ret) "bcs %p start %"PRId64" ret %d"
+-block_copy_with_bounce_buffer_write_fail(void *bcs, int64_t start, int ret) "bcs %p start %"PRId64" ret %d"
+-block_copy_with_offload_fail(void *bcs, int64_t start, int ret) "bcs %p start %"PRId64" ret %d"
++block_copy_copy_range_fail(void *bcs, int64_t start, int ret) "bcs %p start %"PRId64" ret %d"
++block_copy_read_fail(void *bcs, int64_t start, int ret) "bcs %p start %"PRId64" ret %d"
++block_copy_write_fail(void *bcs, int64_t start, int ret) "bcs %p start %"PRId64" ret %d"
+ 
+ # ../blockdev.c
+ qmp_block_job_cancel(void *job) "job %p"
 -- 
 2.21.0
 
