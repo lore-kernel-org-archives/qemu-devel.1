@@ -2,61 +2,86 @@ Return-Path: <SRS0=tSBD=YP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1ED48CA9EA0
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 14:01:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A0255CA9EA0
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 14:02:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E81BA21872
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 14:01:14 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E81BA21872
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id 69A1321872
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 14:02:25 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="AAGS6PcH"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 69A1321872
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57994 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58006 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iMuim-0002Bf-Sr
-	for qemu-devel@archiver.kernel.org; Tue, 22 Oct 2019 10:01:13 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39996)
+	id 1iMujv-0003p3-SV
+	for qemu-devel@archiver.kernel.org; Tue, 22 Oct 2019 10:02:23 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37094)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <clg@kaod.org>) id 1iMuUw-0003nt-JW
- for qemu-devel@nongnu.org; Tue, 22 Oct 2019 09:46:56 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1iMuHH-0003JQ-D6
+ for qemu-devel@nongnu.org; Tue, 22 Oct 2019 09:32:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <clg@kaod.org>) id 1iMuUu-0007nc-EH
- for qemu-devel@nongnu.org; Tue, 22 Oct 2019 09:46:54 -0400
-Received: from 5.mo2.mail-out.ovh.net ([87.98.181.248]:43032)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <clg@kaod.org>) id 1iMuUt-0007ja-72
- for qemu-devel@nongnu.org; Tue, 22 Oct 2019 09:46:52 -0400
-Received: from player772.ha.ovh.net (unknown [10.109.159.69])
- by mo2.mail-out.ovh.net (Postfix) with ESMTP id DE8DD1B08EE
- for <qemu-devel@nongnu.org>; Tue, 22 Oct 2019 15:46:48 +0200 (CEST)
-Received: from kaod.org (deibp9eh1--blueice1n4.emea.ibm.com [195.212.29.166])
- (Authenticated sender: clg@kaod.org)
- by player772.ha.ovh.net (Postfix) with ESMTPSA id 1A550B3F2FCF;
- Tue, 22 Oct 2019 13:46:42 +0000 (UTC)
-From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
-To: David Gibson <david@gibson.dropbear.id.au>
-Subject: [PATCH v4 1/7] spapr: move CPU reset after presenter creation
-Date: Tue, 22 Oct 2019 15:46:26 +0200
-Message-Id: <20191022134632.29098-2-clg@kaod.org>
-X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20191022134632.29098-1-clg@kaod.org>
-References: <20191022134632.29098-1-clg@kaod.org>
+ (envelope-from <peter.maydell@linaro.org>) id 1iMuHG-0001UN-AM
+ for qemu-devel@nongnu.org; Tue, 22 Oct 2019 09:32:47 -0400
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:32955)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1iMuHG-0001Tw-2o
+ for qemu-devel@nongnu.org; Tue, 22 Oct 2019 09:32:46 -0400
+Received: by mail-wr1-x441.google.com with SMTP id s1so9347779wro.0
+ for <qemu-devel@nongnu.org>; Tue, 22 Oct 2019 06:32:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:subject:date:message-id:in-reply-to:references:mime-version
+ :content-transfer-encoding;
+ bh=btuVklyn5jdYvmT5eZen6ynTwp3atEoaC3ET/0yyHkk=;
+ b=AAGS6PcH5i5GhLBuPsbq2N31XjVBoNao7t+B0p+4rppQ2f6Y1HPQVq4RFVY1R619bc
+ 3f0tS8Afs64qJi03/HNPjrmX6mQVfGv+pEdA4HezyeaDj8UxFeQr0r8uf8yZ01OhYWDD
+ UJ5TGh0TtgPcJ0Kn9p5kISv2trsGeSzhKqarTBiEWUcluW3uArSxV9rNqnGM9plwlXiR
+ YP8tg8zuB1/8qV1gXE08Qh6JrR1UREwfE6hljH5X6UYrLFE99T+HsSnjXL8nKuc75kn/
+ 1pcacBfAg2Yk4VJkIS7gi2KOODyZwbKTIm+kB0cYGdoaV0DZdJnpSBQPzhBoGEiEk+wP
+ fLfw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=btuVklyn5jdYvmT5eZen6ynTwp3atEoaC3ET/0yyHkk=;
+ b=pKTTqchidCmoxQGmJOSUB1uv4ds2Wk2DkmM5vS0TnDF56BVQU6sWvs/F9PI7wDYw4t
+ D2zHcdHA2fF/4HEXJqCehFW92JN/Myb2zQY0Ql03+yrNEgu7Xmr96ZQr7s4Lp0P/s4FP
+ ZNDbynpDR0lM07iti5TGR43eUXz06WdUDeMO92JON+7AYGnxE5eigkDj4DzaUNqfIZ2u
+ b+eW0mzK9oC4Jx0YtGCYlncIZKMc7ABT0xDUWVFA3wgkmj65kacAThOzWDsqa4ve+TGH
+ 8cdHHti6Pyi1rsj95LGlZoG/aZHLZB7JZM7Wc1tqwMCmmq+iFWRWqpJdorUXFTcmQCki
+ qWWA==
+X-Gm-Message-State: APjAAAXS+0oJLH8DY+NxDS3PmjXFfZcsQyVkKiZxzZRyspI7ulht4kT7
+ rzxgzjh851Eb6FpUEFI45JjbpqGadFs=
+X-Google-Smtp-Source: APXvYqydXAya8dE79HY+LIlOk43kEw8Is+CeDQpSPuyRv2Yogr2QB603oXNHPC5WipFS2iEIfSyS9w==
+X-Received: by 2002:a5d:5392:: with SMTP id d18mr3857792wrv.382.1571751164620; 
+ Tue, 22 Oct 2019 06:32:44 -0700 (PDT)
+Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
+ by smtp.gmail.com with ESMTPSA id r2sm20263856wma.1.2019.10.22.06.32.42
+ for <qemu-devel@nongnu.org>
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 22 Oct 2019 06:32:43 -0700 (PDT)
+From: Peter Maydell <peter.maydell@linaro.org>
+To: qemu-devel@nongnu.org
+Subject: [PULL 29/41] target/arm: Rebuild hflags at Xscale SCTLR writes
+Date: Tue, 22 Oct 2019 14:31:22 +0100
+Message-Id: <20191022133134.14487-30-peter.maydell@linaro.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20191022133134.14487-1-peter.maydell@linaro.org>
+References: <20191022133134.14487-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-X-Ovh-Tracer-Id: 596726950679514086
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrkeejgdeikecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 87.98.181.248
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::441
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -68,62 +93,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>, qemu-ppc@nongnu.org,
- qemu-devel@nongnu.org, Greg Kurz <groug@kaod.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This change prepares ground for future changes which will reset the
-interrupt presenter in the reset handler of the sPAPR and PowerNV
-cores.
+From: Richard Henderson <richard.henderson@linaro.org>
 
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-Reviewed-by: Greg Kurz <groug@kaod.org>
-Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
+Continue setting, but not relying upon, env->hflags.
+
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+Message-id: 20191018174431.1784-20-richard.henderson@linaro.org
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- hw/ppc/spapr_cpu_core.c | 14 ++++++++------
- 1 file changed, 8 insertions(+), 6 deletions(-)
+ target/arm/helper.c | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
 
-diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
-index 3e4302c7d596..2b21285d2009 100644
---- a/hw/ppc/spapr_cpu_core.c
-+++ b/hw/ppc/spapr_cpu_core.c
-@@ -234,13 +234,16 @@ static void spapr_realize_vcpu(PowerPCCPU *cpu, Spa=
-prMachineState *spapr,
-     cpu_ppc_set_vhyp(cpu, PPC_VIRTUAL_HYPERVISOR(spapr));
-     kvmppc_set_papr(cpu);
-=20
--    qemu_register_reset(spapr_cpu_reset, cpu);
--    spapr_cpu_reset(cpu);
--
-     if (spapr_irq_cpu_intc_create(spapr, cpu, &local_err) < 0) {
--        goto error_unregister;
-+        goto error_intc_create;
-     }
-=20
-+    /*
-+     * FIXME: Hot-plugged CPUs are not reset. Do it at realize.
-+     */
-+    qemu_register_reset(spapr_cpu_reset, cpu);
-+    spapr_cpu_reset(cpu);
+diff --git a/target/arm/helper.c b/target/arm/helper.c
+index aae7b62458f..c55783e5406 100644
+--- a/target/arm/helper.c
++++ b/target/arm/helper.c
+@@ -4174,6 +4174,16 @@ static void sctlr_write(CPUARMState *env, const ARMCPRegInfo *ri,
+     /* ??? Lots of these bits are not implemented.  */
+     /* This may enable/disable the MMU, so do a TLB flush.  */
+     tlb_flush(CPU(cpu));
 +
-     if (!sc->pre_3_0_migration) {
-         vmstate_register(NULL, cs->cpu_index, &vmstate_spapr_cpu_state,
-                          cpu->machine_data);
-@@ -248,8 +251,7 @@ static void spapr_realize_vcpu(PowerPCCPU *cpu, Spapr=
-MachineState *spapr,
-=20
-     return;
-=20
--error_unregister:
--    qemu_unregister_reset(spapr_cpu_reset, cpu);
-+error_intc_create:
-     cpu_remove_sync(CPU(cpu));
- error:
-     error_propagate(errp, local_err);
---=20
-2.21.0
++    if (ri->type & ARM_CP_SUPPRESS_TB_END) {
++        /*
++         * Normally we would always end the TB on an SCTLR write; see the
++         * comment in ARMCPRegInfo sctlr initialization below for why Xscale
++         * is special.  Setting ARM_CP_SUPPRESS_TB_END also stops the rebuild
++         * of hflags from the translator, so do it here.
++         */
++        arm_rebuild_hflags(env);
++    }
+ }
+ 
+ static CPAccessResult fpexc32_access(CPUARMState *env, const ARMCPRegInfo *ri,
+-- 
+2.20.1
 
 
