@@ -2,122 +2,60 @@ Return-Path: <SRS0=tSBD=YP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9BDBECA9EA0
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 14:18:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BBAC6CA9EA0
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 14:20:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6545B20700
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 14:18:20 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=os.amperecomputing.com header.i=@os.amperecomputing.com header.b="hBP//5t+"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6545B20700
-Authentication-Results: mail.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=os.amperecomputing.com
+	by mail.kernel.org (Postfix) with ESMTPS id 7E0D020700
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 14:20:29 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7E0D020700
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58538 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58658 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iMuzL-000855-40
-	for qemu-devel@archiver.kernel.org; Tue, 22 Oct 2019 10:18:19 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43393)
+	id 1iMv1P-0001zj-Mc
+	for qemu-devel@archiver.kernel.org; Tue, 22 Oct 2019 10:20:27 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45265)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <aaron@os.amperecomputing.com>) id 1iMulm-0006aN-F0
- for qemu-devel@nongnu.org; Tue, 22 Oct 2019 10:04:20 -0400
+ (envelope-from <yezhenyu2@huawei.com>) id 1iMuzT-0000FQ-Sz
+ for qemu-devel@nongnu.org; Tue, 22 Oct 2019 10:18:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aaron@os.amperecomputing.com>) id 1iMulk-0001TQ-7j
- for qemu-devel@nongnu.org; Tue, 22 Oct 2019 10:04:18 -0400
-Received: from mail-eopbgr790137.outbound.protection.outlook.com
- ([40.107.79.137]:22737 helo=NAM03-CO1-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <aaron@os.amperecomputing.com>)
- id 1iMulg-0001R5-UT
- for qemu-devel@nongnu.org; Tue, 22 Oct 2019 10:04:14 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=B/UZglFXOACAzzTLbEzJb5v6DW4Ffh7HPvYqhlW+P/CI4XvDZW+uorlTjgn8hQZxU2NaINFQWbxYkUXDOF++SnG7Qu9RlUcNMe9hS/FNVFwpcLTGUBz91FwWZ53A9pmAJ2XxIq1xujQFTPry9BYCdM3ID4ohjxKbuDv2Af8fyaUqyX2fEJU5DlsbJF3minq6BR0WPjab4QFGkjuV4mgilGRj4zNckeXRplQWHDr5xbM9ouLFZKYgDn5OSZSqjYdnDUVA/EjQ6xgRjnmCIvJFcZbB2LS4mpl3wOp3OES6Q9xlC/IB0yOLpu6Cw9xw0K8zhxGCQQ79G++dpzv20t5ehQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=J2jBDyaRtnGCCoDiUJg5tCU29pGGkDV2BOffIq0Lr10=;
- b=QBRlpWYPapUF5saA3/FzAj7amReu7bPC/WOm/t+Ea7ErcOwPNpenGoDVZCCJO1lboIrc1vsLIKTcxyA79V4BlQBgtyYTiF52jEZ7KVPE2ifUnYdDoW6UQGMgmFK8a5TP6if0NwEEp9ibZiqjUaiwO1hUd2NgBg6s628NUnw8PfIipgL8xjXMJUt/d6o4/5JqdFly0E7J3sXIoCDOYpZ0fyjAykQD9QHgWNQCpfkUbEpYKfZgQvkR7MWQEsY6wlL+y1ZyQM0qDOCGlolVkZLb/nASHvp3MWxTYyN27DBvQT99bbPeSW1xbAua4L83sOHddE8vqhsQkBF9/VvaXf2lgQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=os.amperecomputing.com; dmarc=pass action=none
- header.from=os.amperecomputing.com; dkim=pass
- header.d=os.amperecomputing.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=os.amperecomputing.com; s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=J2jBDyaRtnGCCoDiUJg5tCU29pGGkDV2BOffIq0Lr10=;
- b=hBP//5t+eJhbzzvyarh8IgHe8kiHclHeENp2cDPnSZN82JHN/120NpFm6uH64riWdCGxewJuROXjQUYTWtKaqAsmT7h+evbUKtrJukHT/l9kFcknl003QjMpVNgvAQ0fVvwqmVlpvAntyOyqSU7dYedKDBVuvxVDEv2kbECrUXA=
-Received: from DM6PR01MB6027.prod.exchangelabs.com (52.132.249.89) by
- DM6PR01MB5404.prod.exchangelabs.com (20.179.55.24) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2347.17; Tue, 22 Oct 2019 14:04:08 +0000
-Received: from DM6PR01MB6027.prod.exchangelabs.com
- ([fe80::3029:7c3:24fc:bb60]) by DM6PR01MB6027.prod.exchangelabs.com
- ([fe80::3029:7c3:24fc:bb60%7]) with mapi id 15.20.2347.029; Tue, 22 Oct 2019
- 14:04:08 +0000
-From: Aaron Lindsay OS <aaron@os.amperecomputing.com>
-To: =?iso-8859-1?Q?Alex_Benn=E9e?= <alex.bennee@linaro.org>
-CC: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "cota@braap.org"
- <cota@braap.org>, "peter.puhov@futurewei.com" <peter.puhov@futurewei.com>,
- "robert.foley@futurewei.com" <robert.foley@futurewei.com>
-Subject: Re: [PATCH  v6 37/54] plugin: expand the plugin_init function to
- include an info block
-Thread-Topic: [PATCH  v6 37/54] plugin: expand the plugin_init function to
- include an info block
-Thread-Index: AQHVhO5ZtkD22KgDqEOJovKpMAx4f6dgiJEAgAAGPgCABipfgA==
-Date: Tue, 22 Oct 2019 14:04:08 +0000
-Message-ID: <20191022140347.GF42857@RDU-FVFX20TUHV2H>
-References: <20191017131615.19660-1-alex.bennee@linaro.org>
- <20191017131615.19660-38-alex.bennee@linaro.org>
- <20191018153214.GE42857@RDU-FVFX20TUHV2H> <87wod2nj5x.fsf@linaro.org>
-In-Reply-To: <87wod2nj5x.fsf@linaro.org>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-clientproxiedby: CY4PR14CA0027.namprd14.prod.outlook.com
- (2603:10b6:903:101::13) To DM6PR01MB6027.prod.exchangelabs.com
- (2603:10b6:5:1da::25)
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=aaron@os.amperecomputing.com; 
-x-ms-exchange-messagesentrepresentingtype: 1
-x-originating-ip: [108.169.132.82]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: d690d347-53c9-4f14-db66-08d756f8b4c6
-x-ms-traffictypediagnostic: DM6PR01MB5404:
-x-microsoft-antispam-prvs: <DM6PR01MB5404905EDED06BE96DB7B51B8A680@DM6PR01MB5404.prod.exchangelabs.com>
-x-ms-oob-tlc-oobclassifiers: OLM:7219;
-x-forefront-prvs: 01986AE76B
-x-forefront-antispam-report: SFV:NSPM;
- SFS:(10019020)(4636009)(7916004)(136003)(346002)(366004)(376002)(396003)(39840400004)(189003)(54094003)(199004)(4326008)(3846002)(6436002)(102836004)(478600001)(316002)(256004)(14444005)(5660300002)(8676002)(6916009)(229853002)(66066001)(81156014)(9686003)(81166006)(6512007)(6486002)(52116002)(33656002)(99286004)(2906002)(6116002)(71200400001)(71190400001)(8936002)(86362001)(66446008)(25786009)(1076003)(76176011)(66574012)(54906003)(6246003)(14454004)(476003)(446003)(11346002)(386003)(66556008)(6506007)(64756008)(33716001)(66476007)(186003)(486006)(26005)(7736002)(66946007)(305945005);
- DIR:OUT; SFP:1102; SCL:1; SRVR:DM6PR01MB5404;
- H:DM6PR01MB6027.prod.exchangelabs.com; FPR:; SPF:None; LANG:en;
- PTR:InfoNoRecords; MX:1; A:0; 
-received-spf: None (protection.outlook.com: os.amperecomputing.com does not
- designate permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: 7eLgfqX7N5ZtYHVXXHF9es5iHMWrCNgQT9Il1Sg2W+HFsrS785tqD5eJSuK8CpCeqP5EI/1gFPUA1P+AryfAbWfePy5TeCUKyx0dtYFwLcGgEcZg420dKHteHpEHII2hQIXXRdDr4ufUb2xtp8qAcQnhQPc0I6Yqa3DyEdm1NXmwuOfLlexrcuDHLURPjxHhR3197CIKOKj810TKbY4aiXK2355qbI6T7EGA4u4mDkr2LokPduZahG23ksmikhgWqt+aqPkb/yvlCXr45/qLk2NU6kwedX3PLVqWJRnpnyc//NYh7um/iqMJYwPt8pPDnby/W7UbkjgsPfyjmrRdg50IZ5cQZ9Gcch4UVyFiWAZFdllXQ68fJ9os/EziEhAzkrkGFM2gfVCeHWYX6Mqe6dOUb3aTC7AmW/7qXg3NGhbkTCz1cnh3qUcn/x94ws5H
-x-ms-exchange-transport-forked: True
-Content-Type: text/plain; charset="iso-8859-1"
-Content-ID: <81118864C785D94BABBA338CA07EFB74@prod.exchangelabs.com>
-Content-Transfer-Encoding: quoted-printable
+ (envelope-from <yezhenyu2@huawei.com>) id 1iMuzR-00008p-SW
+ for qemu-devel@nongnu.org; Tue, 22 Oct 2019 10:18:27 -0400
+Received: from szxga06-in.huawei.com ([45.249.212.32]:60584 helo=huawei.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <yezhenyu2@huawei.com>)
+ id 1iMuzR-00007W-7X
+ for qemu-devel@nongnu.org; Tue, 22 Oct 2019 10:18:25 -0400
+Received: from DGGEMS411-HUB.china.huawei.com (unknown [172.30.72.60])
+ by Forcepoint Email with ESMTP id AB5748DAC510D990A9A1;
+ Tue, 22 Oct 2019 22:18:20 +0800 (CST)
+Received: from [127.0.0.1] (10.173.223.212) by DGGEMS411-HUB.china.huawei.com
+ (10.3.19.211) with Microsoft SMTP Server id 14.3.439.0;
+ Tue, 22 Oct 2019 22:18:12 +0800
+Subject: Re: [RFC PATCH] iothread: add set_iothread_poll_* commands
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+References: <5DAEB9D3.3080503@huawei.com> <20191022085119.GB2815@work-vm>
+From: Zhenyu Ye <yezhenyu2@huawei.com>
+Message-ID: <5DAF0FA3.1070309@huawei.com>
+Date: Tue, 22 Oct 2019 22:18:11 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:38.0) Gecko/20100101
+ Thunderbird/38.1.0
 MIME-Version: 1.0
-X-OriginatorOrg: os.amperecomputing.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: d690d347-53c9-4f14-db66-08d756f8b4c6
-X-MS-Exchange-CrossTenant-originalarrivaltime: 22 Oct 2019 14:04:08.2163 (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 3bc2b170-fd94-476d-b0ce-4229bdc904a7
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: BLg3n0zvPs9Xi+e4YG3KGz6Lxbrr6TnaR64jAN/TWUP8s6Uba0CC9eY9HXigrbiuz7z+jMMuUY/0OIJW1VvYP2HqOz+TsT+Qpzyp851FpLs=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR01MB5404
-X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
-X-Received-From: 40.107.79.137
+In-Reply-To: <20191022085119.GB2815@work-vm>
+Content-Type: text/plain; charset="UTF-8"
+X-Originating-IP: [10.173.223.212]
+X-CFilter-Loop: Reflected
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 45.249.212.32
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -129,85 +67,362 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: qemu-devel@nongnu.org, xiexiangyou@huawei.com,
+ jiangyiwen <jiangyiwen@huawei.com>, stefanha@redhat.com, pbonzini@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Oct 18 16:54, Alex Benn=E9e wrote:
+
+
+On 2019/10/22 16:51, Dr. David Alan Gilbert wrote:
+> * yezhenyu (A) (yezhenyu2@huawei.com) wrote:
+>> Since qemu2.9, QEMU added three AioContext poll parameters to struct
+>> IOThread: poll_max_ns, poll_grow and poll_shrink. These properties are
+>> used to control iothread polling time.
+>>
+>> However, there isn't properly hmp commands to adjust them when the VM =
+is
+>> alive. It's useful to adjust them online when observing the impact of
+>> different property value on performance.
+>>
+>> This patch add three hmp commands to adjust iothread poll-* properties
+>> for special iothread:
+>>
+>> set_iothread_poll_max_ns: set the maximum polling time in ns;
+>> set_iothread_poll_grow: set how many ns will be added to polling time;
+>> set_iothread_poll_shrink: set how many ns will be removed from polling
+>> time.
 >=20
-> Aaron Lindsay OS <aaron@os.amperecomputing.com> writes:
+> Thanks;  I don't know much about iothread, so I'll answer just from the
+> HMP side.
 >=20
-> > On Oct 17 14:15, Alex Benn=E9e wrote:
-> >> +    const char *target_name;
-> >> +    /* is this a full system emulation? */
-> >> +    bool system_emulation;
-> >
-> > It seems that 'system_emulation' is meant primarily in opposition to
-> > user-mode. I'm wondering if this could/should this be an enum of the
-> > execution mode being used to allow for future expansion? Or, if your
-> > intention here is mostly to allow the user to detect when the *_vcpus
-> > variables are valid, could it be renamed or commented differently to
-> > make that link more clear?
+
+Thanks for your review. I will update my patch according to your advice, =
+and
+submit a NEW PATCH. Some of my answers are below...
+
+>> Signed-off-by: Zhenyu Ye <yezhenyu2@huawei.com>
+>> ---
+>> hmp-commands.hx | 42 ++++++++++++++++++++
+>> hmp.c | 30 +++++++++++++++
+>> hmp.h | 3 ++
+>> include/sysemu/iothread.h | 6 +++
+>> iothread.c | 80 +++++++++++++++++++++++++++++++++++++++
+>> qapi/misc.json | 23 +++++++++++
+>> 6 files changed, 184 insertions(+)
+>>
+>> diff --git a/hmp-commands.hx b/hmp-commands.hx
+>> index a2c3ffc218..6fa0c5227a 100644
+>> --- a/hmp-commands.hx
+>> +++ b/hmp-commands.hx
+>> @@ -74,6 +74,48 @@ VM initialization using configuration data provided=
+ on the command line
+>> and via the QMP monitor during the preconfig state. The command is onl=
+y
+>> available during the preconfig state (i.e. when the --preconfig comman=
+d
+>> line option was in use).
+>> +ETEXI
+>> +
+>> + {
+>> + .name =3D "set_iothread_poll_max_ns",
+>> + .args_type =3D "iothread_id:s,poll_max_ns:i",
+>> + .params =3D "iothread_id poll_max_ns",
+>> + .help =3D "set poll_max_ns for a special iothread",
+>> + .cmd =3D hmp_set_iothread_poll_max_ns,
+>> + },
+>> +
+>> +STEXI
+>> +@item set_iothread_poll_max_ns
+>> +@findex set_iothread_poll_max_ns
+>> +set poll_max_ns property for a special iothread.
+>> +ETEXI
+>> +
+>> + {
+>> + .name =3D "set_iothread_poll_grow",
+>> + .args_type =3D "iothread_id:s,poll_grow:i",
+>> + .params =3D "iothread_id poll_grow",
+>> + .help =3D "set poll_grow for a special iothread",
+>> + .cmd =3D hmp_set_iothread_poll_grow,
+>> + },
+>> +
+>> +STEXI
+>> +@item set_iothread_poll_grow
+>> +@findex set_iothread_poll_grow
+>> +set poll_grow property for a special iothread.
+>> +ETEXI
+>> +
+>> + {
+>> + .name =3D "set_iothread_poll_shrink",
+>> + .args_type =3D "iothread_id:s,poll_shrink:i",
+>> + .params =3D "iothread_id poll_shrink",
+>> + .help =3D "set poll_shrink for a special iothread",
+>> + .cmd =3D hmp_set_iothread_poll_shrink,
+>> + },
+>> +
+>> +STEXI
+>> +@item set_iothread_poll_shrink
+>> +@findex set_iothread_poll_shrink
+>> +set poll_shrink property for a special iothread.
+>> ETEXI
 >=20
-> The only other operating mode that's ever been mooted is softmmu-user
-> (and no implementation has been done so far). Even then I don't think
-> that is a distinction that should be reported to the plugin as we are
-> trying not to leak implementation details.
+> I think I'd prefer one command with a parameter to select
+> the value to be set;   in migration we used to have lots of commands
+> but are moving to migrate_set_parameter which then handles all of them.
 >=20
-> But yes the practical upshot is for system emulation you at least have
-> sort of bounded size for how many threads you may have running.
-
-Fair enough. My fear was that any other operating modes might require
-different plugin behavior, but it sounds like you think that unlikely.
-If we're attempting to keep the implementation details hidden, should we
-name this variable in terms of what it means for plugin implementations
-instead of what it means for QEMU? (Not sure this is a winner, but maybe
-something like "hardware_threading_model" )
-
-> >> +    info->target_name =3D TARGET_NAME;
-> >> +#ifndef CONFIG_USER_ONLY
-> >> +    MachineState *ms =3D MACHINE(qdev_get_machine());
-> >> +    info->system_emulation =3D true;
-> >> +    info->system.smp_vcpus =3D ms->smp.cpus;
-> >> +    info->system.max_vcpus =3D ms->smp.max_cpus;
-> >> +#else
-> >> +    info->system_emulation =3D false;
-> >
-> > Thinking "out loud" here - I wonder if it would be helpful to set the
-> > *_vcpus variables even for user mode here. It might allow unconditional
-> > allocation of "per-cpu" structures that the plugin might need - without
-> > first needing to check whether the *_vcpus variables were valid.
+> So something like,
 >=20
-> but what too? It would certainly be wrong because any user-space process
-> could create (and destroy) thousands of threads.
-
-Hmm, right. To make sure I fully understand, does this mean that for
-user-mode, `vcpu_index` in the callback function pointer type below is
-actually the thread index?
-
-typedef void (*qemu_plugin_vcpu_simple_cb_t)(qemu_plugin_id_t id,
-                                             unsigned int vcpu_index);
-
-If so, do we have some max number of threads we support? I suppose we
-could set max_vcpux to that number, and smp_cpus to 1, though I'm not
-sure if that would be helpful or not.
-
-> We could consider just asking plugins to deal with threads with their
-> own __thread variables but in that case we'd need to expose some sort of
-> thread exit/cleanup method so they can collect data from threads and
-> safely place it somewhere else - but I suspect that is a hairy
-> programming model to impose on plugins.
+>     iothread set_parameter poll_shrink 10
 >=20
-> So far all the example plugins have just used locks to serialise things
-> and it's not been too bad. I guess we could do with an example that
-> tries to use this information to get an idea of how grungy the interface
-> is. Perhaps exposing the vCPUs at this point is pointless and we should
-> just stick to TARGET_NAME for now?
+> The code is a little more complex, but a lot less repetative!
+>=20
 
-I'm not sure. I liked the idea of exposing the vCPUs because it
-theoretically allows you to allocate per-cpu things up front, which can
-be helpful... but maybe forcing users to deal with dynamically
-allocating everything will make for more resilient plugins anyway?
+OK=EF=BC=8C I will combine these in one command such as,
 
--Aaron
+    set_iothread_parameter iothread_id parameter_name value
+
+>> {
+>> diff --git a/hmp.c b/hmp.c
+>> index 56a3ed7375..87520bcc85 100644
+>> --- a/hmp.c
+>> +++ b/hmp.c
+>> @@ -2711,6 +2711,36 @@ void hmp_info_iothreads(Monitor *mon, const QDi=
+ct *qdict)
+>> qapi_free_IOThreadInfoList(info_list);
+>> }
+>>
+>> +void hmp_set_iothread_poll_max_ns(Monitor *mon, const QDict *qdict)
+>> +{
+>> + const char *iothread_id =3D qdict_get_str(qdict, "iothread_id");
+>> + int64_t poll_max_ns =3D qdict_get_int(qdict, "poll_max_ns");
+>> + Error *err =3D NULL;
+>> +
+>> + qmp_set_iothread_poll_param(iothread_id, "poll_max_ns", poll_max_ns,=
+ &err);
+>> + hmp_handle_error(mon, &err);
+>> +}
+>> +
+>> +void hmp_set_iothread_poll_grow(Monitor *mon, const QDict *qdict)
+>> +{
+>> + const char *iothread_id =3D qdict_get_str(qdict, "iothread_id");
+>> + int64_t poll_grow =3D qdict_get_int(qdict, "poll_grow");
+>> + Error *err =3D NULL;
+>> +
+>> + qmp_set_iothread_poll_param(iothread_id, "poll_grow", poll_grow, &er=
+r);
+>> + hmp_handle_error(mon, &err);
+>> +}
+>> +
+>> +void hmp_set_iothread_poll_shrink(Monitor *mon, const QDict *qdict)
+>> +{
+>> + const char *iothread_id =3D qdict_get_str(qdict, "iothread_id");
+>> + int64_t poll_shrink =3D qdict_get_int(qdict, "poll_shrink");
+>> + Error *err =3D NULL;
+>> +
+>> + qmp_set_iothread_poll_param(iothread_id, "poll_shrink", poll_shrink,=
+ &err);
+>> + hmp_handle_error(mon, &err);
+>> +}
+>> +
+>> void hmp_qom_list(Monitor *mon, const QDict *qdict)
+>> {
+>> const char *path =3D qdict_get_try_str(qdict, "path");
+>> diff --git a/hmp.h b/hmp.h
+>> index 43617f2646..8ce3b53556 100644
+>> --- a/hmp.h
+>> +++ b/hmp.h
+>> @@ -41,6 +41,9 @@ void hmp_info_pci(Monitor *mon, const QDict *qdict);
+>> void hmp_info_block_jobs(Monitor *mon, const QDict *qdict);
+>> void hmp_info_tpm(Monitor *mon, const QDict *qdict);
+>> void hmp_info_iothreads(Monitor *mon, const QDict *qdict);
+>> +void hmp_set_iothread_poll_max_ns(Monitor *mon, const QDict *qdict);
+>> +void hmp_set_iothread_poll_grow(Monitor *mon, const QDict *qdict);
+>> +void hmp_set_iothread_poll_shrink(Monitor *mon, const QDict *qdict);
+>> void hmp_quit(Monitor *mon, const QDict *qdict);
+>> void hmp_stop(Monitor *mon, const QDict *qdict);
+>> void hmp_sync_profile(Monitor *mon, const QDict *qdict);
+>> diff --git a/include/sysemu/iothread.h b/include/sysemu/iothread.h
+>> index 5f6240d5cb..7ebeb51f37 100644
+>> --- a/include/sysemu/iothread.h
+>> +++ b/include/sysemu/iothread.h
+>> @@ -45,6 +45,12 @@ char *iothread_get_id(IOThread *iothread);
+>> IOThread *iothread_by_id(const char *id);
+>> AioContext *iothread_get_aio_context(IOThread *iothread);
+>> GMainContext *iothread_get_g_main_context(IOThread *iothread);
+>> +void iothread_set_poll_max_ns(IOThread *iothread, int64_t poll_max_ns=
+);
+>> +int64_t iothread_get_poll_max_ns(IOThread *iothread);
+>> +void iothread_set_poll_grow(IOThread *iothread, int64_t poll_grow);
+>> +int64_t iothread_get_poll_grow(IOThread *iothread);
+>> +void iothread_set_poll_shrink(IOThread *iothread, int64_t poll_shrink=
+);
+>> +int64_t iothread_get_poll_shrink(IOThread *iothread);
+>>
+>> /*
+>> * Helpers used to allocate iothreads for internal use. These
+>> diff --git a/iothread.c b/iothread.c
+>> index 7130be58e3..4ab6128c5f 100644
+>> --- a/iothread.c
+>> +++ b/iothread.c
+>> @@ -384,3 +384,83 @@ IOThread *iothread_by_id(const char *id)
+>> {
+>> return IOTHREAD(object_resolve_path_type(id, TYPE_IOTHREAD, NULL));
+>> }
+>> +
+>> +void iothread_set_poll_max_ns(IOThread *iothread, int64_t poll_max_ns=
+)
+>> +{
+>> + iothread->poll_max_ns =3D poll_max_ns;
+>> +}
+>=20
+> Is the indentation correct here? It looks a bit off.
+>=20
+
+I will correct this.
+
+>> +int64_t iothread_get_poll_max_ns(IOThread *iothread)
+>> +{
+>> + return iothread->poll_max_ns;
+>> +}
+>> +
+>> +void iothread_set_poll_grow(IOThread *iothread, int64_t poll_grow)
+>> +{
+>> + iothread->poll_grow =3D poll_grow;
+>> +}
+>> +
+>> +int64_t iothread_get_poll_grow(IOThread *iothread)
+>> +{
+>> + return iothread->poll_grow;
+>> +}
+>> +
+>> +void iothread_set_poll_shrink(IOThread *iothread, int64_t poll_shrink=
+)
+>> +{
+>> + iothread->poll_shrink =3D poll_shrink;
+>> +}
+>> +
+>> +int64_t iothread_get_poll_shrink(IOThread *iothread)
+>> +{
+>> + return iothread->poll_shrink;
+>> +}
+>> +
+>> +void qmp_set_iothread_poll_param(const char *iothread_id, const char =
+*name,
+>> + int64_t value, Error **errp)
+>=20
+> OK, so you should split the patch into a qmp patch and and then an HMP
+> patch.
+> I'll leave the QMP review to others, but I'm guessing they'd prefer
+> to take a QAPI enum here rather than the name.
+>=20
+
+I will split the patch according your advice.
+
+> Are there some docs somewhere that describe what grow and shrink
+> actually are - are they % ?  If so, then you should range check
+> them to make sure someone doesn't set them to something silly like -5.
+>=20
+>=20
+
+They should be positive number. I will add type check in function.
+
+>> +{
+>> + Error *local_error =3D NULL;
+>> + int64_t old_value =3D 0;
+>> + IOThread *iothread =3D iothread_by_id(iothread_id);
+>> + if (!iothread) {
+>> + error_setg(errp, "can not find iothread: %s", iothread_id);
+>> + return;
+>> + }
+>> +
+>> + if (strcmp(name, "poll_max_ns") =3D=3D 0) {
+>> + old_value =3D iothread_get_poll_max_ns(iothread);
+>> + iothread_set_poll_max_ns(iothread, value);
+>> + } else if (strcmp(name, "poll_grow") =3D=3D 0) {
+>> + old_value =3D iothread_get_poll_grow(iothread);
+>> + iothread_set_poll_grow(iothread, value);
+>> + } else if (strcmp(name, "poll_shrink") =3D=3D 0) {
+>> + old_value =3D iothread_get_poll_shrink(iothread);
+>> + iothread_set_poll_shrink(iothread, value);
+>> + } else {
+>> + error_setg(errp, "can not find param name: %s", name);
+>> + return;
+>> + }
+>> +
+>> + /* update the value in context */
+>> + aio_context_set_poll_params(iothread->ctx,
+>> + iothread->poll_max_ns,
+>> + iothread->poll_grow,
+>> + iothread->poll_shrink,
+>> + &local_error);
+>> +
+>> + if (local_error) {
+>> + error_propagate(errp, local_error);
+>> +
+>> + /* reset the property to old value */
+>> + if (strcmp(name, "poll_max_ns") =3D=3D 0) {
+>> + iothread_set_poll_max_ns(iothread, old_value);
+>> + } else if (strcmp(name, "poll_grow") =3D=3D 0) {
+>> + iothread_set_poll_grow(iothread, old_value);
+>> + } else if (strcmp(name, "poll_shrink") =3D=3D 0) {
+>> + iothread_set_poll_shrink(iothread, old_value);
+>> + }
+>> +
+>> + return;
+>> + }
+>> +
+>> + return;
+>> +}
+>> diff --git a/qapi/misc.json b/qapi/misc.json
+>> index 8b3ca4fdd3..43d3f4351c 100644
+>> --- a/qapi/misc.json
+>> +++ b/qapi/misc.json
+>> @@ -675,6 +675,29 @@
+>> { 'command': 'query-iothreads', 'returns': ['IOThreadInfo'],
+>> 'allow-preconfig': true }
+>>
+>> +##
+>> +# @set-iothread-poll-param:
+>> +#
+>> +# Set poll-* properties for a special iothread.
+>> +# The poll-* name can be poll_max_ns/poll_grow/poll_shrink.
+>> +#
+>> +# Notes: can not set the QEMU main loop thread, which is not declared
+>> +# using the -object iothread command-line option. The poll_ns propert=
+y can not
+>> +# be set manually, which is auto-adjust.
+>> +#
+>> +# Example:
+>> +#
+>> +# -> { "execute": "set-iothread-poll-param",
+>> +# "arguments": { "iothread_id": "1",
+>> +# "name": "poll_max_ns",
+>> +# "value": 1000 } }
+>> +# <- { "return": {} }
+>> +#
+>> +# Since 3.0
+>=20
+> 3.0 was long long ago; needs updating.
+>=20
+
+I will update this to 4.1.0
+
+>> +##
+>> +{ 'command': 'set-iothread-poll-param',
+>> + 'data': {'iothread_id': 'str', 'name': 'str', 'value': 'int'} }
+>> +
+>> ##
+>> # @BalloonInfo:
+>> #
+>> --=20
+>> 2.22.0.windows.1
+>>
+> --
+> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+>=20
+>=20
+> .
+>=20
+
 
