@@ -2,61 +2,56 @@ Return-Path: <SRS0=tSBD=YP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7B6B4CA9EA0
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 07:31:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E135CA9EA0
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 07:40:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5328A205C9
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 07:31:07 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5328A205C9
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id E848521783
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 07:40:29 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E848521783
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51068 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51142 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iModG-0008H8-BB
-	for qemu-devel@archiver.kernel.org; Tue, 22 Oct 2019 03:31:06 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39352)
+	id 1iMomK-0004ux-QG
+	for qemu-devel@archiver.kernel.org; Tue, 22 Oct 2019 03:40:28 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40875)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <clg@kaod.org>) id 1iMoVj-0006fO-CG
- for qemu-devel@nongnu.org; Tue, 22 Oct 2019 03:23:20 -0400
+ (envelope-from <cathy.zhang@intel.com>) id 1iMol9-0003gg-Sn
+ for qemu-devel@nongnu.org; Tue, 22 Oct 2019 03:39:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <clg@kaod.org>) id 1iMoVi-0005lh-4s
- for qemu-devel@nongnu.org; Tue, 22 Oct 2019 03:23:19 -0400
-Received: from 5.mo4.mail-out.ovh.net ([188.165.44.50]:50711)
+ (envelope-from <cathy.zhang@intel.com>) id 1iMol8-00049a-3Z
+ for qemu-devel@nongnu.org; Tue, 22 Oct 2019 03:39:14 -0400
+Received: from mga11.intel.com ([192.55.52.93]:62444)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <clg@kaod.org>) id 1iMoVh-0005kl-Uz
- for qemu-devel@nongnu.org; Tue, 22 Oct 2019 03:23:18 -0400
-Received: from player786.ha.ovh.net (unknown [10.109.160.230])
- by mo4.mail-out.ovh.net (Postfix) with ESMTP id E195F20C911
- for <qemu-devel@nongnu.org>; Tue, 22 Oct 2019 09:23:15 +0200 (CEST)
-Received: from kaod.org (lfbn-1-2229-223.w90-76.abo.wanadoo.fr [90.76.50.223])
- (Authenticated sender: clg@kaod.org)
- by player786.ha.ovh.net (Postfix) with ESMTPSA id 36FF6B518B08;
- Tue, 22 Oct 2019 07:23:10 +0000 (UTC)
-From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
-To: David Gibson <david@gibson.dropbear.id.au>
-Subject: [PATCH v3 2/4] spapr_cpu_core: Implement DeviceClass::reset
-Date: Tue, 22 Oct 2019 09:22:44 +0200
-Message-Id: <20191022072246.9200-3-clg@kaod.org>
-X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20191022072246.9200-1-clg@kaod.org>
-References: <20191022072246.9200-1-clg@kaod.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-X-Ovh-Tracer-Id: 12565887388731542502
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrkeeigdduudelucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddm
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 188.165.44.50
+ (Exim 4.71) (envelope-from <cathy.zhang@intel.com>)
+ id 1iMol7-00045e-Ru
+ for qemu-devel@nongnu.org; Tue, 22 Oct 2019 03:39:14 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga001.fm.intel.com ([10.253.24.23])
+ by fmsmga102.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
+ 22 Oct 2019 00:39:05 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.67,326,1566889200"; d="scan'208";a="209615694"
+Received: from unknown (HELO localhost.localdomain.bj.intel.com)
+ ([10.238.156.101])
+ by fmsmga001.fm.intel.com with ESMTP; 22 Oct 2019 00:39:03 -0700
+From: Cathy Zhang <cathy.zhang@intel.com>
+To: qemu-devel@nongnu.org
+Subject: [Resend PATCH 0/3] Add CPU model for intel processor Cooper Lake
+Date: Tue, 22 Oct 2019 15:35:25 +0800
+Message-Id: <1571729728-23284-1-git-send-email-cathy.zhang@intel.com>
+X-Mailer: git-send-email 1.8.3.1
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 192.55.52.93
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -68,125 +63,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>, qemu-ppc@nongnu.org,
- qemu-devel@nongnu.org, Greg Kurz <groug@kaod.org>
+Cc: Cathy Zhang <cathy.zhang@intel.com>, pbonzini@redhat.com,
+ ehabkost@redhat.com, rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Greg Kurz <groug@kaod.org>
+This patchset is to add CPU model for intel processor Cooper Lake. It
+will inherit features from the existing CPU model Cascadelake-Server,
+meanwhile, add the platform associated new instruction and feature
+for speculative execution which the host supports. There are associated
+feature bit and macro defined here as needed.
 
-Since vCPUs aren't plugged into a bus, we manually register a reset
-handler for each vCPU. We also call this handler at realize time
-to ensure hot plugged vCPUs are reset before being exposed to the
-guest. This results in vCPUs being reset twice at machine reset.
-It doesn't break anything but it is slightly suboptimal and above
-all confusing.
+Cathy Zhang (3):
+  i386: Add MSR feature bit for MDS-NO
+  i386: Add macro for stibp
+  i386: Add new CPU model Cooperlake
 
-The hotplug path in device_set_realized() already knows how to reset
-a hotplugged device if the device reset handler is present. Implement
-one for sPAPR CPU cores that resets all vCPUs under a core.
+ target/i386/cpu.c | 60 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ target/i386/cpu.h |  3 +++
+ 2 files changed, 63 insertions(+)
 
-While here rename spapr_cpu_reset() to spapr_reset_vcpu() for
-consistency with spapr_realize_vcpu() and spapr_unrealize_vcpu().
-
-Signed-off-by: Greg Kurz <groug@kaod.org>
-Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
----
- hw/ppc/spapr_cpu_core.c | 31 ++++++++++++++++++++++---------
- 1 file changed, 22 insertions(+), 9 deletions(-)
-
-diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
-index 992f00da6540..5947e39b36ad 100644
---- a/hw/ppc/spapr_cpu_core.c
-+++ b/hw/ppc/spapr_cpu_core.c
-@@ -25,9 +25,8 @@
- #include "sysemu/hw_accel.h"
- #include "qemu/error-report.h"
-=20
--static void spapr_cpu_reset(void *opaque)
-+static void spapr_reset_vcpu(PowerPCCPU *cpu)
- {
--    PowerPCCPU *cpu =3D opaque;
-     CPUState *cs =3D CPU(cpu);
-     CPUPPCState *env =3D &cpu->env;
-     PowerPCCPUClass *pcc =3D POWERPC_CPU_GET_CLASS(cpu);
-@@ -193,7 +192,6 @@ static void spapr_unrealize_vcpu(PowerPCCPU *cpu, Spa=
-prCpuCore *sc)
-     if (!sc->pre_3_0_migration) {
-         vmstate_unregister(NULL, &vmstate_spapr_cpu_state, cpu->machine_=
-data);
-     }
--    qemu_unregister_reset(spapr_cpu_reset, cpu);
-     if (spapr_cpu_state(cpu)->icp) {
-         object_unparent(OBJECT(spapr_cpu_state(cpu)->icp));
-     }
-@@ -204,12 +202,30 @@ static void spapr_unrealize_vcpu(PowerPCCPU *cpu, S=
-paprCpuCore *sc)
-     object_unparent(OBJECT(cpu));
- }
-=20
-+static void spapr_cpu_core_reset(DeviceState *dev)
-+{
-+    CPUCore *cc =3D CPU_CORE(dev);
-+    SpaprCpuCore *sc =3D SPAPR_CPU_CORE(dev);
-+    int i;
-+
-+    for (i =3D 0; i < cc->nr_threads; i++) {
-+        spapr_reset_vcpu(sc->threads[i]);
-+    }
-+}
-+
-+static void spapr_cpu_core_reset_handler(void *opaque)
-+{
-+    spapr_cpu_core_reset(opaque);
-+}
-+
- static void spapr_cpu_core_unrealize(DeviceState *dev, Error **errp)
- {
-     SpaprCpuCore *sc =3D SPAPR_CPU_CORE(OBJECT(dev));
-     CPUCore *cc =3D CPU_CORE(dev);
-     int i;
-=20
-+    qemu_unregister_reset(spapr_cpu_core_reset_handler, sc);
-+
-     for (i =3D 0; i < cc->nr_threads; i++) {
-         spapr_unrealize_vcpu(sc->threads[i], sc);
-     }
-@@ -238,12 +254,6 @@ static void spapr_realize_vcpu(PowerPCCPU *cpu, Spap=
-rMachineState *spapr,
-         goto error_intc_create;
-     }
-=20
--    /*
--     * FIXME: Hot-plugged CPUs are not reseted. Do it at realize.
--     */
--    qemu_register_reset(spapr_cpu_reset, cpu);
--    spapr_cpu_reset(cpu);
--
-     if (!sc->pre_3_0_migration) {
-         vmstate_register(NULL, cs->cpu_index, &vmstate_spapr_cpu_state,
-                          cpu->machine_data);
-@@ -338,6 +348,8 @@ static void spapr_cpu_core_realize(DeviceState *dev, =
-Error **errp)
-             goto err_unrealize;
-         }
-     }
-+
-+    qemu_register_reset(spapr_cpu_core_reset_handler, sc);
-     return;
-=20
- err_unrealize:
-@@ -366,6 +378,7 @@ static void spapr_cpu_core_class_init(ObjectClass *oc=
-, void *data)
-=20
-     dc->realize =3D spapr_cpu_core_realize;
-     dc->unrealize =3D spapr_cpu_core_unrealize;
-+    dc->reset =3D spapr_cpu_core_reset;
-     dc->props =3D spapr_cpu_core_properties;
-     scc->cpu_type =3D data;
- }
---=20
-2.21.0
+-- 
+1.8.3.1
 
 
