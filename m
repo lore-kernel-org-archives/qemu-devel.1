@@ -2,58 +2,88 @@ Return-Path: <SRS0=tSBD=YP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	UPPERCASE_50_75,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BB0C8CA9EA0
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 07:42:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F80DCA9EA0
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 07:46:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8FFBD21783
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 07:42:16 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8FFBD21783
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id F15E220640
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 07:46:06 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F15E220640
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51156 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51174 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iMoo3-0006rM-RJ
-	for qemu-devel@archiver.kernel.org; Tue, 22 Oct 2019 03:42:15 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40884)
+	id 1iMorm-0008Ho-64
+	for qemu-devel@archiver.kernel.org; Tue, 22 Oct 2019 03:46:06 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41355)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <cathy.zhang@intel.com>) id 1iMol9-0003gj-UT
- for qemu-devel@nongnu.org; Tue, 22 Oct 2019 03:39:17 -0400
+ (envelope-from <pbonzini@redhat.com>) id 1iMor4-0007l6-P4
+ for qemu-devel@nongnu.org; Tue, 22 Oct 2019 03:45:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <cathy.zhang@intel.com>) id 1iMol8-00049q-Id
- for qemu-devel@nongnu.org; Tue, 22 Oct 2019 03:39:15 -0400
-Received: from mga11.intel.com ([192.55.52.93]:62449)
+ (envelope-from <pbonzini@redhat.com>) id 1iMor2-00077x-Fv
+ for qemu-devel@nongnu.org; Tue, 22 Oct 2019 03:45:21 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46336)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <cathy.zhang@intel.com>)
- id 1iMol8-00047q-9w
- for qemu-devel@nongnu.org; Tue, 22 Oct 2019 03:39:14 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga001.fm.intel.com ([10.253.24.23])
- by fmsmga102.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
- 22 Oct 2019 00:39:08 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.67,326,1566889200"; d="scan'208";a="209615716"
-Received: from unknown (HELO localhost.localdomain.bj.intel.com)
- ([10.238.156.101])
- by fmsmga001.fm.intel.com with ESMTP; 22 Oct 2019 00:39:07 -0700
-From: Cathy Zhang <cathy.zhang@intel.com>
-To: qemu-devel@nongnu.org
-Subject: [Resend PATCH 3/3] i386: Add new CPU model Cooperlake
-Date: Tue, 22 Oct 2019 15:35:28 +0800
-Message-Id: <1571729728-23284-4-git-send-email-cathy.zhang@intel.com>
-X-Mailer: git-send-email 1.8.3.1
-In-Reply-To: <1571729728-23284-1-git-send-email-cathy.zhang@intel.com>
-References: <1571729728-23284-1-git-send-email-cathy.zhang@intel.com>
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 192.55.52.93
+ (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1iMor2-00077P-AP
+ for qemu-devel@nongnu.org; Tue, 22 Oct 2019 03:45:20 -0400
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id C58CF368B1
+ for <qemu-devel@nongnu.org>; Tue, 22 Oct 2019 07:45:18 +0000 (UTC)
+Received: by mail-wr1-f70.google.com with SMTP id o10so8668486wrm.22
+ for <qemu-devel@nongnu.org>; Tue, 22 Oct 2019 00:45:18 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=3DkJU6qVIwd1CHHmHQXJNsVx04oduLw/xo3uOgt1ReA=;
+ b=bPjeAAI9cq41ZeTITvmmwmSSA6eLzA1zpmyGfDE8TidZcsaPdApaoQ+BmupPGNmNkt
+ a9COpg3IHXAV3qn7fknH+ZVmaI1UVivMvMQn0gOPIK3GwMeqSKTYOmvg60FlPhbc6k+H
+ v2apCzFun/7nlm3U42vIWmp9A5eUTWmcrHVMvZkRbcBuybOfRb1XzsrwR38tT7KcGB2t
+ XpObv/4WAEOct1NKT/B6Z0kPL9VFA3ZQjcR3IfR8iopxyGZOWYkgLeRFiVL2jEfOhWW/
+ lWX0HiwttN7R1lzIyQxjFB30uiOTH22Gc4+blIv7GmB2JZyXkgvWT6i1bjIiq1JB5+Kk
+ Qx6Q==
+X-Gm-Message-State: APjAAAW7jT/yb7HSk4EvVCxErnqqG2e3B861fZj2klpDaGI4MQbbhH/f
+ 7T8JlduS3DCVTO9SGwJGI2mVQOc7cCCuaGgtjVfauijff2y6NiHl5hBufYkRnwrPZ1OTi/PZR/9
+ P7bsKie+SCWxZYXk=
+X-Received: by 2002:a1c:f018:: with SMTP id a24mr1590268wmb.77.1571730317499; 
+ Tue, 22 Oct 2019 00:45:17 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqyY1Gwd1ZKN0g6tgokY/JEmQV3ZcC2ofjvV/plzRPmTCcaz0DEaXlGEU/RUvGOROTzgFI7BdA==
+X-Received: by 2002:a1c:f018:: with SMTP id a24mr1590248wmb.77.1571730317250; 
+ Tue, 22 Oct 2019 00:45:17 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:566:fc24:94f2:2f13?
+ ([2001:b07:6468:f312:566:fc24:94f2:2f13])
+ by smtp.gmail.com with ESMTPSA id f17sm5761230wrs.66.2019.10.22.00.45.16
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Tue, 22 Oct 2019 00:45:16 -0700 (PDT)
+Subject: Re: [Patch v2] checkpatch: sugguest to use qemu_real_host_page_size
+ instead of getpagesize() or sysconf(_SC_PAGESIZE)
+To: Wei Yang <richardw.yang@linux.intel.com>, philmd@redhat.com,
+ eblake@redhat.com, thuth@redhat.com, berrange@redhat.com
+References: <20191017004633.13229-1-richardw.yang@linux.intel.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Openpgp: preference=signencrypt
+Message-ID: <0c72a7a3-7d0d-4052-33b4-7a7522fe8a02@redhat.com>
+Date: Tue, 22 Oct 2019 09:45:16 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
+MIME-Version: 1.0
+In-Reply-To: <20191017004633.13229-1-richardw.yang@linux.intel.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -65,96 +95,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Cathy Zhang <cathy.zhang@intel.com>, pbonzini@redhat.com,
- ehabkost@redhat.com, rth@twiddle.net
+Cc: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org,
+ Stefan Hajnoczi <stefanha@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Cooper Lake is intel's successor to Cascade Lake, the new
-CPU model inherits features from Cascadelake-Server, while
-add one platform associated new feature: AVX512_BF16. Meanwhile,
-add STIBP for speculative execution.
+On 17/10/19 02:46, Wei Yang wrote:
+> Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
+> CC: Richard Henderson <richard.henderson@linaro.org>
+> CC: Stefan Hajnoczi <stefanha@redhat.com>
+> 
+> ---
+> v2: add "\b" for better match, suggested by Richard Henderson <richard.henderson@linaro.org>
+> ---
+>  scripts/checkpatch.pl | 6 ++++++
+>  1 file changed, 6 insertions(+)
+> 
+> diff --git a/scripts/checkpatch.pl b/scripts/checkpatch.pl
+> index aa9a354a0e..ab68a16fd2 100755
+> --- a/scripts/checkpatch.pl
+> +++ b/scripts/checkpatch.pl
+> @@ -2915,6 +2915,12 @@ sub process {
+>  		if ($line =~ /\bbzero\(/) {
+>  			ERROR("use memset() instead of bzero()\n" . $herecurr);
+>  		}
+> +		if ($line =~ /\bgetpagesize\(\)/) {
+> +			ERROR("use qemu_real_host_page_size instead of getpagesize()\n" . $herecurr);
+> +		}
+> +		if ($line =~ /\bsysconf\(_SC_PAGESIZE\)/) {
+> +			ERROR("use qemu_real_host_page_size instead of sysconf(_SC_PAGESIZE)\n" . $herecurr);
+> +		}
+>  		my $non_exit_glib_asserts = qr{g_assert_cmpstr|
+>  						g_assert_cmpint|
+>  						g_assert_cmpuint|
+> 
 
-Signed-off-by: Cathy Zhang <cathy.zhang@intel.com>
-Reviewed-by: Xiaoyao Li <xiaoyao.li@intel.com>
-Reviewed-by: Tao Xu <tao3.xu@intel.com>
----
- target/i386/cpu.c | 60 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 60 insertions(+)
+Queued, thanks.
 
-diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-index 44f1bbd..630a190 100644
---- a/target/i386/cpu.c
-+++ b/target/i386/cpu.c
-@@ -2612,6 +2612,66 @@ static X86CPUDefinition builtin_x86_defs[] = {
-         }
-     },
-     {
-+        .name = "Cooperlake",
-+        .level = 0xd,
-+        .vendor = CPUID_VENDOR_INTEL,
-+        .family = 6,
-+        .model = 85,
-+        .stepping = 10,
-+        .features[FEAT_1_EDX] =
-+            CPUID_VME | CPUID_SSE2 | CPUID_SSE | CPUID_FXSR | CPUID_MMX |
-+            CPUID_CLFLUSH | CPUID_PSE36 | CPUID_PAT | CPUID_CMOV | CPUID_MCA |
-+            CPUID_PGE | CPUID_MTRR | CPUID_SEP | CPUID_APIC | CPUID_CX8 |
-+            CPUID_MCE | CPUID_PAE | CPUID_MSR | CPUID_TSC | CPUID_PSE |
-+            CPUID_DE | CPUID_FP87,
-+        .features[FEAT_1_ECX] =
-+            CPUID_EXT_AVX | CPUID_EXT_XSAVE | CPUID_EXT_AES |
-+            CPUID_EXT_POPCNT | CPUID_EXT_X2APIC | CPUID_EXT_SSE42 |
-+            CPUID_EXT_SSE41 | CPUID_EXT_CX16 | CPUID_EXT_SSSE3 |
-+            CPUID_EXT_PCLMULQDQ | CPUID_EXT_SSE3 |
-+            CPUID_EXT_TSC_DEADLINE_TIMER | CPUID_EXT_FMA | CPUID_EXT_MOVBE |
-+            CPUID_EXT_PCID | CPUID_EXT_F16C | CPUID_EXT_RDRAND,
-+        .features[FEAT_8000_0001_EDX] =
-+            CPUID_EXT2_LM | CPUID_EXT2_PDPE1GB | CPUID_EXT2_RDTSCP |
-+            CPUID_EXT2_NX | CPUID_EXT2_SYSCALL,
-+        .features[FEAT_8000_0001_ECX] =
-+            CPUID_EXT3_ABM | CPUID_EXT3_LAHF_LM | CPUID_EXT3_3DNOWPREFETCH,
-+        .features[FEAT_7_0_EBX] =
-+            CPUID_7_0_EBX_FSGSBASE | CPUID_7_0_EBX_BMI1 |
-+            CPUID_7_0_EBX_HLE | CPUID_7_0_EBX_AVX2 | CPUID_7_0_EBX_SMEP |
-+            CPUID_7_0_EBX_BMI2 | CPUID_7_0_EBX_ERMS | CPUID_7_0_EBX_INVPCID |
-+            CPUID_7_0_EBX_RTM | CPUID_7_0_EBX_RDSEED | CPUID_7_0_EBX_ADX |
-+            CPUID_7_0_EBX_SMAP | CPUID_7_0_EBX_CLWB |
-+            CPUID_7_0_EBX_AVX512F | CPUID_7_0_EBX_AVX512DQ |
-+            CPUID_7_0_EBX_AVX512BW | CPUID_7_0_EBX_AVX512CD |
-+            CPUID_7_0_EBX_AVX512VL | CPUID_7_0_EBX_CLFLUSHOPT,
-+        .features[FEAT_7_0_ECX] =
-+            CPUID_7_0_ECX_PKU |
-+            CPUID_7_0_ECX_AVX512VNNI,
-+        .features[FEAT_7_0_EDX] =
-+            CPUID_7_0_EDX_SPEC_CTRL | CPUID_7_0_EDX_STIBP |
-+            CPUID_7_0_EDX_SPEC_CTRL_SSBD | CPUID_7_0_EDX_ARCH_CAPABILITIES,
-+        .features[FEAT_ARCH_CAPABILITIES] =
-+            MSR_ARCH_CAP_RDCL_NO | MSR_ARCH_CAP_IBRS_ALL |
-+            MSR_ARCH_CAP_SKIP_L1DFL_VMENTRY | MSR_ARCH_CAP_MDS_NO,
-+        .features[FEAT_7_1_EAX] =
-+            CPUID_7_1_EAX_AVX512_BF16,
-+        /*
-+         * Missing: XSAVES (not supported by some Linux versions,
-+         * including v4.1 to v4.12).
-+         * KVM doesn't yet expose any XSAVES state save component,
-+         * and the only one defined in Skylake (processor tracing)
-+         * probably will block migration anyway.
-+         */
-+        .features[FEAT_XSAVE] =
-+            CPUID_XSAVE_XSAVEOPT | CPUID_XSAVE_XSAVEC |
-+            CPUID_XSAVE_XGETBV1,
-+        .features[FEAT_6_EAX] =
-+            CPUID_6_EAX_ARAT,
-+        .xlevel = 0x80000008,
-+        .model_id = "Intel Xeon Processor (Cooperlake)",
-+    },
-+    {
-         .name = "Icelake-Client",
-         .level = 0xd,
-         .vendor = CPUID_VENDOR_INTEL,
--- 
-1.8.3.1
-
+Paolo
 
