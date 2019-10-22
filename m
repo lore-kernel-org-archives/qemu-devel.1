@@ -2,84 +2,84 @@ Return-Path: <SRS0=tSBD=YP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DEFF4CA9EA0
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 21:25:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A0862CA9EA0
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 21:45:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A35532084B
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 21:25:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 54B2D20679
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 21:45:17 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=berkeley-edu.20150623.gappssmtp.com header.i=@berkeley-edu.20150623.gappssmtp.com header.b="cVTdazFl"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A35532084B
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=berkeley.edu
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aFCksAJE"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 54B2D20679
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45508 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46072 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iN1eR-0002XJ-CT
-	for qemu-devel@archiver.kernel.org; Tue, 22 Oct 2019 17:25:11 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51524)
+	id 1iN1xs-0000aO-EU
+	for qemu-devel@archiver.kernel.org; Tue, 22 Oct 2019 17:45:16 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53944)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dayeol@berkeley.edu>) id 1iN1b1-0000bj-2m
- for qemu-devel@nongnu.org; Tue, 22 Oct 2019 17:21:40 -0400
+ (envelope-from <ehabkost@redhat.com>) id 1iN1x5-00006J-UL
+ for qemu-devel@nongnu.org; Tue, 22 Oct 2019 17:44:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dayeol@berkeley.edu>) id 1iN1az-0001ei-Fk
- for qemu-devel@nongnu.org; Tue, 22 Oct 2019 17:21:38 -0400
-Received: from mail-qt1-x842.google.com ([2607:f8b0:4864:20::842]:41024)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <dayeol@berkeley.edu>) id 1iN1az-0001eN-5p
- for qemu-devel@nongnu.org; Tue, 22 Oct 2019 17:21:37 -0400
-Received: by mail-qt1-x842.google.com with SMTP id c17so26077522qtn.8
- for <qemu-devel@nongnu.org>; Tue, 22 Oct 2019 14:21:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=berkeley-edu.20150623.gappssmtp.com; s=20150623;
- h=from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=4ciWYO+JQTfvwrYJqiccgIFokh0umLIjCGNk8VTvZkI=;
- b=cVTdazFlt+E+xN+sUem5370SgcTGwyhjVxJXbzsYy5by9y4njNglJcHtu5y8/bCCo4
- zH3mOFyd9FNKLwkhqVHzDkEi2P/yryiJ0of76nnqxTUFoAYWpXE5Mr1UZKzjez4E0BOd
- lqrlYqirqnyc1aXGMbQwsiTV85oPWafEVzjCedjHurVnBmPA8e6D4hOj5cekY2OmmJIQ
- 6nX9Xrfl3gFQ0hTlIQrK858UdOBWept0FA9qnCnIk3ZBCbaUjdMDAFBEC1mTK95Wh+42
- +Ya05P/CM77DB3u9Cfg8tAQOUj+hC4FvIPbUJZ3CfO0RiU2TETaBiGXzc9Ri89HbP3vw
- kFxg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=4ciWYO+JQTfvwrYJqiccgIFokh0umLIjCGNk8VTvZkI=;
- b=Q6XbG/uOIZUEi7RvX691bNZzTcpJeUM+ZE7ojCcyYQnFRyT3j59GblN50yYogNUgV5
- X/G4kKLwPLyGH4vvvmtxUoAyvElQCO4feYsE+luczfGPnM3QMY28qf/U6KiUMbyqJMv4
- 9hbP5yhqaVQejrje9egwNmQFpUnqoEoQWJImERehRpmGUuAhApLWMzA02RMSt8590dQS
- AshK9vtjRmuQOM1B87+14vpevBY1ptL12Zn640PclGF2kxHXPBoCs/n623Nwo0m4ioD7
- sU2nGQcN/faeaUI7J9P0+YLe5zVAc7CTOLMwVdgrZmKcLhJNeZdnCmvgypLByIeDzEHq
- +h/Q==
-X-Gm-Message-State: APjAAAWC+TDcu1pEGzhhJlo7wkFHcY/dgtO7rSVB8JWATkOzChDfaH8N
- rxZrMB/8AVwPMJMCQ1xzc8AZXPh8Im1Zkw==
-X-Google-Smtp-Source: APXvYqwsdr6ZhYJ8iiAjz/Hg+tgGmCI7x+R7tbcmQgArv30Q09txhTI2OVFfcCfN2iRTQPqYmh99Lg==
-X-Received: by 2002:ac8:73cf:: with SMTP id v15mr1610041qtp.310.1571779295221; 
- Tue, 22 Oct 2019 14:21:35 -0700 (PDT)
-Received: from ip-172-31-33-50.ec2.internal
- (ec2-34-206-44-154.compute-1.amazonaws.com. [34.206.44.154])
- by smtp.gmail.com with ESMTPSA id z5sm9625014qkl.101.2019.10.22.14.21.34
- (version=TLS1_2 cipher=ECDHE-RSA-AES128-SHA bits=128/128);
- Tue, 22 Oct 2019 14:21:34 -0700 (PDT)
-From: Dayeol Lee <dayeol@berkeley.edu>
-To: qemu-devel@nongnu.org
-Subject: [PATCH] target/riscv: PMP violation due to wrong size parameter
-Date: Tue, 22 Oct 2019 21:21:29 +0000
-Message-Id: <20191022212129.8452-1-dayeol@berkeley.edu>
-X-Mailer: git-send-email 2.23.0
+ (envelope-from <ehabkost@redhat.com>) id 1iN1x3-0007RJ-9a
+ for qemu-devel@nongnu.org; Tue, 22 Oct 2019 17:44:26 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:26765
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1iN1x3-0007Qn-5W
+ for qemu-devel@nongnu.org; Tue, 22 Oct 2019 17:44:25 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1571780664;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=PKEnwwvZkBoKQkKjGLBuPW/9OyQ9zYCnXgLkDtHA/wU=;
+ b=aFCksAJEuXcAYCOB/HflqKJ99Q9hnQunhOv5UOimbRnSlYV2FHp6nO9buk326Y62Biq/xS
+ BI/6w8JYgfmpQ7cGiWkPTuurcXLJhwOTytO4R3QFgU9IbkjTl7iuyLRIfblD+X8JWdRsyc
+ CCJbgexCpUObpBYosM9pa/WKkoQ1VYU=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-342-BzegCTQAPeCZk_lTI7ZwPA-1; Tue, 22 Oct 2019 17:44:20 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2A938476;
+ Tue, 22 Oct 2019 21:44:19 +0000 (UTC)
+Received: from localhost (ovpn-116-104.gru2.redhat.com [10.97.116.104])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 807745DA32;
+ Tue, 22 Oct 2019 21:44:18 +0000 (UTC)
+Date: Tue, 22 Oct 2019 18:44:17 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+To: "Kang, Luwei" <luwei.kang@intel.com>
+Subject: Re: [PATCH v4 2/2] i386: Add support to get/set/migrate Intel
+ Processor Trace feature
+Message-ID: <20191022214416.GA21651@habkost.net>
+References: <1520182116-16485-1-git-send-email-luwei.kang@intel.com>
+ <1520182116-16485-2-git-send-email-luwei.kang@intel.com>
+ <20191012031407.GK4084@habkost.net>
+ <82D7661F83C1A047AF7DC287873BF1E17382A209@SHSMSX104.ccr.corp.intel.com>
+ <20191015132929.GY4084@habkost.net>
+ <82D7661F83C1A047AF7DC287873BF1E17382BB76@SHSMSX104.ccr.corp.intel.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::842
+In-Reply-To: <82D7661F83C1A047AF7DC287873BF1E17382BB76@SHSMSX104.ccr.corp.intel.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-MC-Unique: BzegCTQAPeCZk_lTI7ZwPA-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=WINDOWS-1252
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,68 +91,100 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "open list:RISC-V TCG CPUs" <qemu-riscv@nongnu.org>,
- Sagar Karandikar <sagark@eecs.berkeley.edu>, Dayeol Lee <dayeol@berkeley.edu>,
- Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
- Palmer Dabbelt <palmer@sifive.com>,
- Richard Henderson <richard.henderson@linaro.org>,
- Alistair Francis <Alistair.Francis@wdc.com>, diodesign@tuta.io
+Cc: "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+ "mtosatti@redhat.com" <mtosatti@redhat.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ Chao Peng <chao.p.peng@linux.intel.com>,
+ "pbonzini@redhat.com" <pbonzini@redhat.com>,
+ "rth@twiddle.net" <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-riscv_cpu_tlb_fill() uses the `size` parameter to check PMP violation
-using pmp_hart_has_privs().
-However, if the size is unknown (=0), the ending address will be
-`addr - 1` as it is `addr + size - 1` in `pmp_hart_has_privs()`.
-This always causes a false PMP violation on the starting address of the
-range, as `addr - 1` is not in the range.
+On Mon, Oct 21, 2019 at 06:02:28AM +0000, Kang, Luwei wrote:
+> > > > > f9f4cd1..097c953 100644
+> > > > > --- a/target/i386/kvm.c
+> > > > > +++ b/target/i386/kvm.c
+> > > > > @@ -1811,6 +1811,25 @@ static int kvm_put_msrs(X86CPU *cpu, int l=
+evel)
+> > > > >                  kvm_msr_entry_add(cpu, MSR_MTRRphysMask(i), mask=
+);
+> > > > >              }
+> > > > >          }
+> > > > > +        if (env->features[FEAT_7_0_EBX] & CPUID_7_0_EBX_INTEL_PT=
+) {
+> > > > > +            int addr_num =3D kvm_arch_get_supported_cpuid(kvm_st=
+ate,
+> > > > > +                                                    0x14, 1,
+> > > > > + R_EAX) & 0x7;
+> > > > > +
+> > > > > +            kvm_msr_entry_add(cpu, MSR_IA32_RTIT_CTL,
+> > > > > +                            env->msr_rtit_ctrl);
+> > > > > +            kvm_msr_entry_add(cpu, MSR_IA32_RTIT_STATUS,
+> > > > > +                            env->msr_rtit_status);
+> > > > > +            kvm_msr_entry_add(cpu, MSR_IA32_RTIT_OUTPUT_BASE,
+> > > > > +                            env->msr_rtit_output_base);
+> > > >
+> > > > This causes the following crash on some hosts:
+> > > >
+> > > >   qemu-system-x86_64: error: failed to set MSR 0x560 to 0x0
+> > > >   qemu-system-x86_64: target/i386/kvm.c:2673: kvm_put_msrs: Asserti=
+on `ret =3D=3D cpu->kvm_msr_buf->nmsrs' failed.
+> > > >
+> > > > Checking for CPUID_7_0_EBX_INTEL_PT is not enough: KVM has
+> > > > additional conditions that might prevent writing to this MSR (PT_CA=
+P_topa_output && PT_CAP_single_range_output).  This
+> > causes QEMU to crash if some of the conditions aren't met.
+> > > >
+> > > > Writing and reading this MSR (and the ones below) need to be condit=
+ional on KVM_GET_MSR_INDEX_LIST.
+> > > >
+> > >
+> > > Hi Eduardo,
+> > >     I found this issue can't be reproduced in upstream source code bu=
+t can be reproduced on RHEL8.1. I haven't got the qemu source
+> > code of RHEL8.1. But after adding some trace in KVM, I found the KVM ha=
+s reported the complete Intel PT CPUID information to qemu
+> > but the Intel PT CPUID (0x14) is lost when qemu setting the CPUID to KV=
+M (cpuid level is 0xd). It looks like lost the below patch.
+> > >
+> > > commit f24c3a79a415042f6dc195f029a2ba7247d14cac
+> > > Author: Luwei Kang <luwei.kang@intel.com>
+> > > Date:   Tue Jan 29 18:52:59 2019 -0500
+> > >     i386: extended the cpuid_level when Intel PT is enabled
+> > >
+> > >     Intel Processor Trace required CPUID[0x14] but the cpuid_level
+> > >     have no change when create a kvm guest with
+> > >     e.g. "-cpu qemu64,+intel-pt".
+> >=20
+> > Thanks for the pointer.  This may avoid triggering the bug in the defau=
+lt configuration, but we still need to make the MSR writing
+> > conditional on KVM_GET_MSR_INDEX_LIST.  Older machine-types have x-inte=
+l-pt-auto-level=3Doff, and the user may set `level`
+> > manually.
+>=20
+> Hi Eduardo,
+> Sorry for a delay reply because my mail filter. I tried with
+> the Q35 machine type and default, all looks work well (With
+> some old cpu type + "intel_pt" also work well).  KVM will check
+> the Intel PT work mode and HW to decide if Intel PT can be
+> exposed to guest, only extended the CPUID level is useless. If
+> the guest doesn't support Intel PT, any MSR read or write will
+> cause #GP. Please remind me if I lost something.
 
-In order to fix, we just assume that all bytes from addr to the end of
-the page will be accessed if the size is unknown.
+I understand you have tried q35 and pc, but have you tried with
+older machine-type versions?
 
-Signed-off-by: Dayeol Lee <dayeol@berkeley.edu>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
----
- target/riscv/pmp.c | 13 ++++++++++++-
- 1 file changed, 12 insertions(+), 1 deletion(-)
+Commit f24c3a79a415 doesn't change behavior on pc-*-3.1 and
+older, so it only avoids triggering the crash in the default
+case.  Doesn't QEMU crash if running:
+"-cpu qemu64,+intel-pt -machine pc-i440fx-3.1"?
 
-diff --git a/target/riscv/pmp.c b/target/riscv/pmp.c
-index 958c7502a0..7a9fd415ba 100644
---- a/target/riscv/pmp.c
-+++ b/target/riscv/pmp.c
-@@ -232,6 +232,7 @@ bool pmp_hart_has_privs(CPURISCVState *env, target_ulong addr,
- {
-     int i = 0;
-     int ret = -1;
-+    int pmp_size = 0;
-     target_ulong s = 0;
-     target_ulong e = 0;
-     pmp_priv_t allowed_privs = 0;
-@@ -241,11 +242,21 @@ bool pmp_hart_has_privs(CPURISCVState *env, target_ulong addr,
-         return true;
-     }
- 
-+    /*
-+     * if size is unknown (0), assume that all bytes
-+     * from addr to the end of the page will be accessed.
-+     */
-+    if (size == 0) {
-+        pmp_size = -(addr | TARGET_PAGE_MASK);
-+    } else {
-+        pmp_size = size;
-+    }
-+
-     /* 1.10 draft priv spec states there is an implicit order
-          from low to high */
-     for (i = 0; i < MAX_RISCV_PMPS; i++) {
-         s = pmp_is_in_range(env, i, addr);
--        e = pmp_is_in_range(env, i, addr + size - 1);
-+        e = pmp_is_in_range(env, i, addr + pmp_size - 1);
- 
-         /* partially inside */
-         if ((s + e) == 1) {
--- 
-2.23.0
+KVM rejecting MSR writes when something is missing is correct.
+QEMU trying to write the MSR when something is missing (and
+crashing because of that) is a bug.
+
+--=20
+Eduardo
 
 
