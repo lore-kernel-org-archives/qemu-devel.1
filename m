@@ -2,74 +2,55 @@ Return-Path: <SRS0=tSBD=YP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C3351CA9EA0
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 13:07:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 20014CA9EA0
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 13:08:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9712D2184C
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 13:07:40 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9712D2184C
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id D74702184C
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 13:08:01 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D74702184C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56054 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56058 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iMtsx-0006xu-8U
-	for qemu-devel@archiver.kernel.org; Tue, 22 Oct 2019 09:07:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59148)
+	id 1iMttI-0007Z2-9C
+	for qemu-devel@archiver.kernel.org; Tue, 22 Oct 2019 09:08:00 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58587)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1iMtn0-0000r4-CM
- for qemu-devel@nongnu.org; Tue, 22 Oct 2019 09:01:32 -0400
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iMtkV-0006zD-IA
+ for qemu-devel@nongnu.org; Tue, 22 Oct 2019 08:58:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1iMtmu-0007Q6-Hk
- for qemu-devel@nongnu.org; Tue, 22 Oct 2019 09:01:30 -0400
-Received: from indium.canonical.com ([91.189.90.7]:45166)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1iMtmu-0007PT-Ay
- for qemu-devel@nongnu.org; Tue, 22 Oct 2019 09:01:24 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1iMtms-00022F-4o
- for <qemu-devel@nongnu.org>; Tue, 22 Oct 2019 13:01:22 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id DDEB52E80CD
- for <qemu-devel@nongnu.org>; Tue, 22 Oct 2019 13:01:21 +0000 (UTC)
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iMtkS-0006P0-Vp
+ for qemu-devel@nongnu.org; Tue, 22 Oct 2019 08:58:54 -0400
+Received: from relay.sw.ru ([185.231.240.75]:55178)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1iMtkK-0006K8-IZ; Tue, 22 Oct 2019 08:58:44 -0400
+Received: from [10.94.3.0] (helo=kvm.qa.sw.ru)
+ by relay.sw.ru with esmtp (Exim 4.92.2)
+ (envelope-from <vsementsov@virtuozzo.com>)
+ id 1iMtkI-0003xx-Cb; Tue, 22 Oct 2019 15:58:42 +0300
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+To: qemu-block@nongnu.org
+Subject: [PATCH v2 07/10] block/dirty-bitmap: improve _next_dirty_area API
+Date: Tue, 22 Oct 2019 15:58:36 +0300
+Message-Id: <20191022125839.12633-8-vsementsov@virtuozzo.com>
+X-Mailer: git-send-email 2.21.0
+In-Reply-To: <20191022125839.12633-1-vsementsov@virtuozzo.com>
+References: <20191022125839.12633-1-vsementsov@virtuozzo.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 22 Oct 2019 12:48:04 -0000
-From: Kevin Wolf <1846427@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: dgilbert-h kwolf-redhat lersek michael-weiser
- psyhomb sej7278
-X-Launchpad-Bug-Reporter: Michael Weiser (michael-weiser)
-X-Launchpad-Bug-Modifier: Kevin Wolf (kwolf-redhat)
-References: <157005622285.15919.12087374175062502233.malonedeb@gac.canonical.com>
-Message-Id: <157174848468.9025.16931492303047950507.malone@soybean.canonical.com>
-Subject: [Bug 1846427] Re: 4.1.0: qcow2 corruption on savevm/quit/loadvm cycle
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="186023fa645d8be19d403a76064f0643f510db2f";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 73dea18df58b68b7c6077f1a6dfc5684e79ae548
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 91.189.90.7
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [fuzzy]
+X-Received-From: 185.231.240.75
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -78,179 +59,295 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1846427 <1846427@bugs.launchpad.net>
+Cc: kwolf@redhat.com, vsementsov@virtuozzo.com, qemu-devel@nongnu.org,
+ mreitz@redhat.com, den@openvz.org, jsnow@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-> But isn't that "if" at the core of this problem? What happens if the
-> detection misfires?
+Firstly, _next_dirty_area is for scenarios when we may contiguously
+search for next dirty area inside some limited region, so it is more
+comfortable to specify "end" which should not be recalculated on each
+iteration.
 
-The information that a block driver must give is just whether the given
-block is allocated by the image or whether it is taken from the backing
-file. Almost everything else is just a hint that can be given if the
-driver can be more specific, but that can be omitted.
+Secondly, mirror wants to limit resulting are, and for this thing it
+limits @count. But actually mirror don't want to limit the whole region
+to search, but only resulting sub-region. Add separate parameter
+@max_dirty_count to satisfy such request.
 
-In the specific case, what commit 69f4750 intends to do is avoid too
-much effort to determine whether a block is fully zeroed on the
-filesystem level because the qcow2 metadata should already accurately
-answer the question. It still keeps the additional checks for metadata
-preallocation because in this case, the qcow2 metadata says that the
-whole image is allocated while it's created sparse on the filesystem
-level, so the check can actually be useful in practice.
+Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+---
+ include/block/dirty-bitmap.h |  3 ++-
+ include/qemu/hbitmap.h       | 25 ++++++++++++---------
+ block/dirty-bitmap.c         |  6 +++--
+ block/mirror.c               | 11 +++++----
+ tests/test-hbitmap.c         | 43 +++++++++++++++++++++++-------------
+ util/hbitmap.c               | 41 +++++++++++++++++++++-------------
+ 6 files changed, 79 insertions(+), 50 deletions(-)
 
-If the detection fails (and the code is implemented correctly), we have
-two cases:
+diff --git a/include/block/dirty-bitmap.h b/include/block/dirty-bitmap.h
+index 333e44e793..a010110709 100644
+--- a/include/block/dirty-bitmap.h
++++ b/include/block/dirty-bitmap.h
+@@ -108,7 +108,8 @@ int64_t bdrv_dirty_bitmap_next_dirty(BdrvDirtyBitmap *bitmap, int64_t offset,
+ int64_t bdrv_dirty_bitmap_next_zero(BdrvDirtyBitmap *bitmap, int64_t offset,
+                                     int64_t bytes);
+ bool bdrv_dirty_bitmap_next_dirty_area(BdrvDirtyBitmap *bitmap,
+-                                       int64_t *offset, int64_t *bytes);
++        int64_t start, int64_t end, int64_t max_dirty_count,
++        int64_t *dirty_start, int64_t *dirty_count);
+ BdrvDirtyBitmap *bdrv_reclaim_dirty_bitmap_locked(BdrvDirtyBitmap *bitmap,
+                                                   Error **errp);
+ 
+diff --git a/include/qemu/hbitmap.h b/include/qemu/hbitmap.h
+index a4b032b270..4e7a6e72ef 100644
+--- a/include/qemu/hbitmap.h
++++ b/include/qemu/hbitmap.h
+@@ -324,18 +324,21 @@ int64_t hbitmap_next_zero(const HBitmap *hb, int64_t start, int64_t count);
+ 
+ /* hbitmap_next_dirty_area:
+  * @hb: The HBitmap to operate on
+- * @start: in-out parameter.
+- *         in: the offset to start from
+- *         out: (if area found) start of found area
+- * @count: in-out parameter.
+- *         in: length of requested region
+- *         out: length of found area
+- *
+- * If dirty area found within [@start, @start + @count), returns true and sets
+- * @offset and @bytes appropriately. Otherwise returns false and leaves @offset
+- * and @bytes unchanged.
++ * @start: the offset to start from
++ * @end: end of requested area
++ * @max_dirty_count: limit for out parameter dirty_count
++ * @dirty_start: on success: start of found area
++ * @dirty_count: on success: length of found area
++ *
++ * If dirty area found within [@start, @end), returns true and sets
++ * @dirty_start and @dirty_count appropriately. @dirty_count will not exceed
++ * @max_dirty_count.
++ * If dirty area was not found, returns false and leaves @dirty_start and
++ * @dirty_count unchanged.
+  */
+-bool hbitmap_next_dirty_area(const HBitmap *hb, int64_t *start, int64_t *count);
++bool hbitmap_next_dirty_area(const HBitmap *hb, int64_t start, int64_t end,
++                             int64_t max_dirty_count,
++                             int64_t *dirty_start, int64_t *dirty_count);
+ 
+ /**
+  * hbitmap_iter_next:
+diff --git a/block/dirty-bitmap.c b/block/dirty-bitmap.c
+index fe2420b297..f1b552b7a2 100644
+--- a/block/dirty-bitmap.c
++++ b/block/dirty-bitmap.c
+@@ -867,9 +867,11 @@ int64_t bdrv_dirty_bitmap_next_zero(BdrvDirtyBitmap *bitmap, int64_t offset,
+ }
+ 
+ bool bdrv_dirty_bitmap_next_dirty_area(BdrvDirtyBitmap *bitmap,
+-                                       int64_t *offset, int64_t *bytes)
++        int64_t start, int64_t end, int64_t max_dirty_count,
++        int64_t *dirty_start, int64_t *dirty_count)
+ {
+-    return hbitmap_next_dirty_area(bitmap->bitmap, offset, bytes);
++    return hbitmap_next_dirty_area(bitmap->bitmap, start, end, max_dirty_count,
++                                   dirty_start, dirty_count);
+ }
+ 
+ /**
+diff --git a/block/mirror.c b/block/mirror.c
+index d6b3a898ed..c8947a5726 100644
+--- a/block/mirror.c
++++ b/block/mirror.c
+@@ -1190,15 +1190,14 @@ do_sync_target_write(MirrorBlockJob *job, MirrorMethod method,
+     }
+ 
+     while (true) {
+-        bool valid_area;
++        bool found;
+         int ret;
+ 
+         bdrv_dirty_bitmap_lock(job->dirty_bitmap);
+-        dirty_bytes = MIN(offset + bytes - dirty_offset, INT_MAX);
+-        valid_area = bdrv_dirty_bitmap_next_dirty_area(job->dirty_bitmap,
+-                                                       &dirty_offset,
+-                                                       &dirty_bytes);
+-        if (!valid_area) {
++        found = bdrv_dirty_bitmap_next_dirty_area(job->dirty_bitmap,
++                dirty_offset, offset + bytes, INT_MAX,
++                &dirty_offset, &dirty_bytes);
++        if (!found) {
+             bdrv_dirty_bitmap_unlock(job->dirty_bitmap);
+             break;
+         }
+diff --git a/tests/test-hbitmap.c b/tests/test-hbitmap.c
+index e3f1b3f361..d75e84a76a 100644
+--- a/tests/test-hbitmap.c
++++ b/tests/test-hbitmap.c
+@@ -920,18 +920,19 @@ static void test_hbitmap_next_x_after_truncate(TestHBitmapData *data,
+     test_hbitmap_next_x_check(data, 0);
+ }
+ 
+-static void test_hbitmap_next_dirty_area_check(TestHBitmapData *data,
+-                                               int64_t offset,
+-                                               int64_t count)
++static void test_hbitmap_next_dirty_area_check_limited(TestHBitmapData *data,
++                                                       int64_t offset,
++                                                       int64_t count,
++                                                       int64_t max_dirty)
+ {
+     int64_t off1, off2;
+     int64_t len1 = 0, len2;
+     bool ret1, ret2;
+     int64_t end;
+ 
+-    off1 = offset;
+-    len1 = count;
+-    ret1 = hbitmap_next_dirty_area(data->hb, &off1, &len1);
++    ret1 = hbitmap_next_dirty_area(data->hb,
++            offset, count == INT64_MAX ? INT64_MAX : offset + count, max_dirty,
++            &off1, &len1);
+ 
+     end = offset > data->size || data->size - offset < count ? data->size :
+                                                                offset + count;
+@@ -940,21 +941,25 @@ static void test_hbitmap_next_dirty_area_check(TestHBitmapData *data,
+         ;
+     }
+ 
+-    for (len2 = 1; off2 + len2 < end && hbitmap_get(data->hb, off2 + len2);
+-         len2++) {
++    for (len2 = 1; (off2 + len2 < end && len2 < max_dirty &&
++                    hbitmap_get(data->hb, off2 + len2)); len2++)
++    {
+         ;
+     }
+ 
+     ret2 = off2 < end;
+-    if (!ret2) {
+-        /* leave unchanged */
+-        off2 = offset;
+-        len2 = count;
++    g_assert_cmpint(ret1, ==, ret2);
++
++    if (ret2) {
++        g_assert_cmpint(off1, ==, off2);
++        g_assert_cmpint(len1, ==, len2);
+     }
++}
+ 
+-    g_assert_cmpint(ret1, ==, ret2);
+-    g_assert_cmpint(off1, ==, off2);
+-    g_assert_cmpint(len1, ==, len2);
++static void test_hbitmap_next_dirty_area_check(TestHBitmapData *data,
++                                               int64_t offset, int64_t count)
++{
++    test_hbitmap_next_dirty_area_check_limited(data, offset, count, INT64_MAX);
+ }
+ 
+ static void test_hbitmap_next_dirty_area_do(TestHBitmapData *data,
+@@ -964,6 +969,7 @@ static void test_hbitmap_next_dirty_area_do(TestHBitmapData *data,
+     test_hbitmap_next_dirty_area_check(data, 0, INT64_MAX);
+     test_hbitmap_next_dirty_area_check(data, 0, 1);
+     test_hbitmap_next_dirty_area_check(data, L3 - 1, 1);
++    test_hbitmap_next_dirty_area_check_limited(data, 0, INT64_MAX, 1);
+ 
+     hbitmap_set(data->hb, L2, 1);
+     test_hbitmap_next_dirty_area_check(data, 0, 1);
+@@ -976,6 +982,8 @@ static void test_hbitmap_next_dirty_area_do(TestHBitmapData *data,
+     test_hbitmap_next_dirty_area_check(data, L2, INT64_MAX);
+     test_hbitmap_next_dirty_area_check(data, L2, 1);
+     test_hbitmap_next_dirty_area_check(data, L2 + 1, 1);
++    test_hbitmap_next_dirty_area_check_limited(data, 0, INT64_MAX, 1);
++    test_hbitmap_next_dirty_area_check_limited(data, L2 - 1, 2, 1);
+ 
+     hbitmap_set(data->hb, L2 + 5, L1);
+     test_hbitmap_next_dirty_area_check(data, 0, INT64_MAX);
+@@ -988,6 +996,8 @@ static void test_hbitmap_next_dirty_area_do(TestHBitmapData *data,
+     test_hbitmap_next_dirty_area_check(data, L2 + L1, L1);
+     test_hbitmap_next_dirty_area_check(data, L2, 0);
+     test_hbitmap_next_dirty_area_check(data, L2 + 1, 0);
++    test_hbitmap_next_dirty_area_check_limited(data, L2 + 3, INT64_MAX, 3);
++    test_hbitmap_next_dirty_area_check_limited(data, L2 + 3, 7, 10);
+ 
+     hbitmap_set(data->hb, L2 * 2, L3 - L2 * 2);
+     test_hbitmap_next_dirty_area_check(data, 0, INT64_MAX);
+@@ -997,6 +1007,9 @@ static void test_hbitmap_next_dirty_area_do(TestHBitmapData *data,
+     test_hbitmap_next_dirty_area_check(data, L2 + 5 + L1, 5);
+     test_hbitmap_next_dirty_area_check(data, L2 * 2 - L1, L1 + 1);
+     test_hbitmap_next_dirty_area_check(data, L2 * 2, L2);
++    test_hbitmap_next_dirty_area_check_limited(data, L2 * 2 + 1, INT64_MAX, 5);
++    test_hbitmap_next_dirty_area_check_limited(data, L2 * 2 + 1, 10, 5);
++    test_hbitmap_next_dirty_area_check_limited(data, L2 * 2 + 1, 2, 5);
+ 
+     hbitmap_set(data->hb, 0, L3);
+     test_hbitmap_next_dirty_area_check(data, 0, INT64_MAX);
+diff --git a/util/hbitmap.c b/util/hbitmap.c
+index ec689b9372..684bd759c3 100644
+--- a/util/hbitmap.c
++++ b/util/hbitmap.c
+@@ -270,22 +270,34 @@ int64_t hbitmap_next_zero(const HBitmap *hb, int64_t start, int64_t count)
+     return res;
+ }
+ 
+-bool hbitmap_next_dirty_area(const HBitmap *hb, int64_t *start, int64_t *count)
++bool hbitmap_next_dirty_area(const HBitmap *hb, int64_t start, int64_t end,
++                             int64_t max_dirty_count,
++                             int64_t *dirty_start, int64_t *dirty_count)
+ {
+-    int64_t area_start, area_end;
++    int64_t next_zero;
+ 
+-    area_start = hbitmap_next_dirty(hb, *start, *count);
+-    if (area_start < 0) {
++    assert(start >= 0 && end >= 0 && max_dirty_count > 0);
++
++    if (start >= hb->orig_size || end <= start) {
++        return false;
++    }
++
++    end = MIN(end, hb->orig_size);
++
++    start = hbitmap_next_dirty(hb, start, end - start);
++    if (start < 0) {
+         return false;
+     }
+ 
+-    area_end = hbitmap_next_zero(hb, area_start, *start + *count - area_start);
+-    if (area_end < 0) {
+-        area_end = MIN(hb->orig_size, *start + *count);
++    end = start + MIN(end - start, max_dirty_count);
++
++    next_zero = hbitmap_next_zero(hb, start, end - start);
++    if (next_zero >= 0) {
++        end = next_zero;
+     }
+ 
+-    *start = area_start;
+-    *count = area_end - area_start;
++    *dirty_start = start;
++    *dirty_count = end - start;
+ 
+     return true;
+ }
+@@ -836,13 +848,12 @@ static void hbitmap_sparse_merge(HBitmap *dst, const HBitmap *src)
+     int64_t offset = 0;
+     int64_t count = src->orig_size;
+ 
+-    while (hbitmap_next_dirty_area(src, &offset, &count)) {
++    for (offset = 0;
++         hbitmap_next_dirty_area(src, offset, src->orig_size, INT64_MAX,
++                                 &offset, &count);
++         offset += count)
++    {
+         hbitmap_set(dst, offset, count);
+-        offset += count;
+-        if (offset >= src->orig_size) {
+-            break;
+-        }
+-        count = src->orig_size - offset;
+     }
+ }
+ 
+-- 
+2.21.0
 
-1. Preallocated image detected as non-preallocated: It could happens
-that a fully zeroed block wouldn't be reported as "fully zeroed", but as
-"allocated (unknown content)". This could prevent some optimisations,
-but it's still a correct description of the block.
-
-2. Non-preallocated image detected as preallocated: We waste some cycles
-on finding out that the filesystem doesn't know more than the qcow2
-layer.
-
-> Hopefully this helps at least a tiny bit... Thanks!
-
-Yes, that helps. With an image that is mostly sparse, preallocation
-detection should work perfectly. It works by comparing the number of
-allocated qcow2 clusters (the full 100 GB in your case) to the file size
-(around 10 GB). In other words, your case is one where the behaviour
-isn't supposed to have changed at all.
-
-I had a thought earlier that maybe the problem isn't with the value
-returned by bdrv_co_block_status(), but with the fact that
-bdrv_co_block_status(), and with it preallocation detection, is even
-running in some code paths. Your cases might support that idea.
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1846427
-
-Title:
-  4.1.0: qcow2 corruption on savevm/quit/loadvm cycle
-
-Status in QEMU:
-  New
-
-Bug description:
-  I'm seeing massive corruption of qcow2 images with qemu 4.1.0 and git
-  master as of 7f21573c822805a8e6be379d9bcf3ad9effef3dc after a few
-  savevm/quit/loadvm cycles. I've narrowed it down to the following
-  reproducer (further notes below):
-
-  # qemu-img check debian.qcow2
-  No errors were found on the image.
-  251601/327680 =3D 76.78% allocated, 1.63% fragmented, 0.00% compressed cl=
-usters
-  Image end offset: 18340446208
-  # bin/qemu/bin/qemu-system-x86_64 -machine pc-q35-4.0.1,accel=3Dkvm -m 40=
-96 -chardev stdio,id=3Dcharmonitor -mon chardev=3Dcharmonitor -drive file=
-=3Ddebian.qcow2,id=3Dd -S
-  qemu-system-x86_64: warning: dbind: Couldn't register with accessibility =
-bus: Did not receive a reply. Possible causes include: the remote applicati=
-on did not send a reply, the message bus security policy blocked the reply,=
- the reply timeout expired, or the network connection was broken.
-  QEMU 4.1.50 monitor - type 'help' for more information
-  (qemu) loadvm foo
-  (qemu) c
-  (qemu) qcow2_free_clusters failed: Invalid argument
-  qcow2_free_clusters failed: Invalid argument
-  qcow2_free_clusters failed: Invalid argument
-  qcow2_free_clusters failed: Invalid argument
-  quit
-  [m@nargothrond:~] qemu-img check debian.qcow2
-  Leaked cluster 85179 refcount=3D2 reference=3D1
-  Leaked cluster 85180 refcount=3D2 reference=3D1
-  ERROR cluster 266150 refcount=3D0 reference=3D2
-  [...]
-  ERROR OFLAG_COPIED data cluster: l2_entry=3D422840000 refcount=3D1
-
-  9493 errors were found on the image.
-  Data may be corrupted, or further writes to the image may corrupt it.
-
-  2 leaked clusters were found on the image.
-  This means waste of disk space, but no harm to data.
-  259266/327680 =3D 79.12% allocated, 1.67% fragmented, 0.00% compressed cl=
-usters
-  Image end offset: 18340446208
-
-  This is on a x86_64 Linux 5.3.1 Gentoo host with qemu-system-x86_64
-  and accel=3Dkvm. The compiler is gcc-9.2.0 with the rest of the system
-  similarly current.
-
-  Reproduced with qemu-4.1.0 from distribution package as well as
-  vanilla git checkout of tag v4.1.0 and commit
-  7f21573c822805a8e6be379d9bcf3ad9effef3dc (today's master). Does not
-  happen with qemu compiled from vanilla checkout of tag v4.0.0. Build
-  sequence:
-
-  ./configure --prefix=3D$HOME/bin/qemu-bisect --target-list=3Dx86_64-softm=
-mu --disable-werror --disable-docs
-  [...]
-  CFLAGS            -O2 -U_FORTIFY_SOURCE -D_FORTIFY_SOURCE=3D2 -g
-  [...] (can provide full configure output if helpful)
-  make -j8 install
-
-  The kind of guest OS does not matter: seen with Debian testing 64bit,
-  Windows 7 x86/x64 BIOS and Windows 7 x64 EFI.
-
-  The virtual storage controller does not seem to matter: seen with
-  VirtIO SCSI, emulated SCSI and emulated SATA AHCI.
-
-  Caching modes (none, directsync, writeback), aio mode (threads,
-  native) or discard (ignore, unmap) or detect-zeroes (off, unmap) does
-  not influence occurence either.
-
-  Having more RAM in the guest seems to increase odds of corruption:
-  With 512MB to the Debian guest problem hardly occurs at all, with 4GB
-  RAM it happens almost instantly.
-
-  An automated reproducer works as follows:
-
-  - the guest *does* mount its root fs and swap with option discard and
-  my testing leaves me with the impression that file deletion rather
-  than reading is causing the issue
-
-  - foo is a snapshot of the running Debian VM which is already running
-  command
-
-  # while true ; do dd if=3D/dev/zero of=3Dfoo bs=3D10240k count=3D400 ; do=
-ne
-
-  to produce some I/O to the disk (4GB file with 4GB of RAM).
-
-  - on the host a loop continuously resumes and saves the guest state
-  and quits qemu inbetween:
-
-  # while true ; do (echo loadvm foo ; echo c ; sleep 10 ; echo stop ;
-  echo savevm foo ; echo quit ) | bin/qemu-bisect/bin/qemu-system-x86_64
-  -machine pc-q35-3.1,accel=3Dkvm -m 4096 -chardev stdio,id=3Dcharmonitor
-  -mon chardev=3Dcharmonitor -drive file=3Ddebian.qcow2,id=3Dd -S -display
-  none ; done
-
-  - quitting qemu inbetween saves and loads seems to be necessary for
-  the problem to occur. Just continusouly in one session saving and
-  loading guest state does not trigger it.
-
-  - For me, after about 2 to 6 iterations of above loop the image is
-  corrupted.
-
-  - corruption manifests with other messages from qemu as well, e.g.:
-
-  (qemu) loadvm foo
-  Error: Device 'd' does not have the requested snapshot 'foo'
-
-  Using above reproducer I have to the be best of my ability bisected
-  the introduction of the problem to commit
-  69f47505ee66afaa513305de0c1895a224e52c45 (block: avoid recursive
-  block_status call if possible). qemu compiled from the commit before
-  does not exhibit the issue, from that commit on it does and reverting
-  the commit off of current master makes it disappear.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1846427/+subscriptions
 
