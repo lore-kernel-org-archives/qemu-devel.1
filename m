@@ -6,42 +6,41 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0BEF6CA9EA0
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 11:20:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9C6BACA9EA0
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 11:21:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D570B20B7C
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 11:20:38 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D570B20B7C
+	by mail.kernel.org (Postfix) with ESMTPS id 72AAA20B7C
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 11:21:59 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 72AAA20B7C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53458 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53480 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iMsDN-0006sX-CC
-	for qemu-devel@archiver.kernel.org; Tue, 22 Oct 2019 07:20:37 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44039)
+	id 1iMsEg-0000MG-FD
+	for qemu-devel@archiver.kernel.org; Tue, 22 Oct 2019 07:21:58 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44018)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iMsB4-0004Av-Ft
- for qemu-devel@nongnu.org; Tue, 22 Oct 2019 07:18:15 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iMsB3-0007hP-7r
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iMsB3-0004AU-Sx
  for qemu-devel@nongnu.org; Tue, 22 Oct 2019 07:18:14 -0400
-Received: from relay.sw.ru ([185.231.240.75]:51916)
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iMsB2-0007h7-Rg
+ for qemu-devel@nongnu.org; Tue, 22 Oct 2019 07:18:13 -0400
+Received: from relay.sw.ru ([185.231.240.75]:51920)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1iMsB0-0007dl-Hy; Tue, 22 Oct 2019 07:18:10 -0400
+ id 1iMsB0-0007dn-2x; Tue, 22 Oct 2019 07:18:10 -0400
 Received: from [10.94.3.0] (helo=kvm.qa.sw.ru)
  by relay.sw.ru with esmtp (Exim 4.92.2)
  (envelope-from <vsementsov@virtuozzo.com>)
- id 1iMsAw-0003JX-ER; Tue, 22 Oct 2019 14:18:06 +0300
+ id 1iMsAw-0003JX-TA; Tue, 22 Oct 2019 14:18:06 +0300
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 To: qemu-block@nongnu.org
-Subject: [PATCH v3 1/6] block/block-copy: allocate buffer in
- block_copy_with_bounce_buffer
-Date: Tue, 22 Oct 2019 14:18:00 +0300
-Message-Id: <20191022111805.3432-2-vsementsov@virtuozzo.com>
+Subject: [PATCH v3 5/6] block/block-copy: add memory limit
+Date: Tue, 22 Oct 2019 14:18:04 +0300
+Message-Id: <20191022111805.3432-6-vsementsov@virtuozzo.com>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20191022111805.3432-1-vsementsov@virtuozzo.com>
 References: <20191022111805.3432-1-vsementsov@virtuozzo.com>
@@ -66,99 +65,78 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Move bounce_buffer allocation block_copy_with_bounce_buffer. This
-commit simplifies further work on implementing copying by larger chunks
-(of different size) and further asynchronous handling of block_copy
-iterations (with help of block/aio_task API).
+Currently total allocation for parallel requests to block-copy instance
+is unlimited. Let's limit it to 128 MiB.
 
-Allocation works fast, a lot faster than disk io, so it's not a problem
-that we now allocate/free bounce_buffer more times. And we anyway will
-have to allocate several bounce_buffers for parallel execution of loop
-iterations in future.
+For now block-copy is used only in backup, so actually we limit total
+allocation for backup job.
 
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 Reviewed-by: Max Reitz <mreitz@redhat.com>
 ---
- block/block-copy.c | 21 ++++++++-------------
- 1 file changed, 8 insertions(+), 13 deletions(-)
+ include/block/block-copy.h | 3 +++
+ block/block-copy.c         | 5 +++++
+ 2 files changed, 8 insertions(+)
 
+diff --git a/include/block/block-copy.h b/include/block/block-copy.h
+index e2e135ff1b..edcdf0072d 100644
+--- a/include/block/block-copy.h
++++ b/include/block/block-copy.h
+@@ -16,6 +16,7 @@
+ #define BLOCK_COPY_H
+ 
+ #include "block/block.h"
++#include "qemu/co-shared-resource.h"
+ 
+ typedef struct BlockCopyInFlightReq {
+     int64_t start_byte;
+@@ -69,6 +70,8 @@ typedef struct BlockCopyState {
+      */
+     ProgressResetCallbackFunc progress_reset_callback;
+     void *progress_opaque;
++
++    SharedResource *mem;
+ } BlockCopyState;
+ 
+ BlockCopyState *block_copy_state_new(BdrvChild *source, BdrvChild *target,
 diff --git a/block/block-copy.c b/block/block-copy.c
-index 066e3a7274..ecd086010e 100644
+index 845b2423dc..7f0ebb58f8 100644
 --- a/block/block-copy.c
 +++ b/block/block-copy.c
-@@ -126,20 +126,17 @@ void block_copy_set_callbacks(
- static int coroutine_fn block_copy_with_bounce_buffer(BlockCopyState *s,
-                                                       int64_t start,
-                                                       int64_t end,
--                                                      bool *error_is_read,
--                                                      void **bounce_buffer)
-+                                                      bool *error_is_read)
- {
-     int ret;
-     int nbytes;
-+    void *bounce_buffer = qemu_blockalign(s->source->bs, s->cluster_size);
+@@ -21,6 +21,7 @@
+ #include "qemu/units.h"
  
-     assert(QEMU_IS_ALIGNED(start, s->cluster_size));
-     bdrv_reset_dirty_bitmap(s->copy_bitmap, start, s->cluster_size);
-     nbytes = MIN(s->cluster_size, s->len - start);
--    if (!*bounce_buffer) {
--        *bounce_buffer = qemu_blockalign(s->source->bs, s->cluster_size);
--    }
+ #define BLOCK_COPY_MAX_COPY_RANGE (16 * MiB)
++#define BLOCK_COPY_MAX_MEM (128 * MiB)
  
--    ret = bdrv_co_pread(s->source, start, nbytes, *bounce_buffer, 0);
-+    ret = bdrv_co_pread(s->source, start, nbytes, bounce_buffer, 0);
-     if (ret < 0) {
-         trace_block_copy_with_bounce_buffer_read_fail(s, start, ret);
-         if (error_is_read) {
-@@ -148,7 +145,7 @@ static int coroutine_fn block_copy_with_bounce_buffer(BlockCopyState *s,
-         goto fail;
+ static void coroutine_fn block_copy_wait_inflight_reqs(BlockCopyState *s,
+                                                        int64_t start,
+@@ -64,6 +65,7 @@ void block_copy_state_free(BlockCopyState *s)
      }
  
--    ret = bdrv_co_pwrite(s->target, start, nbytes, *bounce_buffer,
-+    ret = bdrv_co_pwrite(s->target, start, nbytes, bounce_buffer,
-                          s->write_flags);
-     if (ret < 0) {
-         trace_block_copy_with_bounce_buffer_write_fail(s, start, ret);
-@@ -158,8 +155,11 @@ static int coroutine_fn block_copy_with_bounce_buffer(BlockCopyState *s,
-         goto fail;
-     }
+     bdrv_release_dirty_bitmap(s->copy_bitmap);
++    shres_destroy(s->mem);
+     g_free(s);
+ }
  
-+    qemu_vfree(bounce_buffer);
-+
-     return nbytes;
- fail:
-+    qemu_vfree(bounce_buffer);
-     bdrv_set_dirty_bitmap(s->copy_bitmap, start, s->cluster_size);
-     return ret;
+@@ -95,6 +97,7 @@ BlockCopyState *block_copy_state_new(BdrvChild *source, BdrvChild *target,
+         .cluster_size = cluster_size,
+         .len = bdrv_dirty_bitmap_size(copy_bitmap),
+         .write_flags = write_flags,
++        .mem = shres_create(BLOCK_COPY_MAX_MEM),
+     };
  
-@@ -271,7 +271,6 @@ int coroutine_fn block_copy(BlockCopyState *s,
- {
-     int ret = 0;
-     int64_t end = bytes + start; /* bytes */
--    void *bounce_buffer = NULL;
-     int64_t status_bytes;
-     BlockCopyInFlightReq req;
+     s->copy_range_size = QEMU_ALIGN_DOWN(max_transfer, cluster_size),
+@@ -313,7 +316,9 @@ int coroutine_fn block_copy(BlockCopyState *s,
  
-@@ -324,7 +323,7 @@ int coroutine_fn block_copy(BlockCopyState *s,
-         }
-         if (!s->use_copy_range) {
-             ret = block_copy_with_bounce_buffer(s, start, dirty_end,
--                                                error_is_read, &bounce_buffer);
-+                                                error_is_read);
-         }
+         bdrv_reset_dirty_bitmap(s->copy_bitmap, start, chunk_end - start);
+ 
++        co_get_from_shres(s->mem, chunk_end - start);
+         ret = block_copy_do_copy(s, start, chunk_end, error_is_read);
++        co_put_to_shres(s->mem, chunk_end - start);
          if (ret < 0) {
+             bdrv_set_dirty_bitmap(s->copy_bitmap, start, chunk_end - start);
              break;
-@@ -335,10 +334,6 @@ int coroutine_fn block_copy(BlockCopyState *s,
-         ret = 0;
-     }
- 
--    if (bounce_buffer) {
--        qemu_vfree(bounce_buffer);
--    }
--
-     block_copy_inflight_req_end(&req);
- 
-     return ret;
 -- 
 2.21.0
 
