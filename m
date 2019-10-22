@@ -2,100 +2,90 @@ Return-Path: <SRS0=tSBD=YP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AEC9ACA9EA0
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 08:54:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 78754CA9EB9
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 08:55:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 741C020679
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 08:54:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4726720679
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 08:55:08 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bwXbEUJ0"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 741C020679
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Dgu+TC/p"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4726720679
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51904 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51914 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iMpvv-00051B-ID
-	for qemu-devel@archiver.kernel.org; Tue, 22 Oct 2019 04:54:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49565)
+	id 1iMpwZ-00061V-Ha
+	for qemu-devel@archiver.kernel.org; Tue, 22 Oct 2019 04:55:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49667)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1iMpuz-0004Vm-Sr
- for qemu-devel@nongnu.org; Tue, 22 Oct 2019 04:53:30 -0400
+ (envelope-from <estebanbosse@gmail.com>) id 1iMpvo-0005AA-Cv
+ for qemu-devel@nongnu.org; Tue, 22 Oct 2019 04:54:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1iMpux-0006WL-DU
- for qemu-devel@nongnu.org; Tue, 22 Oct 2019 04:53:28 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:46530
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iMpux-0006WA-9j
- for qemu-devel@nongnu.org; Tue, 22 Oct 2019 04:53:27 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1571734406;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=4Teat/O7Thvzjviv6gKgPmC90IP01JvMG/rS8O7GH+8=;
- b=bwXbEUJ0wVPUFe1ZNN/RGA0EYsFzGDHZn/ohL4n9++Z7IafqNy2VuC3rCKk1GaP11RgFUe
- O/mG/lveX/7PG2orJ9iVSwx5Ztp+SDD8bJVlcJ6BsHp0KP1lDlp+bBZ5zeK24UnoBMAXcT
- jsOxzluj4YdjY6yF8X5cC2xzE36gRdE=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-214-ADMBJ88qML6I06wZtXkY0w-1; Tue, 22 Oct 2019 04:53:25 -0400
-Received: by mail-wm1-f72.google.com with SMTP id a81so3518204wma.4
- for <qemu-devel@nongnu.org>; Tue, 22 Oct 2019 01:53:25 -0700 (PDT)
+ (envelope-from <estebanbosse@gmail.com>) id 1iMpvn-0006vS-8N
+ for qemu-devel@nongnu.org; Tue, 22 Oct 2019 04:54:20 -0400
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:33785)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <estebanbosse@gmail.com>)
+ id 1iMpvn-0006v3-2T
+ for qemu-devel@nongnu.org; Tue, 22 Oct 2019 04:54:19 -0400
+Received: by mail-wr1-x441.google.com with SMTP id s1so8314711wro.0
+ for <qemu-devel@nongnu.org>; Tue, 22 Oct 2019 01:54:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=message-id:subject:from:to:cc:date:in-reply-to:references
+ :user-agent:mime-version:content-transfer-encoding;
+ bh=V4VhBihoolZqFYIN54r9nmx9vYW/oQSJU4NMMDQk7As=;
+ b=Dgu+TC/pYPvxFl322P5ZQxatcCTlZr9/Na3bgs3e7uOoeVESu2uvhuRLFlA7Vx7/JT
+ /eva777fMJ8YfTgOGc73Mx0YxP01s6+hevrbvcCTqdpw/rTSEltteQbcZoXK4PmPIUBm
+ cl1ypCckqOcn43h6toBhuentFcrt9KGnXUPqpaFPa4bW3E56B+6i3Tx8qAHh1iiETUX3
+ dGqXsu8Ew2uALCJSx4VFErFJJJcuSnDcWNuVe97h231nTAgZjz2TP8/8KWalCN6fqC//
+ yNJAMz15ra9LHEt59Z0uirpJUswkt76MyYPG+hYLPwDY8SCBSYcr4fVQzU3aNLfA4uei
+ GoKA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=81ijpT7mXrnoP0yxcW0WPzWKgomsl4GpFfUcpIMV87k=;
- b=QQlzDSSFKO49qW1+5Tf7q17UAnpx6adJIg+gO6NM5U7Oc45mQXcKq8ZCivlaLji4GT
- J9lDACzfhli8IiSfAkiRx73wUpkNedTDw/UkFfCHcQmR4e9uj8onnG6S4lxgXhlMHqcR
- o3rDS7cNcAbBczh/Sqy/cwyPLafKvchUQb6+qxfIp/AsiCgZDFloH8lP+UsJRK6eeHO6
- xmXs4eQvIm3E5L+f6wzd8/8uCIU3pF0VOvtQJ7tE4OSR4RTi3zB3bZanwJzJOXPSXNFc
- C3xWO2GRez5uVDpnCd9AMYas++GNp8cerO9vT9erdHgRVSPn2ZL9/EjyTen9XUek3seE
- BH/w==
-X-Gm-Message-State: APjAAAWqt5+Lo3MlRvugEVMMOHDBE6E23eqraFH7akqrXtzCWE3wXYV2
- OKyLkNyR2v3czfT5oTeVxqDcUKMoQC3073jMpKMx5Us4miLs4gTH14vQ3rddXfMy3iqSg+lncp4
- 37We66xxKPlGzmFI=
-X-Received: by 2002:a5d:638c:: with SMTP id p12mr2139307wru.136.1571734403827; 
- Tue, 22 Oct 2019 01:53:23 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqwlIMk5NuX+tnaNYjjOyBBAghKOtcZ/1Ag5UhUryP6rhPBYhrNog9mcrqyCmgJobQsKFqaM0w==
-X-Received: by 2002:a5d:638c:: with SMTP id p12mr2139293wru.136.1571734403574; 
- Tue, 22 Oct 2019 01:53:23 -0700 (PDT)
-Received: from [192.168.1.41] (129.red-83-57-174.dynamicip.rima-tde.net.
- [83.57.174.129])
- by smtp.gmail.com with ESMTPSA id 79sm26272751wmb.7.2019.10.22.01.53.22
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 22 Oct 2019 01:53:23 -0700 (PDT)
-Subject: Re: [PATCH v3 1/4] spapr: move CPU reset after presenter creation
-To: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>,
- David Gibson <david@gibson.dropbear.id.au>
-References: <20191022072246.9200-1-clg@kaod.org>
- <20191022072246.9200-2-clg@kaod.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <71a4409c-6dc2-891b-d1c8-b60acbc94919@redhat.com>
-Date: Tue, 22 Oct 2019 10:53:21 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.1
+ h=x-gm-message-state:message-id:subject:from:to:cc:date:in-reply-to
+ :references:user-agent:mime-version:content-transfer-encoding;
+ bh=V4VhBihoolZqFYIN54r9nmx9vYW/oQSJU4NMMDQk7As=;
+ b=jchSzmO0xAlxcHp5n7+amjlAyIFcYgRZXiyptNoJZd4WnbmiTk+MqtPaMi6bYycvq5
+ 9iVTqYXmHYv2utSR3kG/CAtbrona5uBRACCDiEAUbJoeCyWhUUExb9kp4eSRvoq3hw6y
+ Sr7dhqwj6VzqTxSFyev7Xm4bxrpmuD0aLs8C7Ilgb1MLx/pzojkhrZsGLGZl0Y2wsMw3
+ uoXtnJuy2sdYqTudmByXOM4jJD3X53lJ3QRaC9gV8qTGIP8mveqGPR47RXCnesQ90ZqG
+ UDIBna5vcJFs4a5wITjTc3rM7WT8DOwx1zZN2wIPVbr3LAF2n5B+A+AGuseE/hurPw0K
+ 0IMA==
+X-Gm-Message-State: APjAAAUGbjjgGz1arpoDoGEHPof0fTsYilpzaijpMns7NQqN0+BUMWxi
+ hd9oZrukynUu1WUqKyYBefE=
+X-Google-Smtp-Source: APXvYqz8BBP5wYK70GC9RnObS4GNK085VbmK6595Ok53rEH80UBeoYuODXHUVHqO1KEoZ2xkh46u7g==
+X-Received: by 2002:a5d:6b0a:: with SMTP id v10mr2269042wrw.32.1571734457519; 
+ Tue, 22 Oct 2019 01:54:17 -0700 (PDT)
+Received: from ?IPv6:2a01:c23:604c:2a00:af2b:2e92:39f9:c05b?
+ ([2a01:c23:604c:2a00:af2b:2e92:39f9:c05b])
+ by smtp.gmail.com with ESMTPSA id p21sm8365131wmc.25.2019.10.22.01.54.16
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 22 Oct 2019 01:54:17 -0700 (PDT)
+Message-ID: <80119c423b25ff027844fd04a4e57e5fcb7dfbb9.camel@gmail.com>
+Subject: Re: [PATCH v2 04/20] Revert "irq: introduce qemu_irq_proxy()"
+From: Esteban Bosse <estebanbosse@gmail.com>
+To: Philippe =?ISO-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>, 
+ qemu-devel@nongnu.org
+Date: Tue, 22 Oct 2019 10:50:46 +0200
+In-Reply-To: <20191018134754.16362-5-philmd@redhat.com>
+References: <20191018134754.16362-1-philmd@redhat.com>
+ <20191018134754.16362-5-philmd@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.30.5-1.1 
 MIME-Version: 1.0
-In-Reply-To: <20191022072246.9200-2-clg@kaod.org>
-Content-Language: en-US
-X-MC-Unique: ADMBJ88qML6I06wZtXkY0w-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 205.139.110.61
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::441
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -107,62 +97,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Greg Kurz <groug@kaod.org>
+Cc: Thomas Huth <thuth@redhat.com>, Stefano Stabellini <sstabellini@kernel.org>,
+ xen-devel@lists.xenproject.org, Paul Durrant <paul@xen.org>,
+ "Michael S. Tsirkin" <mst@redhat.com>,
+ Philippe =?ISO-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>,
+ Eduardo Habkost <ehabkost@redhat.com>,
+ =?ISO-8859-1?Q?Herv=E9?= Poussineau <hpoussin@reactos.org>,
+ Aleksandar Markovic <amarkovic@wavecomp.com>,
+ Igor Mammedov <imammedo@redhat.com>,
+ Anthony Perard <anthony.perard@citrix.com>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
+ Aurelien Jarno <aurelien@aurel32.net>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 10/22/19 9:22 AM, C=C3=A9dric Le Goater wrote:
-> spapr_realize_vcpu() is modified to call the CPU reset only after the
-> the intc presenter has been created.
->=20
-> Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
+El vie, 18-10-2019 a las 15:47 +0200, Philippe Mathieu-Daudé escribió:
+> From: Philippe Mathieu-Daudé <f4bug@amsat.org>
+> 
+> This function isn't used anymore.
+> 
+> This reverts commit 22ec3283efba9ba0792790da786d6776d83f2a92.
+> 
+> Reviewed-by: Thomas Huth <thuth@redhat.com>
+> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 > ---
->   hw/ppc/spapr_cpu_core.c | 14 ++++++++------
->   1 file changed, 8 insertions(+), 6 deletions(-)
->=20
-> diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
-> index 3e4302c7d596..992f00da6540 100644
-> --- a/hw/ppc/spapr_cpu_core.c
-> +++ b/hw/ppc/spapr_cpu_core.c
-> @@ -234,13 +234,16 @@ static void spapr_realize_vcpu(PowerPCCPU *cpu, Spa=
-prMachineState *spapr,
->       cpu_ppc_set_vhyp(cpu, PPC_VIRTUAL_HYPERVISOR(spapr));
->       kvmppc_set_papr(cpu);
->  =20
-> -    qemu_register_reset(spapr_cpu_reset, cpu);
-> -    spapr_cpu_reset(cpu);
+>  hw/core/irq.c    | 14 --------------
+>  include/hw/irq.h |  5 -----
+>  2 files changed, 19 deletions(-)
+> 
+> diff --git a/hw/core/irq.c b/hw/core/irq.c
+> index 7cc0295d0e..fb3045b912 100644
+> --- a/hw/core/irq.c
+> +++ b/hw/core/irq.c
+> @@ -120,20 +120,6 @@ qemu_irq qemu_irq_split(qemu_irq irq1, qemu_irq
+> irq2)
+>      return qemu_allocate_irq(qemu_splitirq, s, 0);
+>  }
+>  
+> -static void proxy_irq_handler(void *opaque, int n, int level)
+> -{
+> -    qemu_irq **target = opaque;
 > -
->       if (spapr_irq_cpu_intc_create(spapr, cpu, &local_err) < 0) {
-> -        goto error_unregister;
-> +        goto error_intc_create;
->       }
->  =20
-> +    /*
-> +     * FIXME: Hot-plugged CPUs are not reseted. Do it at realize.
-
-Typo: "reset" (past tense of reset is also reset).
-
-> +     */
-> +    qemu_register_reset(spapr_cpu_reset, cpu);
-> +    spapr_cpu_reset(cpu);
-> +
->       if (!sc->pre_3_0_migration) {
->           vmstate_register(NULL, cs->cpu_index, &vmstate_spapr_cpu_state,
->                            cpu->machine_data);
-> @@ -248,8 +251,7 @@ static void spapr_realize_vcpu(PowerPCCPU *cpu, Spapr=
-MachineState *spapr,
->  =20
->       return;
->  =20
-> -error_unregister:
-> -    qemu_unregister_reset(spapr_cpu_reset, cpu);
-> +error_intc_create:
->       cpu_remove_sync(CPU(cpu));
->   error:
->       error_propagate(errp, local_err);
->=20
-
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+> -    if (*target) {
+> -        qemu_set_irq((*target)[n], level);
+> -    }
+> -}
+> -
+> -qemu_irq *qemu_irq_proxy(qemu_irq **target, int n)
+> -{
+> -    return qemu_allocate_irqs(proxy_irq_handler, target, n);
+> -}
+> -
+>  void qemu_irq_intercept_in(qemu_irq *gpio_in, qemu_irq_handler
+> handler, int n)
+>  {
+>      int i;
+> diff --git a/include/hw/irq.h b/include/hw/irq.h
+> index fe527f6f51..24ba0ece11 100644
+> --- a/include/hw/irq.h
+> +++ b/include/hw/irq.h
+> @@ -51,11 +51,6 @@ qemu_irq qemu_irq_invert(qemu_irq irq);
+>   */
+>  qemu_irq qemu_irq_split(qemu_irq irq1, qemu_irq irq2);
+>  
+> -/* Returns a new IRQ set which connects 1:1 to another IRQ set,
+> which
+> - * may be set later.
+> - */
+> -qemu_irq *qemu_irq_proxy(qemu_irq **target, int n);
+> -
+>  /* For internal use in qtest.  Similar to qemu_irq_split, but
+> operating
+>     on an existing vector of qemu_irq.  */
+>  void qemu_irq_intercept_in(qemu_irq *gpio_in, qemu_irq_handler
+> handler, int n);
+Reviewed-by: Esteban Bosse <estebanbosse@gmail.com>
 
 
