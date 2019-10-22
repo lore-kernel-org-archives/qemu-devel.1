@@ -2,63 +2,71 @@ Return-Path: <SRS0=tSBD=YP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_2 autolearn=ham autolearn_force=no version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DC3BFCA9EA0
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 11:27:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B3F1FCA9EA0
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 11:28:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9BA7A214B2
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 11:27:52 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9BA7A214B2
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id 748CF214B2
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 11:28:37 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 748CF214B2
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53554 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53560 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iMsKN-0000AW-FI
-	for qemu-devel@archiver.kernel.org; Tue, 22 Oct 2019 07:27:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44464)
+	id 1iMsL5-0000YZ-5s
+	for qemu-devel@archiver.kernel.org; Tue, 22 Oct 2019 07:28:36 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44335)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <groug@kaod.org>) id 1iMsCV-00062c-1L
- for qemu-devel@nongnu.org; Tue, 22 Oct 2019 07:19:45 -0400
+ (envelope-from <laurent@vivier.eu>) id 1iMsBe-0004uH-ES
+ for qemu-devel@nongnu.org; Tue, 22 Oct 2019 07:18:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <groug@kaod.org>) id 1iMsCS-0008E2-K5
- for qemu-devel@nongnu.org; Tue, 22 Oct 2019 07:19:42 -0400
-Received: from 6.mo5.mail-out.ovh.net ([178.32.119.138]:55580)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <groug@kaod.org>) id 1iMsCS-0008DE-9S
- for qemu-devel@nongnu.org; Tue, 22 Oct 2019 07:19:40 -0400
-Received: from player760.ha.ovh.net (unknown [10.108.57.50])
- by mo5.mail-out.ovh.net (Postfix) with ESMTP id ADF32254279
- for <qemu-devel@nongnu.org>; Tue, 22 Oct 2019 13:19:37 +0200 (CEST)
-Received: from kaod.org (deibp9eh1--blueice1n4.emea.ibm.com [195.212.29.166])
- (Authenticated sender: groug@kaod.org)
- by player760.ha.ovh.net (Postfix) with ESMTPSA id 340AFB45C124;
- Tue, 22 Oct 2019 11:19:33 +0000 (UTC)
-Date: Tue, 22 Oct 2019 13:19:27 +0200
-From: Greg Kurz <groug@kaod.org>
-To: =?UTF-8?B?Q8OpZHJpYw==?= Le Goater <clg@kaod.org>
-Subject: Re: [PATCH v3 3/4] ppc: reset the interrupt presenter from the CPU
- reset handler
-Message-ID: <20191022131927.29079cf9@bahia.lan>
-In-Reply-To: <20191022072246.9200-4-clg@kaod.org>
-References: <20191022072246.9200-1-clg@kaod.org>
- <20191022072246.9200-4-clg@kaod.org>
-X-Mailer: Claws Mail 3.17.4 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+ (envelope-from <laurent@vivier.eu>) id 1iMsBb-0007yR-Es
+ for qemu-devel@nongnu.org; Tue, 22 Oct 2019 07:18:50 -0400
+Received: from mout.kundenserver.de ([217.72.192.75]:35925)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <laurent@vivier.eu>)
+ id 1iMsBN-0007qF-W6; Tue, 22 Oct 2019 07:18:34 -0400
+Received: from localhost.localdomain ([78.238.229.36]) by
+ mrelayeu.kundenserver.de (mreue109 [212.227.15.183]) with ESMTPSA (Nemesis)
+ id 1Mgek6-1hoex717AS-00h8Ta; Tue, 22 Oct 2019 13:18:05 +0200
+From: Laurent Vivier <laurent@vivier.eu>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v14 8/9] hw/m68k: define Macintosh Quadra 800
+Date: Tue, 22 Oct 2019 13:17:37 +0200
+Message-Id: <20191022111738.20803-9-laurent@vivier.eu>
+X-Mailer: git-send-email 2.21.0
+In-Reply-To: <20191022111738.20803-1-laurent@vivier.eu>
+References: <20191022111738.20803-1-laurent@vivier.eu>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-Ovh-Tracer-Id: 16557765508214069643
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrkeejgdefkecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
+Content-Transfer-Encoding: 8bit
+X-Provags-ID: V03:K1:MsOQIyhUNAv5bweOrLRO/EwL6Idr45AeGdLbn3MWzaSoqoKTvKK
+ XqtLUbCxsIQ4DNeJI4MDQtTRt/6x7J7eZfKBiB3rGg0ad0U7jXfRNgNJrEhhgfcyjqDH3A3
+ s8ZvpGkAHO6xwbfCD1/CQtkWjur6OUh0Jj2l+Isb5HKftwt2xl1nVAoD/pHsNxJ74eB4f/z
+ KxcSNXB23XNmzBVDHwxqA==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:Zl2UAoDnagw=:zzo2rwUlWXgNnF0fcDZIxV
+ fsPdIi9z6pZfQrW68mwxJOjRJrqtPFp8bFQW6wTJsMaVmw4fnznkXHS3D6YzuoL1FhHRhoiww
+ hsUm23FcZxM4b8xLiKSnCeNayJuCJom8gaD+F1fiQsuid6EsVUrwK6sZn5WXOdNKs/zuUY2S7
+ bn9pzQfJpRjFk1nTRKfHQznrDtc35mC2aoPbvY5T2dRB/66h45bBktE7vg2FhQqRQ77FyIHsQ
+ uUMBqdEH0REyTrkLPOqb2JhP/aGqrArrAuL+3zyhuSLnUmjKuHFq0RSUNe6Hajl+sI+/tOuu2
+ EIB4z72mBQDHA8bndHQSyG3eHCcs7TWaDoQ36tgponSpktq1R0BA7K+/QnY+6GTleM8XqHS0j
+ DlM5d099vlmS8+Gen98vWUPjXuGMEKLca+NLGCzoqun12dBWHGoFdwQ3XjvhhfvFehkFK17qO
+ 8ZFY3UFQdMkfr+y1fN5z5Xeqx+jv1YTR38WtaHcdPaTGhJvH6a/JwQqB5XnAaqkheIrAPEeZn
+ 3vsYfJaA9dCUGgLVh+ofb1rvBlQ8xYyKaQXg/i5VkMVcB8DiTwfsF7SckVjpELb+QHAslsdKE
+ VLJIIZUY8AHA02NLUdXFMPS5U1ovVHGfwzLj6vgmKKz9YOmFwHVStMVNz3P6j5csDYxwynk3c
+ MeBpY6zG1cc7YMwaL5n+lD98FbN0HjZROwwRDv4myW/k3EgTqQzOLykT3lBOguOLVXchP6/cP
+ OCMKPLXWqcHBHa5IurV8Om6bwgltBFxhR7bhFOHH0hXv1BnReQ0l4MIBhnlqtlVedO+TjqNfP
+ MkROZ5N48U5TdlIq/pTVTVY4Lsg/P5HNlwtxa+RbGMZ3IJx3syOCLSG9ajnNhAD3YHNhIo1KL
+ RX97cNHiFGtdtsg1LgcjGcLLYKap5si+Ur+eGXgpY=
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 178.32.119.138
+X-Received-From: 217.72.192.75
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -70,405 +78,614 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org,
- David Gibson <david@gibson.dropbear.id.au>
+Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
+ qemu-block@nongnu.org, Thomas Huth <huth@tuxfamily.org>,
+ Jason Wang <jasowang@redhat.com>,
+ Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
+ "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
+ Laurent Vivier <laurent@vivier.eu>,
+ =?UTF-8?q?Herv=C3=A9=20Poussineau?= <hpoussin@reactos.org>,
+ Gerd Hoffmann <kraxel@redhat.com>,
+ =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Max Reitz <mreitz@redhat.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 22 Oct 2019 09:22:45 +0200
-C=C3=A9dric Le Goater <clg@kaod.org> wrote:
+If you want to test the machine, it doesn't yet boot a MacROM, but you can
+boot a linux kernel from the command line.
 
-> On the sPAPR machine and PowerNV machine, the interrupt presenters are
-> created by a machine handler at the core level and are reseted
-> independently. This is not consistent and it raises issues when it
-> comes to handle hot-plugged CPUs. In that case, the presenters are not
-> reseted. This is less of an issue in XICS, although a zero MFFR could
-> be a concern, but in XIVE, the OS CAM line is not set and this breaks
-> the presenting algorithm. The current code has workarounds which need
-> a global cleanup.
->=20
-> Extend the sPAPR IRQ backend and the PowerNV Chip class with a new
-> cpu_intc_reset() handler called by the CPU reset handler and remove
-> the XiveTCTX reset handler which is now redundant.
->=20
-> Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
-> ---
+You can install your own disk using debian-installer with:
 
-Reviewed-by: Greg Kurz <groug@kaod.org>
+    ./qemu-system-m68k \
+    -M q800 \
+    -serial none -serial mon:stdio \
+    -m 1000M -drive file=m68k.qcow2,format=qcow2 \
+    -net nic,model=dp83932,addr=09:00:07:12:34:57 \
+    -append "console=ttyS0 vga=off" \
+    -kernel vmlinux-4.15.0-2-m68k \
+    -initrd initrd.gz \
+    -drive file=debian-9.0-m68k-NETINST-1.iso \
+    -drive file=m68k.qcow2,format=qcow2 \
+    -nographic
 
->  include/hw/ppc/pnv.h       |  1 +
->  include/hw/ppc/spapr_irq.h |  2 ++
->  include/hw/ppc/xics.h      |  1 +
->  include/hw/ppc/xive.h      |  1 +
->  hw/intc/spapr_xive.c       |  9 +++++++++
->  hw/intc/xics.c             |  8 ++------
->  hw/intc/xics_spapr.c       |  7 +++++++
->  hw/intc/xive.c             | 12 +-----------
->  hw/ppc/pnv.c               | 18 ++++++++++++++++++
->  hw/ppc/pnv_core.c          |  8 ++++++++
->  hw/ppc/spapr_cpu_core.c    |  5 ++++-
->  hw/ppc/spapr_irq.c         | 14 ++++++++++++++
->  12 files changed, 68 insertions(+), 18 deletions(-)
->=20
-> diff --git a/include/hw/ppc/pnv.h b/include/hw/ppc/pnv.h
-> index 1cdbe55bf86c..2a780e633f23 100644
-> --- a/include/hw/ppc/pnv.h
-> +++ b/include/hw/ppc/pnv.h
-> @@ -111,6 +111,7 @@ typedef struct PnvChipClass {
-> =20
->      uint32_t (*core_pir)(PnvChip *chip, uint32_t core_id);
->      void (*intc_create)(PnvChip *chip, PowerPCCPU *cpu, Error **errp);
-> +    void (*intc_reset)(PnvChip *chip, PowerPCCPU *cpu);
->      ISABus *(*isa_create)(PnvChip *chip, Error **errp);
->      void (*dt_populate)(PnvChip *chip, void *fdt);
->      void (*pic_print_info)(PnvChip *chip, Monitor *mon);
-> diff --git a/include/hw/ppc/spapr_irq.h b/include/hw/ppc/spapr_irq.h
-> index 5e150a667902..09232999b07e 100644
-> --- a/include/hw/ppc/spapr_irq.h
-> +++ b/include/hw/ppc/spapr_irq.h
-> @@ -52,6 +52,7 @@ typedef struct SpaprInterruptControllerClass {
->       */
->      int (*cpu_intc_create)(SpaprInterruptController *intc,
->                              PowerPCCPU *cpu, Error **errp);
-> +    void (*cpu_intc_reset)(SpaprInterruptController *intc, PowerPCCPU *c=
-pu);
->      int (*claim_irq)(SpaprInterruptController *intc, int irq, bool lsi,
->                       Error **errp);
->      void (*free_irq)(SpaprInterruptController *intc, int irq);
-> @@ -68,6 +69,7 @@ void spapr_irq_update_active_intc(SpaprMachineState *sp=
-apr);
-> =20
->  int spapr_irq_cpu_intc_create(SpaprMachineState *spapr,
->                                PowerPCCPU *cpu, Error **errp);
-> +void spapr_irq_cpu_intc_reset(SpaprMachineState *spapr, PowerPCCPU *cpu);
->  void spapr_irq_print_info(SpaprMachineState *spapr, Monitor *mon);
->  void spapr_irq_dt(SpaprMachineState *spapr, uint32_t nr_servers,
->                    void *fdt, uint32_t phandle);
-> diff --git a/include/hw/ppc/xics.h b/include/hw/ppc/xics.h
-> index 1e6a9300eb2b..602173c12250 100644
-> --- a/include/hw/ppc/xics.h
-> +++ b/include/hw/ppc/xics.h
-> @@ -161,6 +161,7 @@ void icp_set_mfrr(ICPState *icp, uint8_t mfrr);
->  uint32_t icp_accept(ICPState *ss);
->  uint32_t icp_ipoll(ICPState *ss, uint32_t *mfrr);
->  void icp_eoi(ICPState *icp, uint32_t xirr);
-> +void icp_reset(ICPState *icp);
-> =20
->  void ics_write_xive(ICSState *ics, int nr, int server,
->                      uint8_t priority, uint8_t saved_priority);
-> diff --git a/include/hw/ppc/xive.h b/include/hw/ppc/xive.h
-> index fd3319bd3202..99381639f50c 100644
-> --- a/include/hw/ppc/xive.h
-> +++ b/include/hw/ppc/xive.h
-> @@ -415,6 +415,7 @@ uint64_t xive_tctx_tm_read(XiveTCTX *tctx, hwaddr off=
-set, unsigned size);
-> =20
->  void xive_tctx_pic_print_info(XiveTCTX *tctx, Monitor *mon);
->  Object *xive_tctx_create(Object *cpu, XiveRouter *xrtr, Error **errp);
-> +void xive_tctx_reset(XiveTCTX *tctx);
-> =20
->  static inline uint32_t xive_nvt_cam_line(uint8_t nvt_blk, uint32_t nvt_i=
-dx)
->  {
-> diff --git a/hw/intc/spapr_xive.c b/hw/intc/spapr_xive.c
-> index ba32d2cc5b0f..20a8d8285f64 100644
-> --- a/hw/intc/spapr_xive.c
-> +++ b/hw/intc/spapr_xive.c
-> @@ -553,6 +553,14 @@ static int spapr_xive_cpu_intc_create(SpaprInterrupt=
-Controller *intc,
->      return 0;
->  }
-> =20
-> +static void spapr_xive_cpu_intc_reset(SpaprInterruptController *intc,
-> +                                     PowerPCCPU *cpu)
-> +{
-> +    XiveTCTX *tctx =3D spapr_cpu_state(cpu)->tctx;
-> +
-> +    xive_tctx_reset(tctx);
-> +}
-> +
->  static void spapr_xive_set_irq(SpaprInterruptController *intc, int irq, =
-int val)
->  {
->      SpaprXive *xive =3D SPAPR_XIVE(intc);
-> @@ -697,6 +705,7 @@ static void spapr_xive_class_init(ObjectClass *klass,=
- void *data)
->      sicc->activate =3D spapr_xive_activate;
->      sicc->deactivate =3D spapr_xive_deactivate;
->      sicc->cpu_intc_create =3D spapr_xive_cpu_intc_create;
-> +    sicc->cpu_intc_reset =3D spapr_xive_cpu_intc_reset;
->      sicc->claim_irq =3D spapr_xive_claim_irq;
->      sicc->free_irq =3D spapr_xive_free_irq;
->      sicc->set_irq =3D spapr_xive_set_irq;
-> diff --git a/hw/intc/xics.c b/hw/intc/xics.c
-> index b5ac408f7b74..6da05763f9db 100644
-> --- a/hw/intc/xics.c
-> +++ b/hw/intc/xics.c
-> @@ -274,10 +274,8 @@ static const VMStateDescription vmstate_icp_server =
-=3D {
->      },
->  };
-> =20
-> -static void icp_reset_handler(void *dev)
-> +void icp_reset(ICPState *icp)
->  {
-> -    ICPState *icp =3D ICP(dev);
-> -
->      icp->xirr =3D 0;
->      icp->pending_priority =3D 0xff;
->      icp->mfrr =3D 0xff;
-> @@ -288,7 +286,7 @@ static void icp_reset_handler(void *dev)
->      if (kvm_irqchip_in_kernel()) {
->          Error *local_err =3D NULL;
-> =20
-> -        icp_set_kvm_state(ICP(dev), &local_err);
-> +        icp_set_kvm_state(icp, &local_err);
->          if (local_err) {
->              error_report_err(local_err);
->          }
-> @@ -351,7 +349,6 @@ static void icp_realize(DeviceState *dev, Error **err=
-p)
->          }
->      }
-> =20
-> -    qemu_register_reset(icp_reset_handler, dev);
->      vmstate_register(NULL, icp->cs->cpu_index, &vmstate_icp_server, icp);
->  }
-> =20
-> @@ -360,7 +357,6 @@ static void icp_unrealize(DeviceState *dev, Error **e=
-rrp)
->      ICPState *icp =3D ICP(dev);
-> =20
->      vmstate_unregister(NULL, &vmstate_icp_server, icp);
-> -    qemu_unregister_reset(icp_reset_handler, dev);
->  }
-> =20
->  static void icp_class_init(ObjectClass *klass, void *data)
-> diff --git a/hw/intc/xics_spapr.c b/hw/intc/xics_spapr.c
-> index 4f64b9a9fc66..7418fb9f370c 100644
-> --- a/hw/intc/xics_spapr.c
-> +++ b/hw/intc/xics_spapr.c
-> @@ -346,6 +346,12 @@ static int xics_spapr_cpu_intc_create(SpaprInterrupt=
-Controller *intc,
->      return 0;
->  }
-> =20
-> +static void xics_spapr_cpu_intc_reset(SpaprInterruptController *intc,
-> +                                     PowerPCCPU *cpu)
-> +{
-> +    icp_reset(spapr_cpu_state(cpu)->icp);
-> +}
-> +
->  static int xics_spapr_claim_irq(SpaprInterruptController *intc, int irq,
->                                  bool lsi, Error **errp)
->  {
-> @@ -433,6 +439,7 @@ static void ics_spapr_class_init(ObjectClass *klass, =
-void *data)
->      sicc->activate =3D xics_spapr_activate;
->      sicc->deactivate =3D xics_spapr_deactivate;
->      sicc->cpu_intc_create =3D xics_spapr_cpu_intc_create;
-> +    sicc->cpu_intc_reset =3D xics_spapr_cpu_intc_reset;
->      sicc->claim_irq =3D xics_spapr_claim_irq;
->      sicc->free_irq =3D xics_spapr_free_irq;
->      sicc->set_irq =3D xics_spapr_set_irq;
-> diff --git a/hw/intc/xive.c b/hw/intc/xive.c
-> index d420c6571e14..f066be5eb5e3 100644
-> --- a/hw/intc/xive.c
-> +++ b/hw/intc/xive.c
-> @@ -547,10 +547,8 @@ void xive_tctx_pic_print_info(XiveTCTX *tctx, Monito=
-r *mon)
->      }
->  }
-> =20
-> -static void xive_tctx_reset(void *dev)
-> +void xive_tctx_reset(XiveTCTX *tctx)
->  {
-> -    XiveTCTX *tctx =3D XIVE_TCTX(dev);
-> -
->      memset(tctx->regs, 0, sizeof(tctx->regs));
-> =20
->      /* Set some defaults */
-> @@ -607,13 +605,6 @@ static void xive_tctx_realize(DeviceState *dev, Erro=
-r **errp)
->              return;
->          }
->      }
-> -
-> -    qemu_register_reset(xive_tctx_reset, dev);
-> -}
-> -
-> -static void xive_tctx_unrealize(DeviceState *dev, Error **errp)
-> -{
-> -    qemu_unregister_reset(xive_tctx_reset, dev);
->  }
-> =20
->  static int vmstate_xive_tctx_pre_save(void *opaque)
-> @@ -668,7 +659,6 @@ static void xive_tctx_class_init(ObjectClass *klass, =
-void *data)
-> =20
->      dc->desc =3D "XIVE Interrupt Thread Context";
->      dc->realize =3D xive_tctx_realize;
-> -    dc->unrealize =3D xive_tctx_unrealize;
->      dc->vmsd =3D &vmstate_xive_tctx;
->      /*
->       * Reason: part of XIVE interrupt controller, needs to be wired up
-> diff --git a/hw/ppc/pnv.c b/hw/ppc/pnv.c
-> index 7cf64b6d2533..4a51fb65a834 100644
-> --- a/hw/ppc/pnv.c
-> +++ b/hw/ppc/pnv.c
-> @@ -778,6 +778,13 @@ static void pnv_chip_power8_intc_create(PnvChip *chi=
-p, PowerPCCPU *cpu,
->      pnv_cpu->intc =3D obj;
->  }
-> =20
-> +static void pnv_chip_power8_intc_reset(PnvChip *chip, PowerPCCPU *cpu)
-> +{
-> +    PnvCPUState *pnv_cpu =3D pnv_cpu_state(cpu);
-> +
-> +    icp_reset(ICP(pnv_cpu->intc));
-> +}
-> +
->  /*
->   *    0:48  Reserved - Read as zeroes
->   *   49:52  Node ID
-> @@ -815,6 +822,13 @@ static void pnv_chip_power9_intc_create(PnvChip *chi=
-p, PowerPCCPU *cpu,
->      pnv_cpu->intc =3D obj;
->  }
-> =20
-> +static void pnv_chip_power9_intc_reset(PnvChip *chip, PowerPCCPU *cpu)
-> +{
-> +    PnvCPUState *pnv_cpu =3D pnv_cpu_state(cpu);
-> +
-> +    xive_tctx_reset(XIVE_TCTX(pnv_cpu->intc));
-> +}
-> +
->  /*
->   * Allowed core identifiers on a POWER8 Processor Chip :
->   *
-> @@ -984,6 +998,7 @@ static void pnv_chip_power8e_class_init(ObjectClass *=
-klass, void *data)
->      k->cores_mask =3D POWER8E_CORE_MASK;
->      k->core_pir =3D pnv_chip_core_pir_p8;
->      k->intc_create =3D pnv_chip_power8_intc_create;
-> +    k->intc_reset =3D pnv_chip_power8_intc_reset;
->      k->isa_create =3D pnv_chip_power8_isa_create;
->      k->dt_populate =3D pnv_chip_power8_dt_populate;
->      k->pic_print_info =3D pnv_chip_power8_pic_print_info;
-> @@ -1003,6 +1018,7 @@ static void pnv_chip_power8_class_init(ObjectClass =
-*klass, void *data)
->      k->cores_mask =3D POWER8_CORE_MASK;
->      k->core_pir =3D pnv_chip_core_pir_p8;
->      k->intc_create =3D pnv_chip_power8_intc_create;
-> +    k->intc_reset =3D pnv_chip_power8_intc_reset;
->      k->isa_create =3D pnv_chip_power8_isa_create;
->      k->dt_populate =3D pnv_chip_power8_dt_populate;
->      k->pic_print_info =3D pnv_chip_power8_pic_print_info;
-> @@ -1022,6 +1038,7 @@ static void pnv_chip_power8nvl_class_init(ObjectCla=
-ss *klass, void *data)
->      k->cores_mask =3D POWER8_CORE_MASK;
->      k->core_pir =3D pnv_chip_core_pir_p8;
->      k->intc_create =3D pnv_chip_power8_intc_create;
-> +    k->intc_reset =3D pnv_chip_power8_intc_reset;
->      k->isa_create =3D pnv_chip_power8nvl_isa_create;
->      k->dt_populate =3D pnv_chip_power8_dt_populate;
->      k->pic_print_info =3D pnv_chip_power8_pic_print_info;
-> @@ -1191,6 +1208,7 @@ static void pnv_chip_power9_class_init(ObjectClass =
-*klass, void *data)
->      k->cores_mask =3D POWER9_CORE_MASK;
->      k->core_pir =3D pnv_chip_core_pir_p9;
->      k->intc_create =3D pnv_chip_power9_intc_create;
-> +    k->intc_reset =3D pnv_chip_power9_intc_reset;
->      k->isa_create =3D pnv_chip_power9_isa_create;
->      k->dt_populate =3D pnv_chip_power9_dt_populate;
->      k->pic_print_info =3D pnv_chip_power9_pic_print_info;
-> diff --git a/hw/ppc/pnv_core.c b/hw/ppc/pnv_core.c
-> index b1a7489e7abf..f36cb39dbf77 100644
-> --- a/hw/ppc/pnv_core.c
-> +++ b/hw/ppc/pnv_core.c
-> @@ -45,6 +45,8 @@ static void pnv_cpu_reset(void *opaque)
->      PowerPCCPU *cpu =3D opaque;
->      CPUState *cs =3D CPU(cpu);
->      CPUPPCState *env =3D &cpu->env;
-> +    PnvChipClass *pcc;
-> +    Object *chip;
-> =20
->      cpu_reset(cs);
-> =20
-> @@ -55,6 +57,10 @@ static void pnv_cpu_reset(void *opaque)
->      env->gpr[3] =3D PNV_FDT_ADDR;
->      env->nip =3D 0x10;
->      env->msr |=3D MSR_HVB; /* Hypervisor mode */
-> +
-> +    chip =3D object_property_get_link(OBJECT(cpu), "chip", &error_fatal);
-> +    pcc =3D PNV_CHIP_GET_CLASS(chip);
-> +    pcc->intc_reset(PNV_CHIP(chip), cpu);
->  }
-> =20
->  /*
-> @@ -169,6 +175,8 @@ static void pnv_realize_vcpu(PowerPCCPU *cpu, PnvChip=
- *chip, Error **errp)
->      Error *local_err =3D NULL;
->      PnvChipClass *pcc =3D PNV_CHIP_GET_CLASS(chip);
-> =20
-> +    object_property_add_const_link(OBJECT(cpu), "chip",
-> +                                   OBJECT(chip), &error_fatal);
->      object_property_set_bool(OBJECT(cpu), true, "realized", &local_err);
->      if (local_err) {
->          error_propagate(errp, local_err);
-> diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
-> index 5947e39b36ad..d2903c2d0f22 100644
-> --- a/hw/ppc/spapr_cpu_core.c
-> +++ b/hw/ppc/spapr_cpu_core.c
-> @@ -32,6 +32,7 @@ static void spapr_reset_vcpu(PowerPCCPU *cpu)
->      PowerPCCPUClass *pcc =3D POWERPC_CPU_GET_CLASS(cpu);
->      SpaprCpuState *spapr_cpu =3D spapr_cpu_state(cpu);
->      target_ulong lpcr;
-> +    SpaprMachineState *spapr =3D SPAPR_MACHINE(qdev_get_machine());
-> =20
->      cpu_reset(cs);
-> =20
-> @@ -76,9 +77,11 @@ static void spapr_reset_vcpu(PowerPCCPU *cpu)
->      spapr_cpu->dtl_addr =3D 0;
->      spapr_cpu->dtl_size =3D 0;
-> =20
-> -    spapr_caps_cpu_apply(SPAPR_MACHINE(qdev_get_machine()), cpu);
-> +    spapr_caps_cpu_apply(spapr, cpu);
-> =20
->      kvm_check_mmu(cpu, &error_fatal);
-> +
-> +    spapr_irq_cpu_intc_reset(spapr, cpu);
->  }
-> =20
->  void spapr_cpu_set_entry_state(PowerPCCPU *cpu, target_ulong nip, target=
-_ulong r3)
-> diff --git a/hw/ppc/spapr_irq.c b/hw/ppc/spapr_irq.c
-> index 234d1073e518..b941608b69ba 100644
-> --- a/hw/ppc/spapr_irq.c
-> +++ b/hw/ppc/spapr_irq.c
-> @@ -220,6 +220,20 @@ int spapr_irq_cpu_intc_create(SpaprMachineState *spa=
-pr,
->      return 0;
->  }
-> =20
-> +void spapr_irq_cpu_intc_reset(SpaprMachineState *spapr, PowerPCCPU *cpu)
-> +{
-> +    SpaprInterruptController *intcs[] =3D ALL_INTCS(spapr);
-> +    int i;
-> +
-> +    for (i =3D 0; i < ARRAY_SIZE(intcs); i++) {
-> +        SpaprInterruptController *intc =3D intcs[i];
-> +        if (intc) {
-> +            SpaprInterruptControllerClass *sicc =3D SPAPR_INTC_GET_CLASS=
-(intc);
-> +            sicc->cpu_intc_reset(intc, cpu);
-> +        }
-> +    }
-> +}
-> +
->  static void spapr_set_irq(void *opaque, int irq, int level)
->  {
->      SpaprMachineState *spapr =3D SPAPR_MACHINE(opaque);
+If you use a graphic adapter instead of "-nographic", you can use "-g"
+to set the size of the display (I use "-g 1600x800x24").
+
+Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Co-developed-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Signed-off-by: Laurent Vivier <laurent@vivier.eu>
+---
+ hw/m68k/bootinfo.h    | 114 ++++++++++++
+ hw/m68k/q800.c        | 394 ++++++++++++++++++++++++++++++++++++++++++
+ MAINTAINERS           |   2 +
+ hw/m68k/Kconfig       |   3 +
+ hw/m68k/Makefile.objs |   1 +
+ 5 files changed, 514 insertions(+)
+ create mode 100644 hw/m68k/bootinfo.h
+ create mode 100644 hw/m68k/q800.c
+
+diff --git a/hw/m68k/bootinfo.h b/hw/m68k/bootinfo.h
+new file mode 100644
+index 0000000000..5f8ded2686
+--- /dev/null
++++ b/hw/m68k/bootinfo.h
+@@ -0,0 +1,114 @@
++/*
++ * SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note
++ *
++ * Bootinfo tags from linux bootinfo.h and bootinfo-mac.h:
++ * This is an easily parsable and extendable structure containing all
++ * information to be passed from the bootstrap to the kernel
++ *
++ * This structure is copied right after the kernel by the bootstrap
++ * routine.
++ */
++
++#ifndef HW_M68K_BOOTINFO_H
++#define HW_M68K_BOOTINFO_H
++struct bi_record {
++    uint16_t tag;        /* tag ID */
++    uint16_t size;       /* size of record */
++    uint32_t data[0];    /* data */
++};
++
++/* machine independent tags */
++
++#define BI_LAST         0x0000 /* last record */
++#define BI_MACHTYPE     0x0001 /* machine type (u_long) */
++#define BI_CPUTYPE      0x0002 /* cpu type (u_long) */
++#define BI_FPUTYPE      0x0003 /* fpu type (u_long) */
++#define BI_MMUTYPE      0x0004 /* mmu type (u_long) */
++#define BI_MEMCHUNK     0x0005 /* memory chunk address and size */
++                               /* (struct mem_info) */
++#define BI_RAMDISK      0x0006 /* ramdisk address and size */
++                               /* (struct mem_info) */
++#define BI_COMMAND_LINE 0x0007 /* kernel command line parameters */
++                               /* (string) */
++
++/*  Macintosh-specific tags (all u_long) */
++
++#define BI_MAC_MODEL    0x8000  /* Mac Gestalt ID (model type) */
++#define BI_MAC_VADDR    0x8001  /* Mac video base address */
++#define BI_MAC_VDEPTH   0x8002  /* Mac video depth */
++#define BI_MAC_VROW     0x8003  /* Mac video rowbytes */
++#define BI_MAC_VDIM     0x8004  /* Mac video dimensions */
++#define BI_MAC_VLOGICAL 0x8005  /* Mac video logical base */
++#define BI_MAC_SCCBASE  0x8006  /* Mac SCC base address */
++#define BI_MAC_BTIME    0x8007  /* Mac boot time */
++#define BI_MAC_GMTBIAS  0x8008  /* Mac GMT timezone offset */
++#define BI_MAC_MEMSIZE  0x8009  /* Mac RAM size (sanity check) */
++#define BI_MAC_CPUID    0x800a  /* Mac CPU type (sanity check) */
++#define BI_MAC_ROMBASE  0x800b  /* Mac system ROM base address */
++
++/*  Macintosh hardware profile data */
++
++#define BI_MAC_VIA1BASE 0x8010  /* Mac VIA1 base address (always present) */
++#define BI_MAC_VIA2BASE 0x8011  /* Mac VIA2 base address (type varies) */
++#define BI_MAC_VIA2TYPE 0x8012  /* Mac VIA2 type (VIA, RBV, OSS) */
++#define BI_MAC_ADBTYPE  0x8013  /* Mac ADB interface type */
++#define BI_MAC_ASCBASE  0x8014  /* Mac Apple Sound Chip base address */
++#define BI_MAC_SCSI5380 0x8015  /* Mac NCR 5380 SCSI (base address, multi) */
++#define BI_MAC_SCSIDMA  0x8016  /* Mac SCSI DMA (base address) */
++#define BI_MAC_SCSI5396 0x8017  /* Mac NCR 53C96 SCSI (base address, multi) */
++#define BI_MAC_IDETYPE  0x8018  /* Mac IDE interface type */
++#define BI_MAC_IDEBASE  0x8019  /* Mac IDE interface base address */
++#define BI_MAC_NUBUS    0x801a  /* Mac Nubus type (none, regular, pseudo) */
++#define BI_MAC_SLOTMASK 0x801b  /* Mac Nubus slots present */
++#define BI_MAC_SCCTYPE  0x801c  /* Mac SCC serial type (normal, IOP) */
++#define BI_MAC_ETHTYPE  0x801d  /* Mac builtin ethernet type (Sonic, MACE */
++#define BI_MAC_ETHBASE  0x801e  /* Mac builtin ethernet base address */
++#define BI_MAC_PMU      0x801f  /* Mac power management / poweroff hardware */
++#define BI_MAC_IOP_SWIM 0x8020  /* Mac SWIM floppy IOP */
++#define BI_MAC_IOP_ADB  0x8021  /* Mac ADB IOP */
++
++#define BOOTINFO0(as, base, id) \
++    do { \
++        stw_phys(as, base, id); \
++        base += 2; \
++        stw_phys(as, base, sizeof(struct bi_record)); \
++        base += 2; \
++    } while (0)
++
++#define BOOTINFO1(as, base, id, value) \
++    do { \
++        stw_phys(as, base, id); \
++        base += 2; \
++        stw_phys(as, base, sizeof(struct bi_record) + 4); \
++        base += 2; \
++        stl_phys(as, base, value); \
++        base += 4; \
++    } while (0)
++
++#define BOOTINFO2(as, base, id, value1, value2) \
++    do { \
++        stw_phys(as, base, id); \
++        base += 2; \
++        stw_phys(as, base, sizeof(struct bi_record) + 8); \
++        base += 2; \
++        stl_phys(as, base, value1); \
++        base += 4; \
++        stl_phys(as, base, value2); \
++        base += 4; \
++    } while (0)
++
++#define BOOTINFOSTR(as, base, id, string) \
++    do { \
++        int i; \
++        stw_phys(as, base, id); \
++        base += 2; \
++        stw_phys(as, base, \
++                 (sizeof(struct bi_record) + strlen(string) + 2) & ~1); \
++        base += 2; \
++        for (i = 0; string[i]; i++) { \
++            stb_phys(as, base++, string[i]); \
++        } \
++        stb_phys(as, base++, 0); \
++        base = (parameters_base + 1) & ~1; \
++    } while (0)
++#endif
+diff --git a/hw/m68k/q800.c b/hw/m68k/q800.c
+new file mode 100644
+index 0000000000..039bfbd88b
+--- /dev/null
++++ b/hw/m68k/q800.c
+@@ -0,0 +1,394 @@
++/*
++ * QEMU Motorla 680x0 Macintosh hardware System Emulator
++ *
++ * Permission is hereby granted, free of charge, to any person obtaining a copy
++ * of this software and associated documentation files (the "Software"), to deal
++ * in the Software without restriction, including without limitation the rights
++ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
++ * copies of the Software, and to permit persons to whom the Software is
++ * furnished to do so, subject to the following conditions:
++ *
++ * The above copyright notice and this permission notice shall be included in
++ * all copies or substantial portions of the Software.
++ *
++ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
++ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
++ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
++ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
++ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
++ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
++ * THE SOFTWARE.
++ */
++
++#include "qemu/osdep.h"
++#include "qemu-common.h"
++#include "sysemu/sysemu.h"
++#include "cpu.h"
++#include "hw/hw.h"
++#include "hw/boards.h"
++#include "hw/irq.h"
++#include "elf.h"
++#include "hw/loader.h"
++#include "ui/console.h"
++#include "exec/address-spaces.h"
++#include "hw/char/escc.h"
++#include "hw/sysbus.h"
++#include "hw/scsi/esp.h"
++#include "bootinfo.h"
++#include "hw/misc/mac_via.h"
++#include "hw/input/adb.h"
++#include "hw/nubus/mac-nubus-bridge.h"
++#include "hw/display/macfb.h"
++#include "hw/block/swim.h"
++#include "net/net.h"
++#include "qapi/error.h"
++#include "sysemu/qtest.h"
++#include "sysemu/runstate.h"
++#include "sysemu/reset.h"
++
++#define MACROM_ADDR     0x40000000
++#define MACROM_SIZE     0x00100000
++
++#define MACROM_FILENAME "MacROM.bin"
++
++#define Q800_MACHINE_ID 35
++#define Q800_CPU_ID (1 << 2)
++#define Q800_FPU_ID (1 << 2)
++#define Q800_MMU_ID (1 << 2)
++
++#define MACH_MAC        3
++#define Q800_MAC_CPU_ID 2
++
++#define VIA_BASE              0x50f00000
++#define SONIC_PROM_BASE       0x50f08000
++#define SONIC_BASE            0x50f0a000
++#define SCC_BASE              0x50f0c020
++#define ESP_BASE              0x50f10000
++#define ESP_PDMA              0x50f10100
++#define ASC_BASE              0x50F14000
++#define SWIM_BASE             0x50F1E000
++#define NUBUS_SUPER_SLOT_BASE 0x60000000
++#define NUBUS_SLOT_BASE       0xf0000000
++
++/*
++ * the video base, whereas it a Nubus address,
++ * is needed by the kernel to have early display and
++ * thus provided by the bootloader
++ */
++#define VIDEO_BASE            0xf9001000
++
++#define MAC_CLOCK  3686418
++
++/*
++ * The GLUE (General Logic Unit) is an Apple custom integrated circuit chip
++ * that performs a variety of functions (RAM management, clock generation, ...).
++ * The GLUE chip receives interrupt requests from various devices,
++ * assign priority to each, and asserts one or more interrupt line to the
++ * CPU.
++ */
++
++typedef struct {
++    M68kCPU *cpu;
++    uint8_t ipr;
++} GLUEState;
++
++static void GLUE_set_irq(void *opaque, int irq, int level)
++{
++    GLUEState *s = opaque;
++    int i;
++
++    if (level) {
++        s->ipr |= 1 << irq;
++    } else {
++        s->ipr &= ~(1 << irq);
++    }
++
++    for (i = 7; i >= 0; i--) {
++        if ((s->ipr >> i) & 1) {
++            m68k_set_irq_level(s->cpu, i + 1, i + 25);
++            return;
++        }
++    }
++    m68k_set_irq_level(s->cpu, 0, 0);
++}
++
++static void main_cpu_reset(void *opaque)
++{
++    M68kCPU *cpu = opaque;
++    CPUState *cs = CPU(cpu);
++
++    cpu_reset(cs);
++    cpu->env.aregs[7] = ldl_phys(cs->as, 0);
++    cpu->env.pc = ldl_phys(cs->as, 4);
++}
++
++static void q800_init(MachineState *machine)
++{
++    M68kCPU *cpu = NULL;
++    int linux_boot;
++    int32_t kernel_size;
++    uint64_t elf_entry;
++    char *filename;
++    int bios_size;
++    ram_addr_t initrd_base;
++    int32_t initrd_size;
++    MemoryRegion *rom;
++    MemoryRegion *ram;
++    ram_addr_t ram_size = machine->ram_size;
++    const char *kernel_filename = machine->kernel_filename;
++    const char *initrd_filename = machine->initrd_filename;
++    const char *kernel_cmdline = machine->kernel_cmdline;
++    hwaddr parameters_base;
++    CPUState *cs;
++    DeviceState *dev;
++    DeviceState *via_dev;
++    SysBusESPState *sysbus_esp;
++    ESPState *esp;
++    SysBusDevice *sysbus;
++    BusState *adb_bus;
++    NubusBus *nubus;
++    GLUEState *irq;
++    qemu_irq *pic;
++
++    linux_boot = (kernel_filename != NULL);
++
++    /* init CPUs */
++    cpu = M68K_CPU(cpu_create(machine->cpu_type));
++    qemu_register_reset(main_cpu_reset, cpu);
++
++    ram = g_malloc(sizeof(*ram));
++    memory_region_init_ram(ram, NULL, "m68k_mac.ram", ram_size, &error_abort);
++    memory_region_add_subregion(get_system_memory(), 0, ram);
++
++    /* IRQ Glue */
++
++    irq = g_new0(GLUEState, 1);
++    irq->cpu = cpu;
++    pic = qemu_allocate_irqs(GLUE_set_irq, irq, 8);
++
++    /* VIA */
++
++    via_dev = qdev_create(NULL, TYPE_MAC_VIA);
++    qdev_init_nofail(via_dev);
++    sysbus = SYS_BUS_DEVICE(via_dev);
++    sysbus_mmio_map(sysbus, 0, VIA_BASE);
++    qdev_connect_gpio_out_named(DEVICE(sysbus), "irq", 0, pic[0]);
++    qdev_connect_gpio_out_named(DEVICE(sysbus), "irq", 1, pic[1]);
++
++
++    adb_bus = qdev_get_child_bus(via_dev, "adb.0");
++    dev = qdev_create(adb_bus, TYPE_ADB_KEYBOARD);
++    qdev_init_nofail(dev);
++    dev = qdev_create(adb_bus, TYPE_ADB_MOUSE);
++    qdev_init_nofail(dev);
++
++    /* MACSONIC */
++
++    if (nb_nics > 1) {
++        error_report("q800 can only have one ethernet interface");
++        exit(1);
++    }
++
++    qemu_check_nic_model(&nd_table[0], "dp83932");
++
++    /*
++     * MacSonic driver needs an Apple MAC address
++     * Valid prefix are:
++     * 00:05:02 Apple
++     * 00:80:19 Dayna Communications, Inc.
++     * 00:A0:40 Apple
++     * 08:00:07 Apple
++     * (Q800 use the last one)
++     */
++    nd_table[0].macaddr.a[0] = 0x08;
++    nd_table[0].macaddr.a[1] = 0x00;
++    nd_table[0].macaddr.a[2] = 0x07;
++
++    dev = qdev_create(NULL, "dp8393x");
++    qdev_set_nic_properties(dev, &nd_table[0]);
++    qdev_prop_set_uint8(dev, "it_shift", 2);
++    qdev_prop_set_bit(dev, "big_endian", true);
++    qdev_prop_set_ptr(dev, "dma_mr", get_system_memory());
++    qdev_init_nofail(dev);
++    sysbus = SYS_BUS_DEVICE(dev);
++    sysbus_mmio_map(sysbus, 0, SONIC_BASE);
++    sysbus_mmio_map(sysbus, 1, SONIC_PROM_BASE);
++    sysbus_connect_irq(sysbus, 0, pic[2]);
++
++    /* SCC */
++
++    dev = qdev_create(NULL, TYPE_ESCC);
++    qdev_prop_set_uint32(dev, "disabled", 0);
++    qdev_prop_set_uint32(dev, "frequency", MAC_CLOCK);
++    qdev_prop_set_uint32(dev, "it_shift", 1);
++    qdev_prop_set_bit(dev, "bit_swap", true);
++    qdev_prop_set_chr(dev, "chrA", serial_hd(0));
++    qdev_prop_set_chr(dev, "chrB", serial_hd(1));
++    qdev_prop_set_uint32(dev, "chnBtype", 0);
++    qdev_prop_set_uint32(dev, "chnAtype", 0);
++    qdev_init_nofail(dev);
++    sysbus = SYS_BUS_DEVICE(dev);
++    sysbus_connect_irq(sysbus, 0, pic[3]);
++    sysbus_connect_irq(sysbus, 1, pic[3]);
++    sysbus_mmio_map(sysbus, 0, SCC_BASE);
++
++    /* SCSI */
++
++    dev = qdev_create(NULL, TYPE_ESP);
++    sysbus_esp = ESP_STATE(dev);
++    esp = &sysbus_esp->esp;
++    esp->dma_memory_read = NULL;
++    esp->dma_memory_write = NULL;
++    esp->dma_opaque = NULL;
++    sysbus_esp->it_shift = 4;
++    esp->dma_enabled = 1;
++    qdev_init_nofail(dev);
++
++    sysbus = SYS_BUS_DEVICE(dev);
++    sysbus_connect_irq(sysbus, 0, qdev_get_gpio_in_named(via_dev,
++                                                         "via2-irq",
++                                                         VIA2_IRQ_SCSI_BIT));
++    sysbus_connect_irq(sysbus, 1,
++                       qdev_get_gpio_in_named(via_dev, "via2-irq",
++                                              VIA2_IRQ_SCSI_DATA_BIT));
++    sysbus_mmio_map(sysbus, 0, ESP_BASE);
++    sysbus_mmio_map(sysbus, 1, ESP_PDMA);
++
++    scsi_bus_legacy_handle_cmdline(&esp->bus);
++
++    /* SWIM floppy controller */
++
++    dev = qdev_create(NULL, TYPE_SWIM);
++    qdev_init_nofail(dev);
++    sysbus_mmio_map(SYS_BUS_DEVICE(dev), 0, SWIM_BASE);
++
++    /* NuBus */
++
++    dev = qdev_create(NULL, TYPE_MAC_NUBUS_BRIDGE);
++    qdev_init_nofail(dev);
++    sysbus_mmio_map(SYS_BUS_DEVICE(dev), 0, NUBUS_SUPER_SLOT_BASE);
++    sysbus_mmio_map(SYS_BUS_DEVICE(dev), 1, NUBUS_SLOT_BASE);
++
++    nubus = MAC_NUBUS_BRIDGE(dev)->bus;
++
++    /* framebuffer in nubus slot #9 */
++
++    dev = qdev_create(BUS(nubus), TYPE_NUBUS_MACFB);
++    qdev_prop_set_uint32(dev, "width", graphic_width);
++    qdev_prop_set_uint32(dev, "height", graphic_height);
++    qdev_prop_set_uint8(dev, "depth", graphic_depth);
++    qdev_init_nofail(dev);
++
++    cs = CPU(cpu);
++    if (linux_boot) {
++        uint64_t high;
++        kernel_size = load_elf(kernel_filename, NULL, NULL, NULL,
++                               &elf_entry, NULL, &high, 1,
++                               EM_68K, 0, 0);
++        if (kernel_size < 0) {
++            error_report("could not load kernel '%s'", kernel_filename);
++            exit(1);
++        }
++        stl_phys(cs->as, 4, elf_entry); /* reset initial PC */
++        parameters_base = (high + 1) & ~1;
++
++        BOOTINFO1(cs->as, parameters_base, BI_MACHTYPE, MACH_MAC);
++        BOOTINFO1(cs->as, parameters_base, BI_FPUTYPE, Q800_FPU_ID);
++        BOOTINFO1(cs->as, parameters_base, BI_MMUTYPE, Q800_MMU_ID);
++        BOOTINFO1(cs->as, parameters_base, BI_CPUTYPE, Q800_CPU_ID);
++        BOOTINFO1(cs->as, parameters_base, BI_MAC_CPUID, Q800_MAC_CPU_ID);
++        BOOTINFO1(cs->as, parameters_base, BI_MAC_MODEL, Q800_MACHINE_ID);
++        BOOTINFO1(cs->as, parameters_base,
++                  BI_MAC_MEMSIZE, ram_size >> 20); /* in MB */
++        BOOTINFO2(cs->as, parameters_base, BI_MEMCHUNK, 0, ram_size);
++        BOOTINFO1(cs->as, parameters_base, BI_MAC_VADDR, VIDEO_BASE);
++        BOOTINFO1(cs->as, parameters_base, BI_MAC_VDEPTH, graphic_depth);
++        BOOTINFO1(cs->as, parameters_base, BI_MAC_VDIM,
++                  (graphic_height << 16) | graphic_width);
++        BOOTINFO1(cs->as, parameters_base, BI_MAC_VROW,
++                  (graphic_width * graphic_depth + 7) / 8);
++        BOOTINFO1(cs->as, parameters_base, BI_MAC_SCCBASE, SCC_BASE);
++
++        if (kernel_cmdline) {
++            BOOTINFOSTR(cs->as, parameters_base, BI_COMMAND_LINE,
++                        kernel_cmdline);
++        }
++
++        /* load initrd */
++        if (initrd_filename) {
++            initrd_size = get_image_size(initrd_filename);
++            if (initrd_size < 0) {
++                error_report("could not load initial ram disk '%s'",
++                             initrd_filename);
++                exit(1);
++            }
++
++            initrd_base = (ram_size - initrd_size) & TARGET_PAGE_MASK;
++            load_image_targphys(initrd_filename, initrd_base,
++                                ram_size - initrd_base);
++            BOOTINFO2(cs->as, parameters_base, BI_RAMDISK, initrd_base,
++                      initrd_size);
++        } else {
++            initrd_base = 0;
++            initrd_size = 0;
++        }
++        BOOTINFO0(cs->as, parameters_base, BI_LAST);
++    } else {
++        uint8_t *ptr;
++        /* allocate and load BIOS */
++        rom = g_malloc(sizeof(*rom));
++        memory_region_init_ram(rom, NULL, "m68k_mac.rom", MACROM_SIZE,
++                               &error_abort);
++        if (bios_name == NULL) {
++            bios_name = MACROM_FILENAME;
++        }
++        filename = qemu_find_file(QEMU_FILE_TYPE_BIOS, bios_name);
++        memory_region_set_readonly(rom, true);
++        memory_region_add_subregion(get_system_memory(), MACROM_ADDR, rom);
++
++        /* Load MacROM binary */
++        if (filename) {
++            bios_size = load_image_targphys(filename, MACROM_ADDR, MACROM_SIZE);
++            g_free(filename);
++        } else {
++            bios_size = -1;
++        }
++
++        /* Remove qtest_enabled() check once firmware files are in the tree */
++        if (!qtest_enabled()) {
++            if (bios_size < 0 || bios_size > MACROM_SIZE) {
++                error_report("could not load MacROM '%s'", bios_name);
++                exit(1);
++            }
++
++            ptr = rom_ptr(MACROM_ADDR, MACROM_SIZE);
++            stl_phys(cs->as, 0, ldl_p(ptr));    /* reset initial SP */
++            stl_phys(cs->as, 4,
++                     MACROM_ADDR + ldl_p(ptr + 4)); /* reset initial PC */
++        }
++    }
++}
++
++static void q800_machine_class_init(ObjectClass *oc, void *data)
++{
++    MachineClass *mc = MACHINE_CLASS(oc);
++    mc->desc = "Macintosh Quadra 800";
++    mc->init = q800_init;
++    mc->default_cpu_type = M68K_CPU_TYPE_NAME("m68040");
++    mc->max_cpus = 1;
++    mc->is_default = 0;
++    mc->block_default_type = IF_SCSI;
++}
++
++static const TypeInfo q800_machine_typeinfo = {
++    .name       = MACHINE_TYPE_NAME("q800"),
++    .parent     = TYPE_MACHINE,
++    .class_init = q800_machine_class_init,
++};
++
++static void q800_machine_register_types(void)
++{
++    type_register_static(&q800_machine_typeinfo);
++}
++
++type_init(q800_machine_register_types)
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 67506792b2..af68c96cae 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -920,10 +920,12 @@ F: include/hw/m68k/next-cube.h
+ q800
+ M: Laurent Vivier <laurent@vivier.eu>
+ S: Maintained
++F: hw/m68k/q800.c
+ F: hw/misc/mac_via.c
+ F: hw/nubus/*
+ F: hw/display/macfb.c
+ F: hw/block/swim.c
++F: hw/m68k/bootinfo.h
+ F: include/hw/misc/mac_via.h
+ F: include/hw/nubus/*
+ F: include/hw/display/macfb.h
+diff --git a/hw/m68k/Kconfig b/hw/m68k/Kconfig
+index bab4885ca5..c757e7dfa4 100644
+--- a/hw/m68k/Kconfig
++++ b/hw/m68k/Kconfig
+@@ -19,3 +19,6 @@ config Q800
+     select NUBUS
+     select MACFB
+     select SWIM
++    select ESCC
++    select ESP
++    select DP8393X
+diff --git a/hw/m68k/Makefile.objs b/hw/m68k/Makefile.objs
+index f25854730d..b2c9e5ab12 100644
+--- a/hw/m68k/Makefile.objs
++++ b/hw/m68k/Makefile.objs
+@@ -1,3 +1,4 @@
+ obj-$(CONFIG_AN5206) += an5206.o mcf5206.o
+ obj-$(CONFIG_MCF5208) += mcf5208.o mcf_intc.o
+ obj-$(CONFIG_NEXTCUBE) += next-kbd.o next-cube.o
++obj-$(CONFIG_Q800) += q800.o
+-- 
+2.21.0
 
 
