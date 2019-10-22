@@ -6,74 +6,74 @@ X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CF62BCA9EA0
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 16:30:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 69F0ACA9EA0
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 16:32:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9DC3D20B7C
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 16:30:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3298420B7C
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 16:32:46 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ywk8CDKq"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9DC3D20B7C
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WreBdHm8"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3298420B7C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35750 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35764 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iMx3L-0008BF-Ap
-	for qemu-devel@archiver.kernel.org; Tue, 22 Oct 2019 12:30:35 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38253)
+	id 1iMx5R-0001FD-5D
+	for qemu-devel@archiver.kernel.org; Tue, 22 Oct 2019 12:32:45 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38166)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <marcandre.lureau@redhat.com>) id 1iMwwE-0007Dc-22
- for qemu-devel@nongnu.org; Tue, 22 Oct 2019 12:23:15 -0400
+ (envelope-from <marcandre.lureau@redhat.com>) id 1iMww5-00079f-9m
+ for qemu-devel@nongnu.org; Tue, 22 Oct 2019 12:23:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <marcandre.lureau@redhat.com>) id 1iMwwC-0007PT-Li
- for qemu-devel@nongnu.org; Tue, 22 Oct 2019 12:23:13 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:27156
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <marcandre.lureau@redhat.com>) id 1iMww4-0007Lz-6Q
+ for qemu-devel@nongnu.org; Tue, 22 Oct 2019 12:23:05 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:29747
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
- id 1iMwwC-0007Ow-I2
- for qemu-devel@nongnu.org; Tue, 22 Oct 2019 12:23:12 -0400
+ id 1iMww2-0007LG-89
+ for qemu-devel@nongnu.org; Tue, 22 Oct 2019 12:23:04 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1571761392;
+ s=mimecast20190719; t=1571761381;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=89Zo2A2N2T1L7Eo/D/HcuXY8WnhlbrmU/BS7ldbzPes=;
- b=Ywk8CDKqYiwfv6HfD1ddxcJzHsMCu6YD+Hcaz71PbvMFlGe5IcwArUl97XO1FJw82zZdzb
- jiR+TonxQFWLkcCkb3ZLn6SrEjGVXFigKNhACyrJ3zqSTZRPZtk0EIYwRpR/nL4oF0XNf8
- +bCyzQynYiMWDVhhOJALUOMX7Pu81To=
+ bh=C8VliOfXNriDMO2dKLePabRm6Hq+1WtEx9pktGTynxQ=;
+ b=WreBdHm8TmwfYsl/qVs8MVWmYzX0E+SupgWFp30SGADt7FeE5BpFO8MjjIGj9JbmTkyU/N
+ OEK977RyAdJd/Zf9cvcKmJtSEDeCi0j2UruDK5A4EtDS31FJMYnPX2vAexRpIT/JOz1ibE
+ zNZSqKyJHIu4OCGIedtGIzce0gK5884=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-352-VjPIc05rNO2t1yDblpAyQg-1; Tue, 22 Oct 2019 12:23:08 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ us-mta-6-tDR0K_S9MieNkKv5EgLOsw-1; Tue, 22 Oct 2019 12:22:58 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DBE89107AD31;
- Tue, 22 Oct 2019 16:23:02 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DA6F3107AD31;
+ Tue, 22 Oct 2019 16:22:55 +0000 (UTC)
 Received: from localhost (ovpn-112-21.ams2.redhat.com [10.36.112.21])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 3FA1D5DC18;
- Tue, 22 Oct 2019 16:22:57 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id AEA6119C4F;
+ Tue, 22 Oct 2019 16:22:49 +0000 (UTC)
 From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 09/28] serial: add "baudbase" property
-Date: Tue, 22 Oct 2019 18:21:18 +0200
-Message-Id: <20191022162137.27161-10-marcandre.lureau@redhat.com>
+Subject: [PATCH v2 08/28] serial: convert irq to qdev gpio properties
+Date: Tue, 22 Oct 2019 18:21:17 +0200
+Message-Id: <20191022162137.27161-9-marcandre.lureau@redhat.com>
 In-Reply-To: <20191022162137.27161-1-marcandre.lureau@redhat.com>
 References: <20191022162137.27161-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-MC-Unique: VjPIc05rNO2t1yDblpAyQg-1
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-MC-Unique: tDR0K_S9MieNkKv5EgLOsw-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.61
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -104,58 +104,57 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Use qdev facility for IRQ handling.
+
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 ---
- hw/char/serial.c         | 5 +++--
- include/hw/char/serial.h | 2 +-
- 2 files changed, 4 insertions(+), 3 deletions(-)
+ hw/char/serial.c | 12 ++++++++++--
+ 1 file changed, 10 insertions(+), 2 deletions(-)
 
 diff --git a/hw/char/serial.c b/hw/char/serial.c
-index 7bc7c4370b..0ae52ec60c 100644
+index 18ca79ccf3..7bc7c4370b 100644
 --- a/hw/char/serial.c
 +++ b/hw/char/serial.c
-@@ -988,7 +988,7 @@ SerialState *serial_init(int base, qemu_irq irq, int ba=
+@@ -987,7 +987,7 @@ SerialState *serial_init(int base, qemu_irq irq, int ba=
 udbase,
+     DeviceState *dev =3D DEVICE(object_new(TYPE_SERIAL));
      SerialState *s =3D SERIAL(dev);
 =20
-     qdev_connect_gpio_out_named(dev, "serial-irq", 0, irq);
--    s->baudbase =3D baudbase;
-+    qdev_prop_set_uint32(dev, "baudbase", baudbase);
+-    s->irq =3D irq;
++    qdev_connect_gpio_out_named(dev, "serial-irq", 0, irq);
+     s->baudbase =3D baudbase;
      qdev_prop_set_chr(dev, "chardev", chr);
      serial_realize_core(s, &error_fatal);
-     qdev_set_legacy_instance_id(dev, base, 2);
-@@ -1002,6 +1002,7 @@ SerialState *serial_init(int base, qemu_irq irq, int =
-baudbase,
+@@ -1014,10 +1014,18 @@ static void serial_class_init(ObjectClass *klass, v=
+oid* data)
+     dc->props =3D serial_properties;
+ }
 =20
- static Property serial_properties[] =3D {
-     DEFINE_PROP_CHR("chardev", SerialState, chr),
-+    DEFINE_PROP_UINT32("baudbase", SerialState, baudbase, 115200),
-     DEFINE_PROP_END_OF_LIST(),
++static void serial_instance_init(Object *o)
++{
++    SerialState *s =3D SERIAL(o);
++
++    qdev_init_gpio_out_named(DEVICE(o), &s->irq, "serial-irq", 1);
++}
++
+ static const TypeInfo serial_info =3D {
+     .name =3D TYPE_SERIAL,
+     .parent =3D TYPE_DEVICE,
+     .instance_size =3D sizeof(SerialState),
++    .instance_init =3D serial_instance_init,
+     .class_init =3D serial_class_init,
  };
 =20
-@@ -1079,7 +1080,7 @@ SerialState *serial_mm_init(MemoryRegion *address_spa=
+@@ -1070,7 +1078,7 @@ SerialState *serial_mm_init(MemoryRegion *address_spa=
 ce,
+     SerialMMState *m =3D SERIAL_MM(dev);
      SerialState *s =3D SERIAL(dev);
 =20
-     qdev_connect_gpio_out_named(dev, "serial-irq", 0, irq);
--    s->baudbase =3D baudbase;
-+    qdev_prop_set_uint32(dev, "baudbase", baudbase);
+-    s->irq =3D irq;
++    qdev_connect_gpio_out_named(dev, "serial-irq", 0, irq);
+     s->baudbase =3D baudbase;
      qdev_prop_set_chr(dev, "chardev", chr);
      qdev_prop_set_uint8(dev, "regshift", regshift);
-=20
-diff --git a/include/hw/char/serial.h b/include/hw/char/serial.h
-index 613879ced8..ecbd3f1b40 100644
---- a/include/hw/char/serial.h
-+++ b/include/hw/char/serial.h
-@@ -57,7 +57,7 @@ typedef struct SerialState {
-     qemu_irq irq;
-     CharBackend chr;
-     int last_break_enable;
--    int baudbase;
-+    uint32_t baudbase;
-     uint32_t tsr_retry;
-     guint watch_tag;
-     uint32_t wakeup;
 --=20
 2.23.0.606.g08da6496b6
 
