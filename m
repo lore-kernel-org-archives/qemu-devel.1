@@ -2,106 +2,89 @@ Return-Path: <SRS0=tSBD=YP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C9931CA9EB9
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 10:37:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 175BDCA9EA0
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 10:42:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 93C8420B7C
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 10:37:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D4F9920B7C
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 10:42:16 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Nk+/QZB5"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 93C8420B7C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="P0jibDZV"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D4F9920B7C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53116 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53142 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iMrXr-0000A2-Oh
-	for qemu-devel@archiver.kernel.org; Tue, 22 Oct 2019 06:37:43 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38268)
+	id 1iMrcG-00029k-3K
+	for qemu-devel@archiver.kernel.org; Tue, 22 Oct 2019 06:42:16 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38717)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1iMrX5-0007wZ-Uq
- for qemu-devel@nongnu.org; Tue, 22 Oct 2019 06:36:57 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1iMrbc-0001kb-Kd
+ for qemu-devel@nongnu.org; Tue, 22 Oct 2019 06:41:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1iMrX4-0008Vh-Tn
- for qemu-devel@nongnu.org; Tue, 22 Oct 2019 06:36:55 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:60316
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1iMrX4-0008VE-OW
- for qemu-devel@nongnu.org; Tue, 22 Oct 2019 06:36:54 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1571740614;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=G2SEPtMzADW2ZSb+C5+EjbAtjGCnVn/faxDanX7Hvik=;
- b=Nk+/QZB5UkssBicZviduSI2VUSlzI+9NISkasMH2QmHtbgQvSFaaGFHwrREkQ7dwZqOXal
- ozaKkQwACUHaC3t/gmxOZ5D+x3sZVr4ax5os/eQO9GU2WLMEBPExXQ8laXTctf/fv96vwK
- WCVXNJhMT2kMLLLsc0JJjG46XuwI5nA=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-113-e7zyJPQaPuqwA5LlJUZ9cg-1; Tue, 22 Oct 2019 06:36:50 -0400
-X-MC-Unique: e7zyJPQaPuqwA5LlJUZ9cg-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8347B1005500;
- Tue, 22 Oct 2019 10:36:49 +0000 (UTC)
-Received: from dresden.str.redhat.com (ovpn-117-215.ams2.redhat.com
- [10.36.117.215])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 8AD48608A5;
- Tue, 22 Oct 2019 10:36:45 +0000 (UTC)
-Subject: Re: [PATCH v2 6/6] block/block-copy: increase buffered copy request
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-block@nongnu.org
-References: <20191016170905.8325-1-vsementsov@virtuozzo.com>
- <20191016170905.8325-7-vsementsov@virtuozzo.com>
-From: Max Reitz <mreitz@redhat.com>
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <5bbcd4bb-2131-d2ad-4bc6-3a69b5e1f992@redhat.com>
-Date: Tue, 22 Oct 2019 12:36:44 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.1
+ (envelope-from <alex.bennee@linaro.org>) id 1iMrbb-0001NQ-D5
+ for qemu-devel@nongnu.org; Tue, 22 Oct 2019 06:41:36 -0400
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:39194)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1iMrbb-0001N7-5a
+ for qemu-devel@nongnu.org; Tue, 22 Oct 2019 06:41:35 -0400
+Received: by mail-wr1-x443.google.com with SMTP id a11so1390456wra.6
+ for <qemu-devel@nongnu.org>; Tue, 22 Oct 2019 03:41:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=JHRxvgL9FDQka6jd9HMMnEgyR0vmSHI4ys57q/6/LmY=;
+ b=P0jibDZVKr3FoLVflKAvcMnGOSqVDYmDtjr0m6F+W5Q3P30cGKagjp9GVrI6lK8RoU
+ V3Vlh4Q3stdu1QRodLOQ9qLsHHnh+Mq8J7uuXHhKjGfFNa6M4AeXdniRDWwX9Sw6UxFr
+ XQpWwQ5a55ZXhKEgH5acPSdrsXPjU9FMQedbiXjsasjAm/RO5mB6bbx8sokArgavrJF+
+ nrCmG+e9NAo90nX9YGXcueymoCRNpCgs7OsvW9RePXl3OP+p9EmCWdzl39AqopLsuDQ3
+ g54z10hCqKFqpe4ezz8S8KLWqhkD7NRkfUhPKo5puNdOl2Yc32tssL8dar6FsBT8p0oK
+ EPEg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=JHRxvgL9FDQka6jd9HMMnEgyR0vmSHI4ys57q/6/LmY=;
+ b=NWw2Ecv4GOtIR7JJs0/cyyNoVfHJE3ZCqLcb4HYflguMp0P8MdSMzQu0tPRdRlCXwM
+ BfBltqfoEoIqofjExwaY5GSfLVzQcZ05Q/M7hea8lwU3lLSRbSwQQvnmKiWEvy4tl1S6
+ +zna1/c+HBjhdSJRx3gNI6Nmyu31CJynZ1Ype1yPpYHYg3NfAUN27K2Sr+JrVUGaFVn5
+ CWUS/IgS0dgNigGRswnC5p1OEF4StbDWraik5rDmOIkiFxonPr/bpIHJgQC3LfsU8rqp
+ n5JKPwBG/5CILaA/WEu+UdcpqkRfnpngfyj84/di6UG3PgF1Tw8YLuKm0SYRXTNQeLFV
+ 1ZOg==
+X-Gm-Message-State: APjAAAXMY/cMvtAePFJB975hNLLg1VqQXecph8vv35EpQ7U7nivlCJ1G
+ az3w1goHas4lT0DLzL7YaxtcPg==
+X-Google-Smtp-Source: APXvYqyYkilgByeqxpjybtQLK1fEegCQ7w3wwUg1OL6J2M+qR1vFGRutR7HUjagM1hUXUnSK87AGFQ==
+X-Received: by 2002:a5d:46ca:: with SMTP id g10mr2934333wrs.193.1571740893398; 
+ Tue, 22 Oct 2019 03:41:33 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id o15sm372131wrv.76.2019.10.22.03.41.32
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 22 Oct 2019 03:41:32 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 091321FF87;
+ Tue, 22 Oct 2019 11:41:32 +0100 (BST)
+References: <20191009170701.14756-1-thuth@redhat.com>
+ <20191009170701.14756-6-thuth@redhat.com>
+User-agent: mu4e 1.3.5; emacs 27.0.50
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Thomas Huth <thuth@redhat.com>
+Subject: Re: [PATCH 5/5] travis.yml: Compile on arm64, too
+In-reply-to: <20191009170701.14756-6-thuth@redhat.com>
+Date: Tue, 22 Oct 2019 11:41:31 +0100
+Message-ID: <87lftdvz8k.fsf@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <20191016170905.8325-7-vsementsov@virtuozzo.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Mimecast-Spam-Score: 0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="nWcsf0ixzpO0XvBStLUjBekigqtAXNXw3"
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.120
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::443
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -113,51 +96,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, den@openvz.org, jsnow@redhat.com, qemu-devel@nongnu.org
+Cc: Fam Zheng <fam@euphon.net>, Peter Maydell <peter.maydell@linaro.org>,
+ Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---nWcsf0ixzpO0XvBStLUjBekigqtAXNXw3
-Content-Type: multipart/mixed; boundary="xKCDGT7aTQC5f5xIp89DWbBLk8rn3OMrk"
 
---xKCDGT7aTQC5f5xIp89DWbBLk8rn3OMrk
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+Thomas Huth <thuth@redhat.com> writes:
 
-On 16.10.19 19:09, Vladimir Sementsov-Ogievskiy wrote:
-> No reason to limit buffered copy to one cluster. Let's allow up to 1
-> MiB.
->=20
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> Travis now features an arm64 build host, so let's check compilation
+> there, too.
+>
+> Unfortunately, there are some quirks:
+> - block/ssh.c does not compile properly in this environment, so we have
+>   to use --disable-libssh until that problem is fixed.
+> - test-util-filemonitor fails, so we can not run the unit tests there
+> - The file system size seems to be very limited, so the iotest tests
+>   can't be used and the hd-geo-test fails (thus we can't compile
+>   x86_64-softmmu here and run "check-qtest" afterwards)
+> - Compiling seems to be quite a bit slower than on the x86 builders,
+>   so we better limit the target list to some few architectures.
+>
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
 > ---
->  include/block/block-copy.h |  2 +-
->  block/block-copy.c         | 48 +++++++++++++++++++++++++-------------
->  2 files changed, 33 insertions(+), 17 deletions(-)
-Reviewed-by: Max Reitz <mreitz@redhat.com>
+>  .travis.yml | 6 ++++++
+>  1 file changed, 6 insertions(+)
+>
+> diff --git a/.travis.yml b/.travis.yml
+> index 0c88e8757b..357ca02890 100644
+> --- a/.travis.yml
+> +++ b/.travis.yml
+> @@ -342,3 +342,9 @@ matrix:
+>          - CONFIG=3D"--target-list=3Dxtensa-softmmu,arm-softmmu,aarch64-s=
+oftmmu,alpha-softmmu"
+>          - TEST_CMD=3D"make -j3 check-tcg V=3D1"
+>          - CACHE_NAME=3D"${TRAVIS_BRANCH}-linux-gcc-default"
+> +
+> +    # Non-x86 builds:
+> +    - env:
+> +        - CONFIG=3D"--disable-libssh --target-list=3Daarch64-softmmu,ppc=
+64-softmmu,s390x-softmmu,x86_64-linux-user"
+> +        - TEST_CMD=3D"make check-qtest check-softfloat -j3 V=3D1"
+> +      arch: arm64
 
 
---xKCDGT7aTQC5f5xIp89DWbBLk8rn3OMrk--
+Hmm this keeps fail for me now but it looks like missing deps:
 
---nWcsf0ixzpO0XvBStLUjBekigqtAXNXw3
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+Reading state information...
 
------BEGIN PGP SIGNATURE-----
+E: Unable to locate package libspice-server-dev
+apt-get.diagnostics
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl2u27wACgkQ9AfbAGHV
-z0B6FQf+Ms/xHzQ5T+ILXclKo/MUXRRtnzfx5PATeRwdsJl8QWNTJu93da6DltC2
-DudsWPa14xNVlHws2p74Y0CYqJMDT5TqOgGxGhoXX1abdN1CTj7LrpjR5WpEq3Hn
-h7Sjydvp4jiTsaE0URSlXW0b3ORIf6nkIN+eoBbeoz5MUkJ+POu0HvYFGuD5U6YM
-rKCjmSZk9myN0FtOzwvjFMe8Y17pvacp8SmDwx+WJUDHGpdHptudGgqVW0ltT4hU
-2+G3tJoril9gRVvIkB+1Jd2zft9cnvGsBWAGvoNpptstuwera1Q+FBe+fnSIMNV3
-vhYSYCmO5sKhJrmYLNZFZLEF9KzfFQ==
-=YfGQ
------END PGP SIGNATURE-----
+apt-get install failed
 
---nWcsf0ixzpO0XvBStLUjBekigqtAXNXw3--
+The command "sudo -E apt-get -yq --no-install-suggests --no-install-recomme=
+nds $(travis_apt_get_options) install libaio-dev libattr1-dev libbrlapi-dev=
+ libcap-dev libcap-ng-dev libgcc-4.8-dev libgnutls28-dev libgtk-3-dev libis=
+csi-dev liblttng-ust-dev libncurses5-dev libnfs-dev libnss3-dev libpixman-1=
+-dev libpng-dev librados-dev libsdl2-dev libsdl2-image-dev libseccomp-dev l=
+ibspice-protocol-dev libspice-server-dev libssh-dev liburcu-dev libusb-1.0-=
+0-dev libvdeplug-dev libvte-2.91-dev sparse uuid-dev gcovr" failed and exit=
+ed with 100 during .
 
+--
+Alex Benn=C3=A9e
 
