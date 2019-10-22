@@ -2,62 +2,77 @@ Return-Path: <SRS0=tSBD=YP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AE145CA9EA0
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 07:25:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D9369CA9EA0
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 07:25:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 697C62064B
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 07:25:02 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 697C62064B
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id A26B62064B
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 07:25:39 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="giak/gwL"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A26B62064B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51002 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51006 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iMoXN-0000De-5T
-	for qemu-devel@archiver.kernel.org; Tue, 22 Oct 2019 03:25:01 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39382)
+	id 1iMoXy-0001GT-8V
+	for qemu-devel@archiver.kernel.org; Tue, 22 Oct 2019 03:25:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39101)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <clg@kaod.org>) id 1iMoVr-0006uT-PT
- for qemu-devel@nongnu.org; Tue, 22 Oct 2019 03:23:29 -0400
+ (envelope-from <thuth@redhat.com>) id 1iMoUS-0005Cm-GU
+ for qemu-devel@nongnu.org; Tue, 22 Oct 2019 03:22:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <clg@kaod.org>) id 1iMoVp-0005pe-ME
- for qemu-devel@nongnu.org; Tue, 22 Oct 2019 03:23:27 -0400
-Received: from 8.mo5.mail-out.ovh.net ([178.32.116.78]:34786)
+ (envelope-from <thuth@redhat.com>) id 1iMoUR-0005G8-GN
+ for qemu-devel@nongnu.org; Tue, 22 Oct 2019 03:22:00 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:30805
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <clg@kaod.org>) id 1iMoVp-0005p2-Bq
- for qemu-devel@nongnu.org; Tue, 22 Oct 2019 03:23:25 -0400
-Received: from player786.ha.ovh.net (unknown [10.109.159.191])
- by mo5.mail-out.ovh.net (Postfix) with ESMTP id C115C2540D5
- for <qemu-devel@nongnu.org>; Tue, 22 Oct 2019 09:23:23 +0200 (CEST)
-Received: from kaod.org (lfbn-1-2229-223.w90-76.abo.wanadoo.fr [90.76.50.223])
- (Authenticated sender: clg@kaod.org)
- by player786.ha.ovh.net (Postfix) with ESMTPSA id AF827B518BA5;
- Tue, 22 Oct 2019 07:23:15 +0000 (UTC)
-From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
-To: David Gibson <david@gibson.dropbear.id.au>
-Subject: [PATCH v3 3/4] ppc: reset the interrupt presenter from the CPU reset
- handler
-Date: Tue, 22 Oct 2019 09:22:45 +0200
-Message-Id: <20191022072246.9200-4-clg@kaod.org>
-X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20191022072246.9200-1-clg@kaod.org>
-References: <20191022072246.9200-1-clg@kaod.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-X-Ovh-Tracer-Id: 12568139188045056998
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrkeeigdduudelucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddm
+ (Exim 4.71) (envelope-from <thuth@redhat.com>) id 1iMoUR-0005Fr-D4
+ for qemu-devel@nongnu.org; Tue, 22 Oct 2019 03:21:59 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1571728919;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=F6xpS5jn3FPueHeHNbHmw7PW4u/jvYS3g/pddsd2v1A=;
+ b=giak/gwLanKJ5Ktju9UkSFf+yDPrN8Djb0ZAQvms4+YA3C77C9gVjh+l3++MtVh72dnTcY
+ HDU0A2veTl1DsydmJsXoRYRbemSlbjmD6d/+isJfkBuIhy9GtwmE3loAXBRVzruiBR7Cj3
+ u1cIiTldM5UUC+fsPGSNvxXGywpF5g8=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-366-eW9S0Y-4NVCKEoJpKDKFKw-1; Tue, 22 Oct 2019 03:21:55 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C20EE476;
+ Tue, 22 Oct 2019 07:21:54 +0000 (UTC)
+Received: from thuth.com (dhcp-200-228.str.redhat.com [10.33.200.228])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id B61F51B5B8;
+ Tue, 22 Oct 2019 07:21:51 +0000 (UTC)
+From: Thomas Huth <thuth@redhat.com>
+To: Max Reitz <mreitz@redhat.com>,
+	qemu-block@nongnu.org
+Subject: [PATCH v3 2/6] iotests: Test 041 only works on certain systems
+Date: Tue, 22 Oct 2019 09:21:31 +0200
+Message-Id: <20191022072135.11188-3-thuth@redhat.com>
+In-Reply-To: <20191022072135.11188-1-thuth@redhat.com>
+References: <20191022072135.11188-1-thuth@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-MC-Unique: eW9S0Y-4NVCKEoJpKDKFKw-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=WINDOWS-1252
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 178.32.116.78
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -69,404 +84,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>, qemu-ppc@nongnu.org,
- qemu-devel@nongnu.org, Greg Kurz <groug@kaod.org>
+Cc: Kevin Wolf <kwolf@redhat.com>, John Snow <jsnow@redhat.com>,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On the sPAPR machine and PowerNV machine, the interrupt presenters are
-created by a machine handler at the core level and are reseted
-independently. This is not consistent and it raises issues when it
-comes to handle hot-plugged CPUs. In that case, the presenters are not
-reseted. This is less of an issue in XICS, although a zero MFFR could
-be a concern, but in XIVE, the OS CAM line is not set and this breaks
-the presenting algorithm. The current code has workarounds which need
-a global cleanup.
+041 works fine on Linux, FreeBSD, NetBSD and OpenBSD, but fails on macOS.
+Let's mark it as only supported on the systems where we know that it is
+working fine.
 
-Extend the sPAPR IRQ backend and the PowerNV Chip class with a new
-cpu_intc_reset() handler called by the CPU reset handler and remove
-the XiveTCTX reset handler which is now redundant.
-
-Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
+Signed-off-by: Thomas Huth <thuth@redhat.com>
 ---
- include/hw/ppc/pnv.h       |  1 +
- include/hw/ppc/spapr_irq.h |  2 ++
- include/hw/ppc/xics.h      |  1 +
- include/hw/ppc/xive.h      |  1 +
- hw/intc/spapr_xive.c       |  9 +++++++++
- hw/intc/xics.c             |  8 ++------
- hw/intc/xics_spapr.c       |  7 +++++++
- hw/intc/xive.c             | 12 +-----------
- hw/ppc/pnv.c               | 18 ++++++++++++++++++
- hw/ppc/pnv_core.c          |  8 ++++++++
- hw/ppc/spapr_cpu_core.c    |  5 ++++-
- hw/ppc/spapr_irq.c         | 14 ++++++++++++++
- 12 files changed, 68 insertions(+), 18 deletions(-)
+ tests/qemu-iotests/041 | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/include/hw/ppc/pnv.h b/include/hw/ppc/pnv.h
-index 1cdbe55bf86c..2a780e633f23 100644
---- a/include/hw/ppc/pnv.h
-+++ b/include/hw/ppc/pnv.h
-@@ -111,6 +111,7 @@ typedef struct PnvChipClass {
+diff --git a/tests/qemu-iotests/041 b/tests/qemu-iotests/041
+index 8568426311..0326888c98 100755
+--- a/tests/qemu-iotests/041
++++ b/tests/qemu-iotests/041
+@@ -1123,4 +1123,5 @@ class TestOrphanedSource(iotests.QMPTestCase):
 =20
-     uint32_t (*core_pir)(PnvChip *chip, uint32_t core_id);
-     void (*intc_create)(PnvChip *chip, PowerPCCPU *cpu, Error **errp);
-+    void (*intc_reset)(PnvChip *chip, PowerPCCPU *cpu);
-     ISABus *(*isa_create)(PnvChip *chip, Error **errp);
-     void (*dt_populate)(PnvChip *chip, void *fdt);
-     void (*pic_print_info)(PnvChip *chip, Monitor *mon);
-diff --git a/include/hw/ppc/spapr_irq.h b/include/hw/ppc/spapr_irq.h
-index 5e150a667902..09232999b07e 100644
---- a/include/hw/ppc/spapr_irq.h
-+++ b/include/hw/ppc/spapr_irq.h
-@@ -52,6 +52,7 @@ typedef struct SpaprInterruptControllerClass {
-      */
-     int (*cpu_intc_create)(SpaprInterruptController *intc,
-                             PowerPCCPU *cpu, Error **errp);
-+    void (*cpu_intc_reset)(SpaprInterruptController *intc, PowerPCCPU *c=
-pu);
-     int (*claim_irq)(SpaprInterruptController *intc, int irq, bool lsi,
-                      Error **errp);
-     void (*free_irq)(SpaprInterruptController *intc, int irq);
-@@ -68,6 +69,7 @@ void spapr_irq_update_active_intc(SpaprMachineState *sp=
-apr);
-=20
- int spapr_irq_cpu_intc_create(SpaprMachineState *spapr,
-                               PowerPCCPU *cpu, Error **errp);
-+void spapr_irq_cpu_intc_reset(SpaprMachineState *spapr, PowerPCCPU *cpu)=
-;
- void spapr_irq_print_info(SpaprMachineState *spapr, Monitor *mon);
- void spapr_irq_dt(SpaprMachineState *spapr, uint32_t nr_servers,
-                   void *fdt, uint32_t phandle);
-diff --git a/include/hw/ppc/xics.h b/include/hw/ppc/xics.h
-index 1e6a9300eb2b..602173c12250 100644
---- a/include/hw/ppc/xics.h
-+++ b/include/hw/ppc/xics.h
-@@ -161,6 +161,7 @@ void icp_set_mfrr(ICPState *icp, uint8_t mfrr);
- uint32_t icp_accept(ICPState *ss);
- uint32_t icp_ipoll(ICPState *ss, uint32_t *mfrr);
- void icp_eoi(ICPState *icp, uint32_t xirr);
-+void icp_reset(ICPState *icp);
-=20
- void ics_write_xive(ICSState *ics, int nr, int server,
-                     uint8_t priority, uint8_t saved_priority);
-diff --git a/include/hw/ppc/xive.h b/include/hw/ppc/xive.h
-index fd3319bd3202..99381639f50c 100644
---- a/include/hw/ppc/xive.h
-+++ b/include/hw/ppc/xive.h
-@@ -415,6 +415,7 @@ uint64_t xive_tctx_tm_read(XiveTCTX *tctx, hwaddr off=
-set, unsigned size);
-=20
- void xive_tctx_pic_print_info(XiveTCTX *tctx, Monitor *mon);
- Object *xive_tctx_create(Object *cpu, XiveRouter *xrtr, Error **errp);
-+void xive_tctx_reset(XiveTCTX *tctx);
-=20
- static inline uint32_t xive_nvt_cam_line(uint8_t nvt_blk, uint32_t nvt_i=
-dx)
- {
-diff --git a/hw/intc/spapr_xive.c b/hw/intc/spapr_xive.c
-index ba32d2cc5b0f..20a8d8285f64 100644
---- a/hw/intc/spapr_xive.c
-+++ b/hw/intc/spapr_xive.c
-@@ -553,6 +553,14 @@ static int spapr_xive_cpu_intc_create(SpaprInterrupt=
-Controller *intc,
-     return 0;
- }
-=20
-+static void spapr_xive_cpu_intc_reset(SpaprInterruptController *intc,
-+                                     PowerPCCPU *cpu)
-+{
-+    XiveTCTX *tctx =3D spapr_cpu_state(cpu)->tctx;
-+
-+    xive_tctx_reset(tctx);
-+}
-+
- static void spapr_xive_set_irq(SpaprInterruptController *intc, int irq, =
-int val)
- {
-     SpaprXive *xive =3D SPAPR_XIVE(intc);
-@@ -697,6 +705,7 @@ static void spapr_xive_class_init(ObjectClass *klass,=
- void *data)
-     sicc->activate =3D spapr_xive_activate;
-     sicc->deactivate =3D spapr_xive_deactivate;
-     sicc->cpu_intc_create =3D spapr_xive_cpu_intc_create;
-+    sicc->cpu_intc_reset =3D spapr_xive_cpu_intc_reset;
-     sicc->claim_irq =3D spapr_xive_claim_irq;
-     sicc->free_irq =3D spapr_xive_free_irq;
-     sicc->set_irq =3D spapr_xive_set_irq;
-diff --git a/hw/intc/xics.c b/hw/intc/xics.c
-index b5ac408f7b74..6da05763f9db 100644
---- a/hw/intc/xics.c
-+++ b/hw/intc/xics.c
-@@ -274,10 +274,8 @@ static const VMStateDescription vmstate_icp_server =3D=
- {
-     },
- };
-=20
--static void icp_reset_handler(void *dev)
-+void icp_reset(ICPState *icp)
- {
--    ICPState *icp =3D ICP(dev);
--
-     icp->xirr =3D 0;
-     icp->pending_priority =3D 0xff;
-     icp->mfrr =3D 0xff;
-@@ -288,7 +286,7 @@ static void icp_reset_handler(void *dev)
-     if (kvm_irqchip_in_kernel()) {
-         Error *local_err =3D NULL;
-=20
--        icp_set_kvm_state(ICP(dev), &local_err);
-+        icp_set_kvm_state(icp, &local_err);
-         if (local_err) {
-             error_report_err(local_err);
-         }
-@@ -351,7 +349,6 @@ static void icp_realize(DeviceState *dev, Error **err=
-p)
-         }
-     }
-=20
--    qemu_register_reset(icp_reset_handler, dev);
-     vmstate_register(NULL, icp->cs->cpu_index, &vmstate_icp_server, icp)=
-;
- }
-=20
-@@ -360,7 +357,6 @@ static void icp_unrealize(DeviceState *dev, Error **e=
-rrp)
-     ICPState *icp =3D ICP(dev);
-=20
-     vmstate_unregister(NULL, &vmstate_icp_server, icp);
--    qemu_unregister_reset(icp_reset_handler, dev);
- }
-=20
- static void icp_class_init(ObjectClass *klass, void *data)
-diff --git a/hw/intc/xics_spapr.c b/hw/intc/xics_spapr.c
-index 4f64b9a9fc66..7418fb9f370c 100644
---- a/hw/intc/xics_spapr.c
-+++ b/hw/intc/xics_spapr.c
-@@ -346,6 +346,12 @@ static int xics_spapr_cpu_intc_create(SpaprInterrupt=
-Controller *intc,
-     return 0;
- }
-=20
-+static void xics_spapr_cpu_intc_reset(SpaprInterruptController *intc,
-+                                     PowerPCCPU *cpu)
-+{
-+    icp_reset(spapr_cpu_state(cpu)->icp);
-+}
-+
- static int xics_spapr_claim_irq(SpaprInterruptController *intc, int irq,
-                                 bool lsi, Error **errp)
- {
-@@ -433,6 +439,7 @@ static void ics_spapr_class_init(ObjectClass *klass, =
-void *data)
-     sicc->activate =3D xics_spapr_activate;
-     sicc->deactivate =3D xics_spapr_deactivate;
-     sicc->cpu_intc_create =3D xics_spapr_cpu_intc_create;
-+    sicc->cpu_intc_reset =3D xics_spapr_cpu_intc_reset;
-     sicc->claim_irq =3D xics_spapr_claim_irq;
-     sicc->free_irq =3D xics_spapr_free_irq;
-     sicc->set_irq =3D xics_spapr_set_irq;
-diff --git a/hw/intc/xive.c b/hw/intc/xive.c
-index d420c6571e14..f066be5eb5e3 100644
---- a/hw/intc/xive.c
-+++ b/hw/intc/xive.c
-@@ -547,10 +547,8 @@ void xive_tctx_pic_print_info(XiveTCTX *tctx, Monito=
-r *mon)
-     }
- }
-=20
--static void xive_tctx_reset(void *dev)
-+void xive_tctx_reset(XiveTCTX *tctx)
- {
--    XiveTCTX *tctx =3D XIVE_TCTX(dev);
--
-     memset(tctx->regs, 0, sizeof(tctx->regs));
-=20
-     /* Set some defaults */
-@@ -607,13 +605,6 @@ static void xive_tctx_realize(DeviceState *dev, Erro=
-r **errp)
-             return;
-         }
-     }
--
--    qemu_register_reset(xive_tctx_reset, dev);
--}
--
--static void xive_tctx_unrealize(DeviceState *dev, Error **errp)
--{
--    qemu_unregister_reset(xive_tctx_reset, dev);
- }
-=20
- static int vmstate_xive_tctx_pre_save(void *opaque)
-@@ -668,7 +659,6 @@ static void xive_tctx_class_init(ObjectClass *klass, =
-void *data)
-=20
-     dc->desc =3D "XIVE Interrupt Thread Context";
-     dc->realize =3D xive_tctx_realize;
--    dc->unrealize =3D xive_tctx_unrealize;
-     dc->vmsd =3D &vmstate_xive_tctx;
-     /*
-      * Reason: part of XIVE interrupt controller, needs to be wired up
-diff --git a/hw/ppc/pnv.c b/hw/ppc/pnv.c
-index 7cf64b6d2533..4a51fb65a834 100644
---- a/hw/ppc/pnv.c
-+++ b/hw/ppc/pnv.c
-@@ -778,6 +778,13 @@ static void pnv_chip_power8_intc_create(PnvChip *chi=
-p, PowerPCCPU *cpu,
-     pnv_cpu->intc =3D obj;
- }
-=20
-+static void pnv_chip_power8_intc_reset(PnvChip *chip, PowerPCCPU *cpu)
-+{
-+    PnvCPUState *pnv_cpu =3D pnv_cpu_state(cpu);
-+
-+    icp_reset(ICP(pnv_cpu->intc));
-+}
-+
- /*
-  *    0:48  Reserved - Read as zeroes
-  *   49:52  Node ID
-@@ -815,6 +822,13 @@ static void pnv_chip_power9_intc_create(PnvChip *chi=
-p, PowerPCCPU *cpu,
-     pnv_cpu->intc =3D obj;
- }
-=20
-+static void pnv_chip_power9_intc_reset(PnvChip *chip, PowerPCCPU *cpu)
-+{
-+    PnvCPUState *pnv_cpu =3D pnv_cpu_state(cpu);
-+
-+    xive_tctx_reset(XIVE_TCTX(pnv_cpu->intc));
-+}
-+
- /*
-  * Allowed core identifiers on a POWER8 Processor Chip :
-  *
-@@ -984,6 +998,7 @@ static void pnv_chip_power8e_class_init(ObjectClass *=
-klass, void *data)
-     k->cores_mask =3D POWER8E_CORE_MASK;
-     k->core_pir =3D pnv_chip_core_pir_p8;
-     k->intc_create =3D pnv_chip_power8_intc_create;
-+    k->intc_reset =3D pnv_chip_power8_intc_reset;
-     k->isa_create =3D pnv_chip_power8_isa_create;
-     k->dt_populate =3D pnv_chip_power8_dt_populate;
-     k->pic_print_info =3D pnv_chip_power8_pic_print_info;
-@@ -1003,6 +1018,7 @@ static void pnv_chip_power8_class_init(ObjectClass =
-*klass, void *data)
-     k->cores_mask =3D POWER8_CORE_MASK;
-     k->core_pir =3D pnv_chip_core_pir_p8;
-     k->intc_create =3D pnv_chip_power8_intc_create;
-+    k->intc_reset =3D pnv_chip_power8_intc_reset;
-     k->isa_create =3D pnv_chip_power8_isa_create;
-     k->dt_populate =3D pnv_chip_power8_dt_populate;
-     k->pic_print_info =3D pnv_chip_power8_pic_print_info;
-@@ -1022,6 +1038,7 @@ static void pnv_chip_power8nvl_class_init(ObjectCla=
-ss *klass, void *data)
-     k->cores_mask =3D POWER8_CORE_MASK;
-     k->core_pir =3D pnv_chip_core_pir_p8;
-     k->intc_create =3D pnv_chip_power8_intc_create;
-+    k->intc_reset =3D pnv_chip_power8_intc_reset;
-     k->isa_create =3D pnv_chip_power8nvl_isa_create;
-     k->dt_populate =3D pnv_chip_power8_dt_populate;
-     k->pic_print_info =3D pnv_chip_power8_pic_print_info;
-@@ -1191,6 +1208,7 @@ static void pnv_chip_power9_class_init(ObjectClass =
-*klass, void *data)
-     k->cores_mask =3D POWER9_CORE_MASK;
-     k->core_pir =3D pnv_chip_core_pir_p9;
-     k->intc_create =3D pnv_chip_power9_intc_create;
-+    k->intc_reset =3D pnv_chip_power9_intc_reset;
-     k->isa_create =3D pnv_chip_power9_isa_create;
-     k->dt_populate =3D pnv_chip_power9_dt_populate;
-     k->pic_print_info =3D pnv_chip_power9_pic_print_info;
-diff --git a/hw/ppc/pnv_core.c b/hw/ppc/pnv_core.c
-index b1a7489e7abf..f36cb39dbf77 100644
---- a/hw/ppc/pnv_core.c
-+++ b/hw/ppc/pnv_core.c
-@@ -45,6 +45,8 @@ static void pnv_cpu_reset(void *opaque)
-     PowerPCCPU *cpu =3D opaque;
-     CPUState *cs =3D CPU(cpu);
-     CPUPPCState *env =3D &cpu->env;
-+    PnvChipClass *pcc;
-+    Object *chip;
-=20
-     cpu_reset(cs);
-=20
-@@ -55,6 +57,10 @@ static void pnv_cpu_reset(void *opaque)
-     env->gpr[3] =3D PNV_FDT_ADDR;
-     env->nip =3D 0x10;
-     env->msr |=3D MSR_HVB; /* Hypervisor mode */
-+
-+    chip =3D object_property_get_link(OBJECT(cpu), "chip", &error_fatal)=
-;
-+    pcc =3D PNV_CHIP_GET_CLASS(chip);
-+    pcc->intc_reset(PNV_CHIP(chip), cpu);
- }
-=20
- /*
-@@ -169,6 +175,8 @@ static void pnv_realize_vcpu(PowerPCCPU *cpu, PnvChip=
- *chip, Error **errp)
-     Error *local_err =3D NULL;
-     PnvChipClass *pcc =3D PNV_CHIP_GET_CLASS(chip);
-=20
-+    object_property_add_const_link(OBJECT(cpu), "chip",
-+                                   OBJECT(chip), &error_fatal);
-     object_property_set_bool(OBJECT(cpu), true, "realized", &local_err);
-     if (local_err) {
-         error_propagate(errp, local_err);
-diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
-index 5947e39b36ad..d2903c2d0f22 100644
---- a/hw/ppc/spapr_cpu_core.c
-+++ b/hw/ppc/spapr_cpu_core.c
-@@ -32,6 +32,7 @@ static void spapr_reset_vcpu(PowerPCCPU *cpu)
-     PowerPCCPUClass *pcc =3D POWERPC_CPU_GET_CLASS(cpu);
-     SpaprCpuState *spapr_cpu =3D spapr_cpu_state(cpu);
-     target_ulong lpcr;
-+    SpaprMachineState *spapr =3D SPAPR_MACHINE(qdev_get_machine());
-=20
-     cpu_reset(cs);
-=20
-@@ -76,9 +77,11 @@ static void spapr_reset_vcpu(PowerPCCPU *cpu)
-     spapr_cpu->dtl_addr =3D 0;
-     spapr_cpu->dtl_size =3D 0;
-=20
--    spapr_caps_cpu_apply(SPAPR_MACHINE(qdev_get_machine()), cpu);
-+    spapr_caps_cpu_apply(spapr, cpu);
-=20
-     kvm_check_mmu(cpu, &error_fatal);
-+
-+    spapr_irq_cpu_intc_reset(spapr, cpu);
- }
-=20
- void spapr_cpu_set_entry_state(PowerPCCPU *cpu, target_ulong nip, target=
-_ulong r3)
-diff --git a/hw/ppc/spapr_irq.c b/hw/ppc/spapr_irq.c
-index 234d1073e518..b941608b69ba 100644
---- a/hw/ppc/spapr_irq.c
-+++ b/hw/ppc/spapr_irq.c
-@@ -220,6 +220,20 @@ int spapr_irq_cpu_intc_create(SpaprMachineState *spa=
-pr,
-     return 0;
- }
-=20
-+void spapr_irq_cpu_intc_reset(SpaprMachineState *spapr, PowerPCCPU *cpu)
-+{
-+    SpaprInterruptController *intcs[] =3D ALL_INTCS(spapr);
-+    int i;
-+
-+    for (i =3D 0; i < ARRAY_SIZE(intcs); i++) {
-+        SpaprInterruptController *intc =3D intcs[i];
-+        if (intc) {
-+            SpaprInterruptControllerClass *sicc =3D SPAPR_INTC_GET_CLASS=
-(intc);
-+            sicc->cpu_intc_reset(intc, cpu);
-+        }
-+    }
-+}
-+
- static void spapr_set_irq(void *opaque, int irq, int level)
- {
-     SpaprMachineState *spapr =3D SPAPR_MACHINE(opaque);
+ if __name__ =3D=3D '__main__':
+     iotests.main(supported_fmts=3D['qcow2', 'qed'],
+-                 supported_protocols=3D['file'])
++                 supported_protocols=3D['file'],
++                 supported_platforms=3D['linux', 'freebsd', 'netbsd', 'ope=
+nbsd'])
 --=20
-2.21.0
+2.18.1
 
 
