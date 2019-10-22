@@ -2,72 +2,124 @@ Return-Path: <SRS0=tSBD=YP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 753F9CA9EA0
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 08:08:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3A7F2CA9EA0
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 08:08:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 48FD521872
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 08:08:34 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 48FD521872
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id 0402320684
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 08:08:49 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AF9t6sH2"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0402320684
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51352 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51354 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iMpDU-00078N-VF
-	for qemu-devel@archiver.kernel.org; Tue, 22 Oct 2019 04:08:32 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42821)
+	id 1iMpDj-0007VK-L5
+	for qemu-devel@archiver.kernel.org; Tue, 22 Oct 2019 04:08:47 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42885)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <clg@kaod.org>) id 1iMp3j-00065h-P1
- for qemu-devel@nongnu.org; Tue, 22 Oct 2019 03:58:30 -0400
+ (envelope-from <thuth@redhat.com>) id 1iMp3z-0006LQ-18
+ for qemu-devel@nongnu.org; Tue, 22 Oct 2019 03:58:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <clg@kaod.org>) id 1iMp3i-0006oo-Ca
- for qemu-devel@nongnu.org; Tue, 22 Oct 2019 03:58:27 -0400
-Received: from 18.mo3.mail-out.ovh.net ([87.98.172.162]:49243)
+ (envelope-from <thuth@redhat.com>) id 1iMp3x-0006x2-3l
+ for qemu-devel@nongnu.org; Tue, 22 Oct 2019 03:58:42 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:52853
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <clg@kaod.org>) id 1iMp3i-0006nj-5l
- for qemu-devel@nongnu.org; Tue, 22 Oct 2019 03:58:26 -0400
-Received: from player793.ha.ovh.net (unknown [10.108.35.74])
- by mo3.mail-out.ovh.net (Postfix) with ESMTP id 537DE22C1A6
- for <qemu-devel@nongnu.org>; Tue, 22 Oct 2019 09:58:23 +0200 (CEST)
-Received: from kaod.org (lfbn-1-2229-223.w90-76.abo.wanadoo.fr [90.76.50.223])
- (Authenticated sender: clg@kaod.org)
- by player793.ha.ovh.net (Postfix) with ESMTPSA id 8C0CEB391131;
- Tue, 22 Oct 2019 07:58:11 +0000 (UTC)
-Subject: Re: qemu/powernv: coreboot support?
-To: "Marty E. Plummer" <hanetzer@startmail.com>
-References: <20191018172622.kz4smemh5cwesfit@proprietary-killer>
- <21ba3404-dcd3-fe06-7725-d58e249f9fd2@kaod.org>
- <20191019153108.gkupn3tnihspq7th@proprietary-killer>
- <1cbd1882-15c8-5471-cd65-1c84c2920ba8@kaod.org>
- <20191019160933.fizoc6tpu5jday4o@proprietary-killer>
- <20191020062842.GI1960@umbus.fritz.box>
- <0a7cbd9b-2c46-259d-4e0d-9084ee2875a3@kaod.org>
- <20191021053439.GA6439@umbus.fritz.box>
- <f196a1a6-fcbf-f409-e7e7-95b42135c0be@kaod.org>
- <20191022003209.6ssq2ojiv57ixeyd@proprietary-killer>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <cfc2186f-52e2-53e8-bc3a-9511428542d0@kaod.org>
-Date: Tue, 22 Oct 2019 09:58:10 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.1
+ (Exim 4.71) (envelope-from <thuth@redhat.com>) id 1iMp3w-0006wf-W2
+ for qemu-devel@nongnu.org; Tue, 22 Oct 2019 03:58:41 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1571731120;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references:openpgp:openpgp:autocrypt:autocrypt;
+ bh=ck6GFRxCVNKOF1waS63KbscEi9g1hOFpXt7kigVyrPg=;
+ b=AF9t6sH2/SN7BMTcfRVHbU2eU9IKAfRLcnROi5145GimFcTAwgeMPuUPjXrveMkxNsZD0z
+ 0hDvs8PCvM2lwdQq/el1Xh1wqYCN0U08nsGY0jtdRlr3B48cwmn3+SXoZH6GEAdd/y54qw
+ ZNI8hHQjmxMMInF9v5vLEDiPi/OmeL4=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-286-Uws_QXUlOcmxrDVHUUEpHQ-1; Tue, 22 Oct 2019 03:58:38 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C359180183D;
+ Tue, 22 Oct 2019 07:58:37 +0000 (UTC)
+Received: from thuth.remote.csb (dhcp-200-228.str.redhat.com [10.33.200.228])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 897363CCA;
+ Tue, 22 Oct 2019 07:58:30 +0000 (UTC)
+Subject: Re: [PATCH v3 0/6] Enable more iotests during "make check-block"
+From: Thomas Huth <thuth@redhat.com>
+To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+References: <20191022072135.11188-1-thuth@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=thuth@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+Organization: Red Hat
+Message-ID: <8e7b1ebe-edd7-6a45-e95b-dd2fd0d6f1c1@redhat.com>
+Date: Tue, 22 Oct 2019 09:58:29 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-In-Reply-To: <20191022003209.6ssq2ojiv57ixeyd@proprietary-killer>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20191022072135.11188-1-thuth@redhat.com>
 Content-Language: en-US
-X-Ovh-Tracer-Id: 13158955164694776787
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrkeeigdduvdeiucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddm
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-MC-Unique: Uws_QXUlOcmxrDVHUUEpHQ-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 87.98.172.162
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -79,69 +131,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Joel Stanley <joel@jms.id.au>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org,
- David Gibson <david@gibson.dropbear.id.au>
+Cc: Kevin Wolf <kwolf@redhat.com>,
+ =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 22/10/2019 02:32, Marty E. Plummer wrote:
-> On Mon, Oct 21, 2019 at 02:46:59PM +0200, C=C3=A9dric Le Goater wrote:
->> On 21/10/2019 07:34, David Gibson wrote:
->>> On Sun, Oct 20, 2019 at 08:51:47AM +0200, C=C3=A9dric Le Goater wrote=
-:
->>>> On 20/10/2019 08:28, David Gibson wrote:
->>>>>
->>>>> Ok.  Note that the qemu emulated machine doesn't model the hardware
->>>>> right down to the level of hostboot.  That's wy we're just loading
->>>>> skiboot and jumping straight into it usually.  I guess clg's stuff =
-to
->>>>> load pnor images gets us a little closer to the hardware behaviour,
->>>>> but I think it's still only a rough approximation.
->>>>
-> On that note, is qemu-ppc64 currently capable of running LE firmware? M=
-y
-> coreboot port has currently reached a hitch in that part of the firmwar=
-e
-> headers mapping stuff out is saved in LE mode while the cpu (real or em=
-u)
-> is running in BE mode (FMAP headers are saved LE but CBFS headers are
-> saved BE)
->>>> It's really tied to the OpenPOWER firmwares using the HIOMAP protoco=
-l
->>>> to discuss with the BMC and load the flash. We could loosen how QEMU=
-=20
->>>> interprets the MTD device and use a property to inform QEMU that thi=
-s
->>>> is an OpenPOWER  PNOR file and that skiboot and can be loaded from i=
-t.
->>>> Something to discuss.
->>>
->>> Right.  I'm guessing one significant issue here is that to fully mode=
-l
->>> the BMC, with *its* firmware and comms channels with the main host
->>> would be quite a lot of work, hence cheating a bit to bypass that.
->>
->> In fact, we are not cheating that much. We use the IPMI BT interface o=
-f=20
->> QEMU to handle the HIOMAP communication with the BMC and this model is=
-=20
->> quite precise.=20
->>
->> The mapping of the PNOR is simply mapped on the LPC FW address space.=20
->> The underlying access are simplified because we don't have a LPC model
->> but we could generate all the SPI transaction using the Aspeed models.=
-=20
->> I had experiments in that sense for P8.=20
->>
-> Honestly getting the coreboot.rom into the lpc fw addr space in the sam=
-e
-> way you do pnor images would be a useful sim, as that's more or less ho=
-w
-> its going to be done on existing hardware.
+On 22/10/2019 09.21, Thomas Huth wrote:
+> As discussed here:
+>=20
+>  https://lists.gnu.org/archive/html/qemu-devel/2019-10/msg00697.html
+>=20
+> and here:
+>=20
+>  https://lists.gnu.org/archive/html/qemu-devel/2019-10/msg01388.html
+>=20
+> it would be good to have some more valuable iotests enabled in the
+> "auto" group to get better iotest coverage during "make check".
+>=20
+> And once Max' "iotests: Add and use $SOCK_DIR" patch series has been
+> merged, we can indeed enable these Python-based tests, too.
 
-That is covered by patch 'ppc/pnv: Add HIOMAP commands' in the series
-I sent.
+Oh well, some Travis jobs are now running too long and hit the 50
+minutes limit:
 
-C.=20
+ https://travis-ci.com/huth/qemu/jobs/248158477
+
+... so we either might need to remove some other iotests from the "auto"
+group again, or change the Travis jobs to include less targets...
+
+That "clang + sanitizer" job was already running 45 minutes before my
+change, so it was already close to the limit. So I'd suggest to change
+it to include less targets. Opinions?
+
+ Thomas
+
 
