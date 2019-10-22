@@ -2,86 +2,78 @@ Return-Path: <SRS0=tSBD=YP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	HTML_MESSAGE,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E11B9CA9EA0
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 16:17:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F0E25CA9EA0
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 16:24:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A53E521925
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 16:17:47 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A53E521925
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=parsons.com
+	by mail.kernel.org (Postfix) with ESMTPS id B56862084B
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 16:24:26 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hvbTw0wq"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B56862084B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35258 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35546 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iMwqw-00048V-NX
-	for qemu-devel@archiver.kernel.org; Tue, 22 Oct 2019 12:17:46 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37014)
+	id 1iMwxN-0007mh-HH
+	for qemu-devel@archiver.kernel.org; Tue, 22 Oct 2019 12:24:25 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37834)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <prvs=5198e8e603=alexander.bensch@parsons.com>)
- id 1iMwpx-0003Yi-Hs
- for qemu-devel@nongnu.org; Tue, 22 Oct 2019 12:16:50 -0400
+ (envelope-from <marcandre.lureau@redhat.com>) id 1iMwv7-0005uH-MM
+ for qemu-devel@nongnu.org; Tue, 22 Oct 2019 12:22:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <prvs=5198e8e603=alexander.bensch@parsons.com>)
- id 1iMwpt-0005C2-22
- for qemu-devel@nongnu.org; Tue, 22 Oct 2019 12:16:45 -0400
-Received: from txdal11mx05.parsons.com ([206.219.199.115]:47982)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71)
- (envelope-from <prvs=5198e8e603=alexander.bensch@parsons.com>)
- id 1iMwpr-0005B8-7T
- for qemu-devel@nongnu.org; Tue, 22 Oct 2019 12:16:41 -0400
-Received: from pps.filterd (txdal11mx05.parsons.com [127.0.0.1])
- by txdal11mx05.parsons.com (8.16.0.27/8.16.0.27) with SMTP id x9MGA43u009566
- for <qemu-devel@nongnu.org>; Tue, 22 Oct 2019 11:16:37 -0500
-Received: from txdal11exch01.parsons.com (txdal11exch01.parsons.com
- [172.21.212.127])
- by txdal11mx05.parsons.com with ESMTP id 2vt44ega1k-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT)
- for <qemu-devel@nongnu.org>; Tue, 22 Oct 2019 11:16:37 -0500
-Received: from ALHUN12EXCH01.Parsons.com (10.62.8.71) by
- TXDAL11EXCH01.Parsons.com (172.21.212.127) with Microsoft SMTP Server (TLS)
- id 15.0.1473.3; Tue, 22 Oct 2019 11:16:35 -0500
-Received: from ALHUN12EXCH02.Parsons.com (10.62.8.72) by
- ALHUN12EXCH01.Parsons.com (10.62.8.71) with Microsoft SMTP Server (TLS) id
- 15.0.1473.3; Tue, 22 Oct 2019 11:16:31 -0500
-Received: from ALHUN12EXCH02.Parsons.com ([10.62.8.72]) by
- ALHUN12EXCH02.Parsons.com ([10.62.8.72]) with mapi id 15.00.1473.003; Tue, 22
- Oct 2019 11:16:31 -0500
-From: "Bensch, Alexander" <Alexander.Bensch@parsons.com>
-To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Subject: MIPS32 - 16550 UART implementation on custom board
-Thread-Topic: MIPS32 - 16550 UART implementation on custom board
-Thread-Index: AdWI79ChFlP8gTYRSpm5S0W5XJjcZw==
-Date: Tue, 22 Oct 2019 16:16:31 +0000
-Message-ID: <5921a5c8358e4aa48d199e2fdf7114af@ALHUN12EXCH02.Parsons.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-msip_labels: MSIP_Label_79ae2783-b6e8-45ab-9e71-54c07b2dade0_Enabled=True;
- MSIP_Label_79ae2783-b6e8-45ab-9e71-54c07b2dade0_SiteId=8d088ff8-7e52-4d0f-8187-dcd9ca37815a;
- MSIP_Label_79ae2783-b6e8-45ab-9e71-54c07b2dade0_Owner=Alexander.Bensch@parsons.com;
- MSIP_Label_79ae2783-b6e8-45ab-9e71-54c07b2dade0_SetDate=2019-10-22T16:16:29.7248865Z;
- MSIP_Label_79ae2783-b6e8-45ab-9e71-54c07b2dade0_Name=Public;
- MSIP_Label_79ae2783-b6e8-45ab-9e71-54c07b2dade0_Application=Microsoft Azure
- Information Protection;
- MSIP_Label_79ae2783-b6e8-45ab-9e71-54c07b2dade0_ActionId=d068c304-9975-4e9b-92a4-3084be31bdcf;
- MSIP_Label_79ae2783-b6e8-45ab-9e71-54c07b2dade0_Extended_MSFT_Method=Manual
-x-ms-exchange-transport-fromentityheader: Hosted
-x-originating-ip: [172.21.212.10]
-Content-Type: multipart/alternative;
- boundary="_000_5921a5c8358e4aa48d199e2fdf7114afALHUN12EXCH02Parsonscom_"
+ (envelope-from <marcandre.lureau@redhat.com>) id 1iMwv5-0006zp-Od
+ for qemu-devel@nongnu.org; Tue, 22 Oct 2019 12:22:04 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:33065
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
+ id 1iMwv5-0006z0-Jy
+ for qemu-devel@nongnu.org; Tue, 22 Oct 2019 12:22:03 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1571761322;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=/qSKp+Dha50wwfkLLlipKox8Za+pAS4L71giPOhThTA=;
+ b=hvbTw0wq0u3nHa9Mbj86aajZJgLzmjfciPoBYWv2QyAOSmLDNCoHLg8yPNigCAUhGJItOJ
+ K//t5YWz96FBN/I36sXSdyYFmE7SeJKYOej+4lMxdgpvqnzLgKjrh70UWCxghrywxmHVCm
+ 45IwfBsPTFDLgVO4evJRR4qN3djC4/4=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-294-g1YdJS2rNKCKh0dfbsptjA-1; Tue, 22 Oct 2019 12:21:58 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 576B3107AD33;
+ Tue, 22 Oct 2019 16:21:56 +0000 (UTC)
+Received: from localhost (ovpn-112-21.ams2.redhat.com [10.36.112.21])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 494D35D6B2;
+ Tue, 22 Oct 2019 16:21:49 +0000 (UTC)
+From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v2 01/28] chardev: generate an internal id when none given
+Date: Tue, 22 Oct 2019 18:21:10 +0200
+Message-Id: <20191022162137.27161-2-marcandre.lureau@redhat.com>
+In-Reply-To: <20191022162137.27161-1-marcandre.lureau@redhat.com>
+References: <20191022162137.27161-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
- definitions=2019-10-22_03:, , signatures=0
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
-X-Received-From: 206.219.199.115
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-MC-Unique: g1YdJS2rNKCKh0dfbsptjA-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -93,313 +85,137 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Corey Minyard <cminyard@mvista.com>,
+ Peter Maydell <peter.maydell@linaro.org>,
+ "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
+ Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
+ KONRAD Frederic <frederic.konrad@adacore.com>,
+ "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
+ Aleksandar Rikalo <arikalo@wavecomp.com>, Magnus Damm <magnus.damm@gmail.com>,
+ =?UTF-8?q?Herv=C3=A9=20Poussineau?= <hpoussin@reactos.org>,
+ =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
+ Artyom Tarasenko <atar4qemu@gmail.com>, Eduardo Habkost <ehabkost@redhat.com>,
+ Fabien Chouteau <chouteau@adacore.com>, qemu-arm@nongnu.org,
+ Richard Henderson <rth@twiddle.net>,
+ =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
+ qemu-ppc@nongnu.org, Aleksandar Markovic <amarkovic@wavecomp.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---_000_5921a5c8358e4aa48d199e2fdf7114afALHUN12EXCH02Parsonscom_
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+Internally, qemu may create chardev without ID. Those will not be
+looked up with qemu_chr_find(), which prevents using qdev_prop_set_chr().
 
-Hi all,
+Use id_generate(), to generate an internal name (prefixed with #), so
+no conflict exist with user-named chardev.
 
-I'm trying to use QEMU to emulate a piece of firmware, but I'm having troub=
-le getting the UART device to properly update the Line Status Register and =
-display the input character.
+Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+---
+ chardev/char.c    | 32 ++++++++++++++++++++++++--------
+ include/qemu/id.h |  1 +
+ util/id.c         |  1 +
+ 3 files changed, 26 insertions(+), 8 deletions(-)
 
-Details:
-Target device: Qualcomm QCA9533 (Documentation here if you're curious<https=
-://github.com/Deoptim/atheros/blob/master/QCA9531_V2.0_nowatermark.pdf>)
-Target firmware: VxWorks 6.6 with U-Boot bootload
-CPU: MIPS 24Kc
-Board: mipssim (modified)
-Memory: 512MB
-Command used: qemu-system-mips -S -s -cpu 24Kc -M mipssim -nographic -bios =
-target_image.bin
+diff --git a/chardev/char.c b/chardev/char.c
+index 7b6b2cb123..e7e7492b0e 100644
+--- a/chardev/char.c
++++ b/chardev/char.c
+@@ -37,6 +37,7 @@
+ #include "qemu/help_option.h"
+ #include "qemu/module.h"
+ #include "qemu/option.h"
++#include "qemu/id.h"
+=20
+ #include "chardev/char-mux.h"
+=20
+@@ -944,10 +945,10 @@ void qemu_chr_set_feature(Chardev *chr,
+     return set_bit(feature, chr->features);
+ }
+=20
+-Chardev *qemu_chardev_new(const char *id, const char *typename,
+-                          ChardevBackend *backend,
+-                          GMainContext *gcontext,
+-                          Error **errp)
++static Chardev *chardev_new(const char *id, const char *typename,
++                            ChardevBackend *backend,
++                            GMainContext *gcontext,
++                            Error **errp)
+ {
+     Object *obj;
+     Chardev *chr =3D NULL;
+@@ -991,6 +992,21 @@ end:
+     return chr;
+ }
+=20
++Chardev *qemu_chardev_new(const char *id, const char *typename,
++                          ChardevBackend *backend,
++                          GMainContext *gcontext,
++                          Error **errp)
++{
++    g_autofree char *genid =3D NULL;
++
++    if (!id) {
++        genid =3D id_generate(ID_CHR);
++        id =3D genid;
++    }
++
++    return chardev_new(id, typename, backend, gcontext, errp);
++}
++
+ ChardevReturn *qmp_chardev_add(const char *id, ChardevBackend *backend,
+                                Error **errp)
+ {
+@@ -1003,8 +1019,8 @@ ChardevReturn *qmp_chardev_add(const char *id, Charde=
+vBackend *backend,
+         return NULL;
+     }
+=20
+-    chr =3D qemu_chardev_new(id, object_class_get_name(OBJECT_CLASS(cc)),
+-                           backend, NULL, errp);
++    chr =3D chardev_new(id, object_class_get_name(OBJECT_CLASS(cc)),
++                      backend, NULL, errp);
+     if (!chr) {
+         return NULL;
+     }
+@@ -1061,8 +1077,8 @@ ChardevReturn *qmp_chardev_change(const char *id, Cha=
+rdevBackend *backend,
+         return NULL;
+     }
+=20
+-    chr_new =3D qemu_chardev_new(NULL, object_class_get_name(OBJECT_CLASS(=
+cc)),
+-                               backend, chr->gcontext, errp);
++    chr_new =3D chardev_new(NULL, object_class_get_name(OBJECT_CLASS(cc)),
++                          backend, chr->gcontext, errp);
+     if (!chr_new) {
+         return NULL;
+     }
+diff --git a/include/qemu/id.h b/include/qemu/id.h
+index 40c70103e4..b55c406e69 100644
+--- a/include/qemu/id.h
++++ b/include/qemu/id.h
+@@ -4,6 +4,7 @@
+ typedef enum IdSubSystems {
+     ID_QDEV,
+     ID_BLOCK,
++    ID_CHR,
+     ID_MAX      /* last element, used as array size */
+ } IdSubSystems;
+=20
+diff --git a/util/id.c b/util/id.c
+index af1c5f1b81..5addb4460e 100644
+--- a/util/id.c
++++ b/util/id.c
+@@ -34,6 +34,7 @@ bool id_wellformed(const char *id)
+ static const char *const id_subsys_str[ID_MAX] =3D {
+     [ID_QDEV]  =3D "qdev",
+     [ID_BLOCK] =3D "block",
++    [ID_CHR] =3D "chr",
+ };
+=20
+ /*
+--=20
+2.23.0.606.g08da6496b6
 
-I have to apologize here, but I am unable to share my source. However, as I=
- am attempting to retool the mipssim board, I have only made minor changes =
-to the code, which are as follows:
-
-  *   Rebased bios memory region to 0x1F000000
-  *   Changed load_image_targphys() target address to 0x1F000000
-  *   Changed $pc initial value to 0xBF000000 (TLB remap of 0x1F000000)
-  *   Replaced the mipssim serial_init() call with serial_mm_init(isa, 0x20=
-000, env->irq[0], 115200, serial_hd(0), DEVICE_NATIVE_ENDIAN).
-
-While it seems like serial_init() is probably the currently accepted standa=
-rd, I wasn't having any luck with remapping it. I noticed the malta board h=
-ad no issues outputting on a MIPS test kernel I gave it, so I tried to mimi=
-c what was done there. However, I still cannot understand how QEMU works an=
-d I am unable to find many good resources that explain it. My slog through =
-the source and included docs is ongoing, but in the meantime I was hoping s=
-omeone might have some insight into what I'm doing wrong.
-
-The binary loads and executes correctly from address 0xBF000000, but hangs =
-when it hits the first UART polling loop. A look at mtree in the QEMU monit=
-or shows that the I/O device is mapped correctly to address range 0x1802000=
-0-0x1802003f, and when the firmware writes to the Tx buffer, gdb shows the =
-character successfully is written to memory. There's just no further action=
- from the serial device to pull that character and display it, so the firmw=
-are endlessly polls on the LSR waiting for an update.
-
-Is there something I'm missing when it comes to serial/hardware interaction=
- in QEMU? I would have assumed that remapping all of the existing functiona=
-l components of the mipssim board would be enough to at least get serial co=
-mmunication working, especially since the target uses the same 16550 UART t=
-hat mipssim does. Please let me know if you have any insights. It would be =
-helpful if I could find a way to debug QEMU itself with symbols, but at the=
- same time I'm not totally sure what I'd be looking for. Even advice on how=
- to scope down the issue would be useful.
-
-Thank you!
-
-NOTICE: This email message and all attachments transmitted with it may cont=
-ain privileged and confidential information, and information that is protec=
-ted by, and proprietary to, Parsons Corporation, and is intended solely for=
- the use of the addressee for the specific purpose set forth in this commun=
-ication. If the reader of this message is not the intended recipient, you a=
-re hereby notified that any reading, dissemination, distribution, copying, =
-or other use of this message or its attachments is strictly prohibited, and=
- you should delete this message and all copies and backups thereof. The rec=
-ipient may not further distribute or use any of the information contained h=
-erein without the express written authorization of the sender. If you have =
-received this message in error, or if you have any questions regarding the =
-use of the proprietary information contained therein, please contact the se=
-nder of this message immediately, and the sender will provide you with furt=
-her instructions.
-
---_000_5921a5c8358e4aa48d199e2fdf7114afALHUN12EXCH02Parsonscom_
-Content-Type: text/html; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
-
-<html xmlns:v=3D"urn:schemas-microsoft-com:vml" xmlns:o=3D"urn:schemas-micr=
-osoft-com:office:office" xmlns:w=3D"urn:schemas-microsoft-com:office:word" =
-xmlns:m=3D"http://schemas.microsoft.com/office/2004/12/omml" xmlns=3D"http:=
-//www.w3.org/TR/REC-html40">
-<head>
-<meta http-equiv=3D"Content-Type" content=3D"text/html; charset=3Dus-ascii"=
->
-<meta name=3D"Generator" content=3D"Microsoft Word 15 (filtered medium)">
-<style><!--
-/* Font Definitions */
-@font-face
-	{font-family:Wingdings;
-	panose-1:5 0 0 0 0 0 0 0 0 0;}
-@font-face
-	{font-family:"Cambria Math";
-	panose-1:2 4 5 3 5 4 6 3 2 4;}
-@font-face
-	{font-family:Calibri;
-	panose-1:2 15 5 2 2 2 4 3 2 4;}
-/* Style Definitions */
-p.MsoNormal, li.MsoNormal, div.MsoNormal
-	{margin:0in;
-	margin-bottom:.0001pt;
-	font-size:11.0pt;
-	font-family:"Calibri",sans-serif;}
-a:link, span.MsoHyperlink
-	{mso-style-priority:99;
-	color:#0563C1;
-	text-decoration:underline;}
-a:visited, span.MsoHyperlinkFollowed
-	{mso-style-priority:99;
-	color:#954F72;
-	text-decoration:underline;}
-p.MsoListParagraph, li.MsoListParagraph, div.MsoListParagraph
-	{mso-style-priority:34;
-	margin-top:0in;
-	margin-right:0in;
-	margin-bottom:0in;
-	margin-left:.5in;
-	margin-bottom:.0001pt;
-	font-size:11.0pt;
-	font-family:"Calibri",sans-serif;}
-span.EmailStyle17
-	{mso-style-type:personal-compose;
-	font-family:"Calibri",sans-serif;
-	color:windowtext;}
-.MsoChpDefault
-	{mso-style-type:export-only;
-	font-family:"Calibri",sans-serif;}
-@page WordSection1
-	{size:8.5in 11.0in;
-	margin:1.0in 1.0in 1.0in 1.0in;}
-div.WordSection1
-	{page:WordSection1;}
-/* List Definitions */
-@list l0
-	{mso-list-id:1923219766;
-	mso-list-type:hybrid;
-	mso-list-template-ids:1309976598 -858104088 67698691 67698693 67698689 676=
-98691 67698693 67698689 67698691 67698693;}
-@list l0:level1
-	{mso-level-start-at:0;
-	mso-level-number-format:bullet;
-	mso-level-text:-;
-	mso-level-tab-stop:none;
-	mso-level-number-position:left;
-	text-indent:-.25in;
-	font-family:"Calibri",sans-serif;
-	mso-fareast-font-family:Calibri;}
-@list l0:level2
-	{mso-level-number-format:bullet;
-	mso-level-text:o;
-	mso-level-tab-stop:none;
-	mso-level-number-position:left;
-	text-indent:-.25in;
-	font-family:"Courier New";}
-@list l0:level3
-	{mso-level-number-format:bullet;
-	mso-level-text:\F0A7;
-	mso-level-tab-stop:none;
-	mso-level-number-position:left;
-	text-indent:-.25in;
-	font-family:Wingdings;}
-@list l0:level4
-	{mso-level-number-format:bullet;
-	mso-level-text:\F0B7;
-	mso-level-tab-stop:none;
-	mso-level-number-position:left;
-	text-indent:-.25in;
-	font-family:Symbol;}
-@list l0:level5
-	{mso-level-number-format:bullet;
-	mso-level-text:o;
-	mso-level-tab-stop:none;
-	mso-level-number-position:left;
-	text-indent:-.25in;
-	font-family:"Courier New";}
-@list l0:level6
-	{mso-level-number-format:bullet;
-	mso-level-text:\F0A7;
-	mso-level-tab-stop:none;
-	mso-level-number-position:left;
-	text-indent:-.25in;
-	font-family:Wingdings;}
-@list l0:level7
-	{mso-level-number-format:bullet;
-	mso-level-text:\F0B7;
-	mso-level-tab-stop:none;
-	mso-level-number-position:left;
-	text-indent:-.25in;
-	font-family:Symbol;}
-@list l0:level8
-	{mso-level-number-format:bullet;
-	mso-level-text:o;
-	mso-level-tab-stop:none;
-	mso-level-number-position:left;
-	text-indent:-.25in;
-	font-family:"Courier New";}
-@list l0:level9
-	{mso-level-number-format:bullet;
-	mso-level-text:\F0A7;
-	mso-level-tab-stop:none;
-	mso-level-number-position:left;
-	text-indent:-.25in;
-	font-family:Wingdings;}
-ol
-	{margin-bottom:0in;}
-ul
-	{margin-bottom:0in;}
---></style><!--[if gte mso 9]><xml>
-<o:shapedefaults v:ext=3D"edit" spidmax=3D"1026" />
-</xml><![endif]--><!--[if gte mso 9]><xml>
-<o:shapelayout v:ext=3D"edit">
-<o:idmap v:ext=3D"edit" data=3D"1" />
-</o:shapelayout></xml><![endif]-->
-</head>
-<body lang=3D"EN-US" link=3D"#0563C1" vlink=3D"#954F72">
-<div class=3D"WordSection1">
-<p class=3D"MsoNormal">Hi all,<br>
-<br>
-I&#8217;m trying to use QEMU to emulate a piece of firmware, but I&#8217;m =
-having trouble getting the UART device to properly update the Line Status R=
-egister and display the input character.
-<o:p></o:p></p>
-<p class=3D"MsoNormal"><o:p>&nbsp;</o:p></p>
-<p class=3D"MsoNormal">Details:<o:p></o:p></p>
-<p class=3D"MsoNormal">Target device: Qualcomm QCA9533 (<a href=3D"https://=
-github.com/Deoptim/atheros/blob/master/QCA9531_V2.0_nowatermark.pdf">Docume=
-ntation here if you're curious</a>)<o:p></o:p></p>
-<p class=3D"MsoNormal">Target firmware: VxWorks 6.6 with U-Boot bootload<o:=
-p></o:p></p>
-<p class=3D"MsoNormal">CPU: MIPS 24Kc<o:p></o:p></p>
-<p class=3D"MsoNormal">Board: mipssim (modified)<o:p></o:p></p>
-<p class=3D"MsoNormal">Memory: 512MB<o:p></o:p></p>
-<p class=3D"MsoNormal">Command used: <i>qemu-system-mips -S -s -cpu 24Kc -M=
- mipssim &#8211;nographic -bios target_image.bin</i><o:p></o:p></p>
-<p class=3D"MsoNormal"><o:p>&nbsp;</o:p></p>
-<p class=3D"MsoNormal">I have to apologize here, but I am unable to share m=
-y source. However, as I am attempting to retool the mipssim board, I have o=
-nly made minor changes to the code, which are as follows:<o:p></o:p></p>
-<ul style=3D"margin-top:0in" type=3D"disc">
-<li class=3D"MsoListParagraph" style=3D"margin-left:0in;mso-list:l0 level1 =
-lfo1">Rebased
-<i>bios </i>memory region to 0x1F000000<o:p></o:p></li><li class=3D"MsoList=
-Paragraph" style=3D"margin-left:0in;mso-list:l0 level1 lfo1">Changed
-<i>load_image_targphys() </i>target address to 0x1F000000<o:p></o:p></li><l=
-i class=3D"MsoListParagraph" style=3D"margin-left:0in;mso-list:l0 level1 lf=
-o1">Changed $pc initial value to 0xBF000000 (TLB remap of 0x1F000000)<o:p><=
-/o:p></li><li class=3D"MsoListParagraph" style=3D"margin-left:0in;mso-list:=
-l0 level1 lfo1">Replaced the mipssim
-<i>serial_init() &shy;</i>call with <i>serial_mm_init(isa, 0x20000, env-&gt=
-;irq[0], 115200, serial_hd(0), DEVICE_NATIVE_ENDIAN).
-</i><o:p></o:p></li></ul>
-<p class=3D"MsoNormal"><o:p>&nbsp;</o:p></p>
-<p class=3D"MsoNormal">While it seems like <i>serial_init() </i>is probably=
- the currently accepted standard, I wasn&#8217;t having any luck with remap=
-ping it. I noticed the malta board had no issues outputting on a MIPS test =
-kernel I gave it, so I tried to mimic what
- was done there. However, I still cannot understand how QEMU works and I am=
- unable to find many good resources that explain it. My slog through the so=
-urce and included docs is ongoing, but in the meantime I was hoping someone=
- might have some insight into what
- I&#8217;m doing wrong. <o:p></o:p></p>
-<p class=3D"MsoNormal"><o:p>&nbsp;</o:p></p>
-<p class=3D"MsoNormal">The binary loads and executes correctly from address=
- 0xBF000000, but hangs when it hits the first UART polling loop. A look at
-<i>mtree</i> in the QEMU monitor shows that the I/O device is mapped correc=
-tly to address range 0x18020000-0x1802003f, and when the firmware writes to=
- the Tx buffer,
-<i>gdb </i>shows the character successfully is written to memory. There&#82=
-17;s just no further action from the serial device to pull that character a=
-nd display it, so the firmware endlessly polls on the LSR waiting for an up=
-date.<o:p></o:p></p>
-<p class=3D"MsoNormal"><o:p>&nbsp;</o:p></p>
-<p class=3D"MsoNormal">Is there something I&#8217;m missing when it comes t=
-o serial/hardware interaction in QEMU? I would have assumed that remapping =
-all of the existing functional components of the mipssim board would be eno=
-ugh to at least get serial communication
- working, especially since the target uses the same 16550 UART that mipssim=
- does. Please let me know if you have any insights. It would be helpful if =
-I could find a way to debug QEMU itself with symbols, but at the same time =
-I&#8217;m not totally sure what I&#8217;d be
- looking for. Even advice on how to scope down the issue would be useful.<o=
-:p></o:p></p>
-<p class=3D"MsoNormal"><o:p>&nbsp;</o:p></p>
-<p class=3D"MsoNormal">Thank you!<o:p></o:p></p>
-</div>
-<br>
-<div style=3D"font-size:10pt;  font-family: 'Franklin Gothic Book';">NOTICE=
-: This email message and all attachments transmitted with it may contain pr=
-ivileged and confidential information, and information that is protected by=
-, and proprietary to, Parsons Corporation,
- and is intended solely for the use of the addressee for the specific purpo=
-se set forth in this communication. If the reader of this message is not th=
-e intended recipient, you are hereby notified that any reading, disseminati=
-on, distribution, copying, or other
- use of this message or its attachments is strictly prohibited, and you sho=
-uld delete this message and all copies and backups thereof. The recipient m=
-ay not further distribute or use any of the information contained herein wi=
-thout the express written authorization
- of the sender. If you have received this message in error, or if you have =
-any questions regarding the use of the proprietary information contained th=
-erein, please contact the sender of this message immediately, and the sende=
-r will provide you with further
- instructions.</div>
-</body>
-</html>
-
---_000_5921a5c8358e4aa48d199e2fdf7114afALHUN12EXCH02Parsonscom_--
 
