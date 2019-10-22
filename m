@@ -2,88 +2,85 @@ Return-Path: <SRS0=tSBD=YP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E47F8CA9EA0
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 13:31:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 79202CA9EA0
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 13:34:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AECA02053B
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 13:31:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 433E02053B
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 13:34:26 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="nf7nXMJO"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AECA02053B
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="rBK2R4bV"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 433E02053B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56930 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57322 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iMuFp-0001Tp-SK
-	for qemu-devel@archiver.kernel.org; Tue, 22 Oct 2019 09:31:17 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:32853)
+	id 1iMuIq-0004Dy-MT
+	for qemu-devel@archiver.kernel.org; Tue, 22 Oct 2019 09:34:24 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36525)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1iMtxA-0004qK-OS
- for qemu-devel@nongnu.org; Tue, 22 Oct 2019 09:12:02 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1iMuGE-00020T-1j
+ for qemu-devel@nongnu.org; Tue, 22 Oct 2019 09:31:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1iMtx8-0003Ww-80
- for qemu-devel@nongnu.org; Tue, 22 Oct 2019 09:12:00 -0400
-Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:50552)
+ (envelope-from <peter.maydell@linaro.org>) id 1iMuGC-00016D-5B
+ for qemu-devel@nongnu.org; Tue, 22 Oct 2019 09:31:41 -0400
+Received: from mail-wr1-x435.google.com ([2a00:1450:4864:20::435]:42911)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1iMtx7-0003Vu-V0
- for qemu-devel@nongnu.org; Tue, 22 Oct 2019 09:11:58 -0400
-Received: by mail-wm1-x344.google.com with SMTP id q13so7164046wmj.0
- for <qemu-devel@nongnu.org>; Tue, 22 Oct 2019 06:11:57 -0700 (PDT)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1iMuGB-00015t-V0
+ for qemu-devel@nongnu.org; Tue, 22 Oct 2019 09:31:40 -0400
+Received: by mail-wr1-x435.google.com with SMTP id r1so8296125wrs.9
+ for <qemu-devel@nongnu.org>; Tue, 22 Oct 2019 06:31:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=RGomnqlzbQaX/+pTthi8oGYNnI0CjCkjc8GqV2fgmPk=;
- b=nf7nXMJOrig3zxloni3qKmXfxiUDdZGZn+KFiwAyyUFbygaWz/t6g2d/V3udcdWkWc
- fL3eyDklUfWjQ4ppdshcMBxkraWMtKTiENvjxx0ky0IwegBDQVBolQ2ckx06oNpe8Zrj
- 8zAVZuTX8LRYEVkdswP2SiwyK4DtiITuOdolBEmAnxH958tRCFTHdWJaYZP0nyflHTpd
- KtUH+Vb2ZPwkSpSuh1qHHmvFqbuPEK39dWkpmUxr8rEXT94U3DJkF0XEv/7b35KDOkcg
- bOoKyXOKa7c5GlRO6JhIwjBZfqI+XeXIGPlUfljOlNJKbFFdCw+i7ONTt72lq/acXiix
- ZU0A==
+ h=from:to:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=LR4rIgmQXvfQk5CDJ7hzF1Z4lq3e4Ysz7dPKYncsVAE=;
+ b=rBK2R4bVHPkJoMgyP7l4oDpByVsGvt6A1lI/f9B5s57blyyrjcu9WoA68K8u7ualsr
+ UoJ6lxI2lxpKwkcRhdKEjS6mSb7+nATxUgAPEKj975mxcMgCuy/339fp52F4+qpVpkNu
+ /Xkqe4uPb2OM4ZrtxQfx+NQSIZWzyjBU+5JnOFayVZRbr9Dz13qtVTRS4JAzO86Qzrh2
+ U5Hknr3ja9c0WCyO69aFdst/K1IW0Uucx6Avpn6qdhM4G6ePnVOdwjHkhO4wnuVt2jW7
+ R9EN4wMD33B6nunFsfMydghPmzFtgEUMdcFJWPCqim+QJB/2f1eOGiq7s3gAQVZNOVDk
+ 5C/g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=RGomnqlzbQaX/+pTthi8oGYNnI0CjCkjc8GqV2fgmPk=;
- b=oZL3z/4Jw1nBbV9Y7xUBIfShsDIDCfz2atx+xMvyzGYu2Q9lAtww62rUJ1bAzm/gof
- dOJqx/4/HhzT1e+e55X6xK2cHgsQ254+F6w4yrsanoY5DoQCD9LNmLeThlkk1SHKDhIf
- FYKLJmgp1IP4rn6OZ2kG/IRxjb2bfHJbXxCyMu5MCiLxNsoHOIPLfICN9O7udBwn8lJc
- 2G4r45MkHOOXILTiKKEdPbzFTfxlgbYPNNLpPO1fmaG4rfzywdar8/cWSgVJRbPtulu5
- vj5b+UaQwKTa50B6QNPQjzdqTswrqOyX3LicUdOzrRm5cmobobi9WIFpWLq7NAvcq4+a
- PvHg==
-X-Gm-Message-State: APjAAAU5fh59MUDMr+MZJR1XgEehvsESbolijhqXyixHe46KBZkeUEh3
- akWxqKG4CBgajCgEVTol17SxjQ==
-X-Google-Smtp-Source: APXvYqziomzzfbl/S1ZfEp41BtxJVgp/sV6SCJuOHt0Hza15UVcmDar1E3dtw4ejOu/0aDGOyqH2lQ==
-X-Received: by 2002:a7b:c94f:: with SMTP id i15mr3089656wml.8.1571749916481;
- Tue, 22 Oct 2019 06:11:56 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id x12sm8856626wru.93.2019.10.22.06.11.55
+ h=x-gm-message-state:from:to:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=LR4rIgmQXvfQk5CDJ7hzF1Z4lq3e4Ysz7dPKYncsVAE=;
+ b=YaEbchTC1rZhkZTtDulYzcnqND4qM0l1Sla/LXY/coAreibgOaSSYiosuAsnDuu58m
+ j5u06vWoCF48Z2MFoxG2OOF1oqDru7SoIUCxtnea7J5HArb+YjyrHkiEjmz5s3teSGH0
+ oagSkXjaf6XdkMzt99vWYf2uMGPpKxP5Ee0b77KaCxWdF2KHdDoDv8ORI0cNQQUCE2et
+ diNDYfwPfq4Qsyws4oab3LvKahRpi3c/q+xRphdE4Xs0zZQtnTN2NWb5P54RMdPhJw6G
+ Q3hAKEVe9ePZZDtPVKR4+/CN1VKZbgMXes7vfZoKjiXb1FiYB9WQpwbdEXJAZtctTvhO
+ BX7g==
+X-Gm-Message-State: APjAAAW08CHGr/+wQM5+UhFMPjtwPc70MRA/4zK8QjgUxr7ziy51aZJU
+ WW9ERMddbNIuBtmmUKn/ewyYX7fqSWQ=
+X-Google-Smtp-Source: APXvYqw+0v27MOM1DF/Zdkv45QcpMUIy0H7Yz5gzrZY3mDEFo4fd5tGLyS1rlAmWF8GjFQaWVOc+Sg==
+X-Received: by 2002:a5d:55c2:: with SMTP id i2mr3640764wrw.176.1571751097693; 
+ Tue, 22 Oct 2019 06:31:37 -0700 (PDT)
+Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
+ by smtp.gmail.com with ESMTPSA id r2sm20263856wma.1.2019.10.22.06.31.35
+ for <qemu-devel@nongnu.org>
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 22 Oct 2019 06:11:55 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 1F3D31FF87;
- Tue, 22 Oct 2019 14:11:55 +0100 (BST)
-References: <20191022072135.11188-1-thuth@redhat.com>
-User-agent: mu4e 1.3.5; emacs 27.0.50
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+ Tue, 22 Oct 2019 06:31:36 -0700 (PDT)
+From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: Re: [PATCH v3 0/6] Enable more iotests during "make check-block"
-In-reply-to: <20191022072135.11188-1-thuth@redhat.com>
-Date: Tue, 22 Oct 2019 14:11:55 +0100
-Message-ID: <87a79sx6uc.fsf@linaro.org>
+Subject: [PULL 00/41] target-arm queue
+Date: Tue, 22 Oct 2019 14:30:53 +0100
+Message-Id: <20191022133134.14487-1-peter.maydell@linaro.org>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::344
+X-Received-From: 2a00:1450:4864:20::435
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -95,74 +92,127 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, John Snow <jsnow@redhat.com>,
- qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+The big thing in here is RTH's caching-of-tb-flags patchset
+which should improve TCG performance.
 
-Thomas Huth <thuth@redhat.com> writes:
+thanks
+-- PMM
 
-> As discussed here:
->
->  https://lists.gnu.org/archive/html/qemu-devel/2019-10/msg00697.html
->
-> and here:
->
->  https://lists.gnu.org/archive/html/qemu-devel/2019-10/msg01388.html
+The following changes since commit 2152e740a8938b3bad73bfe1a01f8b94dab02d41:
 
-Queued to testing/next, thanks.
+  Merge remote-tracking branch 'remotes/vivier2/tags/trivial-branch-pull-request' into staging (2019-10-22 12:03:03 +0100)
 
->
-> it would be good to have some more valuable iotests enabled in the
-> "auto" group to get better iotest coverage during "make check".
->
-> And once Max' "iotests: Add and use $SOCK_DIR" patch series has been
-> merged, we can indeed enable these Python-based tests, too.
->
-> There is just one small downside: Since these tests require a QEMU
-> that features a 'virtio-blk' device, we cannot run the iotests
-> with binaries like qemu-system-tricore anymore. But since the iotests
-> were not very useful with such binaries anyway, I think it's ok now
-> if we skip them there.
->
-> I've also added a patch that removes test 130 from the "auto" group
-> instead. Test 130 has been reported to fail intermittently, so we
-> should not use it in "make check" block until it is fixed.
->
-> Based-on: 20191010152457.17713-1-mreitz@redhat.com
->
-> v3:
->  - Test 183 fails on Patchew, so I removed it from the "auto" group
->    again
->
-> v2:
->  - Checked the iotests with NetBSD, too (now that Eduardo has
->    re-activated Gerd's patches for creating NetBSD VM images)
->  - Use 'openbsd' instead of 'openbsd6'
->  - Use 'grep -q' instead of 'grep' for grep'ing silently
->  - Added the patch to disable 130 from the "auto" group
->
-> John Snow (1):
->   iotests: remove 'linux' from default supported platforms
->
-> Thomas Huth (5):
->   iotests: Test 041 only works on certain systems
->   iotests: Test 183 does not work on macOS and OpenBSD
->   iotests: Skip "make check-block" if QEMU does not support virtio-blk
->   iotests: Enable more tests in the 'auto' group to improve test
->     coverage
->   iotests: Remove 130 from the "auto" group
->
->  tests/check-block.sh          | 16 +++++++++++++++-
->  tests/qemu-iotests/041        |  3 ++-
->  tests/qemu-iotests/183        |  1 +
->  tests/qemu-iotests/group      | 18 +++++++++---------
->  tests/qemu-iotests/iotests.py | 16 +++++++++++-----
->  5 files changed, 38 insertions(+), 16 deletions(-)
+are available in the Git repository at:
 
+  https://git.linaro.org/people/pmaydell/qemu-arm.git tags/pull-target-arm-20191022
 
---
-Alex Benn=C3=A9e
+for you to fetch changes up to 833043a060f7d0e95ded88e61e992466305c0345:
+
+  hw/arm/digic4: Inline digic4_board_setup_ram() function (2019-10-22 14:21:57 +0100)
+
+----------------------------------------------------------------
+target-arm queue:
+ * Fix sign-extension for SMLAL* instructions
+ * aspeed: Add an AST2600 eval board
+ * Various ptimer device conversions to new transaction API
+ * Cache TB flags to avoid expensively recomputing them every time
+ * Add a dummy Samsung SDHCI controller model to exynos4 boards
+ * Minor refactorings of RAM creation for some arm boards
+
+----------------------------------------------------------------
+Cédric Le Goater (1):
+      aspeed: Add an AST2600 eval board
+
+Guenter Roeck (1):
+      hw/timer/exynos4210_mct: Initialize ptimer before starting it
+
+Peter Maydell (7):
+      hw/timer/arm_mptimer.c: Undo accidental rename of arm_mptimer_init()
+      hw/timer/puv3_ost.c: Switch to transaction-based ptimer API
+      hw/timer/sh_timer: Switch to transaction-based ptimer API
+      hw/timer/lm32_timer: Switch to transaction-based ptimer API
+      hw/timer/altera_timer.c: Switch to transaction-based ptimer API
+      hw/watchdog/etraxfs_timer.c: Switch to transaction-based ptimer API
+      hw/m68k/mcf5208.c: Switch to transaction-based ptimer API
+
+Philippe Mathieu-Daudé (9):
+      hw/sd/sdhci: Add a comment to distinct the i.MX eSDHC functions
+      hw/sd/sdhci: Add dummy Samsung SDHCI controller
+      hw/arm/exynos4210: Use the Samsung s3c SDHCI controller
+      hw/arm/xilinx_zynq: Use the IEC binary prefix definitions
+      hw/arm/mps2: Use the IEC binary prefix definitions
+      hw/arm/collie: Create the RAM in the board
+      hw/arm/omap2: Create the RAM in the board
+      hw/arm/omap1: Create the RAM in the board
+      hw/arm/digic4: Inline digic4_board_setup_ram() function
+
+Richard Henderson (23):
+      target/arm: Fix sign-extension for SMLAL*
+      target/arm: Split out rebuild_hflags_common
+      target/arm: Split out rebuild_hflags_a64
+      target/arm: Split out rebuild_hflags_common_32
+      target/arm: Split arm_cpu_data_is_big_endian
+      target/arm: Split out rebuild_hflags_m32
+      target/arm: Reduce tests vs M-profile in cpu_get_tb_cpu_state
+      target/arm: Split out rebuild_hflags_a32
+      target/arm: Split out rebuild_hflags_aprofile
+      target/arm: Hoist XSCALE_CPAR, VECLEN, VECSTRIDE in cpu_get_tb_cpu_state
+      target/arm: Simplify set of PSTATE_SS in cpu_get_tb_cpu_state
+      target/arm: Hoist computation of TBFLAG_A32.VFPEN
+      target/arm: Add arm_rebuild_hflags
+      target/arm: Split out arm_mmu_idx_el
+      target/arm: Hoist store to cs_base in cpu_get_tb_cpu_state
+      target/arm: Add HELPER(rebuild_hflags_{a32, a64, m32})
+      target/arm: Rebuild hflags at EL changes
+      target/arm: Rebuild hflags at MSR writes
+      target/arm: Rebuild hflags at CPSR writes
+      target/arm: Rebuild hflags at Xscale SCTLR writes
+      target/arm: Rebuild hflags for M-profile
+      target/arm: Rebuild hflags for M-profile NVIC
+      target/arm: Rely on hflags correct in cpu_get_tb_cpu_state
+
+ hw/arm/strongarm.h         |   4 +-
+ include/hw/arm/aspeed.h    |   1 +
+ include/hw/arm/omap.h      |  10 +-
+ include/hw/sd/sdhci.h      |   2 +
+ target/arm/cpu.h           |  84 ++++++----
+ target/arm/helper.h        |   4 +
+ target/arm/internals.h     |   9 ++
+ hw/arm/aspeed.c            |  23 +++
+ hw/arm/collie.c            |   8 +-
+ hw/arm/digic_boards.c      |   9 +-
+ hw/arm/exynos4210.c        |   2 +-
+ hw/arm/mps2-tz.c           |   3 +-
+ hw/arm/mps2.c              |   3 +-
+ hw/arm/nseries.c           |  10 +-
+ hw/arm/omap1.c             |  12 +-
+ hw/arm/omap2.c             |  13 +-
+ hw/arm/omap_sx1.c          |   8 +-
+ hw/arm/palm.c              |   8 +-
+ hw/arm/strongarm.c         |   7 +-
+ hw/arm/xilinx_zynq.c       |   3 +-
+ hw/intc/armv7m_nvic.c      |  22 +--
+ hw/m68k/mcf5208.c          |   9 +-
+ hw/sd/sdhci.c              |  68 +++++++-
+ hw/timer/altera_timer.c    |  13 +-
+ hw/timer/arm_mptimer.c     |   4 +-
+ hw/timer/etraxfs_timer.c   |  23 +--
+ hw/timer/exynos4210_mct.c  |   2 +-
+ hw/timer/lm32_timer.c      |  13 +-
+ hw/timer/puv3_ost.c        |   9 +-
+ hw/timer/sh_timer.c        |  13 +-
+ linux-user/syscall.c       |   1 +
+ target/arm/cpu.c           |   1 +
+ target/arm/helper-a64.c    |   3 +
+ target/arm/helper.c        | 393 +++++++++++++++++++++++++++++----------------
+ target/arm/m_helper.c      |   6 +
+ target/arm/machine.c       |   1 +
+ target/arm/op_helper.c     |   4 +
+ target/arm/translate-a64.c |  13 +-
+ target/arm/translate.c     |  37 ++++-
+ 39 files changed, 588 insertions(+), 270 deletions(-)
 
