@@ -2,78 +2,61 @@ Return-Path: <SRS0=tSBD=YP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B9ABECA9EA0
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 07:28:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4139BCA9EA0
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 07:28:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8399F2064B
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 07:28:09 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Gte1KvYq"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8399F2064B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 1949E2064B
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 07:28:12 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1949E2064B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51040 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51042 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iMoaO-0004wf-IM
-	for qemu-devel@archiver.kernel.org; Tue, 22 Oct 2019 03:28:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39169)
+	id 1iMoaR-00053U-4v
+	for qemu-devel@archiver.kernel.org; Tue, 22 Oct 2019 03:28:11 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39406)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <thuth@redhat.com>) id 1iMoUg-0005ZE-CQ
- for qemu-devel@nongnu.org; Tue, 22 Oct 2019 03:22:15 -0400
+ (envelope-from <clg@kaod.org>) id 1iMoVw-000723-7N
+ for qemu-devel@nongnu.org; Tue, 22 Oct 2019 03:23:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <thuth@redhat.com>) id 1iMoUf-0005L5-9q
- for qemu-devel@nongnu.org; Tue, 22 Oct 2019 03:22:14 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:24737
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <clg@kaod.org>) id 1iMoVu-0005tJ-V5
+ for qemu-devel@nongnu.org; Tue, 22 Oct 2019 03:23:32 -0400
+Received: from 5.mo178.mail-out.ovh.net ([46.105.51.53]:58920)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <thuth@redhat.com>) id 1iMoUf-0005Ku-5l
- for qemu-devel@nongnu.org; Tue, 22 Oct 2019 03:22:13 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1571728932;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=W/3jEa0khY8EIsvamGoGXV0Y4SSFZ2VbgKsJcLDSgeg=;
- b=Gte1KvYqP9CygaoKifNYfa3VVUjJN438PgjK8Ya1RXUpS3OJsn0oHy3Eh6hxqo3Aue0i3z
- JJXWa/HAB/AK2sOAc8s1jcCubAOZuk19+niLydhswmOTn+kzZ3eWyMRt4jt4P0F21weYEM
- u//ES4jEe3qUWVR203YIN747G8gP6OA=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-264-Dn9t54yaO2-3ghxvc8YNtw-1; Tue, 22 Oct 2019 03:22:09 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 554251800D6A;
- Tue, 22 Oct 2019 07:22:08 +0000 (UTC)
-Received: from thuth.com (dhcp-200-228.str.redhat.com [10.33.200.228])
- by smtp.corp.redhat.com (Postfix) with ESMTP id DB2942965D;
- Tue, 22 Oct 2019 07:21:57 +0000 (UTC)
-From: Thomas Huth <thuth@redhat.com>
-To: Max Reitz <mreitz@redhat.com>,
-	qemu-block@nongnu.org
-Subject: [PATCH v3 5/6] iotests: Enable more tests in the 'auto' group to
- improve test coverage
-Date: Tue, 22 Oct 2019 09:21:34 +0200
-Message-Id: <20191022072135.11188-6-thuth@redhat.com>
-In-Reply-To: <20191022072135.11188-1-thuth@redhat.com>
-References: <20191022072135.11188-1-thuth@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-MC-Unique: Dn9t54yaO2-3ghxvc8YNtw-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=WINDOWS-1252
+ (Exim 4.71) (envelope-from <clg@kaod.org>) id 1iMoVu-0005sK-OF
+ for qemu-devel@nongnu.org; Tue, 22 Oct 2019 03:23:30 -0400
+Received: from player786.ha.ovh.net (unknown [10.109.146.1])
+ by mo178.mail-out.ovh.net (Postfix) with ESMTP id 382E37CC81
+ for <qemu-devel@nongnu.org>; Tue, 22 Oct 2019 09:23:29 +0200 (CEST)
+Received: from kaod.org (lfbn-1-2229-223.w90-76.abo.wanadoo.fr [90.76.50.223])
+ (Authenticated sender: clg@kaod.org)
+ by player786.ha.ovh.net (Postfix) with ESMTPSA id CB69BB518C42;
+ Tue, 22 Oct 2019 07:23:23 +0000 (UTC)
+From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
+To: David Gibson <david@gibson.dropbear.id.au>
+Subject: [PATCH v3 4/4] spapr/xive: Set the OS CAM line at reset
+Date: Tue, 22 Oct 2019 09:22:46 +0200
+Message-Id: <20191022072246.9200-5-clg@kaod.org>
+X-Mailer: git-send-email 2.21.0
+In-Reply-To: <20191022072246.9200-1-clg@kaod.org>
+References: <20191022072246.9200-1-clg@kaod.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+X-Ovh-Tracer-Id: 12569828037710613478
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrkeeigdduudelucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddm
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.120
+X-Received-From: 46.105.51.53
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -85,96 +68,129 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, John Snow <jsnow@redhat.com>,
- qemu-devel@nongnu.org
+Cc: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>, qemu-ppc@nongnu.org,
+ qemu-devel@nongnu.org, Greg Kurz <groug@kaod.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-According to Kevin, tests 030, 040 and 041 are among the most valuable
-tests that we have, so we should always run them if possible, even if
-they take a little bit longer.
+When a Virtual Processor is scheduled to run on a HW thread, the
+hypervisor pushes its identifier in the OS CAM line. When running with
+kernel_irqchip=3Doff, QEMU needs to emulate the same behavior.
 
-According to Max, it would be good to have a test for iothreads and
-migration. 127 and 256 seem to be good candidates for iothreads. For
-migration, let's enable 091, 181, and 203 (which also tests iothreads).
+Set the OS CAM line when the interrupt presenter of the sPAPR core is
+reseted. This will also cover the case of hot-plugged CPUs.
 
-Reviewed-by: Max Reitz <mreitz@redhat.com>
-Signed-off-by: Thomas Huth <thuth@redhat.com>
+This change also has the benefit to remove the use of CPU_FOREACH()
+which can be unsafe.
+
+Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
 ---
- tests/qemu-iotests/group | 16 ++++++++--------
- 1 file changed, 8 insertions(+), 8 deletions(-)
+ include/hw/ppc/spapr_xive.h |  1 -
+ hw/intc/spapr_xive.c        | 48 +++++++++++++------------------------
+ 2 files changed, 17 insertions(+), 32 deletions(-)
 
-diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
-index a73df279e5..33b499ed41 100644
---- a/tests/qemu-iotests/group
-+++ b/tests/qemu-iotests/group
-@@ -51,7 +51,7 @@
- 027 rw auto quick
- 028 rw backing quick
- 029 rw auto quick
--030 rw backing
-+030 rw auto backing
- 031 rw auto quick
- 032 rw auto quick
- 033 rw auto quick
-@@ -61,8 +61,8 @@
- 037 rw auto backing quick
- 038 rw auto backing quick
- 039 rw auto quick
--040 rw
--041 rw backing
-+040 rw auto
-+041 rw auto backing
- 042 rw auto quick
- 043 rw auto backing
- 044 rw
-@@ -112,7 +112,7 @@
- 088 rw quick
- 089 rw auto quick
- 090 rw auto quick
--091 rw migration
-+091 rw auto migration
- 092 rw quick
- 093 throttle
- 094 rw quick
-@@ -148,7 +148,7 @@
- 124 rw backing
- 125 rw
- 126 rw auto backing
--127 rw backing quick
-+127 rw auto backing quick
- 128 rw quick
- 129 rw quick
- 130 rw auto quick
-@@ -197,7 +197,7 @@
- 177 rw auto quick
- 178 img
- 179 rw auto quick
--181 rw migration
-+181 rw auto migration
- 182 rw quick
- 183 rw migration
- 184 rw auto quick
-@@ -218,7 +218,7 @@
- 200 rw
- 201 rw migration
- 202 rw quick
--203 rw migration
-+203 rw auto migration
- 204 rw quick
- 205 rw quick
- 206 rw
-@@ -270,7 +270,7 @@
- 253 rw quick
- 254 rw backing quick
- 255 rw quick
--256 rw quick
-+256 rw auto quick
- 257 rw
- 258 rw quick
- 260 rw quick
+diff --git a/include/hw/ppc/spapr_xive.h b/include/hw/ppc/spapr_xive.h
+index d84bd5c229f0..742b7e834f2a 100644
+--- a/include/hw/ppc/spapr_xive.h
++++ b/include/hw/ppc/spapr_xive.h
+@@ -57,7 +57,6 @@ typedef struct SpaprXive {
+ void spapr_xive_pic_print_info(SpaprXive *xive, Monitor *mon);
+=20
+ void spapr_xive_hcall_init(SpaprMachineState *spapr);
+-void spapr_xive_set_tctx_os_cam(XiveTCTX *tctx);
+ void spapr_xive_mmio_set_enabled(SpaprXive *xive, bool enable);
+ void spapr_xive_map_mmio(SpaprXive *xive);
+=20
+diff --git a/hw/intc/spapr_xive.c b/hw/intc/spapr_xive.c
+index 20a8d8285f64..d8e1291905c3 100644
+--- a/hw/intc/spapr_xive.c
++++ b/hw/intc/spapr_xive.c
+@@ -205,23 +205,6 @@ void spapr_xive_mmio_set_enabled(SpaprXive *xive, bo=
+ol enable)
+     memory_region_set_enabled(&xive->end_source.esb_mmio, false);
+ }
+=20
+-/*
+- * When a Virtual Processor is scheduled to run on a HW thread, the
+- * hypervisor pushes its identifier in the OS CAM line. Emulate the
+- * same behavior under QEMU.
+- */
+-void spapr_xive_set_tctx_os_cam(XiveTCTX *tctx)
+-{
+-    uint8_t  nvt_blk;
+-    uint32_t nvt_idx;
+-    uint32_t nvt_cam;
+-
+-    spapr_xive_cpu_to_nvt(POWERPC_CPU(tctx->cs), &nvt_blk, &nvt_idx);
+-
+-    nvt_cam =3D cpu_to_be32(TM_QW1W2_VO | xive_nvt_cam_line(nvt_blk, nvt=
+_idx));
+-    memcpy(&tctx->regs[TM_QW1_OS + TM_WORD2], &nvt_cam, 4);
+-}
+-
+ static void spapr_xive_end_reset(XiveEND *end)
+ {
+     memset(end, 0, sizeof(*end));
+@@ -544,21 +527,32 @@ static int spapr_xive_cpu_intc_create(SpaprInterrup=
+tController *intc,
+     }
+=20
+     spapr_cpu->tctx =3D XIVE_TCTX(obj);
+-
+-    /*
+-     * (TCG) Early setting the OS CAM line for hotplugged CPUs as they
+-     * don't beneficiate from the reset of the XIVE IRQ backend
+-     */
+-    spapr_xive_set_tctx_os_cam(spapr_cpu->tctx);
+     return 0;
+ }
+=20
++static void xive_tctx_set_os_cam(XiveTCTX *tctx, uint32_t os_cam)
++{
++    uint32_t qw1w2 =3D cpu_to_be32(TM_QW1W2_VO | os_cam);
++    memcpy(&tctx->regs[TM_QW1_OS + TM_WORD2], &qw1w2, 4);
++}
++
+ static void spapr_xive_cpu_intc_reset(SpaprInterruptController *intc,
+                                      PowerPCCPU *cpu)
+ {
+     XiveTCTX *tctx =3D spapr_cpu_state(cpu)->tctx;
++    uint8_t  nvt_blk;
++    uint32_t nvt_idx;
+=20
+     xive_tctx_reset(tctx);
++
++    /*
++     * When a Virtual Processor is scheduled to run on a HW thread,
++     * the hypervisor pushes its identifier in the OS CAM line.
++     * Emulate the same behavior under QEMU.
++     */
++    spapr_xive_cpu_to_nvt(cpu, &nvt_blk, &nvt_idx);
++
++    xive_tctx_set_os_cam(tctx, xive_nvt_cam_line(nvt_blk, nvt_idx));
+ }
+=20
+ static void spapr_xive_set_irq(SpaprInterruptController *intc, int irq, =
+int val)
+@@ -651,14 +645,6 @@ static void spapr_xive_dt(SpaprInterruptController *=
+intc, uint32_t nr_servers,
+ static int spapr_xive_activate(SpaprInterruptController *intc, Error **e=
+rrp)
+ {
+     SpaprXive *xive =3D SPAPR_XIVE(intc);
+-    CPUState *cs;
+-
+-    CPU_FOREACH(cs) {
+-        PowerPCCPU *cpu =3D POWERPC_CPU(cs);
+-
+-        /* (TCG) Set the OS CAM line of the thread interrupt context. */
+-        spapr_xive_set_tctx_os_cam(spapr_cpu_state(cpu)->tctx);
+-    }
+=20
+     if (kvm_enabled()) {
+         int rc =3D spapr_irq_init_kvm(kvmppc_xive_connect, intc, errp);
 --=20
-2.18.1
+2.21.0
 
 
