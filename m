@@ -2,119 +2,87 @@ Return-Path: <SRS0=tSBD=YP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 486EFCA9EA0
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 14:15:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 49E88CA9EA0
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 14:15:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1398321872
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 14:15:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 136CA21783
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 14:15:08 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=os.amperecomputing.com header.i=@os.amperecomputing.com header.b="tQnakT/z"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1398321872
-Authentication-Results: mail.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=os.amperecomputing.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="JzUZnxk2"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 136CA21783
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58328 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58330 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iMuw7-0004KG-OH
-	for qemu-devel@archiver.kernel.org; Tue, 22 Oct 2019 10:14:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43778)
+	id 1iMuwE-0004X9-LG
+	for qemu-devel@archiver.kernel.org; Tue, 22 Oct 2019 10:15:06 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37331)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <aaron@os.amperecomputing.com>) id 1iMuoa-0002be-6B
- for qemu-devel@nongnu.org; Tue, 22 Oct 2019 10:07:13 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1iMuHq-0003Zu-C5
+ for qemu-devel@nongnu.org; Tue, 22 Oct 2019 09:33:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aaron@os.amperecomputing.com>) id 1iMuoZ-0002nV-1K
- for qemu-devel@nongnu.org; Tue, 22 Oct 2019 10:07:12 -0400
-Received: from mail-eopbgr720121.outbound.protection.outlook.com
- ([40.107.72.121]:30903 helo=NAM05-CO1-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <aaron@os.amperecomputing.com>)
- id 1iMuoY-0002n0-RJ
- for qemu-devel@nongnu.org; Tue, 22 Oct 2019 10:07:10 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=V7xW+JBJHNXr0KXmBR97cq9N0fXl/qh6ji/EkdrB1TtTXBZh9/oaYcb5za30KeDlUvyVtJO7wDQ3xqfVE6ANl3SgFiMdqOee9Rb0V9s7J6+rYhjtooOVGlJ2cKqEePV7zixsCs9apPM7nZ7/luie2ltQnvmCurMdICpQqM1chX8dJTYSdpw6tJvPBS2EApiokWKVv7bpGCs0ra+ia+X31Hd24aVDnz3O+bgabkTffdjhovgMpT5b9KOze6YncTr7Mfuxy+nA1NGbK2TWbKRmztDzZ8+L6dOaTbWupCI9YBHCQLUthSJxMq5AjLHdhUjgUcQXnjGtIuIOTbpP4FphMg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=v0+1EVVhcUf00loUVtV2NIHs20Q+61OHq35OaHFDFKQ=;
- b=caBxVCSR8BwoJ5VFrQGIEHCAvfBZuu4+f03tg12Odc2QM+2ouyeF8O8llXlc9U2EyGQ1J0Y+y5PLN/Oxr586twG98ztIiWCjLC15g1AgVl8UDm8A1uNPJDbInsaCOJpFDIH46dPh1U2BnHJXe4jaI3slkl/qEMPYRrlRZ24nLxeGyDc35vA3s53xSizVDwwDBLhQ3wwmP30d3ISr6QeRsAh/KwE1Mzfvxs/5llpeOIvAuklHxymQPtLis3ytRYH+hT3UBsBYQ58XFXhg21RmkcPgQcGeV00AOtXkYIbRHp+yj7JSWupcvcu44BAlxahpE02+xJKO80KPBvwLPmiUuw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=os.amperecomputing.com; dmarc=pass action=none
- header.from=os.amperecomputing.com; dkim=pass
- header.d=os.amperecomputing.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=os.amperecomputing.com; s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=v0+1EVVhcUf00loUVtV2NIHs20Q+61OHq35OaHFDFKQ=;
- b=tQnakT/zMxcPTOjX+LefQRug9/cxXItrOXW8IBIFcBJU9/YGtYabUUlY10N9aR3yJ3zexuHYzWY7QS5jqz3+q6M/u8mUWmHAuHCi92iNh8fvwRsTILq+9pNdAR9ON/l43lq0YtCnfTZzGcBHm9Lx4RIQ5+dVIxmLGRgPJN+3Rk0=
-Received: from DM6PR01MB6027.prod.exchangelabs.com (52.132.249.89) by
- DM6PR01MB5612.prod.exchangelabs.com (20.179.69.220) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2367.24; Tue, 22 Oct 2019 14:07:07 +0000
-Received: from DM6PR01MB6027.prod.exchangelabs.com
- ([fe80::3029:7c3:24fc:bb60]) by DM6PR01MB6027.prod.exchangelabs.com
- ([fe80::3029:7c3:24fc:bb60%7]) with mapi id 15.20.2347.029; Tue, 22 Oct 2019
- 14:07:07 +0000
-From: Aaron Lindsay OS <aaron@os.amperecomputing.com>
-To: =?iso-8859-1?Q?Alex_Benn=E9e?= <alex.bennee@linaro.org>
-CC: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "cota@braap.org"
- <cota@braap.org>, "peter.puhov@futurewei.com" <peter.puhov@futurewei.com>,
- "robert.foley@futurewei.com" <robert.foley@futurewei.com>
-Subject: Re: [PATCH  v6 39/54] plugin: add qemu_plugin_outs helper
-Thread-Topic: [PATCH  v6 39/54] plugin: add qemu_plugin_outs helper
-Thread-Index: AQHVhO5VFQaxqC28QE2m7X2ER1g5SqdmugWA
-Date: Tue, 22 Oct 2019 14:07:07 +0000
-Message-ID: <20191022140647.GG42857@RDU-FVFX20TUHV2H>
-References: <20191017131615.19660-1-alex.bennee@linaro.org>
- <20191017131615.19660-40-alex.bennee@linaro.org>
-In-Reply-To: <20191017131615.19660-40-alex.bennee@linaro.org>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-clientproxiedby: CY4PR01CA0022.prod.exchangelabs.com (2603:10b6:903:1f::32)
- To DM6PR01MB6027.prod.exchangelabs.com (2603:10b6:5:1da::25)
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=aaron@os.amperecomputing.com; 
-x-ms-exchange-messagesentrepresentingtype: 1
-x-originating-ip: [108.169.132.82]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 7d5da8ce-233a-44db-0cd1-08d756f91f55
-x-ms-traffictypediagnostic: DM6PR01MB5612:
-x-microsoft-antispam-prvs: <DM6PR01MB561240C6DBE84CBC0DA02C1A8A680@DM6PR01MB5612.prod.exchangelabs.com>
-x-ms-oob-tlc-oobclassifiers: OLM:469;
-x-forefront-prvs: 01986AE76B
-x-forefront-antispam-report: SFV:NSPM;
- SFS:(10019020)(7916004)(4636009)(39850400004)(136003)(376002)(346002)(396003)(366004)(199004)(189003)(6436002)(6486002)(7736002)(305945005)(229853002)(14454004)(3846002)(6506007)(386003)(26005)(6116002)(99286004)(102836004)(1076003)(9686003)(4326008)(186003)(6512007)(66476007)(81166006)(446003)(66556008)(64756008)(5660300002)(86362001)(81156014)(8676002)(486006)(478600001)(476003)(8936002)(11346002)(66446008)(66946007)(33716001)(256004)(316002)(54906003)(25786009)(558084003)(33656002)(2906002)(6916009)(71200400001)(71190400001)(6246003)(52116002)(76176011)(66066001);
- DIR:OUT; SFP:1102; SCL:1; SRVR:DM6PR01MB5612;
- H:DM6PR01MB6027.prod.exchangelabs.com; FPR:; SPF:None; LANG:en;
- PTR:InfoNoRecords; A:0; MX:1; 
-received-spf: None (protection.outlook.com: os.amperecomputing.com does not
- designate permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: /V6T7LzeWQPgx1ZQnja3h/kESHpeeC+fCEpvoSmiHqAxuHF07vQ/KQJAfvfr5rPeb5/y6n/t8CG/EOSFTzcds6TLeSEXBT1+63B15pM3bSwMWv2Ei4sXNp8tw/WN0Qla6frvGTZ8zKk6+hrBAhTK9FKKpPp3dCQj5qm+d2HSbVz+lgAC3w6fd/0BfjkdlEhQPJyN+axukGsCdV06sk/3038CYsrPlrnneMLdzv+fFcfyydmS56snyZAbF5t5wFeBFewcZfT26yirhjmA/si5YAYgDRIignqAHBaJ+Mmw0UKezmf9sUpHEqGPj3jMhMgwOKcFJATPeJH5g5bpSB9yiGAjHPxVx303J6oRUhPZB3MO1TWOMtrRV4Vkx364TNLvtgdxbiHU5C44aFW2BDg5FTTJRPuMzAyOL6LeQ+pqvmlBlk8LoXlaxCrXjy8NmUxM
-x-ms-exchange-transport-forked: True
-Content-Type: text/plain; charset="iso-8859-1"
-Content-ID: <77FBF3CF0EB67543B3A13E0867BB963A@prod.exchangelabs.com>
-Content-Transfer-Encoding: quoted-printable
+ (envelope-from <peter.maydell@linaro.org>) id 1iMuHo-0001hT-3x
+ for qemu-devel@nongnu.org; Tue, 22 Oct 2019 09:33:22 -0400
+Received: from mail-wm1-x333.google.com ([2a00:1450:4864:20::333]:50563)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1iMuHm-0001fQ-UG
+ for qemu-devel@nongnu.org; Tue, 22 Oct 2019 09:33:20 -0400
+Received: by mail-wm1-x333.google.com with SMTP id q13so7253560wmj.0
+ for <qemu-devel@nongnu.org>; Tue, 22 Oct 2019 06:33:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:subject:date:message-id:in-reply-to:references:mime-version
+ :content-transfer-encoding;
+ bh=ZwNW00oas6mcry2/k1wb4Dsg08MtsQnh0O8QmW/x2tI=;
+ b=JzUZnxk2KnZ2IeEX86dyIe0gWMAQvqB6rnrDgzV1zSck1Sep4ogcgOZu8y6J0pzjwC
+ q+n1b6+UJ8um8HWLrB5vLo+/F+zhzRcPr+FnLUuT2lMAkhNhvytHFpMuK3sQdiJ6ZIdV
+ TaLqYU/UzrgkNXMHUjEKAkYQwEEMxj2T3tG0iTZXDfI3w2tiHHkab1DYn8ct+rMwvxoA
+ ZYW41wEl2Ad7kLPdJq9B8lqODgy/A17lHHghZPF1KCXMrdvTuLFDoTfWM2sGHB2mHRRZ
+ vk4o+AC+Bdyqi8r5KHcQcViA/o1MhY8mmMEqCPs/JX5WFg0ww9W/QgC7QI0TWWFfvx6G
+ ZbTA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=ZwNW00oas6mcry2/k1wb4Dsg08MtsQnh0O8QmW/x2tI=;
+ b=AYT431qqFQSbJLjjIPSCGj18SJqX8GU1QvjZFb3ULKJyWMV7wxvsafphRo/U/1tkNb
+ XmVVAEdi97SH4mL3GZbmRZkBv7SRGHi1xyJUcKoDhbs9Ak+zaMqmGVhJpTiZngNxF6Br
+ PuHifP6KReoog+PK3LfU/skdTzQ/HzhDQk1vswbrqhz50AjxPtGNPnZa4UEC5asEhB4u
+ zFKPknkurDh5KzxtTZxzkZO0q0//etpn3GUKpVZ203p3/0FqKhCy3BZN7a1G2Kn53bUM
+ gnCLcO99n7cpwa1wWn/3xBV8KQTn7xxCjDLfz7xoTSS4DevdWb6+sn7xNTlv00n6mNv+
+ btWA==
+X-Gm-Message-State: APjAAAUtNi/t20yEM/W5gQfZckEMsIgcmaL6hJAMX9rWeCP3WByQxRb4
+ yhsxbRvbGsHjUMl9+bt1XCKiqDcJe3Y=
+X-Google-Smtp-Source: APXvYqzSv9UPNIDfIfqTaQUTPSd65pOXNkkiTllvTpuE8attUvYF492vEIxZX+TOQaE92TD43LGymg==
+X-Received: by 2002:a7b:c924:: with SMTP id h4mr3211922wml.46.1571751190844;
+ Tue, 22 Oct 2019 06:33:10 -0700 (PDT)
+Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
+ by smtp.gmail.com with ESMTPSA id r2sm20263856wma.1.2019.10.22.06.33.08
+ for <qemu-devel@nongnu.org>
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 22 Oct 2019 06:33:09 -0700 (PDT)
+From: Peter Maydell <peter.maydell@linaro.org>
+To: qemu-devel@nongnu.org
+Subject: [PULL 41/41] hw/arm/digic4: Inline digic4_board_setup_ram() function
+Date: Tue, 22 Oct 2019 14:31:34 +0100
+Message-Id: <20191022133134.14487-42-peter.maydell@linaro.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20191022133134.14487-1-peter.maydell@linaro.org>
+References: <20191022133134.14487-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
-X-OriginatorOrg: os.amperecomputing.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 7d5da8ce-233a-44db-0cd1-08d756f91f55
-X-MS-Exchange-CrossTenant-originalarrivaltime: 22 Oct 2019 14:07:07.2095 (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 3bc2b170-fd94-476d-b0ce-4229bdc904a7
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: DkOUNRASPvElc5ZMy4tqW4Ry7O0R9CFlZ7uymzYULM3pRcby5/p9ZRkCy5uno1kriVq+BqA9bVXt/VUYshv5Wi6WEJQ/g9T3Erv32JQaJ2k=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR01MB5612
-X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
-X-Received-From: 40.107.72.121
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::333
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -130,12 +98,50 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Oct 17 14:16, Alex Benn=E9e wrote:
-> Having the plugins grab stdout and spew stuff there is a bit ugly and
-> certainly makes the tests look ugly. Provide a hook back into QEMU
-> which can be redirected as needed.
->=20
-> Signed-off-by: Alex Benn=E9e <alex.bennee@linaro.org>
+From: Philippe Mathieu-Daudé <philmd@redhat.com>
 
-Reviewed-by: Aaron Lindsay <aaron@os.amperecomputing.com>
+Having the RAM creation code in a separate function is not
+very helpful. Move this code directly inside the board_init()
+function, this will later allow the board to have the QOM
+ownership of the RAM.
+
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+Message-id: 20191021190653.9511-7-philmd@redhat.com
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+---
+ hw/arm/digic_boards.c | 9 ++-------
+ 1 file changed, 2 insertions(+), 7 deletions(-)
+
+diff --git a/hw/arm/digic_boards.c b/hw/arm/digic_boards.c
+index 304e4d1a294..ef3fc2b6a5f 100644
+--- a/hw/arm/digic_boards.c
++++ b/hw/arm/digic_boards.c
+@@ -53,12 +53,6 @@ typedef struct DigicBoard {
+     const char *rom1_def_filename;
+ } DigicBoard;
+ 
+-static void digic4_board_setup_ram(DigicBoardState *s, hwaddr ram_size)
+-{
+-    memory_region_allocate_system_memory(&s->ram, NULL, "ram", ram_size);
+-    memory_region_add_subregion(get_system_memory(), 0, &s->ram);
+-}
+-
+ static void digic4_board_init(DigicBoard *board)
+ {
+     Error *err = NULL;
+@@ -72,7 +66,8 @@ static void digic4_board_init(DigicBoard *board)
+         exit(1);
+     }
+ 
+-    digic4_board_setup_ram(s, board->ram_size);
++    memory_region_allocate_system_memory(&s->ram, NULL, "ram", board->ram_size);
++    memory_region_add_subregion(get_system_memory(), 0, &s->ram);
+ 
+     if (board->add_rom0) {
+         board->add_rom0(s, DIGIC4_ROM0_BASE, board->rom0_def_filename);
+-- 
+2.20.1
+
 
