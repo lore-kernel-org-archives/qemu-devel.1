@@ -7,84 +7,84 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 329E3CA9EA0
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 19:25:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 70C72CA9EA0
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 19:26:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E95972184C
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 19:25:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 34D722184C
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 19:26:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="jPeUPUP6"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E95972184C
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="A58/CEve"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 34D722184C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42138 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42230 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iMzmF-0003Ug-1C
-	for qemu-devel@archiver.kernel.org; Tue, 22 Oct 2019 15:25:07 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36465)
+	id 1iMznv-000585-Bm
+	for qemu-devel@archiver.kernel.org; Tue, 22 Oct 2019 15:26:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36442)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1iMzej-0002Tl-UY
- for qemu-devel@nongnu.org; Tue, 22 Oct 2019 15:17:23 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1iMzej-0002Sz-7Z
+ for qemu-devel@nongnu.org; Tue, 22 Oct 2019 15:17:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1iMzeh-0005Q5-KL
- for qemu-devel@nongnu.org; Tue, 22 Oct 2019 15:17:21 -0400
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:39600)
+ (envelope-from <alex.bennee@linaro.org>) id 1iMzeg-0005Nk-3L
+ for qemu-devel@nongnu.org; Tue, 22 Oct 2019 15:17:20 -0400
+Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:39075)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1iMzeh-0005Na-EC
- for qemu-devel@nongnu.org; Tue, 22 Oct 2019 15:17:19 -0400
-Received: by mail-wr1-x444.google.com with SMTP id a11so3238597wra.6
- for <qemu-devel@nongnu.org>; Tue, 22 Oct 2019 12:17:18 -0700 (PDT)
+ id 1iMzef-0005MW-T5
+ for qemu-devel@nongnu.org; Tue, 22 Oct 2019 15:17:18 -0400
+Received: by mail-wm1-x343.google.com with SMTP id r141so7653783wme.4
+ for <qemu-devel@nongnu.org>; Tue, 22 Oct 2019 12:17:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=ifdTWY7rA8JzLf+c4o7pX4/w+sZoXMC1jEUoG7lAHv4=;
- b=jPeUPUP6T0TNgGu6WSyoaEuW/ws6xMG3ufV7u/6Vsp3BrV0xLEedvQ5mcfkpO2DDbt
- JvAGXKz7YdkB+dxZy9ReQFLccX3feX9qd/cP/uPrLyg8e6IGl7ihM5vOlbO2xV+rjYvv
- cgEfYQWFYC0rGfX5CfG77aIb/VlDVZqLxKCosky++5hGf5dKp5QMP3sJeOaDxnqhjBCS
- CtoH5zJST4JoXvVvv+xq6FoeYBxCEfbnNaI/mAQQDdsN37MRcO/ZyI7XUyjiExImTalW
- cAw4J92rOCWLuX27LrT/+ui7uZJgYZtZhfm/7Dz9vufIRPbD+FIzAzC1NvDkVkH1++mG
- 1C8g==
+ bh=t90FRs36jykQWIQiuf5k/HIsomfoZi6hqWnwwcBmJOI=;
+ b=A58/CEve1bOsXJfvmqX9zNw9jJj517JTAESaQ4S/vEklYwUiYxyQP6LfbnCKAOvPru
+ mXu9Borla2VdiPFSC3x7TsoEpp5vKk/NQ3xnACRtBe1x4CyF74uWak8cOjQricciBEP3
+ liwvVbj6v4w2qyQJnSilInNZXXiojIjieic5W3ZeEkp1l5puWPY9jDK+nZxXN652EctG
+ 7AEN1KxV8u2gUxvLFNB2VW8cwNIkd+BNPDpNzNxf3APBD/hmG5MyIQOcKD6z3k6anAMA
+ aMMjOFMLrwnR7dk2/KJIKOX8cJKaQFZhl35PHARSTjghwsF1rz+JZpAiQrMkzxN5ugkq
+ OYBA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=ifdTWY7rA8JzLf+c4o7pX4/w+sZoXMC1jEUoG7lAHv4=;
- b=BIc6SDj824tlPuVM0PvKAOIEmJa81D87iplX1VzuYA+Ii1CqnB5v39X6shkwpvXV7O
- 89qF+2ThUH1gI2AcgUb5hd66iJksTGjIpbWj7UHTTPsPem4GFOLXDJxaRlfunUh2/a+x
- wg7JMg65/BQxHvOkJdyg6z83KTSfZXADHd7ONJD6ThrlTNTGd4M8HQzDt+mir6sEZgnI
- kPQnhRJmG5+ujmrGMbhV6usg6HZyvzFvY9YAdHxBuiTvO3Qj2fRZi6/7512J9m79mPdU
- +BDHcS1F5uEpJ2DNlTYQcnl88FJaMEC0NOZ+t3IZwSk/yaz4H2pGu/x24BsADaEQC+Mj
- BC3w==
-X-Gm-Message-State: APjAAAXkevrnPJPVZ4y412N1iUbmiQsX/4eduzFwcmq2PS/IFalrWXfD
- WJOAIrL5Hb9srvpSJC+2ZXV0Fw==
-X-Google-Smtp-Source: APXvYqzHxSsV236LaS9ViuVgyFPnP0sjA+pk37Cu13+vzYSAw3y2EEB2WOAkpEjVfNEQOPg/GPHjaA==
-X-Received: by 2002:adf:92e7:: with SMTP id 94mr5185809wrn.199.1571771837272; 
- Tue, 22 Oct 2019 12:17:17 -0700 (PDT)
+ bh=t90FRs36jykQWIQiuf5k/HIsomfoZi6hqWnwwcBmJOI=;
+ b=AYhIRFU3wnl/9IPXQtoclKCzaMerqeBVWhAn4z53to+hH7TJspmLMyOZD5xKCdKmHx
+ e0SXG14UH2zI4WUbn0iaGg/euHgzCfU//mTalHFs0ZxBetnveYpTfwI0nJuWpCclPb5O
+ 1PF64oWs5TshBVtk2V8L5hMy2QDLb3UsdCYCimdEkwS/Q1LEBrRWsBJhU682Esw7vugt
+ nLV+uEGsgoXlAT1N1AbkXHR+zx+Snkj4XtYCJTXVxHboRAOz9WlonZLZEODR/cLI1QM1
+ n6KPrkTTKKK5F+xZcVXeg4DNo/yialW5c646vMUwhK9i8xNZ+9xyAkJ55b5nXpE5kp95
+ Vzmw==
+X-Gm-Message-State: APjAAAUqSF2C0p1vkpVtLzxugr6/s+Y0pB5KCsrTN+E2Vf5gTs6A5QKy
+ J5HHSCtzDhx+6Y+IK1TAIf2RSQ==
+X-Google-Smtp-Source: APXvYqz5zbEshz26wnbOF01rWBN7Td4KpTklmBs2WepRM+KMGxcq2vzT6N8PmS9A+F+E3GIs73B2Fg==
+X-Received: by 2002:a7b:c041:: with SMTP id u1mr4305307wmc.88.1571771836688;
+ Tue, 22 Oct 2019 12:17:16 -0700 (PDT)
 Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id m7sm20390526wrv.40.2019.10.22.12.17.09
+ by smtp.gmail.com with ESMTPSA id o4sm30892371wre.91.2019.10.22.12.17.09
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
  Tue, 22 Oct 2019 12:17:14 -0700 (PDT)
 Received: from zen.lan (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 833DD1FF9E;
+ by zen.linaroharston (Postfix) with ESMTP id 6BE051FF9D;
  Tue, 22 Oct 2019 20:17:05 +0100 (BST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v1 14/19] iotests: remove 'linux' from default supported
- platforms
-Date: Tue, 22 Oct 2019 20:16:59 +0100
-Message-Id: <20191022191704.6134-15-alex.bennee@linaro.org>
+Subject: [PATCH  v1 13/19] travis.yml: cache the clang sanitizer build
+Date: Tue, 22 Oct 2019 20:16:58 +0100
+Message-Id: <20191022191704.6134-14-alex.bennee@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20191022191704.6134-1-alex.bennee@linaro.org>
 References: <20191022191704.6134-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::444
+X-Received-From: 2a00:1450:4864:20::343
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,87 +96,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: fam@euphon.net, Kevin Wolf <kwolf@redhat.com>, berrange@redhat.com,
- "open list:Block layer core" <qemu-block@nongnu.org>,
- stefanb@linux.vnet.ibm.com, John Snow <jsnow@redhat.com>,
- richard.henderson@linaro.org, f4bug@amsat.org, Max Reitz <mreitz@redhat.com>,
- cota@braap.org, stefanha@redhat.com, marcandre.lureau@redhat.com,
- pbonzini@redhat.com, aurelien@aurel32.net
+Cc: fam@euphon.net, berrange@redhat.com, stefanb@linux.vnet.ibm.com,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ richard.henderson@linaro.org, f4bug@amsat.org,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>, cota@braap.org,
+ stefanha@redhat.com, marcandre.lureau@redhat.com, pbonzini@redhat.com,
+ aurelien@aurel32.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: John Snow <jsnow@redhat.com>
+Hopefully we'll see the same benefits as the other builds.
 
-verify_platform will check an explicit whitelist and blacklist instead.
-The default will now be assumed to be allowed to run anywhere.
-
-For tests that do not specify their platforms explicitly, this has the effect of
-enabling these tests on non-linux platforms. For tests that always specified
-linux explicitly, there is no change.
-
-For Python tests on FreeBSD at least; only seven python tests fail:
-045 147 149 169 194 199 211
-
-045 and 149 appear to be misconfigurations,
-147 and 194 are the AF_UNIX path too long error,
-169 and 199 are bitmap migration bugs, and
-211 is a bug that shows up on Linux platforms, too.
-
-This is at least good evidence that these tests are not Linux-only. If
-they aren't suitable for other platforms, they should be disabled on a
-per-platform basis as appropriate.
-
-Therefore, let's switch these on and deal with the failures.
-
-Reviewed-by: Max Reitz <mreitz@redhat.com>
-Signed-off-by: John Snow <jsnow@redhat.com>
-Message-Id: <20191022072135.11188-2-thuth@redhat.com>
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 ---
- tests/qemu-iotests/iotests.py | 16 +++++++++++-----
- 1 file changed, 11 insertions(+), 5 deletions(-)
+ .travis.yml | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotests.py
-index 3a8f378f90d..75e64ef85be 100644
---- a/tests/qemu-iotests/iotests.py
-+++ b/tests/qemu-iotests/iotests.py
-@@ -869,9 +869,14 @@ def verify_protocol(supported=[], unsupported=[]):
-     if not_sup or (imgproto in unsupported):
-         notrun('not suitable for this protocol: %s' % imgproto)
+diff --git a/.travis.yml b/.travis.yml
+index da6a2063fca..c43597f1331 100644
+--- a/.travis.yml
++++ b/.travis.yml
+@@ -189,6 +189,7 @@ matrix:
  
--def verify_platform(supported_oses=['linux']):
--    if True not in [sys.platform.startswith(x) for x in supported_oses]:
--        notrun('not suitable for this OS: %s' % sys.platform)
-+def verify_platform(supported=None, unsupported=None):
-+    if unsupported is not None:
-+        if any((sys.platform.startswith(x) for x in unsupported)):
-+            notrun('not suitable for this OS: %s' % sys.platform)
-+
-+    if supported is not None:
-+        if not any((sys.platform.startswith(x) for x in supported)):
-+            notrun('not suitable for this OS: %s' % sys.platform)
- 
- def verify_cache_mode(supported_cache_modes=[]):
-     if supported_cache_modes and (cachemode not in supported_cache_modes):
-@@ -933,7 +938,8 @@ def execute_unittest(output, verbosity, debug):
-                                     r'Ran \1 tests', output.getvalue()))
- 
- def execute_test(test_function=None,
--                 supported_fmts=[], supported_oses=['linux'],
-+                 supported_fmts=[],
-+                 supported_platforms=None,
-                  supported_cache_modes=[], unsupported_fmts=[],
-                  supported_protocols=[], unsupported_protocols=[]):
-     """Run either unittest or script-style tests."""
-@@ -950,7 +956,7 @@ def execute_test(test_function=None,
-     verbosity = 1
-     verify_image_format(supported_fmts, unsupported_fmts)
-     verify_protocol(supported_protocols, unsupported_protocols)
--    verify_platform(supported_oses)
-+    verify_platform(supported=supported_platforms)
-     verify_cache_mode(supported_cache_modes)
- 
-     if debug:
+     - env:
+         - CONFIG="--target-list=${MAIN_SOFTMMU_TARGETS} "
++        - CACHE_NAME="${TRAVIS_BRANCH}-linux-clang-sanitize"
+       compiler: clang
+       before_script:
+         - ./configure ${CONFIG} --extra-cflags="-fsanitize=undefined -Werror" || { cat config.log && exit 1; }
 -- 
 2.20.1
 
