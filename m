@@ -2,72 +2,71 @@ Return-Path: <SRS0=tSBD=YP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8EB30CA9EA0
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 08:15:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F111CA9EA0
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 08:17:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 629912184C
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 08:15:14 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 629912184C
+	by mail.kernel.org (Postfix) with ESMTPS id 72AA320684
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 08:17:15 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 72AA320684
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51422 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51434 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iMpJw-0006mP-Pg
-	for qemu-devel@archiver.kernel.org; Tue, 22 Oct 2019 04:15:12 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44162)
+	id 1iMpLu-0000BB-Io
+	for qemu-devel@archiver.kernel.org; Tue, 22 Oct 2019 04:17:14 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44159)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <laurent@vivier.eu>) id 1iMpGG-0002hh-QR
- for qemu-devel@nongnu.org; Tue, 22 Oct 2019 04:11:26 -0400
+ (envelope-from <laurent@vivier.eu>) id 1iMpGG-0002hD-Mp
+ for qemu-devel@nongnu.org; Tue, 22 Oct 2019 04:11:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <laurent@vivier.eu>) id 1iMpGF-00054T-Ho
+ (envelope-from <laurent@vivier.eu>) id 1iMpGF-00054N-Ej
  for qemu-devel@nongnu.org; Tue, 22 Oct 2019 04:11:24 -0400
-Received: from mout.kundenserver.de ([212.227.17.10]:55701)
+Received: from mout.kundenserver.de ([212.227.17.24]:40997)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1iMpGF-00053g-7z
+ (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1iMpGF-00053W-4t
  for qemu-devel@nongnu.org; Tue, 22 Oct 2019 04:11:23 -0400
 Received: from localhost.localdomain ([78.238.229.36]) by
  mrelayeu.kundenserver.de (mreue107 [212.227.15.183]) with ESMTPSA (Nemesis)
- id 1MF45G-1iGAM33J8K-00FRiM; Tue, 22 Oct 2019 10:11:19 +0200
+ id 1MybX9-1i6Vha17qn-00yzDT; Tue, 22 Oct 2019 10:11:19 +0200
 From: Laurent Vivier <laurent@vivier.eu>
 To: qemu-devel@nongnu.org
-Subject: [PULL 07/11] linux-user/strace: Dump AF_NETLINK sockaddr content
-Date: Tue, 22 Oct 2019 10:11:00 +0200
-Message-Id: <20191022081104.11814-8-laurent@vivier.eu>
+Subject: [PULL 06/11] linux-user/syscall: Introduce target_sockaddr_nl
+Date: Tue, 22 Oct 2019 10:10:59 +0200
+Message-Id: <20191022081104.11814-7-laurent@vivier.eu>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20191022081104.11814-1-laurent@vivier.eu>
 References: <20191022081104.11814-1-laurent@vivier.eu>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:DESsI0QzkWz1nsQbcal9gf9LarrsZojwOWRoWfhXnSB6PiAk9J0
- HmHMa349MQ/A2yJ7oxS8THE4ccjvm/5HADO1EEQSX5EOxuQ4wX4BQlQ2ZEC7zITDySJqcKF
- O14pXkgyYAhLbIq6q528N9IrmbPfsF2iVNtJFn1D2GoSAmICcv+ZYKOHpGe/AuAGWKX0aOt
- WGsMKH9s+6MUMQl9yymsA==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:s4Tb9goKibs=:O+4G6uWWuVfeER3YZyJbzq
- F9aW3+zrOnrxMdHdPuBJzcgLvItCNS190WrzXDwzUBgUjCFhYSwm0JhZyT2zyXg6XUeLjOCql
- 4t/e7SehfklTMw0LIWhQlwyWLPy5dEDEYj7NsT2p8HNQfl4hBIjEnQUac+UfdQIaC1TxvoXS7
- oHzkiwdh5vq9KRnkJsuykzNgR06Xm0YXNJvad4FtBeO/DZ4sWxZNLJUIvPhqtbujvMD8gfR+8
- qJ8BT8+7CoAZweyj2cBAqkVUa+9B8oyo1Iquh2wHEw4vvmQlz+Ng4Zd/oSx9XmbRpNgXRutJD
- XvEhgzwsJAe09nU2v75OoPyHj4dYHPIxsnsSnNga1DYdz14WsUEeagD9VFZAZvE3Af5/5QM8C
- zpa+UmYg4OEJ2yR0zoxLS1P/Mq8Uew02nSRvVBM/a/JSs/IKInWALhnZ6H7BOXbkfsati83Mh
- 9Swg0wUSsDeadgpm9rJQcLzu39jgUn7FmHLYv2yzCQI9OcnwTDFfFSWbgEs4AnWZAB8HUnBjf
- D6xSeV2HPyPeqDjnPXOxWaoSagQjf1uzc0z2nP3zUusQl+rFHAac/K1rSdd+/8XMa//0thytU
- jDhShrjEfwtVI5A3YSxC0M8gWopprZXOSBZmSGokbCsl+w+438JxeD1el93O8EP3D1Hj9ep2Y
- M++35S1knKga4Fgi3stRJ9tczkcQvHxvyEw6CCCkF8/F4uXsQ3KTTyVR4zWlQZUcnNgOl3t6K
- dy39WbG5Z8SvodnGEirOA4kKX4l/28FOR08ZXgtm7+RT219VDO+453OHDrpS+jxu9JyrLFlKg
- WhkSZ47bHqFK3O600URAIf7W/QsiG7eHunUodxseuYsDD7qD7aD6NfEUkGIZRy5N1uLkiTXXX
- BCSo0OjDWoIfIMaMird21gCanoKdx0zHl1GnI7Baw=
+X-Provags-ID: V03:K1:cZCZNjFSvn6JZ5+AViajwJTnhlc+xH1cJl92ap2WOuFI7HJd+YP
+ Ny3c/DvDRX+jV3hDnIrmkfmcWzELybH/cReND6lqryMrKTGlJm+/9Zos3vrPoskOw3Uf7iH
+ Rv+COdgOMLK9Zpik1u1p2PuVYVl+APBSnf9Hw7aaUM+gQ6RvoJlyem21ueqX1u4ZFKTDVO/
+ DB7Z8HO6F4+w2rXY3NTPw==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:6Qn5bnVgGAc=:mCL7xW8618kbGqJ7gorYNI
+ FSa8MHPlQbeSQjROQIG8pd9qchPFBksyCxhMhs4kkpx/6vcg+l6mEYy88yM/SgyxMPm7E954S
+ HOdxOXCHSPmPuGo9knTE9EL2s3UEBahi9mOX+dgCQ3HoBa5lMqto82x6Fx3oRBYRh16xlSwWP
+ y29aIgv3L2Qlz8nWM9DJftvWGojS6qIQF9AS6wQm+WKlLEUNedpIv1n1GtuFc2bL7TLeii/Oe
+ vwrT8S9Zn1PLRBSYpf/JwYzrZ7TDCxmc9c8qpKMQg5jARDc42kVW90oFustde+zuUSvVG1lJ+
+ FbL1d+W7dVyr6NMjj60/ZS8ZNrSPe9h/NeIQuy8/XQ/vZUugc0iF1BDcsB0aDv6VierBr4e8J
+ LbLzapXdkUHD4j7QSxflCdVhBOFOP5mGp1bUwDcLRR7aqOmD8NFPxjPGvQTicuCRAJu/Iy26T
+ 3gKcgC892VQ+t9J8vXmuo4dMrOFLEiFQv8vU35vz0WtmvohbFbUIi3oDB4FJdmHW2j3vh3jmK
+ FNF0pS6y0HKBddP8bK9luL2igFAVX+gpOU0gIeFbI1EdRvA1yR2CPC8+g3/zkiX0AiGRT2nRX
+ WclTBXH7RlZXwieSx4+XVRsFuDKoqNXv46kqf4fL0jn0gatnJtn2x8CWAiTBAPgyDgzbp4eUL
+ tvELaWmxyHXmhySphON5RLW7TvsCpbhvRTaecPN1xx88joLXLMG3rsQU1ctj4HC9bZsE6C4k7
+ CA1ietTDyhOe9xhvs9aaSMgt+L8z0sC5XtYHnR2YWasl/phkzQFQyNLs3NHA1PqfbG5puDoOR
+ Qbf0zpyy8SAVVKEVtnSkQaZCXXQCNEhZnd8/O1h5wTuT7SLq5Y8rgvOEfR540utX8hel8z/YY
+ lMQ2IV4wHOR6bfwCbNzlN5pbGuXDPdlc5c4l0togU=
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 212.227.17.10
+X-Received-From: 212.227.17.24
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,84 +87,51 @@ Sender: "Qemu-devel"
 
 From: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 Tested-By: Guido Günther <agx@sigxcpu.org>
 Reviewed-by: Laurent Vivier <laurent@vivier.eu>
-Message-Id: <20191021114857.20538-6-f4bug@amsat.org>
+Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Message-Id: <20191021114857.20538-5-f4bug@amsat.org>
 Signed-off-by: Laurent Vivier <laurent@vivier.eu>
 ---
- linux-user/strace.c | 37 +++++++++++++++++++++++++++++++++++++
- 1 file changed, 37 insertions(+)
+ linux-user/syscall.c      | 6 ++++--
+ linux-user/syscall_defs.h | 7 +++++++
+ 2 files changed, 11 insertions(+), 2 deletions(-)
 
-diff --git a/linux-user/strace.c b/linux-user/strace.c
-index fd5596a64074..5fa7748427f0 100644
---- a/linux-user/strace.c
-+++ b/linux-user/strace.c
-@@ -8,6 +8,7 @@
- #include <arpa/inet.h>
- #include <netinet/tcp.h>
- #include <linux/if_packet.h>
-+#include <linux/netlink.h>
- #include <sched.h>
- #include "qemu.h"
- 
-@@ -398,6 +399,12 @@ print_sockaddr(abi_ulong addr, abi_long addrlen)
-             gemu_log("}");
-             break;
-         }
-+        case AF_NETLINK: {
-+            struct target_sockaddr_nl *nl = (struct target_sockaddr_nl *)sa;
-+            gemu_log("{nl_family=AF_NETLINK,nl_pid=%u,nl_groups=%u}",
-+                     tswap32(nl->nl_pid), tswap32(nl->nl_groups));
-+            break;
-+        }
-         default:
-             gemu_log("{sa_family=%d, sa_data={", sa->sa_family);
-             for (i = 0; i < 13; i++) {
-@@ -424,6 +431,9 @@ print_socket_domain(int domain)
-     case PF_INET:
-         gemu_log("PF_INET");
-         break;
-+    case PF_NETLINK:
-+        gemu_log("PF_NETLINK");
-+        break;
-     case PF_PACKET:
-         gemu_log("PF_PACKET");
-         break;
-@@ -473,6 +483,33 @@ print_socket_protocol(int domain, int type, int protocol)
-         return;
+diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+index e2af3c1494fa..f1ab81b91771 100644
+--- a/linux-user/syscall.c
++++ b/linux-user/syscall.c
+@@ -1496,8 +1496,10 @@ static inline abi_long host_to_target_sockaddr(abi_ulong target_addr,
+         sizeof(target_saddr->sa_family)) {
+         target_saddr->sa_family = tswap16(addr->sa_family);
      }
+-    if (addr->sa_family == AF_NETLINK && len >= sizeof(struct sockaddr_nl)) {
+-        struct sockaddr_nl *target_nl = (struct sockaddr_nl *)target_saddr;
++    if (addr->sa_family == AF_NETLINK &&
++        len >= sizeof(struct target_sockaddr_nl)) {
++        struct target_sockaddr_nl *target_nl =
++               (struct target_sockaddr_nl *)target_saddr;
+         target_nl->nl_pid = tswap32(target_nl->nl_pid);
+         target_nl->nl_groups = tswap32(target_nl->nl_groups);
+     } else if (addr->sa_family == AF_PACKET) {
+diff --git a/linux-user/syscall_defs.h b/linux-user/syscall_defs.h
+index fa69c6ab8d01..7694d72446d1 100644
+--- a/linux-user/syscall_defs.h
++++ b/linux-user/syscall_defs.h
+@@ -153,6 +153,13 @@ struct target_sockaddr_un {
+     uint8_t sun_path[108];
+ };
  
-+    if (domain == PF_NETLINK) {
-+        switch (protocol) {
-+        case NETLINK_ROUTE:
-+            gemu_log("NETLINK_ROUTE");
-+            break;
-+        case NETLINK_AUDIT:
-+            gemu_log("NETLINK_AUDIT");
-+            break;
-+        case NETLINK_NETFILTER:
-+            gemu_log("NETLINK_NETFILTER");
-+            break;
-+        case NETLINK_KOBJECT_UEVENT:
-+            gemu_log("NETLINK_KOBJECT_UEVENT");
-+            break;
-+        case NETLINK_RDMA:
-+            gemu_log("NETLINK_RDMA");
-+            break;
-+        case NETLINK_CRYPTO:
-+            gemu_log("NETLINK_CRYPTO");
-+            break;
-+        default:
-+            gemu_log("%d", protocol);
-+            break;
-+        }
-+        return;
-+    }
++struct target_sockaddr_nl {
++    abi_ushort nl_family;   /* AF_NETLINK */
++    abi_ushort __pad;
++    abi_uint nl_pid;
++    abi_uint nl_groups;
++};
 +
-     switch (protocol) {
-     case IPPROTO_IP:
-         gemu_log("IPPROTO_IP");
+ struct target_in_addr {
+     uint32_t s_addr; /* big endian */
+ };
 -- 
 2.21.0
 
