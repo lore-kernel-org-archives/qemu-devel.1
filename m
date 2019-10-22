@@ -6,74 +6,74 @@ X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5EA6BCA9EA0
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 16:46:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AD10CCA9EA0
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 16:49:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 267A120659
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 16:46:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 764BB2084B
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 16:49:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="V/XqgK3M"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 267A120659
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WKJlfbhw"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 764BB2084B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36076 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36172 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iMxIF-0000W1-Ck
-	for qemu-devel@archiver.kernel.org; Tue, 22 Oct 2019 12:45:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38610)
+	id 1iMxLI-0003b3-3E
+	for qemu-devel@archiver.kernel.org; Tue, 22 Oct 2019 12:49:08 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38933)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <marcandre.lureau@redhat.com>) id 1iMwx0-00080Z-G3
- for qemu-devel@nongnu.org; Tue, 22 Oct 2019 12:24:04 -0400
+ (envelope-from <marcandre.lureau@redhat.com>) id 1iMwxn-0000dQ-Qf
+ for qemu-devel@nongnu.org; Tue, 22 Oct 2019 12:24:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <marcandre.lureau@redhat.com>) id 1iMwwy-0007nP-C4
- for qemu-devel@nongnu.org; Tue, 22 Oct 2019 12:24:02 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:37107
+ (envelope-from <marcandre.lureau@redhat.com>) id 1iMwxm-00086C-Lu
+ for qemu-devel@nongnu.org; Tue, 22 Oct 2019 12:24:51 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:22900
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
- id 1iMwwy-0007mt-5I
- for qemu-devel@nongnu.org; Tue, 22 Oct 2019 12:24:00 -0400
+ id 1iMwxm-00085m-H0
+ for qemu-devel@nongnu.org; Tue, 22 Oct 2019 12:24:50 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1571761439;
+ s=mimecast20190719; t=1571761490;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=KKxnDtWH+IBHEOp1QyHnSnDFsBZXpz4ihyY+6fCgcJ4=;
- b=V/XqgK3MtmQqeJWBxut2fR5BIUdRpUBg6oIT5JHcQgmt+JhPg+q495fsFN3kpaV6LP5DDF
- gNGm5So0JZCQrA8O7/l6qr3ZwA/g9Zly2kSLI5OMju5oyZsopS0TrPvoFu96XmUohpYj/V
- KPc0zOvacpDEutugVh4Ct3wwsQ3oQR4=
+ bh=9r30TFYWwWXP6UsNuJpEoLyIN45bJ0sm/8D+1psh3Ds=;
+ b=WKJlfbhwCa5jQNioFv2pr+Ebo8Vt+pA8oulJK7fGDg5GBEdL3FMhesD19Hu82sbIvq3uqt
+ qb1wXHV8NZyfXJvCjHRIWpSA6kjeB9qiwf/290RQGeXkcsxhS5yqGMS6N/implFtojAgF1
+ Ra1UoOClvst0Qb9H+CEfuVu542tHXcg=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-211-n52AM4gmMZKvlnpDdvQVpg-1; Tue, 22 Oct 2019 12:23:56 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ us-mta-102-AXEmr3W2ONqvCfzLHTK9wQ-1; Tue, 22 Oct 2019 12:24:37 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0EE3380183D;
- Tue, 22 Oct 2019 16:23:54 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id AD2AC476;
+ Tue, 22 Oct 2019 16:24:34 +0000 (UTC)
 Received: from localhost (ovpn-112-21.ams2.redhat.com [10.36.112.21])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 9127A5D6A9;
- Tue, 22 Oct 2019 16:23:53 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 439A860C5D;
+ Tue, 22 Oct 2019 16:24:29 +0000 (UTC)
 From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 18/28] dp8393x: replace PROP_PTR with PROP_LINK
-Date: Tue, 22 Oct 2019 18:21:27 +0200
-Message-Id: <20191022162137.27161-19-marcandre.lureau@redhat.com>
+Subject: [PATCH v2 23/28] smbus-eeprom: remove PROP_PTR
+Date: Tue, 22 Oct 2019 18:21:32 +0200
+Message-Id: <20191022162137.27161-24-marcandre.lureau@redhat.com>
 In-Reply-To: <20191022162137.27161-1-marcandre.lureau@redhat.com>
 References: <20191022162137.27161-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-MC-Unique: n52AM4gmMZKvlnpDdvQVpg-1
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-MC-Unique: AXEmr3W2ONqvCfzLHTK9wQ-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.81
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -104,66 +104,72 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Link property is the correct way to pass a MemoryRegion to a device
-for DMA purposes.
+Instead, set the initial data field directly.
 
-Sidenote: as a sysbus device, this remains non-usercreatable
-even though we can drop the specific flag here.
+(the initial data is an array of 256 bytes. As I don't know if it may
+change over time, I keep the pointer to original buffer as is, but it
+might be worth to consider to copy it instead)
 
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- hw/mips/mips_jazz.c | 3 ++-
- hw/net/dp8393x.c    | 7 +++----
- 2 files changed, 5 insertions(+), 5 deletions(-)
+ hw/i2c/smbus_eeprom.c | 17 ++++++++---------
+ 1 file changed, 8 insertions(+), 9 deletions(-)
 
-diff --git a/hw/mips/mips_jazz.c b/hw/mips/mips_jazz.c
-index 8d010a0b6e..878925a963 100644
---- a/hw/mips/mips_jazz.c
-+++ b/hw/mips/mips_jazz.c
-@@ -284,7 +284,8 @@ static void mips_jazz_init(MachineState *machine,
-             dev =3D qdev_create(NULL, "dp8393x");
-             qdev_set_nic_properties(dev, nd);
-             qdev_prop_set_uint8(dev, "it_shift", 2);
--            qdev_prop_set_ptr(dev, "dma_mr", rc4030_dma_mr);
-+            object_property_set_link(OBJECT(dev), OBJECT(rc4030_dma_mr),
-+                                     "dma_mr", &error_abort);
-             qdev_init_nofail(dev);
-             sysbus =3D SYS_BUS_DEVICE(dev);
-             sysbus_mmio_map(sysbus, 0, 0x80001000);
-diff --git a/hw/net/dp8393x.c b/hw/net/dp8393x.c
-index a5678e11fa..946c7a8f64 100644
---- a/hw/net/dp8393x.c
-+++ b/hw/net/dp8393x.c
-@@ -173,7 +173,7 @@ typedef struct dp8393xState {
-     int loopback_packet;
+diff --git a/hw/i2c/smbus_eeprom.c b/hw/i2c/smbus_eeprom.c
+index 54c86a0112..533c728b3b 100644
+--- a/hw/i2c/smbus_eeprom.c
++++ b/hw/i2c/smbus_eeprom.c
+@@ -44,7 +44,7 @@
+ typedef struct SMBusEEPROMDevice {
+     SMBusDevice smbusdev;
+     uint8_t data[SMBUS_EEPROM_SIZE];
+-    void *init_data;
++    uint8_t *init_data;
+     uint8_t offset;
+     bool accessed;
+ } SMBusEEPROMDevice;
+@@ -129,14 +129,14 @@ static void smbus_eeprom_reset(DeviceState *dev)
 =20
-     /* Memory access */
--    void *dma_mr;
-+    MemoryRegion *dma_mr;
-     AddressSpace as;
- } dp8393xState;
-=20
-@@ -922,7 +922,8 @@ static const VMStateDescription vmstate_dp8393x =3D {
-=20
- static Property dp8393x_properties[] =3D {
-     DEFINE_NIC_PROPERTIES(dp8393xState, conf),
--    DEFINE_PROP_PTR("dma_mr", dp8393xState, dma_mr),
-+    DEFINE_PROP_LINK("dma_mr", dp8393xState, dma_mr,
-+                     TYPE_MEMORY_REGION, MemoryRegion *),
-     DEFINE_PROP_UINT8("it_shift", dp8393xState, it_shift, 0),
-     DEFINE_PROP_END_OF_LIST(),
- };
-@@ -936,8 +937,6 @@ static void dp8393x_class_init(ObjectClass *klass, void=
- *data)
-     dc->reset =3D dp8393x_reset;
-     dc->vmsd =3D &vmstate_dp8393x;
-     dc->props =3D dp8393x_properties;
--    /* Reason: dma_mr property can't be set */
--    dc->user_creatable =3D false;
+ static void smbus_eeprom_realize(DeviceState *dev, Error **errp)
+ {
++    SMBusEEPROMDevice *eeprom =3D SMBUS_EEPROM(dev);
++
+     smbus_eeprom_reset(dev);
++    if (eeprom->init_data =3D=3D NULL) {
++        error_setg(errp, "init_data cannot be NULL");
++    }
  }
 =20
- static const TypeInfo dp8393x_info =3D {
+-static Property smbus_eeprom_properties[] =3D {
+-    DEFINE_PROP_PTR("data", SMBusEEPROMDevice, init_data),
+-    DEFINE_PROP_END_OF_LIST(),
+-};
+-
+ static void smbus_eeprom_class_initfn(ObjectClass *klass, void *data)
+ {
+     DeviceClass *dc =3D DEVICE_CLASS(klass);
+@@ -146,9 +146,8 @@ static void smbus_eeprom_class_initfn(ObjectClass *klas=
+s, void *data)
+     dc->reset =3D smbus_eeprom_reset;
+     sc->receive_byte =3D eeprom_receive_byte;
+     sc->write_data =3D eeprom_write_data;
+-    dc->props =3D smbus_eeprom_properties;
+     dc->vmsd =3D &vmstate_smbus_eeprom;
+-    /* Reason: pointer property "data" */
++    /* Reason: init_data */
+     dc->user_creatable =3D false;
+ }
+=20
+@@ -172,7 +171,7 @@ void smbus_eeprom_init_one(I2CBus *smbus, uint8_t addre=
+ss, uint8_t *eeprom_buf)
+=20
+     dev =3D qdev_create((BusState *) smbus, TYPE_SMBUS_EEPROM);
+     qdev_prop_set_uint8(dev, "address", address);
+-    qdev_prop_set_ptr(dev, "data", eeprom_buf);
++    SMBUS_EEPROM(dev)->init_data =3D eeprom_buf;
+     qdev_init_nofail(dev);
+ }
+=20
 --=20
 2.23.0.606.g08da6496b6
 
