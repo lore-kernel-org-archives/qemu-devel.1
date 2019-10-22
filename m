@@ -2,83 +2,89 @@ Return-Path: <SRS0=tSBD=YP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 20BAACA9EA0
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 09:43:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 982EBCA9EA0
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 09:44:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E04112084B
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 09:43:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 61CFE2084B
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 09:44:23 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="h70lvQ7T"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E04112084B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Makr/dWt"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 61CFE2084B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52394 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52422 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iMqhC-0005Xi-3m
-	for qemu-devel@archiver.kernel.org; Tue, 22 Oct 2019 05:43:18 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56861)
+	id 1iMqiE-0006XO-Hx
+	for qemu-devel@archiver.kernel.org; Tue, 22 Oct 2019 05:44:22 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56994)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1iMqgY-00058h-0z
- for qemu-devel@nongnu.org; Tue, 22 Oct 2019 05:42:39 -0400
+ (envelope-from <estebanbosse@gmail.com>) id 1iMqhC-0005iX-Mf
+ for qemu-devel@nongnu.org; Tue, 22 Oct 2019 05:43:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1iMqgW-0001iV-3S
- for qemu-devel@nongnu.org; Tue, 22 Oct 2019 05:42:37 -0400
-Received: from mail-oi1-x241.google.com ([2607:f8b0:4864:20::241]:43634)
+ (envelope-from <estebanbosse@gmail.com>) id 1iMqhB-00021a-Kn
+ for qemu-devel@nongnu.org; Tue, 22 Oct 2019 05:43:18 -0400
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:39461)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1iMqgV-0001iF-Tz
- for qemu-devel@nongnu.org; Tue, 22 Oct 2019 05:42:36 -0400
-Received: by mail-oi1-x241.google.com with SMTP id t84so13577009oih.10
- for <qemu-devel@nongnu.org>; Tue, 22 Oct 2019 02:42:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=AWDQsNcnEDFIcVKDwUT9YNcZRuv6IBRMy3EtcZqV0EQ=;
- b=h70lvQ7TyNXB21tFyDZroFl6Fq6Hl1eqNQUbH6dMlA8JfQraDnKMKVOU81jNG6sq1/
- q/Qi75OkmSa2ECksv0gtVj7U6c+BjzX8dX5GO3TtqfGkCCk6BajmsZYTEJtGdWWG2Lvf
- cga7Hgbjp2G9B+qBMDFaveNAPG+svmofglchsyQ6uJAAxotK0jg3GJ34ZYR/wJy90WBu
- TzJonBMAlbADkLRX115CP+hkrZfVBMrkepq437Ur60o4dzwJGSa3gJdqeqOaCzi/39IK
- qY3iz1AorWY+U9/8HXABi0B87e71aPhR/caHA69dWYE1uejRDlUsYqVJ8LhEaMfmjiRX
- HC1A==
+ (Exim 4.71) (envelope-from <estebanbosse@gmail.com>)
+ id 1iMqhB-00021L-Eg
+ for qemu-devel@nongnu.org; Tue, 22 Oct 2019 05:43:17 -0400
+Received: by mail-wr1-x441.google.com with SMTP id a11so1171064wra.6
+ for <qemu-devel@nongnu.org>; Tue, 22 Oct 2019 02:43:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=message-id:subject:from:to:cc:date:in-reply-to:references
+ :user-agent:mime-version:content-transfer-encoding;
+ bh=bOO11wkg+2Pv2o27r/wTAOCc87SP9Q0u1nKIfbm7dc4=;
+ b=Makr/dWtTrYdoqQAsMav8Vn9ebRf0GuVi0GlHq/CdPrEY7lPLP9o3hZzx+bM/c6od6
+ lPNAcNXGHk6xc+eyl9pZuOFNtAsYSJF56xBE6l8wH8I+l5QPhoX3dzcg3znn0vfyHB5o
+ gZePOcNqjyibY+fQktOvYeZRqHlGEODv0Jkzck6D+WO4wR7rJlSMZbFXKCFMkeqzgoqX
+ sjp2Rf4vp5mB4rb03fR439sbTc21fR3mNolz9hE8oXNFgsz3M2gJorJNekSTm4bl7uos
+ LSmgG/sUepd4aRnHEAftEiY8wv1ZJnCyOkpn7B1wVHyXG3m9DUdkKezwO39OiD5cJn3C
+ U/Tg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=AWDQsNcnEDFIcVKDwUT9YNcZRuv6IBRMy3EtcZqV0EQ=;
- b=TlhpCHTs7rzFDA+dFkyBGROS1rbJx7hQe1G+UjF2Wp+lPY8ECTELC5sAB7WuHzi8Bz
- Qxy3AcCUGwBlqdqRkQQWpRtfQC2eFevqmR49p7plxDm7XwOtPWC6kY4AdP+AqO3RUPTY
- 7eEA0IZSCS/M0ksSJpVpdY8UrHxKSE0X5VN/TcnzWWSFnPluYCqDOcQ4sjXaIpqOH4Vq
- 3hWgUfrI1OGzfGpRLIOrNxe0PUCIMC0IxOlanySxg8u/S1td5zCjRJjXmx1E0BGc0iPw
- 5AqBU479OGtDaI6W9kSsvTirzM/ovueuFwFE979FSV2rZpgjwuAgU969KQ/baJVLGYdG
- qfhg==
-X-Gm-Message-State: APjAAAVIyaDm/NFK68wmp5DiVE0NCXjwE6OYRdiJAGDfJDMy8OaFipXs
- Mi3mRxjqK5lXSe5cZnnOwgQUCTjAYI/ZT1XPSxGPFQ==
-X-Google-Smtp-Source: APXvYqy1pKOdTvHcFP0XzOJuYsvQj/PHqE3DixwCFjquN5kcVT5U1DWjRFzC5idMPh4Y1iB7MBwDm6ikZe/nY8+oUcE=
-X-Received: by 2002:a05:6808:9:: with SMTP id u9mr2183082oic.98.1571737355053; 
- Tue, 22 Oct 2019 02:42:35 -0700 (PDT)
-MIME-Version: 1.0
+ h=x-gm-message-state:message-id:subject:from:to:cc:date:in-reply-to
+ :references:user-agent:mime-version:content-transfer-encoding;
+ bh=bOO11wkg+2Pv2o27r/wTAOCc87SP9Q0u1nKIfbm7dc4=;
+ b=mjbka24ZsCcokgk3mrr4dn/2C5Vxt5oLyyrP9atYIOZqlUAoLvZk3SVC+XvaoHIpAQ
+ Li/xacIZ2pGUjr1ZkP08n71gi9+JWVsVxeCwiDi3OG6SNnIsM7KUdbZzzFYRZjbD+D30
+ TjTxO4aqEg0EVGcl08mpmMn76p7EoMbhzOljQ+H/vwDydNUEOaRwWZNOJ3NfcETrfLQF
+ 5onrKH3mNvvzZA48nb5R3E02RrgK9u3D00dl6MlrJkvpRUe+zMAoWHLhQzAPOKZ7oonu
+ zSjt7kWmJLz0gK08zPiZIHb9JO0Ih6RMkls1mnu1YKpKhRpgnCWC7qbDZAv2oiKDC2i9
+ JMWA==
+X-Gm-Message-State: APjAAAWxnQZsDqOQY3s3xIwtMicJe0r+a5YTwJ1qhCTNOlXCsFqsZjjj
+ GsCQr3/foArBTfEKP5nm7E4=
+X-Google-Smtp-Source: APXvYqxXLI5hVIo27IDWpEbmDG0UYH133w1mDm61eRNBrGPJ00fgYopAm7GZ0y/Rb1XxYHR9ffEDug==
+X-Received: by 2002:a5d:498e:: with SMTP id r14mr2444844wrq.36.1571737396409; 
+ Tue, 22 Oct 2019 02:43:16 -0700 (PDT)
+Received: from ?IPv6:2a01:c23:604c:2a00:af2b:2e92:39f9:c05b?
+ ([2a01:c23:604c:2a00:af2b:2e92:39f9:c05b])
+ by smtp.gmail.com with ESMTPSA id p12sm5101204wrt.7.2019.10.22.02.43.15
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 22 Oct 2019 02:43:15 -0700 (PDT)
+Message-ID: <6289a119c4be0dcae17eecb6176acdd387206b02.camel@gmail.com>
+Subject: Re: [PATCH v2 17/20] hw/pci-host/piix: Fix code style issues
+From: Esteban Bosse <estebanbosse@gmail.com>
+To: Philippe =?ISO-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>, 
+ qemu-devel@nongnu.org
+Date: Tue, 22 Oct 2019 11:39:44 +0200
+In-Reply-To: <20191018134754.16362-18-philmd@redhat.com>
 References: <20191018134754.16362-1-philmd@redhat.com>
- <20191018134754.16362-4-philmd@redhat.com>
- <b1255a22fe4409244f7a68887137fbe43b71a08d.camel@gmail.com>
-In-Reply-To: <b1255a22fe4409244f7a68887137fbe43b71a08d.camel@gmail.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 22 Oct 2019 10:42:24 +0100
-Message-ID: <CAFEAcA-FesfcimTutrYwZFdB93mEE42ha7X93jDqAW7CFUd+0w@mail.gmail.com>
-Subject: Re: [PATCH v2 03/20] piix4: Add a i8259 Interrupt Controller as
- specified in datasheet
-To: Esteban Bosse <estebanbosse@gmail.com>
+ <20191018134754.16362-18-philmd@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.30.5-1.1 
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::241
+X-Received-From: 2a00:1450:4864:20::441
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,54 +96,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Stefano Stabellini <sstabellini@kernel.org>,
- Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>,
- Paul Durrant <paul@xen.org>, QEMU Developers <qemu-devel@nongnu.org>,
- Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?Q?Herv=C3=A9_Poussineau?= <hpoussin@reactos.org>,
+Cc: Stefano Stabellini <sstabellini@kernel.org>, xen-devel@lists.xenproject.org,
+ Paul Durrant <paul@xen.org>, "Michael S. Tsirkin" <mst@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>,
+ =?ISO-8859-1?Q?Herv=E9?= Poussineau <hpoussin@reactos.org>,
  Aleksandar Markovic <amarkovic@wavecomp.com>,
  Igor Mammedov <imammedo@redhat.com>,
  Anthony Perard <anthony.perard@citrix.com>,
- "open list:X86" <xen-devel@lists.xenproject.org>,
+ Paolo Bonzini <pbonzini@redhat.com>,
  Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
- =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
  Aurelien Jarno <aurelien@aurel32.net>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 22 Oct 2019 at 09:52, Esteban Bosse <estebanbosse@gmail.com> wrote:
->
-> El vie, 18-10-2019 a las 15:47 +0200, Philippe Mathieu-Daud=C3=A9 escribi=
-=C3=B3:
-> > +static void piix4_request_i8259_irq(void *opaque, int irq, int
-> > level)
-> > +{
-> > +    PIIX4State *s =3D opaque;
-> > +    qemu_set_irq(s->cpu_intr, level);
-> > +}
-> I would like to understand why in `PIIX4State *s =3D opaque;` its not
-> necessary a cast or a object macro magic.
-> Something like:
-> PIIX4State *s =3D (PIIX4State*)opaque;
-> PIIX4State *s =3D PIIX4STATE(opaque);
+El vie, 18-10-2019 a las 15:47 +0200, Philippe Mathieu-Daudé escribió:
+> We will move this code, fix its style first.
+> 
+> Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+> ---
+>  hw/pci-host/piix.c | 7 ++++---
+>  1 file changed, 4 insertions(+), 3 deletions(-)
+> 
+> diff --git a/hw/pci-host/piix.c b/hw/pci-host/piix.c
+> index 95b04122fa..1544c4726b 100644
+> --- a/hw/pci-host/piix.c
+> +++ b/hw/pci-host/piix.c
+> @@ -133,9 +133,10 @@ static PCIINTxRoute
+> piix3_route_intx_pin_to_irq(void *opaque, int pci_intx);
+>  static void piix3_write_config_xen(PCIDevice *dev,
+>                                 uint32_t address, uint32_t val, int
+> len);
+>  
+> -/* return the global irq number corresponding to a given device irq
+> -   pin. We could also use the bus number to have a more precise
+> -   mapping. */
+> +/*
+> + * Return the global irq number corresponding to a given device irq
+> + * pin. We could also use the bus number to have a more precise
+> mapping.
+> + */
+>  static int pci_slot_get_pirq(PCIDevice *pci_dev, int pci_intx)
+>  {
+>      int slot_addend;
+Reviewed-by: Esteban Bosse <estebanbosse@gmail.com>
 
-The simple answer to "why don't we need a cast" is
-"because the type of 'opaque' is 'void *', and in C there is
-no need to explicitly cast a 'void *' as it will be implicitly
-converted to the pointer type of the destination". (This is
-different from C++, which does require an explicit cast for void*.)
-
-For QOM types, QEMU conventionally uses the QOM casting
-macro to convert a pointer-to-instance to
-pointer-to-instance-of-parent-class and vice versa.
-In some places, like this one, what we have is just a
-void* representing opaque data having been passed around.
-You could use the QOM cast macro here, which would add
-a bit of extra type-safety, but the project doesn't have
-a strong convention here on whether to do so or not, so
-you'll often see the just-assignment code.
-
-thanks
--- PMM
 
