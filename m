@@ -2,61 +2,81 @@ Return-Path: <SRS0=tSBD=YP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D656BCA9EA0
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 17:19:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 442BCCA9EA0
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 17:20:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id ACD7720679
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 17:19:22 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ACD7720679
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id 114F520679
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 17:20:38 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="kAjKDe9t"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 114F520679
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37268 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37368 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iMxoX-0003RI-SC
-	for qemu-devel@archiver.kernel.org; Tue, 22 Oct 2019 13:19:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41409)
+	id 1iMxpl-0005KI-4o
+	for qemu-devel@archiver.kernel.org; Tue, 22 Oct 2019 13:20:37 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47959)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <clg@kaod.org>) id 1iMxCK-00023L-F0
- for qemu-devel@nongnu.org; Tue, 22 Oct 2019 12:39:53 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1iMxom-00045x-2F
+ for qemu-devel@nongnu.org; Tue, 22 Oct 2019 13:19:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <clg@kaod.org>) id 1iMxCJ-00073o-4G
- for qemu-devel@nongnu.org; Tue, 22 Oct 2019 12:39:52 -0400
-Received: from 1.mo179.mail-out.ovh.net ([178.33.111.220]:51896)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <clg@kaod.org>) id 1iMxCI-00072e-Uc
- for qemu-devel@nongnu.org; Tue, 22 Oct 2019 12:39:51 -0400
-Received: from player688.ha.ovh.net (unknown [10.109.159.224])
- by mo179.mail-out.ovh.net (Postfix) with ESMTP id 1C433145FD0
- for <qemu-devel@nongnu.org>; Tue, 22 Oct 2019 18:39:47 +0200 (CEST)
-Received: from kaod.org (lfbn-1-2229-223.w90-76.abo.wanadoo.fr [90.76.50.223])
- (Authenticated sender: clg@kaod.org)
- by player688.ha.ovh.net (Postfix) with ESMTPSA id A465AB32C457;
- Tue, 22 Oct 2019 16:39:38 +0000 (UTC)
-From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
-To: David Gibson <david@gibson.dropbear.id.au>
-Subject: [PATCH v5 7/7] spapr/xive: Set the OS CAM line at reset
-Date: Tue, 22 Oct 2019 18:38:12 +0200
-Message-Id: <20191022163812.330-8-clg@kaod.org>
-X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20191022163812.330-1-clg@kaod.org>
-References: <20191022163812.330-1-clg@kaod.org>
+ (envelope-from <peter.maydell@linaro.org>) id 1iMxok-0001vB-Kq
+ for qemu-devel@nongnu.org; Tue, 22 Oct 2019 13:19:35 -0400
+Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:42028)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1iMxok-0001uj-G1
+ for qemu-devel@nongnu.org; Tue, 22 Oct 2019 13:19:34 -0400
+Received: by mail-ot1-x342.google.com with SMTP id b16so4083837otk.9
+ for <qemu-devel@nongnu.org>; Tue, 22 Oct 2019 10:19:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=Ne/hWEhyLPh9P2iF1f90rmFstvnIDJwvxB4L5jsXSuo=;
+ b=kAjKDe9ts8LLutdSWhimO3rnDoZSVaFLD8hXo4uggeLRx9cQ6lMwvAZxX/sjTaz1Ex
+ wilD7EjhJcwtlumoFu4f8CQDoExbuMAFA6FTMb2ylhLSXkjhPt85ja/OtEzpnlnM19cy
+ POdCLMl30scf4SlBHroOqgKcWgz3uiKv5kwRwSKDUSXEl+7UyvIrlBT8hRdFaPBOblk5
+ QKYtWD5tp5lonBcX689hhiDG7l2RMlvRRcUjgIwwYU18mpjYdCXI9HfBi+/6VBSXaiLQ
+ y2eukzOKlmkxivbBj0yE5U1kfUiH8DcvDNxX8HKxOJXwAaMphQqAOJgZARZgY7G2QX+o
+ GuHg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=Ne/hWEhyLPh9P2iF1f90rmFstvnIDJwvxB4L5jsXSuo=;
+ b=JKuVVmoj30IzXQPaEiiv2V36V5AVYi+fuAkraIUXmM9/RU+n71Bd+6Vtx6bH0S/s1o
+ iFmgW2R+rmLwPEWDFKuouTKgibYxl3m6Kh4ZQwUbK4vWoUio2eIb1gMZVgXkfrHusu7b
+ lgbbkVEytDwhubhLa0gvK0INPnZOhgXZofhwIkL3XxBs+OStir/sp9gs5gwHoH0Pozh9
+ hcM164waGAOKUdZ5PuGrjoXj0JpeDHn/8HcVdupN1jPRZiQ6/s1nbPCo7iRgKwWOYqJE
+ nU6vIEFyV4brukStA+C83C5dnCnQOS3BpQF7eSWAhIMIc4GSxRVXumCRg3yXPZF/frE4
+ cVjg==
+X-Gm-Message-State: APjAAAUdpUBiprFDO3fEBRkTu+5KQWXIvQ7VirbUGikOFLHT5jAtSooD
+ PjI8qeH3Q6MqobGPu/XOcTPJWF+5FQex2p5Z+9p4CQ==
+X-Google-Smtp-Source: APXvYqwPDJ8a7SDxn28pcfe8LPi1wUlcUwbQaSokc8T8BEfjFK0fQwnK1Qbht46ymkl889JNdDTTT7W8S5K4ZYNuvEU=
+X-Received: by 2002:a9d:398a:: with SMTP id y10mr3443749otb.97.1571764773451; 
+ Tue, 22 Oct 2019 10:19:33 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-X-Ovh-Tracer-Id: 3518155734886419430
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrkeejgddutdefucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddm
+References: <20191022162137.27161-1-marcandre.lureau@redhat.com>
+ <20191022162137.27161-24-marcandre.lureau@redhat.com>
+In-Reply-To: <20191022162137.27161-24-marcandre.lureau@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 22 Oct 2019 18:19:21 +0100
+Message-ID: <CAFEAcA8A4-wEy3ueq+Tz3oN3Fpyy_vXdQ4k_mmOXYiVwjDEe_w@mail.gmail.com>
+Subject: Re: [PATCH v2 23/28] smbus-eeprom: remove PROP_PTR
+To: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 178.33.111.220
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::342
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -68,131 +88,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>, qemu-ppc@nongnu.org,
- qemu-devel@nongnu.org, Greg Kurz <groug@kaod.org>
+Cc: Corey Minyard <cminyard@mvista.com>, "Michael S. Tsirkin" <mst@redhat.com>,
+ Jason Wang <jasowang@redhat.com>,
+ Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
+ QEMU Developers <qemu-devel@nongnu.org>,
+ KONRAD Frederic <frederic.konrad@adacore.com>,
+ "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
+ Aleksandar Rikalo <arikalo@wavecomp.com>, Magnus Damm <magnus.damm@gmail.com>,
+ =?UTF-8?Q?Herv=C3=A9_Poussineau?= <hpoussin@reactos.org>,
+ Artyom Tarasenko <atar4qemu@gmail.com>, Eduardo Habkost <ehabkost@redhat.com>,
+ Fabien Chouteau <chouteau@adacore.com>, qemu-arm <qemu-arm@nongnu.org>,
+ Richard Henderson <rth@twiddle.net>,
+ =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>,
+ qemu-ppc <qemu-ppc@nongnu.org>, Aleksandar Markovic <amarkovic@wavecomp.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-When a Virtual Processor is scheduled to run on a HW thread, the
-hypervisor pushes its identifier in the OS CAM line. When running with
-kernel_irqchip=3Doff, QEMU needs to emulate the same behavior.
+On Tue, 22 Oct 2019 at 17:24, Marc-Andr=C3=A9 Lureau
+<marcandre.lureau@redhat.com> wrote:
+>
+> Instead, set the initial data field directly.
+>
+> (the initial data is an array of 256 bytes. As I don't know if it may
+> change over time, I keep the pointer to original buffer as is, but it
+> might be worth to consider to copy it instead)
 
-Set the OS CAM line when the interrupt presenter of the sPAPR core is
-reset. This will also cover the case of hot-plugged CPUs.
+All the callers to smbus_eeprom_init_one() allocate the
+memory for the initial data, populate it, pass the pointer
+to smbus_eeprom_init_one() and do not save the pointer
+anyway. So we effectively "own" the data -- we could choose
+to copy the data and make the callers free the memory instead.
 
-This change also has the benefit to remove the use of CPU_FOREACH()
-which can be unsafe.
+> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
-Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
-Reviewed-by: Greg Kurz <groug@kaod.org>
----
- include/hw/ppc/spapr_xive.h |  1 -
- hw/intc/spapr_xive.c        | 48 +++++++++++++------------------------
- 2 files changed, 17 insertions(+), 32 deletions(-)
+I'd still like to know what the right QOM way to pass
+256 bytes of constant data to a device as a property is.
 
-diff --git a/include/hw/ppc/spapr_xive.h b/include/hw/ppc/spapr_xive.h
-index d84bd5c229f0..742b7e834f2a 100644
---- a/include/hw/ppc/spapr_xive.h
-+++ b/include/hw/ppc/spapr_xive.h
-@@ -57,7 +57,6 @@ typedef struct SpaprXive {
- void spapr_xive_pic_print_info(SpaprXive *xive, Monitor *mon);
-=20
- void spapr_xive_hcall_init(SpaprMachineState *spapr);
--void spapr_xive_set_tctx_os_cam(XiveTCTX *tctx);
- void spapr_xive_mmio_set_enabled(SpaprXive *xive, bool enable);
- void spapr_xive_map_mmio(SpaprXive *xive);
-=20
-diff --git a/hw/intc/spapr_xive.c b/hw/intc/spapr_xive.c
-index 20a8d8285f64..d8e1291905c3 100644
---- a/hw/intc/spapr_xive.c
-+++ b/hw/intc/spapr_xive.c
-@@ -205,23 +205,6 @@ void spapr_xive_mmio_set_enabled(SpaprXive *xive, bo=
-ol enable)
-     memory_region_set_enabled(&xive->end_source.esb_mmio, false);
- }
-=20
--/*
-- * When a Virtual Processor is scheduled to run on a HW thread, the
-- * hypervisor pushes its identifier in the OS CAM line. Emulate the
-- * same behavior under QEMU.
-- */
--void spapr_xive_set_tctx_os_cam(XiveTCTX *tctx)
--{
--    uint8_t  nvt_blk;
--    uint32_t nvt_idx;
--    uint32_t nvt_cam;
--
--    spapr_xive_cpu_to_nvt(POWERPC_CPU(tctx->cs), &nvt_blk, &nvt_idx);
--
--    nvt_cam =3D cpu_to_be32(TM_QW1W2_VO | xive_nvt_cam_line(nvt_blk, nvt=
-_idx));
--    memcpy(&tctx->regs[TM_QW1_OS + TM_WORD2], &nvt_cam, 4);
--}
--
- static void spapr_xive_end_reset(XiveEND *end)
- {
-     memset(end, 0, sizeof(*end));
-@@ -544,21 +527,32 @@ static int spapr_xive_cpu_intc_create(SpaprInterrup=
-tController *intc,
-     }
-=20
-     spapr_cpu->tctx =3D XIVE_TCTX(obj);
--
--    /*
--     * (TCG) Early setting the OS CAM line for hotplugged CPUs as they
--     * don't beneficiate from the reset of the XIVE IRQ backend
--     */
--    spapr_xive_set_tctx_os_cam(spapr_cpu->tctx);
-     return 0;
- }
-=20
-+static void xive_tctx_set_os_cam(XiveTCTX *tctx, uint32_t os_cam)
-+{
-+    uint32_t qw1w2 =3D cpu_to_be32(TM_QW1W2_VO | os_cam);
-+    memcpy(&tctx->regs[TM_QW1_OS + TM_WORD2], &qw1w2, 4);
-+}
-+
- static void spapr_xive_cpu_intc_reset(SpaprInterruptController *intc,
-                                      PowerPCCPU *cpu)
- {
-     XiveTCTX *tctx =3D spapr_cpu_state(cpu)->tctx;
-+    uint8_t  nvt_blk;
-+    uint32_t nvt_idx;
-=20
-     xive_tctx_reset(tctx);
-+
-+    /*
-+     * When a Virtual Processor is scheduled to run on a HW thread,
-+     * the hypervisor pushes its identifier in the OS CAM line.
-+     * Emulate the same behavior under QEMU.
-+     */
-+    spapr_xive_cpu_to_nvt(cpu, &nvt_blk, &nvt_idx);
-+
-+    xive_tctx_set_os_cam(tctx, xive_nvt_cam_line(nvt_blk, nvt_idx));
- }
-=20
- static void spapr_xive_set_irq(SpaprInterruptController *intc, int irq, =
-int val)
-@@ -651,14 +645,6 @@ static void spapr_xive_dt(SpaprInterruptController *=
-intc, uint32_t nr_servers,
- static int spapr_xive_activate(SpaprInterruptController *intc, Error **e=
-rrp)
- {
-     SpaprXive *xive =3D SPAPR_XIVE(intc);
--    CPUState *cs;
--
--    CPU_FOREACH(cs) {
--        PowerPCCPU *cpu =3D POWERPC_CPU(cs);
--
--        /* (TCG) Set the OS CAM line of the thread interrupt context. */
--        spapr_xive_set_tctx_os_cam(spapr_cpu_state(cpu)->tctx);
--    }
-=20
-     if (kvm_enabled()) {
-         int rc =3D spapr_irq_init_kvm(kvmppc_xive_connect, intc, errp);
---=20
-2.21.0
 
+thanks
+-- PMM
 
