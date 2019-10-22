@@ -2,90 +2,100 @@ Return-Path: <SRS0=tSBD=YP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 78754CA9EB9
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 08:55:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 38D39CA9EA0
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 08:59:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4726720679
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 08:55:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0142120640
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 08:59:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Dgu+TC/p"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4726720679
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RnCbv1gr"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0142120640
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51914 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51932 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iMpwZ-00061V-Ha
-	for qemu-devel@archiver.kernel.org; Tue, 22 Oct 2019 04:55:07 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49667)
+	id 1iMq0s-0007jt-6x
+	for qemu-devel@archiver.kernel.org; Tue, 22 Oct 2019 04:59:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50157)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <estebanbosse@gmail.com>) id 1iMpvo-0005AA-Cv
- for qemu-devel@nongnu.org; Tue, 22 Oct 2019 04:54:21 -0400
+ (envelope-from <philmd@redhat.com>) id 1iMq0B-0007Bv-Hg
+ for qemu-devel@nongnu.org; Tue, 22 Oct 2019 04:58:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <estebanbosse@gmail.com>) id 1iMpvn-0006vS-8N
- for qemu-devel@nongnu.org; Tue, 22 Oct 2019 04:54:20 -0400
-Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:33785)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <estebanbosse@gmail.com>)
- id 1iMpvn-0006v3-2T
- for qemu-devel@nongnu.org; Tue, 22 Oct 2019 04:54:19 -0400
-Received: by mail-wr1-x441.google.com with SMTP id s1so8314711wro.0
- for <qemu-devel@nongnu.org>; Tue, 22 Oct 2019 01:54:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=message-id:subject:from:to:cc:date:in-reply-to:references
- :user-agent:mime-version:content-transfer-encoding;
- bh=V4VhBihoolZqFYIN54r9nmx9vYW/oQSJU4NMMDQk7As=;
- b=Dgu+TC/pYPvxFl322P5ZQxatcCTlZr9/Na3bgs3e7uOoeVESu2uvhuRLFlA7Vx7/JT
- /eva777fMJ8YfTgOGc73Mx0YxP01s6+hevrbvcCTqdpw/rTSEltteQbcZoXK4PmPIUBm
- cl1ypCckqOcn43h6toBhuentFcrt9KGnXUPqpaFPa4bW3E56B+6i3Tx8qAHh1iiETUX3
- dGqXsu8Ew2uALCJSx4VFErFJJJcuSnDcWNuVe97h231nTAgZjz2TP8/8KWalCN6fqC//
- yNJAMz15ra9LHEt59Z0uirpJUswkt76MyYPG+hYLPwDY8SCBSYcr4fVQzU3aNLfA4uei
- GoKA==
+ (envelope-from <philmd@redhat.com>) id 1iMq09-0000lx-Iu
+ for qemu-devel@nongnu.org; Tue, 22 Oct 2019 04:58:51 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:52014
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iMq09-0000l8-Ei
+ for qemu-devel@nongnu.org; Tue, 22 Oct 2019 04:58:49 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1571734728;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=ClnMIVCVSchrhUH/X8rae5F4lXRxmQWqJIcm8qZiUrg=;
+ b=RnCbv1gryTrwFJCZ2mDoaDU9yk3qGXL6m/Z5HgMw/pIEWeR0kEqvdpcKVnGeGCOJryT3H8
+ mEeLQfSR0CXuYKRLp27MrPzSWvz8sWyOGeLCYVrSCJtAWdJ6vi8HvcXemUgxJuXop0nvaC
+ GS64kioRb7corjtsezl7SwaFea5ZKz4=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-158-23TObJhPNIyQDnKyWgQ_bQ-1; Tue, 22 Oct 2019 04:58:46 -0400
+Received: by mail-wr1-f69.google.com with SMTP id x9so2465331wrq.5
+ for <qemu-devel@nongnu.org>; Tue, 22 Oct 2019 01:58:46 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:message-id:subject:from:to:cc:date:in-reply-to
- :references:user-agent:mime-version:content-transfer-encoding;
- bh=V4VhBihoolZqFYIN54r9nmx9vYW/oQSJU4NMMDQk7As=;
- b=jchSzmO0xAlxcHp5n7+amjlAyIFcYgRZXiyptNoJZd4WnbmiTk+MqtPaMi6bYycvq5
- 9iVTqYXmHYv2utSR3kG/CAtbrona5uBRACCDiEAUbJoeCyWhUUExb9kp4eSRvoq3hw6y
- Sr7dhqwj6VzqTxSFyev7Xm4bxrpmuD0aLs8C7Ilgb1MLx/pzojkhrZsGLGZl0Y2wsMw3
- uoXtnJuy2sdYqTudmByXOM4jJD3X53lJ3QRaC9gV8qTGIP8mveqGPR47RXCnesQ90ZqG
- UDIBna5vcJFs4a5wITjTc3rM7WT8DOwx1zZN2wIPVbr3LAF2n5B+A+AGuseE/hurPw0K
- 0IMA==
-X-Gm-Message-State: APjAAAUGbjjgGz1arpoDoGEHPof0fTsYilpzaijpMns7NQqN0+BUMWxi
- hd9oZrukynUu1WUqKyYBefE=
-X-Google-Smtp-Source: APXvYqz8BBP5wYK70GC9RnObS4GNK085VbmK6595Ok53rEH80UBeoYuODXHUVHqO1KEoZ2xkh46u7g==
-X-Received: by 2002:a5d:6b0a:: with SMTP id v10mr2269042wrw.32.1571734457519; 
- Tue, 22 Oct 2019 01:54:17 -0700 (PDT)
-Received: from ?IPv6:2a01:c23:604c:2a00:af2b:2e92:39f9:c05b?
- ([2a01:c23:604c:2a00:af2b:2e92:39f9:c05b])
- by smtp.gmail.com with ESMTPSA id p21sm8365131wmc.25.2019.10.22.01.54.16
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 22 Oct 2019 01:54:17 -0700 (PDT)
-Message-ID: <80119c423b25ff027844fd04a4e57e5fcb7dfbb9.camel@gmail.com>
-Subject: Re: [PATCH v2 04/20] Revert "irq: introduce qemu_irq_proxy()"
-From: Esteban Bosse <estebanbosse@gmail.com>
-To: Philippe =?ISO-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>, 
- qemu-devel@nongnu.org
-Date: Tue, 22 Oct 2019 10:50:46 +0200
-In-Reply-To: <20191018134754.16362-5-philmd@redhat.com>
-References: <20191018134754.16362-1-philmd@redhat.com>
- <20191018134754.16362-5-philmd@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.30.5-1.1 
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=Ayd/SeWTSZAemrH7DapWEzpe3D7Ajn0oec+PTWibXxI=;
+ b=ncqbOT5p1we21pWFtdcdUf1ndtytAiKdhM2b5lBYMik7q6mOqfkjFW5IiWbPSjAoDX
+ osB0XBY/MjsRCsrh/C3b2qQJxIcXCyUC4wVBWU85CCuDlAXCLFaDWE9TfZlaOtQk5JXT
+ 0WKlQRbmjqu1aTwBHuufNJvol2bW7Qpchj+gtjxrhyxAaNikTO6169KW5HLltTMUpjfW
+ dpMu6S+FYdoJloXj2myYWicujJ8nDPEfZU1zda7QTu3wynnypuOrIB9krGm22GfXuCzf
+ GMmvVuTFWjM+3yu4nqwlcsOCMZQkzOwQDyzhkFE10xPS9kg4E4FMClA8U+HneoR1vKM3
+ KnHw==
+X-Gm-Message-State: APjAAAVHhqLBt0n3bvwinadmi1cZsy4awoCMh2I/YPVeiZSS8u8SkBrj
+ AFMwCmlEuoEHjg0xs9K588mIWdqZyoyyeXJE4T59djwathVPWgdJvN7NayT8Q7S2Cn5jpMd/tJw
+ sVU+emrKN6eqF8Zc=
+X-Received: by 2002:a5d:44c6:: with SMTP id z6mr2335990wrr.313.1571734724911; 
+ Tue, 22 Oct 2019 01:58:44 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqwTXcOWmju4U9ee5t+FOXHv4KB5VV1t0sfWzoQ9v/XQMMNwTbL8+6Uyz8PGsUq5a1LMGJq1FQ==
+X-Received: by 2002:a5d:44c6:: with SMTP id z6mr2335966wrr.313.1571734724627; 
+ Tue, 22 Oct 2019 01:58:44 -0700 (PDT)
+Received: from [192.168.1.41] (129.red-83-57-174.dynamicip.rima-tde.net.
+ [83.57.174.129])
+ by smtp.gmail.com with ESMTPSA id z9sm18223061wrl.35.2019.10.22.01.58.43
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Tue, 22 Oct 2019 01:58:44 -0700 (PDT)
+Subject: Re: [PATCH v3 2/4] spapr_cpu_core: Implement DeviceClass::reset
+To: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>,
+ David Gibson <david@gibson.dropbear.id.au>
+References: <20191022072246.9200-1-clg@kaod.org>
+ <20191022072246.9200-3-clg@kaod.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <31941faa-88bd-b029-89e2-15374498af8a@redhat.com>
+Date: Tue, 22 Oct 2019 10:58:42 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.1
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::441
+In-Reply-To: <20191022072246.9200-3-clg@kaod.org>
+Content-Language: en-US
+X-MC-Unique: 23TObJhPNIyQDnKyWgQ_bQ-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,82 +107,128 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Huth <thuth@redhat.com>, Stefano Stabellini <sstabellini@kernel.org>,
- xen-devel@lists.xenproject.org, Paul Durrant <paul@xen.org>,
- "Michael S. Tsirkin" <mst@redhat.com>,
- Philippe =?ISO-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>,
- Eduardo Habkost <ehabkost@redhat.com>,
- =?ISO-8859-1?Q?Herv=E9?= Poussineau <hpoussin@reactos.org>,
- Aleksandar Markovic <amarkovic@wavecomp.com>,
- Igor Mammedov <imammedo@redhat.com>,
- Anthony Perard <anthony.perard@citrix.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
- Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
- Aurelien Jarno <aurelien@aurel32.net>, Richard Henderson <rth@twiddle.net>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Greg Kurz <groug@kaod.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-El vie, 18-10-2019 a las 15:47 +0200, Philippe Mathieu-Daudé escribió:
-> From: Philippe Mathieu-Daudé <f4bug@amsat.org>
-> 
-> This function isn't used anymore.
-> 
-> This reverts commit 22ec3283efba9ba0792790da786d6776d83f2a92.
-> 
-> Reviewed-by: Thomas Huth <thuth@redhat.com>
-> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+On 10/22/19 9:22 AM, C=C3=A9dric Le Goater wrote:
+> From: Greg Kurz <groug@kaod.org>
+>=20
+> Since vCPUs aren't plugged into a bus, we manually register a reset
+> handler for each vCPU. We also call this handler at realize time
+> to ensure hot plugged vCPUs are reset before being exposed to the
+> guest. This results in vCPUs being reset twice at machine reset.
+> It doesn't break anything but it is slightly suboptimal and above
+> all confusing.
+>=20
+> The hotplug path in device_set_realized() already knows how to reset
+> a hotplugged device if the device reset handler is present. Implement
+> one for sPAPR CPU cores that resets all vCPUs under a core.
+>=20
+> While here rename spapr_cpu_reset() to spapr_reset_vcpu() for
+> consistency with spapr_realize_vcpu() and spapr_unrealize_vcpu().
+>=20
+> Signed-off-by: Greg Kurz <groug@kaod.org>
+> Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
 > ---
->  hw/core/irq.c    | 14 --------------
->  include/hw/irq.h |  5 -----
->  2 files changed, 19 deletions(-)
-> 
-> diff --git a/hw/core/irq.c b/hw/core/irq.c
-> index 7cc0295d0e..fb3045b912 100644
-> --- a/hw/core/irq.c
-> +++ b/hw/core/irq.c
-> @@ -120,20 +120,6 @@ qemu_irq qemu_irq_split(qemu_irq irq1, qemu_irq
-> irq2)
->      return qemu_allocate_irq(qemu_splitirq, s, 0);
->  }
->  
-> -static void proxy_irq_handler(void *opaque, int n, int level)
-> -{
-> -    qemu_irq **target = opaque;
+>   hw/ppc/spapr_cpu_core.c | 31 ++++++++++++++++++++++---------
+>   1 file changed, 22 insertions(+), 9 deletions(-)
+>=20
+> diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
+> index 992f00da6540..5947e39b36ad 100644
+> --- a/hw/ppc/spapr_cpu_core.c
+> +++ b/hw/ppc/spapr_cpu_core.c
+> @@ -25,9 +25,8 @@
+>   #include "sysemu/hw_accel.h"
+>   #include "qemu/error-report.h"
+>  =20
+> -static void spapr_cpu_reset(void *opaque)
+> +static void spapr_reset_vcpu(PowerPCCPU *cpu)
+>   {
+> -    PowerPCCPU *cpu =3D opaque;
+>       CPUState *cs =3D CPU(cpu);
+>       CPUPPCState *env =3D &cpu->env;
+>       PowerPCCPUClass *pcc =3D POWERPC_CPU_GET_CLASS(cpu);
+> @@ -193,7 +192,6 @@ static void spapr_unrealize_vcpu(PowerPCCPU *cpu, Spa=
+prCpuCore *sc)
+>       if (!sc->pre_3_0_migration) {
+>           vmstate_unregister(NULL, &vmstate_spapr_cpu_state, cpu->machine=
+_data);
+>       }
+> -    qemu_unregister_reset(spapr_cpu_reset, cpu);
+>       if (spapr_cpu_state(cpu)->icp) {
+>           object_unparent(OBJECT(spapr_cpu_state(cpu)->icp));
+>       }
+> @@ -204,12 +202,30 @@ static void spapr_unrealize_vcpu(PowerPCCPU *cpu, S=
+paprCpuCore *sc)
+>       object_unparent(OBJECT(cpu));
+>   }
+>  =20
+> +static void spapr_cpu_core_reset(DeviceState *dev)
+> +{
+> +    CPUCore *cc =3D CPU_CORE(dev);
+> +    SpaprCpuCore *sc =3D SPAPR_CPU_CORE(dev);
+> +    int i;
+> +
+> +    for (i =3D 0; i < cc->nr_threads; i++) {
+> +        spapr_reset_vcpu(sc->threads[i]);
+> +    }
+> +}
+> +
+> +static void spapr_cpu_core_reset_handler(void *opaque)
+> +{
+> +    spapr_cpu_core_reset(opaque);
+> +}
+> +
+>   static void spapr_cpu_core_unrealize(DeviceState *dev, Error **errp)
+>   {
+>       SpaprCpuCore *sc =3D SPAPR_CPU_CORE(OBJECT(dev));
+>       CPUCore *cc =3D CPU_CORE(dev);
+>       int i;
+>  =20
+> +    qemu_unregister_reset(spapr_cpu_core_reset_handler, sc);
+> +
+>       for (i =3D 0; i < cc->nr_threads; i++) {
+>           spapr_unrealize_vcpu(sc->threads[i], sc);
+>       }
+> @@ -238,12 +254,6 @@ static void spapr_realize_vcpu(PowerPCCPU *cpu, Spap=
+rMachineState *spapr,
+>           goto error_intc_create;
+>       }
+>  =20
+> -    /*
+> -     * FIXME: Hot-plugged CPUs are not reseted. Do it at realize.
+> -     */
+> -    qemu_register_reset(spapr_cpu_reset, cpu);
+> -    spapr_cpu_reset(cpu);
 > -
-> -    if (*target) {
-> -        qemu_set_irq((*target)[n], level);
-> -    }
-> -}
-> -
-> -qemu_irq *qemu_irq_proxy(qemu_irq **target, int n)
-> -{
-> -    return qemu_allocate_irqs(proxy_irq_handler, target, n);
-> -}
-> -
->  void qemu_irq_intercept_in(qemu_irq *gpio_in, qemu_irq_handler
-> handler, int n)
->  {
->      int i;
-> diff --git a/include/hw/irq.h b/include/hw/irq.h
-> index fe527f6f51..24ba0ece11 100644
-> --- a/include/hw/irq.h
-> +++ b/include/hw/irq.h
-> @@ -51,11 +51,6 @@ qemu_irq qemu_irq_invert(qemu_irq irq);
->   */
->  qemu_irq qemu_irq_split(qemu_irq irq1, qemu_irq irq2);
->  
-> -/* Returns a new IRQ set which connects 1:1 to another IRQ set,
-> which
-> - * may be set later.
-> - */
-> -qemu_irq *qemu_irq_proxy(qemu_irq **target, int n);
-> -
->  /* For internal use in qtest.  Similar to qemu_irq_split, but
-> operating
->     on an existing vector of qemu_irq.  */
->  void qemu_irq_intercept_in(qemu_irq *gpio_in, qemu_irq_handler
-> handler, int n);
-Reviewed-by: Esteban Bosse <estebanbosse@gmail.com>
+>       if (!sc->pre_3_0_migration) {
+>           vmstate_register(NULL, cs->cpu_index, &vmstate_spapr_cpu_state,
+>                            cpu->machine_data);
+> @@ -338,6 +348,8 @@ static void spapr_cpu_core_realize(DeviceState *dev, =
+Error **errp)
+>               goto err_unrealize;
+>           }
+>       }
+> +
+> +    qemu_register_reset(spapr_cpu_core_reset_handler, sc);
+>       return;
+>  =20
+>   err_unrealize:
+> @@ -366,6 +378,7 @@ static void spapr_cpu_core_class_init(ObjectClass *oc=
+, void *data)
+>  =20
+>       dc->realize =3D spapr_cpu_core_realize;
+>       dc->unrealize =3D spapr_cpu_core_unrealize;
+> +    dc->reset =3D spapr_cpu_core_reset;
+>       dc->props =3D spapr_cpu_core_properties;
+>       scc->cpu_type =3D data;
+>   }
+>=20
+
+Good cleanup!
+
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 
 
