@@ -5,81 +5,81 @@ X-Spam-Level:
 X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 41B90CA9EA0
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 11:51:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A8C91CA9EA0
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 11:52:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CE7DC21783
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 11:51:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4248321783
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 11:52:55 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IuZVG1Jg"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CE7DC21783
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DdfMj9By"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4248321783
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53806 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53818 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iMsgp-0003Bo-Pb
-	for qemu-devel@archiver.kernel.org; Tue, 22 Oct 2019 07:51:03 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47774)
+	id 1iMsic-0004h1-G5
+	for qemu-devel@archiver.kernel.org; Tue, 22 Oct 2019 07:52:54 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48048)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <aleksandar.m.mail@gmail.com>) id 1iMsfr-0002RN-HZ
- for qemu-devel@nongnu.org; Tue, 22 Oct 2019 07:50:11 -0400
+ (envelope-from <aleksandar.m.mail@gmail.com>) id 1iMshe-000444-Bs
+ for qemu-devel@nongnu.org; Tue, 22 Oct 2019 07:52:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aleksandar.m.mail@gmail.com>) id 1iMsfi-0003ju-Cj
- for qemu-devel@nongnu.org; Tue, 22 Oct 2019 07:50:03 -0400
-Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:33040)
+ (envelope-from <aleksandar.m.mail@gmail.com>) id 1iMshV-0004b1-Lt
+ for qemu-devel@nongnu.org; Tue, 22 Oct 2019 07:51:54 -0400
+Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:46900)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
- id 1iMsfh-0003io-QL
- for qemu-devel@nongnu.org; Tue, 22 Oct 2019 07:49:54 -0400
-Received: by mail-ot1-x342.google.com with SMTP id 60so13892443otu.0
- for <qemu-devel@nongnu.org>; Tue, 22 Oct 2019 04:49:53 -0700 (PDT)
+ id 1iMshT-0004a2-NC
+ for qemu-devel@nongnu.org; Tue, 22 Oct 2019 07:51:44 -0400
+Received: by mail-ot1-x343.google.com with SMTP id 89so13850375oth.13
+ for <qemu-devel@nongnu.org>; Tue, 22 Oct 2019 04:51:43 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=mime-version:in-reply-to:references:from:date:message-id:subject:to
- :cc; bh=3ecfGuTeP1eOdbimGs6NyK1OeLZKRQucvGIqPydORVg=;
- b=IuZVG1Jg0XIKw/3HtlZfDTnh0FShaCDQbBmEPHqygdQZce1aQf4AfUfH+43ymToXg/
- 0SXS7JXnJkB8Tr96u6x+1QB/V2OTJ1GcWGiby10NLyeK2JiJdFdZ53RSXXDWR+DbStnp
- xP+hY4qI07i3nzxfm5TCmQErkzyGGqOAuPlLkKrKN5omZsQfq0M09hBGyarwChrLSpCv
- ltBrwy/05b+rpZ7wTamCB16cUtZF3XCsnuHLunudtVHAtubgx6tyaWjtyUQdc81ZjrmV
- FJkZxUPK4EiVp8UqVFDlIZ9llhOe9BC19qCWHEz5PJzdbtLM1837ayNgcC02+RiW1p4W
- p9Iw==
+ :cc; bh=cQZksq/hOK2KXN50A1UNO0lzsIuaoBU/E7Qcplsy+l8=;
+ b=DdfMj9ByX16ssjGA8FA7QvxVWIRqQt15UE1sx2V9c5wZiU5VySeVOzrILmDNGfq9nT
+ N2+2Q3LLNntMM+i33aejM+9qZ1WZTfe57W9Zn5QLxy4UotOiwUkvk4AaVsiTAEkkuiKe
+ sT/KUYoyI8b/5hxJCxqvVmjRtBHwNSKbdLizxMQ+n3ilu800Mj4T7dMRYtq8emmipPxT
+ VS2q3xiBHVbdMDet68pr85lCr2TBo+pFAZZh0Xy/j+Ax2qw+MAxYQOFijYz9HqhEnvDq
+ kfFAdsGmRSMDRvQINeh0Jtfi9s/fatPNER2rIHYVznZnCXUEGNHPi7mBs5vCXu3tkRaM
+ Qw3Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:in-reply-to:references:from:date
  :message-id:subject:to:cc;
- bh=3ecfGuTeP1eOdbimGs6NyK1OeLZKRQucvGIqPydORVg=;
- b=ngVALrJkSY3pVhBKYqrrA2Xxdel91vPK/0K8sBEYBRdfzrW/M95//G7U3p1kxgRh0I
- +rAtwnWKmc4RFKoH8cjOsaUw1vOMN8ts8nR34aKQhQZ/RtoNLFKCp1X1Zy0d9+swXb0s
- BiLNsfDdk3tyuQJQeUL0UekXCQzVsGJ8ZbOoPhaU3+9kBCMUccBib92o0/frptmA2Du+
- gD1iqZUevmH/KIGBwef7eMKOOr4pdzV43zs6aSxRAh1w0hOzNdajj2V6AYmXOGdmCQbE
- Y0fG1tVDLEUmbYuNHcyf3S/ZIS44T5mRSU/1uIzCFbwJcGS1XrcUeaz+cSJ6neX8hcgS
- Kghg==
-X-Gm-Message-State: APjAAAXCiLYIxXywDpMcb5fft62Ig8OOn+3WavyiYZ0GyNHcNQvk77Qk
- Jhz6awzNOWE8vIpdNUmWOqpwThr5x94sxxa3r/M=
-X-Google-Smtp-Source: APXvYqzm+XMCU4zVBFpWI7gJn69LsOk/AjQJiyWBoxh5QGBlqUDP17GPVBELXFWUoHFV8gioK+W/6+i/hWbiLx7saNo=
-X-Received: by 2002:a9d:684c:: with SMTP id c12mr2386724oto.341.1571744992541; 
- Tue, 22 Oct 2019 04:49:52 -0700 (PDT)
+ bh=cQZksq/hOK2KXN50A1UNO0lzsIuaoBU/E7Qcplsy+l8=;
+ b=MyZn7LfMkJdoB4R5caejcNvtYUXaT0gNjpLuEk83QR/Wio2vaoHKC8BrVtQyPFe2DU
+ +4bZD0ouXMn9nsMsi8H4hZC+TY/UMULcNS+UGTV+Cgw0Ht8IHpo+0dZcWWZ0I0TnnrbU
+ YZS/29fWdL/4di/oqqqtlXXEqUS4Nnrg3lxHT1lAm/wfx0akM9rYwCNeg/KvC48PHGCY
+ rIPEAAr3BhAQwZyx+HH/+Thmca4NfY13uHrdyNWvZ6mNkiZZzgKw5JUVoOm6iegKZoKy
+ WMJkhcrvymFB75Az5udPDGGvo710juaCt+SmrB07WcXQC5369mgC8TQGjlfCxNe4js8n
+ b+AQ==
+X-Gm-Message-State: APjAAAU+S2L3jUG+8BfXKatxjb4FXTEmx2Qsk9txbdeb6HNaNTaA0QgO
+ cwd1khd+MMVvX4M87mSWKSJKHqtJt/jmzCaGcbI=
+X-Google-Smtp-Source: APXvYqzs6T9pfgKb5waHaqxaNx4Q1RcosnX3aNeBLaZNceO+FuXvKekrmxCKmbnkXo5xcTrvcYgXCcB2VQXLOPpiYwM=
+X-Received: by 2002:a9d:5914:: with SMTP id t20mr2323808oth.306.1571745102120; 
+ Tue, 22 Oct 2019 04:51:42 -0700 (PDT)
 MIME-Version: 1.0
-Received: by 2002:a9d:340a:0:0:0:0:0 with HTTP; Tue, 22 Oct 2019 04:49:51
+Received: by 2002:a9d:340a:0:0:0:0:0 with HTTP; Tue, 22 Oct 2019 04:51:41
  -0700 (PDT)
 In-Reply-To: <20191021223711.66955-2-mrolnik@gmail.com>
 References: <20191021223711.66955-1-mrolnik@gmail.com>
  <20191021223711.66955-2-mrolnik@gmail.com>
 From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
-Date: Tue, 22 Oct 2019 13:49:51 +0200
-Message-ID: <CAL1e-=jPynt_N-RoTyxpU1G0yBjfdBRz3vmzuWtFCgwqMVY2nw@mail.gmail.com>
+Date: Tue, 22 Oct 2019 13:51:41 +0200
+Message-ID: <CAL1e-=iBgJw4j7reE+cXqJjPAP+tViaZ0U4zKFgLBJFE1hZUdw@mail.gmail.com>
 Subject: Re: [PATCH v33 01/13] target/avr: Add outward facing interfaces and
  core CPU logic
 To: Michael Rolnik <mrolnik@gmail.com>
-Content-Type: multipart/alternative; boundary="000000000000f53fad05957e6566"
+Content-Type: multipart/alternative; boundary="0000000000007d4c5905957e6cb1"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::342
+X-Received-From: 2607:f8b0:4864:20::343
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -101,7 +101,7 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---000000000000f53fad05957e6566
+--0000000000007d4c5905957e6cb1
 Content-Type: text/plain; charset="UTF-8"
 
 On Tuesday, October 22, 2019, Michael Rolnik <mrolnik@gmail.com> wrote:
@@ -135,6 +135,11 @@ On Tuesday, October 22, 2019, Michael Rolnik <mrolnik@gmail.com> wrote:
 >  create mode 100644 target/avr/gdbstub.c
 >  create mode 100644 target/avr/machine.c
 >
+>
+Can you explain writing from gdb to Z flag of status register?
+
+
+
 > diff --git a/gdb-xml/avr-cpu.xml b/gdb-xml/avr-cpu.xml
 > new file mode 100644
 > index 0000000000..c4747f5b40
@@ -474,15 +479,6 @@ On Tuesday, October 22, 2019, Michael Rolnik <mrolnik@gmail.com> wrote:
 > +                        env->sregN ? '-' : 'N', /* Zf has negative logic
 > */
 > +                        env->sregZ ? 'Z' : '-',
->
->
->
-Here the comment says Z flag has reversed logic, but the code is written as
-if N flag has reverse logic. Also, the location if the comment is as if it
-is linked to N flag.
-
-
->
 > +                        env->sregC ? 'I' : '-');
 > +    qemu_fprintf(f, "SKIP:    %02x\n", env->skip);
 > +
@@ -1371,7 +1367,7 @@ is linked to N flag.
 >
 >
 
---000000000000f53fad05957e6566
+--0000000000007d4c5905957e6cb1
 Content-Type: text/html; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
@@ -1414,7 +1410,10 @@ r>
 =C2=A0create mode 100644 target/avr/cpu.h<br>
 =C2=A0create mode 100644 target/avr/gdbstub.c<br>
 =C2=A0create mode 100644 target/avr/machine.c<br>
-<br>
+<br></blockquote><div><br></div><div>Can you explain writing from gdb to Z =
+flag of status register?</div><div><br></div><div>=C2=A0</div><blockquote c=
+lass=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;border-left:1px #ccc solid;=
+padding-left:1ex">
 diff --git a/gdb-xml/avr-cpu.xml b/gdb-xml/avr-cpu.xml<br>
 new file mode 100644<br>
 index 0000000000..c4747f5b40<br>
@@ -1823,15 +1822,7 @@ n&quot;, env-&gt;r[31], env-&gt;r[30]);<br>
 =A0 =C2=A0 env-&gt;sregN ? &#39;-&#39; : &#39;N&#39;, /* Zf has negative lo=
 gic */<br>
 +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 env-&gt;sregZ ? &#39;Z&#39; : &#39;-&#39;,<br><br></blockquote><=
-blockquote class=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;border-left:1px=
- #ccc solid;padding-left:1ex"><br></blockquote><div><br></div><div>Here the=
- comment says Z flag has reversed logic, but the code is written as if N fl=
-ag has reverse logic. Also, the location if the comment is as if it is link=
-ed to N flag.</div><div>=C2=A0</div><blockquote class=3D"gmail_quote" style=
-=3D"margin:0 0 0 .8ex;border-left:1px #ccc solid;padding-left:1ex"><br></bl=
-ockquote><blockquote class=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;borde=
-r-left:1px #ccc solid;padding-left:1ex">
+=A0 =C2=A0 env-&gt;sregZ ? &#39;Z&#39; : &#39;-&#39;,<br>
 +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
 =A0 =C2=A0 env-&gt;sregC ? &#39;I&#39; : &#39;-&#39;);<br>
 +=C2=A0 =C2=A0 qemu_fprintf(f, &quot;SKIP:=C2=A0 =C2=A0 %02x\n&quot;, env-&=
@@ -2774,5 +2765,5 @@ uint32_t),<br>
 <br>
 </blockquote>
 
---000000000000f53fad05957e6566--
+--0000000000007d4c5905957e6cb1--
 
