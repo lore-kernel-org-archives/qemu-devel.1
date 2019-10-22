@@ -2,106 +2,86 @@ Return-Path: <SRS0=tSBD=YP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C5257CA9EA0
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 10:33:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2DAF4CA9EA0
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 10:36:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 93A552184C
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 10:33:21 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XLiwrpC3"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 93A552184C
+	by mail.kernel.org (Postfix) with ESMTPS id 024B320B7C
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 10:36:46 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 024B320B7C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53046 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53094 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iMrTc-0005hj-KO
-	for qemu-devel@archiver.kernel.org; Tue, 22 Oct 2019 06:33:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37583)
+	id 1iMrWv-0007cm-8F
+	for qemu-devel@archiver.kernel.org; Tue, 22 Oct 2019 06:36:45 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38149)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1iMrRE-0003rp-UQ
- for qemu-devel@nongnu.org; Tue, 22 Oct 2019 06:30:53 -0400
+ (envelope-from <philmd@redhat.com>) id 1iMrWC-00076u-5K
+ for qemu-devel@nongnu.org; Tue, 22 Oct 2019 06:36:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1iMrRC-0006JP-S9
- for qemu-devel@nongnu.org; Tue, 22 Oct 2019 06:30:52 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:50721
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <philmd@redhat.com>) id 1iMrWA-0008Dy-SW
+ for qemu-devel@nongnu.org; Tue, 22 Oct 2019 06:36:00 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40902)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1iMrRC-0006IB-NT
- for qemu-devel@nongnu.org; Tue, 22 Oct 2019 06:30:50 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1571740249;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=A6WEeKdq+0TzWx5GjwTw6Y5+tFw85YFrATiaS2wRXM8=;
- b=XLiwrpC3E5+9mbQweq8e2Gz+4wi1i5kC3YoWkNjbkA/UYGIkr4MndCpUppGj2wJWcbTWvv
- dqFK+IMvhhra51X1gIAFI2s+7sA6312LZx3vt2PMpbOfxzHtaX9JkWD3hF2MMcaPtuzU42
- oJu3It42OKd7ciNGrBcx2xgiK54Q0qI=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-286-CA_tXLtzNPOs47iTwiQgDg-1; Tue, 22 Oct 2019 06:30:47 -0400
-X-MC-Unique: CA_tXLtzNPOs47iTwiQgDg-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iMrWA-0008Db-Il
+ for qemu-devel@nongnu.org; Tue, 22 Oct 2019 06:35:58 -0400
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B48A680183E;
- Tue, 22 Oct 2019 10:30:46 +0000 (UTC)
-Received: from dresden.str.redhat.com (ovpn-117-215.ams2.redhat.com
- [10.36.117.215])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 0CEBE5D6A5;
- Tue, 22 Oct 2019 10:30:42 +0000 (UTC)
-Subject: Re: [PATCH v2 5/6] block/block-copy: add memory limit
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-block@nongnu.org
-References: <20191016170905.8325-1-vsementsov@virtuozzo.com>
- <20191016170905.8325-6-vsementsov@virtuozzo.com>
-From: Max Reitz <mreitz@redhat.com>
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <2580217a-41a0-7154-4230-e2b9179bf96d@redhat.com>
-Date: Tue, 22 Oct 2019 12:30:41 +0200
+ by mx1.redhat.com (Postfix) with ESMTPS id 68F2E368E2
+ for <qemu-devel@nongnu.org>; Tue, 22 Oct 2019 10:35:57 +0000 (UTC)
+Received: by mail-wm1-f72.google.com with SMTP id o128so8326825wmo.1
+ for <qemu-devel@nongnu.org>; Tue, 22 Oct 2019 03:35:57 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=f0q8fIpV9ECYNdGuFoWEvPSk29jvKO4VCTXV6ut9pj4=;
+ b=IGJYFbv7n/C94KKo4M11OnhPDAVWfSDIZDkuLmvoVpZRu3m07ccTC/VZ33DFLTXPwX
+ rNbNQHvVpFmstAZ0iYCcr17RpNPXye7ru4oqp7u9IeMrWBa8Poj8Zi2Cg6b7JURKVOwI
+ PRKUYLCTc03cfXKgKd/YUKjnnk6FuAWUtJuNe9wAG2636q7SdXZ2LpmbC+ptLuigvopY
+ exW6idKzg77NF5iZ30yaqchap3BKWTsyNr+flkbnxMGys6wf0bQfTJ1vyo8FVmYm7fQs
+ Tj/X4+7vsYWKEnzYY/z5UcEqUOPIjwU2dResekElUvH7yTeESuytGEHybydi+LfMnBm5
+ 83Sg==
+X-Gm-Message-State: APjAAAXlQJPDvXKcebD8ea1xG1GYtZ2xkm3+8WkCaXrFhE4/yjygl/JG
+ hiKHVNnV8YrI63yibiFl6lGK1sToXFzKXrForu1xJE8imMoFP/UlNDy9+MbRVgfJTqJ/pXuyYav
+ YmLXjlu3P/wdqsok=
+X-Received: by 2002:adf:fc10:: with SMTP id i16mr2715933wrr.157.1571740556083; 
+ Tue, 22 Oct 2019 03:35:56 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqwglst3tJqRIZGqf+Xe3PQIxEIqP7pVUGbJk0jDY+8jEH7IjoOkiv8/hoKI/559OizfFb5sTw==
+X-Received: by 2002:adf:fc10:: with SMTP id i16mr2715894wrr.157.1571740555786; 
+ Tue, 22 Oct 2019 03:35:55 -0700 (PDT)
+Received: from [192.168.1.41] (129.red-83-57-174.dynamicip.rima-tde.net.
+ [83.57.174.129])
+ by smtp.gmail.com with ESMTPSA id u7sm11374341wre.59.2019.10.22.03.35.54
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Tue, 22 Oct 2019 03:35:55 -0700 (PDT)
+Subject: Re: [PATCH v8 7/8] bootdevice: FW_CFG interface for LCHS values
+To: Sam Eiderman <sameid@google.com>, qemu-devel@nongnu.org
+References: <20191016164145.115898-1-sameid@google.com>
+ <20191016164145.115898-9-sameid@google.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <90c66621-3a56-cb5e-2403-fc9197a8aec1@redhat.com>
+Date: Tue, 22 Oct 2019 12:35:53 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.1.1
 MIME-Version: 1.0
-In-Reply-To: <20191016170905.8325-6-vsementsov@virtuozzo.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Mimecast-Spam-Score: 0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="yiGjQ0yv9FbEYtsAC1ClflKK4aZbLVzxR"
+In-Reply-To: <20191016164145.115898-9-sameid@google.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.61
+X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -113,55 +93,158 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, den@openvz.org, jsnow@redhat.com, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, qemu-block@nongnu.org, arbel.moshe@oracle.com,
+ jsnow@redhat.com, seabios@seabios.org, kevin@koconnor.net,
+ liran.alon@oracle.com, kraxel@redhat.com,
+ Sam Eiderman <shmuel.eiderman@oracle.com>, lersek@redhat.com,
+ karl.heubaum@oracle.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---yiGjQ0yv9FbEYtsAC1ClflKK4aZbLVzxR
-Content-Type: multipart/mixed; boundary="umByOOC84fLQ2wznrrvnipLI0ZFz8YCRC"
-
---umByOOC84fLQ2wznrrvnipLI0ZFz8YCRC
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-
-On 16.10.19 19:09, Vladimir Sementsov-Ogievskiy wrote:
-> Currently total allocation for parallel requests to block-copy instance
-> is unlimited. Let's limit it to 128 MiB.
+On 10/16/19 6:41 PM, Sam Eiderman wrote:
+> From: Sam Eiderman <shmuel.eiderman@oracle.com>
 >=20
-> For now block-copy is used only in backup, so actually we limit total
-> allocation for backup job.
+> Using fw_cfg, supply logical CHS values directly from QEMU to the BIOS.
 >=20
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> Non-standard logical geometries break under QEMU.
+>=20
+> A virtual disk which contains an operating system which depends on
+> logical geometries (consistent values being reported from BIOS INT13
+> AH=3D08) will most likely break under QEMU/SeaBIOS if it has non-standa=
+rd
+> logical geometries - for example 56 SPT (sectors per track).
+> No matter what QEMU will report - SeaBIOS, for large enough disks - wil=
+l
+> use LBA translation, which will report 63 SPT instead.
+>=20
+> In addition we cannot force SeaBIOS to rely on physical geometries at
+> all. A virtio-blk-pci virtual disk with 255 phyiscal heads cannot
+> report more than 16 physical heads when moved to an IDE controller,
+> since the ATA spec allows a maximum of 16 heads - this is an artifact o=
+f
+> virtualization.
+>=20
+> By supplying the logical geometries directly we are able to support suc=
+h
+> "exotic" disks.
+>=20
+> We serialize this information in a similar way to the "bootorder"
+> interface.
+> The new fw_cfg entry is "bios-geometry".
+>=20
+> Reviewed-by: Karl Heubaum <karl.heubaum@oracle.com>
+> Reviewed-by: Arbel Moshe <arbel.moshe@oracle.com>
+> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+> Signed-off-by: Sam Eiderman <shmuel.eiderman@oracle.com>
+> Signed-off-by: Sam Eiderman <sameid@google.com>
 > ---
->  include/block/block-copy.h | 3 +++
->  block/block-copy.c         | 5 +++++
->  2 files changed, 8 insertions(+)
+>   bootdevice.c            | 31 +++++++++++++++++++++++++++++++
+>   hw/nvram/fw_cfg.c       | 14 +++++++++++---
+>   include/sysemu/sysemu.h |  1 +
+>   3 files changed, 43 insertions(+), 3 deletions(-)
+>=20
+> diff --git a/bootdevice.c b/bootdevice.c
+> index 2cf6b37c57..03aaffcc8d 100644
+> --- a/bootdevice.c
+> +++ b/bootdevice.c
+> @@ -405,3 +405,34 @@ void del_boot_device_lchs(DeviceState *dev, const =
+char *suffix)
+>           }
+>       }
+>   }
+> +
+> +char *get_boot_devices_lchs_list(size_t *size)
+> +{
+> +    FWLCHSEntry *i;
+> +    size_t total =3D 0;
+> +    char *list =3D NULL;
+> +
+> +    QTAILQ_FOREACH(i, &fw_lchs, link) {
+> +        char *bootpath;
+> +        char *chs_string;
+> +        size_t len;
+> +
+> +        bootpath =3D get_boot_device_path(i->dev, false, i->suffix);
+> +        chs_string =3D g_strdup_printf("%s %" PRIu32 " %" PRIu32 " %" =
+PRIu32,
+> +                                     bootpath, i->lcyls, i->lheads, i-=
+>lsecs);
+> +
+> +        if (total) {
+> +            list[total - 1] =3D '\n';
+> +        }
+> +        len =3D strlen(chs_string) + 1;
+> +        list =3D g_realloc(list, total + len);
+> +        memcpy(&list[total], chs_string, len);
+> +        total +=3D len;
+> +        g_free(chs_string);
+> +        g_free(bootpath);
+> +    }
+> +
 
-Reviewed-by: Max Reitz <mreitz@redhat.com>
+Hmm maybe assert(size !=3D NULL) or if(size) {
 
+> +    *size =3D total;
 
---umByOOC84fLQ2wznrrvnipLI0ZFz8YCRC--
+} or simply document "@size must not be NULL" in the declaration.
 
---yiGjQ0yv9FbEYtsAC1ClflKK4aZbLVzxR
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+Can be a follow-up cleaning patch.
 
------BEGIN PGP SIGNATURE-----
+Regardless:
+Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl2u2lEACgkQ9AfbAGHV
-z0Bzxgf/RaVRbGiM1wWK3G+lWIBhMTBbDzTPK4RAdEwwj2vuA7TORLR7kUP8+iQw
-jcsEXC5WLbRCeeBO7wnP64lVltJfjkLB/BUPkjpZ898ZhGO3cOFaQ7/3hwLEitYC
-XgpDQfvBkmtpQEwfebO9WdTkQDHvKX1rpHIsxekpOZGk4F9aDclkcviRHdwM/tuY
-S8AlpRFkMCbE8TSSXXQsmLj7Q+ycVc7TTSTmDKlRlIjmNW5jg05HL6dAot2vpDdB
-tIg5wnRr8r7n2orn6izFyu8JkwwY/nznjyoZA75kKK9NE/ptrwgpiDgTHTvngg8K
-EyzufmR3+E1Gn0NSy5DrrJclTc5Stg==
-=y/d8
------END PGP SIGNATURE-----
+> +
+> +    return list;
+> +}
+> diff --git a/hw/nvram/fw_cfg.c b/hw/nvram/fw_cfg.c
+> index 7dc3ac378e..18aff658c0 100644
+> --- a/hw/nvram/fw_cfg.c
+> +++ b/hw/nvram/fw_cfg.c
+> @@ -920,13 +920,21 @@ void *fw_cfg_modify_file(FWCfgState *s, const cha=
+r *filename,
+>  =20
+>   static void fw_cfg_machine_reset(void *opaque)
+>   {
+> +    MachineClass *mc =3D MACHINE_GET_CLASS(qdev_get_machine());
+> +    FWCfgState *s =3D opaque;
+>       void *ptr;
+>       size_t len;
+> -    FWCfgState *s =3D opaque;
+> -    char *bootindex =3D get_boot_devices_list(&len);
+> +    char *buf;
+>  =20
+> -    ptr =3D fw_cfg_modify_file(s, "bootorder", (uint8_t *)bootindex, l=
+en);
+> +    buf =3D get_boot_devices_list(&len);
+> +    ptr =3D fw_cfg_modify_file(s, "bootorder", (uint8_t *)buf, len);
+>       g_free(ptr);
+> +
+> +    if (!mc->legacy_fw_cfg_order) {
+> +        buf =3D get_boot_devices_lchs_list(&len);
+> +        ptr =3D fw_cfg_modify_file(s, "bios-geometry", (uint8_t *)buf,=
+ len);
+> +        g_free(ptr);
+> +    }
+>   }
+>  =20
+>   static void fw_cfg_machine_ready(struct Notifier *n, void *data)
+> diff --git a/include/sysemu/sysemu.h b/include/sysemu/sysemu.h
+> index 5bc5c79cbc..80c57fdc4e 100644
+> --- a/include/sysemu/sysemu.h
+> +++ b/include/sysemu/sysemu.h
+> @@ -106,6 +106,7 @@ void validate_bootdevices(const char *devices, Erro=
+r **errp);
+>   void add_boot_device_lchs(DeviceState *dev, const char *suffix,
+>                             uint32_t lcyls, uint32_t lheads, uint32_t l=
+secs);
+>   void del_boot_device_lchs(DeviceState *dev, const char *suffix);
+> +char *get_boot_devices_lchs_list(size_t *size);
+>  =20
+>   /* handler to set the boot_device order for a specific type of Machin=
+eClass */
+>   typedef void QEMUBootSetHandler(void *opaque, const char *boot_order,
+>=20
 
---yiGjQ0yv9FbEYtsAC1ClflKK4aZbLVzxR--
-
+Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 
