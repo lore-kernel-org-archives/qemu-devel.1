@@ -2,60 +2,61 @@ Return-Path: <SRS0=tSBD=YP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 33BB4CA9EA0
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 16:57:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D11AECA9EA0
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 16:58:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0B6992084B
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 16:57:46 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0B6992084B
+	by mail.kernel.org (Postfix) with ESMTPS id A15412084B
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Oct 2019 16:58:33 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A15412084B
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36436 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36445 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iMxT3-00053g-Kj
-	for qemu-devel@archiver.kernel.org; Tue, 22 Oct 2019 12:57:09 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41125)
+	id 1iMxU6-00065Q-QK
+	for qemu-devel@archiver.kernel.org; Tue, 22 Oct 2019 12:58:14 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41235)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <clg@kaod.org>) id 1iMxBQ-0000kp-Lm
- for qemu-devel@nongnu.org; Tue, 22 Oct 2019 12:38:57 -0400
+ (envelope-from <clg@kaod.org>) id 1iMxBm-0001Mk-BZ
+ for qemu-devel@nongnu.org; Tue, 22 Oct 2019 12:39:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <clg@kaod.org>) id 1iMxBO-0006hU-Uh
- for qemu-devel@nongnu.org; Tue, 22 Oct 2019 12:38:56 -0400
-Received: from 5.mo1.mail-out.ovh.net ([178.33.45.107]:46775)
+ (envelope-from <clg@kaod.org>) id 1iMxBl-0006oU-6u
+ for qemu-devel@nongnu.org; Tue, 22 Oct 2019 12:39:18 -0400
+Received: from 7.mo2.mail-out.ovh.net ([188.165.48.182]:34113)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <clg@kaod.org>) id 1iMxBO-0006gh-Nk
- for qemu-devel@nongnu.org; Tue, 22 Oct 2019 12:38:54 -0400
-Received: from player688.ha.ovh.net (unknown [10.108.35.185])
- by mo1.mail-out.ovh.net (Postfix) with ESMTP id 6E2DF194F67
- for <qemu-devel@nongnu.org>; Tue, 22 Oct 2019 18:38:52 +0200 (CEST)
+ (Exim 4.71) (envelope-from <clg@kaod.org>) id 1iMxBl-0006ns-0B
+ for qemu-devel@nongnu.org; Tue, 22 Oct 2019 12:39:17 -0400
+Received: from player688.ha.ovh.net (unknown [10.109.143.18])
+ by mo2.mail-out.ovh.net (Postfix) with ESMTP id 20B871B01B9
+ for <qemu-devel@nongnu.org>; Tue, 22 Oct 2019 18:39:15 +0200 (CEST)
 Received: from kaod.org (lfbn-1-2229-223.w90-76.abo.wanadoo.fr [90.76.50.223])
  (Authenticated sender: clg@kaod.org)
- by player688.ha.ovh.net (Postfix) with ESMTPSA id 70050B32C2DD;
- Tue, 22 Oct 2019 16:38:46 +0000 (UTC)
+ by player688.ha.ovh.net (Postfix) with ESMTPSA id 1D9E2B32C394;
+ Tue, 22 Oct 2019 16:39:07 +0000 (UTC)
 From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
 To: David Gibson <david@gibson.dropbear.id.au>
-Subject: [PATCH v5 0/7] ppc: reset the interrupt presenter from the CPU reset
- handler
-Date: Tue, 22 Oct 2019 18:38:05 +0200
-Message-Id: <20191022163812.330-1-clg@kaod.org>
+Subject: [PATCH v5 3/7] ppc/pnv: Introduce a PnvCore reset handler
+Date: Tue, 22 Oct 2019 18:38:08 +0200
+Message-Id: <20191022163812.330-4-clg@kaod.org>
 X-Mailer: git-send-email 2.21.0
+In-Reply-To: <20191022163812.330-1-clg@kaod.org>
+References: <20191022163812.330-1-clg@kaod.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-X-Ovh-Tracer-Id: 3502393138045684710
+X-Ovh-Tracer-Id: 3509148538540035046
 X-VR-SPAMSTATE: OK
 X-VR-SPAMSCORE: -100
 X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrkeejgddutdefucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddm
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 178.33.45.107
+X-Received-From: 188.165.48.182
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -74,74 +75,79 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hello,
+in which individual CPUs are reset. It will ease the introduction of
+future change reseting the interrupt presenter from the CPU reset
+handler.
 
-On the sPAPR machine and PowerNV machine, the interrupt presenters are
-created by a machine handler at the core level and are reseted
-independently. This is not consistent and it raises issues when it
-comes to handle hot-plugged CPUs. In that case, the presenters are not
-reseted. This is less of an issue in XICS, although a zero MFFR could
-be a concern, but in XIVE, the OS CAM line is not set and this breaks
-the presenting algorithm. The current code has workarounds which need
-a global cleanup.
+Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
+Reviewed-by: Greg Kurz <groug@kaod.org>
+---
+ hw/ppc/pnv_core.c | 19 +++++++++++++++----
+ 1 file changed, 15 insertions(+), 4 deletions(-)
 
-Extend the sPAPR IRQ backend and the PowerNV Chip class with a new
-cpu_intc_reset() handler called by the CPU reset handler and remove
-the XiveTCTX reset handler which is now redundant.
-
-Set the OS CAM line when the interrupt presenter of the sPAPR core is
-reseted. This will also cover the case of hot-plugged CPUs.
-
-Thanks,
-
-C.
-
-Changes in v5:
-
- - Removed useless PNV_CHIP() cast
+diff --git a/hw/ppc/pnv_core.c b/hw/ppc/pnv_core.c
+index b1a7489e7abf..9f981a4940e6 100644
+--- a/hw/ppc/pnv_core.c
++++ b/hw/ppc/pnv_core.c
+@@ -40,9 +40,8 @@ static const char *pnv_core_cpu_typename(PnvCore *pc)
+     return cpu_type;
+ }
 =20
-Changes in v4:
-
- - Introduce a PnvCore reset handler
- - Add PnvChip pointer to PnvCore
-
-Changes in v3:
-
- - Introduced a DeviceClass::reset for the CPU (Greg)
- - add support for PowerNV
+-static void pnv_cpu_reset(void *opaque)
++static void pnv_core_cpu_reset(PowerPCCPU *cpu)
+ {
+-    PowerPCCPU *cpu =3D opaque;
+     CPUState *cs =3D CPU(cpu);
+     CPUPPCState *env =3D &cpu->env;
 =20
-Changes in v2:
-
- - removed property
- - simplified reset handlers
-
-C=C3=A9dric Le Goater (6):
-  spapr: move CPU reset after presenter creation
-  ppc/pnv: Introduce a PnvCore reset handler
-  ppc/pnv: Add a PnvChip pointer to PnvCore
-  ppc: Reset the interrupt presenter from the CPU reset handler
-  ppc/pnv: Fix naming of routines realizing the CPUs
-  spapr/xive: Set the OS CAM line at reset
-
-Greg Kurz (1):
-  spapr_cpu_core: Implement DeviceClass::reset
-
- include/hw/ppc/pnv.h        |  1 +
- include/hw/ppc/pnv_core.h   |  3 +++
- include/hw/ppc/spapr_irq.h  |  2 ++
- include/hw/ppc/spapr_xive.h |  1 -
- include/hw/ppc/xics.h       |  1 +
- include/hw/ppc/xive.h       |  1 +
- hw/intc/spapr_xive.c        | 53 +++++++++++++++++--------------------
- hw/intc/xics.c              |  8 ++----
- hw/intc/xics_spapr.c        |  7 +++++
- hw/intc/xive.c              | 12 +--------
- hw/ppc/pnv.c                | 18 +++++++++++++
- hw/ppc/pnv_core.c           | 31 ++++++++++++++++------
- hw/ppc/spapr_cpu_core.c     | 44 +++++++++++++++++++++++-------
- hw/ppc/spapr_irq.c          | 14 ++++++++++
- 14 files changed, 131 insertions(+), 65 deletions(-)
-
+@@ -192,8 +191,17 @@ static void pnv_realize_vcpu(PowerPCCPU *cpu, PnvChi=
+p *chip, Error **errp)
+=20
+     /* Set time-base frequency to 512 MHz */
+     cpu_ppc_tb_init(env, PNV_TIMEBASE_FREQ);
++}
++
++static void pnv_core_reset(void *dev)
++{
++    CPUCore *cc =3D CPU_CORE(dev);
++    PnvCore *pc =3D PNV_CORE(dev);
++    int i;
+=20
+-    qemu_register_reset(pnv_cpu_reset, cpu);
++    for (i =3D 0; i < cc->nr_threads; i++) {
++        pnv_core_cpu_reset(pc->threads[i]);
++    }
+ }
+=20
+ static void pnv_core_realize(DeviceState *dev, Error **errp)
+@@ -244,6 +252,8 @@ static void pnv_core_realize(DeviceState *dev, Error =
+**errp)
+     snprintf(name, sizeof(name), "xscom-core.%d", cc->core_id);
+     pnv_xscom_region_init(&pc->xscom_regs, OBJECT(dev), pcc->xscom_ops,
+                           pc, name, PNV_XSCOM_EX_SIZE);
++
++    qemu_register_reset(pnv_core_reset, pc);
+     return;
+=20
+ err:
+@@ -259,7 +269,6 @@ static void pnv_unrealize_vcpu(PowerPCCPU *cpu)
+ {
+     PnvCPUState *pnv_cpu =3D pnv_cpu_state(cpu);
+=20
+-    qemu_unregister_reset(pnv_cpu_reset, cpu);
+     object_unparent(OBJECT(pnv_cpu_state(cpu)->intc));
+     cpu_remove_sync(CPU(cpu));
+     cpu->machine_data =3D NULL;
+@@ -273,6 +282,8 @@ static void pnv_core_unrealize(DeviceState *dev, Erro=
+r **errp)
+     CPUCore *cc =3D CPU_CORE(dev);
+     int i;
+=20
++    qemu_unregister_reset(pnv_core_reset, pc);
++
+     for (i =3D 0; i < cc->nr_threads; i++) {
+         pnv_unrealize_vcpu(pc->threads[i]);
+     }
 --=20
 2.21.0
 
