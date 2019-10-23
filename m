@@ -4,76 +4,77 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B0FD3CA9EB9
-	for <qemu-devel@archiver.kernel.org>; Wed, 23 Oct 2019 18:33:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 98403CA9EB9
+	for <qemu-devel@archiver.kernel.org>; Wed, 23 Oct 2019 18:39:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7C7282173B
-	for <qemu-devel@archiver.kernel.org>; Wed, 23 Oct 2019 18:33:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 612EC20663
+	for <qemu-devel@archiver.kernel.org>; Wed, 23 Oct 2019 18:39:12 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="a4YnYLIa"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7C7282173B
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Mf5fRUoX"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 612EC20663
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43490 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43650 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iNLS1-0000e9-4m
-	for qemu-devel@archiver.kernel.org; Wed, 23 Oct 2019 14:33:41 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59672)
+	id 1iNLXK-00071T-US
+	for qemu-devel@archiver.kernel.org; Wed, 23 Oct 2019 14:39:10 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59949)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <marcandre.lureau@redhat.com>) id 1iNKWw-0005DD-42
- for qemu-devel@nongnu.org; Wed, 23 Oct 2019 13:34:47 -0400
+ (envelope-from <marcandre.lureau@redhat.com>) id 1iNKXM-0005jl-MP
+ for qemu-devel@nongnu.org; Wed, 23 Oct 2019 13:35:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <marcandre.lureau@redhat.com>) id 1iNKWu-0002FV-5M
- for qemu-devel@nongnu.org; Wed, 23 Oct 2019 13:34:42 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:29618
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <marcandre.lureau@redhat.com>) id 1iNKXL-0002U4-D5
+ for qemu-devel@nongnu.org; Wed, 23 Oct 2019 13:35:08 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:28624
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
- id 1iNKWu-0002F6-1D
- for qemu-devel@nongnu.org; Wed, 23 Oct 2019 13:34:40 -0400
+ id 1iNKXL-0002Ts-8B
+ for qemu-devel@nongnu.org; Wed, 23 Oct 2019 13:35:07 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1571852079;
+ s=mimecast20190719; t=1571852106;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=QmFFdvh8lLCYoMRknFLWTBCMhIo3Fn3Z3qJbSbzkpNo=;
- b=a4YnYLIazxqYSaAOQAdVgaJp7fxM+/g4NyJ0RTmmJ/HpOygNUEclAr52i13Lo2Y30mzCBi
- NG96W1bhbAiYUooJ4HLgytat0ZR9lJz5GPYiHy2UA1ZbA/d5LWykvKJCyGXDCTcYMkb4Hm
- 43ELV9NJEGq5CQ9qdzn6URmMH80JThU=
+ bh=Eybeycl+Mdd0uyU/fVDKSh323lQWcR1DmZZ34tMwi+A=;
+ b=Mf5fRUoXAeQ+9j793NXPMJHtwGu+cDJNX7dYwOtxw5qv2KBYvWcw07ya+DW1ObeVDgjqv7
+ a+yAq8oVrevRFJXEaqVebIs0dKGe1LOv05F2zwYUGZD21SnKqDPiG1B3wzCSxWrT8veNMV
+ fw8xw3dAVc9dzGX1WjSAsDeEELtnAS8=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-361-p4x3Qlo_MS6XbmYlbZtcUQ-1; Wed, 23 Oct 2019 13:34:36 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+ us-mta-354-cm98ngysNjO3AXe0jT2EwQ-1; Wed, 23 Oct 2019 13:35:05 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EF68E107AD34;
- Wed, 23 Oct 2019 17:34:33 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 33ADC800D62;
+ Wed, 23 Oct 2019 17:35:03 +0000 (UTC)
 Received: from localhost (ovpn-112-21.ams2.redhat.com [10.36.112.21])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 115FD19C78;
- Wed, 23 Oct 2019 17:34:30 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 9CD516061E;
+ Wed, 23 Oct 2019 17:34:55 +0000 (UTC)
 From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v3 22/33] etraxfs: remove PROP_PTR usage
-Date: Wed, 23 Oct 2019 19:31:43 +0200
-Message-Id: <20191023173154.30051-23-marcandre.lureau@redhat.com>
+Subject: [PATCH v3 27/33] cris: improve passing PIC interrupt vector to the CPU
+Date: Wed, 23 Oct 2019 19:31:48 +0200
+Message-Id: <20191023173154.30051-28-marcandre.lureau@redhat.com>
 In-Reply-To: <20191023173154.30051-1-marcandre.lureau@redhat.com>
 References: <20191023173154.30051-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-MC-Unique: p4x3Qlo_MS6XbmYlbZtcUQ-1
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-MC-Unique: cm98ngysNjO3AXe0jT2EwQ-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.81
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -105,121 +106,145 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-etraxfs_dma_client are not Object, so can't be exposed to user with
-QOM path. Let's remove property usage and move the constructor to the
-.c unit, simplifying some code on the way.
+Instead of accessing cpu interrupt vector directly from PIC, send the
+vector value over the qemu_irq.
 
+Suggested-by: Peter Maydell <peter.maydell@linaro.org>
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 ---
- hw/net/etraxfs_eth.c      | 44 +++++++++++++++++++++++++++++----------
- include/hw/cris/etraxfs.h | 20 +++---------------
- 2 files changed, 36 insertions(+), 28 deletions(-)
+ hw/cris/axis_dev88.c  |  4 ----
+ hw/intc/etraxfs_pic.c | 26 +-------------------------
+ target/cris/cpu.c     |  8 ++++++++
+ target/cris/cpu.h     |  1 +
+ 4 files changed, 10 insertions(+), 29 deletions(-)
 
-diff --git a/hw/net/etraxfs_eth.c b/hw/net/etraxfs_eth.c
-index 4cfbf1135a..f30d963487 100644
---- a/hw/net/etraxfs_eth.c
-+++ b/hw/net/etraxfs_eth.c
-@@ -338,14 +338,8 @@ typedef struct ETRAXFSEthState
-     uint8_t macaddr[2][6];
-     uint32_t regs[FS_ETH_MAX_REGS];
+diff --git a/hw/cris/axis_dev88.c b/hw/cris/axis_dev88.c
+index 940c7dd122..be7760476a 100644
+--- a/hw/cris/axis_dev88.c
++++ b/hw/cris/axis_dev88.c
+@@ -253,7 +253,6 @@ void axisdev88_init(MachineState *machine)
+     const char *kernel_filename =3D machine->kernel_filename;
+     const char *kernel_cmdline =3D machine->kernel_cmdline;
+     CRISCPU *cpu;
+-    CPUCRISState *env;
+     DeviceState *dev;
+     SysBusDevice *s;
+     DriveInfo *nand;
+@@ -267,7 +266,6 @@ void axisdev88_init(MachineState *machine)
 =20
--    union {
--        void *vdma_out;
--        struct etraxfs_dma_client *dma_out;
--    };
--    union {
--        void *vdma_in;
--        struct etraxfs_dma_client *dma_in;
--    };
-+    struct etraxfs_dma_client *dma_out;
-+    struct etraxfs_dma_client *dma_in;
+     /* init CPUs */
+     cpu =3D CRIS_CPU(cpu_create(machine->cpu_type));
+-    env =3D &cpu->env;
 =20
-     /* MDIO bus.  */
-     struct qemu_mdio mdio_bus;
-@@ -635,8 +629,6 @@ static void etraxfs_eth_realize(DeviceState *dev, Error=
- **errp)
+     /* allocate RAM */
+     memory_region_allocate_system_memory(phys_ram, NULL, "axisdev88.ram",
+@@ -297,8 +295,6 @@ void axisdev88_init(MachineState *machine)
 =20
- static Property etraxfs_eth_properties[] =3D {
-     DEFINE_PROP_UINT32("phyaddr", ETRAXFSEthState, phyaddr, 1),
--    DEFINE_PROP_PTR("dma_out", ETRAXFSEthState, vdma_out),
--    DEFINE_PROP_PTR("dma_in", ETRAXFSEthState, vdma_in),
-     DEFINE_NIC_PROPERTIES(ETRAXFSEthState, conf),
-     DEFINE_PROP_END_OF_LIST(),
- };
-@@ -648,10 +640,40 @@ static void etraxfs_eth_class_init(ObjectClass *klass=
-, void *data)
-     dc->realize =3D etraxfs_eth_realize;
-     dc->reset =3D etraxfs_eth_reset;
-     dc->props =3D etraxfs_eth_properties;
--    /* Reason: pointer properties "dma_out", "dma_in" */
-+    /* Reason: dma_out, dma_in are not user settable */
-     dc->user_creatable =3D false;
+=20
+     dev =3D qdev_create(NULL, "etraxfs,pic");
+-    /* FIXME: Is there a proper way to signal vectors to the CPU core?  */
+-    qdev_prop_set_ptr(dev, "interrupt_vector", &env->interrupt_vector);
+     qdev_init_nofail(dev);
+     s =3D SYS_BUS_DEVICE(dev);
+     sysbus_mmio_map(s, 0, 0x3001c000);
+diff --git a/hw/intc/etraxfs_pic.c b/hw/intc/etraxfs_pic.c
+index 77f652acec..12988c7aa9 100644
+--- a/hw/intc/etraxfs_pic.c
++++ b/hw/intc/etraxfs_pic.c
+@@ -27,8 +27,6 @@
+ #include "qemu/module.h"
+ #include "hw/irq.h"
+ #include "hw/qdev-properties.h"
+-//#include "pc.h"
+-//#include "etraxfs.h"
+=20
+ #define D(x)
+=20
+@@ -48,7 +46,6 @@ struct etrax_pic
+     SysBusDevice parent_obj;
+=20
+     MemoryRegion mmio;
+-    void *interrupt_vector;
+     qemu_irq parent_irq;
+     qemu_irq parent_nmi;
+     uint32_t regs[R_MAX];
+@@ -79,11 +76,7 @@ static void pic_update(struct etrax_pic *fs)
+         }
+     }
+=20
+-    if (fs->interrupt_vector) {
+-        /* hack alert: ptr property */
+-        *(uint32_t*)(fs->interrupt_vector) =3D vector;
+-    }
+-    qemu_set_irq(fs->parent_irq, !!vector);
++    qemu_set_irq(fs->parent_irq, vector);
  }
 =20
-+
-+/* Instantiate an ETRAXFS Ethernet MAC.  */
-+DeviceState *
-+etraxfs_eth_init(NICInfo *nd, hwaddr base, int phyaddr,
-+                 struct etraxfs_dma_client *dma_out,
-+                 struct etraxfs_dma_client *dma_in)
-+{
-+    DeviceState *dev;
-+    qemu_check_nic_model(nd, "fseth");
-+
-+    dev =3D qdev_create(NULL, "etraxfs-eth");
-+    qdev_set_nic_properties(dev, nd);
-+    qdev_prop_set_uint32(dev, "phyaddr", phyaddr);
-+
-+    /*
-+     * TODO: QOM design, define a QOM interface for "I am an etraxfs
-+     * DMA client" (which replaces the current 'struct
-+     * etraxfs_dma_client' ad-hoc interface), implement it on the
-+     * ethernet device, and then have QOM link properties on the DMA
-+     * controller device so that you can pass the interface
-+     * implementations to it.
-+     */
-+    ETRAX_FS_ETH(dev)->dma_out =3D dma_out;
-+    ETRAX_FS_ETH(dev)->dma_in =3D dma_in;
-+    qdev_init_nofail(dev);
-+    sysbus_mmio_map(SYS_BUS_DEVICE(dev), 0, base);
-+
-+    return dev;
-+}
-+
- static const TypeInfo etraxfs_eth_info =3D {
-     .name          =3D TYPE_ETRAX_FS_ETH,
-     .parent        =3D TYPE_SYS_BUS_DEVICE,
-diff --git a/include/hw/cris/etraxfs.h b/include/hw/cris/etraxfs.h
-index aa146a2cd8..403e7f95e6 100644
---- a/include/hw/cris/etraxfs.h
-+++ b/include/hw/cris/etraxfs.h
-@@ -30,23 +30,9 @@
- #include "hw/qdev-properties.h"
- #include "hw/sysbus.h"
+ static uint64_t
+@@ -163,28 +156,11 @@ static void etraxfs_pic_init(Object *obj)
+     sysbus_init_mmio(sbd, &s->mmio);
+ }
 =20
--/* Instantiate an ETRAXFS Ethernet MAC.  */
--static inline DeviceState *
--etraxfs_eth_init(NICInfo *nd, hwaddr base, int phyaddr,
--                 void *dma_out, void *dma_in)
--{
--    DeviceState *dev;
--    qemu_check_nic_model(nd, "fseth");
+-static Property etraxfs_pic_properties[] =3D {
+-    DEFINE_PROP_PTR("interrupt_vector", struct etrax_pic, interrupt_vector=
+),
+-    DEFINE_PROP_END_OF_LIST(),
+-};
 -
--    dev =3D qdev_create(NULL, "etraxfs-eth");
--    qdev_set_nic_properties(dev, nd);
--    qdev_prop_set_uint32(dev, "phyaddr", phyaddr);
--    qdev_prop_set_ptr(dev, "dma_out", dma_out);
--    qdev_prop_set_ptr(dev, "dma_in", dma_in);
--    qdev_init_nofail(dev);
--    sysbus_mmio_map(SYS_BUS_DEVICE(dev), 0, base);
--    return dev;
+-static void etraxfs_pic_class_init(ObjectClass *klass, void *data)
+-{
+-    DeviceClass *dc =3D DEVICE_CLASS(klass);
+-
+-    dc->props =3D etraxfs_pic_properties;
+-    /*
+-     * Note: pointer property "interrupt_vector" may remain null, thus
+-     * no need for dc->user_creatable =3D false;
+-     */
 -}
-+DeviceState *etraxfs_eth_init(NICInfo *nd, hwaddr base, int phyaddr,
-+                              struct etraxfs_dma_client *dma_out,
-+                              struct etraxfs_dma_client *dma_in);
+-
+ static const TypeInfo etraxfs_pic_info =3D {
+     .name          =3D TYPE_ETRAX_FS_PIC,
+     .parent        =3D TYPE_SYS_BUS_DEVICE,
+     .instance_size =3D sizeof(struct etrax_pic),
+     .instance_init =3D etraxfs_pic_init,
+-    .class_init    =3D etraxfs_pic_class_init,
+ };
 =20
- static inline DeviceState *etraxfs_ser_create(hwaddr addr,
-                                               qemu_irq irq,
+ static void etraxfs_pic_register_types(void)
+diff --git a/target/cris/cpu.c b/target/cris/cpu.c
+index 7adfd6caf4..6a857f548d 100644
+--- a/target/cris/cpu.c
++++ b/target/cris/cpu.c
+@@ -147,6 +147,14 @@ static void cris_cpu_set_irq(void *opaque, int irq, in=
+t level)
+     CPUState *cs =3D CPU(cpu);
+     int type =3D irq =3D=3D CRIS_CPU_IRQ ? CPU_INTERRUPT_HARD : CPU_INTERR=
+UPT_NMI;
+=20
++    if (irq =3D=3D CRIS_CPU_IRQ) {
++        /*
++         * The PIC passes us the vector for the IRQ as the value it sends
++         * over the qemu_irq line
++         */
++        cpu->env.interrupt_vector =3D level;
++    }
++
+     if (level) {
+         cpu_interrupt(cs, type);
+     } else {
+diff --git a/target/cris/cpu.h b/target/cris/cpu.h
+index aba0a66474..a7c2a8e15b 100644
+--- a/target/cris/cpu.h
++++ b/target/cris/cpu.h
+@@ -34,6 +34,7 @@
+ #define CPU_INTERRUPT_NMI       CPU_INTERRUPT_TGT_EXT_3
+=20
+ /* CRUS CPU device objects interrupt lines.  */
++/* PIC passes the vector for the IRQ as the value of it sends over qemu_ir=
+q */
+ #define CRIS_CPU_IRQ 0
+ #define CRIS_CPU_NMI 1
+=20
 --=20
 2.23.0.606.g08da6496b6
 
