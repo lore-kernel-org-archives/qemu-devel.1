@@ -2,77 +2,53 @@ Return-Path: <SRS0=brme=YQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 26DFBCA9EB6
-	for <qemu-devel@archiver.kernel.org>; Wed, 23 Oct 2019 10:38:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B0F43CA9EB7
+	for <qemu-devel@archiver.kernel.org>; Wed, 23 Oct 2019 10:40:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E4ABD2064A
-	for <qemu-devel@archiver.kernel.org>; Wed, 23 Oct 2019 10:38:02 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="baVmfWeP"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E4ABD2064A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 8AC782064A
+	for <qemu-devel@archiver.kernel.org>; Wed, 23 Oct 2019 10:40:22 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8AC782064A
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=rt-rk.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60072 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60088 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iNE1h-0008S8-Ps
-	for qemu-devel@archiver.kernel.org; Wed, 23 Oct 2019 06:38:01 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40596)
+	id 1iNE3x-0001mT-EC
+	for qemu-devel@archiver.kernel.org; Wed, 23 Oct 2019 06:40:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42920)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <stefanha@redhat.com>) id 1iNDYV-0005cW-De
- for qemu-devel@nongnu.org; Wed, 23 Oct 2019 06:07:53 -0400
+ (envelope-from <aleksandar.markovic@rt-rk.com>) id 1iNDpv-0000yU-0I
+ for qemu-devel@nongnu.org; Wed, 23 Oct 2019 06:25:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <stefanha@redhat.com>) id 1iNDYQ-0003VO-Pn
- for qemu-devel@nongnu.org; Wed, 23 Oct 2019 06:07:50 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:33010
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <aleksandar.markovic@rt-rk.com>) id 1iNDpp-0002wF-Bx
+ for qemu-devel@nongnu.org; Wed, 23 Oct 2019 06:25:47 -0400
+Received: from mx2.rt-rk.com ([89.216.37.149]:45049 helo=mail.rt-rk.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1iNDYO-0003S6-JF
- for qemu-devel@nongnu.org; Wed, 23 Oct 2019 06:07:44 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1571825263;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=372NNTcYnSIQBMgZ5qLgMiK1FMNHd9cWDMz+HfJfX38=;
- b=baVmfWePoKv+K5NaAezBlUcndLnhECBFWXxBh6RVfZr8wl3LU11PffjNtfpoxajvktyPqJ
- tbs1s1+teOdywQAvPRizDP9XSwiYPhHASb+sff/nF+yQrLecOH1i1/EPb0lsofOCXd7na4
- GKUt/nGxMPzGrFSGJ5vDdo66CEue280=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-76-tmfB42kUNLCS01B_CPvpXA-1; Wed, 23 Oct 2019 06:07:42 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 08E0047B;
- Wed, 23 Oct 2019 10:07:41 +0000 (UTC)
-Received: from localhost (unknown [10.36.118.70])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 7DC7D1001E75;
- Wed, 23 Oct 2019 10:07:28 +0000 (UTC)
-From: Stefan Hajnoczi <stefanha@redhat.com>
+ (Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
+ id 1iNDpo-0002Ue-9c
+ for qemu-devel@nongnu.org; Wed, 23 Oct 2019 06:25:44 -0400
+Received: from localhost (localhost [127.0.0.1])
+ by mail.rt-rk.com (Postfix) with ESMTP id 31B691A21C8;
+ Wed, 23 Oct 2019 12:24:37 +0200 (CEST)
+X-Virus-Scanned: amavisd-new at rt-rk.com
+Received: from rtrkw774-lin.domain.local (rtrkw774-lin.domain.local
+ [10.10.14.106])
+ by mail.rt-rk.com (Postfix) with ESMTPSA id F0EF11A22A1;
+ Wed, 23 Oct 2019 12:23:58 +0200 (CEST)
+From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v4 14/16] libqos: make the virtio-pci BAR index configurable
-Date: Wed, 23 Oct 2019 11:04:23 +0100
-Message-Id: <20191023100425.12168-15-stefanha@redhat.com>
-In-Reply-To: <20191023100425.12168-1-stefanha@redhat.com>
-References: <20191023100425.12168-1-stefanha@redhat.com>
-MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-MC-Unique: tmfB42kUNLCS01B_CPvpXA-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 205.139.110.120
+Subject: [PATCH v7 00/14] target/mips: Misc cleanups for September/October 2019
+Date: Wed, 23 Oct 2019 12:23:33 +0200
+Message-Id: <1571826227-10583-1-git-send-email-aleksandar.markovic@rt-rk.com>
+X-Mailer: git-send-email 2.7.4
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [fuzzy]
+X-Received-From: 89.216.37.149
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -84,70 +60,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Laurent Vivier <lvivier@redhat.com>,
- Thomas Huth <thuth@redhat.com>, qemu-block@nongnu.org, slp@redhat.com,
- "Michael S. Tsirkin" <mst@redhat.com>, Cornelia Huck <cohuck@redhat.com>,
- Stefan Hajnoczi <stefanha@redhat.com>,
- Christophe de Dinechin <dinechin@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Richard Henderson <rth@twiddle.net>
+Cc: aleksandar.rikalo@rt-rk.com, Aleksandar Markovic <amarkovic@wavecomp.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The Legacy virtio-pci interface always uses BAR 0.  VIRTIO 1.0 may need
-to use a different BAR index, so make it configurable.
+From: Aleksandar Markovic <amarkovic@wavecomp.com>
 
-Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
-Reviewed-by: Thomas Huth <thuth@redhat.com>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
----
-v3:
- * Change uint8_t bar_idx to int [Thomas]
----
- tests/libqos/virtio-pci.h | 2 ++
- tests/libqos/virtio-pci.c | 3 ++-
- 2 files changed, 4 insertions(+), 1 deletion(-)
+Mostly cosmetic changes.
 
-diff --git a/tests/libqos/virtio-pci.h b/tests/libqos/virtio-pci.h
-index 0e4a8b7b00..78a1c15c2a 100644
---- a/tests/libqos/virtio-pci.h
-+++ b/tests/libqos/virtio-pci.h
-@@ -25,6 +25,8 @@ typedef struct QVirtioPCIDevice {
-     uint16_t config_msix_entry;
-     uint64_t config_msix_addr;
-     uint32_t config_msix_data;
-+
-+    int bar_idx;
- } QVirtioPCIDevice;
-=20
- struct QVirtioPCIMSIXOps {
-diff --git a/tests/libqos/virtio-pci.c b/tests/libqos/virtio-pci.c
-index c900742f96..e9595603f5 100644
---- a/tests/libqos/virtio-pci.c
-+++ b/tests/libqos/virtio-pci.c
-@@ -310,7 +310,7 @@ static const QVirtioPCIMSIXOps qvirtio_pci_msix_ops_leg=
-acy =3D {
- void qvirtio_pci_device_enable(QVirtioPCIDevice *d)
- {
-     qpci_device_enable(d->pdev);
--    d->bar =3D qpci_iomap(d->pdev, 0, NULL);
-+    d->bar =3D qpci_iomap(d->pdev, d->bar_idx, NULL);
- }
-=20
- void qvirtio_pci_device_disable(QVirtioPCIDevice *d)
-@@ -400,6 +400,7 @@ static void qvirtio_pci_init_from_pcidev(QVirtioPCIDevi=
-ce *dev, QPCIDevice *pci_
- {
-     dev->pdev =3D pci_dev;
-     dev->vdev.device_type =3D qpci_config_readw(pci_dev, PCI_SUBSYSTEM_ID)=
-;
-+    dev->bar_idx =3D 0;
-=20
-     dev->config_msix_entry =3D -1;
-     dev->msix_ops =3D &qvirtio_pci_msix_ops_legacy;
---=20
-2.21.0
+v6->v7:
+
+  - minor corrections in commit messages
+  - added patches 13 and 14
+
+v5->v6:
+
+  - minor corrections (r-b, t-b marks) in commit messages
+  - added patches 11 and 12
+
+v4->v5:
+
+  - minor correction in patch on helper.c
+  - added patches 9 and 10
+
+v3->v4:
+
+  - added patches 7 and 8
+
+v2->v3:
+
+  - removed all patches that were already integrated
+  - patches 1 and 2 are improved from v2
+  - added patches 3-6
+
+v1->v2:
+
+  - minor corrections to satisfy reviews
+  - added several more patches
+
+Aleksandar Markovic (14):
+  target/mips: Clean up helper.c
+  target/mips: Clean up op_helper.c
+  MAINTAINERS: Update mail address of Aleksandar Rikalo
+  target/mips: msa: Split helpers for <MAX|MIN>_A.<B|H|W|D>
+  target/mips: msa: Split helpers for <MAX|MIN>_<S|U>.<B|H|W|D>
+  target/mips: msa: Split helpers for ILV<EV|OD|L|R>.<B|H|W|D>
+  target/mips: msa: Split helpers for ADD<_A|S_A|S_S|S_U|V>.<B|H|W|D>
+  target/mips: msa: Split helpers for HADD_<S|U>.<H|W|D>
+  target/mips: msa: Split helpers for S<LL|RA|RAR|RL|RLR>.<B|H|W|D>
+  target/mips: msa: Split helpers for PCK<EV|OD>.<B|H|W|D>
+  target/mips: msa: Split helpers for HSUB_<S|U>.<H|W|D>
+  target/mips: msa: Split helpers for ASUB_<S|U>.<B|H|W|D>
+  target/mips: Add support for emulation of CRC32 group of instructions
+  target/mips: Demacro LMI decoder
+
+ .mailmap                 |    5 +-
+ MAINTAINERS              |   18 +-
+ disas/mips.c             |    8 +
+ target/mips/helper.c     |  123 +-
+ target/mips/helper.h     |  157 +-
+ target/mips/msa_helper.c | 4583 ++++++++++++++++++++++++++++++----------------
+ target/mips/op_helper.c  | 1032 +++++++----
+ target/mips/translate.c  |  800 ++++++--
+ 8 files changed, 4565 insertions(+), 2161 deletions(-)
+
+-- 
+2.7.4
 
 
