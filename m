@@ -2,58 +2,77 @@ Return-Path: <SRS0=brme=YQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 96E76CA9EB9
-	for <qemu-devel@archiver.kernel.org>; Wed, 23 Oct 2019 04:31:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2270DCA9EAE
+	for <qemu-devel@archiver.kernel.org>; Wed, 23 Oct 2019 05:54:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 626C12064A
-	for <qemu-devel@archiver.kernel.org>; Wed, 23 Oct 2019 04:31:21 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 626C12064A
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTPS id E1CC4214B2
+	for <qemu-devel@archiver.kernel.org>; Wed, 23 Oct 2019 05:54:47 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ab5x/m4N"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E1CC4214B2
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53254 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54548 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iN8Iq-0008Tt-F7
-	for qemu-devel@archiver.kernel.org; Wed, 23 Oct 2019 00:31:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56871)
+	id 1iN9bb-0000a0-2P
+	for qemu-devel@archiver.kernel.org; Wed, 23 Oct 2019 01:54:47 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34615)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <cenjiahui@huawei.com>) id 1iN8IA-00082P-Pk
- for qemu-devel@nongnu.org; Wed, 23 Oct 2019 00:30:39 -0400
+ (envelope-from <kraxel@redhat.com>) id 1iN9ad-0008Hk-N8
+ for qemu-devel@nongnu.org; Wed, 23 Oct 2019 01:53:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <cenjiahui@huawei.com>) id 1iN8I9-0005kc-EJ
- for qemu-devel@nongnu.org; Wed, 23 Oct 2019 00:30:38 -0400
-Received: from szxga04-in.huawei.com ([45.249.212.190]:2181 helo=huawei.com)
+ (envelope-from <kraxel@redhat.com>) id 1iN9ab-0005l8-4a
+ for qemu-devel@nongnu.org; Wed, 23 Oct 2019 01:53:45 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:43679
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <cenjiahui@huawei.com>)
- id 1iN8I9-0005hG-30
- for qemu-devel@nongnu.org; Wed, 23 Oct 2019 00:30:37 -0400
-Received: from DGGEMS403-HUB.china.huawei.com (unknown [172.30.72.59])
- by Forcepoint Email with ESMTP id 2AB8EFCEF0CF53FA6933;
- Wed, 23 Oct 2019 12:30:32 +0800 (CST)
-Received: from localhost (10.173.220.89) by DGGEMS403-HUB.china.huawei.com
- (10.3.19.203) with Microsoft SMTP Server id 14.3.439.0; Wed, 23 Oct 2019
- 12:30:26 +0800
-From: cenjiahui <cenjiahui@huawei.com>
-To: <quintela@redhat.com>, <dgilbert@redhat.com>
-Subject: [PATCH 1/3] migration/multifd: fix nullptr access in terminating
- multifd threads
-Date: Wed, 23 Oct 2019 12:30:02 +0800
-Message-ID: <20191023043002.8788-1-cenjiahui@huawei.com>
-X-Mailer: git-send-email 2.22.1
-MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.173.220.89]
-X-CFilter-Loop: Reflected
+ (Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1iN9aa-0005ik-Hr
+ for qemu-devel@nongnu.org; Wed, 23 Oct 2019 01:53:45 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1571810022;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=8469xb+2VuQlLPmjABSkRF0IvDPs/aiFrqjE7+Fyd4I=;
+ b=Ab5x/m4NBV41Whwhji9lcE7Ji898+iTJeQcEOEmcB/2S+H5Tc3XyVEGzMymyYJQHn08dul
+ 4ncgVzlvutuyyn0NXzJjOLl3NT/06x3vCN90KVNTWSlQJI0viBqYIINOP0Ps0NvpS8IXsb
+ Uuhp0XEfOLler+zg8U+/7bibCiiSKfk=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-13-z7VoON_0NWWLJyjJc4tKhA-1; Wed, 23 Oct 2019 01:53:40 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 21244800D54
+ for <qemu-devel@nongnu.org>; Wed, 23 Oct 2019 05:53:40 +0000 (UTC)
+Received: from sirius.home.kraxel.org (ovpn-116-43.ams2.redhat.com
+ [10.36.116.43])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id A7E165DA8D;
+ Wed, 23 Oct 2019 05:53:37 +0000 (UTC)
+Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
+ id BDD469D69; Wed, 23 Oct 2019 07:53:36 +0200 (CEST)
+From: Gerd Hoffmann <kraxel@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH] paaudio: add missing break
+Date: Wed, 23 Oct 2019 07:53:36 +0200
+Message-Id: <20191023055336.21809-1-kraxel@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-MC-Unique: z7VoON_0NWWLJyjJc4tKhA-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=WINDOWS-1252
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 45.249.212.190
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -65,79 +84,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: fangying1@huawei.com, Jiahui Cen <cenjiahui@huawei.com>,
- qemu-devel@nongnu.org, peterx@redhat.com, zhouyibo3@huawei.com
+Cc: Gerd Hoffmann <kraxel@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Jiahui Cen <cenjiahui@huawei.com>
+CID 1406449
 
-One multifd channel will shutdown all the other multifd's IOChannel when =
-it
-fails to receive an IOChannel. In this senario, if some multifds had not
-received its IOChannel yet, it would try to shutdown its IOChannel which =
-could
-cause nullptr access at qio_channel_shutdown.
-
-Here is the coredump stack:
-    #0  object_get_class (obj=3Dobj@entry=3D0x0) at qom/object.c:908
-    #1  0x00005563fdbb8f4a in qio_channel_shutdown (ioc=3D0x0, how=3DQIO_=
-CHANNEL_SHUTDOWN_BOTH, errp=3D0x0) at io/channel.c:355
-    #2  0x00005563fd7b4c5f in multifd_recv_terminate_threads (err=3D<opti=
-mized out>) at migration/ram.c:1280
-    #3  0x00005563fd7bc019 in multifd_recv_new_channel (ioc=3Dioc@entry=3D=
-0x556400255610, errp=3Derrp@entry=3D0x7ffec07dce00) at migration/ram.c:14=
-78
-    #4  0x00005563fda82177 in migration_ioc_process_incoming (ioc=3Dioc@e=
-ntry=3D0x556400255610, errp=3Derrp@entry=3D0x7ffec07dce30) at migration/m=
-igration.c:605
-    #5  0x00005563fda8567d in migration_channel_process_incoming (ioc=3D0=
-x556400255610) at migration/channel.c:44
-    #6  0x00005563fda83ee0 in socket_accept_incoming_migration (listener=3D=
-0x5563fff6b920, cioc=3D0x556400255610, opaque=3D<optimized out>) at migra=
-tion/socket.c:166
-    #7  0x00005563fdbc25cd in qio_net_listener_channel_func (ioc=3D<optim=
-ized out>, condition=3D<optimized out>, opaque=3D<optimized out>) at io/n=
-et-listener.c:54
-    #8  0x00007f895b6fe9a9 in g_main_context_dispatch () from /usr/lib64/=
-libglib-2.0.so.0
-    #9  0x00005563fdc18136 in glib_pollfds_poll () at util/main-loop.c:21=
-8
-    #10 0x00005563fdc181b5 in os_host_main_loop_wait (timeout=3D100000000=
-0) at util/main-loop.c:241
-    #11 0x00005563fdc183a2 in main_loop_wait (nonblocking=3Dnonblocking@e=
-ntry=3D0) at util/main-loop.c:517
-    #12 0x00005563fd8edb37 in main_loop () at vl.c:1791
-    #13 0x00005563fd74fd45 in main (argc=3D<optimized out>, argv=3D<optim=
-ized out>, envp=3D<optimized out>) at vl.c:4473
-
-To fix it up, let's check p->c before calling qio_channel_shutdown.
-
-Signed-off-by: Jiahui Cen <cenjiahui@huawei.com>
-Signed-off-by: Ying Fang <fangying1@huawei.com>
+Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
 ---
- migration/ram.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+ audio/paaudio.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/migration/ram.c b/migration/ram.c
-index 5078f94..dc63692 100644
---- a/migration/ram.c
-+++ b/migration/ram.c
-@@ -1280,7 +1280,9 @@ static void multifd_recv_terminate_threads(Error *e=
-rr)
-            - normal quit, i.e. everything went fine, just finished
-            - error quit: We close the channels so the channel threads
-              finish the qio_channel_read_all_eof() */
--        qio_channel_shutdown(p->c, QIO_CHANNEL_SHUTDOWN_BOTH, NULL);
-+        if (p->c) {
-+            qio_channel_shutdown(p->c, QIO_CHANNEL_SHUTDOWN_BOTH, NULL);
-+        }
-         qemu_mutex_unlock(&p->mutex);
-     }
- }
+diff --git a/audio/paaudio.c b/audio/paaudio.c
+index df541a72d3a9..55a91f898073 100644
+--- a/audio/paaudio.c
++++ b/audio/paaudio.c
+@@ -385,6 +385,7 @@ static pa_stream *qpa_simple_new (
+         map.map[5] =3D PA_CHANNEL_POSITION_REAR_RIGHT;
+         map.map[6] =3D PA_CHANNEL_POSITION_SIDE_LEFT;
+         map.map[7] =3D PA_CHANNEL_POSITION_SIDE_RIGHT;
++        break;
+=20
+     default:
+         dolog("Internal error: unsupported channel count %d\n", ss->channe=
+ls);
 --=20
-1.8.3.1
-
+2.18.1
 
 
