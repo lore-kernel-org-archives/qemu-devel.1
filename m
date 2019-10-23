@@ -4,76 +4,77 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 50D6BCA9EB9
-	for <qemu-devel@archiver.kernel.org>; Wed, 23 Oct 2019 18:57:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 160B5CA9EB9
+	for <qemu-devel@archiver.kernel.org>; Wed, 23 Oct 2019 18:59:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1BB0621928
-	for <qemu-devel@archiver.kernel.org>; Wed, 23 Oct 2019 18:57:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D32D12084C
+	for <qemu-devel@archiver.kernel.org>; Wed, 23 Oct 2019 18:59:10 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dG22qFIc"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1BB0621928
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Kp5cFQ+8"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D32D12084C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44066 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44120 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iNLou-0006WK-4K
-	for qemu-devel@archiver.kernel.org; Wed, 23 Oct 2019 14:57:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58848)
+	id 1iNLqe-0008Ar-HF
+	for qemu-devel@archiver.kernel.org; Wed, 23 Oct 2019 14:59:08 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60265)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <marcandre.lureau@redhat.com>) id 1iNKVF-0003Yq-Tv
- for qemu-devel@nongnu.org; Wed, 23 Oct 2019 13:32:59 -0400
+ (envelope-from <marcandre.lureau@redhat.com>) id 1iNKYK-0006W7-23
+ for qemu-devel@nongnu.org; Wed, 23 Oct 2019 13:36:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <marcandre.lureau@redhat.com>) id 1iNKVC-0001dC-VB
- for qemu-devel@nongnu.org; Wed, 23 Oct 2019 13:32:56 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:29815
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <marcandre.lureau@redhat.com>) id 1iNKYE-0002yz-3w
+ for qemu-devel@nongnu.org; Wed, 23 Oct 2019 13:36:05 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:46701
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
- id 1iNKVC-0001cZ-RT
- for qemu-devel@nongnu.org; Wed, 23 Oct 2019 13:32:54 -0400
+ id 1iNKY8-0002wm-D6
+ for qemu-devel@nongnu.org; Wed, 23 Oct 2019 13:35:58 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1571851971;
+ s=mimecast20190719; t=1571852153;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=erhtuldwyK3E+RzzrVrDprCGejZBAHO61QUqKFkdfAk=;
- b=dG22qFIcLj67y7xp+me9hIDc/Bb12Wz771k0Vl0c2Ye8+Ddfb3yNQdC1VxAhaE7z9OpYPk
- 8EabNW9zdLV/Ib3mdMPGA8+lrIYckceoyQtJUK872VA6DVtlmV1E7BK2PJi0wGf3byCb0R
- h/WbVs8FcPzZxJ+GkTHUf1Dtpu5Gnis=
+ bh=UfiNxxYjH3sYEO1mfbxHgayQzvy7QgMJpTON/ahYwLE=;
+ b=Kp5cFQ+8UdaWQFq4Hark5xFVRSuvIaEGfU35C8XBs28O+xrrYSvdKk0UMKMFju7RznBNeK
+ zr/zjaXrk9LHQK6MP4D7tmhSWr8D6YMM63+FkkLLrQrZ8JNkf8fue9clYrrSOIW6HUlc8m
+ OE8tIaXP3py9emBaQ3FkpogTKDq+F3Q=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-319-AG7nAZJIM1C5TrTsB32LxA-1; Wed, 23 Oct 2019 13:32:43 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
+ us-mta-274-CBcB3M0VN4G3EIEOra0ZtQ-1; Wed, 23 Oct 2019 13:35:50 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id F31DA801E72;
- Wed, 23 Oct 2019 17:32:39 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E200F1800E01;
+ Wed, 23 Oct 2019 17:35:47 +0000 (UTC)
 Received: from localhost (ovpn-112-21.ams2.redhat.com [10.36.112.21])
- by smtp.corp.redhat.com (Postfix) with ESMTP id EF47D60C63;
- Wed, 23 Oct 2019 17:32:14 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 47FD2196B2;
+ Wed, 23 Oct 2019 17:35:42 +0000 (UTC)
 From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v3 02/33] sysbus: remove unused sysbus_try_create*
-Date: Wed, 23 Oct 2019 19:31:23 +0200
-Message-Id: <20191023173154.30051-3-marcandre.lureau@redhat.com>
+Subject: [PATCH v3 33/33] qdev: remove QDEV_PROP_PTR
+Date: Wed, 23 Oct 2019 19:31:54 +0200
+Message-Id: <20191023173154.30051-34-marcandre.lureau@redhat.com>
 In-Reply-To: <20191023173154.30051-1-marcandre.lureau@redhat.com>
 References: <20191023173154.30051-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-MC-Unique: AG7nAZJIM1C5TrTsB32LxA-1
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-MC-Unique: CBcB3M0VN4G3EIEOra0ZtQ-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.120
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -105,99 +106,101 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+No longer used in the tree. The comment about user_creatable is still
+quite relevant, but there is already a similar comment in qdev-core.h.
+
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 ---
- hw/core/sysbus.c    | 32 --------------------------------
- hw/i386/pc.c        |  1 -
- include/hw/sysbus.h |  9 +--------
- 3 files changed, 1 insertion(+), 41 deletions(-)
+ hw/core/qdev-properties.c    | 18 ------------------
+ include/hw/qdev-properties.h | 22 ----------------------
+ 2 files changed, 40 deletions(-)
 
-diff --git a/hw/core/sysbus.c b/hw/core/sysbus.c
-index 9e69c83aed..08b0311c5f 100644
---- a/hw/core/sysbus.c
-+++ b/hw/core/sysbus.c
-@@ -250,38 +250,6 @@ DeviceState *sysbus_create_varargs(const char *name,
-     return dev;
+diff --git a/hw/core/qdev-properties.c b/hw/core/qdev-properties.c
+index be4cb01f0b..6271169d7d 100644
+--- a/hw/core/qdev-properties.c
++++ b/hw/core/qdev-properties.c
+@@ -469,13 +469,6 @@ const PropertyInfo qdev_prop_string =3D {
+     .set   =3D set_string,
+ };
+=20
+-/* --- pointer --- */
+-
+-/* Not a proper property, just for dirty hacks.  TODO Remove it!  */
+-const PropertyInfo qdev_prop_ptr =3D {
+-    .name  =3D "ptr",
+-};
+-
+ /* --- mac address --- */
+=20
+ /*
+@@ -1133,17 +1126,6 @@ void qdev_prop_set_enum(DeviceState *dev, const char=
+ *name, int value)
+                             name, &error_abort);
  }
 =20
--DeviceState *sysbus_try_create_varargs(const char *name,
--                                       hwaddr addr, ...)
+-void qdev_prop_set_ptr(DeviceState *dev, const char *name, void *value)
 -{
--    DeviceState *dev;
--    SysBusDevice *s;
--    va_list va;
--    qemu_irq irq;
--    int n;
+-    Property *prop;
+-    void **ptr;
 -
--    dev =3D qdev_try_create(NULL, name);
--    if (!dev) {
--        return NULL;
--    }
--    s =3D SYS_BUS_DEVICE(dev);
--    qdev_init_nofail(dev);
--    if (addr !=3D (hwaddr)-1) {
--        sysbus_mmio_map(s, 0, addr);
--    }
--    va_start(va, addr);
--    n =3D 0;
--    while (1) {
--        irq =3D va_arg(va, qemu_irq);
--        if (!irq) {
--            break;
--        }
--        sysbus_connect_irq(s, n, irq);
--        n++;
--    }
--    va_end(va);
--    return dev;
+-    prop =3D qdev_prop_find(dev, name);
+-    assert(prop && prop->info =3D=3D &qdev_prop_ptr);
+-    ptr =3D qdev_get_prop_ptr(dev, prop);
+-    *ptr =3D value;
 -}
 -
- static void sysbus_dev_print(Monitor *mon, DeviceState *dev, int indent)
+ static GPtrArray *global_props(void)
  {
-     SysBusDevice *s =3D SYS_BUS_DEVICE(dev);
-diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-index 4b1904237e..00ee16ccab 100644
---- a/hw/i386/pc.c
-+++ b/hw/i386/pc.c
-@@ -1902,7 +1902,6 @@ void pc_basic_device_init(ISABus *isa_bus, qemu_irq *=
-gsi,
-      * when the HPET wants to take over. Thus we have to disable the latte=
-r.
-      */
-     if (!no_hpet && (!kvm_irqchip_in_kernel() || kvm_has_pit_state2())) {
--        /* In order to set property, here not using sysbus_try_create_simp=
-le */
-         hpet =3D qdev_try_create(NULL, TYPE_HPET);
-         if (hpet) {
-             /* For pc-piix-*, hpet's intcap is always IRQ2. For pc-q35-1.7
-diff --git a/include/hw/sysbus.h b/include/hw/sysbus.h
-index 27e80881da..2eb0484388 100644
---- a/include/hw/sysbus.h
-+++ b/include/hw/sysbus.h
-@@ -117,8 +117,7 @@ void foreach_dynamic_sysbus_device(FindSysbusDeviceFunc=
- *func, void *opaque);
- /* Legacy helper function for creating devices.  */
- DeviceState *sysbus_create_varargs(const char *name,
-                                  hwaddr addr, ...);
--DeviceState *sysbus_try_create_varargs(const char *name,
--                                       hwaddr addr, ...);
-+
- static inline DeviceState *sysbus_create_simple(const char *name,
-                                               hwaddr addr,
-                                               qemu_irq irq)
-@@ -126,11 +125,5 @@ static inline DeviceState *sysbus_create_simple(const =
-char *name,
-     return sysbus_create_varargs(name, addr, irq, NULL);
- }
+     static GPtrArray *gp;
+diff --git a/include/hw/qdev-properties.h b/include/hw/qdev-properties.h
+index 5bba033b7b..a708c3870b 100644
+--- a/include/hw/qdev-properties.h
++++ b/include/hw/qdev-properties.h
+@@ -17,7 +17,6 @@ extern const PropertyInfo qdev_prop_size;
+ extern const PropertyInfo qdev_prop_string;
+ extern const PropertyInfo qdev_prop_chr;
+ extern const PropertyInfo qdev_prop_tpm;
+-extern const PropertyInfo qdev_prop_ptr;
+ extern const PropertyInfo qdev_prop_macaddr;
+ extern const PropertyInfo qdev_prop_on_off_auto;
+ extern const PropertyInfo qdev_prop_losttickpolicy;
+@@ -168,25 +167,6 @@ extern const PropertyInfo qdev_prop_pcie_link_width;
+ #define DEFINE_PROP_PCI_DEVFN(_n, _s, _f, _d)                   \
+     DEFINE_PROP_SIGNED(_n, _s, _f, _d, qdev_prop_pci_devfn, int32_t)
 =20
--static inline DeviceState *sysbus_try_create_simple(const char *name,
--                                                    hwaddr addr,
--                                                    qemu_irq irq)
--{
--    return sysbus_try_create_varargs(name, addr, irq, NULL);
--}
+-/*
+- * Please avoid pointer properties.  If you must use them, you must
+- * cover them in their device's class init function as follows:
+- *
+- * - If the property must be set, the device cannot be used with
+- *   device_add, so add code like this:
+- *   |* Reason: pointer property "NAME-OF-YOUR-PROP" *|
+- *   DeviceClass *dc =3D DEVICE_CLASS(class);
+- *   dc->user_creatable =3D false;
+- *
+- * - If the property may safely remain null, document it like this:
+- *   |*
+- *    * Note: pointer property "interrupt_vector" may remain null, thus
+- *    * no need for dc->user_creatable =3D false;
+- *    *|
+- */
+-#define DEFINE_PROP_PTR(_n, _s, _f)             \
+-    DEFINE_PROP(_n, _s, _f, qdev_prop_ptr, void*)
+-
+ #define DEFINE_PROP_CHR(_n, _s, _f)             \
+     DEFINE_PROP(_n, _s, _f, qdev_prop_chr, CharBackend)
+ #define DEFINE_PROP_STRING(_n, _s, _f)             \
+@@ -259,8 +239,6 @@ void qdev_prop_set_drive(DeviceState *dev, const char *=
+name,
+ void qdev_prop_set_macaddr(DeviceState *dev, const char *name,
+                            const uint8_t *value);
+ void qdev_prop_set_enum(DeviceState *dev, const char *name, int value);
+-/* FIXME: Remove opaque pointer properties.  */
+-void qdev_prop_set_ptr(DeviceState *dev, const char *name, void *value);
 =20
- #endif /* HW_SYSBUS_H */
+ void qdev_prop_register_global(GlobalProperty *prop);
+ int qdev_prop_check_globals(void);
 --=20
 2.23.0.606.g08da6496b6
 
