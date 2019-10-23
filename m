@@ -6,39 +6,40 @@ X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8ABD7CA9EB6
-	for <qemu-devel@archiver.kernel.org>; Wed, 23 Oct 2019 13:46:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D0A50CA9EB9
+	for <qemu-devel@archiver.kernel.org>; Wed, 23 Oct 2019 13:49:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5CC9220663
-	for <qemu-devel@archiver.kernel.org>; Wed, 23 Oct 2019 13:46:02 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5CC9220663
+	by mail.kernel.org (Postfix) with ESMTPS id A868C20663
+	for <qemu-devel@archiver.kernel.org>; Wed, 23 Oct 2019 13:49:17 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A868C20663
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36444 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36558 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iNGxd-0001yr-Fh
-	for qemu-devel@archiver.kernel.org; Wed, 23 Oct 2019 09:46:01 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48793)
+	id 1iNH0m-0004dA-CY
+	for qemu-devel@archiver.kernel.org; Wed, 23 Oct 2019 09:49:16 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48881)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <laurent@vivier.eu>) id 1iNGuI-0000P6-5L
- for qemu-devel@nongnu.org; Wed, 23 Oct 2019 09:42:35 -0400
+ (envelope-from <laurent@vivier.eu>) id 1iNGuk-0000kE-8L
+ for qemu-devel@nongnu.org; Wed, 23 Oct 2019 09:43:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <laurent@vivier.eu>) id 1iNGuH-0003VT-5z
- for qemu-devel@nongnu.org; Wed, 23 Oct 2019 09:42:34 -0400
-Received: from mout.kundenserver.de ([212.227.126.187]:44401)
+ (envelope-from <laurent@vivier.eu>) id 1iNGuh-0003eN-Fc
+ for qemu-devel@nongnu.org; Wed, 23 Oct 2019 09:43:02 -0400
+Received: from mout.kundenserver.de ([212.227.126.134]:33181)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <laurent@vivier.eu>)
- id 1iNGuG-0003VC-T6; Wed, 23 Oct 2019 09:42:33 -0400
+ id 1iNGuf-0003dv-Dk; Wed, 23 Oct 2019 09:42:59 -0400
 Received: from [192.168.100.1] ([78.238.229.36]) by mrelayeu.kundenserver.de
- (mreue010 [213.165.67.103]) with ESMTPSA (Nemesis) id
- 1M7aqD-1iMQV53UJZ-00867J; Wed, 23 Oct 2019 15:42:26 +0200
-Subject: Re: [PATCH 3/3] qemu-timer: reuse MIN macro in qemu_timeout_ns_to_ms
+ (mreue012 [213.165.67.103]) with ESMTPSA (Nemesis) id
+ 1MPaQU-1iaw8m0x9u-00MaYj; Wed, 23 Oct 2019 15:42:50 +0200
+Subject: Re: [PATCH 2/3] event_notifier: avoid dandling file descriptor in
+ event_notifier_cleanup
 To: Frediano Ziglio <fziglio@redhat.com>, Michael Tokarev <mjt@tls.msk.ru>
 References: <20191023122652.2999-1-fziglio@redhat.com>
- <20191023122652.2999-3-fziglio@redhat.com>
+ <20191023122652.2999-2-fziglio@redhat.com>
 From: Laurent Vivier <laurent@vivier.eu>
 Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  mQINBFYFJhkBEAC2me7w2+RizYOKZM+vZCx69GTewOwqzHrrHSG07MUAxJ6AY29/+HYf6EY2
@@ -82,36 +83,36 @@ Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  OpKgu3nD0ahBDqANU/ZmNNarBJEwvM2vfusmNnWm3QMIwxNuJghRyuFfx694Im1js0ZY3LEU
  JGSHFG4ZynA+ZFUPA6Xf0wHeJOxGKCGIyeKORsteIqgnkINW9fnKJw2pgk8qHkwVc3Vu+wGS
  ZiJK0xFusPQehjWTHn9WjMG1zvQ5TQQHxau/2FkP45+nRPco6vVFQe8JmgtRF8WFJA==
-Message-ID: <5f20705e-60bc-08d5-8b6e-72438afabefe@vivier.eu>
-Date: Wed, 23 Oct 2019 15:42:24 +0200
+Message-ID: <3dafc0c5-bdb2-6345-961f-4ff6691bafeb@vivier.eu>
+Date: Wed, 23 Oct 2019 15:42:47 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.1.1
 MIME-Version: 1.0
-In-Reply-To: <20191023122652.2999-3-fziglio@redhat.com>
+In-Reply-To: <20191023122652.2999-2-fziglio@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: fr
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:BxwfjrfByz2tgq/K2MbFt9mSddCPZ9B/dBkPy/yS4Gw/u/qNB58
- 2nO9Ua+iBvyTpG7AUI7wWnWNRZ/1OgW9ttUMH+/v8VGsNqOVJDv240r5kYp4WEHzD4iREib
- 2TvL18rxy7+aZKdVLQ2sAPlG8ZWZ+hn41OzwbQQ7C1whZ1YyWUy6HxUvDoRzIiF0P+BuE8n
- nTuUGlHYvXxL7KKRCkO2A==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:szg7n7+lmXE=:cYgwx3ymsKlP+t2DxiGfpp
- Mplp6MXwQmI4Sm6YHVlE7z0rEDIb7cXiCFK+6C/cr6qy2/5gGQvshA9WXtjRu84hJOqzZwSqk
- gwg7vKRV3nCFk0KnQXvt2eQG297MRWcVZEyG6dDaHGRv2u+6BzpzDsBs2zAvJt/6E4Le2rO03
- idpfhw6jQHOzp+CdZpBpmsVF1+fSQ8JtCSS6C87ffByrBkurVxFqadQ+iHv4qJ1M+Smp/aUID
- OF8Qb8sZYeAa7Ez37SNsmcGxEOy4VHuK6xVrR9+J1aCK91qPQ8Tfa9j2BeDT1UM21mbtOQWdv
- HlX8ztmM5SMh3Q6W53pTqORrL3kGzuAblzuDucc66946nKccoN2YQc6LtEnkDPcDSC/lOiS2Z
- 0UVB+FbXblaQuNrkDlkG6LYOy43lrhYSRUOxL5w+vz/gOzf9+DEFs+qoNKEVpC4dT8n8sIQFr
- 69KboaYIvxYjRMno9HxnxFxMlSyAaCiCUJ8GMZNBwRpois4DX+ZWzIHIabOGSJA2DzrV6a127
- iwcs42yUze9f8BDaXEcrKGG7MiGpL2jmjb71hIjYLFLM0JWyfafePYpx1G+Ld+X+3AkAQOiug
- jySkgT6ujVAcw/kcwWb6H43H2fQ640WrHyTxI4TmivauyViw1bep0W3sKNSVXQFuLrXFCdYtC
- p6rfoLa64lwLozvstNTHCo/xN6ZtlVlZXOAwaEbqcPYyGQ3UdIcWJiDtgxnDqd/v+oveyDBPh
- W3GZf+V5fe8Id6j0AyMnZjpV/DxLwBFEOI49ZcttkNayAtyvLpnSDhfzJr1HeVjFMUGEyhY4X
- DZbSBHidJ8Iq/qS8vdlzJvsWNMZbi+gH6FiKCwsf0CAHitmGk5OAOkCiw4Wg+DQBX4EYBZ4Sp
- XWlH6LHsM0ZhfgcXSse7OX4AypAevraoNA8aTV+40=
+X-Provags-ID: V03:K1:6nnb/F2ItGS/DZN6kICWRGUKQWHiXMPP2NdimF5ChuDcVKE9oaW
+ /pEyu3pNLOdA5zhpxPwhzGHpKIqNgRRKeSRYyZsS8vJgscuJKRzAhV/stVrYejplv70MVrY
+ VU4Hy3O8LYvYqT5d9USWuZWGO2+XusXa1Uo3GNMJAFMflT3Fekr269WKEAXXQsnf/OfOujw
+ yUUlAfzamr9rcK4CKpo4A==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:NqbEz8nkdwQ=:WKBriyCui7qgSHDiWRyjnd
+ H/hs0dMhyUrvH43jpySi35TGfR8cwy+lA+KkDVJ0uZyd32ttmrgscTOKjDImkIWtBtaQF+ZeI
+ S4rilzFJk3E7lyJaUizW4v9dlWztjv0unr0/HJNY169Q7UOWmG5Q6ZMloS/1/KnHetP38FZ5a
+ AV4PM/y6ktq1US6eNAUBCSqeJnxPPREzsWoewBTdhgdaHN4OoHE39JHw3F9Js2NYYxiiDoDie
+ IMdupdjOzEzHcqqlWcWC6nGjRlr4+sfsTsvudpgNEXQKbOEwpYH4ZpoAQyQyToKr5FjcvXBqW
+ cHPln3Iayp6+MRaUpKD4YAyocAtCjepUJ6BKs3/4jT3B9xE2ayCRgwSNQfwy+5v1+jeZNzmm6
+ 00hDncxQrHEXwxiDwSbyqkOZRTaR+gZ/aRNt+tyteuVYITDms/JnJE6oH7wtOkq7Yf93Ftk9o
+ CK9BBd5cvYRWiZtUYrlwPiB43GfIkzGFnbwgTfChFIqVz8iGM9ArgR32d4khqvrwNwf4t6E6V
+ XWqvtt928WwOugOhJW70oC/3RHKCvNAj2jMYTaGCOh1IUDZ4NEAwZXOfvWqnQN6AcS+s7BWNW
+ lpuiTbdbh5Op3VUlylDRPM0o5LsHm7QhDND76JC24jB0yq4e8K/R1mnAhx9nB4sLlIKBzi4RT
+ SsSK+dfZGp35i6RZE5zBjy8Cc7b7xHg1OGDn1zUzGBwCqdIjn8WqrjThQHT2DGjSdlq8e+SHs
+ EOyShMthLKmw3vCFxSviL0yHMpjSdHyPlUixBf72lXsTCf2MltLp1U7x0jeYD+7bHunHO3Yy5
+ ELWGFZmsBrz1pa8y2yqrI7rImzcfAXy0Uv3ViSWBtfbU33P7vMZAo4fKtWL17SHujrADnTicL
+ DhfT088wYP5GQL+5Q9wsED7XFUBCSO9EY+yhXnRuk=
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 212.227.126.187
+X-Received-From: 212.227.126.134
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -129,28 +130,31 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 Le 23/10/2019 à 14:26, Frediano Ziglio a écrit :
+> If rfd is equal to wfd the file descriptor is closed but
+> rfd will still have the closed value.
+> The EventNotifier structure should not be used again after calling
+> event_notifier_cleanup or should be initialized again but make
+> sure to not have dandling file descriptors around.
+> 
 > Signed-off-by: Frediano Ziglio <fziglio@redhat.com>
 > ---
->  util/qemu-timer.c | 6 +-----
->  1 file changed, 1 insertion(+), 5 deletions(-)
+>  util/event_notifier-posix.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 > 
-> diff --git a/util/qemu-timer.c b/util/qemu-timer.c
-> index d428fec567..094a20a05a 100644
-> --- a/util/qemu-timer.c
-> +++ b/util/qemu-timer.c
-> @@ -322,11 +322,7 @@ int qemu_timeout_ns_to_ms(int64_t ns)
->      ms = DIV_ROUND_UP(ns, SCALE_MS);
->  
->      /* To avoid overflow problems, limit this to 2^31, i.e. approx 25 days */
-> -    if (ms > (int64_t) INT32_MAX) {
-> -        ms = INT32_MAX;
-> -    }
-> -
-> -    return (int) ms;
-> +    return (int) MIN(ms, (int64_t) INT32_MAX);
+> diff --git a/util/event_notifier-posix.c b/util/event_notifier-posix.c
+> index 73c4046b58..00d93204f9 100644
+> --- a/util/event_notifier-posix.c
+> +++ b/util/event_notifier-posix.c
+> @@ -80,8 +80,8 @@ void event_notifier_cleanup(EventNotifier *e)
+>  {
+>      if (e->rfd != e->wfd) {
+>          close(e->rfd);
+> -        e->rfd = -1;
+>      }
+> +    e->rfd = -1;
+>      close(e->wfd);
+>      e->wfd = -1;
 >  }
->  
->  
 > 
 
 Reviewed-by: Laurent Vivier <laurent@vivier.eu>
