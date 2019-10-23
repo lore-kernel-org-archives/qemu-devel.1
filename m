@@ -2,63 +2,63 @@ Return-Path: <SRS0=Jnn8=YR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.3 required=3.0 tests=DATE_IN_PAST_03_06,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 26BD4CA9EB9
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 03:09:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B0605CA9EB9
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 03:09:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E3D5A20684
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 03:09:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 78DFA20684
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 03:09:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="KHSe/QAI"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E3D5A20684
+	dkim=pass (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="ga4fzf79"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 78DFA20684
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56856 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56864 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iNTVQ-0000XO-Ar
-	for qemu-devel@archiver.kernel.org; Wed, 23 Oct 2019 23:09:44 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53794)
+	id 1iNTVX-0000hi-Fd
+	for qemu-devel@archiver.kernel.org; Wed, 23 Oct 2019 23:09:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53796)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgibson@ozlabs.org>) id 1iNTTJ-0006Pz-QR
+ (envelope-from <dgibson@ozlabs.org>) id 1iNTTK-0006QJ-1X
  for qemu-devel@nongnu.org; Wed, 23 Oct 2019 23:07:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1iNTTI-0002ry-Be
+ (envelope-from <dgibson@ozlabs.org>) id 1iNTTI-0002s6-G9
  for qemu-devel@nongnu.org; Wed, 23 Oct 2019 23:07:33 -0400
-Received: from ozlabs.org ([203.11.71.1]:42729)
+Received: from ozlabs.org ([2401:3900:2:1::2]:39173)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1iNTTH-0002nF-7k; Wed, 23 Oct 2019 23:07:32 -0400
+ id 1iNTTH-0002nG-43; Wed, 23 Oct 2019 23:07:32 -0400
 Received: by ozlabs.org (Postfix, from userid 1007)
- id 46zBxS1hS9z9sNw; Thu, 24 Oct 2019 14:07:24 +1100 (AEDT)
+ id 46zBxS0qnbz9sNx; Thu, 24 Oct 2019 14:07:24 +1100 (AEDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
  d=gibson.dropbear.id.au; s=201602; t=1571886444;
- bh=gSjtQwlQKxTQDrZCVgREHwp9Og1zNXyrSBBxMJ6cltA=;
+ bh=TI2K2tEnS6VS21LfD8G/xnEySo+P63uXvyLkCf2hCj0=;
  h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=KHSe/QAIfLNjPvirl0woJy9EGiqo5K4zLtYVSqqsQM0D0PuuMZ3dLcCQIj3MFvW3l
- b7unB+Tu4XKWB+e+LP2PKH3wsgEjF3xN7RU2JhmOGoZ/u66/INwRPjixCXEeUb6mnO
- b/etgVKadHw2wp+ltPmmbrTzK8uWYSaywM87mDrM=
-Date: Thu, 24 Oct 2019 13:35:02 +1100
+ b=ga4fzf79k3ESUsx5ftBAMHpjua4i1MU7U0eGk66dJ89X2+h68fswHm4cN2ZSsqegx
+ H/gpnbwk4dui+KgaTcSQEO4EVyE9rhbm4yj0bQ9OgCVzno8cHJDPi7QITvdPRDsWss
+ nQpsrXqYdyX/rgJm9NuM5Y1JV+RJ2OeQO7AkUTLU=
+Date: Thu, 24 Oct 2019 09:38:17 +1100
 From: David Gibson <david@gibson.dropbear.id.au>
-To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
-Subject: Re: [PATCH v5 0/7] ppc: reset the interrupt presenter from the CPU
- reset handler
-Message-ID: <20191024023502.GN6439@umbus.fritz.box>
-References: <20191022163812.330-1-clg@kaod.org>
+To: Greg Kurz <groug@kaod.org>
+Subject: Re: [PATCH] spapr: Don't request to unplug the same core twice
+Message-ID: <20191023223817.GL6439@umbus.fritz.box>
+References: <157185826035.3073024.1664101000438499392.stgit@bahia.lan>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="8CNmCRe8Sh4keFKJ"
+ protocol="application/pgp-signature"; boundary="V3eawNQxI9TAjvgi"
 Content-Disposition: inline
-In-Reply-To: <20191022163812.330-1-clg@kaod.org>
+In-Reply-To: <157185826035.3073024.1664101000438499392.stgit@bahia.lan>
 User-Agent: Mutt/1.12.1 (2019-06-15)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 203.11.71.1
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2401:3900:2:1::2
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -70,92 +70,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>,
- qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Greg Kurz <groug@kaod.org>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
---8CNmCRe8Sh4keFKJ
-Content-Type: text/plain; charset=iso-8859-1
+--V3eawNQxI9TAjvgi
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, Oct 22, 2019 at 06:38:05PM +0200, C=E9dric Le Goater wrote:
-> Hello,
+On Wed, Oct 23, 2019 at 09:17:40PM +0200, Greg Kurz wrote:
+> We must not call spapr_drc_detach() on a detached DRC otherwise bad things
+> can happen, ie. QEMU hangs or crashes. This is easily demonstrated with
+> a CPU hotplug/unplug loop using QMP.
 >=20
-> On the sPAPR machine and PowerNV machine, the interrupt presenters are
-> created by a machine handler at the core level and are reseted
-> independently. This is not consistent and it raises issues when it
-> comes to handle hot-plugged CPUs. In that case, the presenters are not
-> reseted. This is less of an issue in XICS, although a zero MFFR could
-> be a concern, but in XIVE, the OS CAM line is not set and this breaks
-> the presenting algorithm. The current code has workarounds which need
-> a global cleanup.
->=20
-> Extend the sPAPR IRQ backend and the PowerNV Chip class with a new
-> cpu_intc_reset() handler called by the CPU reset handler and remove
-> the XiveTCTX reset handler which is now redundant.
->=20
-> Set the OS CAM line when the interrupt presenter of the sPAPR core is
-> reseted. This will also cover the case of hot-plugged CPUs.
+> Signed-off-by: Greg Kurz <groug@kaod.org>
 
-I'm not totally convinced whether every step here is done the best it
-can be.  But it addresses real problems, so I've applied anyway.  I
-will make some comments inline, which could be addressed in follow up
-patches.
+Ouch, good catch.  Applied.
 
+I wonder if we have the same problem with other DRC types.
+
+> ---
+>  hw/ppc/spapr.c |    7 ++++---
+>  1 file changed, 4 insertions(+), 3 deletions(-)
 >=20
-> Thanks,
->=20
-> C.
->=20
-> Changes in v5:
->=20
->  - Removed useless PNV_CHIP() cast
+> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> index f9410d390a07..94f9d27096af 100644
+> --- a/hw/ppc/spapr.c
+> +++ b/hw/ppc/spapr.c
+> @@ -3741,9 +3741,10 @@ void spapr_core_unplug_request(HotplugHandler *hot=
+plug_dev, DeviceState *dev,
+>                            spapr_vcpu_id(spapr, cc->core_id));
+>      g_assert(drc);
 > =20
-> Changes in v4:
->=20
->  - Introduce a PnvCore reset handler
->  - Add PnvChip pointer to PnvCore
->=20
-> Changes in v3:
->=20
->  - Introduced a DeviceClass::reset for the CPU (Greg)
->  - add support for PowerNV
+> -    spapr_drc_detach(drc);
+> -
+> -    spapr_hotplug_req_remove_by_index(drc);
+> +    if (!spapr_drc_unplug_requested(drc)) {
+> +        spapr_drc_detach(drc);
+> +        spapr_hotplug_req_remove_by_index(drc);
+> +    }
+>  }
 > =20
-> Changes in v2:
->=20
->  - removed property
->  - simplified reset handlers
->=20
-> C=E9dric Le Goater (6):
->   spapr: move CPU reset after presenter creation
->   ppc/pnv: Introduce a PnvCore reset handler
->   ppc/pnv: Add a PnvChip pointer to PnvCore
->   ppc: Reset the interrupt presenter from the CPU reset handler
->   ppc/pnv: Fix naming of routines realizing the CPUs
->   spapr/xive: Set the OS CAM line at reset
->=20
-> Greg Kurz (1):
->   spapr_cpu_core: Implement DeviceClass::reset
->=20
->  include/hw/ppc/pnv.h        |  1 +
->  include/hw/ppc/pnv_core.h   |  3 +++
->  include/hw/ppc/spapr_irq.h  |  2 ++
->  include/hw/ppc/spapr_xive.h |  1 -
->  include/hw/ppc/xics.h       |  1 +
->  include/hw/ppc/xive.h       |  1 +
->  hw/intc/spapr_xive.c        | 53 +++++++++++++++++--------------------
->  hw/intc/xics.c              |  8 ++----
->  hw/intc/xics_spapr.c        |  7 +++++
->  hw/intc/xive.c              | 12 +--------
->  hw/ppc/pnv.c                | 18 +++++++++++++
->  hw/ppc/pnv_core.c           | 31 ++++++++++++++++------
->  hw/ppc/spapr_cpu_core.c     | 44 +++++++++++++++++++++++-------
->  hw/ppc/spapr_irq.c          | 14 ++++++++++
->  14 files changed, 131 insertions(+), 65 deletions(-)
+>  int spapr_core_dt_populate(SpaprDrc *drc, SpaprMachineState *spapr,
 >=20
 
 --=20
@@ -164,25 +123,25 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---8CNmCRe8Sh4keFKJ
+--V3eawNQxI9TAjvgi
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl2xDdYACgkQbDjKyiDZ
-s5LcDBAAjjPgZUMKAzlR+n564uUSo0pC0ZkN62hgP6mTkrVo/sk1Xs810AuGih/x
-Oxpv9DQIz9UkMOgVgL+QGBcL4ohSjzQLL51aiNfkC5iLhv22ydIVsy1x/TeuvQnB
-+XI3hfd2M67RnZY2Ul1Qc2nRG2MCkfRZ9wORoUEdw0mPkZV3+J+1p+3iN6ZPzH55
-6iCTDP+HNHh5J3gAa6uIgtPUjOepVJro5Ri4wvsFoHzfY/EXr7g+PVOBFV9p7q6O
-XF7JrViHKrpbVaLtFlHOkuDA5FOG35TZpSzjcCjnYIxrxWylKt8qmb8ph8vpBauC
-PL2BWuik36FmYUtFYNUZJBqE/0T/yq45Os6mcbPT2ewTejue6aNWrQFzsvNg1KpF
-N1eS6h/fr044TPmvJixCbKuFPTozIVEcGSQFiVeA6hmB4sOMo2gv4yMCIZvEvLQ7
-5HmFtENAY0jFouwkfR7iEhffbgw8lp4bDfg/ty4yV7fAsW7+KCq4MLDhLIiKoCzh
-trdjocdcfOu/nntmXQf/s0RaBGMARY0U5xs8ZlOHnW26ahdazZRVX2vcb18UhMmU
-CpXBkbHxqW7JWjTEm+gkoIBDgXo5mJRhZrzY75SauIqSckPR+086Wx9/jTgqaE2A
-18Yd8q8UQI0o1o7GqlYvo514VtPNxCNew3aNCWGuspAWHD5FL54=
-=0EVm
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl2w1lkACgkQbDjKyiDZ
+s5IMMxAAgCxa35gi8c2yiuv2T6l51YksYKxQq5DokiblWiy0JdLVc+QfyeB/JFnE
+nqAGVq0SDexRWBYT4Pz38Ccn7Vi7PEw3q1GcEhELtPoEg0Hs63YpWfOV8eThiJSH
+H7ln6eOY2w3j6ArvYouGMA1XArKZ/l3kC8A+p/cVTQ3MDGt6X9TunHmwKytCfHN7
+9a9FV6alY2fMgk7gV+R9epS2rFXqvPewCTUfEuM1mPbRX8KnTzXVisA1bJBR0fij
+xqVcKfT72NUohtL24/gN5Rab1hBpmPJQ3/mV7PbPUjQFLb/RHUut4iOJEvyxpIeZ
+aEKfPpmUg8VUZRMzOLPKAOIbIxI+4Rv0hUcUbl9UgfriqDf2H3CN1FOP7HTJNelV
+zQKa2tCsaGLTeJzb9gJtnTkzMNaCh/YdFkxyvJAefULalBAr0mhufJwc1V80KdEO
+WWBkrwYGz5xf88NajeqUC0VUZeHJsTjq9a+uuyij2p+vbWkSrdc97VKM8ogvIA5+
+u7Qstv6tgSThpcM1R0YfP7tl6YtlpPVOPDvvsVM9+lioM9U2vgZAKIjgc9NvYCtY
+dM4C3MmurHU8j85R6t5JXHz0Nq/EP3KbwudSvABAYwaPx2zm4KhnBAG65PU3800m
+6WSe0/o2XMnLedPYIk9HX/MS9THAS/5cg3AOWbmjO4Co+ezJFyc=
+=iNu5
 -----END PGP SIGNATURE-----
 
---8CNmCRe8Sh4keFKJ--
+--V3eawNQxI9TAjvgi--
 
