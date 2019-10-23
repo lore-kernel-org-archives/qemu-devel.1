@@ -2,82 +2,55 @@ Return-Path: <SRS0=brme=YQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8C73DCA9EB6
-	for <qemu-devel@archiver.kernel.org>; Wed, 23 Oct 2019 14:07:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 735D9CA9EB6
+	for <qemu-devel@archiver.kernel.org>; Wed, 23 Oct 2019 14:08:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5580421906
-	for <qemu-devel@archiver.kernel.org>; Wed, 23 Oct 2019 14:07:27 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iVaUe9s1"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5580421906
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 47F0421906
+	for <qemu-devel@archiver.kernel.org>; Wed, 23 Oct 2019 14:08:09 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 47F0421906
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=rt-rk.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36988 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37002 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iNHIM-0006eo-8f
-	for qemu-devel@archiver.kernel.org; Wed, 23 Oct 2019 10:07:26 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52423)
+	id 1iNHJ2-00074d-A0
+	for qemu-devel@archiver.kernel.org; Wed, 23 Oct 2019 10:08:08 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51799)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eblake@redhat.com>) id 1iNHDx-000412-Je
- for qemu-devel@nongnu.org; Wed, 23 Oct 2019 10:02:58 -0400
+ (envelope-from <stefan.brankovic@rt-rk.com>) id 1iNHBK-0002ZM-5r
+ for qemu-devel@nongnu.org; Wed, 23 Oct 2019 10:00:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eblake@redhat.com>) id 1iNHDs-0006ko-6E
- for qemu-devel@nongnu.org; Wed, 23 Oct 2019 10:02:51 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:22434
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <stefan.brankovic@rt-rk.com>) id 1iNHBH-0004pX-Nl
+ for qemu-devel@nongnu.org; Wed, 23 Oct 2019 10:00:09 -0400
+Received: from mx2.rt-rk.com ([89.216.37.149]:46696 helo=mail.rt-rk.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1iNHDm-0006fV-Aj
- for qemu-devel@nongnu.org; Wed, 23 Oct 2019 10:02:42 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1571839361;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=2N0r/3ZPUWbWhS7qcO9YRvvvG9oDdigYbWU9QZaPE1I=;
- b=iVaUe9s1GVg93MEzODp2lsezlkZEekyA+Uw4fLluj72V0UaJUNJLkJMHew/iYEfyqtM6hP
- mNhPwYqcP+yyLck+c5XJQ/dFwmHBneoYQdCozWt97Bpavr1y8y1D9Kvd/WGUulCSYprP8O
- FPIMx0Bi0RtKkxTy06FkfQ3MigWHWfc=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-224-3KqLCC6_Nka6NuAEdweo7A-1; Wed, 23 Oct 2019 10:02:36 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 96F655EE
- for <qemu-devel@nongnu.org>; Wed, 23 Oct 2019 14:01:35 +0000 (UTC)
-Received: from [10.3.117.0] (ovpn-117-0.phx2.redhat.com [10.3.117.0])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 6DAB360852
- for <qemu-devel@nongnu.org>; Wed, 23 Oct 2019 14:01:35 +0000 (UTC)
-Subject: Re: [PULL 0/3] NBD patches for 2019-10-22
+ (Exim 4.71) (envelope-from <stefan.brankovic@rt-rk.com>)
+ id 1iNHBH-0004nG-22
+ for qemu-devel@nongnu.org; Wed, 23 Oct 2019 10:00:07 -0400
+Received: from localhost (localhost [127.0.0.1])
+ by mail.rt-rk.com (Postfix) with ESMTP id D378A1A2261;
+ Wed, 23 Oct 2019 16:00:02 +0200 (CEST)
+X-Virus-Scanned: amavisd-new at rt-rk.com
+Received: from rtrkw870-lin.domain.local (rtrkw870-lin.domain.local
+ [10.10.14.77])
+ by mail.rt-rk.com (Postfix) with ESMTPSA id 78BD11A224B;
+ Wed, 23 Oct 2019 16:00:02 +0200 (CEST)
+From: Stefan Brankovic <stefan.brankovic@rt-rk.com>
 To: qemu-devel@nongnu.org
-References: <157183175375.17590.12883932088108636951@37313f22b938>
-From: Eric Blake <eblake@redhat.com>
-Organization: Red Hat, Inc.
-Message-ID: <4c896e81-5857-ed06-0cf8-455299f4f0f4@redhat.com>
-Date: Wed, 23 Oct 2019 09:01:34 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.1
-MIME-Version: 1.0
-In-Reply-To: <157183175375.17590.12883932088108636951@37313f22b938>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-MC-Unique: 3KqLCC6_Nka6NuAEdweo7A-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 205.139.110.61
+Subject: [PATCH v9 2/3] target/ppc: Optimize emulation of vpkpx instruction
+Date: Wed, 23 Oct 2019 15:59:55 +0200
+Message-Id: <1571839196-1739-3-git-send-email-stefan.brankovic@rt-rk.com>
+X-Mailer: git-send-email 2.7.4
+In-Reply-To: <1571839196-1739-1-git-send-email-stefan.brankovic@rt-rk.com>
+References: <1571839196-1739-1-git-send-email-stefan.brankovic@rt-rk.com>
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [fuzzy]
+X-Received-From: 89.216.37.149
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,51 +62,191 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: aleksandar.markovic@rt-rk.com, stefan.brankovic@rt-rk.com,
+ richard.henderson@linaro.org, david@gibson.dropbear.id.au
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 10/23/19 6:55 AM, no-reply@patchew.org wrote:
-> Patchew URL: https://patchew.org/QEMU/20191023020126.24991-1-eblake@redha=
-t.com/
->=20
->=20
->=20
-> Hi,
->=20
-> This series failed the docker-quick@centos7 build test. Please find the t=
-esting commands and
-> their output below. If you have Docker installed, you can probably reprod=
-uce it
-> locally.
->=20
-> =3D=3D=3D TEST SCRIPT BEGIN =3D=3D=3D
-> #!/bin/bash
-> make docker-image-centos7 V=3D1 NETWORK=3D1
-> time make docker-test-quick@centos7 SHOW_ENV=3D1 J=3D14 NETWORK=3D1
-> =3D=3D=3D TEST SCRIPT END =3D=3D=3D
->=20
->    TEST    check-unit: tests/test-qht-par
->    TEST    check-qtest-x86_64: tests/hd-geo-test
-> **
-> ERROR:/tmp/qemu-test/src/tests/migration-test.c:1316:test_migrate_auto_co=
-nverge: assertion failed (remaining < expected_threshold): (100003840 < 100=
-000000)
-> ERROR - Bail out! ERROR:/tmp/qemu-test/src/tests/migration-test.c:1316:te=
-st_migrate_auto_converge: assertion failed (remaining < expected_threshold)=
-: (100003840 < 100000000)
+Optimize altivec instruction vpkpx (Vector Pack Pixel).
+Rearranges 8 pixels coded in 6-5-5 pattern (4 from each source register)
+into a contigous array of bits in the destination register.
 
-Random race? I could not reproduce it, and don't see how this series=20
-would break that test.
+In each iteration of outer loop, the instruction is to be done with
+the 6-5-5 pack for 2 pixels of each doubleword element of each
+source register. The first thing to be done in outer loop is
+choosing which doubleword element of which register is to be used
+in the current iteration and it is to be placed in 'avr' variable. The
+next step is to perform 6-5-5 pack of pixels on 'avr' variable in inner
+'for' loop(2 iterations, 1 for each pixel) and save result in 'tmp'
+variable. At the end of the outer 'for' loop, the result is merged in the
+variable called 'result' and saved in the appropriate doubleword element
+of vD if the whole doubleword is finished(every second iteration). The
+outer loop has 4 iterations.
 
+Signed-off-by: Stefan Brankovic <stefan.brankovic@rt-rk.com>
+---
+ target/ppc/helper.h                 |  1 -
+ target/ppc/int_helper.c             | 21 ---------
+ target/ppc/translate/vmx-impl.inc.c | 93 ++++++++++++++++++++++++++++++++++++-
+ 3 files changed, 92 insertions(+), 23 deletions(-)
 
-> The full log is available at
-> http://patchew.org/logs/20191023020126.24991-1-eblake@redhat.com/testing.=
-docker-quick@centos7/?type=3Dmessage.
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
+diff --git a/target/ppc/helper.h b/target/ppc/helper.h
+index 281e54f..b489b38 100644
+--- a/target/ppc/helper.h
++++ b/target/ppc/helper.h
+@@ -258,7 +258,6 @@ DEF_HELPER_4(vpkudus, void, env, avr, avr, avr)
+ DEF_HELPER_4(vpkuhum, void, env, avr, avr, avr)
+ DEF_HELPER_4(vpkuwum, void, env, avr, avr, avr)
+ DEF_HELPER_4(vpkudum, void, env, avr, avr, avr)
+-DEF_HELPER_3(vpkpx, void, avr, avr, avr)
+ DEF_HELPER_5(vmhaddshs, void, env, avr, avr, avr, avr)
+ DEF_HELPER_5(vmhraddshs, void, env, avr, avr, avr, avr)
+ DEF_HELPER_5(vmsumuhm, void, env, avr, avr, avr, avr)
+diff --git a/target/ppc/int_helper.c b/target/ppc/int_helper.c
+index cd00f5e..f910c11 100644
+--- a/target/ppc/int_helper.c
++++ b/target/ppc/int_helper.c
+@@ -1262,27 +1262,6 @@ void helper_vpmsumd(ppc_avr_t *r, ppc_avr_t *a, ppc_avr_t *b)
+ #else
+ #define PKBIG 0
+ #endif
+-void helper_vpkpx(ppc_avr_t *r, ppc_avr_t *a, ppc_avr_t *b)
+-{
+-    int i, j;
+-    ppc_avr_t result;
+-#if defined(HOST_WORDS_BIGENDIAN)
+-    const ppc_avr_t *x[2] = { a, b };
+-#else
+-    const ppc_avr_t *x[2] = { b, a };
+-#endif
+-
+-    VECTOR_FOR_INORDER_I(i, u64) {
+-        VECTOR_FOR_INORDER_I(j, u32) {
+-            uint32_t e = x[i]->u32[j];
+-
+-            result.u16[4 * i + j] = (((e >> 9) & 0xfc00) |
+-                                     ((e >> 6) & 0x3e0) |
+-                                     ((e >> 3) & 0x1f));
+-        }
+-    }
+-    *r = result;
+-}
+ 
+ #define VPK(suffix, from, to, cvt, dosat)                               \
+     void helper_vpk##suffix(CPUPPCState *env, ppc_avr_t *r,             \
+diff --git a/target/ppc/translate/vmx-impl.inc.c b/target/ppc/translate/vmx-impl.inc.c
+index 8f68e41..787008d 100644
+--- a/target/ppc/translate/vmx-impl.inc.c
++++ b/target/ppc/translate/vmx-impl.inc.c
+@@ -579,6 +579,97 @@ static void trans_lvsr(DisasContext *ctx)
+ }
+ 
+ /*
++ * vpkpx VRT,VRA,VRB - Vector Pack Pixel
++ *
++ * Rearranges 8 pixels coded in 6-5-5 pattern (4 from each source register)
++ * into contigous array of bits in the destination register.
++ */
++static void trans_vpkpx(DisasContext *ctx)
++{
++    int VT = rD(ctx->opcode);
++    int VA = rA(ctx->opcode);
++    int VB = rB(ctx->opcode);
++    TCGv_i64 tmp = tcg_temp_new_i64();
++    TCGv_i64 shifted = tcg_temp_new_i64();
++    TCGv_i64 avr = tcg_temp_new_i64();
++    TCGv_i64 result = tcg_temp_new_i64();
++    TCGv_i64 result1 = tcg_temp_new_i64();
++    int64_t mask1 = 0x1fULL;
++    int64_t mask2 = 0x1fULL << 5;
++    int64_t mask3 = 0x3fULL << 10;
++    int i, j;
++    /*
++     * In each iteration do the 6-5-5 pack for 2 pixels of each doubleword
++     * element of each source register.
++     */
++    for (i = 0; i < 4; i++) {
++        switch (i) {
++        case 0:
++            /*
++             * Get high doubleword of vA to perform 6-5-5 pack of pixels
++             * 1 and 2.
++             */
++            get_avr64(avr, VA, true);
++            tcg_gen_movi_i64(result, 0x0ULL);
++            break;
++        case 1:
++            /*
++             * Get low doubleword of vA to perform 6-5-5 pack of pixels
++             * 3 and 4.
++             */
++            get_avr64(avr, VA, false);
++            break;
++        case 2:
++            /*
++             * Get high doubleword of vB to perform 6-5-5 pack of pixels
++             * 5 and 6.
++             */
++            get_avr64(avr, VB, true);
++            tcg_gen_movi_i64(result, 0x0ULL);
++            break;
++        case 3:
++            /*
++             * Get low doubleword of vB to perform 6-5-5 pack of pixels
++             * 7 and 8.
++             */
++            get_avr64(avr, VB, false);
++            break;
++        }
++        /* Perform the packing for 2 pixels(each iteration for 1). */
++        tcg_gen_movi_i64(tmp, 0x0ULL);
++        for (j = 0; j < 2; j++) {
++            tcg_gen_shri_i64(shifted, avr, (j * 16 + 3));
++            tcg_gen_andi_i64(shifted, shifted, mask1 << (j * 16));
++            tcg_gen_or_i64(tmp, tmp, shifted);
++
++            tcg_gen_shri_i64(shifted, avr, (j * 16 + 6));
++            tcg_gen_andi_i64(shifted, shifted, mask2 << (j * 16));
++            tcg_gen_or_i64(tmp, tmp, shifted);
++
++            tcg_gen_shri_i64(shifted, avr, (j * 16 + 9));
++            tcg_gen_andi_i64(shifted, shifted, mask3 << (j * 16));
++            tcg_gen_or_i64(tmp, tmp, shifted);
++        }
++        if ((i == 0) || (i == 2)) {
++            tcg_gen_shli_i64(tmp, tmp, 32);
++        }
++        tcg_gen_or_i64(result, result, tmp);
++        if (i == 1) {
++            /* Place packed pixels 1:4 to high doubleword of vD. */
++            tcg_gen_mov_i64(result1, result);
++        }
++    }
++    set_avr64(VT, result1, true);
++    set_avr64(VT, result, false);
++
++    tcg_temp_free_i64(tmp);
++    tcg_temp_free_i64(shifted);
++    tcg_temp_free_i64(avr);
++    tcg_temp_free_i64(result);
++    tcg_temp_free_i64(result1);
++}
++
++/*
+  * vsl VRT,VRA,VRB - Vector Shift Left
+  *
+  * Shifting left 128 bit value of vA by value specified in bits 125-127 of vB.
+@@ -1059,7 +1150,7 @@ GEN_VXFORM_ENV(vpksdus, 7, 21);
+ GEN_VXFORM_ENV(vpkshss, 7, 6);
+ GEN_VXFORM_ENV(vpkswss, 7, 7);
+ GEN_VXFORM_ENV(vpksdss, 7, 23);
+-GEN_VXFORM(vpkpx, 7, 12);
++GEN_VXFORM_TRANS(vpkpx, 7, 12);
+ GEN_VXFORM_ENV(vsum4ubs, 4, 24);
+ GEN_VXFORM_ENV(vsum4sbs, 4, 28);
+ GEN_VXFORM_ENV(vsum4shs, 4, 25);
+-- 
+2.7.4
 
 
