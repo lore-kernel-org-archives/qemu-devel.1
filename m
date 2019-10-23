@@ -4,76 +4,77 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D5D6DCA9EB6
-	for <qemu-devel@archiver.kernel.org>; Wed, 23 Oct 2019 18:09:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EBB8BCA9EB6
+	for <qemu-devel@archiver.kernel.org>; Wed, 23 Oct 2019 18:09:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A40132173B
-	for <qemu-devel@archiver.kernel.org>; Wed, 23 Oct 2019 18:09:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B9DFC2086D
+	for <qemu-devel@archiver.kernel.org>; Wed, 23 Oct 2019 18:09:38 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QOj0Ehzz"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A40132173B
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PNmXoEOv"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B9DFC2086D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43254 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43262 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iNL4H-0006HO-9L
-	for qemu-devel@archiver.kernel.org; Wed, 23 Oct 2019 14:09:09 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59500)
+	id 1iNL4j-0006uh-5b
+	for qemu-devel@archiver.kernel.org; Wed, 23 Oct 2019 14:09:37 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59626)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <marcandre.lureau@redhat.com>) id 1iNKWZ-0004lD-KY
- for qemu-devel@nongnu.org; Wed, 23 Oct 2019 13:34:20 -0400
+ (envelope-from <marcandre.lureau@redhat.com>) id 1iNKWs-0005BV-4L
+ for qemu-devel@nongnu.org; Wed, 23 Oct 2019 13:34:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <marcandre.lureau@redhat.com>) id 1iNKWX-00026c-Uh
- for qemu-devel@nongnu.org; Wed, 23 Oct 2019 13:34:19 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:32127
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <marcandre.lureau@redhat.com>) id 1iNKWp-0002Co-O0
+ for qemu-devel@nongnu.org; Wed, 23 Oct 2019 13:34:37 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:54264
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
- id 1iNKWX-000266-OM
- for qemu-devel@nongnu.org; Wed, 23 Oct 2019 13:34:17 -0400
+ id 1iNKWp-0002C8-D4
+ for qemu-devel@nongnu.org; Wed, 23 Oct 2019 13:34:35 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1571852056;
+ s=mimecast20190719; t=1571852075;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=3n8NemwbAtO2vjJo0cvTmj3rjEQJOf2iog0bPQvhlk8=;
- b=QOj0EhzzKUY1momYp6YDRy9tQx06Zko3laN+T4h1zj4iikfJCqBvGw4zcGRqyCA03MnrOl
- HU/ujWfWXapBMmgDV4Gk3f/HwOjNDdCcYzvIDbyRi5AKNeT2HoNJn98iS/OD79poyBNbMN
- AZPffiVUxQD+BwOuGtPyvUi+IUJsIds=
+ bh=uRcevYlv0dVgCjvswi8iWE9SF8YIZpxrJoGckyI6E5E=;
+ b=PNmXoEOv2acHPPYJChDUDzFf1WAE6UXZfZwj73lVd3oLLaKHSYV53SLs4BYpK6sGtCL2Fd
+ MZK7Pxp5zEq2OO/h9wC2hmOGmnFq9k7d5lAvbordtq4TsvXzx3l7df4A0DX3EI86u5cwaR
+ iy8ZkwDP2naKPeLlbYn2g0KHc5qpNqI=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-318-u0nE5TA2Ps2mdxSKYUAz6Q-1; Wed, 23 Oct 2019 13:34:13 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+ us-mta-239-y_YU16iLOl23DKjRYuNApg-1; Wed, 23 Oct 2019 13:34:31 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A9B111005512;
- Wed, 23 Oct 2019 17:34:10 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8F06C5E9;
+ Wed, 23 Oct 2019 17:34:29 +0000 (UTC)
 Received: from localhost (ovpn-112-21.ams2.redhat.com [10.36.112.21])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 74C4B19C78;
- Wed, 23 Oct 2019 17:34:05 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 1D8035DC18;
+ Wed, 23 Oct 2019 17:34:28 +0000 (UTC)
 From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v3 17/33] serial: make SerialIO a sysbus device
-Date: Wed, 23 Oct 2019 19:31:38 +0200
-Message-Id: <20191023173154.30051-18-marcandre.lureau@redhat.com>
+Subject: [PATCH v3 21/33] lance: replace PROP_PTR with PROP_LINK
+Date: Wed, 23 Oct 2019 19:31:42 +0200
+Message-Id: <20191023173154.30051-22-marcandre.lureau@redhat.com>
 In-Reply-To: <20191023173154.30051-1-marcandre.lureau@redhat.com>
 References: <20191023173154.30051-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-MC-Unique: u0nE5TA2Ps2mdxSKYUAz6Q-1
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-MC-Unique: y_YU16iLOl23DKjRYuNApg-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.61
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -105,128 +106,80 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Make serial IO a proper sysbus device, similar to serial MM.
-
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- hw/char/serial.c         | 58 ++++++++++++++++++++++++++++++++--------
- include/hw/char/serial.h | 13 +++++++--
- 2 files changed, 58 insertions(+), 13 deletions(-)
+ hw/dma/sparc32_dma.c | 2 +-
+ hw/net/lance.c       | 5 ++---
+ hw/net/pcnet-pci.c   | 2 +-
+ hw/net/pcnet.h       | 2 +-
+ 4 files changed, 5 insertions(+), 6 deletions(-)
 
-diff --git a/hw/char/serial.c b/hw/char/serial.c
-index a40bc3ab81..84de2740a7 100644
---- a/hw/char/serial.c
-+++ b/hw/char/serial.c
-@@ -986,22 +986,57 @@ const MemoryRegionOps serial_io_ops =3D {
-     .endianness =3D DEVICE_LITTLE_ENDIAN,
+diff --git a/hw/dma/sparc32_dma.c b/hw/dma/sparc32_dma.c
+index 0e5bbcdc7f..3e4da0c47f 100644
+--- a/hw/dma/sparc32_dma.c
++++ b/hw/dma/sparc32_dma.c
+@@ -346,7 +346,7 @@ static void sparc32_ledma_device_realize(DeviceState *d=
+ev, Error **errp)
+     d =3D qdev_create(NULL, TYPE_LANCE);
+     object_property_add_child(OBJECT(dev), "lance", OBJECT(d), errp);
+     qdev_set_nic_properties(d, nd);
+-    qdev_prop_set_ptr(d, "dma", dev);
++    object_property_set_link(OBJECT(d), OBJECT(dev), "dma", errp);
+     qdev_init_nofail(d);
+ }
+=20
+diff --git a/hw/net/lance.c b/hw/net/lance.c
+index 6631e2a4e0..4d96299041 100644
+--- a/hw/net/lance.c
++++ b/hw/net/lance.c
+@@ -138,7 +138,8 @@ static void lance_instance_init(Object *obj)
+ }
+=20
+ static Property lance_properties[] =3D {
+-    DEFINE_PROP_PTR("dma", SysBusPCNetState, state.dma_opaque),
++    DEFINE_PROP_LINK("dma", SysBusPCNetState, state.dma_opaque,
++                     TYPE_DEVICE, DeviceState *),
+     DEFINE_NIC_PROPERTIES(SysBusPCNetState, state.conf),
+     DEFINE_PROP_END_OF_LIST(),
  };
-=20
--SerialState *serial_init(int base, qemu_irq irq, int baudbase,
--                         Chardev *chr, MemoryRegion *system_io)
-+static void serial_io_realize(DeviceState *dev, Error **errp)
- {
--    DeviceState *dev =3D DEVICE(object_new(TYPE_SERIAL));
--    SerialState *s =3D SERIAL(dev);
-+    SerialIO *self =3D SERIAL_IO(dev);
-+    SerialState *s =3D &self->serial;
-=20
--    s->irq =3D irq;
--    qdev_prop_set_uint32(dev, "baudbase", baudbase);
--    qdev_prop_set_chr(dev, "chardev", chr);
--    qdev_prop_set_int32(dev, "instance-id", base);
--    qdev_init_nofail(dev);
-+    qdev_init_nofail(DEVICE(s));
-=20
-     memory_region_init_io(&s->io, NULL, &serial_io_ops, s, "serial", 8);
--    memory_region_add_subregion(system_io, base, &s->io);
-+    sysbus_init_irq(SYS_BUS_DEVICE(self), &self->serial.irq);
-+}
-+
-+static void serial_io_class_init(ObjectClass *klass, void* data)
-+{
-+    DeviceClass *dc =3D DEVICE_CLASS(klass);
-+
-+    dc->realize =3D serial_io_realize;
-+}
-+
-+static void serial_io_instance_init(Object *o)
-+{
-+    SerialIO *self =3D SERIAL_IO(o);
-+
-+    object_initialize_child(o, "serial", &self->serial, sizeof(self->seria=
-l),
-+                            TYPE_SERIAL, &error_abort, NULL);
-+
-+    qdev_alias_all_properties(DEVICE(&self->serial), o);
-+}
-+
-+
-+static const TypeInfo serial_io_info =3D {
-+    .name =3D TYPE_SERIAL_IO,
-+    .parent =3D TYPE_SYS_BUS_DEVICE,
-+    .instance_size =3D sizeof(SerialIO),
-+    .instance_init =3D serial_io_instance_init,
-+    .class_init =3D serial_io_class_init,
-+};
-+
-+SerialIO *serial_init(int base, qemu_irq irq, int baudbase,
-+                         Chardev *chr, MemoryRegion *system_io)
-+{
-+    SerialIO *self =3D SERIAL_IO(qdev_create(NULL, TYPE_SERIAL_IO));
-=20
--    return s;
-+    qdev_prop_set_uint32(DEVICE(self), "baudbase", baudbase);
-+    qdev_prop_set_chr(DEVICE(self), "chardev", chr);
-+    qdev_prop_set_int32(DEVICE(self), "instance-id", base);
-+    qdev_init_nofail(DEVICE(self));
-+
-+    sysbus_connect_irq(SYS_BUS_DEVICE(self), 0, irq);
-+    memory_region_add_subregion(system_io, base, &self->serial.io);
-+
-+    return self;
+@@ -153,8 +154,6 @@ static void lance_class_init(ObjectClass *klass, void *=
+data)
+     dc->reset =3D lance_reset;
+     dc->vmsd =3D &vmstate_lance;
+     dc->props =3D lance_properties;
+-    /* Reason: pointer property "dma" */
+-    dc->user_creatable =3D false;
  }
 =20
- static Property serial_properties[] =3D {
-@@ -1138,6 +1173,7 @@ static const TypeInfo serial_mm_info =3D {
- static void serial_register_types(void)
- {
-     type_register_static(&serial_info);
-+    type_register_static(&serial_io_info);
-     type_register_static(&serial_mm_info);
+ static const TypeInfo lance_info =3D {
+diff --git a/hw/net/pcnet-pci.c b/hw/net/pcnet-pci.c
+index 4723c30c79..d067d21e2c 100644
+--- a/hw/net/pcnet-pci.c
++++ b/hw/net/pcnet-pci.c
+@@ -231,7 +231,7 @@ static void pci_pcnet_realize(PCIDevice *pci_dev, Error=
+ **errp)
+     s->irq =3D pci_allocate_irq(pci_dev);
+     s->phys_mem_read =3D pci_physical_memory_read;
+     s->phys_mem_write =3D pci_physical_memory_write;
+-    s->dma_opaque =3D pci_dev;
++    s->dma_opaque =3D DEVICE(pci_dev);
+=20
+     pcnet_common_init(DEVICE(pci_dev), s, &net_pci_pcnet_info);
  }
-=20
-diff --git a/include/hw/char/serial.h b/include/hw/char/serial.h
-index 2d0802a909..cf9cdafaee 100644
---- a/include/hw/char/serial.h
-+++ b/include/hw/char/serial.h
-@@ -89,6 +89,12 @@ typedef struct SerialMM {
-     uint8_t endianness;
- } SerialMM;
-=20
-+typedef struct SerialIO {
-+    SysBusDevice parent;
-+
-+    SerialState serial;
-+} SerialIO;
-+
- extern const VMStateDescription vmstate_serial;
- extern const MemoryRegionOps serial_io_ops;
-=20
-@@ -100,8 +106,11 @@ void serial_set_frequency(SerialState *s, uint32_t fre=
-quency);
- #define TYPE_SERIAL_MM "serial-mm"
- #define SERIAL_MM(s) OBJECT_CHECK(SerialMM, (s), TYPE_SERIAL_MM)
-=20
--SerialState *serial_init(int base, qemu_irq irq, int baudbase,
--                         Chardev *chr, MemoryRegion *system_io);
-+#define TYPE_SERIAL_IO "serial-io"
-+#define SERIAL_IO(s) OBJECT_CHECK(SerialIO, (s), TYPE_SERIAL_IO)
-+
-+SerialIO *serial_init(int base, qemu_irq irq, int baudbase,
-+                      Chardev *chr, MemoryRegion *system_io);
- SerialMM *serial_mm_init(MemoryRegion *address_space,
-                          hwaddr base, int regshift,
-                          qemu_irq irq, int baudbase,
+diff --git a/hw/net/pcnet.h b/hw/net/pcnet.h
+index 28d19a5c6f..f49b213c57 100644
+--- a/hw/net/pcnet.h
++++ b/hw/net/pcnet.h
+@@ -50,7 +50,7 @@ struct PCNetState_st {
+                          uint8_t *buf, int len, int do_bswap);
+     void (*phys_mem_write)(void *dma_opaque, hwaddr addr,
+                           uint8_t *buf, int len, int do_bswap);
+-    void *dma_opaque;
++    DeviceState *dma_opaque;
+     int tx_busy;
+     int looptest;
+ };
 --=20
 2.23.0.606.g08da6496b6
 
