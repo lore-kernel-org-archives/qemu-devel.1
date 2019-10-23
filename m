@@ -2,84 +2,83 @@ Return-Path: <SRS0=brme=YQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8C0F7CA9EB6
-	for <qemu-devel@archiver.kernel.org>; Wed, 23 Oct 2019 17:05:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 360F2CA9EB6
+	for <qemu-devel@archiver.kernel.org>; Wed, 23 Oct 2019 17:06:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 541E921925
-	for <qemu-devel@archiver.kernel.org>; Wed, 23 Oct 2019 17:05:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id F20E22086D
+	for <qemu-devel@archiver.kernel.org>; Wed, 23 Oct 2019 17:06:18 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=astrobotic-com.20150623.gappssmtp.com header.i=@astrobotic-com.20150623.gappssmtp.com header.b="MxAStarE"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 541E921925
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=astrobotic.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="aEmAmX23"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F20E22086D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41938 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41958 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iNK4g-0002vT-SP
-	for qemu-devel@archiver.kernel.org; Wed, 23 Oct 2019 13:05:30 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54119)
+	id 1iNK5R-0003zg-NN
+	for qemu-devel@archiver.kernel.org; Wed, 23 Oct 2019 13:06:17 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42577)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <joshua.shaffer@astrobotic.com>) id 1iNJza-0007NA-KZ
- for qemu-devel@nongnu.org; Wed, 23 Oct 2019 13:00:19 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1iNIp4-0004mb-PT
+ for qemu-devel@nongnu.org; Wed, 23 Oct 2019 11:45:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <joshua.shaffer@astrobotic.com>) id 1iNJzZ-0006wL-9V
- for qemu-devel@nongnu.org; Wed, 23 Oct 2019 13:00:14 -0400
-Received: from mail-lf1-x142.google.com ([2a00:1450:4864:20::142]:40945)
+ (envelope-from <richard.henderson@linaro.org>) id 1iNIp2-0005Z8-Un
+ for qemu-devel@nongnu.org; Wed, 23 Oct 2019 11:45:18 -0400
+Received: from mail-qt1-x843.google.com ([2607:f8b0:4864:20::843]:42859)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <joshua.shaffer@astrobotic.com>)
- id 1iNJzY-0006s9-Ch
- for qemu-devel@nongnu.org; Wed, 23 Oct 2019 13:00:12 -0400
-Received: by mail-lf1-x142.google.com with SMTP id i15so9240997lfo.7
- for <qemu-devel@nongnu.org>; Wed, 23 Oct 2019 10:00:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=astrobotic-com.20150623.gappssmtp.com; s=20150623;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=r8sfDS5dTki4Hmb9E3zat+NOVe6WUF2vcvXnCBQBCPI=;
- b=MxAStarEp8HHKrn0gqL+zI73shASPV7vgkrcU3LrmmlKKRfYOwpn75fCgtAek3wSCz
- jgQhCftgWcE7tNu6elKMNzjrkdvbiWIMqvI9v2MPcUtmb4IgplPcggsdWN+CK2HIl/zN
- pa8Mqo+kYgmOxCvb8BigyinSgUPwywVPmRlHSolMBO2OQBrUOlmlwN/s2wIFFSn7ensm
- G1uofQcfhOg5EdwKxKDIKxocma6hvb2ATzslUOpECCmDUUpOsqcaSzOOrMRcbA1Dd19G
- Sgi1hhaQ83BijCl6indOA8mmey5klig7vxsIP/sYkodVHc3XWQpvhaFYxXT4mtamC5QC
- /jGw==
+ (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+ id 1iNIp1-0005R8-1L
+ for qemu-devel@nongnu.org; Wed, 23 Oct 2019 11:45:15 -0400
+Received: by mail-qt1-x843.google.com with SMTP id w14so32933492qto.9
+ for <qemu-devel@nongnu.org>; Wed, 23 Oct 2019 08:45:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id:in-reply-to:references;
+ bh=GvLqP4YBrj+nrlStAyuwbfcMGIRPPiTu+vJ+23TQgAw=;
+ b=aEmAmX23InlnUT2icHg3aEvWcd49dzoz4tbuKp+wnSiTzBvcUrDLYrPrMHv9kwvBoR
+ b9WlmgYjlZNXvCaej6FvgZSEcjkfVLvTg0I2djVAFWAo0wCkqt0x/I/MGRu5n0mKdczy
+ EgPCoqsGfSzTt6VKsxkEkJndlPDk6k+3KNgacLCS2Ybu495vzIGN4JYK05cRLjoQZ76+
+ cNKnvW5Q21wIaLH1lFYI589K+Sx2g3Eq9EJ68KivWEP/s/pI9xrm6vTjbjMKjlnm7zjK
+ G/5Nh2kpQH5y7DvVUzICh0Vt4VXFkQV0U2P63J1fm3dAzE8v/SkuOHN0HXK/YHErMhkM
+ vuug==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=r8sfDS5dTki4Hmb9E3zat+NOVe6WUF2vcvXnCBQBCPI=;
- b=g0dglBKfekZjWpMjcNFL+9OxbwNzufCTGIQG4ywrnffkVPC3lJY36gbueqwv4yCyAS
- xI0NT+XMgbCSl78kOmB81yY9uPuoLpvFe7cvCvqYxiZtXxD2AfqagcxNlLgmONpDpxdd
- PNr9qUdRF5FniiBvx9A0pGvXXqO4r8f3WGG54IApAjKHiebeMnrQOzK3Zo+DGwRcQy8w
- T0fNPVoC/3sJsFl/WvM6uBLFKRgdepJWap6YV7Rn9s7RteBqm/xHoANypxKw6VwiUeEV
- rPAZAhigsi5Ve2y5K0UGiJGtGZ+mhPwcTgvMzrqztj0zA4m7Py6l8WZLas2VrZMCoBTn
- FAMw==
-X-Gm-Message-State: APjAAAWcUv+unasdWtBaYNQ9C14A0vLR93cWYPAgjhQcDrsI+iocY7GC
- bOr0Ai4psB6HXVmts/UmiijjR1gL+DYXQp4eFqVxf+s0kdeE3ZxEVHXE1owLdqtp0mgpCP5BNVc
- EQS3OUNVi4aY2bXK6hrus2g==
-X-Google-Smtp-Source: APXvYqz4qLPVPSWN85wAYtsb1SYfGwckDAv416QmG6LOQiogR6HhQnv1ZQxjiwV/N+S/dcTPiracs0PVegINNq/S0Iw=
-X-Received: by 2002:ac2:414f:: with SMTP id c15mr14178835lfi.157.1571850009732; 
- Wed, 23 Oct 2019 10:00:09 -0700 (PDT)
-MIME-Version: 1.0
-References: <CAPJW7GKLH3pkrGQQj_OaAy0UecUJttsHOJp35+CcpZvm9cM2WQ@mail.gmail.com>
- <6bb8abb2-68f0-db85-1557-6e04839b5ea2@redhat.com>
- <32c38984-e745-de6c-792e-09910b68cedd@adacore.com>
-In-Reply-To: <32c38984-e745-de6c-792e-09910b68cedd@adacore.com>
-From: Joshua Shaffer <joshua.shaffer@astrobotic.com>
-Date: Wed, 23 Oct 2019 12:59:58 -0400
-Message-ID: <CAPJW7GLOTyjdMozrb+TSnqpEyoiFh2sxZjYkLXx2pz2_J_dPgA@mail.gmail.com>
-Subject: Re: LEON3 networking
-To: Fabien Chouteau <chouteau@adacore.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references;
+ bh=GvLqP4YBrj+nrlStAyuwbfcMGIRPPiTu+vJ+23TQgAw=;
+ b=bsiBlAs5Cc30BerFvt6cBckN5g5tX5K61GIRRkUDZAxC4GCXk9wW+IsujyEOIkSvU/
+ WfNSplOqd1SHGK5u+AxAYZvyn43sPN+Vw+dY57VCxxThbSI2o9kWc0VnZ18wIIJXTrw+
+ E/y66wF4tO1NSfsL8SJmOF+BEW13bsdhgc1mc4tvsqZmm19j6QzdxUZU1XrCvu33UDiv
+ nv0Va0ntohc8F2iNSq/YM2nJycx5iKmDCZ4cnGGJ2k8KHqzPVsDNQgQxLrYE2kJHLQlI
+ cnPwvULRxcpHnKjinb77md85PFRnj6ST51M8V9toFHatcFT9fxORhu4RHD8vqVAl0UWT
+ ltnw==
+X-Gm-Message-State: APjAAAVIWCbhcTswvbxCXC/zL6hqs4Xc4fnK+iXDbAuBqNXO1x5F/ROr
+ lxmPEcM6XDWjaw7d+8MnzrksswKVnZk=
+X-Google-Smtp-Source: APXvYqzPMQXqII0RIFiLAvVcq6huIg3ZdYpjVAcAQydEIsP9Juw2FS79y0dcZR3YvaOHq2B9IG9zyA==
+X-Received: by 2002:aed:2687:: with SMTP id q7mr9746711qtd.382.1571845512179; 
+ Wed, 23 Oct 2019 08:45:12 -0700 (PDT)
+Received: from localhost.localdomain (rrcs-172-254-253-50.nyc.biz.rr.com.
+ [172.254.253.50])
+ by smtp.gmail.com with ESMTPSA id o1sm2456272qtb.82.2019.10.23.08.45.11
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 23 Oct 2019 08:45:11 -0700 (PDT)
+From: Richard Henderson <richard.henderson@linaro.org>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v2 4/7] exec: Use const alias for TARGET_PAGE_BITS_VARY
+Date: Wed, 23 Oct 2019 11:45:02 -0400
+Message-Id: <20191023154505.30521-5-richard.henderson@linaro.org>
+X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20191023154505.30521-1-richard.henderson@linaro.org>
+References: <20191023154505.30521-1-richard.henderson@linaro.org>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::142
+X-Received-From: 2607:f8b0:4864:20::843
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,74 +90,145 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org,
- KONRAD Frederic <frederic.konrad@adacore.com>,
- Artyom Tarasenko <atar4qemu@gmail.com>,
- =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
- Jiri Gaisler <jiri@gaisler.se>
+Cc: pbonzini@redhat.com, alex.bennee@linaro.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Does anyone know what needs implemented to get networking supported?
+Using a variable that is declared "const" for this tells the
+compiler that it may read the value once and assume that it
+does not change across function calls.
 
-Joshua
+For target_page_size, this means we have only one assert per
+function, and one read of the variable.
 
-On Wed, Oct 16, 2019 at 6:34 AM Fabien Chouteau <chouteau@adacore.com> wrot=
-e:
->
-> Hello people,
->
-> On 15/10/2019 18:57, Philippe Mathieu-Daud=C3=A9 wrote:
-> > Hi Joshua,
-> >
-> > On 10/15/19 3:17 PM, Joshua Shaffer wrote:
-> >> Hello,
-> >>
-> >> I've been using the LEON3 port of qemu, and am wondering if anyone has=
- touched the networking setup for such since the thread here: https://lists=
-.rtems.org/pipermail/users/2014-September/028224.html
-> >
-> > Thanks for sharing this!
-> >
-> > Good news, Jiri keeps rebasing his patch with the latest stable version=
-.
-> > Bad news, he didn't not signed his work with a "Signed-off-by" tag so w=
-e can not take this as it into the mainstream repository, see https://wiki.=
-qemu.org/Contribute/SubmitAPatch#Patch_emails_must_include_a_Signed-off-by:=
-_line
-> >
->
-> The Gaisler patches have been rewrote by my colleague Frederic (in CC) an=
-d they are now in mainstream.
-> (see https://lists.gnu.org/archive/html/qemu-devel/2019-05/msg03869.html)
->
-> But none of them are implementing network support, and I never heard of s=
-omeone working on network for leon3.
->
-> Regards,
->
+This reduces the size of qemu-system-aarch64 by 8k.
 
---=20
-Notice: This message is intended solely for use of the individual or entity=
-=20
-to which it is addressed and may contain information that is proprietary,=
-=20
-privileged, company confidential and/or exempt from disclosure under=20
-applicable law. If the reader is not the intended recipient or agent=20
-responsible for delivering the message to the intended recipient, you are=
-=20
-hereby notified that any dissemination, distribution or copying of this=20
-communication is strictly prohibited. This communication may also contain=
-=20
-data subject to the International Traffic in Arms Regulations or U.S.=20
-Export Administration Regulations and cannot be disseminated, distributed=
-=20
-or copied to foreign nationals, residing in the U.S. or abroad, without the=
-=20
-prior approval of the U.S. Department of State or appropriate export=20
-licensing authority. If you have received this communication in error,=20
-please notify the sender by reply e-mail or collect telephone call and=20
-delete or destroy all copies of this email message, any physical copies=20
-made of this e-mail message and/or any file attachment(s).
+Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+---
+v2: Notice CONFIG_ATTRIBUTE_ALIAS, and work around Xcode 9 lossage.
+---
+ include/exec/cpu-all.h | 14 +++++++---
+ exec-vary.c            | 60 ++++++++++++++++++++++++++++++++++++------
+ 2 files changed, 62 insertions(+), 12 deletions(-)
+
+diff --git a/include/exec/cpu-all.h b/include/exec/cpu-all.h
+index 255bb186ac..76515dc8d9 100644
+--- a/include/exec/cpu-all.h
++++ b/include/exec/cpu-all.h
+@@ -210,10 +210,16 @@ static inline void stl_phys_notdirty(AddressSpace *as, hwaddr addr, uint32_t val
+ /* page related stuff */
+ 
+ #ifdef TARGET_PAGE_BITS_VARY
+-extern bool target_page_bits_decided;
+-extern int target_page_bits;
+-#define TARGET_PAGE_BITS ({ assert(target_page_bits_decided); \
+-                            target_page_bits; })
++typedef struct {
++    bool decided;
++    int bits;
++} TargetPageBits;
++# if defined(CONFIG_ATTRIBUTE_ALIAS) || !defined(IN_EXEC_VARY)
++extern const TargetPageBits target_page;
++#else
++extern TargetPageBits target_page;
++# endif
++#define TARGET_PAGE_BITS (assert(target_page.decided), target_page.bits)
+ #else
+ #define TARGET_PAGE_BITS_MIN TARGET_PAGE_BITS
+ #endif
+diff --git a/exec-vary.c b/exec-vary.c
+index 48c0ab306c..e0befd502a 100644
+--- a/exec-vary.c
++++ b/exec-vary.c
+@@ -19,11 +19,55 @@
+ 
+ #include "qemu/osdep.h"
+ #include "qemu-common.h"
++
++#define IN_EXEC_VARY 1
++
+ #include "exec/exec-all.h"
+ 
+ #ifdef TARGET_PAGE_BITS_VARY
+-int target_page_bits;
+-bool target_page_bits_decided;
++# ifdef CONFIG_ATTRIBUTE_ALIAS
++/*
++ * We want to declare the "target_page" variable as const, which tells
++ * the compiler that it can cache any value that it reads across calls.
++ * This avoids multiple assertions and multiple reads within any one user.
++ *
++ * This works because we initialize the target_page data very early, in a
++ * location far removed from the functions that require the final results.
++ *
++ * This also requires that we have a non-constant symbol by which we can
++ * perform the actual initialization, and which forces the data to be
++ * allocated within writable memory.  Thus "init_target_page", and we use
++ * that symbol exclusively in the two functions that initialize this value.
++ *
++ * The "target_page" symbol is created as an alias of "init_target_page".
++ */
++static TargetPageBits init_target_page;
++
++/*
++ * Note that this is *not* a redundant decl, this is the definition of
++ * the "target_page" symbol.  The syntax for this definition requires
++ * the use of the extern keyword.  This seems to be a GCC bug in
++ * either the syntax for the alias attribute or in -Wredundant-decls.
++ *
++ * See https://gcc.gnu.org/bugzilla/show_bug.cgi?id=91765
++ */
++#  pragma GCC diagnostic push
++#  pragma GCC diagnostic ignored "-Wredundant-decls"
++
++extern const TargetPageBits target_page
++    __attribute__((alias("init_target_page")));
++
++#  pragma GCC diagnostic pop
++# else
++/*
++ * When aliases are not supported then we force two different declarations,
++ * by way of suppressing the header declaration with IN_EXEC_VARY.
++ * We assume that on such an old compiler, LTO cannot be used, and so the
++ * compiler cannot not detect the mismatched declarations, and all is well.
++ */
++TargetPageBits target_page;
++#  define init_target_page target_page
++# endif
+ #endif
+ 
+ bool set_preferred_target_page_bits(int bits)
+@@ -36,11 +80,11 @@ bool set_preferred_target_page_bits(int bits)
+      */
+ #ifdef TARGET_PAGE_BITS_VARY
+     assert(bits >= TARGET_PAGE_BITS_MIN);
+-    if (target_page_bits == 0 || target_page_bits > bits) {
+-        if (target_page_bits_decided) {
++    if (init_target_page.bits == 0 || init_target_page.bits > bits) {
++        if (init_target_page.decided) {
+             return false;
+         }
+-        target_page_bits = bits;
++        init_target_page.bits = bits;
+     }
+ #endif
+     return true;
+@@ -49,9 +93,9 @@ bool set_preferred_target_page_bits(int bits)
+ void finalize_target_page_bits(void)
+ {
+ #ifdef TARGET_PAGE_BITS_VARY
+-    if (target_page_bits == 0) {
+-        target_page_bits = TARGET_PAGE_BITS_MIN;
++    if (init_target_page.bits == 0) {
++        init_target_page.bits = TARGET_PAGE_BITS_MIN;
+     }
+-    target_page_bits_decided = true;
++    init_target_page.decided = true;
+ #endif
+ }
+-- 
+2.17.1
+
 
