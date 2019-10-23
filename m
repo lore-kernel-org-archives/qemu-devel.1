@@ -2,79 +2,85 @@ Return-Path: <SRS0=brme=YQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CA91BCA9EB6
-	for <qemu-devel@archiver.kernel.org>; Wed, 23 Oct 2019 16:14:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E1713CA9EB6
+	for <qemu-devel@archiver.kernel.org>; Wed, 23 Oct 2019 16:15:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 94CC92064A
-	for <qemu-devel@archiver.kernel.org>; Wed, 23 Oct 2019 16:14:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A65E02064A
+	for <qemu-devel@archiver.kernel.org>; Wed, 23 Oct 2019 16:15:38 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VF5iUgui"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 94CC92064A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b="eY/S4Yd3"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A65E02064A
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=sifive.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40920 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40948 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iNJH7-0007g4-7r
-	for qemu-devel@archiver.kernel.org; Wed, 23 Oct 2019 12:14:17 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39352)
+	id 1iNJIP-00007c-0t
+	for qemu-devel@archiver.kernel.org; Wed, 23 Oct 2019 12:15:37 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43471)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <stefanha@redhat.com>) id 1iNIV2-0002YZ-IO
- for qemu-devel@nongnu.org; Wed, 23 Oct 2019 11:24:38 -0400
+ (envelope-from <palmer@sifive.com>) id 1iNIud-0001oG-Gs
+ for qemu-devel@nongnu.org; Wed, 23 Oct 2019 11:51:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <stefanha@redhat.com>) id 1iNIV1-0001RC-Fc
- for qemu-devel@nongnu.org; Wed, 23 Oct 2019 11:24:36 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:43650
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1iNIV1-0001Qb-BJ
- for qemu-devel@nongnu.org; Wed, 23 Oct 2019 11:24:35 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1571844274;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=GkE+hDlB5fFKLn+2E0jRJ3qxFPV0UL3vNbXeQOwxfpk=;
- b=VF5iUgui6cofgC16pk3bzVH5VNhklE/W7pdbBj011EbqI0ysOeJk/lXQ+EoVbQzZzhoYcR
- iHtVLEWnGHgSEBpbhdf6iMtfFICj2u+nvHfxsAdQE7UNEeehZl0DgideoLOsCPMxmVi2tl
- LOMxbBydwaleJXdET40j1DzgZDKzDwE=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-130-cqJ1O4tgOSaouQeKXqJRhw-1; Wed, 23 Oct 2019 11:24:29 -0400
-X-MC-Unique: cqJ1O4tgOSaouQeKXqJRhw-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3B6A8107AD40;
- Wed, 23 Oct 2019 15:19:13 +0000 (UTC)
-Received: from localhost (unknown [10.36.118.70])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 793D160166;
- Wed, 23 Oct 2019 15:19:04 +0000 (UTC)
-Date: Wed, 23 Oct 2019 16:19:03 +0100
-From: Stefan Hajnoczi <stefanha@redhat.com>
-To: "yezhenyu (A)" <yezhenyu2@huawei.com>
-Subject: Re: [RFC PATCH] iothread: add set_iothread_poll_* commands
-Message-ID: <20191023151903.GI9574@stefanha-x1.localdomain>
-References: <5DAEB9D3.3080503@huawei.com>
-MIME-Version: 1.0
-In-Reply-To: <5DAEB9D3.3080503@huawei.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Mimecast-Spam-Score: 0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="kH8JNVvasRCCW1Oz"
-Content-Disposition: inline
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 205.139.110.120
+ (envelope-from <palmer@sifive.com>) id 1iNIuc-0002C9-4s
+ for qemu-devel@nongnu.org; Wed, 23 Oct 2019 11:51:03 -0400
+Received: from mail-pf1-x444.google.com ([2607:f8b0:4864:20::444]:37404)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <palmer@sifive.com>) id 1iNIub-0002Bg-Qg
+ for qemu-devel@nongnu.org; Wed, 23 Oct 2019 11:51:01 -0400
+Received: by mail-pf1-x444.google.com with SMTP id y5so13188976pfo.4
+ for <qemu-devel@nongnu.org>; Wed, 23 Oct 2019 08:51:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sifive.com; s=google;
+ h=date:subject:in-reply-to:cc:from:to:message-id:mime-version
+ :content-transfer-encoding;
+ bh=lGu68nCovEPsrHRd7JaveUjJGF93eRXSwxmkZjlbdJw=;
+ b=eY/S4Yd3LHO7/oBnR0ioqvL15/MAblYJdjBoQQfRfMp9MMWfLpMmIoXY26MNTgCA8N
+ gFpFxlw3lyK4KWVaWZcefIHmmmVA+T0LKduUO9yQQIArBZc1gCw2pjaKvfOSEj7Vk7QG
+ yd439nMD1QfcnuFIgcGHUqfjVnJ5tnuKzhSvEteyKRdUfL66y9/pdsWkwakusWBPRwSr
+ a3fgeuBRVojwSVlRysyCxvKOijnOQs+NS30cyKAVU1IXbLBlR5YeZ/xrVKjlwsHJ5vGg
+ mtSMvwHl8Hy7Ot1Wk9rksXQr40yR6NQUXjvdiYWNRLx/YiOzPfT+vTDQ8RFcPpWPTUEO
+ kU7A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:subject:in-reply-to:cc:from:to:message-id
+ :mime-version:content-transfer-encoding;
+ bh=lGu68nCovEPsrHRd7JaveUjJGF93eRXSwxmkZjlbdJw=;
+ b=EjeHRD1C+tGsscteFlsWytxwO2TZa4nuIsW6Eb4eURXHvASpELKenXyq8jSn0iT3sg
+ OGFuK0aSpIvS7pNfx95Isiei6p0gX8A1auhO6g1LN9asrthvR0Rvf9k5WHFnh7T1c2JT
+ uZDkuj8Nk23sizZiV5AE84lX/Y+xFNAPqrYxC67tt6naybVXrrXviOXeMYB4nyvMxAGB
+ Z8ytyOZVIhupCB2NFM7MOqeRZBFb7RCvvMYyXEJYIDVeMEHEXAxicH+NP/E9krSW6DfA
+ onBkhkr5AaHvxxQtjexNcMbhURS1vvqWJZC1VCNMt4Qm/ohHSOk24jjdHnxGJM/f30ZM
+ WlFA==
+X-Gm-Message-State: APjAAAUjFiwW7A3ifXhw8z75VnQStn6nqKsCVztFHDmo+kgZB9BsenGz
+ +REMxo/xAdFEgixiI/WFDizVXAzSYjJeJg==
+X-Google-Smtp-Source: APXvYqyT6x8Swfsd/vljMYdifmUQe4kOcuKxi4C660WcA6a1PgzYQ0K4zq7zAhq0m2x8KyZECeJobQ==
+X-Received: by 2002:a62:31c2:: with SMTP id
+ x185mr11788403pfx.112.1571845860194; 
+ Wed, 23 Oct 2019 08:51:00 -0700 (PDT)
+Received: from localhost ([12.206.222.5])
+ by smtp.gmail.com with ESMTPSA id 64sm23863659pfx.31.2019.10.23.08.50.59
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 23 Oct 2019 08:50:59 -0700 (PDT)
+Date: Wed, 23 Oct 2019 08:50:59 -0700 (PDT)
+X-Google-Original-Date: Wed, 23 Oct 2019 08:50:19 PDT (-0700)
+Subject: Re: [PATCH] target/riscv: PMP violation due to wrong size parameter
+In-Reply-To: <20191022212129.8452-1-dayeol@berkeley.edu>
+From: Palmer Dabbelt <palmer@sifive.com>
+To: dayeol@berkeley.edu
+Message-ID: <mhng-bdf2777a-b43b-4192-aa4f-ba07fa146a62@palmer-si-x1c4>
+Mime-Version: 1.0 (MHng)
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::444
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,69 +92,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: dgilbert@redhat.com, xiexiangyou@huawei.com, qemu-devel@nongnu.org,
- jiangyiwen <jiangyiwen@huawei.com>, pbonzini@redhat.com
+Cc: qemu-riscv@nongnu.org, sagark@eecs.berkeley.edu, dayeol@berkeley.edu,
+ Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
+ richard.henderson@linaro.org, qemu-devel@nongnu.org,
+ Alistair Francis <Alistair.Francis@wdc.com>, diodesign@tuta.io
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---kH8JNVvasRCCW1Oz
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Tue, Oct 22, 2019 at 04:12:03PM +0800, yezhenyu (A) wrote:
-> Since qemu2.9, QEMU added three AioContext poll parameters to struct
-> IOThread: poll_max_ns, poll_grow and poll_shrink. These properties are
-> used to control iothread polling time.
->=20
-> However, there isn't properly hmp commands to adjust them when the VM is
-> alive. It's useful to adjust them online when observing the impact of
-> different property value on performance.
->=20
-> This patch add three hmp commands to adjust iothread poll-* properties
-> for special iothread:
->=20
-> set_iothread_poll_max_ns: set the maximum polling time in ns;
-> set_iothread_poll_grow: set how many ns will be added to polling time;
-> set_iothread_poll_shrink: set how many ns will be removed from polling
-> time.
->=20
-> Signed-off-by: Zhenyu Ye <yezhenyu2@huawei.com>
+On Tue, 22 Oct 2019 14:21:29 PDT (-0700), dayeol@berkeley.edu wrote:
+> riscv_cpu_tlb_fill() uses the `size` parameter to check PMP violation
+> using pmp_hart_has_privs().
+> However, if the size is unknown (=0), the ending address will be
+> `addr - 1` as it is `addr + size - 1` in `pmp_hart_has_privs()`.
+> This always causes a false PMP violation on the starting address of the
+> range, as `addr - 1` is not in the range.
+>
+> In order to fix, we just assume that all bytes from addr to the end of
+> the page will be accessed if the size is unknown.
+>
+> Signed-off-by: Dayeol Lee <dayeol@berkeley.edu>
+> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 > ---
-> hmp-commands.hx | 42 ++++++++++++++++++++
-> hmp.c | 30 +++++++++++++++
-> hmp.h | 3 ++
-> include/sysemu/iothread.h | 6 +++
-> iothread.c | 80 +++++++++++++++++++++++++++++++++++++++
-> qapi/misc.json | 23 +++++++++++
-> 6 files changed, 184 insertions(+)
+>  target/riscv/pmp.c | 13 ++++++++++++-
+>  1 file changed, 12 insertions(+), 1 deletion(-)
+>
+> diff --git a/target/riscv/pmp.c b/target/riscv/pmp.c
+> index 958c7502a0..7a9fd415ba 100644
+> --- a/target/riscv/pmp.c
+> +++ b/target/riscv/pmp.c
+> @@ -232,6 +232,7 @@ bool pmp_hart_has_privs(CPURISCVState *env, target_ulong addr,
+>  {
+>      int i = 0;
+>      int ret = -1;
+> +    int pmp_size = 0;
+>      target_ulong s = 0;
+>      target_ulong e = 0;
+>      pmp_priv_t allowed_privs = 0;
+> @@ -241,11 +242,21 @@ bool pmp_hart_has_privs(CPURISCVState *env, target_ulong addr,
+>          return true;
+>      }
+>
+> +    /*
+> +     * if size is unknown (0), assume that all bytes
+> +     * from addr to the end of the page will be accessed.
+> +     */
+> +    if (size == 0) {
+> +        pmp_size = -(addr | TARGET_PAGE_MASK);
+> +    } else {
+> +        pmp_size = size;
+> +    }
+> +
+>      /* 1.10 draft priv spec states there is an implicit order
+>           from low to high */
+>      for (i = 0; i < MAX_RISCV_PMPS; i++) {
+>          s = pmp_is_in_range(env, i, addr);
+> -        e = pmp_is_in_range(env, i, addr + size - 1);
+> +        e = pmp_is_in_range(env, i, addr + pmp_size - 1);
+>
+>          /* partially inside */
+>          if ((s + e) == 1) {
 
-poll-max-ns, poll-grow, poll-shrink are properties of IOThread objects.
-They can already be modified at runtime using:
-
-  $ qemu -object iothread,id=3Diothread1
-  (qemu) qom-set /objects/iothread1 poll-max-ns 100000
-
-I think there is no need for a patch.
-
-Stefan
-
---kH8JNVvasRCCW1Oz
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl2wb2cACgkQnKSrs4Gr
-c8j+TQf9GOdblXMO8mK7BVUu9vQ1TQkWGGGDAwJNU/cWmFglAOf3cnV7pZupKrcO
-9Mx8hVe7guURupVflHNPWu8YTKDbFUabETz01dOiTgAvZ9RL4GRDBd2Eg8T/a7UY
-Xa5hsR9ppepmLu2xjh0B0Ua6Sh832dJQTfNOxFkZTtqzLTpYfLpRSNsB+me8UiS/
-v2Kq4utPgwETRnFEawivN9aLDyiB9cRtNCoVan7hXXgcazmoJXREsokxC2vmVrt+
-s7JbXCsZMBSyj/y+mgY3SBybVl/GlJRbyoeLpo8sqRmNtQ6FLUArlpzXOheg1TyP
-fSFwsPoLIGYfN7oV6IDg4k37FsF8QQ==
-=9778
------END PGP SIGNATURE-----
-
---kH8JNVvasRCCW1Oz--
-
+Thanks.  I've queued this up for my next pull request.
 
