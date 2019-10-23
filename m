@@ -2,95 +2,87 @@ Return-Path: <SRS0=brme=YQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 804CDCA9EB6
-	for <qemu-devel@archiver.kernel.org>; Wed, 23 Oct 2019 15:07:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CAA5CCA9EB6
+	for <qemu-devel@archiver.kernel.org>; Wed, 23 Oct 2019 15:08:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5439A21872
-	for <qemu-devel@archiver.kernel.org>; Wed, 23 Oct 2019 15:07:38 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5439A21872
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id 94AAB21872
+	for <qemu-devel@archiver.kernel.org>; Wed, 23 Oct 2019 15:08:52 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Kl7dFo28"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 94AAB21872
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39018 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39024 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iNIEa-0003wN-QJ
-	for qemu-devel@archiver.kernel.org; Wed, 23 Oct 2019 11:07:36 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33051)
+	id 1iNIFm-0004yc-Ph
+	for qemu-devel@archiver.kernel.org; Wed, 23 Oct 2019 11:08:50 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35095)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <groug@kaod.org>) id 1iNHzs-0000pF-VC
- for qemu-devel@nongnu.org; Wed, 23 Oct 2019 10:52:27 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1iNI8r-000861-T6
+ for qemu-devel@nongnu.org; Wed, 23 Oct 2019 11:01:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <groug@kaod.org>) id 1iNHzr-0004Ay-Br
- for qemu-devel@nongnu.org; Wed, 23 Oct 2019 10:52:24 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:52376
- helo=mx0a-001b2d01.pphosted.com)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <groug@kaod.org>) id 1iNHzr-0004Ad-6v
- for qemu-devel@nongnu.org; Wed, 23 Oct 2019 10:52:23 -0400
-Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
- by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
- x9NEpPWu079567
- for <qemu-devel@nongnu.org>; Wed, 23 Oct 2019 10:52:22 -0400
-Received: from e06smtp01.uk.ibm.com (e06smtp01.uk.ibm.com [195.75.94.97])
- by mx0b-001b2d01.pphosted.com with ESMTP id 2vts0ag1c0-1
- (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
- for <qemu-devel@nongnu.org>; Wed, 23 Oct 2019 10:52:22 -0400
-Received: from localhost
- by e06smtp01.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
- Violators will be prosecuted
- for <qemu-devel@nongnu.org> from <groug@kaod.org>;
- Wed, 23 Oct 2019 15:52:19 +0100
-Received: from b06cxnps4074.portsmouth.uk.ibm.com (9.149.109.196)
- by e06smtp01.uk.ibm.com (192.168.101.131) with IBM ESMTP SMTP Gateway:
- Authorized Use Only! Violators will be prosecuted; 
- (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
- Wed, 23 Oct 2019 15:52:17 +0100
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com
- (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
- by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- x9NEqGln41746582
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Wed, 23 Oct 2019 14:52:16 GMT
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id BA656A4060;
- Wed, 23 Oct 2019 14:52:16 +0000 (GMT)
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 81BA9A4054;
- Wed, 23 Oct 2019 14:52:16 +0000 (GMT)
-Received: from bahia.lan (unknown [9.145.36.67])
- by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
- Wed, 23 Oct 2019 14:52:16 +0000 (GMT)
-Subject: [PATCH 4/6] qom: Add object_child_foreach_type() helper function
-From: Greg Kurz <groug@kaod.org>
-To: David Gibson <david@gibson.dropbear.id.au>
-Date: Wed, 23 Oct 2019 16:52:16 +0200
-In-Reply-To: <157184231371.3053790.17713393349394736594.stgit@bahia.lan>
-References: <157184231371.3053790.17713393349394736594.stgit@bahia.lan>
-User-Agent: StGit/unknown-version
+ (envelope-from <richard.henderson@linaro.org>) id 1iNI8q-0001Dg-MX
+ for qemu-devel@nongnu.org; Wed, 23 Oct 2019 11:01:41 -0400
+Received: from mail-qt1-x843.google.com ([2607:f8b0:4864:20::843]:37773)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+ id 1iNI8o-00013Z-L2
+ for qemu-devel@nongnu.org; Wed, 23 Oct 2019 11:01:40 -0400
+Received: by mail-qt1-x843.google.com with SMTP id g50so18582133qtb.4
+ for <qemu-devel@nongnu.org>; Wed, 23 Oct 2019 08:01:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=IBA+abtZ26hlRDDlZ8eTB3Pn4yNYwZChmFB+u2JQGOM=;
+ b=Kl7dFo28PEXr9icb+mFQdKLB4ia3YW7xNtm5+36Axi5JLbMVMjmEJg+o1rLT7O6hFY
+ Njdd1uj18qTWYtm1tKivlXWozJ0IXiXkjEMBjxjH1Xtqcy78egANpG+uFQbfRcZOwDj0
+ FVcZcImevfyeqhw6Xii0bm3EbKKIVsuiQ5xidiZxYuFShVTIpllo8EOt/iqv9JiKt2eb
+ WPe8B12kbWYO8FX4R67m6AdhgjfSeB2Ia0IyFw4pgky5hh7WXRlLZGZNQTU4Ib3rH9ka
+ hjw2vkFPUXNyDR1/FBkytveJpl2WqoS2zJUzfWkrFDoVRFw+xsmiuz3xMdtAv+Z/ZY/+
+ 2YXA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=IBA+abtZ26hlRDDlZ8eTB3Pn4yNYwZChmFB+u2JQGOM=;
+ b=L42PabNQYuvb39SSpTAAOyURxuS6tzclsG/BVRQw4vJM7NJJPOwcV3BS47XE8Vw9yG
+ IJyfsE4aJUDwJvFAWedqVtpPK234nomQ2EhRsU+6o6kJx09keUONxqQ0oOvKaa1bSeRf
+ DobIfi1EBrgRywsaFqhFysb5sWBIAhmxato5JK24iIXuZDezuhK/CQKlVuk5fv0AuiJq
+ cJU+AWX5Xishg+slX0z/v4j5nc5/oCrGWhHEIXXRKN6ScZAvY4szPGSaQbgHttfnOv3n
+ p0tme1TBPIhOfop5RdeRCAshk0mIg+XxoG1x2hZqVQvxJqOLMa8vPNoaCehP34AmOy04
+ 5O5A==
+X-Gm-Message-State: APjAAAVWPYdKqzrUO4+ZHJiAfTRm5LD+d/He/XgfbNdUCKvY+c+ctr6w
+ E5+I/w9/P2Ahs2JBfWVPmbihuuhKnxE=
+X-Google-Smtp-Source: APXvYqy3W63RxWhSSR5seFaLZo0aDIGTzsWVncaCydtEqw8o04kC8LCJtNLOZTHhGvLZzwcdsoQHFA==
+X-Received: by 2002:ac8:3597:: with SMTP id k23mr3420879qtb.195.1571842871709; 
+ Wed, 23 Oct 2019 08:01:11 -0700 (PDT)
+Received: from localhost.localdomain (198-4-20-64.static.cosmoweb.net.
+ [64.20.4.198])
+ by smtp.gmail.com with ESMTPSA id l189sm11030168qke.69.2019.10.23.08.01.10
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 23 Oct 2019 08:01:11 -0700 (PDT)
+From: Richard Henderson <richard.henderson@linaro.org>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v9 07/24] target/arm: Split out rebuild_hflags_a32
+Date: Wed, 23 Oct 2019 11:00:40 -0400
+Message-Id: <20191023150057.25731-8-richard.henderson@linaro.org>
+X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20191023150057.25731-1-richard.henderson@linaro.org>
+References: <20191023150057.25731-1-richard.henderson@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-x-cbid: 19102314-4275-0000-0000-000003763436
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19102314-4276-0000-0000-000038895BDE
-Message-Id: <157184233616.3053790.246919545000657597.stgit@bahia.lan>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
- definitions=2019-10-23_03:, , signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- priorityscore=1501
- malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
- clxscore=1034 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1908290000 definitions=main-1910230148
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
-X-Received-From: 148.163.158.5
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::843
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -102,131 +94,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-ppc@nongnu.org,
- =?utf-8?q?C=C3=A9dric?= Le Goater <clg@kaod.org>, qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, qemu-arm@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Calling a function for children of a certain type is a recurring pattern
-in the QEMU code base. In order to avoid the need to setup the same boiler
-plate again and again, introduce a variant of object_child_foreach() that
-only considers children of the given type.
+Currently a trivial wrapper for rebuild_hflags_common_32.
 
-Signed-off-by: Greg Kurz <groug@kaod.org>
+Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- include/qom/object.h |   35 +++++++++++++++++++++++++++++++++++
- qom/object.c         |   30 +++++++++++++++++++++++-------
- 2 files changed, 58 insertions(+), 7 deletions(-)
+ target/arm/helper.c | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
 
-diff --git a/include/qom/object.h b/include/qom/object.h
-index 128d00c77fd6..e9e3c2eae8ed 100644
---- a/include/qom/object.h
-+++ b/include/qom/object.h
-@@ -1728,6 +1728,41 @@ int object_child_foreach(Object *obj, int (*fn)(Object *child, void *opaque),
- int object_child_foreach_recursive(Object *obj,
-                                    int (*fn)(Object *child, void *opaque),
-                                    void *opaque);
-+
-+/**
-+ * object_child_foreach_type:
-+ * @obj: the object whose children will be navigated
-+ * @typename: the type of child objects to consider
-+ * @fn: the iterator function to be called
-+ * @opaque: an opaque value that will be passed to the iterator
-+ *
-+ * This is similar to object_child_foreach, but it only calls @fn for
-+ * child objects of the give @typename.
-+ *
-+ * Returns: The last value returned by @fn, or 0 if there is no child of
-+ * the given @typename.
-+ */
-+int object_child_foreach_type(Object *obj, const char *typename,
-+                              int (*fn)(Object *child, void *opaque),
-+                              void *opaque);
-+
-+/**
-+ * object_child_foreach_recursive_type:
-+ * @obj: the object whose children will be navigated
-+ * @typename: the type of child objects to consider
-+ * @fn: the iterator function to be called
-+ * @opaque: an opaque value that will be passed to the iterator
-+ *
-+ * This is similar to object_child_foreach_recursive, but it only calls
-+ * @fn for child objects of the give @typename.
-+ *
-+ * Returns: The last value returned by @fn, or 0 if there is no child of
-+ * the given @typename.
-+ */
-+int object_child_foreach_recursive_type(Object *obj, const char *typename,
-+                                        int (*fn)(Object *child, void *opaque),
-+                                        void *opaque);
-+
- /**
-  * container_get:
-  * @root: root of the #path, e.g., object_get_root()
-diff --git a/qom/object.c b/qom/object.c
-index 6fa9c619fac4..a2dec1261ff7 100644
---- a/qom/object.c
-+++ b/qom/object.c
-@@ -986,7 +986,7 @@ void object_class_foreach(void (*fn)(ObjectClass *klass, void *opaque),
-     enumerating_types = false;
+diff --git a/target/arm/helper.c b/target/arm/helper.c
+index 296a4b2232..d1cd54cc93 100644
+--- a/target/arm/helper.c
++++ b/target/arm/helper.c
+@@ -11106,6 +11106,12 @@ static uint32_t rebuild_hflags_m32(CPUARMState *env, int fp_el,
+     return rebuild_hflags_common_32(env, fp_el, mmu_idx, flags);
  }
  
--static int do_object_child_foreach(Object *obj,
-+static int do_object_child_foreach(Object *obj, const char *typename,
-                                    int (*fn)(Object *child, void *opaque),
-                                    void *opaque, bool recurse)
++static uint32_t rebuild_hflags_a32(CPUARMState *env, int fp_el,
++                                   ARMMMUIdx mmu_idx)
++{
++    return rebuild_hflags_common_32(env, fp_el, mmu_idx, 0);
++}
++
+ static uint32_t rebuild_hflags_a64(CPUARMState *env, int el, int fp_el,
+                                    ARMMMUIdx mmu_idx)
  {
-@@ -999,12 +999,14 @@ static int do_object_child_foreach(Object *obj,
-         if (object_property_is_child(prop)) {
-             Object *child = prop->opaque;
- 
--            ret = fn(child, opaque);
--            if (ret != 0) {
--                break;
-+            if (!typename || object_dynamic_cast(child, typename)) {
-+                ret = fn(child, opaque);
-+                if (ret != 0) {
-+                    break;
-+                }
+@@ -11218,7 +11224,7 @@ void cpu_get_tb_cpu_state(CPUARMState *env, target_ulong *pc,
+                 flags = FIELD_DP32(flags, TBFLAG_A32, LSPACT, 1);
              }
-             if (recurse) {
--                do_object_child_foreach(child, fn, opaque, true);
-+                do_object_child_foreach(child, typename, fn, opaque, true);
-             }
+         } else {
+-            flags = rebuild_hflags_common_32(env, fp_el, mmu_idx, 0);
++            flags = rebuild_hflags_a32(env, fp_el, mmu_idx);
          }
-     }
-@@ -1014,14 +1016,28 @@ static int do_object_child_foreach(Object *obj,
- int object_child_foreach(Object *obj, int (*fn)(Object *child, void *opaque),
-                          void *opaque)
- {
--    return do_object_child_foreach(obj, fn, opaque, false);
-+    return do_object_child_foreach(obj, NULL, fn, opaque, false);
- }
  
- int object_child_foreach_recursive(Object *obj,
-                                    int (*fn)(Object *child, void *opaque),
-                                    void *opaque)
- {
--    return do_object_child_foreach(obj, fn, opaque, true);
-+    return do_object_child_foreach(obj, NULL, fn, opaque, true);
-+}
-+
-+int object_child_foreach_type(Object *obj, const char *typename,
-+                              int (*fn)(Object *child, void *opaque),
-+                              void *opaque)
-+{
-+    return do_object_child_foreach(obj, typename, fn, opaque, false);
-+}
-+
-+int object_child_foreach_recursive_type(Object *obj, const char *typename,
-+                                        int (*fn)(Object *child, void *opaque),
-+                                        void *opaque)
-+{
-+    return do_object_child_foreach(obj, typename, fn, opaque, true);
- }
- 
- static void object_class_get_list_tramp(ObjectClass *klass, void *opaque)
+         flags = FIELD_DP32(flags, TBFLAG_A32, THUMB, env->thumb);
+-- 
+2.17.1
 
 
