@@ -2,84 +2,87 @@ Return-Path: <SRS0=brme=YQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,FROM_LOCAL_NOVOWEL,
-	HEADER_FROM_DIFFERENT_DOMAINS,HK_RANDOM_FROM,INCLUDES_PULL_REQUEST,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 392A1CA9EB9
-	for <qemu-devel@archiver.kernel.org>; Wed, 23 Oct 2019 23:03:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DE080CA9EB9
+	for <qemu-devel@archiver.kernel.org>; Wed, 23 Oct 2019 23:04:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F2ACB20679
-	for <qemu-devel@archiver.kernel.org>; Wed, 23 Oct 2019 23:03:03 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cMrXmb5q"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F2ACB20679
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id AF31120659
+	for <qemu-devel@archiver.kernel.org>; Wed, 23 Oct 2019 23:04:34 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AF31120659
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52142 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52182 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iNPeg-0002Dw-5P
-	for qemu-devel@archiver.kernel.org; Wed, 23 Oct 2019 19:03:02 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60610)
+	id 1iNPg9-00046g-TO
+	for qemu-devel@archiver.kernel.org; Wed, 23 Oct 2019 19:04:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60759)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jcmvbkbc@gmail.com>) id 1iNPdH-0000wj-CS
- for qemu-devel@nongnu.org; Wed, 23 Oct 2019 19:01:36 -0400
+ (envelope-from <philmd@redhat.com>) id 1iNPeS-0002SW-Oc
+ for qemu-devel@nongnu.org; Wed, 23 Oct 2019 19:02:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jcmvbkbc@gmail.com>) id 1iNPdG-0008Sa-7l
- for qemu-devel@nongnu.org; Wed, 23 Oct 2019 19:01:35 -0400
-Received: from mail-lf1-x12d.google.com ([2a00:1450:4864:20::12d]:33935)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <jcmvbkbc@gmail.com>) id 1iNPdF-0008S8-TP
- for qemu-devel@nongnu.org; Wed, 23 Oct 2019 19:01:34 -0400
-Received: by mail-lf1-x12d.google.com with SMTP id f5so9752236lfp.1
- for <qemu-devel@nongnu.org>; Wed, 23 Oct 2019 16:01:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=I8j4dAhlgluaZhQ+lH7QcWf+rfQOK1gdUYJEkBkfVwQ=;
- b=cMrXmb5q29/uRBibIUeErXB93uwiq7cDGLP0Ql+40npuD/Ko96/0lOwZ64tJn6GI+J
- 7YE+l1AKzcJU6T2Ixvep9mQpUrwx9T/jT7u7sNrNO2Emfhm73RGTbMP7ttortsbrrFsw
- etWnnp4k73fClfqdzhv1hORJq/h1rhkrPBCRoT1eZ7nD8QVW431Uy8++54jWKyfCD4R4
- B4tEyowCPkCcy+iyc7I8hjqHXSXMy7lsudqhOo3Dr4MZK1orSIy26e0mYvw9AXxyV2iY
- 2HWBPmZVjRaDuzWX8Si51ezGhB3MIMkwFnoFYs5sbCmKzBUU/OmizEawKm0+CUxrUKQB
- ReDg==
+ (envelope-from <philmd@redhat.com>) id 1iNPeR-0000TN-Ee
+ for qemu-devel@nongnu.org; Wed, 23 Oct 2019 19:02:48 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:33004)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iNPeR-0000T8-6N
+ for qemu-devel@nongnu.org; Wed, 23 Oct 2019 19:02:47 -0400
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 31E1D4E938
+ for <qemu-devel@nongnu.org>; Wed, 23 Oct 2019 23:02:46 +0000 (UTC)
+Received: by mail-wr1-f72.google.com with SMTP id v8so10888052wrt.16
+ for <qemu-devel@nongnu.org>; Wed, 23 Oct 2019 16:02:46 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=I8j4dAhlgluaZhQ+lH7QcWf+rfQOK1gdUYJEkBkfVwQ=;
- b=Ay6onZtL9jLmHC8ccyzEP4vZfU1v9HwSpadrGudifaURQZ4Uksd09xQNSwn9vLqYau
- 8+TG5RfOKQf+jLn7SoV4VFy28f8/5umHiHpYD/U40oJmuBgftZ5jBXhoIcd3yHPDqZ+B
- bID/hODkcytgsxWwVk+rnEnwLAfvRP6dsjy8UdoBSmyo5SZ8+mX7EiV27aXas4LHoh7U
- NaAH2D0GZeOa72YLogp24aEQswKFi+2O8HUTBKDDXuak6p92VH9wbEY7zmhMrJ6qWUEw
- ErbvI6+FuSLvKatBFAJ3lzEkeD+QZlB70WY6IRl9sv/E/4QhI9utHajtX6BBkmAdSpdU
- PISQ==
-X-Gm-Message-State: APjAAAXlXg0ioA4+ZJhG9/VL0I3axcRI7RCIzGFYRVjsOqSXXJTBHyI9
- M0M/wWtkZvBT637RRnvXZhYP37gM
-X-Google-Smtp-Source: APXvYqwUB9qrGtGQnjrb2kXZqudv/8VQ+aesPexMI8BGmCBSgvelO6RONVXQ7zMZpIIffUxI/UJjbg==
-X-Received: by 2002:ac2:47ed:: with SMTP id b13mr19901725lfp.43.1571871691614; 
- Wed, 23 Oct 2019 16:01:31 -0700 (PDT)
-Received: from octofox.cadence.com
- (jcmvbkbc-1-pt.tunnel.tserv24.sto1.ipv6.he.net. [2001:470:27:1fa::2])
- by smtp.gmail.com with ESMTPSA id b2sm15634556lfq.27.2019.10.23.16.01.25
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 23 Oct 2019 16:01:26 -0700 (PDT)
-From: Max Filippov <jcmvbkbc@gmail.com>
-To: qemu-devel@nongnu.org
-Subject: [PULL 0/2] target/xtensa queue
-Date: Wed, 23 Oct 2019 16:01:10 -0700
-Message-Id: <20191023230110.7170-1-jcmvbkbc@gmail.com>
-X-Mailer: git-send-email 2.20.1
+ bh=NbN8nXL/7OUD5AseCS8Rxjxq6seb8+nEYKYOUhNwpgY=;
+ b=lcar0U0iP1FBGcPahZK2CSQjd99rqkHTJqaakbCblEz+qcLH0I8zs2i9MHORGA5ndy
+ rr3q7wcuAPufmwt60fU/0KkRJIAkwkje4XSr8cjSBUYnfincKhDFdb4px4qEoVsmcnJU
+ Gkrv+k0QjtsSPF7KbWCNN6i1O4b90TqNXI9rtyaZec7DgYo2qKNgKufn8Ok9zXHx5Ent
+ 3UOHjfPn4yhl6n5kJGOAvVvbT9yhE2ksHDUQKm0vXTybDm1hccksTxaRqkClNWXv9EsM
+ IzcMcGnqStCjce2Z8HO2WQQQtsxUAOuZQQEJ1lbpTZ7kDGKtIWdDOu9BoXVf+ehPE9PI
+ r8qw==
+X-Gm-Message-State: APjAAAWVvSn3BX0BhSjJtnnqzSuNWm1xQ3HI7DDlMeVFpqTyXgYDtcsM
+ nR8+Suoy+SvTFwwvQ2VvriCo8ANnoyJLh22SMzLc1lVIutyt2O87pbvp1zVkkm6w/oQIbjf33NQ
+ XWpJayvn6lAk/ey8=
+X-Received: by 2002:adf:e28f:: with SMTP id v15mr917947wri.130.1571871764874; 
+ Wed, 23 Oct 2019 16:02:44 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqz3aT+W/ZMy4PwBXoAWniwHmqOR5s78djqw2L18aRQYTNQFH+3sm54d870hyh0BhqrQOdAS+Q==
+X-Received: by 2002:adf:e28f:: with SMTP id v15mr917920wri.130.1571871764660; 
+ Wed, 23 Oct 2019 16:02:44 -0700 (PDT)
+Received: from [192.168.1.41] (129.red-83-57-174.dynamicip.rima-tde.net.
+ [83.57.174.129])
+ by smtp.gmail.com with ESMTPSA id a4sm521075wmm.10.2019.10.23.16.02.43
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Wed, 23 Oct 2019 16:02:44 -0700 (PDT)
+Subject: Re: [PATCH v3 23/33] dp8393x: replace PROP_PTR with PROP_LINK
+To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
+ qemu-devel@nongnu.org
+References: <20191023173154.30051-1-marcandre.lureau@redhat.com>
+ <20191023173154.30051-24-marcandre.lureau@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <06288994-a5d3-038d-794e-ed63acdadd95@redhat.com>
+Date: Thu, 24 Oct 2019 01:02:42 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.1
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::12d
+In-Reply-To: <20191023173154.30051-24-marcandre.lureau@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,54 +94,91 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Max Filippov <jcmvbkbc@gmail.com>
+Cc: Corey Minyard <cminyard@mvista.com>,
+ =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>,
+ Peter Maydell <peter.maydell@linaro.org>, Magnus Damm <magnus.damm@gmail.com>,
+ Jason Wang <jasowang@redhat.com>, qemu-ppc@nongnu.org,
+ Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
+ Fabien Chouteau <chouteau@adacore.com>,
+ Aleksandar Rikalo <arikalo@wavecomp.com>,
+ KONRAD Frederic <frederic.konrad@adacore.com>, qemu-arm@nongnu.org,
+ =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>,
+ Aurelien Jarno <aurelien@aurel32.net>,
+ Aleksandar Markovic <amarkovic@wavecomp.com>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
+ Paul Burton <pburton@wavecomp.com>, Artyom Tarasenko <atar4qemu@gmail.com>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Peter,
+On 10/23/19 7:31 PM, Marc-Andr=C3=A9 Lureau wrote:
+> Link property is the correct way to pass a MemoryRegion to a device
+> for DMA purposes.
+>=20
+> Sidenote: as a sysbus device, this remains non-usercreatable
+> even though we can drop the specific flag here.
+>=20
+> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+> ---
+>   hw/mips/mips_jazz.c | 3 ++-
+>   hw/net/dp8393x.c    | 7 +++----
+>   2 files changed, 5 insertions(+), 5 deletions(-)
+>=20
+> diff --git a/hw/mips/mips_jazz.c b/hw/mips/mips_jazz.c
+> index 8d010a0b6e..878925a963 100644
+> --- a/hw/mips/mips_jazz.c
+> +++ b/hw/mips/mips_jazz.c
+> @@ -284,7 +284,8 @@ static void mips_jazz_init(MachineState *machine,
+>               dev =3D qdev_create(NULL, "dp8393x");
+>               qdev_set_nic_properties(dev, nd);
+>               qdev_prop_set_uint8(dev, "it_shift", 2);
+> -            qdev_prop_set_ptr(dev, "dma_mr", rc4030_dma_mr);
+> +            object_property_set_link(OBJECT(dev), OBJECT(rc4030_dma_mr=
+),
+> +                                     "dma_mr", &error_abort);
+>               qdev_init_nofail(dev);
+>               sysbus =3D SYS_BUS_DEVICE(dev);
+>               sysbus_mmio_map(sysbus, 0, 0x80001000);
+> diff --git a/hw/net/dp8393x.c b/hw/net/dp8393x.c
+> index a5678e11fa..946c7a8f64 100644
+> --- a/hw/net/dp8393x.c
+> +++ b/hw/net/dp8393x.c
+> @@ -173,7 +173,7 @@ typedef struct dp8393xState {
+>       int loopback_packet;
+>  =20
+>       /* Memory access */
+> -    void *dma_mr;
+> +    MemoryRegion *dma_mr;
+>       AddressSpace as;
+>   } dp8393xState;
+>  =20
+> @@ -922,7 +922,8 @@ static const VMStateDescription vmstate_dp8393x =3D=
+ {
+>  =20
+>   static Property dp8393x_properties[] =3D {
+>       DEFINE_NIC_PROPERTIES(dp8393xState, conf),
+> -    DEFINE_PROP_PTR("dma_mr", dp8393xState, dma_mr),
+> +    DEFINE_PROP_LINK("dma_mr", dp8393xState, dma_mr,
+> +                     TYPE_MEMORY_REGION, MemoryRegion *),
+>       DEFINE_PROP_UINT8("it_shift", dp8393xState, it_shift, 0),
+>       DEFINE_PROP_END_OF_LIST(),
+>   };
+> @@ -936,8 +937,6 @@ static void dp8393x_class_init(ObjectClass *klass, =
+void *data)
+>       dc->reset =3D dp8393x_reset;
+>       dc->vmsd =3D &vmstate_dp8393x;
+>       dc->props =3D dp8393x_properties;
+> -    /* Reason: dma_mr property can't be set */
+> -    dc->user_creatable =3D false;
 
-please pull the following two target/xtensa patches for v4.2.
+Patch is OK except this user_creatable change I don't understand.
 
-The following changes since commit a30cb4b1f22c58aa3b933ee9e1d7611399b57b5b:
-
-  Merge remote-tracking branch 'remotes/vivier2/tags/linux-user-for-4.2-pull-request' into staging (2019-09-12 16:17:26 +0100)
-
-are available in the Git repository at:
-
-  git://github.com/OSLL/qemu-xtensa.git tags/20191023-xtensa
-
-for you to fetch changes up to d9e8553bc8821d72cb72ca95f76b2d8ff6eb628a:
-
-  hw/xtensa: add virt machine (2019-10-18 20:38:10 -0700)
-
-----------------------------------------------------------------
-target/xtensa improvements for v4.2:
-
-- regenerate and reimport test_mmuhifi_c3 core;
-- add virt machine.
-
-----------------------------------------------------------------
-Max Filippov (2):
-      target/xtensa: regenerate and re-import test_mmuhifi_c3 core
-      hw/xtensa: add virt machine
-
- MAINTAINERS                                        |    5 +
- default-configs/xtensa-softmmu.mak                 |    1 +
- hw/xtensa/Kconfig                                  |    6 +
- hw/xtensa/Makefile.objs                            |    1 +
- hw/xtensa/sim.c                                    |   41 +-
- hw/xtensa/virt.c                                   |  135 +
- hw/xtensa/xtensa_sim.h                             |   34 +
- target/xtensa/core-test_mmuhifi_c3.c               |    3 +-
- target/xtensa/core-test_mmuhifi_c3/core-isa.h      |  116 +-
- .../xtensa/core-test_mmuhifi_c3/gdb-config.inc.c   |  114 +-
- .../core-test_mmuhifi_c3/xtensa-modules.inc.c      | 6384 ++++++++++----------
- 11 files changed, 3593 insertions(+), 3247 deletions(-)
- create mode 100644 hw/xtensa/virt.c
- create mode 100644 hw/xtensa/xtensa_sim.h
-
--- 
-Thanks.
--- Max
+>   }
+>  =20
+>   static const TypeInfo dp8393x_info =3D {
+>=20
 
