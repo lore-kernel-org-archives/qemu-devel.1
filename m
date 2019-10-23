@@ -2,76 +2,77 @@ Return-Path: <SRS0=brme=YQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8FBB2CA9EB6
-	for <qemu-devel@archiver.kernel.org>; Wed, 23 Oct 2019 08:59:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 99361CA9EB6
+	for <qemu-devel@archiver.kernel.org>; Wed, 23 Oct 2019 08:59:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 580F2205C9
-	for <qemu-devel@archiver.kernel.org>; Wed, 23 Oct 2019 08:59:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 60953205C9
+	for <qemu-devel@archiver.kernel.org>; Wed, 23 Oct 2019 08:59:50 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QL8yn2Oy"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 580F2205C9
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="i9qwA9nl"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 60953205C9
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57592 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57596 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iNCTy-00051R-GY
-	for qemu-devel@archiver.kernel.org; Wed, 23 Oct 2019 04:59:06 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48904)
+	id 1iNCUf-0005I6-Ff
+	for qemu-devel@archiver.kernel.org; Wed, 23 Oct 2019 04:59:49 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49902)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jfreimann@redhat.com>) id 1iNC0z-0003eC-Li
- for qemu-devel@nongnu.org; Wed, 23 Oct 2019 04:29:11 -0400
+ (envelope-from <stefanha@redhat.com>) id 1iNC9F-0000G0-QN
+ for qemu-devel@nongnu.org; Wed, 23 Oct 2019 04:37:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jfreimann@redhat.com>) id 1iNC0x-00077X-LO
- for qemu-devel@nongnu.org; Wed, 23 Oct 2019 04:29:09 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:26579
+ (envelope-from <stefanha@redhat.com>) id 1iNC9D-0007BT-SL
+ for qemu-devel@nongnu.org; Wed, 23 Oct 2019 04:37:41 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:27101
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jfreimann@redhat.com>)
- id 1iNC0v-00075c-QH
- for qemu-devel@nongnu.org; Wed, 23 Oct 2019 04:29:06 -0400
+ (Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1iNC9B-00076V-Re
+ for qemu-devel@nongnu.org; Wed, 23 Oct 2019 04:37:39 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1571819344;
+ s=mimecast20190719; t=1571819855;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=QZS+Bpg3A6NPh7e22P/XIvlyKZUB0+Jeal7rH5qYaGI=;
- b=QL8yn2OyRmsJ2KrCyb6HyIz2jHjCCLZQ78eShe91BGDzF67qaxHB0FIjRIiZoqMfkqZy6b
- MyYxgyLvk+x56TGRaHj/c4NtMJtznOOBTjwAHMToqwE+zS+l23E1n1m1AgTBsN6h6gvZ32
- ZHBFFK9Vydct7q/LqKdoB2jQBR3GL4s=
+ bh=FIqCARfcVW9wuiOKaI1ga1uSM/PJ7/4To4/XNBhaQOM=;
+ b=i9qwA9nlQMhAnqKtPxqBKY4k3UTg0VGH7h+72NUadDZZ/7Cnk2ih8QydAop1fTJUINiMSo
+ BzwIR0oY2TbQEH/FelSA7+jt5YJugQcTWpW+l/E+zpnmGtWuXuHmhf8WoT4bPSjiVVCXY0
+ g2pEZtZEzG49RmdvdEwAvoFEWW5xy/8=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-86-KYC4yDNGM-OqmCJhnCHPTA-1; Wed, 23 Oct 2019 04:29:01 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
+ us-mta-348-ufJBc-1bMMyTl94Z0Xs-3g-1; Wed, 23 Oct 2019 04:37:32 -0400
+X-MC-Unique: ufJBc-1bMMyTl94Z0Xs-3g-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9C912476;
- Wed, 23 Oct 2019 08:29:00 +0000 (UTC)
-Received: from localhost (dhcp-192-217.str.redhat.com [10.33.192.217])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 8ADF55C1D4;
- Wed, 23 Oct 2019 08:28:53 +0000 (UTC)
-From: Jens Freimann <jfreimann@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v5 11/11] vfio: unplug failover primary device before migration
-Date: Wed, 23 Oct 2019 10:27:11 +0200
-Message-Id: <20191023082711.16694-12-jfreimann@redhat.com>
-In-Reply-To: <20191023082711.16694-1-jfreimann@redhat.com>
-References: <20191023082711.16694-1-jfreimann@redhat.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6D25B800D49;
+ Wed, 23 Oct 2019 08:37:31 +0000 (UTC)
+Received: from localhost (unknown [10.36.118.70])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 301D0600CC;
+ Wed, 23 Oct 2019 08:37:23 +0000 (UTC)
+Date: Wed, 23 Oct 2019 09:37:22 +0100
+From: Stefan Hajnoczi <stefanha@redhat.com>
+To: Christophe de Dinechin <dinechin@redhat.com>
+Subject: Re: [PATCH v3 09/16] libqos: access VIRTIO 1.0 vring in little-endian
+Message-ID: <20191023083722.GB9574@stefanha-x1.localdomain>
+References: <20191019063810.6944-1-stefanha@redhat.com>
+ <20191019063810.6944-10-stefanha@redhat.com>
+ <m136fkoh9g.fsf@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-MC-Unique: KYC4yDNGM-OqmCJhnCHPTA-1
+In-Reply-To: <m136fkoh9g.fsf@redhat.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=WINDOWS-1252
-Content-Transfer-Encoding: quoted-printable
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="tjCHc7DPkfUGtrlw"
+Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 205.139.110.61
@@ -86,115 +87,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: pkrempa@redhat.com, berrange@redhat.com, ehabkost@redhat.com,
- mst@redhat.com, aadam@redhat.com, dgilbert@redhat.com,
- alex.williamson@redhat.com, laine@redhat.com, ailan@redhat.com,
- parav@mellanox.com
+Cc: Fam Zheng <fam@euphon.net>, Laurent Vivier <lvivier@redhat.com>,
+ Thomas Huth <thuth@redhat.com>, qemu-block@nongnu.org, slp@redhat.com,
+ "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org,
+ Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-As usual block all vfio-pci devices from being migrated, but make an
-exception for failover primary devices. This is achieved by setting
-unmigratable to 0 but also add a migration blocker for all vfio-pci
-devices except failover primary devices. These will be unplugged before
-migration happens by the migration handler of the corresponding
-virtio-net standby device.
+--tjCHc7DPkfUGtrlw
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Signed-off-by: Jens Freimann <jfreimann@redhat.com>
----
- hw/vfio/pci.c | 26 ++++++++++++++++++++------
- hw/vfio/pci.h |  1 +
- 2 files changed, 21 insertions(+), 6 deletions(-)
+On Tue, Oct 22, 2019 at 06:51:39PM +0200, Christophe de Dinechin wrote:
+>=20
+> Stefan Hajnoczi writes:
+> [...]
+> > +static uint16_t qvirtio_readw(QVirtioDevice *d, QTestState *qts, uint6=
+4_t addr)
+> > +{
+> > +    uint16_t val =3D qtest_readw(qts, addr);
+> > +
+> > +    if (d->features & (1ull << VIRTIO_F_VERSION_1) && qtest_big_endian=
+(qts)) {
+>=20
+> For my education, I was wondering why tests use the (1ull << FEATURE)
+> notation and not an equivalent of virtio_has_feature()? Is this
+> intentional, or just legacy?
 
-diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
-index 12fac39804..5dadfec6e8 100644
---- a/hw/vfio/pci.c
-+++ b/hw/vfio/pci.c
-@@ -40,6 +40,7 @@
- #include "pci.h"
- #include "trace.h"
- #include "qapi/error.h"
-+#include "migration/blocker.h"
-=20
- #define TYPE_VFIO_PCI "vfio-pci"
- #define PCI_VFIO(obj)    OBJECT_CHECK(VFIOPCIDevice, obj, TYPE_VFIO_PCI)
-@@ -2732,6 +2733,17 @@ static void vfio_realize(PCIDevice *pdev, Error **er=
-rp)
-         return;
-     }
-=20
-+    if (!pdev->net_failover_pair_id) {
-+        error_setg(&vdev->migration_blocker,
-+                "VFIO device doesn't support migration");
-+        ret =3D migrate_add_blocker(vdev->migration_blocker, &err);
-+        if (err) {
-+            error_propagate(errp, err);
-+            error_free(vdev->migration_blocker);
-+            return;
-+        }
-+    }
-+
-     vdev->vbasedev.name =3D g_path_get_basename(vdev->vbasedev.sysfsdev);
-     vdev->vbasedev.ops =3D &vfio_pci_ops;
-     vdev->vbasedev.type =3D VFIO_DEVICE_TYPE_PCI;
-@@ -3008,6 +3020,10 @@ out_teardown:
-     vfio_bars_exit(vdev);
- error:
-     error_prepend(errp, VFIO_MSG_PREFIX, vdev->vbasedev.name);
-+    if (vdev->migration_blocker) {
-+        migrate_del_blocker(vdev->migration_blocker);
-+        error_free(vdev->migration_blocker);
-+    }
- }
-=20
- static void vfio_instance_finalize(Object *obj)
-@@ -3019,6 +3035,10 @@ static void vfio_instance_finalize(Object *obj)
-     vfio_bars_finalize(vdev);
-     g_free(vdev->emulated_config_bits);
-     g_free(vdev->rom);
-+    if (vdev->migration_blocker) {
-+        migrate_del_blocker(vdev->migration_blocker);
-+        error_free(vdev->migration_blocker);
-+    }
-     /*
-      * XXX Leaking igd_opregion is not an oversight, we can't remove the
-      * fw_cfg entry therefore leaking this allocation seems like the safes=
-t
-@@ -3151,11 +3171,6 @@ static Property vfio_pci_dev_properties[] =3D {
-     DEFINE_PROP_END_OF_LIST(),
- };
-=20
--static const VMStateDescription vfio_pci_vmstate =3D {
--    .name =3D "vfio-pci",
--    .unmigratable =3D 1,
--};
--
- static void vfio_pci_dev_class_init(ObjectClass *klass, void *data)
- {
-     DeviceClass *dc =3D DEVICE_CLASS(klass);
-@@ -3163,7 +3178,6 @@ static void vfio_pci_dev_class_init(ObjectClass *klas=
-s, void *data)
-=20
-     dc->reset =3D vfio_pci_reset;
-     dc->props =3D vfio_pci_dev_properties;
--    dc->vmsd =3D &vfio_pci_vmstate;
-     dc->desc =3D "VFIO-based PCI device assignment";
-     set_bit(DEVICE_CATEGORY_MISC, dc->categories);
-     pdc->realize =3D vfio_realize;
-diff --git a/hw/vfio/pci.h b/hw/vfio/pci.h
-index 834a90d646..b329d50338 100644
---- a/hw/vfio/pci.h
-+++ b/hw/vfio/pci.h
-@@ -168,6 +168,7 @@ typedef struct VFIOPCIDevice {
-     bool no_vfio_ioeventfd;
-     bool enable_ramfb;
-     VFIODisplay *dpy;
-+    Error *migration_blocker;
- } VFIOPCIDevice;
-=20
- uint32_t vfio_pci_read_config(PCIDevice *pdev, uint32_t addr, int len);
---=20
-2.21.0
+It's historical, libqos never defined an equivalent helper function.
+
+Stefan
+
+--tjCHc7DPkfUGtrlw
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl2wEUIACgkQnKSrs4Gr
+c8j/pwgAn1feplUcaId3D0UmhGGu6XRKjD81wabPxaFeh/nLM51VjlRzXMu8bubc
+Xyo2NffI+Rnc4Tp2wMFaQ5tWgY+vugIscW6eZw340WQU6bc8ja1c6N+3//tywrjA
+HBt4U6+6MUPIL8beVU2umD9+s+ta5iXluNWgwwAGP6yLgrF4STRAqWCip2FfbGuX
++yb4ccbuT18jmiSPECOVH8U/+t4sTfNxrOLAw41OZ0fqHJQHzKi2sGvoj6IHcZgY
+Bal03fr2ZYL1PfGdr6I/PY9uC9ZvbNpPPPIdnCSFbmitCcQTt5S3P5RfbOM9ssoG
+hHk6Q9qcrGk6NWunoO/7eDubgKpLrw==
+=nQrg
+-----END PGP SIGNATURE-----
+
+--tjCHc7DPkfUGtrlw--
 
 
