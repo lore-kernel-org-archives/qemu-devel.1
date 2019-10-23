@@ -6,77 +6,77 @@ X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DE080CA9EB9
-	for <qemu-devel@archiver.kernel.org>; Wed, 23 Oct 2019 23:04:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A057CA9EB9
+	for <qemu-devel@archiver.kernel.org>; Wed, 23 Oct 2019 23:08:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AF31120659
-	for <qemu-devel@archiver.kernel.org>; Wed, 23 Oct 2019 23:04:34 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AF31120659
+	by mail.kernel.org (Postfix) with ESMTPS id 1E9532064B
+	for <qemu-devel@archiver.kernel.org>; Wed, 23 Oct 2019 23:08:48 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1E9532064B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52182 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52292 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iNPg9-00046g-TO
-	for qemu-devel@archiver.kernel.org; Wed, 23 Oct 2019 19:04:33 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60759)
+	id 1iNPkF-0001LU-6y
+	for qemu-devel@archiver.kernel.org; Wed, 23 Oct 2019 19:08:47 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33217)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1iNPeS-0002SW-Oc
- for qemu-devel@nongnu.org; Wed, 23 Oct 2019 19:02:49 -0400
+ (envelope-from <philmd@redhat.com>) id 1iNPjG-00075K-HX
+ for qemu-devel@nongnu.org; Wed, 23 Oct 2019 19:07:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1iNPeR-0000TN-Ee
- for qemu-devel@nongnu.org; Wed, 23 Oct 2019 19:02:48 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:33004)
+ (envelope-from <philmd@redhat.com>) id 1iNPjF-0001uo-IB
+ for qemu-devel@nongnu.org; Wed, 23 Oct 2019 19:07:46 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46894)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iNPeR-0000T8-6N
- for qemu-devel@nongnu.org; Wed, 23 Oct 2019 19:02:47 -0400
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72])
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iNPjF-0001uI-AQ
+ for qemu-devel@nongnu.org; Wed, 23 Oct 2019 19:07:45 -0400
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72])
  (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 31E1D4E938
- for <qemu-devel@nongnu.org>; Wed, 23 Oct 2019 23:02:46 +0000 (UTC)
-Received: by mail-wr1-f72.google.com with SMTP id v8so10888052wrt.16
- for <qemu-devel@nongnu.org>; Wed, 23 Oct 2019 16:02:46 -0700 (PDT)
+ by mx1.redhat.com (Postfix) with ESMTPS id 11DE93B717
+ for <qemu-devel@nongnu.org>; Wed, 23 Oct 2019 23:07:43 +0000 (UTC)
+Received: by mail-wm1-f72.google.com with SMTP id o188so183290wmo.5
+ for <qemu-devel@nongnu.org>; Wed, 23 Oct 2019 16:07:42 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:message-id:date
  :user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=NbN8nXL/7OUD5AseCS8Rxjxq6seb8+nEYKYOUhNwpgY=;
- b=lcar0U0iP1FBGcPahZK2CSQjd99rqkHTJqaakbCblEz+qcLH0I8zs2i9MHORGA5ndy
- rr3q7wcuAPufmwt60fU/0KkRJIAkwkje4XSr8cjSBUYnfincKhDFdb4px4qEoVsmcnJU
- Gkrv+k0QjtsSPF7KbWCNN6i1O4b90TqNXI9rtyaZec7DgYo2qKNgKufn8Ok9zXHx5Ent
- 3UOHjfPn4yhl6n5kJGOAvVvbT9yhE2ksHDUQKm0vXTybDm1hccksTxaRqkClNWXv9EsM
- IzcMcGnqStCjce2Z8HO2WQQQtsxUAOuZQQEJ1lbpTZ7kDGKtIWdDOu9BoXVf+ehPE9PI
- r8qw==
-X-Gm-Message-State: APjAAAWVvSn3BX0BhSjJtnnqzSuNWm1xQ3HI7DDlMeVFpqTyXgYDtcsM
- nR8+Suoy+SvTFwwvQ2VvriCo8ANnoyJLh22SMzLc1lVIutyt2O87pbvp1zVkkm6w/oQIbjf33NQ
- XWpJayvn6lAk/ey8=
-X-Received: by 2002:adf:e28f:: with SMTP id v15mr917947wri.130.1571871764874; 
- Wed, 23 Oct 2019 16:02:44 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqz3aT+W/ZMy4PwBXoAWniwHmqOR5s78djqw2L18aRQYTNQFH+3sm54d870hyh0BhqrQOdAS+Q==
-X-Received: by 2002:adf:e28f:: with SMTP id v15mr917920wri.130.1571871764660; 
- Wed, 23 Oct 2019 16:02:44 -0700 (PDT)
+ bh=yBnIzIRWnC1PwBFYZOLXIfan46JBj2GdcoEJiFRPnSc=;
+ b=oO3GeoYIyZeww8Enkt/DdUvyM/ND7qhY+udrDI/lEtqme7lj9qV3uW8BwSQny906Xw
+ v4hyfsJ1MXYyj6/pideYCx8o1etyYuMEDUQ40ckHlWzmsk99TG2VebR/qv8ejDcQXTRz
+ 01rWmjxbQ6xSn/Ql/7TYCj6ZEO/5XQT4MpygNoyL9F+BseuT2Qib1LolVKm+IgsBSbiY
+ +CHiTba/TkXkUfaNaZKZ8pE+eDjQQgQUh0NQ8vHKJ66OO01rxnBf7G5AMb7tfq2yWCNC
+ RnFVAphQnPW2M9BPRGMihc5CmFehT/SMPXkn+WJuVBDPrHF9nSTwE7BQ4dim62mm+N6U
+ V2cA==
+X-Gm-Message-State: APjAAAXpVfF5Nf0WkbFIxa1JyLOGIIJBIKTO86WZy1yZ0DIZlcBWfOqf
+ KzvH0P2TSJBGmLr5UBydS5WHRU8fFpl2jmYMcdUUdxg+o2juk3O3h5Gg+QN8rcKv2JWokJb1Gda
+ R4hJXgDfh6mRxCPk=
+X-Received: by 2002:a1c:a849:: with SMTP id r70mr1908154wme.59.1571872061746; 
+ Wed, 23 Oct 2019 16:07:41 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqzNPUa579x7BZ55JB5Xrk8JjggWbukp2qx6rkgxIaSkJ7Q436Gwd19nRLBKxXg2LE7vcZHQ6Q==
+X-Received: by 2002:a1c:a849:: with SMTP id r70mr1908123wme.59.1571872061501; 
+ Wed, 23 Oct 2019 16:07:41 -0700 (PDT)
 Received: from [192.168.1.41] (129.red-83-57-174.dynamicip.rima-tde.net.
  [83.57.174.129])
- by smtp.gmail.com with ESMTPSA id a4sm521075wmm.10.2019.10.23.16.02.43
+ by smtp.gmail.com with ESMTPSA id n1sm27987009wrg.67.2019.10.23.16.07.39
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Wed, 23 Oct 2019 16:02:44 -0700 (PDT)
-Subject: Re: [PATCH v3 23/33] dp8393x: replace PROP_PTR with PROP_LINK
+ Wed, 23 Oct 2019 16:07:40 -0700 (PDT)
+Subject: Re: [PATCH v3 32/33] qdev: remove PROP_MEMORY_REGION
 To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
  qemu-devel@nongnu.org
 References: <20191023173154.30051-1-marcandre.lureau@redhat.com>
- <20191023173154.30051-24-marcandre.lureau@redhat.com>
+ <20191023173154.30051-33-marcandre.lureau@redhat.com>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <06288994-a5d3-038d-794e-ed63acdadd95@redhat.com>
-Date: Thu, 24 Oct 2019 01:02:42 +0200
+Message-ID: <93780bab-1ae4-19e5-7ea8-247803f21cac@redhat.com>
+Date: Thu, 24 Oct 2019 01:07:39 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.1.1
 MIME-Version: 1.0
-In-Reply-To: <20191023173154.30051-24-marcandre.lureau@redhat.com>
+In-Reply-To: <20191023173154.30051-33-marcandre.lureau@redhat.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
@@ -115,70 +115,36 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 On 10/23/19 7:31 PM, Marc-Andr=C3=A9 Lureau wrote:
-> Link property is the correct way to pass a MemoryRegion to a device
-> for DMA purposes.
->=20
-> Sidenote: as a sysbus device, this remains non-usercreatable
-> even though we can drop the specific flag here.
+> PROP_MEMORY_REGION was a derivative of PROP_PTR, added in commit
+> ed03d749f3f513b8fb0287757cfda2cb6825f063 (qdev: add MemoryRegion
+> property) and thankfully no longer needed since commit
+> 3eff40dbf44896a8180c86c84dbdefb2eb173fbe (hw/misc: Remove
+> mmio_interface device).
 >=20
 > Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 > Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 > ---
->   hw/mips/mips_jazz.c | 3 ++-
->   hw/net/dp8393x.c    | 7 +++----
->   2 files changed, 5 insertions(+), 5 deletions(-)
+>   include/hw/qdev-properties.h | 2 --
+>   1 file changed, 2 deletions(-)
 >=20
-> diff --git a/hw/mips/mips_jazz.c b/hw/mips/mips_jazz.c
-> index 8d010a0b6e..878925a963 100644
-> --- a/hw/mips/mips_jazz.c
-> +++ b/hw/mips/mips_jazz.c
-> @@ -284,7 +284,8 @@ static void mips_jazz_init(MachineState *machine,
->               dev =3D qdev_create(NULL, "dp8393x");
->               qdev_set_nic_properties(dev, nd);
->               qdev_prop_set_uint8(dev, "it_shift", 2);
-> -            qdev_prop_set_ptr(dev, "dma_mr", rc4030_dma_mr);
-> +            object_property_set_link(OBJECT(dev), OBJECT(rc4030_dma_mr=
-),
-> +                                     "dma_mr", &error_abort);
->               qdev_init_nofail(dev);
->               sysbus =3D SYS_BUS_DEVICE(dev);
->               sysbus_mmio_map(sysbus, 0, 0x80001000);
-> diff --git a/hw/net/dp8393x.c b/hw/net/dp8393x.c
-> index a5678e11fa..946c7a8f64 100644
-> --- a/hw/net/dp8393x.c
-> +++ b/hw/net/dp8393x.c
-> @@ -173,7 +173,7 @@ typedef struct dp8393xState {
->       int loopback_packet;
->  =20
->       /* Memory access */
-> -    void *dma_mr;
-> +    MemoryRegion *dma_mr;
->       AddressSpace as;
->   } dp8393xState;
->  =20
-> @@ -922,7 +922,8 @@ static const VMStateDescription vmstate_dp8393x =3D=
- {
->  =20
->   static Property dp8393x_properties[] =3D {
->       DEFINE_NIC_PROPERTIES(dp8393xState, conf),
-> -    DEFINE_PROP_PTR("dma_mr", dp8393xState, dma_mr),
-> +    DEFINE_PROP_LINK("dma_mr", dp8393xState, dma_mr,
-> +                     TYPE_MEMORY_REGION, MemoryRegion *),
->       DEFINE_PROP_UINT8("it_shift", dp8393xState, it_shift, 0),
->       DEFINE_PROP_END_OF_LIST(),
->   };
-> @@ -936,8 +937,6 @@ static void dp8393x_class_init(ObjectClass *klass, =
-void *data)
->       dc->reset =3D dp8393x_reset;
->       dc->vmsd =3D &vmstate_dp8393x;
->       dc->props =3D dp8393x_properties;
-> -    /* Reason: dma_mr property can't be set */
-> -    dc->user_creatable =3D false;
-
-Patch is OK except this user_creatable change I don't understand.
-
->   }
->  =20
->   static const TypeInfo dp8393x_info =3D {
+> diff --git a/include/hw/qdev-properties.h b/include/hw/qdev-properties.=
+h
+> index 690ff07ae2..5bba033b7b 100644
+> --- a/include/hw/qdev-properties.h
+> +++ b/include/hw/qdev-properties.h
+> @@ -213,8 +213,6 @@ extern const PropertyInfo qdev_prop_pcie_link_width=
+;
+>       DEFINE_PROP_UNSIGNED(_n, _s, _f, 0, qdev_prop_blocksize, uint16_t=
+)
+>   #define DEFINE_PROP_PCI_HOST_DEVADDR(_n, _s, _f) \
+>       DEFINE_PROP(_n, _s, _f, qdev_prop_pci_host_devaddr, PCIHostDevice=
+Address)
+> -#define DEFINE_PROP_MEMORY_REGION(_n, _s, _f)             \
+> -    DEFINE_PROP(_n, _s, _f, qdev_prop_ptr, MemoryRegion *)
+>   #define DEFINE_PROP_OFF_AUTO_PCIBAR(_n, _s, _f, _d) \
+>       DEFINE_PROP_SIGNED(_n, _s, _f, _d, qdev_prop_off_auto_pcibar, \
+>                           OffAutoPCIBAR)
 >=20
+
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 
