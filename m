@@ -6,74 +6,74 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7381CCA9EB6
-	for <qemu-devel@archiver.kernel.org>; Wed, 23 Oct 2019 08:44:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C3ABCA9EB6
+	for <qemu-devel@archiver.kernel.org>; Wed, 23 Oct 2019 08:45:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3E4102084C
-	for <qemu-devel@archiver.kernel.org>; Wed, 23 Oct 2019 08:44:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C86212084C
+	for <qemu-devel@archiver.kernel.org>; Wed, 23 Oct 2019 08:45:00 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BnJfKHGV"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3E4102084C
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bLVA35PN"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C86212084C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57370 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57386 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iNCGA-00044j-CV
-	for qemu-devel@archiver.kernel.org; Wed, 23 Oct 2019 04:44:50 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48532)
+	id 1iNCGI-0004F1-NA
+	for qemu-devel@archiver.kernel.org; Wed, 23 Oct 2019 04:44:58 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48777)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jfreimann@redhat.com>) id 1iNC0C-0003Et-JO
- for qemu-devel@nongnu.org; Wed, 23 Oct 2019 04:28:21 -0400
+ (envelope-from <jfreimann@redhat.com>) id 1iNC0g-0003VA-Aw
+ for qemu-devel@nongnu.org; Wed, 23 Oct 2019 04:28:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jfreimann@redhat.com>) id 1iNC0A-0006Nd-Q6
- for qemu-devel@nongnu.org; Wed, 23 Oct 2019 04:28:20 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:46158
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <jfreimann@redhat.com>) id 1iNC0f-0006pz-8t
+ for qemu-devel@nongnu.org; Wed, 23 Oct 2019 04:28:50 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:53276
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <jfreimann@redhat.com>)
- id 1iNC07-0006If-1j
- for qemu-devel@nongnu.org; Wed, 23 Oct 2019 04:28:17 -0400
+ id 1iNC0f-0006pd-4r
+ for qemu-devel@nongnu.org; Wed, 23 Oct 2019 04:28:49 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1571819292;
+ s=mimecast20190719; t=1571819328;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=a0z18X9hX1k7WK6Ipini1RAn90sFvkNyQ0KnUbkp4vE=;
- b=BnJfKHGV1MJBYr6/mXk+fEfDR391d//u4lGQ9KXZ+l8CC6mSUI8dClpe9uL0wUzeD1P+5k
- tZ1JtooO9Bm1iPtf6IqexA2mtOeL+890xeKeqjHBxAMLALfLJWvPR/1YwmXSJjGhu3vvt9
- YmpBbmBUBTKQyVmZ11hwb7eHq7rxP88=
+ bh=RYq1a2cQnwSoFC7ZG9jOkK0ifFOYr2LBMa3wLluDZwY=;
+ b=bLVA35PNIrc6jy6NfgJktB9nHiRvA2iUIyRsMArVV9Z2zQEQ3CaaE1Wn3jVu2LUqgT+ePL
+ cbm90JMoJoDqGDMviv0PJ+AGBvff1U5AAd5+wIFmiiCelR6pmisdVXdfDRg402TfqSUBhh
+ DK3gP7suIgShrFGQ6kO4X0TquiDHUGM=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-132-wz05NgOUOoeAc9xYQRuKOg-1; Wed, 23 Oct 2019 04:28:11 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+ us-mta-134-PoitEdo6N0ywMGGDRQBNsg-1; Wed, 23 Oct 2019 04:28:43 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2DD55107AD31;
- Wed, 23 Oct 2019 08:28:10 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A988D1800D6B;
+ Wed, 23 Oct 2019 08:28:42 +0000 (UTC)
 Received: from localhost (dhcp-192-217.str.redhat.com [10.33.192.217])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id F198319C78;
- Wed, 23 Oct 2019 08:28:00 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 834BB5C72D;
+ Wed, 23 Oct 2019 08:28:32 +0000 (UTC)
 From: Jens Freimann <jfreimann@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v5 05/11] qapi: add unplug primary event
-Date: Wed, 23 Oct 2019 10:27:05 +0200
-Message-Id: <20191023082711.16694-6-jfreimann@redhat.com>
+Subject: [PATCH v5 09/11] libqos: tolerate wait-unplug migration state
+Date: Wed, 23 Oct 2019 10:27:09 +0200
+Message-Id: <20191023082711.16694-10-jfreimann@redhat.com>
 In-Reply-To: <20191023082711.16694-1-jfreimann@redhat.com>
 References: <20191023082711.16694-1-jfreimann@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-MC-Unique: wz05NgOUOoeAc9xYQRuKOg-1
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-MC-Unique: PoitEdo6N0ywMGGDRQBNsg-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=WINDOWS-1252
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.120
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -93,43 +93,28 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This event is emitted when we sent a request to unplug a
-failover primary device from the Guest OS and it includes the
-device id of the primary device.
-
 Signed-off-by: Jens Freimann <jfreimann@redhat.com>
 ---
- qapi/migration.json | 19 +++++++++++++++++++
- 1 file changed, 19 insertions(+)
+ tests/libqos/libqos.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/qapi/migration.json b/qapi/migration.json
-index 82feb5bd39..52e69e2868 100644
---- a/qapi/migration.json
-+++ b/qapi/migration.json
-@@ -1448,3 +1448,22 @@
- # Since: 3.0
- ##
- { 'command': 'migrate-pause', 'allow-oob': true }
-+
-+##
-+# @UNPLUG_PRIMARY:
-+#
-+# Emitted from source side of a migration when migration state is
-+# WAIT_UNPLUG. Device was unplugged by guest operating system.
-+# Device resources in QEMU are kept on standby to be able to re-plug it in=
- case
-+# of migration failure.
-+#
-+# @device_id: QEMU device id of the unplugged device
-+#
-+# Since: 4.2
-+#
-+# Example:
-+#   {"event": "UNPLUG_PRIMARY", "data": {"device_id": "hostdev0"} }
-+#
-+##
-+{ 'event': 'UNPLUG_PRIMARY',
-+  'data': { 'device_id': 'str' } }
+diff --git a/tests/libqos/libqos.c b/tests/libqos/libqos.c
+index d71557c5cb..f229eb2cb8 100644
+--- a/tests/libqos/libqos.c
++++ b/tests/libqos/libqos.c
+@@ -125,7 +125,8 @@ void migrate(QOSState *from, QOSState *to, const char *=
+uri)
+             break;
+         }
+=20
+-        if ((strcmp(st, "setup") =3D=3D 0) || (strcmp(st, "active") =3D=3D=
+ 0)) {
++        if ((strcmp(st, "setup") =3D=3D 0) || (strcmp(st, "active") =3D=3D=
+ 0)
++            || (strcmp(st, "wait-unplug") =3D=3D 0)) {
+             qobject_unref(rsp);
+             g_usleep(5000);
+             continue;
 --=20
 2.21.0
 
