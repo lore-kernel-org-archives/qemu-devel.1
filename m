@@ -2,94 +2,87 @@ Return-Path: <SRS0=brme=YQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D914ECA9EB7
-	for <qemu-devel@archiver.kernel.org>; Wed, 23 Oct 2019 15:11:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A8D8CCA9EB6
+	for <qemu-devel@archiver.kernel.org>; Wed, 23 Oct 2019 15:14:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B18AC21920
-	for <qemu-devel@archiver.kernel.org>; Wed, 23 Oct 2019 15:11:41 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B18AC21920
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id 6ACA721872
+	for <qemu-devel@archiver.kernel.org>; Wed, 23 Oct 2019 15:14:51 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="gT/PMVO8"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6ACA721872
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39076 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39242 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iNIIW-0006sf-42
-	for qemu-devel@archiver.kernel.org; Wed, 23 Oct 2019 11:11:40 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33162)
+	id 1iNILa-0002IB-Ae
+	for qemu-devel@archiver.kernel.org; Wed, 23 Oct 2019 11:14:50 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35224)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <groug@kaod.org>) id 1iNI0B-0000qu-0y
- for qemu-devel@nongnu.org; Wed, 23 Oct 2019 10:52:44 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1iNI8t-00088p-PP
+ for qemu-devel@nongnu.org; Wed, 23 Oct 2019 11:01:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <groug@kaod.org>) id 1iNI09-0004Ok-1e
- for qemu-devel@nongnu.org; Wed, 23 Oct 2019 10:52:42 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:17950)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <groug@kaod.org>) id 1iNI08-0004JJ-BS
- for qemu-devel@nongnu.org; Wed, 23 Oct 2019 10:52:40 -0400
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
- by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
- x9NEiuZo063546
- for <qemu-devel@nongnu.org>; Wed, 23 Oct 2019 10:52:34 -0400
-Received: from e06smtp01.uk.ibm.com (e06smtp01.uk.ibm.com [195.75.94.97])
- by mx0a-001b2d01.pphosted.com with ESMTP id 2vtqypaw5k-1
- (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
- for <qemu-devel@nongnu.org>; Wed, 23 Oct 2019 10:52:33 -0400
-Received: from localhost
- by e06smtp01.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
- Violators will be prosecuted
- for <qemu-devel@nongnu.org> from <groug@kaod.org>;
- Wed, 23 Oct 2019 15:52:31 +0100
-Received: from b06cxnps3075.portsmouth.uk.ibm.com (9.149.109.195)
- by e06smtp01.uk.ibm.com (192.168.101.131) with IBM ESMTP SMTP Gateway:
- Authorized Use Only! Violators will be prosecuted; 
- (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
- Wed, 23 Oct 2019 15:52:28 +0100
-Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com
- [9.149.105.58])
- by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- x9NEqRtq58523898
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Wed, 23 Oct 2019 14:52:28 GMT
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id D2DB74C058;
- Wed, 23 Oct 2019 14:52:27 +0000 (GMT)
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id A422D4C04A;
- Wed, 23 Oct 2019 14:52:27 +0000 (GMT)
-Received: from bahia.lan (unknown [9.145.36.67])
- by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
- Wed, 23 Oct 2019 14:52:27 +0000 (GMT)
-Subject: [PATCH 6/6] xive: Don't use CPU_FOREACH() to perform CAM line matching
-From: Greg Kurz <groug@kaod.org>
-To: David Gibson <david@gibson.dropbear.id.au>
-Date: Wed, 23 Oct 2019 16:52:27 +0200
-In-Reply-To: <157184231371.3053790.17713393349394736594.stgit@bahia.lan>
-References: <157184231371.3053790.17713393349394736594.stgit@bahia.lan>
-User-Agent: StGit/unknown-version
+ (envelope-from <richard.henderson@linaro.org>) id 1iNI8r-0001Eg-74
+ for qemu-devel@nongnu.org; Wed, 23 Oct 2019 11:01:43 -0400
+Received: from mail-qt1-x844.google.com ([2607:f8b0:4864:20::844]:37776)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+ id 1iNI8q-00016v-Uz
+ for qemu-devel@nongnu.org; Wed, 23 Oct 2019 11:01:41 -0400
+Received: by mail-qt1-x844.google.com with SMTP id g50so18582856qtb.4
+ for <qemu-devel@nongnu.org>; Wed, 23 Oct 2019 08:01:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=PtanC1h+OlQIbLy4htGIe38tBGV1DOrNspWjSEGlJl4=;
+ b=gT/PMVO8fSLBK5v5I57cupb/YDFLU7LxWI80c3PtF3u5wlTT+TCVchjkQFyaZn1DGE
+ Y2nM8RAf1Jd0AmRXzNEPMA+HAXGuWCcCl83DNRiwM7eBMCGgc2kuCcyM7gXWSRbiLHBy
+ tu9+HqS6PH0QosydLNCCBgA6uhK+P77pOKMyo95P/ioyGUuNKuxanpl8lks+XoyjvnTe
+ QzBTJOoBiQ/L4AEj2vNZeaPAhnxfmWA7vhGVqYh+VSdb/9aAcq1yUEr+wiS3uZYHwJk+
+ ta0RsfU23frI7derHLkzkrqei4scRqtiwZrUYuLQhwvqKI1hUwfPhHhEFfXEC9s41X0c
+ JhLA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=PtanC1h+OlQIbLy4htGIe38tBGV1DOrNspWjSEGlJl4=;
+ b=fNPAUJ2tnO5X/9stS9WFmdsUV/XkVuMnojoSnLuPesLqdVSykBTwCgmU5hlLOxhPec
+ HdblQL6iS2LMdVB+khA9k/iX0tpRsGFtdgDL/E0aedeaeQlDVXoxu/iHAec4TYsLxJAA
+ NH0Q72Hixm74jsyA7oRjQ/22qLVEq0R3rTr3+xGAxYoaL101YL5KfozJGrrBgnBSDWSR
+ XpMr8SqMBeo/rYDVbL70y/990VzEcPsSAZnFRh/+xWSz2N+5vn+pZbtNshkAXF831NdJ
+ hkhKbvlE6wB8XKrat59GMMgQCYbALWduGykvVt9pS5JuSTdesesC3QOfqdDtYdIXRUnR
+ 3oJQ==
+X-Gm-Message-State: APjAAAWs66Yz30PUcVZAFIABz7Txp7XbQ6ROoxFfFQHV7i7xw25oNxy+
+ KniokbnPr6vKwBVsBK2UMBYhUurULt8=
+X-Google-Smtp-Source: APXvYqyU5QXl0zNSRXGLx3rw4IsoLGYtP12oNai/csEGXQepE0EVwAyKaSpY+CMTeEmHC7hjCrLw8g==
+X-Received: by 2002:ac8:5547:: with SMTP id o7mr8502758qtr.315.1571842878494; 
+ Wed, 23 Oct 2019 08:01:18 -0700 (PDT)
+Received: from localhost.localdomain (198-4-20-64.static.cosmoweb.net.
+ [64.20.4.198])
+ by smtp.gmail.com with ESMTPSA id l189sm11030168qke.69.2019.10.23.08.01.17
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 23 Oct 2019 08:01:17 -0700 (PDT)
+From: Richard Henderson <richard.henderson@linaro.org>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v9 12/24] target/arm: Add arm_rebuild_hflags
+Date: Wed, 23 Oct 2019 11:00:45 -0400
+Message-Id: <20191023150057.25731-13-richard.henderson@linaro.org>
+X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20191023150057.25731-1-richard.henderson@linaro.org>
+References: <20191023150057.25731-1-richard.henderson@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-x-cbid: 19102314-4275-0000-0000-00000376343F
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19102314-4276-0000-0000-000038895BE9
-Message-Id: <157184234731.3053790.18369348907304339634.stgit@bahia.lan>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
- definitions=2019-10-23_03:, , signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- priorityscore=1501
- malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
- clxscore=1034 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1908290000 definitions=main-1910230148
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
-X-Received-From: 148.163.156.1
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::844
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -101,141 +94,101 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-ppc@nongnu.org,
- =?utf-8?q?C=C3=A9dric?= Le Goater <clg@kaod.org>, qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, qemu-arm@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Now that the TCTX objects are children of the XIVE router, stop
-using CPU_FOREACH() when looking for a matching VCPU target.
+This function assumes nothing about the current state of the cpu,
+and writes the computed value to env->hflags.
 
-Signed-off-by: Greg Kurz <groug@kaod.org>
+Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- hw/intc/xive.c |  100 +++++++++++++++++++++++++++++++++++---------------------
- 1 file changed, 62 insertions(+), 38 deletions(-)
+ target/arm/cpu.h    |  6 ++++++
+ target/arm/helper.c | 30 ++++++++++++++++++++++--------
+ 2 files changed, 28 insertions(+), 8 deletions(-)
 
-diff --git a/hw/intc/xive.c b/hw/intc/xive.c
-index 40ce43152456..ec5e7d0ee39a 100644
---- a/hw/intc/xive.c
-+++ b/hw/intc/xive.c
-@@ -1403,55 +1403,79 @@ typedef struct XiveTCTXMatch {
-     uint8_t ring;
- } XiveTCTXMatch;
+diff --git a/target/arm/cpu.h b/target/arm/cpu.h
+index 9909ff89d4..d844ea21d8 100644
+--- a/target/arm/cpu.h
++++ b/target/arm/cpu.h
+@@ -3297,6 +3297,12 @@ void arm_register_pre_el_change_hook(ARMCPU *cpu, ARMELChangeHookFn *hook,
+ void arm_register_el_change_hook(ARMCPU *cpu, ARMELChangeHookFn *hook, void
+         *opaque);
  
--static bool xive_presenter_match(XiveRouter *xrtr, uint8_t format,
--                                 uint8_t nvt_blk, uint32_t nvt_idx,
--                                 bool cam_ignore, uint8_t priority,
--                                 uint32_t logic_serv, XiveTCTXMatch *match)
-+typedef struct XivePresenterMatch {
-+    uint8_t format;
-+    uint8_t nvt_blk;
-+    uint32_t nvt_idx;
-+    bool cam_ignore;
-+    uint8_t priority;
-+    uint32_t logic_serv;
-+    XiveTCTXMatch *match;
-+    int count;
-+} XivePresenterMatch;
++/**
++ * arm_rebuild_hflags:
++ * Rebuild the cached TBFLAGS for arbitrary changed processor state.
++ */
++void arm_rebuild_hflags(CPUARMState *env);
 +
-+static int do_xive_presenter_match(Object *child, void *opaque)
- {
--    CPUState *cs;
-+    XiveTCTX *tctx = XIVE_TCTX(child);
-+    XivePresenterMatch *xpm = opaque;
-+    int ring;
+ /**
+  * aa32_vfp_dreg:
+  * Return a pointer to the Dn register within env in 32-bit mode.
+diff --git a/target/arm/helper.c b/target/arm/helper.c
+index 89aa6fd933..85de96d071 100644
+--- a/target/arm/helper.c
++++ b/target/arm/helper.c
+@@ -11198,17 +11198,35 @@ static uint32_t rebuild_hflags_a64(CPUARMState *env, int el, int fp_el,
+     return rebuild_hflags_common(env, fp_el, mmu_idx, flags);
+ }
  
-     /*
-      * TODO (PowerNV): handle chip_id overwrite of block field for
-      * hardwired CAM compares
-      */
- 
--    CPU_FOREACH(cs) {
--        XiveTCTX *tctx = xive_router_get_tctx(xrtr, cs);
--        int ring;
-+    /*
-+     * HW checks that the CPU is enabled in the Physical Thread
-+     * Enable Register (PTER).
-+     */
- 
--        /*
--         * Skip partially initialized vCPUs. This can happen when
--         * vCPUs are hotplugged.
--         */
--        if (!tctx) {
--            continue;
-+    /*
-+     * Check the thread context CAM lines and record matches. We
-+     * will handle CPU exception delivery later
-+     */
-+    ring = xive_presenter_tctx_match(tctx, xpm->format, xpm->nvt_blk,
-+                                     xpm->nvt_idx, xpm->cam_ignore,
-+                                     xpm->logic_serv);
++static uint32_t rebuild_hflags_internal(CPUARMState *env)
++{
++    int el = arm_current_el(env);
++    int fp_el = fp_exception_el(env, el);
++    ARMMMUIdx mmu_idx = arm_mmu_idx(env);
 +
-+    /*
-+     * Save the context and follow on to catch duplicates, that we
-+     * don't support yet.
-+     */
-+    if (ring != -1) {
-+        if (xpm->match->tctx) {
-+            qemu_log_mask(LOG_GUEST_ERROR, "XIVE: already found a thread "
-+                          "context NVT %x/%x\n", xpm->nvt_blk, xpm->nvt_idx);
-+            return -1;
-         }
- 
--        /*
--         * HW checks that the CPU is enabled in the Physical Thread
--         * Enable Register (PTER).
--         */
-+        xpm->match->ring = ring;
-+        xpm->match->tctx = tctx;
-+        xpm->count++;
++    if (is_a64(env)) {
++        return rebuild_hflags_a64(env, el, fp_el, mmu_idx);
++    } else if (arm_feature(env, ARM_FEATURE_M)) {
++        return rebuild_hflags_m32(env, fp_el, mmu_idx);
++    } else {
++        return rebuild_hflags_a32(env, fp_el, mmu_idx);
 +    }
- 
--        /*
--         * Check the thread context CAM lines and record matches. We
--         * will handle CPU exception delivery later
--         */
--        ring = xive_presenter_tctx_match(tctx, format, nvt_blk, nvt_idx,
--                                         cam_ignore, logic_serv);
--        /*
--         * Save the context and follow on to catch duplicates, that we
--         * don't support yet.
--         */
--        if (ring != -1) {
--            if (match->tctx) {
--                qemu_log_mask(LOG_GUEST_ERROR, "XIVE: already found a thread "
--                              "context NVT %x/%x\n", nvt_blk, nvt_idx);
--                return false;
--            }
--
--            match->ring = ring;
--            match->tctx = tctx;
--        }
-+    return 0;
 +}
 +
-+static bool xive_presenter_match(XiveRouter *xrtr, uint8_t format,
-+                                 uint8_t nvt_blk, uint32_t nvt_idx,
-+                                 bool cam_ignore, uint8_t priority,
-+                                 uint32_t logic_serv, XiveTCTXMatch *match)
++void arm_rebuild_hflags(CPUARMState *env)
 +{
-+    XivePresenterMatch xpm = {
-+        .format     = format,
-+        .nvt_blk    = nvt_blk,
-+        .nvt_idx    = nvt_idx,
-+        .cam_ignore = cam_ignore,
-+        .priority   = priority,
-+        .logic_serv = logic_serv,
-+        .match      = match,
-+        .count      = 0,
-+    };
++    env->hflags = rebuild_hflags_internal(env);
++}
 +
-+    if (object_child_foreach_type(OBJECT(xrtr), TYPE_XIVE_TCTX,
-+                                  do_xive_presenter_match, &xpm) < 0) {
-+        return false;
-     }
+ void cpu_get_tb_cpu_state(CPUARMState *env, target_ulong *pc,
+                           target_ulong *cs_base, uint32_t *pflags)
+ {
+-    ARMMMUIdx mmu_idx = arm_mmu_idx(env);
+-    int current_el = arm_current_el(env);
+-    int fp_el = fp_exception_el(env, current_el);
+     uint32_t flags, pstate_for_ss;
  
-     if (!match->tctx) {
++    flags = rebuild_hflags_internal(env);
++
+     if (is_a64(env)) {
+         *pc = env->pc;
+-        flags = rebuild_hflags_a64(env, current_el, fp_el, mmu_idx);
+         if (cpu_isar_feature(aa64_bti, env_archcpu(env))) {
+             flags = FIELD_DP32(flags, TBFLAG_A64, BTYPE, env->btype);
+         }
+@@ -11217,8 +11235,6 @@ void cpu_get_tb_cpu_state(CPUARMState *env, target_ulong *pc,
+         *pc = env->regs[15];
+ 
+         if (arm_feature(env, ARM_FEATURE_M)) {
+-            flags = rebuild_hflags_m32(env, fp_el, mmu_idx);
+-
+             if (arm_feature(env, ARM_FEATURE_M_SECURITY) &&
+                 FIELD_EX32(env->v7m.fpccr[M_REG_S], V7M_FPCCR, S)
+                 != env->v7m.secure) {
+@@ -11242,8 +11258,6 @@ void cpu_get_tb_cpu_state(CPUARMState *env, target_ulong *pc,
+                 flags = FIELD_DP32(flags, TBFLAG_A32, LSPACT, 1);
+             }
+         } else {
+-            flags = rebuild_hflags_a32(env, fp_el, mmu_idx);
+-
+             /*
+              * Note that XSCALE_CPAR shares bits with VECSTRIDE.
+              * Note that VECLEN+VECSTRIDE are RES0 for M-profile.
+-- 
+2.17.1
 
 
