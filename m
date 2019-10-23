@@ -2,165 +2,102 @@ Return-Path: <SRS0=brme=YQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,LOTS_OF_MONEY,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 95A04CA9EA0
-	for <qemu-devel@archiver.kernel.org>; Wed, 23 Oct 2019 00:05:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ACD57CA9EA0
+	for <qemu-devel@archiver.kernel.org>; Wed, 23 Oct 2019 00:56:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5C4642084B
-	for <qemu-devel@archiver.kernel.org>; Wed, 23 Oct 2019 00:05:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5553620659
+	for <qemu-devel@archiver.kernel.org>; Wed, 23 Oct 2019 00:56:20 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=ozlabs-ru.20150623.gappssmtp.com header.i=@ozlabs-ru.20150623.gappssmtp.com header.b="X9Yoi7ix"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5C4642084B
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ozlabs.ru
+	dkim=pass (1024-bit key) header.d=ziglang.org header.i=@ziglang.org header.b="Z31bEWcJ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5553620659
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ziglang.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49344 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50038 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iN49O-0004LA-If
-	for qemu-devel@archiver.kernel.org; Tue, 22 Oct 2019 20:05:18 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36466)
+	id 1iN4wl-0007Jh-CT
+	for qemu-devel@archiver.kernel.org; Tue, 22 Oct 2019 20:56:19 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39674)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <aik@ozlabs.ru>) id 1iN48W-0003mS-J7
- for qemu-devel@nongnu.org; Tue, 22 Oct 2019 20:04:25 -0400
+ (envelope-from <andrew@ziglang.org>) id 1iN4vu-0006p2-0Y
+ for qemu-devel@nongnu.org; Tue, 22 Oct 2019 20:55:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aik@ozlabs.ru>) id 1iN48V-0007eO-IT
- for qemu-devel@nongnu.org; Tue, 22 Oct 2019 20:04:24 -0400
-Received: from mail-pl1-x644.google.com ([2607:f8b0:4864:20::644]:32877)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <aik@ozlabs.ru>) id 1iN48R-0007bO-Qf
- for qemu-devel@nongnu.org; Tue, 22 Oct 2019 20:04:20 -0400
-Received: by mail-pl1-x644.google.com with SMTP id y8so628366plk.0
- for <qemu-devel@nongnu.org>; Tue, 22 Oct 2019 17:04:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=ozlabs-ru.20150623.gappssmtp.com; s=20150623;
- h=subject:to:cc:references:from:autocrypt:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=Ib7DFb1sAvrfL8naQKLv57U7s7gSLHlgq0E1GXW+gfw=;
- b=X9Yoi7ixUMYS5izj3+DjzqoWuG8dAefQ06qWMYYerGoisBwKe5spFdDArjpCMZKSup
- anUw5dkf7KBUOkDy6tkWI40DrrZPZxrsGpg6x80vlK4kxOqEU3ZTDipiNOyq0Ja2cquh
- fIlA43Ryx0JywGyd334QIV4JWvupYK3l/jUHgCZSOgFuOYaoeBhmCsU3vJjTOMyJCUQa
- SPWlbGIMsKsNH/n33Aywc76jaNmnO6u2XHK+9sQ1NF3kCG3aNzECvovsu7JJ4yCX2THX
- x/wE0EykMemLrENnHVG3pPoa2OX5curl2Hg8LV7lj2PpXHqqKbaURF3MnHWJ1ywd8mhB
- LHAQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:autocrypt
- :message-id:date:user-agent:mime-version:in-reply-to
- :content-language:content-transfer-encoding;
- bh=Ib7DFb1sAvrfL8naQKLv57U7s7gSLHlgq0E1GXW+gfw=;
- b=a8FTE+kdoyXoO/85pINYuuWapVZHZ0RZjT2tmJ8XVrXrRgZ/PEGLhBL+S72ly4ckBZ
- cLZ8spZqrNU2YvHw/FsUfqyT0heASukIu1ygm7D8KhMFms6ouZki+nvCfmHrUxRX4U63
- 11RgBLZQculPXZ5qXBpmeI//FAXqKxUtZtGEn5pAjv8OZBvvBJfqBhx3LxDLoQBtFBFL
- RcZdcwnMACr97YWdL+3PClQ+h078qh2OXc4CFzsnwZduIibbbTkHA0HTxuyseqsQMXpt
- ynavb/HPei+fzShUvvET49u9f9lJxoRCfxvTGfOP6tI+naTApH8dsWxn8DhREN1a34zU
- VvSw==
-X-Gm-Message-State: APjAAAWSjZONdWVSlxAjru2k73kwgl/vBnVDYhOINRTrNuhzN1GYXQLv
- OrtvKpN0utHOnYBI73W+/zvN/MdAIwfEHw==
-X-Google-Smtp-Source: APXvYqz2kfBkGx2cW+sDIQlqmDaKZd9LIUN/fVGVpjyR5oxPkjaFN5l1velf+6ENr7gEJqu3vMtTtQ==
-X-Received: by 2002:a17:902:b08f:: with SMTP id
- p15mr6242900plr.229.1571789055205; 
- Tue, 22 Oct 2019 17:04:15 -0700 (PDT)
-Received: from [10.61.2.175] ([122.99.82.10])
- by smtp.gmail.com with ESMTPSA id r11sm16617105pgn.67.2019.10.22.17.04.12
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 22 Oct 2019 17:04:14 -0700 (PDT)
-Subject: Re: [GIT PULL for qemu-pseries] pseries: Update SLOF firmware image
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- David Gibson <david@gibson.dropbear.id.au>
-References: <20191022040945.35730-1-aik@ozlabs.ru>
- <1c3c1b36-a355-9ebb-9c68-8ae1af268fff@redhat.com>
-From: Alexey Kardashevskiy <aik@ozlabs.ru>
-Autocrypt: addr=aik@ozlabs.ru; keydata=
- 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
-Message-ID: <89175bc7-87d0-8b77-595e-2a610a9d3b30@ozlabs.ru>
-Date: Wed, 23 Oct 2019 11:04:10 +1100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.2
+ (envelope-from <andrew@ziglang.org>) id 1iN4vs-0007g1-C3
+ for qemu-devel@nongnu.org; Tue, 22 Oct 2019 20:55:25 -0400
+Received: from mail.ziglang.org ([108.61.23.47]:53378)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <andrew@ziglang.org>) id 1iN4vs-0007fK-5b
+ for qemu-devel@nongnu.org; Tue, 22 Oct 2019 20:55:24 -0400
+Subject: Re: [PATCH] enable translating statx syscalls on more arches
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=ziglang.org; s=mail;
+ t=1571792121; bh=6Acz2GimKrYtWBWHEn/EhNE2zsJ2svArtRsVZYoBi10=;
+ h=Subject:From:To:References:Date:In-Reply-To;
+ b=Z31bEWcJj3Nwa95Z08oQN3Oe4t2kzuxD3xCAnO/Zz/+lQleObIreSTkOXBY12mG2d
+ ktQdU8RV5F5gcbAtNb5/QpMKShhGJdIU63O8IDNvO66OIVd1tX8TcET0tYgpVD5taM
+ LrOdqcHwokigzNfRkxZ5Q1I1VzOylNAn0U9j3QyE=
+From: Andrew Kelley <andrew@ziglang.org>
+To: qemu-devel@nongnu.org
+References: <7fc7a64e-cb52-fab6-5739-807b40be9c1d@ziglang.org>
+Autocrypt: addr=andrew@ziglang.org; prefer-encrypt=mutual; keydata=
+ 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
+Message-ID: <0ba23b5a-b22f-aac9-bed1-85f22bdeb082@ziglang.org>
+Date: Tue, 22 Oct 2019 20:55:17 -0400
 MIME-Version: 1.0
-In-Reply-To: <1c3c1b36-a355-9ebb-9c68-8ae1af268fff@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::644
+In-Reply-To: <7fc7a64e-cb52-fab6-5739-807b40be9c1d@ziglang.org>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="SKPF9nDI7aZKuTbEiruEOJPQEfsw0nARQ"
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 108.61.23.47
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -172,73 +109,255 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--SKPF9nDI7aZKuTbEiruEOJPQEfsw0nARQ
+Content-Type: multipart/mixed; boundary="gh8p2Ip9a0d0YlVqOLlsgnJk0n4uswKDP"
+
+--gh8p2Ip9a0d0YlVqOLlsgnJk0n4uswKDP
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+
+bump
+
+On 10/16/19 5:01 PM, Andrew Kelley wrote:
+> Signed-off-by: Andrew Kelley <andrew@ziglang.org>
+> ---
+>  linux-user/aarch64/syscall_nr.h | 13 ++++++++++
+>  linux-user/arm/syscall_nr.h     | 38 ++++++++++++++++++++++++++++
+>  linux-user/i386/syscall_nr.h    | 43 ++++++++++++++++++++++++++++++++
+>  linux-user/mips/cpu_loop.c      |  6 +++++
+>  linux-user/ppc/syscall_nr.h     | 44 +++++++++++++++++++++++++++++++++=
+
+>  5 files changed, 144 insertions(+)
+>=20
+> diff --git a/linux-user/aarch64/syscall_nr.h
+> b/linux-user/aarch64/syscall_nr.h
+> index f00ffd7fb8..4e8d0bbb15 100644
+> --- a/linux-user/aarch64/syscall_nr.h
+> +++ b/linux-user/aarch64/syscall_nr.h
+> @@ -276,5 +276,18 @@
+>  #define TARGET_NR_membarrier 283
+>  #define TARGET_NR_mlock2 284
+>  #define TARGET_NR_copy_file_range 285
+> +#define TARGET_NR_preadv2 286
+> +#define TARGET_NR_pwritev2 287
+> +#define TARGET_NR_pkey_mprotect 288
+> +#define TARGET_NR_pkey_alloc 289
+> +#define TARGET_NR_pkey_free 290
+> +#define TARGET_NR_statx 291
+> +#define TARGET_NR_io_pgetevents 292
+> +#define TARGET_NR_rseq 293
+> +#define TARGET_NR_kexec_file_load 294
+> +#define TARGET_NR_pidfd_send_signal 424
+> +#define TARGET_NR_io_uring_setup 425
+> +#define TARGET_NR_io_uring_enter 426
+> +#define TARGET_NR_io_uring_register 427
+>=20
+>  #endif
+> diff --git a/linux-user/arm/syscall_nr.h b/linux-user/arm/syscall_nr.h
+> index e7eda0d766..20afa3992a 100644
+> --- a/linux-user/arm/syscall_nr.h
+> +++ b/linux-user/arm/syscall_nr.h
+> @@ -400,4 +400,42 @@
+>  #define TARGET_NR_membarrier                   (389)
+>  #define TARGET_NR_mlock2                       (390)
+>=20
+> +#define TARGET_NR_copy_file_range              (391)
+> +#define TARGET_NR_preadv2                      (392)
+> +#define TARGET_NR_pwritev2                     (393)
+> +#define TARGET_NR_pkey_mprotect                (394)
+> +#define TARGET_NR_pkey_alloc                   (395)
+> +#define TARGET_NR_pkey_free                    (396)
+> +#define TARGET_NR_statx                        (397)
+> +#define TARGET_NR_rseq                         (398)
+> +#define TARGET_NR_io_pgetevents                (399)
+> +#define TARGET_NR_migrate_pages                (400)
+> +
+> +#define TARGET_NR_kexec_file_load              (401)
+> +#define TARGET_NR_clock_gettime64              (403)
+> +#define TARGET_NR_clock_settime64              (404)
+> +#define TARGET_NR_clock_adjtime64              (405)
+> +#define TARGET_NR_clock_getres_time64          (406)
+> +#define TARGET_NR_clock_nanosleep_time64       (407)
+> +#define TARGET_NR_timer_gettime64              (408)
+> +#define TARGET_NR_timer_settime64              (409)
+> +#define TARGET_NR_timerfd_gettime64            (410)
+> +
+> +#define TARGET_NR_timerfd_settime64            (411)
+> +#define TARGET_NR_utimensat_time64             (412)
+> +#define TARGET_NR_pselect6_time64              (413)
+> +#define TARGET_NR_ppoll_time64                 (414)
+> +#define TARGET_NR_io_pgetevents_time64         (416)
+> +#define TARGET_NR_recvmmsg_time64              (417)
+> +#define TARGET_NR_mq_timedsend_time64          (418)
+> +#define TARGET_NR_mq_timedreceive_time64       (419)
+> +#define TARGET_NR_semtimedop_time64            (420)
+> +
+> +#define TARGET_NR_rt_sigtimedwait_time64       (421)
+> +#define TARGET_NR_futex_time64                 (422)
+> +#define TARGET_NR_sched_rr_get_interval_time64 (423)
+> +#define TARGET_NR_pidfd_send_signal            (424)
+> +#define TARGET_NR_io_uring_setup               (425)
+> +#define TARGET_NR_io_uring_enter               (426)
+> +#define TARGET_NR_io_uring_register            (427)
+>  #endif
+> diff --git a/linux-user/i386/syscall_nr.h b/linux-user/i386/syscall_nr.=
+h
+> index 3234ec21c6..e641674daf 100644
+> --- a/linux-user/i386/syscall_nr.h
+> +++ b/linux-user/i386/syscall_nr.h
+> @@ -383,5 +383,48 @@
+>  #define TARGET_NR_membarrier            375
+>  #define TARGET_NR_mlock2                376
+>  #define TARGET_NR_copy_file_range       377
+> +#define TARGET_NR_preadv2 378
+> +#define TARGET_NR_pwritev2 379
+> +#define TARGET_NR_pkey_mprotect 380
+> +#define TARGET_NR_pkey_alloc 381
+> +#define TARGET_NR_pkey_free 382
+> +#define TARGET_NR_statx 383
+> +#define TARGET_NR_arch_prctl 384
+> +#define TARGET_NR_io_pgetevents 385
+> +#define TARGET_NR_rseq 386
+> +#define TARGET_NR_semget 393
+> +#define TARGET_NR_semctl 394
+> +#define TARGET_NR_shmget 395
+> +#define TARGET_NR_shmctl 396
+> +#define TARGET_NR_shmat 397
+> +#define TARGET_NR_shmdt 398
+> +#define TARGET_NR_msgget 399
+> +#define TARGET_NR_msgsnd 400
+> +#define TARGET_NR_msgrcv 401
+> +#define TARGET_NR_msgctl 402
+> +#define TARGET_NR_clock_gettime64 403
+> +#define TARGET_NR_clock_settime64 404
+> +#define TARGET_NR_clock_adjtime64 405
+> +#define TARGET_NR_clock_getres_time64 406
+> +#define TARGET_NR_clock_nanosleep_time64 407
+> +#define TARGET_NR_timer_gettime64 408
+> +#define TARGET_NR_timer_settime64 409
+> +#define TARGET_NR_timerfd_gettime64 410
+> +#define TARGET_NR_timerfd_settime64 411
+> +#define TARGET_NR_utimensat_time64 412
+> +#define TARGET_NR_pselect6_time64 413
+> +#define TARGET_NR_ppoll_time64 414
+> +#define TARGET_NR_io_pgetevents_time64 416
+> +#define TARGET_NR_recvmmsg_time64 417
+> +#define TARGET_NR_mq_timedsend_time64 418
+> +#define TARGET_NR_mq_timedreceive_time64 419
+> +#define TARGET_NR_semtimedop_time64 420
+> +#define TARGET_NR_rt_sigtimedwait_time64 421
+> +#define TARGET_NR_futex_time64 422
+> +#define TARGET_NR_sched_rr_get_interval_time64 423
+> +#define TARGET_NR_pidfd_send_signal 424
+> +#define TARGET_NR_io_uring_setup 425
+> +#define TARGET_NR_io_uring_enter 426
+> +#define TARGET_NR_io_uring_register 427
+>=20
+>  #endif
+> diff --git a/linux-user/mips/cpu_loop.c b/linux-user/mips/cpu_loop.c
+> index 39915b3fde..044a00f531 100644
+> --- a/linux-user/mips/cpu_loop.c
+> +++ b/linux-user/mips/cpu_loop.c
+> @@ -390,6 +390,12 @@ static const uint8_t mips_syscall_args[] =3D {
+>          MIPS_SYS(sys_copy_file_range, 6) /* 360 */
+>          MIPS_SYS(sys_preadv2, 6)
+>          MIPS_SYS(sys_pwritev2, 6)
+> +        MIPS_SYS(sys_pkey_mprotect, 4)
+> +        MIPS_SYS(sys_pkey_alloc, 2)
+> +        MIPS_SYS(sys_pkey_free, 1)
+> +        MIPS_SYS(sys_statx, 5)
+> +        MIPS_SYS(sys_rseq, 4)
+> +        MIPS_SYS(sys_io_pgetevents, 5)
+>  };
+>  #  undef MIPS_SYS
+>  # endif /* O32 */
+> diff --git a/linux-user/ppc/syscall_nr.h b/linux-user/ppc/syscall_nr.h
+> index b57a07b931..eea4056e3d 100644
+> --- a/linux-user/ppc/syscall_nr.h
+> +++ b/linux-user/ppc/syscall_nr.h
+> @@ -398,5 +398,49 @@
+>  #define TARGET_NR_shmget                376
+>  #define TARGET_NR_shmctl                377
+>  #define TARGET_NR_mlock2                378
+> +#define TARGET_NR_copy_file_range       379
+> +#define TARGET_NR_preadv2               380
+> +#define TARGET_NR_pwritev2              381
+> +#define TARGET_NR_kexec_file_load       382
+> +#define TARGET_NR_statx                 383
+> +#define TARGET_NR_pkey_alloc            384
+> +#define TARGET_NR_pkey_free             385
+> +#define TARGET_NR_pkey_mprotect         386
+> +#define TARGET_NR_rseq                  387
+> +#define TARGET_NR_io_pgetevents         388
+> +#define TARGET_NR_semget                393
+> +#define TARGET_NR_semctl                394
+> +#define TARGET_NR_shmget                395
+> +#define TARGET_NR_shmctl                396
+> +#define TARGET_NR_shmat                 397
+> +#define TARGET_NR_shmdt                 398
+> +#define TARGET_NR_msgget                399
+> +#define TARGET_NR_msgsnd                400
+> +#define TARGET_NR_msgrcv                401
+> +#define TARGET_NR_msgctl                402
+> +#define TARGET_NR_clock_gettime64       403
+> +#define TARGET_NR_clock_settime64       404
+> +#define TARGET_NR_clock_adjtime64       405
+> +#define TARGET_NR_clock_getres_time64   406
+> +#define TARGET_NR_clock_nanosleep_time64 407
+> +#define TARGET_NR_timer_gettime64       408
+> +#define TARGET_NR_timer_settime64       409
+> +#define TARGET_NR_timerfd_gettime64     410
+> +#define TARGET_NR_timerfd_settime64     411
+> +#define TARGET_NR_utimensat_time64      412
+> +#define TARGET_NR_pselect6_time64       413
+> +#define TARGET_NR_ppoll_time64          414
+> +#define TARGET_NR_io_pgetevents_time64  416
+> +#define TARGET_NR_recvmmsg_time64       417
+> +#define TARGET_NR_mq_timedsend_time64   418
+> +#define TARGET_NR_mq_timedreceive_time64 419
+> +#define TARGET_NR_semtimedop_time64     420
+> +#define TARGET_NR_rt_sigtimedwait_time64 421
+> +#define TARGET_NR_futex_time64          422
+> +#define TARGET_NR_sched_rr_get_interval_time64 423
+> +#define TARGET_NR_pidfd_send_signal     424
+> +#define TARGET_NR_io_uring_setup        425
+> +#define TARGET_NR_io_uring_enter        426
+> +#define TARGET_NR_io_uring_register     427
+>=20
+>  #endif
+>=20
 
 
-On 22/10/2019 19:49, Philippe Mathieu-Daudé wrote:
-> Hi Alekey,
-> 
-> On 10/22/19 6:09 AM, Alexey Kardashevskiy wrote:
->> The following changes since commit 7cff77c24d8f5e558cef3538a44044d66aa225a5:
->>
->>    spapr: Move SpaprIrq::nr_xirqs to SpaprMachineClass (2019-10-16 12:01:41 +1100)
->>
->> are available in the Git repository at:
->>
->>    git@github.com:aik/qemu.git tags/qemu-slof-20191022
->>
->> for you to fetch changes up to 8e59d05f71ae783e12a8eb7eb582e0a86ba3d6dc:
->>
->>    pseries: Update SLOF firmware image (2019-10-22 15:05:36 +1100)
->>
->> ----------------------------------------------------------------
->> Alexey Kardashevskiy (1):
->>        pseries: Update SLOF firmware image
->>
->>   pc-bios/README   |   2 +-
->>   pc-bios/slof.bin | Bin 930640 -> 928552 bytes
->>   roms/SLOF        |   2 +-
->>   3 files changed, 2 insertions(+), 2 deletions(-)
-> 
-> Looking at commit 8e59d05f71ae which update the SLOF submodule,
-> in your future updates can you include the git shortlog in the
-> commit description?
 
+--gh8p2Ip9a0d0YlVqOLlsgnJk0n4uswKDP--
 
-I guess I can do that.
+--SKPF9nDI7aZKuTbEiruEOJPQEfsw0nARQ
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-Is there an easy way to combine
+-----BEGIN PGP SIGNATURE-----
 
-git -C roms/SLOF shortlog qemu-slof-20190911..qemu-slof-20191022
-git commit
-?
+iQIzBAEBCAAdFiEEl8v20Nl/A6duouJgfF9Uj3KFAakFAl2vpPUACgkQfF9Uj3KF
+AanUSA//RjXjysuYvOJv93IiUwYdYgSATT6QUUvJN+HEVaxTef8i2LPrJJzC5C13
+tpD/CyvpAdedXvRUIno9JNPDAvxbyygdJ/zos/rz557c6tKiaheRpp/6kilRMe3k
+OwOkzXQhbtF5jSE7TYLRlvYgYC2p0NE37zxgeOq586HDNRCHqgUawZU8UB/00oe9
+8mfbiH1JgLQk4i5uK7o5EEPoBdSY3+fUekKynbCoCePJ/O99pOp0hFIo6XOR8wBL
+EXegPrnZ5MgcI4n57FlhiD3G0o0WL+hE5vBCHjNbijRafo24I9h+p6Sc7OIHOnKk
+tmKhGY5jyAI000CcULo4imFbmHXT4wQTyOi/c7Pr1JYhRAW7QWcoxCojeKMgH8YD
+B04nd/ywIkpYoPQAA5nSlRe3yGWR/ANOvenVdP0e5KL2vm5ZdZcizZkWocxXJ36V
+rWlfVk7kYveGibnu2eGJzt0VLYfACsdHWZFOLYM5I07aAZ3zDLtVnBP/BsE9F7Ro
+zSvuQ+mBb5S9FFCnoDpMj/pwzmCOUNDP/3KlLYniSDNUnwO2iPI6udwaPAhapZJP
+pWBP2sC6LHCZZSCrwhAe9xyW6q5tE+kuCUWuFy/G3sZM91KTelAcAtZc+IwmtqhO
++dkboAmZy4/AQvEtVyiuJ4OG5OAAX+nxaql+jPQsZ9qnsk/Rk4I=
+=hbqj
+-----END PGP SIGNATURE-----
 
-After
-export MYDIFF=$(git -C roms/SLOF shortlog qemu-slof-20190911..qemu-slof-20191022)
-$MYDIFF looses formatting (drops \r) so it is no good for a commit log.
-
-
-> 
-> Simply:
-> 
->   $ git shortlog qemu-slof-20190911..qemu-slof-20191022
->   Alexey Kardashevskiy (3):
->         pci: Align PCI node names with QEMU
->         libusb: Fix compiler warnings with gcc9
->         version: update to 20191022
-> 
->   Thomas Huth (1):
->         ipv6: Fix gcc9 warnings
-> 
-> Thanks,
-> 
-> Phil.
-> 
-
--- 
-Alexey
+--SKPF9nDI7aZKuTbEiruEOJPQEfsw0nARQ--
 
