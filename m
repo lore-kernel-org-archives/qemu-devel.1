@@ -2,85 +2,74 @@ Return-Path: <SRS0=brme=YQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A1C84CA9EB9
-	for <qemu-devel@archiver.kernel.org>; Wed, 23 Oct 2019 19:27:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C09DCA9EB9
+	for <qemu-devel@archiver.kernel.org>; Wed, 23 Oct 2019 19:34:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6F73220679
-	for <qemu-devel@archiver.kernel.org>; Wed, 23 Oct 2019 19:27:07 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6F73220679
+	by mail.kernel.org (Postfix) with ESMTPS id F417F21928
+	for <qemu-devel@archiver.kernel.org>; Wed, 23 Oct 2019 19:34:33 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ev2MUb0p"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F417F21928
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44948 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45238 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iNMHg-0002zQ-Ql
-	for qemu-devel@archiver.kernel.org; Wed, 23 Oct 2019 15:27:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41315)
+	id 1iNMOu-0004gV-Hc
+	for qemu-devel@archiver.kernel.org; Wed, 23 Oct 2019 15:34:32 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60941)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1iNLHr-0000lH-KN
- for qemu-devel@nongnu.org; Wed, 23 Oct 2019 14:23:14 -0400
+ (envelope-from <marcandre.lureau@redhat.com>) id 1iNKbV-0001bw-Vq
+ for qemu-devel@nongnu.org; Wed, 23 Oct 2019 13:39:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1iNLHo-0003dT-6E
- for qemu-devel@nongnu.org; Wed, 23 Oct 2019 14:23:10 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:48902)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iNLHm-0003ZB-4Q
- for qemu-devel@nongnu.org; Wed, 23 Oct 2019 14:23:08 -0400
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69])
- (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+ (envelope-from <marcandre.lureau@redhat.com>) id 1iNKbT-0005h5-QS
+ for qemu-devel@nongnu.org; Wed, 23 Oct 2019 13:39:25 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:59298
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtp (Exim 4.71)
+ (envelope-from <marcandre.lureau@redhat.com>) id 1iNKbR-0005fi-Tr
+ for qemu-devel@nongnu.org; Wed, 23 Oct 2019 13:39:23 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1571851934;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=pmXQHe+rWCvel74Q+ujxEdZVMUQNzVj52uZOOpW0iGg=;
+ b=Ev2MUb0p9Rd6og7FkRwzTSOgaHT4l2qk8duXq2I5FLR1mmgbc+1CcSx12gnRzsTceWcW6i
+ t1UBzuedOFdRfSA1yTrEx+PDNDDOuOGzu65GIdKwadaqIQftPQRxOQb9dB2Wou/NGCrq9u
+ aYZfxAuNDTQZBfcg0SbvYC5LhDf68Zw=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-103-OwsQ3D6iPUq19Zj2ib_NBA-1; Wed, 23 Oct 2019 13:32:10 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id C9614C04B31E
- for <qemu-devel@nongnu.org>; Wed, 23 Oct 2019 18:23:02 +0000 (UTC)
-Received: by mail-wm1-f69.google.com with SMTP id z5so6266206wma.5
- for <qemu-devel@nongnu.org>; Wed, 23 Oct 2019 11:23:02 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=aabKx3Sw58gZ8F5vMUyxedq8mepIjKfbdhzgpSqLYKU=;
- b=S/lxnJ8HTR3Hr4zGOoMVkuUvUdr9fumPd3fCiq0a90RIfQEak/uMVzwt9S09+BcHVi
- flkVbWPGODWG+kJR+Umgd6qta9DwneY/Pe6+ichyMniUswSVFsrxI1WCdM0Z0nHtNOYl
- PZgJlUUQedOdindFDjjYcGPHCwvg46zpAZi1FboogGMN+aMCZcBHMRQWFpbFACrU9FAM
- dprV/WgZ+CqAti5Es9lM8uMfMEJNKHJ9myx2BYmWuYzUc/EVrbZLzgruRXpfqTLvEIjB
- PORnxFWzY0GlWvmBHYegjqM7FuiVpdMPs7Gqe7+8vwzzgO2Ika140jKhXxNBojx+vUXK
- Cj4A==
-X-Gm-Message-State: APjAAAVCrusDI2X15s6fAnqG7O3GmAFFfupYSXEOlMqLIJ40y2ohrgIY
- 7hyr8d+P1hcuZZrNYrKD9nlrv7BcVj1L/Uk0UtiapkQnQku8hmoteCcSj6FW7BU1hD4YxiehxBD
- jM20rX3ngfk2M5rc=
-X-Received: by 2002:a5d:53c1:: with SMTP id a1mr66917wrw.243.1571854981556;
- Wed, 23 Oct 2019 11:23:01 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqx62nRFKjGA+3JxwMsNzp8z20yv6BiN2z4HiUFAv0RrZeGa8wI8Ru/Vq+K9DGcRH/HFA3GtDw==
-X-Received: by 2002:a5d:53c1:: with SMTP id a1mr66902wrw.243.1571854981266;
- Wed, 23 Oct 2019 11:23:01 -0700 (PDT)
-Received: from [192.168.1.41] (129.red-83-57-174.dynamicip.rima-tde.net.
- [83.57.174.129])
- by smtp.gmail.com with ESMTPSA id p1sm7211086wmg.11.2019.10.23.11.22.59
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Wed, 23 Oct 2019 11:23:00 -0700 (PDT)
-Subject: Re: [PATCH] cputlb: Fix tlb_vaddr_to_host
-To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
-References: <20191023154952.30731-1-richard.henderson@linaro.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <1aefcc9f-67fe-d4c6-207f-db0de292df27@redhat.com>
-Date: Wed, 23 Oct 2019 20:22:59 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.1
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2FDA3100550E;
+ Wed, 23 Oct 2019 17:32:04 +0000 (UTC)
+Received: from localhost (ovpn-112-21.ams2.redhat.com [10.36.112.21])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 6433C5C1D4;
+ Wed, 23 Oct 2019 17:31:55 +0000 (UTC)
+From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v3 00/33] Clean-ups: qom-ify serial and remove QDEV_PROP_PTR
+Date: Wed, 23 Oct 2019 19:31:21 +0200
+Message-Id: <20191023173154.30051-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20191023154952.30731-1-richard.henderson@linaro.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-MC-Unique: OwsQ3D6iPUq19Zj2ib_NBA-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 209.132.183.28
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -92,61 +81,142 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: david@redhat.com
+Cc: Corey Minyard <cminyard@mvista.com>,
+ Peter Maydell <peter.maydell@linaro.org>,
+ "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
+ Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
+ KONRAD Frederic <frederic.konrad@adacore.com>,
+ "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
+ Paul Burton <pburton@wavecomp.com>, Aleksandar Rikalo <arikalo@wavecomp.com>,
+ Magnus Damm <magnus.damm@gmail.com>,
+ =?UTF-8?q?Herv=C3=A9=20Poussineau?= <hpoussin@reactos.org>,
+ =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
+ Artyom Tarasenko <atar4qemu@gmail.com>, Eduardo Habkost <ehabkost@redhat.com>,
+ Fabien Chouteau <chouteau@adacore.com>, qemu-arm@nongnu.org,
+ Richard Henderson <rth@twiddle.net>,
+ =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
+ qemu-ppc@nongnu.org, Aleksandar Markovic <amarkovic@wavecomp.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 10/23/19 5:49 PM, Richard Henderson wrote:
-> Using uintptr_t instead of target_ulong meant that, for 64-bit guest
-> and 32-bit host, we truncated the guest address comparator and so may
-> not hit the tlb when we should.
->=20
-> Fixes: 4811e9095c0
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-> ---
->=20
-> Fixes aarch64 emulation on arm32 host, after our recent changes
-> to tlb probing.
->=20
->=20
-> r~
->=20
-> ---
->   accel/tcg/cputlb.c | 2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
->=20
-> diff --git a/accel/tcg/cputlb.c b/accel/tcg/cputlb.c
-> index 6f4194df96..5eebddcca8 100644
-> --- a/accel/tcg/cputlb.c
-> +++ b/accel/tcg/cputlb.c
-> @@ -1189,7 +1189,7 @@ void *tlb_vaddr_to_host(CPUArchState *env, abi_pt=
-r addr,
->                           MMUAccessType access_type, int mmu_idx)
->   {
->       CPUTLBEntry *entry =3D tlb_entry(env, mmu_idx, addr);
-> -    uintptr_t tlb_addr, page;
-> +    target_ulong tlb_addr, page;
->       size_t elt_ofs;
->  =20
->       switch (access_type) {
->=20
+Hi,
 
-Clang catched this with -Wshorten-64-to-32 but there are so many other=20
-warnings to fix that we can not use it :(
+QDEV_PROP_PTR is marked in multiple places as "FIXME/TODO/remove
+me". In most cases, it can be easily replaced with QDEV_PROP_LINK when
+the pointer points to an Object.
 
-accel/tcg/cputlb.c:620:26: error: implicit conversion loses integer=20
-precision: 'size_t' (aka 'unsigned long') to 'unsigned int'=20
-[-Werror,-Wshorten-64-to-32]
-         unsigned int n =3D tlb_n_entries(env, mmu_idx);
-                      ~   ^~~~~~~~~~~~~~~~~~~~~~~~~~~
-accel/tcg/cputlb.c:788:13: error: implicit conversion loses integer=20
-precision: 'uintptr_t' (aka 'unsigned long') to 'unsigned int'=20
-[-Werror,-Wshorten-64-to-32]
-     index =3D tlb_index(env, mmu_idx, vaddr_page);
-           ~ ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+There are a few places where such substitution isn't possible. For
+those places, it seems reasonable to use a specific setter method
+instead, and keep the user_creatable =3D false. In other places,
+proper usage of qemu_irq is the solution.
 
-Maybe we could try to clean accel/tcg/ and use it there at least.
+The serial code wasn't converted to qdev, which makes it a bit more
+archaic to deal with. Let's convert it first, so we can more easily
+embed it from other devices, and re-export some properties.
 
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+v3:
+ - introduce SerialMM and SerialIO sysbus devices
+ - remove serial_mm_connect introduced in v2
+ - replace "base" property introduced in v2, use "instance-id" for
+   vmstate purpose only
+ - add a few preliminary clean-ups
+
+v2:
+ - qom-ify serial
+ - embed the serial from sm501, and expose a "chardev" property
+ - add "leon3: use qemu_irq framework instead of callback as property"
+ - add "sparc: move PIL irq handling to cpu.c"
+ - add "cris: improve passing PIC interrupt vector to the CPU"
+ - misc comment/todo changes, add r-b tags
+
+Marc-Andr=C3=A9 Lureau (33):
+  qdev: remove unused qdev_prop_int64
+  sysbus: remove unused sysbus_try_create*
+  sysbus: remove outdated comment
+  chardev: generate an internal id when none given
+  serial-pci-multi: factor out multi_serial_get_nr_ports
+  serial: initial qom-ification
+  serial: register vmsd with DeviceClass
+  serial: add "chardev" property
+  serial: add "baudbase" property
+  serial: add "instance-id" property
+  serial: realize the serial device
+  serial: replace serial_exit_core() with unrealize
+  serial: start making SerialMM a sysbus device
+  serial-mm: add "regshift" property
+  serial-mm: add endianness property
+  serial-mm: use sysbus facilities
+  serial: make SerialIO a sysbus device
+  mips: inline serial_init
+  sm501: make SerialMM a child, export chardev property
+  vmmouse: replace PROP_PTR with PROP_LINK
+  lance: replace PROP_PTR with PROP_LINK
+  etraxfs: remove PROP_PTR usage
+  dp8393x: replace PROP_PTR with PROP_LINK
+  leon3: use qemu_irq framework instead of callback as property
+  sparc: move PIL irq handling to cpu.c
+  RFC: mips/cps: fix setting saar property
+  cris: improve passing PIC interrupt vector to the CPU
+  smbus-eeprom: remove PROP_PTR
+  omap-intc: remove PROP_PTR
+  omap-i2c: remove PROP_PTR
+  omap-gpio: remove PROP_PTR
+  qdev: remove PROP_MEMORY_REGION
+  qdev: remove QDEV_PROP_PTR
+
+ chardev/char.c               |  32 +++++--
+ hw/arm/omap1.c               |   8 +-
+ hw/arm/omap2.c               |  25 +++---
+ hw/char/omap_uart.c          |   2 +-
+ hw/char/serial-isa.c         |  11 ++-
+ hw/char/serial-pci-multi.c   |  45 +++++++---
+ hw/char/serial-pci.c         |  17 +++-
+ hw/char/serial.c             | 164 ++++++++++++++++++++++++++++-------
+ hw/core/qdev-properties.c    |  50 -----------
+ hw/core/sysbus.c             |  32 -------
+ hw/cris/axis_dev88.c         |   4 -
+ hw/display/sm501.c           |  31 +++++--
+ hw/dma/sparc32_dma.c         |   2 +-
+ hw/gpio/omap_gpio.c          |  42 ++++-----
+ hw/i2c/omap_i2c.c            |  19 ++--
+ hw/i2c/smbus_eeprom.c        |  17 ++--
+ hw/i386/pc.c                 |   7 +-
+ hw/i386/vmmouse.c            |   8 +-
+ hw/input/pckbd.c             |   8 +-
+ hw/intc/etraxfs_pic.c        |  26 +-----
+ hw/intc/grlib_irqmp.c        |  35 +-------
+ hw/intc/omap_intc.c          |  17 ++--
+ hw/mips/boston.c             |   2 +-
+ hw/mips/cps.c                |   2 +-
+ hw/mips/mips_jazz.c          |   3 +-
+ hw/mips/mips_malta.c         |   2 +-
+ hw/mips/mips_mipssim.c       |  13 ++-
+ hw/net/dp8393x.c             |   7 +-
+ hw/net/etraxfs_eth.c         |  44 +++++++---
+ hw/net/lance.c               |   5 +-
+ hw/net/pcnet-pci.c           |   2 +-
+ hw/net/pcnet.h               |   2 +-
+ hw/sh4/r2d.c                 |   2 +-
+ hw/sparc/leon3.c             |  38 +-------
+ hw/sparc/trace-events        |   4 -
+ include/hw/arm/omap.h        |  52 +++++++++++
+ include/hw/char/serial.h     |  44 +++++++---
+ include/hw/cris/etraxfs.h    |  20 +----
+ include/hw/input/i8042.h     |   4 +-
+ include/hw/qdev-properties.h |  27 ------
+ include/hw/sysbus.h          |  13 +--
+ include/qemu/id.h            |   1 +
+ target/cris/cpu.c            |   8 ++
+ target/cris/cpu.h            |   1 +
+ target/sparc/cpu.c           |  39 +++++++++
+ target/sparc/cpu.h           |   1 +
+ target/sparc/trace-events    |   4 +
+ util/id.c                    |   1 +
+ 48 files changed, 515 insertions(+), 428 deletions(-)
+
+--=20
+2.23.0.606.g08da6496b6
+
 
