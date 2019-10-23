@@ -2,83 +2,70 @@ Return-Path: <SRS0=brme=YQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 00823CA9EB6
-	for <qemu-devel@archiver.kernel.org>; Wed, 23 Oct 2019 12:03:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D2BF0CA9EB6
+	for <qemu-devel@archiver.kernel.org>; Wed, 23 Oct 2019 12:04:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BF40A2064A
-	for <qemu-devel@archiver.kernel.org>; Wed, 23 Oct 2019 12:03:42 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DyYYIIwK"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BF40A2064A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id A5C9A2064A
+	for <qemu-devel@archiver.kernel.org>; Wed, 23 Oct 2019 12:04:06 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A5C9A2064A
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=tuxfamily.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33848 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33850 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iNFMb-0000sl-QQ
-	for qemu-devel@archiver.kernel.org; Wed, 23 Oct 2019 08:03:41 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54745)
+	id 1iNFMz-0001HC-P5
+	for qemu-devel@archiver.kernel.org; Wed, 23 Oct 2019 08:04:05 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59154)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eblake@redhat.com>) id 1iNEsd-0007vK-SQ
- for qemu-devel@nongnu.org; Wed, 23 Oct 2019 07:32:45 -0400
+ (envelope-from <th.huth@gmail.com>) id 1iNFKb-0008OF-FG
+ for qemu-devel@nongnu.org; Wed, 23 Oct 2019 08:01:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eblake@redhat.com>) id 1iNEsa-0003cy-7C
- for qemu-devel@nongnu.org; Wed, 23 Oct 2019 07:32:42 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:38571
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1iNEsY-0003Mo-LH
- for qemu-devel@nongnu.org; Wed, 23 Oct 2019 07:32:39 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1571830340;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=/59X2Omb6FYUcGXfhxnI/lxrSBG+w9/vrP99TGSedlM=;
- b=DyYYIIwKEO3s/6iOFSkNA1fRhW+Jz5R612xFV3/o/KWVYQDgDzvnz9x9rwTnmNS8Hu0R8w
- XX/xpF80YPRTdgYYL3HlLVQxx/6sKDFpKEvpqRDB9oIYjMEKJ/ylDur8NSb5DGjLKMBW8A
- EzIVzNOE0M9R9UTK4y5udMsEZ3ksIDI=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-57-OtMda3kmM_qrbgjZKcI9pQ-1; Wed, 23 Oct 2019 07:32:17 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9DD04801E66;
- Wed, 23 Oct 2019 11:32:16 +0000 (UTC)
-Received: from [10.3.117.0] (ovpn-117-0.phx2.redhat.com [10.3.117.0])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 0B2D45C1B2;
- Wed, 23 Oct 2019 11:32:01 +0000 (UTC)
-Subject: Re: [PATCH v5 05/11] qapi: add unplug primary event
-To: Jens Freimann <jfreimann@redhat.com>, qemu-devel@nongnu.org
-References: <20191023082711.16694-1-jfreimann@redhat.com>
- <20191023082711.16694-6-jfreimann@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Organization: Red Hat, Inc.
-Message-ID: <1064f550-353d-0a5d-38ae-76a934fac3cc@redhat.com>
-Date: Wed, 23 Oct 2019 06:32:01 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.1
+ (envelope-from <th.huth@gmail.com>) id 1iNFKa-0004Nk-1x
+ for qemu-devel@nongnu.org; Wed, 23 Oct 2019 08:01:37 -0400
+Received: from mail-wr1-f45.google.com ([209.85.221.45]:41782)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <th.huth@gmail.com>) id 1iNFKZ-0004NM-S2
+ for qemu-devel@nongnu.org; Wed, 23 Oct 2019 08:01:36 -0400
+Received: by mail-wr1-f45.google.com with SMTP id p4so21790375wrm.8
+ for <qemu-devel@nongnu.org>; Wed, 23 Oct 2019 05:01:35 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=pZk0MZLQdMzXbJMr9doDgj8waKfXrWSNV2vK14XQpRw=;
+ b=je3a15RwBOn5qa0e2N/2JALpp3bm3z6YyNIEovfyswTtiENRkOJ3LGn4ODr7v2adbW
+ aFVhhOhyNZdQUjO3jNZVGLl3v1zTM8M8zOnzkw2EEWbvt3amMA/o8Z13qzKbjQBLZxbU
+ 4Gy54fl5mcqmEMrMLunoVBCmMvaK0EVg9UaPykMbpPpOOBmXOW/8LRrzEaFGzeuS0sqv
+ DgeBVGewHBme7BpgqKp4+TAQ8L1wmoH2x8L2WuVAn9pcMeQyvDyHOYj/MVztYHO/XbZQ
+ sx8p4ga8O8I2AA5gs9EOdA5SDJc5/iflBrdGqWaA1VOrBOs4ELounxFoftkJqUeWe9OI
+ 09Dw==
+X-Gm-Message-State: APjAAAUvTSrIjGkkqjHKd8Y0VC+ZjMoKdzg/Rr9R3y3CW0Lwl+I9Q7N5
+ uOQ55rU4yREahS7pSEt4UPPXGuhE
+X-Google-Smtp-Source: APXvYqwDyLhvXFCGuPBTuAMYlGSte/svhmdQBz7xp6052u0Pm9N5yNbqS1MFnV8uuSaLfShZQYA4iQ==
+X-Received: by 2002:adf:ec0b:: with SMTP id x11mr7764858wrn.107.1571832093633; 
+ Wed, 23 Oct 2019 05:01:33 -0700 (PDT)
+Received: from thl530.redhat.com (nat-pool-str-u.redhat.com. [149.14.88.107])
+ by smtp.gmail.com with ESMTPSA id
+ p7sm19621115wma.34.2019.10.23.05.01.32
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 23 Oct 2019 05:01:32 -0700 (PDT)
+From: Thomas Huth <huth@tuxfamily.org>
+To: qemu-devel@nongnu.org
+Subject: [PATCH] qemu-options: Rework the help text of the '-display' option
+Date: Wed, 23 Oct 2019 14:01:28 +0200
+Message-Id: <20191023120129.13721-1-huth@tuxfamily.org>
+X-Mailer: git-send-email 2.21.0
 MIME-Version: 1.0
-In-Reply-To: <20191023082711.16694-6-jfreimann@redhat.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-MC-Unique: OtMda3kmM_qrbgjZKcI9pQ-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=WINDOWS-1252; format=flowed
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.81
+X-Received-From: 209.85.221.45
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,55 +77,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: pkrempa@redhat.com, berrange@redhat.com, ehabkost@redhat.com,
- mst@redhat.com, aadam@redhat.com, dgilbert@redhat.com,
- alex.williamson@redhat.com, laine@redhat.com, ailan@redhat.com,
- parav@mellanox.com
+Cc: Gerd Hoffmann <kraxel@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 10/23/19 3:27 AM, Jens Freimann wrote:
-> This event is emitted when we sent a request to unplug a
-> failover primary device from the Guest OS and it includes the
-> device id of the primary device.
->=20
-> Signed-off-by: Jens Freimann <jfreimann@redhat.com>
-> ---
->   qapi/migration.json | 19 +++++++++++++++++++
->   1 file changed, 19 insertions(+)
->=20
-> diff --git a/qapi/migration.json b/qapi/migration.json
-> index 82feb5bd39..52e69e2868 100644
-> --- a/qapi/migration.json
-> +++ b/qapi/migration.json
-> @@ -1448,3 +1448,22 @@
->   # Since: 3.0
->   ##
->   { 'command': 'migrate-pause', 'allow-oob': true }
-> +
-> +##
-> +# @UNPLUG_PRIMARY:
-> +#
-> +# Emitted from source side of a migration when migration state is
-> +# WAIT_UNPLUG. Device was unplugged by guest operating system.
-> +# Device resources in QEMU are kept on standby to be able to re-plug it =
-in case
-> +# of migration failure.
-> +#
-> +# @device_id: QEMU device id of the unplugged device
-> +#
-> +# Since: 4.2
-> +#
-> +# Example:
-> +#   {"event": "UNPLUG_PRIMARY", "data": {"device_id": "hostdev0"} }
+Improve the help text of the "-display" option:
 
-Should be device-id
+- Only print the options that we have enabled in the binary
+  (similar to what we do for other options like -netdev already)
 
+- The "frame=on|off" from "-display sdl" has been removed in commit
+  09bd7ba9f5f7 ("Remove deprecated -no-frame option"), so we should
+  not show this in the help text anymore
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
+- The "-display egl-headless" line was missing a "\n" at the end
+
+- Indent the default display text in a nicer way
+
+Signed-off-by: Thomas Huth <huth@tuxfamily.org>
+---
+ qemu-options.hx | 30 +++++++++++++++++++++---------
+ 1 file changed, 21 insertions(+), 9 deletions(-)
+
+diff --git a/qemu-options.hx b/qemu-options.hx
+index 996b6fba74..917c54b302 100644
+--- a/qemu-options.hx
++++ b/qemu-options.hx
+@@ -1526,26 +1526,38 @@ STEXI
+ ETEXI
+ 
+ DEF("display", HAS_ARG, QEMU_OPTION_display,
++#if defined(CONFIG_SPICE)
+     "-display spice-app[,gl=on|off]\n"
+-    "-display sdl[,frame=on|off][,alt_grab=on|off][,ctrl_grab=on|off]\n"
++#endif
++#if defined(CONFIG_SDL)
++    "-display sdl[,alt_grab=on|off][,ctrl_grab=on|off]\n"
+     "            [,window_close=on|off][,gl=on|core|es|off]\n"
++#endif
++#if defined(CONFIG_GTK)
+     "-display gtk[,grab_on_hover=on|off][,gl=on|off]|\n"
++#endif
++#if defined(CONFIG_VNC)
+     "-display vnc=<display>[,<optargs>]\n"
++#endif
++#if defined(CONFIG_CURSES)
+     "-display curses[,charset=<encoding>]\n"
++#endif
++#if defined(CONFIG_OPENGL)
++    "-display egl-headless[,rendernode=<file>]\n"
++#endif
+     "-display none\n"
+-    "-display egl-headless[,rendernode=<file>]"
+-    "                select display type\n"
+-    "The default display is equivalent to\n"
++    "                select display backend type\n"
++    "                The default display is equivalent to\n                "
+ #if defined(CONFIG_GTK)
+-            "\t\"-display gtk\"\n"
++            "\"-display gtk\"\n"
+ #elif defined(CONFIG_SDL)
+-            "\t\"-display sdl\"\n"
++            "\"-display sdl\"\n"
+ #elif defined(CONFIG_COCOA)
+-            "\t\"-display cocoa\"\n"
++            "\"-display cocoa\"\n"
+ #elif defined(CONFIG_VNC)
+-            "\t\"-vnc localhost:0,to=99,id=default\"\n"
++            "\"-vnc localhost:0,to=99,id=default\"\n"
+ #else
+-            "\t\"-display none\"\n"
++            "\"-display none\"\n"
+ #endif
+     , QEMU_ARCH_ALL)
+ STEXI
+-- 
+2.21.0
 
 
