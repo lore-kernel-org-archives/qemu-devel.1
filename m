@@ -2,80 +2,156 @@ Return-Path: <SRS0=brme=YQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3287ACA9EB6
-	for <qemu-devel@archiver.kernel.org>; Wed, 23 Oct 2019 15:56:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 09F40CA9EB6
+	for <qemu-devel@archiver.kernel.org>; Wed, 23 Oct 2019 15:58:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E25C720679
-	for <qemu-devel@archiver.kernel.org>; Wed, 23 Oct 2019 15:56:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B1EA020640
+	for <qemu-devel@archiver.kernel.org>; Wed, 23 Oct 2019 15:58:40 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="V2L2VoEo"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E25C720679
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ND1z+2Gy"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B1EA020640
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40214 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40336 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iNIzt-0006Wm-Ea
-	for qemu-devel@archiver.kernel.org; Wed, 23 Oct 2019 11:56:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40162)
+	id 1iNJ1z-0008Tf-6c
+	for qemu-devel@archiver.kernel.org; Wed, 23 Oct 2019 11:58:39 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40997)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <imammedo@redhat.com>) id 1iNIZM-0007Ji-OH
- for qemu-devel@nongnu.org; Wed, 23 Oct 2019 11:29:07 -0400
+ (envelope-from <jsnow@redhat.com>) id 1iNIf0-0002uS-BZ
+ for qemu-devel@nongnu.org; Wed, 23 Oct 2019 11:34:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <imammedo@redhat.com>) id 1iNIZK-0003Nq-Ha
- for qemu-devel@nongnu.org; Wed, 23 Oct 2019 11:29:04 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:46308
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <jsnow@redhat.com>) id 1iNIey-0006ml-OT
+ for qemu-devel@nongnu.org; Wed, 23 Oct 2019 11:34:54 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:30674
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1iNIZK-0003Ng-Dg
- for qemu-devel@nongnu.org; Wed, 23 Oct 2019 11:29:02 -0400
+ (Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1iNIey-0006mH-L9
+ for qemu-devel@nongnu.org; Wed, 23 Oct 2019 11:34:52 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1571844542;
+ s=mimecast20190719; t=1571844892;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=MHTQpGI74b8/oA0QRYy5/0PHL/SRsovJ61XNt3Pw6f8=;
- b=V2L2VoEowXtthz/C05dH7P6BRel/eRae3T0wF1Z4M5qrPsk++UO2JNOdDOczereLCME+K4
- BzDCvlapcIy3CoK6d09g413Rqgu8MCNWEOsIY2ug3XwR/QbVc7jZzpQauHO3K7JrDkQcCK
- C4eE+f+N3qWlfQcJBAg6eWY7Nb5U4YI=
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=4UwFW3ofKox7TkLynPfP56a/KzXwJNHOHyFU9qW3eZI=;
+ b=ND1z+2GytbBq04RVj+phAsyPCXPIb8a6toNxdm3v7vUHDDZwmJZi2x/ibjMuCsTC0z1Bib
+ gwXWT8/JajPEeRyGbtja+OVhNoA+vcZQiPTBhzp4rlp186AD0/4dlvSHbYLsdmqYbqy4jO
+ rC8a05tTMZS8ih7AjGb0p7gofTMGkZ0=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-185-oH1Gnxv6OPeOTzfCvbejKQ-1; Wed, 23 Oct 2019 11:28:58 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ us-mta-232-u_Nr_UbpMUCWM9h9rh5K4A-1; Wed, 23 Oct 2019 11:34:47 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 775CB476;
- Wed, 23 Oct 2019 15:28:57 +0000 (UTC)
-Received: from localhost (unknown [10.43.2.182])
- by smtp.corp.redhat.com (Postfix) with ESMTP id D6C1D5D6D0;
- Wed, 23 Oct 2019 15:28:55 +0000 (UTC)
-Date: Wed, 23 Oct 2019 17:28:54 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-To: Tao Xu <tao3.xu@intel.com>
-Subject: Re: [PATCH v13 06/12] numa: Extend CLI to provide memory latency
- and bandwidth information
-Message-ID: <20191023172854.42c495d5@redhat.com>
-In-Reply-To: <20191020111125.27659-7-tao3.xu@intel.com>
-References: <20191020111125.27659-1-tao3.xu@intel.com>
- <20191020111125.27659-7-tao3.xu@intel.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 72A65107AD35;
+ Wed, 23 Oct 2019 15:34:46 +0000 (UTC)
+Received: from [10.10.121.110] (ovpn-121-110.rdu2.redhat.com [10.10.121.110])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id EE91F5C1D4;
+ Wed, 23 Oct 2019 15:34:45 +0000 (UTC)
+Subject: Re: qemu crashing when attaching an ISO file to a virtio-scsi CD-ROM
+ device through libvirt
+To: =?UTF-8?Q?Fernando_Casas_Sch=c3=b6ssow?= <casasfernando@outlook.com>,
+ QEMU Developers <qemu-devel@nongnu.org>
+References: <VI1PR03MB481484C08A04458ACA64F7A0A46C0@VI1PR03MB4814.eurprd03.prod.outlook.com>
+From: John Snow <jsnow@redhat.com>
+Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+Message-ID: <dbb363cf-bc3a-6de5-a62a-1467208d0017@redhat.com>
+Date: Wed, 23 Oct 2019 11:34:45 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.1
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-MC-Unique: oH1Gnxv6OPeOTzfCvbejKQ-1
+In-Reply-To: <VI1PR03MB481484C08A04458ACA64F7A0A46C0@VI1PR03MB4814.eurprd03.prod.outlook.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-MC-Unique: u_Nr_UbpMUCWM9h9rh5K4A-1
 X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=WINDOWS-1252
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.81
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,312 +163,148 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: ehabkost@redhat.com, jingqi.liu@intel.com, fan.du@intel.com,
- qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>,
- jonathan.cameron@huawei.com
+Cc: Peter Krempa <pkrempa@redhat.com>,
+ "qemu-block@nongnu.org" <qemu-block@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Sun, 20 Oct 2019 19:11:19 +0800
-Tao Xu <tao3.xu@intel.com> wrote:
 
-> From: Liu Jingqi <jingqi.liu@intel.com>
+
+On 10/18/19 5:41 PM, Fernando Casas Sch=C3=B6ssow wrote:
+> Hi,
 >=20
-> Add -numa hmat-lb option to provide System Locality Latency and
-> Bandwidth Information. These memory attributes help to build
-> System Locality Latency and Bandwidth Information Structure(s)
-> in ACPI Heterogeneous Memory Attribute Table (HMAT).
+
+Hi! Thanks for the report.
+
+> Today while working with two different Windows Server 2012 R2 guests I=20
+> found that when I try to attach an ISO file to a SCSI CD-ROM device=20
+> through libvirt (virsh or virt-manager) while the guest is running,=20
+> qemu crashes and the following message is logged:
 >=20
-> Signed-off-by: Liu Jingqi <jingqi.liu@intel.com>
-> Signed-off-by: Tao Xu <tao3.xu@intel.com>
-> ---
+> Assertion failed: blk_get_aio_context(d->conf.blk) =3D=3D s->ctx=20
+> (/home/buildozer/aports/main/qemu/src/qemu-4.0.0/hw/scsi/virtio-scsi.c:=
+=20
+> virtio_scsi_ctx_check: 246)
 >=20
-> Changes in v13:
->     - Reuse Garray to store the raw bandwidth and bandwidth data
->     - Calculate common base unit using range bitmap (Igor)
-> ---
->  hw/core/numa.c        | 127 ++++++++++++++++++++++++++++++++++++++++++
->  include/sysemu/numa.h |  68 ++++++++++++++++++++++
->  qapi/machine.json     |  95 ++++++++++++++++++++++++++++++-
->  qemu-options.hx       |  49 +++++++++++++++-
->  4 files changed, 336 insertions(+), 3 deletions(-)
-Below some comments on doc parts of the patch
-(since I'm too familiar with the topic y now I can't properly review doc pa=
-rts)
+> I can repro this at will. All I have to do is to try to attach an ISO=20
+> file to the SCSI CDROM while the guest is running.
+> The SCSI controller model is virtio-scsi with iothread enabled.
+> Please find below all the details about my setup that I considered=20
+> relevant but I missed something please don't hesitate to let me know:
+>=20
 
-perhaps Eric and Markus can suggest a better way to describe new options.
+Looks like we got aio_context management wrong with iothread for the
+media change events somewhere. Should be easy enough to fix if we figure
+out where the bad assumption is.
 
-[...]
+> Host arch: x86_64
+> Distro: Alpine Linux 3.10.2
+> qemu version: 4.0
 
-> diff --git a/qapi/machine.json b/qapi/machine.json
-> index f1b07b3486..9ca008810b 100644
-> --- a/qapi/machine.json
-> +++ b/qapi/machine.json
-> @@ -426,10 +426,12 @@
->  #
->  # @cpu: property based CPU(s) to node mapping (Since: 2.10)
->  #
-> +# @hmat-lb: memory latency and bandwidth information (Since: 4.2)
-> +#
->  # Since: 2.1
->  ##
->  { 'enum': 'NumaOptionsType',
-> -  'data': [ 'node', 'dist', 'cpu' ] }
-> +  'data': [ 'node', 'dist', 'cpu', 'hmat-lb' ] }
-> =20
->  ##
->  # @NumaOptions:
-> @@ -444,7 +446,8 @@
->    'data': {
->      'node': 'NumaNodeOptions',
->      'dist': 'NumaDistOptions',
-> -    'cpu': 'NumaCpuOptions' }}
-> +    'cpu': 'NumaCpuOptions',
-> +    'hmat-lb': 'NumaHmatLBOptions' }}
-> =20
->  ##
->  # @NumaNodeOptions:
-> @@ -557,6 +560,94 @@
->     'base': 'CpuInstanceProperties',
->     'data' : {} }
-> =20
-> +##
-> +# @HmatLBMemoryHierarchy:
-> +#
-> +# The memory hierarchy in the System Locality Latency
-> +# and Bandwidth Information Structure of HMAT (Heterogeneous
-> +# Memory Attribute Table)
-> +#
-> +# For more information of @HmatLBMemoryHierarchy see
-> +# the chapter 5.2.27.4: Table 5-142: Field "Flags" of ACPI 6.3 spec.
-> +#
-> +# @memory: the structure represents the memory performance
-> +#
-> +# @first-level: first level memory of memory side cached memory
-> +#
-> +# @second-level: second level memory of memory side cached memory
-> +#
-> +# @third-level: third level memory of memory side cached memory
-> +#
-> +# Since: 4.2
-> +##
-> +{ 'enum': 'HmatLBMemoryHierarchy',
-> +  'data': [ 'memory', 'first-level', 'second-level', 'third-level' ] }
-> +
-> +##
-> +# @HmatLBDataType:
-> +#
-> +# Data type in the System Locality Latency
-> +# and Bandwidth Information Structure of HMAT (Heterogeneous
-> +# Memory Attribute Table)
-> +#
-> +# For more information of @HmatLBDataType see
-> +# the chapter 5.2.27.4: Table 5-142:  Field "Data Type" of ACPI 6.3 spec=
-.
-> +#
-> +# @access-latency: access latency (nanoseconds)
-> +#
-> +# @read-latency: read latency (nanoseconds)
-> +#
-> +# @write-latency: write latency (nanoseconds)
-> +#
-> +# @access-bandwidth: access bandwidth (MB/s)
-> +#
-> +# @read-bandwidth: read bandwidth (MB/s)
-> +#
-> +# @write-bandwidth: write bandwidth (MB/s)
-I think units here are not appropriate, values stored in fields are
-minimal base units only and nothing else (i.e. ps and B/s)
+Do you have the ability to try 4.1, or the latest development head with
+debugging symbols enabled?
 
-> +#
-> +# Since: 4.2
-> +##
-> +{ 'enum': 'HmatLBDataType',
-> +  'data': [ 'access-latency', 'read-latency', 'write-latency',
-> +            'access-bandwidth', 'read-bandwidth', 'write-bandwidth' ] }
-> +
-> +##
-> +# @NumaHmatLBOptions:
-> +#
-> +# Set the system locality latency and bandwidth information
-> +# between Initiator and Target proximity Domains.
-> +#
-> +# For more information of @NumaHmatLBOptions see
-> +# the chapter 5.2.27.4: Table 5-142 of ACPI 6.3 spec.
-> +#
-> +# @initiator: the Initiator Proximity Domain.
-> +#
-> +# @target: the Target Proximity Domain.
-> +#
-> +# @hierarchy: the Memory Hierarchy. Indicates the performance
-> +#             of memory or side cache.
-> +#
-> +# @data-type: presents the type of data, access/read/write
-> +#             latency or hit latency.
+> Linux kernel version: 4.19.67
+> libvirt: 5.5.0
+> Emulated SCSI controller: virtio-scsi (with iothread enabled)
+> Guest firmware: OVMF-EFI
+> Guest OS: Window Server 2012 R2
+> Guest virtio drivers version: 171 (current stable)
+>=20
+> qemu command line:
+>=20
+> /usr/bin/qemu-system-x86_64 -name guest=3DDCHOMENET01,debug-threads=3Don =
+-S=20
+> -object=20
+> secret,id=3DmasterKey0,format=3Draw,file=3D/var/lib/libvirt/qemu/domain-7=
+8-DCHOMENET01/master-key.aes=20
+> -machine pc-i440fx-4.0,accel=3Dkvm,usb=3Doff,dump-guest-core=3Don -cpu=20
+> IvyBridge,ss=3Don,vmx=3Doff,pcid=3Don,hypervisor=3Don,arat=3Don,tsc_adjus=
+t=3Don,umip=3Don,xsaveopt=3Don,hv_time,hv_relaxed,hv_vapic,hv_spinlocks=3D0=
+x1fff=20
+> -drive=20
+> file=3D/usr/share/edk2.git/ovmf-x64/OVMF_CODE-pure-efi.fd,if=3Dpflash,for=
+mat=3Draw,unit=3D0,readonly=3Don=20
+> -drive=20
+> file=3D/var/lib/libvirt/qemu/nvram/DCHOMENET01_VARS.fd,if=3Dpflash,format=
+=3Draw,unit=3D1=20
+> -m 1536 -overcommit mem-lock=3Doff -smp 1,sockets=3D1,cores=3D1,threads=
+=3D1=20
+> -object iothread,id=3Diothread1 -uuid=20
+> f06978ad-2734-44ab-a518-5dfcf71d625e -no-user-config -nodefaults=20
+> -chardev socket,id=3Dcharmonitor,fd=3D33,server,nowait -mon=20
+> chardev=3Dcharmonitor,id=3Dmonitor,mode=3Dcontrol -rtc=20
+> base=3Dlocaltime,driftfix=3Dslew -global kvm-pit.lost_tick_policy=3Ddelay=
+=20
+> -no-hpet -no-shutdown -global PIIX4_PM.disable_s3=3D1 -global=20
+> PIIX4_PM.disable_s4=3D1 -boot strict=3Don -device=20
+> qemu-xhci,id=3Dusb,bus=3Dpci.0,addr=3D0x4 -device=20
+> virtio-scsi-pci,iothread=3Diothread1,id=3Dscsi0,num_queues=3D1,bus=3Dpci.=
+0,addr=3D0x5=20
+> -device virtio-serial-pci,id=3Dvirtio-serial0,bus=3Dpci.0,addr=3D0x6 -dri=
+ve=20
+> file=3D/storage/storage-hdd-vms/virtual_machines_hdd/dchomenet01.qcow2,fo=
+rmat=3Dqcow2,if=3Dnone,id=3Ddrive-scsi0-0-0-0,cache=3Dnone,discard=3Dunmap,=
+aio=3Dthreads=20
+> -device=20
+> scsi-hd,bus=3Dscsi0.0,channel=3D0,scsi-id=3D0,lun=3D0,device_id=3Ddrive-s=
+csi0-0-0-0,drive=3Ddrive-scsi0-0-0-0,id=3Dscsi0-0-0-0,bootindex=3D1,write-c=
+ache=3Don=20
+> -drive if=3Dnone,id=3Ddrive-scsi0-0-0-1,readonly=3Don -device=20
+> scsi-cd,bus=3Dscsi0.0,channel=3D0,scsi-id=3D0,lun=3D1,device_id=3Ddrive-s=
+csi0-0-0-1,drive=3Ddrive-scsi0-0-0-1,id=3Dscsi0-0-0-1=20
+> -netdev tap,fd=3D41,id=3Dhostnet0,vhost=3Don,vhostfd=3D43 -device=20
+> virtio-net-pci,netdev=3Dhostnet0,id=3Dnet0,mac=3D52:54:00:99:b5:62,bus=3D=
+pci.0,addr=3D0x3=20
+> -chardev=20
+> socket,id=3Dcharserial0,host=3D127.0.0.1,port=3D4900,telnet,server,nowait=
+=20
+> -device isa-serial,chardev=3Dcharserial0,id=3Dserial0 -chardev=20
+> spicevmc,id=3Dcharchannel0,name=3Dvdagent -device=20
+> virtserialport,bus=3Dvirtio-serial0.0,nr=3D1,chardev=3Dcharchannel0,id=3D=
+channel0,name=3Dcom.redhat.spice.0=20
+> -chardev socket,id=3Dcharchannel1,fd=3D45,server,nowait -device=20
+> virtserialport,bus=3Dvirtio-serial0.0,nr=3D2,chardev=3Dcharchannel1,id=3D=
+channel1,name=3Dorg.qemu.guest_agent.0=20
+> -chardev spiceport,id=3Dcharchannel2,name=3Dorg.spice-space.webdav.0=20
+> -device=20
+> virtserialport,bus=3Dvirtio-serial0.0,nr=3D3,chardev=3Dcharchannel2,id=3D=
+channel2,name=3Dorg.spice-space.webdav.0=20
+> -device virtio-tablet-pci,id=3Dinput2,bus=3Dpci.0,addr=3D0x7 -spice=20
+> port=3D5900,addr=3D127.0.0.1,disable-ticketing,seamless-migration=3Don=20
+> -device=20
+> qxl-vga,id=3Dvideo0,ram_size=3D67108864,vram_size=3D67108864,vram64_size_=
+mb=3D0,vgamem_mb=3D16,max_outputs=3D1,bus=3Dpci.0,addr=3D0x2=20
+> -chardev spicevmc,id=3Dcharredir0,name=3Dusbredir -device=20
+> usb-redir,chardev=3Dcharredir0,id=3Dredir0,bus=3Dusb.0,port=3D2 -chardev=
+=20
+> spicevmc,id=3Dcharredir1,name=3Dusbredir -device=20
+> usb-redir,chardev=3Dcharredir1,id=3Dredir1,bus=3Dusb.0,port=3D3 -device=
+=20
+> virtio-balloon-pci,id=3Dballoon0,bus=3Dpci.0,addr=3D0x8 -sandbox=20
+> on,obsolete=3Ddeny,elevateprivileges=3Ddeny,spawn=3Ddeny,resourcecontrol=
+=3Ddeny=20
+> -msg timestamp=3Don
+>=20
+> I can provide a core dump of the process if needed for debugging and=20
+> the guest XML as well.
+>=20
 
-> +# @latency: the value of latency from @initiator to @target proximity do=
-main,
-> +#           the latency units are "ps(picosecond)", "ns(nanosecond)" or
-> +#           "us(microsecond)".
-> +#
-> +# @bandwidth: the value of bandwidth between @initiator and @target prox=
-imity
-> +#             domain, the bandwidth units are "MB(/s)","GB(/s)" or "TB(/=
-s)".
-ditto
+A backtrace is probably a great starting point (from gdb: `thread apply
+all bt`.) I don't know exactly what codepath is being exercised when you
+"attach an ISO file" through libvirt's interface.
 
-> +# Since: 4.2
-> +##
-> +{ 'struct': 'NumaHmatLBOptions',
-> +    'data': {
-> +    'initiator': 'uint16',
-> +    'target': 'uint16',
-> +    'hierarchy': 'HmatLBMemoryHierarchy',
-> +    'data-type': 'HmatLBDataType',
-> +    '*latency': 'time',
-> +    '*bandwidth': 'size' }}
-> +
->  ##
->  # @HostMemPolicy:
->  #
-> diff --git a/qemu-options.hx b/qemu-options.hx
-> index 1f96399521..de97939f9a 100644
-> --- a/qemu-options.hx
-> +++ b/qemu-options.hx
-> @@ -168,16 +168,19 @@ DEF("numa", HAS_ARG, QEMU_OPTION_numa,
->      "-numa node[,mem=3Dsize][,cpus=3Dfirstcpu[-lastcpu]][,nodeid=3Dnode]=
-[,initiator=3Dnode]\n"
->      "-numa node[,memdev=3Did][,cpus=3Dfirstcpu[-lastcpu]][,nodeid=3Dnode=
-][,initiator=3Dnode]\n"
->      "-numa dist,src=3Dsource,dst=3Ddestination,val=3Ddistance\n"
-> -    "-numa cpu,node-id=3Dnode[,socket-id=3Dx][,core-id=3Dy][,thread-id=
-=3Dz]\n",
-> +    "-numa cpu,node-id=3Dnode[,socket-id=3Dx][,core-id=3Dy][,thread-id=
-=3Dz]\n"
-> +    "-numa hmat-lb,initiator=3Dnode,target=3Dnode,hierarchy=3Dmemory|fir=
-st-level|second-level|third-level,data-type=3Daccess-latency|read-latency|w=
-rite-latency[,latency=3Dlat][,bandwidth=3Dbw]\n",
->      QEMU_ARCH_ALL)
->  STEXI
->  @item -numa node[,mem=3D@var{size}][,cpus=3D@var{firstcpu}[-@var{lastcpu=
-}]][,nodeid=3D@var{node}][,initiator=3D@var{initiator}]
->  @itemx -numa node[,memdev=3D@var{id}][,cpus=3D@var{firstcpu}[-@var{lastc=
-pu}]][,nodeid=3D@var{node}][,initiator=3D@var{initiator}]
->  @itemx -numa dist,src=3D@var{source},dst=3D@var{destination},val=3D@var{=
-distance}
->  @itemx -numa cpu,node-id=3D@var{node}[,socket-id=3D@var{x}][,core-id=3D@=
-var{y}][,thread-id=3D@var{z}]
-> +@itemx -numa hmat-lb,initiator=3D@var{node},target=3D@var{node},hierarch=
-y=3D@var{str},data-type=3D@var{str}[,latency=3D@var{lat}][,bandwidth=3D@var=
-{bw}]
-                                                                           =
-   ^^^                 ^^^
-Using the same 'str' for 2 different enums is confusing.
-Suggest for 1st use 'level' and for the second just 'type'
+If you don't mind the hassle, trying on the 4.1 (or a development build
+would be even more luxurious) and giving a stacktrace would be nice.
 
->  @findex -numa
->  Define a NUMA node and assign RAM and VCPUs to it.
->  Set the NUMA distance from a source node to a destination node.
-> +Set the ACPI Heterogeneous Memory Attributes for the given nodes.
-> =20
->  Legacy VCPU assignment uses @samp{cpus} option where
->  @var{firstcpu} and @var{lastcpu} are CPU indexes. Each
-> @@ -256,6 +259,50 @@ specified resources, it just assigns existing resour=
-ces to NUMA
->  nodes. This means that one still has to use the @option{-m},
->  @option{-smp} options to allocate RAM and VCPUs respectively.
-> =20
-> +Use @samp{hmat-lb} to set System Locality Latency and Bandwidth Informat=
-ion
-> +between initiator and target NUMA nodes in ACPI Heterogeneous Attribute =
-Memory Table (HMAT).
-> +Initiator NUMA node can create memory requests, usually including one or=
- more processors.
-s/including/it has/
+> Thanks.
+>=20
+> Fernando
+>=20
+>=20
 
-> +Target NUMA node contains addressable memory.
-> +
-> +In @samp{hmat-lb} option, @var{node} are NUMA node IDs. @var{str} of 'hi=
-erarchy'
-> +is the memory hierarchy of the target NUMA node: if @var{str} is 'memory=
-', the structure
-> +represents the memory performance; if @var{str} is 'first-level|second-l=
-evel|third-level',
-> +this structure represents aggregated performance of memory side caches f=
-or each domain.
-> +@var{str} of 'data-type' is type of data represented by this structure i=
-nstance:
-> +if 'hierarchy' is 'memory', 'data-type' is 'access|read|write' latency(n=
-anoseconds)
-is nanoseconds is right here? Looking at previous patches default value of =
-suffix-less
-should be picoseconds. I'd just drop '(nanoseconds)'. User will use appropr=
-iate suffix.
-
-> +or 'access|read|write' bandwidth(MB/s) of the target memory; if 'hierarc=
-hy' is
-ditto (MB/s), probably should be Bytes/s for default suffix-less value
-(well, I'm not sure how to express it better)
-
-> +'first-level|second-level|third-level', 'data-type' is 'access|read|writ=
-e' hit latency
-> +or 'access|read|write' hit bandwidth of the target memory side cache.
-> +
-> +@var{lat} of 'latency' is latency value, the possible value and units ar=
-e
-> +NUM[ps|ns|us] (picosecond|nanosecond|microsecond), the recommended unit =
-is 'ns'. @var{bw}
-> +is bandwidth value, the possible value and units are NUM[M|G|T], mean th=
-at
-
-> +the bandwidth value are NUM MB/s, GB/s or TB/s. Note that max NUM is 655=
-34,
-> +if NUM is 0, means the corresponding latency or bandwidth information is=
- not provided.
-> +And if input numbers without any unit, the latency unit will be 'ps' and=
- the bandwidth
-> +will be MB/s.
- 1st: above is applicable to both bw and lat values and should be documente=
-d as such
- 2nd: 'max NUM is 65534' when different suffixes is fleeting target,
-      spec says that entry with 0xFFFF is unreachable, so how about documen=
-ting
-      unreachable value as 0xFFFFFFFFFFFFFFFF (then CLI parsing code will
-      exclude it from range detection and acpi table building code translat=
-e it
-      to internal 0xFFFF it could fit into the tables)
-
-> +For example, the following option assigns NUMA node 0 and 1. Node 0 has =
-2 cpus and
-> +a ram, node 1 has only a ram. The processors in node 0 access memory in =
-node
-> +0 with access-latency 5 nanoseconds, access-bandwidth is 200 MB/s;
-> +The processors in NUMA node 0 access memory in NUMA node 1 with access-l=
-atency 10
-> +nanoseconds, access-bandwidth is 100 MB/s.
-> +@example
-> +-machine hmat=3Don \
-> +-m 2G \
-> +-object memory-backend-ram,size=3D1G,id=3Dm0 \
-> +-object memory-backend-ram,size=3D1G,id=3Dm1 \
-> +-smp 2 \
-> +-numa node,nodeid=3D0,memdev=3Dm0 \
-> +-numa node,nodeid=3D1,memdev=3Dm1,initiator=3D0 \
-> +-numa cpu,node-id=3D0,socket-id=3D0 \
-> +-numa cpu,node-id=3D0,socket-id=3D1 \
-> +-numa hmat-lb,initiator=3D0,target=3D0,hierarchy=3Dmemory,data-type=3Dac=
-cess-latency,latency=3D5ns \
-> +-numa hmat-lb,initiator=3D0,target=3D0,hierarchy=3Dmemory,data-type=3Dac=
-cess-bandwidth,bandwidth=3D200M \
-> +-numa hmat-lb,initiator=3D0,target=3D1,hierarchy=3Dmemory,data-type=3Dac=
-cess-latency,latency=3D10ns \
-> +-numa hmat-lb,initiator=3D0,target=3D1,hierarchy=3Dmemory,data-type=3Dac=
-cess-bandwidth,bandwidth=3D100M
-> +@end example
-> +
->  ETEXI
-> =20
->  DEF("add-fd", HAS_ARG, QEMU_OPTION_add_fd,
+Thanks!
+--js
 
 
