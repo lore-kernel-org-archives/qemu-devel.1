@@ -2,80 +2,64 @@ Return-Path: <SRS0=brme=YQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 382D2CA9EB9
-	for <qemu-devel@archiver.kernel.org>; Wed, 23 Oct 2019 08:09:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D040CA9EB6
+	for <qemu-devel@archiver.kernel.org>; Wed, 23 Oct 2019 08:09:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 02DD121906
-	for <qemu-devel@archiver.kernel.org>; Wed, 23 Oct 2019 08:09:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6824C21906
+	for <qemu-devel@archiver.kernel.org>; Wed, 23 Oct 2019 08:09:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="F0W+VUof"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 02DD121906
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=duncanthrax.net header.i=@duncanthrax.net header.b="iTJ8Iq0w"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6824C21906
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=stackframe.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56882 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56884 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iNBhp-0001GX-Tu
+	id 1iNBhp-0001Ge-CW
 	for qemu-devel@archiver.kernel.org; Wed, 23 Oct 2019 04:09:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45845)
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45858)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <quintela@redhat.com>) id 1iNBer-0007v5-5O
- for qemu-devel@nongnu.org; Wed, 23 Oct 2019 04:06:18 -0400
+ (envelope-from <svens@stackframe.org>) id 1iNBew-0007wx-7V
+ for qemu-devel@nongnu.org; Wed, 23 Oct 2019 04:06:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <quintela@redhat.com>) id 1iNBen-0000vx-SW
+ (envelope-from <svens@stackframe.org>) id 1iNBep-0000wv-Vs
+ for qemu-devel@nongnu.org; Wed, 23 Oct 2019 04:06:20 -0400
+Received: from [2001:470:70c5:1111::170] (port=57428 helo=smtp.duncanthrax.net)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <svens@stackframe.org>)
+ id 1iNBeo-0000uW-Fg
  for qemu-devel@nongnu.org; Wed, 23 Oct 2019 04:06:15 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:20115
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <quintela@redhat.com>) id 1iNBem-0000uw-Tw
- for qemu-devel@nongnu.org; Wed, 23 Oct 2019 04:06:13 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1571817970;
- h=from:from:reply-to:reply-to:subject:subject:date:date:
- message-id:message-id:to:to:cc:cc:mime-version:mime-version:
- content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=RM/2bddLhUzZRDeJpUUEiZsDOfLIbtwaInxiTrFtrAI=;
- b=F0W+VUofo+5vB148CsvNYexRFf1IA7+PFHtkDDwhEKn/uCYqgJMAA3REh9hUwr0DxLxK28
- GRR5TsiuwTzEQiuvEMs8xYJc+4cZCOSyp6m6foZvF2LL+AEDY/UZN4OVgogHyKAei7XKW0
- aNBmOaz5mxtrTkS3EoIA+tsBj6lFGqU=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-377-kzpNM_46ONm-mllRTOJ6LQ-1; Wed, 23 Oct 2019 04:06:08 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1D7AB800D49;
- Wed, 23 Oct 2019 08:06:08 +0000 (UTC)
-Received: from redhat.com (unknown [10.36.118.62])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 317C160BE1;
- Wed, 23 Oct 2019 08:06:02 +0000 (UTC)
-From: Juan Quintela <quintela@redhat.com>
-To: Eric Auger <eric.auger@redhat.com>
-Subject: Re: [PATCH v4] migration: Support QLIST migration
-In-Reply-To: <20191018092136.26581-1-eric.auger@redhat.com> (Eric Auger's
- message of "Fri, 18 Oct 2019 11:21:36 +0200")
-References: <20191018092136.26581-1-eric.auger@redhat.com>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.2 (gnu/linux)
-Date: Wed, 23 Oct 2019 10:06:00 +0200
-Message-ID: <87imof7uon.fsf@trasno.org>
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+ d=duncanthrax.net; s=dkim; h=In-Reply-To:Content-Type:MIME-Version:References
+ :Message-ID:Subject:Cc:To:From:Date;
+ bh=yvUWCn0OatQpyJTrQJOu1drZsZCj2Z91HHoJda77AN4=; b=iTJ8Iq0wsy+yiVjDO3caYKjCth
+ kPij6IQ2sbAeTiwcPzf0UbWZpUcCrRXOTHjn2j8Pka33KBG7pD7dClYAUK75q9wiqi7vMundIzy1U
+ DvtGvrgrM05v+28PKKxKj/cmMjzNpbox94RLhZ48mOgCj5jHK47F31snxdBnM7I4R4oU=;
+Received: from [2a01:4f8:121:41fa::170] (helo=stackframe.org)
+ by smtp.eurescom.eu with esmtpa (Exim 4.86_2)
+ (envelope-from <svens@stackframe.org>)
+ id 1iNBej-0002Ea-6w; Wed, 23 Oct 2019 10:06:09 +0200
+Date: Wed, 23 Oct 2019 10:06:09 +0200
+From: Sven Schnelle <svens@stackframe.org>
+To: Peter Maydell <peter.maydell@linaro.org>
+Subject: Re: [PATCH v2] net: add tulip (dec21143) driver
+Message-ID: <20191023080608.GB19036@stackframe.org>
+References: <20191022155413.4619-1-svens@stackframe.org>
+ <CAFEAcA8DWwWLnMZqqsn4RpJbtPbxoPnrB2Z7UXvK3FhHRgk78A@mail.gmail.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-MC-Unique: kzpNM_46ONm-mllRTOJ6LQ-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=WINDOWS-1252
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.81
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAFEAcA8DWwWLnMZqqsn4RpJbtPbxoPnrB2Z7UXvK3FhHRgk78A@mail.gmail.com>
+User-Agent: Mutt/1.9.4 (2018-02-28)
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2001:470:70c5:1111::170
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,27 +71,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: quintela@redhat.com
-Cc: peterx@redhat.com, qemu-devel@nongnu.org, dgilbert@redhat.com,
- eric.auger.pro@gmail.com
+Cc: Jason Wang <jasowang@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>,
+ "Michael S . Tsirkin" <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Eric Auger <eric.auger@redhat.com> wrote:
-> Support QLIST migration using the same principle as QTAILQ:
-> 94869d5c52 ("migration: migrate QTAILQ").
->
-> The VMSTATE_QLIST_V macro has the same proto as VMSTATE_QTAILQ_V.
-> The change mainly resides in QLIST RAW macros: QLIST_RAW_INSERT_HEAD
-> and QLIST_RAW_REVERSE.
->
-> Tests also are provided.
->
-> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+On Tue, Oct 22, 2019 at 05:00:16PM +0100, Peter Maydell wrote:
+> 
+> There are a couple of minor wrong-indent nits:
+> 
+> > +static void tulip_update_ts(TULIPState *s, int state)
+> > +{
+> > +        s->csr[5] &= ~(CSR5_TS_MASK << CSR5_TS_SHIFT);
+> > +        s->csr[5] |= (state & CSR5_TS_MASK) << CSR5_TS_SHIFT;
+> > +        trace_tulip_tx_state(tulip_tx_state_name(state));
+> > +}
+> 
+> > +struct tulip_descriptor {
+> > +        uint32_t status;
+> > +        uint32_t control;
+> > +        uint32_t buf_addr1;
+> > +        uint32_t buf_addr2;
+> > +};
+> 
+> but maybe Jason can fix those up when he takes the patch ?
 
-Reviewed-by: Juan Quintela <quintela@redhat.com>
+I'll send an updated version soon - there are some other small things
+that i need to address.
 
-With the minor fix found by peter.
-
+Thanks
+Sven
 
