@@ -2,77 +2,59 @@ Return-Path: <SRS0=brme=YQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E9010CA9EB6
-	for <qemu-devel@archiver.kernel.org>; Wed, 23 Oct 2019 10:45:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E2B89CA9EB6
+	for <qemu-devel@archiver.kernel.org>; Wed, 23 Oct 2019 10:45:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BA6842064A
-	for <qemu-devel@archiver.kernel.org>; Wed, 23 Oct 2019 10:45:30 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BA6842064A
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id A69C620659
+	for <qemu-devel@archiver.kernel.org>; Wed, 23 Oct 2019 10:45:53 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A69C620659
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=rt-rk.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60130 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60132 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iNE8v-0006oq-H6
-	for qemu-devel@archiver.kernel.org; Wed, 23 Oct 2019 06:45:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40971)
+	id 1iNE9I-00077J-Ka
+	for qemu-devel@archiver.kernel.org; Wed, 23 Oct 2019 06:45:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43043)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1iNDc2-0007uL-9W
- for qemu-devel@nongnu.org; Wed, 23 Oct 2019 06:11:34 -0400
+ (envelope-from <aleksandar.markovic@rt-rk.com>) id 1iNDpz-00010m-Ul
+ for qemu-devel@nongnu.org; Wed, 23 Oct 2019 06:25:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1iNDc0-0005LT-5g
- for qemu-devel@nongnu.org; Wed, 23 Oct 2019 06:11:30 -0400
-Received: from indium.canonical.com ([91.189.90.7]:51780)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1iNDbz-0005Kz-Pa
- for qemu-devel@nongnu.org; Wed, 23 Oct 2019 06:11:28 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1iNDby-0006Ww-MI
- for <qemu-devel@nongnu.org>; Wed, 23 Oct 2019 10:11:26 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id A4E972E8037
- for <qemu-devel@nongnu.org>; Wed, 23 Oct 2019 10:11:26 +0000 (UTC)
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 23 Oct 2019 10:05:14 -0000
-From: David Hildenbrand <1847232@bugs.launchpad.net>
+ (envelope-from <aleksandar.markovic@rt-rk.com>) id 1iNDpv-00030A-Mn
+ for qemu-devel@nongnu.org; Wed, 23 Oct 2019 06:25:55 -0400
+Received: from mx2.rt-rk.com ([89.216.37.149]:35709 helo=mail.rt-rk.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
+ id 1iNDpv-0002xh-0i
+ for qemu-devel@nongnu.org; Wed, 23 Oct 2019 06:25:51 -0400
+Received: from localhost (localhost [127.0.0.1])
+ by mail.rt-rk.com (Postfix) with ESMTP id A753D1A214B;
+ Wed, 23 Oct 2019 12:24:40 +0200 (CEST)
+X-Virus-Scanned: amavisd-new at rt-rk.com
+Received: from rtrkw774-lin.domain.local (rtrkw774-lin.domain.local
+ [10.10.14.106])
+ by mail.rt-rk.com (Postfix) with ESMTPSA id 857771A21AC;
+ Wed, 23 Oct 2019 12:23:59 +0200 (CEST)
+From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
 To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=Fix Committed; importance=Undecided;
- assignee=david@redhat.com; 
-X-Launchpad-Bug-Tags: s390x
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: davidhildenbrand ivmn
-X-Launchpad-Bug-Reporter: Ivan Warren (ivmn)
-X-Launchpad-Bug-Modifier: David Hildenbrand (davidhildenbrand)
-References: <157053356610.22354.6751604707489617887.malonedeb@gac.canonical.com>
- <157182344968.26037.260550507074298149.malone@chaenomeles.canonical.com>
-Message-Id: <2c3d94b3-2737-227c-cb7d-8e82982bfc5a@redhat.com>
-Subject: Re: [Bug 1847232] Re: qemu TCG in s390x mode issue with calculating
- HASH
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="186023fa645d8be19d403a76064f0643f510db2f";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 7c280aa56eeb65978ba36b4383939895d889e856
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 91.189.90.7
+Subject: [PATCH v7 05/14] target/mips: msa: Split helpers for
+ <MAX|MIN>_<S|U>.<B|H|W|D>
+Date: Wed, 23 Oct 2019 12:23:38 +0200
+Message-Id: <1571826227-10583-6-git-send-email-aleksandar.markovic@rt-rk.com>
+X-Mailer: git-send-email 2.7.4
+In-Reply-To: <1571826227-10583-1-git-send-email-aleksandar.markovic@rt-rk.com>
+References: <1571826227-10583-1-git-send-email-aleksandar.markovic@rt-rk.com>
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [fuzzy]
+X-Received-From: 89.216.37.149
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -81,66 +63,539 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1847232 <1847232@bugs.launchpad.net>
+Cc: aleksandar.rikalo@rt-rk.com, Aleksandar Markovic <amarkovic@wavecomp.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 23.10.19 11:37, Ivan Warren wrote:
-> Looks fixed to me ! The issue no longer shows even without specifying
-> vx=3Doff
-> =
+From: Aleksandar Markovic <amarkovic@wavecomp.com>
 
+Achieves clearer code and slightly better performance.
 
-Nice, I suspect that there might be more issues when using golang (as it =
+Reviewed-by: Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>
+Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+---
+ target/mips/helper.h     |  20 ++-
+ target/mips/msa_helper.c | 320 ++++++++++++++++++++++++++++++++++++++++++-----
+ target/mips/translate.c  |  76 +++++++++--
+ 3 files changed, 372 insertions(+), 44 deletions(-)
 
-really makes excessive use of vector registers to my surprise). So in =
+diff --git a/target/mips/helper.h b/target/mips/helper.h
+index cef4de6..6419bb8 100644
+--- a/target/mips/helper.h
++++ b/target/mips/helper.h
+@@ -881,10 +881,26 @@ DEF_HELPER_4(msa_max_a_b, void, env, i32, i32, i32)
+ DEF_HELPER_4(msa_max_a_h, void, env, i32, i32, i32)
+ DEF_HELPER_4(msa_max_a_w, void, env, i32, i32, i32)
+ DEF_HELPER_4(msa_max_a_d, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_max_s_b, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_max_s_h, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_max_s_w, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_max_s_d, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_max_u_b, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_max_u_h, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_max_u_w, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_max_u_d, void, env, i32, i32, i32)
+ DEF_HELPER_4(msa_min_a_b, void, env, i32, i32, i32)
+ DEF_HELPER_4(msa_min_a_h, void, env, i32, i32, i32)
+ DEF_HELPER_4(msa_min_a_w, void, env, i32, i32, i32)
+ DEF_HELPER_4(msa_min_a_d, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_min_s_b, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_min_s_h, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_min_s_w, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_min_s_d, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_min_u_b, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_min_u_h, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_min_u_w, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_min_u_d, void, env, i32, i32, i32)
+ 
+ DEF_HELPER_4(msa_mod_u_b, void, env, i32, i32, i32)
+ DEF_HELPER_4(msa_mod_u_h, void, env, i32, i32, i32)
+@@ -945,10 +961,6 @@ DEF_HELPER_5(msa_binsl_df, void, env, i32, i32, i32, i32)
+ DEF_HELPER_5(msa_binsr_df, void, env, i32, i32, i32, i32)
+ DEF_HELPER_5(msa_addv_df, void, env, i32, i32, i32, i32)
+ DEF_HELPER_5(msa_subv_df, void, env, i32, i32, i32, i32)
+-DEF_HELPER_5(msa_max_s_df, void, env, i32, i32, i32, i32)
+-DEF_HELPER_5(msa_max_u_df, void, env, i32, i32, i32, i32)
+-DEF_HELPER_5(msa_min_s_df, void, env, i32, i32, i32, i32)
+-DEF_HELPER_5(msa_min_u_df, void, env, i32, i32, i32, i32)
+ DEF_HELPER_5(msa_add_a_df, void, env, i32, i32, i32, i32)
+ DEF_HELPER_5(msa_adds_a_df, void, env, i32, i32, i32, i32)
+ DEF_HELPER_5(msa_adds_s_df, void, env, i32, i32, i32, i32)
+diff --git a/target/mips/msa_helper.c b/target/mips/msa_helper.c
+index 3eb0ab1..65df15d 100644
+--- a/target/mips/msa_helper.c
++++ b/target/mips/msa_helper.c
+@@ -1810,6 +1810,152 @@ void helper_msa_max_a_d(CPUMIPSState *env,
+ }
+ 
+ 
++static inline int64_t msa_max_s_df(uint32_t df, int64_t arg1, int64_t arg2)
++{
++    return arg1 > arg2 ? arg1 : arg2;
++}
++
++void helper_msa_max_s_b(CPUMIPSState *env,
++                        uint32_t wd, uint32_t ws, uint32_t wt)
++{
++    wr_t *pwd = &(env->active_fpu.fpr[wd].wr);
++    wr_t *pws = &(env->active_fpu.fpr[ws].wr);
++    wr_t *pwt = &(env->active_fpu.fpr[wt].wr);
++
++    pwd->b[0]  = msa_max_s_df(DF_BYTE, pws->b[0],  pwt->b[0]);
++    pwd->b[1]  = msa_max_s_df(DF_BYTE, pws->b[1],  pwt->b[1]);
++    pwd->b[2]  = msa_max_s_df(DF_BYTE, pws->b[2],  pwt->b[2]);
++    pwd->b[3]  = msa_max_s_df(DF_BYTE, pws->b[3],  pwt->b[3]);
++    pwd->b[4]  = msa_max_s_df(DF_BYTE, pws->b[4],  pwt->b[4]);
++    pwd->b[5]  = msa_max_s_df(DF_BYTE, pws->b[5],  pwt->b[5]);
++    pwd->b[6]  = msa_max_s_df(DF_BYTE, pws->b[6],  pwt->b[6]);
++    pwd->b[7]  = msa_max_s_df(DF_BYTE, pws->b[7],  pwt->b[7]);
++    pwd->b[8]  = msa_max_s_df(DF_BYTE, pws->b[8],  pwt->b[8]);
++    pwd->b[9]  = msa_max_s_df(DF_BYTE, pws->b[9],  pwt->b[9]);
++    pwd->b[10] = msa_max_s_df(DF_BYTE, pws->b[10], pwt->b[10]);
++    pwd->b[11] = msa_max_s_df(DF_BYTE, pws->b[11], pwt->b[11]);
++    pwd->b[12] = msa_max_s_df(DF_BYTE, pws->b[12], pwt->b[12]);
++    pwd->b[13] = msa_max_s_df(DF_BYTE, pws->b[13], pwt->b[13]);
++    pwd->b[14] = msa_max_s_df(DF_BYTE, pws->b[14], pwt->b[14]);
++    pwd->b[15] = msa_max_s_df(DF_BYTE, pws->b[15], pwt->b[15]);
++}
++
++void helper_msa_max_s_h(CPUMIPSState *env,
++                        uint32_t wd, uint32_t ws, uint32_t wt)
++{
++    wr_t *pwd = &(env->active_fpu.fpr[wd].wr);
++    wr_t *pws = &(env->active_fpu.fpr[ws].wr);
++    wr_t *pwt = &(env->active_fpu.fpr[wt].wr);
++
++    pwd->h[0]  = msa_max_s_df(DF_HALF, pws->h[0],  pwt->h[0]);
++    pwd->h[1]  = msa_max_s_df(DF_HALF, pws->h[1],  pwt->h[1]);
++    pwd->h[2]  = msa_max_s_df(DF_HALF, pws->h[2],  pwt->h[2]);
++    pwd->h[3]  = msa_max_s_df(DF_HALF, pws->h[3],  pwt->h[3]);
++    pwd->h[4]  = msa_max_s_df(DF_HALF, pws->h[4],  pwt->h[4]);
++    pwd->h[5]  = msa_max_s_df(DF_HALF, pws->h[5],  pwt->h[5]);
++    pwd->h[6]  = msa_max_s_df(DF_HALF, pws->h[6],  pwt->h[6]);
++    pwd->h[7]  = msa_max_s_df(DF_HALF, pws->h[7],  pwt->h[7]);
++}
++
++void helper_msa_max_s_w(CPUMIPSState *env,
++                        uint32_t wd, uint32_t ws, uint32_t wt)
++{
++    wr_t *pwd = &(env->active_fpu.fpr[wd].wr);
++    wr_t *pws = &(env->active_fpu.fpr[ws].wr);
++    wr_t *pwt = &(env->active_fpu.fpr[wt].wr);
++
++    pwd->w[0]  = msa_max_s_df(DF_WORD, pws->w[0],  pwt->w[0]);
++    pwd->w[1]  = msa_max_s_df(DF_WORD, pws->w[1],  pwt->w[1]);
++    pwd->w[2]  = msa_max_s_df(DF_WORD, pws->w[2],  pwt->w[2]);
++    pwd->w[3]  = msa_max_s_df(DF_WORD, pws->w[3],  pwt->w[3]);
++}
++
++void helper_msa_max_s_d(CPUMIPSState *env,
++                        uint32_t wd, uint32_t ws, uint32_t wt)
++{
++    wr_t *pwd = &(env->active_fpu.fpr[wd].wr);
++    wr_t *pws = &(env->active_fpu.fpr[ws].wr);
++    wr_t *pwt = &(env->active_fpu.fpr[wt].wr);
++
++    pwd->d[0]  = msa_max_s_df(DF_DOUBLE, pws->d[0],  pwt->d[0]);
++    pwd->d[1]  = msa_max_s_df(DF_DOUBLE, pws->d[1],  pwt->d[1]);
++}
++
++
++static inline int64_t msa_max_u_df(uint32_t df, int64_t arg1, int64_t arg2)
++{
++    uint64_t u_arg1 = UNSIGNED(arg1, df);
++    uint64_t u_arg2 = UNSIGNED(arg2, df);
++    return u_arg1 > u_arg2 ? arg1 : arg2;
++}
++
++void helper_msa_max_u_b(CPUMIPSState *env,
++                        uint32_t wd, uint32_t ws, uint32_t wt)
++{
++    wr_t *pwd = &(env->active_fpu.fpr[wd].wr);
++    wr_t *pws = &(env->active_fpu.fpr[ws].wr);
++    wr_t *pwt = &(env->active_fpu.fpr[wt].wr);
++
++    pwd->b[0]  = msa_max_u_df(DF_BYTE, pws->b[0],  pwt->b[0]);
++    pwd->b[1]  = msa_max_u_df(DF_BYTE, pws->b[1],  pwt->b[1]);
++    pwd->b[2]  = msa_max_u_df(DF_BYTE, pws->b[2],  pwt->b[2]);
++    pwd->b[3]  = msa_max_u_df(DF_BYTE, pws->b[3],  pwt->b[3]);
++    pwd->b[4]  = msa_max_u_df(DF_BYTE, pws->b[4],  pwt->b[4]);
++    pwd->b[5]  = msa_max_u_df(DF_BYTE, pws->b[5],  pwt->b[5]);
++    pwd->b[6]  = msa_max_u_df(DF_BYTE, pws->b[6],  pwt->b[6]);
++    pwd->b[7]  = msa_max_u_df(DF_BYTE, pws->b[7],  pwt->b[7]);
++    pwd->b[8]  = msa_max_u_df(DF_BYTE, pws->b[8],  pwt->b[8]);
++    pwd->b[9]  = msa_max_u_df(DF_BYTE, pws->b[9],  pwt->b[9]);
++    pwd->b[10] = msa_max_u_df(DF_BYTE, pws->b[10], pwt->b[10]);
++    pwd->b[11] = msa_max_u_df(DF_BYTE, pws->b[11], pwt->b[11]);
++    pwd->b[12] = msa_max_u_df(DF_BYTE, pws->b[12], pwt->b[12]);
++    pwd->b[13] = msa_max_u_df(DF_BYTE, pws->b[13], pwt->b[13]);
++    pwd->b[14] = msa_max_u_df(DF_BYTE, pws->b[14], pwt->b[14]);
++    pwd->b[15] = msa_max_u_df(DF_BYTE, pws->b[15], pwt->b[15]);
++}
++
++void helper_msa_max_u_h(CPUMIPSState *env,
++                        uint32_t wd, uint32_t ws, uint32_t wt)
++{
++    wr_t *pwd = &(env->active_fpu.fpr[wd].wr);
++    wr_t *pws = &(env->active_fpu.fpr[ws].wr);
++    wr_t *pwt = &(env->active_fpu.fpr[wt].wr);
++
++    pwd->h[0]  = msa_max_u_df(DF_HALF, pws->h[0],  pwt->h[0]);
++    pwd->h[1]  = msa_max_u_df(DF_HALF, pws->h[1],  pwt->h[1]);
++    pwd->h[2]  = msa_max_u_df(DF_HALF, pws->h[2],  pwt->h[2]);
++    pwd->h[3]  = msa_max_u_df(DF_HALF, pws->h[3],  pwt->h[3]);
++    pwd->h[4]  = msa_max_u_df(DF_HALF, pws->h[4],  pwt->h[4]);
++    pwd->h[5]  = msa_max_u_df(DF_HALF, pws->h[5],  pwt->h[5]);
++    pwd->h[6]  = msa_max_u_df(DF_HALF, pws->h[6],  pwt->h[6]);
++    pwd->h[7]  = msa_max_u_df(DF_HALF, pws->h[7],  pwt->h[7]);
++}
++
++void helper_msa_max_u_w(CPUMIPSState *env,
++                        uint32_t wd, uint32_t ws, uint32_t wt)
++{
++    wr_t *pwd = &(env->active_fpu.fpr[wd].wr);
++    wr_t *pws = &(env->active_fpu.fpr[ws].wr);
++    wr_t *pwt = &(env->active_fpu.fpr[wt].wr);
++
++    pwd->w[0]  = msa_max_u_df(DF_WORD, pws->w[0],  pwt->w[0]);
++    pwd->w[1]  = msa_max_u_df(DF_WORD, pws->w[1],  pwt->w[1]);
++    pwd->w[2]  = msa_max_u_df(DF_WORD, pws->w[2],  pwt->w[2]);
++    pwd->w[3]  = msa_max_u_df(DF_WORD, pws->w[3],  pwt->w[3]);
++}
++
++void helper_msa_max_u_d(CPUMIPSState *env,
++                        uint32_t wd, uint32_t ws, uint32_t wt)
++{
++    wr_t *pwd = &(env->active_fpu.fpr[wd].wr);
++    wr_t *pws = &(env->active_fpu.fpr[ws].wr);
++    wr_t *pwt = &(env->active_fpu.fpr[wt].wr);
++
++    pwd->d[0]  = msa_max_u_df(DF_DOUBLE, pws->d[0],  pwt->d[0]);
++    pwd->d[1]  = msa_max_u_df(DF_DOUBLE, pws->d[1],  pwt->d[1]);
++}
++
++
+ static inline int64_t msa_min_a_df(uint32_t df, int64_t arg1, int64_t arg2)
+ {
+     uint64_t abs_arg1 = arg1 >= 0 ? arg1 : -arg1;
+@@ -1884,6 +2030,152 @@ void helper_msa_min_a_d(CPUMIPSState *env,
+ }
+ 
+ 
++static inline int64_t msa_min_s_df(uint32_t df, int64_t arg1, int64_t arg2)
++{
++    return arg1 < arg2 ? arg1 : arg2;
++}
++
++void helper_msa_min_s_b(CPUMIPSState *env,
++                        uint32_t wd, uint32_t ws, uint32_t wt)
++{
++    wr_t *pwd = &(env->active_fpu.fpr[wd].wr);
++    wr_t *pws = &(env->active_fpu.fpr[ws].wr);
++    wr_t *pwt = &(env->active_fpu.fpr[wt].wr);
++
++    pwd->b[0]  = msa_min_s_df(DF_BYTE, pws->b[0],  pwt->b[0]);
++    pwd->b[1]  = msa_min_s_df(DF_BYTE, pws->b[1],  pwt->b[1]);
++    pwd->b[2]  = msa_min_s_df(DF_BYTE, pws->b[2],  pwt->b[2]);
++    pwd->b[3]  = msa_min_s_df(DF_BYTE, pws->b[3],  pwt->b[3]);
++    pwd->b[4]  = msa_min_s_df(DF_BYTE, pws->b[4],  pwt->b[4]);
++    pwd->b[5]  = msa_min_s_df(DF_BYTE, pws->b[5],  pwt->b[5]);
++    pwd->b[6]  = msa_min_s_df(DF_BYTE, pws->b[6],  pwt->b[6]);
++    pwd->b[7]  = msa_min_s_df(DF_BYTE, pws->b[7],  pwt->b[7]);
++    pwd->b[8]  = msa_min_s_df(DF_BYTE, pws->b[8],  pwt->b[8]);
++    pwd->b[9]  = msa_min_s_df(DF_BYTE, pws->b[9],  pwt->b[9]);
++    pwd->b[10] = msa_min_s_df(DF_BYTE, pws->b[10], pwt->b[10]);
++    pwd->b[11] = msa_min_s_df(DF_BYTE, pws->b[11], pwt->b[11]);
++    pwd->b[12] = msa_min_s_df(DF_BYTE, pws->b[12], pwt->b[12]);
++    pwd->b[13] = msa_min_s_df(DF_BYTE, pws->b[13], pwt->b[13]);
++    pwd->b[14] = msa_min_s_df(DF_BYTE, pws->b[14], pwt->b[14]);
++    pwd->b[15] = msa_min_s_df(DF_BYTE, pws->b[15], pwt->b[15]);
++}
++
++void helper_msa_min_s_h(CPUMIPSState *env,
++                        uint32_t wd, uint32_t ws, uint32_t wt)
++{
++    wr_t *pwd = &(env->active_fpu.fpr[wd].wr);
++    wr_t *pws = &(env->active_fpu.fpr[ws].wr);
++    wr_t *pwt = &(env->active_fpu.fpr[wt].wr);
++
++    pwd->h[0]  = msa_min_s_df(DF_HALF, pws->h[0],  pwt->h[0]);
++    pwd->h[1]  = msa_min_s_df(DF_HALF, pws->h[1],  pwt->h[1]);
++    pwd->h[2]  = msa_min_s_df(DF_HALF, pws->h[2],  pwt->h[2]);
++    pwd->h[3]  = msa_min_s_df(DF_HALF, pws->h[3],  pwt->h[3]);
++    pwd->h[4]  = msa_min_s_df(DF_HALF, pws->h[4],  pwt->h[4]);
++    pwd->h[5]  = msa_min_s_df(DF_HALF, pws->h[5],  pwt->h[5]);
++    pwd->h[6]  = msa_min_s_df(DF_HALF, pws->h[6],  pwt->h[6]);
++    pwd->h[7]  = msa_min_s_df(DF_HALF, pws->h[7],  pwt->h[7]);
++}
++
++void helper_msa_min_s_w(CPUMIPSState *env,
++                        uint32_t wd, uint32_t ws, uint32_t wt)
++{
++    wr_t *pwd = &(env->active_fpu.fpr[wd].wr);
++    wr_t *pws = &(env->active_fpu.fpr[ws].wr);
++    wr_t *pwt = &(env->active_fpu.fpr[wt].wr);
++
++    pwd->w[0]  = msa_min_s_df(DF_WORD, pws->w[0],  pwt->w[0]);
++    pwd->w[1]  = msa_min_s_df(DF_WORD, pws->w[1],  pwt->w[1]);
++    pwd->w[2]  = msa_min_s_df(DF_WORD, pws->w[2],  pwt->w[2]);
++    pwd->w[3]  = msa_min_s_df(DF_WORD, pws->w[3],  pwt->w[3]);
++}
++
++void helper_msa_min_s_d(CPUMIPSState *env,
++                        uint32_t wd, uint32_t ws, uint32_t wt)
++{
++    wr_t *pwd = &(env->active_fpu.fpr[wd].wr);
++    wr_t *pws = &(env->active_fpu.fpr[ws].wr);
++    wr_t *pwt = &(env->active_fpu.fpr[wt].wr);
++
++    pwd->d[0]  = msa_min_s_df(DF_DOUBLE, pws->d[0],  pwt->d[0]);
++    pwd->d[1]  = msa_min_s_df(DF_DOUBLE, pws->d[1],  pwt->d[1]);
++}
++
++
++static inline int64_t msa_min_u_df(uint32_t df, int64_t arg1, int64_t arg2)
++{
++    uint64_t u_arg1 = UNSIGNED(arg1, df);
++    uint64_t u_arg2 = UNSIGNED(arg2, df);
++    return u_arg1 < u_arg2 ? arg1 : arg2;
++}
++
++void helper_msa_min_u_b(CPUMIPSState *env,
++                        uint32_t wd, uint32_t ws, uint32_t wt)
++{
++    wr_t *pwd = &(env->active_fpu.fpr[wd].wr);
++    wr_t *pws = &(env->active_fpu.fpr[ws].wr);
++    wr_t *pwt = &(env->active_fpu.fpr[wt].wr);
++
++    pwd->b[0]  = msa_min_u_df(DF_BYTE, pws->b[0],  pwt->b[0]);
++    pwd->b[1]  = msa_min_u_df(DF_BYTE, pws->b[1],  pwt->b[1]);
++    pwd->b[2]  = msa_min_u_df(DF_BYTE, pws->b[2],  pwt->b[2]);
++    pwd->b[3]  = msa_min_u_df(DF_BYTE, pws->b[3],  pwt->b[3]);
++    pwd->b[4]  = msa_min_u_df(DF_BYTE, pws->b[4],  pwt->b[4]);
++    pwd->b[5]  = msa_min_u_df(DF_BYTE, pws->b[5],  pwt->b[5]);
++    pwd->b[6]  = msa_min_u_df(DF_BYTE, pws->b[6],  pwt->b[6]);
++    pwd->b[7]  = msa_min_u_df(DF_BYTE, pws->b[7],  pwt->b[7]);
++    pwd->b[8]  = msa_min_u_df(DF_BYTE, pws->b[8],  pwt->b[8]);
++    pwd->b[9]  = msa_min_u_df(DF_BYTE, pws->b[9],  pwt->b[9]);
++    pwd->b[10] = msa_min_u_df(DF_BYTE, pws->b[10], pwt->b[10]);
++    pwd->b[11] = msa_min_u_df(DF_BYTE, pws->b[11], pwt->b[11]);
++    pwd->b[12] = msa_min_u_df(DF_BYTE, pws->b[12], pwt->b[12]);
++    pwd->b[13] = msa_min_u_df(DF_BYTE, pws->b[13], pwt->b[13]);
++    pwd->b[14] = msa_min_u_df(DF_BYTE, pws->b[14], pwt->b[14]);
++    pwd->b[15] = msa_min_u_df(DF_BYTE, pws->b[15], pwt->b[15]);
++}
++
++void helper_msa_min_u_h(CPUMIPSState *env,
++                        uint32_t wd, uint32_t ws, uint32_t wt)
++{
++    wr_t *pwd = &(env->active_fpu.fpr[wd].wr);
++    wr_t *pws = &(env->active_fpu.fpr[ws].wr);
++    wr_t *pwt = &(env->active_fpu.fpr[wt].wr);
++
++    pwd->h[0]  = msa_min_u_df(DF_HALF, pws->h[0],  pwt->h[0]);
++    pwd->h[1]  = msa_min_u_df(DF_HALF, pws->h[1],  pwt->h[1]);
++    pwd->h[2]  = msa_min_u_df(DF_HALF, pws->h[2],  pwt->h[2]);
++    pwd->h[3]  = msa_min_u_df(DF_HALF, pws->h[3],  pwt->h[3]);
++    pwd->h[4]  = msa_min_u_df(DF_HALF, pws->h[4],  pwt->h[4]);
++    pwd->h[5]  = msa_min_u_df(DF_HALF, pws->h[5],  pwt->h[5]);
++    pwd->h[6]  = msa_min_u_df(DF_HALF, pws->h[6],  pwt->h[6]);
++    pwd->h[7]  = msa_min_u_df(DF_HALF, pws->h[7],  pwt->h[7]);
++}
++
++void helper_msa_min_u_w(CPUMIPSState *env,
++                        uint32_t wd, uint32_t ws, uint32_t wt)
++{
++    wr_t *pwd = &(env->active_fpu.fpr[wd].wr);
++    wr_t *pws = &(env->active_fpu.fpr[ws].wr);
++    wr_t *pwt = &(env->active_fpu.fpr[wt].wr);
++
++    pwd->w[0]  = msa_min_u_df(DF_WORD, pws->w[0],  pwt->w[0]);
++    pwd->w[1]  = msa_min_u_df(DF_WORD, pws->w[1],  pwt->w[1]);
++    pwd->w[2]  = msa_min_u_df(DF_WORD, pws->w[2],  pwt->w[2]);
++    pwd->w[3]  = msa_min_u_df(DF_WORD, pws->w[3],  pwt->w[3]);
++}
++
++void helper_msa_min_u_d(CPUMIPSState *env,
++                        uint32_t wd, uint32_t ws, uint32_t wt)
++{
++    wr_t *pwd = &(env->active_fpu.fpr[wd].wr);
++    wr_t *pws = &(env->active_fpu.fpr[ws].wr);
++    wr_t *pwt = &(env->active_fpu.fpr[wt].wr);
++
++    pwd->d[0]  = msa_min_u_df(DF_DOUBLE, pws->d[0],  pwt->d[0]);
++    pwd->d[1]  = msa_min_u_df(DF_DOUBLE, pws->d[1],  pwt->d[1]);
++}
++
++
+ /*
+  * Int Modulo
+  * ----------
+@@ -2354,30 +2646,6 @@ static inline int64_t msa_subv_df(uint32_t df, int64_t arg1, int64_t arg2)
+     return arg1 - arg2;
+ }
+ 
+-static inline int64_t msa_max_s_df(uint32_t df, int64_t arg1, int64_t arg2)
+-{
+-    return arg1 > arg2 ? arg1 : arg2;
+-}
+-
+-static inline int64_t msa_max_u_df(uint32_t df, int64_t arg1, int64_t arg2)
+-{
+-    uint64_t u_arg1 = UNSIGNED(arg1, df);
+-    uint64_t u_arg2 = UNSIGNED(arg2, df);
+-    return u_arg1 > u_arg2 ? arg1 : arg2;
+-}
+-
+-static inline int64_t msa_min_s_df(uint32_t df, int64_t arg1, int64_t arg2)
+-{
+-    return arg1 < arg2 ? arg1 : arg2;
+-}
+-
+-static inline int64_t msa_min_u_df(uint32_t df, int64_t arg1, int64_t arg2)
+-{
+-    uint64_t u_arg1 = UNSIGNED(arg1, df);
+-    uint64_t u_arg2 = UNSIGNED(arg2, df);
+-    return u_arg1 < u_arg2 ? arg1 : arg2;
+-}
+-
+ #define MSA_BINOP_IMM_DF(helper, func)                                  \
+ void helper_msa_ ## helper ## _df(CPUMIPSState *env, uint32_t df,       \
+                         uint32_t wd, uint32_t ws, int32_t u5)           \
+@@ -2900,10 +3168,6 @@ MSA_BINOP_DF(sra)
+ MSA_BINOP_DF(srl)
+ MSA_BINOP_DF(addv)
+ MSA_BINOP_DF(subv)
+-MSA_BINOP_DF(max_s)
+-MSA_BINOP_DF(max_u)
+-MSA_BINOP_DF(min_s)
+-MSA_BINOP_DF(min_u)
+ MSA_BINOP_DF(add_a)
+ MSA_BINOP_DF(adds_a)
+ MSA_BINOP_DF(adds_s)
+diff --git a/target/mips/translate.c b/target/mips/translate.c
+index 8e26548..7a35c26 100644
+--- a/target/mips/translate.c
++++ b/target/mips/translate.c
+@@ -28658,6 +28658,38 @@ static void gen_msa_3r(CPUMIPSState *env, DisasContext *ctx)
+             break;
+         }
+         break;
++    case OPC_MAX_S_df:
++        switch (df) {
++        case DF_BYTE:
++            gen_helper_msa_max_s_b(cpu_env, twd, tws, twt);
++            break;
++        case DF_HALF:
++            gen_helper_msa_max_s_h(cpu_env, twd, tws, twt);
++            break;
++        case DF_WORD:
++            gen_helper_msa_max_s_w(cpu_env, twd, tws, twt);
++            break;
++        case DF_DOUBLE:
++            gen_helper_msa_max_s_d(cpu_env, twd, tws, twt);
++            break;
++        }
++        break;
++    case OPC_MAX_U_df:
++        switch (df) {
++        case DF_BYTE:
++            gen_helper_msa_max_u_b(cpu_env, twd, tws, twt);
++            break;
++        case DF_HALF:
++            gen_helper_msa_max_u_h(cpu_env, twd, tws, twt);
++            break;
++        case DF_WORD:
++            gen_helper_msa_max_u_w(cpu_env, twd, tws, twt);
++            break;
++        case DF_DOUBLE:
++            gen_helper_msa_max_u_d(cpu_env, twd, tws, twt);
++            break;
++        }
++        break;
+     case OPC_MIN_A_df:
+         switch (df) {
+         case DF_BYTE:
+@@ -28674,6 +28706,38 @@ static void gen_msa_3r(CPUMIPSState *env, DisasContext *ctx)
+             break;
+         }
+         break;
++    case OPC_MIN_S_df:
++        switch (df) {
++        case DF_BYTE:
++            gen_helper_msa_min_s_b(cpu_env, twd, tws, twt);
++            break;
++        case DF_HALF:
++            gen_helper_msa_min_s_h(cpu_env, twd, tws, twt);
++            break;
++        case DF_WORD:
++            gen_helper_msa_min_s_w(cpu_env, twd, tws, twt);
++            break;
++        case DF_DOUBLE:
++            gen_helper_msa_min_s_d(cpu_env, twd, tws, twt);
++            break;
++        }
++        break;
++    case OPC_MIN_U_df:
++        switch (df) {
++        case DF_BYTE:
++            gen_helper_msa_min_u_b(cpu_env, twd, tws, twt);
++            break;
++        case DF_HALF:
++            gen_helper_msa_min_u_h(cpu_env, twd, tws, twt);
++            break;
++        case DF_WORD:
++            gen_helper_msa_min_u_w(cpu_env, twd, tws, twt);
++            break;
++        case DF_DOUBLE:
++            gen_helper_msa_min_u_d(cpu_env, twd, tws, twt);
++            break;
++        }
++        break;
+     case OPC_MOD_S_df:
+         switch (df) {
+         case DF_BYTE:
+@@ -28751,9 +28815,6 @@ static void gen_msa_3r(CPUMIPSState *env, DisasContext *ctx)
+     case OPC_SRL_df:
+         gen_helper_msa_srl_df(cpu_env, tdf, twd, tws, twt);
+         break;
+-    case OPC_MAX_S_df:
+-        gen_helper_msa_max_s_df(cpu_env, tdf, twd, tws, twt);
+-        break;
+     case OPC_ADDS_S_df:
+         gen_helper_msa_adds_s_df(cpu_env, tdf, twd, tws, twt);
+         break;
+@@ -28769,9 +28830,6 @@ static void gen_msa_3r(CPUMIPSState *env, DisasContext *ctx)
+     case OPC_SRLR_df:
+         gen_helper_msa_srlr_df(cpu_env, tdf, twd, tws, twt);
+         break;
+-    case OPC_MAX_U_df:
+-        gen_helper_msa_max_u_df(cpu_env, tdf, twd, tws, twt);
+-        break;
+     case OPC_ADDS_U_df:
+         gen_helper_msa_adds_u_df(cpu_env, tdf, twd, tws, twt);
+         break;
+@@ -28781,18 +28839,12 @@ static void gen_msa_3r(CPUMIPSState *env, DisasContext *ctx)
+     case OPC_PCKOD_df:
+         gen_helper_msa_pckod_df(cpu_env, tdf, twd, tws, twt);
+         break;
+-    case OPC_MIN_S_df:
+-        gen_helper_msa_min_s_df(cpu_env, tdf, twd, tws, twt);
+-        break;
+     case OPC_ASUB_S_df:
+         gen_helper_msa_asub_s_df(cpu_env, tdf, twd, tws, twt);
+         break;
+     case OPC_ILVL_df:
+         gen_helper_msa_ilvl_df(cpu_env, tdf, twd, tws, twt);
+         break;
+-    case OPC_MIN_U_df:
+-        gen_helper_msa_min_u_df(cpu_env, tdf, twd, tws, twt);
+-        break;
+     case OPC_ASUB_U_df:
+         gen_helper_msa_asub_u_df(cpu_env, tdf, twd, tws, twt);
+         break;
+-- 
+2.7.4
 
-case you run into problems (and especially can't reproduce with vx=3Doff), =
-
-please inform me!
-
-Thanks!
-
---
-
-Thanks,
-
-David / dhildenb
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1847232
-
-Title:
-  qemu TCG in s390x mode issue with calculating HASH
-
-Status in QEMU:
-  Fix Committed
-
-Bug description:
-  When using go on s390x on Debian x64 (buster) (host) and debian s390x
-  (sid) (guest) I run into the following problem :
-
-  The following occurs while trying to build a custom project :
-
-  go: github.com/FactomProject/basen@v0.0.0-20150613233007-fe3947df716e:
-  Get
-  https://proxy.golang.org/github.com/%21factom%21project/basen/@v/v0.0.0-2=
-0150613233007-fe3947df716e.mod:
-  local error: tls: bad record MAC
-
-  Doing a git bisect I find that this problem only occurs on and after
-  commit 08ef92d556c584c7faf594ff3af46df456276e1b
-
-  Before that commit, all works fine. Past this commit, build always
-  fails.
-
-  Without any proof, It looks like a hash calculation bug related to
-  using z/Arch vector facilities...
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1847232/+subscriptions
 
