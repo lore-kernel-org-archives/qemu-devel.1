@@ -2,65 +2,66 @@ Return-Path: <SRS0=brme=YQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F3B9ACA9EB6
-	for <qemu-devel@archiver.kernel.org>; Wed, 23 Oct 2019 16:05:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CEB25CA9EB9
+	for <qemu-devel@archiver.kernel.org>; Wed, 23 Oct 2019 16:05:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B95EF205C9
+	by mail.kernel.org (Postfix) with ESMTPS id 9BD31205C9
 	for <qemu-devel@archiver.kernel.org>; Wed, 23 Oct 2019 16:05:23 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="c/BQAham"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B95EF205C9
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bA6ZQkV+"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9BD31205C9
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40474 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40472 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iNJ8U-0005fa-Ox
+	id 1iNJ8U-0005eb-No
 	for qemu-devel@archiver.kernel.org; Wed, 23 Oct 2019 12:05:22 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38716)
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37099)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jsnow@redhat.com>) id 1iNIRE-0006sx-8Z
- for qemu-devel@nongnu.org; Wed, 23 Oct 2019 11:20:41 -0400
+ (envelope-from <jsnow@redhat.com>) id 1iNIHJ-00074R-Tb
+ for qemu-devel@nongnu.org; Wed, 23 Oct 2019 11:10:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1iNIRC-0006Oq-WC
- for qemu-devel@nongnu.org; Wed, 23 Oct 2019 11:20:40 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:37255
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <jsnow@redhat.com>) id 1iNIHG-00012w-8l
+ for qemu-devel@nongnu.org; Wed, 23 Oct 2019 11:10:24 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:35051
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1iNIRC-0006OJ-T8
- for qemu-devel@nongnu.org; Wed, 23 Oct 2019 11:20:38 -0400
+ (Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1iNIHA-0000Fo-HK
+ for qemu-devel@nongnu.org; Wed, 23 Oct 2019 11:10:20 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1571844038;
+ s=mimecast20190719; t=1571843396;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ to:to:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=WqrJvDgTQx8z6WuQxTAFpiMtB3Nt2Aa01vcVeZxjbUI=;
- b=c/BQAhamEK+lwrWpTNhjnaClXBHVwHv4ZrOhogorOn7x9kXmXQG3z5aJ3aRH5++pmlWji3
- iuvTAd/wyOe+XVcT57Ta9Hk9I13uFUhpaRmGp/rv+2XPGvsPtXFY1lgBRLOSKT2ogaQkPl
- 2ooCjPZn/cuJMVyKhgX/4qblwpvISXA=
+ bh=rPUaznNYtzBm5KrK8wc7LG1vLuSqfjA2isVPw47iyfs=;
+ b=bA6ZQkV+Em99a6ClE+ZyTme4uDj0G4BVtwZA78e0WJrscV1TIyHGSikr8uTJ8Vp4ipjO7S
+ ZmmVMDO5/uVKMR3gpZzOBt283nBaoru3zw0DTAA5e36VQiNNc2glqerFsHCOFheKbXRYOI
+ CYDpgaCu0nlwSg09M/th13Lrufq5R8c=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-369-uDeFkxpvM9iwT4UtCkwAWA-1; Wed, 23 Oct 2019 11:20:34 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ us-mta-47-Kfv2wiRzO_a7pnBt2ZsN9Q-1; Wed, 23 Oct 2019 11:05:50 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DBD49835BD2;
- Wed, 23 Oct 2019 15:20:33 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id F36B6801E72;
+ Wed, 23 Oct 2019 15:04:51 +0000 (UTC)
 Received: from [10.10.121.110] (ovpn-121-110.rdu2.redhat.com [10.10.121.110])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 6AE135D70E;
- Wed, 23 Oct 2019 15:20:33 +0000 (UTC)
-Subject: Re: [PATCH v2] qemu-img.texi: Describe data_file and data_file_raw
-To: Han Han <hhan@redhat.com>, qemu-devel@nongnu.org
-References: <20191021011421.24748-1-hhan@redhat.com>
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 96DFC60852;
+ Wed, 23 Oct 2019 15:04:51 +0000 (UTC)
+Subject: Re: [Bug 1848901] [NEW] kvm_mem_ioeventfd_add: error adding
+ ioeventfd: No space left on device (28)
+To: Bug 1848901 <1848901@bugs.launchpad.net>, qemu-devel@nongnu.org
+References: <157153622475.25094.3691269102491613645.malonedeb@chaenomeles.canonical.com>
 From: John Snow <jsnow@redhat.com>
 Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
  mQINBFTKefwBEAChvwqYC6saTzawbih87LqBYq0d5A8jXYXaiFMV/EvMSDqqY4EY6whXliNO
@@ -136,21 +137,21 @@ Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
  i0HjnLoJP5jDcoMTabZTIazXmJz3pKM11HYJ5/ZsTIf3ZRJJKIvXJpbmcAPVwTZII6XxiJdh
  RSSX4Mvd5pL/+5WI6NTdW6DMfigTtdd85fe6PwBNVJL2ZvBfsBJZ5rxg1TOH3KLsYBqBTgW2
  glQofxhkJhDEcvjLhe3Y2BlbCWKOmvM8XS9TRt0OwUs=
-Message-ID: <be95fef4-4377-ff56-402c-fd88fa7ad03e@redhat.com>
-Date: Wed, 23 Oct 2019 11:20:33 -0400
+Message-ID: <8d4cd62b-c8b2-f9ea-2e67-a2f4ecd357bc@redhat.com>
+Date: Wed, 23 Oct 2019 11:04:51 -0400
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.1.1
 MIME-Version: 1.0
-In-Reply-To: <20191021011421.24748-1-hhan@redhat.com>
+In-Reply-To: <157153622475.25094.3691269102491613645.malonedeb@chaenomeles.canonical.com>
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-MC-Unique: uDeFkxpvM9iwT4UtCkwAWA-1
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-MC-Unique: Kfv2wiRzO_a7pnBt2ZsN9Q-1
 X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=WINDOWS-1252
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.120
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -162,49 +163,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-block@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
 
-On 10/20/19 9:14 PM, Han Han wrote:
-> https://bugzilla.redhat.com/show_bug.cgi?id=3D1763105
+On 10/19/19 9:50 PM, P.O. wrote:
+> Public bug reported:
 >=20
-> Signed-off-by: Han Han <hhan@redhat.com>
-> ---
->  qemu-img.texi | 10 ++++++++++
->  1 file changed, 10 insertions(+)
+> =3D> QEMU process has stopped, return code: -6
 >=20
-> diff --git a/qemu-img.texi b/qemu-img.texi
-> index b5156d6316..983c6122f8 100644
-> --- a/qemu-img.texi
-> +++ b/qemu-img.texi
-> @@ -763,6 +763,16 @@ file which is COW and has data blocks already, it co=
-uldn't be changed to NOCOW
->  by setting @code{nocow=3Don}. One can issue @code{lsattr filename} to ch=
-eck if
->  the NOCOW flag is set or not (Capital 'C' is NOCOW flag).
-> =20
-> +@item data_file
-> +File name of data file that is stored in the image and used as a default=
- for
-> +opening the image. If the option is used, qcow2 file only stores the met=
-adata
-> +for the image.
-> +
-> +@item data_file_raw
-> +This option requires @option{data_file}. If this option is set to @code{=
-on},
-> +qemu will always keep the external data file consistent as a standalone
-> +read-only raw image. Default value is @code{off}.
-> +
->  @end table
-> =20
->  @item Other
+> Start QEMU with /usr/bin/qemu-system-x86_64 -name CiscoASAv9.8.1-1 -m
+> 2048M -smp cpus=3D1 -enable-kvm -machine smm=3Doff -boot order=3Dc -drive
+> 'file=3D/home/deemon/GNS3/projects/ASAv my ass/project-files/qemu
+> /7725cdea-5e66-4777-b4dd-
+> c3905f258394/hda_disk.qcow2,if=3Dvirtio,index=3D0,media=3Ddisk,id=3Ddrive=
+0'
+> -uuid 7725cdea-5e66-4777-b4dd-c3905f258394 -serial
+> telnet:127.0.0.1:5000,server,nowait -monitor
+> tcp:127.0.0.1:44629,server,nowait -net none -device
+> e1000,mac=3D0c:7a:1d:83:94:00,netdev=3Dgns3-0 -netdev
+> socket,id=3Dgns3-0,udp=3D127.0.0.1:10001,localaddr=3D127.0.0.1:10000 -dev=
+ice
+> e1000,mac=3D0c:7a:1d:83:94:01,netdev=3Dgns3-1 -netdev
+> socket,id=3Dgns3-1,udp=3D127.0.0.1:10003,localaddr=3D127.0.0.1:10002 -dev=
+ice
+> e1000,mac=3D0c:7a:1d:83:94:02,netdev=3Dgns3-2 -netdev
+> socket,id=3Dgns3-2,udp=3D127.0.0.1:10005,localaddr=3D127.0.0.1:10004 -dev=
+ice
+> e1000,mac=3D0c:7a:1d:83:94:03,netdev=3Dgns3-3 -netdev
+> socket,id=3Dgns3-3,udp=3D127.0.0.1:10007,localaddr=3D127.0.0.1:10006 -dev=
+ice
+> e1000,mac=3D0c:7a:1d:83:94:04,netdev=3Dgns3-4 -netdev
+> socket,id=3Dgns3-4,udp=3D127.0.0.1:10009,localaddr=3D127.0.0.1:10008 -dev=
+ice
+> e1000,mac=3D0c:7a:1d:83:94:05,netdev=3Dgns3-5 -netdev
+> socket,id=3Dgns3-5,udp=3D127.0.0.1:10011,localaddr=3D127.0.0.1:10010 -dev=
+ice
+> e1000,mac=3D0c:7a:1d:83:94:06,netdev=3Dgns3-6 -netdev
+> socket,id=3Dgns3-6,udp=3D127.0.0.1:10013,localaddr=3D127.0.0.1:10012 -dev=
+ice
+> e1000,mac=3D0c:7a:1d:83:94:07,netdev=3Dgns3-7 -netdev
+> socket,id=3Dgns3-7,udp=3D127.0.0.1:10015,localaddr=3D127.0.0.1:10014
+> -nographic
 >=20
 
-Reviewed-by: John Snow <jsnow@redhat.com>
+Reminds me of #1813940 https://bugs.launchpad.net/qemu/+bug/1813940
+
+but that fix was in v4.1.0.
+
+> =20
+> Execution log:
+> kvm_mem_ioeventfd_add: error adding ioeventfd: No space left on device (2=
+8)
+>=20
+> and then it just closes...
+>=20
+>=20
+> [deemon@Zen ~]$ coredumpctl info 8638
+>            PID: 8638 (qemu-system-x86)
+>            UID: 1000 (deemon)
+>            GID: 1000 (deemon)
+>         Signal: 6 (ABRT)
+>      Timestamp: Sun 2019-10-20 04:27:29 EEST (5min ago)
+>   Command Line: /usr/bin/qemu-system-x86_64 -name CiscoASAv9.8.1-1 -m 204=
+8M -smp cpus=3D1 -enable-kvm -machine smm=3Doff -boot order=3Dc -drive file=
+=3D/home/deemon/GNS3/projects/ASAv my ass/project-files/qemu>
+>     Executable: /usr/bin/qemu-system-x86_64
+>  Control Group: /user.slice/user-1000.slice/session-2.scope
+>           Unit: session-2.scope
+>          Slice: user-1000.slice
+>        Session: 2
+>      Owner UID: 1000 (deemon)
+>        Boot ID: cd30f69a8d194359a31889dc7b6b026c
+>     Machine ID: d0a2d74a5cd9430797d902f5237c448d
+>       Hostname: Zen
+>        Storage: /var/lib/systemd/coredump/core.qemu-system-x86.1000.cd30f=
+69a8d194359a31889dc7b6b026c.8638.1571534849000000.lz4 (truncated)
+>        Message: Process 8638 (qemu-system-x86) of user 1000 dumped core.
+>                =20
+>                 Stack trace of thread 8642:
+>                 #0  0x00007f1a33609f25 n/a (n/a)
+>=20
+> ** Affects: qemu
+>      Importance: Undecided
+>          Status: New
+>=20
 
 
