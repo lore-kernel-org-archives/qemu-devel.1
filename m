@@ -2,81 +2,74 @@ Return-Path: <SRS0=brme=YQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C8C41CA9EB6
-	for <qemu-devel@archiver.kernel.org>; Wed, 23 Oct 2019 08:55:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5FE8DCA9EB6
+	for <qemu-devel@archiver.kernel.org>; Wed, 23 Oct 2019 08:56:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4F079205C9
-	for <qemu-devel@archiver.kernel.org>; Wed, 23 Oct 2019 08:55:36 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VHm8ZuR9"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4F079205C9
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 35210205C9
+	for <qemu-devel@archiver.kernel.org>; Wed, 23 Oct 2019 08:56:28 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 35210205C9
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57546 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57554 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iNCQZ-0002QS-9Z
-	for qemu-devel@archiver.kernel.org; Wed, 23 Oct 2019 04:55:35 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48625)
+	id 1iNCRP-00035w-Cx
+	for qemu-devel@archiver.kernel.org; Wed, 23 Oct 2019 04:56:27 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49816)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jfreimann@redhat.com>) id 1iNC0Y-0003M2-OR
- for qemu-devel@nongnu.org; Wed, 23 Oct 2019 04:28:44 -0400
+ (envelope-from <bounces@canonical.com>) id 1iNC8r-0008TU-V7
+ for qemu-devel@nongnu.org; Wed, 23 Oct 2019 04:37:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jfreimann@redhat.com>) id 1iNC0V-0006eM-U4
- for qemu-devel@nongnu.org; Wed, 23 Oct 2019 04:28:42 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:21680
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jfreimann@redhat.com>)
- id 1iNC0V-0006Zo-Pi
- for qemu-devel@nongnu.org; Wed, 23 Oct 2019 04:28:39 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1571819313;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=l5RpSaMs8bMQN2SO4g/r35AIQAc1GgQ2h2NBpnRyB4k=;
- b=VHm8ZuR9IRk0WVmBowap8OfXMUgmdlVg9pAXLRMF/4lAe0GR77qmoqvrX96bAHa1MSCOTh
- +mJXLqGu06LoMjCv9OtuXqfaBlZXuMD/Py9/rn2H7EU2GtXpVQAfT+Ts3TyhHwmVgX8KVZ
- 74eiAoP5DMpfcCIcX2VFX0i6I9XvX5M=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-378-0x7QgRUBMR-E3a_pjlLgYg-1; Wed, 23 Oct 2019 04:28:32 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 13EAC107AD31;
- Wed, 23 Oct 2019 08:28:31 +0000 (UTC)
-Received: from localhost (dhcp-192-217.str.redhat.com [10.33.192.217])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 500D51F3;
- Wed, 23 Oct 2019 08:28:23 +0000 (UTC)
-From: Jens Freimann <jfreimann@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v5 08/11] migration: add new migration state wait-unplug
-Date: Wed, 23 Oct 2019 10:27:08 +0200
-Message-Id: <20191023082711.16694-9-jfreimann@redhat.com>
-In-Reply-To: <20191023082711.16694-1-jfreimann@redhat.com>
-References: <20191023082711.16694-1-jfreimann@redhat.com>
+ (envelope-from <bounces@canonical.com>) id 1iNC8p-0006rQ-M8
+ for qemu-devel@nongnu.org; Wed, 23 Oct 2019 04:37:17 -0400
+Received: from indium.canonical.com ([91.189.90.7]:49496)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <bounces@canonical.com>)
+ id 1iNC8k-0006nE-Kv
+ for qemu-devel@nongnu.org; Wed, 23 Oct 2019 04:37:10 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1iNC8h-0006Lc-JZ
+ for <qemu-devel@nongnu.org>; Wed, 23 Oct 2019 08:37:07 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 77AF32E8079
+ for <qemu-devel@nongnu.org>; Wed, 23 Oct 2019 08:37:07 +0000 (UTC)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-MC-Unique: 0x7QgRUBMR-E3a_pjlLgYg-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=WINDOWS-1252
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
+Date: Wed, 23 Oct 2019 08:25:06 -0000
+From: Thomas Huth <1596579@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=Incomplete; importance=Undecided;
+ assignee=None; 
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: alex-l-williamson eduardok th-huth
+X-Launchpad-Bug-Reporter: Eduardo (eduardok)
+X-Launchpad-Bug-Modifier: Thomas Huth (th-huth)
+References: <20160627153749.31174.93791.malonedeb@chaenomeles.canonical.com>
+Message-Id: <157181910693.21612.14590430833451281479.malone@wampee.canonical.com>
+Subject: [Bug 1596579] Re: segfault upon reboot
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="186023fa645d8be19d403a76064f0643f510db2f";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: ef27858c5fb1d2b570c79958135321718e590f03
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.120
+X-Received-From: 91.189.90.7
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -85,225 +78,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: pkrempa@redhat.com, berrange@redhat.com, ehabkost@redhat.com,
- mst@redhat.com, aadam@redhat.com, dgilbert@redhat.com,
- alex.williamson@redhat.com, laine@redhat.com, ailan@redhat.com,
- parav@mellanox.com
+Reply-To: Bug 1596579 <1596579@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This patch adds a new migration state called wait-unplug.  It is entered
-after the SETUP state if failover devices are present. It will transition
-into ACTIVE once all devices were succesfully unplugged from the guest.
+Can you reproduce this problem with the latest upstream version of QEMU
+(currently version 4.1)? Or is it only reproducible in the qemu-kvm from
+your distribution? (In the latter case, please report this bug to your
+distro instead)
 
-So if a guest doesn't respond or takes long to honor the unplug request
-the user will see the migration state 'wait-unplug'.
+** Changed in: qemu
+       Status: New =3D> Incomplete
 
-In the migration thread we query failover devices if they're are still
-pending the guest unplug. When all are unplugged the migration
-continues. If one device won't unplug migration will stay in wait_unplug
-state.
+-- =
 
-Signed-off-by: Jens Freimann <jfreimann@redhat.com>
----
- include/migration/vmstate.h |  2 ++
- migration/migration.c       | 21 +++++++++++++++++++++
- migration/migration.h       |  3 +++
- migration/savevm.c          | 36 ++++++++++++++++++++++++++++++++++++
- migration/savevm.h          |  2 ++
- qapi/migration.json         |  5 ++++-
- 6 files changed, 68 insertions(+), 1 deletion(-)
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1596579
 
-diff --git a/include/migration/vmstate.h b/include/migration/vmstate.h
-index b9ee563aa4..ac4f46a67d 100644
---- a/include/migration/vmstate.h
-+++ b/include/migration/vmstate.h
-@@ -186,6 +186,8 @@ struct VMStateDescription {
-     int (*pre_save)(void *opaque);
-     int (*post_save)(void *opaque);
-     bool (*needed)(void *opaque);
-+    bool (*dev_unplug_pending)(void *opaque);
-+
-     const VMStateField *fields;
-     const VMStateDescription **subsections;
- };
-diff --git a/migration/migration.c b/migration/migration.c
-index 3febd0f8f3..51764f2565 100644
---- a/migration/migration.c
-+++ b/migration/migration.c
-@@ -52,6 +52,7 @@
- #include "hw/qdev-properties.h"
- #include "monitor/monitor.h"
- #include "net/announce.h"
-+#include "qemu/queue.h"
-=20
- #define MAX_THROTTLE  (32 << 20)      /* Migration transfer speed throttli=
-ng */
-=20
-@@ -819,6 +820,7 @@ bool migration_is_setup_or_active(int state)
-     case MIGRATION_STATUS_SETUP:
-     case MIGRATION_STATUS_PRE_SWITCHOVER:
-     case MIGRATION_STATUS_DEVICE:
-+    case MIGRATION_STATUS_WAIT_UNPLUG:
-         return true;
-=20
-     default:
-@@ -954,6 +956,9 @@ static void fill_source_migration_info(MigrationInfo *i=
-nfo)
-     case MIGRATION_STATUS_CANCELLED:
-         info->has_status =3D true;
-         break;
-+    case MIGRATION_STATUS_WAIT_UNPLUG:
-+        info->has_status =3D true;
-+        break;
-     }
-     info->status =3D s->state;
- }
-@@ -1694,6 +1699,7 @@ bool migration_is_idle(void)
-     case MIGRATION_STATUS_COLO:
-     case MIGRATION_STATUS_PRE_SWITCHOVER:
-     case MIGRATION_STATUS_DEVICE:
-+    case MIGRATION_STATUS_WAIT_UNPLUG:
-         return false;
-     case MIGRATION_STATUS__MAX:
-         g_assert_not_reached();
-@@ -3264,6 +3270,19 @@ static void *migration_thread(void *opaque)
-=20
-     qemu_savevm_state_setup(s->to_dst_file);
-=20
-+    if (qemu_savevm_nr_failover_devices()) {
-+        migrate_set_state(&s->state, MIGRATION_STATUS_SETUP,
-+                          MIGRATION_STATUS_WAIT_UNPLUG);
-+
-+        while (s->state =3D=3D MIGRATION_STATUS_WAIT_UNPLUG &&
-+                !qemu_savevm_state_guest_unplug_pending()) {
-+            qemu_sem_timedwait(&s->wait_unplug_sem, 250);
-+        }
-+
-+        migrate_set_state(&s->state, MIGRATION_STATUS_WAIT_UNPLUG,
-+                MIGRATION_STATUS_ACTIVE);
-+    }
-+
-     s->setup_time =3D qemu_clock_get_ms(QEMU_CLOCK_HOST) - setup_start;
-     migrate_set_state(&s->state, MIGRATION_STATUS_SETUP,
-                       MIGRATION_STATUS_ACTIVE);
-@@ -3511,6 +3530,7 @@ static void migration_instance_finalize(Object *obj)
-     qemu_mutex_destroy(&ms->qemu_file_lock);
-     g_free(params->tls_hostname);
-     g_free(params->tls_creds);
-+    qemu_sem_destroy(&ms->wait_unplug_sem);
-     qemu_sem_destroy(&ms->rate_limit_sem);
-     qemu_sem_destroy(&ms->pause_sem);
-     qemu_sem_destroy(&ms->postcopy_pause_sem);
-@@ -3556,6 +3576,7 @@ static void migration_instance_init(Object *obj)
-     qemu_sem_init(&ms->postcopy_pause_rp_sem, 0);
-     qemu_sem_init(&ms->rp_state.rp_sem, 0);
-     qemu_sem_init(&ms->rate_limit_sem, 0);
-+    qemu_sem_init(&ms->wait_unplug_sem, 0);
-     qemu_mutex_init(&ms->qemu_file_lock);
- }
-=20
-diff --git a/migration/migration.h b/migration/migration.h
-index 4f2fe193dc..79b3dda146 100644
---- a/migration/migration.h
-+++ b/migration/migration.h
-@@ -206,6 +206,9 @@ struct MigrationState
-     /* Flag set once the migration thread called bdrv_inactivate_all */
-     bool block_inactive;
-=20
-+    /* Migration is waiting for guest to unplug device */
-+    QemuSemaphore wait_unplug_sem;
-+
-     /* Migration is paused due to pause-before-switchover */
-     QemuSemaphore pause_sem;
-=20
-diff --git a/migration/savevm.c b/migration/savevm.c
-index 8d95e261f6..0f18dea49e 100644
---- a/migration/savevm.c
-+++ b/migration/savevm.c
-@@ -1113,6 +1113,42 @@ void qemu_savevm_state_header(QEMUFile *f)
-     }
- }
-=20
-+int qemu_savevm_nr_failover_devices(void)
-+{
-+    SaveStateEntry *se;
-+    int n =3D 0;
-+
-+    QTAILQ_FOREACH(se, &savevm_state.handlers, entry) {
-+        if (se->vmsd && se->vmsd->dev_unplug_pending) {
-+            n++;
-+        }
-+    }
-+
-+    return n;
-+}
-+
-+bool qemu_savevm_state_guest_unplug_pending(void)
-+{
-+    int nr_failover_devs;
-+    SaveStateEntry *se;
-+    bool ret =3D false;
-+    int n =3D 0;
-+
-+    nr_failover_devs =3D qemu_savevm_nr_failover_devices();
-+
-+    QTAILQ_FOREACH(se, &savevm_state.handlers, entry) {
-+        if (!se->vmsd || !se->vmsd->dev_unplug_pending) {
-+            continue;
-+        }
-+        ret =3D se->vmsd->dev_unplug_pending(se->opaque);
-+        if (!ret) {
-+            n++;
-+        }
-+    }
-+
-+    return n =3D=3D nr_failover_devs;
-+}
-+
- void qemu_savevm_state_setup(QEMUFile *f)
- {
-     SaveStateEntry *se;
-diff --git a/migration/savevm.h b/migration/savevm.h
-index 51a4b9caa8..c42b9c80ee 100644
---- a/migration/savevm.h
-+++ b/migration/savevm.h
-@@ -31,6 +31,8 @@
-=20
- bool qemu_savevm_state_blocked(Error **errp);
- void qemu_savevm_state_setup(QEMUFile *f);
-+int qemu_savevm_nr_failover_devices(void);
-+bool qemu_savevm_state_guest_unplug_pending(void);
- int qemu_savevm_state_resume_prepare(MigrationState *s);
- void qemu_savevm_state_header(QEMUFile *f);
- int qemu_savevm_state_iterate(QEMUFile *f, bool postcopy);
-diff --git a/qapi/migration.json b/qapi/migration.json
-index 52e69e2868..5a06cd489f 100644
---- a/qapi/migration.json
-+++ b/qapi/migration.json
-@@ -133,6 +133,9 @@
- # @device: During device serialisation when pause-before-switchover is ena=
-bled
- #        (since 2.11)
- #
-+# @wait-unplug: wait for device unplug request by guest OS to be completed=
-.
-+#               (since 4.2)
-+#
- # Since: 2.3
- #
- ##
-@@ -140,7 +143,7 @@
-   'data': [ 'none', 'setup', 'cancelling', 'cancelled',
-             'active', 'postcopy-active', 'postcopy-paused',
-             'postcopy-recover', 'completed', 'failed', 'colo',
--            'pre-switchover', 'device' ] }
-+            'pre-switchover', 'device', 'wait-unplug' ] }
-=20
- ##
- # @MigrationInfo:
---=20
-2.21.0
+Title:
+  segfault upon reboot
 
+Status in QEMU:
+  Incomplete
+
+Bug description:
+  [   31.167946] VFIO - User Level meta-driver version: 0.3
+  [   34.969182] kvm: zapping shadow pages for mmio generation wraparound
+  [   43.095077] vfio-pci 0000:1a:00.0: irq 50 for MSI/MSI-X
+  [166493.891331] perf interrupt took too long (2506 > 2500), lowering kern=
+el.perf_event_max_sample_rate to 50000
+  [315765.858431] qemu-kvm[1385]: segfault at 0 ip           (null) sp 0000=
+7ffe5430db18 error 14
+  [315782.002077] vfio-pci 0000:1a:00.0: transaction is not cleared; procee=
+ding with reset anyway
+  [315782.910854] mptsas 0000:1a:00.0: Refused to change power state, curre=
+ntly in D3
+  [315782.911236] mptbase: ioc1: Initiating bringup
+  [315782.911238] mptbase: ioc1: WARNING - Unexpected doorbell active!
+  [315842.957613] mptbase: ioc1: ERROR - Failed to come READY after reset! =
+IocState=3Df0000000
+  [315842.957670] mptbase: ioc1: WARNING - ResetHistory bit failed to clear!
+  [315842.957675] mptbase: ioc1: ERROR - Diagnostic reset FAILED! (ffffffff=
+h)
+  [315842.957717] mptbase: ioc1: WARNING - NOT READY WARNING!
+  [315842.957720] mptbase: ioc1: ERROR - didn't initialize properly! (-1)
+  [315842.957890] mptsas: probe of 0000:1a:00.0 failed with error -1
+
+  The qemu-kvm segfault happens when I issue a reboot on the Windows VM. Th=
+e card I have is:
+  1a:00.0 SCSI storage controller: LSI Logic / Symbios Logic SAS1068E PCI-E=
+xpress Fusion-MPT SAS (rev ff)
+
+  I have two of these cards (bought with many years difference), exact same=
+ model, and they fail the same way. I'm using PCI passthrough on this card =
+for access to the tape drive.
+  This is very easy to reproduce, so feel free to let me know what to try.
+  Kernel 3.10.0-327.18.2.el7.x86_64 (Centos 7.2.1511).
+  qemu-kvm-1.5.3-105.el7_2.4.x86_64
+  Reporting it here because of the segfault, but I guess I might have to op=
+en a bug report with mptbase as well?
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1596579/+subscriptions
 
