@@ -2,117 +2,55 @@ Return-Path: <SRS0=brme=YQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C03A8CA9EB6
-	for <qemu-devel@archiver.kernel.org>; Wed, 23 Oct 2019 11:12:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6EADDCA9EB6
+	for <qemu-devel@archiver.kernel.org>; Wed, 23 Oct 2019 11:13:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 753D620650
-	for <qemu-devel@archiver.kernel.org>; Wed, 23 Oct 2019 11:12:11 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="CKLyzElP"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 753D620650
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	by mail.kernel.org (Postfix) with ESMTPS id 2735920650
+	for <qemu-devel@archiver.kernel.org>; Wed, 23 Oct 2019 11:13:36 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2735920650
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=rt-rk.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60508 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60520 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iNEYk-00011n-J6
-	for qemu-devel@archiver.kernel.org; Wed, 23 Oct 2019 07:12:10 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44828)
+	id 1iNEa7-0001z2-6s
+	for qemu-devel@archiver.kernel.org; Wed, 23 Oct 2019 07:13:35 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42929)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iNE35-00025J-6w
- for qemu-devel@nongnu.org; Wed, 23 Oct 2019 06:39:29 -0400
+ (envelope-from <aleksandar.markovic@rt-rk.com>) id 1iNDpv-0000yY-3E
+ for qemu-devel@nongnu.org; Wed, 23 Oct 2019 06:25:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iNE32-00035l-Ot
- for qemu-devel@nongnu.org; Wed, 23 Oct 2019 06:39:27 -0400
-Received: from mail-ve1eur01on071e.outbound.protection.outlook.com
- ([2a01:111:f400:fe1f::71e]:31110
- helo=EUR01-VE1-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1iNE2w-00033l-7D; Wed, 23 Oct 2019 06:39:19 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=VJujchJmF9ME+vi6mHm6ErqNIXr3JbfreEMZwn8aZ7+2oCrBZlzMrKt7tHc9xRt0m05SZ4ruyFU0tcitjeAJPjagiLbO07BM2vzph0ecAsGxihCTqG3dCk31UvbLXlteOrojJEB1oJsy34a+DIAO/mADQmubFcCLd6Muv45/mYESb+fWoFY9ebdz4WQabeSDZAXU0mFXa8V6f4FBz4M9qejyelqtg4vTPnL33RTNyjuuCnxKWhT9DjLGOCKAx+HM3QryG9Cliei/oW7C+C+ndFRflQbR4qsXFd8fqIUr0MOUSCIlZOAxrRtwEyFTEdVQ8xOB6FFlool3HmDMWFvHSg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=e6fXieJVuq+/m4Qy4deurYir1GtBDtd4pgylYvMZgMc=;
- b=ckdn/CTPohrlcNztXoFlIg1bWNNnN6kSCPithhR75uQnfEgJ3JEue7RAxFkKK3WA+ZbrL5n7uX/uNEtmt38ajovwv1DWSwNONSBN6sybTdNdRKNUyl/i9K9qQVChoh7Z6vvzTZ79mpVCb5xocF+oLed212dHvPDApqjCDanSPhu00tUEMKgRfjs3jzrU2MKs1lWXH5GJ4NviLp7TJqbryY0dtBg/EmUCmBbFObg9tY7qXsHWnIhlMXc9IKIJ2Hhnr/so8etfaqFhXt4U/5AfqhElyd+qfCVg4B2O4XbgnnYdTtRyJV26xxOqqxf1cOe7oUqyoPeQvf7zPw82vsDIrg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=e6fXieJVuq+/m4Qy4deurYir1GtBDtd4pgylYvMZgMc=;
- b=CKLyzElP6TEHZT3CnuLcMxyfbsVW9pflD1zSImu5ko/wLFKNhUtxZ4UqPStNTqTphY5DDcwXyYTlpvok3OsxkxFZU63/jnJlQxN/0QH0BmO9H9K/madAvnvQVM+1VLUsMnEkEaAJdDZCHVjTI3Rk2u/2/NdXusyBSYOaKi5WN/w=
-Received: from AM0PR08MB4435.eurprd08.prod.outlook.com (20.179.35.83) by
- AM0PR08MB5490.eurprd08.prod.outlook.com (52.132.213.215) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2387.22; Wed, 23 Oct 2019 10:39:14 +0000
-Received: from AM0PR08MB4435.eurprd08.prod.outlook.com
- ([fe80::4461:dd32:b358:110c]) by AM0PR08MB4435.eurprd08.prod.outlook.com
- ([fe80::4461:dd32:b358:110c%7]) with mapi id 15.20.2367.022; Wed, 23 Oct 2019
- 10:39:14 +0000
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-To: Alberto Garcia <berto@igalia.com>, "qemu-devel@nongnu.org"
- <qemu-devel@nongnu.org>
-Subject: Re: [RFC PATCH 00/23] Add subcluster allocation to qcow2
-Thread-Topic: [RFC PATCH 00/23] Add subcluster allocation to qcow2
-Thread-Index: AQHVg24rGdeOuSgFrEaxrUkPVrhMx6doFVsA
-Date: Wed, 23 Oct 2019 10:39:14 +0000
-Message-ID: <666d9f71-9279-8d53-ca20-75d9db8aebc0@virtuozzo.com>
-References: <cover.1571152571.git.berto@igalia.com>
-In-Reply-To: <cover.1571152571.git.berto@igalia.com>
-Accept-Language: ru-RU, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-clientproxiedby: HE1PR05CA0138.eurprd05.prod.outlook.com
- (2603:10a6:7:28::25) To AM0PR08MB4435.eurprd08.prod.outlook.com
- (2603:10a6:208:144::19)
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=vsementsov@virtuozzo.com; 
-x-ms-exchange-messagesentrepresentingtype: 1
-x-tagtoolbar-keys: D20191023133912936
-x-originating-ip: [185.231.240.5]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: fac79a2e-e210-44b4-afe3-08d757a53fa7
-x-ms-traffictypediagnostic: AM0PR08MB5490:
-x-ms-exchange-purlcount: 2
-x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <AM0PR08MB54902F142A37D3AC043BAAD8C16B0@AM0PR08MB5490.eurprd08.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:10000;
-x-forefront-prvs: 019919A9E4
-x-forefront-antispam-report: SFV:NSPM;
- SFS:(10019020)(39840400004)(396003)(376002)(366004)(346002)(136003)(199004)(189003)(71200400001)(71190400001)(8936002)(446003)(11346002)(2616005)(31686004)(66066001)(476003)(486006)(66946007)(81156014)(81166006)(8676002)(66446008)(64756008)(66556008)(66476007)(229853002)(25786009)(7736002)(4326008)(3846002)(6116002)(36756003)(54906003)(110136005)(26005)(99286004)(52116002)(316002)(6506007)(76176011)(386003)(102836004)(186003)(6486002)(6436002)(30864003)(561944003)(6512007)(6306002)(966005)(14454004)(31696002)(6246003)(2501003)(107886003)(478600001)(86362001)(256004)(14444005)(2906002)(305945005)(5660300002);
- DIR:OUT; SFP:1102; SCL:1; SRVR:AM0PR08MB5490;
- H:AM0PR08MB4435.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
- PTR:InfoNoRecords; A:1; MX:1; 
-received-spf: None (protection.outlook.com: virtuozzo.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: mTK0WZnGaEmwG2h2phrXJwB5NCYB9ngZNRJ/mZUfHfZ6+YwNBJy7xDpsGGwOloZhMYBe9KDVVtXBLSSKDTQiLyVGhjT2KZuxfaODXbJNlJyq0+Ejb1vDwsz1h7CUHjWlVrPvrzdb2LD4Y/BJiEVbX2KIKvfYflDszXZER8fxpXvQt/y8Y/uETeY2amiaM9NX3NUDXa9xhbY1eTOEpKVq5NoUDHt6K3b+8AlfR3AYcjPDk0YY4BLjCHVX/ARGq2DzmWn4bpDEmsK+l5PkBcWOuFIHRC++wvHfbE5OEiOGESJrYk9Rmwww7I8c28mvU2AZtCtV1ATZPjipDRi0P92J0WFLNdwS6SulK+cT3QmgleM3eTOnGXKt44XuiXCLC/0Slv6Z948pntgivq6zDgFjej4jhYjiJpWbZa95OTRSel9ltr4aaeh0migg8xpRBkszZ3PMXbiTp9XApcuaQCTk9TaLbTQKOs9Mi8e0G4VLsn0=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <F1DBAEF15A07EB49A62E91D30DF3BCDE@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
-MIME-Version: 1.0
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: fac79a2e-e210-44b4-afe3-08d757a53fa7
-X-MS-Exchange-CrossTenant-originalarrivaltime: 23 Oct 2019 10:39:14.7427 (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: mXYZWsTFkINlc5nsccsBVXSB60ba+1r1xbRu0CQVAY4CALzef6K0AWf1LnHhT32Yn4JloiPzwzjmKHMSn+nRTvgvw6lU3m8eybUGfK6MQLM=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM0PR08MB5490
-X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
-X-Received-From: 2a01:111:f400:fe1f::71e
+ (envelope-from <aleksandar.markovic@rt-rk.com>) id 1iNDpp-0002wY-Cn
+ for qemu-devel@nongnu.org; Wed, 23 Oct 2019 06:25:47 -0400
+Received: from mx2.rt-rk.com ([89.216.37.149]:45148 helo=mail.rt-rk.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
+ id 1iNDpo-0002Ur-9E
+ for qemu-devel@nongnu.org; Wed, 23 Oct 2019 06:25:44 -0400
+Received: from localhost (localhost [127.0.0.1])
+ by mail.rt-rk.com (Postfix) with ESMTP id 39A8D1A21F2;
+ Wed, 23 Oct 2019 12:24:38 +0200 (CEST)
+X-Virus-Scanned: amavisd-new at rt-rk.com
+Received: from rtrkw774-lin.domain.local (rtrkw774-lin.domain.local
+ [10.10.14.106])
+ by mail.rt-rk.com (Postfix) with ESMTPSA id 1036E1A22A4;
+ Wed, 23 Oct 2019 12:23:59 +0200 (CEST)
+From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v7 01/14] target/mips: Clean up helper.c
+Date: Wed, 23 Oct 2019 12:23:34 +0200
+Message-Id: <1571826227-10583-2-git-send-email-aleksandar.markovic@rt-rk.com>
+X-Mailer: git-send-email 2.7.4
+In-Reply-To: <1571826227-10583-1-git-send-email-aleksandar.markovic@rt-rk.com>
+References: <1571826227-10583-1-git-send-email-aleksandar.markovic@rt-rk.com>
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [fuzzy]
+X-Received-From: 89.216.37.149
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -124,243 +62,336 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Anton Nefedov <anton.nefedov@virtuozzo.com>,
- Denis Lunev <den@virtuozzo.com>,
- "qemu-block@nongnu.org" <qemu-block@nongnu.org>, Max Reitz <mreitz@redhat.com>
+Cc: aleksandar.rikalo@rt-rk.com, Markus Armbruster <armbru@redhat.com>,
+ Aleksandar Markovic <amarkovic@wavecomp.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-SGkhDQoNClRoaXMgaXMgdmVyeSBpbnRlcmVzdGluZyEgQ291bGQgeW91IHBsZWFzZSBleHBvcnQg
-YSBicmFuY2ggdG8gbG9vayBhdCwNCmFzIHBhdGNoZXMgY2FuJ3QgYmUgYXBwbGllZCBvbiBtYXN0
-ZXIgbm93IDooDQoNCjE1LjEwLjIwMTkgMTg6MjMsIEFsYmVydG8gR2FyY2lhIHdyb3RlOg0KPiBI
-aSwNCj4gDQo+IHRoaXMgc2VyaWVzIGFkZHMgYSBuZXcgZmVhdHVyZSB0byB0aGUgcWNvdzIgb24t
-ZGlzayBmb3JtYXQgY2FsbGVkDQo+ICJFeHRlbmRlZCBMMiBFbnRyaWVzIiwgd2hpY2ggYWxsb3dz
-IHVzIHRvIGRvIHN1YmNsdXN0ZXIgYWxsb2NhdGlvbi4NCj4gDQo+IFRoaXMgY292ZXIgbGV0dGVy
-IGV4cGxhaW5zIHRoZSByZWFzb25zIGJlaGluZCB0aGlzIHByb3Bvc2FsLCB0aGUNCj4gY2hhbmdl
-cyB0byB0aGUgb24tZGlzayBmb3JtYXQsIHRlc3QgcmVzdWx0cyBhbmQgcGVuZGluZyB3b3JrLiBJ
-ZiB5b3UNCj4gYXJlIGN1cmlvdXMgeW91IGNhbiBhbHNvIGhhdmUgYSBsb29rIGF0IHByZXZpb3Vz
-IGRpc2N1c3Npb25zIGFib3V0DQo+IHRoaXMgZmVhdHVyZToNCj4gDQo+ICAgICBodHRwczovL2xp
-c3RzLmdudS5vcmcvYXJjaGl2ZS9odG1sL3FlbXUtYmxvY2svMjAxNy0wNC9tc2cwMDE3OC5odG1s
-DQo+ICAgICBodHRwczovL2xpc3RzLmdudS5vcmcvYXJjaGl2ZS9odG1sL3FlbXUtYmxvY2svMjAx
-OS0wNi9tc2cwMTE1NS5odG1sDQo+IA0KPiBUaGlzIGlzIHRoZSBmaXJzdCBwcm9wZXIgdmVyc2lv
-biBvZiB0aGUgcGF0Y2hlcywgYW5kIEkgYmVsaWV2ZSB0aGF0DQo+IHRoZSBpbXBsZW1lbnRhdGlv
-biBpcyBjb21wbGV0ZS4gSG93ZXZlciBzaW5jZSBJJ20gcHJvcG9zaW5nIGEgY2hhbmdlDQo+IHRv
-IHRoZSBvbi1kaXNrIGZvcm1hdCBJJ20gbGFiZWxpbmcgdGhpcyBhcyBSRkMgYmVjYXVzZSBJJ20g
-ZXhwZWN0aW5nDQo+IHNvbWUgZGViYXRlLiBJJ2xsIHJlbW92ZSB0aGUgUkZDIHRhZyBhbmQgYWRk
-IG1vcmUgdGVzdHMgaW4gZnV0dXJlDQo+IHJldmlzaW9ucy4NCj4gDQo+ID09PSBQcm9ibGVtID09
-PQ0KPiANCj4gQSBxY293MiBpbWFnZSBpcyBkaXZpZGVkIGludG8gdW5pdHMgb2YgY29uc3RhbnQg
-c2l6ZSBjYWxsZWQgY2x1c3RlcnMsDQo+IGFuZCBhbW9uZyBvdGhlciB0aGluZ3MgaXQgY29udGFp
-bnMgbWV0YWRhdGEgdGhhdCBtYXBzIGd1ZXN0IGFkZHJlc3Nlcw0KPiB0byBob3N0IGFkZHJlc3Nl
-cyAodGhlIHNvLWNhbGxlZCBMMSBhbmQgTDIgdGFibGVzKS4NCj4gDQo+IFRoZXJlIGFyZSB0d28g
-YmFzaWMgcHJvYmxlbXMgdGhhdCByZXN1bHQgZnJvbSB0aGlzOg0KPiANCj4gMSkgUmVhZGluZyBm
-cm9tIG9yIHdyaXRpbmcgdG8gYSBxY293MiBpbWFnZSBpbnZvbHZlcyByZWFkaW5nIHRoZQ0KPiAg
-ICAgY29ycmVzcG9uZGluZyBlbnRyeSBvbiB0aGUgTDIgdGFibGUgdGhhdCBtYXBzIHRoZSBndWVz
-dCBhZGRyZXNzIHRvDQo+ICAgICB0aGUgaG9zdCBhZGRyZXNzLiBUaGlzIGlzIHZlcnkgc2xvdyBi
-ZWNhdXNlIGl0IGludm9sdmVzIHR3byBJL08NCj4gICAgIG9wZXJhdGlvbnM6IG9uZSBvbiB0aGUg
-TDIgdGFibGUgYW5kIHRoZSBvdGhlciBvbmUgb24gdGhlIGFjdHVhbA0KPiAgICAgZGF0YSBjbHVz
-dGVyLg0KPiANCj4gMikgQSBjbHVzdGVyIGlzIHRoZSBzbWFsbGVzdCB1bml0IG9mIGFsbG9jYXRp
-b24uIFRoZXJlZm9yZSB3cml0aW5nIGENCj4gICAgIG1lcmUgNTEyIGJ5dGVzIHRvIGFuIGVtcHR5
-IGRpc2sgcmVxdWlyZXMgYWxsb2NhdGluZyBhIGNvbXBsZXRlDQo+ICAgICBjbHVzdGVyIGFuZCBm
-aWxsaW5nIGl0IHdpdGggemVyb2VzIChvciB3aXRoIGRhdGEgZnJvbSB0aGUgYmFja2luZw0KPiAg
-ICAgaW1hZ2UgaWYgdGhlcmUgaXMgb25lKS4gVGhpcyB3YXN0ZXMgbW9yZSBkaXNrIHNwYWNlIGFu
-ZCBhbHNvIGhhcyBhDQo+ICAgICBuZWdhdGl2ZSBpbXBhY3Qgb24gSS9PLg0KPiANCj4gUHJvYmxl
-bSAoMSkgY2FuIGJlIHNvbHZlZCBieSBjYWNoaW5nIHRoZSBMMiB0YWJsZXMgaW4gbWVtb3J5LiBU
-aGUNCj4gbWF4aW11bSBhbW91bnQgb2YgZGlzayBzcGFjZSB1c2VkIGJ5IEwyIHRhYmxlcyBkZXBl
-bmRzIG9uIHRoZSB2aXJ0dWFsDQo+IGRpc2sgc2l6ZSBhbmQgdGhlIGNsdXN0ZXIgc2l6ZToNCj4g
-DQo+ICAgICBtYXhfbDJfc2l6ZSA9IHZpcnR1YWxfZGlza19zaXplICogOCAvIGNsdXN0ZXJfc2l6
-ZQ0KPiANCj4gQmVjYXVzZSBvZiB0aGlzLCB0aGUgb25seSB3YXkgdG8gcmVkdWNlIHRoZSBzaXpl
-IG9mIHRoZSBMMiB0YWJsZXMgaXMNCj4gYnkgaW5jcmVhc2luZyB0aGUgY2x1c3RlciBzaXplICh3
-aGljaCBjYW4gYmUgYW55IHBvd2VyIG9mIHR3byBiZXR3ZWVuDQo+IDUxMiBieXRlcyBhbmQgMiBN
-QikuIEJ1dCB0aGVuIHdlIGhpdCBwcm9ibGVtICgyKTogSS9PIGlzIHNsb3dlciBhbmQNCj4gbW9y
-ZSBkaXNrIHNwYWNlIGlzIHdhc3RlZC4NCj4gDQo+ID09PSBUaGUgcHJvcG9zYWwgPT09DQo+IA0K
-PiBUaGUgcHJvcG9zYWwgaXMgdG8gZXh0ZW5kIHRoZSBxY293MiBmb3JtYXQgYnkgYWxsb3dpbmcg
-c3ViY2x1c3Rlcg0KPiBhbGxvY2F0aW9uLiBUaGUgb24tZGlzayBmb3JtYXQgcmVtYWlucyBlc3Nl
-bnRpYWxseSB0aGUgc2FtZSwgZXhjZXB0DQo+IHRoYXQgZWFjaCBkYXRhIGNsdXN0ZXIgaXMgaW50
-ZXJuYWxseSBkaXZpZGVkIGludG8gMzIgc3ViY2x1c3RlcnMgb2YNCj4gZXF1YWwgc2l6ZS4NCj4g
-DQo+IFRoZSB3YXkgaXQgd29ya3MgaW4gcHJhY3RpY2UgaXMgd2l0aCBhIG5ldyBvcHRpb25hbCBm
-ZWF0dXJlIGNhbGxlZA0KPiAiRXh0ZW5kZWQgTDIgRW50cmllcyIsIHRoYXQgbmVlZHMgdG8gYmUg
-ZW5hYmxlZCB3aGVuIGFuIGltYWdlIGlzDQo+IGNyZWF0ZWQuIFdpdGggdGhpcywgZWFjaCBlbnRy
-eSBvbiBhbiBMMiB0YWJsZSBpcyBhY2NvbXBhbmllZCBieSBhDQo+IGJpdG1hcCBpbmRpY2F0aW5n
-IHRoZSBhbGxvY2F0aW9uIHN0YXRlIG9mIGVhY2ggb25lIG9mIHRoZSBzdWJjbHVzdGVycw0KPiBm
-b3IgdGhhdCBjbHVzdGVyLiBUaGUgc2l6ZSBvZiBhbiBMMiBlbnRyeSBkb3VibGVzIGZyb20gNjQg
-dG8gMTI4IGJpdHMuDQo+IA0KPiBPdGhlciB0aGFuIEwyIGVudHJpZXMsIGFsbCBvdGhlciBkYXRh
-IHN0cnVjdHVyZXMgcmVtYWluIHVuY2hhbmdlZCwgYnV0DQo+IGZvciBkYXRhIGNsdXN0ZXJzIHRo
-ZSBzbWFsbGVzdCB1bml0IG9mIGFsbG9jYXRpb24gaXMgbm93IHRoZQ0KPiBzdWJjbHVzdGVyLiBS
-ZWZlcmVuY2UgY291bnRpbmcgaXMgc3RpbGwgYXQgdGhlIGNsdXN0ZXIgbGV2ZWwsIGJlY2F1c2UN
-Cj4gdGhlcmUgaXMgbm8gd2F5IHRvIHJlZmVyZW5jZSBpbmRpdmlkdWFsIHN1YmNsdXN0ZXJzLiBD
-b3B5LW9uLXdyaXRlIG9uDQo+IGludGVybmFsIHNuYXBzaG90cyBuZWVkcyB0byBjb3B5IGNvbXBs
-ZXRlIGNsdXN0ZXJzLCBzbyB0aGF0IHNjZW5hcmlvDQo+IHdvdWxkIG5vdCBiZW5lZml0IGZyb20g
-dGhpcyBjaGFuZ2UuDQo+IA0KPiBJIHNlZSB0d28gbWFpbiB1c2UgY2FzZXMgZm9yIHRoaXMgZmVh
-dHVyZToNCj4gDQo+IGEpIFRoZSBxY293MiBpbWFnZSBpcyBub3QgdG9vIGxhcmdlIC8gdGhlIEwy
-IGNhY2hlIGlzIG5vdCBhIHByb2JsZW0sDQo+ICAgICBidXQgeW91IHdhbnQgdG8gaW5jcmVhc2Ug
-dGhlIGFsbG9jYXRpb24gcGVyZm9ybWFuY2UuIEluIHRoaXMgY2FzZQ0KPiAgICAgeW91IGNhbiBo
-YXZlIGEgMTI4S0IgY2x1c3RlciB3aXRoIDRLQiBzdWJjbHVzdGVycyAod2l0aCA0S0IgYmVpbmcg
-YQ0KPiAgICAgY29tbW9uIGJsb2NrIHNpemUgaW4gZXh0NCBhbmQgb3RoZXIgZmlsZXN5c3RlbXMp
-DQo+IA0KPiBiKSBUaGUgcWNvdzIgaW1hZ2UgaXMgdmVyeSBsYXJnZSBhbmQgeW91IHdhbnQgdG8g
-c2F2ZSBtZXRhZGF0YSBzcGFjZQ0KPiAgICAgaW4gb3JkZXIgdG8gaGF2ZSBhIHNtYWxsZXIgTDIg
-Y2FjaGUuIEluIHRoaXMgY2FzZSB5b3UgY2FuIGdvIGZvcg0KPiAgICAgdGhlIG1heGltdW0gY2x1
-c3RlciBzaXplICgyTUIpIGJ1dCB5b3Ugd2FudCB0byBoYXZlIHNtYWxsZXINCj4gICAgIHN1YmNs
-dXN0ZXJzIHRvIGluY3JlYXNlIHRoZSBhbGxvY2F0aW9uIHBlcmZvcm1hbmNlIGFuZCBvcHRpbWl6
-ZSB0aGUNCj4gICAgIGRpc2sgdXNhZ2UuDQo+IA0KPiA9PT0gQ2hhbmdlcyB0byB0aGUgb24tZGlz
-ayBmb3JtYXQgPT09DQo+IA0KPiBBbiBMMiBlbnRyeSBpcyA2NCBiaXRzIHdpZGUsIHdpdGggdGhp
-cyBmb3JtYXQgKGZvciB1bmNvbXByZXNzZWQNCj4gY2x1c3RlcnMpOg0KPiANCj4gNjMgICAgNTYg
-NTUgICAgNDggNDcgICAgNDAgMzkgICAgMzIgMzEgICAgMjQgMjMgICAgMTYgMTUgICAgIDggNyAg
-ICAgIDANCj4gMDAwMDAwMDAgMDAwMDAwMDAgMDAwMDAwMDAgMDAwMDAwMDAgMDAwMDAwMDAgMDAw
-MDAwMDAgMDAwMDAwMDAgMDAwMDAwMDANCj4gKio8LS0tLT4gPC0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tPjwtLS0tLS0tPioNCj4gICAgUnNydmVkICAg
-ICAgICAgICAgICBob3N0IGNsdXN0ZXIgb2Zmc2V0IG9mIGRhdGEgICAgICAgICAgICAgUmVzZXJ2
-ZWQNCj4gICAgKDYgYml0cykgICAgICAgICAgICAgICAgKDQ3IGJpdHMpICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgKDggYml0cykNCj4gDQo+ICAgICAgYml0IDYzOiByZWZjb3VudCA9PSAxICAg
-KFFDT1dfT0ZMQUdfQ09QSUVEKQ0KPiAgICAgIGJpdCA2MjogY29tcHJlc3NlZCA9IDEgIChRQ09X
-X09GTEFHX0NPTVBSRVNTRUQpDQo+ICAgICAgYml0ICAwOiBhbGwgemVyb3MgICAgICAgKFFDT1df
-T0ZMQUdfWkVSTykNCj4gDQo+IElmIEV4dGVuZGVkIEwyIEVudHJpZXMgYXJlIGVuYWJsZWQsIGJp
-dCAwIGJlY29tZXMgcmVzZXJ2ZWQgYW5kIG11c3QgYmUNCj4gdW5zZXQsIGFuZCB0aGlzIDY0LWJp
-dCBiaXRtYXAgZm9sbG93cyB0aGUgZW50cnk6DQo+IA0KPiA2MyAgICA1NiA1NSAgICA0OCA0NyAg
-ICA0MCAzOSAgICAzMiAzMSAgICAyNCAyMyAgICAxNiAxNSAgICAgOCA3ICAgICAgMA0KPiAwMDAw
-MDAwMCAwMDAwMDAwMCAwMDAwMDAwMCAwMDAwMDAwMCAwMDAwMDAwMCAwMDAwMDAwMCAwMDAwMDAw
-MCAwMDAwMDAwMA0KPiA8LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tPiA8LS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tPg0KPiAgICAgICBzdWJjbHVzdGVyIHJlYWRzIGFz
-IHplcm9zICAgICAgICAgICAgc3ViY2x1c3RlciBpcyBhbGxvY2F0ZWQNCj4gICAgICAgICAgICAg
-ICAoMzIgYml0cykgICAgICAgICAgICAgICAgICAgICAgICAgICAoMzIgYml0cykNCj4gDQo+IEFs
-bCB0aGlzIGFwcGxpZXMgdG8gdW5jb21wcmVzc2VkIGNsdXN0ZXJzLiBDb21wcmVzc2VkIGNsdXN0
-ZXJzIGFyZSBub3QNCj4gZGl2aWRlZCBpbnRvIHN1YmNsdXN0ZXJzLCB0aGUgY2x1c3RlciBkZXNj
-cmlwdG9yIHJlbWFpbnMgZXhhY3RseSB0aGUNCj4gc2FtZSwgYW5kIHRoZSA2NC1iaXQgYml0bWFw
-IGlzIG5vdCB1c2VkIChpLmUuIGFsbCBiaXRzIGFyZSBhbHdheXMgMCkuDQo+IA0KPiA9PT0gVGVz
-dCByZXN1bHRzID09PQ0KPiANCj4gSSBtYWRlIGFsbCB0ZXN0cyBvbiBhbiBTU0QgZHJpdmUsIHdy
-aXRpbmcgdG8gYW4gZW1wdHkgcWNvdzIgaW1hZ2Ugd2l0aA0KPiBhIGZ1bGx5IHBvcHVsYXRlZCA0
-MEdCIGJhY2tpbmcgaW1hZ2UsIHBlcmZvcm1pbmcgcmFuZG9tIHdyaXRlcyB1c2luZw0KPiBmaW8g
-d2l0aCBhIGJsb2NrIHNpemUgb2YgNEtCLiBJIHJhbiB0aGUgdGVzdHMgd2l0aCBhbGwgYXZhaWxh
-YmxlDQo+IGNsdXN0ZXIgc2l6ZXMgc3RhcnRpbmcgZnJvbSA0S0IuDQo+IA0KPiBJdCdzIGltcG9y
-dGFudCB0byBwb2ludCBvdXQgdGhhdCBvbmNlIGEgY2x1c3RlciBoYXMgYmVlbiBjb21wbGV0ZWx5
-DQo+IGFsbG9jYXRlZCB0aGVuIGhhdmluZyBzdWJjbHVzdGVycyBvZmZlcnMgbm8gcGVyZm9ybWFu
-Y2UgYmVuZWZpdC4gRm9yDQo+IHRoaXMgcmVhc29uIHRoZSBzaXplIG9mIHRoZSBpbWFnZSBmb3Ig
-dGhlc2UgdGVzdHMgKDQwR0IpIHdhcyBjaG9zZW4gdG8NCj4gYmUgbGFyZ2UgZW5vdWdoIHRvIGd1
-YXJhbnRlZSB0aGF0IHRoZXJlIGFyZSBhbHdheXMgbmV3IGNsdXN0ZXJzIGJlaW5nDQo+IGFsbG9j
-YXRlZC4gVGhpcyBpcyB0aGVyZWZvcmUgYSB3b3JzdC1jYXNlIHNjZW5hcmlvIChvciBiZXN0LWNh
-c2UgZm9yDQo+IHRoaXMgZmVhdHVyZSwgaWYgeW91IHdhbnQpLg0KPiANCj4gU3ViY2x1c3RlciBz
-aXplcyBhcmUgaW4gYnJhY2tldHM6DQo+IA0KPiB8LS0tLS0tLS0tLS0tLS0tLS0rLS0tLS0tLS0t
-LS0tLS0tLSstLS0tLS0tLS0tLS0tLS0tLXwNCj4gfCAgIENsdXN0ZXIgc2l6ZSAgfCBzdWJjbHVz
-dGVycz1vbiB8IHN1YmNsdXN0ZXJzPW9mZiB8DQo+IHwtLS0tLS0tLS0tLS0tLS0tLSstLS0tLS0t
-LS0tLS0tLS0tKy0tLS0tLS0tLS0tLS0tLS0tfA0KPiB8ICAgIDQgS0IgKCBOL0EgKSB8ICAgICAg
-ICAgICAgTi9BIHwgICAgICAgICA5NSBJT1BTIHwNCj4gfCAgICA4IEtCICggTi9BICkgfCAgICAg
-ICAgICAgIE4vQSB8ICAgICAgICA1OTkgSU9QUyB8DQo+IHwgICAxNiBLQiAoNTEyIEIpIHwgICAg
-ICA0MTI5IElPUFMgfCAgICAgICAzNTk3IElPUFMgfA0KPiB8ICAgMzIgS0IgICgxIEtCKSB8ICAg
-ICAxMTI1NSBJT1BTIHwgICAgICAgMjY0MiBJT1BTIHwNCj4gfCAgIDY0IEtCICAoMiBLQikgfCAg
-ICAgMTMzNDEgSU9QUyB8ICAgICAgIDE2NzEgSU9QUyB8DQo+IHwgIDEyOCBLQiAgKDQgS0IpIHwg
-ICAgIDEyMzkxIElPUFMgfCAgICAgICAgODcwIElPUFMgfA0KPiB8ICAyNTYgS0IgICg4IEtCKSB8
-ICAgICAgOTY0NSBJT1BTIHwgICAgICAgIDU2NiBJT1BTIHwNCj4gfCAgNTEyIEtCICgxNiBLQikg
-fCAgICAgIDQ5NjAgSU9QUyB8ICAgICAgICAzNTkgSU9QUyB8DQo+IHwgMTAyNCBLQiAoMzIgS0Ip
-IHwgICAgICAyNzMyIElPUFMgfCAgICAgICAgMjE1IElPUFMgfA0KPiB8IDIwNDggS0IgKDY0IEtC
-KSB8ICAgICAgMTYzMCBJT1BTIHwgICAgICAgIDIxNCBJT1BTIHwNCj4gfC0tLS0tLS0tLS0tLS0t
-LS0tKy0tLS0tLS0tLS0tLS0tLS0rLS0tLS0tLS0tLS0tLS0tLS18DQo+IA0KPiBIZXJlIGFyZSB0
-aGUgc2FtZSB0ZXN0cywgYnV0IHdpdGhvdXQgYW55IGJhY2tpbmcgaW1hZ2U6DQo+IA0KPiB8LS0t
-LS0tLS0tLS0tLS0tLS0rLS0tLS0tLS0tLS0tLS0tLSstLS0tLS0tLS0tLS0tLS0tLXwNCj4gfCAg
-IENsdXN0ZXIgc2l6ZSAgfCBzdWJjbHVzdGVycz1vbiB8IHN1YmNsdXN0ZXJzPW9mZiB8DQo+IHwt
-LS0tLS0tLS0tLS0tLS0tLSstLS0tLS0tLS0tLS0tLS0tKy0tLS0tLS0tLS0tLS0tLS0tfA0KPiB8
-ICAgIDQgS0IgKCBOL0EgKSB8ICAgICAgICAgICAgTi9BIHwgICAgICAgICA5MyBJT1BTIHwNCj4g
-fCAgICA4IEtCICggTi9BICkgfCAgICAgICAgICAgIE4vQSB8ICAgICAgICA1MzkgSU9QUyB8DQo+
-IHwgICAxNiBLQiAoNTEyIEIpIHwgICAgICA0MTc0IElPUFMgfCAgICAgICA3NTk4IElPUFMgfA0K
-PiB8ICAgMzIgS0IgICgxIEtCKSB8ICAgICAxMTMyNiBJT1BTIHwgICAgICAxMTk1NyBJT1BTIHwN
-Cj4gfCAgIDY0IEtCICAoMiBLQikgfCAgICAgMTM1MTYgSU9QUyB8ICAgICAgMTMzNzUgSU9QUyB8
-DQo+IHwgIDEyOCBLQiAgKDQgS0IpIHwgICAgIDEyNDM1IElPUFMgfCAgICAgIDEzMjc0IElPUFMg
-fA0KPiB8ICAyNTYgS0IgICg4IEtCKSB8ICAgICAxMjA3MSBJT1BTIHwgICAgICAxNDE3NCBJT1BT
-IHwNCj4gfCAgNTEyIEtCICgxNiBLQikgfCAgICAgMTIxNjkgSU9QUyB8ICAgICAgMTQzNDMgSU9Q
-UyB8DQo+IHwgMTAyNCBLQiAoMzIgS0IpIHwgICAgIDEyMzA3IElPUFMgfCAgICAgIDE0NjIyIElP
-UFMgfA0KPiB8IDIwNDggS0IgKDY0IEtCKSB8ICAgICAxMjc4NCBJT1BTIHwgICAgICAxNDU3NCBJ
-T1BTIHwNCj4gfC0tLS0tLS0tLS0tLS0tLS0tKy0tLS0tLS0tLS0tLS0tLS0rLS0tLS0tLS0tLS0t
-LS0tLS18DQo+IA0KPiBTb21lIGNvbW1lbnRzIGFib3V0IHRoZSByZXN1bHRzOg0KPiANCj4gLSBU
-aGUgc21hbGxlc3QgYWxsb3dlZCBjbHVzdGVyIHNpemUgZm9yIGFuIGltYWdlIHdpdGggc3ViY2x1
-c3RlcnMgaXMNCj4gICAgMTYgS0IgKGluIHRoaXMgY2FzZSB0aGUgc3ViY2x1c3RlcnMgc2l6ZSBp
-cyA1MTIgYnl0ZXMpLCBoZW5jZSB0aGUNCj4gICAgbWlzc2luZyB2YWx1ZXMgaW4gdGhlIDQgS0Ig
-YW5kIDggS0Igcm93cy4NCj4gDQo+IC0gSW4gaW1hZ2VzIHdpdGggYSBiYWNraW5nIGZpbGU6IGFs
-bG9jYXRpb24gaXMgbXVjaCBmYXN0ZXIgd2hlbg0KPiAgICBzdWJjbHVzdGVycyBhcmUgZW5hYmxl
-ZC4gQXMgZXhwZWN0ZWQsIGltYWdlcyB3aXRoIGEgY2x1c3RlciBzaXplIG9mDQo+ICAgIDY0S0Ig
-cGVyZm9ybSBzaW1pbGFyIHRvIGltYWdlcyB3aXRoIGEgc3ViY2x1c3RlciBzaXplIG9mIDY0S0Iu
-IFdoZW4NCj4gICAgdGhlcmUgaXMgbm8gY29weS1vbi13cml0ZSBpbnZvbHZlZCAoc3ViY2x1c3Rl
-ciBzaXplIDw9IDRLQikgdGhlbiB0aGUNCj4gICAgbWF4aW11bSBwZXJmb3JtYW5jZSBpcyBhY2hp
-ZXZlZC4NCj4gDQo+IC0gSW4gaW1hZ2VzIHdpdGhvdXQgYSBiYWNraW5nIGZpbGU6IFNpbmNlIGNv
-bW1pdCBjOGJiMjNjYmRiIHdoZW4gZW1wdHkNCj4gICAgY2x1c3RlcnMgYXJlIGFsbG9jYXRlZCBm
-b3IgdGhlIGZpcnN0IHRpbWUgdGhleSBhcmUgZmlsbGVkIHdpdGgNCj4gICAgemVyb2VzIHVzaW5n
-IGFuIGVmZmljaWVudCBtZXRob2QgKHR5cGljYWxseSBmYWxsb2NhdGUoKSB3aXRoDQo+ICAgIEZB
-TExPQ19GTF9aRVJPX1JBTkdFKS4gVGhpcyBpcyBzbyBmYXN0IHRoYXQgaGF2aW5nIHN1YmNsdXN0
-ZXJzIGhlcmUNCj4gICAgaXMgYWN0dWFsbHkgYSBiaXQgc2xvd2VyIGluIG1vc3QgY2FzZXMgKGFs
-dGhvdWdoIGl0IHN0aWxsIHNhdmVzIGRpc2sNCj4gICAgc3BhY2UpLg0KPiANCj4gLSBUaGUgMTYg
-S0IgY2x1c3RlciAvIDUxMiBieXRlIHN1YmNsdXN0ZXIgY2FzZSBpcyBxdWl0ZSBzbG93Lg0KPiAg
-ICBJIGhhdmVuJ3QgZGVidWdnZWQgdGhpcyBidXQgSSBzdXNwZWN0IHRoYXQgdGhpcyBpcyBiZWNh
-dXNlIG5ldw0KPiAgICBjbHVzdGVycyBuZWVkIHRvIGJlIGFsbG9jYXRlZCBhbGwgdGhlIHRpbWUs
-IGFuZCBhbHNvIEwyIGFuZCByZWZjb3VudA0KPiAgICB0YWJsZXMgYXJlIHZlcnkgc21hbGwgYW5k
-IG5lZWQgdG8gZ3JvdyBhbGwgdGhlIHRpbWUuIFRoZSBzYW1lIHBhdHRlcm4NCj4gICAgY2FuIGJl
-IHNlZW4gaW4gaW1hZ2VzIHdpdGhvdXQgc3ViY2x1c3RlcnMuDQo+IA0KPiA9PT0gVG8gZG8gPT09
-DQo+IA0KPiBBIGNvdXBsZSBvZiB0aGluZ3MgYXJlIG1pc3NpbmcgZnJvbSB0aGlzIHNlcmllczoN
-Cj4gDQo+IC0gVGhlIGFiaWxpdHkgdG8gZWZmaWNpZW50bHkgemVybyBpbmRpdmlkdWFsIHN1YmNs
-dXN0ZXJzIHVzaW5nDQo+ICAgIHFjb3cyX2NvX3B3cml0ZV96ZXJvZXMoKS4gQXQgdGhlIG1vbWVu
-dCBvbmx5IGZ1bGwgY2x1c3RlcnMgY2FuIGJlDQo+ICAgIHplcm9lZCB3aXRoIHRoaXMgbWV0aG9k
-Lg0KPiANCj4gLSBBbHRlcm5hdGl2ZWx5IHdlIGNvdWxkIGdldCByaWQgb2YgdGhlIGluZGl2aWR1
-YWwgImFsbCB6ZXJvZXMiIGJpdHMNCj4gICAgYWx0b2dldGhlciBhbmQgaGF2ZSA2NCBzdWJjbHVz
-dGVycyBwZXIgY2x1c3Rlci4gV2Ugd291bGQgc3RpbGwgaGF2ZQ0KPiAgICB0aGUgUUNPV19PRkxB
-R19aRVJPIGJpdCBpbiB0aGUgc3RhbmRhcmQgY2x1c3RlciBkZXNjcmlwdG9yLg0KPiANCj4gLSBU
-aGUgbnVtYmVyIG9mIHN1YmNsdXN0ZXJzIHBlciBjbHVzdGVyIGlzIGFsd2F5cyAzMi4gSXQgd291
-bGQgYmUNCj4gICAgdHJpdmlhbCB0byBhbGxvdyBjb25maWd1cmluZyB0aGlzLCBidXQgSSBkb24n
-dCBzZWUgYW55IHVzZSBjYXNlLg0KPiANCj4gLSBUZXN0czogSSBoYXZlIGEgZmV3IHdyaXR0ZW4g
-dGhhdCBJJ2xsIGFkZCBpbiBmdXR1cmUgcmV2aXNpb25zIG9mDQo+ICAgIHRoaXMgc2VyaWVzLg0K
-PiANCj4gLSBoYW5kbGVfYWxsb2Nfc3BhY2UoKSB3b3JrcyBhdCB0aGUgc3ViY2x1c3RlcnMgbGV2
-ZWwuIFRoYXQgaXMsIGlmIHlvdQ0KPiAgICBoYXZlIGFuIHVuYWxsb2NhdGVkIDJNQiBjbHVzdGVy
-IHdpdGggNjRLQiBzdWJjbHVzdGVycywgbm8gYmFja2luZw0KPiAgICBpbWFnZSBhbmQgeW91IHdy
-aXRlIDRLQiBvZiBkYXRhLCBRRU1VIHdvbid0IHdyaXRlIHplcm9lcyB0byB0aGUNCj4gICAgYWZm
-ZWN0ZWQgc3ViY2x1c3RlcihzKSBhbmQgd2lsbCB1c2UgaGFuZGxlX2FsbG9jX3NwYWNlKCkgaW5z
-dGVhZC4NCj4gICAgVGhlIG90aGVyIHN1YmNsdXN0ZXJzIHdvbid0IGJlIHRvdWNoZWQgYW5kIHdp
-bGwgcmVtYWluIHVuYWxsb2NhdGVkLg0KPiAgICBUaGlzIGJlaGF2aW9yIGlzIGNvbnNpc3RlbnQg
-d2l0aCBob3cgc3ViY2x1c3RlcnMgd29yayBhbmQgc2F2ZXMgZGlzaw0KPiAgICBzcGFjZSwgYnV0
-IG9mZmVycyBzbGlnaHRseSBsb3dlciBwZXJmb3JtYW5jZSAoc2VlIHRlc3QgcmVzdWx0cw0KPiAg
-ICBhYm92ZSkuIFRoZW9yZXRpY2FsbHkgd2UgY291bGQgb2ZmZXIgYSBzZXR0aW5nIHRvIGNvbmZp
-Z3VyZSB0aGlzLA0KPiAgICBidXQgSSdtIG5vdCBjb252aW5jZWQgdGhhdCB0aGlzIGlzIHZlcnkg
-dXNlZnVsLg0KPiANCj4gPT09PT09PT09PT09PT09PT09PT09PT09PT09DQo+IA0KPiBBcyB1c3Vh
-bCwgZmVlZGJhY2sgaXMgd2VsY29tZSwNCj4gDQo+IEJlcnRvDQo+IA0KPiBBbGJlcnRvIEdhcmNp
-YSAoMjMpOg0KPiAgICBxY293MjogQWRkIGNhbGN1bGF0ZV9sMl9tZXRhKCkNCj4gICAgcWNvdzI6
-IFNwbGl0IGNsdXN0ZXJfbmVlZHNfY293KCkgb3V0IG9mIGNvdW50X2Nvd19jbHVzdGVycygpDQo+
-ICAgIHFjb3cyOiBQcm9jZXNzIFFDT1cyX0NMVVNURVJfWkVST19BTExPQyBjbHVzdGVycyBpbiBo
-YW5kbGVfY29waWVkKCkNCj4gICAgcWNvdzI6IEFkZCBnZXRfbDJfZW50cnkoKSBhbmQgc2V0X2wy
-X2VudHJ5KCkNCj4gICAgcWNvdzI6IERvY3VtZW50IHRoZSBFeHRlbmRlZCBMMiBFbnRyaWVzIGZl
-YXR1cmUNCj4gICAgcWNvdzI6IEFkZCBkdW1teSBoYXNfc3ViY2x1c3RlcnMoKSBmdW5jdGlvbg0K
-PiAgICBxY293MjogQWRkIHN1YmNsdXN0ZXItcmVsYXRlZCBmaWVsZHMgdG8gQkRSVlFjb3cyU3Rh
-dGUNCj4gICAgcWNvdzI6IEFkZCBvZmZzZXRfdG9fc2NfaW5kZXgoKQ0KPiAgICBxY293MjogQWRk
-IGwyX2VudHJ5X3NpemUoKQ0KPiAgICBxY293MjogVXBkYXRlIGdldC9zZXRfbDJfZW50cnkoKSBh
-bmQgYWRkIGdldC9zZXRfbDJfYml0bWFwKCkNCj4gICAgcWNvdzI6IEFkZCBxY293Ml9nZXRfc3Vi
-Y2x1c3Rlcl90eXBlKCkNCj4gICAgcWNvdzI6IEhhbmRsZSBRQ09XMl9DTFVTVEVSX1VOQUxMT0NB
-VEVEX1NVQkNMVVNURVINCj4gICAgcWNvdzI6IEFkZCBzdWJjbHVzdGVyIHN1cHBvcnQgdG8gY2Fs
-Y3VsYXRlX2wyX21ldGEoKQ0KPiAgICBxY293MjogQWRkIHN1YmNsdXN0ZXIgc3VwcG9ydCB0byBx
-Y293Ml9nZXRfY2x1c3Rlcl9vZmZzZXQoKQ0KPiAgICBxY293MjogQWRkIHN1YmNsdXN0ZXIgc3Vw
-cG9ydCB0byB6ZXJvX2luX2wyX3NsaWNlKCkNCj4gICAgcWNvdzI6IEFkZCBzdWJjbHVzdGVyIHN1
-cHBvcnQgdG8gZGlzY2FyZF9pbl9sMl9zbGljZSgpDQo+ICAgIHFjb3cyOiBBZGQgc3ViY2x1c3Rl
-ciBzdXBwb3J0IHRvIGNoZWNrX3JlZmNvdW50c19sMigpDQo+ICAgIHFjb3cyOiBBZGQgc3ViY2x1
-c3RlciBzdXBwb3J0IHRvIGV4cGFuZF96ZXJvX2NsdXN0ZXJzX2luX2wxKCkNCj4gICAgcWNvdzI6
-IEZpeCBvZmZzZXQgY2FsY3VsYXRpb24gaW4gaGFuZGxlX2RlcGVuZGVuY2llcygpDQo+ICAgIHFj
-b3cyOiBVcGRhdGUgTDIgYml0bWFwIGluIHFjb3cyX2FsbG9jX2NsdXN0ZXJfbGlua19sMigpDQo+
-ICAgIHFjb3cyOiBBZGQgc3ViY2x1c3RlciBzdXBwb3J0IHRvIGhhbmRsZV9hbGxvY19zcGFjZSgp
-DQo+ICAgIHFjb3cyOiBSZXN0cmljdCBxY293Ml9jb19wd3JpdGVfemVyb2VzKCkgdG8gZnVsbCBj
-bHVzdGVycyBvbmx5DQo+ICAgIHFjb3cyOiBBZGQgdGhlICdleHRlbmRlZF9sMicgb3B0aW9uIGFu
-ZCB0aGUgUUNPVzJfSU5DT01QQVRfRVhUTDIgYml0DQo+IA0KPiAgIGJsb2NrL3Fjb3cyLWNsdXN0
-ZXIuYyAgICAgICAgICAgIHwgNTQ3ICsrKysrKysrKysrKysrKysrKysrLS0tLS0tLS0tLS0NCj4g
-ICBibG9jay9xY293Mi1yZWZjb3VudC5jICAgICAgICAgICB8ICAzOCArKy0NCj4gICBibG9jay9x
-Y293Mi5jICAgICAgICAgICAgICAgICAgICB8ICA4MyArKysrLQ0KPiAgIGJsb2NrL3Fjb3cyLmgg
-ICAgICAgICAgICAgICAgICAgIHwgMTIxICsrKysrKy0NCj4gICBkb2NzL2ludGVyb3AvcWNvdzIu
-dHh0ICAgICAgICAgICB8ICA2OCArKystDQo+ICAgZG9jcy9xY293Mi1jYWNoZS50eHQgICAgICAg
-ICAgICAgfCAgMTkgKy0NCj4gICBpbmNsdWRlL2Jsb2NrL2Jsb2NrX2ludC5oICAgICAgICB8ICAg
-MSArDQo+ICAgcWFwaS9ibG9jay1jb3JlLmpzb24gICAgICAgICAgICAgfCAgIDIgKw0KPiAgIHRl
-c3RzL3FlbXUtaW90ZXN0cy8wMzEub3V0ICAgICAgIHwgICA4ICstDQo+ICAgdGVzdHMvcWVtdS1p
-b3Rlc3RzLzAzNi5vdXQgICAgICAgfCAgIDQgKy0NCj4gICB0ZXN0cy9xZW11LWlvdGVzdHMvMDQ5
-Lm91dCAgICAgICB8IDEwMiArKystLS0NCj4gICB0ZXN0cy9xZW11LWlvdGVzdHMvMDYwLm91dCAg
-ICAgICB8ICAgMSArDQo+ICAgdGVzdHMvcWVtdS1pb3Rlc3RzLzA2MS5vdXQgICAgICAgfCAgMjAg
-Ky0NCj4gICB0ZXN0cy9xZW11LWlvdGVzdHMvMDY1ICAgICAgICAgICB8ICAxOCArLQ0KPiAgIHRl
-c3RzL3FlbXUtaW90ZXN0cy8wODIub3V0ICAgICAgIHwgIDQ4ICsrLQ0KPiAgIHRlc3RzL3FlbXUt
-aW90ZXN0cy8wODUub3V0ICAgICAgIHwgIDM4ICstLQ0KPiAgIHRlc3RzL3FlbXUtaW90ZXN0cy8x
-NDQub3V0ICAgICAgIHwgICA0ICstDQo+ICAgdGVzdHMvcWVtdS1pb3Rlc3RzLzE4Mi5vdXQgICAg
-ICAgfCAgIDIgKy0NCj4gICB0ZXN0cy9xZW11LWlvdGVzdHMvMTg1Lm91dCAgICAgICB8ICAgOCAr
-LQ0KPiAgIHRlc3RzL3FlbXUtaW90ZXN0cy8xOTgub3V0ICAgICAgIHwgICAyICsNCj4gICB0ZXN0
-cy9xZW11LWlvdGVzdHMvMjA2Lm91dCAgICAgICB8ICAgNCArDQo+ICAgdGVzdHMvcWVtdS1pb3Rl
-c3RzLzI0Mi5vdXQgICAgICAgfCAgIDUgKw0KPiAgIHRlc3RzL3FlbXUtaW90ZXN0cy8yNTUub3V0
-ICAgICAgIHwgICA4ICstDQo+ICAgdGVzdHMvcWVtdS1pb3Rlc3RzL2NvbW1vbi5maWx0ZXIgfCAg
-IDEgKw0KPiAgIDI0IGZpbGVzIGNoYW5nZWQsIDgxNyBpbnNlcnRpb25zKCspLCAzMzUgZGVsZXRp
-b25zKC0pDQo+IA0KDQoNCi0tIA0KQmVzdCByZWdhcmRzLA0KVmxhZGltaXINCg==
+From: Aleksandar Markovic <amarkovic@wavecomp.com>
+
+Mostly fix errors and warnings reported by 'checkpatch.pl -f'.
+
+Cc: Markus Armbruster <armbru@redhat.com>
+Reviewed-by: Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>
+Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+---
+ target/mips/helper.c | 123 +++++++++++++++++++++++++++++++--------------------
+ 1 file changed, 74 insertions(+), 49 deletions(-)
+
+diff --git a/target/mips/helper.c b/target/mips/helper.c
+index a2b6459..781930a 100644
+--- a/target/mips/helper.c
++++ b/target/mips/helper.c
+@@ -39,8 +39,8 @@ enum {
+ #if !defined(CONFIG_USER_ONLY)
+ 
+ /* no MMU emulation */
+-int no_mmu_map_address (CPUMIPSState *env, hwaddr *physical, int *prot,
+-                        target_ulong address, int rw, int access_type)
++int no_mmu_map_address(CPUMIPSState *env, hwaddr *physical, int *prot,
++                       target_ulong address, int rw, int access_type)
+ {
+     *physical = address;
+     *prot = PAGE_READ | PAGE_WRITE | PAGE_EXEC;
+@@ -48,26 +48,28 @@ int no_mmu_map_address (CPUMIPSState *env, hwaddr *physical, int *prot,
+ }
+ 
+ /* fixed mapping MMU emulation */
+-int fixed_mmu_map_address (CPUMIPSState *env, hwaddr *physical, int *prot,
+-                           target_ulong address, int rw, int access_type)
++int fixed_mmu_map_address(CPUMIPSState *env, hwaddr *physical, int *prot,
++                          target_ulong address, int rw, int access_type)
+ {
+     if (address <= (int32_t)0x7FFFFFFFUL) {
+-        if (!(env->CP0_Status & (1 << CP0St_ERL)))
++        if (!(env->CP0_Status & (1 << CP0St_ERL))) {
+             *physical = address + 0x40000000UL;
+-        else
++        } else {
+             *physical = address;
+-    } else if (address <= (int32_t)0xBFFFFFFFUL)
++        }
++    } else if (address <= (int32_t)0xBFFFFFFFUL) {
+         *physical = address & 0x1FFFFFFF;
+-    else
++    } else {
+         *physical = address;
++    }
+ 
+     *prot = PAGE_READ | PAGE_WRITE | PAGE_EXEC;
+     return TLBRET_MATCH;
+ }
+ 
+ /* MIPS32/MIPS64 R4000-style MMU emulation */
+-int r4k_map_address (CPUMIPSState *env, hwaddr *physical, int *prot,
+-                     target_ulong address, int rw, int access_type)
++int r4k_map_address(CPUMIPSState *env, hwaddr *physical, int *prot,
++                    target_ulong address, int rw, int access_type)
+ {
+     uint16_t ASID = env->CP0_EntryHi & env->CP0_EntryHi_ASID_mask;
+     int i;
+@@ -99,8 +101,9 @@ int r4k_map_address (CPUMIPSState *env, hwaddr *physical, int *prot,
+             if (rw != MMU_DATA_STORE || (n ? tlb->D1 : tlb->D0)) {
+                 *physical = tlb->PFN[n] | (address & (mask >> 1));
+                 *prot = PAGE_READ;
+-                if (n ? tlb->D1 : tlb->D0)
++                if (n ? tlb->D1 : tlb->D0) {
+                     *prot |= PAGE_WRITE;
++                }
+                 if (!(n ? tlb->XI1 : tlb->XI0)) {
+                     *prot |= PAGE_EXEC;
+                 }
+@@ -130,7 +133,7 @@ static int is_seg_am_mapped(unsigned int am, bool eu, int mmu_idx)
+     int32_t adetlb_mask;
+ 
+     switch (mmu_idx) {
+-    case 3 /* ERL */:
++    case 3: /* ERL */
+         /* If EU is set, always unmapped */
+         if (eu) {
+             return 0;
+@@ -204,7 +207,7 @@ static int get_segctl_physical_address(CPUMIPSState *env, hwaddr *physical,
+                                     pa & ~(hwaddr)segmask);
+ }
+ 
+-static int get_physical_address (CPUMIPSState *env, hwaddr *physical,
++static int get_physical_address(CPUMIPSState *env, hwaddr *physical,
+                                 int *prot, target_ulong real_address,
+                                 int rw, int access_type, int mmu_idx)
+ {
+@@ -252,14 +255,15 @@ static int get_physical_address (CPUMIPSState *env, hwaddr *physical,
+         } else {
+             segctl = env->CP0_SegCtl2 >> 16;
+         }
+-        ret = get_segctl_physical_address(env, physical, prot, real_address, rw,
+-                                          access_type, mmu_idx, segctl,
+-                                          0x3FFFFFFF);
++        ret = get_segctl_physical_address(env, physical, prot,
++                                          real_address, rw, access_type,
++                                          mmu_idx, segctl, 0x3FFFFFFF);
+ #if defined(TARGET_MIPS64)
+     } else if (address < 0x4000000000000000ULL) {
+         /* xuseg */
+         if (UX && address <= (0x3FFFFFFFFFFFFFFFULL & env->SEGMask)) {
+-            ret = env->tlb->map_address(env, physical, prot, real_address, rw, access_type);
++            ret = env->tlb->map_address(env, physical, prot,
++                                        real_address, rw, access_type);
+         } else {
+             ret = TLBRET_BADADDR;
+         }
+@@ -267,7 +271,8 @@ static int get_physical_address (CPUMIPSState *env, hwaddr *physical,
+         /* xsseg */
+         if ((supervisor_mode || kernel_mode) &&
+             SX && address <= (0x7FFFFFFFFFFFFFFFULL & env->SEGMask)) {
+-            ret = env->tlb->map_address(env, physical, prot, real_address, rw, access_type);
++            ret = env->tlb->map_address(env, physical, prot,
++                                        real_address, rw, access_type);
+         } else {
+             ret = TLBRET_BADADDR;
+         }
+@@ -307,7 +312,8 @@ static int get_physical_address (CPUMIPSState *env, hwaddr *physical,
+         /* xkseg */
+         if (kernel_mode && KX &&
+             address <= (0xFFFFFFFF7FFFFFFFULL & env->SEGMask)) {
+-            ret = env->tlb->map_address(env, physical, prot, real_address, rw, access_type);
++            ret = env->tlb->map_address(env, physical, prot,
++                                        real_address, rw, access_type);
+         } else {
+             ret = TLBRET_BADADDR;
+         }
+@@ -328,8 +334,10 @@ static int get_physical_address (CPUMIPSState *env, hwaddr *physical,
+                                           access_type, mmu_idx,
+                                           env->CP0_SegCtl0 >> 16, 0x1FFFFFFF);
+     } else {
+-        /* kseg3 */
+-        /* XXX: debug segment is not emulated */
++        /*
++         * kseg3
++         * XXX: debug segment is not emulated
++         */
+         ret = get_segctl_physical_address(env, physical, prot, real_address, rw,
+                                           access_type, mmu_idx,
+                                           env->CP0_SegCtl0, 0x1FFFFFFF);
+@@ -515,9 +523,9 @@ static void raise_mmu_exception(CPUMIPSState *env, target_ulong address,
+ #if defined(TARGET_MIPS64)
+     env->CP0_EntryHi &= env->SEGMask;
+     env->CP0_XContext =
+-        /* PTEBase */   (env->CP0_XContext & ((~0ULL) << (env->SEGBITS - 7))) |
+-        /* R */         (extract64(address, 62, 2) << (env->SEGBITS - 9)) |
+-        /* BadVPN2 */   (extract64(address, 13, env->SEGBITS - 13) << 4);
++        (env->CP0_XContext & ((~0ULL) << (env->SEGBITS - 7))) | /* PTEBase */
++        (extract64(address, 62, 2) << (env->SEGBITS - 9)) |     /* R       */
++        (extract64(address, 13, env->SEGBITS - 13) << 4);       /* BadVPN2 */
+ #endif
+     cs->exception_index = exception;
+     env->error_code = error_code;
+@@ -945,7 +953,8 @@ bool mips_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
+ }
+ 
+ #ifndef CONFIG_USER_ONLY
+-hwaddr cpu_mips_translate_address(CPUMIPSState *env, target_ulong address, int rw)
++hwaddr cpu_mips_translate_address(CPUMIPSState *env, target_ulong address,
++                                  int rw)
+ {
+     hwaddr physical;
+     int prot;
+@@ -1005,7 +1014,7 @@ static const char * const excp_names[EXCP_LAST + 1] = {
+ };
+ #endif
+ 
+-target_ulong exception_resume_pc (CPUMIPSState *env)
++target_ulong exception_resume_pc(CPUMIPSState *env)
+ {
+     target_ulong bad_pc;
+     target_ulong isa_mode;
+@@ -1013,8 +1022,10 @@ target_ulong exception_resume_pc (CPUMIPSState *env)
+     isa_mode = !!(env->hflags & MIPS_HFLAG_M16);
+     bad_pc = env->active_tc.PC | isa_mode;
+     if (env->hflags & MIPS_HFLAG_BMASK) {
+-        /* If the exception was raised from a delay slot, come back to
+-           the jump.  */
++        /*
++         * If the exception was raised from a delay slot, come back to
++         * the jump.
++         */
+         bad_pc -= (env->hflags & MIPS_HFLAG_B16 ? 2 : 4);
+     }
+ 
+@@ -1022,14 +1033,14 @@ target_ulong exception_resume_pc (CPUMIPSState *env)
+ }
+ 
+ #if !defined(CONFIG_USER_ONLY)
+-static void set_hflags_for_handler (CPUMIPSState *env)
++static void set_hflags_for_handler(CPUMIPSState *env)
+ {
+     /* Exception handlers are entered in 32-bit mode.  */
+     env->hflags &= ~(MIPS_HFLAG_M16);
+     /* ...except that microMIPS lets you choose.  */
+     if (env->insn_flags & ASE_MICROMIPS) {
+-        env->hflags |= (!!(env->CP0_Config3
+-                           & (1 << CP0C3_ISA_ON_EXC))
++        env->hflags |= (!!(env->CP0_Config3 &
++                           (1 << CP0C3_ISA_ON_EXC))
+                         << MIPS_HFLAG_M16_SHIFT);
+     }
+ }
+@@ -1096,10 +1107,12 @@ void mips_cpu_do_interrupt(CPUState *cs)
+     switch (cs->exception_index) {
+     case EXCP_DSS:
+         env->CP0_Debug |= 1 << CP0DB_DSS;
+-        /* Debug single step cannot be raised inside a delay slot and
+-           resume will always occur on the next instruction
+-           (but we assume the pc has always been updated during
+-           code translation). */
++        /*
++         * Debug single step cannot be raised inside a delay slot and
++         * resume will always occur on the next instruction
++         * (but we assume the pc has always been updated during
++         * code translation).
++         */
+         env->CP0_DEPC = env->active_tc.PC | !!(env->hflags & MIPS_HFLAG_M16);
+         goto enter_debug_mode;
+     case EXCP_DINT:
+@@ -1111,7 +1124,8 @@ void mips_cpu_do_interrupt(CPUState *cs)
+     case EXCP_DBp:
+         env->CP0_Debug |= 1 << CP0DB_DBp;
+         /* Setup DExcCode - SDBBP instruction */
+-        env->CP0_Debug = (env->CP0_Debug & ~(0x1fULL << CP0DB_DEC)) | 9 << CP0DB_DEC;
++        env->CP0_Debug = (env->CP0_Debug & ~(0x1fULL << CP0DB_DEC)) |
++                         (9 << CP0DB_DEC);
+         goto set_DEPC;
+     case EXCP_DDBS:
+         env->CP0_Debug |= 1 << CP0DB_DDBS;
+@@ -1132,8 +1146,9 @@ void mips_cpu_do_interrupt(CPUState *cs)
+         env->hflags |= MIPS_HFLAG_DM | MIPS_HFLAG_CP0;
+         env->hflags &= ~(MIPS_HFLAG_KSU);
+         /* EJTAG probe trap enable is not implemented... */
+-        if (!(env->CP0_Status & (1 << CP0St_EXL)))
++        if (!(env->CP0_Status & (1 << CP0St_EXL))) {
+             env->CP0_Cause &= ~(1U << CP0Ca_BD);
++        }
+         env->active_tc.PC = env->exception_base + 0x480;
+         set_hflags_for_handler(env);
+         break;
+@@ -1159,8 +1174,9 @@ void mips_cpu_do_interrupt(CPUState *cs)
+         }
+         env->hflags |= MIPS_HFLAG_CP0;
+         env->hflags &= ~(MIPS_HFLAG_KSU);
+-        if (!(env->CP0_Status & (1 << CP0St_EXL)))
++        if (!(env->CP0_Status & (1 << CP0St_EXL))) {
+             env->CP0_Cause &= ~(1U << CP0Ca_BD);
++        }
+         env->active_tc.PC = env->exception_base;
+         set_hflags_for_handler(env);
+         break;
+@@ -1176,12 +1192,16 @@ void mips_cpu_do_interrupt(CPUState *cs)
+                 uint32_t pending = (env->CP0_Cause & CP0Ca_IP_mask) >> CP0Ca_IP;
+ 
+                 if (env->CP0_Config3 & (1 << CP0C3_VEIC)) {
+-                    /* For VEIC mode, the external interrupt controller feeds
+-                     * the vector through the CP0Cause IP lines.  */
++                    /*
++                     * For VEIC mode, the external interrupt controller feeds
++                     * the vector through the CP0Cause IP lines.
++                     */
+                     vector = pending;
+                 } else {
+-                    /* Vectored Interrupts
+-                     * Mask with Status.IM7-IM0 to get enabled interrupts. */
++                    /*
++                     * Vectored Interrupts
++                     * Mask with Status.IM7-IM0 to get enabled interrupts.
++                     */
+                     pending &= (env->CP0_Status >> CP0St_IM) & 0xff;
+                     /* Find the highest-priority interrupt. */
+                     while (pending >>= 1) {
+@@ -1354,7 +1374,8 @@ void mips_cpu_do_interrupt(CPUState *cs)
+ 
+         env->active_tc.PC += offset;
+         set_hflags_for_handler(env);
+-        env->CP0_Cause = (env->CP0_Cause & ~(0x1f << CP0Ca_EC)) | (cause << CP0Ca_EC);
++        env->CP0_Cause = (env->CP0_Cause & ~(0x1f << CP0Ca_EC)) |
++                         (cause << CP0Ca_EC);
+         break;
+     default:
+         abort();
+@@ -1390,7 +1411,7 @@ bool mips_cpu_exec_interrupt(CPUState *cs, int interrupt_request)
+ }
+ 
+ #if !defined(CONFIG_USER_ONLY)
+-void r4k_invalidate_tlb (CPUMIPSState *env, int idx, int use_extra)
++void r4k_invalidate_tlb(CPUMIPSState *env, int idx, int use_extra)
+ {
+     CPUState *cs = env_cpu(env);
+     r4k_tlb_t *tlb;
+@@ -1400,16 +1421,20 @@ void r4k_invalidate_tlb (CPUMIPSState *env, int idx, int use_extra)
+     target_ulong mask;
+ 
+     tlb = &env->tlb->mmu.r4k.tlb[idx];
+-    /* The qemu TLB is flushed when the ASID changes, so no need to
+-       flush these entries again.  */
++    /*
++     * The qemu TLB is flushed when the ASID changes, so no need to
++     * flush these entries again.
++     */
+     if (tlb->G == 0 && tlb->ASID != ASID) {
+         return;
+     }
+ 
+     if (use_extra && env->tlb->tlb_in_use < MIPS_TLB_MAX) {
+-        /* For tlbwr, we can shadow the discarded entry into
+-           a new (fake) TLB entry, as long as the guest can not
+-           tell that it's there.  */
++        /*
++         * For tlbwr, we can shadow the discarded entry into
++         * a new (fake) TLB entry, as long as the guest can not
++         * tell that it's there.
++         */
+         env->tlb->mmu.r4k.tlb[env->tlb->tlb_in_use] = *tlb;
+         env->tlb->tlb_in_use++;
+         return;
+-- 
+2.7.4
+
 
