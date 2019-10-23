@@ -2,66 +2,65 @@ Return-Path: <SRS0=brme=YQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B3813CA9EB6
-	for <qemu-devel@archiver.kernel.org>; Wed, 23 Oct 2019 16:03:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F3B9ACA9EB6
+	for <qemu-devel@archiver.kernel.org>; Wed, 23 Oct 2019 16:05:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 77425205C9
-	for <qemu-devel@archiver.kernel.org>; Wed, 23 Oct 2019 16:03:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B95EF205C9
+	for <qemu-devel@archiver.kernel.org>; Wed, 23 Oct 2019 16:05:23 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="b/hQkbsi"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 77425205C9
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="c/BQAham"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B95EF205C9
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40460 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40474 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iNJ6u-0004N6-LV
-	for qemu-devel@archiver.kernel.org; Wed, 23 Oct 2019 12:03:46 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41912)
+	id 1iNJ8U-0005fa-Ox
+	for qemu-devel@archiver.kernel.org; Wed, 23 Oct 2019 12:05:22 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38716)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jsnow@redhat.com>) id 1iNIll-0001Ic-DU
- for qemu-devel@nongnu.org; Wed, 23 Oct 2019 11:41:54 -0400
+ (envelope-from <jsnow@redhat.com>) id 1iNIRE-0006sx-8Z
+ for qemu-devel@nongnu.org; Wed, 23 Oct 2019 11:20:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1iNIlk-0003oJ-8A
- for qemu-devel@nongnu.org; Wed, 23 Oct 2019 11:41:53 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:49368
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <jsnow@redhat.com>) id 1iNIRC-0006Oq-WC
+ for qemu-devel@nongnu.org; Wed, 23 Oct 2019 11:20:40 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:37255
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1iNIlk-0003nO-45
- for qemu-devel@nongnu.org; Wed, 23 Oct 2019 11:41:52 -0400
+ (Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1iNIRC-0006OJ-T8
+ for qemu-devel@nongnu.org; Wed, 23 Oct 2019 11:20:38 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1571845311;
+ s=mimecast20190719; t=1571844038;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=wA1k1XNTKvF/Im9rALDh0EAwxE5v2hw75LyMlzomFE8=;
- b=b/hQkbsi8OuYsdD80BjPIAsqgFQxbIIYIrPjBk3bJve7GQMiDgW9DyRCjyjR+A9t7b1Mfp
- B4V+xhEnkfNUCiFcc+crqUU9XZ/Wb4GGJbHXk06C9gj8Op1ebJBPgzpUujciX+l+yhilZs
- bVMXQvxcbywOB7RbCPzE9NbPCxt1Uuw=
+ bh=WqrJvDgTQx8z6WuQxTAFpiMtB3Nt2Aa01vcVeZxjbUI=;
+ b=c/BQAhamEK+lwrWpTNhjnaClXBHVwHv4ZrOhogorOn7x9kXmXQG3z5aJ3aRH5++pmlWji3
+ iuvTAd/wyOe+XVcT57Ta9Hk9I13uFUhpaRmGp/rv+2XPGvsPtXFY1lgBRLOSKT2ogaQkPl
+ 2ooCjPZn/cuJMVyKhgX/4qblwpvISXA=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-252-P7A7cg7IMPWi5QcrwpTd_Q-1; Wed, 23 Oct 2019 11:41:48 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
+ us-mta-369-uDeFkxpvM9iwT4UtCkwAWA-1; Wed, 23 Oct 2019 11:20:34 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 477681800D6B;
- Wed, 23 Oct 2019 15:41:47 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DBD49835BD2;
+ Wed, 23 Oct 2019 15:20:33 +0000 (UTC)
 Received: from [10.10.121.110] (ovpn-121-110.rdu2.redhat.com [10.10.121.110])
- by smtp.corp.redhat.com (Postfix) with ESMTP id C3926608C0;
- Wed, 23 Oct 2019 15:41:41 +0000 (UTC)
-Subject: Re: [PATCH] image-fuzzer: Use OSerror.strerror instead of tuple
- subscript
-To: Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org
-References: <20191021214117.18091-1-ehabkost@redhat.com>
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 6AE135D70E;
+ Wed, 23 Oct 2019 15:20:33 +0000 (UTC)
+Subject: Re: [PATCH v2] qemu-img.texi: Describe data_file and data_file_raw
+To: Han Han <hhan@redhat.com>, qemu-devel@nongnu.org
+References: <20191021011421.24748-1-hhan@redhat.com>
 From: John Snow <jsnow@redhat.com>
 Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
  mQINBFTKefwBEAChvwqYC6saTzawbih87LqBYq0d5A8jXYXaiFMV/EvMSDqqY4EY6whXliNO
@@ -137,21 +136,21 @@ Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
  i0HjnLoJP5jDcoMTabZTIazXmJz3pKM11HYJ5/ZsTIf3ZRJJKIvXJpbmcAPVwTZII6XxiJdh
  RSSX4Mvd5pL/+5WI6NTdW6DMfigTtdd85fe6PwBNVJL2ZvBfsBJZ5rxg1TOH3KLsYBqBTgW2
  glQofxhkJhDEcvjLhe3Y2BlbCWKOmvM8XS9TRt0OwUs=
-Message-ID: <a91f4a69-c219-cf82-bd2a-f368cf4778f0@redhat.com>
-Date: Wed, 23 Oct 2019 11:41:41 -0400
+Message-ID: <be95fef4-4377-ff56-402c-fd88fa7ad03e@redhat.com>
+Date: Wed, 23 Oct 2019 11:20:33 -0400
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.1.1
 MIME-Version: 1.0
-In-Reply-To: <20191021214117.18091-1-ehabkost@redhat.com>
+In-Reply-To: <20191021011421.24748-1-hhan@redhat.com>
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-MC-Unique: P7A7cg7IMPWi5QcrwpTd_Q-1
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-MC-Unique: uDeFkxpvM9iwT4UtCkwAWA-1
 X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=WINDOWS-1252
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.61
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -163,55 +162,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- qemu-block@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>
+Cc: qemu-block@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
 
-On 10/21/19 5:41 PM, Eduardo Habkost wrote:
-> OSError can't be used like a tuple on Python 3, so change the
-> code to use `e.sterror` instead of `e[1]`.
+On 10/20/19 9:14 PM, Han Han wrote:
+> https://bugzilla.redhat.com/show_bug.cgi?id=3D1763105
 >=20
-> Reported-by: John Snow <jsnow@redhat.com>
-> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+> Signed-off-by: Han Han <hhan@redhat.com>
+> ---
+>  qemu-img.texi | 10 ++++++++++
+>  1 file changed, 10 insertions(+)
+>=20
+> diff --git a/qemu-img.texi b/qemu-img.texi
+> index b5156d6316..983c6122f8 100644
+> --- a/qemu-img.texi
+> +++ b/qemu-img.texi
+> @@ -763,6 +763,16 @@ file which is COW and has data blocks already, it co=
+uldn't be changed to NOCOW
+>  by setting @code{nocow=3Don}. One can issue @code{lsattr filename} to ch=
+eck if
+>  the NOCOW flag is set or not (Capital 'C' is NOCOW flag).
+> =20
+> +@item data_file
+> +File name of data file that is stored in the image and used as a default=
+ for
+> +opening the image. If the option is used, qcow2 file only stores the met=
+adata
+> +for the image.
+> +
+> +@item data_file_raw
+> +This option requires @option{data_file}. If this option is set to @code{=
+on},
+> +qemu will always keep the external data file consistent as a standalone
+> +read-only raw image. Default value is @code{off}.
+> +
+>  @end table
+> =20
+>  @item Other
+>=20
 
 Reviewed-by: John Snow <jsnow@redhat.com>
-
-> ---
->  tests/image-fuzzer/runner.py | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
->=20
-> diff --git a/tests/image-fuzzer/runner.py b/tests/image-fuzzer/runner.py
-> index 95d84f38f3..1eb2138f94 100755
-> --- a/tests/image-fuzzer/runner.py
-> +++ b/tests/image-fuzzer/runner.py
-> @@ -159,7 +159,7 @@ class TestEnv(object):
->              os.makedirs(self.current_dir)
->          except OSError as e:
->              print("Error: The working directory '%s' cannot be used. Rea=
-son: %s"\
-> -                % (self.work_dir, e[1]), file=3Dsys.stderr)
-> +                % (self.work_dir, e.strerror), file=3Dsys.stderr)
->              raise TestException
->          self.log =3D open(os.path.join(self.current_dir, "test.log"), "w=
-")
->          self.parent_log =3D open(run_log, "a")
-> @@ -246,7 +246,7 @@ class TestEnv(object):
->              except OSError as e:
->                  multilog("%sError: Start of '%s' failed. Reason: %s\n\n"
->                           % (test_summary, os.path.basename(current_cmd[0=
-]),
-> -                            e[1]),
-> +                            e.strerror),
->                           sys.stderr, self.log, self.parent_log)
->                  raise TestException
-> =20
->=20
-
---=20
-=E2=80=94js
 
 
