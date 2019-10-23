@@ -4,71 +4,70 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 160B5CA9EB9
-	for <qemu-devel@archiver.kernel.org>; Wed, 23 Oct 2019 18:59:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DEB30CA9EB9
+	for <qemu-devel@archiver.kernel.org>; Wed, 23 Oct 2019 19:01:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D32D12084C
-	for <qemu-devel@archiver.kernel.org>; Wed, 23 Oct 2019 18:59:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A9D6E21872
+	for <qemu-devel@archiver.kernel.org>; Wed, 23 Oct 2019 19:01:55 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Kp5cFQ+8"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D32D12084C
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NucpxCK+"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A9D6E21872
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44120 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44228 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iNLqe-0008Ar-HF
-	for qemu-devel@archiver.kernel.org; Wed, 23 Oct 2019 14:59:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60265)
+	id 1iNLtJ-0001S2-V6
+	for qemu-devel@archiver.kernel.org; Wed, 23 Oct 2019 15:01:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58883)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <marcandre.lureau@redhat.com>) id 1iNKYK-0006W7-23
- for qemu-devel@nongnu.org; Wed, 23 Oct 2019 13:36:09 -0400
+ (envelope-from <marcandre.lureau@redhat.com>) id 1iNKVL-0003bm-Lh
+ for qemu-devel@nongnu.org; Wed, 23 Oct 2019 13:33:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <marcandre.lureau@redhat.com>) id 1iNKYE-0002yz-3w
- for qemu-devel@nongnu.org; Wed, 23 Oct 2019 13:36:05 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:46701
+ (envelope-from <marcandre.lureau@redhat.com>) id 1iNKVK-0001ek-Jq
+ for qemu-devel@nongnu.org; Wed, 23 Oct 2019 13:33:03 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:49409
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
- id 1iNKY8-0002wm-D6
- for qemu-devel@nongnu.org; Wed, 23 Oct 2019 13:35:58 -0400
+ id 1iNKVI-0001eC-I1
+ for qemu-devel@nongnu.org; Wed, 23 Oct 2019 13:33:01 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1571852153;
+ s=mimecast20190719; t=1571851980;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=UfiNxxYjH3sYEO1mfbxHgayQzvy7QgMJpTON/ahYwLE=;
- b=Kp5cFQ+8UdaWQFq4Hark5xFVRSuvIaEGfU35C8XBs28O+xrrYSvdKk0UMKMFju7RznBNeK
- zr/zjaXrk9LHQK6MP4D7tmhSWr8D6YMM63+FkkLLrQrZ8JNkf8fue9clYrrSOIW6HUlc8m
- OE8tIaXP3py9emBaQ3FkpogTKDq+F3Q=
+ bh=6RTteADGfpM4YBMydoONN1yiclwUwAxdyyctis1vQqE=;
+ b=NucpxCK+ZXrJypjzDWQ5M7Wzpka81imEnNipuWG5ffIc/FQt4R5RLFobN2HOUIh0SpbBmt
+ IYUsL4YQDsQjC0mTbZquLFhzzv14PbDovxIYbWfEd36NSO//UPLNW1hwQLPfMpKG84ez8W
+ cBAOFvKqaeJi7NNkVyMeLLqbm/RgV5A=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-274-CBcB3M0VN4G3EIEOra0ZtQ-1; Wed, 23 Oct 2019 13:35:50 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+ us-mta-204-Dna11Fl4OdaSv9tgO5c6Iw-1; Wed, 23 Oct 2019 13:32:55 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E200F1800E01;
- Wed, 23 Oct 2019 17:35:47 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 31F031800E01;
+ Wed, 23 Oct 2019 17:32:53 +0000 (UTC)
 Received: from localhost (ovpn-112-21.ams2.redhat.com [10.36.112.21])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 47FD2196B2;
- Wed, 23 Oct 2019 17:35:42 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 4956D6CE40;
+ Wed, 23 Oct 2019 17:32:41 +0000 (UTC)
 From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v3 33/33] qdev: remove QDEV_PROP_PTR
-Date: Wed, 23 Oct 2019 19:31:54 +0200
-Message-Id: <20191023173154.30051-34-marcandre.lureau@redhat.com>
+Subject: [PATCH v3 03/33] sysbus: remove outdated comment
+Date: Wed, 23 Oct 2019 19:31:24 +0200
+Message-Id: <20191023173154.30051-4-marcandre.lureau@redhat.com>
 In-Reply-To: <20191023173154.30051-1-marcandre.lureau@redhat.com>
 References: <20191023173154.30051-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-MC-Unique: CBcB3M0VN4G3EIEOra0ZtQ-1
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-MC-Unique: Dna11Fl4OdaSv9tgO5c6Iw-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
@@ -106,101 +105,31 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-No longer used in the tree. The comment about user_creatable is still
-quite relevant, but there is already a similar comment in qdev-core.h.
+The init callback is no more since commit
+817a17fc60f44e29a1944b60d32f45ea127f0cf9 ("core/sysbus: remove the
+SysBusDeviceClass::init path")
 
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 ---
- hw/core/qdev-properties.c    | 18 ------------------
- include/hw/qdev-properties.h | 22 ----------------------
- 2 files changed, 40 deletions(-)
+ include/hw/sysbus.h | 4 ----
+ 1 file changed, 4 deletions(-)
 
-diff --git a/hw/core/qdev-properties.c b/hw/core/qdev-properties.c
-index be4cb01f0b..6271169d7d 100644
---- a/hw/core/qdev-properties.c
-+++ b/hw/core/qdev-properties.c
-@@ -469,13 +469,6 @@ const PropertyInfo qdev_prop_string =3D {
-     .set   =3D set_string,
- };
+diff --git a/include/hw/sysbus.h b/include/hw/sysbus.h
+index 2eb0484388..c4a1c0adfa 100644
+--- a/include/hw/sysbus.h
++++ b/include/hw/sysbus.h
+@@ -24,10 +24,6 @@ typedef struct SysBusDevice SysBusDevice;
 =20
--/* --- pointer --- */
--
--/* Not a proper property, just for dirty hacks.  TODO Remove it!  */
--const PropertyInfo qdev_prop_ptr =3D {
--    .name  =3D "ptr",
--};
--
- /* --- mac address --- */
-=20
- /*
-@@ -1133,17 +1126,6 @@ void qdev_prop_set_enum(DeviceState *dev, const char=
- *name, int value)
-                             name, &error_abort);
- }
-=20
--void qdev_prop_set_ptr(DeviceState *dev, const char *name, void *value)
--{
--    Property *prop;
--    void **ptr;
--
--    prop =3D qdev_prop_find(dev, name);
--    assert(prop && prop->info =3D=3D &qdev_prop_ptr);
--    ptr =3D qdev_get_prop_ptr(dev, prop);
--    *ptr =3D value;
--}
--
- static GPtrArray *global_props(void)
- {
-     static GPtrArray *gp;
-diff --git a/include/hw/qdev-properties.h b/include/hw/qdev-properties.h
-index 5bba033b7b..a708c3870b 100644
---- a/include/hw/qdev-properties.h
-+++ b/include/hw/qdev-properties.h
-@@ -17,7 +17,6 @@ extern const PropertyInfo qdev_prop_size;
- extern const PropertyInfo qdev_prop_string;
- extern const PropertyInfo qdev_prop_chr;
- extern const PropertyInfo qdev_prop_tpm;
--extern const PropertyInfo qdev_prop_ptr;
- extern const PropertyInfo qdev_prop_macaddr;
- extern const PropertyInfo qdev_prop_on_off_auto;
- extern const PropertyInfo qdev_prop_losttickpolicy;
-@@ -168,25 +167,6 @@ extern const PropertyInfo qdev_prop_pcie_link_width;
- #define DEFINE_PROP_PCI_DEVFN(_n, _s, _f, _d)                   \
-     DEFINE_PROP_SIGNED(_n, _s, _f, _d, qdev_prop_pci_devfn, int32_t)
-=20
--/*
-- * Please avoid pointer properties.  If you must use them, you must
-- * cover them in their device's class init function as follows:
-- *
-- * - If the property must be set, the device cannot be used with
-- *   device_add, so add code like this:
-- *   |* Reason: pointer property "NAME-OF-YOUR-PROP" *|
-- *   DeviceClass *dc =3D DEVICE_CLASS(class);
-- *   dc->user_creatable =3D false;
-- *
-- * - If the property may safely remain null, document it like this:
-- *   |*
-- *    * Note: pointer property "interrupt_vector" may remain null, thus
-- *    * no need for dc->user_creatable =3D false;
-- *    *|
-- */
--#define DEFINE_PROP_PTR(_n, _s, _f)             \
--    DEFINE_PROP(_n, _s, _f, qdev_prop_ptr, void*)
--
- #define DEFINE_PROP_CHR(_n, _s, _f)             \
-     DEFINE_PROP(_n, _s, _f, qdev_prop_chr, CharBackend)
- #define DEFINE_PROP_STRING(_n, _s, _f)             \
-@@ -259,8 +239,6 @@ void qdev_prop_set_drive(DeviceState *dev, const char *=
-name,
- void qdev_prop_set_macaddr(DeviceState *dev, const char *name,
-                            const uint8_t *value);
- void qdev_prop_set_enum(DeviceState *dev, const char *name, int value);
--/* FIXME: Remove opaque pointer properties.  */
--void qdev_prop_set_ptr(DeviceState *dev, const char *name, void *value);
-=20
- void qdev_prop_register_global(GlobalProperty *prop);
- int qdev_prop_check_globals(void);
+ /**
+  * SysBusDeviceClass:
+- * @init: Callback function invoked when the #DeviceState.realized propert=
+y
+- * is changed to %true. Deprecated, new types inheriting directly from
+- * TYPE_SYS_BUS_DEVICE should use #DeviceClass.realize instead, new leaf
+- * types should consult their respective parent type.
+  *
+  * SysBusDeviceClass is not overriding #DeviceClass.realize, so derived
+  * classes overriding it are not required to invoke its implementation.
 --=20
 2.23.0.606.g08da6496b6
 
