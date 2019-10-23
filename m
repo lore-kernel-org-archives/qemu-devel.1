@@ -2,74 +2,98 @@ Return-Path: <SRS0=brme=YQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 520E1CA9EB6
-	for <qemu-devel@archiver.kernel.org>; Wed, 23 Oct 2019 14:59:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8AD09CA9EB9
+	for <qemu-devel@archiver.kernel.org>; Wed, 23 Oct 2019 14:59:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1DD272086D
-	for <qemu-devel@archiver.kernel.org>; Wed, 23 Oct 2019 14:59:03 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1DD272086D
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 5E4082086D
+	for <qemu-devel@archiver.kernel.org>; Wed, 23 Oct 2019 14:59:34 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5E4082086D
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38514 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38522 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iNI6I-0005vx-7Z
-	for qemu-devel@archiver.kernel.org; Wed, 23 Oct 2019 10:59:02 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60974)
+	id 1iNI6m-0006QV-Qv
+	for qemu-devel@archiver.kernel.org; Wed, 23 Oct 2019 10:59:32 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:32960)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1iNHz2-0000KP-1y
- for qemu-devel@nongnu.org; Wed, 23 Oct 2019 10:51:33 -0400
+ (envelope-from <groug@kaod.org>) id 1iNHzi-0000mx-Kb
+ for qemu-devel@nongnu.org; Wed, 23 Oct 2019 10:52:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1iNHz0-0003Wa-3X
- for qemu-devel@nongnu.org; Wed, 23 Oct 2019 10:51:31 -0400
-Received: from indium.canonical.com ([91.189.90.7]:35746)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1iNHyz-0003UH-Sk
- for qemu-devel@nongnu.org; Wed, 23 Oct 2019 10:51:30 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1iNHyv-0005lA-VW
- for <qemu-devel@nongnu.org>; Wed, 23 Oct 2019 14:51:25 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id D80E92E8083
- for <qemu-devel@nongnu.org>; Wed, 23 Oct 2019 14:51:25 +0000 (UTC)
+ (envelope-from <groug@kaod.org>) id 1iNHzh-00042a-GO
+ for qemu-devel@nongnu.org; Wed, 23 Oct 2019 10:52:14 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:25014
+ helo=mx0a-001b2d01.pphosted.com)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <groug@kaod.org>) id 1iNHzh-000426-A0
+ for qemu-devel@nongnu.org; Wed, 23 Oct 2019 10:52:13 -0400
+Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+ by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
+ x9NEiowi062724
+ for <qemu-devel@nongnu.org>; Wed, 23 Oct 2019 10:52:12 -0400
+Received: from e06smtp02.uk.ibm.com (e06smtp02.uk.ibm.com [195.75.94.98])
+ by mx0b-001b2d01.pphosted.com with ESMTP id 2vtqvyk8c9-1
+ (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+ for <qemu-devel@nongnu.org>; Wed, 23 Oct 2019 10:52:11 -0400
+Received: from localhost
+ by e06smtp02.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+ Violators will be prosecuted
+ for <qemu-devel@nongnu.org> from <groug@kaod.org>;
+ Wed, 23 Oct 2019 15:52:09 +0100
+Received: from b06cxnps4076.portsmouth.uk.ibm.com (9.149.109.198)
+ by e06smtp02.uk.ibm.com (192.168.101.132) with IBM ESMTP SMTP Gateway:
+ Authorized Use Only! Violators will be prosecuted; 
+ (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+ Wed, 23 Oct 2019 15:52:06 +0100
+Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com
+ [9.149.105.61])
+ by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ x9NEq5fF49348844
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Wed, 23 Oct 2019 14:52:05 GMT
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 8BE1F11C05C;
+ Wed, 23 Oct 2019 14:52:05 +0000 (GMT)
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 5456011C04A;
+ Wed, 23 Oct 2019 14:52:05 +0000 (GMT)
+Received: from bahia.lan (unknown [9.145.36.67])
+ by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+ Wed, 23 Oct 2019 14:52:05 +0000 (GMT)
+Subject: [PATCH 2/6] xive, xics: Fix reference counting on CPU objects
+From: Greg Kurz <groug@kaod.org>
+To: David Gibson <david@gibson.dropbear.id.au>
+Date: Wed, 23 Oct 2019 16:52:05 +0200
+In-Reply-To: <157184231371.3053790.17713393349394736594.stgit@bahia.lan>
+References: <157184231371.3053790.17713393349394736594.stgit@bahia.lan>
+User-Agent: StGit/unknown-version
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 23 Oct 2019 14:38:50 -0000
-From: Thomas Huth <1656234@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=Fix Released; importance=Undecided;
- assignee=None; 
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: robert-hu stefanha th-huth
-X-Launchpad-Bug-Reporter: Robert Hu (robert-hu)
-X-Launchpad-Bug-Modifier: Thomas Huth (th-huth)
-References: <20170113084022.20152.24498.malonedeb@wampee.canonical.com>
-Message-Id: <157184153031.28406.10800705354498659048.malone@chaenomeles.canonical.com>
-Subject: [Bug 1656234] Re: Qemu core dumped if using virtio-net
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="469f241f4e73cc0bdffa4e30654052a2af068e06";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 66e745a025d3e073aee79e478014d32ef1bfb214
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 91.189.90.7
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+x-cbid: 19102314-0008-0000-0000-00000326285C
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19102314-0009-0000-0000-00004A455840
+Message-Id: <157184232497.3053790.5571330781863409160.stgit@bahia.lan>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
+ definitions=2019-10-23_03:, , signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ priorityscore=1501
+ malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
+ clxscore=1034 lowpriorityscore=0 mlxscore=0 impostorscore=0
+ mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.0.1-1908290000 definitions=main-1910230148
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
+X-Received-From: 148.163.158.5
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -78,75 +102,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1656234 <1656234@bugs.launchpad.net>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-ppc@nongnu.org,
+ =?utf-8?q?C=C3=A9dric?= Le Goater <clg@kaod.org>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Fix had been included here:
-https://git.qemu.org/?p=3Dqemu.git;a=3Dcommitdiff;h=3D332fa82d0963409
+When a VCPU gets connected to the XIVE interrupt controller, we add a
+const link targetting the CPU object to the TCTX object. Similar links
+are added to the ICP object when using the XICS interrupt controller.
 
-** Changed in: qemu
-       Status: New =3D> Fix Released
+As explained in <qom/object.h>:
 
--- =
+ * The caller must ensure that @target stays alive as long as
+ * this property exists.  In the case @target is a child of @obj,
+ * this will be the case.  Otherwise, the caller is responsible for
+ * taking a reference.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1656234
+We're in the latter case for both XICS and XIVE. Add the missing
+calls to object_ref() and object_unref().
 
-Title:
-  Qemu core dumped if using virtio-net
+This doesn't fix any known issue because the life cycle of the TCTX or
+ICP happens to be shorter than the one of the CPU or XICS fabric, but
+better safe than sorry.
 
-Status in QEMU:
-  Fix Released
+Signed-off-by: Greg Kurz <groug@kaod.org>
+---
+ hw/intc/xics.c |    8 +++++++-
+ hw/intc/xive.c |    6 +++++-
+ 2 files changed, 12 insertions(+), 2 deletions(-)
 
-Bug description:
-  System Environment
-  =3D=3D=3D=3D=3D=3D=3D
-  Qemu commit/branch: e92fbc75
-  Host OS: RHEL7.2 ia32e
-  Host Kernel: 4.9.0
-  Guest OS: RHEL7.2 ia32e
-  Guest Kernel: 4.9.0
+diff --git a/hw/intc/xics.c b/hw/intc/xics.c
+index 935f325749cb..5f746079be46 100644
+--- a/hw/intc/xics.c
++++ b/hw/intc/xics.c
+@@ -388,8 +388,10 @@ Object *icp_create(Object *cpu, const char *type, XICSFabric *xi, Error **errp)
+     obj = object_new(type);
+     object_property_add_child(cpu, type, obj, &error_abort);
+     object_unref(obj);
++    object_ref(OBJECT(xi));
+     object_property_add_const_link(obj, ICP_PROP_XICS, OBJECT(xi),
+                                    &error_abort);
++    object_ref(cpu);
+     object_property_add_const_link(obj, ICP_PROP_CPU, cpu, &error_abort);
+     object_property_set_bool(obj, true, "realized", &local_err);
+     if (local_err) {
+@@ -403,7 +405,11 @@ Object *icp_create(Object *cpu, const char *type, XICSFabric *xi, Error **errp)
+ 
+ void icp_destroy(ICPState *icp)
+ {
+-    object_unparent(OBJECT(icp));
++    Object *obj = OBJECT(icp);
++
++    object_unref(object_property_get_link(obj, ICP_PROP_CPU, &error_abort));
++    object_unref(object_property_get_link(obj, ICP_PROP_XICS, &error_abort));
++    object_unparent(obj);
+ }
+ 
+ /*
+diff --git a/hw/intc/xive.c b/hw/intc/xive.c
+index 38257aa02083..952a461d5329 100644
+--- a/hw/intc/xive.c
++++ b/hw/intc/xive.c
+@@ -682,6 +682,7 @@ Object *xive_tctx_create(Object *cpu, XiveRouter *xrtr, Error **errp)
+     obj = object_new(TYPE_XIVE_TCTX);
+     object_property_add_child(cpu, TYPE_XIVE_TCTX, obj, &error_abort);
+     object_unref(obj);
++    object_ref(cpu);
+     object_property_add_const_link(obj, "cpu", cpu, &error_abort);
+     object_property_set_bool(obj, true, "realized", &local_err);
+     if (local_err) {
+@@ -698,7 +699,10 @@ error:
+ 
+ void xive_tctx_destroy(XiveTCTX *tctx)
+ {
+-    object_unparent(OBJECT(tctx));
++    Object *obj = OBJECT(tctx);
++
++    object_unref(object_property_get_link(obj, "cpu", &error_abort));
++    object_unparent(obj);
+ }
+ 
+ /*
 
-  Bug detailed description
-  =3D=3D=3D=3D=3D=3D=3D
-  While create a kvm guest using virtio-net, the qemu will core dump with s=
-howing "Aborted (core dumped)".
-  Reproduce Steps
-  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-  create a guest:
-  qemu-system-x86_64 -enable-kvm -m 4096 -smp 4 -device virtio-net-pci,netd=
-ev=3Dnic0,mac=3D00:16:3e:49:be:24 -netdev tap,id=3Dnic0,script=3D/etc/kvm/q=
-emu-ifup -drive file=3D/ia32e_rhel7u2_kvm.qcow2,if=3Dnone,id=3Dvirtio-disk0=
- -device virtio-blk-pci,drive=3Dvirtio-disk0 -serial file:serial.log
-
-  Current Result:
-  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-
-  qemu-system-x86_64: /workspace/ia32e/nightly/kvm-next-20170105-ef85b6-e92=
-fbc/kvm/qemu/hw/virtio/virtio.c:214: virtio_queue_set_notification: Asserti=
-on `vq->notification_disabled > 0' failed.
-  Aborted (core dumped)
-
-  add info
-  =3D=3D=3D=3D=3D=3D=3D=3D
-  [root@hsw-ep2 Desktop]# dmesg |grep -v virbr0 |tail -n 10
-  [ 1760.265000] device tap0 left promiscuous mode
-  [ 1879.148642] device tap0 entered promiscuous mode
-  [ 1885.213702] kvm [14186]: vcpu0, guest rIP: 0xffffffff81066784 disabled=
- perfctr wrmsr: 0xc2 data 0xffff
-  [ 1912.258783] device tap0 left promiscuous mode
-  [ 1995.972267] device tap0 entered promiscuous mode
-  [ 2001.990207] kvm [14335]: vcpu0, guest rIP: 0xffffffff81066784 disabled=
- perfctr wrmsr: 0xc2 data 0xffff
-  [ 2024.703072] device tap0 left promiscuous mode
-  [ 2145.374239] device tap0 entered promiscuous mode
-  [ 2151.409948] kvm [14541]: vcpu0, guest rIP: 0xffffffff81066784 disabled=
- perfctr wrmsr: 0xc2 data 0xffff
-  [ 2178.281446] device tap0 left promiscuous mode
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1656234/+subscriptions
 
