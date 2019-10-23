@@ -2,74 +2,83 @@ Return-Path: <SRS0=brme=YQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C09DCA9EB9
-	for <qemu-devel@archiver.kernel.org>; Wed, 23 Oct 2019 19:34:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D8BECA9EB9
+	for <qemu-devel@archiver.kernel.org>; Wed, 23 Oct 2019 19:34:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F417F21928
-	for <qemu-devel@archiver.kernel.org>; Wed, 23 Oct 2019 19:34:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6602121928
+	for <qemu-devel@archiver.kernel.org>; Wed, 23 Oct 2019 19:34:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ev2MUb0p"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F417F21928
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Sfw7v7NI"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6602121928
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45238 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45240 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iNMOu-0004gV-Hc
-	for qemu-devel@archiver.kernel.org; Wed, 23 Oct 2019 15:34:32 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60941)
+	id 1iNMPC-0005KK-7A
+	for qemu-devel@archiver.kernel.org; Wed, 23 Oct 2019 15:34:50 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55095)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <marcandre.lureau@redhat.com>) id 1iNKbV-0001bw-Vq
- for qemu-devel@nongnu.org; Wed, 23 Oct 2019 13:39:28 -0400
+ (envelope-from <jfreimann@redhat.com>) id 1iNMLM-0001lM-Nj
+ for qemu-devel@nongnu.org; Wed, 23 Oct 2019 15:30:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <marcandre.lureau@redhat.com>) id 1iNKbT-0005h5-QS
- for qemu-devel@nongnu.org; Wed, 23 Oct 2019 13:39:25 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:59298
+ (envelope-from <jfreimann@redhat.com>) id 1iNMLK-0000aS-Ee
+ for qemu-devel@nongnu.org; Wed, 23 Oct 2019 15:30:51 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:53640
  helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtp (Exim 4.71)
- (envelope-from <marcandre.lureau@redhat.com>) id 1iNKbR-0005fi-Tr
- for qemu-devel@nongnu.org; Wed, 23 Oct 2019 13:39:23 -0400
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <jfreimann@redhat.com>)
+ id 1iNMLK-0000a8-9x
+ for qemu-devel@nongnu.org; Wed, 23 Oct 2019 15:30:50 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1571851934;
+ s=mimecast20190719; t=1571859049;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding;
- bh=pmXQHe+rWCvel74Q+ujxEdZVMUQNzVj52uZOOpW0iGg=;
- b=Ev2MUb0p9Rd6og7FkRwzTSOgaHT4l2qk8duXq2I5FLR1mmgbc+1CcSx12gnRzsTceWcW6i
- t1UBzuedOFdRfSA1yTrEx+PDNDDOuOGzu65GIdKwadaqIQftPQRxOQb9dB2Wou/NGCrq9u
- aYZfxAuNDTQZBfcg0SbvYC5LhDf68Zw=
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=KnujnO/KuApV2nCDBo9KNNikQGgcgXCIzUPXYlDL3Gc=;
+ b=Sfw7v7NIMKx+bV0U1Jw+RXzCtbytK6+EkRqen0TuvYewBwjTWwtF4KQhqn4np9SHg3tO2G
+ s6FJfRgHiiV5nej7YOVdnhwwi/K+XUFA7vlCKP9EiA0v5eKxAGNr3GcDGtTeRql2cW78s6
+ YtIZRQ/NNEL/DZ5sdClaV/04fL/KGXg=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-103-OwsQ3D6iPUq19Zj2ib_NBA-1; Wed, 23 Oct 2019 13:32:10 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
+ us-mta-78-7dxen6axPvSobGNO5FcdQw-1; Wed, 23 Oct 2019 15:30:45 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2FDA3100550E;
- Wed, 23 Oct 2019 17:32:04 +0000 (UTC)
-Received: from localhost (ovpn-112-21.ams2.redhat.com [10.36.112.21])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 6433C5C1D4;
- Wed, 23 Oct 2019 17:31:55 +0000 (UTC)
-From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v3 00/33] Clean-ups: qom-ify serial and remove QDEV_PROP_PTR
-Date: Wed, 23 Oct 2019 19:31:21 +0200
-Message-Id: <20191023173154.30051-1-marcandre.lureau@redhat.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id F0E80107AD31;
+ Wed, 23 Oct 2019 19:30:44 +0000 (UTC)
+Received: from localhost (ovpn-116-38.ams2.redhat.com [10.36.116.38])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id E14AB60872;
+ Wed, 23 Oct 2019 19:30:37 +0000 (UTC)
+Date: Wed, 23 Oct 2019 21:30:35 +0200
+From: Jens Freimann <jfreimann@redhat.com>
+To: Alex Williamson <alex.williamson@redhat.com>
+Subject: Re: [PATCH v5 02/11] pci: add option for net failover
+Message-ID: <20191023193035.tlcumzmgjw242hgw@jenstp.localdomain>
+References: <20191023082711.16694-1-jfreimann@redhat.com>
+ <20191023082711.16694-3-jfreimann@redhat.com>
+ <20191023120648.57e50ae1@x1.home>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-MC-Unique: OwsQ3D6iPUq19Zj2ib_NBA-1
+In-Reply-To: <20191023120648.57e50ae1@x1.home>
+User-Agent: NeoMutt/20180716-1376-5d6ed1
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-MC-Unique: 7dxen6axPvSobGNO5FcdQw-1
 X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=WINDOWS-1252; format=flowed
 Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.81
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -81,142 +90,134 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Corey Minyard <cminyard@mvista.com>,
- Peter Maydell <peter.maydell@linaro.org>,
- "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
- Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
- KONRAD Frederic <frederic.konrad@adacore.com>,
- "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
- Paul Burton <pburton@wavecomp.com>, Aleksandar Rikalo <arikalo@wavecomp.com>,
- Magnus Damm <magnus.damm@gmail.com>,
- =?UTF-8?q?Herv=C3=A9=20Poussineau?= <hpoussin@reactos.org>,
- =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
- Artyom Tarasenko <atar4qemu@gmail.com>, Eduardo Habkost <ehabkost@redhat.com>,
- Fabien Chouteau <chouteau@adacore.com>, qemu-arm@nongnu.org,
- Richard Henderson <rth@twiddle.net>,
- =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
- qemu-ppc@nongnu.org, Aleksandar Markovic <amarkovic@wavecomp.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>
+Cc: pkrempa@redhat.com, berrange@redhat.com, ehabkost@redhat.com,
+ mst@redhat.com, aadam@redhat.com, qemu-devel@nongnu.org, dgilbert@redhat.com,
+ laine@redhat.com, ailan@redhat.com, parav@mellanox.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi,
+On Wed, Oct 23, 2019 at 12:06:48PM -0600, Alex Williamson wrote:
+>On Wed, 23 Oct 2019 10:27:02 +0200
+>Jens Freimann <jfreimann@redhat.com> wrote:
+>
+>> This patch adds a net_failover_pair_id property to PCIDev which is
+>> used to link the primary device in a failover pair (the PCI dev) to
+>> a standby (a virtio-net-pci) device.
+>>
+>> It only supports ethernet devices. Also currently it only supports
+>> PCIe devices. QEMU will exit with an error message otherwise.
+>>
+>> Signed-off-by: Jens Freimann <jfreimann@redhat.com>
+>> ---
+>>  hw/pci/pci.c         | 17 +++++++++++++++++
+>>  include/hw/pci/pci.h |  3 +++
+>>  2 files changed, 20 insertions(+)
+>>
+>> diff --git a/hw/pci/pci.c b/hw/pci/pci.c
+>> index aa05c2b9b2..fa9b5219f8 100644
+>> --- a/hw/pci/pci.c
+>> +++ b/hw/pci/pci.c
+>> @@ -75,6 +75,8 @@ static Property pci_props[] =3D {
+>>                      QEMU_PCIE_LNKSTA_DLLLA_BITNR, true),
+>>      DEFINE_PROP_BIT("x-pcie-extcap-init", PCIDevice, cap_present,
+>>                      QEMU_PCIE_EXTCAP_INIT_BITNR, true),
+>> +    DEFINE_PROP_STRING("net_failover_pair_id", PCIDevice,
+>> +            net_failover_pair_id),
+>
+>Nit, white space appears broken here.
 
-QDEV_PROP_PTR is marked in multiple places as "FIXME/TODO/remove
-me". In most cases, it can be easily replaced with QDEV_PROP_LINK when
-the pointer points to an Object.
+I'll fix it.
 
-There are a few places where such substitution isn't possible. For
-those places, it seems reasonable to use a specific setter method
-instead, and keep the user_creatable =3D false. In other places,
-proper usage of qemu_irq is the solution.
+>>      DEFINE_PROP_END_OF_LIST()
+>>  };
+>>
+>> @@ -2077,6 +2079,7 @@ static void pci_qdev_realize(DeviceState *qdev, Er=
+ror **errp)
+>>      ObjectClass *klass =3D OBJECT_CLASS(pc);
+>>      Error *local_err =3D NULL;
+>>      bool is_default_rom;
+>> +    uint16_t class_id;
+>>
+>>      /* initialize cap_present for pci_is_express() and pci_config_size(=
+),
+>>       * Note that hybrid PCIs are not set automatically and need to mana=
+ge
+>> @@ -2101,6 +2104,20 @@ static void pci_qdev_realize(DeviceState *qdev, E=
+rror **errp)
+>>          }
+>>      }
+>>
+>> +    if (pci_dev->net_failover_pair_id) {
+>> +        if (!pci_is_express(pci_dev)) {
+>> +            error_setg(errp, "failover device is not a PCIExpress devic=
+e");
+>> +            error_propagate(errp, local_err);
+>> +            return;
+>> +        }
+>
+>Did we decide we don't need to test that the device is also in a
+>hotpluggable slot? =20
 
-The serial code wasn't converted to qdev, which makes it a bit more
-archaic to deal with. Let's convert it first, so we can more easily
-embed it from other devices, and re-export some properties.
+Hmm, my reply to you was never sent. I thought the check for
+qdev_device_add() was sufficient but you said that works only
+after qdev_hotplug is set (after machine creation). I modified
+the check to this:
 
-v3:
- - introduce SerialMM and SerialIO sysbus devices
- - remove serial_mm_connect introduced in v2
- - replace "base" property introduced in v2, use "instance-id" for
-   vmstate purpose only
- - add a few preliminary clean-ups
+    hide =3D should_hide_device(opts);                                     =
+                                =20
+                                                                           =
+                              =20
+    if ((hide || qdev_hotplug) && bus && !qbus_is_hotpluggable(bus)) {     =
+                              =20
+        error_setg(errp, QERR_BUS_NO_HOTPLUG, bus->name);                  =
+                              =20
+        return NULL;                                                       =
+                              =20
+    }                                                                      =
+                              =20
+                                                                           =
+                              =20
+    if (hide) {                                                            =
+                              =20
+        return NULL;                                                       =
+                              =20
+    }
 
-v2:
- - qom-ify serial
- - embed the serial from sm501, and expose a "chardev" property
- - add "leon3: use qemu_irq framework instead of callback as property"
- - add "sparc: move PIL irq handling to cpu.c"
- - add "cris: improve passing PIC interrupt vector to the CPU"
- - misc comment/todo changes, add r-b tags
+This will make qemu fail when we have the device in the initial
+configuration or when we hotplug it to a bus that doesn't support it.
+I tested both with a device on pcie.0. Am I missing something?=20
 
-Marc-Andr=C3=A9 Lureau (33):
-  qdev: remove unused qdev_prop_int64
-  sysbus: remove unused sysbus_try_create*
-  sysbus: remove outdated comment
-  chardev: generate an internal id when none given
-  serial-pci-multi: factor out multi_serial_get_nr_ports
-  serial: initial qom-ification
-  serial: register vmsd with DeviceClass
-  serial: add "chardev" property
-  serial: add "baudbase" property
-  serial: add "instance-id" property
-  serial: realize the serial device
-  serial: replace serial_exit_core() with unrealize
-  serial: start making SerialMM a sysbus device
-  serial-mm: add "regshift" property
-  serial-mm: add endianness property
-  serial-mm: use sysbus facilities
-  serial: make SerialIO a sysbus device
-  mips: inline serial_init
-  sm501: make SerialMM a child, export chardev property
-  vmmouse: replace PROP_PTR with PROP_LINK
-  lance: replace PROP_PTR with PROP_LINK
-  etraxfs: remove PROP_PTR usage
-  dp8393x: replace PROP_PTR with PROP_LINK
-  leon3: use qemu_irq framework instead of callback as property
-  sparc: move PIL irq handling to cpu.c
-  RFC: mips/cps: fix setting saar property
-  cris: improve passing PIC interrupt vector to the CPU
-  smbus-eeprom: remove PROP_PTR
-  omap-intc: remove PROP_PTR
-  omap-i2c: remove PROP_PTR
-  omap-gpio: remove PROP_PTR
-  qdev: remove PROP_MEMORY_REGION
-  qdev: remove QDEV_PROP_PTR
+>Are there also multi-function considerations that
+>should be prevented or documented?  For example, if a user tries to
+>configure both the primary and failover NICs in the same slot, I assume
+>bad things will happen.
 
- chardev/char.c               |  32 +++++--
- hw/arm/omap1.c               |   8 +-
- hw/arm/omap2.c               |  25 +++---
- hw/char/omap_uart.c          |   2 +-
- hw/char/serial-isa.c         |  11 ++-
- hw/char/serial-pci-multi.c   |  45 +++++++---
- hw/char/serial-pci.c         |  17 +++-
- hw/char/serial.c             | 164 ++++++++++++++++++++++++++++-------
- hw/core/qdev-properties.c    |  50 -----------
- hw/core/sysbus.c             |  32 -------
- hw/cris/axis_dev88.c         |   4 -
- hw/display/sm501.c           |  31 +++++--
- hw/dma/sparc32_dma.c         |   2 +-
- hw/gpio/omap_gpio.c          |  42 ++++-----
- hw/i2c/omap_i2c.c            |  19 ++--
- hw/i2c/smbus_eeprom.c        |  17 ++--
- hw/i386/pc.c                 |   7 +-
- hw/i386/vmmouse.c            |   8 +-
- hw/input/pckbd.c             |   8 +-
- hw/intc/etraxfs_pic.c        |  26 +-----
- hw/intc/grlib_irqmp.c        |  35 +-------
- hw/intc/omap_intc.c          |  17 ++--
- hw/mips/boston.c             |   2 +-
- hw/mips/cps.c                |   2 +-
- hw/mips/mips_jazz.c          |   3 +-
- hw/mips/mips_malta.c         |   2 +-
- hw/mips/mips_mipssim.c       |  13 ++-
- hw/net/dp8393x.c             |   7 +-
- hw/net/etraxfs_eth.c         |  44 +++++++---
- hw/net/lance.c               |   5 +-
- hw/net/pcnet-pci.c           |   2 +-
- hw/net/pcnet.h               |   2 +-
- hw/sh4/r2d.c                 |   2 +-
- hw/sparc/leon3.c             |  38 +-------
- hw/sparc/trace-events        |   4 -
- include/hw/arm/omap.h        |  52 +++++++++++
- include/hw/char/serial.h     |  44 +++++++---
- include/hw/cris/etraxfs.h    |  20 +----
- include/hw/input/i8042.h     |   4 +-
- include/hw/qdev-properties.h |  27 ------
- include/hw/sysbus.h          |  13 +--
- include/qemu/id.h            |   1 +
- target/cris/cpu.c            |   8 ++
- target/cris/cpu.h            |   1 +
- target/sparc/cpu.c           |  39 +++++++++
- target/sparc/cpu.h           |   1 +
- target/sparc/trace-events    |   4 +
- util/id.c                    |   1 +
- 48 files changed, 515 insertions(+), 428 deletions(-)
+  I would have expected that this is already checked in pci code, but
+it is not. I tried it and when I put both devices into the same slot
+they are both unplugged from the guest during boot but nothing else
+happens. I don't know what triggers that unplug of the devices.
 
---=20
-2.23.0.606.g08da6496b6
+I'm not aware of any other problems regarding multi-function, which
+doesn't mean there aren't any.=20
+
+>
+>> +        class_id =3D pci_get_word(pci_dev->config + PCI_CLASS_DEVICE);
+>> +        if (class_id !=3D PCI_CLASS_NETWORK_ETHERNET) {
+>> +            error_setg(errp, "failover device is not an Ethernet device=
+");
+>> +            error_propagate(errp, local_err);
+>> +            return;
+>> +        }
+>> +    }
+>
+>Looks like cleanup is missing both both error cases, the option rom
+>error path below this does a pci_qdev_unrealize() before returning so
+>I'd assume we want the same here.  Thanks,
+
+Thanks, I'll fix this too.
+
+regards,
+Jens=20
 
 
