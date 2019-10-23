@@ -2,59 +2,83 @@ Return-Path: <SRS0=brme=YQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1B056CA9EB9
-	for <qemu-devel@archiver.kernel.org>; Wed, 23 Oct 2019 21:45:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 23DE7CA9EB9
+	for <qemu-devel@archiver.kernel.org>; Wed, 23 Oct 2019 21:54:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DE32C2173B
-	for <qemu-devel@archiver.kernel.org>; Wed, 23 Oct 2019 21:45:29 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DE32C2173B
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=keithp.com
+	by mail.kernel.org (Postfix) with ESMTPS id E8D4B20679
+	for <qemu-devel@archiver.kernel.org>; Wed, 23 Oct 2019 21:54:07 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E8D4B20679
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49170 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49388 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iNORb-0001ue-BB
-	for qemu-devel@archiver.kernel.org; Wed, 23 Oct 2019 17:45:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54199)
+	id 1iNOZy-0003rZ-3O
+	for qemu-devel@archiver.kernel.org; Wed, 23 Oct 2019 17:54:06 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50136)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <keithp@keithp.com>) id 1iNMHm-00044I-RI
- for qemu-devel@nongnu.org; Wed, 23 Oct 2019 15:27:12 -0400
+ (envelope-from <mst@redhat.com>) id 1iNOWd-0006Jw-DP
+ for qemu-devel@nongnu.org; Wed, 23 Oct 2019 17:50:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <keithp@keithp.com>) id 1iNMHk-0006qc-R1
- for qemu-devel@nongnu.org; Wed, 23 Oct 2019 15:27:10 -0400
-Received: from home.keithp.com ([63.227.221.253]:51678 helo=elaine.keithp.com)
+ (envelope-from <mst@redhat.com>) id 1iNOWa-0007fW-5V
+ for qemu-devel@nongnu.org; Wed, 23 Oct 2019 17:50:37 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:33254)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <keithp@keithp.com>)
- id 1iNMHf-0006mu-6g; Wed, 23 Oct 2019 15:27:04 -0400
-Received: from localhost (localhost [127.0.0.1])
- by elaine.keithp.com (Postfix) with ESMTP id F1D8D3F2403C;
- Wed, 23 Oct 2019 12:26:57 -0700 (PDT)
-X-Virus-Scanned: Debian amavisd-new at keithp.com
-Received: from elaine.keithp.com ([127.0.0.1])
- by localhost (elaine.keithp.com [127.0.0.1]) (amavisd-new, port 10024)
- with LMTP id f22q8JQ4hIgC; Wed, 23 Oct 2019 12:26:57 -0700 (PDT)
-Received: from keithp.com (keithp-172.keithp.com [10.0.0.172])
- by elaine.keithp.com (Postfix) with ESMTPSA id 85D563F23FF8;
- Wed, 23 Oct 2019 12:26:57 -0700 (PDT)
-Received: by keithp.com (Postfix, from userid 1000)
- id 6A1671582118; Wed, 23 Oct 2019 12:26:57 -0700 (PDT)
-From: Keith Packard <keithp@keithp.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH] Semihost SYS_READC implementation (v3)
-Date: Wed, 23 Oct 2019 12:26:40 -0700
-Message-Id: <20191023192640.13125-1-keithp@keithp.com>
-X-Mailer: git-send-email 2.24.0.rc0
+ (Exim 4.71) (envelope-from <mst@redhat.com>) id 1iNOWZ-0007eh-SF
+ for qemu-devel@nongnu.org; Wed, 23 Oct 2019 17:50:36 -0400
+Received: from mail-qt1-f200.google.com (mail-qt1-f200.google.com
+ [209.85.160.200])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id A2125369AC
+ for <qemu-devel@nongnu.org>; Wed, 23 Oct 2019 21:50:34 +0000 (UTC)
+Received: by mail-qt1-f200.google.com with SMTP id y10so22809017qti.1
+ for <qemu-devel@nongnu.org>; Wed, 23 Oct 2019 14:50:34 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=vf2Gujh1D+kIfLyLKSFywI9uwqFrxpfl5qAZxk1EKKQ=;
+ b=g5HhSnS1/3pmdMWjSpjLln/KV+/jO10gKKQ4/FRgDzrxr5ghV0mb7IHvD2R3QKberT
+ 981vaYRF7oCVp/Db6xNhlTvJb8AgwWsJZ1R7zcBiaS2YO49ROWXuy1jACMhB+wnfRPFe
+ jDJqP6wzlKBFlPMlc9kzei/rslufnyvfM/QJ8dfNf2ZdPIgPcaZY5M0gUKnJxMtw7zXy
+ dKx5WTqY+pT0f2gu8VFgRPEVCUV2wIfJ7ipD8AaNliPAZPPDXm3t3DaHsKfgXexs5d6C
+ XQE2vaDVfgJvrnRN0mIbsiJhocNr+XL6nyvbA7F6XMv9Gcgn7JcyPYBA7YPp3mC236rO
+ 9HUg==
+X-Gm-Message-State: APjAAAXknllPy1QZgFMDOjDq8+UezRpwzrtb2TMofJXy2qJ+G8n23s1Z
+ XHWu0BwIE0VAJSP5OTYhgQHgDo14GFAL9uZ1jgNoEZt+rG5LAoR/jtHo8a5WAY3SnxEf1My+1l8
+ ecPi1nNbAni9fCag=
+X-Received: by 2002:ac8:72ce:: with SMTP id o14mr886003qtp.62.1571867433914;
+ Wed, 23 Oct 2019 14:50:33 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqxmHGOMRePmVhVDbI4mndRio6jgZN0om/ykrr4Z9IGi8om/Xyb7XgfJ+4eU/fi8AgSdPIaR/w==
+X-Received: by 2002:ac8:72ce:: with SMTP id o14mr885986qtp.62.1571867433642;
+ Wed, 23 Oct 2019 14:50:33 -0700 (PDT)
+Received: from redhat.com (bzq-79-176-10-77.red.bezeqint.net. [79.176.10.77])
+ by smtp.gmail.com with ESMTPSA id
+ y188sm9917277qke.31.2019.10.23.14.50.30
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 23 Oct 2019 14:50:32 -0700 (PDT)
+Date: Wed, 23 Oct 2019 17:50:28 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Stefan Hajnoczi <stefanha@redhat.com>
+Subject: Re: [PATCH] virtio: fix IO request length in virtio SCSI/block
+ #PSBM-78839
+Message-ID: <20191023174957-mutt-send-email-mst@kernel.org>
+References: <20191018115547.19299-1-dplotnikov@virtuozzo.com>
+ <20191021132455.GH22659@stefanha-x1.localdomain>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20191021132455.GH22659@stefanha-x1.localdomain>
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 63.227.221.253
+X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -66,245 +90,107 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Keith Packard <keithp@keithp.com>,
- Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>,
- qemu-arm@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Cc: kwolf@redhat.com, den@virtuozzo.com, qemu-devel@nongnu.org,
+ mreitz@redhat.com, Denis Plotnikov <dplotnikov@virtuozzo.com>,
+ kraxel@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Provides a blocking call to read a character from the console using
-semihosting.chardev, if specified. This takes some careful command
-line options to use stdio successfully as the serial ports, monitor
-and semihost all want to use stdio. Here's a sample set of command
-line options which share stdio betwen semihost, monitor and serial
-ports:
+On Mon, Oct 21, 2019 at 02:24:55PM +0100, Stefan Hajnoczi wrote:
+> On Fri, Oct 18, 2019 at 02:55:47PM +0300, Denis Plotnikov wrote:
+> > From: "Denis V. Lunev" <den@openvz.org>
+> > 
+> > Linux guests submit IO requests no longer than PAGE_SIZE * max_seg
+> > field reported by SCSI controler. Thus typical sequential read with
+> > 1 MB size results in the following pattern of the IO from the guest:
+> >   8,16   1    15754     2.766095122  2071  D   R 2095104 + 1008 [dd]
+> >   8,16   1    15755     2.766108785  2071  D   R 2096112 + 1008 [dd]
+> >   8,16   1    15756     2.766113486  2071  D   R 2097120 + 32 [dd]
+> >   8,16   1    15757     2.767668961     0  C   R 2095104 + 1008 [0]
+> >   8,16   1    15758     2.768534315     0  C   R 2096112 + 1008 [0]
+> >   8,16   1    15759     2.768539782     0  C   R 2097120 + 32 [0]
+> > The IO was generated by
+> >   dd if=/dev/sda of=/dev/null bs=1024 iflag=direct
+> > 
+> > This effectively means that on rotational disks we will observe 3 IOPS
+> > for each 2 MBs processed. This definitely negatively affects both
+> > guest and host IO performance.
+> > 
+> > The cure is relatively simple - we should report lengthy scatter-gather
+> > ability of the SCSI controller. Fortunately the situation here is very
+> > good. VirtIO transport layer can accomodate 1024 items in one request
+> > while we are using only 128. This situation is present since almost
+> > very beginning. 2 items are dedicated for request metadata thus we
+> > should publish VIRTQUEUE_MAX_SIZE - 2 as max_seg.
+> > 
+> > The following pattern is observed after the patch:
+> >   8,16   1     9921     2.662721340  2063  D   R 2095104 + 1024 [dd]
+> >   8,16   1     9922     2.662737585  2063  D   R 2096128 + 1024 [dd]
+> >   8,16   1     9923     2.665188167     0  C   R 2095104 + 1024 [0]
+> >   8,16   1     9924     2.665198777     0  C   R 2096128 + 1024 [0]
+> > which is much better.
+> > 
+> > The dark side of this patch is that we are tweaking guest visible
+> > parameter, though this should be relatively safe as above transport
+> > layer support is present in QEMU/host Linux for a very long time.
+> > The patch adds configurable property for VirtIO SCSI with a new default
+> > and hardcode option for VirtBlock which does not provide good
+> > configurable framework.
+> > 
+> > Unfortunately the commit can not be applied as is. For the real cure we
+> > need guest to be fixed to accomodate that queue length, which is done
+> > only in the latest 4.14 kernel. Thus we are going to expose the property
+> > and tweak it on machine type level.
+> > 
+> > The problem with the old kernels is that they have
+> > max_segments <= virtqueue_size restriction which cause the guest
+> > crashing in the case of violation.
+> > To fix the case described above in the old kernels we can increase
+> > virtqueue_size to 256 and max_segments to 254. The pitfall here is
+> > that seabios allows the virtqueue_size-s < 128, however, the seabios
+> > patch extending that value to 256 is pending.
+> 
+> If I understand correctly you are relying on Indirect Descriptor support
+> in the guest driver in order to exceed the Virtqueue Descriptor Table
+> size.
+> 
+> Unfortunately the "max_segments <= virtqueue_size restriction" is
+> required by the VIRTIO 1.1 specification:
+> 
+>   2.6.5.3.1 Driver Requirements: Indirect Descriptors
+> 
+>   A driver MUST NOT create a descriptor chain longer than the Queue
+>   Size of the device.
+> 
+> So this idea seems to be in violation of the specification?
+> 
+> There is a bug in hw/block/virtio-blk.c:virtio_blk_update_config() and
+> hw/scsi/virtio-scsi.c:virtio_scsi_get_config():
+> 
+>   virtio_stl_p(vdev, &blkcfg.seg_max, 128 - 2);
+> 
+> This number should be the minimum of blk_get_max_iov() and
+> virtio_queue_get_num(), minus 2 for the header and footer.
+> 
+> I looked at the Linux SCSI driver code and it seems each HBA has a
+> single max_segments number - it does not vary on a per-device basis.
+> This could be a problem if two host block device with different
+> max_segments are exposed to the guest through the same virtio-scsi
+> controller.  Another bug? :(
+> 
+> Anyway, if you want ~1024 descriptors you should set Queue Size to 1024.
+> I don't see a spec-compliant way of doing it otherwise.  Hopefully I
+> have overlooked something and there is a nice way to solve this.
+> 
+> Stefan
 
-	qemu \
-	-chardev stdio,mux=3Don,id=3Dstdio0 \
-	-serial chardev:stdio0 \
-	-semihosting-config enable=3Don,chardev=3Dstdio0 \
-	-mon chardev=3Dstdio0,mode=3Dreadline
 
-This creates a chardev hooked to stdio and then connects all of the
-subsystems to it. A shorter mechanism would be good to hear about.
 
-v2:
-	Add implementation in linux-user/arm/semihost.c
+We can extend the spec of course. And we can also
+have different vq sizes between legacy and modern
+interfaces.
 
-v3:  (thanks to Paolo Bonzini <pbonzini@redhat.com>)
-	Replace hand-rolled fifo with fifo8
-	Avoid mixing code and declarations
-	Remove spurious (void) cast of function parameters
-	Define qemu_semihosting_console_init when CONFIG_USER_ONLY
-
-Signed-off-by: Keith Packard <keithp@keithp.com>
----
- hw/semihosting/console.c          | 73 +++++++++++++++++++++++++++++++
- include/hw/semihosting/console.h  | 12 +++++
- include/hw/semihosting/semihost.h |  4 ++
- linux-user/arm/semihost.c         | 24 ++++++++++
- target/arm/arm-semi.c             |  3 +-
- vl.c                              |  3 ++
- 6 files changed, 117 insertions(+), 2 deletions(-)
-
-diff --git a/hw/semihosting/console.c b/hw/semihosting/console.c
-index b4b17c8afb..197bff079b 100644
---- a/hw/semihosting/console.c
-+++ b/hw/semihosting/console.c
-@@ -98,3 +98,76 @@ void qemu_semihosting_console_outc(CPUArchState *env, =
-target_ulong addr)
-                       __func__, addr);
-     }
- }
-+
-+#include <pthread.h>
-+#include "chardev/char-fe.h"
-+#include "sysemu/sysemu.h"
-+#include "qemu/main-loop.h"
-+#include "qapi/error.h"
-+#include "qemu/fifo8.h"
-+
-+#define FIFO_SIZE   1024
-+
-+typedef struct SemihostingConsole {
-+    CharBackend         backend;
-+    pthread_mutex_t     mutex;
-+    pthread_cond_t      cond;
-+    bool                got;
-+    Fifo8               fifo;
-+} SemihostingConsole;
-+
-+static SemihostingConsole console =3D {
-+    .mutex =3D PTHREAD_MUTEX_INITIALIZER,
-+    .cond =3D PTHREAD_COND_INITIALIZER
-+};
-+
-+static int console_can_read(void *opaque)
-+{
-+    SemihostingConsole *c =3D opaque;
-+    int ret;
-+    pthread_mutex_lock(&c->mutex);
-+    ret =3D (int) fifo8_num_free(&c->fifo);
-+    pthread_mutex_unlock(&c->mutex);
-+    return ret;
-+}
-+
-+static void console_read(void *opaque, const uint8_t *buf, int size)
-+{
-+    SemihostingConsole *c =3D opaque;
-+    pthread_mutex_lock(&c->mutex);
-+    while (size-- && !fifo8_is_full(&c->fifo)) {
-+        fifo8_push(&c->fifo, *buf++);
-+    }
-+    pthread_cond_broadcast(&c->cond);
-+    pthread_mutex_unlock(&c->mutex);
-+}
-+
-+target_ulong qemu_semihosting_console_inc(CPUArchState *env)
-+{
-+    uint8_t ch;
-+    SemihostingConsole *c =3D &console;
-+    qemu_mutex_unlock_iothread();
-+    pthread_mutex_lock(&c->mutex);
-+    while (fifo8_is_empty(&c->fifo)) {
-+        pthread_cond_wait(&c->cond, &c->mutex);
-+    }
-+    ch =3D fifo8_pop(&c->fifo);
-+    pthread_mutex_unlock(&c->mutex);
-+    qemu_mutex_lock_iothread();
-+    return (target_ulong) ch;
-+}
-+
-+void qemu_semihosting_console_init(void)
-+{
-+    Chardev *chr =3D semihosting_get_chardev();
-+
-+    if  (chr) {
-+        fifo8_create(&console.fifo, FIFO_SIZE);
-+        qemu_chr_fe_init(&console.backend, chr, &error_abort);
-+        qemu_chr_fe_set_handlers(&console.backend,
-+                                 console_can_read,
-+                                 console_read,
-+                                 NULL, NULL, &console,
-+                                 NULL, true);
-+    }
-+}
-diff --git a/include/hw/semihosting/console.h b/include/hw/semihosting/co=
-nsole.h
-index 9be9754bcd..f7d5905b41 100644
---- a/include/hw/semihosting/console.h
-+++ b/include/hw/semihosting/console.h
-@@ -37,6 +37,18 @@ int qemu_semihosting_console_outs(CPUArchState *env, t=
-arget_ulong s);
-  */
- void qemu_semihosting_console_outc(CPUArchState *env, target_ulong c);
-=20
-+/**
-+ * qemu_semihosting_console_inc:
-+ * @env: CPUArchState
-+ *
-+ * Receive single character from debug console. This
-+ * may be the remote gdb session if a softmmu guest is currently being
-+ * debugged.
-+ *
-+ * Returns: character read or -1 on error
-+ */
-+target_ulong qemu_semihosting_console_inc(CPUArchState *env);
-+
- /**
-  * qemu_semihosting_log_out:
-  * @s: pointer to string
-diff --git a/include/hw/semihosting/semihost.h b/include/hw/semihosting/s=
-emihost.h
-index 60fc42d851..b8ce5117ae 100644
---- a/include/hw/semihosting/semihost.h
-+++ b/include/hw/semihosting/semihost.h
-@@ -56,6 +56,9 @@ static inline Chardev *semihosting_get_chardev(void)
- {
-     return NULL;
- }
-+static inline void qemu_semihosting_console_init(void)
-+{
-+}
- #else /* !CONFIG_USER_ONLY */
- bool semihosting_enabled(void);
- SemihostingTarget semihosting_get_target(void);
-@@ -68,6 +71,7 @@ Chardev *semihosting_get_chardev(void);
- void qemu_semihosting_enable(void);
- int qemu_semihosting_config_options(const char *opt);
- void qemu_semihosting_connect_chardevs(void);
-+void qemu_semihosting_console_init(void);
- #endif /* CONFIG_USER_ONLY */
-=20
- #endif /* SEMIHOST_H */
-diff --git a/linux-user/arm/semihost.c b/linux-user/arm/semihost.c
-index a16b525eec..13a097515b 100644
---- a/linux-user/arm/semihost.c
-+++ b/linux-user/arm/semihost.c
-@@ -47,3 +47,27 @@ void qemu_semihosting_console_outc(CPUArchState *env, =
-target_ulong addr)
-         }
-     }
- }
-+
-+#include <poll.h>
-+
-+target_ulong qemu_semihosting_console_inc(CPUArchState *env)
-+{
-+    uint8_t c;
-+    struct pollfd pollfd =3D {
-+        .fd =3D STDIN_FILENO,
-+        .events =3D POLLIN
-+    };
-+
-+    if (poll(&pollfd, 1, -1) !=3D 1) {
-+        qemu_log_mask(LOG_UNIMP, "%s: unexpected read from stdin failure=
-",
-+                      __func__);
-+        return (target_ulong) -1;
-+    }
-+
-+    if (read(STDIN_FILENO, &c, 1) !=3D 1) {
-+        qemu_log_mask(LOG_UNIMP, "%s: unexpected read from stdin failure=
-",
-+                      __func__);
-+        return (target_ulong) -1;
-+    }
-+    return (target_ulong) c;
-+}
-diff --git a/target/arm/arm-semi.c b/target/arm/arm-semi.c
-index 6f7b6d801b..47d61f6fe1 100644
---- a/target/arm/arm-semi.c
-+++ b/target/arm/arm-semi.c
-@@ -802,8 +802,7 @@ target_ulong do_arm_semihosting(CPUARMState *env)
-=20
-         return guestfd_fns[gf->type].readfn(cpu, gf, arg1, len);
-     case TARGET_SYS_READC:
--        qemu_log_mask(LOG_UNIMP, "%s: SYS_READC not implemented", __func=
-__);
--        return 0;
-+        return qemu_semihosting_console_inc(env);
-     case TARGET_SYS_ISTTY:
-         GET_ARG(0);
-=20
-diff --git a/vl.c b/vl.c
-index 4489cfb2bb..ac584d97ea 100644
---- a/vl.c
-+++ b/vl.c
-@@ -4381,6 +4381,9 @@ int main(int argc, char **argv, char **envp)
-     ds =3D init_displaystate();
-     qemu_display_init(ds, &dpy);
-=20
-+    /* connect semihosting console input if requested */
-+    qemu_semihosting_console_init();
-+
-     /* must be after terminal init, SDL library changes signal handlers =
-*/
-     os_setup_signal_handling();
-=20
---=20
-2.24.0.rc0
-
+-- 
+MST
 
