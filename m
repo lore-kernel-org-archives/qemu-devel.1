@@ -6,74 +6,74 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CBF30CA9EB6
-	for <qemu-devel@archiver.kernel.org>; Wed, 23 Oct 2019 18:21:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C0CBCCA9EB6
+	for <qemu-devel@archiver.kernel.org>; Wed, 23 Oct 2019 18:23:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9505221872
-	for <qemu-devel@archiver.kernel.org>; Wed, 23 Oct 2019 18:21:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 88EE621872
+	for <qemu-devel@archiver.kernel.org>; Wed, 23 Oct 2019 18:23:00 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OlVf7yCg"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9505221872
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="co8ODF8h"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 88EE621872
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43352 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43358 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iNLG2-0006pF-T7
-	for qemu-devel@archiver.kernel.org; Wed, 23 Oct 2019 14:21:18 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59549)
+	id 1iNLHd-00087w-T9
+	for qemu-devel@archiver.kernel.org; Wed, 23 Oct 2019 14:22:59 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60149)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <marcandre.lureau@redhat.com>) id 1iNKWi-0004yq-1k
- for qemu-devel@nongnu.org; Wed, 23 Oct 2019 13:34:30 -0400
+ (envelope-from <marcandre.lureau@redhat.com>) id 1iNKXw-0006Hv-5V
+ for qemu-devel@nongnu.org; Wed, 23 Oct 2019 13:35:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <marcandre.lureau@redhat.com>) id 1iNKWg-000285-K3
- for qemu-devel@nongnu.org; Wed, 23 Oct 2019 13:34:27 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:38177
+ (envelope-from <marcandre.lureau@redhat.com>) id 1iNKXu-0002py-Rd
+ for qemu-devel@nongnu.org; Wed, 23 Oct 2019 13:35:43 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:20292
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
- id 1iNKWg-00027r-Fn
- for qemu-devel@nongnu.org; Wed, 23 Oct 2019 13:34:26 -0400
+ id 1iNKXu-0002ps-OR
+ for qemu-devel@nongnu.org; Wed, 23 Oct 2019 13:35:42 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1571852066;
+ s=mimecast20190719; t=1571852142;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=Q0NcN9La6mtlCg8u7COd46bpf07XvGZW0dbEVjDzVPU=;
- b=OlVf7yCgTBdO+hRWcA/CSNYvvBDTwPBmeK2UDcyUlMi4BpHdaP6icV8WZeQYZ1GLVkMiiM
- 7IBnrzN6iz29cClBOjEAe8D/3UVjJGwl2bxjOGExc5054+Px8txFE1iZ0B0dGKYnUzhUxP
- g6WW5DXWQw5M7X0KhOO8F3fI1oAA+AA=
+ bh=RLin/gMURkv6SWnRw7pKzxO/OTySf/usbRwej+gNRbs=;
+ b=co8ODF8h7Loh4rZuN3L7I5GzSxAp+OwTDz8Qot2icJ6zSnmn1D3c4GOjoflk5iwTyjNmhe
+ H1Cn0BkuNDpu+BoZD/5jDrV7TOx1SjF6I45FYoL6x4jlbO56KkLjEqdRjylfQaaeprsJkZ
+ WWJ74DqUfMJCKPQGzQAACzUveYhYnaE=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-194-v-RhcreSM0qQs1Bx5neQGA-1; Wed, 23 Oct 2019 13:34:22 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ us-mta-81-jMqYSDZYN2WIEXtmvCk1VQ-1; Wed, 23 Oct 2019 13:34:27 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id F24695E9;
- Wed, 23 Oct 2019 17:34:17 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 57E3B800D62;
+ Wed, 23 Oct 2019 17:34:25 +0000 (UTC)
 Received: from localhost (ovpn-112-21.ams2.redhat.com [10.36.112.21])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 063225DAAF;
- Wed, 23 Oct 2019 17:34:11 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 9269C5C1D4;
+ Wed, 23 Oct 2019 17:34:19 +0000 (UTC)
 From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v3 18/33] mips: inline serial_init
-Date: Wed, 23 Oct 2019 19:31:39 +0200
-Message-Id: <20191023173154.30051-19-marcandre.lureau@redhat.com>
+Subject: [PATCH v3 19/33] sm501: make SerialMM a child, export chardev property
+Date: Wed, 23 Oct 2019 19:31:40 +0200
+Message-Id: <20191023173154.30051-20-marcandre.lureau@redhat.com>
 In-Reply-To: <20191023173154.30051-1-marcandre.lureau@redhat.com>
 References: <20191023173154.30051-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-MC-Unique: v-RhcreSM0qQs1Bx5neQGA-1
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-MC-Unique: jMqYSDZYN2WIEXtmvCk1VQ-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.61
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -105,88 +105,109 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The function is specific to mipssim, let's inline it.
+Embed the SerialMM sybus device, and re-export its "chardev" property.
+That way, we can get rid of PROP_PTR "chr-state" and better track
+devices relationship.
 
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 ---
- hw/char/serial.c         | 16 ----------------
- hw/mips/mips_mipssim.c   | 13 ++++++++++---
- include/hw/char/serial.h |  2 --
- 3 files changed, 10 insertions(+), 21 deletions(-)
+ hw/display/sm501.c | 31 ++++++++++++++++++++++---------
+ hw/sh4/r2d.c       |  2 +-
+ 2 files changed, 23 insertions(+), 10 deletions(-)
 
-diff --git a/hw/char/serial.c b/hw/char/serial.c
-index 84de2740a7..ca95e09ec9 100644
---- a/hw/char/serial.c
-+++ b/hw/char/serial.c
-@@ -1023,22 +1023,6 @@ static const TypeInfo serial_io_info =3D {
-     .class_init =3D serial_io_class_init,
+diff --git a/hw/display/sm501.c b/hw/display/sm501.c
+index 1f33c87e65..6efdf764c1 100644
+--- a/hw/display/sm501.c
++++ b/hw/display/sm501.c
+@@ -1930,13 +1930,14 @@ typedef struct {
+     SM501State state;
+     uint32_t vram_size;
+     uint32_t base;
+-    void *chr_state;
++    SerialMM serial;
+ } SM501SysBusState;
+=20
+ static void sm501_realize_sysbus(DeviceState *dev, Error **errp)
+ {
+     SM501SysBusState *s =3D SYSBUS_SM501(dev);
+     SysBusDevice *sbd =3D SYS_BUS_DEVICE(dev);
++    SerialState *ss =3D &s->serial.serial;
+     DeviceState *usb_dev;
+=20
+     sm501_init(&s->state, dev, s->vram_size);
+@@ -1958,17 +1959,18 @@ static void sm501_realize_sysbus(DeviceState *dev, =
+Error **errp)
+     sysbus_pass_irq(sbd, SYS_BUS_DEVICE(usb_dev));
+=20
+     /* bridge to serial emulation module */
+-    if (s->chr_state) {
+-        serial_mm_init(&s->state.mmio_region, SM501_UART0, 2,
+-                       NULL, /* TODO : chain irq to IRL */
+-                       115200, s->chr_state, DEVICE_LITTLE_ENDIAN);
++    if (qemu_chr_fe_backend_connected(&ss->chr)) {
++        MemoryRegion *mr;
++        qdev_init_nofail(DEVICE(&s->serial));
++        mr =3D sysbus_mmio_get_region(SYS_BUS_DEVICE(&s->serial), 0);
++        memory_region_add_subregion(&s->state.mmio_region, SM501_UART0, mr=
+);
++        /* TODO : chain irq to IRL */
+     }
+ }
+=20
+ static Property sm501_sysbus_properties[] =3D {
+     DEFINE_PROP_UINT32("vram-size", SM501SysBusState, vram_size, 0),
+     DEFINE_PROP_UINT32("base", SM501SysBusState, base, 0),
+-    DEFINE_PROP_PTR("chr-state", SM501SysBusState, chr_state),
+     DEFINE_PROP_END_OF_LIST(),
  };
 =20
--SerialIO *serial_init(int base, qemu_irq irq, int baudbase,
--                         Chardev *chr, MemoryRegion *system_io)
--{
--    SerialIO *self =3D SERIAL_IO(qdev_create(NULL, TYPE_SERIAL_IO));
--
--    qdev_prop_set_uint32(DEVICE(self), "baudbase", baudbase);
--    qdev_prop_set_chr(DEVICE(self), "chardev", chr);
--    qdev_prop_set_int32(DEVICE(self), "instance-id", base);
--    qdev_init_nofail(DEVICE(self));
--
--    sysbus_connect_irq(SYS_BUS_DEVICE(self), 0, irq);
--    memory_region_add_subregion(system_io, base, &self->serial.io);
--
--    return self;
--}
--
- static Property serial_properties[] =3D {
-     DEFINE_PROP_CHR("chardev", SerialState, chr),
-     DEFINE_PROP_UINT32("baudbase", SerialState, baudbase, 115200),
-diff --git a/hw/mips/mips_mipssim.c b/hw/mips/mips_mipssim.c
-index 282bbecb24..26fb8fa4de 100644
---- a/hw/mips/mips_mipssim.c
-+++ b/hw/mips/mips_mipssim.c
-@@ -40,6 +40,7 @@
- #include "hw/loader.h"
- #include "elf.h"
- #include "hw/sysbus.h"
-+#include "hw/qdev-properties.h"
- #include "exec/address-spaces.h"
- #include "qemu/error-report.h"
- #include "sysemu/qtest.h"
-@@ -219,9 +220,15 @@ mips_mipssim_init(MachineState *machine)
-      * A single 16450 sits at offset 0x3f8. It is attached to
-      * MIPS CPU INT2, which is interrupt 4.
-      */
--    if (serial_hd(0))
--        serial_init(0x3f8, env->irq[4], 115200, serial_hd(0),
--                    get_system_io());
-+    if (serial_hd(0)) {
-+        DeviceState *dev =3D qdev_create(NULL, TYPE_SERIAL_IO);
+@@ -1999,9 +2001,19 @@ static void sm501_sysbus_class_init(ObjectClass *kla=
+ss, void *data)
+     dc->props =3D sm501_sysbus_properties;
+     dc->reset =3D sm501_reset_sysbus;
+     dc->vmsd =3D &vmstate_sm501_sysbus;
+-    /* Note: pointer property "chr-state" may remain null, thus
+-     * no need for dc->user_creatable =3D false;
+-     */
++}
 +
-+        qdev_prop_set_chr(dev, "chardev", serial_hd(0));
-+        qdev_prop_set_int32(dev, "instance-id", 0x3f8);
-+        qdev_init_nofail(dev);
-+        sysbus_connect_irq(SYS_BUS_DEVICE(dev), 0, env->irq[4]);
-+        sysbus_add_io(SYS_BUS_DEVICE(dev), 0x3f8, &SERIAL_IO(dev)->serial.=
-io);
-+    }
++static void sm501_sysbus_init(Object *o)
++{
++    SM501SysBusState *self =3D SYSBUS_SM501(o);
++    SerialMM *s =3D &self->serial;
++
++    sysbus_init_child_obj(o, "serial", s, sizeof(SerialMM), TYPE_SERIAL_MM=
+);
++    qdev_prop_set_int32(DEVICE(s), "instance-id", SM501_UART0);
++    qdev_prop_set_uint8(DEVICE(s), "regshift", 2);
++    qdev_prop_set_uint8(DEVICE(s), "endianness", DEVICE_LITTLE_ENDIAN);
++
++    object_property_add_alias(o, "chardev", OBJECT(s), "chardev", &error_a=
+bort);
+ }
 =20
-     if (nd_table[0].used)
-         /* MIPSnet uses the MIPS CPU INT0, which is interrupt 2. */
-diff --git a/include/hw/char/serial.h b/include/hw/char/serial.h
-index cf9cdafaee..40e35e6fff 100644
---- a/include/hw/char/serial.h
-+++ b/include/hw/char/serial.h
-@@ -109,8 +109,6 @@ void serial_set_frequency(SerialState *s, uint32_t freq=
-uency);
- #define TYPE_SERIAL_IO "serial-io"
- #define SERIAL_IO(s) OBJECT_CHECK(SerialIO, (s), TYPE_SERIAL_IO)
+ static const TypeInfo sm501_sysbus_info =3D {
+@@ -2009,6 +2021,7 @@ static const TypeInfo sm501_sysbus_info =3D {
+     .parent        =3D TYPE_SYS_BUS_DEVICE,
+     .instance_size =3D sizeof(SM501SysBusState),
+     .class_init    =3D sm501_sysbus_class_init,
++    .instance_init =3D sm501_sysbus_init,
+ };
 =20
--SerialIO *serial_init(int base, qemu_irq irq, int baudbase,
--                      Chardev *chr, MemoryRegion *system_io);
- SerialMM *serial_mm_init(MemoryRegion *address_space,
-                          hwaddr base, int regshift,
-                          qemu_irq irq, int baudbase,
+ #define TYPE_PCI_SM501 "sm501"
+diff --git a/hw/sh4/r2d.c b/hw/sh4/r2d.c
+index ee0840f380..72bb5285cc 100644
+--- a/hw/sh4/r2d.c
++++ b/hw/sh4/r2d.c
+@@ -272,7 +272,7 @@ static void r2d_init(MachineState *machine)
+     busdev =3D SYS_BUS_DEVICE(dev);
+     qdev_prop_set_uint32(dev, "vram-size", SM501_VRAM_SIZE);
+     qdev_prop_set_uint32(dev, "base", 0x10000000);
+-    qdev_prop_set_ptr(dev, "chr-state", serial_hd(2));
++    qdev_prop_set_chr(dev, "chardev", serial_hd(2));
+     qdev_init_nofail(dev);
+     sysbus_mmio_map(busdev, 0, 0x10000000);
+     sysbus_mmio_map(busdev, 1, 0x13e00000);
 --=20
 2.23.0.606.g08da6496b6
 
