@@ -2,86 +2,87 @@ Return-Path: <SRS0=brme=YQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A79BCA9EB6
-	for <qemu-devel@archiver.kernel.org>; Wed, 23 Oct 2019 11:50:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 30C97CA9EB6
+	for <qemu-devel@archiver.kernel.org>; Wed, 23 Oct 2019 11:51:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 449F920650
-	for <qemu-devel@archiver.kernel.org>; Wed, 23 Oct 2019 11:50:55 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UPUhVhzs"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 449F920650
+	by mail.kernel.org (Postfix) with ESMTPS id B49EE20650
+	for <qemu-devel@archiver.kernel.org>; Wed, 23 Oct 2019 11:51:17 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B49EE20650
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33028 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33032 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iNFAE-0005lz-7v
-	for qemu-devel@archiver.kernel.org; Wed, 23 Oct 2019 07:50:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54800)
+	id 1iNFAa-0006H3-Lc
+	for qemu-devel@archiver.kernel.org; Wed, 23 Oct 2019 07:51:16 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54277)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eblake@redhat.com>) id 1iNEtB-00086G-SL
- for qemu-devel@nongnu.org; Wed, 23 Oct 2019 07:33:18 -0400
+ (envelope-from <philmd@redhat.com>) id 1iNEnU-0004Oj-WB
+ for qemu-devel@nongnu.org; Wed, 23 Oct 2019 07:27:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eblake@redhat.com>) id 1iNEtA-0003oQ-Ls
- for qemu-devel@nongnu.org; Wed, 23 Oct 2019 07:33:17 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:21803
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <philmd@redhat.com>) id 1iNEnU-0007Wq-1q
+ for qemu-devel@nongnu.org; Wed, 23 Oct 2019 07:27:24 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37224)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1iNEtA-0003oK-Hr
- for qemu-devel@nongnu.org; Wed, 23 Oct 2019 07:33:16 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1571830396;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=5eU5g1UeZOxkZuc38LGAeFmPpsDbBPjfhepyp9TW5HI=;
- b=UPUhVhzsg+44moRRJWsQj+F47XrR+iWMX6zQFbgATYgPg9InHY+KQr9UlUfL+GpaIy0evA
- WSJie9WesxJMddluA0aX6SRkiHoo7nWiQ0d6Mw528t9hbHTQXeAU3IFPrS9led2KuDOve+
- GmUbtTMjhYDJnwRV+gm6tgdBrv15rfw=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-370-7EGQ1fTJNBC_Lle9iKDNiQ-1; Wed, 23 Oct 2019 07:33:11 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iNEnT-0007Va-NK
+ for qemu-devel@nongnu.org; Wed, 23 Oct 2019 07:27:24 -0400
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E6A401800D6B;
- Wed, 23 Oct 2019 11:33:09 +0000 (UTC)
-Received: from [10.3.117.0] (ovpn-117-0.phx2.redhat.com [10.3.117.0])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 1A84219C70;
- Wed, 23 Oct 2019 11:33:07 +0000 (UTC)
-Subject: Re: [PATCH v10 3/3] iotests: test nbd reconnect
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- "qemu-block@nongnu.org" <qemu-block@nongnu.org>
-References: <20191009084158.15614-1-vsementsov@virtuozzo.com>
- <20191009084158.15614-4-vsementsov@virtuozzo.com>
- <0c87e5cd-cddf-b91a-3cca-fa3af9799d2b@redhat.com>
- <45ff7437-6b8a-c430-5a19-06ccd9742f5e@virtuozzo.com>
-From: Eric Blake <eblake@redhat.com>
-Organization: Red Hat, Inc.
-Message-ID: <6d0245f0-7d31-fe32-48ad-3964d18eda20@redhat.com>
-Date: Wed, 23 Oct 2019 06:33:06 -0500
+ by mx1.redhat.com (Postfix) with ESMTPS id C172D4ACA5
+ for <qemu-devel@nongnu.org>; Wed, 23 Oct 2019 11:27:22 +0000 (UTC)
+Received: by mail-wr1-f70.google.com with SMTP id 92so5434611wro.14
+ for <qemu-devel@nongnu.org>; Wed, 23 Oct 2019 04:27:22 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=ePuC57VwSKpSQ2wXoLmJq2KLCqJrItXgLd5Kjve1l64=;
+ b=dGNpiGXzGaSzyIh/xpLfEqPip9JD0VmMvJbPME2zPCry6alLwo5nIKowioE5QAyXiq
+ Gz0XLbJdoCJXps75mcijgCLXgJkrhf6qkDGwdL80Jawt+UBTXvtoU07s8N5fMS+tNQt7
+ ZylO/Ou2s9evD3ZrAs1Cbl1WVUoA4R4a9E2wNRUR0m2z2eZCfz/lffzWvxR3lrsHi9PQ
+ 1c886BubHNL7ZDNlqtU/S9V2Hd01xTiYz57ie/NDKT4P/m8/yGiGN7aMG2bvYwoNQuCK
+ rS1KJQ0iU56sC3XoN/a3mXVxTjwrhiTvUWTswlYAP3ehi799OYZRcY3ID0NdNuw0EwD7
+ oQtw==
+X-Gm-Message-State: APjAAAW6ab5yUIur7DXHATuIw9HJv0z9FnsBpawVipu7Frm6NXfw27In
+ ww3x+sLhzDRcKMFsNg0f5dKeNbzik2PUavrdbNamH4wQPU1T4ZhJi0u4qhYtvQURmJRthGkIUa/
+ +wMyAk0Z40XPUOtE=
+X-Received: by 2002:a5d:464f:: with SMTP id j15mr7920705wrs.366.1571830041485; 
+ Wed, 23 Oct 2019 04:27:21 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqyk5D9g0pgy3/IGWg1Tga/sCh5bRkcu0TvNBfh/+vHLJDOhrsgvS8/3y5xxTVYrY8NqxZHZog==
+X-Received: by 2002:a5d:464f:: with SMTP id j15mr7920678wrs.366.1571830041126; 
+ Wed, 23 Oct 2019 04:27:21 -0700 (PDT)
+Received: from [192.168.1.41] (129.red-83-57-174.dynamicip.rima-tde.net.
+ [83.57.174.129])
+ by smtp.gmail.com with ESMTPSA id l5sm3837937wmj.44.2019.10.23.04.27.19
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Wed, 23 Oct 2019 04:27:20 -0700 (PDT)
+Subject: Re: [PATCH v1 05/19] travis.yml: Fix the ccache lines
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ qemu-devel@nongnu.org
+References: <20191022191704.6134-1-alex.bennee@linaro.org>
+ <20191022191704.6134-6-alex.bennee@linaro.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <182668f2-ba8d-0c32-6968-659cf9a29614@redhat.com>
+Date: Wed, 23 Oct 2019 13:27:18 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.1.1
 MIME-Version: 1.0
-In-Reply-To: <45ff7437-6b8a-c430-5a19-06ccd9742f5e@virtuozzo.com>
+In-Reply-To: <20191022191704.6134-6-alex.bennee@linaro.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-MC-Unique: 7EGQ1fTJNBC_Lle9iKDNiQ-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.61
+X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -93,78 +94,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "kwolf@redhat.com" <kwolf@redhat.com>, Denis Lunev <den@virtuozzo.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "stefanha@redhat.com" <stefanha@redhat.com>,
- "mreitz@redhat.com" <mreitz@redhat.com>
+Cc: fam@euphon.net, Thomas Huth <thuth@redhat.com>, berrange@redhat.com,
+ stefanb@linux.vnet.ibm.com, richard.henderson@linaro.org, f4bug@amsat.org,
+ cota@braap.org, stefanha@redhat.com, marcandre.lureau@redhat.com,
+ pbonzini@redhat.com, aurelien@aurel32.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 10/23/19 3:33 AM, Vladimir Sementsov-Ogievskiy wrote:
-> 23.10.2019 4:31, Eric Blake wrote:
->> On 10/9/19 3:41 AM, Vladimir Sementsov-Ogievskiy wrote:
->>> Add test, which starts backup to nbd target and restarts nbd server
->>> during backup.
->>>
->>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
->>> ---
-
->>> +vm.qmp_log('blockdev-backup', device=3D'drive0', sync=3D'full', target=
-=3D'backup0',
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 speed=3D(=
-1 * 1024 * 1024))
->>
->> This starts the job throttled, to give us time...
->>
->>> +
->>> +# Wait for some progress
->>> +t =3D 0
->>> +while t < wait_limit:
->>> +=C2=A0=C2=A0=C2=A0 jobs =3D vm.qmp('query-block-jobs')['return']
->>> +=C2=A0=C2=A0=C2=A0 if jobs and jobs[0]['offset'] > 0:
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 break
->>> +=C2=A0=C2=A0=C2=A0 time.sleep(wait_step)
->>> +=C2=A0=C2=A0=C2=A0 t +=3D wait_step
->>> +
->>> +if jobs and jobs[0]['offset'] > 0:
->>> +=C2=A0=C2=A0=C2=A0 log('Backup job is started')
->>> +
->>> +log('Kill NBD server')
->>> +srv.kill()
->>> +srv.wait()
->>> +
->>> +jobs =3D vm.qmp('query-block-jobs')['return']
->>> +if jobs and jobs[0]['offset'] < jobs[0]['len']:
->>> +=C2=A0=C2=A0=C2=A0 log('Backup job is still in progress')
->>> +
->>> +vm.qmp_log('block-job-set-speed', device=3D'drive0', speed=3D0)
-
-Ah, I overlooked this line in my late-night review.
-
->>> +
->>> +# Emulate server down time for 1 second
->>> +time.sleep(1)
->>
->> ...but once we restart,...
->>
->>> +
->>> +log('Start NBD server')
->>> +srv =3D qemu_nbd_popen('-k', nbd_sock, '-f', iotests.imgfmt, disk_b)
->>> +
->>> +e =3D vm.event_wait('BLOCK_JOB_COMPLETED')
->>
->> ...should we unthrottle the job to allow the test to complete slightly f=
-aster after the reconnect?=C2=A0 But that can be done as an improvement on =
-top, if it helps.
+On 10/22/19 9:16 PM, Alex Benn=C3=A9e wrote:
+> From: Thomas Huth <thuth@redhat.com>
 >=20
-> It is done above, before time.sleep(1)
+> The "command -v ccache && ccache ..." likely were supposed to test
+> the availability of ccache before running the program. But this
+> shell construct causes Travis to abort if ccache is not available.
+> Use an if-statement instead to fix this problem.
+>=20
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> Message-Id: <20191009170701.14756-5-thuth@redhat.com>
 
-Yep, so I feel better now.
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
-
+> ---
+>   .travis.yml | 4 ++--
+>   1 file changed, 2 insertions(+), 2 deletions(-)
+>=20
+> diff --git a/.travis.yml b/.travis.yml
+> index e65e53f3d7e..7e0d4ad2b31 100644
+> --- a/.travis.yml
+> +++ b/.travis.yml
+> @@ -91,13 +91,13 @@ git:
+>  =20
+>   before_script:
+>     - if [ "$TRAVIS_OS_NAME" =3D=3D "osx" ] ; then export PATH=3D"/usr/=
+local/opt/ccache/libexec:$PATH" ; fi
+> -  - command -v ccache && ccache --zero-stats
+> +  - if command -v ccache ; then ccache --zero-stats ; fi
+>     - mkdir -p ${BUILD_DIR} && cd ${BUILD_DIR}
+>     - ${SRC_DIR}/configure ${BASE_CONFIG} ${CONFIG} || { cat config.log=
+ && exit 1; }
+>   script:
+>     - make -j3 && travis_retry ${TEST_CMD}
+>   after_script:
+> -  - command -v ccache && ccache --show-stats
+> +  - if command -v ccache ; then ccache --show-stats ; fi
+>  =20
+>  =20
+>   matrix:
+>=20
 
