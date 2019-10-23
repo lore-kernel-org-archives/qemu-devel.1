@@ -2,94 +2,82 @@ Return-Path: <SRS0=brme=YQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2DEF3CA9EB6
-	for <qemu-devel@archiver.kernel.org>; Wed, 23 Oct 2019 16:37:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0B8B7CA9EB6
+	for <qemu-devel@archiver.kernel.org>; Wed, 23 Oct 2019 16:44:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EA2CD21872
-	for <qemu-devel@archiver.kernel.org>; Wed, 23 Oct 2019 16:37:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C4FF721872
+	for <qemu-devel@archiver.kernel.org>; Wed, 23 Oct 2019 16:44:41 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="H6kM1rbh"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EA2CD21872
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cwR845OP"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C4FF721872
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41330 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41494 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iNJdq-0005Xf-Dg
-	for qemu-devel@archiver.kernel.org; Wed, 23 Oct 2019 12:37:46 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46971)
+	id 1iNJkW-0005cY-Ow
+	for qemu-devel@archiver.kernel.org; Wed, 23 Oct 2019 12:44:40 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48548)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1iNJGD-0007F5-0w
- for qemu-devel@nongnu.org; Wed, 23 Oct 2019 12:13:21 -0400
+ (envelope-from <david@redhat.com>) id 1iNJQV-0008HH-Os
+ for qemu-devel@nongnu.org; Wed, 23 Oct 2019 12:24:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1iNJGB-0005oZ-Ml
- for qemu-devel@nongnu.org; Wed, 23 Oct 2019 12:13:20 -0400
-Received: from mail-qt1-x844.google.com ([2607:f8b0:4864:20::844]:41700)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1iNJGB-0005oK-I8
- for qemu-devel@nongnu.org; Wed, 23 Oct 2019 12:13:19 -0400
-Received: by mail-qt1-x844.google.com with SMTP id c17so30084401qtn.8
- for <qemu-devel@nongnu.org>; Wed, 23 Oct 2019 09:13:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=nrvAJTS/jezBLWvO+M8F8gQv267wMLuwRBhFnSGEFeM=;
- b=H6kM1rbhivP4l30+902GgNfOQQV06aLx3rfEcQUrn8aEcH0hmVUgMEPS8e9V+pipyg
- j/3aAddl/1EyoYMEJNfSBwXbuLgPI131z2nFXc8lolP4gHEFKNynJsJCg723iAi+GKPX
- o+3s5fT9PrJ+hyD6sS5ODt2IFxARWkaqluWGZniURp3tBMhY+HzuxrioSX6BpaOxrWn3
- T1JDHv26QH0FQg2tGnYvJVP/SEGDYQMC4dOkISUjDRZqy+/0FdiCWvyZzr3h3VcngkZo
- 3kXu5Jq299aUm94grA6mcO/REahpsNudQKhKTdRkE/ThW9LlN1h2PlFqa9jpd2lgWFrk
- NuZQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=nrvAJTS/jezBLWvO+M8F8gQv267wMLuwRBhFnSGEFeM=;
- b=JziwqvdGNS6Q4fhPY039VaFxyHI+LAon/3eGW9JSlxOdbdDzXn8OkdoAggKIE+Mkit
- rU+fEUoghXUNT0EHLvtkqm+bRP5uW/83L1GhnQAXcU6g94rsT25uu2MifxLOMI4QIU6d
- sq2kJw+tkGqv4EmyTd0eLa8Heb3kvtZtE0F7ZFwYiUR2SLAfLTizWx65SPq7WjLID0yI
- 4U/zKst8+qwxp3+eTwkz2ywjIHGGjjkyoX9K2krhQcX6HWJLVhxHn1FseJQfItD84hDX
- e/CXzi511nnmaLF2wZ2GTy6YHXpiAXlaVYKuk/w9E3KPVhRScdVN16VU7ZeWNL7IyFbD
- iIGA==
-X-Gm-Message-State: APjAAAXT/CReONS4cSpnIKAY5yx56otbrlohQx5zNbjnYPKTdXqgQJxW
- jbB1oxBdLvmBQiNdPKRbW7lHBLlevJA=
-X-Google-Smtp-Source: APXvYqy394SF9xkkWaG3lftyOqPnhFJh4yEDe9NZamGJd+2yUihx/Yt7DUAVisMG1ApRAR7mLgjMwA==
-X-Received: by 2002:ac8:1408:: with SMTP id k8mr9854763qtj.327.1571847198500; 
- Wed, 23 Oct 2019 09:13:18 -0700 (PDT)
-Received: from [172.20.87.163] (rrcs-172-254-253-50.nyc.biz.rr.com.
- [172.254.253.50])
- by smtp.gmail.com with ESMTPSA id c126sm12954799qkd.13.2019.10.23.09.13.17
- (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Wed, 23 Oct 2019 09:13:17 -0700 (PDT)
-Subject: Re: [PATCH v8 00/22] target/arm: Reduce overhead of
- cpu_get_tb_cpu_state
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, qemu-arm@nongnu.org
-References: <20191018174431.1784-1-richard.henderson@linaro.org>
- <CAFEAcA-MyKoA63UF6DYQ6J-dKihYn9iyG09eFCgWT8j4OqsQnw@mail.gmail.com>
- <CAFEAcA-Xj-6CdVzgfcVONipApD5b5PZ84nPnvbbOQjQkqQLnqA@mail.gmail.com>
- <6e06dede-2470-92e1-eba9-40646ed56af0@linaro.org> <87zhhrmqyh.fsf@linaro.org>
-From: Richard Henderson <richard.henderson@linaro.org>
-Openpgp: preference=signencrypt
-Message-ID: <3e366a5d-0de6-ff1d-7a0c-a40ef8a2bf98@linaro.org>
-Date: Wed, 23 Oct 2019 12:13:15 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+ (envelope-from <david@redhat.com>) id 1iNJQS-0004XT-Ct
+ for qemu-devel@nongnu.org; Wed, 23 Oct 2019 12:23:58 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:35726
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <david@redhat.com>) id 1iNJQS-0004Wg-9G
+ for qemu-devel@nongnu.org; Wed, 23 Oct 2019 12:23:56 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1571847834;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=XJ2K2GJxpKAfkNsURNC6mJmIbnmlynPVTOZpP4D4MiE=;
+ b=cwR845OPMj40UrchBHb1SpZWSynKCxI6bWYGf6iPulEAo5wS2C3lXFgadRAe8vZ/HpWaoZ
+ DT2DYMbx10dQobGWcMyzMYVyYzpF0JBGwihHuF/RXdJci9aq/jBWZf/TXD2ho10in6K0Vw
+ nrrr8sCRO2VipfFFR0JM75HhDDr1EK4=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-201-QBd_2ebGPDS_Al5uivcLbg-1; Wed, 23 Oct 2019 12:23:50 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 018B01005500;
+ Wed, 23 Oct 2019 16:23:50 +0000 (UTC)
+Received: from [10.36.116.105] (ovpn-116-105.ams2.redhat.com [10.36.116.105])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 5160019C78;
+ Wed, 23 Oct 2019 16:23:49 +0000 (UTC)
+Subject: Re: [PATCH] cputlb: Fix tlb_vaddr_to_host
+To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
+References: <20191023154952.30731-1-richard.henderson@linaro.org>
+From: David Hildenbrand <david@redhat.com>
+Organization: Red Hat GmbH
+Message-ID: <82dba2ed-4ed6-7ff4-64d6-119e3eefc8fa@redhat.com>
+Date: Wed, 23 Oct 2019 18:23:48 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.1
 MIME-Version: 1.0
-In-Reply-To: <87zhhrmqyh.fsf@linaro.org>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20191023154952.30731-1-richard.henderson@linaro.org>
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::844
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-MC-Unique: QBd_2ebGPDS_Al5uivcLbg-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -101,21 +89,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 10/23/19 11:17 AM, Alex Bennée wrote:
->>> Dropping this series again for the moment.
->> Argh!  I had forgotten that we have no testing of armeb in check-tcg.
-> 
-> Does it need it's own toolchain or can it be done with flags?
+On 23.10.19 17:49, Richard Henderson wrote:
+> Using uintptr_t instead of target_ulong meant that, for 64-bit guest
+> and 32-bit host, we truncated the guest address comparator and so may
+> not hit the tlb when we should.
+>=20
+> Fixes: 4811e9095c0
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> ---
+>=20
+> Fixes aarch64 emulation on arm32 host, after our recent changes
+> to tlb probing.
+>=20
+>=20
+> r~
+>=20
+> ---
+>   accel/tcg/cputlb.c | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
+>=20
+> diff --git a/accel/tcg/cputlb.c b/accel/tcg/cputlb.c
+> index 6f4194df96..5eebddcca8 100644
+> --- a/accel/tcg/cputlb.c
+> +++ b/accel/tcg/cputlb.c
+> @@ -1189,7 +1189,7 @@ void *tlb_vaddr_to_host(CPUArchState *env, abi_ptr =
+addr,
+>                           MMUAccessType access_type, int mmu_idx)
+>   {
+>       CPUTLBEntry *entry =3D tlb_entry(env, mmu_idx, addr);
+> -    uintptr_t tlb_addr, page;
+> +    target_ulong tlb_addr, page;
+>       size_t elt_ofs;
+>  =20
+>       switch (access_type) {
+>=20
 
-I think the compiler only needs flags, so we might be able to gin something up
-for {aarch64_eb,armeb}-linux-user from __start.
+probe_access() seems to be fine
 
+Reviewed-by: David Hildenbrand <david@redhat.com>
 
-r~
+--=20
+
+Thanks,
+
+David / dhildenb
+
 
