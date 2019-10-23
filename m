@@ -2,74 +2,82 @@ Return-Path: <SRS0=brme=YQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5FE8DCA9EB6
-	for <qemu-devel@archiver.kernel.org>; Wed, 23 Oct 2019 08:56:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8FBB2CA9EB6
+	for <qemu-devel@archiver.kernel.org>; Wed, 23 Oct 2019 08:59:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 35210205C9
-	for <qemu-devel@archiver.kernel.org>; Wed, 23 Oct 2019 08:56:28 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 35210205C9
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 580F2205C9
+	for <qemu-devel@archiver.kernel.org>; Wed, 23 Oct 2019 08:59:07 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QL8yn2Oy"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 580F2205C9
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57554 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57592 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iNCRP-00035w-Cx
-	for qemu-devel@archiver.kernel.org; Wed, 23 Oct 2019 04:56:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49816)
+	id 1iNCTy-00051R-GY
+	for qemu-devel@archiver.kernel.org; Wed, 23 Oct 2019 04:59:06 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48904)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1iNC8r-0008TU-V7
- for qemu-devel@nongnu.org; Wed, 23 Oct 2019 04:37:21 -0400
+ (envelope-from <jfreimann@redhat.com>) id 1iNC0z-0003eC-Li
+ for qemu-devel@nongnu.org; Wed, 23 Oct 2019 04:29:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1iNC8p-0006rQ-M8
- for qemu-devel@nongnu.org; Wed, 23 Oct 2019 04:37:17 -0400
-Received: from indium.canonical.com ([91.189.90.7]:49496)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1iNC8k-0006nE-Kv
- for qemu-devel@nongnu.org; Wed, 23 Oct 2019 04:37:10 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1iNC8h-0006Lc-JZ
- for <qemu-devel@nongnu.org>; Wed, 23 Oct 2019 08:37:07 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 77AF32E8079
- for <qemu-devel@nongnu.org>; Wed, 23 Oct 2019 08:37:07 +0000 (UTC)
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 23 Oct 2019 08:25:06 -0000
-From: Thomas Huth <1596579@bugs.launchpad.net>
+ (envelope-from <jfreimann@redhat.com>) id 1iNC0x-00077X-LO
+ for qemu-devel@nongnu.org; Wed, 23 Oct 2019 04:29:09 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:26579
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <jfreimann@redhat.com>)
+ id 1iNC0v-00075c-QH
+ for qemu-devel@nongnu.org; Wed, 23 Oct 2019 04:29:06 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1571819344;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=QZS+Bpg3A6NPh7e22P/XIvlyKZUB0+Jeal7rH5qYaGI=;
+ b=QL8yn2OyRmsJ2KrCyb6HyIz2jHjCCLZQ78eShe91BGDzF67qaxHB0FIjRIiZoqMfkqZy6b
+ MyYxgyLvk+x56TGRaHj/c4NtMJtznOOBTjwAHMToqwE+zS+l23E1n1m1AgTBsN6h6gvZ32
+ ZHBFFK9Vydct7q/LqKdoB2jQBR3GL4s=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-86-KYC4yDNGM-OqmCJhnCHPTA-1; Wed, 23 Oct 2019 04:29:01 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9C912476;
+ Wed, 23 Oct 2019 08:29:00 +0000 (UTC)
+Received: from localhost (dhcp-192-217.str.redhat.com [10.33.192.217])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 8ADF55C1D4;
+ Wed, 23 Oct 2019 08:28:53 +0000 (UTC)
+From: Jens Freimann <jfreimann@redhat.com>
 To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=Incomplete; importance=Undecided;
- assignee=None; 
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: alex-l-williamson eduardok th-huth
-X-Launchpad-Bug-Reporter: Eduardo (eduardok)
-X-Launchpad-Bug-Modifier: Thomas Huth (th-huth)
-References: <20160627153749.31174.93791.malonedeb@chaenomeles.canonical.com>
-Message-Id: <157181910693.21612.14590430833451281479.malone@wampee.canonical.com>
-Subject: [Bug 1596579] Re: segfault upon reboot
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="186023fa645d8be19d403a76064f0643f510db2f";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: ef27858c5fb1d2b570c79958135321718e590f03
+Subject: [PATCH v5 11/11] vfio: unplug failover primary device before migration
+Date: Wed, 23 Oct 2019 10:27:11 +0200
+Message-Id: <20191023082711.16694-12-jfreimann@redhat.com>
+In-Reply-To: <20191023082711.16694-1-jfreimann@redhat.com>
+References: <20191023082711.16694-1-jfreimann@redhat.com>
+MIME-Version: 1.0
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-MC-Unique: KYC4yDNGM-OqmCJhnCHPTA-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=WINDOWS-1252
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 91.189.90.7
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -78,68 +86,115 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1596579 <1596579@bugs.launchpad.net>
+Cc: pkrempa@redhat.com, berrange@redhat.com, ehabkost@redhat.com,
+ mst@redhat.com, aadam@redhat.com, dgilbert@redhat.com,
+ alex.williamson@redhat.com, laine@redhat.com, ailan@redhat.com,
+ parav@mellanox.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Can you reproduce this problem with the latest upstream version of QEMU
-(currently version 4.1)? Or is it only reproducible in the qemu-kvm from
-your distribution? (In the latter case, please report this bug to your
-distro instead)
+As usual block all vfio-pci devices from being migrated, but make an
+exception for failover primary devices. This is achieved by setting
+unmigratable to 0 but also add a migration blocker for all vfio-pci
+devices except failover primary devices. These will be unplugged before
+migration happens by the migration handler of the corresponding
+virtio-net standby device.
 
-** Changed in: qemu
-       Status: New =3D> Incomplete
+Signed-off-by: Jens Freimann <jfreimann@redhat.com>
+---
+ hw/vfio/pci.c | 26 ++++++++++++++++++++------
+ hw/vfio/pci.h |  1 +
+ 2 files changed, 21 insertions(+), 6 deletions(-)
 
--- =
+diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
+index 12fac39804..5dadfec6e8 100644
+--- a/hw/vfio/pci.c
++++ b/hw/vfio/pci.c
+@@ -40,6 +40,7 @@
+ #include "pci.h"
+ #include "trace.h"
+ #include "qapi/error.h"
++#include "migration/blocker.h"
+=20
+ #define TYPE_VFIO_PCI "vfio-pci"
+ #define PCI_VFIO(obj)    OBJECT_CHECK(VFIOPCIDevice, obj, TYPE_VFIO_PCI)
+@@ -2732,6 +2733,17 @@ static void vfio_realize(PCIDevice *pdev, Error **er=
+rp)
+         return;
+     }
+=20
++    if (!pdev->net_failover_pair_id) {
++        error_setg(&vdev->migration_blocker,
++                "VFIO device doesn't support migration");
++        ret =3D migrate_add_blocker(vdev->migration_blocker, &err);
++        if (err) {
++            error_propagate(errp, err);
++            error_free(vdev->migration_blocker);
++            return;
++        }
++    }
++
+     vdev->vbasedev.name =3D g_path_get_basename(vdev->vbasedev.sysfsdev);
+     vdev->vbasedev.ops =3D &vfio_pci_ops;
+     vdev->vbasedev.type =3D VFIO_DEVICE_TYPE_PCI;
+@@ -3008,6 +3020,10 @@ out_teardown:
+     vfio_bars_exit(vdev);
+ error:
+     error_prepend(errp, VFIO_MSG_PREFIX, vdev->vbasedev.name);
++    if (vdev->migration_blocker) {
++        migrate_del_blocker(vdev->migration_blocker);
++        error_free(vdev->migration_blocker);
++    }
+ }
+=20
+ static void vfio_instance_finalize(Object *obj)
+@@ -3019,6 +3035,10 @@ static void vfio_instance_finalize(Object *obj)
+     vfio_bars_finalize(vdev);
+     g_free(vdev->emulated_config_bits);
+     g_free(vdev->rom);
++    if (vdev->migration_blocker) {
++        migrate_del_blocker(vdev->migration_blocker);
++        error_free(vdev->migration_blocker);
++    }
+     /*
+      * XXX Leaking igd_opregion is not an oversight, we can't remove the
+      * fw_cfg entry therefore leaking this allocation seems like the safes=
+t
+@@ -3151,11 +3171,6 @@ static Property vfio_pci_dev_properties[] =3D {
+     DEFINE_PROP_END_OF_LIST(),
+ };
+=20
+-static const VMStateDescription vfio_pci_vmstate =3D {
+-    .name =3D "vfio-pci",
+-    .unmigratable =3D 1,
+-};
+-
+ static void vfio_pci_dev_class_init(ObjectClass *klass, void *data)
+ {
+     DeviceClass *dc =3D DEVICE_CLASS(klass);
+@@ -3163,7 +3178,6 @@ static void vfio_pci_dev_class_init(ObjectClass *klas=
+s, void *data)
+=20
+     dc->reset =3D vfio_pci_reset;
+     dc->props =3D vfio_pci_dev_properties;
+-    dc->vmsd =3D &vfio_pci_vmstate;
+     dc->desc =3D "VFIO-based PCI device assignment";
+     set_bit(DEVICE_CATEGORY_MISC, dc->categories);
+     pdc->realize =3D vfio_realize;
+diff --git a/hw/vfio/pci.h b/hw/vfio/pci.h
+index 834a90d646..b329d50338 100644
+--- a/hw/vfio/pci.h
++++ b/hw/vfio/pci.h
+@@ -168,6 +168,7 @@ typedef struct VFIOPCIDevice {
+     bool no_vfio_ioeventfd;
+     bool enable_ramfb;
+     VFIODisplay *dpy;
++    Error *migration_blocker;
+ } VFIOPCIDevice;
+=20
+ uint32_t vfio_pci_read_config(PCIDevice *pdev, uint32_t addr, int len);
+--=20
+2.21.0
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1596579
-
-Title:
-  segfault upon reboot
-
-Status in QEMU:
-  Incomplete
-
-Bug description:
-  [   31.167946] VFIO - User Level meta-driver version: 0.3
-  [   34.969182] kvm: zapping shadow pages for mmio generation wraparound
-  [   43.095077] vfio-pci 0000:1a:00.0: irq 50 for MSI/MSI-X
-  [166493.891331] perf interrupt took too long (2506 > 2500), lowering kern=
-el.perf_event_max_sample_rate to 50000
-  [315765.858431] qemu-kvm[1385]: segfault at 0 ip           (null) sp 0000=
-7ffe5430db18 error 14
-  [315782.002077] vfio-pci 0000:1a:00.0: transaction is not cleared; procee=
-ding with reset anyway
-  [315782.910854] mptsas 0000:1a:00.0: Refused to change power state, curre=
-ntly in D3
-  [315782.911236] mptbase: ioc1: Initiating bringup
-  [315782.911238] mptbase: ioc1: WARNING - Unexpected doorbell active!
-  [315842.957613] mptbase: ioc1: ERROR - Failed to come READY after reset! =
-IocState=3Df0000000
-  [315842.957670] mptbase: ioc1: WARNING - ResetHistory bit failed to clear!
-  [315842.957675] mptbase: ioc1: ERROR - Diagnostic reset FAILED! (ffffffff=
-h)
-  [315842.957717] mptbase: ioc1: WARNING - NOT READY WARNING!
-  [315842.957720] mptbase: ioc1: ERROR - didn't initialize properly! (-1)
-  [315842.957890] mptsas: probe of 0000:1a:00.0 failed with error -1
-
-  The qemu-kvm segfault happens when I issue a reboot on the Windows VM. Th=
-e card I have is:
-  1a:00.0 SCSI storage controller: LSI Logic / Symbios Logic SAS1068E PCI-E=
-xpress Fusion-MPT SAS (rev ff)
-
-  I have two of these cards (bought with many years difference), exact same=
- model, and they fail the same way. I'm using PCI passthrough on this card =
-for access to the tape drive.
-  This is very easy to reproduce, so feel free to let me know what to try.
-  Kernel 3.10.0-327.18.2.el7.x86_64 (Centos 7.2.1511).
-  qemu-kvm-1.5.3-105.el7_2.4.x86_64
-  Reporting it here because of the segfault, but I guess I might have to op=
-en a bug report with mptbase as well?
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1596579/+subscriptions
 
