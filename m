@@ -2,88 +2,84 @@ Return-Path: <SRS0=brme=YQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E5B7CA9EB6
-	for <qemu-devel@archiver.kernel.org>; Wed, 23 Oct 2019 15:32:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 85073CA9EB6
+	for <qemu-devel@archiver.kernel.org>; Wed, 23 Oct 2019 15:32:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4448F2084C
-	for <qemu-devel@archiver.kernel.org>; Wed, 23 Oct 2019 15:32:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 54B912084C
+	for <qemu-devel@archiver.kernel.org>; Wed, 23 Oct 2019 15:32:20 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="m2C8Roib"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4448F2084C
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="oNlh9OpJ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 54B912084C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39566 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39570 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iNIcS-0000V2-Oh
-	for qemu-devel@archiver.kernel.org; Wed, 23 Oct 2019 11:32:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35284)
+	id 1iNIcU-0000dF-Rf
+	for qemu-devel@archiver.kernel.org; Wed, 23 Oct 2019 11:32:18 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35348)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1iNI8u-0008A7-Oy
- for qemu-devel@nongnu.org; Wed, 23 Oct 2019 11:01:49 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1iNI8v-0008Dk-RW
+ for qemu-devel@nongnu.org; Wed, 23 Oct 2019 11:01:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1iNI8r-0001GY-NJ
- for qemu-devel@nongnu.org; Wed, 23 Oct 2019 11:01:44 -0400
-Received: from mail-qt1-x841.google.com ([2607:f8b0:4864:20::841]:46550)
+ (envelope-from <richard.henderson@linaro.org>) id 1iNI8q-0001Db-M3
+ for qemu-devel@nongnu.org; Wed, 23 Oct 2019 11:01:45 -0400
+Received: from mail-qt1-x843.google.com ([2607:f8b0:4864:20::843]:38830)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1iNI8r-00017c-GO
- for qemu-devel@nongnu.org; Wed, 23 Oct 2019 11:01:41 -0400
-Received: by mail-qt1-x841.google.com with SMTP id u22so32678675qtq.13
- for <qemu-devel@nongnu.org>; Wed, 23 Oct 2019 08:01:22 -0700 (PDT)
+ id 1iNI8o-0000yd-Ju
+ for qemu-devel@nongnu.org; Wed, 23 Oct 2019 11:01:38 -0400
+Received: by mail-qt1-x843.google.com with SMTP id o25so19348572qtr.5
+ for <qemu-devel@nongnu.org>; Wed, 23 Oct 2019 08:01:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=bIwXZuVFcex8c2gsnRtwJL32LXPTCWgJCQzC/Gsa6O8=;
- b=m2C8RoibueHknxvHHmygii7frJMQFcjjKTc7biRX04nhvioilXfsWLektiwgg02/gs
- 2dGtRi03vI5AFS0Yw60XH+QL1UikrZ4ujJxcEaCVHmyIFdgt2hLcU20zgRF49kCkqsp5
- Kz4g8aL7OD7ihrlK8KUB/tGvfDnAo9vC1DdvCoAp5bGrmLmbNHncrjDIzgrYrwMLLVKv
- Mb29/Kd/ftwtdKCJoRhpjg4/og4NAy2LNJx3+y5LmFu5vAQtDKNyJXlD5c/MXZRp5zwo
- jx5jAU1kiEBJlK6IdWzMUprT9Ymmx2+IEMIkvPULrmMU/REsY7B/llk+po+YWh8Dd96W
- kE9A==
+ h=from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=G2RHHCFtsP5auZ4wmaveYQuuH6u7l3/77Cc/6E9VhRU=;
+ b=oNlh9OpJdglfNTjhTYgZNIGISi32kTmvH0YOBux5UM5605QPr0d0B0bAinIAoZqDsT
+ vvk1WvcbqN3oqgrbadClOCpr8emdHK41QHVkTcDyscl6u224wbq/zWtViA6MCZkrE+jK
+ XwehN3wEmhMKbG42dCxegyLjpLHkDeEh2kJgzKho+osgSpFOzVvK5PQyuB8AqRJrGgD8
+ iA2SWYzLcP5R8ocqQZdgP4+i37Ks0HCgXWpNHc0qugJDDm5jz51eX5I6WW0q0H/ykv5d
+ INSDxa5e3ke5H6MqPPgJZ1ge1cj8T6n64Qcn5g/ffMLve8P2ycUF0BaBBTeyA9Jw9hXt
+ 5KSw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=bIwXZuVFcex8c2gsnRtwJL32LXPTCWgJCQzC/Gsa6O8=;
- b=cX4N/iecPhmXIp93EsoAnwPpKf3HjIy0pIGMLeF1iUAhHXZuhAYzZIFiJYs1n7+ZKE
- hcde4c33ysETsr8jHIUbsf5PVLG5sF1lNTXdr/zGubKP5MYl8Jj35uLLkXEzc28Q5cP9
- va6SX/7vB71qRUa3tIj1Is0jX1MFu08hdJ9cPw+LbFlE9Dqd9qqHWZf/8pADFDcx7cDj
- erZYBy5PGpZOxXf04LL9ggW2UFPI0s6E9vnTmWFrwvuaXvr6jmKc9gQzeaztvmmOtvyI
- JOtdM8J2w8l9ZcoLRS6yRY2cOrHJdk4eq573NtGIOu8U4Pm+jZcbTK3Si0lE28FlheVc
- DBew==
-X-Gm-Message-State: APjAAAVAgeqXjSUPdJ4DN1ZbXsihY6sVI0+09vHjzbHrhm4W6XqxMhnv
- ZJnhPbXG1s33iP9zmnis+IgHhSMsrfA=
-X-Google-Smtp-Source: APXvYqyuG20jKzkwbvXtrRkkDZ1tv+rSWd1in05BROTQsfWpdtAal92eOyCIQ4VAjC/NGBxZOVy04A==
-X-Received: by 2002:ac8:2a66:: with SMTP id l35mr10054665qtl.340.1571842881175; 
- Wed, 23 Oct 2019 08:01:21 -0700 (PDT)
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=G2RHHCFtsP5auZ4wmaveYQuuH6u7l3/77Cc/6E9VhRU=;
+ b=TiLMkpbeQaVYFOS5fgyvE1qpieIfWSaE02oqSXhgvUO4AriRyads5u4HJ5FpI5xWFo
+ BJnSUbEZnTOCj02sbYMCM9Yrb9iC33D7jpz9Nm5Manc6RzfXRrrhqVhtcEWsG7t4o6q5
+ TYnLSc9nLNZM/1kBQLJhHpr6ZsgZr2Ua0yxjQsEoEsApUA18kW0iEhbcfl7x2J5Vy2u7
+ +Yj7SJOvn4FaHlPQxmz2ybp+yS/9pvVz9FFNPbDM0z/UhKPHKMZJbMcfTuXgedvRY4V/
+ SE0+nK6WnO39w1+kQdYQW0rOUcMbF48gxDXFtaWFhbhV0MWOZ3Dl8Vlbph6zvZdCBbd4
+ fwyQ==
+X-Gm-Message-State: APjAAAURiejIRGu8bJpvI2r8Ee2HUgHJ99BQHTGkzFDQjbmgv/fufa9h
+ mlj8NhfFgigdAA5yI7jcobn+FZjatmo=
+X-Google-Smtp-Source: APXvYqyWjwMwjQ0j3AFrSZ396cSQ45oI5+IwgorOOumkuFlVUCU8zt5nd3/m+mbd12jP6O7rxmT5Uw==
+X-Received: by 2002:ac8:7052:: with SMTP id y18mr9879850qtm.24.1571842861327; 
+ Wed, 23 Oct 2019 08:01:01 -0700 (PDT)
 Received: from localhost.localdomain (198-4-20-64.static.cosmoweb.net.
  [64.20.4.198])
- by smtp.gmail.com with ESMTPSA id l189sm11030168qke.69.2019.10.23.08.01.19
+ by smtp.gmail.com with ESMTPSA id l189sm11030168qke.69.2019.10.23.08.00.58
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 23 Oct 2019 08:01:20 -0700 (PDT)
+ Wed, 23 Oct 2019 08:00:59 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v9 14/24] target/arm: Hoist store to cs_base in
- cpu_get_tb_cpu_state
-Date: Wed, 23 Oct 2019 11:00:47 -0400
-Message-Id: <20191023150057.25731-15-richard.henderson@linaro.org>
+Subject: [PATCH v9 00/24] target/arm: Reduce overhead of cpu_get_tb_cpu_state
+Date: Wed, 23 Oct 2019 11:00:33 -0400
+Message-Id: <20191023150057.25731-1-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20191023150057.25731-1-richard.henderson@linaro.org>
-References: <20191023150057.25731-1-richard.henderson@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::841
+X-Received-From: 2607:f8b0:4864:20::843
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -100,35 +96,67 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-By performing this store early, we avoid having to save and restore
-the register holding the address around any function calls.
+Changes since v8:
+  * Rebuild hflags in linux-user/*/cpu_loop.c, after changing to big-endian.
+    This allows the armeb busybox ls to pass.  I don't have a test image for
+    aarch64_eb, but the code looks the same.
 
-Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
----
- target/arm/helper.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Changes since v7:
+  * Rebuild hflags for all successful nvic writes (Peter).
+  * Rebuild hflags for Xscale sctlr writes (Peter).
 
-diff --git a/target/arm/helper.c b/target/arm/helper.c
-index 3f7d3f257d..37424e3d4d 100644
---- a/target/arm/helper.c
-+++ b/target/arm/helper.c
-@@ -11225,6 +11225,7 @@ void cpu_get_tb_cpu_state(CPUARMState *env, target_ulong *pc,
- {
-     uint32_t flags, pstate_for_ss;
- 
-+    *cs_base = 0;
-     flags = rebuild_hflags_internal(env);
- 
-     if (is_a64(env)) {
-@@ -11298,7 +11299,6 @@ void cpu_get_tb_cpu_state(CPUARMState *env, target_ulong *pc,
-     }
- 
-     *pflags = flags;
--    *cs_base = 0;
- }
- 
- #ifdef TARGET_AARCH64
+Changes since v6:
+  * Regen hflags in two more places for m-profile (patch 19).
+...
+
+
+r~
+
+
+Richard Henderson (24):
+  target/arm: Split out rebuild_hflags_common
+  target/arm: Split out rebuild_hflags_a64
+  target/arm: Split out rebuild_hflags_common_32
+  target/arm: Split arm_cpu_data_is_big_endian
+  target/arm: Split out rebuild_hflags_m32
+  target/arm: Reduce tests vs M-profile in cpu_get_tb_cpu_state
+  target/arm: Split out rebuild_hflags_a32
+  target/arm: Split out rebuild_hflags_aprofile
+  target/arm: Hoist XSCALE_CPAR, VECLEN, VECSTRIDE in
+    cpu_get_tb_cpu_state
+  target/arm: Simplify set of PSTATE_SS in cpu_get_tb_cpu_state
+  target/arm: Hoist computation of TBFLAG_A32.VFPEN
+  target/arm: Add arm_rebuild_hflags
+  target/arm: Split out arm_mmu_idx_el
+  target/arm: Hoist store to cs_base in cpu_get_tb_cpu_state
+  target/arm: Add HELPER(rebuild_hflags_{a32,a64,m32})
+  target/arm: Rebuild hflags at EL changes
+  target/arm: Rebuild hflags at MSR writes
+  target/arm: Rebuild hflags at CPSR writes
+  target/arm: Rebuild hflags at Xscale SCTLR writes
+  target/arm: Rebuild hflags for M-profile
+  target/arm: Rebuild hflags for M-profile NVIC
+  linux-user/aarch64: Rebuild hflags for TARGET_WORDS_BIGENDIAN
+  linux-user/arm: Rebuild hflags for TARGET_WORDS_BIGENDIAN
+  target/arm: Rely on hflags correct in cpu_get_tb_cpu_state
+
+ target/arm/cpu.h              |  84 +++++---
+ target/arm/helper.h           |   4 +
+ target/arm/internals.h        |   9 +
+ hw/intc/armv7m_nvic.c         |  22 +-
+ linux-user/aarch64/cpu_loop.c |   1 +
+ linux-user/arm/cpu_loop.c     |   1 +
+ linux-user/syscall.c          |   1 +
+ target/arm/cpu.c              |   1 +
+ target/arm/helper-a64.c       |   3 +
+ target/arm/helper.c           | 393 ++++++++++++++++++++++------------
+ target/arm/m_helper.c         |   6 +
+ target/arm/machine.c          |   1 +
+ target/arm/op_helper.c        |   4 +
+ target/arm/translate-a64.c    |  13 +-
+ target/arm/translate.c        |  33 ++-
+ 15 files changed, 392 insertions(+), 184 deletions(-)
+
 -- 
 2.17.1
 
