@@ -2,91 +2,77 @@ Return-Path: <SRS0=brme=YQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F3A3ACA9EB6
-	for <qemu-devel@archiver.kernel.org>; Wed, 23 Oct 2019 10:37:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 26DFBCA9EB6
+	for <qemu-devel@archiver.kernel.org>; Wed, 23 Oct 2019 10:38:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BD2EF2064A
-	for <qemu-devel@archiver.kernel.org>; Wed, 23 Oct 2019 10:37:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E4ABD2064A
+	for <qemu-devel@archiver.kernel.org>; Wed, 23 Oct 2019 10:38:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="seQU58Sg"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BD2EF2064A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="baVmfWeP"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E4ABD2064A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60068 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60072 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iNE1c-0008H9-Nx
-	for qemu-devel@archiver.kernel.org; Wed, 23 Oct 2019 06:37:56 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40457)
+	id 1iNE1h-0008S8-Ps
+	for qemu-devel@archiver.kernel.org; Wed, 23 Oct 2019 06:38:01 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40596)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1iNDXw-0005OQ-6E
- for qemu-devel@nongnu.org; Wed, 23 Oct 2019 06:07:17 -0400
+ (envelope-from <stefanha@redhat.com>) id 1iNDYV-0005cW-De
+ for qemu-devel@nongnu.org; Wed, 23 Oct 2019 06:07:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1iNDXu-0003BO-30
- for qemu-devel@nongnu.org; Wed, 23 Oct 2019 06:07:15 -0400
-Received: from mail-wm1-x335.google.com ([2a00:1450:4864:20::335]:51530)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1iNDXt-00039f-6x
- for qemu-devel@nongnu.org; Wed, 23 Oct 2019 06:07:14 -0400
-Received: by mail-wm1-x335.google.com with SMTP id q70so13360738wme.1
- for <qemu-devel@nongnu.org>; Wed, 23 Oct 2019 03:07:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=Z6lK17UQmr8eYfSUfvewTyfTNhH4uVDKwgkN/WXk0n0=;
- b=seQU58Sgeet0hvCg3bW/RlctHhpWbIa2/VEJaLLSywYyJAw8Di7K8OPyGCkhwpY47Q
- Jgsf0xXgknsl7YdH8bPtlto85ZeBGiAJM8ZPmVScFrr0DXJVoKwt7yAg8T4UI7fyJB3I
- YlrTTciArqZ1HiP+cMsElQCSkmMXIU1+MRnDMHzNI55pLnoDyhPpYY5BZYmRjCkGb/58
- SvAMRpDctDq6A0/WVzdykB20Pftd8BiMkoh8H88xDSb5s/9la60T4HQSzImL4OlB522B
- RNtiCTWEXwNWkmWJWtjUdSLUlW8+kdF5fRcO0q3Huz4NjopvZqERZTfr6NBi0HAR0BgX
- gSfA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=Z6lK17UQmr8eYfSUfvewTyfTNhH4uVDKwgkN/WXk0n0=;
- b=bXw6IzGhcAaU5FNzD9XaTdX6QZZ4kvojddJJ3j36MAjbpskYJspPDv2asA9GLbMmQg
- 02y4HYDB/4wjVWZ1yg9aO/0OAXBy2swt7VCJ5nEgDsG54J9EoMebTJ6kVc6jGlGlXBH5
- R+y5Gi1jAX1qui8FtZNO4phKNkbbdEFH2DCgv99nGGJTciN+fFRHUohPwORo9H0VZNIg
- WECmVoyCpYFrQHQB9c3GLtrVGot4Pc3iDRnbJMv55zdP38pQcIht2Ra1EAzjC33/MEtv
- Exxi1F1ohUlrvuKKZfo9daQs7tYOdBr5QbWaHGvkNmlvG9JvD0OfMW0DRm2a719eeQ0b
- 1Y1w==
-X-Gm-Message-State: APjAAAUU8OowW/6oSoF3k0h1RxR0tO6eFB658DZj5e4UH62vktqgNuAW
- jVtDIV0cGGkpJVJ8hTz8QScyMQ==
-X-Google-Smtp-Source: APXvYqxtsJ/YIrEhbdQuKgbAaqbtVsUQ6ZkcE1vpSFgsM6Qu84nsU4Hk+chb2o2v9rI1DzI4Y3mVBg==
-X-Received: by 2002:a7b:c313:: with SMTP id k19mr7406606wmj.6.1571825231010;
- Wed, 23 Oct 2019 03:07:11 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id o1sm17962595wmc.38.2019.10.23.03.07.10
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 23 Oct 2019 03:07:10 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 8F1B71FF87;
- Wed, 23 Oct 2019 11:07:09 +0100 (BST)
-References: <20191022191704.6134-1-alex.bennee@linaro.org>
- <20191022191704.6134-8-alex.bennee@linaro.org>
- <2020367759.8121043.1571815677935.JavaMail.zimbra@redhat.com>
-User-agent: mu4e 1.3.5; emacs 27.0.50
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: Thomas Huth <thuth@redhat.com>
-Subject: Re: [PATCH  v1 07/19] cirrus.yml: reduce scope of MacOS build
-In-reply-to: <2020367759.8121043.1571815677935.JavaMail.zimbra@redhat.com>
-Date: Wed, 23 Oct 2019 11:07:09 +0100
-Message-ID: <87y2xbvkqa.fsf@linaro.org>
+ (envelope-from <stefanha@redhat.com>) id 1iNDYQ-0003VO-Pn
+ for qemu-devel@nongnu.org; Wed, 23 Oct 2019 06:07:50 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:33010
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1iNDYO-0003S6-JF
+ for qemu-devel@nongnu.org; Wed, 23 Oct 2019 06:07:44 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1571825263;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=372NNTcYnSIQBMgZ5qLgMiK1FMNHd9cWDMz+HfJfX38=;
+ b=baVmfWePoKv+K5NaAezBlUcndLnhECBFWXxBh6RVfZr8wl3LU11PffjNtfpoxajvktyPqJ
+ tbs1s1+teOdywQAvPRizDP9XSwiYPhHASb+sff/nF+yQrLecOH1i1/EPb0lsofOCXd7na4
+ GKUt/nGxMPzGrFSGJ5vDdo66CEue280=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-76-tmfB42kUNLCS01B_CPvpXA-1; Wed, 23 Oct 2019 06:07:42 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 08E0047B;
+ Wed, 23 Oct 2019 10:07:41 +0000 (UTC)
+Received: from localhost (unknown [10.36.118.70])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 7DC7D1001E75;
+ Wed, 23 Oct 2019 10:07:28 +0000 (UTC)
+From: Stefan Hajnoczi <stefanha@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v4 14/16] libqos: make the virtio-pci BAR index configurable
+Date: Wed, 23 Oct 2019 11:04:23 +0100
+Message-Id: <20191023100425.12168-15-stefanha@redhat.com>
+In-Reply-To: <20191023100425.12168-1-stefanha@redhat.com>
+References: <20191023100425.12168-1-stefanha@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-MC-Unique: tmfB42kUNLCS01B_CPvpXA-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::335
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,48 +84,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: fam@euphon.net, berrange@redhat.com, pbonzini@redhat.com,
- stefanb@linux.vnet.ibm.com, richard henderson <richard.henderson@linaro.org>,
- f4bug@amsat.org, qemu-devel@nongnu.org, cota@braap.org, stefanha@redhat.com,
- marcandre lureau <marcandre.lureau@redhat.com>, Ed Maste <emaste@freebsd.org>,
- Li-Wen Hsu <lwhsu@freebsd.org>, aurelien@aurel32.net
+Cc: Fam Zheng <fam@euphon.net>, Laurent Vivier <lvivier@redhat.com>,
+ Thomas Huth <thuth@redhat.com>, qemu-block@nongnu.org, slp@redhat.com,
+ "Michael S. Tsirkin" <mst@redhat.com>, Cornelia Huck <cohuck@redhat.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>,
+ Christophe de Dinechin <dinechin@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+The Legacy virtio-pci interface always uses BAR 0.  VIRTIO 1.0 may need
+to use a different BAR index, so make it configurable.
 
-Thomas Huth <thuth@redhat.com> writes:
+Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+Reviewed-by: Thomas Huth <thuth@redhat.com>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+---
+v3:
+ * Change uint8_t bar_idx to int [Thomas]
+---
+ tests/libqos/virtio-pci.h | 2 ++
+ tests/libqos/virtio-pci.c | 3 ++-
+ 2 files changed, 4 insertions(+), 1 deletion(-)
 
-> ----- Original Message -----
->> From: "Alex Benn=C3=A9e" <alex.bennee@linaro.org>
->> Sent: Tuesday, October 22, 2019 9:16:52 PM
->>
->> The MacOS build can time out on Cirrus running to almost an hour.
->> Reduce the scope to the historical MacOS architectures much the same
->> way we do on Travis.
->
-> Oh, really? For me, the builds on Cirrus-CI work reasonable fast and
-> almost always finish within 20 minutes, e.g.:
+diff --git a/tests/libqos/virtio-pci.h b/tests/libqos/virtio-pci.h
+index 0e4a8b7b00..78a1c15c2a 100644
+--- a/tests/libqos/virtio-pci.h
++++ b/tests/libqos/virtio-pci.h
+@@ -25,6 +25,8 @@ typedef struct QVirtioPCIDevice {
+     uint16_t config_msix_entry;
+     uint64_t config_msix_addr;
+     uint32_t config_msix_data;
++
++    int bar_idx;
+ } QVirtioPCIDevice;
+=20
+ struct QVirtioPCIMSIXOps {
+diff --git a/tests/libqos/virtio-pci.c b/tests/libqos/virtio-pci.c
+index c900742f96..e9595603f5 100644
+--- a/tests/libqos/virtio-pci.c
++++ b/tests/libqos/virtio-pci.c
+@@ -310,7 +310,7 @@ static const QVirtioPCIMSIXOps qvirtio_pci_msix_ops_leg=
+acy =3D {
+ void qvirtio_pci_device_enable(QVirtioPCIDevice *d)
+ {
+     qpci_device_enable(d->pdev);
+-    d->bar =3D qpci_iomap(d->pdev, 0, NULL);
++    d->bar =3D qpci_iomap(d->pdev, d->bar_idx, NULL);
+ }
+=20
+ void qvirtio_pci_device_disable(QVirtioPCIDevice *d)
+@@ -400,6 +400,7 @@ static void qvirtio_pci_init_from_pcidev(QVirtioPCIDevi=
+ce *dev, QPCIDevice *pci_
+ {
+     dev->pdev =3D pci_dev;
+     dev->vdev.device_type =3D qpci_config_readw(pci_dev, PCI_SUBSYSTEM_ID)=
+;
++    dev->bar_idx =3D 0;
+=20
+     dev->config_msix_entry =3D -1;
+     dev->msix_ops =3D &qvirtio_pci_msix_ops_legacy;
+--=20
+2.21.0
 
-It seems to be an intermittent thing:
-
-  https://cirrus-ci.com/github/stsquad/qemu
-
-but looking again maybe it's only the xcode build that is reliably long...
-
->
-> https://cirrus-ci.com/build/4976412120842240
->
-> Also the last macos_task from the official QEMU mirror on github finished=
- within 15 minutes:
->
-> https://github.com/qemu/qemu/runs/269964092
->
-> ... so was your issue maybe just a temporary dropout?
->
->  Thomas
-
-
---
-Alex Benn=C3=A9e
 
