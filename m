@@ -2,79 +2,82 @@ Return-Path: <SRS0=Jnn8=YR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B8DC8CA9EAF
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 10:44:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D07C8CA9EAF
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 10:47:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8DCF52084C
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 10:44:35 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8DCF52084C
+	by mail.kernel.org (Postfix) with ESMTPS id 9B1F820856
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 10:47:56 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="G5Fy3K9b"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9B1F820856
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38421 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38484 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iNaba-0008OY-IL
-	for qemu-devel@archiver.kernel.org; Thu, 24 Oct 2019 06:44:34 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55051)
+	id 1iNaeo-0003zR-Pm
+	for qemu-devel@archiver.kernel.org; Thu, 24 Oct 2019 06:47:54 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54648)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mlureau@redhat.com>) id 1iNaMh-0006Dt-CD
- for qemu-devel@nongnu.org; Thu, 24 Oct 2019 06:29:13 -0400
+ (envelope-from <berrange@redhat.com>) id 1iNaK5-0001o5-2a
+ for qemu-devel@nongnu.org; Thu, 24 Oct 2019 06:26:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mlureau@redhat.com>) id 1iNaMd-0006uI-6m
- for qemu-devel@nongnu.org; Thu, 24 Oct 2019 06:29:09 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58936)
+ (envelope-from <berrange@redhat.com>) id 1iNaK2-0005gD-42
+ for qemu-devel@nongnu.org; Thu, 24 Oct 2019 06:26:27 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:29253
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mlureau@redhat.com>) id 1iNaMb-0006qi-Fo
- for qemu-devel@nongnu.org; Thu, 24 Oct 2019 06:29:07 -0400
-Received: from mail-oi1-f198.google.com (mail-oi1-f198.google.com
- [209.85.167.198])
- (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+ (Exim 4.71) (envelope-from <berrange@redhat.com>) id 1iNaK0-0005fM-6H
+ for qemu-devel@nongnu.org; Thu, 24 Oct 2019 06:26:24 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1571912782;
+ h=from:from:reply-to:reply-to:subject:subject:date:date:
+ message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+ content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=Phis3ZiVLeE4i/I7Up7oncRANQvVerLgwndX9J9dRX8=;
+ b=G5Fy3K9bK/21/jEU7JoOmFDEVAXJlq1o9bBjQUof1s697JyIf/Z95mR/F2UeL5SDQWKXtA
+ mkqpXUj3wkb3frHR1WjCw0PCtQf3VjpWHOyRpftRV6BSoD4C5okAgmaq8pOKO6eRoQN4Mv
+ dCCkSe2jJkN2wrWTh9wA0h/jLKQPQFU=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-84-WuyoZ-MJMBC0fhXuoMP6mQ-1; Thu, 24 Oct 2019 06:26:20 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 50B80C049E12
- for <qemu-devel@nongnu.org>; Thu, 24 Oct 2019 10:29:04 +0000 (UTC)
-Received: by mail-oi1-f198.google.com with SMTP id g25so13953840oiy.12
- for <qemu-devel@nongnu.org>; Thu, 24 Oct 2019 03:29:04 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=d7Wp61BGCGzkAAW7NSNW4W65oL+oV43yXlrfwYxbZWA=;
- b=kjpNHNh5oUTsLYNPgQa4Ucu2H1ak9TPvsQVlBPGcn8B89uZeQf2cokT440DWtWYpTY
- AN2p/NZouc5F5IdGq5aheKhemaSHwgasojnQzWHMdnzmWwZSLKtsoj2rWWAo1yIP3chi
- vxJ7tqJc8QeMUi47Sq8tmQ4xseyoFYtMBUYuLWvdBKn0y3k4Z2odg5GWz2x3WQLtXXQ1
- BdSGTin1B8EGEaoVFkegC+xNvwN74V5muDux9DdVV/kqMWYHF5og48tLxdcVzhnkoZnD
- TFSLNEghLCZdubQoGswSMMRltZPgVhdGKoR1D6DpXPQ+Kc7cyYjDD+Hoaw3RHKJa19TP
- JTjA==
-X-Gm-Message-State: APjAAAUdHqq+b1VnIb5zhdiAMmk8WD00wRaSx9NZlh7GnxcU5DwUJBgN
- cAh+qxGtg/hYWVI9uUWXYgao0QgVvaoL5Z91FsLqFEjOp3VKExGr21FRqfoONnRQ4xkimfVzn07
- awNhigS0/5l+Q/1fBcO7R/6b3XEImYd0=
-X-Received: by 2002:aca:4fd8:: with SMTP id d207mr4093816oib.33.1571912943708; 
- Thu, 24 Oct 2019 03:29:03 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqwvhlXJ3ljF2QTE/gtS6/GxE7AjFNRkjgAfnbulIQ4VaJ8+kJcVKh66ncg9Ks1mqplAbLakCKkklSAL72QCrfQ=
-X-Received: by 2002:aca:4fd8:: with SMTP id d207mr4093783oib.33.1571912943430; 
- Thu, 24 Oct 2019 03:29:03 -0700 (PDT)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2A4651800DD0
+ for <qemu-devel@nongnu.org>; Thu, 24 Oct 2019 10:26:19 +0000 (UTC)
+Received: from redhat.com (unknown [10.42.16.231])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 0CD9360BF3;
+ Thu, 24 Oct 2019 10:26:13 +0000 (UTC)
+Date: Thu, 24 Oct 2019 11:26:11 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To: Stefan Hajnoczi <stefanha@redhat.com>
+Subject: Re: [PATCH 2/2] virtiofsd: move to a new pid namespace
+Message-ID: <20191024102611.GF3700@redhat.com>
+References: <20191016160157.12414-1-stefanha@redhat.com>
+ <20191016160157.12414-3-stefanha@redhat.com>
 MIME-Version: 1.0
-References: <20191023173154.30051-1-marcandre.lureau@redhat.com>
- <20191023173154.30051-20-marcandre.lureau@redhat.com>
- <0033fd98-f191-c3f5-4726-ba052254808a@redhat.com>
-In-Reply-To: <0033fd98-f191-c3f5-4726-ba052254808a@redhat.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
-Date: Thu, 24 Oct 2019 12:28:52 +0200
-Message-ID: <CAMxuvawtzdWkyuZRoEs9Zmv9EsxeD6H_d+9-aEM0PetKjf1hbQ@mail.gmail.com>
-Subject: Re: [PATCH v3 19/33] sm501: make SerialMM a child,
- export chardev property
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <20191016160157.12414-3-stefanha@redhat.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-MC-Unique: WuyoZ-MJMBC0fhXuoMP6mQ-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 209.132.183.28
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,147 +89,231 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Corey Minyard <cminyard@mvista.com>, "Michael S. Tsirkin" <mst@redhat.com>,
- Jason Wang <jasowang@redhat.com>,
- Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
- qemu-devel <qemu-devel@nongnu.org>,
- KONRAD Frederic <frederic.konrad@adacore.com>,
- "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
- Paul Burton <pburton@wavecomp.com>, Peter Maydell <peter.maydell@linaro.org>,
- Magnus Damm <magnus.damm@gmail.com>,
- =?UTF-8?Q?Herv=C3=A9_Poussineau?= <hpoussin@reactos.org>,
- Artyom Tarasenko <atar4qemu@gmail.com>, Eduardo Habkost <ehabkost@redhat.com>,
- Fabien Chouteau <chouteau@adacore.com>, qemu-arm <qemu-arm@nongnu.org>,
- Richard Henderson <rth@twiddle.net>,
- =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>,
- Aleksandar Rikalo <arikalo@wavecomp.com>, qemu-ppc <qemu-ppc@nongnu.org>,
- Aleksandar Markovic <amarkovic@wavecomp.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Cc: virtio-fs@redhat.com, qemu-devel@nongnu.org,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi
+On Wed, Oct 16, 2019 at 05:01:57PM +0100, Stefan Hajnoczi wrote:
+> virtiofsd needs access to /proc/self/fd.  Let's move to a new pid
+> namespace so that a compromised process cannot see another other
+> processes running on the system.
+>=20
+> One wrinkle in this approach: unshare(CLONE_NEWPID) affects *child*
+> processes and not the current process.  Therefore we need to fork the
+> pid 1 process that will actually run virtiofsd and leave a parent in
+> waitpid(2).  This is not the same thing as daemonization and parent
+> processes should not notice a difference.
+>=20
+> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+> ---
+>  contrib/virtiofsd/passthrough_ll.c | 95 ++++++++++++++++++++++--------
+>  1 file changed, 72 insertions(+), 23 deletions(-)
+>=20
+> diff --git a/contrib/virtiofsd/passthrough_ll.c b/contrib/virtiofsd/passt=
+hrough_ll.c
+> index c27ff7d800..b6ee9b2e90 100644
+> --- a/contrib/virtiofsd/passthrough_ll.c
+> +++ b/contrib/virtiofsd/passthrough_ll.c
+> @@ -56,9 +56,12 @@
+>  #include <sys/xattr.h>
+>  #include <sys/mman.h>
+>  #include <sys/socket.h>
+> +#include <sys/types.h>
+>  #include <sys/un.h>
+> +#include <sys/wait.h>
+>  #include <sys/capability.h>
+> =20
+> +
+>  #include "ireg.h"
+>  #include <sys/mount.h>
+>  #include <sys/resource.h>
+> @@ -2749,6 +2752,72 @@ static void setup_net_namespace(void)
+>  =09}
+>  }
+> =20
+> +/*
+> + * Move to a new pid namespace to prevent access to other processes if t=
+his
+> + * process is compromised.
+> + */
+> +static void setup_pid_namespace(void)
+> +{
+> +=09pid_t child;
+> +
+> +=09/*
+> +=09 * Create a new pid namespace for *child* processes.  We'll have to
+> +=09 * fork in order to enter the new pid namespace.  A new mount namespa=
+ce
+> +=09 * is also needed so that we can remount /proc for the new pid
+> +=09 * namespace.
+> +=09 */
+> +=09if (unshare(CLONE_NEWPID | CLONE_NEWNS) !=3D 0) {
+> +=09=09fuse_log(FUSE_LOG_ERR, "unshare(CLONE_NEWPID | CLONE_NEWNS): %m\n"=
+);
+> +=09=09exit(1);
+> +=09}
+> +
+> +=09child =3D fork();
+> +=09if (child < 0) {
+> +=09=09fuse_log(FUSE_LOG_ERR, "fork() failed: %m\n");
+> +=09=09exit(1);
+> +=09}
+> +=09if (child > 0) {
+> +=09=09pid_t waited;
+> +=09=09int wstatus;
+> +
+> +=09=09/* The parent waits for the child */
+> +=09=09do {
+> +=09=09=09waited =3D waitpid(child, &wstatus, 0);
+> +=09=09} while (waited < 0 && errno =3D=3D EINTR);
+> +
+> +=09=09if (WIFEXITED(wstatus)) {
+> +=09=09=09exit(WEXITSTATUS(wstatus));
+> +=09=09}
+> +
+> +=09=09exit(1);
+> +=09}
 
-On Thu, Oct 24, 2019 at 12:58 AM Philippe Mathieu-Daud=C3=A9
-<philmd@redhat.com> wrote:
->
-> On 10/23/19 7:31 PM, Marc-Andr=C3=A9 Lureau wrote:
-> > Embed the SerialMM sybus device, and re-export its "chardev" property.
-> > That way, we can get rid of PROP_PTR "chr-state" and better track
-> > devices relationship.
-> >
-> > Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> > ---
-> >   hw/display/sm501.c | 31 ++++++++++++++++++++++---------
-> >   hw/sh4/r2d.c       |  2 +-
-> >   2 files changed, 23 insertions(+), 10 deletions(-)
-> >
-> > diff --git a/hw/display/sm501.c b/hw/display/sm501.c
-> > index 1f33c87e65..6efdf764c1 100644
-> > --- a/hw/display/sm501.c
-> > +++ b/hw/display/sm501.c
-> > @@ -1930,13 +1930,14 @@ typedef struct {
-> >       SM501State state;
-> >       uint32_t vram_size;
-> >       uint32_t base;
-> > -    void *chr_state;
-> > +    SerialMM serial;
-> >   } SM501SysBusState;
-> >
-> >   static void sm501_realize_sysbus(DeviceState *dev, Error **errp)
-> >   {
-> >       SM501SysBusState *s =3D SYSBUS_SM501(dev);
-> >       SysBusDevice *sbd =3D SYS_BUS_DEVICE(dev);
-> > +    SerialState *ss =3D &s->serial.serial;
-> >       DeviceState *usb_dev;
-> >
-> >       sm501_init(&s->state, dev, s->vram_size);
-> > @@ -1958,17 +1959,18 @@ static void sm501_realize_sysbus(DeviceState *d=
-ev, Error **errp)
-> >       sysbus_pass_irq(sbd, SYS_BUS_DEVICE(usb_dev));
-> >
-> >       /* bridge to serial emulation module */
-> > -    if (s->chr_state) {
-> > -        serial_mm_init(&s->state.mmio_region, SM501_UART0, 2,
-> > -                       NULL, /* TODO : chain irq to IRL */
-> > -                       115200, s->chr_state, DEVICE_LITTLE_ENDIAN);
-> > +    if (qemu_chr_fe_backend_connected(&ss->chr)) {
->
-> Oh, this is a Companion Chip (Northbridge + Southbridge), mostly
-> implementing the display part, that's why it is in hw/display/.
->
-> The SM501_UART0 is always mapped here, no need to check for the backend.
-> (Not related to your series goal, but cleaning this might simplify this
-> patch).
+It might be useful to call prctl(PR_SET_PDEATHSIG) here, so that
+if the parent process exits for any reason, the child will be killed
+off too.
 
-I see, I will drop a FIXME. Otherwise, it looks ok?
+> +
+> +=09/*
+> +=09 * If the mounts have shared propagation then we want to opt out so o=
+ur
+> +=09 * mount changes don't affect the parent mount namespace.
+> +=09 */
+> +=09if (mount(NULL, "/", NULL, MS_REC|MS_SLAVE, NULL) < 0) {
+> +=09=09fuse_log(FUSE_LOG_ERR, "mount(/, MS_REC|MS_SLAVE): %m\n");
+> +=09=09exit(1);
+> +=09}
+> +
+> +=09/* The child must remount /proc to use the new pid namespace */
+> +=09if (mount("proc", "/proc", "proc",
+> +=09=09  MS_NODEV | MS_NOEXEC | MS_NOSUID | MS_RELATIME, NULL) < 0) {
+> +=09=09fuse_log(FUSE_LOG_ERR, "mount(/proc): %m\n");
+> +=09=09exit(1);
+> +=09}
+> +}
 
+I feel like this is making things a bit misleading.
 
->
-> > +        MemoryRegion *mr;
-> > +        qdev_init_nofail(DEVICE(&s->serial));
-> > +        mr =3D sysbus_mmio_get_region(SYS_BUS_DEVICE(&s->serial), 0);
-> > +        memory_region_add_subregion(&s->state.mmio_region, SM501_UART0=
-, mr);
-> > +        /* TODO : chain irq to IRL */
-> >       }
-> >   }
-> >
-> >   static Property sm501_sysbus_properties[] =3D {
-> >       DEFINE_PROP_UINT32("vram-size", SM501SysBusState, vram_size, 0),
-> >       DEFINE_PROP_UINT32("base", SM501SysBusState, base, 0),
-> > -    DEFINE_PROP_PTR("chr-state", SM501SysBusState, chr_state),
-> >       DEFINE_PROP_END_OF_LIST(),
-> >   };
-> >
-> > @@ -1999,9 +2001,19 @@ static void sm501_sysbus_class_init(ObjectClass =
-*klass, void *data)
-> >       dc->props =3D sm501_sysbus_properties;
-> >       dc->reset =3D sm501_reset_sysbus;
-> >       dc->vmsd =3D &vmstate_sm501_sysbus;
-> > -    /* Note: pointer property "chr-state" may remain null, thus
-> > -     * no need for dc->user_creatable =3D false;
-> > -     */
-> > +}
-> > +
-> > +static void sm501_sysbus_init(Object *o)
-> > +{
-> > +    SM501SysBusState *self =3D SYSBUS_SM501(o);
-> > +    SerialMM *s =3D &self->serial;
-> > +
-> > +    sysbus_init_child_obj(o, "serial", s, sizeof(SerialMM), TYPE_SERIA=
-L_MM);
-> > +    qdev_prop_set_int32(DEVICE(s), "instance-id", SM501_UART0);
-> > +    qdev_prop_set_uint8(DEVICE(s), "regshift", 2);
-> > +    qdev_prop_set_uint8(DEVICE(s), "endianness", DEVICE_LITTLE_ENDIAN)=
-;
-> > +
-> > +    object_property_add_alias(o, "chardev", OBJECT(s), "chardev", &err=
-or_abort);
-> >   }
-> >
-> >   static const TypeInfo sm501_sysbus_info =3D {
-> > @@ -2009,6 +2021,7 @@ static const TypeInfo sm501_sysbus_info =3D {
-> >       .parent        =3D TYPE_SYS_BUS_DEVICE,
-> >       .instance_size =3D sizeof(SM501SysBusState),
-> >       .class_init    =3D sm501_sysbus_class_init,
-> > +    .instance_init =3D sm501_sysbus_init,
-> >   };
-> >
-> >   #define TYPE_PCI_SM501 "sm501"
-> > diff --git a/hw/sh4/r2d.c b/hw/sh4/r2d.c
-> > index ee0840f380..72bb5285cc 100644
-> > --- a/hw/sh4/r2d.c
-> > +++ b/hw/sh4/r2d.c
-> > @@ -272,7 +272,7 @@ static void r2d_init(MachineState *machine)
-> >       busdev =3D SYS_BUS_DEVICE(dev);
-> >       qdev_prop_set_uint32(dev, "vram-size", SM501_VRAM_SIZE);
-> >       qdev_prop_set_uint32(dev, "base", 0x10000000);
-> > -    qdev_prop_set_ptr(dev, "chr-state", serial_hd(2));
-> > +    qdev_prop_set_chr(dev, "chardev", serial_hd(2));
-> >       qdev_init_nofail(dev);
-> >       sysbus_mmio_map(busdev, 0, 0x10000000);
-> >       sysbus_mmio_map(busdev, 1, 0x13e00000);
-> >
+ setup_pid_namespace()
+
+is now creating the mount namespace and pid namespace, and doing
+some mount point config
+
+ setup_mount_namespace()
+
+is not creating the mount namespace, but is doing some more mount
+point config.
+
+And then there's setup_net_namespace() too.
+
+I think there could be a  single
+
+  setup_namespaces()
+
+method that does the unshare(CLONE_NEWNS|CLONE_NEWNET|CLONE_NEWPID)
+and forking the child.
+
+And a setup_mounts()
+
+method that does all the mount() calls.
+
+> +
+> +static void setup_proc_self_fd(struct lo_data *lo)
+> +{
+> +=09lo->proc_self_fd =3D open("/proc/self/fd", O_PATH);
+> +=09if (lo->proc_self_fd =3D=3D -1) {
+> +=09=09fuse_log(FUSE_LOG_ERR, "open(/proc/self/fd, O_PATH): %m\n");
+> +=09=09exit(1);
+> +=09}
+> +}
+> +
+>  /* This magic is based on lxc's lxc_pivot_root() */
+>  static void setup_pivot_root(const char *source)
+>  {
+> @@ -2803,20 +2872,10 @@ static void setup_pivot_root(const char *source)
+> =20
+>  /*
+>   * Make the source directory our root so symlinks cannot escape and no o=
+ther
+> - * files are accessible.
+> + * files are accessible.  Assumes unshare(CLONE_NEWNS) was already calle=
+d.
+>   */
+>  static void setup_mount_namespace(const char *source)
+>  {
+> -=09if (unshare(CLONE_NEWNS) !=3D 0) {
+> -=09=09fuse_log(FUSE_LOG_ERR, "unshare(CLONE_NEWNS): %m\n");
+> -=09=09exit(1);
+> -=09}
+> -
+> -=09if (mount(NULL, "/", NULL, MS_REC|MS_SLAVE, NULL) < 0) {
+> -=09=09fuse_log(FUSE_LOG_ERR, "mount(/, MS_REC|MS_PRIVATE): %m\n");
+> -=09=09exit(1);
+> -=09}
+> -
+>  =09if (mount(source, source, NULL, MS_BIND, NULL) < 0) {
+>  =09=09fuse_log(FUSE_LOG_ERR, "mount(%s, %s, MS_BIND): %m\n", source, sou=
+rce);
+>  =09=09exit(1);
+> @@ -2831,6 +2890,8 @@ static void setup_mount_namespace(const char *sourc=
+e)
+>   */
+>  static void setup_sandbox(struct lo_data *lo, bool enable_syslog)
+>  {
+> +=09setup_pid_namespace();
+> +=09setup_proc_self_fd(lo);
+>  =09setup_net_namespace();
+>  =09setup_mount_namespace(lo->source);
+>  =09setup_seccomp(enable_syslog);
+> @@ -2860,15 +2921,6 @@ static void setup_root(struct lo_data *lo, struct =
+lo_inode *root)
+>  =09g_atomic_int_set(&root->refcount, 2);
+>  }
+> =20
+> -static void setup_proc_self_fd(struct lo_data *lo)
+> -{
+> -=09lo->proc_self_fd =3D open("/proc/self/fd", O_PATH);
+> -=09if (lo->proc_self_fd =3D=3D -1) {
+> -=09=09fuse_log(FUSE_LOG_ERR, "open(/proc/self/fd, O_PATH): %m\n");
+> -=09=09exit(1);
+> -=09}
+> -}
+> -
+>  /* Raise the maximum number of open file descriptors to the system limit=
+ */
+>  static void setup_nofile_rlimit(void)
+>  {
+> @@ -3110,9 +3162,6 @@ int main(int argc, char *argv[])
+>  =09=09get_shared(&lo, &lo.root);
+>  =09}
+> =20
+> -=09/* Must be after daemonize to get the right /proc/self/fd */
+> -=09setup_proc_self_fd(&lo);
+> -
+>  =09setup_sandbox(&lo, opts.syslog);
+> =20
+>  =09setup_root(&lo, &lo.root);
+> --=20
+> 2.21.0
+>=20
+>=20
+
+Regards,
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange=
+ :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com=
+ :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange=
+ :|
+
 
