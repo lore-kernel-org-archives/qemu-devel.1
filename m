@@ -2,63 +2,98 @@ Return-Path: <SRS0=Jnn8=YR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_2 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 05D16CA9EAF
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 10:06:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2A63DCA9EAF
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 10:06:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CC7FB205F4
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 10:06:20 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CC7FB205F4
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id E798A205F4
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 10:06:37 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="C2hi090u"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E798A205F4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37256 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37258 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iNa0Z-0000eU-SO
-	for qemu-devel@archiver.kernel.org; Thu, 24 Oct 2019 06:06:19 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46741)
+	id 1iNa0q-0001Ax-Fu
+	for qemu-devel@archiver.kernel.org; Thu, 24 Oct 2019 06:06:36 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44486)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <groug@kaod.org>) id 1iNZQS-00012N-43
- for qemu-devel@nongnu.org; Thu, 24 Oct 2019 05:29:01 -0400
+ (envelope-from <jag.raman@oracle.com>) id 1iNZBO-0005Qw-Fy
+ for qemu-devel@nongnu.org; Thu, 24 Oct 2019 05:13:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <groug@kaod.org>) id 1iNZQQ-0004DG-7i
- for qemu-devel@nongnu.org; Thu, 24 Oct 2019 05:29:00 -0400
-Received: from 5.mo2.mail-out.ovh.net ([87.98.181.248]:39566)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <groug@kaod.org>) id 1iNZQP-0004Cj-SU
- for qemu-devel@nongnu.org; Thu, 24 Oct 2019 05:28:58 -0400
-Received: from player730.ha.ovh.net (unknown [10.109.146.137])
- by mo2.mail-out.ovh.net (Postfix) with ESMTP id 8242D1B0719
- for <qemu-devel@nongnu.org>; Thu, 24 Oct 2019 11:28:55 +0200 (CEST)
-Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
- [82.253.208.248]) (Authenticated sender: groug@kaod.org)
- by player730.ha.ovh.net (Postfix) with ESMTPSA id 7D319B36B026;
- Thu, 24 Oct 2019 09:28:49 +0000 (UTC)
-Date: Thu, 24 Oct 2019 11:28:45 +0200
-From: Greg Kurz <groug@kaod.org>
-To: David Gibson <david@gibson.dropbear.id.au>
-Subject: Re: [PATCH 5/6] spapr: Don't use CPU_FOREACH() in 'info pic'
-Message-ID: <20191024112845.43005bae@bahia.lan>
-In-Reply-To: <20191024030231.GV6439@umbus.fritz.box>
-References: <157184231371.3053790.17713393349394736594.stgit@bahia.lan>
- <157184234176.3053790.8577967462603127139.stgit@bahia.lan>
- <20191024030231.GV6439@umbus.fritz.box>
-X-Mailer: Claws Mail 3.17.4 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
-MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/Sw8TTc3ySUnpCs7zuV=Aa4H";
- protocol="application/pgp-signature"; micalg=pgp-sha256
-X-Ovh-Tracer-Id: 7986852464264190438
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrledugdduhecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 87.98.181.248
+ (envelope-from <jag.raman@oracle.com>) id 1iNZBN-0005my-6S
+ for qemu-devel@nongnu.org; Thu, 24 Oct 2019 05:13:26 -0400
+Received: from aserp2120.oracle.com ([141.146.126.78]:34384)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <jag.raman@oracle.com>)
+ id 1iNZBM-0005mk-Uq
+ for qemu-devel@nongnu.org; Thu, 24 Oct 2019 05:13:25 -0400
+Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
+ by aserp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x9O94s7L100066;
+ Thu, 24 Oct 2019 09:13:19 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
+ h=from : to : cc :
+ subject : date : message-id : in-reply-to : references : in-reply-to :
+ references; s=corp-2019-08-05;
+ bh=yI2wGKXkkFdVlfFpbe0//221YQeG7qB/jqZ/0nHBlMY=;
+ b=C2hi090uhSq4aOmMojHR/mpeWhpSYhOr9qFLtnqieTGBrTRdG/XvR5Me2jyG4SF8RA9G
+ aUTf9c/6oqy20pmnk9uUnV+JzJx7opv4TjzcL7N4BwyJPTirRtkHEGGn+Eu4HWUZ+q4+
+ 3yiRtnkIkhZ+jZUxV/IpP+zthnPSfOpR8qgNl1Sv22DINnnrCjgifFEgPKXuRBy1DdG0
+ tQegBkS27Hw7xOzYGJtYRu4ZgQVBa7LjitWsVPSPSRhJsDtG7VoSG+rQY34sqcgvRqxv
+ yvOEBrd9OEekNZG04h4jZ3zbG79+s7fHvHr1oiLtIkl/DqYiD4k/gbw5OcUHZTu4TWm7 6A== 
+Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
+ by aserp2120.oracle.com with ESMTP id 2vqteq2att-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Thu, 24 Oct 2019 09:13:18 +0000
+Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
+ by userp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x9O97n26170844;
+ Thu, 24 Oct 2019 09:11:18 GMT
+Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
+ by userp3020.oracle.com with ESMTP id 2vtsk4884n-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Thu, 24 Oct 2019 09:11:17 +0000
+Received: from abhmp0008.oracle.com (abhmp0008.oracle.com [141.146.116.14])
+ by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id x9O9BGiU002536;
+ Thu, 24 Oct 2019 09:11:16 GMT
+Received: from jaraman-bur-1.us.oracle.com (/10.152.33.39)
+ by default (Oracle Beehive Gateway v4.0)
+ with ESMTP ; Thu, 24 Oct 2019 02:11:16 -0700
+From: Jagannathan Raman <jag.raman@oracle.com>
+To: qemu-devel@nongnu.org
+Subject: [RFC v4 PATCH 33/49] multi-process: perform device reset in the
+ remote process
+Date: Thu, 24 Oct 2019 05:09:14 -0400
+Message-Id: <7579c5df98f9c09933685209395aa4a0e0ceb857.1571905346.git.jag.raman@oracle.com>
+X-Mailer: git-send-email 1.8.3.1
+In-Reply-To: <cover.1571905346.git.jag.raman@oracle.com>
+References: <cover.1571905346.git.jag.raman@oracle.com>
+In-Reply-To: <cover.1571905346.git.jag.raman@oracle.com>
+References: <cover.1571905346.git.jag.raman@oracle.com>
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9419
+ signatures=668684
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=1
+ malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1908290000 definitions=main-1910240089
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9419
+ signatures=668684
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0
+ priorityscore=1501 malwarescore=0
+ suspectscore=1 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1908290000
+ definitions=main-1910240089
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
+X-Received-From: 141.146.126.78
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -70,197 +105,142 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-ppc@nongnu.org,
- =?UTF-8?B?Q8OpZHJpYw==?= Le Goater <clg@kaod.org>, qemu-devel@nongnu.org
+Cc: elena.ufimtseva@oracle.com, fam@euphon.net, john.g.johnson@oracle.com,
+ kraxel@redhat.com, jag.raman@oracle.com, quintela@redhat.com, mst@redhat.com,
+ armbru@redhat.com, kanth.ghatraju@oracle.com, thuth@redhat.com,
+ ehabkost@redhat.com, konrad.wilk@oracle.com, dgilbert@redhat.com,
+ liran.alon@oracle.com, stefanha@redhat.com, rth@twiddle.net, kwolf@redhat.com,
+ berrange@redhat.com, mreitz@redhat.com, ross.lagerwall@citrix.com,
+ marcandre.lureau@gmail.com, pbonzini@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---Sig_/Sw8TTc3ySUnpCs7zuV=Aa4H
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+Perform device reset in the remote process when QEMU performs
+device reset. This is required to reset the internal state
+(like registers, etc...) of emulated devices
 
-On Thu, 24 Oct 2019 14:02:31 +1100
-David Gibson <david@gibson.dropbear.id.au> wrote:
+Signed-off-by: Elena Ufimtseva <elena.ufimtseva@oracle.com>
+Signed-off-by: John G Johnson <john.g.johnson@oracle.com>
+Signed-off-by: Jagannathan Raman <jag.raman@oracle.com>
+---
+ New patch in v3
 
-> On Wed, Oct 23, 2019 at 04:52:21PM +0200, Greg Kurz wrote:
-> > Now that presenter objects are parented to the interrupt controller, st=
-op
-> > relying on CPU_FOREACH() which can race with CPU hotplug and crash QEMU.
-> >=20
-> > Signed-off-by: Greg Kurz <groug@kaod.org>
->=20
-> So.. we might be able to go further than this.  Having the
-> TYPE_INTERRUPT_STATS_PROVIDER interrupt on the machine is actually an
-> spapr and pnv oddity.  In most cases that interface is on the various
-> components of the interrupt controller directly.  hmp_info_irq() scans
-> the whole QOM tree looking for everything with the interface to
-> produce the info pic output.
->=20
-> It would be nice if we can do the same for xics and xive.  The tricky
-> bit is that we do have the possibility of both, in which case the
-> individual components would need to know if they're currently "active"
-> and minimize their output if so.
->=20
+ hw/proxy/proxy-lsi53c895a.c   |  6 ++++++
+ hw/proxy/qemu-proxy.c         | 14 ++++++++++++++
+ include/hw/proxy/qemu-proxy.h |  2 ++
+ include/io/mpqemu-link.h      |  1 +
+ remote/remote-main.c          | 11 +++++++++++
+ 5 files changed, 34 insertions(+)
 
-Yes but this looks like 4.3 material. If we want to fix this for 4.2,
-I'm now thinking it might be safer to keep CPU_FOREACH() and check the
-state.
+diff --git a/hw/proxy/proxy-lsi53c895a.c b/hw/proxy/proxy-lsi53c895a.c
+index 7734ae2..f6bd8a1 100644
+--- a/hw/proxy/proxy-lsi53c895a.c
++++ b/hw/proxy/proxy-lsi53c895a.c
+@@ -57,6 +57,11 @@ static void proxy_lsi_realize(PCIProxyDev *dev, Error **errp)
+                           &dev->region[2], "proxy-lsi-ram", 0x2000);
+ }
+ 
++static void proxy_lsi_reset(DeviceState *dev)
++{
++    proxy_device_reset(dev);
++}
++
+ static void proxy_lsi_class_init(ObjectClass *klass, void *data)
+ {
+     DeviceClass *dc = DEVICE_CLASS(klass);
+@@ -74,6 +79,7 @@ static void proxy_lsi_class_init(ObjectClass *klass, void *data)
+     set_bit(DEVICE_CATEGORY_STORAGE, dc->categories);
+ 
+     dc->desc = "LSI Proxy Device";
++    dc->reset = proxy_lsi_reset;
+ }
+ 
+ static const TypeInfo lsi_proxy_dev_type_info = {
+diff --git a/hw/proxy/qemu-proxy.c b/hw/proxy/qemu-proxy.c
+index 74aecd3..5aada67 100644
+--- a/hw/proxy/qemu-proxy.c
++++ b/hw/proxy/qemu-proxy.c
+@@ -577,3 +577,17 @@ const MemoryRegionOps proxy_default_ops = {
+         .max_access_size = 1,
+     },
+ };
++
++void proxy_device_reset(DeviceState *dev)
++{
++    PCIProxyDev *pdev = PCI_PROXY_DEV(dev);
++    MPQemuMsg msg;
++
++    memset(&msg, 0, sizeof(MPQemuMsg));
++
++    msg.bytestream = 0;
++    msg.size = sizeof(msg.data1);
++    msg.cmd = DEVICE_RESET;
++
++    mpqemu_msg_send(pdev->mpqemu_link, &msg, pdev->mpqemu_link->com);
++}
+diff --git a/include/hw/proxy/qemu-proxy.h b/include/hw/proxy/qemu-proxy.h
+index 5e858cc..672303c 100644
+--- a/include/hw/proxy/qemu-proxy.h
++++ b/include/hw/proxy/qemu-proxy.h
+@@ -112,4 +112,6 @@ void proxy_default_bar_write(void *opaque, hwaddr addr, uint64_t val,
+ 
+ uint64_t proxy_default_bar_read(void *opaque, hwaddr addr, unsigned size);
+ 
++void proxy_device_reset(DeviceState *dev);
++
+ #endif /* QEMU_PROXY_H */
+diff --git a/include/io/mpqemu-link.h b/include/io/mpqemu-link.h
+index 4911eea..6fcc6f5 100644
+--- a/include/io/mpqemu-link.h
++++ b/include/io/mpqemu-link.h
+@@ -74,6 +74,7 @@ typedef enum {
+     DEVICE_DEL,
+     PROXY_PING,
+     MMIO_RETURN,
++    DEVICE_RESET,
+     MAX,
+ } mpqemu_cmd_t;
+ 
+diff --git a/remote/remote-main.c b/remote/remote-main.c
+index 0a1326d..4459d26 100644
+--- a/remote/remote-main.c
++++ b/remote/remote-main.c
+@@ -66,8 +66,11 @@
+ #include "qemu/log.h"
+ #include "qemu/cutils.h"
+ #include "remote-opts.h"
++#include "monitor/monitor.h"
++#include "sysemu/reset.h"
+ 
+ static MPQemuLinkState *mpqemu_link;
++
+ PCIDevice *remote_pci_dev;
+ bool create_done;
+ 
+@@ -237,6 +240,11 @@ fail:
+     PUT_REMOTE_WAIT(wait);
+ }
+ 
++static void process_device_reset_msg(MPQemuMsg *msg)
++{
++    qemu_devices_reset();
++}
++
+ static int init_drive(QDict *rqdict, Error **errp)
+ {
+     QemuOpts *opts;
+@@ -441,6 +449,9 @@ static void process_msg(GIOCondition cond, MPQemuChannel *chan)
+         notify_proxy(wait, (uint32_t)getpid());
+         PUT_REMOTE_WAIT(wait);
+         break;
++    case DEVICE_RESET:
++        process_device_reset_msg(msg);
++        break;
+     default:
+         error_setg(&err, "Unknown command");
+         goto finalize_loop;
+-- 
+1.8.3.1
 
-> > ---
-> >  hw/intc/spapr_xive.c  |    8 +-------
-> >  hw/intc/xics.c        |   12 ++++++++++++
-> >  hw/intc/xics_spapr.c  |    8 +-------
-> >  hw/intc/xive.c        |   12 ++++++++++++
-> >  include/hw/ppc/xics.h |    1 +
-> >  include/hw/ppc/xive.h |    2 ++
-> >  6 files changed, 29 insertions(+), 14 deletions(-)
-> >=20
-> > diff --git a/hw/intc/spapr_xive.c b/hw/intc/spapr_xive.c
-> > index d74ee71e76b4..05763a58cf5d 100644
-> > --- a/hw/intc/spapr_xive.c
-> > +++ b/hw/intc/spapr_xive.c
-> > @@ -579,14 +579,8 @@ static void spapr_xive_set_irq(SpaprInterruptContr=
-oller *intc, int irq, int val)
-> >  static void spapr_xive_print_info(SpaprInterruptController *intc, Moni=
-tor *mon)
-> >  {
-> >      SpaprXive *xive =3D SPAPR_XIVE(intc);
-> > -    CPUState *cs;
-> > -
-> > -    CPU_FOREACH(cs) {
-> > -        PowerPCCPU *cpu =3D POWERPC_CPU(cs);
-> > -
-> > -        xive_tctx_pic_print_info(spapr_cpu_state(cpu)->tctx, mon);
-> > -    }
-> > =20
-> > +    xive_presenter_print_info(XIVE_ROUTER(intc), mon);
-> >      spapr_xive_pic_print_info(xive, mon);
-> >  }
-> > =20
-> > diff --git a/hw/intc/xics.c b/hw/intc/xics.c
-> > index d5e4db668a4b..6e820c4851f3 100644
-> > --- a/hw/intc/xics.c
-> > +++ b/hw/intc/xics.c
-> > @@ -88,6 +88,18 @@ void ics_pic_print_info(ICSState *ics, Monitor *mon)
-> >      }
-> >  }
-> > =20
-> > +static int do_ics_pic_print_icp_infos(Object *child, void *opaque)
-> > +{
-> > +    icp_pic_print_info(ICP(child), opaque);
-> > +    return 0;
-> > +}
-> > +
-> > +void ics_pic_print_icp_infos(ICSState *ics, const char *type, Monitor =
-*mon)
-> > +{
-> > +    object_child_foreach_type(OBJECT(ics), type, do_ics_pic_print_icp_=
-infos,
-> > +                              mon);
-> > +}
-> > +
-> >  /*
-> >   * ICP: Presentation layer
-> >   */
-> > diff --git a/hw/intc/xics_spapr.c b/hw/intc/xics_spapr.c
-> > index 080ed73aad64..7624d693c8da 100644
-> > --- a/hw/intc/xics_spapr.c
-> > +++ b/hw/intc/xics_spapr.c
-> > @@ -400,14 +400,8 @@ static void xics_spapr_set_irq(SpaprInterruptContr=
-oller *intc, int irq, int val)
-> >  static void xics_spapr_print_info(SpaprInterruptController *intc, Moni=
-tor *mon)
-> >  {
-> >      ICSState *ics =3D ICS_SPAPR(intc);
-> > -    CPUState *cs;
-> > -
-> > -    CPU_FOREACH(cs) {
-> > -        PowerPCCPU *cpu =3D POWERPC_CPU(cs);
-> > -
-> > -        icp_pic_print_info(spapr_cpu_state(cpu)->icp, mon);
-> > -    }
-> > =20
-> > +    ics_pic_print_icp_infos(ics, TYPE_ICP, mon);
-> >      ics_pic_print_info(ics, mon);
-> >  }
-> > =20
-> > diff --git a/hw/intc/xive.c b/hw/intc/xive.c
-> > index 8d2da4a11163..40ce43152456 100644
-> > --- a/hw/intc/xive.c
-> > +++ b/hw/intc/xive.c
-> > @@ -547,6 +547,18 @@ void xive_tctx_pic_print_info(XiveTCTX *tctx, Moni=
-tor *mon)
-> >      }
-> >  }
-> > =20
-> > +static int do_xive_presenter_print_info(Object *child, void *opaque)
-> > +{
-> > +    xive_tctx_pic_print_info(XIVE_TCTX(child), opaque);
-> > +    return 0;
-> > +}
-> > +
-> > +void xive_presenter_print_info(XiveRouter *xrtr, Monitor *mon)
-> > +{
-> > +    object_child_foreach_type(OBJECT(xrtr), TYPE_XIVE_TCTX,
-> > +                              do_xive_presenter_print_info, mon);
-> > +}
-> > +
-> >  void xive_tctx_reset(XiveTCTX *tctx)
-> >  {
-> >      memset(tctx->regs, 0, sizeof(tctx->regs));
-> > diff --git a/include/hw/ppc/xics.h b/include/hw/ppc/xics.h
-> > index f4827e748fd8..4de1f421c997 100644
-> > --- a/include/hw/ppc/xics.h
-> > +++ b/include/hw/ppc/xics.h
-> > @@ -175,6 +175,7 @@ static inline bool ics_irq_free(ICSState *ics, uint=
-32_t srcno)
-> >  void ics_set_irq_type(ICSState *ics, int srcno, bool lsi);
-> >  void icp_pic_print_info(ICPState *icp, Monitor *mon);
-> >  void ics_pic_print_info(ICSState *ics, Monitor *mon);
-> > +void ics_pic_print_icp_infos(ICSState *ics, const char *type, Monitor =
-*mon);
-> > =20
-> >  void ics_resend(ICSState *ics);
-> >  void icp_resend(ICPState *ss);
-> > diff --git a/include/hw/ppc/xive.h b/include/hw/ppc/xive.h
-> > index 8fd439ec9bba..14690428a0aa 100644
-> > --- a/include/hw/ppc/xive.h
-> > +++ b/include/hw/ppc/xive.h
-> > @@ -367,6 +367,8 @@ int xive_router_write_nvt(XiveRouter *xrtr, uint8_t=
- nvt_blk, uint32_t nvt_idx,
-> >  XiveTCTX *xive_router_get_tctx(XiveRouter *xrtr, CPUState *cs);
-> >  void xive_router_notify(XiveNotifier *xn, uint32_t lisn);
-> > =20
-> > +void xive_presenter_print_info(XiveRouter *xrtr, Monitor *mon);
-> > +
-> >  /*
-> >   * XIVE END ESBs
-> >   */
-> >=20
->=20
-
-
---Sig_/Sw8TTc3ySUnpCs7zuV=Aa4H
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEtIKLr5QxQM7yo0kQcdTV5YIvc9YFAl2xbs0ACgkQcdTV5YIv
-c9ZVHg/9FR6YWDwO6IIDz/J/S2VrT/2k6oMdH0sDPPVDCmThAQpy2VQFjr9NXNib
-nWsI1JPKllraVPKtC9Vk1H4VooNibUV5TEMIg5qE0KJq50cWOwGYDR/uppQ9TpQk
-tHfXfqlcnC10eV60LTXYq4pud5aABHjKJ1bHVgww0AMKyVS+JQ8HVmJnBMiU++ES
-+zFKyh6XVWZjy+JqlqgxNPMBirc0Cg4gSBDTBlhdnaGOwD894z3hyDtMATj0Jc8k
-/Sat3Rx22tdSCOzFWwXwN/u+PdjgQwvuvP4RTOp8JOCNLykPD7wIusmJ+kDxY99V
-jMtQXfVj48ejp9MzIxZUNBj6Jxsod/Da10rYYBVy9I+GtOG64VcDrnTTbz2bm4KV
-4TITZFmG2QaN9SWfGIfV2p4RTJjm5V4jntzWhsM2JNle1Cx5tI2h8RvugkJgqm0B
-kTW+wL7M5I+9HDacpjaaHqLUMQOfmVZsqbqMHmLC4RKpU/jSNO1r6OpP1IB96E+I
-bOUcOd3AtpLe5Gc8fqAm8Gl4f6Yb/2IHQHUDFxmtBOrdKDeZGvmF20WIuD6nj46m
-Nwm2+cmeAZYKNSapzpQDcOzOWaqHhc1tu40pUQsN5q9WwPgHGrV4/LaxKmaENSJL
-67Bdgfsx/c7oOOimLZzzdqLFcTSHAIBIevsXzsaTtnTlplQSWiY=
-=Yqop
------END PGP SIGNATURE-----
-
---Sig_/Sw8TTc3ySUnpCs7zuV=Aa4H--
 
