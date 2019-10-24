@@ -2,87 +2,86 @@ Return-Path: <SRS0=Jnn8=YR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8B98CCA9EAF
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 15:33:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 21E96CA9EAF
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 15:34:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 55D8B21655
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 15:33:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id DEBA020650
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 15:34:18 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LbMyW7bK"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 55D8B21655
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=web.de header.i=@web.de header.b="ECteYd6W"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DEBA020650
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=web.de
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45452 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45450 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iNf7Q-0001gS-BQ
-	for qemu-devel@archiver.kernel.org; Thu, 24 Oct 2019 11:33:44 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34958)
+	id 1iNf7x-00017m-Qp
+	for qemu-devel@archiver.kernel.org; Thu, 24 Oct 2019 11:34:18 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38886)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <paolo.bonzini@gmail.com>) id 1iNdjA-0008Cw-0c
- for qemu-devel@nongnu.org; Thu, 24 Oct 2019 10:04:37 -0400
+ (envelope-from <lukasstraub2@web.de>) id 1iNe46-0008AA-TK
+ for qemu-devel@nongnu.org; Thu, 24 Oct 2019 10:26:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <paolo.bonzini@gmail.com>) id 1iNdj8-0007rf-Ie
- for qemu-devel@nongnu.org; Thu, 24 Oct 2019 10:04:35 -0400
-Received: from mail-wr1-x434.google.com ([2a00:1450:4864:20::434]:43856)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
- id 1iNdj8-0007qe-Bs
- for qemu-devel@nongnu.org; Thu, 24 Oct 2019 10:04:34 -0400
-Received: by mail-wr1-x434.google.com with SMTP id c2so21003643wrr.10
- for <qemu-devel@nongnu.org>; Thu, 24 Oct 2019 07:04:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=xgA/nfPYbU/wnzE4LWtTg2UNcRZThw4UJ6slzE0LxoU=;
- b=LbMyW7bKdslaII83GV1xbLROtaD+ZotfiirSUVD6vJceeKbss9ykHyWY76DHQkzb0v
- XA0+h3YzwhginXpGBGSbXJ/uCeBUpnrJ9POhoYIbdSqavtLxq/ZJ5SELoRziAnASR9QF
- IWnMcLUyhFgML4IdiMhUXT50eyUApRgvr3C8VzV76BAi9ICNSdXAzLaCN+H/fq1+mu9E
- K6JwA0OrJfvC5ZJ0Gd/3J8rPd5gtPedWe1z4nE/WGayU0KC+AsC8K35yrb8HuDcGMNEZ
- imclijIqlHfgCsKaMkOSokWftwCOyxUcbr6lwcoWu5tvmgseo/tVh7zPAYxdU7zwhW2f
- QgOA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
- :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=xgA/nfPYbU/wnzE4LWtTg2UNcRZThw4UJ6slzE0LxoU=;
- b=AYHqkkS31fVG71YoFJl3Fgnn0lmXzH9aOSM+gAnE9DL4+27ZOw+XCm7Zy44iwIm8t4
- k8JRtv9Rp+uZ37Epujq3s0XtU55KqDnM5uJhGU0eqq0nYsLOB576RJdE35q1Kjnw2tqu
- Ll6tcOIxh26JS5ISqZiZSZ89NoL5nRgKp/5bspIUunnMfq027ZnlSjqAk/Fzid5q30Of
- jZ2BD51BJBZzalwGbt5a4ooAJrn1GrPnwNygANX0GELE1qiMYCDJB5Zws8RF63db5+VY
- Qa5QvpP1FLdD90Z9XSrP56wUQKfX2Hcmm1z4YlaERxD+1ZuUh2sfDZgXnwKTx5pf1P9x
- MVJg==
-X-Gm-Message-State: APjAAAXgieRbzd/3Hsm7u2kKfv4n7nUjwUgOtMTba3mWDYPKJSiQI5kJ
- xqS4Omrq/fLK0zAVNx3lbEsvfwyU
-X-Google-Smtp-Source: APXvYqzjj66oYe4cundTg3pmDCwXXDMiAMALKxgoMd1F72ypDGL6L/VT1cbtB0gzBcp5SgsZMSscag==
-X-Received: by 2002:a05:6000:11cd:: with SMTP id
- i13mr3899820wrx.197.1571925872989; 
- Thu, 24 Oct 2019 07:04:32 -0700 (PDT)
-Received: from 640k.localdomain ([93.56.166.5])
- by smtp.gmail.com with ESMTPSA id b7sm10610155wrn.53.2019.10.24.07.04.31
- (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Thu, 24 Oct 2019 07:04:32 -0700 (PDT)
-From: Paolo Bonzini <pbonzini@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PULL 32/39] mc146818rtc: Move RTC_ISA_IRQ definition
-Date: Thu, 24 Oct 2019 16:03:48 +0200
-Message-Id: <1571925835-31930-33-git-send-email-pbonzini@redhat.com>
-X-Mailer: git-send-email 1.8.3.1
-In-Reply-To: <1571925835-31930-1-git-send-email-pbonzini@redhat.com>
-References: <1571925835-31930-1-git-send-email-pbonzini@redhat.com>
+ (envelope-from <lukasstraub2@web.de>) id 1iNe45-0002eS-FD
+ for qemu-devel@nongnu.org; Thu, 24 Oct 2019 10:26:14 -0400
+Received: from mout.web.de ([212.227.17.11]:43101)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <lukasstraub2@web.de>)
+ id 1iNe40-0002RH-07; Thu, 24 Oct 2019 10:26:09 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=web.de;
+ s=dbaedf251592; t=1571927139;
+ bh=9FbTgtuzcaCTjHUA8BY5mKaFybBmxQpiWe1iZMpLbP8=;
+ h=X-UI-Sender-Class:Date:From:To:Cc:Subject:In-Reply-To:References;
+ b=ECteYd6W7+tp3RAxMUKZ2oADi66QCSQVMtP+Pw595ghY+Rz/s1Idpn3PXaxkT5iO5
+ Ict4U5HrjWYjyMXkoOFSbRWjUKURK3hDInCIkz3AEcIr6VWeo1ezyPwvHtKSPkA0+d
+ NT7hWX1IqqiSDVhnobU1upEvRUbVNu2+00JFOa6c=
+X-UI-Sender-Class: c548c8c5-30a9-4db5-a2e7-cb6cb037b8f9
+Received: from luklap ([89.247.255.150]) by smtp.web.de (mrweb103
+ [213.165.67.124]) with ESMTPSA (Nemesis) id 0LbrZ2-1hgZWx132a-00jMnl; Thu, 24
+ Oct 2019 16:25:39 +0200
+Date: Thu, 24 Oct 2019 16:25:35 +0200
+From: Lukas Straub <lukasstraub2@web.de>
+To: qemu-devel <qemu-devel@nongnu.org>
+Subject: [PATCH v7 1/4] block/replication.c: Ignore requests after failover
+Message-ID: <039d59f89205824273eef070cdfa7d5e94f95697.1571925699.git.lukasstraub2@web.de>
+In-Reply-To: <cover.1571925699.git.lukasstraub2@web.de>
+References: <cover.1571925699.git.lukasstraub2@web.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::434
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
+X-Provags-ID: V03:K1:N+uedjqvs76OPbOtDsp0z41+9k3NWKoNkTJgPFrKREuJ21iR//o
+ ewMsA3MGKGDnBKEt3mZbmHUiuvusrrzdw6Y0n2g5zVy+pmlKmMrkzg2jG0d4Wfm23cU2QSG
+ 1PcSZwCQ7XchdE9BZ4ki0HxdQNfRMFwHkCFYqs+yWvPBLMcBAdiYmYU2QRcb5FTzNYyexC6
+ XyG5WFbow66C0VRrgpFWQ==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:6iDpevWf7ak=:en4MnMBtuJfdrRM62TmJ0B
+ o9lFzlR8nJUrQgAsMGv13tz6cfXNsp1tLlAy+MAOQj3IxjES9VExNgi/pbgwPxMZhgzC3tzFc
+ UKC9aLLupGenudyQ8DkKglJB2tKIcb/8vlKiOEhsa6/0Vi8VKCDK+9Sy5/u0pzNzcqx9Ia3yi
+ kJNhs1DabApFvxmGE/E7TfyvleRTLduQ6oMuYLxfAwdob6jbk9ys46ocp0n5+kN4yZq38eicu
+ gJIFHKR4rhifIooNlHfCnpHevwB6tL3LNE4d4PO4icU5/kIHXKe4uzOuGnuGcag079W+VEgDu
+ y98CiFnbUYiRa1p0Mfo4A6nQzjhX1FCUIxUIAVMj9xid3b/PsQzRfnCyJqrEqvjG1zNkGcQW+
+ IC1lKzpxZgmMleZEXDBYjZzsYCdcIAWFqB+4WuE3lCjYXFn7ZEk+VFsQmY1qMeaZQyw32lqUT
+ wrJO2HKe+h6p/qW6DfAvgi4QrJgfghHxgCegcVqPWEJN2V2MU2AuHj9PCYXCUUOXNoT7k3UTc
+ cpowuvCYtQHdPELz+SfZ3hxl7dCL030S+gWoJcWGtSBDQkYPwGsEWt95G+r06N5mNxdjx0AKv
+ atRy4Ouqb9CakS+qSxcwFM84OnqI7Dikjo/te+1Iorv/t2nK7Tco0MTOYD5W7HtodyixHcgwu
+ U1sn4ivjcre5EE/kJazkzeIzHpIRAaHAu1m/4nRj+7m2TsjZOA+sqatlHTlgh9G2rFsaOMhCV
+ uB1F04GIjJo2PEBfXPKH8d7lTzIxBPBJd6DmJvq4rrLvLbArCxILiL6c+RVVd+lER6bjDtlqK
+ hptyIBYmYmvfzKiz38E6qv/TvUWWtVMImfAmgcieHq3HAJXfxwDZo6+aOV65+yWmkbvTvFQRE
+ NHgYylI5bTAVP4cAuy3Ur9lzNc8GlIxxsE+A9yAL47o5vSjaZ3pfIHNNeCe7F5S2ygZtjKsui
+ BgaFLwnnkNfIg6IFjwMNIHDBQxgOZhYkI3iMBg12qY7bficlQDcfSSTEuyWPAKV/am5vl10By
+ 5kehvgvJGKGID55kqqhxqq5pHjZQ6pSZ9pXNflEdJ27kXE5Hwrtd5m7Okk5XRRpTF99QQZYno
+ rP4ZsBe3c5pzxcGXCX2qNJ9bD4CBqdIZ9vboE8XJNbZ0ZFs+vdCCSqj2GsSzqBClFq0qHKVvD
+ k720+tEqLBHpocoAfNYEoVVCNNJMrGEes2mVTh115zxAbfPaSfLSxw29gyPVYaCGJ3+1CeaFo
+ UIQyuewuET2/+mlCBMQcp/A9WemIVPFLN1L115R5an2JfQhgGTWMhoVzCUSE=
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 212.227.17.11
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,68 +93,103 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block <qemu-block@nongnu.org>,
+ Wen Congyang <wency@cn.fujitsu.com>, Wen Congyang <wencongyang2@huawei.com>,
+ Jason Wang <jasowang@redhat.com>, Max Reitz <mreitz@redhat.com>,
+ Zhang Chen <chen.zhang@intel.com>, Xie Changlong <xiechanglong.d@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Philippe Mathieu-Daudé <f4bug@amsat.org>
+After failover the Secondary side of replication shouldn't change state, b=
+ecause
+it now functions as our primary disk.
 
-The ISA default number for the RTC devices is not related to its
-registers neither. Move this definition to "hw/timer/mc146818rtc.h".
+In replication_start, replication_do_checkpoint, replication_stop, ignore
+the request if current state is BLOCK_REPLICATION_DONE (sucessful failover=
+) or
+BLOCK_REPLICATION_FAILOVER (failover in progres i.e. currently merging act=
+ive
+and hidden images into the base image).
 
-Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Message-Id: <20191018133547.10936-3-philmd@redhat.com>
-Reviewed-by: Thomas Huth <thuth@redhat.com>
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
----
- include/hw/timer/mc146818rtc.h      | 2 ++
- include/hw/timer/mc146818rtc_regs.h | 2 --
- tests/rtc-test.c                    | 1 +
- 3 files changed, 3 insertions(+), 2 deletions(-)
+Signed-off-by: Lukas Straub <lukasstraub2@web.de>
+Reviewed-by: Zhang Chen <chen.zhang@intel.com>
+=2D--
+ block/replication.c | 35 ++++++++++++++++++++++++++++++++++-
+ 1 file changed, 34 insertions(+), 1 deletion(-)
 
-diff --git a/include/hw/timer/mc146818rtc.h b/include/hw/timer/mc146818rtc.h
-index 0f1c886..17761cf 100644
---- a/include/hw/timer/mc146818rtc.h
-+++ b/include/hw/timer/mc146818rtc.h
-@@ -39,6 +39,8 @@ typedef struct RTCState {
-     QLIST_ENTRY(RTCState) link;
- } RTCState;
- 
-+#define RTC_ISA_IRQ 8
+diff --git a/block/replication.c b/block/replication.c
+index 3d4dedddfc..78234d1a04 100644
+=2D-- a/block/replication.c
++++ b/block/replication.c
+@@ -454,6 +454,17 @@ static void replication_start(ReplicationState *rs, R=
+eplicationMode mode,
+     aio_context_acquire(aio_context);
+     s =3D bs->opaque;
+
++    if (s->stage =3D=3D BLOCK_REPLICATION_DONE ||
++        s->stage =3D=3D BLOCK_REPLICATION_FAILOVER) {
++        /*
++         * This case happens when a secondary is promoted to primary.
++         * Ignore the request because the secondary side of replication
++         * doesn't have to do anything anymore.
++         */
++        aio_context_release(aio_context);
++        return;
++    }
 +
- ISADevice *mc146818_rtc_init(ISABus *bus, int base_year,
-                              qemu_irq intercept_irq);
- void rtc_set_memory(ISADevice *dev, int addr, int val);
-diff --git a/include/hw/timer/mc146818rtc_regs.h b/include/hw/timer/mc146818rtc_regs.h
-index bfbb57e..631f71c 100644
---- a/include/hw/timer/mc146818rtc_regs.h
-+++ b/include/hw/timer/mc146818rtc_regs.h
-@@ -27,8 +27,6 @@
- 
- #include "qemu/timer.h"
- 
--#define RTC_ISA_IRQ 8
--
- #define RTC_SECONDS             0
- #define RTC_SECONDS_ALARM       1
- #define RTC_MINUTES             2
-diff --git a/tests/rtc-test.c b/tests/rtc-test.c
-index 6309b0e..18f8956 100644
---- a/tests/rtc-test.c
-+++ b/tests/rtc-test.c
-@@ -15,6 +15,7 @@
- 
- #include "libqtest-single.h"
- #include "qemu/timer.h"
-+#include "hw/timer/mc146818rtc.h"
- #include "hw/timer/mc146818rtc_regs.h"
- 
- #define UIP_HOLD_LENGTH           (8 * NANOSECONDS_PER_SECOND / 32768)
--- 
-1.8.3.1
+     if (s->stage !=3D BLOCK_REPLICATION_NONE) {
+         error_setg(errp, "Block replication is running or done");
+         aio_context_release(aio_context);
+@@ -577,6 +588,17 @@ static void replication_do_checkpoint(ReplicationStat=
+e *rs, Error **errp)
+     aio_context_acquire(aio_context);
+     s =3D bs->opaque;
 
++    if (s->stage =3D=3D BLOCK_REPLICATION_DONE ||
++        s->stage =3D=3D BLOCK_REPLICATION_FAILOVER) {
++        /*
++         * This case happens when a secondary was promoted to primary.
++         * Ignore the request because the secondary side of replication
++         * doesn't have to do anything anymore.
++         */
++        aio_context_release(aio_context);
++        return;
++    }
++
+     if (s->mode =3D=3D REPLICATION_MODE_SECONDARY) {
+         secondary_do_checkpoint(s, errp);
+     }
+@@ -593,7 +615,7 @@ static void replication_get_error(ReplicationState *rs=
+, Error **errp)
+     aio_context_acquire(aio_context);
+     s =3D bs->opaque;
+
+-    if (s->stage !=3D BLOCK_REPLICATION_RUNNING) {
++    if (s->stage =3D=3D BLOCK_REPLICATION_NONE) {
+         error_setg(errp, "Block replication is not running");
+         aio_context_release(aio_context);
+         return;
+@@ -635,6 +657,17 @@ static void replication_stop(ReplicationState *rs, bo=
+ol failover, Error **errp)
+     aio_context_acquire(aio_context);
+     s =3D bs->opaque;
+
++    if (s->stage =3D=3D BLOCK_REPLICATION_DONE ||
++        s->stage =3D=3D BLOCK_REPLICATION_FAILOVER) {
++        /*
++         * This case happens when a secondary was promoted to primary.
++         * Ignore the request because the secondary side of replication
++         * doesn't have to do anything anymore.
++         */
++        aio_context_release(aio_context);
++        return;
++    }
++
+     if (s->stage !=3D BLOCK_REPLICATION_RUNNING) {
+         error_setg(errp, "Block replication is not running");
+         aio_context_release(aio_context);
+=2D-
+2.20.1
 
 
