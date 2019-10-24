@@ -2,82 +2,62 @@ Return-Path: <SRS0=Jnn8=YR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 64586CA9EAF
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 08:15:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 69CBACA9EBB
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 08:20:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 26D7620856
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 08:15:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E6DE620856
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 08:20:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cy+SAWbk"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 26D7620856
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="pOIo6nL/"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E6DE620856
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34800 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34844 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iNYHf-0001le-C9
-	for qemu-devel@archiver.kernel.org; Thu, 24 Oct 2019 04:15:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35949)
+	id 1iNYMN-0007My-Be
+	for qemu-devel@archiver.kernel.org; Thu, 24 Oct 2019 04:20:43 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36468)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <kraxel@redhat.com>) id 1iNYGs-0001Gn-Lh
- for qemu-devel@nongnu.org; Thu, 24 Oct 2019 04:15:07 -0400
+ (envelope-from <dgibson@ozlabs.org>) id 1iNYKQ-0004b7-8p
+ for qemu-devel@nongnu.org; Thu, 24 Oct 2019 04:18:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kraxel@redhat.com>) id 1iNYGp-000244-Mp
- for qemu-devel@nongnu.org; Thu, 24 Oct 2019 04:15:01 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:39856
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <dgibson@ozlabs.org>) id 1iNYKO-0004yQ-Tl
+ for qemu-devel@nongnu.org; Thu, 24 Oct 2019 04:18:42 -0400
+Received: from ozlabs.org ([2401:3900:2:1::2]:59063)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1iNYGn-00022Y-3p
- for qemu-devel@nongnu.org; Thu, 24 Oct 2019 04:14:57 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1571904894;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=jziDkiLBQ9fOC5h1WDvDikwF/Y+E02EBVpxpOpCkMS0=;
- b=cy+SAWbkHMYY2hDEjJKJoLhmDJ7fhqsFv50UIoad9hzv54KBfICvLXf+tdw7uc4QuuugkO
- 1ZwkvUjxlmHugfNR/WoYhbuMwtTvW6p+J6tEVKEa2mf5yRRuDZcsQMiYxGEMRqZX3OQWtI
- wOjCcrGyd5JhQgRl4W6pnLj0IAFCFBI=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-294-qq3dEZ6SOeaOfkAwb93YAg-1; Thu, 24 Oct 2019 04:14:53 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1E96247B;
- Thu, 24 Oct 2019 08:14:52 +0000 (UTC)
-Received: from sirius.home.kraxel.org (ovpn-116-43.ams2.redhat.com
- [10.36.116.43])
- by smtp.corp.redhat.com (Postfix) with ESMTP id BC46D60C80;
- Thu, 24 Oct 2019 08:14:49 +0000 (UTC)
-Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
- id A7DB59DB6; Thu, 24 Oct 2019 10:14:48 +0200 (CEST)
-Date: Thu, 24 Oct 2019 10:14:48 +0200
-From: Gerd Hoffmann <kraxel@redhat.com>
-To: Jidong Xia <xiajidong@cmss.chinamobile.com>
-Subject: Re: [PATCH] hw/audio: fix a memory leak in OPLCreate()
-Message-ID: <20191024081448.asnqqljxb6zxstzp@sirius.home.kraxel.org>
-References: <1571824420-24893-1-git-send-email-xiajidong@cmss.chinamobile.com>
+ (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
+ id 1iNYKO-0004rP-Gx; Thu, 24 Oct 2019 04:18:40 -0400
+Received: by ozlabs.org (Postfix, from userid 1007)
+ id 46zKrX2xX5z9sPc; Thu, 24 Oct 2019 19:18:36 +1100 (AEDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+ d=gibson.dropbear.id.au; s=201602; t=1571905116;
+ bh=5KV84r29nIJXr/A9Jl+oWqntFxHPYStDWAbStjFb6C0=;
+ h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+ b=pOIo6nL/g0cs7ZmGtQyiVU+Xwptba5ORRELo0HylMxOJfHIlyM0NGu3E/5XmLd9Zs
+ B6riZ8E/jZ8RC2HkJPL7s7MrJfWtZ4z+/NdFX3LkBWPAY88qyz2XDxnPfvcy/AVoCk
+ 8LshCdkzJzY+USm1i9YBjvUJUAz+MLNGx8pXqTc8=
+From: David Gibson <david@gibson.dropbear.id.au>
+To: peter.maydell@linaro.org
+Subject: [PULL 01/28] xive: Make some device types not user creatable
+Date: Thu, 24 Oct 2019 19:17:46 +1100
+Message-Id: <20191024081813.2115-2-david@gibson.dropbear.id.au>
+X-Mailer: git-send-email 2.21.0
+In-Reply-To: <20191024081813.2115-1-david@gibson.dropbear.id.au>
+References: <20191024081813.2115-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
-In-Reply-To: <1571824420-24893-1-git-send-email-xiajidong@cmss.chinamobile.com>
-User-Agent: NeoMutt/20180716
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-MC-Unique: qq3dEZ6SOeaOfkAwb93YAg-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=WINDOWS-1252
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 205.139.110.61
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2401:3900:2:1::2
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,17 +69,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org
+Cc: lvivier@redhat.com, qemu-devel@nongnu.org, groug@kaod.org,
+ qemu-ppc@nongnu.org, clg@kaod.org, David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, Oct 23, 2019 at 05:53:40PM +0800, Jidong Xia wrote:
-> There is a memory leak in OPLCreate(),
+From: Greg Kurz <groug@kaod.org>
 
-No, it's released properly in OPLDestroy().
+Some device types of the XIVE model are exposed to the QEMU command
+line:
 
-cheers,
-  Gerd
+$ ppc64-softmmu/qemu-system-ppc64 -device help | grep xive
+name "xive-end-source", desc "XIVE END Source"
+name "xive-source", desc "XIVE Interrupt Source"
+name "xive-tctx", desc "XIVE Interrupt Thread Context"
+
+These are internal devices that shouldn't be instantiable by the
+user. By the way, they can't be because their respective realize
+functions expect link properties that can't be set from the command
+line:
+
+qemu-system-ppc64: -device xive-source: required link 'xive' not found:
+ Property '.xive' not found
+qemu-system-ppc64: -device xive-end-source: required link 'xive' not foun=
+d:
+ Property '.xive' not found
+qemu-system-ppc64: -device xive-tctx: required link 'cpu' not found:
+ Property '.cpu' not found
+
+Hide them by setting dc->user_creatable to false in their respective
+class init functions.
+
+Signed-off-by: Greg Kurz <groug@kaod.org>
+Message-Id: <157017473006.331610.2983143972519884544.stgit@bahia.lan>
+Message-Id: <157045578401.865784.6058183726552779559.stgit@bahia.lan>
+Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
+[dwg: Folded comment update into base patch]
+Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+---
+ hw/intc/xive.c | 15 +++++++++++++++
+ 1 file changed, 15 insertions(+)
+
+diff --git a/hw/intc/xive.c b/hw/intc/xive.c
+index 29df06df11..453d389848 100644
+--- a/hw/intc/xive.c
++++ b/hw/intc/xive.c
+@@ -670,6 +670,11 @@ static void xive_tctx_class_init(ObjectClass *klass,=
+ void *data)
+     dc->realize =3D xive_tctx_realize;
+     dc->unrealize =3D xive_tctx_unrealize;
+     dc->vmsd =3D &vmstate_xive_tctx;
++    /*
++     * Reason: part of XIVE interrupt controller, needs to be wired up
++     * by xive_tctx_create().
++     */
++    dc->user_creatable =3D false;
+ }
+=20
+ static const TypeInfo xive_tctx_info =3D {
+@@ -1118,6 +1123,11 @@ static void xive_source_class_init(ObjectClass *kl=
+ass, void *data)
+     dc->props   =3D xive_source_properties;
+     dc->realize =3D xive_source_realize;
+     dc->vmsd    =3D &vmstate_xive_source;
++    /*
++     * Reason: part of XIVE interrupt controller, needs to be wired up,
++     * e.g. by spapr_xive_instance_init().
++     */
++    dc->user_creatable =3D false;
+ }
+=20
+ static const TypeInfo xive_source_info =3D {
+@@ -1853,6 +1863,11 @@ static void xive_end_source_class_init(ObjectClass=
+ *klass, void *data)
+     dc->desc    =3D "XIVE END Source";
+     dc->props   =3D xive_end_source_properties;
+     dc->realize =3D xive_end_source_realize;
++    /*
++     * Reason: part of XIVE interrupt controller, needs to be wired up,
++     * e.g. by spapr_xive_instance_init().
++     */
++    dc->user_creatable =3D false;
+ }
+=20
+ static const TypeInfo xive_end_source_info =3D {
+--=20
+2.21.0
 
 
