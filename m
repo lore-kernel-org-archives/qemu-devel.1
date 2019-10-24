@@ -2,89 +2,64 @@ Return-Path: <SRS0=Jnn8=YR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_2 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1777ECA9EAF
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 10:00:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CB11ACA9EAF
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 10:01:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D535D20856
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 10:00:29 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="i8Vs+o2M"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D535D20856
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 9EE6B205F4
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 10:01:23 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9EE6B205F4
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37152 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37180 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iNZuu-0004dC-JL
-	for qemu-devel@archiver.kernel.org; Thu, 24 Oct 2019 06:00:28 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46592)
+	id 1iNZvl-0006fX-UH
+	for qemu-devel@archiver.kernel.org; Thu, 24 Oct 2019 06:01:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45711)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <estebanbosse@gmail.com>) id 1iNZPD-0007bs-2D
- for qemu-devel@nongnu.org; Thu, 24 Oct 2019 05:27:44 -0400
+ (envelope-from <groug@kaod.org>) id 1iNZIJ-0006RI-Lw
+ for qemu-devel@nongnu.org; Thu, 24 Oct 2019 05:20:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <estebanbosse@gmail.com>) id 1iNZPC-0003q9-0Y
- for qemu-devel@nongnu.org; Thu, 24 Oct 2019 05:27:42 -0400
-Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:35021)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <estebanbosse@gmail.com>)
- id 1iNZPA-0003pt-W9; Thu, 24 Oct 2019 05:27:41 -0400
-Received: by mail-wm1-x342.google.com with SMTP id v6so1862187wmj.0;
- Thu, 24 Oct 2019 02:27:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=message-id:subject:from:to:cc:date:in-reply-to:references
- :user-agent:mime-version:content-transfer-encoding;
- bh=xJZGkKh8fZ9kCKCk45SiDZFkdbshXyCaxMtp65tdQig=;
- b=i8Vs+o2MncpWwXW9pGHNXaGee3eJpV+p7x5qDVvjUKpn+nV3oSkkkiBU5Gd9rgv6Rl
- KAciwuw2d6oZT08ozqHF7D1ByoB2zyjA9iaeyhd8URh0OaB447MVturdrPWxXg2ySoty
- jQhh2yrA5ll2DOx/pwFCbMnXC1F4BgzbkXUqHJsD4uu8oHUNAwI/O7lOqddTBWq2uoYZ
- GSpG4BI4OPKb8YlPFM+mtRTCOsSQKLWDsBsRHZVv1cOcv1KjloUTluADeKoPeeotfcGT
- 5/z2Gop1fUzyVMYPOFcgjfWHn7kw00XE98Q7gMpmAkLWY3r8Mgq200+qzjTFgSWJihXR
- Vi5w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:message-id:subject:from:to:cc:date:in-reply-to
- :references:user-agent:mime-version:content-transfer-encoding;
- bh=xJZGkKh8fZ9kCKCk45SiDZFkdbshXyCaxMtp65tdQig=;
- b=fKx5ivCbbkNdukdvxyJMFE4+PbX8rTBxkvJUXgO5IluInkEae6M2FPOb2Ff9KoxPEd
- t5QW+hkE5kXM5xjrviam7MA5l1pmralrh5rTqeT2erR1TkiAUz/j6riXFxUvBLU5yE5o
- 7BwrBhmmzCaCFRHDqSMS8B7Qyq/1sR9Bjfr7D3WB+nL4uog8uL18FlPYW2vkD9+OOiyp
- RXdYNjoF6gGclhKoXg7zTHw6J3XhXtCdT4zFAEUMCXHPLMt32g1iLfAlM5SzKDEtqfVv
- yHAyZBAa13avcJwK0zpo4OoPid7H2lGG3QmfnRN5MlGqdURjhWpYKtjiNW3dCckWKIlL
- YACA==
-X-Gm-Message-State: APjAAAUJTJbqJUEnhkq3dt6d1yY+xChsITWycAe7mVf/Jd/bp6a7uePj
- 9Ocs27oM6SKc9HEVsnFzTcU=
-X-Google-Smtp-Source: APXvYqwZm4vS68Ia3SBxO+IooRdOjahmeTTwTL6dYG952S/wsq6XvJoZWtAptXGMXgJycECOqQ11gg==
-X-Received: by 2002:a1c:a551:: with SMTP id o78mr3734821wme.4.1571909259765;
- Thu, 24 Oct 2019 02:27:39 -0700 (PDT)
-Received: from ?IPv6:2a01:c22:b04f:9c00:d5b4:db5f:bfb4:fdb?
- ([2a01:c22:b04f:9c00:d5b4:db5f:bfb4:fdb])
- by smtp.gmail.com with ESMTPSA id l14sm9632811wrr.37.2019.10.24.02.27.38
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 24 Oct 2019 02:27:39 -0700 (PDT)
-Message-ID: <c88659d6aa590f1ea20bfd86636e14710e8813fb.camel@gmail.com>
-Subject: Re: [PATCH 15/19] tests/boot_linux_console: Extract the gunzip()
- helper
-From: Esteban Bosse <estebanbosse@gmail.com>
-To: Philippe =?ISO-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>, 
- qemu-devel@nongnu.org
-Date: Thu, 24 Oct 2019 11:23:29 +0200
-In-Reply-To: <20190926173428.10713-16-f4bug@amsat.org>
-References: <20190926173428.10713-1-f4bug@amsat.org>
- <20190926173428.10713-16-f4bug@amsat.org>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.30.5-1.1 
+ (envelope-from <groug@kaod.org>) id 1iNZIH-0000hx-Bw
+ for qemu-devel@nongnu.org; Thu, 24 Oct 2019 05:20:35 -0400
+Received: from 8.mo68.mail-out.ovh.net ([46.105.74.219]:40404)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <groug@kaod.org>) id 1iNZIF-0000fu-Sm
+ for qemu-devel@nongnu.org; Thu, 24 Oct 2019 05:20:33 -0400
+Received: from player792.ha.ovh.net (unknown [10.109.160.25])
+ by mo68.mail-out.ovh.net (Postfix) with ESMTP id D014E145D3C
+ for <qemu-devel@nongnu.org>; Thu, 24 Oct 2019 11:20:27 +0200 (CEST)
+Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
+ [82.253.208.248]) (Authenticated sender: groug@kaod.org)
+ by player792.ha.ovh.net (Postfix) with ESMTPSA id DD139B535424;
+ Thu, 24 Oct 2019 09:20:22 +0000 (UTC)
+Date: Thu, 24 Oct 2019 11:20:21 +0200
+From: Greg Kurz <groug@kaod.org>
+To: David Gibson <david@gibson.dropbear.id.au>
+Subject: Re: [PATCH 4/6] qom: Add object_child_foreach_type() helper function
+Message-ID: <20191024112021.41c70e7c@bahia.lan>
+In-Reply-To: <20191024030715.GX6439@umbus.fritz.box>
+References: <157184231371.3053790.17713393349394736594.stgit@bahia.lan>
+ <157184233616.3053790.246919545000657597.stgit@bahia.lan>
+ <20191024025903.GU6439@umbus.fritz.box>
+ <20191024030715.GX6439@umbus.fritz.box>
+X-Mailer: Claws Mail 3.17.4 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::342
+Content-Type: multipart/signed; boundary="Sig_/H77nyE5qLY1xEuKeNR1vVOF";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
+X-Ovh-Tracer-Id: 7843863179972352486
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrledugddugecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 46.105.74.219
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,62 +71,203 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- =?ISO-8859-1?Q?Zolt=E1n?= Baldaszti <bztemail@gmail.com>,
- Laurent Bonnans <laurent.bonnans@here.com>,
- Alistair Francis <alistair@alistair23.me>,
- Andrew Baumann <Andrew.Baumann@microsoft.com>,
- =?ISO-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>,
- qemu-arm@nongnu.org, Clement Deschamps <clement.deschamps@antfield.fr>,
- Cleber Rosa <crosa@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Cheng Xiang <ext-cheng.xiang@here.com>,
- Philippe =?ISO-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>,
- Pekka Enberg <penberg@iki.fi>, Guenter Roeck <linux@roeck-us.net>,
- Eduardo Habkost <ehabkost@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-ppc@nongnu.org,
+ =?UTF-8?B?Q8OpZHJpYw==?= Le Goater <clg@kaod.org>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-El jue, 26-09-2019 a las 19:34 +0200, Philippe Mathieu-Daudé escribió:
-> We are going to use the same pattern. Instead of keeping
-> copy/pasting this code, extract as a local function.
-> 
-> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-> ---
->  tests/acceptance/boot_linux_console.py | 10 ++++++----
->  1 file changed, 6 insertions(+), 4 deletions(-)
-> 
-> diff --git a/tests/acceptance/boot_linux_console.py
-> b/tests/acceptance/boot_linux_console.py
-> index 8a9a314ab4..079590f0c8 100644
-> --- a/tests/acceptance/boot_linux_console.py
-> +++ b/tests/acceptance/boot_linux_console.py
-> @@ -19,6 +19,11 @@ from avocado.utils import process
->  from avocado.utils import archive
->  
->  
-> +def gunzip(in_pathname_gz, out_pathname):
-> +    with gzip.open(in_pathname_gz, 'rb') as f_in:
-> +        with open(out_pathname, 'wb') as f_out:
-> +            shutil.copyfileobj(f_in, f_out)
-> +
->  class BootLinuxConsole(Test):
->      """
->      Boots a Linux kernel and checks that the console is operational
-> and the
-> @@ -166,10 +171,7 @@ class BootLinuxConsole(Test):
->          initrd_hash = 'bf806e17009360a866bf537f6de66590de349a99'
->          initrd_path_gz = self.fetch_asset(initrd_url,
-> asset_hash=initrd_hash)
->          initrd_path = self.workdir + "rootfs.cpio"
-> -
-> -        with gzip.open(initrd_path_gz, 'rb') as f_in:
-> -            with open(initrd_path, 'wb') as f_out:
-> -                shutil.copyfileobj(f_in, f_out)
-> +        gunzip(initrd_path_gz, initrd_path)
->  
->          self.vm.set_machine('malta')
->          self.vm.set_console()
-Reviewed-by: Esteban Bosse <estebanbosse@gmail.com>
+--Sig_/H77nyE5qLY1xEuKeNR1vVOF
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
+On Thu, 24 Oct 2019 14:07:15 +1100
+David Gibson <david@gibson.dropbear.id.au> wrote:
+
+> On Thu, Oct 24, 2019 at 01:59:03PM +1100, David Gibson wrote:
+> > On Wed, Oct 23, 2019 at 04:52:16PM +0200, Greg Kurz wrote:
+> > > Calling a function for children of a certain type is a recurring patt=
+ern
+> > > in the QEMU code base. In order to avoid the need to setup the same b=
+oiler
+> > > plate again and again, introduce a variant of object_child_foreach() =
+that
+> > > only considers children of the given type.
+> > >=20
+> > > Signed-off-by: Greg Kurz <groug@kaod.org>
+> >=20
+> > Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
+>=20
+> Actually.. a couuple of caveats on that.
+>=20
+> Reading it again the name is potentially misleading it's "for each
+> object of given type" not "for each type"  So maybe
+> "object_child_foreach_of_type()".
+>=20
+
+Makes sense.
+
+> Also, having created these, using them to simplify hmp_info_irq() and
+> hmp_info_pic() seems like a good idea.
+>=20
+> >=20
+> > > ---
+> > >  include/qom/object.h |   35 +++++++++++++++++++++++++++++++++++
+> > >  qom/object.c         |   30 +++++++++++++++++++++++-------
+> > >  2 files changed, 58 insertions(+), 7 deletions(-)
+> > >=20
+> > > diff --git a/include/qom/object.h b/include/qom/object.h
+> > > index 128d00c77fd6..e9e3c2eae8ed 100644
+> > > --- a/include/qom/object.h
+> > > +++ b/include/qom/object.h
+> > > @@ -1728,6 +1728,41 @@ int object_child_foreach(Object *obj, int (*fn=
+)(Object *child, void *opaque),
+> > >  int object_child_foreach_recursive(Object *obj,
+> > >                                     int (*fn)(Object *child, void *op=
+aque),
+> > >                                     void *opaque);
+> > > +
+> > > +/**
+> > > + * object_child_foreach_type:
+> > > + * @obj: the object whose children will be navigated
+> > > + * @typename: the type of child objects to consider
+> > > + * @fn: the iterator function to be called
+> > > + * @opaque: an opaque value that will be passed to the iterator
+> > > + *
+> > > + * This is similar to object_child_foreach, but it only calls @fn for
+> > > + * child objects of the give @typename.
+> > > + *
+> > > + * Returns: The last value returned by @fn, or 0 if there is no chil=
+d of
+> > > + * the given @typename.
+> > > + */
+> > > +int object_child_foreach_type(Object *obj, const char *typename,
+> > > +                              int (*fn)(Object *child, void *opaque),
+> > > +                              void *opaque);
+> > > +
+> > > +/**
+> > > + * object_child_foreach_recursive_type:
+> > > + * @obj: the object whose children will be navigated
+> > > + * @typename: the type of child objects to consider
+> > > + * @fn: the iterator function to be called
+> > > + * @opaque: an opaque value that will be passed to the iterator
+> > > + *
+> > > + * This is similar to object_child_foreach_recursive, but it only ca=
+lls
+> > > + * @fn for child objects of the give @typename.
+> > > + *
+> > > + * Returns: The last value returned by @fn, or 0 if there is no chil=
+d of
+> > > + * the given @typename.
+> > > + */
+> > > +int object_child_foreach_recursive_type(Object *obj, const char *typ=
+ename,
+> > > +                                        int (*fn)(Object *child, voi=
+d *opaque),
+> > > +                                        void *opaque);
+> > > +
+> > >  /**
+> > >   * container_get:
+> > >   * @root: root of the #path, e.g., object_get_root()
+> > > diff --git a/qom/object.c b/qom/object.c
+> > > index 6fa9c619fac4..a2dec1261ff7 100644
+> > > --- a/qom/object.c
+> > > +++ b/qom/object.c
+> > > @@ -986,7 +986,7 @@ void object_class_foreach(void (*fn)(ObjectClass =
+*klass, void *opaque),
+> > >      enumerating_types =3D false;
+> > >  }
+> > > =20
+> > > -static int do_object_child_foreach(Object *obj,
+> > > +static int do_object_child_foreach(Object *obj, const char *typename,
+> > >                                     int (*fn)(Object *child, void *op=
+aque),
+> > >                                     void *opaque, bool recurse)
+> > >  {
+> > > @@ -999,12 +999,14 @@ static int do_object_child_foreach(Object *obj,
+> > >          if (object_property_is_child(prop)) {
+> > >              Object *child =3D prop->opaque;
+> > > =20
+> > > -            ret =3D fn(child, opaque);
+> > > -            if (ret !=3D 0) {
+> > > -                break;
+> > > +            if (!typename || object_dynamic_cast(child, typename)) {
+> > > +                ret =3D fn(child, opaque);
+> > > +                if (ret !=3D 0) {
+> > > +                    break;
+> > > +                }
+> > >              }
+> > >              if (recurse) {
+> > > -                do_object_child_foreach(child, fn, opaque, true);
+> > > +                do_object_child_foreach(child, typename, fn, opaque,=
+ true);
+> > >              }
+> > >          }
+> > >      }
+> > > @@ -1014,14 +1016,28 @@ static int do_object_child_foreach(Object *ob=
+j,
+> > >  int object_child_foreach(Object *obj, int (*fn)(Object *child, void =
+*opaque),
+> > >                           void *opaque)
+> > >  {
+> > > -    return do_object_child_foreach(obj, fn, opaque, false);
+> > > +    return do_object_child_foreach(obj, NULL, fn, opaque, false);
+> > >  }
+> > > =20
+> > >  int object_child_foreach_recursive(Object *obj,
+> > >                                     int (*fn)(Object *child, void *op=
+aque),
+> > >                                     void *opaque)
+> > >  {
+> > > -    return do_object_child_foreach(obj, fn, opaque, true);
+> > > +    return do_object_child_foreach(obj, NULL, fn, opaque, true);
+> > > +}
+> > > +
+> > > +int object_child_foreach_type(Object *obj, const char *typename,
+> > > +                              int (*fn)(Object *child, void *opaque),
+> > > +                              void *opaque)
+> > > +{
+> > > +    return do_object_child_foreach(obj, typename, fn, opaque, false);
+> > > +}
+> > > +
+> > > +int object_child_foreach_recursive_type(Object *obj, const char *typ=
+ename,
+> > > +                                        int (*fn)(Object *child, voi=
+d *opaque),
+> > > +                                        void *opaque)
+> > > +{
+> > > +    return do_object_child_foreach(obj, typename, fn, opaque, true);
+> > >  }
+> > > =20
+> > >  static void object_class_get_list_tramp(ObjectClass *klass, void *op=
+aque)
+> > >=20
+> >=20
+>=20
+>=20
+>=20
+
+
+--Sig_/H77nyE5qLY1xEuKeNR1vVOF
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEtIKLr5QxQM7yo0kQcdTV5YIvc9YFAl2xbNUACgkQcdTV5YIv
+c9axxhAArHSYbUcIMNb1wX/J1yU1MLbnoxcREjI0vzjmnL+TvmEfLu8aWGSyfYkG
+4KaorHT4+NFFhgzi0nSHXpJ1OHC9L/EMqeXD5OoksOsxhsSDDG518ufGODp/uHac
+uDOpfwv5Rw1WXtpQC5AiZVBUBwD4VXTe+LIWgvTsiPHjqyDDpRCW0E5q/4AjxPqY
+cJiPiVLrritBih5rBfxkjxUTForh0U2uRM5wYTD/hTsCFZzs7Uhi4qRKg5d00bFK
+jxdtx/bjDp1hvpKK4oeNORAaMG0B+xDayftgR9MGhX1kMeXKpoaBBFcjU7mFhAMR
+5xILNOCmJz+htpSGa/vGxH6Zy1dOew//cjErCnkvVF1rVVd53ByenZpP9LknUsf3
+xkBPUbgi6yIIjTAVlKq+HSZJoqnQy1llJd5URCwthbh/tm5vAcWmjXjKA29XJDEC
+ARwe4ZLWynTjf2DUI4P7fMONVJsOEOb+71xLVEyFY+GEo4UENMC/qKmaTM1dqb4Q
+NccIk+8GY3Z5pwJ4EF5ni1XpI2fFKruydRTE0PnzsGBidrurfe8vyQJ7VY85+4ZT
+QLXIaURHcamK9hso/NlZ0m3W2REmiyQbGF+avNaH3+CiuOjhuCaUHjWjm3pkjzqk
+HfwGbdJk8//7y11Fw9oKU6VLqjPOQhRp8PA1WCTEg0c5F07W4Qk=
+=uRcl
+-----END PGP SIGNATURE-----
+
+--Sig_/H77nyE5qLY1xEuKeNR1vVOF--
 
