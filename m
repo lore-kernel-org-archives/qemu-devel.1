@@ -2,99 +2,81 @@ Return-Path: <SRS0=Jnn8=YR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 85F7ECA9EAF
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 18:04:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C2368CA9EAF
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 18:04:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4F66A205F4
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 18:04:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 886E4205F4
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 18:04:23 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Q46PgCoZ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4F66A205F4
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TFcBUQ2M"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 886E4205F4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49692 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49698 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iNhT5-00016Y-C4
-	for qemu-devel@archiver.kernel.org; Thu, 24 Oct 2019 14:04:15 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45389)
+	id 1iNhTC-0001XQ-4m
+	for qemu-devel@archiver.kernel.org; Thu, 24 Oct 2019 14:04:22 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40966)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1iNhOy-0001Ef-BC
- for qemu-devel@nongnu.org; Thu, 24 Oct 2019 14:00:03 -0400
+ (envelope-from <dgilbert@redhat.com>) id 1iNgyz-0005JU-8v
+ for qemu-devel@nongnu.org; Thu, 24 Oct 2019 13:33:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1iNhOu-0002Br-HV
- for qemu-devel@nongnu.org; Thu, 24 Oct 2019 13:59:58 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:53292
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <dgilbert@redhat.com>) id 1iNgyx-00080w-6G
+ for qemu-devel@nongnu.org; Thu, 24 Oct 2019 13:33:08 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:45798
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iNhOu-0002Aq-AD
- for qemu-devel@nongnu.org; Thu, 24 Oct 2019 13:59:56 -0400
+ (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1iNgyx-00080d-1D
+ for qemu-devel@nongnu.org; Thu, 24 Oct 2019 13:33:07 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1571939994;
+ s=mimecast20190719; t=1571938386;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=mra5WsFMDMwMaKphhK95i3CcfFGGRS2c1ypwx7gw2+8=;
- b=Q46PgCoZqr0Hlctp32o4/Y5SKf/Y8ZcjwoEYQXNjeMg+ECYdy6Mhxh286mOkaCMwfvKhvf
- vP3ZK/kV58V2FLO2rn4KDaAyFO20thC5uX5QqR7pfAclxeZe42oTLDY3T0aE7GXSWN6TQd
- sQLlptrgpJOPq/7zqVYRKZAPfxxTEJw=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-124-9S7CbDw6NOan1HIkKkOW4w-1; Thu, 24 Oct 2019 13:59:48 -0400
-Received: by mail-wm1-f69.google.com with SMTP id z23so1383860wml.0
- for <qemu-devel@nongnu.org>; Thu, 24 Oct 2019 10:59:48 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=wtfUwemMHbbCR3o+kWYCbsDa/IiYXq0j8CinEDPTlLo=;
- b=HLdfpVOsgYXlYG1lXnZ9msFN73Zlkln0bb3altBiCc+Aaw0RW3S3DAHdWMy52sBvLf
- BqnCYuDprULD/EwBbKjmEcOgajQ4PupylUCL3XuEnZOsIp2JZy2/suGQeTaO8EUzC4aI
- S6egfRtBODkqAtaK7NrDmBFkP/Zyq1NUJbxlJMVZNGXcRDs0x8QpSeKBIuDUCfHISSVi
- ZFYF2xF0XMNF4S7SlphsGeBFYgwf1YOW1zbADYFq5Tboj9PS9gPtnOEpwMeTOc70Y9cm
- 3QCdDhucyJctfQvMkI9CbZvjRMhQukajB/QHJFrAh+uzIkQA0lU0aYuj7GXdzO2hVQT9
- Smkg==
-X-Gm-Message-State: APjAAAUT/6nFFbIC305WXy74t5t1YnSNey8dBuSz2KkhByQ220aEgzBH
- AeLDkWQrWIE+ipJOYmMnOjpoWKBOqx27i43DZHbara4F8fZZVBF7f0V3cGTKsJht+UkNAcWHJKg
- XQScGs2BSKGxecSA=
-X-Received: by 2002:adf:ea07:: with SMTP id q7mr4873516wrm.102.1571939987499; 
- Thu, 24 Oct 2019 10:59:47 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqwstqnhKvOvRzhfYYrWcopWNGXeQX6iwDzNnzR4g3N3cAoEdkn8sxojNNRst00x46A79vJxnQ==
-X-Received: by 2002:adf:ea07:: with SMTP id q7mr4873497wrm.102.1571939987231; 
- Thu, 24 Oct 2019 10:59:47 -0700 (PDT)
-Received: from [192.168.1.115] (129.red-83-57-174.dynamicip.rima-tde.net.
- [83.57.174.129])
- by smtp.gmail.com with ESMTPSA id g5sm3822944wmg.12.2019.10.24.10.59.46
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Thu, 24 Oct 2019 10:59:46 -0700 (PDT)
-Subject: Re: [PATCH] travis.yml: enable linux-gcc-debug-tcg cache
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
-References: <20191024160619.14179-1-alex.bennee@linaro.org>
- <4f36130d-f2cc-2432-7098-b73f82c1501e@redhat.com> <877e4um5t7.fsf@linaro.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <688b8633-72dd-c3d5-019e-4af527a9dc52@redhat.com>
-Date: Thu, 24 Oct 2019 19:59:45 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.1
+ bh=ROTVFsZAaQbT3/ih8j3XLeTnP0uCsrRCtGiUIw+D3mA=;
+ b=TFcBUQ2MOKTb09qNixBBTYxkVxXyGJFEnJDF/nF/b3R3bco98atZ7qeMsiGhYoe/4DJLJ/
+ HA4TK7XSNiffX1PdeeZFJuwzeYrYF1wL//288j3Q/pcgIFw52DoyeXndSZMFoaxRdxqgRl
+ NyRY5dOjJ8le60HS7rBBzCnuXELWR1U=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-137-qATnKHOxNger00x8lAEIEw-1; Thu, 24 Oct 2019 13:33:03 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3CC25801E5F;
+ Thu, 24 Oct 2019 17:33:02 +0000 (UTC)
+Received: from work-vm (ovpn-117-248.ams2.redhat.com [10.36.117.248])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 9B7395D9D5;
+ Thu, 24 Oct 2019 17:32:47 +0000 (UTC)
+Date: Thu, 24 Oct 2019 18:32:45 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Jens Freimann <jfreimann@redhat.com>
+Subject: Re: [PATCH v5 06/11] qapi: add failover negotiated event
+Message-ID: <20191024173245.GP2877@work-vm>
+References: <20191023082711.16694-1-jfreimann@redhat.com>
+ <20191023082711.16694-7-jfreimann@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <877e4um5t7.fsf@linaro.org>
-Content-Language: en-US
-X-MC-Unique: 9S7CbDw6NOan1HIkKkOW4w-1
+In-Reply-To: <20191023082711.16694-7-jfreimann@redhat.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-MC-Unique: qATnKHOxNger00x8lAEIEw-1
 X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=WINDOWS-1252
 Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.61
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -106,110 +88,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, qemu-devel@nongnu.org
+Cc: pkrempa@redhat.com, berrange@redhat.com, ehabkost@redhat.com,
+ mst@redhat.com, aadam@redhat.com, qemu-devel@nongnu.org,
+ alex.williamson@redhat.com, laine@redhat.com, ailan@redhat.com,
+ parav@mellanox.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 10/24/19 7:06 PM, Alex Benn=C3=A9e wrote:
-> Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> writes:
+* Jens Freimann (jfreimann@redhat.com) wrote:
+> This event is sent to let libvirt know that VIRTIO_NET_F_STANDBY
+> feature was not negotiated during virtio feature negotiation. If this
+> event is received it means any primary devices hotplugged before
+> this were were never really added to QEMU devices.
 >=20
->> On 10/24/19 6:06 PM, Alex Benn=C3=A9e wrote:
->>> Create a new cache for the --enable-debug-tcg builds which is separate
->>> from the normal debug builds which generate different code. We also
->>> enable debug-tcg for the new plugins based builds as we want to ensure
->>> any breakage to TCG is picked up by the sanity checks.
->>> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
->>> ---
->>>    .travis.yml | 14 +++++++-------
->>>    1 file changed, 7 insertions(+), 7 deletions(-)
->>> diff --git a/.travis.yml b/.travis.yml
->>> index e3f10a93683..34bc8134f5b 100644
->>> --- a/.travis.yml
->>> +++ b/.travis.yml
->>> @@ -135,7 +135,7 @@ matrix:
->>>        # TCG debug can be run just on its own and is mostly agnostic to=
- user/softmmu distinctions
->>>        - env:
->>>            - CONFIG=3D"--enable-debug-tcg --disable-system"
->>> -        - CACHE_NAME=3D"${TRAVIS_BRANCH}-linux-gcc-debug"
->>> +        - CACHE_NAME=3D"${TRAVIS_BRANCH}-linux-gcc-debug-tcg"
->>
->> This one runs default TEST_CMD=3D"make check -j3 V=3D1"
->=20
-> That does exercise the TCG a little because the various qemu-system-FOO
-> builds have some bootcode. However given we exercise the TCG more
-> further down we could just drop this matrix entry.
+> Signed-off-by: Jens Freimann <jfreimann@redhat.com>
 
-I haven't checked how long takes "make check check-tcg", hopefully we=20
-could merge both.
+Can I just understand a bit more about what the meaning of this is.
 
->>>
->>>        - env:
->>> @@ -336,29 +336,29 @@ matrix:
->>>        - env:
->>>            - CONFIG=3D"--disable-system --enable-debug-tcg"
->>>            - TEST_CMD=3D"make -j3 check-tcg V=3D1"
->>
->> And this one "check-tcg", OK.
->> (Maybe we can reorder the $CONFIG arguments so both jobs are more simila=
-r).
->>
->> Too bad Travis 'stages' are an enterprise feature:
->>
->> https://docs.travis-ci.com/user/conditional-builds-stages-jobs/#conditio=
-nal-stages
->>
->> Because here we are building 2x the same, and cache isn't used.
->=20
-> Why isn't the cache used?
+Say my VM boots:
+   a) BIOS
+   b) Boot loader
+   c) Linux
+   d) Reboots
+      (possibly a',b', different c')
 
-IIUC cache aren't shared within the same jobs of a build, but by jobs at=20
-build+1.
+When would I get that event?
+When can libvirt know it can use it?
 
->>
->> Not this patch problem.
->>
->> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
->>
->>> -        - CACHE_NAME=3D"${TRAVIS_BRANCH}-linux-gcc-default"
->>> +        - CACHE_NAME=3D"${TRAVIS_BRANCH}-linux-gcc-debug-tcg"
->>>
->>>        # Run check-tcg against linux-user (with plugins)
->>>        # we skip sparc64-linux-user until it has been fixed somewhat
->>>        - env:
->>> -        - CONFIG=3D"--disable-system --enable-plugins --target-list-ex=
-clude=3Dsparc64-linux-user"
->>> +        - CONFIG=3D"--disable-system --enable-plugins --enable-debug-t=
-cg --target-list-exclude=3Dsparc64-linux-user"
->>>            - TEST_CMD=3D"make -j3 check-tcg V=3D1"
->>> -        - CACHE_NAME=3D"${TRAVIS_BRANCH}-linux-gcc-default"
->>> +        - CACHE_NAME=3D"${TRAVIS_BRANCH}-linux-gcc-debug-tcg"
->>>
->>>        # Run check-tcg against softmmu targets
->>>        - env:
->>>            - CONFIG=3D"--enable-debug-tcg --target-list=3Dxtensa-softmm=
-u,arm-softmmu,aarch64-softmmu,alpha-softmmu"
->>>            - TEST_CMD=3D"make -j3 check-tcg V=3D1"
->>> -        - CACHE_NAME=3D"${TRAVIS_BRANCH}-linux-gcc-default"
->>> +        - CACHE_NAME=3D"${TRAVIS_BRANCH}-linux-gcc-debug-tcg"
->>>
->>>        # Run check-tcg against softmmu targets (with plugins)
->>>        - env:
->>> -        - CONFIG=3D"--enable-plugins --target-list=3Dxtensa-softmmu,ar=
-m-softmmu,aarch64-softmmu,alpha-softmmu"
->>> +        - CONFIG=3D"--enable-plugins --enable-debug-tcg --target-list=
-=3Dxtensa-softmmu,arm-softmmu,aarch64-softmmu,alpha-softmmu"
->>>            - TEST_CMD=3D"make -j3 check-tcg V=3D1"
->>> -        - CACHE_NAME=3D"${TRAVIS_BRANCH}-linux-gcc-default"
->>> +        - CACHE_NAME=3D"${TRAVIS_BRANCH}-linux-gcc-debug-tcg"
->>>
->>>        # Release builds
->>>
+Dave
+
+> ---
+>  qapi/net.json | 16 ++++++++++++++++
+>  1 file changed, 16 insertions(+)
 >=20
+> diff --git a/qapi/net.json b/qapi/net.json
+> index 728990f4fb..8c5f3f1fb2 100644
+> --- a/qapi/net.json
+> +++ b/qapi/net.json
+> @@ -737,3 +737,19 @@
+>  ##
+>  { 'command': 'announce-self', 'boxed': true,
+>    'data' : 'AnnounceParameters'}
+> +
+> +##
+> +# @FAILOVER_NEGOTIATED:
+> +#
+> +# Emitted when VIRTIO_NET_F_STANDBY was negotiated during feature negoti=
+ation
+> +#
+> +# Since: 4.2
+> +#
+> +# Example:
+> +#
+> +# <- { "event": "FAILOVER_NEGOTIATED",
+> +#      "data": {} }
+> +#
+> +##
+> +{ 'event': 'FAILOVER_NEGOTIATED',
+> +  'data': {} }
+> --=20
+> 2.21.0
 >=20
-> --
-> Alex Benn=C3=A9e
->=20
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
 
