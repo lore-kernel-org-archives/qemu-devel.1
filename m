@@ -2,78 +2,82 @@ Return-Path: <SRS0=Jnn8=YR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A6869CA9EBB
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 14:41:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F228DCA9EAF
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 14:41:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7454220679
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 14:41:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id BB99520679
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 14:41:19 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="KRjr7LZh"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7454220679
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eg9rLttA"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BB99520679
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44436 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44440 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iNeIO-0000WH-0l
-	for qemu-devel@archiver.kernel.org; Thu, 24 Oct 2019 10:41:00 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59165)
+	id 1iNeIg-0001iy-Dd
+	for qemu-devel@archiver.kernel.org; Thu, 24 Oct 2019 10:41:18 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36966)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1iNdNv-0002nj-GH
- for qemu-devel@nongnu.org; Thu, 24 Oct 2019 09:42:40 -0400
+ (envelope-from <berrange@redhat.com>) id 1iNdvS-0002Uf-IS
+ for qemu-devel@nongnu.org; Thu, 24 Oct 2019 10:17:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1iNdNu-00064c-6z
- for qemu-devel@nongnu.org; Thu, 24 Oct 2019 09:42:39 -0400
-Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:40894)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1iNdNu-00064K-2X
- for qemu-devel@nongnu.org; Thu, 24 Oct 2019 09:42:38 -0400
-Received: by mail-ot1-x343.google.com with SMTP id d8so9486206otc.7
- for <qemu-devel@nongnu.org>; Thu, 24 Oct 2019 06:42:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=CB+2oiFbxh4lSMQlG0CPRGf4bWxa5qmoD5xmiQFW3NM=;
- b=KRjr7LZhZ3xQVBJmnk74lxWhxgchqIZXDFOBUZ4r+GaYd6gCXgf6nPEkp192Q9Vx1s
- 0tzO8pLrrbO9D1ByOyW2OcRY4I2oFjaClTt8yJB0i1DL4v29GVkecDt+xiCVpnoeweLF
- 1w7G8JWWPFsyysBhr3QI+IQXXS5Pk44e+SdKvkMxHy7/QGwLRqGFWxAyh+OgU2dzMIfx
- JYe6RJwYXBXZ88ZJGmMq+rib3kb4dXSLLA7qJgVb/cRDEkDrMfC++HSlgYKWnOSe0/7G
- SDDrCnDDWXS2t1zyHgj0MG66YY2YC7QpH9pwFnwqwA6uaS9xR+ez+RcquGcFZHgma5Hc
- wdMw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=CB+2oiFbxh4lSMQlG0CPRGf4bWxa5qmoD5xmiQFW3NM=;
- b=loszibp5hhsI68almBkUO5DOioPttQsHy3qOJbJJTCsjF6+9h3jhdn1SQpaEdcivs9
- IazULet9skmgeXNM1RAwOmHwCgl3r/1WzCMB8EoDmC3x3i4W8EO5Sk4TG0WBJ7INAFVG
- RzbFkvjKv9vhjdfrl3QEFcd3kH0DMmRkvjGIYBvJWBs91pxYLm0y/++aFinS069t2mR2
- BGrZjg4RTBHkFTqq6F2yupNxnrxUlWVmU/QceuQLQIAzfKmoU3coPbtA8IKnWsYiSi/E
- +KUP2JvvUlUyjOjdeZJCdxlyrhmwEyjrz9OR4Vac0aY21Iw7D4ZeSTp4MLs7eMPKTIgm
- ZbCA==
-X-Gm-Message-State: APjAAAXVjpXgjyzJRE0tAipcWKxobEq9rPXt8f9sAVTsQgSSdCevJFkI
- bZy0kG1p7rMsswtvdaowsopkCE9x6riQ3KAR5XuUYw==
-X-Google-Smtp-Source: APXvYqzVbdw0wum9mFXZ6RXQ2LWQNQ+bvYqE3mpbTXd9JXDR7Y+0mF6EjROoE54s9vTawNilbLB9rxTSkee9pSsiAQ4=
-X-Received: by 2002:a9d:398a:: with SMTP id y10mr11136759otb.97.1571924556987; 
- Thu, 24 Oct 2019 06:42:36 -0700 (PDT)
+ (envelope-from <berrange@redhat.com>) id 1iNdvQ-0004XU-7a
+ for qemu-devel@nongnu.org; Thu, 24 Oct 2019 10:17:18 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:42647
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <berrange@redhat.com>) id 1iNdvN-0004Vq-3z
+ for qemu-devel@nongnu.org; Thu, 24 Oct 2019 10:17:13 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1571926631;
+ h=from:from:reply-to:reply-to:subject:subject:date:date:
+ message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+ content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=eXSdXd9/UhlDotVVCFbY/e/EQyZci5kL4xWgA9QkOW4=;
+ b=eg9rLttAriFy7OA4JkpjAmZc+Mfd9EnrYv7+H3MSqTu+TyyMu/3sla5xFPchlqbMU/aCwG
+ +rUlFyrL22rsQWpNDm5t++Oin2z9FAnvpz+ldKHmleTrrEW9O9KRheBRpFto8U//UAfBYL
+ vli2ohJ4D6U6YipKiY0yT95vMtOAuOc=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-183-C5cEJIRCOTelcSkyYfSZrA-1; Thu, 24 Oct 2019 10:17:04 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B2EAE801E5C
+ for <qemu-devel@nongnu.org>; Thu, 24 Oct 2019 14:17:03 +0000 (UTC)
+Received: from redhat.com (unknown [10.42.16.231])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 89A06600CC;
+ Thu, 24 Oct 2019 14:17:00 +0000 (UTC)
+Date: Thu, 24 Oct 2019 15:16:58 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>
+Subject: Re: [libvirt] [RFC PATCH 19/19] qapi: Implement -compat
+ deprecated-output=hide for events
+Message-ID: <20191024141658.GD8381@redhat.com>
+References: <20191024123458.13505-1-armbru@redhat.com>
+ <20191024123458.13505-20-armbru@redhat.com>
 MIME-Version: 1.0
-References: <20191024121808.9612-1-drjones@redhat.com>
-In-Reply-To: <20191024121808.9612-1-drjones@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 24 Oct 2019 14:42:25 +0100
-Message-ID: <CAFEAcA9ehcuktCTGR0xpTvZegUkr99H62F_fiT7RY_L_dqgN4g@mail.gmail.com>
-Subject: Re: [PATCH v7 0/9] target/arm/kvm: enable SVE in guests
-To: Andrew Jones <drjones@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::343
+In-Reply-To: <20191024123458.13505-20-armbru@redhat.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-MC-Unique: C5cEJIRCOTelcSkyYfSZrA-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -85,45 +89,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: m.mizuma@jp.fujitsu.com, Beata Michalska <beata.michalska@linaro.org>,
- Richard Henderson <richard.henderson@linaro.org>,
- QEMU Developers <qemu-devel@nongnu.org>, Markus Armbruster <armbru@redhat.com>,
- Eric Auger <eric.auger@redhat.com>, qemu-arm <qemu-arm@nongnu.org>,
- Igor Mammedov <imammedo@redhat.com>,
- =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
- Dave P Martin <Dave.Martin@arm.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Cc: libvir-list@redhat.com, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, 24 Oct 2019 at 13:18, Andrew Jones <drjones@redhat.com> wrote:
->
-> Since Linux kernel v5.2-rc1 KVM has support for enabling SVE in guests.
-> This series provides the QEMU bits for that enablement. First, we
-> select existing CPU properties representing features we want to
-> advertise in addition to the SVE vector lengths and prepare
-> them for a qmp query. Then we introduce the qmp query, applying
-> it immediately to those selected features. We also document ARM CPU
-> features at this time. We next add a qtest for the selected CPU
-> features that uses the qmp query for its tests - and we continue to
-> add tests as we add CPU features with the following patches. So then,
-> once we have the support we need for CPU feature querying and testing,
-> we add our first SVE CPU feature property, 'sve', which just allows
-> SVE to be completely enabled/disabled. Following that feature property,
-> we add all 16 vector length properties along with the input validation
-> they need and tests to prove the validation works. At this point the
-> SVE features are still only for TCG, so we provide some patches to
-> prepare for KVM and then a patch that allows the 'max' CPU type to
-> enable SVE with KVM, but at first without vector length properties.
-> After a bit more preparation we add the SVE vector length properties
-> to the KVM-enabled 'max' CPU type along with the additional input
-> validation and tests that that needs.  Finally we allow the 'host'
-> CPU type to also enjoy these properties by simply sharing them with it.
->
+On Thu, Oct 24, 2019 at 02:34:58PM +0200, Markus Armbruster wrote:
+> This policy suppresses deprecated events, and thus permits "testing
+> the future".
+
+One thing that occurs to me is that this is a fairly passive impact
+on libvirt. eg it may well be not at all obvious if libvirt is behaving
+in a broken way due to an event not being emitted, as the code in
+question simply won't be triggered.
+
+With the current QMP this situation is unavoidable since QEMU doesn't
+know which events the client (libvirt) is actually using. QEMU just
+unconditionally emits all events.
+
+I've often wondered if we should have the client explicitly tell
+QEMU which events it wants to receive as part of the QMP greeting
+handshake.
+
+ie, libvirt knows which events it can handle. QEMU knows which
+events it can emit, and reports this via capabilities which
+libvirt probes.
+
+So on connecting libvirt can tell QEMU exactly which evnets it
+wants to get back. QEMU is now able to explicitly tell libvirt
+it has asked for a deprecated event, and so the logic from the
+"deprecated-input" option can take effect.
+
+We'd not need "deprecated-output" at that point.
 
 
+Regards,
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange=
+ :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com=
+ :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange=
+ :|
 
-Applied to target-arm.next, thanks.
-
--- PMM
 
