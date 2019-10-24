@@ -2,83 +2,115 @@ Return-Path: <SRS0=Jnn8=YR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 749DECA9EAF
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 16:27:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8F62BCA9EAF
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 16:28:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3703B20650
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 16:27:52 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="W6UdFYih"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3703B20650
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 519BE20650
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 16:28:48 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 519BE20650
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46844 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47082 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iNfxn-0005uJ-9b
-	for qemu-devel@archiver.kernel.org; Thu, 24 Oct 2019 12:27:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57198)
+	id 1iNfyg-000886-Rm
+	for qemu-devel@archiver.kernel.org; Thu, 24 Oct 2019 12:28:46 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49618)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgilbert@redhat.com>) id 1iNfvB-0001FH-5L
- for qemu-devel@nongnu.org; Thu, 24 Oct 2019 12:25:11 -0400
+ (envelope-from <laurent@vivier.eu>) id 1iNfEt-00058M-UY
+ for qemu-devel@nongnu.org; Thu, 24 Oct 2019 11:41:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgilbert@redhat.com>) id 1iNfv9-0008KL-4y
- for qemu-devel@nongnu.org; Thu, 24 Oct 2019 12:25:08 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:48136
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1iNfv8-0008J6-Ra
- for qemu-devel@nongnu.org; Thu, 24 Oct 2019 12:25:07 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1571934300;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=kCoSgfvK/2t5gR1vUEAXOo4jgxjVBFsuJyIk6a7YhRc=;
- b=W6UdFYihh0C5OAB6mVzf1P7Ogzt53Vu7LCcNMmLd9lmcDA46HI4fF2kUGWAxniUUtiAG6I
- ev4oOEXzX/vho4JeVzZeBPjjkgoex9jesSsWsLnwgBmz5YvEkDzU0lYDI6JD+km+HfWn5j
- QRxH+xoDFZs1xbekhtGkDToe3+JxLks=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-198-xE5GD7PyN-mccVaOmbhqdQ-1; Thu, 24 Oct 2019 11:02:38 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7F88261182;
- Thu, 24 Oct 2019 14:39:03 +0000 (UTC)
-Received: from work-vm (ovpn-117-248.ams2.redhat.com [10.36.117.248])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 97C5210EC746;
- Thu, 24 Oct 2019 14:39:01 +0000 (UTC)
-Date: Thu, 24 Oct 2019 15:38:59 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: Zhenyu Ye <yezhenyu2@huawei.com>
-Subject: Re: [RFC PATCH] iothread: add set_iothread_poll_* commands
-Message-ID: <20191024143859.GJ2877@work-vm>
-References: <5DAEB9D3.3080503@huawei.com>
- <20191023151903.GI9574@stefanha-x1.localdomain>
- <5DB1ACF2.9080500@huawei.com> <20191024135645.GG2877@work-vm>
- <5DB1B65C.3020104@huawei.com>
+ (envelope-from <laurent@vivier.eu>) id 1iNfEr-00017B-9C
+ for qemu-devel@nongnu.org; Thu, 24 Oct 2019 11:41:27 -0400
+Received: from mout.kundenserver.de ([212.227.126.131]:36117)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1iNfEq-00015Y-Gp
+ for qemu-devel@nongnu.org; Thu, 24 Oct 2019 11:41:25 -0400
+Received: from [192.168.100.1] ([78.238.229.36]) by mrelayeu.kundenserver.de
+ (mreue011 [213.165.67.103]) with ESMTPSA (Nemesis) id
+ 1MgNMV-1hnWb52XTb-00huh9; Thu, 24 Oct 2019 17:41:16 +0200
+Subject: Re: [PATCH v3] linux-user: manage binfmt-misc preserve-arg[0] flag
+To: qemu-devel@nongnu.org
+References: <20191024153847.31815-1-laurent@vivier.eu>
+From: Laurent Vivier <laurent@vivier.eu>
+Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
+ mQINBFYFJhkBEAC2me7w2+RizYOKZM+vZCx69GTewOwqzHrrHSG07MUAxJ6AY29/+HYf6EY2
+ WoeuLWDmXE7A3oJoIsRecD6BXHTb0OYS20lS608anr3B0xn5g0BX7es9Mw+hV/pL+63EOCVm
+ SUVTEQwbGQN62guOKnJJJfphbbv82glIC/Ei4Ky8BwZkUuXd7d5NFJKC9/GDrbWdj75cDNQx
+ UZ9XXbXEKY9MHX83Uy7JFoiFDMOVHn55HnncflUncO0zDzY7CxFeQFwYRbsCXOUL9yBtqLer
+ Ky8/yjBskIlNrp0uQSt9LMoMsdSjYLYhvk1StsNPg74+s4u0Q6z45+l8RAsgLw5OLtTa+ePM
+ JyS7OIGNYxAX6eZk1+91a6tnqfyPcMbduxyBaYXn94HUG162BeuyBkbNoIDkB7pCByed1A7q
+ q9/FbuTDwgVGVLYthYSfTtN0Y60OgNkWCMtFwKxRaXt1WFA5ceqinN/XkgA+vf2Ch72zBkJL
+ RBIhfOPFv5f2Hkkj0MvsUXpOWaOjatiu0fpPo6Hw14UEpywke1zN4NKubApQOlNKZZC4hu6/
+ 8pv2t4HRi7s0K88jQYBRPObjrN5+owtI51xMaYzvPitHQ2053LmgsOdN9EKOqZeHAYG2SmRW
+ LOxYWKX14YkZI5j/TXfKlTpwSMvXho+efN4kgFvFmP6WT+tPnwARAQABtCJMYXVyZW50IFZp
+ dmllciA8bGF1cmVudEB2aXZpZXIuZXU+iQI4BBMBAgAiBQJWBTDeAhsDBgsJCAcDAgYVCAIJ
+ CgsEFgIDAQIeAQIXgAAKCRDzDDi9Py++PCEdD/oD8LD5UWxhQrMQCsUgLlXCSM7sxGLkwmmF
+ ozqSSljEGRhffxZvO35wMFcdX9Z0QOabVoFTKrT04YmvbjsErh/dP5zeM/4EhUByeOS7s6Yl
+ HubMXVQTkak9Wa9Eq6irYC6L41QNzz/oTwNEqL1weV1+XC3TNnht9B76lIaELyrJvRfgsp9M
+ rE+PzGPo5h7QHWdL/Cmu8yOtPLa8Y6l/ywEJ040IoiAUfzRoaJs2csMXf0eU6gVBhCJ4bs91
+ jtWTXhkzdl4tdV+NOwj3j0ukPy+RjqeL2Ej+bomnPTOW8nAZ32dapmu7Fj7VApuQO/BSIHyO
+ NkowMMjB46yohEepJaJZkcgseaus0x960c4ua/SUm/Nm6vioRsxyUmWd2nG0m089pp8LPopq
+ WfAk1l4GciiMepp1Cxn7cnn1kmG6fhzedXZ/8FzsKjvx/aVeZwoEmucA42uGJ3Vk9TiVdZes
+ lqMITkHqDIpHjC79xzlWkXOsDbA2UY/P18AtgJEZQPXbcrRBtdSifCuXdDfHvI+3exIdTpvj
+ BfbgZAar8x+lcsQBugvktlQWPfAXZu4Shobi3/mDYMEDOE92dnNRD2ChNXg2IuvAL4OW40wh
+ gXlkHC1ZgToNGoYVvGcZFug1NI+vCeCFchX+L3bXyLMg3rAfWMFPAZLzn42plIDMsBs+x2yP
+ +bkCDQRWBSYZARAAvFJBFuX9A6eayxUPFaEczlMbGXugs0mazbOYGlyaWsiyfyc3PStHLFPj
+ rSTaeJpPCjBJErwpZUN4BbpkBpaJiMuVO6egrC8Xy8/cnJakHPR2JPEvmj7Gm/L9DphTcE15
+ 92rxXLesWzGBbuYxKsj8LEnrrvLyi3kNW6B5LY3Id+ZmU8YTQ2zLuGV5tLiWKKxc6s3eMXNq
+ wrJTCzdVd6ThXrmUfAHbcFXOycUyf9vD+s+WKpcZzCXwKgm7x1LKsJx3UhuzT8ier1L363RW
+ ZaJBZ9CTPiu8R5NCSn9V+BnrP3wlFbtLqXp6imGhazT9nJF86b5BVKpF8Vl3F0/Y+UZ4gUwL
+ d9cmDKBcmQU/JaRUSWvvolNu1IewZZu3rFSVgcpdaj7F/1aC0t5vLdx9KQRyEAKvEOtCmP4m
+ 38kU/6r33t3JuTJnkigda4+Sfu5kYGsogeYG6dNyjX5wpK5GJIJikEhdkwcLM+BUOOTi+I9u
+ tX03BGSZo7FW/J7S9y0l5a8nooDs2gBRGmUgYKqQJHCDQyYut+hmcr+BGpUn9/pp2FTWijrP
+ inb/Pc96YDQLQA1q2AeAFv3Rx3XoBTGl0RCY4KZ02c0kX/dm3eKfMX40XMegzlXCrqtzUk+N
+ 8LeipEsnOoAQcEONAWWo1HcgUIgCjhJhBEF0AcELOQzitbJGG5UAEQEAAYkCHwQYAQIACQUC
+ VgUmGQIbDAAKCRDzDDi9Py++PCD3D/9VCtydWDdOyMTJvEMRQGbx0GacqpydMEWbE3kUW0ha
+ US5jz5gyJZHKR3wuf1En/3z+CEAEfP1M3xNGjZvpaKZXrgWaVWfXtGLoWAVTfE231NMQKGoB
+ w2Dzx5ivIqxikXB6AanBSVpRpoaHWb06tPNxDL6SVV9lZpUn03DSR6gZEZvyPheNWkvz7bE6
+ FcqszV/PNvwm0C5Ju7NlJA8PBAQjkIorGnvN/vonbVh5GsRbhYPOc/JVwNNr63P76rZL8Gk/
+ hb3xtcIEi5CCzab45+URG/lzc6OV2nTj9Lg0SNcRhFZ2ILE3txrmI+aXmAu26+EkxLLfqCVT
+ ohb2SffQha5KgGlOSBXustQSGH0yzzZVZb+HZPEvx6d/HjQ+t9sO1bCpEgPdZjyMuuMp9N1H
+ ctbwGdQM2Qb5zgXO+8ZSzwC+6rHHIdtcB8PH2j+Nd88dVGYlWFKZ36ELeZxD7iJflsE8E8yg
+ OpKgu3nD0ahBDqANU/ZmNNarBJEwvM2vfusmNnWm3QMIwxNuJghRyuFfx694Im1js0ZY3LEU
+ JGSHFG4ZynA+ZFUPA6Xf0wHeJOxGKCGIyeKORsteIqgnkINW9fnKJw2pgk8qHkwVc3Vu+wGS
+ ZiJK0xFusPQehjWTHn9WjMG1zvQ5TQQHxau/2FkP45+nRPco6vVFQe8JmgtRF8WFJA==
+Message-ID: <049854b7-51fe-5ca7-2173-484b5b98c475@vivier.eu>
+Date: Thu, 24 Oct 2019 17:41:15 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.1
 MIME-Version: 1.0
-In-Reply-To: <5DB1B65C.3020104@huawei.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-MC-Unique: xE5GD7PyN-mccVaOmbhqdQ-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=WINDOWS-1252
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
+In-Reply-To: <20191024153847.31815-1-laurent@vivier.eu>
+Content-Type: text/plain; charset=utf-8
+Content-Language: fr
+Content-Transfer-Encoding: 8bit
+X-Provags-ID: V03:K1:k0EZNUfuJ47O2QIbUzvAmZx1SbojzIiq8DwejJy+mrmCgLFl5Sp
+ Q8nvKaUA7QqK+z+eiWbMSCnAV3izg3OjnthH66ShLl3LP3my0CWOVkq20Ka6x4n9O77hcB2
+ 5iTug+Fyqy6GzEJdQGmBodSBOoKnCJhciS+a8GxOqGI9xOE+BuzrhJ59IcQSabu3sDqQPA6
+ bgHLZf6ls1g34EwEX25wQ==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:GowoQiDoGxU=:2kgn5I24RYMlWs6cprQ8b7
+ etUmHYWZOrzDvp8/W9kZ2y3lkFMeFPfbLbYnesyEFz+8IE/YUjXKhtClAPVUQwQD4WifrJ1Pg
+ 1H/RtJzW2ZtFqnNEFu/zfbI5vUTSL1R2xxUUzWixmtcBcpRzOs0vEOxOyO5HKWImOgMlBi8vK
+ pqRJjm0cC+re1b9o2nD4SHP5D9FZa3Lwe6hAgRmyUrFKOobWOssrGAJZf7lbarAIIeuhGgkL1
+ 62fUydLs2MsiK0RG6OGfy0QnAfTgbAkNLEdA/4+A3ZgxTTgFb7VXbHV3TzSRqilO2J2zPF6RC
+ rrzC5OfqVkdUfyqGjcsz89ONeKYDZMz5E9pcwRpG1xshj+wE7R58Y2lYo92Ip1tsm9TKwslpf
+ B68Q44xBEuFOx9RpkdSH/8sQixRDO/wYAQPEderm42DtmdpWCeF5CR/1lorJfXsOOO37oSfHw
+ Amzo2gTJ4MQhXBZvt3hb2AhMuiKZPTGB3aC1XXY0VY/mTxatAIW7DH+IfSBaVY1JF5RFj+uxM
+ nzt/2uRastfm9CxKv/5s2LJx4/f9qxjuJUyM211H2LUHsB6e/iitMuzLh4amucklI2svyS3dE
+ QB6Y0F0duw1oTka9vuzNPI3awXD56BwNneaIBm5x89NylNq6e3shGwxYVNlvmSr6wHdAjjNQ5
+ Q1d0iaIuVvsYgzsso4PTcVGLZMumDvVSYebKMd/q9f1YTkJXqpT8piJMPWTitgDAQDjd9gy0T
+ RjXAqf4ZpPptYrEDJBv3NlpIXGP8ZLX4rV/ZL0LHJ1pNElmIsnRj3fJT/Wb5Q7B/PUQJtnYdY
+ xpOP2G7j6wak4YUiAbbWAL0ixEAef194Gs5Vx9xc9C4fLIGl+Qh+YyKTOMFL68QdqOaBK0apJ
+ qU301BV1RT+jBd35Gq5pwHBjSwg8TpGXy5fb8pDP8=
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.120
+X-Received-From: 212.227.126.131
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,150 +122,225 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org, xiexiangyou@huawei.com,
- jiangyiwen <jiangyiwen@huawei.com>, Stefan Hajnoczi <stefanha@redhat.com>,
- pbonzini@redhat.com
+Cc: Christophe de Dinechin <dinechin@redhat.com>,
+ Peter Maydell <peter.maydell@linaro.org>, Riku Voipio <riku.voipio@iki.fi>,
+ John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-* Zhenyu Ye (yezhenyu2@huawei.com) wrote:
->=20
->=20
-> On 2019/10/24 21:56, Dr. David Alan Gilbert wrote:
-> > * Zhenyu Ye (yezhenyu2@huawei.com) wrote:
-> >>
-> >>
-> >> On 2019/10/23 23:19, Stefan Hajnoczi wrote:
-> >>> On Tue, Oct 22, 2019 at 04:12:03PM +0800, yezhenyu (A) wrote:
-> >>>> Since qemu2.9, QEMU added three AioContext poll parameters to struct
-> >>>> IOThread: poll_max_ns, poll_grow and poll_shrink. These properties a=
-re
-> >>>> used to control iothread polling time.
-> >>>>
-> >>>> However, there isn't properly hmp commands to adjust them when the V=
-M is
-> >>>> alive. It's useful to adjust them online when observing the impact o=
-f
-> >>>> different property value on performance.
-> >>>>
-> >>>> This patch add three hmp commands to adjust iothread poll-* properti=
-es
-> >>>> for special iothread:
-> >>>>
-> >>>> set_iothread_poll_max_ns: set the maximum polling time in ns;
-> >>>> set_iothread_poll_grow: set how many ns will be added to polling tim=
-e;
-> >>>> set_iothread_poll_shrink: set how many ns will be removed from polli=
-ng
-> >>>> time.
-> >>>>
-> >>>> Signed-off-by: Zhenyu Ye <yezhenyu2@huawei.com>
-> >>>> ---
-> >>>> hmp-commands.hx | 42 ++++++++++++++++++++
-> >>>> hmp.c | 30 +++++++++++++++
-> >>>> hmp.h | 3 ++
-> >>>> include/sysemu/iothread.h | 6 +++
-> >>>> iothread.c | 80 +++++++++++++++++++++++++++++++++++++++
-> >>>> qapi/misc.json | 23 +++++++++++
-> >>>> 6 files changed, 184 insertions(+)
-> >>>
-> >>> poll-max-ns, poll-grow, poll-shrink are properties of IOThread object=
-s.
-> >>> They can already be modified at runtime using:
-> >>>
-> >>>   $ qemu -object iothread,id=3Diothread1
-> >>>   (qemu) qom-set /objects/iothread1 poll-max-ns 100000
-> >>>
-> >>> I think there is no need for a patch.
-> >>>
-> >>> Stefan
-> >>>
-> >>
-> >> Thanks for your review. I have considered using the `qom-set` command =
-to modify
-> >> IOThread object's properties, however, this command is not friendly to=
- primary
-> >> users. The help info for this command is only:
-> >>
-> >>     qom-set path property value -- set QOM property
-> >>
-> >> It's almost impossible to get the correct `path` parameter for primary=
- user.
-> >=20
-> > Is this just a matter of documenting how to do it?
-> >=20
-> > It sounds like there's no need for a new QMP command though;  if you
-> > want an easier HMP command I'd probably still take it (because HMP is o=
-k
-> > at having things for convenience) - but not if it turns out that just
-> > adding a paragraph of documentation is enough.
-> >=20
-> > Dave
-> >=20
->=20
-> I will show the differences in QMP and HMP:
-> If I want to set iothread1.poll-max-ns=3D1000 and iothread1.poll-grow=3D2=
-:
->=20
-> Without this patch:
-> QMP command:
->=20
->     qom-set /objects/iothread1 poll-max-ns 1000
->     qom-set /objects/iothread1 poll-grow 2
->=20
-> HMP command:
->=20
->     { "execute": "qom-set", "arguments": { "path": "/objects/iothread1",
->                                            "property": "poll-max-ns", "va=
-lue": 1000 } }
->     { "execute": "qom-set", "arguments": { "path": "/objects/iothread1",
->                                            "property": "poll-grow", "valu=
-e": 2} }
->=20
-> with this patch:
-> QMP command:
->=20
->     iothread_set_parameter iothread1 max-ns 1000
->     iothread_set_parameter iothread1 grow 2
->=20
-> HMP command:
->=20
->     { "execute": "set-iothread-poll-params", "arguments': { "iothread-id"=
-: "iothread1",
->                                                             "max-ns": 100=
-0, "grow": 2 } }
->=20
->=20
-> I think the inconvenience of qom-set is how to get the correct `path` par=
-ameter.
-> Anyway, I will consider your advice.
+Le 24/10/2019 à 17:38, Laurent Vivier a écrit :
+> Add --preserve-argv0 in qemu-binfmt-conf.sh to configure the preserve-argv0
+> flag.
+> 
+> Now, if QEMU is started with -0 or QEMU_ARGV0 and an empty parameter
+> argv[0] (the full pathname provided by binfmt-misc) is removed and
+> replaced by argv[1] (the original argv[0] provided by binfmt-misc when
+> 'P'/preserve-arg[0] is set)
+> 
+> For instance:
+> 
+>   $ sudo QEMU_ARGV0= chroot m68k-chroot sh -c 'echo $0'
+>   sh
+> 
+> without this patch:
+> 
+>   $ sudo chroot m68k-chroot sh -c 'echo $0'
+>   /usr/bin/sh
+> 
+> QEMU can be forced to always use preserve-argv[0] at configuration
+> time with --force-preserve-argv0
+> 
+> Signed-off-by: Laurent Vivier <laurent@vivier.eu>
+> ---
 
-So it depends how obvious the path is;  if it's just   /objects/
-followed by whatever you used with id=3D  when you created the iothread
-then I think it's easy - we just need to update the docs.
-Is there a case where it's harder to know?
+missing revision history:
 
-Dave
+    v3: s/preserve-arg0/preserve-argv0/
+    v2: add --force-preserve-argv0 configure option
 
->=20
-> >> This patch provides a more convenient and easy-use hmp&qmp interface t=
-o modify
-> >> these IOThread properties. I think this patch still has a little value=
-.
-> >>
-> >> And I can implement this patch compactly by reusing your code.
-> >>
-> >> Waiting for your reply.
-> >>
-> > --
-> > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
-> >=20
-> >=20
-> > .
-> >=20
->=20
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+>  configure                   |  8 +++++++
+>  linux-user/main.c           | 24 +++++++++++++++++++-
+>  scripts/qemu-binfmt-conf.sh | 44 +++++++++++++++++++++++--------------
+>  3 files changed, 58 insertions(+), 18 deletions(-)
+> 
+> diff --git a/configure b/configure
+> index 145fcabbb3c3..94c41f0a068a 100755
+> --- a/configure
+> +++ b/configure
+> @@ -497,6 +497,7 @@ sheepdog="yes"
+>  libxml2=""
+>  debug_mutex="no"
+>  libpmem=""
+> +force_preserve_argv0="no"
+>  default_devices="yes"
+>  
+>  supported_cpu="no"
+> @@ -1529,6 +1530,8 @@ for opt do
+>    ;;
+>    --disable-xkbcommon) xkbcommon=no
+>    ;;
+> +  --force-preserve-argv0) force_preserve_argv0=yes
+> +  ;;
+>    *)
+>        echo "ERROR: unknown option $opt"
+>        echo "Try '$0 --help' for more information"
+> @@ -1710,6 +1713,8 @@ Advanced options (experts only):
+>    --enable-profiler        profiler support
+>    --enable-debug-stack-usage
+>                             track the maximum stack usage of stacks created by qemu_alloc_stack
+> +  --force-preserve-argv0   for linux-user only, force the use of binfmt_misc 'P'
+> +                           flag (preserve-argv[0])
+>  
+>  Optional features, enabled with --enable-FEATURE and
+>  disabled with --disable-FEATURE, default is enabled if available:
+> @@ -7633,6 +7638,9 @@ if test "$target_user_only" = "yes" ; then
+>  fi
+>  if test "$target_linux_user" = "yes" ; then
+>    echo "CONFIG_LINUX_USER=y" >> $config_target_mak
+> +  if test "$force_preserve_argv0" = "yes" ; then
+> +    echo "CONFIG_FORCE_PRESERVE_ARGV0=y" >> $config_target_mak
+> +  fi
+>  fi
+>  list=""
+>  if test ! -z "$gdb_xml_files" ; then
+> diff --git a/linux-user/main.c b/linux-user/main.c
+> index 560d053f7249..1b4df24ef483 100644
+> --- a/linux-user/main.c
+> +++ b/linux-user/main.c
+> @@ -616,6 +616,7 @@ int main(int argc, char **argv, char **envp)
+>      int ret;
+>      int execfd;
+>      unsigned long max_reserved_va;
+> +    bool preserve_argv0;
+>  
+>      error_init(argv[0]);
+>      module_call_init(MODULE_INIT_TRACE);
+> @@ -664,6 +665,9 @@ int main(int argc, char **argv, char **envp)
+>  
+>      init_qemu_uname_release();
+>  
+> +    /*
+> +     * Manage binfmt-misc open-binary flag
+> +     */
+>      execfd = qemu_getauxval(AT_EXECFD);
+>      if (execfd == 0) {
+>          execfd = open(exec_path, O_RDONLY);
+> @@ -673,6 +677,24 @@ int main(int argc, char **argv, char **envp)
+>          }
+>      }
+>  
+> +     /*
+> +      * argv0 with an empty string will set argv[optind + 1]
+> +      * as target_argv[0]
+> +      */
+> +#ifdef CONFIG_FORCE_PRESERVE_ARGV0
+> +    preserve_argv0 = true;
+> +#else
+> +    preserve_argv0 = (argv0 != NULL && argv0[0] == 0);
+> +#endif
+> +    /*
+> +     * Manage binfmt-misc preserve-arg[0] flag
+> +     *    argv[optind]     full path to the binary
+> +     *    argv[optind + 1] original argv[0]
+> +     */
+> +    if (optind + 1 < argc && preserve_argv0) {
+> +        optind++;
+> +    }
+> +
+>      if (cpu_model == NULL) {
+>          cpu_model = cpu_get_model(get_elf_eflags(execfd));
+>      }
+> @@ -777,7 +799,7 @@ int main(int argc, char **argv, char **envp)
+>       * argv[0] pointer with the given one.
+>       */
+>      i = 0;
+> -    if (argv0 != NULL) {
+> +    if (argv0 != NULL && argv0[0] != 0) {
+>          target_argv[i++] = strdup(argv0);
+>      }
+>      for (; i < target_argc; i++) {
+> diff --git a/scripts/qemu-binfmt-conf.sh b/scripts/qemu-binfmt-conf.sh
+> index b5a16742a149..275d3cf57e83 100755
+> --- a/scripts/qemu-binfmt-conf.sh
+> +++ b/scripts/qemu-binfmt-conf.sh
+> @@ -170,25 +170,27 @@ usage() {
+>  Usage: qemu-binfmt-conf.sh [--qemu-path PATH][--debian][--systemd CPU]
+>                             [--help][--credential yes|no][--exportdir PATH]
+>                             [--persistent yes|no][--qemu-suffix SUFFIX]
+> +                           [--preserve-argv0 yes|no]
+>  
+>         Configure binfmt_misc to use qemu interpreter
+>  
+> -       --help:        display this usage
+> -       --qemu-path:   set path to qemu interpreter ($QEMU_PATH)
+> -       --qemu-suffix: add a suffix to the default interpreter name
+> -       --debian:      don't write into /proc,
+> -                      instead generate update-binfmts templates
+> -       --systemd:     don't write into /proc,
+> -                      instead generate file for systemd-binfmt.service
+> -                      for the given CPU. If CPU is "ALL", generate a
+> -                      file for all known cpus
+> -       --exportdir:   define where to write configuration files
+> -                      (default: $SYSTEMDDIR or $DEBIANDIR)
+> -       --credential:  if yes, credential and security tokens are
+> -                      calculated according to the binary to interpret
+> -       --persistent:  if yes, the interpreter is loaded when binfmt is
+> -                      configured and remains in memory. All future uses
+> -                      are cloned from the open file.
+> +       --help:          display this usage
+> +       --qemu-path:     set path to qemu interpreter ($QEMU_PATH)
+> +       --qemu-suffix:   add a suffix to the default interpreter name
+> +       --debian:        don't write into /proc,
+> +                        instead generate update-binfmts templates
+> +       --systemd:       don't write into /proc,
+> +                        instead generate file for systemd-binfmt.service
+> +                        for the given CPU. If CPU is "ALL", generate a
+> +                        file for all known cpus
+> +       --exportdir:     define where to write configuration files
+> +                        (default: $SYSTEMDDIR or $DEBIANDIR)
+> +       --credential:    if yes, credential and security tokens are
+> +                        calculated according to the binary to interpret
+> +       --persistent:    if yes, the interpreter is loaded when binfmt is
+> +                        configured and remains in memory. All future uses
+> +                        are cloned from the open file.
+> +       --preserve-argv0 preserve argv[0]
+>  
+>      To import templates with update-binfmts, use :
+>  
+> @@ -261,6 +263,9 @@ qemu_generate_register() {
+>      if [ "$PERSISTENT" = "yes" ] ; then
+>          flags="${flags}F"
+>      fi
+> +    if [ "$PRESERVE_ARG0" = "yes" ] ; then
+> +        flags="${flags}P"
+> +    fi
+>  
+>      echo ":qemu-$cpu:M::$magic:$mask:$qemu:$flags"
+>  }
+> @@ -322,9 +327,10 @@ DEBIANDIR="/usr/share/binfmts"
+>  QEMU_PATH=/usr/local/bin
+>  CREDENTIAL=no
+>  PERSISTENT=no
+> +PRESERVE_ARG0=no
+>  QEMU_SUFFIX=""
+>  
+> -options=$(getopt -o ds:Q:S:e:hc:p: -l debian,systemd:,qemu-path:,qemu-suffix:,exportdir:,help,credential:,persistent: -- "$@")
+> +options=$(getopt -o ds:Q:S:e:hc:p:0: -l debian,systemd:,qemu-path:,qemu-suffix:,exportdir:,help,credential:,persistent:,preserve-argv0: -- "$@")
+>  eval set -- "$options"
+>  
+>  while true ; do
+> @@ -380,6 +386,10 @@ while true ; do
+>          shift
+>          PERSISTENT="$1"
+>          ;;
+> +    -0|--preserve-argv0)
+> +        shift
+> +        PRESERVE_ARG0="$1"
+> +        ;;
+>      *)
+>          break
+>          ;;
+> 
 
 
