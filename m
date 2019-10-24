@@ -2,82 +2,77 @@ Return-Path: <SRS0=Jnn8=YR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 15607CA9EAF
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 13:17:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 58EB5CA9EAF
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 13:21:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D42212084C
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 13:17:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1ECA52084C
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 13:21:00 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="F6icXuxV"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D42212084C
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ki98oVAX"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1ECA52084C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42300 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42416 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iNczW-0005nb-Dg
-	for qemu-devel@archiver.kernel.org; Thu, 24 Oct 2019 09:17:26 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50394)
+	id 1iNd2w-0001al-OV
+	for qemu-devel@archiver.kernel.org; Thu, 24 Oct 2019 09:20:58 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47739)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgilbert@redhat.com>) id 1iNcdJ-0004Fq-Go
- for qemu-devel@nongnu.org; Thu, 24 Oct 2019 08:54:31 -0400
+ (envelope-from <armbru@redhat.com>) id 1iNcKi-0003uy-Q6
+ for qemu-devel@nongnu.org; Thu, 24 Oct 2019 08:35:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgilbert@redhat.com>) id 1iNcdG-00071M-Ps
- for qemu-devel@nongnu.org; Thu, 24 Oct 2019 08:54:28 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:21417
+ (envelope-from <armbru@redhat.com>) id 1iNcKh-0006Au-CR
+ for qemu-devel@nongnu.org; Thu, 24 Oct 2019 08:35:16 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:54236
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1iNcdG-000716-LP
- for qemu-devel@nongnu.org; Thu, 24 Oct 2019 08:54:26 -0400
+ (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1iNcKh-0006AT-7G
+ for qemu-devel@nongnu.org; Thu, 24 Oct 2019 08:35:15 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1571921666;
+ s=mimecast20190719; t=1571920514;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=59X5Zte38Cgzy7JMHUGFe9KOmVyhJUTAXgKbgIdm69k=;
- b=F6icXuxVIcgnr60PoyC37/dxb87Mf3tniED0ltkgJNhbQGGo2u0r9Wgf3420kxg7ffW9d4
- OvbSEbtCGrDf2ilMVTs6O6BUcR0bEnNHJkKr9Yc/BnuBJmCT2kZLZNmIUFBavXPI4kjdEd
- /G3l0CR5NxYRuxpEDSD8jDN3415aad8=
+ bh=VwkGbCv7Og2OBZVs11s5/f+xm7Uo964VHovW0vL2Pa4=;
+ b=Ki98oVAXV/10HRyVEbfsC+oECOt7SYx6TKJTN7NsJjs7Y3dwyq/1BfTusRR5Bb7vOVpJFq
+ eocIq2T/j9SG9PPXvQuVfB9Y1Efy+6X2GnHty4hQgWLSRG2xJhDq8Cj3lXXtOTC/hWGSmK
+ J6OidU8rmmvjB5p4DhqImT+1R1egyis=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-8-dXN9-o_uONivsNoRgWttMw-1; Thu, 24 Oct 2019 08:54:24 -0400
+ us-mta-354-oULp1_mRNAieugi6TVf_Gg-1; Thu, 24 Oct 2019 08:35:11 -0400
 Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
  [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 17ACE5E4;
- Thu, 24 Oct 2019 12:54:23 +0000 (UTC)
-Received: from work-vm (ovpn-117-248.ams2.redhat.com [10.36.117.248])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 7EAA01001B33;
- Thu, 24 Oct 2019 12:54:12 +0000 (UTC)
-Date: Thu, 24 Oct 2019 13:54:10 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Subject: Re: [PATCH 00/30] virtiofs daemon (base)
-Message-ID: <20191024125410.GE2877@work-vm>
-References: <20191021105832.36574-1-dgilbert@redhat.com>
- <157166664425.24734.3489596262271351160@37313f22b938>
- <20191021143357.GB5837@work-vm>
- <20191024065826-mutt-send-email-mst@kernel.org>
- <20191024110708.GI3700@redhat.com> <20191024111439.GD2877@work-vm>
- <20191024071738-mutt-send-email-mst@kernel.org>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 104DA801E5C;
+ Thu, 24 Oct 2019 12:35:10 +0000 (UTC)
+Received: from blackfin.pond.sub.org (unknown [10.36.118.123])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id A9CBD10027A1;
+ Thu, 24 Oct 2019 12:35:06 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id 1B371113294C; Thu, 24 Oct 2019 14:34:59 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [RFC PATCH 10/19] qapi: Simplify how qmp_dispatch() deals with
+ QCO_NO_SUCCESS_RESP
+Date: Thu, 24 Oct 2019 14:34:49 +0200
+Message-Id: <20191024123458.13505-11-armbru@redhat.com>
+In-Reply-To: <20191024123458.13505-1-armbru@redhat.com>
+References: <20191024123458.13505-1-armbru@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20191024071738-mutt-send-email-mst@kernel.org>
-User-Agent: Mutt/1.12.1 (2019-06-15)
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-MC-Unique: dXN9-o_uONivsNoRgWttMw-1
+X-MC-Unique: oULp1_mRNAieugi6TVf_Gg-1
 X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=WINDOWS-1252
 Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 205.139.110.120
@@ -92,126 +87,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>,
- qemu-devel@nongnu.org, piaojun@huawei.com, stefanha@redhat.com,
- marcandre.lureau@redhat.com, eguan@linux.alibaba.com, vgoyal@redhat.com
+Cc: libvir-list@redhat.com, mdroth@linux.vnet.ibm.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-* Michael S. Tsirkin (mst@redhat.com) wrote:
-> On Thu, Oct 24, 2019 at 12:14:39PM +0100, Dr. David Alan Gilbert wrote:
-> > * Daniel P. Berrang=E9 (berrange@redhat.com) wrote:
-> > > On Thu, Oct 24, 2019 at 06:59:33AM -0400, Michael S. Tsirkin wrote:
-> > > > On Mon, Oct 21, 2019 at 03:33:57PM +0100, Dr. David Alan Gilbert wr=
-ote:
-> > > > > * no-reply@patchew.org (no-reply@patchew.org) wrote:
-> > > > > > Patchew URL: https://patchew.org/QEMU/20191021105832.36574-1-dg=
-ilbert@redhat.com/
-> > > > > >=20
-> > > > > >=20
-> > > > > >=20
-> > > > > > Hi,
-> > > > > >=20
-> > > > > > This series seems to have some coding style problems. See outpu=
-t below for
-> > > > > > more information:
-> > > > > >=20
-> > > > > > Subject: [PATCH 00/30] virtiofs daemon (base)
-> > > > > > Type: series
-> > > > > > Message-id: 20191021105832.36574-1-dgilbert@redhat.com
-> > > > > >=20
-> > > > > > =3D=3D=3D TEST SCRIPT BEGIN =3D=3D=3D
-> > > > > > #!/bin/bash
-> > > > > > git rev-parse base > /dev/null || exit 0
-> > > > > > git config --local diff.renamelimit 0
-> > > > > > git config --local diff.renames True
-> > > > > > git config --local diff.algorithm histogram
-> > > > > > ./scripts/checkpatch.pl --mailback base..
-> > > > >=20
-> > > > > Expecting checkpatch to be broken here; most of the files
-> > > > > follow FUSE's formatting.
-> > > > >=20
-> > > > > Dave
-> > > >=20
-> > > > I wonder what do others think about this.
-> > > > One problem with such inconsistencies is that people tend to copy c=
-ode
-> > > > around, which tends to result in a mess.
-> > >=20
-> > > IIUC, most of this code is simpy copied as-is from the fuse or linux
-> > > git repos. I'm wondering what the intention is for it long term ?
-> > >=20
-> > > For header files, I would have expected us to be able to compile agai=
-nst
-> > > the -devel package provided by the kernel or fuse packages. I can
-> > > understand if we want to import the headers if the VSOCK additions to
-> > > them are not yet widely available in distros though. If this is the c=
-ase
-> > > we should put a time limit on how long we'd keep these copied headers
-> > > around for before dropping them. It would be fine to violate QEMU cod=
-ing
-> > > style in this case as its not code QEMU would "maintain" long term - =
-just
-> > > a read-only import.
-> >=20
-> > The headers are really two types;  one are external definitions, the
-> > other are internal parts of libfuse.  I'd expect to keep the internal
-> > parts long term; teh external parts hmm; where would we pull them in
-> > externally from?
-> >=20
-> > > The source files though, we appear to then be modifying locally, whic=
-h
-> > > suggests they'll live in our repo forever. In this case I'd expect to
-> > > have compliance with QEMU coding standards.
-> >=20
-> > OK.
-> >=20
-> > > I'm surprised we need to copy so much in from fuse though. Is there a
-> > > case to be made for fuse to provide a library of APIs for people who
-> > > are building fuse daemons to link against, instead of copy & fork ?
-> >=20
-> > libfuse *is* such a library; but it preserves ABI compliance; it's
-> > intention is to be used to build filesystem implementations on top of -
-> > and that's got a fairly good separation;  however changing the fuse
-> > transport, and security models is much more invasive than it was
-> > designed for.
-> >=20
-> > Dave
->=20
->=20
-> I guess you did try to propose adding the functionality to the libfuse
-> maintainer and got rejected? If not it's worth asking.
+Signed-off-by: Markus Armbruster <armbru@redhat.com>
+---
+ qapi/qmp-dispatch.c | 20 ++++++++++----------
+ 1 file changed, 10 insertions(+), 10 deletions(-)
 
-I looked at it; we started off thinking we'd merge much of it up there -
-but there's at least two problems:
-
-  a) Our libvhost-user isn't a separable library either - so we'd need
-to copy it into libfuse which is just as big a problem.
-  b) It's not additional interfaces, it's changes to existing APIs that
-break A*B*I compatibility that are very hard to avoid when you're
-changing the transport.
-
-Also, we're not just changing the transport - if you look at the
-security patchset we're inverting the security model and there's a bunch
-of threading changes that you haven't got yet.
-
-Dave
-
->=20
->=20
-> > > Regards,
-> > > Daniel
-> > > --=20
-> > > |: https://berrange.com      -o-    https://www.flickr.com/photos/dbe=
-rrange :|
-> > > |: https://libvirt.org         -o-            https://fstop138.berran=
-ge.com :|
-> > > |: https://entangle-photo.org    -o-    https://www.instagram.com/dbe=
-rrange :|
-> > --
-> > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+diff --git a/qapi/qmp-dispatch.c b/qapi/qmp-dispatch.c
+index a69d5b5a96..d1643fe37a 100644
+--- a/qapi/qmp-dispatch.c
++++ b/qapi/qmp-dispatch.c
+@@ -151,31 +151,31 @@ QDict *qmp_dispatch(QmpCommandList *cmds, QObject *re=
+quest,
+         args =3D qdict_get_qdict(dict, "arguments");
+         qobject_ref(args);
+     }
+-
+     cmd->fn(args, &ret, &err);=20
++    qobject_unref(args);
+     if (err) {
+-        ;
+-    } else if (cmd->options & QCO_NO_SUCCESS_RESP) {
++        goto out;
++    }
++
++    if (cmd->options & QCO_NO_SUCCESS_RESP) {
+         g_assert(!ret);
++        return NULL;
+     } else if (!ret) {
+         /* TODO turn into assertion */
+         ret =3D QOBJECT(qdict_new());
+     }
+=20
+-    qobject_unref(args);
+-
+ out:
++    assert(!err !=3D !ret);
++
+     if (err) {
+         rsp =3D qmp_error_response(err);
+-    } else if (ret) {
++    } else {
+         rsp =3D qdict_new();
+         qdict_put_obj(rsp, "return", ret);
+-    } else {
+-        /* Can only happen for commands with QCO_NO_SUCCESS_RESP */
+-        rsp =3D NULL;
+     }
+=20
+-    if (rsp && id) {
++    if (id) {
+         qdict_put_obj(rsp, "id", qobject_ref(id));
+     }
+=20
+--=20
+2.21.0
 
 
