@@ -2,58 +2,86 @@ Return-Path: <SRS0=Jnn8=YR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 76274CA9EBC
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 14:13:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DD737CA9EAF
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 14:13:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4DFA221A4A
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 14:13:20 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4DFA221A4A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id A245C21872
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 14:13:30 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZOKx1Usj"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A245C21872
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43750 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43758 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iNdrb-0008HN-1j
-	for qemu-devel@archiver.kernel.org; Thu, 24 Oct 2019 10:13:19 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52295)
+	id 1iNdrl-0000GF-O5
+	for qemu-devel@archiver.kernel.org; Thu, 24 Oct 2019 10:13:29 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34931)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <yi.l.liu@intel.com>) id 1iNcl4-0006Eg-Tm
- for qemu-devel@nongnu.org; Thu, 24 Oct 2019 09:02:32 -0400
+ (envelope-from <paolo.bonzini@gmail.com>) id 1iNdj7-00088U-EB
+ for qemu-devel@nongnu.org; Thu, 24 Oct 2019 10:04:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <yi.l.liu@intel.com>) id 1iNcl2-0003G7-Mx
- for qemu-devel@nongnu.org; Thu, 24 Oct 2019 09:02:30 -0400
-Received: from mga11.intel.com ([192.55.52.93]:40489)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <yi.l.liu@intel.com>) id 1iNcl2-0002NX-Bn
- for qemu-devel@nongnu.org; Thu, 24 Oct 2019 09:02:28 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga001.fm.intel.com ([10.253.24.23])
- by fmsmga102.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
- 24 Oct 2019 06:02:12 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.68,224,1569308400"; d="scan'208";a="210156343"
-Received: from iov.bj.intel.com ([10.238.145.67])
- by fmsmga001.fm.intel.com with ESMTP; 24 Oct 2019 06:02:09 -0700
-From: Liu Yi L <yi.l.liu@intel.com>
-To: qemu-devel@nongnu.org, mst@redhat.com, pbonzini@redhat.com,
- alex.williamson@redhat.com, peterx@redhat.com
-Subject: [RFC v2 21/22] intel_iommu: propagate PASID-based iotlb invalidation
- to host
-Date: Thu, 24 Oct 2019 08:34:42 -0400
-Message-Id: <1571920483-3382-22-git-send-email-yi.l.liu@intel.com>
-X-Mailer: git-send-email 2.7.4
-In-Reply-To: <1571920483-3382-1-git-send-email-yi.l.liu@intel.com>
-References: <1571920483-3382-1-git-send-email-yi.l.liu@intel.com>
+ (envelope-from <paolo.bonzini@gmail.com>) id 1iNdj6-0007pH-8F
+ for qemu-devel@nongnu.org; Thu, 24 Oct 2019 10:04:33 -0400
+Received: from mail-wm1-x333.google.com ([2a00:1450:4864:20::333]:39157)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
+ id 1iNdj6-0007ou-28
+ for qemu-devel@nongnu.org; Thu, 24 Oct 2019 10:04:32 -0400
+Received: by mail-wm1-x333.google.com with SMTP id r141so2732743wme.4
+ for <qemu-devel@nongnu.org>; Thu, 24 Oct 2019 07:04:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=Ikbis2EmZPHbVV90StLUr/aGwCPiufobBGQ1XGXra5o=;
+ b=ZOKx1UsjF2cFt8CIG5BAL16XIvQuYeg4o8U9slre8HF0mLBLNnpMkj5OWudygv+Q6H
+ UyZUQGimyF16DZNrqpe+f7bwU4Ze8vWrtLCkhUkhEFTdSDw7B7emLSAGFB+HjTjhBbMn
+ 2eL+mqCQGEbu837ebU0LuJku7f98sPME9GWFspGB/EBNcEoz7mF/TbEBEN8CZpU8zW20
+ aUharQQlq8x01p5v0EmecD2LbmoVFVTryMuAHQDeV/rjGjrR7nKW0JWbKjTJZOXkBXZ8
+ 0RdksorNxEYPQziot4Y/18k4rxLdZVsMKBlfTzstFmT7wzzeDn191CSyXMrftIkwooO/
+ IMzw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
+ :in-reply-to:references:mime-version:content-transfer-encoding;
+ bh=Ikbis2EmZPHbVV90StLUr/aGwCPiufobBGQ1XGXra5o=;
+ b=OlWTq6GvzZfgrlHh1ZN5qvDNrr0AjkpeuLXpmQDkA3Iv96RWYVWIP9AH9SS9cPg/CQ
+ 5pSTjxazVGd0NZiXESITWHTS6DmXT+1Amac5k/WZKCnibCQ83QoK2ML4YWWYxtZ8OGmZ
+ LaI4rp+F1wTxS5rhzrBcxCLsolG27EMZWkNGy1PC/0qBOx4ZM2iG4JyjJevsXfa+x2Fv
+ RhlBEdTRC3Pn71oBW+LQ42bR07Ie0u9eFElBZm57udmMSBMVb7EqKwdbyIETZBsH++ev
+ ikLpOpIZNd/qAIqZG9MCBySlwQH/K+9Ovp7SyZhz5RRySzCDe/c+fhSJAAIDVcTCu/Ub
+ xKLw==
+X-Gm-Message-State: APjAAAWylEOePBGiRPTj5H1THzDPempIZDthabkpfFrUDRNFn0K8R9IN
+ YJArJBHUTPS77oPblqJoFupIaZyU
+X-Google-Smtp-Source: APXvYqwWNh1KZRI3lvx9Z6vzN5xOr8jBaOerQ0dJf5ON01ofGkvv2hdtzX9ZUNNGCpV18Du2MZNARA==
+X-Received: by 2002:a1c:6745:: with SMTP id b66mr5087014wmc.30.1571925870752; 
+ Thu, 24 Oct 2019 07:04:30 -0700 (PDT)
+Received: from 640k.localdomain ([93.56.166.5])
+ by smtp.gmail.com with ESMTPSA id b7sm10610155wrn.53.2019.10.24.07.04.29
+ (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+ Thu, 24 Oct 2019 07:04:29 -0700 (PDT)
+From: Paolo Bonzini <pbonzini@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PULL 30/39] hw/i386/pc: Remove kvm_i386.h include
+Date: Thu, 24 Oct 2019 16:03:46 +0200
+Message-Id: <1571925835-31930-31-git-send-email-pbonzini@redhat.com>
+X-Mailer: git-send-email 1.8.3.1
+In-Reply-To: <1571925835-31930-1-git-send-email-pbonzini@redhat.com>
+References: <1571925835-31930-1-git-send-email-pbonzini@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 192.55.52.93
+X-Received-From: 2a00:1450:4864:20::333
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -65,202 +93,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: tianyu.lan@intel.com, kevin.tian@intel.com, yi.l.liu@intel.com,
- Yi Sun <yi.y.sun@linux.intel.com>, kvm@vger.kernel.org, jun.j.tian@intel.com,
- eric.auger@redhat.com, yi.y.sun@intel.com, jacob.jun.pan@linux.intel.com,
- david@gibson.dropbear.id.au
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This patch propagates PASID-based iotlb invalidation to host.
+From: Philippe Mathieu-Daudé <philmd@redhat.com>
 
-Intel VT-d 3.0 supports nested translation in PASID granularity. For guest
-SVA support, nested translation is enabled for specific PASID. This is also
-known as dual stage translation which gives better virtualization support.
+By extracting pc_gsi_create() and pc_i8259_create() we removed
+the access to "kvm_i386.h" from the machine code. We can now
+remove it.
 
-Under such configuration, guest owns the GVA->GPA translation which is
-configured as first level page table in host side for a specific pasid, and
-host owns GPA->HPA translation. As guest owns first level translation table,
-piotlb invalidation should be propagated to host since host IOMMU will cache
-first level page table related mappings during DMA address translation.
-
-Cc: Kevin Tian <kevin.tian@intel.com>
-Cc: Jacob Pan <jacob.jun.pan@linux.intel.com>
-Cc: Peter Xu <peterx@redhat.com>
-Cc: Yi Sun <yi.y.sun@linux.intel.com>
-Signed-off-by: Liu Yi L <yi.l.liu@intel.com>
+Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Message-Id: <20191015162705.28087-25-philmd@redhat.com>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- hw/i386/intel_iommu.c          | 127 +++++++++++++++++++++++++++++++++++++++++
- hw/i386/intel_iommu_internal.h |   7 +++
- 2 files changed, 134 insertions(+)
+ hw/i386/pc_piix.c | 1 -
+ hw/i386/pc_q35.c  | 1 -
+ 2 files changed, 2 deletions(-)
 
-diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
-index 6cd922f..5ca9ee1 100644
---- a/hw/i386/intel_iommu.c
-+++ b/hw/i386/intel_iommu.c
-@@ -3092,15 +3092,142 @@ static bool vtd_process_pasid_desc(IntelIOMMUState *s,
-     return (ret == 0) ? true : false;
- }
+diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
+index 648dc9a..3a4a64a 100644
+--- a/hw/i386/pc_piix.c
++++ b/hw/i386/pc_piix.c
+@@ -57,7 +57,6 @@
+ #endif
+ #include "migration/global_state.h"
+ #include "migration/misc.h"
+-#include "kvm_i386.h"
+ #include "sysemu/numa.h"
  
-+static void vtd_invalidate_piotlb(IntelIOMMUState *s, VTDBus *vtd_bus,
-+                                  int devfn, IOMMUCTXCacheInvInfo *inv_info)
-+{
-+#ifdef __linux__
-+    VTDIOMMUContext *vtd_ic;
-+    IOMMUCTXEventData event_data;
-+    vtd_ic = vtd_bus->dev_ic[devfn];
-+    if (!vtd_ic) {
-+        return;
-+    }
-+    event_data.event = IOMMU_CTX_EVENT_CACHE_INV;
-+    event_data.data = inv_info;
-+    iommu_ctx_event_notify(&vtd_ic->iommu_context, &event_data);
-+#endif
-+}
-+
-+static inline bool vtd_pasid_cache_valid(
-+                          VTDPASIDAddressSpace *vtd_pasid_as)
-+{
-+    return (vtd_pasid_as->iommu_state->pasid_cache_gen &&
-+            (vtd_pasid_as->iommu_state->pasid_cache_gen
-+             == vtd_pasid_as->pasid_cache_entry.pasid_cache_gen));
-+}
-+
-+/**
-+ * This function is a loop function for the s->vtd_pasid_as
-+ * list with VTDPIOTLBInvInfo as execution filter. It propagates
-+ * the piotlb invalidation to host. Caller of this function
-+ * should hold iommu_lock.
-+ */
-+static void vtd_flush_pasid_iotlb(gpointer key, gpointer value,
-+                                  gpointer user_data)
-+{
-+    VTDPIOTLBInvInfo *piotlb_info = user_data;
-+    VTDPASIDAddressSpace *vtd_pasid_as = value;
-+    uint16_t did;
-+
-+    /*
-+     * Needs to check whether the pasid entry cache stored in
-+     * vtd_pasid_as is valid or not. "invalid" means the pasid
-+     * cache has been flushed, thus host should have done piotlb
-+     * invalidation together with a pasid cache invalidation, so
-+     * no need to pass down piotlb invalidation to host for better
-+     * performance. Only when pasid entry cache is "valid", should
-+     * a piotlb invalidation be propagated to host since it means
-+     * guest just modified a mapping in its page table.
-+     */
-+    if (!vtd_pasid_cache_valid(vtd_pasid_as)) {
-+        return;
-+    }
-+
-+    did = vtd_pe_get_domain_id(
-+                &(vtd_pasid_as->pasid_cache_entry.pasid_entry));
-+
-+    if ((piotlb_info->domain_id == did) &&
-+        (piotlb_info->pasid == vtd_pasid_as->pasid)) {
-+        vtd_invalidate_piotlb(vtd_pasid_as->iommu_state,
-+                              vtd_pasid_as->vtd_bus,
-+                              vtd_pasid_as->devfn,
-+                              &piotlb_info->inv_info);
-+    }
-+
-+    /*
-+     * TODO: needs to add QEMU piotlb flush when QEMU piotlb
-+     * infrastructure is ready. For now, it is enough for passthru
-+     * devices.
-+     */
-+}
-+
- static void vtd_piotlb_pasid_invalidate(IntelIOMMUState *s,
-                                         uint16_t domain_id,
-                                         uint32_t pasid)
- {
-+#ifdef __linux__
-+    VTDPIOTLBInvInfo piotlb_info;
-+    struct iommu_cache_invalidate_info *cache_info;
-+    IOMMUCTXCacheInvInfo *inv_info = &piotlb_info.inv_info;
-+
-+    cache_info = g_malloc0(sizeof(*cache_info));
-+    cache_info->version = IOMMU_CACHE_INVALIDATE_INFO_VERSION_1;
-+    cache_info->cache = IOMMU_CACHE_INV_TYPE_IOTLB;
-+    cache_info->granularity = IOMMU_INV_GRANU_PASID;
-+    cache_info->pasid_info.pasid = pasid;
-+    cache_info->pasid_info.flags = IOMMU_INV_PASID_FLAGS_PASID;
-+    inv_info->info = cache_info;
-+    piotlb_info.domain_id = domain_id;
-+    piotlb_info.pasid = pasid;
-+
-+    vtd_iommu_lock(s);
-+    /*
-+     * Here loops all the vtd_pasid_as instances in s->vtd_pasid_as
-+     * to find out the affected devices since piotlb invalidation
-+     * should check pasid cache per architecture point of view.
-+     */
-+    g_hash_table_foreach(s->vtd_pasid_as,
-+                         vtd_flush_pasid_iotlb, &piotlb_info);
-+    vtd_iommu_unlock(s);
-+
-+    g_free(cache_info);
-+#endif
- }
- 
- static void vtd_piotlb_page_invalidate(IntelIOMMUState *s, uint16_t domain_id,
-                              uint32_t pasid, hwaddr addr, uint8_t am, bool ih)
- {
-+#ifdef __linux__
-+    VTDPIOTLBInvInfo piotlb_info;
-+    struct iommu_cache_invalidate_info *cache_info;
-+    IOMMUCTXCacheInvInfo *inv_info = &piotlb_info.inv_info;
-+
-+    cache_info = g_malloc0(sizeof(*cache_info));
-+    cache_info->version = IOMMU_CACHE_INVALIDATE_INFO_VERSION_1;
-+    cache_info->cache = IOMMU_CACHE_INV_TYPE_IOTLB;
-+    cache_info->granularity = IOMMU_INV_GRANU_ADDR;
-+    cache_info->addr_info.flags = IOMMU_INV_ADDR_FLAGS_PASID;
-+    cache_info->addr_info.flags |= ih ? IOMMU_INV_ADDR_FLAGS_LEAF : 0;
-+    cache_info->addr_info.pasid = pasid;
-+    cache_info->addr_info.addr = addr;
-+    cache_info->addr_info.granule_size = 1 << (12 + am);
-+    cache_info->addr_info.nb_granules = 1;
-+    inv_info->info = cache_info;
-+    piotlb_info.domain_id = domain_id;
-+    piotlb_info.pasid = pasid;
-+
-+    vtd_iommu_lock(s);
-+    /*
-+     * Here loops all the vtd_pasid_as instances in s->vtd_pasid_as
-+     * to find out the affected devices since piotlb invalidation
-+     * should check pasid cache per architecture point of view.
-+     */
-+    g_hash_table_foreach(s->vtd_pasid_as,
-+                         vtd_flush_pasid_iotlb, &piotlb_info);
-+    vtd_iommu_unlock(s);
-+
-+    g_free(cache_info);
-+#endif
- }
- 
- static bool vtd_process_piotlb_desc(IntelIOMMUState *s,
-diff --git a/hw/i386/intel_iommu_internal.h b/hw/i386/intel_iommu_internal.h
-index eddfe54..6a83f6c 100644
---- a/hw/i386/intel_iommu_internal.h
-+++ b/hw/i386/intel_iommu_internal.h
-@@ -516,6 +516,13 @@ struct VTDPASIDCacheInfo {
- };
- typedef struct VTDPASIDCacheInfo VTDPASIDCacheInfo;
- 
-+struct VTDPIOTLBInvInfo {
-+    uint16_t domain_id;
-+    uint32_t pasid;
-+    IOMMUCTXCacheInvInfo inv_info;
-+};
-+typedef struct VTDPIOTLBInvInfo VTDPIOTLBInvInfo;
-+
- /* Masks for struct VTDRootEntry */
- #define VTD_ROOT_ENTRY_P            1ULL
- #define VTD_ROOT_ENTRY_CTP          (~0xfffULL)
+ #define MAX_IDE_BUS 2
+diff --git a/hw/i386/pc_q35.c b/hw/i386/pc_q35.c
+index 157d1da..def3bc2 100644
+--- a/hw/i386/pc_q35.c
++++ b/hw/i386/pc_q35.c
+@@ -36,7 +36,6 @@
+ #include "hw/timer/mc146818rtc.h"
+ #include "hw/xen/xen.h"
+ #include "sysemu/kvm.h"
+-#include "kvm_i386.h"
+ #include "hw/kvm/clock.h"
+ #include "hw/pci-host/q35.h"
+ #include "hw/qdev-properties.h"
 -- 
-2.7.4
+1.8.3.1
+
 
 
