@@ -2,88 +2,90 @@ Return-Path: <SRS0=Jnn8=YR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A03ECA9EAF
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 12:02:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E7E54CA9EAF
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 12:03:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3B1DE20856
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 12:02:00 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3B1DE20856
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id B199A20856
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 12:03:27 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Ldos5N8f"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B199A20856
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40514 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40520 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iNboU-00067X-LF
-	for qemu-devel@archiver.kernel.org; Thu, 24 Oct 2019 08:01:58 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38596)
+	id 1iNbpu-00082S-7V
+	for qemu-devel@archiver.kernel.org; Thu, 24 Oct 2019 08:03:26 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33027)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <luwei.kang@intel.com>) id 1iNbCL-0006GT-IU
- for qemu-devel@nongnu.org; Thu, 24 Oct 2019 07:22:34 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1iNb4Z-000644-Q4
+ for qemu-devel@nongnu.org; Thu, 24 Oct 2019 07:14:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <luwei.kang@intel.com>) id 1iNbCI-0006OO-DB
- for qemu-devel@nongnu.org; Thu, 24 Oct 2019 07:22:31 -0400
-Received: from mga04.intel.com ([192.55.52.120]:62954)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <luwei.kang@intel.com>)
- id 1iNbCI-0006LC-56
- for qemu-devel@nongnu.org; Thu, 24 Oct 2019 07:22:30 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga007.fm.intel.com ([10.253.24.52])
- by fmsmga104.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
- 24 Oct 2019 04:22:21 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.68,224,1569308400"; d="scan'208";a="197707850"
-Received: from fmsmsx104.amr.corp.intel.com ([10.18.124.202])
- by fmsmga007.fm.intel.com with ESMTP; 24 Oct 2019 04:22:20 -0700
-Received: from fmsmsx116.amr.corp.intel.com (10.18.116.20) by
- fmsmsx104.amr.corp.intel.com (10.18.124.202) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Thu, 24 Oct 2019 04:22:20 -0700
-Received: from shsmsx103.ccr.corp.intel.com (10.239.4.69) by
- fmsmsx116.amr.corp.intel.com (10.18.116.20) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Thu, 24 Oct 2019 04:22:20 -0700
-Received: from shsmsx104.ccr.corp.intel.com ([169.254.5.166]) by
- SHSMSX103.ccr.corp.intel.com ([169.254.4.165]) with mapi id 14.03.0439.000;
- Thu, 24 Oct 2019 19:22:18 +0800
-From: "Kang, Luwei" <luwei.kang@intel.com>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Subject: RE: [PATCH v4 2/2] i386: Add support to get/set/migrate Intel
- Processor Trace feature
-Thread-Topic: [PATCH v4 2/2] i386: Add support to get/set/migrate Intel
- Processor Trace feature
-Thread-Index: AQHVgKsg+eNsNdVZH0GZ6Dwyyz/Lp6dbpngw//+LOYCACWt2QIACHxuAgAL58EA=
-Date: Thu, 24 Oct 2019 11:22:18 +0000
-Message-ID: <82D7661F83C1A047AF7DC287873BF1E17382D523@SHSMSX104.ccr.corp.intel.com>
-References: <1520182116-16485-1-git-send-email-luwei.kang@intel.com>
- <1520182116-16485-2-git-send-email-luwei.kang@intel.com>
- <20191012031407.GK4084@habkost.net>
- <82D7661F83C1A047AF7DC287873BF1E17382A209@SHSMSX104.ccr.corp.intel.com>
- <20191015132929.GY4084@habkost.net>
- <82D7661F83C1A047AF7DC287873BF1E17382BB76@SHSMSX104.ccr.corp.intel.com>
- <20191022214416.GA21651@habkost.net>
-In-Reply-To: <20191022214416.GA21651@habkost.net>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ctpclassification: CTP_NT
-x-titus-metadata-40: eyJDYXRlZ29yeUxhYmVscyI6IiIsIk1ldGFkYXRhIjp7Im5zIjoiaHR0cDpcL1wvd3d3LnRpdHVzLmNvbVwvbnNcL0ludGVsMyIsImlkIjoiZjczMDk5MmUtNWUwOS00NjExLWE1NDAtZThmNGU5YTA4ZjQ3IiwicHJvcHMiOlt7Im4iOiJDVFBDbGFzc2lmaWNhdGlvbiIsInZhbHMiOlt7InZhbHVlIjoiQ1RQX05UIn1dfV19LCJTdWJqZWN0TGFiZWxzIjpbXSwiVE1DVmVyc2lvbiI6IjE3LjEwLjE4MDQuNDkiLCJUcnVzdGVkTGFiZWxIYXNoIjoiM2dHTDFuYkc2ZkM1UUt5S1J3dDRzV0JTV0xvK0pkcXNUaDdScmdRSkpMSUVvaTA3NlpGXC96ajBhdWU3U1BiM1gifQ==
-dlp-product: dlpe-windows
-dlp-version: 11.2.0.6
-dlp-reaction: no-action
-x-originating-ip: [10.239.127.40]
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+ (envelope-from <alex.bennee@linaro.org>) id 1iNb4Y-0002DS-Gi
+ for qemu-devel@nongnu.org; Thu, 24 Oct 2019 07:14:31 -0400
+Received: from mail-wr1-x435.google.com ([2a00:1450:4864:20::435]:45724)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1iNb4Y-0002Cb-4v
+ for qemu-devel@nongnu.org; Thu, 24 Oct 2019 07:14:30 -0400
+Received: by mail-wr1-x435.google.com with SMTP id q13so20636977wrs.12
+ for <qemu-devel@nongnu.org>; Thu, 24 Oct 2019 04:14:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=f63dB6hLG8yXun8B3m+kJKUwp9SZsm+9kHC3CVxTHYY=;
+ b=Ldos5N8fDKiQpHNrsRoDB0u2uP++bu15v95BzAvY6kWgJQql7Gvxt6iwtGZtI95hTp
+ r/8mwDPVnHJN0TMMnxEDEt1uAO7MuutL6cMhiKGYcT/dMz1FBzuC1EmUWT6HMAtZxkBE
+ jkDG4vBJj7P50SVhxMR0BuouvNVChQtlqiaYOsS54d7uKtbLp2JBW9Gk3GMmJqwpU/mF
+ hn5X6rpvJlFFCDSl0zhZBajsLm93fiQffU7VQBf5YxzmNyGgyEiQTiuhiQG8caQKPjjb
+ Dl8N7Yaa7Vk/68jePtnZpG1k1Q6Pm3zEJh1oRRb5wfzK2Xo7cVxqaE9ei2B0Egq+nUTY
+ Ouag==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=f63dB6hLG8yXun8B3m+kJKUwp9SZsm+9kHC3CVxTHYY=;
+ b=B2CIGflkxWy6WTaZkrpPR8tmmc/Ee3gGC9Djsp0qyiDg+enxYiz9RrXwDTsGlWkQKH
+ WX15DJiicCKdrTde0zRGCoAJLJu0ibXhB2P1Yq5LunpOAGtijE8xomgaStiNb+juYXMZ
+ nVymPXGdmAD45j1hYv3Q23IieNs+ufOhkw+5TCOF/T8oaU8e0uEbB4LA1nuM2NGRY94i
+ luf1z0nEh89GcB723X8BucjNIWQVwNECBxRvRHRkKoaZFo5R/Kze6k4WXhC7HU7kcfqx
+ AD6dh9o+f9jk0552cpxLx/2yVbk9kRW9s1zzfw5eJ1i2PQ82nM66ny1D+wbBcr+0g3wz
+ 0lZA==
+X-Gm-Message-State: APjAAAUjSYUm3YU9oM9vLn1AcCOqX/Cv+ODSkDc46MNw696V8/jIuQnV
+ A4nf7+kOLTqOVd5eMsds859DIQ==
+X-Google-Smtp-Source: APXvYqwAvv+BDWf+ueCxqjW152AvXJJnzNj8JCZyYp+pIRTgCVVATrNnYTOhOt8h8VQeDPIqNDDUYQ==
+X-Received: by 2002:a5d:66c1:: with SMTP id k1mr3543854wrw.73.1571915668347;
+ Thu, 24 Oct 2019 04:14:28 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id i18sm22886295wrx.14.2019.10.24.04.14.27
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 24 Oct 2019 04:14:27 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id C0C3C1FF87;
+ Thu, 24 Oct 2019 12:14:26 +0100 (BST)
+References: <20191022072135.11188-1-thuth@redhat.com>
+ <20191022072135.11188-6-thuth@redhat.com>
+User-agent: mu4e 1.3.5; emacs 27.0.50
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: qemu-devel@nongnu.org
+Subject: Re: [PATCH v3 5/6] iotests: Enable more tests in the 'auto' group
+ to improve test coverage
+In-reply-to: <20191022072135.11188-6-thuth@redhat.com>
+Date: Thu, 24 Oct 2019 12:14:26 +0100
+Message-ID: <87ftjimm3x.fsf@linaro.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 192.55.52.120
+X-Received-From: 2a00:1450:4864:20::435
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -95,118 +97,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
- "mtosatti@redhat.com" <mtosatti@redhat.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- Chao Peng <chao.p.peng@linux.intel.com>,
- "pbonzini@redhat.com" <pbonzini@redhat.com>,
- "rth@twiddle.net" <rth@twiddle.net>
+Cc: Kevin Wolf <kwolf@redhat.com>, John Snow <jsnow@redhat.com>,
+ qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-> > > > > > f9f4cd1..097c953 100644
-> > > > > > --- a/target/i386/kvm.c
-> > > > > > +++ b/target/i386/kvm.c
-> > > > > > @@ -1811,6 +1811,25 @@ static int kvm_put_msrs(X86CPU *cpu, int=
- level)
-> > > > > >                  kvm_msr_entry_add(cpu, MSR_MTRRphysMask(i), ma=
-sk);
-> > > > > >              }
-> > > > > >          }
-> > > > > > +        if (env->features[FEAT_7_0_EBX] & CPUID_7_0_EBX_INTEL_=
-PT) {
-> > > > > > +            int addr_num =3D kvm_arch_get_supported_cpuid(kvm_=
-state,
-> > > > > > +                                                    0x14, 1,
-> > > > > > + R_EAX) & 0x7;
-> > > > > > +
-> > > > > > +            kvm_msr_entry_add(cpu, MSR_IA32_RTIT_CTL,
-> > > > > > +                            env->msr_rtit_ctrl);
-> > > > > > +            kvm_msr_entry_add(cpu, MSR_IA32_RTIT_STATUS,
-> > > > > > +                            env->msr_rtit_status);
-> > > > > > +            kvm_msr_entry_add(cpu, MSR_IA32_RTIT_OUTPUT_BASE,
-> > > > > > +                            env->msr_rtit_output_base);
-> > > > >
-> > > > > This causes the following crash on some hosts:
-> > > > >
-> > > > >   qemu-system-x86_64: error: failed to set MSR 0x560 to 0x0
-> > > > >   qemu-system-x86_64: target/i386/kvm.c:2673: kvm_put_msrs: Asser=
-tion `ret =3D=3D cpu->kvm_msr_buf->nmsrs' failed.
-> > > > >
-> > > > > Checking for CPUID_7_0_EBX_INTEL_PT is not enough: KVM has
-> > > > > additional conditions that might prevent writing to this MSR
-> > > > > (PT_CAP_topa_output && PT_CAP_single_range_output).  This
-> > > causes QEMU to crash if some of the conditions aren't met.
-> > > > >
-> > > > > Writing and reading this MSR (and the ones below) need to be cond=
-itional on KVM_GET_MSR_INDEX_LIST.
-> > > > >
-> > > >
-> > > > Hi Eduardo,
-> > > >     I found this issue can't be reproduced in upstream source code
-> > > > but can be reproduced on RHEL8.1. I haven't got the qemu source
-> > > code of RHEL8.1. But after adding some trace in KVM, I found the KVM
-> > > has reported the complete Intel PT CPUID information to qemu but the =
-Intel PT CPUID (0x14) is lost when qemu setting the CPUID
-> to KVM (cpuid level is 0xd). It looks like lost the below patch.
-> > > >
-> > > > commit f24c3a79a415042f6dc195f029a2ba7247d14cac
-> > > > Author: Luwei Kang <luwei.kang@intel.com>
-> > > > Date:   Tue Jan 29 18:52:59 2019 -0500
-> > > >     i386: extended the cpuid_level when Intel PT is enabled
-> > > >
-> > > >     Intel Processor Trace required CPUID[0x14] but the cpuid_level
-> > > >     have no change when create a kvm guest with
-> > > >     e.g. "-cpu qemu64,+intel-pt".
-> > >
-> > > Thanks for the pointer.  This may avoid triggering the bug in the
-> > > default configuration, but we still need to make the MSR writing
-> > > conditional on KVM_GET_MSR_INDEX_LIST.  Older machine-types have x-in=
-tel-pt-auto-level=3Doff, and the user may set `level`
-> manually.
-> >
-> > Hi Eduardo,
-> > Sorry for a delay reply because my mail filter. I tried with the Q35
-> > machine type and default, all looks work well (With some old cpu type
-> > + "intel_pt" also work well).  KVM will check the Intel PT work mode
-> > and HW to decide if Intel PT can be exposed to guest, only extended
-> > the CPUID level is useless. If the guest doesn't support Intel PT, any
-> > MSR read or write will cause #GP. Please remind me if I lost
-> > something.
->=20
-> I understand you have tried q35 and pc, but have you tried with older mac=
-hine-type versions?
->=20
-> Commit f24c3a79a415 doesn't change behavior on pc-*-3.1 and older, so it =
-only avoids triggering the crash in the default case.
-> Doesn't QEMU crash if running:
-> "-cpu qemu64,+intel-pt -machine pc-i440fx-3.1"?
->=20
-> KVM rejecting MSR writes when something is missing is correct.
-> QEMU trying to write the MSR when something is missing (and crashing beca=
-use of that) is a bug.
 
-Hi Eduardo,
-    Yes, you are right. Intel PT is only set in leaf 0x7.ebx but leaf 0x14 =
-is lost because of the leaf number still 0xd (should 0x14).=20
-    May I remove the "off" like this?
+Thomas Huth <thuth@redhat.com> writes:
 
---- a/hw/i386/pc.c
-+++ b/hw/i386/pc.c
-@@ -132,7 +132,6 @@ GlobalProperty pc_compat_3_1[] =3D {
-     { "Icelake-Client" "-" TYPE_X86_CPU,      "mpx", "on" },
-     { "Icelake-Server" "-" TYPE_X86_CPU,      "mpx", "on" },
-     { "Cascadelake-Server" "-" TYPE_X86_CPU, "stepping", "5" },
--    { TYPE_X86_CPU, "x-intel-pt-auto-level", "off" },
- };
- const size_t pc_compat_3_1_len =3D G_N_ELEMENTS(pc_compat_3_1);
+<snip>
+>
+> According to Max, it would be good to have a test for iothreads and
+> migration. 127 and 256 seem to be good candidates for iothreads. For
+> migration, let's enable 091, 181, and 203 (which also tests iothreads).
+<snip>
+> @@ -112,7 +112,7 @@
+>  088 rw quick
+>  089 rw auto quick
+>  090 rw auto quick
+> -091 rw migration
+> +091 rw auto migration
 
-Thanks,
-Luwei Kang
 
->=20
-> --
-> Eduardo
+This is breaking consistently on my ZFS machine:
 
+TEST    iotest-qcow2: 091 [fail]
+QEMU          -- "/home/alex.bennee/lsrc/qemu.git/tests/qemu-iotests/../../=
+x86_64-softmmu/qemu-system-x86_64" -nodefaults -display none -machine accel=
+=3Dqtest
+QEMU_IMG      -- "/home/alex.bennee/lsrc/qemu.git/tests/qemu-iotests/../../=
+qemu-img"
+QEMU_IO       -- "/home/alex.bennee/lsrc/qemu.git/tests/qemu-iotests/../../=
+qemu-io"  --cache writeback -f qcow2
+QEMU_NBD      -- "/home/alex.bennee/lsrc/qemu.git/tests/qemu-iotests/../../=
+qemu-nbd"
+IMGFMT        -- qcow2 (compat=3D1.1)
+IMGPROTO      -- file
+PLATFORM      -- Linux/x86_64 hackbox2 4.15.0-66-generic
+TEST_DIR      -- /home/alex.bennee/lsrc/qemu.git/tests/qemu-iotests/scratch
+SOCKET_SCM_HELPER -- /home/alex.bennee/lsrc/qemu.git/tests/qemu-iotests/soc=
+ket_scm_helper
+
+--- /home/alex.bennee/lsrc/qemu.git/tests/qemu-iotests/091.out  2019-02-19 =
+12:32:03.231730789 +0000
++++ /home/alex.bennee/lsrc/qemu.git/tests/qemu-iotests/091.out.bad      201=
+9-10-24 12:07:00.624967556 +0100
+@@ -9,20 +9,4 @@
+
+ =3D=3D=3D VM 1: Migrate from VM1 to VM2 =3D=3D=3D
+
+-vm1: qemu-io disk write complete
+-vm1: live migration started
+-vm1: live migration completed
+-
+-=3D=3D=3D VM 2: Post-migration, write to disk, verify running =3D=3D=3D
+-
+-vm2: qemu-io disk write complete
+-vm2: qemu process running successfully
+-vm2: flush io, and quit
+-Check image pattern
+-read 4194304/4194304 bytes at offset 0
+-4 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+-Running 'qemu-img check -r all $TEST_IMG'
+-No errors were found on the image.
+-80/16384 =3D 0.49% allocated, 0.00% fragmented, 0.00% compressed clusters
+-Image end offset: 5570560
+-*** done
++Timeout waiting for (qemu) on handle 0
+
+
+--
+Alex Benn=C3=A9e
 
