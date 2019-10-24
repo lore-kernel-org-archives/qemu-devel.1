@@ -2,88 +2,86 @@ Return-Path: <SRS0=Jnn8=YR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 89AE6C47E49
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 15:22:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F36A9CA9EAF
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 15:22:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 526012064A
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 15:22:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7C4082064A
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 15:22:36 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HGk/Wx4b"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 526012064A
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="d6heQ/OB"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7C4082064A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45290 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45302 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iNew8-0004ii-Q4
-	for qemu-devel@archiver.kernel.org; Thu, 24 Oct 2019 11:22:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36776)
+	id 1iNewc-0005OE-Qk
+	for qemu-devel@archiver.kernel.org; Thu, 24 Oct 2019 11:22:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34825)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <ehabkost@redhat.com>) id 1iNdtw-0008Og-3A
- for qemu-devel@nongnu.org; Thu, 24 Oct 2019 10:15:45 -0400
+ (envelope-from <paolo.bonzini@gmail.com>) id 1iNdiy-0007ry-Lh
+ for qemu-devel@nongnu.org; Thu, 24 Oct 2019 10:04:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <ehabkost@redhat.com>) id 1iNdtu-0003pe-LZ
- for qemu-devel@nongnu.org; Thu, 24 Oct 2019 10:15:43 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:41832
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1iNdtu-0003pU-Ha
- for qemu-devel@nongnu.org; Thu, 24 Oct 2019 10:15:42 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1571926542;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=n2opU6N6m1wz6aDqqkbrk6Znhodiar6RbhpaEcpu0Kk=;
- b=HGk/Wx4bLi1BsvlM/dRzPPCMPug2rmcFwSepQLJNSFPziKGkBByosr6NDfy+t7XrQk2KGi
- +n5Z0Z1Mlhd7z6AKa2hN+Gb+tRBcMklcabt2DEIgGD6vYDNC7xQoHNMD3BORBdJmdHIqPg
- juPWt9unaDoN/kNGAUUDeoyUELApDlM=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-182-KhechL12NUKftkTc7zP1yw-1; Thu, 24 Oct 2019 10:15:39 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5CAAD47B;
- Thu, 24 Oct 2019 14:15:38 +0000 (UTC)
-Received: from localhost (ovpn-116-62.gru2.redhat.com [10.97.116.62])
- by smtp.corp.redhat.com (Postfix) with ESMTP id E85F45DC1E;
- Thu, 24 Oct 2019 14:15:37 +0000 (UTC)
-Date: Thu, 24 Oct 2019 11:15:36 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-To: "Kang, Luwei" <luwei.kang@intel.com>
-Subject: Re: [PATCH v4 2/2] i386: Add support to get/set/migrate Intel
- Processor Trace feature
-Message-ID: <20191024141536.GU6744@habkost.net>
-References: <1520182116-16485-1-git-send-email-luwei.kang@intel.com>
- <1520182116-16485-2-git-send-email-luwei.kang@intel.com>
- <20191012031407.GK4084@habkost.net>
- <82D7661F83C1A047AF7DC287873BF1E17382A209@SHSMSX104.ccr.corp.intel.com>
- <20191015132929.GY4084@habkost.net>
- <82D7661F83C1A047AF7DC287873BF1E17382BB76@SHSMSX104.ccr.corp.intel.com>
- <20191022214416.GA21651@habkost.net>
- <82D7661F83C1A047AF7DC287873BF1E17382D523@SHSMSX104.ccr.corp.intel.com>
- <20191024132414.GQ6744@habkost.net>
- <82D7661F83C1A047AF7DC287873BF1E17382D885@SHSMSX104.ccr.corp.intel.com>
+ (envelope-from <paolo.bonzini@gmail.com>) id 1iNdit-0007ih-At
+ for qemu-devel@nongnu.org; Thu, 24 Oct 2019 10:04:24 -0400
+Received: from mail-wm1-x32a.google.com ([2a00:1450:4864:20::32a]:53281)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
+ id 1iNdir-0007hQ-OI
+ for qemu-devel@nongnu.org; Thu, 24 Oct 2019 10:04:18 -0400
+Received: by mail-wm1-x32a.google.com with SMTP id n7so2166733wmc.3
+ for <qemu-devel@nongnu.org>; Thu, 24 Oct 2019 07:04:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=nbdM4QsVX6w/vZF6SHA0C1caqBfc8BftNTLt4pHDGbQ=;
+ b=d6heQ/OBpiVsx1ecilCPT+HUeoAdccwTZUdXs0eAT//BB9MAAL3NzqsWe8p/rFAwkm
+ 4gNQWW4N2VL5S8CpmYZqjdAiJGbt6RYyqZQZqI20oiL0YAqClvyVRwHU1rbl7voyX8RL
+ fMWh2w1LvvYVZtF+C8G6N/DiXHC/lZIFamSNcZmlaOA4kqn0NxONoJynF5IuaQD/IHaP
+ JfQi5apBa/8GZdf0PuUnm3AI8TzceISZ7AbyXSDbE9Tp12lIGZoXvIrETsPF/pm5XJzj
+ 8EQXB1iELmwVJiZ6c1T8cYPClSa6E4s3zBF+LNYUzv62qqKlcEGH0Yic2WxrUdLRCSdt
+ bOjg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
+ :in-reply-to:references:mime-version:content-transfer-encoding;
+ bh=nbdM4QsVX6w/vZF6SHA0C1caqBfc8BftNTLt4pHDGbQ=;
+ b=FGyVzSqzuSCQxWmv+QKCmBw/tSyYVA84WR9aKpO2MI2UjE+jvGv9wH1EqPjtq9OciT
+ bIfD5jRGeIjS4Etbu0MPp7rRsV17TjJwTXYSnaY/ksjrNIT+ZyoMRexPnPi+WMwTsZq5
+ tEwoQjcPLGNZSQ7MfVamNhNUtf2GWcL8Gb/JfjFaWyadlSWd4SSqMPcLxeeax15nH4ZI
+ Ubk3mQO6MdjUVMe1p891CSkPinoo5wPX7jyXb1XZVWcMsPzDYGx0mqFAIkMN74eMPHe0
+ gfTEaUmECx73/ZwORlY0tqiwbTUpqSF59bCTlGbGdHI/SRrK3BcbHbGtlccZBhUUksIR
+ ZI7Q==
+X-Gm-Message-State: APjAAAU7pu0wZob2cJRLZuiVXkO9dAneVtoz0zkrQUvLKalEwCqMQX4J
+ 1NSrPWE8Qm8udkDUvbvLZBhCQbzr
+X-Google-Smtp-Source: APXvYqw7/VeX3i9cgxJ9iiNHwbF3RFDBrDwZ222FLJnkpUPZHsdovMjryKNglHUFm7zPnz9QkrJTSg==
+X-Received: by 2002:a1c:6386:: with SMTP id x128mr4994980wmb.41.1571925855227; 
+ Thu, 24 Oct 2019 07:04:15 -0700 (PDT)
+Received: from 640k.localdomain ([93.56.166.5])
+ by smtp.gmail.com with ESMTPSA id b7sm10610155wrn.53.2019.10.24.07.04.14
+ (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+ Thu, 24 Oct 2019 07:04:14 -0700 (PDT)
+From: Paolo Bonzini <pbonzini@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PULL 16/39] fw_cfg: add "modify" functions for all types
+Date: Thu, 24 Oct 2019 16:03:32 +0200
+Message-Id: <1571925835-31930-17-git-send-email-pbonzini@redhat.com>
+X-Mailer: git-send-email 1.8.3.1
+In-Reply-To: <1571925835-31930-1-git-send-email-pbonzini@redhat.com>
+References: <1571925835-31930-1-git-send-email-pbonzini@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <82D7661F83C1A047AF7DC287873BF1E17382D885@SHSMSX104.ccr.corp.intel.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-MC-Unique: KhechL12NUKftkTc7zP1yw-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=WINDOWS-1252
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 205.139.110.61
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::32a
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -95,178 +93,146 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
- "mtosatti@redhat.com" <mtosatti@redhat.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- Chao Peng <chao.p.peng@linux.intel.com>,
- "pbonzini@redhat.com" <pbonzini@redhat.com>,
- "rth@twiddle.net" <rth@twiddle.net>
+Cc: Sergio Lopez <slp@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Oct 24, 2019 at 01:36:50PM +0000, Kang, Luwei wrote:
-> > > > > > > > > f9f4cd1..097c953 100644
-> > > > > > > > > --- a/target/i386/kvm.c
-> > > > > > > > > +++ b/target/i386/kvm.c
-> > > > > > > > > @@ -1811,6 +1811,25 @@ static int kvm_put_msrs(X86CPU *cp=
-u, int level)
-> > > > > > > > >                  kvm_msr_entry_add(cpu, MSR_MTRRphysMask(=
-i), mask);
-> > > > > > > > >              }
-> > > > > > > > >          }
-> > > > > > > > > +        if (env->features[FEAT_7_0_EBX] & CPUID_7_0_EBX_=
-INTEL_PT) {
-> > > > > > > > > +            int addr_num =3D kvm_arch_get_supported_cpui=
-d(kvm_state,
-> > > > > > > > > +                                                    0x14=
-,
-> > > > > > > > > + 1,
-> > > > > > > > > + R_EAX) & 0x7;
-> > > > > > > > > +
-> > > > > > > > > +            kvm_msr_entry_add(cpu, MSR_IA32_RTIT_CTL,
-> > > > > > > > > +                            env->msr_rtit_ctrl);
-> > > > > > > > > +            kvm_msr_entry_add(cpu, MSR_IA32_RTIT_STATUS,
-> > > > > > > > > +                            env->msr_rtit_status);
-> > > > > > > > > +            kvm_msr_entry_add(cpu, MSR_IA32_RTIT_OUTPUT_=
-BASE,
-> > > > > > > > > +                            env->msr_rtit_output_base);
-> > > > > > > >
-> > > > > > > > This causes the following crash on some hosts:
-> > > > > > > >
-> > > > > > > >   qemu-system-x86_64: error: failed to set MSR 0x560 to 0x0
-> > > > > > > >   qemu-system-x86_64: target/i386/kvm.c:2673: kvm_put_msrs:=
- Assertion `ret =3D=3D cpu->kvm_msr_buf->nmsrs' failed.
-> > > > > > > >
-> > > > > > > > Checking for CPUID_7_0_EBX_INTEL_PT is not enough: KVM has
-> > > > > > > > additional conditions that might prevent writing to this MS=
-R
-> > > > > > > > (PT_CAP_topa_output && PT_CAP_single_range_output).  This
-> > > > > > causes QEMU to crash if some of the conditions aren't met.
-> > > > > > > >
-> > > > > > > > Writing and reading this MSR (and the ones below) need to b=
-e conditional on KVM_GET_MSR_INDEX_LIST.
-> > > > > > > >
-> > > > > > >
-> > > > > > > Hi Eduardo,
-> > > > > > >     I found this issue can't be reproduced in upstream source
-> > > > > > > code but can be reproduced on RHEL8.1. I haven't got the qemu
-> > > > > > > source
-> > > > > > code of RHEL8.1. But after adding some trace in KVM, I found th=
-e
-> > > > > > KVM has reported the complete Intel PT CPUID information to qem=
-u
-> > > > > > but the Intel PT CPUID (0x14) is lost when qemu setting the
-> > > > > > CPUID
-> > > > to KVM (cpuid level is 0xd). It looks like lost the below patch.
-> > > > > > >
-> > > > > > > commit f24c3a79a415042f6dc195f029a2ba7247d14cac
-> > > > > > > Author: Luwei Kang <luwei.kang@intel.com>
-> > > > > > > Date:   Tue Jan 29 18:52:59 2019 -0500
-> > > > > > >     i386: extended the cpuid_level when Intel PT is enabled
-> > > > > > >
-> > > > > > >     Intel Processor Trace required CPUID[0x14] but the cpuid_=
-level
-> > > > > > >     have no change when create a kvm guest with
-> > > > > > >     e.g. "-cpu qemu64,+intel-pt".
-> > > > > >
-> > > > > > Thanks for the pointer.  This may avoid triggering the bug in
-> > > > > > the default configuration, but we still need to make the MSR
-> > > > > > writing conditional on KVM_GET_MSR_INDEX_LIST.  Older
-> > > > > > machine-types have x-intel-pt-auto-level=3Doff, and the user ma=
-y
-> > > > > > set `level`
-> > > > manually.
-> > > > >
-> > > > > Hi Eduardo,
-> > > > > Sorry for a delay reply because my mail filter. I tried with the
-> > > > > Q35 machine type and default, all looks work well (With some old
-> > > > > cpu type
-> > > > > + "intel_pt" also work well).  KVM will check the Intel PT work
-> > > > > + mode
-> > > > > and HW to decide if Intel PT can be exposed to guest, only
-> > > > > extended the CPUID level is useless. If the guest doesn't support
-> > > > > Intel PT, any MSR read or write will cause #GP. Please remind me
-> > > > > if I lost something.
-> > > >
-> > > > I understand you have tried q35 and pc, but have you tried with old=
-er machine-type versions?
-> > > >
-> > > > Commit f24c3a79a415 doesn't change behavior on pc-*-3.1 and older, =
-so it only avoids triggering the crash in the default case.
-> > > > Doesn't QEMU crash if running:
-> > > > "-cpu qemu64,+intel-pt -machine pc-i440fx-3.1"?
-> > > >
-> > > > KVM rejecting MSR writes when something is missing is correct.
-> > > > QEMU trying to write the MSR when something is missing (and crashin=
-g because of that) is a bug.
-> > >
-> > > Hi Eduardo,
-> > >     Yes, you are right. Intel PT is only set in leaf 0x7.ebx but leaf=
- 0x14 is lost because of the leaf number still 0xd (should 0x14).
-> > >     May I remove the "off" like this?
-> >=20
-> > We can't.  This is necessary to keep guest ABI compatibility.
-> > Instead, we need to make QEMU not crash if xlevel is too low, because x=
-level can be configured by the user.
->=20
-> Thanks Eduardo.  But I think it is a little complex for user.
-> User found crash but how does he know it need to configure the
-> xlevel or others?
-> If we want to the old machine type support PT can we add some
-> code to extend the level to 0x14? Or old machine type can't
-> support PT,  mask off this feature from leaf 0x07.ebx[25]
-> directly and output some messages?
+From: Sergio Lopez <slp@redhat.com>
 
-I agree it's complex for the user, but let's address this
-separately:
+This allows to alter the contents of an already added item.
 
-the first issue here is the crash: QEMU must not crash if using
-(e.g.) "-cpu ...,+intel-pt,xlevel=3D0x13".  This can't be solved by
-making any machine-type changes.
+Signed-off-by: Sergio Lopez <slp@redhat.com>
+Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+Reviewed-by: Marc-André Lureau <marcandre.lureau@redhat.com>
+---
+ hw/nvram/fw_cfg.c         | 29 +++++++++++++++++++++++++++++
+ include/hw/nvram/fw_cfg.h | 42 ++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 71 insertions(+)
 
-The second issue is usability.  This is hard to fix on old
-machine-types because we must keep guest ABI compatibility.
+diff --git a/hw/nvram/fw_cfg.c b/hw/nvram/fw_cfg.c
+index 7dc3ac3..aef1727 100644
+--- a/hw/nvram/fw_cfg.c
++++ b/hw/nvram/fw_cfg.c
+@@ -690,6 +690,15 @@ void fw_cfg_add_string(FWCfgState *s, uint16_t key, const char *value)
+     fw_cfg_add_bytes(s, key, g_memdup(value, sz), sz);
+ }
+ 
++void fw_cfg_modify_string(FWCfgState *s, uint16_t key, const char *value)
++{
++    size_t sz = strlen(value) + 1;
++    char *old;
++
++    old = fw_cfg_modify_bytes_read(s, key, g_memdup(value, sz), sz);
++    g_free(old);
++}
++
+ void fw_cfg_add_i16(FWCfgState *s, uint16_t key, uint16_t value)
+ {
+     uint16_t *copy;
+@@ -720,6 +729,16 @@ void fw_cfg_add_i32(FWCfgState *s, uint16_t key, uint32_t value)
+     fw_cfg_add_bytes(s, key, copy, sizeof(value));
+ }
+ 
++void fw_cfg_modify_i32(FWCfgState *s, uint16_t key, uint32_t value)
++{
++    uint32_t *copy, *old;
++
++    copy = g_malloc(sizeof(value));
++    *copy = cpu_to_le32(value);
++    old = fw_cfg_modify_bytes_read(s, key, copy, sizeof(value));
++    g_free(old);
++}
++
+ void fw_cfg_add_i64(FWCfgState *s, uint16_t key, uint64_t value)
+ {
+     uint64_t *copy;
+@@ -730,6 +749,16 @@ void fw_cfg_add_i64(FWCfgState *s, uint16_t key, uint64_t value)
+     fw_cfg_add_bytes(s, key, copy, sizeof(value));
+ }
+ 
++void fw_cfg_modify_i64(FWCfgState *s, uint16_t key, uint64_t value)
++{
++    uint64_t *copy, *old;
++
++    copy = g_malloc(sizeof(value));
++    *copy = cpu_to_le64(value);
++    old = fw_cfg_modify_bytes_read(s, key, copy, sizeof(value));
++    g_free(old);
++}
++
+ void fw_cfg_set_order_override(FWCfgState *s, int order)
+ {
+     assert(s->fw_cfg_order_override == 0);
+diff --git a/include/hw/nvram/fw_cfg.h b/include/hw/nvram/fw_cfg.h
+index 80e435d..b5291ee 100644
+--- a/include/hw/nvram/fw_cfg.h
++++ b/include/hw/nvram/fw_cfg.h
+@@ -99,6 +99,20 @@ void fw_cfg_add_bytes(FWCfgState *s, uint16_t key, void *data, size_t len);
+ void fw_cfg_add_string(FWCfgState *s, uint16_t key, const char *value);
+ 
+ /**
++ * fw_cfg_modify_string:
++ * @s: fw_cfg device being modified
++ * @key: selector key value for new fw_cfg item
++ * @value: NUL-terminated ascii string
++ *
++ * Replace the fw_cfg item available by selecting the given key. The new
++ * data will consist of a dynamically allocated copy of the provided string,
++ * including its NUL terminator. The data being replaced, assumed to have
++ * been dynamically allocated during an earlier call to either
++ * fw_cfg_add_string() or fw_cfg_modify_string(), is freed before returning.
++ */
++void fw_cfg_modify_string(FWCfgState *s, uint16_t key, const char *value);
++
++/**
+  * fw_cfg_add_i16:
+  * @s: fw_cfg device being modified
+  * @key: selector key value for new fw_cfg item
+@@ -137,6 +151,20 @@ void fw_cfg_modify_i16(FWCfgState *s, uint16_t key, uint16_t value);
+ void fw_cfg_add_i32(FWCfgState *s, uint16_t key, uint32_t value);
+ 
+ /**
++ * fw_cfg_modify_i32:
++ * @s: fw_cfg device being modified
++ * @key: selector key value for new fw_cfg item
++ * @value: 32-bit integer
++ *
++ * Replace the fw_cfg item available by selecting the given key. The new
++ * data will consist of a dynamically allocated copy of the given 32-bit
++ * value, converted to little-endian representation. The data being replaced,
++ * assumed to have been dynamically allocated during an earlier call to
++ * either fw_cfg_add_i32() or fw_cfg_modify_i32(), is freed before returning.
++ */
++void fw_cfg_modify_i32(FWCfgState *s, uint16_t key, uint32_t value);
++
++/**
+  * fw_cfg_add_i64:
+  * @s: fw_cfg device being modified
+  * @key: selector key value for new fw_cfg item
+@@ -149,6 +177,20 @@ void fw_cfg_add_i32(FWCfgState *s, uint16_t key, uint32_t value);
+ void fw_cfg_add_i64(FWCfgState *s, uint16_t key, uint64_t value);
+ 
+ /**
++ * fw_cfg_modify_i64:
++ * @s: fw_cfg device being modified
++ * @key: selector key value for new fw_cfg item
++ * @value: 64-bit integer
++ *
++ * Replace the fw_cfg item available by selecting the given key. The new
++ * data will consist of a dynamically allocated copy of the given 64-bit
++ * value, converted to little-endian representation. The data being replaced,
++ * assumed to have been dynamically allocated during an earlier call to
++ * either fw_cfg_add_i64() or fw_cfg_modify_i64(), is freed before returning.
++ */
++void fw_cfg_modify_i64(FWCfgState *s, uint16_t key, uint64_t value);
++
++/**
+  * fw_cfg_add_file:
+  * @s: fw_cfg device being modified
+  * @filename: name of new fw_cfg file item
+-- 
+1.8.3.1
 
-In QEMU 3.1 the results of:
-  -machine pc-i440fx-3.1 -cpu qemu64,+intel-pt
-was:
-  CPUID[0].EAX (level) =3D 7
-  CPUID[7].EBX[25] (intel-pt) =3D 1
-
-and we can't change the behavior of pc-i440fx-3.1.
-
-Your suggestion of printing a warning is good, though.  We can do
-that if intel-pt is enabled and level < 0x14.
-
->=20
-> Luwei Kang
->=20
-> >=20
-> > >
-> > > --- a/hw/i386/pc.c
-> > > +++ b/hw/i386/pc.c
-> > > @@ -132,7 +132,6 @@ GlobalProperty pc_compat_3_1[] =3D {
-> > >      { "Icelake-Client" "-" TYPE_X86_CPU,      "mpx", "on" },
-> > >      { "Icelake-Server" "-" TYPE_X86_CPU,      "mpx", "on" },
-> > >      { "Cascadelake-Server" "-" TYPE_X86_CPU, "stepping", "5" },
-> > > -    { TYPE_X86_CPU, "x-intel-pt-auto-level", "off" },
-> > >  };
-> > >  const size_t pc_compat_3_1_len =3D G_N_ELEMENTS(pc_compat_3_1);
-> > >
-> > > Thanks,
-> > > Luwei Kang
-> > >
-> > > >
-> > > > --
-> > > > Eduardo
-> > >
-> >=20
-> > --
-> > Eduardo
->=20
-
---=20
-Eduardo
 
 
