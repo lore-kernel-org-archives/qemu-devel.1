@@ -2,117 +2,83 @@ Return-Path: <SRS0=Jnn8=YR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 98A6ACA9EAF
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 16:25:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 749DECA9EAF
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 16:27:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5B4BA20659
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 16:25:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3703B20650
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 16:27:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="LoplJj7d"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5B4BA20659
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="W6UdFYih"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3703B20650
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46736 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46844 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iNfv2-00087v-42
-	for qemu-devel@archiver.kernel.org; Thu, 24 Oct 2019 12:25:00 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48952)
+	id 1iNfxn-0005uJ-9b
+	for qemu-devel@archiver.kernel.org; Thu, 24 Oct 2019 12:27:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57198)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iNf9g-00058e-D2
- for qemu-devel@nongnu.org; Thu, 24 Oct 2019 11:36:05 -0400
+ (envelope-from <dgilbert@redhat.com>) id 1iNfvB-0001FH-5L
+ for qemu-devel@nongnu.org; Thu, 24 Oct 2019 12:25:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iNf9f-0007IT-9n
- for qemu-devel@nongnu.org; Thu, 24 Oct 2019 11:36:04 -0400
-Received: from mail-eopbgr140124.outbound.protection.outlook.com
- ([40.107.14.124]:31625 helo=EUR01-VE1-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1iNf9Z-00079x-ML; Thu, 24 Oct 2019 11:35:58 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=H+o4rr06Cdv1uNur/nBRXBjZFhU99lJTlfugbQni4XlD59yDudkZLcQjvybpLVC3CL1nieYMENYVE5jbJ3PEvTPz7B1y8XBTcUYs8Yw3YzF1iaDd1Os82DsyLW+YGriF/um/4S5Ln7KXRqpInnXfKTxk828Bkk/rLm5D+eGKfVS+1v4V33N922cfr6Rd99JIYCe5rYW5R8Bvnyr7+WoFxV0SOh8FqDusWU3WBajJucJW4g0a8BV2EWU2vOTz0UH50IkW/vaupiGLd5T+m4ZZM7lun+tGOVY4YmVQRgoV7afOeWWF8eCnfbKZND+qwFU7BWMdiX1BqKIZMs+2N/5EWQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=T+4o90liPwl/6hfookt/09j/6VcTn8gCBIWB3ObCnZk=;
- b=CzKfaWq0L0J2qfhHQ4DhM38bjzOAci6ltCKAYA8u+il4JwHhtTEsflRQLrYgt2qhQSRkRbVs2EbyKkomtrDqBZbSW591On/EZk52pp0D4WYkpBno5wR0EXQprAYRq0D+hmRzhyF0JApw016yHitbM97IZ1De7yxFpAoEXhCTGyada5aEnE2ntkWoVCegzOLySD+PEkex6p47IGHIHBE2aC9eb2ECjxVDVg+KVtAnGMS5tNazdV64jMvx0eYQy6bt48a5GyqtOJet07DPCz48GCpB9O0nygGmYuMymf8ND0C3g7OQaB+EAXzgKNgkLTfutuSCUFKyKWkQl+mDY0Az0g==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=T+4o90liPwl/6hfookt/09j/6VcTn8gCBIWB3ObCnZk=;
- b=LoplJj7d2cmt97/vS+eMnEpkHUUAfVN++vRCRkHu8r8Ysgkqc/m4kGTyL+c/+7HqFS357X+kb++3Rzv9oaP4igQwZysuXdJoCd5y6+Ewz2eIPEttYPB4AEQCqnLIGfsCyraxbbcmGdlQLXk6Ah2rr5Q7nsDuKqXcYw+bVWG+x4U=
-Received: from AM0PR08MB4435.eurprd08.prod.outlook.com (20.179.35.83) by
- AM0PR08MB5154.eurprd08.prod.outlook.com (10.255.29.155) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2347.18; Thu, 24 Oct 2019 15:35:54 +0000
-Received: from AM0PR08MB4435.eurprd08.prod.outlook.com
- ([fe80::4461:dd32:b358:110c]) by AM0PR08MB4435.eurprd08.prod.outlook.com
- ([fe80::4461:dd32:b358:110c%7]) with mapi id 15.20.2367.027; Thu, 24 Oct 2019
- 15:35:54 +0000
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-To: Kevin Wolf <kwolf@redhat.com>, "qemu-block@nongnu.org"
- <qemu-block@nongnu.org>
-Subject: Re: [PATCH v2 1/2] coroutine: Add qemu_co_mutex_assert_locked()
-Thread-Topic: [PATCH v2 1/2] coroutine: Add qemu_co_mutex_assert_locked()
-Thread-Index: AQHVinvHvXCpnsFASkKqEU6ua/i9dadp7HaA
-Date: Thu, 24 Oct 2019 15:35:53 +0000
-Message-ID: <1c120c98-2693-5e92-2dbb-4037d3472b63@virtuozzo.com>
-References: <20191024142658.22306-1-kwolf@redhat.com>
- <20191024142658.22306-2-kwolf@redhat.com>
-In-Reply-To: <20191024142658.22306-2-kwolf@redhat.com>
-Accept-Language: ru-RU, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-clientproxiedby: HE1PR05CA0301.eurprd05.prod.outlook.com
- (2603:10a6:7:93::32) To AM0PR08MB4435.eurprd08.prod.outlook.com
- (2603:10a6:208:144::19)
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=vsementsov@virtuozzo.com; 
-x-ms-exchange-messagesentrepresentingtype: 1
-x-tagtoolbar-keys: D20191024183551801
-x-originating-ip: [185.231.240.5]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 071ca739-909b-45f4-81bb-08d75897db44
-x-ms-traffictypediagnostic: AM0PR08MB5154:
-x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <AM0PR08MB5154429F7E0B0698B8A03B72C16A0@AM0PR08MB5154.eurprd08.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:7691;
-x-forefront-prvs: 0200DDA8BE
-x-forefront-antispam-report: SFV:NSPM;
- SFS:(10019020)(366004)(346002)(396003)(136003)(39840400004)(376002)(189003)(199004)(14454004)(2906002)(66476007)(6486002)(229853002)(31696002)(6512007)(71190400001)(31686004)(66066001)(6436002)(86362001)(476003)(99286004)(54906003)(110136005)(186003)(71200400001)(76176011)(478600001)(386003)(6506007)(6246003)(26005)(446003)(102836004)(52116002)(2616005)(11346002)(486006)(8936002)(316002)(4326008)(36756003)(6116002)(64756008)(7736002)(66446008)(81156014)(305945005)(5660300002)(8676002)(81166006)(3846002)(66946007)(66556008)(256004)(14444005)(25786009)(2501003);
- DIR:OUT; SFP:1102; SCL:1; SRVR:AM0PR08MB5154;
- H:AM0PR08MB4435.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
- PTR:InfoNoRecords; MX:1; A:1; 
-received-spf: None (protection.outlook.com: virtuozzo.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: 2cuyP9U4a61bXc8aIO38lY6ucCecIVovdlBF1t7cX114gKl0wI7uhB0p4MrsMCspDApq+tfxrjaskpvhti0eMa091ZZJEiUf1jIN1LbXRWiNQClBVl/nLSz4dO12QwqYNo5ZgoAjBgleBoNhj/C970P0M1LEbAZPyANORPk3QNj6Sd44cAoziY+SVcQRMDeTxhoaKHpD3/V9uYLI2ho9IEWhlEKSJ0j3KIS9DI92AJIwZawZGrzsL7sAjid4E+TJ8qyUFZtVoGa2Fuj+ILRR4JErR4Br/2WeSIXVwMY7uCZkGRIgOizQtMtGsyO0gHnkCUIV/P/7yd8hq9W+O3wxBoj0DPqzVXjjcPcznWeTslwPhXvJTWZc7jbp6II98YzO1A3lAvrf+OjUnxNV+T5NRg97L6KQ2SsdozLXSX2CY7GtD0vWphB1W+eqd3x1NHsi
-Content-Type: text/plain; charset="Windows-1252"
-Content-ID: <A8D73AFA3E074046B543721CC5DD003F@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: quoted-printable
+ (envelope-from <dgilbert@redhat.com>) id 1iNfv9-0008KL-4y
+ for qemu-devel@nongnu.org; Thu, 24 Oct 2019 12:25:08 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:48136
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1iNfv8-0008J6-Ra
+ for qemu-devel@nongnu.org; Thu, 24 Oct 2019 12:25:07 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1571934300;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=kCoSgfvK/2t5gR1vUEAXOo4jgxjVBFsuJyIk6a7YhRc=;
+ b=W6UdFYihh0C5OAB6mVzf1P7Ogzt53Vu7LCcNMmLd9lmcDA46HI4fF2kUGWAxniUUtiAG6I
+ ev4oOEXzX/vho4JeVzZeBPjjkgoex9jesSsWsLnwgBmz5YvEkDzU0lYDI6JD+km+HfWn5j
+ QRxH+xoDFZs1xbekhtGkDToe3+JxLks=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-198-xE5GD7PyN-mccVaOmbhqdQ-1; Thu, 24 Oct 2019 11:02:38 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7F88261182;
+ Thu, 24 Oct 2019 14:39:03 +0000 (UTC)
+Received: from work-vm (ovpn-117-248.ams2.redhat.com [10.36.117.248])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 97C5210EC746;
+ Thu, 24 Oct 2019 14:39:01 +0000 (UTC)
+Date: Thu, 24 Oct 2019 15:38:59 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Zhenyu Ye <yezhenyu2@huawei.com>
+Subject: Re: [RFC PATCH] iothread: add set_iothread_poll_* commands
+Message-ID: <20191024143859.GJ2877@work-vm>
+References: <5DAEB9D3.3080503@huawei.com>
+ <20191023151903.GI9574@stefanha-x1.localdomain>
+ <5DB1ACF2.9080500@huawei.com> <20191024135645.GG2877@work-vm>
+ <5DB1B65C.3020104@huawei.com>
 MIME-Version: 1.0
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 071ca739-909b-45f4-81bb-08d75897db44
-X-MS-Exchange-CrossTenant-originalarrivaltime: 24 Oct 2019 15:35:54.0049 (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: j45Xjx7VdEK/DOobMMl7v+j3iAKL4MvImAMfN6+4uvaTGn814XuAQIYdcy2MvbH8mG2Xfo9QGZVzX8qZ+Xj121BDcfn0J8/L/TdIUP6djr0=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM0PR08MB5154
-X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
-X-Received-From: 40.107.14.124
+In-Reply-To: <5DB1B65C.3020104@huawei.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-MC-Unique: xE5GD7PyN-mccVaOmbhqdQ-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=WINDOWS-1252
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -124,69 +90,150 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "psyhomb@gmail.com" <psyhomb@gmail.com>,
- "michael@weiser.dinsnail.net" <michael@weiser.dinsnail.net>,
- Denis Lunev <den@virtuozzo.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "qemu-stable@nongnu.org" <qemu-stable@nongnu.org>,
- "dgilbert@redhat.com" <dgilbert@redhat.com>,
- "mreitz@redhat.com" <mreitz@redhat.com>,
- "lersek@redhat.com" <lersek@redhat.com>
+Cc: qemu-devel@nongnu.org, xiexiangyou@huawei.com,
+ jiangyiwen <jiangyiwen@huawei.com>, Stefan Hajnoczi <stefanha@redhat.com>,
+ pbonzini@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-24.10.2019 17:26, Kevin Wolf wrote:
-> Some functions require that the caller holds a certain CoMutex for them
-> to operate correctly. Add a function so that they can assert the lock is
-> really held.
+* Zhenyu Ye (yezhenyu2@huawei.com) wrote:
 >=20
-> Cc: qemu-stable@nongnu.org
-> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-
-Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-
-> ---
->   include/qemu/coroutine.h | 15 +++++++++++++++
->   1 file changed, 15 insertions(+)
 >=20
-> diff --git a/include/qemu/coroutine.h b/include/qemu/coroutine.h
-> index 9801e7f5a4..f4843b5f59 100644
-> --- a/include/qemu/coroutine.h
-> +++ b/include/qemu/coroutine.h
-> @@ -167,6 +167,21 @@ void coroutine_fn qemu_co_mutex_lock(CoMutex *mutex)=
-;
->    */
->   void coroutine_fn qemu_co_mutex_unlock(CoMutex *mutex);
->  =20
-> +/**
-> + * Assert that the current coroutine holds @mutex.
-> + */
-> +static inline coroutine_fn void qemu_co_mutex_assert_locked(CoMutex *mut=
-ex)
-> +{
-> +    /*
-> +     * mutex->holder doesn't need any synchronisation if the assertion h=
-olds
-> +     * true because the mutex protects it. If it doesn't hold true, we s=
-till
-> +     * don't mind if another thread takes or releases mutex behind our b=
-ack,
-> +     * because the condition will be false no matter whether we read NUL=
-L or
-> +     * the pointer for any other coroutine.
-> +     */
-> +    assert(atomic_read(&mutex->locked) &&
-> +           mutex->holder =3D=3D qemu_coroutine_self());
-> +}
->  =20
->   /**
->    * CoQueues are a mechanism to queue coroutines in order to continue ex=
-ecuting
+> On 2019/10/24 21:56, Dr. David Alan Gilbert wrote:
+> > * Zhenyu Ye (yezhenyu2@huawei.com) wrote:
+> >>
+> >>
+> >> On 2019/10/23 23:19, Stefan Hajnoczi wrote:
+> >>> On Tue, Oct 22, 2019 at 04:12:03PM +0800, yezhenyu (A) wrote:
+> >>>> Since qemu2.9, QEMU added three AioContext poll parameters to struct
+> >>>> IOThread: poll_max_ns, poll_grow and poll_shrink. These properties a=
+re
+> >>>> used to control iothread polling time.
+> >>>>
+> >>>> However, there isn't properly hmp commands to adjust them when the V=
+M is
+> >>>> alive. It's useful to adjust them online when observing the impact o=
+f
+> >>>> different property value on performance.
+> >>>>
+> >>>> This patch add three hmp commands to adjust iothread poll-* properti=
+es
+> >>>> for special iothread:
+> >>>>
+> >>>> set_iothread_poll_max_ns: set the maximum polling time in ns;
+> >>>> set_iothread_poll_grow: set how many ns will be added to polling tim=
+e;
+> >>>> set_iothread_poll_shrink: set how many ns will be removed from polli=
+ng
+> >>>> time.
+> >>>>
+> >>>> Signed-off-by: Zhenyu Ye <yezhenyu2@huawei.com>
+> >>>> ---
+> >>>> hmp-commands.hx | 42 ++++++++++++++++++++
+> >>>> hmp.c | 30 +++++++++++++++
+> >>>> hmp.h | 3 ++
+> >>>> include/sysemu/iothread.h | 6 +++
+> >>>> iothread.c | 80 +++++++++++++++++++++++++++++++++++++++
+> >>>> qapi/misc.json | 23 +++++++++++
+> >>>> 6 files changed, 184 insertions(+)
+> >>>
+> >>> poll-max-ns, poll-grow, poll-shrink are properties of IOThread object=
+s.
+> >>> They can already be modified at runtime using:
+> >>>
+> >>>   $ qemu -object iothread,id=3Diothread1
+> >>>   (qemu) qom-set /objects/iothread1 poll-max-ns 100000
+> >>>
+> >>> I think there is no need for a patch.
+> >>>
+> >>> Stefan
+> >>>
+> >>
+> >> Thanks for your review. I have considered using the `qom-set` command =
+to modify
+> >> IOThread object's properties, however, this command is not friendly to=
+ primary
+> >> users. The help info for this command is only:
+> >>
+> >>     qom-set path property value -- set QOM property
+> >>
+> >> It's almost impossible to get the correct `path` parameter for primary=
+ user.
+> >=20
+> > Is this just a matter of documenting how to do it?
+> >=20
+> > It sounds like there's no need for a new QMP command though;  if you
+> > want an easier HMP command I'd probably still take it (because HMP is o=
+k
+> > at having things for convenience) - but not if it turns out that just
+> > adding a paragraph of documentation is enough.
+> >=20
+> > Dave
+> >=20
 >=20
+> I will show the differences in QMP and HMP:
+> If I want to set iothread1.poll-max-ns=3D1000 and iothread1.poll-grow=3D2=
+:
+>=20
+> Without this patch:
+> QMP command:
+>=20
+>     qom-set /objects/iothread1 poll-max-ns 1000
+>     qom-set /objects/iothread1 poll-grow 2
+>=20
+> HMP command:
+>=20
+>     { "execute": "qom-set", "arguments": { "path": "/objects/iothread1",
+>                                            "property": "poll-max-ns", "va=
+lue": 1000 } }
+>     { "execute": "qom-set", "arguments": { "path": "/objects/iothread1",
+>                                            "property": "poll-grow", "valu=
+e": 2} }
+>=20
+> with this patch:
+> QMP command:
+>=20
+>     iothread_set_parameter iothread1 max-ns 1000
+>     iothread_set_parameter iothread1 grow 2
+>=20
+> HMP command:
+>=20
+>     { "execute": "set-iothread-poll-params", "arguments': { "iothread-id"=
+: "iothread1",
+>                                                             "max-ns": 100=
+0, "grow": 2 } }
+>=20
+>=20
+> I think the inconvenience of qom-set is how to get the correct `path` par=
+ameter.
+> Anyway, I will consider your advice.
 
+So it depends how obvious the path is;  if it's just   /objects/
+followed by whatever you used with id=3D  when you created the iothread
+then I think it's easy - we just need to update the docs.
+Is there a case where it's harder to know?
 
---=20
-Best regards,
-Vladimir
+Dave
+
+>=20
+> >> This patch provides a more convenient and easy-use hmp&qmp interface t=
+o modify
+> >> these IOThread properties. I think this patch still has a little value=
+.
+> >>
+> >> And I can implement this patch compactly by reusing your code.
+> >>
+> >> Waiting for your reply.
+> >>
+> > --
+> > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> >=20
+> >=20
+> > .
+> >=20
+>=20
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+
 
