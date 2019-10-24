@@ -2,109 +2,91 @@ Return-Path: <SRS0=Jnn8=YR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 920D4CA9EBC
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 07:36:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2A542CA9EAF
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 07:47:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 695D820856
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 07:36:21 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 695D820856
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gaisler.se
+	by mail.kernel.org (Postfix) with ESMTPS id F167F2084C
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 07:47:17 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F167F2084C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34150 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34254 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iNXfO-0002FJ-Ip
-	for qemu-devel@archiver.kernel.org; Thu, 24 Oct 2019 03:36:18 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59647)
+	id 1iNXq0-0000fa-Jj
+	for qemu-devel@archiver.kernel.org; Thu, 24 Oct 2019 03:47:16 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60919)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jiri@gaisler.se>) id 1iNXbG-00051j-2q
- for qemu-devel@nongnu.org; Thu, 24 Oct 2019 03:32:03 -0400
+ (envelope-from <ganeshgr@linux.ibm.com>) id 1iNXms-0006I7-Lh
+ for qemu-devel@nongnu.org; Thu, 24 Oct 2019 03:44:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jiri@gaisler.se>) id 1iNXbD-0001zI-Fo
- for qemu-devel@nongnu.org; Thu, 24 Oct 2019 03:32:00 -0400
-Received: from bin-mail-out-06.binero.net ([195.74.38.229]:34384)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jiri@gaisler.se>) id 1iNXb8-0001tS-Ib
- for qemu-devel@nongnu.org; Thu, 24 Oct 2019 03:31:59 -0400
-X-Halon-ID: 430d3c75-f630-11e9-bdc3-005056917a89
-Authorized-sender: jiri@gaisler.se
-Received: from [192.168.9.20] (unknown [92.33.136.219])
- by bin-vsp-out-01.atm.binero.net (Halon) with ESMTPSA
- id 430d3c75-f630-11e9-bdc3-005056917a89;
- Thu, 24 Oct 2019 09:31:16 +0200 (CEST)
-Subject: Re: LEON3 networking
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- Joshua Shaffer <joshua.shaffer@astrobotic.com>,
- Fabien Chouteau <chouteau@adacore.com>,
- KONRAD Frederic <frederic.konrad@adacore.com>
-References: <CAPJW7GKLH3pkrGQQj_OaAy0UecUJttsHOJp35+CcpZvm9cM2WQ@mail.gmail.com>
- <6bb8abb2-68f0-db85-1557-6e04839b5ea2@redhat.com>
- <32c38984-e745-de6c-792e-09910b68cedd@adacore.com>
- <CAPJW7GLOTyjdMozrb+TSnqpEyoiFh2sxZjYkLXx2pz2_J_dPgA@mail.gmail.com>
- <a6783ce6-eea2-214f-7dbd-7224e830db0b@gaisler.se>
- <2ea63643-5cb2-017e-8889-bb8c77fd75cf@gaisler.se>
- <6d0ffeda-68c4-3c0e-39bb-e00d544e1b8e@redhat.com>
-From: Jiri Gaisler <jiri@gaisler.se>
-Openpgp: preference=signencrypt
-Autocrypt: addr=jiri@gaisler.se; prefer-encrypt=mutual; keydata=
- mQINBFIL1RABEADg+FWUuIf3VApE91vIIR0pnPRPaESnd13+xQlWWy0rcQNOssRWt5IeF3XH
- ii+kAc/ZtQEEVsfTqMUlfjoVGqowvuN548RIdW3xoKCFUsFqwtuR8lb5Jh9XvjrQvxkwWvxa
- QxHXieaGwJ9ei/XSkwUYbwYq/hY+x2YamWJi/BsK9uu5j00Iac7EmFHjNiymZ1ihaEip1cAy
- Yt+AjHAQ11fUaT/+ox+6NmBqRXlLb9v6xiiwArtspgjpIGAgUmGt7Xf3bnfvJLJHp8EKl2MC
- ejFBvJHGp/1uiqeqIP9V3bRNbAjVKMiNoM4pvig1FCDySzD34fT6TD0vftCzALxXeSiRF43p
- 6ZeUR7BDeBWxkGWwgDpzJIYpIxNQvJGviAGjWyTLC95j7qECPcF8tEcN5akHrjv6HRCaP665
- ylZv4325TmH3xm5UZ8YKZkXU2yzD6LGPkT8szK7viRHkcLqp5sbJbr6eWtI5CbpXA2ymBZbr
- LAzgp/HoXZp15pjXyXy5WUB/Ns3mYnvRgnULopKrj6nAXzCyzNkM4hIZAZJxnp60JZ/nSsEU
- j8S4aU/YdfUZnZONNhvsLwzGgjYGCrxcwT6soSR5w0wecvMFdHAxxgO76eESne4xrBUFjEZC
- j6L1p8nZRDcwhGGYKKYvn0A+xpbPM80bZg4CNaknRoRdAVyIJwARAQABtB5KaXJpIEdhaXNs
- ZXIgPGppcmlAZ2Fpc2xlci5zZT6JAjgEEwECACIFAlIL1RACGyMGCwkIBwMCBhUIAgkKCwQW
- AgMBAh4BAheAAAoJEIAIwBKmO2+b9tMQAIp3L1aDa2RiVgz4LGUPXpDWOIVqWXyIiA+9GPri
- 6eKM5NT4NL1Wmo6G7rEuuZtgmfOJQ5hpoJ+8JiH9qRReQTMZyYwYUjLfh0NeY87CTvdkC+QU
- pzxyxohk/SZ3gkhETaTvrshzoc2Ik3WpVXNxFlobkEFMfOA84LZQyOF+B+SeVoysPa5GEmcj
- y20TqFEP7L4HU3veDLTBTEX5krMRdGwQXa/sqiztR1AqTcTZWXKw/yJvAzD884hg6CjRRbqi
- lNx3IOCkxiDnZifTpiHD6ZwARJsPGwtgemyg4lVpQVjzRZSBBEYWw3665hLecHD1ocSgvMRe
- cj5vkS9+gvcqqFYjXkwhmfgcNDmKfJlt0DXRv8yfNzMvNHFjrNWnhPqFkM/UZ2MCy94OUoVe
- gF7ApA8xTosbwqZyDJYoFijqD81349GgXdIqaZLkw1mVpkeBdn81zTWwiU7Gm2cii3Peu7NF
- Huoj0hK9InWZqjrGF+2lC9gZ8LAMs1VHeD+PvPFiwdS+3HJt3rB6HtZ04kRbFBgjFAVE4R1J
- BP4Z16omHa+dt/KNSIzB4AfpBeFYP0tN5YrKVuM2WSgywDiIk4TezQ5vBkwjRg96Tet3TIW2
- foYocVkcuWmLhFvMIfSNAmprtatC2FXO2MXrRrF80SVNPdln0Bu7IFbHPDm1Ik33CFQEuQIN
- BFIL1RABEAD0RYeTDCNIwzjLi0RzaaKnfNgKlKrfnlKbg04jAgel37qS1XLv2HaLDt627Aob
- RDmt9mCFhgyGyfLBjRRLAssSHa+mejQ4KIIVbuGhenjSYlHpy7AW/AVPiFDD9niDfCbzKuHD
- r461cVoxgJh1a1LeQN6yBI2T9ugLufBLQ6uAdY8H38pGmD5d0+JjLoAm2N5mvcaaPadbpmHU
- 1/5oMGdO0mMKP/uXb2tssNl/daXb/gkfqDny8UlPT4XclbQ5beODj/DIvIXAZEd49t+1jMRP
- Nm+fTCJSRNPlNiiX/VJvHS9HVouyZu/opoqpsCZVITXPtQQfNBNbdAIKLyTR/k0OvCG70mNo
- DA0H2yz9kZbTXmpT8jkJsAsLUfArqYulGLi9uSQjPXLm40iMshPvtf/bbtGWqh9T4ZOBLvyf
- PwhLrcKkkHrBoWp9ZePe+LuXSVGqEEhPD/No/uPIjfZwLqo+HDXmfdK3gOZMSAwlPn+bNBJK
- BQsR57/oX1TVJjPLSeDYhFTQxG1oNsRmH9qYBIpZckOCD+MIqpdZxZmiXrN0F9u6hFGZORG4
- el3shVON0JELvWQZyOa21hkWzKj8I5EueGcB1X4OFnWu6WiA4mBpo97rPt9kUmpcYZHlYAeB
- cXnX2x9TXb3ZQu/YXoveC1GrX6siPLdruQzaXUcDdb7ObwARAQABiQIfBBgBAgAJBQJSC9UQ
- AhsMAAoJEIAIwBKmO2+buqYP/0YNBDaeUcjYjfgwquGxp0FQpqazeJ+28K9RlBygxpcEy2rI
- hIsXgZCmS5GbEcw64U4t+TNT7NCX9Oiii9kOEyXTMdNQvXfWj2NGM+dJRv1j1r9QYuKDpbTz
- RVjIe2tE1uPCV1+wASZm+orkPUXvq+HbwVzxnSQqA+fGCi7dsGiOlefG3vrkIHTwACJhAE1g
- b25KeYnTWT0uDBizpZM07c4owR6F8HTg7crfrUZkU483eie5xaspvl+0Ux2dN/eXOgrjfehK
- FDeRI97RhuR+dETThShmLtUBASTZOR6pNCeWd6CKtyNje9sEM6hxDbiFAtX+gRk6FTAUnsQc
- 8cs6CH9k1xve14pUy64aDuxJXnLIwmnD2f85e5wrXDP71uq5SZ+VWVPThcNhWg1G9JhMrX9p
- 2PfrKSk8Z53QuQBy+v+WMvz+Q4XER71aNTXPJJ7SvgGlM3Tgav87elpYS0fV1Cl7DyHS5sJo
- VkjUofa/uEK5VgBk55oHhl9CfFFMZSfZJIm1DB16vVu1q8TE86IovjUlfDh95n8jxlCjBC33
- C1X/C9j5Sgn4RRSfMwdnaLl8u0tWEmgZ5rq/PAypCkkEg4WteuLeUtLgusH/mLTXANB7wxxd
- 0p5jSjCC2U6+yCgiKaiGX7rsGNuzoIYs7u9Rj1R6qtn4vLtM10VXdWDuehS9
-Message-ID: <9ce71f42-741c-000a-1b44-d473575f7458@gaisler.se>
-Date: Thu, 24 Oct 2019 09:31:48 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
-MIME-Version: 1.0
-In-Reply-To: <6d0ffeda-68c4-3c0e-39bb-e00d544e1b8e@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Content-Language: en-US
-X-detected-operating-system: by eggs.gnu.org: FreeBSD 9.x [fuzzy]
-X-Received-From: 195.74.38.229
+ (envelope-from <ganeshgr@linux.ibm.com>) id 1iNXmq-0007Wz-BL
+ for qemu-devel@nongnu.org; Thu, 24 Oct 2019 03:44:02 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:58490)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <ganeshgr@linux.ibm.com>)
+ id 1iNXmm-0007W3-Ol
+ for qemu-devel@nongnu.org; Thu, 24 Oct 2019 03:43:58 -0400
+Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
+ x9O7grL6085030
+ for <qemu-devel@nongnu.org>; Thu, 24 Oct 2019 03:43:53 -0400
+Received: from e06smtp02.uk.ibm.com (e06smtp02.uk.ibm.com [195.75.94.98])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 2vu533w9pt-1
+ (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+ for <qemu-devel@nongnu.org>; Thu, 24 Oct 2019 03:43:52 -0400
+Received: from localhost
+ by e06smtp02.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+ Violators will be prosecuted
+ for <qemu-devel@nongnu.org> from <ganeshgr@linux.ibm.com>;
+ Thu, 24 Oct 2019 08:43:50 +0100
+Received: from b06avi18878370.portsmouth.uk.ibm.com (9.149.26.194)
+ by e06smtp02.uk.ibm.com (192.168.101.132) with IBM ESMTP SMTP Gateway:
+ Authorized Use Only! Violators will be prosecuted; 
+ (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+ Thu, 24 Oct 2019 08:43:47 +0100
+Received: from d06av24.portsmouth.uk.ibm.com (mk.ibm.com [9.149.105.60])
+ by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP
+ id x9O7hkST42336698
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Thu, 24 Oct 2019 07:43:46 GMT
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 3B20142042;
+ Thu, 24 Oct 2019 07:43:46 +0000 (GMT)
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id D7C804203F;
+ Thu, 24 Oct 2019 07:43:43 +0000 (GMT)
+Received: from localhost.localdomain.com (unknown [9.85.73.55])
+ by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+ Thu, 24 Oct 2019 07:43:43 +0000 (GMT)
+From: Ganesh Goudar <ganeshgr@linux.ibm.com>
+To: aik@ozlabs.ru, qemu-ppc@nongnu.org, qemu-devel@nongnu.org,
+ david@gibson.dropbear.id.au
+Subject: [PATCH v17 0/7] target-ppc/spapr: Add FWNMI support in QEMU for
+ PowerKM guests
+Date: Thu, 24 Oct 2019 13:13:00 +0530
+X-Mailer: git-send-email 2.17.2
+X-TM-AS-GCONF: 00
+x-cbid: 19102407-0008-0000-0000-00000326A3ED
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19102407-0009-0000-0000-00004A45D5FB
+Message-Id: <20191024074307.22821-1-ganeshgr@linux.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
+ definitions=2019-10-24_05:, , signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ priorityscore=1501
+ malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
+ clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
+ mlxlogscore=818 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.0.1-1908290000 definitions=main-1910240074
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
+X-Received-From: 148.163.156.1
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -116,134 +98,95 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org,
- Artyom Tarasenko <atar4qemu@gmail.com>
+Cc: paulus@ozlabs.org, Ganesh Goudar <ganeshgr@linux.ibm.com>,
+ arawinda.p@gmail.com, groug@kaod.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+This patch set adds support for FWNMI in PowerKVM guests.
 
-On 10/24/19 12:31 AM, Philippe Mathieu-Daud=C3=A9 wrote:
-> Hi Jiri,
->
-> On 10/23/19 9:55 PM, Jiri Gaisler wrote:
->> BTW, here is a patch that you might want to apply to qemu if you inten=
-d
->> to run RTEMS on leon3. The plug&play area must support byte accesses,
->> which is used by the RTEMS grlib scanning functions...
->
-> Do you mean this one?
->
-> http://gaisler.org/qemu/qemu-4.1.0-leon3.patch
+System errors such as SLB multihit and memory errors
+that cannot be corrected by hardware is passed on to
+the kernel for handling by raising machine check
+exception (an NMI). Upon such machine check exceptions,
+if the address in error belongs to guest then KVM
+invokes guests' 0x200 interrupt vector if the guest
+is not FWNMI capable. For FWNMI capable guest
+KVM passes the control to QEMU by exiting the guest.
 
+This patch series adds functionality to QEMU to pass
+on such machine check exceptions to the FWNMI capable
+guest kernel by building an error log and invoking
+the guest registered machine check handling routine.
 
-Yes.
+The KVM changes are now part of the upstream kernel
+(commit e20bbd3d). This series contain QEMU changes.
 
->
-> -- >8 --
-> --- a/hw/misc/grlib_ahb_apb_pnp.c
-> +++ b/hw/misc/grlib_ahb_apb_pnp.c
-> @@ -228,6 +228,9 @@ static uint64_t grlib_apb_pnp_read(void *opaque, hw=
-addr offset, unsigned size)
-> =C2=A0{
-> =C2=A0=C2=A0=C2=A0=C2=A0 APBPnp *apb_pnp =3D GRLIB_APB_PNP(opaque);
->
-> +=C2=A0=C2=A0=C2=A0 if (size !=3D 4)
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return apb_pnp->regs[offset=
- >> 2] >> ((~offset & 3) * 8);
-> +
-> =C2=A0=C2=A0=C2=A0=C2=A0 return apb_pnp->regs[offset >> 2];
-> =C2=A0}
->
-> ---
->
-> But then this is incorrect for 16-bit accesses.
+Change Log v17:
+  - Add fwnmi cap to migration state
+  - Reprhase the commit message in patch 2/7
 
-Correct, it only fixes 8-bit accesses so that RTEMS can boot.
+Change Log v16:
+  - Fixed coding style problems
 
+Change Log v15:
+  - Removed cap_ppc_fwnmi
+  - Moved fwnmi registeration to .apply hook
+  - Assume SLOF has allocated enough room for rtas error log
+  - Using ARRAY_SIZE to end the loop
+  - Do not set FWNMI cap in post_load, now its done in .apply hook
 
->
-> The proper patch might be:
->
-> -- >8 --
-> @@ -234,6 +234,13 @@ static uint64_t grlib_apb_pnp_read(void *opaque, h=
-waddr offset, unsigned size)
-> =C2=A0static const MemoryRegionOps grlib_apb_pnp_ops =3D {
-> =C2=A0=C2=A0=C2=A0=C2=A0 .read=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 =3D =
-grlib_apb_pnp_read,
-> =C2=A0=C2=A0=C2=A0=C2=A0 .endianness =3D DEVICE_BIG_ENDIAN,
-> +=C2=A0=C2=A0=C2=A0 .valid =3D {
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 .min_access_size =3D 1,
-> +=C2=A0=C2=A0=C2=A0 },
-> +=C2=A0=C2=A0=C2=A0 .impl =3D {
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 .min_access_size =3D 4,
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 .max_access_size =3D 4,
-> +=C2=A0=C2=A0=C2=A0 },
-> =C2=A0};
->
+Change Log v14:
+  - Feature activation moved to a separate patch
+  - Fixed issues with migration blocker
 
-I don't know enough about qemu internals to have an opinion on this, but =
-it certainly looks much more elegant than my simple fix .. :-)
+Change Log v13:
+  - Minor fixes (mostly nits)
+  - Moved FWNMI guest registration check from patch 4 to 3.
 
-Jiri.
+Change Log v12:
+  - Rebased to latest ppc-for-4.2 (SHA b1e8156743)
 
-> ---
->
-> (Unrelated note, this device model lacks the MemoryRegionOps::write han=
-dler).
->
->> Jiri.
->>
->> On 10/23/19 8:37 PM, Jiri Gaisler wrote:
->>> Leon3 uses the GRETH ethernet IP core for networking. You would need =
-to
->>> write a qemu emulation model of it to get networking support. The GRE=
-TH
->>> is fairly well described in the GRLIB IP manual, so it should not be
->>> impossible. The core is also available in open-source (VHDL) if you n=
-eed
->>> to look up some finer details ... :-)
->>>
->>> Jiri.
->>>
->>> On 10/23/19 6:59 PM, Joshua Shaffer wrote:
->>>> Does anyone know what needs implemented to get networking supported?=
+Change Log v11:
+  - Moved FWNMI SPAPR cap defaults to 4.2 class option
+  - Fixed issues with handling fwnmi KVM capability
 
->>>>
->>>> Joshua
->>>>
->>>> On Wed, Oct 16, 2019 at 6:34 AM Fabien Chouteau <chouteau@adacore.co=
-m> wrote:
->>>>> Hello people,
->>>>>
->>>>> On 15/10/2019 18:57, Philippe Mathieu-Daud=C3=A9 wrote:
->>>>>> Hi Joshua,
->>>>>>
->>>>>> On 10/15/19 3:17 PM, Joshua Shaffer wrote:
->>>>>>> Hello,
->>>>>>>
->>>>>>> I've been using the LEON3 port of qemu, and am wondering if anyon=
-e has touched the networking setup for such since the thread here: https:=
-//lists.rtems.org/pipermail/users/2014-September/028224.html
->>>>>> Thanks for sharing this!
->>>>>>
->>>>>> Good news, Jiri keeps rebasing his patch with the latest stable ve=
-rsion.
->>>>>> Bad news, he didn't not signed his work with a "Signed-off-by" tag=
- so we can not take this as it into the mainstream repository, see https:=
-//wiki.qemu.org/Contribute/SubmitAPatch#Patch_emails_must_include_a_Signe=
-d-off-by:_line
->>>>>>
->>>>> The Gaisler patches have been rewrote by my colleague Frederic (in =
-CC) and they are now in mainstream.
->>>>> (see https://lists.gnu.org/archive/html/qemu-devel/2019-05/msg03869=
-=2Ehtml)
->>>>>
->>>>> But none of them are implementing network support, and I never hear=
-d of someone working on network for leon3.
->>>>>
->>>>> Regards,
->>>>>
->
+Change Log v10:
+  - Reshuffled the patch sequence + minor fixes
+
+Change Log v9:
+  - Fixed kvm cap and spapr cap issues
+
+Change Log v8:
+  - Added functionality to check FWNMI capability during
+    VM migration
+
+---
+
+Aravinda Prasad (7):
+  Wrapper function to wait on condition for the main loop mutex
+  ppc: spapr: Introduce FWNMI capability
+  target/ppc: Handle NMI guest exit
+  target/ppc: Build rtas error log upon an MCE
+  ppc: spapr: Handle "ibm,nmi-register" and "ibm,nmi-interlock" RTAS
+    calls
+  migration: Include migration support for machine check handling
+  ppc: spapr: Activate the FWNMI functionality
+
+ cpus.c                   |   5 +
+ hw/ppc/spapr.c           |  52 ++++++++
+ hw/ppc/spapr_caps.c      |  34 +++++
+ hw/ppc/spapr_events.c    | 269 +++++++++++++++++++++++++++++++++++++++
+ hw/ppc/spapr_rtas.c      |  85 +++++++++++++
+ include/hw/ppc/spapr.h   |  26 +++-
+ include/qemu/main-loop.h |   8 ++
+ target/ppc/kvm.c         |  24 ++++
+ target/ppc/kvm_ppc.h     |   8 ++
+ target/ppc/trace-events  |   1 +
+ 10 files changed, 510 insertions(+), 2 deletions(-)
+
+-- 
+2.17.2
 
 
