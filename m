@@ -7,75 +7,76 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D3003CA9EAF
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 13:11:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 41DFDCA9EBB
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 13:11:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7BA4420663
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 13:11:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id EED9520659
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 13:11:50 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JGitjycg"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7BA4420663
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KCoVe8sT"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EED9520659
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42038 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42064 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iNctg-0005JV-Uw
-	for qemu-devel@archiver.kernel.org; Thu, 24 Oct 2019 09:11:25 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47817)
+	id 1iNcu5-0007Zu-Dj
+	for qemu-devel@archiver.kernel.org; Thu, 24 Oct 2019 09:11:49 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45608)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <armbru@redhat.com>) id 1iNcKo-00049l-Ty
- for qemu-devel@nongnu.org; Thu, 24 Oct 2019 08:35:27 -0400
+ (envelope-from <drjones@redhat.com>) id 1iNc5D-0001Kw-GZ
+ for qemu-devel@nongnu.org; Thu, 24 Oct 2019 08:19:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1iNcKg-00069x-EF
- for qemu-devel@nongnu.org; Thu, 24 Oct 2019 08:35:22 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:26686
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <drjones@redhat.com>) id 1iNc5A-0004Gh-K8
+ for qemu-devel@nongnu.org; Thu, 24 Oct 2019 08:19:15 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:48239
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1iNcKg-00069B-6o
- for qemu-devel@nongnu.org; Thu, 24 Oct 2019 08:35:14 -0400
+ (Exim 4.71) (envelope-from <drjones@redhat.com>) id 1iNc5A-0004GN-FD
+ for qemu-devel@nongnu.org; Thu, 24 Oct 2019 08:19:12 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1571920513;
+ s=mimecast20190719; t=1571919552;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=DozXcw9tnlDl0LzdgpzU6hGrU59c21CuoJOKOZbwanc=;
- b=JGitjycg7sVTh13fUMzTkfhDfizTIb4RkYSQzzeVxEMl5r71/a3IfNs7AbkqDKdSJJ9K0X
- Rhkyxx/is8UYETVEHjegpuk6GjNrRvBoz84hB62uf5kFVlWtshRedV0ynYfpd/lCUTnjkf
- 6+b6m8IAxESWU3ZXFiMlJz6/711+7Jc=
+ bh=9hSmYREoJ+UXm6rJ/wX0fdl2eVAD5IrX1t5KyW4nFkw=;
+ b=KCoVe8sTOXLuhTbY33IGCmXWBJRkc1WmO25onIuRih/z8x5Ct1AXfeRdkUOiQvPCCMI/OR
+ z8vgeyutg2BjTLQrofZr4iunomCifn8iqgJwOF+eYqXU9ip/g1M6GZsBRRkAT9Ik50CDO2
+ sA1m/MvPTNE5BrE89PUapvvfcLIMxEA=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-326-hmWGS2j4OeqxlZPMVETOCw-1; Thu, 24 Oct 2019 08:35:11 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
+ us-mta-322-q_vgK6whM-OMpwGkWL7wNw-1; Thu, 24 Oct 2019 08:19:08 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EEA901005500;
- Thu, 24 Oct 2019 12:35:10 +0000 (UTC)
-Received: from blackfin.pond.sub.org (unknown [10.36.118.123])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id A87125C222;
- Thu, 24 Oct 2019 12:35:06 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 114AA1132986; Thu, 24 Oct 2019 14:34:59 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [RFC PATCH 07/19] qapi: Add feature flags to remaining definitions
-Date: Thu, 24 Oct 2019 14:34:46 +0200
-Message-Id: <20191024123458.13505-8-armbru@redhat.com>
-In-Reply-To: <20191024123458.13505-1-armbru@redhat.com>
-References: <20191024123458.13505-1-armbru@redhat.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BBACE800D49;
+ Thu, 24 Oct 2019 12:19:06 +0000 (UTC)
+Received: from kamzik.brq.redhat.com (unknown [10.43.2.160])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 5AC1460E1C;
+ Thu, 24 Oct 2019 12:18:51 +0000 (UTC)
+From: Andrew Jones <drjones@redhat.com>
+To: qemu-devel@nongnu.org,
+	qemu-arm@nongnu.org,
+	peter.maydell@linaro.org
+Subject: [PATCH v7 8/9] target/arm/cpu64: max cpu: Support sve properties with
+ KVM
+Date: Thu, 24 Oct 2019 14:18:07 +0200
+Message-Id: <20191024121808.9612-9-drjones@redhat.com>
+In-Reply-To: <20191024121808.9612-1-drjones@redhat.com>
+References: <20191024121808.9612-1-drjones@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-MC-Unique: hmWGS2j4OeqxlZPMVETOCw-1
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-MC-Unique: q_vgK6whM-OMpwGkWL7wNw-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=WINDOWS-1252
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.61
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,1171 +88,681 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: libvir-list@redhat.com, mdroth@linux.vnet.ibm.com
+Cc: m.mizuma@jp.fujitsu.com, beata.michalska@linaro.org,
+ richard.henderson@linaro.org, armbru@redhat.com, eric.auger@redhat.com,
+ imammedo@redhat.com, alex.bennee@linaro.org, Dave.Martin@arm.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-In v4.1.0, we added feature flags just to struct types (commit
-6a8c0b5102^..f3ed93d545), to satisfy an immediate need (commit
-c9d4070991 "file-posix: Add dynamic-auto-read-only QAPI feature").  We
-just added them to commands (commit 23394b4c39 "qapi: Add feature
-flags to commands") to satisfy another immediate need (commit
-d76744e65e "qapi: Allow introspecting fix for savevm's cooperation
-with blockdev").
+Extend the SVE vq map initialization and validation with KVM's
+supported vector lengths when KVM is enabled. In order to determine
+and select supported lengths we add two new KVM functions for getting
+and setting the KVM_REG_ARM64_SVE_VLS pseudo-register.
 
-Add them to the remaining definitions: enumeration types, union types,
-alternate types, and events.
+This patch has been co-authored with Richard Henderson, who reworked
+the target/arm/cpu64.c changes in order to push all the validation and
+auto-enabling/disabling steps into the finalizer, resulting in a nice
+LOC reduction.
 
-Signed-off-by: Markus Armbruster <armbru@redhat.com>
+Signed-off-by: Andrew Jones <drjones@redhat.com>
+Reviewed-by: Eric Auger <eric.auger@redhat.com>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Tested-by: Masayoshi Mizuma <m.mizuma@jp.fujitsu.com>
 ---
- docs/devel/qapi-code-gen.txt            | 15 ++--
- tests/qapi-schema/doc-good.texi         | 32 ++++++++-
- qapi/introspect.json                    | 28 +++++---
- tests/test-qmp-cmds.c                   |  6 +-
- scripts/qapi/doc.py                     |  6 +-
- scripts/qapi/events.py                  |  2 +-
- scripts/qapi/expr.py                    | 11 ++-
- scripts/qapi/introspect.py              | 31 ++++----
- scripts/qapi/schema.py                  | 96 ++++++++++++++-----------
- scripts/qapi/types.py                   |  4 +-
- scripts/qapi/visit.py                   |  4 +-
- tests/qapi-schema/alternate-base.err    |  2 +-
- tests/qapi-schema/doc-good.json         | 18 ++++-
- tests/qapi-schema/doc-good.out          | 20 +++++-
- tests/qapi-schema/qapi-schema-test.json | 29 ++++++--
- tests/qapi-schema/qapi-schema-test.out  | 27 +++++--
- tests/qapi-schema/test-qapi.py          |  9 ++-
- 17 files changed, 226 insertions(+), 114 deletions(-)
+ docs/arm-cpu-features.rst |  45 +++++++---
+ target/arm/cpu64.c        | 172 +++++++++++++++++++++++++++++---------
+ target/arm/kvm64.c        | 100 +++++++++++++++++++++-
+ target/arm/kvm_arm.h      |  12 +++
+ tests/arm-cpu-features.c  | 106 ++++++++++++++++++++++-
+ 5 files changed, 379 insertions(+), 56 deletions(-)
 
-diff --git a/docs/devel/qapi-code-gen.txt b/docs/devel/qapi-code-gen.txt
-index 45c93a43cc..eaeedc7bd3 100644
---- a/docs/devel/qapi-code-gen.txt
-+++ b/docs/devel/qapi-code-gen.txt
-@@ -172,7 +172,8 @@ Syntax:
-     ENUM =3D { 'enum': STRING,
-              'data': [ ENUM-VALUE, ... ],
-              '*prefix': STRING,
--             '*if': COND }
-+             '*if': COND,
-+             '*features': FEATURES }
-     ENUM-VALUE =3D STRING
-                | { 'name': STRING, '*if': COND }
+diff --git a/docs/arm-cpu-features.rst b/docs/arm-cpu-features.rst
+index 2ea4d6e90c02..bed218d44619 100644
+--- a/docs/arm-cpu-features.rst
++++ b/docs/arm-cpu-features.rst
+@@ -191,10 +191,18 @@ SVE CPU Property Dependencies and Constraints
 =20
-@@ -279,12 +280,14 @@ below for more on this.
- Syntax:
-     UNION =3D { 'union': STRING,
-               'data': BRANCHES,
--              '*if': COND }
-+              '*if': COND,
-+              '*features': FEATURES }
-           | { 'union': STRING,
-               'data': BRANCHES,
-               'base': ( MEMBERS | STRING ),
-               'discriminator': STRING,
--              '*if': COND }
-+              '*if': COND,
-+              '*features': FEATURES }
-     BRANCHES =3D { BRANCH, ... }
-     BRANCH =3D STRING : TYPE-REF
-            | STRING : { 'type': TYPE-REF, '*if': COND }
-@@ -397,7 +400,8 @@ the schema" below for more on this.
- Syntax:
-     ALTERNATE =3D { 'alternate': STRING,
-                   'data': ALTERNATIVES,
--                  '*if': COND }
-+                  '*if': COND,
-+                  '*features': FEATURES }
-     ALTERNATIVES =3D { ALTERNATIVE, ... }
-     ALTERNATIVE =3D STRING : TYPE-REF
-                 | STRING : { 'type': STRING, '*if': COND }
-@@ -595,7 +599,8 @@ Syntax:
-               'data': STRING,
-               'boxed': true,
-               )
--              '*if': COND }
-+              '*if': COND,
-+              '*features': FEATURES }
+   1) At least one vector length must be enabled when `sve` is enabled.
 =20
- Member 'event' names the event.  This is the event name used in the
- Client JSON Protocol.
-diff --git a/tests/qapi-schema/doc-good.texi b/tests/qapi-schema/doc-good.t=
-exi
-index d4b15dabf0..5ef7fea436 100644
---- a/tests/qapi-schema/doc-good.texi
-+++ b/tests/qapi-schema/doc-good.texi
-@@ -84,11 +84,17 @@ Examples:
- @table @asis
- @item @code{one}
- The @emph{one} @{and only@}
-+@code{two} is undocumented
- @*@b{If:} @code{defined(IFONE)}
- @item @code{two}
- Not documented
- @end table
--@code{two} is undocumented
+-  2) If a vector length `N` is enabled, then all power-of-two vector
+-     lengths smaller than `N` must also be enabled.  E.g. if `sve512`
+-     is enabled, then the 128-bit and 256-bit vector lengths must also
+-     be enabled.
++  2) If a vector length `N` is enabled, then, when KVM is enabled, all
++     smaller, host supported vector lengths must also be enabled.  If
++     KVM is not enabled, then only all the smaller, power-of-two vector
++     lengths must be enabled.  E.g. with KVM if the host supports all
++     vector lengths up to 512-bits (128, 256, 384, 512), then if `sve512`
++     is enabled, the 128-bit vector length, 256-bit vector length, and
++     384-bit vector length must also be enabled. Without KVM, the 384-bit
++     vector length would not be required.
 +
-+@b{Features:}
-+@table @asis
-+@item @code{enum-feat}
-+Also @emph{one} @{and only@}
-+@end table
++  3) If KVM is enabled then only vector lengths that the host CPU type
++     support may be enabled.  If SVE is not supported by the host, then
++     no `sve*` properties may be enabled.
 =20
- @b{If:} @code{defined(IFCOND)}
- @end deftp
-@@ -151,6 +157,12 @@ a feature
- @item The members of @code{Variant2} when @code{base1} is @t{"two"} (@b{If=
-:} @code{IFTWO})
- @end table
+ SVE CPU Property Parsing Semantics
+ ----------------------------------
+@@ -209,8 +217,10 @@ SVE CPU Property Parsing Semantics
+      an error is generated.
 =20
-+@b{Features:}
-+@table @asis
-+@item @code{union-feat1}
-+a feature
-+@end table
+   2) If SVE is enabled (`sve=3Don`), but no `sve<N>` CPU properties are
+-     provided, then all supported vector lengths are enabled, including
+-     the non-power-of-two lengths.
++     provided, then all supported vector lengths are enabled, which when
++     KVM is not in use means including the non-power-of-two lengths, and,
++     when KVM is in use, it means all vector lengths supported by the host
++     processor.
+=20
+   3) If SVE is enabled, then an error is generated when attempting to
+      disable the last enabled vector length (see constraint (1) of "SVE
+@@ -221,20 +231,31 @@ SVE CPU Property Parsing Semantics
+      has been explicitly disabled, then an error is generated (see
+      constraint (2) of "SVE CPU Property Dependencies and Constraints").
+=20
+-  5) If one or more `sve<N>` CPU properties are set `off`, but no `sve<N>`=
+,
++  5) When KVM is enabled, if the host does not support SVE, then an error
++     is generated when attempting to enable any `sve*` properties (see
++     constraint (3) of "SVE CPU Property Dependencies and Constraints").
 +
- @end deftp
-=20
-=20
-@@ -167,6 +179,12 @@ One of @t{"one"}, @t{"two"}
- @item @code{data: Variant2} when @code{type} is @t{"two"} (@b{If:} @code{I=
-FTWO})
- @end table
-=20
-+@b{Features:}
-+@table @asis
-+@item @code{union-feat2}
-+a feature
-+@end table
++  6) When KVM is enabled, if the host does support SVE, then an error is
++     generated when attempting to enable any vector lengths not supported
++     by the host (see constraint (3) of "SVE CPU Property Dependencies and
++     Constraints").
 +
- @end deftp
++  7) If one or more `sve<N>` CPU properties are set `off`, but no `sve<N>`=
+,
+      CPU properties are set `on`, then the specified vector lengths are
+      disabled but the default for any unspecified lengths remains enabled.
+-     Disabling a power-of-two vector length also disables all vector
+-     lengths larger than the power-of-two length (see constraint (2) of
+-     "SVE CPU Property Dependencies and Constraints").
++     When KVM is not enabled, disabling a power-of-two vector length also
++     disables all vector lengths larger than the power-of-two length.
++     When KVM is enabled, then disabling any supported vector length also
++     disables all larger vector lengths (see constraint (2) of "SVE CPU
++     Property Dependencies and Constraints").
 =20
+-  6) If one or more `sve<N>` CPU properties are set to `on`, then they
++  8) If one or more `sve<N>` CPU properties are set to `on`, then they
+      are enabled and all unspecified lengths default to disabled, except
+      for the required lengths per constraint (2) of "SVE CPU Property
+      Dependencies and Constraints", which will even be auto-enabled if
+      they were not explicitly enabled.
 =20
-@@ -184,6 +202,12 @@ an integer
- Not documented
- @end table
+-  7) If SVE was disabled (`sve=3Doff`), allowing all vector lengths to be
++  9) If SVE was disabled (`sve=3Doff`), allowing all vector lengths to be
+      explicitly disabled (i.e. avoiding the error specified in (3) of
+      "SVE CPU Property Parsing Semantics"), then if later an `sve=3Don` is
+      provided an error will be generated.  To avoid this error, one must
+diff --git a/target/arm/cpu64.c b/target/arm/cpu64.c
+index a771a28daa56..c161a146ff0d 100644
+--- a/target/arm/cpu64.c
++++ b/target/arm/cpu64.c
+@@ -273,9 +273,18 @@ void arm_cpu_sve_finalize(ARMCPU *cpu, Error **errp)
+      * any of the above.  Finally, if SVE is not disabled, then at least o=
+ne
+      * vector length must be enabled.
+      */
++    DECLARE_BITMAP(kvm_supported, ARM_MAX_VQ);
+     DECLARE_BITMAP(tmp, ARM_MAX_VQ);
+     uint32_t vq, max_vq =3D 0;
 =20
-+@b{Features:}
-+@table @asis
-+@item @code{alt-feat}
-+a feature
-+@end table
++    /* Collect the set of vector lengths supported by KVM. */
++    bitmap_zero(kvm_supported, ARM_MAX_VQ);
++    if (kvm_enabled() && kvm_arm_sve_supported(CPU(cpu))) {
++        kvm_arm_sve_get_vls(CPU(cpu), kvm_supported);
++    } else if (kvm_enabled()) {
++        assert(!cpu_isar_feature(aa64_sve, cpu));
++    }
 +
- @end deftp
+     /*
+      * Process explicit sve<N> properties.
+      * From the properties, sve_vq_map<N> implies sve_vq_init<N>.
+@@ -293,10 +302,19 @@ void arm_cpu_sve_finalize(ARMCPU *cpu, Error **errp)
+             return;
+         }
 =20
+-        /* Propagate enabled bits down through required powers-of-two. */
+-        for (vq =3D pow2floor(max_vq); vq >=3D 1; vq >>=3D 1) {
+-            if (!test_bit(vq - 1, cpu->sve_vq_init)) {
+-                set_bit(vq - 1, cpu->sve_vq_map);
++        if (kvm_enabled()) {
++            /*
++             * For KVM we have to automatically enable all supported uniti=
+alized
++             * lengths, even when the smaller lengths are not all powers-o=
+f-two.
++             */
++            bitmap_andnot(tmp, kvm_supported, cpu->sve_vq_init, max_vq);
++            bitmap_or(cpu->sve_vq_map, cpu->sve_vq_map, tmp, max_vq);
++        } else {
++            /* Propagate enabled bits down through required powers-of-two.=
+ */
++            for (vq =3D pow2floor(max_vq); vq >=3D 1; vq >>=3D 1) {
++                if (!test_bit(vq - 1, cpu->sve_vq_init)) {
++                    set_bit(vq - 1, cpu->sve_vq_map);
++                }
+             }
+         }
+     } else if (cpu->sve_max_vq =3D=3D 0) {
+@@ -308,23 +326,45 @@ void arm_cpu_sve_finalize(ARMCPU *cpu, Error **errp)
+             return;
+         }
 =20
-@@ -283,5 +307,11 @@ another feature
+-        /* Disabling a power-of-two disables all larger lengths. */
+-        if (test_bit(0, cpu->sve_vq_init)) {
+-            error_setg(errp, "cannot disable sve128");
+-            error_append_hint(errp, "Disabling sve128 results in all vecto=
+r "
+-                              "lengths being disabled.\n");
+-            error_append_hint(errp, "With SVE enabled, at least one vector=
+ "
+-                              "length must be enabled.\n");
+-            return;
+-        }
+-        for (vq =3D 2; vq <=3D ARM_MAX_VQ; vq <<=3D 1) {
+-            if (test_bit(vq - 1, cpu->sve_vq_init)) {
+-                break;
++        if (kvm_enabled()) {
++            /* Disabling a supported length disables all larger lengths. *=
+/
++            for (vq =3D 1; vq <=3D ARM_MAX_VQ; ++vq) {
++                if (test_bit(vq - 1, cpu->sve_vq_init) &&
++                    test_bit(vq - 1, kvm_supported)) {
++                    break;
++                }
++            }
++            max_vq =3D vq <=3D ARM_MAX_VQ ? vq - 1 : ARM_MAX_VQ;
++            bitmap_andnot(cpu->sve_vq_map, kvm_supported,
++                          cpu->sve_vq_init, max_vq);
++            if (max_vq =3D=3D 0 || bitmap_empty(cpu->sve_vq_map, max_vq)) =
+{
++                error_setg(errp, "cannot disable sve%d", vq * 128);
++                error_append_hint(errp, "Disabling sve%d results in all "
++                                  "vector lengths being disabled.\n",
++                                  vq * 128);
++                error_append_hint(errp, "With SVE enabled, at least one "
++                                  "vector length must be enabled.\n");
++                return;
++            }
++        } else {
++            /* Disabling a power-of-two disables all larger lengths. */
++            if (test_bit(0, cpu->sve_vq_init)) {
++                error_setg(errp, "cannot disable sve128");
++                error_append_hint(errp, "Disabling sve128 results in all "
++                                  "vector lengths being disabled.\n");
++                error_append_hint(errp, "With SVE enabled, at least one "
++                                  "vector length must be enabled.\n");
++                return;
++            }
++            for (vq =3D 2; vq <=3D ARM_MAX_VQ; vq <<=3D 1) {
++                if (test_bit(vq - 1, cpu->sve_vq_init)) {
++                    break;
++                }
+             }
++            max_vq =3D vq <=3D ARM_MAX_VQ ? vq - 1 : ARM_MAX_VQ;
++            bitmap_complement(cpu->sve_vq_map, cpu->sve_vq_init, max_vq);
+         }
+-        max_vq =3D vq <=3D ARM_MAX_VQ ? vq - 1 : ARM_MAX_VQ;
 =20
- @b{Arguments:} the members of @code{Object}
+-        bitmap_complement(cpu->sve_vq_map, cpu->sve_vq_init, max_vq);
+         max_vq =3D find_last_bit(cpu->sve_vq_map, max_vq) + 1;
+     }
 =20
-+@b{Features:}
-+@table @asis
-+@item @code{feat3}
-+a feature
-+@end table
-+
- @end deftypefn
+@@ -358,16 +398,48 @@ void arm_cpu_sve_finalize(ARMCPU *cpu, Error **errp)
+     assert(max_vq !=3D 0);
+     bitmap_clear(cpu->sve_vq_map, max_vq, ARM_MAX_VQ - max_vq);
 =20
-diff --git a/qapi/introspect.json b/qapi/introspect.json
-index 031a954fa9..7322ab3f59 100644
---- a/qapi/introspect.json
-+++ b/qapi/introspect.json
-@@ -105,6 +105,17 @@
-       'command': 'SchemaInfoCommand',
-       'event': 'SchemaInfoEvent' } }
+-    /* Ensure all required powers-of-two are enabled. */
+-    for (vq =3D pow2floor(max_vq); vq >=3D 1; vq >>=3D 1) {
+-        if (!test_bit(vq - 1, cpu->sve_vq_map)) {
+-            error_setg(errp, "cannot disable sve%d", vq * 128);
+-            error_append_hint(errp, "sve%d is required as it "
+-                              "is a power-of-two length smaller than "
+-                              "the maximum, sve%d\n",
+-                              vq * 128, max_vq * 128);
++    if (kvm_enabled()) {
++        /* Ensure the set of lengths matches what KVM supports. */
++        bitmap_xor(tmp, cpu->sve_vq_map, kvm_supported, max_vq);
++        if (!bitmap_empty(tmp, max_vq)) {
++            vq =3D find_last_bit(tmp, max_vq) + 1;
++            if (test_bit(vq - 1, cpu->sve_vq_map)) {
++                if (cpu->sve_max_vq) {
++                    error_setg(errp, "cannot set sve-max-vq=3D%d",
++                               cpu->sve_max_vq);
++                    error_append_hint(errp, "This KVM host does not suppor=
+t "
++                                      "the vector length %d-bits.\n",
++                                      vq * 128);
++                    error_append_hint(errp, "It may not be possible to use=
+ "
++                                      "sve-max-vq with this KVM host. Try =
+"
++                                      "using only sve<N> properties.\n");
++                } else {
++                    error_setg(errp, "cannot enable sve%d", vq * 128);
++                    error_append_hint(errp, "This KVM host does not suppor=
+t "
++                                      "the vector length %d-bits.\n",
++                                      vq * 128);
++                }
++            } else {
++                error_setg(errp, "cannot disable sve%d", vq * 128);
++                error_append_hint(errp, "The KVM host requires all "
++                                  "supported vector lengths smaller "
++                                  "than %d bits to also be enabled.\n",
++                                  max_vq * 128);
++            }
+             return;
+         }
++    } else {
++        /* Ensure all required powers-of-two are enabled. */
++        for (vq =3D pow2floor(max_vq); vq >=3D 1; vq >>=3D 1) {
++            if (!test_bit(vq - 1, cpu->sve_vq_map)) {
++                error_setg(errp, "cannot disable sve%d", vq * 128);
++                error_append_hint(errp, "sve%d is required as it "
++                                  "is a power-of-two length smaller than "
++                                  "the maximum, sve%d\n",
++                                  vq * 128, max_vq * 128);
++                return;
++            }
++        }
+     }
 =20
-+##
-+# @SchemaInfoFeatures:
-+#
-+# @features: names of features associated with the entity, in no particula=
-r
-+#            order.
-+#
-+# Since: 4.2
-+##
-+{ 'struct': 'SchemaInfoFeatures',
-+  'data': { '*features': [ 'str' ] } }
-+
- ##
- # @SchemaInfoBuiltin:
- #
-@@ -142,6 +153,7 @@
- # Since: 2.5
- ##
- { 'struct': 'SchemaInfoEnum',
-+  'base': 'SchemaInfoFeatures',
-   'data': { 'values': ['str'] } }
-=20
- ##
-@@ -174,18 +186,15 @@
- #            and may even differ from the order of the values of the
- #            enum type of the @tag.
- #
--# @features: names of features associated with the type, in no particular
--#            order. (since: 4.1)
--#
- # Values of this type are JSON object on the wire.
- #
- # Since: 2.5
- ##
- { 'struct': 'SchemaInfoObject',
-+  'base': 'SchemaInfoFeatures',
-   'data': { 'members': [ 'SchemaInfoObjectMember' ],
-             '*tag': 'str',
--            '*variants': [ 'SchemaInfoObjectVariant' ],
--            '*features': [ 'str' ] } }
-+            '*variants': [ 'SchemaInfoObjectVariant' ] } }
-=20
- ##
- # @SchemaInfoObjectMember:
-@@ -239,6 +248,7 @@
- # Since: 2.5
- ##
- { 'struct': 'SchemaInfoAlternate',
-+  'base': 'SchemaInfoFeatures',
-   'data': { 'members': [ 'SchemaInfoAlternateMember' ] } }
-=20
- ##
-@@ -266,17 +276,14 @@
- # @allow-oob: whether the command allows out-of-band execution,
- #             defaults to false (Since: 2.12)
- #
--# @features: names of features associated with the command, in no particul=
-ar
--#            order. (since 4.2)
--#
- # TODO: @success-response (currently irrelevant, because it's QGA, not QMP=
-)
- #
- # Since: 2.5
- ##
- { 'struct': 'SchemaInfoCommand',
-+  'base': 'SchemaInfoFeatures',
-   'data': { 'arg-type': 'str', 'ret-type': 'str',
--            '*allow-oob': 'bool',
--            '*features': [ 'str' ] } }
-+            '*allow-oob': 'bool' } }
-=20
- ##
- # @SchemaInfoEvent:
-@@ -289,4 +296,5 @@
- # Since: 2.5
- ##
- { 'struct': 'SchemaInfoEvent',
-+  'base': 'SchemaInfoFeatures',
-   'data': { 'arg-type': 'str' } }
-diff --git a/tests/test-qmp-cmds.c b/tests/test-qmp-cmds.c
-index 3798ba1b16..cf4fa1a091 100644
---- a/tests/test-qmp-cmds.c
-+++ b/tests/test-qmp-cmds.c
-@@ -44,7 +44,7 @@ void qmp_user_def_cmd1(UserDefOne * ud1, Error **errp)
+     /*
+@@ -421,15 +493,28 @@ static void cpu_max_set_sve_max_vq(Object *obj, Visit=
+or *v, const char *name,
  {
- }
+     ARMCPU *cpu =3D ARM_CPU(obj);
+     Error *err =3D NULL;
++    uint32_t max_vq;
++
++    visit_type_uint32(v, name, &max_vq, &err);
++    if (err) {
++        error_propagate(errp, err);
++        return;
++    }
 =20
--void qmp_test_features(FeatureStruct0 *fs0, FeatureStruct1 *fs1,
-+void qmp_test_features0(FeatureStruct0 *fs0, FeatureStruct1 *fs1,
-                        FeatureStruct2 *fs2, FeatureStruct3 *fs3,
-                        FeatureStruct4 *fs4, CondFeatureStruct1 *cfs1,
-                        CondFeatureStruct2 *cfs2, CondFeatureStruct3 *cfs3,
-@@ -52,10 +52,6 @@ void qmp_test_features(FeatureStruct0 *fs0, FeatureStruc=
-t1 *fs1,
- {
- }
-=20
--void qmp_test_command_features0(Error **errp)
--{
--}
--
- void qmp_test_command_features1(Error **errp)
- {
- }
-diff --git a/scripts/qapi/doc.py b/scripts/qapi/doc.py
-index 6f1c17f71f..53a1f8e952 100644
---- a/scripts/qapi/doc.py
-+++ b/scripts/qapi/doc.py
-@@ -244,7 +244,7 @@ class QAPISchemaGenDocVisitor(QAPISchemaVisitor):
-     def write(self, output_dir):
-         self._gen.write(output_dir)
-=20
--    def visit_enum_type(self, name, info, ifcond, members, prefix):
-+    def visit_enum_type(self, name, info, ifcond, features, members, prefi=
-x):
-         doc =3D self.cur_doc
-         self._gen.add(texi_type('Enum', doc, ifcond,
-                                 texi_members(doc, 'Values',
-@@ -258,7 +258,7 @@ class QAPISchemaGenDocVisitor(QAPISchemaVisitor):
-         self._gen.add(texi_type('Object', doc, ifcond,
-                                 texi_members(doc, 'Members', base, variant=
-s)))
-=20
--    def visit_alternate_type(self, name, info, ifcond, variants):
-+    def visit_alternate_type(self, name, info, ifcond, features, variants)=
-:
-         doc =3D self.cur_doc
-         self._gen.add(texi_type('Alternate', doc, ifcond,
-                                 texi_members(doc, 'Members')))
-@@ -271,7 +271,7 @@ class QAPISchemaGenDocVisitor(QAPISchemaVisitor):
-                                texi_arguments(doc,
-                                               arg_type if boxed else None)=
-))
-=20
--    def visit_event(self, name, info, ifcond, arg_type, boxed):
-+    def visit_event(self, name, info, ifcond, features, arg_type, boxed):
-         doc =3D self.cur_doc
-         self._gen.add(texi_msg('Event', doc, ifcond,
-                                texi_arguments(doc,
-diff --git a/scripts/qapi/events.py b/scripts/qapi/events.py
-index 10fc509fa9..f64e61076e 100644
---- a/scripts/qapi/events.py
-+++ b/scripts/qapi/events.py
-@@ -189,7 +189,7 @@ void %(event_emit)s(%(event_enum)s event, QDict *qdict)=
+-    visit_type_uint32(v, name, &cpu->sve_max_vq, &err);
++    if (kvm_enabled() && !kvm_arm_sve_supported(CPU(cpu))) {
++        error_setg(errp, "cannot set sve-max-vq");
++        error_append_hint(errp, "SVE not supported by KVM on this host\n")=
 ;
-                              event_emit=3Dself._event_emit_name,
-                              event_enum=3Dself._event_enum_name))
++        return;
++    }
 =20
--    def visit_event(self, name, info, ifcond, arg_type, boxed):
-+    def visit_event(self, name, info, ifcond, features, arg_type, boxed):
-         with ifcontext(ifcond, self._genh, self._genc):
-             self._genh.add(gen_event_send_decl(name, arg_type, boxed))
-             self._genc.add(gen_event_send(name, arg_type, boxed,
-diff --git a/scripts/qapi/expr.py b/scripts/qapi/expr.py
-index d7a289eded..92b2407315 100644
---- a/scripts/qapi/expr.py
-+++ b/scripts/qapi/expr.py
-@@ -220,7 +220,6 @@ def check_struct(expr, info):
+-    if (!err && (cpu->sve_max_vq =3D=3D 0 || cpu->sve_max_vq > ARM_MAX_VQ)=
+) {
+-        error_setg(&err, "unsupported SVE vector length");
+-        error_append_hint(&err, "Valid sve-max-vq in range [1-%d]\n",
++    if (max_vq =3D=3D 0 || max_vq > ARM_MAX_VQ) {
++        error_setg(errp, "unsupported SVE vector length");
++        error_append_hint(errp, "Valid sve-max-vq in range [1-%d]\n",
+                           ARM_MAX_VQ);
++        return;
+     }
+-    error_propagate(errp, err);
++
++    cpu->sve_max_vq =3D max_vq;
+ }
 =20
-     check_type(members, info, "'data'", allow_dict=3Dname)
-     check_type(expr.get('base'), info, "'base'")
--    check_features(expr.get('features'), info)
+ static void cpu_arm_get_sve_vq(Object *obj, Visitor *v, const char *name,
+@@ -462,6 +547,12 @@ static void cpu_arm_set_sve_vq(Object *obj, Visitor *v=
+, const char *name,
+         return;
+     }
 =20
-=20
- def check_union(expr, info):
-@@ -268,7 +267,6 @@ def check_command(expr, info):
-         raise QAPISemError(info, "'boxed': true requires 'data'")
-     check_type(args, info, "'data'", allow_dict=3Dnot boxed)
-     check_type(rets, info, "'returns'", allow_array=3DTrue)
--    check_features(expr.get('features'), info)
-=20
-=20
- def check_event(expr, info):
-@@ -320,18 +318,18 @@ def check_exprs(exprs):
-=20
-         if meta =3D=3D 'enum':
-             check_keys(expr, info, meta,
--                       ['enum', 'data'], ['if', 'prefix'])
-+                       ['enum', 'data'], ['if', 'features', 'prefix'])
-             check_enum(expr, info)
-         elif meta =3D=3D 'union':
-             check_keys(expr, info, meta,
-                        ['union', 'data'],
--                       ['base', 'discriminator', 'if'])
-+                       ['base', 'discriminator', 'if', 'features'])
-             normalize_members(expr.get('base'))
-             normalize_members(expr['data'])
-             check_union(expr, info)
-         elif meta =3D=3D 'alternate':
-             check_keys(expr, info, meta,
--                       ['alternate', 'data'], ['if'])
-+                       ['alternate', 'data'], ['if', 'features'])
-             normalize_members(expr['data'])
-             check_alternate(expr, info)
-         elif meta =3D=3D 'struct':
-@@ -349,13 +347,14 @@ def check_exprs(exprs):
-             check_command(expr, info)
-         elif meta =3D=3D 'event':
-             check_keys(expr, info, meta,
--                       ['event'], ['data', 'boxed', 'if'])
-+                       ['event'], ['data', 'boxed', 'if', 'features'])
-             normalize_members(expr.get('data'))
-             check_event(expr, info)
-         else:
-             assert False, 'unexpected meta type'
-=20
-         check_if(expr, info, meta)
-+        check_features(expr.get('features'), info)
-         check_flags(expr, info)
-=20
-     return exprs
-diff --git a/scripts/qapi/introspect.py b/scripts/qapi/introspect.py
-index b3a463dd8b..ba493977cf 100644
---- a/scripts/qapi/introspect.py
-+++ b/scripts/qapi/introspect.py
-@@ -146,7 +146,7 @@ const QLitObject %(c_name)s =3D %(c_string)s;
-             return '[' + self._use_type(typ.element_type) + ']'
-         return self._name(typ.name)
-=20
--    def _gen_qlit(self, name, mtype, obj, ifcond):
-+    def _gen_qlit(self, name, mtype, obj, ifcond, features):
-         extra =3D {}
-         if mtype not in ('command', 'event', 'builtin', 'array'):
-             if not self._unmask:
-@@ -156,6 +156,8 @@ const QLitObject %(c_name)s =3D %(c_string)s;
-             name =3D self._name(name)
-         obj['name'] =3D name
-         obj['meta-type'] =3D mtype
-+        if features:
-+            obj['features'] =3D [(f.name, {'if': f.ifcond}) for f in featu=
-res]
-         if ifcond:
-             extra['if'] =3D ifcond
-         if extra:
-@@ -180,18 +182,18 @@ const QLitObject %(c_name)s =3D %(c_string)s;
-                 {'if': variant.ifcond})
-=20
-     def visit_builtin_type(self, name, info, json_type):
--        self._gen_qlit(name, 'builtin', {'json-type': json_type}, [])
-+        self._gen_qlit(name, 'builtin', {'json-type': json_type}, [], None=
-)
-=20
--    def visit_enum_type(self, name, info, ifcond, members, prefix):
-+    def visit_enum_type(self, name, info, ifcond, features, members, prefi=
-x):
-         self._gen_qlit(name, 'enum',
-                        {'values':
-                         [(m.name, {'if': m.ifcond}) for m in members]},
--                       ifcond)
-+                       ifcond, features)
-=20
-     def visit_array_type(self, name, info, ifcond, element_type):
-         element =3D self._use_type(element_type)
-         self._gen_qlit('[' + element + ']', 'array', {'element-type': elem=
-ent},
--                       ifcond)
-+                       ifcond, None)
-=20
-     def visit_object_type_flat(self, name, info, ifcond, members, variants=
-,
-                                features):
-@@ -199,16 +201,15 @@ const QLitObject %(c_name)s =3D %(c_string)s;
-         if variants:
-             obj.update(self._gen_variants(variants.tag_member.name,
-                                           variants.variants))
--        if features:
--            obj['features'] =3D [(f.name, {'if': f.ifcond}) for f in featu=
-res]
-=20
--        self._gen_qlit(name, 'object', obj, ifcond)
-+        self._gen_qlit(name, 'object', obj, ifcond, features)
-=20
--    def visit_alternate_type(self, name, info, ifcond, variants):
-+    def visit_alternate_type(self, name, info, ifcond, features, variants)=
-:
-         self._gen_qlit(name, 'alternate',
-                        {'members': [
-                            ({'type': self._use_type(m.type)}, {'if': m.ifc=
-ond})
--                           for m in variants.variants]}, ifcond)
-+                           for m in variants.variants]},
-+                       ifcond, features)
-=20
-     def visit_command(self, name, info, ifcond, arg_type, ret_type, gen,
-                       success_response, boxed, allow_oob, allow_preconfig,
-@@ -219,16 +220,12 @@ const QLitObject %(c_name)s =3D %(c_string)s;
-                'ret-type': self._use_type(ret_type)}
-         if allow_oob:
-             obj['allow-oob'] =3D allow_oob
-+        self._gen_qlit(name, 'command', obj, ifcond, features)
-=20
--        if features:
--            obj['features'] =3D [(f.name, {'if': f.ifcond}) for f in featu=
-res]
++    if (value && kvm_enabled() && !kvm_arm_sve_supported(CPU(cpu))) {
++        error_setg(errp, "cannot enable %s", name);
++        error_append_hint(errp, "SVE not supported by KVM on this host\n")=
+;
++        return;
++    }
++
+     if (value) {
+         set_bit(vq - 1, cpu->sve_vq_map);
+     } else {
+@@ -619,20 +710,19 @@ static void aarch64_max_initfn(Object *obj)
+         cpu->ctr =3D 0x80038003; /* 32 byte I and D cacheline size, VIPT i=
+cache */
+         cpu->dcz_blocksize =3D 7; /*  512 bytes */
+ #endif
 -
--        self._gen_qlit(name, 'command', obj, ifcond)
+-        object_property_add(obj, "sve-max-vq", "uint32", cpu_max_get_sve_m=
+ax_vq,
+-                            cpu_max_set_sve_max_vq, NULL, NULL, &error_fat=
+al);
 -
--    def visit_event(self, name, info, ifcond, arg_type, boxed):
-+    def visit_event(self, name, info, ifcond, features, arg_type, boxed):
-         arg_type =3D arg_type or self._schema.the_empty_object_type
-         self._gen_qlit(name, 'event', {'arg-type': self._use_type(arg_type=
-)},
--                       ifcond)
-+                       ifcond, features)
+-        for (vq =3D 1; vq <=3D ARM_MAX_VQ; ++vq) {
+-            char name[8];
+-            sprintf(name, "sve%d", vq * 128);
+-            object_property_add(obj, name, "bool", cpu_arm_get_sve_vq,
+-                                cpu_arm_set_sve_vq, NULL, NULL, &error_fat=
+al);
+-        }
+     }
 =20
+     object_property_add(obj, "sve", "bool", cpu_arm_get_sve,
+                         cpu_arm_set_sve, NULL, NULL, &error_fatal);
++    object_property_add(obj, "sve-max-vq", "uint32", cpu_max_get_sve_max_v=
+q,
++                        cpu_max_set_sve_max_vq, NULL, NULL, &error_fatal);
++
++    for (vq =3D 1; vq <=3D ARM_MAX_VQ; ++vq) {
++        char name[8];
++        sprintf(name, "sve%d", vq * 128);
++        object_property_add(obj, name, "bool", cpu_arm_get_sve_vq,
++                            cpu_arm_set_sve_vq, NULL, NULL, &error_fatal);
++    }
+ }
 =20
- def gen_introspect(schema, output_dir, prefix, opt_unmask):
-diff --git a/scripts/qapi/schema.py b/scripts/qapi/schema.py
-index cf0045f34e..f13f442896 100644
---- a/scripts/qapi/schema.py
-+++ b/scripts/qapi/schema.py
-@@ -109,7 +109,7 @@ class QAPISchemaVisitor(object):
-     def visit_builtin_type(self, name, info, json_type):
-         pass
+ struct ARMCPUInfo {
+diff --git a/target/arm/kvm64.c b/target/arm/kvm64.c
+index c7ecefbed720..c93bbee425ae 100644
+--- a/target/arm/kvm64.c
++++ b/target/arm/kvm64.c
+@@ -613,6 +613,100 @@ bool kvm_arm_sve_supported(CPUState *cpu)
+     return kvm_check_extension(s, KVM_CAP_ARM_SVE);
+ }
 =20
--    def visit_enum_type(self, name, info, ifcond, members, prefix):
-+    def visit_enum_type(self, name, info, ifcond, features, members, prefi=
-x):
-         pass
++QEMU_BUILD_BUG_ON(KVM_ARM64_SVE_VQ_MIN !=3D 1);
++
++void kvm_arm_sve_get_vls(CPUState *cs, unsigned long *map)
++{
++    /* Only call this function if kvm_arm_sve_supported() returns true. */
++    static uint64_t vls[KVM_ARM64_SVE_VLS_WORDS];
++    static bool probed;
++    uint32_t vq =3D 0;
++    int i, j;
++
++    bitmap_clear(map, 0, ARM_MAX_VQ);
++
++    /*
++     * KVM ensures all host CPUs support the same set of vector lengths.
++     * So we only need to create the scratch VCPUs once and then cache
++     * the results.
++     */
++    if (!probed) {
++        struct kvm_vcpu_init init =3D {
++            .target =3D -1,
++            .features[0] =3D (1 << KVM_ARM_VCPU_SVE),
++        };
++        struct kvm_one_reg reg =3D {
++            .id =3D KVM_REG_ARM64_SVE_VLS,
++            .addr =3D (uint64_t)&vls[0],
++        };
++        int fdarray[3], ret;
++
++        probed =3D true;
++
++        if (!kvm_arm_create_scratch_host_vcpu(NULL, fdarray, &init)) {
++            error_report("failed to create scratch VCPU with SVE enabled")=
+;
++            abort();
++        }
++        ret =3D ioctl(fdarray[2], KVM_GET_ONE_REG, &reg);
++        kvm_arm_destroy_scratch_host_vcpu(fdarray);
++        if (ret) {
++            error_report("failed to get KVM_REG_ARM64_SVE_VLS: %s",
++                         strerror(errno));
++            abort();
++        }
++
++        for (i =3D KVM_ARM64_SVE_VLS_WORDS - 1; i >=3D 0; --i) {
++            if (vls[i]) {
++                vq =3D 64 - clz64(vls[i]) + i * 64;
++                break;
++            }
++        }
++        if (vq > ARM_MAX_VQ) {
++            warn_report("KVM supports vector lengths larger than "
++                        "QEMU can enable");
++        }
++    }
++
++    for (i =3D 0; i < KVM_ARM64_SVE_VLS_WORDS; ++i) {
++        if (!vls[i]) {
++            continue;
++        }
++        for (j =3D 1; j <=3D 64; ++j) {
++            vq =3D j + i * 64;
++            if (vq > ARM_MAX_VQ) {
++                return;
++            }
++            if (vls[i] & (1UL << (j - 1))) {
++                set_bit(vq - 1, map);
++            }
++        }
++    }
++}
++
++static int kvm_arm_sve_set_vls(CPUState *cs)
++{
++    uint64_t vls[KVM_ARM64_SVE_VLS_WORDS] =3D {0};
++    struct kvm_one_reg reg =3D {
++        .id =3D KVM_REG_ARM64_SVE_VLS,
++        .addr =3D (uint64_t)&vls[0],
++    };
++    ARMCPU *cpu =3D ARM_CPU(cs);
++    uint32_t vq;
++    int i, j;
++
++    assert(cpu->sve_max_vq <=3D KVM_ARM64_SVE_VQ_MAX);
++
++    for (vq =3D 1; vq <=3D cpu->sve_max_vq; ++vq) {
++        if (test_bit(vq - 1, cpu->sve_vq_map)) {
++            i =3D (vq - 1) / 64;
++            j =3D (vq - 1) % 64;
++            vls[i] |=3D 1UL << j;
++        }
++    }
++
++    return kvm_vcpu_ioctl(cs, KVM_SET_ONE_REG, &reg);
++}
++
+ #define ARM_CPU_ID_MPIDR       3, 0, 0, 0, 5
 =20
-     def visit_array_type(self, name, info, ifcond, element_type):
-@@ -123,7 +123,7 @@ class QAPISchemaVisitor(object):
-                                features):
-         pass
+ int kvm_arch_init_vcpu(CPUState *cs)
+@@ -624,7 +718,7 @@ int kvm_arch_init_vcpu(CPUState *cs)
 =20
--    def visit_alternate_type(self, name, info, ifcond, variants):
-+    def visit_alternate_type(self, name, info, ifcond, features, variants)=
-:
-         pass
+     if (cpu->kvm_target =3D=3D QEMU_KVM_ARM_TARGET_NONE ||
+         !object_dynamic_cast(OBJECT(cpu), TYPE_AARCH64_CPU)) {
+-        fprintf(stderr, "KVM is not supported for this guest CPU type\n");
++        error_report("KVM is not supported for this guest CPU type");
+         return -EINVAL;
+     }
 =20
-     def visit_command(self, name, info, ifcond, arg_type, ret_type, gen,
-@@ -131,7 +131,7 @@ class QAPISchemaVisitor(object):
-                       features):
-         pass
+@@ -660,6 +754,10 @@ int kvm_arch_init_vcpu(CPUState *cs)
+     }
 =20
--    def visit_event(self, name, info, ifcond, arg_type, boxed):
-+    def visit_event(self, name, info, ifcond, features, arg_type, boxed):
-         pass
+     if (cpu_isar_feature(aa64_sve, cpu)) {
++        ret =3D kvm_arm_sve_set_vls(cs);
++        if (ret) {
++            return ret;
++        }
+         ret =3D kvm_arm_vcpu_finalize(cs, KVM_ARM_VCPU_SVE);
+         if (ret) {
+             return ret;
+diff --git a/target/arm/kvm_arm.h b/target/arm/kvm_arm.h
+index 7c12f1501a8b..8e14d400e8ab 100644
+--- a/target/arm/kvm_arm.h
++++ b/target/arm/kvm_arm.h
+@@ -212,6 +212,17 @@ typedef struct ARMHostCPUFeatures {
+  */
+ bool kvm_arm_get_host_cpu_features(ARMHostCPUFeatures *ahcf);
 =20
++/**
++ * kvm_arm_sve_get_vls:
++ * @cs: CPUState
++ * @map: bitmap to fill in
++ *
++ * Get all the SVE vector lengths supported by the KVM host, setting
++ * the bits corresponding to their length in quadwords minus one
++ * (vq - 1) in @map up to ARM_MAX_VQ.
++ */
++void kvm_arm_sve_get_vls(CPUState *cs, unsigned long *map);
++
+ /**
+  * kvm_arm_set_cpu_features_from_host:
+  * @cpu: ARMCPU to set the features for
+@@ -316,6 +327,7 @@ static inline int kvm_arm_vgic_probe(void)
+ static inline void kvm_arm_pmu_set_irq(CPUState *cs, int irq) {}
+ static inline void kvm_arm_pmu_init(CPUState *cs) {}
 =20
-@@ -220,8 +220,8 @@ class QAPISchemaBuiltinType(QAPISchemaType):
- class QAPISchemaEnumType(QAPISchemaType):
-     meta =3D 'enum'
++static inline void kvm_arm_sve_get_vls(CPUState *cs, unsigned long *map) {=
+}
+ #endif
 =20
--    def __init__(self, name, info, doc, ifcond, members, prefix):
--        QAPISchemaType.__init__(self, name, info, doc, ifcond)
-+    def __init__(self, name, info, doc, ifcond, features, members, prefix)=
-:
-+        QAPISchemaType.__init__(self, name, info, doc, ifcond, features)
-         for m in members:
-             assert isinstance(m, QAPISchemaEnumMember)
-             m.set_defined_in(name)
-@@ -256,15 +256,16 @@ class QAPISchemaEnumType(QAPISchemaType):
+ static inline const char *gic_class_name(void)
+diff --git a/tests/arm-cpu-features.c b/tests/arm-cpu-features.c
+index 3efc168d62a4..597c1cd78db2 100644
+--- a/tests/arm-cpu-features.c
++++ b/tests/arm-cpu-features.c
+@@ -112,6 +112,17 @@ static QDict *resp_get_props(QDict *resp)
+     return qdict;
+ }
 =20
-     def visit(self, visitor):
-         QAPISchemaType.visit(self, visitor)
--        visitor.visit_enum_type(self.name, self.info, self.ifcond,
--                                self.members, self.prefix)
-+        visitor.visit_enum_type(
-+            self.name, self.info, self.ifcond, self.features,
-+            self.members, self.prefix)
++static bool resp_get_feature(QDict *resp, const char *feature)
++{
++    QDict *props;
++
++    g_assert(resp);
++    g_assert(resp_has_props(resp));
++    props =3D resp_get_props(resp);
++    g_assert(qdict_get(props, feature));
++    return qdict_get_bool(props, feature);
++}
++
+ #define assert_has_feature(qts, cpu_type, feature)                     \
+ ({                                                                     \
+     QDict *_resp =3D do_query_no_props(qts, cpu_type);                   \
+@@ -341,6 +352,25 @@ static void sve_tests_sve_off(const void *data)
+     qtest_quit(qts);
+ }
 =20
++static void sve_tests_sve_off_kvm(const void *data)
++{
++    QTestState *qts;
++
++    qts =3D qtest_init(MACHINE "-accel kvm -cpu max,sve=3Doff");
++
++    /*
++     * We don't know if this host supports SVE so we don't
++     * attempt to test enabling anything. We only test that
++     * everything is disabled (as it should be with sve=3Doff)
++     * and that using sve<N>=3Doff to explicitly disable vector
++     * lengths is OK too.
++     */
++    assert_sve_vls(qts, "max", 0, NULL);
++    assert_sve_vls(qts, "max", 0, "{ 'sve128': false }");
++
++    qtest_quit(qts);
++}
++
+ static void test_query_cpu_model_expansion(const void *data)
+ {
+     QTestState *qts;
+@@ -388,14 +418,82 @@ static void test_query_cpu_model_expansion_kvm(const =
+void *data)
+     qts =3D qtest_init(MACHINE "-accel kvm -cpu host");
 =20
- class QAPISchemaArrayType(QAPISchemaType):
-     meta =3D 'array'
+     if (g_str_equal(qtest_get_arch(), "aarch64")) {
++        bool kvm_supports_sve;
++        char max_name[8], name[8];
++        uint32_t max_vq, vq;
++        uint64_t vls;
++        QDict *resp;
++        char *error;
++
+         assert_has_feature(qts, "host", "aarch64");
+         assert_has_feature(qts, "host", "pmu");
 =20
-     def __init__(self, name, info, element_type):
--        QAPISchemaType.__init__(self, name, info, None, None)
-+        QAPISchemaType.__init__(self, name, info, None)
-         assert isinstance(element_type, str)
-         self._element_type_name =3D element_type
-         self.element_type =3D None
-@@ -312,8 +313,8 @@ class QAPISchemaArrayType(QAPISchemaType):
-=20
-=20
- class QAPISchemaObjectType(QAPISchemaType):
--    def __init__(self, name, info, doc, ifcond,
--                 base, local_members, variants, features):
-+    def __init__(self, name, info, doc, ifcond, features,
-+                 base, local_members, variants):
-         # struct has local_members, optional base, and no variants
-         # flat union has base, variants, and no local_members
-         # simple union has local_members, variants, and no base
-@@ -609,8 +610,8 @@ class QAPISchemaObjectTypeVariant(QAPISchemaObjectTypeM=
-ember):
- class QAPISchemaAlternateType(QAPISchemaType):
-     meta =3D 'alternate'
-=20
--    def __init__(self, name, info, doc, ifcond, variants):
--        QAPISchemaType.__init__(self, name, info, doc, ifcond)
-+    def __init__(self, name, info, doc, ifcond, features, variants):
-+        QAPISchemaType.__init__(self, name, info, doc, ifcond, features)
-         assert isinstance(variants, QAPISchemaObjectTypeVariants)
-         assert variants.tag_member
-         variants.set_defined_in(name)
-@@ -669,16 +670,16 @@ class QAPISchemaAlternateType(QAPISchemaType):
-=20
-     def visit(self, visitor):
-         QAPISchemaType.visit(self, visitor)
--        visitor.visit_alternate_type(self.name, self.info, self.ifcond,
--                                     self.variants)
-+        visitor.visit_alternate_type(
-+            self.name, self.info, self.ifcond, self.features, self.variant=
-s)
-=20
-=20
- class QAPISchemaCommand(QAPISchemaEntity):
-     meta =3D 'command'
-=20
--    def __init__(self, name, info, doc, ifcond, arg_type, ret_type,
--                 gen, success_response, boxed, allow_oob, allow_preconfig,
--                 features):
-+    def __init__(self, name, info, doc, ifcond, features,
-+                 arg_type, ret_type,
-+                 gen, success_response, boxed, allow_oob, allow_preconfig)=
-:
-         QAPISchemaEntity.__init__(self, name, info, doc, ifcond, features)
-         assert not arg_type or isinstance(arg_type, str)
-         assert not ret_type or isinstance(ret_type, str)
-@@ -739,8 +740,8 @@ class QAPISchemaCommand(QAPISchemaEntity):
- class QAPISchemaEvent(QAPISchemaEntity):
-     meta =3D 'event'
-=20
--    def __init__(self, name, info, doc, ifcond, arg_type, boxed):
--        QAPISchemaEntity.__init__(self, name, info, doc, ifcond)
-+    def __init__(self, name, info, doc, ifcond, features, arg_type, boxed)=
-:
-+        QAPISchemaEntity.__init__(self, name, info, doc, ifcond, features)
-         assert not arg_type or isinstance(arg_type, str)
-         self._arg_type_name =3D arg_type
-         self.arg_type =3D None
-@@ -770,8 +771,9 @@ class QAPISchemaEvent(QAPISchemaEntity):
-=20
-     def visit(self, visitor):
-         QAPISchemaEntity.visit(self, visitor)
--        visitor.visit_event(self.name, self.info, self.ifcond,
--                            self.arg_type, self.boxed)
-+        visitor.visit_event(
-+            self.name, self.info, self.ifcond, self.features,
-+            self.arg_type, self.boxed)
-=20
-=20
- class QAPISchema(object):
-@@ -860,7 +862,7 @@ class QAPISchema(object):
-                   ('null',   'null',    'QNull' + pointer_suffix)]:
-             self._def_builtin_type(*t)
-         self.the_empty_object_type =3D QAPISchemaObjectType(
--            'q_empty', None, None, None, None, [], None, [])
-+            'q_empty', None, None, None, None, None, [], None)
-         self._def_entity(self.the_empty_object_type)
-=20
-         qtypes =3D ['none', 'qnull', 'qnum', 'qstring', 'qdict', 'qlist',
-@@ -868,10 +870,11 @@ class QAPISchema(object):
-         qtype_values =3D self._make_enum_members(
-             [{'name': n} for n in qtypes], None)
-=20
--        self._def_entity(QAPISchemaEnumType('QType', None, None, None,
-+        self._def_entity(QAPISchemaEnumType('QType', None, None, None, Non=
-e,
-                                             qtype_values, 'QTYPE'))
-=20
--    def _make_features(self, features, info):
-+    def _make_features(self, expr, info):
-+        features =3D expr.get('features', [])
-         return [QAPISchemaFeature(f['name'], info, f.get('if'))
-                 for f in features]
-=20
-@@ -883,7 +886,8 @@ class QAPISchema(object):
-         # See also QAPISchemaObjectTypeMember.describe()
-         name =3D name + 'Kind'    # reserved by check_defn_name_str()
-         self._def_entity(QAPISchemaEnumType(
--            name, info, None, ifcond, self._make_enum_members(values, info=
-),
-+            name, info, None, ifcond, None,
-+            self._make_enum_members(values, info),
-             None))
-         return name
-=20
-@@ -911,8 +915,8 @@ class QAPISchema(object):
-             # TODO kill simple unions or implement the disjunction
-             assert (ifcond or []) =3D=3D typ._ifcond # pylint: disable=3Dp=
-rotected-access
-         else:
--            self._def_entity(QAPISchemaObjectType(name, info, None, ifcond=
-,
--                                                  None, members, None, [])=
-)
-+            self._def_entity(QAPISchemaObjectType(
-+                name, info, None, ifcond, None, None, members, None))
-         return name
-=20
-     def _def_enum_type(self, expr, info, doc):
-@@ -920,8 +924,9 @@ class QAPISchema(object):
-         data =3D expr['data']
-         prefix =3D expr.get('prefix')
-         ifcond =3D expr.get('if')
-+        features =3D self._make_features(expr, info)
-         self._def_entity(QAPISchemaEnumType(
--            name, info, doc, ifcond,
-+            name, info, doc, ifcond, features,
-             self._make_enum_members(data, info), prefix))
-=20
-     def _make_member(self, name, typ, ifcond, info):
-@@ -943,12 +948,11 @@ class QAPISchema(object):
-         base =3D expr.get('base')
-         data =3D expr['data']
-         ifcond =3D expr.get('if')
--        features =3D expr.get('features', [])
-+        features =3D self._make_features(expr, info)
-         self._def_entity(QAPISchemaObjectType(
--            name, info, doc, ifcond, base,
-+            name, info, doc, ifcond, features, base,
-             self._make_members(data, info),
--            None,
--            self._make_features(features, info)))
-+            None))
-=20
-     def _make_variant(self, case, typ, ifcond, info):
-         return QAPISchemaObjectTypeVariant(case, info, typ, ifcond)
-@@ -967,6 +971,7 @@ class QAPISchema(object):
-         data =3D expr['data']
-         base =3D expr.get('base')
-         ifcond =3D expr.get('if')
-+        features =3D self._make_features(expr, info)
-         tag_name =3D expr.get('discriminator')
-         tag_member =3D None
-         if isinstance(base, dict):
-@@ -987,21 +992,22 @@ class QAPISchema(object):
-             tag_member =3D QAPISchemaObjectTypeMember('type', info, typ, F=
-alse)
-             members =3D [tag_member]
-         self._def_entity(
--            QAPISchemaObjectType(name, info, doc, ifcond, base, members,
-+            QAPISchemaObjectType(name, info, doc, ifcond, features,
-+                                 base, members,
-                                  QAPISchemaObjectTypeVariants(
--                                     tag_name, info, tag_member, variants)=
-,
--                                 []))
-+                                     tag_name, info, tag_member, variants)=
-))
-=20
-     def _def_alternate_type(self, expr, info, doc):
-         name =3D expr['alternate']
-         data =3D expr['data']
-         ifcond =3D expr.get('if')
-+        features =3D self._make_features(expr, info)
-         variants =3D [self._make_variant(key, value['type'], value.get('if=
-'),
-                                        info)
-                     for (key, value) in data.items()]
-         tag_member =3D QAPISchemaObjectTypeMember('type', info, 'QType', F=
-alse)
-         self._def_entity(
--            QAPISchemaAlternateType(name, info, doc, ifcond,
-+            QAPISchemaAlternateType(name, info, doc, ifcond, features,
-                                     QAPISchemaObjectTypeVariants(
-                                         None, info, tag_member, variants))=
-)
-=20
-@@ -1015,27 +1021,31 @@ class QAPISchema(object):
-         allow_oob =3D expr.get('allow-oob', False)
-         allow_preconfig =3D expr.get('allow-preconfig', False)
-         ifcond =3D expr.get('if')
--        features =3D expr.get('features', [])
-+        features =3D self._make_features(expr, info)
-         if isinstance(data, OrderedDict):
-             data =3D self._make_implicit_object_type(
--                name, info, ifcond, 'arg', self._make_members(data, info))
-+                name, info, ifcond,
-+                'arg', self._make_members(data, info))
-         if isinstance(rets, list):
-             assert len(rets) =3D=3D 1
-             rets =3D self._make_array_type(rets[0], info)
--        self._def_entity(QAPISchemaCommand(name, info, doc, ifcond, data, =
-rets,
-+        self._def_entity(QAPISchemaCommand(name, info, doc, ifcond, featur=
-es,
-+                                           data, rets,
-                                            gen, success_response,
--                                           boxed, allow_oob, allow_preconf=
-ig,
--                                           self._make_features(features, i=
-nfo)))
-+                                           boxed, allow_oob, allow_preconf=
-ig))
-=20
-     def _def_event(self, expr, info, doc):
-         name =3D expr['event']
-         data =3D expr.get('data')
-         boxed =3D expr.get('boxed', False)
-         ifcond =3D expr.get('if')
-+        features =3D self._make_features(expr, info)
-         if isinstance(data, OrderedDict):
-             data =3D self._make_implicit_object_type(
--                name, info, ifcond, 'arg', self._make_members(data, info))
--        self._def_entity(QAPISchemaEvent(name, info, doc, ifcond, data, bo=
-xed))
-+                name, info, ifcond,
-+                'arg', self._make_members(data, info))
-+        self._def_entity(QAPISchemaEvent(name, info, doc, ifcond, features=
-,
-+                                         data, boxed))
-=20
-     def _def_exprs(self, exprs):
-         for expr_elem in exprs:
-diff --git a/scripts/qapi/types.py b/scripts/qapi/types.py
-index d8751daa04..2a108b6911 100644
---- a/scripts/qapi/types.py
-+++ b/scripts/qapi/types.py
-@@ -277,7 +277,7 @@ class QAPISchemaGenTypeVisitor(QAPISchemaModularCVisito=
-r):
-         self._genh.add(gen_type_cleanup_decl(name))
-         self._genc.add(gen_type_cleanup(name))
-=20
--    def visit_enum_type(self, name, info, ifcond, members, prefix):
-+    def visit_enum_type(self, name, info, ifcond, features, members, prefi=
-x):
-         with ifcontext(ifcond, self._genh, self._genc):
-             self._genh.preamble_add(gen_enum(name, members, prefix))
-             self._genc.add(gen_enum_lookup(name, members, prefix))
-@@ -305,7 +305,7 @@ class QAPISchemaGenTypeVisitor(QAPISchemaModularCVisito=
-r):
-                 # implicit types won't be directly allocated/freed
-                 self._gen_type_cleanup(name)
-=20
--    def visit_alternate_type(self, name, info, ifcond, variants):
-+    def visit_alternate_type(self, name, info, ifcond, features, variants)=
-:
-         with ifcontext(ifcond, self._genh):
-             self._genh.preamble_add(gen_fwd_object_or_array(name))
-         self._genh.add(gen_object(name, ifcond, None,
-diff --git a/scripts/qapi/visit.py b/scripts/qapi/visit.py
-index c72f2bc5c0..b21e1340a2 100644
---- a/scripts/qapi/visit.py
-+++ b/scripts/qapi/visit.py
-@@ -316,7 +316,7 @@ class QAPISchemaGenVisitVisitor(QAPISchemaModularCVisit=
-or):
- ''',
-                                       types=3Dtypes))
-=20
--    def visit_enum_type(self, name, info, ifcond, members, prefix):
-+    def visit_enum_type(self, name, info, ifcond, features, members, prefi=
-x):
-         with ifcontext(ifcond, self._genh, self._genc):
-             self._genh.add(gen_visit_decl(name, scalar=3DTrue))
-             self._genc.add(gen_visit_enum(name))
-@@ -342,7 +342,7 @@ class QAPISchemaGenVisitVisitor(QAPISchemaModularCVisit=
-or):
-                 self._genh.add(gen_visit_decl(name))
-                 self._genc.add(gen_visit_object(name, base, members, varia=
-nts))
-=20
--    def visit_alternate_type(self, name, info, ifcond, variants):
-+    def visit_alternate_type(self, name, info, ifcond, features, variants)=
-:
-         with ifcontext(ifcond, self._genh, self._genc):
-             self._genh.add(gen_visit_decl(name))
-             self._genc.add(gen_visit_alternate(name, variants))
-diff --git a/tests/qapi-schema/alternate-base.err b/tests/qapi-schema/alter=
-nate-base.err
-index 31ebe56bbf..970a08ab26 100644
---- a/tests/qapi-schema/alternate-base.err
-+++ b/tests/qapi-schema/alternate-base.err
-@@ -1,3 +1,3 @@
- alternate-base.json: In alternate 'Alt':
- alternate-base.json:4: alternate has unknown key 'base'
--Valid keys are 'alternate', 'data', 'if'.
-+Valid keys are 'alternate', 'data', 'features', 'if'.
-diff --git a/tests/qapi-schema/doc-good.json b/tests/qapi-schema/doc-good.j=
-son
-index d992e713d9..01c930c474 100644
---- a/tests/qapi-schema/doc-good.json
-+++ b/tests/qapi-schema/doc-good.json
-@@ -52,11 +52,14 @@
- ##
- # @Enum:
- # @one: The _one_ {and only}
--#
- # @two is undocumented
-+#
-+# Features:
-+# @enum-feat: Also _one_ {and only}
- ##
- { 'enum': 'Enum', 'data':
-   [ { 'name': 'one', 'if': 'defined(IFONE)' }, 'two' ],
-+  'features': [ 'enum-feat' ],
-   'if': 'defined(IFCOND)' }
-=20
- ##
-@@ -86,24 +89,34 @@
-=20
- ##
- # @Object:
-+# Features:
-+# @union-feat1: a feature
- ##
- { 'union': 'Object',
-+  'features': [ 'union-feat1' ],
-   'base': 'Base',
-   'discriminator': 'base1',
-   'data': { 'one': 'Variant1', 'two': { 'type': 'Variant2', 'if': 'IFTWO' =
-} } }
-=20
- ##
- # @SugaredUnion:
-+# Features:
-+# @union-feat2: a feature
- ##
- { 'union': 'SugaredUnion',
-+  'features': [ 'union-feat2' ],
-   'data': { 'one': 'Variant1', 'two': { 'type': 'Variant2', 'if': 'IFTWO' =
-} } }
-=20
- ##
- # @Alternate:
- # @i: an integer
- # @b is undocumented
-+#
-+# Features:
-+# @alt-feat: a feature
- ##
- { 'alternate': 'Alternate',
-+  'features': [ 'alt-feat' ],
-   'data': { 'i': 'int', 'b': 'bool' } }
-=20
- ##
-@@ -160,6 +173,9 @@
-=20
- ##
- # @EVT-BOXED:
-+# Features:
-+# @feat3: a feature
- ##
- { 'event': 'EVT-BOXED',  'boxed': true,
-+  'features': [ 'feat3' ],
-   'data': 'Object' }
-diff --git a/tests/qapi-schema/doc-good.out b/tests/qapi-schema/doc-good.ou=
-t
-index 4c9406a464..f5d9dc969c 100644
---- a/tests/qapi-schema/doc-good.out
-+++ b/tests/qapi-schema/doc-good.out
-@@ -15,6 +15,7 @@ enum Enum
-         if ['defined(IFONE)']
-     member two
-     if ['defined(IFCOND)']
-+    feature enum-feat
- object Base
-     member base1: Enum optional=3DFalse
- object Variant1
-@@ -28,6 +29,7 @@ object Object
-     case one: Variant1
-     case two: Variant2
-         if ['IFTWO']
-+    feature union-feat1
- object q_obj_Variant1-wrapper
-     member data: Variant1 optional=3DFalse
- object q_obj_Variant2-wrapper
-@@ -42,10 +44,12 @@ object SugaredUnion
-     case one: q_obj_Variant1-wrapper
-     case two: q_obj_Variant2-wrapper
-         if ['IFTWO']
-+    feature union-feat2
- alternate Alternate
-     tag type
-     case i: int
-     case b: bool
-+    feature alt-feat
- object q_obj_cmd-arg
-     member arg1: int optional=3DFalse
-     member arg2: str optional=3DTrue
-@@ -60,6 +64,7 @@ command cmd-boxed Object -> None
-     feature cmd-feat2
- event EVT-BOXED Object
-     boxed=3DTrue
-+    feature feat3
- doc freeform
-     body=3D
- =3D Section
-@@ -110,10 +115,11 @@ doc symbol=3DEnum
-=20
-     arg=3Done
- The _one_ {and only}
--    arg=3Dtwo
+-        assert_has_feature(qts, "max", "sve");
 -
--    section=3DNone
- @two is undocumented
-+    arg=3Dtwo
+         assert_error(qts, "cortex-a15",
+             "We cannot guarantee the CPU type 'cortex-a15' works "
+             "with KVM on this host", NULL);
 +
-+    feature=3Denum-feat
-+Also _one_ {and only}
- doc symbol=3DBase
-     body=3D
-=20
-@@ -134,11 +140,15 @@ doc symbol=3DVariant2
- doc symbol=3DObject
-     body=3D
-=20
-+    feature=3Dunion-feat1
-+a feature
- doc symbol=3DSugaredUnion
-     body=3D
-=20
-     arg=3Dtype
-=20
-+    feature=3Dunion-feat2
-+a feature
- doc symbol=3DAlternate
-     body=3D
-=20
-@@ -147,6 +157,8 @@ an integer
- @b is undocumented
-     arg=3Db
-=20
-+    feature=3Dalt-feat
-+a feature
- doc freeform
-     body=3D
- =3D=3D Another subsection
-@@ -197,3 +209,5 @@ another feature
- doc symbol=3DEVT-BOXED
-     body=3D
-=20
-+    feature=3Dfeat3
-+a feature
-diff --git a/tests/qapi-schema/qapi-schema-test.json b/tests/qapi-schema/qa=
-pi-schema-test.json
-index 9abf175fe0..fa4f3a15da 100644
---- a/tests/qapi-schema/qapi-schema-test.json
-+++ b/tests/qapi-schema/qapi-schema-test.json
-@@ -252,7 +252,7 @@
-     'bar': { 'type': ['TestIfEnum'], 'if': 'defined(TEST_IF_EVT_BAR)' } },
-   'if': 'defined(TEST_IF_EVT) && defined(TEST_IF_STRUCT)' }
-=20
--# test 'features' for structs
-+# test 'features'
-=20
- { 'struct': 'FeatureStruct0',
-   'data': { 'foo': 'int' },
-@@ -281,7 +281,22 @@
-   'data': { 'foo': 'int' },
-   'features': [ { 'name': 'feature1', 'if': [ 'defined(TEST_IF_COND_1)',
-                                               'defined(TEST_IF_COND_2)'] }=
- ] }
--{ 'command': 'test-features',
++        assert_has_feature(qts, "max", "sve");
++        resp =3D do_query_no_props(qts, "max");
++        kvm_supports_sve =3D resp_get_feature(resp, "sve");
++        vls =3D resp_get_sve_vls(resp);
++        qobject_unref(resp);
 +
-+{ 'enum': 'FeatureEnum1',
-+  'data': [ 'eins', 'zwei', 'drei' ],
-+  'features': [ 'feature1' ] }
++        if (kvm_supports_sve) {
++            g_assert(vls !=3D 0);
++            max_vq =3D 64 - __builtin_clzll(vls);
++            sprintf(max_name, "sve%d", max_vq * 128);
 +
-+{ 'union': 'FeatureUnion1',
-+  'base': { 'tag': 'FeatureEnum1' },
-+  'discriminator': 'tag',
-+  'data': { 'eins': 'FeatureStruct1' },
-+  'features': [ 'feature1' ] }
++            /* Enabling a supported length is of course fine. */
++            assert_sve_vls(qts, "max", vls, "{ %s: true }", max_name);
 +
-+{ 'alternate': 'FeatureAlternate1',
-+  'data': { 'eins': 'FeatureStruct1' },
-+  'features': [ 'feature1' ] }
++            /* Get the next supported length smaller than max-vq. */
++            vq =3D 64 - __builtin_clzll(vls & ~BIT_ULL(max_vq - 1));
++            if (vq) {
++                /*
++                 * We have at least one length smaller than max-vq,
++                 * so we can disable max-vq.
++                 */
++                assert_sve_vls(qts, "max", (vls & ~BIT_ULL(max_vq - 1)),
++                               "{ %s: false }", max_name);
 +
-+{ 'command': 'test-features0',
-   'data': { 'fs0': 'FeatureStruct0',
-             'fs1': 'FeatureStruct1',
-             'fs2': 'FeatureStruct2',
-@@ -289,12 +304,9 @@
-             'fs4': 'FeatureStruct4',
-             'cfs1': 'CondFeatureStruct1',
-             'cfs2': 'CondFeatureStruct2',
--            'cfs3': 'CondFeatureStruct3' } }
--
--# test 'features' for command
--
--{ 'command': 'test-command-features0',
-+            'cfs3': 'CondFeatureStruct3' },
-   'features': [] }
++                /*
++                 * Smaller, supported vector lengths cannot be disabled
++                 * unless all larger, supported vector lengths are also
++                 * disabled.
++                 */
++                sprintf(name, "sve%d", vq * 128);
++                error =3D g_strdup_printf("cannot disable %s", name);
++                assert_error(qts, "max", error,
++                             "{ %s: true, %s: false }",
++                             max_name, name);
++                g_free(error);
++            }
 +
- { 'command': 'test-command-features1',
-   'features': [ 'feature1' ] }
- { 'command': 'test-command-features3',
-@@ -308,3 +320,6 @@
- { 'command': 'test-command-cond-features3',
-   'features': [ { 'name': 'feature1', 'if': [ 'defined(TEST_IF_COND_1)',
-                                               'defined(TEST_IF_COND_2)'] }=
- ] }
++            /*
++             * The smallest, supported vector length is required, because
++             * we need at least one vector length enabled.
++             */
++            vq =3D __builtin_ffsll(vls);
++            sprintf(name, "sve%d", vq * 128);
++            error =3D g_strdup_printf("cannot disable %s", name);
++            assert_error(qts, "max", error, "{ %s: false }", name);
++            g_free(error);
 +
-+{ 'event': 'TEST-EVENT-FEATURES1',
-+  'features': [ 'feature1' ] }
-diff --git a/tests/qapi-schema/qapi-schema-test.out b/tests/qapi-schema/qap=
-i-schema-test.out
-index 3660e75a48..1ece836d9b 100644
---- a/tests/qapi-schema/qapi-schema-test.out
-+++ b/tests/qapi-schema/qapi-schema-test.out
-@@ -401,7 +401,25 @@ object CondFeatureStruct3
-     member foo: int optional=3DFalse
-     feature feature1
-         if ['defined(TEST_IF_COND_1)', 'defined(TEST_IF_COND_2)']
--object q_obj_test-features-arg
-+enum FeatureEnum1
-+    member eins
-+    member zwei
-+    member drei
-+    feature feature1
-+object q_obj_FeatureUnion1-base
-+    member tag: FeatureEnum1 optional=3DFalse
-+object FeatureUnion1
-+    base q_obj_FeatureUnion1-base
-+    tag tag
-+    case eins: FeatureStruct1
-+    case zwei: q_empty
-+    case drei: q_empty
-+    feature feature1
-+alternate FeatureAlternate1
-+    tag type
-+    case eins: FeatureStruct1
-+    feature feature1
-+object q_obj_test-features0-arg
-     member fs0: FeatureStruct0 optional=3DFalse
-     member fs1: FeatureStruct1 optional=3DFalse
-     member fs2: FeatureStruct2 optional=3DFalse
-@@ -410,9 +428,7 @@ object q_obj_test-features-arg
-     member cfs1: CondFeatureStruct1 optional=3DFalse
-     member cfs2: CondFeatureStruct2 optional=3DFalse
-     member cfs3: CondFeatureStruct3 optional=3DFalse
--command test-features q_obj_test-features-arg -> None
--    gen=3DTrue success_response=3DTrue boxed=3DFalse oob=3DFalse preconfig=
-=3DFalse
--command test-command-features0 None -> None
-+command test-features0 q_obj_test-features0-arg -> None
-     gen=3DTrue success_response=3DTrue boxed=3DFalse oob=3DFalse preconfig=
-=3DFalse
- command test-command-features1 None -> None
-     gen=3DTrue success_response=3DTrue boxed=3DFalse oob=3DFalse preconfig=
-=3DFalse
-@@ -435,3 +451,6 @@ command test-command-cond-features3 None -> None
-     gen=3DTrue success_response=3DTrue boxed=3DFalse oob=3DFalse preconfig=
-=3DFalse
-     feature feature1
-         if ['defined(TEST_IF_COND_1)', 'defined(TEST_IF_COND_2)']
-+event TEST-EVENT-FEATURES1 None
-+    boxed=3DFalse
-+    feature feature1
-diff --git a/tests/qapi-schema/test-qapi.py b/tests/qapi-schema/test-qapi.p=
-y
-index bad14edb47..078fc63f97 100755
---- a/tests/qapi-schema/test-qapi.py
-+++ b/tests/qapi-schema/test-qapi.py
-@@ -35,7 +35,7 @@ class QAPISchemaTestVisitor(QAPISchemaVisitor):
-     def visit_include(self, name, info):
-         print('include %s' % name)
++            /* Get an unsupported length. */
++            for (vq =3D 1; vq <=3D max_vq; ++vq) {
++                if (!(vls & BIT_ULL(vq - 1))) {
++                    break;
++                }
++            }
++            if (vq <=3D SVE_MAX_VQ) {
++                sprintf(name, "sve%d", vq * 128);
++                error =3D g_strdup_printf("cannot enable %s", name);
++                assert_error(qts, "max", error, "{ %s: true }", name);
++                g_free(error);
++            }
++        } else {
++            g_assert(vls =3D=3D 0);
++        }
+     } else {
+         assert_has_not_feature(qts, "host", "aarch64");
+         assert_has_not_feature(qts, "host", "pmu");
+@@ -433,6 +531,10 @@ int main(int argc, char **argv)
+     if (kvm_available) {
+         qtest_add_data_func("/arm/kvm/query-cpu-model-expansion",
+                             NULL, test_query_cpu_model_expansion_kvm);
++        if (g_str_equal(qtest_get_arch(), "aarch64")) {
++            qtest_add_data_func("/arm/kvm/query-cpu-model-expansion/sve-of=
+f",
++                                NULL, sve_tests_sve_off_kvm);
++        }
+     }
 =20
--    def visit_enum_type(self, name, info, ifcond, members, prefix):
-+    def visit_enum_type(self, name, info, ifcond, features, members, prefi=
-x):
-         print('enum %s' % name)
-         if prefix:
-             print('    prefix %s' % prefix)
-@@ -43,6 +43,7 @@ class QAPISchemaTestVisitor(QAPISchemaVisitor):
-             print('    member %s' % m.name)
-             self._print_if(m.ifcond, indent=3D8)
-         self._print_if(ifcond)
-+        self._print_features(features)
-=20
-     def visit_array_type(self, name, info, ifcond, element_type):
-         if not info:
-@@ -63,10 +64,11 @@ class QAPISchemaTestVisitor(QAPISchemaVisitor):
-         self._print_if(ifcond)
-         self._print_features(features)
-=20
--    def visit_alternate_type(self, name, info, ifcond, variants):
-+    def visit_alternate_type(self, name, info, ifcond, features, variants)=
-:
-         print('alternate %s' % name)
-         self._print_variants(variants)
-         self._print_if(ifcond)
-+        self._print_features(features)
-=20
-     def visit_command(self, name, info, ifcond, arg_type, ret_type, gen,
-                       success_response, boxed, allow_oob, allow_preconfig,
-@@ -79,10 +81,11 @@ class QAPISchemaTestVisitor(QAPISchemaVisitor):
-         self._print_if(ifcond)
-         self._print_features(features)
-=20
--    def visit_event(self, name, info, ifcond, arg_type, boxed):
-+    def visit_event(self, name, info, ifcond, features, arg_type, boxed):
-         print('event %s %s' % (name, arg_type and arg_type.name))
-         print('    boxed=3D%s' % boxed)
-         self._print_if(ifcond)
-+        self._print_features(features)
-=20
-     @staticmethod
-     def _print_variants(variants):
+     return g_test_run();
 --=20
 2.21.0
 
