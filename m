@@ -2,83 +2,89 @@ Return-Path: <SRS0=Jnn8=YR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 98147CA9EAF
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 11:52:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 66F19CA9EBB
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 11:53:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 660452054F
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 11:52:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 34F8121655
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 11:53:38 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ERy0pBmu"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 660452054F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="FkSqSfkp"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 34F8121655
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40314 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40344 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iNbf0-0002zU-VG
-	for qemu-devel@archiver.kernel.org; Thu, 24 Oct 2019 07:52:10 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39310)
+	id 1iNbgO-0007T9-SR
+	for qemu-devel@archiver.kernel.org; Thu, 24 Oct 2019 07:53:36 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53981)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgilbert@redhat.com>) id 1iNbHg-0002qy-E5
- for qemu-devel@nongnu.org; Thu, 24 Oct 2019 07:28:05 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1iNaGZ-0002CL-2L
+ for qemu-devel@nongnu.org; Thu, 24 Oct 2019 06:22:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgilbert@redhat.com>) id 1iNbHf-0008RU-2J
- for qemu-devel@nongnu.org; Thu, 24 Oct 2019 07:28:04 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:40234
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1iNbHe-0008RF-UQ
- for qemu-devel@nongnu.org; Thu, 24 Oct 2019 07:28:03 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1571916482;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=GbHh3qC6nN7/aLtZ1m8ayqe8KVnDr7FIj5gJzBi24vM=;
- b=ERy0pBmu/GgxhQxiw7NY+m+S/AmLH7FFZhSbAf6quFXKTt6T2xaBGvd1CH0wY07NTBOjSj
- bXK1qHhqSKB46pXFiZRxtpkGlRD07ZYumuhpIWwzuLY9jI/U1qnMrks67CrWFJn7TuZgzR
- Fjzg7IDaeyCj5X9cLS8EM6q2JNNnrps=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-32-T_nwPjz2OWidMkApyAXhjQ-1; Thu, 24 Oct 2019 07:27:59 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A457D1005512;
- Thu, 24 Oct 2019 11:27:57 +0000 (UTC)
-Received: from dgilbert-t580.localhost (ovpn-117-248.ams2.redhat.com
- [10.36.117.248])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 2E0674524;
- Thu, 24 Oct 2019 11:27:55 +0000 (UTC)
-From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-To: qemu-devel@nongnu.org, renzhen@linux.alibaba.com, eguan@linux.alibaba.com,
- ganesh.mahalingam@intel.com, m.mizuma@jp.fujitsu.com, mszeredi@redhat.com,
- misono.tomohiro@jp.fujitsu.com, tao.peng@linux.alibaba.com,
- piaojun@huawei.com, stefanha@redhat.com, vgoyal@redhat.com, mst@redhat.com,
- berrange@redhat.com
-Subject: [PATCH 09/25] virtiofsd: Pass write iov's all the way through
-Date: Thu, 24 Oct 2019 12:27:02 +0100
-Message-Id: <20191024112718.34657-10-dgilbert@redhat.com>
-In-Reply-To: <20191024112718.34657-1-dgilbert@redhat.com>
-References: <20191024112718.34657-1-dgilbert@redhat.com>
+ (envelope-from <alex.bennee@linaro.org>) id 1iNaGX-00046W-VW
+ for qemu-devel@nongnu.org; Thu, 24 Oct 2019 06:22:50 -0400
+Received: from mail-wr1-x436.google.com ([2a00:1450:4864:20::436]:39957)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1iNaGX-000467-PE
+ for qemu-devel@nongnu.org; Thu, 24 Oct 2019 06:22:49 -0400
+Received: by mail-wr1-x436.google.com with SMTP id o28so25415720wro.7
+ for <qemu-devel@nongnu.org>; Thu, 24 Oct 2019 03:22:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=Vc+nT+KPxCdxDvyWLTbHjSdRMwRfzVEoPYWOARbj278=;
+ b=FkSqSfkpevpI1wqK9zemfKDT2uqJPGv4Mceb1UjqvO0GHA98U4zPu2pAzNRV7d81L8
+ EAE38ZYb+icDlGiPM98fm8MCZwc1kg4vdHaaB1nR0HxyjFW3iFbCp2vVLSY2ci3qHkDJ
+ fnIRB1bLfM+S5457Da2uUkkYuc9Zu1WPHgObkMBXrTsKI5UCk+c09YPq/eixeEbuwZmE
+ G/6Wc49yE9JRBi6ePl1o73d4f3NVk11hj4JAZD3e7usZsU4O1GZLDc/V/SWuOj2FoTmI
+ 3IWopQjulRia1Rn9HAmlRG7pqnykyWU9lCOfv6T+U6LUEtIxXq+7tabcoTMk4hlXz1GO
+ 6vDg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=Vc+nT+KPxCdxDvyWLTbHjSdRMwRfzVEoPYWOARbj278=;
+ b=ih5XZgugI8o1KbEdi6Ajd9F0oH1uHucUUBd+coxrgq4ZMmKHBcCUaLP0tFK7tSrL0C
+ u7EhD83s9RBOHoHz6FsBd4Cj3zKi7zFliAP2NjkHzar8zX9kXfPnysUTgZ16UEcopEx1
+ +P4RzDXt7ehJ+8AhmfuMWpoLrJturx7Mtvr7mBy6FAtBkOB9NDGshG3q1wmNoyxWWiWS
+ JnfqHJFKGZhGeLUUmMKSWWOkB7+sHgmWkCJShGzM5fWkhoz146t1qPM9+sGqQTj/TGW8
+ SNCypBFrXs2LT8HfLLMEzZWjyVEj3e+38u3ViPYPOm8zBjt+Vz/KSpkYoYkP6x9S088E
+ mdlA==
+X-Gm-Message-State: APjAAAVOT6aFuS+rn7VfCNKbzpGJcWI0bmxAJxQkdNiRigLKv+WFoejo
+ nzBb4SMGLfxYcA1Ypx5mnhC8HQ==
+X-Google-Smtp-Source: APXvYqyyXgihKfQtTYzgoOjOJXlxigrT6rk8FLysYYp5FmuyjidjFJwKmlIXncTc/mX5Goz8W5Qlcw==
+X-Received: by 2002:adf:f90d:: with SMTP id b13mr3036440wrr.316.1571912568619; 
+ Thu, 24 Oct 2019 03:22:48 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id r5sm8010904wrs.57.2019.10.24.03.22.42
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 24 Oct 2019 03:22:45 -0700 (PDT)
+Received: from zen.lan (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 0EBA11FF98;
+ Thu, 24 Oct 2019 11:22:41 +0100 (BST)
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: qemu-devel@nongnu.org
+Subject: [PATCH  v2 08/17] travis.yml: bump Xcode 10 to latest dot release
+Date: Thu, 24 Oct 2019 11:22:31 +0100
+Message-Id: <20191024102240.2778-9-alex.bennee@linaro.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20191024102240.2778-1-alex.bennee@linaro.org>
+References: <20191024102240.2778-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-MC-Unique: T_nwPjz2OWidMkApyAXhjQ-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 205.139.110.61
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::436
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,121 +96,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: fam@euphon.net, berrange@redhat.com, stefanb@linux.vnet.ibm.com,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ richard.henderson@linaro.org, f4bug@amsat.org,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>, cota@braap.org,
+ stefanha@redhat.com, marcandre.lureau@redhat.com, pbonzini@redhat.com,
+ aurelien@aurel32.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+According to:
 
-Pass the write iov pointing to guest RAM all the way through rather
-than copying the data.
+  https://docs.travis-ci.com/user/reference/osx/#macos-version
 
-Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+we have 10.3 available so lets use it. I don't know what Apple's
+deprecation policy is for Xcode because it requires an AppleID to find
+out.
+
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 ---
- contrib/virtiofsd/fuse_virtio.c | 73 ++++++++++++++++++++++++++++++---
- 1 file changed, 67 insertions(+), 6 deletions(-)
+ .travis.yml | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/contrib/virtiofsd/fuse_virtio.c b/contrib/virtiofsd/fuse_virti=
-o.c
-index 68036e2171..98f77d338d 100644
---- a/contrib/virtiofsd/fuse_virtio.c
-+++ b/contrib/virtiofsd/fuse_virtio.c
-@@ -452,6 +452,10 @@ static void *fv_queue_thread(void *opaque)
-                  __func__, qi->qidx, (size_t)evalue, in_bytes, out_bytes);
-=20
-         while (1) {
-+            bool allocated_bufv =3D false;
-+            struct fuse_bufvec bufv;
-+            struct fuse_bufvec *pbufv;
-+
-             /*
-              * An element contains one request and the space to send our
-              * response They're spread over multiple descriptors in a
-@@ -493,14 +497,71 @@ static void *fv_queue_thread(void *opaque)
-                          __func__, elem->index);
-                 assert(0); /* TODO */
-             }
--            copy_from_iov(&fbuf, out_num, out_sg);
--            fbuf.size =3D out_len;
-+            /* Copy just the first element and look at it */
-+            copy_from_iov(&fbuf, 1, out_sg);
-+
-+            if (out_num > 2 &&
-+                out_sg[0].iov_len =3D=3D sizeof(struct fuse_in_header) &&
-+                ((struct fuse_in_header *)fbuf.mem)->opcode =3D=3D FUSE_WR=
-ITE &&
-+                out_sg[1].iov_len =3D=3D sizeof(struct fuse_write_in)) {
-+                /*
-+                 * For a write we don't actually need to copy the
-+                 * data, we can just do it straight out of guest memory
-+                 * but we must sitll copy the headers in case the guest
-+                 * was nasty and changed them while we were using them.
-+                 */
-+                if (se->debug) {
-+                    fprintf(stderr, "%s: Write special case\n", __func__);
-+                }
-+
-+                /* copy the fuse_write_in header after the fuse_in_header =
-*/
-+                fbuf.mem +=3D out_sg->iov_len;
-+                copy_from_iov(&fbuf, 1, out_sg + 1);
-+                fbuf.mem -=3D out_sg->iov_len;
-+                fbuf.size =3D out_sg[0].iov_len + out_sg[1].iov_len;
-+
-+                /* Allocate the bufv, with space for the rest of the iov *=
-/
-+                allocated_bufv =3D true;
-+                pbufv =3D malloc(sizeof(struct fuse_bufvec) +
-+                               sizeof(struct fuse_buf) * (out_num - 2));
-+
-+                pbufv->count =3D 1;
-+                pbufv->buf[0] =3D fbuf;
-+
-+                size_t iovindex, pbufvindex;
-+                iovindex =3D 2; /* 2 headers, separate iovs */
-+                pbufvindex =3D 1; /* 2 headers, 1 fusebuf */
-+
-+                for (; iovindex < out_num; iovindex++, pbufvindex++) {
-+                    pbufv->count++;
-+                    pbufv->buf[pbufvindex].pos =3D ~0; /* Dummy */
-+                    pbufv->buf[pbufvindex].flags =3D 0;
-+                    pbufv->buf[pbufvindex].mem =3D out_sg[iovindex].iov_ba=
-se;
-+                    pbufv->buf[pbufvindex].size =3D out_sg[iovindex].iov_l=
-en;
-+                }
-+            } else {
-+                /* Normal (non fast write) path */
-+
-+                /* Copy the rest of the buffer */
-+                fbuf.mem +=3D out_sg->iov_len;
-+                copy_from_iov(&fbuf, out_num - 1, out_sg + 1);
-+                fbuf.mem -=3D out_sg->iov_len;
-+                fbuf.size =3D out_len;
-=20
--            /* TODO! Endianness of header */
-+                /* TODO! Endianness of header */
-=20
--            /* TODO: Add checks for fuse_session_exited */
--            struct fuse_bufvec bufv =3D { .buf[0] =3D fbuf, .count =3D 1 }=
-;
--            fuse_session_process_buf_int(se, &bufv, &ch);
-+                /* TODO: Add checks for fuse_session_exited */
-+                bufv.buf[0] =3D fbuf;
-+                bufv.count =3D 1;
-+                pbufv =3D &bufv;
-+            }
-+            pbufv->idx =3D 0;
-+            pbufv->off =3D 0;
-+            fuse_session_process_buf_int(se, pbufv, &ch);
-+
-+            if (allocated_bufv) {
-+                free(pbufv);
-+            }
-=20
-             if (!qi->reply_sent) {
-                 fuse_log(FUSE_LOG_DEBUG, "%s: elem %d no reply sent\n",
---=20
-2.23.0
+diff --git a/.travis.yml b/.travis.yml
+index f2b679fe701..da6a2063fca 100644
+--- a/.travis.yml
++++ b/.travis.yml
+@@ -247,7 +247,7 @@ matrix:
+     - env:
+         - CONFIG="--target-list=i386-softmmu,ppc-softmmu,ppc64-softmmu,m68k-softmmu,x86_64-softmmu"
+       os: osx
+-      osx_image: xcode10.2
++      osx_image: xcode10.3
+       compiler: clang
+ 
+ 
+-- 
+2.20.1
 
 
