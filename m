@@ -7,71 +7,70 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4E6A8CA9EAF
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 09:39:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C9CD8CA9EAF
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 09:40:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 074F220684
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 09:39:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 85FCC20684
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 09:40:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="lqqpJ81d"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 074F220684
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="AS3kPjkg"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 85FCC20684
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36822 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36842 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iNZaI-0008BL-Lj
-	for qemu-devel@archiver.kernel.org; Thu, 24 Oct 2019 05:39:10 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44023)
+	id 1iNZbg-0002N0-A9
+	for qemu-devel@archiver.kernel.org; Thu, 24 Oct 2019 05:40:36 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44312)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jag.raman@oracle.com>) id 1iNZ9b-0008Nt-Pi
- for qemu-devel@nongnu.org; Thu, 24 Oct 2019 05:11:38 -0400
+ (envelope-from <jag.raman@oracle.com>) id 1iNZAG-0001Si-5d
+ for qemu-devel@nongnu.org; Thu, 24 Oct 2019 05:12:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jag.raman@oracle.com>) id 1iNZ9Z-0004k4-05
- for qemu-devel@nongnu.org; Thu, 24 Oct 2019 05:11:35 -0400
-Received: from userp2120.oracle.com ([156.151.31.85]:33178)
+ (envelope-from <jag.raman@oracle.com>) id 1iNZAE-0005BE-2q
+ for qemu-devel@nongnu.org; Thu, 24 Oct 2019 05:12:16 -0400
+Received: from userp2120.oracle.com ([156.151.31.85]:33846)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <jag.raman@oracle.com>)
- id 1iNZ9Y-0004jK-M1
- for qemu-devel@nongnu.org; Thu, 24 Oct 2019 05:11:32 -0400
+ id 1iNZAD-0005Ag-QD
+ for qemu-devel@nongnu.org; Thu, 24 Oct 2019 05:12:14 -0400
 Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
- by userp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x9O94c9X095089;
- Thu, 24 Oct 2019 09:11:27 GMT
+ by userp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x9O94Md7094848;
+ Thu, 24 Oct 2019 09:12:07 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
  h=from : to : cc :
  subject : date : message-id : in-reply-to : references : in-reply-to :
  references; s=corp-2019-08-05;
- bh=XK7s+/O+U8roh3eX64pnG1HxKvK+OEYT+3URSvPIhsE=;
- b=lqqpJ81dRYU4lUzOnKiq1oRS0Odvr8gvJR72dwEHzjUkXcqGkMNZ+vhmqsQcZobxb5r5
- sNpgjzv/OpownSwE7djnJHCBc9rHn3VPa2EJ11Jrt2cnFkgFjdQK3ILMFymOLSNJ3i+q
- iiMYAgolN0BwvDClW4K2ehSokFuYcXrkwOXown2hLLNDXXR7ZxybZ7Z1BO2lgBN4vmqX
- s1J/fYubcdQrguCOtw6vyY16ATkplMIuV8wbIdh4ce/5+ygTTo+ajJJ3a3jbpLeqiWI7
- DygMSRFmc5SWZQRu/QXkwa3aJY5UF72HL8HZQ4CzLJPpAIMLccG2EIrzMjcRKhkzzpOZ Iw== 
-Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
- by userp2120.oracle.com with ESMTP id 2vqu4r24ry-1
+ bh=F/E41FhsIR2e21OD7DpZqakoxt8Wz7+Qliiw0Bdlxt4=;
+ b=AS3kPjkgooLHwUyNncGazR/qm0hKD+BlEiL/1IN5RKzdPOeusv4yXrnp+UvdoRgoFHUx
+ G3ZBGPDO+2U8jA+AznlEByFQFSTrn2zWF0TgTb2UhM3ullmfg018hg47zE9d5jIGzsMP
+ 4v1DP/rK4axJzJ4BYicZduWNIOPvKUlIAewThWgiVbfIJgVRtAYOKkiyXAfiPmRzddiR
+ VbGxwgD2YAqjB+Xe8L8BAbREfKrya9CsY+YdcMjE5WYWn1WLB3UX2+llp9cLCpvYwi66
+ EH5WNURHtqEVlRGHgfOXWKzGdiexFMTBeEumR1Q5gF5ff8oU1z5x+x4oSW/rLfr6+b27 YA== 
+Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
+ by userp2120.oracle.com with ESMTP id 2vqu4r24ue-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Thu, 24 Oct 2019 09:11:27 +0000
-Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
- by userp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x9O98mrj076119;
- Thu, 24 Oct 2019 09:11:27 GMT
-Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
- by userp3030.oracle.com with ESMTP id 2vtjkj2yyu-1
+ Thu, 24 Oct 2019 09:12:07 +0000
+Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
+ by userp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x9O97j18170537;
+ Thu, 24 Oct 2019 09:10:06 GMT
+Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
+ by userp3020.oracle.com with ESMTP id 2vtsk4857y-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Thu, 24 Oct 2019 09:11:27 +0000
+ Thu, 24 Oct 2019 09:10:06 +0000
 Received: from abhmp0008.oracle.com (abhmp0008.oracle.com [141.146.116.14])
- by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id x9O9BPHO002581;
- Thu, 24 Oct 2019 09:11:25 GMT
+ by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id x9O9A4Jk008991;
+ Thu, 24 Oct 2019 09:10:04 GMT
 Received: from jaraman-bur-1.us.oracle.com (/10.152.33.39)
  by default (Oracle Beehive Gateway v4.0)
- with ESMTP ; Thu, 24 Oct 2019 02:11:25 -0700
+ with ESMTP ; Thu, 24 Oct 2019 02:10:04 -0700
 From: Jagannathan Raman <jag.raman@oracle.com>
 To: qemu-devel@nongnu.org
-Subject: [RFC v4 PATCH 36/49] multi-process/mon: enable QMP module support in
- the remote process
-Date: Thu, 24 Oct 2019 05:09:17 -0400
-Message-Id: <bb38f7b4d7573c3ffc639170c348a8def35a6295.1571905346.git.jag.raman@oracle.com>
+Subject: [RFC v4 PATCH 07/49] multi-process: define mpqemu-link object
+Date: Thu, 24 Oct 2019 05:08:48 -0400
+Message-Id: <b0bc2a517b0a41eb138ed4127aebe8a3952daec6.1571905346.git.jag.raman@oracle.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <cover.1571905346.git.jag.raman@oracle.com>
 References: <cover.1571905346.git.jag.raman@oracle.com>
@@ -116,610 +115,515 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Build system changes to enable QMP module in the remote process
+Defines mpqemu-link object which forms the communication link between
+QEMU & emulation program.
+Adds functions to configure members of mpqemu-link object instance.
+Adds functions to send and receive messages over the communication
+channel.
+Adds GMainLoop to handle events received on the communication channel.
 
-Signed-off-by: Elena Ufimtseva <elena.ufimtseva@oracle.com>
-Signed-off-by: John G Johnson <john.g.johnson@oracle.com>
 Signed-off-by: Jagannathan Raman <jag.raman@oracle.com>
+Signed-off-by: John G Johnson <john.g.johnson@oracle.com>
+Signed-off-by: Elena Ufimtseva <elena.ufimtseva@oracle.com>
 ---
- New patch in v3
+ v1 -> v2:
+   - Use default context for main loop instead of a new context
 
- Makefile.objs              |  9 +++++
- Makefile.target            | 34 +++++++++++++++++--
- hmp-commands.hx            |  5 +--
- hw/core/Makefile.objs      |  1 +
- monitor/Makefile.objs      |  3 ++
- monitor/misc.c             | 84 +++++++++++++++++++++++++---------------------
- monitor/monitor-internal.h | 38 +++++++++++++++++++++
- qapi/Makefile.objs         |  2 ++
- qom/Makefile.objs          |  1 +
- ui/Makefile.objs           |  2 ++
- 10 files changed, 137 insertions(+), 42 deletions(-)
+ v2 -> v3:
+   - Enabled multi-channel support in the communication link
 
-diff --git a/Makefile.objs b/Makefile.objs
-index c23ccaa..c72db88 100644
---- a/Makefile.objs
-+++ b/Makefile.objs
-@@ -30,6 +30,7 @@ remote-pci-obj-$(CONFIG_MPQEMU) += backends/
- remote-pci-obj-$(CONFIG_MPQEMU) += block/
- remote-pci-obj-$(CONFIG_MPQEMU) += migration/
- remote-pci-obj-$(CONFIG_MPQEMU) += remote/
-+remote-pci-obj-$(CONFIG_MPQEMU) += monitor/
- 
- remote-pci-obj-$(CONFIG_MPQEMU) += cpus-common.o
- remote-pci-obj-$(CONFIG_MPQEMU) += dma-helpers.o
-@@ -42,6 +43,9 @@ remote-pci-obj-$(CONFIG_MPQEMU) += iothread.o
- # remote-lsi-obj-y is code used to implement remote LSI device
- 
- remote-lsi-obj-$(CONFIG_MPQEMU) += hw/
-+remote-lsi-obj-$(CONFIG_MPQEMU) += ui/
+ v3 -> v4:
+  - Change the name of proxy-link to mpqemu-link
+  - Use separate locks for sending and receiving messages
+
+ include/io/mpqemu-link.h | 150 +++++++++++++++++++++++
+ io/Makefile.objs         |   2 +
+ io/mpqemu-link.c         | 309 +++++++++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 461 insertions(+)
+ create mode 100644 include/io/mpqemu-link.h
+ create mode 100644 io/mpqemu-link.c
+
+diff --git a/include/io/mpqemu-link.h b/include/io/mpqemu-link.h
+new file mode 100644
+index 0000000..345c67e
+--- /dev/null
++++ b/include/io/mpqemu-link.h
+@@ -0,0 +1,150 @@
++/*
++ * Communication channel between QEMU and remote device process
++ *
++ * Copyright 2019, Oracle and/or its affiliates.
++ *
++ * Permission is hereby granted, free of charge, to any person obtaining a copy
++ * of this software and associated documentation files (the "Software"), to deal
++ * in the Software without restriction, including without limitation the rights
++ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
++ * copies of the Software, and to permit persons to whom the Software is
++ * furnished to do so, subject to the following conditions:
++ *
++ * The above copyright notice and this permission notice shall be included in
++ * all copies or substantial portions of the Software.
++ *
++ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
++ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
++ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
++ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
++ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
++ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
++ * THE SOFTWARE.
++ */
 +
-+remote-lsi-obj-$(CONFIG_MPQEMU) += device-hotplug.o
- 
- #######################################################################
- # crypto-obj-y is code used by both qemu system emulation and qemu-img
-@@ -112,6 +116,11 @@ common-obj-y += vl-parse.o
- common-obj-y += qapi/
- endif
- 
-+remote-pci-obj-$(CONFIG_MPQEMU) += qapi/
-+remote-pci-obj-$(CONFIG_MPQEMU) += blockdev-nbd.o
-+remote-pci-obj-$(CONFIG_MPQEMU) += job-qmp.o
-+remote-pci-obj-$(CONFIG_MPQEMU) += balloon.o
++#ifndef MPQEMU_LINK_H
++#define MPQEMU_LINK_H
 +
- #######################################################################
- # Target-independent parts used in system and user emulation
- common-obj-y += cpus-common.o
-diff --git a/Makefile.target b/Makefile.target
-index 0ca40f1..8010998 100644
---- a/Makefile.target
-+++ b/Makefile.target
-@@ -132,13 +132,31 @@ remote-pci-tgt-obj-$(CONFIG_MPQEMU) += accel/stubs/hax-stub.o
- remote-pci-tgt-obj-$(CONFIG_MPQEMU) += accel/stubs/whpx-stub.o
- remote-pci-tgt-obj-$(CONFIG_MPQEMU) += stubs/vl-stub.o
- remote-pci-tgt-obj-$(CONFIG_MPQEMU) += stubs/net-stub.o
--remote-pci-tgt-obj-$(CONFIG_MPQEMU) += stubs/monitor.o
- remote-pci-tgt-obj-$(CONFIG_MPQEMU) += stubs/replay.o
- remote-pci-tgt-obj-$(CONFIG_MPQEMU) += stubs/xen-mapcache.o
- remote-pci-tgt-obj-$(CONFIG_MPQEMU) += stubs/audio.o
- remote-pci-tgt-obj-$(CONFIG_MPQEMU) += stubs/monitor.o
-+remote-pci-tgt-obj-$(CONFIG_MPQEMU) += stubs/migration.o
-+remote-pci-tgt-obj-$(CONFIG_MPQEMU) += stubs/ui-stub.o
-+remote-pci-tgt-obj-$(CONFIG_MPQEMU) += stubs/gdbstub.o
-+remote-pci-tgt-obj-$(CONFIG_MPQEMU) += stubs/qapi-target.o
-+remote-pci-tgt-obj-$(CONFIG_MPQEMU) += stubs/qapi-misc.o
- 
- remote-pci-tgt-obj-$(CONFIG_MPQEMU) += remote/memory.o
-+remote-pci-tgt-obj-$(CONFIG_MPQEMU) += arch_init.o
-+remote-pci-tgt-obj-$(CONFIG_MPQEMU) += monitor/misc.o
++#include "qemu/osdep.h"
++#include "qemu-common.h"
 +
-+remote-pci-tgt-obj-$(CONFIG_MPQEMU) += qapi/qapi-introspect.o
-+remote-pci-tgt-obj-$(CONFIG_MPQEMU) += qapi/qapi-commands-block-core.o
-+remote-pci-tgt-obj-$(CONFIG_MPQEMU) += qapi/qapi-commands-block.o
-+remote-pci-tgt-obj-$(CONFIG_MPQEMU) += qapi/qapi-commands-misc.o
-+remote-pci-tgt-obj-$(CONFIG_MPQEMU) += qapi/qapi-commands.o
-+remote-pci-tgt-obj-$(CONFIG_MPQEMU) += qapi/qapi-commands-machine-target.o
-+remote-pci-tgt-obj-$(CONFIG_MPQEMU) += qapi/qapi-commands-misc-target.o
-+remote-pci-tgt-obj-$(CONFIG_MPQEMU) += qapi/qapi-visit-machine-target.o
-+remote-pci-tgt-obj-$(CONFIG_MPQEMU) += qapi/qapi-visit-misc-target.o
-+remote-pci-tgt-obj-$(CONFIG_MPQEMU) += qapi/qapi-types-machine-target.o
-+remote-pci-tgt-obj-$(CONFIG_MPQEMU) += qapi/qapi-types-misc-target.o
- 
- #########################################################
- # Linux user emulator target
-@@ -191,6 +209,10 @@ endif
- generated-files-y += hmp-commands.h hmp-commands-info.h
- generated-files-y += config-devices.h
- 
-+ifdef CONFIG_MPQEMU
-+generated-files-y += hmp-scsi-commands.h hmp-scsi-commands-info.h
-+endif
++#include <stddef.h>
++#include <stdint.h>
++#include <pthread.h>
 +
- endif # CONFIG_SOFTMMU
- 
- dummy := $(call unnest-vars,,obj-y)
-@@ -275,10 +297,18 @@ hmp-commands.h: $(SRC_PATH)/hmp-commands.hx $(SRC_PATH)/scripts/hxtool
- hmp-commands-info.h: $(SRC_PATH)/hmp-commands-info.hx $(SRC_PATH)/scripts/hxtool
- 	$(call quiet-command,sh $(SRC_PATH)/scripts/hxtool -h < $< > $@,"GEN","$(TARGET_DIR)$@")
- 
-+ifdef CONFIG_MPQEMU
-+hmp-scsi-commands.h: $(SRC_PATH)/hmp-commands.hx $(SRC_PATH)/scripts/hxtool
-+	$(call quiet-command,sh $(SRC_PATH)/scripts/hxtool -tgt scsi < $< > $@)
++#include "qom/object.h"
++#include "qemu/thread.h"
 +
-+hmp-scsi-commands-info.h: $(SRC_PATH)/hmp-commands-info.hx $(SRC_PATH)/scripts/hxtool
-+	$(call quiet-command,sh $(SRC_PATH)/scripts/hxtool -tgt scsi < $< > $@)
-+endif
++#define TYPE_MPQEMU_LINK "mpqemu-link"
++#define MPQEMU_LINK(obj) \
++    OBJECT_CHECK(MPQemuLinkState, (obj), TYPE_MPQEMU_LINK)
 +
- clean: clean-target
- 	rm -f *.a *~ $(PROGS)
- 	rm -f $(shell find . -name '*.[od]')
--	rm -f hmp-commands.h gdbstub-xml.c
-+	rm -f hmp-commands.h gdbstub-xml.c hmp-scsi-commands.h hmp-scsi-commands-info.h
- 	rm -f trace/generated-helpers.c trace/generated-helpers.c-timestamp
- ifdef CONFIG_TRACE_SYSTEMTAP
- 	rm -f *.stp
-diff --git a/hmp-commands.hx b/hmp-commands.hx
-index 6d9674b..534f272 100644
---- a/hmp-commands.hx
-+++ b/hmp-commands.hx
-@@ -14,7 +14,8 @@ ETEXI
-         .args_type  = "name:S?",
-         .params     = "[cmd]",
-         .help       = "show the help",
--        .cmd        = do_help_cmd,
-+        .cmd        = hmp_do_help_cmd,
-+        .targets    = "scsi",
-         .flags      = "p",
-     },
- 
-@@ -618,7 +619,7 @@ ETEXI
-         .args_type  = "fmt:/,val:l",
-         .params     = "/fmt expr",
-         .help       = "print expression value (use $reg for CPU register access)",
--        .cmd        = do_print,
-+        .cmd        = hmp_do_print,
-     },
- 
- STEXI
-diff --git a/hw/core/Makefile.objs b/hw/core/Makefile.objs
-index 9ef6b42..721bc5f 100644
---- a/hw/core/Makefile.objs
-+++ b/hw/core/Makefile.objs
-@@ -44,3 +44,4 @@ remote-pci-obj-$(CONFIG_MPQEMU) += qdev-properties-system.o
- remote-pci-obj-$(CONFIG_MPQEMU) += qdev-fw.o
- remote-pci-obj-$(CONFIG_MPQEMU) += numa.o
- remote-pci-obj-$(CONFIG_MPQEMU) += cpu.o
-+remote-pci-obj-$(CONFIG_MPQEMU) += machine-qmp-cmds.o
-diff --git a/monitor/Makefile.objs b/monitor/Makefile.objs
-index e91a858..11c42ec 100644
---- a/monitor/Makefile.objs
-+++ b/monitor/Makefile.objs
-@@ -1,3 +1,6 @@
- obj-y += misc.o
- common-obj-y += monitor.o qmp.o hmp.o
- common-obj-y += qmp-cmds.o hmp-cmds.o
++#define REMOTE_MAX_FDS 8
 +
-+remote-pci-obj-$(CONFIG_MPQEMU) += monitor.o qmp.o hmp.o
-+remote-pci-obj-$(CONFIG_MPQEMU) += qmp-cmds.o hmp-cmds.o
-diff --git a/monitor/misc.c b/monitor/misc.c
-index aef16f6..400ba06 100644
---- a/monitor/misc.c
-+++ b/monitor/misc.c
-@@ -176,12 +176,12 @@ int hmp_compare_cmd(const char *name, const char *list)
-     return 0;
- }
- 
--static void do_help_cmd(Monitor *mon, const QDict *qdict)
-+void hmp_do_help_cmd(Monitor *mon, const QDict *qdict)
- {
-     help_cmd(mon, qdict_get_try_str(qdict, "name"));
- }
- 
--static void hmp_trace_event(Monitor *mon, const QDict *qdict)
-+void hmp_trace_event(Monitor *mon, const QDict *qdict)
- {
-     const char *tp_name = qdict_get_str(qdict, "name");
-     bool new_state = qdict_get_bool(qdict, "option");
-@@ -225,7 +225,7 @@ static void hmp_trace_file(Monitor *mon, const QDict *qdict)
- }
- #endif
- 
--static void hmp_info_help(Monitor *mon, const QDict *qdict)
-+void hmp_info_help(Monitor *mon, const QDict *qdict)
- {
-     help_cmd(mon, "info");
- }
-@@ -436,7 +436,7 @@ int monitor_get_cpu_index(void)
-     return cs ? cs->cpu_index : UNASSIGNED_CPU_INDEX;
- }
- 
--static void hmp_info_registers(Monitor *mon, const QDict *qdict)
-+void hmp_info_registers(Monitor *mon, const QDict *qdict)
- {
-     bool all_cpus = qdict_get_try_bool(qdict, "cpustate_all", false);
-     CPUState *cs;
-@@ -459,7 +459,7 @@ static void hmp_info_registers(Monitor *mon, const QDict *qdict)
- }
- 
- #ifdef CONFIG_TCG
--static void hmp_info_jit(Monitor *mon, const QDict *qdict)
-+void hmp_info_jit(Monitor *mon, const QDict *qdict)
- {
-     if (!tcg_enabled()) {
-         error_report("JIT information is only available with accel=tcg");
-@@ -470,13 +470,13 @@ static void hmp_info_jit(Monitor *mon, const QDict *qdict)
-     dump_drift_info();
- }
- 
--static void hmp_info_opcount(Monitor *mon, const QDict *qdict)
-+void hmp_info_opcount(Monitor *mon, const QDict *qdict)
- {
-     dump_opcount_info();
- }
- #endif
- 
--static void hmp_info_sync_profile(Monitor *mon, const QDict *qdict)
-+void hmp_info_sync_profile(Monitor *mon, const QDict *qdict)
- {
-     int64_t max = qdict_get_try_int(qdict, "max", 10);
-     bool mean = qdict_get_try_bool(qdict, "mean", false);
-@@ -487,7 +487,7 @@ static void hmp_info_sync_profile(Monitor *mon, const QDict *qdict)
-     qsp_report(max, sort_by, coalesce);
- }
- 
--static void hmp_info_history(Monitor *mon, const QDict *qdict)
-+void hmp_info_history(Monitor *mon, const QDict *qdict)
- {
-     MonitorHMP *hmp_mon = container_of(mon, MonitorHMP, common);
-     int i;
-@@ -507,7 +507,7 @@ static void hmp_info_history(Monitor *mon, const QDict *qdict)
-     }
- }
- 
--static void hmp_info_cpustats(Monitor *mon, const QDict *qdict)
-+void hmp_info_cpustats(Monitor *mon, const QDict *qdict)
- {
-     CPUState *cs = mon_get_cpu();
- 
-@@ -518,7 +518,7 @@ static void hmp_info_cpustats(Monitor *mon, const QDict *qdict)
-     cpu_dump_statistics(cs, 0);
- }
- 
--static void hmp_info_trace_events(Monitor *mon, const QDict *qdict)
-+void hmp_info_trace_events(Monitor *mon, const QDict *qdict)
- {
-     const char *name = qdict_get_try_str(qdict, "name");
-     bool has_vcpu = qdict_haskey(qdict, "vcpu");
-@@ -578,7 +578,7 @@ void qmp_client_migrate_info(const char *protocol, const char *hostname,
-     error_setg(errp, QERR_INVALID_PARAMETER_VALUE, "protocol", "spice");
- }
- 
--static void hmp_logfile(Monitor *mon, const QDict *qdict)
-+void hmp_logfile(Monitor *mon, const QDict *qdict)
- {
-     Error *err = NULL;
- 
-@@ -588,7 +588,7 @@ static void hmp_logfile(Monitor *mon, const QDict *qdict)
-     }
- }
- 
--static void hmp_log(Monitor *mon, const QDict *qdict)
-+void hmp_log(Monitor *mon, const QDict *qdict)
- {
-     int mask;
-     const char *items = qdict_get_str(qdict, "items");
-@@ -605,7 +605,7 @@ static void hmp_log(Monitor *mon, const QDict *qdict)
-     qemu_set_log(mask);
- }
- 
--static void hmp_singlestep(Monitor *mon, const QDict *qdict)
-+void hmp_singlestep(Monitor *mon, const QDict *qdict)
- {
-     const char *option = qdict_get_try_str(qdict, "option");
-     if (!option || !strcmp(option, "on")) {
-@@ -617,7 +617,7 @@ static void hmp_singlestep(Monitor *mon, const QDict *qdict)
-     }
- }
- 
--static void hmp_gdbserver(Monitor *mon, const QDict *qdict)
-+void hmp_gdbserver(Monitor *mon, const QDict *qdict)
- {
-     const char *device = qdict_get_try_str(qdict, "device");
-     if (!device)
-@@ -633,7 +633,7 @@ static void hmp_gdbserver(Monitor *mon, const QDict *qdict)
-     }
- }
- 
--static void hmp_watchdog_action(Monitor *mon, const QDict *qdict)
-+void hmp_watchdog_action(Monitor *mon, const QDict *qdict)
- {
-     const char *action = qdict_get_str(qdict, "action");
-     if (select_watchdog_action(action) == -1) {
-@@ -775,7 +775,7 @@ static void memory_dump(Monitor *mon, int count, int format, int wsize,
-     }
- }
- 
--static void hmp_memory_dump(Monitor *mon, const QDict *qdict)
-+void hmp_memory_dump(Monitor *mon, const QDict *qdict)
- {
-     int count = qdict_get_int(qdict, "count");
-     int format = qdict_get_int(qdict, "format");
-@@ -785,7 +785,7 @@ static void hmp_memory_dump(Monitor *mon, const QDict *qdict)
-     memory_dump(mon, count, format, size, addr, 0);
- }
- 
--static void hmp_physical_memory_dump(Monitor *mon, const QDict *qdict)
-+void hmp_physical_memory_dump(Monitor *mon, const QDict *qdict)
- {
-     int count = qdict_get_int(qdict, "count");
-     int format = qdict_get_int(qdict, "format");
-@@ -815,7 +815,7 @@ static void *gpa2hva(MemoryRegion **p_mr, hwaddr addr, Error **errp)
-     return qemu_map_ram_ptr(mrs.mr->ram_block, mrs.offset_within_region);
- }
- 
--static void hmp_gpa2hva(Monitor *mon, const QDict *qdict)
-+void hmp_gpa2hva(Monitor *mon, const QDict *qdict)
- {
-     hwaddr addr = qdict_get_int(qdict, "addr");
-     Error *local_err = NULL;
-@@ -835,7 +835,7 @@ static void hmp_gpa2hva(Monitor *mon, const QDict *qdict)
-     memory_region_unref(mr);
- }
- 
--static void hmp_gva2gpa(Monitor *mon, const QDict *qdict)
-+void hmp_gva2gpa(Monitor *mon, const QDict *qdict)
- {
-     target_ulong addr = qdict_get_int(qdict, "addr");
-     MemTxAttrs attrs;
-@@ -890,7 +890,7 @@ out:
-     return ret;
- }
- 
--static void hmp_gpa2hpa(Monitor *mon, const QDict *qdict)
-+void hmp_gpa2hpa(Monitor *mon, const QDict *qdict)
- {
-     hwaddr addr = qdict_get_int(qdict, "addr");
-     Error *local_err = NULL;
-@@ -917,7 +917,7 @@ static void hmp_gpa2hpa(Monitor *mon, const QDict *qdict)
- }
- #endif
- 
--static void do_print(Monitor *mon, const QDict *qdict)
-+void hmp_do_print(Monitor *mon, const QDict *qdict)
- {
-     int format = qdict_get_int(qdict, "format");
-     hwaddr val = qdict_get_int(qdict, "val");
-@@ -943,7 +943,7 @@ static void do_print(Monitor *mon, const QDict *qdict)
-     monitor_printf(mon, "\n");
- }
- 
--static void hmp_sum(Monitor *mon, const QDict *qdict)
-+void hmp_sum(Monitor *mon, const QDict *qdict)
- {
-     uint32_t addr;
-     uint16_t sum;
-@@ -963,7 +963,7 @@ static void hmp_sum(Monitor *mon, const QDict *qdict)
- 
- static int mouse_button_state;
- 
--static void hmp_mouse_move(Monitor *mon, const QDict *qdict)
-+void hmp_mouse_move(Monitor *mon, const QDict *qdict)
- {
-     int dx, dy, dz, button;
-     const char *dx_str = qdict_get_str(qdict, "dx_str");
-@@ -987,7 +987,7 @@ static void hmp_mouse_move(Monitor *mon, const QDict *qdict)
-     qemu_input_event_sync();
- }
- 
--static void hmp_mouse_button(Monitor *mon, const QDict *qdict)
-+void hmp_mouse_button(Monitor *mon, const QDict *qdict)
- {
-     static uint32_t bmap[INPUT_BUTTON__MAX] = {
-         [INPUT_BUTTON_LEFT]       = MOUSE_EVENT_LBUTTON,
-@@ -1004,7 +1004,7 @@ static void hmp_mouse_button(Monitor *mon, const QDict *qdict)
-     mouse_button_state = button_state;
- }
- 
--static void hmp_ioport_read(Monitor *mon, const QDict *qdict)
-+void hmp_ioport_read(Monitor *mon, const QDict *qdict)
- {
-     int size = qdict_get_int(qdict, "size");
-     int addr = qdict_get_int(qdict, "addr");
-@@ -1038,7 +1038,7 @@ static void hmp_ioport_read(Monitor *mon, const QDict *qdict)
-                    suffix, addr, size * 2, val);
- }
- 
--static void hmp_ioport_write(Monitor *mon, const QDict *qdict)
-+void hmp_ioport_write(Monitor *mon, const QDict *qdict)
- {
-     int size = qdict_get_int(qdict, "size");
-     int addr = qdict_get_int(qdict, "addr");
-@@ -1060,7 +1060,7 @@ static void hmp_ioport_write(Monitor *mon, const QDict *qdict)
-     }
- }
- 
--static void hmp_boot_set(Monitor *mon, const QDict *qdict)
-+void hmp_boot_set(Monitor *mon, const QDict *qdict)
- {
-     Error *local_err = NULL;
-     const char *bootdevice = qdict_get_str(qdict, "bootdevice");
-@@ -1073,7 +1073,7 @@ static void hmp_boot_set(Monitor *mon, const QDict *qdict)
-     }
- }
- 
--static void hmp_info_mtree(Monitor *mon, const QDict *qdict)
-+void hmp_info_mtree(Monitor *mon, const QDict *qdict)
- {
-     bool flatview = qdict_get_try_bool(qdict, "flatview", false);
-     bool dispatch_tree = qdict_get_try_bool(qdict, "dispatch_tree", false);
-@@ -1086,7 +1086,7 @@ static void hmp_info_mtree(Monitor *mon, const QDict *qdict)
- 
- int64_t dev_time;
- 
--static void hmp_info_profile(Monitor *mon, const QDict *qdict)
-+void hmp_info_profile(Monitor *mon, const QDict *qdict)
- {
-     static int64_t last_cpu_exec_time;
-     int64_t cpu_exec_time;
-@@ -1103,7 +1103,7 @@ static void hmp_info_profile(Monitor *mon, const QDict *qdict)
-     dev_time = 0;
- }
- #else
--static void hmp_info_profile(Monitor *mon, const QDict *qdict)
-+void hmp_info_profile(Monitor *mon, const QDict *qdict)
- {
-     monitor_printf(mon, "Internal profiler not compiled\n");
- }
-@@ -1112,7 +1112,7 @@ static void hmp_info_profile(Monitor *mon, const QDict *qdict)
- /* Capture support */
- static QLIST_HEAD (capture_list_head, CaptureState) capture_head;
- 
--static void hmp_info_capture(Monitor *mon, const QDict *qdict)
-+void hmp_info_capture(Monitor *mon, const QDict *qdict)
- {
-     int i;
-     CaptureState *s;
-@@ -1123,7 +1123,7 @@ static void hmp_info_capture(Monitor *mon, const QDict *qdict)
-     }
- }
- 
--static void hmp_stopcapture(Monitor *mon, const QDict *qdict)
-+void hmp_stopcapture(Monitor *mon, const QDict *qdict)
- {
-     int i;
-     int n = qdict_get_int(qdict, "n");
-@@ -1139,7 +1139,7 @@ static void hmp_stopcapture(Monitor *mon, const QDict *qdict)
-     }
- }
- 
--static void hmp_wavcapture(Monitor *mon, const QDict *qdict)
-+void hmp_wavcapture(Monitor *mon, const QDict *qdict)
- {
-     const char *path = qdict_get_str(qdict, "path");
-     int freq = qdict_get_try_int(qdict, "freq", 44100);
-@@ -1192,7 +1192,7 @@ static void hmp_warn_acl(void)
-     warn_acl = true;
- }
- 
--static void hmp_acl_show(Monitor *mon, const QDict *qdict)
-+void hmp_acl_show(Monitor *mon, const QDict *qdict)
- {
-     const char *aclname = qdict_get_str(qdict, "aclname");
-     QAuthZList *auth = find_auth(mon, aclname);
-@@ -1219,7 +1219,7 @@ static void hmp_acl_show(Monitor *mon, const QDict *qdict)
-     }
- }
- 
--static void hmp_acl_reset(Monitor *mon, const QDict *qdict)
-+void hmp_acl_reset(Monitor *mon, const QDict *qdict)
- {
-     const char *aclname = qdict_get_str(qdict, "aclname");
-     QAuthZList *auth = find_auth(mon, aclname);
-@@ -1236,7 +1236,7 @@ static void hmp_acl_reset(Monitor *mon, const QDict *qdict)
-     monitor_printf(mon, "acl: removed all rules\n");
- }
- 
--static void hmp_acl_policy(Monitor *mon, const QDict *qdict)
-+void hmp_acl_policy(Monitor *mon, const QDict *qdict)
- {
-     const char *aclname = qdict_get_str(qdict, "aclname");
-     const char *policy = qdict_get_str(qdict, "policy");
-@@ -1277,7 +1277,7 @@ static QAuthZListFormat hmp_acl_get_format(const char *match)
-     }
- }
- 
--static void hmp_acl_add(Monitor *mon, const QDict *qdict)
-+void hmp_acl_add(Monitor *mon, const QDict *qdict)
- {
-     const char *aclname = qdict_get_str(qdict, "aclname");
-     const char *match = qdict_get_str(qdict, "match");
-@@ -1330,7 +1330,7 @@ static void hmp_acl_add(Monitor *mon, const QDict *qdict)
-     }
- }
- 
--static void hmp_acl_remove(Monitor *mon, const QDict *qdict)
-+void hmp_acl_remove(Monitor *mon, const QDict *qdict)
- {
-     const char *aclname = qdict_get_str(qdict, "aclname");
-     const char *match = qdict_get_str(qdict, "match");
-@@ -1799,13 +1799,21 @@ int monitor_fd_param(Monitor *mon, const char *fdname, Error **errp)
- 
- /* Please update hmp-commands.hx when adding or changing commands */
- static HMPCommand hmp_info_cmds[] = {
-+#if defined(SCSI_PROCESS)
-+#include "hmp-scsi-commands-info.h"
-+#else
- #include "hmp-commands-info.h"
++#define MPQEMU_MSG_HDR_SIZE offsetof(MPQemuMsg, data1.u64)
++
++/**
++ * mpqemu_cmd_t:
++ * CONF_READ        PCI config. space read
++ * CONF_WRITE       PCI config. space write
++ *
++ * proc_cmd_t enum type to specify the command to be executed on the remote
++ * device.
++ */
++typedef enum {
++    INIT = 0,
++    CONF_READ,
++    CONF_WRITE,
++    MAX,
++} mpqemu_cmd_t;
++
++/**
++ * MPQemuMsg:
++ * @cmd: The remote command
++ * @bytestream: Indicates if the data to be shared is structured (data1)
++ *              or unstructured (data2)
++ * @size: Size of the data to be shared
++ * @data1: Structured data
++ * @fds: File descriptors to be shared with remote device
++ * @data2: Unstructured data
++ *
++ * MPQemuMsg Format of the message sent to the remote device from QEMU.
++ *
++ */
++typedef struct {
++    mpqemu_cmd_t cmd;
++    int bytestream;
++    size_t size;
++
++    union {
++        uint64_t u64;
++    } data1;
++
++    int fds[REMOTE_MAX_FDS];
++    int num_fds;
++
++    uint8_t *data2;
++} MPQemuMsg;
++
++struct conf_data_msg {
++    uint32_t addr;
++    uint32_t val;
++    int l;
++};
++
++/**
++ * MPQemuChannel:
++ * @gsrc: GSource object to be used by loop
++ * @gpfd: GPollFD object containing the socket & events to monitor
++ * @sock: Socket to send/receive communication, same as the one in gpfd
++ * @send_lock: Mutex to synchronize access to the send stream
++ * @recv_lock: Mutex to synchronize access to the recv stream
++ *
++ * Defines the channel that make up the communication link
++ * between QEMU and remote process
++ */
++
++typedef struct MPQemuChannel {
++    GSource gsrc;
++    GPollFD gpfd;
++    int sock;
++    QemuMutex send_lock;
++    QemuMutex recv_lock;
++} MPQemuChannel;
++
++typedef void (*mpqemu_link_callback)(GIOCondition cond, MPQemuChannel *chan);
++
++/*
++ * MPQemuLinkState Instance info. of the communication
++ * link between QEMU and remote process. The Link could
++ * be made up of multiple channels.
++ *
++ * ctx        GMainContext to be used for communication
++ * loop       Main loop that would be used to poll for incoming data
++ * com        Communication channel to transport control messages
++ *
++ */
++
++typedef struct MPQemuLinkState {
++    Object obj;
++
++    GMainContext *ctx;
++    GMainLoop *loop;
++
++    MPQemuChannel *com;
++
++    mpqemu_link_callback callback;
++} MPQemuLinkState;
++
++MPQemuLinkState *mpqemu_link_create(void);
++void mpqemu_link_finalize(MPQemuLinkState *s);
++
++void mpqemu_msg_send(MPQemuLinkState *s, MPQemuMsg *msg, MPQemuChannel *chan);
++int mpqemu_msg_recv(MPQemuLinkState *s, MPQemuMsg *msg, MPQemuChannel *chan);
++
++void mpqemu_init_channel(MPQemuLinkState *s, MPQemuChannel **chan, int fd);
++void mpqemu_destroy_channel(MPQemuChannel *chan);
++void mpqemu_link_set_callback(MPQemuLinkState *s, mpqemu_link_callback callback);
++void mpqemu_start_coms(MPQemuLinkState *s);
++
 +#endif
-     { NULL, NULL, },
- };
- 
- /* hmp_cmds and hmp_info_cmds would be sorted at runtime */
- HMPCommand hmp_cmds[] = {
-+#if defined(SCSI_PROCESS)
-+#include "hmp-scsi-commands.h"
-+#else
- #include "hmp-commands.h"
-+#endif
-     { NULL, NULL, },
- };
- 
-diff --git a/monitor/monitor-internal.h b/monitor/monitor-internal.h
-index d78f5ca..6ea7211 100644
---- a/monitor/monitor-internal.h
-+++ b/monitor/monitor-internal.h
-@@ -179,4 +179,42 @@ void help_cmd(Monitor *mon, const char *name);
- void handle_hmp_command(MonitorHMP *mon, const char *cmdline);
- int hmp_compare_cmd(const char *name, const char *list);
- 
-+void hmp_do_help_cmd(Monitor *mon, const QDict *qdict);
-+void hmp_trace_event(Monitor *mon, const QDict *qdict);
-+void hmp_info_help(Monitor *mon, const QDict *qdict);
-+void hmp_info_registers(Monitor *mon, const QDict *qdict);
-+void hmp_info_jit(Monitor *mon, const QDict *qdict);
-+void hmp_info_opcount(Monitor *mon, const QDict *qdict);
-+void hmp_info_sync_profile(Monitor *mon, const QDict *qdict);
-+void hmp_info_history(Monitor *mon, const QDict *qdict);
-+void hmp_info_cpustats(Monitor *mon, const QDict *qdict);
-+void hmp_info_trace_events(Monitor *mon, const QDict *qdict);
-+void hmp_logfile(Monitor *mon, const QDict *qdict);
-+void hmp_log(Monitor *mon, const QDict *qdict);
-+void hmp_singlestep(Monitor *mon, const QDict *qdict);
-+void hmp_gdbserver(Monitor *mon, const QDict *qdict);
-+void hmp_watchdog_action(Monitor *mon, const QDict *qdict);
-+void hmp_memory_dump(Monitor *mon, const QDict *qdict);
-+void hmp_physical_memory_dump(Monitor *mon, const QDict *qdict);
-+void hmp_gpa2hva(Monitor *mon, const QDict *qdict);
-+void hmp_gva2gpa(Monitor *mon, const QDict *qdict);
-+void hmp_gpa2hpa(Monitor *mon, const QDict *qdict);
-+void hmp_do_print(Monitor *mon, const QDict *qdict);
-+void hmp_sum(Monitor *mon, const QDict *qdict);
-+void hmp_mouse_move(Monitor *mon, const QDict *qdict);
-+void hmp_mouse_button(Monitor *mon, const QDict *qdict);
-+void hmp_ioport_read(Monitor *mon, const QDict *qdict);
-+void hmp_ioport_write(Monitor *mon, const QDict *qdict);
-+void hmp_boot_set(Monitor *mon, const QDict *qdict);
-+void hmp_info_mtree(Monitor *mon, const QDict *qdict);
-+void hmp_info_profile(Monitor *mon, const QDict *qdict);
-+void hmp_info_capture(Monitor *mon, const QDict *qdict);
-+void hmp_stopcapture(Monitor *mon, const QDict *qdict);
-+void hmp_wavcapture(Monitor *mon, const QDict *qdict);
-+void hmp_acl_show(Monitor *mon, const QDict *qdict);
-+void hmp_acl_reset(Monitor *mon, const QDict *qdict);
-+void hmp_acl_policy(Monitor *mon, const QDict *qdict);
-+void hmp_acl_add(Monitor *mon, const QDict *qdict);
-+void hmp_acl_remove(Monitor *mon, const QDict *qdict);
+diff --git a/io/Makefile.objs b/io/Makefile.objs
+index 9a20fce..5875ab0 100644
+--- a/io/Makefile.objs
++++ b/io/Makefile.objs
+@@ -10,3 +10,5 @@ io-obj-y += channel-util.o
+ io-obj-y += dns-resolver.o
+ io-obj-y += net-listener.o
+ io-obj-y += task.o
 +
- #endif
-diff --git a/qapi/Makefile.objs b/qapi/Makefile.objs
-index dd3f5e6..059ad08 100644
---- a/qapi/Makefile.objs
-+++ b/qapi/Makefile.objs
-@@ -30,3 +30,5 @@ obj-y += $(QAPI_TARGET_MODULES:%=qapi-events-%.o)
- obj-y += qapi-events.o
- obj-y += $(QAPI_TARGET_MODULES:%=qapi-commands-%.o)
- obj-y += qapi-commands.o
++io-obj-$(CONFIG_MPQEMU) += mpqemu-link.o
+diff --git a/io/mpqemu-link.c b/io/mpqemu-link.c
+new file mode 100644
+index 0000000..b39f4d0
+--- /dev/null
++++ b/io/mpqemu-link.c
+@@ -0,0 +1,309 @@
++/*
++ * Communication channel between QEMU and remote device process
++ *
++ * Copyright 2019, Oracle and/or its affiliates.
++ *
++ * Permission is hereby granted, free of charge, to any person obtaining a copy
++ * of this software and associated documentation files (the "Software"), to deal
++ * in the Software without restriction, including without limitation the rights
++ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
++ * copies of the Software, and to permit persons to whom the Software is
++ * furnished to do so, subject to the following conditions:
++ *
++ * The above copyright notice and this permission notice shall be included in
++ * all copies or substantial portions of the Software.
++ *
++ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
++ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
++ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
++ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
++ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
++ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
++ * THE SOFTWARE.
++ */
 +
-+remote-pci-obj-$(CONFIG_MPQEMU) += $(QAPI_COMMON_MODULES:%=qapi-commands-%.o)
-diff --git a/qom/Makefile.objs b/qom/Makefile.objs
-index 07e50e5..16603d7 100644
---- a/qom/Makefile.objs
-+++ b/qom/Makefile.objs
-@@ -5,3 +5,4 @@ common-obj-$(CONFIG_SOFTMMU) += qom-hmp-cmds.o qom-qmp-cmds.o
- 
- remote-pci-obj-$(CONFIG_MPQEMU) += object.o qom-qobject.o container.o
- remote-pci-obj-$(CONFIG_MPQEMU) += object_interfaces.o
-+remote-pci-obj-$(CONFIG_MPQEMU) += qom-qmp-cmds.o qom-hmp-cmds.o
-diff --git a/ui/Makefile.objs b/ui/Makefile.objs
-index e6da6ff..c3ac572 100644
---- a/ui/Makefile.objs
-+++ b/ui/Makefile.objs
-@@ -68,3 +68,5 @@ console-gl.o-libs += $(OPENGL_LIBS)
- egl-helpers.o-libs += $(OPENGL_LIBS)
- egl-context.o-libs += $(OPENGL_LIBS)
- egl-headless.o-libs += $(OPENGL_LIBS)
++#include "qemu/osdep.h"
++#include "qemu-common.h"
 +
-+remote-lsi-obj-$(CONFIG_MPQEMU) += vnc-stubs.o
++#include <assert.h>
++#include <errno.h>
++#include <pthread.h>
++#include <stdio.h>
++#include <stdlib.h>
++#include <sys/types.h>
++#include <sys/socket.h>
++#include <sys/un.h>
++#include <unistd.h>
++#include <limits.h>
++#include <poll.h>
++
++#include "qemu/module.h"
++#include "io/mpqemu-link.h"
++#include "qemu/log.h"
++
++GSourceFuncs gsrc_funcs;
++
++static void mpqemu_link_inst_init(Object *obj)
++{
++    MPQemuLinkState *s = MPQEMU_LINK(obj);
++
++    s->ctx = g_main_context_default();
++    s->loop = g_main_loop_new(s->ctx, FALSE);
++}
++
++static const TypeInfo mpqemu_link_info = {
++    .name = TYPE_MPQEMU_LINK,
++    .parent = TYPE_OBJECT,
++    .instance_size = sizeof(MPQemuLinkState),
++    .instance_init = mpqemu_link_inst_init,
++};
++
++static void mpqemu_link_register_types(void)
++{
++    type_register_static(&mpqemu_link_info);
++}
++
++type_init(mpqemu_link_register_types)
++
++MPQemuLinkState *mpqemu_link_create(void)
++{
++    return MPQEMU_LINK(object_new(TYPE_MPQEMU_LINK));
++}
++
++void mpqemu_link_finalize(MPQemuLinkState *s)
++{
++    g_main_loop_unref(s->loop);
++    g_main_context_unref(s->ctx);
++    g_main_loop_quit(s->loop);
++
++    mpqemu_destroy_channel(s->com);
++
++    object_unref(OBJECT(s));
++}
++
++void mpqemu_msg_send(MPQemuLinkState *s, MPQemuMsg *msg, MPQemuChannel *chan)
++{
++    int rc;
++    uint8_t *data;
++    union {
++        char control[CMSG_SPACE(REMOTE_MAX_FDS * sizeof(int))];
++        struct cmsghdr align;
++    } u;
++    struct msghdr hdr;
++    struct cmsghdr *chdr;
++    int sock = chan->sock;
++    QemuMutex *lock = &chan->send_lock;
++
++    struct iovec iov = {
++        .iov_base = (char *) msg,
++        .iov_len = MPQEMU_MSG_HDR_SIZE,
++    };
++
++    memset(&hdr, 0, sizeof(hdr));
++    memset(&u, 0, sizeof(u));
++
++    hdr.msg_iov = &iov;
++    hdr.msg_iovlen = 1;
++
++    if (msg->num_fds > REMOTE_MAX_FDS) {
++        qemu_log_mask(LOG_REMOTE_DEBUG, "%s: Max FDs exceeded\n", __func__);
++        return;
++    }
++
++    if (msg->num_fds > 0) {
++        size_t fdsize = msg->num_fds * sizeof(int);
++
++        hdr.msg_control = &u;
++        hdr.msg_controllen = sizeof(u);
++
++        chdr = CMSG_FIRSTHDR(&hdr);
++        chdr->cmsg_len = CMSG_LEN(fdsize);
++        chdr->cmsg_level = SOL_SOCKET;
++        chdr->cmsg_type = SCM_RIGHTS;
++        memcpy(CMSG_DATA(chdr), msg->fds, fdsize);
++        hdr.msg_controllen = CMSG_SPACE(fdsize);
++    }
++
++    qemu_mutex_lock(lock);
++
++    do {
++        rc = sendmsg(sock, &hdr, 0);
++    } while (rc < 0 && (errno == EINTR || errno == EAGAIN));
++
++    if (rc < 0) {
++        qemu_log_mask(LOG_REMOTE_DEBUG, "%s - sendmsg rc is %d, errno is %d,"
++                      " sock %d\n", __func__, rc, errno, sock);
++        qemu_mutex_unlock(lock);
++        return;
++    }
++
++    if (msg->bytestream) {
++        data = msg->data2;
++    } else {
++        data = (uint8_t *)msg + MPQEMU_MSG_HDR_SIZE;
++    }
++
++    do {
++        rc = write(sock, data, msg->size);
++    } while (rc < 0 && (errno == EINTR || errno == EAGAIN));
++
++    qemu_mutex_unlock(lock);
++}
++
++
++int mpqemu_msg_recv(MPQemuLinkState *s, MPQemuMsg *msg, MPQemuChannel *chan)
++{
++    int rc;
++    uint8_t *data;
++    union {
++        char control[CMSG_SPACE(REMOTE_MAX_FDS * sizeof(int))];
++        struct cmsghdr align;
++    } u;
++    struct msghdr hdr;
++    struct cmsghdr *chdr;
++    size_t fdsize;
++    int sock = chan->sock;
++    QemuMutex *lock = &chan->recv_lock;
++
++    struct iovec iov = {
++        .iov_base = (char *) msg,
++        .iov_len = MPQEMU_MSG_HDR_SIZE,
++    };
++
++    memset(&hdr, 0, sizeof(hdr));
++    memset(&u, 0, sizeof(u));
++
++    hdr.msg_iov = &iov;
++    hdr.msg_iovlen = 1;
++    hdr.msg_control = &u;
++    hdr.msg_controllen = sizeof(u);
++
++    qemu_mutex_lock(lock);
++
++    do {
++        rc = recvmsg(sock, &hdr, 0);
++    } while (rc < 0 && (errno == EINTR || errno == EAGAIN));
++
++    if (rc < 0) {
++        qemu_log_mask(LOG_REMOTE_DEBUG, "%s - recvmsg rc is %d, errno is %d,"
++                      " sock %d\n", __func__, rc, errno, sock);
++        qemu_mutex_unlock(lock);
++        return rc;
++    }
++
++    msg->num_fds = 0;
++    for (chdr = CMSG_FIRSTHDR(&hdr); chdr != NULL;
++         chdr = CMSG_NXTHDR(&hdr, chdr)) {
++        if ((chdr->cmsg_level == SOL_SOCKET) &&
++            (chdr->cmsg_type == SCM_RIGHTS)) {
++            fdsize = chdr->cmsg_len - CMSG_LEN(0);
++            msg->num_fds = fdsize / sizeof(int);
++            if (msg->num_fds > REMOTE_MAX_FDS) {
++                /*
++                 * TODO: Security issue detected. Sender never sends more
++                 * than REMOTE_MAX_FDS. This condition should be signaled to
++                 * the admin
++                 */
++                qemu_log_mask(LOG_REMOTE_DEBUG, "%s: Max FDs exceeded\n", __func__);
++                return -ERANGE;
++            }
++
++            memcpy(msg->fds, CMSG_DATA(chdr), fdsize);
++            break;
++        }
++    }
++
++    if (msg->size && msg->bytestream) {
++        msg->data2 = calloc(1, msg->size);
++        data = msg->data2;
++    } else {
++        data = (uint8_t *)&msg->data1;
++    }
++
++    if (msg->size) {
++        do {
++            rc = read(sock, data, msg->size);
++        } while (rc < 0 && (errno == EINTR || errno == EAGAIN));
++    }
++
++    qemu_mutex_unlock(lock);
++
++    return rc;
++}
++
++static gboolean mpqemu_link_handler_prepare(GSource *gsrc, gint *timeout)
++{
++    g_assert(timeout);
++
++    *timeout = -1;
++
++    return FALSE;
++}
++
++static gboolean mpqemu_link_handler_check(GSource *gsrc)
++{
++    MPQemuChannel *chan = (MPQemuChannel *)gsrc;
++
++    return chan->gpfd.events & chan->gpfd.revents;
++}
++
++static gboolean mpqemu_link_handler_dispatch(GSource *gsrc, GSourceFunc func,
++                                             gpointer data)
++{
++    MPQemuLinkState *s = (MPQemuLinkState *)data;
++    MPQemuChannel *chan = (MPQemuChannel *)gsrc;
++
++    s->callback(chan->gpfd.revents, chan);
++
++    if ((chan->gpfd.revents & G_IO_HUP) || (chan->gpfd.revents & G_IO_ERR)) {
++        return G_SOURCE_REMOVE;
++    }
++
++    return G_SOURCE_CONTINUE;
++}
++
++void mpqemu_link_set_callback(MPQemuLinkState *s, mpqemu_link_callback callback)
++{
++    s->callback = callback;
++}
++
++void mpqemu_init_channel(MPQemuLinkState *s, MPQemuChannel **chan, int fd)
++{
++    MPQemuChannel *src;
++
++    gsrc_funcs = (GSourceFuncs){
++        .prepare = mpqemu_link_handler_prepare,
++        .check = mpqemu_link_handler_check,
++        .dispatch = mpqemu_link_handler_dispatch,
++        .finalize = NULL,
++    };
++
++    src = (MPQemuChannel *)g_source_new(&gsrc_funcs, sizeof(MPQemuChannel));
++
++    src->sock = fd;
++    qemu_mutex_init(&src->send_lock);
++    qemu_mutex_init(&src->recv_lock);
++
++    g_source_set_callback(&src->gsrc, NULL, (gpointer)s, NULL);
++    src->gpfd.fd = fd;
++    src->gpfd.events = G_IO_IN | G_IO_HUP | G_IO_ERR;
++    g_source_add_poll(&src->gsrc, &src->gpfd);
++
++    *chan = src;
++}
++
++void mpqemu_destroy_channel(MPQemuChannel *chan)
++{
++    g_source_unref(&chan->gsrc);
++    close(chan->sock);
++    qemu_mutex_destroy(&chan->send_lock);
++    qemu_mutex_destroy(&chan->recv_lock);
++}
++
++void mpqemu_start_coms(MPQemuLinkState *s)
++{
++
++    g_assert(g_source_attach(&s->com->gsrc, s->ctx));
++
++    g_main_loop_run(s->loop);
++}
 -- 
 1.8.3.1
 
