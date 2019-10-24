@@ -2,58 +2,80 @@ Return-Path: <SRS0=Jnn8=YR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2A17FCA9EAF
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 13:31:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D964CA9EBC
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 13:33:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0287621925
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 13:31:34 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0287621925
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id 4CE0A21906
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 13:33:24 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="atCgNN3R"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4CE0A21906
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42638 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42670 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iNdDB-0001QE-37
-	for qemu-devel@archiver.kernel.org; Thu, 24 Oct 2019 09:31:33 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51394)
+	id 1iNdEw-00050Z-RZ
+	for qemu-devel@archiver.kernel.org; Thu, 24 Oct 2019 09:33:22 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47741)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <yi.l.liu@intel.com>) id 1iNckH-0005Ex-Ta
- for qemu-devel@nongnu.org; Thu, 24 Oct 2019 09:01:47 -0400
+ (envelope-from <armbru@redhat.com>) id 1iNcKi-0003v9-U7
+ for qemu-devel@nongnu.org; Thu, 24 Oct 2019 08:35:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <yi.l.liu@intel.com>) id 1iNckG-0002SH-Cl
- for qemu-devel@nongnu.org; Thu, 24 Oct 2019 09:01:41 -0400
-Received: from mga11.intel.com ([192.55.52.93]:40482)
+ (envelope-from <armbru@redhat.com>) id 1iNcKh-0006BD-K3
+ for qemu-devel@nongnu.org; Thu, 24 Oct 2019 08:35:16 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:37315
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <yi.l.liu@intel.com>) id 1iNckF-0002MX-FT
- for qemu-devel@nongnu.org; Thu, 24 Oct 2019 09:01:39 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga001.fm.intel.com ([10.253.24.23])
- by fmsmga102.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
- 24 Oct 2019 06:01:24 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.68,224,1569308400"; d="scan'208";a="210156186"
-Received: from iov.bj.intel.com ([10.238.145.67])
- by fmsmga001.fm.intel.com with ESMTP; 24 Oct 2019 06:01:21 -0700
-From: Liu Yi L <yi.l.liu@intel.com>
-To: qemu-devel@nongnu.org, mst@redhat.com, pbonzini@redhat.com,
- alex.williamson@redhat.com, peterx@redhat.com
-Subject: [RFC v2 05/22] vfio/common: add iommu_ctx_notifier in container
-Date: Thu, 24 Oct 2019 08:34:26 -0400
-Message-Id: <1571920483-3382-6-git-send-email-yi.l.liu@intel.com>
-X-Mailer: git-send-email 2.7.4
-In-Reply-To: <1571920483-3382-1-git-send-email-yi.l.liu@intel.com>
-References: <1571920483-3382-1-git-send-email-yi.l.liu@intel.com>
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 192.55.52.93
+ (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1iNcKh-0006Ai-Eq
+ for qemu-devel@nongnu.org; Thu, 24 Oct 2019 08:35:15 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1571920514;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=w68YnewbiPS7fEui1YXuGwai5ALcO+GSjwBTz6xGpog=;
+ b=atCgNN3R6+PgzHwhO5l+tkywNUCbFnsd/HfhwVD5CYKhbbCbyHwSSkb7bJOzQs0dGXXn5v
+ hy/nAn9oc33n4v2JkjvgvTT3BlLuFPm8jOsGerm/teh+trjg5Xnh1hZpLfpRvtSTa2p3cu
+ sqjSVoeD4kRra/aDeQTpPbkAJbFpJHs=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-230-YQRnQqtCMby0P_1f6FrmPg-1; Thu, 24 Oct 2019 08:35:10 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CB671107AD33;
+ Thu, 24 Oct 2019 12:35:09 +0000 (UTC)
+Received: from blackfin.pond.sub.org (unknown [10.36.118.123])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 944645D9CA;
+ Thu, 24 Oct 2019 12:35:09 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id 317951130348; Thu, 24 Oct 2019 14:34:59 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [RFC PATCH 17/19] qapi: Implement -compat deprecated-input=crash for
+ commands
+Date: Thu, 24 Oct 2019 14:34:56 +0200
+Message-Id: <20191024123458.13505-18-armbru@redhat.com>
+In-Reply-To: <20191024123458.13505-1-armbru@redhat.com>
+References: <20191024123458.13505-1-armbru@redhat.com>
+MIME-Version: 1.0
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-MC-Unique: YQRnQqtCMby0P_1f6FrmPg-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=WINDOWS-1252
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -65,77 +87,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: tianyu.lan@intel.com, kevin.tian@intel.com, yi.l.liu@intel.com,
- Yi Sun <yi.y.sun@linux.intel.com>, kvm@vger.kernel.org, jun.j.tian@intel.com,
- eric.auger@redhat.com, yi.y.sun@intel.com, jacob.jun.pan@linux.intel.com,
- david@gibson.dropbear.id.au
+Cc: libvir-list@redhat.com, mdroth@linux.vnet.ibm.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This patch adds a list in VFIOContainer to store iommu_ctx_notifier
-which is based on IOMMUContext. As a preparation of registering
-iommu_ctx_notifiers.
+This policy calls abort() when a deprecated command is received.
 
-Cc: Kevin Tian <kevin.tian@intel.com>
-Cc: Jacob Pan <jacob.jun.pan@linux.intel.com>
-Cc: Peter Xu <peterx@redhat.com>
-Cc: Eric Auger <eric.auger@redhat.com>
-Cc: Yi Sun <yi.y.sun@linux.intel.com>
-Cc: David Gibson <david@gibson.dropbear.id.au>
-Signed-off-by: Liu Yi L <yi.l.liu@intel.com>
+Crashing should reliably[*] fail existing integration tests with very
+little additional work (just pass the option).
+
+[*] Bugs in tests can conceivably mask even crashes, but that seems
+unlikely.
+
+Signed-off-by: Markus Armbruster <armbru@redhat.com>
 ---
- hw/vfio/common.c              | 1 +
- include/hw/vfio/vfio-common.h | 9 +++++++++
- 2 files changed, 10 insertions(+)
+ qapi/common.json    | 4 ++--
+ qapi/qmp-dispatch.c | 1 +
+ qemu-options.hx     | 4 +++-
+ 3 files changed, 6 insertions(+), 3 deletions(-)
 
-diff --git a/hw/vfio/common.c b/hw/vfio/common.c
-index 5ca1148..d418527 100644
---- a/hw/vfio/common.c
-+++ b/hw/vfio/common.c
-@@ -1271,6 +1271,7 @@ static int vfio_connect_container(VFIOGroup *group, AddressSpace *as,
-     container->error = NULL;
-     QLIST_INIT(&container->giommu_list);
-     QLIST_INIT(&container->hostwin_list);
-+    QLIST_INIT(&container->iommu_ctx_list);
- 
-     ret = vfio_init_container(container, group->fd, errp);
-     if (ret) {
-diff --git a/include/hw/vfio/vfio-common.h b/include/hw/vfio/vfio-common.h
-index fd56420..975d12b 100644
---- a/include/hw/vfio/vfio-common.h
-+++ b/include/hw/vfio/vfio-common.h
-@@ -29,6 +29,7 @@
- #ifdef CONFIG_LINUX
- #include <linux/vfio.h>
- #endif
-+#include "hw/iommu/iommu.h"
- 
- #define VFIO_MSG_PREFIX "vfio %s: "
- 
-@@ -75,6 +76,7 @@ typedef struct VFIOContainer {
-     bool initialized;
-     unsigned long pgsizes;
-     QLIST_HEAD(, VFIOGuestIOMMU) giommu_list;
-+    QLIST_HEAD(, VFIOIOMMUContext) iommu_ctx_list;
-     QLIST_HEAD(, VFIOHostDMAWindow) hostwin_list;
-     QLIST_HEAD(, VFIOGroup) group_list;
-     QLIST_ENTRY(VFIOContainer) next;
-@@ -88,6 +90,13 @@ typedef struct VFIOGuestIOMMU {
-     QLIST_ENTRY(VFIOGuestIOMMU) giommu_next;
- } VFIOGuestIOMMU;
- 
-+typedef struct VFIOIOMMUContext {
-+    VFIOContainer *container;
-+    IOMMUContext *iommu_ctx;
-+    IOMMUCTXNotifier n;
-+    QLIST_ENTRY(VFIOIOMMUContext) iommu_ctx_next;
-+} VFIOIOMMUContext;
-+
- typedef struct VFIOHostDMAWindow {
-     hwaddr min_iova;
-     hwaddr max_iova;
--- 
-2.7.4
+diff --git a/qapi/common.json b/qapi/common.json
+index 3e9d12c90f..06e54642bb 100644
+--- a/qapi/common.json
++++ b/qapi/common.json
+@@ -152,14 +152,14 @@
+ #
+ # @accept: Accept silently
+ # @reject: Reject with an error
+-# TODO @crash: abort() the process
++# @crash: abort() the process
+ #
+ # FIXME Guidance on intended use.
+ #
+ # Since: 4.2
+ ##
+ { 'enum': 'CompatPolicyInput',
+-  'data': [ 'accept', 'reject' ] }
++  'data': [ 'accept', 'reject', 'crash' ] }
+=20
+ ##
+ # @CompatPolicyOutput:
+diff --git a/qapi/qmp-dispatch.c b/qapi/qmp-dispatch.c
+index b079db85d2..6436417844 100644
+--- a/qapi/qmp-dispatch.c
++++ b/qapi/qmp-dispatch.c
+@@ -141,6 +141,7 @@ QDict *qmp_dispatch(QmpCommandList *cmds, QObject *requ=
+est,
+                       "Deprecated command %s disabled by policy",
+                       command);
+             goto out;
++        case COMPAT_POLICY_INPUT_CRASH:
+         default:
+             abort();
+         }
+diff --git a/qemu-options.hx b/qemu-options.hx
+index f107a57c81..3a740ea7b1 100644
+--- a/qemu-options.hx
++++ b/qemu-options.hx
+@@ -3320,7 +3320,7 @@ STEXI
+ ETEXI
+=20
+ DEF("compat", HAS_ARG, QEMU_OPTION_compat,
+-    "-compat [deprecated-input=3Daccept|reject][,deprecated-output=3Daccep=
+t]\n"
++    "-compat [deprecated-input=3Daccept|reject|crash][,deprecated-output=
+=3Daccept]\n"
+     "                Policy for handling deprecated management interfaces\=
+n",
+     QEMU_ARCH_ALL)
+ STEXI
+@@ -3333,6 +3333,8 @@ Set policy for handling deprecated management interfa=
+ces:
+ Accept deprecated commands
+ @item deprecated-input=3Dreject
+ Reject deprecated commands
++@item deprecated-input=3Dcrash
++Crash on deprecated command
+ @item deprecated-output=3Daccept (default)
+ Emit deprecated events
+ @end table
+--=20
+2.21.0
 
 
