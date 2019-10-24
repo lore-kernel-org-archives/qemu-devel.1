@@ -2,84 +2,120 @@ Return-Path: <SRS0=Jnn8=YR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY autolearn=ham
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C149ECA9EAF
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 11:47:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6C04CCA9EBB
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 11:47:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8CE9C21655
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 11:47:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3412521655
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 11:47:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="jGC4qO3Q"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8CE9C21655
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="A5W55rvs"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3412521655
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40266 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40268 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iNbaP-0000rz-NT
-	for qemu-devel@archiver.kernel.org; Thu, 24 Oct 2019 07:47:26 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39252)
+	id 1iNbaq-00018o-NS
+	for qemu-devel@archiver.kernel.org; Thu, 24 Oct 2019 07:47:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:32948)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgilbert@redhat.com>) id 1iNbHR-00028h-G1
- for qemu-devel@nongnu.org; Thu, 24 Oct 2019 07:27:51 -0400
+ (envelope-from <den@virtuozzo.com>) id 1iNb4D-0005Lr-Un
+ for qemu-devel@nongnu.org; Thu, 24 Oct 2019 07:14:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgilbert@redhat.com>) id 1iNbHP-0008Lh-O0
- for qemu-devel@nongnu.org; Thu, 24 Oct 2019 07:27:49 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:42422
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1iNbHP-0008LT-Jv
- for qemu-devel@nongnu.org; Thu, 24 Oct 2019 07:27:47 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1571916467;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=epYFexBAvojJruBQufHQ3wH4UK2rDrrqSsjxLR4oqMI=;
- b=jGC4qO3QM9S12lNtsOVfm+aUOwwBgcJ2fk5Reewm+xFWCyO186is6145jio1TAI1eYvPyw
- TjaBwxI2glGCJdJWt9tesY8A1I2xo2zXFBOJ/PJ31rVo409r0GwqP0OiWUCHrU+6Kcg4NN
- 9G7iQhQBnWyCsgOdH3my/pqgc404klU=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-78-Gc9NGrtTOcaMrzlHZizrbA-1; Thu, 24 Oct 2019 07:27:37 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0DB3A800D49;
- Thu, 24 Oct 2019 11:27:36 +0000 (UTC)
-Received: from dgilbert-t580.localhost (ovpn-117-248.ams2.redhat.com
- [10.36.117.248])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 899C11C93D;
- Thu, 24 Oct 2019 11:27:33 +0000 (UTC)
-From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-To: qemu-devel@nongnu.org, renzhen@linux.alibaba.com, eguan@linux.alibaba.com,
- ganesh.mahalingam@intel.com, m.mizuma@jp.fujitsu.com, mszeredi@redhat.com,
- misono.tomohiro@jp.fujitsu.com, tao.peng@linux.alibaba.com,
- piaojun@huawei.com, stefanha@redhat.com, vgoyal@redhat.com, mst@redhat.com,
- berrange@redhat.com
-Subject: [PATCH 03/25] virtiofsd: passthrough_ll: add ino_map to hide lo_inode
- pointers
-Date: Thu, 24 Oct 2019 12:26:56 +0100
-Message-Id: <20191024112718.34657-4-dgilbert@redhat.com>
-In-Reply-To: <20191024112718.34657-1-dgilbert@redhat.com>
-References: <20191024112718.34657-1-dgilbert@redhat.com>
-MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-MC-Unique: Gc9NGrtTOcaMrzlHZizrbA-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=US-ASCII
+ (envelope-from <den@virtuozzo.com>) id 1iNb4C-000227-IQ
+ for qemu-devel@nongnu.org; Thu, 24 Oct 2019 07:14:09 -0400
+Received: from mail-he1eur01on0708.outbound.protection.outlook.com
+ ([2a01:111:f400:fe1e::708]:3328
+ helo=EUR01-HE1-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <den@virtuozzo.com>)
+ id 1iNb49-0001zd-UQ; Thu, 24 Oct 2019 07:14:06 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=k3fomcLYihLpzmVQUyCVFvGdtF8yyxnsEKvg6wpK+0cln69n9vd/GLwjX/CD/o400szonyON5EGSRX0O2kXaRAdVKsVHGF6HlzcLoIfyiyGh/4U5Vm67nxb32f4H1FAawoziMOmiBY+Kxwp+WNcOvO6MmRqoqpCfqSqI2uHNpsx0DsFItLW1+dDB3g6oaTG0sNPcTws4UOL+N7H+9+2UyD5jn1BmG18c0uLlZET80v/dU9hYXlbZJsM3t1nyI8DGKyPZB5EYmNprm7GAAMjz815cWU9AGJ9kS5v2QDlXQ6aB/bniJ569vVyMkjbiF+pJSdRw3M0bhAlZyWPe8k9YLw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=hxhLi3QYg0sD1RLbwgCis0jEXkdIzkI6rA24E+B1GUs=;
+ b=Chq6802//AvJ6Y/IsefgSvQ4LJe0JL4xmFgFYGOYWKtgw9TQMH5p68K6br9axGHbFaUNkEqKWyrZ89Xh73nJIbPyR1AkK9kH4olpdRFiHlx13xdakljXHSUC0DnEENSskSSS7GrFWWQgKySem5MV0n9WAT/B6LIZRFug3Wws/+HtIs8bAzdlhryQYkvEcF9A6sC8RLwmJFyHhSzh81DV4bS6pTua87eQHh/bMX4561Eyeb6qqokSV4BlbPuuTckxF2lJ4nnF5bzJBXQ32KOTyhgQuA8Owh6seyODncypErSXoX4Ycp4FXMSACcA27aIzKnDNQe7rL2E3tPiL5fSR7Q==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=hxhLi3QYg0sD1RLbwgCis0jEXkdIzkI6rA24E+B1GUs=;
+ b=A5W55rvs+f4p7NCzPYNszFlipK1alrx2QJzqzBGFKkKe4PtWyPRcxTuBoXBCxtnxni/v5vbcTC3VZgD7z+pq4i4Nglt9kQt4ig99+lNHuS6Qwnw80lUT3wxfPMg+20U7TLhZWxtzLWXRt3N6lLX3uOa8YgMfNLfGfOUCS/FUmI0=
+Received: from DB6PR0801MB1702.eurprd08.prod.outlook.com (10.169.221.21) by
+ DB6PR0801MB1685.eurprd08.prod.outlook.com (10.169.225.145) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2387.20; Thu, 24 Oct 2019 11:14:02 +0000
+Received: from DB6PR0801MB1702.eurprd08.prod.outlook.com
+ ([fe80::f849:2ba0:2a0b:5b34]) by DB6PR0801MB1702.eurprd08.prod.outlook.com
+ ([fe80::f849:2ba0:2a0b:5b34%7]) with mapi id 15.20.2347.030; Thu, 24 Oct 2019
+ 11:14:02 +0000
+From: Denis Lunev <den@virtuozzo.com>
+To: Kevin Wolf <kwolf@redhat.com>
+Subject: Re: [PATCH 2/3] qcow2: Assert that qcow2_cache_get() callers hold
+ s->lock
+Thread-Topic: [PATCH 2/3] qcow2: Assert that qcow2_cache_get() callers hold
+ s->lock
+Thread-Index: AQHVibZRoCM6NbrZp0+Q3TpWlZwDWKdpws2A///dggCAAASJAA==
+Date: Thu, 24 Oct 2019 11:14:02 +0000
+Message-ID: <b244c211-aa73-b4f9-7313-474e909359fb@virtuozzo.com>
+References: <20191023152620.13166-1-kwolf@redhat.com>
+ <20191023152620.13166-3-kwolf@redhat.com>
+ <3600fb84-e1f1-c70a-4b83-e7a379f50614@virtuozzo.com>
+ <20191024105746.GB6200@linux.fritz.box>
+In-Reply-To: <20191024105746.GB6200@linux.fritz.box>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-clientproxiedby: HE1PR0202CA0035.eurprd02.prod.outlook.com
+ (2603:10a6:3:e4::21) To DB6PR0801MB1702.eurprd08.prod.outlook.com
+ (2603:10a6:4:2f::21)
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=den@virtuozzo.com; 
+x-ms-exchange-messagesentrepresentingtype: 1
+x-originating-ip: [185.231.240.5]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 716905c6-80d7-449e-6ebc-08d758734692
+x-ms-traffictypediagnostic: DB6PR0801MB1685:
+x-ms-exchange-transport-forked: True
+x-microsoft-antispam-prvs: <DB6PR0801MB1685B8CEC7303E089B0BB824B66A0@DB6PR0801MB1685.eurprd08.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:203;
+x-forefront-prvs: 0200DDA8BE
+x-forefront-antispam-report: SFV:NSPM;
+ SFS:(10019020)(396003)(136003)(366004)(39840400004)(346002)(376002)(189003)(199004)(52314003)(86362001)(8936002)(2906002)(99286004)(486006)(476003)(2616005)(11346002)(446003)(66446008)(6512007)(66476007)(66556008)(64756008)(25786009)(66946007)(6246003)(31696002)(8676002)(71200400001)(71190400001)(6486002)(386003)(81156014)(76176011)(52116002)(81166006)(53546011)(6506007)(36756003)(6436002)(14454004)(305945005)(229853002)(54906003)(316002)(7736002)(3846002)(5660300002)(6116002)(66066001)(256004)(14444005)(186003)(6916009)(4326008)(102836004)(26005)(31686004)(478600001);
+ DIR:OUT; SFP:1102; SCL:1; SRVR:DB6PR0801MB1685;
+ H:DB6PR0801MB1702.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
+ PTR:InfoNoRecords; MX:1; A:1; 
+received-spf: None (protection.outlook.com: virtuozzo.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: IgO+PaUWawRHkdavLyVcdJomVDQOVZAf9O+kiBGSnR+bgfMbQxdBvwReLwADWrpWGZsBJPM0OLnFvXwwtb+6HUMLBs/EM0ZYLb4dybvAuybAdgavuMQ8TlG1R9HweR93Akep+XxJVuAYL77QElBTcbfV0+wBq9dGEomAIDPXWT1JY92H0gfWlaBu3xJMirWRV6SDHnhyJibgN+sjmwQqNg8xHzulfIyPhOWGi0kOqnQVY7GBWS3gjVlYu/MV9bndlNg/Z9ogJs/qXjQRki0DTut9MnxMt85j3YkOywdcC8lwT8sod9fss1kYga11LbWWMNVccHtvD61Ythpp954LL2SDx6XA8pZ/jTuxK5HWS6LWSrNUIfX3bSfcIY2LsI6GO0FqLi8JmmstVWPZoeXt4iA3EFvDKhEVofpkCLyw0mxtBqnbWjbkF71xDFA9AF1f
+Content-Type: text/plain; charset="Windows-1252"
+Content-ID: <DB0E61B9902FB449B14C01A391672EE8@eurprd08.prod.outlook.com>
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 205.139.110.120
+MIME-Version: 1.0
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 716905c6-80d7-449e-6ebc-08d758734692
+X-MS-Exchange-CrossTenant-originalarrivaltime: 24 Oct 2019 11:14:02.6948 (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: eS5891G+yNdx2AiWd4EbhpCB0THJyvIrUf3CJsXdSCFZfvTInI0H8rlZcxlb9hygThCLucA/U/hv2ThtuKxf1w==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB6PR0801MB1685
+X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
+X-Received-From: 2a01:111:f400:fe1e::708
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,337 +127,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: "psyhomb@gmail.com" <psyhomb@gmail.com>,
+ "michael@weiser.dinsnail.net" <michael@weiser.dinsnail.net>,
+ Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ "qemu-block@nongnu.org" <qemu-block@nongnu.org>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "qemu-stable@nongnu.org" <qemu-stable@nongnu.org>,
+ "dgilbert@redhat.com" <dgilbert@redhat.com>,
+ "mreitz@redhat.com" <mreitz@redhat.com>,
+ "lersek@redhat.com" <lersek@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Stefan Hajnoczi <stefanha@redhat.com>
+On 10/24/19 1:57 PM, Kevin Wolf wrote:
+> Am 24.10.2019 um 12:01 hat Denis Lunev geschrieben:
+>> On 10/23/19 6:26 PM, Kevin Wolf wrote:
+>>> qcow2_cache_do_get() requires that s->lock is locked because it can
+>>> yield between picking a cache entry and actually taking ownership of it
+>>> by setting offset and increasing the reference count.
+>>>
+>>> Add an assertion to make sure the caller really holds the lock. The
+>>> function can be called outside of coroutine context, where bdrv_pread
+>>> and flushes become synchronous operations. The lock cannot and need not
+>>> be taken in this case.
+>>>
+>>> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+>>> ---
+>>>  block/qcow2-cache.c | 5 +++++
+>>>  1 file changed, 5 insertions(+)
+>>>
+>>> diff --git a/block/qcow2-cache.c b/block/qcow2-cache.c
+>>> index d29b038a67..75b13dad99 100644
+>>> --- a/block/qcow2-cache.c
+>>> +++ b/block/qcow2-cache.c
+>>> @@ -327,6 +327,9 @@ static int qcow2_cache_do_get(BlockDriverState *bs,=
+ Qcow2Cache *c,
+>>>      int min_lru_index =3D -1;
+>>> =20
+>>>      assert(offset !=3D 0);
+>>> +    if (qemu_in_coroutine()) {
+>>> +        qemu_co_mutex_assert_locked(&s->lock);
+>>> +    }
+>> that is looking not good to me. If this is really requires lock, we shou=
+ld
+>> check for the lock always. In the other hand we could face missed
+>> lock out of coroutine.
+> As the commit message explains, outside of coroutine context, we can't
+> yield and bdrv_pread and bdrv_flush become synchronous operations
+> instead, so there is nothing else that we need to protect against.
+>
+> Kevin
+>
+Hmm. It seems I was not careful enough with reading entire message.
+I am fine with this though it looks a bit tricky to me as such things
+can change in the future.
 
-Do not expose lo_inode pointers to clients.
+Anyway, you could consider this as
 
-Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
----
- contrib/virtiofsd/passthrough_ll.c | 125 ++++++++++++++++++++++++-----
- 1 file changed, 105 insertions(+), 20 deletions(-)
+Reviewed-by: Denis V. Lunev <den@openvz.org>
 
-diff --git a/contrib/virtiofsd/passthrough_ll.c b/contrib/virtiofsd/passthr=
-ough_ll.c
-index 3093d1171e..f718c951f7 100644
---- a/contrib/virtiofsd/passthrough_ll.c
-+++ b/contrib/virtiofsd/passthrough_ll.c
-@@ -56,8 +56,8 @@
-=20
- #define HAVE_POSIX_FALLOCATE 1
-=20
--/* We are re-using pointers to our `struct lo_inode` and `struct
--   lo_dirp` elements as inodes. This means that we must be able to
-+/* We are re-using pointers to our `struct lo_dirp`
-+   elements as inodes. This means that we must be able to
-    store uintptr_t values in a fuse_ino_t variable. The following
-    incantation checks this condition at compile time. */
- #if defined(__GNUC__) && (__GNUC__ > 4 || __GNUC__ =3D=3D 4 && __GNUC_MINO=
-R__ >=3D 6) && !defined __cplusplus
-@@ -71,7 +71,7 @@ struct _uintptr_to_must_hold_fuse_ino_t_dummy_struct \
-=20
- struct lo_map_elem {
- =09union {
--=09=09/* Element values will go here... */
-+=09=09struct lo_inode *inode;
- =09=09ssize_t freelist;
- =09};
- =09bool in_use;
-@@ -92,6 +92,7 @@ struct lo_inode {
- =09ino_t ino;
- =09dev_t dev;
- =09uint64_t refcount; /* protected by lo->mutex */
-+=09fuse_ino_t fuse_ino;
- };
-=20
- struct lo_cred {
-@@ -116,6 +117,7 @@ struct lo_data {
- =09int cache;
- =09int timeout_set;
- =09struct lo_inode root; /* protected by lo->mutex */
-+=09struct lo_map ino_map; /* protected by lo->mutex */
- };
-=20
- static const struct fuse_opt lo_opts[] =3D {
-@@ -250,17 +252,38 @@ static void lo_map_remove(struct lo_map *map, size_t =
-key)
- =09map->freelist =3D key;
- }
-=20
-+/* Assumes lo->mutex is held */
-+static ssize_t lo_add_inode_mapping(fuse_req_t req, struct lo_inode *inode=
-)
-+{
-+=09struct lo_map_elem *elem;
-+
-+=09elem =3D lo_map_alloc_elem(&lo_data(req)->ino_map);
-+=09if (!elem)
-+=09=09return -1;
-+
-+=09elem->inode =3D inode;
-+=09return elem - lo_data(req)->ino_map.elems;
-+}
-+
- static struct lo_inode *lo_inode(fuse_req_t req, fuse_ino_t ino)
- {
--=09if (ino =3D=3D FUSE_ROOT_ID)
--=09=09return &lo_data(req)->root;
--=09else
--=09=09return (struct lo_inode *) (uintptr_t) ino;
-+=09struct lo_data *lo =3D lo_data(req);
-+=09struct lo_map_elem *elem;
-+
-+=09pthread_mutex_lock(&lo->mutex);
-+=09elem =3D lo_map_get(&lo->ino_map, ino);
-+=09pthread_mutex_unlock(&lo->mutex);
-+
-+=09if (!elem)
-+=09=09return NULL;
-+
-+=09return elem->inode;
- }
-=20
- static int lo_fd(fuse_req_t req, fuse_ino_t ino)
- {
--=09return lo_inode(req, ino)->fd;
-+=09struct lo_inode *inode =3D lo_inode(req, ino);
-+=09return inode ? inode->fd : -1;
- }
-=20
- static bool lo_debug(fuse_req_t req)
-@@ -330,10 +353,18 @@ static void lo_setattr(fuse_req_t req, fuse_ino_t ino=
-, struct stat *attr,
- {
- =09int saverr;
- =09char procname[64];
--=09struct lo_inode *inode =3D lo_inode(req, ino);
--=09int ifd =3D inode->fd;
-+=09struct lo_inode *inode;
-+=09int ifd;
- =09int res;
-=20
-+=09inode =3D lo_inode(req, ino);
-+=09if (!inode) {
-+=09=09fuse_reply_err(req, EBADF);
-+=09=09return;
-+=09}
-+
-+=09ifd =3D inode->fd;
-+
- =09if (valid & FUSE_SET_ATTR_MODE) {
- =09=09if (fi) {
- =09=09=09res =3D fchmod(fi->fh, attr->st_mode);
-@@ -456,6 +487,7 @@ static int lo_do_lookup(fuse_req_t req, fuse_ino_t pare=
-nt, const char *name,
- =09=09inode->dev =3D e->attr.st_dev;
-=20
- =09=09pthread_mutex_lock(&lo->mutex);
-+=09=09inode->fuse_ino =3D lo_add_inode_mapping(req, inode);
- =09=09prev =3D &lo->root;
- =09=09next =3D prev->next;
- =09=09next->prev =3D inode;
-@@ -464,7 +496,7 @@ static int lo_do_lookup(fuse_req_t req, fuse_ino_t pare=
-nt, const char *name,
- =09=09prev->next =3D inode;
- =09=09pthread_mutex_unlock(&lo->mutex);
- =09}
--=09e->ino =3D (uintptr_t) inode;
-+=09e->ino =3D inode->fuse_ino;
-=20
- =09if (lo_debug(req))
- =09=09fuse_log(FUSE_LOG_DEBUG, "  %lli/%s -> %lli\n",
-@@ -546,10 +578,16 @@ static void lo_mknod_symlink(fuse_req_t req, fuse_ino=
-_t parent,
- {
- =09int res;
- =09int saverr;
--=09struct lo_inode *dir =3D lo_inode(req, parent);
-+=09struct lo_inode *dir;
- =09struct fuse_entry_param e;
- =09struct lo_cred old =3D {};
-=20
-+=09dir =3D lo_inode(req, parent);
-+=09if (!dir) {
-+=09=09fuse_reply_err(req, EBADF);
-+=09=09return;
-+=09}
-+
- =09saverr =3D ENOMEM;
-=20
- =09saverr =3D lo_change_cred(req, &old);
-@@ -623,10 +661,16 @@ static void lo_link(fuse_req_t req, fuse_ino_t ino, f=
-use_ino_t parent,
- {
- =09int res;
- =09struct lo_data *lo =3D lo_data(req);
--=09struct lo_inode *inode =3D lo_inode(req, ino);
-+=09struct lo_inode *inode;
- =09struct fuse_entry_param e;
- =09int saverr;
-=20
-+=09inode =3D lo_inode(req, ino);
-+=09if (!inode) {
-+=09=09fuse_reply_err(req, EBADF);
-+=09=09return;
-+=09}
-+
- =09memset(&e, 0, sizeof(struct fuse_entry_param));
- =09e.attr_timeout =3D lo->timeout;
- =09e.entry_timeout =3D lo->timeout;
-@@ -642,7 +686,7 @@ static void lo_link(fuse_req_t req, fuse_ino_t ino, fus=
-e_ino_t parent,
- =09pthread_mutex_lock(&lo->mutex);
- =09inode->refcount++;
- =09pthread_mutex_unlock(&lo->mutex);
--=09e.ino =3D (uintptr_t) inode;
-+=09e.ino =3D inode->fuse_ino;
-=20
- =09if (lo_debug(req))
- =09=09fuse_log(FUSE_LOG_DEBUG, "  %lli/%s -> %lli\n",
-@@ -708,10 +752,10 @@ static void unref_inode(struct lo_data *lo, struct lo=
-_inode *inode, uint64_t n)
- =09=09next->prev =3D prev;
- =09=09prev->next =3D next;
-=20
-+=09=09lo_map_remove(&lo->ino_map, inode->fuse_ino);
- =09=09pthread_mutex_unlock(&lo->mutex);
- =09=09close(inode->fd);
- =09=09free(inode);
--
- =09} else {
- =09=09pthread_mutex_unlock(&lo->mutex);
- =09}
-@@ -720,7 +764,11 @@ static void unref_inode(struct lo_data *lo, struct lo_=
-inode *inode, uint64_t n)
- static void lo_forget_one(fuse_req_t req, fuse_ino_t ino, uint64_t nlookup=
-)
- {
- =09struct lo_data *lo =3D lo_data(req);
--=09struct lo_inode *inode =3D lo_inode(req, ino);
-+=09struct lo_inode *inode;
-+
-+=09inode =3D lo_inode(req, ino);
-+=09if (!inode)
-+=09=09return;
-=20
- =09if (lo_debug(req)) {
- =09=09fuse_log(FUSE_LOG_DEBUG, "  forget %lli %lli -%lli\n",
-@@ -1161,10 +1209,16 @@ static void lo_getxattr(fuse_req_t req, fuse_ino_t =
-ino, const char *name,
- {
- =09char *value =3D NULL;
- =09char procname[64];
--=09struct lo_inode *inode =3D lo_inode(req, ino);
-+=09struct lo_inode *inode;
- =09ssize_t ret;
- =09int saverr;
-=20
-+=09inode =3D lo_inode(req, ino);
-+=09if (!inode) {
-+=09=09fuse_reply_err(req, EBADF);
-+=09=09return;
-+=09}
-+
- =09saverr =3D ENOSYS;
- =09if (!lo_data(req)->xattr)
- =09=09goto out;
-@@ -1217,10 +1271,16 @@ static void lo_listxattr(fuse_req_t req, fuse_ino_t=
- ino, size_t size)
- {
- =09char *value =3D NULL;
- =09char procname[64];
--=09struct lo_inode *inode =3D lo_inode(req, ino);
-+=09struct lo_inode *inode;
- =09ssize_t ret;
- =09int saverr;
-=20
-+=09inode =3D lo_inode(req, ino);
-+=09if (!inode) {
-+=09=09fuse_reply_err(req, EBADF);
-+=09=09return;
-+=09}
-+
- =09saverr =3D ENOSYS;
- =09if (!lo_data(req)->xattr)
- =09=09goto out;
-@@ -1273,10 +1333,16 @@ static void lo_setxattr(fuse_req_t req, fuse_ino_t =
-ino, const char *name,
- =09=09=09const char *value, size_t size, int flags)
- {
- =09char procname[64];
--=09struct lo_inode *inode =3D lo_inode(req, ino);
-+=09struct lo_inode *inode;
- =09ssize_t ret;
- =09int saverr;
-=20
-+=09inode =3D lo_inode(req, ino);
-+=09if (!inode) {
-+=09=09fuse_reply_err(req, EBADF);
-+=09=09return;
-+=09}
-+
- =09saverr =3D ENOSYS;
- =09if (!lo_data(req)->xattr)
- =09=09goto out;
-@@ -1304,10 +1370,16 @@ out:
- static void lo_removexattr(fuse_req_t req, fuse_ino_t ino, const char *nam=
-e)
- {
- =09char procname[64];
--=09struct lo_inode *inode =3D lo_inode(req, ino);
-+=09struct lo_inode *inode;
- =09ssize_t ret;
- =09int saverr;
-=20
-+=09inode =3D lo_inode(req, ino);
-+=09if (!inode) {
-+=09=09fuse_reply_err(req, EBADF);
-+=09=09return;
-+=09}
-+
- =09saverr =3D ENOSYS;
- =09if (!lo_data(req)->xattr)
- =09=09goto out;
-@@ -1411,6 +1483,7 @@ int main(int argc, char *argv[])
- =09struct fuse_cmdline_opts opts;
- =09struct lo_data lo =3D { .debug =3D 0,
- =09                      .writeback =3D 0 };
-+=09struct lo_map_elem *root_elem;
- =09int ret =3D -1;
-=20
- =09/* Don't mask creation mode, kernel already did that */
-@@ -1419,8 +1492,18 @@ int main(int argc, char *argv[])
- =09pthread_mutex_init(&lo.mutex, NULL);
- =09lo.root.next =3D lo.root.prev =3D &lo.root;
- =09lo.root.fd =3D -1;
-+=09lo.root.fuse_ino =3D FUSE_ROOT_ID;
- =09lo.cache =3D CACHE_NORMAL;
-=20
-+=09/* Set up the ino map like this:
-+=09 * [0] Reserved (will not be used)
-+=09 * [1] Root inode
-+=09 */
-+=09lo_map_init(&lo.ino_map);
-+=09lo_map_reserve(&lo.ino_map, 0)->in_use =3D false;
-+=09root_elem =3D lo_map_reserve(&lo.ino_map, lo.root.fuse_ino);
-+=09root_elem->inode =3D &lo.root;
-+
- =09if (fuse_parse_cmdline(&args, &opts) !=3D 0)
- =09=09return 1;
- =09if (opts.show_help) {
-@@ -1514,6 +1597,8 @@ err_out2:
- err_out1:
- =09fuse_opt_free_args(&args);
-=20
-+=09lo_map_destroy(&lo.ino_map);
-+
- =09if (lo.root.fd >=3D 0)
- =09=09close(lo.root.fd);
-=20
---=20
-2.23.0
-
+Den
 
