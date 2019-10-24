@@ -2,92 +2,85 @@ Return-Path: <SRS0=Jnn8=YR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.2 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6C9DCCA9EAF
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 19:33:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9C204CA9EAF
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 19:39:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2F0AB2084C
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 19:33:17 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2F0AB2084C
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ilande.co.uk
+	by mail.kernel.org (Postfix) with ESMTPS id 68C222064A
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 19:39:45 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hyv0R1oV"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 68C222064A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51444 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51478 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iNirE-0007qn-6l
-	for qemu-devel@archiver.kernel.org; Thu, 24 Oct 2019 15:33:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57562)
+	id 1iNixU-0004R2-JP
+	for qemu-devel@archiver.kernel.org; Thu, 24 Oct 2019 15:39:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58723)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mark.cave-ayland@ilande.co.uk>) id 1iNinG-0006P2-HK
- for qemu-devel@nongnu.org; Thu, 24 Oct 2019 15:29:12 -0400
+ (envelope-from <armbru@redhat.com>) id 1iNitt-000181-2F
+ for qemu-devel@nongnu.org; Thu, 24 Oct 2019 15:36:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mark.cave-ayland@ilande.co.uk>) id 1iNinE-0008TN-Ic
- for qemu-devel@nongnu.org; Thu, 24 Oct 2019 15:29:10 -0400
-Received: from mail.ilande.co.uk ([46.43.2.167]:56620
- helo=mail.default.ilande.uk0.bigv.io)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1iNinE-0008T3-CL
- for qemu-devel@nongnu.org; Thu, 24 Oct 2019 15:29:08 -0400
-Received: from host86-185-106-131.range86-185.btcentralplus.com
- ([86.185.106.131] helo=[192.168.1.65])
- by mail.default.ilande.uk0.bigv.io with esmtpsa
- (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.89)
- (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1iNing-0000aw-Rt; Thu, 24 Oct 2019 20:29:37 +0100
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
-References: <20191024162724.31675-1-peter.maydell@linaro.org>
- <1bf876f8-b868-ac37-e7ef-083fdf2544a9@redhat.com>
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Openpgp: preference=signencrypt
-Autocrypt: addr=mark.cave-ayland@ilande.co.uk; keydata=
- mQENBFQJuzwBCADAYvxrwUh1p/PvUlNFwKosVtVHHplgWi5p29t58QlOUkceZG0DBYSNqk93
- 3JzBTbtd4JfFcSupo6MNNOrCzdCbCjZ64ik8ycaUOSzK2tKbeQLEXzXoaDL1Y7vuVO7nL9bG
- E5Ru3wkhCFc7SkoypIoAUqz8EtiB6T89/D9TDEyjdXUacc53R5gu8wEWiMg5MQQuGwzbQy9n
- PFI+mXC7AaEUqBVc2lBQVpAYXkN0EyqNNT12UfDLdxaxaFpUAE2pCa2LTyo5vn5hEW+i3VdN
- PkmjyPvL6DdY03fvC01PyY8zaw+UI94QqjlrDisHpUH40IUPpC/NB0LwzL2aQOMkzT2NABEB
- AAG0ME1hcmsgQ2F2ZS1BeWxhbmQgPG1hcmsuY2F2ZS1heWxhbmRAaWxhbmRlLmNvLnVrPokB
- OAQTAQIAIgUCVAm7PAIbAwYLCQgHAwIGFQgCCQoLBBYCAwECHgECF4AACgkQW8LFb64PMh9f
- NAgAuc3ObOEY8NbZko72AGrg2tWKdybcMVITxmcor4hb9155o/OWcA4IDbeATR6cfiDL/oxU
- mcmtXVgPqOwtW3NYAKr5g/FrZZ3uluQ2mtNYAyTFeALy8YF7N3yhs7LOcpbFP7tEbkSzoXNG
- z8iYMiYtKwttt40WaheWuRs0ZOLbs6yoczZBDhna3Nj0LA3GpeJKlaV03O4umjKJgACP1c/q
- T2Pkg+FCBHHFP454+waqojHp4OCBo6HyK+8I4wJRa9Z0EFqXIu8lTDYoggeX0Xd6bWeCFHK3
- DhD0/Xi/kegSW33unsp8oVcM4kcFxTkpBgj39dB4KwAUznhTJR0zUHf63LkBDQRUCbs8AQgA
- y7kyevA4bpetM/EjtuqQX4U05MBhEz/2SFkX6IaGtTG2NNw5wbcAfhOIuNNBYbw6ExuaJ3um
- 2uLseHnudmvN4VSJ5Hfbd8rhqoMmmO71szgT/ZD9MEe2KHzBdmhmhxJdp+zQNivy215j6H27
- 14mbC2dia7ktwP1rxPIX1OOfQwPuqlkmYPuVwZP19S4EYnCELOrnJ0m56tZLn5Zj+1jZX9Co
- YbNLMa28qsktYJ4oU4jtn6V79H+/zpERZAHmH40IRXdR3hA+Ye7iC/ZpWzT2VSDlPbGY9Yja
- Sp7w2347L5G+LLbAfaVoejHlfy/msPeehUcuKjAdBLoEhSPYzzdvEQARAQABiQEfBBgBAgAJ
- BQJUCbs8AhsMAAoJEFvCxW+uDzIfabYIAJXmBepHJpvCPiMNEQJNJ2ZSzSjhic84LTMWMbJ+
- opQgr5cb8SPQyyb508fc8b4uD8ejlF/cdbbBNktp3BXsHlO5BrmcABgxSP8HYYNsX0n9kERv
- NMToU0oiBuAaX7O/0K9+BW+3+PGMwiu5ml0cwDqljxfVN0dUBZnQ8kZpLsY+WDrIHmQWjtH+
- Ir6VauZs5Gp25XLrL6bh/SL8aK0BX6y79m5nhfKI1/6qtzHAjtMAjqy8ChPvOqVVVqmGUzFg
- KPsrrIoklWcYHXPyMLj9afispPVR8e0tMKvxzFBWzrWX1mzljbBlnV2n8BIwVXWNbgwpHSsj
- imgcU9TTGC5qd9g=
-Message-ID: <f03025d5-e704-27f8-b941-39f4cc7cd2c4@ilande.co.uk>
-Date: Thu, 24 Oct 2019 20:29:05 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+ (envelope-from <armbru@redhat.com>) id 1iNith-0002Gu-OO
+ for qemu-devel@nongnu.org; Thu, 24 Oct 2019 15:35:51 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:31109
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1iNith-0002GE-Jz
+ for qemu-devel@nongnu.org; Thu, 24 Oct 2019 15:35:49 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1571945748;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=dZBxxwtJr61xMT6jebBHlktczPXyQWeFtZb0+1TntPI=;
+ b=hyv0R1oV/Sw0Xg+B2x6HwK9Vl+l5Hu2Jv2huH9VuK/GGkQIrc/ZzXzeaVLpWRJmrnbLxFy
+ ygwFuzQfwLzjXHk9r30wMT4ifKEKw8qn4u0QrQ88FIazCxJUFch8MPKlRN9WeBiOeKN/T8
+ cviTarBpcd2E1ZinR5do7UTbevBF2ks=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-324-3G7cB8kcPhiIcmZ92dg_tA-1; Thu, 24 Oct 2019 15:35:47 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 21ACB800D49
+ for <qemu-devel@nongnu.org>; Thu, 24 Oct 2019 19:35:46 +0000 (UTC)
+Received: from blackfin.pond.sub.org (unknown [10.36.118.123])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 5BB9B5DA8D;
+ Thu, 24 Oct 2019 19:35:43 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id CC0AD1138619; Thu, 24 Oct 2019 21:35:33 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: Daniel P. =?utf-8?Q?Berrang=C3=A9?= <berrange@redhat.com>
+Subject: Re: [libvirt] [RFC PATCH 18/19] qapi: Include a warning in the
+ response to a deprecated command
+References: <20191024123458.13505-1-armbru@redhat.com>
+ <20191024123458.13505-19-armbru@redhat.com>
+ <20191024140146.GC8381@redhat.com>
+Date: Thu, 24 Oct 2019 21:35:33 +0200
+In-Reply-To: <20191024140146.GC8381@redhat.com> ("Daniel P. =?utf-8?Q?Berr?=
+ =?utf-8?Q?ang=C3=A9=22's?=
+ message of "Thu, 24 Oct 2019 15:01:46 +0100")
+Message-ID: <87h83yndh6.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.2 (gnu/linux)
 MIME-Version: 1.0
-In-Reply-To: <1bf876f8-b868-ac37-e7ef-083fdf2544a9@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-GB
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 86.185.106.131
-X-SA-Exim-Mail-From: mark.cave-ayland@ilande.co.uk
-Subject: Re: [PULL 00/51] target-arm queue
-X-SA-Exim-Version: 4.2.1 (built Tue, 02 Aug 2016 21:08:31 +0000)
-X-SA-Exim-Scanned: Yes (on mail.default.ilande.uk0.bigv.io)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-MC-Unique: 3G7cB8kcPhiIcmZ92dg_tA-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 46.43.2.167
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,174 +92,138 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: libvir-list@redhat.com, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 24/10/2019 19:18, Philippe Mathieu-Daudé wrote:
+Daniel P. Berrang=C3=A9 <berrange@redhat.com> writes:
 
-> On 10/24/19 6:26 PM, Peter Maydell wrote:
->> Probably the last arm pullreq before softfreeze...
->>
->> The following changes since commit 58560ad254fbda71d4daa6622d71683190070ee2:
->>
->>    Merge remote-tracking branch 'remotes/dgibson/tags/ppc-for-4.2-20191024' into
->> staging (2019-10-24 16:22:58 +0100)
->>
->> are available in the Git repository at:
->>
->>    https://git.linaro.org/people/pmaydell/qemu-arm.git tags/pull-target-arm-20191024
->>
->> for you to fetch changes up to a01a4a3e85ae8f6fe21adbedc80f7013faabdcf4:
->>
->>    hw/arm/highbank: Use AddressSpace when using write_secondary_boot() (2019-10-24
->> 17:16:30 +0100)
->>
->> ----------------------------------------------------------------
->> target-arm queue:
->>   * raspi boards: some cleanup
->>   * raspi: implement the bcm2835 system timer device
->>   * raspi: implement a dummy thermal sensor
->>   * KVM: support providing SVE to the guest
->>   * misc devices: switch to ptimer transaction API
->>   * cache TB flag state to improve performance of cpu_get_tb_cpu_state
->>   * aspeed: Add an AST2600 eval board
->>
->> ----------------------------------------------------------------
->> Andrew Jones (9):
->>        target/arm/monitor: Introduce qmp_query_cpu_model_expansion
->>        tests: arm: Introduce cpu feature tests
->>        target/arm: Allow SVE to be disabled via a CPU property
->>        target/arm/cpu64: max cpu: Introduce sve<N> properties
->>        target/arm/kvm64: Add kvm_arch_get/put_sve
->>        target/arm/kvm64: max cpu: Enable SVE when available
->>        target/arm/kvm: scratch vcpu: Preserve input kvm_vcpu_init features
->>        target/arm/cpu64: max cpu: Support sve properties with KVM
->>        target/arm/kvm: host cpu: Add support for sve<N> properties
->>
->> Cédric Le Goater (2):
->>        hw/gpio: Fix property accessors of the AST2600 GPIO 1.8V model
->>        aspeed: Add an AST2600 eval board
->>
->> Peter Maydell (8):
->>        hw/net/fsl_etsec/etsec.c: Switch to transaction-based ptimer API
->>        hw/timer/xilinx_timer.c: Switch to transaction-based ptimer API
->>        hw/dma/xilinx_axidma.c: Switch to transaction-based ptimer API
->>        hw/timer/slavio_timer: Remove useless check for NULL t->timer
->>        hw/timer/slavio_timer.c: Switch to transaction-based ptimer API
->>        hw/timer/grlib_gptimer.c: Switch to transaction-based ptimer API
->>        hw/m68k/mcf5206.c: Switch to transaction-based ptimer API
->>        hw/watchdog/milkymist-sysctl.c: Switch to transaction-based ptimer API
->>
->> Philippe Mathieu-Daudé (8):
->>        hw/misc/bcm2835_thermal: Add a dummy BCM2835 thermal sensor
->>        hw/arm/bcm2835_peripherals: Use the thermal sensor block
->>        hw/timer/bcm2835: Add the BCM2835 SYS_timer
->>        hw/arm/bcm2835_peripherals: Use the SYS_timer
->>        hw/arm/bcm2836: Make the SoC code modular
->>        hw/arm/bcm2836: Rename cpus[] as cpu[].core
->>        hw/arm/raspi: Use AddressSpace when using arm_boot::write_secondary_boot
->>        hw/arm/highbank: Use AddressSpace when using write_secondary_boot()
->>
->> Richard Henderson (24):
->>        target/arm: Split out rebuild_hflags_common
->>        target/arm: Split out rebuild_hflags_a64
->>        target/arm: Split out rebuild_hflags_common_32
->>        target/arm: Split arm_cpu_data_is_big_endian
->>        target/arm: Split out rebuild_hflags_m32
->>        target/arm: Reduce tests vs M-profile in cpu_get_tb_cpu_state
->>        target/arm: Split out rebuild_hflags_a32
->>        target/arm: Split out rebuild_hflags_aprofile
->>        target/arm: Hoist XSCALE_CPAR, VECLEN, VECSTRIDE in cpu_get_tb_cpu_state
->>        target/arm: Simplify set of PSTATE_SS in cpu_get_tb_cpu_state
->>        target/arm: Hoist computation of TBFLAG_A32.VFPEN
->>        target/arm: Add arm_rebuild_hflags
->>        target/arm: Split out arm_mmu_idx_el
->>        target/arm: Hoist store to cs_base in cpu_get_tb_cpu_state
->>        target/arm: Add HELPER(rebuild_hflags_{a32, a64, m32})
->>        target/arm: Rebuild hflags at EL changes
->>        target/arm: Rebuild hflags at MSR writes
->>        target/arm: Rebuild hflags at CPSR writes
->>        target/arm: Rebuild hflags at Xscale SCTLR writes
->>        target/arm: Rebuild hflags for M-profile
->>        target/arm: Rebuild hflags for M-profile NVIC
->>        linux-user/aarch64: Rebuild hflags for TARGET_WORDS_BIGENDIAN
->>        linux-user/arm: Rebuild hflags for TARGET_WORDS_BIGENDIAN
->>        target/arm: Rely on hflags correct in cpu_get_tb_cpu_state
->>
->>   hw/misc/Makefile.objs                |   1 +
->>   hw/timer/Makefile.objs               |   1 +
->>   tests/Makefile.include               |   5 +-
->>   qapi/machine-target.json             |   6 +-
->>   hw/net/fsl_etsec/etsec.h             |   1 -
->>   include/hw/arm/aspeed.h              |   1 +
->>   include/hw/arm/bcm2835_peripherals.h |   5 +-
->>   include/hw/arm/bcm2836.h             |   4 +-
->>   include/hw/arm/raspi_platform.h      |   1 +
->>   include/hw/misc/bcm2835_thermal.h    |  27 ++
->>   include/hw/timer/bcm2835_systmr.h    |  33 +++
->>   include/qemu/bitops.h                |   1 +
->>   target/arm/cpu.h                     | 105 +++++--
->>   target/arm/helper.h                  |   4 +
->>   target/arm/internals.h               |   9 +
->>   target/arm/kvm_arm.h                 |  39 +++
->>   hw/arm/aspeed.c                      |  23 ++
->>   hw/arm/bcm2835_peripherals.c         |  30 +-
->>   hw/arm/bcm2836.c                     |  44 +--
->>   hw/arm/highbank.c                    |   3 +-
->>   hw/arm/raspi.c                       |  14 +-
->>   hw/dma/xilinx_axidma.c               |   9 +-
->>   hw/gpio/aspeed_gpio.c                |   8 +-
->>   hw/intc/armv7m_nvic.c                |  22 +-
->>   hw/m68k/mcf5206.c                    |  15 +-
->>   hw/misc/bcm2835_thermal.c            | 135 +++++++++
->>   hw/net/fsl_etsec/etsec.c             |   9 +-
->>   hw/timer/bcm2835_systmr.c            | 163 +++++++++++
->>   hw/timer/grlib_gptimer.c             |  28 +-
->>   hw/timer/milkymist-sysctl.c          |  25 +-
->>   hw/timer/slavio_timer.c              |  32 ++-
->>   hw/timer/xilinx_timer.c              |  13 +-
->>   linux-user/aarch64/cpu_loop.c        |   1 +
->>   linux-user/arm/cpu_loop.c            |   1 +
->>   linux-user/syscall.c                 |   1 +
->>   target/arm/cpu.c                     |  26 +-
->>   target/arm/cpu64.c                   | 364 +++++++++++++++++++++--
->>   target/arm/helper-a64.c              |   3 +
->>   target/arm/helper.c                  | 403 +++++++++++++++++---------
->>   target/arm/kvm.c                     |  25 +-
->>   target/arm/kvm32.c                   |   6 +-
->>   target/arm/kvm64.c                   | 325 ++++++++++++++++++---
->>   target/arm/m_helper.c                |   6 +
->>   target/arm/machine.c                 |   1 +
->>   target/arm/monitor.c                 | 158 ++++++++++
->>   target/arm/op_helper.c               |   4 +
->>   target/arm/translate-a64.c           |  13 +-
->>   target/arm/translate.c               |  33 ++-
->>   tests/arm-cpu-features.c             | 540 +++++++++++++++++++++++++++++++++++
->>   docs/arm-cpu-features.rst            | 317 ++++++++++++++++++++
->>   hw/timer/trace-events                |   5 +
->>   51 files changed, 2725 insertions(+), 323 deletions(-)
->>   create mode 100644 include/hw/misc/bcm2835_thermal.h
->>   create mode 100644 include/hw/timer/bcm2835_systmr.h
->>   create mode 100644 hw/misc/bcm2835_thermal.c
->>   create mode 100644 hw/timer/bcm2835_systmr.c
->>   create mode 100644 tests/arm-cpu-features.c
->>   create mode 100644 docs/arm-cpu-features.rst
->>
-> 
-> If this pull ever fails, please consider fixing:
-> 
-> typo "device":
-> https://www.mail-archive.com/qemu-devel@nongnu.org/msg654117.html
-> 
-> Tested-by: Mark Cave-Ayland
-> https://www.mail-archive.com/qemu-devel@nongnu.org/msg653861.html
+> On Thu, Oct 24, 2019 at 02:34:57PM +0200, Markus Armbruster wrote:
+>> Looks like this
+>>=20
+>>     ---> {"execute": "query-cpus"}
+>>     <--- {"return": [...], "warnings": [{"class": "CommandNotFound", "de=
+sc": "command is deprecated"}]}
+>>=20
+>> Management applications may want to log such warnings.
+>>=20
+>> This commit is not for merging as is, because
+>>=20
+>> * docs/interop/qmp-spec.txt needs an update for the new success
+>>   response member "warnings".
+>>=20
+>> * I'd like to see a prospective user before I extend the QMP protocol.
+>>   If you have specific plans to put them to use, let me know.
+>
+> Thinking about libvirt's usage of QMP
+>
+>  - A public API call may result in many QMP commands being run.
+>  - Public APIs don't have any convenient way to report deprecated
+>    usage synchronously at runtime.
+>  - The set of QMP comamnds used by libvirt is a private impl
+>    detail that a mgmt app shouldn't know about
+>
+> Some (most) deprecations will be things targetted at libvirt
+> developers, where libvirt just needs fixing to use some new
+> alternative instead.
 
-Certainly it's not worth a re-spin just on account of a missing tag, I really just
-wanted to confirm that the changes are good here :)
+Based on what we've deprecated so far: most, for a large value of
+"most".
 
+> Other deprecations where there's no replacement provided by QEMU
+> are things where an application might need to be told to stop
+> using the feature. From libvirt's public API POV the feature
+> likely won't be deprecated, only the specific usage of that
+> feature with the QEMU driver. eg consider QEMU decides to
+> stop POSTCOPY migration for some reason. Its deprecated from
+> POV of QEMU & QMP commands. If Xen or ESX support POSTCOPY
+> though, its not deprecated from libvirt's API POV. In many
+> ways this becomes a capabilities reporting problem between
+> libvirt & the application. Libvirt needs to tell the app which
+> features they can use, given their curent open libvirt connection
+> and VM instance(s).
 
-ATB,
+Makes sense.
 
-Mark.
+> So, either way, I don't think the QMP deprecations are something
+> we would want to expose to applications 'as is', since they're
+> either not something an app dev can fix, or they need rephrasing
+> in terms of the libvirt API/config feature the app is using, or
+> translating into a way for libvirt to expose capabilities to apps.
+
+Makes sense, too.
+
+> Libvirt could potentially log the deprecation warning in the per
+> QEMU VM log file. If end users see such log messages they'll
+> probably file support tickets / bug reports against libvirt and/or
+> the mgmt app, which will alert their maintainers to the fact. THis
+> could be useful if the maintainers missed the QEMU documentation
+> update listing the deprecation. It could be annoying if libvirt
+> knows it is deprecated though, and intentionally is still using
+> it in this particular version, with plans already present to fix
+> it in future.   So if libvirt does log the deprecations to the
+> VM log file, we'll probably want to /not/ log certain deprecations
+> that we're intentionally ignoring (temporarily).
+
+Makes sense, too.
+
+Logging the complete QMP traffic can be invaluable when troubleshooting,
+and is unlikely to make users report the warnings to libvirt developers.
+But that's a different log / a higher debug level.
+
+> In theory libvirt could see the deprecation reply and take
+> different action, but I don't much like that idea. It is too
+
+That way is madness :)
+
+> late becasue we've already run the command, and its providing
+> a second way to deal with capabilities. We should be able to
+> query/probe the right way to invoke commands upfront, so that
+> we avoid using deprecated stuff in the first place.
+
+PATCH 15 makes deprecation visible in introspection.  Like all of this
+series, it's limited to commands and events.  Extending to arguments and
+return values feels feasible, and I'm willing to do the work.
+
+Argument *values* are a different ballgame.  Schema support for "this
+argument is deprecated" is straightforward (tack feature "deprecated" to
+it).  Support for "this argument value is deprecated" is not (except for
+enumerations, where we can tack feature "deprecated" to the enumeration
+value).  Same for return values, combinations of arguments, and so
+forth.  Not sure how relevant these are in practice.
+
+I'm not sure how useful the "deprecated" feature will be for guiding
+decisions on which interface to use.  I imagine there's typically a list
+of interfaces libvirt can use, ordered by "desirability", and the most
+desirable interface known to work gets used.  If $new_way is workable,
+you use it, else you fall back to $old_way.  Whether $old_way is
+deprecated is immaterial.
+
+The "deprecated" feature could be used for dynamic checking, i.e. check
+the commands sent to QEMU against the output of query-qmp-schema.  But
+that merely duplicates the check QEMU does when it receives it.
+
+Static checking would be more interesting, if we can pull it off.
+
+>> * The same warning should be included in a deprecated event.
+>>=20
+>> * Emitting the same warning over and over again might be annoying or
+>>   slow.  Perhaps warning just once would be better.
+>
+> If written to a log file, any single deprecation definitely
+> needs to be limited to once only per QEMU process lifetime.
+> Once a libvirt/qemu pair is deployed on a host it may be a
+> long time before an upgrade is done that pulls in the new
+> libvirt to avoid the deprecation. So we don't want to be
+> spamming logs of an otherwise fully functional VM.
+>
+> In summary, it is probably reasonable to include this info in the QMP
+> command reply, but don't expect much to be done with it beyond possibly
+> writing it to a log file.
+
+Understood.
+
+Thanks!
+
 
