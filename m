@@ -4,71 +4,72 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E178FCA9EBC
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 12:55:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A733CA9EAF
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 12:56:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B002F205C9
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 12:55:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C77B421872
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 12:56:29 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IMBfwlSe"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B002F205C9
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="X+G4trt3"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C77B421872
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41710 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41718 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iNcdu-0004Ky-Lw
-	for qemu-devel@archiver.kernel.org; Thu, 24 Oct 2019 08:55:06 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47599)
+	id 1iNcfE-0006Ck-OH
+	for qemu-devel@archiver.kernel.org; Thu, 24 Oct 2019 08:56:28 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45461)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <armbru@redhat.com>) id 1iNcKc-0003by-2f
- for qemu-devel@nongnu.org; Thu, 24 Oct 2019 08:35:11 -0400
+ (envelope-from <drjones@redhat.com>) id 1iNc4i-0000zc-OG
+ for qemu-devel@nongnu.org; Thu, 24 Oct 2019 08:18:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1iNcKa-00061k-AQ
- for qemu-devel@nongnu.org; Thu, 24 Oct 2019 08:35:09 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:23226
+ (envelope-from <drjones@redhat.com>) id 1iNc4g-0003uk-N8
+ for qemu-devel@nongnu.org; Thu, 24 Oct 2019 08:18:44 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:56737
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1iNcKa-00061S-6K
- for qemu-devel@nongnu.org; Thu, 24 Oct 2019 08:35:08 -0400
+ (Exim 4.71) (envelope-from <drjones@redhat.com>) id 1iNc4e-0003s4-OE
+ for qemu-devel@nongnu.org; Thu, 24 Oct 2019 08:18:40 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1571920507;
+ s=mimecast20190719; t=1571919518;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=SemqXsPAY1Vd+OZb+KKA+UPO0kVAOEgdOZElEzsIGkA=;
- b=IMBfwlSe6wifF3+WSN5m+ikGITDZZCdCif/euiGK0NUnK5tQdRbvCqvvQQUAswxYWnXrL+
- ov1HAphaJqHmiYtkIxOIpPPfCBeJTXPFfruP/hGKmtXbct7iIlA8wOe7xyyiX627NcJ8pA
- U2JMURN7ATaz6M8JaTHb+45JFeIrJpw=
+ bh=r001ev/QWo0iXQWWhga9Wzo8hKWyq94EvY8sPz6b0y4=;
+ b=X+G4trt3z/nHAUm0qR69lIqfsyLTQeHXrmstfnQLMC8+oeFPznSy1O0Rp8hlM08UINl2KC
+ CbIoBCobNTt1D3wDRdboosVeuVHMh/N1ZJOzL9RG4nnyucT71zcHX4oomnnU0TKO/UFWHC
+ 7ZSJODb/2kcH80qmKWWMFG2jjghJMTM=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-270-pCLIiQjgN3qmY0WmrV0Wjw-1; Thu, 24 Oct 2019 08:35:05 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ us-mta-182-5vEZNzfWN2ixbaLFtW_yDA-1; Thu, 24 Oct 2019 08:18:37 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EC629107AD33;
- Thu, 24 Oct 2019 12:35:04 +0000 (UTC)
-Received: from blackfin.pond.sub.org (unknown [10.36.118.123])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 8B28B5D9CA;
- Thu, 24 Oct 2019 12:35:00 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 00DB31133034; Thu, 24 Oct 2019 14:34:58 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [RFC PATCH 02/19] tests/test-qmp-cmds: Check responses more thoroughly
-Date: Thu, 24 Oct 2019 14:34:41 +0200
-Message-Id: <20191024123458.13505-3-armbru@redhat.com>
-In-Reply-To: <20191024123458.13505-1-armbru@redhat.com>
-References: <20191024123458.13505-1-armbru@redhat.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C70A6800D49;
+ Thu, 24 Oct 2019 12:18:35 +0000 (UTC)
+Received: from kamzik.brq.redhat.com (unknown [10.43.2.160])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id BF88E60BF3;
+ Thu, 24 Oct 2019 12:18:30 +0000 (UTC)
+From: Andrew Jones <drjones@redhat.com>
+To: qemu-devel@nongnu.org,
+	qemu-arm@nongnu.org,
+	peter.maydell@linaro.org
+Subject: [PATCH v7 3/9] target/arm: Allow SVE to be disabled via a CPU property
+Date: Thu, 24 Oct 2019 14:18:02 +0200
+Message-Id: <20191024121808.9612-4-drjones@redhat.com>
+In-Reply-To: <20191024121808.9612-1-drjones@redhat.com>
+References: <20191024121808.9612-1-drjones@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-MC-Unique: pCLIiQjgN3qmY0WmrV0Wjw-1
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-MC-Unique: 5vEZNzfWN2ixbaLFtW_yDA-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=WINDOWS-1252
 Content-Transfer-Encoding: quoted-printable
@@ -86,85 +87,162 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: libvir-list@redhat.com, mdroth@linux.vnet.ibm.com
+Cc: m.mizuma@jp.fujitsu.com, beata.michalska@linaro.org,
+ richard.henderson@linaro.org, armbru@redhat.com, eric.auger@redhat.com,
+ imammedo@redhat.com, alex.bennee@linaro.org, Dave.Martin@arm.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Signed-off-by: Markus Armbruster <armbru@redhat.com>
----
- tests/test-qmp-cmds.c | 23 +++++++++++++++++------
- 1 file changed, 17 insertions(+), 6 deletions(-)
+Since 97a28b0eeac14 ("target/arm: Allow VFP and Neon to be disabled via
+a CPU property") we can disable the 'max' cpu model's VFP and neon
+features, but there's no way to disable SVE. Add the 'sve=3Don|off'
+property to give it that flexibility. We also rename
+cpu_max_get/set_sve_vq to cpu_max_get/set_sve_max_vq in order for them
+to follow the typical *_get/set_<property-name> pattern.
 
-diff --git a/tests/test-qmp-cmds.c b/tests/test-qmp-cmds.c
-index e738bead86..667e03cb1b 100644
---- a/tests/test-qmp-cmds.c
-+++ b/tests/test-qmp-cmds.c
-@@ -150,9 +150,10 @@ static QObject *do_qmp_dispatch(QDict *req, bool allow=
-_oob)
-     QObject *ret;
-=20
-     resp =3D qmp_dispatch(&qmp_commands, QOBJECT(req), allow_oob);
--    g_assert(resp && !qdict_haskey(resp, "error"));
-+    g_assert(resp);
-     ret =3D qdict_get(resp, "return");
-     g_assert(ret);
-+    g_assert(qdict_size(resp) =3D=3D 1);
-=20
-     qobject_ref(ret);
-     qobject_unref(resp);
-@@ -162,9 +163,17 @@ static QObject *do_qmp_dispatch(QDict *req, bool allow=
-_oob)
- static void do_qmp_dispatch_error(QDict *req, bool allow_oob, ErrorClass c=
-ls)
- {
-     QDict *resp;
-+    QDict *error;
-=20
-     resp =3D qmp_dispatch(&qmp_commands, QOBJECT(req), allow_oob);
--    g_assert(resp && qdict_haskey(resp, "error"));
-+    g_assert(resp);
-+    error =3D qdict_get_qdict(resp, "error");
-+    g_assert(error);
-+    g_assert_cmpstr(qdict_get_try_str(error, "class"),
-+                    =3D=3D, QapiErrorClass_str(cls));
-+    g_assert(qdict_get_try_str(error, "desc"));
-+    g_assert(qdict_size(error) =3D=3D 2);
-+    g_assert(qdict_size(resp) =3D=3D 1);
-=20
-     qobject_unref(resp);
+Signed-off-by: Andrew Jones <drjones@redhat.com>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Reviewed-by: Eric Auger <eric.auger@redhat.com>
+Tested-by: Masayoshi Mizuma <m.mizuma@jp.fujitsu.com>
+Reviewed-by: Beata Michalska <beata.michalska@linaro.org>
+---
+ target/arm/cpu.c         |  3 ++-
+ target/arm/cpu64.c       | 52 ++++++++++++++++++++++++++++++++++------
+ target/arm/monitor.c     |  2 +-
+ tests/arm-cpu-features.c |  1 +
+ 4 files changed, 49 insertions(+), 9 deletions(-)
+
+diff --git a/target/arm/cpu.c b/target/arm/cpu.c
+index 13813fb21354..2a1e95e90df3 100644
+--- a/target/arm/cpu.c
++++ b/target/arm/cpu.c
+@@ -200,7 +200,8 @@ static void arm_cpu_reset(CPUState *s)
+         env->cp15.cpacr_el1 =3D deposit64(env->cp15.cpacr_el1, 16, 2, 3);
+         env->cp15.cptr_el[3] |=3D CPTR_EZ;
+         /* with maximum vector length */
+-        env->vfp.zcr_el[1] =3D cpu->sve_max_vq - 1;
++        env->vfp.zcr_el[1] =3D cpu_isar_feature(aa64_sve, cpu) ?
++                             cpu->sve_max_vq - 1 : 0;
+         env->vfp.zcr_el[2] =3D env->vfp.zcr_el[1];
+         env->vfp.zcr_el[3] =3D env->vfp.zcr_el[1];
+         /*
+diff --git a/target/arm/cpu64.c b/target/arm/cpu64.c
+index d7f5bf610a7d..89a8ae77fe84 100644
+--- a/target/arm/cpu64.c
++++ b/target/arm/cpu64.c
+@@ -256,15 +256,23 @@ static void aarch64_a72_initfn(Object *obj)
+     define_arm_cp_regs(cpu, cortex_a72_a57_a53_cp_reginfo);
  }
-@@ -173,11 +182,12 @@ static void do_qmp_dispatch_error(QDict *req, bool al=
-low_oob, ErrorClass cls)
- static void test_dispatch_cmd(void)
+=20
+-static void cpu_max_get_sve_vq(Object *obj, Visitor *v, const char *name,
+-                               void *opaque, Error **errp)
++static void cpu_max_get_sve_max_vq(Object *obj, Visitor *v, const char *na=
+me,
++                                   void *opaque, Error **errp)
  {
-     QDict *req =3D qdict_new();
--    QObject *ret;
-+    QDict *ret;
+     ARMCPU *cpu =3D ARM_CPU(obj);
+-    visit_type_uint32(v, name, &cpu->sve_max_vq, errp);
++    uint32_t value;
++
++    /* All vector lengths are disabled when SVE is off. */
++    if (!cpu_isar_feature(aa64_sve, cpu)) {
++        value =3D 0;
++    } else {
++        value =3D cpu->sve_max_vq;
++    }
++    visit_type_uint32(v, name, &value, errp);
+ }
 =20
-     qdict_put_str(req, "execute", "user_def_cmd");
-=20
--    ret =3D do_qmp_dispatch(req, false);
-+    ret =3D qobject_to(QDict, do_qmp_dispatch(req, false));
-+    assert(ret && qdict_size(ret) =3D=3D 0);
-=20
-     qobject_unref(ret);
-     qobject_unref(req);
-@@ -186,11 +196,12 @@ static void test_dispatch_cmd(void)
- static void test_dispatch_cmd_oob(void)
+-static void cpu_max_set_sve_vq(Object *obj, Visitor *v, const char *name,
+-                               void *opaque, Error **errp)
++static void cpu_max_set_sve_max_vq(Object *obj, Visitor *v, const char *na=
+me,
++                                   void *opaque, Error **errp)
  {
-     QDict *req =3D qdict_new();
--    QObject *ret;
-+    QDict *ret;
+     ARMCPU *cpu =3D ARM_CPU(obj);
+     Error *err =3D NULL;
+@@ -279,6 +287,34 @@ static void cpu_max_set_sve_vq(Object *obj, Visitor *v=
+, const char *name,
+     error_propagate(errp, err);
+ }
 =20
-     qdict_put_str(req, "exec-oob", "test-flags-command");
++static void cpu_arm_get_sve(Object *obj, Visitor *v, const char *name,
++                            void *opaque, Error **errp)
++{
++    ARMCPU *cpu =3D ARM_CPU(obj);
++    bool value =3D cpu_isar_feature(aa64_sve, cpu);
++
++    visit_type_bool(v, name, &value, errp);
++}
++
++static void cpu_arm_set_sve(Object *obj, Visitor *v, const char *name,
++                            void *opaque, Error **errp)
++{
++    ARMCPU *cpu =3D ARM_CPU(obj);
++    Error *err =3D NULL;
++    bool value;
++    uint64_t t;
++
++    visit_type_bool(v, name, &value, &err);
++    if (err) {
++        error_propagate(errp, err);
++        return;
++    }
++
++    t =3D cpu->isar.id_aa64pfr0;
++    t =3D FIELD_DP64(t, ID_AA64PFR0, SVE, value);
++    cpu->isar.id_aa64pfr0 =3D t;
++}
++
+ /* -cpu max: if KVM is enabled, like -cpu host (best possible with this ho=
+st);
+  * otherwise, a CPU with as many features enabled as our emulation support=
+s.
+  * The version of '-cpu max' for qemu-system-arm is defined in cpu.c;
+@@ -391,8 +427,10 @@ static void aarch64_max_initfn(Object *obj)
+ #endif
 =20
--    ret =3D do_qmp_dispatch(req, true);
-+    ret =3D qobject_to(QDict, do_qmp_dispatch(req, true));
-+    assert(ret && qdict_size(ret) =3D=3D 0);
+         cpu->sve_max_vq =3D ARM_MAX_VQ;
+-        object_property_add(obj, "sve-max-vq", "uint32", cpu_max_get_sve_v=
+q,
+-                            cpu_max_set_sve_vq, NULL, NULL, &error_fatal);
++        object_property_add(obj, "sve-max-vq", "uint32", cpu_max_get_sve_m=
+ax_vq,
++                            cpu_max_set_sve_max_vq, NULL, NULL, &error_fat=
+al);
++        object_property_add(obj, "sve", "bool", cpu_arm_get_sve,
++                            cpu_arm_set_sve, NULL, NULL, &error_fatal);
+     }
+ }
 =20
-     qobject_unref(ret);
-     qobject_unref(req);
+diff --git a/target/arm/monitor.c b/target/arm/monitor.c
+index 560970de7f5c..2209b27b9a08 100644
+--- a/target/arm/monitor.c
++++ b/target/arm/monitor.c
+@@ -97,7 +97,7 @@ GICCapabilityList *qmp_query_gic_capabilities(Error **err=
+p)
+  * then the order that considers those dependencies must be used.
+  */
+ static const char *cpu_model_advertised_features[] =3D {
+-    "aarch64", "pmu",
++    "aarch64", "pmu", "sve",
+     NULL
+ };
+=20
+diff --git a/tests/arm-cpu-features.c b/tests/arm-cpu-features.c
+index c59fcf409c89..6342cd2e4ecc 100644
+--- a/tests/arm-cpu-features.c
++++ b/tests/arm-cpu-features.c
+@@ -179,6 +179,7 @@ static void test_query_cpu_model_expansion(const void *=
+data)
+=20
+     if (g_str_equal(qtest_get_arch(), "aarch64")) {
+         assert_has_feature(qts, "max", "aarch64");
++        assert_has_feature(qts, "max", "sve");
+         assert_has_feature(qts, "cortex-a57", "pmu");
+         assert_has_feature(qts, "cortex-a57", "aarch64");
+=20
 --=20
 2.21.0
 
