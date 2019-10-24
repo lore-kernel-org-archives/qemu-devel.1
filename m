@@ -4,73 +4,71 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 07912CA9EBC
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 11:05:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 18D37CA9EAF
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 11:05:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C9F4120856
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 11:05:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D57BC20684
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 11:05:56 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="f2+7BTEN"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C9F4120856
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SfA6DEcT"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D57BC20684
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38896 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38898 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iNavy-0003ut-BJ
-	for qemu-devel@archiver.kernel.org; Thu, 24 Oct 2019 07:05:38 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59237)
+	id 1iNawF-0003xC-Bh
+	for qemu-devel@archiver.kernel.org; Thu, 24 Oct 2019 07:05:55 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59234)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <armbru@redhat.com>) id 1iNatG-0000sc-Om
+ (envelope-from <armbru@redhat.com>) id 1iNatG-0000sW-OG
  for qemu-devel@nongnu.org; Thu, 24 Oct 2019 07:02:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1iNatE-0004pk-Ae
+ (envelope-from <armbru@redhat.com>) id 1iNatE-0004pT-6b
  for qemu-devel@nongnu.org; Thu, 24 Oct 2019 07:02:50 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:60251
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:30169
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1iNatE-0004mA-4m
+ (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1iNatC-0004md-6N
  for qemu-devel@nongnu.org; Thu, 24 Oct 2019 07:02:48 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1571914964;
+ s=mimecast20190719; t=1571914965;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=y0LluG9x73pG1eSjKT6+/4tvxwpeWh3fys+DjJoQOMg=;
- b=f2+7BTENNjDXdpS7USRAoyXErWQjS8fuqJqo6MPS3Xg626T7MCKojvPq3M5gB92ctPipDg
- fkgN3dj6r+5p09TUTISRYg7rg9WtPXPdwyz8FtEdpPwoC3cwYsDDS+snEC+ZOe0D2ThaBW
- uMczbgN936sGbG9YwOQXgE9OBfTri9k=
+ bh=HEH6dJqIX2o6eSh9nLq+VexyA00m5Ca/Dv9zvsmSO0o=;
+ b=SfA6DEcTUyLWrfMVP8eQ0XVfqAEfPcOP4qbmgZCwbzcqQv7dIrc97PCTc5pW6uV34K+so9
+ 6khj0twruinrTUf1i2G+4wYA78he40POeG0ho+bnxu0UVjY/gi60Ndpd2Z3vw9Mr2+YESK
+ KanJvJDW9LjsECQiUMeZv86PxzKHRcA=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-32-_jn1AztyOcmJM2z2geaMwQ-1; Thu, 24 Oct 2019 07:02:42 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
+ us-mta-236-KLQ0sS5zOeCkDQ1UCIesKA-1; Thu, 24 Oct 2019 07:02:41 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 72922800D5A;
- Thu, 24 Oct 2019 11:02:41 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 80BF81005512;
+ Thu, 24 Oct 2019 11:02:40 +0000 (UTC)
 Received: from blackfin.pond.sub.org (unknown [10.36.118.123])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 3DA24600CC;
- Thu, 24 Oct 2019 11:02:41 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 4E27360BF3;
+ Thu, 24 Oct 2019 11:02:40 +0000 (UTC)
 Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 6095D113294C; Thu, 24 Oct 2019 13:02:37 +0200 (CEST)
+ id 489951132A0B; Thu, 24 Oct 2019 13:02:37 +0200 (CEST)
 From: Markus Armbruster <armbru@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 10/19] qapi: Clean up doc comment checking for implicit union
- base
-Date: Thu, 24 Oct 2019 13:02:28 +0200
-Message-Id: <20191024110237.30963-11-armbru@redhat.com>
+Subject: [PATCH 05/19] qemu-doc: Belatedly document QMP command deprecation
+Date: Thu, 24 Oct 2019 13:02:23 +0200
+Message-Id: <20191024110237.30963-6-armbru@redhat.com>
 In-Reply-To: <20191024110237.30963-1-armbru@redhat.com>
 References: <20191024110237.30963-1-armbru@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-MC-Unique: _jn1AztyOcmJM2z2geaMwQ-1
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-MC-Unique: KLQ0sS5zOeCkDQ1UCIesKA-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=WINDOWS-1252
 Content-Transfer-Encoding: quoted-printable
@@ -93,123 +91,52 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-An object type's doc comment describes the type's members, less the
-ones defined in a named base type.  Cases:
+Commit 24fb413300 "qmp: Introduce blockdev-change-medium" (v2.5.0)
+deprecated change.
 
-* Struct: the members are defined in 'data' and inherited from 'base'.
-  Since the base type cannot be implicit, the doc comment describes
-  just 'data'.
+Commit 2ff3025797 "migrate: move max-bandwidth and downtime-limit to
+migrate_set_parameter" (v2.8.0) deprecated migrate_set_downtime and
+migrate_set_speed.
 
-* Simple union: the only member is the implicit tag member @type, and
-  the doc comment describes it.
+These wre missed in commit eb22aeca65 "docs: document deprecation
+policy & deprecated features in appendix" (v2.10.0).
 
-* Flat union with implicit base type: the members are defined in
-  'base', and the doc comment describes it.
+Commit 73af8dd8d7 "migration: Make xbzrle_cache_size a migration
+parameter" (v2.11.0) deprecated migrate-set-cache-size and
+query-migrate-cache-size, but neglected to update qemu-doc.
 
-* Flat union with named base type: the members are inherited from
-  'base'.  The doc comment describes no members.
-
-Before we can check a doc comment with .check_doc(), we need
-.connect_doc() connect each of its "argument sections" to the member
-it documents.
-
-For structs and simple unions, this is straightforward: the members in
-question are in .local_members, and .connect_doc() connects them.
-
-For flat unions with a named base type, it's trivial: .local_members
-is empty, and .connect_doc() does nothing.
-
-For flat unions with an implicit base type, it's tricky.  We have
-QAPISchema._make_implicit_object_type() forward the union's doc
-comment to the implicit base type, so that the base type's
-.connect_doc() connects the members.  The union's .connect_doc() does
-nothing, as .local_members is empty.
-
-Dirt effect: we check the doc comment twice, once for the union type,
-and once for the implicit base type.
-
-This is needlessly brittle and hard to understand.  Clean up as
-follows.  Make the union's .connect_doc() connect an implicit base's
-members itself.  Do not forward the union's doc comment to its
-implicit base type.
-
-Requires extending .connect_doc() so it can work with a doc comment
-other than self.doc.  Add an optional argument for that.
+Make up for that.
 
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 ---
- scripts/qapi/schema.py | 27 ++++++++++++++++-----------
- 1 file changed, 16 insertions(+), 11 deletions(-)
+ qemu-deprecated.texi | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
 
-diff --git a/scripts/qapi/schema.py b/scripts/qapi/schema.py
-index 0381e3cb40..c16dce1fe0 100644
---- a/scripts/qapi/schema.py
-+++ b/scripts/qapi/schema.py
-@@ -51,7 +51,7 @@ class QAPISchemaEntity(object):
-                                            os.path.dirname(schema.fname))
-         self._checked =3D True
+diff --git a/qemu-deprecated.texi b/qemu-deprecated.texi
+index 7239e0959d..f727bd3932 100644
+--- a/qemu-deprecated.texi
++++ b/qemu-deprecated.texi
+@@ -149,6 +149,18 @@ QEMU 4.1 has three options, please migrate to one of t=
+hese three:
 =20
--    def connect_doc(self):
-+    def connect_doc(self, doc=3DNone):
-         pass
+ @section QEMU Machine Protocol (QMP) commands
 =20
-     def check_doc(self):
-@@ -224,10 +224,11 @@ class QAPISchemaEnumType(QAPISchemaType):
-         for m in self.members:
-             m.check_clash(self.info, seen)
++@subsection change (since 2.5.0)
++
++Use ``blockdev-change-medium'' or ``change-vnc-password'' instead.
++
++@subsection migrate_set_downtime and migrate_set_speed (since 2.8.0)
++
++Use ``migrate-set-parameters'' instead.
++
++@subsection migrate-set-cache-size and query-migrate-cache-size (since 2.1=
+1.0)
++
++Use ``migrate-set-parameters'' and ``query-migrate-parameters'' instead.
++
+ @subsection query-block result field dirty-bitmaps[i].status (since 4.0)
 =20
--    def connect_doc(self):
--        if self.doc:
-+    def connect_doc(self, doc=3DNone):
-+        doc =3D doc or self.doc
-+        if doc:
-             for m in self.members:
--                self.doc.connect_member(m)
-+                doc.connect_member(m)
-=20
-     def check_doc(self):
-         if self.doc:
-@@ -380,10 +381,13 @@ class QAPISchemaObjectType(QAPISchemaType):
-         for m in self.members:
-             m.check_clash(info, seen)
-=20
--    def connect_doc(self):
--        if self.doc:
-+    def connect_doc(self, doc=3DNone):
-+        doc =3D doc or self.doc
-+        if doc:
-+            if self.base and self.base.is_implicit():
-+                self.base.connect_doc(doc)
-             for m in self.local_members:
--                self.doc.connect_member(m)
-+                doc.connect_member(m)
-=20
-     def check_doc(self):
-         if self.doc:
-@@ -657,10 +661,11 @@ class QAPISchemaAlternateType(QAPISchemaType):
-                         % (v.describe(self.info), types_seen[qt]))
-                 types_seen[qt] =3D v.name
-=20
--    def connect_doc(self):
--        if self.doc:
-+    def connect_doc(self, doc=3DNone):
-+        doc =3D doc or self.doc
-+        if doc:
-             for v in self.variants.variants:
--                self.doc.connect_member(v)
-+                doc.connect_member(v)
-=20
-     def check_doc(self):
-         if self.doc:
-@@ -974,7 +979,7 @@ class QAPISchema(object):
-         tag_member =3D None
-         if isinstance(base, dict):
-             base =3D self._make_implicit_object_type(
--                name, info, doc, ifcond,
-+                name, info, None, ifcond,
-                 'base', self._make_members(base, info))
-         if tag_name:
-             variants =3D [self._make_variant(key, value['type'],
+ The ``status'' field of the ``BlockDirtyInfo'' structure, returned by
 --=20
 2.21.0
 
