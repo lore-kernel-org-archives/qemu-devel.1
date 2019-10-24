@@ -2,98 +2,89 @@ Return-Path: <SRS0=Jnn8=YR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BA5AACA9EAF
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 09:59:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1777ECA9EAF
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 10:00:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7DAE620856
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 09:59:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D535D20856
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 10:00:29 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="eE01w91l"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7DAE620856
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="i8Vs+o2M"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D535D20856
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37138 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37152 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iNZts-0001eS-OJ
-	for qemu-devel@archiver.kernel.org; Thu, 24 Oct 2019 05:59:24 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44441)
+	id 1iNZuu-0004dC-JL
+	for qemu-devel@archiver.kernel.org; Thu, 24 Oct 2019 06:00:28 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46592)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jag.raman@oracle.com>) id 1iNZB0-0003vk-Hz
- for qemu-devel@nongnu.org; Thu, 24 Oct 2019 05:13:04 -0400
+ (envelope-from <estebanbosse@gmail.com>) id 1iNZPD-0007bs-2D
+ for qemu-devel@nongnu.org; Thu, 24 Oct 2019 05:27:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jag.raman@oracle.com>) id 1iNZAz-0005eS-EM
- for qemu-devel@nongnu.org; Thu, 24 Oct 2019 05:13:02 -0400
-Received: from userp2120.oracle.com ([156.151.31.85]:34638)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jag.raman@oracle.com>)
- id 1iNZAz-0005dN-6s
- for qemu-devel@nongnu.org; Thu, 24 Oct 2019 05:13:01 -0400
-Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
- by userp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x9O94MaG094899;
- Thu, 24 Oct 2019 09:12:54 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
- h=from : to : cc :
- subject : date : message-id : in-reply-to : references : in-reply-to :
- references; s=corp-2019-08-05;
- bh=UCqtZIGXlcDh8wCI6QvJFE2Ebd8V/aXNkefNr+61NL8=;
- b=eE01w91ljJBc6g5mDv/SNn7a7dTTPKPygwZg1Q3XrJl0LUwTheM94hcXs18TIopxcdYg
- xmaqvmhkRapkXVo1L7pVT+EKdI1MMMgi+i7IJ3SZNrqpl0gEXS8SC100/JcQ09rTCaxV
- Drk1MwLKehVx9tUlwEXoBiBeQe3KnYMc9R0w/4SuHqp8FKTWlk0rSXFsPZ6j68oz5tbB
- YP53TwHBqI+76Gmt440BunCpxsRZgBAkZw9EPqZOeIUN3fvWoIa/NW5B7P6zOOZz5Nkq
- 7KpM88nRktFCwydeiBn1oyICB7rzq474JtFvHitJuai3218mMAzHzlhx7MiUhCKQP7Dz ug== 
-Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
- by userp2120.oracle.com with ESMTP id 2vqu4r24yx-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Thu, 24 Oct 2019 09:12:53 +0000
-Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
- by aserp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x9O98Ld5047105;
- Thu, 24 Oct 2019 09:10:53 GMT
-Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
- by aserp3020.oracle.com with ESMTP id 2vu0fnu7e7-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Thu, 24 Oct 2019 09:10:52 +0000
-Received: from abhmp0008.oracle.com (abhmp0008.oracle.com [141.146.116.14])
- by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id x9O9AqvV023684;
- Thu, 24 Oct 2019 09:10:52 GMT
-Received: from jaraman-bur-1.us.oracle.com (/10.152.33.39)
- by default (Oracle Beehive Gateway v4.0)
- with ESMTP ; Thu, 24 Oct 2019 02:10:51 -0700
-From: Jagannathan Raman <jag.raman@oracle.com>
-To: qemu-devel@nongnu.org
-Subject: [RFC v4 PATCH 25/49] multi-process: Introduce build flags to separate
- remote process code
-Date: Thu, 24 Oct 2019 05:09:06 -0400
-Message-Id: <ffff5a3cb8dbaa053e1f36933a72a29bb770444b.1571905346.git.jag.raman@oracle.com>
-X-Mailer: git-send-email 1.8.3.1
-In-Reply-To: <cover.1571905346.git.jag.raman@oracle.com>
-References: <cover.1571905346.git.jag.raman@oracle.com>
-In-Reply-To: <cover.1571905346.git.jag.raman@oracle.com>
-References: <cover.1571905346.git.jag.raman@oracle.com>
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9419
- signatures=668684
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=1
- malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.0.1-1908290000 definitions=main-1910240089
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9419
- signatures=668684
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0
- priorityscore=1501 malwarescore=0
- suspectscore=1 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1908290000
- definitions=main-1910240089
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
-X-Received-From: 156.151.31.85
+ (envelope-from <estebanbosse@gmail.com>) id 1iNZPC-0003q9-0Y
+ for qemu-devel@nongnu.org; Thu, 24 Oct 2019 05:27:42 -0400
+Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:35021)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <estebanbosse@gmail.com>)
+ id 1iNZPA-0003pt-W9; Thu, 24 Oct 2019 05:27:41 -0400
+Received: by mail-wm1-x342.google.com with SMTP id v6so1862187wmj.0;
+ Thu, 24 Oct 2019 02:27:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=message-id:subject:from:to:cc:date:in-reply-to:references
+ :user-agent:mime-version:content-transfer-encoding;
+ bh=xJZGkKh8fZ9kCKCk45SiDZFkdbshXyCaxMtp65tdQig=;
+ b=i8Vs+o2MncpWwXW9pGHNXaGee3eJpV+p7x5qDVvjUKpn+nV3oSkkkiBU5Gd9rgv6Rl
+ KAciwuw2d6oZT08ozqHF7D1ByoB2zyjA9iaeyhd8URh0OaB447MVturdrPWxXg2ySoty
+ jQhh2yrA5ll2DOx/pwFCbMnXC1F4BgzbkXUqHJsD4uu8oHUNAwI/O7lOqddTBWq2uoYZ
+ GSpG4BI4OPKb8YlPFM+mtRTCOsSQKLWDsBsRHZVv1cOcv1KjloUTluADeKoPeeotfcGT
+ 5/z2Gop1fUzyVMYPOFcgjfWHn7kw00XE98Q7gMpmAkLWY3r8Mgq200+qzjTFgSWJihXR
+ Vi5w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:message-id:subject:from:to:cc:date:in-reply-to
+ :references:user-agent:mime-version:content-transfer-encoding;
+ bh=xJZGkKh8fZ9kCKCk45SiDZFkdbshXyCaxMtp65tdQig=;
+ b=fKx5ivCbbkNdukdvxyJMFE4+PbX8rTBxkvJUXgO5IluInkEae6M2FPOb2Ff9KoxPEd
+ t5QW+hkE5kXM5xjrviam7MA5l1pmralrh5rTqeT2erR1TkiAUz/j6riXFxUvBLU5yE5o
+ 7BwrBhmmzCaCFRHDqSMS8B7Qyq/1sR9Bjfr7D3WB+nL4uog8uL18FlPYW2vkD9+OOiyp
+ RXdYNjoF6gGclhKoXg7zTHw6J3XhXtCdT4zFAEUMCXHPLMt32g1iLfAlM5SzKDEtqfVv
+ yHAyZBAa13avcJwK0zpo4OoPid7H2lGG3QmfnRN5MlGqdURjhWpYKtjiNW3dCckWKIlL
+ YACA==
+X-Gm-Message-State: APjAAAUJTJbqJUEnhkq3dt6d1yY+xChsITWycAe7mVf/Jd/bp6a7uePj
+ 9Ocs27oM6SKc9HEVsnFzTcU=
+X-Google-Smtp-Source: APXvYqwZm4vS68Ia3SBxO+IooRdOjahmeTTwTL6dYG952S/wsq6XvJoZWtAptXGMXgJycECOqQ11gg==
+X-Received: by 2002:a1c:a551:: with SMTP id o78mr3734821wme.4.1571909259765;
+ Thu, 24 Oct 2019 02:27:39 -0700 (PDT)
+Received: from ?IPv6:2a01:c22:b04f:9c00:d5b4:db5f:bfb4:fdb?
+ ([2a01:c22:b04f:9c00:d5b4:db5f:bfb4:fdb])
+ by smtp.gmail.com with ESMTPSA id l14sm9632811wrr.37.2019.10.24.02.27.38
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 24 Oct 2019 02:27:39 -0700 (PDT)
+Message-ID: <c88659d6aa590f1ea20bfd86636e14710e8813fb.camel@gmail.com>
+Subject: Re: [PATCH 15/19] tests/boot_linux_console: Extract the gunzip()
+ helper
+From: Esteban Bosse <estebanbosse@gmail.com>
+To: Philippe =?ISO-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>, 
+ qemu-devel@nongnu.org
+Date: Thu, 24 Oct 2019 11:23:29 +0200
+In-Reply-To: <20190926173428.10713-16-f4bug@amsat.org>
+References: <20190926173428.10713-1-f4bug@amsat.org>
+ <20190926173428.10713-16-f4bug@amsat.org>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.30.5-1.1 
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::342
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -105,59 +96,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: elena.ufimtseva@oracle.com, fam@euphon.net, john.g.johnson@oracle.com,
- kraxel@redhat.com, jag.raman@oracle.com, quintela@redhat.com, mst@redhat.com,
- armbru@redhat.com, kanth.ghatraju@oracle.com, thuth@redhat.com,
- ehabkost@redhat.com, konrad.wilk@oracle.com, dgilbert@redhat.com,
- liran.alon@oracle.com, stefanha@redhat.com, rth@twiddle.net, kwolf@redhat.com,
- berrange@redhat.com, mreitz@redhat.com, ross.lagerwall@citrix.com,
- marcandre.lureau@gmail.com, pbonzini@redhat.com
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ =?ISO-8859-1?Q?Zolt=E1n?= Baldaszti <bztemail@gmail.com>,
+ Laurent Bonnans <laurent.bonnans@here.com>,
+ Alistair Francis <alistair@alistair23.me>,
+ Andrew Baumann <Andrew.Baumann@microsoft.com>,
+ =?ISO-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>,
+ qemu-arm@nongnu.org, Clement Deschamps <clement.deschamps@antfield.fr>,
+ Cleber Rosa <crosa@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Cheng Xiang <ext-cheng.xiang@here.com>,
+ Philippe =?ISO-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>,
+ Pekka Enberg <penberg@iki.fi>, Guenter Roeck <linux@roeck-us.net>,
+ Eduardo Habkost <ehabkost@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Introduce SCSI_PROCESS & REMOTE_PROCESS build flags to separate
-code that applies only to remote processes.
-
-Signed-off-by: Elena Ufimtseva <elena.ufimtseva@oracle.com>
-Signed-off-by: John G Johnson <john.g.johnson@oracle.com>
-Signed-off-by: Jagannathan Raman <jag.raman@oracle.com>
----
- New patch in v3
-
- Makefile.target | 4 ++++
- rules.mak       | 2 +-
- 2 files changed, 5 insertions(+), 1 deletion(-)
-
-diff --git a/Makefile.target b/Makefile.target
-index f16b74a..0ca40f1 100644
---- a/Makefile.target
-+++ b/Makefile.target
-@@ -255,6 +255,10 @@ ifdef CONFIG_DARWIN
- 	$(call quiet-command,SetFile -a C $@,"SETFILE","$(TARGET_DIR)$@")
- endif
- 
-+ifdef CONFIG_MPQEMU
-+$(SCSI_DEV_BUILD): REMOTE_FLAGS = -DREMOTE_PROCESS -DSCSI_PROCESS
-+endif
-+
- $(SCSI_DEV_BUILD): $(all-remote-lsi-obj-y) $(COMMON_LDADDS)
- 	$(call LINK, $(filter-out %.mak, $^))
- ifdef CONFIG_DARWIN
-diff --git a/rules.mak b/rules.mak
-index 967295d..22e0c36 100644
---- a/rules.mak
-+++ b/rules.mak
-@@ -67,7 +67,7 @@ expand-objs = $(strip $(sort $(filter %.o,$1)) \
- 
- %.o: %.c
- 	$(call quiet-command,$(CC) $(QEMU_LOCAL_INCLUDES) $(QEMU_INCLUDES) \
--	       $(QEMU_CFLAGS) $(QEMU_DGFLAGS) $(CFLAGS) $($@-cflags) \
-+	       $(QEMU_CFLAGS) $(QEMU_DGFLAGS) $(CFLAGS) $($@-cflags) $(REMOTE_FLAGS) \
- 	       -c -o $@ $<,"CC","$(TARGET_DIR)$@")
- %.o: %.rc
- 	$(call quiet-command,$(WINDRES) -I. -o $@ $<,"RC","$(TARGET_DIR)$@")
--- 
-1.8.3.1
+El jue, 26-09-2019 a las 19:34 +0200, Philippe Mathieu-Daudé escribió:
+> We are going to use the same pattern. Instead of keeping
+> copy/pasting this code, extract as a local function.
+> 
+> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+> ---
+>  tests/acceptance/boot_linux_console.py | 10 ++++++----
+>  1 file changed, 6 insertions(+), 4 deletions(-)
+> 
+> diff --git a/tests/acceptance/boot_linux_console.py
+> b/tests/acceptance/boot_linux_console.py
+> index 8a9a314ab4..079590f0c8 100644
+> --- a/tests/acceptance/boot_linux_console.py
+> +++ b/tests/acceptance/boot_linux_console.py
+> @@ -19,6 +19,11 @@ from avocado.utils import process
+>  from avocado.utils import archive
+>  
+>  
+> +def gunzip(in_pathname_gz, out_pathname):
+> +    with gzip.open(in_pathname_gz, 'rb') as f_in:
+> +        with open(out_pathname, 'wb') as f_out:
+> +            shutil.copyfileobj(f_in, f_out)
+> +
+>  class BootLinuxConsole(Test):
+>      """
+>      Boots a Linux kernel and checks that the console is operational
+> and the
+> @@ -166,10 +171,7 @@ class BootLinuxConsole(Test):
+>          initrd_hash = 'bf806e17009360a866bf537f6de66590de349a99'
+>          initrd_path_gz = self.fetch_asset(initrd_url,
+> asset_hash=initrd_hash)
+>          initrd_path = self.workdir + "rootfs.cpio"
+> -
+> -        with gzip.open(initrd_path_gz, 'rb') as f_in:
+> -            with open(initrd_path, 'wb') as f_out:
+> -                shutil.copyfileobj(f_in, f_out)
+> +        gunzip(initrd_path_gz, initrd_path)
+>  
+>          self.vm.set_machine('malta')
+>          self.vm.set_console()
+Reviewed-by: Esteban Bosse <estebanbosse@gmail.com>
 
 
