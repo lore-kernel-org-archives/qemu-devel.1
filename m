@@ -2,62 +2,50 @@ Return-Path: <SRS0=Jnn8=YR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3FAEDCA9EAF
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 08:47:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 63C49CA9EAF
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 08:49:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 09DD220684
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 08:47:34 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="dtirUoML"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 09DD220684
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
+	by mail.kernel.org (Postfix) with ESMTPS id 36D2120684
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 08:49:38 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 36D2120684
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=proxmox.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35292 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35312 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iNYmL-0004Ad-8G
-	for qemu-devel@archiver.kernel.org; Thu, 24 Oct 2019 04:47:33 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36832)
+	id 1iNYoL-00077g-Cl
+	for qemu-devel@archiver.kernel.org; Thu, 24 Oct 2019 04:49:37 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37480)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgibson@ozlabs.org>) id 1iNYKa-0004ye-Ae
- for qemu-devel@nongnu.org; Thu, 24 Oct 2019 04:18:53 -0400
+ (envelope-from <w.bumiller@proxmox.com>) id 1iNYOC-0004SO-8D
+ for qemu-devel@nongnu.org; Thu, 24 Oct 2019 04:22:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1iNYKY-0005Ol-H7
- for qemu-devel@nongnu.org; Thu, 24 Oct 2019 04:18:52 -0400
-Received: from bilbo.ozlabs.org ([203.11.71.1]:40291 helo=ozlabs.org)
+ (envelope-from <w.bumiller@proxmox.com>) id 1iNYOA-0000lE-U9
+ for qemu-devel@nongnu.org; Thu, 24 Oct 2019 04:22:35 -0400
+Received: from proxmox-new.maurer-it.com ([212.186.127.180]:3405)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1iNYKY-0005IN-3v; Thu, 24 Oct 2019 04:18:50 -0400
-Received: by ozlabs.org (Postfix, from userid 1007)
- id 46zKrc1jf3z9sRs; Thu, 24 Oct 2019 19:18:38 +1100 (AEDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1571905120;
- bh=U2SbhbG10Q31T/En/uIElsIUQzlSawLqGYxd7BEmbcM=;
- h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=dtirUoMLuKsi7E+qp3tzeIOrUhadgLyotNIf5jpZ5+lu3tl6tnMfiqiDQFiSIiGPp
- tcknkFlDUqiLfT2JtreCvylqRGSlGpKoAz9ZmJKqWc7iI5ibDEX06GF1anC46fpZK0
- rVH4gEXrReOoAuOazztjnAcv1+b82HimoIArXPYo=
-From: David Gibson <david@gibson.dropbear.id.au>
-To: peter.maydell@linaro.org
-Subject: [PULL 28/28] spapr/xive: Set the OS CAM line at reset
-Date: Thu, 24 Oct 2019 19:18:13 +1100
-Message-Id: <20191024081813.2115-29-david@gibson.dropbear.id.au>
-X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20191024081813.2115-1-david@gibson.dropbear.id.au>
-References: <20191024081813.2115-1-david@gibson.dropbear.id.au>
+ (Exim 4.71) (envelope-from <w.bumiller@proxmox.com>)
+ id 1iNYOA-0000jC-Mq; Thu, 24 Oct 2019 04:22:34 -0400
+Received: from proxmox-new.maurer-it.com (localhost.localdomain [127.0.0.1])
+ by proxmox-new.maurer-it.com (Proxmox) with ESMTP id AE566407FB;
+ Thu, 24 Oct 2019 10:12:32 +0200 (CEST)
+From: Wolfgang Bumiller <w.bumiller@proxmox.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v2] monitor/qmp: resume monitor when clearing its queue
+Date: Thu, 24 Oct 2019 10:12:31 +0200
+Message-Id: <20191024081231.19087-1-w.bumiller@proxmox.com>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 203.11.71.1
+X-Received-From: 212.186.127.180
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -69,134 +57,104 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: lvivier@redhat.com, qemu-devel@nongnu.org, groug@kaod.org,
- qemu-ppc@nongnu.org, clg@kaod.org, David Gibson <david@gibson.dropbear.id.au>
+Cc: Michael Roth <mdroth@linux.vnet.ibm.com>,
+ =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
+ Gerd Hoffmann <kraxel@redhat.com>, Markus Armbruster <armbru@redhat.com>,
+ qemu-stable@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: C=C3=A9dric Le Goater <clg@kaod.org>
+When a monitor's queue is filled up in handle_qmp_command()
+it gets suspended. It's the dispatcher bh's job currently to
+resume the monitor, which it does after processing an event
+from the queue. However, it is possible for a
+CHR_EVENT_CLOSED event to be processed before before the bh
+is scheduled, which will clear the queue without resuming
+the monitor, thereby preventing the dispatcher from reaching
+the resume() call.
+Any new connections to the qmp socket will be accept()ed and
+show the greeting, but will not respond to any messages sent
+afterwards (as they will not be read from the
+still-suspended socket).
+Fix this by resuming the monitor when clearing a queue which
+was filled up.
 
-When a Virtual Processor is scheduled to run on a HW thread, the
-hypervisor pushes its identifier in the OS CAM line. When running with
-kernel_irqchip=3Doff, QEMU needs to emulate the same behavior.
-
-Set the OS CAM line when the interrupt presenter of the sPAPR core is
-reset. This will also cover the case of hot-plugged CPUs.
-
-This change also has the benefit to remove the use of CPU_FOREACH()
-which can be unsafe.
-
-Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
-Reviewed-by: Greg Kurz <groug@kaod.org>
-Message-Id: <20191022163812.330-8-clg@kaod.org>
-Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+Signed-off-by: Wolfgang Bumiller <w.bumiller@proxmox.com>
 ---
- hw/intc/spapr_xive.c        | 48 +++++++++++++------------------------
- include/hw/ppc/spapr_xive.h |  1 -
- 2 files changed, 17 insertions(+), 32 deletions(-)
+Changes to v1:
+  * Update commit message to include the resulting symptoms.
+  * Moved the resume code from `monitor_qmp_cleanup_req_queue_locked` to
+    `monitor_qmp_cleanup_queues` to avoid an unnecessary resume when
+    destroying the monitor (as the `_locked` version is also used by
+    `monitor_data_destroy()`.
+  * Renamed `monitor_qmp_cleanup_queues` to
+    `monitor_qmp_cleanup_queues_and_resume` to reflect the change and be
+    verbose about it for potential future users of the function.
+    Currently the only user is `monitor_qmp_event()` in the
+    `CHR_EVENT_CLOSED` case, which is exactly the problematic case curren=
+tly.
 
-diff --git a/hw/intc/spapr_xive.c b/hw/intc/spapr_xive.c
-index 20a8d8285f..d8e1291905 100644
---- a/hw/intc/spapr_xive.c
-+++ b/hw/intc/spapr_xive.c
-@@ -205,23 +205,6 @@ void spapr_xive_mmio_set_enabled(SpaprXive *xive, bo=
-ol enable)
-     memory_region_set_enabled(&xive->end_source.esb_mmio, false);
- }
-=20
--/*
-- * When a Virtual Processor is scheduled to run on a HW thread, the
-- * hypervisor pushes its identifier in the OS CAM line. Emulate the
-- * same behavior under QEMU.
-- */
--void spapr_xive_set_tctx_os_cam(XiveTCTX *tctx)
--{
--    uint8_t  nvt_blk;
--    uint32_t nvt_idx;
--    uint32_t nvt_cam;
--
--    spapr_xive_cpu_to_nvt(POWERPC_CPU(tctx->cs), &nvt_blk, &nvt_idx);
--
--    nvt_cam =3D cpu_to_be32(TM_QW1W2_VO | xive_nvt_cam_line(nvt_blk, nvt=
-_idx));
--    memcpy(&tctx->regs[TM_QW1_OS + TM_WORD2], &nvt_cam, 4);
--}
--
- static void spapr_xive_end_reset(XiveEND *end)
- {
-     memset(end, 0, sizeof(*end));
-@@ -544,21 +527,32 @@ static int spapr_xive_cpu_intc_create(SpaprInterrup=
-tController *intc,
+Sorry for the deleay :|
+
+ monitor/qmp.c | 24 ++++++++++++++++++++++--
+ 1 file changed, 22 insertions(+), 2 deletions(-)
+
+diff --git a/monitor/qmp.c b/monitor/qmp.c
+index 9d9e5d8b27..df689aa95e 100644
+--- a/monitor/qmp.c
++++ b/monitor/qmp.c
+@@ -75,10 +75,30 @@ static void monitor_qmp_cleanup_req_queue_locked(Moni=
+torQMP *mon)
      }
-=20
-     spapr_cpu->tctx =3D XIVE_TCTX(obj);
--
--    /*
--     * (TCG) Early setting the OS CAM line for hotplugged CPUs as they
--     * don't beneficiate from the reset of the XIVE IRQ backend
--     */
--    spapr_xive_set_tctx_os_cam(spapr_cpu->tctx);
-     return 0;
  }
 =20
-+static void xive_tctx_set_os_cam(XiveTCTX *tctx, uint32_t os_cam)
-+{
-+    uint32_t qw1w2 =3D cpu_to_be32(TM_QW1W2_VO | os_cam);
-+    memcpy(&tctx->regs[TM_QW1_OS + TM_WORD2], &qw1w2, 4);
-+}
-+
- static void spapr_xive_cpu_intc_reset(SpaprInterruptController *intc,
-                                      PowerPCCPU *cpu)
+-static void monitor_qmp_cleanup_queues(MonitorQMP *mon)
++static void monitor_qmp_cleanup_queues_and_resume(MonitorQMP *mon)
  {
-     XiveTCTX *tctx =3D spapr_cpu_state(cpu)->tctx;
-+    uint8_t  nvt_blk;
-+    uint32_t nvt_idx;
-=20
-     xive_tctx_reset(tctx);
+     qemu_mutex_lock(&mon->qmp_queue_lock);
 +
 +    /*
-+     * When a Virtual Processor is scheduled to run on a HW thread,
-+     * the hypervisor pushes its identifier in the OS CAM line.
-+     * Emulate the same behavior under QEMU.
++     * Same condition as in monitor_qmp_bh_dispatcher(), but before remo=
+ving an
++     * element from the queue (hence no `- 1`), also, the queue should n=
+ot be
++     * empty either, otherwise the monitor hasn't been suspended yet (or=
+ was
++     * already resumed).
 +     */
-+    spapr_xive_cpu_to_nvt(cpu, &nvt_blk, &nvt_idx);
++    bool need_resume =3D (!qmp_oob_enabled(mon) && mon->qmp_requests->le=
+ngth > 0)
++        || mon->qmp_requests->length =3D=3D QMP_REQ_QUEUE_LEN_MAX;
 +
-+    xive_tctx_set_os_cam(tctx, xive_nvt_cam_line(nvt_blk, nvt_idx));
+     monitor_qmp_cleanup_req_queue_locked(mon);
++
++    if (need_resume) {
++        /*
++         * Pairs with the monitor_suspend() in handle_qmp_command() in c=
+ase the
++         * queue gets cleared from a CH_EVENT_CLOSED event before the di=
+spatch
++         * bh got scheduled.
++         */
++        monitor_resume(&mon->common);
++    }
++
+     qemu_mutex_unlock(&mon->qmp_queue_lock);
  }
 =20
- static void spapr_xive_set_irq(SpaprInterruptController *intc, int irq, =
-int val)
-@@ -651,14 +645,6 @@ static void spapr_xive_dt(SpaprInterruptController *=
-intc, uint32_t nr_servers,
- static int spapr_xive_activate(SpaprInterruptController *intc, Error **e=
-rrp)
- {
-     SpaprXive *xive =3D SPAPR_XIVE(intc);
--    CPUState *cs;
--
--    CPU_FOREACH(cs) {
--        PowerPCCPU *cpu =3D POWERPC_CPU(cs);
--
--        /* (TCG) Set the OS CAM line of the thread interrupt context. */
--        spapr_xive_set_tctx_os_cam(spapr_cpu_state(cpu)->tctx);
--    }
-=20
-     if (kvm_enabled()) {
-         int rc =3D spapr_irq_init_kvm(kvmppc_xive_connect, intc, errp);
-diff --git a/include/hw/ppc/spapr_xive.h b/include/hw/ppc/spapr_xive.h
-index d84bd5c229..742b7e834f 100644
---- a/include/hw/ppc/spapr_xive.h
-+++ b/include/hw/ppc/spapr_xive.h
-@@ -57,7 +57,6 @@ typedef struct SpaprXive {
- void spapr_xive_pic_print_info(SpaprXive *xive, Monitor *mon);
-=20
- void spapr_xive_hcall_init(SpaprMachineState *spapr);
--void spapr_xive_set_tctx_os_cam(XiveTCTX *tctx);
- void spapr_xive_mmio_set_enabled(SpaprXive *xive, bool enable);
- void spapr_xive_map_mmio(SpaprXive *xive);
-=20
+@@ -332,7 +352,7 @@ static void monitor_qmp_event(void *opaque, int event=
+)
+          * stdio, it's possible that stdout is still open when stdin
+          * is closed.
+          */
+-        monitor_qmp_cleanup_queues(mon);
++        monitor_qmp_cleanup_queues_and_resume(mon);
+         json_message_parser_destroy(&mon->parser);
+         json_message_parser_init(&mon->parser, handle_qmp_command,
+                                  mon, NULL);
 --=20
-2.21.0
+2.20.1
+
 
 
