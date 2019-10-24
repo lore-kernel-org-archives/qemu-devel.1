@@ -2,117 +2,62 @@ Return-Path: <SRS0=Jnn8=YR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 30827CA9EAF
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 08:45:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3FAEDCA9EAF
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 08:47:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 03D4420684
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 08:45:56 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 03D4420684
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
+	by mail.kernel.org (Postfix) with ESMTPS id 09DD220684
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 08:47:34 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="dtirUoML"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 09DD220684
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35248 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35292 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iNYkk-0001Ee-Ov
-	for qemu-devel@archiver.kernel.org; Thu, 24 Oct 2019 04:45:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37151)
+	id 1iNYmL-0004Ad-8G
+	for qemu-devel@archiver.kernel.org; Thu, 24 Oct 2019 04:47:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36832)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <laurent@vivier.eu>) id 1iNYLd-00073L-H7
- for qemu-devel@nongnu.org; Thu, 24 Oct 2019 04:19:58 -0400
+ (envelope-from <dgibson@ozlabs.org>) id 1iNYKa-0004ye-Ae
+ for qemu-devel@nongnu.org; Thu, 24 Oct 2019 04:18:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <laurent@vivier.eu>) id 1iNYLc-0006pc-Ff
- for qemu-devel@nongnu.org; Thu, 24 Oct 2019 04:19:57 -0400
-Received: from mout.kundenserver.de ([212.227.126.134]:33733)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1iNYLc-0006nn-6m
- for qemu-devel@nongnu.org; Thu, 24 Oct 2019 04:19:56 -0400
-Received: from [192.168.100.1] ([78.238.229.36]) by mrelayeu.kundenserver.de
- (mreue011 [213.165.67.103]) with ESMTPSA (Nemesis) id
- 1N6bTa-1hwfvq2jUM-0184W3; Thu, 24 Oct 2019 10:19:36 +0200
-Subject: Re: [Qemu-devel] [PATCH v2 2/2] linux-user: manage binfmt-misc
- preserve-arg[0] flag
-To: Christophe de Dinechin <dinechin@redhat.com>, qemu-devel@nongnu.org
-References: <20190908104816.20713-1-laurent@vivier.eu>
- <20190908104816.20713-2-laurent@vivier.eu> <m1tv7zt8c4.fsf@redhat.com>
-From: Laurent Vivier <laurent@vivier.eu>
-Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
- 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
-Message-ID: <ebcb638f-4fb8-3643-5780-35b21bb05c2f@vivier.eu>
-Date: Thu, 24 Oct 2019 10:19:33 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.1
+ (envelope-from <dgibson@ozlabs.org>) id 1iNYKY-0005Ol-H7
+ for qemu-devel@nongnu.org; Thu, 24 Oct 2019 04:18:52 -0400
+Received: from bilbo.ozlabs.org ([203.11.71.1]:40291 helo=ozlabs.org)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
+ id 1iNYKY-0005IN-3v; Thu, 24 Oct 2019 04:18:50 -0400
+Received: by ozlabs.org (Postfix, from userid 1007)
+ id 46zKrc1jf3z9sRs; Thu, 24 Oct 2019 19:18:38 +1100 (AEDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+ d=gibson.dropbear.id.au; s=201602; t=1571905120;
+ bh=U2SbhbG10Q31T/En/uIElsIUQzlSawLqGYxd7BEmbcM=;
+ h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+ b=dtirUoMLuKsi7E+qp3tzeIOrUhadgLyotNIf5jpZ5+lu3tl6tnMfiqiDQFiSIiGPp
+ tcknkFlDUqiLfT2JtreCvylqRGSlGpKoAz9ZmJKqWc7iI5ibDEX06GF1anC46fpZK0
+ rVH4gEXrReOoAuOazztjnAcv1+b82HimoIArXPYo=
+From: David Gibson <david@gibson.dropbear.id.au>
+To: peter.maydell@linaro.org
+Subject: [PULL 28/28] spapr/xive: Set the OS CAM line at reset
+Date: Thu, 24 Oct 2019 19:18:13 +1100
+Message-Id: <20191024081813.2115-29-david@gibson.dropbear.id.au>
+X-Mailer: git-send-email 2.21.0
+In-Reply-To: <20191024081813.2115-1-david@gibson.dropbear.id.au>
+References: <20191024081813.2115-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
-In-Reply-To: <m1tv7zt8c4.fsf@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: fr
-Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:7fsH6B/SycyN6ie7Me5OG323ZezAWFsw6EUDS5pdyyL/wGzwkpU
- zJhoiXlZ8b3AUXBRLSyMy4gZAokqRptQvQT8baW8bzuFRIp8978uxZvmP6NzrTDTMg8eWDr
- KqgdSwJef/O+drwvWXZ0RXXweL6dZcETta7c1MC+p1d85ipxexGl987I69tfZBX1lm74xMz
- oJEbBtPsZ3EVhLaz9kBxg==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:gqGXPi9kJFg=:dtbGSnezIc9ohDRXvvcVbn
- T1Nmjd3Hdieguf952Nvi2kPuHFxtjXZQPSx0FczRO/HDWisijYNd7rvQa0NLittUBLw4Gt6jB
- MlpvlBBbnOmpfbSu2KdzLiKKEovIxNobXHiO22kmW1kmjpOLgsJlmqiH/+blVAEZty0ZGqZ0b
- O31gNFv3f8fMTAeNwG2b7TrBUcfyeWh47+n3gdO6kaELBXJU8AuP4bOe5JEY3NeUiDNLcvGsv
- tC1cfejsg4q7BwC8XyAEBoMvD1p38C39m5zGYv0OZY6Nvs8K9N8YhJN0y0LFhpAcu4X4urBBO
- i34VWEwSDTo6pNzoQBpuSzuvhDE5iNYQZGIadSvH/EVHPNtoSyFyx4yOvRT0tfWRKwh485LU0
- vEEk1E5RZmHbMZnRHpawEscFrFu2F1cObArafciW/BwikXf0aRdPAGtYaouNcOjYJM987TI1Q
- gw44ndsUxMHW1ujhjgWHAoNFOlWuo1xeGJ60K02WDtDBLfcPJ4lGizd7Eu6CYJ+mVQNxG0tOF
- yf+6TDvY4V4N+F0g9lU4HI9wZShpNffYC1ksNZuV+NRynhPj2UJBQ7BJ56My4kk552fDuahfX
- LU46dsdv1C0bT4NPOD5QaHSP9gfoSqR5xB58q4ArBpX1dI5R6bo0Ek7B1vCA7gJK3UTL/5ocP
- imPToxx+1CupN8IXsofNUUkAWgWIFNn4RL9wAeWBvBjFBduv3v7EU0G9w7YF6EMhwFtISjCSu
- J35ajR0Gs7aY22KI3uZFQjwkNTyQiuKoPX0wz0Dt2G5E6VtdDFcMxEl5BvgJtBVze8fs/9lZj
- JwNS9nLj2NGqvsn/oWc1HWwjfwMHtfLpKajPdTIPconnfK0T7/y0yiKUhwJKjBJZtVvHBkIsM
- f0ESzpOItTR3s+BECH5y/2ZOMlQq/kvp0vuleaiZg=
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 212.227.126.134
+X-Received-From: 203.11.71.1
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -124,25 +69,134 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Riku Voipio <riku.voipio@iki.fi>,
- John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>
+Cc: lvivier@redhat.com, qemu-devel@nongnu.org, groug@kaod.org,
+ qemu-ppc@nongnu.org, clg@kaod.org, David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Le 24/10/2019 à 00:37, Christophe de Dinechin a écrit :
-> 
-> Laurent Vivier writes:
-> 
->> Add --preserve-arg0 in qemu-binfmt-conf.sh to configure the preserve-arg0
->> flag.
-> 
-> There is an inconsistency below, where some parts use preserve-argv0
-> and others preserve-arg0 (no v)
+From: C=C3=A9dric Le Goater <clg@kaod.org>
 
-I agree. I'm going to fix that.
+When a Virtual Processor is scheduled to run on a HW thread, the
+hypervisor pushes its identifier in the OS CAM line. When running with
+kernel_irqchip=3Doff, QEMU needs to emulate the same behavior.
 
-Thanks,
-Laurent
+Set the OS CAM line when the interrupt presenter of the sPAPR core is
+reset. This will also cover the case of hot-plugged CPUs.
+
+This change also has the benefit to remove the use of CPU_FOREACH()
+which can be unsafe.
+
+Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
+Reviewed-by: Greg Kurz <groug@kaod.org>
+Message-Id: <20191022163812.330-8-clg@kaod.org>
+Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+---
+ hw/intc/spapr_xive.c        | 48 +++++++++++++------------------------
+ include/hw/ppc/spapr_xive.h |  1 -
+ 2 files changed, 17 insertions(+), 32 deletions(-)
+
+diff --git a/hw/intc/spapr_xive.c b/hw/intc/spapr_xive.c
+index 20a8d8285f..d8e1291905 100644
+--- a/hw/intc/spapr_xive.c
++++ b/hw/intc/spapr_xive.c
+@@ -205,23 +205,6 @@ void spapr_xive_mmio_set_enabled(SpaprXive *xive, bo=
+ol enable)
+     memory_region_set_enabled(&xive->end_source.esb_mmio, false);
+ }
+=20
+-/*
+- * When a Virtual Processor is scheduled to run on a HW thread, the
+- * hypervisor pushes its identifier in the OS CAM line. Emulate the
+- * same behavior under QEMU.
+- */
+-void spapr_xive_set_tctx_os_cam(XiveTCTX *tctx)
+-{
+-    uint8_t  nvt_blk;
+-    uint32_t nvt_idx;
+-    uint32_t nvt_cam;
+-
+-    spapr_xive_cpu_to_nvt(POWERPC_CPU(tctx->cs), &nvt_blk, &nvt_idx);
+-
+-    nvt_cam =3D cpu_to_be32(TM_QW1W2_VO | xive_nvt_cam_line(nvt_blk, nvt=
+_idx));
+-    memcpy(&tctx->regs[TM_QW1_OS + TM_WORD2], &nvt_cam, 4);
+-}
+-
+ static void spapr_xive_end_reset(XiveEND *end)
+ {
+     memset(end, 0, sizeof(*end));
+@@ -544,21 +527,32 @@ static int spapr_xive_cpu_intc_create(SpaprInterrup=
+tController *intc,
+     }
+=20
+     spapr_cpu->tctx =3D XIVE_TCTX(obj);
+-
+-    /*
+-     * (TCG) Early setting the OS CAM line for hotplugged CPUs as they
+-     * don't beneficiate from the reset of the XIVE IRQ backend
+-     */
+-    spapr_xive_set_tctx_os_cam(spapr_cpu->tctx);
+     return 0;
+ }
+=20
++static void xive_tctx_set_os_cam(XiveTCTX *tctx, uint32_t os_cam)
++{
++    uint32_t qw1w2 =3D cpu_to_be32(TM_QW1W2_VO | os_cam);
++    memcpy(&tctx->regs[TM_QW1_OS + TM_WORD2], &qw1w2, 4);
++}
++
+ static void spapr_xive_cpu_intc_reset(SpaprInterruptController *intc,
+                                      PowerPCCPU *cpu)
+ {
+     XiveTCTX *tctx =3D spapr_cpu_state(cpu)->tctx;
++    uint8_t  nvt_blk;
++    uint32_t nvt_idx;
+=20
+     xive_tctx_reset(tctx);
++
++    /*
++     * When a Virtual Processor is scheduled to run on a HW thread,
++     * the hypervisor pushes its identifier in the OS CAM line.
++     * Emulate the same behavior under QEMU.
++     */
++    spapr_xive_cpu_to_nvt(cpu, &nvt_blk, &nvt_idx);
++
++    xive_tctx_set_os_cam(tctx, xive_nvt_cam_line(nvt_blk, nvt_idx));
+ }
+=20
+ static void spapr_xive_set_irq(SpaprInterruptController *intc, int irq, =
+int val)
+@@ -651,14 +645,6 @@ static void spapr_xive_dt(SpaprInterruptController *=
+intc, uint32_t nr_servers,
+ static int spapr_xive_activate(SpaprInterruptController *intc, Error **e=
+rrp)
+ {
+     SpaprXive *xive =3D SPAPR_XIVE(intc);
+-    CPUState *cs;
+-
+-    CPU_FOREACH(cs) {
+-        PowerPCCPU *cpu =3D POWERPC_CPU(cs);
+-
+-        /* (TCG) Set the OS CAM line of the thread interrupt context. */
+-        spapr_xive_set_tctx_os_cam(spapr_cpu_state(cpu)->tctx);
+-    }
+=20
+     if (kvm_enabled()) {
+         int rc =3D spapr_irq_init_kvm(kvmppc_xive_connect, intc, errp);
+diff --git a/include/hw/ppc/spapr_xive.h b/include/hw/ppc/spapr_xive.h
+index d84bd5c229..742b7e834f 100644
+--- a/include/hw/ppc/spapr_xive.h
++++ b/include/hw/ppc/spapr_xive.h
+@@ -57,7 +57,6 @@ typedef struct SpaprXive {
+ void spapr_xive_pic_print_info(SpaprXive *xive, Monitor *mon);
+=20
+ void spapr_xive_hcall_init(SpaprMachineState *spapr);
+-void spapr_xive_set_tctx_os_cam(XiveTCTX *tctx);
+ void spapr_xive_mmio_set_enabled(SpaprXive *xive, bool enable);
+ void spapr_xive_map_mmio(SpaprXive *xive);
+=20
+--=20
+2.21.0
 
 
