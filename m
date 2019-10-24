@@ -2,87 +2,86 @@ Return-Path: <SRS0=Jnn8=YR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B296FCA9EAF
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 14:58:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EB3F5CA9EAF
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 14:59:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8294C20650
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 14:58:20 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8294C20650
+	by mail.kernel.org (Postfix) with ESMTPS id B5BC620650
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 14:59:01 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OVYHa+s7"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B5BC620650
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44838 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44840 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iNeZ9-0002kO-Ay
-	for qemu-devel@archiver.kernel.org; Thu, 24 Oct 2019 10:58:19 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39950)
+	id 1iNeZo-0004EJ-7m
+	for qemu-devel@archiver.kernel.org; Thu, 24 Oct 2019 10:59:00 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34903)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1iNeAp-0004ym-4b
- for qemu-devel@nongnu.org; Thu, 24 Oct 2019 10:33:12 -0400
+ (envelope-from <paolo.bonzini@gmail.com>) id 1iNdj5-00083u-00
+ for qemu-devel@nongnu.org; Thu, 24 Oct 2019 10:04:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1iNeAn-0002IQ-Vq
- for qemu-devel@nongnu.org; Thu, 24 Oct 2019 10:33:10 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:57982)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iNeAn-0002HQ-Mb
- for qemu-devel@nongnu.org; Thu, 24 Oct 2019 10:33:09 -0400
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71])
- (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id D3959C05683F
- for <qemu-devel@nongnu.org>; Thu, 24 Oct 2019 14:33:08 +0000 (UTC)
-Received: by mail-wm1-f71.google.com with SMTP id 6so1076197wmj.9
- for <qemu-devel@nongnu.org>; Thu, 24 Oct 2019 07:33:08 -0700 (PDT)
+ (envelope-from <paolo.bonzini@gmail.com>) id 1iNdj3-0007o6-Um
+ for qemu-devel@nongnu.org; Thu, 24 Oct 2019 10:04:30 -0400
+Received: from mail-wm1-x335.google.com ([2a00:1450:4864:20::335]:54770)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
+ id 1iNdj3-0007nl-OU
+ for qemu-devel@nongnu.org; Thu, 24 Oct 2019 10:04:29 -0400
+Received: by mail-wm1-x335.google.com with SMTP id g7so2988057wmk.4
+ for <qemu-devel@nongnu.org>; Thu, 24 Oct 2019 07:04:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=addr6HEN99Dsw110Mj0HtzWMNzU3f7sx/0UbPvS5mDg=;
+ b=OVYHa+s72RwVBjxxCnMtsPt2upmay1bGC+AFoJR2IZhCyo3+ReEjyZklbIg46fnWhK
+ PWVNf4wWgVNNBOJ9GO49ONYujexVF6FbHibvirIQqxd/Tde7W50NZca4dJ60NSBNMRGS
+ zglJRHljvqFJIcJe1zZnjgrchtDy6kL8DSTW7RSeIRsCrzMHFiUFgn3rnEeB8W39qOk/
+ 8EhMZrnTX6L0IeLNrlPLm7HgTaJkIjgG8CAA5Ew+Ew6M7xySIYeaDm97feblIkLFcfWL
+ JLdTOp/lhLiK8Nag5XmvXJdxQebNQfkqixEEhgds1hn+L0UH3r7I96WFgXu9/9GTvhr7
+ 9Glw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=imnilA3lbvSojZROB8ERKcIG7XNz8EMO2/f4KNixz+M=;
- b=GYjl0TxOF1jP24pGc5jI8GSxYS+bVG8nMFS7dm5JPmZKe0utBu46xDjHByvn2bdBEj
- WufxRmrey0st1nsFNxuh5uwFeEdy+s3V55EFsqwmB+RMDRGrX6IzJ7hME2X5vc9rSvuL
- mo4ejIz+4om72UH6TMj9sx0gLc329Bw2/a3dh4RRaNGrkwoT/eAyUNbL4iekIqTLwz5M
- UafLD04WQyuMN+aOs4OMRj4z80exhY4MuZg134rb0rsz2f0d5cgpLYtKaK3Fv3266u4I
- DO2k0t/K3wr54ciBnttIGpQr46EPJQy02jRDT+OLG4nPVAC6r/ee11nbsvmOYgyyqEBC
- YK5Q==
-X-Gm-Message-State: APjAAAV+wbOoHrRp5VpDvl+gesMp4dXlBcmgXuMBoMC5bXf6G8HDelgF
- FH5+pfdo8xXjDqmFc/ThEd/WAZJNyBxVE/zliprgVn+VElmBe1HQOjCHdEatNkOGD/qOShxVxPs
- x7BVm4vE8aAwXUr0=
-X-Received: by 2002:a7b:c05a:: with SMTP id u26mr5227321wmc.128.1571927587631; 
- Thu, 24 Oct 2019 07:33:07 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqzbFYF5RrO0vstHSeK+jr6YPc5Wy3bFz8ge1MhO0lovZSYMJ3w9ocQHKI/w7vvYwgbiEbgmJw==
-X-Received: by 2002:a7b:c05a:: with SMTP id u26mr5227304wmc.128.1571927587452; 
- Thu, 24 Oct 2019 07:33:07 -0700 (PDT)
-Received: from [192.168.1.115] (129.red-83-57-174.dynamicip.rima-tde.net.
- [83.57.174.129])
- by smtp.gmail.com with ESMTPSA id i3sm21116127wrw.69.2019.10.24.07.33.06
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Thu, 24 Oct 2019 07:33:06 -0700 (PDT)
-Subject: Re: [PATCH v2 15/17] travis.yml: --enable-debug-tcg to check-tcg
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
- qemu-devel@nongnu.org
-References: <20191024102240.2778-1-alex.bennee@linaro.org>
- <20191024102240.2778-16-alex.bennee@linaro.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <c4ea7902-b3ad-47ab-ad56-42f604473922@redhat.com>
-Date: Thu, 24 Oct 2019 16:33:06 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.1
+ h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
+ :in-reply-to:references:mime-version:content-transfer-encoding;
+ bh=addr6HEN99Dsw110Mj0HtzWMNzU3f7sx/0UbPvS5mDg=;
+ b=j08V+QW9fI+1eCBgx0i/wTF5wfHkgiMMF5pOsNNvJAwFcNVU2u0CRXiCFVzASwAlkI
+ apCCyjALzl7fHwv2GUQ5X+8EWh580W/iXqhPw3qiEaPpWK/0zx0DACiKYskAy4gbPCJw
+ 56SexboA9VnXn+Ly9S6CKoqy9Ozn3SYJAaJKdI94FZJbRvBPR2xobuxdTeXc944zbOsV
+ UUy/oZfcgteItXTyAyTiLpjgQv4zPWRr4FAO6I/TeJuNkYQz6NQe9WImq5/5JQULCRO0
+ n/v+HQ7Ytqsp3r76PxyrJBP1MgVGpci3hC2uk4evxU/DcAInUGZ9zk0XCYVzNvKzZuUg
+ j9Qw==
+X-Gm-Message-State: APjAAAU+4w4cYP1RrWjP/SZWoqyphaCRhb5Cdac0gAoIU2Fj3ETgs8kK
+ uuzNcHZSMYiywa/389Or6aRFtxn2
+X-Google-Smtp-Source: APXvYqxLJ9lOZ6z8Vn2vzHR9som7LoayIqV+8eW0LmGrPqRhPiyohTMerHnAyg28NmZZ202G2aQViw==
+X-Received: by 2002:a1c:7913:: with SMTP id l19mr5394022wme.26.1571925868453; 
+ Thu, 24 Oct 2019 07:04:28 -0700 (PDT)
+Received: from 640k.localdomain ([93.56.166.5])
+ by smtp.gmail.com with ESMTPSA id b7sm10610155wrn.53.2019.10.24.07.04.27
+ (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+ Thu, 24 Oct 2019 07:04:27 -0700 (PDT)
+From: Paolo Bonzini <pbonzini@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PULL 28/39] hw/i386/pc: Move gsi_state creation code
+Date: Thu, 24 Oct 2019 16:03:44 +0200
+Message-Id: <1571925835-31930-29-git-send-email-pbonzini@redhat.com>
+X-Mailer: git-send-email 1.8.3.1
+In-Reply-To: <1571925835-31930-1-git-send-email-pbonzini@redhat.com>
+References: <1571925835-31930-1-git-send-email-pbonzini@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20191024102240.2778-16-alex.bennee@linaro.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.132.183.28
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::335
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,50 +93,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: fam@euphon.net, berrange@redhat.com, stefanb@linux.vnet.ibm.com,
- richard.henderson@linaro.org, f4bug@amsat.org, cota@braap.org,
- stefanha@redhat.com, marcandre.lureau@redhat.com, pbonzini@redhat.com,
- aurelien@aurel32.net
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 10/24/19 12:22 PM, Alex Benn=C3=A9e wrote:
-> This adds a whole bunch of asserts which will catch bugs you might
-> introduce into the TCG code.
+From: Philippe Mathieu-Daudé <philmd@redhat.com>
 
-Very good idea.
+The code block related to IRQ starts few lines later. Move
+the comment and the pc_gsi_create() invocation where we start
+to use the IRQs.
 
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Message-Id: <20191018135910.24286-4-philmd@redhat.com>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ hw/i386/pc_q35.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
->=20
-> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-> ---
->   .travis.yml | 4 ++--
->   1 file changed, 2 insertions(+), 2 deletions(-)
->=20
-> diff --git a/.travis.yml b/.travis.yml
-> index c43597f1331..ba3a8d4cfc9 100644
-> --- a/.travis.yml
-> +++ b/.travis.yml
-> @@ -334,14 +334,14 @@ matrix:
->  =20
->       # Run check-tcg against linux-user
->       - env:
-> -        - CONFIG=3D"--disable-system"
-> +        - CONFIG=3D"--disable-system --enable-debug-tcg"
->           - TEST_CMD=3D"make -j3 check-tcg V=3D1"
->           - CACHE_NAME=3D"${TRAVIS_BRANCH}-linux-gcc-default"
->  =20
->  =20
->       # Run check-tcg against softmmu targets
->       - env:
-> -        - CONFIG=3D"--target-list=3Dxtensa-softmmu,arm-softmmu,aarch64=
--softmmu,alpha-softmmu"
-> +        - CONFIG=3D"--enable-debug-tcg --target-list=3Dxtensa-softmmu,=
-arm-softmmu,aarch64-softmmu,alpha-softmmu"
->           - TEST_CMD=3D"make -j3 check-tcg V=3D1"
->           - CACHE_NAME=3D"${TRAVIS_BRANCH}-linux-gcc-default"
->  =20
->=20
+diff --git a/hw/i386/pc_q35.c b/hw/i386/pc_q35.c
+index 255c803..6cf12b7 100644
+--- a/hw/i386/pc_q35.c
++++ b/hw/i386/pc_q35.c
+@@ -211,9 +211,6 @@ static void pc_q35_init(MachineState *machine)
+                        rom_memory, &ram_memory);
+     }
+ 
+-    /* irq lines */
+-    gsi_state = pc_gsi_create(&x86ms->gsi, pcmc->pci_enabled);
+-
+     /* create pci host bus */
+     q35_host = Q35_HOST_DEVICE(qdev_create(NULL, TYPE_Q35_HOST_DEVICE));
+ 
+@@ -247,6 +244,9 @@ static void pc_q35_init(MachineState *machine)
+     object_property_set_link(OBJECT(machine), OBJECT(lpc),
+                              PC_MACHINE_ACPI_DEVICE_PROP, &error_abort);
+ 
++    /* irq lines */
++    gsi_state = pc_gsi_create(&x86ms->gsi, pcmc->pci_enabled);
++
+     ich9_lpc = ICH9_LPC_DEVICE(lpc);
+     lpc_dev = DEVICE(lpc);
+     for (i = 0; i < GSI_NUM_PINS; i++) {
+-- 
+1.8.3.1
+
+
 
