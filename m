@@ -7,73 +7,75 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 25F7ACA9EAF
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 17:10:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 66AF5CA9EAF
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 17:11:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E396720650
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 17:10:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2BDCD20650
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 17:11:00 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="sz4rEsZC"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E396720650
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="bh0tUVgC"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2BDCD20650
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48370 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48374 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iNgdQ-0001K7-AT
-	for qemu-devel@archiver.kernel.org; Thu, 24 Oct 2019 13:10:52 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57839)
+	id 1iNgdW-0001e8-SZ
+	for qemu-devel@archiver.kernel.org; Thu, 24 Oct 2019 13:10:58 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58150)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1iNfxj-0007J1-Qn
- for qemu-devel@nongnu.org; Thu, 24 Oct 2019 12:27:48 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1iNfy7-0007zY-Q0
+ for qemu-devel@nongnu.org; Thu, 24 Oct 2019 12:28:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1iNfxi-0000lA-CT
- for qemu-devel@nongnu.org; Thu, 24 Oct 2019 12:27:47 -0400
-Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:52639)
+ (envelope-from <peter.maydell@linaro.org>) id 1iNfy6-0000xp-He
+ for qemu-devel@nongnu.org; Thu, 24 Oct 2019 12:28:11 -0400
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:44573)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1iNfxi-0000km-6D
- for qemu-devel@nongnu.org; Thu, 24 Oct 2019 12:27:46 -0400
-Received: by mail-wm1-x341.google.com with SMTP id p21so2099344wmg.2
- for <qemu-devel@nongnu.org>; Thu, 24 Oct 2019 09:27:46 -0700 (PDT)
+ id 1iNfy6-0000xQ-BM
+ for qemu-devel@nongnu.org; Thu, 24 Oct 2019 12:28:10 -0400
+Received: by mail-wr1-x442.google.com with SMTP id z11so3425828wro.11
+ for <qemu-devel@nongnu.org>; Thu, 24 Oct 2019 09:28:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:subject:date:message-id:in-reply-to:references:mime-version
  :content-transfer-encoding;
- bh=yfXT1kAIXINflleiLaCvqElRIW5XZjl76Cc6V+HbJs0=;
- b=sz4rEsZC5067Tcw1a5qKvZXNWGWTTmlooa7k91VU7loXEdPnmyu6UWlaXdlFI8nwCo
- ZoSyoDi+t1JbjlfcQqypZN/g5THsHORvqyL0gV0CWUS291ShQSm5Sqp+DYfpJ94ecmtI
- 3+UBgB726qW33k08B+UmXfanT6X9J0pyIe5n/XznkgLTY7DjIwGQWuOwkIceRPuEACI3
- fCBeTBNimppdZeCVM3jjgE5UOo+sPPCYPx9ZwBqzIPm+74tNhoBNC3Y9wg7yGuZWeZ5q
- DXkxhAdxljg1m3gc7ocM3xc0DhqM7/E7s7cI5pq95iHHCQFP9HZopTxJ82XElgmI3eFx
- jujw==
+ bh=8gomn01XLvBOBw7vPQuO9R/LxnmjSiX180WMSIb6GFs=;
+ b=bh0tUVgC/1ZbJ36SIsl+8vE6Dh0rK+GQ7ttrbMOIz7zDP5jvg4yq9wto8Bi/0N+fNb
+ RbZCRzahCVbNs6fCGqXsaL33FyS80pIzSg1ugDWhRHk7wzGhOiplVgm8JZo3hPaOqPT3
+ 5AlB/ZD9zHH3f78/jdzVGTexLwjICSXqNVpBNCRdTJRGp2kK3GWCKNLXKINzjd/5uF+i
+ 3Puh6JkPji3sSli1UsgUjPK8cbkW8f77K96uOSkaCEKdjoyf9ZLD4qHPsxJiIHcZzeZ5
+ BtlXraBReXp+3V+uJ7ne9+8WYUqtxse2JsrsTfL0wfKpFY8KQttxDu+YmNaACBJXkwmE
+ zvQA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=yfXT1kAIXINflleiLaCvqElRIW5XZjl76Cc6V+HbJs0=;
- b=ijCY2+A+IJwl6Db57IImyKP9mYUenW0PCIMbmgip16TK5mWrKtLj1scFSjbgU+RqlO
- crAtc0Jxp27edaCkP3WwrSYLQ05FZF4uwKzMndhi9MZsrVN0W9YzOEcG7QDm0an9LBxU
- Q+oe++9bKSaHmRmqTMUOgUgH/OsSTvME7xzI644KnDVSJtdjiSuO3P+8zxrV1oyKhBXQ
- 9lBPEjk3Y518WX3VdMW81RCUJeJ0uNiubRWSIPt6c4wJfmj76ZQYk99BYq14nKlsEHwN
- puvM4RSI+N5EBL8DDe0pJVhbix/LJQZNFwlyl23CZiwJx1WOmOxrwCNX1wKyGSCbVskM
- I/qQ==
-X-Gm-Message-State: APjAAAV2BTsW7BXSaGO/pOsG66Lk78hCdZCTs30EYcdHYiho4XAtzLWC
- LVayEVI8BSGdIGq6NshcZGtoCOTImn0=
-X-Google-Smtp-Source: APXvYqwwOH2gG1+LoDgTUXxisSYjLfVoW1HkUhpi6kwugrO1WbNsD7OzhsfCQFB15w1grmM8J8Js9Q==
-X-Received: by 2002:a1c:1b07:: with SMTP id b7mr5674683wmb.111.1571934464753; 
- Thu, 24 Oct 2019 09:27:44 -0700 (PDT)
+ bh=8gomn01XLvBOBw7vPQuO9R/LxnmjSiX180WMSIb6GFs=;
+ b=UbI0eIbwFZKsRIZgbXLU1whf7wPZT5b4wCmOaxKUE/sIh/qLUe0FJhXWpikZTCMWd/
+ 4DciBq873y8i6m+zJSRR+ihZ0hGYgdoI6I9QUkYKIwN5ARZrYZsy9tDq1dGLVmnqskDC
+ fS/+8vF2CgicO00k6mlcTSLis5sNu3SpKqhPuqL9uIdiHm+PduXDb5bLX1GMpl0vJY0X
+ sJd9u5KMzxPfXwfSlyijyM225d7uqcrnBUDNl6RhvuPPPxlTN7MvjLECH83W7eRstS0n
+ THZpMOML6W+alKJEagA0d7qbAcvVOFWI/N9zHgmJy8ZEmC7Sy49kNLyGDwjfjiyLG5D3
+ SiKw==
+X-Gm-Message-State: APjAAAWIh1XJO4gtrZ+qKVk5QCPVM4cPpwz/kZVxZyIRT4v+XJdy5NAo
+ JbNUOPb2GZWu1q4I9YFtfz3J6RFMW3M=
+X-Google-Smtp-Source: APXvYqzkM5AqjDl5AK8uaa7Y8UMD0pA7fmI+yofFFxSDNM+FnQ4rnqqTOhBh+07y3ZS2V+HnYy62pw==
+X-Received: by 2002:a05:6000:4f:: with SMTP id
+ k15mr4416110wrx.137.1571934489134; 
+ Thu, 24 Oct 2019 09:28:09 -0700 (PDT)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id r27sm42606124wrc.55.2019.10.24.09.27.43
+ by smtp.gmail.com with ESMTPSA id r27sm42606124wrc.55.2019.10.24.09.28.08
  for <qemu-devel@nongnu.org>
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 24 Oct 2019 09:27:44 -0700 (PDT)
+ Thu, 24 Oct 2019 09:28:08 -0700 (PDT)
 From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PULL 14/51] target/arm: Add arm_rebuild_hflags
-Date: Thu, 24 Oct 2019 17:26:47 +0100
-Message-Id: <20191024162724.31675-15-peter.maydell@linaro.org>
+Subject: [PULL 34/51] hw/watchdog/milkymist-sysctl.c: Switch to
+ transaction-based ptimer API
+Date: Thu, 24 Oct 2019 17:27:07 +0100
+Message-Id: <20191024162724.31675-35-peter.maydell@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20191024162724.31675-1-peter.maydell@linaro.org>
 References: <20191024162724.31675-1-peter.maydell@linaro.org>
@@ -82,7 +84,7 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::341
+X-Received-From: 2a00:1450:4864:20::442
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,99 +100,112 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Richard Henderson <richard.henderson@linaro.org>
+Switch the milkymist-sysctl code away from bottom-half based
+ptimers to the new transaction-based ptimer API.  This just requires
+adding begin/commit calls around the various places that modify the
+ptimer state, and using the new ptimer_init() function to create the
+timer.
 
-This function assumes nothing about the current state of the cpu,
-and writes the computed value to env->hflags.
-
-Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-Message-id: 20191023150057.25731-13-richard.henderson@linaro.org
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Message-id: 20191021141040.11007-1-peter.maydell@linaro.org
 ---
- target/arm/cpu.h    |  6 ++++++
- target/arm/helper.c | 30 ++++++++++++++++++++++--------
- 2 files changed, 28 insertions(+), 8 deletions(-)
+ hw/timer/milkymist-sysctl.c | 25 ++++++++++++++++++-------
+ 1 file changed, 18 insertions(+), 7 deletions(-)
 
-diff --git a/target/arm/cpu.h b/target/arm/cpu.h
-index 9909ff89d4f..d844ea21d8d 100644
---- a/target/arm/cpu.h
-+++ b/target/arm/cpu.h
-@@ -3297,6 +3297,12 @@ void arm_register_pre_el_change_hook(ARMCPU *cpu, ARMELChangeHookFn *hook,
- void arm_register_el_change_hook(ARMCPU *cpu, ARMELChangeHookFn *hook, void
-         *opaque);
+diff --git a/hw/timer/milkymist-sysctl.c b/hw/timer/milkymist-sysctl.c
+index 5193c038501..7a62e212c35 100644
+--- a/hw/timer/milkymist-sysctl.c
++++ b/hw/timer/milkymist-sysctl.c
+@@ -31,7 +31,6 @@
+ #include "hw/ptimer.h"
+ #include "hw/qdev-properties.h"
+ #include "qemu/error-report.h"
+-#include "qemu/main-loop.h"
+ #include "qemu/module.h"
  
-+/**
-+ * arm_rebuild_hflags:
-+ * Rebuild the cached TBFLAGS for arbitrary changed processor state.
-+ */
-+void arm_rebuild_hflags(CPUARMState *env);
-+
- /**
-  * aa32_vfp_dreg:
-  * Return a pointer to the Dn register within env in 32-bit mode.
-diff --git a/target/arm/helper.c b/target/arm/helper.c
-index 89aa6fd9339..85de96d071a 100644
---- a/target/arm/helper.c
-+++ b/target/arm/helper.c
-@@ -11198,17 +11198,35 @@ static uint32_t rebuild_hflags_a64(CPUARMState *env, int el, int fp_el,
-     return rebuild_hflags_common(env, fp_el, mmu_idx, flags);
+ enum {
+@@ -71,8 +70,6 @@ struct MilkymistSysctlState {
+ 
+     MemoryRegion regs_region;
+ 
+-    QEMUBH *bh0;
+-    QEMUBH *bh1;
+     ptimer_state *ptimer0;
+     ptimer_state *ptimer1;
+ 
+@@ -161,14 +158,19 @@ static void sysctl_write(void *opaque, hwaddr addr, uint64_t value,
+         s->regs[addr] = value;
+         break;
+     case R_TIMER0_COMPARE:
++        ptimer_transaction_begin(s->ptimer0);
+         ptimer_set_limit(s->ptimer0, value, 0);
+         s->regs[addr] = value;
++        ptimer_transaction_commit(s->ptimer0);
+         break;
+     case R_TIMER1_COMPARE:
++        ptimer_transaction_begin(s->ptimer1);
+         ptimer_set_limit(s->ptimer1, value, 0);
+         s->regs[addr] = value;
++        ptimer_transaction_commit(s->ptimer1);
+         break;
+     case R_TIMER0_CONTROL:
++        ptimer_transaction_begin(s->ptimer0);
+         s->regs[addr] = value;
+         if (s->regs[R_TIMER0_CONTROL] & CTRL_ENABLE) {
+             trace_milkymist_sysctl_start_timer0();
+@@ -179,8 +181,10 @@ static void sysctl_write(void *opaque, hwaddr addr, uint64_t value,
+             trace_milkymist_sysctl_stop_timer0();
+             ptimer_stop(s->ptimer0);
+         }
++        ptimer_transaction_commit(s->ptimer0);
+         break;
+     case R_TIMER1_CONTROL:
++        ptimer_transaction_begin(s->ptimer1);
+         s->regs[addr] = value;
+         if (s->regs[R_TIMER1_CONTROL] & CTRL_ENABLE) {
+             trace_milkymist_sysctl_start_timer1();
+@@ -191,6 +195,7 @@ static void sysctl_write(void *opaque, hwaddr addr, uint64_t value,
+             trace_milkymist_sysctl_stop_timer1();
+             ptimer_stop(s->ptimer1);
+         }
++        ptimer_transaction_commit(s->ptimer1);
+         break;
+     case R_ICAP:
+         sysctl_icap_write(s, value);
+@@ -263,8 +268,12 @@ static void milkymist_sysctl_reset(DeviceState *d)
+         s->regs[i] = 0;
+     }
+ 
++    ptimer_transaction_begin(s->ptimer0);
+     ptimer_stop(s->ptimer0);
++    ptimer_transaction_commit(s->ptimer0);
++    ptimer_transaction_begin(s->ptimer1);
+     ptimer_stop(s->ptimer1);
++    ptimer_transaction_commit(s->ptimer1);
+ 
+     /* defaults */
+     s->regs[R_ICAP] = ICAP_READY;
+@@ -292,13 +301,15 @@ static void milkymist_sysctl_realize(DeviceState *dev, Error **errp)
+ {
+     MilkymistSysctlState *s = MILKYMIST_SYSCTL(dev);
+ 
+-    s->bh0 = qemu_bh_new(timer0_hit, s);
+-    s->bh1 = qemu_bh_new(timer1_hit, s);
+-    s->ptimer0 = ptimer_init_with_bh(s->bh0, PTIMER_POLICY_DEFAULT);
+-    s->ptimer1 = ptimer_init_with_bh(s->bh1, PTIMER_POLICY_DEFAULT);
++    s->ptimer0 = ptimer_init(timer0_hit, s, PTIMER_POLICY_DEFAULT);
++    s->ptimer1 = ptimer_init(timer1_hit, s, PTIMER_POLICY_DEFAULT);
+ 
++    ptimer_transaction_begin(s->ptimer0);
+     ptimer_set_freq(s->ptimer0, s->freq_hz);
++    ptimer_transaction_commit(s->ptimer0);
++    ptimer_transaction_begin(s->ptimer1);
+     ptimer_set_freq(s->ptimer1, s->freq_hz);
++    ptimer_transaction_commit(s->ptimer1);
  }
  
-+static uint32_t rebuild_hflags_internal(CPUARMState *env)
-+{
-+    int el = arm_current_el(env);
-+    int fp_el = fp_exception_el(env, el);
-+    ARMMMUIdx mmu_idx = arm_mmu_idx(env);
-+
-+    if (is_a64(env)) {
-+        return rebuild_hflags_a64(env, el, fp_el, mmu_idx);
-+    } else if (arm_feature(env, ARM_FEATURE_M)) {
-+        return rebuild_hflags_m32(env, fp_el, mmu_idx);
-+    } else {
-+        return rebuild_hflags_a32(env, fp_el, mmu_idx);
-+    }
-+}
-+
-+void arm_rebuild_hflags(CPUARMState *env)
-+{
-+    env->hflags = rebuild_hflags_internal(env);
-+}
-+
- void cpu_get_tb_cpu_state(CPUARMState *env, target_ulong *pc,
-                           target_ulong *cs_base, uint32_t *pflags)
- {
--    ARMMMUIdx mmu_idx = arm_mmu_idx(env);
--    int current_el = arm_current_el(env);
--    int fp_el = fp_exception_el(env, current_el);
-     uint32_t flags, pstate_for_ss;
- 
-+    flags = rebuild_hflags_internal(env);
-+
-     if (is_a64(env)) {
-         *pc = env->pc;
--        flags = rebuild_hflags_a64(env, current_el, fp_el, mmu_idx);
-         if (cpu_isar_feature(aa64_bti, env_archcpu(env))) {
-             flags = FIELD_DP32(flags, TBFLAG_A64, BTYPE, env->btype);
-         }
-@@ -11217,8 +11235,6 @@ void cpu_get_tb_cpu_state(CPUARMState *env, target_ulong *pc,
-         *pc = env->regs[15];
- 
-         if (arm_feature(env, ARM_FEATURE_M)) {
--            flags = rebuild_hflags_m32(env, fp_el, mmu_idx);
--
-             if (arm_feature(env, ARM_FEATURE_M_SECURITY) &&
-                 FIELD_EX32(env->v7m.fpccr[M_REG_S], V7M_FPCCR, S)
-                 != env->v7m.secure) {
-@@ -11242,8 +11258,6 @@ void cpu_get_tb_cpu_state(CPUARMState *env, target_ulong *pc,
-                 flags = FIELD_DP32(flags, TBFLAG_A32, LSPACT, 1);
-             }
-         } else {
--            flags = rebuild_hflags_a32(env, fp_el, mmu_idx);
--
-             /*
-              * Note that XSCALE_CPAR shares bits with VECSTRIDE.
-              * Note that VECLEN+VECSTRIDE are RES0 for M-profile.
+ static const VMStateDescription vmstate_milkymist_sysctl = {
 -- 
 2.20.1
 
