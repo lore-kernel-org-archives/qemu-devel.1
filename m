@@ -2,115 +2,81 @@ Return-Path: <SRS0=Jnn8=YR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D6DACA9EAF
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 14:14:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8BCF5CA9EAF
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 14:15:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1560021872
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 14:14:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2E7F720679
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 14:15:16 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="ZcrXWD71"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1560021872
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AP+yPhdh"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2E7F720679
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43762 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43768 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iNdsM-0000tp-7D
-	for qemu-devel@archiver.kernel.org; Thu, 24 Oct 2019 10:14:06 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33014)
+	id 1iNdtR-0003Ub-Uo
+	for qemu-devel@archiver.kernel.org; Thu, 24 Oct 2019 10:15:13 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47773)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iNda3-0004oR-Fb
- for qemu-devel@nongnu.org; Thu, 24 Oct 2019 09:55:13 -0400
+ (envelope-from <armbru@redhat.com>) id 1iNcKk-0003z6-4k
+ for qemu-devel@nongnu.org; Thu, 24 Oct 2019 08:35:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iNda1-0002o0-Cc
- for qemu-devel@nongnu.org; Thu, 24 Oct 2019 09:55:10 -0400
-Received: from mail-eopbgr10097.outbound.protection.outlook.com
- ([40.107.1.97]:9069 helo=EUR02-HE1-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1iNda0-0002mY-Fm; Thu, 24 Oct 2019 09:55:09 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=BSyuMhxbSBfHGa+o+9agB/bXZCITgnIJhqFIizEZSGTfYvwPpT8RJ6sfj9yG/ln11Fr85dYypmxUQUyB5/GC0Ay4aB7tbk9nu+shtgxNkmohbsIl9bvXSA7IHaQ81dB7R5yhV589yyXvpFucoXaRz/ORAT1G0apazhRDPsUZeqjjU47G0tFdNiaFkr93QSNSITwNzhIrLy1eo0TmXRjAGkxMHH/3dQRKL4gnsS/iKifUtftNrRsDk+CHqSlzwksZhCmZL9hlyC+sUmxNK3m7krJIR5cQ+T19qxkltn4parCoup45sSDk9EITDtcG2FsQrfI6vvtnKO5eqU8UsmW3rQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=3NTwzbUVbdxI0AjexCaEFNKyN66hY+wwXsEpCHwGcnA=;
- b=AN3U2l+/DeysNOikGxhnz31qhHkrqGjXhm/9IKc27y9sAgmoaBI9t1xORD5jl323/yfkqrghSkt/MzVsQtjdEG7j4OnZEtV3vOECyaqBJzJsMP3f9FWPKBduuL1yw4US0Rs5J/0Cndwph4t8v9ZysGV2tcb5xhyICX2PdhJIQFpQSK6azux22grH2/+y/m24DhWqnhuI1P4KnL7VglDI68boWJytYmYml/IHm5cmt1bXn2aks6j4qbYgZW1JQtt7ObuIzDkRndsLWiDL/Yb9NUp6Q36N6ZvZC14xr/Rbud7ROoHNYNL2ZlErM/bvGmPGqR6o2lepQeXsMqUCU8wRCQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=3NTwzbUVbdxI0AjexCaEFNKyN66hY+wwXsEpCHwGcnA=;
- b=ZcrXWD71CJhz2kyGhGDtAN8kgxU4C1tgg0ZQb2gPhjRUzAWul2y7/a6KdBbqvw4b8FZRoYwTkaH6LD3D7zhrPIXYWRKbZMT9ZlGGLJ9PPLcIH7URnm1gH7WTjGvdUybJxe0CJM/8PIIxJVyN+fNVRpUpaBCYOOBYYv5/wPIDooM=
-Received: from AM0PR08MB4435.eurprd08.prod.outlook.com (20.179.35.83) by
- AM0PR08MB3763.eurprd08.prod.outlook.com (20.178.82.152) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2387.22; Thu, 24 Oct 2019 13:55:06 +0000
-Received: from AM0PR08MB4435.eurprd08.prod.outlook.com
- ([fe80::4461:dd32:b358:110c]) by AM0PR08MB4435.eurprd08.prod.outlook.com
- ([fe80::4461:dd32:b358:110c%7]) with mapi id 15.20.2367.027; Thu, 24 Oct 2019
- 13:55:06 +0000
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-To: Kevin Wolf <kwolf@redhat.com>, "qemu-block@nongnu.org"
- <qemu-block@nongnu.org>
-Subject: Re: [RFC PATCH 00/18] Add qemu-storage-daemon
-Thread-Topic: [RFC PATCH 00/18] Add qemu-storage-daemon
-Thread-Index: AQHVhOwHsbz+7R+kT0iIPJdO9QVzyqdp22yA
-Date: Thu, 24 Oct 2019 13:55:05 +0000
-Message-ID: <45be7a0c-f6ae-5d18-7297-697311046fbd@virtuozzo.com>
-References: <20191017130204.16131-1-kwolf@redhat.com>
-In-Reply-To: <20191017130204.16131-1-kwolf@redhat.com>
-Accept-Language: ru-RU, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-clientproxiedby: HE1PR08CA0044.eurprd08.prod.outlook.com
- (2603:10a6:7:2a::15) To AM0PR08MB4435.eurprd08.prod.outlook.com
- (2603:10a6:208:144::19)
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=vsementsov@virtuozzo.com; 
-x-ms-exchange-messagesentrepresentingtype: 1
-x-tagtoolbar-keys: D20191024165503693
-x-originating-ip: [185.231.240.5]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: c01b68d8-c1a5-478d-1ede-08d75889c661
-x-ms-traffictypediagnostic: AM0PR08MB3763:
-x-microsoft-antispam-prvs: <AM0PR08MB3763B614B261B2EF9BF5E25DC16A0@AM0PR08MB3763.eurprd08.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:10000;
-x-forefront-prvs: 0200DDA8BE
-x-forefront-antispam-report: SFV:NSPM;
- SFS:(10019020)(39840400004)(346002)(396003)(366004)(376002)(136003)(199004)(189003)(305945005)(66556008)(86362001)(66446008)(64756008)(66476007)(486006)(476003)(31686004)(6486002)(2616005)(446003)(36756003)(11346002)(6512007)(71200400001)(71190400001)(6436002)(2906002)(5660300002)(66946007)(14454004)(4326008)(25786009)(478600001)(2501003)(6116002)(3846002)(99286004)(66066001)(14444005)(6246003)(256004)(54906003)(110136005)(229853002)(26005)(186003)(31696002)(102836004)(76176011)(52116002)(386003)(6506007)(7736002)(316002)(8936002)(81156014)(81166006)(8676002);
- DIR:OUT; SFP:1102; SCL:1; SRVR:AM0PR08MB3763;
- H:AM0PR08MB4435.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
- PTR:InfoNoRecords; A:1; MX:1; 
-received-spf: None (protection.outlook.com: virtuozzo.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: y1SE18oheHuYm4wM2lL79WSFakw8HUja3hY5LLr0rQxvUeIC22t9f+2uuGbXadamWLOFqujRlaS4IsHBDiXY1yuCz6qI1KOg0VL0rhjcQ/t89KIJAkcsWvXGF/FYTL5jSZXGdZA8f21jFxSkkVORRe9gFRt6spzkdz9SeUrOtpKJdxtIovRk5aEXnZeyZCZwManW1SI5NbVNMegHF0yzw1EL1CiFDwBqXTflaVR2j7mFNKRdTC/JDSdyMCtgF8PlpxzgIcjJ2OWaaUGWGxHabF3vv2UoFxlgF+SKvznjLQ/U6HBve36SYe3TqKq6BwJ/k3BwHuRWO+mZAxtnivQxsEq283MXqnAu8zy6TXhnbeyMZKb9fcn8V5WgJmevuhuGmInaD79/zKYs3w3QLosK7e8gy2+eCRKV5G3vUmdjnbuJz5z3F2sg8cvxd5Hx/EJ5
-x-ms-exchange-transport-forked: True
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <0D18AD0F9BC377459D0EC0B2FAFECC02@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+ (envelope-from <armbru@redhat.com>) id 1iNcKi-0006BX-1U
+ for qemu-devel@nongnu.org; Thu, 24 Oct 2019 08:35:17 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:60794
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1iNcKh-0006Ay-TV
+ for qemu-devel@nongnu.org; Thu, 24 Oct 2019 08:35:15 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1571920515;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=tH3KRe0Iy3dxA+vLYN3e4E2c91fWMAngW0oeY2mbIt0=;
+ b=AP+yPhdhvU4/unFvTnouJJTp9JwABZld2Ebxj617ygwzqaJkyFnYw2D4vbgMFcTkRYnWMu
+ bcXpsLYND6inAAAFBzXbG2izGi/pijYAMR4Q6yClNUvJzjGTGc4FWz8Gv9McASs1lIpRNQ
+ 339vJ4+ABSaZN+uRlv56PCgWBSnxRSo=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-218-Gnydq9ogM5CwbGJGAB-4Mw-1; Thu, 24 Oct 2019 08:35:09 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 49E261800DFC;
+ Thu, 24 Oct 2019 12:35:08 +0000 (UTC)
+Received: from blackfin.pond.sub.org (unknown [10.36.118.123])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id E0FAE52E7;
+ Thu, 24 Oct 2019 12:35:07 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id 2E5A71130346; Thu, 24 Oct 2019 14:34:59 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [RFC PATCH 16/19] qapi: Implement -compat deprecated-input=reject for
+ commands
+Date: Thu, 24 Oct 2019 14:34:55 +0200
+Message-Id: <20191024123458.13505-17-armbru@redhat.com>
+In-Reply-To: <20191024123458.13505-1-armbru@redhat.com>
+References: <20191024123458.13505-1-armbru@redhat.com>
 MIME-Version: 1.0
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: c01b68d8-c1a5-478d-1ede-08d75889c661
-X-MS-Exchange-CrossTenant-originalarrivaltime: 24 Oct 2019 13:55:05.9511 (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: CA6bDCH0mgMoRTPrMYHESWEPq8W8mnXzKeLnIOqQrAIXOLUZ7CRyJRc43Up60g4z1v6qUIrPkGsyN3BdXZHSLOck/j2XwST1fRPxx8OvAjY=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM0PR08MB3763
-X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
-X-Received-From: 40.107.1.97
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-MC-Unique: Gnydq9ogM5CwbGJGAB-4Mw-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=WINDOWS-1252
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -122,148 +88,200 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "pkrempa@redhat.com" <pkrempa@redhat.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "mreitz@redhat.com" <mreitz@redhat.com>,
- "armbru@redhat.com" <armbru@redhat.com>
+Cc: libvir-list@redhat.com, mdroth@linux.vnet.ibm.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-SGkhDQoNClRoaXMgcmVmbGVjdHMgb3VyIGlkZWEgb2YgdXNpbmcgcWVtdSBiaW5hcnkgaW5zdGVh
-ZCBvZiBxZW11LWltZyBmb3IgZG9pbmcNCmJsb2NrLWxheWVyIG9wZXJhdGlvbnMgb2ZmbGluZS4N
-Cg0KV2hhdCBpcyB0aGUgcHJhY3RpY2FsIGRpZmZlcmVuY2UgYmV0d2VlbiBxZW11LXN0b3JhZ2Ut
-ZGFlbW9uIGFuZCBzdGFydGluZw0KcWVtdSBiaW5hcnkgaW4gc3RvcHBlZCBzdGF0ZT8NCg0KMTcu
-MTAuMjAxOSAxNjowMSwgS2V2aW4gV29sZiB3cm90ZToNCj4gVGhpcyBzZXJpZXMgYWRkcyBhIG5l
-dyB0b29sICdxZW11LXN0b3JhZ2UtZGFlbW9uJywgd2hpY2ggY2FuIGJlIHVzZWQgdG8NCj4gZXhw
-b3J0IGFuZCBwZXJmb3JtIG9wZXJhdGlvbnMgb24gYmxvY2sgZGV2aWNlcy4gVGhlcmUgaXMgc29t
-ZSBvdmVybGFwDQo+IGJldHdlZW4gcWVtdS1pbWcvcWVtdS1uYmQgYW5kIHRoZSBuZXcgcWVtdS1z
-dG9yYWdlLWRhZW1vbiwgYnV0IHRoZXJlIGFyZQ0KPiBhIGZldyBpbXBvcnRhbnQgZGlmZmVyZW5j
-ZXM6DQo+IA0KPiAqIFRoZSBxZW11LXN0b3JhZ2UtZGFlbW9uIGhhcyBRTVAgc3VwcG9ydC4gVGhl
-IGNvbW1hbmQgc2V0IGlzIG9idmlvdXNseQ0KPiAgICByZXN0cmljdGVkIGNvbXBhcmVkIHRvIHRo
-ZSBzeXN0ZW0gZW11bGF0b3IgYmVjYXVzZSB0aGVyZSBpcyBubyBndWVzdCwNCj4gICAgYnV0IGFs
-bCBvZiB0aGUgYmxvY2sgb3BlcmF0aW9ucyBhcmUgcHJlc2VudC4NCj4gDQo+ICAgIFRoaXMgbWVh
-bnMgdGhhdCBpdCBjYW4gYWNjZXNzIGFkdmFuY2VkIG9wdGlvbnMgb3Igb3BlcmF0aW9ucyB0aGF0
-IHRoZQ0KPiAgICBxZW11LWltZyBjb21tYW5kIGxpbmUgZG9lc24ndCBleHBvc2UuIEZvciBleGFt
-cGxlLCBibG9ja2Rldi1jcmVhdGUgaXMNCj4gICAgYSBsb3QgbW9yZSBwb3dlcmZ1bCB0aGFuICdx
-ZW11LWltZyBjcmVhdGUnLCBhbmQgcWVtdS1zdG9yYWdlLWRhZW1vbg0KPiAgICBhbGxvd3MgdG8g
-ZXhlY3V0ZSBpdCB3aXRob3V0IHN0YXJ0aW5nIGEgZ3Vlc3QuDQoNCnFlbXUgYmluYXJ5IGNhbiBk
-byB0aGF0IHRvbywgd2l0aCAtUyBvcHRpb24uLg0KDQo+IA0KPiAgICBDb21wYXJlZCB0byBxZW11
-LW5iZCBpdCBtZWFucyB0aGF0LCBmb3IgZXhhbXBsZSwgYmxvY2sgam9icyBjYW4gbm93IGJlDQo+
-ICAgIGV4ZWN1dGVkIG9uIHRoZSBzZXJ2ZXIgc2lkZSwgYW5kIGJhY2tpbmcgY2hhaW5zIHNoYXJl
-ZCBieSBtdWx0aXBsZSBWTXMNCj4gICAgY2FuIGJlIG1vZGlmaWVkIHRoaXMgd2F5Lg0KPiANCj4g
-KiBUaGUgZXhpc3RpbmcgdG9vbHMgYWxsIGhhdmUgYSBzZXBhcmF0ZWx5IGludmVudGVkIG9uZS1v
-ZmYgc3ludGF4IGZvcg0KPiAgICB0aGUgam9iIGF0IGhhbmQsIHdoaWNoIHVzdWFsbHkgY29tZXMg
-d2l0aCByZXN0cmljdGlvbnMgY29tcGFyZWQgdG8gdGhlDQo+ICAgIHN5c3RlbSBlbXVsYXRvci4g
-cWVtdS1zdG9yYWdlLWRhZW1vbiBzaGFyZXMgdGhlIHNhbWUgc3ludGF4IHdpdGggdGhlDQo+ICAg
-IHN5c3RlbSBlbXVsYXRvciBmb3IgbW9zdCBvcHRpb25zIGFuZCBwcmVmZXJzIFFBUEkgYmFzZWQg
-aW50ZXJmYWNlcw0KPiAgICB3aGVyZSBwb3NzaWJsZSAoc3VjaCBhcyAtLWJsb2NrZGV2KSwgc28g
-aXQgc2hvdWxkIGJlIGVhc3kgdG8gbWFrZSB1c2UNCj4gICAgb2YgaW4gbGlidmlydC4NCj4gDQo+
-ICogV2hpbGUgdGhpcyBzZXJpZXMgaW1wbGVtZW50cyBvbmx5IE5CRCBleHBvcnRzLCB0aGUgc3Rv
-cmFnZSBkYWVtb24gaXMNCj4gICAgaW50ZW5kZWQgdG8gc2VydmUgbXVsdGlwbGUgcHJvdG9jb2xz
-IGFuZCBpdHMgc3ludGF4IHJlZmxlY3RzIHRoaXMuIEluDQo+ICAgIHRoZSBwYXN0LCB3ZSBoYWQg
-cHJvcG9zYWxzIHRvIGFkZCBuZXcgb25lLW9mZiB0b29scyBmb3IgZXhwb3J0aW5nIG92ZXINCj4g
-ICAgbmV3IHByb3RvY29scyBsaWtlIEZVU0Ugb3IgVENNVS4NCj4gDQo+ICAgIFdpdGggYSBnZW5l
-cmljIHN0b3JhZ2UgZGFlbW9uLCBhZGRpdGlvbmFsIGV4cG9ydCBtZXRob2RzIGhhdmUgYSBob21l
-DQo+ICAgIHdpdGhvdXQgYWRkaW5nIGEgbmV3IHRvb2wgZm9yIGVhY2ggb2YgdGhlbS4NCj4gDQo+
-IEknbSBwb3N0aW5nIHRoaXMgYXMgYW4gUkZDIG1haW5seSBmb3IgdHdvIHJlYXNvbnM6DQo+IA0K
-PiAxLiBUaGUgbW9uaXRvciBpbnRlZ3JhdGlvbiwgd2hpY2ggY291bGQgYmUgYXJndWVkIHRvIGJl
-IGEgbGl0dGxlIGhhY2tpc2gNCj4gICAgIChzb21lIGdlbmVyYXRlZCBRQVBJIHNvdXJjZSBmaWxl
-cyBhcmUgYnVpbHQgZnJvbSBhIHNlcGFyYXRlIFFBUEkNCj4gICAgIHNjaGVtYSwgYnV0IHRoZSBw
-ZXItbW9kdWxlIG9uZXMgYXJlIHRha2VuIGZyb20gdGhlIHN5c3RlbSBlbXVsYXRvcikNCj4gICAg
-IGFuZCBNYXJrdXMgd2lsbCB3YW50IHRvIGhhdmUgYSBjbG9zZXIgbG9vayB0aGVyZS4gQnV0IGZy
-b20gdGhlIElSQw0KPiAgICAgZGlzY3Vzc2lvbnMgd2UgaGFkLCB3ZSBzZWVtIHRvIGFncmVlIG9u
-IHRoZSBnZW5lcmFsIGFwcHJvYWNoIGhlcmUuDQo+IA0KPiAyLiBJJ20gbm90IGNvbXBsZXRlbHkg
-c3VyZSBpZiB0aGUgY29tbWFuZCBsaW5lIHN5bnRheCBpcyB0aGUgZmluYWwNCj4gICAgIHZlcnNp
-b24gdGhhdCB3ZSB3YW50IHRvIHN1cHBvcnQgbG9uZy10ZXJtLiBNYW55IG9wdGlvbnMgZGlyZWN0
-bHkgdXNlDQo+ICAgICBRQVBJIHZpc2l0b3JzICgtLWJsb2NrZGV2LCAtLWV4cG9ydCwgLS1uYmQt
-c2VydmVyKSBhbmQgc2hvdWxkIGJlDQo+ICAgICBmaW5lLiBIb3dldmVyLCBvdGhlcnMgdXNlIFFl
-bXVPcHRzICgtLWNoYXJkZXYsIC0tbW9uaXRvciwgLS1vYmplY3QpLg0KPiANCj4gICAgIFRoaXMg
-aXMgdGhlIHNhbWUgYXMgaW4gdGhlIHN5c3RlbSBlbXVsYXRvciwgc28gd2Ugd291bGRuJ3QgYmUg
-YWRkaW5nDQo+ICAgICBhIG5ldyBwcm9ibGVtLCBidXQgYXMgdGhlcmUgd2FzIHRhbGsgYWJvdXQg
-UUFQSWZ5aW5nIHRoZSBjb21tYW5kDQo+ICAgICBsaW5lLCBhbmQgSSB3b3VsZG4ndCB3YW50IGxh
-dGVyIHN5bnRheCBjaGFuZ2VzIG9yIGFkZGluZyBsb3RzIG9mDQo+ICAgICBjb21wYXRpYmlsaXR5
-IGNvZGUgdG8gYSBuZXcgdG9vbCwgSSB0aG91Z2h0IHdlIHNob3VsZCBwcm9iYWJseQ0KPiAgICAg
-ZGlzY3VzcyB3aGV0aGVyIFFBUElmeWluZyBmcm9tIHRoZSBzdGFydCB3b3VsZCBiZSBhbiBvcHRp
-b24uDQo+IA0KPiBJIHdvdWxkIGxpa2UgdG8gaGF2ZSBzb21ldGhpbmcgbWVyZ2VkIGZvciA0LjIs
-IGJ1dCBJJ20gY29uc2lkZXJpbmcNCj4gbWFya2luZyB0aGUgd2hvbGUgdG9vbCBhcyBleHBlcmlt
-ZW50YWwgYW5kIHVuc3RhYmxlIEFCSSBieSByZXF1aXJpbmcgYQ0KPiBjb21tYW5kIGxpbmUgb3B0
-aW9uIGxpa2UgLS1leHBlcmltZW50YWwgZm9yIHRoZSB0b29sIHRvIGV2ZW4gc3RhcnQgaWYgd2UN
-Cj4ga25vdyB0aGF0IHdlIHdhbnQgdG8gY2hhbmdlIHNvbWUgdGhpbmdzIGxhdGVyLg0KPiANCj4g
-VGhpcyBzZXJpZXMgaXMgYmFzZWQgb246DQo+ICogW1BBVENIXSBibG9ja2RldjogVXNlIGVycm9y
-X3JlcG9ydCgpIGluIGhtcF9jb21taXQoKQ0KPiAqIFtQQVRDSCAwLzddIHFhcGk6IENsZWFudXBz
-IGFuZCB0ZXN0IHNwZWVkdXANCj4gDQo+IEJhc2VkLW9uOiA8MjAxOTEwMTUxMjM5MzIuMTIyMTQt
-MS1rd29sZkByZWRoYXQuY29tPg0KPiBCYXNlZC1vbjogPDIwMTkxMDAxMTkxNTE0LjExMjA4LTEt
-YXJtYnJ1QHJlZGhhdC5jb20+DQo+IA0KPiBLZXZpbiBXb2xmICgxOCk6DQo+ICAgIHFlbXUtc3Rv
-cmFnZS1kYWVtb246IEFkZCBiYXJlYm9uZSB0b29sDQo+ICAgIHFlbXUtc3RvcmFnZS1kYWVtb246
-IEFkZCAtLW9iamVjdCBvcHRpb24NCj4gICAgc3R1YnM6IEFkZCBhcmNoX3R5cGUNCj4gICAgc3R1
-YnM6IEFkZCBibGtfYnlfcWRldl9pZCgpDQo+ICAgIHFlbXUtc3RvcmFnZS1kYWVtb246IEFkZCAt
-LWJsb2NrZGV2IG9wdGlvbg0KPiAgICBxZW11LXN0b3JhZ2UtZGFlbW9uOiBBZGQgLS1uYmQtc2Vy
-dmVyIG9wdGlvbg0KPiAgICBibG9ja2Rldi1uYmQ6IEJveGVkIGFyZ3VtZW50IHR5cGUgZm9yIG5i
-ZC1zZXJ2ZXItYWRkDQo+ICAgIHFlbXUtc3RvcmFnZS1kYWVtb246IEFkZCAtLWV4cG9ydCBvcHRp
-b24NCj4gICAgcWVtdS1zdG9yYWdlLWRhZW1vbjogQWRkIG1haW4gbG9vcA0KPiAgICBxZW11LXN0
-b3JhZ2UtZGFlbW9uOiBBZGQgLS1jaGFyZGV2IG9wdGlvbg0KPiAgICBtb25pdG9yOiBNb3ZlIG1v
-bml0b3Igb3B0aW9uIHBhcnNpbmcgdG8gbW9uaXRvci9tb25pdG9yLmMNCj4gICAgc3R1YnM6IFVw
-ZGF0ZSBtb25pdG9yIHN0dWJzIGZvciBxZW11LXN0b3JhZ2UtZGFlbW9uDQo+ICAgIHFhcGk6IENy
-ZWF0ZSBtb2R1bGUgJ21vbml0b3InDQo+ICAgIG1vbml0b3I6IENyZWF0ZSBtb25pdG9yL3FtcC1j
-bWRzLW1vbml0b3IuYw0KPiAgICBxYXBpOiBTdXBwb3J0IGVtcHR5IG1vZHVsZXMNCj4gICAgcWFw
-aTogQ3JlYXRlICdwcmFnbWEnIG1vZHVsZQ0KPiAgICBtb25pdG9yOiBNb3ZlIHFtcF9xdWVyeV9x
-bXBfc2NoZW1hIHRvIHFtcC1jbWRzLW1vbml0b3IuYw0KPiAgICBxZW11LXN0b3JhZ2UtZGFlbW9u
-OiBBZGQgLS1tb25pdG9yIG9wdGlvbg0KPiANCj4gICBxYXBpL2Jsb2NrLmpzb24gICAgICAgICAg
-ICAgICAgICAgICAgICAgIHwgIDY1ICsrKystDQo+ICAgcWFwaS9taXNjLmpzb24gICAgICAgICAg
-ICAgICAgICAgICAgICAgICB8IDIxMiAtLS0tLS0tLS0tLS0tLS0NCj4gICBxYXBpL21vbml0b3Iu
-anNvbiAgICAgICAgICAgICAgICAgICAgICAgIHwgMjE4ICsrKysrKysrKysrKysrKw0KPiAgIHFh
-cGkvcHJhZ21hLmpzb24gICAgICAgICAgICAgICAgICAgICAgICAgfCAgMjQgKysNCj4gICBxYXBp
-L3FhcGktc2NoZW1hLmpzb24gICAgICAgICAgICAgICAgICAgIHwgIDI2ICstDQo+ICAgc3RvcmFn
-ZS1kYWVtb24vcWFwaS9xYXBpLXNjaGVtYS5qc29uICAgICB8ICAxNSArKw0KPiAgIGNvbmZpZ3Vy
-ZSAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgfCAgIDIgKy0NCj4gICBpbmNsdWRlL2Js
-b2NrL25iZC5oICAgICAgICAgICAgICAgICAgICAgIHwgICAxICsNCj4gICBpbmNsdWRlL21vbml0
-b3IvbW9uaXRvci5oICAgICAgICAgICAgICAgIHwgICA0ICsNCj4gICBpbmNsdWRlL3N5c2VtdS9h
-cmNoX2luaXQuaCAgICAgICAgICAgICAgIHwgICAyICsNCj4gICBpbmNsdWRlL3N5c2VtdS9zeXNl
-bXUuaCAgICAgICAgICAgICAgICAgIHwgICAxIC0NCj4gICBtb25pdG9yL21vbml0b3ItaW50ZXJu
-YWwuaCAgICAgICAgICAgICAgIHwgICA0ICsNCj4gICBibG9ja2Rldi1uYmQuYyAgICAgICAgICAg
-ICAgICAgICAgICAgICAgIHwgIDMwICsrLQ0KPiAgIG1vbml0b3IvaG1wLWNtZHMuYyAgICAgICAg
-ICAgICAgICAgICAgICAgfCAgMjIgKy0NCj4gICBtb25pdG9yL21pc2MuYyAgICAgICAgICAgICAg
-ICAgICAgICAgICAgIHwgMTI2IC0tLS0tLS0tLQ0KPiAgIG1vbml0b3IvbW9uaXRvci5jICAgICAg
-ICAgICAgICAgICAgICAgICAgfCAgNTIgKysrKw0KPiAgIG1vbml0b3IvcW1wLWNtZHMtbW9uaXRv
-ci5jICAgICAgICAgICAgICAgfCAxNjkgKysrKysrKysrKysrDQo+ICAgbW9uaXRvci9xbXAtY21k
-cy5jICAgICAgICAgICAgICAgICAgICAgICB8ICAxNSArLQ0KPiAgIG1vbml0b3IvcW1wLmMgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgfCAgIDIgKy0NCj4gICBxZW11LXN0b3JhZ2UtZGFlbW9u
-LmMgICAgICAgICAgICAgICAgICAgIHwgMzI2ICsrKysrKysrKysrKysrKysrKysrKysrDQo+ICAg
-c3R1YnMvYXJjaF90eXBlLmMgICAgICAgICAgICAgICAgICAgICAgICB8ICAgNCArDQo+ICAgc3R1
-YnMvYmxrLWJ5LXFkZXYtaWQuYyAgICAgICAgICAgICAgICAgICB8ICAgOSArDQo+ICAgc3R1YnMv
-bW9uaXRvci1jb3JlLmMgICAgICAgICAgICAgICAgICAgICB8ICAyMSArKw0KPiAgIHN0dWJzL21v
-bml0b3IuYyAgICAgICAgICAgICAgICAgICAgICAgICAgfCAgMTUgKy0NCj4gICB0ZXN0cy9xbXAt
-dGVzdC5jICAgICAgICAgICAgICAgICAgICAgICAgIHwgICAyICstDQo+ICAgdWkvZ3RrLmMgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICB8ICAgMSArDQo+ICAgdmwuYyAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICB8ICA0NSArLS0tDQo+ICAgTWFrZWZpbGUgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICB8ICAzNCArKysNCj4gICBNYWtlZmlsZS5vYmpzICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgIHwgICA5ICsNCj4gICBibG9jay9NYWtlZmlsZS5vYmpz
-ICAgICAgICAgICAgICAgICAgICAgIHwgICAyICstDQo+ICAgbW9uaXRvci9NYWtlZmlsZS5vYmpz
-ICAgICAgICAgICAgICAgICAgICB8ICAgNSArLQ0KPiAgIHFhcGkvTWFrZWZpbGUub2JqcyAgICAg
-ICAgICAgICAgICAgICAgICAgfCAgIDkgKy0NCj4gICBxb20vTWFrZWZpbGUub2JqcyAgICAgICAg
-ICAgICAgICAgICAgICAgIHwgICAxICsNCj4gICBzY3JpcHRzL3FhcGkvZ2VuLnB5ICAgICAgICAg
-ICAgICAgICAgICAgIHwgICA1ICsNCj4gICBzY3JpcHRzL3FhcGkvc2NoZW1hLnB5ICAgICAgICAg
-ICAgICAgICAgIHwgICA5ICsNCj4gICBzdG9yYWdlLWRhZW1vbi9NYWtlZmlsZS5vYmpzICAgICAg
-ICAgICAgIHwgICAxICsNCj4gICBzdG9yYWdlLWRhZW1vbi9xYXBpL01ha2VmaWxlLm9ianMgICAg
-ICAgIHwgICAxICsNCj4gICBzdHVicy9NYWtlZmlsZS5vYmpzICAgICAgICAgICAgICAgICAgICAg
-IHwgICAzICsNCj4gICB0ZXN0cy9xYXBpLXNjaGVtYS9jb21tZW50cy5vdXQgICAgICAgICAgIHwg
-ICAyICsNCj4gICB0ZXN0cy9xYXBpLXNjaGVtYS9kb2MtYmFkLXNlY3Rpb24ub3V0ICAgIHwgICAy
-ICsNCj4gICB0ZXN0cy9xYXBpLXNjaGVtYS9kb2MtZ29vZC5vdXQgICAgICAgICAgIHwgICAyICsN
-Cj4gICB0ZXN0cy9xYXBpLXNjaGVtYS9lbXB0eS5vdXQgICAgICAgICAgICAgIHwgICAyICsNCj4g
-ICB0ZXN0cy9xYXBpLXNjaGVtYS9ldmVudC1jYXNlLm91dCAgICAgICAgIHwgICAyICsNCj4gICB0
-ZXN0cy9xYXBpLXNjaGVtYS9pbmNsdWRlLXJlcGV0aXRpb24ub3V0IHwgICA0ICsNCj4gICB0ZXN0
-cy9xYXBpLXNjaGVtYS9pbmNsdWRlLXNpbXBsZS5vdXQgICAgIHwgICAzICsNCj4gICB0ZXN0cy9x
-YXBpLXNjaGVtYS9pbmRlbnRlZC1leHByLm91dCAgICAgIHwgICAyICsNCj4gICB0ZXN0cy9xYXBp
-LXNjaGVtYS9xYXBpLXNjaGVtYS10ZXN0Lm91dCAgIHwgICA0ICsNCj4gICA0NyBmaWxlcyBjaGFu
-Z2VkLCAxMDUyIGluc2VydGlvbnMoKyksIDQ2MyBkZWxldGlvbnMoLSkNCj4gICBjcmVhdGUgbW9k
-ZSAxMDA2NDQgcWFwaS9tb25pdG9yLmpzb24NCj4gICBjcmVhdGUgbW9kZSAxMDA2NDQgcWFwaS9w
-cmFnbWEuanNvbg0KPiAgIGNyZWF0ZSBtb2RlIDEwMDY0NCBzdG9yYWdlLWRhZW1vbi9xYXBpL3Fh
-cGktc2NoZW1hLmpzb24NCj4gICBjcmVhdGUgbW9kZSAxMDA2NDQgbW9uaXRvci9xbXAtY21kcy1t
-b25pdG9yLmMNCj4gICBjcmVhdGUgbW9kZSAxMDA2NDQgcWVtdS1zdG9yYWdlLWRhZW1vbi5jDQo+
-ICAgY3JlYXRlIG1vZGUgMTAwNjQ0IHN0dWJzL2FyY2hfdHlwZS5jDQo+ICAgY3JlYXRlIG1vZGUg
-MTAwNjQ0IHN0dWJzL2Jsay1ieS1xZGV2LWlkLmMNCj4gICBjcmVhdGUgbW9kZSAxMDA2NDQgc3R1
-YnMvbW9uaXRvci1jb3JlLmMNCj4gICBjcmVhdGUgbW9kZSAxMDA2NDQgc3RvcmFnZS1kYWVtb24v
-TWFrZWZpbGUub2Jqcw0KPiAgIGNyZWF0ZSBtb2RlIDEwMDY0NCBzdG9yYWdlLWRhZW1vbi9xYXBp
-L01ha2VmaWxlLm9ianMNCj4gDQoNCg0KLS0gDQpCZXN0IHJlZ2FyZHMsDQpWbGFkaW1pcg0K
+This policy makes deprecated commands fail like this:
+
+    ---> {"execute": "query-cpus"}
+    <--- {"error": {"class": "CommandNotFound", "desc": "Deprecated command=
+ query-cpus disabled by policy"}}
+
+When the command is removed, the error will change to
+
+    <--- {"error": {"class": "CommandNotFound", "desc": "The command query-=
+cpus has not been found"}}
+
+The policy thus permits "testing the future".
+
+Signed-off-by: Markus Armbruster <armbru@redhat.com>
+---
+ qapi/common.json            |  4 ++--
+ include/qapi/qmp/dispatch.h |  1 +
+ qapi/qmp-dispatch.c         | 13 +++++++++++++
+ tests/test-qmp-cmds.c       | 23 +++++++++++++++++++++++
+ qemu-options.hx             |  4 +++-
+ scripts/qapi/commands.py    | 10 +++++++---
+ 6 files changed, 49 insertions(+), 6 deletions(-)
+
+diff --git a/qapi/common.json b/qapi/common.json
+index 9fc3e6400c..3e9d12c90f 100644
+--- a/qapi/common.json
++++ b/qapi/common.json
+@@ -151,7 +151,7 @@
+ # Policy for handling "funny" input.
+ #
+ # @accept: Accept silently
+-# TODO @reject: Reject with an error
++# @reject: Reject with an error
+ # TODO @crash: abort() the process
+ #
+ # FIXME Guidance on intended use.
+@@ -159,7 +159,7 @@
+ # Since: 4.2
+ ##
+ { 'enum': 'CompatPolicyInput',
+-  'data': [ 'accept' ] }
++  'data': [ 'accept', 'reject' ] }
+=20
+ ##
+ # @CompatPolicyOutput:
+diff --git a/include/qapi/qmp/dispatch.h b/include/qapi/qmp/dispatch.h
+index 9aa426a398..ef256f2bb7 100644
+--- a/include/qapi/qmp/dispatch.h
++++ b/include/qapi/qmp/dispatch.h
+@@ -24,6 +24,7 @@ typedef enum QmpCommandOptions
+     QCO_NO_SUCCESS_RESP       =3D  (1U << 0),
+     QCO_ALLOW_OOB             =3D  (1U << 1),
+     QCO_ALLOW_PRECONFIG       =3D  (1U << 2),
++    QCO_DEPRECATED            =3D  (1U << 3),
+ } QmpCommandOptions;
+=20
+ typedef struct QmpCommand
+diff --git a/qapi/qmp-dispatch.c b/qapi/qmp-dispatch.c
+index 8fe59cf54d..b079db85d2 100644
+--- a/qapi/qmp-dispatch.c
++++ b/qapi/qmp-dispatch.c
+@@ -132,6 +132,19 @@ QDict *qmp_dispatch(QmpCommandList *cmds, QObject *req=
+uest,
+                   "The command %s has not been found", command);
+         goto out;
+     }
++    if (cmd->options & QCO_DEPRECATED) {
++        switch (qapi_compat_policy.deprecated_input) {
++        case COMPAT_POLICY_INPUT_ACCEPT:
++            break;
++        case COMPAT_POLICY_INPUT_REJECT:
++            error_set(&err, ERROR_CLASS_COMMAND_NOT_FOUND,
++                      "Deprecated command %s disabled by policy",
++                      command);
++            goto out;
++        default:
++            abort();
++        }
++    }
+     if (!cmd->enabled) {
+         error_set(&err, ERROR_CLASS_COMMAND_NOT_FOUND,
+                   "The command %s has been disabled for this instance",
+diff --git a/tests/test-qmp-cmds.c b/tests/test-qmp-cmds.c
+index cf4fa1a091..005ea24a27 100644
+--- a/tests/test-qmp-cmds.c
++++ b/tests/test-qmp-cmds.c
+@@ -1,4 +1,5 @@
+ #include "qemu/osdep.h"
++#include "qapi/compat-policy.h"
+ #include "qapi/qmp/qdict.h"
+ #include "qapi/qmp/qjson.h"
+ #include "qapi/qmp/qnum.h"
+@@ -235,6 +236,26 @@ static void test_dispatch_cmd_success_response(void)
+     qobject_unref(req);
+ }
+=20
++static void test_dispatch_cmd_deprecated(void)
++{
++    const char *cmd =3D "{ 'execute': 'test-command-features1' }";
++    QDict *ret;
++
++    /* accept */
++    ret =3D qobject_to(QDict, do_qmp_dispatch(false, cmd));
++    assert(ret && qdict_size(ret) =3D=3D 0);
++    qobject_unref(ret);
++
++    qapi_compat_policy.has_deprecated_input =3D true;
++    qapi_compat_policy.deprecated_input =3D COMPAT_POLICY_INPUT_ACCEPT;
++    ret =3D qobject_to(QDict, do_qmp_dispatch(false, cmd));
++    assert(ret && qdict_size(ret) =3D=3D 0);
++    qobject_unref(ret);
++
++    qapi_compat_policy.deprecated_input =3D COMPAT_POLICY_INPUT_REJECT;
++    do_qmp_dispatch_error(false, ERROR_CLASS_COMMAND_NOT_FOUND, cmd);
++}
++
+ /* test commands that involve both input parameters and return values */
+ static void test_dispatch_cmd_io(void)
+ {
+@@ -344,6 +365,8 @@ int main(int argc, char **argv)
+     g_test_add_func("/qmp/dispatch_cmd_io", test_dispatch_cmd_io);
+     g_test_add_func("/qmp/dispatch_cmd_success_response",
+                     test_dispatch_cmd_success_response);
++    g_test_add_func("/qmp/dispatch_cmd_deprecated",
++                    test_dispatch_cmd_deprecated);
+     g_test_add_func("/qmp/dealloc_types", test_dealloc_types);
+     g_test_add_func("/qmp/dealloc_partial", test_dealloc_partial);
+=20
+diff --git a/qemu-options.hx b/qemu-options.hx
+index c43f768a15..f107a57c81 100644
+--- a/qemu-options.hx
++++ b/qemu-options.hx
+@@ -3320,7 +3320,7 @@ STEXI
+ ETEXI
+=20
+ DEF("compat", HAS_ARG, QEMU_OPTION_compat,
+-    "-compat [deprecated-input=3Daccept][,deprecated-output=3Daccept]\n"
++    "-compat [deprecated-input=3Daccept|reject][,deprecated-output=3Daccep=
+t]\n"
+     "                Policy for handling deprecated management interfaces\=
+n",
+     QEMU_ARCH_ALL)
+ STEXI
+@@ -3331,6 +3331,8 @@ Set policy for handling deprecated management interfa=
+ces:
+ @table @option
+ @item deprecated-input=3Daccept (default)
+ Accept deprecated commands
++@item deprecated-input=3Dreject
++Reject deprecated commands
+ @item deprecated-output=3Daccept (default)
+ Emit deprecated events
+ @end table
+diff --git a/scripts/qapi/commands.py b/scripts/qapi/commands.py
+index 11e9a6c095..df2a132915 100644
+--- a/scripts/qapi/commands.py
++++ b/scripts/qapi/commands.py
+@@ -194,9 +194,13 @@ out:
+     return ret
+=20
+=20
+-def gen_register_command(name, success_response, allow_oob, allow_preconfi=
+g):
++def gen_register_command(name, features,
++                         success_response, allow_oob, allow_preconfig):
+     options =3D []
+=20
++    if 'deprecated' in [f.name for f in features]:
++        options +=3D ['QCO_DEPRECATED']
++
+     if not success_response:
+         options +=3D ['QCO_NO_SUCCESS_RESP']
+     if allow_oob:
+@@ -295,8 +299,8 @@ void %(c_prefix)sqmp_init_marshal(QmpCommandList *cmds)=
+;
+             self._genh.add(gen_command_decl(name, arg_type, boxed, ret_typ=
+e))
+             self._genh.add(gen_marshal_decl(name))
+             self._genc.add(gen_marshal(name, arg_type, boxed, ret_type))
+-            self._regy.add(gen_register_command(name, success_response,
+-                                                allow_oob, allow_preconfig=
+))
++            self._regy.add(gen_register_command(
++                name, features, success_response, allow_oob, allow_preconf=
+ig))
+=20
+=20
+ def gen_commands(schema, output_dir, prefix):
+--=20
+2.21.0
+
 
