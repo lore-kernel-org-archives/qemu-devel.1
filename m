@@ -2,80 +2,87 @@ Return-Path: <SRS0=Jnn8=YR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C9501CA9EAF
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 11:43:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E41DCCA9EAF
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 11:44:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9D0662166E
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 11:43:12 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9D0662166E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id AB53820679
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 11:44:30 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Fsz5fsUN"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AB53820679
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40218 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40224 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iNbWJ-0000sw-38
-	for qemu-devel@archiver.kernel.org; Thu, 24 Oct 2019 07:43:11 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60950)
+	id 1iNbXZ-0004pq-8r
+	for qemu-devel@archiver.kernel.org; Thu, 24 Oct 2019 07:44:29 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53934)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mlureau@redhat.com>) id 1iNb38-0003OS-6R
- for qemu-devel@nongnu.org; Thu, 24 Oct 2019 07:13:03 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1iNaGV-00023S-PI
+ for qemu-devel@nongnu.org; Thu, 24 Oct 2019 06:22:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mlureau@redhat.com>) id 1iNb36-0001SP-RC
- for qemu-devel@nongnu.org; Thu, 24 Oct 2019 07:13:01 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:56558)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mlureau@redhat.com>) id 1iNb36-0001Ry-JJ
- for qemu-devel@nongnu.org; Thu, 24 Oct 2019 07:13:00 -0400
-Received: from mail-ot1-f70.google.com (mail-ot1-f70.google.com
- [209.85.210.70])
- (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id C7E9B4E919
- for <qemu-devel@nongnu.org>; Thu, 24 Oct 2019 11:12:59 +0000 (UTC)
-Received: by mail-ot1-f70.google.com with SMTP id m7so13034447otc.11
- for <qemu-devel@nongnu.org>; Thu, 24 Oct 2019 04:12:59 -0700 (PDT)
+ (envelope-from <alex.bennee@linaro.org>) id 1iNaGU-00044o-KR
+ for qemu-devel@nongnu.org; Thu, 24 Oct 2019 06:22:47 -0400
+Received: from mail-wr1-x42f.google.com ([2a00:1450:4864:20::42f]:39853)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1iNaGU-000439-Dy
+ for qemu-devel@nongnu.org; Thu, 24 Oct 2019 06:22:46 -0400
+Received: by mail-wr1-x42f.google.com with SMTP id a11so9343078wra.6
+ for <qemu-devel@nongnu.org>; Thu, 24 Oct 2019 03:22:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=qmWZe7YRnWYQvnMO9Ft+oK9d0E1Wp0RQ12k34wleFcU=;
+ b=Fsz5fsUNy9O5dVOrwtJWSX7eiXtPZJWeP+wHVOzeNe4RTk2KLBgNNr3iZf1ZqT0chg
+ 1MQyrFSKd5YFbOWB7Jj2cUVpWXDkwEbrfw/ldKLTQ6fHPLvcstuCUhPHGIag+gw9DMOF
+ 0jmK7xo2tvDa4b9KTZZYN433RyuHaB3tdU5uHGwKWodcWCvXYF55Ir9tnPHTzigRwmBS
+ fuA2cdI0Mx8ZIgMhvtfk1CEwj5A4odgcR/CJdXtsVu3pQl4PWO65rcR7ZmmqxQsZ4XF0
+ v5SI+1FcXk00drOIqxjsukq3zCX41TTSeToigXaCAHkRIFIyCHF3r4UPhqb7R5S+4lHd
+ r63g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=IVJGlbjmC8YxXRv3XhIhG4IkKHi+YOzThhNUpLQ4XfM=;
- b=dud2RSdBvJ8ak4lj4OZtvWAaErfZX+jZ2TxQOtyT1yGLjpaDzkdMAcJXJYjsT5KxpR
- 87B1fiOcnjQ2fX7ac6T/A3rroBXQkhRHCDSA4Rw4UkJydSBivUt3Z8nW9dXJBzkOdUFj
- yJA0TB66BS27tByccK/klHkMz4AQhYQrPlMGVS4Tyu717SWnKdDG7HBzpXKglyhN9HWw
- YM5ShgjuOVuwFpO1jhs/KPriL8u3Mpnf4k9EbACp5a9JJRHcFfHzOL4v7iXeyQ8+K3Hm
- px5jypEsuex0tdkUWMsamqeQpweaPOxOmKQZr/vN/lmoGlZK1CJ97TKZJ13fkXTcPFT9
- fB4w==
-X-Gm-Message-State: APjAAAVD/PHM6DX/3g2hIvUkcDqeUq2teu/PopOWeiLdgiMHaY2EFpwr
- FXSOp68VY/MzfV+3UiE80REnPYh1dM/+glz3pe44Ux3VF4w8+QqBxAIckslzXRB+J8d+281Efwk
- 05Pojm3jV/+UVi1rLwjZnf7pG0tJWWcc=
-X-Received: by 2002:a05:6830:1003:: with SMTP id
- a3mr6367269otp.166.1571915579133; 
- Thu, 24 Oct 2019 04:12:59 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqzgeTJR0woCmzAkkFWpuNfq1DQcA5xKHk2J7BuUbaxmOizL4X47kI//iATfvfu2aqnF0v5qUGf8amsD2uWJVgE=
-X-Received: by 2002:a05:6830:1003:: with SMTP id
- a3mr6367236otp.166.1571915578846; 
- Thu, 24 Oct 2019 04:12:58 -0700 (PDT)
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=qmWZe7YRnWYQvnMO9Ft+oK9d0E1Wp0RQ12k34wleFcU=;
+ b=IfjzlupRaBlsWIPWn7LGiVW9nMQvb/ZE6xqGypfB/Fk50X8NHa5lrzw0j0FMTXDaLh
+ S7ZQuCHm5y08I9VPdd1pAraS0s/R+AZGNnmSKH/jszvfFX0fQg3RKtd50zkmk42t2WsO
+ n5teRnlKHoCUQ6IDQMInTLJlfIGtTrkNqJHj8c5qiZGuFdlfu//uDuHdFNYVn0qtKYfF
+ 4zsKFTDdGNnFmo6lLmbLPSyB5t7FL85itwalB7XM0sGVX8aCe0g7tyG4XzISF/BvZR+s
+ Vw7zHRmV2aZAINzPojyuEQgJM63PrpjL6m7egJL2Xq1xRNtv8cbKP8UOeIhFhL4I9IZg
+ lmzQ==
+X-Gm-Message-State: APjAAAUn87nRYPUuDectVf467osUm5cnkOT2z2s4XOeF6Ql50fwSarOL
+ I+VmdGk6cVcCio8kxmVtk5K28A==
+X-Google-Smtp-Source: APXvYqxZGiYRQLl+HuzfSOyfUaOW8+13v+CMVcXhZldgMOWfgqYUZ/GEpzFj01pamzRikc/QRBhMGw==
+X-Received: by 2002:a05:6000:1051:: with SMTP id
+ c17mr3047410wrx.124.1571912565048; 
+ Thu, 24 Oct 2019 03:22:45 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id a17sm22512855wrx.84.2019.10.24.03.22.40
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 24 Oct 2019 03:22:41 -0700 (PDT)
+Received: from zen.lan (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 51FB51FF87;
+ Thu, 24 Oct 2019 11:22:40 +0100 (BST)
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: qemu-devel@nongnu.org
+Subject: [PATCH for 4.2 v2 00/17] testing/next
+Date: Thu, 24 Oct 2019 11:22:23 +0100
+Message-Id: <20191024102240.2778-1-alex.bennee@linaro.org>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-References: <20191023173154.30051-1-marcandre.lureau@redhat.com>
- <20191023173154.30051-24-marcandre.lureau@redhat.com>
- <06288994-a5d3-038d-794e-ed63acdadd95@redhat.com>
-In-Reply-To: <06288994-a5d3-038d-794e-ed63acdadd95@redhat.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
-Date: Thu, 24 Oct 2019 13:12:47 +0200
-Message-ID: <CAMxuvawLDSsNkoSXNprXAWVZ13FZT_WZ5V3AXyN0euT9SKa1DQ@mail.gmail.com>
-Subject: Re: [PATCH v3 23/33] dp8393x: replace PROP_PTR with PROP_LINK
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.132.183.28
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::42f
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,98 +94,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Corey Minyard <cminyard@mvista.com>, "Michael S. Tsirkin" <mst@redhat.com>,
- Jason Wang <jasowang@redhat.com>,
- Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
- qemu-devel <qemu-devel@nongnu.org>,
- KONRAD Frederic <frederic.konrad@adacore.com>,
- "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
- Paul Burton <pburton@wavecomp.com>, Peter Maydell <peter.maydell@linaro.org>,
- Magnus Damm <magnus.damm@gmail.com>,
- =?UTF-8?Q?Herv=C3=A9_Poussineau?= <hpoussin@reactos.org>,
- Artyom Tarasenko <atar4qemu@gmail.com>, Eduardo Habkost <ehabkost@redhat.com>,
- Fabien Chouteau <chouteau@adacore.com>, qemu-arm <qemu-arm@nongnu.org>,
- Richard Henderson <rth@twiddle.net>,
- =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>,
- Aleksandar Rikalo <arikalo@wavecomp.com>, qemu-ppc <qemu-ppc@nongnu.org>,
- Aleksandar Markovic <amarkovic@wavecomp.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>
+Cc: fam@euphon.net, berrange@redhat.com, stefanb@linux.vnet.ibm.com,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ richard.henderson@linaro.org, f4bug@amsat.org, cota@braap.org,
+ stefanha@redhat.com, marcandre.lureau@redhat.com, pbonzini@redhat.com,
+ aurelien@aurel32.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Oct 24, 2019 at 1:02 AM Philippe Mathieu-Daud=C3=A9
-<philmd@redhat.com> wrote:
->
-> On 10/23/19 7:31 PM, Marc-Andr=C3=A9 Lureau wrote:
-> > Link property is the correct way to pass a MemoryRegion to a device
-> > for DMA purposes.
-> >
-> > Sidenote: as a sysbus device, this remains non-usercreatable
-> > even though we can drop the specific flag here.
-> >
-> > Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> > Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-> > ---
-> >   hw/mips/mips_jazz.c | 3 ++-
-> >   hw/net/dp8393x.c    | 7 +++----
-> >   2 files changed, 5 insertions(+), 5 deletions(-)
-> >
-> > diff --git a/hw/mips/mips_jazz.c b/hw/mips/mips_jazz.c
-> > index 8d010a0b6e..878925a963 100644
-> > --- a/hw/mips/mips_jazz.c
-> > +++ b/hw/mips/mips_jazz.c
-> > @@ -284,7 +284,8 @@ static void mips_jazz_init(MachineState *machine,
-> >               dev =3D qdev_create(NULL, "dp8393x");
-> >               qdev_set_nic_properties(dev, nd);
-> >               qdev_prop_set_uint8(dev, "it_shift", 2);
-> > -            qdev_prop_set_ptr(dev, "dma_mr", rc4030_dma_mr);
-> > +            object_property_set_link(OBJECT(dev), OBJECT(rc4030_dma_mr=
-),
-> > +                                     "dma_mr", &error_abort);
-> >               qdev_init_nofail(dev);
-> >               sysbus =3D SYS_BUS_DEVICE(dev);
-> >               sysbus_mmio_map(sysbus, 0, 0x80001000);
-> > diff --git a/hw/net/dp8393x.c b/hw/net/dp8393x.c
-> > index a5678e11fa..946c7a8f64 100644
-> > --- a/hw/net/dp8393x.c
-> > +++ b/hw/net/dp8393x.c
-> > @@ -173,7 +173,7 @@ typedef struct dp8393xState {
-> >       int loopback_packet;
-> >
-> >       /* Memory access */
-> > -    void *dma_mr;
-> > +    MemoryRegion *dma_mr;
-> >       AddressSpace as;
-> >   } dp8393xState;
-> >
-> > @@ -922,7 +922,8 @@ static const VMStateDescription vmstate_dp8393x =3D=
- {
-> >
-> >   static Property dp8393x_properties[] =3D {
-> >       DEFINE_NIC_PROPERTIES(dp8393xState, conf),
-> > -    DEFINE_PROP_PTR("dma_mr", dp8393xState, dma_mr),
-> > +    DEFINE_PROP_LINK("dma_mr", dp8393xState, dma_mr,
-> > +                     TYPE_MEMORY_REGION, MemoryRegion *),
-> >       DEFINE_PROP_UINT8("it_shift", dp8393xState, it_shift, 0),
-> >       DEFINE_PROP_END_OF_LIST(),
-> >   };
-> > @@ -936,8 +937,6 @@ static void dp8393x_class_init(ObjectClass *klass, =
-void *data)
-> >       dc->reset =3D dp8393x_reset;
-> >       dc->vmsd =3D &vmstate_dp8393x;
-> >       dc->props =3D dp8393x_properties;
-> > -    /* Reason: dma_mr property can't be set */
-> > -    dc->user_creatable =3D false;
->
-> Patch is OK except this user_creatable change I don't understand.
+Hi,
 
-It's a sysbus device, so it's not user-creatable anyway. I'll add a
-commit comment.
+This is the current status of testing/next. I've dropped the iotests
+as they should come in with the rest of the block patches. I've
+included a few more stragglers including some docker tweaks. Currently
+the following could do with review:
 
->
-> >   }
-> >
-> >   static const TypeInfo dp8393x_info =3D {
-> >
+   07 - cirrus.yml reduce scope of MacOS build
+   08 - travis.yml bump Xcode 10 to latest dot release
+   09 - cirrus.yml add latest Xcode build target
+   15 - travis.yml enable debug tcg to check tcg
+   16 - tests docker set HOST_ARCH if we don t have ARCH
+   17 - tests docker update Travis image to a more curren
+
+
+Alex Bennée (8):
+  travis.yml: reduce scope of the --enable-debug build
+  cirrus.yml: reduce scope of MacOS build
+  travis.yml: bump Xcode 10 to latest dot release
+  cirrus.yml: add latest Xcode build target
+  travis.yml: cache the clang sanitizer build
+  travis.yml: --enable-debug-tcg to check-tcg
+  tests/docker: set HOST_ARCH if we don't have ARCH
+  tests/docker: update Travis image to a more current version
+
+Eduardo Habkost (2):
+  tests/vm: Let subclasses disable IPv6
+  tests/vm/netbsd: Disable IPv6
+
+Gerd Hoffmann (1):
+  tests/vm: netbsd autoinstall, using serial console
+
+Philippe Mathieu-Daudé (1):
+  travis.yml: Test the release tarball
+
+Thomas Huth (5):
+  travis.yml: Add libvdeplug-dev to compile-test net/vde.c
+  travis.yml: Use libsdl2 instead of libsdl1.2, and install
+    libsdl2-image
+  travis.yml: Use newer version of libgnutls and libpng
+  travis.yml: Fix the ccache lines
+  gitlab-ci.yml: Use libvdeplug-dev to compile-test the VDE network
+    backend
+
+ .cirrus.yml                            |  14 +-
+ .gitlab-ci.yml                         |   2 +-
+ .shippable.yml                         |   2 -
+ .travis.yml                            |  50 +++++--
+ tests/docker/Makefile.include          |   6 +-
+ tests/docker/dockerfiles/travis.docker |   6 +-
+ tests/vm/basevm.py                     |  15 +-
+ tests/vm/netbsd                        | 195 +++++++++++++++++++++++--
+ 8 files changed, 259 insertions(+), 31 deletions(-)
+
+-- 
+2.20.1
+
 
