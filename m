@@ -2,87 +2,126 @@ Return-Path: <SRS0=Jnn8=YR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 444E5CA9EAF
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 15:10:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F961CA9EAF
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 15:12:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0CE682070B
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 15:10:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 667C921872
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 15:12:43 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WiRufVyw"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0CE682070B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="TaqmjA8d"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 667C921872
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45180 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45190 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iNekd-0004Rg-5J
-	for qemu-devel@archiver.kernel.org; Thu, 24 Oct 2019 11:10:11 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34660)
+	id 1iNen4-00082T-Cs
+	for qemu-devel@archiver.kernel.org; Thu, 24 Oct 2019 11:12:42 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35588)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <paolo.bonzini@gmail.com>) id 1iNdij-00075A-LP
- for qemu-devel@nongnu.org; Thu, 24 Oct 2019 10:04:16 -0400
+ (envelope-from <andrey.shinkevich@virtuozzo.com>) id 1iNdmF-0004ub-OH
+ for qemu-devel@nongnu.org; Thu, 24 Oct 2019 10:07:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <paolo.bonzini@gmail.com>) id 1iNdih-0007eP-Rm
- for qemu-devel@nongnu.org; Thu, 24 Oct 2019 10:04:09 -0400
-Received: from mail-wr1-x42a.google.com ([2a00:1450:4864:20::42a]:46832)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
- id 1iNdih-0007dl-Jk
- for qemu-devel@nongnu.org; Thu, 24 Oct 2019 10:04:07 -0400
-Received: by mail-wr1-x42a.google.com with SMTP id n15so15443696wrw.13
- for <qemu-devel@nongnu.org>; Thu, 24 Oct 2019 07:04:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=aHMT2RmStBudCWNCIOuhp+PQb1yFu2fWEBeieC/7ws8=;
- b=WiRufVywNpU+Z4aWXn+upt4fMizH8PkEaX8706XkSw/4W+8/lvBWkvXdnPdU9iPcfK
- mINAarbhhMIgL8trXbXBDznjHz8psAZtSIA2H7gzT0Oe8dErFjWBSsUSKNC12Te+0FrO
- ZRuTdM6NWw06pyXjr7EdYsVlGRc58yZNyzesIO8hFv0IIelUSkxe0b3GlD+J9HN0i/Ap
- 06laKCjSMn9ywz986cOzzBBtnzBoibbdpeVnp7FTPSZdGPjPIGjIYfHrRoYZFu+cYQXP
- Sz7uxQ0ASgt2AexOj9o7bHMAyr7yx2oqVovMglg1vNX2Zy+YWGWZAf2tnf9kqXW5IAfz
- i6ww==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
- :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=aHMT2RmStBudCWNCIOuhp+PQb1yFu2fWEBeieC/7ws8=;
- b=RPVnNopGtpmZvzRmqDCQ45YoTtoCBQbEXltoxgA/KUPzbva4OzkoMMDmvEhgEoyfXK
- VT3hn94S8vwWY1vEV4GWv35oHRAQSgzPgaOhvhXSKe21XCAvI+AhKcKoF99NfteOBqqn
- NAACNbkkiw4/F7NprJBfcTt/VSz5JjX3qVd9kpXr1a0ClY29BRFkUNHChhdCFKVi4Jja
- iS/Hm7EWgUgYR20hngzvKQ95NjM+gUn6MFWYngHZVwpzwoARrFSY4i5ksRpTph7nBo5x
- REVMGoue/CdAJQT+6TEXyJgKfNnbnSndQjV1JH4WYW6aY6PZLrUt6Y9YNXaDWl299bUW
- oClQ==
-X-Gm-Message-State: APjAAAWDz9SWfXprYHqeabRWUY5zQcudeZhZsc/TFZfnroNp6qXnoteO
- vQXiUFI6FPIqP6JrM+3bhbB7PIXv
-X-Google-Smtp-Source: APXvYqwTwLX2vJwrTqgCpJZ4YZJubyQOw22H3TeM8UADba6bi96WEOWh8kK9WfzNMbBgRajEqj7NoQ==
-X-Received: by 2002:a05:6000:343:: with SMTP id
- e3mr2572558wre.20.1571925846115; 
- Thu, 24 Oct 2019 07:04:06 -0700 (PDT)
-Received: from 640k.localdomain ([93.56.166.5])
- by smtp.gmail.com with ESMTPSA id b7sm10610155wrn.53.2019.10.24.07.04.05
- (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Thu, 24 Oct 2019 07:04:05 -0700 (PDT)
-From: Paolo Bonzini <pbonzini@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PULL 08/39] hw/i386/pc: rename functions shared with non-PC machines
-Date: Thu, 24 Oct 2019 16:03:24 +0200
-Message-Id: <1571925835-31930-9-git-send-email-pbonzini@redhat.com>
-X-Mailer: git-send-email 1.8.3.1
-In-Reply-To: <1571925835-31930-1-git-send-email-pbonzini@redhat.com>
-References: <1571925835-31930-1-git-send-email-pbonzini@redhat.com>
+ (envelope-from <andrey.shinkevich@virtuozzo.com>) id 1iNdmE-0000yd-G5
+ for qemu-devel@nongnu.org; Thu, 24 Oct 2019 10:07:47 -0400
+Received: from mail-eopbgr70138.outbound.protection.outlook.com
+ ([40.107.7.138]:52454 helo=EUR04-HE1-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <andrey.shinkevich@virtuozzo.com>)
+ id 1iNdmA-0000qQ-4S; Thu, 24 Oct 2019 10:07:42 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=DoqWY4d2WXlRI/IxiszEiv/2aVeoYeoV0GmF2XsiFmMvKopSHq0AXYSgYKt9V7vtqbsyUw6s2G38dt410vfa6LhnwfHYBIvuUGCdWEpYyaeJLVBZjiUNLRzSmYNKSjTpx4ZpL/mLlKOjDBnbizhLjRZH68AaxeN0LaZLFFHLZq9bp+3ods7E2NZich+3LoVCVj4WcsV2hQ/wdKieflneCq6RUbzPxYlPTQjaaEev1TtV7+cuci/t+IUwBqxvagk0v8R4UiagleRsC7nkIZzLDGU3rdxGgZp5gJSTgDhvdiTu1cc2al6oEPr0BABp9bPRvoyruYokIVhJ+N07+BepJA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=fesfcg6Yo9aZX2Ypm3G1bol+PLmLXoxhyULa8eUj0zo=;
+ b=Hcm4RT1VcYZuuM5cRSI1Sly1j5Dnu0eUj29QxPAHxqqZzW5fLW3rXvyApQUNQdywPaeeO0xOq9J1WLf28FQ1C7F8fUnh94aYL19Uj+3YK2TLBFszYMW7lFNkv+BPxa3XGGraGYG70ncJRNQzru0iBMFFeFaUA8otk4hF0+m5Mx0wAs5B9RBk4D4fJYu+05hvtqXHrZy5EwaZUGv5RxxopnTDH7RIBvQe7aemk/EvboHQ900upjSdta5Ym9CQnDdZ4YK12casFSZ4cZ3aA10sRVbFtgE6OcD1CkM/70ZkP9e3TFngAh73ft+sU7NwjC/Ni+fq7IQ/8P5Vm1oM3P9vig==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=fesfcg6Yo9aZX2Ypm3G1bol+PLmLXoxhyULa8eUj0zo=;
+ b=TaqmjA8d6Pv9RD+kHULUR09Vjp8yyKxaECMyI5m42sATvEGUGXAMgYOobF0O68GPUOc+RWnE8u/5IeVlTva0Zp6CY/Xr9Nb+7YP9ANSW1wpJXzgkKUKwyejrhA7z5PgASE0IvQszay7SgRI3xagveFZTvnZUkO+F3W1zsSBQAnY=
+Received: from DB6PR08MB2757.eurprd08.prod.outlook.com (10.170.220.33) by
+ DB6PR08MB2693.eurprd08.prod.outlook.com (10.170.222.13) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2347.18; Thu, 24 Oct 2019 14:07:39 +0000
+Received: from DB6PR08MB2757.eurprd08.prod.outlook.com
+ ([fe80::a1ee:668f:c3a5:87b]) by DB6PR08MB2757.eurprd08.prod.outlook.com
+ ([fe80::a1ee:668f:c3a5:87b%4]) with mapi id 15.20.2387.023; Thu, 24 Oct 2019
+ 14:07:38 +0000
+From: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+To: Max Reitz <mreitz@redhat.com>, Vladimir Sementsov-Ogievskiy
+ <vsementsov@virtuozzo.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+Subject: Re: [PATCH v5 1/4] block: support compressed write at generic layer
+Thread-Topic: [PATCH v5 1/4] block: support compressed write at generic layer
+Thread-Index: AQHVh4YxkyM0Azl4xEijX5NTK9vhK6dmZxIAgABBJ4D//9ScgIAADIKAgAAOngCAAAlKgIAAQkoAgAKp9ICAAGq2gP//3BKAgAAFdAA=
+Date: Thu, 24 Oct 2019 14:07:38 +0000
+Message-ID: <26cfb4ed-941a-11b0-c1cf-bf3c7e354487@virtuozzo.com>
+References: <1571603828-185910-1-git-send-email-andrey.shinkevich@virtuozzo.com>
+ <1571603828-185910-2-git-send-email-andrey.shinkevich@virtuozzo.com>
+ <408ef2ab-1f6c-2c9f-ad50-92269c20fb27@redhat.com>
+ <eece4ca2-7c40-cae6-b15f-beed73830fd8@virtuozzo.com>
+ <cc3f87c2-3ad5-da4e-4750-27a48bce1ee6@virtuozzo.com>
+ <787da788-9aca-2110-a092-b63ef498a9fa@redhat.com>
+ <ae5bc00f-e65e-8c33-2620-a9147e48ea78@virtuozzo.com>
+ <1088f0ff-d882-083f-705c-95c08bdc486f@redhat.com>
+ <cb6db9c4-0dbc-9d9a-4ec5-b436c48178a8@virtuozzo.com>
+ <4fd89d2a-94aa-6f2d-ed7d-7633356e5163@redhat.com>
+ <539e7d9e-0cb7-fdb7-f376-1648361ec2f3@virtuozzo.com>
+ <8828d08f-79aa-f3a6-4387-f1423a8b7d70@redhat.com>
+In-Reply-To: <8828d08f-79aa-f3a6-4387-f1423a8b7d70@redhat.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-clientproxiedby: HE1PR0202CA0035.eurprd02.prod.outlook.com
+ (2603:10a6:3:e4::21) To DB6PR08MB2757.eurprd08.prod.outlook.com
+ (2603:10a6:6:18::33)
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=andrey.shinkevich@virtuozzo.com; 
+x-ms-exchange-messagesentrepresentingtype: 1
+x-originating-ip: [185.231.240.5]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 0be78f65-b5ef-492a-5152-08d7588b8721
+x-ms-traffictypediagnostic: DB6PR08MB2693:
+x-ms-exchange-transport-forked: True
+x-microsoft-antispam-prvs: <DB6PR08MB2693D2FAA682977196D5C89AF46A0@DB6PR08MB2693.eurprd08.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:669;
+x-forefront-prvs: 0200DDA8BE
+x-forefront-antispam-report: SFV:NSPM;
+ SFS:(10019020)(39840400004)(396003)(136003)(346002)(366004)(376002)(189003)(199004)(6486002)(2501003)(107886003)(44832011)(478600001)(14454004)(6436002)(486006)(186003)(31696002)(71200400001)(11346002)(6506007)(53546011)(2201001)(386003)(26005)(99286004)(6512007)(52116002)(102836004)(76176011)(476003)(2906002)(3846002)(6116002)(86362001)(31686004)(66066001)(2616005)(229853002)(316002)(66946007)(64756008)(66446008)(4326008)(66556008)(66476007)(446003)(71190400001)(110136005)(54906003)(5660300002)(25786009)(6246003)(8676002)(256004)(14444005)(36756003)(305945005)(7736002)(8936002)(81156014)(81166006)(41533002);
+ DIR:OUT; SFP:1102; SCL:1; SRVR:DB6PR08MB2693;
+ H:DB6PR08MB2757.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
+ PTR:InfoNoRecords; MX:1; A:1; 
+received-spf: None (protection.outlook.com: virtuozzo.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: pNx6tjxfqrOTIitaJLKM2mfwdI++97ZZxB7+WxA/Ny9swpxK8msRlxIDUEkJaCVDHpwgKAwhpjynFSb8HdPIruHTbZRF9IuC3a7mXUD7k3Km7XGOW55iEuRnhJddtU7ee8+VVuzzhMjcYus+h1cqXq5bfnAyW28GAExV/4IVYjU4oHMpwYwFLTo2cd//m9tH5aZsDgYJmxQIbp2FdnANDm4Qo68MFfQg741Kv/DGufHwAMeBEn84XdhP34hiPyb5gXRkNsHIwkCqDh60oXp++eN1onO8AnAEudsWAHol/MpDim0wfUnWfC8LPPu0aBMrv7pxSsrRy6vMEc4VAQntRY093CGdcfu/SPkvYHUywFWiMvu1GDPj+pS4KWrbgI4mVOIPSQK1s3Gf5IKWkj41VQL8xIibU5lK6EAduK381ce9tIMFT8ay0KEMXF+Se06U
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <71ED71E897CE0F4283FAD20CCC6FBC2B@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::42a
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 0be78f65-b5ef-492a-5152-08d7588b8721
+X-MS-Exchange-CrossTenant-originalarrivaltime: 24 Oct 2019 14:07:38.9089 (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: gVnrA2lQ/whyoN+c209GA+iRxfm6pdAk60goD2iESlRJ0egWNgOQm02jPzKKPHep1rOkMaybgjzJrRjH9sd863IhYM11603utARyhw/I79g=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB6PR08MB2693
+X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
+X-Received-From: 40.107.7.138
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,217 +133,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Sergio Lopez <slp@redhat.com>
+Cc: "kwolf@redhat.com" <kwolf@redhat.com>, "fam@euphon.net" <fam@euphon.net>,
+ Denis Lunev <den@virtuozzo.com>, "armbru@redhat.com" <armbru@redhat.com>,
+ "stefanha@redhat.com" <stefanha@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Sergio Lopez <slp@redhat.com>
-
-The following functions are named *pc* but are not PC-machine specific
-but generic to the X86 architecture, rename them:
-
-  load_linux                 -> x86_load_linux
-  pc_new_cpu                 -> x86_new_cpu
-  pc_cpus_init               -> x86_cpus_init
-  pc_cpu_index_to_props      -> x86_cpu_index_to_props
-  pc_get_default_cpu_node_id -> x86_get_default_cpu_node_id
-  pc_possible_cpu_arch_ids   -> x86_possible_cpu_arch_ids
-  old_pc_system_rom_init     -> x86_system_rom_init
-
-Signed-off-by: Sergio Lopez <slp@redhat.com>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
-Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
----
- hw/i386/pc.c         | 28 ++++++++++++++--------------
- hw/i386/pc_piix.c    |  2 +-
- hw/i386/pc_q35.c     |  2 +-
- hw/i386/pc_sysfw.c   |  6 +++---
- include/hw/i386/pc.h |  2 +-
- 5 files changed, 20 insertions(+), 20 deletions(-)
-
-diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-index 4b19042..1c27223 100644
---- a/hw/i386/pc.c
-+++ b/hw/i386/pc.c
-@@ -1019,8 +1019,8 @@ static bool load_elfboot(const char *kernel_filename,
-     return true;
- }
- 
--static void load_linux(PCMachineState *pcms,
--                       FWCfgState *fw_cfg)
-+static void x86_load_linux(PCMachineState *pcms,
-+                           FWCfgState *fw_cfg)
- {
-     uint16_t protocol;
-     int setup_size, kernel_size, cmdline_size;
-@@ -1374,7 +1374,7 @@ void pc_acpi_smi_interrupt(void *opaque, int irq, int level)
-     }
- }
- 
--static void pc_new_cpu(PCMachineState *pcms, int64_t apic_id, Error **errp)
-+static void x86_cpu_new(PCMachineState *pcms, int64_t apic_id, Error **errp)
- {
-     Object *cpu = NULL;
-     Error *local_err = NULL;
-@@ -1490,14 +1490,14 @@ void pc_hot_add_cpu(MachineState *ms, const int64_t id, Error **errp)
-         return;
-     }
- 
--    pc_new_cpu(PC_MACHINE(ms), apic_id, &local_err);
-+    x86_cpu_new(PC_MACHINE(ms), apic_id, &local_err);
-     if (local_err) {
-         error_propagate(errp, local_err);
-         return;
-     }
- }
- 
--void pc_cpus_init(PCMachineState *pcms)
-+void x86_cpus_init(PCMachineState *pcms)
- {
-     int i;
-     const CPUArchIdList *possible_cpus;
-@@ -1518,7 +1518,7 @@ void pc_cpus_init(PCMachineState *pcms)
-                                                      ms->smp.max_cpus - 1) + 1;
-     possible_cpus = mc->possible_cpu_arch_ids(ms);
-     for (i = 0; i < ms->smp.cpus; i++) {
--        pc_new_cpu(pcms, possible_cpus->cpus[i].arch_id, &error_fatal);
-+        x86_cpu_new(pcms, possible_cpus->cpus[i].arch_id, &error_fatal);
-     }
- }
- 
-@@ -1621,7 +1621,7 @@ void xen_load_linux(PCMachineState *pcms)
-     fw_cfg_add_i16(fw_cfg, FW_CFG_NB_CPUS, pcms->boot_cpus);
-     rom_set_fw(fw_cfg);
- 
--    load_linux(pcms, fw_cfg);
-+    x86_load_linux(pcms, fw_cfg);
-     for (i = 0; i < nb_option_roms; i++) {
-         assert(!strcmp(option_rom[i].name, "linuxboot.bin") ||
-                !strcmp(option_rom[i].name, "linuxboot_dma.bin") ||
-@@ -1756,7 +1756,7 @@ void pc_memory_init(PCMachineState *pcms,
-     }
- 
-     if (linux_boot) {
--        load_linux(pcms, fw_cfg);
-+        x86_load_linux(pcms, fw_cfg);
-     }
- 
-     for (i = 0; i < nb_option_roms; i++) {
-@@ -2681,7 +2681,7 @@ static void pc_machine_wakeup(MachineState *machine)
- }
- 
- static CpuInstanceProperties
--pc_cpu_index_to_props(MachineState *ms, unsigned cpu_index)
-+x86_cpu_index_to_props(MachineState *ms, unsigned cpu_index)
- {
-     MachineClass *mc = MACHINE_GET_CLASS(ms);
-     const CPUArchIdList *possible_cpus = mc->possible_cpu_arch_ids(ms);
-@@ -2690,7 +2690,7 @@ pc_cpu_index_to_props(MachineState *ms, unsigned cpu_index)
-     return possible_cpus->cpus[cpu_index].props;
- }
- 
--static int64_t pc_get_default_cpu_node_id(const MachineState *ms, int idx)
-+static int64_t x86_get_default_cpu_node_id(const MachineState *ms, int idx)
- {
-    X86CPUTopoInfo topo;
-    PCMachineState *pcms = PC_MACHINE(ms);
-@@ -2702,7 +2702,7 @@ static int64_t pc_get_default_cpu_node_id(const MachineState *ms, int idx)
-    return topo.pkg_id % ms->numa_state->num_nodes;
- }
- 
--static const CPUArchIdList *pc_possible_cpu_arch_ids(MachineState *ms)
-+static const CPUArchIdList *x86_possible_cpu_arch_ids(MachineState *ms)
- {
-     PCMachineState *pcms = PC_MACHINE(ms);
-     int i;
-@@ -2804,9 +2804,9 @@ static void pc_machine_class_init(ObjectClass *oc, void *data)
-     assert(!mc->get_hotplug_handler);
-     mc->get_hotplug_handler = pc_get_hotplug_handler;
-     mc->hotplug_allowed = pc_hotplug_allowed;
--    mc->cpu_index_to_instance_props = pc_cpu_index_to_props;
--    mc->get_default_cpu_node_id = pc_get_default_cpu_node_id;
--    mc->possible_cpu_arch_ids = pc_possible_cpu_arch_ids;
-+    mc->cpu_index_to_instance_props = x86_cpu_index_to_props;
-+    mc->get_default_cpu_node_id = x86_get_default_cpu_node_id;
-+    mc->possible_cpu_arch_ids = x86_possible_cpu_arch_ids;
-     mc->auto_enable_numa_with_memhp = true;
-     mc->has_hotpluggable_cpus = true;
-     mc->default_boot_order = "cad";
-diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
-index 6824b72..de09e07 100644
---- a/hw/i386/pc_piix.c
-+++ b/hw/i386/pc_piix.c
-@@ -152,7 +152,7 @@ static void pc_init1(MachineState *machine,
-         }
-     }
- 
--    pc_cpus_init(pcms);
-+    x86_cpus_init(pcms);
- 
-     if (kvm_enabled() && pcmc->kvmclock_enabled) {
-         kvmclock_create();
-diff --git a/hw/i386/pc_q35.c b/hw/i386/pc_q35.c
-index 8fad20f..894989b 100644
---- a/hw/i386/pc_q35.c
-+++ b/hw/i386/pc_q35.c
-@@ -179,7 +179,7 @@ static void pc_q35_init(MachineState *machine)
-         xen_hvm_init(pcms, &ram_memory);
-     }
- 
--    pc_cpus_init(pcms);
-+    x86_cpus_init(pcms);
- 
-     kvmclock_create();
- 
-diff --git a/hw/i386/pc_sysfw.c b/hw/i386/pc_sysfw.c
-index a9983f0..28cb1f6 100644
---- a/hw/i386/pc_sysfw.c
-+++ b/hw/i386/pc_sysfw.c
-@@ -211,7 +211,7 @@ static void pc_system_flash_map(PCMachineState *pcms,
-     }
- }
- 
--static void old_pc_system_rom_init(MemoryRegion *rom_memory, bool isapc_ram_fw)
-+static void x86_bios_rom_init(MemoryRegion *rom_memory, bool isapc_ram_fw)
- {
-     char *filename;
-     MemoryRegion *bios, *isa_bios;
-@@ -272,7 +272,7 @@ void pc_system_firmware_init(PCMachineState *pcms,
-     BlockBackend *pflash_blk[ARRAY_SIZE(pcms->flash)];
- 
-     if (!pcmc->pci_enabled) {
--        old_pc_system_rom_init(rom_memory, true);
-+        x86_bios_rom_init(rom_memory, true);
-         return;
-     }
- 
-@@ -293,7 +293,7 @@ void pc_system_firmware_init(PCMachineState *pcms,
- 
-     if (!pflash_blk[0]) {
-         /* Machine property pflash0 not set, use ROM mode */
--        old_pc_system_rom_init(rom_memory, false);
-+        x86_bios_rom_init(rom_memory, false);
-     } else {
-         if (kvm_enabled() && !kvm_readonly_mem_enabled()) {
-             /*
-diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
-index 37bfd95..7082b06 100644
---- a/include/hw/i386/pc.h
-+++ b/include/hw/i386/pc.h
-@@ -198,7 +198,7 @@ bool pc_machine_is_smm_enabled(PCMachineState *pcms);
- void pc_register_ferr_irq(qemu_irq irq);
- void pc_acpi_smi_interrupt(void *opaque, int irq, int level);
- 
--void pc_cpus_init(PCMachineState *pcms);
-+void x86_cpus_init(PCMachineState *pcms);
- void pc_hot_add_cpu(MachineState *ms, const int64_t id, Error **errp);
- void pc_smp_parse(MachineState *ms, QemuOpts *opts);
- 
--- 
-1.8.3.1
-
-
+DQoNCk9uIDI0LzEwLzIwMTkgMTY6NDgsIE1heCBSZWl0eiB3cm90ZToNCj4gT24gMjQuMTAuMTkg
+MTQ6NTYsIEFuZHJleSBTaGlua2V2aWNoIHdyb3RlOg0KPj4NCj4+DQo+PiBPbiAyNC8xMC8yMDE5
+IDEyOjM0LCBNYXggUmVpdHogd3JvdGU6DQo+Pj4gT24gMjIuMTAuMTkgMTU6NTMsIEFuZHJleSBT
+aGlua2V2aWNoIHdyb3RlOg0KPj4+DQo+Pj4gWy4uLl0NCj4+Pg0KPj4+PiBJZiB0aGUgc3VwcG9y
+dCBvZiBDT1cgZm9yIGNvbXByZXNzZWQgd3JpdGVzIGlzIGZvdW5kIGZlYXNpYmxlLCB3aWxsIGl0
+DQo+Pj4+IG1ha2UgYSBzZW5zZSB0byBpbXBsZW1lbnQ/IFRoZW4gdGhpcyBzZXJpZXMgd2lsbCBm
+b2xsb3cuDQo+Pj4NCj4+PiBIbSwgd2hhdCBleGFjdGx5IGRvIHlvdSBtZWFuIGJ5IHN1cHBvcnQg
+b2YgQ09XIGZvciBjb21wcmVzc2VkIHdyaXRlcz8NCj4+Pg0KPj4NCj4+IEkgc3Bva2UgaW4gdGVy
+bXMgb2YgdGhlIGNvbW1pdCBtZXNzYWdlIHdpdGggdGhlIGZvbGxvd2luZyBJRDoNCj4+DQo+PiBi
+MGI2ODYyZTVlMWExMzk0ZTBhYjNkNWRhOTRiYThiMGRhODY2NGUyDQo+Pg0KPj4gInFjb3cyOiBG
+YWlsIHdyaXRlX2NvbXByZXNzZWQgd2hlbiBvdmVyd3JpdGluZyBkYXRhIg0KPj4NCj4+ICIuLi5x
+Y293Ml93cml0ZV9jb21wcmVzc2VkKCkgZG9lc24ndCBwZXJmb3JtIENPVyBhcyBpdCB3b3VsZCBo
+YXZlIHRvIGRvLi4uIg0KPj4NCj4+IFNvLCBJIHN1Z2dlc3QgdGhhdCB3ZSBpbXBsZW1lbnQgd3Jp
+dGluZyBjb21wcmVzc2VkIGRhdGEgdG8gdGhlIGFsbG9jYXRlZA0KPj4gY2x1c3RlcnMgcmF0aGVy
+IHRoYW4gcWNvdzJfYWxsb2NfY29tcHJlc3NlZF9jbHVzdGVyX29mZnNldCgpIHJldHVybnMgdGhl
+DQo+PiBlcnJvci4gUGFydGljdWxhcmx5LCB3aGVuIGl0IGNvbWVzIHRvIE5CRCBzZXJ2ZXIgY29u
+bmVjdGlvbiBmYWlsdXJlIGZvcg0KPj4gd3JpdGhpbmcgYSBjb21wcmVzc2VkIGNsdXN0ZXIsIGl0
+IG1heSBub3QgYmUgcmV3cml0dGVuIGFmdGVyIHRoZQ0KPj4gY29ubmVjdGlvbiBpcyByZXN0b3Jl
+ZC4NCj4+IEFyZSB0aGVyZSBhbnkgaXNzdWVzIHdpdGggdGhhdCBpbXBsZW1lbnRhdGlvbiBpZGVh
+Pw0KPiANCj4gV2VsbCwgdGhlIENPVyBpbiB0aGF0IGNvbW1pdCBpcyBtZWFudCBkaWZmZXJlbnRs
+eSwgYmVjYXVzZSBpdCByZWZlcnMgdG8NCj4gdGhlIENPVyB0aGF04oCZcyByZXF1aXJlZCB3aGVu
+IHdyaXRpbmcgdG8gYSBjbHVzdGVyIHNoYXJlZCBieSBhbiBpbnRlcm5hbA0KPiBzbmFwc2hvdC4N
+Cj4gDQo+IE9UT0gsIHlvdSBjb3VsZCBzYXkgdGhhdCBhbGwgY29tcHJlc3NlZCB3cml0ZXMgdG8g
+YSBjbHVzdGVyIHRoYXQgaXMNCj4gYWxyZWFkeSBhbGxvY2F0ZWQgd291bGQgbmVlZCB0byBkbyBD
+T1cgYmVjYXVzZSB3ZeKAmWQgYWx3YXlzIGhhdmUgdG8gZnVsbHkNCj4gcmV3cml0ZSB0aGF0IGNs
+dXN0ZXIgaW4gYW4gUk1XIGN5Y2xlLg0KPiANCj4gSSBkb27igJl0IHNlZSBob3cgbGV0dGluZyBx
+Y293Ml9hbGxvY19jb21wcmVzc2VkX2NsdXN0ZXJfb2Zmc2V0KCkgdXNlIHRoZQ0KPiBleGlzdGlu
+ZyBjbHVzdGVyIHdvdWxkIHNvbHZlIHRoZSBwcm9ibGVtLCB0aG91Z2guICBZb3XigJlkIGdlbmVy
+YWxseSBuZWVkDQo+IHRvIGFsbG9jYXRlIGEgbmV3IGNsdXN0ZXI7IG9yIGF0dGVtcHQgdG8gcmV1
+c2UgdGhlIGV4aXN0aW5nIHNwYWNlIGluIGENCj4gY29tcHJlc3NlZCBjbHVzdGVyLg0KPiANCj4g
+TWF4DQo+IA0KDQpZZXMsIG5ldyBjbHVzdGVycyB3b3VsZCBiZSBhbGxvY2F0ZWQgZm9yIHRoZSBj
+b21wcmVzc2VkIFJNVyBhbmQgdGhlIA0KZXhpc3Rpbmcgb25lcyB3b3VsZCBiZSByZXVzZWQgaWYg
+cG9zc2libGUuIEl0IHNlYW1zIHRvIGJlIGluZWZmZWN0aXZlIA0KYnV0IHVzZXJzIGFyZSBzdXBw
+b3NlZCB0byBrbm93IHdoYXQgdGhleSBkby4NClNvLCBkb2VzIGl0IHdvcnRoIHRvIGNoZWNrIGEg
+ZmVhc2liaWxpdHkgb2YgdGhlIGltcGxlbWVudGF0aW9uPw0KDQpBbmRyZXkNCg0K
 
