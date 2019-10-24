@@ -2,82 +2,88 @@ Return-Path: <SRS0=Jnn8=YR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DD87ACA9EAF
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 17:28:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AAA09CA9EAF
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 17:29:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A76B1205F4
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 17:28:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7412F205F4
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 17:29:23 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fpGBHgfv"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A76B1205F4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="IW1U/8Da"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7412F205F4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48732 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48734 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iNgur-0000SO-Dn
-	for qemu-devel@archiver.kernel.org; Thu, 24 Oct 2019 13:28:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34596)
+	id 1iNgvK-0002qO-25
+	for qemu-devel@archiver.kernel.org; Thu, 24 Oct 2019 13:29:22 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58381)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.williamson@redhat.com>) id 1iNgM1-0003MV-AX
- for qemu-devel@nongnu.org; Thu, 24 Oct 2019 12:52:54 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1iNfyT-0000Aq-TP
+ for qemu-devel@nongnu.org; Thu, 24 Oct 2019 12:28:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.williamson@redhat.com>) id 1iNgLy-0002LH-SD
- for qemu-devel@nongnu.org; Thu, 24 Oct 2019 12:52:52 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:40595
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
- id 1iNgLy-0002Kh-N6
- for qemu-devel@nongnu.org; Thu, 24 Oct 2019 12:52:50 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1571935969;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=uKOalkmBq3mjNvBfAexQzAOH46NlfYH1VkmM9D43+Ig=;
- b=fpGBHgfvBKtgKenuwz3Wu0ZAvmXbdWURqJVSVFZMYa8fcQOaa74SSDRCMnNiHGSpn08sWJ
- U7KN/PzUsftTchFrf0URMmwU8x9HfEx0dDWnYYPPzABuQANTKnppENGKQgIDO6GA3dvbGw
- Sny49c5cvcHIQ2hYms4w6suT532rREM=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-364-THgXYK7qOw6Xh1CtOuOvUw-1; Thu, 24 Oct 2019 12:52:48 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 230171800D6B;
- Thu, 24 Oct 2019 16:52:47 +0000 (UTC)
-Received: from x1.home (ovpn-118-102.phx2.redhat.com [10.3.118.102])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 93D2C5C21A;
- Thu, 24 Oct 2019 16:52:37 +0000 (UTC)
-Date: Thu, 24 Oct 2019 10:52:36 -0600
-From: Alex Williamson <alex.williamson@redhat.com>
-To: Jens Freimann <jfreimann@redhat.com>
-Subject: Re: [PATCH v5 02/11] pci: add option for net failover
-Message-ID: <20191024105236.70403a2f@x1.home>
-In-Reply-To: <20191024093754.tgdd7cp5riwcsytc@jenstp.localdomain>
-References: <20191023082711.16694-1-jfreimann@redhat.com>
- <20191023082711.16694-3-jfreimann@redhat.com>
- <AM0PR05MB486628D14AE740F3843CA236D16A0@AM0PR05MB4866.eurprd05.prod.outlook.com>
- <20191024093754.tgdd7cp5riwcsytc@jenstp.localdomain>
-Organization: Red Hat
+ (envelope-from <peter.maydell@linaro.org>) id 1iNfyS-00018I-TV
+ for qemu-devel@nongnu.org; Thu, 24 Oct 2019 12:28:33 -0400
+Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:38070)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1iNfyS-000182-NN
+ for qemu-devel@nongnu.org; Thu, 24 Oct 2019 12:28:32 -0400
+Received: by mail-wm1-x343.google.com with SMTP id 3so3221451wmi.3
+ for <qemu-devel@nongnu.org>; Thu, 24 Oct 2019 09:28:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:subject:date:message-id:in-reply-to:references:mime-version
+ :content-transfer-encoding;
+ bh=TW1rHEa4Yt+Clo9YX+nLhtNEgx47fDesU2q7Xi3+SMM=;
+ b=IW1U/8DauZCiUdzyrb45j+OZKBHmnRYYJ0HrHRmfTzQdGpKQMtDk5HGT7M/jXpcpZd
+ iXx+9HL5kQUb8kz3yzM525dIguE9H89a6sv/MlRuwwsLZIQUSo7+IewoQIi5cFlVBATS
+ o1lB4rKrHJZLDTy+1DFdfB0Zm3dA4RD2WQNiWDD1Gp+37u23MZE+lzbTwABj/X777SHj
+ Df4Bxwc/lABBIVPsEo1JD5noz5NSgBTd9CyTrfUPd46DfXEwcDI0yqqMnnt7i7r0uokM
+ RbFW5kyHu2KSIde1fqXotBs/c0hKYblGvSLKjYpy2mgjXES7HztkYPdUufAYq819TReX
+ 2JPA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=TW1rHEa4Yt+Clo9YX+nLhtNEgx47fDesU2q7Xi3+SMM=;
+ b=kEHgBAE6BtnBICPpSVHltj0jRhPosDIjkIINmhY3jSXJ9mLehsQb5NW92wUVEZFuqL
+ GpO6CyLxvUGxaDLeos3jhxJBFKwjd4tCbZkJs+phX5iiISjP/oYIwfMFJhiiyiwnGEg1
+ 6hVUcknazpvLex0TfuQPaJ0gdwgIdcHTIREg5B8WkAPvT2c3f9nJMQj2slClecZPXq1n
+ nfIhz5wzvv0wizzMjlmrTszahIA+Kt2iUhj5RP7jO4rkGH2hDflcCdv/6gxbA8ddB2sf
+ Y83ygC98KIiM96msFNWgGo8OjlRqFP6QicgrBOJmDGsKKbGcIeroxqqL3zvF8lagcTbm
+ JX1w==
+X-Gm-Message-State: APjAAAVirvn/iL+pZpBNgVjBsnwxDovWHKnzt/cSu1h7XkOiVUrcpSRY
+ 6b4Es6/KO+UJehnALnjqlOt+mSnE8pE=
+X-Google-Smtp-Source: APXvYqwDb1l8z/AUSogAhBAPDc0lzKHagIm7TSIzRnEV2+8es246w946LzWld3yIbFz1Az5sTgtCOg==
+X-Received: by 2002:a1c:7517:: with SMTP id o23mr6001285wmc.34.1571934511495; 
+ Thu, 24 Oct 2019 09:28:31 -0700 (PDT)
+Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
+ by smtp.gmail.com with ESMTPSA id r27sm42606124wrc.55.2019.10.24.09.28.30
+ for <qemu-devel@nongnu.org>
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 24 Oct 2019 09:28:30 -0700 (PDT)
+From: Peter Maydell <peter.maydell@linaro.org>
+To: qemu-devel@nongnu.org
+Subject: [PULL 51/51] hw/arm/highbank: Use AddressSpace when using
+ write_secondary_boot()
+Date: Thu, 24 Oct 2019 17:27:24 +0100
+Message-Id: <20191024162724.31675-52-peter.maydell@linaro.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20191024162724.31675-1-peter.maydell@linaro.org>
+References: <20191024162724.31675-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-MC-Unique: THgXYK7qOw6Xh1CtOuOvUw-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=WINDOWS-1252
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 205.139.110.61
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::343
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,84 +95,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "pkrempa@redhat.com" <pkrempa@redhat.com>,
- "berrange@redhat.com" <berrange@redhat.com>, Parav Pandit <parav@mellanox.com>,
- "mst@redhat.com" <mst@redhat.com>, "aadam@redhat.com" <aadam@redhat.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "dgilbert@redhat.com" <dgilbert@redhat.com>,
- "laine@redhat.com" <laine@redhat.com>, "ailan@redhat.com" <ailan@redhat.com>,
- "ehabkost@redhat.com" <ehabkost@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, 24 Oct 2019 11:37:54 +0200
-Jens Freimann <jfreimann@redhat.com> wrote:
+From: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-> On Thu, Oct 24, 2019 at 05:03:46AM +0000, Parav Pandit wrote:
-> >> @@ -2101,6 +2104,20 @@ static void pci_qdev_realize(DeviceState *qdev,
-> >> Error **errp)
-> >>          }
-> >>      }
-> >>
-> >> +    if (pci_dev->net_failover_pair_id) {
-> >> +        if (!pci_is_express(pci_dev)) { =20
-> >
-> >I am testing and integrating this piece with mlx5 devices.
-> >I see that pci_is_express() return true only for first PCI function.
-> >Didn't yet dig the API.
-> >Commenting out this check and below class check progresses further. =20
->=20
-> First of all, thanks for testing this!
-> Could you share your commandline please? I can't reproduce it.
-> >
-> >While reviewing, I realized that we shouldn't have this check for below =
-reasons.
-> >
-> >1. It is user's responsibility to pass networking device.
-> >But its ok to check the class, if PCI Device is passed.
-> >So class comparison should be inside the pci_check(). =20
->=20
-> I'm not sure I understand this point, could you please elaborate?
-> You're suggesting to move the check for the class into the check for
-> pci_is_express?
+write_secondary_boot() is used in SMP configurations where the
+CPU address space might not be the main System Bus.
+The rom_add_blob_fixed_as() function allow us to specify an
+address space. Use it to write each boot blob in the corresponding
+CPU address space.
 
-Seems like the suggestion is that net_failover_pair_id should be an
-option on the base class of PCIDevice (DeviceState?) and only if it's a
-PCI device would we check the class code.  But there are dependencies
-at the hotplug controller, which I think is why this is currently
-specific to PCI.
+Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+Message-id: 20191019234715.25750-15-f4bug@amsat.org
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+---
+ hw/arm/highbank.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-However, it's an interesting point about pci_is_express().  This test
-is really just meant to check whether the hotplug controller supports
-this feature, which is only implemented in pciehp via this series.
-There's a bit of a mismatch though that pcie_is_express() checks
-whether the device is express, not whether the bus it sits on is
-express.  I think we really want the latter, so maybe this should be:
-
-pci_bus_is_express(pci_get_bus(dev)
-
-For example this feature should work if I plug an e1000 (not e1000e)
-into an express slot, but not if I plug an e1000e into a conventional
-slot.
-=20
-> >2. It is limiting to only consider PCI devices.
-> >Automated and regression tests should be able validate this feature with=
-out PCI Device.
-> >This will enhance the stability of feature in long run.
-> >
-> >3. net failover driver doesn't limit it to have it over only PCI device.
-> >So similarly hypervisor should be limiting. =20
->=20
-> I agree that we don't have to limit it to PCI(e) forever. But for this
-> first shot I think we should and then extend it continually. There are
-> more things we can support in the future like other hotplug types etc.
-
-Yep, long term it seems very generic, but there's a dependency in the
-hotplug controller and it is beneficial that PCI has a class code
-feature that allows us to error if this is specified on a non-net
-device.  Thanks,
-
-Alex
+diff --git a/hw/arm/highbank.c b/hw/arm/highbank.c
+index f1724d69290..518d935fdf6 100644
+--- a/hw/arm/highbank.c
++++ b/hw/arm/highbank.c
+@@ -78,7 +78,8 @@ static void hb_write_secondary(ARMCPU *cpu, const struct arm_boot_info *info)
+     for (n = 0; n < ARRAY_SIZE(smpboot); n++) {
+         smpboot[n] = tswap32(smpboot[n]);
+     }
+-    rom_add_blob_fixed("smpboot", smpboot, sizeof(smpboot), SMP_BOOT_ADDR);
++    rom_add_blob_fixed_as("smpboot", smpboot, sizeof(smpboot), SMP_BOOT_ADDR,
++                          arm_boot_address_space(cpu, info));
+ }
+ 
+ static void hb_reset_secondary(ARMCPU *cpu, const struct arm_boot_info *info)
+-- 
+2.20.1
 
 
