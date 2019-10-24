@@ -2,80 +2,80 @@ Return-Path: <SRS0=Jnn8=YR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 47B72CA9EAF
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 14:11:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8DF5DCA9EAF
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 14:11:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 10F2F2166E
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 14:11:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5BAEB205C9
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 14:11:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="g7yMMcq4"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 10F2F2166E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ECS11l21"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5BAEB205C9
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43718 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43727 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iNdpS-00022H-Rq
-	for qemu-devel@archiver.kernel.org; Thu, 24 Oct 2019 10:11:06 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:32820)
+	id 1iNdqC-0004bE-Pn
+	for qemu-devel@archiver.kernel.org; Thu, 24 Oct 2019 10:11:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47687)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1iNdZC-0002Iy-5l
- for qemu-devel@nongnu.org; Thu, 24 Oct 2019 09:54:20 -0400
+ (envelope-from <armbru@redhat.com>) id 1iNcKg-0003pn-Ly
+ for qemu-devel@nongnu.org; Thu, 24 Oct 2019 08:35:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1iNdZA-0002Qo-6y
- for qemu-devel@nongnu.org; Thu, 24 Oct 2019 09:54:17 -0400
-Received: from mail-ot1-x32d.google.com ([2607:f8b0:4864:20::32d]:37450)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1iNdZA-0002QX-1f
- for qemu-devel@nongnu.org; Thu, 24 Oct 2019 09:54:16 -0400
-Received: by mail-ot1-x32d.google.com with SMTP id 53so9104337otv.4
- for <qemu-devel@nongnu.org>; Thu, 24 Oct 2019 06:54:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=5jAAyVlzQw0jedZ6X53PF88YjErFNqAPbE/dq5y4Q3o=;
- b=g7yMMcq4i2FZaQctuoQd3ihfWi9nu8ipGLfWZqnlUIARe957QLC4F1Wg1/rcRyV28x
- WUsfxAObE6NTsDPoo4T55G6RhGTUWbefMvN58VZjaJ1+yLRhaq6ZmSdX+VGGQq76aP+u
- W34kUxPC79Akqfx+PyAfgwSH7Jtd+F1tgTQCnMjdikx8Gh+haelipabyXaFCTnSb9WF6
- HvvQfowzqzXy1CDvnu5j+eCo4tkFJqz9ORTuOKaUioJ4bbou3vKcxQIuTDf+iKzN5YxS
- LpsFvTFqeajh6wTEh7fByTswTRBTJ8S4X+Jz43Zlmk6bETBD1+QQ/3N+OhmPHTYwigir
- dFxw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=5jAAyVlzQw0jedZ6X53PF88YjErFNqAPbE/dq5y4Q3o=;
- b=SUMVm9RbuvZqVMyvjD/7h13ap0o2WwGmloGcPsRFSSZbbd8oflMbp6vrGARlXzx0J6
- ynes5hT8yw9aE1NVPMTUETfKIN4/pB/5erfppKbHXq1+1szmFW03S2WC3EOeCInQKy4N
- bAKvOpeRsDHAnPqL553TyDX1P2heUIrhztawLZaikGMgEd93M/nJFZkHwb7P/jU2C4Hu
- W9vCcDX/JUjcp1iJJs3VshSkPMOaGBFStb6CdtxdZjSsuxEFEX1NI4Js+Anwld9HNSgO
- PiktNImQzMxjRwm0/1G6XwoRB3s8I2qDIRCsEMKG6kzI2/kEWnkJEjPtmB+wIBGtKQJT
- kEdw==
-X-Gm-Message-State: APjAAAX+hKvLIxkHTVBDMCqju8Wtn7kABAmTgbRy9Bh4gyusUyNm2YfQ
- 0j4ZIIQO13Bj34JkSE5COVvcNww8uA2PArKKfipNBg==
-X-Google-Smtp-Source: APXvYqzI0zJ1PfAKPbzCRSmerZKFDJJpcbeP3z8cUMpEH3k0qf1WIxwYngG9aWeTMkdg3DfbAD50koL9AYqjwVqzhZc=
-X-Received: by 2002:a05:6830:ca:: with SMTP id
- x10mr11261834oto.221.1571925255061; 
- Thu, 24 Oct 2019 06:54:15 -0700 (PDT)
+ (envelope-from <armbru@redhat.com>) id 1iNcKf-00068x-JS
+ for qemu-devel@nongnu.org; Thu, 24 Oct 2019 08:35:14 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:38691
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1iNcKf-00068c-Fl
+ for qemu-devel@nongnu.org; Thu, 24 Oct 2019 08:35:13 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1571920513;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=be0BwK+WI51a53q3dTuHUsRjhO/h4OkPgEmwAXu9BBY=;
+ b=ECS11l21s2tY4ijHsBvpEv40DtOhYLnTRZBmmEHqInWtG/RQ79ZIs3jfiIcykU01EqGg1i
+ u6Jvi2qqNWGyl3hs9vLkeS/4sl54QGgK6YTgq7IHaRQjrZ51mysmQ/HfFlgfgjNahVYcn+
+ GQ8WJM3Dj48VO27qTUEkQo4ucu3NWyA=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-228-h5TPNVbsPR2tLJQM1LDiuQ-1; Thu, 24 Oct 2019 08:35:09 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D08CC1005500;
+ Thu, 24 Oct 2019 12:35:08 +0000 (UTC)
+Received: from blackfin.pond.sub.org (unknown [10.36.118.123])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 9B47D52E7;
+ Thu, 24 Oct 2019 12:35:08 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id 2177F11328A8; Thu, 24 Oct 2019 14:34:59 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [RFC PATCH 12/19] qapi: Replace qmp_dispatch()'s TODO comment by an
+ explanation
+Date: Thu, 24 Oct 2019 14:34:51 +0200
+Message-Id: <20191024123458.13505-13-armbru@redhat.com>
+In-Reply-To: <20191024123458.13505-1-armbru@redhat.com>
+References: <20191024123458.13505-1-armbru@redhat.com>
 MIME-Version: 1.0
-References: <20191024024623.18848-1-ehabkost@redhat.com>
-In-Reply-To: <20191024024623.18848-1-ehabkost@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 24 Oct 2019 14:54:04 +0100
-Message-ID: <CAFEAcA8VZUt8gvktwMczHGyto88RUs0SbGHNR7s_C1=KnHTJJw@mail.gmail.com>
-Subject: Re: [PULL 0/4] x86 and machine queue, 2019-10-23
-To: Eduardo Habkost <ehabkost@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::32d
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-MC-Unique: h5TPNVbsPR2tLJQM1LDiuQ-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=WINDOWS-1252
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,42 +87,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>, Richard Henderson <rth@twiddle.net>
+Cc: libvir-list@redhat.com, mdroth@linux.vnet.ibm.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, 24 Oct 2019 at 03:46, Eduardo Habkost <ehabkost@redhat.com> wrote:
->
-> The following changes since commit f78398bfe544db81a974825b0a2aa826f6576414:
->
->   Merge remote-tracking branch 'remotes/ericb/tags/pull-nbd-2019-10-22' into staging (2019-10-23 16:06:13 +0100)
->
-> are available in the Git repository at:
->
->   git://github.com/ehabkost/qemu.git tags/machine-next-pull-request
->
-> for you to fetch changes up to 6a3a2e828220d9c86425930178445b868ea3c3c4:
->
->   hppa: drop usage of memory_region_allocate_system_memory() for ROM (2019-10-23 23:37:42 -0300)
->
-> ----------------------------------------------------------------
-> x86 and machine queue, 2019-10-23
->
-> Features:
-> * Denverton CPU model (Tao Xu)
->
-> Cleanups:
-> * Eliminate remaining places that abuse
->   memory_region_allocate_system_memory() (Igor Mammedov)
->
+Signed-off-by: Markus Armbruster <armbru@redhat.com>
+---
+ qapi/qmp-dispatch.c | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
 
+diff --git a/qapi/qmp-dispatch.c b/qapi/qmp-dispatch.c
+index 0cbb663097..55bc224c61 100644
+--- a/qapi/qmp-dispatch.c
++++ b/qapi/qmp-dispatch.c
+@@ -164,7 +164,11 @@ QDict *qmp_dispatch(QmpCommandList *cmds, QObject *req=
+uest,
+         g_assert(!ret);
+         return NULL;
+     } else if (!ret) {
+-        /* TODO turn into assertion */
++        /*=20
++         * When the command's schema has no 'returns', cmd->fn()
++         * leaves @ret null.  The QMP spec calls for an the empty
++         * object then; supply it.
++         */
+         ret =3D QOBJECT(qdict_new());
+     }
+=20
+--=20
+2.21.0
 
-Applied, thanks.
-
-Please update the changelog at https://wiki.qemu.org/ChangeLog/4.2
-for any user-visible changes.
-
--- PMM
 
