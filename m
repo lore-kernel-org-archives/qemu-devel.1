@@ -2,78 +2,63 @@ Return-Path: <SRS0=Jnn8=YR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_2 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E5FE0CA9EAF
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 18:09:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CA171CA9EAF
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 18:09:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B2778205F4
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 18:09:14 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MRorIbYX"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B2778205F4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 9CF11205F4
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 18:09:19 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9CF11205F4
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49788 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49792 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iNhXt-0002NB-Bd
-	for qemu-devel@archiver.kernel.org; Thu, 24 Oct 2019 14:09:13 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37940)
+	id 1iNhXy-0002cW-CL
+	for qemu-devel@archiver.kernel.org; Thu, 24 Oct 2019 14:09:18 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40601)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eperezma@redhat.com>) id 1iNgh1-0002D1-DB
- for qemu-devel@nongnu.org; Thu, 24 Oct 2019 13:14:36 -0400
+ (envelope-from <groug@kaod.org>) id 1iNgwd-0008M7-76
+ for qemu-devel@nongnu.org; Thu, 24 Oct 2019 13:30:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eperezma@redhat.com>) id 1iNggz-0001p2-Ru
- for qemu-devel@nongnu.org; Thu, 24 Oct 2019 13:14:35 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:28021
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <groug@kaod.org>) id 1iNgwb-0007X6-JX
+ for qemu-devel@nongnu.org; Thu, 24 Oct 2019 13:30:42 -0400
+Received: from 4.mo69.mail-out.ovh.net ([46.105.42.102]:46273)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eperezma@redhat.com>) id 1iNggy-0001lg-U1
- for qemu-devel@nongnu.org; Thu, 24 Oct 2019 13:14:33 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1571937272;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=T4PjgDwYwVllCjJyAa4O4jV5g3gFoiQ2rK589sd19L8=;
- b=MRorIbYXiZEvIIiGFbCi2FZpN7mu/4EVpu6nH1kLU/VBDgxRcKbe492nWI5cnDJsl6KC4u
- Z7d+Z+hVf1t+jMnEmaWNBIuKCVn0uvP9Qd/C7O45XZrAnYvffW7cuVXYylbWYXa28Q/R7C
- v6T+pwJkociB3U47jopmEHi5NN4HRd0=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-233-d9WzHKqiNyCoPTorYWETTQ-1; Thu, 24 Oct 2019 13:14:28 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5069D107AD31;
- Thu, 24 Oct 2019 17:14:27 +0000 (UTC)
-Received: from eperezma.remote.csb (ovpn-116-206.ams2.redhat.com
- [10.36.116.206])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 8A65C5B681;
- Thu, 24 Oct 2019 17:14:24 +0000 (UTC)
-From: =?UTF-8?q?Eugenio=20P=C3=A9rez?= <eperezma@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v6 2/9] virtio: device/driver area size calculation refactor
- for split ring
-Date: Thu, 24 Oct 2019 19:13:59 +0200
-Message-Id: <20191024171406.12504-3-eperezma@redhat.com>
-In-Reply-To: <20191024171406.12504-1-eperezma@redhat.com>
-References: <20191024171406.12504-1-eperezma@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-MC-Unique: d9WzHKqiNyCoPTorYWETTQ-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+ (Exim 4.71) (envelope-from <groug@kaod.org>) id 1iNgwb-0007WS-BA
+ for qemu-devel@nongnu.org; Thu, 24 Oct 2019 13:30:41 -0400
+Received: from player786.ha.ovh.net (unknown [10.109.143.189])
+ by mo69.mail-out.ovh.net (Postfix) with ESMTP id F01D66D213
+ for <qemu-devel@nongnu.org>; Thu, 24 Oct 2019 19:30:38 +0200 (CEST)
+Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
+ [82.253.208.248]) (Authenticated sender: groug@kaod.org)
+ by player786.ha.ovh.net (Postfix) with ESMTPSA id BE217B729F92;
+ Thu, 24 Oct 2019 17:30:32 +0000 (UTC)
+Date: Thu, 24 Oct 2019 19:30:30 +0200
+From: Greg Kurz <groug@kaod.org>
+To: David Gibson <david@gibson.dropbear.id.au>
+Subject: Re: [PATCH v5 4/7] ppc/pnv: Add a PnvChip pointer to PnvCore
+Message-ID: <20191024193030.40ee674e@bahia.lan>
+In-Reply-To: <20191024023812.GO6439@umbus.fritz.box>
+References: <20191022163812.330-1-clg@kaod.org>
+ <20191022163812.330-5-clg@kaod.org>
+ <20191024023812.GO6439@umbus.fritz.box>
+X-Mailer: Claws Mail 3.17.4 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+MIME-Version: 1.0
+Content-Type: multipart/signed; boundary="Sig_/MZtdGY+9DSBGz1VusGPK_0r";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
+X-Ovh-Tracer-Id: 16122323719608113638
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrledugdduudegucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddm
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.81
+X-Received-From: 46.105.42.102
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -85,93 +70,118 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Laurent Vivier <lvivier@redhat.com>,
- qemu-block@nongnu.org, Amit Shah <amit@kernel.org>,
- Jason Wang <jasowang@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>,
- Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
- Fam Zheng <fam@euphon.net>
+Cc: Philippe =?UTF-8?B?TWF0aGll?= =?UTF-8?B?dS1EYXVkw6k=?= <philmd@redhat.com>,
+ qemu-ppc@nongnu.org, =?UTF-8?B?Q8OpZHJpYw==?= Le Goater <clg@kaod.org>,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Wei Xu <wexu@redhat.com>
+--Sig_/MZtdGY+9DSBGz1VusGPK_0r
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-There is slight size difference between split/packed rings.
+On Thu, 24 Oct 2019 13:38:12 +1100
+David Gibson <david@gibson.dropbear.id.au> wrote:
 
-This is the refactor of split ring as well as a helper to expanding
-device and driver area size calculation for packed ring.
+> On Tue, Oct 22, 2019 at 06:38:09PM +0200, C=C3=A9dric Le Goater wrote:
+> > We will use it to reset the interrupt presenter from the CPU reset
+> > handler.
+> >=20
+> > Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
+> > Reviewed-by: Greg Kurz <groug@kaod.org>
+> > ---
+> >  include/hw/ppc/pnv_core.h | 3 +++
+> >  hw/ppc/pnv_core.c         | 3 ++-
+> >  2 files changed, 5 insertions(+), 1 deletion(-)
+> >=20
+> > diff --git a/include/hw/ppc/pnv_core.h b/include/hw/ppc/pnv_core.h
+> > index bfbd2ec42aa6..55eee95104da 100644
+> > --- a/include/hw/ppc/pnv_core.h
+> > +++ b/include/hw/ppc/pnv_core.h
+> > @@ -31,6 +31,8 @@
+> >  #define PNV_CORE_GET_CLASS(obj) \
+> >       OBJECT_GET_CLASS(PnvCoreClass, (obj), TYPE_PNV_CORE)
+> > =20
+> > +typedef struct PnvChip PnvChip;
+> > +
+> >  typedef struct PnvCore {
+> >      /*< private >*/
+> >      CPUCore parent_obj;
+> > @@ -38,6 +40,7 @@ typedef struct PnvCore {
+> >      /*< public >*/
+> >      PowerPCCPU **threads;
+> >      uint32_t pir;
+> > +    PnvChip *chip;
+>=20
+> I don't love having this as a redundant encoding of the information
+> already in the property, since it raises the possibility of confusing
+> bugs if they ever got out of sync.
+>=20
 
-Signed-off-by: Wei Xu <wexu@redhat.com>
-Signed-off-by: Jason Wang <jasowang@redhat.com>
-Reviewed-by: Jens Freimann <jfreimann@redhat.com>
----
- hw/virtio/virtio.c | 16 ++++++++++------
- 1 file changed, 10 insertions(+), 6 deletions(-)
+Ouch, we also have this pattern in xive_tctx_realize(). The XiveTCXT
+object has both a "cpu" property and a pointer to the vCPU.
 
-diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
-index fdac203cdf..74cc10fad9 100644
---- a/hw/virtio/virtio.c
-+++ b/hw/virtio/virtio.c
-@@ -159,10 +159,8 @@ static void virtio_init_region_cache(VirtIODevice *vde=
-v, int n)
-     VRingMemoryRegionCaches *old =3D vq->vring.caches;
-     VRingMemoryRegionCaches *new =3D NULL;
-     hwaddr addr, size;
--    int event_size;
-     int64_t len;
-=20
--    event_size =3D virtio_vdev_has_feature(vq->vdev, VIRTIO_RING_F_EVENT_I=
-DX) ? 2 : 0;
-=20
-     addr =3D vq->vring.desc;
-     if (!addr) {
-@@ -177,7 +175,7 @@ static void virtio_init_region_cache(VirtIODevice *vdev=
-, int n)
-         goto err_desc;
-     }
-=20
--    size =3D virtio_queue_get_used_size(vdev, n) + event_size;
-+    size =3D virtio_queue_get_used_size(vdev, n);
-     len =3D address_space_cache_init(&new->used, vdev->dma_as,
-                                    vq->vring.used, size, true);
-     if (len < size) {
-@@ -185,7 +183,7 @@ static void virtio_init_region_cache(VirtIODevice *vdev=
-, int n)
-         goto err_used;
-     }
-=20
--    size =3D virtio_queue_get_avail_size(vdev, n) + event_size;
-+    size =3D virtio_queue_get_avail_size(vdev, n);
-     len =3D address_space_cache_init(&new->avail, vdev->dma_as,
-                                    vq->vring.avail, size, false);
-     if (len < size) {
-@@ -2414,14 +2412,20 @@ hwaddr virtio_queue_get_desc_size(VirtIODevice *vde=
-v, int n)
-=20
- hwaddr virtio_queue_get_avail_size(VirtIODevice *vdev, int n)
- {
-+    int s;
-+
-+    s =3D virtio_vdev_has_feature(vdev, VIRTIO_RING_F_EVENT_IDX) ? 2 : 0;
-     return offsetof(VRingAvail, ring) +
--        sizeof(uint16_t) * vdev->vq[n].vring.num;
-+        sizeof(uint16_t) * vdev->vq[n].vring.num + s;
- }
-=20
- hwaddr virtio_queue_get_used_size(VirtIODevice *vdev, int n)
- {
-+    int s;
-+
-+    s =3D virtio_vdev_has_feature(vdev, VIRTIO_RING_F_EVENT_IDX) ? 2 : 0;
-     return offsetof(VRingUsed, ring) +
--        sizeof(VRingUsedElem) * vdev->vq[n].vring.num;
-+        sizeof(VRingUsedElem) * vdev->vq[n].vring.num + s;
- }
-=20
- uint16_t virtio_queue_get_last_avail_idx(VirtIODevice *vdev, int n)
---=20
-2.16.5
+> It's not a huge deal, but it would be nice to at least to at least
+> consider either a) grabbing the property everywhere you need it (if
+> there aren't too many places) or b) customizing the property
+> definition so it's written directly into that field.
+>=20
 
+The pointer to the vCPU is used among other things to get the
+value of the PIR, which is needed by the presenting logic to
+match physical CAM lines. This is a _hot_ path so it's probably
+better to go for b).
+
+> > =20
+> >      MemoryRegion xscom_regs;
+> >  } PnvCore;
+> > diff --git a/hw/ppc/pnv_core.c b/hw/ppc/pnv_core.c
+> > index 9f981a4940e6..cc17bbfed829 100644
+> > --- a/hw/ppc/pnv_core.c
+> > +++ b/hw/ppc/pnv_core.c
+> > @@ -222,6 +222,7 @@ static void pnv_core_realize(DeviceState *dev, Erro=
+r **errp)
+> >                                  "required link 'chip' not found: ");
+> >          return;
+> >      }
+> > +    pc->chip =3D PNV_CHIP(chip);
+> > =20
+> >      pc->threads =3D g_new(PowerPCCPU *, cc->nr_threads);
+> >      for (i =3D 0; i < cc->nr_threads; i++) {
+> > @@ -243,7 +244,7 @@ static void pnv_core_realize(DeviceState *dev, Erro=
+r **errp)
+> >      }
+> > =20
+> >      for (j =3D 0; j < cc->nr_threads; j++) {
+> > -        pnv_realize_vcpu(pc->threads[j], PNV_CHIP(chip), &local_err);
+> > +        pnv_realize_vcpu(pc->threads[j], pc->chip, &local_err);
+> >          if (local_err) {
+> >              goto err;
+> >          }
+>=20
+
+
+--Sig_/MZtdGY+9DSBGz1VusGPK_0r
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEtIKLr5QxQM7yo0kQcdTV5YIvc9YFAl2x37YACgkQcdTV5YIv
+c9YomBAAvX0uUCVX1jZLr0bxt0nf0domv0LIzMRKQJROzMTqo8/DzsLlc3Xuq21a
+lHwTuh3dA8syWQ4TQpbYZvmg+KZIpVeE8R3xYs4YHrUxQE6kpLUYZSqtaXtH5w43
+KlYwB8+SSAIw76zlCiJArf/xXhymHa7MRdfU8MSzW69FG7W2Q+U7Q7/MPez/vY6M
+x4rAjxEAeQcUnyJ9ZCTzh68q0Bh2wAmbMyzvqcmIirtmNHejaNeTjRPsLkLVKg1b
+MEb3vAniBdW3+qF2Y5ifiT5Z3b+dkzmSrCV9nMuoA4yy3UDwc/XTMcTWnBSbho8z
+P4D8GQfCp+uUcUbD9dcOzuT334jhVtK91SgFH6Z403waHOsXHLzbkeP1wCJ7XZbH
+ZTCW1p41ckFAvP/iPBkaBGYISSI5EHEFaA8OA/zCBiUGu8ev8mTUUOnJoZBPlg8+
+p2gh9K3VZU9dSqnpmTas/D/yP2g+cbED1zdLmx1lgPJO5VVMecxpTkXq5/CZZx+3
+PCkT3i3QIBJGdBe+Puj7zcvuEgKzJ9x43QsvVMqLTnv8UTS/ddiOJ/IF0YkUup1l
+P5ukyLXBiHSJWsD6GZTNjZy7x8IU0gHQ2ZBqPdGtl0B6nLwprYFOybT0kMguCfqC
+IwaIqVia34SMAIDLU8qpl04KFYbeUcxH6amJwfs4jcdOppYGDtI=
+=+EOy
+-----END PGP SIGNATURE-----
+
+--Sig_/MZtdGY+9DSBGz1VusGPK_0r--
 
