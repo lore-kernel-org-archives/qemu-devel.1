@@ -2,88 +2,78 @@ Return-Path: <SRS0=Jnn8=YR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CB074CA9EB9
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 03:25:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 98461CA9EB9
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 03:33:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9C8B02075C
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 03:25:06 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9C8B02075C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id 5D34B20679
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 03:33:08 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kM4wHoCJ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5D34B20679
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57278 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57526 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iNTkH-0005yR-LL
-	for qemu-devel@archiver.kernel.org; Wed, 23 Oct 2019 23:25:05 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54342)
+	id 1iNTs3-0000Bs-8W
+	for qemu-devel@archiver.kernel.org; Wed, 23 Oct 2019 23:33:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41107)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <chen.zhang@intel.com>) id 1iNTTp-0007M4-Qv
- for qemu-devel@nongnu.org; Wed, 23 Oct 2019 23:08:07 -0400
+ (envelope-from <elohimes@gmail.com>) id 1iNTpl-0006Vd-F6
+ for qemu-devel@nongnu.org; Wed, 23 Oct 2019 23:30:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <chen.zhang@intel.com>) id 1iNTTm-0003KD-F6
- for qemu-devel@nongnu.org; Wed, 23 Oct 2019 23:08:04 -0400
-Received: from mga05.intel.com ([192.55.52.43]:4040)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <chen.zhang@intel.com>)
- id 1iNTTm-0003G1-6v
- for qemu-devel@nongnu.org; Wed, 23 Oct 2019 23:08:02 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga004.fm.intel.com ([10.253.24.48])
- by fmsmga105.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
- 23 Oct 2019 20:07:58 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.68,223,1569308400"; d="scan'208";a="223411769"
-Received: from fmsmsx103.amr.corp.intel.com ([10.18.124.201])
- by fmsmga004.fm.intel.com with ESMTP; 23 Oct 2019 20:07:58 -0700
-Received: from fmsmsx111.amr.corp.intel.com (10.18.116.5) by
- FMSMSX103.amr.corp.intel.com (10.18.124.201) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Wed, 23 Oct 2019 20:07:58 -0700
-Received: from shsmsx152.ccr.corp.intel.com (10.239.6.52) by
- fmsmsx111.amr.corp.intel.com (10.18.116.5) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Wed, 23 Oct 2019 20:07:57 -0700
-Received: from shsmsx102.ccr.corp.intel.com ([169.254.2.176]) by
- SHSMSX152.ccr.corp.intel.com ([10.239.6.52]) with mapi id 14.03.0439.000;
- Thu, 24 Oct 2019 11:07:56 +0800
-From: "Zhang, Chen" <chen.zhang@intel.com>
-To: =?utf-8?B?UGhpbGlwcGUgTWF0aGlldS1EYXVkw6k=?= <philmd@redhat.com>, "Jason
- Wang" <jasowang@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, qemu-dev
- <qemu-devel@nongnu.org>
-Subject: RE: [RFC PATCH 1/4] net/awd.c: Introduce Advanced Watch Dog module
- framework
-Thread-Topic: [RFC PATCH 1/4] net/awd.c: Introduce Advanced Watch Dog module
- framework
-Thread-Index: AQHVhBTjxTqcvh6BcUahjVnjYn1+nKdnlByAgACGwZD//4PCAIABhPHA
-Date: Thu, 24 Oct 2019 03:07:55 +0000
-Message-ID: <9CFF81C0F6B98A43A459C9EDAD400D78062C4C7E@shsmsx102.ccr.corp.intel.com>
-References: <20191016112209.9024-1-chen.zhang@intel.com>
- <20191016112209.9024-2-chen.zhang@intel.com>
- <e294876e-d26b-b401-78ab-487e1b44685f@redhat.com>
- <9CFF81C0F6B98A43A459C9EDAD400D78062C3894@shsmsx102.ccr.corp.intel.com>
- <bea650cd-b790-ba3c-3872-3b1af5682318@redhat.com>
-In-Reply-To: <bea650cd-b790-ba3c-3872-3b1af5682318@redhat.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-dlp-product: dlpe-windows
-dlp-version: 11.2.0.6
-dlp-reaction: no-action
-x-ctpclassification: CTP_NT
-x-titus-metadata-40: eyJDYXRlZ29yeUxhYmVscyI6IiIsIk1ldGFkYXRhIjp7Im5zIjoiaHR0cDpcL1wvd3d3LnRpdHVzLmNvbVwvbnNcL0ludGVsMyIsImlkIjoiNTA3ZGVhZDMtMTgyZS00OTMyLThkNzgtOThjNTk3NjI0MDliIiwicHJvcHMiOlt7Im4iOiJDVFBDbGFzc2lmaWNhdGlvbiIsInZhbHMiOlt7InZhbHVlIjoiQ1RQX05UIn1dfV19LCJTdWJqZWN0TGFiZWxzIjpbXSwiVE1DVmVyc2lvbiI6IjE3LjEwLjE4MDQuNDkiLCJUcnVzdGVkTGFiZWxIYXNoIjoia1dLeXAyS3VRenNVRkFvT0RkQ1wvZzNjdTZmMWhkdU9kYm5ob3l2aHFDcFVlV2RaZ2JaQ1VEd0VuYzlSNUZrRWIifQ==
-x-originating-ip: [10.239.127.40]
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+ (envelope-from <elohimes@gmail.com>) id 1iNTpk-0003ye-3v
+ for qemu-devel@nongnu.org; Wed, 23 Oct 2019 23:30:45 -0400
+Received: from mail-qt1-x843.google.com ([2607:f8b0:4864:20::843]:44148)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <elohimes@gmail.com>) id 1iNTpj-0003yE-UG
+ for qemu-devel@nongnu.org; Wed, 23 Oct 2019 23:30:44 -0400
+Received: by mail-qt1-x843.google.com with SMTP id z22so15195151qtq.11
+ for <qemu-devel@nongnu.org>; Wed, 23 Oct 2019 20:30:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=mcgumC042hamXm29+yyv01VNWxQR+25pIkxpCnBxqjA=;
+ b=kM4wHoCJP7GzrQCAQmsWFb8g0+GXQ+NASSj9dUtPIl9EPft0IAhmWqi7Ives1FWviW
+ cSAb4rKmbTKKxm0m5JaSa8NRVYqJdLs4mJkrh9Jvvbdj5dZ9P6uLoEJZxkA3bxG8PCEm
+ 7tm5heZxFXPX3VCm3MIbTGoDFRzx0y/eiYdKujMd4IZ4MDjeBeJ2uVWZbf5419z0SoWd
+ pENoltFiLVOpoY60FWWy1O0iyU83BTQc3ZAnU/47KYTdta5w3F+UUAfc3JgqnjkK0GlF
+ 5OXtlW6xNXdTvJyluKh9BwbPUFLEcDMlzhnNcIGmjIBs8td/hCVibfWgaDyqpq6ep6gY
+ F8CQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=mcgumC042hamXm29+yyv01VNWxQR+25pIkxpCnBxqjA=;
+ b=mFXXaDJ3OPc+sQsoxeKS5AOwePZyQ3YHfdu5gMw/VfUySfCp8sgGvndGmMY+DEVZiW
+ kDqT/zwsgeoG+zu0g74XbAA8HJ9UfQgImLBc8GozDEraUxvbBgeKL2ff1DfY7U4/nfdN
+ mCsb4hHlBsO8JwI5Y9MyyKdNidD0EBIrlfnDvHy8kBOOQgefw7JBEA/pplEt0arbNMED
+ YkDOwQSe8yzcx3B5BmyNuy1gHQGPAtiZDjH/IQKjFqU2Y7ggqn3EEMS9M63SNISV5Dwl
+ KDkQFDACO+QCFx1DuXxs2KblCF4ZYYA3UIO7dg7RScvu0+rzP84Ge1Qi5S/XrK6cJ7dN
+ Tl0Q==
+X-Gm-Message-State: APjAAAViliCyii4TPwhKnOarCpldjA/+hNf4Lp6r1vWdfZNDKBvRXvgr
+ I2ivTlWy8u5+fil9Mpy1M38rYISWArdq0ki6uys=
+X-Google-Smtp-Source: APXvYqwv2OkVLF5eEKJG0Ns0rVUyUA9voZ8QnMQmXb8/qfIgPn9n2vj68B+adzYnJGsJxoujk1ntp3KsJm7MDBO1Iek=
+X-Received: by 2002:ac8:5408:: with SMTP id b8mr1636912qtq.164.1571887843007; 
+ Wed, 23 Oct 2019 20:30:43 -0700 (PDT)
 MIME-Version: 1.0
+References: <20191021114017.26011-1-stefanha@redhat.com>
+In-Reply-To: <20191021114017.26011-1-stefanha@redhat.com>
+From: Yongji Xie <elohimes@gmail.com>
+Date: Thu, 24 Oct 2019 11:30:31 +0800
+Message-ID: <CAONzpcYQZ2zL4AvdXD6vbMCsfg72213S8wORSoPiAfQ9vCxxZQ@mail.gmail.com>
+Subject: Re: [PATCH] virtio: notify virtqueue via host notifier when available
+To: Stefan Hajnoczi <stefanha@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 192.55.52.43
+X-Received-From: 2607:f8b0:4864:20::843
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -95,64 +85,106 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Zhang Chen <zhangckid@gmail.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel <qemu-devel@nongnu.org>,
+ Felipe Franciosi <felipe@nutanix.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-DQo+IC0tLS0tT3JpZ2luYWwgTWVzc2FnZS0tLS0tDQo+IEZyb206IFBoaWxpcHBlIE1hdGhpZXUt
-RGF1ZMOpIDxwaGlsbWRAcmVkaGF0LmNvbT4NCj4gU2VudDogV2VkbmVzZGF5LCBPY3RvYmVyIDIz
-LCAyMDE5IDc6MzkgUE0NCj4gVG86IFpoYW5nLCBDaGVuIDxjaGVuLnpoYW5nQGludGVsLmNvbT47
-IEphc29uIFdhbmcNCj4gPGphc293YW5nQHJlZGhhdC5jb20+OyBQYW9sbyBCb256aW5pIDxwYm9u
-emluaUByZWRoYXQuY29tPjsgcWVtdS0NCj4gZGV2IDxxZW11LWRldmVsQG5vbmdudS5vcmc+DQo+
-IENjOiBaaGFuZyBDaGVuIDx6aGFuZ2NraWRAZ21haWwuY29tPg0KPiBTdWJqZWN0OiBSZTogW1JG
-QyBQQVRDSCAxLzRdIG5ldC9hd2QuYzogSW50cm9kdWNlIEFkdmFuY2VkIFdhdGNoIERvZw0KPiBt
-b2R1bGUgZnJhbWV3b3JrDQo+IA0KPiBPbiAxMC8yMy8xOSAxOjA5IFBNLCBaaGFuZywgQ2hlbiB3
-cm90ZToNCj4gPj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gPj4gRnJvbTogUGhpbGlw
-cGUgTWF0aGlldS1EYXVkw6kgPHBoaWxtZEByZWRoYXQuY29tPg0KPiA+PiBTZW50OiBXZWRuZXNk
-YXksIE9jdG9iZXIgMjMsIDIwMTkgNzowMSBQTQ0KPiA+PiBUbzogWmhhbmcsIENoZW4gPGNoZW4u
-emhhbmdAaW50ZWwuY29tPjsgSmFzb24gV2FuZw0KPiA+PiA8amFzb3dhbmdAcmVkaGF0LmNvbT47
-IFBhb2xvIEJvbnppbmkgPHBib256aW5pQHJlZGhhdC5jb20+OyBxZW11LQ0KPiBkZXYNCj4gPj4g
-PHFlbXUtZGV2ZWxAbm9uZ251Lm9yZz4NCj4gPj4gQ2M6IFpoYW5nIENoZW4gPHpoYW5nY2tpZEBn
-bWFpbC5jb20+DQo+ID4+IFN1YmplY3Q6IFJlOiBbUkZDIFBBVENIIDEvNF0gbmV0L2F3ZC5jOiBJ
-bnRyb2R1Y2UgQWR2YW5jZWQgV2F0Y2ggRG9nDQo+ID4+IG1vZHVsZSBmcmFtZXdvcmsNCj4gPj4N
-Cj4gPj4gSGkgQ2hlbiwNCj4gPj4NCj4gPj4gT24gMTAvMTYvMTkgMToyMiBQTSwgWmhhbmcgQ2hl
-biB3cm90ZToNCj4gPj4+IEZyb206IFpoYW5nIENoZW4gPGNoZW4uemhhbmdAaW50ZWwuY29tPg0K
-PiA+Pj4NCj4gPj4+IFRoaXMgcGF0Y2ggaW50cm9kdWNlIGEgbmV3IG1vZHVsZSBuYW1lZCBBZHZh
-bmNlZCBXYXRjaCBEb2csIGFuZA0KPiA+Pj4gZGVmaW5lZCB0aGUgaW5wdXQgYW5kIG91dHB1dCBw
-YXJhbWV0ZXIuIEFXRCB1c2Ugc3RhbmRhcmQgY2hhcmRldiBhcw0KPiA+Pj4gdGhlIHdheSBvZiBj
-b21tdW5pY2F0aW9uZyB3aXRoIHRoZSBvdXRzaWRlIHdvcmxkLg0KPiA+Pj4gRGVtbyBjb21tYW5k
-Og0KPiA+Pj4gLW9iamVjdA0KPiA+Pj4gYWR2YW5jZWQtDQo+ID4+IHdhdGNoZG9nLGlkPWhlYXJ0
-MSxzZXJ2ZXI9b24sYXdkX25vZGU9aDEsbm90aWZpY2F0aW9uX25vZGU9aGUNCj4gPj4+IGFydGJl
-YXQwLG9wdF9zY3JpcHQ9b3B0X3NjcmlwdF9wYXRoLGlvdGhyZWFkPWlvdGhyZWFkMSxwdWxzZV9p
-bnRlcnZhDQo+ID4+PiBsPQ0KPiA+Pj4gMTAwMCx0aW1lb3V0PTUwMDANCj4gPj4+DQo+ID4+PiBT
-aWduZWQtb2ZmLWJ5OiBaaGFuZyBDaGVuIDxjaGVuLnpoYW5nQGludGVsLmNvbT4NCj4gPj4+IC0t
-LQ0KPiA+Pj4gICAgbmV0L01ha2VmaWxlLm9ianMgfCAgIDEgKw0KPiA+Pj4gICAgbmV0L2F3ZC5j
-ICAgICAgICAgfCAyNjENCj4gPj4gKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysr
-KysrKysrKysrKw0KPiA+Pj4gICAgcWVtdS1vcHRpb25zLmh4ICAgfCAgIDYgKysNCj4gPj4+ICAg
-IDMgZmlsZXMgY2hhbmdlZCwgMjY4IGluc2VydGlvbnMoKykNCj4gPj4+ICAgIGNyZWF0ZSBtb2Rl
-IDEwMDY0NCBuZXQvYXdkLmMNCj4gPj4+DQo+ID4+PiBkaWZmIC0tZ2l0IGEvbmV0L01ha2VmaWxl
-Lm9ianMgYi9uZXQvTWFrZWZpbGUub2JqcyBpbmRleA0KPiA+Pj4gYzVkMDc2ZDE5Yy4uMTM5YjEz
-OTRlOSAxMDA2NDQNCj4gPj4+IC0tLSBhL25ldC9NYWtlZmlsZS5vYmpzDQo+ID4+PiArKysgYi9u
-ZXQvTWFrZWZpbGUub2Jqcw0KPiA+Pj4gQEAgLTE5LDYgKzE5LDcgQEAgY29tbW9uLW9iai15ICs9
-IGNvbG8tY29tcGFyZS5vDQo+ID4+PiAgICBjb21tb24tb2JqLXkgKz0gY29sby5vDQo+ID4+PiAg
-ICBjb21tb24tb2JqLXkgKz0gZmlsdGVyLXJld3JpdGVyLm8NCj4gPj4+ICAgIGNvbW1vbi1vYmot
-eSArPSBmaWx0ZXItcmVwbGF5Lm8NCj4gPj4+ICtjb21tb24tb2JqLXkgKz0gYXdkLm8NCj4gPj4g
-Q2FuIHlvdSBhZGQgYSBuZXQvS2NvbmZpZyBmaWxlIGludHJvZHVjaW5nIHRoZSBBRFZBTkNFRF9X
-QVRDSERPRw0KPiA+PiBzZWxlY3Rvcj8NCj4gPj4NCj4gPj4gY29uZmlnIENPTE9fQURWQU5DRURf
-V0FUQ0hET0cNCj4gPj4gICAgICAgYm9vbA0KPiA+PiAgICAgICBkZWZhdWx0IG4NCj4gPj4NCj4g
-Pj4gVGhlbiB1c2UgaGVyZToNCj4gPj4NCj4gPj4gICAgICAgY29tbW9uLW9iai0kKENPTE9fQURW
-QU5DRURfV0FUQ0hET0cpICs9IGF3ZC5vDQo+ID4+DQo+ID4NCj4gPiBTdXJlLCBidXQgQVdEIGlz
-IGEgdW5pdmVyc2FsIG1vZHVsZSwgIENPTE8gaXMganVzdCB0aGUgZmlyc3QgdXNlci4NCj4gPiBN
-YXliZSB1c2UgImNvbmZpZyBBRFZBTkNFRF9XQVRDSERPRyIgaXMgYmV0dGVyLg0KPiANCj4gT2gg
-SSBzZWUsIGJldHRlciB0aGVuLg0KPiANCj4gVGhlbiB3ZSBtaWdodCBhZGQgKGxhdGVyKQ0KPiAN
-Cj4gICAgY29uZmlnIENPTE8NCj4gICAgICAgIC4uLg0KPiAgICAgICAgc2VsZWN0IEFEVkFOQ0VE
-X1dBVENIRE9HDQo+IA0KDQpJIG5vdGljZWQgdGhhdCB3ZSBoYXZlbid0IHRoZSAibmV0L2tjb25m
-aWciIGZpbGUsIHRoZSBBV0QgaXNuJ3QgYSBIVyBpbiB0aGUgaHcvbmV0Lg0KRG8geW91IG1lYW5z
-IHdlIGNhbiBhZGQgdGhlIHNlbGVjdG9yIGluICJjb25maWd1cmF0aW9uIiBmaWxlPw0KV2UgY2Fu
-IGFkZCBzb21lIHJlbGF0ZWQgY29uZmlndXJhdGlvbiBjb21tYW5kIGxpa2UgIi0tZW5hYmxlLWFk
-dmFuY2VkLXdhdGNoZG9nIiBhbmQgZGVmYXVsdCBpcyAibm8iLg0KDQpUaGFua3MNClpoYW5nIENo
-ZW4NCg0KPiBUaGFua3MhDQo+IA0KPiBQaGlsLg0KPiANCj4gPj4+ICAgIHRhcC1vYmotJChDT05G
-SUdfTElOVVgpID0gdGFwLWxpbnV4Lm8NCj4gPj4+ICAgIHRhcC1vYmotJChDT05GSUdfQlNEKSA9
-IHRhcC1ic2Qubw0KPiA+PiBbLi4uXQ0K
+On Mon, 21 Oct 2019 at 19:40, Stefan Hajnoczi <stefanha@redhat.com> wrote:
+>
+> Host notifiers are used in several cases:
+> 1. Traditional ioeventfd where virtqueue notifications are handled in
+>    the main loop thread.
+> 2. IOThreads (aio_handle_output) where virtqueue notifications are
+>    handled in an IOThread AioContext.
+> 3. vhost where virtqueue notifications are handled by kernel vhost or
+>    a vhost-user device backend.
+>
+> Most virtqueue notifications from the guest use the ioeventfd mechanism,
+> but there are corner cases where QEMU code calls virtio_queue_notify().
+> This currently honors the host notifier for the IOThreads
+> aio_handle_output case, but not for the vhost case.  The result is that
+> vhost does not receive virtqueue notifications from QEMU when
+> virtio_queue_notify() is called.
+>
+> This patch extends virtio_queue_notify() to set the host notifier
+> whenever it is enabled instead of calling the vq->(aio_)handle_output()
+> function directly.
+>
+> This fixes the vhost case although it does add a trip through the
+> eventfd for the traditional ioeventfd case.  I don't think it's worth
+> adding a fast path for the traditional ioeventfd case because calling
+> virtio_queue_notify() is rare when ioeventfd is enabled.
+>
+> Reported-by: Felipe Franciosi <felipe@nutanix.com>
+> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+> ---
+> Felipe and Yongji: Only tested with "make check".  Please try
+> vhost-user-scsi/blk and let us know if it fixes the issue.
+>
+
+I can see the vhost-user-blk issue is fixed by this patch after the
+below patch applied:
+
+diff --git a/hw/virtio/vhost-user-blk-pci.c b/hw/virtio/vhost-user-blk-pci.c
+index 1dc834a..a32a439 100644
+--- a/hw/virtio/vhost-user-blk-pci.c
++++ b/hw/virtio/vhost-user-blk-pci.c
+@@ -46,6 +46,8 @@ static Property vhost_user_blk_pci_properties[] = {
+     DEFINE_PROP_UINT32("class", VirtIOPCIProxy, class_code, 0),
+     DEFINE_PROP_UINT32("vectors", VirtIOPCIProxy, nvectors,
+                        DEV_NVECTORS_UNSPECIFIED),
++    DEFINE_PROP_BIT("ioeventfd", VirtIOPCIProxy, flags,
++                    VIRTIO_PCI_FLAG_USE_IOEVENTFD_BIT, true),
+     DEFINE_PROP_END_OF_LIST(),
+ };
+
+>  include/hw/virtio/virtio-bus.h | 7 +++++++
+>  hw/virtio/virtio.c             | 4 +++-
+>  2 files changed, 10 insertions(+), 1 deletion(-)
+>
+> diff --git a/include/hw/virtio/virtio-bus.h b/include/hw/virtio/virtio-bus.h
+> index 38c9399cd4..28ca51cb4c 100644
+> --- a/include/hw/virtio/virtio-bus.h
+> +++ b/include/hw/virtio/virtio-bus.h
+> @@ -139,6 +139,13 @@ static inline VirtIODevice *virtio_bus_get_device(VirtioBusState *bus)
+>
+>  /* Return whether the proxy allows ioeventfd.  */
+>  bool virtio_bus_ioeventfd_enabled(VirtioBusState *bus);
+> +
+> +/* Return whether ioeventfd has been started. */
+> +static inline bool virtio_bus_ioeventfd_started(VirtioBusState *bus)
+> +{
+> +    return bus->ioeventfd_started;
+> +}
+> +
+>  /* Start the ioeventfd. */
+>  int virtio_bus_start_ioeventfd(VirtioBusState *bus);
+>  /* Stop the ioeventfd. */
+> diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
+> index 527df03bfd..abdcec00cd 100644
+> --- a/hw/virtio/virtio.c
+> +++ b/hw/virtio/virtio.c
+> @@ -1567,6 +1567,8 @@ static void virtio_queue_notify_vq(VirtQueue *vq)
+>
+>  void virtio_queue_notify(VirtIODevice *vdev, int n)
+>  {
+> +    BusState *qbus = qdev_get_parent_bus(DEVICE(vdev));
+> +    VirtioBusState *vbus = VIRTIO_BUS(qbus);
+>      VirtQueue *vq = &vdev->vq[n];
+>
+>      if (unlikely(!vq->vring.desc || vdev->broken)) {
+> @@ -1574,7 +1576,7 @@ void virtio_queue_notify(VirtIODevice *vdev, int n)
+>      }
+>
+>      trace_virtio_queue_notify(vdev, vq - vdev->vq, vq);
+> -    if (vq->handle_aio_output) {
+> +    if (virtio_bus_ioeventfd_started(vbus)) {
+
+Need to check whether vq->host_notifier is valid or not here.
+Otherwise, it could break the ctrl_vq in vhost_net device.
+
+Thanks,
+Yongji
 
