@@ -2,93 +2,57 @@ Return-Path: <SRS0=Jnn8=YR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 29CDFCA9EAF
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 14:01:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2DDE4CA9EAF
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 14:01:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E6D9E2084C
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 14:01:13 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="h5GanjIO"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E6D9E2084C
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
+	by mail.kernel.org (Postfix) with ESMTPS id 011692084C
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 14:01:38 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 011692084C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43472 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43522 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iNdfs-0006hU-Iu
-	for qemu-devel@archiver.kernel.org; Thu, 24 Oct 2019 10:01:12 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59670)
+	id 1iNdgH-0000II-IM
+	for qemu-devel@archiver.kernel.org; Thu, 24 Oct 2019 10:01:37 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51477)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1iNdRt-00069X-PH
- for qemu-devel@nongnu.org; Thu, 24 Oct 2019 09:46:46 -0400
+ (envelope-from <yi.l.liu@intel.com>) id 1iNckM-0005Kg-AX
+ for qemu-devel@nongnu.org; Thu, 24 Oct 2019 09:01:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1iNdRs-0007Qk-Ls
- for qemu-devel@nongnu.org; Thu, 24 Oct 2019 09:46:45 -0400
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:43462)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1iNdRp-0007PJ-DU; Thu, 24 Oct 2019 09:46:41 -0400
-Received: by mail-wr1-x442.google.com with SMTP id c2so20929845wrr.10;
- Thu, 24 Oct 2019 06:46:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=PiDWom4c6Rr19xjKo+tDaPEyShkwqoaa566oCfkTRBc=;
- b=h5GanjIO9zPlA1t592GgK6fTFpU2eeeqqXkKndNs44bPaFKvGw+uhnt9s4nkK25bS1
- fwx6J1k6MCozAJiqNWVvQ0CQ9TNCSOiyToDnnMpmEwgIykcZHNr+Ym3x4t+/KcPLrI4C
- 0mz3RklnfKRU5/tXeT/rtzzdeH4sI+i/z9C6m9Da9OAZnY5ld1Zl4VmPu5Elfbx2yiMT
- z+tVUMvZSegTFJ6/liSGky0VKtPi6zd/YGSj2re4Xkz53/ov/BNeYzYqdqNljEKYrPRE
- vzv583/Ry6HzYgV6StucTuP6FnM9rPuYRDyofL5w64zhHrp+Wvqs6Shb7AOPMDc143ph
- vXBg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=PiDWom4c6Rr19xjKo+tDaPEyShkwqoaa566oCfkTRBc=;
- b=De1QP5PfwhuOg/dQ3dhKzqjCDOE2/Y51iYLY9GaBC4BBorZZsJdV9do4uh3mASZEGE
- 4B6VNM/MS3Osllg/nF38jcExNnK5mv7MmS6+qN2g4cSPhN3tDkyL/gGt9XFM9oeYBJMe
- kWPBHYIhKLqvck2pArIBo9EWVexkgnJXqfsdDz4HtctqTWMtWnmtTzC29ZylWug6Wp7W
- iobchBgZAnePfMingpPQ4CHSlRbZiNqPBMdqfrCK3q+jZi+R15z4khNGSb9TaoXpH/dP
- LW0e3lVqM+4+bM8j7c6VWbHn8s2xBPbq8l8jLaE14+vJKEBvYfF6LmgWh1uHI2uQWZR8
- WIew==
-X-Gm-Message-State: APjAAAU2c/Fb+DtVyZuSH0LS7WrLMtBYkSb8YBe9VbZCKdr9FLrBmnmH
- q6QbsCnuQYmZRD8bke5MWfs=
-X-Google-Smtp-Source: APXvYqyZygIrnPWNcqTxtHDhw0Px1SfZgZWv3ufvbhgsPWY1BNRQ6kvVxuQ2HSqtNzWadrptpRcuIg==
-X-Received: by 2002:adf:e441:: with SMTP id t1mr3767830wrm.395.1571924800186; 
- Thu, 24 Oct 2019 06:46:40 -0700 (PDT)
-Received: from [192.168.1.115] (129.red-83-57-174.dynamicip.rima-tde.net.
- [83.57.174.129])
- by smtp.gmail.com with ESMTPSA id y13sm37094271wrg.8.2019.10.24.06.46.37
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Thu, 24 Oct 2019 06:46:38 -0700 (PDT)
-Subject: Re: [PATCH v3 00/16] hw/arm/raspi: Add thermal/timer, improve address
- space, run U-boot
-To: Peter Maydell <peter.maydell@linaro.org>
-References: <20191019234715.25750-1-f4bug@amsat.org>
- <CAFEAcA_WTyJ2AWZfKQSipFmn46ztG1XTL9sE9P2QDD7ob-FKFg@mail.gmail.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <1ad1b559-13c4-ed2c-f82b-e6a516219e57@amsat.org>
-Date: Thu, 24 Oct 2019 15:46:37 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.1
-MIME-Version: 1.0
-In-Reply-To: <CAFEAcA_WTyJ2AWZfKQSipFmn46ztG1XTL9sE9P2QDD7ob-FKFg@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+ (envelope-from <yi.l.liu@intel.com>) id 1iNckG-0002TH-Tm
+ for qemu-devel@nongnu.org; Thu, 24 Oct 2019 09:01:46 -0400
+Received: from mga11.intel.com ([192.55.52.93]:40482)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <yi.l.liu@intel.com>) id 1iNckG-0002MX-KR
+ for qemu-devel@nongnu.org; Thu, 24 Oct 2019 09:01:40 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga001.fm.intel.com ([10.253.24.23])
+ by fmsmga102.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
+ 24 Oct 2019 06:01:33 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.68,224,1569308400"; d="scan'208";a="210156218"
+Received: from iov.bj.intel.com ([10.238.145.67])
+ by fmsmga001.fm.intel.com with ESMTP; 24 Oct 2019 06:01:30 -0700
+From: Liu Yi L <yi.l.liu@intel.com>
+To: qemu-devel@nongnu.org, mst@redhat.com, pbonzini@redhat.com,
+ alex.williamson@redhat.com, peterx@redhat.com
+Subject: [RFC v2 08/22] intel_iommu: provide get_iommu_context() callback
+Date: Thu, 24 Oct 2019 08:34:29 -0400
+Message-Id: <1571920483-3382-9-git-send-email-yi.l.liu@intel.com>
+X-Mailer: git-send-email 2.7.4
+In-Reply-To: <1571920483-3382-1-git-send-email-yi.l.liu@intel.com>
+References: <1571920483-3382-1-git-send-email-yi.l.liu@intel.com>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::442
+X-Received-From: 192.55.52.93
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -100,77 +64,162 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Rob Herring <robh@kernel.org>, Matthias Brugger <mbrugger@suse.com>,
- Alistair Francis <alistair@alistair23.me>,
- Richard Henderson <richard.henderson@linaro.org>,
- QEMU Developers <qemu-devel@nongnu.org>,
- Andrew Baumann <Andrew.Baumann@microsoft.com>,
- Esteban Bosse <estebanbosse@gmail.com>, "Emilio G . Cota" <cota@braap.org>,
- Clement Deschamps <clement.deschamps@antfield.fr>,
- qemu-arm <qemu-arm@nongnu.org>, Cleber Rosa <crosa@redhat.com>,
- Laurent Bonnans <laurent.bonnans@here.com>,
- Cheng Xiang <ext-cheng.xiang@here.com>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- Pekka Enberg <penberg@iki.fi>, Pete Batard <pete@akeo.ie>
+Cc: tianyu.lan@intel.com, kevin.tian@intel.com, yi.l.liu@intel.com,
+ Yi Sun <yi.y.sun@linux.intel.com>, kvm@vger.kernel.org, jun.j.tian@intel.com,
+ eric.auger@redhat.com, yi.y.sun@intel.com, jacob.jun.pan@linux.intel.com,
+ david@gibson.dropbear.id.au
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 10/24/19 3:42 PM, Peter Maydell wrote:
-> On Sun, 20 Oct 2019 at 00:47, Philippe Mathieu-Daudé <f4bug@amsat.org> wrote:
->>
->> Since v2:
->> - fixed issue in videocore address space
->> - allow to start with some cores OFF (to boot firmwares)
->> - add proof-of-concept test for '-smp cores=1' and U-boot
->> - fixed my email setup
->>
->> Previous cover:
->>
->> Hi,
->>
->> Some patches from v1 are already merged. This v2 addresses the
->> review comment from v1, and add patches to clean the memory
->> space when using multiple cores.
->>
->> Laurent, if you test U-Boot with this patchset again, do you mind
->> replying with a "Tested-by:" tag?
->>
->> The next patchset is probably about the interrupt controller blocks,
->> then will come another one about the MBox/Properties.
->>
->> The last patch is unrelated to the series, but since I cleaned this
->> for the raspi and the highbank is the only board with the same issue,
->> I included the patch in this series.
-> 
-> I'm going to apply 1-10 and 14 to target-arm.next.
-> (I've reviewed 10, and the rest have been reviewed.)
+This patch adds get_iommu_context() callback to return an iommu_context
+Intel VT-d platform.
 
-Thanks!
-
-Do you mind amending this to patch #3
-"hw/timer/bcm2835: Add the BCM2835 SYS_timer"
-or should I respin (or resend it alone)?
-
--- >8 --
-diff --git a/hw/timer/bcm2835_systmr.c b/hw/timer/bcm2835_systmr.c
-index 49b40b55f9..3387a6214a 100644
---- a/hw/timer/bcm2835_systmr.c
-+++ b/hw/timer/bcm2835_systmr.c
-@@ -115,10 +115,7 @@ static void bcm2835_systmr_reset(DeviceState *dev)
-  {
-      BCM2835SystemTimerState *s = BCM2835_SYSTIMER(dev);
-
--    s->reg.status = 0;
--    for (size_t i = 0; i < ARRAY_SIZE(s->reg.compare); i++) {
--        s->reg.compare[i] = 0;
--    }
-+    memset(&s->reg, 0, sizeof(s->reg));
-  }
-
+Cc: Kevin Tian <kevin.tian@intel.com>
+Cc: Jacob Pan <jacob.jun.pan@linux.intel.com>
+Cc: Peter Xu <peterx@redhat.com>
+Cc: Yi Sun <yi.y.sun@linux.intel.com>
+Signed-off-by: Liu Yi L <yi.l.liu@intel.com>
 ---
+ hw/i386/intel_iommu.c         | 57 ++++++++++++++++++++++++++++++++++++++-----
+ include/hw/i386/intel_iommu.h | 14 ++++++++++-
+ 2 files changed, 64 insertions(+), 7 deletions(-)
 
-Thanks,
+diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
+index 67a7836..e9f8692 100644
+--- a/hw/i386/intel_iommu.c
++++ b/hw/i386/intel_iommu.c
+@@ -3288,22 +3288,33 @@ static const MemoryRegionOps vtd_mem_ir_ops = {
+     },
+ };
+ 
+-VTDAddressSpace *vtd_find_add_as(IntelIOMMUState *s, PCIBus *bus, int devfn)
++static VTDBus *vtd_find_add_bus(IntelIOMMUState *s, PCIBus *bus)
+ {
+     uintptr_t key = (uintptr_t)bus;
+-    VTDBus *vtd_bus = g_hash_table_lookup(s->vtd_as_by_busptr, &key);
+-    VTDAddressSpace *vtd_dev_as;
+-    char name[128];
++    VTDBus *vtd_bus;
+ 
++    vtd_iommu_lock(s);
++    vtd_bus = g_hash_table_lookup(s->vtd_as_by_busptr, &key);
+     if (!vtd_bus) {
+         uintptr_t *new_key = g_malloc(sizeof(*new_key));
+         *new_key = (uintptr_t)bus;
+         /* No corresponding free() */
+-        vtd_bus = g_malloc0(sizeof(VTDBus) + sizeof(VTDAddressSpace *) * \
+-                            PCI_DEVFN_MAX);
++        vtd_bus = g_malloc0(sizeof(VTDBus) + PCI_DEVFN_MAX * \
++                    (sizeof(VTDAddressSpace *) + sizeof(VTDIOMMUContext *)));
+         vtd_bus->bus = bus;
+         g_hash_table_insert(s->vtd_as_by_busptr, new_key, vtd_bus);
+     }
++    vtd_iommu_unlock(s);
++    return vtd_bus;
++}
++
++VTDAddressSpace *vtd_find_add_as(IntelIOMMUState *s, PCIBus *bus, int devfn)
++{
++    VTDBus *vtd_bus;
++    VTDAddressSpace *vtd_dev_as;
++    char name[128];
++
++    vtd_bus = vtd_find_add_bus(s, bus);
+ 
+     vtd_dev_as = vtd_bus->dev_as[devfn];
+ 
+@@ -3370,6 +3381,27 @@ VTDAddressSpace *vtd_find_add_as(IntelIOMMUState *s, PCIBus *bus, int devfn)
+     return vtd_dev_as;
+ }
+ 
++VTDIOMMUContext *vtd_find_add_ic(IntelIOMMUState *s,
++                                 PCIBus *bus, int devfn)
++{
++    VTDBus *vtd_bus;
++    VTDIOMMUContext *vtd_dev_ic;
++
++    vtd_bus = vtd_find_add_bus(s, bus);
++
++    vtd_dev_ic = vtd_bus->dev_ic[devfn];
++
++    if (!vtd_dev_ic) {
++        vtd_bus->dev_ic[devfn] = vtd_dev_ic =
++                    g_malloc0(sizeof(VTDIOMMUContext));
++        vtd_dev_ic->vtd_bus = vtd_bus;
++        vtd_dev_ic->devfn = (uint8_t)devfn;
++        vtd_dev_ic->iommu_state = s;
++        iommu_context_init(&vtd_dev_ic->iommu_context);
++    }
++    return vtd_dev_ic;
++}
++
+ static uint64_t get_naturally_aligned_size(uint64_t start,
+                                            uint64_t size, int gaw)
+ {
+@@ -3666,8 +3698,21 @@ static AddressSpace *vtd_host_dma_iommu(PCIBus *bus, void *opaque, int devfn)
+     return &vtd_as->as;
+ }
+ 
++static IOMMUContext *vtd_dev_iommu_context(PCIBus *bus,
++                                           void *opaque, int devfn)
++{
++    IntelIOMMUState *s = opaque;
++    VTDIOMMUContext *vtd_ic;
++
++    assert(0 <= devfn && devfn < PCI_DEVFN_MAX);
++
++    vtd_ic = vtd_find_add_ic(s, bus, devfn);
++    return &vtd_ic->iommu_context;
++}
++
+ static PCIIOMMUOps vtd_iommu_ops = {
+     .get_address_space = vtd_host_dma_iommu,
++    .get_iommu_context = vtd_dev_iommu_context,
+ };
+ 
+ static bool vtd_decide_config(IntelIOMMUState *s, Error **errp)
+diff --git a/include/hw/i386/intel_iommu.h b/include/hw/i386/intel_iommu.h
+index 6062588..1c580c1 100644
+--- a/include/hw/i386/intel_iommu.h
++++ b/include/hw/i386/intel_iommu.h
+@@ -68,6 +68,7 @@ typedef union VTD_IR_TableEntry VTD_IR_TableEntry;
+ typedef union VTD_IR_MSIAddress VTD_IR_MSIAddress;
+ typedef struct VTDPASIDDirEntry VTDPASIDDirEntry;
+ typedef struct VTDPASIDEntry VTDPASIDEntry;
++typedef struct VTDIOMMUContext VTDIOMMUContext;
+ 
+ /* Context-Entry */
+ struct VTDContextEntry {
+@@ -116,9 +117,19 @@ struct VTDAddressSpace {
+     IOVATree *iova_tree;          /* Traces mapped IOVA ranges */
+ };
+ 
++struct VTDIOMMUContext {
++    VTDBus *vtd_bus;
++    uint8_t devfn;
++    IOMMUContext iommu_context;
++    IntelIOMMUState *iommu_state;
++};
++
+ struct VTDBus {
+     PCIBus* bus;		/* A reference to the bus to provide translation for */
+-    VTDAddressSpace *dev_as[0];	/* A table of VTDAddressSpace objects indexed by devfn */
++    /* A table of VTDAddressSpace objects indexed by devfn */
++    VTDAddressSpace *dev_as[PCI_DEVFN_MAX];
++    /* A table of VTDIOMMUContext objects indexed by devfn */
++    VTDIOMMUContext *dev_ic[PCI_DEVFN_MAX];
+ };
+ 
+ struct VTDIOTLBEntry {
+@@ -282,5 +293,6 @@ struct IntelIOMMUState {
+  * create a new one if none exists
+  */
+ VTDAddressSpace *vtd_find_add_as(IntelIOMMUState *s, PCIBus *bus, int devfn);
++VTDIOMMUContext *vtd_find_add_ic(IntelIOMMUState *s, PCIBus *bus, int devfn);
+ 
+ #endif
+-- 
+2.7.4
 
-Phil.
 
