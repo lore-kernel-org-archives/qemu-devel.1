@@ -7,77 +7,78 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CEAD3CA9EAF
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 15:08:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8CED0CA9EAF
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 15:08:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 990432070B
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 15:08:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5A7A62070B
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 15:08:06 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ps38OElF"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 990432070B
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KlYALKah"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5A7A62070B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45151 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45152 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iNeiY-0001Qq-Io
-	for qemu-devel@archiver.kernel.org; Thu, 24 Oct 2019 11:08:02 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34607)
+	id 1iNeib-0001Yb-Ed
+	for qemu-devel@archiver.kernel.org; Thu, 24 Oct 2019 11:08:05 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35003)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <paolo.bonzini@gmail.com>) id 1iNdig-0006t8-St
- for qemu-devel@nongnu.org; Thu, 24 Oct 2019 10:04:10 -0400
+ (envelope-from <paolo.bonzini@gmail.com>) id 1iNdjD-0008IW-Li
+ for qemu-devel@nongnu.org; Thu, 24 Oct 2019 10:04:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <paolo.bonzini@gmail.com>) id 1iNdib-0007a3-Hs
- for qemu-devel@nongnu.org; Thu, 24 Oct 2019 10:04:06 -0400
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:40867)
+ (envelope-from <paolo.bonzini@gmail.com>) id 1iNdjB-0007tb-I3
+ for qemu-devel@nongnu.org; Thu, 24 Oct 2019 10:04:38 -0400
+Received: from mail-wr1-x42d.google.com ([2a00:1450:4864:20::42d]:36888)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
- id 1iNdib-0007ZZ-3O
- for qemu-devel@nongnu.org; Thu, 24 Oct 2019 10:04:01 -0400
-Received: by mail-wm1-x343.google.com with SMTP id w9so1561263wmm.5
- for <qemu-devel@nongnu.org>; Thu, 24 Oct 2019 07:04:01 -0700 (PDT)
+ id 1iNdjB-0007tE-C7
+ for qemu-devel@nongnu.org; Thu, 24 Oct 2019 10:04:37 -0400
+Received: by mail-wr1-x42d.google.com with SMTP id e11so17538969wrv.4
+ for <qemu-devel@nongnu.org>; Thu, 24 Oct 2019 07:04:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=iGmswL4U/5XW7ql7Ew8zQ48E5AkJVaBYfQW9kZ657mI=;
- b=ps38OElF2RwitS8r3osFXr8symM/iIehe0wXdlIb3ctYk1BNZrHA0bR0eMFzp5+hPP
- RxPs0TNWiIQFoIaf7dRLZpfTD6CFmtJgxhcaj3lsGsLrrU4XcPgsg/Hs39YPoUpRfH8R
- c741xxkW87CXl5sVmhSUtXUIqVwzVp+WzsIbMqeqZowSv8+/NMg82kz7l36hUnea5mGL
- iJU9K0ahgTI0hgpivTpwqVjAGZKNk0PuGFMTbLwk8gw8NquQJRCQ7OJ9Rc6z9GhE7RGk
- rUA8gqt/4vS0NdPqJxXIZuNe1tKCFLEj1QUbs37eFnuICqT0VLE8LyuWskrxt7FjWtls
- Hh6Q==
+ h=sender:from:to:subject:date:message-id:in-reply-to:references;
+ bh=tKEZ3xBORUH745lD3K4++eyOpvEvcJPLpryLwnDHKcA=;
+ b=KlYALKahNrJgFupyMnWGV0LlYr32drx9DnG/SugQq6IuVOVVjRaWxWpEGDO1XbhjFC
+ keugCdxBvjG5HmVg6dpx4HKuTfXECz1KuMALAnPl59mELmoLQvumifgoOc/siIAg+idl
+ 318wjDZbc6QTr+EHdm9JEIMXuvKGNmZS61D1WZETZOTuYc037mHVHAhTaHkIXrSnw5y/
+ +5E1HyKTsuRxyVea7ZTJcgDQB0xwE97oHkkiZJeI6+ITBK7hwGz+r0ohzlucDetv11t3
+ 28QudQkeS7FqssnX9PkhmdoSGOBlnNL7D3SdPLldYLTlCmjwhhdbgs4JXJ43VSpR1uGb
+ PI6A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
+ h=x-gm-message-state:sender:from:to:subject:date:message-id
  :in-reply-to:references;
- bh=iGmswL4U/5XW7ql7Ew8zQ48E5AkJVaBYfQW9kZ657mI=;
- b=DzRkVQ5rADWzRuSv974YPbYlZrWu2y6INKqf+nJsyHlpW+HS6tDh3e5nsL4qxUV4lE
- Dni8PSs1n880wxhpGLdA6PrPUrDYJIyPlts3bHSaj2OpTMGbhdFNSAhep9APuk6gzJX8
- zOrKoghR5mhq5UM4XB9wHpCAQJjXEi0zpXtMd4sVeLAgZ+66Y6Np8Qrq7HpBqM4597C7
- sIXkbuzJ3E5Z596e201PR/xWLOxENojZUNxp4O8mNFWPu1WF86LD2nIHPmPLpZad4H4D
- WyYKV7ZmzZ1E2ShKdpbrUSDLZMW9YTZgH51h1diJafahqJ1AAgohukMGEybgsIEe7VA1
- AsJA==
-X-Gm-Message-State: APjAAAVFjyGFOqQJ7IT8rCuPKtzCStcaQqjheiXbDgEChkyUEkt0iHuC
- s/PPQqAMwKX7tQlpnfU9k/qYN8US
-X-Google-Smtp-Source: APXvYqxV6x/LUk/FGWOTOI4l7+8LG8EaHqdcHV1pkWRoOOYvdchHy1F001MLq6RepbdnpeI92C0Ptg==
-X-Received: by 2002:a1c:e404:: with SMTP id b4mr5555773wmh.90.1571925839703;
- Thu, 24 Oct 2019 07:03:59 -0700 (PDT)
+ bh=tKEZ3xBORUH745lD3K4++eyOpvEvcJPLpryLwnDHKcA=;
+ b=O5BdOjO7l5r7HkgbAF0mTCczu91/hd+47wC0R9Z+3NbWBu9NqhacONUXJPcNdO9nWF
+ gkE818xdPPcgqGaJs+I968NRPyVaczxXy8y7POAbP+O1YzhZnmd+7hNPzolukoq4jom/
+ XyrfeOpIUVPqz3CUAAh0BphNNqGfRh26wh3KAGP7Z1/LSRyJdUUkM+2DymMhpqaUoMBg
+ kkuXl/+ve+FpLn+nf0SKzAQuwMh662ca2SHb03mUq+ziXqcdFy2/7/ZMflTQxoLKmLfI
+ bk/BkK8tuAwQ8CH1fExwLxbxb7jHhkN5ogC0A68iX1mM56SSVWJpNFQjUP9kX1aK1gEn
+ d0Dg==
+X-Gm-Message-State: APjAAAXX5YcsziPX0pCYe1YswdbWnqy4LWNjsUD+/gcOybAbNbjW6uzS
+ 8Lt13wAHsE8quY4Jy0wstbhPcLM5
+X-Google-Smtp-Source: APXvYqxnVvBj2e5TpYey+vMYgfaOnlGHnVomlb65E2bZN3wJr/Wsage04i80XZzjZehgmA/Zp1v1xw==
+X-Received: by 2002:a5d:424a:: with SMTP id s10mr3904767wrr.108.1571925876167; 
+ Thu, 24 Oct 2019 07:04:36 -0700 (PDT)
 Received: from 640k.localdomain ([93.56.166.5])
- by smtp.gmail.com with ESMTPSA id b7sm10610155wrn.53.2019.10.24.07.03.58
+ by smtp.gmail.com with ESMTPSA id b7sm10610155wrn.53.2019.10.24.07.04.35
+ for <qemu-devel@nongnu.org>
  (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Thu, 24 Oct 2019 07:03:58 -0700 (PDT)
+ Thu, 24 Oct 2019 07:04:35 -0700 (PDT)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 02/39] mc146818rtc: fix timer interrupt reinjection
-Date: Thu, 24 Oct 2019 16:03:18 +0200
-Message-Id: <1571925835-31930-3-git-send-email-pbonzini@redhat.com>
+Subject: [PULL 35/39] audio: fix missing break
+Date: Thu, 24 Oct 2019 16:03:51 +0200
+Message-Id: <1571925835-31930-36-git-send-email-pbonzini@redhat.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1571925835-31930-1-git-send-email-pbonzini@redhat.com>
 References: <1571925835-31930-1-git-send-email-pbonzini@redhat.com>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::343
+X-Received-From: 2a00:1450:4864:20::42d
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,113 +90,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Marcelo Tosatti <mtosatti@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Marcelo Tosatti <mtosatti@redhat.com>
+Reported by Coverity (CID 1406449).
 
-commit 369b41359af46bded5799c9ef8be2b641d92e043 broke timer interrupt
-reinjection when there is no period change by the guest.
-
-In that case, old_period is 0, which ends up zeroing irq_coalesced
-(counter of reinjected interrupts).
-
-The consequence is Windows 7 is unable to synchronize time via NTP.
-Easily reproducible by playing a fullscreen video with cirrus and VNC.
-
-Fix by not updating s->irq_coalesced when old_period is 0.
-
-V2: reorganize code (Paolo Bonzini)
-
-Signed-off-by: Marcelo Tosatti <mtosatti@redhat.com>
-
-Message-Id: <20191010123008.GA19158@amt.cnet>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- hw/timer/mc146818rtc.c | 53 +++++++++++++++++++++++++-------------------------
- 1 file changed, 27 insertions(+), 26 deletions(-)
+ audio/paaudio.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/hw/timer/mc146818rtc.c b/hw/timer/mc146818rtc.c
-index 6cb3787..0e7cf97 100644
---- a/hw/timer/mc146818rtc.c
-+++ b/hw/timer/mc146818rtc.c
-@@ -203,24 +203,28 @@ periodic_timer_update(RTCState *s, int64_t current_time, uint32_t old_period)
+diff --git a/audio/paaudio.c b/audio/paaudio.c
+index df541a7..55a91f8 100644
+--- a/audio/paaudio.c
++++ b/audio/paaudio.c
+@@ -385,6 +385,7 @@ static pa_stream *qpa_simple_new (
+         map.map[5] = PA_CHANNEL_POSITION_REAR_RIGHT;
+         map.map[6] = PA_CHANNEL_POSITION_SIDE_LEFT;
+         map.map[7] = PA_CHANNEL_POSITION_SIDE_RIGHT;
++        break;
  
-     period = rtc_periodic_clock_ticks(s);
- 
--    if (period) {
--        /* compute 32 khz clock */
--        cur_clock =
--            muldiv64(current_time, RTC_CLOCK_RATE, NANOSECONDS_PER_SECOND);
-+    if (!period) {
-+        s->irq_coalesced = 0;
-+        timer_del(s->periodic_timer);
-+        return;
-+    }
- 
--        /*
--        * if the periodic timer's update is due to period re-configuration,
--        * we should count the clock since last interrupt.
--        */
--        if (old_period) {
--            int64_t last_periodic_clock, next_periodic_clock;
--
--            next_periodic_clock = muldiv64(s->next_periodic_time,
--                                    RTC_CLOCK_RATE, NANOSECONDS_PER_SECOND);
--            last_periodic_clock = next_periodic_clock - old_period;
--            lost_clock = cur_clock - last_periodic_clock;
--            assert(lost_clock >= 0);
--        }
-+    /* compute 32 khz clock */
-+    cur_clock =
-+        muldiv64(current_time, RTC_CLOCK_RATE, NANOSECONDS_PER_SECOND);
-+
-+    /*
-+     * if the periodic timer's update is due to period re-configuration,
-+     * we should count the clock since last interrupt.
-+     */
-+    if (old_period) {
-+        int64_t last_periodic_clock, next_periodic_clock;
-+
-+        next_periodic_clock = muldiv64(s->next_periodic_time,
-+                                RTC_CLOCK_RATE, NANOSECONDS_PER_SECOND);
-+        last_periodic_clock = next_periodic_clock - old_period;
-+        lost_clock = cur_clock - last_periodic_clock;
-+        assert(lost_clock >= 0);
- 
-         /*
-          * s->irq_coalesced can change for two reasons:
-@@ -251,22 +255,19 @@ periodic_timer_update(RTCState *s, int64_t current_time, uint32_t old_period)
-                 rtc_coalesced_timer_update(s);
-             }
-         } else {
--           /*
-+            /*
-              * no way to compensate the interrupt if LOST_TICK_POLICY_SLEW
-              * is not used, we should make the time progress anyway.
-              */
-             lost_clock = MIN(lost_clock, period);
-         }
-+    }
- 
--        assert(lost_clock >= 0 && lost_clock <= period);
-+    assert(lost_clock >= 0 && lost_clock <= period);
- 
--        next_irq_clock = cur_clock + period - lost_clock;
--        s->next_periodic_time = periodic_clock_to_ns(next_irq_clock) + 1;
--        timer_mod(s->periodic_timer, s->next_periodic_time);
--    } else {
--        s->irq_coalesced = 0;
--        timer_del(s->periodic_timer);
--    }
-+    next_irq_clock = cur_clock + period - lost_clock;
-+    s->next_periodic_time = periodic_clock_to_ns(next_irq_clock) + 1;
-+    timer_mod(s->periodic_timer, s->next_periodic_time);
- }
- 
- static void rtc_periodic_timer(void *opaque)
+     default:
+         dolog("Internal error: unsupported channel count %d\n", ss->channels);
 -- 
 1.8.3.1
 
