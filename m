@@ -2,83 +2,87 @@ Return-Path: <SRS0=Jnn8=YR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3FB1ECA9EAF
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 15:43:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 19495CA9EAF
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 15:46:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B669320650
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 15:43:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id AF0E220684
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 15:46:26 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YXoEhScK"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B669320650
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=web.de header.i=@web.de header.b="lGQgBB/F"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AF0E220684
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=web.de
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45552 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45580 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iNfGc-0000z1-B9
-	for qemu-devel@archiver.kernel.org; Thu, 24 Oct 2019 11:43:14 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35030)
+	id 1iNfJh-0006rr-HP
+	for qemu-devel@archiver.kernel.org; Thu, 24 Oct 2019 11:46:25 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38932)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <paolo.bonzini@gmail.com>) id 1iNdjF-0008LG-L8
- for qemu-devel@nongnu.org; Thu, 24 Oct 2019 10:04:42 -0400
+ (envelope-from <lukasstraub2@web.de>) id 1iNe4B-0008QB-Vs
+ for qemu-devel@nongnu.org; Thu, 24 Oct 2019 10:26:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <paolo.bonzini@gmail.com>) id 1iNdjE-0007xB-7I
- for qemu-devel@nongnu.org; Thu, 24 Oct 2019 10:04:41 -0400
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:33228)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
- id 1iNdjE-0007we-17
- for qemu-devel@nongnu.org; Thu, 24 Oct 2019 10:04:40 -0400
-Received: by mail-wr1-x442.google.com with SMTP id s1so17473487wro.0
- for <qemu-devel@nongnu.org>; Thu, 24 Oct 2019 07:04:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:subject:date:message-id:in-reply-to:references;
- bh=ACSSwd4vLiPduucfk8qILiYK3BU6NBbxPynhmSEzC6A=;
- b=YXoEhScKkoeIwTfYdNx/Gv6m/u6kNPKPze0mWwwCVCV3hmU7UNVgefmnmw41th7Rp+
- mZjC7jet6BAgq6QFHKGuYGQVcB/k8CuoRx+Z0xpdESTe4sIiXz3sCkTSA+5psfnEZbZT
- hnBR5fvkkHuqQzFT70VHLeIBfct0yKoOq/pzdJp6aHdnWGVsERR+PNkZHVZDLWRiyQ4v
- oMCZ4SS6QJzexh3bwll0nFREhKrIrXTFZQGLwdfP3c+jMQvUsCsUMALv+uyNXK1FXN1q
- 0p8hD3evedbLYF6yJo17raNzCpMdV/TzW8RfQ/281Fbt/DniAOC8+1HbSWMafNbYPb0m
- 9a5g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:from:to:subject:date:message-id
- :in-reply-to:references;
- bh=ACSSwd4vLiPduucfk8qILiYK3BU6NBbxPynhmSEzC6A=;
- b=lNhj03OERNVT/G+tZ6hli91wl2gRu7lBr5pdQOOFQIzW26Jdf0S6iyWsA1dPBw2JzH
- A3p3SDqQW6zBrk3uaRVFtSShW+FReHh3jksWxv5gNidV3YP8ZEgTDSOHMmMxOPaoXAqU
- jqRRLszm8k3vbdbtUesPMR0Jbhzu0oI3WFBmNpHZjXy9IsSR3mwscj4GJXlLurEqX9MC
- vuN/HfQyVo4CEyAtIcedMp7guXbOdUUjGTmFWWIwIn3yBbohx/I9XXP5eLRTPJ41xfWH
- 9V+p/vIPGpztTDLJOoJ0WhCczcHWaI25ywDL9YRhFPPhrdGU695gE+5+EMek61/yq8Bv
- ySYw==
-X-Gm-Message-State: APjAAAVZ6Wuv67X3YHayvVjpSz77yK57yvyCHcSCKXrqc2pvKe2llt4r
- ZIqTnBgSfnu2R+QEte4+WYKLhlWh
-X-Google-Smtp-Source: APXvYqxQDSGFdpPuxTzYN3MHJYdSlYSzwda4d+Kf9uxWHaQVOqAYtpeAGeGCSf89acBPCLRhsIRDXQ==
-X-Received: by 2002:adf:a48c:: with SMTP id g12mr3830271wrb.212.1571925878701; 
- Thu, 24 Oct 2019 07:04:38 -0700 (PDT)
-Received: from 640k.localdomain ([93.56.166.5])
- by smtp.gmail.com with ESMTPSA id b7sm10610155wrn.53.2019.10.24.07.04.38
- for <qemu-devel@nongnu.org>
- (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Thu, 24 Oct 2019 07:04:38 -0700 (PDT)
-From: Paolo Bonzini <pbonzini@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PULL 38/39] target/i386: introduce cpu_set_fpus
-Date: Thu, 24 Oct 2019 16:03:54 +0200
-Message-Id: <1571925835-31930-39-git-send-email-pbonzini@redhat.com>
-X-Mailer: git-send-email 1.8.3.1
-In-Reply-To: <1571925835-31930-1-git-send-email-pbonzini@redhat.com>
-References: <1571925835-31930-1-git-send-email-pbonzini@redhat.com>
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::442
+ (envelope-from <lukasstraub2@web.de>) id 1iNe4A-0002oC-Nf
+ for qemu-devel@nongnu.org; Thu, 24 Oct 2019 10:26:19 -0400
+Received: from mout.web.de ([212.227.15.4]:46739)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <lukasstraub2@web.de>)
+ id 1iNe47-0002hh-QU; Thu, 24 Oct 2019 10:26:16 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=web.de;
+ s=dbaedf251592; t=1571927145;
+ bh=OfJkK2vnGkQe8T1r5KQyutlaZ4TJ+K9pB9jGve8qHNk=;
+ h=X-UI-Sender-Class:Date:From:To:Cc:Subject:In-Reply-To:References;
+ b=lGQgBB/FqY7YomFrbayzQXuH0TFlk1D6pOdg3MMZBzvSOpUKRJ5Ry/6AjD0gbQ2/+
+ i2FDuGDcMBi3vALQypOB54Yl1bmxe2rsH23IYFiCLldK8Ehr0L3/WMpbFb4fm9Kvod
+ TpmAtoMZIZR6XAk4zvqmsf3F75Myo5RAJJLHQ3VM=
+X-UI-Sender-Class: c548c8c5-30a9-4db5-a2e7-cb6cb037b8f9
+Received: from luklap ([89.247.255.150]) by smtp.web.de (mrweb003
+ [213.165.67.108]) with ESMTPSA (Nemesis) id 0M6V2p-1i430c1cYF-00yT6q; Thu, 24
+ Oct 2019 16:25:45 +0200
+Date: Thu, 24 Oct 2019 16:25:44 +0200
+From: Lukas Straub <lukasstraub2@web.de>
+To: qemu-devel <qemu-devel@nongnu.org>
+Subject: [PATCH v7 2/4] tests/test-replication.c: Add test for for secondary
+ node continuing replication
+Message-ID: <60b4c574f996824210f7b2282eac030dbe9f9e41.1571925699.git.lukasstraub2@web.de>
+In-Reply-To: <cover.1571925699.git.lukasstraub2@web.de>
+References: <cover.1571925699.git.lukasstraub2@web.de>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
+X-Provags-ID: V03:K1:V5s0lVOsEJp343Q4r+2aot8a5KDekal2vhV757BxhU3szgkIQkk
+ Ca1LIXE/QxcdcWzTALMks8Tc5IOs6LJ1NayoFVk1Ab8qShiZ9UlPxVnIgyf03Z8S8sybf0H
+ NrRtBysges0FuD41IzzWHByVvjcq26AOVYhbc+FESFqdrtNlAEbikvvG3Wq20+IsDx4Rkum
+ UeD1wpNg3cMfSytJoTPSw==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:uLNgf5N+nB8=:HLa0Py9yOmgtio6ntdlwv3
+ GkaWct/MAScNOCPofH445DxjJLIbCgte+ZxZneDz5uTKyh1m194AMveo7pwi06N/8NfUCi+Se
+ FGH31cJolgPzmj3wz36sZ2w3uG/y6Qo6iCgiU5D9lVAgnTad1mfjzKjjKHkWpZ1Nsab/bUHdd
+ k85gLY82DqedgsFYv7O0KdfwXquaV6Gh19vh7TFWIgzGX8B6eAvpFErAqxfQbOWT3fKmOY73r
+ VehWk5IFK5DcVjs7uM/sCSkKei4IhuK5syKMy4TKJzq/7F541V+53GIKKZ9GXTuMKLreEvMxG
+ fzSNaud/910YYBMrfAbU4AMzGXKrwwtUErs+GyFsz4Hf2OLWeWWSz6PCjjg+9Z/qYr/tF/Hnh
+ NWgNQdx6QiNXYofyjEGp88y8TvqFY5O8FyP7Mlz1MSGXZf4FyE7Y+L3HxDa5wclJFm0HXk5k7
+ dF5DpuBznILwENzmvI9XJbdPvgQXjxIdYFy9mMlOOYb6UYKjipoU0rSzSFS837ilJrmAaMQS6
+ 4I964NqijpDJtCm7970FwKPJjhtb6QCBs5z/ABeTZ7TnX/GGrO6Mr0774vUBUUe60yC8nuNck
+ KmmqUAnsRa0CbY1nb9L4/MAWxNQjGt6mYjy5hyAC3VTY+w3taSI3X8qzWINs05fM3DxwBMO3h
+ i/yQIr7ZnN72d3rK8deWl3q1wzCnAWJ247waCP3DgFz4/5vIaZ8gf5ySIVudPA59n9i5Jf0bc
+ Kntd333/fNDzQlMTaUzMoa8WTMhhx5Pfw5ucCGcA7c/p3M+ghOTNtBPA51JpCdZQAi0sC010U
+ Wzx37j7nVgOxJRtzWO3UYte1QwpkDXcG9fRa16Etk+emALczQiKs3g+s3VBfQEaGJ9rhTmAJf
+ oA4M8eWakrzsEfBw01pXLlGyEsJ6RODD+G8EWvR5UODNI2BY0DrumYmOdKU3k1JDd5etKfSz8
+ vkj77pGQNQhOVOIz9FRaOiTs5sMDtlESukmT42lXYZQCHvGR6UR0y3/bQQyM2ggHNp0FVA+Mq
+ eTNircCbTClk4GlLlLgJmEmAgEJFudVOnPI5f6B3eoC0tPDy/6YbMa1yxGAAwaICqv66VhVmS
+ eL9Xvy+14rRQlBwjC5iIHOxMdNjT04csCMCSQd3rX7iTs+p1X8jr4EHIwQb8O28oLQ3v1SO8P
+ Vhp7VESMdmMgPe5+fODNKz7RZCFVQJt1EZe6IC6Oev7qP2i6yyKVntJ8vAQZCib+YrRzpCnyH
+ WiVOeWvSLoq5KnAMlKsxK71OowocDJwzx/hmvgq3hnThmM0N+DxwDKi3gOq4=
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 212.227.15.4
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,57 +94,94 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block <qemu-block@nongnu.org>,
+ Wen Congyang <wency@cn.fujitsu.com>, Wen Congyang <wencongyang2@huawei.com>,
+ Jason Wang <jasowang@redhat.com>, Max Reitz <mreitz@redhat.com>,
+ Zhang Chen <chen.zhang@intel.com>, Xie Changlong <xiechanglong.d@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-In the next patch, this will provide a hook to detect clearing of
-FSW.ES.
+This simulates the case that happens when we resume COLO after failover.
 
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- target/i386/fpu_helper.c | 12 ++++++++----
- 1 file changed, 8 insertions(+), 4 deletions(-)
+Signed-off-by: Lukas Straub <lukasstraub2@web.de>
+=2D--
+ tests/test-replication.c | 52 ++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 52 insertions(+)
 
-diff --git a/target/i386/fpu_helper.c b/target/i386/fpu_helper.c
-index 4db0059..6825024 100644
---- a/target/i386/fpu_helper.c
-+++ b/target/i386/fpu_helper.c
-@@ -1053,6 +1053,12 @@ void helper_fstenv(CPUX86State *env, target_ulong ptr, int data32)
-     do_fstenv(env, ptr, data32, GETPC());
+diff --git a/tests/test-replication.c b/tests/test-replication.c
+index f085d1993a..8e18ecd998 100644
+=2D-- a/tests/test-replication.c
++++ b/tests/test-replication.c
+@@ -489,6 +489,56 @@ static void test_secondary_stop(void)
+     teardown_secondary();
  }
- 
-+static void cpu_set_fpus(CPUX86State *env, uint16_t fpus)
+
++static void test_secondary_continuous_replication(void)
 +{
-+    env->fpstt = (fpus >> 11) & 7;
-+    env->fpus = fpus & ~0x3800;
++    BlockBackend *top_blk, *local_blk;
++    Error *local_err =3D NULL;
++
++    top_blk =3D start_secondary();
++    replication_start_all(REPLICATION_MODE_SECONDARY, &local_err);
++    g_assert(!local_err);
++
++    /* write 0x22 to s_local_disk (IMG_SIZE / 2, IMG_SIZE) */
++    local_blk =3D blk_by_name(S_LOCAL_DISK_ID);
++    test_blk_write(local_blk, 0x22, IMG_SIZE / 2, IMG_SIZE / 2, false);
++
++    /* replication will backup s_local_disk to s_hidden_disk */
++    test_blk_read(top_blk, 0x11, IMG_SIZE / 2,
++                  IMG_SIZE / 2, 0, IMG_SIZE, false);
++
++    /* write 0x33 to s_active_disk (0, IMG_SIZE / 2) */
++    test_blk_write(top_blk, 0x33, 0, IMG_SIZE / 2, false);
++
++    /* do failover (active commit) */
++    replication_stop_all(true, &local_err);
++    g_assert(!local_err);
++
++    /* it should ignore all requests from now on */
++
++    /* start after failover */
++    replication_start_all(REPLICATION_MODE_PRIMARY, &local_err);
++    g_assert(!local_err);
++
++    /* checkpoint */
++    replication_do_checkpoint_all(&local_err);
++    g_assert(!local_err);
++
++    /* stop */
++    replication_stop_all(true, &local_err);
++    g_assert(!local_err);
++
++    /* read from s_local_disk (0, IMG_SIZE / 2) */
++    test_blk_read(top_blk, 0x33, 0, IMG_SIZE / 2,
++                  0, IMG_SIZE / 2, false);
++
++
++    /* read from s_local_disk (IMG_SIZE / 2, IMG_SIZE) */
++    test_blk_read(top_blk, 0x22, IMG_SIZE / 2,
++                  IMG_SIZE / 2, 0, IMG_SIZE, false);
++
++    teardown_secondary();
 +}
 +
- static void do_fldenv(CPUX86State *env, target_ulong ptr, int data32,
-                       uintptr_t retaddr)
+ static void test_secondary_do_checkpoint(void)
  {
-@@ -1067,8 +1073,7 @@ static void do_fldenv(CPUX86State *env, target_ulong ptr, int data32,
-         fpus = cpu_lduw_data_ra(env, ptr + 2, retaddr);
-         fptag = cpu_lduw_data_ra(env, ptr + 4, retaddr);
-     }
--    env->fpstt = (fpus >> 11) & 7;
--    env->fpus = fpus & ~0x3800;
-+    cpu_set_fpus(env, fpus);
-     for (i = 0; i < 8; i++) {
-         env->fptags[i] = ((fptag & 3) == 3);
-         fptag >>= 2;
-@@ -1316,8 +1321,7 @@ static void do_xrstor_fpu(CPUX86State *env, target_ulong ptr, uintptr_t ra)
-     fpus = cpu_lduw_data_ra(env, ptr + XO(legacy.fsw), ra);
-     fptag = cpu_lduw_data_ra(env, ptr + XO(legacy.ftw), ra);
-     cpu_set_fpuc(env, fpuc);
--    env->fpstt = (fpus >> 11) & 7;
--    env->fpus = fpus & ~0x3800;
-+    cpu_set_fpus(env, fpus);
-     fptag ^= 0xff;
-     for (i = 0; i < 8; i++) {
-         env->fptags[i] = ((fptag >> i) & 1);
--- 
-1.8.3.1
-
+     BlockBackend *top_blk, *local_blk;
+@@ -584,6 +634,8 @@ int main(int argc, char **argv)
+     g_test_add_func("/replication/secondary/write", test_secondary_write)=
+;
+     g_test_add_func("/replication/secondary/start", test_secondary_start)=
+;
+     g_test_add_func("/replication/secondary/stop",  test_secondary_stop);
++    g_test_add_func("/replication/secondary/continuous_replication",
++                    test_secondary_continuous_replication);
+     g_test_add_func("/replication/secondary/do_checkpoint",
+                     test_secondary_do_checkpoint);
+     g_test_add_func("/replication/secondary/get_error_all",
+=2D-
+2.20.1
 
 
