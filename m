@@ -7,78 +7,81 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A693CA9EAF
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 15:38:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 59813CA9EAF
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 15:40:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C7E9C20650
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 15:38:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 202F620650
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 15:40:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="keDUGG/y"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C7E9C20650
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YN6pXa+s"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 202F620650
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45504 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45514 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iNfC8-0002Ne-Tb
-	for qemu-devel@archiver.kernel.org; Thu, 24 Oct 2019 11:38:36 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34929)
+	id 1iNfDV-0005t3-4m
+	for qemu-devel@archiver.kernel.org; Thu, 24 Oct 2019 11:40:01 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34937)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <paolo.bonzini@gmail.com>) id 1iNdj7-000882-51
- for qemu-devel@nongnu.org; Thu, 24 Oct 2019 10:04:34 -0400
+ (envelope-from <paolo.bonzini@gmail.com>) id 1iNdj7-00089b-V9
+ for qemu-devel@nongnu.org; Thu, 24 Oct 2019 10:04:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <paolo.bonzini@gmail.com>) id 1iNdj1-0007nD-SO
- for qemu-devel@nongnu.org; Thu, 24 Oct 2019 10:04:32 -0400
-Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:54185)
+ (envelope-from <paolo.bonzini@gmail.com>) id 1iNdj2-0007nd-Tb
+ for qemu-devel@nongnu.org; Thu, 24 Oct 2019 10:04:33 -0400
+Received: from mail-wr1-x429.google.com ([2a00:1450:4864:20::429]:36883)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
- id 1iNdj1-0007mo-Kl
- for qemu-devel@nongnu.org; Thu, 24 Oct 2019 10:04:27 -0400
-Received: by mail-wm1-x341.google.com with SMTP id n7so2167426wmc.3
- for <qemu-devel@nongnu.org>; Thu, 24 Oct 2019 07:04:27 -0700 (PDT)
+ id 1iNdj2-0007nL-Lx
+ for qemu-devel@nongnu.org; Thu, 24 Oct 2019 10:04:28 -0400
+Received: by mail-wr1-x429.google.com with SMTP id e11so17538338wrv.4
+ for <qemu-devel@nongnu.org>; Thu, 24 Oct 2019 07:04:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=fkvm9nrySjtGqEqh6sk4DK7nSHHS/gX3BsRBOkEFvus=;
- b=keDUGG/yBFtGV3tw0WN+roAJAig/BbaIL5TL8UsKIMmHKdZrNGNomWs8vvDGXJZJQc
- 4hvk5IqjzwP3RQqJ+tRKAEvq7QXbgihs0K9luApE6DuOCquBPozsHknbVvj12wwfBqdU
- Ula6s90gUqrZEN5BD6bGJDYPli23wLEGWVHsJJYcdZIwlD3+0HfDsPkz8085BcgWGM7f
- yyUkjlPZci87gV+dbIWRHqqiHsvNAOmptXzQUR1WXlkURYFKpZ/d9BGnUy68f7yWUA85
- X+T79EyMyNNnO9LHWiFWjs2j6ufdxyJ9kAWMxj9hzkm/psva+ZskX9bsJpod5xaLAOXz
- HYqg==
+ h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=ZKfl1Pqq3FGyY1lzuLtSAUoFrIIAbeG7CA7XuDqVexQ=;
+ b=YN6pXa+sf8rVTyeQfBml0lF2fXextF1eTmUy0cNjribSUpFhTIG4Y19e36NPOiVM03
+ 7xyKaeEoPX70BnWfFXsIJvw5A1h00lNtRPeggoI31KLBjsrq49fJoPOyUL4G6Ra9v0ly
+ kH/FZ4SIRjIdGWpYZHvm85ptK5W/5peW2VO4OLqcAfsTNl0hmPvTRq5h28d3AmnSLxRC
+ SwjfVrKv65uuJ3HudfmQto1CndOdu1rU8ygIw2cQJ33kdEC1tkcPaMEYy+9B+z+fMJ6W
+ zkLOKRaRzwJig0E89AG9QYMYaCG0h/ClF7eKTSYVeKd0CBKodGcLkhcabllBu2o96+6A
+ Y4yA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
- :in-reply-to:references;
- bh=fkvm9nrySjtGqEqh6sk4DK7nSHHS/gX3BsRBOkEFvus=;
- b=FoMt3pnre1gCkR8IK4zQs4WLU8Vu4WBTsJt1sz8S5eRL/xPdEp3QefXQiV8/8A0egh
- k2WCZfvWLfOPhDRSqxX7FHg2mfaJvWXeWtVZQG40NLRW0NC6U49oUvRLho3H37fsMhY4
- wQxPYAiK4S/78Kn6cupMdwbLjxxM8OqGABRqk0auyyKsRarH6uyrJoiTtz9U2UA67WrZ
- xiUXlcpWwVjwk7n+ZzeZw2ha0ruPI6aFL8MEGbVRQ2cu91IKcd9BfF42Vd7UzPR2Zpa5
- c6MZMTXafOfqsTcBt3EwUetHE+Zi+DfppirugxNJHSLlUu4eeURkAhOxcAEiqv7W16p1
- RBuA==
-X-Gm-Message-State: APjAAAWYLH+wEfAD31pg/YZgfW2qXDRLPKAaqIFr2DVPOmFNw+mFG9e7
- BpZmeiaOfhnmqLhGUwywtPudC9Wz
-X-Google-Smtp-Source: APXvYqyFt9a5EGOmmNolhHIF2RhmlnTgzXeu+AsTZkhVqNvnIkmUcx6GqhI1YugNJWoagccy6cxg5g==
-X-Received: by 2002:a1c:2d49:: with SMTP id t70mr432720wmt.131.1571925866214; 
- Thu, 24 Oct 2019 07:04:26 -0700 (PDT)
+ :in-reply-to:references:mime-version:content-transfer-encoding;
+ bh=ZKfl1Pqq3FGyY1lzuLtSAUoFrIIAbeG7CA7XuDqVexQ=;
+ b=ObTxHK91U2J75k9r2RKeXG+x+nUuUlrj6k3QOeMI5V+M3YasnY7+l9fAL4BZjslMOT
+ JkvTQBOPNoglJ/WUxfEUfuWUYod1ThxN19nvmLIlQDV5Vod0wYTc8OUeETiFLtsXquES
+ bdW6Nq+WPgNpxLs9Nr7+1pNoVYV22cSZgkNmv6ccjv2hawgTa8fmFRDRzRQXnh2SSCg7
+ OVNBS08eRRe9G0TO2L0B2popfdVvCmRKBCrOuipXIhJLctrZVvkyK7vvmAXQ6+wGX7m5
+ rd/iB/2yi2oKJiLkfHl41mXtCBALobsKfUJSj2oScLNVQt7S76UKC8s6JLVPtlzyro76
+ KhPw==
+X-Gm-Message-State: APjAAAX70NzPMp1fuu6uvuFKpLMJ5IFpplQ+w8B58+/nx/PZqoWdw8yI
+ tFfQTBKl7EgLI+6BwUG64iUXaOCz
+X-Google-Smtp-Source: APXvYqyE0tP6WgmXztxrLj9AtSkpg4kG2uI41EIgkzx82zID+YYP9gAqG2oAHhMqGFjHUW1OZXgKsA==
+X-Received: by 2002:a5d:638c:: with SMTP id p12mr3755598wru.136.1571925867265; 
+ Thu, 24 Oct 2019 07:04:27 -0700 (PDT)
 Received: from 640k.localdomain ([93.56.166.5])
- by smtp.gmail.com with ESMTPSA id b7sm10610155wrn.53.2019.10.24.07.04.24
+ by smtp.gmail.com with ESMTPSA id b7sm10610155wrn.53.2019.10.24.07.04.26
  (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Thu, 24 Oct 2019 07:04:25 -0700 (PDT)
+ Thu, 24 Oct 2019 07:04:26 -0700 (PDT)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 26/39] target/i386: Add support for save/load
- IA32_UMWAIT_CONTROL MSR
-Date: Thu, 24 Oct 2019 16:03:42 +0200
-Message-Id: <1571925835-31930-27-git-send-email-pbonzini@redhat.com>
+Subject: [PULL 27/39] hw/i386/pc: Extract pc_gsi_create()
+Date: Thu, 24 Oct 2019 16:03:43 +0200
+Message-Id: <1571925835-31930-28-git-send-email-pbonzini@redhat.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1571925835-31930-1-git-send-email-pbonzini@redhat.com>
 References: <1571925835-31930-1-git-send-email-pbonzini@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::341
+X-Received-From: 2a00:1450:4864:20::429
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,141 +93,107 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Jingqi Liu <jingqi.liu@intel.com>, Tao Xu <tao3.xu@intel.com>
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Tao Xu <tao3.xu@intel.com>
+From: Philippe Mathieu-Daudé <philmd@redhat.com>
 
-UMWAIT and TPAUSE instructions use 32bits IA32_UMWAIT_CONTROL at MSR
-index E1H to determines the maximum time in TSC-quanta that the processor
-can reside in either C0.1 or C0.2.
+The GSI creation code is common to all PC machines, extract the
+common code.
 
-This patch is to Add support for save/load IA32_UMWAIT_CONTROL MSR in
-guest.
-
-Co-developed-by: Jingqi Liu <jingqi.liu@intel.com>
-Signed-off-by: Jingqi Liu <jingqi.liu@intel.com>
-Signed-off-by: Tao Xu <tao3.xu@intel.com>
-Message-Id: <20191011074103.30393-3-tao3.xu@intel.com>
+Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+Reviewed-by: Thomas Huth <thuth@redhat.com>
+Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Message-Id: <20191018135910.24286-2-philmd@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- target/i386/cpu.h     |  2 ++
- target/i386/kvm.c     | 13 +++++++++++++
- target/i386/machine.c | 20 ++++++++++++++++++++
- 3 files changed, 35 insertions(+)
+ hw/i386/pc.c         | 15 +++++++++++++++
+ hw/i386/pc_piix.c    |  9 +--------
+ hw/i386/pc_q35.c     |  9 +--------
+ include/hw/i386/pc.h |  2 ++
+ 4 files changed, 19 insertions(+), 16 deletions(-)
 
-diff --git a/target/i386/cpu.h b/target/i386/cpu.h
-index 112f867..b772e82 100644
---- a/target/i386/cpu.h
-+++ b/target/i386/cpu.h
-@@ -452,6 +452,7 @@ typedef enum X86Seg {
+diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+index a8888dd..e8a54ac 100644
+--- a/hw/i386/pc.c
++++ b/hw/i386/pc.c
+@@ -355,6 +355,21 @@ void gsi_handler(void *opaque, int n, int level)
+     qemu_set_irq(s->ioapic_irq[n], level);
+ }
  
- #define MSR_IA32_BNDCFGS                0x00000d90
- #define MSR_IA32_XSS                    0x00000da0
-+#define MSR_IA32_UMWAIT_CONTROL         0xe1
- 
- #define MSR_IA32_VMX_BASIC              0x00000480
- #define MSR_IA32_VMX_PINBASED_CTLS      0x00000481
-@@ -1587,6 +1588,7 @@ typedef struct CPUX86State {
-     uint16_t fpregs_format_vmstate;
- 
-     uint64_t xss;
-+    uint32_t umwait;
- 
-     TPRAccess tpr_access_type;
- 
-diff --git a/target/i386/kvm.c b/target/i386/kvm.c
-index 94c2339..bfd09bd 100644
---- a/target/i386/kvm.c
-+++ b/target/i386/kvm.c
-@@ -95,6 +95,7 @@ static bool has_msr_hv_stimer;
- static bool has_msr_hv_frequencies;
- static bool has_msr_hv_reenlightenment;
- static bool has_msr_xss;
-+static bool has_msr_umwait;
- static bool has_msr_spec_ctrl;
- static bool has_msr_virt_ssbd;
- static bool has_msr_smi_count;
-@@ -2005,6 +2006,9 @@ static int kvm_get_supported_msrs(KVMState *s)
-             case MSR_IA32_XSS:
-                 has_msr_xss = true;
-                 break;
-+            case MSR_IA32_UMWAIT_CONTROL:
-+                has_msr_umwait = true;
-+                break;
-             case HV_X64_MSR_CRASH_CTL:
-                 has_msr_hv_crash = true;
-                 break;
-@@ -2684,6 +2688,9 @@ static int kvm_put_msrs(X86CPU *cpu, int level)
-     if (has_msr_xss) {
-         kvm_msr_entry_add(cpu, MSR_IA32_XSS, env->xss);
-     }
-+    if (has_msr_umwait) {
-+        kvm_msr_entry_add(cpu, MSR_IA32_UMWAIT_CONTROL, env->umwait);
-+    }
-     if (has_msr_spec_ctrl) {
-         kvm_msr_entry_add(cpu, MSR_IA32_SPEC_CTRL, env->spec_ctrl);
-     }
-@@ -3097,6 +3104,9 @@ static int kvm_get_msrs(X86CPU *cpu)
-     if (has_msr_xss) {
-         kvm_msr_entry_add(cpu, MSR_IA32_XSS, 0);
-     }
-+    if (has_msr_umwait) {
-+        kvm_msr_entry_add(cpu, MSR_IA32_UMWAIT_CONTROL, 0);
-+    }
-     if (has_msr_spec_ctrl) {
-         kvm_msr_entry_add(cpu, MSR_IA32_SPEC_CTRL, 0);
-     }
-@@ -3349,6 +3359,9 @@ static int kvm_get_msrs(X86CPU *cpu)
-         case MSR_IA32_XSS:
-             env->xss = msrs[i].data;
-             break;
-+        case MSR_IA32_UMWAIT_CONTROL:
-+            env->umwait = msrs[i].data;
-+            break;
-         default:
-             if (msrs[i].index >= MSR_MC0_CTL &&
-                 msrs[i].index < MSR_MC0_CTL + (env->mcg_cap & 0xff) * 4) {
-diff --git a/target/i386/machine.c b/target/i386/machine.c
-index 2767b30..6481f84 100644
---- a/target/i386/machine.c
-+++ b/target/i386/machine.c
-@@ -943,6 +943,25 @@ static const VMStateDescription vmstate_xss = {
-     }
- };
- 
-+static bool umwait_needed(void *opaque)
++GSIState *pc_gsi_create(qemu_irq **irqs, bool pci_enabled)
 +{
-+    X86CPU *cpu = opaque;
-+    CPUX86State *env = &cpu->env;
++    GSIState *s;
 +
-+    return env->umwait != 0;
++    s = g_new0(GSIState, 1);
++    if (kvm_ioapic_in_kernel()) {
++        kvm_pc_setup_irq_routing(pci_enabled);
++        *irqs = qemu_allocate_irqs(kvm_pc_gsi_handler, s, GSI_NUM_PINS);
++    } else {
++        *irqs = qemu_allocate_irqs(gsi_handler, s, GSI_NUM_PINS);
++    }
++
++    return s;
 +}
 +
-+static const VMStateDescription vmstate_umwait = {
-+    .name = "cpu/umwait",
-+    .version_id = 1,
-+    .minimum_version_id = 1,
-+    .needed = umwait_needed,
-+    .fields = (VMStateField[]) {
-+        VMSTATE_UINT32(env.umwait, X86CPU),
-+        VMSTATE_END_OF_LIST()
-+    }
-+};
-+
- #ifdef TARGET_X86_64
- static bool pkru_needed(void *opaque)
+ static void ioport80_write(void *opaque, hwaddr addr, uint64_t data,
+                            unsigned size)
  {
-@@ -1391,6 +1410,7 @@ VMStateDescription vmstate_x86_cpu = {
-         &vmstate_msr_hyperv_reenlightenment,
-         &vmstate_avx512,
-         &vmstate_xss,
-+        &vmstate_umwait,
-         &vmstate_tsc_khz,
-         &vmstate_msr_smi_count,
- #ifdef TARGET_X86_64
+diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
+index a86317c..0cc951a 100644
+--- a/hw/i386/pc_piix.c
++++ b/hw/i386/pc_piix.c
+@@ -189,14 +189,7 @@ static void pc_init1(MachineState *machine,
+         xen_load_linux(pcms);
+     }
+ 
+-    gsi_state = g_malloc0(sizeof(*gsi_state));
+-    if (kvm_ioapic_in_kernel()) {
+-        kvm_pc_setup_irq_routing(pcmc->pci_enabled);
+-        x86ms->gsi = qemu_allocate_irqs(kvm_pc_gsi_handler, gsi_state,
+-                                       GSI_NUM_PINS);
+-    } else {
+-        x86ms->gsi = qemu_allocate_irqs(gsi_handler, gsi_state, GSI_NUM_PINS);
+-    }
++    gsi_state = pc_gsi_create(&x86ms->gsi, pcmc->pci_enabled);
+ 
+     if (pcmc->pci_enabled) {
+         pci_bus = i440fx_init(host_type,
+diff --git a/hw/i386/pc_q35.c b/hw/i386/pc_q35.c
+index 75c8caf..255c803 100644
+--- a/hw/i386/pc_q35.c
++++ b/hw/i386/pc_q35.c
+@@ -212,14 +212,7 @@ static void pc_q35_init(MachineState *machine)
+     }
+ 
+     /* irq lines */
+-    gsi_state = g_malloc0(sizeof(*gsi_state));
+-    if (kvm_ioapic_in_kernel()) {
+-        kvm_pc_setup_irq_routing(pcmc->pci_enabled);
+-        x86ms->gsi = qemu_allocate_irqs(kvm_pc_gsi_handler, gsi_state,
+-                                       GSI_NUM_PINS);
+-    } else {
+-        x86ms->gsi = qemu_allocate_irqs(gsi_handler, gsi_state, GSI_NUM_PINS);
+-    }
++    gsi_state = pc_gsi_create(&x86ms->gsi, pcmc->pci_enabled);
+ 
+     /* create pci host bus */
+     q35_host = Q35_HOST_DEVICE(qdev_create(NULL, TYPE_Q35_HOST_DEVICE));
+diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
+index 13c4eac..8c5dc39 100644
+--- a/include/hw/i386/pc.h
++++ b/include/hw/i386/pc.h
+@@ -157,6 +157,8 @@ typedef struct GSIState {
+ 
+ void gsi_handler(void *opaque, int n, int level);
+ 
++GSIState *pc_gsi_create(qemu_irq **irqs, bool pci_enabled);
++
+ /* vmport.c */
+ #define TYPE_VMPORT "vmport"
+ typedef uint32_t (VMPortReadFunc)(void *opaque, uint32_t address);
 -- 
 1.8.3.1
 
