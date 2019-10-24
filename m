@@ -2,58 +2,80 @@ Return-Path: <SRS0=Jnn8=YR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 01D70CA9EAF
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 13:27:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 93D0ECA9EAF
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 13:28:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BBB222084C
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 13:27:41 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BBB222084C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id 60FE42084C
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 13:28:38 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="D4DmuWjB"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 60FE42084C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42598 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42610 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iNd9Q-0002cq-De
-	for qemu-devel@archiver.kernel.org; Thu, 24 Oct 2019 09:27:40 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51431)
+	id 1iNdAL-0004Yo-5g
+	for qemu-devel@archiver.kernel.org; Thu, 24 Oct 2019 09:28:37 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47693)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <yi.l.liu@intel.com>) id 1iNckJ-0005Gq-L3
- for qemu-devel@nongnu.org; Thu, 24 Oct 2019 09:01:45 -0400
+ (envelope-from <armbru@redhat.com>) id 1iNcKg-0003qA-QZ
+ for qemu-devel@nongnu.org; Thu, 24 Oct 2019 08:35:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <yi.l.liu@intel.com>) id 1iNckH-0002Tc-7x
- for qemu-devel@nongnu.org; Thu, 24 Oct 2019 09:01:43 -0400
-Received: from mga11.intel.com ([192.55.52.93]:40489)
+ (envelope-from <armbru@redhat.com>) id 1iNcKf-00068R-2t
+ for qemu-devel@nongnu.org; Thu, 24 Oct 2019 08:35:14 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:57160
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <yi.l.liu@intel.com>) id 1iNckG-0002NX-Ug
- for qemu-devel@nongnu.org; Thu, 24 Oct 2019 09:01:41 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga001.fm.intel.com ([10.253.24.23])
- by fmsmga102.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
- 24 Oct 2019 06:01:39 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.68,224,1569308400"; d="scan'208";a="210156260"
-Received: from iov.bj.intel.com ([10.238.145.67])
- by fmsmga001.fm.intel.com with ESMTP; 24 Oct 2019 06:01:36 -0700
-From: Liu Yi L <yi.l.liu@intel.com>
-To: qemu-devel@nongnu.org, mst@redhat.com, pbonzini@redhat.com,
- alex.williamson@redhat.com, peterx@redhat.com
-Subject: [RFC v2 10/22] intel_iommu: add virtual command capability support
-Date: Thu, 24 Oct 2019 08:34:31 -0400
-Message-Id: <1571920483-3382-11-git-send-email-yi.l.liu@intel.com>
-X-Mailer: git-send-email 2.7.4
-In-Reply-To: <1571920483-3382-1-git-send-email-yi.l.liu@intel.com>
-References: <1571920483-3382-1-git-send-email-yi.l.liu@intel.com>
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 192.55.52.93
+ (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1iNcKe-00067t-Uk
+ for qemu-devel@nongnu.org; Thu, 24 Oct 2019 08:35:13 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1571920512;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=c+207YnY0Ct+qBVy2Eo1y/pQo+gHFJd33LWlUQYqF6E=;
+ b=D4DmuWjBFsN22xU86J+kTpLDYO6bcmG/WrzkYktrndM/T9N+FKsnJS8OQZjOtmW320/I7z
+ bkBJmjxdUGKaHvjttCrtfRJN4qZp6Be4tZEgKx3RS79TxCMzhfoi5SFBsS/rCS2CktchNL
+ M1ptQyAKs3q5jBvku7DixsjiWncImIM=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-226-zQty8r6DMbmdmKaYHv5mbA-1; Thu, 24 Oct 2019 08:35:09 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 45E88801E5F;
+ Thu, 24 Oct 2019 12:35:08 +0000 (UTC)
+Received: from blackfin.pond.sub.org (unknown [10.36.118.123])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id DD4A5413A;
+ Thu, 24 Oct 2019 12:35:07 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id 2B2FB1130344; Thu, 24 Oct 2019 14:34:59 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [RFC PATCH 15/19] qapi: Mark deprecated QMP commands with feature
+ 'deprecated'
+Date: Thu, 24 Oct 2019 14:34:54 +0200
+Message-Id: <20191024123458.13505-16-armbru@redhat.com>
+In-Reply-To: <20191024123458.13505-1-armbru@redhat.com>
+References: <20191024123458.13505-1-armbru@redhat.com>
+MIME-Version: 1.0
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-MC-Unique: zQty8r6DMbmdmKaYHv5mbA-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=WINDOWS-1252
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -65,332 +87,271 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: tianyu.lan@intel.com, kevin.tian@intel.com, yi.l.liu@intel.com,
- Yi Sun <yi.y.sun@linux.intel.com>, kvm@vger.kernel.org, jun.j.tian@intel.com,
- eric.auger@redhat.com, yi.y.sun@intel.com, jacob.jun.pan@linux.intel.com,
- david@gibson.dropbear.id.au
+Cc: libvir-list@redhat.com, mdroth@linux.vnet.ibm.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This patch adds virtual command support to Intel vIOMMU per
-Intel VT-d 3.1 spec. And adds two virtual commands: alloc_pasid
-and free_pasid.
+Add feature 'deprecated' to the deprecated QMP commands, so their
+deprecation becomes visible in output of query-qmp-schema.  Looks like
+this:
 
-Cc: Kevin Tian <kevin.tian@intel.com>
-Cc: Jacob Pan <jacob.jun.pan@linux.intel.com>
-Cc: Peter Xu <peterx@redhat.com>
-Cc: Yi Sun <yi.y.sun@linux.intel.com>
-Signed-off-by: Liu Yi L <yi.l.liu@intel.com>
-Signed-off-by: Yi Sun <yi.y.sun@linux.intel.com>
+    {"name": "query-cpus",
+     "ret-type": "[164]",
+     "meta-type": "command",
+     "arg-type": "0",
+---> "features": ["deprecated"]}
+
+The deprecated commands are change, cpu-add, migrate-set-cache-size,
+migrate_set_downtime, migrate_set_speed, query-cpus, query-events,
+query-migrate-cache-size.
+
+Management applications can use -compat deprecated-input=3D... to set
+policy for these commands.  So far, the only available policy is
+"accept", which doesn't change behavior.  The next few commits will
+provide more interesting policies.
+
+Command deprecation becomes visible in introspection.  Management
+applications could conceivably use this for static checking.
+
+Signed-off-by: Markus Armbruster <armbru@redhat.com>
 ---
- hw/i386/intel_iommu.c          | 162 ++++++++++++++++++++++++++++++++++++++++-
- hw/i386/intel_iommu_internal.h |  38 ++++++++++
- hw/i386/trace-events           |   1 +
- include/hw/i386/intel_iommu.h  |   6 +-
- 4 files changed, 205 insertions(+), 2 deletions(-)
+ qapi/machine.json   | 24 ++++++++++++++----------
+ qapi/migration.json | 36 ++++++++++++++++++++++++------------
+ qapi/misc.json      | 25 +++++++++++++++----------
+ 3 files changed, 53 insertions(+), 32 deletions(-)
 
-diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
-index e9f8692..88b843f 100644
---- a/hw/i386/intel_iommu.c
-+++ b/hw/i386/intel_iommu.c
-@@ -944,6 +944,7 @@ static VTDBus *vtd_find_as_from_bus_num(IntelIOMMUState *s, uint8_t bus_num)
-                 return vtd_bus;
-             }
-         }
-+        vtd_bus = NULL;
-     }
-     return vtd_bus;
- }
-@@ -2590,6 +2591,140 @@ static void vtd_handle_iectl_write(IntelIOMMUState *s)
-     }
- }
- 
-+static int vtd_request_pasid_alloc(IntelIOMMUState *s)
-+{
-+    VTDBus *vtd_bus;
-+    int bus_n, devfn;
-+    IOMMUCTXEventData event_data;
-+    IOMMUCTXPASIDReqDesc req;
-+    VTDIOMMUContext *vtd_ic;
-+
-+    event_data.event = IOMMU_CTX_EVENT_PASID_ALLOC;
-+    event_data.data = &req;
-+    req.min_pasid = VTD_MIN_HPASID;
-+    req.max_pasid = VTD_MAX_HPASID;
-+    req.alloc_result = 0;
-+    event_data.length = sizeof(req);
-+    for (bus_n = 0; bus_n < PCI_BUS_MAX; bus_n++) {
-+        vtd_bus = vtd_find_as_from_bus_num(s, bus_n);
-+        if (!vtd_bus) {
-+            continue;
-+        }
-+        for (devfn = 0; devfn < PCI_DEVFN_MAX; devfn++) {
-+            vtd_ic = vtd_bus->dev_ic[devfn];
-+            if (!vtd_ic) {
-+                continue;
-+            }
-+            iommu_ctx_event_notify(&vtd_ic->iommu_context, &event_data);
-+            if (req.alloc_result > 0) {
-+                return req.alloc_result;
-+            }
-+        }
-+    }
-+    return -1;
-+}
-+
-+static int vtd_request_pasid_free(IntelIOMMUState *s, uint32_t pasid)
-+{
-+    VTDBus *vtd_bus;
-+    int bus_n, devfn;
-+    IOMMUCTXEventData event_data;
-+    IOMMUCTXPASIDReqDesc req;
-+    VTDIOMMUContext *vtd_ic;
-+
-+    event_data.event = IOMMU_CTX_EVENT_PASID_FREE;
-+    event_data.data = &req;
-+    req.pasid = pasid;
-+    req.free_result = 0;
-+    event_data.length = sizeof(req);
-+    for (bus_n = 0; bus_n < PCI_BUS_MAX; bus_n++) {
-+        vtd_bus = vtd_find_as_from_bus_num(s, bus_n);
-+        if (!vtd_bus) {
-+            continue;
-+        }
-+        for (devfn = 0; devfn < PCI_DEVFN_MAX; devfn++) {
-+            vtd_ic = vtd_bus->dev_ic[devfn];
-+            if (!vtd_ic) {
-+                continue;
-+            }
-+            iommu_ctx_event_notify(&vtd_ic->iommu_context, &event_data);
-+            if (req.free_result == 0) {
-+                return 0;
-+            }
-+        }
-+    }
-+    return -1;
-+}
-+
-+/*
-+ * If IP is not set, set it and return 0
-+ * If IP is already set, return -1
-+ */
-+static int vtd_vcmd_rsp_ip_check(IntelIOMMUState *s)
-+{
-+    if (!(s->vccap & VTD_VCCAP_PAS) ||
-+         (s->vcrsp & 1)) {
-+        return -1;
-+    }
-+    s->vcrsp = 1;
-+    vtd_set_quad_raw(s, DMAR_VCRSP_REG,
-+                     ((uint64_t) s->vcrsp));
-+    return 0;
-+}
-+
-+static void vtd_vcmd_clear_ip(IntelIOMMUState *s)
-+{
-+    s->vcrsp &= (~((uint64_t)(0x1)));
-+    vtd_set_quad_raw(s, DMAR_VCRSP_REG,
-+                     ((uint64_t) s->vcrsp));
-+}
-+
-+/* Handle write to Virtual Command Register */
-+static int vtd_handle_vcmd_write(IntelIOMMUState *s, uint64_t val)
-+{
-+    uint32_t pasid;
-+    int ret = -1;
-+
-+    trace_vtd_reg_write_vcmd(s->vcrsp, val);
-+
-+    /*
-+     * Since vCPU should be blocked when the guest VMCD
-+     * write was trapped to here. Should be no other vCPUs
-+     * try to access VCMD if guest software is well written.
-+     * However, we still emulate the IP bit here in case of
-+     * bad guest software. Also align with the spec.
-+     */
-+    ret = vtd_vcmd_rsp_ip_check(s);
-+    if (ret) {
-+        return ret;
-+    }
-+    switch (val & VTD_VCMD_CMD_MASK) {
-+    case VTD_VCMD_ALLOC_PASID:
-+        ret = vtd_request_pasid_alloc(s);
-+        if (ret < 0) {
-+            s->vcrsp |= VTD_VCRSP_SC(VTD_VCMD_NO_AVAILABLE_PASID);
-+        } else {
-+            s->vcrsp |= VTD_VCRSP_RSLT(ret);
-+        }
-+        break;
-+
-+    case VTD_VCMD_FREE_PASID:
-+        pasid = VTD_VCMD_PASID_VALUE(val);
-+        ret = vtd_request_pasid_free(s, pasid);
-+        if (ret < 0) {
-+            s->vcrsp |= VTD_VCRSP_SC(VTD_VCMD_FREE_INVALID_PASID);
-+        }
-+        break;
-+
-+    default:
-+        s->vcrsp |= VTD_VCRSP_SC(VTD_VCMD_UNDEFINED_CMD);
-+        printf("Virtual Command: unsupported command!!!\n");
-+        break;
-+    }
-+    vtd_vcmd_clear_ip(s);
-+    return 0;
-+}
-+
- static uint64_t vtd_mem_read(void *opaque, hwaddr addr, unsigned size)
- {
-     IntelIOMMUState *s = opaque;
-@@ -2879,6 +3014,23 @@ static void vtd_mem_write(void *opaque, hwaddr addr,
-         vtd_set_long(s, addr, val);
-         break;
- 
-+    case DMAR_VCMD_REG:
-+        if (!vtd_handle_vcmd_write(s, val)) {
-+            if (size == 4) {
-+                vtd_set_long(s, addr, val);
-+            } else {
-+                vtd_set_quad(s, addr, val);
-+            }
-+        }
-+        break;
-+
-+    case DMAR_VCMD_REG_HI:
-+        assert(size == 4);
-+        if (!vtd_handle_vcmd_write(s, val)) {
-+            vtd_set_long(s, addr, val);
-+        }
-+        break;
-+
-     default:
-         if (size == 4) {
-             vtd_set_long(s, addr, val);
-@@ -3617,7 +3769,8 @@ static void vtd_init(IntelIOMMUState *s)
-             s->ecap |= VTD_ECAP_SMTS | VTD_ECAP_SRS | VTD_ECAP_SLTS;
-         } else if (!strcmp(s->scalable_mode, "modern")) {
-             s->ecap |= VTD_ECAP_SMTS | VTD_ECAP_SRS | VTD_ECAP_PASID
--                       | VTD_ECAP_FLTS | VTD_ECAP_PSS;
-+                       | VTD_ECAP_FLTS | VTD_ECAP_PSS | VTD_ECAP_VCS;
-+            s->vccap |= VTD_VCCAP_PAS;
-         }
-     }
- 
-@@ -3674,6 +3827,13 @@ static void vtd_init(IntelIOMMUState *s)
-      * Interrupt remapping registers.
-      */
-     vtd_define_quad(s, DMAR_IRTA_REG, 0, 0xfffffffffffff80fULL, 0);
-+
-+    /*
-+     * Virtual Command Definitions
-+     */
-+    vtd_define_quad(s, DMAR_VCCAP_REG, s->vccap, 0, 0);
-+    vtd_define_quad(s, DMAR_VCMD_REG, 0, 0xffffffffffffffffULL, 0);
-+    vtd_define_quad(s, DMAR_VCRSP_REG, 0, 0, 0);
- }
- 
- /* Should not reset address_spaces when reset because devices will still use
-diff --git a/hw/i386/intel_iommu_internal.h b/hw/i386/intel_iommu_internal.h
-index be7b30a..8668771 100644
---- a/hw/i386/intel_iommu_internal.h
-+++ b/hw/i386/intel_iommu_internal.h
-@@ -85,6 +85,12 @@
- #define DMAR_MTRRCAP_REG_HI     0x104
- #define DMAR_MTRRDEF_REG        0x108 /* MTRR default type */
- #define DMAR_MTRRDEF_REG_HI     0x10c
-+#define DMAR_VCCAP_REG          0xE00 /* Virtual Command Capability Register */
-+#define DMAR_VCCAP_REG_HI       0xE04
-+#define DMAR_VCMD_REG           0xE10 /* Virtual Command Register */
-+#define DMAR_VCMD_REG_HI        0xE14
-+#define DMAR_VCRSP_REG          0xE20 /* Virtual Command Reponse Register */
-+#define DMAR_VCRSP_REG_HI       0xE24
- 
- /* IOTLB registers */
- #define DMAR_IOTLB_REG_OFFSET   0xf0 /* Offset to the IOTLB registers */
-@@ -193,6 +199,7 @@
- #define VTD_ECAP_PSS                (19ULL << 35)
- #define VTD_ECAP_PASID              (1ULL << 40)
- #define VTD_ECAP_SMTS               (1ULL << 43)
-+#define VTD_ECAP_VCS                (1ULL << 44)
- #define VTD_ECAP_SLTS               (1ULL << 46)
- #define VTD_ECAP_FLTS               (1ULL << 47)
- 
-@@ -315,6 +322,37 @@ typedef enum VTDFaultReason {
- 
- #define VTD_CONTEXT_CACHE_GEN_MAX       0xffffffffUL
- 
-+/* VCCAP_REG */
-+#define VTD_VCCAP_PAS               (1UL << 0)
-+
-+/*
-+ * The basic idea is to let hypervisor to set a range for available
-+ * PASIDs for VMs. One of the reasons is PASID #0 is reserved by
-+ * RID_PASID usage. We have no idea how many reserved PASIDs in future,
-+ * so here just an evaluated value. Honestly, set it as "1" is enough
-+ * at current stage.
-+ */
-+#define VTD_MIN_HPASID              1
-+#define VTD_MAX_HPASID              0xFFFFF
-+
-+/* Virtual Command Register */
-+enum {
-+     VTD_VCMD_NULL_CMD = 0,
-+     VTD_VCMD_ALLOC_PASID = 1,
-+     VTD_VCMD_FREE_PASID = 2,
-+     VTD_VCMD_CMD_NUM,
-+};
-+
-+#define VTD_VCMD_CMD_MASK           0xffUL
-+#define VTD_VCMD_PASID_VALUE(val)   (((val) >> 8) & 0xfffff)
-+
-+#define VTD_VCRSP_RSLT(val)         ((val) << 8)
-+#define VTD_VCRSP_SC(val)           (((val) & 0x3) << 1)
-+
-+#define VTD_VCMD_UNDEFINED_CMD         1ULL
-+#define VTD_VCMD_NO_AVAILABLE_PASID    2ULL
-+#define VTD_VCMD_FREE_INVALID_PASID    2ULL
-+
- /* Interrupt Entry Cache Invalidation Descriptor: VT-d 6.5.2.7. */
- struct VTDInvDescIEC {
-     uint32_t type:4;            /* Should always be 0x4 */
-diff --git a/hw/i386/trace-events b/hw/i386/trace-events
-index c8bc464..43c0314 100644
---- a/hw/i386/trace-events
-+++ b/hw/i386/trace-events
-@@ -51,6 +51,7 @@ vtd_reg_write_gcmd(uint32_t status, uint32_t val) "status 0x%"PRIx32" value 0x%"
- vtd_reg_write_fectl(uint32_t value) "value 0x%"PRIx32
- vtd_reg_write_iectl(uint32_t value) "value 0x%"PRIx32
- vtd_reg_ics_clear_ip(void) ""
-+vtd_reg_write_vcmd(uint32_t status, uint32_t val) "status 0x%"PRIx32" value 0x%"PRIx32
- vtd_dmar_translate(uint8_t bus, uint8_t slot, uint8_t func, uint64_t iova, uint64_t gpa, uint64_t mask) "dev %02x:%02x.%02x iova 0x%"PRIx64" -> gpa 0x%"PRIx64" mask 0x%"PRIx64
- vtd_dmar_enable(bool en) "enable %d"
- vtd_dmar_fault(uint16_t sid, int fault, uint64_t addr, bool is_write) "sid 0x%"PRIx16" fault %d addr 0x%"PRIx64" write %d"
-diff --git a/include/hw/i386/intel_iommu.h b/include/hw/i386/intel_iommu.h
-index 1c580c1..0d49480 100644
---- a/include/hw/i386/intel_iommu.h
-+++ b/include/hw/i386/intel_iommu.h
-@@ -46,7 +46,7 @@
- #define VTD_SID_TO_BUS(sid)         (((sid) >> 8) & 0xff)
- #define VTD_SID_TO_DEVFN(sid)       ((sid) & 0xff)
- 
--#define DMAR_REG_SIZE               0x230
-+#define DMAR_REG_SIZE               0xF00
- #define VTD_HOST_AW_39BIT           39
- #define VTD_HOST_AW_48BIT           48
- #define VTD_HOST_ADDRESS_WIDTH      VTD_HOST_AW_39BIT
-@@ -282,6 +282,10 @@ struct IntelIOMMUState {
-     uint8_t aw_bits;                /* Host/IOVA address width (in bits) */
-     bool dma_drain;                 /* Whether DMA r/w draining enabled */
- 
-+    /* Virtual Command Register */
-+    uint64_t vccap;                 /* The value of vcmd capability reg */
-+    uint64_t vcrsp;                 /* Current value of VCMD RSP REG */
-+
-     /*
-      * Protects IOMMU states in general.  Currently it protects the
-      * per-IOMMU IOTLB cache, and context entry cache in VTDAddressSpace.
--- 
-2.7.4
+diff --git a/qapi/machine.json b/qapi/machine.json
+index ca26779f1a..3913ef2138 100644
+--- a/qapi/machine.json
++++ b/qapi/machine.json
+@@ -189,6 +189,11 @@
+ # It is recommended to use @query-cpus-fast instead of this command to
+ # avoid the vCPU interruption.
+ #
++# Features:
++# @deprecated: This interface is deprecated (since 2.12.0), and it is
++#     strongly recommended that you avoid using it.  Use
++#     @query-cpus-fast to obtain information about virtual CPUs.
++#
+ # Returns: a list of @CpuInfo for each virtual CPU
+ #
+ # Since: 0.14.0
+@@ -218,12 +223,9 @@
+ #       ]
+ #    }
+ #
+-# Notes: This interface is deprecated (since 2.12.0), and it is strongly
+-#        recommended that you avoid using it. Use @query-cpus-fast to
+-#        obtain information about virtual CPUs.
+-#
+ ##
+-{ 'command': 'query-cpus', 'returns': ['CpuInfo'] }
++{ 'command': 'query-cpus', 'returns': ['CpuInfo'],
++  'features': [ 'deprecated' ] }
+=20
+ ##
+ # @CpuInfoFast:
+@@ -309,21 +311,23 @@
+ #
+ # @id: ID of CPU to be created, valid values [0..max_cpus)
+ #
++# Features:
++# @deprecated: This command is deprecated.  The `device_add` command
++#     should be used instead.  See the `query-hotpluggable-cpus`
++#     command for details.
++#
+ # Returns: Nothing on success
+ #
+ # Since: 1.5
+ #
+-# Note: This command is deprecated.  The `device_add` command should be
+-#       used instead.  See the `query-hotpluggable-cpus` command for
+-#       details.
+-#
+ # Example:
+ #
+ # -> { "execute": "cpu-add", "arguments": { "id": 2 } }
+ # <- { "return": {} }
+ #
+ ##
+-{ 'command': 'cpu-add', 'data': {'id': 'int'} }
++{ 'command': 'cpu-add', 'data': {'id': 'int'},
++  'features': [ 'deprecated' ] }
+=20
+ ##
+ # @MachineInfo:
+diff --git a/qapi/migration.json b/qapi/migration.json
+index 82feb5bd39..a110948bfe 100644
+--- a/qapi/migration.json
++++ b/qapi/migration.json
+@@ -1119,9 +1119,11 @@
+ #
+ # @value: maximum downtime in seconds
+ #
+-# Returns: nothing on success
++# Features:
++# @deprecated: This command is deprecated in favor of
++#     'migrate-set-parameters'.
+ #
+-# Notes: This command is deprecated in favor of 'migrate-set-parameters'
++# Returns: nothing on success
+ #
+ # Since: 0.14.0
+ #
+@@ -1131,7 +1133,8 @@
+ # <- { "return": {} }
+ #
+ ##
+-{ 'command': 'migrate_set_downtime', 'data': {'value': 'number'} }
++{ 'command': 'migrate_set_downtime', 'data': {'value': 'number'},
++  'features': [ 'deprecated' ] }
+=20
+ ##
+ # @migrate_set_speed:
+@@ -1140,9 +1143,11 @@
+ #
+ # @value: maximum speed in bytes per second.
+ #
+-# Returns: nothing on success
++# Features:
++# @deprecated: This command is deprecated in favor of
++#     'migrate-set-parameters'.
+ #
+-# Notes: This command is deprecated in favor of 'migrate-set-parameters'
++# Returns: nothing on success
+ #
+ # Since: 0.14.0
+ #
+@@ -1152,7 +1157,8 @@
+ # <- { "return": {} }
+ #
+ ##
+-{ 'command': 'migrate_set_speed', 'data': {'value': 'int'} }
++{ 'command': 'migrate_set_speed', 'data': {'value': 'int'},
++  'features': [ 'deprecated' ] }
+=20
+ ##
+ # @migrate-set-cache-size:
+@@ -1161,13 +1167,15 @@
+ #
+ # @value: cache size in bytes
+ #
++# Features:
++# @deprecated: This command is deprecated in favor of
++#     'migrate-set-parameters'.
++#
+ # The size will be rounded down to the nearest power of 2.
+ # The cache size can be modified before and during ongoing migration
+ #
+ # Returns: nothing on success
+ #
+-# Notes: This command is deprecated in favor of 'migrate-set-parameters'
+-#
+ # Since: 1.2
+ #
+ # Example:
+@@ -1177,17 +1185,20 @@
+ # <- { "return": {} }
+ #
+ ##
+-{ 'command': 'migrate-set-cache-size', 'data': {'value': 'int'} }
++{ 'command': 'migrate-set-cache-size', 'data': {'value': 'int'},
++  'features': [ 'deprecated' ] }
+=20
+ ##
+ # @query-migrate-cache-size:
+ #
+ # Query migration XBZRLE cache size
+ #
++# Features:
++# @deprecated: This command is deprecated in favor of
++#     'query-migrate-parameters'.
++#
+ # Returns: XBZRLE cache size in bytes
+ #
+-# Notes: This command is deprecated in favor of 'query-migrate-parameters'
+-#
+ # Since: 1.2
+ #
+ # Example:
+@@ -1196,7 +1207,8 @@
+ # <- { "return": 67108864 }
+ #
+ ##
+-{ 'command': 'query-migrate-cache-size', 'returns': 'int' }
++{ 'command': 'query-migrate-cache-size', 'returns': 'int',
++  'features': [ 'deprecated' ] }
+=20
+ ##
+ # @migrate:
+diff --git a/qapi/misc.json b/qapi/misc.json
+index 33b94e3589..abd2e5dc6e 100644
+--- a/qapi/misc.json
++++ b/qapi/misc.json
+@@ -316,13 +316,15 @@
+ #
+ # Return information on QMP events.
+ #
++# Features:
++# @deprecated: This command is deprecated, because its output doesn't
++#     reflect compile-time configuration.  Use query-qmp-schema
++#     instead.
++#
+ # Returns: A list of @EventInfo.
+ #
+ # Since: 1.2.0
+ #
+-# Note: This command is deprecated, because its output doesn't reflect
+-# compile-time configuration.  Use query-qmp-schema instead.
+-#
+ # Example:
+ #
+ # -> { "execute": "query-events" }
+@@ -340,7 +342,8 @@
+ # Note: This example has been shortened as the real response is too long.
+ #
+ ##
+-{ 'command': 'query-events', 'returns': ['EventInfo'] }
++{ 'command': 'query-events', 'returns': ['EventInfo'],
++  'features': [ 'deprecated' ] }
+=20
+ ##
+ # @IOThreadInfo:
+@@ -1074,14 +1077,15 @@
+ #          If @device is 'vnc' and @target is 'password', this is the new =
+VNC
+ #          password to set.  See change-vnc-password for additional notes.
+ #
++# Features:
++# @deprecated: This command is deprecated, and it is strongly
++#     recommended that you avoid using it.  For changing block
++#     devices, use blockdev-change-medium; for changing VNC
++#     parameters, use change-vnc-password.
++#
+ # Returns: Nothing on success.
+ #          If @device is not a valid block device, DeviceNotFound
+ #
+-# Notes:  This interface is deprecated, and it is strongly recommended tha=
+t you
+-#         avoid using it.  For changing block devices, use
+-#         blockdev-change-medium; for changing VNC parameters, use
+-#         change-vnc-password.
+-#
+ # Since: 0.14.0
+ #
+ # Example:
+@@ -1102,7 +1106,8 @@
+ #
+ ##
+ { 'command': 'change',
+-  'data': {'device': 'str', 'target': 'str', '*arg': 'str'} }
++  'data': {'device': 'str', 'target': 'str', '*arg': 'str'},
++  'features': [ 'deprecated' ] }
+=20
+ ##
+ # @xen-set-global-dirty-log:
+--=20
+2.21.0
 
 
