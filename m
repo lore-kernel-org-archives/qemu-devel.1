@@ -2,78 +2,48 @@ Return-Path: <SRS0=Jnn8=YR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 98461CA9EB9
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 03:33:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3AC44CA9EAF
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 04:14:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5D34B20679
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 03:33:08 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kM4wHoCJ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5D34B20679
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 07F532075C
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 04:14:43 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 07F532075C
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ozlabs.ru
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57526 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59094 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iNTs3-0000Bs-8W
-	for qemu-devel@archiver.kernel.org; Wed, 23 Oct 2019 23:33:07 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41107)
+	id 1iNUWJ-0006im-5E
+	for qemu-devel@archiver.kernel.org; Thu, 24 Oct 2019 00:14:43 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42068)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <elohimes@gmail.com>) id 1iNTpl-0006Vd-F6
- for qemu-devel@nongnu.org; Wed, 23 Oct 2019 23:30:46 -0400
+ (envelope-from <aik@ozlabs.ru>) id 1iNUVN-0005o9-JH
+ for qemu-devel@nongnu.org; Thu, 24 Oct 2019 00:13:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <elohimes@gmail.com>) id 1iNTpk-0003ye-3v
- for qemu-devel@nongnu.org; Wed, 23 Oct 2019 23:30:45 -0400
-Received: from mail-qt1-x843.google.com ([2607:f8b0:4864:20::843]:44148)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <elohimes@gmail.com>) id 1iNTpj-0003yE-UG
- for qemu-devel@nongnu.org; Wed, 23 Oct 2019 23:30:44 -0400
-Received: by mail-qt1-x843.google.com with SMTP id z22so15195151qtq.11
- for <qemu-devel@nongnu.org>; Wed, 23 Oct 2019 20:30:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=mcgumC042hamXm29+yyv01VNWxQR+25pIkxpCnBxqjA=;
- b=kM4wHoCJP7GzrQCAQmsWFb8g0+GXQ+NASSj9dUtPIl9EPft0IAhmWqi7Ives1FWviW
- cSAb4rKmbTKKxm0m5JaSa8NRVYqJdLs4mJkrh9Jvvbdj5dZ9P6uLoEJZxkA3bxG8PCEm
- 7tm5heZxFXPX3VCm3MIbTGoDFRzx0y/eiYdKujMd4IZ4MDjeBeJ2uVWZbf5419z0SoWd
- pENoltFiLVOpoY60FWWy1O0iyU83BTQc3ZAnU/47KYTdta5w3F+UUAfc3JgqnjkK0GlF
- 5OXtlW6xNXdTvJyluKh9BwbPUFLEcDMlzhnNcIGmjIBs8td/hCVibfWgaDyqpq6ep6gY
- F8CQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=mcgumC042hamXm29+yyv01VNWxQR+25pIkxpCnBxqjA=;
- b=mFXXaDJ3OPc+sQsoxeKS5AOwePZyQ3YHfdu5gMw/VfUySfCp8sgGvndGmMY+DEVZiW
- kDqT/zwsgeoG+zu0g74XbAA8HJ9UfQgImLBc8GozDEraUxvbBgeKL2ff1DfY7U4/nfdN
- mCsb4hHlBsO8JwI5Y9MyyKdNidD0EBIrlfnDvHy8kBOOQgefw7JBEA/pplEt0arbNMED
- YkDOwQSe8yzcx3B5BmyNuy1gHQGPAtiZDjH/IQKjFqU2Y7ggqn3EEMS9M63SNISV5Dwl
- KDkQFDACO+QCFx1DuXxs2KblCF4ZYYA3UIO7dg7RScvu0+rzP84Ge1Qi5S/XrK6cJ7dN
- Tl0Q==
-X-Gm-Message-State: APjAAAViliCyii4TPwhKnOarCpldjA/+hNf4Lp6r1vWdfZNDKBvRXvgr
- I2ivTlWy8u5+fil9Mpy1M38rYISWArdq0ki6uys=
-X-Google-Smtp-Source: APXvYqwv2OkVLF5eEKJG0Ns0rVUyUA9voZ8QnMQmXb8/qfIgPn9n2vj68B+adzYnJGsJxoujk1ntp3KsJm7MDBO1Iek=
-X-Received: by 2002:ac8:5408:: with SMTP id b8mr1636912qtq.164.1571887843007; 
- Wed, 23 Oct 2019 20:30:43 -0700 (PDT)
-MIME-Version: 1.0
-References: <20191021114017.26011-1-stefanha@redhat.com>
-In-Reply-To: <20191021114017.26011-1-stefanha@redhat.com>
-From: Yongji Xie <elohimes@gmail.com>
-Date: Thu, 24 Oct 2019 11:30:31 +0800
-Message-ID: <CAONzpcYQZ2zL4AvdXD6vbMCsfg72213S8wORSoPiAfQ9vCxxZQ@mail.gmail.com>
-Subject: Re: [PATCH] virtio: notify virtqueue via host notifier when available
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::843
+ (envelope-from <aik@ozlabs.ru>) id 1iNUVL-0007MR-LR
+ for qemu-devel@nongnu.org; Thu, 24 Oct 2019 00:13:44 -0400
+Received: from ozlabs.ru ([107.173.13.209]:48252)
+ by eggs.gnu.org with esmtp (Exim 4.71)
+ (envelope-from <aik@ozlabs.ru>)
+ id 1iNUVL-0007J2-E7; Thu, 24 Oct 2019 00:13:43 -0400
+Received: from fstn1-p1.ozlabs.ibm.com (localhost [IPv6:::1])
+ by ozlabs.ru (Postfix) with ESMTP id 92391AE80026;
+ Thu, 24 Oct 2019 00:12:24 -0400 (EDT)
+From: Alexey Kardashevskiy <aik@ozlabs.ru>
+To: qemu-devel@nongnu.org
+Subject: [PATCH qemu] spapr: Add /choses to FDT only at reset time to preserve
+ kernel and initramdisk
+Date: Thu, 24 Oct 2019 15:13:08 +1100
+Message-Id: <20191024041308.5673-1-aik@ozlabs.ru>
+X-Mailer: git-send-email 2.17.1
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [fuzzy]
+X-Received-From: 107.173.13.209
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -85,106 +55,108 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel <qemu-devel@nongnu.org>,
- Felipe Franciosi <felipe@nutanix.com>
+Cc: Alexey Kardashevskiy <aik@ozlabs.ru>, qemu-ppc@nongnu.org,
+ David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, 21 Oct 2019 at 19:40, Stefan Hajnoczi <stefanha@redhat.com> wrote:
->
-> Host notifiers are used in several cases:
-> 1. Traditional ioeventfd where virtqueue notifications are handled in
->    the main loop thread.
-> 2. IOThreads (aio_handle_output) where virtqueue notifications are
->    handled in an IOThread AioContext.
-> 3. vhost where virtqueue notifications are handled by kernel vhost or
->    a vhost-user device backend.
->
-> Most virtqueue notifications from the guest use the ioeventfd mechanism,
-> but there are corner cases where QEMU code calls virtio_queue_notify().
-> This currently honors the host notifier for the IOThreads
-> aio_handle_output case, but not for the vhost case.  The result is that
-> vhost does not receive virtqueue notifications from QEMU when
-> virtio_queue_notify() is called.
->
-> This patch extends virtio_queue_notify() to set the host notifier
-> whenever it is enabled instead of calling the vq->(aio_)handle_output()
-> function directly.
->
-> This fixes the vhost case although it does add a trip through the
-> eventfd for the traditional ioeventfd case.  I don't think it's worth
-> adding a fast path for the traditional ioeventfd case because calling
-> virtio_queue_notify() is rare when ioeventfd is enabled.
->
-> Reported-by: Felipe Franciosi <felipe@nutanix.com>
-> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
-> ---
-> Felipe and Yongji: Only tested with "make check".  Please try
-> vhost-user-scsi/blk and let us know if it fixes the issue.
->
+Since "spapr: Render full FDT on ibm,client-architecture-support" we build
+the entire flatten device tree (FDT) twice - at the reset time and
+when "ibm,client-architecture-support" (CAS) is called. The full FDT from
+CAS is then applied on top of the SLOF internal device tree.
 
-I can see the vhost-user-blk issue is fixed by this patch after the
-below patch applied:
+This is mostly ok, however there is a case when the QEMU is started with
+-initrd and for some reason the guest decided to move/unpack the init RAM
+disk image - the guest correctly notifies SLOF about the change but
+at CAS it is overridden with the QEMU initial location addresses and
+the guest may fail to boot if the original initrd memory was changed.
 
-diff --git a/hw/virtio/vhost-user-blk-pci.c b/hw/virtio/vhost-user-blk-pci.c
-index 1dc834a..a32a439 100644
---- a/hw/virtio/vhost-user-blk-pci.c
-+++ b/hw/virtio/vhost-user-blk-pci.c
-@@ -46,6 +46,8 @@ static Property vhost_user_blk_pci_properties[] = {
-     DEFINE_PROP_UINT32("class", VirtIOPCIProxy, class_code, 0),
-     DEFINE_PROP_UINT32("vectors", VirtIOPCIProxy, nvectors,
-                        DEV_NVECTORS_UNSPECIFIED),
-+    DEFINE_PROP_BIT("ioeventfd", VirtIOPCIProxy, flags,
-+                    VIRTIO_PCI_FLAG_USE_IOEVENTFD_BIT, true),
-     DEFINE_PROP_END_OF_LIST(),
- };
+This fixes the problem by only adding the /chosen node at the reset time
+to prevent the original QEMU's linux,initrd-start/linux,initrd-end to
+override the updated addresses.
 
->  include/hw/virtio/virtio-bus.h | 7 +++++++
->  hw/virtio/virtio.c             | 4 +++-
->  2 files changed, 10 insertions(+), 1 deletion(-)
->
-> diff --git a/include/hw/virtio/virtio-bus.h b/include/hw/virtio/virtio-bus.h
-> index 38c9399cd4..28ca51cb4c 100644
-> --- a/include/hw/virtio/virtio-bus.h
-> +++ b/include/hw/virtio/virtio-bus.h
-> @@ -139,6 +139,13 @@ static inline VirtIODevice *virtio_bus_get_device(VirtioBusState *bus)
->
->  /* Return whether the proxy allows ioeventfd.  */
->  bool virtio_bus_ioeventfd_enabled(VirtioBusState *bus);
-> +
-> +/* Return whether ioeventfd has been started. */
-> +static inline bool virtio_bus_ioeventfd_started(VirtioBusState *bus)
-> +{
-> +    return bus->ioeventfd_started;
-> +}
-> +
->  /* Start the ioeventfd. */
->  int virtio_bus_start_ioeventfd(VirtioBusState *bus);
->  /* Stop the ioeventfd. */
-> diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
-> index 527df03bfd..abdcec00cd 100644
-> --- a/hw/virtio/virtio.c
-> +++ b/hw/virtio/virtio.c
-> @@ -1567,6 +1567,8 @@ static void virtio_queue_notify_vq(VirtQueue *vq)
->
->  void virtio_queue_notify(VirtIODevice *vdev, int n)
->  {
-> +    BusState *qbus = qdev_get_parent_bus(DEVICE(vdev));
-> +    VirtioBusState *vbus = VIRTIO_BUS(qbus);
->      VirtQueue *vq = &vdev->vq[n];
->
->      if (unlikely(!vq->vring.desc || vdev->broken)) {
-> @@ -1574,7 +1576,7 @@ void virtio_queue_notify(VirtIODevice *vdev, int n)
->      }
->
->      trace_virtio_queue_notify(vdev, vq - vdev->vq, vq);
-> -    if (vq->handle_aio_output) {
-> +    if (virtio_bus_ioeventfd_started(vbus)) {
+This only treats /chosen differently as we know there is a special case
+already and it is unlikely anything else will need to change /chosen at CAS
+we are better off not touching /chosen after we handed it over to SLOF.
 
-Need to check whether vq->host_notifier is valid or not here.
-Otherwise, it could break the ctrl_vq in vhost_net device.
+Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
+---
+ hw/ppc/spapr.c | 25 +++++++++++++++----------
+ 1 file changed, 15 insertions(+), 10 deletions(-)
 
-Thanks,
-Yongji
+diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+index d4c07a9b1bab..0580789a1509 100644
+--- a/hw/ppc/spapr.c
++++ b/hw/ppc/spapr.c
+@@ -925,7 +925,7 @@ static bool spapr_hotplugged_dev_before_cas(void)
+     return false;
+ }
+ 
+-static void *spapr_build_fdt(SpaprMachineState *spapr);
++static void *spapr_build_fdt(SpaprMachineState *spapr, bool reset);
+ 
+ int spapr_h_cas_compose_response(SpaprMachineState *spapr,
+                                  target_ulong addr, target_ulong size,
+@@ -947,7 +947,7 @@ int spapr_h_cas_compose_response(SpaprMachineState *spapr,
+ 
+     size -= sizeof(hdr);
+ 
+-    fdt = spapr_build_fdt(spapr);
++    fdt = spapr_build_fdt(spapr, false);
+     _FDT((fdt_pack(fdt)));
+ 
+     if (fdt_totalsize(fdt) + sizeof(hdr) > size) {
+@@ -1205,7 +1205,7 @@ static void spapr_dt_hypervisor(SpaprMachineState *spapr, void *fdt)
+     }
+ }
+ 
+-static void *spapr_build_fdt(SpaprMachineState *spapr)
++static void *spapr_build_fdt(SpaprMachineState *spapr, bool reset)
+ {
+     MachineState *machine = MACHINE(spapr);
+     MachineClass *mc = MACHINE_GET_CLASS(machine);
+@@ -1305,7 +1305,9 @@ static void *spapr_build_fdt(SpaprMachineState *spapr)
+     spapr_dt_rtas(spapr, fdt);
+ 
+     /* /chosen */
+-    spapr_dt_chosen(spapr, fdt);
++    if (reset) {
++        spapr_dt_chosen(spapr, fdt);
++    }
+ 
+     /* /hypervisor */
+     if (kvm_enabled()) {
+@@ -1313,11 +1315,14 @@ static void *spapr_build_fdt(SpaprMachineState *spapr)
+     }
+ 
+     /* Build memory reserve map */
+-    if (spapr->kernel_size) {
+-        _FDT((fdt_add_mem_rsv(fdt, KERNEL_LOAD_ADDR, spapr->kernel_size)));
+-    }
+-    if (spapr->initrd_size) {
+-        _FDT((fdt_add_mem_rsv(fdt, spapr->initrd_base, spapr->initrd_size)));
++    if (reset) {
++        if (spapr->kernel_size) {
++            _FDT((fdt_add_mem_rsv(fdt, KERNEL_LOAD_ADDR, spapr->kernel_size)));
++        }
++        if (spapr->initrd_size) {
++            _FDT((fdt_add_mem_rsv(fdt, spapr->initrd_base,
++                                  spapr->initrd_size)));
++        }
+     }
+ 
+     /* ibm,client-architecture-support updates */
+@@ -1726,7 +1731,7 @@ static void spapr_machine_reset(MachineState *machine)
+      */
+     fdt_addr = MIN(spapr->rma_size, RTAS_MAX_ADDR) - FDT_MAX_SIZE;
+ 
+-    fdt = spapr_build_fdt(spapr);
++    fdt = spapr_build_fdt(spapr, true);
+ 
+     rc = fdt_pack(fdt);
+ 
+-- 
+2.17.1
+
 
