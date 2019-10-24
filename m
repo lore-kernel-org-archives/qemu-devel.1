@@ -2,59 +2,78 @@ Return-Path: <SRS0=Jnn8=YR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 51C08CA9EAF
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 17:35:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 99244CA9EAF
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 17:35:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 28D96205C9
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 17:35:23 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 28D96205C9
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=users.sourceforge.jp
+	by mail.kernel.org (Postfix) with ESMTPS id 64A44205C9
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 17:35:39 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OVkBbmp9"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 64A44205C9
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48882 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48888 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iNh17-0000yy-Fd
-	for qemu-devel@archiver.kernel.org; Thu, 24 Oct 2019 13:35:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58740)
+	id 1iNh1O-0001JQ-FO
+	for qemu-devel@archiver.kernel.org; Thu, 24 Oct 2019 13:35:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38134)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <ysato@users.sourceforge.jp>) id 1iNg1R-0005bh-Gq
- for qemu-devel@nongnu.org; Thu, 24 Oct 2019 12:31:41 -0400
+ (envelope-from <eperezma@redhat.com>) id 1iNghV-0002cd-O8
+ for qemu-devel@nongnu.org; Thu, 24 Oct 2019 13:15:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <ysato@users.sourceforge.jp>) id 1iNg1P-000224-Ho
- for qemu-devel@nongnu.org; Thu, 24 Oct 2019 12:31:37 -0400
-Received: from mail02.asahi-net.or.jp ([202.224.55.14]:38005)
- by eggs.gnu.org with esmtp (Exim 4.71)
- (envelope-from <ysato@users.sourceforge.jp>) id 1iNg1L-00020T-LJ
- for qemu-devel@nongnu.org; Thu, 24 Oct 2019 12:31:34 -0400
-Received: from h61-195-96-97.vps.ablenet.jp (h61-195-96-97.ablenetvps.ne.jp
- [61.195.96.97]) (Authenticated sender: PQ4Y-STU)
- by mail02.asahi-net.or.jp (Postfix) with ESMTPA id EFA8673821;
- Fri, 25 Oct 2019 01:31:25 +0900 (JST)
-Received: from yo-satoh-debian.ysato.ml (ZM005235.ppp.dion.ne.jp [222.8.5.235])
- by h61-195-96-97.vps.ablenet.jp (Postfix) with ESMTPSA id C4FD124008E;
- Fri, 25 Oct 2019 01:31:24 +0900 (JST)
-Date: Fri, 25 Oct 2019 01:31:19 +0900
-Message-ID: <875zkeqf54.wl-ysato@users.sourceforge.jp>
-From: Yoshinori Sato <ysato@users.sourceforge.jp>
+ (envelope-from <eperezma@redhat.com>) id 1iNghU-00023Y-OM
+ for qemu-devel@nongnu.org; Thu, 24 Oct 2019 13:15:05 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:42493
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <eperezma@redhat.com>) id 1iNghU-00023O-LQ
+ for qemu-devel@nongnu.org; Thu, 24 Oct 2019 13:15:04 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1571937304;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=QHi/ZcZkuogsRdwJr7LU741XrjKiy2gJElKC2Qe6S0E=;
+ b=OVkBbmp9bdPHTi8VUfOHOGnKYXT928/IptIFmlUqyVKFP9qQbqFUDRLXrKK0N4tsC4OvmB
+ ItTYU5qXIUthAwXJG3Sn8L+j/7fJvQ2UVwq16sKcUAI8n0h46441doXWeTYxf8CRiQ2q2n
+ GG08GP3vLQFSZntGCR7xAcLwrCpNTFI=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-143-YEA7LjBPM6G2_I9af-Bt7A-1; Thu, 24 Oct 2019 13:15:00 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C9B54107AD31;
+ Thu, 24 Oct 2019 17:14:59 +0000 (UTC)
+Received: from eperezma.remote.csb (ovpn-116-206.ams2.redhat.com
+ [10.36.116.206])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 5CB9E61F21;
+ Thu, 24 Oct 2019 17:14:50 +0000 (UTC)
+From: =?UTF-8?q?Eugenio=20P=C3=A9rez?= <eperezma@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: Re: [PATCH v26 00/21] Add RX archtecture support
-In-Reply-To: <20191014115757.51866-1-ysato@users.sourceforge.jp>
-References: <20191014115757.51866-1-ysato@users.sourceforge.jp>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM/1.14.9 (=?ISO-8859-4?Q?Goj=F2?=) APEL/10.8 EasyPG/1.0.0 Emacs/26
- (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=ISO-8859-1
+Subject: [PATCH v6 8/9] virtio: add some rcu comments
+Date: Thu, 24 Oct 2019 19:14:05 +0200
+Message-Id: <20191024171406.12504-9-eperezma@redhat.com>
+In-Reply-To: <20191024171406.12504-1-eperezma@redhat.com>
+References: <20191024171406.12504-1-eperezma@redhat.com>
+MIME-Version: 1.0
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-MC-Unique: YEA7LjBPM6G2_I9af-Bt7A-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 202.224.55.14
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -66,170 +85,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: philmd@redhat.com
+Cc: Kevin Wolf <kwolf@redhat.com>, Laurent Vivier <lvivier@redhat.com>,
+ qemu-block@nongnu.org, Amit Shah <amit@kernel.org>,
+ Jason Wang <jasowang@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>,
+ Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
+ Fam Zheng <fam@euphon.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, 14 Oct 2019 20:57:36 +0900,
+Signed-off-by: Eugenio P=C3=A9rez <eperezma@redhat.com>
+---
+ hw/virtio/virtio.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-Ping.
+diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
+index 3cf12a62c0..9195b08da8 100644
+--- a/hw/virtio/virtio.c
++++ b/hw/virtio/virtio.c
+@@ -278,6 +278,7 @@ static void vring_packed_flags_write(VirtIODevice *vdev=
+,
+     address_space_cache_invalidate(cache, off, sizeof(flags));
+ }
+=20
++/* Called within rcu_read_lock().  */
+ static VRingMemoryRegionCaches *vring_get_region_caches(struct VirtQueue *=
+vq)
+ {
+     VRingMemoryRegionCaches *caches =3D atomic_rcu_read(&vq->vring.caches)=
+;
+@@ -721,7 +722,6 @@ bool virtqueue_rewind(VirtQueue *vq, unsigned int num)
+     return true;
+ }
+=20
+-/* Called within rcu_read_lock().  */
+ static void virtqueue_split_fill(VirtQueue *vq, const VirtQueueElement *el=
+em,
+                     unsigned int len, unsigned int idx)
+ {
+@@ -780,6 +780,7 @@ static void virtqueue_packed_fill_desc(VirtQueue *vq,
+     vring_packed_desc_write(vq->vdev, &desc, &caches->desc, head, strict_o=
+rder);
+ }
+=20
++/* Called within rcu_read_lock().  */
+ void virtqueue_fill(VirtQueue *vq, const VirtQueueElement *elem,
+                     unsigned int len, unsigned int idx)
+ {
+--=20
+2.16.5
 
-Yoshinori Sato wrote:
->=20
-> Hello.
-> This patch series is added Renesas RX target emulation.
->=20
-> Changes for v25.
-> Update commit message.
-> Squashed qapi/machine.json changes.
->=20
-> Changes for v24.
-> Add note for qapi/machine.json.
-> Added Acked-by for 6/22.
-> git rebase master.
->=20
-> Changes for v23.
-> Follow master changes.
->=20
-> Changes for v22.
-> Added some include.
->=20
-> Changes for v21.
-> rebase latest master.
-> Remove unneeded hmp_info_tlb.
->=20
-> Chanegs for v20.
-> Reorderd patches.
-> Squashed v19 changes.
->=20
-> Changes for v19.
-> Follow tcg changes.
-> Cleanup cpu.c.
-> simplify rx_cpu_class_by_name and rx_load_image move to rx-virt.
->=20
-> My git repository is bellow.
-> git://git.pf.osdn.net/gitroot/y/ys/ysato/qemu.git tags/rx-20190912
->=20
-> Testing binaries bellow.
-> u-boot
-> Download - https://osdn.net/users/ysato/pf/qemu/dl/u-boot.bin.gz
->=20
-> starting
-> $ gzip -d u-boot.bin.gz
-> $ qemu-system-rx -bios u-boot.bin
->=20
-> linux and pico-root (only sash)
-> Download - https://osdn.net/users/ysato/pf/qemu/dl/zImage (kernel)
->            https://osdn.net/users/ysato/pf/qemu/dl/rx-qemu.dtb (DeviceTre=
-e)
->=20
-> starting
-> $ qemu-system-rx -kernel zImage -dtb rx-qemu.dtb -append "earlycon"
->=20
-> Philippe Mathieu-Daud=E9 (3):
->   hw/registerfields.h: Add 8bit and 16bit register macros
->   hw/rx: Restrict the RX62N microcontroller to the RX62N CPU core
->   BootLinuxConsoleTest: Test the RX-Virt machine
->=20
-> Richard Henderson (7):
->   target/rx: Disassemble rx_index_addr into a string
->   target/rx: Replace operand with prt_ldmi in disassembler
->   target/rx: Use prt_ldmi for XCHG_mr disassembly
->   target/rx: Emit all disassembly in one prt()
->   target/rx: Collect all bytes during disassembly
->   target/rx: Dump bytes for each insn during disassembly
->   hw/rx: Honor -accel qtest
->=20
-> Yoshinori Sato (11):
->   MAINTAINERS: Add RX
->   qemu/bitops.h: Add extract8 and extract16
->   target/rx: TCG translation
->   target/rx: TCG helper
->   target/rx: CPU definition
->   target/rx: RX disassembler
->   hw/intc: RX62N interrupt controller (ICUa)
->   hw/timer: RX62N internal timer modules
->   hw/char: RX62N serial communication interface (SCI)
->   hw/rx: RX Target hardware definition
->   Add rx-softmmu
->=20
->  configure                              |    8 +
->  default-configs/rx-softmmu.mak         |    3 +
->  qapi/machine.json                      |    3 +-
->  include/disas/dis-asm.h                |    5 +
->  include/exec/poison.h                  |    1 +
->  include/hw/char/renesas_sci.h          |   45 +
->  include/hw/intc/rx_icu.h               |   56 +
->  include/hw/registerfields.h            |   32 +-
->  include/hw/rx/rx.h                     |    7 +
->  include/hw/rx/rx62n.h                  |   91 +
->  include/hw/timer/renesas_cmt.h         |   38 +
->  include/hw/timer/renesas_tmr.h         |   53 +
->  include/qemu/bitops.h                  |   38 +
->  include/sysemu/arch_init.h             |    1 +
->  target/rx/cpu-param.h                  |   31 +
->  target/rx/cpu-qom.h                    |   42 +
->  target/rx/cpu.h                        |  181 ++
->  target/rx/helper.h                     |   31 +
->  arch_init.c                            |    2 +
->  hw/char/renesas_sci.c                  |  343 ++++
->  hw/intc/rx_icu.c                       |  379 ++++
->  hw/rx/rx-virt.c                        |  135 ++
->  hw/rx/rx62n.c                          |  247 +++
->  hw/timer/renesas_cmt.c                 |  278 +++
->  hw/timer/renesas_tmr.c                 |  458 +++++
->  target/rx/cpu.c                        |  217 +++
->  target/rx/disas.c                      | 1446 ++++++++++++++
->  target/rx/gdbstub.c                    |  112 ++
->  target/rx/helper.c                     |  149 ++
->  target/rx/op_helper.c                  |  470 +++++
->  target/rx/translate.c                  | 2432 ++++++++++++++++++++++++
->  tests/machine-none-test.c              |    1 +
->  MAINTAINERS                            |   19 +
->  hw/Kconfig                             |    1 +
->  hw/char/Kconfig                        |    3 +
->  hw/char/Makefile.objs                  |    1 +
->  hw/intc/Kconfig                        |    3 +
->  hw/intc/Makefile.objs                  |    1 +
->  hw/rx/Kconfig                          |   14 +
->  hw/rx/Makefile.objs                    |    2 +
->  hw/timer/Kconfig                       |    6 +
->  hw/timer/Makefile.objs                 |    3 +
->  target/rx/Makefile.objs                |   11 +
->  target/rx/insns.decode                 |  621 ++++++
->  tests/acceptance/boot_linux_console.py |   46 +
->  45 files changed, 8064 insertions(+), 2 deletions(-)
->  create mode 100644 default-configs/rx-softmmu.mak
->  create mode 100644 include/hw/char/renesas_sci.h
->  create mode 100644 include/hw/intc/rx_icu.h
->  create mode 100644 include/hw/rx/rx.h
->  create mode 100644 include/hw/rx/rx62n.h
->  create mode 100644 include/hw/timer/renesas_cmt.h
->  create mode 100644 include/hw/timer/renesas_tmr.h
->  create mode 100644 target/rx/cpu-param.h
->  create mode 100644 target/rx/cpu-qom.h
->  create mode 100644 target/rx/cpu.h
->  create mode 100644 target/rx/helper.h
->  create mode 100644 hw/char/renesas_sci.c
->  create mode 100644 hw/intc/rx_icu.c
->  create mode 100644 hw/rx/rx-virt.c
->  create mode 100644 hw/rx/rx62n.c
->  create mode 100644 hw/timer/renesas_cmt.c
->  create mode 100644 hw/timer/renesas_tmr.c
->  create mode 100644 target/rx/cpu.c
->  create mode 100644 target/rx/disas.c
->  create mode 100644 target/rx/gdbstub.c
->  create mode 100644 target/rx/helper.c
->  create mode 100644 target/rx/op_helper.c
->  create mode 100644 target/rx/translate.c
->  create mode 100644 hw/rx/Kconfig
->  create mode 100644 hw/rx/Makefile.objs
->  create mode 100644 target/rx/Makefile.objs
->  create mode 100644 target/rx/insns.decode
->=20
-> --=20
-> 2.20.1
->=20
->=20
 
