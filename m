@@ -7,71 +7,71 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BDA84CA9EAF
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 09:42:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B7431CA9EAF
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 09:42:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8857420684
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 09:42:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6EA9A20684
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 09:42:42 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="CLRwokvA"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8857420684
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="E23NGreU"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6EA9A20684
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36870 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36882 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iNZdF-0006Ep-Fj
-	for qemu-devel@archiver.kernel.org; Thu, 24 Oct 2019 05:42:13 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44237)
+	id 1iNZdh-0007EE-2R
+	for qemu-devel@archiver.kernel.org; Thu, 24 Oct 2019 05:42:41 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44043)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jag.raman@oracle.com>) id 1iNZA1-0000uU-Fn
- for qemu-devel@nongnu.org; Thu, 24 Oct 2019 05:12:02 -0400
+ (envelope-from <jag.raman@oracle.com>) id 1iNZ9d-0008Qz-4d
+ for qemu-devel@nongnu.org; Thu, 24 Oct 2019 05:11:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jag.raman@oracle.com>) id 1iNZ9z-00052e-KE
- for qemu-devel@nongnu.org; Thu, 24 Oct 2019 05:12:01 -0400
-Received: from userp2120.oracle.com ([156.151.31.85]:33590)
+ (envelope-from <jag.raman@oracle.com>) id 1iNZ9b-0004lS-7H
+ for qemu-devel@nongnu.org; Thu, 24 Oct 2019 05:11:36 -0400
+Received: from aserp2120.oracle.com ([141.146.126.78]:60738)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <jag.raman@oracle.com>)
- id 1iNZ9y-00051r-UJ
- for qemu-devel@nongnu.org; Thu, 24 Oct 2019 05:11:59 -0400
-Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
- by userp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x9O94MZL094876;
- Thu, 24 Oct 2019 09:11:53 GMT
+ id 1iNZ9a-0004kr-Tg
+ for qemu-devel@nongnu.org; Thu, 24 Oct 2019 05:11:35 -0400
+Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
+ by aserp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x9O94MZv099572;
+ Thu, 24 Oct 2019 09:11:29 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
  h=from : to : cc :
  subject : date : message-id : in-reply-to : references : in-reply-to :
  references; s=corp-2019-08-05;
- bh=N8PJ1VFLIRV6XErZ+8XozqEUwrGNVhMsDzQHeeVf7e8=;
- b=CLRwokvAAFypNPmna/GjuHSF2ECutc/tmUMIZRK43SVh9Kq3QCMG2FkqkEsgbdnBuSJC
- gjgBExn3nYQMX6F3U9PqbOGotR7rCDHKhoqZitEfdo3apIYl0VmM28PG2dqPoYexdv6p
- ZKirPeyPnWMAOSbf2kL+ZWEf0DoyvZI1EpOvEof7PLdvVT7IGBpqaNqNrKXOvRdJVDf7
- Hh8AneCpqdyQ5kgY+q3gyxmYzkUEs7V5yvh6J/UEIKioXqjHpNSGYU1PkBSP63SGlXtP
- qScpvEWuM284KTL7AxcdS8JlMHTZf3anVVteZ+pph50E7uUYTiEVMcX83DcTv/mopplf Aw== 
-Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
- by userp2120.oracle.com with ESMTP id 2vqu4r24t4-1
+ bh=isX1KAndj6ulSnNqa6bQoDEYVpd7UGNGOW9edca/S74=;
+ b=E23NGreUKUTLzPI0U1Z7zVOfn4B9I+n1rF+U/zHeAYiEWqk9UbkJUHQEDCwSNcWy2DJe
+ oLDz226cvZqL5pxDMBYZqbuMn8dazP5ivQHymb9wMqsZ9at7CEqGUZ312nmQcw7UAvn2
+ dKWVp6MKYF/PpewMoof1KU4VWRy1ZwLYCeO0lqrTwkeOpiFZat0CL+AklZuAM9NHTIFM
+ 1d4eNgZ+ah0Yz7Te39k2SH/HKolaOdG+LURxsOFgkZ0Uci9EikjI/lXxSIOOeT8atkqY
+ 4xz3wqqNPy3XpZM2F3clqbn7PX3GGsV0r96eGmUicmHZp/jqmwXzUVLRR0ovWbW9mtCp Dg== 
+Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
+ by aserp2120.oracle.com with ESMTP id 2vqteq2ajg-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Thu, 24 Oct 2019 09:11:52 +0000
-Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
- by userp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x9O98jLj076057;
- Thu, 24 Oct 2019 09:11:52 GMT
-Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
- by userp3030.oracle.com with ESMTP id 2vtjkj30sy-1
+ Thu, 24 Oct 2019 09:11:29 +0000
+Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
+ by aserp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x9O98Mrl047226;
+ Thu, 24 Oct 2019 09:11:29 GMT
+Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
+ by aserp3020.oracle.com with ESMTP id 2vu0fnu8ct-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Thu, 24 Oct 2019 09:11:52 +0000
+ Thu, 24 Oct 2019 09:11:29 +0000
 Received: from abhmp0008.oracle.com (abhmp0008.oracle.com [141.146.116.14])
- by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id x9O9BpZP024555;
- Thu, 24 Oct 2019 09:11:51 GMT
+ by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id x9O9BSCm002614;
+ Thu, 24 Oct 2019 09:11:28 GMT
 Received: from jaraman-bur-1.us.oracle.com (/10.152.33.39)
  by default (Oracle Beehive Gateway v4.0)
- with ESMTP ; Thu, 24 Oct 2019 02:11:50 -0700
+ with ESMTP ; Thu, 24 Oct 2019 02:11:28 -0700
 From: Jagannathan Raman <jag.raman@oracle.com>
 To: qemu-devel@nongnu.org
-Subject: [RFC v4 PATCH 44/49] multi-process/mig: refactor runstate_check into
- common file
-Date: Thu, 24 Oct 2019 05:09:25 -0400
-Message-Id: <ee0c69c6f3c80bba6646260f92f4c4d8176f0a54.1571905346.git.jag.raman@oracle.com>
+Subject: [RFC v4 PATCH 37/49] multi-process/mon: Refactor monitor/chardev
+ functions out of vl.c
+Date: Thu, 24 Oct 2019 05:09:18 -0400
+Message-Id: <0dd799b9be18a4ad4c888b403fee3f823516ee45.1571905346.git.jag.raman@oracle.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <cover.1571905346.git.jag.raman@oracle.com>
 References: <cover.1571905346.git.jag.raman@oracle.com>
@@ -93,7 +93,7 @@ X-Proofpoint-Spam-Details: rule=notspam policy=default score=0
  classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1908290000
  definitions=main-1910240089
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
-X-Received-From: 156.151.31.85
+X-Received-From: 141.146.126.78
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -116,151 +116,382 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Elena Ufimtseva <elena.ufimtseva@oracle.com>
-
-runstate_check file is refactored into vl-parse.c
+Some of the initialization helper functions w.r.t monitor & chardev
+in vl.c are also used by the remote process. Therefore, these functions
+are refactored into shared files that both QEMU & remote process
+could use.
 
 Signed-off-by: Elena Ufimtseva <elena.ufimtseva@oracle.com>
 Signed-off-by: John G Johnson <john.g.johnson@oracle.com>
 Signed-off-by: Jagannathan Raman <jag.raman@oracle.com>
 ---
- New patch in v4
+ New patch in v3
 
- Makefile.objs             |  2 ++
- include/sysemu/runstate.h |  2 ++
- runstate.c                | 36 ++++++++++++++++++++++++++++++++++++
- stubs/runstate-check.c    |  3 +++
- vl-parse.c                |  1 -
- vl.c                      | 10 ----------
- 6 files changed, 43 insertions(+), 11 deletions(-)
- create mode 100644 runstate.c
+ v3 -> v4
+   - Moved monitor related functions to monitor.c and chardev functions
+     to char.c
 
-diff --git a/Makefile.objs b/Makefile.objs
-index ebb1938..66fbee0 100644
---- a/Makefile.objs
-+++ b/Makefile.objs
-@@ -38,6 +38,7 @@ remote-pci-obj-$(CONFIG_MPQEMU) += blockdev.o
- remote-pci-obj-$(CONFIG_MPQEMU) += qdev-monitor.o
- remote-pci-obj-$(CONFIG_MPQEMU) += bootdevice.o
- remote-pci-obj-$(CONFIG_MPQEMU) += iothread.o
-+remote-pci-obj-$(CONFIG_MPQEMU) += runstate.o
+ chardev/char.c            | 14 ++++++++
+ include/chardev/char.h    |  1 +
+ include/monitor/monitor.h |  2 ++
+ monitor/monitor.c         | 83 +++++++++++++++++++++++++++++++++++++++++-
+ remote/remote-main.c      |  1 +
+ remote/remote-opts.c      |  1 +
+ vl-parse.c                | 35 +++++++++---------
+ vl.c                      | 91 -----------------------------------------------
+ 8 files changed, 119 insertions(+), 109 deletions(-)
+
+diff --git a/chardev/char.c b/chardev/char.c
+index 7b6b2cb..9f339ec 100644
+--- a/chardev/char.c
++++ b/chardev/char.c
+@@ -1168,4 +1168,18 @@ static void register_types(void)
+     qemu_add_machine_init_done_notifier(&chardev_machine_done_notify);
+ }
  
- ##############################################################
- # remote-lsi-obj-y is code used to implement remote LSI device
-@@ -111,6 +112,7 @@ qemu-seccomp.o-libs := $(SECCOMP_LIBS)
- common-obj-$(CONFIG_FDT) += device_tree.o
- 
- common-obj-y += vl-parse.o
-+common-obj-y += runstate.o
- 
- remote-pci-obj-$(CONFIG_MPQEMU) += net/
- 
-diff --git a/include/sysemu/runstate.h b/include/sysemu/runstate.h
-index 0b41555..e89ebf8 100644
---- a/include/sysemu/runstate.h
-+++ b/include/sysemu/runstate.h
-@@ -4,6 +4,8 @@
- #include "qapi/qapi-types-run-state.h"
- #include "qemu/notify.h"
- 
-+extern RunState current_run_state;
-+
- bool runstate_check(RunState state);
- void runstate_set(RunState new_state);
- int runstate_is_running(void);
-diff --git a/runstate.c b/runstate.c
-new file mode 100644
-index 0000000..273345a
---- /dev/null
-+++ b/runstate.c
-@@ -0,0 +1,36 @@
-+/*
-+ * Copyright (c) 2003-2008 Fabrice Bellard
-+ *
-+ * Permission is hereby granted, free of charge, to any person obtaining a copy
-+ * of this software and associated documentation files (the "Software"), to deal
-+ * in the Software without restriction, including without limitation the rights
-+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-+ * copies of the Software, and to permit persons to whom the Software is
-+ * furnished to do so, subject to the following conditions:
-+ *
-+ * The above copyright notice and this permission notice shall be included in
-+ * all copies or substantial portions of the Software.
-+ *
-+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
-+ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-+ * THE SOFTWARE.
-+ */
-+
-+
-+#include "qemu/osdep.h"
-+#include "qemu-common.h"
-+#include "sysemu/runstate.h"
-+
-+/***********************************************************/
-+/* QEMU state */
-+
-+RunState current_run_state = RUN_STATE_PRECONFIG;
-+
-+bool runstate_check(RunState state)
++int chardev_init_func(void *opaque, QemuOpts *opts, Error **errp)
 +{
-+    return current_run_state == state;
++    Error *local_err = NULL;
++
++    if (!qemu_chr_new_from_opts(opts, NULL, &local_err)) {
++        if (local_err) {
++            error_propagate(errp, local_err);
++            return -1;
++        }
++        exit(0);
++    }
++    return 0;
 +}
-diff --git a/stubs/runstate-check.c b/stubs/runstate-check.c
-index 2ccda2b..3038bcb 100644
---- a/stubs/runstate-check.c
-+++ b/stubs/runstate-check.c
-@@ -1,6 +1,9 @@
- #include "qemu/osdep.h"
++
+ type_init(register_types);
+diff --git a/include/chardev/char.h b/include/chardev/char.h
+index 087b202..bad076c 100644
+--- a/include/chardev/char.h
++++ b/include/chardev/char.h
+@@ -290,4 +290,5 @@ GSource *qemu_chr_timeout_add_ms(Chardev *chr, guint ms,
+ /* console.c */
+ void qemu_chr_parse_vc(QemuOpts *opts, ChardevBackend *backend, Error **errp);
  
- #include "sysemu/runstate.h"
++int chardev_init_func(void *opaque, QemuOpts *opts, Error **errp);
+ #endif
+diff --git a/include/monitor/monitor.h b/include/monitor/monitor.h
+index a81eeff..ed1963a 100644
+--- a/include/monitor/monitor.h
++++ b/include/monitor/monitor.h
+@@ -42,5 +42,7 @@ int monitor_fdset_get_fd(int64_t fdset_id, int flags);
+ int monitor_fdset_dup_fd_add(int64_t fdset_id, int dup_fd);
+ void monitor_fdset_dup_fd_remove(int dup_fd);
+ int64_t monitor_fdset_dup_fd_find(int dup_fd);
++void monitor_parse(const char *optarg, const char *mode, bool pretty);
++int mon_init_func(void *opaque, QemuOpts *opts, Error **errp);
+ 
+ #endif /* MONITOR_H */
+diff --git a/monitor/monitor.c b/monitor/monitor.c
+index 12898b6..18bcb57 100644
+--- a/monitor/monitor.c
++++ b/monitor/monitor.c
+@@ -33,7 +33,10 @@
+ #include "sysemu/qtest.h"
+ #include "sysemu/sysemu.h"
+ #include "trace.h"
+-
++#include "qemu/cutils.h"
++#include "qemu/option.h"
++#include "qemu-options.h"
++#include "qemu/config-file.h"
+ /*
+  * To prevent flooding clients, events can be throttled. The
+  * throttling is calculated globally, rather than per-Monitor
+@@ -609,6 +612,84 @@ void monitor_init_globals_core(void)
+                                    NULL);
+ }
+ 
++void monitor_parse(const char *optarg, const char *mode, bool pretty)
++{
++    static int monitor_device_index;
++    QemuOpts *opts;
++    const char *p;
++    char label[32];
 +
-+#pragma weak runstate_check
++    if (strstart(optarg, "chardev:", &p)) {
++        snprintf(label, sizeof(label), "%s", p);
++    } else {
++        snprintf(label, sizeof(label), "compat_monitor%d",
++                 monitor_device_index);
++        opts = qemu_chr_parse_compat(label, optarg, true);
++        if (!opts) {
++            error_report("parse error: %s", optarg);
++            exit(1);
++        }
++    }
 +
- bool runstate_check(RunState state)
- {
-     return state == RUN_STATE_PRELAUNCH;
++    opts = qemu_opts_create(qemu_find_opts("mon"), label, 1, &error_fatal);
++    qemu_opt_set(opts, "mode", mode, &error_abort);
++    qemu_opt_set(opts, "chardev", label, &error_abort);
++    if (!strcmp(mode, "control")) {
++        qemu_opt_set_bool(opts, "pretty", pretty, &error_abort);
++    } else {
++        assert(pretty == false);
++    }
++    monitor_device_index++;
++}
++
++int mon_init_func(void *opaque, QemuOpts *opts, Error **errp)
++{
++    Chardev *chr;
++    bool qmp;
++    bool pretty = false;
++    const char *chardev;
++    const char *mode;
++
++    mode = qemu_opt_get(opts, "mode");
++    if (mode == NULL) {
++        mode = "readline";
++    }
++    if (strcmp(mode, "readline") == 0) {
++        qmp = false;
++    } else if (strcmp(mode, "control") == 0) {
++        qmp = true;
++    } else {
++        error_setg(errp, "unknown monitor mode \"%s\"", mode);
++        return -1;
++    }
++
++    if (!qmp && qemu_opt_get(opts, "pretty")) {
++        warn_report("'pretty' is deprecated for HMP monitors, it has no effect "
++                    "and will be removed in future versions");
++    }
++    if (qemu_opt_get_bool(opts, "pretty", 0)) {
++        pretty = true;
++    }
++
++    chardev = qemu_opt_get(opts, "chardev");
++    if (!chardev) {
++        error_report("chardev is required");
++        exit(1);
++    }
++    chr = qemu_chr_find(chardev);
++    if (chr == NULL) {
++        error_setg(errp, "chardev \"%s\" not found", chardev);
++        return -1;
++    }
++
++    if (qmp) {
++        monitor_init_qmp(chr, pretty);
++    } else {
++        monitor_init_hmp(chr, true);
++    }
++    return 0;
++}
++
+ QemuOptsList qemu_mon_opts = {
+     .name = "mon",
+     .implied_opt_name = "chardev",
+diff --git a/remote/remote-main.c b/remote/remote-main.c
+index 4459d26..30182dc 100644
+--- a/remote/remote-main.c
++++ b/remote/remote-main.c
+@@ -67,6 +67,7 @@
+ #include "qemu/cutils.h"
+ #include "remote-opts.h"
+ #include "monitor/monitor.h"
++#include "chardev/char.h"
+ #include "sysemu/reset.h"
+ 
+ static MPQemuLinkState *mpqemu_link;
+diff --git a/remote/remote-opts.c b/remote/remote-opts.c
+index 0ebe6b1..7de6195 100644
+--- a/remote/remote-opts.c
++++ b/remote/remote-opts.c
+@@ -55,6 +55,7 @@
+ #include "block/block.h"
+ #include "remote/remote-opts.h"
+ #include "include/qemu-common.h"
++#include "monitor/monitor.h"
+ 
+ #include "vl.h"
+ /*
 diff --git a/vl-parse.c b/vl-parse.c
-index 1c8ecbe..3bf1f0f 100644
+index 4e2bd7c..011a9ef 100644
 --- a/vl-parse.c
 +++ b/vl-parse.c
-@@ -159,4 +159,3 @@ int rdevice_init_func(void *opaque, QemuOpts *opts, Error **errp)
+@@ -110,49 +110,50 @@ int drive_init_func(void *opaque, QemuOpts *opts, Error **errp)
+     return 0;
+ }
+ 
+-#if defined(CONFIG_MPQEMU)
+-int rdrive_init_func(void *opaque, QemuOpts *opts, Error **errp)
++int device_init_func(void *opaque, QemuOpts *opts, Error **errp)
+ {
+     DeviceState *dev;
++    const char *remote = NULL;
+ 
+-    dev = qdev_remote_add(opts, false /* this is drive */, errp);
++    remote = qemu_opt_get(opts, "rid");
++    if (remote) {
++        return 0;
++    }
++
++    dev = qdev_device_add(opts, errp);
+     if (!dev) {
+-        error_setg(errp, "qdev_remote_add failed for drive.");
+         return -1;
+     }
+     object_unref(OBJECT(dev));
+     return 0;
+ }
+-#endif
+ 
+ #if defined(CONFIG_MPQEMU)
+-int rdevice_init_func(void *opaque, QemuOpts *opts, Error **errp)
++int rdrive_init_func(void *opaque, QemuOpts *opts, Error **errp)
+ {
+     DeviceState *dev;
+ 
+-    dev = qdev_remote_add(opts, true /* this is device */, errp);
++    dev = qdev_remote_add(opts, false /* this is drive */, errp);
+     if (!dev) {
+-        error_setg(errp, "qdev_remote_add failed for device.");
++        error_setg(errp, "qdev_remote_add failed for drive.");
+         return -1;
+     }
++    object_unref(OBJECT(dev));
      return 0;
  }
  #endif
+ 
+-int device_init_func(void *opaque, QemuOpts *opts, Error **errp)
++#if defined(CONFIG_MPQEMU)
++int rdevice_init_func(void *opaque, QemuOpts *opts, Error **errp)
+ {
+     DeviceState *dev;
+-    const char *remote = NULL;
+ 
+-    remote = qemu_opt_get(opts, "rid");
+-    if (remote) {
+-        return 0;
+-    }
 -
-diff --git a/vl.c b/vl.c
-index 8a26d81..725429b 100644
---- a/vl.c
-+++ b/vl.c
-@@ -665,11 +665,6 @@ static int default_driver_check(void *opaque, QemuOpts *opts, Error **errp)
+-    dev = qdev_device_add(opts, errp);
++    dev = qdev_remote_add(opts, true /* this is device */, errp);
+     if (!dev) {
++        error_setg(errp, "qdev_remote_add failed for device.");
+         return -1;
+     }
+-    object_unref(OBJECT(dev));
      return 0;
  }
++#endif
++
+diff --git a/vl.c b/vl.c
+index 1417ff2..a6a0db8 100644
+--- a/vl.c
++++ b/vl.c
+@@ -2279,19 +2279,6 @@ static int device_help_func(void *opaque, QemuOpts *opts, Error **errp)
+     return qdev_device_help(opts);
+ }
  
--/***********************************************************/
--/* QEMU state */
--
--static RunState current_run_state = RUN_STATE_PRECONFIG;
--
- /* We use RUN_STATE__MAX but any invalid value will do */
- static RunState vmstop_requested = RUN_STATE__MAX;
- static QemuMutex vmstop_lock;
-@@ -777,11 +772,6 @@ static const RunStateTransition runstate_transitions_def[] = {
- 
- static bool runstate_valid_transitions[RUN_STATE__MAX][RUN_STATE__MAX];
- 
--bool runstate_check(RunState state)
+-static int chardev_init_func(void *opaque, QemuOpts *opts, Error **errp)
 -{
--    return current_run_state == state;
+-    Error *local_err = NULL;
+-
+-    if (!qemu_chr_new_from_opts(opts, NULL, &local_err)) {
+-        if (local_err) {
+-            error_propagate(errp, local_err);
+-            return -1;
+-        }
+-        exit(0);
+-    }
+-    return 0;
+-}
+ 
+ #ifdef CONFIG_VIRTFS
+ static int fsdev_init_func(void *opaque, QemuOpts *opts, Error **errp)
+@@ -2300,84 +2287,6 @@ static int fsdev_init_func(void *opaque, QemuOpts *opts, Error **errp)
+ }
+ #endif
+ 
+-static int mon_init_func(void *opaque, QemuOpts *opts, Error **errp)
+-{
+-    Chardev *chr;
+-    bool qmp;
+-    bool pretty = false;
+-    const char *chardev;
+-    const char *mode;
+-
+-    mode = qemu_opt_get(opts, "mode");
+-    if (mode == NULL) {
+-        mode = "readline";
+-    }
+-    if (strcmp(mode, "readline") == 0) {
+-        qmp = false;
+-    } else if (strcmp(mode, "control") == 0) {
+-        qmp = true;
+-    } else {
+-        error_setg(errp, "unknown monitor mode \"%s\"", mode);
+-        return -1;
+-    }
+-
+-    if (!qmp && qemu_opt_get(opts, "pretty")) {
+-        warn_report("'pretty' is deprecated for HMP monitors, it has no effect "
+-                    "and will be removed in future versions");
+-    }
+-    if (qemu_opt_get_bool(opts, "pretty", 0)) {
+-        pretty = true;
+-    }
+-
+-    chardev = qemu_opt_get(opts, "chardev");
+-    if (!chardev) {
+-        error_report("chardev is required");
+-        exit(1);
+-    }
+-    chr = qemu_chr_find(chardev);
+-    if (chr == NULL) {
+-        error_setg(errp, "chardev \"%s\" not found", chardev);
+-        return -1;
+-    }
+-
+-    if (qmp) {
+-        monitor_init_qmp(chr, pretty);
+-    } else {
+-        monitor_init_hmp(chr, true);
+-    }
+-    return 0;
 -}
 -
- bool runstate_store(char *str, size_t size)
- {
-     const char *state = RunState_str(current_run_state);
+-static void monitor_parse(const char *optarg, const char *mode, bool pretty)
+-{
+-    static int monitor_device_index = 0;
+-    QemuOpts *opts;
+-    const char *p;
+-    char label[32];
+-
+-    if (strstart(optarg, "chardev:", &p)) {
+-        snprintf(label, sizeof(label), "%s", p);
+-    } else {
+-        snprintf(label, sizeof(label), "compat_monitor%d",
+-                 monitor_device_index);
+-        opts = qemu_chr_parse_compat(label, optarg, true);
+-        if (!opts) {
+-            error_report("parse error: %s", optarg);
+-            exit(1);
+-        }
+-    }
+-
+-    opts = qemu_opts_create(qemu_find_opts("mon"), label, 1, &error_fatal);
+-    qemu_opt_set(opts, "mode", mode, &error_abort);
+-    qemu_opt_set(opts, "chardev", label, &error_abort);
+-    if (!strcmp(mode, "control")) {
+-        qemu_opt_set_bool(opts, "pretty", pretty, &error_abort);
+-    } else {
+-        assert(pretty == false);
+-    }
+-    monitor_device_index++;
+-}
+-
+ struct device_config {
+     enum {
+         DEV_USB,       /* -usbdevice     */
 -- 
 1.8.3.1
 
