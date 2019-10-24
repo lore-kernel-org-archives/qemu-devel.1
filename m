@@ -2,83 +2,57 @@ Return-Path: <SRS0=Jnn8=YR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EE101CA9EAF
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 14:06:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0863CCA9EAF
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 14:07:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BAFA321655
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 14:06:36 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MMHLOjgl"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BAFA321655
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id BDE612084C
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 14:07:54 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BDE612084C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43630 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43656 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iNdl4-0002F1-PL
-	for qemu-devel@archiver.kernel.org; Thu, 24 Oct 2019 10:06:34 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34621)
+	id 1iNdmL-0004Mt-NW
+	for qemu-devel@archiver.kernel.org; Thu, 24 Oct 2019 10:07:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51711)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <paolo.bonzini@gmail.com>) id 1iNdih-0006vR-DI
- for qemu-devel@nongnu.org; Thu, 24 Oct 2019 10:04:15 -0400
+ (envelope-from <yi.l.liu@intel.com>) id 1iNckh-0005mk-50
+ for qemu-devel@nongnu.org; Thu, 24 Oct 2019 09:02:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <paolo.bonzini@gmail.com>) id 1iNdif-0007cr-Sv
- for qemu-devel@nongnu.org; Thu, 24 Oct 2019 10:04:07 -0400
-Received: from mail-wm1-x334.google.com ([2a00:1450:4864:20::334]:39153)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
- id 1iNdid-0007ag-VY
- for qemu-devel@nongnu.org; Thu, 24 Oct 2019 10:04:05 -0400
-Received: by mail-wm1-x334.google.com with SMTP id r141so2730756wme.4
- for <qemu-devel@nongnu.org>; Thu, 24 Oct 2019 07:04:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=klIHsHZRArDFTcQXKJkBiIBV52Qlwr6+QqqMGTKzp4Y=;
- b=MMHLOjgl1bnUBY6IdFLx285S7DNwKFsOmKFUhbFwpwfHtuIGPnwREJjhs8s9HTTy/n
- ql7iBfG+OFMnetnBsLrSI84jdSAnNQ9mNLiodWzgOE2ijTb5o5UJo5qDXCrWplVGG1Iq
- 8BgLwLwyCItaLKzAP0SqsHK181uPRsV9eEeY0ilUTzZV/gHHqVG77oNEqTFh3/FynE+W
- hzHjn1AN6DYdJQ+yKlo3Fp4Bsw3WvFdDCBddjuzzDqlZcOt97h0GWnI0qq+kWTEt7LW/
- ZPbXCVBv/+aRGAS+sEXElbTxlUsYv9h5I4aHOXQIW6G68I9MH+sIP6AGdivNCm+Cg7Le
- ylOg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
- :in-reply-to:references;
- bh=klIHsHZRArDFTcQXKJkBiIBV52Qlwr6+QqqMGTKzp4Y=;
- b=le9UAQRbHPMFg6XOhz4m48mwdFsrR1ndj/U9wvz0ShTKva+35NWGqzrRc3U77npm9F
- 6qdarn/KqccgQRtUHlSul8z3yeF1IuPQ8khnSZa6T9gkFlf1k28tovO980T6hnVHjBXe
- N+WhfSWzhZIFkPxFn7QuoVuZsNsrs4jzwJRumaK0RYreKrAIP3mJJZfwY7oUsjOOrX9l
- fGE1+lKbOBqmFUIh5Y7/7XjUL/A5fMwZOMOL5PYggCv5CQAQCn298jUwnNAgX3Pidwi+
- g+NGe+R6DRdgfdQwIMm5s4SzlnUYN9CZxcIF8n03Vfqv0JW94VbYcgFO9gitqliIDqd2
- 7dCw==
-X-Gm-Message-State: APjAAAVhSO/ekQ6i1igpZcvvxXUPPiU91mF6ItZrKt7U/HrcNCvE9O2c
- bOpQZBE1rJ/iUFvEicvWyckxw+FM
-X-Google-Smtp-Source: APXvYqzECZXcbGB7oBpbaaliiXU+gqvirWlpGsd4yHMYg5ElFnnphMNWamuXzaY9vxNqJ+EgrqUoPg==
-X-Received: by 2002:a1c:a556:: with SMTP id o83mr5491549wme.0.1571925841889;
- Thu, 24 Oct 2019 07:04:01 -0700 (PDT)
-Received: from 640k.localdomain ([93.56.166.5])
- by smtp.gmail.com with ESMTPSA id b7sm10610155wrn.53.2019.10.24.07.04.00
- (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Thu, 24 Oct 2019 07:04:01 -0700 (PDT)
-From: Paolo Bonzini <pbonzini@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PULL 04/39] i386/kvm: add NoNonArchitecturalCoreSharing Hyper-V
- enlightenment
-Date: Thu, 24 Oct 2019 16:03:20 +0200
-Message-Id: <1571925835-31930-5-git-send-email-pbonzini@redhat.com>
-X-Mailer: git-send-email 1.8.3.1
-In-Reply-To: <1571925835-31930-1-git-send-email-pbonzini@redhat.com>
-References: <1571925835-31930-1-git-send-email-pbonzini@redhat.com>
+ (envelope-from <yi.l.liu@intel.com>) id 1iNcka-0002hV-5T
+ for qemu-devel@nongnu.org; Thu, 24 Oct 2019 09:02:06 -0400
+Received: from mga11.intel.com ([192.55.52.93]:40516)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <yi.l.liu@intel.com>) id 1iNckZ-0002aG-QB
+ for qemu-devel@nongnu.org; Thu, 24 Oct 2019 09:02:00 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga001.fm.intel.com ([10.253.24.23])
+ by fmsmga102.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
+ 24 Oct 2019 06:01:48 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.68,224,1569308400"; d="scan'208";a="210156288"
+Received: from iov.bj.intel.com ([10.238.145.67])
+ by fmsmga001.fm.intel.com with ESMTP; 24 Oct 2019 06:01:45 -0700
+From: Liu Yi L <yi.l.liu@intel.com>
+To: qemu-devel@nongnu.org, mst@redhat.com, pbonzini@redhat.com,
+ alex.williamson@redhat.com, peterx@redhat.com
+Subject: [RFC v2 13/22] intel_iommu: add PASID cache management infrastructure
+Date: Thu, 24 Oct 2019 08:34:34 -0400
+Message-Id: <1571920483-3382-14-git-send-email-yi.l.liu@intel.com>
+X-Mailer: git-send-email 2.7.4
+In-Reply-To: <1571920483-3382-1-git-send-email-yi.l.liu@intel.com>
+References: <1571920483-3382-1-git-send-email-yi.l.liu@intel.com>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::334
+X-Received-From: 192.55.52.93
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,169 +64,616 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Vitaly Kuznetsov <vkuznets@redhat.com>
+Cc: tianyu.lan@intel.com, kevin.tian@intel.com, yi.l.liu@intel.com,
+ Yi Sun <yi.y.sun@linux.intel.com>, kvm@vger.kernel.org, jun.j.tian@intel.com,
+ eric.auger@redhat.com, yi.y.sun@intel.com, jacob.jun.pan@linux.intel.com,
+ david@gibson.dropbear.id.au
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Vitaly Kuznetsov <vkuznets@redhat.com>
+This patch adds a PASID cache management infrastructure based on
+new added structure VTDPASIDAddressSpace, which is used to track
+the PASID usage and future PASID tagged DMA address translation
+support in vIOMMU.
 
-Hyper-V TLFS specifies this enlightenment as:
-"NoNonArchitecturalCoreSharing - Indicates that a virtual processor will never
-share a physical core with another virtual processor, except for virtual
-processors that are reported as sibling SMT threads. This can be used as an
-optimization to avoid the performance overhead of STIBP".
+    struct VTDPASIDAddressSpace {
+        VTDBus *vtd_bus;
+        uint8_t devfn;
+        AddressSpace as;
+        uint32_t pasid;
+        IntelIOMMUState *iommu_state;
+        VTDContextCacheEntry context_cache_entry;
+        QLIST_ENTRY(VTDPASIDAddressSpace) next;
+        VTDPASIDCacheEntry pasid_cache_entry;
+    };
 
-However, STIBP is not the only implication. It was found that Hyper-V on
-KVM doesn't pass MD_CLEAR bit to its guests if it doesn't see
-NoNonArchitecturalCoreSharing bit.
+Ideally, a VTDPASIDAddressSpace instance is created when a PASID
+is bound with a DMA AddressSpace. Intel VT-d spec requires guest
+software to issue pasid cache invalidation when bind or unbind a
+pasid with an address space under caching-mode. However, as
+VTDPASIDAddressSpace instances also act as pasid cache in this
+implementation, its creation also happens during vIOMMU PASID
+tagged DMA translation. The creation in this path will not be
+added in this patch since no PASID-capable emulated devices for
+now.
 
-KVM reports NoNonArchitecturalCoreSharing in KVM_GET_SUPPORTED_HV_CPUID to
-indicate that SMT on the host is impossible (not supported of forcefully
-disabled).
+The implementation in this patch manages VTDPASIDAddressSpace
+instances per PASID+BDF (lookup and insert will use PASID and
+BDF) since Intel VT-d spec allows per-BDF PASID Table. When a
+guest bind a PASID with an AddressSpace, QEMU will capture the
+guest pasid selective pasid cache invalidation, and allocate
+remove a VTDPASIDAddressSpace instance per the invalidation
+reasons:
 
-Implement NoNonArchitecturalCoreSharing support in QEMU as tristate:
-'off' - the feature is disabled (default)
-'on' - the feature is enabled. This is only safe if vCPUS are properly
- pinned and correct topology is exposed. As CPU pinning is done outside
- of QEMU the enablement decision will be made on a higher level.
-'auto' - copy KVM setting. As during live migration SMT settings on the
-source and destination host may differ this requires us to add a migration
-blocker.
+    *) a present pasid entry moved to non-present
+    *) a present pasid entry to be a present entry
+    *) a non-present pasid entry moved to present
 
-Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
-Message-Id: <20191018163908.10246-1-vkuznets@redhat.com>
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+vIOMMU emulator could figure out the reason by fetching latest
+guest pasid entry.
+
+Cc: Kevin Tian <kevin.tian@intel.com>
+Cc: Jacob Pan <jacob.jun.pan@linux.intel.com>
+Cc: Peter Xu <peterx@redhat.com>
+Cc: Yi Sun <yi.y.sun@linux.intel.com>
+Signed-off-by: Liu Yi L <yi.l.liu@intel.com>
 ---
- docs/hyperv.txt            | 13 +++++++++++++
- target/i386/cpu.c          |  2 ++
- target/i386/cpu.h          |  2 ++
- target/i386/hyperv-proto.h |  1 +
- target/i386/kvm.c          | 26 ++++++++++++++++++++++++++
- 5 files changed, 44 insertions(+)
+ hw/i386/intel_iommu.c          | 356 +++++++++++++++++++++++++++++++++++++++++
+ hw/i386/intel_iommu_internal.h |  10 ++
+ hw/i386/trace-events           |   1 +
+ include/hw/i386/intel_iommu.h  |  36 ++++-
+ 4 files changed, 402 insertions(+), 1 deletion(-)
 
-diff --git a/docs/hyperv.txt b/docs/hyperv.txt
-index 8fdf25c..6518b71 100644
---- a/docs/hyperv.txt
-+++ b/docs/hyperv.txt
-@@ -184,6 +184,19 @@ enabled.
+diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
+index 90b8f6c..d8827c9 100644
+--- a/hw/i386/intel_iommu.c
++++ b/hw/i386/intel_iommu.c
+@@ -40,6 +40,7 @@
+ #include "kvm_i386.h"
+ #include "migration/vmstate.h"
+ #include "trace.h"
++#include "qemu/jhash.h"
  
- Requires: hv-vpindex, hv-synic, hv-time, hv-stimer
+ /* context entry operations */
+ #define VTD_CE_GET_RID2PASID(ce) \
+@@ -65,6 +66,8 @@
+ static void vtd_address_space_refresh_all(IntelIOMMUState *s);
+ static void vtd_address_space_unmap(VTDAddressSpace *as, IOMMUNotifier *n);
  
-+3.17. hv-no-nonarch-coresharing=on/off/auto
-+===========================================
-+This enlightenment tells guest OS that virtual processors will never share a
-+physical core unless they are reported as sibling SMT threads. This information
-+is required by Windows and Hyper-V guests to properly mitigate SMT related CPU
-+vulnerabilities.
-+When the option is set to 'auto' QEMU will enable the feature only when KVM
-+reports that non-architectural coresharing is impossible, this means that
-+hyper-threading is not supported or completely disabled on the host. This
-+setting also prevents migration as SMT settings on the destination may differ.
-+When the option is set to 'on' QEMU will always enable the feature, regardless
-+of host setup. To keep guests secure, this can only be used in conjunction with
-+exposing correct vCPU topology and vCPU pinning.
- 
- 4. Development features
- ========================
-diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-index 47200b4..6c87c99 100644
---- a/target/i386/cpu.c
-+++ b/target/i386/cpu.c
-@@ -6174,6 +6174,8 @@ static Property x86_cpu_properties[] = {
-                       HYPERV_FEAT_IPI, 0),
-     DEFINE_PROP_BIT64("hv-stimer-direct", X86CPU, hyperv_features,
-                       HYPERV_FEAT_STIMER_DIRECT, 0),
-+    DEFINE_PROP_ON_OFF_AUTO("hv-no-nonarch-coresharing", X86CPU,
-+                            hyperv_no_nonarch_cs, ON_OFF_AUTO_OFF),
-     DEFINE_PROP_BOOL("hv-passthrough", X86CPU, hyperv_passthrough, false),
- 
-     DEFINE_PROP_BOOL("check", X86CPU, check_cpuid, true),
-diff --git a/target/i386/cpu.h b/target/i386/cpu.h
-index cedb5bc..c50a9c7 100644
---- a/target/i386/cpu.h
-+++ b/target/i386/cpu.h
-@@ -24,6 +24,7 @@
- #include "cpu-qom.h"
- #include "hyperv-proto.h"
- #include "exec/cpu-defs.h"
-+#include "qapi/qapi-types-common.h"
- 
- /* The x86 has a strong memory model with some store-after-load re-ordering */
- #define TCG_GUEST_DEFAULT_MO      (TCG_MO_ALL & ~TCG_MO_ST_LD)
-@@ -1614,6 +1615,7 @@ struct X86CPU {
-     bool hyperv_synic_kvm_only;
-     uint64_t hyperv_features;
-     bool hyperv_passthrough;
-+    OnOffAuto hyperv_no_nonarch_cs;
- 
-     bool check_cpuid;
-     bool enforce_cpuid;
-diff --git a/target/i386/hyperv-proto.h b/target/i386/hyperv-proto.h
-index cffac10..056a305 100644
---- a/target/i386/hyperv-proto.h
-+++ b/target/i386/hyperv-proto.h
-@@ -63,6 +63,7 @@
- #define HV_CLUSTER_IPI_RECOMMENDED          (1u << 10)
- #define HV_EX_PROCESSOR_MASKS_RECOMMENDED   (1u << 11)
- #define HV_ENLIGHTENED_VMCS_RECOMMENDED     (1u << 14)
-+#define HV_NO_NONARCH_CORESHARING           (1u << 18)
- 
- /*
-  * Basic virtualized MSRs
-diff --git a/target/i386/kvm.c b/target/i386/kvm.c
-index 0e3da99..49a3011 100644
---- a/target/i386/kvm.c
-+++ b/target/i386/kvm.c
-@@ -1227,6 +1227,16 @@ static int hyperv_handle_properties(CPUState *cs,
-         }
-     }
- 
-+    if (cpu->hyperv_no_nonarch_cs == ON_OFF_AUTO_ON) {
-+        env->features[FEAT_HV_RECOMM_EAX] |= HV_NO_NONARCH_CORESHARING;
-+    } else if (cpu->hyperv_no_nonarch_cs == ON_OFF_AUTO_AUTO) {
-+        c = cpuid_find_entry(cpuid, HV_CPUID_ENLIGHTMENT_INFO, 0);
-+        if (c) {
-+            env->features[FEAT_HV_RECOMM_EAX] |=
-+                c->eax & HV_NO_NONARCH_CORESHARING;
-+        }
-+    }
++static void vtd_pasid_cache_reset(IntelIOMMUState *s);
 +
-     /* Features */
-     r = hv_cpuid_check_and_set(cs, cpuid, HYPERV_FEAT_RELAXED);
-     r |= hv_cpuid_check_and_set(cs, cpuid, HYPERV_FEAT_VAPIC);
-@@ -1340,6 +1350,7 @@ free:
+ static void vtd_panic_require_caching_mode(void)
+ {
+     error_report("We need to set caching-mode=on for intel-iommu to enable "
+@@ -276,6 +279,7 @@ static void vtd_reset_caches(IntelIOMMUState *s)
+     vtd_iommu_lock(s);
+     vtd_reset_iotlb_locked(s);
+     vtd_reset_context_cache_locked(s);
++    vtd_pasid_cache_reset(s);
+     vtd_iommu_unlock(s);
  }
  
- static Error *hv_passthrough_mig_blocker;
-+static Error *hv_no_nonarch_cs_mig_blocker;
+@@ -686,6 +690,11 @@ static inline bool vtd_pe_type_check(X86IOMMUState *x86_iommu,
+     return true;
+ }
  
- static int hyperv_init_vcpu(X86CPU *cpu)
++static inline uint16_t vtd_pe_get_domain_id(VTDPASIDEntry *pe)
++{
++    return VTD_SM_PASID_ENTRY_DID((pe)->val[1]);
++}
++
+ static inline bool vtd_pdire_present(VTDPASIDDirEntry *pdire)
  {
-@@ -1359,6 +1370,21 @@ static int hyperv_init_vcpu(X86CPU *cpu)
-         }
-     }
+     return pdire->val & 1;
+@@ -2389,19 +2398,361 @@ static bool vtd_process_iotlb_desc(IntelIOMMUState *s, VTDInvDesc *inv_desc)
+     return true;
+ }
  
-+    if (cpu->hyperv_no_nonarch_cs == ON_OFF_AUTO_AUTO &&
-+        hv_no_nonarch_cs_mig_blocker == NULL) {
-+        error_setg(&hv_no_nonarch_cs_mig_blocker,
-+                   "'hv-no-nonarch-coresharing=auto' CPU flag prevents migration"
-+                   " use explicit 'hv-no-nonarch-coresharing=on' instead (but"
-+                   " make sure SMT is disabled and/or that vCPUs are properly"
-+                   " pinned)");
-+        ret = migrate_add_blocker(hv_no_nonarch_cs_mig_blocker, &local_err);
-+        if (local_err) {
-+            error_report_err(local_err);
-+            error_free(hv_no_nonarch_cs_mig_blocker);
-+            return ret;
++static inline struct pasid_key *vtd_get_pasid_key(uint32_t pasid,
++                                                  uint16_t sid)
++{
++    struct pasid_key *key = g_malloc0(sizeof(*key));
++    key->pasid = pasid;
++    key->sid = sid;
++    return key;
++}
++
++static guint vtd_pasid_as_key_hash(gconstpointer v)
++{
++    struct pasid_key *key = (struct pasid_key *)v;
++    uint32_t a, b, c;
++
++    /* Jenkins hash */
++    a = b = c = JHASH_INITVAL + sizeof(*key);
++    a += key->sid;
++    b += extract32(key->pasid, 0, 16);
++    c += extract32(key->pasid, 16, 16);
++
++    __jhash_mix(a, b, c);
++    __jhash_final(a, b, c);
++
++    return c;
++}
++
++static gboolean vtd_pasid_as_key_equal(gconstpointer v1, gconstpointer v2)
++{
++    const struct pasid_key *k1 = v1;
++    const struct pasid_key *k2 = v2;
++
++    return (k1->pasid == k2->pasid) && (k1->sid == k2->sid);
++}
++
++static inline bool vtd_pc_is_dom_si(struct VTDPASIDCacheInfo *pc_info)
++{
++    return pc_info->flags & VTD_PASID_CACHE_DOMSI;
++}
++
++static inline bool vtd_pc_is_pasid_si(struct VTDPASIDCacheInfo *pc_info)
++{
++    return pc_info->flags & VTD_PASID_CACHE_PASIDSI;
++}
++
++static inline int vtd_dev_get_pe_from_pasid(IntelIOMMUState *s,
++                                            uint8_t bus_num,
++                                            uint8_t devfn,
++                                            uint32_t pasid,
++                                            VTDPASIDEntry *pe)
++{
++    VTDContextEntry ce;
++    int ret;
++    dma_addr_t pasid_dir_base;
++
++    if (!s->root_scalable) {
++        return -VTD_FR_PASID_TABLE_INV;
++    }
++
++    ret = vtd_dev_to_context_entry(s, bus_num, devfn, &ce);
++    if (ret) {
++        return ret;
++    }
++
++    pasid_dir_base = VTD_CE_GET_PASID_DIR_TABLE(&ce);
++    ret = vtd_get_pe_from_pasid_table(s,
++                                  pasid_dir_base, pasid, pe);
++
++    return ret;
++}
++
++static bool vtd_pasid_entry_compare(VTDPASIDEntry *p1, VTDPASIDEntry *p2)
++{
++    int i = 0;
++    while (i < sizeof(*p1) / sizeof(p1->val)) {
++        if (p1->val[i] != p2->val[i]) {
++            return false;
++        }
++        i++;
++    }
++    return true;
++}
++
++/**
++ * This function is used to clear pasid_cache_gen of cached pasid
++ * entry in vtd_pasid_as instances. Caller of this function should
++ * hold iommu_lock.
++ */
++static gboolean vtd_flush_pasid(gpointer key, gpointer value,
++                                gpointer user_data)
++{
++    VTDPASIDCacheInfo *pc_info = user_data;
++    VTDPASIDAddressSpace *vtd_pasid_as = value;
++    IntelIOMMUState *s = vtd_pasid_as->iommu_state;
++    VTDPASIDCacheEntry *pc_entry = &vtd_pasid_as->pasid_cache_entry;
++    VTDBus *vtd_bus = vtd_pasid_as->vtd_bus;
++    VTDPASIDEntry pe;
++    uint16_t did;
++    uint32_t pasid;
++    uint16_t devfn;
++    gboolean remove = false;
++
++    did = vtd_pe_get_domain_id(&pc_entry->pasid_entry);
++    pasid = vtd_pasid_as->pasid;
++    devfn = vtd_pasid_as->devfn;
++
++    if (pc_entry->pasid_cache_gen &&
++        (vtd_pc_is_dom_si(pc_info) ? (pc_info->domain_id == did) : 1) &&
++        (vtd_pc_is_pasid_si(pc_info) ? (pc_info->pasid == pasid) : 1)) {
++        /*
++         * Modify pasid_cache_gen to be 0, the cached pasid entry in
++         * vtd_pasid_as instance is invalid. And vtd_pasid_as instance
++         * would be treated as invalid in QEMU scope until the pasid
++         * cache gen is updated in a new pasid binding or updated in
++         * below logic if found guest pasid entry exists.
++         */
++        remove = true;
++        pc_entry->pasid_cache_gen = 0;
++        if (vtd_bus->dev_ic[devfn]) {
++            if (!vtd_dev_get_pe_from_pasid(s,
++                      pci_bus_num(vtd_bus->bus), devfn, pasid, &pe)) {
++                /*
++                 * pasid entry exists, so keep the vtd_pasid_as, and needs
++                 * update the pasid entry cached in vtd_pasid_as. Also, if
++                 * the guest pasid entry doesn't equal to cached pasid entry
++                 * needs to issue a pasid bind to host for passthru devies.
++                 */
++                remove = false;
++                pc_entry->pasid_cache_gen = s->pasid_cache_gen;
++                if (!vtd_pasid_entry_compare(&pe, &pc_entry->pasid_entry)) {
++                    pc_entry->pasid_entry = pe;
++                    /*
++                     * TODO: when pasid-base-iotlb(piotlb) infrastructure is
++                     * ready, should invalidate QEMU piotlb togehter with this
++                     * change.
++                     */
++                }
++            }
 +        }
 +    }
 +
-     if (hyperv_feat_enabled(cpu, HYPERV_FEAT_VPINDEX) && !hv_vpindex_settable) {
-         /*
-          * the kernel doesn't support setting vp_index; assert that its value
++    return remove;
++}
++
+ static int vtd_pasid_cache_dsi(IntelIOMMUState *s, uint16_t domain_id)
+ {
++    VTDPASIDCacheInfo pc_info;
++
++    trace_vtd_pasid_cache_dsi(domain_id);
++
++    pc_info.flags = VTD_PASID_CACHE_DOMSI;
++    pc_info.domain_id = domain_id;
++
++    /*
++     * Loop all existing pasid caches and update them.
++     */
++    vtd_iommu_lock(s);
++    g_hash_table_foreach_remove(s->vtd_pasid_as, vtd_flush_pasid, &pc_info);
++    vtd_iommu_unlock(s);
++
++    /*
++     * TODO: Domain selective PASID cache invalidation
++     * may be issued wrongly by programmer, to be safe,
++     * after invalidating the pasid caches, emulator
++     * needs to replay the pasid bindings by walking guest
++     * pasid dir and pasid table.
++     */
+     return 0;
+ }
+ 
++/**
++ * This function finds or adds a VTDPASIDAddressSpace for a device
++ * when it is bound to a pasid. Caller of this function should hold
++ * iommu_lock.
++ */
++static VTDPASIDAddressSpace *vtd_add_find_pasid_as(IntelIOMMUState *s,
++                                                   VTDBus *vtd_bus,
++                                                   int devfn,
++                                                   uint32_t pasid,
++                                                   bool allocate)
++{
++    struct pasid_key *key;
++    struct pasid_key *new_key;
++    VTDPASIDAddressSpace *vtd_pasid_as;
++    uint16_t sid;
++
++    sid = vtd_make_source_id(pci_bus_num(vtd_bus->bus), devfn);
++    key = vtd_get_pasid_key(pasid, sid);
++    vtd_pasid_as = g_hash_table_lookup(s->vtd_pasid_as, key);
++
++    if (!vtd_pasid_as && allocate) {
++        new_key = vtd_get_pasid_key(pasid, sid);
++        /*
++         * Initiate the vtd_pasid_as structure.
++         *
++         * This structure here is used to track the guest pasid
++         * binding and also serves as pasid-cache mangement entry.
++         *
++         * TODO: in future, if wants to support the SVA-aware DMA
++         *       emulation, the vtd_pasid_as should be fully initialized.
++         *       e.g. the address_space and memory region fields.
++         */
++        vtd_pasid_as = g_malloc0(sizeof(VTDPASIDAddressSpace));
++        vtd_pasid_as->iommu_state = s;
++        vtd_pasid_as->vtd_bus = vtd_bus;
++        vtd_pasid_as->devfn = devfn;
++        vtd_pasid_as->context_cache_entry.context_cache_gen = 0;
++        vtd_pasid_as->pasid = pasid;
++        vtd_pasid_as->pasid_cache_entry.pasid_cache_gen = 0;
++        g_hash_table_insert(s->vtd_pasid_as, new_key, vtd_pasid_as);
++    }
++    return vtd_pasid_as;
++}
++
++ /**
++  * This function updates the pasid entry cached in &vtd_pasid_as.
++  * Caller of this function should hold iommu_lock.
++  */
++static inline void vtd_fill_in_pe_cache(
++              VTDPASIDAddressSpace *vtd_pasid_as, VTDPASIDEntry *pe)
++{
++    IntelIOMMUState *s = vtd_pasid_as->iommu_state;
++    VTDPASIDCacheEntry *pc_entry = &vtd_pasid_as->pasid_cache_entry;
++
++    pc_entry->pasid_entry = *pe;
++    pc_entry->pasid_cache_gen = s->pasid_cache_gen;
++}
++
+ static int vtd_pasid_cache_psi(IntelIOMMUState *s,
+                                uint16_t domain_id, uint32_t pasid)
+ {
++    VTDPASIDCacheInfo pc_info;
++    VTDPASIDEntry pe;
++    VTDBus *vtd_bus;
++    int bus_n, devfn;
++    VTDPASIDAddressSpace *vtd_pasid_as;
++    VTDIOMMUContext *vtd_ic;
++
++    pc_info.flags = VTD_PASID_CACHE_DOMSI;
++    pc_info.domain_id = domain_id;
++    pc_info.flags |= VTD_PASID_CACHE_PASIDSI;
++    pc_info.pasid = pasid;
++
++    /*
++     * Regards to a pasid selective pasid cache invalidation (PSI), it
++     * could be either cases of below:
++     * a) a present pasid entry moved to non-present
++     * b) a present pasid entry to be a present entry
++     * c) a non-present pasid entry moved to present
++     *
++     * Here the handling of a PSI is:
++     * 1) loop all the exisitng vtd_pasid_as instances to update them
++     *    according to the latest guest pasid entry in pasid table.
++     *    this will make sure affected existing vtd_pasid_as instances
++     *    cached the latest pasid entries. Also, during the loop, the
++     *    host should be notified if needed. e.g. pasid unbind or pasid
++     *    update. Should be able to cover case a) and case b).
++     *
++     * 2) loop all devices to cover case c)
++     *    However, it is not good to always loop all devices. In this
++     *    implementation. We do it in this ways:
++     *    - For devices which have VTDIOMMUContext instances, we loop
++     *      them and check if guest pasid entry exists. If yes, it is
++     *      case c), we update the pasid cache and also notify host.
++     *    - For devices which have no VTDIOMMUContext instances, it is
++     *      not necessary to create pasid cache at this phase since it
++     *      could be created when vIOMMU do DMA address translation.
++     *      This is not implemented yet since no PASID-capable emulated
++     *      devices today. If we have it in future, the pasid cache shall
++     *      be created there.
++     */
++
++    vtd_iommu_lock(s);
++    g_hash_table_foreach_remove(s->vtd_pasid_as, vtd_flush_pasid, &pc_info);
++    vtd_iommu_unlock(s);
++
++    vtd_iommu_lock(s);
++    QLIST_FOREACH(vtd_ic, &s->vtd_dev_ic_list, next) {
++        vtd_bus = vtd_ic->vtd_bus;
++        devfn = vtd_ic->devfn;
++        bus_n = pci_bus_num(vtd_bus->bus);
++
++        /* Step 1: fetch vtd_pasid_as and check if it is valid */
++        vtd_pasid_as = vtd_add_find_pasid_as(s, vtd_bus,
++                                        devfn, pasid, true);
++        if (vtd_pasid_as &&
++            (s->pasid_cache_gen ==
++             vtd_pasid_as->pasid_cache_entry.pasid_cache_gen)) {
++            /*
++             * pasid_cache_gen equals to s->pasid_cache_gen means
++             * vtd_pasid_as is valid after the above s->vtd_pasid_as
++             * updates. Thus no need for the below steps.
++             */
++            continue;
++        }
++
++        /*
++         * Step 2: vtd_pasid_as is not valid, it's potentailly a
++         * new pasid bind. Fetch guest pasid entry.
++         */
++        if (vtd_dev_get_pe_from_pasid(s, bus_n, devfn, pasid, &pe)) {
++            continue;
++        }
++
++        /*
++         * Step 3: pasid entry exists, update pasid cache
++         *
++         * Here need to check domain ID since guest pasid entry
++         * exists. What needs to do are:
++         *   - update the pc_entry in the vtd_pasid_as
++         *   - set proper pc_entry.pasid_cache_gen
++         *   - passdown the latest guest pasid entry config to host
++         *     (will be added in later patch)
++         */
++        if (domain_id == vtd_pe_get_domain_id(&pe)) {
++            vtd_fill_in_pe_cache(vtd_pasid_as, &pe);
++        }
++    }
++    vtd_iommu_unlock(s);
+     return 0;
+ }
+ 
++/**
++ * Caller of this function should hold iommu_lock
++ */
++static void vtd_pasid_cache_reset(IntelIOMMUState *s)
++{
++    VTDPASIDCacheInfo pc_info;
++
++    trace_vtd_pasid_cache_reset();
++
++    pc_info.flags = 0;
++
++    /*
++     * Reset pasid cache is a big hammer, so use g_hash_table_foreach_remove
++     * which will free the vtd_pasid_as instances.
++     */
++    g_hash_table_foreach_remove(s->vtd_pasid_as, vtd_flush_pasid, &pc_info);
++    s->pasid_cache_gen = 1;
++}
++
+ static int vtd_pasid_cache_gsi(IntelIOMMUState *s)
+ {
++    trace_vtd_pasid_cache_gsi();
++
++    vtd_iommu_lock(s);
++    vtd_pasid_cache_reset(s);
++    vtd_iommu_unlock(s);
++
++    /*
++     * TODO: Global PASID cache invalidation may be
++     * issued wrongly by programmer, to be safe, after
++     * invalidating the pasid caches, emulator needs
++     * to replay the pasid bindings by walking guest
++     * pasid dir and pasid table.
++     */
+     return 0;
+ }
+ 
+@@ -3660,7 +4011,9 @@ VTDIOMMUContext *vtd_find_add_ic(IntelIOMMUState *s,
+         vtd_dev_ic->devfn = (uint8_t)devfn;
+         vtd_dev_ic->iommu_state = s;
+         iommu_context_init(&vtd_dev_ic->iommu_context);
++        QLIST_INSERT_HEAD(&s->vtd_dev_ic_list, vtd_dev_ic, next);
+     }
++
+     return vtd_dev_ic;
+ }
+ 
+@@ -4074,6 +4427,7 @@ static void vtd_realize(DeviceState *dev, Error **errp)
+     }
+ 
+     QLIST_INIT(&s->vtd_as_with_notifiers);
++    QLIST_INIT(&s->vtd_dev_ic_list);
+     qemu_mutex_init(&s->iommu_lock);
+     memset(s->vtd_as_by_bus_num, 0, sizeof(s->vtd_as_by_bus_num));
+     memory_region_init_io(&s->csrmem, OBJECT(s), &vtd_mem_ops, s,
+@@ -4099,6 +4453,8 @@ static void vtd_realize(DeviceState *dev, Error **errp)
+                                      g_free, g_free);
+     s->vtd_as_by_busptr = g_hash_table_new_full(vtd_uint64_hash, vtd_uint64_equal,
+                                               g_free, g_free);
++    s->vtd_pasid_as = g_hash_table_new_full(vtd_pasid_as_key_hash,
++                                   vtd_pasid_as_key_equal, g_free, g_free);
+     vtd_init(s);
+     sysbus_mmio_map(SYS_BUS_DEVICE(s), 0, Q35_HOST_BRIDGE_IOMMU_ADDR);
+     pci_setup_iommu(bus, &vtd_iommu_ops, dev);
+diff --git a/hw/i386/intel_iommu_internal.h b/hw/i386/intel_iommu_internal.h
+index 879211e..12873e1 100644
+--- a/hw/i386/intel_iommu_internal.h
++++ b/hw/i386/intel_iommu_internal.h
+@@ -311,6 +311,7 @@ typedef enum VTDFaultReason {
+     VTD_FR_IR_SID_ERR = 0x26,   /* Invalid Source-ID */
+ 
+     VTD_FR_PASID_TABLE_INV = 0x58,  /*Invalid PASID table entry */
++    VTD_FR_PASID_ENTRY_P = 0x59, /* The Present(P) field of pasidt-entry is 0 */
+ 
+     /* This is not a normal fault reason. We use this to indicate some faults
+      * that are not referenced by the VT-d specification.
+@@ -482,6 +483,15 @@ struct VTDRootEntry {
+ };
+ typedef struct VTDRootEntry VTDRootEntry;
+ 
++struct VTDPASIDCacheInfo {
++#define VTD_PASID_CACHE_DOMSI   (1ULL << 0);
++#define VTD_PASID_CACHE_PASIDSI (1ULL << 1);
++    uint32_t flags;
++    uint16_t domain_id;
++    uint32_t pasid;
++};
++typedef struct VTDPASIDCacheInfo VTDPASIDCacheInfo;
++
+ /* Masks for struct VTDRootEntry */
+ #define VTD_ROOT_ENTRY_P            1ULL
+ #define VTD_ROOT_ENTRY_CTP          (~0xfffULL)
+diff --git a/hw/i386/trace-events b/hw/i386/trace-events
+index 6da8bd2..7912ae1 100644
+--- a/hw/i386/trace-events
++++ b/hw/i386/trace-events
+@@ -22,6 +22,7 @@ vtd_inv_qi_head(uint16_t head) "read head %d"
+ vtd_inv_qi_tail(uint16_t head) "write tail %d"
+ vtd_inv_qi_fetch(void) ""
+ vtd_context_cache_reset(void) ""
++vtd_pasid_cache_reset(void) ""
+ vtd_pasid_cache_gsi(void) ""
+ vtd_pasid_cache_dsi(uint16_t domain) "Domian slective PC invalidation domain 0x%"PRIx16
+ vtd_pasid_cache_psi(uint16_t domain, uint32_t pasid) "PASID slective PC invalidation domain 0x%"PRIx16" pasid 0x%"PRIx32
+diff --git a/include/hw/i386/intel_iommu.h b/include/hw/i386/intel_iommu.h
+index 0d49480..d693f71 100644
+--- a/include/hw/i386/intel_iommu.h
++++ b/include/hw/i386/intel_iommu.h
+@@ -69,6 +69,8 @@ typedef union VTD_IR_MSIAddress VTD_IR_MSIAddress;
+ typedef struct VTDPASIDDirEntry VTDPASIDDirEntry;
+ typedef struct VTDPASIDEntry VTDPASIDEntry;
+ typedef struct VTDIOMMUContext VTDIOMMUContext;
++typedef struct VTDPASIDCacheEntry VTDPASIDCacheEntry;
++typedef struct VTDPASIDAddressSpace VTDPASIDAddressSpace;
+ 
+ /* Context-Entry */
+ struct VTDContextEntry {
+@@ -101,6 +103,31 @@ struct VTDPASIDEntry {
+     uint64_t val[8];
+ };
+ 
++struct pasid_key {
++    uint32_t pasid;
++    uint16_t sid;
++};
++
++struct VTDPASIDCacheEntry {
++    /*
++     * The cache entry is obsolete if
++     * pasid_cache_gen!=IntelIOMMUState.pasid_cache_gen
++     */
++    uint32_t pasid_cache_gen;
++    struct VTDPASIDEntry pasid_entry;
++};
++
++struct VTDPASIDAddressSpace {
++    VTDBus *vtd_bus;
++    uint8_t devfn;
++    AddressSpace as;
++    uint32_t pasid;
++    IntelIOMMUState *iommu_state;
++    VTDContextCacheEntry context_cache_entry;
++    QLIST_ENTRY(VTDPASIDAddressSpace) next;
++    VTDPASIDCacheEntry pasid_cache_entry;
++};
++
+ struct VTDAddressSpace {
+     PCIBus *bus;
+     uint8_t devfn;
+@@ -121,6 +148,7 @@ struct VTDIOMMUContext {
+     VTDBus *vtd_bus;
+     uint8_t devfn;
+     IOMMUContext iommu_context;
++    QLIST_ENTRY(VTDIOMMUContext) next;
+     IntelIOMMUState *iommu_state;
+ };
+ 
+@@ -269,9 +297,14 @@ struct IntelIOMMUState {
+ 
+     GHashTable *vtd_as_by_busptr;   /* VTDBus objects indexed by PCIBus* reference */
+     VTDBus *vtd_as_by_bus_num[VTD_PCI_BUS_MAX]; /* VTDBus objects indexed by bus number */
++    GHashTable *vtd_pasid_as;   /* VTDPASIDAddressSpace objects */
++    uint32_t pasid_cache_gen;   /* Should be in [1,MAX] */
+     /* list of registered notifiers */
+     QLIST_HEAD(, VTDAddressSpace) vtd_as_with_notifiers;
+ 
++    /* list of registered notifiers */
++    QLIST_HEAD(, VTDIOMMUContext) vtd_dev_ic_list;
++
+     /* interrupt remapping */
+     bool intr_enabled;              /* Whether guest enabled IR */
+     dma_addr_t intr_root;           /* Interrupt remapping table pointer */
+@@ -288,7 +321,8 @@ struct IntelIOMMUState {
+ 
+     /*
+      * Protects IOMMU states in general.  Currently it protects the
+-     * per-IOMMU IOTLB cache, and context entry cache in VTDAddressSpace.
++     * per-IOMMU IOTLB cache, and context entry cache in VTDAddressSpace,
++     * and pasid cache in VTDPASIDAddressSpace.
+      */
+     QemuMutex iommu_lock;
+ };
 -- 
-1.8.3.1
-
+2.7.4
 
 
