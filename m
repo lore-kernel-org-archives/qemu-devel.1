@@ -2,80 +2,83 @@ Return-Path: <SRS0=Jnn8=YR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY autolearn=ham
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 753BECA9EAF
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 14:05:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EE101CA9EAF
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 14:06:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3EBA82084C
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 14:05:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id BAFA321655
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 14:06:36 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PNJZem0I"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3EBA82084C
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MMHLOjgl"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BAFA321655
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43620 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43630 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iNdkF-0000pf-Kz
-	for qemu-devel@archiver.kernel.org; Thu, 24 Oct 2019 10:05:43 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47611)
+	id 1iNdl4-0002F1-PL
+	for qemu-devel@archiver.kernel.org; Thu, 24 Oct 2019 10:06:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34621)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <armbru@redhat.com>) id 1iNcKc-0003dy-D3
- for qemu-devel@nongnu.org; Thu, 24 Oct 2019 08:35:11 -0400
+ (envelope-from <paolo.bonzini@gmail.com>) id 1iNdih-0006vR-DI
+ for qemu-devel@nongnu.org; Thu, 24 Oct 2019 10:04:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1iNcKa-00062D-OG
- for qemu-devel@nongnu.org; Thu, 24 Oct 2019 08:35:10 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:45886
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1iNcKa-00061Y-KB
- for qemu-devel@nongnu.org; Thu, 24 Oct 2019 08:35:08 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1571920507;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=08Z/3vDLTmPV8Cw6RGFpxwEZ6+GbT4mvXHnI+luovaI=;
- b=PNJZem0I/dgBMNEOnV7l97LHIRSE7EVHj1phVQMUI3XDHwo3xjqLJV1wJVrYF7C1RvCFDF
- 0TLReh4TVypEtS8un1KVLDn505ec2Oj9f/ZRKYERwpmaqIGPu+7Ioz77TvnkiYBishUhRE
- BWiFIQNSwSM7sLUJnXWwA1pWIv9SEaI=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-342-lChZL-3nMb-5lc6j2pM_5w-1; Thu, 24 Oct 2019 08:35:04 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4EB4F476;
- Thu, 24 Oct 2019 12:35:03 +0000 (UTC)
-Received: from blackfin.pond.sub.org (unknown [10.36.118.123])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 8F7CB4523;
- Thu, 24 Oct 2019 12:35:00 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 078BA1132A05; Thu, 24 Oct 2019 14:34:59 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
+ (envelope-from <paolo.bonzini@gmail.com>) id 1iNdif-0007cr-Sv
+ for qemu-devel@nongnu.org; Thu, 24 Oct 2019 10:04:07 -0400
+Received: from mail-wm1-x334.google.com ([2a00:1450:4864:20::334]:39153)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
+ id 1iNdid-0007ag-VY
+ for qemu-devel@nongnu.org; Thu, 24 Oct 2019 10:04:05 -0400
+Received: by mail-wm1-x334.google.com with SMTP id r141so2730756wme.4
+ for <qemu-devel@nongnu.org>; Thu, 24 Oct 2019 07:04:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:from:to:cc:subject:date:message-id:in-reply-to:references;
+ bh=klIHsHZRArDFTcQXKJkBiIBV52Qlwr6+QqqMGTKzp4Y=;
+ b=MMHLOjgl1bnUBY6IdFLx285S7DNwKFsOmKFUhbFwpwfHtuIGPnwREJjhs8s9HTTy/n
+ ql7iBfG+OFMnetnBsLrSI84jdSAnNQ9mNLiodWzgOE2ijTb5o5UJo5qDXCrWplVGG1Iq
+ 8BgLwLwyCItaLKzAP0SqsHK181uPRsV9eEeY0ilUTzZV/gHHqVG77oNEqTFh3/FynE+W
+ hzHjn1AN6DYdJQ+yKlo3Fp4Bsw3WvFdDCBddjuzzDqlZcOt97h0GWnI0qq+kWTEt7LW/
+ ZPbXCVBv/+aRGAS+sEXElbTxlUsYv9h5I4aHOXQIW6G68I9MH+sIP6AGdivNCm+Cg7Le
+ ylOg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
+ :in-reply-to:references;
+ bh=klIHsHZRArDFTcQXKJkBiIBV52Qlwr6+QqqMGTKzp4Y=;
+ b=le9UAQRbHPMFg6XOhz4m48mwdFsrR1ndj/U9wvz0ShTKva+35NWGqzrRc3U77npm9F
+ 6qdarn/KqccgQRtUHlSul8z3yeF1IuPQ8khnSZa6T9gkFlf1k28tovO980T6hnVHjBXe
+ N+WhfSWzhZIFkPxFn7QuoVuZsNsrs4jzwJRumaK0RYreKrAIP3mJJZfwY7oUsjOOrX9l
+ fGE1+lKbOBqmFUIh5Y7/7XjUL/A5fMwZOMOL5PYggCv5CQAQCn298jUwnNAgX3Pidwi+
+ g+NGe+R6DRdgfdQwIMm5s4SzlnUYN9CZxcIF8n03Vfqv0JW94VbYcgFO9gitqliIDqd2
+ 7dCw==
+X-Gm-Message-State: APjAAAVhSO/ekQ6i1igpZcvvxXUPPiU91mF6ItZrKt7U/HrcNCvE9O2c
+ bOpQZBE1rJ/iUFvEicvWyckxw+FM
+X-Google-Smtp-Source: APXvYqzECZXcbGB7oBpbaaliiXU+gqvirWlpGsd4yHMYg5ElFnnphMNWamuXzaY9vxNqJ+EgrqUoPg==
+X-Received: by 2002:a1c:a556:: with SMTP id o83mr5491549wme.0.1571925841889;
+ Thu, 24 Oct 2019 07:04:01 -0700 (PDT)
+Received: from 640k.localdomain ([93.56.166.5])
+ by smtp.gmail.com with ESMTPSA id b7sm10610155wrn.53.2019.10.24.07.04.00
+ (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+ Thu, 24 Oct 2019 07:04:01 -0700 (PDT)
+From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [RFC PATCH 04/19] tests/test-qmp-event: Simplify test data setup
-Date: Thu, 24 Oct 2019 14:34:43 +0200
-Message-Id: <20191024123458.13505-5-armbru@redhat.com>
-In-Reply-To: <20191024123458.13505-1-armbru@redhat.com>
-References: <20191024123458.13505-1-armbru@redhat.com>
-MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-MC-Unique: lChZL-3nMb-5lc6j2pM_5w-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=WINDOWS-1252
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 205.139.110.120
+Subject: [PULL 04/39] i386/kvm: add NoNonArchitecturalCoreSharing Hyper-V
+ enlightenment
+Date: Thu, 24 Oct 2019 16:03:20 +0200
+Message-Id: <1571925835-31930-5-git-send-email-pbonzini@redhat.com>
+X-Mailer: git-send-email 1.8.3.1
+In-Reply-To: <1571925835-31930-1-git-send-email-pbonzini@redhat.com>
+References: <1571925835-31930-1-git-send-email-pbonzini@redhat.com>
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::334
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,175 +90,169 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: libvir-list@redhat.com, mdroth@linux.vnet.ibm.com
+Cc: Vitaly Kuznetsov <vkuznets@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Building expected data with qdict_put() & friends is tedious to write
-and hard to read.  Parse them from string literals with
-qdict_from_jsonf_nofail() instead.
+From: Vitaly Kuznetsov <vkuznets@redhat.com>
 
-While there, use initializers instead of assignments for initializing
-aggregate event arguments.
+Hyper-V TLFS specifies this enlightenment as:
+"NoNonArchitecturalCoreSharing - Indicates that a virtual processor will never
+share a physical core with another virtual processor, except for virtual
+processors that are reported as sibling SMT threads. This can be used as an
+optimization to avoid the performance overhead of STIBP".
 
-Signed-off-by: Markus Armbruster <armbru@redhat.com>
+However, STIBP is not the only implication. It was found that Hyper-V on
+KVM doesn't pass MD_CLEAR bit to its guests if it doesn't see
+NoNonArchitecturalCoreSharing bit.
+
+KVM reports NoNonArchitecturalCoreSharing in KVM_GET_SUPPORTED_HV_CPUID to
+indicate that SMT on the host is impossible (not supported of forcefully
+disabled).
+
+Implement NoNonArchitecturalCoreSharing support in QEMU as tristate:
+'off' - the feature is disabled (default)
+'on' - the feature is enabled. This is only safe if vCPUS are properly
+ pinned and correct topology is exposed. As CPU pinning is done outside
+ of QEMU the enablement decision will be made on a higher level.
+'auto' - copy KVM setting. As during live migration SMT settings on the
+source and destination host may differ this requires us to add a migration
+blocker.
+
+Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+Message-Id: <20191018163908.10246-1-vkuznets@redhat.com>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- tests/test-qmp-event.c | 93 ++++++++++++------------------------------
- 1 file changed, 27 insertions(+), 66 deletions(-)
+ docs/hyperv.txt            | 13 +++++++++++++
+ target/i386/cpu.c          |  2 ++
+ target/i386/cpu.h          |  2 ++
+ target/i386/hyperv-proto.h |  1 +
+ target/i386/kvm.c          | 26 ++++++++++++++++++++++++++
+ 5 files changed, 44 insertions(+)
 
-diff --git a/tests/test-qmp-event.c b/tests/test-qmp-event.c
-index eee7e08ab6..430001e622 100644
---- a/tests/test-qmp-event.c
-+++ b/tests/test-qmp-event.c
-@@ -17,6 +17,7 @@
- #include "qapi/error.h"
- #include "qapi/qmp/qbool.h"
- #include "qapi/qmp/qdict.h"
-+#include "qapi/qmp/qjson.h"
- #include "qapi/qmp/qnum.h"
- #include "qapi/qmp/qstring.h"
- #include "qapi/qmp-event.h"
-@@ -124,17 +125,13 @@ static void event_prepare(TestEventData *data,
-     /* Global variable test_event_data was used to pass the expectation, s=
-o
-        test cases can't be executed at same time. */
-     g_mutex_lock(&test_event_lock);
--
--    data->expect =3D qdict_new();
-     test_event_data =3D data;
+diff --git a/docs/hyperv.txt b/docs/hyperv.txt
+index 8fdf25c..6518b71 100644
+--- a/docs/hyperv.txt
++++ b/docs/hyperv.txt
+@@ -184,6 +184,19 @@ enabled.
+ 
+ Requires: hv-vpindex, hv-synic, hv-time, hv-stimer
+ 
++3.17. hv-no-nonarch-coresharing=on/off/auto
++===========================================
++This enlightenment tells guest OS that virtual processors will never share a
++physical core unless they are reported as sibling SMT threads. This information
++is required by Windows and Hyper-V guests to properly mitigate SMT related CPU
++vulnerabilities.
++When the option is set to 'auto' QEMU will enable the feature only when KVM
++reports that non-architectural coresharing is impossible, this means that
++hyper-threading is not supported or completely disabled on the host. This
++setting also prevents migration as SMT settings on the destination may differ.
++When the option is set to 'on' QEMU will always enable the feature, regardless
++of host setup. To keep guests secure, this can only be used in conjunction with
++exposing correct vCPU topology and vCPU pinning.
+ 
+ 4. Development features
+ ========================
+diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+index 47200b4..6c87c99 100644
+--- a/target/i386/cpu.c
++++ b/target/i386/cpu.c
+@@ -6174,6 +6174,8 @@ static Property x86_cpu_properties[] = {
+                       HYPERV_FEAT_IPI, 0),
+     DEFINE_PROP_BIT64("hv-stimer-direct", X86CPU, hyperv_features,
+                       HYPERV_FEAT_STIMER_DIRECT, 0),
++    DEFINE_PROP_ON_OFF_AUTO("hv-no-nonarch-coresharing", X86CPU,
++                            hyperv_no_nonarch_cs, ON_OFF_AUTO_OFF),
+     DEFINE_PROP_BOOL("hv-passthrough", X86CPU, hyperv_passthrough, false),
+ 
+     DEFINE_PROP_BOOL("check", X86CPU, check_cpuid, true),
+diff --git a/target/i386/cpu.h b/target/i386/cpu.h
+index cedb5bc..c50a9c7 100644
+--- a/target/i386/cpu.h
++++ b/target/i386/cpu.h
+@@ -24,6 +24,7 @@
+ #include "cpu-qom.h"
+ #include "hyperv-proto.h"
+ #include "exec/cpu-defs.h"
++#include "qapi/qapi-types-common.h"
+ 
+ /* The x86 has a strong memory model with some store-after-load re-ordering */
+ #define TCG_GUEST_DEFAULT_MO      (TCG_MO_ALL & ~TCG_MO_ST_LD)
+@@ -1614,6 +1615,7 @@ struct X86CPU {
+     bool hyperv_synic_kvm_only;
+     uint64_t hyperv_features;
+     bool hyperv_passthrough;
++    OnOffAuto hyperv_no_nonarch_cs;
+ 
+     bool check_cpuid;
+     bool enforce_cpuid;
+diff --git a/target/i386/hyperv-proto.h b/target/i386/hyperv-proto.h
+index cffac10..056a305 100644
+--- a/target/i386/hyperv-proto.h
++++ b/target/i386/hyperv-proto.h
+@@ -63,6 +63,7 @@
+ #define HV_CLUSTER_IPI_RECOMMENDED          (1u << 10)
+ #define HV_EX_PROCESSOR_MASKS_RECOMMENDED   (1u << 11)
+ #define HV_ENLIGHTENED_VMCS_RECOMMENDED     (1u << 14)
++#define HV_NO_NONARCH_CORESHARING           (1u << 18)
+ 
+ /*
+  * Basic virtualized MSRs
+diff --git a/target/i386/kvm.c b/target/i386/kvm.c
+index 0e3da99..49a3011 100644
+--- a/target/i386/kvm.c
++++ b/target/i386/kvm.c
+@@ -1227,6 +1227,16 @@ static int hyperv_handle_properties(CPUState *cs,
+         }
+     }
+ 
++    if (cpu->hyperv_no_nonarch_cs == ON_OFF_AUTO_ON) {
++        env->features[FEAT_HV_RECOMM_EAX] |= HV_NO_NONARCH_CORESHARING;
++    } else if (cpu->hyperv_no_nonarch_cs == ON_OFF_AUTO_AUTO) {
++        c = cpuid_find_entry(cpuid, HV_CPUID_ENLIGHTMENT_INFO, 0);
++        if (c) {
++            env->features[FEAT_HV_RECOMM_EAX] |=
++                c->eax & HV_NO_NONARCH_CORESHARING;
++        }
++    }
++
+     /* Features */
+     r = hv_cpuid_check_and_set(cs, cpuid, HYPERV_FEAT_RELAXED);
+     r |= hv_cpuid_check_and_set(cs, cpuid, HYPERV_FEAT_VAPIC);
+@@ -1340,6 +1350,7 @@ free:
  }
-=20
- static void event_teardown(TestEventData *data,
-                            const void *unused)
+ 
+ static Error *hv_passthrough_mig_blocker;
++static Error *hv_no_nonarch_cs_mig_blocker;
+ 
+ static int hyperv_init_vcpu(X86CPU *cpu)
  {
--    qobject_unref(data->expect);
-     test_event_data =3D NULL;
--
-     g_mutex_unlock(&test_event_lock);
- }
-=20
-@@ -152,90 +149,54 @@ static void event_test_add(const char *testpath,
- static void test_event_a(TestEventData *data,
-                          const void *unused)
- {
--    QDict *d;
--    d =3D data->expect;
--    qdict_put_str(d, "event", "EVENT_A");
-+    data->expect =3D qdict_from_jsonf_nofail("{ 'event': 'EVENT_A' }");
-     qapi_event_send_event_a();
-+    qobject_unref(data->expect);
- }
-=20
- static void test_event_b(TestEventData *data,
-                          const void *unused)
- {
--    QDict *d;
--    d =3D data->expect;
--    qdict_put_str(d, "event", "EVENT_B");
-+    data->expect =3D qdict_from_jsonf_nofail("{ 'event': 'EVENT_B' }");
-     qapi_event_send_event_b();
-+    qobject_unref(data->expect);
- }
-=20
- static void test_event_c(TestEventData *data,
-                          const void *unused)
- {
--    QDict *d, *d_data, *d_b;
--
--    UserDefOne b;
--    b.integer =3D 2;
--    b.string =3D g_strdup("test1");
--    b.has_enum1 =3D false;
--
--    d_b =3D qdict_new();
--    qdict_put_int(d_b, "integer", 2);
--    qdict_put_str(d_b, "string", "test1");
--
--    d_data =3D qdict_new();
--    qdict_put_int(d_data, "a", 1);
--    qdict_put(d_data, "b", d_b);
--    qdict_put_str(d_data, "c", "test2");
--
--    d =3D data->expect;
--    qdict_put_str(d, "event", "EVENT_C");
--    qdict_put(d, "data", d_data);
-+    UserDefOne b =3D { .integer =3D 2, .string =3D (char *)"test1" };
-=20
-+    data->expect =3D qdict_from_jsonf_nofail(
-+        "{ 'event': 'EVENT_C', 'data': {"
-+        " 'a': 1, 'b': { 'integer': 2, 'string': 'test1' }, 'c': 'test2' }=
- }");
-     qapi_event_send_event_c(true, 1, true, &b, "test2");
--
--    g_free(b.string);
-+    qobject_unref(data->expect);
- }
-=20
- /* Complex type */
- static void test_event_d(TestEventData *data,
-                          const void *unused)
- {
--    UserDefOne struct1;
--    EventStructOne a;
--    QDict *d, *d_data, *d_a, *d_struct1;
--
--    struct1.integer =3D 2;
--    struct1.string =3D g_strdup("test1");
--    struct1.has_enum1 =3D true;
--    struct1.enum1 =3D ENUM_ONE_VALUE1;
--
--    a.struct1 =3D &struct1;
--    a.string =3D g_strdup("test2");
--    a.has_enum2 =3D true;
--    a.enum2 =3D ENUM_ONE_VALUE2;
--
--    d_struct1 =3D qdict_new();
--    qdict_put_int(d_struct1, "integer", 2);
--    qdict_put_str(d_struct1, "string", "test1");
--    qdict_put_str(d_struct1, "enum1", "value1");
--
--    d_a =3D qdict_new();
--    qdict_put(d_a, "struct1", d_struct1);
--    qdict_put_str(d_a, "string", "test2");
--    qdict_put_str(d_a, "enum2", "value2");
--
--    d_data =3D qdict_new();
--    qdict_put(d_data, "a", d_a);
--    qdict_put_str(d_data, "b", "test3");
--    qdict_put_str(d_data, "enum3", "value3");
--
--    d =3D data->expect;
--    qdict_put_str(d, "event", "EVENT_D");
--    qdict_put(d, "data", d_data);
-+    UserDefOne struct1 =3D {
-+        .integer =3D 2, .string =3D (char *)"test1",
-+        .has_enum1 =3D true, .enum1 =3D ENUM_ONE_VALUE1,
-+    };
-+    EventStructOne a =3D {
-+        .struct1 =3D &struct1,
-+        .string =3D (char *)"test2",
-+        .has_enum2 =3D true,
-+        .enum2 =3D ENUM_ONE_VALUE2,
-+    };
-=20
-+    data->expect =3D qdict_from_jsonf_nofail(
-+        "{ 'event': 'EVENT_D', 'data': {"
-+        " 'a': {"
-+        "  'struct1': { 'integer': 2, 'string': 'test1', 'enum1': 'value1'=
- },"
-+        "  'string': 'test2', 'enum2': 'value2' },"
-+        " 'b': 'test3', 'enum3': 'value3' } }");
-     qapi_event_send_event_d(&a, "test3", false, NULL, true, ENUM_ONE_VALUE=
-3);
--
--    g_free(struct1.string);
--    g_free(a.string);
-+    qobject_unref(data->expect);
- }
-=20
- int main(int argc, char **argv)
---=20
-2.21.0
+@@ -1359,6 +1370,21 @@ static int hyperv_init_vcpu(X86CPU *cpu)
+         }
+     }
+ 
++    if (cpu->hyperv_no_nonarch_cs == ON_OFF_AUTO_AUTO &&
++        hv_no_nonarch_cs_mig_blocker == NULL) {
++        error_setg(&hv_no_nonarch_cs_mig_blocker,
++                   "'hv-no-nonarch-coresharing=auto' CPU flag prevents migration"
++                   " use explicit 'hv-no-nonarch-coresharing=on' instead (but"
++                   " make sure SMT is disabled and/or that vCPUs are properly"
++                   " pinned)");
++        ret = migrate_add_blocker(hv_no_nonarch_cs_mig_blocker, &local_err);
++        if (local_err) {
++            error_report_err(local_err);
++            error_free(hv_no_nonarch_cs_mig_blocker);
++            return ret;
++        }
++    }
++
+     if (hyperv_feat_enabled(cpu, HYPERV_FEAT_VPINDEX) && !hv_vpindex_settable) {
+         /*
+          * the kernel doesn't support setting vp_index; assert that its value
+-- 
+1.8.3.1
+
 
 
