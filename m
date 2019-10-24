@@ -6,40 +6,41 @@ X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 28F2BCA9EAF
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 18:31:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ACF6CCA9EAF
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 18:33:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id ED30E205F4
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 18:31:07 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ED30E205F4
+	by mail.kernel.org (Postfix) with ESMTPS id 832A221906
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 18:33:29 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 832A221906
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50252 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50280 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iNht4-0000Uz-Gk
-	for qemu-devel@archiver.kernel.org; Thu, 24 Oct 2019 14:31:06 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40240)
+	id 1iNhvM-0004Lm-5O
+	for qemu-devel@archiver.kernel.org; Thu, 24 Oct 2019 14:33:28 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49283)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <laurent@vivier.eu>) id 1iNgtZ-0007jM-Ip
- for qemu-devel@nongnu.org; Thu, 24 Oct 2019 13:27:34 -0400
+ (envelope-from <laurent@vivier.eu>) id 1iNhoL-0001pl-RI
+ for qemu-devel@nongnu.org; Thu, 24 Oct 2019 14:26:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <laurent@vivier.eu>) id 1iNgtX-0006ex-J1
- for qemu-devel@nongnu.org; Thu, 24 Oct 2019 13:27:33 -0400
-Received: from mout.kundenserver.de ([212.227.126.135]:53669)
+ (envelope-from <laurent@vivier.eu>) id 1iNhoK-0004Uq-Gy
+ for qemu-devel@nongnu.org; Thu, 24 Oct 2019 14:26:13 -0400
+Received: from mout.kundenserver.de ([212.227.126.133]:56647)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <laurent@vivier.eu>)
- id 1iNgtX-0006er-9i; Thu, 24 Oct 2019 13:27:31 -0400
+ id 1iNhoK-0004Ug-4m; Thu, 24 Oct 2019 14:26:12 -0400
 Received: from [192.168.100.1] ([78.238.229.36]) by mrelayeu.kundenserver.de
- (mreue009 [213.165.67.103]) with ESMTPSA (Nemesis) id
- 1N6srH-1hwGOn1YIZ-018KvV; Thu, 24 Oct 2019 19:27:26 +0200
-Subject: Re: [PATCH 2/3] event_notifier: avoid dandling file descriptor in
- event_notifier_cleanup
-To: Frediano Ziglio <fziglio@redhat.com>, Michael Tokarev <mjt@tls.msk.ru>
-References: <20191023122652.2999-1-fziglio@redhat.com>
- <20191023122652.2999-2-fziglio@redhat.com>
+ (mreue010 [213.165.67.103]) with ESMTPSA (Nemesis) id
+ 1MOz8O-1ie8lB0VG0-00PM48; Thu, 24 Oct 2019 20:25:53 +0200
+Subject: Re: [PATCH v2 07/14] hw: Move TWL92230 device from hw/timer/ to
+ hw/rtc/ subdirectory
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ qemu-devel@nongnu.org
+References: <20191003230404.19384-1-philmd@redhat.com>
+ <20191003230404.19384-8-philmd@redhat.com>
 From: Laurent Vivier <laurent@vivier.eu>
 Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  mQINBFYFJhkBEAC2me7w2+RizYOKZM+vZCx69GTewOwqzHrrHSG07MUAxJ6AY29/+HYf6EY2
@@ -83,36 +84,36 @@ Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  OpKgu3nD0ahBDqANU/ZmNNarBJEwvM2vfusmNnWm3QMIwxNuJghRyuFfx694Im1js0ZY3LEU
  JGSHFG4ZynA+ZFUPA6Xf0wHeJOxGKCGIyeKORsteIqgnkINW9fnKJw2pgk8qHkwVc3Vu+wGS
  ZiJK0xFusPQehjWTHn9WjMG1zvQ5TQQHxau/2FkP45+nRPco6vVFQe8JmgtRF8WFJA==
-Message-ID: <63bab37e-f848-8361-2333-cfae59e81ae6@vivier.eu>
-Date: Thu, 24 Oct 2019 19:27:24 +0200
+Message-ID: <fcf23019-02e2-128b-61cc-e5d554e47496@vivier.eu>
+Date: Thu, 24 Oct 2019 20:25:47 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.1.1
 MIME-Version: 1.0
-In-Reply-To: <20191023122652.2999-2-fziglio@redhat.com>
+In-Reply-To: <20191003230404.19384-8-philmd@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: fr
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:RLI+O/ihPBSQVdaCNiHO8/KZeE2zCJ2ej+k0mZq4LqWDWWsk+c0
- 9mrnucF4O2bZsCTgp/CahQo2maS7Ar2a4F21rhPJXX0+Jw5qi5xX6IUwMGRcPqlM1TJ4yjH
- V1YdVlq7z4zqyDUFFUR76XhzZcdUXgls3g6SIWL3aF+TLZJO0l0fmi1e5vqtW8axvy0Mrh9
- 5rEs+XuRkssUmzyu2ozGw==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:jvQwkczo4Oo=:4YVkAV5/J3N1Wbi2rB3VgN
- VsttpdpA8AIWhNCehBl/Vj9L4VaQKTwsGIOzEm4T2NJedriU1lm153GJQkxF6amkXICPSQd+w
- Vki3AW6nhHEJV/I3ql9vRb4wjbEi5/NzdnNxc2+7sh929RdKQweaSkuREARw361Fub+zDLYiU
- DFL7HKP9sVves04r3JpPkmui6eNMb9kLWL8wLgv4zkwNweCPFwhq0RQKpo8Bp/68mI8on9Z19
- 27uWegrViQtA8KwRtlhm5utprupvknfmqDZN3r09974Pn65ZXwTDVW2wDyPq2cnij16wcGYWY
- Oy7CNCDbB92TvXtYUrMJxSpomjIICSdvHj/C9FmEiUmjl01nQJkdE5Y7o32Z8dytDwx3gVUON
- l5Rna06aQ0Bfiwr0Oib7CJ6Pz2lXLu0sxdclUmrdTTLNi7Gz5D2SJrCvTIjw//rIl3Qht3/9X
- CvGvRDdD/Nx8l6r9A5lBEpTKqy0mXN79diN3Sa4MSvyn3Kkopb00xMwaG91gQ0Ko4dS2iu5zF
- 0Xs5x5Ba7iDgiq7EEJY6eow3sWW4zGOb0n6aoBYGhH7yCCRBbF+rGS5/+sFpEA+ZhCDnVUJ9D
- pBD97hvKBgjy1kDvR/bNK9qKy4qUyA8JN4Mvit7hOzFSPqmRWp+yuBroWf31l+6fUvAZJWjzJ
- Q0KafTcuDbf4e8R6XvjeOrkQmCYvRWBOeHRWUvyQVGkci0q29aG8ollPq7bxFhA63RXDLXzMN
- E0r/G9YzX9jN/J1lvKHjrkRcj0zZDRtjHtxIQqKHTg5L9V66tDLpQuCfh5zg5HhnkIL7Bjj+P
- FcDkoROI76zlY3EfXIN86reLZZRweFNrN6mXc6yHtvcljXrommZtZkcrqVZWi5VE6ALXvzuSa
- IPFM+IzK0CHP9KeVEjKfZ/uo0miunJMvyOryt/7Sc=
+X-Provags-ID: V03:K1:MtYMBhPxCOVpabe3WxksqXWnhDcbXJIOMomRYYMhx/je009/pCv
+ XNCauvArpahHmI2vOBeTG84/2tPkrG/c/n//Em+y5bz30JKGh9SDNSZgYR3W6nK3Mn5XcrL
+ YLkBILCuMPT3tU9Yh5Kn0xM9Jf//Sxq9XJ/gfKNeBxING4Ug53n5sIdcQyIpcqdiEYql1L0
+ brgoa6jliVwKvi3qfMiSw==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:O8wnyq7m1lM=:60x+grpeL06QMLfe3jolm/
+ 6pgnXQ7FhOlOmm818AM1VaDxUDS0wgyTu/csG330GCTjE0bJ+fvfbiEJ/zY22Bpa25nyDHBsk
+ OS/bL1B2VU8S50NQjn42A51+fVxaE/ERtWkx34B57QMAUvXu+cwVFXlUKB8KQ6P+iTPZ47gHy
+ S1PMttjj+BPXCu4VIS4fnVrY/4gxlDAyyRshpSyNsgsWE4psNtMJvnkNuigSj2OIboOtLetSi
+ AWc6CHUKAZfx91uDqggfmasMq0fj7b2xs9miLviBWVUckHPw9N7Wawzrks3Msk0zAEgVQ4qh1
+ HWhVCp9TYhwEXVcv0QQLvG5Xq/CZYmWW/Zs+MZWClIYJCm/aHeS0pvUM2yVcBArvd3XzAXqoU
+ cZ5gLX1P4V7ahhWZVkJ5N3mw1r7DfIfTrqaZMTpu9sEOlM844ekItdnNICiLbhOG9kJRnDw37
+ jAeTEM7vIcUxO65EAZVUoGP2ush7KbuoJpDfhy0oqA121e/cjBhJt+sHxH2vSkfyj0vLASOJS
+ rpMf1+2hdbiIDRDSv4MzOBA7cUs4mVAIUiZFzXNgl+v25tJ7g2tYrY3Paq67XU+Wx9TWxdh93
+ 2qqli8Jf4axg9IhZKL6KuDtEYvGvmfS9ALXpFVZChDoHR6nwck9BMqCmOT1v2tx3jmlTZpwgO
+ EBzvBV0UhRcR8aFX9wX/GBy36fhEAvHvjLAIufl45qNhpAEVQRERlpVw8+QQijU/77qbJXW3z
+ iwFthMFp7M0YzJI4rTA/xkVqDdhOrRPkvAWVSgsS4yCbOV3MdD2oBnu8GjBdeulPSy89DEBKM
+ p66BGHji1ZWR8i8wdYAfcQuNdjbBaD8fkkUWzo+GF840CfdJcC15NDYyP0C0dgr04QvBDx3XC
+ +fAnYY1xBachFzzkMt3JgJq3Jv5ae4s/UahJzh7Rk=
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 212.227.126.135
+X-Received-From: 212.227.126.133
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -124,37 +125,114 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-trivial@nongnu.org, qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ "Michael S. Tsirkin" <mst@redhat.com>,
+ Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
+ Alistair Francis <alistair.francis@wdc.com>,
+ "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, qemu-trivial@nongnu.org,
+ Helge Deller <deller@gmx.de>,
+ =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>,
+ Joel Stanley <joel@jms.id.au>, Richard Henderson <rth@twiddle.net>,
+ Artyom Tarasenko <atar4qemu@gmail.com>, Laurent Vivier <lvivier@redhat.com>,
+ Thomas Huth <thuth@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>,
+ Alistair Francis <alistair@alistair23.me>, qemu-arm@nongnu.org,
+ =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>,
+ Igor Mammedov <imammedo@redhat.com>,
+ David Gibson <david@gibson.dropbear.id.au>, Andrew Jeffery <andrew@aj.id.au>,
+ Aleksandar Rikalo <arikalo@wavecomp.com>, qemu-ppc@nongnu.org,
+ Aleksandar Markovic <amarkovic@wavecomp.com>,
+ Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Le 23/10/2019 à 14:26, Frediano Ziglio a écrit :
-> If rfd is equal to wfd the file descriptor is closed but
-> rfd will still have the closed value.
-> The EventNotifier structure should not be used again after calling
-> event_notifier_cleanup or should be initialized again but make
-> sure to not have dandling file descriptors around.
+Le 04/10/2019 à 01:03, Philippe Mathieu-Daudé a écrit :
+> The TWL92230 is an "energy management device" companion with
+> a RTC. Since we mostly model the RTC, move it under the hw/rtc/
+> subdirectory.
 > 
-> Signed-off-by: Frediano Ziglio <fziglio@redhat.com>
+> Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 > ---
->  util/event_notifier-posix.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+>  MAINTAINERS                  | 2 +-
+>  hw/rtc/Kconfig               | 4 ++++
+>  hw/rtc/Makefile.objs         | 1 +
+>  hw/{timer => rtc}/twl92230.c | 0
+>  hw/timer/Kconfig             | 4 ----
+>  hw/timer/Makefile.objs       | 1 -
+>  6 files changed, 6 insertions(+), 6 deletions(-)
+>  rename hw/{timer => rtc}/twl92230.c (100%)
 > 
-> diff --git a/util/event_notifier-posix.c b/util/event_notifier-posix.c
-> index 73c4046b58..00d93204f9 100644
-> --- a/util/event_notifier-posix.c
-> +++ b/util/event_notifier-posix.c
-> @@ -80,8 +80,8 @@ void event_notifier_cleanup(EventNotifier *e)
->  {
->      if (e->rfd != e->wfd) {
->          close(e->rfd);
-> -        e->rfd = -1;
->      }
-> +    e->rfd = -1;
->      close(e->wfd);
->      e->wfd = -1;
->  }
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index 31e4fbf579..daa92cbff0 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -663,7 +663,7 @@ F: hw/display/blizzard.c
+>  F: hw/input/lm832x.c
+>  F: hw/input/tsc2005.c
+>  F: hw/misc/cbus.c
+> -F: hw/timer/twl92230.c
+> +F: hw/rtc/twl92230.c
+>  F: include/hw/display/blizzard.h
+>  F: include/hw/input/tsc2xxx.h
+>  F: include/hw/misc/cbus.h
+> diff --git a/hw/rtc/Kconfig b/hw/rtc/Kconfig
+> index cc7fead764..dff9d60946 100644
+> --- a/hw/rtc/Kconfig
+> +++ b/hw/rtc/Kconfig
+> @@ -8,6 +8,10 @@ config M48T59
+>  config PL031
+>      bool
+>  
+> +config TWL92230
+> +    bool
+> +    depends on I2C
+> +
+>  config MC146818RTC
+>      bool
+>  
+> diff --git a/hw/rtc/Makefile.objs b/hw/rtc/Makefile.objs
+> index 4621b37bc2..810a38ee7b 100644
+> --- a/hw/rtc/Makefile.objs
+> +++ b/hw/rtc/Makefile.objs
+> @@ -4,5 +4,6 @@ ifeq ($(CONFIG_ISA_BUS),y)
+>  common-obj-$(CONFIG_M48T59) += m48t59-isa.o
+>  endif
+>  common-obj-$(CONFIG_PL031) += pl031.o
+> +common-obj-$(CONFIG_TWL92230) += twl92230.o
+>  obj-$(CONFIG_MC146818RTC) += mc146818rtc.o
+>  common-obj-$(CONFIG_SUN4V_RTC) += sun4v-rtc.o
+> diff --git a/hw/timer/twl92230.c b/hw/rtc/twl92230.c
+> similarity index 100%
+> rename from hw/timer/twl92230.c
+> rename to hw/rtc/twl92230.c
+> diff --git a/hw/timer/Kconfig b/hw/timer/Kconfig
+> index b04c928136..9357875f28 100644
+> --- a/hw/timer/Kconfig
+> +++ b/hw/timer/Kconfig
+> @@ -20,10 +20,6 @@ config HPET
+>  config I8254
+>      bool
+>  
+> -config TWL92230
+> -    bool
+> -    depends on I2C
+> -
+>  config ALTERA_TIMER
+>      bool
+>      select PTIMER
+> diff --git a/hw/timer/Makefile.objs b/hw/timer/Makefile.objs
+> index 034bd30255..23be70b71d 100644
+> --- a/hw/timer/Makefile.objs
+> +++ b/hw/timer/Makefile.objs
+> @@ -7,7 +7,6 @@ common-obj-$(CONFIG_DS1338) += ds1338.o
+>  common-obj-$(CONFIG_HPET) += hpet.o
+>  common-obj-$(CONFIG_I8254) += i8254_common.o i8254.o
+>  common-obj-$(CONFIG_PUV3) += puv3_ost.o
+> -common-obj-$(CONFIG_TWL92230) += twl92230.o
+>  common-obj-$(CONFIG_XILINX) += xilinx_timer.o
+>  common-obj-$(CONFIG_SLAVIO) += slavio_timer.o
+>  common-obj-$(CONFIG_ETRAXFS) += etraxfs_timer.o
 > 
 
 Applied to my trivial-patches branch.
