@@ -7,71 +7,70 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6FAC7CA9EAF
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 09:25:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 19245CA9EAF
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 09:25:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 35CE5205F4
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 09:25:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D4E29205F4
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 09:25:19 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="S3mw7v6y"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 35CE5205F4
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="N/Uob2or"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D4E29205F4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36592 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36596 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iNZMf-0003iV-SB
-	for qemu-devel@archiver.kernel.org; Thu, 24 Oct 2019 05:25:05 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43827)
+	id 1iNZMs-00044M-Cr
+	for qemu-devel@archiver.kernel.org; Thu, 24 Oct 2019 05:25:18 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43840)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jag.raman@oracle.com>) id 1iNZ8u-0006pz-Bw
- for qemu-devel@nongnu.org; Thu, 24 Oct 2019 05:10:53 -0400
+ (envelope-from <jag.raman@oracle.com>) id 1iNZ8w-0006vZ-Lu
+ for qemu-devel@nongnu.org; Thu, 24 Oct 2019 05:10:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jag.raman@oracle.com>) id 1iNZ8t-0004LX-9W
- for qemu-devel@nongnu.org; Thu, 24 Oct 2019 05:10:52 -0400
-Received: from userp2130.oracle.com ([156.151.31.86]:45484)
+ (envelope-from <jag.raman@oracle.com>) id 1iNZ8v-0004Nz-GI
+ for qemu-devel@nongnu.org; Thu, 24 Oct 2019 05:10:54 -0400
+Received: from userp2130.oracle.com ([156.151.31.86]:45528)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <jag.raman@oracle.com>)
- id 1iNZ8t-0004Kw-1i
- for qemu-devel@nongnu.org; Thu, 24 Oct 2019 05:10:51 -0400
+ id 1iNZ8v-0004NI-8T
+ for qemu-devel@nongnu.org; Thu, 24 Oct 2019 05:10:53 -0400
 Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
- by userp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x9O94UAI116449;
- Thu, 24 Oct 2019 09:10:46 GMT
+ by userp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x9O94W6c116458;
+ Thu, 24 Oct 2019 09:10:48 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
  h=from : to : cc :
  subject : date : message-id : in-reply-to : references : in-reply-to :
  references; s=corp-2019-08-05;
- bh=+wLS/h90eYFgBw7O1jMToozVxcnhmHzTmuArNonTSbc=;
- b=S3mw7v6yslRRgsKoHNN/BzUB8gS9CUNeHtSff0GQY96dgy//X+2cs5hkvUArYxPRaIzX
- XDsVjNXoAbK41W67sKqUPj2IY1btRZ+kchXahEPMHlspWYqAazDnuFCe3B+Ca1+AfdiI
- 2R4phdha7wj0gBwyhP3SF/hUStxguOvhK7fJsBkFx30iPEWMVimgTwyWsgHt1YN3zjoF
- nIrVPnYYGlet2PUep3Xqen87aX/Hc7wQk4W3KxDmKFAy+o+gaQrd8etz0iuuO7xdPAZK
- 06HXo01PNruud10fgVm5g9KGZtZ2uDJcrHgQ89BW5X7eMwt5gmnm5OHvfgPOc07RGWzs bw== 
-Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
- by userp2130.oracle.com with ESMTP id 2vqswtte02-1
+ bh=CfeS7iUSG1xTfxKr2e8mFCrwRrKlSOQSZckWDmK6o5k=;
+ b=N/Uob2or97TR3xzlrHzsQPggk8JtEjnChajKXA3YMQ0ccN+RcN1QIX56IA8PVk1+9e3m
+ brk1N/ZqXjyEna8Y5WrPny9yUbf/LAvekJYm5KarItW1AurvktTpM3gr3FTH3qQ5rXEG
+ 3XHY4ncb1F07zIa3ID9qtS517PwLxtvs9+W13kyB2Yumvwhd/9NeqsE8dHmAxNL67oAV
+ 5E1oX9I9oYW4qPjOJvsys3AUO/rgahmLhN94tDfNqE5H7EPah0DZUbsz9Whz0OzKm3ky
+ zCv9i5kNCLvr+yxbZCUc2XsJp9Jf559fmgVrq5OOUl6+YsSRvCKzRubiv9e28TtW2bAS Rw== 
+Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
+ by userp2130.oracle.com with ESMTP id 2vqswtte07-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Thu, 24 Oct 2019 09:10:46 +0000
-Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
- by userp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x9O98m3B076178;
- Thu, 24 Oct 2019 09:10:45 GMT
-Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
- by userp3030.oracle.com with ESMTP id 2vtjkj2xjq-1
+ Thu, 24 Oct 2019 09:10:48 +0000
+Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
+ by userp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x9O97j1R170537;
+ Thu, 24 Oct 2019 09:10:48 GMT
+Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
+ by userp3020.oracle.com with ESMTP id 2vtsk486v4-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Thu, 24 Oct 2019 09:10:45 +0000
+ Thu, 24 Oct 2019 09:10:47 +0000
 Received: from abhmp0008.oracle.com (abhmp0008.oracle.com [141.146.116.14])
- by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id x9O9AhQ0011882;
- Thu, 24 Oct 2019 09:10:43 GMT
+ by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id x9O9AkAO002271;
+ Thu, 24 Oct 2019 09:10:46 GMT
 Received: from jaraman-bur-1.us.oracle.com (/10.152.33.39)
  by default (Oracle Beehive Gateway v4.0)
- with ESMTP ; Thu, 24 Oct 2019 02:10:43 -0700
+ with ESMTP ; Thu, 24 Oct 2019 02:10:46 -0700
 From: Jagannathan Raman <jag.raman@oracle.com>
 To: qemu-devel@nongnu.org
-Subject: [RFC v4 PATCH 22/49] multi-process: remote: use fd for socket from
- parent process
-Date: Thu, 24 Oct 2019 05:09:03 -0400
-Message-Id: <afc303fdf609b7263088c6edf6b5ae4b6cde4dd0.1571905346.git.jag.raman@oracle.com>
+Subject: [RFC v4 PATCH 23/49] multi-process: remote: add create_done condition
+Date: Thu, 24 Oct 2019 05:09:04 -0400
+Message-Id: <4f39a3190d10eef9341cc0b2b7a43f90ceeb17b2.1571905346.git.jag.raman@oracle.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <cover.1571905346.git.jag.raman@oracle.com>
 References: <cover.1571905346.git.jag.raman@oracle.com>
@@ -118,48 +117,77 @@ Sender: "Qemu-devel"
 
 From: Elena Ufimtseva <elena.ufimtseva@oracle.com>
 
+Do not allow BAR,MMIO handlers and irq setup to run before
+the configuration of the devices completes.
+
 Signed-off-by: Jagannathan Raman <jag.raman@oracle.com>
 Signed-off-by: John G Johnson <john.g.johnson@oracle.com>
 Signed-off-by: Elena Ufimtseva <elena.ufimtseva@oracle.com>
 ---
- remote/remote-main.c | 10 +++++++++-
- 1 file changed, 9 insertions(+), 1 deletion(-)
+ remote/remote-main.c | 29 ++++++++++++++++++++---------
+ 1 file changed, 20 insertions(+), 9 deletions(-)
 
 diff --git a/remote/remote-main.c b/remote/remote-main.c
-index 5b3ffd8..cb2829e 100644
+index cb2829e..80d8c02 100644
 --- a/remote/remote-main.c
 +++ b/remote/remote-main.c
-@@ -64,6 +64,7 @@
- #include "block/qdict.h"
- #include "qapi/qmp/qlist.h"
- #include "qemu/log.h"
-+#include "qemu/cutils.h"
+@@ -68,6 +68,7 @@
  
  static MPQemuLinkState *mpqemu_link;
  PCIDevice *remote_pci_dev;
-@@ -440,6 +441,7 @@ finalize_loop:
- int main(int argc, char *argv[])
++bool create_done;
+ 
+ static void process_config_write(MPQemuMsg *msg)
  {
-     Error *err = NULL;
-+    int fd = -1;
- 
-     module_call_init(MODULE_INIT_QOM);
- 
-@@ -462,7 +464,13 @@ int main(int argc, char *argv[])
-         return -1;
-     }
- 
--    mpqemu_init_channel(mpqemu_link, &mpqemu_link->com, STDIN_FILENO);
-+    fd = qemu_parse_fd(argv[1]);
-+    if (fd == -1) {
-+        printf("Failed to parse fd for remote process.\n");
-+        return -EINVAL;
-+    }
+@@ -370,21 +371,31 @@ static void process_msg(GIOCondition cond, MPQemuChannel *chan)
+     case INIT:
+         break;
+     case CONF_WRITE:
+-        process_config_write(msg);
++        if (create_done) {
++            process_config_write(msg);
++        }
 +
-+    mpqemu_init_channel(mpqemu_link, &mpqemu_link->com, fd);
-     mpqemu_link_set_callback(mpqemu_link, process_msg);
- 
-     mpqemu_start_coms(mpqemu_link);
+         break;
+     case CONF_READ:
+-        process_config_read(msg);
++        if (create_done) {
++            process_config_read(msg);
++        }
++
+         break;
+     case BAR_WRITE:
+-        process_bar_write(msg, &err);
+-        if (err) {
+-            goto finalize_loop;
++        if (create_done) {
++            process_bar_write(msg, &err);
++            if (err) {
++                error_report_err(err);
++            }
+         }
+         break;
+     case BAR_READ:
+-        process_bar_read(msg, &err);
+-        if (err) {
+-            goto finalize_loop;
++        if (create_done) {
++            process_bar_read(msg, &err);
++            if (err) {
++                error_report_err(err);
++            }
+         }
+         break;
+     case SYNC_SYSMEM:
+@@ -404,7 +415,7 @@ static void process_msg(GIOCondition cond, MPQemuChannel *chan)
+         qemu_mutex_lock_iothread();
+         qemu_run_machine_init_done_notifiers();
+         qemu_mutex_unlock_iothread();
+-
++        create_done = true;
+         break;
+     case DRIVE_OPTS:
+         if (setup_drive(msg, &err)) {
 -- 
 1.8.3.1
 
