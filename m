@@ -2,89 +2,91 @@ Return-Path: <SRS0=Jnn8=YR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EBD5FCA9EAF
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 16:43:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F3A6CA9EAF
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 16:44:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BEFAB20679
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 16:43:21 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BEFAB20679
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 39CE420679
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 16:44:26 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="AVq9mjfC"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 39CE420679
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47726 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47774 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iNgCm-0001Lc-IY
-	for qemu-devel@archiver.kernel.org; Thu, 24 Oct 2019 12:43:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52963)
+	id 1iNgDo-0003fN-SB
+	for qemu-devel@archiver.kernel.org; Thu, 24 Oct 2019 12:44:24 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53866)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <pbonzini@redhat.com>) id 1iNfZD-0007Cs-9m
- for qemu-devel@nongnu.org; Thu, 24 Oct 2019 12:02:36 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1iNfdp-0007OT-7I
+ for qemu-devel@nongnu.org; Thu, 24 Oct 2019 12:07:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pbonzini@redhat.com>) id 1iNfZB-0000Jx-5c
- for qemu-devel@nongnu.org; Thu, 24 Oct 2019 12:02:27 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53296)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1iNfZB-0000Jm-09
- for qemu-devel@nongnu.org; Thu, 24 Oct 2019 12:02:25 -0400
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69])
- (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 1DCCB85540
- for <qemu-devel@nongnu.org>; Thu, 24 Oct 2019 16:02:23 +0000 (UTC)
-Received: by mail-wr1-f69.google.com with SMTP id a6so10264770wru.1
- for <qemu-devel@nongnu.org>; Thu, 24 Oct 2019 09:02:23 -0700 (PDT)
+ (envelope-from <alex.bennee@linaro.org>) id 1iNfdo-0003P8-0E
+ for qemu-devel@nongnu.org; Thu, 24 Oct 2019 12:07:12 -0400
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:43057)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1iNfdn-0003Oq-QA
+ for qemu-devel@nongnu.org; Thu, 24 Oct 2019 12:07:11 -0400
+Received: by mail-wr1-x441.google.com with SMTP id c2so21496225wrr.10
+ for <qemu-devel@nongnu.org>; Thu, 24 Oct 2019 09:07:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=/p9vVo5M/R3Jwh7RMx/rJC/qTIVQmkfMPyGvHdPcyQY=;
+ b=AVq9mjfCslj66wPKC7bcSVeU70YqPRbMobo02ExiInzSz5kM//w4li/7OltKDu7/SQ
+ q2FQmCC9OTz2oX/IZbZhHWQHv0T96NAkgzm+IgMDoFsFTk7lj6yDmS/RxjUJOJ6rMqvx
+ DfqWfAt/NV0N35gphGl+m8eqnh88nNkr/qtskE+bJKbMTA2sCfBDpdh9AzOPm4ITdorY
+ jDh6fX37nBqs7Hq2hfXfdwFGAzj/TPerVeFaKnFnFmkRpW2X1zVtcvcBKdvv1DXMUqwO
+ 6rWBfSvJLeR3hfIsmEwiNEZoIW4spci87z0KGBB6kxknLgnyMDuoDRoFdDhcxOThqVl8
+ L4aA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:references:from:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=pXccublvlI0yhiIlEBx7+O6uD7TwgTWoLdy4DphVr1k=;
- b=aNWi2nw23wuQYZv4ZX+QkWc02BZOZ9d9L3TxitiGehIupnlNkYBaq0UD7/ZlGA2dgQ
- uDHcIXXBnryzPCbY2n/QF4HhDvP1B2IaVcdjTA2EL5FHWvZzlrpytooQ8i64BoqEOozl
- w5AovQgLoOzzTpCesomb6Mib/3+7/FycsmguMaA1keJ4X0Hjn7b+yH1nkH2jJ/rk2khG
- NjICyGs47iRIjxC72OtMHswNFQpeq4gEWeE0mNV3HMyaYJfQONgpyvwv7qG+RanUOh0m
- hr2Ws3/3eiEjkIv15oGX2Ga8zh6pxJ0WAov7mKJQZe4WDIt1jEt+VECKOVcR2Avrj0xh
- eMGg==
-X-Gm-Message-State: APjAAAXJnIAkMdocyI44uHUS8Qj+63nMcwAbinHb1X1YoeuLLeOL/qzF
- X5z7yT7ST+KmZsn3Yu14M1WUaP1AiNSRzR29/4uS5lzuPYMVuWP96tCr61Ru2Ell0jTgw2TdYHa
- 7hEyMXIp9Mj2P6Qs=
-X-Received: by 2002:adf:c402:: with SMTP id v2mr4837313wrf.323.1571932941557; 
- Thu, 24 Oct 2019 09:02:21 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqzDp6/aFR0UVwCh9b623ivPcJnz6RG7+5H23vFhUB8iqLAcvcP28Zgmofz1Nv9fPCdq+1sX7Q==
-X-Received: by 2002:adf:c402:: with SMTP id v2mr4837283wrf.323.1571932941220; 
- Thu, 24 Oct 2019 09:02:21 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:302c:998e:a769:c583?
- ([2001:b07:6468:f312:302c:998e:a769:c583])
- by smtp.gmail.com with ESMTPSA id c144sm3454417wmd.1.2019.10.24.09.02.20
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Thu, 24 Oct 2019 09:02:20 -0700 (PDT)
-Subject: Re: [PULL 35/39] audio: fix missing break
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- qemu-devel@nongnu.org
-References: <1571925835-31930-1-git-send-email-pbonzini@redhat.com>
- <1571925835-31930-36-git-send-email-pbonzini@redhat.com>
- <ec80810d-3821-9a30-5f52-c36fd2ba8845@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Openpgp: preference=signencrypt
-Message-ID: <af8e8e61-a45c-0d28-cfe3-80215fa9ca1f@redhat.com>
-Date: Thu, 24 Oct 2019 18:02:19 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=/p9vVo5M/R3Jwh7RMx/rJC/qTIVQmkfMPyGvHdPcyQY=;
+ b=Lj3FQvuwDSW0pGRtHIZsIZQoUb/sKBSEJsMapKdPow4LZgwzf2FkTfQW9gUCkpxWRq
+ JCARuL9w+O1Domppignk9shk+btybcXaLL2+xpItzC6ohrhA4TZqMla7sCFJ25syH+WO
+ md1SgVSMUi/iXufP1TZeB4LWg3eCIrJKWV4NVL2lxWQfVfei06aDjDSh8UYIT7iRMXYt
+ j7xNxt4iToqauhYEYPiZrU9v4Nvzyk1eZ8pEbrOEse9HNutpuN780hQtaogWfTSqxVeH
+ e4UkTY/tVFQ9O2JiUuYNNedhxL7bI9JAjARU3RMLGLshDU92mGRiRjf64XnhokfRCAj9
+ Hi4w==
+X-Gm-Message-State: APjAAAUQZ2aUPkI7nu629Xu7YZC3Takpp2t12wHwA8Urka3lqqMcFmfn
+ l4DFV4ssTRZA82mby7XhyWaw0g==
+X-Google-Smtp-Source: APXvYqyU13RlA0dlNlBfb58sa7hcXSRnW2K8ue0k4uiLGIV4TguFLaCUsB77LQDNl93HBZDmIVavwA==
+X-Received: by 2002:adf:f78f:: with SMTP id q15mr4430231wrp.282.1571933230492; 
+ Thu, 24 Oct 2019 09:07:10 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id c21sm2781391wmb.46.2019.10.24.09.07.09
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 24 Oct 2019 09:07:09 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 4870D1FF87;
+ Thu, 24 Oct 2019 17:07:09 +0100 (BST)
+References: <20191024102240.2778-1-alex.bennee@linaro.org>
+ <20191024102240.2778-16-alex.bennee@linaro.org>
+ <c4ea7902-b3ad-47ab-ad56-42f604473922@redhat.com>
+ <CAP+75-X4VY=Hk77po2pGF-qjM4dxUQdMC5QaYi=pqMnaoLRxkw@mail.gmail.com>
+User-agent: mu4e 1.3.5; emacs 27.0.50
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Subject: Re: [PATCH v2 15/17] travis.yml: --enable-debug-tcg to check-tcg
+In-reply-to: <CAP+75-X4VY=Hk77po2pGF-qjM4dxUQdMC5QaYi=pqMnaoLRxkw@mail.gmail.com>
+Date: Thu, 24 Oct 2019 17:07:09 +0100
+Message-ID: <87a79qm8k2.fsf@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <ec80810d-3821-9a30-5f52-c36fd2ba8845@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.132.183.28
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::441
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,43 +98,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Fam Zheng <fam@euphon.net>,
+ =?utf-8?Q?Daniel_P=2E_Berra?= =?utf-8?Q?ng=C3=A9?= <berrange@redhat.com>,
+ Stefan Berger <stefanb@linux.vnet.ibm.com>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ QEMU Developers <qemu-devel@nongnu.org>,
+ Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
+ "Emilio G. Cota" <cota@braap.org>, Stefan Hajnoczi <stefanha@redhat.com>,
+ =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 24/10/19 17:14, Philippe Mathieu-Daud=C3=A9 wrote:
-> On 10/24/19 4:03 PM, Paolo Bonzini wrote:
->> Reported by Coverity (CID 1406449).
+
+Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> writes:
+
+> On Thu, Oct 24, 2019 at 4:33 PM Philippe Mathieu-Daud=C3=A9
+> <philmd@redhat.com> wrote:
+>> On 10/24/19 12:22 PM, Alex Benn=C3=A9e wrote:
+>> > This adds a whole bunch of asserts which will catch bugs you might
+>> > introduce into the TCG code.
 >>
->> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
->=20
-> I reviewed this one.
-
-Oops, sorry.  I must have lost your R-b when moving the patch from one
-computer to the other.
-
-Paolo
-
->> ---
->> =C2=A0 audio/paaudio.c | 1 +
->> =C2=A0 1 file changed, 1 insertion(+)
+>> Very good idea.
 >>
->> diff --git a/audio/paaudio.c b/audio/paaudio.c
->> index df541a7..55a91f8 100644
->> --- a/audio/paaudio.c
->> +++ b/audio/paaudio.c
->> @@ -385,6 +385,7 @@ static pa_stream *qpa_simple_new (
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 map.map[5] =3D =
-PA_CHANNEL_POSITION_REAR_RIGHT;
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 map.map[6] =3D =
-PA_CHANNEL_POSITION_SIDE_LEFT;
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 map.map[7] =3D =
-PA_CHANNEL_POSITION_SIDE_RIGHT;
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 break;
->> =C2=A0 =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 default:
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 dolog("Internal=
- error: unsupported channel count %d\n",
->> ss->channels);
+>> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 >>
+>> >
+>> > Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+>> > ---
+>> >   .travis.yml | 4 ++--
+>> >   1 file changed, 2 insertions(+), 2 deletions(-)
+>> >
+>> > diff --git a/.travis.yml b/.travis.yml
+>> > index c43597f1331..ba3a8d4cfc9 100644
+>> > --- a/.travis.yml
+>> > +++ b/.travis.yml
+>> > @@ -334,14 +334,14 @@ matrix:
+>> >
+>> >       # Run check-tcg against linux-user
+>> >       - env:
+>> > -        - CONFIG=3D"--disable-system"
+>> > +        - CONFIG=3D"--disable-system --enable-debug-tcg"
+>> >           - TEST_CMD=3D"make -j3 check-tcg V=3D1"
+>> >           - CACHE_NAME=3D"${TRAVIS_BRANCH}-linux-gcc-default"
+>
+> Hmm maybe we should change the ccache name now...
+>
+> CACHE_NAME=3D"${TRAVIS_BRANCH}-linux-gcc-debug-tcg"?
 
+I've sent a patch that applies to my currently brewing PR.
+
+>
+>> >
+>> >
+>> >       # Run check-tcg against softmmu targets
+>> >       - env:
+>> > -        - CONFIG=3D"--target-list=3Dxtensa-softmmu,arm-softmmu,aarch6=
+4-softmmu,alpha-softmmu"
+>> > +        - CONFIG=3D"--enable-debug-tcg --target-list=3Dxtensa-softmmu=
+,arm-softmmu,aarch64-softmmu,alpha-softmmu"
+>> >           - TEST_CMD=3D"make -j3 check-tcg V=3D1"
+>> >           - CACHE_NAME=3D"${TRAVIS_BRANCH}-linux-gcc-default"
+>
+> Here too.
+
+
+--
+Alex Benn=C3=A9e
 
