@@ -2,80 +2,55 @@ Return-Path: <SRS0=Jnn8=YR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 544FBCA9EAF
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 11:25:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A8076CA9EAF
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 11:26:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1EB7F2084C
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 11:25:21 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Qy3rJJS2"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1EB7F2084C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 6A8592084C
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 11:26:02 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6A8592084C
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=rt-rk.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39792 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39838 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iNbF2-0002Bx-17
-	for qemu-devel@archiver.kernel.org; Thu, 24 Oct 2019 07:25:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59341)
+	id 1iNbFh-0004rr-8M
+	for qemu-devel@archiver.kernel.org; Thu, 24 Oct 2019 07:26:01 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60299)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <armbru@redhat.com>) id 1iNatL-0000zo-0v
- for qemu-devel@nongnu.org; Thu, 24 Oct 2019 07:02:56 -0400
+ (envelope-from <aleksandar.markovic@rt-rk.com>) id 1iNaz7-0002hu-UN
+ for qemu-devel@nongnu.org; Thu, 24 Oct 2019 07:08:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1iNatE-0004qe-Ky
- for qemu-devel@nongnu.org; Thu, 24 Oct 2019 07:02:54 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:29323
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <aleksandar.markovic@rt-rk.com>) id 1iNaz4-0007a3-G2
+ for qemu-devel@nongnu.org; Thu, 24 Oct 2019 07:08:52 -0400
+Received: from mx2.rt-rk.com ([89.216.37.149]:50333 helo=mail.rt-rk.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1iNatE-0004od-9T
- for qemu-devel@nongnu.org; Thu, 24 Oct 2019 07:02:48 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1571914967;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=HNo8W5kBLPXth+ISSC7U9Yf3Hu3WHiltTwo4vNi9h2Q=;
- b=Qy3rJJS2yWn5996N7bTkawpsllkOSTvb9FVKMCK8hOLlckh1/2UdovkbL3aVojGv5EP56m
- WTCxuIaOsCS6TvEvxdNNDx+PPEGDNs3pWOd6hYozAW0FPMa43JfR91JSHfKcFQiEDRusIF
- GYscBAQWSWZs5KinEfkxiBqbDOqSyDY=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-158-8iBBIsdTP_qKRAsWWt5p0w-1; Thu, 24 Oct 2019 07:02:43 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 60883107AD35;
- Thu, 24 Oct 2019 11:02:42 +0000 (UTC)
-Received: from blackfin.pond.sub.org (unknown [10.36.118.123])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 0605752DD;
- Thu, 24 Oct 2019 11:02:42 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 843041130348; Thu, 24 Oct 2019 13:02:37 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
+ (Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
+ id 1iNaz4-00072J-4I
+ for qemu-devel@nongnu.org; Thu, 24 Oct 2019 07:08:50 -0400
+Received: from localhost (localhost [127.0.0.1])
+ by mail.rt-rk.com (Postfix) with ESMTP id E321B1A1EA7;
+ Thu, 24 Oct 2019 13:07:44 +0200 (CEST)
+X-Virus-Scanned: amavisd-new at rt-rk.com
+Received: from rtrkw774-lin.domain.local (rtrkw774-lin.domain.local
+ [10.10.14.106])
+ by mail.rt-rk.com (Postfix) with ESMTPSA id B31CB1A2196;
+ Thu, 24 Oct 2019 13:07:44 +0200 (CEST)
+From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 17/19] qapi: Lift features into QAPISchemaEntity
-Date: Thu, 24 Oct 2019 13:02:35 +0200
-Message-Id: <20191024110237.30963-18-armbru@redhat.com>
-In-Reply-To: <20191024110237.30963-1-armbru@redhat.com>
-References: <20191024110237.30963-1-armbru@redhat.com>
-MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-MC-Unique: 8iBBIsdTP_qKRAsWWt5p0w-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=WINDOWS-1252
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 205.139.110.61
+Subject: [PULL 01/11] target/mips: Clean up helper.c
+Date: Thu, 24 Oct 2019 13:06:25 +0200
+Message-Id: <1571915195-4381-2-git-send-email-aleksandar.markovic@rt-rk.com>
+X-Mailer: git-send-email 2.7.4
+In-Reply-To: <1571915195-4381-1-git-send-email-aleksandar.markovic@rt-rk.com>
+References: <1571915195-4381-1-git-send-email-aleksandar.markovic@rt-rk.com>
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [fuzzy]
+X-Received-From: 89.216.37.149
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,134 +62,336 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, pkrempa@redhat.com, mdroth@linux.vnet.ibm.com
+Cc: peter.maydell@linaro.org, amarkovic@wavecomp.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Commit 6a8c0b5102 "qapi: Add feature flags to struct types" added
-features to QAPISchemaObjectType.  Commit a95daa5093 "qapi: Add
-feature flags to commands in qapi" added them to QAPISchemaCommand,
-duplicating the code.  Tolerable, but the duplication will only get
-worse as we add features to more definitions.
+From: Aleksandar Markovic <amarkovic@wavecomp.com>
 
-To de-duplicate, lift features from QAPISchemaObjectType and
-QAPISchemaCommand into QAPISchemaEntity.
+Mostly fix errors and warnings reported by 'checkpatch.pl -f'.
 
-Signed-off-by: Markus Armbruster <armbru@redhat.com>
+Cc: Markus Armbruster <armbru@redhat.com>
+Reviewed-by: Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>
+Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+Message-Id: <1571826227-10583-2-git-send-email-aleksandar.markovic@rt-rk.com>
 ---
- scripts/qapi/schema.py | 32 +++++++++++---------------------
- 1 file changed, 11 insertions(+), 21 deletions(-)
+ target/mips/helper.c | 123 +++++++++++++++++++++++++++++++--------------------
+ 1 file changed, 74 insertions(+), 49 deletions(-)
 
-diff --git a/scripts/qapi/schema.py b/scripts/qapi/schema.py
-index ee510f129b..bdea9482fc 100644
---- a/scripts/qapi/schema.py
-+++ b/scripts/qapi/schema.py
-@@ -27,8 +27,11 @@ from qapi.parser import QAPISchemaParser
- class QAPISchemaEntity(object):
-     meta =3D None
-=20
--    def __init__(self, name, info, doc, ifcond=3DNone):
-+    def __init__(self, name, info, doc, ifcond=3DNone, features=3DNone):
-         assert name is None or isinstance(name, str)
-+        for f in features or []:
-+            assert isinstance(f, QAPISchemaFeature)
-+            f.set_defined_in(name)
-         self.name =3D name
-         self._module =3D None
-         # For explicitly defined entities, info points to the (explicit)
-@@ -39,6 +42,7 @@ class QAPISchemaEntity(object):
-         self.info =3D info
-         self.doc =3D doc
-         self._ifcond =3D ifcond or []
-+        self.features =3D features or []
-         self._checked =3D False
-=20
-     def c_name(self):
-@@ -49,6 +53,10 @@ class QAPISchemaEntity(object):
-         if self.info:
-             self._module =3D os.path.relpath(self.info.fname,
-                                            os.path.dirname(schema.fname))
-+        seen =3D {}
-+        for f in self.features:
-+            f.check_clash(self.info, seen)
-+
-         self._checked =3D True
-=20
-     def connect_doc(self, doc=3DNone):
-@@ -307,7 +315,7 @@ class QAPISchemaObjectType(QAPISchemaType):
-         # struct has local_members, optional base, and no variants
-         # flat union has base, variants, and no local_members
-         # simple union has local_members, variants, and no base
--        QAPISchemaType.__init__(self, name, info, doc, ifcond)
-+        QAPISchemaType.__init__(self, name, info, doc, ifcond, features)
-         self.meta =3D 'union' if variants else 'struct'
-         assert base is None or isinstance(base, str)
-         for m in local_members:
-@@ -316,15 +324,11 @@ class QAPISchemaObjectType(QAPISchemaType):
-         if variants is not None:
-             assert isinstance(variants, QAPISchemaObjectTypeVariants)
-             variants.set_defined_in(name)
--        for f in features:
--            assert isinstance(f, QAPISchemaFeature)
--            f.set_defined_in(name)
-         self._base_name =3D base
-         self.base =3D None
-         self.local_members =3D local_members
-         self.variants =3D variants
-         self.members =3D None
--        self.features =3D features
-=20
-     def check(self, schema):
-         # This calls another type T's .check() exactly when the C
-@@ -362,11 +366,6 @@ class QAPISchemaObjectType(QAPISchemaType):
-             self.variants.check(schema, seen)
-             self.variants.check_clash(self.info, seen)
-=20
--        # Features are in a name space separate from members
--        seen =3D {}
--        for f in self.features:
--            f.check_clash(self.info, seen)
--
-         self.members =3D members  # mark completed
-=20
-     # Check that the members of this type do not cause duplicate JSON memb=
-ers,
-@@ -678,12 +677,9 @@ class QAPISchemaCommand(QAPISchemaEntity):
-     def __init__(self, name, info, doc, ifcond, arg_type, ret_type,
-                  gen, success_response, boxed, allow_oob, allow_preconfig,
-                  features):
--        QAPISchemaEntity.__init__(self, name, info, doc, ifcond)
-+        QAPISchemaEntity.__init__(self, name, info, doc, ifcond, features)
-         assert not arg_type or isinstance(arg_type, str)
-         assert not ret_type or isinstance(ret_type, str)
--        for f in features:
--            assert isinstance(f, QAPISchemaFeature)
--            f.set_defined_in(name)
-         self._arg_type_name =3D arg_type
-         self.arg_type =3D None
-         self._ret_type_name =3D ret_type
-@@ -693,7 +689,6 @@ class QAPISchemaCommand(QAPISchemaEntity):
-         self.boxed =3D boxed
-         self.allow_oob =3D allow_oob
-         self.allow_preconfig =3D allow_preconfig
--        self.features =3D features
-=20
-     def check(self, schema):
-         QAPISchemaEntity.check(self, schema)
-@@ -723,11 +718,6 @@ class QAPISchemaCommand(QAPISchemaEntity):
-                         "command's 'returns' cannot take %s"
-                         % self.ret_type.describe())
-=20
--        # Features are in a name space separate from members
--        seen =3D {}
--        for f in self.features:
--            f.check_clash(self.info, seen)
--
-     def connect_doc(self, doc=3DNone):
-         doc =3D doc or self.doc
-         if doc:
---=20
-2.21.0
+diff --git a/target/mips/helper.c b/target/mips/helper.c
+index a2b6459..781930a 100644
+--- a/target/mips/helper.c
++++ b/target/mips/helper.c
+@@ -39,8 +39,8 @@ enum {
+ #if !defined(CONFIG_USER_ONLY)
+ 
+ /* no MMU emulation */
+-int no_mmu_map_address (CPUMIPSState *env, hwaddr *physical, int *prot,
+-                        target_ulong address, int rw, int access_type)
++int no_mmu_map_address(CPUMIPSState *env, hwaddr *physical, int *prot,
++                       target_ulong address, int rw, int access_type)
+ {
+     *physical = address;
+     *prot = PAGE_READ | PAGE_WRITE | PAGE_EXEC;
+@@ -48,26 +48,28 @@ int no_mmu_map_address (CPUMIPSState *env, hwaddr *physical, int *prot,
+ }
+ 
+ /* fixed mapping MMU emulation */
+-int fixed_mmu_map_address (CPUMIPSState *env, hwaddr *physical, int *prot,
+-                           target_ulong address, int rw, int access_type)
++int fixed_mmu_map_address(CPUMIPSState *env, hwaddr *physical, int *prot,
++                          target_ulong address, int rw, int access_type)
+ {
+     if (address <= (int32_t)0x7FFFFFFFUL) {
+-        if (!(env->CP0_Status & (1 << CP0St_ERL)))
++        if (!(env->CP0_Status & (1 << CP0St_ERL))) {
+             *physical = address + 0x40000000UL;
+-        else
++        } else {
+             *physical = address;
+-    } else if (address <= (int32_t)0xBFFFFFFFUL)
++        }
++    } else if (address <= (int32_t)0xBFFFFFFFUL) {
+         *physical = address & 0x1FFFFFFF;
+-    else
++    } else {
+         *physical = address;
++    }
+ 
+     *prot = PAGE_READ | PAGE_WRITE | PAGE_EXEC;
+     return TLBRET_MATCH;
+ }
+ 
+ /* MIPS32/MIPS64 R4000-style MMU emulation */
+-int r4k_map_address (CPUMIPSState *env, hwaddr *physical, int *prot,
+-                     target_ulong address, int rw, int access_type)
++int r4k_map_address(CPUMIPSState *env, hwaddr *physical, int *prot,
++                    target_ulong address, int rw, int access_type)
+ {
+     uint16_t ASID = env->CP0_EntryHi & env->CP0_EntryHi_ASID_mask;
+     int i;
+@@ -99,8 +101,9 @@ int r4k_map_address (CPUMIPSState *env, hwaddr *physical, int *prot,
+             if (rw != MMU_DATA_STORE || (n ? tlb->D1 : tlb->D0)) {
+                 *physical = tlb->PFN[n] | (address & (mask >> 1));
+                 *prot = PAGE_READ;
+-                if (n ? tlb->D1 : tlb->D0)
++                if (n ? tlb->D1 : tlb->D0) {
+                     *prot |= PAGE_WRITE;
++                }
+                 if (!(n ? tlb->XI1 : tlb->XI0)) {
+                     *prot |= PAGE_EXEC;
+                 }
+@@ -130,7 +133,7 @@ static int is_seg_am_mapped(unsigned int am, bool eu, int mmu_idx)
+     int32_t adetlb_mask;
+ 
+     switch (mmu_idx) {
+-    case 3 /* ERL */:
++    case 3: /* ERL */
+         /* If EU is set, always unmapped */
+         if (eu) {
+             return 0;
+@@ -204,7 +207,7 @@ static int get_segctl_physical_address(CPUMIPSState *env, hwaddr *physical,
+                                     pa & ~(hwaddr)segmask);
+ }
+ 
+-static int get_physical_address (CPUMIPSState *env, hwaddr *physical,
++static int get_physical_address(CPUMIPSState *env, hwaddr *physical,
+                                 int *prot, target_ulong real_address,
+                                 int rw, int access_type, int mmu_idx)
+ {
+@@ -252,14 +255,15 @@ static int get_physical_address (CPUMIPSState *env, hwaddr *physical,
+         } else {
+             segctl = env->CP0_SegCtl2 >> 16;
+         }
+-        ret = get_segctl_physical_address(env, physical, prot, real_address, rw,
+-                                          access_type, mmu_idx, segctl,
+-                                          0x3FFFFFFF);
++        ret = get_segctl_physical_address(env, physical, prot,
++                                          real_address, rw, access_type,
++                                          mmu_idx, segctl, 0x3FFFFFFF);
+ #if defined(TARGET_MIPS64)
+     } else if (address < 0x4000000000000000ULL) {
+         /* xuseg */
+         if (UX && address <= (0x3FFFFFFFFFFFFFFFULL & env->SEGMask)) {
+-            ret = env->tlb->map_address(env, physical, prot, real_address, rw, access_type);
++            ret = env->tlb->map_address(env, physical, prot,
++                                        real_address, rw, access_type);
+         } else {
+             ret = TLBRET_BADADDR;
+         }
+@@ -267,7 +271,8 @@ static int get_physical_address (CPUMIPSState *env, hwaddr *physical,
+         /* xsseg */
+         if ((supervisor_mode || kernel_mode) &&
+             SX && address <= (0x7FFFFFFFFFFFFFFFULL & env->SEGMask)) {
+-            ret = env->tlb->map_address(env, physical, prot, real_address, rw, access_type);
++            ret = env->tlb->map_address(env, physical, prot,
++                                        real_address, rw, access_type);
+         } else {
+             ret = TLBRET_BADADDR;
+         }
+@@ -307,7 +312,8 @@ static int get_physical_address (CPUMIPSState *env, hwaddr *physical,
+         /* xkseg */
+         if (kernel_mode && KX &&
+             address <= (0xFFFFFFFF7FFFFFFFULL & env->SEGMask)) {
+-            ret = env->tlb->map_address(env, physical, prot, real_address, rw, access_type);
++            ret = env->tlb->map_address(env, physical, prot,
++                                        real_address, rw, access_type);
+         } else {
+             ret = TLBRET_BADADDR;
+         }
+@@ -328,8 +334,10 @@ static int get_physical_address (CPUMIPSState *env, hwaddr *physical,
+                                           access_type, mmu_idx,
+                                           env->CP0_SegCtl0 >> 16, 0x1FFFFFFF);
+     } else {
+-        /* kseg3 */
+-        /* XXX: debug segment is not emulated */
++        /*
++         * kseg3
++         * XXX: debug segment is not emulated
++         */
+         ret = get_segctl_physical_address(env, physical, prot, real_address, rw,
+                                           access_type, mmu_idx,
+                                           env->CP0_SegCtl0, 0x1FFFFFFF);
+@@ -515,9 +523,9 @@ static void raise_mmu_exception(CPUMIPSState *env, target_ulong address,
+ #if defined(TARGET_MIPS64)
+     env->CP0_EntryHi &= env->SEGMask;
+     env->CP0_XContext =
+-        /* PTEBase */   (env->CP0_XContext & ((~0ULL) << (env->SEGBITS - 7))) |
+-        /* R */         (extract64(address, 62, 2) << (env->SEGBITS - 9)) |
+-        /* BadVPN2 */   (extract64(address, 13, env->SEGBITS - 13) << 4);
++        (env->CP0_XContext & ((~0ULL) << (env->SEGBITS - 7))) | /* PTEBase */
++        (extract64(address, 62, 2) << (env->SEGBITS - 9)) |     /* R       */
++        (extract64(address, 13, env->SEGBITS - 13) << 4);       /* BadVPN2 */
+ #endif
+     cs->exception_index = exception;
+     env->error_code = error_code;
+@@ -945,7 +953,8 @@ bool mips_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
+ }
+ 
+ #ifndef CONFIG_USER_ONLY
+-hwaddr cpu_mips_translate_address(CPUMIPSState *env, target_ulong address, int rw)
++hwaddr cpu_mips_translate_address(CPUMIPSState *env, target_ulong address,
++                                  int rw)
+ {
+     hwaddr physical;
+     int prot;
+@@ -1005,7 +1014,7 @@ static const char * const excp_names[EXCP_LAST + 1] = {
+ };
+ #endif
+ 
+-target_ulong exception_resume_pc (CPUMIPSState *env)
++target_ulong exception_resume_pc(CPUMIPSState *env)
+ {
+     target_ulong bad_pc;
+     target_ulong isa_mode;
+@@ -1013,8 +1022,10 @@ target_ulong exception_resume_pc (CPUMIPSState *env)
+     isa_mode = !!(env->hflags & MIPS_HFLAG_M16);
+     bad_pc = env->active_tc.PC | isa_mode;
+     if (env->hflags & MIPS_HFLAG_BMASK) {
+-        /* If the exception was raised from a delay slot, come back to
+-           the jump.  */
++        /*
++         * If the exception was raised from a delay slot, come back to
++         * the jump.
++         */
+         bad_pc -= (env->hflags & MIPS_HFLAG_B16 ? 2 : 4);
+     }
+ 
+@@ -1022,14 +1033,14 @@ target_ulong exception_resume_pc (CPUMIPSState *env)
+ }
+ 
+ #if !defined(CONFIG_USER_ONLY)
+-static void set_hflags_for_handler (CPUMIPSState *env)
++static void set_hflags_for_handler(CPUMIPSState *env)
+ {
+     /* Exception handlers are entered in 32-bit mode.  */
+     env->hflags &= ~(MIPS_HFLAG_M16);
+     /* ...except that microMIPS lets you choose.  */
+     if (env->insn_flags & ASE_MICROMIPS) {
+-        env->hflags |= (!!(env->CP0_Config3
+-                           & (1 << CP0C3_ISA_ON_EXC))
++        env->hflags |= (!!(env->CP0_Config3 &
++                           (1 << CP0C3_ISA_ON_EXC))
+                         << MIPS_HFLAG_M16_SHIFT);
+     }
+ }
+@@ -1096,10 +1107,12 @@ void mips_cpu_do_interrupt(CPUState *cs)
+     switch (cs->exception_index) {
+     case EXCP_DSS:
+         env->CP0_Debug |= 1 << CP0DB_DSS;
+-        /* Debug single step cannot be raised inside a delay slot and
+-           resume will always occur on the next instruction
+-           (but we assume the pc has always been updated during
+-           code translation). */
++        /*
++         * Debug single step cannot be raised inside a delay slot and
++         * resume will always occur on the next instruction
++         * (but we assume the pc has always been updated during
++         * code translation).
++         */
+         env->CP0_DEPC = env->active_tc.PC | !!(env->hflags & MIPS_HFLAG_M16);
+         goto enter_debug_mode;
+     case EXCP_DINT:
+@@ -1111,7 +1124,8 @@ void mips_cpu_do_interrupt(CPUState *cs)
+     case EXCP_DBp:
+         env->CP0_Debug |= 1 << CP0DB_DBp;
+         /* Setup DExcCode - SDBBP instruction */
+-        env->CP0_Debug = (env->CP0_Debug & ~(0x1fULL << CP0DB_DEC)) | 9 << CP0DB_DEC;
++        env->CP0_Debug = (env->CP0_Debug & ~(0x1fULL << CP0DB_DEC)) |
++                         (9 << CP0DB_DEC);
+         goto set_DEPC;
+     case EXCP_DDBS:
+         env->CP0_Debug |= 1 << CP0DB_DDBS;
+@@ -1132,8 +1146,9 @@ void mips_cpu_do_interrupt(CPUState *cs)
+         env->hflags |= MIPS_HFLAG_DM | MIPS_HFLAG_CP0;
+         env->hflags &= ~(MIPS_HFLAG_KSU);
+         /* EJTAG probe trap enable is not implemented... */
+-        if (!(env->CP0_Status & (1 << CP0St_EXL)))
++        if (!(env->CP0_Status & (1 << CP0St_EXL))) {
+             env->CP0_Cause &= ~(1U << CP0Ca_BD);
++        }
+         env->active_tc.PC = env->exception_base + 0x480;
+         set_hflags_for_handler(env);
+         break;
+@@ -1159,8 +1174,9 @@ void mips_cpu_do_interrupt(CPUState *cs)
+         }
+         env->hflags |= MIPS_HFLAG_CP0;
+         env->hflags &= ~(MIPS_HFLAG_KSU);
+-        if (!(env->CP0_Status & (1 << CP0St_EXL)))
++        if (!(env->CP0_Status & (1 << CP0St_EXL))) {
+             env->CP0_Cause &= ~(1U << CP0Ca_BD);
++        }
+         env->active_tc.PC = env->exception_base;
+         set_hflags_for_handler(env);
+         break;
+@@ -1176,12 +1192,16 @@ void mips_cpu_do_interrupt(CPUState *cs)
+                 uint32_t pending = (env->CP0_Cause & CP0Ca_IP_mask) >> CP0Ca_IP;
+ 
+                 if (env->CP0_Config3 & (1 << CP0C3_VEIC)) {
+-                    /* For VEIC mode, the external interrupt controller feeds
+-                     * the vector through the CP0Cause IP lines.  */
++                    /*
++                     * For VEIC mode, the external interrupt controller feeds
++                     * the vector through the CP0Cause IP lines.
++                     */
+                     vector = pending;
+                 } else {
+-                    /* Vectored Interrupts
+-                     * Mask with Status.IM7-IM0 to get enabled interrupts. */
++                    /*
++                     * Vectored Interrupts
++                     * Mask with Status.IM7-IM0 to get enabled interrupts.
++                     */
+                     pending &= (env->CP0_Status >> CP0St_IM) & 0xff;
+                     /* Find the highest-priority interrupt. */
+                     while (pending >>= 1) {
+@@ -1354,7 +1374,8 @@ void mips_cpu_do_interrupt(CPUState *cs)
+ 
+         env->active_tc.PC += offset;
+         set_hflags_for_handler(env);
+-        env->CP0_Cause = (env->CP0_Cause & ~(0x1f << CP0Ca_EC)) | (cause << CP0Ca_EC);
++        env->CP0_Cause = (env->CP0_Cause & ~(0x1f << CP0Ca_EC)) |
++                         (cause << CP0Ca_EC);
+         break;
+     default:
+         abort();
+@@ -1390,7 +1411,7 @@ bool mips_cpu_exec_interrupt(CPUState *cs, int interrupt_request)
+ }
+ 
+ #if !defined(CONFIG_USER_ONLY)
+-void r4k_invalidate_tlb (CPUMIPSState *env, int idx, int use_extra)
++void r4k_invalidate_tlb(CPUMIPSState *env, int idx, int use_extra)
+ {
+     CPUState *cs = env_cpu(env);
+     r4k_tlb_t *tlb;
+@@ -1400,16 +1421,20 @@ void r4k_invalidate_tlb (CPUMIPSState *env, int idx, int use_extra)
+     target_ulong mask;
+ 
+     tlb = &env->tlb->mmu.r4k.tlb[idx];
+-    /* The qemu TLB is flushed when the ASID changes, so no need to
+-       flush these entries again.  */
++    /*
++     * The qemu TLB is flushed when the ASID changes, so no need to
++     * flush these entries again.
++     */
+     if (tlb->G == 0 && tlb->ASID != ASID) {
+         return;
+     }
+ 
+     if (use_extra && env->tlb->tlb_in_use < MIPS_TLB_MAX) {
+-        /* For tlbwr, we can shadow the discarded entry into
+-           a new (fake) TLB entry, as long as the guest can not
+-           tell that it's there.  */
++        /*
++         * For tlbwr, we can shadow the discarded entry into
++         * a new (fake) TLB entry, as long as the guest can not
++         * tell that it's there.
++         */
+         env->tlb->mmu.r4k.tlb[env->tlb->tlb_in_use] = *tlb;
+         env->tlb->tlb_in_use++;
+         return;
+-- 
+2.7.4
 
 
