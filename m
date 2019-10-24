@@ -2,55 +2,78 @@ Return-Path: <SRS0=Jnn8=YR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0CB08CA9EAF
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 12:40:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C7E9CA9EAF
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 12:42:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C53DD21655
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 12:40:19 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C53DD21655
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=rt-rk.com
+	by mail.kernel.org (Postfix) with ESMTPS id 1D79D21872
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 12:42:18 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SFX542rC"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1D79D21872
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41282 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41308 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iNcPa-0006bb-NK
-	for qemu-devel@archiver.kernel.org; Thu, 24 Oct 2019 08:40:18 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60282)
+	id 1iNcRU-0001qW-HM
+	for qemu-devel@archiver.kernel.org; Thu, 24 Oct 2019 08:42:16 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46225)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <aleksandar.markovic@rt-rk.com>) id 1iNaz6-0002ex-Dc
- for qemu-devel@nongnu.org; Thu, 24 Oct 2019 07:08:54 -0400
+ (envelope-from <philmd@redhat.com>) id 1iNcAr-0006d6-82
+ for qemu-devel@nongnu.org; Thu, 24 Oct 2019 08:25:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aleksandar.markovic@rt-rk.com>) id 1iNaz4-0007Zp-C0
- for qemu-devel@nongnu.org; Thu, 24 Oct 2019 07:08:52 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:50399 helo=mail.rt-rk.com)
+ (envelope-from <philmd@redhat.com>) id 1iNcAp-0007Xb-Vo
+ for qemu-devel@nongnu.org; Thu, 24 Oct 2019 08:25:05 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:28280
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
- id 1iNaz4-00072j-0l
- for qemu-devel@nongnu.org; Thu, 24 Oct 2019 07:08:50 -0400
-Received: from localhost (localhost [127.0.0.1])
- by mail.rt-rk.com (Postfix) with ESMTP id 1B1B41A21E8;
- Thu, 24 Oct 2019 13:07:45 +0200 (CEST)
-X-Virus-Scanned: amavisd-new at rt-rk.com
-Received: from rtrkw774-lin.domain.local (rtrkw774-lin.domain.local
- [10.10.14.106])
- by mail.rt-rk.com (Postfix) with ESMTPSA id D5E4A1A21C4;
- Thu, 24 Oct 2019 13:07:44 +0200 (CEST)
-From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-To: qemu-devel@nongnu.org
-Subject: [PULL 04/11] target/mips: msa: Split helpers for <MAX|MIN>_A.<B|H|W|D>
-Date: Thu, 24 Oct 2019 13:06:28 +0200
-Message-Id: <1571915195-4381-5-git-send-email-aleksandar.markovic@rt-rk.com>
-X-Mailer: git-send-email 2.7.4
-In-Reply-To: <1571915195-4381-1-git-send-email-aleksandar.markovic@rt-rk.com>
-References: <1571915195-4381-1-git-send-email-aleksandar.markovic@rt-rk.com>
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [fuzzy]
-X-Received-From: 89.216.37.149
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iNcAp-0007X3-Rj
+ for qemu-devel@nongnu.org; Thu, 24 Oct 2019 08:25:03 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1571919903;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=JZAMN4B//LhIiWLht7TffCNiSr4z5k4zs0lJpc0SH8Y=;
+ b=SFX542rCLjHnH0S/yLqvSYbm9QcPuczzA0io4k5RRZuypHY6s/ggO1ZMwtISi9NdNVLBKc
+ bx/XSm3xwamf1RVBWWKoiXBNYThqYutcypkrtf3DrnQxDsQ1yCVeM1RCyhEQx8NlInFkvL
+ 2ZOgNYUrCys9N85Jx1zKvFZis8T0hB8=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-100-YyzGlylgMbuk-SoRy92QFg-1; Thu, 24 Oct 2019 08:24:59 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D512B1005500;
+ Thu, 24 Oct 2019 12:24:58 +0000 (UTC)
+Received: from x1w.redhat.com (ovpn-204-184.brq.redhat.com [10.40.204.184])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 23C66605A6;
+ Thu, 24 Oct 2019 12:24:45 +0000 (UTC)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>,
+ qemu-devel@nongnu.org
+Subject: [PATCH v3 3/3] mc146818rtc: fix timer interrupt reinjection
+Date: Thu, 24 Oct 2019 14:24:25 +0200
+Message-Id: <20191024122425.2483-4-philmd@redhat.com>
+In-Reply-To: <20191024122425.2483-1-philmd@redhat.com>
+References: <20191024122425.2483-1-philmd@redhat.com>
+MIME-Version: 1.0
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-MC-Unique: YyzGlylgMbuk-SoRy92QFg-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -62,301 +85,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, amarkovic@wavecomp.com
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Xiao Guangrong <guangrong.xiao@gmail.com>,
+ Vadim Rozenfeld <vrozenfe@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Aleksandar Markovic <amarkovic@wavecomp.com>
+From: Marcelo Tosatti <mtosatti@redhat.com>
 
-Achieves clearer code and slightly better performance.
+commit 369b41359af46bded5799c9ef8be2b641d92e043 broke timer interrupt
+reinjection when there is no period change by the guest.
 
-Reviewed-by: Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>
-Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
-Message-Id: <1571826227-10583-5-git-send-email-aleksandar.markovic@rt-rk.com>
+In that case, old_period is 0, which ends up zeroing irq_coalesced
+(counter of reinjected interrupts).
+
+The consequence is Windows 7 is unable to synchronize time via NTP.
+Easily reproducible by playing a fullscreen video with cirrus and VNC.
+
+Fix by not updating s->irq_coalesced when old_period is 0.
+
+Signed-off-by: Marcelo Tosatti <mtosatti@redhat.com>
+Message-Id: <20191010123008.GA19158@amt.cnet>
+Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 ---
- target/mips/helper.h     |  11 +++-
- target/mips/msa_helper.c | 163 ++++++++++++++++++++++++++++++++++++++++++-----
- target/mips/translate.c  |  38 +++++++++--
- 3 files changed, 187 insertions(+), 25 deletions(-)
+ hw/timer/mc146818rtc.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/target/mips/helper.h b/target/mips/helper.h
-index d615c83..cef4de6 100644
---- a/target/mips/helper.h
-+++ b/target/mips/helper.h
-@@ -877,6 +877,15 @@ DEF_HELPER_4(msa_div_u_h, void, env, i32, i32, i32)
- DEF_HELPER_4(msa_div_u_w, void, env, i32, i32, i32)
- DEF_HELPER_4(msa_div_u_d, void, env, i32, i32, i32)
- 
-+DEF_HELPER_4(msa_max_a_b, void, env, i32, i32, i32)
-+DEF_HELPER_4(msa_max_a_h, void, env, i32, i32, i32)
-+DEF_HELPER_4(msa_max_a_w, void, env, i32, i32, i32)
-+DEF_HELPER_4(msa_max_a_d, void, env, i32, i32, i32)
-+DEF_HELPER_4(msa_min_a_b, void, env, i32, i32, i32)
-+DEF_HELPER_4(msa_min_a_h, void, env, i32, i32, i32)
-+DEF_HELPER_4(msa_min_a_w, void, env, i32, i32, i32)
-+DEF_HELPER_4(msa_min_a_d, void, env, i32, i32, i32)
-+
- DEF_HELPER_4(msa_mod_u_b, void, env, i32, i32, i32)
- DEF_HELPER_4(msa_mod_u_h, void, env, i32, i32, i32)
- DEF_HELPER_4(msa_mod_u_w, void, env, i32, i32, i32)
-@@ -940,8 +949,6 @@ DEF_HELPER_5(msa_max_s_df, void, env, i32, i32, i32, i32)
- DEF_HELPER_5(msa_max_u_df, void, env, i32, i32, i32, i32)
- DEF_HELPER_5(msa_min_s_df, void, env, i32, i32, i32, i32)
- DEF_HELPER_5(msa_min_u_df, void, env, i32, i32, i32, i32)
--DEF_HELPER_5(msa_max_a_df, void, env, i32, i32, i32, i32)
--DEF_HELPER_5(msa_min_a_df, void, env, i32, i32, i32, i32)
- DEF_HELPER_5(msa_add_a_df, void, env, i32, i32, i32, i32)
- DEF_HELPER_5(msa_adds_a_df, void, env, i32, i32, i32, i32)
- DEF_HELPER_5(msa_adds_s_df, void, env, i32, i32, i32, i32)
-diff --git a/target/mips/msa_helper.c b/target/mips/msa_helper.c
-index a2052ba..3eb0ab1 100644
---- a/target/mips/msa_helper.c
-+++ b/target/mips/msa_helper.c
-@@ -1736,7 +1736,152 @@ void helper_msa_div_u_d(CPUMIPSState *env,
-  * +---------------+----------------------------------------------------------+
-  */
- 
--/* TODO: insert Int Max Min group helpers here */
-+static inline int64_t msa_max_a_df(uint32_t df, int64_t arg1, int64_t arg2)
-+{
-+    uint64_t abs_arg1 = arg1 >= 0 ? arg1 : -arg1;
-+    uint64_t abs_arg2 = arg2 >= 0 ? arg2 : -arg2;
-+    return abs_arg1 > abs_arg2 ? arg1 : arg2;
-+}
-+
-+void helper_msa_max_a_b(CPUMIPSState *env,
-+                        uint32_t wd, uint32_t ws, uint32_t wt)
-+{
-+    wr_t *pwd = &(env->active_fpu.fpr[wd].wr);
-+    wr_t *pws = &(env->active_fpu.fpr[ws].wr);
-+    wr_t *pwt = &(env->active_fpu.fpr[wt].wr);
-+
-+    pwd->b[0]  = msa_max_a_df(DF_BYTE, pws->b[0],  pwt->b[0]);
-+    pwd->b[1]  = msa_max_a_df(DF_BYTE, pws->b[1],  pwt->b[1]);
-+    pwd->b[2]  = msa_max_a_df(DF_BYTE, pws->b[2],  pwt->b[2]);
-+    pwd->b[3]  = msa_max_a_df(DF_BYTE, pws->b[3],  pwt->b[3]);
-+    pwd->b[4]  = msa_max_a_df(DF_BYTE, pws->b[4],  pwt->b[4]);
-+    pwd->b[5]  = msa_max_a_df(DF_BYTE, pws->b[5],  pwt->b[5]);
-+    pwd->b[6]  = msa_max_a_df(DF_BYTE, pws->b[6],  pwt->b[6]);
-+    pwd->b[7]  = msa_max_a_df(DF_BYTE, pws->b[7],  pwt->b[7]);
-+    pwd->b[8]  = msa_max_a_df(DF_BYTE, pws->b[8],  pwt->b[8]);
-+    pwd->b[9]  = msa_max_a_df(DF_BYTE, pws->b[9],  pwt->b[9]);
-+    pwd->b[10] = msa_max_a_df(DF_BYTE, pws->b[10], pwt->b[10]);
-+    pwd->b[11] = msa_max_a_df(DF_BYTE, pws->b[11], pwt->b[11]);
-+    pwd->b[12] = msa_max_a_df(DF_BYTE, pws->b[12], pwt->b[12]);
-+    pwd->b[13] = msa_max_a_df(DF_BYTE, pws->b[13], pwt->b[13]);
-+    pwd->b[14] = msa_max_a_df(DF_BYTE, pws->b[14], pwt->b[14]);
-+    pwd->b[15] = msa_max_a_df(DF_BYTE, pws->b[15], pwt->b[15]);
-+}
-+
-+void helper_msa_max_a_h(CPUMIPSState *env,
-+                        uint32_t wd, uint32_t ws, uint32_t wt)
-+{
-+    wr_t *pwd = &(env->active_fpu.fpr[wd].wr);
-+    wr_t *pws = &(env->active_fpu.fpr[ws].wr);
-+    wr_t *pwt = &(env->active_fpu.fpr[wt].wr);
-+
-+    pwd->h[0]  = msa_max_a_df(DF_HALF, pws->h[0],  pwt->h[0]);
-+    pwd->h[1]  = msa_max_a_df(DF_HALF, pws->h[1],  pwt->h[1]);
-+    pwd->h[2]  = msa_max_a_df(DF_HALF, pws->h[2],  pwt->h[2]);
-+    pwd->h[3]  = msa_max_a_df(DF_HALF, pws->h[3],  pwt->h[3]);
-+    pwd->h[4]  = msa_max_a_df(DF_HALF, pws->h[4],  pwt->h[4]);
-+    pwd->h[5]  = msa_max_a_df(DF_HALF, pws->h[5],  pwt->h[5]);
-+    pwd->h[6]  = msa_max_a_df(DF_HALF, pws->h[6],  pwt->h[6]);
-+    pwd->h[7]  = msa_max_a_df(DF_HALF, pws->h[7],  pwt->h[7]);
-+}
-+
-+void helper_msa_max_a_w(CPUMIPSState *env,
-+                        uint32_t wd, uint32_t ws, uint32_t wt)
-+{
-+    wr_t *pwd = &(env->active_fpu.fpr[wd].wr);
-+    wr_t *pws = &(env->active_fpu.fpr[ws].wr);
-+    wr_t *pwt = &(env->active_fpu.fpr[wt].wr);
-+
-+    pwd->w[0]  = msa_max_a_df(DF_WORD, pws->w[0],  pwt->w[0]);
-+    pwd->w[1]  = msa_max_a_df(DF_WORD, pws->w[1],  pwt->w[1]);
-+    pwd->w[2]  = msa_max_a_df(DF_WORD, pws->w[2],  pwt->w[2]);
-+    pwd->w[3]  = msa_max_a_df(DF_WORD, pws->w[3],  pwt->w[3]);
-+}
-+
-+void helper_msa_max_a_d(CPUMIPSState *env,
-+                        uint32_t wd, uint32_t ws, uint32_t wt)
-+{
-+    wr_t *pwd = &(env->active_fpu.fpr[wd].wr);
-+    wr_t *pws = &(env->active_fpu.fpr[ws].wr);
-+    wr_t *pwt = &(env->active_fpu.fpr[wt].wr);
-+
-+    pwd->d[0]  = msa_max_a_df(DF_DOUBLE, pws->d[0],  pwt->d[0]);
-+    pwd->d[1]  = msa_max_a_df(DF_DOUBLE, pws->d[1],  pwt->d[1]);
-+}
-+
-+
-+static inline int64_t msa_min_a_df(uint32_t df, int64_t arg1, int64_t arg2)
-+{
-+    uint64_t abs_arg1 = arg1 >= 0 ? arg1 : -arg1;
-+    uint64_t abs_arg2 = arg2 >= 0 ? arg2 : -arg2;
-+    return abs_arg1 < abs_arg2 ? arg1 : arg2;
-+}
-+
-+void helper_msa_min_a_b(CPUMIPSState *env,
-+                        uint32_t wd, uint32_t ws, uint32_t wt)
-+{
-+    wr_t *pwd = &(env->active_fpu.fpr[wd].wr);
-+    wr_t *pws = &(env->active_fpu.fpr[ws].wr);
-+    wr_t *pwt = &(env->active_fpu.fpr[wt].wr);
-+
-+    pwd->b[0]  = msa_min_a_df(DF_BYTE, pws->b[0],  pwt->b[0]);
-+    pwd->b[1]  = msa_min_a_df(DF_BYTE, pws->b[1],  pwt->b[1]);
-+    pwd->b[2]  = msa_min_a_df(DF_BYTE, pws->b[2],  pwt->b[2]);
-+    pwd->b[3]  = msa_min_a_df(DF_BYTE, pws->b[3],  pwt->b[3]);
-+    pwd->b[4]  = msa_min_a_df(DF_BYTE, pws->b[4],  pwt->b[4]);
-+    pwd->b[5]  = msa_min_a_df(DF_BYTE, pws->b[5],  pwt->b[5]);
-+    pwd->b[6]  = msa_min_a_df(DF_BYTE, pws->b[6],  pwt->b[6]);
-+    pwd->b[7]  = msa_min_a_df(DF_BYTE, pws->b[7],  pwt->b[7]);
-+    pwd->b[8]  = msa_min_a_df(DF_BYTE, pws->b[8],  pwt->b[8]);
-+    pwd->b[9]  = msa_min_a_df(DF_BYTE, pws->b[9],  pwt->b[9]);
-+    pwd->b[10] = msa_min_a_df(DF_BYTE, pws->b[10], pwt->b[10]);
-+    pwd->b[11] = msa_min_a_df(DF_BYTE, pws->b[11], pwt->b[11]);
-+    pwd->b[12] = msa_min_a_df(DF_BYTE, pws->b[12], pwt->b[12]);
-+    pwd->b[13] = msa_min_a_df(DF_BYTE, pws->b[13], pwt->b[13]);
-+    pwd->b[14] = msa_min_a_df(DF_BYTE, pws->b[14], pwt->b[14]);
-+    pwd->b[15] = msa_min_a_df(DF_BYTE, pws->b[15], pwt->b[15]);
-+}
-+
-+void helper_msa_min_a_h(CPUMIPSState *env,
-+                        uint32_t wd, uint32_t ws, uint32_t wt)
-+{
-+    wr_t *pwd = &(env->active_fpu.fpr[wd].wr);
-+    wr_t *pws = &(env->active_fpu.fpr[ws].wr);
-+    wr_t *pwt = &(env->active_fpu.fpr[wt].wr);
-+
-+    pwd->h[0]  = msa_min_a_df(DF_HALF, pws->h[0],  pwt->h[0]);
-+    pwd->h[1]  = msa_min_a_df(DF_HALF, pws->h[1],  pwt->h[1]);
-+    pwd->h[2]  = msa_min_a_df(DF_HALF, pws->h[2],  pwt->h[2]);
-+    pwd->h[3]  = msa_min_a_df(DF_HALF, pws->h[3],  pwt->h[3]);
-+    pwd->h[4]  = msa_min_a_df(DF_HALF, pws->h[4],  pwt->h[4]);
-+    pwd->h[5]  = msa_min_a_df(DF_HALF, pws->h[5],  pwt->h[5]);
-+    pwd->h[6]  = msa_min_a_df(DF_HALF, pws->h[6],  pwt->h[6]);
-+    pwd->h[7]  = msa_min_a_df(DF_HALF, pws->h[7],  pwt->h[7]);
-+}
-+
-+void helper_msa_min_a_w(CPUMIPSState *env,
-+                        uint32_t wd, uint32_t ws, uint32_t wt)
-+{
-+    wr_t *pwd = &(env->active_fpu.fpr[wd].wr);
-+    wr_t *pws = &(env->active_fpu.fpr[ws].wr);
-+    wr_t *pwt = &(env->active_fpu.fpr[wt].wr);
-+
-+    pwd->w[0]  = msa_min_a_df(DF_WORD, pws->w[0],  pwt->w[0]);
-+    pwd->w[1]  = msa_min_a_df(DF_WORD, pws->w[1],  pwt->w[1]);
-+    pwd->w[2]  = msa_min_a_df(DF_WORD, pws->w[2],  pwt->w[2]);
-+    pwd->w[3]  = msa_min_a_df(DF_WORD, pws->w[3],  pwt->w[3]);
-+}
-+
-+void helper_msa_min_a_d(CPUMIPSState *env,
-+                        uint32_t wd, uint32_t ws, uint32_t wt)
-+{
-+    wr_t *pwd = &(env->active_fpu.fpr[wd].wr);
-+    wr_t *pws = &(env->active_fpu.fpr[ws].wr);
-+    wr_t *pwt = &(env->active_fpu.fpr[wt].wr);
-+
-+    pwd->d[0]  = msa_min_a_df(DF_DOUBLE, pws->d[0],  pwt->d[0]);
-+    pwd->d[1]  = msa_min_a_df(DF_DOUBLE, pws->d[1],  pwt->d[1]);
-+}
- 
- 
- /*
-@@ -2456,20 +2601,6 @@ MSA_TEROP_IMMU_DF(binsli, binsl)
- MSA_TEROP_IMMU_DF(binsri, binsr)
- #undef MSA_TEROP_IMMU_DF
- 
--static inline int64_t msa_max_a_df(uint32_t df, int64_t arg1, int64_t arg2)
--{
--    uint64_t abs_arg1 = arg1 >= 0 ? arg1 : -arg1;
--    uint64_t abs_arg2 = arg2 >= 0 ? arg2 : -arg2;
--    return abs_arg1 > abs_arg2 ? arg1 : arg2;
--}
--
--static inline int64_t msa_min_a_df(uint32_t df, int64_t arg1, int64_t arg2)
--{
--    uint64_t abs_arg1 = arg1 >= 0 ? arg1 : -arg1;
--    uint64_t abs_arg2 = arg2 >= 0 ? arg2 : -arg2;
--    return abs_arg1 < abs_arg2 ? arg1 : arg2;
--}
--
- static inline int64_t msa_add_a_df(uint32_t df, int64_t arg1, int64_t arg2)
- {
-     uint64_t abs_arg1 = arg1 >= 0 ? arg1 : -arg1;
-@@ -2773,8 +2904,6 @@ MSA_BINOP_DF(max_s)
- MSA_BINOP_DF(max_u)
- MSA_BINOP_DF(min_s)
- MSA_BINOP_DF(min_u)
--MSA_BINOP_DF(max_a)
--MSA_BINOP_DF(min_a)
- MSA_BINOP_DF(add_a)
- MSA_BINOP_DF(adds_a)
- MSA_BINOP_DF(adds_s)
-diff --git a/target/mips/translate.c b/target/mips/translate.c
-index 5039716..8e26548 100644
---- a/target/mips/translate.c
-+++ b/target/mips/translate.c
-@@ -28642,6 +28642,38 @@ static void gen_msa_3r(CPUMIPSState *env, DisasContext *ctx)
-             break;
+diff --git a/hw/timer/mc146818rtc.c b/hw/timer/mc146818rtc.c
+index 8da7fd1a50..adbc3b9d57 100644
+--- a/hw/timer/mc146818rtc.c
++++ b/hw/timer/mc146818rtc.c
+@@ -224,7 +224,6 @@ periodic_timer_update(RTCState *s, int64_t current_time=
+, uint32_t old_period)
+         last_periodic_clock =3D next_periodic_clock - old_period;
+         lost_clock =3D cur_clock - last_periodic_clock;
+         assert(lost_clock >=3D 0);
+-        }
+=20
+         /*
+          * s->irq_coalesced can change for two reasons:
+@@ -261,6 +260,7 @@ periodic_timer_update(RTCState *s, int64_t current_time=
+, uint32_t old_period)
+              */
+             lost_clock =3D MIN(lost_clock, period);
          }
-         break;
-+    case OPC_MAX_A_df:
-+        switch (df) {
-+        case DF_BYTE:
-+            gen_helper_msa_max_a_b(cpu_env, twd, tws, twt);
-+            break;
-+        case DF_HALF:
-+            gen_helper_msa_max_a_h(cpu_env, twd, tws, twt);
-+            break;
-+        case DF_WORD:
-+            gen_helper_msa_max_a_w(cpu_env, twd, tws, twt);
-+            break;
-+        case DF_DOUBLE:
-+            gen_helper_msa_max_a_d(cpu_env, twd, tws, twt);
-+            break;
-+        }
-+        break;
-+    case OPC_MIN_A_df:
-+        switch (df) {
-+        case DF_BYTE:
-+            gen_helper_msa_min_a_b(cpu_env, twd, tws, twt);
-+            break;
-+        case DF_HALF:
-+            gen_helper_msa_min_a_h(cpu_env, twd, tws, twt);
-+            break;
-+        case DF_WORD:
-+            gen_helper_msa_min_a_w(cpu_env, twd, tws, twt);
-+            break;
-+        case DF_DOUBLE:
-+            gen_helper_msa_min_a_d(cpu_env, twd, tws, twt);
-+            break;
-+        }
-+        break;
-     case OPC_MOD_S_df:
-         switch (df) {
-         case DF_BYTE:
-@@ -28767,15 +28799,9 @@ static void gen_msa_3r(CPUMIPSState *env, DisasContext *ctx)
-     case OPC_ILVR_df:
-         gen_helper_msa_ilvr_df(cpu_env, tdf, twd, tws, twt);
-         break;
--    case OPC_MAX_A_df:
--        gen_helper_msa_max_a_df(cpu_env, tdf, twd, tws, twt);
--        break;
-     case OPC_ILVEV_df:
-         gen_helper_msa_ilvev_df(cpu_env, tdf, twd, tws, twt);
-         break;
--    case OPC_MIN_A_df:
--        gen_helper_msa_min_a_df(cpu_env, tdf, twd, tws, twt);
--        break;
-     case OPC_ILVOD_df:
-         gen_helper_msa_ilvod_df(cpu_env, tdf, twd, tws, twt);
-         break;
--- 
-2.7.4
++    }
+=20
+     assert(lost_clock >=3D 0 && lost_clock <=3D period);
+=20
+--=20
+2.21.0
 
 
