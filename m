@@ -2,88 +2,119 @@ Return-Path: <SRS0=Jnn8=YR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 678C2CA9EAF
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 16:36:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CA7BBCA9EAF
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 16:37:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3149121906
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 16:36:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 53183205C9
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 16:37:48 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="dr9H6AZO"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3149121906
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bj62jRzo"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 53183205C9
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47408 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47500 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iNg5n-000474-2z
-	for qemu-devel@archiver.kernel.org; Thu, 24 Oct 2019 12:36:07 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57707)
+	id 1iNg7O-0007J3-Bb
+	for qemu-devel@archiver.kernel.org; Thu, 24 Oct 2019 12:37:46 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51921)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1iNfxY-0006xn-PC
- for qemu-devel@nongnu.org; Thu, 24 Oct 2019 12:27:38 -0400
+ (envelope-from <mreitz@redhat.com>) id 1iNfSS-0001Dz-Kn
+ for qemu-devel@nongnu.org; Thu, 24 Oct 2019 11:55:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1iNfxX-0000ga-C6
- for qemu-devel@nongnu.org; Thu, 24 Oct 2019 12:27:36 -0400
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:55221)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1iNfxX-0000gC-4q
- for qemu-devel@nongnu.org; Thu, 24 Oct 2019 12:27:35 -0400
-Received: by mail-wm1-x343.google.com with SMTP id g7so3535072wmk.4
- for <qemu-devel@nongnu.org>; Thu, 24 Oct 2019 09:27:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:subject:date:message-id:in-reply-to:references:mime-version
- :content-transfer-encoding;
- bh=bYwTl3jw7Dzln0o9WYtKWCimWjsmaSgObx3Y/zWbSwc=;
- b=dr9H6AZOkBHB6ljOi+nH461RRs5U9Pe/21Xeopm5DhgSEFGUjfPz7p/vdKPM9fTOrG
- 3K4h/jT+F89ZzQ/tdBJ+K+QQ7t1fCdRt5mVslDCuUiiJ7XJge69YxQGj2MRGD0idHZSx
- QJe4vnoxDIvZxPtboKgw9QroU/pqRJrRSKfVpfn0LWuyM6EKtVR0K5VlUJs3QQ5X6lC1
- jWiV7WwHCwfq5kIGQSLa9+dp8D9OZAfbcuIfseas8TwaP4tYaCJv5fCqD1JfVH3uhHha
- KoSKgQFsm3JWkPA7maEcuBF9/jQqKwZ6EWOGrmjUMMlbIvXl2WtwiP7nBQGlQi4xZ0+j
- ErWA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=bYwTl3jw7Dzln0o9WYtKWCimWjsmaSgObx3Y/zWbSwc=;
- b=bup9vY/cfd+UMKjDpiazuNeBDqFr3laL3IAs2FDj/rKcQgKsnumsgek1L7UK3aogHd
- dYTw4YN7p8XwNfqGgY8vJXrU3uIqkSpNhnsa2irbrtiQHIcLcHttZb+ZA/WiFinAMY5N
- TRetrsx/b36rrUI70mBRwws1OmW6a0Pt2RpPARd87AZhSfIbYUjFlKzamG+QmcReEvcL
- hncUxlypZtDxoCbMI/1NbU5YYwDq9lp9BqrDhV4QQJK6l6Gf2Y5OEglN/ZABvg1hX8np
- GxHIKrGTpzgFOHRxlFu355Us2H99KBeDPdYie/Ccene5NdAbMBNi1CbJ1/Qftf3dPxdA
- xsow==
-X-Gm-Message-State: APjAAAX4ISHTLXjNTJ0oFwmUUIIbFUKWQ/kZCYzrorhzAXsE2MplN5zO
- nmVQeNmABiNBzcfZTN3NpBmjGLNGi/Q=
-X-Google-Smtp-Source: APXvYqyc4iKotdz2c+oIUzHPAzfAURqBCHVu9xecQY+lXKt+9ijIqcyh2OeG0dyPn1QaQhoL1FSkXw==
-X-Received: by 2002:a05:600c:2318:: with SMTP id
- 24mr5519929wmo.146.1571934452572; 
- Thu, 24 Oct 2019 09:27:32 -0700 (PDT)
-Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id r27sm42606124wrc.55.2019.10.24.09.27.31
- for <qemu-devel@nongnu.org>
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 24 Oct 2019 09:27:31 -0700 (PDT)
-From: Peter Maydell <peter.maydell@linaro.org>
-To: qemu-devel@nongnu.org
-Subject: [PULL 04/51] target/arm: Split out rebuild_hflags_a64
-Date: Thu, 24 Oct 2019 17:26:37 +0100
-Message-Id: <20191024162724.31675-5-peter.maydell@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20191024162724.31675-1-peter.maydell@linaro.org>
-References: <20191024162724.31675-1-peter.maydell@linaro.org>
+ (envelope-from <mreitz@redhat.com>) id 1iNfSP-0006Hi-BU
+ for qemu-devel@nongnu.org; Thu, 24 Oct 2019 11:55:27 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:40596
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1iNfSP-0006Gt-7D
+ for qemu-devel@nongnu.org; Thu, 24 Oct 2019 11:55:25 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1571932521;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=ogmp402+Z+IcVX9NnkmQlLHSGtAcJg+U0yJd1c0m+iw=;
+ b=bj62jRzoysntCy4GalQ+SZn1+xNSvU2XxAgQ3Naa2kGFbJHP5D87oxo5gxHoV4LQQRNh/e
+ +v1AtsQmzyvK3XjQoMwqOEYNDRANx9HYSHP4lgwpv9fbfMl3PUEjAFicfHaGUhHj3edM71
+ P9vS0yhZQ1c4XYbmLivz4n3HwB34fBE=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-135-Vt5hsn6kPhSf6i_jQrRx8A-1; Thu, 24 Oct 2019 11:55:11 -0400
+X-MC-Unique: Vt5hsn6kPhSf6i_jQrRx8A-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D4B0E86A079;
+ Thu, 24 Oct 2019 15:12:10 +0000 (UTC)
+Received: from dresden.str.redhat.com (ovpn-117-205.ams2.redhat.com
+ [10.36.117.205])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 10E2010A33E2;
+ Thu, 24 Oct 2019 15:12:03 +0000 (UTC)
+Subject: Re: [PATCH v5 1/4] block: support compressed write at generic layer
+To: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>,
+ Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+References: <1571603828-185910-1-git-send-email-andrey.shinkevich@virtuozzo.com>
+ <1571603828-185910-2-git-send-email-andrey.shinkevich@virtuozzo.com>
+ <408ef2ab-1f6c-2c9f-ad50-92269c20fb27@redhat.com>
+ <eece4ca2-7c40-cae6-b15f-beed73830fd8@virtuozzo.com>
+ <cc3f87c2-3ad5-da4e-4750-27a48bce1ee6@virtuozzo.com>
+ <787da788-9aca-2110-a092-b63ef498a9fa@redhat.com>
+ <ae5bc00f-e65e-8c33-2620-a9147e48ea78@virtuozzo.com>
+ <1088f0ff-d882-083f-705c-95c08bdc486f@redhat.com>
+ <cb6db9c4-0dbc-9d9a-4ec5-b436c48178a8@virtuozzo.com>
+ <4fd89d2a-94aa-6f2d-ed7d-7633356e5163@redhat.com>
+ <539e7d9e-0cb7-fdb7-f376-1648361ec2f3@virtuozzo.com>
+ <8828d08f-79aa-f3a6-4387-f1423a8b7d70@redhat.com>
+ <26cfb4ed-941a-11b0-c1cf-bf3c7e354487@virtuozzo.com>
+From: Max Reitz <mreitz@redhat.com>
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <f2463f6b-3d61-b64e-2789-e71d7648105c@redhat.com>
+Date: Thu, 24 Oct 2019 17:12:02 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::343
+In-Reply-To: <26cfb4ed-941a-11b0-c1cf-bf3c7e354487@virtuozzo.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Mimecast-Spam-Score: 0
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="JIWV1lqDSdOyWxr1j8zBjZfd906fqz8zL"
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -95,188 +126,114 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: "kwolf@redhat.com" <kwolf@redhat.com>, "fam@euphon.net" <fam@euphon.net>,
+ Denis Lunev <den@virtuozzo.com>, "armbru@redhat.com" <armbru@redhat.com>,
+ "stefanha@redhat.com" <stefanha@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Richard Henderson <richard.henderson@linaro.org>
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--JIWV1lqDSdOyWxr1j8zBjZfd906fqz8zL
+Content-Type: multipart/mixed; boundary="nXwzCthMmdqfmLp2moXhqtdIpJpjKEKXp"
 
-Create a function to compute the values of the TBFLAG_A64 bits
-that will be cached.  For now, the env->hflags variable is not
-used, and the results are fed back to cpu_get_tb_cpu_state.
+--nXwzCthMmdqfmLp2moXhqtdIpJpjKEKXp
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
-Note that not all BTI related flags are cached, so we have to
-test the BTI feature twice -- once for those bits moved out to
-rebuild_hflags_a64 and once for those bits that remain in
-cpu_get_tb_cpu_state.
+On 24.10.19 16:07, Andrey Shinkevich wrote:
+>=20
+>=20
+> On 24/10/2019 16:48, Max Reitz wrote:
+>> On 24.10.19 14:56, Andrey Shinkevich wrote:
+>>>
+>>>
+>>> On 24/10/2019 12:34, Max Reitz wrote:
+>>>> On 22.10.19 15:53, Andrey Shinkevich wrote:
+>>>>
+>>>> [...]
+>>>>
+>>>>> If the support of COW for compressed writes is found feasible, will i=
+t
+>>>>> make a sense to implement? Then this series will follow.
+>>>>
+>>>> Hm, what exactly do you mean by support of COW for compressed writes?
+>>>>
+>>>
+>>> I spoke in terms of the commit message with the following ID:
+>>>
+>>> b0b6862e5e1a1394e0ab3d5da94ba8b0da8664e2
+>>>
+>>> "qcow2: Fail write_compressed when overwriting data"
+>>>
+>>> "...qcow2_write_compressed() doesn't perform COW as it would have to do=
+..."
+>>>
+>>> So, I suggest that we implement writing compressed data to the allocate=
+d
+>>> clusters rather than qcow2_alloc_compressed_cluster_offset() returns th=
+e
+>>> error. Particularly, when it comes to NBD server connection failure for
+>>> writhing a compressed cluster, it may not be rewritten after the
+>>> connection is restored.
+>>> Are there any issues with that implementation idea?
+>>
+>> Well, the COW in that commit is meant differently, because it refers to
+>> the COW that=E2=80=99s required when writing to a cluster shared by an i=
+nternal
+>> snapshot.
+>>
+>> OTOH, you could say that all compressed writes to a cluster that is
+>> already allocated would need to do COW because we=E2=80=99d always have =
+to fully
+>> rewrite that cluster in an RMW cycle.
+>>
+>> I don=E2=80=99t see how letting qcow2_alloc_compressed_cluster_offset() =
+use the
+>> existing cluster would solve the problem, though.  You=E2=80=99d general=
+ly need
+>> to allocate a new cluster; or attempt to reuse the existing space in a
+>> compressed cluster.
+>>
+>> Max
+>>
+>=20
+> Yes, new clusters would be allocated for the compressed RMW and the=20
+> existing ones would be reused if possible. It seams to be ineffective=20
+> but users are supposed to know what they do.
+> So, does it worth to check a feasibility of the implementation?
 
-Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-Message-id: 20191023150057.25731-3-richard.henderson@linaro.org
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
----
- target/arm/helper.c | 131 +++++++++++++++++++++++---------------------
- 1 file changed, 69 insertions(+), 62 deletions(-)
+I don=E2=80=99t know, Vladimir said that use case wouldn=E2=80=99t be neede=
+d.
 
-diff --git a/target/arm/helper.c b/target/arm/helper.c
-index 8829d91ae1d..69da04786e8 100644
---- a/target/arm/helper.c
-+++ b/target/arm/helper.c
-@@ -11070,6 +11070,71 @@ static uint32_t rebuild_hflags_common(CPUARMState *env, int fp_el,
-     return flags;
- }
- 
-+static uint32_t rebuild_hflags_a64(CPUARMState *env, int el, int fp_el,
-+                                   ARMMMUIdx mmu_idx)
-+{
-+    ARMMMUIdx stage1 = stage_1_mmu_idx(mmu_idx);
-+    ARMVAParameters p0 = aa64_va_parameters_both(env, 0, stage1);
-+    uint32_t flags = 0;
-+    uint64_t sctlr;
-+    int tbii, tbid;
-+
-+    flags = FIELD_DP32(flags, TBFLAG_ANY, AARCH64_STATE, 1);
-+
-+    /* FIXME: ARMv8.1-VHE S2 translation regime.  */
-+    if (regime_el(env, stage1) < 2) {
-+        ARMVAParameters p1 = aa64_va_parameters_both(env, -1, stage1);
-+        tbid = (p1.tbi << 1) | p0.tbi;
-+        tbii = tbid & ~((p1.tbid << 1) | p0.tbid);
-+    } else {
-+        tbid = p0.tbi;
-+        tbii = tbid & !p0.tbid;
-+    }
-+
-+    flags = FIELD_DP32(flags, TBFLAG_A64, TBII, tbii);
-+    flags = FIELD_DP32(flags, TBFLAG_A64, TBID, tbid);
-+
-+    if (cpu_isar_feature(aa64_sve, env_archcpu(env))) {
-+        int sve_el = sve_exception_el(env, el);
-+        uint32_t zcr_len;
-+
-+        /*
-+         * If SVE is disabled, but FP is enabled,
-+         * then the effective len is 0.
-+         */
-+        if (sve_el != 0 && fp_el == 0) {
-+            zcr_len = 0;
-+        } else {
-+            zcr_len = sve_zcr_len_for_el(env, el);
-+        }
-+        flags = FIELD_DP32(flags, TBFLAG_A64, SVEEXC_EL, sve_el);
-+        flags = FIELD_DP32(flags, TBFLAG_A64, ZCR_LEN, zcr_len);
-+    }
-+
-+    sctlr = arm_sctlr(env, el);
-+
-+    if (cpu_isar_feature(aa64_pauth, env_archcpu(env))) {
-+        /*
-+         * In order to save space in flags, we record only whether
-+         * pauth is "inactive", meaning all insns are implemented as
-+         * a nop, or "active" when some action must be performed.
-+         * The decision of which action to take is left to a helper.
-+         */
-+        if (sctlr & (SCTLR_EnIA | SCTLR_EnIB | SCTLR_EnDA | SCTLR_EnDB)) {
-+            flags = FIELD_DP32(flags, TBFLAG_A64, PAUTH_ACTIVE, 1);
-+        }
-+    }
-+
-+    if (cpu_isar_feature(aa64_bti, env_archcpu(env))) {
-+        /* Note that SCTLR_EL[23].BT == SCTLR_BT1.  */
-+        if (sctlr & (el == 0 ? SCTLR_BT0 : SCTLR_BT1)) {
-+            flags = FIELD_DP32(flags, TBFLAG_A64, BT, 1);
-+        }
-+    }
-+
-+    return rebuild_hflags_common(env, fp_el, mmu_idx, flags);
-+}
-+
- void cpu_get_tb_cpu_state(CPUARMState *env, target_ulong *pc,
-                           target_ulong *cs_base, uint32_t *pflags)
- {
-@@ -11079,67 +11144,9 @@ void cpu_get_tb_cpu_state(CPUARMState *env, target_ulong *pc,
-     uint32_t flags = 0;
- 
-     if (is_a64(env)) {
--        ARMCPU *cpu = env_archcpu(env);
--        uint64_t sctlr;
--
-         *pc = env->pc;
--        flags = FIELD_DP32(flags, TBFLAG_ANY, AARCH64_STATE, 1);
--
--        /* Get control bits for tagged addresses.  */
--        {
--            ARMMMUIdx stage1 = stage_1_mmu_idx(mmu_idx);
--            ARMVAParameters p0 = aa64_va_parameters_both(env, 0, stage1);
--            int tbii, tbid;
--
--            /* FIXME: ARMv8.1-VHE S2 translation regime.  */
--            if (regime_el(env, stage1) < 2) {
--                ARMVAParameters p1 = aa64_va_parameters_both(env, -1, stage1);
--                tbid = (p1.tbi << 1) | p0.tbi;
--                tbii = tbid & ~((p1.tbid << 1) | p0.tbid);
--            } else {
--                tbid = p0.tbi;
--                tbii = tbid & !p0.tbid;
--            }
--
--            flags = FIELD_DP32(flags, TBFLAG_A64, TBII, tbii);
--            flags = FIELD_DP32(flags, TBFLAG_A64, TBID, tbid);
--        }
--
--        if (cpu_isar_feature(aa64_sve, cpu)) {
--            int sve_el = sve_exception_el(env, current_el);
--            uint32_t zcr_len;
--
--            /* If SVE is disabled, but FP is enabled,
--             * then the effective len is 0.
--             */
--            if (sve_el != 0 && fp_el == 0) {
--                zcr_len = 0;
--            } else {
--                zcr_len = sve_zcr_len_for_el(env, current_el);
--            }
--            flags = FIELD_DP32(flags, TBFLAG_A64, SVEEXC_EL, sve_el);
--            flags = FIELD_DP32(flags, TBFLAG_A64, ZCR_LEN, zcr_len);
--        }
--
--        sctlr = arm_sctlr(env, current_el);
--
--        if (cpu_isar_feature(aa64_pauth, cpu)) {
--            /*
--             * In order to save space in flags, we record only whether
--             * pauth is "inactive", meaning all insns are implemented as
--             * a nop, or "active" when some action must be performed.
--             * The decision of which action to take is left to a helper.
--             */
--            if (sctlr & (SCTLR_EnIA | SCTLR_EnIB | SCTLR_EnDA | SCTLR_EnDB)) {
--                flags = FIELD_DP32(flags, TBFLAG_A64, PAUTH_ACTIVE, 1);
--            }
--        }
--
--        if (cpu_isar_feature(aa64_bti, cpu)) {
--            /* Note that SCTLR_EL[23].BT == SCTLR_BT1.  */
--            if (sctlr & (current_el == 0 ? SCTLR_BT0 : SCTLR_BT1)) {
--                flags = FIELD_DP32(flags, TBFLAG_A64, BT, 1);
--            }
-+        flags = rebuild_hflags_a64(env, current_el, fp_el, mmu_idx);
-+        if (cpu_isar_feature(aa64_bti, env_archcpu(env))) {
-             flags = FIELD_DP32(flags, TBFLAG_A64, BTYPE, env->btype);
-         }
-     } else {
-@@ -11159,9 +11166,9 @@ void cpu_get_tb_cpu_state(CPUARMState *env, target_ulong *pc,
-             flags = FIELD_DP32(flags, TBFLAG_A32,
-                                XSCALE_CPAR, env->cp15.c15_cpar);
-         }
--    }
- 
--    flags = rebuild_hflags_common(env, fp_el, mmu_idx, flags);
-+        flags = rebuild_hflags_common(env, fp_el, mmu_idx, flags);
-+    }
- 
-     /* The SS_ACTIVE and PSTATE_SS bits correspond to the state machine
-      * states defined in the ARM ARM for software singlestep:
--- 
-2.20.1
+I think if the option was there, people would actually use it.  But I
+doubt that anyone misses it sufficiently to warrant the effort.
+
+In addition, there=E2=80=99s still VMDK to consider, too.
+
+Max
+
+
+--nXwzCthMmdqfmLp2moXhqtdIpJpjKEKXp--
+
+--JIWV1lqDSdOyWxr1j8zBjZfd906fqz8zL
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl2xv0IACgkQ9AfbAGHV
+z0DAxwgAxBKm3TKBDPW2H0J4hPoV+A7yDd/Ce7NKEjyNqF9jDphm8YmfnO+y6Il2
+fpRzhQUjqUZRfZOaZqAh5zsizspy+6vbezyYlYRBb5ogb4XkCRFJwm8YIFBCShaO
+nuugg+hk0v60TVEiUAcpw/budtmzurvM7ovZse5yTsTTwVdv4dw/NFN1nZSsNjfY
+yNY3J/Mh+fCPtjSFOIi7/8KGiLiDn2iIFqAKiWnVejTd3Lwr3plWDz7Zw4J9BnxO
+Gn5K/PnHIlhpeBYszPiKKP4fuSDXmVTXuW/VVNhZR/z2DRwY0e01NEv01eD1+NPW
+5UwlfLyeA7kwHOd2S7pubz4L+k22zg==
+=KBnj
+-----END PGP SIGNATURE-----
+
+--JIWV1lqDSdOyWxr1j8zBjZfd906fqz8zL--
 
 
