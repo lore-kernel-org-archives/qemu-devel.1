@@ -2,94 +2,80 @@ Return-Path: <SRS0=Jnn8=YR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5EDEECA9EAF
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 11:18:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 51BA2CA9EAF
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 11:21:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 245722084C
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 11:18:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 196F920856
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 11:21:53 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HWgkSaHL"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 245722084C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="N9aw4x0p"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 196F920856
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39510 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39754 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iNb8f-0004ig-C7
-	for qemu-devel@archiver.kernel.org; Thu, 24 Oct 2019 07:18:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45489)
+	id 1iNbBf-0003bE-Lj
+	for qemu-devel@archiver.kernel.org; Thu, 24 Oct 2019 07:21:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59319)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <estebanbosse@gmail.com>) id 1iNZHY-0005Fm-I4
- for qemu-devel@nongnu.org; Thu, 24 Oct 2019 05:19:49 -0400
+ (envelope-from <armbru@redhat.com>) id 1iNatJ-0000xt-Ty
+ for qemu-devel@nongnu.org; Thu, 24 Oct 2019 07:02:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <estebanbosse@gmail.com>) id 1iNZHX-0000Ik-72
- for qemu-devel@nongnu.org; Thu, 24 Oct 2019 05:19:48 -0400
-Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:51872)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <estebanbosse@gmail.com>)
- id 1iNZHW-0000Gx-Uc; Thu, 24 Oct 2019 05:19:47 -0400
-Received: by mail-wm1-x344.google.com with SMTP id q70so1952739wme.1;
- Thu, 24 Oct 2019 02:19:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=message-id:subject:from:to:cc:date:in-reply-to:references
- :user-agent:mime-version:content-transfer-encoding;
- bh=MtRiJQgfJ9ZnkixG1KDBOu+rrd/k/A5pzUFTb4qm5p0=;
- b=HWgkSaHLaM4KT2a0iNnpJVNdZUAKQxKNvzIj5Z9o+o53prOV01jRgmPf1DMzsVo4iv
- kxckSCehtsshUTI1VKlHo7W/EtaINb/4TyEztSvKLzO+lMDA6jMk/d09NeK5e0m+BBHJ
- l8ywn6JAXGUx4sHRgwMe3s0CAJV+xtur1DJGCURfqkTXBypl5uxu8Vs7BNYmTOM5jOI8
- LxNBGEBL9pJvr+q8ZLOPgAtAFf9eYo5UytM9mXOENCSrrxoBFQFzJvz8ZQvLuHYUuMbq
- Z2frsHjlvPJsSB1FhH5cms6zfJK0ES26NlzLLf058x6B9Y2kkXVRd0QsqvevZG+1shb7
- MwLQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:message-id:subject:from:to:cc:date:in-reply-to
- :references:user-agent:mime-version:content-transfer-encoding;
- bh=MtRiJQgfJ9ZnkixG1KDBOu+rrd/k/A5pzUFTb4qm5p0=;
- b=iYYnaXDNBSQBZEs6RYHiRCUSeue5qel61liM05BItbDsTaO/xwQOx/DqemBVITjwuc
- 0ZpYP5xiLSsmAvhYnjRUDa1t+9VFkcMlo3uH+7n2zF7A2Mnk+XVeDZZCkKXGfKIi96b/
- VjqiN+TTyecxebKbSmAJCHdVS4ZPPgMQdjNj+pRxswoTfSntc8u2bliEeiONqWiJBRmV
- dhoOOUNFKq1RXOaE6Gyar1H/i4ejoZs5O5p8YMvyi2Igt2rkBpMIiqG5SOJlOEnwMwvS
- UFBWHsFjEZJHYdSfkBWHBIn91DW4IGfU1km7pEogxLIpyBxEJRCmY49aDSkekyPZhaH0
- mCBw==
-X-Gm-Message-State: APjAAAVXW3tz099tkB682NjTAYpK1Rj9YuhH7LZRxbe1b/WRYURHcI5y
- VpyFDgOp/wVStbYSenYnKrA=
-X-Google-Smtp-Source: APXvYqygb8LalNQ9Md4VTnLJftVwW84EHPEIBxAwaFKBTMV1aPfo4WAWySUbDAqBIrr3RhGaFJ9O7Q==
-X-Received: by 2002:a1c:64d4:: with SMTP id y203mr3976343wmb.27.1571908784275; 
- Thu, 24 Oct 2019 02:19:44 -0700 (PDT)
-Received: from ?IPv6:2a01:c22:b04f:9c00:d5b4:db5f:bfb4:fdb?
- ([2a01:c22:b04f:9c00:d5b4:db5f:bfb4:fdb])
- by smtp.gmail.com with ESMTPSA id f8sm1926360wmb.37.2019.10.24.02.19.43
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 24 Oct 2019 02:19:43 -0700 (PDT)
-Message-ID: <f623a5e67cec8934b136cf8ae68ba70dd58a6f84.camel@gmail.com>
-Subject: Re: [RFC PATCH 03/14] hw/misc/bcm2835_property: Handle the 'domain
- state' property
-From: Esteban Bosse <estebanbosse@gmail.com>
-To: Philippe =?ISO-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>, Peter
- Maydell <peter.maydell@linaro.org>, Andrew Baumann
- <Andrew.Baumann@microsoft.com>,  qemu-devel@nongnu.org, Pekka Enberg
- <penberg@iki.fi>,  =?ISO-8859-1?Q?Zolt=E1n?= Baldaszti <bztemail@gmail.com>
-Date: Thu, 24 Oct 2019 11:15:33 +0200
-In-Reply-To: <7023ba2c-edfa-8313-8138-0556f4a03023@amsat.org>
-References: <20190904171315.8354-1-f4bug@amsat.org>
- <20190904171315.8354-4-f4bug@amsat.org>
- <d02a29663183b8963bc34a0d1b031442d997ab62.camel@gmail.com>
- <7023ba2c-edfa-8313-8138-0556f4a03023@amsat.org>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.30.5-1.1 
+ (envelope-from <armbru@redhat.com>) id 1iNatE-0004p4-4R
+ for qemu-devel@nongnu.org; Thu, 24 Oct 2019 07:02:53 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:48325
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1iNatC-0004kj-5J
+ for qemu-devel@nongnu.org; Thu, 24 Oct 2019 07:02:46 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1571914963;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=nY8sPXoPv6bdDgTv7e288AmKHTGhWVNKQpDom+3IaZY=;
+ b=N9aw4x0p2jEL7g1kbgEpai57U5mQRRJzpdF/O7g7W1QFWIGpKyC2z5+Zfokkjg2OeZaDUj
+ msJqM8EgV+rQgSNZ/vM1uWPzD9U2iptuZDdzbRE5SIIGd8Xbywh3dhllT+Ftyld4xioAJA
+ aKRNyYd4yb36sYk1IhEzyKUUhahIHxA=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-132-s4gOj8gXOlOOFkIFUjxISA-1; Thu, 24 Oct 2019 07:02:40 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2F63A1005500;
+ Thu, 24 Oct 2019 11:02:39 +0000 (UTC)
+Received: from blackfin.pond.sub.org (unknown [10.36.118.123])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id C01AF196B2;
+ Thu, 24 Oct 2019 11:02:38 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id 3E7D51133034; Thu, 24 Oct 2019 13:02:37 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH 02/19] tests/qapi-schema: Demonstrate command and event doc
+ comment bugs
+Date: Thu, 24 Oct 2019 13:02:20 +0200
+Message-Id: <20191024110237.30963-3-armbru@redhat.com>
+In-Reply-To: <20191024110237.30963-1-armbru@redhat.com>
+References: <20191024110237.30963-1-armbru@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::344
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-MC-Unique: s4gOj8gXOlOOFkIFUjxISA-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=WINDOWS-1252
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -101,95 +87,217 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-arm@nongnu.org, Clement Deschamps <clement.deschamps@antfield.fr>,
- =?ISO-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
- Philippe =?ISO-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>,
- Luc Michel <luc.michel@greensocs.com>
+Cc: kwolf@redhat.com, pkrempa@redhat.com, mdroth@linux.vnet.ibm.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-El mar, 08-10-2019 a las 11:32 +0200, Philippe Mathieu-Daudé escribió:
-> On 9/29/19 9:01 AM, Esteban Bosse wrote:
-> > El mié, 04-09-2019 a las 19:13 +0200, Philippe Mathieu-Daudé
-> > escribió:
-> > > The kernel is happy with this change, so we don't need
-> > > to do anything more sophisticated.
-> > > 
-> > > Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-> > > Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-> > > ---
-> > >   hw/misc/bcm2835_property.c | 8 ++++++++
-> > >   1 file changed, 8 insertions(+)
-> > > 
-> > > diff --git a/hw/misc/bcm2835_property.c
-> > > b/hw/misc/bcm2835_property.c
-> > > index 399f0d9dd5..d8eb28f267 100644
-> > > --- a/hw/misc/bcm2835_property.c
-> > > +++ b/hw/misc/bcm2835_property.c
-> > > @@ -127,6 +127,14 @@ static void
-> > > bcm2835_property_mbox_push(BCM2835PropertyState *s, uint32_t
-> > > value)
-> > >               resplen = 8;
-> > >               break;
-> > >   
-> > > +        case 0x00030030: /* Get domain state */
-> > > +            qemu_log_mask(LOG_UNIMP,
-> > > +                          "bcm2835_property: 0x%08x get domain
-> > > state
-> > > NYI\n",
-> > > +                          tag);
-> > > +            /* FIXME returning uninitialized memory */
-> > > +            resplen = 8;
-> > > +            break;
-> > > +
-> > >           case 0x00038002: /* Set clock rate */
-> > >           case 0x00038004: /* Set max clock rate */
-> > >           case 0x00038007: /* Set min clock rate */
-> > 
-> > Searching this property in the kernel, I found a lot of properties
-> > not
-> > implemented.
-> > https://github.com/raspberrypi/linux/blob/rpi-4.19.y/include/soc/bcm2835/raspberrypi-firmware.h#L41
-> > Are the properties only added when they are necessaries for the
-> > standard kernel use?
-> 
-> Yes, the idea is to emulate the bare minimum required to run your
-> guest 
-> code. To test this series I used the closed source kernel provided
-> by 
-> the Raspberry Pi foundation [1] which the one that does the most of 
-> UNIMP accesses, the Debian trunk one and I build one from [2].
-> 
-> The problem is old kernels don't support the raspi4, and recent
-> kernels 
-> do a lot of property calls to use recent features.
-> 
-> A "property call" is a call from the ARM core to the VideoCore
-> firmware, 
-> like a Remote Procedure Call. The ARM core write some 
-> arguments/structure to a memory space shared with the VideoCore, use
-> a 
-> MailBox to send a 'property' key to the VideoCore and wait/poll for
-> a 
-> response from the VC. The VC handles the 'property' call, if
-> required 
-> fills the structure in the same memory space the ARM used, then
-> reply 
-> via another MailBox channel to notify the ARM core.
-> 
-> QEMU does not model the VideoCore. Instead we directly fill the
-> memory 
-> from the ARM property call. We fake the VC firmware.
-> 
-> [1] 
-> https://github.com/raspberrypi/firmware/blob/master/boot/kernel8.img
-> [2] https://github.com/raspberrypi/linux/tree/rpi-5.3.y
-Thank you very much for all the data Phil.
+Add negative tests doc-bad-boxed-command-arg and doc-bad-event-arg to
+cover boxed and no arguments.  They demonstrate insufficient doc
+comment checking.
 
-Now I understood "the idea is to support the bare minimum for the
-guest", I thought that the idea was a full HW support, but make sense
-it's a lot of work to give full HW support.
+Update positive test doc-good to cover boxed event arguments.  It
+demonstrates the generated doc comment misses arguments.
+
+These bugs will be fixed later in this series.
+
+Signed-off-by: Markus Armbruster <armbru@redhat.com>
+---
+ tests/qapi-schema/doc-good.texi               |  8 ++++++
+ tests/Makefile.include                        |  2 ++
+ .../qapi-schema/doc-bad-boxed-command-arg.err |  0
+ .../doc-bad-boxed-command-arg.json            | 15 +++++++++++
+ .../qapi-schema/doc-bad-boxed-command-arg.out | 26 +++++++++++++++++++
+ tests/qapi-schema/doc-bad-event-arg.err       |  0
+ tests/qapi-schema/doc-bad-event-arg.json      |  8 ++++++
+ tests/qapi-schema/doc-bad-event-arg.out       | 19 ++++++++++++++
+ tests/qapi-schema/doc-good.json               |  7 +++++
+ tests/qapi-schema/doc-good.out                |  5 ++++
+ 10 files changed, 90 insertions(+)
+ create mode 100644 tests/qapi-schema/doc-bad-boxed-command-arg.err
+ create mode 100644 tests/qapi-schema/doc-bad-boxed-command-arg.json
+ create mode 100644 tests/qapi-schema/doc-bad-boxed-command-arg.out
+ create mode 100644 tests/qapi-schema/doc-bad-event-arg.err
+ create mode 100644 tests/qapi-schema/doc-bad-event-arg.json
+ create mode 100644 tests/qapi-schema/doc-bad-event-arg.out
+
+diff --git a/tests/qapi-schema/doc-good.texi b/tests/qapi-schema/doc-good.t=
+exi
+index 2ce8b883c9..d6ecdac94f 100644
+--- a/tests/qapi-schema/doc-good.texi
++++ b/tests/qapi-schema/doc-good.texi
+@@ -258,3 +258,11 @@ another feature
+=20
+ @end deftypefn
+=20
++
++
++@deftypefn Event {} EVT-BOXED
++
++BUG: generated doc misses arguments
++
++@end deftypefn
++
+diff --git a/tests/Makefile.include b/tests/Makefile.include
+index b9deb131fb..ea35cd54cc 100644
+--- a/tests/Makefile.include
++++ b/tests/Makefile.include
+@@ -341,8 +341,10 @@ qapi-schema +=3D base-cycle-indirect.json
+ qapi-schema +=3D command-int.json
+ qapi-schema +=3D comments.json
+ qapi-schema +=3D doc-bad-alternate-member.json
++qapi-schema +=3D doc-bad-boxed-command-arg.json
+ qapi-schema +=3D doc-bad-command-arg.json
+ qapi-schema +=3D doc-bad-enum-member.json
++qapi-schema +=3D doc-bad-event-arg.json
+ qapi-schema +=3D doc-bad-feature.json
+ qapi-schema +=3D doc-bad-section.json
+ qapi-schema +=3D doc-bad-symbol.json
+diff --git a/tests/qapi-schema/doc-bad-boxed-command-arg.err b/tests/qapi-s=
+chema/doc-bad-boxed-command-arg.err
+new file mode 100644
+index 0000000000..e69de29bb2
+diff --git a/tests/qapi-schema/doc-bad-boxed-command-arg.json b/tests/qapi-=
+schema/doc-bad-boxed-command-arg.json
+new file mode 100644
+index 0000000000..2c265d2ca3
+--- /dev/null
++++ b/tests/qapi-schema/doc-bad-boxed-command-arg.json
+@@ -0,0 +1,15 @@
++# Boxed arguments are not to be documented with the command
++# BUG: not rejected
++
++##
++# @Args:
++# @a: an argument
++##
++{ 'struct': 'Args', 'data': { 'a': 'int' } }
++
++##
++# @cmd-boxed:
++# @a: bogus
++##
++{ 'command': 'cmd-boxed', 'boxed': true,
++  'data': 'Args' }
+diff --git a/tests/qapi-schema/doc-bad-boxed-command-arg.out b/tests/qapi-s=
+chema/doc-bad-boxed-command-arg.out
+new file mode 100644
+index 0000000000..4ccd788253
+--- /dev/null
++++ b/tests/qapi-schema/doc-bad-boxed-command-arg.out
+@@ -0,0 +1,26 @@
++module None
++object q_empty
++enum QType
++    prefix QTYPE
++    member none
++    member qnull
++    member qnum
++    member qstring
++    member qdict
++    member qlist
++    member qbool
++module doc-bad-boxed-command-arg.json
++object Args
++    member a: int optional=3DFalse
++command cmd-boxed Args -> None
++    gen=3DTrue success_response=3DTrue boxed=3DTrue oob=3DFalse preconfig=
+=3DFalse
++doc symbol=3DArgs
++    body=3D
++
++    arg=3Da
++an argument
++doc symbol=3Dcmd-boxed
++    body=3D
++
++    arg=3Da
++bogus
+diff --git a/tests/qapi-schema/doc-bad-event-arg.err b/tests/qapi-schema/do=
+c-bad-event-arg.err
+new file mode 100644
+index 0000000000..e69de29bb2
+diff --git a/tests/qapi-schema/doc-bad-event-arg.json b/tests/qapi-schema/d=
+oc-bad-event-arg.json
+new file mode 100644
+index 0000000000..80d4e1240b
+--- /dev/null
++++ b/tests/qapi-schema/doc-bad-event-arg.json
+@@ -0,0 +1,8 @@
++# Arguments listed in the doc comment must exist in the actual schema
++# BUG: nonexistent @a is not rejected
++
++##
++# @FOO:
++# @a: a
++##
++{ 'event': 'FOO' }
+diff --git a/tests/qapi-schema/doc-bad-event-arg.out b/tests/qapi-schema/do=
+c-bad-event-arg.out
+new file mode 100644
+index 0000000000..ad0367cd45
+--- /dev/null
++++ b/tests/qapi-schema/doc-bad-event-arg.out
+@@ -0,0 +1,19 @@
++module None
++object q_empty
++enum QType
++    prefix QTYPE
++    member none
++    member qnull
++    member qnum
++    member qstring
++    member qdict
++    member qlist
++    member qbool
++module doc-bad-event-arg.json
++event FOO None
++    boxed=3DFalse
++doc symbol=3DFOO
++    body=3D
++
++    arg=3Da
++a
+diff --git a/tests/qapi-schema/doc-good.json b/tests/qapi-schema/doc-good.j=
+son
+index 7dc21e58a3..1ae6c3a9da 100644
+--- a/tests/qapi-schema/doc-good.json
++++ b/tests/qapi-schema/doc-good.json
+@@ -149,3 +149,10 @@
+ { 'command': 'cmd-boxed', 'boxed': true,
+   'data': 'Object',
+   'features': [ 'cmd-feat1', 'cmd-feat2' ] }
++
++##
++# @EVT-BOXED:
++# BUG: generated doc misses arguments
++##
++{ 'event': 'EVT-BOXED',  'boxed': true,
++  'data': 'Object' }
+diff --git a/tests/qapi-schema/doc-good.out b/tests/qapi-schema/doc-good.ou=
+t
+index f78fdef6a9..a8fc39d288 100644
+--- a/tests/qapi-schema/doc-good.out
++++ b/tests/qapi-schema/doc-good.out
+@@ -54,6 +54,8 @@ command cmd-boxed Object -> None
+     gen=3DTrue success_response=3DTrue boxed=3DTrue oob=3DFalse preconfig=
+=3DFalse
+     feature cmd-feat1
+     feature cmd-feat2
++event EVT-BOXED Object
++    boxed=3DTrue
+ doc freeform
+     body=3D
+ =3D Section
+@@ -170,3 +172,6 @@ If you're bored enough to read this, go see a video of =
+boxed cats
+ -> in
+=20
+ <- out
++doc symbol=3DEVT-BOXED
++    body=3D
++BUG: generated doc misses arguments
+--=20
+2.21.0
 
 
