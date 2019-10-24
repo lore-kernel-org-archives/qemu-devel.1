@@ -2,87 +2,92 @@ Return-Path: <SRS0=Jnn8=YR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 19495CA9EAF
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 15:46:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A66CFCA9EAF
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 15:46:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AF0E220684
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 15:46:26 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=web.de header.i=@web.de header.b="lGQgBB/F"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AF0E220684
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=web.de
+	by mail.kernel.org (Postfix) with ESMTPS id 7659A2166E
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 15:46:55 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7659A2166E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45580 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45606 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iNfJh-0006rr-HP
-	for qemu-devel@archiver.kernel.org; Thu, 24 Oct 2019 11:46:25 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38932)
+	id 1iNfKA-0002KL-8I
+	for qemu-devel@archiver.kernel.org; Thu, 24 Oct 2019 11:46:54 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36582)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <lukasstraub2@web.de>) id 1iNe4B-0008QB-Vs
- for qemu-devel@nongnu.org; Thu, 24 Oct 2019 10:26:21 -0400
+ (envelope-from <pbonzini@redhat.com>) id 1iNdsR-00033Y-69
+ for qemu-devel@nongnu.org; Thu, 24 Oct 2019 10:14:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <lukasstraub2@web.de>) id 1iNe4A-0002oC-Nf
- for qemu-devel@nongnu.org; Thu, 24 Oct 2019 10:26:19 -0400
-Received: from mout.web.de ([212.227.15.4]:46739)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <lukasstraub2@web.de>)
- id 1iNe47-0002hh-QU; Thu, 24 Oct 2019 10:26:16 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=web.de;
- s=dbaedf251592; t=1571927145;
- bh=OfJkK2vnGkQe8T1r5KQyutlaZ4TJ+K9pB9jGve8qHNk=;
- h=X-UI-Sender-Class:Date:From:To:Cc:Subject:In-Reply-To:References;
- b=lGQgBB/FqY7YomFrbayzQXuH0TFlk1D6pOdg3MMZBzvSOpUKRJ5Ry/6AjD0gbQ2/+
- i2FDuGDcMBi3vALQypOB54Yl1bmxe2rsH23IYFiCLldK8Ehr0L3/WMpbFb4fm9Kvod
- TpmAtoMZIZR6XAk4zvqmsf3F75Myo5RAJJLHQ3VM=
-X-UI-Sender-Class: c548c8c5-30a9-4db5-a2e7-cb6cb037b8f9
-Received: from luklap ([89.247.255.150]) by smtp.web.de (mrweb003
- [213.165.67.108]) with ESMTPSA (Nemesis) id 0M6V2p-1i430c1cYF-00yT6q; Thu, 24
- Oct 2019 16:25:45 +0200
-Date: Thu, 24 Oct 2019 16:25:44 +0200
-From: Lukas Straub <lukasstraub2@web.de>
-To: qemu-devel <qemu-devel@nongnu.org>
-Subject: [PATCH v7 2/4] tests/test-replication.c: Add test for for secondary
- node continuing replication
-Message-ID: <60b4c574f996824210f7b2282eac030dbe9f9e41.1571925699.git.lukasstraub2@web.de>
-In-Reply-To: <cover.1571925699.git.lukasstraub2@web.de>
-References: <cover.1571925699.git.lukasstraub2@web.de>
+ (envelope-from <pbonzini@redhat.com>) id 1iNdsQ-00037b-2D
+ for qemu-devel@nongnu.org; Thu, 24 Oct 2019 10:14:11 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47015)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1iNdsP-00036x-Bk
+ for qemu-devel@nongnu.org; Thu, 24 Oct 2019 10:14:09 -0400
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 61973C049E12
+ for <qemu-devel@nongnu.org>; Thu, 24 Oct 2019 14:14:07 +0000 (UTC)
+Received: by mail-wr1-f69.google.com with SMTP id v8so12053877wrt.16
+ for <qemu-devel@nongnu.org>; Thu, 24 Oct 2019 07:14:07 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=G0Md8s6CdlET5hdyzfeMGq57+JfqtM8PWGHbNWw9yJA=;
+ b=TIeflt9bPHK6UnBdztJUBBvAL9QvNH0uyOWhIY1yPOdmyC6GTRIthOxeHu64K5+K/v
+ sqxuCHzWTKpJ6mB97zXCSoBZVcRv7qKND1ZXmqWF900o38Hgn2yHl+Y5hxK3CwWloVmS
+ aTw43UjueLBeumZ6ZRPw//ccL/QPk5oD96rqo4Yr9o/ahfwcQd23Q3PJ1880+lwoEere
+ TN4X3DpzEsZfkRtwqNDZch6bpxnJkroRox6LLXT2YsoqxaE3C+OGR6LY085InZjg4Jb2
+ RL4j95M2bBUSHZicnf4Xce8raq27lCezTejLWDQnnOCRvSEX98I3yR0o+X1rH3dceU1X
+ HsZw==
+X-Gm-Message-State: APjAAAUMs8rE93rNJCe/mr7FGTlsuYz488STPL9d8Ama+IL+cnDSc6J2
+ sMAasQHjvL9+1tCi4Gu0utsmwb+Z02mPXA8ZbwTb+DboZeIszQIXsK164Oj71FrbHnJvjgwbZIq
+ pup4dYnc/GYnUEac=
+X-Received: by 2002:a1c:a551:: with SMTP id o78mr4852291wme.4.1571926445955;
+ Thu, 24 Oct 2019 07:14:05 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqwwotk77Lz+dGfc3FcB3lDFzQ7rZxwOkk2939qkRpQM1/9lwo3N+bDvdHN7po3fpzcZFEuFTw==
+X-Received: by 2002:a1c:a551:: with SMTP id o78mr4852257wme.4.1571926445639;
+ Thu, 24 Oct 2019 07:14:05 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:6887:47f9:72a7:24e6?
+ ([2001:b07:6468:f312:6887:47f9:72a7:24e6])
+ by smtp.gmail.com with ESMTPSA id z189sm3243798wmc.25.2019.10.24.07.14.04
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Thu, 24 Oct 2019 07:14:04 -0700 (PDT)
+Subject: Re: [PATCH v2 1/7] cpu: use ROUND_UP() to define xxx_PAGE_ALIGN
+To: Richard Henderson <richard.henderson@linaro.org>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ qemu-devel@nongnu.org
+References: <20191023154505.30521-1-richard.henderson@linaro.org>
+ <20191023154505.30521-2-richard.henderson@linaro.org>
+ <55b477b7-877e-954f-2175-ed36fa787600@redhat.com>
+ <e41a98e4-189a-1e0f-7b29-51a6e00e4d7e@redhat.com>
+ <26cb0551-fbac-e059-c1bf-9c17420528b7@linaro.org>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Openpgp: preference=signencrypt
+Message-ID: <af5b2cb5-49b5-68c2-e55b-a1077ad4df28@redhat.com>
+Date: Thu, 24 Oct 2019 16:14:04 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <26cb0551-fbac-e059-c1bf-9c17420528b7@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:V5s0lVOsEJp343Q4r+2aot8a5KDekal2vhV757BxhU3szgkIQkk
- Ca1LIXE/QxcdcWzTALMks8Tc5IOs6LJ1NayoFVk1Ab8qShiZ9UlPxVnIgyf03Z8S8sybf0H
- NrRtBysges0FuD41IzzWHByVvjcq26AOVYhbc+FESFqdrtNlAEbikvvG3Wq20+IsDx4Rkum
- UeD1wpNg3cMfSytJoTPSw==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:uLNgf5N+nB8=:HLa0Py9yOmgtio6ntdlwv3
- GkaWct/MAScNOCPofH445DxjJLIbCgte+ZxZneDz5uTKyh1m194AMveo7pwi06N/8NfUCi+Se
- FGH31cJolgPzmj3wz36sZ2w3uG/y6Qo6iCgiU5D9lVAgnTad1mfjzKjjKHkWpZ1Nsab/bUHdd
- k85gLY82DqedgsFYv7O0KdfwXquaV6Gh19vh7TFWIgzGX8B6eAvpFErAqxfQbOWT3fKmOY73r
- VehWk5IFK5DcVjs7uM/sCSkKei4IhuK5syKMy4TKJzq/7F541V+53GIKKZ9GXTuMKLreEvMxG
- fzSNaud/910YYBMrfAbU4AMzGXKrwwtUErs+GyFsz4Hf2OLWeWWSz6PCjjg+9Z/qYr/tF/Hnh
- NWgNQdx6QiNXYofyjEGp88y8TvqFY5O8FyP7Mlz1MSGXZf4FyE7Y+L3HxDa5wclJFm0HXk5k7
- dF5DpuBznILwENzmvI9XJbdPvgQXjxIdYFy9mMlOOYb6UYKjipoU0rSzSFS837ilJrmAaMQS6
- 4I964NqijpDJtCm7970FwKPJjhtb6QCBs5z/ABeTZ7TnX/GGrO6Mr0774vUBUUe60yC8nuNck
- KmmqUAnsRa0CbY1nb9L4/MAWxNQjGt6mYjy5hyAC3VTY+w3taSI3X8qzWINs05fM3DxwBMO3h
- i/yQIr7ZnN72d3rK8deWl3q1wzCnAWJ247waCP3DgFz4/5vIaZ8gf5ySIVudPA59n9i5Jf0bc
- Kntd333/fNDzQlMTaUzMoa8WTMhhx5Pfw5ucCGcA7c/p3M+ghOTNtBPA51JpCdZQAi0sC010U
- Wzx37j7nVgOxJRtzWO3UYte1QwpkDXcG9fRa16Etk+emALczQiKs3g+s3VBfQEaGJ9rhTmAJf
- oA4M8eWakrzsEfBw01pXLlGyEsJ6RODD+G8EWvR5UODNI2BY0DrumYmOdKU3k1JDd5etKfSz8
- vkj77pGQNQhOVOIz9FRaOiTs5sMDtlESukmT42lXYZQCHvGR6UR0y3/bQQyM2ggHNp0FVA+Mq
- eTNircCbTClk4GlLlLgJmEmAgEJFudVOnPI5f6B3eoC0tPDy/6YbMa1yxGAAwaICqv66VhVmS
- eL9Xvy+14rRQlBwjC5iIHOxMdNjT04csCMCSQd3rX7iTs+p1X8jr4EHIwQb8O28oLQ3v1SO8P
- Vhp7VESMdmMgPe5+fODNKz7RZCFVQJt1EZe6IC6Oev7qP2i6yyKVntJ8vAQZCib+YrRzpCnyH
- WiVOeWvSLoq5KnAMlKsxK71OowocDJwzx/hmvgq3hnThmM0N+DxwDKi3gOq4=
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 212.227.15.4
+X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,94 +99,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block <qemu-block@nongnu.org>,
- Wen Congyang <wency@cn.fujitsu.com>, Wen Congyang <wencongyang2@huawei.com>,
- Jason Wang <jasowang@redhat.com>, Max Reitz <mreitz@redhat.com>,
- Zhang Chen <chen.zhang@intel.com>, Xie Changlong <xiechanglong.d@gmail.com>
+Cc: alex.bennee@linaro.org, Wei Yang <richardw.yang@linux.intel.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This simulates the case that happens when we resume COLO after failover.
+On 24/10/19 16:06, Richard Henderson wrote:
+> On 10/24/19 8:04 AM, Paolo Bonzini wrote:
+>> On 24/10/19 13:52, Philippe Mathieu-Daud=C3=A9 wrote:
+>>>> diff --git a/include/exec/cpu-all.h b/include/exec/cpu-all.h
+>>>> index ad9ab85eb3..255bb186ac 100644
+>>>> --- a/include/exec/cpu-all.h
+>>>> +++ b/include/exec/cpu-all.h
+>>>> @@ -220,7 +220,7 @@ extern int target_page_bits;
+>>>> =C2=A0 =C2=A0 #define TARGET_PAGE_SIZE (1 << TARGET_PAGE_BITS)
+>>>> =C2=A0 #define TARGET_PAGE_MASK ~(TARGET_PAGE_SIZE - 1)
+>>>> -#define TARGET_PAGE_ALIGN(addr) (((addr) + TARGET_PAGE_SIZE - 1) &
+>>>> TARGET_PAGE_MASK)
+>>>> +#define TARGET_PAGE_ALIGN(addr) ROUND_UP((addr), TARGET_PAGE_SIZE)
+>>>> =C2=A0 =C2=A0 /* Using intptr_t ensures that qemu_*_page_mask is sig=
+n-extended even
+>>>> =C2=A0=C2=A0 * when intptr_t is 32-bit and we are aligning a long lo=
+ng.
+>>>> @@ -228,9 +228,8 @@ extern int target_page_bits;
+>>>> =C2=A0 extern uintptr_t qemu_host_page_size;
+>>>> =C2=A0 extern intptr_t qemu_host_page_mask;
+>>>> =C2=A0 -#define HOST_PAGE_ALIGN(addr) (((addr) + qemu_host_page_size=
+ - 1) &
+>>>> qemu_host_page_mask)
+>>>> -#define REAL_HOST_PAGE_ALIGN(addr) (((addr) +
+>>>> qemu_real_host_page_size - 1) & \
+>>>> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 qemu_r=
+eal_host_page_mask)
+>>>> +#define HOST_PAGE_ALIGN(addr) ROUND_UP((addr), qemu_host_page_size)
+>>>> +#define REAL_HOST_PAGE_ALIGN(addr) ROUND_UP((addr),
+>>>> qemu_real_host_page_size)
+>>>> =C2=A0 =C2=A0 /* same as PROT_xxx */
+>>>> =C2=A0 #define PAGE_READ=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 0x0001
+>>>>
+>>
+>> Isn't this the patch where Richard pointed out that the compiler
+>> generates worse code?
+>=20
+> Richard confused ROUND_UP with QEMU_ALIGN_UP.
 
-Signed-off-by: Lukas Straub <lukasstraub2@web.de>
-=2D--
- tests/test-replication.c | 52 ++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 52 insertions(+)
+Uh, those are both really badly named.  Especially considering that
+DIV_ROUND_UP divides the result of QEMU_ALIGN_UP.  Should we consider
+swapping them?!?
 
-diff --git a/tests/test-replication.c b/tests/test-replication.c
-index f085d1993a..8e18ecd998 100644
-=2D-- a/tests/test-replication.c
-+++ b/tests/test-replication.c
-@@ -489,6 +489,56 @@ static void test_secondary_stop(void)
-     teardown_secondary();
- }
-
-+static void test_secondary_continuous_replication(void)
-+{
-+    BlockBackend *top_blk, *local_blk;
-+    Error *local_err =3D NULL;
-+
-+    top_blk =3D start_secondary();
-+    replication_start_all(REPLICATION_MODE_SECONDARY, &local_err);
-+    g_assert(!local_err);
-+
-+    /* write 0x22 to s_local_disk (IMG_SIZE / 2, IMG_SIZE) */
-+    local_blk =3D blk_by_name(S_LOCAL_DISK_ID);
-+    test_blk_write(local_blk, 0x22, IMG_SIZE / 2, IMG_SIZE / 2, false);
-+
-+    /* replication will backup s_local_disk to s_hidden_disk */
-+    test_blk_read(top_blk, 0x11, IMG_SIZE / 2,
-+                  IMG_SIZE / 2, 0, IMG_SIZE, false);
-+
-+    /* write 0x33 to s_active_disk (0, IMG_SIZE / 2) */
-+    test_blk_write(top_blk, 0x33, 0, IMG_SIZE / 2, false);
-+
-+    /* do failover (active commit) */
-+    replication_stop_all(true, &local_err);
-+    g_assert(!local_err);
-+
-+    /* it should ignore all requests from now on */
-+
-+    /* start after failover */
-+    replication_start_all(REPLICATION_MODE_PRIMARY, &local_err);
-+    g_assert(!local_err);
-+
-+    /* checkpoint */
-+    replication_do_checkpoint_all(&local_err);
-+    g_assert(!local_err);
-+
-+    /* stop */
-+    replication_stop_all(true, &local_err);
-+    g_assert(!local_err);
-+
-+    /* read from s_local_disk (0, IMG_SIZE / 2) */
-+    test_blk_read(top_blk, 0x33, 0, IMG_SIZE / 2,
-+                  0, IMG_SIZE / 2, false);
-+
-+
-+    /* read from s_local_disk (IMG_SIZE / 2, IMG_SIZE) */
-+    test_blk_read(top_blk, 0x22, IMG_SIZE / 2,
-+                  IMG_SIZE / 2, 0, IMG_SIZE, false);
-+
-+    teardown_secondary();
-+}
-+
- static void test_secondary_do_checkpoint(void)
- {
-     BlockBackend *top_blk, *local_blk;
-@@ -584,6 +634,8 @@ int main(int argc, char **argv)
-     g_test_add_func("/replication/secondary/write", test_secondary_write)=
-;
-     g_test_add_func("/replication/secondary/start", test_secondary_start)=
-;
-     g_test_add_func("/replication/secondary/stop",  test_secondary_stop);
-+    g_test_add_func("/replication/secondary/continuous_replication",
-+                    test_secondary_continuous_replication);
-     g_test_add_func("/replication/secondary/do_checkpoint",
-                     test_secondary_do_checkpoint);
-     g_test_add_func("/replication/secondary/get_error_all",
-=2D-
-2.20.1
+Paolo
 
 
