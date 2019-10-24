@@ -2,83 +2,80 @@ Return-Path: <SRS0=Jnn8=YR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AF8EDCA9EAF
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 11:01:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E7EC0CA9EAF
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 11:05:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 82DE420684
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 11:01:32 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 82DE420684
+	by mail.kernel.org (Postfix) with ESMTPS id B06DF20684
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 11:05:39 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CW/5RUHm"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B06DF20684
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38808 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38894 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iNarz-0006pm-8r
-	for qemu-devel@archiver.kernel.org; Thu, 24 Oct 2019 07:01:31 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58726)
+	id 1iNavy-0003sX-G9
+	for qemu-devel@archiver.kernel.org; Thu, 24 Oct 2019 07:05:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59155)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mst@redhat.com>) id 1iNaqF-00049A-Ov
- for qemu-devel@nongnu.org; Thu, 24 Oct 2019 06:59:44 -0400
+ (envelope-from <armbru@redhat.com>) id 1iNatE-0000oR-7X
+ for qemu-devel@nongnu.org; Thu, 24 Oct 2019 07:02:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mst@redhat.com>) id 1iNaqD-0003am-PI
- for qemu-devel@nongnu.org; Thu, 24 Oct 2019 06:59:43 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:18448)
+ (envelope-from <armbru@redhat.com>) id 1iNatC-0004oN-6O
+ for qemu-devel@nongnu.org; Thu, 24 Oct 2019 07:02:48 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:27434
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mst@redhat.com>) id 1iNaqD-0003aa-JQ
- for qemu-devel@nongnu.org; Thu, 24 Oct 2019 06:59:41 -0400
-Received: from mail-qk1-f200.google.com (mail-qk1-f200.google.com
- [209.85.222.200])
- (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+ (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1iNatB-0004kK-QJ
+ for qemu-devel@nongnu.org; Thu, 24 Oct 2019 07:02:46 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1571914962;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=lp9FhpPqPeW4kPws4YpI5d1qIzH6KB4ie+B1xHi7htA=;
+ b=CW/5RUHmmtqOOScrxfoW9sTy0iU5hNqmedoqS/8Gf9WgC8mDa28DdlfPcDrMmjVo7QbudS
+ jTaOwGyVeLQPetFiy3pfZJIQNpZ6Utn4tOosPbGcGJb9v3tm17Cr2kefzX2OB8YI6OD/Pm
+ OEgXNZy502PZFWRLgt7eMfIs82Qiai4=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-310-u0xY2OtINme5AWY6k0hlcQ-1; Thu, 24 Oct 2019 07:02:40 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 6992B37E79
- for <qemu-devel@nongnu.org>; Thu, 24 Oct 2019 10:59:40 +0000 (UTC)
-Received: by mail-qk1-f200.google.com with SMTP id d127so20413613qkc.1
- for <qemu-devel@nongnu.org>; Thu, 24 Oct 2019 03:59:40 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=DyYUIfLK2hBSYRoMphgvgCQwDkgxE96s1Dxb90saGmo=;
- b=bFR/uOGArDZw3NCFS0qs3Uzch/X2zAxwTQkhYMgM39IBtW1JG+RR6QApnWSrctO1MZ
- nsE9giW0ehZYp7qYgTtmRH0TbD8htgHyQhx9hsF0AjtSaZh6np3oHmg7okUgsz0G8wnB
- oZhd+XuCzKdnHpX11/UFQEL5+fR4exrV9ZlhcSL69gXIU7k1KBWOi5DcZW8qHF4dKyoy
- T/uQII30dklOO2cRVKk83JCwotstusfMUXqSC5bPqases8l98LvmdDGAE5/wmkV++sZC
- 59ZKZ7C7a4g1cV3pBTUkyWEFZlDcwDwCPpJfqPks4r0ClVZZRa7/P8SYsDXPsMzSlJv9
- bc5A==
-X-Gm-Message-State: APjAAAX/oauhdHwMx2LnDqbXe3lfxVpBo3TG6QOsx9dGetccy7rx7pRu
- 4b/tS5WONwBLVK1ExvFxqklgpDDWBsW+8Jyg0+lZsaDuyTUePz4d5PzNxudejgwAMDDxT0QxIzV
- WqSj/I189m8tD0t4=
-X-Received: by 2002:a0c:efcd:: with SMTP id a13mr13595977qvt.94.1571914779710; 
- Thu, 24 Oct 2019 03:59:39 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqyaOsl5ABF08L3LOb+EhdpaTS551adpaBFZEJFO8To0+J6YJ0oinqx9sZ7RgI3lwvgSwZ5PWg==
-X-Received: by 2002:a0c:efcd:: with SMTP id a13mr13595963qvt.94.1571914779416; 
- Thu, 24 Oct 2019 03:59:39 -0700 (PDT)
-Received: from redhat.com (bzq-79-176-10-77.red.bezeqint.net. [79.176.10.77])
- by smtp.gmail.com with ESMTPSA id
- v4sm12551280qkj.28.2019.10.24.03.59.36
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 24 Oct 2019 03:59:38 -0700 (PDT)
-Date: Thu, 24 Oct 2019 06:59:33 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Subject: Re: [PATCH 00/30] virtiofs daemon (base)
-Message-ID: <20191024065826-mutt-send-email-mst@kernel.org>
-References: <20191021105832.36574-1-dgilbert@redhat.com>
- <157166664425.24734.3489596262271351160@37313f22b938>
- <20191021143357.GB5837@work-vm>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DD67780183E;
+ Thu, 24 Oct 2019 11:02:39 +0000 (UTC)
+Received: from blackfin.pond.sub.org (unknown [10.36.118.123])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id BC7356061E;
+ Thu, 24 Oct 2019 11:02:38 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id 3598A11384A8; Thu, 24 Oct 2019 13:02:37 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH 01/19] tests/qapi-schema: Demonstrate feature and enum doc
+ comment bugs
+Date: Thu, 24 Oct 2019 13:02:19 +0200
+Message-Id: <20191024110237.30963-2-armbru@redhat.com>
+In-Reply-To: <20191024110237.30963-1-armbru@redhat.com>
+References: <20191024110237.30963-1-armbru@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20191021143357.GB5837@work-vm>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-MC-Unique: u0xY2OtINme5AWY6k0hlcQ-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=WINDOWS-1252
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 209.132.183.28
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,44 +87,203 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org, piaojun@huawei.com, stefanha@redhat.com,
- marcandre.lureau@redhat.com, eguan@linux.alibaba.com, vgoyal@redhat.com
+Cc: kwolf@redhat.com, pkrempa@redhat.com, mdroth@linux.vnet.ibm.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, Oct 21, 2019 at 03:33:57PM +0100, Dr. David Alan Gilbert wrote:
-> * no-reply@patchew.org (no-reply@patchew.org) wrote:
-> > Patchew URL: https://patchew.org/QEMU/20191021105832.36574-1-dgilbert@redhat.com/
-> > 
-> > 
-> > 
-> > Hi,
-> > 
-> > This series seems to have some coding style problems. See output below for
-> > more information:
-> > 
-> > Subject: [PATCH 00/30] virtiofs daemon (base)
-> > Type: series
-> > Message-id: 20191021105832.36574-1-dgilbert@redhat.com
-> > 
-> > === TEST SCRIPT BEGIN ===
-> > #!/bin/bash
-> > git rev-parse base > /dev/null || exit 0
-> > git config --local diff.renamelimit 0
-> > git config --local diff.renames True
-> > git config --local diff.algorithm histogram
-> > ./scripts/checkpatch.pl --mailback base..
-> 
-> Expecting checkpatch to be broken here; most of the files
-> follow FUSE's formatting.
-> 
-> Dave
+Add negative tests doc-bad-enum-member and doc-bad-feature to cover
+documentation for nonexistent enum members and features, and test
+doc-undoc-feature to cover features lacking documentation.  None of
+them works.  To be fixed later in this series.
 
-I wonder what do others think about this.
-One problem with such inconsistencies is that people tend to copy code
-around, which tends to result in a mess.
+Signed-off-by: Markus Armbruster <armbru@redhat.com>
+---
+ tests/Makefile.include                     |  3 +++
+ tests/qapi-schema/doc-bad-enum-member.err  |  0
+ tests/qapi-schema/doc-bad-enum-member.json |  9 +++++++++
+ tests/qapi-schema/doc-bad-enum-member.out  | 21 +++++++++++++++++++++
+ tests/qapi-schema/doc-bad-feature.err      |  0
+ tests/qapi-schema/doc-bad-feature.json     | 10 ++++++++++
+ tests/qapi-schema/doc-bad-feature.out      | 17 +++++++++++++++++
+ tests/qapi-schema/doc-undoc-feature.err    |  0
+ tests/qapi-schema/doc-undoc-feature.json   | 10 ++++++++++
+ tests/qapi-schema/doc-undoc-feature.out    | 19 +++++++++++++++++++
+ 10 files changed, 89 insertions(+)
+ create mode 100644 tests/qapi-schema/doc-bad-enum-member.err
+ create mode 100644 tests/qapi-schema/doc-bad-enum-member.json
+ create mode 100644 tests/qapi-schema/doc-bad-enum-member.out
+ create mode 100644 tests/qapi-schema/doc-bad-feature.err
+ create mode 100644 tests/qapi-schema/doc-bad-feature.json
+ create mode 100644 tests/qapi-schema/doc-bad-feature.out
+ create mode 100644 tests/qapi-schema/doc-undoc-feature.err
+ create mode 100644 tests/qapi-schema/doc-undoc-feature.json
+ create mode 100644 tests/qapi-schema/doc-undoc-feature.out
 
-> --
-> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+diff --git a/tests/Makefile.include b/tests/Makefile.include
+index 09e5b410dc..b9deb131fb 100644
+--- a/tests/Makefile.include
++++ b/tests/Makefile.include
+@@ -342,6 +342,8 @@ qapi-schema +=3D command-int.json
+ qapi-schema +=3D comments.json
+ qapi-schema +=3D doc-bad-alternate-member.json
+ qapi-schema +=3D doc-bad-command-arg.json
++qapi-schema +=3D doc-bad-enum-member.json
++qapi-schema +=3D doc-bad-feature.json
+ qapi-schema +=3D doc-bad-section.json
+ qapi-schema +=3D doc-bad-symbol.json
+ qapi-schema +=3D doc-bad-union-member.json
+@@ -365,6 +367,7 @@ qapi-schema +=3D doc-missing-expr.json
+ qapi-schema +=3D doc-missing-space.json
+ qapi-schema +=3D doc-missing.json
+ qapi-schema +=3D doc-no-symbol.json
++qapi-schema +=3D doc-undoc-feature.json
+ qapi-schema +=3D double-type.json
+ qapi-schema +=3D duplicate-key.json
+ qapi-schema +=3D empty.json
+diff --git a/tests/qapi-schema/doc-bad-enum-member.err b/tests/qapi-schema/=
+doc-bad-enum-member.err
+new file mode 100644
+index 0000000000..e69de29bb2
+diff --git a/tests/qapi-schema/doc-bad-enum-member.json b/tests/qapi-schema=
+/doc-bad-enum-member.json
+new file mode 100644
+index 0000000000..9f32fe64b4
+--- /dev/null
++++ b/tests/qapi-schema/doc-bad-enum-member.json
+@@ -0,0 +1,9 @@
++# Members listed in the doc comment must exist in the actual schema
++# BUG: nonexistent @a is not rejected
++
++##
++# @Foo:
++# @a: a
++# @b: b
++##
++{ 'enum': 'Foo', 'data': [ 'b' ] }
+diff --git a/tests/qapi-schema/doc-bad-enum-member.out b/tests/qapi-schema/=
+doc-bad-enum-member.out
+new file mode 100644
+index 0000000000..6ca31c1e9b
+--- /dev/null
++++ b/tests/qapi-schema/doc-bad-enum-member.out
+@@ -0,0 +1,21 @@
++module None
++object q_empty
++enum QType
++    prefix QTYPE
++    member none
++    member qnull
++    member qnum
++    member qstring
++    member qdict
++    member qlist
++    member qbool
++module doc-bad-enum-member.json
++enum Foo
++    member b
++doc symbol=3DFoo
++    body=3D
++
++    arg=3Da
++a
++    arg=3Db
++b
+diff --git a/tests/qapi-schema/doc-bad-feature.err b/tests/qapi-schema/doc-=
+bad-feature.err
+new file mode 100644
+index 0000000000..e69de29bb2
+diff --git a/tests/qapi-schema/doc-bad-feature.json b/tests/qapi-schema/doc=
+-bad-feature.json
+new file mode 100644
+index 0000000000..2a78e3b1db
+--- /dev/null
++++ b/tests/qapi-schema/doc-bad-feature.json
+@@ -0,0 +1,10 @@
++# Features listed in the doc comment must exist in the actual schema
++# BUG: nonexistent @a is not rejected
++
++##
++# @foo:
++#
++# Features:
++# @a: a
++##
++{ 'command': 'foo' }
+diff --git a/tests/qapi-schema/doc-bad-feature.out b/tests/qapi-schema/doc-=
+bad-feature.out
+new file mode 100644
+index 0000000000..4670be3a72
+--- /dev/null
++++ b/tests/qapi-schema/doc-bad-feature.out
+@@ -0,0 +1,17 @@
++module None
++object q_empty
++enum QType
++    prefix QTYPE
++    member none
++    member qnull
++    member qnum
++    member qstring
++    member qdict
++    member qlist
++    member qbool
++module doc-bad-feature.json
++command foo None -> None
++    gen=3DTrue success_response=3DTrue boxed=3DFalse oob=3DFalse preconfig=
+=3DFalse
++doc symbol=3Dfoo
++    body=3D
++
+diff --git a/tests/qapi-schema/doc-undoc-feature.err b/tests/qapi-schema/do=
+c-undoc-feature.err
+new file mode 100644
+index 0000000000..e69de29bb2
+diff --git a/tests/qapi-schema/doc-undoc-feature.json b/tests/qapi-schema/d=
+oc-undoc-feature.json
+new file mode 100644
+index 0000000000..c7650d9974
+--- /dev/null
++++ b/tests/qapi-schema/doc-undoc-feature.json
+@@ -0,0 +1,10 @@
++# Doc comment must cover all features
++# BUG: missing documentation for @undoc not caught
++
++##
++# @foo:
++#
++# Features:
++# @doc: documented feature
++##
++{ 'command': 'foo', 'features': ['undoc', 'doc'] }
+diff --git a/tests/qapi-schema/doc-undoc-feature.out b/tests/qapi-schema/do=
+c-undoc-feature.out
+new file mode 100644
+index 0000000000..faae777f0d
+--- /dev/null
++++ b/tests/qapi-schema/doc-undoc-feature.out
+@@ -0,0 +1,19 @@
++module None
++object q_empty
++enum QType
++    prefix QTYPE
++    member none
++    member qnull
++    member qnum
++    member qstring
++    member qdict
++    member qlist
++    member qbool
++module doc-undoc-feature.json
++command foo None -> None
++    gen=3DTrue success_response=3DTrue boxed=3DFalse oob=3DFalse preconfig=
+=3DFalse
++    feature undoc
++    feature doc
++doc symbol=3Dfoo
++    body=3D
++
+--=20
+2.21.0
+
 
