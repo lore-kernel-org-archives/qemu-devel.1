@@ -7,73 +7,74 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 638F7CA9EAF
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 17:02:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B4AACA9EAF
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 17:02:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2D39B2166E
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 17:02:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 29EC020650
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 17:02:16 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="pdRulk7B"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2D39B2166E
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="L2PlupZG"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 29EC020650
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48200 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48204 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iNgUv-0000L7-FA
-	for qemu-devel@archiver.kernel.org; Thu, 24 Oct 2019 13:02:05 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57854)
+	id 1iNgV4-0000UP-JW
+	for qemu-devel@archiver.kernel.org; Thu, 24 Oct 2019 13:02:14 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58030)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1iNfxk-0007LB-Ts
- for qemu-devel@nongnu.org; Thu, 24 Oct 2019 12:27:50 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1iNfxy-0007hP-D6
+ for qemu-devel@nongnu.org; Thu, 24 Oct 2019 12:28:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1iNfxj-0000mx-Kw
- for qemu-devel@nongnu.org; Thu, 24 Oct 2019 12:27:48 -0400
-Received: from mail-wm1-x32d.google.com ([2a00:1450:4864:20::32d]:55099)
+ (envelope-from <peter.maydell@linaro.org>) id 1iNfxw-0000si-P4
+ for qemu-devel@nongnu.org; Thu, 24 Oct 2019 12:28:02 -0400
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:46810)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1iNfxj-0000mH-Dw
- for qemu-devel@nongnu.org; Thu, 24 Oct 2019 12:27:47 -0400
-Received: by mail-wm1-x32d.google.com with SMTP id g7so3535725wmk.4
- for <qemu-devel@nongnu.org>; Thu, 24 Oct 2019 09:27:47 -0700 (PDT)
+ id 1iNfxw-0000sC-I7
+ for qemu-devel@nongnu.org; Thu, 24 Oct 2019 12:28:00 -0400
+Received: by mail-wr1-x442.google.com with SMTP id n15so16009646wrw.13
+ for <qemu-devel@nongnu.org>; Thu, 24 Oct 2019 09:28:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:subject:date:message-id:in-reply-to:references:mime-version
  :content-transfer-encoding;
- bh=8v8h1OzrhCqLBFglLP5BbJjU1xr59SgzwhT/B4w8jqg=;
- b=pdRulk7Bgy7FfwfzpjIUgenzQhQ3N9sJvbVZkPjHIQPNuSqOqLSukBzq2JoRqhmZZq
- Ew1VYhiK7X82EQgcXstcuNKWsuRk31vwzDfZ60HV8yiHrOXm6ozfuk8nKFtXsQrOauRh
- I4wrUhlMOrjRi260eHoBfR5bGIdwQvBm/j2fxYs6nr6ONqiXPNdtziwNwX7dGIwAon1W
- mlXVr+ZbJlepl1MqkTFAnuLJ3CUgWPxJ2S/1WPB3GgeiatvI19KfUUb30m9uSg3aUK43
- 1KbDtpItEznxh/0m1ZQgXyVOXUpxeF6pCCyPlbmZOwRCOv7/lGwnawNJ4+43Wd3otpH9
- vY6A==
+ bh=EcerNk3YeDT5sQSP3taUcz8aA1kUh9D2O9nEmkTp88Q=;
+ b=L2PlupZGCsVM1GVSZCQM9wCd35aNupZyY2spI6UcISexUjjl8KPSUKoW5S+jv2iwOt
+ bdTpsbx1iZ1eW+ZF0jWCBFmAZt5Yrsu7yYuUu786/mybqOMSMMhz+gmabKwiuR3cUpk+
+ eQwNS0K89OtvMPRGx0TYh8J9ddvuxa4SBNdJNgPEPjYD3Hffr4ri0nzociiyKaLSMUZr
+ 1Ziabd+5F+27gaeczKMC6r/Jg0EpIRuo7m5sWzut06l72yBF3Wd7dcaokbSiSwacknI+
+ WLA00aEeRFzAy+wrhLn5UMZKR+oiKBAan21lrqLgXWcMRbc7bVm5VUCtqUWDa+CXZ3bi
+ QhLQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=8v8h1OzrhCqLBFglLP5BbJjU1xr59SgzwhT/B4w8jqg=;
- b=qWYD7tr+1FddjCN0euDUdJxhbbgqAZ5GGWIrP7QftbxGx970xGJFMfW+Q6r+fg34Ap
- W509DJF/eRUTAR8NzFp2UF5oAR/+bpIrDHzJ66zjOlJk6OHTEsxPJRZ97SZJ1ZZsj+dR
- ILkWhHZaS94zAm50/ntmSpT0gIjjzK8LOF05Q46p0itvDbFFi6xy6RY5hW8Q42Yo1+sW
- cD22PuxWQuFbeI51GmKKFoL1uklmzuUHrTph/5F4blCEN4mzLI18KmHWZvEcjvN/yrO4
- NFkFaq2j+GOE2NP7JzkMZ5NfPryspv1wcYQMypzoa06mPbL3Vlmk1UUPdEpwsX65R+Ic
- Ym8w==
-X-Gm-Message-State: APjAAAXoiszbJF7r+yS6ar6I1yEGah07JwtcFfCCTx7KBe+UhCaJQzgL
- gFWL0I+3rwkXZUwxR0USEb4f+Q7JaYo=
-X-Google-Smtp-Source: APXvYqw5FPDxXpTrbZDTkBFM6OS9QnHUfYwd5sBGfYXySDhCGonExhvYoiNuvJe1gLoeJU9qzZ1ySQ==
-X-Received: by 2002:a1c:f709:: with SMTP id v9mr6023816wmh.62.1571934465909;
- Thu, 24 Oct 2019 09:27:45 -0700 (PDT)
+ bh=EcerNk3YeDT5sQSP3taUcz8aA1kUh9D2O9nEmkTp88Q=;
+ b=f4NofocNo+aGKWL6ytVRVNtVTHDxcF0egA5sqIJLlLX8A8datdDKmz8MUwsH2CwRlS
+ 21HmRHRflQetdRahshv4GCcacRb7/CdrMZM1MzPaVXlE0uUtcoke0tcZVpUCl0qHzJay
+ rebyl2DWUl9LkZp+roxDBzqKcm7uvZ0bUBcv132u1HoDY2+z3phsuDkPQKAs7pmxi+6C
+ J8c4tYITeq5NoaW4vXIOL1chV5P/BlpmDD9oEMj93FfLN/YZ9Zkyh5LmxESXgHsSSrlM
+ c+U2ZIx+IDKpRs8pKQPJj/2oMIA97G+6cQGRc1hUjNyZ0KZ3Cq12mOcwDwvsjxy3gLpe
+ BXGg==
+X-Gm-Message-State: APjAAAWWrdADJkQgek15drZxaFSugha+T0opDBPja3Hu7WWmqfVtM1bZ
+ BEuQfCe2ZeS1LCohIGQxTl8vunBZSoA=
+X-Google-Smtp-Source: APXvYqwJ2ATksEuP6UHrnf1xcQPw18vUI7YHW0iXQM/7he4xlEs9ndiPv7ZR4/wknyzdr1as4sZLTA==
+X-Received: by 2002:adf:f5cc:: with SMTP id k12mr4556905wrp.65.1571934479240; 
+ Thu, 24 Oct 2019 09:27:59 -0700 (PDT)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id r27sm42606124wrc.55.2019.10.24.09.27.44
+ by smtp.gmail.com with ESMTPSA id r27sm42606124wrc.55.2019.10.24.09.27.58
  for <qemu-devel@nongnu.org>
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 24 Oct 2019 09:27:45 -0700 (PDT)
+ Thu, 24 Oct 2019 09:27:58 -0700 (PDT)
 From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PULL 15/51] target/arm: Split out arm_mmu_idx_el
-Date: Thu, 24 Oct 2019 17:26:48 +0100
-Message-Id: <20191024162724.31675-16-peter.maydell@linaro.org>
+Subject: [PULL 26/51] target/arm: Rely on hflags correct in
+ cpu_get_tb_cpu_state
+Date: Thu, 24 Oct 2019 17:26:59 +0100
+Message-Id: <20191024162724.31675-27-peter.maydell@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20191024162724.31675-1-peter.maydell@linaro.org>
 References: <20191024162724.31675-1-peter.maydell@linaro.org>
@@ -82,7 +83,7 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::32d
+X-Received-From: 2a00:1450:4864:20::442
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -100,80 +101,79 @@ Sender: "Qemu-devel"
 
 From: Richard Henderson <richard.henderson@linaro.org>
 
-Avoid calling arm_current_el() twice.
+This is the payoff.
 
+From perf record -g data of ubuntu 18 boot and shutdown:
+
+BEFORE:
+
+-   23.02%     2.82%  qemu-system-aar  [.] helper_lookup_tb_ptr
+   - 20.22% helper_lookup_tb_ptr
+      + 10.05% tb_htable_lookup
+      - 9.13% cpu_get_tb_cpu_state
+           3.20% aa64_va_parameters_both
+           0.55% fp_exception_el
+
+-   11.66%     4.74%  qemu-system-aar  [.] cpu_get_tb_cpu_state
+   - 6.96% cpu_get_tb_cpu_state
+        3.63% aa64_va_parameters_both
+        0.60% fp_exception_el
+        0.53% sve_exception_el
+
+AFTER:
+
+-   16.40%     3.40%  qemu-system-aar  [.] helper_lookup_tb_ptr
+   - 13.03% helper_lookup_tb_ptr
+      + 11.19% tb_htable_lookup
+        0.55% cpu_get_tb_cpu_state
+
+     0.98%     0.71%  qemu-system-aar  [.] cpu_get_tb_cpu_state
+
+     0.87%     0.24%  qemu-system-aar  [.] rebuild_hflags_a64
+
+Before, helper_lookup_tb_ptr is the second hottest function in the
+application, consuming almost a quarter of the runtime.  Within the
+entire execution, cpu_get_tb_cpu_state consumes about 12%.
+
+After, helper_lookup_tb_ptr has dropped to the fourth hottest function,
+with consumption dropping to a sixth of the runtime.  Within the
+entire execution, cpu_get_tb_cpu_state has dropped below 1%, and the
+supporting function to rebuild hflags also consumes about 1%.
+
+Assertions are retained for --enable-debug-tcg.
+
+Tested-by: Alex Bennée <alex.bennee@linaro.org>
 Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-Message-id: 20191023150057.25731-14-richard.henderson@linaro.org
+Message-id: 20191023150057.25731-25-richard.henderson@linaro.org
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- target/arm/internals.h |  9 +++++++++
- target/arm/helper.c    | 12 +++++++-----
- 2 files changed, 16 insertions(+), 5 deletions(-)
+ target/arm/helper.c | 9 ++++++---
+ 1 file changed, 6 insertions(+), 3 deletions(-)
 
-diff --git a/target/arm/internals.h b/target/arm/internals.h
-index 232d9638753..f5313dd3d42 100644
---- a/target/arm/internals.h
-+++ b/target/arm/internals.h
-@@ -949,6 +949,15 @@ void arm_cpu_update_virq(ARMCPU *cpu);
-  */
- void arm_cpu_update_vfiq(ARMCPU *cpu);
- 
-+/**
-+ * arm_mmu_idx_el:
-+ * @env: The cpu environment
-+ * @el: The EL to use.
-+ *
-+ * Return the full ARMMMUIdx for the translation regime for EL.
-+ */
-+ARMMMUIdx arm_mmu_idx_el(CPUARMState *env, int el);
-+
- /**
-  * arm_mmu_idx:
-  * @env: The cpu environment
 diff --git a/target/arm/helper.c b/target/arm/helper.c
-index 85de96d071a..3f7d3f257d8 100644
+index c55783e5406..63815fc4cfc 100644
 --- a/target/arm/helper.c
 +++ b/target/arm/helper.c
-@@ -11026,15 +11026,12 @@ ARMMMUIdx arm_v7m_mmu_idx_for_secstate(CPUARMState *env, bool secstate)
- }
- #endif
- 
--ARMMMUIdx arm_mmu_idx(CPUARMState *env)
-+ARMMMUIdx arm_mmu_idx_el(CPUARMState *env, int el)
+@@ -11259,12 +11259,15 @@ void HELPER(rebuild_hflags_a64)(CPUARMState *env, int el)
+ void cpu_get_tb_cpu_state(CPUARMState *env, target_ulong *pc,
+                           target_ulong *cs_base, uint32_t *pflags)
  {
--    int el;
--
-     if (arm_feature(env, ARM_FEATURE_M)) {
-         return arm_v7m_mmu_idx_for_secstate(env, env->v7m.secure);
-     }
+-    uint32_t flags, pstate_for_ss;
++    uint32_t flags = env->hflags;
++    uint32_t pstate_for_ss;
  
--    el = arm_current_el(env);
-     if (el < 2 && arm_is_secure_below_el3(env)) {
-         return ARMMMUIdx_S1SE0 + el;
-     } else {
-@@ -11042,6 +11039,11 @@ ARMMMUIdx arm_mmu_idx(CPUARMState *env)
-     }
- }
+     *cs_base = 0;
+-    flags = rebuild_hflags_internal(env);
++#ifdef CONFIG_DEBUG_TCG
++    assert(flags == rebuild_hflags_internal(env));
++#endif
  
-+ARMMMUIdx arm_mmu_idx(CPUARMState *env)
-+{
-+    return arm_mmu_idx_el(env, arm_current_el(env));
-+}
-+
- int cpu_mmu_index(CPUARMState *env, bool ifetch)
- {
-     return arm_to_core_mmu_idx(arm_mmu_idx(env));
-@@ -11202,7 +11204,7 @@ static uint32_t rebuild_hflags_internal(CPUARMState *env)
- {
-     int el = arm_current_el(env);
-     int fp_el = fp_exception_el(env, el);
--    ARMMMUIdx mmu_idx = arm_mmu_idx(env);
-+    ARMMMUIdx mmu_idx = arm_mmu_idx_el(env, el);
- 
-     if (is_a64(env)) {
-         return rebuild_hflags_a64(env, el, fp_el, mmu_idx);
+-    if (is_a64(env)) {
++    if (FIELD_EX32(flags, TBFLAG_ANY, AARCH64_STATE)) {
+         *pc = env->pc;
+         if (cpu_isar_feature(aa64_bti, env_archcpu(env))) {
+             flags = FIELD_DP32(flags, TBFLAG_A64, BTYPE, env->btype);
 -- 
 2.20.1
 
