@@ -7,73 +7,73 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DD3EBCA9EAF
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 16:54:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7F300CA9EAF
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 16:55:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AB4EA205C9
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 16:54:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 49A7F205C9
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 16:55:26 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="pjTaFwQY"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AB4EA205C9
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="maqFf5oD"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 49A7F205C9
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48068 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48082 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iNgNg-0005H9-H6
-	for qemu-devel@archiver.kernel.org; Thu, 24 Oct 2019 12:54:36 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57677)
+	id 1iNgOS-0006jE-Rj
+	for qemu-devel@archiver.kernel.org; Thu, 24 Oct 2019 12:55:24 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57709)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1iNfxW-0006rQ-0z
- for qemu-devel@nongnu.org; Thu, 24 Oct 2019 12:27:35 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1iNfxY-0006xx-Sh
+ for qemu-devel@nongnu.org; Thu, 24 Oct 2019 12:27:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1iNfxU-0000fH-J1
- for qemu-devel@nongnu.org; Thu, 24 Oct 2019 12:27:33 -0400
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:38087)
+ (envelope-from <peter.maydell@linaro.org>) id 1iNfxX-0000gl-MK
+ for qemu-devel@nongnu.org; Thu, 24 Oct 2019 12:27:36 -0400
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:32851)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1iNfxU-0000f2-CM
- for qemu-devel@nongnu.org; Thu, 24 Oct 2019 12:27:32 -0400
-Received: by mail-wr1-x443.google.com with SMTP id v9so15522516wrq.5
- for <qemu-devel@nongnu.org>; Thu, 24 Oct 2019 09:27:32 -0700 (PDT)
+ id 1iNfxX-0000gM-G4
+ for qemu-devel@nongnu.org; Thu, 24 Oct 2019 12:27:35 -0400
+Received: by mail-wr1-x441.google.com with SMTP id s1so18033243wro.0
+ for <qemu-devel@nongnu.org>; Thu, 24 Oct 2019 09:27:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:subject:date:message-id:in-reply-to:references:mime-version
  :content-transfer-encoding;
- bh=cpjzzf90ZZlnCC/zG71N3R57DXjC6KFtdGEnCvJDP10=;
- b=pjTaFwQYEIMf7ZGqSvmwAJS07X0zGegcCruzfbYE7pDE5Qte0riKxkAkXV7joNR0VG
- RSzHPPslezWaqaXYGWGh8QTenovSa5zmyOUm2hAJXD/+xFOnONhlxRtzhU1WXBzbQzyM
- JwKcVdePQ1uVBssJ5tvRT/OHdJouTTnUOo4uJNfCC2p9947ZMk8cGh/GxtnVHTS9AEYE
- IpccfQcM3e8INUqShWf1UI77o5RXuZlpTF5TgEdad6DPhhLyJ9NgrP5pGXuyo9dG7x9B
- 0L+FSf6eCHdwOoQDVImx+UAwRUss6T0ySdCe62VNLSRhHkSh/hkOdriwwGx5hMOBdQNx
- 4pKw==
+ bh=KG6cHPR+km+P0qCVntKHolnh4Cws12yKWCSVL0d/8TE=;
+ b=maqFf5oDHZ4o0OAhwnXBEl+RH9nScIIv5r8lEgPdzE5onANFU0egUkabpiczeWKAzj
+ rNhMC+jKutez6LS2nJvYcO2cojsCuefFbQQcw89aQU2MD79zLJ98r/sBu+xGCewELLQS
+ /GKinx1TKeaZVEa5yaWQwVv4iDtOeF5qKhTE90+kO3R2MaWEEEkOOPcMF/I+D5H2vb94
+ 5X5YMukDjXkwPyvj5LHKxGhm6AlJBZJhUnWRbLusDLpp2HTfU9OtPc92xJj/+azwgE1Z
+ VJ1x2h8EukwO0HLMswBS2K6jcFp6+AbLi5uhk/cDdyEZyo6gAixT+VehS7P2BrpKxjkL
+ WCWA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=cpjzzf90ZZlnCC/zG71N3R57DXjC6KFtdGEnCvJDP10=;
- b=idUwRzbka6dqBRKtuUANrfA60qVuIjiOvZbbnGIYcpV+4pNC6L1cys23cmym8PSn9d
- 4IsKBdOptGpiSm16ly7uWIt9inPhxq5KlPrMJCb62/USB4xAJRzeYJf5XfKSgmyVpimB
- QpeKHMH25E6k9Jc/QdTqPuT2ykGs1cUSWYwwADhGR+xu7DZu7UVPz2aqvnt5Y8u8uFvx
- ittCbZDQVmW1GLQTG6G4GJ8pBZ1cIPNhjYHjAIsQkpzpDGHWS03xwLLxjfWlW0LrY5ve
- 9zOZN7nSPzU04+gD1rB7r8d4X+Bay6GHhY3JHlsOaHxLeeFunm7c6D9UtokHd9c+LFvl
- axrA==
-X-Gm-Message-State: APjAAAWTG19uUXuWoo3vaCONwAzbqavkBU6XZ/OKWD9+pjG9dYSJFDgV
- otJaZBYUdmKazt3tK5/38P9znJeHByU=
-X-Google-Smtp-Source: APXvYqyk2wUPgi3WTWa+gUA4PtsGJWkfa3EUC3g9gha46zwroGKaK9qch2Qp4e9n/HMvUz2tRJ18WQ==
-X-Received: by 2002:a5d:6a03:: with SMTP id m3mr4387221wru.90.1571934450942;
- Thu, 24 Oct 2019 09:27:30 -0700 (PDT)
+ bh=KG6cHPR+km+P0qCVntKHolnh4Cws12yKWCSVL0d/8TE=;
+ b=JI24Xzbyb5b9hycDF3WtuKtTn/pksbIyEBBarlfEphpyW44Il8dnsFM81WP/NYFGOw
+ G0b6zgDBkCqL6IjVFIp8T9Zft7Vett5Y+nktOVmJzPQkLDAH7gFeDPxEZrK52axf8jbK
+ PO1cWtsFkJGj4TUayymVIMVw79qMrqVewv3ytneuyz0IZJE9EhVZwCBM16+z7rLWxSM+
+ auB0nwQtfV2uydXqekIE/vBJvhSGax2A83TWj1TPKBpwVGC3gqrLdPqltXo2nYwUW4Y1
+ PzTYPvG+uVXavSvECBoFj2Kw8toMCNTzZA4sqZq1MzrpK3Wc4DsBWVX1XkZ0HjhQ7gkq
+ fmTQ==
+X-Gm-Message-State: APjAAAWHDUkuwUgWFSlWDCRe9uTCq/ILKE1Y23Tsb7YhlGPcq8Fu9BhO
+ 7SYMREKCoczdhGWyBcIp8QTqA8OY1xg=
+X-Google-Smtp-Source: APXvYqxS/RBNkeVgmXBxP2szRRrxY2igJaHppI+addhh2X8c/7cp/m+hljlBzt3hCxlmBO+GhrTl9Q==
+X-Received: by 2002:adf:f5cc:: with SMTP id k12mr4555214wrp.65.1571934453633; 
+ Thu, 24 Oct 2019 09:27:33 -0700 (PDT)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id r27sm42606124wrc.55.2019.10.24.09.27.29
+ by smtp.gmail.com with ESMTPSA id r27sm42606124wrc.55.2019.10.24.09.27.32
  for <qemu-devel@nongnu.org>
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 24 Oct 2019 09:27:30 -0700 (PDT)
+ Thu, 24 Oct 2019 09:27:32 -0700 (PDT)
 From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PULL 03/51] target/arm: Split out rebuild_hflags_common
-Date: Thu, 24 Oct 2019 17:26:36 +0100
-Message-Id: <20191024162724.31675-4-peter.maydell@linaro.org>
+Subject: [PULL 05/51] target/arm: Split out rebuild_hflags_common_32
+Date: Thu, 24 Oct 2019 17:26:38 +0100
+Message-Id: <20191024162724.31675-6-peter.maydell@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20191024162724.31675-1-peter.maydell@linaro.org>
 References: <20191024162724.31675-1-peter.maydell@linaro.org>
@@ -82,7 +82,7 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::443
+X-Received-From: 2a00:1450:4864:20::441
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -100,161 +100,69 @@ Sender: "Qemu-devel"
 
 From: Richard Henderson <richard.henderson@linaro.org>
 
-Create a function to compute the values of the TBFLAG_ANY bits
-that will be cached.  For now, the env->hflags variable is not
-used, and the results are fed back to cpu_get_tb_cpu_state.
+Create a function to compute the values of the TBFLAG_A32 bits
+that will be cached, and are used by all profiles.
 
 Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-Message-id: 20191023150057.25731-2-richard.henderson@linaro.org
+Message-id: 20191023150057.25731-4-richard.henderson@linaro.org
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- target/arm/cpu.h    | 29 ++++++++++++++++++-----------
- target/arm/helper.c | 26 +++++++++++++++++++-------
- 2 files changed, 37 insertions(+), 18 deletions(-)
+ target/arm/helper.c | 16 +++++++++++-----
+ 1 file changed, 11 insertions(+), 5 deletions(-)
 
-diff --git a/target/arm/cpu.h b/target/arm/cpu.h
-index 297ad5e47ad..ad79a6153bb 100644
---- a/target/arm/cpu.h
-+++ b/target/arm/cpu.h
-@@ -231,6 +231,9 @@ typedef struct CPUARMState {
-     uint32_t pstate;
-     uint32_t aarch64; /* 1 if CPU is in aarch64 state; inverse of PSTATE.nRW */
- 
-+    /* Cached TBFLAGS state.  See below for which bits are included.  */
-+    uint32_t hflags;
-+
-     /* Frequently accessed CPSR bits are stored separately for efficiency.
-        This contains all the other bits.  Use cpsr_{read,write} to access
-        the whole CPSR.  */
-@@ -3140,15 +3143,18 @@ typedef ARMCPU ArchCPU;
- 
- #include "exec/cpu-all.h"
- 
--/* Bit usage in the TB flags field: bit 31 indicates whether we are
-+/*
-+ * Bit usage in the TB flags field: bit 31 indicates whether we are
-  * in 32 or 64 bit mode. The meaning of the other bits depends on that.
-  * We put flags which are shared between 32 and 64 bit mode at the top
-  * of the word, and flags which apply to only one mode at the bottom.
-+ *
-+ * Unless otherwise noted, these bits are cached in env->hflags.
-  */
- FIELD(TBFLAG_ANY, AARCH64_STATE, 31, 1)
- FIELD(TBFLAG_ANY, MMUIDX, 28, 3)
- FIELD(TBFLAG_ANY, SS_ACTIVE, 27, 1)
--FIELD(TBFLAG_ANY, PSTATE_SS, 26, 1)
-+FIELD(TBFLAG_ANY, PSTATE_SS, 26, 1)     /* Not cached. */
- /* Target EL if we take a floating-point-disabled exception */
- FIELD(TBFLAG_ANY, FPEXC_EL, 24, 2)
- FIELD(TBFLAG_ANY, BE_DATA, 23, 1)
-@@ -3159,13 +3165,14 @@ FIELD(TBFLAG_ANY, BE_DATA, 23, 1)
- FIELD(TBFLAG_ANY, DEBUG_TARGET_EL, 21, 2)
- 
- /* Bit usage when in AArch32 state: */
--FIELD(TBFLAG_A32, THUMB, 0, 1)
--FIELD(TBFLAG_A32, VECLEN, 1, 3)
--FIELD(TBFLAG_A32, VECSTRIDE, 4, 2)
-+FIELD(TBFLAG_A32, THUMB, 0, 1)          /* Not cached. */
-+FIELD(TBFLAG_A32, VECLEN, 1, 3)         /* Not cached. */
-+FIELD(TBFLAG_A32, VECSTRIDE, 4, 2)      /* Not cached. */
- /*
-  * We store the bottom two bits of the CPAR as TB flags and handle
-  * checks on the other bits at runtime. This shares the same bits as
-  * VECSTRIDE, which is OK as no XScale CPU has VFP.
-+ * Not cached, because VECLEN+VECSTRIDE are not cached.
-  */
- FIELD(TBFLAG_A32, XSCALE_CPAR, 4, 2)
- /*
-@@ -3174,15 +3181,15 @@ FIELD(TBFLAG_A32, XSCALE_CPAR, 4, 2)
-  * the same thing as the current security state of the processor!
-  */
- FIELD(TBFLAG_A32, NS, 6, 1)
--FIELD(TBFLAG_A32, VFPEN, 7, 1)
--FIELD(TBFLAG_A32, CONDEXEC, 8, 8)
-+FIELD(TBFLAG_A32, VFPEN, 7, 1)          /* Not cached. */
-+FIELD(TBFLAG_A32, CONDEXEC, 8, 8)       /* Not cached. */
- FIELD(TBFLAG_A32, SCTLR_B, 16, 1)
- /* For M profile only, set if FPCCR.LSPACT is set */
--FIELD(TBFLAG_A32, LSPACT, 18, 1)
-+FIELD(TBFLAG_A32, LSPACT, 18, 1)        /* Not cached. */
- /* For M profile only, set if we must create a new FP context */
--FIELD(TBFLAG_A32, NEW_FP_CTXT_NEEDED, 19, 1)
-+FIELD(TBFLAG_A32, NEW_FP_CTXT_NEEDED, 19, 1) /* Not cached. */
- /* For M profile only, set if FPCCR.S does not match current security state */
--FIELD(TBFLAG_A32, FPCCR_S_WRONG, 20, 1)
-+FIELD(TBFLAG_A32, FPCCR_S_WRONG, 20, 1) /* Not cached. */
- /* For M profile only, Handler (ie not Thread) mode */
- FIELD(TBFLAG_A32, HANDLER, 21, 1)
- /* For M profile only, whether we should generate stack-limit checks */
-@@ -3194,7 +3201,7 @@ FIELD(TBFLAG_A64, SVEEXC_EL, 2, 2)
- FIELD(TBFLAG_A64, ZCR_LEN, 4, 4)
- FIELD(TBFLAG_A64, PAUTH_ACTIVE, 8, 1)
- FIELD(TBFLAG_A64, BT, 9, 1)
--FIELD(TBFLAG_A64, BTYPE, 10, 2)
-+FIELD(TBFLAG_A64, BTYPE, 10, 2)         /* Not cached. */
- FIELD(TBFLAG_A64, TBID, 12, 2)
- 
- static inline bool bswap_code(bool sctlr_b)
 diff --git a/target/arm/helper.c b/target/arm/helper.c
-index 0d9a2d2ab74..8829d91ae1d 100644
+index 69da04786e8..f05d0424745 100644
 --- a/target/arm/helper.c
 +++ b/target/arm/helper.c
-@@ -11054,6 +11054,22 @@ ARMMMUIdx arm_stage1_mmu_idx(CPUARMState *env)
+@@ -11070,6 +11070,15 @@ static uint32_t rebuild_hflags_common(CPUARMState *env, int fp_el,
+     return flags;
  }
- #endif
  
-+static uint32_t rebuild_hflags_common(CPUARMState *env, int fp_el,
-+                                      ARMMMUIdx mmu_idx, uint32_t flags)
++static uint32_t rebuild_hflags_common_32(CPUARMState *env, int fp_el,
++                                         ARMMMUIdx mmu_idx, uint32_t flags)
 +{
-+    flags = FIELD_DP32(flags, TBFLAG_ANY, FPEXC_EL, fp_el);
-+    flags = FIELD_DP32(flags, TBFLAG_ANY, MMUIDX,
-+                       arm_to_core_mmu_idx(mmu_idx));
++    flags = FIELD_DP32(flags, TBFLAG_A32, SCTLR_B, arm_sctlr_b(env));
++    flags = FIELD_DP32(flags, TBFLAG_A32, NS, !access_secure_reg(env));
 +
-+    if (arm_cpu_data_is_big_endian(env)) {
-+        flags = FIELD_DP32(flags, TBFLAG_ANY, BE_DATA, 1);
-+    }
-+    if (arm_singlestep_active(env)) {
-+        flags = FIELD_DP32(flags, TBFLAG_ANY, SS_ACTIVE, 1);
-+    }
-+    return flags;
++    return rebuild_hflags_common(env, fp_el, mmu_idx, flags);
 +}
 +
- void cpu_get_tb_cpu_state(CPUARMState *env, target_ulong *pc,
-                           target_ulong *cs_base, uint32_t *pflags)
+ static uint32_t rebuild_hflags_a64(CPUARMState *env, int el, int fp_el,
+                                    ARMMMUIdx mmu_idx)
  {
-@@ -11145,7 +11161,7 @@ void cpu_get_tb_cpu_state(CPUARMState *env, target_ulong *pc,
-         }
-     }
+@@ -11141,7 +11150,7 @@ void cpu_get_tb_cpu_state(CPUARMState *env, target_ulong *pc,
+     ARMMMUIdx mmu_idx = arm_mmu_idx(env);
+     int current_el = arm_current_el(env);
+     int fp_el = fp_exception_el(env, current_el);
+-    uint32_t flags = 0;
++    uint32_t flags;
  
--    flags = FIELD_DP32(flags, TBFLAG_ANY, MMUIDX, arm_to_core_mmu_idx(mmu_idx));
-+    flags = rebuild_hflags_common(env, fp_el, mmu_idx, flags);
+     if (is_a64(env)) {
+         *pc = env->pc;
+@@ -11151,12 +11160,11 @@ void cpu_get_tb_cpu_state(CPUARMState *env, target_ulong *pc,
+         }
+     } else {
+         *pc = env->regs[15];
++        flags = rebuild_hflags_common_32(env, fp_el, mmu_idx, 0);
+         flags = FIELD_DP32(flags, TBFLAG_A32, THUMB, env->thumb);
+         flags = FIELD_DP32(flags, TBFLAG_A32, VECLEN, env->vfp.vec_len);
+         flags = FIELD_DP32(flags, TBFLAG_A32, VECSTRIDE, env->vfp.vec_stride);
+         flags = FIELD_DP32(flags, TBFLAG_A32, CONDEXEC, env->condexec_bits);
+-        flags = FIELD_DP32(flags, TBFLAG_A32, SCTLR_B, arm_sctlr_b(env));
+-        flags = FIELD_DP32(flags, TBFLAG_A32, NS, !access_secure_reg(env));
+         if (env->vfp.xregs[ARM_VFP_FPEXC] & (1 << 30)
+             || arm_el_is_aa64(env, 1) || arm_feature(env, ARM_FEATURE_M)) {
+             flags = FIELD_DP32(flags, TBFLAG_A32, VFPEN, 1);
+@@ -11166,8 +11174,6 @@ void cpu_get_tb_cpu_state(CPUARMState *env, target_ulong *pc,
+             flags = FIELD_DP32(flags, TBFLAG_A32,
+                                XSCALE_CPAR, env->cp15.c15_cpar);
+         }
+-
+-        flags = rebuild_hflags_common(env, fp_el, mmu_idx, flags);
+     }
  
      /* The SS_ACTIVE and PSTATE_SS bits correspond to the state machine
-      * states defined in the ARM ARM for software singlestep:
-@@ -11153,9 +11169,9 @@ void cpu_get_tb_cpu_state(CPUARMState *env, target_ulong *pc,
-      *     0            x       Inactive (the TB flag for SS is always 0)
-      *     1            0       Active-pending
-      *     1            1       Active-not-pending
-+     * SS_ACTIVE is set in hflags; PSTATE_SS is computed every TB.
-      */
--    if (arm_singlestep_active(env)) {
--        flags = FIELD_DP32(flags, TBFLAG_ANY, SS_ACTIVE, 1);
-+    if (FIELD_EX32(flags, TBFLAG_ANY, SS_ACTIVE)) {
-         if (is_a64(env)) {
-             if (env->pstate & PSTATE_SS) {
-                 flags = FIELD_DP32(flags, TBFLAG_ANY, PSTATE_SS, 1);
-@@ -11166,10 +11182,6 @@ void cpu_get_tb_cpu_state(CPUARMState *env, target_ulong *pc,
-             }
-         }
-     }
--    if (arm_cpu_data_is_big_endian(env)) {
--        flags = FIELD_DP32(flags, TBFLAG_ANY, BE_DATA, 1);
--    }
--    flags = FIELD_DP32(flags, TBFLAG_ANY, FPEXC_EL, fp_el);
- 
-     if (arm_v7m_is_handler_mode(env)) {
-         flags = FIELD_DP32(flags, TBFLAG_A32, HANDLER, 1);
 -- 
 2.20.1
 
