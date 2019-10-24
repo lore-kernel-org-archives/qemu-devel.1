@@ -2,86 +2,96 @@ Return-Path: <SRS0=Jnn8=YR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4A652CA9EAF
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 14:28:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EE481CA9EAF
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 14:28:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 108432070B
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 14:28:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B882F2070B
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 14:28:53 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fk89SAkA"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 108432070B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="aUy+Ieye"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B882F2070B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44214 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44220 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iNe6B-00044Q-FZ
-	for qemu-devel@archiver.kernel.org; Thu, 24 Oct 2019 10:28:23 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34590)
+	id 1iNe6e-0004vm-En
+	for qemu-devel@archiver.kernel.org; Thu, 24 Oct 2019 10:28:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35382)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <paolo.bonzini@gmail.com>) id 1iNdif-0006pQ-TJ
- for qemu-devel@nongnu.org; Thu, 24 Oct 2019 10:04:10 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1iNdkq-0002db-5a
+ for qemu-devel@nongnu.org; Thu, 24 Oct 2019 10:06:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <paolo.bonzini@gmail.com>) id 1iNdic-0007aV-Cj
- for qemu-devel@nongnu.org; Thu, 24 Oct 2019 10:04:04 -0400
-Received: from mail-wr1-x432.google.com ([2a00:1450:4864:20::432]:38958)
+ (envelope-from <richard.henderson@linaro.org>) id 1iNdko-0000Ky-Qb
+ for qemu-devel@nongnu.org; Thu, 24 Oct 2019 10:06:19 -0400
+Received: from mail-qk1-x741.google.com ([2607:f8b0:4864:20::741]:37830)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
- id 1iNdic-0007Zt-5T
- for qemu-devel@nongnu.org; Thu, 24 Oct 2019 10:04:02 -0400
-Received: by mail-wr1-x432.google.com with SMTP id a11so10151735wra.6
- for <qemu-devel@nongnu.org>; Thu, 24 Oct 2019 07:04:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=fuQszgdPGBPwvusB1Bd3Ai26mEtUdVTfTTnv1HWpc9k=;
- b=fk89SAkAlx/Nn/JW1Za5RwIaD5V7z2cnkGECtpxrIQJaCIrQj+knp6U+tJVdYroGYn
- jWTcnOxv8pBrpV8M0nTqLO6nrMf1p9U6oYLfI1aC5j4SQCtsdBeMBcSH7JNWaNO/EHKl
- kP83FpPfv+geS8yPLQQ/uwGFkmCLio/QowGCx7XeZr8WUlMKDFsnfA9n7oQbIUBurtQI
- sW6ys+tTSVTCgpDhzvWoT9atn3sDNoaTK3vcyH885GjFDNN8sm9p1gR4BMxY2ditH07A
- jQIrchnHQnATyyyaUjm8mPGtcsFNM/e8izVK5DiSK9G5mP1EzI2gefe8P1DiuMU9+9rU
- E3YQ==
+ (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+ id 1iNdko-0000Ko-L1
+ for qemu-devel@nongnu.org; Thu, 24 Oct 2019 10:06:18 -0400
+Received: by mail-qk1-x741.google.com with SMTP id u184so23519521qkd.4
+ for <qemu-devel@nongnu.org>; Thu, 24 Oct 2019 07:06:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=nfmjIwBPnkA+wvYUM3VvUWJrrt75lDRQLCmDT4Oelhc=;
+ b=aUy+IeyeiEr0dCVl1bdkYDbzGFbXs3PXmVpvnYq8vIV4OmFYST3S55UUsRxT3R6AS5
+ gjjcUHQ24JQ+96M58whEJPGBaD9zvkwZ06m0JbvJUwuBOzaSUjplymHUqYRNLg3sjCxw
+ droWLMjnEHqNp9Wm851h0/jo80rBeB1tg4/EYpN7Ag3JqhGfveoGcZiEzZEnY42R9JFg
+ pF+pjJT94/WxJvIqSEOPqhsxSvYXmeNjE/k6EhMc22jMItYrud+blKMLOlWHpBQ/DDai
+ RGJnbngM5CAGgyFGHrboZH4RTo8HYdSaWU/qNixoeMEvnvZ2md9JwnZnWJgt62B7NAzY
+ EN2g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
- :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=fuQszgdPGBPwvusB1Bd3Ai26mEtUdVTfTTnv1HWpc9k=;
- b=jKCp+zCZa30Uk5R3B6LlaPaT/zV9jXV6IhHS3zS6CBWHeXQ99RCtAmNDW6OZD6s1jp
- 4M8+hFt0Lk3+a+AFpGHk9TNsRz0icaiHqbkPO3eeVjPNbxkM3CZ/WGNajSiOn9UVkNwE
- 2sk5/J/F1eZJdvvW3eRpzO3F4BQAiqIw9lCTrRLovR9+BwPRyT9AGJERpeV/ZBoEKn1z
- 9TlZvLQyXUXoqydAhlqqjLgINTOh6T4xNrlawd8cDgZXas+JRKU20EegQn8TP+pGh0Nj
- yvuLQyyDGiZDvqi8RasJ+RGjqStHtajx76tR4OupsoGCV4CwBGURBArTl5WZ0jSqpeyi
- tbvQ==
-X-Gm-Message-State: APjAAAUjTaZy02VyPLom5lKidEHnAQqKtXMHGDMdidaPgJSbPTUc+ErD
- UGWLJYEGB+cda3aweBDI9cYFEtNt
-X-Google-Smtp-Source: APXvYqzRkWulffXzHasD8OjUDZJBDhorCjTD/nzYF1DSfQKnkBKYvbSDUj/bMc7A2ufMMAk19ycEbQ==
-X-Received: by 2002:a5d:674f:: with SMTP id l15mr4388528wrw.80.1571925840725; 
- Thu, 24 Oct 2019 07:04:00 -0700 (PDT)
-Received: from 640k.localdomain ([93.56.166.5])
- by smtp.gmail.com with ESMTPSA id b7sm10610155wrn.53.2019.10.24.07.03.59
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=nfmjIwBPnkA+wvYUM3VvUWJrrt75lDRQLCmDT4Oelhc=;
+ b=nXeGovGT3t6miOJVn9ouuDhTxRYUCQvUSd/Xw+Sz6LzyAXrDcWR8+TEGl2c+OSn00u
+ iNxHJw1FFapQaUG+qF6Z2BpycAq+kxSol2UnQUZtyzuQhXekWdipY+NN34LTt5ieSmy4
+ td+I7wZ8V5JCr5Xxtx5YLi024aP1O3DSHKlTzAR3MNaZ3QTuVlmelh2zYsd5dCzhsNUE
+ 1p4XJx/aQ7l8V1lVtsoHr/3WxEsX01oG74WT+mMSfnX5HwUtF4TU695U8WQMTjfS+M0o
+ V1vwlg6LB1orW4gNu0YYFXIYVdhQylcW428mcYYE9nFQQYbY5VGwkCH7KBKKKdgvn++E
+ 5CZg==
+X-Gm-Message-State: APjAAAVhetKdCHUfEef6pvWS/pDd//NnyYCWo+3nHjyk6jaaKf1MjEE7
+ ZDe9lLhudvF4DMb5o4YHcSvjaw==
+X-Google-Smtp-Source: APXvYqzI525ktSqQ9coMyMsoE29dnvdQ1QiGVKpwiCf9MntngloXZKXNMaH0ndHqYI5YBvJYh1OKig==
+X-Received: by 2002:a37:4e81:: with SMTP id c123mr1066034qkb.468.1571925977776; 
+ Thu, 24 Oct 2019 07:06:17 -0700 (PDT)
+Received: from [172.20.87.163] (rrcs-172-254-253-50.nyc.biz.rr.com.
+ [172.254.253.50])
+ by smtp.gmail.com with ESMTPSA id d55sm17723809qta.41.2019.10.24.07.06.16
  (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Thu, 24 Oct 2019 07:03:59 -0700 (PDT)
-From: Paolo Bonzini <pbonzini@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PULL 03/39] Updated Bulgarian translation (19) - 4.1.0
-Date: Thu, 24 Oct 2019 16:03:19 +0200
-Message-Id: <1571925835-31930-4-git-send-email-pbonzini@redhat.com>
-X-Mailer: git-send-email 1.8.3.1
-In-Reply-To: <1571925835-31930-1-git-send-email-pbonzini@redhat.com>
-References: <1571925835-31930-1-git-send-email-pbonzini@redhat.com>
+ Thu, 24 Oct 2019 07:06:17 -0700 (PDT)
+Subject: Re: [PATCH v2 1/7] cpu: use ROUND_UP() to define xxx_PAGE_ALIGN
+To: Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ qemu-devel@nongnu.org
+References: <20191023154505.30521-1-richard.henderson@linaro.org>
+ <20191023154505.30521-2-richard.henderson@linaro.org>
+ <55b477b7-877e-954f-2175-ed36fa787600@redhat.com>
+ <e41a98e4-189a-1e0f-7b29-51a6e00e4d7e@redhat.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Openpgp: preference=signencrypt
+Message-ID: <26cb0551-fbac-e059-c1bf-9c17420528b7@linaro.org>
+Date: Thu, 24 Oct 2019 10:06:15 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <e41a98e4-189a-1e0f-7b29-51a6e00e4d7e@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::432
+X-Received-From: 2607:f8b0:4864:20::741
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -93,54 +103,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Alexander Shopov <ash@kambanaria.org>
+Cc: alex.bennee@linaro.org, Wei Yang <richardw.yang@linux.intel.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Alexander Shopov <ash@kambanaria.org>
+On 10/24/19 8:04 AM, Paolo Bonzini wrote:
+> On 24/10/19 13:52, Philippe Mathieu-Daudé wrote:
+>>> diff --git a/include/exec/cpu-all.h b/include/exec/cpu-all.h
+>>> index ad9ab85eb3..255bb186ac 100644
+>>> --- a/include/exec/cpu-all.h
+>>> +++ b/include/exec/cpu-all.h
+>>> @@ -220,7 +220,7 @@ extern int target_page_bits;
+>>>     #define TARGET_PAGE_SIZE (1 << TARGET_PAGE_BITS)
+>>>   #define TARGET_PAGE_MASK ~(TARGET_PAGE_SIZE - 1)
+>>> -#define TARGET_PAGE_ALIGN(addr) (((addr) + TARGET_PAGE_SIZE - 1) &
+>>> TARGET_PAGE_MASK)
+>>> +#define TARGET_PAGE_ALIGN(addr) ROUND_UP((addr), TARGET_PAGE_SIZE)
+>>>     /* Using intptr_t ensures that qemu_*_page_mask is sign-extended even
+>>>    * when intptr_t is 32-bit and we are aligning a long long.
+>>> @@ -228,9 +228,8 @@ extern int target_page_bits;
+>>>   extern uintptr_t qemu_host_page_size;
+>>>   extern intptr_t qemu_host_page_mask;
+>>>   -#define HOST_PAGE_ALIGN(addr) (((addr) + qemu_host_page_size - 1) &
+>>> qemu_host_page_mask)
+>>> -#define REAL_HOST_PAGE_ALIGN(addr) (((addr) +
+>>> qemu_real_host_page_size - 1) & \
+>>> -                                    qemu_real_host_page_mask)
+>>> +#define HOST_PAGE_ALIGN(addr) ROUND_UP((addr), qemu_host_page_size)
+>>> +#define REAL_HOST_PAGE_ALIGN(addr) ROUND_UP((addr),
+>>> qemu_real_host_page_size)
+>>>     /* same as PROT_xxx */
+>>>   #define PAGE_READ      0x0001
+>>>
+> 
+> Isn't this the patch where Richard pointed out that the compiler
+> generates worse code?
 
-Signed-off-by: Alexander Shopov <ash@kambanaria.org>
-Message-Id: <20191019120534.27479-2-ash@kambanaria.org>
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- po/bg.po | 10 +++++-----
- 1 file changed, 5 insertions(+), 5 deletions(-)
+Richard confused ROUND_UP with QEMU_ALIGN_UP.
 
-diff --git a/po/bg.po b/po/bg.po
-index 3d8c353..98c57e5 100644
---- a/po/bg.po
-+++ b/po/bg.po
-@@ -1,14 +1,14 @@
- # Bulgarian translation of qemu po-file.
--# Copyright (C) 2016 Alexander Shopov <ash@kambanaria.org>
-+# Copyright (C) 2016, 2019 Alexander Shopov <ash@kambanaria.org>
- # This file is distributed under the same license as the qemu package.
--# Alexander Shopov <ash@kambanaria.org>, 2016.
-+# Alexander Shopov <ash@kambanaria.org>, 2016, 2019.
- #
- msgid ""
- msgstr ""
--"Project-Id-Version: QEMU 2.6.50\n"
-+"Project-Id-Version: QEMU 4.1.0\n"
- "Report-Msgid-Bugs-To: qemu-devel@nongnu.org\n"
- "POT-Creation-Date: 2018-07-18 07:56+0200\n"
--"PO-Revision-Date: 2016-06-09 15:54+0300\n"
-+"PO-Revision-Date: 2019-10-19 13:14+0200\n"
- "Last-Translator: Alexander Shopov <ash@kambanaria.org>\n"
- "Language-Team: Bulgarian <dict@ludost.net>\n"
- "Language: bg\n"
-@@ -66,7 +66,7 @@ msgid "Detach Tab"
- msgstr "Към самостоятелен подпрозорец"
- 
- msgid "Show Menubar"
--msgstr ""
-+msgstr "Лента за менюто"
- 
- msgid "_Machine"
- msgstr "_Машина"
--- 
-1.8.3.1
 
+r~
 
 
