@@ -2,89 +2,87 @@ Return-Path: <SRS0=Jnn8=YR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EBEA2CA9EAF
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 11:57:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 96316CA9EBB
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 11:57:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B49C320659
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 11:57:01 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="JxMSVBcA"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B49C320659
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 6CD9221655
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 11:57:35 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6CD9221655
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40394 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40402 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iNbjg-0005AX-DA
-	for qemu-devel@archiver.kernel.org; Thu, 24 Oct 2019 07:57:00 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54040)
+	id 1iNbkD-0006ao-UJ
+	for qemu-devel@archiver.kernel.org; Thu, 24 Oct 2019 07:57:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37805)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1iNaGe-0002QI-8j
- for qemu-devel@nongnu.org; Thu, 24 Oct 2019 06:22:57 -0400
+ (envelope-from <mst@redhat.com>) id 1iNb9H-0007X3-Gn
+ for qemu-devel@nongnu.org; Thu, 24 Oct 2019 07:19:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1iNaGd-00049R-9l
- for qemu-devel@nongnu.org; Thu, 24 Oct 2019 06:22:56 -0400
-Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:52356)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1iNaGd-00048v-3j
- for qemu-devel@nongnu.org; Thu, 24 Oct 2019 06:22:55 -0400
-Received: by mail-wm1-x341.google.com with SMTP id p21so727165wmg.2
- for <qemu-devel@nongnu.org>; Thu, 24 Oct 2019 03:22:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=D36PJ31cBqi6Xsx0ubeHOSTavNbH+1+Xrogs0tJwB/8=;
- b=JxMSVBcAKDKdQgMPchzRQTdK/AOe9NYxD1ug4Ggyj/RGGPl81ucOIqhr75VAednwLe
- hZvwbxf4j+XR6mCeYARKw4fU+jY+Fb0J95Unn9maMMGJKneVlevmmMv96A8zWFWApmCa
- MLxmOBYfi1B3dS7fGR8w91nwvSIe0ze3bWAplDykkxVtV5aMKy7mh4KEI3nJWnN2iFEi
- 9/Zr1bIxaa6vzUhZfLugWpm/hI1zIoqA1QZq8ppF8g7bVF28jG10rODgva/zhVBccQVa
- OsN5tlBfBzkEBAmyN+M2EyrHipCTy44g6baNAr52jPzTXK7MtxCcUlO+XikrVRsxb9F5
- MYKQ==
+ (envelope-from <mst@redhat.com>) id 1iNb9F-0005Me-WF
+ for qemu-devel@nongnu.org; Thu, 24 Oct 2019 07:19:23 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47339)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <mst@redhat.com>) id 1iNb9F-0005Lw-N8
+ for qemu-devel@nongnu.org; Thu, 24 Oct 2019 07:19:21 -0400
+Received: from mail-qt1-f198.google.com (mail-qt1-f198.google.com
+ [209.85.160.198])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id DD55F83F3C
+ for <qemu-devel@nongnu.org>; Thu, 24 Oct 2019 11:19:20 +0000 (UTC)
+Received: by mail-qt1-f198.google.com with SMTP id m19so24618502qtm.13
+ for <qemu-devel@nongnu.org>; Thu, 24 Oct 2019 04:19:20 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=D36PJ31cBqi6Xsx0ubeHOSTavNbH+1+Xrogs0tJwB/8=;
- b=rb35Ogw4J8KkmH9Y2d1jh+Xw1jQFVBsCvC9nUAArK7x1sUrLKtfWwqNBKt9n9xI3kP
- tZt2/UP3O3vlrLQzv365PqqOb9+P3BYUfSkljJBUPEfq5R3IzmHcidujvE4hJEZUONe1
- 1axV481jb7BrFiPlOhPEgnaSV/CjMvmPelDJygaFVlgImw6tVqgPGU3BMmeuYf/f7JTM
- g/f+sPL0TqZ1KfLmpAlnxSDR9+a7Fw1Jjpbp/tVpMn/25Xxn/tvoh13e++RcMvYpaFXx
- fRTJSn8QF+IgLMj474X98fPTWkcBWI2B5cLdz055NGo9X5cUcw0GzLPpG2EXe946kKf/
- ym6w==
-X-Gm-Message-State: APjAAAUX2QxNuiXPBZ8/XcbpsCIkDg0MP7Gb5c0Uk4VF/qiQgRfyAdYi
- kWq6IHP3BtLrgsb/BGI9l0QTvZIoxxk=
-X-Google-Smtp-Source: APXvYqxX7lpf+ywXJI5PGvZa1JCwcH4LyZIbCSsOQZim9//UuQZCJ94vv3saVhDIJvEcr4zuhHEcUQ==
-X-Received: by 2002:a1c:a848:: with SMTP id r69mr4004243wme.83.1571912573980; 
- Thu, 24 Oct 2019 03:22:53 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id c16sm12233590wrw.32.2019.10.24.03.22.45
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:content-transfer-encoding
+ :in-reply-to;
+ bh=W9J+8pC0nI1qSWQgoFlrnvJigANruwVWY+QPi7Oi9kc=;
+ b=YulAVHkskm69MF7yevWVYYBhtvVrm27zEdG2SotIAgBSW/bEYD5IdP20ZVGS79rf9R
+ Zj09S+mzpBvyiHqn80dCpacS7jbFLCjMSCN2gapyI66owVv6XgI/QIGG6WVz062WGe86
+ JKnO30eHWHaRteBZ2K2RCSBmPkIMyysF2flJNSHjPsgRubuc/wNHe5qx3Ylxbf+0WI/3
+ RTq58RR7esWgDbWPFPyeuyGH1tB77AsnDhRUTu+6wvGc//Su+f+TrkfxPQqHsnXsreNL
+ +LNy9y/VGjOqmMLwf32AOmBK6SzP1eBLjEnx281uMmFWjTOZeNUbz+3u3D4nLbaxQjfn
+ l0+A==
+X-Gm-Message-State: APjAAAXMtMeZNgnXUmHdbSGjf+12xfRlKBkbN2ewt2qQbf1Gq1kGdMA9
+ TXyulkc5d1xJiPsmt8AVch2LKrJYiSe8zpipZ6M3/ekbbywntlULDoDiq3aI+36uyTtLx/VswDt
+ 8BeDFbl/svfd7lKU=
+X-Received: by 2002:a0c:fe02:: with SMTP id x2mr6575190qvr.117.1571915960112; 
+ Thu, 24 Oct 2019 04:19:20 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqxwbZ3igDy9/Zk5fj3+9Q2nFdgrjr95IUlbXzxb5gfGV7G1pl/y4TUMC2a8NpEy1+0a4PPFTQ==
+X-Received: by 2002:a0c:fe02:: with SMTP id x2mr6575148qvr.117.1571915959785; 
+ Thu, 24 Oct 2019 04:19:19 -0700 (PDT)
+Received: from redhat.com (bzq-79-176-10-77.red.bezeqint.net. [79.176.10.77])
+ by smtp.gmail.com with ESMTPSA id
+ e13sm10975534qkm.110.2019.10.24.04.19.16
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 24 Oct 2019 03:22:50 -0700 (PDT)
-Received: from zen.lan (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id ACE441FF9F;
- Thu, 24 Oct 2019 11:22:41 +0100 (BST)
-From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: qemu-devel@nongnu.org
-Subject: [PATCH  v2 15/17] travis.yml: --enable-debug-tcg to check-tcg
-Date: Thu, 24 Oct 2019 11:22:38 +0100
-Message-Id: <20191024102240.2778-16-alex.bennee@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20191024102240.2778-1-alex.bennee@linaro.org>
-References: <20191024102240.2778-1-alex.bennee@linaro.org>
+ Thu, 24 Oct 2019 04:19:19 -0700 (PDT)
+Date: Thu, 24 Oct 2019 07:19:13 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Subject: Re: [PATCH 00/30] virtiofs daemon (base)
+Message-ID: <20191024071738-mutt-send-email-mst@kernel.org>
+References: <20191021105832.36574-1-dgilbert@redhat.com>
+ <157166664425.24734.3489596262271351160@37313f22b938>
+ <20191021143357.GB5837@work-vm>
+ <20191024065826-mutt-send-email-mst@kernel.org>
+ <20191024110708.GI3700@redhat.com> <20191024111439.GD2877@work-vm>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::341
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <20191024111439.GD2877@work-vm>
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,46 +94,107 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: fam@euphon.net, berrange@redhat.com, stefanb@linux.vnet.ibm.com,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
- richard.henderson@linaro.org, f4bug@amsat.org,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>, cota@braap.org,
- stefanha@redhat.com, marcandre.lureau@redhat.com, pbonzini@redhat.com,
- aurelien@aurel32.net
+Cc: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>,
+ qemu-devel@nongnu.org, piaojun@huawei.com, stefanha@redhat.com,
+ marcandre.lureau@redhat.com, eguan@linux.alibaba.com, vgoyal@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This adds a whole bunch of asserts which will catch bugs you might
-introduce into the TCG code.
+On Thu, Oct 24, 2019 at 12:14:39PM +0100, Dr. David Alan Gilbert wrote:
+> * Daniel P. Berrang=E9 (berrange@redhat.com) wrote:
+> > On Thu, Oct 24, 2019 at 06:59:33AM -0400, Michael S. Tsirkin wrote:
+> > > On Mon, Oct 21, 2019 at 03:33:57PM +0100, Dr. David Alan Gilbert wr=
+ote:
+> > > > * no-reply@patchew.org (no-reply@patchew.org) wrote:
+> > > > > Patchew URL: https://patchew.org/QEMU/20191021105832.36574-1-dg=
+ilbert@redhat.com/
+> > > > >=20
+> > > > >=20
+> > > > >=20
+> > > > > Hi,
+> > > > >=20
+> > > > > This series seems to have some coding style problems. See outpu=
+t below for
+> > > > > more information:
+> > > > >=20
+> > > > > Subject: [PATCH 00/30] virtiofs daemon (base)
+> > > > > Type: series
+> > > > > Message-id: 20191021105832.36574-1-dgilbert@redhat.com
+> > > > >=20
+> > > > > =3D=3D=3D TEST SCRIPT BEGIN =3D=3D=3D
+> > > > > #!/bin/bash
+> > > > > git rev-parse base > /dev/null || exit 0
+> > > > > git config --local diff.renamelimit 0
+> > > > > git config --local diff.renames True
+> > > > > git config --local diff.algorithm histogram
+> > > > > ./scripts/checkpatch.pl --mailback base..
+> > > >=20
+> > > > Expecting checkpatch to be broken here; most of the files
+> > > > follow FUSE's formatting.
+> > > >=20
+> > > > Dave
+> > >=20
+> > > I wonder what do others think about this.
+> > > One problem with such inconsistencies is that people tend to copy c=
+ode
+> > > around, which tends to result in a mess.
+> >=20
+> > IIUC, most of this code is simpy copied as-is from the fuse or linux
+> > git repos. I'm wondering what the intention is for it long term ?
+> >=20
+> > For header files, I would have expected us to be able to compile agai=
+nst
+> > the -devel package provided by the kernel or fuse packages. I can
+> > understand if we want to import the headers if the VSOCK additions to
+> > them are not yet widely available in distros though. If this is the c=
+ase
+> > we should put a time limit on how long we'd keep these copied headers
+> > around for before dropping them. It would be fine to violate QEMU cod=
+ing
+> > style in this case as its not code QEMU would "maintain" long term - =
+just
+> > a read-only import.
+>=20
+> The headers are really two types;  one are external definitions, the
+> other are internal parts of libfuse.  I'd expect to keep the internal
+> parts long term; teh external parts hmm; where would we pull them in
+> externally from?
+>=20
+> > The source files though, we appear to then be modifying locally, whic=
+h
+> > suggests they'll live in our repo forever. In this case I'd expect to
+> > have compliance with QEMU coding standards.
+>=20
+> OK.
+>=20
+> > I'm surprised we need to copy so much in from fuse though. Is there a
+> > case to be made for fuse to provide a library of APIs for people who
+> > are building fuse daemons to link against, instead of copy & fork ?
+>=20
+> libfuse *is* such a library; but it preserves ABI compliance; it's
+> intention is to be used to build filesystem implementations on top of -
+> and that's got a fairly good separation;  however changing the fuse
+> transport, and security models is much more invasive than it was
+> designed for.
+>=20
+> Dave
 
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
----
- .travis.yml | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/.travis.yml b/.travis.yml
-index c43597f1331..ba3a8d4cfc9 100644
---- a/.travis.yml
-+++ b/.travis.yml
-@@ -334,14 +334,14 @@ matrix:
- 
-     # Run check-tcg against linux-user
-     - env:
--        - CONFIG="--disable-system"
-+        - CONFIG="--disable-system --enable-debug-tcg"
-         - TEST_CMD="make -j3 check-tcg V=1"
-         - CACHE_NAME="${TRAVIS_BRANCH}-linux-gcc-default"
- 
- 
-     # Run check-tcg against softmmu targets
-     - env:
--        - CONFIG="--target-list=xtensa-softmmu,arm-softmmu,aarch64-softmmu,alpha-softmmu"
-+        - CONFIG="--enable-debug-tcg --target-list=xtensa-softmmu,arm-softmmu,aarch64-softmmu,alpha-softmmu"
-         - TEST_CMD="make -j3 check-tcg V=1"
-         - CACHE_NAME="${TRAVIS_BRANCH}-linux-gcc-default"
- 
--- 
-2.20.1
+I guess you did try to propose adding the functionality to the libfuse
+maintainer and got rejected? If not it's worth asking.
 
+
+
+> > Regards,
+> > Daniel
+> > --=20
+> > |: https://berrange.com      -o-    https://www.flickr.com/photos/dbe=
+rrange :|
+> > |: https://libvirt.org         -o-            https://fstop138.berran=
+ge.com :|
+> > |: https://entangle-photo.org    -o-    https://www.instagram.com/dbe=
+rrange :|
+> --
+> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
