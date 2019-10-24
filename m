@@ -2,85 +2,89 @@ Return-Path: <SRS0=Jnn8=YR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3B13BCA9EAF
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 10:26:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 90E6ACA9EAF
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 10:29:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F1A0C20684
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 10:26:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 58D2F2084C
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 10:29:21 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=greensocs.com header.i=@greensocs.com header.b="U1x/3X9E"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F1A0C20684
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=greensocs.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ocmx/8Ub"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 58D2F2084C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38126 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38166 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iNaJi-0006FI-8z
-	for qemu-devel@archiver.kernel.org; Thu, 24 Oct 2019 06:26:06 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50745)
+	id 1iNaMq-0005Aw-0v
+	for qemu-devel@archiver.kernel.org; Thu, 24 Oct 2019 06:29:20 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53910)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <clement.deschamps@greensocs.com>) id 1iNZua-00058p-HT
- for qemu-devel@nongnu.org; Thu, 24 Oct 2019 06:00:09 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1iNaGU-0001yk-Dn
+ for qemu-devel@nongnu.org; Thu, 24 Oct 2019 06:22:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <clement.deschamps@greensocs.com>) id 1iNZuY-0001w8-4U
- for qemu-devel@nongnu.org; Thu, 24 Oct 2019 06:00:07 -0400
-Received: from beetle.greensocs.com ([5.135.226.135]:55092)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <clement.deschamps@greensocs.com>)
- id 1iNZuX-0001sh-FP
- for qemu-devel@nongnu.org; Thu, 24 Oct 2019 06:00:05 -0400
-Received: from [172.16.11.101] (chartreuse.bar.greensocs.com [172.16.11.101])
- by beetle.greensocs.com (Postfix) with ESMTPSA id 4707996EF0;
- Thu, 24 Oct 2019 10:00:02 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=greensocs.com;
- s=mail; t=1571911202;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=j9gx3x/BV5uVw/llW58jAcbuCRS44fJUYLcMjg4xA5I=;
- b=U1x/3X9Eep/HzxRJ4s/kSK3zPKkybeF5bKo/TAwEeJlC/qwej4f42+tbQWVXaK8C/lyTZ1
- TxlxQ5ZJ/oyuBCwa/til5ht2JZYF4OOFsbPBkgjDaqtbp8aw8s95CCzbuMeVaWohMS1dvU
- /Y2Yfak6z0Jd07Rvx89LO1WDkaXEuwQ=
-Subject: Re: [PATCH] translate-all: Remove tb_alloc
-To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
-References: <20191023164645.5518-1-richard.henderson@linaro.org>
-From: Clement Deschamps <clement.deschamps@greensocs.com>
-Message-ID: <3ecf74c2-379f-65bc-0442-83b9d9b1ddec@greensocs.com>
-Date: Thu, 24 Oct 2019 11:59:48 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.1
+ (envelope-from <alex.bennee@linaro.org>) id 1iNaGT-00042Y-AU
+ for qemu-devel@nongnu.org; Thu, 24 Oct 2019 06:22:46 -0400
+Received: from mail-wm1-x332.google.com ([2a00:1450:4864:20::332]:52207)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1iNaGT-00041g-4O
+ for qemu-devel@nongnu.org; Thu, 24 Oct 2019 06:22:45 -0400
+Received: by mail-wm1-x332.google.com with SMTP id q70so2188553wme.1
+ for <qemu-devel@nongnu.org>; Thu, 24 Oct 2019 03:22:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=5vC+pMfoHMRBCEotAUlhODbfmp7Q411uv5PGK4WJaWY=;
+ b=ocmx/8UbiQhHb5b5H126z557EjDX7hcx7uzpP5T+xv+ArcQP87r6gzmqWe49dRK68q
+ LYSXY893FsEbg4TuIbfeK/2PfN1GmVUk2EEHdBL7cU9ytJooSHeYzqWDqM7zNjN0WQQW
+ CYF9zf9Drl5jlEwrHFfhZkeWG9JUQ9s5oN0fj5UwQYqLOp+elq7vNCENtNOSoWplow5N
+ 93DCzH5gXG23CsPU7wXsm/B/8TO/2Gfi4z7l1eK+LMOTmyPdHuOoDwaLvnAmE3yCwPdm
+ Bs4za/nWUvP1rAs4JAiVmpz/9KnBKtO0j3PGa16Zg8SKWM/5Ofu9Ky0bv15TRnV7NQLN
+ P9NA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=5vC+pMfoHMRBCEotAUlhODbfmp7Q411uv5PGK4WJaWY=;
+ b=No1kVQc+1IpR4DHEZ/wMAPSZ9hpTt05nrmgDgnoKWRIxvJMUimWkPJJvw7x3MCprp4
+ jwXIA/hG62RpLEXCsyd2n5fYcvvmEiD15KNjWXQBUDpUu5AgveVL9c63+e7+fVwWdDiK
+ r1Ylru9OiVkUa1wjdaSyJa5rDeZ3xIcVOZi0cQhz566f1u9h65NZZbfTfJV3nSRJrbGw
+ J2jUA7hpHsmxlICZgIdB9mvPwa12GaLuv7Yw/Xq4zqEUwN/lwaHIrvUEWbnZH63y+1Hp
+ V6zJXvBYThy8iSt03YrfMpggXgq71M/WsBsIFdrhAueDxWGtC2hyPetfNCQJHMg6o1ko
+ fBAw==
+X-Gm-Message-State: APjAAAXu9rs+CQ/TBwqR06B+8KDQ/csCv0GrHihl3kX+1lp5VtNYH+7W
+ UNwA/2qMHKKYAUhVw7QAhr5Sug==
+X-Google-Smtp-Source: APXvYqz5XvQP2MQEW1krSQdFJs1oVkrYZrrHdcD0w4Rc448JTxx+xjGj+GDqyQg5k3gdShF1YoxCSQ==
+X-Received: by 2002:a1c:b4c2:: with SMTP id d185mr3836445wmf.159.1571912564011; 
+ Thu, 24 Oct 2019 03:22:44 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id a4sm1869609wmm.10.2019.10.24.03.22.41
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 24 Oct 2019 03:22:41 -0700 (PDT)
+Received: from zen.lan (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id AB83C1FF91;
+ Thu, 24 Oct 2019 11:22:40 +0100 (BST)
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v2 04/17] travis.yml: Use newer version of libgnutls and libpng
+Date: Thu, 24 Oct 2019 11:22:27 +0100
+Message-Id: <20191024102240.2778-5-alex.bennee@linaro.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20191024102240.2778-1-alex.bennee@linaro.org>
+References: <20191024102240.2778-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <20191023164645.5518-1-richard.henderson@linaro.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=greensocs.com; 
- s=mail; t=1571911202;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=j9gx3x/BV5uVw/llW58jAcbuCRS44fJUYLcMjg4xA5I=;
- b=J+YnZTjFdfyQuuwaUayTvmzN5A2jkDOREl8qiwe7DuoXOqwU/F1Mhn4HFYv5ld+xnePb5b
- E9C8jMOTh5M57seTJfLQULwnY4nSopphmZ9OMbirHF7T9j/n7s14UEQqvynfJ2OMsM0dXP
- GB5l7D+o0HfmKVZRawoXhHIDyp1ImZo=
-ARC-Seal: i=1; s=mail; d=greensocs.com; t=1571911202; a=rsa-sha256; cv=none;
- b=aKN8N58anbqJdtqQ7UDlb6KzxOAX4k/03aiViw6yvCBLSIw4899o2fdwKgPZTRItlpOkqk
- 4lItt26wP4wKvz2FUvcOWJwPf9mMdOWGno2VfA1gwzvYIcLJFHrgsqrcyoOY+zF+LG0SRY
- sZdmEcKg1T2V6wemN7zEbsagTNevWOY=
-ARC-Authentication-Results: i=1; ORIGINATING;
- auth=pass smtp.auth=clement smtp.mailfrom=clement.deschamps@greensocs.com
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 5.135.226.135
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::332
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -92,79 +96,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: fam@euphon.net, Thomas Huth <thuth@redhat.com>, berrange@redhat.com,
+ stefanb@linux.vnet.ibm.com,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ richard.henderson@linaro.org, f4bug@amsat.org,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>, cota@braap.org,
+ stefanha@redhat.com, marcandre.lureau@redhat.com, pbonzini@redhat.com,
+ aurelien@aurel32.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 10/23/19 6:46 PM, Richard Henderson wrote:
-> Since 2ac01d6dafab, this function does only two things: assert a
-> lock is held, and call tcg_tb_alloc.  It is used exactly once,
-> and its user has already done the assert.
-> 
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-> ---
+From: Thomas Huth <thuth@redhat.com>
 
-Reviewed-by: Clement Deschamps <clement.deschamps@greensocs.com>
+libgnutls-dev and libpng12-dev are not available in newer versions
+of Ubuntu anymore, so installing these packages fails e.g. in the
+new arm64 containers on Travis. Let's use newer versions of these
+packages by default instead. (The old versions still get tested in
+the "gcc-9" build).
 
-> 
-> I noticed that this function was essentially a stub while
-> reviewing Clement's tb->orig_tb fix.
-> 
-> Note that the added newline in tb_gen_code both adds the
-> missing break after the variable declaration block and
-> also happens to highlight the assert mentioned above.  ;-)
-> 
-> 
-> r~
-> 
-> ---
->   accel/tcg/translate-all.c | 20 ++------------------
->   1 file changed, 2 insertions(+), 18 deletions(-)
-> 
-> diff --git a/accel/tcg/translate-all.c b/accel/tcg/translate-all.c
-> index f9b7ba159d..ae063b53f9 100644
-> --- a/accel/tcg/translate-all.c
-> +++ b/accel/tcg/translate-all.c
-> @@ -1156,23 +1156,6 @@ void tcg_exec_init(unsigned long tb_size)
->   #endif
->   }
->   
-> -/*
-> - * Allocate a new translation block. Flush the translation buffer if
-> - * too many translation blocks or too much generated code.
-> - */
-> -static TranslationBlock *tb_alloc(target_ulong pc)
-> -{
-> -    TranslationBlock *tb;
-> -
-> -    assert_memory_lock();
-> -
-> -    tb = tcg_tb_alloc(tcg_ctx);
-> -    if (unlikely(tb == NULL)) {
-> -        return NULL;
-> -    }
-> -    return tb;
-> -}
-> -
->   /* call with @p->lock held */
->   static inline void invalidate_page_bitmap(PageDesc *p)
->   {
-> @@ -1681,6 +1664,7 @@ TranslationBlock *tb_gen_code(CPUState *cpu,
->       TCGProfile *prof = &tcg_ctx->prof;
->       int64_t ti;
->   #endif
-> +
->       assert_memory_lock();
->   
->       phys_pc = get_page_addr_code(env, pc);
-> @@ -1706,7 +1690,7 @@ TranslationBlock *tb_gen_code(CPUState *cpu,
->       }
->   
->    buffer_overflow:
-> -    tb = tb_alloc(pc);
-> +    tb = tcg_tb_alloc(tcg_ctx);
->       if (unlikely(!tb)) {
->           /* flush must be done */
->           tb_flush(cpu);
-> 
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+Message-Id: <20191009170701.14756-4-thuth@redhat.com>
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+---
+ .travis.yml | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/.travis.yml b/.travis.yml
+index b446e04e8ae..e65e53f3d7e 100644
+--- a/.travis.yml
++++ b/.travis.yml
+@@ -29,7 +29,7 @@ addons:
+       - libcap-dev
+       - libcap-ng-dev
+       - libgcc-4.8-dev
+-      - libgnutls-dev
++      - libgnutls28-dev
+       - libgtk-3-dev
+       - libiscsi-dev
+       - liblttng-ust-dev
+@@ -37,7 +37,7 @@ addons:
+       - libnfs-dev
+       - libnss3-dev
+       - libpixman-1-dev
+-      - libpng12-dev
++      - libpng-dev
+       - librados-dev
+       - libsdl2-dev
+       - libsdl2-image-dev
+-- 
+2.20.1
+
 
