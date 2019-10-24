@@ -2,96 +2,88 @@ Return-Path: <SRS0=Jnn8=YR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EE481CA9EAF
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 14:28:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 50728CA9EAF
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 14:28:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B882F2070B
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 14:28:53 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="aUy+Ieye"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B882F2070B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 1F5DA2070B
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 14:28:58 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1F5DA2070B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44220 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44224 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iNe6e-0004vm-En
-	for qemu-devel@archiver.kernel.org; Thu, 24 Oct 2019 10:28:52 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35382)
+	id 1iNe6i-0005BC-Jc
+	for qemu-devel@archiver.kernel.org; Thu, 24 Oct 2019 10:28:56 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56401)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1iNdkq-0002db-5a
- for qemu-devel@nongnu.org; Thu, 24 Oct 2019 10:06:21 -0400
+ (envelope-from <philmd@redhat.com>) id 1iNd3h-0003Z1-1b
+ for qemu-devel@nongnu.org; Thu, 24 Oct 2019 09:21:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1iNdko-0000Ky-Qb
- for qemu-devel@nongnu.org; Thu, 24 Oct 2019 10:06:19 -0400
-Received: from mail-qk1-x741.google.com ([2607:f8b0:4864:20::741]:37830)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1iNdko-0000Ko-L1
- for qemu-devel@nongnu.org; Thu, 24 Oct 2019 10:06:18 -0400
-Received: by mail-qk1-x741.google.com with SMTP id u184so23519521qkd.4
- for <qemu-devel@nongnu.org>; Thu, 24 Oct 2019 07:06:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=nfmjIwBPnkA+wvYUM3VvUWJrrt75lDRQLCmDT4Oelhc=;
- b=aUy+IeyeiEr0dCVl1bdkYDbzGFbXs3PXmVpvnYq8vIV4OmFYST3S55UUsRxT3R6AS5
- gjjcUHQ24JQ+96M58whEJPGBaD9zvkwZ06m0JbvJUwuBOzaSUjplymHUqYRNLg3sjCxw
- droWLMjnEHqNp9Wm851h0/jo80rBeB1tg4/EYpN7Ag3JqhGfveoGcZiEzZEnY42R9JFg
- pF+pjJT94/WxJvIqSEOPqhsxSvYXmeNjE/k6EhMc22jMItYrud+blKMLOlWHpBQ/DDai
- RGJnbngM5CAGgyFGHrboZH4RTo8HYdSaWU/qNixoeMEvnvZ2md9JwnZnWJgt62B7NAzY
- EN2g==
+ (envelope-from <philmd@redhat.com>) id 1iNd3f-0005Aw-VX
+ for qemu-devel@nongnu.org; Thu, 24 Oct 2019 09:21:44 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40818)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iNd3f-0005Ad-NS
+ for qemu-devel@nongnu.org; Thu, 24 Oct 2019 09:21:43 -0400
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id A74658553A
+ for <qemu-devel@nongnu.org>; Thu, 24 Oct 2019 13:21:42 +0000 (UTC)
+Received: by mail-wm1-f69.google.com with SMTP id k184so1013315wmk.1
+ for <qemu-devel@nongnu.org>; Thu, 24 Oct 2019 06:21:42 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=nfmjIwBPnkA+wvYUM3VvUWJrrt75lDRQLCmDT4Oelhc=;
- b=nXeGovGT3t6miOJVn9ouuDhTxRYUCQvUSd/Xw+Sz6LzyAXrDcWR8+TEGl2c+OSn00u
- iNxHJw1FFapQaUG+qF6Z2BpycAq+kxSol2UnQUZtyzuQhXekWdipY+NN34LTt5ieSmy4
- td+I7wZ8V5JCr5Xxtx5YLi024aP1O3DSHKlTzAR3MNaZ3QTuVlmelh2zYsd5dCzhsNUE
- 1p4XJx/aQ7l8V1lVtsoHr/3WxEsX01oG74WT+mMSfnX5HwUtF4TU695U8WQMTjfS+M0o
- V1vwlg6LB1orW4gNu0YYFXIYVdhQylcW428mcYYE9nFQQYbY5VGwkCH7KBKKKdgvn++E
- 5CZg==
-X-Gm-Message-State: APjAAAVhetKdCHUfEef6pvWS/pDd//NnyYCWo+3nHjyk6jaaKf1MjEE7
- ZDe9lLhudvF4DMb5o4YHcSvjaw==
-X-Google-Smtp-Source: APXvYqzI525ktSqQ9coMyMsoE29dnvdQ1QiGVKpwiCf9MntngloXZKXNMaH0ndHqYI5YBvJYh1OKig==
-X-Received: by 2002:a37:4e81:: with SMTP id c123mr1066034qkb.468.1571925977776; 
- Thu, 24 Oct 2019 07:06:17 -0700 (PDT)
-Received: from [172.20.87.163] (rrcs-172-254-253-50.nyc.biz.rr.com.
- [172.254.253.50])
- by smtp.gmail.com with ESMTPSA id d55sm17723809qta.41.2019.10.24.07.06.16
- (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Thu, 24 Oct 2019 07:06:17 -0700 (PDT)
-Subject: Re: [PATCH v2 1/7] cpu: use ROUND_UP() to define xxx_PAGE_ALIGN
-To: Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- qemu-devel@nongnu.org
-References: <20191023154505.30521-1-richard.henderson@linaro.org>
- <20191023154505.30521-2-richard.henderson@linaro.org>
- <55b477b7-877e-954f-2175-ed36fa787600@redhat.com>
- <e41a98e4-189a-1e0f-7b29-51a6e00e4d7e@redhat.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Openpgp: preference=signencrypt
-Message-ID: <26cb0551-fbac-e059-c1bf-9c17420528b7@linaro.org>
-Date: Thu, 24 Oct 2019 10:06:15 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+ bh=8ZmlhCsJoIE+YSUtfFBESR4PXWooISs73z1sPHAdYDc=;
+ b=OJKxlx8F9N3xSYK4jKTw5JCB4ipkkZjVWgC7rpNsJQFOeJBdgAVKUbUXKJA4ANnVOy
+ +5sW+IojbW3qMIJ0vwmNWGLvZmVsooi66QoB++NpqWpxXOwBrS2MdZt9s1fP7HoYknie
+ 9km00bXK1qCKAaodenXaoIQzYuhMJl6lA2FKXISzisGqhFRMX0SxgCUCMZhfRuMjbOkA
+ qSFnHeeRrpHG2rnblLQYJ1wy0O13aQjX19lhVF4ZaV1U6RmtHO+GuKxNctMrtYf91hRB
+ HHid7+SbJFBpYGj895d8umYNoD/LZNjbOYd11TyJrQF8zJJS8uSlaZ47Psp2IXSRpILq
+ M82g==
+X-Gm-Message-State: APjAAAXQi/pX4xWQdfeiFQIyXQMKtd2g40C3LbucfDHQW9GNhRpoYXG3
+ maD5+SX+ppgvKFctpunOxULUkw+2epiU3vXh9C71hSNyG44IVkeCodkM0FEvDoJMuU9prVRag8q
+ 0pzSyrA9ZPeNJ8Zk=
+X-Received: by 2002:a7b:cb54:: with SMTP id v20mr4649890wmj.119.1571923301352; 
+ Thu, 24 Oct 2019 06:21:41 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqymvv8boqLPyxAPcUuTqgjvrVyV1JC3xj+OMdE30JANiPp+8Xam/isesUk8gp7ZHrgMiAds7A==
+X-Received: by 2002:a7b:cb54:: with SMTP id v20mr4649874wmj.119.1571923301146; 
+ Thu, 24 Oct 2019 06:21:41 -0700 (PDT)
+Received: from [192.168.1.115] (129.red-83-57-174.dynamicip.rima-tde.net.
+ [83.57.174.129])
+ by smtp.gmail.com with ESMTPSA id d8sm11908890wrr.71.2019.10.24.06.21.40
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Thu, 24 Oct 2019 06:21:40 -0700 (PDT)
+Subject: Re: [PATCH v3 2/3] mc146818rtc: Tidy up indentation
+To: Paolo Bonzini <pbonzini@redhat.com>, Marcelo Tosatti
+ <mtosatti@redhat.com>, qemu-devel@nongnu.org
+References: <20191024122425.2483-1-philmd@redhat.com>
+ <20191024122425.2483-3-philmd@redhat.com>
+ <c4fef2c4-32f1-cb4a-295f-13a03434becd@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <fb0239d5-5705-9d31-8db2-198c0e6913db@redhat.com>
+Date: Thu, 24 Oct 2019 15:21:39 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.1
 MIME-Version: 1.0
-In-Reply-To: <e41a98e4-189a-1e0f-7b29-51a6e00e4d7e@redhat.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <c4fef2c4-32f1-cb4a-295f-13a03434becd@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::741
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -103,46 +95,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: alex.bennee@linaro.org, Wei Yang <richardw.yang@linux.intel.com>
+Cc: Xiao Guangrong <guangrong.xiao@gmail.com>,
+ Vadim Rozenfeld <vrozenfe@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 10/24/19 8:04 AM, Paolo Bonzini wrote:
-> On 24/10/19 13:52, Philippe Mathieu-Daudé wrote:
->>> diff --git a/include/exec/cpu-all.h b/include/exec/cpu-all.h
->>> index ad9ab85eb3..255bb186ac 100644
->>> --- a/include/exec/cpu-all.h
->>> +++ b/include/exec/cpu-all.h
->>> @@ -220,7 +220,7 @@ extern int target_page_bits;
->>>     #define TARGET_PAGE_SIZE (1 << TARGET_PAGE_BITS)
->>>   #define TARGET_PAGE_MASK ~(TARGET_PAGE_SIZE - 1)
->>> -#define TARGET_PAGE_ALIGN(addr) (((addr) + TARGET_PAGE_SIZE - 1) &
->>> TARGET_PAGE_MASK)
->>> +#define TARGET_PAGE_ALIGN(addr) ROUND_UP((addr), TARGET_PAGE_SIZE)
->>>     /* Using intptr_t ensures that qemu_*_page_mask is sign-extended even
->>>    * when intptr_t is 32-bit and we are aligning a long long.
->>> @@ -228,9 +228,8 @@ extern int target_page_bits;
->>>   extern uintptr_t qemu_host_page_size;
->>>   extern intptr_t qemu_host_page_mask;
->>>   -#define HOST_PAGE_ALIGN(addr) (((addr) + qemu_host_page_size - 1) &
->>> qemu_host_page_mask)
->>> -#define REAL_HOST_PAGE_ALIGN(addr) (((addr) +
->>> qemu_real_host_page_size - 1) & \
->>> -                                    qemu_real_host_page_mask)
->>> +#define HOST_PAGE_ALIGN(addr) ROUND_UP((addr), qemu_host_page_size)
->>> +#define REAL_HOST_PAGE_ALIGN(addr) ROUND_UP((addr),
->>> qemu_real_host_page_size)
->>>     /* same as PROT_xxx */
->>>   #define PAGE_READ      0x0001
->>>
-> 
-> Isn't this the patch where Richard pointed out that the compiler
-> generates worse code?
+On 10/24/19 3:01 PM, Paolo Bonzini wrote:
+> On 24/10/19 14:24, Philippe Mathieu-Daud=C3=A9 wrote:
+>> -        * if the periodic timer's update is due to period re-configur=
+ation,
+>> -        * we should count the clock since last interrupt.
+>> -        */
+>> -        if (old_period) {
+>> -            int64_t last_periodic_clock, next_periodic_clock;
+>> +    /*
+>> +     * if the periodic timer's update is due to period re-configurati=
+on,
+>> +     * we should count the clock since last interrupt.
+>> +     */
+>> +    if (old_period) {
+>> +        int64_t last_periodic_clock, next_periodic_clock;
+>>  =20
+>> -            next_periodic_clock =3D muldiv64(s->next_periodic_time,
+>> -                                    RTC_CLOCK_RATE, NANOSECONDS_PER_S=
+ECOND);
+>> -            last_periodic_clock =3D next_periodic_clock - old_period;
+>> -            lost_clock =3D cur_clock - last_periodic_clock;
+>> -            assert(lost_clock >=3D 0);
+>> +        next_periodic_clock =3D muldiv64(s->next_periodic_time,
+>> +                                RTC_CLOCK_RATE, NANOSECONDS_PER_SECON=
+D);
+>> +        last_periodic_clock =3D next_periodic_clock - old_period;
+>> +        lost_clock =3D cur_clock - last_periodic_clock;
+>> +        assert(lost_clock >=3D 0);
+>>           }
+>>  =20
+>>           /*
+>=20
+> Still not entirely tidy, is it?  I understand making Marcelo's fix just
+> move a brace, but in general you can review with "git show -b" to see
+> more clearly what's going on.  Therefore, it would make the most sense
+> to have just two patches, one reversing the if and one fixing the bug
+> (and both of them having indentation changes).
+>=20
+> However, I'm preparing the pull request now so I think I'll just keep
+> Marcelo's version.
 
-Richard confused ROUND_UP with QEMU_ALIGN_UP.
-
-
-r~
-
+OK.
 
