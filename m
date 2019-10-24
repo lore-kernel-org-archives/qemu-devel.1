@@ -2,64 +2,98 @@ Return-Path: <SRS0=Jnn8=YR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_2 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CB11ACA9EAF
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 10:01:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 045C7CA9EAF
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 10:03:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9EE6B205F4
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 10:01:23 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9EE6B205F4
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id C56C52166E
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 10:03:28 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="QyFxe7Ky"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C56C52166E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37180 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37212 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iNZvl-0006fX-UH
-	for qemu-devel@archiver.kernel.org; Thu, 24 Oct 2019 06:01:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45711)
+	id 1iNZxn-0002ND-6C
+	for qemu-devel@archiver.kernel.org; Thu, 24 Oct 2019 06:03:27 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44471)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <groug@kaod.org>) id 1iNZIJ-0006RI-Lw
- for qemu-devel@nongnu.org; Thu, 24 Oct 2019 05:20:37 -0400
+ (envelope-from <jag.raman@oracle.com>) id 1iNZBD-0004ij-L0
+ for qemu-devel@nongnu.org; Thu, 24 Oct 2019 05:13:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <groug@kaod.org>) id 1iNZIH-0000hx-Bw
- for qemu-devel@nongnu.org; Thu, 24 Oct 2019 05:20:35 -0400
-Received: from 8.mo68.mail-out.ovh.net ([46.105.74.219]:40404)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <groug@kaod.org>) id 1iNZIF-0000fu-Sm
- for qemu-devel@nongnu.org; Thu, 24 Oct 2019 05:20:33 -0400
-Received: from player792.ha.ovh.net (unknown [10.109.160.25])
- by mo68.mail-out.ovh.net (Postfix) with ESMTP id D014E145D3C
- for <qemu-devel@nongnu.org>; Thu, 24 Oct 2019 11:20:27 +0200 (CEST)
-Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
- [82.253.208.248]) (Authenticated sender: groug@kaod.org)
- by player792.ha.ovh.net (Postfix) with ESMTPSA id DD139B535424;
- Thu, 24 Oct 2019 09:20:22 +0000 (UTC)
-Date: Thu, 24 Oct 2019 11:20:21 +0200
-From: Greg Kurz <groug@kaod.org>
-To: David Gibson <david@gibson.dropbear.id.au>
-Subject: Re: [PATCH 4/6] qom: Add object_child_foreach_type() helper function
-Message-ID: <20191024112021.41c70e7c@bahia.lan>
-In-Reply-To: <20191024030715.GX6439@umbus.fritz.box>
-References: <157184231371.3053790.17713393349394736594.stgit@bahia.lan>
- <157184233616.3053790.246919545000657597.stgit@bahia.lan>
- <20191024025903.GU6439@umbus.fritz.box>
- <20191024030715.GX6439@umbus.fritz.box>
-X-Mailer: Claws Mail 3.17.4 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
-MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/H77nyE5qLY1xEuKeNR1vVOF";
- protocol="application/pgp-signature"; micalg=pgp-sha256
-X-Ovh-Tracer-Id: 7843863179972352486
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrledugddugecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 46.105.74.219
+ (envelope-from <jag.raman@oracle.com>) id 1iNZBB-0005ka-Jk
+ for qemu-devel@nongnu.org; Thu, 24 Oct 2019 05:13:15 -0400
+Received: from userp2130.oracle.com ([156.151.31.86]:47760)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <jag.raman@oracle.com>)
+ id 1iNZBB-0005k2-9D
+ for qemu-devel@nongnu.org; Thu, 24 Oct 2019 05:13:13 -0400
+Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
+ by userp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x9O94TXq116427;
+ Thu, 24 Oct 2019 09:13:06 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
+ h=from : to : cc :
+ subject : date : message-id : in-reply-to : references : in-reply-to :
+ references; s=corp-2019-08-05;
+ bh=+IofknBIwPgPORHY2P8DEFy8k8iedsHT13hsizFpthU=;
+ b=QyFxe7KyNNRUOU+NmwAiF0WjCwtVDYquUWYmHkMHpijeCk0hbqtmZv9JCirtCrP6t6iA
+ idnERzimuiuU11eNPOc7fKnSaORH91YApszhQp0c4wXWf6XGMqUjDMOhFjRFC6gllrf2
+ M9fCdOGcuQaZMrCFp256kndGP6NoYaLU6si0S0B0cktnKSyf3wI1TweDwUtJ8OWZ3WCg
+ QqtXapgtuDzJLnFBn/ogv9bE2tgoN0DH/2CMEudwNB5PLAnLijDxzBgNQFgdWAPpd5Iy
+ I8ka0VlzFJEdd8K1qu+lZC9SV0Q4k/QTdyXwfJhkumwz6qYBMA+XsZO4mnziA4a5P5YH 3A== 
+Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
+ by userp2130.oracle.com with ESMTP id 2vqswttebd-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Thu, 24 Oct 2019 09:13:06 +0000
+Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
+ by userp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x9O991ZB077488;
+ Thu, 24 Oct 2019 09:11:06 GMT
+Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
+ by userp3030.oracle.com with ESMTP id 2vtjkj2yaa-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Thu, 24 Oct 2019 09:11:06 +0000
+Received: from abhmp0008.oracle.com (abhmp0008.oracle.com [141.146.116.14])
+ by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id x9O9B4CX009509;
+ Thu, 24 Oct 2019 09:11:04 GMT
+Received: from jaraman-bur-1.us.oracle.com (/10.152.33.39)
+ by default (Oracle Beehive Gateway v4.0)
+ with ESMTP ; Thu, 24 Oct 2019 02:11:04 -0700
+From: Jagannathan Raman <jag.raman@oracle.com>
+To: qemu-devel@nongnu.org
+Subject: [RFC v4 PATCH 29/49] multi-process: add parse_cmdline in remote
+ process
+Date: Thu, 24 Oct 2019 05:09:10 -0400
+Message-Id: <57a23f03088dd5036cf432737ee11229a6ea9644.1571905346.git.jag.raman@oracle.com>
+X-Mailer: git-send-email 1.8.3.1
+In-Reply-To: <cover.1571905346.git.jag.raman@oracle.com>
+References: <cover.1571905346.git.jag.raman@oracle.com>
+In-Reply-To: <cover.1571905346.git.jag.raman@oracle.com>
+References: <cover.1571905346.git.jag.raman@oracle.com>
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9419
+ signatures=668684
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=1
+ malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1908290000 definitions=main-1910240089
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9419
+ signatures=668684
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0
+ priorityscore=1501 malwarescore=0
+ suspectscore=1 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1908290000
+ definitions=main-1910240089
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
+X-Received-From: 156.151.31.86
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -71,203 +105,238 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-ppc@nongnu.org,
- =?UTF-8?B?Q8OpZHJpYw==?= Le Goater <clg@kaod.org>, qemu-devel@nongnu.org
+Cc: elena.ufimtseva@oracle.com, fam@euphon.net, john.g.johnson@oracle.com,
+ kraxel@redhat.com, jag.raman@oracle.com, quintela@redhat.com, mst@redhat.com,
+ armbru@redhat.com, kanth.ghatraju@oracle.com, thuth@redhat.com,
+ ehabkost@redhat.com, konrad.wilk@oracle.com, dgilbert@redhat.com,
+ liran.alon@oracle.com, stefanha@redhat.com, rth@twiddle.net, kwolf@redhat.com,
+ berrange@redhat.com, mreitz@redhat.com, ross.lagerwall@citrix.com,
+ marcandre.lureau@gmail.com, pbonzini@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---Sig_/H77nyE5qLY1xEuKeNR1vVOF
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+From: Elena Ufimtseva <elena.ufimtseva@oracle.com>
 
-On Thu, 24 Oct 2019 14:07:15 +1100
-David Gibson <david@gibson.dropbear.id.au> wrote:
+Signed-off-by: Elena Ufimtseva <elena.ufimtseva@oracle.com>
+Signed-off-by: Jagannathan Raman <jag.raman@oracle.com>
+Signed-off-by: John G Johnson <john.g.johnson@oracle.com>
+---
+ New patch in v3
 
-> On Thu, Oct 24, 2019 at 01:59:03PM +1100, David Gibson wrote:
-> > On Wed, Oct 23, 2019 at 04:52:16PM +0200, Greg Kurz wrote:
-> > > Calling a function for children of a certain type is a recurring patt=
-ern
-> > > in the QEMU code base. In order to avoid the need to setup the same b=
-oiler
-> > > plate again and again, introduce a variant of object_child_foreach() =
-that
-> > > only considers children of the given type.
-> > >=20
-> > > Signed-off-by: Greg Kurz <groug@kaod.org>
-> >=20
-> > Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
->=20
-> Actually.. a couuple of caveats on that.
->=20
-> Reading it again the name is potentially misleading it's "for each
-> object of given type" not "for each type"  So maybe
-> "object_child_foreach_of_type()".
->=20
+ remote/Makefile.objs |   1 +
+ remote/remote-main.c |  11 +++++
+ remote/remote-opts.c | 115 +++++++++++++++++++++++++++++++++++++++++++++++++++
+ remote/remote-opts.h |  31 ++++++++++++++
+ 4 files changed, 158 insertions(+)
+ create mode 100644 remote/remote-opts.c
+ create mode 100644 remote/remote-opts.h
 
-Makes sense.
+diff --git a/remote/Makefile.objs b/remote/Makefile.objs
+index c1349ad..a677fce 100644
+--- a/remote/Makefile.objs
++++ b/remote/Makefile.objs
+@@ -1,4 +1,5 @@
+ remote-pci-obj-$(CONFIG_MPQEMU) += remote-main.o
++remote-pci-obj-$(CONFIG_MPQEMU) += remote-opts.o
+ remote-pci-obj-$(CONFIG_MPQEMU) += pcihost.o
+ remote-pci-obj-$(CONFIG_MPQEMU) += machine.o
+ remote-pci-obj-$(CONFIG_MPQEMU) += iohub.o
+diff --git a/remote/remote-main.c b/remote/remote-main.c
+index 80d8c02..729f7e9 100644
+--- a/remote/remote-main.c
++++ b/remote/remote-main.c
+@@ -65,6 +65,7 @@
+ #include "qapi/qmp/qlist.h"
+ #include "qemu/log.h"
+ #include "qemu/cutils.h"
++#include "remote-opts.h"
+ 
+ static MPQemuLinkState *mpqemu_link;
+ PCIDevice *remote_pci_dev;
+@@ -469,6 +470,13 @@ int main(int argc, char *argv[])
+ 
+     current_machine = MACHINE(REMOTE_MACHINE(object_new(TYPE_REMOTE_MACHINE)));
+ 
++    qemu_add_opts(&qemu_device_opts);
++    qemu_add_opts(&qemu_drive_opts);
++    qemu_add_drive_opts(&qemu_legacy_drive_opts);
++    qemu_add_drive_opts(&qemu_common_drive_opts);
++    qemu_add_drive_opts(&qemu_drive_opts);
++    qemu_add_drive_opts(&bdrv_runtime_opts);
++
+     mpqemu_link = mpqemu_link_create();
+     if (!mpqemu_link) {
+         printf("Could not create MPQemu link\n");
+@@ -482,6 +490,9 @@ int main(int argc, char *argv[])
+     }
+ 
+     mpqemu_init_channel(mpqemu_link, &mpqemu_link->com, fd);
++
++    parse_cmdline(argc - 2, argv + 2, NULL);
++
+     mpqemu_link_set_callback(mpqemu_link, process_msg);
+ 
+     mpqemu_start_coms(mpqemu_link);
+diff --git a/remote/remote-opts.c b/remote/remote-opts.c
+new file mode 100644
+index 0000000..0ebe6b1
+--- /dev/null
++++ b/remote/remote-opts.c
+@@ -0,0 +1,115 @@
++/*
++ * Remote device initialization
++ *
++ * Copyright 2019, Oracle and/or its affiliates.
++ *
++ * Permission is hereby granted, free of charge, to any person obtaining a copy
++ * of this software and associated documentation files (the "Software"), to deal
++ * in the Software without restriction, including without limitation the rights
++ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
++ * copies of the Software, and to permit persons to whom the Software is
++ * furnished to do so, subject to the following conditions:
++ *
++ * The above copyright notice and this permission notice shall be included in
++ * all copies or substantial portions of the Software.
++ *
++ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
++ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
++ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
++ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
++ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
++ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
++ * THE SOFTWARE.
++ */
++
++#include "qemu/osdep.h"
++#include "qemu-common.h"
++
++#include <stdio.h>
++#include <unistd.h>
++
++#include "qemu/module.h"
++#include "qapi/error.h"
++#include "qemu/error-report.h"
++#include "qemu-common.h"
++
++#include "remote/pcihost.h"
++#include "remote/machine.h"
++#include "hw/boards.h"
++#include "hw/qdev-core.h"
++#include "qemu/main-loop.h"
++#include "remote/memory.h"
++#include "io/mpqemu-link.h"
++#include "qapi/error.h"
++#include "qemu-options.h"
++#include "sysemu/arch_init.h"
++
++#include "qapi/qmp/qjson.h"
++#include "qapi/qmp/qobject.h"
++#include "qemu/option.h"
++#include "qemu/config-file.h"
++#include "monitor/qdev.h"
++#include "qapi/qmp/qdict.h"
++#include "sysemu/sysemu.h"
++#include "sysemu/blockdev.h"
++#include "block/block.h"
++#include "remote/remote-opts.h"
++#include "include/qemu-common.h"
++
++#include "vl.h"
++/*
++ * In remote process, we parse only subset of options. The code
++ * taken from vl.c to re-use in remote command line parser.
++ */
++void parse_cmdline(int argc, char **argv, char **envp)
++{
++    int optind;
++    const char *optarg;
++    MachineClass *mc;
++
++    /* from vl.c */
++    optind = 0;
++
++    /* second pass of option parsing */
++
++    for (;;) {
++        if (optind >= argc) {
++            break;
++        }
++        if (argv[optind][0] != '-') {
++            loc_set_cmdline(argv, optind, 1);
++            drive_add(IF_DEFAULT, 0, argv[optind++], HD_OPTS);
++        } else {
++            const QEMUOption *popt;
++
++            popt = lookup_opt(argc, argv, &optarg, &optind);
++            #ifndef REMOTE_PROCESS
++            if (!(popt->arch_mask & arch_type)) {
++                error_report("Option not supported for this target, %x arch_mask, %x arch_type",
++                             popt->arch_mask, arch_type);
++                exit(1);
++            }
++            #endif
++            switch (popt->index) {
++            case QEMU_OPTION_drive:
++                if (drive_def(optarg) == NULL) {
++                    fprintf(stderr, "Could not init drive\n");
++                    exit(1);
++                }
++                break;
++            default:
++                break;
++            }
++        }
++    }
++    mc = MACHINE_GET_CLASS(current_machine);
++
++    mc->block_default_type = IF_IDE;
++    if (qemu_opts_foreach(qemu_find_opts("drive"), drive_init_func,
++                          &mc->block_default_type, &error_fatal)) {
++        /* We printed help */
++        exit(0);
++    }
++
++    return;
++}
+diff --git a/remote/remote-opts.h b/remote/remote-opts.h
+new file mode 100644
+index 0000000..e15c29b
+--- /dev/null
++++ b/remote/remote-opts.h
+@@ -0,0 +1,31 @@
++/*
++ * Remote device initialization
++ *
++ * Copyright 2019, Oracle and/or its affiliates.
++ *
++ * Permission is hereby granted, free of charge, to any person obtaining a copy
++ * of this software and associated documentation files (the "Software"), to deal
++ * in the Software without restriction, including without limitation the rights
++ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
++ * copies of the Software, and to permit persons to whom the Software is
++ * furnished to do so, subject to the following conditions:
++ *
++ * The above copyright notice and this permission notice shall be included in
++ * all copies or substantial portions of the Software.
++ *
++ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
++ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
++ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
++ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
++ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
++ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
++ * THE SOFTWARE.
++ */
++
++#ifndef REMOTE_OPTS_H
++#define REMOTE_OPTS_H
++
++void parse_cmdline(int argc, char **argv, char **envp);
++
++#endif
++
+-- 
+1.8.3.1
 
-> Also, having created these, using them to simplify hmp_info_irq() and
-> hmp_info_pic() seems like a good idea.
->=20
-> >=20
-> > > ---
-> > >  include/qom/object.h |   35 +++++++++++++++++++++++++++++++++++
-> > >  qom/object.c         |   30 +++++++++++++++++++++++-------
-> > >  2 files changed, 58 insertions(+), 7 deletions(-)
-> > >=20
-> > > diff --git a/include/qom/object.h b/include/qom/object.h
-> > > index 128d00c77fd6..e9e3c2eae8ed 100644
-> > > --- a/include/qom/object.h
-> > > +++ b/include/qom/object.h
-> > > @@ -1728,6 +1728,41 @@ int object_child_foreach(Object *obj, int (*fn=
-)(Object *child, void *opaque),
-> > >  int object_child_foreach_recursive(Object *obj,
-> > >                                     int (*fn)(Object *child, void *op=
-aque),
-> > >                                     void *opaque);
-> > > +
-> > > +/**
-> > > + * object_child_foreach_type:
-> > > + * @obj: the object whose children will be navigated
-> > > + * @typename: the type of child objects to consider
-> > > + * @fn: the iterator function to be called
-> > > + * @opaque: an opaque value that will be passed to the iterator
-> > > + *
-> > > + * This is similar to object_child_foreach, but it only calls @fn for
-> > > + * child objects of the give @typename.
-> > > + *
-> > > + * Returns: The last value returned by @fn, or 0 if there is no chil=
-d of
-> > > + * the given @typename.
-> > > + */
-> > > +int object_child_foreach_type(Object *obj, const char *typename,
-> > > +                              int (*fn)(Object *child, void *opaque),
-> > > +                              void *opaque);
-> > > +
-> > > +/**
-> > > + * object_child_foreach_recursive_type:
-> > > + * @obj: the object whose children will be navigated
-> > > + * @typename: the type of child objects to consider
-> > > + * @fn: the iterator function to be called
-> > > + * @opaque: an opaque value that will be passed to the iterator
-> > > + *
-> > > + * This is similar to object_child_foreach_recursive, but it only ca=
-lls
-> > > + * @fn for child objects of the give @typename.
-> > > + *
-> > > + * Returns: The last value returned by @fn, or 0 if there is no chil=
-d of
-> > > + * the given @typename.
-> > > + */
-> > > +int object_child_foreach_recursive_type(Object *obj, const char *typ=
-ename,
-> > > +                                        int (*fn)(Object *child, voi=
-d *opaque),
-> > > +                                        void *opaque);
-> > > +
-> > >  /**
-> > >   * container_get:
-> > >   * @root: root of the #path, e.g., object_get_root()
-> > > diff --git a/qom/object.c b/qom/object.c
-> > > index 6fa9c619fac4..a2dec1261ff7 100644
-> > > --- a/qom/object.c
-> > > +++ b/qom/object.c
-> > > @@ -986,7 +986,7 @@ void object_class_foreach(void (*fn)(ObjectClass =
-*klass, void *opaque),
-> > >      enumerating_types =3D false;
-> > >  }
-> > > =20
-> > > -static int do_object_child_foreach(Object *obj,
-> > > +static int do_object_child_foreach(Object *obj, const char *typename,
-> > >                                     int (*fn)(Object *child, void *op=
-aque),
-> > >                                     void *opaque, bool recurse)
-> > >  {
-> > > @@ -999,12 +999,14 @@ static int do_object_child_foreach(Object *obj,
-> > >          if (object_property_is_child(prop)) {
-> > >              Object *child =3D prop->opaque;
-> > > =20
-> > > -            ret =3D fn(child, opaque);
-> > > -            if (ret !=3D 0) {
-> > > -                break;
-> > > +            if (!typename || object_dynamic_cast(child, typename)) {
-> > > +                ret =3D fn(child, opaque);
-> > > +                if (ret !=3D 0) {
-> > > +                    break;
-> > > +                }
-> > >              }
-> > >              if (recurse) {
-> > > -                do_object_child_foreach(child, fn, opaque, true);
-> > > +                do_object_child_foreach(child, typename, fn, opaque,=
- true);
-> > >              }
-> > >          }
-> > >      }
-> > > @@ -1014,14 +1016,28 @@ static int do_object_child_foreach(Object *ob=
-j,
-> > >  int object_child_foreach(Object *obj, int (*fn)(Object *child, void =
-*opaque),
-> > >                           void *opaque)
-> > >  {
-> > > -    return do_object_child_foreach(obj, fn, opaque, false);
-> > > +    return do_object_child_foreach(obj, NULL, fn, opaque, false);
-> > >  }
-> > > =20
-> > >  int object_child_foreach_recursive(Object *obj,
-> > >                                     int (*fn)(Object *child, void *op=
-aque),
-> > >                                     void *opaque)
-> > >  {
-> > > -    return do_object_child_foreach(obj, fn, opaque, true);
-> > > +    return do_object_child_foreach(obj, NULL, fn, opaque, true);
-> > > +}
-> > > +
-> > > +int object_child_foreach_type(Object *obj, const char *typename,
-> > > +                              int (*fn)(Object *child, void *opaque),
-> > > +                              void *opaque)
-> > > +{
-> > > +    return do_object_child_foreach(obj, typename, fn, opaque, false);
-> > > +}
-> > > +
-> > > +int object_child_foreach_recursive_type(Object *obj, const char *typ=
-ename,
-> > > +                                        int (*fn)(Object *child, voi=
-d *opaque),
-> > > +                                        void *opaque)
-> > > +{
-> > > +    return do_object_child_foreach(obj, typename, fn, opaque, true);
-> > >  }
-> > > =20
-> > >  static void object_class_get_list_tramp(ObjectClass *klass, void *op=
-aque)
-> > >=20
-> >=20
->=20
->=20
->=20
-
-
---Sig_/H77nyE5qLY1xEuKeNR1vVOF
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEtIKLr5QxQM7yo0kQcdTV5YIvc9YFAl2xbNUACgkQcdTV5YIv
-c9axxhAArHSYbUcIMNb1wX/J1yU1MLbnoxcREjI0vzjmnL+TvmEfLu8aWGSyfYkG
-4KaorHT4+NFFhgzi0nSHXpJ1OHC9L/EMqeXD5OoksOsxhsSDDG518ufGODp/uHac
-uDOpfwv5Rw1WXtpQC5AiZVBUBwD4VXTe+LIWgvTsiPHjqyDDpRCW0E5q/4AjxPqY
-cJiPiVLrritBih5rBfxkjxUTForh0U2uRM5wYTD/hTsCFZzs7Uhi4qRKg5d00bFK
-jxdtx/bjDp1hvpKK4oeNORAaMG0B+xDayftgR9MGhX1kMeXKpoaBBFcjU7mFhAMR
-5xILNOCmJz+htpSGa/vGxH6Zy1dOew//cjErCnkvVF1rVVd53ByenZpP9LknUsf3
-xkBPUbgi6yIIjTAVlKq+HSZJoqnQy1llJd5URCwthbh/tm5vAcWmjXjKA29XJDEC
-ARwe4ZLWynTjf2DUI4P7fMONVJsOEOb+71xLVEyFY+GEo4UENMC/qKmaTM1dqb4Q
-NccIk+8GY3Z5pwJ4EF5ni1XpI2fFKruydRTE0PnzsGBidrurfe8vyQJ7VY85+4ZT
-QLXIaURHcamK9hso/NlZ0m3W2REmiyQbGF+avNaH3+CiuOjhuCaUHjWjm3pkjzqk
-HfwGbdJk8//7y11Fw9oKU6VLqjPOQhRp8PA1WCTEg0c5F07W4Qk=
-=uRcl
------END PGP SIGNATURE-----
-
---Sig_/H77nyE5qLY1xEuKeNR1vVOF--
 
