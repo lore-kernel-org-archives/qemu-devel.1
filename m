@@ -2,76 +2,79 @@ Return-Path: <SRS0=Jnn8=YR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A6E57CA9EAF
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 13:16:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 38C92CA9EAF
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 13:17:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 704BE2084C
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 13:16:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E81212084C
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 13:17:13 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="h+HkkTW1"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 704BE2084C
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NsqTt+Un"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E81212084C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42266 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42284 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iNcz3-0004xb-Cr
-	for qemu-devel@archiver.kernel.org; Thu, 24 Oct 2019 09:16:57 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47761)
+	id 1iNczI-0005TT-Ke
+	for qemu-devel@archiver.kernel.org; Thu, 24 Oct 2019 09:17:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39417)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <armbru@redhat.com>) id 1iNcKj-0003wk-Gc
- for qemu-devel@nongnu.org; Thu, 24 Oct 2019 08:35:19 -0400
+ (envelope-from <dgilbert@redhat.com>) id 1iNbID-0003oK-Ai
+ for qemu-devel@nongnu.org; Thu, 24 Oct 2019 07:28:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1iNcKh-0006B6-Hj
- for qemu-devel@nongnu.org; Thu, 24 Oct 2019 08:35:17 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:52863
+ (envelope-from <dgilbert@redhat.com>) id 1iNbIB-00006i-An
+ for qemu-devel@nongnu.org; Thu, 24 Oct 2019 07:28:37 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:27203
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1iNcKh-0006Af-CE
- for qemu-devel@nongnu.org; Thu, 24 Oct 2019 08:35:15 -0400
+ (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1iNbIB-00005C-5S
+ for qemu-devel@nongnu.org; Thu, 24 Oct 2019 07:28:35 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1571920514;
+ s=mimecast20190719; t=1571916510;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ to:to:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=XQfcleXTWeT7+7TghUYFF7xtI7QrLnKZNmatYtINs+o=;
- b=h+HkkTW1dO01cRKYUSPOButONlVCea20dKj5ANATx3Q3y5BS0FONIUleX0BVu/gNWbw3qD
- Gg1e72i2mZKCEaOcOLVdZ38/yfEXBiNt5IVgHcBMb7gNuEZZ1EvGrDAkXzmz4p0suE6IKh
- ltsGkcd4u1CkIJRpurkyO9xtoqVZMAE=
+ bh=Zat1t+hKG0Zk8YyYdD8I3eOrGeDc/SeMU3HKQTfuqnA=;
+ b=NsqTt+UndQeVu2T1BsDPz3mjbx8VLxBBcvM6YPAv+b4DjJr5Xig+nvVH8AA1BMM4etO5mr
+ 80GkAukxPpZsah+JFconR6fucjV2FgGR1G/MZCrmmgUtCoiQvtCMr3ZfaUnQ3r64tuOLmI
+ yxXdTkBKk8vviAGtOsk0qhqQqBqmLRw=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-384-sJgHF0iVORqmyQHAHpHIoA-1; Thu, 24 Oct 2019 08:35:11 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ us-mta-204-HpkeFZk8O3mtTFlMMPJkRQ-1; Thu, 24 Oct 2019 07:28:28 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 92840801E5F;
- Thu, 24 Oct 2019 12:35:10 +0000 (UTC)
-Received: from blackfin.pond.sub.org (unknown [10.36.118.123])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 4AF245D713;
- Thu, 24 Oct 2019 12:35:07 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 27E981130341; Thu, 24 Oct 2019 14:34:59 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [RFC PATCH 14/19] qemu-options: New -compat to set policy for "funny"
- interfaces
-Date: Thu, 24 Oct 2019 14:34:53 +0200
-Message-Id: <20191024123458.13505-15-armbru@redhat.com>
-In-Reply-To: <20191024123458.13505-1-armbru@redhat.com>
-References: <20191024123458.13505-1-armbru@redhat.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 092FE107AD31;
+ Thu, 24 Oct 2019 11:28:27 +0000 (UTC)
+Received: from dgilbert-t580.localhost (ovpn-117-248.ams2.redhat.com
+ [10.36.117.248])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 81FD44524;
+ Thu, 24 Oct 2019 11:28:24 +0000 (UTC)
+From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
+To: qemu-devel@nongnu.org, renzhen@linux.alibaba.com, eguan@linux.alibaba.com,
+ ganesh.mahalingam@intel.com, m.mizuma@jp.fujitsu.com, mszeredi@redhat.com,
+ misono.tomohiro@jp.fujitsu.com, tao.peng@linux.alibaba.com,
+ piaojun@huawei.com, stefanha@redhat.com, vgoyal@redhat.com, mst@redhat.com,
+ berrange@redhat.com
+Subject: [PATCH 15/25] virtiofsd: use /proc/self/fd/ O_PATH file descriptor
+Date: Thu, 24 Oct 2019 12:27:08 +0100
+Message-Id: <20191024112718.34657-16-dgilbert@redhat.com>
+In-Reply-To: <20191024112718.34657-1-dgilbert@redhat.com>
+References: <20191024112718.34657-1-dgilbert@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-MC-Unique: sJgHF0iVORqmyQHAHpHIoA-1
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-MC-Unique: HpkeFZk8O3mtTFlMMPJkRQ-1
 X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=WINDOWS-1252
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
@@ -87,211 +90,395 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: libvir-list@redhat.com, mdroth@linux.vnet.ibm.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-"Funny" interface policy is separate for input and output.
+From: Stefan Hajnoczi <stefanha@redhat.com>
 
-Input policy can be "accept" (accept silently; default), "reject"
-(reject the request with an error), or "crash" (abort() the process).
+Sandboxing will remove /proc from the mount namespace so we can no
+longer build string paths into "/proc/self/fd/...".
 
-Output policy can be "accept" (pass on unchanged), or "hide" (filter
-out the deprecated parts).
+Keep an O_PATH file descriptor so we can still re-open fds via
+/proc/self/fd.
 
-Policies other than "accept" are implemented later in this series.
-
-For now, the "funny" interfaces are just QMP commands and events with
-feature "deprecated".  We'll want to extend this to arguments,
-returns, and the command line.  Extending it to experimental
-interfaces may make sense.
-
-FIXME Documentation and help need some work
-
-Signed-off-by: Markus Armbruster <armbru@redhat.com>
+Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
 ---
- qapi/common.json             | 48 ++++++++++++++++++++++++++++++++++++
- include/qapi/compat-policy.h | 20 +++++++++++++++
- qapi/qmp-dispatch.c          |  3 +++
- vl.c                         | 17 +++++++++++++
- qemu-options.hx              | 18 ++++++++++++++
- 5 files changed, 106 insertions(+)
- create mode 100644 include/qapi/compat-policy.h
+ contrib/virtiofsd/passthrough_ll.c | 128 +++++++++++++++++++++++------
+ 1 file changed, 101 insertions(+), 27 deletions(-)
 
-diff --git a/qapi/common.json b/qapi/common.json
-index 7b9cbcd97b..9fc3e6400c 100644
---- a/qapi/common.json
-+++ b/qapi/common.json
-@@ -144,3 +144,51 @@
- ##
- { 'enum': 'PCIELinkWidth',
-   'data': [ '1', '2', '4', '8', '12', '16', '32' ] }
+diff --git a/contrib/virtiofsd/passthrough_ll.c b/contrib/virtiofsd/passthr=
+ough_ll.c
+index cb01e3f088..3ddf22d162 100644
+--- a/contrib/virtiofsd/passthrough_ll.c
++++ b/contrib/virtiofsd/passthrough_ll.c
+@@ -110,6 +110,9 @@ struct lo_data {
+ =09struct lo_map ino_map; /* protected by lo->mutex */
+ =09struct lo_map dirp_map; /* protected by lo->mutex */
+ =09struct lo_map fd_map; /* protected by lo->mutex */
 +
-+##
-+# @CompatPolicyInput:
-+#
-+# Policy for handling "funny" input.
-+#
-+# @accept: Accept silently
-+# TODO @reject: Reject with an error
-+# TODO @crash: abort() the process
-+#
-+# FIXME Guidance on intended use.
-+#
-+# Since: 4.2
-+##
-+{ 'enum': 'CompatPolicyInput',
-+  'data': [ 'accept' ] }
-+
-+##
-+# @CompatPolicyOutput:
-+#
-+# Policy for handling "funny" output.
-+#
-+# @accept: Pass on unchanged
-+# TODO @hide: Filter out
-+#
-+# FIXME Guidance on intended use.
-+#
-+# Since: 4.2
-+##
-+{ 'enum': 'CompatPolicyOutput',
-+  'data': [ 'accept' ] }
-+
-+##
-+# @CompatPolicy:
-+#
-+# Policy for handling "funny" management interfaces.
-+#
-+# Limitation: covers only QMP commands and events.  Argument support
-+# is not yet implemented.  CLI is not yet implemented.
-+#
-+# @deprecated-input: how to handle deprecated input (default 'accept')
-+# @deprecated-output: how to handle deprecated output (default 'accept')
-+##
-+{ 'struct': 'CompatPolicy',
-+  'data': { '*deprecated-input': 'CompatPolicyInput',
-+            '*deprecated-output': 'CompatPolicyOutput' } }
-+
-+# FIXME CompatPolicy & friends don't belong here
-diff --git a/include/qapi/compat-policy.h b/include/qapi/compat-policy.h
-new file mode 100644
-index 0000000000..c491d74aac
---- /dev/null
-+++ b/include/qapi/compat-policy.h
-@@ -0,0 +1,20 @@
-+/*
-+ * Policy for handling "funny" management interfaces
-+ *
-+ * Copyright (C) 2019 Red Hat, Inc.
-+ *
-+ * Authors:
-+ *  Markus Armbruster <armbru@redhat.com>,
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or
-+ * later.  See the COPYING file in the top-level directory.
-+ */
-+
-+#ifndef QAPI_COMPAT_POLICY_H
-+#define QAPI_COMPAT_POLICY_H
-+
-+#include "qapi/qapi-types-common.h"
-+
-+extern CompatPolicy qapi_compat_policy;
-+
-+#endif
-diff --git a/qapi/qmp-dispatch.c b/qapi/qmp-dispatch.c
-index 55bc224c61..8fe59cf54d 100644
---- a/qapi/qmp-dispatch.c
-+++ b/qapi/qmp-dispatch.c
-@@ -12,6 +12,7 @@
-  */
++=09/* An O_PATH file descriptor to /proc/self/fd/ */
++=09int proc_self_fd;
+ };
 =20
- #include "qemu/osdep.h"
-+#include "qapi/compat-policy.h"
- #include "qapi/error.h"
- #include "qapi/qmp/dispatch.h"
- #include "qapi/qmp/qdict.h"
-@@ -19,6 +20,8 @@
- #include "sysemu/runstate.h"
- #include "qapi/qmp/qbool.h"
+ static const struct fuse_opt lo_opts[] =3D {
+@@ -378,9 +381,9 @@ static int lo_parent_and_name(struct lo_data *lo, struc=
+t lo_inode *inode,
+ =09int res;
 =20
-+CompatPolicy qapi_compat_policy;
+ retry:
+-=09sprintf(procname, "/proc/self/fd/%i", inode->fd);
++=09sprintf(procname, "%i", inode->fd);
+=20
+-=09res =3D readlink(procname, path, PATH_MAX);
++=09res =3D readlinkat(lo->proc_self_fd, procname, path, PATH_MAX);
+ =09if (res < 0) {
+ =09=09fuse_log(FUSE_LOG_WARNING, "lo_parent_and_name: readlink failed: %m\=
+n");
+ =09=09goto fail_noretry;
+@@ -465,9 +468,9 @@ static int utimensat_empty(struct lo_data *lo, struct l=
+o_inode *inode,
+ =09=09}
+ =09=09return res;
+ =09}
+-=09sprintf(path, "/proc/self/fd/%i", inode->fd);
++=09sprintf(path, "%i", inode->fd);
+=20
+-=09return utimensat(AT_FDCWD, path, tv, 0);
++=09return utimensat(lo->proc_self_fd, path, tv, 0);
+=20
+ fallback:
+ =09res =3D lo_parent_and_name(lo, inode, path, &parent);
+@@ -521,8 +524,9 @@ static void lo_setattr(fuse_req_t req, fuse_ino_t ino, =
+struct stat *attr,
+ =09=09if (fi) {
+ =09=09=09res =3D fchmod(fd, attr->st_mode);
+ =09=09} else {
+-=09=09=09sprintf(procname, "/proc/self/fd/%i", ifd);
+-=09=09=09res =3D chmod(procname, attr->st_mode);
++=09=09=09sprintf(procname, "%i", ifd);
++=09=09=09res =3D fchmodat(lo->proc_self_fd, procname,
++=09=09=09=09       attr->st_mode, 0);
+ =09=09}
+ =09=09if (res =3D=3D -1)
+ =09=09=09goto out_err;
+@@ -539,11 +543,23 @@ static void lo_setattr(fuse_req_t req, fuse_ino_t ino=
+, struct stat *attr,
+ =09=09=09goto out_err;
+ =09}
+ =09if (valid & FUSE_SET_ATTR_SIZE) {
++=09=09int truncfd;
 +
- static QDict *qmp_dispatch_check_obj(const QObject *request, bool allow_oo=
-b,
-                                      QObject **id, Error **errp)
+ =09=09if (fi) {
+-=09=09=09res =3D ftruncate(fd, attr->st_size);
++=09=09=09truncfd =3D fd;
+ =09=09} else {
+-=09=09=09sprintf(procname, "/proc/self/fd/%i", ifd);
+-=09=09=09res =3D truncate(procname, attr->st_size);
++=09=09=09sprintf(procname, "%i", ifd);
++=09=09=09truncfd =3D openat(lo->proc_self_fd, procname, O_RDWR);
++=09=09=09if (truncfd < 0) {
++=09=09=09=09goto out_err;
++=09=09=09}
++=09=09}
++
++=09=09res =3D ftruncate(truncfd, attr->st_size);
++=09=09if (!fi) {
++=09=09=09saverr =3D errno;
++=09=09=09close(truncfd);
++=09=09=09errno =3D saverr;
+ =09=09}
+ =09=09if (res =3D=3D -1)
+ =09=09=09goto out_err;
+@@ -825,9 +841,9 @@ static int linkat_empty_nofollow(struct lo_data *lo, st=
+ruct lo_inode *inode,
+ =09=09return res;
+ =09}
+=20
+-=09sprintf(path, "/proc/self/fd/%i", inode->fd);
++=09sprintf(path, "%i", inode->fd);
+=20
+-=09return linkat(AT_FDCWD, path, dfd, name, AT_SYMLINK_FOLLOW);
++=09return linkat(lo->proc_self_fd, path, dfd, name, AT_SYMLINK_FOLLOW);
+=20
+ fallback:
+ =09res =3D lo_parent_and_name(lo, inode, path, &parent);
+@@ -1325,8 +1341,8 @@ static void lo_open(fuse_req_t req, fuse_ino_t ino, s=
+truct fuse_file_info *fi)
+ =09if (lo->writeback && (fi->flags & O_APPEND))
+ =09=09fi->flags &=3D ~O_APPEND;
+=20
+-=09sprintf(buf, "/proc/self/fd/%i", lo_fd(req, ino));
+-=09fd =3D open(buf, fi->flags & ~O_NOFOLLOW);
++=09sprintf(buf, "%i", lo_fd(req, ino));
++=09fd =3D openat(lo->proc_self_fd, buf, fi->flags & ~O_NOFOLLOW);
+ =09if (fd =3D=3D -1)
+ =09=09return (void) fuse_reply_err(req, errno);
+=20
+@@ -1375,8 +1391,8 @@ static void lo_flush(fuse_req_t req, fuse_ino_t ino, =
+struct fuse_file_info *fi)
+ static void lo_fsync(fuse_req_t req, fuse_ino_t ino, int datasync,
+ =09=09     struct fuse_file_info *fi)
  {
-diff --git a/vl.c b/vl.c
-index 4489cfb2bb..300f2a01de 100644
---- a/vl.c
-+++ b/vl.c
-@@ -26,6 +26,7 @@
- #include "qemu-common.h"
- #include "qemu/units.h"
- #include "hw/qdev-properties.h"
-+#include "qapi/compat-policy.h"
- #include "qapi/error.h"
- #include "qemu-version.h"
- #include "qemu/cutils.h"
-@@ -3783,6 +3784,22 @@ int main(int argc, char **argv, char **envp)
-                     qemu_opt_get_bool(opts, "mem-lock", false);
-                 enable_cpu_pm =3D qemu_opt_get_bool(opts, "cpu-pm", false)=
-;
-                 break;
-+            case QEMU_OPTION_compat:
-+                {
-+                    CompatPolicy *opts;
-+                    Visitor *v;
-+
-+                    v =3D qobject_input_visitor_new_str(optarg, NULL,
-+                                                      &error_fatal);
-+
-+                    visit_type_CompatPolicy(v, NULL, &opts, &error_fatal);
-+                    QAPI_CLONE_MEMBERS(CompatPolicy, &qapi_compat_policy,
-+                                       opts);
-+
-+                    qapi_free_CompatPolicy(opts);
-+                    visit_free(v);
-+                    break;
-+                }
-             case QEMU_OPTION_msg:
-                 opts =3D qemu_opts_parse_noisily(qemu_find_opts("msg"), op=
-targ,
-                                                false);
-diff --git a/qemu-options.hx b/qemu-options.hx
-index 996b6fba74..c43f768a15 100644
---- a/qemu-options.hx
-+++ b/qemu-options.hx
-@@ -3319,6 +3319,24 @@ STEXI
- @table @option
- ETEXI
++=09struct lo_data *lo =3D lo_data(req);
+ =09int res;
+-=09(void) ino;
+ =09int fd;
+ =09char *buf;
 =20
-+DEF("compat", HAS_ARG, QEMU_OPTION_compat,
-+    "-compat [deprecated-input=3Daccept][,deprecated-output=3Daccept]\n"
-+    "                Policy for handling deprecated management interfaces\=
-n",
-+    QEMU_ARCH_ALL)
-+STEXI
-+@item -compat [deprecated-input=3D@var{input-policy}][,deprecated-output=
-=3D@var{output-policy}]
-+@findex -compat
+@@ -1384,11 +1400,11 @@ static void lo_fsync(fuse_req_t req, fuse_ino_t ino=
+, int datasync,
+ =09=09 (void *)fi);
+=20
+ =09if (!fi) {
+-=09=09res =3D asprintf(&buf, "/proc/self/fd/%i", lo_fd(req, ino));
++=09=09res =3D asprintf(&buf, "%i", lo_fd(req, ino));
+ =09=09if (res =3D=3D -1)
+ =09=09=09return (void) fuse_reply_err(req, errno);
+=20
+-=09=09fd =3D open(buf, O_RDWR);
++=09=09fd =3D openat(lo->proc_self_fd, buf, O_RDWR);
+ =09=09free(buf);
+ =09=09if (fd =3D=3D -1)
+ =09=09=09return (void) fuse_reply_err(req, errno);
+@@ -1493,11 +1509,13 @@ static void lo_flock(fuse_req_t req, fuse_ino_t ino=
+, struct fuse_file_info *fi,
+ static void lo_getxattr(fuse_req_t req, fuse_ino_t ino, const char *name,
+ =09=09=09size_t size)
+ {
++=09struct lo_data *lo =3D lo_data(req);
+ =09char *value =3D NULL;
+ =09char procname[64];
+ =09struct lo_inode *inode;
+ =09ssize_t ret;
+ =09int saverr;
++=09int fd =3D -1;
+=20
+ =09inode =3D lo_inode(req, ino);
+ =09if (!inode) {
+@@ -1520,14 +1538,18 @@ static void lo_getxattr(fuse_req_t req, fuse_ino_t =
+ino, const char *name,
+ =09=09goto out;
+ =09}
+=20
+-=09sprintf(procname, "/proc/self/fd/%i", inode->fd);
++=09sprintf(procname, "%i", inode->fd);
++=09fd =3D openat(lo->proc_self_fd, procname, O_RDONLY);
++=09if (fd < 0) {
++=09=09goto out_err;
++=09}
+=20
+ =09if (size) {
+ =09=09value =3D malloc(size);
+ =09=09if (!value)
+ =09=09=09goto out_err;
+=20
+-=09=09ret =3D getxattr(procname, name, value, size);
++=09=09ret =3D fgetxattr(fd, name, value, size);
+ =09=09if (ret =3D=3D -1)
+ =09=09=09goto out_err;
+ =09=09saverr =3D 0;
+@@ -1536,7 +1558,7 @@ static void lo_getxattr(fuse_req_t req, fuse_ino_t in=
+o, const char *name,
+=20
+ =09=09fuse_reply_buf(req, value, ret);
+ =09} else {
+-=09=09ret =3D getxattr(procname, name, NULL, 0);
++=09=09ret =3D fgetxattr(fd, name, NULL, 0);
+ =09=09if (ret =3D=3D -1)
+ =09=09=09goto out_err;
+=20
+@@ -1544,6 +1566,10 @@ static void lo_getxattr(fuse_req_t req, fuse_ino_t i=
+no, const char *name,
+ =09}
+ out_free:
+ =09free(value);
 +
-+Set policy for handling deprecated management interfaces:
-+@table @option
-+@item deprecated-input=3Daccept (default)
-+Accept deprecated commands
-+@item deprecated-output=3Daccept (default)
-+Emit deprecated events
-+@end table
-+FIXME Guidance on intended use
-+ETEXI
++=09if (fd >=3D 0) {
++=09=09close(fd);
++=09}
+ =09return;
+=20
+ out_err:
+@@ -1555,11 +1581,13 @@ out:
+=20
+ static void lo_listxattr(fuse_req_t req, fuse_ino_t ino, size_t size)
+ {
++=09struct lo_data *lo =3D lo_data(req);
+ =09char *value =3D NULL;
+ =09char procname[64];
+ =09struct lo_inode *inode;
+ =09ssize_t ret;
+ =09int saverr;
++=09int fd =3D -1;
+=20
+ =09inode =3D lo_inode(req, ino);
+ =09if (!inode) {
+@@ -1582,14 +1610,18 @@ static void lo_listxattr(fuse_req_t req, fuse_ino_t=
+ ino, size_t size)
+ =09=09goto out;
+ =09}
+=20
+-=09sprintf(procname, "/proc/self/fd/%i", inode->fd);
++=09sprintf(procname, "%i", inode->fd);
++=09fd =3D openat(lo->proc_self_fd, procname, O_RDONLY);
++=09if (fd < 0) {
++=09=09goto out_err;
++=09}
+=20
+ =09if (size) {
+ =09=09value =3D malloc(size);
+ =09=09if (!value)
+ =09=09=09goto out_err;
+=20
+-=09=09ret =3D listxattr(procname, value, size);
++=09=09ret =3D flistxattr(fd, value, size);
+ =09=09if (ret =3D=3D -1)
+ =09=09=09goto out_err;
+ =09=09saverr =3D 0;
+@@ -1598,7 +1630,7 @@ static void lo_listxattr(fuse_req_t req, fuse_ino_t i=
+no, size_t size)
+=20
+ =09=09fuse_reply_buf(req, value, ret);
+ =09} else {
+-=09=09ret =3D listxattr(procname, NULL, 0);
++=09=09ret =3D flistxattr(fd, NULL, 0);
+ =09=09if (ret =3D=3D -1)
+ =09=09=09goto out_err;
+=20
+@@ -1606,6 +1638,10 @@ static void lo_listxattr(fuse_req_t req, fuse_ino_t =
+ino, size_t size)
+ =09}
+ out_free:
+ =09free(value);
 +
- DEF("fw_cfg", HAS_ARG, QEMU_OPTION_fwcfg,
-     "-fw_cfg [name=3D]<name>,file=3D<file>\n"
-     "                add named fw_cfg entry with contents from file\n"
++=09if (fd >=3D 0) {
++=09=09close(fd);
++=09}
+ =09return;
+=20
+ out_err:
+@@ -1619,9 +1655,11 @@ static void lo_setxattr(fuse_req_t req, fuse_ino_t i=
+no, const char *name,
+ =09=09=09const char *value, size_t size, int flags)
+ {
+ =09char procname[64];
++=09struct lo_data *lo =3D lo_data(req);
+ =09struct lo_inode *inode;
+ =09ssize_t ret;
+ =09int saverr;
++=09int fd =3D -1;
+=20
+ =09inode =3D lo_inode(req, ino);
+ =09if (!inode) {
+@@ -1644,21 +1682,31 @@ static void lo_setxattr(fuse_req_t req, fuse_ino_t =
+ino, const char *name,
+ =09=09goto out;
+ =09}
+=20
+-=09sprintf(procname, "/proc/self/fd/%i", inode->fd);
++=09sprintf(procname, "%i", inode->fd);
++=09fd =3D openat(lo->proc_self_fd, procname, O_RDWR);
++=09if (fd < 0) {
++=09=09saverr =3D errno;
++=09=09goto out;
++=09}
+=20
+-=09ret =3D setxattr(procname, name, value, size, flags);
++=09ret =3D fsetxattr(fd, name, value, size, flags);
+ =09saverr =3D ret =3D=3D -1 ? errno : 0;
+=20
+ out:
++=09if (fd >=3D 0) {
++=09=09close(fd);
++=09}
+ =09fuse_reply_err(req, saverr);
+ }
+=20
+ static void lo_removexattr(fuse_req_t req, fuse_ino_t ino, const char *nam=
+e)
+ {
+ =09char procname[64];
++=09struct lo_data *lo =3D lo_data(req);
+ =09struct lo_inode *inode;
+ =09ssize_t ret;
+ =09int saverr;
++=09int fd =3D -1;
+=20
+ =09inode =3D lo_inode(req, ino);
+ =09if (!inode) {
+@@ -1681,12 +1729,20 @@ static void lo_removexattr(fuse_req_t req, fuse_ino=
+_t ino, const char *name)
+ =09=09goto out;
+ =09}
+=20
+-=09sprintf(procname, "/proc/self/fd/%i", inode->fd);
++=09sprintf(procname, "%i", inode->fd);
++=09fd =3D openat(lo->proc_self_fd, procname, O_RDWR);
++=09if (fd < 0) {
++=09=09saverr =3D errno;
++=09=09goto out;
++=09}
+=20
+-=09ret =3D removexattr(procname, name);
++=09ret =3D fremovexattr(fd, name);
+ =09saverr =3D ret =3D=3D -1 ? errno : 0;
+=20
+ out:
++=09if (fd >=3D 0) {
++=09=09close(fd);
++=09}
+ =09fuse_reply_err(req, saverr);
+ }
+=20
+@@ -1765,13 +1821,24 @@ static void print_capabilities(void)
+ =09printf("}\n");
+ }
+=20
++static void setup_proc_self_fd(struct lo_data *lo)
++{
++=09lo->proc_self_fd =3D open("/proc/self/fd", O_PATH);
++=09if (lo->proc_self_fd =3D=3D -1) {
++=09=09fuse_log(FUSE_LOG_ERR, "open(/proc/self/fd, O_PATH): %m\n");
++=09=09exit(1);
++=09}
++}
++
+ int main(int argc, char *argv[])
+ {
+ =09struct fuse_args args =3D FUSE_ARGS_INIT(argc, argv);
+ =09struct fuse_session *se;
+ =09struct fuse_cmdline_opts opts;
+ =09struct lo_data lo =3D { .debug =3D 0,
+-=09                      .writeback =3D 0 };
++=09                      .writeback =3D 0,
++=09                      .proc_self_fd =3D -1,
++=09};
+ =09struct lo_map_elem *root_elem;
+ =09int ret =3D -1;
+=20
+@@ -1878,6 +1945,9 @@ int main(int argc, char *argv[])
+=20
+ =09fuse_daemonize(opts.foreground);
+=20
++=09/* Must be after daemonize to get the right /proc/self/fd */
++=09setup_proc_self_fd(&lo);
++
+ =09/* Block until ctrl+c or fusermount -u */
+ =09ret =3D virtio_loop(se);
+=20
+@@ -1893,6 +1963,10 @@ err_out1:
+ =09lo_map_destroy(&lo.dirp_map);
+ =09lo_map_destroy(&lo.ino_map);
+=20
++=09if (lo.proc_self_fd >=3D 0) {
++=09=09close(lo.proc_self_fd);
++=09}
++
+ =09if (lo.root.fd >=3D 0)
+ =09=09close(lo.root.fd);
+=20
 --=20
-2.21.0
+2.23.0
 
 
