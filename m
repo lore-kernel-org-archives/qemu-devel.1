@@ -2,47 +2,45 @@ Return-Path: <SRS0=Jnn8=YR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.2 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8CB89CA9EAF
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 18:46:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F6C0CA9EAF
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 18:49:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 613AC21872
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 18:46:36 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 613AC21872
+	by mail.kernel.org (Postfix) with ESMTPS id 72D1620659
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 18:49:05 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 72D1620659
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50656 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50708 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iNi83-0007hL-Bx
-	for qemu-devel@archiver.kernel.org; Thu, 24 Oct 2019 14:46:35 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47346)
+	id 1iNiAS-0003XX-6O
+	for qemu-devel@archiver.kernel.org; Thu, 24 Oct 2019 14:49:04 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50588)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <laurent@vivier.eu>) id 1iNhaJ-0006aS-FL
- for qemu-devel@nongnu.org; Thu, 24 Oct 2019 14:11:44 -0400
+ (envelope-from <laurent@vivier.eu>) id 1iNhwk-0008BL-NF
+ for qemu-devel@nongnu.org; Thu, 24 Oct 2019 14:34:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <laurent@vivier.eu>) id 1iNhaI-0008TV-2S
- for qemu-devel@nongnu.org; Thu, 24 Oct 2019 14:11:43 -0400
-Received: from mout.kundenserver.de ([212.227.126.133]:60977)
+ (envelope-from <laurent@vivier.eu>) id 1iNhwj-0007JR-Io
+ for qemu-devel@nongnu.org; Thu, 24 Oct 2019 14:34:54 -0400
+Received: from mout.kundenserver.de ([212.227.126.135]:43285)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <laurent@vivier.eu>)
- id 1iNhaH-0008Sy-PF; Thu, 24 Oct 2019 14:11:42 -0400
+ id 1iNhwf-0007Hj-8s; Thu, 24 Oct 2019 14:34:49 -0400
 Received: from [192.168.100.1] ([78.238.229.36]) by mrelayeu.kundenserver.de
  (mreue009 [213.165.67.103]) with ESMTPSA (Nemesis) id
- 1N5mOZ-1hv9FK1EFf-017F3I; Thu, 24 Oct 2019 20:11:37 +0200
-Subject: Re: [PATCH 3/3] qemu-timer: reuse MIN macro in qemu_timeout_ns_to_ms
-To: Eric Blake <eblake@redhat.com>, Frediano Ziglio <fziglio@redhat.com>,
- Michael Tokarev <mjt@tls.msk.ru>
-References: <20191023122652.2999-1-fziglio@redhat.com>
- <20191023122652.2999-3-fziglio@redhat.com>
- <ac0dbd04-c594-0904-020c-ab6384153997@vivier.eu>
- <45775e9d-5d7d-74b4-8eee-1813b080c2da@redhat.com>
+ 1N4i3j-1hyRDS1f1D-011kM8; Thu, 24 Oct 2019 20:34:33 +0200
+Subject: Re: [PATCH v2 13/14] hw/rtc/xlnx-zynqmp-rtc: Remove unused "ptimer.h"
+ include
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ qemu-devel@nongnu.org
+References: <20191003230404.19384-1-philmd@redhat.com>
+ <20191003230404.19384-14-philmd@redhat.com>
 From: Laurent Vivier <laurent@vivier.eu>
 Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  mQINBFYFJhkBEAC2me7w2+RizYOKZM+vZCx69GTewOwqzHrrHSG07MUAxJ6AY29/+HYf6EY2
@@ -86,36 +84,36 @@ Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  OpKgu3nD0ahBDqANU/ZmNNarBJEwvM2vfusmNnWm3QMIwxNuJghRyuFfx694Im1js0ZY3LEU
  JGSHFG4ZynA+ZFUPA6Xf0wHeJOxGKCGIyeKORsteIqgnkINW9fnKJw2pgk8qHkwVc3Vu+wGS
  ZiJK0xFusPQehjWTHn9WjMG1zvQ5TQQHxau/2FkP45+nRPco6vVFQe8JmgtRF8WFJA==
-Message-ID: <d9bf8d20-a873-57ec-3cc4-542c72016463@vivier.eu>
-Date: Thu, 24 Oct 2019 20:11:35 +0200
+Message-ID: <e16a9575-d233-d201-bb18-117730c025fc@vivier.eu>
+Date: Thu, 24 Oct 2019 20:34:30 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.1.1
 MIME-Version: 1.0
-In-Reply-To: <45775e9d-5d7d-74b4-8eee-1813b080c2da@redhat.com>
+In-Reply-To: <20191003230404.19384-14-philmd@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: fr
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:Io65x8KOSpNhKJQfe0EV/jvbAueGShzHdDd8ROILf2MwE99pjWn
- V/rnGL2flHK6l+NRaZWXGUADAdlGha3JVN44onLRco5jTZgEQfOHoqghuq6FpjCs27Dvagm
- 9dpSbuA0s4yyzfSwyAzxsyJzccI+jtPp52B68qp2JePGHgTqwUSOMGTfmybqM8YVRU1H00Y
- nty82DnwpzQ3OfW/ZxmOA==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:ved6pVf0YTo=:B9gM8tPp7C+tLJt3WoeBb0
- lQ+Ma1M+sneFgZmNBO83es5DMY9yYz0P+AzYdopb7Ygig5CcuNIJUseRaA5FCBXU2xG/kFe6l
- H/Ednkw54gq0fncxAxl/N/ojE6OFlXO3lU0YMlXGWrYk+Drz9mOxOqiPBKAZ8qf/OfFcgXdUm
- fJ26hROHG9PWf0NOKD/nNdYMaObz1sgIrU3ID7dNeM1Tt4E9E78QlUCocOMc3uakpSiLuVbrn
- CSY5BFystLlb0xc7/esG5iU19OtHWybm5oMNc++TNo7cdbDX8m4QyIyTb2FabHsD6INEpYfoG
- AHeD5fFJl0JKm4/crxwudOekxD5YMGZjJw4aTll58pT95Sc+LsLJuZ/+kY/ZhIRfKJ0vvEn+V
- QaWcyAJQlA94Je9MMIbADjjelb/Sc7nrHdN2ugkqPWVrEhsPmhsHp3aF2TKm9EQsxa0BDcanU
- sGe++JlTw42omgkFLMbfUQDssAPl0nU04qjLwQQB0ZapxV+niEMp3IcbdHXVKgeZIswVkspRW
- HM1tQ+F5RBxNXPchouBAf01e1rs/ps+cyApJc2LfxkZZWwXBaYujKS1BATNx4hzcHizcQw3W9
- sDhpi8WeB3H4VkKfohXO0MopTafNlcr+fxy6NJyueJ8PTLLMDdhthCAHIDD3qnqmUuayQWY2C
- uAR2AUY16mftqfwuVhXT6y9FIwzinYnZjnClRsF+pfGoTCy1fANSlb4+s4aUTF7rXTyk3zf/6
- JM8A6NCcmCYubudR4OHOjfOHG1FxOZ1V1rL/opeA3kFF3cMSEYHEmMt4eh9/+QNklqDMU49me
- 4I7UINIOT+GtuncI1lSSLySVonL0J1Zhds7ORC3M40UVLmdNVoNmaVzvNGfNXhPZefXLJoT6K
- dnEYo9Dr+lX0Xq2BuArS+tcoK9uA+AOCwyG+fu0xI=
+X-Provags-ID: V03:K1:vB5GcqS/QWIfvmEbpf9k4g9Ql1jrV5OMsjYIRD/XF3ZXoybbQGt
+ pDTwu88ImAcYz1XtE2iSkNk0RMOhbRQTKUsb5pJCuiZKNchbVSiy+7XpCGS871Tsjytxg9q
+ fCgboyRhlCKbBNppei9b59rjmEwEqe6w+01PZpDkLX3aRuCL6XD2147qETQWIw7QkhaDwri
+ j01Xrzsf3eJBnpcAGOETg==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:QfZoVryil1c=:wDE8yaAbktyujUArJR97nh
+ 2hhqEugZBcE67QcCoy8LZwWVPStPpaB686JeKhkAbgK/aAXodBk+rvtBJG1VRJ1wQoFvemUHU
+ gAi7k1MsgOlT71ZwEThiGs8lPeSwBTSFJ6JTpYZeq+srG3v7TfJY8napW05Bty30agLuaBubX
+ 1wC9W1IlWDFOgoVzYHnS1W2nLiu8dvG/eh2usrH75bnmYbNQW57NrMOv6olUbaC8/JKj4szRD
+ MQ0jPQmtKccIbWM5qL3REs0RZPJ2TGOgdOPJbRPcIKGdXrNHd/GcPsaxlehAmbG5UfCaWVN3z
+ vzbF6rv4slml+XVioeTfzvF3ktd9raV1TX6bNXvkbGydBTQrc7m6t+niuEYh5m1DHI5G7c4vX
+ XkB87+9Vfieip7T99+G1nruh9/ilNEK6UuPP9TYYfRjyv2OQln2fqf405USVQRWtqooBNAkKL
+ WKHdd1EQ+swj+S7nFT0U86VE1MTVc3erCZTrrt/30yqEkA4NQ73pzjL0XWhR9ogdnSaLAZ4xc
+ mrAdT3ywHPlH1pmbWEVV3rW2tisXIWaA2/wkHiB7NM+XAnghOOft7IgL+ZQ+uBKq9dpL1+0z0
+ XYsVw7vXf9uXWMsM3eOREifjXs8PLIJ2nlc663rAvWWFYUYjgoi3hS3ipyMs8LgJ7fXM1PV0m
+ 5AFH+l38jp9Tm+uAhDmYUp5MzAtyTMz63fabgHLQ3w59RVdN1/aHTxWzxN3zCwmJb8dwmcIes
+ l+Lwk6YyVtA6Up0UgNdUMW8AYWYgK/VRwdw+bAYZ1x2HTVT30CYz/qrLR1uksgQfjceq9SGg+
+ Iqs9y0FdWQ2EHPed93uuYtbf5B0pVzr13NDmqK3Yis1Lyxrkctlqs/zkSVYhtGnjcsGqw1eWe
+ gqYiC65CZRplJI6blGlawtxqV5wu3oy5fuyKAiiXE=
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 212.227.126.133
+X-Received-From: 212.227.126.135
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -127,38 +125,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-trivial@nongnu.org, qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ "Michael S. Tsirkin" <mst@redhat.com>,
+ Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
+ Alistair Francis <alistair.francis@wdc.com>,
+ "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, qemu-trivial@nongnu.org,
+ Helge Deller <deller@gmx.de>,
+ =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>,
+ Joel Stanley <joel@jms.id.au>, Richard Henderson <rth@twiddle.net>,
+ Artyom Tarasenko <atar4qemu@gmail.com>, Laurent Vivier <lvivier@redhat.com>,
+ Thomas Huth <thuth@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>,
+ Alistair Francis <alistair@alistair23.me>, qemu-arm@nongnu.org,
+ =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>,
+ Igor Mammedov <imammedo@redhat.com>,
+ David Gibson <david@gibson.dropbear.id.au>, Andrew Jeffery <andrew@aj.id.au>,
+ Aleksandar Rikalo <arikalo@wavecomp.com>, qemu-ppc@nongnu.org,
+ Aleksandar Markovic <amarkovic@wavecomp.com>,
+ Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Le 24/10/2019 à 20:03, Eric Blake a écrit :
-> On 10/24/19 12:31 PM, Laurent Vivier wrote:
->> Le 23/10/2019 à 14:26, Frediano Ziglio a écrit :
->>> Signed-off-by: Frediano Ziglio <fziglio@redhat.com>
->>> ---
->>>   util/qemu-timer.c | 6 +-----
->>>   1 file changed, 1 insertion(+), 5 deletions(-)
->>>
+Le 04/10/2019 à 01:04, Philippe Mathieu-Daudé a écrit :
+> The "hw/ptimer.h" header is not used, remove it.
 > 
->>>
->>
->> Applied to my trivial-patches branch.
->>
->> I've updated the patch to remove the two useless casts.
->>
->> Eric, if you want to add your R-b, I can add it to the queued patch.
+> Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+> ---
+>  hw/rtc/xlnx-zynqmp-rtc.c | 1 -
+>  1 file changed, 1 deletion(-)
 > 
-> I don't see it queued on https://github.com/vivier/qemu/branches yet,
-
-Sorry, forgot to push it.
-
-> but if removing the two casts is the only difference from the original:
-> 
-> Reviewed-by: Eric Blake <eblake@redhat.com>
+> diff --git a/hw/rtc/xlnx-zynqmp-rtc.c b/hw/rtc/xlnx-zynqmp-rtc.c
+> index f9f09b7296..2bcd14d779 100644
+> --- a/hw/rtc/xlnx-zynqmp-rtc.c
+> +++ b/hw/rtc/xlnx-zynqmp-rtc.c
+> @@ -32,7 +32,6 @@
+>  #include "qemu/log.h"
+>  #include "qemu/module.h"
+>  #include "hw/irq.h"
+> -#include "hw/ptimer.h"
+>  #include "qemu/cutils.h"
+>  #include "sysemu/sysemu.h"
+>  #include "trace.h"
 > 
 
-Added and pushed (branch trivial-patches), you can check.
+Applied to my trivial-patches branch.
 
 Thanks,
 Laurent
