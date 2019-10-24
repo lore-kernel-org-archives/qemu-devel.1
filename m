@@ -2,80 +2,80 @@ Return-Path: <SRS0=Jnn8=YR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 02C7ECA9EBC
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 11:29:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ED0A1CA9EAF
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 11:29:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BF52A2166E
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 11:29:01 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SLWxCr3a"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BF52A2166E
+	by mail.kernel.org (Postfix) with ESMTPS id BF1BC20856
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 11:29:55 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BF1BC20856
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39890 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39922 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iNbIa-0003Jm-BO
-	for qemu-devel@archiver.kernel.org; Thu, 24 Oct 2019 07:29:00 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59336)
+	id 1iNbJS-0005PZ-7Z
+	for qemu-devel@archiver.kernel.org; Thu, 24 Oct 2019 07:29:54 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60453)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <armbru@redhat.com>) id 1iNatK-0000zk-UY
- for qemu-devel@nongnu.org; Thu, 24 Oct 2019 07:02:56 -0400
+ (envelope-from <mlureau@redhat.com>) id 1iNazb-0003f2-9G
+ for qemu-devel@nongnu.org; Thu, 24 Oct 2019 07:09:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1iNatE-0004qN-Fb
- for qemu-devel@nongnu.org; Thu, 24 Oct 2019 07:02:54 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:53603
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <mlureau@redhat.com>) id 1iNazZ-0008EA-Rx
+ for qemu-devel@nongnu.org; Thu, 24 Oct 2019 07:09:23 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55728)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1iNatE-0004oF-8D
- for qemu-devel@nongnu.org; Thu, 24 Oct 2019 07:02:48 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1571914966;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=OPBd4x/97RP023wsihC+zq3VLAl/9PZbaQaixKkNOCU=;
- b=SLWxCr3anMIxvDGhTi7mfPZh3FXf674TH1rkBngXSqxRYTiq8t7W+y3flKRXs+VyrmyMwx
- Agvx/pV+2Y95zFY5z3XnMQonfosZccA9RiPMnrzUxukTTNRAcumvGQO4MdEaJv2UbCI60N
- NaZyyL7jzdhm1e1lNQusKU6hLpH5NfE=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-376-PUB9gDmxPZCTX_6Z8-QMnw-1; Thu, 24 Oct 2019 07:02:42 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (Exim 4.71) (envelope-from <mlureau@redhat.com>) id 1iNazZ-0008Cx-Jn
+ for qemu-devel@nongnu.org; Thu, 24 Oct 2019 07:09:21 -0400
+Received: from mail-oi1-f198.google.com (mail-oi1-f198.google.com
+ [209.85.167.198])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 676E31800E04;
- Thu, 24 Oct 2019 11:02:41 +0000 (UTC)
-Received: from blackfin.pond.sub.org (unknown [10.36.118.123])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 33D84600C4;
- Thu, 24 Oct 2019 11:02:41 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 5C878113292F; Thu, 24 Oct 2019 13:02:37 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH 09/19] qapi: Fix enum doc comment checking
-Date: Thu, 24 Oct 2019 13:02:27 +0200
-Message-Id: <20191024110237.30963-10-armbru@redhat.com>
-In-Reply-To: <20191024110237.30963-1-armbru@redhat.com>
-References: <20191024110237.30963-1-armbru@redhat.com>
+ by mx1.redhat.com (Postfix) with ESMTPS id CA2774E4E6
+ for <qemu-devel@nongnu.org>; Thu, 24 Oct 2019 11:09:20 +0000 (UTC)
+Received: by mail-oi1-f198.google.com with SMTP id 6so805285oij.1
+ for <qemu-devel@nongnu.org>; Thu, 24 Oct 2019 04:09:20 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=Rpd4JWd7D9PJPkDkZ9ciXvbQnSeIpR/ey7a2SgA/3pA=;
+ b=uBlJbA3t1rS7Q4nOsGm84Ju771sVmqhHWAgQZaKHVEgm9aQFqeVLLGSo728O5351wJ
+ 0ebNEVA9L4jDLR2qKkI4mdIWrg9McTinDd0B+t9pjg/LJzB0ujyZu/J1EfYyDSszir9V
+ V/taR39GxycLCmPzWMIMb6tCyj/zOrFmDduu9covjgcC6pRUnpLdmitXyVn4kFREHqxD
+ 1fv6Mau8+dNQkC1jHA2M7XyBRp4xya/Fhl69BUGRIPkIe1LhPd1DCPHdBhBcXNr4wAlc
+ LmOZl7/qwgBoLN+hfMm2K/pxGiL5Riq2PUcnInNOetgGMj6RoIoc/xXNxtIbnHbJAAv+
+ Ha6g==
+X-Gm-Message-State: APjAAAXmHpyJWuoryCU6QsrYL1Q7gH/PHRosZK3G2tp4rPsLdqRQDuZF
+ xLTY5Ns/2qnNTZXCsl4jQBVCCxaMJnKdVpNhMfxSRxf2V9eBz8lUwoEVINz+/Q2Fl7hLUh7Sqph
+ /4cgrMo7gW2qENtE/HSlAO+jQWpSaboM=
+X-Received: by 2002:a05:6808:5c1:: with SMTP id
+ d1mr4181323oij.76.1571915358862; 
+ Thu, 24 Oct 2019 04:09:18 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqzv5RX3lvPErVAP7grCUbmKJsXO88mG/pvhRU/a0SrV7Hi+Esgrhr2k3P6Ik5tlOkEP1ErnYA3hXRVuphe/CzE=
+X-Received: by 2002:a05:6808:5c1:: with SMTP id
+ d1mr4181298oij.76.1571915358579; 
+ Thu, 24 Oct 2019 04:09:18 -0700 (PDT)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-MC-Unique: PUB9gDmxPZCTX_6Z8-QMnw-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=WINDOWS-1252
+References: <20191023173154.30051-1-marcandre.lureau@redhat.com>
+ <20191023173154.30051-22-marcandre.lureau@redhat.com>
+ <2d027692-e178-c1c8-8384-ad70ed345f29@redhat.com>
+In-Reply-To: <2d027692-e178-c1c8-8384-ad70ed345f29@redhat.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
+Date: Thu, 24 Oct 2019 13:09:06 +0200
+Message-ID: <CAMxuvay9kroZUo7ZbdhJqKAdp52rMmLGv0LBvktb68B2CKg+Mw@mail.gmail.com>
+Subject: Re: [PATCH v3 21/33] lance: replace PROP_PTR with PROP_LINK
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.61
+X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,88 +87,116 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, pkrempa@redhat.com, mdroth@linux.vnet.ibm.com
+Cc: Corey Minyard <cminyard@mvista.com>, "Michael S. Tsirkin" <mst@redhat.com>,
+ Jason Wang <jasowang@redhat.com>,
+ Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
+ qemu-devel <qemu-devel@nongnu.org>,
+ KONRAD Frederic <frederic.konrad@adacore.com>,
+ "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
+ Paul Burton <pburton@wavecomp.com>, Peter Maydell <peter.maydell@linaro.org>,
+ Magnus Damm <magnus.damm@gmail.com>,
+ =?UTF-8?Q?Herv=C3=A9_Poussineau?= <hpoussin@reactos.org>,
+ Artyom Tarasenko <atar4qemu@gmail.com>, Eduardo Habkost <ehabkost@redhat.com>,
+ Fabien Chouteau <chouteau@adacore.com>, qemu-arm <qemu-arm@nongnu.org>,
+ Richard Henderson <rth@twiddle.net>,
+ =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>,
+ Aleksandar Rikalo <arikalo@wavecomp.com>, qemu-ppc <qemu-ppc@nongnu.org>,
+ Aleksandar Markovic <amarkovic@wavecomp.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Enumeration type documentation comments are not checked, as
-demonstrated by test doc-bad-enum-member.  This is because we neglect
-to call self.doc.check() for enumeration types.  Messed up in
-816a57cd6e "qapi: Fix detection of bogus member documentation".  Fix
-it.
+Hi
 
-Signed-off-by: Markus Armbruster <armbru@redhat.com>
----
- scripts/qapi/schema.py                     |  4 ++++
- tests/qapi-schema/doc-bad-enum-member.err  |  1 +
- tests/qapi-schema/doc-bad-enum-member.json |  1 -
- tests/qapi-schema/doc-bad-enum-member.out  | 21 ---------------------
- 4 files changed, 5 insertions(+), 22 deletions(-)
 
-diff --git a/scripts/qapi/schema.py b/scripts/qapi/schema.py
-index 9b62c8d74d..0381e3cb40 100644
---- a/scripts/qapi/schema.py
-+++ b/scripts/qapi/schema.py
-@@ -229,6 +229,10 @@ class QAPISchemaEnumType(QAPISchemaType):
-             for m in self.members:
-                 self.doc.connect_member(m)
-=20
-+    def check_doc(self):
-+        if self.doc:
-+            self.doc.check()
-+
-     def is_implicit(self):
-         # See QAPISchema._make_implicit_enum_type() and ._def_predefineds(=
-)
-         return self.name.endswith('Kind') or self.name =3D=3D 'QType'
-diff --git a/tests/qapi-schema/doc-bad-enum-member.err b/tests/qapi-schema/=
-doc-bad-enum-member.err
-index e69de29bb2..dfa1e786d7 100644
---- a/tests/qapi-schema/doc-bad-enum-member.err
-+++ b/tests/qapi-schema/doc-bad-enum-member.err
-@@ -0,0 +1 @@
-+doc-bad-enum-member.json:3: the following documented members are not in th=
-e declaration: a
-diff --git a/tests/qapi-schema/doc-bad-enum-member.json b/tests/qapi-schema=
-/doc-bad-enum-member.json
-index 9f32fe64b4..9cab35c6e8 100644
---- a/tests/qapi-schema/doc-bad-enum-member.json
-+++ b/tests/qapi-schema/doc-bad-enum-member.json
-@@ -1,5 +1,4 @@
- # Members listed in the doc comment must exist in the actual schema
--# BUG: nonexistent @a is not rejected
-=20
- ##
- # @Foo:
-diff --git a/tests/qapi-schema/doc-bad-enum-member.out b/tests/qapi-schema/=
-doc-bad-enum-member.out
-index 6ca31c1e9b..e69de29bb2 100644
---- a/tests/qapi-schema/doc-bad-enum-member.out
-+++ b/tests/qapi-schema/doc-bad-enum-member.out
-@@ -1,21 +0,0 @@
--module None
--object q_empty
--enum QType
--    prefix QTYPE
--    member none
--    member qnull
--    member qnum
--    member qstring
--    member qdict
--    member qlist
--    member qbool
--module doc-bad-enum-member.json
--enum Foo
--    member b
--doc symbol=3DFoo
--    body=3D
--
--    arg=3Da
--a
--    arg=3Db
--b
---=20
-2.21.0
+On Thu, Oct 24, 2019 at 1:01 AM Philippe Mathieu-Daud=C3=A9
+<philmd@redhat.com> wrote:
+>
+> On 10/23/19 7:31 PM, Marc-Andr=C3=A9 Lureau wrote:
+> > Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> > Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+> > ---
+> >   hw/dma/sparc32_dma.c | 2 +-
+> >   hw/net/lance.c       | 5 ++---
+> >   hw/net/pcnet-pci.c   | 2 +-
+> >   hw/net/pcnet.h       | 2 +-
+> >   4 files changed, 5 insertions(+), 6 deletions(-)
+> >
+> > diff --git a/hw/dma/sparc32_dma.c b/hw/dma/sparc32_dma.c
+> > index 0e5bbcdc7f..3e4da0c47f 100644
+> > --- a/hw/dma/sparc32_dma.c
+> > +++ b/hw/dma/sparc32_dma.c
+> > @@ -346,7 +346,7 @@ static void sparc32_ledma_device_realize(DeviceStat=
+e *dev, Error **errp)
+> >       d =3D qdev_create(NULL, TYPE_LANCE);
+> >       object_property_add_child(OBJECT(dev), "lance", OBJECT(d), errp);
+> >       qdev_set_nic_properties(d, nd);
+> > -    qdev_prop_set_ptr(d, "dma", dev);
+> > +    object_property_set_link(OBJECT(d), OBJECT(dev), "dma", errp);
+> >       qdev_init_nofail(d);
+> >   }
+> >
+> > diff --git a/hw/net/lance.c b/hw/net/lance.c
+> > index 6631e2a4e0..4d96299041 100644
+> > --- a/hw/net/lance.c
+> > +++ b/hw/net/lance.c
+> > @@ -138,7 +138,8 @@ static void lance_instance_init(Object *obj)
+> >   }
+> >
+> >   static Property lance_properties[] =3D {
+> > -    DEFINE_PROP_PTR("dma", SysBusPCNetState, state.dma_opaque),
+> > +    DEFINE_PROP_LINK("dma", SysBusPCNetState, state.dma_opaque,
+> > +                     TYPE_DEVICE, DeviceState *),
+> >       DEFINE_NIC_PROPERTIES(SysBusPCNetState, state.conf),
+> >       DEFINE_PROP_END_OF_LIST(),
+> >   };
+> > @@ -153,8 +154,6 @@ static void lance_class_init(ObjectClass *klass, vo=
+id *data)
+> >       dc->reset =3D lance_reset;
+> >       dc->vmsd =3D &vmstate_lance;
+> >       dc->props =3D lance_properties;
+> > -    /* Reason: pointer property "dma" */
+> > -    dc->user_creatable =3D false;
+>
+> But we still can not start it with the -device option and set the dma,
+> can we?
 
+This is a sysbus device, so you can't. I'll add a commit comment.
+
+In theory, link property allows you to pass a QOM path to reference a
+QOM instance from -device.
+
+>
+> >   }
+> >
+> >   static const TypeInfo lance_info =3D {
+> > diff --git a/hw/net/pcnet-pci.c b/hw/net/pcnet-pci.c
+> > index 4723c30c79..d067d21e2c 100644
+> > --- a/hw/net/pcnet-pci.c
+> > +++ b/hw/net/pcnet-pci.c
+> > @@ -231,7 +231,7 @@ static void pci_pcnet_realize(PCIDevice *pci_dev, E=
+rror **errp)
+> >       s->irq =3D pci_allocate_irq(pci_dev);
+> >       s->phys_mem_read =3D pci_physical_memory_read;
+> >       s->phys_mem_write =3D pci_physical_memory_write;
+> > -    s->dma_opaque =3D pci_dev;
+> > +    s->dma_opaque =3D DEVICE(pci_dev);
+> >
+> >       pcnet_common_init(DEVICE(pci_dev), s, &net_pci_pcnet_info);
+> >   }
+> > diff --git a/hw/net/pcnet.h b/hw/net/pcnet.h
+> > index 28d19a5c6f..f49b213c57 100644
+> > --- a/hw/net/pcnet.h
+> > +++ b/hw/net/pcnet.h
+> > @@ -50,7 +50,7 @@ struct PCNetState_st {
+> >                            uint8_t *buf, int len, int do_bswap);
+> >       void (*phys_mem_write)(void *dma_opaque, hwaddr addr,
+> >                             uint8_t *buf, int len, int do_bswap);
+> > -    void *dma_opaque;
+> > +    DeviceState *dma_opaque;
+> >       int tx_busy;
+> >       int looptest;
+> >   };
+> >
 
