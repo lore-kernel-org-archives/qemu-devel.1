@@ -2,120 +2,90 @@ Return-Path: <SRS0=Jnn8=YR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1DF37CA9EAF
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 10:49:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3B992CA9EAF
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 10:51:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D8A2320679
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 10:49:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 08EC320679
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 10:51:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="vv8VkcjK"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D8A2320679
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="fFTSKMhk"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 08EC320679
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38492 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38578 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iNagK-0005Yb-8o
-	for qemu-devel@archiver.kernel.org; Thu, 24 Oct 2019 06:49:28 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57070)
+	id 1iNaiE-0000cc-KW
+	for qemu-devel@archiver.kernel.org; Thu, 24 Oct 2019 06:51:26 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55265)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iNadI-0002hv-Df
- for qemu-devel@nongnu.org; Thu, 24 Oct 2019 06:46:21 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1iNaOx-0000dt-BN
+ for qemu-devel@nongnu.org; Thu, 24 Oct 2019 06:31:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iNadH-0007AY-5B
- for qemu-devel@nongnu.org; Thu, 24 Oct 2019 06:46:20 -0400
-Received: from mail-he1eur02on0703.outbound.protection.outlook.com
- ([2a01:111:f400:fe05::703]:9190
- helo=EUR02-HE1-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1iNadC-00078D-Rd; Thu, 24 Oct 2019 06:46:15 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=j+jrMlkAxZ04Lqtlmy6ZNubomRtjucsdwKr2g5QRuOsjEKnf9JJR1aZCrk2l+XPC2Q0elTP0n0d25xw92e6KHuul+0LebRZDKTV95NoYzHXF5p+U7gVL/8+bkHJb4OKdK5eFxDUZ7XCpzumgbO2dZ3pMJgubKlZstZySBhLz/Li5kFP/srGXmExKXs/uJHQN5gw/isSptBH8+ELuRaiTxTgNquTO5USjZmz+qyUn/bwoA+7REqZEPYifVicmjJtECqkYSzj6yH8Fg09zrlp3JE9jId+iZzmWhErRSQccYrUp86vnaXXk2sg5+0F34VByJ3J0XUMvG9tYDK5zhLRJYQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=pbo5365KXbgSlej2izc6pKjLVNGUv3PjWpPEjpRCC8w=;
- b=e36bNcIUYuON/nXwYOON4s5OrNf9IwoSIditP23Z7I8oXkAfYP9epVDxk+S9kJMMawgU2VN6v0+jSHzCe8uQ5Ka3tVjIliZmr1s9N8lWHyffdxuKE7IAiK66CBzkW1rSThjK/MhGoozROArAImIwNs31B4lwrwhvSnNUDNiRIM0Y0dpejy4IR50TTFyq9gN+tkZegNtvuOlUoJ+/QfsYPEKhaS/2NjjCRk9gOVcsYFY3qF+cezslajIk8188zuKZ9U9jCDgboXEDcX6HiIqRvW5wbz43Tax6ZtfMxqDtVSA+PdZFjJm9IvXqFdmuAD4mU4X09uDqeq6rE1vpeaiXLw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=pbo5365KXbgSlej2izc6pKjLVNGUv3PjWpPEjpRCC8w=;
- b=vv8VkcjKbS9p55tFeJRkvJi0YnsxCfLT/zGzxNonPnZ417O6VBypSmw/u8RtzXIzmnZ+g+PVc7UBVpnGXqoB4zBme4yJVA6DvQOBK/RrEamNeBiRRqxCVvO7Fli2hJP0slG+Bj+MZPstJx1nEZWQaalFVE9vLXKfhduu+o8tSos=
-Received: from AM0PR08MB4435.eurprd08.prod.outlook.com (20.179.35.83) by
- AM0PR08MB4161.eurprd08.prod.outlook.com (20.178.203.93) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2367.24; Thu, 24 Oct 2019 10:46:11 +0000
-Received: from AM0PR08MB4435.eurprd08.prod.outlook.com
- ([fe80::4461:dd32:b358:110c]) by AM0PR08MB4435.eurprd08.prod.outlook.com
- ([fe80::4461:dd32:b358:110c%7]) with mapi id 15.20.2367.027; Thu, 24 Oct 2019
- 10:46:11 +0000
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-To: Kevin Wolf <kwolf@redhat.com>, "qemu-block@nongnu.org"
- <qemu-block@nongnu.org>
-Subject: Re: [PATCH 3/3] qcow2: Fix corruption bug in
- qcow2_detect_metadata_preallocation()
-Thread-Topic: [PATCH 3/3] qcow2: Fix corruption bug in
- qcow2_detect_metadata_preallocation()
-Thread-Index: AQHVibZRVvKZmtdwLUmUBJHEqcF3fadpnRCA
-Date: Thu, 24 Oct 2019 10:46:11 +0000
-Message-ID: <3cfee2ed-cebb-44ef-82ce-77a77c1a9e6a@virtuozzo.com>
-References: <20191023152620.13166-1-kwolf@redhat.com>
- <20191023152620.13166-4-kwolf@redhat.com>
-In-Reply-To: <20191023152620.13166-4-kwolf@redhat.com>
-Accept-Language: ru-RU, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-clientproxiedby: HE1PR02CA0097.eurprd02.prod.outlook.com
- (2603:10a6:7:29::26) To AM0PR08MB4435.eurprd08.prod.outlook.com
- (2603:10a6:208:144::19)
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=vsementsov@virtuozzo.com; 
-x-ms-exchange-messagesentrepresentingtype: 1
-x-tagtoolbar-keys: D20191024134609162
-x-originating-ip: [185.231.240.5]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 28c91069-5967-4170-e8b0-08d7586f6276
-x-ms-traffictypediagnostic: AM0PR08MB4161:
-x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <AM0PR08MB41618DAF7C8E47A5F7FC8D8EC16A0@AM0PR08MB4161.eurprd08.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:3513;
-x-forefront-prvs: 0200DDA8BE
-x-forefront-antispam-report: SFV:NSPM;
- SFS:(10019020)(366004)(39840400004)(346002)(136003)(396003)(376002)(189003)(199004)(11346002)(305945005)(54906003)(446003)(64756008)(14454004)(86362001)(476003)(81156014)(8676002)(8936002)(478600001)(186003)(31696002)(66556008)(486006)(66476007)(66946007)(66446008)(2501003)(66066001)(31686004)(386003)(25786009)(2616005)(102836004)(5660300002)(14444005)(256004)(6506007)(26005)(52116002)(71190400001)(99286004)(2906002)(7736002)(110136005)(4326008)(6116002)(6246003)(3846002)(6486002)(81166006)(6436002)(229853002)(36756003)(6512007)(71200400001)(316002)(76176011);
- DIR:OUT; SFP:1102; SCL:1; SRVR:AM0PR08MB4161;
- H:AM0PR08MB4435.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
- PTR:InfoNoRecords; MX:1; A:1; 
-received-spf: None (protection.outlook.com: virtuozzo.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: kqnlVQGNLsrA+dFZkZvOCThMX4Pqn7gO/ukvjKJj59HXZErgBNdl7jdBMvtKqF2GSA2vdgI7CTLHxLYbOVYodIuOjGJlQLdtvjAZiMiPLAbBB8C1R38KIZ1aaarpG7uKHp/b7p8XJjPX++gAaLwTjix7/PCNed5iXdCRnYhorVniccKZwdmYfk9SXaOTG69XZ1SYwPOuvaXN5Nl9HmPLlbwMpeX/qqcmJK93Lj5Vi//o984O3qoRYGRIZWozuDLxvDt61/PSZ9SW2dl0jKZQJQuCqm/OtOebKgaKcWT9PBPN45A0tqL6MenqL4yaivRsKRpsEtlg5luS89IhWhRrs4239zdUqfAi6ppMYfJKZLqZ/Hv164p+YAvvpnci24cYFgcrPVpO3OIBaOaNByGd9o066UTMyTCcR9Z5+CLpniTvPC3/iXYA8k00E4rnIL2M
-Content-Type: text/plain; charset="Windows-1252"
-Content-ID: <74C5A4897E03AB4B81344148B673ABD1@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: quoted-printable
+ (envelope-from <alex.bennee@linaro.org>) id 1iNaOw-0007nn-74
+ for qemu-devel@nongnu.org; Thu, 24 Oct 2019 06:31:31 -0400
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:46743)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1iNaOv-0007nQ-UD
+ for qemu-devel@nongnu.org; Thu, 24 Oct 2019 06:31:30 -0400
+Received: by mail-wr1-x444.google.com with SMTP id n15so14668879wrw.13
+ for <qemu-devel@nongnu.org>; Thu, 24 Oct 2019 03:31:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=U3W8sIO/2ZBTMPLoFcozYjR2QmMLtyhRSYqqV0DovIY=;
+ b=fFTSKMhkI56d1fwFDm9DK7QpOriiwWI025mJidCgT28Mw2dxEqfMFsIYC1lTMP3sNv
+ EafbVILZIHmDZVHjhe+b4E1HSwvIUIjA+yScohUIXiXTllDgXgiPFMejGZdfPjmIMGVj
+ hnSMCGS4Ls0i3qwV816/p5R0z9X0tFF6LCEWGSLvLxhTFmJi8sivAimceUYg/W+oe1wC
+ 8FekQ8VISl2wJGAkjaLQ1ff7NTmrTKK8tvrAIG1OT+TTns3BMW1oRKgN6Y+Xmj5Mz3Mf
+ tG9TkBqENdoMhhExlxr3ep6om7aUxYw8jK+8+d8O9D2EWMKf+citpCDnHLVbe7WZlmAE
+ H2GQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=U3W8sIO/2ZBTMPLoFcozYjR2QmMLtyhRSYqqV0DovIY=;
+ b=BxhoPDsRXhWzKvyNbXw5Zmx8KJDINFSdwZsp7rWLnwJuo7rwBpopMe7B0NScpNMef2
+ tyhOb+4ryhZsPBoi6IcNLL6ykFQC927YJIUcYEK9m+lCqmr3i6nhaESPXh6eNzO0kEvB
+ yuNYp7lKxfWFMq99OPD2u8UjmaKroeY2OIq5AdFLo+ByX4h0cesM82ioa/AblTVLRUhz
+ gkxL7Cu8SZlSMbiNCn5j8cGH94i2Xd/TFRlYO6rpH/r0RJBFmi0wYBUTgxffVEu58RvQ
+ TK1MEC65MB5DwoSajPVsvGv38UvgPhQjgRjqV9e0jGpwLfcAIx6l9LisP6srNbdZguKO
+ LywA==
+X-Gm-Message-State: APjAAAXL0uVbnkBE0z96vY8D2xI3tCZD0d9s9k/HkmSGVlRH3UZNl2KV
+ nBy4f+O7uPhDdNo8K7ATbUS7Vg==
+X-Google-Smtp-Source: APXvYqyV+EjgB2DFHunNqA4wVGmkEgfzxHqiRd4RnMsIttKqy8RGEh+rNxks3t6u1HjWYR68V5LvVg==
+X-Received: by 2002:adf:cf11:: with SMTP id o17mr3151322wrj.284.1571913088707; 
+ Thu, 24 Oct 2019 03:31:28 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id g5sm2246857wma.43.2019.10.24.03.31.27
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 24 Oct 2019 03:31:27 -0700 (PDT)
+Received: from zen.lan (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id D98C71FFA5;
+ Thu, 24 Oct 2019 11:22:41 +0100 (BST)
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v2 17/17] tests/docker: update Travis image to a more current
+ version
+Date: Thu, 24 Oct 2019 11:22:40 +0100
+Message-Id: <20191024102240.2778-18-alex.bennee@linaro.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20191024102240.2778-1-alex.bennee@linaro.org>
+References: <20191024102240.2778-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 28c91069-5967-4170-e8b0-08d7586f6276
-X-MS-Exchange-CrossTenant-originalarrivaltime: 24 Oct 2019 10:46:11.4507 (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: vwGVBcgcD8LbSnzv+/GnRGdZGxY/hf9RTsQLKdO2wzIKr1mszxnUKWiKD8fMmBq8LZq8RF1b/qXR42OBZHlZ3sriwwb9mGR+qSLomVotLdg=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM0PR08MB4161
-X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
-X-Received-From: 2a01:111:f400:fe05::703
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::444
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -127,91 +97,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "psyhomb@gmail.com" <psyhomb@gmail.com>,
- "michael@weiser.dinsnail.net" <michael@weiser.dinsnail.net>,
- Denis Lunev <den@virtuozzo.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "qemu-stable@nongnu.org" <qemu-stable@nongnu.org>,
- "dgilbert@redhat.com" <dgilbert@redhat.com>,
- "mreitz@redhat.com" <mreitz@redhat.com>,
- "lersek@redhat.com" <lersek@redhat.com>
+Cc: fam@euphon.net, berrange@redhat.com, stefanb@linux.vnet.ibm.com,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ richard.henderson@linaro.org, f4bug@amsat.org,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>, cota@braap.org,
+ stefanha@redhat.com, marcandre.lureau@redhat.com, pbonzini@redhat.com,
+ aurelien@aurel32.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-23.10.2019 18:26, Kevin Wolf wrote:
-> qcow2_detect_metadata_preallocation() calls qcow2_get_refcount() which
-> requires s->lock to be taken to protect its accesses to the refcount
-> table and refcount blocks. However, nothing in this code path actually
-> took the lock. This could cause the same cache entry to be used by two
-> requests at the same time, for different tables at different offsets,
-> resulting in image corruption.
->=20
-> As it would be preferable to base the detection on consistent data (even
-> though it's just heuristics), let's take the lock not only around the
-> qcow2_get_refcount() calls, but around the whole function.
->=20
-> This patch takes the lock in qcow2_co_block_status() earlier and asserts
-> in qcow2_detect_metadata_preallocation() that we hold the lock.
->=20
-> Fixes: 69f47505ee66afaa513305de0c1895a224e52c45
-> Cc: qemu-stable@nongnu.org
-> Reported-by: Michael Weiser <michael@weiser.dinsnail.net>
-> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+This isn't the latest one available on hub.docker.com but it does
+match the ID reported by the Xenial builds running on Travis:
 
-Oh, I'm very sorry. I was going to backport this patch, and found that it's
-fixed in our downstream long ago, even before last upstream version patch s=
-ent :(
+  instance: ... travis-ci-sardonyx-xenial-1553530528-f909ac5
 
-Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+---
+ tests/docker/dockerfiles/travis.docker | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
 
-> ---
->   block/qcow2-refcount.c | 2 ++
->   block/qcow2.c          | 3 ++-
->   2 files changed, 4 insertions(+), 1 deletion(-)
->=20
-> diff --git a/block/qcow2-refcount.c b/block/qcow2-refcount.c
-> index ef965d7895..0d64bf5a5e 100644
-> --- a/block/qcow2-refcount.c
-> +++ b/block/qcow2-refcount.c
-> @@ -3455,6 +3455,8 @@ int qcow2_detect_metadata_preallocation(BlockDriver=
-State *bs)
->       int64_t i, end_cluster, cluster_count =3D 0, threshold;
->       int64_t file_length, real_allocation, real_clusters;
->  =20
-> +    qemu_co_mutex_assert_locked(&s->lock);
-> +
->       file_length =3D bdrv_getlength(bs->file->bs);
->       if (file_length < 0) {
->           return file_length;
-> diff --git a/block/qcow2.c b/block/qcow2.c
-> index 8b05933565..0bc69e6996 100644
-> --- a/block/qcow2.c
-> +++ b/block/qcow2.c
-> @@ -1916,6 +1916,8 @@ static int coroutine_fn qcow2_co_block_status(Block=
-DriverState *bs,
->       unsigned int bytes;
->       int status =3D 0;
->  =20
-> +    qemu_co_mutex_lock(&s->lock);
-> +
->       if (!s->metadata_preallocation_checked) {
->           ret =3D qcow2_detect_metadata_preallocation(bs);
->           s->metadata_preallocation =3D (ret =3D=3D 1);
-> @@ -1923,7 +1925,6 @@ static int coroutine_fn qcow2_co_block_status(Block=
-DriverState *bs,
->       }
->  =20
->       bytes =3D MIN(INT_MAX, count);
-> -    qemu_co_mutex_lock(&s->lock);
->       ret =3D qcow2_get_cluster_offset(bs, offset, &bytes, &cluster_offse=
-t);
->       qemu_co_mutex_unlock(&s->lock);
->       if (ret < 0) {
->=20
+diff --git a/tests/docker/dockerfiles/travis.docker b/tests/docker/dockerfiles/travis.docker
+index ea14da29d97..e8eb48dccfd 100644
+--- a/tests/docker/dockerfiles/travis.docker
++++ b/tests/docker/dockerfiles/travis.docker
+@@ -1,4 +1,8 @@
+-FROM travisci/ci-sardonyx:packer-1546978056-2c98a19
++#
++# Travis Image - this is broadly the same image that we run our CI
++# tests on.
++#
++FROM travisci/ci-sardonyx:packer-1552557266-f909ac5
+ ENV DEBIAN_FRONTEND noninteractive
+ ENV LANG en_US.UTF-8
+ ENV LC_ALL en_US.UTF-8
+-- 
+2.20.1
 
-
---=20
-Best regards,
-Vladimir
 
