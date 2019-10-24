@@ -2,92 +2,87 @@ Return-Path: <SRS0=Jnn8=YR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7EC3CCA9EAF
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 16:10:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 33FDCCA9EAF
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 16:11:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 54357205F4
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 16:10:57 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 54357205F4
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id F2DBC2166E
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 16:11:30 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="VVvQBoX2"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F2DBC2166E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46254 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46268 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iNfhP-00056b-W3
-	for qemu-devel@archiver.kernel.org; Thu, 24 Oct 2019 12:10:56 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39180)
+	id 1iNfhx-0006EB-Im
+	for qemu-devel@archiver.kernel.org; Thu, 24 Oct 2019 12:11:29 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53780)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <groug@kaod.org>) id 1iNe5H-0002Xs-84
- for qemu-devel@nongnu.org; Thu, 24 Oct 2019 10:27:30 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1iNfdA-00069S-RR
+ for qemu-devel@nongnu.org; Thu, 24 Oct 2019 12:06:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <groug@kaod.org>) id 1iNe5F-0004XS-Jl
- for qemu-devel@nongnu.org; Thu, 24 Oct 2019 10:27:26 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:58150)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <groug@kaod.org>) id 1iNe5F-0004Vz-CD
- for qemu-devel@nongnu.org; Thu, 24 Oct 2019 10:27:25 -0400
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
- by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
- x9OEOT7L133765
- for <qemu-devel@nongnu.org>; Thu, 24 Oct 2019 10:27:23 -0400
-Received: from e06smtp01.uk.ibm.com (e06smtp01.uk.ibm.com [195.75.94.97])
- by mx0a-001b2d01.pphosted.com with ESMTP id 2vuctxaptf-1
- (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
- for <qemu-devel@nongnu.org>; Thu, 24 Oct 2019 10:27:22 -0400
-Received: from localhost
- by e06smtp01.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
- Violators will be prosecuted
- for <qemu-devel@nongnu.org> from <groug@kaod.org>;
- Thu, 24 Oct 2019 15:27:20 +0100
-Received: from b06cxnps4074.portsmouth.uk.ibm.com (9.149.109.196)
- by e06smtp01.uk.ibm.com (192.168.101.131) with IBM ESMTP SMTP Gateway:
- Authorized Use Only! Violators will be prosecuted; 
- (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
- Thu, 24 Oct 2019 15:27:18 +0100
-Received: from d06av24.portsmouth.uk.ibm.com (d06av24.portsmouth.uk.ibm.com
- [9.149.105.60])
- by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- x9OERHAj10223780
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Thu, 24 Oct 2019 14:27:17 GMT
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 159F942041;
- Thu, 24 Oct 2019 14:27:17 +0000 (GMT)
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id D6F2442042;
- Thu, 24 Oct 2019 14:27:16 +0000 (GMT)
-Received: from bahia.lan (unknown [9.145.36.67])
- by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
- Thu, 24 Oct 2019 14:27:16 +0000 (GMT)
-Subject: [PATCH 0/3] ppc: Fix 'info pic' crash
-From: Greg Kurz <groug@kaod.org>
-To: David Gibson <david@gibson.dropbear.id.au>
-Date: Thu, 24 Oct 2019 16:27:16 +0200
-User-Agent: StGit/unknown-version
+ (envelope-from <alex.bennee@linaro.org>) id 1iNfd9-0002Yl-Bo
+ for qemu-devel@nongnu.org; Thu, 24 Oct 2019 12:06:32 -0400
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:45900)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1iNfd9-0002YP-4k
+ for qemu-devel@nongnu.org; Thu, 24 Oct 2019 12:06:31 -0400
+Received: by mail-wr1-x444.google.com with SMTP id q13so21750759wrs.12
+ for <qemu-devel@nongnu.org>; Thu, 24 Oct 2019 09:06:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=iMlvgodQ6Jkp63ZYQQNtCc0oq2SvqraFWnbtUZjuzhc=;
+ b=VVvQBoX2WKhAyHjdKpTclcdH4PVICQHTDrqq+87XTVh1V1W9NtbtKlph3omACrs/rg
+ lnTZZyPPbsWicZ6GiXXhwAaJ8EFNBb6jkkrJqPkgRu5ubuyyPi7qkY6n2wdKVS9Aotri
+ RyzYgMRZohxjM89th+UjrtRggAVkWvVCybk1G6az35ZH/SIB7FENj3ToJlYl2zdhDLjB
+ JW0eXY39XVVperxWsgQhMhEQT8kPLhdcKpYQL8eVNE3QB225c9AhxkCxPaGitDn8x2ub
+ ztBOFs7+2l9DgxC0ZGCavGZcdfDypwyaJWeNV9YhpaaFRyG5+TKi+1nu2DtbWPElpzX3
+ TrOw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=iMlvgodQ6Jkp63ZYQQNtCc0oq2SvqraFWnbtUZjuzhc=;
+ b=hJF99ngHtiFIXPtO13xl8sf5g/qTzhguLO8uJPH/BL7JTgjMk99Il8DBnFE4qwn0hl
+ fUNSo0AflrVTDwOc9kUDqDosYi/kiHe0z/2ogAvqYvPJbSALuLnM5vPdzzKVZsk0OkN/
+ saNQnwK0craieq90MX2PZh8befc8Ns9tavYk3I6sEVmENere73XsqYawgEseyuzSyvb3
+ 6XVOLvNgsKv/R3CvIeIx/m2Fclb9wE0tDGktpUVsVq/Y+xsJMV1LID2H2o4xULzZkxgm
+ JiGT42HWvt0iMG85TuSlWoqNcbyshOt5AB38rt/m7e7prwUgRbiCKenL50nEKgdjqMhC
+ wOrA==
+X-Gm-Message-State: APjAAAWz6g4yThPbcfHaD30+c9o8IM9CduMCa6oNHG/fAs87Cnu7CYOp
+ duoD9L7hNTGlgNUhDvJ2IXKSUA==
+X-Google-Smtp-Source: APXvYqwEVpWkPlTXXwPDDshzxieu2/r98ye8bf0EdrqX0Gh52Xi0xPSUapQTlfI6V2/1CU9iUBbDzw==
+X-Received: by 2002:adf:efd1:: with SMTP id i17mr4386992wrp.172.1571933189014; 
+ Thu, 24 Oct 2019 09:06:29 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id a13sm27420032wrf.73.2019.10.24.09.06.28
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 24 Oct 2019 09:06:28 -0700 (PDT)
+Received: from zen.lan (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 8D31F1FF87;
+ Thu, 24 Oct 2019 17:06:27 +0100 (BST)
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: qemu-devel@nongnu.org
+Subject: [PATCH] travis.yml: enable linux-gcc-debug-tcg cache
+Date: Thu, 24 Oct 2019 17:06:19 +0100
+Message-Id: <20191024160619.14179-1-alex.bennee@linaro.org>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-x-cbid: 19102414-4275-0000-0000-00000376E9F5
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19102414-4276-0000-0000-0000388A14C3
-Message-Id: <157192723646.3146912.1271674896169655201.stgit@bahia.lan>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
- definitions=2019-10-24_09:, , signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- priorityscore=1501
- malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
- clxscore=1034 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=800 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1908290000 definitions=main-1910240135
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
-X-Received-From: 148.163.156.1
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::444
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,91 +94,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-ppc@nongnu.org, =?utf-8?q?C=C3=A9dric?= Le Goater <clg@kaod.org>,
- qemu-devel@nongnu.org
+Cc: Fam Zheng <fam@euphon.net>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The interrupt presenters are currently parented to their associated
-VCPU, and we rely on CPU_FOREACH() when we need to perform a specific
-task with them. Like exposing their state with 'info pic', or finding
-the target VCPU for an interrupt when using the XIVE controller.
+Create a new cache for the --enable-debug-tcg builds which is separate
+from the normal debug builds which generate different code. We also
+enable debug-tcg for the new plugins based builds as we want to ensure
+any breakage to TCG is picked up by the sanity checks.
 
-We recently realized that the latter could crash QEMU because CPU_FOREACH()
-can race with CPU hotplug. This got fixed by checking the presenter pointer
-under the CPU was set (commit 627fa61746f7), but I'm not that sure that
-this is enough since the presenter pointers also get stale at some point
-during CPU unplug. And we still have other users of CPU_FOREACH(), namely
-'info pic' with both XICS and XIVE, that have the very same problem:
-
-With XIVE:
-
-Thread 1 "qemu-system-ppc" received signal SIGSEGV, Segmentation fault.
-0x00000001003d2848 in xive_tctx_pic_print_info (tctx=0x101ae5280, 
-    mon=0x7fffffffe180) at /home/greg/Work/qemu/qemu-spapr/hw/intc/xive.c:526
-526         int cpu_index = tctx->cs ? tctx->cs->cpu_index : -1;
-(gdb) p tctx
-$1 = (XiveTCTX *) 0x101ae5280
-(gdb) p tctx->cs
-$2 = (CPUState *) 0x2057512020203a5d <-- tctx is stale
-(gdb) p tctx->cs->cpu_index
-Cannot access memory at address 0x205751202020bead
-
-With XICS:
-
-Thread 1 "qemu-system-ppc" received signal SIGSEGV, Segmentation fault.
-0x00000001003cc39c in icp_pic_print_info (icp=0x10244ccf0, mon=0x7fffffffe940)
-    at /home/greg/Work/qemu/qemu-spapr/hw/intc/xics.c:47
-47          int cpu_index = icp->cs ? icp->cs->cpu_index : -1;
-(gdb) p icp
-$1 = (ICPState *) 0x10244ccf0
-(gdb) p icp->cs
-$2 = (CPUState *) 0x524958203220 <-- icp is stale
-(gdb) p icp->cs->cpu_index
-Cannot access memory at address 0x52495820b670
-
-It may be worth finding a way to address this globally instead of
-open-coding the check of the presenter pointer everywhere because
-this is fragile. I gave a try with this series:
-
-	[0/6] ppc: Reparent the interrupt presenter
-
-	https://patchwork.ozlabs.org/cover/1182224/
-
-but it requires some more reflexion. Also, we're about to enter
-softfreeze, and it seems better to come up with a simpler fix.
-
-Let's forget the reparenting and check the presenter pointers
-where needed instead. Patch 1 from the previous series was changed
-to also NULLify presenter pointers, so that they can be used to
-filter out unwanted vCPUs in patch 3. I've kept patch 2 because
-it's a fix in the same area, but it isn't related to the QEMU
-crashes.
-
---
-Greg
-
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 ---
+ .travis.yml | 14 +++++++-------
+ 1 file changed, 7 insertions(+), 7 deletions(-)
 
-Greg Kurz (3):
-      ppc: Add intc_destroy() handlers to SpaprInterruptController/PnvChip
-      xive, xics: Fix reference counting on CPU objects
-      ppc: Skip partially initialized vCPUs in 'info pic'
-
-
- hw/intc/spapr_xive.c       |   10 ++++++++++
- hw/intc/xics.c             |   22 +++++++++++++++++++++-
- hw/intc/xics_spapr.c       |   10 ++++++++++
- hw/intc/xive.c             |   20 +++++++++++++++++++-
- hw/ppc/pnv.c               |   21 +++++++++++++++++++++
- hw/ppc/pnv_core.c          |    7 ++++---
- hw/ppc/spapr_cpu_core.c    |    7 +------
- hw/ppc/spapr_irq.c         |   14 ++++++++++++++
- include/hw/ppc/pnv.h       |    1 +
- include/hw/ppc/spapr_irq.h |    2 ++
- include/hw/ppc/xics.h      |    1 +
- include/hw/ppc/xive.h      |    1 +
- 12 files changed, 105 insertions(+), 11 deletions(-)
+diff --git a/.travis.yml b/.travis.yml
+index e3f10a93683..34bc8134f5b 100644
+--- a/.travis.yml
++++ b/.travis.yml
+@@ -135,7 +135,7 @@ matrix:
+     # TCG debug can be run just on its own and is mostly agnostic to user/softmmu distinctions
+     - env:
+         - CONFIG="--enable-debug-tcg --disable-system"
+-        - CACHE_NAME="${TRAVIS_BRANCH}-linux-gcc-debug"
++        - CACHE_NAME="${TRAVIS_BRANCH}-linux-gcc-debug-tcg"
+ 
+ 
+     - env:
+@@ -336,29 +336,29 @@ matrix:
+     - env:
+         - CONFIG="--disable-system --enable-debug-tcg"
+         - TEST_CMD="make -j3 check-tcg V=1"
+-        - CACHE_NAME="${TRAVIS_BRANCH}-linux-gcc-default"
++        - CACHE_NAME="${TRAVIS_BRANCH}-linux-gcc-debug-tcg"
+ 
+ 
+     # Run check-tcg against linux-user (with plugins)
+     # we skip sparc64-linux-user until it has been fixed somewhat
+     - env:
+-        - CONFIG="--disable-system --enable-plugins --target-list-exclude=sparc64-linux-user"
++        - CONFIG="--disable-system --enable-plugins --enable-debug-tcg --target-list-exclude=sparc64-linux-user"
+         - TEST_CMD="make -j3 check-tcg V=1"
+-        - CACHE_NAME="${TRAVIS_BRANCH}-linux-gcc-default"
++        - CACHE_NAME="${TRAVIS_BRANCH}-linux-gcc-debug-tcg"
+ 
+ 
+     # Run check-tcg against softmmu targets
+     - env:
+         - CONFIG="--enable-debug-tcg --target-list=xtensa-softmmu,arm-softmmu,aarch64-softmmu,alpha-softmmu"
+         - TEST_CMD="make -j3 check-tcg V=1"
+-        - CACHE_NAME="${TRAVIS_BRANCH}-linux-gcc-default"
++        - CACHE_NAME="${TRAVIS_BRANCH}-linux-gcc-debug-tcg"
+ 
+ 
+     # Run check-tcg against softmmu targets (with plugins)
+     - env:
+-        - CONFIG="--enable-plugins --target-list=xtensa-softmmu,arm-softmmu,aarch64-softmmu,alpha-softmmu"
++        - CONFIG="--enable-plugins --enable-debug-tcg --target-list=xtensa-softmmu,arm-softmmu,aarch64-softmmu,alpha-softmmu"
+         - TEST_CMD="make -j3 check-tcg V=1"
+-        - CACHE_NAME="${TRAVIS_BRANCH}-linux-gcc-default"
++        - CACHE_NAME="${TRAVIS_BRANCH}-linux-gcc-debug-tcg"
+ 
+ 
+     # Release builds
+-- 
+2.20.1
 
 
