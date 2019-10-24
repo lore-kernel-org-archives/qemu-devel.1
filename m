@@ -2,69 +2,80 @@ Return-Path: <SRS0=Jnn8=YR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CB0B3CA9EAF
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 11:26:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 02C7ECA9EBC
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 11:29:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8111920578
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 11:26:48 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8111920578
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id BF52A2166E
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 11:29:01 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SLWxCr3a"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BF52A2166E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39840 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39890 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iNbGR-0006Uq-9t
-	for qemu-devel@archiver.kernel.org; Thu, 24 Oct 2019 07:26:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46761)
+	id 1iNbIa-0003Jm-BO
+	for qemu-devel@archiver.kernel.org; Thu, 24 Oct 2019 07:29:00 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59336)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <no-reply@patchew.org>) id 1iNZQq-0001Sr-6K
- for qemu-devel@nongnu.org; Thu, 24 Oct 2019 05:29:26 -0400
+ (envelope-from <armbru@redhat.com>) id 1iNatK-0000zk-UY
+ for qemu-devel@nongnu.org; Thu, 24 Oct 2019 07:02:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <no-reply@patchew.org>) id 1iNZQo-0004HR-GE
- for qemu-devel@nongnu.org; Thu, 24 Oct 2019 05:29:23 -0400
-Resent-Date: Thu, 24 Oct 2019 05:29:23 -0400
-Resent-Message-Id: <E1iNZQo-0004HR-GE@eggs.gnu.org>
-Received: from sender4-of-o54.zoho.com ([136.143.188.54]:21428)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <no-reply@patchew.org>)
- id 1iNZQo-0004H5-6a
- for qemu-devel@nongnu.org; Thu, 24 Oct 2019 05:29:22 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1571909354; cv=none; 
- d=zohomail.com; s=zohoarc; 
- b=ZkARMz4Vt+6qqxp8wAGqQx7YTud3CvKol7k/S0KDH1dXXkF9RLuQ5ZYLM5SMTM0P6MGYA8tg1YY3pcQWWyo1xdOcEHfXyD9hl0dPnazdLL+dAwcIr9YXuM27YFVSqw43eTyxhJR7t3NAqacquiK5Bwg1NvNQpnh1WhNchpY7iC8=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
- s=zohoarc; t=1571909354;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
- bh=Vf16AC3NZADSnfS2uVRSd3bDXSs874zvBx700MfjUDQ=; 
- b=PyHwkhYdHCoYJ0lpcY9lCU+sD1rXw5dGg2IvPBSm2DDi/bDJUYUZBwlNvH3Gu+a2siDEjOudWD9OwBhO7k0zSQC/mAa5w+9MQ2ldWCJODB30Q37XK3eKgJ/6aVjJXvYVDrreQm/CovlVZS3BvQ0GKlZHLAozc4CuTo5TLKKxhZM=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
- dkim=pass  header.i=patchew.org;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1571909350475183.08446252534384;
- Thu, 24 Oct 2019 02:29:10 -0700 (PDT)
-In-Reply-To: <20191023154505.30521-1-richard.henderson@linaro.org>
-Subject: Re: [PATCH v2 0/7] exec: Improve code for TARGET_PAGE_BITS_VARY
-Message-ID: <157190934929.24565.17569162436118838014@37313f22b938>
+ (envelope-from <armbru@redhat.com>) id 1iNatE-0004qN-Fb
+ for qemu-devel@nongnu.org; Thu, 24 Oct 2019 07:02:54 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:53603
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1iNatE-0004oF-8D
+ for qemu-devel@nongnu.org; Thu, 24 Oct 2019 07:02:48 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1571914966;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=OPBd4x/97RP023wsihC+zq3VLAl/9PZbaQaixKkNOCU=;
+ b=SLWxCr3anMIxvDGhTi7mfPZh3FXf674TH1rkBngXSqxRYTiq8t7W+y3flKRXs+VyrmyMwx
+ Agvx/pV+2Y95zFY5z3XnMQonfosZccA9RiPMnrzUxukTTNRAcumvGQO4MdEaJv2UbCI60N
+ NaZyyL7jzdhm1e1lNQusKU6hLpH5NfE=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-376-PUB9gDmxPZCTX_6Z8-QMnw-1; Thu, 24 Oct 2019 07:02:42 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 676E31800E04;
+ Thu, 24 Oct 2019 11:02:41 +0000 (UTC)
+Received: from blackfin.pond.sub.org (unknown [10.36.118.123])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 33D84600C4;
+ Thu, 24 Oct 2019 11:02:41 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id 5C878113292F; Thu, 24 Oct 2019 13:02:37 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH 09/19] qapi: Fix enum doc comment checking
+Date: Thu, 24 Oct 2019 13:02:27 +0200
+Message-Id: <20191024110237.30963-10-armbru@redhat.com>
+In-Reply-To: <20191024110237.30963-1-armbru@redhat.com>
+References: <20191024110237.30963-1-armbru@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: richard.henderson@linaro.org
-Date: Thu, 24 Oct 2019 02:29:10 -0700 (PDT)
-X-ZohoMailClient: External
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-MC-Unique: PUB9gDmxPZCTX_6Z8-QMnw-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=WINDOWS-1252
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 136.143.188.54
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -76,58 +87,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: pbonzini@redhat.com, alex.bennee@linaro.org, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, pkrempa@redhat.com, mdroth@linux.vnet.ibm.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MTAyMzE1NDUwNS4zMDUy
-MS0xLXJpY2hhcmQuaGVuZGVyc29uQGxpbmFyby5vcmcvCgoKCkhpLAoKVGhpcyBzZXJpZXMgc2Vl
-bXMgdG8gaGF2ZSBzb21lIGNvZGluZyBzdHlsZSBwcm9ibGVtcy4gU2VlIG91dHB1dCBiZWxvdyBm
-b3IKbW9yZSBpbmZvcm1hdGlvbjoKClN1YmplY3Q6IFtQQVRDSCB2MiAwLzddIGV4ZWM6IEltcHJv
-dmUgY29kZSBmb3IgVEFSR0VUX1BBR0VfQklUU19WQVJZClR5cGU6IHNlcmllcwpNZXNzYWdlLWlk
-OiAyMDE5MTAyMzE1NDUwNS4zMDUyMS0xLXJpY2hhcmQuaGVuZGVyc29uQGxpbmFyby5vcmcKCj09
-PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKZ2l0IHJldi1wYXJzZSBiYXNlID4g
-L2Rldi9udWxsIHx8IGV4aXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAw
-CmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQpnaXQgY29uZmlnIC0tbG9jYWwg
-ZGlmZi5hbGdvcml0aG0gaGlzdG9ncmFtCi4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJh
-Y2sgYmFzZS4uCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpTd2l0Y2hlZCB0byBhIG5ldyBicmFu
-Y2ggJ3Rlc3QnCjE5Y2Q3NTMgZXhlYzogQ2FjaGUgVEFSR0VUX1BBR0VfTUFTSyBmb3IgVEFSR0VU
-X1BBR0VfQklUU19WQVJZCjYwNmIwNzAgZXhlYzogUHJvbW90ZSBUQVJHRVRfUEFHRV9NQVNLIHRv
-IHRhcmdldF9sb25nCjg5NmQ0MmIgZXhlYzogUmVzdHJpY3QgVEFSR0VUX1BBR0VfQklUU19WQVJZ
-IGFzc2VydCB0byBDT05GSUdfREVCVUdfVENHCjcyMmQyMmUgZXhlYzogVXNlIGNvbnN0IGFsaWFz
-IGZvciBUQVJHRVRfUEFHRV9CSVRTX1ZBUlkKNmFjNGVmYyBjb25maWd1cmU6IERldGVjdCBjb21w
-aWxlciBzdXBwb3J0IGZvciBfX2F0dHJpYnV0ZV9fKChhbGlhcykpCmUyOGQwMjUgZXhlYzogU3Bs
-aXQgb3V0IHZhcmlhYmxlIHBhZ2Ugc2l6ZSBzdXBwb3J0IHRvIGV4ZWMtdmFyeS5jCjFkMDIyNTEg
-Y3B1OiB1c2UgUk9VTkRfVVAoKSB0byBkZWZpbmUgeHh4X1BBR0VfQUxJR04KCj09PSBPVVRQVVQg
-QkVHSU4gPT09CjEvNyBDaGVja2luZyBjb21taXQgMWQwMjI1MTY2ZmRlIChjcHU6IHVzZSBST1VO
-RF9VUCgpIHRvIGRlZmluZSB4eHhfUEFHRV9BTElHTikKMi83IENoZWNraW5nIGNvbW1pdCBlMjhk
-MDI1YzdjNmMgKGV4ZWM6IFNwbGl0IG91dCB2YXJpYWJsZSBwYWdlIHNpemUgc3VwcG9ydCB0byBl
-eGVjLXZhcnkuYykKV0FSTklORzogYWRkZWQsIG1vdmVkIG9yIGRlbGV0ZWQgZmlsZShzKSwgZG9l
-cyBNQUlOVEFJTkVSUyBuZWVkIHVwZGF0aW5nPwojMzM6IApuZXcgZmlsZSBtb2RlIDEwMDY0NAoK
-dG90YWw6IDAgZXJyb3JzLCAxIHdhcm5pbmdzLCAxMjUgbGluZXMgY2hlY2tlZAoKUGF0Y2ggMi83
-IGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJv
-cnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2Vl
-CkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCjMvNyBDaGVja2luZyBjb21taXQgNmFjNGVmYzMx
-NjhjIChjb25maWd1cmU6IERldGVjdCBjb21waWxlciBzdXBwb3J0IGZvciBfX2F0dHJpYnV0ZV9f
-KChhbGlhcykpKQo0LzcgQ2hlY2tpbmcgY29tbWl0IDcyMmQyMmU0YWY1MiAoZXhlYzogVXNlIGNv
-bnN0IGFsaWFzIGZvciBUQVJHRVRfUEFHRV9CSVRTX1ZBUlkpCkVSUk9SOiBleHRlcm5zIHNob3Vs
-ZCBiZSBhdm9pZGVkIGluIC5jIGZpbGVzCiM2NTogRklMRTogZXhlYy12YXJ5LmM6NTc6CitleHRl
-cm4gY29uc3QgVGFyZ2V0UGFnZUJpdHMgdGFyZ2V0X3BhZ2UKCnRvdGFsOiAxIGVycm9ycywgMCB3
-YXJuaW5ncywgMTAzIGxpbmVzIGNoZWNrZWQKClBhdGNoIDQvNyBoYXMgc3R5bGUgcHJvYmxlbXMs
-IHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2
-ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5U
-QUlORVJTLgoKNS83IENoZWNraW5nIGNvbW1pdCA4OTZkNDJiOWFjNjggKGV4ZWM6IFJlc3RyaWN0
-IFRBUkdFVF9QQUdFX0JJVFNfVkFSWSBhc3NlcnQgdG8gQ09ORklHX0RFQlVHX1RDRykKNi83IENo
-ZWNraW5nIGNvbW1pdCA2MDZiMDcwZWE3NGUgKGV4ZWM6IFByb21vdGUgVEFSR0VUX1BBR0VfTUFT
-SyB0byB0YXJnZXRfbG9uZykKNy83IENoZWNraW5nIGNvbW1pdCAxOWNkNzUzN2I5MjYgKGV4ZWM6
-IENhY2hlIFRBUkdFVF9QQUdFX01BU0sgZm9yIFRBUkdFVF9QQUdFX0JJVFNfVkFSWSkKPT09IE9V
-VFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKClRoZSBmdWxs
-IGxvZyBpcyBhdmFpbGFibGUgYXQKaHR0cDovL3BhdGNoZXcub3JnL2xvZ3MvMjAxOTEwMjMxNTQ1
-MDUuMzA1MjEtMS1yaWNoYXJkLmhlbmRlcnNvbkBsaW5hcm8ub3JnL3Rlc3RpbmcuY2hlY2twYXRj
-aC8/dHlwZT1tZXNzYWdlLgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0
-Y2hldyBbaHR0cHM6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRv
-IHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
+Enumeration type documentation comments are not checked, as
+demonstrated by test doc-bad-enum-member.  This is because we neglect
+to call self.doc.check() for enumeration types.  Messed up in
+816a57cd6e "qapi: Fix detection of bogus member documentation".  Fix
+it.
+
+Signed-off-by: Markus Armbruster <armbru@redhat.com>
+---
+ scripts/qapi/schema.py                     |  4 ++++
+ tests/qapi-schema/doc-bad-enum-member.err  |  1 +
+ tests/qapi-schema/doc-bad-enum-member.json |  1 -
+ tests/qapi-schema/doc-bad-enum-member.out  | 21 ---------------------
+ 4 files changed, 5 insertions(+), 22 deletions(-)
+
+diff --git a/scripts/qapi/schema.py b/scripts/qapi/schema.py
+index 9b62c8d74d..0381e3cb40 100644
+--- a/scripts/qapi/schema.py
++++ b/scripts/qapi/schema.py
+@@ -229,6 +229,10 @@ class QAPISchemaEnumType(QAPISchemaType):
+             for m in self.members:
+                 self.doc.connect_member(m)
+=20
++    def check_doc(self):
++        if self.doc:
++            self.doc.check()
++
+     def is_implicit(self):
+         # See QAPISchema._make_implicit_enum_type() and ._def_predefineds(=
+)
+         return self.name.endswith('Kind') or self.name =3D=3D 'QType'
+diff --git a/tests/qapi-schema/doc-bad-enum-member.err b/tests/qapi-schema/=
+doc-bad-enum-member.err
+index e69de29bb2..dfa1e786d7 100644
+--- a/tests/qapi-schema/doc-bad-enum-member.err
++++ b/tests/qapi-schema/doc-bad-enum-member.err
+@@ -0,0 +1 @@
++doc-bad-enum-member.json:3: the following documented members are not in th=
+e declaration: a
+diff --git a/tests/qapi-schema/doc-bad-enum-member.json b/tests/qapi-schema=
+/doc-bad-enum-member.json
+index 9f32fe64b4..9cab35c6e8 100644
+--- a/tests/qapi-schema/doc-bad-enum-member.json
++++ b/tests/qapi-schema/doc-bad-enum-member.json
+@@ -1,5 +1,4 @@
+ # Members listed in the doc comment must exist in the actual schema
+-# BUG: nonexistent @a is not rejected
+=20
+ ##
+ # @Foo:
+diff --git a/tests/qapi-schema/doc-bad-enum-member.out b/tests/qapi-schema/=
+doc-bad-enum-member.out
+index 6ca31c1e9b..e69de29bb2 100644
+--- a/tests/qapi-schema/doc-bad-enum-member.out
++++ b/tests/qapi-schema/doc-bad-enum-member.out
+@@ -1,21 +0,0 @@
+-module None
+-object q_empty
+-enum QType
+-    prefix QTYPE
+-    member none
+-    member qnull
+-    member qnum
+-    member qstring
+-    member qdict
+-    member qlist
+-    member qbool
+-module doc-bad-enum-member.json
+-enum Foo
+-    member b
+-doc symbol=3DFoo
+-    body=3D
+-
+-    arg=3Da
+-a
+-    arg=3Db
+-b
+--=20
+2.21.0
 
 
