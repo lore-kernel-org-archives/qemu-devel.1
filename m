@@ -7,55 +7,55 @@ X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E9811CA9EB9
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 03:14:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C140BCA9EB9
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 03:16:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6C8F520684
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 03:14:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 866EF205ED
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Oct 2019 03:16:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="Ur83YBp6"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6C8F520684
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="OyM1gfo8"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 866EF205ED
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56956 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56984 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iNTZl-0007Xu-5y
-	for qemu-devel@archiver.kernel.org; Wed, 23 Oct 2019 23:14:13 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53897)
+	id 1iNTc2-0001sR-Ag
+	for qemu-devel@archiver.kernel.org; Wed, 23 Oct 2019 23:16:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53884)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgibson@ozlabs.org>) id 1iNTTN-0006ZY-7L
- for qemu-devel@nongnu.org; Wed, 23 Oct 2019 23:07:39 -0400
+ (envelope-from <dgibson@ozlabs.org>) id 1iNTTN-0006Z5-14
+ for qemu-devel@nongnu.org; Wed, 23 Oct 2019 23:07:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1iNTTL-0002up-Ei
- for qemu-devel@nongnu.org; Wed, 23 Oct 2019 23:07:37 -0400
-Received: from ozlabs.org ([203.11.71.1]:59055)
+ (envelope-from <dgibson@ozlabs.org>) id 1iNTTL-0002ue-A4
+ for qemu-devel@nongnu.org; Wed, 23 Oct 2019 23:07:36 -0400
+Received: from ozlabs.org ([203.11.71.1]:48425)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1iNTTL-0002sk-2T; Wed, 23 Oct 2019 23:07:35 -0400
+ id 1iNTTK-0002sX-U6; Wed, 23 Oct 2019 23:07:35 -0400
 Received: by ozlabs.org (Postfix, from userid 1007)
- id 46zBxT02nGz9sQr; Thu, 24 Oct 2019 14:07:24 +1100 (AEDT)
+ id 46zBxS6YsFz9sQm; Thu, 24 Oct 2019 14:07:24 +1100 (AEDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1571886445;
- bh=F1XmhPCLNsOziR1uD64Al2UyADG9zZc4RHnjsJ9/byQ=;
+ d=gibson.dropbear.id.au; s=201602; t=1571886444;
+ bh=mFjpjq3AOw7ehGA9jrAOd3anUpJ7f6KEFzwF3lNbTU4=;
  h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=Ur83YBp6C+M/YXN/sx+Jcq4iw4cTZnTyr13qUJTV/xB/k6sGzx+YNeZbcKq1dUDVq
- KB5KIkKQqHoOK87FQO/XVoG8/CmXDrgsvdU4y201R9LckRFQ6gpBc0M3+iSY2pREBg
- vUNgQ/a0Z37iQQNvVsWckP87XrrMVsfF1Qj1bL0w=
-Date: Thu, 24 Oct 2019 13:50:41 +1100
+ b=OyM1gfo8Pu30un1SYs78o1+L3CmsVG8zQQpVxq4TNQBcK3zchkBhZiliE8qLt3MRn
+ 3/13qMcPxnpHsECuLp04jpLMyQ/gGMerN6Zkh0pKWlPfyW5XNzMEms4rsirXq7X2Di
+ 7XvHqUMEXjO2/TKMmhc7exN9wEVkimh2MkT4SnFE=
+Date: Thu, 24 Oct 2019 13:59:03 +1100
 From: David Gibson <david@gibson.dropbear.id.au>
 To: Greg Kurz <groug@kaod.org>
-Subject: Re: [PATCH 2/6] xive, xics: Fix reference counting on CPU objects
-Message-ID: <20191024025041.GS6439@umbus.fritz.box>
+Subject: Re: [PATCH 4/6] qom: Add object_child_foreach_type() helper function
+Message-ID: <20191024025903.GU6439@umbus.fritz.box>
 References: <157184231371.3053790.17713393349394736594.stgit@bahia.lan>
- <157184232497.3053790.5571330781863409160.stgit@bahia.lan>
+ <157184233616.3053790.246919545000657597.stgit@bahia.lan>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="kLVKJMuKEUFaIs8+"
+ protocol="application/pgp-signature"; boundary="Ma2pZxZcUUd0eybH"
 Content-Disposition: inline
-In-Reply-To: <157184232497.3053790.5571330781863409160.stgit@bahia.lan>
+In-Reply-To: <157184233616.3053790.246919545000657597.stgit@bahia.lan>
 User-Agent: Mutt/1.12.1 (2019-06-15)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
@@ -78,97 +78,146 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
---kLVKJMuKEUFaIs8+
+--Ma2pZxZcUUd0eybH
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Oct 23, 2019 at 04:52:05PM +0200, Greg Kurz wrote:
-> When a VCPU gets connected to the XIVE interrupt controller, we add a
-> const link targetting the CPU object to the TCTX object. Similar links
-> are added to the ICP object when using the XICS interrupt controller.
->=20
-> As explained in <qom/object.h>:
->=20
->  * The caller must ensure that @target stays alive as long as
->  * this property exists.  In the case @target is a child of @obj,
->  * this will be the case.  Otherwise, the caller is responsible for
->  * taking a reference.
->=20
-> We're in the latter case for both XICS and XIVE. Add the missing
-> calls to object_ref() and object_unref().
->=20
-> This doesn't fix any known issue because the life cycle of the TCTX or
-> ICP happens to be shorter than the one of the CPU or XICS fabric, but
-> better safe than sorry.
+On Wed, Oct 23, 2019 at 04:52:16PM +0200, Greg Kurz wrote:
+> Calling a function for children of a certain type is a recurring pattern
+> in the QEMU code base. In order to avoid the need to setup the same boiler
+> plate again and again, introduce a variant of object_child_foreach() that
+> only considers children of the given type.
 >=20
 > Signed-off-by: Greg Kurz <groug@kaod.org>
 
-LGTM
 Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
 
 > ---
->  hw/intc/xics.c |    8 +++++++-
->  hw/intc/xive.c |    6 +++++-
->  2 files changed, 12 insertions(+), 2 deletions(-)
+>  include/qom/object.h |   35 +++++++++++++++++++++++++++++++++++
+>  qom/object.c         |   30 +++++++++++++++++++++++-------
+>  2 files changed, 58 insertions(+), 7 deletions(-)
 >=20
-> diff --git a/hw/intc/xics.c b/hw/intc/xics.c
-> index 935f325749cb..5f746079be46 100644
-> --- a/hw/intc/xics.c
-> +++ b/hw/intc/xics.c
-> @@ -388,8 +388,10 @@ Object *icp_create(Object *cpu, const char *type, XI=
-CSFabric *xi, Error **errp)
->      obj =3D object_new(type);
->      object_property_add_child(cpu, type, obj, &error_abort);
->      object_unref(obj);
-> +    object_ref(OBJECT(xi));
->      object_property_add_const_link(obj, ICP_PROP_XICS, OBJECT(xi),
->                                     &error_abort);
-> +    object_ref(cpu);
->      object_property_add_const_link(obj, ICP_PROP_CPU, cpu, &error_abort);
->      object_property_set_bool(obj, true, "realized", &local_err);
->      if (local_err) {
-> @@ -403,7 +405,11 @@ Object *icp_create(Object *cpu, const char *type, XI=
-CSFabric *xi, Error **errp)
-> =20
->  void icp_destroy(ICPState *icp)
->  {
-> -    object_unparent(OBJECT(icp));
-> +    Object *obj =3D OBJECT(icp);
+> diff --git a/include/qom/object.h b/include/qom/object.h
+> index 128d00c77fd6..e9e3c2eae8ed 100644
+> --- a/include/qom/object.h
+> +++ b/include/qom/object.h
+> @@ -1728,6 +1728,41 @@ int object_child_foreach(Object *obj, int (*fn)(Ob=
+ject *child, void *opaque),
+>  int object_child_foreach_recursive(Object *obj,
+>                                     int (*fn)(Object *child, void *opaque=
+),
+>                                     void *opaque);
 > +
-> +    object_unref(object_property_get_link(obj, ICP_PROP_CPU, &error_abor=
-t));
-> +    object_unref(object_property_get_link(obj, ICP_PROP_XICS, &error_abo=
-rt));
-> +    object_unparent(obj);
+> +/**
+> + * object_child_foreach_type:
+> + * @obj: the object whose children will be navigated
+> + * @typename: the type of child objects to consider
+> + * @fn: the iterator function to be called
+> + * @opaque: an opaque value that will be passed to the iterator
+> + *
+> + * This is similar to object_child_foreach, but it only calls @fn for
+> + * child objects of the give @typename.
+> + *
+> + * Returns: The last value returned by @fn, or 0 if there is no child of
+> + * the given @typename.
+> + */
+> +int object_child_foreach_type(Object *obj, const char *typename,
+> +                              int (*fn)(Object *child, void *opaque),
+> +                              void *opaque);
+> +
+> +/**
+> + * object_child_foreach_recursive_type:
+> + * @obj: the object whose children will be navigated
+> + * @typename: the type of child objects to consider
+> + * @fn: the iterator function to be called
+> + * @opaque: an opaque value that will be passed to the iterator
+> + *
+> + * This is similar to object_child_foreach_recursive, but it only calls
+> + * @fn for child objects of the give @typename.
+> + *
+> + * Returns: The last value returned by @fn, or 0 if there is no child of
+> + * the given @typename.
+> + */
+> +int object_child_foreach_recursive_type(Object *obj, const char *typenam=
+e,
+> +                                        int (*fn)(Object *child, void *o=
+paque),
+> +                                        void *opaque);
+> +
+>  /**
+>   * container_get:
+>   * @root: root of the #path, e.g., object_get_root()
+> diff --git a/qom/object.c b/qom/object.c
+> index 6fa9c619fac4..a2dec1261ff7 100644
+> --- a/qom/object.c
+> +++ b/qom/object.c
+> @@ -986,7 +986,7 @@ void object_class_foreach(void (*fn)(ObjectClass *kla=
+ss, void *opaque),
+>      enumerating_types =3D false;
 >  }
 > =20
->  /*
-> diff --git a/hw/intc/xive.c b/hw/intc/xive.c
-> index 38257aa02083..952a461d5329 100644
-> --- a/hw/intc/xive.c
-> +++ b/hw/intc/xive.c
-> @@ -682,6 +682,7 @@ Object *xive_tctx_create(Object *cpu, XiveRouter *xrt=
-r, Error **errp)
->      obj =3D object_new(TYPE_XIVE_TCTX);
->      object_property_add_child(cpu, TYPE_XIVE_TCTX, obj, &error_abort);
->      object_unref(obj);
-> +    object_ref(cpu);
->      object_property_add_const_link(obj, "cpu", cpu, &error_abort);
->      object_property_set_bool(obj, true, "realized", &local_err);
->      if (local_err) {
-> @@ -698,7 +699,10 @@ error:
-> =20
->  void xive_tctx_destroy(XiveTCTX *tctx)
+> -static int do_object_child_foreach(Object *obj,
+> +static int do_object_child_foreach(Object *obj, const char *typename,
+>                                     int (*fn)(Object *child, void *opaque=
+),
+>                                     void *opaque, bool recurse)
 >  {
-> -    object_unparent(OBJECT(tctx));
-> +    Object *obj =3D OBJECT(tctx);
-> +
-> +    object_unref(object_property_get_link(obj, "cpu", &error_abort));
-> +    object_unparent(obj);
+> @@ -999,12 +999,14 @@ static int do_object_child_foreach(Object *obj,
+>          if (object_property_is_child(prop)) {
+>              Object *child =3D prop->opaque;
+> =20
+> -            ret =3D fn(child, opaque);
+> -            if (ret !=3D 0) {
+> -                break;
+> +            if (!typename || object_dynamic_cast(child, typename)) {
+> +                ret =3D fn(child, opaque);
+> +                if (ret !=3D 0) {
+> +                    break;
+> +                }
+>              }
+>              if (recurse) {
+> -                do_object_child_foreach(child, fn, opaque, true);
+> +                do_object_child_foreach(child, typename, fn, opaque, tru=
+e);
+>              }
+>          }
+>      }
+> @@ -1014,14 +1016,28 @@ static int do_object_child_foreach(Object *obj,
+>  int object_child_foreach(Object *obj, int (*fn)(Object *child, void *opa=
+que),
+>                           void *opaque)
+>  {
+> -    return do_object_child_foreach(obj, fn, opaque, false);
+> +    return do_object_child_foreach(obj, NULL, fn, opaque, false);
 >  }
 > =20
->  /*
+>  int object_child_foreach_recursive(Object *obj,
+>                                     int (*fn)(Object *child, void *opaque=
+),
+>                                     void *opaque)
+>  {
+> -    return do_object_child_foreach(obj, fn, opaque, true);
+> +    return do_object_child_foreach(obj, NULL, fn, opaque, true);
+> +}
+> +
+> +int object_child_foreach_type(Object *obj, const char *typename,
+> +                              int (*fn)(Object *child, void *opaque),
+> +                              void *opaque)
+> +{
+> +    return do_object_child_foreach(obj, typename, fn, opaque, false);
+> +}
+> +
+> +int object_child_foreach_recursive_type(Object *obj, const char *typenam=
+e,
+> +                                        int (*fn)(Object *child, void *o=
+paque),
+> +                                        void *opaque)
+> +{
+> +    return do_object_child_foreach(obj, typename, fn, opaque, true);
+>  }
+> =20
+>  static void object_class_get_list_tramp(ObjectClass *klass, void *opaque)
 >=20
 
 --=20
@@ -177,25 +226,25 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---kLVKJMuKEUFaIs8+
+--Ma2pZxZcUUd0eybH
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl2xEYEACgkQbDjKyiDZ
-s5LyfA//dZ97U9hlBIwtb4ny04SaHw870f2k1PqmfN+FXJL/+RPOzduQQsg6Y13x
-uedNK/r3pRAtfa/zZEIftsJgY3+ktTHIodzZg/GIKFxkbH75UNYCD+nqTBcCMmVr
-gkSfoGSa8DwukN9TQX+rYYOpmoLe++O4jc/LTv2LcTzL7E/aZWMWOUWS/svuoa/o
-hM82Z15lUq6SWYbEAOFJpbsAIjmbytG2FlyovXp6Jh4wuBNVoqdLilzlUwWpV18R
-fAkYow9zC3UT7SR7lbXYhp4IZ9f69avgJ70iV0Pro1OAbjBXyyXKDunMxrFbpR8U
-Ke94oZj9T5aBczGuPc/gQ/BxjaKiTrC1StX3TofL27wIzHvBQ1pTPar05jg5WJRv
-r/be1CCtyREUS3PUPXZn+BVo2C0pqgsDsCKsreXL5dg3TNBh9gc+H1Pn7pZXXhfJ
-yf2+DEiGo60WE3OD3xfC71Jk7e2QHvWOF7HfpZ7Ncle/Ly7PCgDdthA6EJSSwy0Q
-NFo7fOcz3Ntgct9HZkxfg68/vZbo9/FHdrYLhubDYvOLJL9zVPQ3WT/9M1tn1DQ0
-GNq/OhRX5SzKsChX6vAuUQNuFR+c5jLpzUP3mzjSd1P66D+YjcEvvyhF1vZqZHEc
-qcGBCLgogqjwAxMEw/1wEsVRLQ3r6QMCvz0bNWPZH7emhB0Rzyg=
-=BqZk
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl2xE3cACgkQbDjKyiDZ
+s5K+FxAA5xPTyaJybv7EevyMrX+Qv+eIwbh+z1XEWm6NNkhNqIqF1mVvvsidtdTw
+ewa3xdKCa4TYocoLud9007gatF8W//IX1PP2nDeKnhDvpPRyJeIkmb8O9iCpjZqD
+g4xds9AU7HECR5BaH3UtXMbqVlhL+nloiG6qi4W42hfkjhHNEixfTj08Zk0guk3b
+z8fPi48JPiso8ygJX7bj9ZtBWd/6reMnPu1KmX1FdnDGUsFdE/T38vpP+H85WUtJ
+Zj4WyDDzD4QByxDFTLDospEUa4k0qOKYD7hpn2SqP4SLbuSCVExsN5xRKECH1JoB
+u1HlLJAAqW22s9j/+Pg1UbdG9NXo/7Xaw0S8bQuVmRS/RuT2WtdHvu7VTQA7GjxO
+02OLXOxwlqoXtljraPt4bThQgdEI1byba/hLbv8gaOJIHA35kvHacC0Aq24ocM05
+Rc328clrQtOVyGgaub19AwAIiAFKXHu0qrUWk5p+gW/Gq1LtKeA3nmCNH9F81I71
+JJCkrlind57jqsRl0bYTEMQfZ1OnYiWn89UFVs61w7W17q5UB5paRHY0Z7X+Phhv
++hRcTWr390Y0qGQGZ7HZ7lC9O+jt/KFiJIu2cuD5SM5RY5mQq0O/uUKKwV/qfgXU
+2dY/SbLUFwy/e8YmIt83VwFVD0t5YrQvyJDKKWAvpSxFNKAPtoI=
+=WyKM
 -----END PGP SIGNATURE-----
 
---kLVKJMuKEUFaIs8+--
+--Ma2pZxZcUUd0eybH--
 
