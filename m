@@ -7,76 +7,76 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 79EC3CA9EA0
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 07:03:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C9A9FCA9EA0
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 07:03:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 46DF021929
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 07:03:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9744F21929
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 07:03:59 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="eaVEqL4d"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 46DF021929
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="pNMhZ45J"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9744F21929
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56342 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56346 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iNtdc-0000Wi-En
-	for qemu-devel@archiver.kernel.org; Fri, 25 Oct 2019 03:03:56 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36907)
+	id 1iNtdd-0000sG-WF
+	for qemu-devel@archiver.kernel.org; Fri, 25 Oct 2019 03:03:58 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36989)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1iNtMr-0007l9-D9
- for qemu-devel@nongnu.org; Fri, 25 Oct 2019 02:46:40 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1iNtN2-000864-UM
+ for qemu-devel@nongnu.org; Fri, 25 Oct 2019 02:46:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1iNtMp-00037q-NI
- for qemu-devel@nongnu.org; Fri, 25 Oct 2019 02:46:36 -0400
-Received: from mail-wr1-x430.google.com ([2a00:1450:4864:20::430]:37501)
+ (envelope-from <alex.bennee@linaro.org>) id 1iNtMz-0003Ci-UY
+ for qemu-devel@nongnu.org; Fri, 25 Oct 2019 02:46:47 -0400
+Received: from mail-wm1-x334.google.com ([2a00:1450:4864:20::334]:51313)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1iNtMp-00037C-GT
- for qemu-devel@nongnu.org; Fri, 25 Oct 2019 02:46:35 -0400
-Received: by mail-wr1-x430.google.com with SMTP id e11so947858wrv.4
- for <qemu-devel@nongnu.org>; Thu, 24 Oct 2019 23:46:35 -0700 (PDT)
+ id 1iNtMu-0003A4-4J
+ for qemu-devel@nongnu.org; Fri, 25 Oct 2019 02:46:40 -0400
+Received: by mail-wm1-x334.google.com with SMTP id q70so790819wme.1
+ for <qemu-devel@nongnu.org>; Thu, 24 Oct 2019 23:46:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=a+CNlZHOsvnPAzo+1k2Dke9GSSUrs8d4XRw46Zp2gXU=;
- b=eaVEqL4dgXXp0wqHt21xpcwDfEqgH6Wc8jxwn2b1RM2bQ9mGZakHuwEJaiK3lkeBBd
- ljJ9epTY7OvH/NDMmP/hDld0Yt2ZNr9pkRVKP1K47BFn273Kpqa5EyJKWG7Vz4E8aAXh
- Wci5e1Ng8M0EKVP6BcddPxpGGq+PUACrZ/V15Y6VVfzg/hc0T5z0NvWL6ZPWhMvNJGyd
- mqKrYNDaoCyWgCevr2w3rjOmq48mUhdth50v5myfoLKZxLdL/mRRLG8gD7HqiJowwgHR
- 9BMoIe6Dj/2tBfbYgPuhmqDr47QO5xIh5+NJ5ZRbrGXZLPEePBatswaX/ndEP2QXID/3
- EaPw==
+ bh=d77se2AWHQTDPWAjRF6o7tLkcsKtKX6IpL5FuyPE0Bw=;
+ b=pNMhZ45JBOvME59FiyNdglxMN/f9D8Do0wWVkbQIRwk5VNcrXvPBM/jZwGD9SfzL1q
+ mAf4e5Eio+quxIUZYCFNvCsdew4uO0u01TWodA0NQs9vOELS7lgC1887gYmoLZsvI8om
+ GrrRePeBaSy58RazAhCfiWTA2w/D8bRJYy0OtVg/2EQAz16VpbyO69IKwy90VknEH+Gb
+ s0dYMXNYrtlvIzmFyaWeXbg6Sl55ASe2aXXzvh46zWjyNuz0hDgpnlAzDHtvcNAO+0RC
+ uvZR8H5DtRoKZduEeuGPsU3Y7+61GdP2aOh3dyeGMBjvKABDE0F//lozLJ2GOSMlZgBV
+ EyIg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=a+CNlZHOsvnPAzo+1k2Dke9GSSUrs8d4XRw46Zp2gXU=;
- b=OLSQcZbllcGn9b8yHhWZiD1kRZqV0sOx5/gV4rbdjtWV7EkMVNQb/7O3seG/XVRadz
- OMVig/BFxScCZ3EPH6GuP7gK+g3uBbwnKKo73hSLwVk1B+EO8E0pMaGfohKDk+oqp9xv
- /kRByZPBeOHmGLI3JvlrVOcBA49gyN99Lm4vZCmKtKfWhyKHRYMrG37Q14hVmq5Jyj57
- z/DuLFe8UsjM+FLS8eadK9CU/ONLIfU6L8z0yisUzsiSTGpJIEPn+87k3gj5bpp6WWsm
- DgN4m0eP08XScFSP4aQVbBenxRvmT8a5ce94Lefjkz3Rxfx1tbfk8yY2fwYfUT8K8b4M
- WFjw==
-X-Gm-Message-State: APjAAAWRLO6SUMpXwhc+RnbJWhj9Khp9gYTuQeM/805BEs7jLANxgdXh
- 5GUvBNcrwbvstfcwnuMCyPorEQ==
-X-Google-Smtp-Source: APXvYqzBG7c07ZV5j8HYAHOV9Ri93wKmGvqiEEIvvArV67DO8x1EPK4NWD3NfytRaz6A2ksqhRQreA==
-X-Received: by 2002:a5d:498e:: with SMTP id r14mr1279313wrq.36.1571985993857; 
- Thu, 24 Oct 2019 23:46:33 -0700 (PDT)
+ bh=d77se2AWHQTDPWAjRF6o7tLkcsKtKX6IpL5FuyPE0Bw=;
+ b=NbX2+U0QXFGR0AJYzmhnsvKvGPTNF/8bsVNgkC0Fy6nSOn/EwcuR/sVRO+qjyAocHJ
+ 368yl9Y0mXPJFb3/N6am6uhqAn0uZRoOMa7B7LNICShpb+9NARWr/XwyLTbkNms5CUuj
+ 33+o3LHMhRe/309qEsBej6TzQwgSkoCcaP2HtweSzlrAApXzWFtnrRFUyFyv2lqUxXYa
+ oR5EI+XOJ49ffT2EyBaeW7tEncMwlttcDYsXqyxy3MMa2jfBCwTo4NWmh2VS/tccOSjV
+ 7hyXCzNi3Q17z9itzsGsNFzw3suxKYXn6RrIOtbmXNwUVx1LySpnddQESGKWPXthveu5
+ 0Cjw==
+X-Gm-Message-State: APjAAAVnzO1QvkcnnC4NnMVffSLNrMhD49gRs1GMRMEnli5EbsPiZpoM
+ wVVj7kkGLuPqu+9kbKTGMvuKZA==
+X-Google-Smtp-Source: APXvYqxfzfFW5WBvEvFGQQ+R3mqA4gnaulTkP3CenuRqjVfsc2S2Q9Tvh+SDQh8eSzeS3QvonpsadA==
+X-Received: by 2002:a05:600c:2487:: with SMTP id
+ 7mr1855217wms.164.1571985998432; 
+ Thu, 24 Oct 2019 23:46:38 -0700 (PDT)
 Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id w8sm1779491wrr.44.2019.10.24.23.46.33
+ by smtp.gmail.com with ESMTPSA id n187sm1570516wmb.47.2019.10.24.23.46.34
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 24 Oct 2019 23:46:33 -0700 (PDT)
+ Thu, 24 Oct 2019 23:46:36 -0700 (PDT)
 Received: from zen.lan (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 918D11FFAA;
- Fri, 25 Oct 2019 07:37:15 +0100 (BST)
+ by zen.linaroharston (Postfix) with ESMTP id 574441FFB4;
+ Fri, 25 Oct 2019 07:37:16 +0100 (BST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: peter.maydell@linaro.org
-Subject: [PULL v2 20/73] translate-all: use cpu_in_exclusive_work_context() in
- tb_flush
-Date: Fri, 25 Oct 2019 07:36:20 +0100
-Message-Id: <20191025063713.23374-21-alex.bennee@linaro.org>
+Subject: [PULL v2 28/73] tcg: add tcg_gen_st_ptr
+Date: Fri, 25 Oct 2019 07:36:28 +0100
+Message-Id: <20191025063713.23374-29-alex.bennee@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20191025063713.23374-1-alex.bennee@linaro.org>
 References: <20191025063713.23374-1-alex.bennee@linaro.org>
@@ -85,7 +85,7 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::430
+X-Received-From: 2a00:1450:4864:20::334
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,9 +97,9 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org,
- "Emilio G. Cota" <cota@braap.org>, Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+Cc: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ "Emilio G. Cota" <cota@braap.org>,
+ Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org,
  Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
@@ -107,35 +107,28 @@ Sender: "Qemu-devel"
 
 From: "Emilio G. Cota" <cota@braap.org>
 
-tb_flush will be called by the plugin module from a safe
-work environment. Prepare for that.
+Will gain a user soon.
 
-Suggested-by: Alex Bennée <alex.bennee@linaro.org>
-Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
 Signed-off-by: Emilio G. Cota <cota@braap.org>
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 
-diff --git a/accel/tcg/translate-all.c b/accel/tcg/translate-all.c
-index 66d4bc4341a..0a08fcda3e8 100644
---- a/accel/tcg/translate-all.c
-+++ b/accel/tcg/translate-all.c
-@@ -1268,8 +1268,13 @@ void tb_flush(CPUState *cpu)
- {
-     if (tcg_enabled()) {
-         unsigned tb_flush_count = atomic_mb_read(&tb_ctx.tb_flush_count);
--        async_safe_run_on_cpu(cpu, do_tb_flush,
--                              RUN_ON_CPU_HOST_INT(tb_flush_count));
-+
-+        if (cpu_in_exclusive_context(cpu)) {
-+            do_tb_flush(cpu, RUN_ON_CPU_HOST_INT(tb_flush_count));
-+        } else {
-+            async_safe_run_on_cpu(cpu, do_tb_flush,
-+                                  RUN_ON_CPU_HOST_INT(tb_flush_count));
-+        }
-     }
+diff --git a/tcg/tcg-op.h b/tcg/tcg-op.h
+index e9cf172762e..7c778f96f3b 100644
+--- a/tcg/tcg-op.h
++++ b/tcg/tcg-op.h
+@@ -1249,6 +1249,11 @@ static inline void tcg_gen_ld_ptr(TCGv_ptr r, TCGv_ptr a, intptr_t o)
+     glue(tcg_gen_ld_,PTR)((NAT)r, a, o);
  }
  
++static inline void tcg_gen_st_ptr(TCGv_ptr r, TCGv_ptr a, intptr_t o)
++{
++    glue(tcg_gen_st_, PTR)((NAT)r, a, o);
++}
++
+ static inline void tcg_gen_discard_ptr(TCGv_ptr a)
+ {
+     glue(tcg_gen_discard_,PTR)((NAT)a);
 -- 
 2.20.1
 
