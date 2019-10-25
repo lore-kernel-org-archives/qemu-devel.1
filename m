@@ -2,79 +2,121 @@ Return-Path: <SRS0=bySr=YS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 57632CA9EA0
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 15:55:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 35A3DCA9EA0
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 15:59:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1FD7A21D82
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 15:55:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E1CD520663
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 15:59:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="EatJlTRF"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1FD7A21D82
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="HPm571pc"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E1CD520663
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34096 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34124 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iO1wF-0007Vn-9t
-	for qemu-devel@archiver.kernel.org; Fri, 25 Oct 2019 11:55:43 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51578)
+	id 1iO1zv-0004EN-CI
+	for qemu-devel@archiver.kernel.org; Fri, 25 Oct 2019 11:59:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55987)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1iO11d-0004mT-Ky
- for qemu-devel@nongnu.org; Fri, 25 Oct 2019 10:57:15 -0400
+ (envelope-from <rkagan@virtuozzo.com>) id 1iO1Ra-0004Q3-6s
+ for qemu-devel@nongnu.org; Fri, 25 Oct 2019 11:24:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1iO11c-0001iZ-Dz
- for qemu-devel@nongnu.org; Fri, 25 Oct 2019 10:57:13 -0400
-Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:41508)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1iO11c-0001iF-8Q
- for qemu-devel@nongnu.org; Fri, 25 Oct 2019 10:57:12 -0400
-Received: by mail-ot1-x342.google.com with SMTP id 94so2246864oty.8
- for <qemu-devel@nongnu.org>; Fri, 25 Oct 2019 07:57:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=PzFBIOtrYGHD8aILwNW9Y8nczxSGhZHqE5zG7McmJGQ=;
- b=EatJlTRFjWxhuoPIxF3O/Uhj3cBl9uvFUF4VvhRZRh/WD4LlBlkwexMyQP+oGma7ew
- bj6CIbsiVk+1g9Hq1n5bm2xgmAfi769fY2Z9J4Grp8TSuxB6hQ+A1dKOdDWkWofzoc/2
- Rok9M0gvPkPQauE9nfbpZWABLgTospt0ZEVctQ3B7RhulZckkXvg7a+teM0Dy/TK2EsE
- MIYh31ZUZsVlPL2ONNQXvAALqdMOqegihT39ZaCcPWOFU+a9UT6zIV5mJ5+ZNjtkkp0a
- n2NJC8Yq7OWET8oqiYwJZOVX2KFbF5zukidx9GL6a36eHdmNSOZOGO0bmXRKu0i7Zi+m
- XWFg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=PzFBIOtrYGHD8aILwNW9Y8nczxSGhZHqE5zG7McmJGQ=;
- b=Okd2xoaURCEORTMfO+kPJtsH+R02AJR14djklOfxB35y69/gBm2eaTqrUQolJmUvPg
- FS4gTuSwbPfGd8DJM9LeU/Or2YLnR1QzOzNcJuAqheAzsQa793ilRA1T86++l77sEO+n
- 0H8ewxTzH/M04zeZ/K/ZLRm+LT8nd2Kz/0XSgQ83onEc1xmq3DAR1ERlxjUQXaxeMLlH
- ZnT5SOLZWI9iPOlhVGI7YpID3aO6dk/wLoezbf2qGHrmorTxHgPxZHpu1zZxu9YRcVlB
- sIwrgEvGjNmW91pYVRVEKnZmg1t1FaiBd5pL6FPfOTt8xLnOE3psCx0xYveooSkFkYD9
- sy2Q==
-X-Gm-Message-State: APjAAAX0Dsr82Y0EM82CTzvf8PimI4j1ROdSXs/Xc1PRjfhLOw484KIb
- 2y5NOv7nvnc7UiB8VEJHhnTl4FNBqTsOXevfMbEnMQ==
-X-Google-Smtp-Source: APXvYqwfYkbRgVWdfonQICnVWP9LuSPkxyE21Vg51U6VYGFxcTjQjjLGoxBwNvWLJ9NbVTW7H8dl8makxPg45Vy28AM=
-X-Received: by 2002:a9d:708e:: with SMTP id l14mr1690774otj.135.1572015431419; 
- Fri, 25 Oct 2019 07:57:11 -0700 (PDT)
+ (envelope-from <rkagan@virtuozzo.com>) id 1iO1RX-0007mw-UE
+ for qemu-devel@nongnu.org; Fri, 25 Oct 2019 11:24:01 -0400
+Received: from mail-bgr052101134016.outbound.protection.outlook.com
+ ([52.101.134.16]:24903 helo=EUR03-AM5-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <rkagan@virtuozzo.com>)
+ id 1iO1RX-0007kM-1i
+ for qemu-devel@nongnu.org; Fri, 25 Oct 2019 11:23:59 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=lVMTTCwZJLp53pWy9QjzoKDDYaxXW4AxRJ/Wu37XP+ARCwtSL1TmSpV3jmdCaIBmQDdn3X6/SFVnfls30goGYVlfWrzXT94OxzWK4dqLMGoWwXYAnoRLelNLvRPihLWjx20UoJ1Uus8oxiPjlF/pZH0x104jXE5l+YCIwmq8OUE6ofwFDFHfMOhxhL6jnvC32QLdKCH0b66kGGwSVfP7s7lQ20dF0Ofqs6zu+EG/qUBfkRUyHbVPHoWCoHxUrFRK5Uu+5q2T+eIsMB/0YYSlw9DQtjz+ey/2CdcoyJeOQECvtDgazINykGiTYBZu56WJRdPAapismgeQO0cDY1UeMQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=+/qOYo+cYLRbtlElhr0A7LxRViNvpQVX1DxkHPsAJoI=;
+ b=cfsU+9WHZkJWY/CZ8Nnaw6j1OMBMXrG8cl3ZrZQNAEML+KQ2zzzYyr7nPCcnpgf6l8L1WkBsvyhT/MpbB0qB6Vfb74e/zet6Wb6YY+y3XyI5uu2p3cVoIEaXIAwZpFbhMMIqXnrOnCCTTd/bvMqaTVgCmVyeUJ48rsk6OrG5rr76I7ne0mbd2yXxz1lceoqgmyk4PJgcvQFI7SkqSICsSglY5rWMFoAFfRy32Cdudjxt6bi/RuCy8zCQGdAMtW5npgMwqVBu6RorL755/LOrkITZPINusvLYi0M11sSxnT/GpDxfp/aRLXdu6kO4fSPou8CwyAXWzEnUoBQJ055cHg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=+/qOYo+cYLRbtlElhr0A7LxRViNvpQVX1DxkHPsAJoI=;
+ b=HPm571pcPzf9K6FGZP0AnO6g1JuYTnjrQfNK40sm6ajE5pFCdK0N6mwnWkxmSYlPBgx1olzm9rkzxhFhG5xmsr1oVGjfc9oThix6JeHoVni3YVbp271F0HO1CX14umfwMssUWK3p3cI1I87MpHQQ8WayLHSJQvKQhI1aesHBQWE=
+Received: from AM4PR0802MB2242.eurprd08.prod.outlook.com (10.172.218.15) by
+ AM4PR0802MB2178.eurprd08.prod.outlook.com (10.172.215.146) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2387.22; Fri, 25 Oct 2019 15:23:55 +0000
+Received: from AM4PR0802MB2242.eurprd08.prod.outlook.com
+ ([fe80::9c3e:dc5:e056:9f89]) by AM4PR0802MB2242.eurprd08.prod.outlook.com
+ ([fe80::9c3e:dc5:e056:9f89%12]) with mapi id 15.20.2387.023; Fri, 25 Oct 2019
+ 15:23:55 +0000
+From: Roman Kagan <rkagan@virtuozzo.com>
+To: Jens Freimann <jfreimann@redhat.com>
+Subject: Re: [PATCH v6 0/11] add failover feature for assigned network devices
+Thread-Topic: [PATCH v6 0/11] add failover feature for assigned network devices
+Thread-Index: AQHViy7iJaKROCbVg0GiICMwdTBNrKdregwA
+Date: Fri, 25 Oct 2019 15:23:55 +0000
+Message-ID: <20191025152352.GA24293@rkaganb.sw.ru>
+References: <20191025121930.6855-1-jfreimann@redhat.com>
+In-Reply-To: <20191025121930.6855-1-jfreimann@redhat.com>
+Accept-Language: en-US, ru-RU
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+user-agent: Mutt/1.12.1 (2019-06-15)
+mail-followup-to: Roman Kagan <rkagan@virtuozzo.com>,	Jens Freimann
+ <jfreimann@redhat.com>, qemu-devel@nongnu.org,	pkrempa@redhat.com,
+ berrange@redhat.com, ehabkost@redhat.com,	mst@redhat.com, aadam@redhat.com,
+ jasowang@redhat.com,	dgilbert@redhat.com, armbru@redhat.com,
+ alex.williamson@redhat.com,	laine@redhat.com, ailan@redhat.com,
+ parav@mellanox.com
+x-originating-ip: [185.231.240.5]
+x-clientproxiedby: HE1PR0301CA0020.eurprd03.prod.outlook.com
+ (2603:10a6:3:76::30) To AM4PR0802MB2242.eurprd08.prod.outlook.com
+ (2603:10a6:200:5f::15)
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=rkagan@virtuozzo.com; 
+x-ms-exchange-messagesentrepresentingtype: 1
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 0b823606-642b-46eb-c314-08d7595f597b
+x-ms-traffictypediagnostic: AM4PR0802MB2178:
+x-ms-exchange-purlcount: 8
+x-microsoft-antispam-prvs: <AM4PR0802MB2178EB8CDAA76A4867E06D31C9650@AM4PR0802MB2178.eurprd08.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:6790;
+x-forefront-prvs: 02015246A9
+x-forefront-antispam-report: SFV:SPM;
+ SFS:(10019020)(136003)(396003)(346002)(39840400004)(366004)(376002)(199004)(189003)(6916009)(71190400001)(7416002)(8936002)(386003)(4326008)(256004)(14444005)(33656002)(2906002)(7736002)(8676002)(36756003)(81156014)(81166006)(3846002)(71200400001)(478600001)(486006)(446003)(6486002)(9686003)(6306002)(476003)(6512007)(11346002)(58126008)(66066001)(1076003)(6246003)(5660300002)(229853002)(305945005)(6116002)(76176011)(14454004)(316002)(66476007)(66446008)(25786009)(66946007)(66556008)(64756008)(26005)(52116002)(186003)(99286004)(54906003)(102836004)(86362001)(6506007)(6436002)(966005)(30126002);
+ DIR:OUT; SFP:1501; SCL:5; SRVR:AM4PR0802MB2178;
+ H:AM4PR0802MB2242.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
+ PTR:InfoNoRecords; A:1; MX:1; 
+received-spf: None (protection.outlook.com: virtuozzo.com does not designate
+ permitted sender hosts)
+x-ms-exchange-transport-forked: True
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: tL90uWAOUK7ju3ePdkBObhM9LmF9VjaFEdUcEQjkZqnwf111YPntGKPg4X/lCkzCLD9yaEzVzLW0b9DBcp8FDjEPV015PYQB4M/uIRqg47O0/LXhRWWLbXdLLryvcqcTP0/PfVsuTE4wg7W0lt229jgQQcPd0K/aAKU5+FXH9qHOnzBu1bpnFVkXtc5ANRMlzegSIaBhRdd6QJrEt2K9C4kfgyRrXwxmrxesPzsFhkbpACjas/KhnbnBiL6J08tJp2GW/P8j/46/c80A6oAUlAXiFyHppE6Gv5r98AdTa3XYFE0ZqI8wfNj6E9hDobjh9lM0DltZ6/PUwcXhWJ81BhlNSOnwVC7nDfZ/afQ/M0JcbqYb7GDGKO8j8Il/8LHs2ESHW672jtUiehufxEkPsiW7mY2IdZDBYFSfckH5cFM=
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <B2B449E2A462454583FDB4E4EA1FEE80@eurprd08.prod.outlook.com>
 MIME-Version: 1.0
-References: <20191025134611.25920-1-kwolf@redhat.com>
-In-Reply-To: <20191025134611.25920-1-kwolf@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 25 Oct 2019 15:57:00 +0100
-Message-ID: <CAFEAcA_z1A3yTZUTmXqAYo=kyxXkaoCkjOBx-AkRamW66se3tw@mail.gmail.com>
-Subject: Re: [PULL 0/7] Block layer patches
-To: Kevin Wolf <kwolf@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::342
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 0b823606-642b-46eb-c314-08d7595f597b
+X-MS-Exchange-CrossTenant-originalarrivaltime: 25 Oct 2019 15:23:55.6381 (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: JJ6mwpb3Bj0qTlON9Unib/70NaZMGzpMUgxPqTwy3ns3GyltXlbUTBnqKBal41Dfpk7xi4up9f+aQ0nNH6TFQQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM4PR0802MB2178
+X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
+X-Received-From: 52.101.134.16
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,43 +128,126 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Qemu-block <qemu-block@nongnu.org>
+Cc: "pkrempa@redhat.com" <pkrempa@redhat.com>,
+ "berrange@redhat.com" <berrange@redhat.com>,
+ "ehabkost@redhat.com" <ehabkost@redhat.com>, "mst@redhat.com" <mst@redhat.com>,
+ "aadam@redhat.com" <aadam@redhat.com>,
+ "jasowang@redhat.com" <jasowang@redhat.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "dgilbert@redhat.com" <dgilbert@redhat.com>,
+ "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+ "laine@redhat.com" <laine@redhat.com>, "ailan@redhat.com" <ailan@redhat.com>,
+ "armbru@redhat.com" <armbru@redhat.com>,
+ "parav@mellanox.com" <parav@mellanox.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, 25 Oct 2019 at 14:46, Kevin Wolf <kwolf@redhat.com> wrote:
->
-> The following changes since commit 7bc8f9734213b76e76631a483be13d6737c2adbc:
->
->   Merge remote-tracking branch 'remotes/pmaydell/tags/pull-target-arm-20191025' into staging (2019-10-25 13:12:16 +0100)
->
-> are available in the Git repository at:
->
->   git://repo.or.cz/qemu/kevin.git tags/for-upstream
->
-> for you to fetch changes up to 5e9785505210e2477e590e61b1ab100d0ec22b01:
->
->   qcow2: Fix corruption bug in qcow2_detect_metadata_preallocation() (2019-10-25 15:18:55 +0200)
->
-> ----------------------------------------------------------------
-> Block layer patches:
->
-> - qcow2: Fix data corruption bug that is triggered in partial cluster
->   allocation with default options
-> - qapi: add support for blkreplay driver
-> - doc: Describe missing generic -blockdev options
-> - iotests: Fix 118 when run as root
-> - Minor code cleanups
->
-> ----------------------------------------------------------------
+On Fri, Oct 25, 2019 at 02:19:19PM +0200, Jens Freimann wrote:
+> This is implementing the host side of the net_failover concept
+> (https://www.kernel.org/doc/html/latest/networking/net_failover.html)
+> 
+> Changes since v5:
+> * rename net_failover_pair_id parameter/property to failover_pair_id
+> * in PCI code use pci_bus_is_express(). This won't fail on functions > 0
+> * make sure primary and standby can't be added to same PCI slot
+> * add documentation file in docs/ to virtio-net patch, add file to
+>    MAINTAINERS (added to networking devices section)
+> * add comment to QAPI event for failover negotiation, try to improve
+>    commit message 
+> 
+> The general idea is that we have a pair of devices, a vfio-pci and a
+> virtio-net device. Before migration the vfio device is unplugged and data
+> flows to the virtio-net device, on the target side another vfio-pci device
+> is plugged in to take over the data-path. In the guest the net_failover
+> module will pair net devices with the same MAC address.
+> 
+> * Patch 1 adds the infrastructure to hide the device for the qbus and qdev APIs
+> 
+> * Patch 2 adds checks to PCIDevice for only allowing ethernet devices as
+>   failover primary and only PCIExpress capable devices
+> 
+> * Patch 3 sets a new flag for PCIDevice 'partially_hotplugged' which we
+>   use to skip the unrealize code path when doing a unplug of the primary
+>   device
+> 
+> * Patch 4 sets the pending_deleted_event before triggering the guest
+>   unplug request
+> 
+> * Patch 5 and 6 add new qmp events, one sends the device id of a device
+>   that was just requested to be unplugged from the guest and another one
+>   to let libvirt know if VIRTIO_NET_F_STANDBY was negotiated
+> 
+> * Patch 7 make sure that we can unplug the vfio-device before
+>   migration starts
+> 
+> * Patch 8 adds a new migration state that is entered while we wait for
+>   devices to be unplugged by guest OS
+> 
+> * Patch 9 just adds the new migration state to a check in libqos code
+> 
+> * Patch 10 In the second patch the virtio-net uses the API to defer adding the vfio
+>   device until the VIRTIO_NET_F_STANDBY feature is acked. It also
+>   implements the migration handler to unplug the device from the guest and
+>   re-plug in case of migration failure
+> 
+> * Patch 11 allows migration for failover vfio-pci devices
+> 
+> Previous discussion:
+>   RFC v1 https://patchwork.ozlabs.org/cover/989098/
+>   RFC v2 https://www.mail-archive.com/qemu-devel@nongnu.org/msg606906.html
+>   v1: https://lists.gnu.org/archive/html/qemu-devel/2019-05/msg03968.html
+>   v2: https://www.mail-archive.com/qemu-devel@nongnu.org/msg635214.html
+>   v3: https://patchew.org/QEMU/20191011112015.11785-1-jfreimann@redhat.com/
+>   v4: https://patchew.org/QEMU/20191018202040.30349-1-jfreimann@redhat.com/
+>   v5: https://patchew.org/QEMU/20191023082711.16694-1-jfreimann@redhat.com/
+> 
+> To summarize concerns/feedback from previous discussion:
+> 1.- guest OS can reject or worse _delay_ unplug by any amount of time.
+>   Migration might get stuck for unpredictable time with unclear reason.
+>   This approach combines two tricky things, hot/unplug and migration.
+>   -> We need to let libvirt know what's happening. Add new qmp events
+>      and a new migration state. When a primary device is (partially)
+>      unplugged (only from guest) we send a qmp event with the device id. When
+>      it is unplugged from the guest the DEVICE_DELETED event is sent.
+>      Migration will enter the wait-unplug state while waiting for the guest
+>      os to unplug all primary devices and then move on with migration.
+> 2. PCI devices are a precious ressource. The primary device should never
+>   be added to QEMU if it won't be used by guest instead of hiding it in
+>   QEMU.
+>   -> We only hotplug the device when the standby feature bit was
+>      negotiated. We save the device cmdline options until we need it for
+>      qdev_device_add()
 
+The status of the feature support in the guest can change.  E.g. a guest
+reboot will clear it for certain, and the guest may boot into another OS
+that doesn't support pv-pt failover, and will become confused by two
+network devices with the same MAC.  AFAICS from a brief skimming, the
+patchset doesn't appear to address this scenario (which is probably not
+so uncommon).
 
+>      Hiding a device can be a useful concept to model. For example a
+>      pci device in a powered-off slot could be marked as hidden until the slot is
+>      powered on (mst).
+> 3. Management layer software should handle this. Open Stack already has
+>   components/code to handle unplug/replug VFIO devices and metadata to
+>   provide to the guest for detecting which devices should be paired.
+>   -> An approach that includes all software from firmware to
+>      higher-level management software wasn't tried in the last years. This is
+>      an attempt to keep it simple and contained in QEMU as much as possible.
+>      One of the problems that stopped management software and libvirt from
+>      implementing this idea is that it can't be sure that it's possible to
+>      re-plug the primary device. By not freeing the devices resources in QEMU
+>      and only asking the guest OS to unplug it is possible to re-plug the
+>      device in case of a migration failure.
 
-Applied, thanks.
+Frankly I'm failing to see the point in requiring 100%-reliable re-plug
+on migration rollback.  The whole idea of this failover is to allow
+temporary QOS degradation; if this isn't allowed you don't even consider
+migrating.  So if the migration fails, you can leave the guest in the
+degraded state on the source host until a better migraion target is
+found or the conditions on the source host allow the re-plug to succeed.
 
-Please update the changelog at https://wiki.qemu.org/ChangeLog/4.2
-for any user-visible changes.
-
--- PMM
+Thanks,
+Roman.
 
