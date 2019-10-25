@@ -2,86 +2,61 @@ Return-Path: <SRS0=bySr=YS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A5C9ECA9EA0
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 16:03:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 65496CA9EA0
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 16:08:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 71D8021872
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 16:03:15 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="XcxZGkby"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 71D8021872
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 289862070B
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 16:08:37 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 289862070B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=rt-rk.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34190 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34294 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iO23W-0007oh-7V
-	for qemu-devel@archiver.kernel.org; Fri, 25 Oct 2019 12:03:14 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33769)
+	id 1iO28e-0005hy-LO
+	for qemu-devel@archiver.kernel.org; Fri, 25 Oct 2019 12:08:32 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34134)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1iO1zQ-0004Rz-Nq
- for qemu-devel@nongnu.org; Fri, 25 Oct 2019 11:59:01 -0400
+ (envelope-from <aleksandar.rikalo@rt-rk.com>) id 1iO22F-0007Ck-S7
+ for qemu-devel@nongnu.org; Fri, 25 Oct 2019 12:01:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1iO1zP-0000ka-Ga
- for qemu-devel@nongnu.org; Fri, 25 Oct 2019 11:59:00 -0400
-Received: from mail-wr1-x430.google.com ([2a00:1450:4864:20::430]:38830)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1iO1zP-0000kK-Ae
- for qemu-devel@nongnu.org; Fri, 25 Oct 2019 11:58:59 -0400
-Received: by mail-wr1-x430.google.com with SMTP id v9so2931342wrq.5
- for <qemu-devel@nongnu.org>; Fri, 25 Oct 2019 08:58:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=3fRx+H1bDXh1gn+0aN28Y42f87avsW9PJGXXX9/ZiRU=;
- b=XcxZGkbyFma0qczN/uOoCWPuVA5ArFc0vJLXVWYMCkYnOESORU6R4IwFHAiu13yJvw
- /3IgMLXwDc5qZjpfmpmPQ56HEVFZCbG6g5cN+/l6D8l/kVzsuyZuGRwHFD43Hz4DkxHa
- cQlugLAMmg0NBBedSKGIN7IQc3kQIkHmfge7P/WAQS2tT6G0SYk//0pSa/NtJTH8lwrn
- fCFUaekszG8bbEkW7CxsL4SdcbMFao+63P2PuIZWsQ2x9sSvKZD7lyiJDibcQr3NOwk/
- ajbsce6cTXpHzrYEdckjzCAXmOPMtpKUbDjMtXUnv2s6ZjCYfflRkpLeD2v60Iz51c0+
- 18Qg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=3fRx+H1bDXh1gn+0aN28Y42f87avsW9PJGXXX9/ZiRU=;
- b=qS6mfMpVBPaCK6bl2xXm5V7cYDgiynClhuwE6d4Wkk921YmWU/RiJ/uZQ7XYlutSnY
- yIXHdqyk66ICJxi7ZYb5ztSB4DICEpP5nZE3EwcwXYDCre6HbRxat9Sb1ooxShtKrmF7
- By7Fi2LucUV58vE3dmWgSDgl4bfj1KK+c16UXqGQWZ2xI9KR5hujJc6NKi34KT1/zA2T
- Y7HMODlYnijtCwpmdgiq77NWF4A46JIY/aasxnBGKAXzfWsB9P7J4CbY4Bu2oEe1dPXP
- +VdaxrFnMio2YQBN21DmtN3jxX1uu7KHTPDl0Ugw8kzms6fBn+WorDSaCH3alhGKODYL
- WZ1Q==
-X-Gm-Message-State: APjAAAV6mFPbtdzXKr6DoY2nY7S3nxKVKxcQq+I7+etyQ8WxHU3BncVJ
- szZQPh6oGDvKMY1eoPvnzvHLjOQaYLI=
-X-Google-Smtp-Source: APXvYqyESEwWX9MQ5z5QJZdCzl8KWi6aOkiiboPLaxl9iSGt2Tbv+b8bYX6m2i/kr7fZopbxNRhq2g==
-X-Received: by 2002:a5d:4003:: with SMTP id n3mr3511723wrp.95.1572019138054;
- Fri, 25 Oct 2019 08:58:58 -0700 (PDT)
-Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id 65sm4218887wrs.9.2019.10.25.08.58.56
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 25 Oct 2019 08:58:57 -0700 (PDT)
-From: Peter Maydell <peter.maydell@linaro.org>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v2 4/4] tcg/LICENSE: Remove out of date claim about TCG
- subdirectory licensing
-Date: Fri, 25 Oct 2019 16:58:48 +0100
-Message-Id: <20191025155848.17362-5-peter.maydell@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20191025155848.17362-1-peter.maydell@linaro.org>
-References: <20191025155848.17362-1-peter.maydell@linaro.org>
+ (envelope-from <aleksandar.rikalo@rt-rk.com>) id 1iO22D-0001iT-Ge
+ for qemu-devel@nongnu.org; Fri, 25 Oct 2019 12:01:55 -0400
+Received: from mx2.rt-rk.com ([89.216.37.149]:59585 helo=mail.rt-rk.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <aleksandar.rikalo@rt-rk.com>)
+ id 1iO22C-0001F7-6R
+ for qemu-devel@nongnu.org; Fri, 25 Oct 2019 12:01:52 -0400
+Received: from localhost (localhost [127.0.0.1])
+ by mail.rt-rk.com (Postfix) with ESMTP id 9BC041A2263;
+ Fri, 25 Oct 2019 18:00:43 +0200 (CEST)
+X-Virus-Scanned: amavisd-new at rt-rk.com
+Received: from [10.10.14.141] (rtrkw304-lin.domain.local [10.10.14.141])
+ by mail.rt-rk.com (Postfix) with ESMTPSA id 7BD001A225E;
+ Fri, 25 Oct 2019 18:00:43 +0200 (CEST)
+Subject: Re: [PATCH v7 11/14] target/mips: msa: Split helpers for
+ HSUB_<S|U>.<H|W|D>
+To: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>, qemu-devel@nongnu.org
+References: <1571826227-10583-1-git-send-email-aleksandar.markovic@rt-rk.com>
+ <1571826227-10583-12-git-send-email-aleksandar.markovic@rt-rk.com>
+From: Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>
+Message-ID: <6aaeae87-af3b-cb86-fc41-26d0f2f2a93a@rt-rk.com>
+Date: Fri, 25 Oct 2019 18:00:44 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::430
+In-Reply-To: <1571826227-10583-12-git-send-email-aleksandar.markovic@rt-rk.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [fuzzy]
+X-Received-From: 89.216.37.149
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -93,73 +68,327 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
- Claudio Fontana <claudio.fontana@gmail.com>,
- Ard Biesheuvel <ard.biesheuvel@linaro.org>, Laszlo Ersek <lersek@redhat.com>,
- Richard Henderson <richard.henderson@linaro.org>,
- Markus Armbruster <armbru@redhat.com>, Alexander Graf <agraf@csgraf.de>,
- Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Cc: Aleksandar Markovic <amarkovic@wavecomp.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Since 2008 the tcg/LICENSE file has not changed: it claims that
-everything under tcg/ is BSD-licensed.
+ > From: Aleksandar Markovic <amarkovic@wavecomp.com>
+ >
+ > Achieves clearer code and slightly better performance.
+ >
+ > Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+ > ---
+ >=C2=A0 target/mips/helper.h=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0 10 ++++-
+ >=C2=A0 target/mips/msa_helper.c | 108=20
++++++++++++++++++++++++++++++++++++++++++------
+ >=C2=A0 target/mips/translate.c=C2=A0 |=C2=A0 32 +++++++++++---
+ >=C2=A0 3 files changed, 129 insertions(+), 21 deletions(-)
+ >
+ > diff --git a/target/mips/helper.h b/target/mips/helper.h
+ > index 7bb13d5..d7c4bbf 100644
+ > --- a/target/mips/helper.h
+ > +++ b/target/mips/helper.h
+ > @@ -945,6 +945,14 @@ DEF_HELPER_4(msa_mod_s_h, void, env, i32, i32, i3=
+2)
+ >=C2=A0 DEF_HELPER_4(msa_mod_s_w, void, env, i32, i32, i32)
+ >=C2=A0 DEF_HELPER_4(msa_mod_s_d, void, env, i32, i32, i32)
+ >
+ > +DEF_HELPER_4(msa_hsub_s_h, void, env, i32, i32, i32)
+ > +DEF_HELPER_4(msa_hsub_s_w, void, env, i32, i32, i32)
+ > +DEF_HELPER_4(msa_hsub_s_d, void, env, i32, i32, i32)
+ > +
+ > +DEF_HELPER_4(msa_hsub_u_h, void, env, i32, i32, i32)
+ > +DEF_HELPER_4(msa_hsub_u_w, void, env, i32, i32, i32)
+ > +DEF_HELPER_4(msa_hsub_u_d, void, env, i32, i32, i32)
+ > +
+ >=C2=A0 DEF_HELPER_4(msa_ilvev_b, void, env, i32, i32, i32)
+ >=C2=A0 DEF_HELPER_4(msa_ilvev_h, void, env, i32, i32, i32)
+ >=C2=A0 DEF_HELPER_4(msa_ilvev_w, void, env, i32, i32, i32)
+ > @@ -1059,8 +1067,6 @@ DEF_HELPER_5(msa_dpsub_u_df, void, env, i32,=20
+i32, i32, i32)
+ >=C2=A0 DEF_HELPER_5(msa_sld_df, void, env, i32, i32, i32, i32)
+ >=C2=A0 DEF_HELPER_5(msa_splat_df, void, env, i32, i32, i32, i32)
+ >=C2=A0 DEF_HELPER_5(msa_vshf_df, void, env, i32, i32, i32, i32)
+ > -DEF_HELPER_5(msa_hsub_s_df, void, env, i32, i32, i32, i32)
+ > -DEF_HELPER_5(msa_hsub_u_df, void, env, i32, i32, i32, i32)
+ >
+ >=C2=A0 DEF_HELPER_5(msa_sldi_df, void, env, i32, i32, i32, i32)
+ >=C2=A0 DEF_HELPER_5(msa_splati_df, void, env, i32, i32, i32, i32)
+ > diff --git a/target/mips/msa_helper.c b/target/mips/msa_helper.c
+ > index 2400632..ae9e8e0 100644
+ > --- a/target/mips/msa_helper.c
+ > +++ b/target/mips/msa_helper.c
+ > @@ -2888,7 +2888,101 @@ void helper_msa_mod_u_d(CPUMIPSState *env,
+ >=C2=A0=C2=A0 *=20
++---------------+--------------------------------------------------------=
+--+
+ >=C2=A0=C2=A0 */
+ >
+ > -/* TODO: insert Int Subtract group helpers here */
+ > +/* TODO: insert the rest of Int Subtract group helpers here */
+ > +
+ > +
+ > +static inline int64_t msa_hsub_s_df(uint32_t df, int64_t arg1,=20
+int64_t arg2)
+ > +{
+ > +=C2=A0=C2=A0=C2=A0 return SIGNED_ODD(arg1, df) - SIGNED_EVEN(arg2, df=
+);
+ > +}
+ > +
+ > +void helper_msa_hsub_s_h(CPUMIPSState *env,
+ > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+ uint32_t wd, uint32_t ws, uint32_t wt)
+ > +{
+ > +=C2=A0=C2=A0=C2=A0 wr_t *pwd =3D &(env->active_fpu.fpr[wd].wr);
+ > +=C2=A0=C2=A0=C2=A0 wr_t *pws =3D &(env->active_fpu.fpr[ws].wr);
+ > +=C2=A0=C2=A0=C2=A0 wr_t *pwt =3D &(env->active_fpu.fpr[wt].wr);
+ > +
+ > +=C2=A0=C2=A0=C2=A0 pwd->h[0]=C2=A0 =3D msa_hsub_s_df(DF_HALF, pws->h[=
+0], pwt->h[0]);
+ > +=C2=A0=C2=A0=C2=A0 pwd->h[1]=C2=A0 =3D msa_hsub_s_df(DF_HALF, pws->h[=
+1], pwt->h[1]);
+ > +=C2=A0=C2=A0=C2=A0 pwd->h[2]=C2=A0 =3D msa_hsub_s_df(DF_HALF, pws->h[=
+2], pwt->h[2]);
+ > +=C2=A0=C2=A0=C2=A0 pwd->h[3]=C2=A0 =3D msa_hsub_s_df(DF_HALF, pws->h[=
+3], pwt->h[3]);
+ > +=C2=A0=C2=A0=C2=A0 pwd->h[4]=C2=A0 =3D msa_hsub_s_df(DF_HALF, pws->h[=
+4], pwt->h[4]);
+ > +=C2=A0=C2=A0=C2=A0 pwd->h[5]=C2=A0 =3D msa_hsub_s_df(DF_HALF, pws->h[=
+5], pwt->h[5]);
+ > +=C2=A0=C2=A0=C2=A0 pwd->h[6]=C2=A0 =3D msa_hsub_s_df(DF_HALF, pws->h[=
+6], pwt->h[6]);
+ > +=C2=A0=C2=A0=C2=A0 pwd->h[7]=C2=A0 =3D msa_hsub_s_df(DF_HALF, pws->h[=
+7], pwt->h[7]);
+ > +}
+ > +
+ > +void helper_msa_hsub_s_w(CPUMIPSState *env,
+ > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+ uint32_t wd, uint32_t ws, uint32_t wt)
+ > +{
+ > +=C2=A0=C2=A0=C2=A0 wr_t *pwd =3D &(env->active_fpu.fpr[wd].wr);
+ > +=C2=A0=C2=A0=C2=A0 wr_t *pws =3D &(env->active_fpu.fpr[ws].wr);
+ > +=C2=A0=C2=A0=C2=A0 wr_t *pwt =3D &(env->active_fpu.fpr[wt].wr);
+ > +
+ > +=C2=A0=C2=A0=C2=A0 pwd->w[0]=C2=A0 =3D msa_hsub_s_df(DF_WORD, pws->w[=
+0], pwt->w[0]);
+ > +=C2=A0=C2=A0=C2=A0 pwd->w[1]=C2=A0 =3D msa_hsub_s_df(DF_WORD, pws->w[=
+1], pwt->w[1]);
+ > +=C2=A0=C2=A0=C2=A0 pwd->w[2]=C2=A0 =3D msa_hsub_s_df(DF_WORD, pws->w[=
+2], pwt->w[2]);
+ > +=C2=A0=C2=A0=C2=A0 pwd->w[3]=C2=A0 =3D msa_hsub_s_df(DF_WORD, pws->w[=
+3], pwt->w[3]);
+ > +}
+ > +
+ > +void helper_msa_hsub_s_d(CPUMIPSState *env,
+ > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+ uint32_t wd, uint32_t ws, uint32_t wt)
+ > +{
+ > +=C2=A0=C2=A0=C2=A0 wr_t *pwd =3D &(env->active_fpu.fpr[wd].wr);
+ > +=C2=A0=C2=A0=C2=A0 wr_t *pws =3D &(env->active_fpu.fpr[ws].wr);
+ > +=C2=A0=C2=A0=C2=A0 wr_t *pwt =3D &(env->active_fpu.fpr[wt].wr);
+ > +
+ > +=C2=A0=C2=A0=C2=A0 pwd->d[0]=C2=A0 =3D msa_hsub_s_df(DF_DOUBLE, pws->=
+d[0], pwt->d[0]);
+ > +=C2=A0=C2=A0=C2=A0 pwd->d[1]=C2=A0 =3D msa_hsub_s_df(DF_DOUBLE, pws->=
+d[1], pwt->d[1]);
+ > +}
+ > +
+ > +
+ > +static inline int64_t msa_hsub_u_df(uint32_t df, int64_t arg1,=20
+int64_t arg2)
+ > +{
+ > +=C2=A0=C2=A0=C2=A0 return UNSIGNED_ODD(arg1, df) - UNSIGNED_EVEN(arg2=
+, df);
+ > +}
+ > +
+ > +void helper_msa_hsub_u_h(CPUMIPSState *env,
+ > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+ uint32_t wd, uint32_t ws, uint32_t wt)
+ > +{
+ > +=C2=A0=C2=A0=C2=A0 wr_t *pwd =3D &(env->active_fpu.fpr[wd].wr);
+ > +=C2=A0=C2=A0=C2=A0 wr_t *pws =3D &(env->active_fpu.fpr[ws].wr);
+ > +=C2=A0=C2=A0=C2=A0 wr_t *pwt =3D &(env->active_fpu.fpr[wt].wr);
+ > +
+ > +=C2=A0=C2=A0=C2=A0 pwd->h[0]=C2=A0 =3D msa_hsub_u_df(DF_HALF, pws->h[=
+0], pwt->h[0]);
+ > +=C2=A0=C2=A0=C2=A0 pwd->h[1]=C2=A0 =3D msa_hsub_u_df(DF_HALF, pws->h[=
+1], pwt->h[1]);
+ > +=C2=A0=C2=A0=C2=A0 pwd->h[2]=C2=A0 =3D msa_hsub_u_df(DF_HALF, pws->h[=
+2], pwt->h[2]);
+ > +=C2=A0=C2=A0=C2=A0 pwd->h[3]=C2=A0 =3D msa_hsub_u_df(DF_HALF, pws->h[=
+3], pwt->h[3]);
+ > +=C2=A0=C2=A0=C2=A0 pwd->h[4]=C2=A0 =3D msa_hsub_u_df(DF_HALF, pws->h[=
+4], pwt->h[4]);
+ > +=C2=A0=C2=A0=C2=A0 pwd->h[5]=C2=A0 =3D msa_hsub_u_df(DF_HALF, pws->h[=
+5], pwt->h[5]);
+ > +=C2=A0=C2=A0=C2=A0 pwd->h[6]=C2=A0 =3D msa_hsub_u_df(DF_HALF, pws->h[=
+6], pwt->h[6]);
+ > +=C2=A0=C2=A0=C2=A0 pwd->h[7]=C2=A0 =3D msa_hsub_u_df(DF_HALF, pws->h[=
+7], pwt->h[7]);
+ > +}
+ > +
+ > +void helper_msa_hsub_u_w(CPUMIPSState *env,
+ > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+ uint32_t wd, uint32_t ws, uint32_t wt)
+ > +{
+ > +=C2=A0=C2=A0=C2=A0 wr_t *pwd =3D &(env->active_fpu.fpr[wd].wr);
+ > +=C2=A0=C2=A0=C2=A0 wr_t *pws =3D &(env->active_fpu.fpr[ws].wr);
+ > +=C2=A0=C2=A0=C2=A0 wr_t *pwt =3D &(env->active_fpu.fpr[wt].wr);
+ > +
+ > +=C2=A0=C2=A0=C2=A0 pwd->w[0]=C2=A0 =3D msa_hsub_u_df(DF_WORD, pws->w[=
+0], pwt->w[0]);
+ > +=C2=A0=C2=A0=C2=A0 pwd->w[1]=C2=A0 =3D msa_hsub_u_df(DF_WORD, pws->w[=
+1], pwt->w[1]);
+ > +=C2=A0=C2=A0=C2=A0 pwd->w[2]=C2=A0 =3D msa_hsub_u_df(DF_WORD, pws->w[=
+2], pwt->w[2]);
+ > +=C2=A0=C2=A0=C2=A0 pwd->w[3]=C2=A0 =3D msa_hsub_u_df(DF_WORD, pws->w[=
+3], pwt->w[3]);
+ > +}
+ > +
+ > +void helper_msa_hsub_u_d(CPUMIPSState *env,
+ > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+ uint32_t wd, uint32_t ws, uint32_t wt)
+ > +{
+ > +=C2=A0=C2=A0=C2=A0 wr_t *pwd =3D &(env->active_fpu.fpr[wd].wr);
+ > +=C2=A0=C2=A0=C2=A0 wr_t *pws =3D &(env->active_fpu.fpr[ws].wr);
+ > +=C2=A0=C2=A0=C2=A0 wr_t *pwt =3D &(env->active_fpu.fpr[wt].wr);
+ > +
+ > +=C2=A0=C2=A0=C2=A0 pwd->d[0]=C2=A0 =3D msa_hsub_u_df(DF_DOUBLE, pws->=
+d[0], pwt->d[0]);
+ > +=C2=A0=C2=A0=C2=A0 pwd->d[1]=C2=A0 =3D msa_hsub_u_df(DF_DOUBLE, pws->=
+d[1], pwt->d[1]);
+ > +}
+ >
+ >
+ >=C2=A0 /*
+ > @@ -4450,16 +4544,6 @@ static inline void msa_sld_df(uint32_t df,=20
+wr_t *pwd,
+ >=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
+ >=C2=A0 }
+ >
+ > -static inline int64_t msa_hsub_s_df(uint32_t df, int64_t arg1,=20
+int64_t arg2)
+ > -{
+ > -=C2=A0=C2=A0=C2=A0 return SIGNED_ODD(arg1, df) - SIGNED_EVEN(arg2, df=
+);
+ > -}
+ > -
+ > -static inline int64_t msa_hsub_u_df(uint32_t df, int64_t arg1,=20
+int64_t arg2)
+ > -{
+ > -=C2=A0=C2=A0=C2=A0 return UNSIGNED_ODD(arg1, df) - UNSIGNED_EVEN(arg2=
+, df);
+ > -}
+ > -
+ >=C2=A0 static inline int64_t msa_mul_q_df(uint32_t df, int64_t arg1,=20
+int64_t arg2)
+ >=C2=A0 {
+ >=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 int64_t q_min =3D DF_MIN_INT(df);
+ > @@ -4545,8 +4629,6 @@ MSA_BINOP_DF(asub_u)
+ >=C2=A0 MSA_BINOP_DF(mulv)
+ >=C2=A0 MSA_BINOP_DF(dotp_s)
+ >=C2=A0 MSA_BINOP_DF(dotp_u)
+ > -MSA_BINOP_DF(hsub_s)
+ > -MSA_BINOP_DF(hsub_u)
+ >
+ >=C2=A0 MSA_BINOP_DF(mul_q)
+ >=C2=A0 MSA_BINOP_DF(mulr_q)
+ > diff --git a/target/mips/translate.c b/target/mips/translate.c
+ > index a57e0da..4c68c5b 100644
+ > --- a/target/mips/translate.c
+ > +++ b/target/mips/translate.c
+ > @@ -29107,6 +29107,32 @@ static void gen_msa_3r(CPUMIPSState *env,=20
+DisasContext *ctx)
+ >=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 break;
+ >=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0 }
+ >=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0 break;
+ > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 case OPC_HSUB_S_df:
+ > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 sw=
+itch (df) {
+ > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ca=
+se DF_HALF:
+ > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 gen_helper_msa_hsub_s_h(cpu_env, twd, tws, twt);
+ > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 break;
+ > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ca=
+se DF_WORD:
+ > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 gen_helper_msa_hsub_s_w(cpu_env, twd, tws, twt);
+ > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 break;
+ > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ca=
+se DF_DOUBLE:
+ > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 gen_helper_msa_hsub_s_d(cpu_env, twd, tws, twt);
+ > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 break;
+ > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
+ > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 br=
+eak;
+ > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 case OPC_HSUB_U_df:
+ > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 sw=
+itch (df) {
+ > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ca=
+se DF_HALF:
+ > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 gen_helper_msa_hsub_u_h(cpu_env, twd, tws, twt);
+ > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 break;
+ > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ca=
+se DF_WORD:
+ > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 gen_helper_msa_hsub_u_w(cpu_env, twd, tws, twt);
+ > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 break;
+ > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ca=
+se DF_DOUBLE:
+ > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 gen_helper_msa_hsub_u_d(cpu_env, twd, tws, twt);
+ > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 break;
+ > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
+ > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 br=
+eak;
+ >=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 case OPC_DOTP_S_=
+df:
+ >=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0 gen_helper_msa_dotp_s_df(cpu_env, tdf, twd, tws, twt);
+ >=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0 break;
+ > @@ -29125,12 +29151,6 @@ static void gen_msa_3r(CPUMIPSState *env,=20
+DisasContext *ctx)
+ >=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 case OPC_DPSUB_U=
+_df:
+ >=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0 gen_helper_msa_dpsub_u_df(cpu_env, tdf, twd, tws, twt);
+ >=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0 break;
+ > -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 case OPC_HSUB_S_df:
+ > -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ge=
+n_helper_msa_hsub_s_df(cpu_env, tdf, twd, tws, twt);
+ > -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 br=
+eak;
+ > -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 case OPC_HSUB_U_df:
+ > -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ge=
+n_helper_msa_hsub_u_df(cpu_env, tdf, twd, tws, twt);
+ > -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 br=
+eak;
+ >=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
+ >=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 break;
+ >=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 default:
 
-This is not true and hasn't been true for years: in 2013 we
-accepted the tcg/aarch64 target code under a GPLv2-or-later
-license statement. We also have generic vector optimisation
-code under the LGPL2.1-or-later, and the TCI backend is
-GPLv2-or-later. Further, many of the files are not BSD
-licensed but MIT licensed.
 
-We don't really consider the tcg subdirectory to be a distinct part
-of QEMU anyway.
-
-Remove the LICENSE file, since claiming false information
-about the license of the code is confusing.
-
-Update the main project LICENSE file also to be clearer about
-the licenses used by TCG.
-
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
----
-Changes v1->v2: changed wording of new para 3 in
-top level LICENSE file, since I noticed that we actually
-have a lot of MIT-licensed code in tcg/ too.
----
- LICENSE     | 5 +++--
- tcg/LICENSE | 3 ---
- 2 files changed, 3 insertions(+), 5 deletions(-)
- delete mode 100644 tcg/LICENSE
-
-diff --git a/LICENSE b/LICENSE
-index 9389ba614f8..f19b018486a 100644
---- a/LICENSE
-+++ b/LICENSE
-@@ -18,8 +18,9 @@ As of July 2013, contributions under version 2 of the GNU General Public
- License (and no later version) are only accepted for the following files
- or directories: bsd-user/, linux-user/, hw/vfio/, hw/xen/xen_pt*.
- 
--3) The Tiny Code Generator (TCG) is released under the BSD license
--   (see license headers in files).
-+3) The Tiny Code Generator (TCG) is mostly under the BSD or MIT licenses;
-+   but some parts may be GPLv2 or other licenses. Again, see the
-+   specific licensing information in each source file.
- 
- 4) QEMU is a trademark of Fabrice Bellard.
- 
-diff --git a/tcg/LICENSE b/tcg/LICENSE
-deleted file mode 100644
-index be817fa1625..00000000000
---- a/tcg/LICENSE
-+++ /dev/null
-@@ -1,3 +0,0 @@
--All the files in this directory and subdirectories are released under
--a BSD like license (see header in each file). No other license is
--accepted.
--- 
-2.20.1
+Reviewed-by: Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>
 
 
