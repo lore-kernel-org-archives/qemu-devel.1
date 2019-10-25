@@ -2,82 +2,81 @@ Return-Path: <SRS0=bySr=YS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-10.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 43891CA9EA0
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 10:55:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E37FCA9EA0
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 10:56:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0A01021929
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 10:55:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id EEB2B21D71
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 10:56:19 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UydOuwpR"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0A01021929
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="jezXd4Mv"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EEB2B21D71
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58526 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58530 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iNxFj-0000sj-0s
-	for qemu-devel@archiver.kernel.org; Fri, 25 Oct 2019 06:55:31 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35037)
+	id 1iNxGU-0001im-TT
+	for qemu-devel@archiver.kernel.org; Fri, 25 Oct 2019 06:56:18 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38583)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <kwolf@redhat.com>) id 1iNwgw-0000LO-LY
- for qemu-devel@nongnu.org; Fri, 25 Oct 2019 06:19:35 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1iNx6q-0006Te-LX
+ for qemu-devel@nongnu.org; Fri, 25 Oct 2019 06:46:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kwolf@redhat.com>) id 1iNwgv-0002O2-40
- for qemu-devel@nongnu.org; Fri, 25 Oct 2019 06:19:34 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:56896
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1iNwgv-0002N1-0Y
- for qemu-devel@nongnu.org; Fri, 25 Oct 2019 06:19:33 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1571998770;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=HZo/JBOv+pMyXQAy2tOmSk9WXn/8kYiIXIzF1+Wnb9Q=;
- b=UydOuwpRSx2wL35F2WCiXWRhon6CZDfpZ/3Bp+ofZRV5XQPexhi8haqgGSSVYl8i7GyhCm
- ukzp176/yLTUjYkeiTrdplm3mcWNkHcv57UHUeGsqK9AEuzQNIdVxlUwDd2zaXLJtfpbtX
- U0RdEyAX1hCCdQrBmzKXk2qf5BBNtvw=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-105-xabirLy0O4yDjdcHXmwZow-1; Fri, 25 Oct 2019 06:19:27 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6F1F047B;
- Fri, 25 Oct 2019 10:19:26 +0000 (UTC)
-Received: from localhost.localdomain (ovpn-117-223.ams2.redhat.com
- [10.36.117.223])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id D15E910027C0;
- Fri, 25 Oct 2019 10:19:21 +0000 (UTC)
-Date: Fri, 25 Oct 2019 12:19:20 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-To: Max Reitz <mreitz@redhat.com>
-Subject: Re: [RFC 2/3] block/file-posix: Detect XFS with CONFIG_FALLOCATE
-Message-ID: <20191025101920.GB7275@localhost.localdomain>
-References: <20191025095849.25283-1-mreitz@redhat.com>
- <20191025095849.25283-3-mreitz@redhat.com>
+ (envelope-from <peter.maydell@linaro.org>) id 1iNx6p-0004t2-5z
+ for qemu-devel@nongnu.org; Fri, 25 Oct 2019 06:46:20 -0400
+Received: from mail-ot1-x334.google.com ([2607:f8b0:4864:20::334]:39192)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1iNx6n-0004sB-9x
+ for qemu-devel@nongnu.org; Fri, 25 Oct 2019 06:46:19 -0400
+Received: by mail-ot1-x334.google.com with SMTP id s22so1743018otr.6
+ for <qemu-devel@nongnu.org>; Fri, 25 Oct 2019 03:46:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=WGppmCpKS3dwHZsjVwAOeneLFq0wEm5HeaXQ9RYdWww=;
+ b=jezXd4MveKc7sm/La/hW7yPTXUPvy+EYlEWcm/GzYF4eEM75vI9uwMaA4zd+nLSRoe
+ c35FN2QVWxMA6cKOG6x4EooFWVlrviM2SAooasvVU8uOTwp24v5/5XEfE17u60/5wc0C
+ MLTkmFoDqCYZQn7QiaGx+zB9UG/zWUGedaJfmvclhgTk+YuSnyBRFIykbpOZATAwFdi+
+ AUYLDKIR8g800J+fM5eUZyFdH9ZMlxYpwbBhle535CHLb/ib1DVwfJ77kw23UltUB7AG
+ khZOhT205ggUBQAbAazzGXt2Aqt57RYPREbNvTqV6YAjDFRono0lAGr6dp7dje9h+bBj
+ MMZw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=WGppmCpKS3dwHZsjVwAOeneLFq0wEm5HeaXQ9RYdWww=;
+ b=G4QwdIvwbg0BAnNXgHkwSH62AIFiZ+nHOch8i6zs2/NoZqX5Qj61iK4CMKTWVvmmIO
+ 2VrIgO0x02HBgPy9Uu+QOdkmqJ7AUlk98VMJw4CKKPTaZ1Q/MhKkKmCmuwIVpp1asTMM
+ CdtJqjP0oBniaA6mHiWmxjvjRx0wC9LwfTpohvK5hfsdqxHygb3p7GoIoZnD90yV4yLw
+ OVrIAaOjmFtSBnLRCr3hWP7O8gVj22bw64x8dZ24yvWXtNHNGOhlZJ+DFV1KBWz8jEwG
+ XHoROCF5mgJO1nahxN82t45ob4Pl/Vy2al1a1nKWb0K/0IHaOM80ja8rw1R8zXQHg8J3
+ HxMQ==
+X-Gm-Message-State: APjAAAUfIgWKLMWO2GpBOLEvSWdJyA/UpPU1Iv4lLS03+whi1/McvyxK
+ AQ8prZJ3wu8WvWOJIc3oCbVTy2CvOehWcqlXfgpJ6w==
+X-Google-Smtp-Source: APXvYqwRpYBGt8rBDr3xKsmcVJJN6sOWgsA+JEuiMZlVs6unNW3BYDJ3Lsr20URM4T+qV8gS1ulPzJpMoqfo7aLN/gg=
+X-Received: by 2002:a9d:708e:: with SMTP id l14mr704068otj.135.1572000376362; 
+ Fri, 25 Oct 2019 03:46:16 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20191025095849.25283-3-mreitz@redhat.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-MC-Unique: xabirLy0O4yDjdcHXmwZow-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=WINDOWS-1252
+References: <1571925835-31930-1-git-send-email-pbonzini@redhat.com>
+In-Reply-To: <1571925835-31930-1-git-send-email-pbonzini@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 25 Oct 2019 11:46:05 +0100
+Message-ID: <CAFEAcA-1gWa8qRK85i+MP-UixiPq7NPHw+8kn6KPq6VQMtRt4g@mail.gmail.com>
+Subject: Re: [PULL 00/39] Misc (mostly x86) patches for 2019-10-24
+To: Paolo Bonzini <pbonzini@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.81
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::334
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,51 +88,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- Alberto Garcia <berto@igalia.com>, qemu-block@nongnu.org,
- qemu-devel@nongnu.org, Anton Nefedov <anton.nefedov@virtuozzo.com>,
- Stefan Hajnoczi <stefanha@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Am 25.10.2019 um 11:58 hat Max Reitz geschrieben:
-> We will need this for the next patch.
->=20
-> Signed-off-by: Max Reitz <mreitz@redhat.com>
-> ---
->  block/file-posix.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
->=20
-> diff --git a/block/file-posix.c b/block/file-posix.c
-> index 695fcf740d..5cd54c8bff 100644
-> --- a/block/file-posix.c
-> +++ b/block/file-posix.c
-> @@ -149,7 +149,7 @@ typedef struct BDRVRawState {
->      int perm_change_flags;
->      BDRVReopenState *reopen_state;
-> =20
-> -#ifdef CONFIG_XFS
-> +#if defined(CONFIG_XFS) || defined(CONFIG_FALLOCATE)
->      bool is_xfs:1;
->  #endif
->      bool has_discard:1;
-> @@ -667,7 +667,7 @@ static int raw_open_common(BlockDriverState *bs, QDic=
-t *options,
->      }
->  #endif
-> =20
-> -#ifdef CONFIG_XFS
-> +#if defined(CONFIG_XFS) || defined(CONFIG_FALLOCATE)
->      if (platform_test_xfs_fd(s->fd)) {
+On Thu, 24 Oct 2019 at 15:21, Paolo Bonzini <pbonzini@redhat.com> wrote:
+>
+> The following changes since commit e9d42461920f6f40f4d847a5ba18e90d095ed0=
+b9:
+>
+>   Merge remote-tracking branch 'remotes/kraxel/tags/audio-20191018-pull-r=
+equest' into staging (2019-10-18 14:13:11 +0100)
+>
+> are available in the git repository at:
+>
+>
+>   git://github.com/bonzini/qemu.git tags/for-upstream
+>
+> for you to fetch changes up to a263f81cb4b302eb392898bdc4ad4381e1961629:
+>
+>   i386: implement IGNNE (2019-10-24 16:02:04 +0200)
+>
+> ----------------------------------------------------------------
+> * Bulgarian translation update (Alexander)
+> * RTC and PC refactorings (Herv=C3=A9, Philippe, Sergio)
+> * RTC fix (Marcelo)
+> * More comprehensive MCE logging (Mario)
+> * x86 IGNNE implementation (Paolo)
+> * Microvm machine type (Sergio)
+> * Support for UMONITOR/UMWAIT/TPAUSE (Tao)
+> * Do not use %m in common code (Thomas)
+> * NoNonArchitecturalCoreSharing Hyper-V enlightenment (Vitaly)
+> * getpagesize cleanups (Wei)
+>
 
-platform_test_xfs_fd() is defined in a header file from xfsprogs. I
-don't think you can call that without CONFIG_XFS, it would break the
-build.
+I got a link failure building the --disable-tcg config on x86-64:
 
->          s->is_xfs =3D true;
->      }
 
-Kevin
+  LINK    x86_64-softmmu/qemu-system-x86_64
+hw/i386/pc_piix.o: In function `pc_init1':
+/home/petmay01/linaro/qemu-for-merges/hw/i386/pc_piix.c:216: undefined
+reference to `x86_register_ferr_irq'
+hw/i386/pc_q35.o: In function `pc_q35_init':
+/home/petmay01/linaro/qemu-for-merges/hw/i386/pc_q35.c:264: undefined
+reference to `x86_register_ferr_irq'
+collect2: error: ld returned 1 exit status
+Makefile:206: recipe for target 'qemu-system-x86_64' failed
+make[1]: *** [qemu-system-x86_64] Error 1
+Makefile:482: recipe for target 'x86_64-softmmu/all' failed
+make: *** [x86_64-softmmu/all] Error 2
+make: *** Waiting for unfinished jobs....
+  LINK    i386-softmmu/qemu-system-i386
+hw/i386/pc_piix.o: In function `pc_init1':
+/home/petmay01/linaro/qemu-for-merges/hw/i386/pc_piix.c:216: undefined
+reference to `x86_register_ferr_irq'
+hw/i386/pc_q35.o: In function `pc_q35_init':
+/home/petmay01/linaro/qemu-for-merges/hw/i386/pc_q35.c:264: undefined
+reference to `x86_register_ferr_irq'
+collect2: error: ld returned 1 exit status
 
+
+x86_register_ferr_irq() is defined in target/i386/fpu_helper.c,
+which is only built if CONFIG_TCG, but the callers don't
+seem to be similarly guarded and there's no stub fallback.
+
+thanks
+-- PMM
 
