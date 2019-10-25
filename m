@@ -7,75 +7,75 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 64FF0CA9EA0
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 07:44:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 55780CA9EA0
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 07:45:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2E31521929
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 07:44:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 21FE421D71
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 07:45:06 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ag8ntVPr"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2E31521929
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="O0cbxHjU"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 21FE421D71
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57046 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57054 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iNuGp-0004T9-RX
-	for qemu-devel@archiver.kernel.org; Fri, 25 Oct 2019 03:44:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40339)
+	id 1iNuHQ-0004v3-Sr
+	for qemu-devel@archiver.kernel.org; Fri, 25 Oct 2019 03:45:04 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40472)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1iNtpt-0004W8-S8
- for qemu-devel@nongnu.org; Fri, 25 Oct 2019 03:16:39 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1iNtq0-0004iv-VS
+ for qemu-devel@nongnu.org; Fri, 25 Oct 2019 03:16:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1iNtps-00078m-MN
- for qemu-devel@nongnu.org; Fri, 25 Oct 2019 03:16:37 -0400
-Received: from mail-wr1-x432.google.com ([2a00:1450:4864:20::432]:35402)
+ (envelope-from <alex.bennee@linaro.org>) id 1iNtpz-0007F7-HC
+ for qemu-devel@nongnu.org; Fri, 25 Oct 2019 03:16:44 -0400
+Received: from mail-wm1-x32b.google.com ([2a00:1450:4864:20::32b]:38952)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1iNtps-000780-Gl
- for qemu-devel@nongnu.org; Fri, 25 Oct 2019 03:16:36 -0400
-Received: by mail-wr1-x432.google.com with SMTP id l10so1044272wrb.2
- for <qemu-devel@nongnu.org>; Fri, 25 Oct 2019 00:16:36 -0700 (PDT)
+ id 1iNtpz-0007EC-A7
+ for qemu-devel@nongnu.org; Fri, 25 Oct 2019 03:16:43 -0400
+Received: by mail-wm1-x32b.google.com with SMTP id r141so854747wme.4
+ for <qemu-devel@nongnu.org>; Fri, 25 Oct 2019 00:16:43 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=zhRtg+sEApcMcRytM7hTlQSCCfAJvUQn9AKAeTxM7RA=;
- b=ag8ntVPrTB6Hdqcf0VI6ZBY+jozPz0D/WjuQZXT6cK4lR7mLJAoTbN+sekjAw5eTO9
- JqUHa3La6o6DRx/x6aKG2TNwSl0jmfGtjWoNjQqcoSjK7OW2zgSHWhuhuNr9oYU5lNjv
- 39OBRo5wZMJMHQcaLim+Imjt6Zpbdtj7gOgs1AqvV7R+kZb1VYy5OXbT+lnsiK1ngNEy
- v2mAwqlwPwlM61g7rraBOsG3UmwUU2mXPWlBPy+EyrHCEWPS/HBN6kJPVrIvtgwMzmJR
- ueLgr0BlJui4CBB/QFTztofBNoigWCp450izXI43FN5OYbBUGjTMQ9Ge3qjloQsrqxEJ
- 0GMg==
+ bh=e6OWosr3vkKtYZuEhZpOOVQK50EP38/6kxdAzEYGV48=;
+ b=O0cbxHjU7L9AvD0g3dMSk5Ee9wETctht8caLB2opxTRjFKTAxvHwpKurLzQnpyHCZ9
+ eEfJOJnz8cBghbdYpU5B2Xuox9MIkISKsX7N3FXiZkAW7rEVw1Ge7rEaHQJQwCT/l36o
+ uPT/vNe4YMPWgV5h2GVAWa0iTLc1HGnWJU2dbKaDUAq5gKKT9eaTKv2fBQEK2EOPX11H
+ o8uqZFjaTWFktYY9rO5TbMCxEHj7N/pEtbFUmTBYgOoCt3mXkpAJGh3o3jQNQLDmGvp7
+ 1cBG4yGE/RcODDOWrqAp3ytUgKZIXkcXtQV7xoZsytXThw2QQ3x5cav8k0/dC34W550K
+ TA1A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=zhRtg+sEApcMcRytM7hTlQSCCfAJvUQn9AKAeTxM7RA=;
- b=BVv8tGdU3ogt1AP6B3Py/thkFERFgFwtGGyDq0WYreAg1rGlShMiaBr7SQ87BID9A3
- 7zIr2AY/Mw0D8yfxggG3egCdL8UygtAJqk+5z21w9t/k47kaRlTbwn2QRJ0K1tbNIKLH
- U3RZLkqh7J+KFiuc5xWsS+ekqMfK0ceoyYBQZqu412FAzVdpadObxqATV/bIGr+MDS1Q
- 9p2ZrfEVUeFm/LVh7X5wRTXH/Txt83rtZO+7Bh8avpmXn5dBb/+I+5xa1hB8SKyLaXv7
- bv3/P8pUYDtcRZc69kmcwKEx2ZJbfKkLRQTpSP6HYymfyCuhEeDcKsWeMvQbdUxrrUpK
- 9Nsg==
-X-Gm-Message-State: APjAAAXX2qRqjiM3+ulEC0Y5KZLYwGywtWXpP5W6gKWBzExjLm4jQr4p
- XGFotl70L6WSK1W3kpZpHdF9PQ==
-X-Google-Smtp-Source: APXvYqyQppsDGmmfkncHN/xe/vXR9Je6tp+fTk+XFoFl+8xGZrzeLtEZtcFTpWzFNbJm6Ih2eQEsVA==
-X-Received: by 2002:adf:eb8c:: with SMTP id t12mr1419545wrn.34.1571987795305; 
- Fri, 25 Oct 2019 00:16:35 -0700 (PDT)
+ bh=e6OWosr3vkKtYZuEhZpOOVQK50EP38/6kxdAzEYGV48=;
+ b=WlS57LlKKRqAKpMFFhHzJn4udGbp7xN64s21RLjpNuULTTnKPhuy93URKwQrsxK9I8
+ Nu0mnRRrTyyodQypcg9VxsylR2Xb5I+msTI8jBug+iYNMPkQZdLj3EBmJWB3R5IVJkPF
+ cEWnEJseCXjzZ9XZGCDA69A9j4+FxIVBqXqsrrNxnsnou2HiQA7VvPqiOI188qF3ToGm
+ nXOTKizdmogzPkRd8SB9hIR0x9W+BAYHFTRL/C6vNtcCs4Pt74xSeU11pyTsTtCtK6lA
+ XCM9GQK4cCzL8LReD+P3h2D4S1JfC/68XaN/KhgEJ52ab+3lbf8BAkih9HTXF13hbQop
+ DP4w==
+X-Gm-Message-State: APjAAAW4wjpLR/AY69sxeyDuEa41hTYkWXDr7HCftbeeZPjRvoCggLAZ
+ iB9TF/O1wHgYhnM4GjEggnuEW2x1rRs=
+X-Google-Smtp-Source: APXvYqyzDslGrfRHk9Jqdp8fh8HWCByD71g69sMTX9Va0f7CvNLETFTxXnF4epA9/DovNnpy5XyoFg==
+X-Received: by 2002:a1c:7e10:: with SMTP id z16mr1906939wmc.11.1571987802066; 
+ Fri, 25 Oct 2019 00:16:42 -0700 (PDT)
 Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id w17sm1199346wra.34.2019.10.25.00.16.32
+ by smtp.gmail.com with ESMTPSA id a17sm1176786wmb.8.2019.10.25.00.16.36
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 25 Oct 2019 00:16:32 -0700 (PDT)
+ Fri, 25 Oct 2019 00:16:40 -0700 (PDT)
 Received: from zen.lan (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id E43A01FFC4;
- Fri, 25 Oct 2019 07:37:17 +0100 (BST)
+ by zen.linaroharston (Postfix) with ESMTP id 2F5E91FFC7;
+ Fri, 25 Oct 2019 07:37:18 +0100 (BST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: peter.maydell@linaro.org
-Subject: [PULL v2 44/73] target/hppa: fetch code with translator_ld
-Date: Fri, 25 Oct 2019 07:36:44 +0100
-Message-Id: <20191025063713.23374-45-alex.bennee@linaro.org>
+Subject: [PULL v2 47/73] target/riscv: fetch code with translator_ld
+Date: Fri, 25 Oct 2019 07:36:47 +0100
+Message-Id: <20191025063713.23374-48-alex.bennee@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20191025063713.23374-1-alex.bennee@linaro.org>
 References: <20191025063713.23374-1-alex.bennee@linaro.org>
@@ -84,7 +84,7 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::432
+X-Received-From: 2a00:1450:4864:20::32b
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,10 +96,13 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
- "Emilio G. Cota" <cota@braap.org>,
+Cc: "open list:RISC-V TCG CPUs" <qemu-riscv@nongnu.org>,
+ Sagar Karandikar <sagark@eecs.berkeley.edu>,
+ Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
+ Palmer Dabbelt <palmer@sifive.com>,
  Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org,
- Richard Henderson <rth@twiddle.net>
+ "Emilio G. Cota" <cota@braap.org>, Alistair Francis <Alistair.Francis@wdc.com>,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
@@ -109,20 +112,22 @@ From: "Emilio G. Cota" <cota@braap.org>
 Signed-off-by: Emilio G. Cota <cota@braap.org>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+Acked-by: Palmer Dabbelt <palmer@sifive.com>
 
-diff --git a/target/hppa/translate.c b/target/hppa/translate.c
-index c1b2822f605..2f8d407a82b 100644
---- a/target/hppa/translate.c
-+++ b/target/hppa/translate.c
-@@ -4221,7 +4221,7 @@ static void hppa_tr_translate_insn(DisasContextBase *dcbase, CPUState *cs)
-     {
-         /* Always fetch the insn, even if nullified, so that we check
-            the page permissions for execute.  */
--        uint32_t insn = cpu_ldl_code(env, ctx->base.pc_next);
-+        uint32_t insn = translator_ldl(env, ctx->base.pc_next);
+diff --git a/target/riscv/translate.c b/target/riscv/translate.c
+index adeddb85f67..b26533d4fd7 100644
+--- a/target/riscv/translate.c
++++ b/target/riscv/translate.c
+@@ -779,7 +779,7 @@ static void riscv_tr_translate_insn(DisasContextBase *dcbase, CPUState *cpu)
+     DisasContext *ctx = container_of(dcbase, DisasContext, base);
+     CPURISCVState *env = cpu->env_ptr;
  
-         /* Set up the IA queue for the next insn.
-            This will be overwritten by a branch.  */
+-    ctx->opcode = cpu_ldl_code(env, ctx->base.pc_next);
++    ctx->opcode = translator_ldl(env, ctx->base.pc_next);
+     decode_opc(ctx);
+     ctx->base.pc_next = ctx->pc_succ_insn;
+ 
 -- 
 2.20.1
 
