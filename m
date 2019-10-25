@@ -2,83 +2,106 @@ Return-Path: <SRS0=bySr=YS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E9C94CA9EA0
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 13:15:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E09ECA9EA0
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 13:16:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B1CD12084C
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 13:15:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 313FB21D71
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 13:16:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AfMj+YJD"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B1CD12084C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Dn3YJjcn"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 313FB21D71
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59788 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59796 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iNzQu-00087X-83
-	for qemu-devel@archiver.kernel.org; Fri, 25 Oct 2019 09:15:12 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58710)
+	id 1iNzST-0000qy-L9
+	for qemu-devel@archiver.kernel.org; Fri, 25 Oct 2019 09:16:49 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58649)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mrolnik@gmail.com>) id 1iNzP0-0004NR-I0
- for qemu-devel@nongnu.org; Fri, 25 Oct 2019 09:13:15 -0400
+ (envelope-from <mreitz@redhat.com>) id 1iNzOr-00040M-Ed
+ for qemu-devel@nongnu.org; Fri, 25 Oct 2019 09:13:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mrolnik@gmail.com>) id 1iNzOz-00010c-90
- for qemu-devel@nongnu.org; Fri, 25 Oct 2019 09:13:14 -0400
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:35123)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <mrolnik@gmail.com>) id 1iNzOz-00010P-2e
- for qemu-devel@nongnu.org; Fri, 25 Oct 2019 09:13:13 -0400
-Received: by mail-wr1-x442.google.com with SMTP id l10so2305885wrb.2
- for <qemu-devel@nongnu.org>; Fri, 25 Oct 2019 06:13:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=oElsIV9jGIkcznG1hjJ8A0RR90Xk82sVn+s7o2gFZVw=;
- b=AfMj+YJDRV3VXvDVwY8MuRYmKIL0/myEEaKnU3etQpUsBJUL8v3dAwmlpGExXavcKI
- tTH9lUa2ck7ouswScfT3VpyffUbuApWdLFDqrjlyf33D17E3EC46E3526h6O+On3d8e2
- YANpkE0Z5e7AISCyd0TTAXlEUH8r7mwBvde463TmDS52lMmJ0cl8ZJmm+UIDWhiXldNY
- G7qp/+pEP783T1CPZ6fpv/xa2NkDxiEDNBCtCmAoiy5yLJXoC2TWPwUpUtormgnf5dRP
- alEieqKgSndJ7/Gk8bX/x/aQaUcAv3nU+EjuKYH9MB1mf5DEIWO+W1DVUwDIPJMgxTpH
- 69Qw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references;
- bh=oElsIV9jGIkcznG1hjJ8A0RR90Xk82sVn+s7o2gFZVw=;
- b=CQjTfOvY6gZcLW5too2ZO47fyWVsD9C/eyr705+STwOQuAS51vzR3nnKVxszEMRwv/
- eCjsGDuER/oqKah2SzS31o+LDR/CCIdO9Miwyp+qPm98r8kQGdVUDYifuOHowFqYapmJ
- rp7TNV+J2rmxwTsSfdDNMAREzmjCbyUEcW8et67PW90PesL/RHGSkfyqfTrAHWwSO0aB
- 9WqdzulTCj5ogugHY+Ygj4TrtT9qRBnIVcUwK51C0XMEGedmiid49tFa/44RIIhqsWIq
- tfuvN4UcVj5gA10ovgonJA7SX3d5GiSph2qqCARY8Wu9z+oYtkoLKnx3pwIBjsaj6aBP
- 3oDg==
-X-Gm-Message-State: APjAAAVayxuTWG18lw0XMqx7Ys5aBjkSvlkACDeH3LuYnerVXCMHA24l
- 7tf4vfIbjMhoj0wxxOvCtADWiOJwfrcR9A==
-X-Google-Smtp-Source: APXvYqz/9ZLoaByJ6+Av6EPX45hcOBeiu/8R17u1PuvL2UApEPLeqkOae5ggfLG6zgkF22hUx8r92g==
-X-Received: by 2002:a5d:6402:: with SMTP id z2mr3012406wru.211.1572009191616; 
- Fri, 25 Oct 2019 06:13:11 -0700 (PDT)
-Received: from 8c859074c0ff.ant.amazon.com.com
- (bzq-79-181-93-41.red.bezeqint.net. [79.181.93.41])
- by smtp.gmail.com with ESMTPSA id x205sm2616139wmb.5.2019.10.25.06.13.10
- (version=TLS1_2 cipher=ECDHE-RSA-AES128-SHA bits=128/128);
- Fri, 25 Oct 2019 06:13:11 -0700 (PDT)
-From: Michael Rolnik <mrolnik@gmail.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v34 03/13] target/avr: Add instruction decoding
-Date: Fri, 25 Oct 2019 16:12:27 +0300
-Message-Id: <20191025131237.63149-4-mrolnik@gmail.com>
-X-Mailer: git-send-email 2.17.2 (Apple Git-113)
-In-Reply-To: <20191025131237.63149-1-mrolnik@gmail.com>
-References: <20191025131237.63149-1-mrolnik@gmail.com>
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::442
+ (envelope-from <mreitz@redhat.com>) id 1iNzOq-0000xl-B4
+ for qemu-devel@nongnu.org; Fri, 25 Oct 2019 09:13:05 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:46189
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1iNzOq-0000xZ-7K
+ for qemu-devel@nongnu.org; Fri, 25 Oct 2019 09:13:04 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1572009183;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=BJLpPRUP3p6ol7UnWXCW+0KnDSYD6Jp3/hbZQJAqpD8=;
+ b=Dn3YJjcnF5W77Tk8yDBjUvCdTIZlsKWSe7lUdHQPwIcYKEgualx61FzFaGp9vWlq3/dHNg
+ saF0DEU5TnEHBBY9WMgw+MaYJCekv5+OkVOxUtfy3BBVd6KvMaEd1jJhvr8HeJ+qVMkbHa
+ N9T8wC3hd1H8NCm2ku5UpLA42U2bcow=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-216-IlF2IsURNlGg2F_2RsRkpg-1; Fri, 25 Oct 2019 09:12:57 -0400
+X-MC-Unique: IlF2IsURNlGg2F_2RsRkpg-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 56AD780183D;
+ Fri, 25 Oct 2019 13:12:56 +0000 (UTC)
+Received: from dresden.str.redhat.com (unknown [10.36.118.67])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 7E5C75C1B5;
+ Fri, 25 Oct 2019 13:12:52 +0000 (UTC)
+Subject: Re: [PATCH v2 2/2] iotests: add 269 to check maximum of bitmaps in
+ qcow2
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-block@nongnu.org
+References: <20191014115126.15360-1-vsementsov@virtuozzo.com>
+ <20191014115126.15360-3-vsementsov@virtuozzo.com>
+From: Max Reitz <mreitz@redhat.com>
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <7c9e6d62-fc5e-204e-778d-0320833e9b00@redhat.com>
+Date: Fri, 25 Oct 2019 15:12:51 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.1
+MIME-Version: 1.0
+In-Reply-To: <20191014115126.15360-3-vsementsov@virtuozzo.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Mimecast-Spam-Score: 0
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="nIViJQZrFgFX7fHeKpj4GQFtCPRPVZyRU"
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,205 +113,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: thuth@redhat.com, Michael Rolnik <mrolnik@gmail.com>,
- richard.henderson@linaro.org, dovgaluk@ispras.ru, imammedo@redhat.com,
- philmd@redhat.com, aleksandar.m.mail@gmail.com
+Cc: kwolf@redhat.com, jsnow@redhat.com, qemu-devel@nongnu.org, den@openvz.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This includes:
-- encoding of all 16 bit instructions
-- encoding of all 32 bit instructions
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--nIViJQZrFgFX7fHeKpj4GQFtCPRPVZyRU
+Content-Type: multipart/mixed; boundary="gjI5Gl8jPrO9Vrbv6beNjkwbpE1jcPryk"
 
-Signed-off-by: Michael Rolnik <mrolnik@gmail.com>
----
- target/avr/insn.decode | 175 +++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 175 insertions(+)
- create mode 100644 target/avr/insn.decode
+--gjI5Gl8jPrO9Vrbv6beNjkwbpE1jcPryk
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
-diff --git a/target/avr/insn.decode b/target/avr/insn.decode
-new file mode 100644
-index 0000000000..6b387762c6
---- /dev/null
-+++ b/target/avr/insn.decode
-@@ -0,0 +1,175 @@
-+#
-+#   A = [16 .. 31]
-+#   B = [16 .. 23]
-+#   C = [24, 26, 28, 30]
-+#   D = [0, 2, 4, 6, 8, .. 30]
-+
-+%rd             4:5
-+%rr             9:1 0:4
-+
-+&rd_rr          rd rr
-+&rd_imm         rd imm
-+
-+@op_rd_rr       .... .. . ..... ....        &rd_rr      rd=%rd rr=%rr
-+ADD             0000 11 . ..... ....        @op_rd_rr
-+ADC             0001 11 . ..... ....        @op_rd_rr
-+AND             0010 00 . ..... ....        @op_rd_rr
-+CP              0001 01 . ..... ....        @op_rd_rr
-+CPC             0000 01 . ..... ....        @op_rd_rr
-+CPSE            0001 00 . ..... ....        @op_rd_rr
-+EOR             0010 01 . ..... ....        @op_rd_rr
-+MOV             0010 11 . ..... ....        @op_rd_rr
-+MUL             1001 11 . ..... ....        @op_rd_rr
-+OR              0010 10 . ..... ....        @op_rd_rr
-+SBC             0000 10 . ..... ....        @op_rd_rr
-+SUB             0001 10 . ..... ....        @op_rd_rr
-+
-+
-+%rd_c           4:2                         !function=to_C
-+%imm6           6:2 0:4
-+
-+@op_rd_imm6     .... .... .. .. ....        &rd_imm     rd=%rd_c imm=%imm6
-+ADIW            1001 0110 .. .. ....        @op_rd_imm6
-+SBIW            1001 0111 .. .. ....        @op_rd_imm6
-+
-+
-+%rd_a           4:4                         !function=to_A
-+%rr_a           0:4                         !function=to_A
-+%rd_d           4:4                         !function=to_D
-+%rr_d           0:4                         !function=to_D
-+%imm8           8:4 0:4
-+
-+@op_rd_imm8     .... .... .... ....         &rd_imm     rd=%rd_a imm=%imm8
-+ANDI            0111 .... .... ....         @op_rd_imm8
-+CPI             0011 .... .... ....         @op_rd_imm8
-+LDI             1110 .... .... ....         @op_rd_imm8
-+ORI             0110 .... .... ....         @op_rd_imm8
-+SBCI            0100 .... .... ....         @op_rd_imm8
-+SUBI            0101 .... .... ....         @op_rd_imm8
-+
-+
-+@op_rd          .... ... rd:5 ....
-+ASR             1001 010 ..... 0101         @op_rd
-+COM             1001 010 ..... 0000         @op_rd
-+DEC             1001 010 ..... 1010         @op_rd
-+ELPM2           1001 000 ..... 0110         @op_rd
-+ELPMX           1001 000 ..... 0111         @op_rd
-+INC             1001 010 ..... 0011         @op_rd
-+LDX1            1001 000 ..... 1100         @op_rd
-+LDX2            1001 000 ..... 1101         @op_rd
-+LDX3            1001 000 ..... 1110         @op_rd
-+LDY2            1001 000 ..... 1001         @op_rd
-+LDY3            1001 000 ..... 1010         @op_rd
-+LDZ2            1001 000 ..... 0001         @op_rd
-+LDZ3            1001 000 ..... 0010         @op_rd
-+LPM2            1001 000 ..... 0100         @op_rd
-+LPMX            1001 000 ..... 0101         @op_rd
-+LSR             1001 010 ..... 0110         @op_rd
-+NEG             1001 010 ..... 0001         @op_rd
-+POP             1001 000 ..... 1111         @op_rd
-+PUSH            1001 001 ..... 1111         @op_rd
-+ROR             1001 010 ..... 0111         @op_rd
-+STY2            1001 001 ..... 1001         @op_rd
-+STY3            1001 001 ..... 1010         @op_rd
-+STZ2            1001 001 ..... 0001         @op_rd
-+STZ3            1001 001 ..... 0010         @op_rd
-+SWAP            1001 010 ..... 0010         @op_rd
-+
-+
-+@op_bit         .... .... . bit:3 ....
-+BCLR            1001 0100 1 ... 1000        @op_bit
-+BSET            1001 0100 0 ... 1000        @op_bit
-+
-+
-+@op_rd_bit      .... ... rd:5 . bit:3
-+BLD             1111 100 ..... 0 ...        @op_rd_bit
-+BST             1111 101 ..... 0 ...        @op_rd_bit
-+
-+
-+@op_bit_imm     .... .. imm:s7 bit:3
-+BRBC            1111 01 ....... ...         @op_bit_imm
-+BRBS            1111 00 ....... ...         @op_bit_imm
-+
-+
-+BREAK           1001 0101 1001 1000
-+EICALL          1001 0101 0001 1001
-+EIJMP           1001 0100 0001 1001
-+ELPM1           1001 0101 1101 1000
-+ICALL           1001 0101 0000 1001
-+IJMP            1001 0100 0000 1001
-+LPM1            1001 0101 1100 1000
-+NOP             0000 0000 0000 0000
-+RET             1001 0101 0000 1000
-+RETI            1001 0101 0001 1000
-+SLEEP           1001 0101 1000 1000
-+SPM             1001 0101 1110 1000
-+SPMX            1001 0101 1111 1000
-+WDR             1001 0101 1010 1000
-+
-+
-+@op_reg_bit     .... .... reg:5 bit:3
-+CBI             1001 1000 ..... ...         @op_reg_bit
-+SBI             1001 1010 ..... ...         @op_reg_bit
-+SBIC            1001 1001 ..... ...         @op_reg_bit
-+SBIS            1001 1011 ..... ...         @op_reg_bit
-+
-+
-+DES             1001 0100 imm:4 1011
-+
-+
-+%rd_b           4:3                         !function=to_B
-+%rr_b           0:3                         !function=to_B
-+@fmul           .... .... . ... . ...       &rd_rr      rd=%rd_b rr=%rr_b
-+FMUL            0000 0011 0 ... 1 ...       @fmul
-+FMULS           0000 0011 1 ... 0 ...       @fmul
-+FMULSU          0000 0011 1 ... 1 ...       @fmul
-+MULSU           0000 0011 0 ... 0 ...       @fmul
-+
-+
-+%io_imm         9:2 0:4
-+@io_rd_imm      .... . .. ..... ....        &rd_imm     rd=%rd imm=%io_imm
-+IN              1011 0 .. ..... ....        @io_rd_imm
-+OUT             1011 1 .. ..... ....        @io_rd_imm
-+
-+
-+XCH             1001 001 rd:5 0100
-+LAC             1001 001 rd:5 0110
-+LAS             1001 001 rd:5 0101
-+LAT             1001 001 rd:5 0111
-+STX1            1001 001 rr:5 1100
-+STX2            1001 001 rr:5 1101
-+STX3            1001 001 rr:5 1110
-+
-+
-+%ldst_d_imm     13:1 10:2 0:3
-+@ldst_d         .. . . .. . rd:5  . ...     &rd_imm     imm=%ldst_d_imm
-+LDDY            10 . 0 .. 0 ..... 1 ...     @ldst_d
-+LDDZ            10 . 0 .. 0 ..... 0 ...     @ldst_d
-+STDY            10 . 0 .. 1 ..... 1 ...     @ldst_d
-+STDZ            10 . 0 .. 1 ..... 0 ...     @ldst_d
-+
-+
-+MOVW            0000 0001 .... ....         &rd_rr      rd=%rd_d rr=%rr_d
-+MULS            0000 0010 .... ....         &rd_rr      rd=%rd_a rr=%rr_a
-+
-+RCALL           1101 imm:s12
-+RJMP            1100 imm:s12
-+
-+SBRC            1111 110 rr:5 0 bit:3
-+SBRS            1111 111 rr:5 0 bit:3
-+
-+# The 22-bit immediate is partially in the opcode word,
-+# and partially in the next.  Use append_16 to build the
-+# complete 22-bit value.
-+%imm_call       4:5 0:1                     !function=append_16
-+CALL            1001 010 ..... 111 .        imm=%imm_call
-+JMP             1001 010 ..... 110 .        imm=%imm_call
-+
-+
-+# The 16-bit immediate is completely in the next word.
-+# Fields cannot be defined with no bits, so we cannot play
-+# the same trick and append to a zero-bit value.
-+# Defer reading the immediate until trans_{LDS,STS}.
-+@ldst_s         .... ... rd:5 ....          imm=0
-+LDS             1001 000 ..... 0000         @ldst_s
-+STS             1001 001 ..... 0000         @ldst_s
--- 
-2.17.2 (Apple Git-113)
+On 14.10.19 13:51, Vladimir Sementsov-Ogievskiy wrote:
+> Check that it's impossible to create more persistent bitmaps than qcow2
+> supports.
+>=20
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> ---
+>  tests/qemu-iotests/269     | 47 ++++++++++++++++++++++++++++++++++++++
+>  tests/qemu-iotests/269.out |  3 +++
+>  tests/qemu-iotests/group   |  1 +
+>  3 files changed, 51 insertions(+)
+>  create mode 100755 tests/qemu-iotests/269
+>  create mode 100644 tests/qemu-iotests/269.out
+
+Is there no way to make this test any faster, e.g. by creating like
+65534 bitmaps with dd and a binary blob?  (Similarly to what I do in
+=E2=80=9Ciotests: Test qcow2's snapshot table handling=E2=80=9D)
+
+This is such an edge case, but running the test took 3:46 min before
+patch 1 (which I already find much too long), and 8:13 min afterwards
+(on my machine).
+
+(To be honest, if we take this test as-is, I=E2=80=99m probably just never =
+going
+to run it.)
+
+Max
+
+
+--gjI5Gl8jPrO9Vrbv6beNjkwbpE1jcPryk--
+
+--nIViJQZrFgFX7fHeKpj4GQFtCPRPVZyRU
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl2y9NMACgkQ9AfbAGHV
+z0B4iQf9HtSL7ntLz01on10tO7WhcyTFaQ7g1RHfJF1fWm3FcrpH9oEsHgXB+DJL
+RZquQMc8xMSx7qaWmeG14TfuJSlKht3NfLYEyd8zqzpN82H8kWLB5FDWTMBTx+ZM
+ElbUZlALZrffzzIviSZfZtDAhIIrSdf+MO1gVrKvF0L4TvNyHxl1TKae9YuDZfJA
+GIbP65dwIAtKMbTZcO5HRSZP3D4BxcWE0HSzQbfGq55U9qM7EicJO9JCWus60vgh
+kXmtuxw0F+2Mm3x6aoKJFsAxWU36+atDW9p6w1+Bpj5QqMzKgXB6+LLxfUyvvKt2
+RpzUqM7nwhF4DRno+AzQRW5Q8FTwxg==
+=wpwT
+-----END PGP SIGNATURE-----
+
+--nIViJQZrFgFX7fHeKpj4GQFtCPRPVZyRU--
 
 
