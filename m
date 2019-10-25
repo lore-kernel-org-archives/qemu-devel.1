@@ -2,72 +2,82 @@ Return-Path: <SRS0=bySr=YS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F2E24CA9EA0
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 20:34:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 409DCCA9EA0
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 20:37:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C3948205F4
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 20:34:12 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C3948205F4
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id B7EFA20679
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 20:37:50 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Cccs+c1h"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B7EFA20679
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35960 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35988 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iO6Hj-00074s-Kb
-	for qemu-devel@archiver.kernel.org; Fri, 25 Oct 2019 16:34:11 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34317)
+	id 1iO6LE-00018q-Op
+	for qemu-devel@archiver.kernel.org; Fri, 25 Oct 2019 16:37:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35669)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1iO69e-0002gv-6b
- for qemu-devel@nongnu.org; Fri, 25 Oct 2019 16:25:52 -0400
+ (envelope-from <ehabkost@redhat.com>) id 1iO6II-0002Mi-Ae
+ for qemu-devel@nongnu.org; Fri, 25 Oct 2019 16:34:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1iO69c-0003QA-HF
- for qemu-devel@nongnu.org; Fri, 25 Oct 2019 16:25:50 -0400
-Received: from indium.canonical.com ([91.189.90.7]:37240)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1iO69c-0003Pv-AH
- for qemu-devel@nongnu.org; Fri, 25 Oct 2019 16:25:48 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1iO69a-00064w-M8
- for <qemu-devel@nongnu.org>; Fri, 25 Oct 2019 20:25:46 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 7C14A2E80C3
- for <qemu-devel@nongnu.org>; Fri, 25 Oct 2019 20:25:46 +0000 (UTC)
+ (envelope-from <ehabkost@redhat.com>) id 1iO6IG-0000Ou-B7
+ for qemu-devel@nongnu.org; Fri, 25 Oct 2019 16:34:46 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:48460
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1iO6IC-0000MM-VQ
+ for qemu-devel@nongnu.org; Fri, 25 Oct 2019 16:34:42 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1572035680;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=v7JbbghH8jZLr1Dv0CBBEEG/nngwnlrfbHJAFoetlSM=;
+ b=Cccs+c1h5S8AdfMePYwe5HKYd8xe9cI5QtQrwKQtao+BW8E3+JT1bish3waYpfXs3f5sSo
+ ryxgTKdTVpIHhnSIArZSoEW4gmX1efniuk5wyjEmCQF1bfhy72MlpquZFHs1PMwsNWSwaB
+ V6tbPxZ5qBcW7sx6xNvS7zeqBwi9+/M=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-97-gWyNb81IMgSiUxocXbadBA-1; Fri, 25 Oct 2019 16:34:36 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 23C03476;
+ Fri, 25 Oct 2019 20:34:36 +0000 (UTC)
+Received: from localhost (ovpn-116-62.gru2.redhat.com [10.97.116.62])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id A7AC65C224;
+ Fri, 25 Oct 2019 20:34:30 +0000 (UTC)
+From: Eduardo Habkost <ehabkost@redhat.com>
+To: Cleber Rosa <crosa@redhat.com>, qemu-devel@nongnu.org,
+ Peter Maydell <peter.maydell@linaro.org>
+Subject: [PULL 1/1] configure: Require Python >= 3.5
+Date: Fri, 25 Oct 2019 17:34:27 -0300
+Message-Id: <20191025203427.20181-2-ehabkost@redhat.com>
+In-Reply-To: <20191025203427.20181-1-ehabkost@redhat.com>
+References: <20191025203427.20181-1-ehabkost@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-MC-Unique: gWyNb81IMgSiUxocXbadBA-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
-Date: Fri, 25 Oct 2019 20:15:12 -0000
-From: Witold Baryluk <1849894@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: baryluk
-X-Launchpad-Bug-Reporter: Witold Baryluk (baryluk)
-X-Launchpad-Bug-Modifier: Witold Baryluk (baryluk)
-Message-Id: <157203451253.3372.9480827920211406597.malonedeb@gac.canonical.com>
-Subject: [Bug 1849894] [NEW] hw/scsi/scsi-disk.c line 2554 allocation overflow
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="469f241f4e73cc0bdffa4e30654052a2af068e06";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 3569849f91bd78a7cf5ff2a38c9b16110b3b445b
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 91.189.90.7
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -76,175 +86,107 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1849894 <1849894@bugs.launchpad.net>
+Cc: John Snow <jsnow@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Public bug reported:
+Python 3.5 is the oldest Python version available on our
+supported build platforms, and Python 2 end of life will be 3
+weeks after the planned release date of QEMU 4.2.0.  Drop Python
+2 support from configure completely, and require Python 3.5 or
+newer.
 
-When compiling qemu from git master (at commit
-03bf012e523ecdf047ac56b2057950247256064d ) on Linux amd64, with gcc-9
-9.2.1 , and using `-march=3Dnative -flto`, during linking of most target
-binaries, compiler does detect an issue with allocation in
-scsi_disk_new_request_dump and aborts compilation.
+Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+Message-Id: <20191016224237.26180-1-ehabkost@redhat.com>
+Reviewed-by: John Snow <jsnow@redhat.com>
+Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+---
+ configure              | 18 ++++--------------
+ tests/Makefile.include |  5 -----
+ 2 files changed, 4 insertions(+), 19 deletions(-)
 
+diff --git a/configure b/configure
+index 145fcabbb3..bfc2b1a9d8 100755
+--- a/configure
++++ b/configure
+@@ -896,9 +896,9 @@ fi
+ : ${install=3D${INSTALL-install}}
+ # We prefer python 3.x. A bare 'python' is traditionally
+ # python 2.x, but some distros have it as python 3.x, so
+-# we check that before python2
++# we check that too
+ python=3D
+-for binary in "${PYTHON-python3}" python python2
++for binary in "${PYTHON-python3}" python
+ do
+     if has "$binary"
+     then
+@@ -1829,8 +1829,8 @@ fi
+=20
+ # Note that if the Python conditional here evaluates True we will exit
+ # with status 1 which is a shell 'false' value.
+-if ! $python -c 'import sys; sys.exit(sys.version_info < (2,7))'; then
+-  error_exit "Cannot use '$python', Python 2 >=3D 2.7 or Python 3 is requi=
+red." \
++if ! $python -c 'import sys; sys.exit(sys.version_info < (3,5))'; then
++  error_exit "Cannot use '$python', Python >=3D 3.5 is required." \
+       "Use --python=3D/path/to/python to specify a supported Python."
+ fi
+=20
+@@ -6466,15 +6466,6 @@ if test "$supported_os" =3D "no"; then
+     echo "us upstream at qemu-devel@nongnu.org."
+ fi
+=20
+-# Note that if the Python conditional here evaluates True we will exit
+-# with status 1 which is a shell 'false' value.
+-if ! $python -c 'import sys; sys.exit(sys.version_info < (3,0))'; then
+-  echo
+-  echo "warning: Python 2 support is deprecated" >&2
+-  echo "warning: Python 3 will be required for building future versions of=
+ QEMU" >&2
+-  python2=3D"y"
+-fi
+-
+ config_host_mak=3D"config-host.mak"
+=20
+ echo "# Automatically generated by configure - do not modify" >config-all-=
+disas.mak
+@@ -7295,7 +7286,6 @@ echo "INSTALL_DATA=3D$install -c -m 0644" >> $config_=
+host_mak
+ echo "INSTALL_PROG=3D$install -c -m 0755" >> $config_host_mak
+ echo "INSTALL_LIB=3D$install -c -m 0644" >> $config_host_mak
+ echo "PYTHON=3D$python" >> $config_host_mak
+-echo "PYTHON2=3D$python2" >> $config_host_mak
+ echo "CC=3D$cc" >> $config_host_mak
+ if $iasl -h > /dev/null 2>&1; then
+   echo "IASL=3D$iasl" >> $config_host_mak
+diff --git a/tests/Makefile.include b/tests/Makefile.include
+index 09e5b410dc..c4e656001e 100644
+--- a/tests/Makefile.include
++++ b/tests/Makefile.include
+@@ -1139,7 +1139,6 @@ TESTS_RESULTS_DIR=3D$(BUILD_DIR)/tests/results
+ AVOCADO_SHOW=3Dapp
+ AVOCADO_TAGS=3D$(patsubst %-softmmu,-t arch:%, $(filter %-softmmu,$(TARGET=
+_DIRS)))
+=20
+-ifneq ($(PYTHON2),y)
+ $(TESTS_VENV_DIR): $(TESTS_VENV_REQ)
+ =09$(call quiet-command, \
+             $(PYTHON) -m venv --system-site-packages $@, \
+@@ -1148,10 +1147,6 @@ $(TESTS_VENV_DIR): $(TESTS_VENV_REQ)
+             $(TESTS_VENV_DIR)/bin/python -m pip -q install -r $(TESTS_VENV=
+_REQ), \
+             PIP, $(TESTS_VENV_REQ))
+ =09$(call quiet-command, touch $@)
+-else
+-$(TESTS_VENV_DIR):
+-=09$(error "venv directory for tests requires Python 3")
+-endif
+=20
+ $(TESTS_RESULTS_DIR):
+ =09$(call quiet-command, mkdir -p $@, \
+--=20
+2.21.0
 
-make[1]: Entering directory '/home/user/qemu/slirp'
-make[1]: Nothing to be done for 'all'.
-make[1]: Leaving directory '/home/user/qemu/slirp'
-nm: stats64.o: no symbols
-  LINK    aarch64-softmmu/qemu-system-aarch64
-In function =E2=80=98scsi_disk_new_request_dump=E2=80=99,
-    inlined from =E2=80=98scsi_new_request=E2=80=99 at hw/scsi/scsi-disk.c:=
-2580:9,
-    inlined from =E2=80=98scsi_new_request=E2=80=99 at hw/scsi/scsi-disk.c:=
-2564:21:
-hw/scsi/scsi-disk.c:2554:19: error: argument 1 value =E2=80=981844674407370=
-9551612=E2=80=99 exceeds maximum object size 9223372036854775807 [-Werror=
-=3Dalloc-size-larger-than=3D]
-hw/scsi/scsi-disk.c: In function =E2=80=98scsi_new_request=E2=80=99:
-/usr/include/glib-2.0/glib/gmem.h:78:10: note: in a call to allocation func=
-tion =E2=80=98g_malloc=E2=80=99 declared here
-   78 | gpointer g_malloc         (gsize  n_bytes) G_GNUC_MALLOC G_GNUC_ALL=
-OC_SIZE(1);
-      |          ^
-lto1: all warnings being treated as errors
-lto-wrapper: fatal error: c++ returned 1 exit status
-compilation terminated.
-/usr/bin/ld: error: lto-wrapper failed
-collect2: error: ld returned 1 exit status
-
-
-same happens for most other targets: alpha-softmmu/qemu-system-alpha
-arm-softmmu/qemu-system-arm hppa-softmmu/qemu-system-hppa i386-softmmu
-/qemu-system-i386 lm32-softmmu/qemu-system-lm32 mips-softmmu/qemu-
-system-mips mips64-softmmu/qemu-system-mips64 mips64el-softmmu/qemu-
-system-mips64el mipsel-softmmu/qemu-system-mipsel ppc-softmmu/qemu-
-system-ppc ppc64-softmmu/qemu-system-ppc64 riscv32-softmmu/qemu-system-
-riscv32 riscv64-softmmu/qemu-system-riscv64 s390x-softmmu/qemu-system-
-s390x sh4-softmmu/qemu-system-sh4 sh4eb-softmmu/qemu-system-sh4eb sparc-
-softmmu/qemu-system-sparc sparc64-softmmu/qemu-system-sparc64
-x86_64-softmmu/qemu-system-x86_64 xtensa-softmmu/qemu-system-xtensa
-xtensaeb-softmmu/qemu-system-xtensaeb
-
-Notice -softmmu being a common factor here.
-
-
-The size of the allocation for the temporary buffer for dumping using
-snprintf is determined based on the size of the buffer via call to
-scsi_cdb_length. I believe the heavy inlining and constant propagation
-makes scsi_cdb_length return -1, so len =3D -1. Then allocation size is
-5*len + 1, or -4. Which overflows to 2^64 - 4 or so.
-
-The case of len=3D=3D-1 from scsi_cdb_length happens if the (buf[0] >> 5) is
-not 0, 1, 2, 4 or 5.
-
-However, I can't find out how gcc figures out that buf[0] is not one of
-these variables. To me looking at this function, compiler should not
-know anything about buf[0].
-
-I tried following the chain of calls back, including devirtualize
-alloc_req, and I found scsi_device_alloc_req calling these alloc_req
-callbacks, but it is itself called from scsi_req_new, which is called in
-get_scsi_requests , just after buf is filled from QEMUFile using
-qemu_get_buffer, which ultimately goes even further into read paths,
-which there might be many AFAIK.
-
-
-glib2 version 2.62.1-1
-
-** Affects: qemu
-     Importance: Undecided
-         Status: New
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1849894
-
-Title:
-  hw/scsi/scsi-disk.c line 2554 allocation overflow
-
-Status in QEMU:
-  New
-
-Bug description:
-  When compiling qemu from git master (at commit
-  03bf012e523ecdf047ac56b2057950247256064d ) on Linux amd64, with gcc-9
-  9.2.1 , and using `-march=3Dnative -flto`, during linking of most target
-  binaries, compiler does detect an issue with allocation in
-  scsi_disk_new_request_dump and aborts compilation.
-
-  =
-
-  make[1]: Entering directory '/home/user/qemu/slirp'
-  make[1]: Nothing to be done for 'all'.
-  make[1]: Leaving directory '/home/user/qemu/slirp'
-  nm: stats64.o: no symbols
-    LINK    aarch64-softmmu/qemu-system-aarch64
-  In function =E2=80=98scsi_disk_new_request_dump=E2=80=99,
-      inlined from =E2=80=98scsi_new_request=E2=80=99 at hw/scsi/scsi-disk.=
-c:2580:9,
-      inlined from =E2=80=98scsi_new_request=E2=80=99 at hw/scsi/scsi-disk.=
-c:2564:21:
-  hw/scsi/scsi-disk.c:2554:19: error: argument 1 value =E2=80=9818446744073=
-709551612=E2=80=99 exceeds maximum object size 9223372036854775807 [-Werror=
-=3Dalloc-size-larger-than=3D]
-  hw/scsi/scsi-disk.c: In function =E2=80=98scsi_new_request=E2=80=99:
-  /usr/include/glib-2.0/glib/gmem.h:78:10: note: in a call to allocation fu=
-nction =E2=80=98g_malloc=E2=80=99 declared here
-     78 | gpointer g_malloc         (gsize  n_bytes) G_GNUC_MALLOC G_GNUC_A=
-LLOC_SIZE(1);
-        |          ^
-  lto1: all warnings being treated as errors
-  lto-wrapper: fatal error: c++ returned 1 exit status
-  compilation terminated.
-  /usr/bin/ld: error: lto-wrapper failed
-  collect2: error: ld returned 1 exit status
-
-
-  same happens for most other targets: alpha-softmmu/qemu-system-alpha
-  arm-softmmu/qemu-system-arm hppa-softmmu/qemu-system-hppa i386-softmmu
-  /qemu-system-i386 lm32-softmmu/qemu-system-lm32 mips-softmmu/qemu-
-  system-mips mips64-softmmu/qemu-system-mips64 mips64el-softmmu/qemu-
-  system-mips64el mipsel-softmmu/qemu-system-mipsel ppc-softmmu/qemu-
-  system-ppc ppc64-softmmu/qemu-system-ppc64 riscv32-softmmu/qemu-
-  system-riscv32 riscv64-softmmu/qemu-system-riscv64 s390x-softmmu/qemu-
-  system-s390x sh4-softmmu/qemu-system-sh4 sh4eb-softmmu/qemu-system-
-  sh4eb sparc-softmmu/qemu-system-sparc sparc64-softmmu/qemu-system-
-  sparc64 x86_64-softmmu/qemu-system-x86_64 xtensa-softmmu/qemu-system-
-  xtensa xtensaeb-softmmu/qemu-system-xtensaeb
-
-  Notice -softmmu being a common factor here.
-
-
-  The size of the allocation for the temporary buffer for dumping using
-  snprintf is determined based on the size of the buffer via call to
-  scsi_cdb_length. I believe the heavy inlining and constant propagation
-  makes scsi_cdb_length return -1, so len =3D -1. Then allocation size is
-  5*len + 1, or -4. Which overflows to 2^64 - 4 or so.
-
-  The case of len=3D=3D-1 from scsi_cdb_length happens if the (buf[0] >> 5)
-  is not 0, 1, 2, 4 or 5.
-
-  However, I can't find out how gcc figures out that buf[0] is not one
-  of these variables. To me looking at this function, compiler should
-  not know anything about buf[0].
-
-  I tried following the chain of calls back, including devirtualize
-  alloc_req, and I found scsi_device_alloc_req calling these alloc_req
-  callbacks, but it is itself called from scsi_req_new, which is called
-  in  get_scsi_requests , just after buf is filled from QEMUFile using
-  qemu_get_buffer, which ultimately goes even further into read paths,
-  which there might be many AFAIK.
-
-
-  =
-
-  glib2 version 2.62.1-1
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1849894/+subscriptions
 
