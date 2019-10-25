@@ -2,72 +2,77 @@ Return-Path: <SRS0=bySr=YS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0246DCA9EA0
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 08:53:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 34084CA9EA0
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 08:55:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C74E521D71
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 08:53:35 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C74E521D71
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
+	by mail.kernel.org (Postfix) with ESMTPS id F25A221D71
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 08:55:22 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Z/Km9adN"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F25A221D71
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57736 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57772 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iNvLi-0006jM-2S
-	for qemu-devel@archiver.kernel.org; Fri, 25 Oct 2019 04:53:34 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50217)
+	id 1iNvNR-0002Fz-CU
+	for qemu-devel@archiver.kernel.org; Fri, 25 Oct 2019 04:55:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50250)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <laurent@vivier.eu>) id 1iNv5H-0001HQ-Mg
- for qemu-devel@nongnu.org; Fri, 25 Oct 2019 04:36:37 -0400
+ (envelope-from <eperezma@redhat.com>) id 1iNv5I-0001JD-PG
+ for qemu-devel@nongnu.org; Fri, 25 Oct 2019 04:36:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <laurent@vivier.eu>) id 1iNv5C-00084W-AM
+ (envelope-from <eperezma@redhat.com>) id 1iNv5H-000882-7y
+ for qemu-devel@nongnu.org; Fri, 25 Oct 2019 04:36:36 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:49971
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <eperezma@redhat.com>) id 1iNv5H-00087d-46
  for qemu-devel@nongnu.org; Fri, 25 Oct 2019 04:36:35 -0400
-Received: from mout.kundenserver.de ([212.227.126.133]:49507)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <laurent@vivier.eu>)
- id 1iNv58-000813-Kd; Fri, 25 Oct 2019 04:36:26 -0400
-Received: from localhost.localdomain ([78.238.229.36]) by
- mrelayeu.kundenserver.de (mreue010 [212.227.15.167]) with ESMTPSA (Nemesis)
- id 1MkpOZ-1himgp23qR-00mKlv; Fri, 25 Oct 2019 10:35:44 +0200
-From: Laurent Vivier <laurent@vivier.eu>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1571992594;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=62aNHpT8/o+LHRU6l0eEE98VmdRPzP2CfebWQtkrLiU=;
+ b=Z/Km9adNrAymQMiN7Gbt4U0NyYnj0FMe60ZYxo+QT4ED43R+3XlifvbYT8EhGdIKEgVmE2
+ FfKJDL7l8EsRlqU1iQDj85mVC+l/Ka23JxuhiZkBr40mBwr+H20tABp0YG/j+hg8TE2E9/
+ 5a+2OHqY8a/o18mB8j6nU8tjjOUaGwo=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-164-NicC1khnNy-lpZTZ5MfPHw-1; Fri, 25 Oct 2019 04:36:31 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0C7A4800D49;
+ Fri, 25 Oct 2019 08:36:30 +0000 (UTC)
+Received: from eperezma.remote.csb (unknown [10.36.118.42])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 1273760BE0;
+ Fri, 25 Oct 2019 08:36:26 +0000 (UTC)
+From: =?UTF-8?q?Eugenio=20P=C3=A9rez?= <eperezma@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 11/19] hw: Move sun4v hypervisor RTC from hw/timer/ to hw/rtc/
- subdirectory
-Date: Fri, 25 Oct 2019 10:35:03 +0200
-Message-Id: <20191025083511.11463-12-laurent@vivier.eu>
-X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20191025083511.11463-1-laurent@vivier.eu>
-References: <20191025083511.11463-1-laurent@vivier.eu>
+Subject: [PATCH v7 6/8] virtio: event suppression support for packed ring
+Date: Fri, 25 Oct 2019 10:35:25 +0200
+Message-Id: <20191025083527.30803-7-eperezma@redhat.com>
+In-Reply-To: <20191025083527.30803-1-eperezma@redhat.com>
+References: <20191025083527.30803-1-eperezma@redhat.com>
 MIME-Version: 1.0
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-MC-Unique: NicC1khnNy-lpZTZ5MfPHw-1
+X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:2E4FC47zjnu/IU4BsZd1CtXVEkYxFmlQwgRMLW7X0/TXZCkS/Xj
- 6tiznLRkZkCMiKNF0NRG7eCC6WPmsbqob4ja73U1Tr77nBgi9aXIExk1S41+uPGuIgsoAoq
- G+gIlzlih5iL8Ucr09o/jSBVZb3r6LVQ8jIT6GGAhKtFrSxRdx2rE7xY6HAPx+5CbMU8y4r
- eD+4vhf+KEeQPSHRs+gLQ==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:M8dzK/PK1So=:rhaMZtTst4WTyqnO14su7s
- LewxrVf1EtTGc6RpdGc5fhUkUZJqShgJmEqoW9yxIxlSJqnPcDr/wWUkl+4NY+iiVpAWR6geN
- qtJW+2DGv0qO2QYewCa8BNT4ub1CjN00KLO9+W2DxVkyOWxcSIINYIfIArvWNwONiNCVFEMKc
- wuLgPcY0iWk8WYTT0m03eN29K3g4GfWKyz5LbcqiTjNb1fnZjIq+j0JBcWd5Bg1Z4XrAqSHh1
- 2EWNO5Z1FH7QhSdzmsvX+kphF0Fwoj4HYTyklbOue3wUyf9wZ0v2m8XJbJProXiwTM8kHT6pl
- 5xcB0SV6wrq2ILlg8731AiaX0V00UJG0SQFtqoUgdlVglvL0xkG8pB+K70ReANQP98+3mQuu5
- DHdVN5W3AgGk5gMEn90dXqzxMZyNVKvXy6Ru3p1qkI6qsUOxqTFQY//nzkqCdoTlIrvTl72ai
- eJZeFcWqyVooTzJwJa7cxmuKLgoPLNWi+imJuu/F68iypXfZWgoE8NXzcMXGl9uAjB4ar+MPl
- XFvEyW7nt5j82tLtx82alHY3doJ9WRoKoOzKo9RmXwJOCwKGAAaRgzN+TuOZCyGi7rxkpbtZP
- V3fBOaX9/XWXqiL8hCkF2oQO9ZpX96KacAkUgBGageYQRbR2EuzjMqy0yVYp+RfiYIIKbT/qY
- UaZZDB9vtFHtguiuWsIWYmkbd3EtFy8WlvVmS9w9LD19la6YyqRxTDf8WU4H1uXKx/QvJKdVu
- TTHMeiGeSgF80PCBAHoZjyLgsGVzRZ4AkyDVqxnpFc0oORDZJSS7QOlBwj6rUcNDaT32mNKY6
- ObjrJEV8EGhNQtdeRXz2fnEiwGwoEe7ss4rlQao2WM6Y83hSRHZCfDTzCypgqMuh8/Q5HaA+i
- SHI8yMQup1MsYgctQh/YSyOz4oYXuC5kxI5DKpgd8=
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 212.227.126.133
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -79,206 +84,224 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Peter Maydell <peter.maydell@linaro.org>,
- "Michael S. Tsirkin" <mst@redhat.com>, Michael Tokarev <mjt@tls.msk.ru>,
- Alistair Francis <alistair.francis@wdc.com>,
- "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, qemu-block@nongnu.org,
- qemu-trivial@nongnu.org, Helge Deller <deller@gmx.de>,
- =?UTF-8?q?Herv=C3=A9=20Poussineau?= <hpoussin@reactos.org>,
- Joel Stanley <joel@jms.id.au>, David Gibson <david@gibson.dropbear.id.au>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Artyom Tarasenko <atar4qemu@gmail.com>, Laurent Vivier <lvivier@redhat.com>,
- Thomas Huth <thuth@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>,
- Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
- Alistair Francis <alistair@alistair23.me>, qemu-arm@nongnu.org,
- =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>,
- Stefan Hajnoczi <stefanha@redhat.com>, Igor Mammedov <imammedo@redhat.com>,
- Richard Henderson <rth@twiddle.net>, Andrew Jeffery <andrew@aj.id.au>,
- Laurent Vivier <laurent@vivier.eu>, Aleksandar Rikalo <arikalo@wavecomp.com>,
- qemu-ppc@nongnu.org, Aleksandar Markovic <amarkovic@wavecomp.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>
+Cc: Kevin Wolf <kwolf@redhat.com>, Laurent Vivier <lvivier@redhat.com>,
+ qemu-block@nongnu.org, Amit Shah <amit@kernel.org>,
+ Jason Wang <jasowang@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>,
+ Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
+ Fam Zheng <fam@euphon.net>, Jens Freimann <jfreimann@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Philippe Mathieu-Daudé <philmd@redhat.com>
+From: Jason Wang <jasowang@redhat.com>
 
-Move RTC devices under the hw/rtc/ subdirectory.
+This patch implements event suppression through device/driver
+area. Please refer virtio specification for more information.
 
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
-Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Reviewed-by: Artyom Tarasenko <atar4qemu@gmail.com>
-Message-Id: <20191003230404.19384-7-philmd@redhat.com>
-Signed-off-by: Laurent Vivier <laurent@vivier.eu>
+Signed-off-by: Wei Xu <wexu@redhat.com>
+Signed-off-by: Jason Wang <jasowang@redhat.com>
+Signed-off-by: Eugenio P=C3=A9rez <eperezma@redhat.com>
 ---
- MAINTAINERS                   |  4 ++--
- hw/rtc/Kconfig                |  3 +++
- hw/rtc/Makefile.objs          |  1 +
- hw/{timer => rtc}/sun4v-rtc.c |  2 +-
- hw/rtc/trace-events           |  4 ++++
- hw/sparc64/niagara.c          |  2 +-
- hw/timer/Kconfig              |  3 ---
- hw/timer/Makefile.objs        |  1 -
- hw/timer/trace-events         |  4 ----
- include/hw/rtc/sun4v-rtc.h    | 19 +++++++++++++++++++
- include/hw/timer/sun4v-rtc.h  |  1 -
- 11 files changed, 31 insertions(+), 13 deletions(-)
- rename hw/{timer => rtc}/sun4v-rtc.c (98%)
- create mode 100644 include/hw/rtc/sun4v-rtc.h
- delete mode 100644 include/hw/timer/sun4v-rtc.h
+ hw/virtio/virtio.c | 142 +++++++++++++++++++++++++++++++++++++++++++++++++=
+----
+ 1 file changed, 133 insertions(+), 9 deletions(-)
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index ba0d1906aae9..a7de5e2d1253 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -1163,8 +1163,8 @@ Sun4v
- M: Artyom Tarasenko <atar4qemu@gmail.com>
- S: Maintained
- F: hw/sparc64/niagara.c
--F: hw/timer/sun4v-rtc.c
--F: include/hw/timer/sun4v-rtc.h
-+F: hw/rtc/sun4v-rtc.c
-+F: include/hw/rtc/sun4v-rtc.h
- 
- Leon3
- M: Fabien Chouteau <chouteau@adacore.com>
-diff --git a/hw/rtc/Kconfig b/hw/rtc/Kconfig
-index 434b20b2b1bd..cc7fead764f4 100644
---- a/hw/rtc/Kconfig
-+++ b/hw/rtc/Kconfig
-@@ -10,3 +10,6 @@ config PL031
- 
- config MC146818RTC
-     bool
+diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
+index a694b4ab50..828c27de1f 100644
+--- a/hw/virtio/virtio.c
++++ b/hw/virtio/virtio.c
+@@ -240,6 +240,44 @@ static void vring_split_desc_read(VirtIODevice *vdev, =
+VRingDesc *desc,
+     virtio_tswap16s(vdev, &desc->next);
+ }
+=20
++static void vring_packed_event_read(VirtIODevice *vdev,
++                                    MemoryRegionCache *cache,
++                                    VRingPackedDescEvent *e)
++{
++    hwaddr off_off =3D offsetof(VRingPackedDescEvent, off_wrap);
++    hwaddr off_flags =3D offsetof(VRingPackedDescEvent, flags);
 +
-+config SUN4V_RTC
-+    bool
-diff --git a/hw/rtc/Makefile.objs b/hw/rtc/Makefile.objs
-index 89e8e48c6409..4621b37bc2f6 100644
---- a/hw/rtc/Makefile.objs
-+++ b/hw/rtc/Makefile.objs
-@@ -5,3 +5,4 @@ common-obj-$(CONFIG_M48T59) += m48t59-isa.o
- endif
- common-obj-$(CONFIG_PL031) += pl031.o
- obj-$(CONFIG_MC146818RTC) += mc146818rtc.o
-+common-obj-$(CONFIG_SUN4V_RTC) += sun4v-rtc.o
-diff --git a/hw/timer/sun4v-rtc.c b/hw/rtc/sun4v-rtc.c
-similarity index 98%
-rename from hw/timer/sun4v-rtc.c
-rename to hw/rtc/sun4v-rtc.c
-index 54272a822fdf..ada01b57748b 100644
---- a/hw/timer/sun4v-rtc.c
-+++ b/hw/rtc/sun4v-rtc.c
-@@ -13,7 +13,7 @@
- #include "hw/sysbus.h"
- #include "qemu/module.h"
- #include "qemu/timer.h"
--#include "hw/timer/sun4v-rtc.h"
-+#include "hw/rtc/sun4v-rtc.h"
- #include "trace.h"
- 
- 
-diff --git a/hw/rtc/trace-events b/hw/rtc/trace-events
-index 54c94ac557b2..ac9e0e0fba32 100644
---- a/hw/rtc/trace-events
-+++ b/hw/rtc/trace-events
-@@ -1,5 +1,9 @@
- # See docs/devel/tracing.txt for syntax documentation.
- 
-+# sun4v-rtc.c
-+sun4v_rtc_read(uint64_t addr, uint64_t value) "read: addr 0x%" PRIx64 " value 0x%" PRIx64
-+sun4v_rtc_write(uint64_t addr, uint64_t value) "write: addr 0x%" PRIx64 " value 0x%" PRIx64
++    address_space_read_cached(cache, off_flags, &e->flags,
++                              sizeof(e->flags));
++    /* Make sure flags is seen before off_wrap */
++    smp_rmb();
++    address_space_read_cached(cache, off_off, &e->off_wrap,
++                              sizeof(e->off_wrap));
++    virtio_tswap16s(vdev, &e->off_wrap);
++    virtio_tswap16s(vdev, &e->flags);
++}
 +
- # pl031.c
- pl031_irq_state(int level) "irq state %d"
- pl031_read(uint32_t addr, uint32_t value) "addr 0x%08x value 0x%08x"
-diff --git a/hw/sparc64/niagara.c b/hw/sparc64/niagara.c
-index 5987693659ed..5eb2d097b904 100644
---- a/hw/sparc64/niagara.c
-+++ b/hw/sparc64/niagara.c
-@@ -30,7 +30,7 @@
- #include "hw/misc/unimp.h"
- #include "hw/loader.h"
- #include "hw/sparc/sparc64.h"
--#include "hw/timer/sun4v-rtc.h"
-+#include "hw/rtc/sun4v-rtc.h"
- #include "exec/address-spaces.h"
- #include "sysemu/block-backend.h"
- #include "qemu/error-report.h"
-diff --git a/hw/timer/Kconfig b/hw/timer/Kconfig
-index a6b668b2559b..b04c928136c2 100644
---- a/hw/timer/Kconfig
-+++ b/hw/timer/Kconfig
-@@ -35,9 +35,6 @@ config ALLWINNER_A10_PIT
- config STM32F2XX_TIMER
-     bool
- 
--config SUN4V_RTC
--    bool
++static void vring_packed_off_wrap_write(VirtIODevice *vdev,
++                                        MemoryRegionCache *cache,
++                                        uint16_t off_wrap)
++{
++    hwaddr off =3D offsetof(VRingPackedDescEvent, off_wrap);
++
++    virtio_tswap16s(vdev, &off_wrap);
++    address_space_write_cached(cache, off, &off_wrap, sizeof(off_wrap));
++    address_space_cache_invalidate(cache, off, sizeof(off_wrap));
++}
++
++static void vring_packed_flags_write(VirtIODevice *vdev,
++                                     MemoryRegionCache *cache, uint16_t fl=
+ags)
++{
++    hwaddr off =3D offsetof(VRingPackedDescEvent, flags);
++
++    virtio_tswap16s(vdev, &flags);
++    address_space_write_cached(cache, off, &flags, sizeof(flags));
++    address_space_cache_invalidate(cache, off, sizeof(flags));
++}
++
+ /* Called within rcu_read_lock().  */
+ static VRingMemoryRegionCaches *vring_get_region_caches(struct VirtQueue *=
+vq)
+ {
+@@ -347,14 +385,8 @@ static inline void vring_set_avail_event(VirtQueue *vq=
+, uint16_t val)
+     address_space_cache_invalidate(&caches->used, pa, sizeof(val));
+ }
+=20
+-void virtio_queue_set_notification(VirtQueue *vq, int enable)
++static void virtio_queue_split_set_notification(VirtQueue *vq, int enable)
+ {
+-    vq->notification =3D enable;
 -
- config CMSDK_APB_TIMER
-     bool
-     select PTIMER
-diff --git a/hw/timer/Makefile.objs b/hw/timer/Makefile.objs
-index 2fb12162a623..034bd30255c0 100644
---- a/hw/timer/Makefile.objs
-+++ b/hw/timer/Makefile.objs
-@@ -35,7 +35,6 @@ common-obj-$(CONFIG_ALLWINNER_A10_PIT) += allwinner-a10-pit.o
- common-obj-$(CONFIG_STM32F2XX_TIMER) += stm32f2xx_timer.o
- common-obj-$(CONFIG_ASPEED_SOC) += aspeed_timer.o aspeed_rtc.o
- 
--common-obj-$(CONFIG_SUN4V_RTC) += sun4v-rtc.o
- common-obj-$(CONFIG_CMSDK_APB_TIMER) += cmsdk-apb-timer.o
- common-obj-$(CONFIG_CMSDK_APB_DUALTIMER) += cmsdk-apb-dualtimer.o
- common-obj-$(CONFIG_MSF2) += mss-timer.o
-diff --git a/hw/timer/trace-events b/hw/timer/trace-events
-index 6936fe8573e9..ce34b967db9f 100644
---- a/hw/timer/trace-events
-+++ b/hw/timer/trace-events
-@@ -70,10 +70,6 @@ cmsdk_apb_dualtimer_reset(void) "CMSDK APB dualtimer: reset"
- aspeed_rtc_read(uint64_t addr, uint64_t value) "addr 0x%02" PRIx64 " value 0x%08" PRIx64
- aspeed_rtc_write(uint64_t addr, uint64_t value) "addr 0x%02" PRIx64 " value 0x%08" PRIx64
- 
--# sun4v-rtc.c
--sun4v_rtc_read(uint64_t addr, uint64_t value) "read: addr 0x%" PRIx64 " value 0x%" PRIx64
--sun4v_rtc_write(uint64_t addr, uint64_t value) "write: addr 0x%" PRIx64 " value 0x%" PRIx64
+-    if (!vq->vring.desc) {
+-        return;
+-    }
 -
- # xlnx-zynqmp-rtc.c
- xlnx_zynqmp_rtc_gettime(int year, int month, int day, int hour, int min, int sec) "Get time from host: %d-%d-%d %2d:%02d:%02d"
- 
-diff --git a/include/hw/rtc/sun4v-rtc.h b/include/hw/rtc/sun4v-rtc.h
-new file mode 100644
-index 000000000000..fd868f6ed2fa
---- /dev/null
-+++ b/include/hw/rtc/sun4v-rtc.h
-@@ -0,0 +1,19 @@
-+/*
-+ * QEMU sun4v Real Time Clock device
-+ *
-+ * The sun4v_rtc device (sun4v tod clock)
-+ *
-+ * Copyright (c) 2016 Artyom Tarasenko
-+ *
-+ * This code is licensed under the GNU GPL v3 or (at your option) any later
-+ * version.
-+ */
+     rcu_read_lock();
+     if (virtio_vdev_has_feature(vq->vdev, VIRTIO_RING_F_EVENT_IDX)) {
+         vring_set_avail_event(vq, vring_avail_idx(vq));
+@@ -370,6 +402,51 @@ void virtio_queue_set_notification(VirtQueue *vq, int =
+enable)
+     rcu_read_unlock();
+ }
+=20
++static void virtio_queue_packed_set_notification(VirtQueue *vq, int enable=
+)
++{
++    uint16_t off_wrap;
++    VRingPackedDescEvent e;
++    VRingMemoryRegionCaches *caches;
 +
-+#ifndef HW_RTC_SUN4V
-+#define HW_RTC_SUN4V
++    rcu_read_lock();
++    caches  =3D vring_get_region_caches(vq);
++    vring_packed_event_read(vq->vdev, &caches->used, &e);
 +
-+#include "exec/hwaddr.h"
++    if (!enable) {
++        e.flags =3D VRING_PACKED_EVENT_FLAG_DISABLE;
++    } else if (virtio_vdev_has_feature(vq->vdev, VIRTIO_RING_F_EVENT_IDX))=
+ {
++        off_wrap =3D vq->shadow_avail_idx | vq->shadow_avail_wrap_counter =
+<< 15;
++        vring_packed_off_wrap_write(vq->vdev, &caches->used, off_wrap);
++        /* Make sure off_wrap is wrote before flags */
++        smp_wmb();
++        e.flags =3D VRING_PACKED_EVENT_FLAG_DESC;
++    } else {
++        e.flags =3D VRING_PACKED_EVENT_FLAG_ENABLE;
++    }
 +
-+void sun4v_rtc_init(hwaddr addr);
++    vring_packed_flags_write(vq->vdev, &caches->used, e.flags);
++    if (enable) {
++        /* Expose avail event/used flags before caller checks the avail id=
+x. */
++        smp_mb();
++    }
++    rcu_read_unlock();
++}
 +
-+#endif
-diff --git a/include/hw/timer/sun4v-rtc.h b/include/hw/timer/sun4v-rtc.h
-deleted file mode 100644
-index 407278f91831..000000000000
---- a/include/hw/timer/sun4v-rtc.h
-+++ /dev/null
-@@ -1 +0,0 @@
--void sun4v_rtc_init(hwaddr addr);
--- 
-2.21.0
++void virtio_queue_set_notification(VirtQueue *vq, int enable)
++{
++    vq->notification =3D enable;
++
++    if (!vq->vring.desc) {
++        return;
++    }
++
++    if (virtio_vdev_has_feature(vq->vdev, VIRTIO_F_RING_PACKED)) {
++        virtio_queue_packed_set_notification(vq, enable);
++    } else {
++        virtio_queue_split_set_notification(vq, enable);
++    }
++}
++
+ int virtio_queue_ready(VirtQueue *vq)
+ {
+     return vq->vring.avail !=3D 0;
+@@ -2287,8 +2364,7 @@ static void virtio_set_isr(VirtIODevice *vdev, int va=
+lue)
+     }
+ }
+=20
+-/* Called within rcu_read_lock().  */
+-static bool virtio_should_notify(VirtIODevice *vdev, VirtQueue *vq)
++static bool virtio_split_should_notify(VirtIODevice *vdev, VirtQueue *vq)
+ {
+     uint16_t old, new;
+     bool v;
+@@ -2311,6 +2387,54 @@ static bool virtio_should_notify(VirtIODevice *vdev,=
+ VirtQueue *vq)
+     return !v || vring_need_event(vring_get_used_event(vq), new, old);
+ }
+=20
++static bool vring_packed_need_event(VirtQueue *vq, bool wrap,
++                                    uint16_t off_wrap, uint16_t new,
++                                    uint16_t old)
++{
++    int off =3D off_wrap & ~(1 << 15);
++
++    if (wrap !=3D off_wrap >> 15) {
++        off -=3D vq->vring.num;
++    }
++
++    return vring_need_event(off, new, old);
++}
++
++static bool virtio_packed_should_notify(VirtIODevice *vdev, VirtQueue *vq)
++{
++    VRingPackedDescEvent e;
++    uint16_t old, new;
++    bool v;
++    VRingMemoryRegionCaches *caches;
++
++    caches =3D vring_get_region_caches(vq);
++    vring_packed_event_read(vdev, &caches->avail, &e);
++
++    old =3D vq->signalled_used;
++    new =3D vq->signalled_used =3D vq->used_idx;
++    v =3D vq->signalled_used_valid;
++    vq->signalled_used_valid =3D true;
++
++    if (e.flags =3D=3D VRING_PACKED_EVENT_FLAG_DISABLE) {
++        return false;
++    } else if (e.flags =3D=3D VRING_PACKED_EVENT_FLAG_ENABLE) {
++        return true;
++    }
++
++    return !v || vring_packed_need_event(vq, vq->used_wrap_counter,
++                                         e.off_wrap, new, old);
++}
++
++/* Called within rcu_read_lock().  */
++static bool virtio_should_notify(VirtIODevice *vdev, VirtQueue *vq)
++{
++    if (virtio_vdev_has_feature(vdev, VIRTIO_F_RING_PACKED)) {
++        return virtio_packed_should_notify(vdev, vq);
++    } else {
++        return virtio_split_should_notify(vdev, vq);
++    }
++}
++
+ void virtio_notify_irqfd(VirtIODevice *vdev, VirtQueue *vq)
+ {
+     bool should_notify;
+--=20
+2.16.5
 
 
