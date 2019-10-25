@@ -2,42 +2,42 @@ Return-Path: <SRS0=bySr=YS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4F52ACA9EA0
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 12:49:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9892ECA9EA0
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 12:51:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2458921D7B
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 12:49:30 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2458921D7B
+	by mail.kernel.org (Postfix) with ESMTPS id 6AF7121929
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 12:51:46 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6AF7121929
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59512 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59530 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iNz21-0007i3-6R
-	for qemu-devel@archiver.kernel.org; Fri, 25 Oct 2019 08:49:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54600)
+	id 1iNz4D-0003Kv-GX
+	for qemu-devel@archiver.kernel.org; Fri, 25 Oct 2019 08:51:45 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55237)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <laurent@vivier.eu>) id 1iNz0I-00066S-Cn
- for qemu-devel@nongnu.org; Fri, 25 Oct 2019 08:47:43 -0400
+ (envelope-from <laurent@vivier.eu>) id 1iNz3A-0001Gk-Lv
+ for qemu-devel@nongnu.org; Fri, 25 Oct 2019 08:50:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <laurent@vivier.eu>) id 1iNz0H-00014z-9X
- for qemu-devel@nongnu.org; Fri, 25 Oct 2019 08:47:42 -0400
-Received: from mout.kundenserver.de ([212.227.126.135]:44617)
+ (envelope-from <laurent@vivier.eu>) id 1iNz39-00021y-GL
+ for qemu-devel@nongnu.org; Fri, 25 Oct 2019 08:50:40 -0400
+Received: from mout.kundenserver.de ([212.227.126.187]:54745)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1iNz0F-00013m-TA
- for qemu-devel@nongnu.org; Fri, 25 Oct 2019 08:47:41 -0400
+ (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1iNz39-00021P-7L
+ for qemu-devel@nongnu.org; Fri, 25 Oct 2019 08:50:39 -0400
 Received: from [192.168.100.1] ([78.238.229.36]) by mrelayeu.kundenserver.de
- (mreue012 [213.165.67.103]) with ESMTPSA (Nemesis) id
- 1M6YEz-1iM4GU2IrB-006zO9; Fri, 25 Oct 2019 14:47:35 +0200
+ (mreue011 [213.165.67.103]) with ESMTPSA (Nemesis) id
+ 1MLzSD-1ifmur00gL-00HzkI; Fri, 25 Oct 2019 14:50:36 +0200
+Subject: Re: [PATCH v2 00/12] linux-user sparc fixes
 To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
 References: <20191025113921.9412-1-richard.henderson@linaro.org>
- <20191025113921.9412-9-richard.henderson@linaro.org>
 From: Laurent Vivier <laurent@vivier.eu>
 Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  mQINBFYFJhkBEAC2me7w2+RizYOKZM+vZCx69GTewOwqzHrrHSG07MUAxJ6AY29/+HYf6EY2
@@ -81,37 +81,36 @@ Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  OpKgu3nD0ahBDqANU/ZmNNarBJEwvM2vfusmNnWm3QMIwxNuJghRyuFfx694Im1js0ZY3LEU
  JGSHFG4ZynA+ZFUPA6Xf0wHeJOxGKCGIyeKORsteIqgnkINW9fnKJw2pgk8qHkwVc3Vu+wGS
  ZiJK0xFusPQehjWTHn9WjMG1zvQ5TQQHxau/2FkP45+nRPco6vVFQe8JmgtRF8WFJA==
-Subject: Re: [PATCH v2 08/12] linux-user/sparc64: Fix target_signal_frame
-Message-ID: <fe46bd7d-d036-3a43-d1b4-d05a25555eb4@vivier.eu>
-Date: Fri, 25 Oct 2019 14:47:32 +0200
+Message-ID: <e0b44602-bd2f-3441-5ad3-2d85c00b97e6@vivier.eu>
+Date: Fri, 25 Oct 2019 14:50:33 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.1.1
 MIME-Version: 1.0
-In-Reply-To: <20191025113921.9412-9-richard.henderson@linaro.org>
+In-Reply-To: <20191025113921.9412-1-richard.henderson@linaro.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: fr
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:tfjOjg8bPw3r5d6hCpULNmXm4a+gb1Kypp0n70GOIl3fJLEWax8
- 2xwSrzHyEmXXd787qY3r7zksczC6eV4rvgrC2dV2gIpAmlbUjzej7NYcyvLXXY5RmGhlrKH
- ajjrvrActvZnxB1LEkA91OCr8WVhhDglq4Mv+xMULzHM+WrKysIZnDyxPsIH8/8s25s5xlG
- vQzB+iwZB2QlhM/TnfKKA==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:Xo/o6rvuvoE=:PQ2emsW1e/7Ag+NJGsg/EZ
- B52ztXxwS5hu/PsIOVqfyUuZdMnhDHf3daD3C03ZVEHpOT4MUU+fW8E3G9g/3V//UpOkPyKWC
- 2YKV4sH3ol9+k4Arehidt/oe4fOyIqowp4gjcwz1BlRfJiFtidkDdcqLRNJMCJDxjo1lYiQL1
- jRVdB6YO0Q8udL5alu2KN+oiG6iGPp4q04YzRf7G9/7TwJ2w/dBYrH/QHtzxdb8JE78ayw6Ud
- kqNfinJOIJ0aT+foEUKU8h6wrFRZdg9O9fRIBJmyhei3duOBf2px0/kGu08Bo3s8GgJZjwF7B
- zFwfSBxjMXk3INDX8v0dcfrfWts8Hxzjc0UFtz4RSjOieCiLtr+4oM+sO4i5P0ijgxQ6vJb6B
- GfDijHaQvVYy5K0hfNIgYTGGPN4fuf5MIGk5xmghDONBZpWxl5rr+neP4OusW5Pm3WpOcb3vt
- No+BFN5AtVqYgoxek6UCbyZJIFTkLQ823tH93poHfkUk6BhXi5xeUtsbl4W7f8B8YywtEmGkE
- cceRPnMCPDO49W5oaz2N32fRqvESk4DI9l66og/Dp6Cik4QKCwrvbtBqF+cHzP5vr44uIOR+i
- 4gUgjNVBRbMEpOnTlEIkUH3bCUwV5yOCV/HP/QyhyeguImarmGjZu+shZMbkgefu08sQVufGA
- KX/VIwn+/QcecSuE4WK1vJ7t5L15xSiFE+bp8c7uFFwug3Qvwj5pLN5aCKMcCkaKSLyIzibu2
- tR0rcjNWNYnx6yUk+98s+2j7Ml8H+9Vm7dit0Cxk3WUrVrpjn7V3BVTeBs/I5PTPmpb3wI30l
- HsFVpodYVUqcz/24g1KvjAA5j2Ous0bNaRuzelBb/PSU4/V6yfjwIRxY0MPCGQ/n1dw6b7HXg
- gDpVBSHZe0ZNPxGRACCp1fL/v/M28lOWKthqXQS/8=
+X-Provags-ID: V03:K1:dTnGbkeEiuLUlyfwkWt6D0MZM95RJNzTWqEyAgrON4i9boC3gDz
+ BtiZieAsnPFgKzCPKGZSl9BAm+gXb9rgUre/0oEelRs2aj+rGF1Jy7oyKIDH8o30pmlowPS
+ 8w01VccvIgabxX5EHaWMYugSSQ89iE07r0+xzOndyAppEO+SQv1Z8o7bz8DCrGuZU8tTNB2
+ tTSLA4QJInib7yetfnrxA==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:LxIZftUXxQI=:jseAtmpbGtvilyDN9l7g7N
+ Q4TPqhTOVOAlFpKe7pTy7CwDlHQqiOHNuRm9PIj7Ucht7+ZmB5GUUZfDN7vdEjnMTb+MTCV/3
+ 1iVScvdqCY8nBqHsctoc6a1f2mOrSOmzHSKlWCMYbexwGQfQPVrt2w1JMOjaOB55zBNmRaV+s
+ 9AkLa7EBgOjC3886bNmW6bIgmj07vT+oCgbrCtqfmc7/PEIWXU5NWimgOi70D+JI31cfKVnr9
+ vub2mJq+Bng0xypTouYPw4Xzlzm537znoubaS7RKPBM5s5F/oendO5DePrLdaNa8RMws7Q4hV
+ GhyXwgt/XVAdMTdZKKDMr7rke80vTsyOz6QNn/8evmmY+xD/Wg842eF7VSSHcDgujxJZi3sXc
+ JcocKyAqkNBz+qtFW8js/YPGJSIK+CBBUIU3cGytgXe92pOF6GoqarHCu0603k+HINw0zX4PH
+ QmKbkqX50lwctfHvu4VH9gOqeufI1IjijjOG9aduU+zNVUGjxDX/PmHmppsps6XyTNe9DSGx8
+ ILgtmzwI9iNcFxOgPgAK1DcVKNjbleUNlguvdIM94bqhwT3XkOtRAuoAkNe7lw6u1eSsKPk0p
+ LDc2Poa4XrWv00GIwc/xB3AIzK5Zx5+uKjJum+ZNBKQMeyFBf/QqUsq5/j2Yg9mkWsLhteAXV
+ si7ibP3rSYlLEH/EiA6yNY9napHxLd6I0LONrz07gfLXS1yUzVEJKfSx6IvmHMCRcfy0q2K63
+ mU5jC1bFJxQzHsZDd7ZG3xwdSTv7lNeoAJXe7XCHiNn5MO3oxPhLlD++HKIW4+UsSLm479Lk9
+ Cuk1nd4d0OFB0/ljuBzJtauFH8J91mnOzubxawmpV2w0oTsVWRZ9e265g53RAQ/a1juIQxvy2
+ HFW2ZH+eEuPLmsl2zXdbmUUOcdkdFEK17YAmKgThY=
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 212.227.126.135
+X-Received-From: 212.227.126.187
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -129,44 +128,15 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 Le 25/10/2019 à 13:39, Richard Henderson a écrit :
-> Instructions are always 4 bytes; use uint32_t not abi_ulong.
+> This is a v2 update of 
+>   https://lists.gnu.org/archive/html/qemu-devel/2019-05/msg04240.html
 > 
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-> ---
->  linux-user/sparc/signal.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
+> Some of the v1 patches have been merged, others reworked a bit.
 > 
-> diff --git a/linux-user/sparc/signal.c b/linux-user/sparc/signal.c
-> index efb0df7e2b..ecfdf937e4 100644
-> --- a/linux-user/sparc/signal.c
-> +++ b/linux-user/sparc/signal.c
-> @@ -87,7 +87,7 @@ struct target_signal_frame {
->      struct sparc_stackf ss;
->      __siginfo_t         info;
->      abi_ulong           fpu_save;
-> -    abi_ulong           insns[2] __attribute__ ((aligned (8)));
-> +    uint32_t            insns[2] __attribute__ ((aligned (8)));
->      abi_ulong           extramask[TARGET_NSIG_WORDS - 1];
->      abi_ulong           extra_size; /* Should be 0 */
->      qemu_siginfo_fpu_t fpu_state;
-> @@ -98,7 +98,7 @@ struct target_rt_signal_frame {
->      abi_ulong           regs[20];
->      sigset_t            mask;
->      abi_ulong           fpu_save;
-> -    unsigned int        insns[2];
-> +    uint32_t            insns[2];
->      stack_t             stack;
->      unsigned int        extra_size; /* Should be 0 */
->      qemu_siginfo_fpu_t  fpu_state;
-> 
+> This fixes most of tests/tcg/multiuser/linux-user for sparc64,
 
-This definition is used by sparc and sparc64 (sparc64/signal.c includes
-sparc/signal.c), so the definition was valid before your changes for
-sparc and not good for sparc64. Moreover rt_signal_frame for sparc64
-doesn't look like this one (and signal_frame doesn't exist).
+There are also some aarch64 and alpha fixes...
 
-Perhaps you should consider to introduce a specific file for sparc64?
 Thanks,
-
 Laurent
 
