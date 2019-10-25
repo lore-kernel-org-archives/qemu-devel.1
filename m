@@ -2,85 +2,79 @@ Return-Path: <SRS0=bySr=YS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 40887CA9EA0
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 15:54:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 57632CA9EA0
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 15:55:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0BAEF21D82
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 15:54:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1FD7A21D82
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 15:55:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="B3WgXWSi"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0BAEF21D82
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="EatJlTRF"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1FD7A21D82
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34074 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34096 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iO1ub-0004mD-SR
-	for qemu-devel@archiver.kernel.org; Fri, 25 Oct 2019 11:54:01 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51303)
+	id 1iO1wF-0007Vn-9t
+	for qemu-devel@archiver.kernel.org; Fri, 25 Oct 2019 11:55:43 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51578)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1iO10n-00036Z-Nr
- for qemu-devel@nongnu.org; Fri, 25 Oct 2019 10:56:22 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1iO11d-0004mT-Ky
+ for qemu-devel@nongnu.org; Fri, 25 Oct 2019 10:57:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1iO10m-0001Lw-IM
- for qemu-devel@nongnu.org; Fri, 25 Oct 2019 10:56:21 -0400
-Received: from mail-oi1-x242.google.com ([2607:f8b0:4864:20::242]:40446)
+ (envelope-from <peter.maydell@linaro.org>) id 1iO11c-0001iZ-Dz
+ for qemu-devel@nongnu.org; Fri, 25 Oct 2019 10:57:13 -0400
+Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:41508)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1iO10m-0001LX-CM
- for qemu-devel@nongnu.org; Fri, 25 Oct 2019 10:56:20 -0400
-Received: by mail-oi1-x242.google.com with SMTP id b25so1802817oib.7
- for <qemu-devel@nongnu.org>; Fri, 25 Oct 2019 07:56:20 -0700 (PDT)
+ id 1iO11c-0001iF-8Q
+ for qemu-devel@nongnu.org; Fri, 25 Oct 2019 10:57:12 -0400
+Received: by mail-ot1-x342.google.com with SMTP id 94so2246864oty.8
+ for <qemu-devel@nongnu.org>; Fri, 25 Oct 2019 07:57:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=OJl6vLLFY5BlX1urs2xZCKUVxnbmTzfPVAU83uOxRdM=;
- b=B3WgXWSilvZ03j6JeHT9aOdQzUMYJseO5IQBY7Vi1WXbqYA4s8HXXfN3hSBBpyBZ0d
- G4X7Lu4CYI6Gc8Qhm2JdeQ9gsv/UL1pQ2FvSa4uH22xjTUzRt54FvFWiX/mqyMCgr7Db
- nVpXeMfxP8BnJnoGKzSEHNx5hmRh+RvTaradwKhA5rpBLCEB+DizaETCJ+RN/yhkeSLH
- fACIX7ROaEv3EelaswqvYui9XN8sjbSy8nEBNbluVmdfYu2TCcIuRFwTl5DfVOLADGFV
- t3mayPmuH1KuHXJ0kyoKJeRPKTmuuj0IEVA53HSJBTuF6QBLsUf5Jb5wBQ5OEpi5Cpfz
- r+Rw==
+ :cc; bh=PzFBIOtrYGHD8aILwNW9Y8nczxSGhZHqE5zG7McmJGQ=;
+ b=EatJlTRFjWxhuoPIxF3O/Uhj3cBl9uvFUF4VvhRZRh/WD4LlBlkwexMyQP+oGma7ew
+ bj6CIbsiVk+1g9Hq1n5bm2xgmAfi769fY2Z9J4Grp8TSuxB6hQ+A1dKOdDWkWofzoc/2
+ Rok9M0gvPkPQauE9nfbpZWABLgTospt0ZEVctQ3B7RhulZckkXvg7a+teM0Dy/TK2EsE
+ MIYh31ZUZsVlPL2ONNQXvAALqdMOqegihT39ZaCcPWOFU+a9UT6zIV5mJ5+ZNjtkkp0a
+ n2NJC8Yq7OWET8oqiYwJZOVX2KFbF5zukidx9GL6a36eHdmNSOZOGO0bmXRKu0i7Zi+m
+ XWFg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=OJl6vLLFY5BlX1urs2xZCKUVxnbmTzfPVAU83uOxRdM=;
- b=e5p9iQJ3wJDQiL0kI52pDeGXnyEII8qEPsNkBsXUV7WEDGk4uDfiY3VOidQmi4mZ2F
- do5zJyZYauCju0qh59cBVHcpJtPTF1O8bPiZDwrSlA+c4cPsxloowYpf+HAu9wwyNLyk
- VafJ/tbC40PrZH1OZ3uEuMN7yESXlaFOL/X5seqX61Z2WDNWd1YnCyT/S2AA+jeI5Ml7
- ZohZtg+oh9Bz/wgt/vhJEs63Mjjh/dhrIAHebA5U8INg6MSIKpF/GzRfMbg8ccMRIQ84
- s5cc5GABe8hasMTuFpDaAbi0OCQgg4aUnZ14krrvzvz8HvuJ/v8rgurWZzHI8JR0WyTf
- fdhQ==
-X-Gm-Message-State: APjAAAV4xYq3gx5dMnoxChrOZhaPfQEc8pu2k5udEW7DuWYeZLz2XxvQ
- m5HCURYRImggkYfNsC8BsO5Q8YhiOieEOjwnPD8TGA==
-X-Google-Smtp-Source: APXvYqw/FPf5X20+hwW9g0vgZZV33imuf+44LxF0j3jWzZFreBxYi+6gjiHgQ3FPm0P04Clpz2HLPRliCO/7oPIz/X0=
-X-Received: by 2002:a05:6808:608:: with SMTP id
- y8mr3307708oih.146.1572015379366; 
- Fri, 25 Oct 2019 07:56:19 -0700 (PDT)
+ :message-id:subject:to:cc;
+ bh=PzFBIOtrYGHD8aILwNW9Y8nczxSGhZHqE5zG7McmJGQ=;
+ b=Okd2xoaURCEORTMfO+kPJtsH+R02AJR14djklOfxB35y69/gBm2eaTqrUQolJmUvPg
+ FS4gTuSwbPfGd8DJM9LeU/Or2YLnR1QzOzNcJuAqheAzsQa793ilRA1T86++l77sEO+n
+ 0H8ewxTzH/M04zeZ/K/ZLRm+LT8nd2Kz/0XSgQ83onEc1xmq3DAR1ERlxjUQXaxeMLlH
+ ZnT5SOLZWI9iPOlhVGI7YpID3aO6dk/wLoezbf2qGHrmorTxHgPxZHpu1zZxu9YRcVlB
+ sIwrgEvGjNmW91pYVRVEKnZmg1t1FaiBd5pL6FPfOTt8xLnOE3psCx0xYveooSkFkYD9
+ sy2Q==
+X-Gm-Message-State: APjAAAX0Dsr82Y0EM82CTzvf8PimI4j1ROdSXs/Xc1PRjfhLOw484KIb
+ 2y5NOv7nvnc7UiB8VEJHhnTl4FNBqTsOXevfMbEnMQ==
+X-Google-Smtp-Source: APXvYqwfYkbRgVWdfonQICnVWP9LuSPkxyE21Vg51U6VYGFxcTjQjjLGoxBwNvWLJ9NbVTW7H8dl8makxPg45Vy28AM=
+X-Received: by 2002:a9d:708e:: with SMTP id l14mr1690774otj.135.1572015431419; 
+ Fri, 25 Oct 2019 07:57:11 -0700 (PDT)
 MIME-Version: 1.0
-References: <20191025095849.25283-1-mreitz@redhat.com>
- <CAFEAcA8Y8fGKC3DkdM+wkU5Oe6ACZMtvWjpry9qFgPJc5KYjdA@mail.gmail.com>
- <19d50c64-c07a-3122-dea3-a5d97a2d35da@redhat.com>
- <CAFEAcA-3nt69+fUCf4YysVqsWd3z8r1iuURPYAPWUdHcd41p_Q@mail.gmail.com>
- <e77cacde-05ab-64c6-8f60-0222f096daf2@redhat.com>
-In-Reply-To: <e77cacde-05ab-64c6-8f60-0222f096daf2@redhat.com>
+References: <20191025134611.25920-1-kwolf@redhat.com>
+In-Reply-To: <20191025134611.25920-1-kwolf@redhat.com>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 25 Oct 2019 15:56:07 +0100
-Message-ID: <CAFEAcA_O35Yc=TJ1K4uk_n+hBzUondY1ttqv6xCNB6+yzwiv0g@mail.gmail.com>
-Subject: Re: [RFC 0/3] block/file-posix: Work around XFS bug
-To: Max Reitz <mreitz@redhat.com>
+Date: Fri, 25 Oct 2019 15:57:00 +0100
+Message-ID: <CAFEAcA_z1A3yTZUTmXqAYo=kyxXkaoCkjOBx-AkRamW66se3tw@mail.gmail.com>
+Subject: Re: [PULL 0/7] Block layer patches
+To: Kevin Wolf <kwolf@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::242
+X-Received-From: 2607:f8b0:4864:20::342
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -92,33 +86,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>,
- Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- Alberto Garcia <berto@igalia.com>, Qemu-block <qemu-block@nongnu.org>,
- QEMU Developers <qemu-devel@nongnu.org>,
- Anton Nefedov <anton.nefedov@virtuozzo.com>,
- Stefan Hajnoczi <stefanha@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Qemu-block <qemu-block@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, 25 Oct 2019 at 15:21, Max Reitz <mreitz@redhat.com> wrote:
+On Fri, 25 Oct 2019 at 14:46, Kevin Wolf <kwolf@redhat.com> wrote:
 >
-> On 25.10.19 16:17, Peter Maydell wrote:
-> > On Fri, 25 Oct 2019 at 15:16, Max Reitz <mreitz@redhat.com> wrote:
-> >> I=E2=80=99ve created an RH BZ here:
-> >>
-> >> https://bugzilla.redhat.com/show_bug.cgi?id=3D1765547
-> >
-> > Currently "You are not authorized to access bug #1765547." for
-> > anonymous browsers, just fyi.
+> The following changes since commit 7bc8f9734213b76e76631a483be13d6737c2adbc:
 >
-> Err.  Oops.  That wasn=E2=80=99t my intention.  I hate that misfeature.
+>   Merge remote-tracking branch 'remotes/pmaydell/tags/pull-target-arm-20191025' into staging (2019-10-25 13:12:16 +0100)
 >
-> Thanks for telling me, I fixed it. :-)
+> are available in the Git repository at:
+>
+>   git://repo.or.cz/qemu/kevin.git tags/for-upstream
+>
+> for you to fetch changes up to 5e9785505210e2477e590e61b1ab100d0ec22b01:
+>
+>   qcow2: Fix corruption bug in qcow2_detect_metadata_preallocation() (2019-10-25 15:18:55 +0200)
+>
+> ----------------------------------------------------------------
+> Block layer patches:
+>
+> - qcow2: Fix data corruption bug that is triggered in partial cluster
+>   allocation with default options
+> - qapi: add support for blkreplay driver
+> - doc: Describe missing generic -blockdev options
+> - iotests: Fix 118 when run as root
+> - Minor code cleanups
+>
+> ----------------------------------------------------------------
 
-Yeah, that's a really well written bug report, you definitely
-don't want to hide it away :-) Thanks for making it public.
+
+
+Applied, thanks.
+
+Please update the changelog at https://wiki.qemu.org/ChangeLog/4.2
+for any user-visible changes.
 
 -- PMM
 
