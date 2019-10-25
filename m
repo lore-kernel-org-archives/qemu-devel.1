@@ -7,76 +7,75 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 93CA4CA9EA0
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 07:29:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E2D7BCA9EA0
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 07:31:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 48E57206DD
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 07:29:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9DB6B20867
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 07:31:13 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="mWd7+Unj"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 48E57206DD
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="T+N7XBlw"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9DB6B20867
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56800 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56814 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iNu2O-0002lY-CU
-	for qemu-devel@archiver.kernel.org; Fri, 25 Oct 2019 03:29:32 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37024)
+	id 1iNu3z-00052g-Up
+	for qemu-devel@archiver.kernel.org; Fri, 25 Oct 2019 03:31:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38340)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1iNtN6-00087b-Pl
- for qemu-devel@nongnu.org; Fri, 25 Oct 2019 02:46:56 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1iNtWi-0003kZ-8a
+ for qemu-devel@nongnu.org; Fri, 25 Oct 2019 02:56:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1iNtN2-0003F4-T7
- for qemu-devel@nongnu.org; Fri, 25 Oct 2019 02:46:52 -0400
-Received: from mail-wr1-x42e.google.com ([2a00:1450:4864:20::42e]:42578)
+ (envelope-from <alex.bennee@linaro.org>) id 1iNtWf-0007pM-II
+ for qemu-devel@nongnu.org; Fri, 25 Oct 2019 02:56:48 -0400
+Received: from mail-wr1-x436.google.com ([2a00:1450:4864:20::436]:45946)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1iNtMz-0003Ak-UE
- for qemu-devel@nongnu.org; Fri, 25 Oct 2019 02:46:47 -0400
-Received: by mail-wr1-x42e.google.com with SMTP id r1so925387wrs.9
- for <qemu-devel@nongnu.org>; Thu, 24 Oct 2019 23:46:41 -0700 (PDT)
+ id 1iNtWf-0007ow-AU
+ for qemu-devel@nongnu.org; Fri, 25 Oct 2019 02:56:45 -0400
+Received: by mail-wr1-x436.google.com with SMTP id q13so937477wrs.12
+ for <qemu-devel@nongnu.org>; Thu, 24 Oct 2019 23:56:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=vPFAO1P3yheq7LPHs2PUsFCtoO1DNS7CzmpaZxf7x2Y=;
- b=mWd7+Unj/DkuSbKRgcqNqUOpzBCnr4XD+xP5trNpP2dInpeKU/zs7lxpfv8Sbhb4YG
- Z21JRbGVC3pk8pX8WQEO4gXrtijp38lJqzTyrrH/HvyDo3SnqHCSnVvqnzR6ZzejIk/J
- l6Vw6VVNmJOjh0IUlGxNmq0BcPhgjCm2AFyh93rDUyu9Ge8geqHRmq9xFB1oFE9fcot2
- eCWukOCMAWaA3QHXbxOFy6Wi60c6Bm8aXZIrYS+ia2hMCz46IPHeBtrW4HSAc/bJHwii
- VtzQSEhF1EvDkCO2NA5ztYyZoP7MLSmuCZdlWnm+xiLiL0B0XMs5sJXbyNtwvLCpMqSM
- 7OMw==
+ bh=91dz7KJADMxPUVCAuh+UOifd4EFprDikV0cfmChkEVM=;
+ b=T+N7XBlwRwJjXw63dKnSEQP0tYvN7HTOBf/FD6e47vP6GtHvp6uiszceVLA/DQYeRE
+ VgLrl8zkMBMsDjTY9FooRVZn8Kfzv9zaDz15VvFHctlLixp7QgS/JEnILQ3vy6P+QCFr
+ ysCUJeOO4HkOcenzgpdlWmU6wFLhUiFYs7UP4VdQ9FecrkFr9vhatCuQcJEV7SZDZSOc
+ EAbRjwcT8OYRvLKYVulK8KjGPfqAhyu0pGmq17m9F8DWyV/ZDhr+0Ny78uK4tTRhfPfO
+ //Kzcty5liEDrg/SkW+ccK1kVo0PjJco2k71TLqo5NJPqM2pKgTyywJx7QOFP2ajOCoB
+ a5vA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=vPFAO1P3yheq7LPHs2PUsFCtoO1DNS7CzmpaZxf7x2Y=;
- b=H5UHC6gBtqyEYfRrAThNqfotkwDMHPSlrmiwZuZwAKB705y7auA5as2ghijki+2ZHz
- Tuo1Wt86r23VsSzouWkT3Tb8jHpLY0HsuWhhloZlvWpTA3zo0Ut0Dzs/QZF9xyODx+ck
- +BVeH3+IBmbLJJ//lNDZlm3jEF6roXeQ9o9bPdVTfXZwiltsd39LVNzYfqMVZx5zSoCK
- 1Gh76Rmj3lr47A/n0k+GyQhxrScCyyoZP+TINCCddLEIngUKpP2o4//71H8bHVx4x4eA
- kIlgXP5edcibsyCrKwdyjuc5uDTr1CIdF7pBd5PTa7WeADnyu7C5uSIiNweThgI/noxG
- epqQ==
-X-Gm-Message-State: APjAAAVqS8mZg/S2Exdv4OAGArrQJuA0Sf4YgAdkqVi3llCWWv8voUP9
- LW4KTleX5r+5VK2iq+eGStOKiQ==
-X-Google-Smtp-Source: APXvYqydn5/w/UlvQnHcbNrnlhewPYqntylP8wzIp/C0jv6MJwLvNWQM0ui+dDnX28e/0CnEfUqLtw==
-X-Received: by 2002:a05:6000:92:: with SMTP id
- m18mr1360524wrx.105.1571985999712; 
- Thu, 24 Oct 2019 23:46:39 -0700 (PDT)
+ bh=91dz7KJADMxPUVCAuh+UOifd4EFprDikV0cfmChkEVM=;
+ b=TyHmgQFP8wQA42EBznO3RfGgw8TyDubnrIys7gMKm4DpJ8+KCIOBhhLkfHwUP9tnir
+ 0+Es9Di3SglEBV2X8cnD6sqrMszYzzrMDeI8+Bs5N6NvB21lKFXqTtz+qyuurWs9PXdx
+ SyuedI4SAc/P8pGmZkofSwTCG47HTypLONFsVJ93HeQFB19mCm+p40cIu40vj4xfDlOc
+ 1AegC7lIVCM+Qlmlcu+deWh2jWGKNaZx3qCHd3vDesh6+NRabxRKSmUyFwTyN1ZdbZrl
+ xF57tEDCwHsy2MPZ4S0RUKpzDbymAfSZxsGCIVNsS5Asll8qBte2R76pat8a1CKwHy5+
+ Tlow==
+X-Gm-Message-State: APjAAAUQ15PJFzX0KEPoovLP5SfIiHMYZp1J40jcvbeeX4mTXJvxRTOI
+ 2l6DZfPVDjs82FOTZOvrORVUCw==
+X-Google-Smtp-Source: APXvYqz+e5IVVPu9+X2DPUOCtop+1kzv9O37eXEQK0jT2Ky/EwfB+VpP/9Mw+8u322no4bbU+U84Rg==
+X-Received: by 2002:a5d:404d:: with SMTP id w13mr1393010wrp.185.1571986603974; 
+ Thu, 24 Oct 2019 23:56:43 -0700 (PDT)
 Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id a186sm1359813wmd.3.2019.10.24.23.46.34
+ by smtp.gmail.com with ESMTPSA id h205sm1191520wmf.35.2019.10.24.23.56.36
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 24 Oct 2019 23:46:36 -0700 (PDT)
+ Thu, 24 Oct 2019 23:56:42 -0700 (PDT)
 Received: from zen.lan (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 61A551FFA6;
- Fri, 25 Oct 2019 07:37:15 +0100 (BST)
+ by zen.linaroharston (Postfix) with ESMTP id B75271FF8F;
+ Fri, 25 Oct 2019 07:37:16 +0100 (BST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: peter.maydell@linaro.org
-Subject: [PULL v2 18/73] trace: add mmu_index to mem_info
-Date: Fri, 25 Oct 2019 07:36:18 +0100
-Message-Id: <20191025063713.23374-19-alex.bennee@linaro.org>
+Subject: [PULL v2 31/73] tcg: let plugins instrument virtual memory accesses
+Date: Fri, 25 Oct 2019 07:36:31 +0100
+Message-Id: <20191025063713.23374-32-alex.bennee@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20191025063713.23374-1-alex.bennee@linaro.org>
 References: <20191025063713.23374-1-alex.bennee@linaro.org>
@@ -85,7 +84,7 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::42e
+X-Received-From: 2a00:1450:4864:20::436
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,347 +96,415 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Riku Voipio <riku.voipio@iki.fi>, qemu-devel@nongnu.org,
- Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+Cc: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org,
+ "Emilio G. Cota" <cota@braap.org>, Paolo Bonzini <pbonzini@redhat.com>,
  =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
  Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-We are going to re-use mem_info later for plugins and will need to
-track the mmu_idx for softmmu code.
+From: "Emilio G. Cota" <cota@braap.org>
 
+To capture all memory accesses we need hook into all the various
+helper functions that are involved in memory operations as well as the
+injected inline helper calls. A later commit will allow us to resolve
+the actual guest HW addresses by replaying the lookup.
+
+Signed-off-by: Emilio G. Cota <cota@braap.org>
+[AJB: drop haddr handling, just deal in vaddr]
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
+diff --git a/accel/tcg/atomic_common.inc.c b/accel/tcg/atomic_common.inc.c
+index a86098fb2de..344525b0bb3 100644
+--- a/accel/tcg/atomic_common.inc.c
++++ b/accel/tcg/atomic_common.inc.c
+@@ -25,6 +25,8 @@ void atomic_trace_rmw_pre(CPUArchState *env, target_ulong addr, uint16_t info)
+ static inline void
+ atomic_trace_rmw_post(CPUArchState *env, target_ulong addr, uint16_t info)
+ {
++    qemu_plugin_vcpu_mem_cb(env_cpu(env), addr, info);
++    qemu_plugin_vcpu_mem_cb(env_cpu(env), addr, info | TRACE_MEM_ST);
+ }
+ 
+ static inline
+@@ -36,6 +38,7 @@ void atomic_trace_ld_pre(CPUArchState *env, target_ulong addr, uint16_t info)
+ static inline
+ void atomic_trace_ld_post(CPUArchState *env, target_ulong addr, uint16_t info)
+ {
++    qemu_plugin_vcpu_mem_cb(env_cpu(env), addr, info);
+ }
+ 
+ static inline
+@@ -47,4 +50,5 @@ void atomic_trace_st_pre(CPUArchState *env, target_ulong addr, uint16_t info)
+ static inline
+ void atomic_trace_st_post(CPUArchState *env, target_ulong addr, uint16_t info)
+ {
++    qemu_plugin_vcpu_mem_cb(env_cpu(env), addr, info);
+ }
 diff --git a/accel/tcg/atomic_template.h b/accel/tcg/atomic_template.h
-index 287433d809b..473d7e5a943 100644
+index 84d3370bf01..837676231f6 100644
 --- a/accel/tcg/atomic_template.h
 +++ b/accel/tcg/atomic_template.h
-@@ -60,23 +60,26 @@
- #endif
+@@ -18,6 +18,7 @@
+  * License along with this library; if not, see <http://www.gnu.org/licenses/>.
+  */
  
- #define ATOMIC_TRACE_RMW do {                                           \
--        uint8_t info = glue(trace_mem_build_info_no_se, MEND)(SHIFT, false); \
-+        uint16_t info = glue(trace_mem_build_info_no_se, MEND)          \
-+            (SHIFT, false, ATOMIC_MMU_IDX);                             \
-                                                                         \
--        trace_guest_mem_before_exec(env_cpu(env), addr, info);      \
--        trace_guest_mem_before_exec(env_cpu(env), addr,             \
-+        trace_guest_mem_before_exec(env_cpu(env), addr, info);          \
-+        trace_guest_mem_before_exec(env_cpu(env), addr,                 \
-                                     info | TRACE_MEM_ST);               \
-     } while (0)
++#include "qemu/plugin.h"
+ #include "trace/mem.h"
  
- #define ATOMIC_TRACE_LD do {                                            \
--        uint8_t info = glue(trace_mem_build_info_no_se, MEND)(SHIFT, false); \
-+        uint16_t info = glue(trace_mem_build_info_no_se, MEND)          \
-+            (SHIFT, false, ATOMIC_MMU_IDX);                             \
-                                                                         \
--        trace_guest_mem_before_exec(env_cpu(env), addr, info);      \
-+        trace_guest_mem_before_exec(env_cpu(env), addr, info);          \
-     } while (0)
+ #if DATA_SIZE == 16
+diff --git a/accel/tcg/cpu-exec.c b/accel/tcg/cpu-exec.c
+index 81c33d6475d..c01f59c7433 100644
+--- a/accel/tcg/cpu-exec.c
++++ b/accel/tcg/cpu-exec.c
+@@ -268,6 +268,7 @@ void cpu_exec_step_atomic(CPUState *cpu)
+             qemu_mutex_unlock_iothread();
+         }
+         assert_no_pages_locked();
++        qemu_plugin_disable_mem_helpers(cpu);
+     }
  
--# define ATOMIC_TRACE_ST do {                                           \
--        uint8_t info = glue(trace_mem_build_info_no_se, MEND)(SHIFT, true); \
--                                                                        \
--        trace_guest_mem_before_exec(env_cpu(env), addr, info);      \
-+#define ATOMIC_TRACE_ST do {                                           \
-+        uint16_t info = glue(trace_mem_build_info_no_se, MEND)         \
-+            (SHIFT, true, ATOMIC_MMU_IDX);                             \
-+                                                                       \
-+        trace_guest_mem_before_exec(env_cpu(env), addr, info);         \
-     } while (0)
+     if (cpu_in_exclusive_context(cpu)) {
+@@ -701,6 +702,8 @@ int cpu_exec(CPUState *cpu)
+         if (qemu_mutex_iothread_locked()) {
+             qemu_mutex_unlock_iothread();
+         }
++        qemu_plugin_disable_mem_helpers(cpu);
++
+         assert_no_pages_locked();
+     }
  
- /* Define host-endian atomic operations.  Note that END is used within
-diff --git a/accel/tcg/cputlb.c b/accel/tcg/cputlb.c
-index defc8d59292..a8f90695823 100644
---- a/accel/tcg/cputlb.c
-+++ b/accel/tcg/cputlb.c
-@@ -1811,6 +1811,7 @@ void helper_be_stq_mmu(CPUArchState *env, target_ulong addr, uint64_t val,
- #define ATOMIC_MMU_DECLS
- #define ATOMIC_MMU_LOOKUP atomic_mmu_lookup(env, addr, oi, retaddr)
- #define ATOMIC_MMU_CLEANUP
-+#define ATOMIC_MMU_IDX   get_mmuidx(oi)
- 
- #define DATA_SIZE 1
- #include "atomic_template.h"
-@@ -1853,6 +1854,7 @@ void helper_be_stq_mmu(CPUArchState *env, target_ulong addr, uint64_t val,
- #define DATA_SIZE 8
- #include "atomic_template.h"
- #endif
-+#undef ATOMIC_MMU_IDX
- 
- /* Code access functions.  */
- 
-diff --git a/accel/tcg/user-exec.c b/accel/tcg/user-exec.c
-index 71c4bf6477d..8d315a65876 100644
---- a/accel/tcg/user-exec.c
-+++ b/accel/tcg/user-exec.c
-@@ -751,6 +751,7 @@ static void *atomic_mmu_lookup(CPUArchState *env, target_ulong addr,
- #define ATOMIC_MMU_DECLS do {} while (0)
- #define ATOMIC_MMU_LOOKUP  atomic_mmu_lookup(env, addr, DATA_SIZE, GETPC())
- #define ATOMIC_MMU_CLEANUP do { clear_helper_retaddr(); } while (0)
-+#define ATOMIC_MMU_IDX MMU_USER_IDX
- 
- #define ATOMIC_NAME(X)   HELPER(glue(glue(atomic_ ## X, SUFFIX), END))
- #define EXTRA_ARGS
+diff --git a/include/exec/cpu-defs.h b/include/exec/cpu-defs.h
+index be946ba1ce5..8c44abefa22 100644
+--- a/include/exec/cpu-defs.h
++++ b/include/exec/cpu-defs.h
+@@ -214,6 +214,7 @@ typedef struct CPUTLBCommon {
+  * Since this is placed within CPUNegativeOffsetState, the smallest
+  * negative offsets are at the end of the struct.
+  */
++
+ typedef struct CPUTLB {
+     CPUTLBCommon c;
+     CPUTLBDesc d[NB_MMU_MODES];
 diff --git a/include/exec/cpu_ldst_template.h b/include/exec/cpu_ldst_template.h
-index af7e0b49f2d..5750a26b9ec 100644
+index 5750a26b9ec..6f0d3407979 100644
 --- a/include/exec/cpu_ldst_template.h
 +++ b/include/exec/cpu_ldst_template.h
-@@ -84,17 +84,16 @@ glue(glue(glue(cpu_ld, USUFFIX), MEMSUFFIX), _ra)(CPUArchState *env,
-     CPUTLBEntry *entry;
-     RES_TYPE res;
-     target_ulong addr;
--    int mmu_idx;
-+    int mmu_idx = CPU_MMU_INDEX;
-     TCGMemOpIdx oi;
+@@ -28,6 +28,7 @@
+ #include "trace-root.h"
+ #endif
  
++#include "qemu/plugin.h"
+ #include "trace/mem.h"
+ 
+ #if DATA_SIZE == 8
+@@ -86,11 +87,9 @@ glue(glue(glue(cpu_ld, USUFFIX), MEMSUFFIX), _ra)(CPUArchState *env,
+     target_ulong addr;
+     int mmu_idx = CPU_MMU_INDEX;
+     TCGMemOpIdx oi;
+-
  #if !defined(SOFTMMU_CODE_ACCESS)
-     trace_guest_mem_before_exec(
-         env_cpu(env), ptr,
--        trace_mem_build_info(SHIFT, false, MO_TE, false));
-+        trace_mem_build_info(SHIFT, false, MO_TE, false, mmu_idx));
+-    trace_guest_mem_before_exec(
+-        env_cpu(env), ptr,
+-        trace_mem_build_info(SHIFT, false, MO_TE, false, mmu_idx));
++    uint16_t meminfo = trace_mem_build_info(SHIFT, false, MO_TE, false, mmu_idx);
++    trace_guest_mem_before_exec(env_cpu(env), ptr, meminfo);
  #endif
  
      addr = ptr;
--    mmu_idx = CPU_MMU_INDEX;
-     entry = tlb_entry(env, mmu_idx, addr);
-     if (unlikely(entry->ADDR_READ !=
-                  (addr & (TARGET_PAGE_MASK | (DATA_SIZE - 1))))) {
-@@ -123,17 +122,16 @@ glue(glue(glue(cpu_lds, SUFFIX), MEMSUFFIX), _ra)(CPUArchState *env,
-     CPUTLBEntry *entry;
-     int res;
-     target_ulong addr;
--    int mmu_idx;
-+    int mmu_idx = CPU_MMU_INDEX;
-     TCGMemOpIdx oi;
- 
- #if !defined(SOFTMMU_CODE_ACCESS)
-     trace_guest_mem_before_exec(
-         env_cpu(env), ptr,
--        trace_mem_build_info(SHIFT, true, MO_TE, false));
-+        trace_mem_build_info(SHIFT, true, MO_TE, false, mmu_idx));
- #endif
- 
-     addr = ptr;
--    mmu_idx = CPU_MMU_INDEX;
-     entry = tlb_entry(env, mmu_idx, addr);
-     if (unlikely(entry->ADDR_READ !=
-                  (addr & (TARGET_PAGE_MASK | (DATA_SIZE - 1))))) {
-@@ -165,17 +163,16 @@ glue(glue(glue(cpu_st, SUFFIX), MEMSUFFIX), _ra)(CPUArchState *env,
- {
-     CPUTLBEntry *entry;
-     target_ulong addr;
--    int mmu_idx;
-+    int mmu_idx = CPU_MMU_INDEX;
-     TCGMemOpIdx oi;
- 
- #if !defined(SOFTMMU_CODE_ACCESS)
-     trace_guest_mem_before_exec(
-         env_cpu(env), ptr,
--        trace_mem_build_info(SHIFT, false, MO_TE, true));
-+        trace_mem_build_info(SHIFT, false, MO_TE, true, mmu_idx));
- #endif
- 
-     addr = ptr;
--    mmu_idx = CPU_MMU_INDEX;
-     entry = tlb_entry(env, mmu_idx, addr);
-     if (unlikely(tlb_addr_write(entry) !=
-                  (addr & (TARGET_PAGE_MASK | (DATA_SIZE - 1))))) {
-diff --git a/include/exec/cpu_ldst_useronly_template.h b/include/exec/cpu_ldst_useronly_template.h
-index 2378f2958c9..93ad532f943 100644
---- a/include/exec/cpu_ldst_useronly_template.h
-+++ b/include/exec/cpu_ldst_useronly_template.h
-@@ -73,7 +73,7 @@ glue(glue(cpu_ld, USUFFIX), MEMSUFFIX)(CPUArchState *env, abi_ptr ptr)
- #else
-     trace_guest_mem_before_exec(
-         env_cpu(env), ptr,
--        trace_mem_build_info(SHIFT, false, MO_TE, false));
-+        trace_mem_build_info(SHIFT, false, MO_TE, false, MMU_USER_IDX));
-     return glue(glue(ld, USUFFIX), _p)(g2h(ptr));
- #endif
- }
-@@ -105,7 +105,7 @@ glue(glue(cpu_lds, SUFFIX), MEMSUFFIX)(CPUArchState *env, abi_ptr ptr)
- #else
-     trace_guest_mem_before_exec(
-         env_cpu(env), ptr,
--        trace_mem_build_info(SHIFT, true, MO_TE, false));
-+        trace_mem_build_info(SHIFT, true, MO_TE, false, MMU_USER_IDX));
-     return glue(glue(lds, SUFFIX), _p)(g2h(ptr));
- #endif
- }
-@@ -132,7 +132,7 @@ glue(glue(cpu_st, SUFFIX), MEMSUFFIX)(CPUArchState *env, abi_ptr ptr,
- {
-     trace_guest_mem_before_exec(
-         env_cpu(env), ptr,
--        trace_mem_build_info(SHIFT, false, MO_TE, true));
-+        trace_mem_build_info(SHIFT, false, MO_TE, true, MMU_USER_IDX));
-     glue(glue(st, SUFFIX), _p)(g2h(ptr), v);
- }
- 
-diff --git a/scripts/tracetool/transform.py b/scripts/tracetool/transform.py
-index e18b05315ef..2ca9286046d 100644
---- a/scripts/tracetool/transform.py
-+++ b/scripts/tracetool/transform.py
-@@ -83,6 +83,7 @@ TCG_2_HOST = {
- 
- HOST_2_TCG_COMPAT = {
-     "uint8_t": "uint32_t",
-+    "uint16_t": "uint32_t",
+@@ -104,6 +103,9 @@ glue(glue(glue(cpu_ld, USUFFIX), MEMSUFFIX), _ra)(CPUArchState *env,
+         uintptr_t hostaddr = addr + entry->addend;
+         res = glue(glue(ld, USUFFIX), _p)((uint8_t *)hostaddr);
      }
- 
- 
-diff --git a/tcg/tcg-op.c b/tcg/tcg-op.c
-index e87c327fbf9..1388bd344d3 100644
---- a/tcg/tcg-op.c
-+++ b/tcg/tcg-op.c
-@@ -2795,7 +2795,7 @@ void tcg_gen_qemu_ld_i32(TCGv_i32 val, TCGv addr, TCGArg idx, MemOp memop)
-     tcg_gen_req_mo(TCG_MO_LD_LD | TCG_MO_ST_LD);
-     memop = tcg_canonicalize_memop(memop, 0, 0);
-     trace_guest_mem_before_tcg(tcg_ctx->cpu, cpu_env,
--                               addr, trace_mem_get_info(memop, 0));
-+                               addr, trace_mem_get_info(memop, idx, 0));
- 
-     orig_memop = memop;
-     if (!TCG_TARGET_HAS_MEMORY_BSWAP && (memop & MO_BSWAP)) {
-@@ -2832,7 +2832,7 @@ void tcg_gen_qemu_st_i32(TCGv_i32 val, TCGv addr, TCGArg idx, MemOp memop)
-     tcg_gen_req_mo(TCG_MO_LD_ST | TCG_MO_ST_ST);
-     memop = tcg_canonicalize_memop(memop, 0, 1);
-     trace_guest_mem_before_tcg(tcg_ctx->cpu, cpu_env,
--                               addr, trace_mem_get_info(memop, 1));
-+                               addr, trace_mem_get_info(memop, idx, 1));
- 
-     if (!TCG_TARGET_HAS_MEMORY_BSWAP && (memop & MO_BSWAP)) {
-         swap = tcg_temp_new_i32();
-@@ -2875,7 +2875,7 @@ void tcg_gen_qemu_ld_i64(TCGv_i64 val, TCGv addr, TCGArg idx, MemOp memop)
-     tcg_gen_req_mo(TCG_MO_LD_LD | TCG_MO_ST_LD);
-     memop = tcg_canonicalize_memop(memop, 1, 0);
-     trace_guest_mem_before_tcg(tcg_ctx->cpu, cpu_env,
--                               addr, trace_mem_get_info(memop, 0));
-+                               addr, trace_mem_get_info(memop, idx, 0));
- 
-     orig_memop = memop;
-     if (!TCG_TARGET_HAS_MEMORY_BSWAP && (memop & MO_BSWAP)) {
-@@ -2923,7 +2923,7 @@ void tcg_gen_qemu_st_i64(TCGv_i64 val, TCGv addr, TCGArg idx, MemOp memop)
-     tcg_gen_req_mo(TCG_MO_LD_ST | TCG_MO_ST_ST);
-     memop = tcg_canonicalize_memop(memop, 1, 1);
-     trace_guest_mem_before_tcg(tcg_ctx->cpu, cpu_env,
--                               addr, trace_mem_get_info(memop, 1));
-+                               addr, trace_mem_get_info(memop, idx, 1));
- 
-     if (!TCG_TARGET_HAS_MEMORY_BSWAP && (memop & MO_BSWAP)) {
-         swap = tcg_temp_new_i64();
-diff --git a/trace-events b/trace-events
-index 22133dfd3fa..42107ebc697 100644
---- a/trace-events
-+++ b/trace-events
-@@ -152,12 +152,14 @@ vcpu guest_cpu_reset(void)
- #     uint8_t size_shift : 4; /* interpreted as "1 << size_shift" bytes */
- #     bool    sign_extend: 1; /* sign-extended */
- #     uint8_t endianness : 1; /* 0: little, 1: big */
--#     bool    store      : 1; /* wheter it's a store operation */
-+#     bool    store      : 1; /* whether it is a store operation */
-+#             pad        : 1;
-+#     uint8_t mmuidx     : 4; /* mmuidx (softmmu only)  */
- # };
- #
- # Mode: user, softmmu
- # Targets: TCG(all)
--vcpu tcg guest_mem_before(TCGv vaddr, uint8_t info) "info=%d", "vaddr=0x%016"PRIx64" info=%d"
-+vcpu tcg guest_mem_before(TCGv vaddr, uint16_t info) "info=%d", "vaddr=0x%016"PRIx64" info=%d"
- 
- # linux-user/syscall.c
- # bsd-user/syscall.c
-diff --git a/trace/mem-internal.h b/trace/mem-internal.h
-index 1a010c1b277..0a32aa22ca0 100644
---- a/trace/mem-internal.h
-+++ b/trace/mem-internal.h
-@@ -14,11 +14,13 @@
- #define TRACE_MEM_SE (1ULL << 4)    /* sign extended (y/n) */
- #define TRACE_MEM_BE (1ULL << 5)    /* big endian (y/n) */
- #define TRACE_MEM_ST (1ULL << 6)    /* store (y/n) */
-+#define TRACE_MEM_MMU_SHIFT 8       /* mmu idx */
- 
--static inline uint8_t trace_mem_build_info(
--    int size_shift, bool sign_extend, MemOp endianness, bool store)
-+static inline uint16_t trace_mem_build_info(
-+    int size_shift, bool sign_extend, MemOp endianness,
-+    bool store, unsigned int mmu_idx)
- {
--    uint8_t res;
-+    uint16_t res;
- 
-     res = size_shift & TRACE_MEM_SZ_SHIFT_MASK;
-     if (sign_extend) {
-@@ -30,25 +32,36 @@ static inline uint8_t trace_mem_build_info(
-     if (store) {
-         res |= TRACE_MEM_ST;
-     }
-+#ifdef CONFIG_SOFTMMU
-+    res |= mmu_idx << TRACE_MEM_MMU_SHIFT;
++#ifndef SOFTMMU_CODE_ACCESS
++    qemu_plugin_vcpu_mem_cb(env_cpu(env), ptr, meminfo);
 +#endif
      return res;
  }
  
--static inline uint8_t trace_mem_get_info(MemOp op, bool store)
-+static inline uint16_t trace_mem_get_info(MemOp op,
-+                                          unsigned int mmu_idx,
-+                                          bool store)
- {
-     return trace_mem_build_info(op & MO_SIZE, !!(op & MO_SIGN),
--                                op & MO_BSWAP, store);
-+                                op & MO_BSWAP, store,
-+                                mmu_idx);
+@@ -124,11 +126,9 @@ glue(glue(glue(cpu_lds, SUFFIX), MEMSUFFIX), _ra)(CPUArchState *env,
+     target_ulong addr;
+     int mmu_idx = CPU_MMU_INDEX;
+     TCGMemOpIdx oi;
+-
+ #if !defined(SOFTMMU_CODE_ACCESS)
+-    trace_guest_mem_before_exec(
+-        env_cpu(env), ptr,
+-        trace_mem_build_info(SHIFT, true, MO_TE, false, mmu_idx));
++    uint16_t meminfo = trace_mem_build_info(SHIFT, true, MO_TE, false, mmu_idx);
++    trace_guest_mem_before_exec(env_cpu(env), ptr, meminfo);
+ #endif
+ 
+     addr = ptr;
+@@ -142,6 +142,9 @@ glue(glue(glue(cpu_lds, SUFFIX), MEMSUFFIX), _ra)(CPUArchState *env,
+         uintptr_t hostaddr = addr + entry->addend;
+         res = glue(glue(lds, SUFFIX), _p)((uint8_t *)hostaddr);
+     }
++#ifndef SOFTMMU_CODE_ACCESS
++    qemu_plugin_vcpu_mem_cb(env_cpu(env), ptr, meminfo);
++#endif
+     return res;
  }
  
-+/* Used by the atomic helpers */
- static inline
--uint8_t trace_mem_build_info_no_se_be(int size_shift, bool store)
-+uint16_t trace_mem_build_info_no_se_be(int size_shift, bool store,
-+                                       TCGMemOpIdx oi)
- {
--    return trace_mem_build_info(size_shift, false, MO_BE, store);
-+    return trace_mem_build_info(size_shift, false, MO_BE, store,
-+                                get_mmuidx(oi));
+@@ -165,11 +168,9 @@ glue(glue(glue(cpu_st, SUFFIX), MEMSUFFIX), _ra)(CPUArchState *env,
+     target_ulong addr;
+     int mmu_idx = CPU_MMU_INDEX;
+     TCGMemOpIdx oi;
+-
+ #if !defined(SOFTMMU_CODE_ACCESS)
+-    trace_guest_mem_before_exec(
+-        env_cpu(env), ptr,
+-        trace_mem_build_info(SHIFT, false, MO_TE, true, mmu_idx));
++    uint16_t meminfo = trace_mem_build_info(SHIFT, false, MO_TE, true, mmu_idx);
++    trace_guest_mem_before_exec(env_cpu(env), ptr, meminfo);
+ #endif
+ 
+     addr = ptr;
+@@ -183,6 +184,9 @@ glue(glue(glue(cpu_st, SUFFIX), MEMSUFFIX), _ra)(CPUArchState *env,
+         uintptr_t hostaddr = addr + entry->addend;
+         glue(glue(st, SUFFIX), _p)((uint8_t *)hostaddr, v);
+     }
++#ifndef SOFTMMU_CODE_ACCESS
++    qemu_plugin_vcpu_mem_cb(env_cpu(env), ptr, meminfo);
++#endif
  }
  
- static inline
--uint8_t trace_mem_build_info_no_se_le(int size_shift, bool store)
-+uint16_t trace_mem_build_info_no_se_le(int size_shift, bool store,
-+                                       TCGMemOpIdx oi)
+ static inline void
+diff --git a/include/exec/cpu_ldst_useronly_template.h b/include/exec/cpu_ldst_useronly_template.h
+index 93ad532f943..dbdc7a845d6 100644
+--- a/include/exec/cpu_ldst_useronly_template.h
++++ b/include/exec/cpu_ldst_useronly_template.h
+@@ -64,18 +64,18 @@
+ static inline RES_TYPE
+ glue(glue(cpu_ld, USUFFIX), MEMSUFFIX)(CPUArchState *env, abi_ptr ptr)
  {
--    return trace_mem_build_info(size_shift, false, MO_LE, store);
-+    return trace_mem_build_info(size_shift, false, MO_LE, store,
-+                                get_mmuidx(oi));
+-#ifdef CODE_ACCESS
+     RES_TYPE ret;
++#ifdef CODE_ACCESS
+     set_helper_retaddr(1);
+     ret = glue(glue(ld, USUFFIX), _p)(g2h(ptr));
+     clear_helper_retaddr();
+-    return ret;
+ #else
+-    trace_guest_mem_before_exec(
+-        env_cpu(env), ptr,
+-        trace_mem_build_info(SHIFT, false, MO_TE, false, MMU_USER_IDX));
+-    return glue(glue(ld, USUFFIX), _p)(g2h(ptr));
++    uint16_t meminfo = trace_mem_build_info(SHIFT, false, MO_TE, false,
++                                            MMU_USER_IDX);
++    trace_guest_mem_before_exec(env_cpu(env), ptr, meminfo);
++    ret = glue(glue(ld, USUFFIX), _p)(g2h(ptr));
+ #endif
++    return ret;
  }
  
- #endif /* TRACE__MEM_INTERNAL_H */
-diff --git a/trace/mem.h b/trace/mem.h
-index 8cf213d85b8..9644f592b4f 100644
---- a/trace/mem.h
-+++ b/trace/mem.h
-@@ -18,15 +18,16 @@
-  *
-  * Return a value for the 'info' argument in guest memory access traces.
-  */
--static uint8_t trace_mem_get_info(MemOp op, bool store);
-+static uint16_t trace_mem_get_info(MemOp op, unsigned int mmu_idx, bool store);
+ #ifndef CODE_ACCESS
+@@ -96,18 +96,19 @@ glue(glue(glue(cpu_ld, USUFFIX), MEMSUFFIX), _ra)(CPUArchState *env,
+ static inline int
+ glue(glue(cpu_lds, SUFFIX), MEMSUFFIX)(CPUArchState *env, abi_ptr ptr)
+ {
+-#ifdef CODE_ACCESS
+     int ret;
++#ifdef CODE_ACCESS
+     set_helper_retaddr(1);
+     ret = glue(glue(lds, SUFFIX), _p)(g2h(ptr));
+     clear_helper_retaddr();
+-    return ret;
+ #else
+-    trace_guest_mem_before_exec(
+-        env_cpu(env), ptr,
+-        trace_mem_build_info(SHIFT, true, MO_TE, false, MMU_USER_IDX));
+-    return glue(glue(lds, SUFFIX), _p)(g2h(ptr));
++    uint16_t meminfo = trace_mem_build_info(SHIFT, true, MO_TE, false,
++                                            MMU_USER_IDX);
++    trace_guest_mem_before_exec(env_cpu(env), ptr, meminfo);
++    ret = glue(glue(lds, SUFFIX), _p)(g2h(ptr));
++    qemu_plugin_vcpu_mem_cb(env_cpu(env), ptr, meminfo);
+ #endif
++    return ret;
+ }
  
- /**
-  * trace_mem_build_info:
-  *
-  * Return a value for the 'info' argument in guest memory access traces.
-  */
--static uint8_t trace_mem_build_info(int size_shift, bool sign_extend,
--                                    MemOp endianness, bool store);
-+static uint16_t trace_mem_build_info(int size_shift, bool sign_extend,
-+                                     MemOp endianness, bool store,
-+                                     unsigned int mmuidx);
+ #ifndef CODE_ACCESS
+@@ -130,10 +131,11 @@ static inline void
+ glue(glue(cpu_st, SUFFIX), MEMSUFFIX)(CPUArchState *env, abi_ptr ptr,
+                                       RES_TYPE v)
+ {
+-    trace_guest_mem_before_exec(
+-        env_cpu(env), ptr,
+-        trace_mem_build_info(SHIFT, false, MO_TE, true, MMU_USER_IDX));
++    uint16_t meminfo = trace_mem_build_info(SHIFT, false, MO_TE, true,
++                                            MMU_USER_IDX);
++    trace_guest_mem_before_exec(env_cpu(env), ptr, meminfo);
+     glue(glue(st, SUFFIX), _p)(g2h(ptr), v);
++    qemu_plugin_vcpu_mem_cb(env_cpu(env), ptr, meminfo);
+ }
  
+ static inline void
+diff --git a/tcg/tcg-op.c b/tcg/tcg-op.c
+index 1388bd344d3..c245126f981 100644
+--- a/tcg/tcg-op.c
++++ b/tcg/tcg-op.c
+@@ -30,6 +30,7 @@
+ #include "tcg-mo.h"
+ #include "trace-tcg.h"
+ #include "trace/mem.h"
++#include "exec/plugin-gen.h"
  
- #include "trace/mem-internal.h"
+ /* Reduce the number of ifdefs below.  This assumes that all uses of
+    TCGV_HIGH and TCGV_LOW are properly protected by a conditional that
+@@ -2684,6 +2685,7 @@ void tcg_gen_exit_tb(TranslationBlock *tb, unsigned idx)
+         tcg_debug_assert(idx == TB_EXIT_REQUESTED);
+     }
+ 
++    plugin_gen_disable_mem_helpers();
+     tcg_gen_op1i(INDEX_op_exit_tb, val);
+ }
+ 
+@@ -2696,6 +2698,7 @@ void tcg_gen_goto_tb(unsigned idx)
+     tcg_debug_assert((tcg_ctx->goto_tb_issue_mask & (1 << idx)) == 0);
+     tcg_ctx->goto_tb_issue_mask |= 1 << idx;
+ #endif
++    plugin_gen_disable_mem_helpers();
+     /* When not chaining, we simply fall through to the "fallback" exit.  */
+     if (!qemu_loglevel_mask(CPU_LOG_TB_NOCHAIN)) {
+         tcg_gen_op1i(INDEX_op_goto_tb, idx);
+@@ -2705,7 +2708,10 @@ void tcg_gen_goto_tb(unsigned idx)
+ void tcg_gen_lookup_and_goto_ptr(void)
+ {
+     if (TCG_TARGET_HAS_goto_ptr && !qemu_loglevel_mask(CPU_LOG_TB_NOCHAIN)) {
+-        TCGv_ptr ptr = tcg_temp_new_ptr();
++        TCGv_ptr ptr;
++
++        plugin_gen_disable_mem_helpers();
++        ptr = tcg_temp_new_ptr();
+         gen_helper_lookup_tb_ptr(ptr, cpu_env);
+         tcg_gen_op1i(INDEX_op_goto_ptr, tcgv_ptr_arg(ptr));
+         tcg_temp_free_ptr(ptr);
+@@ -2788,14 +2794,24 @@ static void tcg_gen_req_mo(TCGBar type)
+     }
+ }
+ 
++static inline void plugin_gen_mem_callbacks(TCGv vaddr, uint16_t info)
++{
++#ifdef CONFIG_PLUGIN
++    if (tcg_ctx->plugin_insn == NULL) {
++        return;
++    }
++    plugin_gen_empty_mem_callback(vaddr, info);
++#endif
++}
++
+ void tcg_gen_qemu_ld_i32(TCGv_i32 val, TCGv addr, TCGArg idx, MemOp memop)
+ {
+     MemOp orig_memop;
++    uint16_t info = trace_mem_get_info(memop, idx, 0);
+ 
+     tcg_gen_req_mo(TCG_MO_LD_LD | TCG_MO_ST_LD);
+     memop = tcg_canonicalize_memop(memop, 0, 0);
+-    trace_guest_mem_before_tcg(tcg_ctx->cpu, cpu_env,
+-                               addr, trace_mem_get_info(memop, idx, 0));
++    trace_guest_mem_before_tcg(tcg_ctx->cpu, cpu_env, addr, info);
+ 
+     orig_memop = memop;
+     if (!TCG_TARGET_HAS_MEMORY_BSWAP && (memop & MO_BSWAP)) {
+@@ -2807,6 +2823,7 @@ void tcg_gen_qemu_ld_i32(TCGv_i32 val, TCGv addr, TCGArg idx, MemOp memop)
+     }
+ 
+     gen_ldst_i32(INDEX_op_qemu_ld_i32, val, addr, memop, idx);
++    plugin_gen_mem_callbacks(addr, info);
+ 
+     if ((orig_memop ^ memop) & MO_BSWAP) {
+         switch (orig_memop & MO_SIZE) {
+@@ -2828,11 +2845,11 @@ void tcg_gen_qemu_ld_i32(TCGv_i32 val, TCGv addr, TCGArg idx, MemOp memop)
+ void tcg_gen_qemu_st_i32(TCGv_i32 val, TCGv addr, TCGArg idx, MemOp memop)
+ {
+     TCGv_i32 swap = NULL;
++    uint16_t info = trace_mem_get_info(memop, idx, 1);
+ 
+     tcg_gen_req_mo(TCG_MO_LD_ST | TCG_MO_ST_ST);
+     memop = tcg_canonicalize_memop(memop, 0, 1);
+-    trace_guest_mem_before_tcg(tcg_ctx->cpu, cpu_env,
+-                               addr, trace_mem_get_info(memop, idx, 1));
++    trace_guest_mem_before_tcg(tcg_ctx->cpu, cpu_env, addr, info);
+ 
+     if (!TCG_TARGET_HAS_MEMORY_BSWAP && (memop & MO_BSWAP)) {
+         swap = tcg_temp_new_i32();
+@@ -2852,6 +2869,7 @@ void tcg_gen_qemu_st_i32(TCGv_i32 val, TCGv addr, TCGArg idx, MemOp memop)
+     }
+ 
+     gen_ldst_i32(INDEX_op_qemu_st_i32, val, addr, memop, idx);
++    plugin_gen_mem_callbacks(addr, info);
+ 
+     if (swap) {
+         tcg_temp_free_i32(swap);
+@@ -2861,6 +2879,7 @@ void tcg_gen_qemu_st_i32(TCGv_i32 val, TCGv addr, TCGArg idx, MemOp memop)
+ void tcg_gen_qemu_ld_i64(TCGv_i64 val, TCGv addr, TCGArg idx, MemOp memop)
+ {
+     MemOp orig_memop;
++    uint16_t info;
+ 
+     if (TCG_TARGET_REG_BITS == 32 && (memop & MO_SIZE) < MO_64) {
+         tcg_gen_qemu_ld_i32(TCGV_LOW(val), addr, idx, memop);
+@@ -2874,8 +2893,8 @@ void tcg_gen_qemu_ld_i64(TCGv_i64 val, TCGv addr, TCGArg idx, MemOp memop)
+ 
+     tcg_gen_req_mo(TCG_MO_LD_LD | TCG_MO_ST_LD);
+     memop = tcg_canonicalize_memop(memop, 1, 0);
+-    trace_guest_mem_before_tcg(tcg_ctx->cpu, cpu_env,
+-                               addr, trace_mem_get_info(memop, idx, 0));
++    info = trace_mem_get_info(memop, idx, 0);
++    trace_guest_mem_before_tcg(tcg_ctx->cpu, cpu_env, addr, info);
+ 
+     orig_memop = memop;
+     if (!TCG_TARGET_HAS_MEMORY_BSWAP && (memop & MO_BSWAP)) {
+@@ -2887,6 +2906,7 @@ void tcg_gen_qemu_ld_i64(TCGv_i64 val, TCGv addr, TCGArg idx, MemOp memop)
+     }
+ 
+     gen_ldst_i64(INDEX_op_qemu_ld_i64, val, addr, memop, idx);
++    plugin_gen_mem_callbacks(addr, info);
+ 
+     if ((orig_memop ^ memop) & MO_BSWAP) {
+         switch (orig_memop & MO_SIZE) {
+@@ -2914,6 +2934,7 @@ void tcg_gen_qemu_ld_i64(TCGv_i64 val, TCGv addr, TCGArg idx, MemOp memop)
+ void tcg_gen_qemu_st_i64(TCGv_i64 val, TCGv addr, TCGArg idx, MemOp memop)
+ {
+     TCGv_i64 swap = NULL;
++    uint16_t info;
+ 
+     if (TCG_TARGET_REG_BITS == 32 && (memop & MO_SIZE) < MO_64) {
+         tcg_gen_qemu_st_i32(TCGV_LOW(val), addr, idx, memop);
+@@ -2922,8 +2943,8 @@ void tcg_gen_qemu_st_i64(TCGv_i64 val, TCGv addr, TCGArg idx, MemOp memop)
+ 
+     tcg_gen_req_mo(TCG_MO_LD_ST | TCG_MO_ST_ST);
+     memop = tcg_canonicalize_memop(memop, 1, 1);
+-    trace_guest_mem_before_tcg(tcg_ctx->cpu, cpu_env,
+-                               addr, trace_mem_get_info(memop, idx, 1));
++    info = trace_mem_get_info(memop, idx, 1);
++    trace_guest_mem_before_tcg(tcg_ctx->cpu, cpu_env, addr, info);
+ 
+     if (!TCG_TARGET_HAS_MEMORY_BSWAP && (memop & MO_BSWAP)) {
+         swap = tcg_temp_new_i64();
+@@ -2947,6 +2968,7 @@ void tcg_gen_qemu_st_i64(TCGv_i64 val, TCGv addr, TCGArg idx, MemOp memop)
+     }
+ 
+     gen_ldst_i64(INDEX_op_qemu_st_i64, val, addr, memop, idx);
++    plugin_gen_mem_callbacks(addr, info);
+ 
+     if (swap) {
+         tcg_temp_free_i64(swap);
+diff --git a/tcg/tcg.h b/tcg/tcg.h
+index d234b4c9a53..a38659ea5b3 100644
+--- a/tcg/tcg.h
++++ b/tcg/tcg.h
+@@ -29,6 +29,7 @@
+ #include "exec/memop.h"
+ #include "exec/tb-context.h"
+ #include "qemu/bitops.h"
++#include "qemu/plugin.h"
+ #include "qemu/queue.h"
+ #include "tcg-mo.h"
+ #include "tcg-target.h"
 -- 
 2.20.1
 
