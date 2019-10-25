@@ -7,79 +7,79 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4ABA8CA9EA0
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 11:42:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 66406CA9EA0
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 11:44:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 163BB2070B
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 11:42:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2F84A2070B
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 11:44:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="u1l7sRS4"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 163BB2070B
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="YdvW9nh0"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2F84A2070B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58924 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58962 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iNxyj-00028h-MP
-	for qemu-devel@archiver.kernel.org; Fri, 25 Oct 2019 07:42:01 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45079)
+	id 1iNy1V-0006LW-6n
+	for qemu-devel@archiver.kernel.org; Fri, 25 Oct 2019 07:44:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45080)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1iNxwO-0006gL-Vf
+ (envelope-from <richard.henderson@linaro.org>) id 1iNxwP-0006gO-1c
  for qemu-devel@nongnu.org; Fri, 25 Oct 2019 07:39:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1iNxwK-0006dL-FR
- for qemu-devel@nongnu.org; Fri, 25 Oct 2019 07:39:34 -0400
-Received: from mail-qt1-x843.google.com ([2607:f8b0:4864:20::843]:39021)
+ (envelope-from <richard.henderson@linaro.org>) id 1iNxwI-0006c6-E5
+ for qemu-devel@nongnu.org; Fri, 25 Oct 2019 07:39:36 -0400
+Received: from mail-qk1-x729.google.com ([2607:f8b0:4864:20::729]:38449)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1iNxwJ-0006bH-Ej
- for qemu-devel@nongnu.org; Fri, 25 Oct 2019 07:39:31 -0400
-Received: by mail-qt1-x843.google.com with SMTP id t8so2716641qtc.6
- for <qemu-devel@nongnu.org>; Fri, 25 Oct 2019 04:39:28 -0700 (PDT)
+ id 1iNxwG-0006aV-GD
+ for qemu-devel@nongnu.org; Fri, 25 Oct 2019 07:39:29 -0400
+Received: by mail-qk1-x729.google.com with SMTP id p4so1403429qkf.5
+ for <qemu-devel@nongnu.org>; Fri, 25 Oct 2019 04:39:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=sAjHl90QxJmdMfN37RnYdKMoSO6lq1wA1h9GjJJcTfo=;
- b=u1l7sRS4g3EMkqrK54XJ+/4NVBFCzVGt2T7AO/qeTJGQ5smVtgv/3vgTUDUj+rSuV+
- ysl6JWWDh6XjpvfJchE52uBHzfG5Tgas/A53OPOI/GmBzLuO5XoEiJpnWrSNpF9iPb8G
- +RDvgQOgz9nIndqlfV6zTM0l+PsLWOSqJ4qctZuhjFMMMCtn8wHE82jp3s6AGuLEhiB0
- g7kEIr31HTKa1aO10BaN2kwoRGKCFiHDLLFV1RscGDJ5hMTbGfyPdTEF9Foafk+cLCxt
- iOmcFdCrFK5usIL7W+RJZ4fwoR+IYATqXVqTytZdSsGytGy8Sw/hM7PRXqTk2cLto6O2
- CyfA==
+ bh=MfrPU6dfjKdIPv9pRU2qfeqITCMfZWCuzZQmM0QxYQ0=;
+ b=YdvW9nh04/K98nOhMMeTA9x6+a26eY7B3qAAmfBLYDRcVNVtC14+Ff5ulygjtXvQCK
+ ZC3zYiRiOjrqlaf331uOhMPK1Gze4ttLD/iO83dPhyrVoVnNaXG5mx7RY4WWOXf8XFtb
+ 0EhGUNL7ICG88dMdRka7PkA+IVtGA9yH2Dtf6KlPPU8jpexZPlkmS97Y8TGkpZcOdYbd
+ VPqqhtnZ6urHQyx8tmQGUE+8guZOKxVXt0nRA3vj+8K9JVtLBmx6033cmsx34mODd7is
+ MsjuvvIi9R8DcavW64tfC+Ir29ExzPCMABmLGXqpdmEcLBiSW/1vzX7mo6GRnQiPoEcl
+ Lw2Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references;
- bh=sAjHl90QxJmdMfN37RnYdKMoSO6lq1wA1h9GjJJcTfo=;
- b=N+l+X3t8Qd4pBJ29GUPD0f8OLwO5FNlwttLyKUkIPe7U7NbKIzuxib0vjG1x/AQtRL
- pA9ZaOhuyg9BXHaN1l+mxHbCzkTiSCRLPAIna2yxjqIqhyDAJt+qNz33KJTBrIDHk7Qk
- JrLCZNsH3v4DEq9/Eah8oIZwWJUhwkN75axlDGEnUuJuLRLDc3keAv9k2Iud8844G78r
- QgnmO7EhS4PU+z7xICHXrOA2GNAlq1wVWvnQyLj7mYX+xWGzQXYuG0ZkUDMjcVYnPO1w
- IITIrsF2CrxD7EAua9ep4R53N5OEUlbmz7ry0sTDJj7niO+pTeoxJQokaAyu52D6j8Kx
- +8ng==
-X-Gm-Message-State: APjAAAWDeIQ+KVErpxeWDp2tC2HyksPflKNkgtP3VwPMarCafsDYseT9
- TUFusVNH72Xy+13LHDBkgkCO7FBakKw=
-X-Google-Smtp-Source: APXvYqwVNR5YQphJlyAfKx1Sh2mZa0AmPJ32MqozMymkj2+8g/pFkTl2y2JgLY6YJ1QGbeihw1pyGg==
-X-Received: by 2002:aed:3c67:: with SMTP id u36mr2504489qte.142.1572003568137; 
- Fri, 25 Oct 2019 04:39:28 -0700 (PDT)
+ bh=MfrPU6dfjKdIPv9pRU2qfeqITCMfZWCuzZQmM0QxYQ0=;
+ b=scHJBHaU8PIv9gz78g+Fk2HfrNpxeZhvfhhBW65/SIwxNUEJKbPCKdsxy7G//9Ap0J
+ gXhY2TEmBum3a5vq7NBaSJd7FfOtXZEHBcGD7nuFYxS5bANO7MFrdoV4oUAYqfbbo5pP
+ u6N+ZCxc20iPxlKFUOtCGPC3nB8zYijPSD04CRtgyw586aY5ACwpHQP1q6bWoY+FXNwR
+ C9QPDmYRc08+bNpigLq6gSFdU3rXH4wFBsiQOEZLka6MRrgFCNx3K2Iz4CM1jkANgHLI
+ paJo08UZ7TIPCjBE+4/D3SARHvm7jL6MmucIywBgWums1IdzZQ5pxWntsMikxEBuP249
+ aKiw==
+X-Gm-Message-State: APjAAAWitZ5oir0fpgH+RftjgBfbYlnq6JlK8/jOm1CtOvpX7daQCUB6
+ Iq/k26YizfMoD18WmxsiuJIyp+JHBQc=
+X-Google-Smtp-Source: APXvYqxq6Aqt5lb8YL8eOGjV2BycRh1h2F/7dT4ZU0wSlZIFZFIYZIY29a9g7KxGI9pHe+nWzD3nzA==
+X-Received: by 2002:a37:6305:: with SMTP id x5mr2367044qkb.498.1572003566025; 
+ Fri, 25 Oct 2019 04:39:26 -0700 (PDT)
 Received: from localhost.localdomain (rrcs-172-254-253-50.nyc.biz.rr.com.
  [172.254.253.50])
- by smtp.gmail.com with ESMTPSA id x38sm1473335qtc.64.2019.10.25.04.39.27
+ by smtp.gmail.com with ESMTPSA id x38sm1473335qtc.64.2019.10.25.04.39.25
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 25 Oct 2019 04:39:27 -0700 (PDT)
+ Fri, 25 Oct 2019 04:39:25 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 05/12] linux-user/sparc: Begin using WREG constants in
- sparc/signal.c
-Date: Fri, 25 Oct 2019 07:39:14 -0400
-Message-Id: <20191025113921.9412-6-richard.henderson@linaro.org>
+Subject: [PATCH v2 03/12] target/sparc: Define an enumeration for accessing
+ env->regwptr
+Date: Fri, 25 Oct 2019 07:39:12 -0400
+Message-Id: <20191025113921.9412-4-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20191025113921.9412-1-richard.henderson@linaro.org>
 References: <20191025113921.9412-1-richard.henderson@linaro.org>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::843
+X-Received-From: 2607:f8b0:4864:20::729
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,208 +96,55 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is non-obvious because the UREG constants are in fact wrong.
-
-s/UREG_I/WREG_O/g
-s/UREG_O/WREG_I/g
-s/UREG_L/WREG_L/g
-
-These substitutions have identical integer values.
-
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- linux-user/sparc/signal.c | 93 ++++++++++++++-------------------------
- 1 file changed, 32 insertions(+), 61 deletions(-)
+ target/sparc/cpu.h | 33 +++++++++++++++++++++++++++++++++
+ 1 file changed, 33 insertions(+)
 
-diff --git a/linux-user/sparc/signal.c b/linux-user/sparc/signal.c
-index ead169fbaa..a967e2db73 100644
---- a/linux-user/sparc/signal.c
-+++ b/linux-user/sparc/signal.c
-@@ -104,19 +104,8 @@ struct target_rt_signal_frame {
-     qemu_siginfo_fpu_t  fpu_state;
- };
+diff --git a/target/sparc/cpu.h b/target/sparc/cpu.h
+index 778aa8e073..ae97c7d9f7 100644
+--- a/target/sparc/cpu.h
++++ b/target/sparc/cpu.h
+@@ -13,6 +13,39 @@
  
--#define UREG_O0        16
--#define UREG_O6        22
--#define UREG_I0        0
--#define UREG_I1        1
--#define UREG_I2        2
--#define UREG_I3        3
--#define UREG_I4        4
--#define UREG_I5        5
--#define UREG_I6        6
--#define UREG_I7        7
--#define UREG_L0        8
--#define UREG_FP        UREG_I6
--#define UREG_SP        UREG_O6
-+#define UREG_FP        WREG_O6
-+#define UREG_SP        WREG_I6
+ /*#define EXCP_INTERRUPT 0x100*/
  
- static inline abi_ulong get_sigframe(struct target_sigaction *sa, 
-                                      CPUSPARCState *env,
-@@ -159,30 +148,12 @@ setup___siginfo(__siginfo_t *si, CPUSPARCState *env, abi_ulong mask)
-         __put_user(env->gregs[i], &si->si_regs.u_regs[i]);
-     }
-     for (i=0; i < 8; i++) {
--        __put_user(env->regwptr[UREG_I0 + i], &si->si_regs.u_regs[i+8]);
-+        __put_user(env->regwptr[WREG_O0 + i], &si->si_regs.u_regs[i+8]);
-     }
-     __put_user(mask, &si->si_mask);
-     return err;
- }
- 
--#if 0
--static int
--setup_sigcontext(struct target_sigcontext *sc, /*struct _fpstate *fpstate,*/
--                 CPUSPARCState *env, unsigned long mask)
--{
--    int err = 0;
--
--    __put_user(mask, &sc->sigc_mask);
--    __put_user(env->regwptr[UREG_SP], &sc->sigc_sp);
--    __put_user(env->pc, &sc->sigc_pc);
--    __put_user(env->npc, &sc->sigc_npc);
--    __put_user(env->psr, &sc->sigc_psr);
--    __put_user(env->gregs[1], &sc->sigc_g1);
--    __put_user(env->regwptr[UREG_O0], &sc->sigc_o0);
--
--    return err;
--}
--#endif
- #define NF_ALIGNEDSZ  (((sizeof(struct target_signal_frame) + 7) & (~7)))
- 
- void setup_frame(int sig, struct target_sigaction *ka,
-@@ -221,20 +192,20 @@ void setup_frame(int sig, struct target_sigaction *ka,
-     }
- 
-     for (i = 0; i < 8; i++) {
--        __put_user(env->regwptr[i + UREG_L0], &sf->ss.locals[i]);
-+        __put_user(env->regwptr[i + WREG_L0], &sf->ss.locals[i]);
-     }
-     for (i = 0; i < 8; i++) {
--        __put_user(env->regwptr[i + UREG_I0], &sf->ss.ins[i]);
-+        __put_user(env->regwptr[i + WREG_O0], &sf->ss.ins[i]);
-     }
-     if (err)
-         goto sigsegv;
- 
-     /* 3. signal handler back-trampoline and parameters */
-     env->regwptr[UREG_FP] = sf_addr;
--    env->regwptr[UREG_I0] = sig;
--    env->regwptr[UREG_I1] = sf_addr +
-+    env->regwptr[WREG_O0] = sig;
-+    env->regwptr[WREG_O1] = sf_addr +
-             offsetof(struct target_signal_frame, info);
--    env->regwptr[UREG_I2] = sf_addr +
-+    env->regwptr[WREG_O2] = sf_addr +
-             offsetof(struct target_signal_frame, info);
- 
-     /* 4. signal handler */
-@@ -242,11 +213,11 @@ void setup_frame(int sig, struct target_sigaction *ka,
-     env->npc = (env->pc + 4);
-     /* 5. return to kernel instructions */
-     if (ka->ka_restorer) {
--        env->regwptr[UREG_I7] = ka->ka_restorer;
-+        env->regwptr[WREG_O7] = ka->ka_restorer;
-     } else {
-         uint32_t val32;
- 
--        env->regwptr[UREG_I7] = sf_addr +
-+        env->regwptr[WREG_O7] = sf_addr +
-                 offsetof(struct target_signal_frame, insns) - 2 * 4;
- 
-         /* mov __NR_sigreturn, %g1 */
-@@ -316,7 +287,7 @@ long do_sigreturn(CPUSPARCState *env)
-         __get_user(env->gregs[i], &sf->info.si_regs.u_regs[i]);
-     }
-     for (i=0; i < 8; i++) {
--        __get_user(env->regwptr[i + UREG_I0], &sf->info.si_regs.u_regs[i+8]);
-+        __get_user(env->regwptr[i + WREG_O0], &sf->info.si_regs.u_regs[i+8]);
-     }
- 
-     /* FIXME: implement FPU save/restore:
-@@ -433,7 +404,7 @@ void sparc64_set_context(CPUSPARCState *env)
-     abi_ulong fp, i7, w_addr;
-     unsigned int i;
- 
--    ucp_addr = env->regwptr[UREG_I0];
-+    ucp_addr = env->regwptr[WREG_O0];
-     if (!lock_user_struct(VERIFY_READ, ucp, ucp_addr, 1)) {
-         goto do_sigsegv;
-     }
-@@ -443,7 +414,7 @@ void sparc64_set_context(CPUSPARCState *env)
-     if ((pc | npc) & 3) {
-         goto do_sigsegv;
-     }
--    if (env->regwptr[UREG_I1]) {
-+    if (env->regwptr[WREG_O1]) {
-         target_sigset_t target_set;
-         sigset_t set;
- 
-@@ -474,19 +445,19 @@ void sparc64_set_context(CPUSPARCState *env)
-     __get_user(env->gregs[5], (&(*grp)[SPARC_MC_G5]));
-     __get_user(env->gregs[6], (&(*grp)[SPARC_MC_G6]));
-     __get_user(env->gregs[7], (&(*grp)[SPARC_MC_G7]));
--    __get_user(env->regwptr[UREG_I0], (&(*grp)[SPARC_MC_O0]));
--    __get_user(env->regwptr[UREG_I1], (&(*grp)[SPARC_MC_O1]));
--    __get_user(env->regwptr[UREG_I2], (&(*grp)[SPARC_MC_O2]));
--    __get_user(env->regwptr[UREG_I3], (&(*grp)[SPARC_MC_O3]));
--    __get_user(env->regwptr[UREG_I4], (&(*grp)[SPARC_MC_O4]));
--    __get_user(env->regwptr[UREG_I5], (&(*grp)[SPARC_MC_O5]));
--    __get_user(env->regwptr[UREG_I6], (&(*grp)[SPARC_MC_O6]));
--    __get_user(env->regwptr[UREG_I7], (&(*grp)[SPARC_MC_O7]));
-+    __get_user(env->regwptr[WREG_O0], (&(*grp)[SPARC_MC_O0]));
-+    __get_user(env->regwptr[WREG_O1], (&(*grp)[SPARC_MC_O1]));
-+    __get_user(env->regwptr[WREG_O2], (&(*grp)[SPARC_MC_O2]));
-+    __get_user(env->regwptr[WREG_O3], (&(*grp)[SPARC_MC_O3]));
-+    __get_user(env->regwptr[WREG_O4], (&(*grp)[SPARC_MC_O4]));
-+    __get_user(env->regwptr[WREG_O5], (&(*grp)[SPARC_MC_O5]));
-+    __get_user(env->regwptr[WREG_O6], (&(*grp)[SPARC_MC_O6]));
-+    __get_user(env->regwptr[WREG_O7], (&(*grp)[SPARC_MC_O7]));
- 
-     __get_user(fp, &(ucp->tuc_mcontext.mc_fp));
-     __get_user(i7, &(ucp->tuc_mcontext.mc_i7));
- 
--    w_addr = TARGET_STACK_BIAS+env->regwptr[UREG_I6];
-+    w_addr = TARGET_STACK_BIAS+env->regwptr[WREG_O6];
-     if (put_user(fp, w_addr + offsetof(struct target_reg_window, ins[6]),
-                  abi_ulong) != 0) {
-         goto do_sigsegv;
-@@ -534,7 +505,7 @@ void sparc64_get_context(CPUSPARCState *env)
-     target_sigset_t target_set;
-     sigset_t set;
- 
--    ucp_addr = env->regwptr[UREG_I0];
-+    ucp_addr = env->regwptr[WREG_O0];
-     if (!lock_user_struct(VERIFY_WRITE, ucp, ucp_addr, 0)) {
-         goto do_sigsegv;
-     }
-@@ -580,16 +551,16 @@ void sparc64_get_context(CPUSPARCState *env)
-     __put_user(env->gregs[5], &((*grp)[SPARC_MC_G5]));
-     __put_user(env->gregs[6], &((*grp)[SPARC_MC_G6]));
-     __put_user(env->gregs[7], &((*grp)[SPARC_MC_G7]));
--    __put_user(env->regwptr[UREG_I0], &((*grp)[SPARC_MC_O0]));
--    __put_user(env->regwptr[UREG_I1], &((*grp)[SPARC_MC_O1]));
--    __put_user(env->regwptr[UREG_I2], &((*grp)[SPARC_MC_O2]));
--    __put_user(env->regwptr[UREG_I3], &((*grp)[SPARC_MC_O3]));
--    __put_user(env->regwptr[UREG_I4], &((*grp)[SPARC_MC_O4]));
--    __put_user(env->regwptr[UREG_I5], &((*grp)[SPARC_MC_O5]));
--    __put_user(env->regwptr[UREG_I6], &((*grp)[SPARC_MC_O6]));
--    __put_user(env->regwptr[UREG_I7], &((*grp)[SPARC_MC_O7]));
-+    __put_user(env->regwptr[WREG_O0], &((*grp)[SPARC_MC_O0]));
-+    __put_user(env->regwptr[WREG_O1], &((*grp)[SPARC_MC_O1]));
-+    __put_user(env->regwptr[WREG_O2], &((*grp)[SPARC_MC_O2]));
-+    __put_user(env->regwptr[WREG_O3], &((*grp)[SPARC_MC_O3]));
-+    __put_user(env->regwptr[WREG_O4], &((*grp)[SPARC_MC_O4]));
-+    __put_user(env->regwptr[WREG_O5], &((*grp)[SPARC_MC_O5]));
-+    __put_user(env->regwptr[WREG_O6], &((*grp)[SPARC_MC_O6]));
-+    __put_user(env->regwptr[WREG_O7], &((*grp)[SPARC_MC_O7]));
- 
--    w_addr = TARGET_STACK_BIAS+env->regwptr[UREG_I6];
-+    w_addr = TARGET_STACK_BIAS+env->regwptr[WREG_O6];
-     fp = i7 = 0;
-     if (get_user(fp, w_addr + offsetof(struct target_reg_window, ins[6]),
-                  abi_ulong) != 0) {
++/* Windowed register indexes.  */
++enum {
++    WREG_O0,
++    WREG_O1,
++    WREG_O2,
++    WREG_O3,
++    WREG_O4,
++    WREG_O5,
++    WREG_O6,
++    WREG_O7,
++
++    WREG_L0,
++    WREG_L1,
++    WREG_L2,
++    WREG_L3,
++    WREG_L4,
++    WREG_L5,
++    WREG_L6,
++    WREG_L7,
++
++    WREG_I0,
++    WREG_I1,
++    WREG_I2,
++    WREG_I3,
++    WREG_I4,
++    WREG_I5,
++    WREG_I6,
++    WREG_I7,
++
++    WREG_SP = WREG_O6,
++    WREG_FP = WREG_I6,
++};
++
+ /* trap definitions */
+ #ifndef TARGET_SPARC64
+ #define TT_TFAULT   0x01
 -- 
 2.17.1
 
