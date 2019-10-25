@@ -2,82 +2,58 @@ Return-Path: <SRS0=bySr=YS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	HK_RANDOM_FROM,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2AB14CA9EA0
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 09:55:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 66125CA9EA0
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 09:56:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EE29921929
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 09:55:37 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bXMMNTZB"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EE29921929
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 3AB9921D7B
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 09:56:03 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3AB9921D7B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=cmss.chinamobile.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58146 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58148 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iNwJl-00006m-2b
-	for qemu-devel@archiver.kernel.org; Fri, 25 Oct 2019 05:55:37 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59741)
+	id 1iNwKA-00019V-Cj
+	for qemu-devel@archiver.kernel.org; Fri, 25 Oct 2019 05:56:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58297)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jasowang@redhat.com>) id 1iNwED-0000rG-6O
- for qemu-devel@nongnu.org; Fri, 25 Oct 2019 05:50:01 -0400
+ (envelope-from <baiyaowei@cmss.chinamobile.com>) id 1iNw10-0004WN-1p
+ for qemu-devel@nongnu.org; Fri, 25 Oct 2019 05:36:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jasowang@redhat.com>) id 1iNwEA-00015R-Ia
- for qemu-devel@nongnu.org; Fri, 25 Oct 2019 05:49:52 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:58550
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1iNwEA-000150-BG
- for qemu-devel@nongnu.org; Fri, 25 Oct 2019 05:49:50 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1571996988;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=l5enplt3kss0i+VSuFpeLf1RUqsTPPDkUugAnG5THGI=;
- b=bXMMNTZB27ts301DGmfCLaKbSbB16rz8Z6j5C+gg4APsedX9+Xybuyofb3o7OrejMmwbW+
- 4w84+z36Sm0rNnK/a6kqvYKIJKf+G+uzv7Hi+rq4yd8glQP5jryTPgutgwoI5wNSD21urH
- zmNsGG2NgnOuxkVi+E4xha4V17fvMVw=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-134-UbMDExvAOdCwKEwS4Zs1ZA-1; Fri, 25 Oct 2019 05:49:44 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5BA941005500;
- Fri, 25 Oct 2019 09:49:43 +0000 (UTC)
-Received: from [10.72.12.249] (ovpn-12-249.pek2.redhat.com [10.72.12.249])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 7F003194B6;
- Fri, 25 Oct 2019 09:49:21 +0000 (UTC)
-Subject: Re: [RFC v2 00/22] intel_iommu: expose Shared Virtual Addressing to VM
-To: Liu Yi L <yi.l.liu@intel.com>, qemu-devel@nongnu.org, mst@redhat.com,
- pbonzini@redhat.com, alex.williamson@redhat.com, peterx@redhat.com
-References: <1571920483-3382-1-git-send-email-yi.l.liu@intel.com>
-From: Jason Wang <jasowang@redhat.com>
-Message-ID: <367adad0-eb05-c950-21d7-755fffacbed6@redhat.com>
-Date: Fri, 25 Oct 2019 17:49:19 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
-MIME-Version: 1.0
-In-Reply-To: <1571920483-3382-1-git-send-email-yi.l.liu@intel.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-MC-Unique: UbMDExvAOdCwKEwS4Zs1ZA-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 205.139.110.61
+ (envelope-from <baiyaowei@cmss.chinamobile.com>) id 1iNw0y-0006kZ-OO
+ for qemu-devel@nongnu.org; Fri, 25 Oct 2019 05:36:13 -0400
+Received: from cmccmta1.chinamobile.com ([221.176.66.79]:3483)
+ by eggs.gnu.org with esmtp (Exim 4.71)
+ (envelope-from <baiyaowei@cmss.chinamobile.com>)
+ id 1iNw0v-0006h7-Ke; Fri, 25 Oct 2019 05:36:10 -0400
+Received: from spf.mail.chinamobile.com (unknown[172.16.121.11]) by
+ rmmx-syy-dmz-app01-12001 (RichMail) with SMTP id 2ee15db2c1eccd8-5fe29;
+ Fri, 25 Oct 2019 17:35:41 +0800 (CST)
+X-RM-TRANSID: 2ee15db2c1eccd8-5fe29
+X-RM-TagInfo: emlType=0                                       
+X-RM-SPAM-FLAG: 00000000
+Received: from localhost.novalocal (unknown[112.25.65.41])
+ by rmsmtp-syy-appsvr06-12006 (RichMail) with SMTP id 2ee65db2c1ea9b0-be8c8;
+ Fri, 25 Oct 2019 17:35:40 +0800 (CST)
+X-RM-TRANSID: 2ee65db2c1ea9b0-be8c8
+From: Yaowei Bai <baiyaowei@cmss.chinamobile.com>
+To: pbonzini@redhat.com, fam@euphon.net, dillaman@redhat.com, kwolf@redhat.com,
+ mreitz@redhat.com
+Subject: [PATCH 2/4] block/rbd: implement bdrv_aio_compare_and_write interface
+Date: Fri, 25 Oct 2019 17:36:00 +0800
+Message-Id: <1571996163-27688-3-git-send-email-baiyaowei@cmss.chinamobile.com>
+X-Mailer: git-send-email 1.8.3.1
+In-Reply-To: <1571996163-27688-1-git-send-email-baiyaowei@cmss.chinamobile.com>
+References: <1571996163-27688-1-git-send-email-baiyaowei@cmss.chinamobile.com>
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [fuzzy]
+X-Received-From: 221.176.66.79
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,163 +65,133 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: tianyu.lan@intel.com, kevin.tian@intel.com, jacob.jun.pan@linux.intel.com,
- kvm@vger.kernel.org, jun.j.tian@intel.com, eric.auger@redhat.com,
- yi.y.sun@intel.com, david@gibson.dropbear.id.au
+Cc: baiyaowei@cmss.chinamobile.com, yangjun@cmss.chinamobile.com,
+ qemu-devel@nongnu.org, qemu-block@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+This patch adds librbd's SCSI COMPARE_AND_WRITE command interface
+support with bdrv_aio_compare_and_write function pointer. Note
+currently when a miscompare happens a mismatch offset of 0 is
+always reported rather than the actual mismatch offset. This
+should not be a big issue contemporarily and will be fixed
+accordingly in the future.
 
-On 2019/10/24 =E4=B8=8B=E5=8D=888:34, Liu Yi L wrote:
-> Shared virtual address (SVA), a.k.a, Shared virtual memory (SVM) on Intel
-> platforms allow address space sharing between device DMA and applications=
-.
+Signed-off-by: Yaowei Bai <baiyaowei@cmss.chinamobile.com>
+---
+ block/raw-format.c |  3 ++-
+ block/rbd.c        | 41 +++++++++++++++++++++++++++++++++++++++--
+ 2 files changed, 41 insertions(+), 3 deletions(-)
+
+diff --git a/block/raw-format.c b/block/raw-format.c
+index 42c28cc..3d8f201 100644
+--- a/block/raw-format.c
++++ b/block/raw-format.c
+@@ -438,7 +438,8 @@ static int raw_open(BlockDriverState *bs, QDict *options, int flags,
+ 
+     bs->sg = bs->file->bs->sg;
+     bs->supported_write_flags = BDRV_REQ_WRITE_UNCHANGED |
+-        (BDRV_REQ_FUA & bs->file->bs->supported_write_flags);
++        (BDRV_REQ_FUA & bs->file->bs->supported_write_flags) |
++        (BDRV_REQ_COMPARE_AND_WRITE & bs->file->bs->supported_write_flags);
+     bs->supported_zero_flags = BDRV_REQ_WRITE_UNCHANGED |
+         ((BDRV_REQ_FUA | BDRV_REQ_MAY_UNMAP | BDRV_REQ_NO_FALLBACK) &
+             bs->file->bs->supported_zero_flags);
+diff --git a/block/rbd.c b/block/rbd.c
+index c71e45d..7065343 100644
+--- a/block/rbd.c
++++ b/block/rbd.c
+@@ -73,11 +73,18 @@
+ #define LIBRBD_USE_IOVEC 0
+ #endif
+ 
++#ifdef LIBRBD_SUPPORTS_COMPARE_AND_WRITE
++#define LIBRBD_HAVE_COMPARE_AND_WRITE 1
++#else
++#define LIBRBD_HAVE_COMPARE_AND_WRITE 0
++#endif
++
+ typedef enum {
+     RBD_AIO_READ,
+     RBD_AIO_WRITE,
+     RBD_AIO_DISCARD,
+-    RBD_AIO_FLUSH
++    RBD_AIO_FLUSH,
++    RBD_AIO_COMPARE_AND_WRITE
+ } RBDAIOCmd;
+ 
+ typedef struct RBDAIOCB {
+@@ -798,6 +805,9 @@ static int qemu_rbd_open(BlockDriverState *bs, QDict *options, int flags,
+         }
+     }
+ 
++    if (LIBRBD_HAVE_COMPARE_AND_WRITE)
++        bs->supported_write_flags = BDRV_REQ_COMPARE_AND_WRITE;
++
+     r = 0;
+     goto out;
+ 
+@@ -933,7 +943,15 @@ static BlockAIOCB *rbd_start_aio(BlockDriverState *bs,
+ 
+     rcb = g_new(RADOSCB, 1);
+ 
+-    if (!LIBRBD_USE_IOVEC) {
++    if (cmd == RBD_AIO_COMPARE_AND_WRITE) {
++        acb->bounce = qemu_try_blockalign(bs, qiov->size);
++        if (acb->bounce == NULL) {
++            goto failed;
++        }
++
++        qemu_iovec_to_buf(acb->qiov, 0, acb->bounce, qiov->size);
++        rcb->buf = acb->bounce;
++    } else if (!LIBRBD_USE_IOVEC) {
+         if (cmd == RBD_AIO_DISCARD || cmd == RBD_AIO_FLUSH) {
+             acb->bounce = NULL;
+         } else {
+@@ -993,6 +1011,9 @@ static BlockAIOCB *rbd_start_aio(BlockDriverState *bs,
+     case RBD_AIO_FLUSH:
+         r = rbd_aio_flush_wrapper(s->image, c);
+         break;
++    case RBD_AIO_COMPARE_AND_WRITE:
++        r = rbd_aio_compare_and_write(s->image, off, size/2, rcb->buf, (rcb->buf + size/2), c, 0, 0);
++        break;
+     default:
+         r = -EINVAL;
+     }
+@@ -1056,6 +1077,18 @@ static int qemu_rbd_co_flush(BlockDriverState *bs)
+ }
+ #endif
+ 
++#ifdef LIBRBD_SUPPORTS_COMPARE_AND_WRITE
++static BlockAIOCB *qemu_rbd_aio_compare_and_write(BlockDriverState *bs,
++                                                  uint64_t offset, uint64_t bytes,
++                                                  QEMUIOVector *qiov, int flags,
++                                                  BlockCompletionFunc *cb,
++                                                  void *opaque)
++{
++    return rbd_start_aio(bs, offset, qiov, bytes, cb, opaque,
++                         RBD_AIO_COMPARE_AND_WRITE);
++}
++#endif
++
+ static int qemu_rbd_getinfo(BlockDriverState *bs, BlockDriverInfo *bdi)
+ {
+     BDRVRBDState *s = bs->opaque;
+@@ -1309,6 +1342,10 @@ static BlockDriver bdrv_rbd = {
+     .bdrv_aio_pdiscard      = qemu_rbd_aio_pdiscard,
+ #endif
+ 
++#ifdef LIBRBD_SUPPORTS_COMPARE_AND_WRITE
++    .bdrv_aio_compare_and_write = qemu_rbd_aio_compare_and_write,
++#endif
++
+     .bdrv_snapshot_create   = qemu_rbd_snap_create,
+     .bdrv_snapshot_delete   = qemu_rbd_snap_remove,
+     .bdrv_snapshot_list     = qemu_rbd_snap_list,
+-- 
+1.8.3.1
 
 
-Interesting, so the below figure demonstrates the case of VM. I wonder=20
-how much differences if we compare it with doing SVM between device and=20
-an ordinary process (e.g dpdk)?
-
-Thanks
-
-
-> SVA can reduce programming complexity and enhance security.
-> This series is intended to expose SVA capability to VMs. i.e. shared gues=
-t
-> application address space with passthru devices. The whole SVA virtualiza=
-tion
-> requires QEMU/VFIO/IOMMU changes. This series includes the QEMU changes, =
-for
-> VFIO and IOMMU changes, they are in separate series (listed in the "Relat=
-ed
-> series").
->
-> The high-level architecture for SVA virtualization is as below:
->
->      .-------------.  .---------------------------.
->      |   vIOMMU    |  | Guest process CR3, FL only|
->      |             |  '---------------------------'
->      .----------------/
->      | PASID Entry |--- PASID cache flush -
->      '-------------'                       |
->      |             |                       V
->      |             |                CR3 in GPA
->      '-------------'
-> Guest
-> ------| Shadow |--------------------------|--------
->        v        v                          v
-> Host
->      .-------------.  .----------------------.
->      |   pIOMMU    |  | Bind FL for GVA-GPA  |
->      |             |  '----------------------'
->      .----------------/  |
->      | PASID Entry |     V (Nested xlate)
->      '----------------\.------------------------------.
->      |             |   |SL for GPA-HPA, default domain|
->      |             |   '------------------------------'
->      '-------------'
-> Where:
->   - FL =3D First level/stage one page tables
->   - SL =3D Second level/stage two page tables
->
-> The complete vSVA upstream patches are divided into three phases:
->      1. Common APIs and PCI device direct assignment
->      2. Page Request Services (PRS) support
->      3. Mediated device assignment
->
-> This RFC patchset is aiming for the phase 1. Works together with the VT-d
-> driver[1] changes and VFIO changes[2].
->
-> Related series:
-> [1] [PATCH v6 00/10] Nested Shared Virtual Address (SVA) VT-d support:
-> https://lkml.org/lkml/2019/10/22/953
-> <This series is based on this kernel series from Jacob Pan>
->
-> [2] [RFC v2 0/3] vfio: support Shared Virtual Addressing from Yi Liu
->
-> There are roughly four parts:
->   1. Introduce IOMMUContext as abstract layer between vIOMMU emulator and
->      VFIO to avoid direct calling between the two
->   2. Passdown PASID allocation and free to host
->   3. Passdown guest PASID binding to host
->   4. Passdown guest IOMMU cache invalidation to host
->
-> The full set can be found in below link:
-> https://github.com/luxis1999/qemu.git: sva_vtd_v6_qemu_rfc_v2
->
-> Changelog:
-> =09- RFC v1 -> v2:
-> =09  Introduce IOMMUContext to abstract the connection between VFIO
-> =09  and vIOMMU emulator, which is a replacement of the PCIPASIDOps
-> =09  in RFC v1. Modify x-scalable-mode to be string option instead of
-> =09  adding a new option as RFC v1 did. Refined the pasid cache managemen=
-t
-> =09  and addressed the TODOs mentioned in RFC v1.
-> =09  RFC v1: https://patchwork.kernel.org/cover/11033657/
->
-> Eric Auger (1):
->    update-linux-headers: Import iommu.h
->
-> Liu Yi L (20):
->    header update VFIO/IOMMU vSVA APIs against 5.4.0-rc3+
->    intel_iommu: modify x-scalable-mode to be string option
->    vfio/common: add iommu_ctx_notifier in container
->    hw/pci: modify pci_setup_iommu() to set PCIIOMMUOps
->    hw/pci: introduce pci_device_iommu_context()
->    intel_iommu: provide get_iommu_context() callback
->    vfio/pci: add iommu_context notifier for pasid alloc/free
->    intel_iommu: add virtual command capability support
->    intel_iommu: process pasid cache invalidation
->    intel_iommu: add present bit check for pasid table entries
->    intel_iommu: add PASID cache management infrastructure
->    vfio/pci: add iommu_context notifier for pasid bind/unbind
->    intel_iommu: bind/unbind guest page table to host
->    intel_iommu: replay guest pasid bindings to host
->    intel_iommu: replay pasid binds after context cache invalidation
->    intel_iommu: do not passdown pasid bind for PASID #0
->    vfio/pci: add iommu_context notifier for PASID-based iotlb flush
->    intel_iommu: process PASID-based iotlb invalidation
->    intel_iommu: propagate PASID-based iotlb invalidation to host
->    intel_iommu: process PASID-based Device-TLB invalidation
->
-> Peter Xu (1):
->    hw/iommu: introduce IOMMUContext
->
->   hw/Makefile.objs                |    1 +
->   hw/alpha/typhoon.c              |    6 +-
->   hw/arm/smmu-common.c            |    6 +-
->   hw/hppa/dino.c                  |    6 +-
->   hw/i386/amd_iommu.c             |    6 +-
->   hw/i386/intel_iommu.c           | 1249 ++++++++++++++++++++++++++++++++=
-+++++--
->   hw/i386/intel_iommu_internal.h  |  109 ++++
->   hw/i386/trace-events            |    6 +
->   hw/iommu/Makefile.objs          |    1 +
->   hw/iommu/iommu.c                |   66 +++
->   hw/pci-host/designware.c        |    6 +-
->   hw/pci-host/ppce500.c           |    6 +-
->   hw/pci-host/prep.c              |    6 +-
->   hw/pci-host/sabre.c             |    6 +-
->   hw/pci/pci.c                    |   27 +-
->   hw/ppc/ppc440_pcix.c            |    6 +-
->   hw/ppc/spapr_pci.c              |    6 +-
->   hw/s390x/s390-pci-bus.c         |    8 +-
->   hw/vfio/common.c                |   10 +
->   hw/vfio/pci.c                   |  149 +++++
->   include/hw/i386/intel_iommu.h   |   58 +-
->   include/hw/iommu/iommu.h        |  113 ++++
->   include/hw/pci/pci.h            |   13 +-
->   include/hw/pci/pci_bus.h        |    2 +-
->   include/hw/vfio/vfio-common.h   |    9 +
->   linux-headers/linux/iommu.h     |  324 ++++++++++
->   linux-headers/linux/vfio.h      |   83 +++
->   scripts/update-linux-headers.sh |    2 +-
->   28 files changed, 2232 insertions(+), 58 deletions(-)
->   create mode 100644 hw/iommu/Makefile.objs
->   create mode 100644 hw/iommu/iommu.c
->   create mode 100644 include/hw/iommu/iommu.h
->   create mode 100644 linux-headers/linux/iommu.h
->
 
 
