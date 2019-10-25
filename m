@@ -2,80 +2,89 @@ Return-Path: <SRS0=bySr=YS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 40D01CA9EA0
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 13:29:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6ED43CA9EA0
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 13:29:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0BBDF21D71
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 13:29:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 380AC21D71
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 13:29:31 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="i4TEQpw5"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0BBDF21D71
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="q/93RtM6"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 380AC21D71
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59964 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59966 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iNzeZ-0001Tx-NX
-	for qemu-devel@archiver.kernel.org; Fri, 25 Oct 2019 09:29:19 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33465)
+	id 1iNzej-0001hZ-R5
+	for qemu-devel@archiver.kernel.org; Fri, 25 Oct 2019 09:29:30 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60021)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <ehabkost@redhat.com>) id 1iNzY4-0007U0-6y
- for qemu-devel@nongnu.org; Fri, 25 Oct 2019 09:22:38 -0400
+ (envelope-from <frasse.iglesias@gmail.com>) id 1iNzT0-0003jX-Nx
+ for qemu-devel@nongnu.org; Fri, 25 Oct 2019 09:17:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <ehabkost@redhat.com>) id 1iNzY0-00059p-5H
- for qemu-devel@nongnu.org; Fri, 25 Oct 2019 09:22:33 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:42185
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1iNzXy-00058X-BW
- for qemu-devel@nongnu.org; Fri, 25 Oct 2019 09:22:30 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1572009747;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=TXoeupEoqztpAAd5CgTj1cBSD9Wcv3BgFKcqST9xO2c=;
- b=i4TEQpw5C4+lbVzdAOUrkK4Tt3SZS0ceMMogQpK1mNpb6lgi8QEyyWt5kRp/2W5w5Kp+6w
- Wyn9J5f0S/ttsgRv3ohdN8KJAhfIYtsBXkL6SSstdRJ6KWIKWRyLTkmlF80Um678i7FuvV
- ZCLF9f35LklqQGBliVrR29Tq3i0665c=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-240-GczJZsPlMUmnpCLSWxkQUA-1; Fri, 25 Oct 2019 09:22:24 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 567FD1800DCA;
- Fri, 25 Oct 2019 13:22:22 +0000 (UTC)
-Received: from localhost (ovpn-116-62.gru2.redhat.com [10.97.116.62])
- by smtp.corp.redhat.com (Postfix) with ESMTP id D053760BFB;
- Fri, 25 Oct 2019 13:22:16 +0000 (UTC)
-Date: Fri, 25 Oct 2019 10:22:15 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-To: Markus Armbruster <armbru@redhat.com>, Jiri Denemark <jdenemar@redhat.com>
-Subject: Re: [PATCH 7/7] cpu: Add `machine` parameter to query-cpu-definitions
-Message-ID: <20191025132215.GC6744@habkost.net>
-References: <20191025022553.25298-1-ehabkost@redhat.com>
- <20191025022553.25298-8-ehabkost@redhat.com>
- <8736fhmius.fsf@dusky.pond.sub.org>
+ (envelope-from <frasse.iglesias@gmail.com>) id 1iNzSx-0002Tg-Kg
+ for qemu-devel@nongnu.org; Fri, 25 Oct 2019 09:17:22 -0400
+Received: from mail-lj1-x244.google.com ([2a00:1450:4864:20::244]:42881)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <frasse.iglesias@gmail.com>)
+ id 1iNzSx-0002Rk-Ak
+ for qemu-devel@nongnu.org; Fri, 25 Oct 2019 09:17:19 -0400
+Received: by mail-lj1-x244.google.com with SMTP id a21so2662130ljh.9
+ for <qemu-devel@nongnu.org>; Fri, 25 Oct 2019 06:17:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:in-reply-to:user-agent;
+ bh=gwIJMoe1nqIE2c1gEvEPYH9oqyxsexG6v4l+/euLXsg=;
+ b=q/93RtM6hFXIGLoi1dtU1zprSeiCGCpTQWKvALNkbawYv/lusFCCc9sE7gJeGyXoA1
+ uUgN+fYmvhYJyG2Ko3CpNnwgCrmPfyoUmL+3THh9PoHSeb/3TA8qjlzKlEMygDezrKZa
+ aQ744jwXocQxawFML4LkZp0Ne43aP1Sowfb+2iA907vlyvderzZ5S6Fp4hJBPbCTCVeW
+ 1GWEh79Kfvi6JcUDPZzczTqnXW+gIs0w8eK11nNaIrzNIkQzntWUy3GBPpBdyulDZ6TV
+ wvw8OccZDpJ4TDvGNUWsLGQ19HJoN69uiHYyjz00p21lqANC4ooyLDy05Pq0rJsI1F8p
+ G0/g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to:user-agent;
+ bh=gwIJMoe1nqIE2c1gEvEPYH9oqyxsexG6v4l+/euLXsg=;
+ b=KUJt7Tcha5cA2ETIY5p8zEChfwaKZl04G3AtAB9jc19VvQI2WNHt8Ti7wfsUFFvweP
+ iKKcbVDS5XJuHFe12yjFF5B209CMe7KyfnFMFnmTmuZxszT2yBpqsY2e4u/3NdNn2fgB
+ W3jjehLIWAr7yoC/hIMpphcuql1lC2BUlF60KiQFqHxKB0naVhh+2veucEI5mpk9e9EY
+ LubLm4ioSXGXKo461jBMJl7nxNgVX/5uz0VjvY+W8RDF4Is9q/McELiZel/dLmZvO+fY
+ axEOz0AXJbG38uKMLfwLXwZRSAmtTEB1HwLgzoZEF3Ybf3O4Yrw9C0LU2sd1BigZx3NY
+ 19Xg==
+X-Gm-Message-State: APjAAAX159Lgeb4DjVPz1mcK95G/5ZOsLinlWUA0CyyjPMdvl4nbv8M9
+ m859Z7PNDKe+Vv7Th7ztIYw=
+X-Google-Smtp-Source: APXvYqxK7Yty1QZTsChhXVzK4EX9/0EPcS2zNTyMZdkMPxeYTxMeoYIAsXEcyptLaSPnMtIKPLm6mQ==
+X-Received: by 2002:a2e:908d:: with SMTP id l13mr2328718ljg.165.1572009437413; 
+ Fri, 25 Oct 2019 06:17:17 -0700 (PDT)
+Received: from fralle-msi (31-208-27-151.cust.bredband2.com. [31.208.27.151])
+ by smtp.gmail.com with ESMTPSA id
+ i190sm1487662lfi.45.2019.10.25.06.17.16
+ (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+ Fri, 25 Oct 2019 06:17:16 -0700 (PDT)
+Date: Fri, 25 Oct 2019 15:17:15 +0200
+From: Francisco Iglesias <frasse.iglesias@gmail.com>
+To: Sai Pavan Boddu <sai.pavan.boddu@xilinx.com>
+Subject: Re: [PATCH v5] ssi: xilinx_spips: Skip spi bus update for a few
+ register writes
+Message-ID: <20191025131713.pthu3ihbuhllzszd@fralle-msi>
+References: <1571981531-27498-1-git-send-email-sai.pavan.boddu@xilinx.com>
 MIME-Version: 1.0
-In-Reply-To: <8736fhmius.fsf@dusky.pond.sub.org>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-MC-Unique: GczJZsPlMUmnpCLSWxkQUA-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=WINDOWS-1252
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 205.139.110.61
+In-Reply-To: <1571981531-27498-1-git-send-email-sai.pavan.boddu@xilinx.com>
+User-Agent: NeoMutt/20170113 (1.7.2)
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::244
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,73 +96,105 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, libvir-list@redhat.com,
- David Hildenbrand <david@redhat.com>, Aleksandar Rikalo <arikalo@wavecomp.com>,
- Cornelia Huck <cohuck@redhat.com>, qemu-devel@nongnu.org,
- Halil Pasic <pasic@linux.ibm.com>,
- Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org,
- qemu-arm@nongnu.org, qemu-ppc@nongnu.org,
- Aleksandar Markovic <amarkovic@wavecomp.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>,
- Richard Henderson <rth@twiddle.net>, Aurelien Jarno <aurelien@aurel32.net>,
- David Gibson <david@gibson.dropbear.id.au>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Edgar Iglesias <edgari@xilinx.com>, Alistair Francis <alistair@alistair23.me>,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-CCing libvir-list.
+Hi Sai,
 
-On Fri, Oct 25, 2019 at 08:36:59AM +0200, Markus Armbruster wrote:
-> Eduardo Habkost <ehabkost@redhat.com> writes:
-> > The new parameter can be used by management software to query for
-> > CPU model alias information for multiple machines without
-> > restarting QEMU.
-[...]
-> > @@ -317,9 +321,17 @@
->    ##
->    # @query-cpu-definitions:
-> >  #
-> >  # Return a list of supported virtual CPU definitions
-> >  #
-> > +# @machine: Name of machine type.  The command returns some data
-> > +#           that machine-specific.  This overrides the machine type
->=20
-> "that is machine-specific"
->=20
-> > +#           used to look up that information.  This can be used,
-> > +#           for example, to query machine-specific CPU model aliases
-> > +#           without restarting QEMU (since 4.2)
-> > +#
-> >  # Returns: a list of CpuDefInfo
-> >  #
-> >  # Since: 1.2.0
-> >  ##
-> > -{ 'command': 'query-cpu-definitions', 'returns': ['CpuDefinitionInfo']=
-,
-> > +{ 'command': 'query-cpu-definitions',
-> > +  'data': { '*machine': 'str' },
-> > +  'returns': ['CpuDefinitionInfo'],
-> >    'if': 'defined(TARGET_PPC) || defined(TARGET_ARM) || defined(TARGET_=
-I386) || defined(TARGET_S390X) || defined(TARGET_MIPS)' }
->=20
-> I'm afraid the doc comment is less than clear.  Before I can suggest
-> improvements, I have questions.
->=20
-> Looks like @alias-of is the only part of the return value that changes
-> when I re-run query-cpu-definitions with another @machine argument.
-> Correct?
+On [2019 Oct 25] Fri 11:02:11, Sai Pavan Boddu wrote:
+> A few configuration register writes need not update the spi bus state, so just
+> return after register write.
 
-Yes.
+s/register write/the register write/
 
->=20
-> How is this going to be used?  Will management software run
-> query-cpu-definitions for each machine type returned by query-machines?
-> Or just for a few of them?
+> 
+> Signed-off-by: Sai Pavan Boddu <sai.pavan.boddu@xilinx.com>
 
-I don't know.  I'll let Jiri and other libvirt developers answer
-that.
+After above change:
 
---=20
-Eduardo
+Reviewed-by: Francisco Iglesias <frasse.iglesias@gmail.com>
+Tested-by: Francisco Iglesias <frasse.iglesias@gmail.com>
 
+Best regards,
+Francisco Iglesias
+
+> ---
+> 
+> Changes for V2:
+> 	Just skip update of spips cs and fifos
+> 	Update commit message accordingly
+> Changes for V4:
+> 	Avoid checking for zynqmp qspi
+> 	Skip spi bus update for few of the registers Changes for V4:
+> 	Move the register list to existing switch case above.
+> Change for V5:
+> 	Fixed Commit message.
+> 
+>  hw/ssi/xilinx_spips.c | 22 ++++++++++++++++++----
+>  1 file changed, 18 insertions(+), 4 deletions(-)
+> 
+> diff --git a/hw/ssi/xilinx_spips.c b/hw/ssi/xilinx_spips.c
+> index a309c71..0d6c2e1 100644
+> --- a/hw/ssi/xilinx_spips.c
+> +++ b/hw/ssi/xilinx_spips.c
+> @@ -109,6 +109,7 @@
+>  #define R_GPIO              (0x30 / 4)
+>  #define R_LPBK_DLY_ADJ      (0x38 / 4)
+>  #define R_LPBK_DLY_ADJ_RESET (0x33)
+> +#define R_IOU_TAPDLY_BYPASS (0x3C / 4)
+>  #define R_TXD1              (0x80 / 4)
+>  #define R_TXD2              (0x84 / 4)
+>  #define R_TXD3              (0x88 / 4)
+> @@ -139,6 +140,8 @@
+>  #define R_LQSPI_STS         (0xA4 / 4)
+>  #define LQSPI_STS_WR_RECVD      (1 << 1)
+>  
+> +#define R_DUMMY_CYCLE_EN    (0xC8 / 4)
+> +#define R_ECO               (0xF8 / 4)
+>  #define R_MOD_ID            (0xFC / 4)
+>  
+>  #define R_GQSPI_SELECT          (0x144 / 4)
+> @@ -970,6 +973,7 @@ static void xilinx_spips_write(void *opaque, hwaddr addr,
+>  {
+>      int mask = ~0;
+>      XilinxSPIPS *s = opaque;
+> +    bool try_flush = true;
+>  
+>      DB_PRINT_L(0, "addr=" TARGET_FMT_plx " = %x\n", addr, (unsigned)value);
+>      addr >>= 2;
+> @@ -1019,13 +1023,23 @@ static void xilinx_spips_write(void *opaque, hwaddr addr,
+>          tx_data_bytes(&s->tx_fifo, (uint32_t)value, 3,
+>                        s->regs[R_CONFIG] & R_CONFIG_ENDIAN);
+>          goto no_reg_update;
+> +    /* Skip SPI bus update for below registers writes */
+> +    case R_GPIO:
+> +    case R_LPBK_DLY_ADJ:
+> +    case R_IOU_TAPDLY_BYPASS:
+> +    case R_DUMMY_CYCLE_EN:
+> +    case R_ECO:
+> +        try_flush = false;
+> +        break;
+>      }
+>      s->regs[addr] = (s->regs[addr] & ~mask) | (value & mask);
+>  no_reg_update:
+> -    xilinx_spips_update_cs_lines(s);
+> -    xilinx_spips_check_flush(s);
+> -    xilinx_spips_update_cs_lines(s);
+> -    xilinx_spips_update_ixr(s);
+> +    if (try_flush) {
+> +        xilinx_spips_update_cs_lines(s);
+> +        xilinx_spips_check_flush(s);
+> +        xilinx_spips_update_cs_lines(s);
+> +        xilinx_spips_update_ixr(s);
+> +    }
+>  }
+>  
+>  static const MemoryRegionOps spips_ops = {
+> -- 
+> 2.7.4
+> 
 
