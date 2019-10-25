@@ -7,75 +7,75 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C1397CA9EA0
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 06:44:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D5C1CA9EA0
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 06:44:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8D8942070B
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 06:44:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6E1AF2070B
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 06:44:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="rWe0ZgTk"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8D8942070B
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="smYSJqcH"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6E1AF2070B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55860 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55864 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iNtKK-0000iu-16
-	for qemu-devel@archiver.kernel.org; Fri, 25 Oct 2019 02:44:00 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35344)
+	id 1iNtKN-0000u4-VV
+	for qemu-devel@archiver.kernel.org; Fri, 25 Oct 2019 02:44:04 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35458)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1iNtDr-0002sj-0Y
- for qemu-devel@nongnu.org; Fri, 25 Oct 2019 02:37:19 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1iNtDw-00036P-3Z
+ for qemu-devel@nongnu.org; Fri, 25 Oct 2019 02:37:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1iNtDp-0008Lh-OC
- for qemu-devel@nongnu.org; Fri, 25 Oct 2019 02:37:18 -0400
-Received: from mail-wm1-x32a.google.com ([2a00:1450:4864:20::32a]:36908)
+ (envelope-from <alex.bennee@linaro.org>) id 1iNtDu-0008OG-RF
+ for qemu-devel@nongnu.org; Fri, 25 Oct 2019 02:37:23 -0400
+Received: from mail-wr1-x429.google.com ([2a00:1450:4864:20::429]:40496)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1iNtDp-0008LL-GW
- for qemu-devel@nongnu.org; Fri, 25 Oct 2019 02:37:17 -0400
-Received: by mail-wm1-x32a.google.com with SMTP id q130so761429wme.2
- for <qemu-devel@nongnu.org>; Thu, 24 Oct 2019 23:37:17 -0700 (PDT)
+ id 1iNtDu-0008Np-LD
+ for qemu-devel@nongnu.org; Fri, 25 Oct 2019 02:37:22 -0400
+Received: by mail-wr1-x429.google.com with SMTP id o28so910579wro.7
+ for <qemu-devel@nongnu.org>; Thu, 24 Oct 2019 23:37:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=5I5UoFas/oMecYMX9Nd86Bz4Y4H1FsmbDV1CnX/LR6E=;
- b=rWe0ZgTkAlC8UfOmc3669+jDAnTAMhu92Nq9Ql6zv0px97u6z1Kc7pplBlWpukVzRB
- ccxh0JxUV//cZPwen8Eykkp/gIhdPjv0Lpx0MxCMlg1FxRcTxFD16sXZs3uvgjIKIP9k
- zd5LBoGH1VlobU5F1kezHIBs9kwbClyasfRDucJvWSfxn18blCdXL/02jv8iGo/yHBnL
- DErmJFLBGO5OwJTZZAD7b9ASMVCnKMjrD1xX1mu98V7bXWkCtxqqTrm5pZSTs5APiX7h
- sGmDoVqtFPLPaK4eU84VY3Iafobgnz4XSb+1T3jBVS1D2m0NL9gCoUPEhmRVu5Tzj10j
- zIzg==
+ bh=TdZ5GZorCml1FjL+yJ8DutcSWJmng0qMadQB/3SWejo=;
+ b=smYSJqcHCcYvobR7/VDxV3lMDqhuscsa2UqavQnx/Hsf/n+vM9Jfjos+eJCmLo10iS
+ l9AD86wO5weQ8gTB+ROzfUd7q729LksArF2SGsL9vZ432037qpvgLVdw/siw71Stnp6T
+ 3cs5D8kVVOxS2rIrsgH220Mgck4SpageQqmZ7JhbARUVEoUl0tN6QerHfU8zP81uHs0/
+ IdVntJXGT6W3WqPqJtznfbqzfKqr2tmcIqaFxWzxNHYDD5/RAZVeUDY86eXoGYzGVPm4
+ oEDPDQyxnA2fWw0vOyYj0FvvdAH9R/PL/hbxkAQdTblphZ5CYJFZ1J01pghiwk70BTEJ
+ dB2w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=5I5UoFas/oMecYMX9Nd86Bz4Y4H1FsmbDV1CnX/LR6E=;
- b=c+KBZG3yL87DBJQsb21Fie2WjdFP7uUeVHSmaTNHDBb6rZZbIudnaWonyCk5aBx8Rg
- lnYvVDlly5dI6EazdK4fTNAFSCPlJa+FaBzZE7ugAYRqyJBJNNcA1K7RWsYxyMvlPrOi
- xf8j2MPq5SCRmjjEBE8nfoBmJ0c9KKUL3jXm5JmIoqZYPKj/ZFR+aIs4i28bplphzhvB
- 2FfCHZgetilQ1lO2Dkf8ikK9THDqXnfHMUhLCHDJ89vS7o0hpDWEmp51zDG9bqcWylWX
- yq5a/EqAwoKarUaWU90/XotP3Twe7KZaWngXIwL1U53hndjg7LKJPPwiCgFfKEMDR1jW
- iiSg==
-X-Gm-Message-State: APjAAAXZtoBuQRhSGAcTiJuJkTOrcGmd728AhQyoLuWOTJNBfHPdnOM2
- 7+Ei8kdsRjj1d5omEMt+8l0HbQ==
-X-Google-Smtp-Source: APXvYqyoDZNtgZVqxgNCpdWOIuCpZDIeNmXIYVykAOSIs/o5S6KrACTrUZ0MGY2tdnnmGHybRz+amw==
-X-Received: by 2002:a1c:398b:: with SMTP id g133mr1971190wma.130.1571985436029; 
- Thu, 24 Oct 2019 23:37:16 -0700 (PDT)
+ bh=TdZ5GZorCml1FjL+yJ8DutcSWJmng0qMadQB/3SWejo=;
+ b=XMf/nPtt0Qt615gVAeezH/+DGvmW1uNYRGDYi1evjSngydTgDCUTGI5KgFAd7aPkvV
+ KI1N33YMza3vNirMCUj7YXnlFkE0H93HVo+Mziu4nzt5NKpsPL/DIoyVzAcp1B7jnZbc
+ lunG8Jqbq5VJEMtZjBuqVzDAuG1Cg6bGbKvF0i4qewBZKYPKtfpJIz7+RMabHThHMMn4
+ DCpf7q+zNj/aZ3Y97Oc3X0jHr6B/0O+tqMeXmJkWwsqnw+uARd2M2N9ExUXHX5evitln
+ MWaAkARupzBcPsJZlyor+fT1nlG0TKTKleL1fkutqYWGCpxja51Csnw74a6afX2U+Ecc
+ Fj+w==
+X-Gm-Message-State: APjAAAVcjfAD204zM0j3/o8yPHSpYRWEeLSQOMtigKjcaG8igr1NyqJX
+ Rvmr1NJJVcswzg7GjfdDaQ/2qYl/gNA=
+X-Google-Smtp-Source: APXvYqwr6cETFaexJukUH7hOCUx/9WDAf3Pt34MyqT1Q0oYM4z8U7fSueY/SCgRKsXxkwdoCxXtSYw==
+X-Received: by 2002:adf:de91:: with SMTP id w17mr448426wrl.322.1571985441631; 
+ Thu, 24 Oct 2019 23:37:21 -0700 (PDT)
 Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id q14sm1445345wre.27.2019.10.24.23.37.14
+ by smtp.gmail.com with ESMTPSA id t16sm1278343wrq.52.2019.10.24.23.37.16
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 24 Oct 2019 23:37:14 -0700 (PDT)
+ Thu, 24 Oct 2019 23:37:18 -0700 (PDT)
 Received: from zen.lan (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id CB5631FF8C;
- Fri, 25 Oct 2019 07:37:13 +0100 (BST)
+ by zen.linaroharston (Postfix) with ESMTP id 591F41FF96;
+ Fri, 25 Oct 2019 07:37:14 +0100 (BST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: peter.maydell@linaro.org
-Subject: [PULL v2 01/73] travis.yml: reduce scope of the --enable-debug build
-Date: Fri, 25 Oct 2019 07:36:01 +0100
-Message-Id: <20191025063713.23374-2-alex.bennee@linaro.org>
+Subject: [PULL v2 07/73] travis.yml: bump Xcode 10 to latest dot release
+Date: Fri, 25 Oct 2019 07:36:07 +0100
+Message-Id: <20191025063713.23374-8-alex.bennee@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20191025063713.23374-1-alex.bennee@linaro.org>
 References: <20191025063713.23374-1-alex.bennee@linaro.org>
@@ -84,7 +84,7 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::32a
+X-Received-From: 2a00:1450:4864:20::429
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -103,32 +103,30 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Adding debug makes things run a bit slower so lets not hammer all the
-targets.
+According to:
+
+  https://docs.travis-ci.com/user/reference/osx/#macos-version
+
+we have 10.3 available so lets use it. I don't know what Apple's
+deprecation policy is for Xcode because it requires an AppleID to find
+out.
 
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 
 diff --git a/.travis.yml b/.travis.yml
-index d0b9e099b9c..7d90b87540f 100644
+index f2b679fe701..da6a2063fca 100644
 --- a/.travis.yml
 +++ b/.travis.yml
-@@ -124,12 +124,13 @@ matrix:
-         - CACHE_NAME="${TRAVIS_BRANCH}-linux-gcc-default"
- 
- 
-+    # --enable-debug implies --enable-debug-tcg, also runs quite a bit slower
+@@ -247,7 +247,7 @@ matrix:
      - env:
--        - CONFIG="--enable-debug --enable-debug-tcg --disable-user"
-+        - CONFIG="--enable-debug --target-list=${MAIN_SOFTMMU_TARGETS}"
-         - CACHE_NAME="${TRAVIS_BRANCH}-linux-gcc-debug"
+         - CONFIG="--target-list=i386-softmmu,ppc-softmmu,ppc64-softmmu,m68k-softmmu,x86_64-softmmu"
+       os: osx
+-      osx_image: xcode10.2
++      osx_image: xcode10.3
+       compiler: clang
  
  
--    # TCG debug can be run just on it's own and is mostly agnostic to user/softmmu distinctions
-+    # TCG debug can be run just on its own and is mostly agnostic to user/softmmu distinctions
-     - env:
-         - CONFIG="--enable-debug-tcg --disable-system"
-         - CACHE_NAME="${TRAVIS_BRANCH}-linux-gcc-debug"
 -- 
 2.20.1
 
