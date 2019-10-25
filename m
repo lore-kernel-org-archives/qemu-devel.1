@@ -2,83 +2,82 @@ Return-Path: <SRS0=bySr=YS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9752BCA9EA0
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 14:18:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 69722CA9EA0
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 14:21:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 62F6320684
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 14:18:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 362DC205F4
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 14:21:50 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="N0gLhhPy"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 62F6320684
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="PybseOIE"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 362DC205F4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60740 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60764 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iO0QY-0006F9-Af
-	for qemu-devel@archiver.kernel.org; Fri, 25 Oct 2019 10:18:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42464)
+	id 1iO0TL-0003Bp-WA
+	for qemu-devel@archiver.kernel.org; Fri, 25 Oct 2019 10:21:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43580)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <david@redhat.com>) id 1iO0IV-00031s-1V
- for qemu-devel@nongnu.org; Fri, 25 Oct 2019 10:10:36 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1iO0Pn-0006Ag-OT
+ for qemu-devel@nongnu.org; Fri, 25 Oct 2019 10:18:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <david@redhat.com>) id 1iO0IS-0002l9-FA
- for qemu-devel@nongnu.org; Fri, 25 Oct 2019 10:10:33 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:41240
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <david@redhat.com>) id 1iO0IS-0002js-BT
- for qemu-devel@nongnu.org; Fri, 25 Oct 2019 10:10:32 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1572012630;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=lHfFv+bHO4dxT3tpPi6gtPios1cSIlNl+dxlycDH5nc=;
- b=N0gLhhPy9iY2bK6KJ4LahZu3k+3ooLeqr7uxacG2E74rI3joOg2fH3I9pFi+kI+MEB8ma0
- gFyd8VjOapH49pMNTJ+77D5UQpcauNbs60VrjmQ2qDdakEfKVQDRkgzKeaknQZYRDi9plX
- 4GhVPOr09eTpSj1552Z9RSrAaHgXA1E=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-83-W7ZfdaoOOFSSAg9OiMBCWg-1; Fri, 25 Oct 2019 10:10:26 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1C2C4107AD31;
- Fri, 25 Oct 2019 14:10:25 +0000 (UTC)
-Received: from [10.36.116.227] (ovpn-116-227.ams2.redhat.com [10.36.116.227])
- by smtp.corp.redhat.com (Postfix) with ESMTP id D7E6C5EE1D;
- Fri, 25 Oct 2019 14:10:11 +0000 (UTC)
-Subject: Re: [PATCH 0/7] i386: Add `machine` parameter to query-cpu-definitions
-To: Eduardo Habkost <ehabkost@redhat.com>
-References: <20191025022553.25298-1-ehabkost@redhat.com>
- <dbf9e4c1-0acf-9469-84f9-f80c41e2cae0@redhat.com>
- <20191025133846.GD6744@habkost.net>
-From: David Hildenbrand <david@redhat.com>
-Organization: Red Hat GmbH
-Message-ID: <25e33d78-3d25-7ca9-6922-920846d0d98b@redhat.com>
-Date: Fri, 25 Oct 2019 16:10:10 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.1
+ (envelope-from <peter.maydell@linaro.org>) id 1iO0Pm-0008Bx-EI
+ for qemu-devel@nongnu.org; Fri, 25 Oct 2019 10:18:07 -0400
+Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:45540)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1iO0Pm-0008BX-8r
+ for qemu-devel@nongnu.org; Fri, 25 Oct 2019 10:18:06 -0400
+Received: by mail-oi1-x243.google.com with SMTP id o205so1705779oib.12
+ for <qemu-devel@nongnu.org>; Fri, 25 Oct 2019 07:18:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=4X0GXSUKWTu4Wara9llUPrzOZUPxl9OR9FGZcMHEgSQ=;
+ b=PybseOIERpB8x9rm9/9OdnVCyvLe/m7NV8Eu3me8hb1KiTjQuxJ+9m3BwoHbDeQqjk
+ 4qfr0N8WgKGWc5COZDQK+b1bL+5jE+spkXHaUTc0UO/zy8aE8iLgeQQJ3KeMJrugIfIu
+ n4roc5NprEiOw/74zMaHrvpYctx7OIFg7b3/MTKRH+VLIqufqQ3Wo5rO+zpAepaVbrJh
+ RqlMTZSoa788lhEQU6UhMVTsCyblbSxZysbCWTRO3niMrqqazJ8UrKGUvi/kLMAUfVWL
+ nAvJmRjN9aExJRTXu9dldj2WsDFo8SjbpcAF+T+ras1eIWBPBXV1OlWQGfQHdPLZlDy9
+ PvMg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=4X0GXSUKWTu4Wara9llUPrzOZUPxl9OR9FGZcMHEgSQ=;
+ b=mTNHnvUQ9S2SUIB4+uX3EF7KOO9/gDnfqeirVBpE7i8k5ld0ygs7TM/Q0Q3m7l5Ikv
+ OGZxCmRgIPfPqBOrTfmaaOVagSp8qPBZD06sBNAU82Oe8EIWeQyI0PaniFKyIUYiXS3Q
+ 8lJneYm6qHpHDwSFf+RTK+apGftq6nZAPlLFZDknD4WSxKpBoC+/p/7tKALPpYWv6dy4
+ /b/QqamlCd96ma+jNENMF63EzfaJxoxHq4WdDNN7dYyh9SfzDDYC4PfIgsWpd/rbLPml
+ RElJmIAsNzi2Vl94SpyzCy/0FEpSYieszCd8FkyqW/X0Nl2RqUAydRUy9ah7Xzne6YQY
+ /XJg==
+X-Gm-Message-State: APjAAAU+irPI6zHMKB6E+H+yIb1tFdjENG99d9jmV0y0gd2f7fIeigSE
+ 1iGQHJ8gRFeoH0FyZHioipTGuorHl6LmBtUWgx/sCA==
+X-Google-Smtp-Source: APXvYqxmOxwMa9izI/YUKPAcJVxZuYIkDFfb3Ea/X/sV0hUSwuUgI1+nRRI6YMj1MmG5rGt2BXHZXqUcNL+mG5fGjJ0=
+X-Received: by 2002:aca:2312:: with SMTP id e18mr2233682oie.98.1572013085302; 
+ Fri, 25 Oct 2019 07:18:05 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20191025133846.GD6744@habkost.net>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-MC-Unique: W7ZfdaoOOFSSAg9OiMBCWg-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=UTF-8; format=flowed
+References: <20191025095849.25283-1-mreitz@redhat.com>
+ <CAFEAcA8Y8fGKC3DkdM+wkU5Oe6ACZMtvWjpry9qFgPJc5KYjdA@mail.gmail.com>
+ <19d50c64-c07a-3122-dea3-a5d97a2d35da@redhat.com>
+In-Reply-To: <19d50c64-c07a-3122-dea3-a5d97a2d35da@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 25 Oct 2019 15:17:53 +0100
+Message-ID: <CAFEAcA-3nt69+fUCf4YysVqsWd3z8r1iuURPYAPWUdHcd41p_Q@mail.gmail.com>
+Subject: Re: [RFC 0/3] block/file-posix: Work around XFS bug
+To: Max Reitz <mreitz@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.120
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::243
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,126 +89,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Huth <thuth@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>,
- Janosch Frank <frankja@linux.ibm.com>, libvir-list@redhat.com,
- Cornelia Huck <cohuck@redhat.com>,
- Michal Skrivanek <michal.skrivanek@redhat.com>, qemu-devel@nongnu.org,
- Markus Armbruster <armbru@redhat.com>,
- Christian Borntraeger <borntraeger@de.ibm.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>,
- Jiri Denemark <jdenemar@redhat.com>, Richard Henderson <rth@twiddle.net>
+Cc: Kevin Wolf <kwolf@redhat.com>,
+ Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ Alberto Garcia <berto@igalia.com>, Qemu-block <qemu-block@nongnu.org>,
+ QEMU Developers <qemu-devel@nongnu.org>,
+ Anton Nefedov <anton.nefedov@virtuozzo.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 25.10.19 15:38, Eduardo Habkost wrote:
-> CCing danpb, libvir-list, mskrivanek.
->=20
-> On Fri, Oct 25, 2019 at 09:17:46AM +0200, David Hildenbrand wrote:
->> On 25.10.19 04:25, Eduardo Habkost wrote:
->>> We had introduced versioned CPU models in QEMU 4.1, including a
->>> method for querying for CPU model versions using
->>
->> Interesting, I was not aware of that.
->>
->> On s390x, we somewhat have versioned CPU models, but we decided against
->> giving them explicit names (e.g., z13-v1 or z13-4.1.0), because it didn'=
-t
->> really seem to be necessary. (and we often implement/add features for ol=
-der
->> CPU models, there is a lot of fluctuation) Actually, you would have had =
-to
->> add "z13-z/VM-x.x.x" or "z13-LPAR-x.x.x" or "z13-KVM-x.x.x" to model the
->> features you actually see in all the different virtual environments ("wh=
-at a
->> CPU looks like"). Not to talk about QEMU versions in addition to that. S=
-o we
->> decided to always model what you would see under LPAR and are able to
->> specify for a KVM guest. So you can use "z13" in an up-to-date LPAR
->> environment, but not in a z/VM environment (you would have to disable
->> features).
->>
->> Each (!base) CPU model has a specific feature set per machine. Libvirt u=
-ses
->> query-cpu-model-expansion() to convert this model+machine to a
->> machine-independent representation. That representation is sufficient fo=
-r
->> all use cases we were aware of (esp. "virsh domcapabilities", the host C=
-PU
->> model, migration).
->>
->> While s390x has versioned CPU models, we have no explicit way of specify=
-ing
->> them for older machines, besides going over query-cpu-model-expansion an=
-d
->> using expanded "base model + features".
->>
->> I can see that this might make sense on x86-64, where you only have mayb=
-e 3
->> versions of a CPU (e.g., the one Intel messed up first - Haswell, the on=
-e
->> Intel messed up next - Haswell-noTSX, and the one that Intel eventually =
-did
->> right - Haswell-noTSX-IBRS) and you might want to specify "Haswell" vs.
->> "Haswell-IBRS" vs. "Haswell-noTSX-IBRS". But actually, you will always w=
-ant
->> to go for "Haswell-noTSX-IBRS", because you can expect to run in updated
->> environments if I am not wrong, everything else are corner cases.
->>
->> Of course, versioned CPU model are neat to avoid "base model + list of
->> features", but at least for expanding the host model on s390x, it is not
->> really helpful. When migrating, the model expansion does the trick.
->>
->> I haven't looked into details of "how to specify or model versions". May=
-be
->> IBM wants to look into creating versions for all the old models we had. =
-But
->> again, not sure if that is of any help for s390x. CCing IBM.
->=20
-> I'm not sure yet if there are the x86-specific goals and
-> constraints that would make it difficult to follow the same
-> approach followed by s390x.  I have the impression we do,
-> but I need to think more carefully about it.
->=20
-> Let's discuss that during KVM Forum?
+On Fri, 25 Oct 2019 at 15:16, Max Reitz <mreitz@redhat.com> wrote:
+>
+> On 25.10.19 15:46, Peter Maydell wrote:
+> > On Fri, 25 Oct 2019 at 11:09, Max Reitz <mreitz@redhat.com> wrote:
+> >>
+> >> Hi,
+> >>
+> >> It seems to me that there is a bug in Linux=E2=80=99s XFS kernel drive=
+r, as
+> >> I=E2=80=99ve explained here:
+> >>
+> >> https://lists.nongnu.org/archive/html/qemu-block/2019-10/msg01429.html
+> >>
+> >> In combination with our commit c8bb23cbdbe32f, this may lead to guest
+> >> data corruption when using qcow2 images on XFS with aio=3Dnative.
+> >
+> > Have we reported that upstream to the xfs folks?
+>
+> I=E2=80=99ve created an RH BZ here:
+>
+> https://bugzilla.redhat.com/show_bug.cgi?id=3D1765547
 
-I won't be attending KVM Forum this year, but Christian should be around.
+Currently "You are not authorized to access bug #1765547." for
+anonymous browsers, just fyi.
 
->=20
-> The two main goals of versioned CPU models in x86 are:
-> 1) Decoupling CPU model updates from machine-types (users should be
->     able to update a CPU model definition without changing machine
->     type).
-> 2) Letting management software automate CPU model updates.
->     Normally this is necessary when bare metal microcode or
->     software updates add/remove features from CPUs.  Sometimes the
->     Virtual CPU model update needs to be performed before the host
->     updates are applied (if features are being removed)
-
-We have 2) on s390x after a QEMU machine update. You need a QEMU update=20
-usually either way to support the new CPU feature. But I can see how=20
-decoupling the CPU model definition from the machine makes this easier.=20
-It does introduce complexity. It applies only when running older QEMU=20
-machines, or if we have to update a CPU model before we get a new QEMU=20
-machine.
-
-But we do have versioned CPU models already, so the discussion is=20
-already over :)
-
->=20
-> The main constraint that makes it difficult to address the above
-> without a new API is:
-> A) Every CPU model in x86 except "host" is already expected to
->     be migration-safe (I don't know how this compares to s390x).
-
-I would describe that not a bug but a feature :) It does come with the=20
-price that only using the newest QEMU machine results in the newest CPU=20
-model, that part I understand.
-
---=20
-
-Thanks,
-
-David / dhildenb
-
+thanks
+-- PMM
 
