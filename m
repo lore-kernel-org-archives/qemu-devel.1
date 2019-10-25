@@ -2,106 +2,68 @@ Return-Path: <SRS0=bySr=YS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 501B7CA9EA0
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 14:56:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9041DCA9EA0
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 14:58:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1BBB621929
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 14:56:38 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VoNVR9yv"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1BBB621929
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 67D7521929
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 14:58:56 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 67D7521929
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=weiser.dinsnail.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33272 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33334 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iO112-0002XF-Lj
-	for qemu-devel@archiver.kernel.org; Fri, 25 Oct 2019 10:56:36 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45757)
+	id 1iO13G-0006y0-TS
+	for qemu-devel@archiver.kernel.org; Fri, 25 Oct 2019 10:58:54 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49488)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1iO0Zu-0000wp-PD
- for qemu-devel@nongnu.org; Fri, 25 Oct 2019 10:28:35 -0400
+ (envelope-from <michael@weiser.dinsnail.net>) id 1iO0sk-0006m7-QJ
+ for qemu-devel@nongnu.org; Fri, 25 Oct 2019 10:48:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1iO0Zs-00054G-HY
- for qemu-devel@nongnu.org; Fri, 25 Oct 2019 10:28:33 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:45259
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <michael@weiser.dinsnail.net>) id 1iO0sg-0005lI-G2
+ for qemu-devel@nongnu.org; Fri, 25 Oct 2019 10:48:00 -0400
+Received: from heinz.dinsnail.net
+ ([2a01:238:43b4:3200:9392:5dcc:2f0e:a960]:44930)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1iO0Zs-00053v-Cr
- for qemu-devel@nongnu.org; Fri, 25 Oct 2019 10:28:32 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1572013711;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=SCDwoMZv5JVNbsOXs3g2XT8c9uHNYYmK8D+2SHZfePE=;
- b=VoNVR9yvkh+EYXr5TbNbZEf5cPq1VTQ2VSKCJwex2zN2Rbkumr3A/05bkGag0pxDhwB0MS
- CSeGKg/K3VperfX8JegwU4iZ4euveADECbudO88vg66ce5nutLZRjeXu9OF9/2NCbHpxKC
- cgHJomduJ4Gvini83TGVkd729Ffq+PE=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-198-jnPVNbzqPHSgaImU8TJnJQ-1; Fri, 25 Oct 2019 10:28:26 -0400
-X-MC-Unique: jnPVNbzqPHSgaImU8TJnJQ-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 29236800D41;
- Fri, 25 Oct 2019 14:28:25 +0000 (UTC)
-Received: from dresden.str.redhat.com (ovpn-117-230.ams2.redhat.com
- [10.36.117.230])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 2104C60BEC;
- Fri, 25 Oct 2019 14:28:23 +0000 (UTC)
-Subject: Re: [PULL 3/3] iotests: test nbd reconnect
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
-References: <20191023020126.24991-1-eblake@redhat.com>
- <20191023020126.24991-4-eblake@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <4d5f2858-a0a1-a005-ef2e-056e7b0e8e88@redhat.com>
-Date: Fri, 25 Oct 2019 16:28:22 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.1
+ (Exim 4.71) (envelope-from <michael@weiser.dinsnail.net>)
+ id 1iO0sY-0005hC-Mz; Fri, 25 Oct 2019 10:47:50 -0400
+Received: from heinz.dinsnail.net ([IPv6:0:0:0:0:0:0:0:1])
+ by heinz.dinsnail.net (8.15.2/8.15.2) with ESMTP id x9PEixHX001877;
+ Fri, 25 Oct 2019 16:44:59 +0200
+Received: from eldalonde.UUCP (uucp@localhost)
+ by heinz.dinsnail.net (8.15.2/8.15.2/Submit) with bsmtp id x9PEiw6K001876;
+ Fri, 25 Oct 2019 16:44:58 +0200
+Received: from eldalonde.weiser.dinsnail.net (localhost [IPv6:0:0:0:0:0:0:0:1])
+ by eldalonde.weiser.dinsnail.net (8.15.2/8.15.2) with ESMTP id x9PEgSPY003593; 
+ Fri, 25 Oct 2019 16:42:28 +0200
+Received: (from michael@localhost)
+ by eldalonde.weiser.dinsnail.net (8.15.2/8.15.2/Submit) id x9PEgSnR003592;
+ Fri, 25 Oct 2019 16:42:28 +0200
+Date: Fri, 25 Oct 2019 16:42:28 +0200
+From: Michael Weiser <michael@weiser.dinsnail.net>
+To: Kevin Wolf <kwolf@redhat.com>
+Subject: Re: [PATCH v2 0/2] qcow2: Fix image corruption bug in 4.1
+Message-ID: <20191025144228.GA3419@weiser.dinsnail.net>
+References: <20191024142658.22306-1-kwolf@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20191023020126.24991-4-eblake@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Mimecast-Spam-Score: 0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="4pJzrzxj7iOnZqSuMfvlMVBMKEnME2IlG"
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 205.139.110.120
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20191024142658.22306-1-kwolf@redhat.com>
+User-Agent: Mutt/1.12.2 (2019-09-21)
+X-dinsnail-net-MailScanner-Information: Please contact the ISP for more
+ information
+X-dinsnail-net-MailScanner-ID: x9PEixHX001877
+X-dinsnail-net-MailScanner: Found to be clean
+X-dinsnail-net-MailScanner-From: michael@weiser.dinsnail.net
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a01:238:43b4:3200:9392:5dcc:2f0e:a960
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -113,67 +75,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>,
- Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- "open list:Block layer core" <qemu-block@nongnu.org>
+Cc: psyhomb@gmail.com, vsementsov@virtuozzo.com, den@virtuozzo.com,
+ qemu-block@nongnu.org, qemu-devel@nongnu.org, qemu-stable@nongnu.org,
+ dgilbert@redhat.com, mreitz@redhat.com, lersek@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---4pJzrzxj7iOnZqSuMfvlMVBMKEnME2IlG
-Content-Type: multipart/mixed; boundary="REmuQyZuECOUcqKh3hPuhbGr5UPeprdyc"
+Hello Kevin,
 
---REmuQyZuECOUcqKh3hPuhbGr5UPeprdyc
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+On Thu, Oct 24, 2019 at 04:26:56PM +0200, Kevin Wolf wrote:
 
-On 23.10.19 04:01, Eric Blake wrote:
-> From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
->=20
-> Add test, which starts backup to nbd target and restarts nbd server
-> during backup.
->=20
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> Message-Id: <20191009084158.15614-4-vsementsov@virtuozzo.com>
-> Reviewed-by: Eric Blake <eblake@redhat.com>
-> Signed-off-by: Eric Blake <eblake@redhat.com>
-> ---
->  tests/qemu-iotests/264        | 95 +++++++++++++++++++++++++++++++++++
->  tests/qemu-iotests/264.out    | 13 +++++
->  tests/qemu-iotests/group      |  1 +
->  tests/qemu-iotests/iotests.py | 11 ++++
->  4 files changed, 120 insertions(+)
->  create mode 100755 tests/qemu-iotests/264
->  create mode 100644 tests/qemu-iotests/264.out
+> Kevin Wolf (2):
+>   coroutine: Add qemu_co_mutex_assert_locked()
+>   qcow2: Fix corruption bug in qcow2_detect_metadata_preallocation()
 
-I suppose this test should limit the supported image formats.  For me,
-it fails for at least LUKS, cloop, and vpc.  (Due to different reasons
-for each format.)
+Tested-by: Michael Weiser <michael.weiser@gmx.de>
 
-Max
+with offending 69f47505e and today's master
+(58560ad254fbda71d4daa6622d71683190070ee2).
 
+Corruption does not happen with series applied.
+Assertion tiggers as expected if lock is not taken.
 
---REmuQyZuECOUcqKh3hPuhbGr5UPeprdyc--
-
---4pJzrzxj7iOnZqSuMfvlMVBMKEnME2IlG
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl2zBoYACgkQ9AfbAGHV
-z0Dyggf/QGgxy/G7Yyv7nsDmgQlvOhsmI6QHqEp/eJhTsQLc7oQJf6QqBh8io3BL
-KodAtxHeCo3x7nDITM8IASj+Lp9/BLpYy+Z5ndYZjuRwRI9ItW0Z6coqF1R7U5fZ
-Il2R7VZlFP3UyBFf+2wLIUxpbqSt6IinahyEjm0MnK39l3YcDOXrp1a/fy2LnO9B
-0edFBKFB2R3wxtN5QBBFXrUqh5pK+/4J5F3eZj9TNFO2q+8dvaC05cKoLcKXaN1r
-e261RxZJ6G6mcOfZzqTukj/G6/VZ594dvVc4Bw6PSRri7qgM81wthlTH70Pzu31U
-64mtcjH0sKOhZXUZylxt4dh6KWILEg==
-=met6
------END PGP SIGNATURE-----
-
---4pJzrzxj7iOnZqSuMfvlMVBMKEnME2IlG--
-
+FWIW: Reviewed-by: Michael Weiser <michael.weiser@gmx.de>
+-- 
+Thanks,
+Michael
 
