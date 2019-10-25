@@ -6,68 +6,69 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8D9A5CA9EA0
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 12:27:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 70BB9CA9EA0
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 12:28:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 57CAC2054F
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 12:27:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3CA022084C
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 12:28:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cRj26TvL"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 57CAC2054F
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JdyHreWf"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3CA022084C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59320 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59336 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iNygL-0000AF-CN
-	for qemu-devel@archiver.kernel.org; Fri, 25 Oct 2019 08:27:05 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50390)
+	id 1iNyhq-00076s-2O
+	for qemu-devel@archiver.kernel.org; Fri, 25 Oct 2019 08:28:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50512)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jfreimann@redhat.com>) id 1iNyZX-0003Nh-CF
- for qemu-devel@nongnu.org; Fri, 25 Oct 2019 08:20:04 -0400
+ (envelope-from <jfreimann@redhat.com>) id 1iNyaK-0004wf-Ol
+ for qemu-devel@nongnu.org; Fri, 25 Oct 2019 08:20:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jfreimann@redhat.com>) id 1iNyZW-0006wt-9k
- for qemu-devel@nongnu.org; Fri, 25 Oct 2019 08:20:03 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:36086
+ (envelope-from <jfreimann@redhat.com>) id 1iNyaI-0007DV-OI
+ for qemu-devel@nongnu.org; Fri, 25 Oct 2019 08:20:52 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:47493
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <jfreimann@redhat.com>)
- id 1iNyZW-0006wl-5p
- for qemu-devel@nongnu.org; Fri, 25 Oct 2019 08:20:02 -0400
+ id 1iNyaE-0007BZ-TX
+ for qemu-devel@nongnu.org; Fri, 25 Oct 2019 08:20:48 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1572006001;
+ s=mimecast20190719; t=1572006046;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=1qMFj7DBSODc4wMfQ4Pl3ZeBm7YFbHsJPiOBzst7Mus=;
- b=cRj26TvLy2K53+p1GiaPcIfW9nTNLgVXDsOVodbKkYmta/5XaEoUndYvlVIU9HSLrvaLKS
- s2hGq7Tn4wgb5ehUN96FIvRCFBkJvKwYF2cYqsh7PHn1USj5DvEKQWJYLMm8C/qLo18lFy
- 8GjAGI3tCVBQl0Y68VYxnVhLvrF9YDE=
+ bh=6EMVhICFpOCOpytbZ126I034BRLFkaCnCXMg82NWcow=;
+ b=JdyHreWfPhnPG9cmcoDqifAXRk8SOcujmSiK1bqxnMn3f0q6y2icPQ++9hpAf6l/i2YUbJ
+ cIyFHNHyRUd1elImHszOMNfBuHCbg9RUqYhtQX7k8g4SegkVBAGhVJSDZigSPhBIdST7R3
+ 52NlldL9iWtptngVUfORGHV21rWCfSM=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-172-FSojo_avMSq-E6pRVqzclw-1; Fri, 25 Oct 2019 08:19:57 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ us-mta-158-QSV2p3ZMN1m3VUc2JsthXQ-1; Fri, 25 Oct 2019 08:20:45 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EB7BB801E5F;
- Fri, 25 Oct 2019 12:19:56 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 07D3C1800E00;
+ Fri, 25 Oct 2019 12:20:44 +0000 (UTC)
 Received: from localhost (ovpn-117-235.ams2.redhat.com [10.36.117.235])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 94AC75DAAF;
- Fri, 25 Oct 2019 12:19:51 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 8456B600CD;
+ Fri, 25 Oct 2019 12:20:35 +0000 (UTC)
 From: Jens Freimann <jfreimann@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v6 03/11] pci: mark devices partially unplugged
-Date: Fri, 25 Oct 2019 14:19:22 +0200
-Message-Id: <20191025121930.6855-4-jfreimann@redhat.com>
+Subject: [PATCH v6 07/11] migration: allow unplug during migration for
+ failover devices
+Date: Fri, 25 Oct 2019 14:19:26 +0200
+Message-Id: <20191025121930.6855-8-jfreimann@redhat.com>
 In-Reply-To: <20191025121930.6855-1-jfreimann@redhat.com>
 References: <20191025121930.6855-1-jfreimann@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-MC-Unique: FSojo_avMSq-E6pRVqzclw-1
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-MC-Unique: QSV2p3ZMN1m3VUc2JsthXQ-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=WINDOWS-1252
 Content-Transfer-Encoding: quoted-printable
@@ -93,45 +94,75 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Only the guest unplug request was triggered. This is needed for
-the failover feature. In case of a failed migration we need to
-plug the device back to the guest.
+In "b06424de62 migration: Disable hotplug/unplug during migration" we
+added a check to disable unplug for all devices until we have figured
+out what works. For failover primary devices qdev_unplug() is called
+from the migration handler, i.e. during migration.
+
+This patch adds a flag to DeviceState which is set to false for all
+devices and makes an exception for PCI devices that are also
+primary devices in a failover pair.
 
 Signed-off-by: Jens Freimann <jfreimann@redhat.com>
 Acked-by: Cornelia Huck <cohuck@redhat.com>
 ---
- hw/pci/pcie.c        | 3 +++
- include/hw/pci/pci.h | 1 +
- 2 files changed, 4 insertions(+)
+ hw/core/qdev.c         | 1 +
+ hw/pci/pci.c           | 1 +
+ include/hw/qdev-core.h | 1 +
+ qdev-monitor.c         | 2 +-
+ 4 files changed, 4 insertions(+), 1 deletion(-)
 
-diff --git a/hw/pci/pcie.c b/hw/pci/pcie.c
-index a6beb567bd..19363ff8ce 100644
---- a/hw/pci/pcie.c
-+++ b/hw/pci/pcie.c
-@@ -456,6 +456,9 @@ static void pcie_unplug_device(PCIBus *bus, PCIDevice *=
-dev, void *opaque)
- {
-     HotplugHandler *hotplug_ctrl =3D qdev_get_hotplug_handler(DEVICE(dev))=
-;
+diff --git a/hw/core/qdev.c b/hw/core/qdev.c
+index 3b8d43d0fd..cf1ba28fe3 100644
+--- a/hw/core/qdev.c
++++ b/hw/core/qdev.c
+@@ -996,6 +996,7 @@ static void device_initfn(Object *obj)
 =20
-+    if (dev->partially_hotplugged) {
-+        return;
-+    }
-     hotplug_handler_unplug(hotplug_ctrl, DEVICE(dev), &error_abort);
-     object_unparent(OBJECT(dev));
- }
-diff --git a/include/hw/pci/pci.h b/include/hw/pci/pci.h
-index 69d1f0228b..db75c6dfd0 100644
---- a/include/hw/pci/pci.h
-+++ b/include/hw/pci/pci.h
-@@ -265,6 +265,7 @@ typedef struct PCIReqIDCache PCIReqIDCache;
+     dev->instance_id_alias =3D -1;
+     dev->realized =3D false;
++    dev->allow_unplug_during_migration =3D false;
 =20
- struct PCIDevice {
-     DeviceState qdev;
-+    bool partially_hotplugged;
+     object_property_add_bool(obj, "realized",
+                              device_get_realized, device_set_realized, NUL=
+L);
+diff --git a/hw/pci/pci.c b/hw/pci/pci.c
+index 824ab4ed7b..c68498c0de 100644
+--- a/hw/pci/pci.c
++++ b/hw/pci/pci.c
+@@ -2130,6 +2130,7 @@ static void pci_qdev_realize(DeviceState *qdev, Error=
+ **errp)
+             pci_qdev_unrealize(DEVICE(pci_dev), NULL);
+             return;
+         }
++        qdev->allow_unplug_during_migration =3D true;
+     }
 =20
-     /* PCI config space */
-     uint8_t *config;
+     /* rom loading */
+diff --git a/include/hw/qdev-core.h b/include/hw/qdev-core.h
+index 710981af36..1518495b1e 100644
+--- a/include/hw/qdev-core.h
++++ b/include/hw/qdev-core.h
+@@ -156,6 +156,7 @@ struct DeviceState {
+     bool pending_deleted_event;
+     QemuOpts *opts;
+     int hotplugged;
++    bool allow_unplug_during_migration;
+     BusState *parent_bus;
+     QLIST_HEAD(, NamedGPIOList) gpios;
+     QLIST_HEAD(, BusState) child_bus;
+diff --git a/qdev-monitor.c b/qdev-monitor.c
+index ffa08c670f..e6b112eb0a 100644
+--- a/qdev-monitor.c
++++ b/qdev-monitor.c
+@@ -851,7 +851,7 @@ void qdev_unplug(DeviceState *dev, Error **errp)
+         return;
+     }
+=20
+-    if (!migration_is_idle()) {
++    if (!migration_is_idle() && !dev->allow_unplug_during_migration) {
+         error_setg(errp, "device_del not allowed while migrating");
+         return;
+     }
 --=20
 2.21.0
 
