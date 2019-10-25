@@ -2,64 +2,75 @@ Return-Path: <SRS0=bySr=YS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4246ECA9EA0
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 19:18:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 55C14CA9EA0
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 19:22:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 144E820679
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 19:18:32 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 144E820679
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=keithp.com
+	by mail.kernel.org (Postfix) with ESMTPS id 1C6D2205F4
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 19:22:01 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dvgqPS+A"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1C6D2205F4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35308 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35334 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iO56U-000098-Du
-	for qemu-devel@archiver.kernel.org; Fri, 25 Oct 2019 15:18:30 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55561)
+	id 1iO59q-0008RD-UO
+	for qemu-devel@archiver.kernel.org; Fri, 25 Oct 2019 15:21:58 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55795)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <keithp@keithp.com>) id 1iO53u-0003l2-Db
- for qemu-devel@nongnu.org; Fri, 25 Oct 2019 15:15:51 -0400
+ (envelope-from <stefanha@redhat.com>) id 1iO56x-0002yW-N6
+ for qemu-devel@nongnu.org; Fri, 25 Oct 2019 15:19:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <keithp@keithp.com>) id 1iO53t-0002hy-4r
- for qemu-devel@nongnu.org; Fri, 25 Oct 2019 15:15:50 -0400
-Received: from home.keithp.com ([63.227.221.253]:45460 helo=elaine.keithp.com)
+ (envelope-from <stefanha@redhat.com>) id 1iO56s-0003vA-8T
+ for qemu-devel@nongnu.org; Fri, 25 Oct 2019 15:18:59 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:41419
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <keithp@keithp.com>) id 1iO53s-0002gA-Ux
- for qemu-devel@nongnu.org; Fri, 25 Oct 2019 15:15:49 -0400
-Received: from localhost (localhost [127.0.0.1])
- by elaine.keithp.com (Postfix) with ESMTP id C4F0D3F22EBE;
- Fri, 25 Oct 2019 12:15:46 -0700 (PDT)
-X-Virus-Scanned: Debian amavisd-new at keithp.com
-Received: from elaine.keithp.com ([127.0.0.1])
- by localhost (elaine.keithp.com [127.0.0.1]) (amavisd-new, port 10024)
- with LMTP id e0TfT_6YBjXi; Fri, 25 Oct 2019 12:15:46 -0700 (PDT)
-Received: from keithp.com (c-73-35-169-234.hsd1.wa.comcast.net [73.35.169.234])
- by elaine.keithp.com (Postfix) with ESMTPSA id 5F5533F22EAC;
- Fri, 25 Oct 2019 12:15:46 -0700 (PDT)
-Received: by keithp.com (Postfix, from userid 1000)
- id CD7CB158212D; Fri, 25 Oct 2019 12:15:45 -0700 (PDT)
-From: "Keith Packard" <keithp@keithp.com>
-To: Peter Maydell <peter.maydell@linaro.org>
-Subject: Re: [PATCH] Semihost SYS_READC implementation (v4)
-In-Reply-To: <CAFEAcA-g+RkvYjseDE=1Z=gnLum0Cjvn_7bqB3ti+cBq9UZ3Eg@mail.gmail.com>
-References: <89ada4b1-ee3d-a512-07c2-9bc1ba5806da@redhat.com>
- <20191024224622.12371-1-keithp@keithp.com> <8736fhm9tw.fsf@linaro.org>
- <87pnik4w9n.fsf@keithp.com>
- <CAFEAcA-g+RkvYjseDE=1Z=gnLum0Cjvn_7bqB3ti+cBq9UZ3Eg@mail.gmail.com>
-Date: Fri, 25 Oct 2019 12:15:45 -0700
-Message-ID: <87mudo4owu.fsf@keithp.com>
+ (Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1iO56s-0003ur-02
+ for qemu-devel@nongnu.org; Fri, 25 Oct 2019 15:18:54 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1572031133;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=EGm4IB7QsZrRpoJhJBu4SNax9LQtjAoS4p7d+8vKPgs=;
+ b=dvgqPS+AOmrbymaGLPwfD1+Avh1pJ+wtmE/yCZemgh2hgckAESHepD3ECeNB6RSqytVxsM
+ 8L3/Mfr38xBs1YKTdKHUQ2DNg+hgR8RbaWj1i5tGhiJkzZpoWZG+rTUvIqD4EgwocHdgpr
+ jB7Q1tYK0w8JzSbHOpCtPRdwr9Jaa0M=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-209-31UhpQK0OdSgmqlzU1zVAw-1; Fri, 25 Oct 2019 15:18:47 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D7E12107AD31;
+ Fri, 25 Oct 2019 19:18:46 +0000 (UTC)
+Received: from localhost (ovpn-116-78.ams2.redhat.com [10.36.116.78])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 819E95C1B5;
+ Fri, 25 Oct 2019 19:18:41 +0000 (UTC)
+From: Stefan Hajnoczi <stefanha@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PULL 0/2] Block patches
+Date: Fri, 25 Oct 2019 21:18:37 +0200
+Message-Id: <20191025191839.1215-1-stefanha@redhat.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="=-=-=";
- micalg=pgp-sha256; protocol="application/pgp-signature"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-MC-Unique: 31UhpQK0OdSgmqlzU1zVAw-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=WINDOWS-1252
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 63.227.221.253
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -71,76 +82,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>,
- QEMU Developers <qemu-devel@nongnu.org>
+Cc: Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>,
+ qemu-block@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>,
+ Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
+ Fam Zheng <fam@euphon.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---=-=-=
-Content-Type: text/plain
-Content-Transfer-Encoding: quoted-printable
+The following changes since commit 58560ad254fbda71d4daa6622d71683190070ee2=
+:
 
-Peter Maydell <peter.maydell@linaro.org> writes:
+  Merge remote-tracking branch 'remotes/dgibson/tags/ppc-for-4.2-20191024' =
+into staging (2019-10-24 16:22:58 +0100)
 
-> Is there a specification for RISC-V semihosting? This is
-> likely to be my first question when the support comes
-> round for review, so you can have it early :-)  We'd
-> prefer to implement specified interfaces, not random
-> ad-hoc "this seems to be what newlib wants to see,
-> which is turn got hacked together by copying some other
-> architecture's code".
+are available in the Git repository at:
 
-There seems to be convergence on a pretty simple interface which uses
-ebreak surrounded by a couple of specific no-ops:
+  https://github.com/stefanha/qemu.git tags/block-pull-request
 
-      slli x0, x0, 0x1f
-      ebreak
-      srai x0, x0, 0x7
+for you to fetch changes up to d154ef37ff885918fa3e512fd7a8e42870291667:
 
-There are implementations in rust and openocd, and I've got one for
-picolibc. The risc-v semihosting code is sitting on a branch in my repo
-on github:
+  yield_until_fd_readable: make it work with any AioContect (2019-10-25 14:=
+38:29 +0200)
 
-        https://github.com/keith-packard/qemu/tree/riscv-semihost
+----------------------------------------------------------------
+Pull request
 
-> (describing a mechanism to avoid stopping the emulator)
-> This feels to me like it's a bit overcomplicated unless it turns out
-> we actually require it though.
+----------------------------------------------------------------
 
-Would also be nice for multi-core setups. I'd like to start with the
-simple plan for now.
+Dietmar Maurer (1):
+  yield_until_fd_readable: make it work with any AioContect
 
-> Isn't the answer to this "don't use a command line that tries
-> to connect stdio to multiple things" ?
+Julia Suvorova (1):
+  virtio-blk: Add blk_drain() to virtio_blk_device_unrealize()
 
-Uh, we do that all the time? The mux device is designed to handle this
-so that you can use stdio for both monitor commands and application
-I/O. It's very convenient, the only issue is that the last device that
-hooks to the mux ends up getting input first (you use ^Ac to rotate
-among the selected devices).
+ hw/block/virtio-blk.c    | 1 +
+ util/qemu-coroutine-io.c | 7 +++++--
+ 2 files changed, 6 insertions(+), 2 deletions(-)
 
-=2D-=20
-=2Dkeith
+--=20
+2.21.0
 
---=-=-=
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEw4O3eCVWE9/bQJ2R2yIaaQAAABEFAl2zSeEACgkQ2yIaaQAA
-ABHczg/+MEA9igCCLng4b6efXd/OZ9XMWgHRGWJ/AdQ4A3T0DWWACqk7CKc4DQBL
-GtRIoZLXAEEFkVbL35vovHaMa5jwo1vS7YnEBXOxIG2fzEUONdVVIgEFLe2hCqBW
-cSmoveGztyUyzoIjyBRHCRoT2M5UU+laHCeelA+lObhjzuPbCuBJscW2itODBZUG
-7+hASJWj2wngKdmxjoGwlWolAIMhNCkTyQzDVqvgeBOQGXugkZ/f6+2heWC2+ZAe
-73/5nQJ0i1s6H8cMLHCsSI0kpVf0mZYN1fkRTf1Sh4KO/Gt9Hk0J6wYlUD5wGjsN
-wyDI9MPgdF+utDG3orIN5jhyArj0PYWmza51r7/EtTN8srnuynt2etWmRHYkIJof
-cqJ/FWy2SzswNTLZqXv+7zvmcuGdm7jKloHRTs4Lzgiuc3qqAROnIPJYewTHcYLm
-DEGnzZjssCMfB62PTpN3LPQqZY+mJIczg9qqd6TriwgNMmaQ/8dSRYyHYDff/j/Y
-Q8KqjRgfszRFqqEliBW8a+nmjsdHbpxXrev+9vXiCLdrg5Cl+PYT0bW2pxEP393d
-FBAbN+ucoGoG5oVnEMk/h0TuwAYRL9IeqT16ONWrY5g5V6nl8pWX/Eh1s9QD3R/g
-lA77Q2xwmbqTmWVBO0nzIfxu1pvvzHCrnFrT8NQQXcz+eXqBIxo=
-=sRIS
------END PGP SIGNATURE-----
---=-=-=--
 
