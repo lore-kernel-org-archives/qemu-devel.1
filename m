@@ -2,91 +2,85 @@ Return-Path: <SRS0=bySr=YS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 31A9FCA9EA0
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 15:50:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 40887CA9EA0
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 15:54:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EEF64206DD
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 15:50:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0BAEF21D82
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 15:54:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Ky9Z457I"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EEF64206DD
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="B3WgXWSi"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0BAEF21D82
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34034 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34074 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iO1rY-00005Y-OG
-	for qemu-devel@archiver.kernel.org; Fri, 25 Oct 2019 11:50:52 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48569)
+	id 1iO1ub-0004mD-SR
+	for qemu-devel@archiver.kernel.org; Fri, 25 Oct 2019 11:54:01 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51303)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1iO0p0-0001Hf-RB
- for qemu-devel@nongnu.org; Fri, 25 Oct 2019 10:44:11 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1iO10n-00036Z-Nr
+ for qemu-devel@nongnu.org; Fri, 25 Oct 2019 10:56:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1iO0oz-0004Qh-Jp
- for qemu-devel@nongnu.org; Fri, 25 Oct 2019 10:44:10 -0400
-Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:37392)
+ (envelope-from <peter.maydell@linaro.org>) id 1iO10m-0001Lw-IM
+ for qemu-devel@nongnu.org; Fri, 25 Oct 2019 10:56:21 -0400
+Received: from mail-oi1-x242.google.com ([2607:f8b0:4864:20::242]:40446)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1iO0oz-0004QC-C2
- for qemu-devel@nongnu.org; Fri, 25 Oct 2019 10:44:09 -0400
-Received: by mail-wr1-x441.google.com with SMTP id e11so2648543wrv.4
- for <qemu-devel@nongnu.org>; Fri, 25 Oct 2019 07:44:09 -0700 (PDT)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1iO10m-0001LX-CM
+ for qemu-devel@nongnu.org; Fri, 25 Oct 2019 10:56:20 -0400
+Received: by mail-oi1-x242.google.com with SMTP id b25so1802817oib.7
+ for <qemu-devel@nongnu.org>; Fri, 25 Oct 2019 07:56:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=A4sciDHxO1W5JUOTQfMe9vaz1h3bb9xUJm4mUHbzCBQ=;
- b=Ky9Z457IYK3krRfzDuYAXpHPsGHGEeFBpcYm5LZSUnXuacmDCTXxMlVmo3tfFv+Sfq
- P2pvsjfCCN6VxBXwyftPLqE+0MBvymDKXKhjsBuurIPutRRDUMXOYg5X6waSbBkYhvnN
- lqz1ZNSh1yEawrDo1h0dBTbdR1CK/bk7feUkDe7JgtPXyQUV++fEs/1Q1OEmq1aoHxyi
- A+RzGq1cT9lNXa0585cwJYiWMGPmBU3sfu7ZDilYI0WMSID0hVRTSNIzwz1jQYk5ZCRa
- w+EgGU1lCWCeasqogeDeHkO5EQFp7EmC53AYq93Zdf4dG9lu4unwj93pGZoMwoJPOztA
- rc3Q==
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=OJl6vLLFY5BlX1urs2xZCKUVxnbmTzfPVAU83uOxRdM=;
+ b=B3WgXWSilvZ03j6JeHT9aOdQzUMYJseO5IQBY7Vi1WXbqYA4s8HXXfN3hSBBpyBZ0d
+ G4X7Lu4CYI6Gc8Qhm2JdeQ9gsv/UL1pQ2FvSa4uH22xjTUzRt54FvFWiX/mqyMCgr7Db
+ nVpXeMfxP8BnJnoGKzSEHNx5hmRh+RvTaradwKhA5rpBLCEB+DizaETCJ+RN/yhkeSLH
+ fACIX7ROaEv3EelaswqvYui9XN8sjbSy8nEBNbluVmdfYu2TCcIuRFwTl5DfVOLADGFV
+ t3mayPmuH1KuHXJ0kyoKJeRPKTmuuj0IEVA53HSJBTuF6QBLsUf5Jb5wBQ5OEpi5Cpfz
+ r+Rw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=A4sciDHxO1W5JUOTQfMe9vaz1h3bb9xUJm4mUHbzCBQ=;
- b=DFd8s12MeECY0pI7sArJ0BRG2n2KKE7CNSHxwR1Q9OE1PbIwysOplqb6XD6IGt5D2G
- D9YNd1Jl+dFBQITvR82uqAwouxmG2HqdtGHsnjponcNcgtKnVTOwlSftqbG8F+o2x5JB
- sC8SzmBn4883fXfuNUm5g0YnkQ5gQo4wRgmPQ1GR3wlNwkPYnXdd1/WVOWhasrSB7ils
- q8VgsIu2WDFdxOA8fCTJb/5F180fnftQPlxyZDAm+WXZX5dzijFMi8AKfqbuPyaYnmFW
- DhMI3xCUq30Vx+pdFlQOBva6/pOkGmRbrpSs7W9zCYwuZEvwLxlylWtoGCI/9jPdHvQi
- w4lQ==
-X-Gm-Message-State: APjAAAUHGD4SSIIR9fVdiKbWgqApFXkvCF5FKJ+TC76d4jjT7NK9qGSp
- NJZenzRqTgeY29vqiDdeJv5KsQ==
-X-Google-Smtp-Source: APXvYqx/YGpY08ohZJ4+vutLRNM4wEkxX1nxdPlFsT4DilGEZmNRBPF1/J9FVvVVmmonaSsVYa1hQw==
-X-Received: by 2002:a5d:4885:: with SMTP id g5mr3703480wrq.219.1572014647716; 
- Fri, 25 Oct 2019 07:44:07 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id z9sm2622944wrv.1.2019.10.25.07.44.07
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 25 Oct 2019 07:44:07 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 824441FF87;
- Fri, 25 Oct 2019 15:44:06 +0100 (BST)
-References: <20191023154505.30521-1-richard.henderson@linaro.org>
- <20191023154505.30521-6-richard.henderson@linaro.org>
-User-agent: mu4e 1.3.5; emacs 27.0.50
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: Richard Henderson <richard.henderson@linaro.org>
-Subject: Re: [PATCH v2 5/7] exec: Restrict TARGET_PAGE_BITS_VARY assert to
- CONFIG_DEBUG_TCG
-In-reply-to: <20191023154505.30521-6-richard.henderson@linaro.org>
-Date: Fri, 25 Oct 2019 15:44:06 +0100
-Message-ID: <87o8y4lwax.fsf@linaro.org>
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=OJl6vLLFY5BlX1urs2xZCKUVxnbmTzfPVAU83uOxRdM=;
+ b=e5p9iQJ3wJDQiL0kI52pDeGXnyEII8qEPsNkBsXUV7WEDGk4uDfiY3VOidQmi4mZ2F
+ do5zJyZYauCju0qh59cBVHcpJtPTF1O8bPiZDwrSlA+c4cPsxloowYpf+HAu9wwyNLyk
+ VafJ/tbC40PrZH1OZ3uEuMN7yESXlaFOL/X5seqX61Z2WDNWd1YnCyT/S2AA+jeI5Ml7
+ ZohZtg+oh9Bz/wgt/vhJEs63Mjjh/dhrIAHebA5U8INg6MSIKpF/GzRfMbg8ccMRIQ84
+ s5cc5GABe8hasMTuFpDaAbi0OCQgg4aUnZ14krrvzvz8HvuJ/v8rgurWZzHI8JR0WyTf
+ fdhQ==
+X-Gm-Message-State: APjAAAV4xYq3gx5dMnoxChrOZhaPfQEc8pu2k5udEW7DuWYeZLz2XxvQ
+ m5HCURYRImggkYfNsC8BsO5Q8YhiOieEOjwnPD8TGA==
+X-Google-Smtp-Source: APXvYqw/FPf5X20+hwW9g0vgZZV33imuf+44LxF0j3jWzZFreBxYi+6gjiHgQ3FPm0P04Clpz2HLPRliCO/7oPIz/X0=
+X-Received: by 2002:a05:6808:608:: with SMTP id
+ y8mr3307708oih.146.1572015379366; 
+ Fri, 25 Oct 2019 07:56:19 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+References: <20191025095849.25283-1-mreitz@redhat.com>
+ <CAFEAcA8Y8fGKC3DkdM+wkU5Oe6ACZMtvWjpry9qFgPJc5KYjdA@mail.gmail.com>
+ <19d50c64-c07a-3122-dea3-a5d97a2d35da@redhat.com>
+ <CAFEAcA-3nt69+fUCf4YysVqsWd3z8r1iuURPYAPWUdHcd41p_Q@mail.gmail.com>
+ <e77cacde-05ab-64c6-8f60-0222f096daf2@redhat.com>
+In-Reply-To: <e77cacde-05ab-64c6-8f60-0222f096daf2@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 25 Oct 2019 15:56:07 +0100
+Message-ID: <CAFEAcA_O35Yc=TJ1K4uk_n+hBzUondY1ttqv6xCNB6+yzwiv0g@mail.gmail.com>
+Subject: Re: [RFC 0/3] block/file-posix: Work around XFS bug
+To: Max Reitz <mreitz@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::441
+X-Received-From: 2607:f8b0:4864:20::242
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,47 +92,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: pbonzini@redhat.com, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>,
+ Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ Alberto Garcia <berto@igalia.com>, Qemu-block <qemu-block@nongnu.org>,
+ QEMU Developers <qemu-devel@nongnu.org>,
+ Anton Nefedov <anton.nefedov@virtuozzo.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-
-Richard Henderson <richard.henderson@linaro.org> writes:
-
-> This reduces the size of a release build by about 10k.
-> Noticably, within the tlb miss helpers.
+On Fri, 25 Oct 2019 at 15:21, Max Reitz <mreitz@redhat.com> wrote:
 >
-> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-> Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-
-Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-
-> ---
->  include/exec/cpu-all.h | 6 +++++-
->  1 file changed, 5 insertions(+), 1 deletion(-)
+> On 25.10.19 16:17, Peter Maydell wrote:
+> > On Fri, 25 Oct 2019 at 15:16, Max Reitz <mreitz@redhat.com> wrote:
+> >> I=E2=80=99ve created an RH BZ here:
+> >>
+> >> https://bugzilla.redhat.com/show_bug.cgi?id=3D1765547
+> >
+> > Currently "You are not authorized to access bug #1765547." for
+> > anonymous browsers, just fyi.
 >
-> diff --git a/include/exec/cpu-all.h b/include/exec/cpu-all.h
-> index 76515dc8d9..d3e4660d50 100644
-> --- a/include/exec/cpu-all.h
-> +++ b/include/exec/cpu-all.h
-> @@ -219,7 +219,11 @@ extern const TargetPageBits target_page;
->  #else
->  extern TargetPageBits target_page;
->  # endif
-> -#define TARGET_PAGE_BITS (assert(target_page.decided), target_page.bits)
-> +# ifdef CONFIG_DEBUG_TCG
-> +#  define TARGET_PAGE_BITS (assert(target_page.decided), target_page.bit=
-s)
-> +# else
-> +#  define TARGET_PAGE_BITS target_page.bits
-> +# endif
->  #else
->  #define TARGET_PAGE_BITS_MIN TARGET_PAGE_BITS
->  #endif
+> Err.  Oops.  That wasn=E2=80=99t my intention.  I hate that misfeature.
+>
+> Thanks for telling me, I fixed it. :-)
 
+Yeah, that's a really well written bug report, you definitely
+don't want to hide it away :-) Thanks for making it public.
 
---
-Alex Benn=C3=A9e
+-- PMM
 
