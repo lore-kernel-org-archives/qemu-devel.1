@@ -2,90 +2,90 @@ Return-Path: <SRS0=bySr=YS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E67DCA9EA0
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 20:58:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 05CFECA9EA0
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 20:58:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4598621872
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 20:58:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C09B421872
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 20:58:57 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="fihWnzUI"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4598621872
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="jA/Tqnf8"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C09B421872
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36158 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36162 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iO6f8-0000GR-Ki
-	for qemu-devel@archiver.kernel.org; Fri, 25 Oct 2019 16:58:24 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37758)
+	id 1iO6fg-0001ht-Eg
+	for qemu-devel@archiver.kernel.org; Fri, 25 Oct 2019 16:58:56 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36802)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1iO6cJ-0007Zy-IS
- for qemu-devel@nongnu.org; Fri, 25 Oct 2019 16:55:29 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1iO6Vg-0003EY-7n
+ for qemu-devel@nongnu.org; Fri, 25 Oct 2019 16:48:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1iO6cI-0002M9-Bd
- for qemu-devel@nongnu.org; Fri, 25 Oct 2019 16:55:27 -0400
-Received: from mail-yb1-xb41.google.com ([2607:f8b0:4864:20::b41]:40696)
+ (envelope-from <richard.henderson@linaro.org>) id 1iO6Ve-0007g3-Ur
+ for qemu-devel@nongnu.org; Fri, 25 Oct 2019 16:48:35 -0400
+Received: from mail-yb1-xb2d.google.com ([2607:f8b0:4864:20::b2d]:46230)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1iO6cI-0002LR-6Z
- for qemu-devel@nongnu.org; Fri, 25 Oct 2019 16:55:26 -0400
-Received: by mail-yb1-xb41.google.com with SMTP id d12so1455122ybn.7
- for <qemu-devel@nongnu.org>; Fri, 25 Oct 2019 13:55:25 -0700 (PDT)
+ id 1iO6Ve-0007fV-Px
+ for qemu-devel@nongnu.org; Fri, 25 Oct 2019 16:48:34 -0400
+Received: by mail-yb1-xb2d.google.com with SMTP id h202so1436603ybg.13
+ for <qemu-devel@nongnu.org>; Fri, 25 Oct 2019 13:48:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
  :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=F+cqaKV9NxF3xHqGha8zUZqlSPpzkiq6PFuMuKFS9wo=;
- b=fihWnzUIYMX8oJIry8N1uFX0Jxiuye3vhbuiO4gOMGiCB2GexPOetusPpF/amKaEI+
- CMOby8iFLTM/oRErmEuNkag1Niii6WGRF0ayJzsudbwEd5MSDMvTsuedf24AgVNDXRrg
- FAc+e+feghHAlv94StG/v833A/zn44s5JPUe2TZoBlV6R5C/vbgkrM+swYDuEWFmhWkb
- R/aT4qRwf3w2VyNue2CjwnDwGYIVSihfE5nrtHXMVyOddzMHU0QS9dsfE/vteQcB/S/M
- RDFjbGKvXSPWPYc6cogAOTzXVF4ZJMsVvfIhz+tp6A4iqtLV1KPSMJSvkpV1zxTi0zSd
- PVqw==
+ bh=5FfLgzkrijB5kaN0qmWruhWuxCjOqsZWoeMphZYvIqo=;
+ b=jA/Tqnf8CheDmbtS5JiLoiuZgB9fQNXJ9cDkASuC4dKq1cVChE7+y1X77n+q/UHeWk
+ uWi/7punIk4Itl/WjuiuPa8i32DzdkUQzHY3XWOgf8vnhiL5uiAejYY4Svje7IggLyNb
+ uwvFlarKUHb3s8X4to7TJofUy9aRokIoSL074552LJ+ySVvLCYxAVPPKEy1w1Y6AtvMK
+ n8mLwHFZ374DWmZKE3FN4PQz0DyTzterCdeBLaloyf+RVXwlKLMWHXkVsuAPWbaRLvsS
+ BSXREw0RNTgF6wPNW80ajZMB9S8k8UQvMxWAlGnwrsd8odv3/Rp5wEr2gURCfaa28K0f
+ ZrAw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
  :date:user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=F+cqaKV9NxF3xHqGha8zUZqlSPpzkiq6PFuMuKFS9wo=;
- b=kBGc0IFcYpRbPI0vmemK/5mjWMR+9+Fe9UT8xB/+Rw0Dab3A9ABFQytwVfcicd1/T4
- mp3w2YsrXZ7gUq4DAeENW5nZn2t6jMIXXGQybiMCfZmC5hMCnNzuliqklVrH7kso5SP8
- Mc3gJa1SAQGn8vJchsfrvFFXKP2joJovhWCihZv6xSnvCQwgAbU98QhaM2AB8z8vmopL
- p0ZqHjERwduCprMz8ynf98ye+FdfYKgiZmVvelr0WuK96h8EtUAFQkk/v2mUw7yVfLIy
- hldDJ1uW8JazXNm1ZMzYqOLeg474EZ8+3nC3aBimR9//K5tcpKTMudd/ch5I1zjWdtRU
- bFow==
-X-Gm-Message-State: APjAAAUnBlObmQEbPZ1onOJCjEdfnzlUrzNMJqUfVvolGEyJ+JEnAPTw
- 0IkvWEZ8+l1ZEIvgxC8ocQ4kpw==
-X-Google-Smtp-Source: APXvYqy/HLcLvEJdqE31hIG0Nw+2weZazF3AABU+9L1M3h+AQK0Z52RdatoiDHJtaZTIG8EeVj8FAA==
-X-Received: by 2002:a25:df4d:: with SMTP id w74mr5041984ybg.513.1572036924217; 
- Fri, 25 Oct 2019 13:55:24 -0700 (PDT)
+ bh=5FfLgzkrijB5kaN0qmWruhWuxCjOqsZWoeMphZYvIqo=;
+ b=By/AagUToaBt8aVci46glUExR0Z81IpY2z54+NhK4WQ7FjjuHO4C4CQLVIykxvydwF
+ FxyAp0HhkCEHJJuvDjTlbJ0hNrdBaTzACvdsSklf8n5flUJ23/jFZpH/nQUJZLgEO9iy
+ /S7cxm7W+HT8Qz73RQt8ZEPk5HWhAanitEdC7JOe48HpmUCbn6zHj6GNpEDSi66igrJH
+ 1RI+oizOWTcCVJx0Oa06OewqguGvIpkheUpjv/O8exQN7ndPHQLWSFs7ZZ5wYIs2JzWW
+ QzbkHPt+9EBmd+qPAVZrD0u9sMwJsT4L5K34EwvKxqvDGuk45R+K9hRyavSyPgTbQd3x
+ ixbQ==
+X-Gm-Message-State: APjAAAXcZQYVQf1Tk7uJh6HyVfms+OzANc0ELwKPik9bNx6qRJ6n34/Q
+ 015RqE8u/xLyAFovD0NYPuyVxBqoTzo=
+X-Google-Smtp-Source: APXvYqz4pd8COPemarAXB8+vv3Pxiyb6LpL85OtlFrBtGDnwYAD5/KbUUVYYY11taUpKum9sU4buLA==
+X-Received: by 2002:a25:414f:: with SMTP id o76mr4507402yba.401.1572036512100; 
+ Fri, 25 Oct 2019 13:48:32 -0700 (PDT)
 Received: from [172.20.40.202] ([206.121.8.178])
- by smtp.gmail.com with ESMTPSA id q131sm1411218ywg.60.2019.10.25.13.55.20
+ by smtp.gmail.com with ESMTPSA id y142sm2391401ywy.80.2019.10.25.13.48.30
  (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Fri, 25 Oct 2019 13:55:23 -0700 (PDT)
-Subject: Re: [PATCH v2 0/4] tcg/LICENSE: Remove no-longer-true statement that
- TCG is BSD-licensed
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
-References: <20191025155848.17362-1-peter.maydell@linaro.org>
+ Fri, 25 Oct 2019 13:48:31 -0700 (PDT)
+Subject: Re: [PULL 00/12] tcg patch queue
+To: Peter Maydell <peter.maydell@linaro.org>
+References: <20191025142159.12459-1-richard.henderson@linaro.org>
+ <CAFEAcA_Wpn7uOs_GB5=ym+poSq=vVStp4EVPzaYoGGyEX90x2w@mail.gmail.com>
 From: Richard Henderson <richard.henderson@linaro.org>
 Openpgp: preference=signencrypt
-Message-ID: <10107792-8aef-533e-93ff-39c636eb4691@linaro.org>
-Date: Fri, 25 Oct 2019 16:55:16 -0400
+Message-ID: <24d8d3fc-6ff5-1293-8b20-f116a385177b@linaro.org>
+Date: Fri, 25 Oct 2019 16:48:26 -0400
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.9.0
 MIME-Version: 1.0
-In-Reply-To: <20191025155848.17362-1-peter.maydell@linaro.org>
+In-Reply-To: <CAFEAcA_Wpn7uOs_GB5=ym+poSq=vVStp4EVPzaYoGGyEX90x2w@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::b41
+X-Received-From: 2607:f8b0:4864:20::b2d
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,64 +97,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
- Claudio Fontana <claudio.fontana@gmail.com>,
- Ard Biesheuvel <ard.biesheuvel@linaro.org>, Laszlo Ersek <lersek@redhat.com>,
- Markus Armbruster <armbru@redhat.com>, Alexander Graf <agraf@csgraf.de>,
- Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 10/25/19 11:58 AM, Peter Maydell wrote:
-> Since 2008 the tcg/LICENSE file has not changed: it claims that
-> everything under tcg/ is BSD-licensed.
-> 
-> This is not true and hasn't been true for years: in 2013 we
-> accepted the tcg/aarch64 target code under a GPLv2-or-later
-> license statement. We also have generic vector optimisation
-> code under the LGPL2.1-or-later, and the TCI backend is
-> GPLv2-or-later. Further, many of the files are not BSD
-> licensed but MIT licensed.
-> 
-> We don't really consider the tcg subdirectory to be a distinct
-> part of QEMU anyway.
-> 
-> This patchset adds explicit licensing/copyright comments to
-> the three files which were missing them, removes the
-> inaccurate tcg/LICENSE file, and updates the top-level
-> LICENSE file to be more accurate about the current state
-> of the licenses used in the code in tcg/.
-> 
-> If we want a policy that tcg/ code has a restricted
-> permitted set of licenses, then we really need to have
-> this enforced by checkpatch -- history demonstrates that
-> just writing it in tcg/LICENSE does not prevent code under
-> other licenses getting in. In the v1 email thread nobody
-> seemed to be very strongly arguing for this, though, and
-> at this point we would need to make an active effort to
-> track down contributors and get relicensing statements.
-> If anybody wants to push that effort now would be a good
-> time to volunteer :-)
-> 
-> Note on the licensing for the tcg-target.opc.h files:
->  * I've used the same license as the rest of the relevant
->    backend, which is to say GPL2-or-later for tcg/aarch64
->    and MIT for tcg/i386 and tcg/ppc.
->  * In all 3 cases, the only people who've made contributions
->    to the files are Richard Henderson and (for aarch64) Alex Bennée
-> 
-> Richard, Alex -- an acked-by for the relevant patches would
-> be nice (or if you intended a different license for the
-> contributions than I have assumed please say so!)
+On 10/25/19 12:12 PM, Peter Maydell wrote:
+> Compile failure, win32:
+...
+> /usr/lib/mxe/usr/x86_64-w64-mingw32.shared/include/glib-2.0/glib/gmacros.h:337:23:
+> error: expected expression befor
+> e 'do'
+>  #define G_STMT_START  do
+>                        ^
+> /usr/lib/mxe/usr/x86_64-w64-mingw32.shared/include/glib-2.0/glib/gtestutils.h:115:41:
+> note: in expansion of macro 'G_STMT_START'
+>  #define g_assert(expr)                  G_STMT_START { \
+>                                          ^
+> /home/petmay01/qemu-for-merges/include/qemu/osdep.h:152:20: note: in
+> expansion of macro 'g_assert'
+>  #define assert(x)  g_assert(x)
 
-No, I had no intention to put things under a different license.
+Ho hum.   This...
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+>                     ^
+> /home/petmay01/qemu-for-merges/include/exec/cpu-all.h:225:29: note: in
+> expansion of macro 'assert'
+>  #  define TARGET_PAGE_MASK (assert(target_page.decided), target_page.mask)
 
-for the lot.  Since I'm having to re-spin the last tcg pull for a win32
-failure, I'll include this as well.
+... must be the reason why we used to use ({ ... }) here.
+
+Why oh why does g_assert use a do/while(0) statement instead of use an
+expression like the C assert is required to do?
+
+> Also
+> /home/petmay01/qemu-for-merges/exec.c: In function 'iotlb_to_section':
+> /home/petmay01/qemu-for-merges/exec.c:2871:1: error: control reaches
+> end of non-void function [-Werror=return-type]
+>  }
+...
+> Not sure if that's just follow-on errors from the earlier
+> ones, though.
+
+These are all follow-on, as you say.
 
 
 r~
