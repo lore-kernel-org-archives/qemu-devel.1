@@ -2,88 +2,90 @@ Return-Path: <SRS0=bySr=YS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 171EECA9EA0
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 14:49:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CAD6ACA9EA0
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 14:49:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D6F3A21929
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 14:49:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9538721929
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 14:49:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Yx0FCQUm"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D6F3A21929
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="YX0a/yzE"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9538721929
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33168 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33174 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iO0tp-0007QZ-Ar
-	for qemu-devel@archiver.kernel.org; Fri, 25 Oct 2019 10:49:09 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44426)
+	id 1iO0u1-0007fE-3h
+	for qemu-devel@archiver.kernel.org; Fri, 25 Oct 2019 10:49:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45693)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1iO0Tr-0005Hs-0I
- for qemu-devel@nongnu.org; Fri, 25 Oct 2019 10:22:19 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1iO0ZW-0008Rx-9l
+ for qemu-devel@nongnu.org; Fri, 25 Oct 2019 10:28:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1iO0To-0001hr-Sf
- for qemu-devel@nongnu.org; Fri, 25 Oct 2019 10:22:17 -0400
-Received: from mail-qk1-x742.google.com ([2607:f8b0:4864:20::742]:36391)
+ (envelope-from <alex.bennee@linaro.org>) id 1iO0ZU-0004tn-Nd
+ for qemu-devel@nongnu.org; Fri, 25 Oct 2019 10:28:10 -0400
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:35910)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1iO0To-0001hd-Ou
- for qemu-devel@nongnu.org; Fri, 25 Oct 2019 10:22:16 -0400
-Received: by mail-qk1-x742.google.com with SMTP id y189so1914231qkc.3
- for <qemu-devel@nongnu.org>; Fri, 25 Oct 2019 07:22:16 -0700 (PDT)
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1iO0ZU-0004tE-Gh
+ for qemu-devel@nongnu.org; Fri, 25 Oct 2019 10:28:08 -0400
+Received: by mail-wr1-x443.google.com with SMTP id w18so2594587wrt.3
+ for <qemu-devel@nongnu.org>; Fri, 25 Oct 2019 07:28:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=Q9PA/XGaFb/7jgxWdyktquMDL4GhIzWDsxOacBvv2es=;
- b=Yx0FCQUmjnlC/9wLCFC/AqUil0d6MtaJ466kwyh+3F6W2HvrXAozjn/R9frjenq6m4
- o0h9eArCsFvGLrlGiikTT19M8drjyNC1edKt+qKufB2qgP5iWAGvVdpzPE6+ZTrzqu8r
- F5tRcYhN1K6Kn0nr1ML8eaVAU+VAev21XFk/2CQRNr8IaRdOojopO5tIi5XEWr1M5Nxp
- BY1TZ/9pcaYFXzrzNCB4rw4DbBrnmIkpcM6co5OkQic7VLPnGCUAFCiSXvsc7taFce2F
- KUmcpnFC6Ud9p2cdOnDIlRXJjZKwifAAM7fHIWpP03AYFpjZJDpDBE5SabcciJtWjgEp
- nKoQ==
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=8mFYXdDx7Xf3uxp1Z1U9W4yhEc7cqg6Q2FpuwkjWvfs=;
+ b=YX0a/yzEUH1xvx7j7lfIfDgBLEdtwXYAHVjEXcJcw/uLUbTwiloOOnu4tvVo503w7s
+ 1a9vJfOkeyWa8YSSY+uZDW+Xthy4c0JeehZ4eQBM77A1ugUcmDp8It1hcuKmD8HOT8vP
+ I4b9jQJ88eoLMPNjJgM6H4r+vW39Gz6bBhyOfQ0UGbJthmrwRspPgHYiiWY8J3OF6fxz
+ OBE3K7u+Q4924XHXWqxsOfDvsXQL84781FMFS8eFFcCrmcis/QPTrLARUYGFiO3nnR9g
+ LBaWmIE9btztczOV453DsEBSeUZP7fm+u58ytg9o5N/mZMNUc0LzmPftiEgg7k7rpVvO
+ DVnw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=Q9PA/XGaFb/7jgxWdyktquMDL4GhIzWDsxOacBvv2es=;
- b=DW2hzuL7Dhttb4dXob3LERicuh2H2vOaVYpazUid+AL/Ma9A9u6Nnpl+HM3fvSYBrd
- 3JGjEDoUBfSxNHWB8W7K1M09Rx5s/oCr95ggd0+9cCLhgiU47iDvQ5Ds8G6TQnPzoiBz
- RHhfRc3u1xfACKZEmmYhgGV7LgfU2H6PZoCseJnxI4yrQ01qTg9uc98urwXv24gWzXvk
- 7LycfhwnX4FTs/apU026WCaoryyjsXjb0u/bzkQLfwubUlQrtBZjAODpivhUI4E+M6pp
- ics0XijGXeGo2fkERzEVlBP3OqfTIv2wxA/lWwTVow9CpFFEvu1vsebGULO/pGnwk+Tm
- qiJA==
-X-Gm-Message-State: APjAAAWqopZCY08E1F57vkpHcfVA/NPdMbzh5lm5h4Gi8XEqQGyZouyo
- kv+lnNGwjUGKmIFoIkNE6IH3J5v0N1c=
-X-Google-Smtp-Source: APXvYqws88YWxyBGLMZte4YCw7NNcZMhe9S478cfJn6qCSNFc1Dzop9UQjJhOR7Lui/gIhEKm9qVyg==
-X-Received: by 2002:a05:620a:1321:: with SMTP id
- p1mr3093122qkj.272.1572013335810; 
- Fri, 25 Oct 2019 07:22:15 -0700 (PDT)
-Received: from localhost.localdomain (rrcs-172-254-253-50.nyc.biz.rr.com.
- [172.254.253.50])
- by smtp.gmail.com with ESMTPSA id q17sm1137050qtq.58.2019.10.25.07.22.14
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=8mFYXdDx7Xf3uxp1Z1U9W4yhEc7cqg6Q2FpuwkjWvfs=;
+ b=jIxnLmrbQqqYs0joX+fJVAL99g4uftZacvfW6L6Ub64a/AJViKcORbtNG3gdosWazQ
+ GyQWJnC9ObuIXtDPcFNZsfqxaTRMTXJG2wk+LO6sa/hfOS5duvE0MKjzWFY5SQO6MfwN
+ KUSx5IUD1ZNKcyp4OcdGIgcEHjULX2PBXxhlaJ619DtnxDbfXGbr8uAGM/fP9mUhtlFm
+ HmNAEz0ymUrtJpkV/3gtO+XyPhFrCLLzA5KEWgo73CxvJNQy4Lgs2gfWZTpx7EJpePBU
+ aoeQIJRZWoKb8CZVJFGpwBSImuLf+5iLTj/ujz2/SbV8PsO1HfKZm1GaiC1i1dDHCZRP
+ DOyw==
+X-Gm-Message-State: APjAAAXm1iuxoqIq9aQCNy9NCcp2ZvCxOJ6mAPMxlULsmWPcg/eEeyD5
+ zPdYQIrZH5T7hMV9Mnpuj9PuAg==
+X-Google-Smtp-Source: APXvYqzfC72FX7lwuTVZeWANxjIGczjyFmayqJSbGg8lDtfvlDxu7Cc/shwGYMmtvUybzi+4w+Ymrw==
+X-Received: by 2002:a5d:614a:: with SMTP id y10mr3251875wrt.164.1572013686809; 
+ Fri, 25 Oct 2019 07:28:06 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id i1sm2643608wmb.19.2019.10.25.07.28.05
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 25 Oct 2019 07:22:14 -0700 (PDT)
-From: Richard Henderson <richard.henderson@linaro.org>
-To: qemu-devel@nongnu.org
-Subject: [PULL 12/12] translate-all: Remove tb_alloc
-Date: Fri, 25 Oct 2019 10:21:59 -0400
-Message-Id: <20191025142159.12459-13-richard.henderson@linaro.org>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20191025142159.12459-1-richard.henderson@linaro.org>
-References: <20191025142159.12459-1-richard.henderson@linaro.org>
+ Fri, 25 Oct 2019 07:28:05 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 9B9C41FF87;
+ Fri, 25 Oct 2019 15:28:04 +0100 (BST)
+References: <20191023154505.30521-1-richard.henderson@linaro.org>
+ <20191023154505.30521-5-richard.henderson@linaro.org>
+User-agent: mu4e 1.3.5; emacs 27.0.50
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Richard Henderson <richard.henderson@linaro.org>
+Subject: Re: [PATCH v2 4/7] exec: Use const alias for TARGET_PAGE_BITS_VARY
+In-reply-to: <20191023154505.30521-5-richard.henderson@linaro.org>
+Date: Fri, 25 Oct 2019 15:28:04 +0100
+Message-ID: <87r230lx1n.fsf@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::742
+X-Received-From: 2a00:1450:4864:20::443
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -95,68 +97,158 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org
+Cc: pbonzini@redhat.com, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Since 2ac01d6dafab, this function does only two things: assert a
-lock is held, and call tcg_tb_alloc.  It is used exactly once,
-and its user has already done the assert.
 
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Reviewed-by: Clement Deschamps <clement.deschamps@greensocs.com>
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
----
- accel/tcg/translate-all.c | 20 ++------------------
- 1 file changed, 2 insertions(+), 18 deletions(-)
+Richard Henderson <richard.henderson@linaro.org> writes:
 
-diff --git a/accel/tcg/translate-all.c b/accel/tcg/translate-all.c
-index f9b7ba159d..ae063b53f9 100644
---- a/accel/tcg/translate-all.c
-+++ b/accel/tcg/translate-all.c
-@@ -1156,23 +1156,6 @@ void tcg_exec_init(unsigned long tb_size)
- #endif
- }
- 
--/*
-- * Allocate a new translation block. Flush the translation buffer if
-- * too many translation blocks or too much generated code.
-- */
--static TranslationBlock *tb_alloc(target_ulong pc)
--{
--    TranslationBlock *tb;
--
--    assert_memory_lock();
--
--    tb = tcg_tb_alloc(tcg_ctx);
--    if (unlikely(tb == NULL)) {
--        return NULL;
--    }
--    return tb;
--}
--
- /* call with @p->lock held */
- static inline void invalidate_page_bitmap(PageDesc *p)
- {
-@@ -1681,6 +1664,7 @@ TranslationBlock *tb_gen_code(CPUState *cpu,
-     TCGProfile *prof = &tcg_ctx->prof;
-     int64_t ti;
- #endif
-+
-     assert_memory_lock();
- 
-     phys_pc = get_page_addr_code(env, pc);
-@@ -1706,7 +1690,7 @@ TranslationBlock *tb_gen_code(CPUState *cpu,
-     }
- 
-  buffer_overflow:
--    tb = tb_alloc(pc);
-+    tb = tcg_tb_alloc(tcg_ctx);
-     if (unlikely(!tb)) {
-         /* flush must be done */
-         tb_flush(cpu);
--- 
-2.17.1
+> Using a variable that is declared "const" for this tells the
+> compiler that it may read the value once and assume that it
+> does not change across function calls.
+>
+> For target_page_size, this means we have only one assert per
+> function, and one read of the variable.
+>
+> This reduces the size of qemu-system-aarch64 by 8k.
+>
+> Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 
+Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+
+> ---
+> v2: Notice CONFIG_ATTRIBUTE_ALIAS, and work around Xcode 9 lossage.
+> ---
+>  include/exec/cpu-all.h | 14 +++++++---
+>  exec-vary.c            | 60 ++++++++++++++++++++++++++++++++++++------
+>  2 files changed, 62 insertions(+), 12 deletions(-)
+>
+> diff --git a/include/exec/cpu-all.h b/include/exec/cpu-all.h
+> index 255bb186ac..76515dc8d9 100644
+> --- a/include/exec/cpu-all.h
+> +++ b/include/exec/cpu-all.h
+> @@ -210,10 +210,16 @@ static inline void stl_phys_notdirty(AddressSpace *=
+as, hwaddr addr, uint32_t val
+>  /* page related stuff */
+>
+>  #ifdef TARGET_PAGE_BITS_VARY
+> -extern bool target_page_bits_decided;
+> -extern int target_page_bits;
+> -#define TARGET_PAGE_BITS ({ assert(target_page_bits_decided); \
+> -                            target_page_bits; })
+> +typedef struct {
+> +    bool decided;
+> +    int bits;
+> +} TargetPageBits;
+> +# if defined(CONFIG_ATTRIBUTE_ALIAS) || !defined(IN_EXEC_VARY)
+> +extern const TargetPageBits target_page;
+> +#else
+> +extern TargetPageBits target_page;
+> +# endif
+> +#define TARGET_PAGE_BITS (assert(target_page.decided), target_page.bits)
+>  #else
+>  #define TARGET_PAGE_BITS_MIN TARGET_PAGE_BITS
+>  #endif
+> diff --git a/exec-vary.c b/exec-vary.c
+> index 48c0ab306c..e0befd502a 100644
+> --- a/exec-vary.c
+> +++ b/exec-vary.c
+> @@ -19,11 +19,55 @@
+>
+>  #include "qemu/osdep.h"
+>  #include "qemu-common.h"
+> +
+> +#define IN_EXEC_VARY 1
+> +
+>  #include "exec/exec-all.h"
+>
+>  #ifdef TARGET_PAGE_BITS_VARY
+> -int target_page_bits;
+> -bool target_page_bits_decided;
+> +# ifdef CONFIG_ATTRIBUTE_ALIAS
+> +/*
+> + * We want to declare the "target_page" variable as const, which tells
+> + * the compiler that it can cache any value that it reads across calls.
+> + * This avoids multiple assertions and multiple reads within any one use=
+r.
+> + *
+> + * This works because we initialize the target_page data very early, in a
+> + * location far removed from the functions that require the final result=
+s.
+> + *
+> + * This also requires that we have a non-constant symbol by which we can
+> + * perform the actual initialization, and which forces the data to be
+> + * allocated within writable memory.  Thus "init_target_page", and we use
+> + * that symbol exclusively in the two functions that initialize this val=
+ue.
+> + *
+> + * The "target_page" symbol is created as an alias of "init_target_page".
+> + */
+> +static TargetPageBits init_target_page;
+> +
+> +/*
+> + * Note that this is *not* a redundant decl, this is the definition of
+> + * the "target_page" symbol.  The syntax for this definition requires
+> + * the use of the extern keyword.  This seems to be a GCC bug in
+> + * either the syntax for the alias attribute or in -Wredundant-decls.
+> + *
+> + * See https://gcc.gnu.org/bugzilla/show_bug.cgi?id=3D91765
+> + */
+> +#  pragma GCC diagnostic push
+> +#  pragma GCC diagnostic ignored "-Wredundant-decls"
+> +
+> +extern const TargetPageBits target_page
+> +    __attribute__((alias("init_target_page")));
+> +
+> +#  pragma GCC diagnostic pop
+> +# else
+> +/*
+> + * When aliases are not supported then we force two different declaratio=
+ns,
+> + * by way of suppressing the header declaration with IN_EXEC_VARY.
+> + * We assume that on such an old compiler, LTO cannot be used, and so the
+> + * compiler cannot not detect the mismatched declarations, and all is we=
+ll.
+> + */
+> +TargetPageBits target_page;
+> +#  define init_target_page target_page
+> +# endif
+>  #endif
+>
+>  bool set_preferred_target_page_bits(int bits)
+> @@ -36,11 +80,11 @@ bool set_preferred_target_page_bits(int bits)
+>       */
+>  #ifdef TARGET_PAGE_BITS_VARY
+>      assert(bits >=3D TARGET_PAGE_BITS_MIN);
+> -    if (target_page_bits =3D=3D 0 || target_page_bits > bits) {
+> -        if (target_page_bits_decided) {
+> +    if (init_target_page.bits =3D=3D 0 || init_target_page.bits > bits) {
+> +        if (init_target_page.decided) {
+>              return false;
+>          }
+> -        target_page_bits =3D bits;
+> +        init_target_page.bits =3D bits;
+>      }
+>  #endif
+>      return true;
+> @@ -49,9 +93,9 @@ bool set_preferred_target_page_bits(int bits)
+>  void finalize_target_page_bits(void)
+>  {
+>  #ifdef TARGET_PAGE_BITS_VARY
+> -    if (target_page_bits =3D=3D 0) {
+> -        target_page_bits =3D TARGET_PAGE_BITS_MIN;
+> +    if (init_target_page.bits =3D=3D 0) {
+> +        init_target_page.bits =3D TARGET_PAGE_BITS_MIN;
+>      }
+> -    target_page_bits_decided =3D true;
+> +    init_target_page.decided =3D true;
+>  #endif
+>  }
+
+
+--
+Alex Benn=C3=A9e
 
