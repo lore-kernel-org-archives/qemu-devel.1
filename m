@@ -7,75 +7,75 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D78FBCA9EBC
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 06:43:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C1397CA9EA0
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 06:44:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A70292070B
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 06:43:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8D8942070B
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 06:44:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="gdwQ7JDc"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A70292070B
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="rWe0ZgTk"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8D8942070B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55856 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55860 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iNtKC-0000QF-GI
-	for qemu-devel@archiver.kernel.org; Fri, 25 Oct 2019 02:43:52 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35434)
+	id 1iNtKK-0000iu-16
+	for qemu-devel@archiver.kernel.org; Fri, 25 Oct 2019 02:44:00 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35344)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1iNtDv-000347-8P
- for qemu-devel@nongnu.org; Fri, 25 Oct 2019 02:37:24 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1iNtDr-0002sj-0Y
+ for qemu-devel@nongnu.org; Fri, 25 Oct 2019 02:37:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1iNtDu-0008Nt-8e
- for qemu-devel@nongnu.org; Fri, 25 Oct 2019 02:37:23 -0400
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:50775)
+ (envelope-from <alex.bennee@linaro.org>) id 1iNtDp-0008Lh-OC
+ for qemu-devel@nongnu.org; Fri, 25 Oct 2019 02:37:18 -0400
+Received: from mail-wm1-x32a.google.com ([2a00:1450:4864:20::32a]:36908)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1iNtDu-0008NU-2Q
- for qemu-devel@nongnu.org; Fri, 25 Oct 2019 02:37:22 -0400
-Received: by mail-wm1-x343.google.com with SMTP id 11so770392wmk.0
- for <qemu-devel@nongnu.org>; Thu, 24 Oct 2019 23:37:22 -0700 (PDT)
+ id 1iNtDp-0008LL-GW
+ for qemu-devel@nongnu.org; Fri, 25 Oct 2019 02:37:17 -0400
+Received: by mail-wm1-x32a.google.com with SMTP id q130so761429wme.2
+ for <qemu-devel@nongnu.org>; Thu, 24 Oct 2019 23:37:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=7lImME4yU8lQjHY3wQXqs44DBkoFK3uSqvZ6R7jQMW0=;
- b=gdwQ7JDcWrA0gpmlZx20c6JON2HQJ+vy1mn/tvvxbCuO0QfvZblL0ezEI/fbMZv6xI
- 2pOK3C6IqYZv8POQeR1ax/4kzYZ19IcuywSaqBqOwUz5uaFj+i26O2efRFBkOx1w7JCA
- lPgYhPVjYCzOqDMSrnqyLTpia9f0ufZyEjtaoJI4GljwaHWvrbQkczfb490Uw412EkYi
- PZGeyOFg4z1ILZ1lMBQg+NFcQvQtwDgHtANFMvG70szuYy8xdGKSpFU8z+ACeaUGkzKQ
- a8HUnfruIPgRl18eYe6JgJRgJyZDK2zEbTGKQtzbn6Kcjjm8Yi7KIULB1Tz/I1YDAPUK
- SW4w==
+ bh=5I5UoFas/oMecYMX9Nd86Bz4Y4H1FsmbDV1CnX/LR6E=;
+ b=rWe0ZgTkAlC8UfOmc3669+jDAnTAMhu92Nq9Ql6zv0px97u6z1Kc7pplBlWpukVzRB
+ ccxh0JxUV//cZPwen8Eykkp/gIhdPjv0Lpx0MxCMlg1FxRcTxFD16sXZs3uvgjIKIP9k
+ zd5LBoGH1VlobU5F1kezHIBs9kwbClyasfRDucJvWSfxn18blCdXL/02jv8iGo/yHBnL
+ DErmJFLBGO5OwJTZZAD7b9ASMVCnKMjrD1xX1mu98V7bXWkCtxqqTrm5pZSTs5APiX7h
+ sGmDoVqtFPLPaK4eU84VY3Iafobgnz4XSb+1T3jBVS1D2m0NL9gCoUPEhmRVu5Tzj10j
+ zIzg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=7lImME4yU8lQjHY3wQXqs44DBkoFK3uSqvZ6R7jQMW0=;
- b=J0KsjES6dqLLBDZi4SOZYCcXZ5Iwn9Al/QWfRBNUqzOgH99EGMmvtZ+9rPRtKz+n5y
- XUcyBGd8D8vBTMlCGVoNdpTIaO9grz1kNIrXSgbVRiYND6wMXkCDfRA0jvN1xBl9mzj9
- aMjoDHh4vFwTTX0wwZwzya8DS2w7wdl7Kl1T0+MDB79oFec86zvQ1VrTowj0WwxWbmT9
- sKcTp4kwIEwCFUj69XfX0W0MI9H0l7YRDO1UvTs+JPbDOVfEkNNmeuDyfUp77uXH4zqC
- eAIPQVAakwoVkq0BoRWbrZGL1Xepwa3RmWSqe9RrJw8hGtmy95OQ3Lx7f56N2N79DPCP
- 7aCA==
-X-Gm-Message-State: APjAAAXOCUQI8oXDIBbjWsCj4lj7+zxYw9vr5/6vLfH6JWBEJIFTpEB0
- o2wcB3H2dUThAvaSQItv8RZfdQ==
-X-Google-Smtp-Source: APXvYqy6RRGjhVPRbdD8Yg3iTcUCJhXpUPD70bzCN76QayXFNNmJ+4DRmHmLEcOpXD0UcDx0isXI5A==
-X-Received: by 2002:a1c:610b:: with SMTP id v11mr1823629wmb.156.1571985440911; 
- Thu, 24 Oct 2019 23:37:20 -0700 (PDT)
+ bh=5I5UoFas/oMecYMX9Nd86Bz4Y4H1FsmbDV1CnX/LR6E=;
+ b=c+KBZG3yL87DBJQsb21Fie2WjdFP7uUeVHSmaTNHDBb6rZZbIudnaWonyCk5aBx8Rg
+ lnYvVDlly5dI6EazdK4fTNAFSCPlJa+FaBzZE7ugAYRqyJBJNNcA1K7RWsYxyMvlPrOi
+ xf8j2MPq5SCRmjjEBE8nfoBmJ0c9KKUL3jXm5JmIoqZYPKj/ZFR+aIs4i28bplphzhvB
+ 2FfCHZgetilQ1lO2Dkf8ikK9THDqXnfHMUhLCHDJ89vS7o0hpDWEmp51zDG9bqcWylWX
+ yq5a/EqAwoKarUaWU90/XotP3Twe7KZaWngXIwL1U53hndjg7LKJPPwiCgFfKEMDR1jW
+ iiSg==
+X-Gm-Message-State: APjAAAXZtoBuQRhSGAcTiJuJkTOrcGmd728AhQyoLuWOTJNBfHPdnOM2
+ 7+Ei8kdsRjj1d5omEMt+8l0HbQ==
+X-Google-Smtp-Source: APXvYqyoDZNtgZVqxgNCpdWOIuCpZDIeNmXIYVykAOSIs/o5S6KrACTrUZ0MGY2tdnnmGHybRz+amw==
+X-Received: by 2002:a1c:398b:: with SMTP id g133mr1971190wma.130.1571985436029; 
+ Thu, 24 Oct 2019 23:37:16 -0700 (PDT)
 Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id f20sm1069070wmb.6.2019.10.24.23.37.17
+ by smtp.gmail.com with ESMTPSA id q14sm1445345wre.27.2019.10.24.23.37.14
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 24 Oct 2019 23:37:20 -0700 (PDT)
+ Thu, 24 Oct 2019 23:37:14 -0700 (PDT)
 Received: from zen.lan (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 9BE3B1FF9A;
- Fri, 25 Oct 2019 07:37:14 +0100 (BST)
+ by zen.linaroharston (Postfix) with ESMTP id CB5631FF8C;
+ Fri, 25 Oct 2019 07:37:13 +0100 (BST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: peter.maydell@linaro.org
-Subject: [PULL v2 10/73] tests/vm: Let subclasses disable IPv6
-Date: Fri, 25 Oct 2019 07:36:10 +0100
-Message-Id: <20191025063713.23374-11-alex.bennee@linaro.org>
+Subject: [PULL v2 01/73] travis.yml: reduce scope of the --enable-debug build
+Date: Fri, 25 Oct 2019 07:36:01 +0100
+Message-Id: <20191025063713.23374-2-alex.bennee@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20191025063713.23374-1-alex.bennee@linaro.org>
 References: <20191025063713.23374-1-alex.bennee@linaro.org>
@@ -84,7 +84,7 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::343
+X-Received-From: 2a00:1450:4864:20::32a
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,48 +96,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Thomas Huth <thuth@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>,
+Cc: Fam Zheng <fam@euphon.net>,
  =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Eduardo Habkost <ehabkost@redhat.com>
+Adding debug makes things run a bit slower so lets not hammer all the
+targets.
 
-The mechanism will be used to work around issues related to IPv6
-on the netbsd image builder.
-
-Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-Reviewed-by: Thomas Huth <thuth@redhat.com>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Message-Id: <20191018181705.17957-3-ehabkost@redhat.com>
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 
-diff --git a/tests/vm/basevm.py b/tests/vm/basevm.py
-index 4921e47f9f2..59bd1d31fbe 100755
---- a/tests/vm/basevm.py
-+++ b/tests/vm/basevm.py
-@@ -57,6 +57,8 @@ class BaseVM(object):
-     arch = "#arch"
-     # command to halt the guest, can be overridden by subclasses
-     poweroff = "poweroff"
-+    # enable IPv6 networking
-+    ipv6 = True
-     def __init__(self, debug=False, vcpus=None):
-         self._guest = None
-         self._tmpdir = os.path.realpath(tempfile.mkdtemp(prefix="vm-test-",
-@@ -81,7 +83,8 @@ class BaseVM(object):
-         self._args = [ \
-             "-nodefaults", "-m", "4G",
-             "-cpu", "max",
--            "-netdev", "user,id=vnet,hostfwd=:127.0.0.1:0-:22",
-+            "-netdev", "user,id=vnet,hostfwd=:127.0.0.1:0-:22" +
-+                       (",ipv6=no" if not self.ipv6 else ""),
-             "-device", "virtio-net-pci,netdev=vnet",
-             "-vnc", "127.0.0.1:0,to=20"]
-         if vcpus and vcpus > 1:
+diff --git a/.travis.yml b/.travis.yml
+index d0b9e099b9c..7d90b87540f 100644
+--- a/.travis.yml
++++ b/.travis.yml
+@@ -124,12 +124,13 @@ matrix:
+         - CACHE_NAME="${TRAVIS_BRANCH}-linux-gcc-default"
+ 
+ 
++    # --enable-debug implies --enable-debug-tcg, also runs quite a bit slower
+     - env:
+-        - CONFIG="--enable-debug --enable-debug-tcg --disable-user"
++        - CONFIG="--enable-debug --target-list=${MAIN_SOFTMMU_TARGETS}"
+         - CACHE_NAME="${TRAVIS_BRANCH}-linux-gcc-debug"
+ 
+ 
+-    # TCG debug can be run just on it's own and is mostly agnostic to user/softmmu distinctions
++    # TCG debug can be run just on its own and is mostly agnostic to user/softmmu distinctions
+     - env:
+         - CONFIG="--enable-debug-tcg --disable-system"
+         - CACHE_NAME="${TRAVIS_BRANCH}-linux-gcc-debug"
 -- 
 2.20.1
 
