@@ -7,72 +7,73 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D8C7CCA9EA0
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 16:03:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A5C9ECA9EA0
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 16:03:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A757221872
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 16:03:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 71D8021872
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 16:03:15 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="myGQuG/U"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A757221872
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="XcxZGkby"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 71D8021872
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34182 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34190 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iO23S-0007fN-HG
-	for qemu-devel@archiver.kernel.org; Fri, 25 Oct 2019 12:03:11 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33723)
+	id 1iO23W-0007oh-7V
+	for qemu-devel@archiver.kernel.org; Fri, 25 Oct 2019 12:03:14 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33769)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1iO1zM-0004Hf-74
- for qemu-devel@nongnu.org; Fri, 25 Oct 2019 11:58:58 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1iO1zQ-0004Rz-Nq
+ for qemu-devel@nongnu.org; Fri, 25 Oct 2019 11:59:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1iO1zL-0000jJ-5Q
- for qemu-devel@nongnu.org; Fri, 25 Oct 2019 11:58:56 -0400
-Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:36806)
+ (envelope-from <peter.maydell@linaro.org>) id 1iO1zP-0000ka-Ga
+ for qemu-devel@nongnu.org; Fri, 25 Oct 2019 11:59:00 -0400
+Received: from mail-wr1-x430.google.com ([2a00:1450:4864:20::430]:38830)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1iO1zK-0000j7-Vu
- for qemu-devel@nongnu.org; Fri, 25 Oct 2019 11:58:55 -0400
-Received: by mail-wr1-x441.google.com with SMTP id w18so2943749wrt.3
- for <qemu-devel@nongnu.org>; Fri, 25 Oct 2019 08:58:54 -0700 (PDT)
+ id 1iO1zP-0000kK-Ae
+ for qemu-devel@nongnu.org; Fri, 25 Oct 2019 11:58:59 -0400
+Received: by mail-wr1-x430.google.com with SMTP id v9so2931342wrq.5
+ for <qemu-devel@nongnu.org>; Fri, 25 Oct 2019 08:58:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=bVLJ7+GME2py4X5FmfdSBsVUYfInyOChkRTg8XJtJUM=;
- b=myGQuG/U0FzSiWVydhByhWndEPY7c65H2dvCKSl6albvpQqzKk2uJ6wQo1CXFVu8vN
- euxdUwckRyLzbrNgaZ2eqSSL+OueNnAJpyrhzza8fG5b/sAKTB/qheGkB2TO8inhuppH
- Nyu2FLFfbXz6sUnvskfuLM4vqxEH6s30c0nxZZtQAuQC8vfq+p6HytEt8PUqVUYx7rJ7
- rt9uHxhSDEEWbGSYjkP3mPH4AQ6Srl9NdtKWuBrSeHc0TcNUKgzIPwFGxx1JLChTHvMO
- RBxbU8K0lHwvu9O0V1c+yKsLZlevXHODi+vsORGqR3a49kRtpWjkSUipYurMWFbjeuVJ
- kg7w==
+ bh=3fRx+H1bDXh1gn+0aN28Y42f87avsW9PJGXXX9/ZiRU=;
+ b=XcxZGkbyFma0qczN/uOoCWPuVA5ArFc0vJLXVWYMCkYnOESORU6R4IwFHAiu13yJvw
+ /3IgMLXwDc5qZjpfmpmPQ56HEVFZCbG6g5cN+/l6D8l/kVzsuyZuGRwHFD43Hz4DkxHa
+ cQlugLAMmg0NBBedSKGIN7IQc3kQIkHmfge7P/WAQS2tT6G0SYk//0pSa/NtJTH8lwrn
+ fCFUaekszG8bbEkW7CxsL4SdcbMFao+63P2PuIZWsQ2x9sSvKZD7lyiJDibcQr3NOwk/
+ ajbsce6cTXpHzrYEdckjzCAXmOPMtpKUbDjMtXUnv2s6ZjCYfflRkpLeD2v60Iz51c0+
+ 18Qg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=bVLJ7+GME2py4X5FmfdSBsVUYfInyOChkRTg8XJtJUM=;
- b=jwMivss6XsgTD2CZWNqAzhKZzuooisEav3F81iwVigs32lTwXmdDR14x+lAqfa96fv
- dtf2lX2XByAMTRaCcHckmS7QNOUjiCO6TUKrf9qfZC/oh9fEbTPHz4l3WRgcpf3+G64P
- qJzWSiiKSk1oRRjXppZ0bZ3Eojoko6JejK/ozwNxWntIPw6gZhFSI7Er40qsf6uu3qPq
- YOzOWrh1gQ24S0kk24PnVvt+tBsu27HoImWygvB3ZGLHOHRwVAfB0cRcwzSZse8MrZYI
- lv5FL2NIaGm8qlrb/b+II8tS+3Ok6WqAakIh3l+mk4Y99mUoYPTfn9dJlErsimyxre2w
- dbHQ==
-X-Gm-Message-State: APjAAAWpuhR4LMte4b412siiKSv/E5IQxYpRmQK1Ojy1mDIsG5BoGiRC
- ZiKtR/mwOeBkU4F8NVTCvk1sS49D+dQ=
-X-Google-Smtp-Source: APXvYqwAMVD8dmGLc9CcqLRzhNfkEw3GPKKxmcFoYARz6f9MiAjWIiB8xqH7554eVO9pCv5HBq9mNQ==
-X-Received: by 2002:adf:f746:: with SMTP id z6mr3581648wrp.238.1572019133365; 
- Fri, 25 Oct 2019 08:58:53 -0700 (PDT)
+ bh=3fRx+H1bDXh1gn+0aN28Y42f87avsW9PJGXXX9/ZiRU=;
+ b=qS6mfMpVBPaCK6bl2xXm5V7cYDgiynClhuwE6d4Wkk921YmWU/RiJ/uZQ7XYlutSnY
+ yIXHdqyk66ICJxi7ZYb5ztSB4DICEpP5nZE3EwcwXYDCre6HbRxat9Sb1ooxShtKrmF7
+ By7Fi2LucUV58vE3dmWgSDgl4bfj1KK+c16UXqGQWZ2xI9KR5hujJc6NKi34KT1/zA2T
+ Y7HMODlYnijtCwpmdgiq77NWF4A46JIY/aasxnBGKAXzfWsB9P7J4CbY4Bu2oEe1dPXP
+ +VdaxrFnMio2YQBN21DmtN3jxX1uu7KHTPDl0Ugw8kzms6fBn+WorDSaCH3alhGKODYL
+ WZ1Q==
+X-Gm-Message-State: APjAAAV6mFPbtdzXKr6DoY2nY7S3nxKVKxcQq+I7+etyQ8WxHU3BncVJ
+ szZQPh6oGDvKMY1eoPvnzvHLjOQaYLI=
+X-Google-Smtp-Source: APXvYqyESEwWX9MQ5z5QJZdCzl8KWi6aOkiiboPLaxl9iSGt2Tbv+b8bYX6m2i/kr7fZopbxNRhq2g==
+X-Received: by 2002:a5d:4003:: with SMTP id n3mr3511723wrp.95.1572019138054;
+ Fri, 25 Oct 2019 08:58:58 -0700 (PDT)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id 65sm4218887wrs.9.2019.10.25.08.58.52
+ by smtp.gmail.com with ESMTPSA id 65sm4218887wrs.9.2019.10.25.08.58.56
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 25 Oct 2019 08:58:52 -0700 (PDT)
+ Fri, 25 Oct 2019 08:58:57 -0700 (PDT)
 From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 1/4] tcg/aarch64/tcg-target.opc.h: Add copyright/license
-Date: Fri, 25 Oct 2019 16:58:45 +0100
-Message-Id: <20191025155848.17362-2-peter.maydell@linaro.org>
+Subject: [PATCH v2 4/4] tcg/LICENSE: Remove out of date claim about TCG
+ subdirectory licensing
+Date: Fri, 25 Oct 2019 16:58:48 +0100
+Message-Id: <20191025155848.17362-5-peter.maydell@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20191025155848.17362-1-peter.maydell@linaro.org>
 References: <20191025155848.17362-1-peter.maydell@linaro.org>
@@ -80,7 +81,7 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::441
+X-Received-From: 2a00:1450:4864:20::430
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -103,39 +104,61 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Add the copyright/license boilerplate for target/aarch64/tcg-target.opc.h.
-This file has only had two commits: 14e4c1e2355473ccb29
-and 79525dfd08262d8, both by Linaro engineers.
-The license is GPL-2-or-later, since that's what the
-rest of tcg/aarch64 uses.
+Since 2008 the tcg/LICENSE file has not changed: it claims that
+everything under tcg/ is BSD-licensed.
+
+This is not true and hasn't been true for years: in 2013 we
+accepted the tcg/aarch64 target code under a GPLv2-or-later
+license statement. We also have generic vector optimisation
+code under the LGPL2.1-or-later, and the TCI backend is
+GPLv2-or-later. Further, many of the files are not BSD
+licensed but MIT licensed.
+
+We don't really consider the tcg subdirectory to be a distinct part
+of QEMU anyway.
+
+Remove the LICENSE file, since claiming false information
+about the license of the code is confusing.
+
+Update the main project LICENSE file also to be clearer about
+the licenses used by TCG.
 
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- tcg/aarch64/tcg-target.opc.h | 15 ++++++++++++---
- 1 file changed, 12 insertions(+), 3 deletions(-)
+Changes v1->v2: changed wording of new para 3 in
+top level LICENSE file, since I noticed that we actually
+have a lot of MIT-licensed code in tcg/ too.
+---
+ LICENSE     | 5 +++--
+ tcg/LICENSE | 3 ---
+ 2 files changed, 3 insertions(+), 5 deletions(-)
+ delete mode 100644 tcg/LICENSE
 
-diff --git a/tcg/aarch64/tcg-target.opc.h b/tcg/aarch64/tcg-target.opc.h
-index 59e1d3f7f7d..26bfd9c4609 100644
---- a/tcg/aarch64/tcg-target.opc.h
-+++ b/tcg/aarch64/tcg-target.opc.h
-@@ -1,5 +1,14 @@
--/* Target-specific opcodes for host vector expansion.  These will be
--   emitted by tcg_expand_vec_op.  For those familiar with GCC internals,
--   consider these to be UNSPEC with names.  */
-+/*
-+ * Copyright (c) 2019 Linaro
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or
-+ * (at your option) any later version.
-+ *
-+ * See the COPYING file in the top-level directory for details.
-+ *
-+ * Target-specific opcodes for host vector expansion.  These will be
-+ * emitted by tcg_expand_vec_op.  For those familiar with GCC internals,
-+ * consider these to be UNSPEC with names.
-+ */
+diff --git a/LICENSE b/LICENSE
+index 9389ba614f8..f19b018486a 100644
+--- a/LICENSE
++++ b/LICENSE
+@@ -18,8 +18,9 @@ As of July 2013, contributions under version 2 of the GNU General Public
+ License (and no later version) are only accepted for the following files
+ or directories: bsd-user/, linux-user/, hw/vfio/, hw/xen/xen_pt*.
  
- DEF(aa64_sshl_vec, 1, 2, 0, IMPLVEC)
+-3) The Tiny Code Generator (TCG) is released under the BSD license
+-   (see license headers in files).
++3) The Tiny Code Generator (TCG) is mostly under the BSD or MIT licenses;
++   but some parts may be GPLv2 or other licenses. Again, see the
++   specific licensing information in each source file.
+ 
+ 4) QEMU is a trademark of Fabrice Bellard.
+ 
+diff --git a/tcg/LICENSE b/tcg/LICENSE
+deleted file mode 100644
+index be817fa1625..00000000000
+--- a/tcg/LICENSE
++++ /dev/null
+@@ -1,3 +0,0 @@
+-All the files in this directory and subdirectories are released under
+-a BSD like license (see header in each file). No other license is
+-accepted.
 -- 
 2.20.1
 
