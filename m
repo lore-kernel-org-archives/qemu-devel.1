@@ -2,81 +2,84 @@ Return-Path: <SRS0=bySr=YS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4418DCA9EA0
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 13:35:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 30873CA9EA0
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 13:36:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 10F0321929
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 13:35:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id EF50321D71
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 13:36:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PXbbHk3s"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 10F0321929
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VSdF+ml9"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EF50321D71
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60012 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60014 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iNzks-0002ae-8o
-	for qemu-devel@archiver.kernel.org; Fri, 25 Oct 2019 09:35:50 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34305)
+	id 1iNzlT-00043K-8i
+	for qemu-devel@archiver.kernel.org; Fri, 25 Oct 2019 09:36:27 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58830)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <imammedo@redhat.com>) id 1iNzcp-0000m6-QA
- for qemu-devel@nongnu.org; Fri, 25 Oct 2019 09:27:33 -0400
+ (envelope-from <mrolnik@gmail.com>) id 1iNzP9-0004hK-62
+ for qemu-devel@nongnu.org; Fri, 25 Oct 2019 09:13:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <imammedo@redhat.com>) id 1iNzcn-0007dl-Mx
- for qemu-devel@nongnu.org; Fri, 25 Oct 2019 09:27:31 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:59747
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1iNzcn-0007cq-Bf
- for qemu-devel@nongnu.org; Fri, 25 Oct 2019 09:27:29 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1572010046;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=+iCb/sdPv8Lz9A0cfrw/hI15X1udWcrq4pYJ5Ij4vU0=;
- b=PXbbHk3sS2HW0CTlcEsm+xZ3uW6tfv8CaIUil78dLJn+DtqRXTiw1l7KXeekEF6VQxDbKV
- cmwluY8vWH7EAPY2helNEFFslml7d9ipjObbm05jE1TY80h5sn0AD/OFD4EObqmD15ZQ2s
- 6IyX9JbpWgGc+shH2yK0Zg67NyEEaHQ=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-183-HMEe2cjQMPKtepDcOB5g5g-1; Fri, 25 Oct 2019 09:27:24 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BC17A47B;
- Fri, 25 Oct 2019 13:27:23 +0000 (UTC)
-Received: from localhost (unknown [10.43.2.182])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 4541F60BF4;
- Fri, 25 Oct 2019 13:27:22 +0000 (UTC)
-Date: Fri, 25 Oct 2019 15:27:20 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-To: Tao Xu <tao3.xu@intel.com>
-Subject: Re: [PATCH v13 06/12] numa: Extend CLI to provide memory latency
- and bandwidth information
-Message-ID: <20191025152720.4068bfae@redhat.com>
-In-Reply-To: <9e30d8fe-7274-4ee8-3c4b-64c370141358@intel.com>
-References: <20191020111125.27659-1-tao3.xu@intel.com>
- <20191020111125.27659-7-tao3.xu@intel.com>
- <20191023172854.42c495d5@redhat.com>
- <9e30d8fe-7274-4ee8-3c4b-64c370141358@intel.com>
-MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-MC-Unique: HMEe2cjQMPKtepDcOB5g5g-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=WINDOWS-1252
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.81
+ (envelope-from <mrolnik@gmail.com>) id 1iNzP7-00014K-Op
+ for qemu-devel@nongnu.org; Fri, 25 Oct 2019 09:13:23 -0400
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:35125)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <mrolnik@gmail.com>) id 1iNzP7-000144-Il
+ for qemu-devel@nongnu.org; Fri, 25 Oct 2019 09:13:21 -0400
+Received: by mail-wr1-x441.google.com with SMTP id l10so2306399wrb.2
+ for <qemu-devel@nongnu.org>; Fri, 25 Oct 2019 06:13:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=from:to:cc:subject:date:message-id:in-reply-to:references;
+ bh=PevYNAEW2/rbU2HD9RmLzQ+eiZqSSbUKhGGl3bsW4n4=;
+ b=VSdF+ml9+tp0m5EJnoe0qs6U0i2LovYnGxZDmYogH3CGDnsKqCyzVst29O9lTdZI9F
+ yLS8RXssI+n60QSeccYDtwgxS201aWMwSFio+IkhXuGeY1sdz5gd2rR8nsbcHYePQoI2
+ CzcWlf5ABsYF6OM5xN0+SLmyB6IXKMjt0/n77wELh6kTFR90nvBKybqglfp1WRz7Y3Y1
+ wKKqOkoTPswxisT7udjX7swimPW55L/qa9mQ6TuwEpsx5oMZXIbXYkVXiqG7T21Q+TKa
+ MKSm2AVXS0r+nSAb2ZdQ7j+n/IegzP7n1Y+eEK1RKQ8TE88u+LZoO8kU1qwxUTEo0RHx
+ ifDw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references;
+ bh=PevYNAEW2/rbU2HD9RmLzQ+eiZqSSbUKhGGl3bsW4n4=;
+ b=Y1dwQ+R+fsNB7mfqX+LJKg90IaF2MNMwFqUphLExE55asNbAZMan89ycrjnWPl9kT+
+ 5oxMEsZ6XEg1fUvtlso9lSAms/AP30dUg35B0/EZeAiV85CUV2ZUOlLsvBG6j6whGVBG
+ 0ZtWHwOevy334NY8wV+dT35ujwTxEdJP6qQI97gIHOAr4iJiUbBUAwI0gIhyx1oDJijh
+ dioBJSCQcuNKCftvQc2D6jv4nvxvgJt76P+MINN8eohMnbIBUsfXyXp5D5M7t9yRWnAW
+ e2zY17YnRODYqboLPvF/o8dZD/6rBssy7lgJMmmGJGIjM7eV12jXZ9dDa1TPciBDUw1N
+ Id7A==
+X-Gm-Message-State: APjAAAWAaq/Rt8WCfkFvtZtyIqnb7j0ffozuR3t6ArXUj1LedHhkFJOq
+ rgt8qosh4mTRq46cOsGhge4euOBNcjBkQQ==
+X-Google-Smtp-Source: APXvYqxYkC1RWIw5v+MvnKHo8wJz/F+JMu2Hp7jLw7kuTUvkRmWCLIsAe3y2/Eoak3bwp27NxlYFAw==
+X-Received: by 2002:a5d:6402:: with SMTP id z2mr3012973wru.211.1572009200155; 
+ Fri, 25 Oct 2019 06:13:20 -0700 (PDT)
+Received: from 8c859074c0ff.ant.amazon.com.com
+ (bzq-79-181-93-41.red.bezeqint.net. [79.181.93.41])
+ by smtp.gmail.com with ESMTPSA id x205sm2616139wmb.5.2019.10.25.06.13.18
+ (version=TLS1_2 cipher=ECDHE-RSA-AES128-SHA bits=128/128);
+ Fri, 25 Oct 2019 06:13:19 -0700 (PDT)
+From: Michael Rolnik <mrolnik@gmail.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v34 08/13] target/avr: Add instruction translation - MCU
+ Control Instructions
+Date: Fri, 25 Oct 2019 16:12:32 +0300
+Message-Id: <20191025131237.63149-9-mrolnik@gmail.com>
+X-Mailer: git-send-email 2.17.2 (Apple Git-113)
+In-Reply-To: <20191025131237.63149-1-mrolnik@gmail.com>
+References: <20191025131237.63149-1-mrolnik@gmail.com>
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::441
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,165 +91,214 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "ehabkost@redhat.com" <ehabkost@redhat.com>, "Liu,
- Jingqi" <jingqi.liu@intel.com>, "Du, Fan" <fan.du@intel.com>,
- Markus Armbruster <armbru@redhat.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "jonathan.cameron@huawei.com" <jonathan.cameron@huawei.com>
+Cc: thuth@redhat.com, Michael Rolnik <mrolnik@gmail.com>,
+ richard.henderson@linaro.org, dovgaluk@ispras.ru, imammedo@redhat.com,
+ philmd@redhat.com, aleksandar.m.mail@gmail.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, 25 Oct 2019 14:33:53 +0800
-Tao Xu <tao3.xu@intel.com> wrote:
+This includes:
+    - BREAK
+    - NOP
+    - SLEEP
+    - WDR
 
-> On 10/23/2019 11:28 PM, Igor Mammedov wrote:
-> > On Sun, 20 Oct 2019 19:11:19 +0800
-> > Tao Xu <tao3.xu@intel.com> wrote: =20
-> [...]
-> >> +#
-> >> +# @access-bandwidth: access bandwidth (MB/s)
-> >> +#
-> >> +# @read-bandwidth: read bandwidth (MB/s)
-> >> +#
-> >> +# @write-bandwidth: write bandwidth (MB/s) =20
-> > I think units here are not appropriate, values stored in fields are
-> > minimal base units only and nothing else (i.e. ps and B/s)
-> >  =20
-> Eric suggest me to drop picoseconds. So here I can use ns. For=20
-> bandwidth, if we use B/s here, does it let user or developer to=20
-> misunderstand that the smallest unit is B/s ?
+Signed-off-by: Michael Rolnik <mrolnik@gmail.com>
+---
+ target/avr/translate.c | 174 +++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 174 insertions(+)
 
-It's not nanoseconds or MB/s stored in theses fields, isn't it?
-I'd specify units in which value is stored or drop units altogether.
-
-Maybe Eric and Markus can suggest a better way to describe fields.
-
-> >>   @item -numa node[,mem=3D@var{size}][,cpus=3D@var{firstcpu}[-@var{las=
-tcpu}]][,nodeid=3D@var{node}][,initiator=3D@var{initiator}]
-> >>   @itemx -numa node[,memdev=3D@var{id}][,cpus=3D@var{firstcpu}[-@var{l=
-astcpu}]][,nodeid=3D@var{node}][,initiator=3D@var{initiator}]
-> >>   @itemx -numa dist,src=3D@var{source},dst=3D@var{destination},val=3D@=
-var{distance}
-> >>   @itemx -numa cpu,node-id=3D@var{node}[,socket-id=3D@var{x}][,core-id=
-=3D@var{y}][,thread-id=3D@var{z}]
-> >> +@itemx -numa hmat-lb,initiator=3D@var{node},target=3D@var{node},hiera=
-rchy=3D@var{str},data-type=3D@var{str}[,latency=3D@var{lat}][,bandwidth=3D@=
-var{bw}] =20
-> >                                                                        =
-        ^^^                 ^^^
-> > Using the same 'str' for 2 different enums is confusing.
-> > Suggest for 1st use 'level' and for the second just 'type'
-> >  =20
-> Ok
->=20
-> >>   @findex -numa
-> >>   Define a NUMA node and assign RAM and VCPUs to it.
-> >>   Set the NUMA distance from a source node to a destination node.
-> >> +Set the ACPI Heterogeneous Memory Attributes for the given nodes.
-> >>  =20
-> >>   Legacy VCPU assignment uses @samp{cpus} option where
-> >>   @var{firstcpu} and @var{lastcpu} are CPU indexes. Each
-> >> @@ -256,6 +259,50 @@ specified resources, it just assigns existing res=
-ources to NUMA
-> >>   nodes. This means that one still has to use the @option{-m},
-> >>   @option{-smp} options to allocate RAM and VCPUs respectively.
-> >>  =20
-> >> +Use @samp{hmat-lb} to set System Locality Latency and Bandwidth Infor=
-mation
-> >> +between initiator and target NUMA nodes in ACPI Heterogeneous Attribu=
-te Memory Table (HMAT).
-> >> +Initiator NUMA node can create memory requests, usually including one=
- or more processors. =20
-> > s/including/it has/
-> >  =20
-> >> +Target NUMA node contains addressable memory.
-> >> +
-> >> +In @samp{hmat-lb} option, @var{node} are NUMA node IDs. @var{str} of =
-'hierarchy'
-> >> +is the memory hierarchy of the target NUMA node: if @var{str} is 'mem=
-ory', the structure
-> >> +represents the memory performance; if @var{str} is 'first-level|secon=
-d-level|third-level',
-> >> +this structure represents aggregated performance of memory side cache=
-s for each domain.
-> >> +@var{str} of 'data-type' is type of data represented by this structur=
-e instance:
-> >> +if 'hierarchy' is 'memory', 'data-type' is 'access|read|write' latenc=
-y(nanoseconds) =20
-> > is nanoseconds is right here? Looking at previous patches default value=
- of suffix-less
-> > should be picoseconds. I'd just drop '(nanoseconds)'. User will use app=
-ropriate suffix.
-> >  =20
-> OK, I will drop it.
-> >> +or 'access|read|write' bandwidth(MB/s) of the target memory; if 'hier=
-archy' is =20
-> > ditto (MB/s), probably should be Bytes/s for default suffix-less value
-> > (well, I'm not sure how to express it better)
-> >  =20
->=20
-> But last version, we let !QEMU_IS_ALIGNED(node->bandwidth, MiB) as error.
-it's alignment requirement and it doesn't mean that value could not be
-represented in bytes/s.
-And it is bytes/s if suffix isn't used.
-
-As for alignment and precision of values you probably need to document
-expectations here as well.
-
-> >> +'first-level|second-level|third-level', 'data-type' is 'access|read|w=
-rite' hit latency
-> >> +or 'access|read|write' hit bandwidth of the target memory side cache.
-> >> +
-> >> +@var{lat} of 'latency' is latency value, the possible value and units=
- are
-> >> +NUM[ps|ns|us] (picosecond|nanosecond|microsecond), the recommended un=
-it is 'ns'. @var{bw}
-> >> +is bandwidth value, the possible value and units are NUM[M|G|T], mean=
- that =20
-> >  =20
-> >> +the bandwidth value are NUM MB/s, GB/s or TB/s. Note that max NUM is =
-65534,
-> >> +if NUM is 0, means the corresponding latency or bandwidth information=
- is not provided.
-> >> +And if input numbers without any unit, the latency unit will be 'ps' =
-and the bandwidth
-> >> +will be MB/s. =20
-> >   1st: above is applicable to both bw and lat values and should be docu=
-mented as such
-> >   2nd: 'max NUM is 65534' when different suffixes is fleeting target,
-> >        spec says that entry with 0xFFFF is unreachable, so how about do=
-cumenting
-> >        unreachable value as 0xFFFFFFFFFFFFFFFF (then CLI parsing code w=
-ill
-> >        exclude it from range detection and acpi table building code tra=
-nslate it
-> >        to internal 0xFFFF it could fit into the tables)
-> >  =20
->=20
-> If we input 0xFFFFFFFFFFFFFFFF, qemu will raise error that parameter=20
-> expect a size value.
-
-opts_type_size() can't handle values >=3D 0xfffffffffffffc00
-
-commit f46bfdbfc8f (util/cutils: Change qemu_strtosz*() from int64_t to uin=
-t64_t)
-
-so behavior would change depending on if the value is parsed by CLI (size) =
-or QMP (unit64) parsers.
-
-we can cannibalize 0x0 as the unreachable value and an absent bandwidth/lat=
- option
-for not specified case.
-It would be conflicting with matrix [1] values in spec, but CLI/QMP deals w=
-ith
-absolute values which are later processed into HMAT substructure.
-
-Markus,
-Can we make opts_type_size() handle full range of uint64_t?
-
-1)
-ACPI 6.3 spec:
-5.2.27.4 System Locality Latency and Bandwidth Information Structure
+diff --git a/target/avr/translate.c b/target/avr/translate.c
+index f2ec2e2d2f..30ba13bdd7 100644
+--- a/target/avr/translate.c
++++ b/target/avr/translate.c
+@@ -368,6 +368,115 @@ static bool trans_ADC(DisasContext *ctx, arg_ADC *a)
+ }
+ 
+ 
++static void gen_jmp_ez(DisasContext *ctx)
++{
++    tcg_gen_deposit_tl(cpu_pc, cpu_r[30], cpu_r[31], 8, 8);
++    tcg_gen_or_tl(cpu_pc, cpu_pc, cpu_eind);
++    ctx->bstate = DISAS_LOOKUP;
++}
++
++
++static void gen_jmp_z(DisasContext *ctx)
++{
++    tcg_gen_deposit_tl(cpu_pc, cpu_r[30], cpu_r[31], 8, 8);
++    ctx->bstate = DISAS_LOOKUP;
++}
++
++
++/*
++ *  in the gen_set_addr & gen_get_addr functions
++ *  H assumed to be in 0x00ff0000 format
++ *  M assumed to be in 0x000000ff format
++ *  L assumed to be in 0x000000ff format
++ */
++static void gen_set_addr(TCGv addr, TCGv H, TCGv M, TCGv L)
++{
++
++    tcg_gen_andi_tl(L, addr, 0x000000ff);
++
++    tcg_gen_andi_tl(M, addr, 0x0000ff00);
++    tcg_gen_shri_tl(M, M, 8);
++
++    tcg_gen_andi_tl(H, addr, 0x00ff0000);
++}
++
++
++static void gen_set_xaddr(TCGv addr)
++{
++    gen_set_addr(addr, cpu_rampX, cpu_r[27], cpu_r[26]);
++}
++
++
++static void gen_set_yaddr(TCGv addr)
++{
++    gen_set_addr(addr, cpu_rampY, cpu_r[29], cpu_r[28]);
++}
++
++
++static void gen_set_zaddr(TCGv addr)
++{
++    gen_set_addr(addr, cpu_rampZ, cpu_r[31], cpu_r[30]);
++}
++
++
++static TCGv gen_get_addr(TCGv H, TCGv M, TCGv L)
++{
++    TCGv addr = tcg_temp_new_i32();
++
++    tcg_gen_deposit_tl(addr, M, H, 8, 8);
++    tcg_gen_deposit_tl(addr, L, addr, 8, 16);
++
++    return addr;
++}
++
++
++static TCGv gen_get_xaddr(void)
++{
++    return gen_get_addr(cpu_rampX, cpu_r[27], cpu_r[26]);
++}
++
++
++static TCGv gen_get_yaddr(void)
++{
++    return gen_get_addr(cpu_rampY, cpu_r[29], cpu_r[28]);
++}
++
++
++static TCGv gen_get_zaddr(void)
++{
++    return gen_get_addr(cpu_rampZ, cpu_r[31], cpu_r[30]);
++}
++
++
++/*
++ *  Load one byte indirect from data space to register and stores an clear
++ *  the bits in data space specified by the register. The instruction can only
++ *  be used towards internal SRAM.  The data location is pointed to by the Z (16
++ *  bits) Pointer Register in the Register File. Memory access is limited to the
++ *  current data segment of 64KB. To access another data segment in devices with
++ *  more than 64KB data space, the RAMPZ in register in the I/O area has to be
++ *  changed.  The Z-pointer Register is left unchanged by the operation. This
++ *  instruction is especially suited for clearing status bits stored in SRAM.
++ */
++static void gen_data_store(DisasContext *ctx, TCGv data, TCGv addr)
++{
++    if (ctx->tb->flags & TB_FLAGS_FULL_ACCESS) {
++        gen_helper_fullwr(cpu_env, data, addr);
++    } else {
++        tcg_gen_qemu_st8(data, addr, MMU_DATA_IDX); /* mem[addr] = data */
++    }
++}
++
++static void gen_data_load(DisasContext *ctx, TCGv data, TCGv addr)
++{
++    if (ctx->tb->flags & TB_FLAGS_FULL_ACCESS) {
++        gen_helper_fullrd(data, cpu_env, addr);
++    } else {
++        tcg_gen_qemu_ld8u(data, addr, MMU_DATA_IDX); /* data = mem[addr] */
++    }
++}
++
++
+ /*
+  *  Subtracts an immediate value (0-63) from a register pair and places the
+  *  result in the register pair. This instruction operates on the upper four
+@@ -2618,3 +2727,68 @@ static bool trans_BCLR(DisasContext *ctx, arg_BCLR *a)
+ 
+     return true;
+ }
++
++
++/*
++ *  The BREAK instruction is used by the On-chip Debug system, and is
++ *  normally not used in the application software. When the BREAK instruction is
++ *  executed, the AVR CPU is set in the Stopped Mode. This gives the On-chip
++ *  Debugger access to internal resources.  If any Lock bits are set, or either
++ *  the JTAGEN or OCDEN Fuses are unprogrammed, the CPU will treat the BREAK
++ *  instruction as a NOP and will not enter the Stopped mode.  This instruction
++ *  is not available in all devices. Refer to the device specific instruction
++ *  set summary.
++ */
++static bool trans_BREAK(DisasContext *ctx, arg_BREAK *a)
++{
++    if (!avr_have_feature(ctx, AVR_FEATURE_BREAK)) {
++        return true;
++    }
++
++#ifdef BREAKPOINT_ON_BREAK
++    tcg_gen_movi_tl(cpu_pc, ctx->npc - 1);
++    gen_helper_debug(cpu_env);
++    ctx->bstate = DISAS_EXIT;
++#else
++    /* NOP */
++#endif
++
++    return true;
++}
++
++
++/*
++ *  This instruction performs a single cycle No Operation.
++ */
++static bool trans_NOP(DisasContext *ctx, arg_NOP *a)
++{
++
++    /* NOP */
++
++    return true;
++}
++
++
++/*
++ *  This instruction sets the circuit in sleep mode defined by the MCU
++ *  Control Register.
++ */
++static bool trans_SLEEP(DisasContext *ctx, arg_SLEEP *a)
++{
++    gen_helper_sleep(cpu_env);
++    ctx->bstate = DISAS_NORETURN;
++    return true;
++}
++
++
++/*
++ *  This instruction resets the Watchdog Timer. This instruction must be
++ *  executed within a limited time given by the WD prescaler. See the Watchdog
++ *  Timer hardware specification.
++ */
++static bool trans_WDR(DisasContext *ctx, arg_WDR *a)
++{
++    gen_helper_wdr(cpu_env);
++
++    return true;
++}
+-- 
+2.17.2 (Apple Git-113)
 
 
