@@ -7,75 +7,75 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C746DCA9EA0
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 06:55:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BE954CA9EA0
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 06:55:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9869E20867
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 06:55:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8BF4E20867
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 06:55:59 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Dkaas+Ru"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9869E20867
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="nEchem4M"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8BF4E20867
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56120 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56124 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iNtVk-0007XF-6M
-	for qemu-devel@archiver.kernel.org; Fri, 25 Oct 2019 02:55:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35622)
+	id 1iNtVu-00083L-As
+	for qemu-devel@archiver.kernel.org; Fri, 25 Oct 2019 02:55:58 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35591)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1iNtE6-0003R1-SE
- for qemu-devel@nongnu.org; Fri, 25 Oct 2019 02:37:37 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1iNtE5-0003Od-CW
+ for qemu-devel@nongnu.org; Fri, 25 Oct 2019 02:37:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1iNtE5-0008TS-M1
- for qemu-devel@nongnu.org; Fri, 25 Oct 2019 02:37:34 -0400
-Received: from mail-wm1-x32e.google.com ([2a00:1450:4864:20::32e]:51252)
+ (envelope-from <alex.bennee@linaro.org>) id 1iNtE2-0008Ru-2k
+ for qemu-devel@nongnu.org; Fri, 25 Oct 2019 02:37:31 -0400
+Received: from mail-wr1-x42b.google.com ([2a00:1450:4864:20::42b]:42516)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1iNtE5-0008ST-Bm
- for qemu-devel@nongnu.org; Fri, 25 Oct 2019 02:37:33 -0400
-Received: by mail-wm1-x32e.google.com with SMTP id q70so769195wme.1
- for <qemu-devel@nongnu.org>; Thu, 24 Oct 2019 23:37:32 -0700 (PDT)
+ id 1iNtE1-0008RB-SD
+ for qemu-devel@nongnu.org; Fri, 25 Oct 2019 02:37:30 -0400
+Received: by mail-wr1-x42b.google.com with SMTP id r1so901940wrs.9
+ for <qemu-devel@nongnu.org>; Thu, 24 Oct 2019 23:37:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=ejSGmzKi8yOJXrP8xmGu9NmM/5lE3B8zIrb30U/0RJ0=;
- b=Dkaas+RuFbYXkql0xawrGQmJ2idIvjDSXnSbERjVKJeq0aeh+XyAS2RQG3qv6/TLwu
- gCxcdpPMQ5Ii6t+sao3aSsbghL4q6df8V7xFmzIXKIv/BZ3cIFDpP9J1ZHosYCQFJJac
- qp3DpgDVXp0D/+GGLBukLGnRfOFZ2RRglnZBffIkFRaTZsUroLh/kD5SRc5t1iIAVeoK
- cWCWhrGRCCWnliT1U7+iMQL5Qjb+x45CPATEcqcolM0VOh9crJ8PsTet0W12dJvtzKpG
- 6EXabIWFHiRsV6N+dKvAOe8E64xC+XfGwfwW+WcNSzbnm2u/zGPua+8VPIMREne/TfBo
- q6TQ==
+ bh=yAGQHjJX6sN9vqBD9CUSIS92quPpG3GGj8bU/lL0Ji4=;
+ b=nEchem4M3/M08Rd9orRMB8+/QD76x8Yhe9aigLpWlxq0bbIj3FYlSHgEFq9fL9MRIJ
+ ZlfwjGZHFl6Vi8nsIqxaDTS/A1M8AitUzMmFgjNCHqEAG8tUayB1I3EyQEsH8OiSZbcY
+ 1pcCuv0CkYcX7b9d3wgrhsTs1PGFeRhslLurY3mAPhFXeKnN4CbKqQtEgS39j5vHhE65
+ oVLZ29DQrgD6oLPbFXVsvBGu0dVLtDIt0RRKkhezRIfyncF9pZFN2unv+zPriSnn3tK8
+ FFRUea9mGz1KCfXFxjMLa2r/HDDwBrisHWuJOU6mVWoOYbTj2/dSYr6hYfxEQBnKoilV
+ L9Lg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=ejSGmzKi8yOJXrP8xmGu9NmM/5lE3B8zIrb30U/0RJ0=;
- b=kyIuHh2f6X8wf7Q8FoBddPn2R+5vqevmMphIoVCb1p+kC973JU5FQJIsyvR6l5Yvaj
- Xvn/y+DFH/eqYih1urkMDdaqqo+9CP7BhXp6ph2hh0PhGu0zkjByrIVddyIDq2dDwYnl
- 2nBbnSOcLwVF0WVbfVFD28j3OKxP3F/gyjl30Du38/KO/BX0vbJ1Nn3oHC9K0Hyqagf7
- DeKaFK+CMAo3a6I9bMTDLwmdJiAzHiKyMWpUa69ScLoMhgqUSEZF1sy+0TwnVrHkzNhg
- 7fuqk3f8nLGne9Fz01eaW3U2YavRI8+pfnbn0xBCbh0jdX/aHQmJjtisuZTwVyNpZ0iL
- Qcyg==
-X-Gm-Message-State: APjAAAVNCwaxKArh65LY5/uFYDVbxLcGbEBfAgwqyrX4jj27ZxjTdUaS
- 7V+Ei1yoGksen0ETuB/DmZuYQQ==
-X-Google-Smtp-Source: APXvYqxXpp7YLhQ0qp4POW0Rnv20kYC+XXyzHEm4/CxkQcfb+v5MQylBfEVa1O6G/pMHFlcO/FsJMg==
-X-Received: by 2002:a1c:49d5:: with SMTP id w204mr1922093wma.111.1571985450983; 
- Thu, 24 Oct 2019 23:37:30 -0700 (PDT)
+ bh=yAGQHjJX6sN9vqBD9CUSIS92quPpG3GGj8bU/lL0Ji4=;
+ b=BsYOyeiEQxwPmyEyW2l4cpucaW+NoxYyGjvAI08G+tQj3CJJVrSL6nJGeYvpFcnkOS
+ WAw9CVxPVzG8qfHIGS62xLmRAB4nnYnrIR0mBAd0Xuiet2nuMcycJaiG9ffpkkHYE28U
+ OEYkUwPJBmakQ5yy20bxx9gRPdiEuOowUOSDiNuPDf0Ml7pocJRyOmVC0ZHAPOGD1FVb
+ n7S7jio0FVVjS4iAQ9u6Ds4xUcR4aRT5weNVeAOoL7xSNPyLbSpFQ1dN1zYiG1+BtJaw
+ U6+QgnCIuLotci/m1nbrN6ZDUIuFyV6yqnFHlKXVMVR00YAg7dmra7ci8quUGRTk+Ht9
+ KYYw==
+X-Gm-Message-State: APjAAAWhnY1z8dW4fAyTOh8/B06zMEbPiwey42UUl+7f3Sp2l/iF1DQw
+ 8mzYUm1vHrft3wlmi7w8jflViw==
+X-Google-Smtp-Source: APXvYqy+b7ipQyH12IlBv6SMk8CmUoXXnVOW6pLO8IIkMPUuvMM3AamshUSqJsqxwNvY3HgxJimGjA==
+X-Received: by 2002:a5d:630b:: with SMTP id i11mr1189002wru.87.1571985448546; 
+ Thu, 24 Oct 2019 23:37:28 -0700 (PDT)
 Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id l26sm455009wmg.3.2019.10.24.23.37.22
+ by smtp.gmail.com with ESMTPSA id g10sm1189335wrr.28.2019.10.24.23.37.22
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
  Thu, 24 Oct 2019 23:37:24 -0700 (PDT)
 Received: from zen.lan (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 045201FFCF;
+ by zen.linaroharston (Postfix) with ESMTP id D6BB71FFD7;
  Fri, 25 Oct 2019 07:37:19 +0100 (BST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: peter.maydell@linaro.org
-Subject: [PULL v2 56/73] plugin: add qemu_plugin_outs helper
-Date: Fri, 25 Oct 2019 07:36:56 +0100
-Message-Id: <20191025063713.23374-57-alex.bennee@linaro.org>
+Subject: [PULL v2 65/73] tests/plugin: add a hotblocks plugin
+Date: Fri, 25 Oct 2019 07:37:05 +0100
+Message-Id: <20191025063713.23374-66-alex.bennee@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20191025063713.23374-1-alex.bennee@linaro.org>
 References: <20191025063713.23374-1-alex.bennee@linaro.org>
@@ -84,7 +84,7 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::32e
+X-Received-From: 2a00:1450:4864:20::42b
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,86 +96,185 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Aaron Lindsay <aaron@os.amperecomputing.com>,
+Cc: Richard Henderson <richard.henderson@linaro.org>,
  =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Having the plugins grab stdout and spew stuff there is a bit ugly and
-certainly makes the tests look ugly. Provide a hook back into QEMU
-which can be redirected as needed.
+This is a simple plugin to track which translation blocks are call
+most often. As we don't have a view of the internals of TCG we can
+only work by the address of the start of the block so we also need to
+tracks how often the address is translated.
+
+As there will be multiple blocks starting at the same address. We can
+try and work around this by futzing the value to feed to the hash with
+the insn count.
 
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-Reviewed-by: Aaron Lindsay <aaron@os.amperecomputing.com>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
-diff --git a/include/qemu/log.h b/include/qemu/log.h
-index b097a6cae11..a91105b2adc 100644
---- a/include/qemu/log.h
-+++ b/include/qemu/log.h
-@@ -45,6 +45,7 @@ static inline bool qemu_log_separate(void)
- /* LOG_TRACE (1 << 15) is defined in log-for-trace.h */
- #define CPU_LOG_TB_OP_IND  (1 << 16)
- #define CPU_LOG_TB_FPU     (1 << 17)
-+#define CPU_LOG_PLUGIN     (1 << 18)
+diff --git a/tests/plugin/Makefile b/tests/plugin/Makefile
+index f9a3546ea32..e74940eaac5 100644
+--- a/tests/plugin/Makefile
++++ b/tests/plugin/Makefile
+@@ -10,6 +10,7 @@ NAMES += bb
+ NAMES += empty
+ NAMES += insn
+ NAMES += mem
++NAMES += hotblocks
  
- /* Lock output for a series of related logs.  Since this is not needed
-  * for a single qemu_log / qemu_log_mask / qemu_log_mask_and_addr, we
-diff --git a/include/qemu/qemu-plugin.h b/include/qemu/qemu-plugin.h
-index ddf267fbfe0..a00a7deb461 100644
---- a/include/qemu/qemu-plugin.h
-+++ b/include/qemu/qemu-plugin.h
-@@ -384,4 +384,10 @@ int qemu_plugin_n_vcpus(void);
- /* returns -1 in user-mode */
- int qemu_plugin_n_max_vcpus(void);
+ SONAMES := $(addsuffix .so,$(addprefix lib,$(NAMES)))
  
-+/**
-+ * qemu_plugin_outs() - output string via QEMU's logging system
-+ * @string: a string
+diff --git a/tests/plugin/hotblocks.c b/tests/plugin/hotblocks.c
+new file mode 100644
+index 00000000000..1bd183849a1
+--- /dev/null
++++ b/tests/plugin/hotblocks.c
+@@ -0,0 +1,143 @@
++/*
++ * Copyright (C) 2019, Alex Bennée <alex.bennee@linaro.org>
++ *
++ * License: GNU GPL, version 2 or later.
++ *   See the COPYING file in the top-level directory.
 + */
-+void qemu_plugin_outs(const char *string);
++#include <inttypes.h>
++#include <assert.h>
++#include <stdlib.h>
++#include <inttypes.h>
++#include <string.h>
++#include <unistd.h>
++#include <stdio.h>
++#include <glib.h>
 +
- #endif /* QEMU_PLUGIN_API_H */
-diff --git a/plugins/api.c b/plugins/api.c
-index 5adc4d25a1e..fa1d9f276d3 100644
---- a/plugins/api.c
-+++ b/plugins/api.c
-@@ -331,3 +331,11 @@ int qemu_plugin_n_max_vcpus(void)
-     return get_ms()->smp.max_cpus;
- #endif
- }
++#include <qemu-plugin.h>
++
++static bool do_inline;
++
++/* Plugins need to take care of their own locking */
++static GMutex lock;
++static GHashTable *hotblocks;
++static guint64 limit = 20;
 +
 +/*
-+ * Plugin output
++ * Counting Structure
++ *
++ * The internals of the TCG are not exposed to plugins so we can only
++ * get the starting PC for each block. We cheat this slightly by
++ * xor'ing the number of instructions to the hash to help
++ * differentiate.
 + */
-+void qemu_plugin_outs(const char *string)
++typedef struct {
++    uint64_t start_addr;
++    uint64_t exec_count;
++    int      trans_count;
++    unsigned long insns;
++} ExecCount;
++
++static gint cmp_exec_count(gconstpointer a, gconstpointer b)
 +{
-+    qemu_log_mask(CPU_LOG_PLUGIN, "%s", string);
++    ExecCount *ea = (ExecCount *) a;
++    ExecCount *eb = (ExecCount *) b;
++    return ea->exec_count > eb->exec_count ? -1 : 1;
 +}
-diff --git a/plugins/qemu-plugins.symbols b/plugins/qemu-plugins.symbols
-index 267ec381b4a..4bdb381f48e 100644
---- a/plugins/qemu-plugins.symbols
-+++ b/plugins/qemu-plugins.symbols
-@@ -36,4 +36,5 @@
-   qemu_plugin_vcpu_for_each;
-   qemu_plugin_n_vcpus;
-   qemu_plugin_n_max_vcpus;
-+  qemu_plugin_outs;
- };
-diff --git a/util/log.c b/util/log.c
-index 1d1b33f7d9f..1ca13059eef 100644
---- a/util/log.c
-+++ b/util/log.c
-@@ -273,6 +273,9 @@ const QEMULogItem qemu_log_items[] = {
-     { CPU_LOG_TB_NOCHAIN, "nochain",
-       "do not chain compiled TBs so that \"exec\" and \"cpu\" show\n"
-       "complete traces" },
-+#ifdef CONFIG_PLUGIN
-+    { CPU_LOG_PLUGIN, "plugin", "output from TCG plugins\n"},
-+#endif
-     { 0, NULL, NULL },
- };
- 
++
++static void plugin_exit(qemu_plugin_id_t id, void *p)
++{
++    g_autoptr(GString) report = g_string_new("collected ");
++    GList *counts, *it;
++    int i;
++
++    g_mutex_lock(&lock);
++    g_string_append_printf(report, "%d entries in the hash table\n",
++                           g_hash_table_size(hotblocks));
++    counts = g_hash_table_get_values(hotblocks);
++    it = g_list_sort(counts, cmp_exec_count);
++
++    if (it) {
++        g_string_append_printf(report, "pc, tcount, icount, ecount\n");
++
++        for (i = 0; i < limit && it->next; i++, it = it->next) {
++            ExecCount *rec = (ExecCount *) it->data;
++            g_string_append_printf(report, "%#016"PRIx64", %d, %ld, %"PRId64"\n",
++                                   rec->start_addr, rec->trans_count,
++                                   rec->insns, rec->exec_count);
++        }
++
++        g_list_free(it);
++        g_mutex_unlock(&lock);
++    }
++
++    qemu_plugin_outs(report->str);
++}
++
++static void plugin_init(void)
++{
++    hotblocks = g_hash_table_new(NULL, g_direct_equal);
++}
++
++static void vcpu_tb_exec(unsigned int cpu_index, void *udata)
++{
++    ExecCount *cnt;
++    uint64_t hash = (uint64_t) udata;
++
++    g_mutex_lock(&lock);
++    cnt = (ExecCount *) g_hash_table_lookup(hotblocks, (gconstpointer) hash);
++    /* should always succeed */
++    g_assert(cnt);
++    cnt->exec_count++;
++    g_mutex_unlock(&lock);
++}
++
++/*
++ * When do_inline we ask the plugin to increment the counter for us.
++ * Otherwise a helper is inserted which calls the vcpu_tb_exec
++ * callback.
++ */
++static void vcpu_tb_trans(qemu_plugin_id_t id, struct qemu_plugin_tb *tb)
++{
++    ExecCount *cnt;
++    uint64_t pc = qemu_plugin_tb_vaddr(tb);
++    unsigned long insns = qemu_plugin_tb_n_insns(tb);
++    uint64_t hash = pc ^ insns;
++
++    g_mutex_lock(&lock);
++    cnt = (ExecCount *) g_hash_table_lookup(hotblocks, (gconstpointer) hash);
++    if (cnt) {
++        cnt->trans_count++;
++    } else {
++        cnt = g_new0(ExecCount, 1);
++        cnt->start_addr = pc;
++        cnt->trans_count = 1;
++        cnt->insns = insns;
++        g_hash_table_insert(hotblocks, (gpointer) hash, (gpointer) cnt);
++    }
++
++    g_mutex_unlock(&lock);
++
++    if (do_inline) {
++        qemu_plugin_register_vcpu_tb_exec_inline(tb, QEMU_PLUGIN_INLINE_ADD_U64,
++                                                 &cnt->exec_count, 1);
++    } else {
++        qemu_plugin_register_vcpu_tb_exec_cb(tb, vcpu_tb_exec,
++                                             QEMU_PLUGIN_CB_NO_REGS,
++                                             (void *)hash);
++    }
++}
++
++QEMU_PLUGIN_EXPORT
++int qemu_plugin_install(qemu_plugin_id_t id, const qemu_info_t *info,
++                        int argc, char **argv)
++{
++    if (argc && strcmp(argv[0], "inline") == 0) {
++        do_inline = true;
++    }
++
++    plugin_init();
++
++    qemu_plugin_register_vcpu_tb_trans_cb(id, vcpu_tb_trans);
++    qemu_plugin_register_atexit_cb(id, plugin_exit, NULL);
++    return 0;
++}
 -- 
 2.20.1
 
