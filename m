@@ -2,82 +2,90 @@ Return-Path: <SRS0=bySr=YS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A388CA9EA0
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 20:16:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 36193CA9EA0
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 20:16:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 34BAB21D81
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 20:16:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id EF45721D81
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 20:16:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SJV2Mfab"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 34BAB21D81
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Xlg4bHZE"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EF45721D81
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35838 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35840 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iO60s-0003eb-08
-	for qemu-devel@archiver.kernel.org; Fri, 25 Oct 2019 16:16:46 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54947)
+	id 1iO60x-0003zj-KR
+	for qemu-devel@archiver.kernel.org; Fri, 25 Oct 2019 16:16:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58815)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <armbru@redhat.com>) id 1iO4y4-0007Mo-JN
- for qemu-devel@nongnu.org; Fri, 25 Oct 2019 15:09:49 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1iO5Xl-0002FU-Oa
+ for qemu-devel@nongnu.org; Fri, 25 Oct 2019 15:46:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1iO4y2-0007hl-AT
- for qemu-devel@nongnu.org; Fri, 25 Oct 2019 15:09:47 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:40638
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1iO4y1-0007gr-Tv
- for qemu-devel@nongnu.org; Fri, 25 Oct 2019 15:09:46 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1572030585;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=byH6n30ESDquSyudzxZjAe76G1/YwCVzLTKOc1bKQjU=;
- b=SJV2MfabV1HN1zuEnhd7vxLZXUYd3DnDPNpJScsGXA4ICF7RJCNpABmWVDPkySCHu7UIlr
- wdqlCAc7HSHOTOCs2XCv1Kibj0HJbshK16nTFixZvIvxleE22XXfUxDdBgMqzz5/Vb2FGr
- 5XgeYl2Rl+nfbsDupCro8nUq4mzXHM8=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-8-FB0XUHuRPlGWdIWmpxULsQ-1; Fri, 25 Oct 2019 15:09:41 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E14A880183D;
- Fri, 25 Oct 2019 19:09:40 +0000 (UTC)
-Received: from blackfin.pond.sub.org (unknown [10.36.118.123])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 5B8DC5D9C9;
- Fri, 25 Oct 2019 19:09:31 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id CD0921138619; Fri, 25 Oct 2019 21:09:24 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Subject: Re: [PATCH v2 02/15] qapi/block-core: add option for io_uring
-References: <20191025160444.31632-1-stefanha@redhat.com>
- <20191025160444.31632-3-stefanha@redhat.com>
-Date: Fri, 25 Oct 2019 21:09:24 +0200
-In-Reply-To: <20191025160444.31632-3-stefanha@redhat.com> (Stefan Hajnoczi's
- message of "Fri, 25 Oct 2019 18:04:31 +0200")
-Message-ID: <874kzwprq3.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.2 (gnu/linux)
+ (envelope-from <alex.bennee@linaro.org>) id 1iO5Xk-0000nR-Gk
+ for qemu-devel@nongnu.org; Fri, 25 Oct 2019 15:46:41 -0400
+Received: from mail-wm1-x32d.google.com ([2a00:1450:4864:20::32d]:55338)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1iO5Xk-0000mv-AA
+ for qemu-devel@nongnu.org; Fri, 25 Oct 2019 15:46:40 -0400
+Received: by mail-wm1-x32d.google.com with SMTP id g24so3395494wmh.5
+ for <qemu-devel@nongnu.org>; Fri, 25 Oct 2019 12:46:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=KBMNgmBi7/k8LJ63MGoqOawSxFhttAR/bJdyMWQnEAU=;
+ b=Xlg4bHZE5mRgiBAbCk2n29eocBKhzSvFB8l2fHZczn+Ext9G254ihnnb1ztcCMxE56
+ bSBhtZ09sTYDlqe+0ySi4zuPihMgVMlOyE/4KVDLf819epGk+zN9VUSN0VAEu7cmD0JP
+ E4YIXTKtHVb4wxl1xV4gJl/AenAsNZdXkuEw+hc4gAnYJtE3z6EPJDorRLsu60gpFQRZ
+ wGG7k+BW6HIZsvh3hooZme7IZKu2/B+0bupYSiCK1rqSrt2dPl1otCJm7zJpPFA1x92T
+ qBXE/jYNRhbxSVk5gfqIYRpaj4JhCKwR2Ienidhh2Y6OIa68y2m2FABxxzLyVlmfLr45
+ QUeQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=KBMNgmBi7/k8LJ63MGoqOawSxFhttAR/bJdyMWQnEAU=;
+ b=DSxo+pX2hChX6fZuPCNtQvjmt8SIkHMer+y7cph4FBL+DO80aOaUHSCp1Iyjov+w/y
+ 0B2MW1tYwPiunCA+espordxRldkzw59pItL0mbhjtIfk3deU1cASQkC4U9tywJyMh3At
+ EXjv0sMaJ7H/DIQCBh3hoM1FOZAiTAHjiKxKNfMcxSvcKvMAGKzWNKarULUjGy/xlbnS
+ W3/0qH2VaHjRrckcq7EFoS7x+5HPi97U9vRcfiOftcKoJpYczof7fwrQbPgxb3L05ErD
+ hGkMukZTAEOQUHkeYe9ToCcoOi3rTQxgPw49F4zoHnv6I7vGvNQkibmRraavNIOvGAQT
+ vLzw==
+X-Gm-Message-State: APjAAAXHOUbkFQUnBtfR2smLjPnYUhWngsjeSXLQu77TKMfhbYLTjge0
+ QAH3G4QDXkcsTRzF4kcO39pWlg==
+X-Google-Smtp-Source: APXvYqwpmkBhWDuXLeN8EhHUllm+7qQylSqcRAisQ+EA1R3ZlRyeeQE9SK7xAW/lOuiGh52HsO378w==
+X-Received: by 2002:a1c:e912:: with SMTP id q18mr5070254wmc.29.1572032798967; 
+ Fri, 25 Oct 2019 12:46:38 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id t185sm2588072wmf.45.2019.10.25.12.46.38
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Fri, 25 Oct 2019 12:46:38 -0700 (PDT)
+Received: from zen.lan (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 801991FF9C;
+ Fri, 25 Oct 2019 20:37:10 +0100 (BST)
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: peter.maydell@linaro.org
+Subject: [PULL v3 12/15] gitlab-ci.yml: Use libvdeplug-dev to compile-test the
+ VDE network backend
+Date: Fri, 25 Oct 2019 20:37:06 +0100
+Message-Id: <20191025193709.28783-13-alex.bennee@linaro.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20191025193709.28783-1-alex.bennee@linaro.org>
+References: <20191025193709.28783-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-MC-Unique: FB0XUHuRPlGWdIWmpxULsQ-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=WINDOWS-1252
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 205.139.110.120
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::32d
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,59 +97,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, oleksandr@redhat.com, qemu-block@nongnu.org,
- Julia Suvorova <jusual@redhat.com>, qemu-devel@nongnu.org,
- Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Aarushi Mehta <mehta.aaru20@gmail.com>
+Cc: Thomas Huth <thuth@redhat.com>,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Stefan Hajnoczi <stefanha@redhat.com> writes:
+From: Thomas Huth <thuth@redhat.com>
 
-> From: Aarushi Mehta <mehta.aaru20@gmail.com>
->
-> Only enumerates option for devices that support it.
+The libvdeplug-dev package is required to compile-test net/vde.c.
 
-I'm not sure I get this sentence.
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+Message-Id: <20191016131002.29663-1-thuth@redhat.com>
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 
->                                                     Since QAPI schema
-> supports io_uring, which is the actual name of the Linux API, it is
-> preferred over io-uring.
-
-I guess this one means something like "Since io_uring is the actual name
-of the Linux API, we use it as enum value even though the QAPI schema
-conventions would prefer io-uring."
-
-> Signed-off-by: Aarushi Mehta <mehta.aaru20@gmail.com>
-> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
-> ---
->  qapi/block-core.json | 4 +++-
->  1 file changed, 3 insertions(+), 1 deletion(-)
->
-> diff --git a/qapi/block-core.json b/qapi/block-core.json
-> index b274aef713..3196f40178 100644
-> --- a/qapi/block-core.json
-> +++ b/qapi/block-core.json
-> @@ -2851,11 +2851,13 @@
->  #
->  # @threads:     Use qemu's thread pool
->  # @native:      Use native AIO backend (only Linux and Windows)
-> +# @io_uring:    Use linux io_uring (since 4.2)
->  #
->  # Since: 2.9
->  ##
->  { 'enum': 'BlockdevAioOptions',
-> -  'data': [ 'threads', 'native' ] }
-> +  'data': [ 'threads', 'native',
-> +            { 'name': 'io_uring', 'if': 'defined(CONFIG_LINUX_IO_URING)'=
- } ] }
-> =20
->  ##
->  # @BlockdevCacheOptions:
-
-I encourage you to polish the commit message some.
-
-Acked-by: Markus Armbruster <armbru@redhat.com>
+diff --git a/.gitlab-ci.yml b/.gitlab-ci.yml
+index ed8067f5cf9..be57c6a454a 100644
+--- a/.gitlab-ci.yml
++++ b/.gitlab-ci.yml
+@@ -5,7 +5,7 @@ before_script:
+ build-system1:
+  script:
+  - apt-get install -y -qq libgtk-3-dev libvte-dev nettle-dev libcacard-dev
+-      libusb-dev libvde-dev libspice-protocol-dev libgl1-mesa-dev
++      libusb-dev libvde-dev libspice-protocol-dev libgl1-mesa-dev libvdeplug-dev
+  - ./configure --enable-werror --target-list="aarch64-softmmu alpha-softmmu
+       cris-softmmu hppa-softmmu lm32-softmmu moxie-softmmu microblazeel-softmmu
+       mips64el-softmmu m68k-softmmu ppc-softmmu riscv64-softmmu sparc-softmmu"
+-- 
+2.20.1
 
 
