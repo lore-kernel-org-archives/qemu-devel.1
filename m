@@ -2,78 +2,86 @@ Return-Path: <SRS0=bySr=YS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 55E5CCA9EA0
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 10:40:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9AC19CA9EA0
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 10:46:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 207052070B
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 10:40:11 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HNCoImOW"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 207052070B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 5DA3A21929
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 10:46:39 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5DA3A21929
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58414 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58468 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iNx0s-0007vO-6b
-	for qemu-devel@archiver.kernel.org; Fri, 25 Oct 2019 06:40:10 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33068)
+	id 1iNx76-0003Bs-P1
+	for qemu-devel@archiver.kernel.org; Fri, 25 Oct 2019 06:46:36 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34191)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <stefanha@redhat.com>) id 1iNwRC-0002DO-5f
- for qemu-devel@nongnu.org; Fri, 25 Oct 2019 06:03:27 -0400
+ (envelope-from <kevin.tian@intel.com>) id 1iNwaR-0001La-6d
+ for qemu-devel@nongnu.org; Fri, 25 Oct 2019 06:12:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <stefanha@redhat.com>) id 1iNwQz-0006J0-SV
- for qemu-devel@nongnu.org; Fri, 25 Oct 2019 06:03:16 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:46796
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <kevin.tian@intel.com>) id 1iNwaL-0000QO-9z
+ for qemu-devel@nongnu.org; Fri, 25 Oct 2019 06:12:49 -0400
+Received: from mga18.intel.com ([134.134.136.126]:43971)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1iNwQz-0006A2-M8
- for qemu-devel@nongnu.org; Fri, 25 Oct 2019 06:03:05 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1571997738;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=LwhXgl2ciXXzy/J77uxFbsgMEqtSSgjQHtAsTomujWc=;
- b=HNCoImOW7ThhzlzYt0NE/S+6M0KU444n1kqcccb0U1gE4OKjiDEBc27eq5WbD3+C2D+BpH
- yuPuYVis/5h01MPhJBr2HgZptJUxerS0nFlHahb+k/7xCN50SpzERYXY8uE4GXlg3kniV6
- m+r2uCFMLSz8BnIlQJwUvtw6D16CtZg=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-362-eJvXOwXeMqC3epOlF6APpQ-1; Fri, 25 Oct 2019 06:02:14 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0F9B147B
- for <qemu-devel@nongnu.org>; Fri, 25 Oct 2019 10:02:14 +0000 (UTC)
-Received: from localhost (unknown [10.36.118.25])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 683E65C1D4;
- Fri, 25 Oct 2019 10:02:04 +0000 (UTC)
-From: Stefan Hajnoczi <stefanha@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [RFC 1/3] WIP virtiofsd: import Linux <fuse.h> header file
-Date: Fri, 25 Oct 2019 12:01:50 +0200
-Message-Id: <20191025100152.6638-2-stefanha@redhat.com>
-In-Reply-To: <20191025100152.6638-1-stefanha@redhat.com>
-References: <20191025100152.6638-1-stefanha@redhat.com>
+ (Exim 4.71) (envelope-from <kevin.tian@intel.com>)
+ id 1iNwaH-0000P9-Pn
+ for qemu-devel@nongnu.org; Fri, 25 Oct 2019 06:12:44 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga003.fm.intel.com ([10.253.24.29])
+ by orsmga106.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
+ 25 Oct 2019 03:12:37 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.68,228,1569308400"; d="scan'208";a="204513645"
+Received: from fmsmsx103.amr.corp.intel.com ([10.18.124.201])
+ by FMSMGA003.fm.intel.com with ESMTP; 25 Oct 2019 03:12:37 -0700
+Received: from fmsmsx155.amr.corp.intel.com (10.18.116.71) by
+ FMSMSX103.amr.corp.intel.com (10.18.124.201) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Fri, 25 Oct 2019 03:12:36 -0700
+Received: from shsmsx106.ccr.corp.intel.com (10.239.4.159) by
+ FMSMSX155.amr.corp.intel.com (10.18.116.71) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Fri, 25 Oct 2019 03:12:36 -0700
+Received: from shsmsx104.ccr.corp.intel.com ([169.254.5.166]) by
+ SHSMSX106.ccr.corp.intel.com ([169.254.10.119]) with mapi id 14.03.0439.000;
+ Fri, 25 Oct 2019 18:12:35 +0800
+From: "Tian, Kevin" <kevin.tian@intel.com>
+To: Jason Wang <jasowang@redhat.com>, "Liu, Yi L" <yi.l.liu@intel.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "mst@redhat.com"
+ <mst@redhat.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>,
+ "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+ "peterx@redhat.com" <peterx@redhat.com>
+Subject: RE: [RFC v2 00/22] intel_iommu: expose Shared Virtual Addressing to VM
+Thread-Topic: [RFC v2 00/22] intel_iommu: expose Shared Virtual Addressing
+ to VM
+Thread-Index: AQHVimskKWib+KQlOUaXXMOVBk8bu6dql/6AgACL3iA=
+Date: Fri, 25 Oct 2019 10:12:34 +0000
+Message-ID: <AADFC41AFE54684AB9EE6CBC0274A5D19D5D0619@SHSMSX104.ccr.corp.intel.com>
+References: <1571920483-3382-1-git-send-email-yi.l.liu@intel.com>
+ <367adad0-eb05-c950-21d7-755fffacbed6@redhat.com>
+In-Reply-To: <367adad0-eb05-c950-21d7-755fffacbed6@redhat.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ctpclassification: CTP_NT
+x-titus-metadata-40: eyJDYXRlZ29yeUxhYmVscyI6IiIsIk1ldGFkYXRhIjp7Im5zIjoiaHR0cDpcL1wvd3d3LnRpdHVzLmNvbVwvbnNcL0ludGVsMyIsImlkIjoiNDNhN2FjMTUtOWI5Ni00ZWRkLTkwOTMtZjJiNDRjNDA0YTk0IiwicHJvcHMiOlt7Im4iOiJDVFBDbGFzc2lmaWNhdGlvbiIsInZhbHMiOlt7InZhbHVlIjoiQ1RQX05UIn1dfV19LCJTdWJqZWN0TGFiZWxzIjpbXSwiVE1DVmVyc2lvbiI6IjE3LjEwLjE4MDQuNDkiLCJUcnVzdGVkTGFiZWxIYXNoIjoid0haYTNpRGZTcXhjQWZURXB6MzJLamFwdmpzcUVaZDFNWEJcL0N5RmFYYXdrczRRQU9PYmJBNXNBUSsxaEE5dlwvIn0=
+dlp-product: dlpe-windows
+dlp-version: 11.0.400.15
+dlp-reaction: no-action
+x-originating-ip: [10.239.127.40]
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-MC-Unique: eJvXOwXeMqC3epOlF6APpQ-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=WINDOWS-1252
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 205.139.110.120
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 134.134.136.126
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -85,110 +93,136 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
- "Michael S. Tsirkin" <mst@redhat.com>, Cornelia Huck <cohuck@redhat.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>, virtio-fs@redhat.com,
- Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- vgoyal@redhat.com
+Cc: "tianyu.lan@intel.com" <tianyu.lan@intel.com>,
+ "jacob.jun.pan@linux.intel.com" <jacob.jun.pan@linux.intel.com>,
+ "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "Tian,
+ Jun J" <jun.j.tian@intel.com>, "eric.auger@redhat.com" <eric.auger@redhat.com>,
+ "Sun, Yi Y" <yi.y.sun@intel.com>,
+ "david@gibson.dropbear.id.au" <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-tests/vhost-user-fs-test.c needs fuse.h.  The private copy that
-virtiofsd has can be replaced with a properly imported file using
-update-linux-headers.sh.
-
-TODO rerun update-linux-headers.sh with upstream kernel tree!
-
-Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
----
- contrib/virtiofsd/fuse_lowlevel.h                              | 2 +-
- .../fuse_kernel.h =3D> include/standard-headers/linux/fuse.h     | 0
- contrib/virtiofsd/fuse_loop_mt.c                               | 2 +-
- contrib/virtiofsd/fuse_lowlevel.c                              | 2 +-
- contrib/virtiofsd/fuse_virtio.c                                | 2 +-
- scripts/update-linux-headers.sh                                | 3 ++-
- 6 files changed, 6 insertions(+), 5 deletions(-)
- rename contrib/virtiofsd/fuse_kernel.h =3D> include/standard-headers/linux=
-/fuse.h (100%)
-
-diff --git a/contrib/virtiofsd/fuse_lowlevel.h b/contrib/virtiofsd/fuse_low=
-level.h
-index 79fb30a1c2..a8c92ff7e0 100644
---- a/contrib/virtiofsd/fuse_lowlevel.h
-+++ b/contrib/virtiofsd/fuse_lowlevel.h
-@@ -23,7 +23,7 @@
- #endif
-=20
- #include "fuse_common.h"
--#include "fuse_kernel.h"
-+#include "standard-headers/linux/fuse.h"
-=20
- #include <utime.h>
- #include <fcntl.h>
-diff --git a/contrib/virtiofsd/fuse_kernel.h b/include/standard-headers/lin=
-ux/fuse.h
-similarity index 100%
-rename from contrib/virtiofsd/fuse_kernel.h
-rename to include/standard-headers/linux/fuse.h
-diff --git a/contrib/virtiofsd/fuse_loop_mt.c b/contrib/virtiofsd/fuse_loop=
-_mt.c
-index 2000a8902a..af7b501fac 100644
---- a/contrib/virtiofsd/fuse_loop_mt.c
-+++ b/contrib/virtiofsd/fuse_loop_mt.c
-@@ -11,7 +11,7 @@
- #include "fuse_i.h"
- #include "fuse_lowlevel.h"
- #include "fuse_misc.h"
--#include "fuse_kernel.h"
-+#include "standard-headers/linux/fuse.h"
- #include "fuse_virtio.h"
-=20
- #include <stdio.h>
-diff --git a/contrib/virtiofsd/fuse_lowlevel.c b/contrib/virtiofsd/fuse_low=
-level.c
-index 78ccfe3a27..c1a901cb4d 100644
---- a/contrib/virtiofsd/fuse_lowlevel.c
-+++ b/contrib/virtiofsd/fuse_lowlevel.c
-@@ -10,7 +10,7 @@
- */
-=20
- #include "fuse_i.h"
--#include "fuse_kernel.h"
-+#include "standard-headers/linux/fuse.h"
- #include "fuse_opt.h"
- #include "fuse_misc.h"
- #include "fuse_virtio.h"
-diff --git a/contrib/virtiofsd/fuse_virtio.c b/contrib/virtiofsd/fuse_virti=
-o.c
-index 533ef24bb7..7a0d0b2603 100644
---- a/contrib/virtiofsd/fuse_virtio.c
-+++ b/contrib/virtiofsd/fuse_virtio.c
-@@ -15,7 +15,7 @@
- #include "qapi/error.h"
-=20
- #include "fuse_i.h"
--#include "fuse_kernel.h"
-+#include "standard-headers/linux/fuse.h"
- #include "fuse_misc.h"
- #include "fuse_opt.h"
- #include "fuse_virtio.h"
-diff --git a/scripts/update-linux-headers.sh b/scripts/update-linux-headers=
-.sh
-index f76d77363b..1a627ccd73 100755
---- a/scripts/update-linux-headers.sh
-+++ b/scripts/update-linux-headers.sh
-@@ -184,7 +184,8 @@ EOF
-=20
- rm -rf "$output/include/standard-headers/linux"
- mkdir -p "$output/include/standard-headers/linux"
--for i in "$tmpdir"/include/linux/*virtio*.h \
-+for i in "$tmpdir/include/linux/fuse.h" \
-+         "$tmpdir"/include/linux/*virtio*.h \
-          "$tmpdir/include/linux/qemu_fw_cfg.h" \
-          "$tmpdir/include/linux/input.h" \
-          "$tmpdir/include/linux/input-event-codes.h" \
---=20
-2.21.0
-
+PiBGcm9tOiBKYXNvbiBXYW5nIFttYWlsdG86amFzb3dhbmdAcmVkaGF0LmNvbV0NCj4gU2VudDog
+RnJpZGF5LCBPY3RvYmVyIDI1LCAyMDE5IDU6NDkgUE0NCj4gDQo+IA0KPiBPbiAyMDE5LzEwLzI0
+IOS4i+WNiDg6MzQsIExpdSBZaSBMIHdyb3RlOg0KPiA+IFNoYXJlZCB2aXJ0dWFsIGFkZHJlc3Mg
+KFNWQSksIGEuay5hLCBTaGFyZWQgdmlydHVhbCBtZW1vcnkgKFNWTSkgb24gSW50ZWwNCj4gPiBw
+bGF0Zm9ybXMgYWxsb3cgYWRkcmVzcyBzcGFjZSBzaGFyaW5nIGJldHdlZW4gZGV2aWNlIERNQSBh
+bmQNCj4gYXBwbGljYXRpb25zLg0KPiANCj4gDQo+IEludGVyZXN0aW5nLCBzbyB0aGUgYmVsb3cg
+ZmlndXJlIGRlbW9uc3RyYXRlcyB0aGUgY2FzZSBvZiBWTS4gSSB3b25kZXINCj4gaG93IG11Y2gg
+ZGlmZmVyZW5jZXMgaWYgd2UgY29tcGFyZSBpdCB3aXRoIGRvaW5nIFNWTSBiZXR3ZWVuIGRldmlj
+ZQ0KPiBhbmQNCj4gYW4gb3JkaW5hcnkgcHJvY2VzcyAoZS5nIGRwZGspPw0KPiANCj4gVGhhbmtz
+DQoNCk9uZSBkaWZmZXJlbmNlIGlzIHRoYXQgb3JkaW5hcnkgcHJvY2VzcyByZXF1aXJlcyBvbmx5
+IHN0YWdlLTEgdHJhbnNsYXRpb24sDQp3aGlsZSBWTSByZXF1aXJlcyBuZXN0ZWQgdHJhbnNsYXRp
+b24uDQoNCj4gDQo+IA0KPiA+IFNWQSBjYW4gcmVkdWNlIHByb2dyYW1taW5nIGNvbXBsZXhpdHkg
+YW5kIGVuaGFuY2Ugc2VjdXJpdHkuDQo+ID4gVGhpcyBzZXJpZXMgaXMgaW50ZW5kZWQgdG8gZXhw
+b3NlIFNWQSBjYXBhYmlsaXR5IHRvIFZNcy4gaS5lLiBzaGFyZWQgZ3Vlc3QNCj4gPiBhcHBsaWNh
+dGlvbiBhZGRyZXNzIHNwYWNlIHdpdGggcGFzc3RocnUgZGV2aWNlcy4gVGhlIHdob2xlIFNWQQ0K
+PiB2aXJ0dWFsaXphdGlvbg0KPiA+IHJlcXVpcmVzIFFFTVUvVkZJTy9JT01NVSBjaGFuZ2VzLiBU
+aGlzIHNlcmllcyBpbmNsdWRlcyB0aGUgUUVNVQ0KPiBjaGFuZ2VzLCBmb3INCj4gPiBWRklPIGFu
+ZCBJT01NVSBjaGFuZ2VzLCB0aGV5IGFyZSBpbiBzZXBhcmF0ZSBzZXJpZXMgKGxpc3RlZCBpbiB0
+aGUNCj4gIlJlbGF0ZWQNCj4gPiBzZXJpZXMiKS4NCj4gPg0KPiA+IFRoZSBoaWdoLWxldmVsIGFy
+Y2hpdGVjdHVyZSBmb3IgU1ZBIHZpcnR1YWxpemF0aW9uIGlzIGFzIGJlbG93Og0KPiA+DQo+ID4g
+ICAgICAuLS0tLS0tLS0tLS0tLS4gIC4tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0uDQo+ID4g
+ICAgICB8ICAgdklPTU1VICAgIHwgIHwgR3Vlc3QgcHJvY2VzcyBDUjMsIEZMIG9ubHl8DQo+ID4g
+ICAgICB8ICAgICAgICAgICAgIHwgICctLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0nDQo+ID4g
+ICAgICAuLS0tLS0tLS0tLS0tLS0tLS8NCj4gPiAgICAgIHwgUEFTSUQgRW50cnkgfC0tLSBQQVNJ
+RCBjYWNoZSBmbHVzaCAtDQo+ID4gICAgICAnLS0tLS0tLS0tLS0tLScgICAgICAgICAgICAgICAg
+ICAgICAgIHwNCj4gPiAgICAgIHwgICAgICAgICAgICAgfCAgICAgICAgICAgICAgICAgICAgICAg
+Vg0KPiA+ICAgICAgfCAgICAgICAgICAgICB8ICAgICAgICAgICAgICAgIENSMyBpbiBHUEENCj4g
+PiAgICAgICctLS0tLS0tLS0tLS0tJw0KPiA+IEd1ZXN0DQo+ID4gLS0tLS0tfCBTaGFkb3cgfC0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tfC0tLS0tLS0tDQo+ID4gICAgICAgIHYgICAgICAgIHYg
+ICAgICAgICAgICAgICAgICAgICAgICAgIHYNCj4gPiBIb3N0DQo+ID4gICAgICAuLS0tLS0tLS0t
+LS0tLS4gIC4tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLg0KPiA+ICAgICAgfCAgIHBJT01NVSAgICB8
+ICB8IEJpbmQgRkwgZm9yIEdWQS1HUEEgIHwNCj4gPiAgICAgIHwgICAgICAgICAgICAgfCAgJy0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0nDQo+ID4gICAgICAuLS0tLS0tLS0tLS0tLS0tLS8gIHwNCj4g
+PiAgICAgIHwgUEFTSUQgRW50cnkgfCAgICAgViAoTmVzdGVkIHhsYXRlKQ0KPiA+ICAgICAgJy0t
+LS0tLS0tLS0tLS0tLS1cLi0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS4NCj4gPiAgICAg
+IHwgICAgICAgICAgICAgfCAgIHxTTCBmb3IgR1BBLUhQQSwgZGVmYXVsdCBkb21haW58DQo+ID4g
+ICAgICB8ICAgICAgICAgICAgIHwgICAnLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tJw0K
+PiA+ICAgICAgJy0tLS0tLS0tLS0tLS0nDQo+ID4gV2hlcmU6DQo+ID4gICAtIEZMID0gRmlyc3Qg
+bGV2ZWwvc3RhZ2Ugb25lIHBhZ2UgdGFibGVzDQo+ID4gICAtIFNMID0gU2Vjb25kIGxldmVsL3N0
+YWdlIHR3byBwYWdlIHRhYmxlcw0KPiA+DQo+ID4gVGhlIGNvbXBsZXRlIHZTVkEgdXBzdHJlYW0g
+cGF0Y2hlcyBhcmUgZGl2aWRlZCBpbnRvIHRocmVlIHBoYXNlczoNCj4gPiAgICAgIDEuIENvbW1v
+biBBUElzIGFuZCBQQ0kgZGV2aWNlIGRpcmVjdCBhc3NpZ25tZW50DQo+ID4gICAgICAyLiBQYWdl
+IFJlcXVlc3QgU2VydmljZXMgKFBSUykgc3VwcG9ydA0KPiA+ICAgICAgMy4gTWVkaWF0ZWQgZGV2
+aWNlIGFzc2lnbm1lbnQNCj4gPg0KPiA+IFRoaXMgUkZDIHBhdGNoc2V0IGlzIGFpbWluZyBmb3Ig
+dGhlIHBoYXNlIDEuIFdvcmtzIHRvZ2V0aGVyIHdpdGggdGhlIFZULWQNCj4gPiBkcml2ZXJbMV0g
+Y2hhbmdlcyBhbmQgVkZJTyBjaGFuZ2VzWzJdLg0KPiA+DQo+ID4gUmVsYXRlZCBzZXJpZXM6DQo+
+ID4gWzFdIFtQQVRDSCB2NiAwMC8xMF0gTmVzdGVkIFNoYXJlZCBWaXJ0dWFsIEFkZHJlc3MgKFNW
+QSkgVlQtZCBzdXBwb3J0Og0KPiA+IGh0dHBzOi8vbGttbC5vcmcvbGttbC8yMDE5LzEwLzIyLzk1
+Mw0KPiA+IDxUaGlzIHNlcmllcyBpcyBiYXNlZCBvbiB0aGlzIGtlcm5lbCBzZXJpZXMgZnJvbSBK
+YWNvYiBQYW4+DQo+ID4NCj4gPiBbMl0gW1JGQyB2MiAwLzNdIHZmaW86IHN1cHBvcnQgU2hhcmVk
+IFZpcnR1YWwgQWRkcmVzc2luZyBmcm9tIFlpIExpdQ0KPiA+DQo+ID4gVGhlcmUgYXJlIHJvdWdo
+bHkgZm91ciBwYXJ0czoNCj4gPiAgIDEuIEludHJvZHVjZSBJT01NVUNvbnRleHQgYXMgYWJzdHJh
+Y3QgbGF5ZXIgYmV0d2VlbiB2SU9NTVUNCj4gZW11bGF0b3IgYW5kDQo+ID4gICAgICBWRklPIHRv
+IGF2b2lkIGRpcmVjdCBjYWxsaW5nIGJldHdlZW4gdGhlIHR3bw0KPiA+ICAgMi4gUGFzc2Rvd24g
+UEFTSUQgYWxsb2NhdGlvbiBhbmQgZnJlZSB0byBob3N0DQo+ID4gICAzLiBQYXNzZG93biBndWVz
+dCBQQVNJRCBiaW5kaW5nIHRvIGhvc3QNCj4gPiAgIDQuIFBhc3Nkb3duIGd1ZXN0IElPTU1VIGNh
+Y2hlIGludmFsaWRhdGlvbiB0byBob3N0DQo+ID4NCj4gPiBUaGUgZnVsbCBzZXQgY2FuIGJlIGZv
+dW5kIGluIGJlbG93IGxpbms6DQo+ID4gaHR0cHM6Ly9naXRodWIuY29tL2x1eGlzMTk5OS9xZW11
+LmdpdDogc3ZhX3Z0ZF92Nl9xZW11X3JmY192Mg0KPiA+DQo+ID4gQ2hhbmdlbG9nOg0KPiA+IAkt
+IFJGQyB2MSAtPiB2MjoNCj4gPiAJICBJbnRyb2R1Y2UgSU9NTVVDb250ZXh0IHRvIGFic3RyYWN0
+IHRoZSBjb25uZWN0aW9uIGJldHdlZW4NCj4gVkZJTw0KPiA+IAkgIGFuZCB2SU9NTVUgZW11bGF0
+b3IsIHdoaWNoIGlzIGEgcmVwbGFjZW1lbnQgb2YgdGhlDQo+IFBDSVBBU0lET3BzDQo+ID4gCSAg
+aW4gUkZDIHYxLiBNb2RpZnkgeC1zY2FsYWJsZS1tb2RlIHRvIGJlIHN0cmluZyBvcHRpb24gaW5z
+dGVhZCBvZg0KPiA+IAkgIGFkZGluZyBhIG5ldyBvcHRpb24gYXMgUkZDIHYxIGRpZC4gUmVmaW5l
+ZCB0aGUgcGFzaWQgY2FjaGUNCj4gbWFuYWdlbWVudA0KPiA+IAkgIGFuZCBhZGRyZXNzZWQgdGhl
+IFRPRE9zIG1lbnRpb25lZCBpbiBSRkMgdjEuDQo+ID4gCSAgUkZDIHYxOiBodHRwczovL3BhdGNo
+d29yay5rZXJuZWwub3JnL2NvdmVyLzExMDMzNjU3Lw0KPiA+DQo+ID4gRXJpYyBBdWdlciAoMSk6
+DQo+ID4gICAgdXBkYXRlLWxpbnV4LWhlYWRlcnM6IEltcG9ydCBpb21tdS5oDQo+ID4NCj4gPiBM
+aXUgWWkgTCAoMjApOg0KPiA+ICAgIGhlYWRlciB1cGRhdGUgVkZJTy9JT01NVSB2U1ZBIEFQSXMg
+YWdhaW5zdCA1LjQuMC1yYzMrDQo+ID4gICAgaW50ZWxfaW9tbXU6IG1vZGlmeSB4LXNjYWxhYmxl
+LW1vZGUgdG8gYmUgc3RyaW5nIG9wdGlvbg0KPiA+ICAgIHZmaW8vY29tbW9uOiBhZGQgaW9tbXVf
+Y3R4X25vdGlmaWVyIGluIGNvbnRhaW5lcg0KPiA+ICAgIGh3L3BjaTogbW9kaWZ5IHBjaV9zZXR1
+cF9pb21tdSgpIHRvIHNldCBQQ0lJT01NVU9wcw0KPiA+ICAgIGh3L3BjaTogaW50cm9kdWNlIHBj
+aV9kZXZpY2VfaW9tbXVfY29udGV4dCgpDQo+ID4gICAgaW50ZWxfaW9tbXU6IHByb3ZpZGUgZ2V0
+X2lvbW11X2NvbnRleHQoKSBjYWxsYmFjaw0KPiA+ICAgIHZmaW8vcGNpOiBhZGQgaW9tbXVfY29u
+dGV4dCBub3RpZmllciBmb3IgcGFzaWQgYWxsb2MvZnJlZQ0KPiA+ICAgIGludGVsX2lvbW11OiBh
+ZGQgdmlydHVhbCBjb21tYW5kIGNhcGFiaWxpdHkgc3VwcG9ydA0KPiA+ICAgIGludGVsX2lvbW11
+OiBwcm9jZXNzIHBhc2lkIGNhY2hlIGludmFsaWRhdGlvbg0KPiA+ICAgIGludGVsX2lvbW11OiBh
+ZGQgcHJlc2VudCBiaXQgY2hlY2sgZm9yIHBhc2lkIHRhYmxlIGVudHJpZXMNCj4gPiAgICBpbnRl
+bF9pb21tdTogYWRkIFBBU0lEIGNhY2hlIG1hbmFnZW1lbnQgaW5mcmFzdHJ1Y3R1cmUNCj4gPiAg
+ICB2ZmlvL3BjaTogYWRkIGlvbW11X2NvbnRleHQgbm90aWZpZXIgZm9yIHBhc2lkIGJpbmQvdW5i
+aW5kDQo+ID4gICAgaW50ZWxfaW9tbXU6IGJpbmQvdW5iaW5kIGd1ZXN0IHBhZ2UgdGFibGUgdG8g
+aG9zdA0KPiA+ICAgIGludGVsX2lvbW11OiByZXBsYXkgZ3Vlc3QgcGFzaWQgYmluZGluZ3MgdG8g
+aG9zdA0KPiA+ICAgIGludGVsX2lvbW11OiByZXBsYXkgcGFzaWQgYmluZHMgYWZ0ZXIgY29udGV4
+dCBjYWNoZSBpbnZhbGlkYXRpb24NCj4gPiAgICBpbnRlbF9pb21tdTogZG8gbm90IHBhc3Nkb3du
+IHBhc2lkIGJpbmQgZm9yIFBBU0lEICMwDQo+ID4gICAgdmZpby9wY2k6IGFkZCBpb21tdV9jb250
+ZXh0IG5vdGlmaWVyIGZvciBQQVNJRC1iYXNlZCBpb3RsYiBmbHVzaA0KPiA+ICAgIGludGVsX2lv
+bW11OiBwcm9jZXNzIFBBU0lELWJhc2VkIGlvdGxiIGludmFsaWRhdGlvbg0KPiA+ICAgIGludGVs
+X2lvbW11OiBwcm9wYWdhdGUgUEFTSUQtYmFzZWQgaW90bGIgaW52YWxpZGF0aW9uIHRvIGhvc3QN
+Cj4gPiAgICBpbnRlbF9pb21tdTogcHJvY2VzcyBQQVNJRC1iYXNlZCBEZXZpY2UtVExCIGludmFs
+aWRhdGlvbg0KPiA+DQo+ID4gUGV0ZXIgWHUgKDEpOg0KPiA+ICAgIGh3L2lvbW11OiBpbnRyb2R1
+Y2UgSU9NTVVDb250ZXh0DQo+ID4NCj4gPiAgIGh3L01ha2VmaWxlLm9ianMgICAgICAgICAgICAg
+ICAgfCAgICAxICsNCj4gPiAgIGh3L2FscGhhL3R5cGhvb24uYyAgICAgICAgICAgICAgfCAgICA2
+ICstDQo+ID4gICBody9hcm0vc21tdS1jb21tb24uYyAgICAgICAgICAgIHwgICAgNiArLQ0KPiA+
+ICAgaHcvaHBwYS9kaW5vLmMgICAgICAgICAgICAgICAgICB8ICAgIDYgKy0NCj4gPiAgIGh3L2kz
+ODYvYW1kX2lvbW11LmMgICAgICAgICAgICAgfCAgICA2ICstDQo+ID4gICBody9pMzg2L2ludGVs
+X2lvbW11LmMgICAgICAgICAgIHwgMTI0OQ0KPiArKysrKysrKysrKysrKysrKysrKysrKysrKysr
+KysrKysrKysrLS0NCj4gPiAgIGh3L2kzODYvaW50ZWxfaW9tbXVfaW50ZXJuYWwuaCAgfCAgMTA5
+ICsrKysNCj4gPiAgIGh3L2kzODYvdHJhY2UtZXZlbnRzICAgICAgICAgICAgfCAgICA2ICsNCj4g
+PiAgIGh3L2lvbW11L01ha2VmaWxlLm9ianMgICAgICAgICAgfCAgICAxICsNCj4gPiAgIGh3L2lv
+bW11L2lvbW11LmMgICAgICAgICAgICAgICAgfCAgIDY2ICsrKw0KPiA+ICAgaHcvcGNpLWhvc3Qv
+ZGVzaWdud2FyZS5jICAgICAgICB8ICAgIDYgKy0NCj4gPiAgIGh3L3BjaS1ob3N0L3BwY2U1MDAu
+YyAgICAgICAgICAgfCAgICA2ICstDQo+ID4gICBody9wY2ktaG9zdC9wcmVwLmMgICAgICAgICAg
+ICAgIHwgICAgNiArLQ0KPiA+ICAgaHcvcGNpLWhvc3Qvc2FicmUuYyAgICAgICAgICAgICB8ICAg
+IDYgKy0NCj4gPiAgIGh3L3BjaS9wY2kuYyAgICAgICAgICAgICAgICAgICAgfCAgIDI3ICstDQo+
+ID4gICBody9wcGMvcHBjNDQwX3BjaXguYyAgICAgICAgICAgIHwgICAgNiArLQ0KPiA+ICAgaHcv
+cHBjL3NwYXByX3BjaS5jICAgICAgICAgICAgICB8ICAgIDYgKy0NCj4gPiAgIGh3L3MzOTB4L3Mz
+OTAtcGNpLWJ1cy5jICAgICAgICAgfCAgICA4ICstDQo+ID4gICBody92ZmlvL2NvbW1vbi5jICAg
+ICAgICAgICAgICAgIHwgICAxMCArDQo+ID4gICBody92ZmlvL3BjaS5jICAgICAgICAgICAgICAg
+ICAgIHwgIDE0OSArKysrKw0KPiA+ICAgaW5jbHVkZS9ody9pMzg2L2ludGVsX2lvbW11LmggICB8
+ICAgNTggKy0NCj4gPiAgIGluY2x1ZGUvaHcvaW9tbXUvaW9tbXUuaCAgICAgICAgfCAgMTEzICsr
+KysNCj4gPiAgIGluY2x1ZGUvaHcvcGNpL3BjaS5oICAgICAgICAgICAgfCAgIDEzICstDQo+ID4g
+ICBpbmNsdWRlL2h3L3BjaS9wY2lfYnVzLmggICAgICAgIHwgICAgMiArLQ0KPiA+ICAgaW5jbHVk
+ZS9ody92ZmlvL3ZmaW8tY29tbW9uLmggICB8ICAgIDkgKw0KPiA+ICAgbGludXgtaGVhZGVycy9s
+aW51eC9pb21tdS5oICAgICB8ICAzMjQgKysrKysrKysrKw0KPiA+ICAgbGludXgtaGVhZGVycy9s
+aW51eC92ZmlvLmggICAgICB8ICAgODMgKysrDQo+ID4gICBzY3JpcHRzL3VwZGF0ZS1saW51eC1o
+ZWFkZXJzLnNoIHwgICAgMiArLQ0KPiA+ICAgMjggZmlsZXMgY2hhbmdlZCwgMjIzMiBpbnNlcnRp
+b25zKCspLCA1OCBkZWxldGlvbnMoLSkNCj4gPiAgIGNyZWF0ZSBtb2RlIDEwMDY0NCBody9pb21t
+dS9NYWtlZmlsZS5vYmpzDQo+ID4gICBjcmVhdGUgbW9kZSAxMDA2NDQgaHcvaW9tbXUvaW9tbXUu
+Yw0KPiA+ICAgY3JlYXRlIG1vZGUgMTAwNjQ0IGluY2x1ZGUvaHcvaW9tbXUvaW9tbXUuaA0KPiA+
+ICAgY3JlYXRlIG1vZGUgMTAwNjQ0IGxpbnV4LWhlYWRlcnMvbGludXgvaW9tbXUuaA0KPiA+DQoN
+Cg==
 
