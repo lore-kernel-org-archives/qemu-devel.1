@@ -2,84 +2,87 @@ Return-Path: <SRS0=bySr=YS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+X-Spam-Status: No, score=-14.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8A1D9CA9EA0
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 13:30:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1B594CA9EBE
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 13:31:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 49FC321D71
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 13:30:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D6DA021D7F
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 13:31:08 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WQtq3G06"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 49FC321D71
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CEOAssEp"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D6DA021D7F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59968 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59976 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iNzfn-0002gV-Oc
-	for qemu-devel@archiver.kernel.org; Fri, 25 Oct 2019 09:30:35 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58784)
+	id 1iNzgJ-0003Oi-2a
+	for qemu-devel@archiver.kernel.org; Fri, 25 Oct 2019 09:31:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58971)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mrolnik@gmail.com>) id 1iNzP6-0004Zd-2d
- for qemu-devel@nongnu.org; Fri, 25 Oct 2019 09:13:22 -0400
+ (envelope-from <mrolnik@gmail.com>) id 1iNzPK-0005EP-J4
+ for qemu-devel@nongnu.org; Fri, 25 Oct 2019 09:13:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mrolnik@gmail.com>) id 1iNzP3-00012G-2p
- for qemu-devel@nongnu.org; Fri, 25 Oct 2019 09:13:19 -0400
-Received: from mail-wr1-x429.google.com ([2a00:1450:4864:20::429]:39994)
+ (envelope-from <mrolnik@gmail.com>) id 1iNzPJ-000199-1O
+ for qemu-devel@nongnu.org; Fri, 25 Oct 2019 09:13:34 -0400
+Received: from mail-wr1-x433.google.com ([2a00:1450:4864:20::433]:33089)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <mrolnik@gmail.com>) id 1iNzP2-00011x-Q4
- for qemu-devel@nongnu.org; Fri, 25 Oct 2019 09:13:17 -0400
-Received: by mail-wr1-x429.google.com with SMTP id o28so2286218wro.7
- for <qemu-devel@nongnu.org>; Fri, 25 Oct 2019 06:13:16 -0700 (PDT)
+ (Exim 4.71) (envelope-from <mrolnik@gmail.com>) id 1iNzPI-00018c-RQ
+ for qemu-devel@nongnu.org; Fri, 25 Oct 2019 09:13:32 -0400
+Received: by mail-wr1-x433.google.com with SMTP id s1so2327631wro.0
+ for <qemu-devel@nongnu.org>; Fri, 25 Oct 2019 06:13:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=VqNNx/MzlpYstAOxUoKFhsSpOopQ7LIZjjEcfAJrlzE=;
- b=WQtq3G06WdTAQCSbuXUtr2/TfhRx3mWI9qi6D7DajLZuECQIVFKwVmX9P8EGNGpinR
- o6Em7f9FUPkQ2nXQl45wuY0oFglUldNqBCl7fl7V5J7Ofkw5e3KIRgUqU/u2HhEIR3Gp
- RkvE9gmtDuF+e2p7n65SqhX649mXelkn6emDe4V2fLDwh6ecmGtHa1QStMvk2SrB0iXm
- Ntz8I8nN7E4EDEb9udwrpQoIiK1dnEdfGMWMBqnt3jyRl7nIbNk1Qoo74sAIRZqFRM49
- gPIWk84PUY87GhY7lGUINanya1unKxPEtvEoMuIrwVONBQTUjSGsH+tRLQxa2EiBm0Bj
- M6QA==
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=87Iy/QnNHtLxvX6jVSCCgi733svf73GUIYITANarm74=;
+ b=CEOAssEp36eyQn1sd3bGdxLpBlO3fXB5cQuc6Dphl3LW1vTB76/6NxXlidKZ50622a
+ OgQtSmEW+xAHLiguYftEVbokud1GZvYOiPMPgmvD4Hdkxr1wNr3IwTc8isTzIzobDo5w
+ PIpM1pF6TubN9a/NulYIwib37fHze9Hqb7wbuhyCiwl3xrhNovgJ7jAafSRMeAk2goBg
+ +WszyeQXMsQT8eYAJFMsySegpUBV6zlyQCAqEFEJ5Z+EMUV+omJfLM73n1tatYWd63zP
+ ks3TSK9C0JnJBxNh+1pN4G9Sh9V3uXF36po0FfE816PqCLBuakLYompFfT9schU0z2Wp
+ 91TQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references;
- bh=VqNNx/MzlpYstAOxUoKFhsSpOopQ7LIZjjEcfAJrlzE=;
- b=EVWNMxE6Udqk1Q49cDMpfYzSvNJ0Fo9uk81yNtauTuJAipDBty6BXank4xOQtZ4/QS
- PXQU8pGWIjWJiQA9bxRCierzrtXCuSA+BI32B3t6zJGodnG6K0YCceX3aJD/2SZJAlt/
- CgPO/n3DOv76Nu6cNa3v5mIKLpZVsyJWMRgBeyJsXaVRA7DrL3VZLA6VUbGtZzfiLbU0
- 81PnNzli2Ube7PAR46sYPkDgdTpYO3qJ5VZJE2Zg90wh8Pho4D/C/eOPMDvtzHzBSXgY
- L5n7EsmLUmRKss5LVlnH8FpLlZs6Xo6fyL1+T5/Wh5tQ6JFXdLi5RfqaY/2YKT9AV4CO
- Ndng==
-X-Gm-Message-State: APjAAAUOVZ6fsYemOl81cJCb58m5DSq4hYSpvviGvC0sJgb2PGjP+nkf
- fTJfRIh/F7em218mUdVPouk3GR8yl/4Juw==
-X-Google-Smtp-Source: APXvYqykcYiwDA3WFxlnkslxrBeVLt0+O07EIQ/ffic/M0sSpzcps+04dSE74GIvRw6jNVGgo9wkuw==
-X-Received: by 2002:a5d:4f91:: with SMTP id d17mr3054874wru.184.1572009194905; 
- Fri, 25 Oct 2019 06:13:14 -0700 (PDT)
+ :references:mime-version:content-transfer-encoding;
+ bh=87Iy/QnNHtLxvX6jVSCCgi733svf73GUIYITANarm74=;
+ b=Wr6HXCRZBYwOIUZVbOzsn7QAMHuLvbTmvWi8UbQEUhhC24OhAp3CUmmFlrjDeTxrCf
+ RvqCf+iTLTy25Kd1lTWLNrIH+GdO+Sb3m0RMTighQRC9rvUKWTT/s632IP/FpP/yJVzx
+ h0VRe9QD7FQvV9dy8P6rrnHxIh3jtc4XvJefIdCcYh0QGHOKi9K1dyBXb3YOp5SLV3XV
+ TksIEMC8PKELAkKVguJV8ajQv7V8Wh1iL07QmZA3zTRngdu2c647plc4pHv6Chq1p+mD
+ xWNjzPPfiIi4IU47Ji7wdIV+bGQOkZ/8MvivnHTnA2w+r04YTCBPHTtIIqbVKNozUMrc
+ bGhA==
+X-Gm-Message-State: APjAAAWlvXBCHJJlXQq3tPqnT3LyBpPGKViCx/9gGF9RVId5Qk4c2T5o
+ Ki5d4BRRPJEiZqJy51IQd2aKb+BK3cWOpQ==
+X-Google-Smtp-Source: APXvYqx3V2YKrjX+H1GQ4WWno3CqKgoG86veOiA1gwgsQm7Wq2JkL5E/URqEPx6FsyOzwLgUpm4BlA==
+X-Received: by 2002:a5d:544d:: with SMTP id w13mr3060836wrv.19.1572009211310; 
+ Fri, 25 Oct 2019 06:13:31 -0700 (PDT)
 Received: from 8c859074c0ff.ant.amazon.com.com
  (bzq-79-181-93-41.red.bezeqint.net. [79.181.93.41])
- by smtp.gmail.com with ESMTPSA id x205sm2616139wmb.5.2019.10.25.06.13.13
+ by smtp.gmail.com with ESMTPSA id x205sm2616139wmb.5.2019.10.25.06.13.29
  (version=TLS1_2 cipher=ECDHE-RSA-AES128-SHA bits=128/128);
- Fri, 25 Oct 2019 06:13:14 -0700 (PDT)
+ Fri, 25 Oct 2019 06:13:30 -0700 (PDT)
 From: Michael Rolnik <mrolnik@gmail.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v34 05/13] target/avr: Add instruction translation -
- Arithmetic and Logic Instructions
-Date: Fri, 25 Oct 2019 16:12:29 +0300
-Message-Id: <20191025131237.63149-6-mrolnik@gmail.com>
+Subject: [PATCH v34 13/13] target/avr: Add tests
+Date: Fri, 25 Oct 2019 16:12:37 +0300
+Message-Id: <20191025131237.63149-14-mrolnik@gmail.com>
 X-Mailer: git-send-email 2.17.2 (Apple Git-113)
 In-Reply-To: <20191025131237.63149-1-mrolnik@gmail.com>
 References: <20191025131237.63149-1-mrolnik@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::429
+X-Received-From: 2a00:1450:4864:20::433
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,852 +101,109 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This includes:
-- ADD, ADC, ADIW
-- SBIW, SUB, SUBI, SBC, SBCI
-- AND, ANDI
-- OR, ORI, EOR
-- COM, NEG
-- INC, DEC
-- MUL, MULS, MULSU
-- FMUL, FMULS, FMULSU
-- DES
+1. Avocado test
+    The test is based on
+    https://github.com/seharris/qemu-avr-tests/tree/master/free-rtos/Demo
+    demo which. If working correctly, prints 'ABCDEFGHIJKLMNOPQRSTUVWX' out.
+    it also demostrates that timer and IRQ are working
+
+2. Boot serial test
+    Print out 'T' through serial port
 
 Signed-off-by: Michael Rolnik <mrolnik@gmail.com>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Acked-by: Thomas Huth <thuth@redhat.com>
 ---
- target/avr/translate.c | 822 +++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 822 insertions(+)
+ tests/Makefile.include           |  2 ++
+ tests/acceptance/machine_avr6.py | 36 ++++++++++++++++++++++++++++++++
+ tests/boot-serial-test.c         | 10 +++++++++
+ 3 files changed, 48 insertions(+)
+ create mode 100644 tests/acceptance/machine_avr6.py
 
-diff --git a/target/avr/translate.c b/target/avr/translate.c
-index 53c9892a60..573c9988b5 100644
---- a/target/avr/translate.c
-+++ b/target/avr/translate.c
-@@ -130,3 +130,825 @@ static bool avr_have_feature(DisasContext *ctx, int feature)
- static bool decode_insn(DisasContext *ctx, uint16_t insn);
- #include "decode_insn.inc.c"
+diff --git a/tests/Makefile.include b/tests/Makefile.include
+index 09e5b410dc..7f3f971191 100644
+--- a/tests/Makefile.include
++++ b/tests/Makefile.include
+@@ -206,6 +206,8 @@ check-qtest-i386-y += tests/test-x86-cpuid-compat$(EXESUF)
+ check-qtest-i386-y += tests/numa-test$(EXESUF)
+ check-qtest-x86_64-y += $(check-qtest-i386-y)
  
-+
-+static void gen_add_CHf(TCGv R, TCGv Rd, TCGv Rr)
-+{
-+    TCGv t1 = tcg_temp_new_i32();
-+    TCGv t2 = tcg_temp_new_i32();
-+    TCGv t3 = tcg_temp_new_i32();
-+
-+    tcg_gen_and_tl(t1, Rd, Rr); /* t1 = Rd & Rr */
-+    tcg_gen_andc_tl(t2, Rd, R); /* t2 = Rd & ~R */
-+    tcg_gen_andc_tl(t3, Rr, R); /* t3 = Rr & ~R */
-+    tcg_gen_or_tl(t1, t1, t2); /* t1 = t1 | t2 | t3 */
-+    tcg_gen_or_tl(t1, t1, t3);
-+
-+    tcg_gen_shri_tl(cpu_Cf, t1, 7); /* Cf = t1(7) */
-+    tcg_gen_shri_tl(cpu_Hf, t1, 3); /* Hf = t1(3) */
-+    tcg_gen_andi_tl(cpu_Hf, cpu_Hf, 1);
-+
-+    tcg_temp_free_i32(t3);
-+    tcg_temp_free_i32(t2);
-+    tcg_temp_free_i32(t1);
-+}
-+
-+
-+static void gen_add_Vf(TCGv R, TCGv Rd, TCGv Rr)
-+{
-+    TCGv t1 = tcg_temp_new_i32();
-+    TCGv t2 = tcg_temp_new_i32();
-+
-+    /* t1 = Rd & Rr & ~R | ~Rd & ~Rr & R = (Rd ^ R) & ~(Rd ^ Rr) */
-+    tcg_gen_xor_tl(t1, Rd, R);
-+    tcg_gen_xor_tl(t2, Rd, Rr);
-+    tcg_gen_andc_tl(t1, t1, t2);
-+
-+    tcg_gen_shri_tl(cpu_Vf, t1, 7); /* Vf = t1(7) */
-+
-+    tcg_temp_free_i32(t2);
-+    tcg_temp_free_i32(t1);
-+}
-+
-+
-+static void gen_sub_CHf(TCGv R, TCGv Rd, TCGv Rr)
-+{
-+    TCGv t1 = tcg_temp_new_i32();
-+    TCGv t2 = tcg_temp_new_i32();
-+    TCGv t3 = tcg_temp_new_i32();
-+
-+    /* Cf & Hf */
-+    tcg_gen_not_tl(t1, Rd); /* t1 = ~Rd */
-+    tcg_gen_and_tl(t2, t1, Rr); /* t2 = ~Rd & Rr */
-+    tcg_gen_or_tl(t3, t1, Rr); /* t3 = (~Rd | Rr) & R */
-+    tcg_gen_and_tl(t3, t3, R);
-+    tcg_gen_or_tl(t2, t2, t3); /* t2 = ~Rd & Rr | ~Rd & R | R & Rr */
-+    tcg_gen_shri_tl(cpu_Cf, t2, 7); /* Cf = t2(7) */
-+    tcg_gen_shri_tl(cpu_Hf, t2, 3); /* Hf = t2(3) */
-+    tcg_gen_andi_tl(cpu_Hf, cpu_Hf, 1);
-+
-+    tcg_temp_free_i32(t3);
-+    tcg_temp_free_i32(t2);
-+    tcg_temp_free_i32(t1);
-+}
-+
-+
-+static void gen_sub_Vf(TCGv R, TCGv Rd, TCGv Rr)
-+{
-+    TCGv t1 = tcg_temp_new_i32();
-+    TCGv t2 = tcg_temp_new_i32();
-+
-+    /* Vf */
-+    /* t1 = Rd & ~Rr & ~R | ~Rd & Rr & R = (Rd ^ R) & (Rd ^ R) */
-+    tcg_gen_xor_tl(t1, Rd, R);
-+    tcg_gen_xor_tl(t2, Rd, Rr);
-+    tcg_gen_and_tl(t1, t1, t2);
-+    tcg_gen_shri_tl(cpu_Vf, t1, 7); /* Vf = t1(7) */
-+
-+    tcg_temp_free_i32(t2);
-+    tcg_temp_free_i32(t1);
-+}
-+
-+
-+static void gen_NSf(TCGv R)
-+{
-+    tcg_gen_shri_tl(cpu_Nf, R, 7); /* Nf = R(7) */
-+    tcg_gen_xor_tl(cpu_Sf, cpu_Nf, cpu_Vf); /* Sf = Nf ^ Vf */
-+}
-+
-+
-+static void gen_ZNSf(TCGv R)
-+{
-+    tcg_gen_setcondi_tl(TCG_COND_EQ, cpu_Zf, R, 0); /* Zf = R == 0 */
-+    tcg_gen_shri_tl(cpu_Nf, R, 7); /* Nf = R(7) */
-+    tcg_gen_xor_tl(cpu_Sf, cpu_Nf, cpu_Vf); /* Sf = Nf ^ Vf */
-+}
-+
-+
-+/*
-+ *  Adds two registers without the C Flag and places the result in the
-+ *  destination register Rd.
-+ */
-+static bool trans_ADD(DisasContext *ctx, arg_ADD *a)
-+{
-+    TCGv Rd = cpu_r[a->rd];
-+    TCGv Rr = cpu_r[a->rr];
-+    TCGv R = tcg_temp_new_i32();
-+
-+    /* op */
-+    tcg_gen_add_tl(R, Rd, Rr); /* Rd = Rd + Rr */
-+    tcg_gen_andi_tl(R, R, 0xff); /* make it 8 bits */
-+
-+    gen_add_CHf(R, Rd, Rr);
-+    gen_add_Vf(R, Rd, Rr);
-+    gen_ZNSf(R);
-+
-+    /* R */
-+    tcg_gen_mov_tl(Rd, R);
-+
-+    tcg_temp_free_i32(R);
-+
-+    return true;
-+}
-+
-+
-+/*
-+ *  Adds two registers and the contents of the C Flag and places the result in
-+ *  the destination register Rd.
-+ */
-+static bool trans_ADC(DisasContext *ctx, arg_ADC *a)
-+{
-+    TCGv Rd = cpu_r[a->rd];
-+    TCGv Rr = cpu_r[a->rr];
-+    TCGv R = tcg_temp_new_i32();
-+
-+    /* op */
-+    tcg_gen_add_tl(R, Rd, Rr); /* R = Rd + Rr + Cf */
-+    tcg_gen_add_tl(R, R, cpu_Cf);
-+    tcg_gen_andi_tl(R, R, 0xff); /* make it 8 bits */
-+
-+    gen_add_CHf(R, Rd, Rr);
-+    gen_add_Vf(R, Rd, Rr);
-+    gen_ZNSf(R);
-+
-+    /* R */
-+    tcg_gen_mov_tl(Rd, R);
-+
-+    tcg_temp_free_i32(R);
-+
-+    return true;
-+}
-+
-+
-+/*
-+ *  Subtracts an immediate value (0-63) from a register pair and places the
-+ *  result in the register pair. This instruction operates on the upper four
-+ *  register pairs, and is well suited for operations on the Pointer Registers.
-+ *  This instruction is not available in all devices. Refer to the device
-+ *  specific instruction set summary.
-+ */
-+static bool trans_SBIW(DisasContext *ctx, arg_SBIW *a)
-+{
-+    if (!avr_have_feature(ctx, AVR_FEATURE_ADIW_SBIW)) {
-+        return true;
-+    }
-+
-+    TCGv RdL = cpu_r[a->rd];
-+    TCGv RdH = cpu_r[a->rd + 1];
-+    int Imm = (a->imm);
-+    TCGv R = tcg_temp_new_i32();
-+    TCGv Rd = tcg_temp_new_i32();
-+
-+    /* op */
-+    tcg_gen_deposit_tl(Rd, RdL, RdH, 8, 8); /* Rd = RdH:RdL */
-+    tcg_gen_subi_tl(R, Rd, Imm); /* R = Rd - Imm */
-+    tcg_gen_andi_tl(R, R, 0xffff); /* make it 16 bits */
-+
-+    /* Cf */
-+    tcg_gen_andc_tl(cpu_Cf, R, Rd);
-+    tcg_gen_shri_tl(cpu_Cf, cpu_Cf, 15); /* Cf = R & ~Rd */
-+
-+    /* Vf */
-+    tcg_gen_andc_tl(cpu_Vf, Rd, R);
-+    tcg_gen_shri_tl(cpu_Vf, cpu_Vf, 15); /* Vf = Rd & ~R */
-+
-+    /* Zf */
-+    tcg_gen_setcondi_tl(TCG_COND_EQ, cpu_Zf, R, 0); /* Zf = R == 0 */
-+
-+    /* Nf */
-+    tcg_gen_shri_tl(cpu_Nf, R, 15); /* Nf = R(15) */
-+
-+    /* Sf */
-+    tcg_gen_xor_tl(cpu_Sf, cpu_Nf, cpu_Vf); /* Sf = Nf ^ Vf */
-+
-+    /* R */
-+    tcg_gen_andi_tl(RdL, R, 0xff);
-+    tcg_gen_shri_tl(RdH, R, 8);
-+
-+    tcg_temp_free_i32(Rd);
-+    tcg_temp_free_i32(R);
-+
-+    return true;
-+}
-+
-+
-+/*
-+ *  Adds an immediate value (0 - 63) to a register pair and places the result
-+ *  in the register pair. This instruction operates on the upper four register
-+ *  pairs, and is well suited for operations on the pointer registers.  This
-+ *  instruction is not available in all devices. Refer to the device specific
-+ *  instruction set summary.
-+ */
-+static bool trans_ADIW(DisasContext *ctx, arg_ADIW *a)
-+{
-+    if (!avr_have_feature(ctx, AVR_FEATURE_ADIW_SBIW)) {
-+        return true;
-+    }
-+
-+    TCGv RdL = cpu_r[a->rd];
-+    TCGv RdH = cpu_r[a->rd + 1];
-+    int Imm = (a->imm);
-+    TCGv R = tcg_temp_new_i32();
-+    TCGv Rd = tcg_temp_new_i32();
-+
-+    /* op */
-+    tcg_gen_deposit_tl(Rd, RdL, RdH, 8, 8); /* Rd = RdH:RdL */
-+    tcg_gen_addi_tl(R, Rd, Imm); /* R = Rd + Imm */
-+    tcg_gen_andi_tl(R, R, 0xffff); /* make it 16 bits */
-+
-+    /* Cf */
-+    tcg_gen_andc_tl(cpu_Cf, Rd, R); /* Cf = Rd & ~R */
-+    tcg_gen_shri_tl(cpu_Cf, cpu_Cf, 15);
-+
-+    /* Vf */
-+    tcg_gen_andc_tl(cpu_Vf, R, Rd); /* Vf = R & ~Rd */
-+    tcg_gen_shri_tl(cpu_Vf, cpu_Vf, 15);
-+
-+    /* Zf */
-+    tcg_gen_setcondi_tl(TCG_COND_EQ, cpu_Zf, R, 0); /* Zf = R == 0 */
-+
-+    /* Nf */
-+    tcg_gen_shri_tl(cpu_Nf, R, 15); /* Nf = R(15) */
-+
-+    /* Sf */
-+    tcg_gen_xor_tl(cpu_Sf, cpu_Nf, cpu_Vf);/* Sf = Nf ^ Vf */
-+
-+    /* R */
-+    tcg_gen_andi_tl(RdL, R, 0xff);
-+    tcg_gen_shri_tl(RdH, R, 8);
-+
-+    tcg_temp_free_i32(Rd);
-+    tcg_temp_free_i32(R);
-+
-+    return true;
-+}
-+
-+
-+/*
-+ *  Subtracts two registers and places the result in the destination
-+ *  register Rd.
-+ */
-+static bool trans_SUB(DisasContext *ctx, arg_SUB *a)
-+{
-+    TCGv Rd = cpu_r[a->rd];
-+    TCGv Rr = cpu_r[a->rr];
-+    TCGv R = tcg_temp_new_i32();
-+
-+    /* op */
-+    tcg_gen_sub_tl(R, Rd, Rr); /* R = Rd - Rr */
-+    tcg_gen_andi_tl(R, R, 0xff); /* make it 8 bits */
-+
-+    gen_sub_CHf(R, Rd, Rr);
-+    gen_sub_Vf(R, Rd, Rr);
-+    gen_ZNSf(R);
-+
-+    /* R */
-+    tcg_gen_mov_tl(Rd, R);
-+
-+    tcg_temp_free_i32(R);
-+
-+    return true;
-+}
-+
-+/*
-+ *  Subtracts a register and a constant and places the result in the
-+ *  destination register Rd. This instruction is working on Register R16 to R31
-+ *  and is very well suited for operations on the X, Y, and Z-pointers.
-+ */
-+static bool trans_SUBI(DisasContext *ctx, arg_SUBI *a)
-+{
-+    TCGv Rd = cpu_r[a->rd];
-+    TCGv Rr = tcg_const_i32(a->imm);
-+    TCGv R = tcg_temp_new_i32();
-+
-+    /* op */
-+    tcg_gen_sub_tl(R, Rd, Rr); /* R = Rd - Imm */
-+    tcg_gen_andi_tl(R, R, 0xff); /* make it 8 bits */
-+
-+    gen_sub_CHf(R, Rd, Rr);
-+    gen_sub_Vf(R, Rd, Rr);
-+    gen_ZNSf(R);
-+
-+    /* R */
-+    tcg_gen_mov_tl(Rd, R);
-+
-+    tcg_temp_free_i32(R);
-+    tcg_temp_free_i32(Rr);
-+
-+    return true;
-+}
-+
-+
-+/*
-+ *  Subtracts two registers and subtracts with the C Flag and places the
-+ *  result in the destination register Rd.
-+ */
-+static bool trans_SBC(DisasContext *ctx, arg_SBC *a)
-+{
-+    TCGv Rd = cpu_r[a->rd];
-+    TCGv Rr = cpu_r[a->rr];
-+    TCGv R = tcg_temp_new_i32();
-+    TCGv zero = tcg_const_i32(0);
-+
-+    /* op */
-+    tcg_gen_sub_tl(R, Rd, Rr); /* R = Rd - Rr - Cf */
-+    tcg_gen_sub_tl(R, R, cpu_Cf);
-+    tcg_gen_andi_tl(R, R, 0xff); /* make it 8 bits */
-+
-+    gen_sub_CHf(R, Rd, Rr);
-+    gen_sub_Vf(R, Rd, Rr);
-+    gen_NSf(R);
-+
-+    /*
-+     * Previous value remains unchanged when the result is zero;
-+     * cleared otherwise.
-+     */
-+    tcg_gen_movcond_tl(TCG_COND_EQ, cpu_Zf, R, zero, cpu_Zf, zero);
-+
-+    /* R */
-+    tcg_gen_mov_tl(Rd, R);
-+
-+    tcg_temp_free_i32(zero);
-+    tcg_temp_free_i32(R);
-+
-+    return true;
-+}
-+
-+
-+/*
-+ *  SBCI -- Subtract Immediate with Carry
-+ */
-+static bool trans_SBCI(DisasContext *ctx, arg_SBCI *a)
-+{
-+    TCGv Rd = cpu_r[a->rd];
-+    TCGv Rr = tcg_const_i32(a->imm);
-+    TCGv R = tcg_temp_new_i32();
-+    TCGv zero = tcg_const_i32(0);
-+
-+    /* op */
-+    tcg_gen_sub_tl(R, Rd, Rr); /* R = Rd - Rr - Cf */
-+    tcg_gen_sub_tl(R, R, cpu_Cf);
-+    tcg_gen_andi_tl(R, R, 0xff); /* make it 8 bits */
-+
-+    gen_sub_CHf(R, Rd, Rr);
-+    gen_sub_Vf(R, Rd, Rr);
-+    gen_NSf(R);
-+
-+    /*
-+     * Previous value remains unchanged when the result is zero;
-+     * cleared otherwise.
-+     */
-+    tcg_gen_movcond_tl(TCG_COND_EQ, cpu_Zf, R, zero, cpu_Zf, zero);
-+
-+    /* R */
-+    tcg_gen_mov_tl(Rd, R);
-+
-+    tcg_temp_free_i32(zero);
-+    tcg_temp_free_i32(R);
-+    tcg_temp_free_i32(Rr);
-+
-+    return true;
-+}
-+
-+
-+/*
-+ *  Performs the logical AND between the contents of register Rd and register
-+ *  Rr and places the result in the destination register Rd.
-+ */
-+static bool trans_AND(DisasContext *ctx, arg_AND *a)
-+{
-+    TCGv Rd = cpu_r[a->rd];
-+    TCGv Rr = cpu_r[a->rr];
-+    TCGv R = tcg_temp_new_i32();
-+
-+    /* op */
-+    tcg_gen_and_tl(R, Rd, Rr); /* Rd = Rd and Rr */
-+
-+    /* Vf */
-+    tcg_gen_movi_tl(cpu_Vf, 0); /* Vf = 0 */
-+
-+    /* Zf */
-+    tcg_gen_setcondi_tl(TCG_COND_EQ, cpu_Zf, R, 0); /* Zf = R == 0 */
-+
-+    gen_ZNSf(R);
-+
-+    /* R */
-+    tcg_gen_mov_tl(Rd, R);
-+
-+    tcg_temp_free_i32(R);
-+
-+    return true;
-+}
-+
-+
-+/*
-+ *  Performs the logical AND between the contents of register Rd and a constant
-+ *  and places the result in the destination register Rd.
-+ */
-+static bool trans_ANDI(DisasContext *ctx, arg_ANDI *a)
-+{
-+    TCGv Rd = cpu_r[a->rd];
-+    int Imm = (a->imm);
-+
-+    /* op */
-+    tcg_gen_andi_tl(Rd, Rd, Imm); /* Rd = Rd & Imm */
-+
-+    tcg_gen_movi_tl(cpu_Vf, 0x00); /* Vf = 0 */
-+    gen_ZNSf(Rd);
-+
-+    return true;
-+}
-+
-+
-+/*
-+ *  Performs the logical OR between the contents of register Rd and register
-+ *  Rr and places the result in the destination register Rd.
-+ */
-+static bool trans_OR(DisasContext *ctx, arg_OR *a)
-+{
-+    TCGv Rd = cpu_r[a->rd];
-+    TCGv Rr = cpu_r[a->rr];
-+    TCGv R = tcg_temp_new_i32();
-+
-+    tcg_gen_or_tl(R, Rd, Rr);
-+
-+    tcg_gen_movi_tl(cpu_Vf, 0);
-+    gen_ZNSf(R);
-+
-+    tcg_gen_mov_tl(Rd, R);
-+
-+    tcg_temp_free_i32(R);
-+
-+    return true;
-+}
-+
-+
-+/*
-+ *  Performs the logical OR between the contents of register Rd and a
-+ *  constant and places the result in the destination register Rd.
-+ */
-+static bool trans_ORI(DisasContext *ctx, arg_ORI *a)
-+{
-+    TCGv Rd = cpu_r[a->rd];
-+    int Imm = (a->imm);
-+
-+    tcg_gen_ori_tl(Rd, Rd, Imm); /* Rd = Rd | Imm */
-+
-+    tcg_gen_movi_tl(cpu_Vf, 0x00); /* Vf = 0 */
-+    gen_ZNSf(Rd);
-+
-+    return true;
-+}
-+
-+
-+/*
-+ *  Performs the logical EOR between the contents of register Rd and
-+ *  register Rr and places the result in the destination register Rd.
-+ */
-+static bool trans_EOR(DisasContext *ctx, arg_EOR *a)
-+{
-+    TCGv Rd = cpu_r[a->rd];
-+    TCGv Rr = cpu_r[a->rr];
-+
-+    tcg_gen_xor_tl(Rd, Rd, Rr);
-+
-+    tcg_gen_movi_tl(cpu_Vf, 0);
-+    gen_ZNSf(Rd);
-+
-+    return true;
-+}
-+
-+
-+/*
-+ *  Clears the specified bits in register Rd. Performs the logical AND
-+ *  between the contents of register Rd and the complement of the constant mask
-+ *  K. The result will be placed in register Rd.
-+ */
-+static bool trans_COM(DisasContext *ctx, arg_COM *a)
-+{
-+    TCGv Rd = cpu_r[a->rd];
-+    TCGv R = tcg_temp_new_i32();
-+
-+    tcg_gen_xori_tl(Rd, Rd, 0xff);
-+
-+    tcg_gen_movi_tl(cpu_Cf, 1); /* Cf = 1 */
-+    tcg_gen_movi_tl(cpu_Vf, 0); /* Vf = 0 */
-+    gen_ZNSf(Rd);
-+
-+    tcg_temp_free_i32(R);
-+
-+    return true;
-+}
-+
-+
-+/*
-+ *  Replaces the contents of register Rd with its two's complement; the
-+ *  value $80 is left unchanged.
-+ */
-+static bool trans_NEG(DisasContext *ctx, arg_NEG *a)
-+{
-+    TCGv Rd = cpu_r[a->rd];
-+    TCGv t0 = tcg_const_i32(0);
-+    TCGv R = tcg_temp_new_i32();
-+
-+    /* op */
-+    tcg_gen_sub_tl(R, t0, Rd); /* R = 0 - Rd */
-+    tcg_gen_andi_tl(R, R, 0xff); /* make it 8 bits */
-+
-+    gen_sub_CHf(R, t0, Rd);
-+    gen_sub_Vf(R, t0, Rd);
-+    gen_ZNSf(R);
-+
-+    /* R */
-+    tcg_gen_mov_tl(Rd, R);
-+
-+    tcg_temp_free_i32(t0);
-+    tcg_temp_free_i32(R);
-+
-+    return true;
-+}
-+
-+
-+/*
-+ *  Adds one -1- to the contents of register Rd and places the result in the
-+ *  destination register Rd.  The C Flag in SREG is not affected by the
-+ *  operation, thus allowing the INC instruction to be used on a loop counter in
-+ *  multiple-precision computations.  When operating on unsigned numbers, only
-+ *  BREQ and BRNE branches can be expected to perform consistently. When
-+ *  operating on two's complement values, all signed branches are available.
-+ */
-+static bool trans_INC(DisasContext *ctx, arg_INC *a)
-+{
-+    TCGv Rd = cpu_r[a->rd];
-+
-+    tcg_gen_addi_tl(Rd, Rd, 1);
-+    tcg_gen_andi_tl(Rd, Rd, 0xff);
-+
-+    /* cpu_Vf = Rd == 0x80 */
-+    tcg_gen_setcondi_tl(TCG_COND_EQ, cpu_Vf, Rd, 0x80);
-+    gen_ZNSf(Rd);
-+
-+    return true;
-+}
-+
-+
-+/*
-+ *  Subtracts one -1- from the contents of register Rd and places the result
-+ *  in the destination register Rd.  The C Flag in SREG is not affected by the
-+ *  operation, thus allowing the DEC instruction to be used on a loop counter in
-+ *  multiple-precision computations.  When operating on unsigned values, only
-+ *  BREQ and BRNE branches can be expected to perform consistently.  When
-+ *  operating on two's complement values, all signed branches are available.
-+ */
-+static bool trans_DEC(DisasContext *ctx, arg_DEC *a)
-+{
-+    TCGv Rd = cpu_r[a->rd];
-+
-+    tcg_gen_subi_tl(Rd, Rd, 1); /* Rd = Rd - 1 */
-+    tcg_gen_andi_tl(Rd, Rd, 0xff); /* make it 8 bits */
-+
-+    /* cpu_Vf = Rd == 0x7f */
-+    tcg_gen_setcondi_tl(TCG_COND_EQ, cpu_Vf, Rd, 0x7f);
-+    gen_ZNSf(Rd);
-+
-+    return true;
-+}
-+
-+
-+/*
-+ *  This instruction performs 8-bit x 8-bit -> 16-bit unsigned multiplication.
-+ */
-+static bool trans_MUL(DisasContext *ctx, arg_MUL *a)
-+{
-+    if (!avr_have_feature(ctx, AVR_FEATURE_MUL)) {
-+        return true;
-+    }
-+
-+    TCGv R0 = cpu_r[0];
-+    TCGv R1 = cpu_r[1];
-+    TCGv Rd = cpu_r[a->rd];
-+    TCGv Rr = cpu_r[a->rr];
-+    TCGv R = tcg_temp_new_i32();
-+
-+    tcg_gen_mul_tl(R, Rd, Rr); /* R = Rd * Rr */
-+
-+    tcg_gen_andi_tl(R0, R, 0xff);
-+    tcg_gen_shri_tl(R1, R, 8);
-+
-+    tcg_gen_shri_tl(cpu_Cf, R, 15); /* Cf = R(15) */
-+    tcg_gen_setcondi_tl(TCG_COND_EQ, cpu_Zf, R, 0); /* Zf = R == 0 */
-+
-+    tcg_temp_free_i32(R);
-+
-+    return true;
-+}
-+
-+
-+/*
-+ *  This instruction performs 8-bit x 8-bit -> 16-bit signed multiplication.
-+ */
-+static bool trans_MULS(DisasContext *ctx, arg_MULS *a)
-+{
-+    if (!avr_have_feature(ctx, AVR_FEATURE_MUL)) {
-+        return true;
-+    }
-+
-+    TCGv R0 = cpu_r[0];
-+    TCGv R1 = cpu_r[1];
-+    TCGv Rd = cpu_r[a->rd];
-+    TCGv Rr = cpu_r[a->rr];
-+    TCGv R = tcg_temp_new_i32();
-+    TCGv t0 = tcg_temp_new_i32();
-+    TCGv t1 = tcg_temp_new_i32();
-+
-+    tcg_gen_ext8s_tl(t0, Rd); /* make Rd full 32 bit signed */
-+    tcg_gen_ext8s_tl(t1, Rr); /* make Rr full 32 bit signed */
-+    tcg_gen_mul_tl(R, t0, t1); /* R = Rd * Rr */
-+    tcg_gen_andi_tl(R, R, 0xffff); /* make it 16 bits */
-+
-+    tcg_gen_andi_tl(R0, R, 0xff);
-+    tcg_gen_shri_tl(R1, R, 8);
-+
-+    tcg_gen_shri_tl(cpu_Cf, R, 15); /* Cf = R(15) */
-+    tcg_gen_setcondi_tl(TCG_COND_EQ, cpu_Zf, R, 0); /* Zf = R == 0 */
-+
-+    tcg_temp_free_i32(t1);
-+    tcg_temp_free_i32(t0);
-+    tcg_temp_free_i32(R);
-+
-+    return true;
-+}
-+
-+
-+/*
-+ *  This instruction performs 8-bit x 8-bit -> 16-bit multiplication of a
-+ *  signed and an unsigned number.
-+ */
-+static bool trans_MULSU(DisasContext *ctx, arg_MULSU *a)
-+{
-+    if (!avr_have_feature(ctx, AVR_FEATURE_MUL)) {
-+        return true;
-+    }
-+
-+    TCGv R0 = cpu_r[0];
-+    TCGv R1 = cpu_r[1];
-+    TCGv Rd = cpu_r[a->rd];
-+    TCGv Rr = cpu_r[a->rr];
-+    TCGv R = tcg_temp_new_i32();
-+    TCGv t0 = tcg_temp_new_i32();
-+
-+    tcg_gen_ext8s_tl(t0, Rd); /* make Rd full 32 bit signed */
-+    tcg_gen_mul_tl(R, t0, Rr); /* R = Rd *Rr */
-+
-+    tcg_gen_andi_tl(R0, R, 0xff);
-+    tcg_gen_shri_tl(R1, R, 8);
-+
-+    tcg_gen_shri_tl(cpu_Cf, R, 16); /* Cf = R(16) */
-+    tcg_gen_mov_tl(cpu_Zf, R);
-+
-+    tcg_temp_free_i32(t0);
-+    tcg_temp_free_i32(R);
-+
-+    return true;
-+}
-+
-+
-+/*
-+ *  This instruction performs 8-bit x 8-bit -> 16-bit unsigned
-+ *  multiplication and shifts the result one bit left.
-+ */
-+static bool trans_FMUL(DisasContext *ctx, arg_FMUL *a)
-+{
-+    if (!avr_have_feature(ctx, AVR_FEATURE_MUL)) {
-+        return true;
-+    }
-+
-+    TCGv R0 = cpu_r[0];
-+    TCGv R1 = cpu_r[1];
-+    TCGv Rd = cpu_r[a->rd];
-+    TCGv Rr = cpu_r[a->rr];
-+    TCGv R = tcg_temp_new_i32();
-+
-+    tcg_gen_mul_tl(R, Rd, Rr); /* R = Rd * Rr */
-+
-+    tcg_gen_shri_tl(cpu_Cf, R, 15); /* Cf = R(15) */
-+    tcg_gen_setcondi_tl(TCG_COND_EQ, cpu_Zf, R, 0); /* Zf = R == 0 */
-+
-+    tcg_gen_shli_tl(R, R, 1);
-+
-+    tcg_gen_andi_tl(R0, R, 0xff);
-+    tcg_gen_shri_tl(R1, R, 8);
-+    tcg_gen_andi_tl(R1, R1, 0xff);
-+
-+
-+    tcg_temp_free_i32(R);
-+
-+    return true;
-+}
-+
-+
-+/*
-+ *  This instruction performs 8-bit x 8-bit -> 16-bit signed multiplication
-+ *  and shifts the result one bit left.
-+ */
-+static bool trans_FMULS(DisasContext *ctx, arg_FMULS *a)
-+{
-+    if (!avr_have_feature(ctx, AVR_FEATURE_MUL)) {
-+        return true;
-+    }
-+
-+    TCGv R0 = cpu_r[0];
-+    TCGv R1 = cpu_r[1];
-+    TCGv Rd = cpu_r[a->rd];
-+    TCGv Rr = cpu_r[a->rr];
-+    TCGv R = tcg_temp_new_i32();
-+    TCGv t0 = tcg_temp_new_i32();
-+    TCGv t1 = tcg_temp_new_i32();
-+
-+    tcg_gen_ext8s_tl(t0, Rd); /* make Rd full 32 bit signed */
-+    tcg_gen_ext8s_tl(t1, Rr); /* make Rr full 32 bit signed */
-+    tcg_gen_mul_tl(R, t0, t1); /* R = Rd * Rr */
-+    tcg_gen_andi_tl(R, R, 0xffff); /* make it 16 bits */
-+
-+    tcg_gen_shri_tl(cpu_Cf, R, 15); /* Cf = R(15) */
-+    tcg_gen_setcondi_tl(TCG_COND_EQ, cpu_Zf, R, 0); /* Zf = R == 0 */
-+
-+    tcg_gen_shli_tl(R, R, 1);
-+
-+    tcg_gen_andi_tl(R0, R, 0xff);
-+    tcg_gen_shri_tl(R1, R, 8);
-+    tcg_gen_andi_tl(R1, R1, 0xff);
-+
-+    tcg_temp_free_i32(t1);
-+    tcg_temp_free_i32(t0);
-+    tcg_temp_free_i32(R);
-+
-+    return true;
-+}
-+
-+
-+/*
-+ *  This instruction performs 8-bit x 8-bit -> 16-bit signed multiplication
-+ *  and shifts the result one bit left.
-+ */
-+static bool trans_FMULSU(DisasContext *ctx, arg_FMULSU *a)
-+{
-+    if (!avr_have_feature(ctx, AVR_FEATURE_MUL)) {
-+        return true;
-+    }
-+
-+    TCGv R0 = cpu_r[0];
-+    TCGv R1 = cpu_r[1];
-+    TCGv Rd = cpu_r[a->rd];
-+    TCGv Rr = cpu_r[a->rr];
-+    TCGv R = tcg_temp_new_i32();
-+    TCGv t0 = tcg_temp_new_i32();
-+
-+    tcg_gen_ext8s_tl(t0, Rd); /* make Rd full 32 bit signed */
-+    tcg_gen_mul_tl(R, t0, Rr); /* R = Rd * Rr */
-+    tcg_gen_andi_tl(R, R, 0xffff); /* make it 16 bits */
-+
-+    tcg_gen_shri_tl(cpu_Cf, R, 15); /* Cf = R(15) */
-+    tcg_gen_setcondi_tl(TCG_COND_EQ, cpu_Zf, R, 0); /* Zf = R == 0 */
-+
-+    tcg_gen_shli_tl(R, R, 1);
-+
-+    tcg_gen_andi_tl(R0, R, 0xff);
-+    tcg_gen_shri_tl(R1, R, 8);
-+    tcg_gen_andi_tl(R1, R1, 0xff);
-+
-+    tcg_temp_free_i32(t0);
-+    tcg_temp_free_i32(R);
-+
-+    return true;
-+}
-+
-+
-+/*
-+ *  The module is an instruction set extension to the AVR CPU, performing
-+ *  DES iterations. The 64-bit data block (plaintext or ciphertext) is placed in
-+ *  the CPU register file, registers R0-R7, where LSB of data is placed in LSB
-+ *  of R0 and MSB of data is placed in MSB of R7. The full 64-bit key (including
-+ *  parity bits) is placed in registers R8- R15, organized in the register file
-+ *  with LSB of key in LSB of R8 and MSB of key in MSB of R15. Executing one DES
-+ *  instruction performs one round in the DES algorithm. Sixteen rounds must be
-+ *  executed in increasing order to form the correct DES ciphertext or
-+ *  plaintext. Intermediate results are stored in the register file (R0-R15)
-+ *  after each DES instruction. The instruction's operand (K) determines which
-+ *  round is executed, and the half carry flag (H) determines whether encryption
-+ *  or decryption is performed.  The DES algorithm is described in
-+ *  "Specifications for the Data Encryption Standard" (Federal Information
-+ *  Processing Standards Publication 46). Intermediate results in this
-+ *  implementation differ from the standard because the initial permutation and
-+ *  the inverse initial permutation are performed each iteration. This does not
-+ *  affect the result in the final ciphertext or plaintext, but reduces
-+ *  execution time.
-+ */
-+static bool trans_DES(DisasContext *ctx, arg_DES *a)
-+{
-+    /* TODO */
-+    if (!avr_have_feature(ctx, AVR_FEATURE_DES)) {
-+        return true;
-+    }
-+
-+    return true;
-+}
++check-qtest-avr-y += tests/boot-serial-test$(EXESUF)
++
+ check-qtest-alpha-y += tests/boot-serial-test$(EXESUF)
+ check-qtest-alpha-$(CONFIG_VGA) += tests/display-vga-test$(EXESUF)
+ 
+diff --git a/tests/acceptance/machine_avr6.py b/tests/acceptance/machine_avr6.py
+new file mode 100644
+index 0000000000..0601080b01
+--- /dev/null
++++ b/tests/acceptance/machine_avr6.py
+@@ -0,0 +1,36 @@
++import logging
++import time
++import distutils.spawn
++
++from avocado import skipUnless
++from avocado_qemu import Test
++from avocado.utils import process
++
++class AVR6Machine(Test):
++    timeout = 5
++
++    def test_freertos(self):
++        """
++        :avocado: tags=arch:avr
++        :avocado: tags=machine:sample
++        """
++        """
++        https://github.com/seharris/qemu-avr-tests/raw/master/free-rtos/Demo/AVR_ATMega2560_GCC/demo.elf
++        constantly prints out 'ABCDEFGHIJKLMNOPQRSTUVWXABCDEFGHIJKLMNOPQRSTUVWX'
++        """
++        rom_url = 'https://github.com/seharris/qemu-avr-tests'
++        rom_url += '/raw/master/free-rtos/Demo/AVR_ATMega2560_GCC/demo.elf'
++        rom_hash = '7eb521f511ca8f2622e0a3c5e8dd686efbb911d4'
++        rom_path = self.fetch_asset(rom_url, asset_hash=rom_hash)
++
++        self.vm.set_machine('sample')
++        self.vm.add_args('-bios', rom_path)
++        self.vm.add_args('-nographic')
++        self.vm.launch()
++
++        time.sleep(2)
++        self.vm.shutdown()
++
++        match = 'ABCDEFGHIJKLMNOPQRSTUVWXABCDEFGHIJKLMNOPQRSTUVWX'
++
++        self.assertIn(match, self.vm.get_log())
+diff --git a/tests/boot-serial-test.c b/tests/boot-serial-test.c
+index d3a54a0ba5..1121ed0db2 100644
+--- a/tests/boot-serial-test.c
++++ b/tests/boot-serial-test.c
+@@ -16,6 +16,15 @@
+ #include "qemu/osdep.h"
+ #include "libqtest.h"
+ 
++static const uint8_t bios_avr[] = {
++    0x88, 0xe0,             /* ldi r24, 0x08   */
++    0x80, 0x93, 0xc1, 0x00, /* sts 0x00C1, r24 ; Enable tx */
++    0x86, 0xe0,             /* ldi r24, 0x06   */
++    0x80, 0x93, 0xc2, 0x00, /* sts 0x00C2, r24 ; Set the data bits to 8 */
++    0x84, 0xe5,             /* ldi r24, 0x54   */
++    0x80, 0x93, 0xc6, 0x00, /* sts 0x00C6, r24 ; Output 'T' */
++};
++
+ static const uint8_t kernel_mcf5208[] = {
+     0x41, 0xf9, 0xfc, 0x06, 0x00, 0x00,     /* lea 0xfc060000,%a0 */
+     0x10, 0x3c, 0x00, 0x54,                 /* move.b #'T',%d0 */
+@@ -103,6 +112,7 @@ typedef struct testdef {
+ 
+ static testdef_t tests[] = {
+     { "alpha", "clipper", "", "PCI:" },
++    { "avr", "sample", "", "T", sizeof(bios_avr), NULL, bios_avr },
+     { "ppc", "ppce500", "", "U-Boot" },
+     { "ppc", "40p", "-vga none -boot d", "Trying cd:," },
+     { "ppc", "g3beige", "", "PowerPC,750" },
 -- 
 2.17.2 (Apple Git-113)
 
