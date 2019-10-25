@@ -2,81 +2,96 @@ Return-Path: <SRS0=bySr=YS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 12C73CA9EA0
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 11:53:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2466CCA9EA0
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 11:53:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DC22221D71
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 11:53:04 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DC22221D71
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id E4A0121D71
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 11:53:15 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="HXKqCyae"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E4A0121D71
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59100 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59102 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iNy9Q-00006x-1o
-	for qemu-devel@archiver.kernel.org; Fri, 25 Oct 2019 07:53:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46610)
+	id 1iNy9a-0000KF-U3
+	for qemu-devel@archiver.kernel.org; Fri, 25 Oct 2019 07:53:14 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46328)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mst@redhat.com>) id 1iNy7L-0005bj-Pa
- for qemu-devel@nongnu.org; Fri, 25 Oct 2019 07:50:56 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1iNy59-0002Pi-OX
+ for qemu-devel@nongnu.org; Fri, 25 Oct 2019 07:48:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mst@redhat.com>) id 1iNy7K-00040a-A1
- for qemu-devel@nongnu.org; Fri, 25 Oct 2019 07:50:55 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:40492)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mst@redhat.com>) id 1iNy7K-000407-4X
- for qemu-devel@nongnu.org; Fri, 25 Oct 2019 07:50:54 -0400
-Received: from mail-qt1-f198.google.com (mail-qt1-f198.google.com
- [209.85.160.198])
- (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id C2E4EC08EC00
- for <qemu-devel@nongnu.org>; Fri, 25 Oct 2019 11:50:52 +0000 (UTC)
-Received: by mail-qt1-f198.google.com with SMTP id n34so1768135qta.12
- for <qemu-devel@nongnu.org>; Fri, 25 Oct 2019 04:50:52 -0700 (PDT)
+ (envelope-from <richard.henderson@linaro.org>) id 1iNy58-0002uo-Bk
+ for qemu-devel@nongnu.org; Fri, 25 Oct 2019 07:48:39 -0400
+Received: from mail-qt1-x842.google.com ([2607:f8b0:4864:20::842]:35406)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+ id 1iNy58-0002uY-7E
+ for qemu-devel@nongnu.org; Fri, 25 Oct 2019 07:48:38 -0400
+Received: by mail-qt1-x842.google.com with SMTP id m15so2792014qtq.2
+ for <qemu-devel@nongnu.org>; Fri, 25 Oct 2019 04:48:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=/AMs0Dimb29TZlqTvMOTBeJcsLLD71JGQkASIBl9xME=;
+ b=HXKqCyae1o8GGdtx1cU7ywBhEPj/VJab7fLs9EO8J5kamTR2V6cy6hToaEdgbPIBtT
+ X551pF72UdIg5NCpy6ISz73eRj2DgCLJGhOh1OUnVEks0OxxEQkIxH0oco/i/DnF+mVP
+ rL9d/YYvb2dXtoGcFP9dike0gSTSjYFVNxPgh1owCpllnyxlCI5ZatIiXZpAAiGFEmo7
+ 494dDp3gDSi3kWW6KlDlJUeVd/t9sXdo7HJQe+C70tMNeaFgoCHIahfTkJ0oXNQ1Drzo
+ V00JyrB/Bwc3nB3BpMexF/wExBCQt8xPCuQxd9uWy9NFy50s2TzYANVIo2FvEkF3Ytzn
+ R1cQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=z9kJkoKPJIxbH8oaC1j6IRx5xtVo3P4xk5m8p6ybXvI=;
- b=CqdXGdWH+6p7XhgKanWQ3kd6n5cSHYY9QBl3Yc6qmxnS79bpGgNtILcLjX/Udl6T6S
- 0bSjS2MrAlcwi2LCHAngpzd9lW40aUVU7ZEOD9EXrdD/5iSfw1wruy4d0H3Qfl5OAekI
- lHct3xUv2OatUwK8qcG4+T92SOAnSytYUAxwlQmdqTp8NBUVa5MOt6yQMvi2LsMwxnn1
- YnIKn27ocX9zSfymS/ZQ+6s63BgvzktHmcFONgPwOXfdOskDt8Y5rex13cUbJj8yRKm1
- XRpFD3i6LNlxdrnOSqQwuYDzwvvJR5SDMDwv2uJvJcx7vyJolqn+QnFsL2yMsE7+Qf3s
- qvKQ==
-X-Gm-Message-State: APjAAAXBlOhO/1HARYK4F+pPsZ3WTUN6F//juY5AKm2hhRcNnHMV6sT7
- FMyPdgIupfo88sjL2iW7IKK6ag5jOetuGn9Zh0jTRXQqKj0UWNtTGe1qurvV/DW4cWWOOfroiIs
- WGl2MGSs3Fq390vU=
-X-Received: by 2002:ac8:1346:: with SMTP id f6mr795718qtj.46.1572004252108;
- Fri, 25 Oct 2019 04:50:52 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqw8iKX6WzPGrpb9Ofp5bFJ0GevwqThQdslGjhes+fPLrNejOu5cJJZpUQgiHzqVjTswWoMXHA==
-X-Received: by 2002:ac8:1346:: with SMTP id f6mr795709qtj.46.1572004251949;
- Fri, 25 Oct 2019 04:50:51 -0700 (PDT)
-Received: from redhat.com (bzq-79-176-10-77.red.bezeqint.net. [79.176.10.77])
- by smtp.gmail.com with ESMTPSA id
- t65sm1051854qkh.23.2019.10.25.04.50.49
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 25 Oct 2019 04:50:51 -0700 (PDT)
-Date: Fri, 25 Oct 2019 07:50:47 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Subject: Re: [PATCH 0/2] more rcu_read_(un)lock conversions
-Message-ID: <20191025075035-mutt-send-email-mst@kernel.org>
-References: <20191025103403.120616-1-dgilbert@redhat.com>
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=/AMs0Dimb29TZlqTvMOTBeJcsLLD71JGQkASIBl9xME=;
+ b=XwgExrgl2A4JNp1He5rBpLpxO8S7+0Fpg5i09y2UcmNXyIqquYm/O8J12l6TAEbKtc
+ C+TS5NIrW0C1gD5BQK9ZT2Z1yMhyyvSGxskvV60H99G2nKM4RrQw5e6O8Jubx+cK91wQ
+ mFdjD+xYlPS5AgfrjcFOChNopjxKcmnOyUry90SNmjW71dP7yzTTDruyJZm5bUtQkE1x
+ FN1QtrXCDs8Ym/jw45Knt/aAoQEiwD5cAndrqOPf5rX6Qsu6V8u9lRCRmVUX1VJ34Tru
+ MdParmK9/93SpwQzGy7RziwipNQyOTqkWeDqQRbmq7eg1HvhdtBc7zlOcD5r66MVTYt+
+ wrwA==
+X-Gm-Message-State: APjAAAX/cDHDwMHHKiR4DnajI3O5KGGiQauap/XXXyLwYzaig6zubvG4
+ Rp6LW59gkJa5jogQERljm/63RA==
+X-Google-Smtp-Source: APXvYqzXCAPtdh31nWZd7wHsiUXqobCvZQpZxdfcDwLNt/y2TYjJSbEeHRcJoc42jgzVUyUp8R0+DQ==
+X-Received: by 2002:a0c:c482:: with SMTP id u2mr2760962qvi.121.1572004117097; 
+ Fri, 25 Oct 2019 04:48:37 -0700 (PDT)
+Received: from [172.20.87.163] (198-4-20-64.static.cosmoweb.net. [64.20.4.198])
+ by smtp.gmail.com with ESMTPSA id t199sm990799qke.36.2019.10.25.04.48.35
+ (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+ Fri, 25 Oct 2019 04:48:36 -0700 (PDT)
+Subject: Re: [PATCH v2 1/7] cpu: use ROUND_UP() to define xxx_PAGE_ALIGN
+To: Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ qemu-devel@nongnu.org
+References: <20191023154505.30521-1-richard.henderson@linaro.org>
+ <20191023154505.30521-2-richard.henderson@linaro.org>
+ <55b477b7-877e-954f-2175-ed36fa787600@redhat.com>
+ <e41a98e4-189a-1e0f-7b29-51a6e00e4d7e@redhat.com>
+ <26cb0551-fbac-e059-c1bf-9c17420528b7@linaro.org>
+ <af5b2cb5-49b5-68c2-e55b-a1077ad4df28@redhat.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Openpgp: preference=signencrypt
+Message-ID: <370895eb-f229-ff61-16aa-80587d6ff79a@linaro.org>
+Date: Fri, 25 Oct 2019 07:48:34 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20191025103403.120616-1-dgilbert@redhat.com>
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.132.183.28
+In-Reply-To: <af5b2cb5-49b5-68c2-e55b-a1077ad4df28@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::842
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,32 +103,22 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: jasowang@redhat.com, qemu-devel@nongnu.org
+Cc: alex.bennee@linaro.org, Wei Yang <richardw.yang@linux.intel.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, Oct 25, 2019 at 11:34:01AM +0100, Dr. David Alan Gilbert (git) wrote:
-> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+On 10/24/19 10:14 AM, Paolo Bonzini wrote:
+> On 24/10/19 16:06, Richard Henderson wrote:
+>> Richard confused ROUND_UP with QEMU_ALIGN_UP.
 > 
-> Hi,
->   Two more rcu_read_(un)lock conversions around
-> virtio stuff.
-> (to go with, but independent of my previous 'virtio: Use auto rcu_read macros')
-> 
-> I like the way that the virtio-net case simplifies the function
-> a lot.
+> Uh, those are both really badly named.  Especially considering that
+> DIV_ROUND_UP divides the result of QEMU_ALIGN_UP.  Should we consider
+> swapping them?!?
 
-Indeed, I'll queue this.
+Perhaps not swapping, but perhaps renaming ROUND_UP to POW2_ROUND_UP or
+something.  I dunno, naming is hard.  :-P
 
-> Dr. David Alan Gilbert (2):
->   virtio/vhost: Use auto_rcu_read macros
->   virtio_net: use RCU_READ_LOCK_GUARD
-> 
->  hw/net/virtio-net.c | 7 ++-----
->  hw/virtio/vhost.c   | 4 +---
->  2 files changed, 3 insertions(+), 8 deletions(-)
-> 
-> -- 
-> 2.23.0
+
+r~
 
