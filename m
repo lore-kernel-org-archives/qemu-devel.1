@@ -2,92 +2,81 @@ Return-Path: <SRS0=bySr=YS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 16D12CA9EA0
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 14:13:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9631BCA9EA0
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 14:13:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D727F20663
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 14:13:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5FE0E20663
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 14:13:21 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Fgw49us/"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D727F20663
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="XhskgYdI"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5FE0E20663
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60626 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60630 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iO0Kr-0006Mz-Sq
-	for qemu-devel@archiver.kernel.org; Fri, 25 Oct 2019 10:13:01 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40809)
+	id 1iO0LA-0006eW-Dd
+	for qemu-devel@archiver.kernel.org; Fri, 25 Oct 2019 10:13:20 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41470)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1iO0Ao-000340-K2
- for qemu-devel@nongnu.org; Fri, 25 Oct 2019 10:02:40 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1iO0EV-0002wJ-1x
+ for qemu-devel@nongnu.org; Fri, 25 Oct 2019 10:06:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1iO0Am-0007Pc-O9
- for qemu-devel@nongnu.org; Fri, 25 Oct 2019 10:02:38 -0400
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:39876)
+ (envelope-from <peter.maydell@linaro.org>) id 1iO0ET-0000c9-O3
+ for qemu-devel@nongnu.org; Fri, 25 Oct 2019 10:06:26 -0400
+Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:45845)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1iO0Am-0007PA-Fw
- for qemu-devel@nongnu.org; Fri, 25 Oct 2019 10:02:36 -0400
-Received: by mail-wm1-x343.google.com with SMTP id r141so2125946wme.4
- for <qemu-devel@nongnu.org>; Fri, 25 Oct 2019 07:02:36 -0700 (PDT)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1iO0ET-0000bj-Ap
+ for qemu-devel@nongnu.org; Fri, 25 Oct 2019 10:06:25 -0400
+Received: by mail-ot1-x341.google.com with SMTP id 41so2116268oti.12
+ for <qemu-devel@nongnu.org>; Fri, 25 Oct 2019 07:06:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=guq5J78UShi1OteZ2oPTiw1h2oDmPFvjT9o2d5zZ77Q=;
- b=Fgw49us/j/uj+h595ZK4CYk++nqjiZnCU5JTU7k+7AB1vANRWBJbQHSDcWc8Aj3KSo
- +GPUky6cCjtYfkkG4Zl/hpfnsqczBZnTJR1h1JpCuk8sBApXBkISvWARUuQ1c7c624AB
- 8xTp7oe7M01KjDkO/GPj0t+ZuSBQfeHS3mjDEKAZQ9xYpEe9Ys2W9mtv3Vh36AG9U+NU
- ZtJzFzJG5iDcseqIIr+3sdx6UkhCqXsdPee89+uEyx8cUpD9BScx85yMFWyCKDT7touw
- Bu2uV4n18nAMmRF+Amde0bAOpJzSc/Z9FcC7bxghK85cuj21u91QWHf/5AhtQmA+owOq
- nalQ==
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=gJ/czhl8wcTGR+TDLiE7xOgw7ak8Anrg/+q15fXKPG4=;
+ b=XhskgYdIzSF8HQ22mXBsBqJhPZCOmKSLuZaUwhwnhev/N9c6bSUHaIBTiTlaSUGQ+T
+ FuxPNwXMgs8MxxBwlQRCjRGXpMPsynoWkJnv6BZkZ5ROxstgip/EXbBDfgJnw3cZFr0c
+ eYq1WTOhcUdiDAwB9vrH6LDxBrJ5OSxqEkJhdqBWgrdSFea73F1HNKsibRmdIqi22y+G
+ oO3n8PFOL1GJdzUBVMQ1VcdrywqQ6IzbaRNYQC4BZk4+wQpRwbV0lpU+MHABHkYGOToK
+ TBgYpSO/p61ZMVZESI1sBwJx4kBoQAg+WxH5xs5ki/mXY76nBw4V2G/hzuiDs8r8Twi3
+ kPVg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=guq5J78UShi1OteZ2oPTiw1h2oDmPFvjT9o2d5zZ77Q=;
- b=lPhls1c7bVEAmAsqof5QxG+LnIdWvGfc2crlfYJj4Moe7E/qqApEeIYLfrX5zpksiW
- emTPZq8471uXJUTLH1ByjKYAo34isQ9I5AA3DC3MDXn21WCuXn1lOILj2u6IBClA1rrI
- 9Ei4wexAfh4hYcu6kpcu5If+aLqB2J2cdBMPiApYA77sy68UjP+H/sKgs8SOzZczOprp
- BbCuuUdVIJPT9LdywD/zxHDmJX5P/+QDINPGWE+S7IQJQqfvsyopRaeAV2xbiRAjiXpc
- rNfgatKh2jKgPZ3trbJF1IT63Rhy5+s1CoEIE1sVmmGtpvVJUvLVSOb0fgS5VuBXcaGq
- Qt/w==
-X-Gm-Message-State: APjAAAW63nSLqXC9t8FqRzjCYu2Xs7+vLspRCubo74aUMEwqM+isCBEi
- TcKByxRGG93SGl+O34DkKKAJ/A==
-X-Google-Smtp-Source: APXvYqwoM08KyrJMKTHp439V5I1d7waH80D8zThz70+vMEtnhHF5sDbBJk/grw9ThcO0SOF4c5BRFQ==
-X-Received: by 2002:a05:600c:2948:: with SMTP id
- n8mr3576531wmd.128.1572012154843; 
- Fri, 25 Oct 2019 07:02:34 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id t4sm1589860wmi.39.2019.10.25.07.02.33
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 25 Oct 2019 07:02:34 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 3672F1FF87;
- Fri, 25 Oct 2019 15:02:33 +0100 (BST)
-References: <20191023154505.30521-1-richard.henderson@linaro.org>
- <20191023154505.30521-3-richard.henderson@linaro.org>
-User-agent: mu4e 1.3.5; emacs 27.0.50
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: Richard Henderson <richard.henderson@linaro.org>
-Subject: Re: [PATCH v2 2/7] exec: Split out variable page size support to
- exec-vary.c
-In-reply-to: <20191023154505.30521-3-richard.henderson@linaro.org>
-Date: Fri, 25 Oct 2019 15:02:33 +0100
-Message-ID: <87wocsly86.fsf@linaro.org>
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=gJ/czhl8wcTGR+TDLiE7xOgw7ak8Anrg/+q15fXKPG4=;
+ b=YVXlCFaWBggN1KxIDONbZMhfau6tcyjBHFBJ2zL50K8qIXjLEIk5BUjszmFdxSZrgv
+ SZHxur2Vb8DOc/7NjL8JehU8gSGg8j3YWF+i5b7O42FvDQVWZ5eTtD42SwiIhxIwxE9n
+ CdeUD+eKIGOpHEr0OUiS+268+Mv3Rnld93JgiEp73zPb3Jha0t92m7JzwwEhCyVvOpXQ
+ R4rrl3gN3+mrFbJgzox73pFMdbV8H7G8b1OUqMOjTMKZtv4GnluxvguourlD3UZ70Y4u
+ QzqJmxSHOdiFFxN90Y1HJxGJ0eUEWX2jnVZ6K0PT2a6i3IuYBJ/rg67CQRUJnErcu+rd
+ nAsw==
+X-Gm-Message-State: APjAAAUbwvzfonPJd42/T9UWmvOl4ODgy2GITc1KFhMTAhgnT0Z95qqW
+ zE414GJW5e6t91spjluM4cyKo3Wn8Ozdb9HuEy6FwA==
+X-Google-Smtp-Source: APXvYqwarya0gnCIlCeWY5d/v0i9HIHOu8TI5Kaag1GIkYJGEz/ntZEeWtH54Mbaxn+EPmlEzwDYCzumuOaob4yWvQo=
+X-Received: by 2002:a9d:30c1:: with SMTP id r1mr3070845otg.91.1572012383418;
+ Fri, 25 Oct 2019 07:06:23 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+References: <20191024121808.9612-1-drjones@redhat.com>
+ <CAFEAcA9ehcuktCTGR0xpTvZegUkr99H62F_fiT7RY_L_dqgN4g@mail.gmail.com>
+ <CAFEAcA981jAU6F9RRWBuzg+_5JDrd-ip-L_awtzdZFqKmewMvA@mail.gmail.com>
+ <20191025135159.44siz7g3szpz23og@kamzik.brq.redhat.com>
+In-Reply-To: <20191025135159.44siz7g3szpz23og@kamzik.brq.redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 25 Oct 2019 15:06:12 +0100
+Message-ID: <CAFEAcA9ZdrAgMhdfUxz0OJnM-dF9XGwR-+FeqnyJAsrntGgL_A@mail.gmail.com>
+Subject: Re: [PATCH v7 0/9] target/arm/kvm: enable SVE in guests
+To: Andrew Jones <drjones@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::343
+X-Received-From: 2607:f8b0:4864:20::341
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,187 +88,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: pbonzini@redhat.com, qemu-devel@nongnu.org
+Cc: m.mizuma@jp.fujitsu.com, Beata Michalska <beata.michalska@linaro.org>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ Markus Armbruster <armbru@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>,
+ Eric Auger <eric.auger@redhat.com>, qemu-arm <qemu-arm@nongnu.org>,
+ Igor Mammedov <imammedo@redhat.com>,
+ =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
+ Dave P Martin <Dave.Martin@arm.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On Fri, 25 Oct 2019 at 14:52, Andrew Jones <drjones@redhat.com> wrote:
+>
+> On Fri, Oct 25, 2019 at 01:06:26PM +0100, Peter Maydell wrote:
+> > Fails 'make check' on my aarch32-compile-in-chroot-on-aarch64
+> > machine:
+>
+> Are there easy-to-follow instructions for setting this environment up
+> somewhere?
 
-Richard Henderson <richard.henderson@linaro.org> writes:
-
-> The next patch will play a trick with "const" that will
-> confuse the compiler about the uses of target_page_bits
-> within exec.c.  Moving everything to a new file prevents
-> this confusion.
->
-> No functional change so far.
->
-> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-> Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-
-Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-
-> ---
->  Makefile.target       |  2 +-
->  include/qemu-common.h |  6 +++++
->  exec-vary.c           | 57 +++++++++++++++++++++++++++++++++++++++++++
->  exec.c                | 34 --------------------------
->  4 files changed, 64 insertions(+), 35 deletions(-)
->  create mode 100644 exec-vary.c
->
-> diff --git a/Makefile.target b/Makefile.target
-> index 5e916230c4..ca3d14efe1 100644
-> --- a/Makefile.target
-> +++ b/Makefile.target
-> @@ -107,7 +107,7 @@ obj-y +=3D trace/
->
->  #########################################################
->  # cpu emulator library
-> -obj-y +=3D exec.o
-> +obj-y +=3D exec.o exec-vary.o
->  obj-y +=3D accel/
->  obj-$(CONFIG_TCG) +=3D tcg/tcg.o tcg/tcg-op.o tcg/tcg-op-vec.o tcg/tcg-o=
-p-gvec.o
->  obj-$(CONFIG_TCG) +=3D tcg/tcg-common.o tcg/optimize.o
-> diff --git a/include/qemu-common.h b/include/qemu-common.h
-> index 8d84db90b0..082da59e85 100644
-> --- a/include/qemu-common.h
-> +++ b/include/qemu-common.h
-> @@ -74,6 +74,12 @@ void cpu_exec_step_atomic(CPUState *cpu);
->   */
->  bool set_preferred_target_page_bits(int bits);
->
-> +/**
-> + * finalize_target_page_bits:
-> + * Commit the final value set by set_preferred_target_page_bits.
-> + */
-> +void finalize_target_page_bits(void);
-> +
->  /**
->   * Sends a (part of) iovec down a socket, yielding when the socket is fu=
-ll, or
->   * Receives data into a (part of) iovec from a socket,
-> diff --git a/exec-vary.c b/exec-vary.c
-> new file mode 100644
-> index 0000000000..48c0ab306c
-> --- /dev/null
-> +++ b/exec-vary.c
-> @@ -0,0 +1,57 @@
-> +/*
-> + * Variable page size handling
-> + *
-> + *  Copyright (c) 2003 Fabrice Bellard
-> + *
-> + * This library is free software; you can redistribute it and/or
-> + * modify it under the terms of the GNU Lesser General Public
-> + * License as published by the Free Software Foundation; either
-> + * version 2 of the License, or (at your option) any later version.
-> + *
-> + * This library is distributed in the hope that it will be useful,
-> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
-> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-> + * Lesser General Public License for more details.
-> + *
-> + * You should have received a copy of the GNU Lesser General Public
-> + * License along with this library; if not, see <http://www.gnu.org/lice=
-nses/>.
-> + */
-> +
-> +#include "qemu/osdep.h"
-> +#include "qemu-common.h"
-> +#include "exec/exec-all.h"
-> +
-> +#ifdef TARGET_PAGE_BITS_VARY
-> +int target_page_bits;
-> +bool target_page_bits_decided;
-> +#endif
-> +
-> +bool set_preferred_target_page_bits(int bits)
-> +{
-> +    /*
-> +     * The target page size is the lowest common denominator for all
-> +     * the CPUs in the system, so we can only make it smaller, never
-> +     * larger. And we can't make it smaller once we've committed to
-> +     * a particular size.
-> +     */
-> +#ifdef TARGET_PAGE_BITS_VARY
-> +    assert(bits >=3D TARGET_PAGE_BITS_MIN);
-> +    if (target_page_bits =3D=3D 0 || target_page_bits > bits) {
-> +        if (target_page_bits_decided) {
-> +            return false;
-> +        }
-> +        target_page_bits =3D bits;
-> +    }
-> +#endif
-> +    return true;
-> +}
-> +
-> +void finalize_target_page_bits(void)
-> +{
-> +#ifdef TARGET_PAGE_BITS_VARY
-> +    if (target_page_bits =3D=3D 0) {
-> +        target_page_bits =3D TARGET_PAGE_BITS_MIN;
-> +    }
-> +    target_page_bits_decided =3D true;
-> +#endif
-> +}
-> diff --git a/exec.c b/exec.c
-> index fb0943cfed..5bf181d23e 100644
-> --- a/exec.c
-> +++ b/exec.c
-> @@ -91,11 +91,6 @@ AddressSpace address_space_memory;
->  static MemoryRegion io_mem_unassigned;
->  #endif
->
-> -#ifdef TARGET_PAGE_BITS_VARY
-> -int target_page_bits;
-> -bool target_page_bits_decided;
-> -#endif
-> -
->  CPUTailQ cpus =3D QTAILQ_HEAD_INITIALIZER(cpus);
->
->  /* current CPU in the current thread. It is only valid inside
-> @@ -109,37 +104,8 @@ int use_icount;
->  uintptr_t qemu_host_page_size;
->  intptr_t qemu_host_page_mask;
->
-> -bool set_preferred_target_page_bits(int bits)
-> -{
-> -    /* The target page size is the lowest common denominator for all
-> -     * the CPUs in the system, so we can only make it smaller, never
-> -     * larger. And we can't make it smaller once we've committed to
-> -     * a particular size.
-> -     */
-> -#ifdef TARGET_PAGE_BITS_VARY
-> -    assert(bits >=3D TARGET_PAGE_BITS_MIN);
-> -    if (target_page_bits =3D=3D 0 || target_page_bits > bits) {
-> -        if (target_page_bits_decided) {
-> -            return false;
-> -        }
-> -        target_page_bits =3D bits;
-> -    }
-> -#endif
-> -    return true;
-> -}
-> -
->  #if !defined(CONFIG_USER_ONLY)
->
-> -static void finalize_target_page_bits(void)
-> -{
-> -#ifdef TARGET_PAGE_BITS_VARY
-> -    if (target_page_bits =3D=3D 0) {
-> -        target_page_bits =3D TARGET_PAGE_BITS_MIN;
-> -    }
-> -    target_page_bits_decided =3D true;
-> -#endif
-> -}
-> -
->  typedef struct PhysPageEntry PhysPageEntry;
->
->  struct PhysPageEntry {
+It's an ancient setup, so not really. But it's just an
+Ubuntu 32-bit chroot inside an Ubuntu 64-bit host. I use
+schroot to manage it.
 
 
---
-Alex Benn=C3=A9e
+
+> I guess the problem is how we're determining if KVM is available, which
+> is like this
+>
+> int main(int argc, char **argv)
+> {
+>     bool kvm_available = false;
+>
+>     if (!access("/dev/kvm",  R_OK | W_OK)) {
+> #if defined(HOST_AARCH64)
+>         kvm_available = g_str_equal(qtest_get_arch(), "aarch64");
+> #elif defined(HOST_ARM)
+>         kvm_available = g_str_equal(qtest_get_arch(), "arm");
+> #endif
+>     }
+
+> So we need /dev/kvm and the QEMU binary arch type (qemu-system-arm in
+> this case) needs to match the host arch type. The problem is that
+> HOST_<type> doesn't imply anything about the actual host arch type.
+> <type> comes from the configure $ARCH variable, which for 'arm'
+> comes from the $cpu variable, which for 'arm' comes from whether or
+> not the compiler defines __arm__, and cross compilers certainly do.
+> I guess we'd have the same problem in an aarch32-compile-in-chroot-on-
+> <any-other-type> environment, if a cross compiler is used for the
+> compiling. I should change the KVM available check to something that
+> uses the actual host arch type. I assume the following works, but
+> I don't know if I'm allowed to use uname() in these tests, and, if
+> not, then I don't know what the right way to get the actual host
+> type is.
+
+This all feels like it's trying to do the wrong thing, ie
+replicate the logic within QEMU that decides whether to use
+KVM or not. Some possible other approaches:
+
+ * If you want to know whether you can run the qemu binary
+   with -accel kvm, then just try that and see if it succeeds.
+ * Or use '-accel kvm:tcg' and make the test work so that it
+   will pass for both KVM and TCG
+ * Or use QMP to query what accelerators are available, assuming
+   there's a QMP command for that
+
+thanks
+-- PMM
 
