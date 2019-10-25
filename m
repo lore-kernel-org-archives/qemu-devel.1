@@ -2,85 +2,83 @@ Return-Path: <SRS0=bySr=YS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 14382CA9EBD
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 14:18:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9752BCA9EA0
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 14:18:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DCC6221D71
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 14:18:17 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DCC6221D71
+	by mail.kernel.org (Postfix) with ESMTPS id 62F6320684
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 14:18:55 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="N0gLhhPy"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 62F6320684
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60722 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60740 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iO0Pw-0005LG-44
-	for qemu-devel@archiver.kernel.org; Fri, 25 Oct 2019 10:18:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42932)
+	id 1iO0QY-0006F9-Af
+	for qemu-devel@archiver.kernel.org; Fri, 25 Oct 2019 10:18:54 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42464)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <sgarzare@redhat.com>) id 1iO0Le-0007oJ-Bw
- for qemu-devel@nongnu.org; Fri, 25 Oct 2019 10:13:51 -0400
+ (envelope-from <david@redhat.com>) id 1iO0IV-00031s-1V
+ for qemu-devel@nongnu.org; Fri, 25 Oct 2019 10:10:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <sgarzare@redhat.com>) id 1iO0Ld-0005iQ-2M
- for qemu-devel@nongnu.org; Fri, 25 Oct 2019 10:13:50 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:27944)
+ (envelope-from <david@redhat.com>) id 1iO0IS-0002l9-FA
+ for qemu-devel@nongnu.org; Fri, 25 Oct 2019 10:10:33 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:41240
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <sgarzare@redhat.com>) id 1iO0Lc-0005hZ-Pg
- for qemu-devel@nongnu.org; Fri, 25 Oct 2019 10:13:49 -0400
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72])
- (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+ (Exim 4.71) (envelope-from <david@redhat.com>) id 1iO0IS-0002js-BT
+ for qemu-devel@nongnu.org; Fri, 25 Oct 2019 10:10:32 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1572012630;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=lHfFv+bHO4dxT3tpPi6gtPios1cSIlNl+dxlycDH5nc=;
+ b=N0gLhhPy9iY2bK6KJ4LahZu3k+3ooLeqr7uxacG2E74rI3joOg2fH3I9pFi+kI+MEB8ma0
+ gFyd8VjOapH49pMNTJ+77D5UQpcauNbs60VrjmQ2qDdakEfKVQDRkgzKeaknQZYRDi9plX
+ 4GhVPOr09eTpSj1552Z9RSrAaHgXA1E=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-83-W7ZfdaoOOFSSAg9OiMBCWg-1; Fri, 25 Oct 2019 10:10:26 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 17F444E8AC
- for <qemu-devel@nongnu.org>; Fri, 25 Oct 2019 14:13:47 +0000 (UTC)
-Received: by mail-wr1-f72.google.com with SMTP id l4so1210720wru.10
- for <qemu-devel@nongnu.org>; Fri, 25 Oct 2019 07:13:47 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:content-transfer-encoding
- :in-reply-to:user-agent;
- bh=zKTrq6oks7rUSVsuB0L6seNToGcRYUZAuxxkU9Ca8qM=;
- b=gy3rm5N44bNwQ8InbLYFhF55dxHsUP21x552Kd5Bw7nEoM1TtxaNdFlCMijQxLrwP8
- JbpLqMFz4XuT/Kji786bcKQchUzWG+D+R9uc70piFptBDPywLspTHRpCcQ7Wk9pBjVYj
- INLeEuXcKhNTiseNKtVwWH3FUDpru0zS7C086cQF0P15MvrJ6XqBakGdRZk3NzYrdJ40
- y8+oBfPyW4XFupW8GrDbSEGvAhgOehjzMxK5zJzPO6Yiy4PYXaCkXzqfZNxqjYEQ8XGc
- xwtTuyoB1YC1+n3fF0LyxRA/ZdClbEYhL921Jml8K1cU1bBoTDI2w68qfvL04oxcLd1d
- X3dA==
-X-Gm-Message-State: APjAAAXZxmSZN+8PcGXBfIHGYjqAKAAlUtF1LO6q8VzkGCL4fhNMGGYm
- 0L/LuBpR1Ykuni3QKouPrnAGjKioxq6FU4ZdJ7+caTdzIm1775HQubpX0W4e0lwukU/BrY1faXx
- /82kHfQIxZ+IrlWo=
-X-Received: by 2002:a1c:a848:: with SMTP id r69mr3604404wme.83.1572012825761; 
- Fri, 25 Oct 2019 07:13:45 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqzsj3r3hipAg2S1cjb3DeddN7eH+6TZiyngn2IHCm9XpMJyOh0ca5bzg6NdbBdM6TKFmZo4BA==
-X-Received: by 2002:a1c:a848:: with SMTP id r69mr3604383wme.83.1572012825487; 
- Fri, 25 Oct 2019 07:13:45 -0700 (PDT)
-Received: from steredhat (host174-200-dynamic.52-79-r.retail.telecomitalia.it.
- [79.52.200.174])
- by smtp.gmail.com with ESMTPSA id 200sm3399381wme.32.2019.10.25.07.13.44
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 25 Oct 2019 07:13:45 -0700 (PDT)
-Date: Fri, 25 Oct 2019 16:13:43 +0200
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Subject: Re: [PATCH 4/4] crypto: add support for nettle's native XTS impl
-Message-ID: <20191025141343.l4aiis6acb6hhp35@steredhat>
-References: <20191017145654.11371-1-berrange@redhat.com>
- <20191017145654.11371-5-berrange@redhat.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1C2C4107AD31;
+ Fri, 25 Oct 2019 14:10:25 +0000 (UTC)
+Received: from [10.36.116.227] (ovpn-116-227.ams2.redhat.com [10.36.116.227])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id D7E6C5EE1D;
+ Fri, 25 Oct 2019 14:10:11 +0000 (UTC)
+Subject: Re: [PATCH 0/7] i386: Add `machine` parameter to query-cpu-definitions
+To: Eduardo Habkost <ehabkost@redhat.com>
+References: <20191025022553.25298-1-ehabkost@redhat.com>
+ <dbf9e4c1-0acf-9469-84f9-f80c41e2cae0@redhat.com>
+ <20191025133846.GD6744@habkost.net>
+From: David Hildenbrand <david@redhat.com>
+Organization: Red Hat GmbH
+Message-ID: <25e33d78-3d25-7ca9-6922-920846d0d98b@redhat.com>
+Date: Fri, 25 Oct 2019 16:10:10 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <20191017145654.11371-5-berrange@redhat.com>
-User-Agent: NeoMutt/20180716
+In-Reply-To: <20191025133846.GD6744@habkost.net>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-MC-Unique: W7ZfdaoOOFSSAg9OiMBCWg-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 209.132.183.28
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -92,134 +90,126 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org
+Cc: Thomas Huth <thuth@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>,
+ Janosch Frank <frankja@linux.ibm.com>, libvir-list@redhat.com,
+ Cornelia Huck <cohuck@redhat.com>,
+ Michal Skrivanek <michal.skrivanek@redhat.com>, qemu-devel@nongnu.org,
+ Markus Armbruster <armbru@redhat.com>,
+ Christian Borntraeger <borntraeger@de.ibm.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>,
+ Jiri Denemark <jdenemar@redhat.com>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Oct 17, 2019 at 03:56:54PM +0100, Daniel P. Berrang=E9 wrote:
-> Nettle 3.5.0 will add support for the XTS mode. Use this because long
-> term we wish to delete QEMU's XTS impl to avoid carrying private crypto
-> algorithm impls.
+On 25.10.19 15:38, Eduardo Habkost wrote:
+> CCing danpb, libvir-list, mskrivanek.
 >=20
-> Unfortunately this degrades nettle performance from 612 MB/s to 568 MB/=
-s
-> as nettle's XTS impl isn't so well optimized yet.
+> On Fri, Oct 25, 2019 at 09:17:46AM +0200, David Hildenbrand wrote:
+>> On 25.10.19 04:25, Eduardo Habkost wrote:
+>>> We had introduced versioned CPU models in QEMU 4.1, including a
+>>> method for querying for CPU model versions using
+>>
+>> Interesting, I was not aware of that.
+>>
+>> On s390x, we somewhat have versioned CPU models, but we decided against
+>> giving them explicit names (e.g., z13-v1 or z13-4.1.0), because it didn'=
+t
+>> really seem to be necessary. (and we often implement/add features for ol=
+der
+>> CPU models, there is a lot of fluctuation) Actually, you would have had =
+to
+>> add "z13-z/VM-x.x.x" or "z13-LPAR-x.x.x" or "z13-KVM-x.x.x" to model the
+>> features you actually see in all the different virtual environments ("wh=
+at a
+>> CPU looks like"). Not to talk about QEMU versions in addition to that. S=
+o we
+>> decided to always model what you would see under LPAR and are able to
+>> specify for a KVM guest. So you can use "z13" in an up-to-date LPAR
+>> environment, but not in a z/VM environment (you would have to disable
+>> features).
+>>
+>> Each (!base) CPU model has a specific feature set per machine. Libvirt u=
+ses
+>> query-cpu-model-expansion() to convert this model+machine to a
+>> machine-independent representation. That representation is sufficient fo=
+r
+>> all use cases we were aware of (esp. "virsh domcapabilities", the host C=
+PU
+>> model, migration).
+>>
+>> While s390x has versioned CPU models, we have no explicit way of specify=
+ing
+>> them for older machines, besides going over query-cpu-model-expansion an=
+d
+>> using expanded "base model + features".
+>>
+>> I can see that this might make sense on x86-64, where you only have mayb=
+e 3
+>> versions of a CPU (e.g., the one Intel messed up first - Haswell, the on=
+e
+>> Intel messed up next - Haswell-noTSX, and the one that Intel eventually =
+did
+>> right - Haswell-noTSX-IBRS) and you might want to specify "Haswell" vs.
+>> "Haswell-IBRS" vs. "Haswell-noTSX-IBRS". But actually, you will always w=
+ant
+>> to go for "Haswell-noTSX-IBRS", because you can expect to run in updated
+>> environments if I am not wrong, everything else are corner cases.
+>>
+>> Of course, versioned CPU model are neat to avoid "base model + list of
+>> features", but at least for expanding the host model on s390x, it is not
+>> really helpful. When migrating, the model expansion does the trick.
+>>
+>> I haven't looked into details of "how to specify or model versions". May=
+be
+>> IBM wants to look into creating versions for all the old models we had. =
+But
+>> again, not sure if that is of any help for s390x. CCing IBM.
 >=20
-> Signed-off-by: Daniel P. Berrang=E9 <berrange@redhat.com>
-> ---
->  configure              | 18 ++++++++++++++++++
->  crypto/cipher-nettle.c | 18 ++++++++++++++++++
->  2 files changed, 36 insertions(+)
+> I'm not sure yet if there are the x86-specific goals and
+> constraints that would make it difficult to follow the same
+> approach followed by s390x.  I have the impression we do,
+> but I need to think more carefully about it.
 >=20
-> diff --git a/configure b/configure
-> index 98edb0ff44..6650c72348 100755
-> --- a/configure
-> +++ b/configure
-> @@ -471,6 +471,7 @@ gtk_gl=3D"no"
->  tls_priority=3D"NORMAL"
->  gnutls=3D""
->  nettle=3D""
-> +nettle_xts=3D"no"
->  gcrypt=3D""
->  gcrypt_hmac=3D"no"
->  gcrypt_xts=3D"no"
-> @@ -2862,6 +2863,19 @@ if test "$nettle" !=3D "no"; then
->              pass=3D"yes"
->          fi
->      fi
-> +    if test "$pass" =3D "yes"
-> +    then
-> +        cat > $TMPC << EOF
-> +#include <nettle/xts.h>
-> +int main(void) {
-> +  return 0;
-> +}
-> +EOF
-> +        if compile_prog "$nettle_cflags" "$nettle_libs" ; then
-> +            nettle_xts=3Dyes
-> +            qemu_private_xts=3Dno
-> +        fi
-> +    fi
->      if test "$pass" =3D "no" && test "$nettle" =3D "yes"; then
->          feature_not_found "nettle" "Install nettle devel >=3D 2.7.1"
->      else
-> @@ -6337,6 +6351,10 @@ then
->     echo "  XTS             $gcrypt_xts"
->  fi
->  echo "nettle            $nettle $(echo_version $nettle $nettle_version=
-)"
-> +if test "$nettle" =3D "yes"
-> +then
-> +   echo "  XTS             $nettle_xts"
-> +fi
->  echo "libtasn1          $tasn1"
->  echo "PAM               $auth_pam"
->  echo "iconv support     $iconv"
-> diff --git a/crypto/cipher-nettle.c b/crypto/cipher-nettle.c
-> index d7411bb8ff..08794a9b10 100644
-> --- a/crypto/cipher-nettle.c
-> +++ b/crypto/cipher-nettle.c
-> @@ -19,7 +19,9 @@
->   */
-> =20
->  #include "qemu/osdep.h"
-> +#ifdef CONFIG_QEMU_PRIVATE_XTS
->  #include "crypto/xts.h"
-> +#endif
->  #include "cipherpriv.h"
-> =20
->  #include <nettle/nettle-types.h>
-> @@ -30,6 +32,9 @@
->  #include <nettle/serpent.h>
->  #include <nettle/twofish.h>
->  #include <nettle/ctr.h>
-> +#ifndef CONFIG_QEMU_PRIVATE_XTS
-> +#include <nettle/xts.h>
-> +#endif
-> =20
->  typedef void (*QCryptoCipherNettleFuncWrapper)(const void *ctx,
->                                                 size_t length,
-> @@ -626,9 +631,15 @@ qcrypto_nettle_cipher_encrypt(QCryptoCipher *ciphe=
-r,
->          break;
-> =20
->      case QCRYPTO_CIPHER_MODE_XTS:
-> +#ifdef CONFIG_QEMU_PRIVATE_XTS
->          xts_encrypt(ctx->ctx, ctx->ctx_tweak,
->                      ctx->alg_encrypt_wrapper, ctx->alg_encrypt_wrapper=
-,
->                      ctx->iv, len, out, in);
-> +#else
-> +        xts_encrypt_message(ctx->ctx, ctx->ctx_tweak,
-> +                            ctx->alg_encrypt_native,
-> +                            ctx->iv, len, out, in);
-> +#endif
->          break;
-> =20
->      case QCRYPTO_CIPHER_MODE_CTR:
-> @@ -673,9 +684,16 @@ qcrypto_nettle_cipher_decrypt(QCryptoCipher *ciphe=
-r,
->          break;
-> =20
->      case QCRYPTO_CIPHER_MODE_XTS:
-> +#ifdef CONFIG_QEMU_PRIVATE_XTS
->          xts_decrypt(ctx->ctx, ctx->ctx_tweak,
->                      ctx->alg_encrypt_wrapper, ctx->alg_decrypt_wrapper=
-,
->                      ctx->iv, len, out, in);
-> +#else
-> +        xts_decrypt_message(ctx->ctx, ctx->ctx_tweak,
-> +                            ctx->alg_encrypt_native,
-> +                            ctx->alg_decrypt_native,
-> +                            ctx->iv, len, out, in);
-> +#endif
->          break;
->      case QCRYPTO_CIPHER_MODE_CTR:
->          ctr_crypt(ctx->ctx, ctx->alg_encrypt_native,
+> Let's discuss that during KVM Forum?
 
-It seems clear to me:
+I won't be attending KVM Forum this year, but Christian should be around.
 
-Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
+>=20
+> The two main goals of versioned CPU models in x86 are:
+> 1) Decoupling CPU model updates from machine-types (users should be
+>     able to update a CPU model definition without changing machine
+>     type).
+> 2) Letting management software automate CPU model updates.
+>     Normally this is necessary when bare metal microcode or
+>     software updates add/remove features from CPUs.  Sometimes the
+>     Virtual CPU model update needs to be performed before the host
+>     updates are applied (if features are being removed)
+
+We have 2) on s390x after a QEMU machine update. You need a QEMU update=20
+usually either way to support the new CPU feature. But I can see how=20
+decoupling the CPU model definition from the machine makes this easier.=20
+It does introduce complexity. It applies only when running older QEMU=20
+machines, or if we have to update a CPU model before we get a new QEMU=20
+machine.
+
+But we do have versioned CPU models already, so the discussion is=20
+already over :)
+
+>=20
+> The main constraint that makes it difficult to address the above
+> without a new API is:
+> A) Every CPU model in x86 except "host" is already expected to
+>     be migration-safe (I don't know how this compares to s390x).
+
+I would describe that not a bug but a feature :) It does come with the=20
+price that only using the newest QEMU machine results in the newest CPU=20
+model, that part I understand.
+
+--=20
+
+Thanks,
+
+David / dhildenb
 
 
