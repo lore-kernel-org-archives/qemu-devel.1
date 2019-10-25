@@ -2,106 +2,84 @@ Return-Path: <SRS0=bySr=YS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E09ECA9EA0
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 13:16:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D8161CA9EA0
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 13:17:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 313FB21D71
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 13:16:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8AB4821D71
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 13:17:07 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Dn3YJjcn"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 313FB21D71
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jnXFJLv3"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8AB4821D71
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59796 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59798 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iNzST-0000qy-L9
-	for qemu-devel@archiver.kernel.org; Fri, 25 Oct 2019 09:16:49 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58649)
+	id 1iNzSk-0001W3-54
+	for qemu-devel@archiver.kernel.org; Fri, 25 Oct 2019 09:17:06 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58682)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1iNzOr-00040M-Ed
- for qemu-devel@nongnu.org; Fri, 25 Oct 2019 09:13:06 -0400
+ (envelope-from <mrolnik@gmail.com>) id 1iNzOx-0004Fp-Fj
+ for qemu-devel@nongnu.org; Fri, 25 Oct 2019 09:13:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1iNzOq-0000xl-B4
- for qemu-devel@nongnu.org; Fri, 25 Oct 2019 09:13:05 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:46189
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1iNzOq-0000xZ-7K
- for qemu-devel@nongnu.org; Fri, 25 Oct 2019 09:13:04 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1572009183;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=BJLpPRUP3p6ol7UnWXCW+0KnDSYD6Jp3/hbZQJAqpD8=;
- b=Dn3YJjcnF5W77Tk8yDBjUvCdTIZlsKWSe7lUdHQPwIcYKEgualx61FzFaGp9vWlq3/dHNg
- saF0DEU5TnEHBBY9WMgw+MaYJCekv5+OkVOxUtfy3BBVd6KvMaEd1jJhvr8HeJ+qVMkbHa
- N9T8wC3hd1H8NCm2ku5UpLA42U2bcow=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-216-IlF2IsURNlGg2F_2RsRkpg-1; Fri, 25 Oct 2019 09:12:57 -0400
-X-MC-Unique: IlF2IsURNlGg2F_2RsRkpg-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 56AD780183D;
- Fri, 25 Oct 2019 13:12:56 +0000 (UTC)
-Received: from dresden.str.redhat.com (unknown [10.36.118.67])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 7E5C75C1B5;
- Fri, 25 Oct 2019 13:12:52 +0000 (UTC)
-Subject: Re: [PATCH v2 2/2] iotests: add 269 to check maximum of bitmaps in
- qcow2
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-block@nongnu.org
-References: <20191014115126.15360-1-vsementsov@virtuozzo.com>
- <20191014115126.15360-3-vsementsov@virtuozzo.com>
-From: Max Reitz <mreitz@redhat.com>
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <7c9e6d62-fc5e-204e-778d-0320833e9b00@redhat.com>
-Date: Fri, 25 Oct 2019 15:12:51 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.1
+ (envelope-from <mrolnik@gmail.com>) id 1iNzOv-0000zF-Ch
+ for qemu-devel@nongnu.org; Fri, 25 Oct 2019 09:13:11 -0400
+Received: from mail-wm1-x32c.google.com ([2a00:1450:4864:20::32c]:39777)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <mrolnik@gmail.com>) id 1iNzOv-0000yf-3n
+ for qemu-devel@nongnu.org; Fri, 25 Oct 2019 09:13:09 -0400
+Received: by mail-wm1-x32c.google.com with SMTP id r141so1966786wme.4
+ for <qemu-devel@nongnu.org>; Fri, 25 Oct 2019 06:13:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=nVGmzR+HFivUXu88gbuRb4sCchfIshWSfSVessn67a0=;
+ b=jnXFJLv3SpADSMcHGzx2/W+yMg3bvE66BYj3JAeDrUsZjcu0E/YM8ipKO7BaWDa+lI
+ xI0395VPkLLXsMldLtKvVKpSep5dLlCooOaFFPaQVkskAUfA2ZHZ373ZyujsdkRFUx7X
+ IIOF7LOgnyKA2oCr99J1PCXNEa59K+lNwoNGajXY6+gDdT5nLmv45HHmZaEjnlnTGLH4
+ qlFsTeIXy0oiCsFGtZC8lC5hS+cY7mMOJkuArOxxVBz/yx2i7VOf4FvnejApRaX0raWP
+ VPhuyBIIXspP/gpW45NBWgkNzzG7/L3mtqlcUVyPY0IBKcti1A6JPHMaZ5Mn9py6Q5j8
+ HgVQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=nVGmzR+HFivUXu88gbuRb4sCchfIshWSfSVessn67a0=;
+ b=PWrC4Ejh9nfZbjrT2fOc9lBbDw63A+V4tSNTJHTSiU5Dt3aFPjdVgKwbQSgitjpv9+
+ JJq02VBtcsfWWwQQ+k356gmiKEQz849gQHj+zwY69XcKRO9whHzz2JHzBL0dhx0z6zQ1
+ QM4Gxg5lH+3DaRh85XL8LWqxf6tWBaj+a+0ghcBmVJBpLppi+hRZkv9QFlO84k7lHZNN
+ aYbAnfRdyaPkTcDJQO44vmlmRBDl0W0JhGUn6F2CoDWeJNT2F+JJGe4PUfA5OC7Qhz3F
+ deyQL+tI3jO3Ik/xU6XqmydMjRCYgq3MKVm92DIKzPOruUJn4I7KyGLQNqaqkdflJG/H
+ F3/g==
+X-Gm-Message-State: APjAAAV9gFiF3tnqOCU9Lz+qrOnnNpyMrG9Qr+MFtEjKK8L0kwMELubD
+ ed82uU286CGWidROf6/hgD5JWcarxaN7Lw==
+X-Google-Smtp-Source: APXvYqzxwUPzkRrSFy4upPF9xERihOBR7VzFpRmhXEXRmK6chYj8yApBVvfia/DNsWSdLJolbotrhQ==
+X-Received: by 2002:a1c:7305:: with SMTP id d5mr3434889wmb.84.1572009186505;
+ Fri, 25 Oct 2019 06:13:06 -0700 (PDT)
+Received: from 8c859074c0ff.ant.amazon.com.com
+ (bzq-79-181-93-41.red.bezeqint.net. [79.181.93.41])
+ by smtp.gmail.com with ESMTPSA id x205sm2616139wmb.5.2019.10.25.06.13.04
+ (version=TLS1_2 cipher=ECDHE-RSA-AES128-SHA bits=128/128);
+ Fri, 25 Oct 2019 06:13:05 -0700 (PDT)
+From: Michael Rolnik <mrolnik@gmail.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v34 00/13] QEMU AVR 8 bit cores
+Date: Fri, 25 Oct 2019 16:12:24 +0300
+Message-Id: <20191025131237.63149-1-mrolnik@gmail.com>
+X-Mailer: git-send-email 2.17.2 (Apple Git-113)
 MIME-Version: 1.0
-In-Reply-To: <20191014115126.15360-3-vsementsov@virtuozzo.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Mimecast-Spam-Score: 0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="nIViJQZrFgFX7fHeKpj4GQFtCPRPVZyRU"
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 205.139.110.61
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::32c
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -113,67 +91,330 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, jsnow@redhat.com, qemu-devel@nongnu.org, den@openvz.org
+Cc: thuth@redhat.com, Michael Rolnik <mrolnik@gmail.com>,
+ richard.henderson@linaro.org, dovgaluk@ispras.ru, imammedo@redhat.com,
+ philmd@redhat.com, aleksandar.m.mail@gmail.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---nIViJQZrFgFX7fHeKpj4GQFtCPRPVZyRU
-Content-Type: multipart/mixed; boundary="gjI5Gl8jPrO9Vrbv6beNjkwbpE1jcPryk"
+This series of patches adds 8bit AVR cores to QEMU.
+All instruction, except BREAK/DES/SPM/SPMX, are implemented. Not fully tested yet.
+However I was able to execute simple code with functions. e.g fibonacci calculation.
+This series of patches include a non real, sample board.
+No fuses support yet. PC is set to 0 at reset.
 
---gjI5Gl8jPrO9Vrbv6beNjkwbpE1jcPryk
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+the patches include the following
+1. just a basic 8bit AVR CPU, without instruction decoding or translation
+2. CPU features which allow define the following 8bit AVR cores
+     avr1
+     avr2 avr25
+     avr3 avr31 avr35
+     avr4
+     avr5 avr51
+     avr6
+     xmega2 xmega4 xmega5 xmega6 xmega7
+3. a definition of sample machine with SRAM, FLASH and CPU which allows to execute simple code
+4. encoding for all AVR instructions
+5. interrupt handling
+6. helpers for IN, OUT, SLEEP, WBR & unsupported instructions
+7. a decoder which given an opcode decides what istruction it is
+8. translation of AVR instruction into TCG
+9. all features together
 
-On 14.10.19 13:51, Vladimir Sementsov-Ogievskiy wrote:
-> Check that it's impossible to create more persistent bitmaps than qcow2
-> supports.
->=20
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> ---
->  tests/qemu-iotests/269     | 47 ++++++++++++++++++++++++++++++++++++++
->  tests/qemu-iotests/269.out |  3 +++
->  tests/qemu-iotests/group   |  1 +
->  3 files changed, 51 insertions(+)
->  create mode 100755 tests/qemu-iotests/269
->  create mode 100644 tests/qemu-iotests/269.out
+changes since v3
+1. rampD/X/Y/Z registers are encoded as 0x00ff0000 (instead of 0x000000ff) for faster address manipulaton
+2. ffs changed to ctz32
+3. duplicate code removed at avr_cpu_do_interrupt
+4. using andc instead of not + and
+5. fixing V flag calculation in varios instructions
+6. freeing local variables in PUSH
+7. tcg_const_local_i32 -> tcg_const_i32
+8. using sextract32 instead of my implementation
+9. fixing BLD instruction
+10.xor(r) instead of 0xff - r at COM
+11.fixing MULS/MULSU not to modify inputs' content
+12.using SUB for NEG
+13.fixing tcg_gen_qemu_ld/st call in XCH
 
-Is there no way to make this test any faster, e.g. by creating like
-65534 bitmaps with dd and a binary blob?  (Similarly to what I do in
-=E2=80=9Ciotests: Test qcow2's snapshot table handling=E2=80=9D)
+changes since v4
+1. target is now defined as big endian in order to optimize push_ret/pop_ret
+2. all style warnings are fixed
+3. adding cpu_set/get_sreg functions
+4. simplifying gen_goto_tb as there is no real paging
+5. env->pc -> env->pc_w
+6. making flag dump more compact
+7. more spacing
+8. renaming CODE/DATA_INDEX -> MMU_CODE/DATA_IDX
+9. removing avr_set_feature
+10. SPL/SPH set bug fix
+11. switching stb_phys to cpu_stb_data
+12. cleaning up avr_decode
+13. saving sreg, rampD/X/Y/Z, eind in HW format (savevm)
+14. saving CPU features (savevm)
 
-This is such an edge case, but running the test took 3:46 min before
-patch 1 (which I already find much too long), and 8:13 min afterwards
-(on my machine).
+changes since v5
+1. BLD bug fix
+2. decoder generator is added
 
-(To be honest, if we take this test as-is, I=E2=80=99m probably just never =
-going
-to run it.)
+chages since v6
+1. using cpu_get_sreg/cpu_set_sreg in avr_cpu_gdb_read_register/avr_cpu_gdb_write_register
+2. configure the target as little endian because otherwise GDB does not work
+3. fixing and testing gen_push_ret/gen_pop_ret
 
-Max
+changes since v7
+1. folding back v6
+2. logging at helper_outb and helper_inb are done for non supported yet registers only
+3. MAINTAINERS updated
 
+changes since v8
+1. removing hw/avr from hw/Makefile.obj as it should not be built for all
+2. making linux compilable
+3. testing on
+    a. Mac, Apple LLVM version 7.0.0
+    b. Ubuntu 12.04, gcc 4.9.2
+    c. Fedora 23, gcc 5.3.1
+4. folding back some patches
+5. translation bug fixes for ORI, CPI, XOR instructions
+6. propper handling of cpu register writes though memory
 
---gjI5Gl8jPrO9Vrbv6beNjkwbpE1jcPryk--
+changes since v9
+1. removing forward declarations of static functions
+2. disabling debug prints
+3. switching to case range instead of if else if ...
+4. LD/ST IN/OUT accessing CPU maintainder registers are not routed to any device
+5. commenst about sample board and sample IO device added
+6. sample board description is more descriptive now
+7. memory_region_allocate_system_memory is used to create RAM
+8. now there are helper_fullrd & helper_fullwr when LD/ST try to access registers
 
---nIViJQZrFgFX7fHeKpj4GQFtCPRPVZyRU
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+changes since v10
+1. movig back fullwr & fullrd into the commit where outb and inb were introduced
+2. changing tlb_fill function signature
+3. adding empty line between functions
+4. adding newline on the last line of the file
+5. using tb->flags to generae full access ST/LD instructions
+6. fixing SBRC bug
+7. folding back 10th commit
+8. whenever a new file is introduced it's added to Makefile.objs
 
------BEGIN PGP SIGNATURE-----
+changes since v11
+1. updating to v2.7.0-rc
+2. removing assignment to env->fullacc from gen_intermediate_code
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl2y9NMACgkQ9AfbAGHV
-z0B4iQf9HtSL7ntLz01on10tO7WhcyTFaQ7g1RHfJF1fWm3FcrpH9oEsHgXB+DJL
-RZquQMc8xMSx7qaWmeG14TfuJSlKht3NfLYEyd8zqzpN82H8kWLB5FDWTMBTx+ZM
-ElbUZlALZrffzzIviSZfZtDAhIIrSdf+MO1gVrKvF0L4TvNyHxl1TKae9YuDZfJA
-GIbP65dwIAtKMbTZcO5HRSZP3D4BxcWE0HSzQbfGq55U9qM7EicJO9JCWus60vgh
-kXmtuxw0F+2Mm3x6aoKJFsAxWU36+atDW9p6w1+Bpj5QqMzKgXB6+LLxfUyvvKt2
-RpzUqM7nwhF4DRno+AzQRW5Q8FTwxg==
-=wpwT
------END PGP SIGNATURE-----
+changes since v12
+1. fixing spacing
+2. fixing get/put_segment functions
+3. removing target-avr/machine.h file
+4. VMSTATE_SINGLE_TEST -> VMSTATE_SINGLE
+5. comment spelling
+6. removing hw/avr/sample_io.c
+7. char const* -> const char*
+8. proper ram allocation
+9. fixing breakpoint functionality.
+10.env1 -> env
+11.fixing avr_cpu_gdb_write_register & avr_cpu_gdb_read_register functions
+12.any cpu is removed
+12.feature bits are not saved into vm state
 
---nIViJQZrFgFX7fHeKpj4GQFtCPRPVZyRU--
+changes since v13
+1. rebasing to v2.7.0-rc1
+
+changes since v14
+1. I made self review with git gui tool. (I did not know such a thing exists)
+2. removing all double/tripple spaces
+3. removing comment reference to SampleIO
+4. folding back some changes, so there is not deleted lines in my code
+5. moving avr configuration, within configure file, before chris
+
+changes since v15
+1. removing IO registers cache from CPU
+2. implementing CBI/SBI as read(helper_inb), modify, write(helper_outb)
+3. implementing CBIC/SBIC as read(helper_inb), check, branch
+4. adding missing tcg_temp_free_i32 for tcg_const_i32
+
+changes since v16
+1. removing EXT IO registers knoledge from CPU. These registers are accessible
+   by LD/ST only. CPU has no interest in them
+
+changes since v17 (by Richard Henderson)
+This is Michael's v17, with some adjustments of my own:
+
+1. Fix the whitespace errors reported by "git am",
+2. Replace the utf-8 characters with normal ascii,
+3. Ditch the separate compilation of translate.c.
+
+I retained the two separate files that could be regenerated
+from the included cpugen program, but merged in translate-insn.c.
+Not that it matters, but the code generated is about 3k smaller.
+
+changes since v18
+1.  moving target-avr into target/avr
+2.  do not call cpu_exec_initfn function from avr_cpu_initfn
+3.  call cpu_exec_realizefn avr_cpu_realizefn
+4.  do not fail sample machine creation if no rom is suplied
+5.  add tcg_gen_exit_tb(0) for BS_BRANCH in gen_intermediate_code
+6.  fix a register getters/setters in machine.c
+7.  changing QEMU_ARCH_AVR from 1<<17 to 1<<18
+
+changes since v19
+1.  use decodetree.py tool to decode instructions
+2.  adding USART
+3.  adding 16 bit timer peripherals
+4.  changing QEMU_ARCH_AVR from 1<<18 to 1<<20
+5.  renaming tlb_fill to avr_cpu_tlb_fill
+
+changes since v20
+1.  use one CPU naming convention
+2.  merging insn16.decode & insn32.decode files
+3.  modifying skip next instruction mechanizm
+4.  translate BREAK as NOP for now
+
+changes since v21
+1.  Reorganize bstate.
+    This will make transition to <exec/translator.h> easier, and fixes a couple of bugs wrt single stepping
+    by richard.henderson@linaro.org
+2.  Drop cpc and fix page cross condition.
+    by richard.henderson@linaro.org
+3.  Refactor checking supported/unsupported instructions
+4.  Add gdb-xml/avr-cpu.xml
+
+changes since v22
+1.  Rebase
+2.  Split long comment
+
+changes since v23
+1.  remove avr_cpu_list_compare function
+2.  modify avr_cpu_class_by_name function
+3.  modify avr_cpu_list_entry function
+4.  modify avr_cpu_list function
+
+changes since v24
+1.  remove AVR_CPU_TYPE_NAME macro
+
+changes since v25
+1.  fix patches. every file belong to one patch only
+2.  change copyright year from 2016 to 2019
+3.  create mask device to emulate prr0/prr1
+
+changes since v26
+1.  add avocado acceptence test
+2.  add boot serial test
+
+changes since v27
+1.  list atmel2560 devices as unimplemented
+2.  fix sram base/size
+
+changes since v28
+1.  rebase
+2.  fix includes & build
+
+changes since v29
+1.  fixing ownership
+2.  using 'since' instread of 'added in'
+
+changes since v30
+1.  rebase
+
+changes since v31
+1.  splitting 'Add instruction translation' commit
+2.  fixing typo in qapi/machine.json sicne -> since
+3.  removing unintended changes in configure file
+4.  adding Richard Henderson as a co developer to 'Add instruction translation - CPU main translation funcions' commit
+
+changes since v32
+1.  modify cpu_get_sreg to treat sreg C as other flags, except sreg Z
+
+changes since v33
+1.  ensure flag C is always calculated as one bit
+2.  calculate flag Z as one bit, without using inverse logic
+
+Michael Rolnik (12):
+  target/avr: Add outward facing interfaces and core CPU logic
+  target/avr: Add instruction helpers
+  target/avr: Add instruction decoding
+  target/avr: Add instruction translation - Registers definition
+  target/avr: Add instruction translation - Arithmetic and Logic
+    Instructions
+  target/avr: Add instruction translation - Branch Instructions
+  target/avr: Add instruction translation - Bit and Bit-test
+    Instructions
+  target/avr: Add instruction translation - MCU Control Instructions
+  target/avr: Add instruction translation - CPU main translation
+    function
+  target/avr: Add example board configuration
+  target/avr: Register AVR support with the rest of QEMU, the build
+    system, and the WMAINTAINERS file
+  target/avr: Add tests
+
+Sarah Harris (1):
+  target/avr: Add limited support for USART and 16 bit timer peripherals
+
+ MAINTAINERS                      |    9 +
+ arch_init.c                      |    2 +
+ configure                        |    7 +
+ default-configs/avr-softmmu.mak  |    5 +
+ gdb-xml/avr-cpu.xml              |   49 +
+ hw/Kconfig                       |    1 +
+ hw/avr/Kconfig                   |    6 +
+ hw/avr/Makefile.objs             |    1 +
+ hw/avr/sample.c                  |  282 +++
+ hw/char/Kconfig                  |    3 +
+ hw/char/Makefile.objs            |    1 +
+ hw/char/avr_usart.c              |  324 ++++
+ hw/misc/Kconfig                  |    3 +
+ hw/misc/Makefile.objs            |    2 +
+ hw/misc/avr_mask.c               |  112 ++
+ hw/timer/Kconfig                 |    3 +
+ hw/timer/Makefile.objs           |    1 +
+ hw/timer/avr_timer16.c           |  605 ++++++
+ include/disas/dis-asm.h          |    6 +
+ include/hw/char/avr_usart.h      |   97 +
+ include/hw/misc/avr_mask.h       |   47 +
+ include/hw/timer/avr_timer16.h   |   97 +
+ include/sysemu/arch_init.h       |    1 +
+ qapi/machine.json                |    3 +-
+ target/avr/Makefile.objs         |   33 +
+ target/avr/cpu-param.h           |   37 +
+ target/avr/cpu-qom.h             |   54 +
+ target/avr/cpu.c                 |  576 ++++++
+ target/avr/cpu.h                 |  253 +++
+ target/avr/gdbstub.c             |   85 +
+ target/avr/helper.c              |  354 ++++
+ target/avr/helper.h              |   29 +
+ target/avr/insn.decode           |  175 ++
+ target/avr/machine.c             |  121 ++
+ target/avr/translate.c           | 3028 ++++++++++++++++++++++++++++++
+ tests/Makefile.include           |    2 +
+ tests/acceptance/machine_avr6.py |   36 +
+ tests/boot-serial-test.c         |   10 +
+ tests/machine-none-test.c        |    1 +
+ 39 files changed, 6460 insertions(+), 1 deletion(-)
+ create mode 100644 default-configs/avr-softmmu.mak
+ create mode 100644 gdb-xml/avr-cpu.xml
+ create mode 100644 hw/avr/Kconfig
+ create mode 100644 hw/avr/Makefile.objs
+ create mode 100644 hw/avr/sample.c
+ create mode 100644 hw/char/avr_usart.c
+ create mode 100644 hw/misc/avr_mask.c
+ create mode 100644 hw/timer/avr_timer16.c
+ create mode 100644 include/hw/char/avr_usart.h
+ create mode 100644 include/hw/misc/avr_mask.h
+ create mode 100644 include/hw/timer/avr_timer16.h
+ create mode 100644 target/avr/Makefile.objs
+ create mode 100644 target/avr/cpu-param.h
+ create mode 100644 target/avr/cpu-qom.h
+ create mode 100644 target/avr/cpu.c
+ create mode 100644 target/avr/cpu.h
+ create mode 100644 target/avr/gdbstub.c
+ create mode 100644 target/avr/helper.c
+ create mode 100644 target/avr/helper.h
+ create mode 100644 target/avr/insn.decode
+ create mode 100644 target/avr/machine.c
+ create mode 100644 target/avr/translate.c
+ create mode 100644 tests/acceptance/machine_avr6.py
+
+-- 
+2.17.2 (Apple Git-113)
 
 
