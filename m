@@ -2,78 +2,134 @@ Return-Path: <SRS0=bySr=YS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-5.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 20C6ACA9EA0
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 16:27:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A6C8BCA9EA0
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 16:29:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DD7432084C
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 16:27:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 70BB821872
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 16:29:10 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YNq95hHp"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DD7432084C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="Yyz3FEJO";
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=qualcomm.onmicrosoft.com header.i=@qualcomm.onmicrosoft.com header.b="Tf6GP3wh"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 70BB821872
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=quicinc.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34456 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34466 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iO2RC-0000eV-Co
-	for qemu-devel@archiver.kernel.org; Fri, 25 Oct 2019 12:27:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35234)
+	id 1iO2Sa-0004fM-VM
+	for qemu-devel@archiver.kernel.org; Fri, 25 Oct 2019 12:29:09 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37744)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <stefanha@redhat.com>) id 1iO27e-0004xl-G8
- for qemu-devel@nongnu.org; Fri, 25 Oct 2019 12:07:31 -0400
+ (envelope-from <tsimpson@quicinc.com>) id 1iO2Q2-0007Ji-JC
+ for qemu-devel@nongnu.org; Fri, 25 Oct 2019 12:26:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <stefanha@redhat.com>) id 1iO27c-00043s-O3
- for qemu-devel@nongnu.org; Fri, 25 Oct 2019 12:07:30 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:21647
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1iO27c-00043k-K1
- for qemu-devel@nongnu.org; Fri, 25 Oct 2019 12:07:28 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1572019648;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=KveTrEY2PYZqXZICipBAQRcEI4wbdQiduaTHLrzZMeM=;
- b=YNq95hHpyozUaXEe5+a2nEmgip+TTAR22waedM+7myZrsVuRfbS9Jo/mOBpQTnEMXMIG3w
- 8My8XH1k9p0AN4KxZ4ZYJ8/yDU8RZgVNr10uhIg+yvBUPKIhype/hrr69ePTQfDI6jzPp1
- ZSGITbeqFNed9YiqrVtDTxOcsBn835k=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-315-J32qlknnOqqGlmAvz85IDg-1; Fri, 25 Oct 2019 12:07:24 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A65821800E00;
- Fri, 25 Oct 2019 16:07:23 +0000 (UTC)
-Received: from localhost (ovpn-117-215.ams2.redhat.com [10.36.117.215])
- by smtp.corp.redhat.com (Postfix) with ESMTP id E4B531001B2D;
- Fri, 25 Oct 2019 16:07:15 +0000 (UTC)
-From: Stefan Hajnoczi <stefanha@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v2 14/15] tests/qemu-iotests: enable testing with aio options
-Date: Fri, 25 Oct 2019 18:04:43 +0200
-Message-Id: <20191025160444.31632-15-stefanha@redhat.com>
-In-Reply-To: <20191025160444.31632-1-stefanha@redhat.com>
-References: <20191025160444.31632-1-stefanha@redhat.com>
+ (envelope-from <tsimpson@quicinc.com>) id 1iO2Q1-0001w1-6Z
+ for qemu-devel@nongnu.org; Fri, 25 Oct 2019 12:26:30 -0400
+Received: from alexa-out-sd-01.qualcomm.com ([199.106.114.38]:46740)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <tsimpson@quicinc.com>)
+ id 1iO2Q0-0001vI-HC
+ for qemu-devel@nongnu.org; Fri, 25 Oct 2019 12:26:29 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+ d=quicinc.com; i=@quicinc.com; q=dns/txt; s=qcdkim;
+ t=1572020788; x=1603556788;
+ h=from:to:cc:subject:date:message-id:mime-version;
+ bh=jfsQKUZET5JSvp6YaP0CbM5ZfqaFZLkVLlBZA7tq5R4=;
+ b=Yyz3FEJOZMUhmcDHxCG7KvbGFT/iJVldoiRfLwS/2YmjAWghItqTQjdE
+ 9vLvym1Ql1H34iwRRsovr+xVa9/t3GdRty8b6ZDTeqfK6Yx9sP0dCWIAx
+ cZ/IGHiIRSa3eVuzZh2JDKwU75lrytjlNTJLMRYaiOXv2ghHW9nHh+vgw U=;
+Received: from unknown (HELO ironmsg04-sd.qualcomm.com) ([10.53.140.144])
+ by alexa-out-sd-01.qualcomm.com with ESMTP; 25 Oct 2019 09:26:26 -0700
+IronPort-SDR: WV28dYTCNInwL0RvLeV26KBdHTjtx9sJpm7XZMd1klfDUS9cHqVNVnsnZwBRh+uWKgRY57+nGW
+ v8eidedVaAo6UeDGnuUVH7/lRmYeLEQpNa/S5ViMaYeZGAvSS9NpVMVow4SWcr5u/T7oJ3mmjo
+ Uy19bjp1belzt9a0MaXpztCqJ/6lNFU18UzQdEVCamWwLU8sLMGn/+ZaTZuesHPpMaK+xCFwcT
+ yTv5PLAXrrnjKXLWtkLF0d94T/ZQ7te0bNL2QUtWgDP2Y5cygIrsOlGKV837+sNbQA23HnhNZN
+ 1jBsPkDkg12KioCJg5lt1Hjg
+Received: from nasanexm03h.na.qualcomm.com ([10.85.0.50])
+ by ironmsg04-sd.qualcomm.com with ESMTP/TLS/AES256-SHA;
+ 25 Oct 2019 09:26:25 -0700
+Received: from apsanexr02e.ap.qualcomm.com (10.85.0.28) by
+ nasanexm03h.na.qualcomm.com (10.85.0.50) with Microsoft SMTP Server (TLS) id
+ 15.0.1473.3; Fri, 25 Oct 2019 09:26:25 -0700
+Received: from nasanexm03f.na.qualcomm.com (10.85.0.47) by
+ apsanexr02e.ap.qualcomm.com (10.85.0.28) with Microsoft SMTP Server (TLS) id
+ 15.0.1473.3; Fri, 25 Oct 2019 09:26:23 -0700
+Received: from NAM03-CO1-obe.outbound.protection.outlook.com (199.106.107.6)
+ by nasanexm03f.na.qualcomm.com (10.85.0.47) with Microsoft SMTP Server (TLS)
+ id 15.0.1473.3 via Frontend Transport; Fri, 25 Oct 2019 09:26:23 -0700
+Received: from BYAPR02MB4886.namprd02.prod.outlook.com (52.135.234.160) by
+ BYAPR02MB6439.namprd02.prod.outlook.com (20.179.89.33) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2387.22; Fri, 25 Oct 2019 16:26:22 +0000
+Received: from BYAPR02MB4886.namprd02.prod.outlook.com
+ ([fe80::8cc2:1921:4cb1:6cc1]) by BYAPR02MB4886.namprd02.prod.outlook.com
+ ([fe80::8cc2:1921:4cb1:6cc1%7]) with mapi id 15.20.2387.019; Fri, 25 Oct 2019
+ 16:26:22 +0000
+From: Taylor Simpson <tsimpson@quicinc.com>
+To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Subject: QEMU for Qualcomm Hexagon - KVM Forum talk and code available
+Thread-Topic: QEMU for Qualcomm Hexagon - KVM Forum talk and code available
+Thread-Index: AdWLUOkdof4fsTRrRvOiehGwyV6GSg==
+Date: Fri, 25 Oct 2019 16:26:22 +0000
+Message-ID: <BYAPR02MB48863165DEE32E5C563E93F4DE650@BYAPR02MB4886.namprd02.prod.outlook.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=tsimpson@quicinc.com; 
+x-originating-ip: [199.106.103.59]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 27397635-5bac-44b6-937e-08d7596812cf
+x-ms-traffictypediagnostic: BYAPR02MB6439:
+x-ms-exchange-purlcount: 2
+x-microsoft-antispam-prvs: <BYAPR02MB6439FF1CC21AE2A36B817884DE650@BYAPR02MB6439.namprd02.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:10000;
+x-forefront-prvs: 02015246A9
+x-forefront-antispam-report: SFV:NSPM;
+ SFS:(10019020)(136003)(39860400002)(396003)(366004)(376002)(346002)(189003)(199004)(102836004)(14454004)(3846002)(66446008)(66946007)(54896002)(66476007)(966005)(66556008)(478600001)(86362001)(71190400001)(71200400001)(64756008)(256004)(6506007)(4744005)(26005)(5660300002)(25786009)(7696005)(476003)(606006)(2906002)(99286004)(236005)(6306002)(9686003)(5640700003)(4326008)(55016002)(486006)(66066001)(52536014)(6916009)(316002)(7736002)(8676002)(33656002)(81156014)(81166006)(76116006)(6436002)(2501003)(8936002)(186003)(790700001)(6116002)(2351001)(74316002)(54906003);
+ DIR:OUT; SFP:1102; SCL:1; SRVR:BYAPR02MB6439;
+ H:BYAPR02MB4886.namprd02.prod.outlook.com; FPR:; SPF:None; LANG:en;
+ PTR:InfoNoRecords; MX:1; A:1; 
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: 84j9Mc9n09lAiRDEQBW6dT89OCneAYNWeq7H7tbOPXbeD+iAvUk9vfnCPCHeFVf8cDPcbi3iFdII4GaC29avc9P4Qi52E+YsDsBjwJixzNUZgO5ie6MqxgVmHXAb78PZzH0eJ01TsjKny0n/YhxWzXWv2frSx5PEFCcoerSFIcmx3yaKdyVtNfkBUjdrxUdrq3e6Z1qs8RS2Nv8FvXlazPiytQ0X+7fJFlDKyiIqrVXQM7oAurBf93cJSIk8Su0pvcL/0S1SNEGa+nzw87Ns+Ryhs9qgHvC+V8lR3xT8EcaHcM3wctnDQc520WjyyvTmsKEWKVlCKapoYAwfNbhrUXXol85/2m3z+bnoPBbSiZuysBLGd1XeBjnu1uXjsOC1HvvVkDSG/ibr2oldUOOKMfX4ImmOHniRfgJyihdl2DEJbyKsqjOkE2+SHsUAK/hPh88WnwgJN3ddJnwtsX5/m6QCjwq2/hsjL/UpmHdnIpU=
+x-ms-exchange-transport-forked: True
+arc-seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=GMqiyGqif78teNnQcLsdU4Eacz0Yc1xoQyCzhitL7ccTOD2KrYcgJhavOMpF8t6HtfwPAbfr1VjwfhPEkozXHhKFaHEGfTg76vUnjsntV++zwh7iDYBX08FbWI+e6dYoXSROEdCs8NX7pWuUx+pCCDPaXPqazMGDBYfMJozK64o/HpgLHUMtNVDm1WLBp6h4BFcZ43nzetfWyOZuD61C8PW5VyOhrMN03QqNRwzuz4sGdL2zqUH3oBi84kP01U47N6NS1tNSHpErzGIJJcgT7GdU+WjBRqyTmNsZoLRIcXmC2itoYaIbzJW1r8kl4R/tqpxx7jgPo5FFmSaCFzQ+yQ==
+arc-message-signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=l2k4xB5eyRaKqypJJfpFjug3rKUX2o836UlJWxWfYrw=;
+ b=mEK391XR9KGJoUiOFRhTQ05VotLC+1hkwJ1nfDr8IvULkmAQ8KDq2DXj3DuD+6jdsiy35B0J/0G8Hh9L3MHCEormUwX7kRhrYUO2itphrkEOz0g5TY0jrq3GG9rFc/D59s0xm+bLrLrDTBC2eVf75R1pnlBYvYfw7l7AmxVceAtBEXXAlr+oYvuUTS0YOV559BUv/czts4GYPogw3qC/yWEkkDmY5dhwNzbXoe40dzOcfmlSsAcfZ9eTGKTxkXX16vXGk1WRX0+mXUDdEVGzXnG0niEPSBEvzr3i13qqwz/jHEnx10KLTsexHOMjUGtLSRMYCbdBHnZDstKDZlHD8Q==
+arc-authentication-results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=quicinc.com; dmarc=pass action=none header.from=quicinc.com;
+ dkim=pass header.d=quicinc.com; arc=none
+dkim-signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=qualcomm.onmicrosoft.com; s=selector2-qualcomm-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=l2k4xB5eyRaKqypJJfpFjug3rKUX2o836UlJWxWfYrw=;
+ b=Tf6GP3whfeJ46nz0YZ+3Miba2z42q9WYd7NAIZH8b0YmrDHueYnxmM4DJ1vn6Z+kbK1kMnEm46uIz8KjPjzSnms4nAmsTV6wemOgIBZTd6Huv5h/BLQgFcQPhaBcCq885XZpSo0G9NkC3RENk3D3J643JOd0gOVEmqFIYK8B4mY=
+x-ms-exchange-crosstenant-network-message-id: 27397635-5bac-44b6-937e-08d7596812cf
+x-ms-exchange-crosstenant-originalarrivaltime: 25 Oct 2019 16:26:22.1310 (UTC)
+x-ms-exchange-crosstenant-fromentityheader: Hosted
+x-ms-exchange-crosstenant-id: 98e9ba89-e1a1-4e38-9007-8bdabc25de1d
+x-ms-exchange-crosstenant-mailboxtype: HOSTED
+x-ms-exchange-crosstenant-userprincipalname: jxHt2fYE/MKjj5xyCFy+gXR+MFgOpfSQ75acauNSwa3JgXnr1dCIjygnNsxbtFBTHcVFPfB5ScrCi+bJk+I9GQ==
+x-ms-exchange-transport-crosstenantheadersstamped: BYAPR02MB6439
+Content-Type: multipart/alternative;
+ boundary="_000_BYAPR02MB48863165DEE32E5C563E93F4DE650BYAPR02MB4886namp_"
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-MC-Unique: J32qlknnOqqGlmAvz85IDg-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.81
+X-OriginatorOrg: quicinc.com
+X-detected-operating-system: by eggs.gnu.org: FreeBSD 9.x [fuzzy]
+X-Received-From: 199.106.114.38
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -85,167 +141,106 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, oleksandr@redhat.com, qemu-block@nongnu.org,
- Julia Suvorova <jusual@redhat.com>, Markus Armbruster <armbru@redhat.com>,
- Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Kevin Wolf <kwolf@redhat.com>,
- Aarushi Mehta <mehta.aaru20@gmail.com>
+Cc: Alessandro Di Federico <ale@rev.ng>, "nizzo@rev.ng" <nizzo@rev.ng>,
+ =?iso-8859-1?Q?Niccol=F2_Izzo?= <izzoniccolo@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Aarushi Mehta <mehta.aaru20@gmail.com>
+--_000_BYAPR02MB48863165DEE32E5C563E93F4DE650BYAPR02MB4886namp_
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 
-Signed-off-by: Aarushi Mehta <mehta.aaru20@gmail.com>
-Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
----
- tests/qemu-iotests/check      | 15 ++++++++++++++-
- tests/qemu-iotests/common.rc  | 14 ++++++++++++++
- tests/qemu-iotests/iotests.py | 12 ++++++++++--
- 3 files changed, 38 insertions(+), 3 deletions(-)
+We would like inform the you that we will be doing a talk at the KVM Forum =
+next week on QEMU for Qualcomm Hexagon.  Alessandro Di Federico, Niccolo Iz=
+zo, and I have been working independently on implementations of the Hexagon=
+ target.  We plan to merge the implementations, have a community review, an=
+d ultimately have Hexagon be an official target in QEMU.  Our code is avail=
+able at the links below.
+https://github.com/revng/qemu-hexagon
+https://github.com/quic/qemu
+If anyone has any feedback on the code as it stands today or guidance on ho=
+w best to prepare it for review, please let us know.
 
-diff --git a/tests/qemu-iotests/check b/tests/qemu-iotests/check
-index 588c453a94..150fb71cf9 100755
---- a/tests/qemu-iotests/check
-+++ b/tests/qemu-iotests/check
-@@ -132,6 +132,7 @@ sortme=3Dfalse
- expunge=3Dtrue
- have_test_arg=3Dfalse
- cachemode=3Dfalse
-+aiomode=3Dfalse
-=20
- tmp=3D"${TEST_DIR}"/$$
- rm -f $tmp.list $tmp.tmp $tmp.sed
-@@ -141,6 +142,7 @@ export IMGFMT_GENERIC=3Dtrue
- export IMGPROTO=3Dfile
- export IMGOPTS=3D""
- export CACHEMODE=3D"writeback"
-+export AIOMODE=3D"threads"
- export QEMU_IO_OPTIONS=3D""
- export QEMU_IO_OPTIONS_NO_FMT=3D""
- export CACHEMODE_IS_DEFAULT=3Dtrue
-@@ -225,6 +227,11 @@ s/ .*//p
-         CACHEMODE_IS_DEFAULT=3Dfalse
-         cachemode=3Dfalse
-         continue
-+    elif $aiomode
-+    then
-+        AIOMODE=3D"$r"
-+        aiomode=3Dfalse
-+        continue
-     fi
-=20
-     xpand=3Dtrue
-@@ -269,6 +276,7 @@ other options
-     -n                  show me, do not run tests
-     -o options          -o options to pass to qemu-img create/convert
-     -c mode             cache mode
-+    -i mode             AIO mode
-     -makecheck          pretty print output for make check
-=20
- testlist options
-@@ -433,10 +441,13 @@ testlist options
-             cachemode=3Dtrue
-             xpand=3Dfalse
-             ;;
-+        -i)
-+            aiomode=3Dtrue
-+            xpand=3Dfalse
-+            ;;
-         -T)        # deprecated timestamp option
-             xpand=3Dfalse
-             ;;
--
-         -v)
-             verbose=3Dtrue
-             xpand=3Dfalse
-@@ -515,6 +526,8 @@ done
-=20
- # Set qemu-io cache mode with $CACHEMODE we have
- QEMU_IO_OPTIONS=3D"$QEMU_IO_OPTIONS --cache $CACHEMODE"
-+# Set qemu-io aio mode with $AIOMODE we have
-+QEMU_IO_OPTIONS=3D"$QEMU_IO_OPTIONS --aio $AIOMODE"
-=20
- QEMU_IO_OPTIONS_NO_FMT=3D"$QEMU_IO_OPTIONS"
- if [ "$IMGOPTSSYNTAX" !=3D "true" ]; then
-diff --git a/tests/qemu-iotests/common.rc b/tests/qemu-iotests/common.rc
-index 12b4751848..13f934f79b 100644
---- a/tests/qemu-iotests/common.rc
-+++ b/tests/qemu-iotests/common.rc
-@@ -576,6 +576,20 @@ _default_cache_mode()
-         return
-     fi
- }
-+_supported_aio_modes()
-+{
-+    for mode; do
-+        if [ "$mode" =3D "$AIOMODE" ]; then
-+            return
-+        fi
-+    done
-+    _notrun "not suitable for aio mode: $AIOMODE"
-+}
-+_default_aio_mode()
-+{
-+    AIOMODE=3D"$1"
-+    QEMU_IO=3D"$QEMU_IO --aio $1"
-+}
-=20
- _unsupported_imgopts()
- {
-diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotests.py
-index 693fde155a..0d4ef6b3e6 100644
---- a/tests/qemu-iotests/iotests.py
-+++ b/tests/qemu-iotests/iotests.py
-@@ -59,6 +59,7 @@ imgproto =3D os.environ.get('IMGPROTO', 'file')
- test_dir =3D os.environ.get('TEST_DIR')
- output_dir =3D os.environ.get('OUTPUT_DIR', '.')
- cachemode =3D os.environ.get('CACHEMODE')
-+aiomode =3D os.environ.get('AIOMODE')
- qemu_default_machine =3D os.environ.get('QEMU_DEFAULT_MACHINE')
-=20
- socket_scm_helper =3D os.environ.get('SOCKET_SCM_HELPER', 'socket_scm_help=
-er')
-@@ -483,6 +484,7 @@ class VM(qtest.QEMUQtestMachine):
-             options.append('file=3D%s' % path)
-             options.append('format=3D%s' % format)
-             options.append('cache=3D%s' % cachemode)
-+            options.append('aio=3D%s' % aiomode)
-=20
-         if opts:
-             options.append(opts)
-@@ -888,6 +890,10 @@ def verify_cache_mode(supported_cache_modes=3D[]):
-     if supported_cache_modes and (cachemode not in supported_cache_modes):
-         notrun('not suitable for this cache mode: %s' % cachemode)
-=20
-+def verify_aio_mode(supported_aio_modes=3D[]):
-+    if supported_aio_modes and (aiomode not in supported_aio_modes):
-+        notrun('not suitable for this aio mode: %s' % aiomode)
-+
- def supports_quorum():
-     return 'quorum' in qemu_img_pipe('--help')
-=20
-@@ -945,8 +951,9 @@ def execute_unittest(output, verbosity, debug):
-=20
- def execute_test(test_function=3DNone,
-                  supported_fmts=3D[], supported_oses=3D['linux'],
--                 supported_cache_modes=3D[], unsupported_fmts=3D[],
--                 supported_protocols=3D[], unsupported_protocols=3D[]):
-+                 supported_cache_modes=3D[], supported_aio_modes=3D{},
-+                 unsupported_fmts=3D[], supported_protocols=3D[],
-+                 unsupported_protocols=3D[]):
-     """Run either unittest or script-style tests."""
-=20
-     # We are using TEST_DIR and QEMU_DEFAULT_MACHINE as proxies to
-@@ -963,6 +970,7 @@ def execute_test(test_function=3DNone,
-     verify_protocol(supported_protocols, unsupported_protocols)
-     verify_platform(supported_oses)
-     verify_cache_mode(supported_cache_modes)
-+    verify_aio_mode(supported_aio_modes)
-=20
-     if debug:
-         output =3D sys.stdout
---=20
-2.21.0
+Thanks,
+Taylor
 
+--_000_BYAPR02MB48863165DEE32E5C563E93F4DE650BYAPR02MB4886namp_
+Content-Type: text/html; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
+
+<html xmlns:v=3D"urn:schemas-microsoft-com:vml" xmlns:o=3D"urn:schemas-micr=
+osoft-com:office:office" xmlns:w=3D"urn:schemas-microsoft-com:office:word" =
+xmlns:m=3D"http://schemas.microsoft.com/office/2004/12/omml" xmlns=3D"http:=
+//www.w3.org/TR/REC-html40">
+<head>
+<meta http-equiv=3D"Content-Type" content=3D"text/html; charset=3Diso-8859-=
+1">
+<meta name=3D"Generator" content=3D"Microsoft Word 15 (filtered medium)">
+<style><!--
+/* Font Definitions */
+@font-face
+	{font-family:"Cambria Math";
+	panose-1:2 4 5 3 5 4 6 3 2 4;}
+@font-face
+	{font-family:Calibri;
+	panose-1:2 15 5 2 2 2 4 3 2 4;}
+/* Style Definitions */
+p.MsoNormal, li.MsoNormal, div.MsoNormal
+	{margin:0in;
+	margin-bottom:.0001pt;
+	font-size:11.0pt;
+	font-family:"Calibri",sans-serif;}
+a:link, span.MsoHyperlink
+	{mso-style-priority:99;
+	color:#0563C1;
+	text-decoration:underline;}
+a:visited, span.MsoHyperlinkFollowed
+	{mso-style-priority:99;
+	color:#954F72;
+	text-decoration:underline;}
+span.EmailStyle17
+	{mso-style-type:personal-compose;
+	font-family:"Calibri",sans-serif;
+	color:windowtext;}
+.MsoChpDefault
+	{mso-style-type:export-only;
+	font-family:"Calibri",sans-serif;}
+@page WordSection1
+	{size:8.5in 11.0in;
+	margin:1.0in 1.0in 1.0in 1.0in;}
+div.WordSection1
+	{page:WordSection1;}
+--></style><!--[if gte mso 9]><xml>
+<o:shapedefaults v:ext=3D"edit" spidmax=3D"1026" />
+</xml><![endif]--><!--[if gte mso 9]><xml>
+<o:shapelayout v:ext=3D"edit">
+<o:idmap v:ext=3D"edit" data=3D"1" />
+</o:shapelayout></xml><![endif]-->
+</head>
+<body lang=3D"EN-US" link=3D"#0563C1" vlink=3D"#954F72">
+<div class=3D"WordSection1">
+<p class=3D"MsoNormal">We would like inform the you that we will be doing a=
+ talk at the KVM Forum next week on QEMU for Qualcomm Hexagon.&nbsp; Alessa=
+ndro Di Federico, Niccolo Izzo, and I have been working independently on im=
+plementations of the Hexagon target.&nbsp; We
+ plan to merge the implementations, have a community review, and ultimately=
+ have Hexagon be an official target in QEMU.&nbsp; Our code is available at=
+ the links below.<o:p></o:p></p>
+<p class=3D"MsoNormal" style=3D"text-indent:.5in"><u><a href=3D"https://git=
+hub.com/revng/qemu-hexagon">https://github.com/revng/qemu-hexagon</a></u><o=
+:p></o:p></p>
+<p class=3D"MsoNormal" style=3D"text-indent:.5in"><u><a href=3D"https://git=
+hub.com/quic/qemu">https://github.com/quic/qemu</a></u><o:p></o:p></p>
+<p class=3D"MsoNormal">If anyone has any feedback on the code as it stands =
+today or guidance on how best to prepare it for review, please let us know.=
+<o:p></o:p></p>
+<p class=3D"MsoNormal"><o:p>&nbsp;</o:p></p>
+<p class=3D"MsoNormal">Thanks,<o:p></o:p></p>
+<p class=3D"MsoNormal">Taylor<o:p></o:p></p>
+</div>
+</body>
+</html>
+
+--_000_BYAPR02MB48863165DEE32E5C563E93F4DE650BYAPR02MB4886namp_--
 
