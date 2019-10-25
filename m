@@ -2,56 +2,83 @@ Return-Path: <SRS0=bySr=YS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 75134CA9EA0
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 20:54:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4BA65CA9EA0
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 20:57:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 46E4C21872
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 20:54:30 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 46E4C21872
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=csgraf.de
+	by mail.kernel.org (Postfix) with ESMTPS id 0B00921872
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 20:57:56 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="knSS8sfH"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0B00921872
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36112 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36144 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iO6bM-0001ak-Us
-	for qemu-devel@archiver.kernel.org; Fri, 25 Oct 2019 16:54:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36011)
+	id 1iO6eg-0005ib-8p
+	for qemu-devel@archiver.kernel.org; Fri, 25 Oct 2019 16:57:54 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37561)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <agraf@csgraf.de>) id 1iO6M5-0007Ct-Sb
- for qemu-devel@nongnu.org; Fri, 25 Oct 2019 16:38:42 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1iO6ao-0000PQ-5W
+ for qemu-devel@nongnu.org; Fri, 25 Oct 2019 16:53:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <agraf@csgraf.de>) id 1iO6M4-00039w-Fe
- for qemu-devel@nongnu.org; Fri, 25 Oct 2019 16:38:41 -0400
-Received: from mail.csgraf.de ([188.138.100.120]:52044
- helo=zulu616.server4you.de) by eggs.gnu.org with esmtp (Exim 4.71)
- (envelope-from <agraf@csgraf.de>) id 1iO6M4-000390-8r
- for qemu-devel@nongnu.org; Fri, 25 Oct 2019 16:38:40 -0400
-Received: from 38f9d3867b82.ant.amazon.com (unknown [3.122.114.9])
- by csgraf.de (Postfix) with ESMTPSA id ADB8439003C2;
- Fri, 25 Oct 2019 22:38:36 +0200 (CEST)
-Subject: Re: [PATCH v2 0/4] tcg/LICENSE: Remove no-longer-true statement that
- TCG is BSD-licensed
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
-References: <20191025155848.17362-1-peter.maydell@linaro.org>
-From: Alexander Graf <agraf@csgraf.de>
-Message-ID: <af059b21-94bb-c8c5-6d4a-6b104386c7e6@csgraf.de>
-Date: Fri, 25 Oct 2019 22:38:34 +0200
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:60.0)
- Gecko/20100101 Thunderbird/60.9.0
+ (envelope-from <peter.maydell@linaro.org>) id 1iO6am-0001XM-JW
+ for qemu-devel@nongnu.org; Fri, 25 Oct 2019 16:53:53 -0400
+Received: from mail-oi1-x242.google.com ([2607:f8b0:4864:20::242]:45942)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1iO6am-0001Wo-Dh
+ for qemu-devel@nongnu.org; Fri, 25 Oct 2019 16:53:52 -0400
+Received: by mail-oi1-x242.google.com with SMTP id o205so2467995oib.12
+ for <qemu-devel@nongnu.org>; Fri, 25 Oct 2019 13:53:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=p02z0OsfvVJIqy8Wkqr51LLW+ZWmWxj6T9miCmOTccE=;
+ b=knSS8sfHij5EiTv9pSRRaZCaggntt3op++bR4R+2FoUFVOiPxKTKDQl5jOCUHJGBfb
+ wAlUUCXiM99Cajrp9s/Z+HDZoEvD/px70+rkie+XpmVCv2gN4lVBXNo2mwAqbiKhjWvH
+ ouuEVxfOQesZPnd+7YrEytoqzNmeyidKSrsNNRzWhUEZidUWnHJW2p6ulEfiFcuVivXN
+ UTliGYt5gyymCVZLNMLtmVweO6Rpangm29/ePCSqAgDNv8U3I6w+Q25sBfAzKm4Sg0pr
+ QzlQkj/Xs+25B5AnwDlrU9QkOBlsVdg2aS6XmC04Lh0ZhqEPSJqQ9SCt5aADN61rsp9l
+ 3EoA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=p02z0OsfvVJIqy8Wkqr51LLW+ZWmWxj6T9miCmOTccE=;
+ b=LjaTXsRppBEwLrKQUaN0B3gbqUJG8ppBtTBflqRVbZBNIpx+0l27W7sCV6tatHXgMZ
+ PoiGmvzGN78TotQkxhvzEwcbU/7U8BfvL00w3UjwAIHW4hwXHWDOfZ3N4lV9Hc46FSrY
+ ZM/wA4pOEqpoon+Q5uWsDfaoFtROYK7897gQlzvDvjZZsgx6IUXQjsbUtzta5GMY16Qz
+ 19RAKGRdMCekdsNw6oAmL5sg3qLXptVtBTaGUQ37DoxvJRf2COsRnserUxhlDOUulAyO
+ Qw/h+PUu8ZgFOWq0rOddARiW077O4lkxGWwbcA8P8fJVI05fROkZyW4F2lWEjy7LBIhh
+ mdSw==
+X-Gm-Message-State: APjAAAWp+fRhZNY0pDYBsrw0rVbuDWdbKo1+sYVTa43xlrCMvaQd2Bov
+ 23wTA0rLhAAw4WJAJMBR2hyfHwXzjq+86/IU2tarWQ==
+X-Google-Smtp-Source: APXvYqxg9vQROYbzhQPdIDOCCLiFre9b0ANcxYngQskm3q+/Q/PlyCsqxLGMEM+LHDMcWG1zBhQ9i8DG2b5E/0+Z8jI=
+X-Received: by 2002:a05:6808:7d1:: with SMTP id
+ f17mr3991280oij.163.1572036830819; 
+ Fri, 25 Oct 2019 13:53:50 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20191025155848.17362-1-peter.maydell@linaro.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 188.138.100.120
+References: <89ada4b1-ee3d-a512-07c2-9bc1ba5806da@redhat.com>
+ <20191024224622.12371-1-keithp@keithp.com> <8736fhm9tw.fsf@linaro.org>
+ <87pnik4w9n.fsf@keithp.com>
+ <CAFEAcA-g+RkvYjseDE=1Z=gnLum0Cjvn_7bqB3ti+cBq9UZ3Eg@mail.gmail.com>
+ <87mudo4owu.fsf@keithp.com>
+In-Reply-To: <87mudo4owu.fsf@keithp.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 25 Oct 2019 21:53:39 +0100
+Message-ID: <CAFEAcA-nnkHuj4y8+vFu5=virUoxwarg=kqQvUWeN73SDs+TzA@mail.gmail.com>
+Subject: Re: [PATCH] Semihost SYS_READC implementation (v4)
+To: Keith Packard <keithp@keithp.com>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::242
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -63,67 +90,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
- Claudio Fontana <claudio.fontana@gmail.com>,
- Ard Biesheuvel <ard.biesheuvel@linaro.org>, Laszlo Ersek <lersek@redhat.com>,
- Richard Henderson <richard.henderson@linaro.org>,
- Markus Armbruster <armbru@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+Cc: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
+ QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-
-On 25.10.19 17:58, Peter Maydell wrote:
-> Since 2008 the tcg/LICENSE file has not changed: it claims that
-> everything under tcg/ is BSD-licensed.
+On Fri, 25 Oct 2019 at 20:15, Keith Packard <keithp@keithp.com> wrote:
 >
-> This is not true and hasn't been true for years: in 2013 we
-> accepted the tcg/aarch64 target code under a GPLv2-or-later
-> license statement. We also have generic vector optimisation
-> code under the LGPL2.1-or-later, and the TCI backend is
-> GPLv2-or-later. Further, many of the files are not BSD
-> licensed but MIT licensed.
+> Peter Maydell <peter.maydell@linaro.org> writes:
 >
-> We don't really consider the tcg subdirectory to be a distinct
-> part of QEMU anyway.
+> > Is there a specification for RISC-V semihosting? This is
+> > likely to be my first question when the support comes
+> > round for review, so you can have it early :-)  We'd
+> > prefer to implement specified interfaces, not random
+> > ad-hoc "this seems to be what newlib wants to see,
+> > which is turn got hacked together by copying some other
+> > architecture's code".
 >
-> This patchset adds explicit licensing/copyright comments to
-> the three files which were missing them, removes the
-> inaccurate tcg/LICENSE file, and updates the top-level
-> LICENSE file to be more accurate about the current state
-> of the licenses used in the code in tcg/.
+> There seems to be convergence on a pretty simple interface which uses
+> ebreak surrounded by a couple of specific no-ops:
 >
-> If we want a policy that tcg/ code has a restricted
-> permitted set of licenses, then we really need to have
-> this enforced by checkpatch -- history demonstrates that
-> just writing it in tcg/LICENSE does not prevent code under
-> other licenses getting in. In the v1 email thread nobody
-> seemed to be very strongly arguing for this, though, and
-> at this point we would need to make an active effort to
-> track down contributors and get relicensing statements.
-> If anybody wants to push that effort now would be a good
-> time to volunteer :-)
+>       slli x0, x0, 0x1f
+>       ebreak
+>       srai x0, x0, 0x7
 >
-> Note on the licensing for the tcg-target.opc.h files:
->   * I've used the same license as the rest of the relevant
->     backend, which is to say GPL2-or-later for tcg/aarch64
->     and MIT for tcg/i386 and tcg/ppc.
->   * In all 3 cases, the only people who've made contributions
->     to the files are Richard Henderson and (for aarch64) Alex Benn=C3=A9=
-e
+> There are implementations in rust and openocd, and I've got one for
+> picolibc.
+
+I'm going to push for somebody actually writing out a
+document and putting it somewhere that we can point to
+and say "that's the authoritative spec", please...
+it doesn't have to be a big formal thing, but I do
+think you want it written down, because the whole point
+is for multiple implementations and users to interoperate.
+
+
+> > Isn't the answer to this "don't use a command line that tries
+> > to connect stdio to multiple things" ?
 >
-> Richard, Alex -- an acked-by for the relevant patches would
-> be nice (or if you intended a different license for the
-> contributions than I have assumed please say so!)
+> Uh, we do that all the time? The mux device is designed to handle this
+> so that you can use stdio for both monitor commands and application
+> I/O. It's very convenient, the only issue is that the last device that
+> hooks to the mux ends up getting input first (you use ^Ac to rotate
+> among the selected devices).
 
+Yeah, the mux works fine for this kind of thing. There's
+no inherent reason why semihosting ought to "win" as
+the initially selected thing on the mux, though --
+typically that would be expected to be the UART/serial
+console.
 
-Thanks for cleaning up the license mess :)
-
-Reviewed-by: Alexander Graf <agraf@csgraf.de>
-
-Alex
-
-
+thanks
+-- PMM
 
