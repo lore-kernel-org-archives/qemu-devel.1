@@ -7,80 +7,80 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 004DBCA9EA0
-	for <qemu-devel@archiver.kernel.org>; Sat, 26 Oct 2019 00:40:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F074FCA9EA0
+	for <qemu-devel@archiver.kernel.org>; Sat, 26 Oct 2019 00:41:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B5EED205ED
-	for <qemu-devel@archiver.kernel.org>; Sat, 26 Oct 2019 00:40:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B0D81205ED
+	for <qemu-devel@archiver.kernel.org>; Sat, 26 Oct 2019 00:41:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="MsBFZSVL"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B5EED205ED
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="lrTZEk7p"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B0D81205ED
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=wdc.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37536 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37548 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iOA87-0008BD-U1
-	for qemu-devel@archiver.kernel.org; Fri, 25 Oct 2019 20:40:31 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49585)
+	id 1iOA9R-0002JC-Tw
+	for qemu-devel@archiver.kernel.org; Fri, 25 Oct 2019 20:41:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49632)
  by lists.gnu.org with esmtp (Exim 4.90_1)
  (envelope-from <prvs=194c68654=alistair.francis@wdc.com>)
- id 1iO90q-00051x-33
- for qemu-devel@nongnu.org; Fri, 25 Oct 2019 19:28:57 -0400
+ id 1iO90s-00052p-3s
+ for qemu-devel@nongnu.org; Fri, 25 Oct 2019 19:28:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
  (envelope-from <prvs=194c68654=alistair.francis@wdc.com>)
- id 1iO90n-0004D4-UZ
- for qemu-devel@nongnu.org; Fri, 25 Oct 2019 19:28:55 -0400
-Received: from esa1.hgst.iphmx.com ([68.232.141.245]:10430)
+ id 1iO90q-0004Fu-G4
+ for qemu-devel@nongnu.org; Fri, 25 Oct 2019 19:28:57 -0400
+Received: from esa1.hgst.iphmx.com ([68.232.141.245]:10433)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <prvs=194c68654=alistair.francis@wdc.com>)
- id 1iO90n-0004CY-Hb; Fri, 25 Oct 2019 19:28:53 -0400
+ id 1iO90q-0004DA-5g; Fri, 25 Oct 2019 19:28:56 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
- t=1572046133; x=1603582133;
+ t=1572046136; x=1603582136;
  h=from:to:cc:subject:date:message-id:in-reply-to:
  references:mime-version:content-transfer-encoding;
- bh=FdeZ4NhLfUCPSsQnsVMq9BAn/ZA/owDOlR0AZEjNA30=;
- b=MsBFZSVLvGsdLnJ/eYyEfQZ6SLMVjqrlHlBsRuWK5wA4KmXsD6sVeA4B
- s8hHAVWenLNBdLiLZK/jczpr9I0Tf6mIY2nCFCQ5iPhzd+jujAByO45mL
- G1pyVFwQ9y3XN5hbVsQAMbbz6df2VxJPpeJG/JRncPjkFYmlE+uQCr2DY
- R72IcsBRCLzgh+YHNjrd/TtfSQkEYZd+qXCL2qWzl+od3pjfLuB+nOQGX
- vkJUPrsNI4hH81A0FFBrFM87GefpWBOvVIUWN56OeaVl1n+d/6pyQ0ZTL
- iLySQs/BOqrrf2WUkuROqdwp2pL0PXNq8g89kLt/BJmTN7MOLe0B7BZIE w==;
-IronPort-SDR: QIgdlC26c/9NlcD9JFOfk4I9sz+NM75la7FSlmqdBOxgUQwt1VfPgpM85BPoY8j16S5Xvk6Wxf
- JTfjB/nOjuw0tHHjjX5Z/fav0XKuB5lW7LZP8IiEeWrBbHnTsNnUkaSQLQRcUXLvF9bDFV5CSJ
- QtRjS4RmcA7yYMBE0Yniz6GmV3EfdE3/hhA7+7petqhSysDywtgrmUOuQwRCR/o8OUh6OtF9sk
- +szv5Azvxy6YJ9S/EbYscSyJe3Wwal4H2dPfc/SQ8yynZOEtx3G4Aqd9b36/HXNyhg5zzwlzK6
- x8Y=
-X-IronPort-AV: E=Sophos;i="5.68,230,1569254400"; d="scan'208";a="228520394"
+ bh=tfjEdhd/vyLlGTnc8lObBWvW/ASfYoq9Ezu7PsP0s6o=;
+ b=lrTZEk7pTkQoiFyDnxk6IjeGYNnG/DLrGfz4Xf9AIsi4i9g5BFsKJuiH
+ 5XOjs+vWEOkMwyFFspZ8z0ONgJy6zaP6yvOho4I7PYGbH5vt9m1p33qXa
+ oB4B/43VphxEEVY4DX/Vi56G7+anHbv+r0sQCajCeBGnO5H4618EgkEXV
+ Og5HzteWNth9M+UV1/3NYXGW1TgmDqDarUrDDNFwJz+hpm3xlK0UpOEVc
+ bw4cKNl6UzUzSdeyYPJ9quG7eXEPfFZh/VpAa2TLfefY2JwnF0EfA0/Ey
+ G4u7Fgsag2PbjkzXpXWFxJkQHl1ZEA6kPXIkY2osPBGAtGsF5tTIdmycZ g==;
+IronPort-SDR: XiP25r5Do/WGMAmWNxU+6ONMzGmyYanfDGNFuQCB9VDTnR86MjkcId44d5gtNZkQ8O0KFkn9nv
+ qHVoZiX8UriixLbsFTmYRy4TnqWhGi6hWYVVsLV8LpbxyECeo0C0uioAg2j+j2IRopqyQVKiZe
+ 2XsbangeWnpfNnhcl+x/h3119Tje4uPd2yqHNprniOzzQO94BXgsgaQFXrnu6Xn82sUlL5WL9b
+ AuYNBb9tgbRWlkUiCG3dSyGpYz2qd+9BnRtyK2xqRhP84yVVK9VWmYNjiqnuPnSHi2aZxlOFNY
+ 6AM=
+X-IronPort-AV: E=Sophos;i="5.68,230,1569254400"; d="scan'208";a="228520398"
 Received: from uls-op-cesaip01.wdc.com (HELO uls-op-cesaep01.wdc.com)
  ([199.255.45.14])
- by ob1.hgst.iphmx.com with ESMTP; 26 Oct 2019 07:28:21 +0800
-IronPort-SDR: 8sEjert+rRdGwD95cgxpBTl/O0ah1ECxS5lz954x1vnz6U9KYajYYjHxRT5kFbB0IT8zHSu23q
- 8/GcNu53B5lGCsW6uHkJrx9ojOJMEHyaSu/GXXAyhE1NfDOI91xuNYtaQrd0SairBu077ohi/U
- 6qceM5v6RBdBDug/zArhmmytS3y/5szIgUA63X/N2CPclgm4esn4FVuhRXuEnX43Ew0q2Oi8xD
- l6s/6q1XJn9yEyrXDX8v+rjCtY6lVKZAQq/23sKN9ZhU73MUREpUCK3rQuntptq7U4tpGQs/Nb
- UGM2QursmSlqgIIRDke+wQJp
-Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
+ by ob1.hgst.iphmx.com with ESMTP; 26 Oct 2019 07:28:30 +0800
+IronPort-SDR: Lf46Pp6kPPx84iYieyzMY9KSDnpXu0nhDaJn4wj9lp7b0kyM9uzjb9F/rUTqQrwGcavP6PsWTm
+ hGeEzw8EblOGtir7/PI1hkbzIHWw0c6ew/jVZiIw8YjSBBwie4vObcsqphnymaizlKNm7JSYtg
+ vSVrUBkfvvP7Qk94liJs/3cu5Q+sV8BhagYp4qzPYinbKma7y0TDFCqpvLwaPR1dvh6ivs3u6x
+ mxNZ2HD1V7bSYlVX26DopXx/lKrlxw+HunegiYWJjZAwXl64HT+mC6GWwgrmf4KgauLzEbFHhP
+ yVCpVm9uLzLzF7Cjk2Uvxh5N
+Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 25 Oct 2019 16:23:46 -0700
-IronPort-SDR: EaFI86jyQ2mwZkh2WIGp3Nwx7yinwDy8MSy2wV2tMZd+kOK+gZf7hS/gxpMn0F+6YBlyqcmYtt
- 9d8pHbjPDwcq/7sehmd+H8v7v2A9LGKmc8mm0+/mawGaK9P9/shFzMx8mBH2gMJDd5FlDD3j8q
- cRr5h10pc1acftoKcHxLHenyeXQbP2KBmsH57VXr0Kq3WDZFcVe88JL6D/5xoCDguH4R2HyfKW
- Slgkg2kGKB4Lb0enQsIrubpaWrSsdgCvPIk27i/suVJHOkp1k04rWOx+e/oyfRXJI0B5u0x6mG
- ZYk=
+ 25 Oct 2019 16:23:56 -0700
+IronPort-SDR: pipr8bY0KpY5Ar6WCN+I+uchLW+CmiAKACbsOMEHzdbFlb9r6A5N5VeNd/oV4ZvZtFokKC92fU
+ G0LJJRz3w+FFuvV16GVeasLUr8nwCC+n1DoRA/+a+ESDP8hHQe70tyMzzgx2d6KHvCsvekZN4Q
+ w2fFWryv0yXtAmIw2KHq9nHOjwr8kK4jpsafz3YLjS+nR4pUPnNW7s0VZI/bXy9g7gYDOu9+Wa
+ 0bHLtVPXa2QJTyZfKLw8loxkFhqzUlxRvCZ2XE3GOvaLXySYzFV9ovOg2kohq/4hR71othu2pH
+ 4Ao=
 WDCIronportException: Internal
 Received: from risc6-mainframe.sdcorp.global.sandisk.com (HELO
  risc6-mainframe.int.fusionio.com) ([10.196.157.58])
- by uls-op-cesaip02.wdc.com with ESMTP; 25 Oct 2019 16:28:21 -0700
+ by uls-op-cesaip01.wdc.com with ESMTP; 25 Oct 2019 16:28:31 -0700
 From: Alistair Francis <alistair.francis@wdc.com>
 To: qemu-devel@nongnu.org,
 	qemu-riscv@nongnu.org
-Subject: [PATCH v2 05/27] target/riscv: Fix CSR perm checking for HS mode
-Date: Fri, 25 Oct 2019 16:23:25 -0700
-Message-Id: <1cb5cdbe67d8d9c489f6c0bedfc6c007e1f7243a.1572045716.git.alistair.francis@wdc.com>
+Subject: [PATCH v2 08/27] target/riscv: Dump Hypervisor registers if enabled
+Date: Fri, 25 Oct 2019 16:23:35 -0700
+Message-Id: <f401f134526dd811801e808f6d0bfedf2d42d5eb.1572045716.git.alistair.francis@wdc.com>
 X-Mailer: git-send-email 2.23.0
 In-Reply-To: <cover.1572045716.git.alistair.francis@wdc.com>
 References: <cover.1572045716.git.alistair.francis@wdc.com>
@@ -104,45 +104,73 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Update the CSR permission checking to work correctly when we are in
-HS-mode.
+Dump the Hypervisor registers and the current Hypervisor state.
+
+While we are editing this code let's also dump stvec and scause.
 
 Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
+Signed-off-by: Atish Patra <atish.patra@wdc.com>
+Reviewed-by: Palmer Dabbelt <palmer@sifive.com>
 ---
- target/riscv/csr.c | 18 ++++++++++++++----
- 1 file changed, 14 insertions(+), 4 deletions(-)
+ target/riscv/cpu.c | 34 ++++++++++++++++++++++++++++++++++
+ 1 file changed, 34 insertions(+)
 
-diff --git a/target/riscv/csr.c b/target/riscv/csr.c
-index da02f9f0b1..08956aa557 100644
---- a/target/riscv/csr.c
-+++ b/target/riscv/csr.c
-@@ -799,12 +799,22 @@ int riscv_csrrw(CPURISCVState *env, int csrno, target_ulong *ret_value,
+diff --git a/target/riscv/cpu.c b/target/riscv/cpu.c
+index e521ebe2e1..e66fd300fd 100644
+--- a/target/riscv/cpu.c
++++ b/target/riscv/cpu.c
+@@ -220,17 +220,51 @@ static void riscv_cpu_dump_state(CPUState *cs, FILE *f, int flags)
+     CPURISCVState *env = &cpu->env;
+     int i;
  
-     /* check privileges and return -1 if check fails */
- #if !defined(CONFIG_USER_ONLY)
--    int csr_priv = get_field(csrno, 0x300);
-+    int effective_priv = env->priv;
-     int read_only = get_field(csrno, 0xC00) == 3;
--    if ((!env->debugger) && (env->priv < csr_priv)) {
--        return -1;
-+
-+    if (riscv_has_ext(env, RVH) &&
-+        env->priv == PRV_S &&
-+        !riscv_cpu_virt_enabled(env)) {
-+        /*
-+         * We are in S mode without virtualisation, therefore we are in HS Mode.
-+         * Add 1 to the effective privledge level to allow us to access the
-+         * Hypervisor CSRs.
-+         */
-+        effective_priv++;
-     }
--    if (write_mask && read_only) {
-+
-+    if ((write_mask && read_only) ||
-+        (!env->debugger && (effective_priv < get_field(csrno, 0x300)))) {
-         return -1;
-     }
++#if !defined(CONFIG_USER_ONLY)
++    if (riscv_has_ext(env, RVH)) {
++        qemu_fprintf(f, " %s %d\n", "V      =  ", riscv_cpu_virt_enabled(env));
++    }
++#endif
+     qemu_fprintf(f, " %s " TARGET_FMT_lx "\n", "pc      ", env->pc);
+ #ifndef CONFIG_USER_ONLY
+     qemu_fprintf(f, " %s " TARGET_FMT_lx "\n", "mhartid ", env->mhartid);
+     qemu_fprintf(f, " %s " TARGET_FMT_lx "\n", "mstatus ", env->mstatus);
++    if (riscv_has_ext(env, RVH)) {
++        qemu_fprintf(f, " %s " TARGET_FMT_lx "\n", "hstatus ", env->hstatus);
++        qemu_fprintf(f, " %s " TARGET_FMT_lx "\n", "bstatus ", env->vsstatus);
++    }
+     qemu_fprintf(f, " %s " TARGET_FMT_lx "\n", "mip     ", env->mip);
++    if (riscv_has_ext(env, RVH)) {
++        qemu_fprintf(f, " %s " TARGET_FMT_lx "\n", "vsip    ",
++                     (target_ulong)atomic_read(&env->vsip));
++    }
+     qemu_fprintf(f, " %s " TARGET_FMT_lx "\n", "mie     ", env->mie);
++    if (riscv_has_ext(env, RVH)) {
++        qemu_fprintf(f, " %s " TARGET_FMT_lx "\n", "vsie    ", env->vsie);
++    }
+     qemu_fprintf(f, " %s " TARGET_FMT_lx "\n", "mideleg ", env->mideleg);
++    if (riscv_has_ext(env, RVH)) {
++        qemu_fprintf(f, " %s " TARGET_FMT_lx "\n", "hideleg ", env->hideleg);
++    }
+     qemu_fprintf(f, " %s " TARGET_FMT_lx "\n", "medeleg ", env->medeleg);
++    if (riscv_has_ext(env, RVH)) {
++        qemu_fprintf(f, " %s " TARGET_FMT_lx "\n", "hedeleg ", env->hedeleg);
++    }
+     qemu_fprintf(f, " %s " TARGET_FMT_lx "\n", "mtvec   ", env->mtvec);
++    qemu_fprintf(f, " %s " TARGET_FMT_lx "\n", "stvec   ", env->stvec);
++    if (riscv_has_ext(env, RVH)) {
++        qemu_fprintf(f, " %s " TARGET_FMT_lx "\n", "vstvec  ", env->vstvec);
++    }
+     qemu_fprintf(f, " %s " TARGET_FMT_lx "\n", "mepc    ", env->mepc);
++    qemu_fprintf(f, " %s " TARGET_FMT_lx "\n", "sepc    ", env->sepc);
++    if (riscv_has_ext(env, RVH)) {
++        qemu_fprintf(f, " %s " TARGET_FMT_lx "\n", "vsepc   ", env->vsepc);
++    }
+     qemu_fprintf(f, " %s " TARGET_FMT_lx "\n", "mcause  ", env->mcause);
++    qemu_fprintf(f, " %s " TARGET_FMT_lx "\n", "scause  ", env->scause);
++    if (riscv_has_ext(env, RVH)) {
++        qemu_fprintf(f, " %s " TARGET_FMT_lx "\n", "vscause ", env->vscause);
++    }
  #endif
+ 
+     for (i = 0; i < 32; i++) {
 -- 
 2.23.0
 
