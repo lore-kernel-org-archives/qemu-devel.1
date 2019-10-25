@@ -2,84 +2,87 @@ Return-Path: <SRS0=bySr=YS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 30873CA9EA0
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 13:36:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 60C00CA9EA0
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 13:36:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EF50321D71
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 13:36:28 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VSdF+ml9"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EF50321D71
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 3713E2054F
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 13:36:59 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3713E2054F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60014 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60018 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iNzlT-00043K-8i
-	for qemu-devel@archiver.kernel.org; Fri, 25 Oct 2019 09:36:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58830)
+	id 1iNzly-0004zR-5F
+	for qemu-devel@archiver.kernel.org; Fri, 25 Oct 2019 09:36:58 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35146)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mrolnik@gmail.com>) id 1iNzP9-0004hK-62
- for qemu-devel@nongnu.org; Fri, 25 Oct 2019 09:13:24 -0400
+ (envelope-from <philmd@redhat.com>) id 1iNziu-0000Hb-9V
+ for qemu-devel@nongnu.org; Fri, 25 Oct 2019 09:33:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mrolnik@gmail.com>) id 1iNzP7-00014K-Op
- for qemu-devel@nongnu.org; Fri, 25 Oct 2019 09:13:23 -0400
-Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:35125)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <mrolnik@gmail.com>) id 1iNzP7-000144-Il
- for qemu-devel@nongnu.org; Fri, 25 Oct 2019 09:13:21 -0400
-Received: by mail-wr1-x441.google.com with SMTP id l10so2306399wrb.2
- for <qemu-devel@nongnu.org>; Fri, 25 Oct 2019 06:13:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=PevYNAEW2/rbU2HD9RmLzQ+eiZqSSbUKhGGl3bsW4n4=;
- b=VSdF+ml9+tp0m5EJnoe0qs6U0i2LovYnGxZDmYogH3CGDnsKqCyzVst29O9lTdZI9F
- yLS8RXssI+n60QSeccYDtwgxS201aWMwSFio+IkhXuGeY1sdz5gd2rR8nsbcHYePQoI2
- CzcWlf5ABsYF6OM5xN0+SLmyB6IXKMjt0/n77wELh6kTFR90nvBKybqglfp1WRz7Y3Y1
- wKKqOkoTPswxisT7udjX7swimPW55L/qa9mQ6TuwEpsx5oMZXIbXYkVXiqG7T21Q+TKa
- MKSm2AVXS0r+nSAb2ZdQ7j+n/IegzP7n1Y+eEK1RKQ8TE88u+LZoO8kU1qwxUTEo0RHx
- ifDw==
+ (envelope-from <philmd@redhat.com>) id 1iNzir-0002ku-E5
+ for qemu-devel@nongnu.org; Fri, 25 Oct 2019 09:33:47 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:52096)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iNzir-0002kC-4g
+ for qemu-devel@nongnu.org; Fri, 25 Oct 2019 09:33:45 -0400
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 876B381F0C
+ for <qemu-devel@nongnu.org>; Fri, 25 Oct 2019 13:33:42 +0000 (UTC)
+Received: by mail-wr1-f72.google.com with SMTP id a6so1166943wru.1
+ for <qemu-devel@nongnu.org>; Fri, 25 Oct 2019 06:33:42 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references;
- bh=PevYNAEW2/rbU2HD9RmLzQ+eiZqSSbUKhGGl3bsW4n4=;
- b=Y1dwQ+R+fsNB7mfqX+LJKg90IaF2MNMwFqUphLExE55asNbAZMan89ycrjnWPl9kT+
- 5oxMEsZ6XEg1fUvtlso9lSAms/AP30dUg35B0/EZeAiV85CUV2ZUOlLsvBG6j6whGVBG
- 0ZtWHwOevy334NY8wV+dT35ujwTxEdJP6qQI97gIHOAr4iJiUbBUAwI0gIhyx1oDJijh
- dioBJSCQcuNKCftvQc2D6jv4nvxvgJt76P+MINN8eohMnbIBUsfXyXp5D5M7t9yRWnAW
- e2zY17YnRODYqboLPvF/o8dZD/6rBssy7lgJMmmGJGIjM7eV12jXZ9dDa1TPciBDUw1N
- Id7A==
-X-Gm-Message-State: APjAAAWAaq/Rt8WCfkFvtZtyIqnb7j0ffozuR3t6ArXUj1LedHhkFJOq
- rgt8qosh4mTRq46cOsGhge4euOBNcjBkQQ==
-X-Google-Smtp-Source: APXvYqxYkC1RWIw5v+MvnKHo8wJz/F+JMu2Hp7jLw7kuTUvkRmWCLIsAe3y2/Eoak3bwp27NxlYFAw==
-X-Received: by 2002:a5d:6402:: with SMTP id z2mr3012973wru.211.1572009200155; 
- Fri, 25 Oct 2019 06:13:20 -0700 (PDT)
-Received: from 8c859074c0ff.ant.amazon.com.com
- (bzq-79-181-93-41.red.bezeqint.net. [79.181.93.41])
- by smtp.gmail.com with ESMTPSA id x205sm2616139wmb.5.2019.10.25.06.13.18
- (version=TLS1_2 cipher=ECDHE-RSA-AES128-SHA bits=128/128);
- Fri, 25 Oct 2019 06:13:19 -0700 (PDT)
-From: Michael Rolnik <mrolnik@gmail.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v34 08/13] target/avr: Add instruction translation - MCU
- Control Instructions
-Date: Fri, 25 Oct 2019 16:12:32 +0300
-Message-Id: <20191025131237.63149-9-mrolnik@gmail.com>
-X-Mailer: git-send-email 2.17.2 (Apple Git-113)
-In-Reply-To: <20191025131237.63149-1-mrolnik@gmail.com>
-References: <20191025131237.63149-1-mrolnik@gmail.com>
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::441
+ h=x-gm-message-state:subject:to:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=berD3fWxhcwCOUWiOjo2XF+v7CI9NfplN/fbr5hnQU0=;
+ b=Mk3bR2IsD/10wuFehkSRib1JK2hEVwUtKXfn3/36QzObQNK1QWJ3O0UQJO8DrzcY0O
+ YsVyoHe8qd0GFh2OA2Q2aV9NJ+Q1x4iOlhUGxupANFXMY0eGfQv8QTAfzfSEUsmbA3Ej
+ xC9TAA0TFDcEGulrTH8p/ZY+vZevLW5b4h10L4lG5CZALYBTq1ydH1L274t5GLXAsZy/
+ eHkfUhrq5+O0b1y6OGho8KV2byX9z1Fg8IAs31dlAaPiC2Z5IKDtJBKs//4paKWlW29/
+ NYybj8xtkIqUr51+/Y6Qro7HAafg+HGgpzdjAs+rpqBtptH31T/22KBYkqqM4OqvTaJD
+ FjNQ==
+X-Gm-Message-State: APjAAAVVL/IbdYQ6WIC4TMPGkFEtItNjS2oAEYqMUYZiMqv0PC3jqebz
+ MT3SLI/hqRv9JHzGHB7tiJGLjWw6RYcYXuwfN/Bnu/6JOaElTB3dmnag9V9aWmf1xkxDv0dCKLi
+ lkmeuZSEqHOAoB9k=
+X-Received: by 2002:a5d:630f:: with SMTP id i15mr3130531wru.226.1572010421019; 
+ Fri, 25 Oct 2019 06:33:41 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqzW8VykVqc1WgsYusKZVrDR9P7PkgdYAa5iROQyrHeymAwaPkc0WEi4K1l4ixyl9BnGW01LrQ==
+X-Received: by 2002:a5d:630f:: with SMTP id i15mr3130515wru.226.1572010420801; 
+ Fri, 25 Oct 2019 06:33:40 -0700 (PDT)
+Received: from [192.168.1.115] (129.red-83-57-174.dynamicip.rima-tde.net.
+ [83.57.174.129])
+ by smtp.gmail.com with ESMTPSA id n187sm2896515wmb.47.2019.10.25.06.33.40
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Fri, 25 Oct 2019 06:33:40 -0700 (PDT)
+Subject: Re: [PATCH 4/4] crypto: add support for nettle's native XTS impl
+To: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
+ qemu-devel@nongnu.org
+References: <20191017145654.11371-1-berrange@redhat.com>
+ <20191017145654.11371-5-berrange@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <ad516c72-1b66-daf0-60bd-2eeb34aba227@redhat.com>
+Date: Fri, 25 Oct 2019 15:33:39 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.1
+MIME-Version: 1.0
+In-Reply-To: <20191017145654.11371-5-berrange@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,214 +94,134 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: thuth@redhat.com, Michael Rolnik <mrolnik@gmail.com>,
- richard.henderson@linaro.org, dovgaluk@ispras.ru, imammedo@redhat.com,
- philmd@redhat.com, aleksandar.m.mail@gmail.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This includes:
-    - BREAK
-    - NOP
-    - SLEEP
-    - WDR
+On 10/17/19 4:56 PM, Daniel P. Berrang=C3=A9 wrote:
+> Nettle 3.5.0 will add support for the XTS mode. Use this because long
+> term we wish to delete QEMU's XTS impl to avoid carrying private crypto
+> algorithm impls.
+>=20
+> Unfortunately this degrades nettle performance from 612 MB/s to 568 MB/=
+s
+> as nettle's XTS impl isn't so well optimized yet.
+>=20
+> Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+> ---
+>   configure              | 18 ++++++++++++++++++
+>   crypto/cipher-nettle.c | 18 ++++++++++++++++++
+>   2 files changed, 36 insertions(+)
+>=20
+> diff --git a/configure b/configure
+> index 98edb0ff44..6650c72348 100755
+> --- a/configure
+> +++ b/configure
+> @@ -471,6 +471,7 @@ gtk_gl=3D"no"
+>   tls_priority=3D"NORMAL"
+>   gnutls=3D""
+>   nettle=3D""
+> +nettle_xts=3D"no"
+>   gcrypt=3D""
+>   gcrypt_hmac=3D"no"
+>   gcrypt_xts=3D"no"
+> @@ -2862,6 +2863,19 @@ if test "$nettle" !=3D "no"; then
+>               pass=3D"yes"
+>           fi
+>       fi
+> +    if test "$pass" =3D "yes"
+> +    then
+> +        cat > $TMPC << EOF
+> +#include <nettle/xts.h>
+> +int main(void) {
+> +  return 0;
+> +}
+> +EOF
+> +        if compile_prog "$nettle_cflags" "$nettle_libs" ; then
+> +            nettle_xts=3Dyes
+> +            qemu_private_xts=3Dno
 
-Signed-off-by: Michael Rolnik <mrolnik@gmail.com>
----
- target/avr/translate.c | 174 +++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 174 insertions(+)
+Ah, now this variable makes sense.
 
-diff --git a/target/avr/translate.c b/target/avr/translate.c
-index f2ec2e2d2f..30ba13bdd7 100644
---- a/target/avr/translate.c
-+++ b/target/avr/translate.c
-@@ -368,6 +368,115 @@ static bool trans_ADC(DisasContext *ctx, arg_ADC *a)
- }
- 
- 
-+static void gen_jmp_ez(DisasContext *ctx)
-+{
-+    tcg_gen_deposit_tl(cpu_pc, cpu_r[30], cpu_r[31], 8, 8);
-+    tcg_gen_or_tl(cpu_pc, cpu_pc, cpu_eind);
-+    ctx->bstate = DISAS_LOOKUP;
-+}
-+
-+
-+static void gen_jmp_z(DisasContext *ctx)
-+{
-+    tcg_gen_deposit_tl(cpu_pc, cpu_r[30], cpu_r[31], 8, 8);
-+    ctx->bstate = DISAS_LOOKUP;
-+}
-+
-+
-+/*
-+ *  in the gen_set_addr & gen_get_addr functions
-+ *  H assumed to be in 0x00ff0000 format
-+ *  M assumed to be in 0x000000ff format
-+ *  L assumed to be in 0x000000ff format
-+ */
-+static void gen_set_addr(TCGv addr, TCGv H, TCGv M, TCGv L)
-+{
-+
-+    tcg_gen_andi_tl(L, addr, 0x000000ff);
-+
-+    tcg_gen_andi_tl(M, addr, 0x0000ff00);
-+    tcg_gen_shri_tl(M, M, 8);
-+
-+    tcg_gen_andi_tl(H, addr, 0x00ff0000);
-+}
-+
-+
-+static void gen_set_xaddr(TCGv addr)
-+{
-+    gen_set_addr(addr, cpu_rampX, cpu_r[27], cpu_r[26]);
-+}
-+
-+
-+static void gen_set_yaddr(TCGv addr)
-+{
-+    gen_set_addr(addr, cpu_rampY, cpu_r[29], cpu_r[28]);
-+}
-+
-+
-+static void gen_set_zaddr(TCGv addr)
-+{
-+    gen_set_addr(addr, cpu_rampZ, cpu_r[31], cpu_r[30]);
-+}
-+
-+
-+static TCGv gen_get_addr(TCGv H, TCGv M, TCGv L)
-+{
-+    TCGv addr = tcg_temp_new_i32();
-+
-+    tcg_gen_deposit_tl(addr, M, H, 8, 8);
-+    tcg_gen_deposit_tl(addr, L, addr, 8, 16);
-+
-+    return addr;
-+}
-+
-+
-+static TCGv gen_get_xaddr(void)
-+{
-+    return gen_get_addr(cpu_rampX, cpu_r[27], cpu_r[26]);
-+}
-+
-+
-+static TCGv gen_get_yaddr(void)
-+{
-+    return gen_get_addr(cpu_rampY, cpu_r[29], cpu_r[28]);
-+}
-+
-+
-+static TCGv gen_get_zaddr(void)
-+{
-+    return gen_get_addr(cpu_rampZ, cpu_r[31], cpu_r[30]);
-+}
-+
-+
-+/*
-+ *  Load one byte indirect from data space to register and stores an clear
-+ *  the bits in data space specified by the register. The instruction can only
-+ *  be used towards internal SRAM.  The data location is pointed to by the Z (16
-+ *  bits) Pointer Register in the Register File. Memory access is limited to the
-+ *  current data segment of 64KB. To access another data segment in devices with
-+ *  more than 64KB data space, the RAMPZ in register in the I/O area has to be
-+ *  changed.  The Z-pointer Register is left unchanged by the operation. This
-+ *  instruction is especially suited for clearing status bits stored in SRAM.
-+ */
-+static void gen_data_store(DisasContext *ctx, TCGv data, TCGv addr)
-+{
-+    if (ctx->tb->flags & TB_FLAGS_FULL_ACCESS) {
-+        gen_helper_fullwr(cpu_env, data, addr);
-+    } else {
-+        tcg_gen_qemu_st8(data, addr, MMU_DATA_IDX); /* mem[addr] = data */
-+    }
-+}
-+
-+static void gen_data_load(DisasContext *ctx, TCGv data, TCGv addr)
-+{
-+    if (ctx->tb->flags & TB_FLAGS_FULL_ACCESS) {
-+        gen_helper_fullrd(data, cpu_env, addr);
-+    } else {
-+        tcg_gen_qemu_ld8u(data, addr, MMU_DATA_IDX); /* data = mem[addr] */
-+    }
-+}
-+
-+
- /*
-  *  Subtracts an immediate value (0-63) from a register pair and places the
-  *  result in the register pair. This instruction operates on the upper four
-@@ -2618,3 +2727,68 @@ static bool trans_BCLR(DisasContext *ctx, arg_BCLR *a)
- 
-     return true;
- }
-+
-+
-+/*
-+ *  The BREAK instruction is used by the On-chip Debug system, and is
-+ *  normally not used in the application software. When the BREAK instruction is
-+ *  executed, the AVR CPU is set in the Stopped Mode. This gives the On-chip
-+ *  Debugger access to internal resources.  If any Lock bits are set, or either
-+ *  the JTAGEN or OCDEN Fuses are unprogrammed, the CPU will treat the BREAK
-+ *  instruction as a NOP and will not enter the Stopped mode.  This instruction
-+ *  is not available in all devices. Refer to the device specific instruction
-+ *  set summary.
-+ */
-+static bool trans_BREAK(DisasContext *ctx, arg_BREAK *a)
-+{
-+    if (!avr_have_feature(ctx, AVR_FEATURE_BREAK)) {
-+        return true;
-+    }
-+
-+#ifdef BREAKPOINT_ON_BREAK
-+    tcg_gen_movi_tl(cpu_pc, ctx->npc - 1);
-+    gen_helper_debug(cpu_env);
-+    ctx->bstate = DISAS_EXIT;
-+#else
-+    /* NOP */
-+#endif
-+
-+    return true;
-+}
-+
-+
-+/*
-+ *  This instruction performs a single cycle No Operation.
-+ */
-+static bool trans_NOP(DisasContext *ctx, arg_NOP *a)
-+{
-+
-+    /* NOP */
-+
-+    return true;
-+}
-+
-+
-+/*
-+ *  This instruction sets the circuit in sleep mode defined by the MCU
-+ *  Control Register.
-+ */
-+static bool trans_SLEEP(DisasContext *ctx, arg_SLEEP *a)
-+{
-+    gen_helper_sleep(cpu_env);
-+    ctx->bstate = DISAS_NORETURN;
-+    return true;
-+}
-+
-+
-+/*
-+ *  This instruction resets the Watchdog Timer. This instruction must be
-+ *  executed within a limited time given by the WD prescaler. See the Watchdog
-+ *  Timer hardware specification.
-+ */
-+static bool trans_WDR(DisasContext *ctx, arg_WDR *a)
-+{
-+    gen_helper_wdr(cpu_env);
-+
-+    return true;
-+}
--- 
-2.17.2 (Apple Git-113)
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 
+> +        fi
+> +    fi
+>       if test "$pass" =3D "no" && test "$nettle" =3D "yes"; then
+>           feature_not_found "nettle" "Install nettle devel >=3D 2.7.1"
+>       else
+> @@ -6337,6 +6351,10 @@ then
+>      echo "  XTS             $gcrypt_xts"
+>   fi
+>   echo "nettle            $nettle $(echo_version $nettle $nettle_versio=
+n)"
+> +if test "$nettle" =3D "yes"
+> +then
+> +   echo "  XTS             $nettle_xts"
+> +fi
+>   echo "libtasn1          $tasn1"
+>   echo "PAM               $auth_pam"
+>   echo "iconv support     $iconv"
+> diff --git a/crypto/cipher-nettle.c b/crypto/cipher-nettle.c
+> index d7411bb8ff..08794a9b10 100644
+> --- a/crypto/cipher-nettle.c
+> +++ b/crypto/cipher-nettle.c
+> @@ -19,7 +19,9 @@
+>    */
+>  =20
+>   #include "qemu/osdep.h"
+> +#ifdef CONFIG_QEMU_PRIVATE_XTS
+>   #include "crypto/xts.h"
+> +#endif
+>   #include "cipherpriv.h"
+>  =20
+>   #include <nettle/nettle-types.h>
+> @@ -30,6 +32,9 @@
+>   #include <nettle/serpent.h>
+>   #include <nettle/twofish.h>
+>   #include <nettle/ctr.h>
+> +#ifndef CONFIG_QEMU_PRIVATE_XTS
+> +#include <nettle/xts.h>
+> +#endif
+>  =20
+>   typedef void (*QCryptoCipherNettleFuncWrapper)(const void *ctx,
+>                                                  size_t length,
+> @@ -626,9 +631,15 @@ qcrypto_nettle_cipher_encrypt(QCryptoCipher *ciphe=
+r,
+>           break;
+>  =20
+>       case QCRYPTO_CIPHER_MODE_XTS:
+> +#ifdef CONFIG_QEMU_PRIVATE_XTS
+>           xts_encrypt(ctx->ctx, ctx->ctx_tweak,
+>                       ctx->alg_encrypt_wrapper, ctx->alg_encrypt_wrappe=
+r,
+>                       ctx->iv, len, out, in);
+> +#else
+> +        xts_encrypt_message(ctx->ctx, ctx->ctx_tweak,
+> +                            ctx->alg_encrypt_native,
+> +                            ctx->iv, len, out, in);
+> +#endif
+>           break;
+>  =20
+>       case QCRYPTO_CIPHER_MODE_CTR:
+> @@ -673,9 +684,16 @@ qcrypto_nettle_cipher_decrypt(QCryptoCipher *ciphe=
+r,
+>           break;
+>  =20
+>       case QCRYPTO_CIPHER_MODE_XTS:
+> +#ifdef CONFIG_QEMU_PRIVATE_XTS
+>           xts_decrypt(ctx->ctx, ctx->ctx_tweak,
+>                       ctx->alg_encrypt_wrapper, ctx->alg_decrypt_wrappe=
+r,
+>                       ctx->iv, len, out, in);
+> +#else
+> +        xts_decrypt_message(ctx->ctx, ctx->ctx_tweak,
+> +                            ctx->alg_encrypt_native,
+> +                            ctx->alg_decrypt_native,
+> +                            ctx->iv, len, out, in);
+> +#endif
+>           break;
+>       case QCRYPTO_CIPHER_MODE_CTR:
+>           ctr_crypt(ctx->ctx, ctx->alg_encrypt_native,
+>=20
 
