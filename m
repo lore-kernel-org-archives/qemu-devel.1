@@ -7,79 +7,79 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9FD4ACA9EA0
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 11:48:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BC671CA9EBC
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 11:48:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6DA8421D71
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 11:48:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8C96521D7B
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 11:48:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="IFKRl7Sf"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6DA8421D71
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="rI/Usq5O"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8C96521D7B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59020 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59028 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iNy53-0001ga-Id
-	for qemu-devel@archiver.kernel.org; Fri, 25 Oct 2019 07:48:33 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45064)
+	id 1iNy55-0001ji-Tp
+	for qemu-devel@archiver.kernel.org; Fri, 25 Oct 2019 07:48:35 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45077)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1iNxwM-0006U1-3T
- for qemu-devel@nongnu.org; Fri, 25 Oct 2019 07:39:35 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1iNxwP-0006gF-2K
+ for qemu-devel@nongnu.org; Fri, 25 Oct 2019 07:39:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1iNxwK-0006dA-Ea
- for qemu-devel@nongnu.org; Fri, 25 Oct 2019 07:39:33 -0400
-Received: from mail-qt1-x844.google.com ([2607:f8b0:4864:20::844]:42551)
+ (envelope-from <richard.henderson@linaro.org>) id 1iNxwK-0006dP-FL
+ for qemu-devel@nongnu.org; Fri, 25 Oct 2019 07:39:34 -0400
+Received: from mail-qk1-x741.google.com ([2607:f8b0:4864:20::741]:43147)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1iNxwI-0006au-D5
+ id 1iNxwJ-0006bg-Ex
  for qemu-devel@nongnu.org; Fri, 25 Oct 2019 07:39:31 -0400
-Received: by mail-qt1-x844.google.com with SMTP id w14so2693836qto.9
- for <qemu-devel@nongnu.org>; Fri, 25 Oct 2019 04:39:27 -0700 (PDT)
+Received: by mail-qk1-x741.google.com with SMTP id a194so1390358qkg.10
+ for <qemu-devel@nongnu.org>; Fri, 25 Oct 2019 04:39:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=C1Ka5ZLtI0sImJ7QdMPIBsKCCe+cYWp1x4Ddd/XjEbY=;
- b=IFKRl7SfLyGkRHA2wCnD8Orxigbg5oSbNOHXNwR8D+0jRTEGgSqPnswZdclYiVAgVe
- B+QIirneWP1g3tK9Fg7ZxbgZI6zsjdAxd/4x3wgp7jYU6MHwzyVN4gViKVDL1wQNCuJb
- k2/6L/UpkgwvDDKzkeORzFtaX0K2LF6Ai6A+MCQSWA9zvZmPYfrH66OLl9Qq1INDb/7k
- RXOIYmopyxj8YfGxLhL83DQxXboFsYARE//POLkTkZQf6AyDJzMLBP03u8AOO1Zxd2E4
- 2c4kkL6rd72rG7nAWdep1OZbAOV8qt8a2a/aRXBIX0CSp6ThZlmVLUHQ55dApCnLPhlp
- ULHg==
+ bh=s0q1vqFGnAcsw/qw8CdtCPCtjm1BmD/+WvFX3Z3uxE4=;
+ b=rI/Usq5OenuuvTlRkFeZwBOfcZNf9ytXpIcywXy9m/M8IZ2mPyUS50ReGVbqmJTGcK
+ 6SdGdFYeIdaAAnG/RXVWxBx4cI6SA6/8sNcdVlorKPbVgH9k1iA9QMAz3W7sXNNxoVk0
+ 48Za501PLhL7T45dHqHyex6UmTH95Nf5KJujwROOeK/iWUTLjVzuIZJ8z7xAwFI+z780
+ Bx6S5fiMefqedeKM+B2hr3NewIbGkj24iHwCR5KdkoPAej8hkEQbMloCvQtnDsSSpeU1
+ 1tKN8epoJCIODXYFWSNibNSYI/uPIYDrLe+y2Lw+VKtb7dg0OkaCMFc+UmpwRz1TE++s
+ eQ/w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references;
- bh=C1Ka5ZLtI0sImJ7QdMPIBsKCCe+cYWp1x4Ddd/XjEbY=;
- b=BWMTHxeQ8wSBqmiJILPGgAzwyAZxpES5iFQw7BcjKNJxm9VpdXqw+8bEhgjQXInggZ
- HBNSmMvXoZ8GMgbc/LmST+dDuCl6XCg2AxyL35MF6Vt5auMKY+aOEtUWzo5RVuLUIPes
- d80TSOTFdbSoenVChTnWobtCs3z9seIIqu6/ZQJ3XY4HNqQSYXMFCKLYhPibaIkIZU4Z
- kiQbrXDJFRQkJgLMrVdnPIXjosky1xpaMDV44cDcHjRzHReUFEuedOxsluGAdMXG0yBK
- aSXIdRMoOHOm0lRCdqmWA13HjBAdgROEAnjEIEUuAlZPG0xNz28EahSEwaEnIJM9CqKK
- H4zw==
-X-Gm-Message-State: APjAAAVjWDwCROvVJaxD6g9SATBFXSR2tfkxxkKquEsQzt+qmpQrKkFs
- iP1SSr6JYOHP7ne07Qw5J2N4U6JVs8M=
-X-Google-Smtp-Source: APXvYqxETCq9IEX7Nvx7hiGBZJKXHCfr5U2MiADTJI9somL4zRJfuNoe6qIzpQeN9jxV6sYu42WKfw==
-X-Received: by 2002:ac8:38a9:: with SMTP id f38mr2558976qtc.108.1572003567130; 
- Fri, 25 Oct 2019 04:39:27 -0700 (PDT)
+ bh=s0q1vqFGnAcsw/qw8CdtCPCtjm1BmD/+WvFX3Z3uxE4=;
+ b=SRlf3p2HixRdQxfEWxaY0+gSFXbY7KdYYbImctVJgaZDKPvTbhpkLsR2aYYoMnoHTH
+ FgAex1+LTmy88W6+MS8sIn+jdMqc1PhxB5S2yyFuZlTNKlzteCh7xw0BFk0ZI6g7OaKf
+ Z9rwTq1JJ+pY6VW10KWMA93MR1eJayFEnMIhiEyluqXBVrmcEkbIslWx6sFw+e4uHyUa
+ NI8GW/8ZrtctldwZxdITy83maVwDER6JdS4dUzQHIS3/zcX6MMM9SLa8AFI6g1k2eSlM
+ 6r+BVT0uIm4GDinLmJbiJI8D1uC2ejd/MrTxflFFguTDW6bFQzV8TNh41l/UH7bO1Har
+ YIMQ==
+X-Gm-Message-State: APjAAAUHa0HNr3vrXkjn47uWd1DK/3+5KS948pwFUyu1e1GFtuljCmOg
+ jUM1wnjYMOpbjBhx/KwOI4VDQ5ghUXQ=
+X-Google-Smtp-Source: APXvYqwng05J8eA2QXskL8IGIoydiKvqPSwJY3peuZwGomX5CnrahBUbtHWG8D33cJUODw75m/tSRw==
+X-Received: by 2002:a37:816:: with SMTP id 22mr2479620qki.454.1572003569270;
+ Fri, 25 Oct 2019 04:39:29 -0700 (PDT)
 Received: from localhost.localdomain (rrcs-172-254-253-50.nyc.biz.rr.com.
  [172.254.253.50])
- by smtp.gmail.com with ESMTPSA id x38sm1473335qtc.64.2019.10.25.04.39.26
+ by smtp.gmail.com with ESMTPSA id x38sm1473335qtc.64.2019.10.25.04.39.28
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 25 Oct 2019 04:39:26 -0700 (PDT)
+ Fri, 25 Oct 2019 04:39:28 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 04/12] linux-user/sparc: Use WREG constants in
- sparc/target_cpu.h
-Date: Fri, 25 Oct 2019 07:39:13 -0400
-Message-Id: <20191025113921.9412-5-richard.henderson@linaro.org>
+Subject: [PATCH v2 06/12] linux-user/sparc: Use WREG_SP constant in
+ sparc/signal.c
+Date: Fri, 25 Oct 2019 07:39:15 -0400
+Message-Id: <20191025113921.9412-7-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20191025113921.9412-1-richard.henderson@linaro.org>
 References: <20191025113921.9412-1-richard.henderson@linaro.org>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::844
+X-Received-From: 2607:f8b0:4864:20::741
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,40 +96,52 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This fixes a naming bug wherein we used "UREG_FP" to access the
-stack pointer.  OTOH, the "UREG_FP" constant was also defined
-incorrectly such that it *did* reference the stack pointer.
+s/UREG_FP/WREG_SP/g
 
-Note that the kernel legitimately uses the name "FP", because it
-utilizes the rolled stack window in processing the system call.
+This is non-obvious because the UREG_FP constant is fact wrong.
+However, the previous search-and-replace patch made it clear that
+UREG_FP expands to WREG_O6, and we can see from the enumeration in
+target/sparc/cpu.h that WREG_O6 is in fact WREG_SP, the stack pointer.
+
+The UREG_SP define is unused; remove it.
 
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- linux-user/sparc/target_cpu.h | 10 ++--------
- 1 file changed, 2 insertions(+), 8 deletions(-)
+ linux-user/sparc/signal.c | 7 ++-----
+ 1 file changed, 2 insertions(+), 5 deletions(-)
 
-diff --git a/linux-user/sparc/target_cpu.h b/linux-user/sparc/target_cpu.h
-index 1ffc0ae9f2..b30fbc72c4 100644
---- a/linux-user/sparc/target_cpu.h
-+++ b/linux-user/sparc/target_cpu.h
-@@ -41,15 +41,9 @@ static inline void cpu_set_tls(CPUSPARCState *env, target_ulong newtls)
-     env->gregs[7] = newtls;
- }
+diff --git a/linux-user/sparc/signal.c b/linux-user/sparc/signal.c
+index a967e2db73..0db4c5f84f 100644
+--- a/linux-user/sparc/signal.c
++++ b/linux-user/sparc/signal.c
+@@ -104,9 +104,6 @@ struct target_rt_signal_frame {
+     qemu_siginfo_fpu_t  fpu_state;
+ };
  
--#ifndef UREG_I6
--#define UREG_I6        6
--#endif
--#ifndef UREG_FP
--#define UREG_FP        UREG_I6
--#endif
+-#define UREG_FP        WREG_O6
+-#define UREG_SP        WREG_I6
 -
- static inline abi_ulong get_sp_from_cpustate(CPUSPARCState *state)
- {
--    return state->regwptr[UREG_FP];
-+    return state->regwptr[WREG_SP];
- }
-+
- #endif
+ static inline abi_ulong get_sigframe(struct target_sigaction *sa, 
+                                      CPUSPARCState *env,
+                                      unsigned long framesize)
+@@ -201,7 +198,7 @@ void setup_frame(int sig, struct target_sigaction *ka,
+         goto sigsegv;
+ 
+     /* 3. signal handler back-trampoline and parameters */
+-    env->regwptr[UREG_FP] = sf_addr;
++    env->regwptr[WREG_SP] = sf_addr;
+     env->regwptr[WREG_O0] = sig;
+     env->regwptr[WREG_O1] = sf_addr +
+             offsetof(struct target_signal_frame, info);
+@@ -255,7 +252,7 @@ long do_sigreturn(CPUSPARCState *env)
+     sigset_t host_set;
+     int i;
+ 
+-    sf_addr = env->regwptr[UREG_FP];
++    sf_addr = env->regwptr[WREG_SP];
+     trace_user_do_sigreturn(env, sf_addr);
+     if (!lock_user_struct(VERIFY_READ, sf, sf_addr, 1)) {
+         goto segv_and_exit;
 -- 
 2.17.1
 
