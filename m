@@ -2,77 +2,70 @@ Return-Path: <SRS0=bySr=YS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 65005CA9EA0
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 08:38:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D4B9CA9EA0
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 08:39:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3520021929
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 08:38:22 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dhkdnq90"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3520021929
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 03A0F2070B
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 08:39:13 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 03A0F2070B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57544 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57550 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iNv6y-0003Pp-SK
-	for qemu-devel@archiver.kernel.org; Fri, 25 Oct 2019 04:38:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49568)
+	id 1iNv7n-0004GW-OJ
+	for qemu-devel@archiver.kernel.org; Fri, 25 Oct 2019 04:39:11 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49839)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eperezma@redhat.com>) id 1iNv4j-0000QM-LY
- for qemu-devel@nongnu.org; Fri, 25 Oct 2019 04:36:03 -0400
+ (envelope-from <laurent@vivier.eu>) id 1iNv4x-0000h0-RZ
+ for qemu-devel@nongnu.org; Fri, 25 Oct 2019 04:36:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eperezma@redhat.com>) id 1iNv4h-0007dY-IV
- for qemu-devel@nongnu.org; Fri, 25 Oct 2019 04:36:01 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:44077
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eperezma@redhat.com>) id 1iNv4h-0007Zu-EU
- for qemu-devel@nongnu.org; Fri, 25 Oct 2019 04:35:59 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1571992553;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=RP4sJcJV5+cS5FBPAfqlXPo1zZhyeRWjVcYfOrolyAw=;
- b=dhkdnq90BYlyaulISt4gdTaIIkIGb8wKA3J+tEGeeLo0697vlI7x6p2ktpritTcUZ4d5MP
- XNEsubQudWaR1BRT7r5dp795J01Y/XJZeAzSqNLtChrM8qfzwM6sdrN7tJzwOCARGMxn1n
- VkEODrnLjuUM5GCmLAAcM/XgzWO5igw=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-347-X4knY--ZPzisoEwwcr3swQ-1; Fri, 25 Oct 2019 04:35:49 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C45961800E01;
- Fri, 25 Oct 2019 08:35:48 +0000 (UTC)
-Received: from eperezma.remote.csb (unknown [10.36.118.42])
- by smtp.corp.redhat.com (Postfix) with ESMTP id D729060BE0;
- Fri, 25 Oct 2019 08:35:45 +0000 (UTC)
-From: =?UTF-8?q?Eugenio=20P=C3=A9rez?= <eperezma@redhat.com>
+ (envelope-from <laurent@vivier.eu>) id 1iNv4w-0007q0-Lw
+ for qemu-devel@nongnu.org; Fri, 25 Oct 2019 04:36:15 -0400
+Received: from mout.kundenserver.de ([212.227.126.135]:45989)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <laurent@vivier.eu>)
+ id 1iNv4q-0007iR-4Q; Fri, 25 Oct 2019 04:36:08 -0400
+Received: from localhost.localdomain ([78.238.229.36]) by
+ mrelayeu.kundenserver.de (mreue010 [212.227.15.167]) with ESMTPSA (Nemesis)
+ id 1MjjSt-1hhgEX0pvH-00lEJL; Fri, 25 Oct 2019 10:35:26 +0200
+From: Laurent Vivier <laurent@vivier.eu>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v7 1/8] virtio: basic structure for packed ring
-Date: Fri, 25 Oct 2019 10:35:20 +0200
-Message-Id: <20191025083527.30803-2-eperezma@redhat.com>
-In-Reply-To: <20191025083527.30803-1-eperezma@redhat.com>
-References: <20191025083527.30803-1-eperezma@redhat.com>
+Subject: [PULL 03/19] util/async: avoid useless cast
+Date: Fri, 25 Oct 2019 10:34:55 +0200
+Message-Id: <20191025083511.11463-4-laurent@vivier.eu>
+X-Mailer: git-send-email 2.21.0
+In-Reply-To: <20191025083511.11463-1-laurent@vivier.eu>
+References: <20191025083511.11463-1-laurent@vivier.eu>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-MC-Unique: X4knY--ZPzisoEwwcr3swQ-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-Provags-ID: V03:K1:onD7UkbNa4WcqpkfMRXh4f2hRmOW8C3mwnPjy0VAImYEeEq4nPu
+ CRId/qUyJGNBiOyQrpE42eC0YEtBLhHV1xBd2Wffq14aJN/oPhNh+kc4cvLQ+ivT9F22XXl
+ lDjx0DXU8p2SPkXv76zBwuekgZvvsQRT2mR2E0LVvOujtpk898IVmzH0e5ZH4cmAVvSCXK4
+ SVx9vBNb1IbomK50Es03Q==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:tAM5+AlWd3M=:Ig6AfLJCT3dRBJ4ri7kM2+
+ 5Qg+vq29NwIQM0mwgZ4blaw9zON5OXQtUfOPCBRBiIUGBWmDtZWapmCZtI+r9y8bUjCgvi22O
+ GJmZbY5SRFjn5tFwTdIeBODiaFKZCR+jjntsWQPPBsyTWbgY3sLbFqP3yx1hPnbpDFyCMuqPW
+ qMRBCSQLzVWqckdABMgkzIDUHmYw1vw9UhfM2NFerDOnsTGR768lpFyA4MmTOt8tb4GpHTQH5
+ SCokWHcLEhcfmKuK8NqjFIxaC2ZEVyqK1e0AA83co2ocC79q7cUmge4ncTbW08Buy9jmduOb3
+ 308dURjYoPKWZ1awRyKERjrZ0WIxI85rfIFT2gZfQFhjnFQdVzTHtXgA4CfZ2+/TpkM4J0Bwc
+ RDVh0zeZtSl1rKF4F17p8ijKAT3gc1UGqxFu9RimAXf7mdCB09za8mR/z5Lnm4BevNIG5tjiP
+ Bo4Y8/gb3k09fYjgf7w8gsuQkxNCQiTWHplwyYtS77XhhYSdLwTb+yi0IU1UXJK7DjkvhcDxk
+ 6+Z2U1OUtdP6iK3vEUStq1e19U71OdZoKml5GEfpDGg/0mjp0OqbYjuL0aMmSIsybRQ1i0U8m
+ 0BnG2KXsxMwza7+WdPyuE5dgZQh1jmZQP6uVPGfGdJPDZAx3+w79EckcF8wYwbXxNvEDP/oej
+ QrjXL+x+K+XA04jmptHK0/XZEmQqvBuNsyxp4YJEoH6IEmwsAdskxEzYmSd1xe3tbIWwomRxh
+ S9tQ74hwRsCNzMuP6wy3egTBzrCamPXTb2wV9QNH2ZaJHm1xPUvIQINZ6jJUAM3rSi/RuA2DA
+ I+8+oYS/BYnYyaHQ2UzqFn2JqX2DnW5Tc5ajgScL7x15FNk4EYGErJRNk7baEJBoycPUIqloR
+ 60b12qJaMcJHlyLy/z8A==
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.81
+X-Received-From: 212.227.126.135
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -84,75 +77,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Laurent Vivier <lvivier@redhat.com>,
- qemu-block@nongnu.org, Amit Shah <amit@kernel.org>,
- Jason Wang <jasowang@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>,
- Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
- Fam Zheng <fam@euphon.net>, Jens Freimann <jfreimann@redhat.com>
+Cc: Fam Zheng <fam@euphon.net>, Peter Maydell <peter.maydell@linaro.org>,
+ "Michael S. Tsirkin" <mst@redhat.com>, Michael Tokarev <mjt@tls.msk.ru>,
+ "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, qemu-block@nongnu.org,
+ qemu-trivial@nongnu.org, Helge Deller <deller@gmx.de>,
+ =?UTF-8?q?Herv=C3=A9=20Poussineau?= <hpoussin@reactos.org>,
+ Joel Stanley <joel@jms.id.au>, David Gibson <david@gibson.dropbear.id.au>,
+ Artyom Tarasenko <atar4qemu@gmail.com>, Laurent Vivier <lvivier@redhat.com>,
+ Thomas Huth <thuth@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>,
+ Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
+ Alistair Francis <alistair@alistair23.me>, qemu-arm@nongnu.org,
+ =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>,
+ Stefan Hajnoczi <stefanha@redhat.com>, Igor Mammedov <imammedo@redhat.com>,
+ Richard Henderson <rth@twiddle.net>, Andrew Jeffery <andrew@aj.id.au>,
+ Laurent Vivier <laurent@vivier.eu>, Aleksandar Rikalo <arikalo@wavecomp.com>,
+ qemu-ppc@nongnu.org, Aleksandar Markovic <amarkovic@wavecomp.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>,
+ Frediano Ziglio <fziglio@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Wei Xu <wexu@redhat.com>
+From: Frediano Ziglio <fziglio@redhat.com>
 
-Define packed ring structure according to Qemu nomenclature,
-field data(wrap counter, etc) are also included.
+event_notifier_dummy_cb is already compatible with EventNotifierHandler.
 
-Signed-off-by: Wei Xu <wexu@redhat.com>
-Signed-off-by: Jason Wang <jasowang@redhat.com>
-Signed-off-by: Eugenio P=C3=A9rez <eperezma@redhat.com>
-Reviewed-by: Jens Freimann <jfreimann@redhat.com>
+Signed-off-by: Frediano Ziglio <fziglio@redhat.com>
+Reviewed-by: Laurent Vivier <laurent@vivier.eu>
+Message-Id: <20191023122652.2999-1-fziglio@redhat.com>
+Signed-off-by: Laurent Vivier <laurent@vivier.eu>
 ---
- hw/virtio/virtio.c | 15 +++++++++++++++
- 1 file changed, 15 insertions(+)
+ util/async.c | 1 -
+ 1 file changed, 1 deletion(-)
 
-diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
-index 527df03bfd..fdac203cdf 100644
---- a/hw/virtio/virtio.c
-+++ b/hw/virtio/virtio.c
-@@ -43,6 +43,13 @@ typedef struct VRingDesc
-     uint16_t next;
- } VRingDesc;
-=20
-+typedef struct VRingPackedDesc {
-+    uint64_t addr;
-+    uint32_t len;
-+    uint16_t id;
-+    uint16_t flags;
-+} VRingPackedDesc;
-+
- typedef struct VRingAvail
- {
-     uint16_t flags;
-@@ -81,17 +88,25 @@ typedef struct VRing
-     VRingMemoryRegionCaches *caches;
- } VRing;
-=20
-+typedef struct VRingPackedDescEvent {
-+    uint16_t off_wrap;
-+    uint16_t flags;
-+} VRingPackedDescEvent ;
-+
- struct VirtQueue
- {
-     VRing vring;
-=20
-     /* Next head to pop */
-     uint16_t last_avail_idx;
-+    bool last_avail_wrap_counter;
-=20
-     /* Last avail_idx read from VQ. */
-     uint16_t shadow_avail_idx;
-+    bool shadow_avail_wrap_counter;
-=20
-     uint16_t used_idx;
-+    bool used_wrap_counter;
-=20
-     /* Last used index value we have signalled on */
-     uint16_t signalled_used;
---=20
-2.16.5
+diff --git a/util/async.c b/util/async.c
+index ca83e32c7fa1..b1fa5319e5bc 100644
+--- a/util/async.c
++++ b/util/async.c
+@@ -429,7 +429,6 @@ AioContext *aio_context_new(Error **errp)
+ 
+     aio_set_event_notifier(ctx, &ctx->notifier,
+                            false,
+-                           (EventNotifierHandler *)
+                            event_notifier_dummy_cb,
+                            event_notifier_poll);
+ #ifdef CONFIG_LINUX_AIO
+-- 
+2.21.0
 
 
