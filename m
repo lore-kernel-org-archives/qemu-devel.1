@@ -2,61 +2,85 @@ Return-Path: <SRS0=bySr=YS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 65496CA9EA0
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 16:08:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4EF37CA9EA0
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 16:08:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 289862070B
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 16:08:37 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 289862070B
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=rt-rk.com
+	by mail.kernel.org (Postfix) with ESMTPS id 17E052070B
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 16:08:42 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="CIUz2cS1"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 17E052070B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34294 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34298 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iO28e-0005hy-LO
-	for qemu-devel@archiver.kernel.org; Fri, 25 Oct 2019 12:08:32 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34134)
+	id 1iO28m-0005wM-DU
+	for qemu-devel@archiver.kernel.org; Fri, 25 Oct 2019 12:08:40 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33741)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <aleksandar.rikalo@rt-rk.com>) id 1iO22F-0007Ck-S7
- for qemu-devel@nongnu.org; Fri, 25 Oct 2019 12:01:58 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1iO1zO-0004MJ-Jv
+ for qemu-devel@nongnu.org; Fri, 25 Oct 2019 11:58:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aleksandar.rikalo@rt-rk.com>) id 1iO22D-0001iT-Ge
- for qemu-devel@nongnu.org; Fri, 25 Oct 2019 12:01:55 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:59585 helo=mail.rt-rk.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <aleksandar.rikalo@rt-rk.com>)
- id 1iO22C-0001F7-6R
- for qemu-devel@nongnu.org; Fri, 25 Oct 2019 12:01:52 -0400
-Received: from localhost (localhost [127.0.0.1])
- by mail.rt-rk.com (Postfix) with ESMTP id 9BC041A2263;
- Fri, 25 Oct 2019 18:00:43 +0200 (CEST)
-X-Virus-Scanned: amavisd-new at rt-rk.com
-Received: from [10.10.14.141] (rtrkw304-lin.domain.local [10.10.14.141])
- by mail.rt-rk.com (Postfix) with ESMTPSA id 7BD001A225E;
- Fri, 25 Oct 2019 18:00:43 +0200 (CEST)
-Subject: Re: [PATCH v7 11/14] target/mips: msa: Split helpers for
- HSUB_<S|U>.<H|W|D>
-To: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>, qemu-devel@nongnu.org
-References: <1571826227-10583-1-git-send-email-aleksandar.markovic@rt-rk.com>
- <1571826227-10583-12-git-send-email-aleksandar.markovic@rt-rk.com>
-From: Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>
-Message-ID: <6aaeae87-af3b-cb86-fc41-26d0f2f2a93a@rt-rk.com>
-Date: Fri, 25 Oct 2019 18:00:44 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ (envelope-from <peter.maydell@linaro.org>) id 1iO1zN-0000jx-EF
+ for qemu-devel@nongnu.org; Fri, 25 Oct 2019 11:58:58 -0400
+Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:39872)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1iO1zN-0000jS-7Z
+ for qemu-devel@nongnu.org; Fri, 25 Oct 2019 11:58:57 -0400
+Received: by mail-wm1-x343.google.com with SMTP id r141so2508990wme.4
+ for <qemu-devel@nongnu.org>; Fri, 25 Oct 2019 08:58:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=KB8ofR14/xZTM9k3bx3U5ZJX+jKnpJiT6PCRpzG6xLw=;
+ b=CIUz2cS1ANaB9ZwE245dfwZ3zXA/n0Tb3MGySDL0LnAMfqj4ruxkw/WcKHtZ1uWnoc
+ DmazanhK0PH9LChJuzvmwOHYTky1fOcLKzLCEcTzBe0N4Vj60DCHujq424u/Pxjqo62J
+ ZhpXgg2q1mxfVRwgZi8Z1xgHJ5pTeEiU5bjqzgLflzeLtZrLHubXxRXaiDGouynDac65
+ IbRDLO1fsMeaFzqC4BePEIBQHvkUJRUXSeS1AJOzAdLqNyvx4za/LmvcEq5pgDdtuQT2
+ XCUZc1A7mzW0VEV+LzuC3RTUsTBcC8JBcHt3MIGUj27HmkrWFjMZoMXrRuQpJSJY+Qrl
+ dRIA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=KB8ofR14/xZTM9k3bx3U5ZJX+jKnpJiT6PCRpzG6xLw=;
+ b=DSpp7sEoIKM9IskIG3iAEc0A6woDgXsHbtHOFuViELaCJ3pt/Z4fgVXlmvE/6PQnGF
+ T3+jC+2glITpTeiWcNKV6KnXXVoQbZ4t+1knL6P7FNPAwEGZQrpActkUvYQ9ZH9xq1Jz
+ cxKAlr1PcIPiTteTj+UcfioIXU58z+BQ8HfIFvPKx63Y3lZV08N0/3qH2I1b7+GU6+dq
+ 0ybOksdZ+LmNdhEsM2YftjwY9LFF5ll6mLs/Z7O1yNPl7vs+UIkgs17bETBfEc92nQF3
+ skyK4zxvA0JKEEBFK4wnNY0X+CK9Ak3EbgpPgLqE4p0O3RexJkGAa+LhxymqDFEOpgoo
+ 9iSg==
+X-Gm-Message-State: APjAAAUrmf64GyK/46YvdHr/7cXcBW9Rvf5M+K+TUM3PQCy03fsuZskN
+ KGQhEV+qdDMPMV21hw+UteHxljiI9pU=
+X-Google-Smtp-Source: APXvYqziEs7toGt52CuBlShAVI7bqohX6uIIKeDqxnWz8VYeU8+VCIABAWJbLL9/APIKqQ8T9gx+IQ==
+X-Received: by 2002:a7b:cb54:: with SMTP id v20mr4053219wmj.91.1572019134947; 
+ Fri, 25 Oct 2019 08:58:54 -0700 (PDT)
+Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
+ by smtp.gmail.com with ESMTPSA id 65sm4218887wrs.9.2019.10.25.08.58.53
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Fri, 25 Oct 2019 08:58:54 -0700 (PDT)
+From: Peter Maydell <peter.maydell@linaro.org>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v2 2/4] tcg/i386/tcg-target.opc.h: Add copyright/license
+Date: Fri, 25 Oct 2019 16:58:46 +0100
+Message-Id: <20191025155848.17362-3-peter.maydell@linaro.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20191025155848.17362-1-peter.maydell@linaro.org>
+References: <20191025155848.17362-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <1571826227-10583-12-git-send-email-aleksandar.markovic@rt-rk.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [fuzzy]
-X-Received-From: 89.216.37.149
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::343
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -68,327 +92,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Aleksandar Markovic <amarkovic@wavecomp.com>
+Cc: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
+ Claudio Fontana <claudio.fontana@gmail.com>,
+ Ard Biesheuvel <ard.biesheuvel@linaro.org>, Laszlo Ersek <lersek@redhat.com>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ Markus Armbruster <armbru@redhat.com>, Alexander Graf <agraf@csgraf.de>,
+ Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
- > From: Aleksandar Markovic <amarkovic@wavecomp.com>
- >
- > Achieves clearer code and slightly better performance.
- >
- > Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
- > ---
- >=C2=A0 target/mips/helper.h=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0 10 ++++-
- >=C2=A0 target/mips/msa_helper.c | 108=20
-+++++++++++++++++++++++++++++++++++++++++------
- >=C2=A0 target/mips/translate.c=C2=A0 |=C2=A0 32 +++++++++++---
- >=C2=A0 3 files changed, 129 insertions(+), 21 deletions(-)
- >
- > diff --git a/target/mips/helper.h b/target/mips/helper.h
- > index 7bb13d5..d7c4bbf 100644
- > --- a/target/mips/helper.h
- > +++ b/target/mips/helper.h
- > @@ -945,6 +945,14 @@ DEF_HELPER_4(msa_mod_s_h, void, env, i32, i32, i3=
-2)
- >=C2=A0 DEF_HELPER_4(msa_mod_s_w, void, env, i32, i32, i32)
- >=C2=A0 DEF_HELPER_4(msa_mod_s_d, void, env, i32, i32, i32)
- >
- > +DEF_HELPER_4(msa_hsub_s_h, void, env, i32, i32, i32)
- > +DEF_HELPER_4(msa_hsub_s_w, void, env, i32, i32, i32)
- > +DEF_HELPER_4(msa_hsub_s_d, void, env, i32, i32, i32)
- > +
- > +DEF_HELPER_4(msa_hsub_u_h, void, env, i32, i32, i32)
- > +DEF_HELPER_4(msa_hsub_u_w, void, env, i32, i32, i32)
- > +DEF_HELPER_4(msa_hsub_u_d, void, env, i32, i32, i32)
- > +
- >=C2=A0 DEF_HELPER_4(msa_ilvev_b, void, env, i32, i32, i32)
- >=C2=A0 DEF_HELPER_4(msa_ilvev_h, void, env, i32, i32, i32)
- >=C2=A0 DEF_HELPER_4(msa_ilvev_w, void, env, i32, i32, i32)
- > @@ -1059,8 +1067,6 @@ DEF_HELPER_5(msa_dpsub_u_df, void, env, i32,=20
-i32, i32, i32)
- >=C2=A0 DEF_HELPER_5(msa_sld_df, void, env, i32, i32, i32, i32)
- >=C2=A0 DEF_HELPER_5(msa_splat_df, void, env, i32, i32, i32, i32)
- >=C2=A0 DEF_HELPER_5(msa_vshf_df, void, env, i32, i32, i32, i32)
- > -DEF_HELPER_5(msa_hsub_s_df, void, env, i32, i32, i32, i32)
- > -DEF_HELPER_5(msa_hsub_u_df, void, env, i32, i32, i32, i32)
- >
- >=C2=A0 DEF_HELPER_5(msa_sldi_df, void, env, i32, i32, i32, i32)
- >=C2=A0 DEF_HELPER_5(msa_splati_df, void, env, i32, i32, i32, i32)
- > diff --git a/target/mips/msa_helper.c b/target/mips/msa_helper.c
- > index 2400632..ae9e8e0 100644
- > --- a/target/mips/msa_helper.c
- > +++ b/target/mips/msa_helper.c
- > @@ -2888,7 +2888,101 @@ void helper_msa_mod_u_d(CPUMIPSState *env,
- >=C2=A0=C2=A0 *=20
-+---------------+--------------------------------------------------------=
---+
- >=C2=A0=C2=A0 */
- >
- > -/* TODO: insert Int Subtract group helpers here */
- > +/* TODO: insert the rest of Int Subtract group helpers here */
- > +
- > +
- > +static inline int64_t msa_hsub_s_df(uint32_t df, int64_t arg1,=20
-int64_t arg2)
- > +{
- > +=C2=A0=C2=A0=C2=A0 return SIGNED_ODD(arg1, df) - SIGNED_EVEN(arg2, df=
-);
- > +}
- > +
- > +void helper_msa_hsub_s_h(CPUMIPSState *env,
- > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
- uint32_t wd, uint32_t ws, uint32_t wt)
- > +{
- > +=C2=A0=C2=A0=C2=A0 wr_t *pwd =3D &(env->active_fpu.fpr[wd].wr);
- > +=C2=A0=C2=A0=C2=A0 wr_t *pws =3D &(env->active_fpu.fpr[ws].wr);
- > +=C2=A0=C2=A0=C2=A0 wr_t *pwt =3D &(env->active_fpu.fpr[wt].wr);
- > +
- > +=C2=A0=C2=A0=C2=A0 pwd->h[0]=C2=A0 =3D msa_hsub_s_df(DF_HALF, pws->h[=
-0], pwt->h[0]);
- > +=C2=A0=C2=A0=C2=A0 pwd->h[1]=C2=A0 =3D msa_hsub_s_df(DF_HALF, pws->h[=
-1], pwt->h[1]);
- > +=C2=A0=C2=A0=C2=A0 pwd->h[2]=C2=A0 =3D msa_hsub_s_df(DF_HALF, pws->h[=
-2], pwt->h[2]);
- > +=C2=A0=C2=A0=C2=A0 pwd->h[3]=C2=A0 =3D msa_hsub_s_df(DF_HALF, pws->h[=
-3], pwt->h[3]);
- > +=C2=A0=C2=A0=C2=A0 pwd->h[4]=C2=A0 =3D msa_hsub_s_df(DF_HALF, pws->h[=
-4], pwt->h[4]);
- > +=C2=A0=C2=A0=C2=A0 pwd->h[5]=C2=A0 =3D msa_hsub_s_df(DF_HALF, pws->h[=
-5], pwt->h[5]);
- > +=C2=A0=C2=A0=C2=A0 pwd->h[6]=C2=A0 =3D msa_hsub_s_df(DF_HALF, pws->h[=
-6], pwt->h[6]);
- > +=C2=A0=C2=A0=C2=A0 pwd->h[7]=C2=A0 =3D msa_hsub_s_df(DF_HALF, pws->h[=
-7], pwt->h[7]);
- > +}
- > +
- > +void helper_msa_hsub_s_w(CPUMIPSState *env,
- > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
- uint32_t wd, uint32_t ws, uint32_t wt)
- > +{
- > +=C2=A0=C2=A0=C2=A0 wr_t *pwd =3D &(env->active_fpu.fpr[wd].wr);
- > +=C2=A0=C2=A0=C2=A0 wr_t *pws =3D &(env->active_fpu.fpr[ws].wr);
- > +=C2=A0=C2=A0=C2=A0 wr_t *pwt =3D &(env->active_fpu.fpr[wt].wr);
- > +
- > +=C2=A0=C2=A0=C2=A0 pwd->w[0]=C2=A0 =3D msa_hsub_s_df(DF_WORD, pws->w[=
-0], pwt->w[0]);
- > +=C2=A0=C2=A0=C2=A0 pwd->w[1]=C2=A0 =3D msa_hsub_s_df(DF_WORD, pws->w[=
-1], pwt->w[1]);
- > +=C2=A0=C2=A0=C2=A0 pwd->w[2]=C2=A0 =3D msa_hsub_s_df(DF_WORD, pws->w[=
-2], pwt->w[2]);
- > +=C2=A0=C2=A0=C2=A0 pwd->w[3]=C2=A0 =3D msa_hsub_s_df(DF_WORD, pws->w[=
-3], pwt->w[3]);
- > +}
- > +
- > +void helper_msa_hsub_s_d(CPUMIPSState *env,
- > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
- uint32_t wd, uint32_t ws, uint32_t wt)
- > +{
- > +=C2=A0=C2=A0=C2=A0 wr_t *pwd =3D &(env->active_fpu.fpr[wd].wr);
- > +=C2=A0=C2=A0=C2=A0 wr_t *pws =3D &(env->active_fpu.fpr[ws].wr);
- > +=C2=A0=C2=A0=C2=A0 wr_t *pwt =3D &(env->active_fpu.fpr[wt].wr);
- > +
- > +=C2=A0=C2=A0=C2=A0 pwd->d[0]=C2=A0 =3D msa_hsub_s_df(DF_DOUBLE, pws->=
-d[0], pwt->d[0]);
- > +=C2=A0=C2=A0=C2=A0 pwd->d[1]=C2=A0 =3D msa_hsub_s_df(DF_DOUBLE, pws->=
-d[1], pwt->d[1]);
- > +}
- > +
- > +
- > +static inline int64_t msa_hsub_u_df(uint32_t df, int64_t arg1,=20
-int64_t arg2)
- > +{
- > +=C2=A0=C2=A0=C2=A0 return UNSIGNED_ODD(arg1, df) - UNSIGNED_EVEN(arg2=
-, df);
- > +}
- > +
- > +void helper_msa_hsub_u_h(CPUMIPSState *env,
- > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
- uint32_t wd, uint32_t ws, uint32_t wt)
- > +{
- > +=C2=A0=C2=A0=C2=A0 wr_t *pwd =3D &(env->active_fpu.fpr[wd].wr);
- > +=C2=A0=C2=A0=C2=A0 wr_t *pws =3D &(env->active_fpu.fpr[ws].wr);
- > +=C2=A0=C2=A0=C2=A0 wr_t *pwt =3D &(env->active_fpu.fpr[wt].wr);
- > +
- > +=C2=A0=C2=A0=C2=A0 pwd->h[0]=C2=A0 =3D msa_hsub_u_df(DF_HALF, pws->h[=
-0], pwt->h[0]);
- > +=C2=A0=C2=A0=C2=A0 pwd->h[1]=C2=A0 =3D msa_hsub_u_df(DF_HALF, pws->h[=
-1], pwt->h[1]);
- > +=C2=A0=C2=A0=C2=A0 pwd->h[2]=C2=A0 =3D msa_hsub_u_df(DF_HALF, pws->h[=
-2], pwt->h[2]);
- > +=C2=A0=C2=A0=C2=A0 pwd->h[3]=C2=A0 =3D msa_hsub_u_df(DF_HALF, pws->h[=
-3], pwt->h[3]);
- > +=C2=A0=C2=A0=C2=A0 pwd->h[4]=C2=A0 =3D msa_hsub_u_df(DF_HALF, pws->h[=
-4], pwt->h[4]);
- > +=C2=A0=C2=A0=C2=A0 pwd->h[5]=C2=A0 =3D msa_hsub_u_df(DF_HALF, pws->h[=
-5], pwt->h[5]);
- > +=C2=A0=C2=A0=C2=A0 pwd->h[6]=C2=A0 =3D msa_hsub_u_df(DF_HALF, pws->h[=
-6], pwt->h[6]);
- > +=C2=A0=C2=A0=C2=A0 pwd->h[7]=C2=A0 =3D msa_hsub_u_df(DF_HALF, pws->h[=
-7], pwt->h[7]);
- > +}
- > +
- > +void helper_msa_hsub_u_w(CPUMIPSState *env,
- > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
- uint32_t wd, uint32_t ws, uint32_t wt)
- > +{
- > +=C2=A0=C2=A0=C2=A0 wr_t *pwd =3D &(env->active_fpu.fpr[wd].wr);
- > +=C2=A0=C2=A0=C2=A0 wr_t *pws =3D &(env->active_fpu.fpr[ws].wr);
- > +=C2=A0=C2=A0=C2=A0 wr_t *pwt =3D &(env->active_fpu.fpr[wt].wr);
- > +
- > +=C2=A0=C2=A0=C2=A0 pwd->w[0]=C2=A0 =3D msa_hsub_u_df(DF_WORD, pws->w[=
-0], pwt->w[0]);
- > +=C2=A0=C2=A0=C2=A0 pwd->w[1]=C2=A0 =3D msa_hsub_u_df(DF_WORD, pws->w[=
-1], pwt->w[1]);
- > +=C2=A0=C2=A0=C2=A0 pwd->w[2]=C2=A0 =3D msa_hsub_u_df(DF_WORD, pws->w[=
-2], pwt->w[2]);
- > +=C2=A0=C2=A0=C2=A0 pwd->w[3]=C2=A0 =3D msa_hsub_u_df(DF_WORD, pws->w[=
-3], pwt->w[3]);
- > +}
- > +
- > +void helper_msa_hsub_u_d(CPUMIPSState *env,
- > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
- uint32_t wd, uint32_t ws, uint32_t wt)
- > +{
- > +=C2=A0=C2=A0=C2=A0 wr_t *pwd =3D &(env->active_fpu.fpr[wd].wr);
- > +=C2=A0=C2=A0=C2=A0 wr_t *pws =3D &(env->active_fpu.fpr[ws].wr);
- > +=C2=A0=C2=A0=C2=A0 wr_t *pwt =3D &(env->active_fpu.fpr[wt].wr);
- > +
- > +=C2=A0=C2=A0=C2=A0 pwd->d[0]=C2=A0 =3D msa_hsub_u_df(DF_DOUBLE, pws->=
-d[0], pwt->d[0]);
- > +=C2=A0=C2=A0=C2=A0 pwd->d[1]=C2=A0 =3D msa_hsub_u_df(DF_DOUBLE, pws->=
-d[1], pwt->d[1]);
- > +}
- >
- >
- >=C2=A0 /*
- > @@ -4450,16 +4544,6 @@ static inline void msa_sld_df(uint32_t df,=20
-wr_t *pwd,
- >=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
- >=C2=A0 }
- >
- > -static inline int64_t msa_hsub_s_df(uint32_t df, int64_t arg1,=20
-int64_t arg2)
- > -{
- > -=C2=A0=C2=A0=C2=A0 return SIGNED_ODD(arg1, df) - SIGNED_EVEN(arg2, df=
-);
- > -}
- > -
- > -static inline int64_t msa_hsub_u_df(uint32_t df, int64_t arg1,=20
-int64_t arg2)
- > -{
- > -=C2=A0=C2=A0=C2=A0 return UNSIGNED_ODD(arg1, df) - UNSIGNED_EVEN(arg2=
-, df);
- > -}
- > -
- >=C2=A0 static inline int64_t msa_mul_q_df(uint32_t df, int64_t arg1,=20
-int64_t arg2)
- >=C2=A0 {
- >=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 int64_t q_min =3D DF_MIN_INT(df);
- > @@ -4545,8 +4629,6 @@ MSA_BINOP_DF(asub_u)
- >=C2=A0 MSA_BINOP_DF(mulv)
- >=C2=A0 MSA_BINOP_DF(dotp_s)
- >=C2=A0 MSA_BINOP_DF(dotp_u)
- > -MSA_BINOP_DF(hsub_s)
- > -MSA_BINOP_DF(hsub_u)
- >
- >=C2=A0 MSA_BINOP_DF(mul_q)
- >=C2=A0 MSA_BINOP_DF(mulr_q)
- > diff --git a/target/mips/translate.c b/target/mips/translate.c
- > index a57e0da..4c68c5b 100644
- > --- a/target/mips/translate.c
- > +++ b/target/mips/translate.c
- > @@ -29107,6 +29107,32 @@ static void gen_msa_3r(CPUMIPSState *env,=20
-DisasContext *ctx)
- >=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 break;
- >=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0 }
- >=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0 break;
- > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 case OPC_HSUB_S_df:
- > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 sw=
-itch (df) {
- > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ca=
-se DF_HALF:
- > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0 gen_helper_msa_hsub_s_h(cpu_env, twd, tws, twt);
- > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0 break;
- > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ca=
-se DF_WORD:
- > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0 gen_helper_msa_hsub_s_w(cpu_env, twd, tws, twt);
- > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0 break;
- > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ca=
-se DF_DOUBLE:
- > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0 gen_helper_msa_hsub_s_d(cpu_env, twd, tws, twt);
- > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0 break;
- > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
- > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 br=
-eak;
- > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 case OPC_HSUB_U_df:
- > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 sw=
-itch (df) {
- > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ca=
-se DF_HALF:
- > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0 gen_helper_msa_hsub_u_h(cpu_env, twd, tws, twt);
- > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0 break;
- > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ca=
-se DF_WORD:
- > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0 gen_helper_msa_hsub_u_w(cpu_env, twd, tws, twt);
- > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0 break;
- > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ca=
-se DF_DOUBLE:
- > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0 gen_helper_msa_hsub_u_d(cpu_env, twd, tws, twt);
- > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0 break;
- > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
- > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 br=
-eak;
- >=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 case OPC_DOTP_S_=
-df:
- >=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0 gen_helper_msa_dotp_s_df(cpu_env, tdf, twd, tws, twt);
- >=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0 break;
- > @@ -29125,12 +29151,6 @@ static void gen_msa_3r(CPUMIPSState *env,=20
-DisasContext *ctx)
- >=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 case OPC_DPSUB_U=
-_df:
- >=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0 gen_helper_msa_dpsub_u_df(cpu_env, tdf, twd, tws, twt);
- >=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0 break;
- > -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 case OPC_HSUB_S_df:
- > -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ge=
-n_helper_msa_hsub_s_df(cpu_env, tdf, twd, tws, twt);
- > -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 br=
-eak;
- > -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 case OPC_HSUB_U_df:
- > -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ge=
-n_helper_msa_hsub_u_df(cpu_env, tdf, twd, tws, twt);
- > -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 br=
-eak;
- >=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
- >=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 break;
- >=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 default:
+Add the copyright/license boilerplate for tcg/i386/tcg-target.opc.h.
+This file has had only one commit, 770c2fc7bb70804a, by
+a Linaro engineer.
+The license is MIT, since that's what the rest of tcg/i386/ is.
 
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+---
+ tcg/i386/tcg-target.opc.h | 28 +++++++++++++++++++++++++---
+ 1 file changed, 25 insertions(+), 3 deletions(-)
 
-Reviewed-by: Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>
+diff --git a/tcg/i386/tcg-target.opc.h b/tcg/i386/tcg-target.opc.h
+index e5fa88ba258..1312941800e 100644
+--- a/tcg/i386/tcg-target.opc.h
++++ b/tcg/i386/tcg-target.opc.h
+@@ -1,6 +1,28 @@
+-/* Target-specific opcodes for host vector expansion.  These will be
+-   emitted by tcg_expand_vec_op.  For those familiar with GCC internals,
+-   consider these to be UNSPEC with names.  */
++/*
++ * Copyright (c) 2019 Linaro
++ *
++ * Permission is hereby granted, free of charge, to any person obtaining a copy
++ * of this software and associated documentation files (the "Software"), to deal
++ * in the Software without restriction, including without limitation the rights
++ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
++ * copies of the Software, and to permit persons to whom the Software is
++ * furnished to do so, subject to the following conditions:
++ *
++ * The above copyright notice and this permission notice shall be included in
++ * all copies or substantial portions of the Software.
++ *
++ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
++ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
++ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
++ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
++ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
++ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
++ * THE SOFTWARE.
++ *
++ * Target-specific opcodes for host vector expansion.  These will be
++ * emitted by tcg_expand_vec_op.  For those familiar with GCC internals,
++ * consider these to be UNSPEC with names.
++ */
+ 
+ DEF(x86_shufps_vec, 1, 2, 1, IMPLVEC)
+ DEF(x86_vpblendvb_vec, 1, 3, 0, IMPLVEC)
+-- 
+2.20.1
 
 
