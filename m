@@ -2,59 +2,69 @@ Return-Path: <SRS0=bySr=YS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 45B3ECA9EA0
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 19:04:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 67333CA9EA0
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 19:06:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1867921D7F
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 19:04:06 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1867921D7F
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=keithp.com
+	by mail.kernel.org (Postfix) with ESMTPS id 3A31421D7F
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 19:06:54 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3A31421D7F
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35246 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35260 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iO4sW-00028n-P1
-	for qemu-devel@archiver.kernel.org; Fri, 25 Oct 2019 15:04:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54179)
+	id 1iO4vE-00078q-Un
+	for qemu-devel@archiver.kernel.org; Fri, 25 Oct 2019 15:06:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54353)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <keithp@keithp.com>) id 1iO4q5-0006GJ-OU
- for qemu-devel@nongnu.org; Fri, 25 Oct 2019 15:01:35 -0400
+ (envelope-from <no-reply@patchew.org>) id 1iO4rn-0001Ee-15
+ for qemu-devel@nongnu.org; Fri, 25 Oct 2019 15:03:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <keithp@keithp.com>) id 1iO4q3-0003Qb-KU
- for qemu-devel@nongnu.org; Fri, 25 Oct 2019 15:01:33 -0400
-Received: from home.keithp.com ([63.227.221.253]:45374 helo=elaine.keithp.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <keithp@keithp.com>)
- id 1iO4pz-0003N6-PM; Fri, 25 Oct 2019 15:01:27 -0400
-Received: from localhost (localhost [127.0.0.1])
- by elaine.keithp.com (Postfix) with ESMTP id 885BA3F22EBE;
- Fri, 25 Oct 2019 12:01:24 -0700 (PDT)
-X-Virus-Scanned: Debian amavisd-new at keithp.com
-Received: from elaine.keithp.com ([127.0.0.1])
- by localhost (elaine.keithp.com [127.0.0.1]) (amavisd-new, port 10024)
- with LMTP id Me5PJJzQicVQ; Fri, 25 Oct 2019 12:01:24 -0700 (PDT)
-Received: from keithp.com (c-73-35-169-234.hsd1.wa.comcast.net [73.35.169.234])
- by elaine.keithp.com (Postfix) with ESMTPSA id 1DF323F22EAC;
- Fri, 25 Oct 2019 12:01:24 -0700 (PDT)
-Received: by keithp.com (Postfix, from userid 1000)
- id 32DD9158212D; Fri, 25 Oct 2019 12:01:21 -0700 (PDT)
-From: Keith Packard <keithp@keithp.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH] Semihost SYS_READC implementation (v5)
-Date: Fri, 25 Oct 2019 12:01:10 -0700
-Message-Id: <20191025190110.4570-1-keithp@keithp.com>
-X-Mailer: git-send-email 2.24.0.rc0
+ (envelope-from <no-reply@patchew.org>) id 1iO4rl-0004XH-6s
+ for qemu-devel@nongnu.org; Fri, 25 Oct 2019 15:03:18 -0400
+Resent-Date: Fri, 25 Oct 2019 15:03:18 -0400
+Resent-Message-Id: <E1iO4rl-0004XH-6s@eggs.gnu.org>
+Received: from sender4-of-o54.zoho.com ([136.143.188.54]:21445)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <no-reply@patchew.org>)
+ id 1iO4rk-0004WL-Se
+ for qemu-devel@nongnu.org; Fri, 25 Oct 2019 15:03:17 -0400
+ARC-Seal: i=1; a=rsa-sha256; t=1572030174; cv=none; 
+ d=zohomail.com; s=zohoarc; 
+ b=kA9aPOrZ3g+S6tgp5ozhV+v3zM47Z8WZpc9IEV51ZywAhH3UN5aYJb4ionG+hH6I60MfyuiHd53awL+r+r1McnNnaooACDjzZR8J2ztapbs5XRgbtsm8EW+kF75cnvBfqxEcQxi9lPwi3DqRRlhrjy8kWpYprVeAiePFIcgMdVU=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
+ s=zohoarc; t=1572030174;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
+ bh=nEqxn9SibQJyl+HZHFCCOxOuqM8vWuonUVFa9axPI2E=; 
+ b=NkmNbJl/58juMgNadKkEQZr26tt+SyoJ2goPoGl1tJxW47Hvo12vKj5qNT2T4EKmVyAIF26WQ2tZSFK89kl9eTEjgbBqDqlDnb44bRDsV9LeAwy+kZM1PhQYuMP+o15haEv1eZx9Db3mkvJEpjDfbyGXWyD6S9RgnVo6GXvcOt4=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+ dkim=pass  header.i=patchew.org;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 1572030173844991.2777826940095;
+ Fri, 25 Oct 2019 12:02:53 -0700 (PDT)
+In-Reply-To: <20191025022553.25298-1-ehabkost@redhat.com>
+Subject: Re: [PATCH 0/7] i386: Add `machine` parameter to query-cpu-definitions
+Message-ID: <157203017258.8606.11902247566926802617@37313f22b938>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: ehabkost@redhat.com
+Date: Fri, 25 Oct 2019 12:02:53 -0700 (PDT)
+X-ZohoMailClient: External
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 63.227.221.253
+X-Received-From: 136.143.188.54
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -66,281 +76,96 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Keith Packard <keithp@keithp.com>,
- Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>,
- qemu-arm@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Reply-To: qemu-devel@nongnu.org
+Cc: qemu-devel@nongnu.org, armbru@redhat.com, pbonzini@redhat.com,
+ imammedo@redhat.com, jdenemar@redhat.com, rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Provides a blocking call to read a character from the console using
-semihosting.chardev, if specified. This takes some careful command
-line options to use stdio successfully as the serial ports, monitor
-and semihost all want to use stdio. Here's a sample set of command
-line options which share stdio betwen semihost, monitor and serial
-ports:
-
-	qemu \
-	-chardev stdio,mux=3Don,id=3Dstdio0 \
-	-serial chardev:stdio0 \
-	-semihosting-config enable=3Don,chardev=3Dstdio0 \
-	-mon chardev=3Dstdio0,mode=3Dreadline
-
-This creates a chardev hooked to stdio and then connects all of the
-subsystems to it. A shorter mechanism would be good to hear about.
-
-Signed-off-by: Keith Packard <keithp@keithp.com>
----
-
-v2:
-	Add implementation in linux-user/arm/semihost.c
-
-v3:  (thanks to Paolo Bonzini <pbonzini@redhat.com>)
-	Replace hand-rolled fifo with fifo8
-	Avoid mixing code and declarations
-	Remove spurious (void) cast of function parameters
-	Define qemu_semihosting_console_init when CONFIG_USER_ONLY
-
-v4:
-	Add qemu_semihosting_console_init to stubs/semihost.c for
-	hosts that don't support semihosting
-
-v5:
-	Move #include statements to the top of the file.
-	Actually include the stubs/semihost.c patch that was
-	supposed to be in v4
-
- hw/semihosting/console.c          | 72 +++++++++++++++++++++++++++++++
- include/hw/semihosting/console.h  | 12 ++++++
- include/hw/semihosting/semihost.h |  4 ++
- linux-user/arm/semihost.c         | 23 ++++++++++
- stubs/semihost.c                  |  4 ++
- target/arm/arm-semi.c             |  3 +-
- vl.c                              |  3 ++
- 7 files changed, 119 insertions(+), 2 deletions(-)
-
-diff --git a/hw/semihosting/console.c b/hw/semihosting/console.c
-index b4b17c8afb..4db68d6227 100644
---- a/hw/semihosting/console.c
-+++ b/hw/semihosting/console.c
-@@ -22,6 +22,12 @@
- #include "exec/gdbstub.h"
- #include "qemu/log.h"
- #include "chardev/char.h"
-+#include <pthread.h>
-+#include "chardev/char-fe.h"
-+#include "sysemu/sysemu.h"
-+#include "qemu/main-loop.h"
-+#include "qapi/error.h"
-+#include "qemu/fifo8.h"
-=20
- int qemu_semihosting_log_out(const char *s, int len)
- {
-@@ -98,3 +104,69 @@ void qemu_semihosting_console_outc(CPUArchState *env,=
- target_ulong addr)
-                       __func__, addr);
-     }
- }
-+
-+#define FIFO_SIZE   1024
-+
-+typedef struct SemihostingConsole {
-+    CharBackend         backend;
-+    pthread_mutex_t     mutex;
-+    pthread_cond_t      cond;
-+    bool                got;
-+    Fifo8               fifo;
-+} SemihostingConsole;
-+
-+static SemihostingConsole console =3D {
-+    .mutex =3D PTHREAD_MUTEX_INITIALIZER,
-+    .cond =3D PTHREAD_COND_INITIALIZER
-+};
-+
-+static int console_can_read(void *opaque)
-+{
-+    SemihostingConsole *c =3D opaque;
-+    int ret;
-+    pthread_mutex_lock(&c->mutex);
-+    ret =3D (int) fifo8_num_free(&c->fifo);
-+    pthread_mutex_unlock(&c->mutex);
-+    return ret;
-+}
-+
-+static void console_read(void *opaque, const uint8_t *buf, int size)
-+{
-+    SemihostingConsole *c =3D opaque;
-+    pthread_mutex_lock(&c->mutex);
-+    while (size-- && !fifo8_is_full(&c->fifo)) {
-+        fifo8_push(&c->fifo, *buf++);
-+    }
-+    pthread_cond_broadcast(&c->cond);
-+    pthread_mutex_unlock(&c->mutex);
-+}
-+
-+target_ulong qemu_semihosting_console_inc(CPUArchState *env)
-+{
-+    uint8_t ch;
-+    SemihostingConsole *c =3D &console;
-+    qemu_mutex_unlock_iothread();
-+    pthread_mutex_lock(&c->mutex);
-+    while (fifo8_is_empty(&c->fifo)) {
-+        pthread_cond_wait(&c->cond, &c->mutex);
-+    }
-+    ch =3D fifo8_pop(&c->fifo);
-+    pthread_mutex_unlock(&c->mutex);
-+    qemu_mutex_lock_iothread();
-+    return (target_ulong) ch;
-+}
-+
-+void qemu_semihosting_console_init(void)
-+{
-+    Chardev *chr =3D semihosting_get_chardev();
-+
-+    if  (chr) {
-+        fifo8_create(&console.fifo, FIFO_SIZE);
-+        qemu_chr_fe_init(&console.backend, chr, &error_abort);
-+        qemu_chr_fe_set_handlers(&console.backend,
-+                                 console_can_read,
-+                                 console_read,
-+                                 NULL, NULL, &console,
-+                                 NULL, true);
-+    }
-+}
-diff --git a/include/hw/semihosting/console.h b/include/hw/semihosting/co=
-nsole.h
-index 9be9754bcd..f7d5905b41 100644
---- a/include/hw/semihosting/console.h
-+++ b/include/hw/semihosting/console.h
-@@ -37,6 +37,18 @@ int qemu_semihosting_console_outs(CPUArchState *env, t=
-arget_ulong s);
-  */
- void qemu_semihosting_console_outc(CPUArchState *env, target_ulong c);
-=20
-+/**
-+ * qemu_semihosting_console_inc:
-+ * @env: CPUArchState
-+ *
-+ * Receive single character from debug console. This
-+ * may be the remote gdb session if a softmmu guest is currently being
-+ * debugged.
-+ *
-+ * Returns: character read or -1 on error
-+ */
-+target_ulong qemu_semihosting_console_inc(CPUArchState *env);
-+
- /**
-  * qemu_semihosting_log_out:
-  * @s: pointer to string
-diff --git a/include/hw/semihosting/semihost.h b/include/hw/semihosting/s=
-emihost.h
-index 60fc42d851..b8ce5117ae 100644
---- a/include/hw/semihosting/semihost.h
-+++ b/include/hw/semihosting/semihost.h
-@@ -56,6 +56,9 @@ static inline Chardev *semihosting_get_chardev(void)
- {
-     return NULL;
- }
-+static inline void qemu_semihosting_console_init(void)
-+{
-+}
- #else /* !CONFIG_USER_ONLY */
- bool semihosting_enabled(void);
- SemihostingTarget semihosting_get_target(void);
-@@ -68,6 +71,7 @@ Chardev *semihosting_get_chardev(void);
- void qemu_semihosting_enable(void);
- int qemu_semihosting_config_options(const char *opt);
- void qemu_semihosting_connect_chardevs(void);
-+void qemu_semihosting_console_init(void);
- #endif /* CONFIG_USER_ONLY */
-=20
- #endif /* SEMIHOST_H */
-diff --git a/linux-user/arm/semihost.c b/linux-user/arm/semihost.c
-index a16b525eec..4f998d6220 100644
---- a/linux-user/arm/semihost.c
-+++ b/linux-user/arm/semihost.c
-@@ -14,6 +14,7 @@
- #include "cpu.h"
- #include "hw/semihosting/console.h"
- #include "qemu.h"
-+#include <poll.h>
-=20
- int qemu_semihosting_console_outs(CPUArchState *env, target_ulong addr)
- {
-@@ -47,3 +48,25 @@ void qemu_semihosting_console_outc(CPUArchState *env, =
-target_ulong addr)
-         }
-     }
- }
-+
-+target_ulong qemu_semihosting_console_inc(CPUArchState *env)
-+{
-+    uint8_t c;
-+    struct pollfd pollfd =3D {
-+        .fd =3D STDIN_FILENO,
-+        .events =3D POLLIN
-+    };
-+
-+    if (poll(&pollfd, 1, -1) !=3D 1) {
-+        qemu_log_mask(LOG_UNIMP, "%s: unexpected read from stdin failure=
-",
-+                      __func__);
-+        return (target_ulong) -1;
-+    }
-+
-+    if (read(STDIN_FILENO, &c, 1) !=3D 1) {
-+        qemu_log_mask(LOG_UNIMP, "%s: unexpected read from stdin failure=
-",
-+                      __func__);
-+        return (target_ulong) -1;
-+    }
-+    return (target_ulong) c;
-+}
-diff --git a/stubs/semihost.c b/stubs/semihost.c
-index f90589259c..1d8b37f7b2 100644
---- a/stubs/semihost.c
-+++ b/stubs/semihost.c
-@@ -69,3 +69,7 @@ void semihosting_arg_fallback(const char *file, const c=
-har *cmd)
- void qemu_semihosting_connect_chardevs(void)
- {
- }
-+
-+void qemu_semihosting_console_init(void)
-+{
-+}
-diff --git a/target/arm/arm-semi.c b/target/arm/arm-semi.c
-index 6f7b6d801b..47d61f6fe1 100644
---- a/target/arm/arm-semi.c
-+++ b/target/arm/arm-semi.c
-@@ -802,8 +802,7 @@ target_ulong do_arm_semihosting(CPUARMState *env)
-=20
-         return guestfd_fns[gf->type].readfn(cpu, gf, arg1, len);
-     case TARGET_SYS_READC:
--        qemu_log_mask(LOG_UNIMP, "%s: SYS_READC not implemented", __func=
-__);
--        return 0;
-+        return qemu_semihosting_console_inc(env);
-     case TARGET_SYS_ISTTY:
-         GET_ARG(0);
-=20
-diff --git a/vl.c b/vl.c
-index 4489cfb2bb..ac584d97ea 100644
---- a/vl.c
-+++ b/vl.c
-@@ -4381,6 +4381,9 @@ int main(int argc, char **argv, char **envp)
-     ds =3D init_displaystate();
-     qemu_display_init(ds, &dpy);
-=20
-+    /* connect semihosting console input if requested */
-+    qemu_semihosting_console_init();
-+
-     /* must be after terminal init, SDL library changes signal handlers =
-*/
-     os_setup_signal_handling();
-=20
---=20
-2.24.0.rc0
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MTAyNTAyMjU1My4yNTI5
+OC0xLWVoYWJrb3N0QHJlZGhhdC5jb20vCgoKCkhpLAoKVGhpcyBzZXJpZXMgc2VlbXMgdG8gaGF2
+ZSBzb21lIGNvZGluZyBzdHlsZSBwcm9ibGVtcy4gU2VlIG91dHB1dCBiZWxvdyBmb3IKbW9yZSBp
+bmZvcm1hdGlvbjoKClN1YmplY3Q6IFtQQVRDSCAwLzddIGkzODY6IEFkZCBgbWFjaGluZWAgcGFy
+YW1ldGVyIHRvIHF1ZXJ5LWNwdS1kZWZpbml0aW9ucwpUeXBlOiBzZXJpZXMKTWVzc2FnZS1pZDog
+MjAxOTEwMjUwMjI1NTMuMjUyOTgtMS1laGFia29zdEByZWRoYXQuY29tCgo9PT0gVEVTVCBTQ1JJ
+UFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCmdpdCByZXYtcGFyc2UgYmFzZSA+IC9kZXYvbnVsbCB8
+fCBleGl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmln
+IC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYuYWxnb3Jp
+dGhtIGhpc3RvZ3JhbQouL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIGJhc2UuLgo9
+PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRl
+ZjdmNDRiZDg4ODcxMzM4NApTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCjgwNzc0ZjMg
+Y3B1OiBBZGQgYG1hY2hpbmVgIHBhcmFtZXRlciB0byBxdWVyeS1jcHUtZGVmaW5pdGlvbnMKYTk0
+NDY5ZSBpMzg2OiBEb24ndCB1c2UgZGVmYXVsdF9jcHVfdmVyc2lvbigpIGluc2lkZSBxdWVyeS1j
+cHUtZGVmaW5pdGlvbnMKOWM4MjAwNCBpMzg2OiBSZW1vdmUgeDg2X2NwdV9zZXRfZGVmYXVsdF92
+ZXJzaW9uKCkgZnVuY3Rpb24KYzUyOTYyNCBtYWNoaW5lOiBtYWNoaW5lX2ZpbmRfY2xhc3MoKSBm
+dW5jdGlvbgpmNzllZGZjIGkzODY6IERvbid0IHVzZSBkZWZhdWx0X2NwdV92ZXJzaW9uIGF0ICIt
+Y3B1IGhlbHAiCjAxMDY5ODMgaTM4NjogQWRkIGRlZmF1bHRfdmVyc2lvbiBwYXJhbWV0ZXIgdG8g
+Q1BVIHZlcnNpb24gZnVuY3Rpb25zCmQ2YTE3MmIgaTM4NjogVXNlIGdfYXV0b2ZyZWUgYXQgeDg2
+X2NwdV9saXN0X2VudHJ5KCkKCj09PSBPVVRQVVQgQkVHSU4gPT09CjEvNyBDaGVja2luZyBjb21t
+aXQgZDZhMTcyYjA1NjE5IChpMzg2OiBVc2UgZ19hdXRvZnJlZSBhdCB4ODZfY3B1X2xpc3RfZW50
+cnkoKSkKMi83IENoZWNraW5nIGNvbW1pdCAwMTA2OTgzYzdiM2MgKGkzODY6IEFkZCBkZWZhdWx0
+X3ZlcnNpb24gcGFyYW1ldGVyIHRvIENQVSB2ZXJzaW9uIGZ1bmN0aW9ucykKV0FSTklORzogbGlu
+ZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzI4OiBGSUxFOiB0YXJnZXQvaTM4Ni9jcHUuYzozMTkxOgor
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgWDg2Q1BV
+VmVyc2lvbiBkZWZhdWx0X3ZlcnNpb24pCgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVy
+cwojNjA6IEZJTEU6IHRhcmdldC9pMzg2L2NwdS5jOjM5ODM6CisgICAgZ19hdXRvZnJlZSBjaGFy
+ICphbGlhc19vZiA9IHg4Nl9jcHVfY2xhc3NfZ2V0X2FsaWFzX29mKGNjLCBkZWZhdWx0X2NwdV92
+ZXJzaW9uKTsKCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiM3ODogRklMRTogdGFy
+Z2V0L2kzODYvY3B1LmM6NDEyMToKKyAgICBYODZDUFVWZXJzaW9uIHZlcnNpb24gPSB4ODZfY3B1
+X21vZGVsX3Jlc29sdmVfdmVyc2lvbihtb2RlbCwgZGVmYXVsdF9jcHVfdmVyc2lvbik7Cgp0b3Rh
+bDogMCBlcnJvcnMsIDMgd2FybmluZ3MsIDU1IGxpbmVzIGNoZWNrZWQKClBhdGNoIDIvNyBoYXMg
+c3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFy
+ZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVD
+S1BBVENIIGluIE1BSU5UQUlORVJTLgozLzcgQ2hlY2tpbmcgY29tbWl0IGY3OWVkZmNkNjE5NSAo
+aTM4NjogRG9uJ3QgdXNlIGRlZmF1bHRfY3B1X3ZlcnNpb24gYXQgIi1jcHUgaGVscCIpCjQvNyBD
+aGVja2luZyBjb21taXQgYzUyOTYyNGQyODdiIChtYWNoaW5lOiBtYWNoaW5lX2ZpbmRfY2xhc3Mo
+KSBmdW5jdGlvbikKNS83IENoZWNraW5nIGNvbW1pdCA5YzgyMDA0NWM3MzMgKGkzODY6IFJlbW92
+ZSB4ODZfY3B1X3NldF9kZWZhdWx0X3ZlcnNpb24oKSBmdW5jdGlvbikKV0FSTklORzogbGluZSBv
+dmVyIDgwIGNoYXJhY3RlcnMKIzgxOiBGSUxFOiB0YXJnZXQvaTM4Ni9jcHUuYzozMTc4OgorICAg
+ICAgICAoUENNYWNoaW5lQ2xhc3MgKilvYmplY3RfY2xhc3NfZHluYW1pY19jYXN0KE9CSkVDVF9D
+TEFTUyhtYyksIFRZUEVfUENfTUFDSElORSk7CgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFj
+dGVycwojODc6IEZJTEU6IHRhcmdldC9pMzg2L2NwdS5jOjMxODQ6CisgICAgcmV0dXJuIGRlZmF1
+bHRfY3B1X3ZlcnNpb25fZm9yX21hY2hpbmUoTUFDSElORV9HRVRfQ0xBU1MocWRldl9nZXRfbWFj
+aGluZSgpKSk7CgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojMTEwOiBGSUxFOiB0
+YXJnZXQvaTM4Ni9jcHUuYzo0MTM0OgorICAgIFg4NkNQVVZlcnNpb24gdmVyc2lvbiA9IHg4Nl9j
+cHVfbW9kZWxfcmVzb2x2ZV92ZXJzaW9uKG1vZGVsLCBkZWZhdWx0X2NwdV92ZXJzaW9uKCkpOwoK
+dG90YWw6IDAgZXJyb3JzLCAzIHdhcm5pbmdzLCA4OCBsaW5lcyBjaGVja2VkCgpQYXRjaCA1Lzcg
+aGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9y
+cwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUK
+Q0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KNi83IENoZWNraW5nIGNvbW1pdCBhOTQ0NjllYTli
+ODMgKGkzODY6IERvbid0IHVzZSBkZWZhdWx0X2NwdV92ZXJzaW9uKCkgaW5zaWRlIHF1ZXJ5LWNw
+dS1kZWZpbml0aW9ucykKNy83IENoZWNraW5nIGNvbW1pdCA4MDc3NGYzODY2YmUgKGNwdTogQWRk
+IGBtYWNoaW5lYCBwYXJhbWV0ZXIgdG8gcXVlcnktY3B1LWRlZmluaXRpb25zKQpXQVJOSU5HOiBs
+aW5lIG92ZXIgODAgY2hhcmFjdGVycwojMTQ3OiBGSUxFOiB0ZXN0cy9hY2NlcHRhbmNlL3g4Nl9j
+cHVfbW9kZWxfdmVyc2lvbnMucHk6MjM4OgorICAgICAgICAiIiJDaGVjayBpZiB1bnZlcnNpb25l
+ZCBDUFUgbW9kZWwgaXMgYW4gYWxpYXMgcG9pbnRpbmcgdG8gcmlnaHQgdmVyc2lvbiIiIgoKRVJS
+T1I6IGxpbmUgb3ZlciA5MCBjaGFyYWN0ZXJzCiMxNTI6IEZJTEU6IHRlc3RzL2FjY2VwdGFuY2Uv
+eDg2X2NwdV9tb2RlbF92ZXJzaW9ucy5weToyNDM6CisgICAgICAgIGNwdXMxID0gZGljdCgobVsn
+bmFtZSddLCBtLmdldCgnYWxpYXMtb2YnKSkgZm9yIG0gaW4gdm0xLmNvbW1hbmQoJ3F1ZXJ5LWNw
+dS1kZWZpbml0aW9ucycsIG1hY2hpbmU9J25vbmUnKSkKCkVSUk9SOiBsaW5lIG92ZXIgOTAgY2hh
+cmFjdGVycwojMTU5OiBGSUxFOiB0ZXN0cy9hY2NlcHRhbmNlL3g4Nl9jcHVfbW9kZWxfdmVyc2lv
+bnMucHk6MjUwOgorICAgICAgICBjcHVzMiA9IGRpY3QoKG1bJ25hbWUnXSwgbS5nZXQoJ2FsaWFz
+LW9mJykpIGZvciBtIGluIHZtMi5jb21tYW5kKCdxdWVyeS1jcHUtZGVmaW5pdGlvbnMnKSkKCldB
+Uk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiMxNjU6IEZJTEU6IHRlc3RzL2FjY2VwdGFu
+Y2UveDg2X2NwdV9tb2RlbF92ZXJzaW9ucy5weToyNTY6CisgICAgICAgICIiIkNoZWNrIGlmIHVu
+dmVyc2lvbmVkIENQVSBtb2RlbCBpcyBhbiBhbGlhcyBwb2ludGluZyB0byByaWdodCB2ZXJzaW9u
+IiIiCgpFUlJPUjogbGluZSBvdmVyIDkwIGNoYXJhY3RlcnMKIzE3MDogRklMRTogdGVzdHMvYWNj
+ZXB0YW5jZS94ODZfY3B1X21vZGVsX3ZlcnNpb25zLnB5OjI2MToKKyAgICAgICAgY3B1czEgPSBk
+aWN0KChtWyduYW1lJ10sIG0uZ2V0KCdhbGlhcy1vZicpKSBmb3IgbSBpbiB2bTEuY29tbWFuZCgn
+cXVlcnktY3B1LWRlZmluaXRpb25zJywgbWFjaGluZT0ncGMtaTQ0MGZ4LTQuMScpKQoKRVJST1I6
+IGxpbmUgb3ZlciA5MCBjaGFyYWN0ZXJzCiMxNzc6IEZJTEU6IHRlc3RzL2FjY2VwdGFuY2UveDg2
+X2NwdV9tb2RlbF92ZXJzaW9ucy5weToyNjg6CisgICAgICAgIGNwdXMyID0gZGljdCgobVsnbmFt
+ZSddLCBtLmdldCgnYWxpYXMtb2YnKSkgZm9yIG0gaW4gdm0yLmNvbW1hbmQoJ3F1ZXJ5LWNwdS1k
+ZWZpbml0aW9ucycpKQoKdG90YWw6IDQgZXJyb3JzLCAyIHdhcm5pbmdzLCAxNDEgbGluZXMgY2hl
+Y2tlZAoKUGF0Y2ggNy83IGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFu
+eSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUg
+bWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgo9PT0gT1VUUFVUIEVO
+RCA9PT0KClRlc3QgY29tbWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoKVGhlIGZ1bGwgbG9nIGlz
+IGF2YWlsYWJsZSBhdApodHRwOi8vcGF0Y2hldy5vcmcvbG9ncy8yMDE5MTAyNTAyMjU1My4yNTI5
+OC0xLWVoYWJrb3N0QHJlZGhhdC5jb20vdGVzdGluZy5jaGVja3BhdGNoLz90eXBlPW1lc3NhZ2Uu
+Ci0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwczovL3Bh
+dGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEBy
+ZWRoYXQuY29t
 
 
