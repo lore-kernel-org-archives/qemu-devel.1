@@ -2,83 +2,92 @@ Return-Path: <SRS0=bySr=YS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 66031CA9EA0
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 14:12:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 16D12CA9EA0
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 14:13:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3086B20663
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 14:12:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D727F20663
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 14:13:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="H2/uVMWX"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3086B20663
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Fgw49us/"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D727F20663
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60620 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60626 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iO0Jz-00054o-Up
-	for qemu-devel@archiver.kernel.org; Fri, 25 Oct 2019 10:12:07 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41002)
+	id 1iO0Kr-0006Mz-Sq
+	for qemu-devel@archiver.kernel.org; Fri, 25 Oct 2019 10:13:01 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40809)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <berrange@redhat.com>) id 1iO0Bt-0005tF-DC
- for qemu-devel@nongnu.org; Fri, 25 Oct 2019 10:03:47 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1iO0Ao-000340-K2
+ for qemu-devel@nongnu.org; Fri, 25 Oct 2019 10:02:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <berrange@redhat.com>) id 1iO0Br-0007rs-Kg
- for qemu-devel@nongnu.org; Fri, 25 Oct 2019 10:03:45 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:27442
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <berrange@redhat.com>) id 1iO0Br-0007oq-Fn
- for qemu-devel@nongnu.org; Fri, 25 Oct 2019 10:03:43 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1572012212;
- h=from:from:reply-to:reply-to:subject:subject:date:date:
- message-id:message-id:to:to:cc:cc:mime-version:mime-version:
- content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=+TzvCcOB98PtxSJn5wedoJCyEeADXx+3e8fc2D7d5+w=;
- b=H2/uVMWXUs0Mxrl0Z8qqGo+lnPRXoypSwX5JmrG5eJD3wcxmHk4nrXAjTT2/OQurS2mPyt
- 5xrEKl1Sp3irfOg45FlH8eivKi2XC1kbjJ0+3p87c/8UYzkX5IjzFAJ6LaIMjP4Fy/kpRI
- 6xQkQF//NwC3WJuxpXJ1rXdR9VP53D0=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-329-Y2k6KR-CNQiZ5rf9ziHE5Q-1; Fri, 25 Oct 2019 10:03:18 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E16981005500;
- Fri, 25 Oct 2019 14:03:16 +0000 (UTC)
-Received: from redhat.com (unknown [10.42.16.105])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id DEB075D71C;
- Fri, 25 Oct 2019 14:03:12 +0000 (UTC)
-Date: Fri, 25 Oct 2019 15:03:10 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: David Hildenbrand <david@redhat.com>
-Subject: Re: [PATCH 0/7] i386: Add `machine` parameter to query-cpu-definitions
-Message-ID: <20191025140310.GB3581@redhat.com>
-References: <20191025022553.25298-1-ehabkost@redhat.com>
- <dbf9e4c1-0acf-9469-84f9-f80c41e2cae0@redhat.com>
- <6e7d171e-18c4-6835-f89c-e9e66c093d62@de.ibm.com>
- <4cd530f9-54f3-80e7-1b66-c91f71160062@redhat.com>
+ (envelope-from <alex.bennee@linaro.org>) id 1iO0Am-0007Pc-O9
+ for qemu-devel@nongnu.org; Fri, 25 Oct 2019 10:02:38 -0400
+Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:39876)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1iO0Am-0007PA-Fw
+ for qemu-devel@nongnu.org; Fri, 25 Oct 2019 10:02:36 -0400
+Received: by mail-wm1-x343.google.com with SMTP id r141so2125946wme.4
+ for <qemu-devel@nongnu.org>; Fri, 25 Oct 2019 07:02:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=guq5J78UShi1OteZ2oPTiw1h2oDmPFvjT9o2d5zZ77Q=;
+ b=Fgw49us/j/uj+h595ZK4CYk++nqjiZnCU5JTU7k+7AB1vANRWBJbQHSDcWc8Aj3KSo
+ +GPUky6cCjtYfkkG4Zl/hpfnsqczBZnTJR1h1JpCuk8sBApXBkISvWARUuQ1c7c624AB
+ 8xTp7oe7M01KjDkO/GPj0t+ZuSBQfeHS3mjDEKAZQ9xYpEe9Ys2W9mtv3Vh36AG9U+NU
+ ZtJzFzJG5iDcseqIIr+3sdx6UkhCqXsdPee89+uEyx8cUpD9BScx85yMFWyCKDT7touw
+ Bu2uV4n18nAMmRF+Amde0bAOpJzSc/Z9FcC7bxghK85cuj21u91QWHf/5AhtQmA+owOq
+ nalQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=guq5J78UShi1OteZ2oPTiw1h2oDmPFvjT9o2d5zZ77Q=;
+ b=lPhls1c7bVEAmAsqof5QxG+LnIdWvGfc2crlfYJj4Moe7E/qqApEeIYLfrX5zpksiW
+ emTPZq8471uXJUTLH1ByjKYAo34isQ9I5AA3DC3MDXn21WCuXn1lOILj2u6IBClA1rrI
+ 9Ei4wexAfh4hYcu6kpcu5If+aLqB2J2cdBMPiApYA77sy68UjP+H/sKgs8SOzZczOprp
+ BbCuuUdVIJPT9LdywD/zxHDmJX5P/+QDINPGWE+S7IQJQqfvsyopRaeAV2xbiRAjiXpc
+ rNfgatKh2jKgPZ3trbJF1IT63Rhy5+s1CoEIE1sVmmGtpvVJUvLVSOb0fgS5VuBXcaGq
+ Qt/w==
+X-Gm-Message-State: APjAAAW63nSLqXC9t8FqRzjCYu2Xs7+vLspRCubo74aUMEwqM+isCBEi
+ TcKByxRGG93SGl+O34DkKKAJ/A==
+X-Google-Smtp-Source: APXvYqwoM08KyrJMKTHp439V5I1d7waH80D8zThz70+vMEtnhHF5sDbBJk/grw9ThcO0SOF4c5BRFQ==
+X-Received: by 2002:a05:600c:2948:: with SMTP id
+ n8mr3576531wmd.128.1572012154843; 
+ Fri, 25 Oct 2019 07:02:34 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id t4sm1589860wmi.39.2019.10.25.07.02.33
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Fri, 25 Oct 2019 07:02:34 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 3672F1FF87;
+ Fri, 25 Oct 2019 15:02:33 +0100 (BST)
+References: <20191023154505.30521-1-richard.henderson@linaro.org>
+ <20191023154505.30521-3-richard.henderson@linaro.org>
+User-agent: mu4e 1.3.5; emacs 27.0.50
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Richard Henderson <richard.henderson@linaro.org>
+Subject: Re: [PATCH v2 2/7] exec: Split out variable page size support to
+ exec-vary.c
+In-reply-to: <20191023154505.30521-3-richard.henderson@linaro.org>
+Date: Fri, 25 Oct 2019 15:02:33 +0100
+Message-ID: <87wocsly86.fsf@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <4cd530f9-54f3-80e7-1b66-c91f71160062@redhat.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-MC-Unique: Y2k6KR-CNQiZ5rf9ziHE5Q-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.120
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::343
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,149 +99,187 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: Thomas Huth <thuth@redhat.com>, Janosch Frank <frankja@linux.ibm.com>,
- Cornelia Huck <cohuck@redhat.com>, qemu-devel@nongnu.org,
- Markus Armbruster <armbru@redhat.com>,
- Christian Borntraeger <borntraeger@de.ibm.com>,
- Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Jiri Denemark <jdenemar@redhat.com>, Richard Henderson <rth@twiddle.net>,
- Eduardo Habkost <ehabkost@redhat.com>
+Cc: pbonzini@redhat.com, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, Oct 25, 2019 at 10:02:29AM +0200, David Hildenbrand wrote:
-> On 25.10.19 09:55, Christian Borntraeger wrote:
-> >=20
-> >=20
-> > On 25.10.19 09:17, David Hildenbrand wrote:
-> > > On 25.10.19 04:25, Eduardo Habkost wrote:
-> > > > We had introduced versioned CPU models in QEMU 4.1, including a
-> > > > method for querying for CPU model versions using
-> > >=20
-> > > Interesting, I was not aware of that.
-> > >=20
-> > > On s390x, we somewhat have versioned CPU models, but we decided again=
-st giving them explicit names (e.g., z13-v1 or z13-4.1.0), because it didn'=
-t really seem to be necessary. (and we often implement/add features for old=
-er CPU models, there is a lot of fluctuation) Actually, you would have had =
-to add "z13-z/VM-x.x.x" or "z13-LPAR-x.x.x" or "z13-KVM-x.x.x" to model the=
- features you actually see in all the different virtual environments ("what=
- a CPU looks like"). Not to talk about QEMU versions in addition to that. S=
-o we decided to always model what you would see under LPAR and are able to =
-specify for a KVM guest. So you can use "z13" in an up-to-date LPAR environ=
-ment, but not in a z/VM environment (you would have to disable features).
-> > >=20
-> > > Each (!base) CPU model has a specific feature set per machine. Libvir=
-t uses query-cpu-model-expansion() to convert this model+machine to a machi=
-ne-independent representation. That representation is sufficient for all us=
-e cases we were aware of (esp. "virsh domcapabilities", the host CPU model,=
- migration).
-> > >=20
-> > > While s390x has versioned CPU models, we have no explicit way of spec=
-ifying them for older machines, besides going over query-cpu-model-expansio=
-n and using expanded "base model + features".
-> > >=20
-> > > I can see that this might make sense on x86-64, where you only have m=
-aybe 3 versions of a CPU (e.g., the one Intel messed up first - Haswell, th=
-e one Intel messed up next - Haswell-noTSX, and the one that Intel eventual=
-ly did right - Haswell-noTSX-IBRS) and you might want to specify "Haswell" =
-vs. "Haswell-IBRS" vs. "Haswell-noTSX-IBRS". But actually, you will always =
-want to go for "Haswell-noTSX-IBRS", because you can expect to run in updat=
-ed environments if I am not wrong, everything else are corner cases.
-> > >=20
-> > > Of course, versioned CPU model are neat to avoid "base model + list o=
-f features", but at least for expanding the host model on s390x, it is not =
-really helpful. When migrating, the model expansion does the trick.
-> > >=20
-> > > I haven't looked into details of "how to specify or model versions". =
-Maybe IBM wants to look into creating versions for all the old models we ha=
-d. But again, not sure if that is of any help for s390x. CCing IBM.
-> >=20
-> > I agree that this does not look very helpful.
-> > Especially as several things depend on the kernel version a QEMU versio=
-n is
-> > not sufficient to be guarantee construction success.
-> > So we would need something like z14-qemu4.0-kernel-5.2-suse-flavour-onL=
-PAR
-> >=20
-> > Instead we do check if we can construct an equivalent model on the migr=
-ation target.
-> > And that model is precise. We do even have versions.
-> > Right now with QEMU on s390  our models are versioned in a way that we =
-fence of
-> > facilities for old machine versions.
-> >=20
-> > For example
-> > -machine s390-virtio-ccw-3.1 -cpu z14 will not have the multiple epoch =
-facility
-> > and
-> > -machine s390-virtio-ccw-4.0 -cpu z14 will have the multiple epoch faci=
-lity.
-> > As migration does always require the tuple of machine and cpu this is s=
-ave. I fail
-> > to see what the benefit of an explicit z14-3.1 would be.
-> >=20
->=20
-> AFAIKS the only real benefit of versioned CPU models is that you can add =
-new
-> CPU model versions without new QEMU version.
 
-This is very important for backporting CPU security fixes to existing QEMU
-releases.=20
+Richard Henderson <richard.henderson@linaro.org> writes:
 
->=20
-> Then you can specify "-cpu z13-vX" or "-cpu z13 -cpuv X" (no idea how
-> versioned CPU model were implemented) on any QEMU machine. Which is the s=
-ame
-> as telling your customer "please use z13,featX=3Don" in case you have a g=
-ood
-> reason to not use the host model (along with baselining) but use an expli=
-cit
-> model.
->=20
-> If you can change the default model of QEMU machines, you can automate th=
-is
-> process. I am pretty sure this is a corner case, though (e.g., IBRS).
-> Usually you have a new QEMU machine and can simply enable the new feature
-> from that point on.
+> The next patch will play a trick with "const" that will
+> confuse the compiler about the uses of target_page_bits
+> within exec.c.  Moving everything to a new file prevents
+> this confusion.
+>
+> No functional change so far.
+>
+> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+> Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 
-There are now 4 Haswell variants, only some of which are runnable
-on any given host, depending on what microcode the user has installed
-or what particular Haswell silicon SKU the user purchased. Given the
-frequency of new CPU flaws arrived since the first Meltdown/Spectre,
-this isn't a corner case, at least for the x86 world & Intel in
-particular. Other arches/vendors haven't been quite so badly affected
-in this way.
+Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
 
-If we tied each new Haswell variant to a machine type, then users would
-be blocked from consuming a new machine type depending on runnability of
-the CPU model. This is not at all desirable, as mgmt apps now have complex
-rules on what machine type they can use.
+> ---
+>  Makefile.target       |  2 +-
+>  include/qemu-common.h |  6 +++++
+>  exec-vary.c           | 57 +++++++++++++++++++++++++++++++++++++++++++
+>  exec.c                | 34 --------------------------
+>  4 files changed, 64 insertions(+), 35 deletions(-)
+>  create mode 100644 exec-vary.c
+>
+> diff --git a/Makefile.target b/Makefile.target
+> index 5e916230c4..ca3d14efe1 100644
+> --- a/Makefile.target
+> +++ b/Makefile.target
+> @@ -107,7 +107,7 @@ obj-y +=3D trace/
+>
+>  #########################################################
+>  # cpu emulator library
+> -obj-y +=3D exec.o
+> +obj-y +=3D exec.o exec-vary.o
+>  obj-y +=3D accel/
+>  obj-$(CONFIG_TCG) +=3D tcg/tcg.o tcg/tcg-op.o tcg/tcg-op-vec.o tcg/tcg-o=
+p-gvec.o
+>  obj-$(CONFIG_TCG) +=3D tcg/tcg-common.o tcg/optimize.o
+> diff --git a/include/qemu-common.h b/include/qemu-common.h
+> index 8d84db90b0..082da59e85 100644
+> --- a/include/qemu-common.h
+> +++ b/include/qemu-common.h
+> @@ -74,6 +74,12 @@ void cpu_exec_step_atomic(CPUState *cpu);
+>   */
+>  bool set_preferred_target_page_bits(int bits);
+>
+> +/**
+> + * finalize_target_page_bits:
+> + * Commit the final value set by set_preferred_target_page_bits.
+> + */
+> +void finalize_target_page_bits(void);
+> +
+>  /**
+>   * Sends a (part of) iovec down a socket, yielding when the socket is fu=
+ll, or
+>   * Receives data into a (part of) iovec from a socket,
+> diff --git a/exec-vary.c b/exec-vary.c
+> new file mode 100644
+> index 0000000000..48c0ab306c
+> --- /dev/null
+> +++ b/exec-vary.c
+> @@ -0,0 +1,57 @@
+> +/*
+> + * Variable page size handling
+> + *
+> + *  Copyright (c) 2003 Fabrice Bellard
+> + *
+> + * This library is free software; you can redistribute it and/or
+> + * modify it under the terms of the GNU Lesser General Public
+> + * License as published by the Free Software Foundation; either
+> + * version 2 of the License, or (at your option) any later version.
+> + *
+> + * This library is distributed in the hope that it will be useful,
+> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
+> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+> + * Lesser General Public License for more details.
+> + *
+> + * You should have received a copy of the GNU Lesser General Public
+> + * License along with this library; if not, see <http://www.gnu.org/lice=
+nses/>.
+> + */
+> +
+> +#include "qemu/osdep.h"
+> +#include "qemu-common.h"
+> +#include "exec/exec-all.h"
+> +
+> +#ifdef TARGET_PAGE_BITS_VARY
+> +int target_page_bits;
+> +bool target_page_bits_decided;
+> +#endif
+> +
+> +bool set_preferred_target_page_bits(int bits)
+> +{
+> +    /*
+> +     * The target page size is the lowest common denominator for all
+> +     * the CPUs in the system, so we can only make it smaller, never
+> +     * larger. And we can't make it smaller once we've committed to
+> +     * a particular size.
+> +     */
+> +#ifdef TARGET_PAGE_BITS_VARY
+> +    assert(bits >=3D TARGET_PAGE_BITS_MIN);
+> +    if (target_page_bits =3D=3D 0 || target_page_bits > bits) {
+> +        if (target_page_bits_decided) {
+> +            return false;
+> +        }
+> +        target_page_bits =3D bits;
+> +    }
+> +#endif
+> +    return true;
+> +}
+> +
+> +void finalize_target_page_bits(void)
+> +{
+> +#ifdef TARGET_PAGE_BITS_VARY
+> +    if (target_page_bits =3D=3D 0) {
+> +        target_page_bits =3D TARGET_PAGE_BITS_MIN;
+> +    }
+> +    target_page_bits_decided =3D true;
+> +#endif
+> +}
+> diff --git a/exec.c b/exec.c
+> index fb0943cfed..5bf181d23e 100644
+> --- a/exec.c
+> +++ b/exec.c
+> @@ -91,11 +91,6 @@ AddressSpace address_space_memory;
+>  static MemoryRegion io_mem_unassigned;
+>  #endif
+>
+> -#ifdef TARGET_PAGE_BITS_VARY
+> -int target_page_bits;
+> -bool target_page_bits_decided;
+> -#endif
+> -
+>  CPUTailQ cpus =3D QTAILQ_HEAD_INITIALIZER(cpus);
+>
+>  /* current CPU in the current thread. It is only valid inside
+> @@ -109,37 +104,8 @@ int use_icount;
+>  uintptr_t qemu_host_page_size;
+>  intptr_t qemu_host_page_mask;
+>
+> -bool set_preferred_target_page_bits(int bits)
+> -{
+> -    /* The target page size is the lowest common denominator for all
+> -     * the CPUs in the system, so we can only make it smaller, never
+> -     * larger. And we can't make it smaller once we've committed to
+> -     * a particular size.
+> -     */
+> -#ifdef TARGET_PAGE_BITS_VARY
+> -    assert(bits >=3D TARGET_PAGE_BITS_MIN);
+> -    if (target_page_bits =3D=3D 0 || target_page_bits > bits) {
+> -        if (target_page_bits_decided) {
+> -            return false;
+> -        }
+> -        target_page_bits =3D bits;
+> -    }
+> -#endif
+> -    return true;
+> -}
+> -
+>  #if !defined(CONFIG_USER_ONLY)
+>
+> -static void finalize_target_page_bits(void)
+> -{
+> -#ifdef TARGET_PAGE_BITS_VARY
+> -    if (target_page_bits =3D=3D 0) {
+> -        target_page_bits =3D TARGET_PAGE_BITS_MIN;
+> -    }
+> -    target_page_bits_decided =3D true;
+> -#endif
+> -}
+> -
+>  typedef struct PhysPageEntry PhysPageEntry;
+>
+>  struct PhysPageEntry {
 
-When dealing with backporting patches for new CPU hardware flaws, the
-new CPU features are backported to many old QEMU versions. The new
-machine types are not backportable.
 
-Both these called for making CPU versioning independant of machine
-type versioning.
-
-Essentially the goal with CPU versioning is that the user can request
-a bare "Haswell" and libvirt (or the mgmt app) will automatically
-expand this to the best Haswell version that the host is able to
-support with its CPUs / microcode / BIOS config combination.
-
-
-
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange=
- :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com=
- :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange=
- :|
-
+--
+Alex Benn=C3=A9e
 
