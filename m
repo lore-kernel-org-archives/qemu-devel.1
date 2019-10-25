@@ -2,80 +2,101 @@ Return-Path: <SRS0=bySr=YS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 20169CA9EA0
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 12:35:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D73A0CA9EA0
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 12:36:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E082021D71
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 12:35:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A215621D71
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 12:36:11 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Vsll/zTA"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E082021D71
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aLE/+BUY"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A215621D71
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59384 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59392 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iNyon-0007jF-JH
-	for qemu-devel@archiver.kernel.org; Fri, 25 Oct 2019 08:35:49 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50761)
+	id 1iNyp8-0001eN-Ef
+	for qemu-devel@archiver.kernel.org; Fri, 25 Oct 2019 08:36:10 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52207)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <stefanha@redhat.com>) id 1iNyc8-0000gM-NQ
- for qemu-devel@nongnu.org; Fri, 25 Oct 2019 08:22:45 -0400
+ (envelope-from <mreitz@redhat.com>) id 1iNykd-0001a3-GQ
+ for qemu-devel@nongnu.org; Fri, 25 Oct 2019 08:31:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <stefanha@redhat.com>) id 1iNyc7-0007ro-Cc
- for qemu-devel@nongnu.org; Fri, 25 Oct 2019 08:22:44 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:28017
+ (envelope-from <mreitz@redhat.com>) id 1iNykb-0002is-76
+ for qemu-devel@nongnu.org; Fri, 25 Oct 2019 08:31:30 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:30609
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1iNyc7-0007rZ-8d
- for qemu-devel@nongnu.org; Fri, 25 Oct 2019 08:22:43 -0400
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1iNykV-0002YC-Gq
+ for qemu-devel@nongnu.org; Fri, 25 Oct 2019 08:31:24 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1572006162;
+ s=mimecast20190719; t=1572006675;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=UpGmtUyfdlvxlAtoSbViodlS/3ZIaP9VCEx3R5W0HcU=;
- b=Vsll/zTAb8rY/QylfbyGpKM24RZ/uIQD0j2HGGCbXVocS9YM2KeOica/JuRihhAurBF61Q
- bzFImkiCI2gdUhO0OGsAGMFvDvSqPnJeAR7KGLweigGjIr4Kwin/81SldIiL0/YQ0Ju25U
- R0hDFFFxJJ/Q0nTWfR7i/wkcrX/9V8E=
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=GDb2MaZjbnIVlyvIqk6tWabdPK5Fg/RHZtkhdkdWoPc=;
+ b=aLE/+BUYwk8uN0GJxh6NEZYf50hVq/lAqeKg/bYOq4f1fGx3+aAZ8VUHRrThp9ivS9gMbu
+ T2KM7cDUMZEelzBRqxGdLphWibDM1kX6TGpNJF14og3/T7/thacWI0d8l/s4T9VonmWT5a
+ 6SDG2sdXBJloY9crPObII1eDVrkp1LE=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-261-JlaES2OqMICBY48LEhmXyA-1; Fri, 25 Oct 2019 08:22:40 -0400
-X-MC-Unique: JlaES2OqMICBY48LEhmXyA-1
+ us-mta-257-UStGsJNwMs2iS6jklKV9PQ-1; Fri, 25 Oct 2019 08:31:11 -0400
+X-MC-Unique: UStGsJNwMs2iS6jklKV9PQ-1
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
  [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A7FA61800E00;
- Fri, 25 Oct 2019 12:22:39 +0000 (UTC)
-Received: from localhost (ovpn-117-215.ams2.redhat.com [10.36.117.215])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 4B1E760852;
- Fri, 25 Oct 2019 12:22:37 +0000 (UTC)
-Date: Fri, 25 Oct 2019 13:51:45 +0200
-From: Stefan Hajnoczi <stefanha@redhat.com>
-To: Zhenyu Ye <yezhenyu2@huawei.com>
-Subject: Re: [RFC PATCH] iothread: add set_iothread_poll_* commands
-Message-ID: <20191025115145.GA13314@stefanha-x1.localdomain>
-References: <5DAEB9D3.3080503@huawei.com>
- <20191023151903.GI9574@stefanha-x1.localdomain>
- <5DB1ACF2.9080500@huawei.com> <20191024135645.GG2877@work-vm>
- <5DB1B65C.3020104@huawei.com> <20191024143859.GJ2877@work-vm>
- <5DB258FC.2050506@huawei.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D8C13107AD31;
+ Fri, 25 Oct 2019 12:31:09 +0000 (UTC)
+Received: from dresden.str.redhat.com (unknown [10.36.118.67])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id EEBD560852;
+ Fri, 25 Oct 2019 12:31:05 +0000 (UTC)
+Subject: Re: [PATCH v3 0/6] block-copy: memory limit
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-block@nongnu.org
+References: <20191022111805.3432-1-vsementsov@virtuozzo.com>
+From: Max Reitz <mreitz@redhat.com>
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <06c576de-91f4-69ab-5962-53f2ba9930e3@redhat.com>
+Date: Fri, 25 Oct 2019 14:31:04 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.1
 MIME-Version: 1.0
-In-Reply-To: <5DB258FC.2050506@huawei.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
+In-Reply-To: <20191022111805.3432-1-vsementsov@virtuozzo.com>
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 X-Mimecast-Spam-Score: 0
 Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="YiEDa0DAkWCtVeE4"
-Content-Disposition: inline
+ protocol="application/pgp-signature";
+ boundary="30f7iAuZFQgV1vNie7qaVAOz0MJtPFXac"
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 207.211.31.81
@@ -90,169 +111,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, xiexiangyou@huawei.com,
- qemu-devel@nongnu.org, jiangyiwen <jiangyiwen@huawei.com>, pbonzini@redhat.com
+Cc: kwolf@redhat.com, den@openvz.org, jsnow@redhat.com, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---YiEDa0DAkWCtVeE4
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--30f7iAuZFQgV1vNie7qaVAOz0MJtPFXac
+Content-Type: multipart/mixed; boundary="Bt8vMLjeHDZdAzyAcRqC6pvkmmk1yq7vO"
+
+--Bt8vMLjeHDZdAzyAcRqC6pvkmmk1yq7vO
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, Oct 25, 2019 at 10:07:56AM +0800, Zhenyu Ye wrote:
+On 22.10.19 13:17, Vladimir Sementsov-Ogievskiy wrote:
+> I'm going to bring block-status driven, async copying process to
+> block-copy, to make it fast. The first step is to limit memory usage of
+> backup, here is it.
 >=20
+> v3:
+> 03: add Max's r-b
+> 04: fix commit message and include guards, add Max's r-b
+> 05-06: add Max's r-b
 >=20
-> On 2019/10/24 22:38, Dr. David Alan Gilbert wrote:
-> > * Zhenyu Ye (yezhenyu2@huawei.com) wrote:
-> >>
-> >>
-> >> On 2019/10/24 21:56, Dr. David Alan Gilbert wrote:
-> >>> * Zhenyu Ye (yezhenyu2@huawei.com) wrote:
-> >>>>
-> >>>>
-> >>>> On 2019/10/23 23:19, Stefan Hajnoczi wrote:
-> >>>>> On Tue, Oct 22, 2019 at 04:12:03PM +0800, yezhenyu (A) wrote:
-> >>>>>> Since qemu2.9, QEMU added three AioContext poll parameters to stru=
-ct
-> >>>>>> IOThread: poll_max_ns, poll_grow and poll_shrink. These properties=
- are
-> >>>>>> used to control iothread polling time.
-> >>>>>>
-> >>>>>> However, there isn't properly hmp commands to adjust them when the=
- VM is
-> >>>>>> alive. It's useful to adjust them online when observing the impact=
- of
-> >>>>>> different property value on performance.
-> >>>>>>
-> >>>>>> This patch add three hmp commands to adjust iothread poll-* proper=
-ties
-> >>>>>> for special iothread:
-> >>>>>>
-> >>>>>> set_iothread_poll_max_ns: set the maximum polling time in ns;
-> >>>>>> set_iothread_poll_grow: set how many ns will be added to polling t=
-ime;
-> >>>>>> set_iothread_poll_shrink: set how many ns will be removed from pol=
-ling
-> >>>>>> time.
-> >>>>>>
-> >>>>>> Signed-off-by: Zhenyu Ye <yezhenyu2@huawei.com>
-> >>>>>> ---
-> >>>>>> hmp-commands.hx | 42 ++++++++++++++++++++
-> >>>>>> hmp.c | 30 +++++++++++++++
-> >>>>>> hmp.h | 3 ++
-> >>>>>> include/sysemu/iothread.h | 6 +++
-> >>>>>> iothread.c | 80 +++++++++++++++++++++++++++++++++++++++
-> >>>>>> qapi/misc.json | 23 +++++++++++
-> >>>>>> 6 files changed, 184 insertions(+)
-> >>>>>
-> >>>>> poll-max-ns, poll-grow, poll-shrink are properties of IOThread obje=
-cts.
-> >>>>> They can already be modified at runtime using:
-> >>>>>
-> >>>>>   $ qemu -object iothread,id=3Diothread1
-> >>>>>   (qemu) qom-set /objects/iothread1 poll-max-ns 100000
-> >>>>>
-> >>>>> I think there is no need for a patch.
-> >>>>>
-> >>>>> Stefan
-> >>>>>
-> >>>>
-> >>>> Thanks for your review. I have considered using the `qom-set` comman=
-d to modify
-> >>>> IOThread object's properties, however, this command is not friendly =
-to primary
-> >>>> users. The help info for this command is only:
-> >>>>
-> >>>>     qom-set path property value -- set QOM property
-> >>>>
-> >>>> It's almost impossible to get the correct `path` parameter for prima=
-ry user.
-> >>>
-> >>> Is this just a matter of documenting how to do it?
-> >>>
-> >>> It sounds like there's no need for a new QMP command though;  if you
-> >>> want an easier HMP command I'd probably still take it (because HMP is=
- ok
-> >>> at having things for convenience) - but not if it turns out that just
-> >>> adding a paragraph of documentation is enough.
-> >>>
-> >>> Dave
-> >>>
-> >>
-> >> I will show the differences in QMP and HMP:
-> >> If I want to set iothread1.poll-max-ns=3D1000 and iothread1.poll-grow=
-=3D2:
-> >>
-> >> Without this patch:
-> >> QMP command:
-> >>
-> >>     qom-set /objects/iothread1 poll-max-ns 1000
-> >>     qom-set /objects/iothread1 poll-grow 2
-> >>
-> >> HMP command:
-> >>
-> >>     { "execute": "qom-set", "arguments": { "path": "/objects/iothread1=
-",
-> >>                                            "property": "poll-max-ns", =
-"value": 1000 } }
-> >>     { "execute": "qom-set", "arguments": { "path": "/objects/iothread1=
-",
-> >>                                            "property": "poll-grow", "v=
-alue": 2} }
-> >>
-> >> with this patch:
-> >> QMP command:
-> >>
-> >>     iothread_set_parameter iothread1 max-ns 1000
-> >>     iothread_set_parameter iothread1 grow 2
-> >>
-> >> HMP command:
-> >>
-> >>     { "execute": "set-iothread-poll-params", "arguments': { "iothread-=
-id": "iothread1",
-> >>                                                             "max-ns": =
-1000, "grow": 2 } }
-> >>
-> >>
-> >> I think the inconvenience of qom-set is how to get the correct `path` =
-parameter.
-> >> Anyway, I will consider your advice.
-> >=20
-> > So it depends how obvious the path is;  if it's just   /objects/
-> > followed by whatever you used with id=3D  when you created the iothread
-> > then I think it's easy - we just need to update the docs.
-> > Is there a case where it's harder to know?
-> >=20
-> > Dave
-> >=20
+> v2: [mostly by Max's comments]
+> Now based on master (Thank you Max!)
+> 01: add Max's r-b
+> 02: add Max's r-b
+> 03: - refactor block_copy_do_copy goto/return
+>     - add small comment to block_copy_do_copy
+> 04: - a lot of renaming and wording fixes
+>     - refactor to use "available" instead of "taken"
+>     - refactor co_get_from_shres
+> 05: rebase on 04 changes
+> 06: drop extra things from max_transfer calculation
 >=20
-> You are right, it's just /objects/ followed by the id. Maybe we just need
-> to update the docs for qom-set.
+> Vladimir Sementsov-Ogievskiy (6):
+>   block/block-copy: allocate buffer in block_copy_with_bounce_buffer
+>   block/block-copy: limit copy_range_size to 16 MiB
+>   block/block-copy: refactor copying
+>   util: introduce SharedResource
+>   block/block-copy: add memory limit
+>   block/block-copy: increase buffered copy request
+>=20
+>  include/block/block-copy.h        |   5 +-
+>  include/qemu/co-shared-resource.h |  71 ++++++++++++
+>  block/block-copy.c                | 182 +++++++++++++++---------------
+>  util/qemu-co-shared-resource.c    |  76 +++++++++++++
+>  block/trace-events                |   6 +-
+>  util/Makefile.objs                |   1 +
+>  6 files changed, 249 insertions(+), 92 deletions(-)
+>  create mode 100644 include/qemu/co-shared-resource.h
+>  create mode 100644 util/qemu-co-shared-resource.c
 
-The documentation for qom-set will become very large and unwieldy if the
-properties of all objects are documented there.
+Thanks, applied to my block branch:
 
-I will send a patch documenting -object iothread and CC you.
+https://git.xanclic.moe/XanClic/qemu/commits/branch/block
 
-Stefan
+Max
 
---YiEDa0DAkWCtVeE4
+
+--Bt8vMLjeHDZdAzyAcRqC6pvkmmk1yq7vO--
+
+--30f7iAuZFQgV1vNie7qaVAOz0MJtPFXac
 Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl2y4c4ACgkQnKSrs4Gr
-c8g3UQf/fcCQEWSjRtNXN6aRlj/b3m9yJpB14lFiVbbZiLHOaI/eJYCBBrTxmRdT
-DOk8R9diFSzpBXMfgV37XOY3TcNME+Bb61TP0iTDuvDTol4PKDzRq2+fNyZzvyn4
-uujpiVxBh8qGv200JuCaHiz1vfW2jEUF5kqTrkTrIMdlrCnRCYf6maV1uYLO1NVn
-94aN/Vg8/PLgNCyKbWu3g7L7VYbOIBhNVhs4tZKb+1mJdIYJkhklzVqFnTs/ORr8
-ATaBy6m7wEdw5rKOP2zNLi+UiiAmUQoUJ4y1AiRx3/BEiNnD2p/ia+dAaw+HQnUL
-7QhSQqmaA6kyrqTQJQFd463/nDzx3A==
-=atyU
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl2y6wgACgkQ9AfbAGHV
+z0Aa9Qf/az8nJfwJ2Z54S/IC5oOOFDTL8FAAuvC9ECvKpcNjjdVA9/ft9guJqOta
+NCeZNSCLzUEyJFTfO9Kw44u+uLlbsn84ZwgK+pY9gWhcxLe/Oys6NSpTwJmIdG4m
+h67UMlPf84HTy7GyVV5lS00dmM2BsYxj7AQMIZt53rIG8FmCaEkLuxEIpvWpu5HE
+4ihh+vNjAPk15GCNIW6aVcvDPoL+vVFWIjrfdJlR0KotFz9kBv+NsnzY/iKTBWQw
+89+Hg3e4GohWVJZVxZD6MzOrUMOiuYl01hBM7tz77jPxjr6cYLx+pvYhZA8hx8cC
+x8/JPosiTlk+IOGufZbDY67+p/Fv+w==
+=ijuO
 -----END PGP SIGNATURE-----
 
---YiEDa0DAkWCtVeE4--
+--30f7iAuZFQgV1vNie7qaVAOz0MJtPFXac--
 
 
