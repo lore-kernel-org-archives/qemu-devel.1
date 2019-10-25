@@ -2,83 +2,79 @@ Return-Path: <SRS0=bySr=YS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A8F9FCA9EA0
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 11:36:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D20DCA9EA0
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 11:41:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7F5582070B
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 11:36:39 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7F5582070B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 68DCF2070B
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 11:41:55 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="POIA5b6C"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 68DCF2070B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58812 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58912 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iNxtW-0000d0-MR
-	for qemu-devel@archiver.kernel.org; Fri, 25 Oct 2019 07:36:38 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44477)
+	id 1iNxyc-0001yc-0Z
+	for qemu-devel@archiver.kernel.org; Fri, 25 Oct 2019 07:41:54 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45004)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mst@redhat.com>) id 1iNxs8-0005LU-4x
- for qemu-devel@nongnu.org; Fri, 25 Oct 2019 07:35:13 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1iNxwJ-0006J2-Lb
+ for qemu-devel@nongnu.org; Fri, 25 Oct 2019 07:39:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mst@redhat.com>) id 1iNxs7-0004RO-4m
- for qemu-devel@nongnu.org; Fri, 25 Oct 2019 07:35:12 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:38904 helo=mx1.redhat.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mst@redhat.com>) id 1iNxs6-0004RC-Vr
- for qemu-devel@nongnu.org; Fri, 25 Oct 2019 07:35:11 -0400
-Received: from mail-qk1-f199.google.com (mail-qk1-f199.google.com
- [209.85.222.199])
- (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id A0631414DEEC
- for <qemu-devel@nongnu.org>; Fri, 25 Oct 2019 11:35:10 +0000 (UTC)
-Received: by mail-qk1-f199.google.com with SMTP id v143so1796832qka.21
- for <qemu-devel@nongnu.org>; Fri, 25 Oct 2019 04:35:10 -0700 (PDT)
+ (envelope-from <richard.henderson@linaro.org>) id 1iNxwE-0006ab-TH
+ for qemu-devel@nongnu.org; Fri, 25 Oct 2019 07:39:28 -0400
+Received: from mail-qt1-x82d.google.com ([2607:f8b0:4864:20::82d]:37313)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+ id 1iNxwD-0006ZQ-8T
+ for qemu-devel@nongnu.org; Fri, 25 Oct 2019 07:39:25 -0400
+Received: by mail-qt1-x82d.google.com with SMTP id g50so2730797qtb.4
+ for <qemu-devel@nongnu.org>; Fri, 25 Oct 2019 04:39:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id;
+ bh=NIiOTnpLAsLsvEotBsCW7qgxVpyPSjsxlfZ4hcOEqI0=;
+ b=POIA5b6C8qFMsMRwKqAV420wgUOVo9d5OwI9je3J8dZHQMQJlWtvp6EvGOIswRCysq
+ zo/aQDSVy7UdZu8n87OP5Q60p1Dh606E2rVA2GOaQlELMl/CI0QcCyklXykQJ7caBgV4
+ jfeJypfTkPxfUw5ODy8ofwlX+25OAN8Vo/eHN7ZD9bwm301zGgrWt4YK+saXWdI/2TIs
+ z9TOQK9bx/uzFSWJoym8C4TJpXZ8JywYc6uG8DxH2bF65h+caJmObXvjhnNyapMRoaHg
+ dHcphIcoYwKKmeStz3sl2YGa746SXSxL0v9pSBT4dTkDFIF2jjhFGtHZAbTVTHknzaz6
+ 5aPg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:content-transfer-encoding
- :in-reply-to;
- bh=gquKGJ7sbyRgClU5gNYl2zs8V2N4mRiFMe/U4uutH9w=;
- b=lWTIJr03mBC2phrk1MDYQvfw9W3TMS1hYhU9JD5epzNiFHI+LU8WB0U8U2V8uFjfZZ
- pqKiSkAM53SgCjCkXAQb7t5DB+hsjNImyAx1or5RyGc6o9okUQ5qLe35fs4t8YoPtTLV
- jtKzwJ2FyXVU0iuh23wuw2vhqlmRZMfGHJwsBTqdep/QrtvLZwznvJwHnzZXhqAasb/D
- jr6+94kl9JE2MbHjkFd6biTXZjrxA9RTqIGQqy76IOSuSampvvcjgrQJO1vwkfSG1Mqi
- dIg4FKj9INCjmNuBlGQ+joevrQOM0e/a6X8DFknS7JXmRrIMDQ6tEgl0yixPuI9fe/tx
- 2ggg==
-X-Gm-Message-State: APjAAAUyWJY62/8WIYFNEo4O0y5r+ASuUKbrMjTqpJLh88qlgKo9/STT
- E8v3jwGSvgtEehEl0bvV9fNNB6JKJI5n7n7xnxq8VY74monwHC7Xrb2f51OW5ifmgvC8o4hNMzH
- OZRq69lTBFUeZfZY=
-X-Received: by 2002:ac8:3168:: with SMTP id h37mr2483827qtb.311.1572003250268; 
- Fri, 25 Oct 2019 04:34:10 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqznwABcxa2Cl+2n098sDnEbZ6mD2JC7hcU08YTBEp29sWMAtnu33rl0/rSaCRYO54wDeOi+7g==
-X-Received: by 2002:ac8:3168:: with SMTP id h37mr2483796qtb.311.1572003250011; 
- Fri, 25 Oct 2019 04:34:10 -0700 (PDT)
-Received: from redhat.com (bzq-79-176-10-77.red.bezeqint.net. [79.176.10.77])
- by smtp.gmail.com with ESMTPSA id
- c21sm1117710qtg.61.2019.10.25.04.34.06
+ h=x-gm-message-state:from:to:cc:subject:date:message-id;
+ bh=NIiOTnpLAsLsvEotBsCW7qgxVpyPSjsxlfZ4hcOEqI0=;
+ b=mJx46MqowIZsFkPdUIumfoXIsXyCk9swERsWkri1VFJPejnRdqJpD+KhKA/lR4B0so
+ kpHRXnRtRaFTSuXavsZ5OlLtXhEwGnsvS5+uVCMda4kMxSYa0KqS79Ole5+M5cBzIKKO
+ c5Epv+1gijASg+LVvZz5b1E01CpjRYC2lte+wBISn1+JTlncxX/676Zoro3L1ojy/gGL
+ V2WiIRqpUyeXsj0/ZMi/xYGyX7RZWpYrfDsSTpTkg73grMqZ2CsxcgtCchmZJBhIxnEw
+ i/TiRGgeUYBvp+F1i7xbthWtA2rCdTN+W/ar8YyCXuDYUPAWuM/7OW+/Msk+r6nQQr+5
+ 79Rw==
+X-Gm-Message-State: APjAAAVmB1hnlXW9eiv3F9Bx8GShjOznYHSZYhFOz+wPt+07johXjMak
+ Q5mhSg+6+o6sgbIN3vFAmmwSKJbmE88=
+X-Google-Smtp-Source: APXvYqySqa8t9Pvpz4U5w3S+Y9GLE7s77qBB/z3Wafzaj7F7u3rED7v+88zhNJGLuGMV+JIl48oBvg==
+X-Received: by 2002:ac8:72cf:: with SMTP id o15mr2447816qtp.27.1572003562973; 
+ Fri, 25 Oct 2019 04:39:22 -0700 (PDT)
+Received: from localhost.localdomain (rrcs-172-254-253-50.nyc.biz.rr.com.
+ [172.254.253.50])
+ by smtp.gmail.com with ESMTPSA id x38sm1473335qtc.64.2019.10.25.04.39.22
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 25 Oct 2019 04:34:09 -0700 (PDT)
-Date: Fri, 25 Oct 2019 07:34:03 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>
-Subject: Re: [PATCH v7 0/8] Packed virtqueue for virtio
-Message-ID: <20191025073257-mutt-send-email-mst@kernel.org>
-References: <20191025083527.30803-1-eperezma@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <20191025083527.30803-1-eperezma@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 66.187.233.73
+ Fri, 25 Oct 2019 04:39:22 -0700 (PDT)
+From: Richard Henderson <richard.henderson@linaro.org>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v2 00/12] linux-user sparc fixes
+Date: Fri, 25 Oct 2019 07:39:09 -0400
+Message-Id: <20191025113921.9412-1-richard.henderson@linaro.org>
+X-Mailer: git-send-email 2.17.1
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::82d
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,66 +86,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Laurent Vivier <lvivier@redhat.com>,
- qemu-block@nongnu.org, Amit Shah <amit@kernel.org>,
- Jason Wang <jasowang@redhat.com>, qemu-devel@nongnu.org,
- Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
- =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>,
- Fam Zheng <fam@euphon.net>, Jens Freimann <jfreimann@redhat.com>
+Cc: alex.bennee@linaro.org, laurent@vivier.eu
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, Oct 25, 2019 at 10:35:19AM +0200, Eugenio P=E9rez wrote:
-> Hi:
->=20
-> This is an updated version of packed virtqueue support based on Wei and=
- Jason's
-> V6, mainly solving the clang leak detector error CI gave.
+This is a v2 update of 
+  https://lists.gnu.org/archive/html/qemu-devel/2019-05/msg04240.html
+
+Some of the v1 patches have been merged, others reworked a bit.
+
+This fixes most of tests/tcg/multiuser/linux-user for sparc64,
+except for test_signal.  We're still missing an implementation
+of setup_rt_frame.
 
 
-Looks good, I will queue this up.
-
-It would be nice to add libqos based tests on top,
-based on Stefan's work.
+r~
 
 
-> Please review.
->=20
-> Changes from V6:
-> - Commit reorder: Squash bugfix and sepparate big changes into smaller =
-commits.
->=20
-> Changes from V5:
-> - Fix qemu's CI asan error.
-> - Move/copy rcu comments.
-> - Merge duplicated vdev->broken check between split and packet version.
->=20
-> Eugenio P=E9rez (2):
->   virtio: Free blk virqueues at unrealize()
->   virtio: Free rnd virqueue at unrealize()
->=20
-> Jason Wang (4):
->   virtio: basic packed virtqueue support
->   virtio: event suppression support for packed ring
->   vhost_net: enable packed ring support
->   virtio: add property to enable packed virtqueue
->=20
-> Wei Xu (2):
->   virtio: basic structure for packed ring
->   virtio: device/driver area size calculation refactor for split ring
->=20
->  hw/block/virtio-blk.c       |    7 +-
->  hw/char/virtio-serial-bus.c |    2 +-
->  hw/net/vhost_net.c          |    2 +
->  hw/scsi/virtio-scsi.c       |    3 +-
->  hw/virtio/virtio-rng.c      |    1 +
->  hw/virtio/virtio.c          | 1154 +++++++++++++++++++++++++++++++++++=
-+++-----
->  include/hw/virtio/virtio.h  |   14 +-
->  7 files changed, 1045 insertions(+), 138 deletions(-)
->=20
-> --=20
-> 2.16.5
+Richard Henderson (12):
+  scripts/qemu-binfmt-conf: Update for sparc64
+  tests/tcg/multiarch/linux-test: Fix error check for shmat
+  target/sparc: Define an enumeration for accessing env->regwptr
+  linux-user/sparc: Use WREG constants in sparc/target_cpu.h
+  linux-user/sparc: Begin using WREG constants in sparc/signal.c
+  linux-user/sparc: Use WREG_SP constant in sparc/signal.c
+  linux-user/sparc: Fix WREG usage in setup_frame
+  linux-user/sparc64: Fix target_signal_frame
+  linux-user: Rename cpu_clone_regs to cpu_clone_regs_child
+  linux-user: Introduce cpu_clone_regs_parent
+  linux-user/sparc: Fix cpu_clone_regs_*
+  linux-user/alpha: Set r20 secondary return value
+
+ linux-user/aarch64/target_cpu.h    |   7 +-
+ linux-user/alpha/target_cpu.h      |  16 ++++-
+ linux-user/arm/target_cpu.h        |   7 +-
+ linux-user/cris/target_cpu.h       |   7 +-
+ linux-user/hppa/target_cpu.h       |   7 +-
+ linux-user/i386/target_cpu.h       |   7 +-
+ linux-user/m68k/target_cpu.h       |   7 +-
+ linux-user/microblaze/target_cpu.h |   7 +-
+ linux-user/mips/target_cpu.h       |   7 +-
+ linux-user/nios2/target_cpu.h      |   7 +-
+ linux-user/openrisc/target_cpu.h   |   8 ++-
+ linux-user/ppc/target_cpu.h        |   7 +-
+ linux-user/riscv/target_cpu.h      |   7 +-
+ linux-user/s390x/target_cpu.h      |   7 +-
+ linux-user/sh4/target_cpu.h        |   7 +-
+ linux-user/sparc/target_cpu.h      |  64 ++++++++++++------
+ linux-user/tilegx/target_cpu.h     |   7 +-
+ linux-user/xtensa/target_cpu.h     |   8 ++-
+ target/sparc/cpu.h                 |  33 ++++++++++
+ linux-user/sparc/signal.c          | 100 ++++++++++-------------------
+ linux-user/syscall.c               |   6 +-
+ tests/tcg/multiarch/linux-test.c   |   3 +-
+ scripts/qemu-binfmt-conf.sh        |   8 ++-
+ 23 files changed, 238 insertions(+), 106 deletions(-)
+
+-- 
+2.17.1
+
 
