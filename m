@@ -6,74 +6,70 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 83DBCCA9EAF
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 02:32:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D4D78CA9EAF
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 02:57:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 54BE9206DD
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 02:32:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9622C21929
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 02:57:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MT+fGoom"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 54BE9206DD
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bBoQ3qJi"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9622C21929
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54610 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54808 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iNpOm-0005I1-8U
-	for qemu-devel@archiver.kernel.org; Thu, 24 Oct 2019 22:32:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39560)
+	id 1iNpnL-00045I-No
+	for qemu-devel@archiver.kernel.org; Thu, 24 Oct 2019 22:57:43 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43420)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <ehabkost@redhat.com>) id 1iNpIs-0002JD-Qo
- for qemu-devel@nongnu.org; Thu, 24 Oct 2019 22:26:15 -0400
+ (envelope-from <ehabkost@redhat.com>) id 1iNpmN-0002t5-Ff
+ for qemu-devel@nongnu.org; Thu, 24 Oct 2019 22:56:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <ehabkost@redhat.com>) id 1iNpIr-0007bV-If
- for qemu-devel@nongnu.org; Thu, 24 Oct 2019 22:26:14 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:31516
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <ehabkost@redhat.com>) id 1iNpmK-00029G-3L
+ for qemu-devel@nongnu.org; Thu, 24 Oct 2019 22:56:42 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:23074
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1iNpIr-0007bL-FA
- for qemu-devel@nongnu.org; Thu, 24 Oct 2019 22:26:13 -0400
+ (Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1iNpmJ-000293-VU
+ for qemu-devel@nongnu.org; Thu, 24 Oct 2019 22:56:40 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1571970372;
+ s=mimecast20190719; t=1571972198;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=pbB5R4thUE5Gt4DY003mthYNBru3RU5to81ayHIC/6M=;
- b=MT+fGoomE7YMgONFLfjCE1pnv7ZcWWltd9aOBLJBReDiUDDrxrifMagjeA4pU9A/hOi7eX
- 12/bQjgxY0Oda59KbabU8PsvbA19yKnVLlq2g4vBwf5eH8ZxTDGNGFliRQ3AebnExPl7xs
- j7F6g0Qo8BToKxmXwgQ32w+Uh4Bk2Q4=
+ content-transfer-encoding:content-transfer-encoding;
+ bh=73BawrUYc6aNHsvAvATVMrBAuwEni3+WEcPmsgQDF4M=;
+ b=bBoQ3qJiG8pcTKzV15CCvr37ZMQSnSNQul4wbuNk71agAsLev5fH7O+jx1DciNWGQ5qZVM
+ SK5mCvhMQfv8ONIYvoaXt7+0flPAtJ90QCRgKFc0pGobPfcgJz9AHSgOecmy9Y5uKxKJxh
+ lwibf4ITqp+shNrhwxvXkqDXIAkCqM0=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-166-A0qb6TAJNZ-04Y3SQS7j5A-1; Thu, 24 Oct 2019 22:26:09 -0400
+ us-mta-308-SXRKXMEqPWe4VfN3Mor4Uw-1; Thu, 24 Oct 2019 22:56:35 -0400
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
  [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6CB2B800D49;
- Fri, 25 Oct 2019 02:26:08 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5DB3E80183D;
+ Fri, 25 Oct 2019 02:56:34 +0000 (UTC)
 Received: from localhost (ovpn-116-62.gru2.redhat.com [10.97.116.62])
- by smtp.corp.redhat.com (Postfix) with ESMTP id F1DA660600;
- Fri, 25 Oct 2019 02:26:07 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id A2FB6608C1;
+ Fri, 25 Oct 2019 02:56:33 +0000 (UTC)
 From: Eduardo Habkost <ehabkost@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 6/7] i386: Don't use default_cpu_version() inside
- query-cpu-definitions
-Date: Thu, 24 Oct 2019 23:25:52 -0300
-Message-Id: <20191025022553.25298-7-ehabkost@redhat.com>
-In-Reply-To: <20191025022553.25298-1-ehabkost@redhat.com>
-References: <20191025022553.25298-1-ehabkost@redhat.com>
+Subject: [PATCH] i386: Use g_autofree in a few places
+Date: Thu, 24 Oct 2019 23:56:32 -0300
+Message-Id: <20191025025632.5928-1-ehabkost@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-MC-Unique: A0qb6TAJNZ-04Y3SQS7j5A-1
+X-MC-Unique: SXRKXMEqPWe4VfN3Mor4Uw-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=WINDOWS-1252
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.120
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -85,113 +81,180 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Markus Armbruster <armbru@redhat.com>, Igor Mammedov <imammedo@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Jiri Denemark <jdenemar@redhat.com>,
- Richard Henderson <rth@twiddle.net>
+Cc: Paolo Bonzini <pbonzini@redhat.com>,
+ "Daniel P. Berrange" <berrange@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-We will change query-cpu-definitions to have a new `machine`
-parameter.  Make the machine-specific parts of that code explicit
-instead of calling default_cpu_version(), so we can change it to
-use the new parameter later.
-
-As the code now has a dependency on MachineClass, wrap it inside
-a !CONFIG_USER_ONLY ifdef.  The function was never used by
-*-user, anyway.
-
-This patch shouldn't introduce any behavior change.  Results of
-query-cpu-definition will be exactly the same.
+Get rid of 12 explicit g_free() calls.
 
 Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 ---
- target/i386/cpu.c | 31 ++++++++++++++++++++++---------
- 1 file changed, 22 insertions(+), 9 deletions(-)
+ target/i386/cpu.c | 41 +++++++++++++----------------------------
+ 1 file changed, 13 insertions(+), 28 deletions(-)
 
 diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-index 5dbd379331..67d1eca4ed 100644
+index 0de8a22e1e..59b7aaf580 100644
 --- a/target/i386/cpu.c
 +++ b/target/i386/cpu.c
-@@ -3877,6 +3877,7 @@ static void x86_cpu_get_unavailable_features(Object *=
-obj, Visitor *v,
-     visit_type_strList(v, "unavailable-features", &result, errp);
+@@ -1671,11 +1671,8 @@ static char *x86_cpu_type_name(const char *model_nam=
+e)
+=20
+ static ObjectClass *x86_cpu_class_by_name(const char *cpu_model)
+ {
+-    ObjectClass *oc;
+-    char *typename =3D x86_cpu_type_name(cpu_model);
+-    oc =3D object_class_by_name(typename);
+-    g_free(typename);
+-    return oc;
++    g_autofree char *typename =3D x86_cpu_type_name(cpu_model);
++    return object_class_by_name(typename);
  }
 =20
-+#ifndef CONFIG_USER_ONLY
- /* Check for missing features that may prevent the CPU class from
-  * running using the current machine and accelerator.
-  */
-@@ -3914,6 +3915,7 @@ static void x86_cpu_class_check_missing_features(X86C=
-PUClass *xcc,
+ static char *x86_cpu_class_get_model_name(X86CPUClass *cc)
+@@ -3407,7 +3404,6 @@ static void mark_unavailable_features(X86CPU *cpu, Fe=
+atureWord w, uint64_t mask,
+     CPUX86State *env =3D &cpu->env;
+     FeatureWordInfo *f =3D &feature_word_info[w];
+     int i;
+-    char *feat_word_str;
 =20
-     object_unref(OBJECT(xc));
+     if (!cpu->force_features) {
+         env->features[w] &=3D ~mask;
+@@ -3420,13 +3416,12 @@ static void mark_unavailable_features(X86CPU *cpu, =
+FeatureWord w, uint64_t mask,
+=20
+     for (i =3D 0; i < 64; ++i) {
+         if ((1ULL << i) & mask) {
+-            feat_word_str =3D feature_word_description(f, i);
++            g_autofree char *feat_word_str =3D feature_word_description(f,=
+ i);
+             warn_report("%s: %s%s%s [bit %d]",
+                         verbose_prefix,
+                         feat_word_str,
+                         f->feat_names[i] ? "." : "",
+                         f->feat_names[i] ? f->feat_names[i] : "", i);
+-            g_free(feat_word_str);
+         }
+     }
  }
-+#endif
+@@ -3928,17 +3923,14 @@ static gint x86_cpu_list_compare(gconstpointer a, g=
+constpointer b)
+     ObjectClass *class_b =3D (ObjectClass *)b;
+     X86CPUClass *cc_a =3D X86_CPU_CLASS(class_a);
+     X86CPUClass *cc_b =3D X86_CPU_CLASS(class_b);
+-    char *name_a, *name_b;
+     int ret;
 =20
- /* Print all cpuid feature names in featureset
-  */
-@@ -4039,11 +4041,17 @@ void x86_cpu_list(void)
-     g_list_free(names);
+     if (cc_a->ordering !=3D cc_b->ordering) {
+         ret =3D cc_a->ordering - cc_b->ordering;
+     } else {
+-        name_a =3D x86_cpu_class_get_model_name(cc_a);
+-        name_b =3D x86_cpu_class_get_model_name(cc_b);
++        g_autofree char *name_a =3D x86_cpu_class_get_model_name(cc_a);
++        g_autofree char *name_b =3D x86_cpu_class_get_model_name(cc_b);
+         ret =3D strcmp(name_a, name_b);
+-        g_free(name_a);
+-        g_free(name_b);
+     }
+     return ret;
  }
-=20
-+#ifndef CONFIG_USER_ONLY
-+typedef struct X86CPUDefinitionArgs {
-+    CpuDefinitionInfoList *cpu_list;
-+    X86CPUVersion default_version;
-+} X86CPUDefinitionArgs;
-+
- static void x86_cpu_definition_entry(gpointer data, gpointer user_data)
+@@ -3976,9 +3968,9 @@ static void x86_cpu_list_entry(gpointer data, gpointe=
+r user_data)
  {
      ObjectClass *oc =3D data;
      X86CPUClass *cc =3D X86_CPU_CLASS(oc);
--    CpuDefinitionInfoList **cpu_list =3D user_data;
-+    X86CPUDefinitionArgs *args =3D user_data;
-     CpuDefinitionInfoList *entry;
-     CpuDefinitionInfo *info;
+-    char *name =3D x86_cpu_class_get_model_name(cc);
+-    char *desc =3D g_strdup(cc->model_description);
+-    char *alias_of =3D x86_cpu_class_get_alias_of(cc);
++    g_autofree char *name =3D x86_cpu_class_get_model_name(cc);
++    g_autofree char *desc =3D g_strdup(cc->model_description);
++    g_autofree char *alias_of =3D x86_cpu_class_get_alias_of(cc);
 =20
-@@ -4059,25 +4067,30 @@ static void x86_cpu_definition_entry(gpointer data,=
- gpointer user_data)
-      * Old machine types won't report aliases, so that alias translation
-      * doesn't break compatibility with previous QEMU versions.
-      */
--    if (default_cpu_version() !=3D CPU_VERSION_LEGACY) {
--        info->alias_of =3D x86_cpu_class_get_alias_of(cc, default_cpu_vers=
-ion());
-+    if (args->default_version !=3D CPU_VERSION_LEGACY) {
-+        info->alias_of =3D x86_cpu_class_get_alias_of(cc, args->default_ve=
-rsion);
-         info->has_alias_of =3D !!info->alias_of;
+     if (!desc && alias_of) {
+         if (cc->model && cc->model->version =3D=3D CPU_VERSION_AUTO) {
+@@ -3992,9 +3984,6 @@ static void x86_cpu_list_entry(gpointer data, gpointe=
+r user_data)
      }
 =20
-     entry =3D g_malloc0(sizeof(*entry));
-     entry->value =3D info;
--    entry->next =3D *cpu_list;
--    *cpu_list =3D entry;
-+    entry->next =3D args->cpu_list;
-+    args->cpu_list =3D entry;
+     qemu_printf("x86 %-20s  %-48s\n", name, desc);
+-    g_free(name);
+-    g_free(desc);
+-    g_free(alias_of);
  }
 =20
- CpuDefinitionInfoList *qmp_query_cpu_definitions(Error **errp)
+ /* list available CPU models and flags */
+@@ -4433,7 +4422,7 @@ static void x86_cpu_cpudef_class_init(ObjectClass *oc=
+, void *data)
+=20
+ static void x86_register_cpu_model_type(const char *name, X86CPUModel *mod=
+el)
  {
--    CpuDefinitionInfoList *cpu_list =3D NULL;
--    GSList *list =3D get_sorted_cpu_model_list();
--    g_slist_foreach(list, x86_cpu_definition_entry, &cpu_list);
-+    X86CPUDefinitionArgs args =3D { .cpu_list =3D NULL };
-+    GSList *list;
-+    MachineClass *mc =3D MACHINE_GET_CLASS(qdev_get_machine());
-+
-+    args.default_version =3D default_cpu_version_for_machine(mc);
-+    list =3D get_sorted_cpu_model_list();
-+    g_slist_foreach(list, x86_cpu_definition_entry, &args);
-     g_slist_free(list);
--    return cpu_list;
-+    return args.cpu_list;
- }
-+#endif
+-    char *typename =3D x86_cpu_type_name(name);
++    g_autofree char *typename =3D x86_cpu_type_name(name);
+     TypeInfo ti =3D {
+         .name =3D typename,
+         .parent =3D TYPE_X86_CPU,
+@@ -4442,14 +4431,12 @@ static void x86_register_cpu_model_type(const char =
+*name, X86CPUModel *model)
+     };
 =20
- static uint64_t x86_cpu_get_supported_feature_word(FeatureWord w,
-                                                    bool migratable_only)
+     type_register(&ti);
+-    g_free(typename);
+ }
+=20
+ static void x86_register_cpudef_types(X86CPUDefinition *def)
+ {
+     X86CPUModel *m;
+     const X86CPUVersionDefinition *vdef;
+-    char *name;
+=20
+     /* AMD aliases are handled at runtime based on CPUID vendor, so
+      * they shouldn't be set on the CPU model table.
+@@ -4469,11 +4456,11 @@ static void x86_register_cpudef_types(X86CPUDefinit=
+ion *def)
+=20
+     for (vdef =3D x86_cpu_def_get_versions(def); vdef->version; vdef++) {
+         X86CPUModel *m =3D g_new0(X86CPUModel, 1);
++        g_autofree char *name =3D
++            x86_cpu_versioned_model_name(def, vdef->version);
+         m->cpudef =3D def;
+         m->version =3D vdef->version;
+-        name =3D x86_cpu_versioned_model_name(def, vdef->version);
+         x86_register_cpu_model_type(name, m);
+-        g_free(name);
+=20
+         if (vdef->alias) {
+             X86CPUModel *am =3D g_new0(X86CPUModel, 1);
+@@ -5545,9 +5532,8 @@ static void x86_cpu_realizefn(DeviceState *dev, Error=
+ **errp)
+=20
+     if (xcc->host_cpuid_required) {
+         if (!accel_uses_host_cpuid()) {
+-            char *name =3D x86_cpu_class_get_model_name(xcc);
++            g_autofree char *name =3D x86_cpu_class_get_model_name(xcc);
+             error_setg(&local_err, "CPU model '%s' requires KVM", name);
+-            g_free(name);
+             goto out;
+         }
+=20
+@@ -5663,10 +5649,9 @@ static void x86_cpu_realizefn(DeviceState *dev, Erro=
+r **errp)
+     /* Cache information initialization */
+     if (!cpu->legacy_cache) {
+         if (!xcc->model || !xcc->model->cpudef->cache_info) {
+-            char *name =3D x86_cpu_class_get_model_name(xcc);
++            g_autofree char *name =3D x86_cpu_class_get_model_name(xcc);
+             error_setg(errp,
+                        "CPU model '%s' doesn't support legacy-cache=3Doff"=
+, name);
+-            g_free(name);
+             return;
+         }
+         env->cache_info_cpuid2 =3D env->cache_info_cpuid4 =3D env->cache_i=
+nfo_amd =3D
 --=20
 2.21.0
 
