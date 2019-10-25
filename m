@@ -2,85 +2,73 @@ Return-Path: <SRS0=bySr=YS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BBCEECA9EA0
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 21:04:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 28BC9CA9EA0
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 21:12:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 82C1621D7B
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 21:04:35 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="i3VQXrrT"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 82C1621D7B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id ED07B21D7B
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 21:12:08 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ED07B21D7B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36228 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36272 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iO6l6-0008AH-J0
-	for qemu-devel@archiver.kernel.org; Fri, 25 Oct 2019 17:04:32 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38529)
+	id 1iO6sS-0001zq-4T
+	for qemu-devel@archiver.kernel.org; Fri, 25 Oct 2019 17:12:08 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39469)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1iO6iB-0007Zi-93
- for qemu-devel@nongnu.org; Fri, 25 Oct 2019 17:01:32 -0400
+ (envelope-from <bounces@canonical.com>) id 1iO6rC-00008y-Nb
+ for qemu-devel@nongnu.org; Fri, 25 Oct 2019 17:10:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1iO6iA-00053L-4q
- for qemu-devel@nongnu.org; Fri, 25 Oct 2019 17:01:31 -0400
-Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:35724)
+ (envelope-from <bounces@canonical.com>) id 1iO6rB-0000Lj-6j
+ for qemu-devel@nongnu.org; Fri, 25 Oct 2019 17:10:50 -0400
+Received: from indium.canonical.com ([91.189.90.7]:50848)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1iO6i9-00051D-Vo
- for qemu-devel@nongnu.org; Fri, 25 Oct 2019 17:01:30 -0400
-Received: by mail-ot1-x344.google.com with SMTP id z6so2999707otb.2
- for <qemu-devel@nongnu.org>; Fri, 25 Oct 2019 14:01:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=uhknvv6JSmoL0jL8CNQDIF2omF8f33zN4a+jFkGoeAQ=;
- b=i3VQXrrTiV0E4Kv67Z21Gze9k91ETI7UjfrBnYuKH5WoxbelGjf8AUenVvwxaUo6FM
- k7bz5EhnGzpHz3MTbFLoJjpKOL2LxGyW/44Njibag0JXVsnUEDnbERlpRizQTU82NX8R
- dOmOQxQXsy3/FHTvWb9nubfq+yQU8iL8exDcR+mPbtLXEbidUj4VhVX30PH0oswvBgR5
- DG/MWigoXev22/QG+8DgCGXqPJy1PY1dgjZ6G4ZRI7vqdMr4I25pKMqz1heCqnXHJVEQ
- 3Vy6D2aRmk2Gfmw3dOIvv5B8UMkmqsrNoxsmsSjBZWW1/76iVlg5McD92I0hRcT+Ilom
- KiBw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=uhknvv6JSmoL0jL8CNQDIF2omF8f33zN4a+jFkGoeAQ=;
- b=FP1Aq9KfGExtuCKvqwviBCdFgHJ3FV4XkRPtQYfQZPpNiAiJmb+5Fdfcm+4Z3GTmvI
- 40mpEP4CF3Wra0wzi8Lg9NZfzCmS+cftcg2iVyPh4XM5yNmxgyzbe0xSadyOcPpIICU2
- UoHsgVgg5UXsCEtECj5HXrE5Jk2gS8Sef8s480dPEMsXqRftIvIQUgRPgJ7xlmzYj0j2
- ALDU4SWqROJiS9WckJ36B0V/XlzTrcQYfUCqOM/F1+d5+4ZVYjJa2uZB10O3NIUuswvN
- a87qeZdHP6eHQ86u36trzOhLLiGi4f4uysHl3xjuw/cB255KpMzYXO8tW60GhyZAvxbG
- 1wKQ==
-X-Gm-Message-State: APjAAAVT0xZxDWyGKKZOTydUuVDsrj0ieORmF+VjzvDesVN20iRUXray
- jnTyjRdl+gPNCyMc+eU9yT/ON9v4NVRPDkQmtJ+mrA==
-X-Google-Smtp-Source: APXvYqydRPLafcOnxdee74nt0QXp5EBHp/pdUmbXrkxuDrslIwHrrqvQB8E5H3yGabjpJUdbrJX5Z7k0CBCyXxby1Tc=
-X-Received: by 2002:a05:6830:ca:: with SMTP id
- x10mr4198414oto.221.1572037287563; 
- Fri, 25 Oct 2019 14:01:27 -0700 (PDT)
+ (Exim 4.71) (envelope-from <bounces@canonical.com>)
+ id 1iO6rB-0000LW-0Y
+ for qemu-devel@nongnu.org; Fri, 25 Oct 2019 17:10:49 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1iO6r9-0003jX-JB
+ for <qemu-devel@nongnu.org>; Fri, 25 Oct 2019 21:10:47 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 8B1022E80BA
+ for <qemu-devel@nongnu.org>; Fri, 25 Oct 2019 21:10:47 +0000 (UTC)
 MIME-Version: 1.0
-References: <20191023154505.30521-1-richard.henderson@linaro.org>
- <20191023154505.30521-5-richard.henderson@linaro.org>
- <CAFEAcA8unCxb-4E561fnOFd=LCXv1y7YSd9xUb2GAutjcYXeGg@mail.gmail.com>
- <2d65342e-ed48-1fe6-7e6c-97f51ac21a76@linaro.org>
-In-Reply-To: <2d65342e-ed48-1fe6-7e6c-97f51ac21a76@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 25 Oct 2019 22:01:15 +0100
-Message-ID: <CAFEAcA99ABj9LU4fox-7Zaz4NG-yKQ7cD21M9xv=AwtSSOr1mA@mail.gmail.com>
-Subject: Re: [PATCH v2 4/7] exec: Use const alias for TARGET_PAGE_BITS_VARY
-To: Richard Henderson <richard.henderson@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::344
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 25 Oct 2019 21:04:19 -0000
+From: Witold Baryluk <1849894@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: baryluk
+X-Launchpad-Bug-Reporter: Witold Baryluk (baryluk)
+X-Launchpad-Bug-Modifier: Witold Baryluk (baryluk)
+References: <157203451253.3372.9480827920211406597.malonedeb@gac.canonical.com>
+Message-Id: <157203745989.19302.3436601106988681108.malone@wampee.canonical.com>
+Subject: [Bug 1849894] Re: hw/scsi/scsi-disk.c line 2554 allocation overflow
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="469f241f4e73cc0bdffa4e30654052a2af068e06";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: 9015f741545ef79d8e56f527a12b8c71469f4447
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 91.189.90.7
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -89,33 +77,114 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
- QEMU Developers <qemu-devel@nongnu.org>
+Reply-To: Bug 1849894 <1849894@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, 25 Oct 2019 at 21:43, Richard Henderson
-<richard.henderson@linaro.org> wrote:
->
-> On 10/25/19 10:51 AM, Peter Maydell wrote:
-> >> + * We want to declare the "target_page" variable as const, which tells
-> >> + * the compiler that it can cache any value that it reads across calls.
-> >> + * This avoids multiple assertions and multiple reads within any one user.
-> >> + *
-> >> + * This works because we initialize the target_page data very early, in a
-> >> + * location far removed from the functions that require the final results.
-> >
-> > I have to say that this feels like a worryingly large amount
-> > of magic. Is this actually guaranteed to work by the compiler?
->
-> Yes.
+FYI. Adding if (len <=3D 0) return; in the scsi_disk_new_request_dump
+solved the compilation issue for me.
 
-I'm curious to know how the compiler engineers define
-"very early" and "far removed" -- in my experience they
-usually prefer to be more precise than that :-)
+So indeed gcc thinks len =3D=3D -1
 
-thanks
--- PMM
+I am pretty sure the build qemu is functional, as this path is only
+taken if the trace_event_get_state_backends(TRACE_SCSI_DISK_NEW_REQUEST)
+is true, which by default it is not.
+
+BTW. Also, aarch64-softmmu/qemu-system-aarch64 takes very long time to
+link compared to other targets, so I recommend using -flto=3D16 to
+increase parallelism, and reduce lto link time to about 4 minutes. (But
+64GB of memory recommended).
+
+I also tested with --disable-slirp configure flag. Still same issue.
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1849894
+
+Title:
+  hw/scsi/scsi-disk.c line 2554 allocation overflow
+
+Status in QEMU:
+  New
+
+Bug description:
+  When compiling qemu from git master (at commit
+  03bf012e523ecdf047ac56b2057950247256064d ) on Linux amd64, with gcc-9
+  9.2.1 , and using `-march=3Dnative -flto`, during linking of most target
+  binaries, compiler does detect an issue with allocation in
+  scsi_disk_new_request_dump and aborts compilation.
+
+  =
+
+  make[1]: Entering directory '/home/user/qemu/slirp'
+  make[1]: Nothing to be done for 'all'.
+  make[1]: Leaving directory '/home/user/qemu/slirp'
+  nm: stats64.o: no symbols
+    LINK    aarch64-softmmu/qemu-system-aarch64
+  In function =E2=80=98scsi_disk_new_request_dump=E2=80=99,
+      inlined from =E2=80=98scsi_new_request=E2=80=99 at hw/scsi/scsi-disk.=
+c:2580:9,
+      inlined from =E2=80=98scsi_new_request=E2=80=99 at hw/scsi/scsi-disk.=
+c:2564:21:
+  hw/scsi/scsi-disk.c:2554:19: error: argument 1 value =E2=80=9818446744073=
+709551612=E2=80=99 exceeds maximum object size 9223372036854775807 [-Werror=
+=3Dalloc-size-larger-than=3D]
+  hw/scsi/scsi-disk.c: In function =E2=80=98scsi_new_request=E2=80=99:
+  /usr/include/glib-2.0/glib/gmem.h:78:10: note: in a call to allocation fu=
+nction =E2=80=98g_malloc=E2=80=99 declared here
+     78 | gpointer g_malloc         (gsize  n_bytes) G_GNUC_MALLOC G_GNUC_A=
+LLOC_SIZE(1);
+        |          ^
+  lto1: all warnings being treated as errors
+  lto-wrapper: fatal error: c++ returned 1 exit status
+  compilation terminated.
+  /usr/bin/ld: error: lto-wrapper failed
+  collect2: error: ld returned 1 exit status
+
+
+  same happens for most other targets: alpha-softmmu/qemu-system-alpha
+  arm-softmmu/qemu-system-arm hppa-softmmu/qemu-system-hppa i386-softmmu
+  /qemu-system-i386 lm32-softmmu/qemu-system-lm32 mips-softmmu/qemu-
+  system-mips mips64-softmmu/qemu-system-mips64 mips64el-softmmu/qemu-
+  system-mips64el mipsel-softmmu/qemu-system-mipsel ppc-softmmu/qemu-
+  system-ppc ppc64-softmmu/qemu-system-ppc64 riscv32-softmmu/qemu-
+  system-riscv32 riscv64-softmmu/qemu-system-riscv64 s390x-softmmu/qemu-
+  system-s390x sh4-softmmu/qemu-system-sh4 sh4eb-softmmu/qemu-system-
+  sh4eb sparc-softmmu/qemu-system-sparc sparc64-softmmu/qemu-system-
+  sparc64 x86_64-softmmu/qemu-system-x86_64 xtensa-softmmu/qemu-system-
+  xtensa xtensaeb-softmmu/qemu-system-xtensaeb
+
+  Notice -softmmu being a common factor here.
+
+
+  The size of the allocation for the temporary buffer for dumping using
+  snprintf is determined based on the size of the buffer via call to
+  scsi_cdb_length. I believe the heavy inlining and constant propagation
+  makes scsi_cdb_length return -1, so len =3D -1. Then allocation size is
+  5*len + 1, or -4. Which overflows to 2^64 - 4 or so.
+
+  The case of len=3D=3D-1 from scsi_cdb_length happens if the (buf[0] >> 5)
+  is not 0, 1, 2, 4 or 5.
+
+  However, I can't find out how gcc figures out that buf[0] is not one
+  of these variables. To me looking at this function, compiler should
+  not know anything about buf[0].
+
+  I tried following the chain of calls back, including devirtualize
+  alloc_req, and I found scsi_device_alloc_req calling these alloc_req
+  callbacks, but it is itself called from scsi_req_new, which is called
+  in  get_scsi_requests , just after buf is filled from QEMUFile using
+  qemu_get_buffer, which ultimately goes even further into read paths,
+  which there might be many AFAIK.
+
+
+  =
+
+  glib2 version 2.62.1-1
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1849894/+subscriptions
 
