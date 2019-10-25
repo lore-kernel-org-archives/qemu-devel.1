@@ -2,84 +2,88 @@ Return-Path: <SRS0=bySr=YS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F605CA9EA0
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 17:27:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B3033CA9EA0
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 17:28:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DADCD21872
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 17:27:51 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=web.de header.i=@web.de header.b="H+xgh0u2"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DADCD21872
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=web.de
+	by mail.kernel.org (Postfix) with ESMTPS id 6F42721872
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 17:28:05 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6F42721872
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34908 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34914 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iO3NN-00072Q-MN
-	for qemu-devel@archiver.kernel.org; Fri, 25 Oct 2019 13:27:50 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43149)
+	id 1iO3Nc-0002ne-J9
+	for qemu-devel@archiver.kernel.org; Fri, 25 Oct 2019 13:28:04 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44708)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <lukasstraub2@web.de>) id 1iO33A-0000yD-1Q
- for qemu-devel@nongnu.org; Fri, 25 Oct 2019 13:06:57 -0400
+ (envelope-from <philmd@redhat.com>) id 1iO3DT-0007K1-2z
+ for qemu-devel@nongnu.org; Fri, 25 Oct 2019 13:17:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <lukasstraub2@web.de>) id 1iO338-0005gh-Si
- for qemu-devel@nongnu.org; Fri, 25 Oct 2019 13:06:55 -0400
-Received: from mout.web.de ([212.227.17.11]:50615)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <lukasstraub2@web.de>) id 1iO338-0005cC-JH
- for qemu-devel@nongnu.org; Fri, 25 Oct 2019 13:06:54 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=web.de;
- s=dbaedf251592; t=1572023193;
- bh=swJni6b4V8pRAk84eLDd3KajcXs6Pvhgess3/vHrBUY=;
- h=X-UI-Sender-Class:Date:From:To:Cc:Subject;
- b=H+xgh0u2H/wAFORxkZDCUcm61I2TThjkp0xTq0hQ3ZHil+GPYM5Z7dvfavJygDH7s
- 9RhJSEmQzibMOLCiZwduZ+sIR/C7/cYgynbazIT6e3dU+SgMh74UutPFOQvTLlUclZ
- LcVvfefjpvNaspR1wmSqN4fbe4WntdPHMkloBS8o=
-X-UI-Sender-Class: c548c8c5-30a9-4db5-a2e7-cb6cb037b8f9
-Received: from luklap ([88.130.61.116]) by smtp.web.de (mrweb101
- [213.165.67.124]) with ESMTPSA (Nemesis) id 0M9GVO-1iHxRe3huA-00CeS7; Fri, 25
- Oct 2019 19:06:33 +0200
-Date: Fri, 25 Oct 2019 19:06:31 +0200
-From: Lukas Straub <lukasstraub2@web.de>
-To: qemu-devel <qemu-devel@nongnu.org>
-Subject: [PATCH v7 0/4] colo: Add support for continuous replication
-Message-ID: <cover.1571925699.git.lukasstraub2@web.de>
+ (envelope-from <philmd@redhat.com>) id 1iO3DP-0000hN-SG
+ for qemu-devel@nongnu.org; Fri, 25 Oct 2019 13:17:33 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:19083)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iO3DN-0000Yo-Uw
+ for qemu-devel@nongnu.org; Fri, 25 Oct 2019 13:17:30 -0400
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 3AA7381F01
+ for <qemu-devel@nongnu.org>; Fri, 25 Oct 2019 17:17:27 +0000 (UTC)
+Received: by mail-wr1-f69.google.com with SMTP id x9so1585427wrq.5
+ for <qemu-devel@nongnu.org>; Fri, 25 Oct 2019 10:17:27 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=mykVdOgmocfFRC8diGfS9iMn+BvNzZ/8oBO7MssQwek=;
+ b=D5YfDtPKpKNZNd1CLfaWsQcYCLHret44WwcOYHNWRD6ZeTXt9exRUhhvr4uNlN44jx
+ +VuehtgFIH6KPrV7jVp/DYU20KvcLQx2YhlOIsaaaHkm824386jyAWj2k/rmFZ9Z+zDG
+ JDMKixQ41LAjG9cyUeilqdKzYTIOMZ+AJqMEI5yIwJBtxSp4tcQP97tPgmX1FCFqrqcj
+ OlX3gF7s8LyP5oAerY3TpJlauF4mcnwFjxrsJdTiYRhl7gTA6n4Ck6lVewVFSGav+aif
+ ltLIa7ZlHCnCZY8gukH5Tf0i7IdbMul7340Ul6rms3emugIomQwZOQb3tF1zF4fdM8gE
+ BSWg==
+X-Gm-Message-State: APjAAAWcRiBA5JudtUuWbANm4iljrLJC+hP84ncgtQEnu+S8VYG2xu8R
+ LNJmkU79iKHFvhwXgIAJ0D5yLSG28LMdzp2whgVxraVVVUty5f0HM7t4VpEaQDiBybPTjH+7RK+
+ p/YJ8cRGeL/7ztjg=
+X-Received: by 2002:a5d:6787:: with SMTP id v7mr4213231wru.392.1572023845933; 
+ Fri, 25 Oct 2019 10:17:25 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqx+Eo34IgtB7OcgkkAwGx3bhyxQj40aBzYlR8jQa0BxnmqB775qEg9J9e6hVm5Goinezvwosg==
+X-Received: by 2002:a5d:6787:: with SMTP id v7mr4213203wru.392.1572023845676; 
+ Fri, 25 Oct 2019 10:17:25 -0700 (PDT)
+Received: from [192.168.43.238] (51.red-95-127-156.staticip.rima-tde.net.
+ [95.127.156.51])
+ by smtp.gmail.com with ESMTPSA id w17sm3091171wra.34.2019.10.25.10.17.23
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Fri, 25 Oct 2019 10:17:25 -0700 (PDT)
+Subject: Re: [PATCH 00/11] tests/acceptance: Fix 64-bit MIPS target tests
+To: Aleksandar Markovic <aleksandar.m.mail@gmail.com>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+References: <20191019153437.9820-1-f4bug@amsat.org>
+ <CAL1e-=hMJmmRzD8iQdKji__RKPbGrV0fGNciz2bgLjkhmC2v6Q@mail.gmail.com>
+ <CAL1e-=g+bayWb81M1r0kxf-RU6H=WxKSvXT5TxyuDpVMbuG-KQ@mail.gmail.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <7fa0f06c-5076-3016-ac26-26b31e2b720d@redhat.com>
+Date: Fri, 25 Oct 2019 19:17:22 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:ir2Tllt7UTjwaNgP9n3MqVVRxUHpbyiSyEfbljDG87JfEd6Nofh
- Tjlvx2DLmMPuaPx+7iOLb5a6ofTGPr75PBxfZDu/4aAJ0o/jOnlTy+dOVLthi0tHFh6ulJu
- 680wDDTdfG9lz9jGJGTv+j+5peI/5VzgE81YnRBZyPWPo/PoB9j0FCXHSijUbbSB2gdMVsy
- O4G1l+nQx2NzRZ3+SRNSg==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:3T8tkHj2uDQ=:IRlnrMRIG0gd2nG3yiyPPO
- mOYUWavR2+EZNr9ltO6Q1bChbX48WqjPnvDec/3LJFEaOH+9H7GnmAnL96MiDEzb+oWLiOnfr
- 7pbokNo+hbfGsPwf23MudZtUm2sZfRI+O9ciIXxHQxZrB7PIhcNC3LGFO6eEZIHCLScEVI84k
- pywjJJZiGLRtWuFXgPWxUpN7CcV7UnKc3jXnhcKExyqN8Kypo+PwlKly/Sinf1mdqIEKHz2w4
- qIBfNMSvzzw0OBLajCc8DcVUYeNImHeH6myEPA5Lo4dxT1foYSUYQhU1je+qnKMGQqqGUXJZl
- oFvyoeLwrJxyHX4pcYRlPt0A/hiESqRgC4jErW+5EEgZGUmEBaOSMUzMN3HU2B5UW9Wj+/2X0
- IJcYVPfcr6rfB5jNSyJtiDMaMm79yUqGZi85weFiOLIXTh8vUOJ+qU1r7PaQ/1GwteNVPGDpW
- +ExbF8PV13qMK2ple1a1y32hKBM122JVe0dICDF3r/lFcFYVMU/agLHiQ8Y+wxHtZokWTneS3
- a9DcCy4CBKgnJ2kInXD3owjE8mnQy8KCZH6MBAkjw85JF15NeVUOKkmVu74P/JJ9BIFdzGxfb
- hForrd7intBgtb+LaOAr/5BA4fm2e7QZWsg3RETcIZIbtupOtCYaWbrAbAjver/7z1kBBaNHw
- OMFWQpSVQWZ4nQIfWIL5xZrnAPaN6hv1d9PY2PqsurkPVfctOVRxw5nX60czbZ0EDdWsl9gPS
- e8GtO64CZmmZNIdXRhJfbFwfpwWe7tm+wmK5BvN4j1kTisQJQDHeF2joZnzzoGhg3jMyXZ7FH
- jg+0rRo2044SPDfyGUqYtw7V6vhqyklEgERIcZGq56zQhCZziYEye12h7di4MCK76HkVGVHv7
- oG7yN99tl1Mkmgyo1P+5xvO8uWwffO0y+I7y9lYQGUhBLXiqJ7hUrdqtgz4rSf8OK1F4tF2Vr
- r1NcFg1+Sul67BdpX6HTdIKjummFagXrSXjrR7XDr+aclk8heY5nc1IJ7cL/rqUiHO0MC17nX
- Xl8gJJepP5ApaE3BOqE9XKq9yWU0r1l+nkpvH8/HNiinv7L8XlMUobFnGEk/fWZhLctST3SU9
- IsGlkZX1r1UN5LDfbWiM+lthVvwrzZpAn8O3A/lzKqjNnY9k+tuvA+FWAkoXnLgIM+2RWXEUn
- f9RH53wznl7YVWf2lkOProZWfD1zfervhY+8t4XrUIE3TceMbZh29lgh9sdvwAoRNyYOKBUBY
- OC2bZGFekHIR4a+kWpmM1qT8423llaeDYUm3KIVjCstD7URsW3sn0huCjN9U=
+In-Reply-To: <CAL1e-=g+bayWb81M1r0kxf-RU6H=WxKSvXT5TxyuDpVMbuG-KQ@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 212.227.17.11
+X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,81 +95,23 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block <qemu-block@nongnu.org>,
- Wen Congyang <wencongyang2@huawei.com>, Jason Wang <jasowang@redhat.com>,
- Max Reitz <mreitz@redhat.com>, Zhang Chen <chen.zhang@intel.com>,
- Xie Changlong <xiechanglong.d@gmail.com>
+Cc: Eduardo Habkost <ehabkost@redhat.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ Aleksandar Markovic <amarkovic@wavecomp.com>, Cleber Rosa <crosa@redhat.com>,
+ Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
+ Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hello Everyone,
-These Patches add support for continuous replication to colo. This means
-that after the Primary fails and the Secondary did a failover, the Seconda=
-ry
-can then become Primary and resume replication to a new Secondary.
+On 10/25/19 6:46 PM, Aleksandar Markovic wrote:
+> On Thu, Oct 24, 2019 at 11:23 AM Aleksandar Markovic
+> <aleksandar.m.mail@gmail.com> wrote:
+>>
+>> ping for Cleber and Eduardo
+>>
+> 
+> I applied patches 7, 8, 9, 10, and 11 to MIPS queue.
 
-Regards,
-Lukas Straub
-
-v7:
- - clarify meaning of ip's in documentation and note that active and hidde=
-n
-   images just need to be created once
- - reverted removal of bdrv_is_root_node(top_bs) in replication and adjust=
-ed
-   the top-id=3D parameter in documentation acordingly
-
-v6:
- - documented the position=3D and insert=3D options
- - renamed replication test
- - clarified documentation by using different ip's for primary and seconda=
-ry
- - added Reviewed-by tags
-
-v5:
- - change syntax for the position=3D parameter
- - fix spelling mistake
-
-v4:
- - fix checkpatch.pl warnings
-
-v3:
- - add test for replication changes
- - check if the filter to be inserted before/behind belongs to the same in=
-terface
- - fix the error message for the position=3D parameter
- - rename term "after" -> "behind" and variable "insert_before" -> "insert=
-_before_flag"
- - document the quorum node on the secondary side
- - simplify quorum parameters in documentation
- - remove trailing spaces in documentation
- - clarify the testing procedure in documentation
-
-v2:
- - fix email formating
- - fix checkpatch.pl warnings
- - fix patchew error
- - clearer commit messages
-
-
-Lukas Straub (4):
-  block/replication.c: Ignore requests after failover
-  tests/test-replication.c: Add test for for secondary node continuing
-    replication
-  net/filter.c: Add Options to insert filters anywhere in the filter
-    list
-  colo: Update Documentation for continuous replication
-
- block/replication.c        |  35 +++++-
- docs/COLO-FT.txt           | 224 +++++++++++++++++++++++++++----------
- docs/block-replication.txt |  28 +++--
- include/net/filter.h       |   2 +
- net/filter.c               |  92 ++++++++++++++-
- qemu-options.hx            |  31 ++++-
- tests/test-replication.c   |  52 +++++++++
- 7 files changed, 389 insertions(+), 75 deletions(-)
-
-=2D-
-2.20.1
+Thanks Aleksandar!
 
