@@ -2,70 +2,65 @@ Return-Path: <SRS0=bySr=YS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 803C2CA9EA0
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 10:48:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E4A08CA9EA0
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 10:50:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4EF7821D71
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 10:48:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id ADAD521929
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 10:50:03 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WGNZRh9V"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4EF7821D71
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NKGkg6ff"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ADAD521929
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58490 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58496 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iNx9C-0000Ti-3X
-	for qemu-devel@archiver.kernel.org; Fri, 25 Oct 2019 06:48:46 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37940)
+	id 1iNxAP-0004DL-1t
+	for qemu-devel@archiver.kernel.org; Fri, 25 Oct 2019 06:50:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38383)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1iNx2h-0005Of-12
- for qemu-devel@nongnu.org; Fri, 25 Oct 2019 06:42:04 -0400
+ (envelope-from <mreitz@redhat.com>) id 1iNx5h-0003JR-6B
+ for qemu-devel@nongnu.org; Fri, 25 Oct 2019 06:45:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1iNx2f-00024h-Nj
- for qemu-devel@nongnu.org; Fri, 25 Oct 2019 06:42:02 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:28766
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <mreitz@redhat.com>) id 1iNx5f-00049s-4l
+ for qemu-devel@nongnu.org; Fri, 25 Oct 2019 06:45:09 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:30575
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1iNx2f-00023j-Cq
- for qemu-devel@nongnu.org; Fri, 25 Oct 2019 06:42:01 -0400
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1iNx5e-00045b-Uo
+ for qemu-devel@nongnu.org; Fri, 25 Oct 2019 06:45:07 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1572000120;
+ s=mimecast20190719; t=1572000296;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=Tv0oDsYqQM7UGWklVCIXB4bksBGimUuWYVJLzzivkTQ=;
- b=WGNZRh9VCcmzMLiHic9YRjEclZKZ1kLQ/Q7Bv37sNp900aKJtLBPQ8bLxbdphxJTn1KUUg
- Vf/fEyHEfUXihxeaK6RYVbC9GJiNxTto3Us6OYZ29Nh8rkyco9eDGqca8P5/CSCZjUgXpW
- LCSQv65SZ7Uy/fcw1mVCrvuzKFrEt9g=
+ bh=OX//3DU9fPyNWji4g3JtIxvNOr21IPch+FwWKwMvTRE=;
+ b=NKGkg6ffMca6d18aTK5pQ97N2iWYLxyZIYvew054tSbIrkjL968BVFrdZi32MEXifW6hO8
+ rvtrbAclqGWtilggeoarJZFeTm2gaOW0u6hirPru5FYE6FRqh0MoK9UKa6zHafpHQd9yb9
+ Vhs9toL2TJDeocRMmI78Y7nwl7vXcQw=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-385-NrklIRQ-MJqtbfSG-lDGBw-1; Fri, 25 Oct 2019 06:41:56 -0400
-X-MC-Unique: NrklIRQ-MJqtbfSG-lDGBw-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ us-mta-108-u6o2ybtqNr-nASazb14M1Q-1; Fri, 25 Oct 2019 06:44:51 -0400
+X-MC-Unique: u6o2ybtqNr-nASazb14M1Q-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id ECD0C1005509;
- Fri, 25 Oct 2019 10:41:54 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7A7685EF;
+ Fri, 25 Oct 2019 10:44:50 +0000 (UTC)
 Received: from dresden.str.redhat.com (ovpn-117-205.ams2.redhat.com
  [10.36.117.205])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 3767B5D70E;
- Fri, 25 Oct 2019 10:41:50 +0000 (UTC)
-Subject: Re: [RFC 2/3] block/file-posix: Detect XFS with CONFIG_FALLOCATE
-To: Kevin Wolf <kwolf@redhat.com>
-References: <20191025095849.25283-1-mreitz@redhat.com>
- <20191025095849.25283-3-mreitz@redhat.com>
- <20191025101920.GB7275@localhost.localdomain>
- <f71d7cab-a1cf-c93c-0697-4b5f77105314@redhat.com>
- <20191025103554.GC7275@localhost.localdomain>
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id AE42F5DC1E;
+ Fri, 25 Oct 2019 10:44:47 +0000 (UTC)
+Subject: Re: [PATCH v2 0/2] qcow2: Fix image corruption bug in 4.1
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+References: <20191024142658.22306-1-kwolf@redhat.com>
 From: Max Reitz <mreitz@redhat.com>
 Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
  mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
@@ -91,20 +86,20 @@ Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
  /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
  bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
  R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <b2ee82c2-d30c-6953-ba9e-995435fb8ea7@redhat.com>
-Date: Fri, 25 Oct 2019 12:41:48 +0200
+Message-ID: <d8796036-2a02-681e-f3c2-996edf4f640e@redhat.com>
+Date: Fri, 25 Oct 2019 12:44:45 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.1.1
 MIME-Version: 1.0
-In-Reply-To: <20191025103554.GC7275@localhost.localdomain>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+In-Reply-To: <20191024142658.22306-1-kwolf@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 X-Mimecast-Spam-Score: 0
 Content-Type: multipart/signed; micalg=pgp-sha256;
  protocol="application/pgp-signature";
- boundary="ehumn547lcmkSFyVhLLZlbQpFJ2RHiWsr"
+ boundary="f5VUIRqjZm2gSQ7RTDLKGMUPzK3IQK1qc"
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.120
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -116,101 +111,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- Alberto Garcia <berto@igalia.com>, qemu-block@nongnu.org,
- qemu-devel@nongnu.org, Anton Nefedov <anton.nefedov@virtuozzo.com>,
- Stefan Hajnoczi <stefanha@redhat.com>
+Cc: psyhomb@gmail.com, michael@weiser.dinsnail.net, vsementsov@virtuozzo.com,
+ den@virtuozzo.com, qemu-stable@nongnu.org, dgilbert@redhat.com,
+ qemu-devel@nongnu.org, lersek@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---ehumn547lcmkSFyVhLLZlbQpFJ2RHiWsr
-Content-Type: multipart/mixed; boundary="oKZFdnWMxtZTb6rc9mc7n45cJEr7wQTZ1"
+--f5VUIRqjZm2gSQ7RTDLKGMUPzK3IQK1qc
+Content-Type: multipart/mixed; boundary="8GcfCYtoxGopjT3m4I6raYEdy9ABN813a"
 
---oKZFdnWMxtZTb6rc9mc7n45cJEr7wQTZ1
-Content-Type: text/plain; charset=WINDOWS-1252
+--8GcfCYtoxGopjT3m4I6raYEdy9ABN813a
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
-On 25.10.19 12:35, Kevin Wolf wrote:
-> Am 25.10.2019 um 12:22 hat Max Reitz geschrieben:
->> On 25.10.19 12:19, Kevin Wolf wrote:
->>> Am 25.10.2019 um 11:58 hat Max Reitz geschrieben:
->>>> We will need this for the next patch.
->>>>
->>>> Signed-off-by: Max Reitz <mreitz@redhat.com>
->>>> ---
->>>>  block/file-posix.c | 4 ++--
->>>>  1 file changed, 2 insertions(+), 2 deletions(-)
->>>>
->>>> diff --git a/block/file-posix.c b/block/file-posix.c
->>>> index 695fcf740d..5cd54c8bff 100644
->>>> --- a/block/file-posix.c
->>>> +++ b/block/file-posix.c
->>>> @@ -149,7 +149,7 @@ typedef struct BDRVRawState {
->>>>      int perm_change_flags;
->>>>      BDRVReopenState *reopen_state;
->>>> =20
->>>> -#ifdef CONFIG_XFS
->>>> +#if defined(CONFIG_XFS) || defined(CONFIG_FALLOCATE)
->>>>      bool is_xfs:1;
->>>>  #endif
->>>>      bool has_discard:1;
->>>> @@ -667,7 +667,7 @@ static int raw_open_common(BlockDriverState *bs, Q=
-Dict *options,
->>>>      }
->>>>  #endif
->>>> =20
->>>> -#ifdef CONFIG_XFS
->>>> +#if defined(CONFIG_XFS) || defined(CONFIG_FALLOCATE)
->>>>      if (platform_test_xfs_fd(s->fd)) {
->>>
->>> platform_test_xfs_fd() is defined in a header file from xfsprogs. I
->>> don't think you can call that without CONFIG_XFS, it would break the
->>> build.
->>
->> Aw.
->>
->> OK.  Should we then just assume is_xfs to be true (for the next patch)
->> with !defined(CONFIG_XFS) && defined(CONFIG_FALLOCATE)?
+On 24.10.19 16:26, Kevin Wolf wrote:
+> This series fixes an image corruption bug that was introduced in commit
+> 69f47505e ('block: avoid recursive block_status call if possible'),
+> first contained in the QEMU 4.1.0 release.
 >=20
-> It's a small inline function that basically just calls statfs() and then
-> checks f_type.
+> This bug was reported by Michael Weiser on Launchpad:
+> https://bugs.launchpad.net/qemu/+bug/1846427
+>=20
+> v2:
+>=20
+> - Dropped the assertion in qcow2_cache_do_get() for now. Making sure
+>   that it actually holds true for all callers requires more work and
+>   getting the corruption fix in quickly is important.
+>=20
+> - Use atomic_read() and add comment to qemu_co_mutex_assert_locked()
+>   implementation [Denis]
+>=20
+> Kevin Wolf (2):
+>   coroutine: Add qemu_co_mutex_assert_locked()
+>   qcow2: Fix corruption bug in qcow2_detect_metadata_preallocation()
+>=20
+>  include/qemu/coroutine.h | 15 +++++++++++++++
+>  block/qcow2-refcount.c   |  2 ++
+>  block/qcow2.c            |  3 ++-
+>  3 files changed, 19 insertions(+), 1 deletion(-)
 
-Yes, this is where my error came from.  I asked cscope, which happily
-referred me to the inline implementation and so I didn=92t bother looking
-at the filename and just assumed it=92d be some code that belongs to qemu.
-
-> I think we can have a small function to implement this in the file-posix
-> code. Don't copy it from the header because of licensing (LGPL, while
-> file-posix is MIT); refer to the statfs() manpage instead and write it
-> yourself.
-
-OK.
-
-Max
+Reviewed-by: Max Reitz <mreitz@redhat.com>
 
 
---oKZFdnWMxtZTb6rc9mc7n45cJEr7wQTZ1--
+--8GcfCYtoxGopjT3m4I6raYEdy9ABN813a--
 
---ehumn547lcmkSFyVhLLZlbQpFJ2RHiWsr
+--f5VUIRqjZm2gSQ7RTDLKGMUPzK3IQK1qc
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl2y0WwACgkQ9AfbAGHV
-z0AHjwf/VGODzTn7tHfxK25F7b4nZfHrkQf1ym6Frzl4Nwc9G4+1T8xCOduFvHIY
-W38WMwC8L8xy3WDTfMFqUq2axRGrST8XIBwpU4xEHwkUl5cxMFswrMvwQPWXUvVK
-5nfKIZLuvOBLDtM438w5aEL2TN4/X7zsyEQATME5F6ownPErGgJU3TAalkkLWPgO
-SqbRJGUZhWAWo8euqxPqiBZztcOB6Y0noU+AD5Uk5fajSj2vNatl4Pn0RxYpGtdn
-zB0gJP3+bXuiwci7BZrhRcvQbjDO1CsxFgUirO1ZvXSdtqh0whPG0m5H/5y9quWD
-aHl8BEU9SMI3KSMJgICXkAYfkXbDKQ==
-=+pLd
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl2y0h0ACgkQ9AfbAGHV
+z0AuoAgAnMRBqW1o3NJuffQCbaTbKYcwg72oScZsgrIoaPYY9QaP66+h7mM96Mnb
+9R/Tm5p3UgmjORgNlD5fhdflel5LBH3rvou3DnaCmVXlptObI8d7em2emouwq1YJ
+tltAXFAUY88iuRh7Qj8hPMRDjtqYXtIRTkmkcmW/XPssZzSwYMoS1x9kMflrza/3
+0fq4xqp3bBcCxGg1WKuxhLUShseKBNLAg/yZhiqyHD/8ulXD8ZemXjZWjvB4Epy9
+wjfWveofUK8YF5Jf4Sl1Cicqy6XORdwCXAfctsXJneadqS7BQ+k04jO4ePHemiUP
+20WvH+SGKiioYVNpZV0ApEjK2U2Vhw==
+=YWa/
 -----END PGP SIGNATURE-----
 
---ehumn547lcmkSFyVhLLZlbQpFJ2RHiWsr--
+--f5VUIRqjZm2gSQ7RTDLKGMUPzK3IQK1qc--
 
 
