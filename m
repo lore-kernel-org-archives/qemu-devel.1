@@ -2,86 +2,79 @@ Return-Path: <SRS0=bySr=YS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9EB9ECA9EBC
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 13:55:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 18BB0CA9EBD
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 13:57:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 78254222BD
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 13:55:44 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 78254222BD
+	by mail.kernel.org (Postfix) with ESMTPS id D88C2222CD
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 13:57:51 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Eez6JMfY"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D88C2222CD
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60286 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60334 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iO046-0005Bj-MB
-	for qemu-devel@archiver.kernel.org; Fri, 25 Oct 2019 09:55:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36942)
+	id 1iO06A-0000yf-Lx
+	for qemu-devel@archiver.kernel.org; Fri, 25 Oct 2019 09:57:50 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36869)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <sgarzare@redhat.com>) id 1iNzvZ-0006he-Am
- for qemu-devel@nongnu.org; Fri, 25 Oct 2019 09:46:54 -0400
+ (envelope-from <kwolf@redhat.com>) id 1iNzvJ-0005so-DG
+ for qemu-devel@nongnu.org; Fri, 25 Oct 2019 09:46:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <sgarzare@redhat.com>) id 1iNzvX-0000QD-NF
- for qemu-devel@nongnu.org; Fri, 25 Oct 2019 09:46:53 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:55856)
+ (envelope-from <kwolf@redhat.com>) id 1iNzvI-0000Gm-79
+ for qemu-devel@nongnu.org; Fri, 25 Oct 2019 09:46:37 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:35907
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <sgarzare@redhat.com>) id 1iNzvX-0000Pp-DA
- for qemu-devel@nongnu.org; Fri, 25 Oct 2019 09:46:51 -0400
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72])
- (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+ (Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1iNzvI-00005s-3S
+ for qemu-devel@nongnu.org; Fri, 25 Oct 2019 09:46:36 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1572011185;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=j8me1QXcEFkB4bLdIZ9pA+yTAk+SPcjKqs5vhVTIibU=;
+ b=Eez6JMfYOmmjIGwgAPbhAtazXAYl3ns83F/d3W7qMXDTHE4PT+SC7YI91ZmxtApryFwWaq
+ H520ubwdWGINT7CwRLCPaex9tT96Hfo+OJpcrogc+/9id/ERYgfVRojWtaus/QXUu6P7DK
+ nINGhiOdCQsNv6cCFBhCKfru+tfGz4M=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-104-4vHAmZznO5KnaDXYaKLJTg-1; Fri, 25 Oct 2019 09:46:19 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 5C35985543
- for <qemu-devel@nongnu.org>; Fri, 25 Oct 2019 13:46:50 +0000 (UTC)
-Received: by mail-wr1-f72.google.com with SMTP id x9so1170011wrq.5
- for <qemu-devel@nongnu.org>; Fri, 25 Oct 2019 06:46:50 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:content-transfer-encoding
- :in-reply-to:user-agent;
- bh=qWNR5mr8dRsrMOIhGWml5Gg5BK4sQFEPJ2Rmwcx1KsM=;
- b=pGmZzuB20mqK+vtoJ3/hcz44xfBgcgVOnRUGR7v/hiTkY+gmKxCmv5lQzEa77zhlxi
- W4YS0Qv9XH1s+GOzOamxCMiCMZdIlUZzwa9T6DrKUZlF9xuHahNUXUmqeXzebxzCMd9B
- Ss1AacAsRi8q9k+8TPzbBb7C4/QXh6myoxCV1o0F0QHr/MWT2ArBIgUKAJ4oezTx2qaJ
- 2pOyZNAhofPGP1F2wKJZCywmE06bfQCRmcHSO8Z+jX4JG26EQMNQV84I7jEM9hV0KIqz
- 1X20L5DkpkyDcte+/HAaQsEx+zFc8vrDzRMitCg9vpOWDRUhyZ/v/RlpwXk0cQq2kl6H
- hnzw==
-X-Gm-Message-State: APjAAAUiJds2I11u1IQZK8Z4m8zXHKm3yqa62MMOtzOe4YzCexGhUdoW
- 5qPcQg8xWWvt4FjA/hEtoYdUp3u4h/4uevFQdxKNgLkrgAKbgyk0KkhNZ4BBAT/ygItXeFTfbUR
- bOgMWM1R0KjvAJEQ=
-X-Received: by 2002:a1c:4489:: with SMTP id r131mr3476191wma.132.1572011209074; 
- Fri, 25 Oct 2019 06:46:49 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqxCJVDDC++SsF2QTxeRduS2fhlFcH5AVIxzVuCNktHWDMhUrRBtCDNHj1mjK+jFt/M42uhNIg==
-X-Received: by 2002:a1c:4489:: with SMTP id r131mr3476158wma.132.1572011208747; 
- Fri, 25 Oct 2019 06:46:48 -0700 (PDT)
-Received: from steredhat (host174-200-dynamic.52-79-r.retail.telecomitalia.it.
- [79.52.200.174])
- by smtp.gmail.com with ESMTPSA id v20sm1859388wml.26.2019.10.25.06.46.47
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 25 Oct 2019 06:46:48 -0700 (PDT)
-Date: Fri, 25 Oct 2019 15:46:46 +0200
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Subject: Re: [PATCH 2/4] tests: benchmark crypto with fixed data size, not
- time period
-Message-ID: <20191025134646.tqtf4qgxdzw3tjov@steredhat>
-References: <20191017145654.11371-1-berrange@redhat.com>
- <20191017145654.11371-3-berrange@redhat.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DAA6D47B;
+ Fri, 25 Oct 2019 13:46:18 +0000 (UTC)
+Received: from localhost.localdomain.com (ovpn-117-223.ams2.redhat.com
+ [10.36.117.223])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id F08CB5D70E;
+ Fri, 25 Oct 2019 13:46:15 +0000 (UTC)
+From: Kevin Wolf <kwolf@redhat.com>
+To: qemu-block@nongnu.org
+Subject: [PULL 1/7] qapi: add support for blkreplay driver
+Date: Fri, 25 Oct 2019 15:46:05 +0200
+Message-Id: <20191025134611.25920-2-kwolf@redhat.com>
+In-Reply-To: <20191025134611.25920-1-kwolf@redhat.com>
+References: <20191025134611.25920-1-kwolf@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <20191017145654.11371-3-berrange@redhat.com>
-User-Agent: NeoMutt/20180716
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-MC-Unique: 4vHAmZznO5KnaDXYaKLJTg-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 209.132.183.28
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -93,170 +86,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, peter.maydell@linaro.org, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Oct 17, 2019 at 03:56:52PM +0100, Daniel P. Berrang=E9 wrote:
-> Currently the crypto benchmarks are processing data in varying chunk
-> sizes, over a fixed time period. This turns out to be a terrible idea
-> because with small chunk sizes the overhead of checking the elapsed
-> time on each loop iteration masks the true performance.
->=20
-> Benchmarking over a fixed data size avoids the loop running any system
-> calls which can interfere with the performance measurements.
->=20
-> Before this change
->=20
-> Enc chunk 512 bytes 2283.47 MB/sec Dec chunk 512 bytes 2236.23 MB/sec O=
-K
-> Enc chunk 4096 bytes 2744.97 MB/sec Dec chunk 4096 bytes 2614.71 MB/sec=
- OK
-> Enc chunk 16384 bytes 2777.53 MB/sec Dec chunk 16384 bytes 2678.44 MB/s=
-ec OK
-> Enc chunk 65536 bytes 2809.34 MB/sec Dec chunk 65536 bytes 2699.47 MB/s=
-ec OK
->=20
-> After this change
->=20
-> Enc chunk 512 bytes 2058.22 MB/sec Dec chunk 512 bytes 2030.11 MB/sec O=
-K
-> Enc chunk 4096 bytes 2699.27 MB/sec Dec chunk 4096 bytes 2573.78 MB/sec=
- OK
-> Enc chunk 16384 bytes 2748.52 MB/sec Dec chunk 16384 bytes 2653.76 MB/s=
-ec OK
-> Enc chunk 65536 bytes 2814.08 MB/sec Dec chunk 65536 bytes 2712.74 MB/s=
-ec OK
->=20
-> The actual crypto performance hasn't changed, which shows how
-> significant the mis-measurement has been for small data sizes.
->=20
-> Signed-off-by: Daniel P. Berrang=E9 <berrange@redhat.com>
-> ---
->  tests/benchmark-crypto-cipher.c | 26 ++++++++++++++------------
->  tests/benchmark-crypto-hash.c   | 17 +++++++++--------
->  2 files changed, 23 insertions(+), 20 deletions(-)
->=20
-> diff --git a/tests/benchmark-crypto-cipher.c b/tests/benchmark-crypto-c=
-ipher.c
-> index 3ca31a2779..d8db5504d4 100644
-> --- a/tests/benchmark-crypto-cipher.c
-> +++ b/tests/benchmark-crypto-cipher.c
-> @@ -21,11 +21,12 @@ static void test_cipher_speed(size_t chunk_size,
->  {
->      QCryptoCipher *cipher;
->      Error *err =3D NULL;
-> -    double total =3D 0.0;
->      uint8_t *key =3D NULL, *iv =3D NULL;
->      uint8_t *plaintext =3D NULL, *ciphertext =3D NULL;
->      size_t nkey;
->      size_t niv;
-> +    size_t total =3D 2 * GiB;
-> +    size_t remain;
-> =20
->      if (!qcrypto_cipher_supports(alg, mode)) {
->          return;
-> @@ -58,33 +59,34 @@ static void test_cipher_speed(size_t chunk_size,
->                                        &err) =3D=3D 0);
-> =20
->      g_test_timer_start();
-> -    do {
-> +    remain =3D total;
-> +    while (remain) {
->          g_assert(qcrypto_cipher_encrypt(cipher,
->                                          plaintext,
->                                          ciphertext,
->                                          chunk_size,
->                                          &err) =3D=3D 0);
-> -        total +=3D chunk_size;
-> -    } while (g_test_timer_elapsed() < 1.0);
-> +        remain -=3D chunk_size;
-> +    }
-> +    g_test_timer_elapsed();
-> =20
-> -    total /=3D MiB;
->      g_print("Enc chunk %zu bytes ", chunk_size);
-> -    g_print("%.2f MB/sec ", total / g_test_timer_last());
-> +    g_print("%.2f MB/sec ", (double)total / MiB / g_test_timer_last())=
-;
-> =20
-> -    total =3D 0.0;
->      g_test_timer_start();
-> -    do {
-> +    remain =3D total;
-> +    while (remain) {
->          g_assert(qcrypto_cipher_decrypt(cipher,
->                                          plaintext,
->                                          ciphertext,
->                                          chunk_size,
->                                          &err) =3D=3D 0);
-> -        total +=3D chunk_size;
-> -    } while (g_test_timer_elapsed() < 1.0);
-> +        remain -=3D chunk_size;
+From: Pavel Dovgalyuk <pavel.dovgaluk@gmail.com>
 
-Are we sure that total is a multiple of chunk_size?
-Maybe I would have increased 'done' and checked (done <=3D total),
-but maybe it doesn't matter since I think that chunk_size will always
-be a power of two.
+This patch adds support for blkreplay driver to the blockdev options.
+Now blkreplay can be used with -blockdev command line option
+in the following format:
+-blockdev driver=3Dblkreplay,image=3Dfile-node-name,node-name=3Dreplay-node=
+-name
 
-> +    }
-> +    g_test_timer_elapsed();
-> =20
-> -    total /=3D MiB;
->      g_print("Dec chunk %zu bytes ", chunk_size);
-> -    g_print("%.2f MB/sec ", total / g_test_timer_last());
-> +    g_print("%.2f MB/sec ", (double)total / MiB / g_test_timer_last())=
-;
-> =20
->      qcrypto_cipher_free(cipher);
->      g_free(plaintext);
-> diff --git a/tests/benchmark-crypto-hash.c b/tests/benchmark-crypto-has=
-h.c
-> index 9b6f7a9155..67b7067223 100644
-> --- a/tests/benchmark-crypto-hash.c
-> +++ b/tests/benchmark-crypto-hash.c
-> @@ -20,7 +20,8 @@ static void test_hash_speed(const void *opaque)
->      size_t chunk_size =3D (size_t)opaque;
->      uint8_t *in =3D NULL, *out =3D NULL;
->      size_t out_len =3D 0;
-> -    double total =3D 0.0;
-> +    size_t total =3D 2 * GiB;
-> +    size_t remain;
->      struct iovec iov;
->      int ret;
-> =20
-> @@ -31,20 +32,20 @@ static void test_hash_speed(const void *opaque)
->      iov.iov_len =3D chunk_size;
-> =20
->      g_test_timer_start();
-> -    do {
-> +    remain =3D total;
-> +    while (remain) {
->          ret =3D qcrypto_hash_bytesv(QCRYPTO_HASH_ALG_SHA256,
->                                    &iov, 1, &out, &out_len,
->                                    NULL);
->          g_assert(ret =3D=3D 0);
-> =20
-> -        total +=3D chunk_size;
-> -    } while (g_test_timer_elapsed() < 5.0);
-> +        remain -=3D chunk_size;
-> +    }
-> +    g_test_timer_elapsed();
-> =20
-> -    total /=3D MiB;
->      g_print("sha256: ");
-> -    g_print("Testing chunk_size %zu bytes ", chunk_size);
-> -    g_print("done: %.2f MB in %.2f secs: ", total, g_test_timer_last()=
-);
-> -    g_print("%.2f MB/sec\n", total / g_test_timer_last());
-> +    g_print("Hash %zu GB chunk size %zu bytes ", total / GiB, chunk_si=
-ze);
-> +    g_print("%.2f MB/sec ", (double)total / MiB / g_test_timer_last())=
-;
-> =20
->      g_free(out);
->      g_free(in);
+This option makes possible implementation of the better command
+line support for record/replay invocations.
 
-Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
+Signed-off-by: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
+Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+---
+ qapi/block-core.json | 18 ++++++++++++++++--
+ 1 file changed, 16 insertions(+), 2 deletions(-)
+
+diff --git a/qapi/block-core.json b/qapi/block-core.json
+index b274aef713..aa97ee2641 100644
+--- a/qapi/block-core.json
++++ b/qapi/block-core.json
+@@ -2883,12 +2883,13 @@
+ # @nvme: Since 2.12
+ # @copy-on-read: Since 3.0
+ # @blklogwrites: Since 3.0
++# @blkreplay: Since 4.2
+ #
+ # Since: 2.9
+ ##
+ { 'enum': 'BlockdevDriver',
+-  'data': [ 'blkdebug', 'blklogwrites', 'blkverify', 'bochs', 'cloop',
+-            'copy-on-read', 'dmg', 'file', 'ftp', 'ftps', 'gluster',
++  'data': [ 'blkdebug', 'blklogwrites', 'blkreplay', 'blkverify', 'bochs',
++            'cloop', 'copy-on-read', 'dmg', 'file', 'ftp', 'ftps', 'gluste=
+r',
+             'host_cdrom', 'host_device', 'http', 'https', 'iscsi', 'luks',
+             'nbd', 'nfs', 'null-aio', 'null-co', 'nvme', 'parallels', 'qco=
+w',
+             'qcow2', 'qed', 'quorum', 'raw', 'rbd',
+@@ -3501,6 +3502,18 @@
+   'data': { 'test': 'BlockdevRef',
+             'raw': 'BlockdevRef' } }
+=20
++##
++# @BlockdevOptionsBlkreplay:
++#
++# Driver specific block device options for blkreplay.
++#
++# @image:     disk image which should be controlled with blkreplay
++#
++# Since: 4.2
++##
++{ 'struct': 'BlockdevOptionsBlkreplay',
++  'data': { 'image': 'BlockdevRef' } }
++
+ ##
+ # @QuorumReadPattern:
+ #
+@@ -4028,6 +4041,7 @@
+       'blkdebug':   'BlockdevOptionsBlkdebug',
+       'blklogwrites':'BlockdevOptionsBlklogwrites',
+       'blkverify':  'BlockdevOptionsBlkverify',
++      'blkreplay':  'BlockdevOptionsBlkreplay',
+       'bochs':      'BlockdevOptionsGenericFormat',
+       'cloop':      'BlockdevOptionsGenericFormat',
+       'copy-on-read':'BlockdevOptionsGenericFormat',
+--=20
+2.20.1
+
 
