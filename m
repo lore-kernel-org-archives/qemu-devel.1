@@ -6,68 +6,68 @@ X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 701C1CA9EA0
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 09:00:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E3527CA9EA0
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 09:03:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 45C5821D7B
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 09:00:58 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 45C5821D7B
+	by mail.kernel.org (Postfix) with ESMTPS id B9C6E21929
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 09:03:56 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B9C6E21929
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57834 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57864 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iNvSr-0007hl-0u
-	for qemu-devel@archiver.kernel.org; Fri, 25 Oct 2019 05:00:57 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50624)
+	id 1iNvVj-00005O-7q
+	for qemu-devel@archiver.kernel.org; Fri, 25 Oct 2019 05:03:55 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50648)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <laurent@vivier.eu>) id 1iNv5V-0001dU-HG
+ (envelope-from <laurent@vivier.eu>) id 1iNv5W-0001ec-7D
  for qemu-devel@nongnu.org; Fri, 25 Oct 2019 04:36:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <laurent@vivier.eu>) id 1iNv5T-0008H7-To
- for qemu-devel@nongnu.org; Fri, 25 Oct 2019 04:36:49 -0400
-Received: from mout.kundenserver.de ([212.227.126.134]:60005)
+ (envelope-from <laurent@vivier.eu>) id 1iNv5V-0008Il-09
+ for qemu-devel@nongnu.org; Fri, 25 Oct 2019 04:36:50 -0400
+Received: from mout.kundenserver.de ([212.227.126.187]:41995)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <laurent@vivier.eu>)
- id 1iNv5N-0008BJ-5y; Fri, 25 Oct 2019 04:36:41 -0400
+ id 1iNv5P-0008CZ-KG; Fri, 25 Oct 2019 04:36:43 -0400
 Received: from localhost.localdomain ([78.238.229.36]) by
  mrelayeu.kundenserver.de (mreue010 [212.227.15.167]) with ESMTPSA (Nemesis)
- id 1MEVFi-1iCKDd2bFK-00G2Qg; Fri, 25 Oct 2019 10:35:51 +0200
+ id 1Mn2Jj-1hgZlK1kvf-00k8uZ; Fri, 25 Oct 2019 10:35:49 +0200
 From: Laurent Vivier <laurent@vivier.eu>
 To: qemu-devel@nongnu.org
-Subject: [PULL 14/19] hw: Move Xilinx ZynqMP RTC from hw/timer/ to hw/rtc/
+Subject: [PULL 13/19] hw: Move DS1338 device from hw/timer/ to hw/rtc/
  subdirectory
-Date: Fri, 25 Oct 2019 10:35:06 +0200
-Message-Id: <20191025083511.11463-15-laurent@vivier.eu>
+Date: Fri, 25 Oct 2019 10:35:05 +0200
+Message-Id: <20191025083511.11463-14-laurent@vivier.eu>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20191025083511.11463-1-laurent@vivier.eu>
 References: <20191025083511.11463-1-laurent@vivier.eu>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:etCUXD52RarWTMMWx6gvRrbz0qPxz/OK/mTowevKvf7KrVhR6fH
- R3gTkOx1/tY26LybSCfVMzae+/OMpo3pvEZGy5J2LcHeyR1ts4U+5ylkMWaJvW9ju5u1a6e
- k2JzO95VmMtpiwOZ2Jadc6g/m/IgHG8pvzsgHzPJ8ydm29LrE2hcocBnHeBtfhYlj1GQlBJ
- 2lX6oQkmb7pZgW2aV0x5A==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:KKa+C83ziFE=:bnyn3MqhkPUrazDEuUJSXF
- TI/+EBeASIWyWUG3ZUYihiD0zfIxfIx1gnv4+GMbWxfP4wrwGGZSFlCT4li+vKr64xBaWD9Ae
- r2HbVpnehIaveXClzVqXAVNcFYBp0T/JUZ3jfRIZCXWl3F26jbHKdvXsQSdirY02cmhd0ByNS
- UIQWEL2GPdKODaH+meRclnpJHAEjI89a/GUhCirneMqtnGlj+c+9L7WHvMla3hc6Z7DMbQvwc
- E154eu4Io0haAj/jAzBwlCAppD9lPxBg1N6tnJBMI81IYim+QDRBFQ8HgqhG3+1o1mZzJrdN0
- 1rCgfF0kzTaACDSDelPlO7iNznTRvCJ93Msz4h1C3RjgdV0JRao7MGnMNOiQKaDgMQfSIXT6u
- fTgDoAYtV7fsnWkeygz24g3WyxHSwDnmWsQVJVqqW4Yy/OCv2JGruDj1tg9aLtyAHU3ijm2l/
- n/c8AM9yCuewCUR68Hk064qQ7vsy28aFFDyrmiHYIfItf8wtbmgRkAHJs/JwtkLJUjYFpGvPH
- KXxUChJt4N44d/MNgXqgTp62j81Qa4PzZFBtmoYpvJdB7SdyvxrqK86LPBKDIEFFLttsqqR+a
- OikkJSD6sV4QkU6a1LSraCpKJpiQGwL54SWY80zZsixg8bhBcqVF4wDPQ3WPYMNG580imIpow
- mBF4pYA8OrYupnbZiHwChtR4G85lDxIxJyZURcFEmIbVR5TCTza2AgfM6ncTluEZ0Ftncal4j
- I6SqxMGOjsjao9yFOud8N62NGWMmJe5bFM2Bj1g7dEVpKdTaa/pVwPHimbmT4dzB7atfezciY
- astSBhwQ3zEZ+eAhI7CoWSahp963/BTPvb/dgFuLXeCgMnJfys91oFivVVPomWWp8qG819Aby
- mp/opAat3zopAFVhKoBmCjKOCGo+OX95uepMIeVE0=
+X-Provags-ID: V03:K1:rJpG7AFrJa5zxrJnEIXmaC/LXkpNWpKRKxi0bZbrkc9VUN2g1k8
+ DXHNeKMyAVUlGUGkjaHVuQVS008mcDT2PxJr2db/xHm3FVKPAMvC6YLxMRNx/y6JmFXrF59
+ Ft2lhi6+UyEYigpFA0rztXUlaM8fKeO7A7TZtf3mimGUO9J3izpXVp8G8YFOci4jyAOesAK
+ 2KiVUNcL+ksRH+BQoOCGg==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:0ukzWR3gjvI=:3PrK2L5ZBDozNBKmcHZ0M7
+ 5egoKg40fSD3DUXckVpDF2QdDXmBzc4DzQIKSGVcaDexevcg4JxgrKaUgMWPjK/g98DrPX38k
+ OXas1TSHrdZpZVzNKIFrD9mYsJ6V7f1+DTGEyfihJrbcpjB4FxrgcvdpT9rmqvNLO6gzfZtSp
+ TN2cPMcTgcaDifcrgNOKpAT+B3bKNKysjHYxsqqLPsGomyrus6sjFO0hItdw6NEjJ7LRvD4fW
+ LcjteXijWhncjxB9O0qvplzE4KMyU/2s6a0Dj4SPuOj2Pe2U/FjOpiAEOu9ZhnKWL/KTtArD4
+ 2+uVYh1iMi32ebt5zjNbiuwDXr12duNV3vxx2sf6HfqNbgmg+1UbV1JyF4lUjyfcVKlxNIwdH
+ UBiE9GJ3RuyWV34aNM0xOeCTMbjtR/0EJiEFD0/2rMSeNB083Q7SQPu6HIAV4nKROR1jkLccX
+ mjwjWpnq+SRzZCtGRwgNrU3K0VsY4bm7ywdVBLJEc76wpfXP/Fg4su6kYdgPGraZUrrq5Et4h
+ z28HAAOtXoCUJ/sxkFIc9vE9cInYebPrdsKmIDdQFXORNLoLKAvQdHXA3FmaE8SDtLIRm78cU
+ his2uYCSPcKU0jBePrlmNWPPt0b2xbnoo8QFwhELKspKK4oONrNS+xq49hYXbr1dmpMiJYbF6
+ nvAh00Wo8UVhg10y5xPODlcrvkz7CnJbaJ4GjuMa6DS5VKMbMd+e6kVWA0iY2U4t02W/EKJ8L
+ bGPiRDhAuBBjJ1I/0Dga/x25ew5oivw/kvh0CCSLRIwYRDyr8EIGEnBDaX2VoowAxDVQBH+xQ
+ 62hMvRY9bqANKDCOG6rEGfyrwLXhGzEGvRHSbQ6sgrppHN4QKYTS2t/hnRb2+IsbnFVX2kdYU
+ YzylShGK6taQVcAkc5H1L0sxiDsscHV0tFT8XDhNM=
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 212.227.126.134
+X-Received-From: 212.227.126.187
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -103,134 +103,75 @@ Sender: "Qemu-devel"
 
 From: Philippe Mathieu-Daudé <philmd@redhat.com>
 
-Move RTC devices under the hw/rtc/ subdirectory.
-
-Remove Alistair outdated email address (see commit c22e580c2ad).
+The DS1338 is a Real Time Clock, not a timer.
+Move it under the hw/rtc/ subdirectory.
 
 Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 Acked-by: Peter Maydell <peter.maydell@linaro.org>
-Message-Id: <20191003230404.19384-10-philmd@redhat.com>
+Message-Id: <20191003230404.19384-9-philmd@redhat.com>
 Signed-off-by: Laurent Vivier <laurent@vivier.eu>
 ---
- hw/rtc/Makefile.objs                        | 1 +
- hw/rtc/trace-events                         | 3 +++
- hw/{timer => rtc}/xlnx-zynqmp-rtc.c         | 2 +-
- hw/timer/Makefile.objs                      | 1 -
- hw/timer/trace-events                       | 3 ---
- include/hw/arm/xlnx-zynqmp.h                | 2 +-
- include/hw/{timer => rtc}/xlnx-zynqmp-rtc.h | 6 +++---
- 7 files changed, 9 insertions(+), 9 deletions(-)
- rename hw/{timer => rtc}/xlnx-zynqmp-rtc.c (99%)
- rename include/hw/{timer => rtc}/xlnx-zynqmp-rtc.h (95%)
+ hw/rtc/Kconfig             | 4 ++++
+ hw/rtc/Makefile.objs       | 1 +
+ hw/{timer => rtc}/ds1338.c | 0
+ hw/timer/Kconfig           | 4 ----
+ hw/timer/Makefile.objs     | 1 -
+ 5 files changed, 5 insertions(+), 5 deletions(-)
+ rename hw/{timer => rtc}/ds1338.c (100%)
 
+diff --git a/hw/rtc/Kconfig b/hw/rtc/Kconfig
+index dff9d60946af..45daa8d655c9 100644
+--- a/hw/rtc/Kconfig
++++ b/hw/rtc/Kconfig
+@@ -1,3 +1,7 @@
++config DS1338
++    bool
++    depends on I2C
++
+ config M41T80
+     bool
+     depends on I2C
 diff --git a/hw/rtc/Makefile.objs b/hw/rtc/Makefile.objs
-index b195863291d1..543a550a0f11 100644
+index 810a38ee7b3d..b195863291d1 100644
 --- a/hw/rtc/Makefile.objs
 +++ b/hw/rtc/Makefile.objs
-@@ -6,5 +6,6 @@ common-obj-$(CONFIG_M48T59) += m48t59-isa.o
- endif
- common-obj-$(CONFIG_PL031) += pl031.o
- common-obj-$(CONFIG_TWL92230) += twl92230.o
-+common-obj-$(CONFIG_XLNX_ZYNQMP) += xlnx-zynqmp-rtc.o
- obj-$(CONFIG_MC146818RTC) += mc146818rtc.o
- common-obj-$(CONFIG_SUN4V_RTC) += sun4v-rtc.o
-diff --git a/hw/rtc/trace-events b/hw/rtc/trace-events
-index ac9e0e0fba32..7f1945ad4cc6 100644
---- a/hw/rtc/trace-events
-+++ b/hw/rtc/trace-events
-@@ -4,6 +4,9 @@
- sun4v_rtc_read(uint64_t addr, uint64_t value) "read: addr 0x%" PRIx64 " value 0x%" PRIx64
- sun4v_rtc_write(uint64_t addr, uint64_t value) "write: addr 0x%" PRIx64 " value 0x%" PRIx64
+@@ -1,3 +1,4 @@
++common-obj-$(CONFIG_DS1338) += ds1338.o
+ common-obj-$(CONFIG_M41T80) += m41t80.o
+ common-obj-$(CONFIG_M48T59) += m48t59.o
+ ifeq ($(CONFIG_ISA_BUS),y)
+diff --git a/hw/timer/ds1338.c b/hw/rtc/ds1338.c
+similarity index 100%
+rename from hw/timer/ds1338.c
+rename to hw/rtc/ds1338.c
+diff --git a/hw/timer/Kconfig b/hw/timer/Kconfig
+index 9357875f285d..a990f9fe35fc 100644
+--- a/hw/timer/Kconfig
++++ b/hw/timer/Kconfig
+@@ -9,10 +9,6 @@ config ARM_MPTIMER
+ config A9_GTIMER
+     bool
  
-+# xlnx-zynqmp-rtc.c
-+xlnx_zynqmp_rtc_gettime(int year, int month, int day, int hour, int min, int sec) "Get time from host: %d-%d-%d %2d:%02d:%02d"
-+
- # pl031.c
- pl031_irq_state(int level) "irq state %d"
- pl031_read(uint32_t addr, uint32_t value) "addr 0x%08x value 0x%08x"
-diff --git a/hw/timer/xlnx-zynqmp-rtc.c b/hw/rtc/xlnx-zynqmp-rtc.c
-similarity index 99%
-rename from hw/timer/xlnx-zynqmp-rtc.c
-rename to hw/rtc/xlnx-zynqmp-rtc.c
-index 5692db98c2db..f9f09b72965a 100644
---- a/hw/timer/xlnx-zynqmp-rtc.c
-+++ b/hw/rtc/xlnx-zynqmp-rtc.c
-@@ -36,7 +36,7 @@
- #include "qemu/cutils.h"
- #include "sysemu/sysemu.h"
- #include "trace.h"
--#include "hw/timer/xlnx-zynqmp-rtc.h"
-+#include "hw/rtc/xlnx-zynqmp-rtc.h"
- #include "migration/vmstate.h"
- 
- #ifndef XLNX_ZYNQMP_RTC_ERR_DEBUG
+-config DS1338
+-    bool
+-    depends on I2C
+-
+ config HPET
+     bool
+     default y if PC
 diff --git a/hw/timer/Makefile.objs b/hw/timer/Makefile.objs
-index 70b61b69c7a4..294465ef47ad 100644
+index 23be70b71d32..70b61b69c7a4 100644
 --- a/hw/timer/Makefile.objs
 +++ b/hw/timer/Makefile.objs
-@@ -14,7 +14,6 @@ common-obj-$(CONFIG_IMX) += imx_epit.o
- common-obj-$(CONFIG_IMX) += imx_gpt.o
- common-obj-$(CONFIG_LM32) += lm32_timer.o
- common-obj-$(CONFIG_MILKYMIST) += milkymist-sysctl.o
--common-obj-$(CONFIG_XLNX_ZYNQMP) += xlnx-zynqmp-rtc.o
- common-obj-$(CONFIG_NRF51_SOC) += nrf51_timer.o
- 
- common-obj-$(CONFIG_ALTERA_TIMER) += altera_timer.o
-diff --git a/hw/timer/trace-events b/hw/timer/trace-events
-index ce34b967db9f..1459d07237b9 100644
---- a/hw/timer/trace-events
-+++ b/hw/timer/trace-events
-@@ -70,9 +70,6 @@ cmsdk_apb_dualtimer_reset(void) "CMSDK APB dualtimer: reset"
- aspeed_rtc_read(uint64_t addr, uint64_t value) "addr 0x%02" PRIx64 " value 0x%08" PRIx64
- aspeed_rtc_write(uint64_t addr, uint64_t value) "addr 0x%02" PRIx64 " value 0x%08" PRIx64
- 
--# xlnx-zynqmp-rtc.c
--xlnx_zynqmp_rtc_gettime(int year, int month, int day, int hour, int min, int sec) "Get time from host: %d-%d-%d %2d:%02d:%02d"
--
- # nrf51_timer.c
- nrf51_timer_read(uint64_t addr, uint32_t value, unsigned size) "read addr 0x%" PRIx64 " data 0x%" PRIx32 " size %u"
- nrf51_timer_write(uint64_t addr, uint32_t value, unsigned size) "write addr 0x%" PRIx64 " data 0x%" PRIx32 " size %u"
-diff --git a/include/hw/arm/xlnx-zynqmp.h b/include/hw/arm/xlnx-zynqmp.h
-index d7483c3b4285..53076fa29a75 100644
---- a/include/hw/arm/xlnx-zynqmp.h
-+++ b/include/hw/arm/xlnx-zynqmp.h
-@@ -29,7 +29,7 @@
- #include "hw/dma/xlnx-zdma.h"
- #include "hw/display/xlnx_dp.h"
- #include "hw/intc/xlnx-zynqmp-ipi.h"
--#include "hw/timer/xlnx-zynqmp-rtc.h"
-+#include "hw/rtc/xlnx-zynqmp-rtc.h"
- #include "hw/cpu/cluster.h"
- #include "target/arm/cpu.h"
- 
-diff --git a/include/hw/timer/xlnx-zynqmp-rtc.h b/include/hw/rtc/xlnx-zynqmp-rtc.h
-similarity index 95%
-rename from include/hw/timer/xlnx-zynqmp-rtc.h
-rename to include/hw/rtc/xlnx-zynqmp-rtc.h
-index 97e32322ed70..6fa1cb2f43f8 100644
---- a/include/hw/timer/xlnx-zynqmp-rtc.h
-+++ b/include/hw/rtc/xlnx-zynqmp-rtc.h
-@@ -3,7 +3,7 @@
-  *
-  * Copyright (c) 2017 Xilinx Inc.
-  *
-- * Written-by: Alistair Francis <alistair.francis@xilinx.com>
-+ * Written-by: Alistair Francis
-  *
-  * Permission is hereby granted, free of charge, to any person obtaining a copy
-  * of this software and associated documentation files (the "Software"), to deal
-@@ -24,8 +24,8 @@
-  * THE SOFTWARE.
-  */
- 
--#ifndef HW_TIMER_XLNX_ZYNQMP_RTC_H
--#define HW_TIMER_XLNX_ZYNQMP_RTC_H
-+#ifndef HW_RTC_XLNX_ZYNQMP_H
-+#define HW_RTC_XLNX_ZYNQMP_H
- 
- #include "hw/register.h"
- #include "hw/sysbus.h"
+@@ -3,7 +3,6 @@ common-obj-$(CONFIG_ARM_MPTIMER) += arm_mptimer.o
+ common-obj-$(CONFIG_ARM_V7M) += armv7m_systick.o
+ common-obj-$(CONFIG_A9_GTIMER) += a9gtimer.o
+ common-obj-$(CONFIG_CADENCE) += cadence_ttc.o
+-common-obj-$(CONFIG_DS1338) += ds1338.o
+ common-obj-$(CONFIG_HPET) += hpet.o
+ common-obj-$(CONFIG_I8254) += i8254_common.o i8254.o
+ common-obj-$(CONFIG_PUV3) += puv3_ost.o
 -- 
 2.21.0
 
