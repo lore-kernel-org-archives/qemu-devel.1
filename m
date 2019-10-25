@@ -2,79 +2,143 @@ Return-Path: <SRS0=bySr=YS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3EF61CA9EA0
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 07:58:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 99401CA9EA0
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 07:59:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EEB622070B
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 07:58:26 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EnAQrqAp"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EEB622070B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 732A62070B
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 07:59:52 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 732A62070B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=de.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57304 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57310 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iNuUM-0000cJ-2q
-	for qemu-devel@archiver.kernel.org; Fri, 25 Oct 2019 03:58:26 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42873)
+	id 1iNuVj-0003I9-Gs
+	for qemu-devel@archiver.kernel.org; Fri, 25 Oct 2019 03:59:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44816)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <hsp.cat7@gmail.com>) id 1iNuCn-000850-Jn
- for qemu-devel@nongnu.org; Fri, 25 Oct 2019 03:40:21 -0400
+ (envelope-from <borntraeger@de.ibm.com>) id 1iNuSD-0005O3-NK
+ for qemu-devel@nongnu.org; Fri, 25 Oct 2019 03:56:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <hsp.cat7@gmail.com>) id 1iNuCk-0001iB-1T
- for qemu-devel@nongnu.org; Fri, 25 Oct 2019 03:40:17 -0400
-Received: from mail-oi1-x233.google.com ([2607:f8b0:4864:20::233]:46081)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <hsp.cat7@gmail.com>) id 1iNuCj-0001ha-Pw
- for qemu-devel@nongnu.org; Fri, 25 Oct 2019 03:40:13 -0400
-Received: by mail-oi1-x233.google.com with SMTP id c2so886192oic.13
- for <qemu-devel@nongnu.org>; Fri, 25 Oct 2019 00:40:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to;
- bh=3ozBoP7CEMvrj+cVpbGJkU7+pULv9a+iNtdaHFD7mzY=;
- b=EnAQrqApbsNnr1hPryqX8VYbX0PfAk8d/BoRLbJo+bTAorqeGEvGRkwJ5Vb7w1WaF/
- MXiSN2bpfvu1MczBsF+qtzqr9FvbEmehPu66KA1WvEC+gHORydDnp07HtvCKDBGqBBNH
- wAKYwtpUM9VJSxZIMMoQTg/RqGmw2tOYMgYYuvYsnkcs5T8lMwLHZ4hO7zEw+9X24Kd/
- WTW0Il1F1IAgJuS7g/0f0PtMLO3sp2yONUF7NJhZi1a3nlVhMKPS5FMKwKpkUGuR/tIm
- TEeN7qxC08su3ZlFXlQcchX4ZjdEsM1EUIBmGVaCxUOMSEd5J17mJkaPFfCB2jFYEi3Z
- ZpKQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to;
- bh=3ozBoP7CEMvrj+cVpbGJkU7+pULv9a+iNtdaHFD7mzY=;
- b=RsjZlpCfDrkWHqsGriY+Yg+RChuqoTq5hPcYGKsTNs2/TIPIMWnIgXpkVniJjGB/VT
- uNQbpZQpOsKD1phaPPWDjqmOL2SbjDVU2ltRl7Qf7wiNHRys5a2o7t5K2buIq+HddWBi
- Or2wmGEUc5IxMAC/vc9Ma5VpD1GxTfhtzSmS2W0NjN2Vr2RK+MvYITvJ1XYlJS8HOHhN
- F4AqwAzx3JggRvU9HqqUTMZ0MTrLkqMgHaRmD7q1VWpv33B86Vq0vrv1MTOhIwqfSiHD
- dq2gmd2fyI2tjWln9xiHy+79XmLa/uhwZYonDRqGipTY+OnE6thBsn1vOJOEpIw5XLPZ
- ux2A==
-X-Gm-Message-State: APjAAAXpKnPldS9QJa13chw4XzaY9O/m1/E2tiXACz8OSRalRwCbE/+e
- pxgL7a3lj5ySdzcABCwdg/PRcBqJZoNDjZo4/KzYXgbK
-X-Google-Smtp-Source: APXvYqyq31wuSsJXb6/CAz7UUa60YRW+0s3vzsTHR21W4MV6CPN3Gh9HJ0KLywX2JTEPqOBRRBBxXzWymgUbxF7je/Q=
-X-Received: by 2002:aca:fc11:: with SMTP id a17mr1749664oii.59.1571989211279; 
- Fri, 25 Oct 2019 00:40:11 -0700 (PDT)
+ (envelope-from <borntraeger@de.ibm.com>) id 1iNuSC-0007j8-A9
+ for qemu-devel@nongnu.org; Fri, 25 Oct 2019 03:56:13 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:46400)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
+ id 1iNuSC-0007i8-2L
+ for qemu-devel@nongnu.org; Fri, 25 Oct 2019 03:56:12 -0400
+Received: from pps.filterd (m0187473.ppops.net [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
+ x9P7qmXK188888
+ for <qemu-devel@nongnu.org>; Fri, 25 Oct 2019 03:56:08 -0400
+Received: from e06smtp05.uk.ibm.com (e06smtp05.uk.ibm.com [195.75.94.101])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 2vusu8w5g1-1
+ (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+ for <qemu-devel@nongnu.org>; Fri, 25 Oct 2019 03:56:06 -0400
+Received: from localhost
+ by e06smtp05.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+ Violators will be prosecuted
+ for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
+ Fri, 25 Oct 2019 08:56:03 +0100
+Received: from b06cxnps4074.portsmouth.uk.ibm.com (9.149.109.196)
+ by e06smtp05.uk.ibm.com (192.168.101.135) with IBM ESMTP SMTP Gateway:
+ Authorized Use Only! Violators will be prosecuted; 
+ (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+ Fri, 25 Oct 2019 08:56:00 +0100
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com
+ (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
+ by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ x9P7u0Gj52428824
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Fri, 25 Oct 2019 07:56:00 GMT
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 00AEDA4064;
+ Fri, 25 Oct 2019 07:56:00 +0000 (GMT)
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 9D9EBA4060;
+ Fri, 25 Oct 2019 07:55:59 +0000 (GMT)
+Received: from oc7455500831.ibm.com (unknown [9.152.224.123])
+ by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+ Fri, 25 Oct 2019 07:55:59 +0000 (GMT)
+Subject: Re: [PATCH 0/7] i386: Add `machine` parameter to query-cpu-definitions
+To: David Hildenbrand <david@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org
+References: <20191025022553.25298-1-ehabkost@redhat.com>
+ <dbf9e4c1-0acf-9469-84f9-f80c41e2cae0@redhat.com>
+From: Christian Borntraeger <borntraeger@de.ibm.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
+ 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
+ syiRa+UVlsKmx1hsEg==
+Date: Fri, 25 Oct 2019 09:55:59 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-References: <20191025063713.23374-1-alex.bennee@linaro.org>
- <20191025063713.23374-47-alex.bennee@linaro.org>
-In-Reply-To: <20191025063713.23374-47-alex.bennee@linaro.org>
-From: Howard Spoelstra <hsp.cat7@gmail.com>
-Date: Fri, 25 Oct 2019 09:40:00 +0200
-Message-ID: <CABLmASH=xHu+JZT34kX0cC3N6YsYqan3mzT7b7g1RgWz8nFrYw@mail.gmail.com>
-Subject: USB-audio sound issues with qemu-system-ppc in Linux and Windows.
-To: qemu-devel qemu-devel <qemu-devel@nongnu.org>
-Content-Type: multipart/alternative; boundary="0000000000008775810595b742c7"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::233
+In-Reply-To: <dbf9e4c1-0acf-9469-84f9-f80c41e2cae0@redhat.com>
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+x-cbid: 19102507-0020-0000-0000-0000037E5277
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19102507-0021-0000-0000-000021D49D61
+Message-Id: <6e7d171e-18c4-6835-f89c-e9e66c093d62@de.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
+ definitions=2019-10-25_05:, , signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ priorityscore=1501
+ malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
+ clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
+ mlxlogscore=707 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.0.1-1908290000 definitions=main-1910250075
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
+X-Received-From: 148.163.156.1
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,226 +150,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Thomas Huth <thuth@redhat.com>, Janosch Frank <frankja@linux.ibm.com>,
+ Cornelia Huck <cohuck@redhat.com>, Markus Armbruster <armbru@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>,
+ Jiri Denemark <jdenemar@redhat.com>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---0000000000008775810595b742c7
-Content-Type: text/plain; charset="UTF-8"
 
-Hi,
 
-I'm  experiencing several issues related to sound using usb-audio when
-running qemu-system-ppc in Linux and Windows. Guests tried are Mac OS 9.2
-and Mac OS X 10.0, 10.1, 10.2 and 10.3.
-(10.4 and 10.5 never have the usb-audio device available for audio
-playback, even though the device is recognised in the OS X system profiler.)
-It is hit and miss whether the audio device is actually available upon boot
-in 9.2 and the other versions of OS X.
+On 25.10.19 09:17, David Hildenbrand wrote:
+> On 25.10.19 04:25, Eduardo Habkost wrote:
+>> We had introduced versioned CPU models in QEMU 4.1, including a
+>> method for querying for CPU model versions using
+> 
+> Interesting, I was not aware of that.
+> 
+> On s390x, we somewhat have versioned CPU models, but we decided against giving them explicit names (e.g., z13-v1 or z13-4.1.0), because it didn't really seem to be necessary. (and we often implement/add features for older CPU models, there is a lot of fluctuation) Actually, you would have had to add "z13-z/VM-x.x.x" or "z13-LPAR-x.x.x" or "z13-KVM-x.x.x" to model the features you actually see in all the different virtual environments ("what a CPU looks like"). Not to talk about QEMU versions in addition to that. So we decided to always model what you would see under LPAR and are able to specify for a KVM guest. So you can use "z13" in an up-to-date LPAR environment, but not in a z/VM environment (you would have to disable features).
+> 
+> Each (!base) CPU model has a specific feature set per machine. Libvirt uses query-cpu-model-expansion() to convert this model+machine to a machine-independent representation. That representation is sufficient for all use cases we were aware of (esp. "virsh domcapabilities", the host CPU model, migration).
+> 
+> While s390x has versioned CPU models, we have no explicit way of specifying them for older machines, besides going over query-cpu-model-expansion and using expanded "base model + features".
+> 
+> I can see that this might make sense on x86-64, where you only have maybe 3 versions of a CPU (e.g., the one Intel messed up first - Haswell, the one Intel messed up next - Haswell-noTSX, and the one that Intel eventually did right - Haswell-noTSX-IBRS) and you might want to specify "Haswell" vs. "Haswell-IBRS" vs. "Haswell-noTSX-IBRS". But actually, you will always want to go for "Haswell-noTSX-IBRS", because you can expect to run in updated environments if I am not wrong, everything else are corner cases.
+> 
+> Of course, versioned CPU model are neat to avoid "base model + list of features", but at least for expanding the host model on s390x, it is not really helpful. When migrating, the model expansion does the trick.
+> 
+> I haven't looked into details of "how to specify or model versions". Maybe IBM wants to look into creating versions for all the old models we had. But again, not sure if that is of any help for s390x. CCing IBM.
 
-Qemu version tried is current master (Oct 25th), Windows version is
-cross-compiled from Fedora 30. I do not think there is any regression going
-on here, these are just issues that have been present for a long time.
+I agree that this does not look very helpful. 
+Especially as several things depend on the kernel version a QEMU version is
+not sufficient to be guarantee construction success.
+So we would need something like z14-qemu4.0-kernel-5.2-suse-flavour-onLPAR
 
-General issue: when audio is played, it almost always sounds crackling.
+Instead we do check if we can construct an equivalent model on the migration target.
+And that model is precise. We do even have versions.
+Right now with QEMU on s390  our models are versioned in a way that we fence of
+facilities for old machine versions.
 
-For reasons of size, I uploaded 3 logs obtained in Linux running Mac OS X
-10.3 with -trace "usb*" to:
-https://surfdrive.surf.nl/files/index.php/s/YfVVxEE3cHXkFPf/download
-1. Log_no_audio_available.txt
-2. Log_audio_available_2_sounds_played.txt
-3. Log_audio_available_multi_sounds_played_untill_hangup.txt
+For example
+-machine s390-virtio-ccw-3.1 -cpu z14 will not have the multiple epoch facility
+and 
+-machine s390-virtio-ccw-4.0 -cpu z14 will have the multiple epoch facility.
+As migration does always require the tuple of machine and cpu this is save. I fail
+to see what the benefit of an explicit z14-3.1 would be.
 
-General issue in Linux (fedora 30)(which seems related to bug
-https://bugs.launchpad.net/qemu/+bug/1623998):
-[hsp@fedora30 qemu-master]$ ./startqemu.sh
-pulseaudio: set_sink_input_volume() failed
-pulseaudio: Reason: Invalid argument
-pulseaudio: set_sink_input_mute() failed
-pulseaudio: Reason: Invalid argument
-
-General issue in Windows 10: I always get to a point where this is logged:
-dsound: Could not lock playback buffer
-dsound: Reason: An invalid parameter was passed to the returning function
-dsound: Failed to lock buffer
-
-Linux specific.
-Qemu invocation for Mac OS 9.2:
-./qemu-system-ppc -L pc-bios -boot c -M mac99 -m 512 \
--drive file=~/Mac-disks/9.2.img,format=raw,media=disk \
--serial stdio -sdl -device usb-audio -trace "*aud*"
-
-This immediately starts logging:
-7380@1571817102.833929:audio_timer_start interval 10 ms
-7380@1571817125.207880:audio_timer_delayed interval 16 ms
-7380@1571817129.046816:audio_timer_delayed interval 16 ms
-
-Any movement of a window on the Linux desktop results in additional
-audio_timer_delayed logging.
-The audio_timer_delayed never stops.
-In Mac OS 9.2, the desktop icons disappear after some seconds of running,
-so the system cannot be stopped normally.
-Running the GTK GUI, only this is logged (no additional logging when moving
-windows).
-14130@1571988483.402017:audio_timer_start interval 10 ms
-But the icons on the desktop also disappear.
-
-When running Mac OS X 10.X and clicking some system sounds, I see:
-12134@1571818709.446031:audio_timer_start interval 10 ms
-12134@1571818710.195023:audio_timer_stop
-12134@1571818714.951030:audio_timer_start interval 10 ms
-12134@1571818715.432959:audio_timer_stop
-12134@1571818717.171045:audio_timer_start interval 10 ms
-12134@1571818717.714323:audio_timer_stop
-12134@1571818718.072381:audio_timer_start interval 10 ms
-12134@1571818719.114544:audio_timer_stop
-
-After randomly clicking some system sounds more, the timer starts delaying
-and no longer stops:
-12134@1571818893.564793:audio_timer_stop
-12134@1571818895.698040:audio_timer_start interval 10 ms
-12134@1571818899.961673:audio_timer_delayed interval 15 ms
-12134@1571818900.472716:audio_timer_delayed interval 15 ms
-12134@1571818902.759007:audio_timer_delayed interval 15 ms
-12134@1571818905.803400:audio_timer_delayed interval 15 ms
-But the systems stays responsive, so can be shut down.
-
-Windows specific.
-Invocation:
-qemu-system-ppc.exe -L pc-bios -boot c -M mac99 -m 512 ^
--drive file=C:\Mac-disks\9.2.img,format=raw,media=disk ^
--serial stdio -sdl -device usb-audio -trace "*aud*"
-
-This immediately starts logging the audio_timer_start interval and never
-stops.
-Icons disappear from the desktop after some seconds.
-
-When running Mac OS X 10.X, playing just two system sounds results in:
-2380@1571822566.040790:audio_timer_start interval 10 ms
-2380@1571822566.108279:audio_timer_delayed interval 22 ms
-2380@1571822566.128820:audio_timer_delayed interval 20 ms
-2380@1571822566.150509:audio_timer_delayed interval 22 ms
-2380@1571822566.172112:audio_timer_delayed interval 21 ms
-......
-2380@1571822566.561345:audio_timer_delayed interval 21 ms
-2380@1571822566.583846:audio_timer_delayed interval 22 ms
-2380@1571822566.600482:audio_timer_delayed interval 15 ms
-2380@1571822566.610111:audio_timer_stop
-2380@1571822572.226433:audio_timer_start interval 10 ms
-2380@1571822572.250866:audio_timer_delayed interval 24 ms
-2380@1571822572.269819:audio_timer_delayed interval 18 ms
-......
-2380@1571822572.452403:audio_timer_delayed interval 20 ms
-2380@1571822572.474190:audio_timer_delayed interval 21 ms
-2380@1571822572.509474:audio_timer_delayed interval 35 ms
-dsound: Could not lock playback buffer
-dsound: Reason: An invalid parameter was passed to the returning function
-dsound: Failed to lock buffer
-2380@1571822572.560505:audio_timer_delayed interval 51 ms
-2380@1571822572.581102:audio_timer_delayed interval 19 ms
-2380@1571822572.600912:audio_timer_delayed interval 19 ms
-
-There is no saying when audio_timer_delayed will start displaying
-constantly.
-Only when one set of:
-2260@1571823472.652244:audio_timer_start interval 10 ms
-2260@1571823473.198349:audio_timer_stop
-Is following directly after each other, sound is played somewhat correctly.
-After randomly clicking several system sounds, the audio_timer_delayed
-message never stops.
-
-Thanks for looking into this.
-If there is any additional information needed, or disk images of Mac OS 9.2
-or OS X 10.3 are required, please let me know.
-
-Best,
-Howard
-
---0000000000008775810595b742c7
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-<div dir=3D"ltr"><div dir=3D"ltr">Hi,<br><br>I&#39;m =C2=A0experiencing sev=
-eral issues related to sound using usb-audio when running qemu-system-ppc i=
-n Linux and Windows. Guests tried are Mac OS 9.2 and Mac OS X 10.0, 10.1, 1=
-0.2 and 10.3. <br>(10.4 and 10.5 never have the usb-audio device available =
-for audio playback, even though the device is recognised in the OS X system=
- profiler.)<br>It is hit and miss whether the audio device is actually avai=
-lable upon boot in 9.2 and the other versions of OS X.<br><br>Qemu version =
-tried is current master (Oct 25th), Windows version is cross-compiled from =
-Fedora 30. I do not think there is any regression going on here, these are =
-just issues that have been present for a long time.<br><br>General issue: w=
-hen audio is played, it almost always sounds crackling.<br><br>For reasons =
-of size, I uploaded 3 logs obtained in Linux running Mac OS X 10.3 with -tr=
-ace &quot;usb*&quot; to: <a href=3D"https://surfdrive.surf.nl/files/index.p=
-hp/s/YfVVxEE3cHXkFPf/download">https://surfdrive.surf.nl/files/index.php/s/=
-YfVVxEE3cHXkFPf/download</a><br>1. Log_no_audio_available.txt<br>2. Log_aud=
-io_available_2_sounds_played.txt<br>3. Log_audio_available_multi_sounds_pla=
-yed_untill_hangup.txt<br><br>General issue in Linux (fedora 30)(which seems=
- related to bug <a href=3D"https://bugs.launchpad.net/qemu/+bug/1623998">ht=
-tps://bugs.launchpad.net/qemu/+bug/1623998</a>):<br>[hsp@fedora30 qemu-mast=
-er]$ ./startqemu.sh<br>pulseaudio: set_sink_input_volume() failed<br>pulsea=
-udio: Reason: Invalid argument<br>pulseaudio: set_sink_input_mute() failed<=
-br>pulseaudio: Reason: Invalid argument<br><br>General issue in Windows 10:=
- I always get to a point where this is logged:<br>dsound: Could not lock pl=
-ayback buffer<br>dsound: Reason: An invalid parameter was passed to the ret=
-urning function<br>dsound: Failed to lock buffer<br><br>Linux specific.<br>=
-Qemu invocation for Mac OS 9.2:<br>./qemu-system-ppc -L pc-bios -boot c -M =
-mac99 -m 512 \<br>-drive file=3D~/Mac-disks/9.2.img,format=3Draw,media=3Ddi=
-sk \<br>-serial stdio -sdl -device usb-audio -trace &quot;*aud*&quot;<br><b=
-r>This immediately starts logging:<br>7380@1571817102.833929:audio_timer_st=
-art interval 10 ms<br>7380@1571817125.207880:audio_timer_delayed interval 1=
-6 ms<br>7380@1571817129.046816:audio_timer_delayed interval 16 ms<br><br>An=
-y movement of a window on the Linux desktop results in additional audio_tim=
-er_delayed logging. <br>The audio_timer_delayed never stops.<br>In Mac OS 9=
-.2, the desktop icons disappear after some seconds of running, so the syste=
-m cannot be stopped normally.<br>Running the GTK GUI, only this is logged (=
-no additional logging when moving windows).<br>14130@1571988483.402017:audi=
-o_timer_start interval 10 ms<br>But the icons on the desktop also disappear=
-.<br><br>When running Mac OS X 10.X and clicking some system sounds, I see:=
- <br>12134@1571818709.446031:audio_timer_start interval 10 ms<br>12134@1571=
-818710.195023:audio_timer_stop <br>12134@1571818714.951030:audio_timer_star=
-t interval 10 ms<br>12134@1571818715.432959:audio_timer_stop <br>12134@1571=
-818717.171045:audio_timer_start interval 10 ms<br>12134@1571818717.714323:a=
-udio_timer_stop <br>12134@1571818718.072381:audio_timer_start interval 10 m=
-s<br>12134@1571818719.114544:audio_timer_stop <br><br>After randomly clicki=
-ng some system sounds more, the timer starts delaying and no longer stops:<=
-br>12134@1571818893.564793:audio_timer_stop <br>12134@1571818895.698040:aud=
-io_timer_start interval 10 ms<br>12134@1571818899.961673:audio_timer_delaye=
-d interval 15 ms<br>12134@1571818900.472716:audio_timer_delayed interval 15=
- ms<br>12134@1571818902.759007:audio_timer_delayed interval 15 ms<br>12134@=
-1571818905.803400:audio_timer_delayed interval 15 ms<br>But the systems sta=
-ys responsive, so can be shut down.<br><br>Windows specific.<br>Invocation:=
-<br>qemu-system-ppc.exe -L pc-bios -boot c -M mac99 -m 512 ^<br>-drive file=
-=3DC:\Mac-disks\9.2.img,format=3Draw,media=3Ddisk ^<br>-serial stdio -sdl -=
-device usb-audio -trace &quot;*aud*&quot;<br><br>This immediately starts lo=
-gging the audio_timer_start interval and never stops.<br>Icons disappear fr=
-om the desktop after some seconds.<br><br>When running Mac OS X 10.X, playi=
-ng just two system sounds results in:<br>2380@1571822566.040790:audio_timer=
-_start interval 10 ms<br>2380@1571822566.108279:audio_timer_delayed interva=
-l 22 ms<br>2380@1571822566.128820:audio_timer_delayed interval 20 ms<br>238=
-0@1571822566.150509:audio_timer_delayed interval 22 ms<br>2380@1571822566.1=
-72112:audio_timer_delayed interval 21 ms<br>......<br>2380@1571822566.56134=
-5:audio_timer_delayed interval 21 ms<br>2380@1571822566.583846:audio_timer_=
-delayed interval 22 ms<br>2380@1571822566.600482:audio_timer_delayed interv=
-al 15 ms<br>2380@1571822566.610111:audio_timer_stop<br>2380@1571822572.2264=
-33:audio_timer_start interval 10 ms<br>2380@1571822572.250866:audio_timer_d=
-elayed interval 24 ms<br>2380@1571822572.269819:audio_timer_delayed interva=
-l 18 ms<br>......<br>2380@1571822572.452403:audio_timer_delayed interval 20=
- ms<br>2380@1571822572.474190:audio_timer_delayed interval 21 ms<br>2380@15=
-71822572.509474:audio_timer_delayed interval 35 ms<br>dsound: Could not loc=
-k playback buffer<br>dsound: Reason: An invalid parameter was passed to the=
- returning function<br>dsound: Failed to lock buffer<br>2380@1571822572.560=
-505:audio_timer_delayed interval 51 ms<br>2380@1571822572.581102:audio_time=
-r_delayed interval 19 ms<br>2380@1571822572.600912:audio_timer_delayed inte=
-rval 19 ms<br><br>There is no saying when audio_timer_delayed will start di=
-splaying constantly. <br>Only when one set of: <br>2260@1571823472.652244:a=
-udio_timer_start interval 10 ms<br>2260@1571823473.198349:audio_timer_stop<=
-br>Is following directly after each other, sound is played somewhat correct=
-ly.<br>After randomly clicking several system sounds, the audio_timer_delay=
-ed message never stops.<br><br>Thanks for looking into this. <br>If there i=
-s any additional information needed, or disk images of Mac OS 9.2 or OS X 1=
-0.3 are required, please let me know.<br><br>Best,<br>Howard</div></div>
-
---0000000000008775810595b742c7--
 
