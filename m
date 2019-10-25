@@ -2,89 +2,83 @@ Return-Path: <SRS0=bySr=YS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 891D1CA9EA0
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 07:51:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 84F4BCA9EA0
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 07:52:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5562A21929
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 07:51:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5011220578
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 07:52:40 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="n3qhAO3k"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5562A21929
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hEwdSyTg"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5011220578
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57154 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57190 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iNuNO-0001R7-FK
-	for qemu-devel@archiver.kernel.org; Fri, 25 Oct 2019 03:51:14 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40336)
+	id 1iNuOl-0004q8-9T
+	for qemu-devel@archiver.kernel.org; Fri, 25 Oct 2019 03:52:39 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44325)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1iNtpt-0004Vh-OX
- for qemu-devel@nongnu.org; Fri, 25 Oct 2019 03:16:39 -0400
+ (envelope-from <jfreimann@redhat.com>) id 1iNuNQ-0002JT-UP
+ for qemu-devel@nongnu.org; Fri, 25 Oct 2019 03:51:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1iNtps-00078I-9J
- for qemu-devel@nongnu.org; Fri, 25 Oct 2019 03:16:37 -0400
-Received: from mail-wm1-x330.google.com ([2a00:1450:4864:20::330]:36150)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1iNtps-00077q-2d
- for qemu-devel@nongnu.org; Fri, 25 Oct 2019 03:16:36 -0400
-Received: by mail-wm1-x330.google.com with SMTP id c22so865963wmd.1
- for <qemu-devel@nongnu.org>; Fri, 25 Oct 2019 00:16:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=kHDw5giSQUpa5TavdPwJmtfXF3VzRIg0gye452+mQFA=;
- b=n3qhAO3kwLwn+fuVou4I4zvxlFjgYpq5U8GrQ8VznxWHN7kbhSrbm8I/IGcj0qxUH2
- 9cMkCa3SzI12UABnNvb1eigaJ/T48+MwxeHZ4TygRbdst3HXmWJ2LQg3XslHdEKvQBzR
- 03DlGt+E6rpIWwL6q2BYhTqZq/lBUGn46FTW8ia7y+oJ2YZQWjRqthOsgMc5uoGjQJKa
- J1vT2kj39PSLZIflWi/eGTKLzgOcri53dgugNBoEVRHbdR0pdUYsbYe4oxaRESHojxpD
- rm850s9fmoqylPL/dzJ14gGEpdPAc8C5tubvaJsLtBCmrmmw22bY9xdojiGZilYMLXAU
- Fk0w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=kHDw5giSQUpa5TavdPwJmtfXF3VzRIg0gye452+mQFA=;
- b=f5UodWGWyXEuJQqh84NwFhRPa4cOSXUnGEUBClidPdtK09kDkn5i2fa9PjfVNOluy+
- JqKzH1ExSStaSlxZgsK/FT/qylTUO0YlXhmO8rLHnGQPpp37VNOFxpPhYFKQ3IHknG0n
- u8s3yN+LGmTHAXtLfRYKCX49CQzKyWfg2TA19fYXcMNx8IlFgC7hnMtFsT6Jw/pN7jvy
- UvS69fW+ycuQt6VZ3kR/P72ga8KkPS8psQGGYjZWiFaj2HM1TS1nTjKzytarBPr2KFD8
- 1frrbAAn2bLvT93+LMD7l9VJMstS4nc0tWap7FzPEwsTIPZej9CtVBR7fAN5hVhhmxw/
- cJNA==
-X-Gm-Message-State: APjAAAXlCgO5NZ9i1msEuKMjWdY0zeX9pG85RvfSzfPs9RQ1cpE+tLhs
- FLwTSost3E24NqOaORrHnHB1UQ==
-X-Google-Smtp-Source: APXvYqxOOfyKHYtZWpkh7qPbfj5PIOpB/3ZikbAGxWt+Z2FAHAiW0ZyCHFBGouvo41jM47ogm0pHAw==
-X-Received: by 2002:a1c:2c88:: with SMTP id s130mr2133109wms.66.1571987794791; 
- Fri, 25 Oct 2019 00:16:34 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id a2sm1430092wrv.39.2019.10.25.00.16.32
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 25 Oct 2019 00:16:32 -0700 (PDT)
-Received: from zen.lan (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id C10081FFD5;
- Fri, 25 Oct 2019 07:37:19 +0100 (BST)
-From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: peter.maydell@linaro.org
-Subject: [PULL v2 64/73] tests/tcg: enable plugin testing
-Date: Fri, 25 Oct 2019 07:37:04 +0100
-Message-Id: <20191025063713.23374-65-alex.bennee@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20191025063713.23374-1-alex.bennee@linaro.org>
-References: <20191025063713.23374-1-alex.bennee@linaro.org>
+ (envelope-from <jfreimann@redhat.com>) id 1iNuNO-00064c-QU
+ for qemu-devel@nongnu.org; Fri, 25 Oct 2019 03:51:15 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:21398
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <jfreimann@redhat.com>)
+ id 1iNuNO-00064A-MH
+ for qemu-devel@nongnu.org; Fri, 25 Oct 2019 03:51:14 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1571989873;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=0ATwRXB9PJ+nflcJPXGv328O1uY1JwoAsqnhbGQXOOk=;
+ b=hEwdSyTgEzub3r5SY+A6neIhyA0nRIE89Li7H2XvnEWTciLECRPkP2ZYvlzzP1fjx3HEza
+ eXpRzuclhvJL9A0YzyGJvm5XLAL3NgXgUM8NEswHgcY+B8LXcfY6XtrKye++et23nRPXyS
+ ZojEZiu9JP5rsJtdG3QgIyCo9bNp+f4=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-5-5BfM57FkOnetmmMiDsieyw-1; Fri, 25 Oct 2019 03:51:11 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B83F7801E5C;
+ Fri, 25 Oct 2019 07:51:10 +0000 (UTC)
+Received: from localhost (ovpn-117-235.ams2.redhat.com [10.36.117.235])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 998F25D713;
+ Fri, 25 Oct 2019 07:51:02 +0000 (UTC)
+Date: Fri, 25 Oct 2019 09:51:00 +0200
+From: Jens Freimann <jfreimann@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>
+Subject: Re: [PATCH v5 06/11] qapi: add failover negotiated event
+Message-ID: <20191025075100.i6dqqvnepghhd7ve@jenstp.localdomain>
+References: <20191023082711.16694-1-jfreimann@redhat.com>
+ <20191023082711.16694-7-jfreimann@redhat.com>
+ <878sp9mlpb.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::330
+In-Reply-To: <878sp9mlpb.fsf@dusky.pond.sub.org>
+User-Agent: NeoMutt/20180716-1376-5d6ed1
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-MC-Unique: 5BfM57FkOnetmmMiDsieyw-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=WINDOWS-1252; format=flowed
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,159 +90,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Richard Henderson <richard.henderson@linaro.org>,
- "open list:ARM TCG CPUs" <qemu-arm@nongnu.org>,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Cc: pkrempa@redhat.com, berrange@redhat.com, ehabkost@redhat.com,
+ mst@redhat.com, aadam@redhat.com, qemu-devel@nongnu.org, dgilbert@redhat.com,
+ alex.williamson@redhat.com, laine@redhat.com, ailan@redhat.com,
+ parav@mellanox.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-If CONFIG_PLUGINS is enabled then lets enable testing for all our TCG
-targets. This is a simple smoke test that ensure we don't crash or
-otherwise barf out by running each plugin against each test.
+On Fri, Oct 25, 2019 at 07:35:28AM +0200, Markus Armbruster wrote:
+>We ask patch submitters to cc: subject matter experts for review.  You
+>did.  When such patches touch the QAPI schema, it's best to cc the qapi
+>schema maintainers (Eric Blake and me) as well, because we can't require
+>all subject matter experts to be fluent in the QAPI schema language and
+>conventions.  I found this one more or less by chance.
 
-There is a minor knock on effect for additional runners which need
-specialised QEMU_OPTS which will also need to declare a plugin version
-of the runner. If this gets onerous we might need to add another
-helper.
+Sorry about that, I'll make sure to get the right people next time.
+>
+>Jens Freimann <jfreimann@redhat.com> writes:
+>
+>> This event is sent to let libvirt know that VIRTIO_NET_F_STANDBY
+>> feature was not negotiated during virtio feature negotiation. If this
+>> event is received it means any primary devices hotplugged before
+>> this were were never really added to QEMU devices.
+>
+>Too many negations for my poor old brain to process.
 
-Checking the results of the plugins is left for a later exercise.
+I'll try to explain better :)=20
+>
+>>
+>> Signed-off-by: Jens Freimann <jfreimann@redhat.com>
+>> ---
+>>  qapi/net.json | 16 ++++++++++++++++
+>>  1 file changed, 16 insertions(+)
+>>
+>> diff --git a/qapi/net.json b/qapi/net.json
+>> index 728990f4fb..8c5f3f1fb2 100644
+>> --- a/qapi/net.json
+>> +++ b/qapi/net.json
+>> @@ -737,3 +737,19 @@
+>>  ##
+>>  { 'command': 'announce-self', 'boxed': true,
+>>    'data' : 'AnnounceParameters'}
+>> +
+>> +##
+>> +# @FAILOVER_NEGOTIATED:
+>> +#
+>> +# Emitted when VIRTIO_NET_F_STANDBY was negotiated during feature negot=
+iation
+>> +#
+>> +# Since: 4.2
+>> +#
+>> +# Example:
+>> +#
+>> +# <- { "event": "FAILOVER_NEGOTIATED",
+>> +#      "data": {} }
+>> +#
+>> +##
+>> +{ 'event': 'FAILOVER_NEGOTIATED',
+>> +  'data': {} }
+>
+>The commit message at least tries to explain intended use.  The doc
+>string does not.  Should it?
 
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Sure, I'll add it.=20
 
-diff --git a/tests/Makefile.include b/tests/Makefile.include
-index 09e5b410dca..a2c4c56dbe4 100644
---- a/tests/Makefile.include
-+++ b/tests/Makefile.include
-@@ -1060,6 +1060,15 @@ check-softfloat:
- 		"SKIPPED for non-TCG builds")
- endif
- 
-+# Plugins
-+ifeq ($(CONFIG_PLUGIN),y)
-+.PHONY: plugins
-+plugins:
-+	$(call quiet-command,\
-+		$(MAKE) $(SUBDIR_MAKEFLAGS) -C tests/plugin V="$(V)", \
-+		"BUILD", "plugins")
-+endif
-+
- # Per guest TCG tests
- 
- BUILD_TCG_TARGET_RULES=$(patsubst %,build-tcg-tests-%, $(TARGET_DIRS))
-@@ -1070,7 +1079,7 @@ RUN_TCG_TARGET_RULES=$(patsubst %,run-tcg-tests-%, $(TARGET_DIRS))
- $(foreach PROBE_TARGET,$(TARGET_DIRS), 				\
- 	$(eval -include $(SRC_PATH)/tests/tcg/Makefile.prereqs))
- 
--build-tcg-tests-%:
-+build-tcg-tests-%: $(if $(CONFIG_PLUGIN),plugins)
- 	$(call quiet-command,$(MAKE) $(SUBDIR_MAKEFLAGS) \
- 		-f $(SRC_PATH)/tests/tcg/Makefile.qemu \
- 		SRC_PATH=$(SRC_PATH) \
-diff --git a/tests/tcg/Makefile.target b/tests/tcg/Makefile.target
-index 96646130020..3c7421a356e 100644
---- a/tests/tcg/Makefile.target
-+++ b/tests/tcg/Makefile.target
-@@ -123,11 +123,39 @@ all: $(TESTS) $(EXTRA_TESTS)
- #
- 
- RUN_TESTS=$(patsubst %,run-%, $(TESTS))
-+
-+# If plugins exist also include those in the tests
-+ifeq ($(CONFIG_PLUGIN),y)
-+PLUGIN_DIR=../../plugin
-+VPATH+=$(PLUGIN_DIR)
-+PLUGINS=$(notdir $(wildcard $(PLUGIN_DIR)/*.so))
-+
-+# We need to ensure expand the run-plugin-TEST-with-PLUGIN
-+# pre-requistes manually here as we can't use stems to handle it. We
-+# also add some special helpers the run-plugin- rules can use bellow.
-+
-+$(foreach p,$(PLUGINS), \
-+	$(foreach t,$(TESTS),\
-+		$(eval run-plugin-$(t)-with-$(p): $t $p) \
-+		$(eval run-plugin-$(t)-with-$(p): TIMEOUT=30) \
-+		$(eval RUN_TESTS+=run-plugin-$(t)-with-$(p))))
-+endif
-+
-+strip-plugin = $(wordlist 1, 1, $(subst -with-, ,$1))
-+extract-plugin = $(wordlist 2, 2, $(subst -with-, ,$1))
-+
- RUN_TESTS+=$(EXTRA_RUNS)
- 
- ifdef CONFIG_USER_ONLY
- run-%: %
- 	$(call run-test, $<, $(QEMU) $(QEMU_OPTS) $<, "$< on $(TARGET_NAME)")
-+
-+run-plugin-%:
-+	$(call run-test, $@, $(QEMU) $(QEMU_OPTS) \
-+		-plugin $(PLUGIN_DIR)/$(call extract-plugin,$@) \
-+		-d plugin -D $*.pout \
-+		 $(call strip-plugin,$<), \
-+	"$* on $(TARGET_NAME)")
- else
- run-%: %
- 	$(call run-test, $<, \
-@@ -135,6 +163,15 @@ run-%: %
- 		  -chardev file$(COMMA)path=$<.out$(COMMA)id=output \
- 	   	  $(QEMU_OPTS) $<, \
- 	  "$< on $(TARGET_NAME)")
-+
-+run-plugin-%:
-+	$(call run-test, $@, \
-+	  $(QEMU) -monitor none -display none \
-+		  -chardev file$(COMMA)path=$@.out$(COMMA)id=output \
-+	   	  -plugin $(PLUGIN_DIR)/$(call extract-plugin,$@) \
-+	    	  -d plugin -D $*.pout \
-+	   	  $(QEMU_OPTS) $(call strip-plugin,$<), \
-+	  "$* on $(TARGET_NAME)")
- endif
- 
- gdb-%: %
-diff --git a/tests/tcg/aarch64/Makefile.target b/tests/tcg/aarch64/Makefile.target
-index 509f1afa93d..96d2321045a 100644
---- a/tests/tcg/aarch64/Makefile.target
-+++ b/tests/tcg/aarch64/Makefile.target
-@@ -26,4 +26,10 @@ AARCH64_TESTS += semihosting
- run-semihosting: semihosting
- 	$(call run-test,$<,$(QEMU) $< 2> $<.err, "$< on $(TARGET_NAME)")
- 
-+run-plugin-semihosting-with-%:
-+	$(call run-test, $@, $(QEMU) $(QEMU_OPTS) \
-+		-plugin $(PLUGIN_DIR)/$(call extract-plugin,$@) \
-+		 $(call strip-plugin,$<) 2> $<.err, \
-+		"$< on $(TARGET_NAME) with $*")
-+
- TESTS += $(AARCH64_TESTS)
-diff --git a/tests/tcg/arm/Makefile.softmmu-target b/tests/tcg/arm/Makefile.softmmu-target
-index 231e9a57b48..3fe237ba391 100644
---- a/tests/tcg/arm/Makefile.softmmu-target
-+++ b/tests/tcg/arm/Makefile.softmmu-target
-@@ -23,3 +23,4 @@ LDFLAGS+=-nostdlib -N -static
- test-armv6m-undef: EXTRA_CFLAGS+=-mcpu=cortex-m0
- 
- run-test-armv6m-undef: QEMU_OPTS+=-semihosting -M microbit -kernel
-+run-plugin-test-armv6m-undef-%: QEMU_OPTS+=-semihosting -M microbit -kernel
-diff --git a/tests/tcg/arm/Makefile.target b/tests/tcg/arm/Makefile.target
-index 3ddff852404..0765f37ff04 100644
---- a/tests/tcg/arm/Makefile.target
-+++ b/tests/tcg/arm/Makefile.target
-@@ -34,6 +34,12 @@ ARM_TESTS += semihosting
- run-semihosting: semihosting
- 	$(call run-test,$<,$(QEMU) $< 2> $<.err, "$< on $(TARGET_NAME)")
- 
-+run-plugin-semihosting-with-%:
-+	$(call run-test, $@, $(QEMU) $(QEMU_OPTS) \
-+		-plugin $(PLUGIN_DIR)/$(call extract-plugin,$@) \
-+		 $(call strip-plugin,$<) 2> $<.err, \
-+		"$< on $(TARGET_NAME) with $*")
-+
- TESTS += $(ARM_TESTS)
- 
- # On ARM Linux only supports 4k pages
--- 
-2.20.1
+Thanks for the review!
+
+regards,
+Jens=20
 
 
