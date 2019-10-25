@@ -2,79 +2,78 @@ Return-Path: <SRS0=bySr=YS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3BC5BCA9EA0
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 16:35:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B182CA9EA0
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 16:36:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 074CC20663
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 16:35:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2370E20578
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 16:36:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="FGTfkeZG"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 074CC20663
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BWen1DHS"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2370E20578
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34532 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34536 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iO2Z5-0007e0-VE
-	for qemu-devel@archiver.kernel.org; Fri, 25 Oct 2019 12:35:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35970)
+	id 1iO2Zu-000138-VC
+	for qemu-devel@archiver.kernel.org; Fri, 25 Oct 2019 12:36:43 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35137)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1iO2CL-0003qH-9R
- for qemu-devel@nongnu.org; Fri, 25 Oct 2019 12:12:22 -0400
+ (envelope-from <stefanha@redhat.com>) id 1iO27I-0004Hr-8S
+ for qemu-devel@nongnu.org; Fri, 25 Oct 2019 12:07:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1iO2CJ-0005Ua-LJ
- for qemu-devel@nongnu.org; Fri, 25 Oct 2019 12:12:20 -0400
-Received: from mail-oi1-x230.google.com ([2607:f8b0:4864:20::230]:45580)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1iO2CJ-0005UD-Gp
- for qemu-devel@nongnu.org; Fri, 25 Oct 2019 12:12:19 -0400
-Received: by mail-oi1-x230.google.com with SMTP id o205so1945414oib.12
- for <qemu-devel@nongnu.org>; Fri, 25 Oct 2019 09:12:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=gXHKxg+CR5koGVWP1EQKxRo+QB+NP4/sHkue85G+Fog=;
- b=FGTfkeZG8oBvFyh5WKVsWOR72yTiNleMnxvFQf5LJO9gdCC3HnjnBsii7IHN7fm5yH
- C/2opX9PaSgbrI2lJsqi7APTZ9Zlgmkn+atho8oDgq2t6x36zBbypVNfbiOy8oTh4Z+8
- zyuwiuoq63ZxfgyBeVLcMMbNyxOY03ncg/mLITreXXkTp8+gqWJJbxKrukY5gfYJiLiE
- N/jZm4XzBtnEVlYu10nUEbR/pmmwjW2XZ1wqoCIaEjPNwxZYKIWsEZgn19A5g1clSgV5
- GzB54OszBFhDwB/PKFEALnw6coG71FowkD7Czu/C5xI7y9NAdyn7R9bWqQz6HCbKK+HJ
- IfFQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=gXHKxg+CR5koGVWP1EQKxRo+QB+NP4/sHkue85G+Fog=;
- b=HeI5ehH+PGcdbGGcUxvogDWFhq16/OcK/ylESNw0AqKFTCy8lGphkiUMfgKFWl9BXI
- 85e/MGNRwcCFZN4++p3On7Y6G8ZVRyZ7qoXN34CoPs5IXOZn8tbHeOsVLLyzF9L0TzOS
- Q5ktI7E2zUOi6/+q7CMs7qCkleFgVWg8cN34dEGTrNNkst3LsFCQA9zg2hnTu1U2nAsb
- 45N0ZiEWhsPMrpqblLr+q+Zy3m9ax3UU9tcg3G3O3m5dSLlDfwu1AY3qU9d50Nm9bi2d
- i1nJbp4+jk4W/hj/iUQ+RWl1YN2dFZYqh6f9egjflIGaXnBfDNDrYVxugkyBQMBejUKB
- Buuw==
-X-Gm-Message-State: APjAAAUNyPr1R4C59mx0DqHt8zKEfguUzKqsfdz8HsIdYAW19tsu7oFa
- uL07PL+tcR/yCH7khUQTCbTHm/WBi/87qI23o4SDYA==
-X-Google-Smtp-Source: APXvYqzmHdg0h3J2ukg06oGV0fSQ7HLAUcYVM61FUKP0xdKE6KXfeGU7vwEqHHl/4oXCjryKZIdr3HcIgX4yDLTZF+I=
-X-Received: by 2002:aca:2312:: with SMTP id e18mr2721371oie.98.1572019938621; 
- Fri, 25 Oct 2019 09:12:18 -0700 (PDT)
+ (envelope-from <stefanha@redhat.com>) id 1iO27F-0003oM-Sv
+ for qemu-devel@nongnu.org; Fri, 25 Oct 2019 12:07:08 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:28097
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1iO27F-0003nj-OR
+ for qemu-devel@nongnu.org; Fri, 25 Oct 2019 12:07:05 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1572019625;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=l8/E8Ixm69JNDiocHrRbDC2w2nRid/JAzc8pC/QbMe4=;
+ b=BWen1DHSKwqvPc3/5fGggytbzE283qGWZahpjy3huChINPMxJXsMZT59G6Ckl882ZHmwCp
+ u5bRPaTrqGLz5ArsDeSWLcfUbrAbvTiNM8xc0ZE+gbQT5xt4VhJVOFzhSNpy191QGJOx0D
+ EiOl3e+aTYL8FmGZvr8Bkn1vzTVAX9g=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-142-4cjSk5cnOF2wgtcHYMLz8w-1; Fri, 25 Oct 2019 12:07:03 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B37DD1005509;
+ Fri, 25 Oct 2019 16:07:01 +0000 (UTC)
+Received: from localhost (ovpn-117-215.ams2.redhat.com [10.36.117.215])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 5385E5D70E;
+ Fri, 25 Oct 2019 16:06:53 +0000 (UTC)
+From: Stefan Hajnoczi <stefanha@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v2 12/15] qemu-img: adds option to use aio engine for
+ benchmarking
+Date: Fri, 25 Oct 2019 18:04:41 +0200
+Message-Id: <20191025160444.31632-13-stefanha@redhat.com>
+In-Reply-To: <20191025160444.31632-1-stefanha@redhat.com>
+References: <20191025160444.31632-1-stefanha@redhat.com>
 MIME-Version: 1.0
-References: <20191025142159.12459-1-richard.henderson@linaro.org>
-In-Reply-To: <20191025142159.12459-1-richard.henderson@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 25 Oct 2019 17:12:07 +0100
-Message-ID: <CAFEAcA_Wpn7uOs_GB5=ym+poSq=vVStp4EVPzaYoGGyEX90x2w@mail.gmail.com>
-Subject: Re: [PULL 00/12] tcg patch queue
-To: Richard Henderson <richard.henderson@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::230
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-MC-Unique: 4cjSk5cnOF2wgtcHYMLz8w-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,105 +85,118 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+Cc: Fam Zheng <fam@euphon.net>, oleksandr@redhat.com, qemu-block@nongnu.org,
+ Julia Suvorova <jusual@redhat.com>, Markus Armbruster <armbru@redhat.com>,
+ Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Kevin Wolf <kwolf@redhat.com>,
+ Aarushi Mehta <mehta.aaru20@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, 25 Oct 2019 at 15:22, Richard Henderson
-<richard.henderson@linaro.org> wrote:
->
-> The following changes since commit bad76ac319556dab2497429d473b49a237672e1c:
->
->   Merge remote-tracking branch 'remotes/vivier2/tags/trivial-branch-pull-request' into staging (2019-10-25 14:17:08 +0100)
->
-> are available in the Git repository at:
->
->   https://github.com/rth7680/qemu.git tags/pull-tcg-20191025
->
-> for you to fetch changes up to 0ed1bfb046b740b70eed2cf3581e01768703b185:
->
->   translate-all: Remove tb_alloc (2019-10-25 10:15:25 -0400)
->
-> ----------------------------------------------------------------
-> Improvements for TARGET_PAGE_BITS_VARY
-> Fix for TCI ld16u_i64.
-> Fix for segv on icount execute from i/o memory.
-> Two misc cleanups.
->
-> ----------------------------------------------------------------
+From: Aarushi Mehta <mehta.aaru20@gmail.com>
 
-Compile failure, win32:
+Signed-off-by: Aarushi Mehta <mehta.aaru20@gmail.com>
+Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+---
+v10:
+ * Add missing space to qemu-img command-line documentation
+---
+ qemu-img.c       | 11 ++++++++++-
+ qemu-img-cmds.hx |  4 ++--
+ qemu-img.texi    |  5 ++++-
+ 3 files changed, 16 insertions(+), 4 deletions(-)
 
-In file included from
-/usr/lib/mxe/usr/x86_64-w64-mingw32.shared/lib/glib-2.0/include/glibconfig.h:9:0,
-                 from
-/usr/lib/mxe/usr/x86_64-w64-mingw32.shared/include/glib-2.0/glib/gtypes.h:32,
-                 from
-/usr/lib/mxe/usr/x86_64-w64-mingw32.shared/include/glib-2.0/glib/galloca.h:32,
-                 from
-/usr/lib/mxe/usr/x86_64-w64-mingw32.shared/include/glib-2.0/glib.h:30,
-                 from /home/petmay01/qemu-for-merges/include/glib-compat.h:32,
-                 from /home/petmay01/qemu-for-merges/include/qemu/osdep.h:140,
-                 from /home/petmay01/qemu-for-merges/exec.c:20:
-/home/petmay01/qemu-for-merges/include/exec/cpu-all.h: In function
-'tlb_hit_page':
-/usr/lib/mxe/usr/x86_64-w64-mingw32.shared/include/glib-2.0/glib/gmacros.h:337:23:
-error: expected expression befor
-e 'do'
- #define G_STMT_START  do
-                       ^
-/usr/lib/mxe/usr/x86_64-w64-mingw32.shared/include/glib-2.0/glib/gtestutils.h:115:41:
-note: in expansion of macro 'G_STMT_START'
- #define g_assert(expr)                  G_STMT_START { \
-                                         ^
-/home/petmay01/qemu-for-merges/include/qemu/osdep.h:152:20: note: in
-expansion of macro 'g_assert'
- #define assert(x)  g_assert(x)
-                    ^
-/home/petmay01/qemu-for-merges/include/exec/cpu-all.h:225:29: note: in
-expansion of macro 'assert'
- #  define TARGET_PAGE_MASK (assert(target_page.decided), target_page.mask)
-                             ^
-/home/petmay01/qemu-for-merges/include/exec/cpu-all.h:372:33: note: in
-expansion of macro 'TARGET_PAGE_MASK'
-     return addr == (tlb_addr & (TARGET_PAGE_MASK | TLB_INVALID_MASK));
-                                 ^
+diff --git a/qemu-img.c b/qemu-img.c
+index 8b03ef8171..3e696a4d8e 100644
+--- a/qemu-img.c
++++ b/qemu-img.c
+@@ -4210,7 +4210,8 @@ static int img_bench(int argc, char **argv)
+             {"force-share", no_argument, 0, 'U'},
+             {0, 0, 0, 0}
+         };
+-        c =3D getopt_long(argc, argv, ":hc:d:f:no:qs:S:t:wU", long_options=
+, NULL);
++        c =3D getopt_long(argc, argv, ":hc:d:f:ni:o:qs:S:t:wU", long_optio=
+ns,
++                        NULL);
+         if (c =3D=3D -1) {
+             break;
+         }
+@@ -4253,6 +4254,14 @@ static int img_bench(int argc, char **argv)
+         case 'n':
+             flags |=3D BDRV_O_NATIVE_AIO;
+             break;
++        case 'i':
++            ret =3D bdrv_parse_aio(optarg, &flags);
++            if (ret < 0) {
++                error_report("Invalid aio option: %s", optarg);
++                ret =3D -1;
++                goto out;
++            }
++            break;
+         case 'o':
+         {
+             offset =3D cvtnum(optarg);
+diff --git a/qemu-img-cmds.hx b/qemu-img-cmds.hx
+index 1c93e6d185..77b5a8dda8 100644
+--- a/qemu-img-cmds.hx
++++ b/qemu-img-cmds.hx
+@@ -20,9 +20,9 @@ STEXI
+ ETEXI
+=20
+ DEF("bench", img_bench,
+-    "bench [-c count] [-d depth] [-f fmt] [--flush-interval=3Dflush_interv=
+al] [-n] [--no-drain] [-o offset] [--pattern=3Dpattern] [-q] [-s buffer_siz=
+e] [-S step_size] [-t cache] [-w] [-U] filename")
++    "bench [-c count] [-d depth] [-f fmt] [--flush-interval=3Dflush_interv=
+al] [-n] [--no-drain] [-o offset] [--pattern=3Dpattern] [-q] [-s buffer_siz=
+e] [-S step_size] [-t cache] [-i aio] [-w] [-U] filename")
+ STEXI
+-@item bench [-c @var{count}] [-d @var{depth}] [-f @var{fmt}] [--flush-inte=
+rval=3D@var{flush_interval}] [-n] [--no-drain] [-o @var{offset}] [--pattern=
+=3D@var{pattern}] [-q] [-s @var{buffer_size}] [-S @var{step_size}] [-t @var=
+{cache}] [-w] [-U] @var{filename}
++@item bench [-c @var{count}] [-d @var{depth}] [-f @var{fmt}] [--flush-inte=
+rval=3D@var{flush_interval}] [-n] [--no-drain] [-o @var{offset}] [--pattern=
+=3D@var{pattern}] [-q] [-s @var{buffer_size}] [-S @var{step_size}] [-t @var=
+{cache}] [-i @var{aio}] [-w] [-U] @var{filename}
+ ETEXI
+=20
+ DEF("check", img_check,
+diff --git a/qemu-img.texi b/qemu-img.texi
+index b5156d6316..20136fcb94 100644
+--- a/qemu-img.texi
++++ b/qemu-img.texi
+@@ -206,7 +206,7 @@ Command description:
+ Amends the image format specific @var{options} for the image file
+ @var{filename}. Not all file formats support this operation.
+=20
+-@item bench [-c @var{count}] [-d @var{depth}] [-f @var{fmt}] [--flush-inte=
+rval=3D@var{flush_interval}] [-n] [--no-drain] [-o @var{offset}] [--pattern=
+=3D@var{pattern}] [-q] [-s @var{buffer_size}] [-S @var{step_size}] [-t @var=
+{cache}] [-w] [-U] @var{filename}
++@item bench [-c @var{count}] [-d @var{depth}] [-f @var{fmt}] [--flush-inte=
+rval=3D@var{flush_interval}] [-n] [-i @var{aio}] [--no-drain] [-o @var{offs=
+et}] [--pattern=3D@var{pattern}] [-q] [-s @var{buffer_size}] [-S @var{step_=
+size}] [-t @var{cache}] [-w] [-U] @var{filename}
+=20
+ Run a simple sequential I/O benchmark on the specified image. If @code{-w}=
+ is
+ specified, a write test is performed, otherwise a read test is performed.
+@@ -227,6 +227,9 @@ If @code{-n} is specified, the native AIO backend is us=
+ed if possible. On
+ Linux, this option only works if @code{-t none} or @code{-t directsync} is
+ specified as well.
+=20
++If @code{-i} is specified, aio option can be used to specify different AIO
++backends: @var{threads}, @var{native} or @var{io_uring}.
++
+ For write tests, by default a buffer filled with zeros is written. This ca=
+n be
+ overridden with a pattern byte specified by @var{pattern}.
+=20
+--=20
+2.21.0
 
-(repeated in all the other places TARGET_PAGE_MASK is used;
-similar for TARGET_PAGE_BITS.)
-
-Also
-/home/petmay01/qemu-for-merges/exec.c: In function 'iotlb_to_section':
-/home/petmay01/qemu-for-merges/exec.c:2871:1: error: control reaches
-end of non-void function [-Werror=return-type]
- }
- ^
-/home/petmay01/qemu-for-merges/exec.c: In function 'qemu_target_page_size':
-/home/petmay01/qemu-for-merges/exec.c:3791:1: error: control reaches
-end of non-void function [-Werror=return-type]
- }
- ^
-/home/petmay01/qemu-for-merges/exec.c: In function 'qemu_target_page_bits':
-/home/petmay01/qemu-for-merges/exec.c:3796:1: error: control reaches
-end of non-void function [-Werror=return-type]
- }
- ^
-cc1: all warnings being treated as errors
-/home/petmay01/qemu-for-merges/exec.c: In function 'last_ram_page':
-/home/petmay01/qemu-for-merges/exec.c:1977:1: error: control reaches
-end of non-void function [-Werror=return-type]
- }
- ^
-/home/petmay01/qemu-for-merges/exec.c: In function 'iotlb_to_section':
-/home/petmay01/qemu-for-merges/exec.c:2871:1: error: control reaches
-end of non-void function [-Werror=return-type]
- }
- ^
-
-Not sure if that's just follow-on errors from the earlier
-ones, though.
-
-thanks
--- PMM
 
