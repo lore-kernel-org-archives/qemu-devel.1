@@ -7,79 +7,78 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 66406CA9EA0
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A9BD4CA9EBD
 	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 11:44:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2F84A2070B
+	by mail.kernel.org (Postfix) with ESMTPS id 7354E2070B
 	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 11:44:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="YdvW9nh0"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2F84A2070B
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="tARXIZaf"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7354E2070B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58962 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58966 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iNy1V-0006LW-6n
+	id 1iNy1V-0006M3-Id
 	for qemu-devel@archiver.kernel.org; Fri, 25 Oct 2019 07:44:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45080)
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45130)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1iNxwP-0006gO-1c
- for qemu-devel@nongnu.org; Fri, 25 Oct 2019 07:39:38 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1iNxwV-0006qW-UM
+ for qemu-devel@nongnu.org; Fri, 25 Oct 2019 07:39:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1iNxwI-0006c6-E5
- for qemu-devel@nongnu.org; Fri, 25 Oct 2019 07:39:36 -0400
-Received: from mail-qk1-x729.google.com ([2607:f8b0:4864:20::729]:38449)
+ (envelope-from <richard.henderson@linaro.org>) id 1iNxwQ-0006gc-Pw
+ for qemu-devel@nongnu.org; Fri, 25 Oct 2019 07:39:41 -0400
+Received: from mail-qk1-x742.google.com ([2607:f8b0:4864:20::742]:39897)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1iNxwG-0006aV-GD
- for qemu-devel@nongnu.org; Fri, 25 Oct 2019 07:39:29 -0400
-Received: by mail-qk1-x729.google.com with SMTP id p4so1403429qkf.5
- for <qemu-devel@nongnu.org>; Fri, 25 Oct 2019 04:39:26 -0700 (PDT)
+ id 1iNxwP-0006fB-1v
+ for qemu-devel@nongnu.org; Fri, 25 Oct 2019 07:39:37 -0400
+Received: by mail-qk1-x742.google.com with SMTP id 15so1401379qkh.6
+ for <qemu-devel@nongnu.org>; Fri, 25 Oct 2019 04:39:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=MfrPU6dfjKdIPv9pRU2qfeqITCMfZWCuzZQmM0QxYQ0=;
- b=YdvW9nh04/K98nOhMMeTA9x6+a26eY7B3qAAmfBLYDRcVNVtC14+Ff5ulygjtXvQCK
- ZC3zYiRiOjrqlaf331uOhMPK1Gze4ttLD/iO83dPhyrVoVnNaXG5mx7RY4WWOXf8XFtb
- 0EhGUNL7ICG88dMdRka7PkA+IVtGA9yH2Dtf6KlPPU8jpexZPlkmS97Y8TGkpZcOdYbd
- VPqqhtnZ6urHQyx8tmQGUE+8guZOKxVXt0nRA3vj+8K9JVtLBmx6033cmsx34mODd7is
- MsjuvvIi9R8DcavW64tfC+Ir29ExzPCMABmLGXqpdmEcLBiSW/1vzX7mo6GRnQiPoEcl
- Lw2Q==
+ bh=gyTalvpUNKSJ73L+c2LcfOwC3yCRl3XSXEKw11FCS20=;
+ b=tARXIZaf6JD0O9SZZCu7GP4auGvVhv7DjA+9hKeRokTMaCXYJDGn31BbcZXum3Y+cO
+ diDAadMmFfFRj2KDve28ON0J+vUV4+qm51pB1rYwTMYLJI8mIcUtA/icikTKVzd2rd0P
+ j0S9QZ6v5PC2En32z4VLUhrNkaONv89wWwXsAyQXyX5aXL5t0ricm3bfU5SYF3cq1M1x
+ qErQJGO0312iSn8lfYidXV/OKJkkTVJFijsRoeewtqNbC9F6OQ1MuP2bujEaN97oaGla
+ ZXiR/R9bG5DHRODjU+SB2UflrnuJwTyERG6RQ4tSW3XFjHrAk6FwzhLAQYsbG6GSNbgD
+ YHNw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references;
- bh=MfrPU6dfjKdIPv9pRU2qfeqITCMfZWCuzZQmM0QxYQ0=;
- b=scHJBHaU8PIv9gz78g+Fk2HfrNpxeZhvfhhBW65/SIwxNUEJKbPCKdsxy7G//9Ap0J
- gXhY2TEmBum3a5vq7NBaSJd7FfOtXZEHBcGD7nuFYxS5bANO7MFrdoV4oUAYqfbbo5pP
- u6N+ZCxc20iPxlKFUOtCGPC3nB8zYijPSD04CRtgyw586aY5ACwpHQP1q6bWoY+FXNwR
- C9QPDmYRc08+bNpigLq6gSFdU3rXH4wFBsiQOEZLka6MRrgFCNx3K2Iz4CM1jkANgHLI
- paJo08UZ7TIPCjBE+4/D3SARHvm7jL6MmucIywBgWums1IdzZQ5pxWntsMikxEBuP249
- aKiw==
-X-Gm-Message-State: APjAAAWitZ5oir0fpgH+RftjgBfbYlnq6JlK8/jOm1CtOvpX7daQCUB6
- Iq/k26YizfMoD18WmxsiuJIyp+JHBQc=
-X-Google-Smtp-Source: APXvYqxq6Aqt5lb8YL8eOGjV2BycRh1h2F/7dT4ZU0wSlZIFZFIYZIY29a9g7KxGI9pHe+nWzD3nzA==
-X-Received: by 2002:a37:6305:: with SMTP id x5mr2367044qkb.498.1572003566025; 
- Fri, 25 Oct 2019 04:39:26 -0700 (PDT)
+ bh=gyTalvpUNKSJ73L+c2LcfOwC3yCRl3XSXEKw11FCS20=;
+ b=bhSNrpy+MSYOUBYJyUa1yE1ocs45vjNe7ltvZEmRh2gGhqb8o286m0cTQpvAmTkjHv
+ BSQYaOnMlM4BnVfY6yRhEiikJjOnDwAClZSspIvpBM6fii7YFX6m45+uPlOJWcdYdNbW
+ HdtqsPGyGG7melgbJwcgL9tvIcha0raJgojNv+JJ6QFJFHbZiQO80BvFNkOAMr1BSBd3
+ gCMeckd8TG1xHB8EIFN2HZkMqXZMwmghbYydt7RKTRw1KgCDneRoHxyiTxdgCVE2yPDO
+ 7MCEIVBs/8xjVTUX+1rOnCfQWs7FVKEqBIiJvkO8B5Nws6SFxgUCplMctv2OWvKskkum
+ 6U4Q==
+X-Gm-Message-State: APjAAAU54oEDSiEBFvTh4xK1SKugZ97stJ6NLJg9gG3SQKxOCtOcjgMx
+ 8xRGUShmrbhafhSpU211xyOD8H2x8Qo=
+X-Google-Smtp-Source: APXvYqwNfSIPuSrnweJE5Z6p+WWVkVtcnvb9CUDeJST5WzUMThmvHZvWKiafLfQkGyXt4LD8aWBJBg==
+X-Received: by 2002:a37:507:: with SMTP id 7mr2378216qkf.107.1572003576108;
+ Fri, 25 Oct 2019 04:39:36 -0700 (PDT)
 Received: from localhost.localdomain (rrcs-172-254-253-50.nyc.biz.rr.com.
  [172.254.253.50])
- by smtp.gmail.com with ESMTPSA id x38sm1473335qtc.64.2019.10.25.04.39.25
+ by smtp.gmail.com with ESMTPSA id x38sm1473335qtc.64.2019.10.25.04.39.35
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 25 Oct 2019 04:39:25 -0700 (PDT)
+ Fri, 25 Oct 2019 04:39:35 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 03/12] target/sparc: Define an enumeration for accessing
- env->regwptr
-Date: Fri, 25 Oct 2019 07:39:12 -0400
-Message-Id: <20191025113921.9412-4-richard.henderson@linaro.org>
+Subject: [PATCH v2 12/12] linux-user/alpha: Set r20 secondary return value
+Date: Fri, 25 Oct 2019 07:39:21 -0400
+Message-Id: <20191025113921.9412-13-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20191025113921.9412-1-richard.henderson@linaro.org>
 References: <20191025113921.9412-1-richard.henderson@linaro.org>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::729
+X-Received-From: 2607:f8b0:4864:20::742
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,55 +95,40 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+This value is not, as far as I know, used by any linux software,
+but it is set by the kernel and is part of the ABI.
+
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/sparc/cpu.h | 33 +++++++++++++++++++++++++++++++++
- 1 file changed, 33 insertions(+)
+v2: Do not set the parent secondary return if SETTLS.
+---
+ linux-user/alpha/target_cpu.h | 9 +++++++++
+ 1 file changed, 9 insertions(+)
 
-diff --git a/target/sparc/cpu.h b/target/sparc/cpu.h
-index 778aa8e073..ae97c7d9f7 100644
---- a/target/sparc/cpu.h
-+++ b/target/sparc/cpu.h
-@@ -13,6 +13,39 @@
+diff --git a/linux-user/alpha/target_cpu.h b/linux-user/alpha/target_cpu.h
+index dd25e18f47..ad408ab5cc 100644
+--- a/linux-user/alpha/target_cpu.h
++++ b/linux-user/alpha/target_cpu.h
+@@ -27,10 +27,19 @@ static inline void cpu_clone_regs_child(CPUAlphaState *env, target_ulong newsp,
+     }
+     env->ir[IR_V0] = 0;
+     env->ir[IR_A3] = 0;
++    env->ir[IR_A4] = 1;  /* OSF/1 secondary return: child */
+ }
  
- /*#define EXCP_INTERRUPT 0x100*/
+ static inline void cpu_clone_regs_parent(CPUAlphaState *env, unsigned flags)
+ {
++    /*
++     * OSF/1 secondary return: parent
++     * Note that the kernel does not do this if SETTLS, because the
++     * settls argument register is still live after copy_thread.
++     */
++    if (!(flags & CLONE_SETTLS)) {
++        env->ir[IR_A4] = 0;
++    }
+ }
  
-+/* Windowed register indexes.  */
-+enum {
-+    WREG_O0,
-+    WREG_O1,
-+    WREG_O2,
-+    WREG_O3,
-+    WREG_O4,
-+    WREG_O5,
-+    WREG_O6,
-+    WREG_O7,
-+
-+    WREG_L0,
-+    WREG_L1,
-+    WREG_L2,
-+    WREG_L3,
-+    WREG_L4,
-+    WREG_L5,
-+    WREG_L6,
-+    WREG_L7,
-+
-+    WREG_I0,
-+    WREG_I1,
-+    WREG_I2,
-+    WREG_I3,
-+    WREG_I4,
-+    WREG_I5,
-+    WREG_I6,
-+    WREG_I7,
-+
-+    WREG_SP = WREG_O6,
-+    WREG_FP = WREG_I6,
-+};
-+
- /* trap definitions */
- #ifndef TARGET_SPARC64
- #define TT_TFAULT   0x01
+ static inline void cpu_set_tls(CPUAlphaState *env, target_ulong newtls)
 -- 
 2.17.1
 
