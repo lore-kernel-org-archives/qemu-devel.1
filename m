@@ -6,49 +6,52 @@ X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 74DA7CA9EA0
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 16:50:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BECCCCA9EA0
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 16:53:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3AE2D21D71
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 16:50:41 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3AE2D21D71
+	by mail.kernel.org (Postfix) with ESMTPS id 9374B21D81
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 16:53:27 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9374B21D81
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=rt-rk.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34622 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34652 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iO2nP-0003uG-9T
-	for qemu-devel@archiver.kernel.org; Fri, 25 Oct 2019 12:50:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40572)
+	id 1iO2q6-0001J6-1o
+	for qemu-devel@archiver.kernel.org; Fri, 25 Oct 2019 12:53:26 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40526)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <aleksandar.markovic@rt-rk.com>) id 1iO2ic-0004xj-5R
- for qemu-devel@nongnu.org; Fri, 25 Oct 2019 12:45:47 -0400
+ (envelope-from <aleksandar.markovic@rt-rk.com>) id 1iO2ia-0004qs-BP
+ for qemu-devel@nongnu.org; Fri, 25 Oct 2019 12:45:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aleksandar.markovic@rt-rk.com>) id 1iO2iX-0002Fa-5x
- for qemu-devel@nongnu.org; Fri, 25 Oct 2019 12:45:41 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:34453 helo=mail.rt-rk.com)
+ (envelope-from <aleksandar.markovic@rt-rk.com>) id 1iO2iV-0002DZ-Ki
+ for qemu-devel@nongnu.org; Fri, 25 Oct 2019 12:45:39 -0400
+Received: from mx2.rt-rk.com ([89.216.37.149]:60689 helo=mail.rt-rk.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
- id 1iO2iW-0002Dx-QK
- for qemu-devel@nongnu.org; Fri, 25 Oct 2019 12:45:37 -0400
+ id 1iO2iV-0001Xe-9b
+ for qemu-devel@nongnu.org; Fri, 25 Oct 2019 12:45:35 -0400
 Received: from localhost (localhost [127.0.0.1])
- by mail.rt-rk.com (Postfix) with ESMTP id 03E961A228F;
- Fri, 25 Oct 2019 18:44:30 +0200 (CEST)
+ by mail.rt-rk.com (Postfix) with ESMTP id 760DA1A227E;
+ Fri, 25 Oct 2019 18:44:29 +0200 (CEST)
 X-Virus-Scanned: amavisd-new at rt-rk.com
 Received: from rtrkw774-lin.domain.local (rtrkw774-lin.domain.local
  [10.10.14.106])
- by mail.rt-rk.com (Postfix) with ESMTPSA id AE3DE1A2282;
+ by mail.rt-rk.com (Postfix) with ESMTPSA id 555141A2232;
  Fri, 25 Oct 2019 18:44:29 +0200 (CEST)
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 12/20] target/mips: msa: Split helpers for ASUB_<S|U>.<B|H|W|D>
-Date: Fri, 25 Oct 2019 18:44:14 +0200
-Message-Id: <1572021862-28273-13-git-send-email-aleksandar.markovic@rt-rk.com>
+Subject: [PULL 03/20] MAINTAINERS: Update mail address of Aleksandar Rikalo
+Date: Fri, 25 Oct 2019 18:44:05 +0200
+Message-Id: <1572021862-28273-4-git-send-email-aleksandar.markovic@rt-rk.com>
 X-Mailer: git-send-email 2.7.4
 In-Reply-To: <1572021862-28273-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1572021862-28273-1-git-send-email-aleksandar.markovic@rt-rk.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [fuzzy]
 X-Received-From: 89.216.37.149
 X-BeenThere: qemu-devel@nongnu.org
@@ -69,298 +72,128 @@ Sender: "Qemu-devel"
 
 From: Aleksandar Markovic <amarkovic@wavecomp.com>
 
-Achieves clearer code and slightly better performance.
+Aleksandar Rikalo wishes to change his primary mail address for QEMU.
+Some minor line order is corrected in .mailmap to be alphabetical,
+too.
 
-Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 Reviewed-by: Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>
-Message-Id: <1571826227-10583-13-git-send-email-aleksandar.markovic@rt-rk.com>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+Message-Id: <1571826227-10583-4-git-send-email-aleksandar.markovic@rt-rk.=
+com>
 ---
- target/mips/helper.h     |  12 +++-
- target/mips/msa_helper.c | 169 ++++++++++++++++++++++++++++++++++++++++++-----
- target/mips/translate.c  |  38 +++++++++--
- 3 files changed, 193 insertions(+), 26 deletions(-)
+ .mailmap    |  5 +++--
+ MAINTAINERS | 18 +++++++++---------
+ 2 files changed, 12 insertions(+), 11 deletions(-)
 
-diff --git a/target/mips/helper.h b/target/mips/helper.h
-index d7c4bbf..7b8ad74 100644
---- a/target/mips/helper.h
-+++ b/target/mips/helper.h
-@@ -945,6 +945,16 @@ DEF_HELPER_4(msa_mod_s_h, void, env, i32, i32, i32)
- DEF_HELPER_4(msa_mod_s_w, void, env, i32, i32, i32)
- DEF_HELPER_4(msa_mod_s_d, void, env, i32, i32, i32)
- 
-+DEF_HELPER_4(msa_asub_s_b, void, env, i32, i32, i32)
-+DEF_HELPER_4(msa_asub_s_h, void, env, i32, i32, i32)
-+DEF_HELPER_4(msa_asub_s_w, void, env, i32, i32, i32)
-+DEF_HELPER_4(msa_asub_s_d, void, env, i32, i32, i32)
-+
-+DEF_HELPER_4(msa_asub_u_b, void, env, i32, i32, i32)
-+DEF_HELPER_4(msa_asub_u_h, void, env, i32, i32, i32)
-+DEF_HELPER_4(msa_asub_u_w, void, env, i32, i32, i32)
-+DEF_HELPER_4(msa_asub_u_d, void, env, i32, i32, i32)
-+
- DEF_HELPER_4(msa_hsub_s_h, void, env, i32, i32, i32)
- DEF_HELPER_4(msa_hsub_s_w, void, env, i32, i32, i32)
- DEF_HELPER_4(msa_hsub_s_d, void, env, i32, i32, i32)
-@@ -1053,8 +1063,6 @@ DEF_HELPER_5(msa_subs_s_df, void, env, i32, i32, i32, i32)
- DEF_HELPER_5(msa_subs_u_df, void, env, i32, i32, i32, i32)
- DEF_HELPER_5(msa_subsus_u_df, void, env, i32, i32, i32, i32)
- DEF_HELPER_5(msa_subsuu_s_df, void, env, i32, i32, i32, i32)
--DEF_HELPER_5(msa_asub_s_df, void, env, i32, i32, i32, i32)
--DEF_HELPER_5(msa_asub_u_df, void, env, i32, i32, i32, i32)
- DEF_HELPER_5(msa_mulv_df, void, env, i32, i32, i32, i32)
- DEF_HELPER_5(msa_maddv_df, void, env, i32, i32, i32, i32)
- DEF_HELPER_5(msa_msubv_df, void, env, i32, i32, i32, i32)
-diff --git a/target/mips/msa_helper.c b/target/mips/msa_helper.c
-index ae9e8e0..0e39016 100644
---- a/target/mips/msa_helper.c
-+++ b/target/mips/msa_helper.c
-@@ -2888,6 +2888,157 @@ void helper_msa_mod_u_d(CPUMIPSState *env,
-  * +---------------+----------------------------------------------------------+
-  */
- 
-+
-+static inline int64_t msa_asub_s_df(uint32_t df, int64_t arg1, int64_t arg2)
-+{
-+    /* signed compare */
-+    return (arg1 < arg2) ?
-+        (uint64_t)(arg2 - arg1) : (uint64_t)(arg1 - arg2);
-+}
-+
-+void helper_msa_asub_s_b(CPUMIPSState *env,
-+                         uint32_t wd, uint32_t ws, uint32_t wt)
-+{
-+    wr_t *pwd = &(env->active_fpu.fpr[wd].wr);
-+    wr_t *pws = &(env->active_fpu.fpr[ws].wr);
-+    wr_t *pwt = &(env->active_fpu.fpr[wt].wr);
-+
-+    pwd->b[0]  = msa_asub_s_df(DF_BYTE, pws->b[0],  pwt->b[0]);
-+    pwd->b[1]  = msa_asub_s_df(DF_BYTE, pws->b[1],  pwt->b[1]);
-+    pwd->b[2]  = msa_asub_s_df(DF_BYTE, pws->b[2],  pwt->b[2]);
-+    pwd->b[3]  = msa_asub_s_df(DF_BYTE, pws->b[3],  pwt->b[3]);
-+    pwd->b[4]  = msa_asub_s_df(DF_BYTE, pws->b[4],  pwt->b[4]);
-+    pwd->b[5]  = msa_asub_s_df(DF_BYTE, pws->b[5],  pwt->b[5]);
-+    pwd->b[6]  = msa_asub_s_df(DF_BYTE, pws->b[6],  pwt->b[6]);
-+    pwd->b[7]  = msa_asub_s_df(DF_BYTE, pws->b[7],  pwt->b[7]);
-+    pwd->b[8]  = msa_asub_s_df(DF_BYTE, pws->b[8],  pwt->b[8]);
-+    pwd->b[9]  = msa_asub_s_df(DF_BYTE, pws->b[9],  pwt->b[9]);
-+    pwd->b[10] = msa_asub_s_df(DF_BYTE, pws->b[10], pwt->b[10]);
-+    pwd->b[11] = msa_asub_s_df(DF_BYTE, pws->b[11], pwt->b[11]);
-+    pwd->b[12] = msa_asub_s_df(DF_BYTE, pws->b[12], pwt->b[12]);
-+    pwd->b[13] = msa_asub_s_df(DF_BYTE, pws->b[13], pwt->b[13]);
-+    pwd->b[14] = msa_asub_s_df(DF_BYTE, pws->b[14], pwt->b[14]);
-+    pwd->b[15] = msa_asub_s_df(DF_BYTE, pws->b[15], pwt->b[15]);
-+}
-+
-+void helper_msa_asub_s_h(CPUMIPSState *env,
-+                         uint32_t wd, uint32_t ws, uint32_t wt)
-+{
-+    wr_t *pwd = &(env->active_fpu.fpr[wd].wr);
-+    wr_t *pws = &(env->active_fpu.fpr[ws].wr);
-+    wr_t *pwt = &(env->active_fpu.fpr[wt].wr);
-+
-+    pwd->h[0]  = msa_asub_s_df(DF_HALF, pws->h[0],  pwt->h[0]);
-+    pwd->h[1]  = msa_asub_s_df(DF_HALF, pws->h[1],  pwt->h[1]);
-+    pwd->h[2]  = msa_asub_s_df(DF_HALF, pws->h[2],  pwt->h[2]);
-+    pwd->h[3]  = msa_asub_s_df(DF_HALF, pws->h[3],  pwt->h[3]);
-+    pwd->h[4]  = msa_asub_s_df(DF_HALF, pws->h[4],  pwt->h[4]);
-+    pwd->h[5]  = msa_asub_s_df(DF_HALF, pws->h[5],  pwt->h[5]);
-+    pwd->h[6]  = msa_asub_s_df(DF_HALF, pws->h[6],  pwt->h[6]);
-+    pwd->h[7]  = msa_asub_s_df(DF_HALF, pws->h[7],  pwt->h[7]);
-+}
-+
-+void helper_msa_asub_s_w(CPUMIPSState *env,
-+                         uint32_t wd, uint32_t ws, uint32_t wt)
-+{
-+    wr_t *pwd = &(env->active_fpu.fpr[wd].wr);
-+    wr_t *pws = &(env->active_fpu.fpr[ws].wr);
-+    wr_t *pwt = &(env->active_fpu.fpr[wt].wr);
-+
-+    pwd->w[0]  = msa_asub_s_df(DF_WORD, pws->w[0],  pwt->w[0]);
-+    pwd->w[1]  = msa_asub_s_df(DF_WORD, pws->w[1],  pwt->w[1]);
-+    pwd->w[2]  = msa_asub_s_df(DF_WORD, pws->w[2],  pwt->w[2]);
-+    pwd->w[3]  = msa_asub_s_df(DF_WORD, pws->w[3],  pwt->w[3]);
-+}
-+
-+void helper_msa_asub_s_d(CPUMIPSState *env,
-+                         uint32_t wd, uint32_t ws, uint32_t wt)
-+{
-+    wr_t *pwd = &(env->active_fpu.fpr[wd].wr);
-+    wr_t *pws = &(env->active_fpu.fpr[ws].wr);
-+    wr_t *pwt = &(env->active_fpu.fpr[wt].wr);
-+
-+    pwd->d[0]  = msa_asub_s_df(DF_DOUBLE, pws->d[0],  pwt->d[0]);
-+    pwd->d[1]  = msa_asub_s_df(DF_DOUBLE, pws->d[1],  pwt->d[1]);
-+}
-+
-+
-+static inline uint64_t msa_asub_u_df(uint32_t df, uint64_t arg1, uint64_t arg2)
-+{
-+    uint64_t u_arg1 = UNSIGNED(arg1, df);
-+    uint64_t u_arg2 = UNSIGNED(arg2, df);
-+    /* unsigned compare */
-+    return (u_arg1 < u_arg2) ?
-+        (uint64_t)(u_arg2 - u_arg1) : (uint64_t)(u_arg1 - u_arg2);
-+}
-+
-+void helper_msa_asub_u_b(CPUMIPSState *env,
-+                         uint32_t wd, uint32_t ws, uint32_t wt)
-+{
-+    wr_t *pwd = &(env->active_fpu.fpr[wd].wr);
-+    wr_t *pws = &(env->active_fpu.fpr[ws].wr);
-+    wr_t *pwt = &(env->active_fpu.fpr[wt].wr);
-+
-+    pwd->b[0]  = msa_asub_u_df(DF_BYTE, pws->b[0],  pwt->b[0]);
-+    pwd->b[1]  = msa_asub_u_df(DF_BYTE, pws->b[1],  pwt->b[1]);
-+    pwd->b[2]  = msa_asub_u_df(DF_BYTE, pws->b[2],  pwt->b[2]);
-+    pwd->b[3]  = msa_asub_u_df(DF_BYTE, pws->b[3],  pwt->b[3]);
-+    pwd->b[4]  = msa_asub_u_df(DF_BYTE, pws->b[4],  pwt->b[4]);
-+    pwd->b[5]  = msa_asub_u_df(DF_BYTE, pws->b[5],  pwt->b[5]);
-+    pwd->b[6]  = msa_asub_u_df(DF_BYTE, pws->b[6],  pwt->b[6]);
-+    pwd->b[7]  = msa_asub_u_df(DF_BYTE, pws->b[7],  pwt->b[7]);
-+    pwd->b[8]  = msa_asub_u_df(DF_BYTE, pws->b[8],  pwt->b[8]);
-+    pwd->b[9]  = msa_asub_u_df(DF_BYTE, pws->b[9],  pwt->b[9]);
-+    pwd->b[10] = msa_asub_u_df(DF_BYTE, pws->b[10], pwt->b[10]);
-+    pwd->b[11] = msa_asub_u_df(DF_BYTE, pws->b[11], pwt->b[11]);
-+    pwd->b[12] = msa_asub_u_df(DF_BYTE, pws->b[12], pwt->b[12]);
-+    pwd->b[13] = msa_asub_u_df(DF_BYTE, pws->b[13], pwt->b[13]);
-+    pwd->b[14] = msa_asub_u_df(DF_BYTE, pws->b[14], pwt->b[14]);
-+    pwd->b[15] = msa_asub_u_df(DF_BYTE, pws->b[15], pwt->b[15]);
-+}
-+
-+void helper_msa_asub_u_h(CPUMIPSState *env,
-+                         uint32_t wd, uint32_t ws, uint32_t wt)
-+{
-+    wr_t *pwd = &(env->active_fpu.fpr[wd].wr);
-+    wr_t *pws = &(env->active_fpu.fpr[ws].wr);
-+    wr_t *pwt = &(env->active_fpu.fpr[wt].wr);
-+
-+    pwd->h[0]  = msa_asub_u_df(DF_HALF, pws->h[0],  pwt->h[0]);
-+    pwd->h[1]  = msa_asub_u_df(DF_HALF, pws->h[1],  pwt->h[1]);
-+    pwd->h[2]  = msa_asub_u_df(DF_HALF, pws->h[2],  pwt->h[2]);
-+    pwd->h[3]  = msa_asub_u_df(DF_HALF, pws->h[3],  pwt->h[3]);
-+    pwd->h[4]  = msa_asub_u_df(DF_HALF, pws->h[4],  pwt->h[4]);
-+    pwd->h[5]  = msa_asub_u_df(DF_HALF, pws->h[5],  pwt->h[5]);
-+    pwd->h[6]  = msa_asub_u_df(DF_HALF, pws->h[6],  pwt->h[6]);
-+    pwd->h[7]  = msa_asub_u_df(DF_HALF, pws->h[7],  pwt->h[7]);
-+}
-+
-+void helper_msa_asub_u_w(CPUMIPSState *env,
-+                         uint32_t wd, uint32_t ws, uint32_t wt)
-+{
-+    wr_t *pwd = &(env->active_fpu.fpr[wd].wr);
-+    wr_t *pws = &(env->active_fpu.fpr[ws].wr);
-+    wr_t *pwt = &(env->active_fpu.fpr[wt].wr);
-+
-+    pwd->w[0]  = msa_asub_u_df(DF_WORD, pws->w[0],  pwt->w[0]);
-+    pwd->w[1]  = msa_asub_u_df(DF_WORD, pws->w[1],  pwt->w[1]);
-+    pwd->w[2]  = msa_asub_u_df(DF_WORD, pws->w[2],  pwt->w[2]);
-+    pwd->w[3]  = msa_asub_u_df(DF_WORD, pws->w[3],  pwt->w[3]);
-+}
-+
-+void helper_msa_asub_u_d(CPUMIPSState *env,
-+                         uint32_t wd, uint32_t ws, uint32_t wt)
-+{
-+    wr_t *pwd = &(env->active_fpu.fpr[wd].wr);
-+    wr_t *pws = &(env->active_fpu.fpr[ws].wr);
-+    wr_t *pwt = &(env->active_fpu.fpr[wt].wr);
-+
-+    pwd->d[0]  = msa_asub_u_df(DF_DOUBLE, pws->d[0],  pwt->d[0]);
-+    pwd->d[1]  = msa_asub_u_df(DF_DOUBLE, pws->d[1],  pwt->d[1]);
-+}
-+
-+
- /* TODO: insert the rest of Int Subtract group helpers here */
- 
- 
-@@ -4447,22 +4598,6 @@ static inline int64_t msa_subsuu_s_df(uint32_t df, int64_t arg1, int64_t arg2)
-     }
- }
- 
--static inline int64_t msa_asub_s_df(uint32_t df, int64_t arg1, int64_t arg2)
--{
--    /* signed compare */
--    return (arg1 < arg2) ?
--        (uint64_t)(arg2 - arg1) : (uint64_t)(arg1 - arg2);
--}
--
--static inline uint64_t msa_asub_u_df(uint32_t df, uint64_t arg1, uint64_t arg2)
--{
--    uint64_t u_arg1 = UNSIGNED(arg1, df);
--    uint64_t u_arg2 = UNSIGNED(arg2, df);
--    /* unsigned compare */
--    return (u_arg1 < u_arg2) ?
--        (uint64_t)(u_arg2 - u_arg1) : (uint64_t)(u_arg1 - u_arg2);
--}
--
- static inline int64_t msa_mulv_df(uint32_t df, int64_t arg1, int64_t arg2)
- {
-     return arg1 * arg2;
-@@ -4624,8 +4759,6 @@ MSA_BINOP_DF(subs_s)
- MSA_BINOP_DF(subs_u)
- MSA_BINOP_DF(subsus_u)
- MSA_BINOP_DF(subsuu_s)
--MSA_BINOP_DF(asub_s)
--MSA_BINOP_DF(asub_u)
- MSA_BINOP_DF(mulv)
- MSA_BINOP_DF(dotp_s)
- MSA_BINOP_DF(dotp_u)
-diff --git a/target/mips/translate.c b/target/mips/translate.c
-index 4c68c5b..20c69d2 100644
---- a/target/mips/translate.c
-+++ b/target/mips/translate.c
-@@ -28850,6 +28850,38 @@ static void gen_msa_3r(CPUMIPSState *env, DisasContext *ctx)
-             break;
-         }
-         break;
-+    case OPC_ASUB_S_df:
-+        switch (df) {
-+        case DF_BYTE:
-+            gen_helper_msa_asub_s_b(cpu_env, twd, tws, twt);
-+            break;
-+        case DF_HALF:
-+            gen_helper_msa_asub_s_h(cpu_env, twd, tws, twt);
-+            break;
-+        case DF_WORD:
-+            gen_helper_msa_asub_s_w(cpu_env, twd, tws, twt);
-+            break;
-+        case DF_DOUBLE:
-+            gen_helper_msa_asub_s_d(cpu_env, twd, tws, twt);
-+            break;
-+        }
-+        break;
-+    case OPC_ASUB_U_df:
-+        switch (df) {
-+        case DF_BYTE:
-+            gen_helper_msa_asub_u_b(cpu_env, twd, tws, twt);
-+            break;
-+        case DF_HALF:
-+            gen_helper_msa_asub_u_h(cpu_env, twd, tws, twt);
-+            break;
-+        case DF_WORD:
-+            gen_helper_msa_asub_u_w(cpu_env, twd, tws, twt);
-+            break;
-+        case DF_DOUBLE:
-+            gen_helper_msa_asub_u_d(cpu_env, twd, tws, twt);
-+            break;
-+        }
-+        break;
-     case OPC_ILVEV_df:
-         switch (df) {
-         case DF_BYTE:
-@@ -29059,12 +29091,6 @@ static void gen_msa_3r(CPUMIPSState *env, DisasContext *ctx)
-     case OPC_SUBSUU_S_df:
-         gen_helper_msa_subsuu_s_df(cpu_env, tdf, twd, tws, twt);
-         break;
--    case OPC_ASUB_S_df:
--        gen_helper_msa_asub_s_df(cpu_env, tdf, twd, tws, twt);
--        break;
--    case OPC_ASUB_U_df:
--        gen_helper_msa_asub_u_df(cpu_env, tdf, twd, tws, twt);
--        break;
- 
-     case OPC_DOTP_S_df:
-     case OPC_DOTP_U_df:
--- 
+diff --git a/.mailmap b/.mailmap
+index 0756a0b..3816e4e 100644
+--- a/.mailmap
++++ b/.mailmap
+@@ -39,10 +39,11 @@ Julia Suvorova <jusual@mail.ru> Julia Suvorova via Qe=
+mu-devel <qemu-devel@nongnu
+ Justin Terry (VM) <juterry@microsoft.com> Justin Terry (VM) via Qemu-dev=
+el <qemu-devel@nongnu.org>
+=20
+ # Next, replace old addresses by a more recent one.
+-Anthony Liguori <anthony@codemonkey.ws> Anthony Liguori <aliguori@us.ibm=
+.com>
+-James Hogan <jhogan@kernel.org> <james.hogan@imgtec.com>
+ Aleksandar Markovic <amarkovic@wavecomp.com> <aleksandar.markovic@mips.c=
+om>
+ Aleksandar Markovic <amarkovic@wavecomp.com> <aleksandar.markovic@imgtec=
+.com>
++Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com> <arikalo@wavecomp.com>
++Anthony Liguori <anthony@codemonkey.ws> Anthony Liguori <aliguori@us.ibm=
+.com>
++James Hogan <jhogan@kernel.org> <james.hogan@imgtec.com>
+ Paul Burton <pburton@wavecomp.com> <paul.burton@mips.com>
+ Paul Burton <pburton@wavecomp.com> <paul.burton@imgtec.com>
+ Paul Burton <pburton@wavecomp.com> <paul@archlinuxmips.org>
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 0dc72d3..556ce0b 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -208,7 +208,7 @@ F: disas/microblaze.c
+ MIPS TCG CPUs
+ M: Aurelien Jarno <aurelien@aurel32.net>
+ M: Aleksandar Markovic <amarkovic@wavecomp.com>
+-R: Aleksandar Rikalo <arikalo@wavecomp.com>
++R: Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>
+ S: Maintained
+ F: target/mips/
+ F: default-configs/*mips*
+@@ -363,7 +363,7 @@ F: target/arm/kvm.c
+=20
+ MIPS KVM CPUs
+ M: James Hogan <jhogan@kernel.org>
+-R: Aleksandar Rikalo <arikalo@wavecomp.com>
++R: Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>
+ S: Maintained
+ F: target/mips/kvm.c
+=20
+@@ -934,7 +934,7 @@ MIPS Machines
+ -------------
+ Jazz
+ M: Herv=C3=A9 Poussineau <hpoussin@reactos.org>
+-R: Aleksandar Rikalo <arikalo@wavecomp.com>
++R: Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>
+ S: Maintained
+ F: hw/mips/mips_jazz.c
+ F: hw/display/jazz_led.c
+@@ -942,7 +942,7 @@ F: hw/dma/rc4030.c
+=20
+ Malta
+ M: Aurelien Jarno <aurelien@aurel32.net>
+-R: Aleksandar Rikalo <arikalo@wavecomp.com>
++R: Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>
+ S: Maintained
+ F: hw/mips/mips_malta.c
+ F: hw/mips/gt64xxx_pci.c
+@@ -950,20 +950,20 @@ F: tests/acceptance/linux_ssh_mips_malta.py
+=20
+ Mipssim
+ M: Aleksandar Markovic <amarkovic@wavecomp.com>
+-R: Aleksandar Rikalo <arikalo@wavecomp.com>
++R: Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>
+ S: Odd Fixes
+ F: hw/mips/mips_mipssim.c
+ F: hw/net/mipsnet.c
+=20
+ R4000
+ M: Aurelien Jarno <aurelien@aurel32.net>
+-R: Aleksandar Rikalo <arikalo@wavecomp.com>
++R: Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>
+ S: Maintained
+ F: hw/mips/mips_r4k.c
+=20
+ Fulong 2E
+ M: Aleksandar Markovic <amarkovic@wavecomp.com>
+-R: Aleksandar Rikalo <arikalo@wavecomp.com>
++R: Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>
+ S: Odd Fixes
+ F: hw/mips/mips_fulong2e.c
+ F: hw/isa/vt82c686.c
+@@ -972,7 +972,7 @@ F: include/hw/isa/vt82c686.h
+=20
+ Boston
+ M: Paul Burton <pburton@wavecomp.com>
+-R: Aleksandar Rikalo <arikalo@wavecomp.com>
++R: Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>
+ S: Maintained
+ F: hw/core/loader-fit.c
+ F: hw/mips/boston.c
+@@ -2352,7 +2352,7 @@ F: disas/i386.c
+=20
+ MIPS TCG target
+ M: Aurelien Jarno <aurelien@aurel32.net>
+-R: Aleksandar Rikalo <arikalo@wavecomp.com>
++R: Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>
+ S: Maintained
+ F: tcg/mips/
+=20
+--=20
 2.7.4
 
 
