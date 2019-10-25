@@ -2,81 +2,115 @@ Return-Path: <SRS0=bySr=YS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E37FCA9EA0
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 10:56:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F3561CA9EA0
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 10:58:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EEB2B21D71
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 10:56:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B921321929
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 10:58:08 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="jezXd4Mv"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EEB2B21D71
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b="TGfwzRsD"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B921321929
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=outlook.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58530 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58564 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iNxGU-0001im-TT
-	for qemu-devel@archiver.kernel.org; Fri, 25 Oct 2019 06:56:18 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38583)
+	id 1iNxIF-0004ml-FJ
+	for qemu-devel@archiver.kernel.org; Fri, 25 Oct 2019 06:58:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36218)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1iNx6q-0006Te-LX
- for qemu-devel@nongnu.org; Fri, 25 Oct 2019 06:46:22 -0400
+ (envelope-from <casasfernando@outlook.com>) id 1iNwpd-0002Mn-Ta
+ for qemu-devel@nongnu.org; Fri, 25 Oct 2019 06:28:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1iNx6p-0004t2-5z
- for qemu-devel@nongnu.org; Fri, 25 Oct 2019 06:46:20 -0400
-Received: from mail-ot1-x334.google.com ([2607:f8b0:4864:20::334]:39192)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1iNx6n-0004sB-9x
- for qemu-devel@nongnu.org; Fri, 25 Oct 2019 06:46:19 -0400
-Received: by mail-ot1-x334.google.com with SMTP id s22so1743018otr.6
- for <qemu-devel@nongnu.org>; Fri, 25 Oct 2019 03:46:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=WGppmCpKS3dwHZsjVwAOeneLFq0wEm5HeaXQ9RYdWww=;
- b=jezXd4MveKc7sm/La/hW7yPTXUPvy+EYlEWcm/GzYF4eEM75vI9uwMaA4zd+nLSRoe
- c35FN2QVWxMA6cKOG6x4EooFWVlrviM2SAooasvVU8uOTwp24v5/5XEfE17u60/5wc0C
- MLTkmFoDqCYZQn7QiaGx+zB9UG/zWUGedaJfmvclhgTk+YuSnyBRFIykbpOZATAwFdi+
- AUYLDKIR8g800J+fM5eUZyFdH9ZMlxYpwbBhle535CHLb/ib1DVwfJ77kw23UltUB7AG
- khZOhT205ggUBQAbAazzGXt2Aqt57RYPREbNvTqV6YAjDFRono0lAGr6dp7dje9h+bBj
- MMZw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=WGppmCpKS3dwHZsjVwAOeneLFq0wEm5HeaXQ9RYdWww=;
- b=G4QwdIvwbg0BAnNXgHkwSH62AIFiZ+nHOch8i6zs2/NoZqX5Qj61iK4CMKTWVvmmIO
- 2VrIgO0x02HBgPy9Uu+QOdkmqJ7AUlk98VMJw4CKKPTaZ1Q/MhKkKmCmuwIVpp1asTMM
- CdtJqjP0oBniaA6mHiWmxjvjRx0wC9LwfTpohvK5hfsdqxHygb3p7GoIoZnD90yV4yLw
- OVrIAaOjmFtSBnLRCr3hWP7O8gVj22bw64x8dZ24yvWXtNHNGOhlZJ+DFV1KBWz8jEwG
- XHoROCF5mgJO1nahxN82t45ob4Pl/Vy2al1a1nKWb0K/0IHaOM80ja8rw1R8zXQHg8J3
- HxMQ==
-X-Gm-Message-State: APjAAAUfIgWKLMWO2GpBOLEvSWdJyA/UpPU1Iv4lLS03+whi1/McvyxK
- AQ8prZJ3wu8WvWOJIc3oCbVTy2CvOehWcqlXfgpJ6w==
-X-Google-Smtp-Source: APXvYqwRpYBGt8rBDr3xKsmcVJJN6sOWgsA+JEuiMZlVs6unNW3BYDJ3Lsr20URM4T+qV8gS1ulPzJpMoqfo7aLN/gg=
-X-Received: by 2002:a9d:708e:: with SMTP id l14mr704068otj.135.1572000376362; 
- Fri, 25 Oct 2019 03:46:16 -0700 (PDT)
+ (envelope-from <casasfernando@outlook.com>) id 1iNwpb-0004gc-PW
+ for qemu-devel@nongnu.org; Fri, 25 Oct 2019 06:28:32 -0400
+Received: from mail-oln040092070071.outbound.protection.outlook.com
+ ([40.92.70.71]:21382 helo=EUR03-AM5-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <casasfernando@outlook.com>)
+ id 1iNwpb-0004gL-4B; Fri, 25 Oct 2019 06:28:31 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=OTtcAjkhDvIUyKa0uD1QMC4HV46XzV1Y2W/TvdcBjt8HL43cfcOpZ8xDHLHGSQm6umub81ukb4UHS8estsQLdmoN2n8ut1qWHf74mDT47N+PTPEKWie+1gSxX1SLx3ZFhqlXNDfLVm7VN1T0B8P3N1ogRwy9g1r0ELg5nz/235N/A+6e51hNXdf7BnYwF0ONCCBFj59wiY6TvzuEAzR4JJK8GJWo3GwBzUlFS9bfiXANUqKWk/JvbBIZyhAeG5YAYAr6DAp/+PxdUkJ97jsuHXCDIoJXOVejTsyvKlPQRu1pNThnuwpCca2/FrV1HG63oa0a+K/MZmoFkbELL8BG5Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=heE6OZpVrIKsZxShuwsKo6eq6axMkAYo71gGXdcLXp4=;
+ b=bDzPphzUXow7IwX73JrACQqmNMUcgk0F3WGINHV4TVjT9w+2XT/+/+oCry76uP4b2O8oTgYVSd8HvHLyhl0LhQ88jC9cA90iY84AJdM+PbQAjgMeSyRarfnOVyPqLHTZ1S2A5pX26G84QmgOoUREZIN6YpP1wsi+ElImXCp5Obujd3AammNhXG2A86OSvbN4KDoqhWOsybv/aMkaMKom0x/Eu8/HJiWkBXe29e9ZSvVlKvyBDop1jo+3f1yjxEU+v34ieWpSDyIGapeIxMf8o6Sxg54gq06CzmNTJmcMq7vwgp4aROHE2+YgrxWbvT4LSC/TEM59v5Wyiay7lL5X+w==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
+ dkim=none; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=outlook.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=heE6OZpVrIKsZxShuwsKo6eq6axMkAYo71gGXdcLXp4=;
+ b=TGfwzRsDdjayTsCTKrHJPXnTfOJcEX1Tn4qpPG7w7YxFFXiv4Qex6IVe17xrwi6wRtD/p7aHyLS7UXf/iha+xpDF0905HMLNxCjs2Pe9Og3Ncuc63uzf264pt/e2mzZNyjMI57lExnwctOiVjIKp3s8njCOEULaQS5jjn/GyvOD9CjZQmHkUkYlbZRDJFVN6ZMJOrUIWtCH1ldhqBtp1pP2q97nmik5Gah6xq964/gkQUEcrMc8JEhuwl0eRKWXr3f3QD3P9Zvd4qLa3w4tYFiLlaA8ugJDPRTvHIgUd5b8ZoRST8LMcyjWERHxjZfoMV0/uVUtbO/BerLtXChgJQQ==
+Received: from VE1EUR03FT018.eop-EUR03.prod.protection.outlook.com
+ (10.152.18.59) by VE1EUR03HT036.eop-EUR03.prod.protection.outlook.com
+ (10.152.19.157) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.20.2305.15; Fri, 25 Oct
+ 2019 10:28:29 +0000
+Received: from VI1PR03MB4814.eurprd03.prod.outlook.com (10.152.18.52) by
+ VE1EUR03FT018.mail.protection.outlook.com (10.152.18.135) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2387.20 via Frontend Transport; Fri, 25 Oct 2019 10:28:29 +0000
+Received: from VI1PR03MB4814.eurprd03.prod.outlook.com
+ ([fe80::a063:1748:6dae:1c75]) by VI1PR03MB4814.eurprd03.prod.outlook.com
+ ([fe80::a063:1748:6dae:1c75%6]) with mapi id 15.20.2387.023; Fri, 25 Oct 2019
+ 10:28:29 +0000
+From: =?iso-8859-1?Q?Fernando_Casas_Sch=F6ssow?= <casasfernando@outlook.com>
+To: Kevin Wolf <kwolf@redhat.com>
+Subject: Re: qemu crashing when attaching an ISO file to a virtio-scsi CD-ROM
+ device through libvirt
+Thread-Topic: qemu crashing when attaching an ISO file to a virtio-scsi CD-ROM
+ device through libvirt
+Thread-Index: AQHVhfzB7lc3mC9pr0OyFBE/io6S3qdoYtGAgAAfrICAAqmVgIAABdMA
+Date: Fri, 25 Oct 2019 10:28:28 +0000
+Message-ID: <VI1PR03MB48140DB2BA084EAEBD980302A4650@VI1PR03MB4814.eurprd03.prod.outlook.com>
+References: <VI1PR03MB481484C08A04458ACA64F7A0A46C0@VI1PR03MB4814.eurprd03.prod.outlook.com>
+ <dbb363cf-bc3a-6de5-a62a-1467208d0017@redhat.com>
+ <VI1PR03MB4814DBEC71814C520D123ADDA46B0@VI1PR03MB4814.eurprd03.prod.outlook.com>
+ <20191025100735.GA7275@localhost.localdomain>
+In-Reply-To: <20191025100735.GA7275@localhost.localdomain>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-clientproxiedby: PR0P264CA0016.FRAP264.PROD.OUTLOOK.COM (2603:10a6:100::28)
+ To VI1PR03MB4814.eurprd03.prod.outlook.com
+ (2603:10a6:803:b7::21)
+x-incomingtopheadermarker: OriginalChecksum:7FA57E465A949B161975AA041C72447DD1C7FBB6A63D280107D7C6B2BA9E1302;
+ UpperCasedChecksum:645B500B81EC8302514AB4E78F70BD6E5D5C0A42EDB108B5B5A01BC8AD6C92E0;
+ SizeAsReceived:7625; Count:49
+x-ms-exchange-messagesentrepresentingtype: 1
+x-mailer: pantheon-mail/1.0.8
+x-tmn: [6O6KB2tC1uZvwN7VBAGsuo6H/mIEB8RKwJHcYYvDpeo=]
+x-microsoft-original-message-id: <1571999306.6067.0@smtp-mail.outlook.com>
+x-ms-publictraffictype: Email
+x-incomingheadercount: 49
+x-eopattributedmessage: 0
+x-ms-traffictypediagnostic: VE1EUR03HT036:
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: vqehmmm2QJArOzfIjv2pUAZ2vjggFiTTU7mjUtHIAuHAdAV42hO3QyolgphSpVzmtG/9B1gp03j+EsYLp+qmjnlnpwAFjkjJUSIelJm2MKYWTf3dfcFp8CgyTk1HoP+reRfLPQYLjNvqxG4l05CrzafV2el5nWGSpz/90jwnOGxgD6DrvAysDbBUTKAi4Zpc
+x-ms-exchange-transport-forked: True
+Content-Type: multipart/alternative;
+ boundary="_000_VI1PR03MB48140DB2BA084EAEBD980302A4650VI1PR03MB4814eurp_"
 MIME-Version: 1.0
-References: <1571925835-31930-1-git-send-email-pbonzini@redhat.com>
-In-Reply-To: <1571925835-31930-1-git-send-email-pbonzini@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 25 Oct 2019 11:46:05 +0100
-Message-ID: <CAFEAcA-1gWa8qRK85i+MP-UixiPq7NPHw+8kn6KPq6VQMtRt4g@mail.gmail.com>
-Subject: Re: [PULL 00/39] Misc (mostly x86) patches for 2019-10-24
-To: Paolo Bonzini <pbonzini@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::334
+X-OriginatorOrg: outlook.com
+X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg: 00000000-0000-0000-0000-000000000000
+X-MS-Exchange-CrossTenant-Network-Message-Id: 655413bb-af32-4306-cad3-08d759361361
+X-MS-Exchange-CrossTenant-rms-persistedconsumerorg: 00000000-0000-0000-0000-000000000000
+X-MS-Exchange-CrossTenant-originalarrivaltime: 25 Oct 2019 10:28:29.0093 (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Internet
+X-MS-Exchange-CrossTenant-id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: VE1EUR03HT036
+X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
+X-Received-From: 40.92.70.71
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,71 +122,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+Cc: John Snow <jsnow@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>,
+ "qemu-block@nongnu.org" <qemu-block@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, 24 Oct 2019 at 15:21, Paolo Bonzini <pbonzini@redhat.com> wrote:
->
-> The following changes since commit e9d42461920f6f40f4d847a5ba18e90d095ed0=
-b9:
->
->   Merge remote-tracking branch 'remotes/kraxel/tags/audio-20191018-pull-r=
-equest' into staging (2019-10-18 14:13:11 +0100)
->
-> are available in the git repository at:
->
->
->   git://github.com/bonzini/qemu.git tags/for-upstream
->
-> for you to fetch changes up to a263f81cb4b302eb392898bdc4ad4381e1961629:
->
->   i386: implement IGNNE (2019-10-24 16:02:04 +0200)
->
-> ----------------------------------------------------------------
-> * Bulgarian translation update (Alexander)
-> * RTC and PC refactorings (Herv=C3=A9, Philippe, Sergio)
-> * RTC fix (Marcelo)
-> * More comprehensive MCE logging (Mario)
-> * x86 IGNNE implementation (Paolo)
-> * Microvm machine type (Sergio)
-> * Support for UMONITOR/UMWAIT/TPAUSE (Tao)
-> * Do not use %m in common code (Thomas)
-> * NoNonArchitecturalCoreSharing Hyper-V enlightenment (Vitaly)
-> * getpagesize cleanups (Wei)
->
+--_000_VI1PR03MB48140DB2BA084EAEBD980302A4650VI1PR03MB4814eurp_
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 
-I got a link failure building the --disable-tcg config on x86-64:
+Thanks for the reply Kevin.
+
+I will do my best to upgrade to 4.1, test again and report back if this is =
+fixed or not in that version.
+Hopefully it is.
+
+Fernando
+
+On vie, oct 25, 2019 at 12:07 PM, Kevin Wolf <kwolf@redhat.com> wrote:
+Am 23.10.2019 um 19:28 hat Fernando Casas Sch=F6ssow geschrieben:
+Hi John, Thanks for looking into this. I can quickly repro the problem with=
+ qemu 4.0 binary with debugging symbols enabled as I have it available alre=
+ady. Doing the same with qemu 4.1 or development head may be too much hassl=
+e but if it's really the only way I can give it try.
+We had a lot of iothread related fixes in 4.1, so this would really be the =
+only way to tell if it's a bug that still exists. I suspect that it's alrea=
+dy fixed (and to be more precise, I assume that commit d0ee0204f fixed it).=
+ Kevin
 
 
-  LINK    x86_64-softmmu/qemu-system-x86_64
-hw/i386/pc_piix.o: In function `pc_init1':
-/home/petmay01/linaro/qemu-for-merges/hw/i386/pc_piix.c:216: undefined
-reference to `x86_register_ferr_irq'
-hw/i386/pc_q35.o: In function `pc_q35_init':
-/home/petmay01/linaro/qemu-for-merges/hw/i386/pc_q35.c:264: undefined
-reference to `x86_register_ferr_irq'
-collect2: error: ld returned 1 exit status
-Makefile:206: recipe for target 'qemu-system-x86_64' failed
-make[1]: *** [qemu-system-x86_64] Error 1
-Makefile:482: recipe for target 'x86_64-softmmu/all' failed
-make: *** [x86_64-softmmu/all] Error 2
-make: *** Waiting for unfinished jobs....
-  LINK    i386-softmmu/qemu-system-i386
-hw/i386/pc_piix.o: In function `pc_init1':
-/home/petmay01/linaro/qemu-for-merges/hw/i386/pc_piix.c:216: undefined
-reference to `x86_register_ferr_irq'
-hw/i386/pc_q35.o: In function `pc_q35_init':
-/home/petmay01/linaro/qemu-for-merges/hw/i386/pc_q35.c:264: undefined
-reference to `x86_register_ferr_irq'
-collect2: error: ld returned 1 exit status
 
+--_000_VI1PR03MB48140DB2BA084EAEBD980302A4650VI1PR03MB4814eurp_
+Content-Type: text/html; charset="iso-8859-1"
+Content-ID: <70FF353749A6ED4CA9C79C802B6639CC@eurprd03.prod.outlook.com>
+Content-Transfer-Encoding: quoted-printable
 
-x86_register_ferr_irq() is defined in target/i386/fpu_helper.c,
-which is only built if CONFIG_TCG, but the callers don't
-seem to be similarly guarded and there's no stub fallback.
+<html>
+<head>
+<meta http-equiv=3D"Content-Type" content=3D"text/html; charset=3Diso-8859-=
+1">
+</head>
+<body>
+Thanks for the reply Kevin.
+<div><br>
+</div>
+<div>I will do my best to upgrade to 4.1, test again and report back if thi=
+s is fixed or not in that version.</div>
+<div>Hopefully it is.</div>
+<div><br>
+</div>
+<div>Fernando</div>
+<div><br>
+</div>
+<div>
+<div>On vie, oct 25, 2019 at 12:07 PM, Kevin Wolf &lt;kwolf@redhat.com&gt; =
+wrote:<br>
+<blockquote type=3D"cite">
+<div class=3D"plaintext" style=3D"white-space: pre-wrap;">Am 23.10.2019 um =
+19:28 hat Fernando Casas Sch=F6ssow geschrieben:
+<blockquote>Hi John, Thanks for looking into this. I can quickly repro the =
+problem with qemu 4.0 binary with debugging symbols enabled as I have it av=
+ailable already. Doing the same with qemu 4.1 or development head may be to=
+o much hassle but if it's really
+ the only way I can give it try. </blockquote>
+We had a lot of iothread related fixes in 4.1, so this would really be the =
+only way to tell if it's a bug that still exists. I suspect that it's alrea=
+dy fixed (and to be more precise, I assume that commit d0ee0204f fixed it).=
+ Kevin
+</div>
+</blockquote>
+<br>
+<br>
+</div>
+</div>
+</body>
+</html>
 
-thanks
--- PMM
+--_000_VI1PR03MB48140DB2BA084EAEBD980302A4650VI1PR03MB4814eurp_--
 
