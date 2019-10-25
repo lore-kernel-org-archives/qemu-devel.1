@@ -2,87 +2,81 @@ Return-Path: <SRS0=bySr=YS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1B594CA9EBE
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 13:31:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4418DCA9EA0
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 13:35:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D6DA021D7F
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 13:31:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 10F0321929
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 13:35:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CEOAssEp"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D6DA021D7F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PXbbHk3s"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 10F0321929
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59976 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60012 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iNzgJ-0003Oi-2a
-	for qemu-devel@archiver.kernel.org; Fri, 25 Oct 2019 09:31:07 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58971)
+	id 1iNzks-0002ae-8o
+	for qemu-devel@archiver.kernel.org; Fri, 25 Oct 2019 09:35:50 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34305)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mrolnik@gmail.com>) id 1iNzPK-0005EP-J4
- for qemu-devel@nongnu.org; Fri, 25 Oct 2019 09:13:35 -0400
+ (envelope-from <imammedo@redhat.com>) id 1iNzcp-0000m6-QA
+ for qemu-devel@nongnu.org; Fri, 25 Oct 2019 09:27:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mrolnik@gmail.com>) id 1iNzPJ-000199-1O
- for qemu-devel@nongnu.org; Fri, 25 Oct 2019 09:13:34 -0400
-Received: from mail-wr1-x433.google.com ([2a00:1450:4864:20::433]:33089)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <mrolnik@gmail.com>) id 1iNzPI-00018c-RQ
- for qemu-devel@nongnu.org; Fri, 25 Oct 2019 09:13:32 -0400
-Received: by mail-wr1-x433.google.com with SMTP id s1so2327631wro.0
- for <qemu-devel@nongnu.org>; Fri, 25 Oct 2019 06:13:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=87Iy/QnNHtLxvX6jVSCCgi733svf73GUIYITANarm74=;
- b=CEOAssEp36eyQn1sd3bGdxLpBlO3fXB5cQuc6Dphl3LW1vTB76/6NxXlidKZ50622a
- OgQtSmEW+xAHLiguYftEVbokud1GZvYOiPMPgmvD4Hdkxr1wNr3IwTc8isTzIzobDo5w
- PIpM1pF6TubN9a/NulYIwib37fHze9Hqb7wbuhyCiwl3xrhNovgJ7jAafSRMeAk2goBg
- +WszyeQXMsQT8eYAJFMsySegpUBV6zlyQCAqEFEJ5Z+EMUV+omJfLM73n1tatYWd63zP
- ks3TSK9C0JnJBxNh+1pN4G9Sh9V3uXF36po0FfE816PqCLBuakLYompFfT9schU0z2Wp
- 91TQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=87Iy/QnNHtLxvX6jVSCCgi733svf73GUIYITANarm74=;
- b=Wr6HXCRZBYwOIUZVbOzsn7QAMHuLvbTmvWi8UbQEUhhC24OhAp3CUmmFlrjDeTxrCf
- RvqCf+iTLTy25Kd1lTWLNrIH+GdO+Sb3m0RMTighQRC9rvUKWTT/s632IP/FpP/yJVzx
- h0VRe9QD7FQvV9dy8P6rrnHxIh3jtc4XvJefIdCcYh0QGHOKi9K1dyBXb3YOp5SLV3XV
- TksIEMC8PKELAkKVguJV8ajQv7V8Wh1iL07QmZA3zTRngdu2c647plc4pHv6Chq1p+mD
- xWNjzPPfiIi4IU47Ji7wdIV+bGQOkZ/8MvivnHTnA2w+r04YTCBPHTtIIqbVKNozUMrc
- bGhA==
-X-Gm-Message-State: APjAAAWlvXBCHJJlXQq3tPqnT3LyBpPGKViCx/9gGF9RVId5Qk4c2T5o
- Ki5d4BRRPJEiZqJy51IQd2aKb+BK3cWOpQ==
-X-Google-Smtp-Source: APXvYqx3V2YKrjX+H1GQ4WWno3CqKgoG86veOiA1gwgsQm7Wq2JkL5E/URqEPx6FsyOzwLgUpm4BlA==
-X-Received: by 2002:a5d:544d:: with SMTP id w13mr3060836wrv.19.1572009211310; 
- Fri, 25 Oct 2019 06:13:31 -0700 (PDT)
-Received: from 8c859074c0ff.ant.amazon.com.com
- (bzq-79-181-93-41.red.bezeqint.net. [79.181.93.41])
- by smtp.gmail.com with ESMTPSA id x205sm2616139wmb.5.2019.10.25.06.13.29
- (version=TLS1_2 cipher=ECDHE-RSA-AES128-SHA bits=128/128);
- Fri, 25 Oct 2019 06:13:30 -0700 (PDT)
-From: Michael Rolnik <mrolnik@gmail.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v34 13/13] target/avr: Add tests
-Date: Fri, 25 Oct 2019 16:12:37 +0300
-Message-Id: <20191025131237.63149-14-mrolnik@gmail.com>
-X-Mailer: git-send-email 2.17.2 (Apple Git-113)
-In-Reply-To: <20191025131237.63149-1-mrolnik@gmail.com>
-References: <20191025131237.63149-1-mrolnik@gmail.com>
+ (envelope-from <imammedo@redhat.com>) id 1iNzcn-0007dl-Mx
+ for qemu-devel@nongnu.org; Fri, 25 Oct 2019 09:27:31 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:59747
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1iNzcn-0007cq-Bf
+ for qemu-devel@nongnu.org; Fri, 25 Oct 2019 09:27:29 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1572010046;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=+iCb/sdPv8Lz9A0cfrw/hI15X1udWcrq4pYJ5Ij4vU0=;
+ b=PXbbHk3sS2HW0CTlcEsm+xZ3uW6tfv8CaIUil78dLJn+DtqRXTiw1l7KXeekEF6VQxDbKV
+ cmwluY8vWH7EAPY2helNEFFslml7d9ipjObbm05jE1TY80h5sn0AD/OFD4EObqmD15ZQ2s
+ 6IyX9JbpWgGc+shH2yK0Zg67NyEEaHQ=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-183-HMEe2cjQMPKtepDcOB5g5g-1; Fri, 25 Oct 2019 09:27:24 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BC17A47B;
+ Fri, 25 Oct 2019 13:27:23 +0000 (UTC)
+Received: from localhost (unknown [10.43.2.182])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 4541F60BF4;
+ Fri, 25 Oct 2019 13:27:22 +0000 (UTC)
+Date: Fri, 25 Oct 2019 15:27:20 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+To: Tao Xu <tao3.xu@intel.com>
+Subject: Re: [PATCH v13 06/12] numa: Extend CLI to provide memory latency
+ and bandwidth information
+Message-ID: <20191025152720.4068bfae@redhat.com>
+In-Reply-To: <9e30d8fe-7274-4ee8-3c4b-64c370141358@intel.com>
+References: <20191020111125.27659-1-tao3.xu@intel.com>
+ <20191020111125.27659-7-tao3.xu@intel.com>
+ <20191023172854.42c495d5@redhat.com>
+ <9e30d8fe-7274-4ee8-3c4b-64c370141358@intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::433
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-MC-Unique: HMEe2cjQMPKtepDcOB5g5g-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=WINDOWS-1252
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,117 +88,165 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: thuth@redhat.com, Michael Rolnik <mrolnik@gmail.com>,
- richard.henderson@linaro.org, dovgaluk@ispras.ru, imammedo@redhat.com,
- philmd@redhat.com, aleksandar.m.mail@gmail.com
+Cc: "ehabkost@redhat.com" <ehabkost@redhat.com>, "Liu,
+ Jingqi" <jingqi.liu@intel.com>, "Du, Fan" <fan.du@intel.com>,
+ Markus Armbruster <armbru@redhat.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "jonathan.cameron@huawei.com" <jonathan.cameron@huawei.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-1. Avocado test
-    The test is based on
-    https://github.com/seharris/qemu-avr-tests/tree/master/free-rtos/Demo
-    demo which. If working correctly, prints 'ABCDEFGHIJKLMNOPQRSTUVWX' out.
-    it also demostrates that timer and IRQ are working
+On Fri, 25 Oct 2019 14:33:53 +0800
+Tao Xu <tao3.xu@intel.com> wrote:
 
-2. Boot serial test
-    Print out 'T' through serial port
+> On 10/23/2019 11:28 PM, Igor Mammedov wrote:
+> > On Sun, 20 Oct 2019 19:11:19 +0800
+> > Tao Xu <tao3.xu@intel.com> wrote: =20
+> [...]
+> >> +#
+> >> +# @access-bandwidth: access bandwidth (MB/s)
+> >> +#
+> >> +# @read-bandwidth: read bandwidth (MB/s)
+> >> +#
+> >> +# @write-bandwidth: write bandwidth (MB/s) =20
+> > I think units here are not appropriate, values stored in fields are
+> > minimal base units only and nothing else (i.e. ps and B/s)
+> >  =20
+> Eric suggest me to drop picoseconds. So here I can use ns. For=20
+> bandwidth, if we use B/s here, does it let user or developer to=20
+> misunderstand that the smallest unit is B/s ?
 
-Signed-off-by: Michael Rolnik <mrolnik@gmail.com>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Acked-by: Thomas Huth <thuth@redhat.com>
----
- tests/Makefile.include           |  2 ++
- tests/acceptance/machine_avr6.py | 36 ++++++++++++++++++++++++++++++++
- tests/boot-serial-test.c         | 10 +++++++++
- 3 files changed, 48 insertions(+)
- create mode 100644 tests/acceptance/machine_avr6.py
+It's not nanoseconds or MB/s stored in theses fields, isn't it?
+I'd specify units in which value is stored or drop units altogether.
 
-diff --git a/tests/Makefile.include b/tests/Makefile.include
-index 09e5b410dc..7f3f971191 100644
---- a/tests/Makefile.include
-+++ b/tests/Makefile.include
-@@ -206,6 +206,8 @@ check-qtest-i386-y += tests/test-x86-cpuid-compat$(EXESUF)
- check-qtest-i386-y += tests/numa-test$(EXESUF)
- check-qtest-x86_64-y += $(check-qtest-i386-y)
- 
-+check-qtest-avr-y += tests/boot-serial-test$(EXESUF)
-+
- check-qtest-alpha-y += tests/boot-serial-test$(EXESUF)
- check-qtest-alpha-$(CONFIG_VGA) += tests/display-vga-test$(EXESUF)
- 
-diff --git a/tests/acceptance/machine_avr6.py b/tests/acceptance/machine_avr6.py
-new file mode 100644
-index 0000000000..0601080b01
---- /dev/null
-+++ b/tests/acceptance/machine_avr6.py
-@@ -0,0 +1,36 @@
-+import logging
-+import time
-+import distutils.spawn
-+
-+from avocado import skipUnless
-+from avocado_qemu import Test
-+from avocado.utils import process
-+
-+class AVR6Machine(Test):
-+    timeout = 5
-+
-+    def test_freertos(self):
-+        """
-+        :avocado: tags=arch:avr
-+        :avocado: tags=machine:sample
-+        """
-+        """
-+        https://github.com/seharris/qemu-avr-tests/raw/master/free-rtos/Demo/AVR_ATMega2560_GCC/demo.elf
-+        constantly prints out 'ABCDEFGHIJKLMNOPQRSTUVWXABCDEFGHIJKLMNOPQRSTUVWX'
-+        """
-+        rom_url = 'https://github.com/seharris/qemu-avr-tests'
-+        rom_url += '/raw/master/free-rtos/Demo/AVR_ATMega2560_GCC/demo.elf'
-+        rom_hash = '7eb521f511ca8f2622e0a3c5e8dd686efbb911d4'
-+        rom_path = self.fetch_asset(rom_url, asset_hash=rom_hash)
-+
-+        self.vm.set_machine('sample')
-+        self.vm.add_args('-bios', rom_path)
-+        self.vm.add_args('-nographic')
-+        self.vm.launch()
-+
-+        time.sleep(2)
-+        self.vm.shutdown()
-+
-+        match = 'ABCDEFGHIJKLMNOPQRSTUVWXABCDEFGHIJKLMNOPQRSTUVWX'
-+
-+        self.assertIn(match, self.vm.get_log())
-diff --git a/tests/boot-serial-test.c b/tests/boot-serial-test.c
-index d3a54a0ba5..1121ed0db2 100644
---- a/tests/boot-serial-test.c
-+++ b/tests/boot-serial-test.c
-@@ -16,6 +16,15 @@
- #include "qemu/osdep.h"
- #include "libqtest.h"
- 
-+static const uint8_t bios_avr[] = {
-+    0x88, 0xe0,             /* ldi r24, 0x08   */
-+    0x80, 0x93, 0xc1, 0x00, /* sts 0x00C1, r24 ; Enable tx */
-+    0x86, 0xe0,             /* ldi r24, 0x06   */
-+    0x80, 0x93, 0xc2, 0x00, /* sts 0x00C2, r24 ; Set the data bits to 8 */
-+    0x84, 0xe5,             /* ldi r24, 0x54   */
-+    0x80, 0x93, 0xc6, 0x00, /* sts 0x00C6, r24 ; Output 'T' */
-+};
-+
- static const uint8_t kernel_mcf5208[] = {
-     0x41, 0xf9, 0xfc, 0x06, 0x00, 0x00,     /* lea 0xfc060000,%a0 */
-     0x10, 0x3c, 0x00, 0x54,                 /* move.b #'T',%d0 */
-@@ -103,6 +112,7 @@ typedef struct testdef {
- 
- static testdef_t tests[] = {
-     { "alpha", "clipper", "", "PCI:" },
-+    { "avr", "sample", "", "T", sizeof(bios_avr), NULL, bios_avr },
-     { "ppc", "ppce500", "", "U-Boot" },
-     { "ppc", "40p", "-vga none -boot d", "Trying cd:," },
-     { "ppc", "g3beige", "", "PowerPC,750" },
--- 
-2.17.2 (Apple Git-113)
+Maybe Eric and Markus can suggest a better way to describe fields.
+
+> >>   @item -numa node[,mem=3D@var{size}][,cpus=3D@var{firstcpu}[-@var{las=
+tcpu}]][,nodeid=3D@var{node}][,initiator=3D@var{initiator}]
+> >>   @itemx -numa node[,memdev=3D@var{id}][,cpus=3D@var{firstcpu}[-@var{l=
+astcpu}]][,nodeid=3D@var{node}][,initiator=3D@var{initiator}]
+> >>   @itemx -numa dist,src=3D@var{source},dst=3D@var{destination},val=3D@=
+var{distance}
+> >>   @itemx -numa cpu,node-id=3D@var{node}[,socket-id=3D@var{x}][,core-id=
+=3D@var{y}][,thread-id=3D@var{z}]
+> >> +@itemx -numa hmat-lb,initiator=3D@var{node},target=3D@var{node},hiera=
+rchy=3D@var{str},data-type=3D@var{str}[,latency=3D@var{lat}][,bandwidth=3D@=
+var{bw}] =20
+> >                                                                        =
+        ^^^                 ^^^
+> > Using the same 'str' for 2 different enums is confusing.
+> > Suggest for 1st use 'level' and for the second just 'type'
+> >  =20
+> Ok
+>=20
+> >>   @findex -numa
+> >>   Define a NUMA node and assign RAM and VCPUs to it.
+> >>   Set the NUMA distance from a source node to a destination node.
+> >> +Set the ACPI Heterogeneous Memory Attributes for the given nodes.
+> >>  =20
+> >>   Legacy VCPU assignment uses @samp{cpus} option where
+> >>   @var{firstcpu} and @var{lastcpu} are CPU indexes. Each
+> >> @@ -256,6 +259,50 @@ specified resources, it just assigns existing res=
+ources to NUMA
+> >>   nodes. This means that one still has to use the @option{-m},
+> >>   @option{-smp} options to allocate RAM and VCPUs respectively.
+> >>  =20
+> >> +Use @samp{hmat-lb} to set System Locality Latency and Bandwidth Infor=
+mation
+> >> +between initiator and target NUMA nodes in ACPI Heterogeneous Attribu=
+te Memory Table (HMAT).
+> >> +Initiator NUMA node can create memory requests, usually including one=
+ or more processors. =20
+> > s/including/it has/
+> >  =20
+> >> +Target NUMA node contains addressable memory.
+> >> +
+> >> +In @samp{hmat-lb} option, @var{node} are NUMA node IDs. @var{str} of =
+'hierarchy'
+> >> +is the memory hierarchy of the target NUMA node: if @var{str} is 'mem=
+ory', the structure
+> >> +represents the memory performance; if @var{str} is 'first-level|secon=
+d-level|third-level',
+> >> +this structure represents aggregated performance of memory side cache=
+s for each domain.
+> >> +@var{str} of 'data-type' is type of data represented by this structur=
+e instance:
+> >> +if 'hierarchy' is 'memory', 'data-type' is 'access|read|write' latenc=
+y(nanoseconds) =20
+> > is nanoseconds is right here? Looking at previous patches default value=
+ of suffix-less
+> > should be picoseconds. I'd just drop '(nanoseconds)'. User will use app=
+ropriate suffix.
+> >  =20
+> OK, I will drop it.
+> >> +or 'access|read|write' bandwidth(MB/s) of the target memory; if 'hier=
+archy' is =20
+> > ditto (MB/s), probably should be Bytes/s for default suffix-less value
+> > (well, I'm not sure how to express it better)
+> >  =20
+>=20
+> But last version, we let !QEMU_IS_ALIGNED(node->bandwidth, MiB) as error.
+it's alignment requirement and it doesn't mean that value could not be
+represented in bytes/s.
+And it is bytes/s if suffix isn't used.
+
+As for alignment and precision of values you probably need to document
+expectations here as well.
+
+> >> +'first-level|second-level|third-level', 'data-type' is 'access|read|w=
+rite' hit latency
+> >> +or 'access|read|write' hit bandwidth of the target memory side cache.
+> >> +
+> >> +@var{lat} of 'latency' is latency value, the possible value and units=
+ are
+> >> +NUM[ps|ns|us] (picosecond|nanosecond|microsecond), the recommended un=
+it is 'ns'. @var{bw}
+> >> +is bandwidth value, the possible value and units are NUM[M|G|T], mean=
+ that =20
+> >  =20
+> >> +the bandwidth value are NUM MB/s, GB/s or TB/s. Note that max NUM is =
+65534,
+> >> +if NUM is 0, means the corresponding latency or bandwidth information=
+ is not provided.
+> >> +And if input numbers without any unit, the latency unit will be 'ps' =
+and the bandwidth
+> >> +will be MB/s. =20
+> >   1st: above is applicable to both bw and lat values and should be docu=
+mented as such
+> >   2nd: 'max NUM is 65534' when different suffixes is fleeting target,
+> >        spec says that entry with 0xFFFF is unreachable, so how about do=
+cumenting
+> >        unreachable value as 0xFFFFFFFFFFFFFFFF (then CLI parsing code w=
+ill
+> >        exclude it from range detection and acpi table building code tra=
+nslate it
+> >        to internal 0xFFFF it could fit into the tables)
+> >  =20
+>=20
+> If we input 0xFFFFFFFFFFFFFFFF, qemu will raise error that parameter=20
+> expect a size value.
+
+opts_type_size() can't handle values >=3D 0xfffffffffffffc00
+
+commit f46bfdbfc8f (util/cutils: Change qemu_strtosz*() from int64_t to uin=
+t64_t)
+
+so behavior would change depending on if the value is parsed by CLI (size) =
+or QMP (unit64) parsers.
+
+we can cannibalize 0x0 as the unreachable value and an absent bandwidth/lat=
+ option
+for not specified case.
+It would be conflicting with matrix [1] values in spec, but CLI/QMP deals w=
+ith
+absolute values which are later processed into HMAT substructure.
+
+Markus,
+Can we make opts_type_size() handle full range of uint64_t?
+
+1)
+ACPI 6.3 spec:
+5.2.27.4 System Locality Latency and Bandwidth Information Structure
 
 
