@@ -6,68 +6,67 @@ X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EB728CA9EA0
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 08:49:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C9ADCA9EBD
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 08:52:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C00A221D71
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 08:49:33 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C00A221D71
+	by mail.kernel.org (Postfix) with ESMTPS id 569E521D71
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 08:52:30 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 569E521D71
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57680 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57730 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iNvHn-0005w8-I8
-	for qemu-devel@archiver.kernel.org; Fri, 25 Oct 2019 04:49:31 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49948)
+	id 1iNvKe-00048j-4S
+	for qemu-devel@archiver.kernel.org; Fri, 25 Oct 2019 04:52:28 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50711)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <laurent@vivier.eu>) id 1iNv51-0000mf-7Y
- for qemu-devel@nongnu.org; Fri, 25 Oct 2019 04:36:20 -0400
+ (envelope-from <laurent@vivier.eu>) id 1iNv5Y-0001hf-5L
+ for qemu-devel@nongnu.org; Fri, 25 Oct 2019 04:36:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <laurent@vivier.eu>) id 1iNv4z-0007tY-SA
- for qemu-devel@nongnu.org; Fri, 25 Oct 2019 04:36:19 -0400
-Received: from mout.kundenserver.de ([212.227.126.134]:42539)
+ (envelope-from <laurent@vivier.eu>) id 1iNv5W-0008KZ-Ul
+ for qemu-devel@nongnu.org; Fri, 25 Oct 2019 04:36:51 -0400
+Received: from mout.kundenserver.de ([212.227.126.131]:34557)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <laurent@vivier.eu>)
- id 1iNv4p-0007i4-NA; Fri, 25 Oct 2019 04:36:07 -0400
+ id 1iNv5P-0008CN-FA; Fri, 25 Oct 2019 04:36:43 -0400
 Received: from localhost.localdomain ([78.238.229.36]) by
  mrelayeu.kundenserver.de (mreue010 [212.227.15.167]) with ESMTPSA (Nemesis)
- id 1MPXta-1iacMQ3LTG-00Mbyg; Fri, 25 Oct 2019 10:35:33 +0200
+ id 1M4K6z-1iOC3d1MB7-000O1d; Fri, 25 Oct 2019 10:36:00 +0200
 From: Laurent Vivier <laurent@vivier.eu>
 To: qemu-devel@nongnu.org
-Subject: [PULL 06/19] hw/timer: Compile devices not target-dependent as common
- object
-Date: Fri, 25 Oct 2019 10:34:58 +0200
-Message-Id: <20191025083511.11463-7-laurent@vivier.eu>
+Subject: [PULL 18/19] hw/rtc/xlnx-zynqmp-rtc: Remove unused "ptimer.h" include
+Date: Fri, 25 Oct 2019 10:35:10 +0200
+Message-Id: <20191025083511.11463-19-laurent@vivier.eu>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20191025083511.11463-1-laurent@vivier.eu>
 References: <20191025083511.11463-1-laurent@vivier.eu>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:fJ4V1AnXTAcItYSV9oR8i35L0OGfAII0+g067o8KOiaQpL/F/Dy
- ZwprbljE8vnKw8Swcki38wOLABSHSdwgvzsbd+ruAOD6OewQ2dfUeIPD3xqRfGXKlWl8MGW
- uN+u7znWyXKIvvd+uqmtszoEu4aaEcKL/AakDVxCLTeOfq8keKigQPyAktuA1038zubP+aE
- R0KAfL6HP8jiXkSihxieg==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:2Rpo3xlo6y0=:J14/lgwOwfUNXqY26XKPK6
- /LCbiixh3U/3SOte/ZGRUhk+qolPY5xQqR270PaRTA3v/G2M+NOBR+aLMRmKFJPx4NdV/1ltx
- fv72HigBTOsZPL/BZJ+Et2RcShxvX28bivAsnJ2IlswAaPXI6xKuSVQ8NSB8qc5fBMccYLuEj
- F5qF4fkimZFsbsgoXyYmry9jl0cWgRd2hU4F22Bs49KlwCJuGSCrh5QFTKUmHn3N0ZE+jiB6W
- ZDf1pBmPYrsXfG9DVDbkGzPQJeocDJzxvh5uGm+Mrdgx3udtJ11UJpNWjQ6SKrAHxff413K8P
- xzagBpNEGKT4O2LUZsJ2fECKH60Llus3OwJ30mQyB2/p4JOIm/upvzxyx3cW6xt2EuKOjo+mr
- NcSHPmpzoYPhrzGFrUomDARcEsRLJ58rBbCObt91brilSotJ8rF/o6Vs/Gv0iDiYSI8AXAbGE
- B1W8Ias8YXT+zsuQm5KKja5bjWPWCbN9STEQquRCYj256usZuLNi9ms0n2GsDu4VvKc5ilGz6
- N9KTMkJieMGuT0JQYAUJZXUPw0t7jiqBk9UWsjJir50pZOyB1ncdpY2h3S7+4J/HSanLbYPTt
- Lj4FBn5fktue0bg3uDk0+Io9V6rDCtvvxiy3zKx6yBVjm5cM2PzaQopdc+zdIjKvpcktqw/vy
- HtFm25iYMsF8SRj35bU1kG9q+iIiITv+yAp2wzNkm1JevXaFgUAQl/djX+XMaDQVjoeGk7y8d
- 2rJOl/ShR9yxS20Tx5wuxhNJRlFYqxvNLu+qz9YoBdOeEjD6pGeNlhJIPqwtJEUqibuT7wXod
- mVE40dupzFuta57phzfzRSI6J/I4S3cymRmnXEpBe4dwb09KizjrRiofQwws+hKwn6Gq0lZNl
- o5vwYz3el7btGeww7WCqF4c5qSYOgtzRxedd5CLao=
+X-Provags-ID: V03:K1:bIVh4Atdz8bHUNgDKytO4sxywaGZPxNGPkscIkQ59ZOiIyIm/xq
+ c8nPdAO8wITFiXU10dVK67Q/hD/eeRjyt7FlwozDNzVNUSu7N5VWqK4n9MHIEupT16Crppp
+ +0UYhJlob30MSu6hlUpt/rYmmSIknby3svJtfkCbqClmTP2DvE77O6Cr/Vjh0/9KYswm32T
+ w1Ix0+hjxjmif4ar3mGhg==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:ra8smSEyvIs=:JTCe2FY0XoUYysYNNN89O1
+ Aro3pi6I4fhHm4AXqjsGea1WxQ8lDqO8HwQEFWwhrLOhITnHTI5eUXJvhIt0GMXwm/DeFkNdR
+ hwoS5iC4RNrZKP67fcCvcGfzLiSA9UTG4C9iXv22bVb8VvQXUkSA9dYfqd/dsLiRs45QUnad9
+ zA/nUqmX8FuHrTAG0tIu/nU54+5tcZ4yzruXEVO3gmKT3Y57Vg3TgEMP6m5a1YD0dYifPr4Pd
+ sXmSE/JT4TCZVAdDieQlFOlQvbKJRPIsceaIAmRxPqwBGs0HASYSfi+lfAwHw0U7Y0x5wsm3/
+ 9WJxT8d+CzM8spnitrE5LWibeOCMgXQIs1OHPLTGpeUzjDeN2VwO0T+Er2WnAJsor16ProFgS
+ wAEVxOrsFTiWUV3lmudp0OACmpXsVweblTah713IRaExbhR/8dh0Mt13VZ0e/cQ6MHC38TaE0
+ 9kaFSItY77DwttlKpPO9H++p5pz30/gi+/218zR38dNd3kQhD8xRp1sM+9hU0WASgdwMJ8r4n
+ TdVGDxjqw4EuezAQ8Oj8c/CLg1pXmsBW5K2db5k3aXxr6ZejRx7CrFXlLe8UJJaE7NIfd+9lA
+ 0QzMMrM8UMUV+e0eDDj6N9EqBfWifrQTW0K6cqBviaI0NY41Jkdz1Nrb8Tsa1eOJbmIEpnEou
+ i90n4oLape0x7p56MhqJU6a3/17VV2xLf/+iQoZHWaulz5scPM0C+YT1BBp9XWHhZCJ0P6m/l
+ m/ZN9K3mlbjRLF4NFqnVPHbc4j8RkIPBYHBFLZVbL+N8LlTHkUBasWh479xXMrKjxUT3dYn1w
+ Y1NtT6Ae5egJGyc+vSkA61Alkz492aB6TBA+1GkOGAVQvyn9Wwp8KmcJQomuV6rs7nr+2U36q
+ c7X5oYlwsc6k8qGcSOZEzK/5ySzyhlnCIxPACRGrk=
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 212.227.126.134
+X-Received-From: 212.227.126.131
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -103,57 +102,29 @@ Sender: "Qemu-devel"
 
 From: Philippe Mathieu-Daudé <philmd@redhat.com>
 
-All these devices do not contain any target-specific. While most
-of them are arch-specific, they are shared between different
-targets of the same arch family (ARM and AArch64, MIPS32/MIPS64,
-endianess, ...).
-Put them into common-obj-y to compile them once for all targets.
+The "hw/ptimer.h" header is not used, remove it.
 
 Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
-Reviewed-by: Thomas Huth <thuth@redhat.com>
 Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Message-Id: <20191003230404.19384-2-philmd@redhat.com>
+Acked-by: Peter Maydell <peter.maydell@linaro.org>
+Message-Id: <20191003230404.19384-14-philmd@redhat.com>
 Signed-off-by: Laurent Vivier <laurent@vivier.eu>
 ---
- hw/timer/Makefile.objs | 22 +++++++++++-----------
- 1 file changed, 11 insertions(+), 11 deletions(-)
+ hw/rtc/xlnx-zynqmp-rtc.c | 1 -
+ 1 file changed, 1 deletion(-)
 
-diff --git a/hw/timer/Makefile.objs b/hw/timer/Makefile.objs
-index 123d92c9692c..f407523aa49d 100644
---- a/hw/timer/Makefile.objs
-+++ b/hw/timer/Makefile.objs
-@@ -25,20 +25,20 @@ common-obj-$(CONFIG_MILKYMIST) += milkymist-sysctl.o
- common-obj-$(CONFIG_XLNX_ZYNQMP) += xlnx-zynqmp-rtc.o
- common-obj-$(CONFIG_NRF51_SOC) += nrf51_timer.o
- 
--obj-$(CONFIG_ALTERA_TIMER) += altera_timer.o
--obj-$(CONFIG_EXYNOS4) += exynos4210_mct.o
--obj-$(CONFIG_EXYNOS4) += exynos4210_pwm.o
--obj-$(CONFIG_EXYNOS4) += exynos4210_rtc.o
--obj-$(CONFIG_OMAP) += omap_gptimer.o
--obj-$(CONFIG_OMAP) += omap_synctimer.o
--obj-$(CONFIG_PXA2XX) += pxa2xx_timer.o
--obj-$(CONFIG_SH4) += sh_timer.o
--obj-$(CONFIG_DIGIC) += digic-timer.o
--obj-$(CONFIG_MIPS_CPS) += mips_gictimer.o
-+common-obj-$(CONFIG_ALTERA_TIMER) += altera_timer.o
-+common-obj-$(CONFIG_EXYNOS4) += exynos4210_mct.o
-+common-obj-$(CONFIG_EXYNOS4) += exynos4210_pwm.o
-+common-obj-$(CONFIG_EXYNOS4) += exynos4210_rtc.o
-+common-obj-$(CONFIG_OMAP) += omap_gptimer.o
-+common-obj-$(CONFIG_OMAP) += omap_synctimer.o
-+common-obj-$(CONFIG_PXA2XX) += pxa2xx_timer.o
-+common-obj-$(CONFIG_SH4) += sh_timer.o
-+common-obj-$(CONFIG_DIGIC) += digic-timer.o
-+common-obj-$(CONFIG_MIPS_CPS) += mips_gictimer.o
- 
- obj-$(CONFIG_MC146818RTC) += mc146818rtc.o
- 
--obj-$(CONFIG_ALLWINNER_A10_PIT) += allwinner-a10-pit.o
-+common-obj-$(CONFIG_ALLWINNER_A10_PIT) += allwinner-a10-pit.o
- 
- common-obj-$(CONFIG_STM32F2XX_TIMER) += stm32f2xx_timer.o
- common-obj-$(CONFIG_ASPEED_SOC) += aspeed_timer.o aspeed_rtc.o
+diff --git a/hw/rtc/xlnx-zynqmp-rtc.c b/hw/rtc/xlnx-zynqmp-rtc.c
+index f9f09b72965a..2bcd14d7795d 100644
+--- a/hw/rtc/xlnx-zynqmp-rtc.c
++++ b/hw/rtc/xlnx-zynqmp-rtc.c
+@@ -32,7 +32,6 @@
+ #include "qemu/log.h"
+ #include "qemu/module.h"
+ #include "hw/irq.h"
+-#include "hw/ptimer.h"
+ #include "qemu/cutils.h"
+ #include "sysemu/sysemu.h"
+ #include "trace.h"
 -- 
 2.21.0
 
