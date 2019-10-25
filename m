@@ -2,79 +2,88 @@ Return-Path: <SRS0=bySr=YS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AF27DCA9EA0
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 13:41:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6852ECA9EA0
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 13:42:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7103B2054F
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 13:41:32 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="F+d8Clph"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7103B2054F
+	by mail.kernel.org (Postfix) with ESMTPS id 3ACA82054F
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 13:42:32 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3ACA82054F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60076 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60092 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iNzqN-0005YH-1S
-	for qemu-devel@archiver.kernel.org; Fri, 25 Oct 2019 09:41:31 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35707)
+	id 1iNzrL-0001Ky-2T
+	for qemu-devel@archiver.kernel.org; Fri, 25 Oct 2019 09:42:31 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35514)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <ehabkost@redhat.com>) id 1iNzo0-0001QH-WD
- for qemu-devel@nongnu.org; Fri, 25 Oct 2019 09:39:06 -0400
+ (envelope-from <philmd@redhat.com>) id 1iNzly-0006PC-0h
+ for qemu-devel@nongnu.org; Fri, 25 Oct 2019 09:36:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <ehabkost@redhat.com>) id 1iNznz-0004tU-IX
- for qemu-devel@nongnu.org; Fri, 25 Oct 2019 09:39:04 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:56558
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <philmd@redhat.com>) id 1iNzlw-0004EV-KL
+ for qemu-devel@nongnu.org; Fri, 25 Oct 2019 09:36:57 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:50052)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1iNznz-0004t3-ED
- for qemu-devel@nongnu.org; Fri, 25 Oct 2019 09:39:03 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1572010742;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=T0dwScUuQPxCgDFvUk10hGTdWF4VqfpY1OvfV0q2gVc=;
- b=F+d8ClphIq89IpmEI0lCYXov7V20kQrLAw2ondR/K4evrDxkBblmpk8XRl8Rv2SGpSXoIC
- 9MIri4yhyv3yhIvrwXUTPPMG93kmamXzzkiwxp9pPtCeH1oPbSKwT1W7jv+cozaIs84M4q
- 9R9Ty339hqQ0Otfvq/AV1y89NdervQI=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-83-zb41F479PEWt4ongl4xs0w-1; Fri, 25 Oct 2019 09:38:56 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iNzlw-0004EC-4a
+ for qemu-devel@nongnu.org; Fri, 25 Oct 2019 09:36:56 -0400
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4C46E80183D;
- Fri, 25 Oct 2019 13:38:54 +0000 (UTC)
-Received: from localhost (ovpn-116-62.gru2.redhat.com [10.97.116.62])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 7AC8260126;
- Fri, 25 Oct 2019 13:38:48 +0000 (UTC)
-Date: Fri, 25 Oct 2019 10:38:46 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-To: David Hildenbrand <david@redhat.com>
-Subject: Re: [PATCH 0/7] i386: Add `machine` parameter to query-cpu-definitions
-Message-ID: <20191025133846.GD6744@habkost.net>
-References: <20191025022553.25298-1-ehabkost@redhat.com>
- <dbf9e4c1-0acf-9469-84f9-f80c41e2cae0@redhat.com>
+ by mx1.redhat.com (Postfix) with ESMTPS id C4B06C056808
+ for <qemu-devel@nongnu.org>; Fri, 25 Oct 2019 13:36:54 +0000 (UTC)
+Received: by mail-wm1-f69.google.com with SMTP id g67so999216wmg.4
+ for <qemu-devel@nongnu.org>; Fri, 25 Oct 2019 06:36:54 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=qzemR98VM0iraa5w9nzXUv/tzcdkZPRDfo5s70/oLv4=;
+ b=IlBIEjep36nGAqUXzS2AWCwnd3C1KI/X7rBFglBXIUNUGZKTacTK/Hr6whTwTyh/kk
+ hI7jcCJqHLpAVTBhE3o7B4HKkXZ7J6qP7RX7qczd5n052VNFVVlWF7JQtHpHMVvowQVH
+ wdQ5zfmM8Apye5KgDu40JzASjnW8CABEHfxAQCyNxWG6vvMhwZQUQPnOELLg2VyLYddu
+ mQ7/yWWp5tPsjgpBm8i+pgy4TXGmOpF6vP4xtBn9aaWvzUsXa+Z4OT9RI9VQgga/R/Iy
+ hcWn/cPgS0DX4ddZko/kmAK/eJYKA+G8q+Tp7DGrb2ujZJsmIXvXRspcJb+a+Dc7bCAm
+ QINQ==
+X-Gm-Message-State: APjAAAXGzDMyzWUkXHywaKSd+xrhMfkbKGs6BBZkwu9fJwTU+xF2zSSd
+ 5rPG4x9gq5xjfuvKK/KJamSESYNfMxfKPGVB/ibqpYhA3uB9lPUqnXizrxC/5temolr+ELNaiGJ
+ ghKcMbpOXJhkncCs=
+X-Received: by 2002:a1c:7fd8:: with SMTP id a207mr3684724wmd.10.1572010612974; 
+ Fri, 25 Oct 2019 06:36:52 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqwsgV4Tcnc9RcmhGFBrwWBlZjI2ryS+ynvQhpRSffZiCCmykX8KiVF+qU400UUeswcOfxlG+A==
+X-Received: by 2002:a1c:7fd8:: with SMTP id a207mr3684695wmd.10.1572010612691; 
+ Fri, 25 Oct 2019 06:36:52 -0700 (PDT)
+Received: from [192.168.1.115] (129.red-83-57-174.dynamicip.rima-tde.net.
+ [83.57.174.129])
+ by smtp.gmail.com with ESMTPSA id k24sm7611709wmi.1.2019.10.25.06.36.51
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Fri, 25 Oct 2019 06:36:52 -0700 (PDT)
+Subject: Re: [PATCH 2/4] tests: benchmark crypto with fixed data size, not
+ time period
+To: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
+ qemu-devel@nongnu.org
+References: <20191017145654.11371-1-berrange@redhat.com>
+ <20191017145654.11371-3-berrange@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <8c9bef40-7520-2cb5-409f-ea5317783c68@redhat.com>
+Date: Fri, 25 Oct 2019 15:36:51 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.1
 MIME-Version: 1.0
-In-Reply-To: <dbf9e4c1-0acf-9469-84f9-f80c41e2cae0@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-MC-Unique: zb41F479PEWt4ongl4xs0w-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=WINDOWS-1252
+In-Reply-To: <20191017145654.11371-3-berrange@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.81
+X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,143 +95,170 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Huth <thuth@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>,
- Janosch Frank <frankja@linux.ibm.com>, libvir-list@redhat.com,
- Cornelia Huck <cohuck@redhat.com>,
- Michal Skrivanek <michal.skrivanek@redhat.com>, qemu-devel@nongnu.org,
- Markus Armbruster <armbru@redhat.com>,
- Christian Borntraeger <borntraeger@de.ibm.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>,
- Jiri Denemark <jdenemar@redhat.com>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-CCing danpb, libvir-list, mskrivanek.
+On 10/17/19 4:56 PM, Daniel P. Berrang=C3=A9 wrote:
+> Currently the crypto benchmarks are processing data in varying chunk
+> sizes, over a fixed time period. This turns out to be a terrible idea
+> because with small chunk sizes the overhead of checking the elapsed
+> time on each loop iteration masks the true performance.
+>=20
+> Benchmarking over a fixed data size avoids the loop running any system
+> calls which can interfere with the performance measurements.
+>=20
+> Before this change
+>=20
+> Enc chunk 512 bytes 2283.47 MB/sec Dec chunk 512 bytes 2236.23 MB/sec O=
+K
+> Enc chunk 4096 bytes 2744.97 MB/sec Dec chunk 4096 bytes 2614.71 MB/sec=
+ OK
+> Enc chunk 16384 bytes 2777.53 MB/sec Dec chunk 16384 bytes 2678.44 MB/s=
+ec OK
+> Enc chunk 65536 bytes 2809.34 MB/sec Dec chunk 65536 bytes 2699.47 MB/s=
+ec OK
+>=20
+> After this change
+>=20
+> Enc chunk 512 bytes 2058.22 MB/sec Dec chunk 512 bytes 2030.11 MB/sec O=
+K
+> Enc chunk 4096 bytes 2699.27 MB/sec Dec chunk 4096 bytes 2573.78 MB/sec=
+ OK
+> Enc chunk 16384 bytes 2748.52 MB/sec Dec chunk 16384 bytes 2653.76 MB/s=
+ec OK
+> Enc chunk 65536 bytes 2814.08 MB/sec Dec chunk 65536 bytes 2712.74 MB/s=
+ec OK
+>=20
+> The actual crypto performance hasn't changed, which shows how
+> significant the mis-measurement has been for small data sizes.
+>=20
+> Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+> ---
+>   tests/benchmark-crypto-cipher.c | 26 ++++++++++++++------------
+>   tests/benchmark-crypto-hash.c   | 17 +++++++++--------
+>   2 files changed, 23 insertions(+), 20 deletions(-)
+>=20
+> diff --git a/tests/benchmark-crypto-cipher.c b/tests/benchmark-crypto-c=
+ipher.c
+> index 3ca31a2779..d8db5504d4 100644
+> --- a/tests/benchmark-crypto-cipher.c
+> +++ b/tests/benchmark-crypto-cipher.c
+> @@ -21,11 +21,12 @@ static void test_cipher_speed(size_t chunk_size,
+>   {
+>       QCryptoCipher *cipher;
+>       Error *err =3D NULL;
+> -    double total =3D 0.0;
+>       uint8_t *key =3D NULL, *iv =3D NULL;
+>       uint8_t *plaintext =3D NULL, *ciphertext =3D NULL;
+>       size_t nkey;
+>       size_t niv;
+> +    size_t total =3D 2 * GiB;
 
-On Fri, Oct 25, 2019 at 09:17:46AM +0200, David Hildenbrand wrote:
-> On 25.10.19 04:25, Eduardo Habkost wrote:
-> > We had introduced versioned CPU models in QEMU 4.1, including a
-> > method for querying for CPU model versions using
->=20
-> Interesting, I was not aware of that.
->=20
-> On s390x, we somewhat have versioned CPU models, but we decided against
-> giving them explicit names (e.g., z13-v1 or z13-4.1.0), because it didn't
-> really seem to be necessary. (and we often implement/add features for old=
-er
-> CPU models, there is a lot of fluctuation) Actually, you would have had t=
-o
-> add "z13-z/VM-x.x.x" or "z13-LPAR-x.x.x" or "z13-KVM-x.x.x" to model the
-> features you actually see in all the different virtual environments ("wha=
-t a
-> CPU looks like"). Not to talk about QEMU versions in addition to that. So=
- we
-> decided to always model what you would see under LPAR and are able to
-> specify for a KVM guest. So you can use "z13" in an up-to-date LPAR
-> environment, but not in a z/VM environment (you would have to disable
-> features).
->=20
-> Each (!base) CPU model has a specific feature set per machine. Libvirt us=
-es
-> query-cpu-model-expansion() to convert this model+machine to a
-> machine-independent representation. That representation is sufficient for
-> all use cases we were aware of (esp. "virsh domcapabilities", the host CP=
-U
-> model, migration).
->=20
-> While s390x has versioned CPU models, we have no explicit way of specifyi=
-ng
-> them for older machines, besides going over query-cpu-model-expansion and
-> using expanded "base model + features".
->=20
-> I can see that this might make sense on x86-64, where you only have maybe=
- 3
-> versions of a CPU (e.g., the one Intel messed up first - Haswell, the one
-> Intel messed up next - Haswell-noTSX, and the one that Intel eventually d=
-id
-> right - Haswell-noTSX-IBRS) and you might want to specify "Haswell" vs.
-> "Haswell-IBRS" vs. "Haswell-noTSX-IBRS". But actually, you will always wa=
-nt
-> to go for "Haswell-noTSX-IBRS", because you can expect to run in updated
-> environments if I am not wrong, everything else are corner cases.
->=20
-> Of course, versioned CPU model are neat to avoid "base model + list of
-> features", but at least for expanding the host model on s390x, it is not
-> really helpful. When migrating, the model expansion does the trick.
->=20
-> I haven't looked into details of "how to specify or model versions". Mayb=
-e
-> IBM wants to look into creating versions for all the old models we had. B=
-ut
-> again, not sure if that is of any help for s390x. CCing IBM.
+Can you use 'const size_t total'?.
 
-I'm not sure yet if there are the x86-specific goals and
-constraints that would make it difficult to follow the same
-approach followed by s390x.  I have the impression we do,
-but I need to think more carefully about it.
+> +    size_t remain;
+>  =20
+>       if (!qcrypto_cipher_supports(alg, mode)) {
+>           return;
+> @@ -58,33 +59,34 @@ static void test_cipher_speed(size_t chunk_size,
+>                                         &err) =3D=3D 0);
+>  =20
+>       g_test_timer_start();
+> -    do {
+> +    remain =3D total;
+> +    while (remain) {
+>           g_assert(qcrypto_cipher_encrypt(cipher,
+>                                           plaintext,
+>                                           ciphertext,
+>                                           chunk_size,
+>                                           &err) =3D=3D 0);
+> -        total +=3D chunk_size;
+> -    } while (g_test_timer_elapsed() < 1.0);
+> +        remain -=3D chunk_size;
+> +    }
+> +    g_test_timer_elapsed();
+>  =20
+> -    total /=3D MiB;
+>       g_print("Enc chunk %zu bytes ", chunk_size);
+> -    g_print("%.2f MB/sec ", total / g_test_timer_last());
+> +    g_print("%.2f MB/sec ", (double)total / MiB / g_test_timer_last())=
+;
+>  =20
+> -    total =3D 0.0;
+>       g_test_timer_start();
+> -    do {
+> +    remain =3D total;
+> +    while (remain) {
+>           g_assert(qcrypto_cipher_decrypt(cipher,
+>                                           plaintext,
+>                                           ciphertext,
+>                                           chunk_size,
+>                                           &err) =3D=3D 0);
+> -        total +=3D chunk_size;
+> -    } while (g_test_timer_elapsed() < 1.0);
+> +        remain -=3D chunk_size;
+> +    }
+> +    g_test_timer_elapsed();
+>  =20
+> -    total /=3D MiB;
+>       g_print("Dec chunk %zu bytes ", chunk_size);
+> -    g_print("%.2f MB/sec ", total / g_test_timer_last());
+> +    g_print("%.2f MB/sec ", (double)total / MiB / g_test_timer_last())=
+;
+>  =20
+>       qcrypto_cipher_free(cipher);
+>       g_free(plaintext);
+> diff --git a/tests/benchmark-crypto-hash.c b/tests/benchmark-crypto-has=
+h.c
+> index 9b6f7a9155..67b7067223 100644
+> --- a/tests/benchmark-crypto-hash.c
+> +++ b/tests/benchmark-crypto-hash.c
+> @@ -20,7 +20,8 @@ static void test_hash_speed(const void *opaque)
+>       size_t chunk_size =3D (size_t)opaque;
+>       uint8_t *in =3D NULL, *out =3D NULL;
+>       size_t out_len =3D 0;
+> -    double total =3D 0.0;
+> +    size_t total =3D 2 * GiB;
 
-Let's discuss that during KVM Forum?
+Ditto: 'const size_t total'.
 
-The two main goals of versioned CPU models in x86 are:
-1) Decoupling CPU model updates from machine-types (users should be
-   able to update a CPU model definition without changing machine
-   type).
-2) Letting management software automate CPU model updates.
-   Normally this is necessary when bare metal microcode or
-   software updates add/remove features from CPUs.  Sometimes the
-   Virtual CPU model update needs to be performed before the host
-   updates are applied (if features are being removed).
-
-The main constraint that makes it difficult to address the above
-without a new API is:
-A) Every CPU model in x86 except "host" is already expected to
-   be migration-safe (I don't know how this compares to s390x).
-
-
+> +    size_t remain;
+>       struct iovec iov;
+>       int ret;
+>  =20
+> @@ -31,20 +32,20 @@ static void test_hash_speed(const void *opaque)
+>       iov.iov_len =3D chunk_size;
+>  =20
+>       g_test_timer_start();
+> -    do {
+> +    remain =3D total;
+> +    while (remain) {
+>           ret =3D qcrypto_hash_bytesv(QCRYPTO_HASH_ALG_SHA256,
+>                                     &iov, 1, &out, &out_len,
+>                                     NULL);
+>           g_assert(ret =3D=3D 0);
+>  =20
+> -        total +=3D chunk_size;
+> -    } while (g_test_timer_elapsed() < 5.0);
+> +        remain -=3D chunk_size;
+> +    }
+> +    g_test_timer_elapsed();
+>  =20
+> -    total /=3D MiB;
+>       g_print("sha256: ");
+> -    g_print("Testing chunk_size %zu bytes ", chunk_size);
+> -    g_print("done: %.2f MB in %.2f secs: ", total, g_test_timer_last()=
+);
+> -    g_print("%.2f MB/sec\n", total / g_test_timer_last());
+> +    g_print("Hash %zu GB chunk size %zu bytes ", total / GiB, chunk_si=
+ze);
+> +    g_print("%.2f MB/sec ", (double)total / MiB / g_test_timer_last())=
+;
+>  =20
+>       g_free(out);
+>       g_free(in);
 >=20
-> > query-cpu-definitions.  This only has one problem: fetching CPU
-> > alias information for multiple machine types required restarting
-> > QEMU for each machine being queried.
-> >=20
-> > This series adds a new `machine` parameter to
-> > query-cpu-definitions, that can be used to query CPU model alias
-> > information for multiple machines without restarting QEMU.
-> >=20
-> > Eduardo Habkost (7):
-> >    i386: Use g_autofree at x86_cpu_list_entry()
-> >    i386: Add default_version parameter to CPU version functions
-> >    i386: Don't use default_cpu_version at "-cpu help"
-> >    machine: machine_find_class() function
-> >    i386: Remove x86_cpu_set_default_version() function
-> >    i386: Don't use default_cpu_version() inside query-cpu-definitions
-> >    cpu: Add `machine` parameter to query-cpu-definitions
-> >=20
-> >   qapi/machine-target.json                   | 14 +++-
-> >   include/hw/boards.h                        |  1 +
-> >   include/hw/i386/pc.h                       |  5 +-
-> >   target/i386/cpu.h                          |  6 --
-> >   hw/core/machine.c                          | 16 ++++
-> >   hw/i386/pc.c                               |  3 -
-> >   target/arm/helper.c                        |  4 +-
-> >   target/i386/cpu.c                          | 93 +++++++++++++++------=
--
-> >   target/mips/helper.c                       |  4 +-
-> >   target/ppc/translate_init.inc.c            |  4 +-
-> >   target/s390x/cpu_models.c                  |  4 +-
-> >   vl.c                                       | 17 +---
-> >   tests/acceptance/x86_cpu_model_versions.py | 42 ++++++++++
-> >   13 files changed, 154 insertions(+), 59 deletions(-)
-> >=20
->=20
->=20
-> --=20
->=20
-> Thanks,
->=20
-> David / dhildenb
 
---=20
-Eduardo
-
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 
