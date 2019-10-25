@@ -2,69 +2,65 @@ Return-Path: <SRS0=bySr=YS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E875CA9EA0
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 06:31:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 28594CA9EA0
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 06:34:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 65D882070B
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 06:31:28 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 65D882070B
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id F39A82070B
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 06:34:56 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F39A82070B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55590 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55612 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iNt8B-0007Xz-Dd
-	for qemu-devel@archiver.kernel.org; Fri, 25 Oct 2019 02:31:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34637)
+	id 1iNtBY-0003lG-3x
+	for qemu-devel@archiver.kernel.org; Fri, 25 Oct 2019 02:34:56 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34947)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <no-reply@patchew.org>) id 1iNt7L-0006iD-0K
- for qemu-devel@nongnu.org; Fri, 25 Oct 2019 02:30:38 -0400
+ (envelope-from <tao3.xu@intel.com>) id 1iNtAg-0002Su-Fe
+ for qemu-devel@nongnu.org; Fri, 25 Oct 2019 02:34:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <no-reply@patchew.org>) id 1iNt7J-00070P-8z
- for qemu-devel@nongnu.org; Fri, 25 Oct 2019 02:30:34 -0400
-Resent-Date: Fri, 25 Oct 2019 02:30:34 -0400
-Resent-Message-Id: <E1iNt7J-00070P-8z@eggs.gnu.org>
-Received: from sender4-of-o54.zoho.com ([136.143.188.54]:21424)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <no-reply@patchew.org>)
- id 1iNt7J-000706-1A
- for qemu-devel@nongnu.org; Fri, 25 Oct 2019 02:30:33 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1571985016; cv=none; 
- d=zohomail.com; s=zohoarc; 
- b=cX5NB5iFS+gaJwrqQ0dVshzWLzEOBRSHY+1Uu8FHT0Mwjlk6LkNAqoIoDeTnmwfmHRZtZKRZwEs1FRDcRa0x7IKkoL4hpbf5GhxNfPAul6pg4gK5LJf5Pi5ZbuJ5MLNVBfHTGNPAfItY2QXK2nimz5fXRrXEL8VMthsPBjgaVTg=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
- s=zohoarc; t=1571985016;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
- bh=azCxEkF5FPPXrvBkyfF1UVi2CemWVTQoli9kvBdoI/4=; 
- b=FINIa9e1KPgE6+/AHl9Uhi2E8cqIb7V6sXJbCNEukviUpifauRVX0QrC02lzlcc6MN8nah7kfx8ZUIbL8oChG+HvxszIMl8klk9ThRHmtcs3f8LnUx3D6lel+fxUBgFH4555L/yuSvClxxuVYConjvS4HpsyikvY0QMTFZXpg34=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
- dkim=pass  header.i=patchew.org;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1571985014307838.2650256655787;
- Thu, 24 Oct 2019 23:30:14 -0700 (PDT)
-In-Reply-To: <1571920483-3382-1-git-send-email-yi.l.liu@intel.com>
-Subject: Re: [RFC v2 00/22] intel_iommu: expose Shared Virtual Addressing to VM
-Message-ID: <157198501236.8606.12214821075996433238@37313f22b938>
+ (envelope-from <tao3.xu@intel.com>) id 1iNtAe-0007fx-9S
+ for qemu-devel@nongnu.org; Fri, 25 Oct 2019 02:34:01 -0400
+Received: from mga14.intel.com ([192.55.52.115]:3375)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <tao3.xu@intel.com>) id 1iNtAe-0007fF-1j
+ for qemu-devel@nongnu.org; Fri, 25 Oct 2019 02:34:00 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga007.jf.intel.com ([10.7.209.58])
+ by fmsmga103.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
+ 24 Oct 2019 23:33:56 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.68,227,1569308400"; d="scan'208";a="188833237"
+Received: from txu2-mobl.ccr.corp.intel.com (HELO [10.239.196.142])
+ ([10.239.196.142])
+ by orsmga007.jf.intel.com with ESMTP; 24 Oct 2019 23:33:54 -0700
+Subject: Re: [PATCH v13 06/12] numa: Extend CLI to provide memory latency and
+ bandwidth information
+To: Igor Mammedov <imammedo@redhat.com>
+References: <20191020111125.27659-1-tao3.xu@intel.com>
+ <20191020111125.27659-7-tao3.xu@intel.com>
+ <20191023172854.42c495d5@redhat.com>
+From: Tao Xu <tao3.xu@intel.com>
+Message-ID: <9e30d8fe-7274-4ee8-3c4b-64c370141358@intel.com>
+Date: Fri, 25 Oct 2019 14:33:53 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: yi.l.liu@intel.com
-Date: Thu, 24 Oct 2019 23:30:14 -0700 (PDT)
-X-ZohoMailClient: External
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 136.143.188.54
+In-Reply-To: <20191023172854.42c495d5@redhat.com>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 192.55.52.115
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -76,62 +72,97 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: tianyu.lan@intel.com, kevin.tian@intel.com, yi.l.liu@intel.com,
- kvm@vger.kernel.org, mst@redhat.com, jun.j.tian@intel.com,
- qemu-devel@nongnu.org, peterx@redhat.com, eric.auger@redhat.com,
- alex.williamson@redhat.com, jacob.jun.pan@linux.intel.com, pbonzini@redhat.com,
- yi.y.sun@intel.com, david@gibson.dropbear.id.au
+Cc: "ehabkost@redhat.com" <ehabkost@redhat.com>, "Liu,
+ Jingqi" <jingqi.liu@intel.com>, "Du, Fan" <fan.du@intel.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ Markus Armbruster <armbru@redhat.com>,
+ "jonathan.cameron@huawei.com" <jonathan.cameron@huawei.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8xNTcxOTIwNDgzLTMzODItMS1n
-aXQtc2VuZC1lbWFpbC15aS5sLmxpdUBpbnRlbC5jb20vCgoKCkhpLAoKVGhpcyBzZXJpZXMgZmFp
-bGVkIHRoZSBkb2NrZXItbWluZ3dAZmVkb3JhIGJ1aWxkIHRlc3QuIFBsZWFzZSBmaW5kIHRoZSB0
-ZXN0aW5nIGNvbW1hbmRzIGFuZAp0aGVpciBvdXRwdXQgYmVsb3cuIElmIHlvdSBoYXZlIERvY2tl
-ciBpbnN0YWxsZWQsIHlvdSBjYW4gcHJvYmFibHkgcmVwcm9kdWNlIGl0CmxvY2FsbHkuCgo9PT0g
-VEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhIC9iaW4vYmFzaApleHBvcnQgQVJDSD14ODZfNjQKbWFr
-ZSBkb2NrZXItaW1hZ2UtZmVkb3JhIFY9MSBORVRXT1JLPTEKdGltZSBtYWtlIGRvY2tlci10ZXN0
-LW1pbmd3QGZlZG9yYSBKPTE0IE5FVFdPUks9MQo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKICBD
-QyAgICAgIGh3L3BjaS9wY2lfaG9zdC5vCiAgQ0MgICAgICBody9wY2kvcGNpZS5vCi90bXAvcWVt
-dS10ZXN0L3NyYy9ody9wY2ktaG9zdC9kZXNpZ253YXJlLmM6IEluIGZ1bmN0aW9uICdkZXNpZ253
-YXJlX3BjaWVfaG9zdF9yZWFsaXplJzoKL3RtcC9xZW11LXRlc3Qvc3JjL2h3L3BjaS1ob3N0L2Rl
-c2lnbndhcmUuYzo2OTM6MzE6IGVycm9yOiBpbmNvbXBhdGlibGUgdHlwZSBmb3IgYXJndW1lbnQg
-MiBvZiAncGNpX3NldHVwX2lvbW11JwogICAgIHBjaV9zZXR1cF9pb21tdShwY2ktPmJ1cywgZGVz
-aWdud2FyZV9pb21tdV9vcHMsIHMpOwogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXn5+
-fn5+fn5+fn5+fn5+fn5+fn4KSW4gZmlsZSBpbmNsdWRlZCBmcm9tIC90bXAvcWVtdS10ZXN0L3Ny
-Yy9pbmNsdWRlL2h3L3BjaS9tc2kuaDoyNCwKLS0tCi90bXAvcWVtdS10ZXN0L3NyYy9pbmNsdWRl
-L2h3L3BjaS9wY2kuaDo0OTU6NTQ6IG5vdGU6IGV4cGVjdGVkICdjb25zdCBQQ0lJT01NVU9wcyAq
-JyB7YWthICdjb25zdCBzdHJ1Y3QgUENJSU9NTVVPcHMgKid9IGJ1dCBhcmd1bWVudCBpcyBvZiB0
-eXBlICdQQ0lJT01NVU9wcycge2FrYSAnY29uc3Qgc3RydWN0IFBDSUlPTU1VT3BzJ30KIHZvaWQg
-cGNpX3NldHVwX2lvbW11KFBDSUJ1cyAqYnVzLCBjb25zdCBQQ0lJT01NVU9wcyAqaW9tbXVfb3Bz
-LCB2b2lkICpvcGFxdWUpOwogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIH5+fn5+
-fn5+fn5+fn5+fn5+fn5efn5+fn5+fn4KbWFrZTogKioqIFsvdG1wL3FlbXUtdGVzdC9zcmMvcnVs
-ZXMubWFrOjY5OiBody9wY2ktaG9zdC9kZXNpZ253YXJlLm9dIEVycm9yIDEKbWFrZTogKioqIFdh
-aXRpbmcgZm9yIHVuZmluaXNoZWQgam9icy4uLi4KVHJhY2ViYWNrIChtb3N0IHJlY2VudCBjYWxs
-IGxhc3QpOgogIEZpbGUgIi4vdGVzdHMvZG9ja2VyL2RvY2tlci5weSIsIGxpbmUgNjYyLCBpbiA8
-bW9kdWxlPgotLS0KICAgIHJhaXNlIENhbGxlZFByb2Nlc3NFcnJvcihyZXRjb2RlLCBjbWQpCnN1
-YnByb2Nlc3MuQ2FsbGVkUHJvY2Vzc0Vycm9yOiBDb21tYW5kICdbJ3N1ZG8nLCAnLW4nLCAnZG9j
-a2VyJywgJ3J1bicsICctLWxhYmVsJywgJ2NvbS5xZW11Lmluc3RhbmNlLnV1aWQ9YzI2Njc5OTI4
-YTljNDMyZDk4MzI5NzhhY2Q4MGUyMGInLCAnLXUnLCAnMTAwMycsICctLXNlY3VyaXR5LW9wdCcs
-ICdzZWNjb21wPXVuY29uZmluZWQnLCAnLS1ybScsICctZScsICdUQVJHRVRfTElTVD0nLCAnLWUn
-LCAnRVhUUkFfQ09ORklHVVJFX09QVFM9JywgJy1lJywgJ1Y9JywgJy1lJywgJ0o9MTQnLCAnLWUn
-LCAnREVCVUc9JywgJy1lJywgJ1NIT1dfRU5WPScsICctZScsICdDQ0FDSEVfRElSPS92YXIvdG1w
-L2NjYWNoZScsICctdicsICcvaG9tZS9wYXRjaGV3Mi8uY2FjaGUvcWVtdS1kb2NrZXItY2NhY2hl
-Oi92YXIvdG1wL2NjYWNoZTp6JywgJy12JywgJy92YXIvdG1wL3BhdGNoZXctdGVzdGVyLXRtcC1j
-NWlqMnRyaS9zcmMvZG9ja2VyLXNyYy4yMDE5LTEwLTI1LTAyLjI3LjI3LjE2NTk1Oi92YXIvdG1w
-L3FlbXU6eixybycsICdxZW11OmZlZG9yYScsICcvdmFyL3RtcC9xZW11L3J1bicsICd0ZXN0LW1p
-bmd3J10nIHJldHVybmVkIG5vbi16ZXJvIGV4aXQgc3RhdHVzIDIuCmZpbHRlcj0tLWZpbHRlcj1s
-YWJlbD1jb20ucWVtdS5pbnN0YW5jZS51dWlkPWMyNjY3OTkyOGE5YzQzMmQ5ODMyOTc4YWNkODBl
-MjBiCm1ha2VbMV06ICoqKiBbZG9ja2VyLXJ1bl0gRXJyb3IgMQptYWtlWzFdOiBMZWF2aW5nIGRp
-cmVjdG9yeSBgL3Zhci90bXAvcGF0Y2hldy10ZXN0ZXItdG1wLWM1aWoydHJpL3NyYycKbWFrZTog
-KioqIFtkb2NrZXItcnVuLXRlc3QtbWluZ3dAZmVkb3JhXSBFcnJvciAyCgpyZWFsICAgIDJtNDUu
-Njg2cwp1c2VyICAgIDBtNy44NDFzCgoKVGhlIGZ1bGwgbG9nIGlzIGF2YWlsYWJsZSBhdApodHRw
-Oi8vcGF0Y2hldy5vcmcvbG9ncy8xNTcxOTIwNDgzLTMzODItMS1naXQtc2VuZC1lbWFpbC15aS5s
-LmxpdUBpbnRlbC5jb20vdGVzdGluZy5kb2NrZXItbWluZ3dAZmVkb3JhLz90eXBlPW1lc3NhZ2Uu
-Ci0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwczovL3Bh
-dGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEBy
-ZWRoYXQuY29t
+On 10/23/2019 11:28 PM, Igor Mammedov wrote:
+> On Sun, 20 Oct 2019 19:11:19 +0800
+> Tao Xu <tao3.xu@intel.com> wrote:
+[...]
+>> +#
+>> +# @access-bandwidth: access bandwidth (MB/s)
+>> +#
+>> +# @read-bandwidth: read bandwidth (MB/s)
+>> +#
+>> +# @write-bandwidth: write bandwidth (MB/s)
+> I think units here are not appropriate, values stored in fields are
+> minimal base units only and nothing else (i.e. ps and B/s)
+> 
+Eric suggest me to drop picoseconds. So here I can use ns. For 
+bandwidth, if we use B/s here, does it let user or developer to 
+misunderstand that the smallest unit is B/s ?
+
+>>   @item -numa node[,mem=@var{size}][,cpus=@var{firstcpu}[-@var{lastcpu}]][,nodeid=@var{node}][,initiator=@var{initiator}]
+>>   @itemx -numa node[,memdev=@var{id}][,cpus=@var{firstcpu}[-@var{lastcpu}]][,nodeid=@var{node}][,initiator=@var{initiator}]
+>>   @itemx -numa dist,src=@var{source},dst=@var{destination},val=@var{distance}
+>>   @itemx -numa cpu,node-id=@var{node}[,socket-id=@var{x}][,core-id=@var{y}][,thread-id=@var{z}]
+>> +@itemx -numa hmat-lb,initiator=@var{node},target=@var{node},hierarchy=@var{str},data-type=@var{str}[,latency=@var{lat}][,bandwidth=@var{bw}]
+>                                                                                ^^^                 ^^^
+> Using the same 'str' for 2 different enums is confusing.
+> Suggest for 1st use 'level' and for the second just 'type'
+> 
+Ok
+
+>>   @findex -numa
+>>   Define a NUMA node and assign RAM and VCPUs to it.
+>>   Set the NUMA distance from a source node to a destination node.
+>> +Set the ACPI Heterogeneous Memory Attributes for the given nodes.
+>>   
+>>   Legacy VCPU assignment uses @samp{cpus} option where
+>>   @var{firstcpu} and @var{lastcpu} are CPU indexes. Each
+>> @@ -256,6 +259,50 @@ specified resources, it just assigns existing resources to NUMA
+>>   nodes. This means that one still has to use the @option{-m},
+>>   @option{-smp} options to allocate RAM and VCPUs respectively.
+>>   
+>> +Use @samp{hmat-lb} to set System Locality Latency and Bandwidth Information
+>> +between initiator and target NUMA nodes in ACPI Heterogeneous Attribute Memory Table (HMAT).
+>> +Initiator NUMA node can create memory requests, usually including one or more processors.
+> s/including/it has/
+> 
+>> +Target NUMA node contains addressable memory.
+>> +
+>> +In @samp{hmat-lb} option, @var{node} are NUMA node IDs. @var{str} of 'hierarchy'
+>> +is the memory hierarchy of the target NUMA node: if @var{str} is 'memory', the structure
+>> +represents the memory performance; if @var{str} is 'first-level|second-level|third-level',
+>> +this structure represents aggregated performance of memory side caches for each domain.
+>> +@var{str} of 'data-type' is type of data represented by this structure instance:
+>> +if 'hierarchy' is 'memory', 'data-type' is 'access|read|write' latency(nanoseconds)
+> is nanoseconds is right here? Looking at previous patches default value of suffix-less
+> should be picoseconds. I'd just drop '(nanoseconds)'. User will use appropriate suffix.
+> 
+OK, I will drop it.
+>> +or 'access|read|write' bandwidth(MB/s) of the target memory; if 'hierarchy' is
+> ditto (MB/s), probably should be Bytes/s for default suffix-less value
+> (well, I'm not sure how to express it better)
+> 
+
+But last version, we let !QEMU_IS_ALIGNED(node->bandwidth, MiB) as error.
+>> +'first-level|second-level|third-level', 'data-type' is 'access|read|write' hit latency
+>> +or 'access|read|write' hit bandwidth of the target memory side cache.
+>> +
+>> +@var{lat} of 'latency' is latency value, the possible value and units are
+>> +NUM[ps|ns|us] (picosecond|nanosecond|microsecond), the recommended unit is 'ns'. @var{bw}
+>> +is bandwidth value, the possible value and units are NUM[M|G|T], mean that
+> 
+>> +the bandwidth value are NUM MB/s, GB/s or TB/s. Note that max NUM is 65534,
+>> +if NUM is 0, means the corresponding latency or bandwidth information is not provided.
+>> +And if input numbers without any unit, the latency unit will be 'ps' and the bandwidth
+>> +will be MB/s.
+>   1st: above is applicable to both bw and lat values and should be documented as such
+>   2nd: 'max NUM is 65534' when different suffixes is fleeting target,
+>        spec says that entry with 0xFFFF is unreachable, so how about documenting
+>        unreachable value as 0xFFFFFFFFFFFFFFFF (then CLI parsing code will
+>        exclude it from range detection and acpi table building code translate it
+>        to internal 0xFFFF it could fit into the tables)
+> 
+
+If we input 0xFFFFFFFFFFFFFFFF, qemu will raise error that parameter 
+expect a size value.
 
 
