@@ -2,93 +2,83 @@ Return-Path: <SRS0=bySr=YS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 98C11CA9EA0
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 21:18:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B6F38CA9EA0
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 21:29:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 60A1A2084C
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 21:18:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7D3FE2084C
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 21:29:26 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="WECYIXPR"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 60A1A2084C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="H5w9B0bC"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7D3FE2084C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36304 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36336 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iO6yK-0004xC-HX
-	for qemu-devel@archiver.kernel.org; Fri, 25 Oct 2019 17:18:12 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40050)
+	id 1iO79B-0002SQ-Mr
+	for qemu-devel@archiver.kernel.org; Fri, 25 Oct 2019 17:29:25 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41076)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1iO6ww-0001As-EF
- for qemu-devel@nongnu.org; Fri, 25 Oct 2019 17:16:48 -0400
+ (envelope-from <lersek@redhat.com>) id 1iO78C-0008Jr-ED
+ for qemu-devel@nongnu.org; Fri, 25 Oct 2019 17:28:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1iO6wt-00017J-Vw
- for qemu-devel@nongnu.org; Fri, 25 Oct 2019 17:16:45 -0400
-Received: from mail-yw1-xc42.google.com ([2607:f8b0:4864:20::c42]:46511)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1iO6ws-000173-Lr
- for qemu-devel@nongnu.org; Fri, 25 Oct 2019 17:16:42 -0400
-Received: by mail-yw1-xc42.google.com with SMTP id l64so1344307ywe.13
- for <qemu-devel@nongnu.org>; Fri, 25 Oct 2019 14:16:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=JGlYHS/84KhZi5NqUT8zMYlFvSm3aB4CLlmPYx6j0I0=;
- b=WECYIXPRcjy338Ek6i1mpgiTKESYaEpPcmQ7bPvcnnKH+NX3aryT8ILnuBm8jBkdE5
- xUfLBsxWuVVbOZRtUclI1RAZZD2nl5BQDn7+PIZQ4a8X/Kg3B0FFZWjH37tQ4CRO6kiY
- W/GfUzHlbIkxqvuT1c8xF0ZtpRMJ6hBaSY9y2Q2Ik9hdc+vyHuUZdYVi2Tz/EawwhsSU
- 1GpkRP3iOMoHnHbzmQeiQSjG4vKKkrtFbVxA7dvItXh9NF1/z6XaR29QWQ59tdgFoKwD
- 4VukKxMyEQ+f2RWOWJGkDBEbwH8AfUXKVs2DMGNZ8h1ZUuxlIzmKYd5sXEOuI6qKkIJQ
- UirQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=JGlYHS/84KhZi5NqUT8zMYlFvSm3aB4CLlmPYx6j0I0=;
- b=oIQF962OD63LFyE6oQqcRNHBNEfQpYxrUQAihZKW3cejtVn76+TpFlOPW1HLvru6xI
- +hQDTUOTmEVYqBpaM2e58X36uA2d/VfTqs7Dry0vmhHpatbaFwvlUXmHOVCPpdmuZbX4
- xunOVOzBoFwFoZde9gDiu/iqJ4coxRQymj20/CeAIaXxVfdngyVsvS6IXVVM9kndd5i2
- Z70uqnDZr+KGbkPIfOuGb690yfPhaweBPjuizdDEWcZarGZ0Sjk9NO0014v2szcMxs/3
- +2WAzng2uumBwle9bNH3p0TvaL9gNNlKu32n6jSw05WuuQLYUhARbnslLGz1JRvC9l3+
- Mbeg==
-X-Gm-Message-State: APjAAAUc/Dve1XdLyHQZnpgmKBq06U5cWSl9cSZSFpn8H2u4fGH3rXXl
- 4bkgOFmqFMUkUJrHxkpC/stX9g==
-X-Google-Smtp-Source: APXvYqxO63ANnK7p5BNOMmZJKnO1EH1RyAVk3H9GK5sJz7TRx+JZ5fzPNrzosZvzTYNSA2Kcf/NmjA==
-X-Received: by 2002:a0d:ee07:: with SMTP id x7mr3910829ywe.461.1572038201576; 
- Fri, 25 Oct 2019 14:16:41 -0700 (PDT)
-Received: from [172.20.40.202] ([206.121.8.178])
- by smtp.gmail.com with ESMTPSA id f194sm4172507ywb.53.2019.10.25.14.16.39
- (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Fri, 25 Oct 2019 14:16:40 -0700 (PDT)
-Subject: Re: [PATCH v2 4/7] exec: Use const alias for TARGET_PAGE_BITS_VARY
-To: Peter Maydell <peter.maydell@linaro.org>
-References: <20191023154505.30521-1-richard.henderson@linaro.org>
- <20191023154505.30521-5-richard.henderson@linaro.org>
- <CAFEAcA8unCxb-4E561fnOFd=LCXv1y7YSd9xUb2GAutjcYXeGg@mail.gmail.com>
- <2d65342e-ed48-1fe6-7e6c-97f51ac21a76@linaro.org>
- <CAFEAcA99ABj9LU4fox-7Zaz4NG-yKQ7cD21M9xv=AwtSSOr1mA@mail.gmail.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Openpgp: preference=signencrypt
-Message-ID: <5225af4a-51db-5e21-ad67-77d50b365786@linaro.org>
-Date: Fri, 25 Oct 2019 17:16:35 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+ (envelope-from <lersek@redhat.com>) id 1iO789-0004Jn-PV
+ for qemu-devel@nongnu.org; Fri, 25 Oct 2019 17:28:23 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:39961
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <lersek@redhat.com>) id 1iO787-0004Iy-Qj
+ for qemu-devel@nongnu.org; Fri, 25 Oct 2019 17:28:19 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1572038896;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=b4ILVHRZi1HFz0bjyQxiwWmNcW6X4167plTLfWVmX1A=;
+ b=H5w9B0bC5lx8aJnwL/3hmO3FAEWmuHd+JZWcVt4GhdJ4Z/VcbWvCz5XBGaOBerCwjh/acq
+ GQ68T44HyM0nLaZgQaXUvFE7P7GEJ3CnUWEG8zF1QSUqsZhz+WVI9SR2VNzc3psz8gruDp
+ AXe2KRksB6n8sU8O5kwUQMCyRMmJJmQ=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-178-F75pepwgPS6bflOq5yM1YA-1; Fri, 25 Oct 2019 17:28:13 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id F37DD800D49;
+ Fri, 25 Oct 2019 21:28:11 +0000 (UTC)
+Received: from lacos-laptop-7.usersys.redhat.com (ovpn-116-26.ams2.redhat.com
+ [10.36.116.26])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 4D79A5C1B5;
+ Fri, 25 Oct 2019 21:28:05 +0000 (UTC)
+Subject: Re: [PATCH] fw_cfg: Allow reboot-timeout=-1 again
+To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>,
+ qemu-devel@nongnu.org, philmd@redhat.com, kraxel@redhat.com
+References: <20191025165706.177653-1-dgilbert@redhat.com>
+From: Laszlo Ersek <lersek@redhat.com>
+Message-ID: <37ac197c-f20e-dd05-ff6a-13a2171c7148@redhat.com>
+Date: Fri, 25 Oct 2019 23:28:04 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
+ Thunderbird/52.9.1
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA99ABj9LU4fox-7Zaz4NG-yKQ7cD21M9xv=AwtSSOr1mA@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20191025165706.177653-1-dgilbert@redhat.com>
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::c42
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-MC-Unique: F75pepwgPS6bflOq5yM1YA-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -100,52 +90,130 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
- QEMU Developers <qemu-devel@nongnu.org>
+Cc: liq3ea@gmail.com, armbru@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 10/25/19 5:01 PM, Peter Maydell wrote:
-> On Fri, 25 Oct 2019 at 21:43, Richard Henderson
-> <richard.henderson@linaro.org> wrote:
->>
->> On 10/25/19 10:51 AM, Peter Maydell wrote:
->>>> + * We want to declare the "target_page" variable as const, which tells
->>>> + * the compiler that it can cache any value that it reads across calls.
->>>> + * This avoids multiple assertions and multiple reads within any one user.
->>>> + *
->>>> + * This works because we initialize the target_page data very early, in a
->>>> + * location far removed from the functions that require the final results.
->>>
->>> I have to say that this feels like a worryingly large amount
->>> of magic. Is this actually guaranteed to work by the compiler?
->>
->> Yes.
-> 
-> I'm curious to know how the compiler engineers define
-> "very early" and "far removed" -- in my experience they
-> usually prefer to be more precise than that :-)
+On 10/25/19 18:57, Dr. David Alan Gilbert (git) wrote:
+> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+>
+> Commit ee5d0f89de3e53cdb0dc added range checking on reboot-timeout
+> to only allow the range 0..65535; however both qemu and libvirt document
+> the special value -1  to mean don't reboot.
+> Allow it again.
+>
+> Fixes: ee5d0f89de3e53cdb0dc ("fw_cfg: Fix -boot reboot-timeout error chec=
+king")
+> RH bz: https://bugzilla.redhat.com/show_bug.cgi?id=3D1765443
+> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> ---
+>  hw/nvram/fw_cfg.c | 5 +++--
+>  1 file changed, 3 insertions(+), 2 deletions(-)
+>
+> diff --git a/hw/nvram/fw_cfg.c b/hw/nvram/fw_cfg.c
+> index 7dc3ac378e..1a9ec44232 100644
+> --- a/hw/nvram/fw_cfg.c
+> +++ b/hw/nvram/fw_cfg.c
+> @@ -247,10 +247,11 @@ static void fw_cfg_reboot(FWCfgState *s)
+>
+>      if (reboot_timeout) {
+>          rt_val =3D qemu_opt_get_number(opts, "reboot-timeout", -1);
+> +
+>          /* validate the input */
+> -        if (rt_val < 0 || rt_val > 0xffff) {
+> +        if (rt_val < -1 || rt_val > 0xffff) {
+>              error_report("reboot timeout is invalid,"
+> -                         "it should be a value between 0 and 65535");
+> +                         "it should be a value between -1 and 65535");
+>              exit(1);
+>          }
+>      }
+>
 
-I remembered putting more precise language in there, but I don't see it now.
-Perhaps I just dreamt it.
+Ouch.
 
-The last write to the non-const variable happens before the first time we
-access the const variable.  At the first access to the const variable, we
-assert that it has been initialized.
+Here's the prototype of qemu_opt_get_number():
 
-There's no specific barrier to avoid that first read of the const variable not
-be hoisted by the compiler before the last store of the non-const variable,
-except for being in a separate function, in a separate compilation unit, and
-thus "far away".
+> uint64_t qemu_opt_get_number(QemuOpts *opts, const char *name, uint64_t d=
+efval);
 
-We could, perhaps, put a barrier() at the end of finalize_target_page_bits(),
-documenting this fact against some future date when compilation with -flto is
-viable.  I will say, though, that I've tried that recently and quite some work
-is required before one could enable -flto.  In the meantime, the barrier()
-would compile away to nothing.
+So, when we call it, here's what we actually do:
 
+        rt_val =3D (int64_t)qemu_opt_get_number(opts, "reboot-timeout", (ui=
+nt64_t)-1);
+                 ^^^^^^^^^                                            ^^^^^=
+^^^^^
 
-r~
+The conversion to uint64_t is fine.
+
+The conversion to int64_t is not great:
+
+> Otherwise, the new type is signed and the value cannot be represented
+> in it; either the result is implementation-defined or an
+> implementation-defined signal is raised.
+
+I guess we're exploiting two's complement, as the implementation-defined
+result. Not great. :)
+
+Here's what I'd prefer:
+
+> diff --git a/hw/nvram/fw_cfg.c b/hw/nvram/fw_cfg.c
+> index 7dc3ac378ee0..16413550a1da 100644
+> --- a/hw/nvram/fw_cfg.c
+> +++ b/hw/nvram/fw_cfg.c
+> @@ -237,7 +237,7 @@ static void fw_cfg_bootsplash(FWCfgState *s)
+>  static void fw_cfg_reboot(FWCfgState *s)
+>  {
+>      const char *reboot_timeout =3D NULL;
+> -    int64_t rt_val =3D -1;
+> +    uint64_t rt_val =3D -1;
+>      uint32_t rt_le32;
+>
+>      /* get user configuration */
+> @@ -248,9 +248,9 @@ static void fw_cfg_reboot(FWCfgState *s)
+>      if (reboot_timeout) {
+>          rt_val =3D qemu_opt_get_number(opts, "reboot-timeout", -1);
+>          /* validate the input */
+> -        if (rt_val < 0 || rt_val > 0xffff) {
+> +        if (rt_val > 0xffff && rt_val !=3D (uint64_t)-1) {
+>              error_report("reboot timeout is invalid,"
+> -                         "it should be a value between 0 and 65535");
+> +                         "it should be a value between -1 and 65535");
+>              exit(1);
+>          }
+>      }
+
+(
+
+The trick is that strtoull(), in
+
+  qemu_opt_get_number()
+    qemu_opt_get_number_helper()
+      parse_option_number()
+        qemu_strtou64()
+          strtoull()
+
+turns "-1" into (uint64_t)-1, which counts as a valid conversion, per
+spec:
+
+> If the subject sequence has the expected form and the value of /base/
+> is zero, the sequence of characters starting with the first digit is
+> interpreted as an integer constant according to the rules of 6.4.4.1.
+> If the subject sequence has the expected form and the value of /base/
+> is between 2 and 36, it is used as the base for conversion, ascribing
+> to each letter its value as given above. If the subject sequence
+> begins with a minus sign, the value resulting from the conversion is
+> negated (in the return type). A pointer to the final string is stored
+> in the object pointed to by /endptr/, provided that /endptr/ is not a
+> null pointer.
+
+)
+
+I don't insist though; if Phil is OK with the posted patch, I won't try
+to block it.
+
+Thanks
+Laszlo
+
 
