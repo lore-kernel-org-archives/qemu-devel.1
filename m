@@ -2,63 +2,111 @@ Return-Path: <SRS0=bySr=YS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A1D52CA9EA0
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 16:40:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0B340CA9EBD
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 16:45:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7473921D71
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 16:40:58 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7473921D71
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=keithp.com
+	by mail.kernel.org (Postfix) with ESMTPS id C955F21872
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 16:45:26 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=wavecomp.com header.i=@wavecomp.com header.b="c8z9y1DP"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C955F21872
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=wavecomp.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34584 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34598 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iO2e1-00021q-KI
-	for qemu-devel@archiver.kernel.org; Fri, 25 Oct 2019 12:40:57 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39167)
+	id 1iO2iL-0003O2-Rx
+	for qemu-devel@archiver.kernel.org; Fri, 25 Oct 2019 12:45:25 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40093)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <keithp@keithp.com>) id 1iO2a9-0002Qr-QW
- for qemu-devel@nongnu.org; Fri, 25 Oct 2019 12:36:59 -0400
+ (envelope-from <amarkovic@wavecomp.com>) id 1iO2gT-0000ia-Ne
+ for qemu-devel@nongnu.org; Fri, 25 Oct 2019 12:43:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <keithp@keithp.com>) id 1iO2a8-0006Yy-Cv
- for qemu-devel@nongnu.org; Fri, 25 Oct 2019 12:36:57 -0400
-Received: from home.keithp.com ([63.227.221.253]:43884 helo=elaine.keithp.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <keithp@keithp.com>) id 1iO2a8-0006YX-2L
- for qemu-devel@nongnu.org; Fri, 25 Oct 2019 12:36:56 -0400
-Received: from localhost (localhost [127.0.0.1])
- by elaine.keithp.com (Postfix) with ESMTP id A67BA3F22EA2;
- Fri, 25 Oct 2019 09:36:53 -0700 (PDT)
-X-Virus-Scanned: Debian amavisd-new at keithp.com
-Received: from elaine.keithp.com ([127.0.0.1])
- by localhost (elaine.keithp.com [127.0.0.1]) (amavisd-new, port 10024)
- with LMTP id ZXnpgSfUsqMm; Fri, 25 Oct 2019 09:36:53 -0700 (PDT)
-Received: from keithp.com (unknown [204.134.242.194])
- by elaine.keithp.com (Postfix) with ESMTPSA id F2FDA3F22E9D;
- Fri, 25 Oct 2019 09:36:52 -0700 (PDT)
-Received: by keithp.com (Postfix, from userid 1000)
- id 98D8C158212D; Fri, 25 Oct 2019 09:36:52 -0700 (PDT)
-From: "Keith Packard" <keithp@keithp.com>
-To: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>,
- qemu-devel@nongnu.org
-Subject: Re: [PATCH] Semihost SYS_READC implementation (v4)
-In-Reply-To: <8736fhm9tw.fsf@linaro.org>
-References: <89ada4b1-ee3d-a512-07c2-9bc1ba5806da@redhat.com>
- <20191024224622.12371-1-keithp@keithp.com> <8736fhm9tw.fsf@linaro.org>
-Date: Fri, 25 Oct 2019 09:36:52 -0700
-Message-ID: <87pnik4w9n.fsf@keithp.com>
+ (envelope-from <amarkovic@wavecomp.com>) id 1iO2gS-00012T-P5
+ for qemu-devel@nongnu.org; Fri, 25 Oct 2019 12:43:29 -0400
+Received: from mail-eopbgr720098.outbound.protection.outlook.com
+ ([40.107.72.98]:36112 helo=NAM05-CO1-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <amarkovic@wavecomp.com>)
+ id 1iO2gS-0000yf-Bh
+ for qemu-devel@nongnu.org; Fri, 25 Oct 2019 12:43:28 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=MPyIelOlZSexs3jgWKbl5cy4t0dNX1SzqRw9Ie1KHEsS/5JgLayHDbhUXAkfLAGebiBKjHv1FXh3fK6oFYIY1cs6GKCnwzmUivI6+6pUqvPNRchGVjxhauvKvcvBD6pjM6A3R2EIzdvsNwTequRH+pQf/JMUvhxkZDpQWm6/LneL/dvLgdTKzSc89kfWc4fu068nNf0bAHEL+c9L4UGK7z6Eoc5ZTejE8aYUEapYClDDQKDWWNdgdU68xtFmQhmhFGPXrYnPbaFCF2HULVHpDNfkYXKukIWFr25K5h3gPEO47KuGjkReme9gKkTUtYML8X0TJXiTXdCYCzLe2IuRMQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=m/32WKVFh4f2EhZsKs4UJrGl2sCU0mBAQPuijhgzC04=;
+ b=NlYCaNKKyioKdsBc6K6UGVgU1m3sjz3LZqLodHmBwSd/xg3p6l1vDPkmlaU5usFD2BGFWf+mzTLSgc6M8da+QY8KMoaDoM+EPKxJYtC/qcamzI/WpYJ5Fr1RZnWv2ZNrwQgXEV/o2jdNCL9W+ZGui7du/GlssbxL0qNN3xLJbMNecgNfXNWrazWuX2ncEM8Wh+z+fRZdJTEz5n+VZCCQeNazKUUZhwcDV5nb/dt/IehASNqbZ+37wiOfBSLWmBfg+dKO5FGj0izMJrF/Xiaer0JhbfRx+sIP0Uqv0CQoja52Fx6lT1/cbnFmZCjHVleHDy31SAm0/TSsKdEbEoozfQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=wavecomp.com; dmarc=pass action=none header.from=wavecomp.com;
+ dkim=pass header.d=wavecomp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=wavecomp.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=m/32WKVFh4f2EhZsKs4UJrGl2sCU0mBAQPuijhgzC04=;
+ b=c8z9y1DPfLou6MrNuT8x7XnN5ArojlMdK5x3tnL0EJBgVZAwCocfSWUO+g8tJbFms4NZzJjg2yhQOkJJHNcxWUEEsR9Ut/GYU41MYF2nByiVzjwW+6chhoo5LGbHIO5ZJqNzaFElXDnWfCz+4mW4SS8sRw0yhZ+PF9qcvZpUgPE=
+Received: from BN6PR2201MB1251.namprd22.prod.outlook.com (10.174.81.139) by
+ BN6PR2201MB1555.namprd22.prod.outlook.com (10.174.81.147) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2387.20; Fri, 25 Oct 2019 16:43:15 +0000
+Received: from BN6PR2201MB1251.namprd22.prod.outlook.com
+ ([fe80::850f:a4cc:f2f8:364a]) by BN6PR2201MB1251.namprd22.prod.outlook.com
+ ([fe80::850f:a4cc:f2f8:364a%11]) with mapi id 15.20.2367.025; Fri, 25 Oct
+ 2019 16:43:15 +0000
+From: Aleksandar Markovic <amarkovic@wavecomp.com>
+To: Peter Maydell <peter.maydell@linaro.org>, Aleksandar Markovic
+ <aleksandar.markovic@rt-rk.com>
+Subject: Re: [EXTERNAL]Re: [PULL 00/11] MIPS queue for October 24th, 2019
+Thread-Topic: [EXTERNAL]Re: [PULL 00/11] MIPS queue for October 24th, 2019
+Thread-Index: AQHVixcS8n6SCPd4PkKMyhAuK+OhzKdrkBad
+Date: Fri, 25 Oct 2019 16:43:15 +0000
+Message-ID: <BN6PR2201MB1251CCF53610941977596E8DC6650@BN6PR2201MB1251.namprd22.prod.outlook.com>
+References: <1571915195-4381-1-git-send-email-aleksandar.markovic@rt-rk.com>,
+ <CAFEAcA-Eawy4t-aGG7u7jR389bUqHab8KX7VSmZUEUjZxbABCQ@mail.gmail.com>
+In-Reply-To: <CAFEAcA-Eawy4t-aGG7u7jR389bUqHab8KX7VSmZUEUjZxbABCQ@mail.gmail.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=amarkovic@wavecomp.com; 
+x-originating-ip: [82.117.201.26]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 0f797f21-d651-497c-46f8-08d7596a6eb4
+x-ms-traffictypediagnostic: BN6PR2201MB1555:
+x-microsoft-antispam-prvs: <BN6PR2201MB1555EFBCE166E48ED7E8A10DC6650@BN6PR2201MB1555.namprd22.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:5797;
+x-forefront-prvs: 02015246A9
+x-forefront-antispam-report: SFV:NSPM;
+ SFS:(10019020)(366004)(346002)(136003)(376002)(39840400004)(396003)(199004)(189003)(99286004)(558084003)(5660300002)(8936002)(316002)(2906002)(7736002)(110136005)(81156014)(91956017)(74316002)(8676002)(305945005)(81166006)(3846002)(33656002)(71200400001)(446003)(14454004)(25786009)(478600001)(256004)(86362001)(6506007)(6116002)(76176011)(486006)(55236004)(7696005)(9686003)(186003)(55016002)(66556008)(66476007)(76116006)(4326008)(66946007)(66446008)(6436002)(64756008)(26005)(6246003)(11346002)(71190400001)(229853002)(476003)(52536014)(66066001)(102836004);
+ DIR:OUT; SFP:1102; SCL:1; SRVR:BN6PR2201MB1555;
+ H:BN6PR2201MB1251.namprd22.prod.outlook.com; FPR:; SPF:None; LANG:en;
+ PTR:InfoNoRecords; A:1; MX:1; 
+received-spf: None (protection.outlook.com: wavecomp.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: xKY0qJBs3CHsTSipcqUYPJAU9fGjUQQGH8PXlsSBOVMwsK11xEMyVot57B9lIZQhFFnvZmJy27fCD22jUYSroz8dXXVVy2GMUoFPUfmUx9QZSTjGcQEFSaCjiJNxNwvoblQq2E55gy6lNR3OTja9Ji30D8f9ZRfTSAWgrAT7/zYwN3B8L/7UXbGLq1dG0WILbSeseHY1DebkMH3mLKt22tEI+2SAaKCPKh8bINB6qv6pchkXHho5CL/ePTQgxrFD1j7js4CHyQFhzvjDYetaFWW1HxkeJgr5nO2PlMyLdiNFRwSHF16sUoFWR7GU/37PugAPoB5ub9P7iFFB566Oq8hHTXSRVg4a11aQNLo8z2XaE5tGc+i8FZfwhazZwDRS2SPE0CsM2t94ozaFQWc7wI7fIXw2eBqHnlI/A+kkZr+OVJ6l7noiKvvvdMz0Xrs+
+x-ms-exchange-transport-forked: True
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="=-=-=";
- micalg=pgp-sha256; protocol="application/pgp-signature"
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 63.227.221.253
+X-OriginatorOrg: wavecomp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 0f797f21-d651-497c-46f8-08d7596a6eb4
+X-MS-Exchange-CrossTenant-originalarrivaltime: 25 Oct 2019 16:43:15.1599 (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 463607d3-1db3-40a0-8a29-970c56230104
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: adWvq5xbQf6vKE7fN+EHCD4XvS2p4c4S1knrXIUr49rbbg3Z2/zOhBipO0x9u+4rU816JLkof+Kg8q8GftHDXQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN6PR2201MB1555
+X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
+X-Received-From: 40.107.72.98
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -70,115 +118,20 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---=-=-=
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-Alex Benn=C3=A9e <alex.bennee@linaro.org> writes:
-
-> I can see the use for this but I'd like to know what you are testing
-> with. We only have very basic smoketests in check-tcg but I've tested
-> with the latest arm-semihosting tests and they are all fine so no
-> regressions there.
-
-I'm adding semihosting support to picolibc
-(https://keithp.com/picolibc/) and need a way to automate tests for it's
-SYS_READC support, so eventually I'll have automated tests there, but
-that depends on qemu support...
-
-> Please keep version history bellow --- so they get dropped when the
-> patch is applied.
-
-Sure, I'll edit the mail before sending. In my repo, I'm leaving the
-version history in git so I can keep track of it.
-
->> v4:
->> 	Add qemu_semihosting_console_init to stubs/semihost.c for
->> 	hosts that don't support semihosting
->
-> This doesn't appear to be in the diff which is why I'm seeing a compile
-> failure for non-CONFIG_SEMIHOST machines. However...
-
-Argh! Just git operation failure -- I'm building another patch on top of
-this (for RISC-V semihosting support) and the stubs/semihost.c change
-got caught in there. My overall check for changes missed this mistake.
-
->> +
->> +#include <poll.h>
->
-> Headers should go at the top.
-
-Thanks; I've fixed this file and hw/semihosting/console.c
-
->>      case TARGET_SYS_READC:
->> -        qemu_log_mask(LOG_UNIMP, "%s: SYS_READC not implemented", __fun=
-c__);
->> -        return 0;
->> +        return qemu_semihosting_console_inc(env);
->
-> I'm not sure this would be correct if there was no character available.
-> The docs imply it blocks although don't say so explicitly AFAICT.
-
-Here's what the docs say:
-
-        https://static.docs.arm.com/100863/0200/semihosting.pdf
-
-        Return
-
-        On exit, the RETURN REGISTER contains the byte read from the consol=
-e.
-
-If this call didn't block, they'd have to define a value which indicated
-that no byte was available? Openocd also implements SYS_READC using
-'getchar()', which definitely blocks. So, at least qemu would be the
-same.
-
-I realize it's really weird to block the whole emulation for this call,
-but given the target environment (deeply embedded devices), it's quite
-convenient as the whole qemu process blocks, instead of spinning.
-
->> +    /* connect semihosting console input if requested */
->> +    qemu_semihosting_console_init();
->> +
->
-> I'd rather rename qemu_semihosting_connect_chardevs to
-> qemu_semihosting_init and keep all our bits of semihosting setup in
-> there rather than having multiple calls out of vl.c
-
-I also thought this would be a nice cleanup. However, the last caller to
-qemu_chr_fe_set_handlers gets the focus for input, and connect_chardevs
-is called before the serial ports and monitor are initialized, so
-semihosting gets pushed aside and stdio input ends up hooked to the monitor
-instead.
-
-Adding this function and placing the call after the other stdio users
-get hooked up means that semihosting starts with the input focus.
-
-=2D-=20
-=2Dkeith
-
---=-=-=
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEw4O3eCVWE9/bQJ2R2yIaaQAAABEFAl2zJKQACgkQ2yIaaQAA
-ABGTIhAAmiGNN2S90GOK+1tMuv/7nSW1Q3/xmTWdUSv/GcGa9fmTeJtMcmue0xCu
-QULzf6bwSlvYPzkWepcDIHfFmuk6CLOYX6AK5n/YWuyUzntAAdaFkP1//LMbf1A1
-pn/5GIXyvhQo5Bj3rugEhPMR1zxWCsStcoBSyHKlCk2qUWj5kCZoO/e50BmNT7N0
-zVsq9ZSnWsmzGtF8fjM/JB/5VAcpYRWY1iZplKZZwp/QTfqS1uXqjT+c0Ik/2wYK
-D2Znbtu+jgi7qZpXenmamYX/iZBA4Vgy5rM1WT20craeUJBN/qIQdOZHgLav0EAe
-NAmwiLD6+lODwOv75BD0TjMDlF+Oh6aW1tksjyEcDorj5u3xNxjwGqk8DbrhqVoy
-VNR07sfPI/+f6mhk7zPacyFuUa88cKUOodmu6F9ROy7PYpK6HC9druvm2BVH5M+D
-BTnK7oKOIa20CLhcLjcpfi3LpYMpJhAjlfN2VI8N8fNzCJUoT02x61vC53ASj5/t
-AnOLnQ+Zxfrglbm2aJqN7w0Nj1AgqAf+2J/7QA5utyqyoSkwutvN9rMiMIyGO6kD
-ImsJM+5srpaCfDuASuedOQx8Kv9hdIqRNg4ITP3MkwhOQxpDFZTjBZW6Bo8K2jAC
-MQRM+Zrtslu+Ko6gxTnV7fK/LZmNX3BZi9FPcjEIKFbbdt7d+w0=
-=Psq6
------END PGP SIGNATURE-----
---=-=-=--
+=0A=
+> Hi; this fails to compile with 'implicit conversion' errors=0A=
+> on clang (OSX, freebsd, openbsd, and linux):=0A=
+=0A=
+=0A=
+I am going to send v2 shortly, that will not contain the offending patch.=
+=0A=
+=0A=
+Sorry about this.=0A=
+=0A=
+Aleksandar=
 
