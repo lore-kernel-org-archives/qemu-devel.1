@@ -7,76 +7,75 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3CB8CCA9EA0
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 06:40:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 49DC5CA9EA0
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 06:40:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 013EB2070B
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 06:40:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1901D2070B
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Oct 2019 06:40:06 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="GXF77aQ6"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 013EB2070B
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="BVJvA2yq"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1901D2070B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55806 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55810 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iNtGT-0007vk-IL
-	for qemu-devel@archiver.kernel.org; Fri, 25 Oct 2019 02:40:01 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35346)
+	id 1iNtGW-0008DI-Nq
+	for qemu-devel@archiver.kernel.org; Fri, 25 Oct 2019 02:40:04 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35432)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1iNtDr-0002tR-0h
- for qemu-devel@nongnu.org; Fri, 25 Oct 2019 02:37:20 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1iNtDv-00033N-1j
+ for qemu-devel@nongnu.org; Fri, 25 Oct 2019 02:37:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1iNtDq-0008Ln-1w
- for qemu-devel@nongnu.org; Fri, 25 Oct 2019 02:37:18 -0400
-Received: from mail-wr1-x42a.google.com ([2a00:1450:4864:20::42a]:33587)
+ (envelope-from <alex.bennee@linaro.org>) id 1iNtDt-0008Ni-Vw
+ for qemu-devel@nongnu.org; Fri, 25 Oct 2019 02:37:22 -0400
+Received: from mail-wr1-x429.google.com ([2a00:1450:4864:20::429]:40998)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1iNtDp-0008LR-SE
- for qemu-devel@nongnu.org; Fri, 25 Oct 2019 02:37:17 -0400
-Received: by mail-wr1-x42a.google.com with SMTP id s1so950077wro.0
- for <qemu-devel@nongnu.org>; Thu, 24 Oct 2019 23:37:17 -0700 (PDT)
+ id 1iNtDt-0008NI-Pq
+ for qemu-devel@nongnu.org; Fri, 25 Oct 2019 02:37:21 -0400
+Received: by mail-wr1-x429.google.com with SMTP id p4so902806wrm.8
+ for <qemu-devel@nongnu.org>; Thu, 24 Oct 2019 23:37:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=RnAEdxIMsOBRs/5T7Ts8em7DhClh/2QoH7on8QJvikk=;
- b=GXF77aQ6K7GUQI/DBeGy/kss9IBhyssgrJldSSwFr2v9jQTeLec6jgrWu4A1pB3KCV
- PcIY1sGkS7rPi2meeAh2yjAEmD8+RbVtJgtrOFl8x8HFKmjTJNPDbl3Cguv/BmmLutqr
- LHp0Nl3XScG89lEZm6aqjuu9X4y4SrSHfDRscW0IZwJtH2hQfLGkC2q8waMif0qlGQ70
- ahUGIA5RLDNpdO1m6tBsfsCWft+h6PqwdFfjBf0oiP9Y+wLKKdT22CvfOMG9YIhOwVAe
- waB0fnMB9kHkQQiLCZsYVCsijRUtPSqxLM9XbmS0scji1JXQ3ojoBEtCbf/k8I/kar06
- eeDg==
+ bh=HDnFETyoSIS8dCFtwOkMGxSV5Cme4iWm+VQG9FYgBJY=;
+ b=BVJvA2yqHYZAiaGEyIppJbFRs4G+yCx49/V6avT4Sa/D/zgUQeoKJiakUZdu3stBEy
+ QoYV+/8yFVQ71uaUzZEyZZpnGuxBl6aN4/9hHDjeLE4TPoNLi1uRqIxoQrFc6EqBXl/6
+ KolpLIlmKhkYiJ2G0VNF+cVjziA6AAmohYAXo27QUiS6Pw0mOVJIoYOpIypWiRwT4Z2D
+ sQAE+2gAkPm4epyr5jB1M0Mwula1HFBfRA0EsQzLR8Nz2AqzFbcGAdSUS/6TJxCdw+HN
+ 8m9Ht7qHz/O45FWX3DtRvjNb0XV3s0H63EHypDR46CL84DB6DAghqeBgvfWOJ8DYDIHx
+ lHdQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=RnAEdxIMsOBRs/5T7Ts8em7DhClh/2QoH7on8QJvikk=;
- b=NrE/kNVG35jsPL8PKRdtBDvtIx4KYuIzX9a0gzemPAUHK8BzyhxSm4ZJqtdoMXZYwd
- PSV2F/JYUEgrfEmOPLK4h1j/palM4aknbH9QLWa06htNvK9rnv3Kyq8FGK5rYzIqrEZw
- nOuXONdcP+m1kRwYO++mw//F3YpvcdSkkIkt+m3MWce5e8wqYq1QE9fWiM+InXo9QBnU
- yngb9PTTyR7BwegCPsjQIcFhqj9HgbOPW6lIxP3rFIbfu/SnQTL8j2mRr23J5W0aQ0gp
- w9qYFuANLyt4S2AJ7DLqzoWrhpRGA7UjsNdTmTwqYVIysukilW02laUQfb+hK9zRcSXm
- a7LQ==
-X-Gm-Message-State: APjAAAV5O8W7oG3/0bxIWnVnFfiUr49c3Dhr9SxtnPXfuG3UWQ2z0bMV
- jRa+z3PtaArXs9noQOS1j0+45A==
-X-Google-Smtp-Source: APXvYqwyhoswGM5+Oj8pmzE3+OYg3/PTQOrOIJ2byQ1IcGbCSN0/RXjMHwENGF4tnyy6nqzl6llOUg==
-X-Received: by 2002:a5d:60ce:: with SMTP id x14mr1187808wrt.294.1571985436529; 
- Thu, 24 Oct 2019 23:37:16 -0700 (PDT)
+ bh=HDnFETyoSIS8dCFtwOkMGxSV5Cme4iWm+VQG9FYgBJY=;
+ b=p7LQ8ECa8NWWlv0cQ+nPPCqal2c9Itc5fcqvQqa3qu3IRQgI91vU4bfFCpmz5zIAic
+ kpj7eczMzUFoPsPVABV7gilJFmoj5BJuFNhoag0PTAxw5E3JAQy62rkWidwdb2CcFuyG
+ 90PZKNv51a4jam60B59njqXbNChi8BPjV/DdHkdrltP2xi4DBn69gCDuTqUERoF18Er2
+ iO6NFUrer9y4Ue3MtncMiY2JHEFqURcEakSYcaXfjKLMG2/WrycTtl/ezLI2jgbbvjCK
+ kQKn2X9gVsJ4ga2CPrgBOiGT18hZe6MSJI4I90+jG0TT1LGkqVkvYLnliaM4PAUGNOuJ
+ ViBw==
+X-Gm-Message-State: APjAAAVuw2PChG4Hr7snabMMTwd1rO1h7kyE6ry6m+hmoJlcgJlApVqa
+ GjaZMK014JCaj/QM47GqWFLmDg==
+X-Google-Smtp-Source: APXvYqzvnQA7cEtuiXQPHTC06pAqXiIAkUSd+m3DbTr3PyLveYkGD0xDHxT/zj2VAYgnUs5VpIlbvQ==
+X-Received: by 2002:adf:b21a:: with SMTP id u26mr1300646wra.119.1571985440635; 
+ Thu, 24 Oct 2019 23:37:20 -0700 (PDT)
 Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id o18sm1555923wrm.11.2019.10.24.23.37.14
+ by smtp.gmail.com with ESMTPSA id d11sm1269265wrf.80.2019.10.24.23.37.16
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 24 Oct 2019 23:37:14 -0700 (PDT)
+ Thu, 24 Oct 2019 23:37:17 -0700 (PDT)
 Received: from zen.lan (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id E0B931FF8F;
- Fri, 25 Oct 2019 07:37:13 +0100 (BST)
+ by zen.linaroharston (Postfix) with ESMTP id 312AA1FF92;
+ Fri, 25 Oct 2019 07:37:14 +0100 (BST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: peter.maydell@linaro.org
-Subject: [PULL v2 02/73] travis.yml: Add libvdeplug-dev to compile-test
- net/vde.c
-Date: Fri, 25 Oct 2019 07:36:02 +0100
-Message-Id: <20191025063713.23374-3-alex.bennee@linaro.org>
+Subject: [PULL v2 05/73] travis.yml: Fix the ccache lines
+Date: Fri, 25 Oct 2019 07:36:05 +0100
+Message-Id: <20191025063713.23374-6-alex.bennee@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20191025063713.23374-1-alex.bennee@linaro.org>
 References: <20191025063713.23374-1-alex.bennee@linaro.org>
@@ -85,7 +84,7 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::42a
+X-Received-From: 2a00:1450:4864:20::429
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,34 +97,47 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Fam Zheng <fam@euphon.net>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
  Thomas Huth <thuth@redhat.com>,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 From: Thomas Huth <thuth@redhat.com>
 
-This library is needed to compile the VDE network backend.
+The "command -v ccache && ccache ..." likely were supposed to test
+the availability of ccache before running the program. But this
+shell construct causes Travis to abort if ccache is not available.
+Use an if-statement instead to fix this problem.
 
 Signed-off-by: Thomas Huth <thuth@redhat.com>
-Message-Id: <20191009170701.14756-2-thuth@redhat.com>
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Message-Id: <20191009170701.14756-5-thuth@redhat.com>
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 
 diff --git a/.travis.yml b/.travis.yml
-index 7d90b87540f..7be2a9949f5 100644
+index e65e53f3d7e..7e0d4ad2b31 100644
 --- a/.travis.yml
 +++ b/.travis.yml
-@@ -46,6 +46,7 @@ addons:
-       - libssh-dev
-       - liburcu-dev
-       - libusb-1.0-0-dev
-+      - libvdeplug-dev
-       - libvte-2.91-dev
-       - sparse
-       - uuid-dev
+@@ -91,13 +91,13 @@ git:
+ 
+ before_script:
+   - if [ "$TRAVIS_OS_NAME" == "osx" ] ; then export PATH="/usr/local/opt/ccache/libexec:$PATH" ; fi
+-  - command -v ccache && ccache --zero-stats
++  - if command -v ccache ; then ccache --zero-stats ; fi
+   - mkdir -p ${BUILD_DIR} && cd ${BUILD_DIR}
+   - ${SRC_DIR}/configure ${BASE_CONFIG} ${CONFIG} || { cat config.log && exit 1; }
+ script:
+   - make -j3 && travis_retry ${TEST_CMD}
+ after_script:
+-  - command -v ccache && ccache --show-stats
++  - if command -v ccache ; then ccache --show-stats ; fi
+ 
+ 
+ matrix:
 -- 
 2.20.1
 
