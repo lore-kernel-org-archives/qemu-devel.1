@@ -6,72 +6,71 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6B3D6CA9EB9
-	for <qemu-devel@archiver.kernel.org>; Sat, 26 Oct 2019 19:41:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0D2B7CA9EB9
+	for <qemu-devel@archiver.kernel.org>; Sat, 26 Oct 2019 19:44:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 42E7D206DD
-	for <qemu-devel@archiver.kernel.org>; Sat, 26 Oct 2019 19:41:55 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 42E7D206DD
+	by mail.kernel.org (Postfix) with ESMTPS id CFCE1206DD
+	for <qemu-devel@archiver.kernel.org>; Sat, 26 Oct 2019 19:44:32 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CFCE1206DD
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41678 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41706 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iORwg-0003vk-1z
-	for qemu-devel@archiver.kernel.org; Sat, 26 Oct 2019 15:41:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50985)
+	id 1iORzD-0001a2-7m
+	for qemu-devel@archiver.kernel.org; Sat, 26 Oct 2019 15:44:31 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50951)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mst@redhat.com>) id 1iORuR-0000mq-6A
- for qemu-devel@nongnu.org; Sat, 26 Oct 2019 15:39:36 -0400
+ (envelope-from <mst@redhat.com>) id 1iORuG-0000P2-Jm
+ for qemu-devel@nongnu.org; Sat, 26 Oct 2019 15:39:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mst@redhat.com>) id 1iORuP-0000B5-TB
- for qemu-devel@nongnu.org; Sat, 26 Oct 2019 15:39:35 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:38332)
+ (envelope-from <mst@redhat.com>) id 1iORuF-00008o-Fs
+ for qemu-devel@nongnu.org; Sat, 26 Oct 2019 15:39:24 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40514)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mst@redhat.com>) id 1iORuP-0000Av-My
- for qemu-devel@nongnu.org; Sat, 26 Oct 2019 15:39:33 -0400
-Received: from mail-qt1-f197.google.com (mail-qt1-f197.google.com
- [209.85.160.197])
+ (Exim 4.71) (envelope-from <mst@redhat.com>) id 1iORuF-00008W-7f
+ for qemu-devel@nongnu.org; Sat, 26 Oct 2019 15:39:23 -0400
+Received: from mail-qt1-f199.google.com (mail-qt1-f199.google.com
+ [209.85.160.199])
  (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id DC12D80F6D
- for <qemu-devel@nongnu.org>; Sat, 26 Oct 2019 19:39:32 +0000 (UTC)
-Received: by mail-qt1-f197.google.com with SMTP id i25so6314894qtm.17
- for <qemu-devel@nongnu.org>; Sat, 26 Oct 2019 12:39:32 -0700 (PDT)
+ by mx1.redhat.com (Postfix) with ESMTPS id 4BCA6C01D36C
+ for <qemu-devel@nongnu.org>; Sat, 26 Oct 2019 19:39:22 +0000 (UTC)
+Received: by mail-qt1-f199.google.com with SMTP id t16so6322277qtp.11
+ for <qemu-devel@nongnu.org>; Sat, 26 Oct 2019 12:39:22 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
  :mime-version:content-disposition:content-transfer-encoding
  :in-reply-to;
- bh=VjvBlMoTKwLGMX9SWGSd6Z2eE4BOtsqncgN0gdyFP+8=;
- b=NBlB72Ln+J1NW5NvZBmIFwCgFZBb3KugAFnne5PWCSegU2cGMyUJJnjJA6o5VKwuS3
- lp1NMM8mtFYjMW43SdRyraC9u+ziAR8Hc/mSdYX1aDH/o6Qe62wv6IMwZTsvn5oeWmbl
- RCHFnU7DOQdYPmvMZSil+TlMazK6Zrn1lKX3uxE5bTUNXkHY+ZkJuO+0MioM7JyJFi3X
- l+V7cwj0cKnzL6kPZp7YTPPoCWVNx0ex8LytWhsthEntELY8j2yfoIRFoXaUcr/U1whS
- yltuTm59lhRBU3sVtW/XiPg6MmCpC4sn4fiS4iE5dTzd2f+KAMTKmsc/ptBGQRTby2ru
- E5tw==
-X-Gm-Message-State: APjAAAWofX3Zr3CTOuqLcnJiM8eex1TLCs7knynX9AzMCGA6z2Iz6WKJ
- uVmli8AkvWqBMf3CJ0xBXNtZO3ezpZFjq3jsoK6Vsn6+pcKhtmGZyiyYy4ZzrHjvNpk3ekMn1dK
- Z7Vm/1ACvTrZzsxc=
-X-Received: by 2002:a05:6214:4d:: with SMTP id
- c13mr9668920qvr.116.1572118771828; 
- Sat, 26 Oct 2019 12:39:31 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqx6wqLiKA5A17StVA84YfBdWo21UuEFuuOM9+EUtn1P0kxSYyQXM+OEeJoeotvdqaOb7gJ6tw==
-X-Received: by 2002:a05:6214:4d:: with SMTP id
- c13mr9668911qvr.116.1572118771633; 
- Sat, 26 Oct 2019 12:39:31 -0700 (PDT)
+ bh=42QY6USANjxLIh2wuts0pVaXl5XWhZ8Sl7+dDJBp7pk=;
+ b=jk+rFymt/Av21sBXPeawJJSSJvT0+T7OEK8VG2Lf/FnHq4RtS9910grtuEJQV7dtan
+ AhZWVpCZgWuVs1PANESp0o1XkhHOE+K1mmYPefZGzcNDDk/Daawz5YU+3ACIeIsKkC1n
+ xbPexFNU1xKT+tQRQ022M0n0ZM9Pd01cX1Yn94fx/nQSs9DCZFUKaG/Xx7DVcyb94rVf
+ jJPvj1ZCnVrAjVvC4UPVC4qKYOC0linP6KI+fbAupIkovap8GCtTonwxSplDjD+UyyoO
+ ZnFNzrTJbOEIIRI7Aipl3/md4j4CI1lqQipa94ipe8tsCSl/vxBi9hfJeFUGSYsP1MYI
+ r28Q==
+X-Gm-Message-State: APjAAAWa7smCaxBJTxHcW3Slx40yC/k0w+D8VaHFcxL6t1BScv4NSOEf
+ bRiqayA7v2RK5PVzA3Gq7w65QSliGLOxDwZ82To0N4T6iGzXMc5MGyyBZJkhOyjtiYA0EXPrUzh
+ MS96Gh48GMmmPhmM=
+X-Received: by 2002:a37:383:: with SMTP id 125mr9218186qkd.482.1572118761181; 
+ Sat, 26 Oct 2019 12:39:21 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqy0xa33mrY3EfAWFFaoci3fH5N4xX4WisAKxdnr53QiZNbOUkHgEPYT5d/HKnSuHzdXibjf3g==
+X-Received: by 2002:a37:383:: with SMTP id 125mr9218162qkd.482.1572118760807; 
+ Sat, 26 Oct 2019 12:39:20 -0700 (PDT)
 Received: from redhat.com (bzq-79-176-10-77.red.bezeqint.net. [79.176.10.77])
  by smtp.gmail.com with ESMTPSA id
- n65sm3556435qkb.19.2019.10.26.12.39.29
+ 14sm2991819qtb.54.2019.10.26.12.39.18
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sat, 26 Oct 2019 12:39:30 -0700 (PDT)
-Date: Sat, 26 Oct 2019 15:39:27 -0400
+ Sat, 26 Oct 2019 12:39:20 -0700 (PDT)
+Date: Sat, 26 Oct 2019 15:39:15 -0400
 From: "Michael S. Tsirkin" <mst@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 04/25] virtio: Free rnd virqueue at unrealize()
-Message-ID: <20191026193824.11926-5-mst@redhat.com>
+Subject: [PULL 02/25] virtio: device/driver area size calculation refactor
+ for split ring
+Message-ID: <20191026193824.11926-3-mst@redhat.com>
 References: <20191026193824.11926-1-mst@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
@@ -94,42 +93,94 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>,
- Peter Maydell <peter.maydell@linaro.org>, Amit Shah <amit@kernel.org>,
+Cc: Peter Maydell <peter.maydell@linaro.org>, Jason Wang <jasowang@redhat.com>,
+ Jens Freimann <jfreimann@redhat.com>, Wei Xu <wexu@redhat.com>,
  Eugenio =?utf-8?B?UMOpcmV6?= <eperezma@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Eugenio P=C3=A9rez <eperezma@redhat.com>
+From: Wei Xu <wexu@redhat.com>
 
-The function virtio_del_queue was not called at unrealize() callback.
+There is slight size difference between split/packed rings.
 
-This was detected due to add an allocated element on the vq introduce
-in future commits (used_elems) and running address sanitizer memory
-leak detector.
+This is the refactor of split ring as well as a helper to expanding
+device and driver area size calculation for packed ring.
 
+Signed-off-by: Wei Xu <wexu@redhat.com>
+Signed-off-by: Jason Wang <jasowang@redhat.com>
 Signed-off-by: Eugenio P=C3=A9rez <eperezma@redhat.com>
-Message-Id: <20191025083527.30803-5-eperezma@redhat.com>
+Reviewed-by: Jens Freimann <jfreimann@redhat.com>
+Message-Id: <20191025083527.30803-3-eperezma@redhat.com>
 Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 ---
- hw/virtio/virtio-rng.c | 1 +
- 1 file changed, 1 insertion(+)
+ hw/virtio/virtio.c | 16 ++++++++++------
+ 1 file changed, 10 insertions(+), 6 deletions(-)
 
-diff --git a/hw/virtio/virtio-rng.c b/hw/virtio/virtio-rng.c
-index e93bed020f..b498a20332 100644
---- a/hw/virtio/virtio-rng.c
-+++ b/hw/virtio/virtio-rng.c
-@@ -238,6 +238,7 @@ static void virtio_rng_device_unrealize(DeviceState *=
-dev, Error **errp)
-     qemu_del_vm_change_state_handler(vrng->vmstate);
-     timer_del(vrng->rate_limit_timer);
-     timer_free(vrng->rate_limit_timer);
-+    virtio_del_queue(vdev, 0);
-     virtio_cleanup(vdev);
+diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
+index fdac203cdf..74cc10fad9 100644
+--- a/hw/virtio/virtio.c
++++ b/hw/virtio/virtio.c
+@@ -159,10 +159,8 @@ static void virtio_init_region_cache(VirtIODevice *v=
+dev, int n)
+     VRingMemoryRegionCaches *old =3D vq->vring.caches;
+     VRingMemoryRegionCaches *new =3D NULL;
+     hwaddr addr, size;
+-    int event_size;
+     int64_t len;
+=20
+-    event_size =3D virtio_vdev_has_feature(vq->vdev, VIRTIO_RING_F_EVENT=
+_IDX) ? 2 : 0;
+=20
+     addr =3D vq->vring.desc;
+     if (!addr) {
+@@ -177,7 +175,7 @@ static void virtio_init_region_cache(VirtIODevice *vd=
+ev, int n)
+         goto err_desc;
+     }
+=20
+-    size =3D virtio_queue_get_used_size(vdev, n) + event_size;
++    size =3D virtio_queue_get_used_size(vdev, n);
+     len =3D address_space_cache_init(&new->used, vdev->dma_as,
+                                    vq->vring.used, size, true);
+     if (len < size) {
+@@ -185,7 +183,7 @@ static void virtio_init_region_cache(VirtIODevice *vd=
+ev, int n)
+         goto err_used;
+     }
+=20
+-    size =3D virtio_queue_get_avail_size(vdev, n) + event_size;
++    size =3D virtio_queue_get_avail_size(vdev, n);
+     len =3D address_space_cache_init(&new->avail, vdev->dma_as,
+                                    vq->vring.avail, size, false);
+     if (len < size) {
+@@ -2414,14 +2412,20 @@ hwaddr virtio_queue_get_desc_size(VirtIODevice *v=
+dev, int n)
+=20
+ hwaddr virtio_queue_get_avail_size(VirtIODevice *vdev, int n)
+ {
++    int s;
++
++    s =3D virtio_vdev_has_feature(vdev, VIRTIO_RING_F_EVENT_IDX) ? 2 : 0=
+;
+     return offsetof(VRingAvail, ring) +
+-        sizeof(uint16_t) * vdev->vq[n].vring.num;
++        sizeof(uint16_t) * vdev->vq[n].vring.num + s;
  }
 =20
+ hwaddr virtio_queue_get_used_size(VirtIODevice *vdev, int n)
+ {
++    int s;
++
++    s =3D virtio_vdev_has_feature(vdev, VIRTIO_RING_F_EVENT_IDX) ? 2 : 0=
+;
+     return offsetof(VRingUsed, ring) +
+-        sizeof(VRingUsedElem) * vdev->vq[n].vring.num;
++        sizeof(VRingUsedElem) * vdev->vq[n].vring.num + s;
+ }
+=20
+ uint16_t virtio_queue_get_last_avail_idx(VirtIODevice *vdev, int n)
 --=20
 MST
 
