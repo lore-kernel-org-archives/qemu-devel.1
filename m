@@ -2,61 +2,83 @@ Return-Path: <SRS0=l02z=YT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 12409CA9EB9
-	for <qemu-devel@archiver.kernel.org>; Sat, 26 Oct 2019 22:35:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8CE4DCA9EB9
+	for <qemu-devel@archiver.kernel.org>; Sat, 26 Oct 2019 22:38:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CCA8F214DA
-	for <qemu-devel@archiver.kernel.org>; Sat, 26 Oct 2019 22:35:21 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b="Z8HRbTTG"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CCA8F214DA
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=igalia.com
+	by mail.kernel.org (Postfix) with ESMTPS id 5A7B8214DA
+	for <qemu-devel@archiver.kernel.org>; Sat, 26 Oct 2019 22:38:27 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5A7B8214DA
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43254 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43286 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iOUeW-0005wr-Uq
-	for qemu-devel@archiver.kernel.org; Sat, 26 Oct 2019 18:35:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60324)
+	id 1iOUhW-0007e8-Gn
+	for qemu-devel@archiver.kernel.org; Sat, 26 Oct 2019 18:38:26 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34203)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <berto@igalia.com>) id 1iOTZx-0000Xz-4m
- for qemu-devel@nongnu.org; Sat, 26 Oct 2019 17:26:35 -0400
+ (envelope-from <mst@redhat.com>) id 1iOTzF-0005VT-GG
+ for qemu-devel@nongnu.org; Sat, 26 Oct 2019 17:52:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <berto@igalia.com>) id 1iOTZv-0005RQ-F3
- for qemu-devel@nongnu.org; Sat, 26 Oct 2019 17:26:33 -0400
-Received: from fanzine.igalia.com ([178.60.130.6]:42510)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <berto@igalia.com>)
- id 1iOTZu-0005F5-Ub; Sat, 26 Oct 2019 17:26:31 -0400
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=igalia.com;
- s=20170329; 
- h=Content-Transfer-Encoding:MIME-Version:Message-Id:Date:Subject:Cc:To:From;
- bh=M1JnWBLeI/U2q/+ye9GuOt2ejRpDtekbRhZrMSseTQY=; 
- b=Z8HRbTTG3ClGlo/+TnRK3GY04AhSL7TsQtITFAM0T94lFiUXibAFdqXM7EhOaAGBi7gNMVBZFnunrYjEEKyq3dvLnxPylz7KHSyMOCSW2+3tAaVqjXxwN4pdb6xBYcVyh/slyfWKDjs40edBIjcekFArDarWymrepWOamA3ZwPky1/kaa5P3t/r4KOIrbPc2mAv9HODBxsh2/JFWTVs1r4jEXLWDCqMkEJf8fZbttLyNNG2uGHJNf5LKlG/JS9tFWCXsl8rBIZbQ7eoAUHdUXNJUZuhI5OWcNVR90yQXLOzbQWW8DofvIeyQMhyz93OGubHizOOOkkD4f3EJybowRA==;
-Received: from 87-100-137-117.bb.dnainternet.fi ([87.100.137.117]
- helo=perseus.local) by fanzine.igalia.com with esmtpsa 
- (Cipher TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim)
- id 1iOTZI-00045l-Kn; Sat, 26 Oct 2019 23:25:52 +0200
-Received: from berto by perseus.local with local (Exim 4.92)
- (envelope-from <berto@igalia.com>)
- id 1iOTYz-0001P0-Vm; Sun, 27 Oct 2019 00:25:33 +0300
-From: Alberto Garcia <berto@igalia.com>
+ (envelope-from <mst@redhat.com>) id 1iOTzE-0003Za-37
+ for qemu-devel@nongnu.org; Sat, 26 Oct 2019 17:52:41 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54122)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <mst@redhat.com>) id 1iOTzD-0003ZK-RB
+ for qemu-devel@nongnu.org; Sat, 26 Oct 2019 17:52:40 -0400
+Received: from mail-qt1-f198.google.com (mail-qt1-f198.google.com
+ [209.85.160.198])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 5A27A5945B
+ for <qemu-devel@nongnu.org>; Sat, 26 Oct 2019 21:52:38 +0000 (UTC)
+Received: by mail-qt1-f198.google.com with SMTP id v23so2739650qth.20
+ for <qemu-devel@nongnu.org>; Sat, 26 Oct 2019 14:52:38 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=3gU25GDgMsUx4G9fo45xqWhGpCO+qZL7RzGmc1DlyOI=;
+ b=V9J9rQaSdtUFOnWHWswgGHFOk6D4kMyMS1zxLPCp1kMsAX0NkBQslgpTtnCl975Dk+
+ Hlw6CcsBg/d1bU11pFCkk5SUzw66u8XhDrXT3V1B8EnKu9OU1bQstKbKVIKABIoy2PyD
+ XrMA6ER4vtSqn+zYSJxE+rKCF0VMrwVQJvJhkkvhiBg0PyMP92r00GuWgdeS0ZgM3vsF
+ yxbvPlnT8XHffgtoQYoi1SAWilhbHFu48kL3TTaKsM+o1TVsIebbWrusOMxX8Lh4YEIW
+ gnV1za0T0FgB9oTWu50x+NY6hmGfvy1ki8UpCpzMaveiVdRAKRFk7c6j4VOXWWxGTMLb
+ Tzzg==
+X-Gm-Message-State: APjAAAX37cegOg60Qc7zrrBD7MovV4y4WRAYaQtGsUVHu6/mOcyrK63w
+ qG6qXDK0/K+44d/M0NNCQvf8ppOBU6uM8sZXZ8/9OYn7NwfRCXct5MSMQvh7YYjusf3KRwmJCZQ
+ mjxhKnMZXq1Z7Mw0=
+X-Received: by 2002:ac8:548f:: with SMTP id h15mr10530362qtq.176.1572126757144; 
+ Sat, 26 Oct 2019 14:52:37 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqyFcWr2TR3/a8sv/hVoVHaVJY/En9bM9BtgSmbS+5gaAfTxQx0GwYqmNyf4RS/hqamjA4hx+Q==
+X-Received: by 2002:ac8:548f:: with SMTP id h15mr10530345qtq.176.1572126756944; 
+ Sat, 26 Oct 2019 14:52:36 -0700 (PDT)
+Received: from redhat.com (bzq-79-176-10-77.red.bezeqint.net. [79.176.10.77])
+ by smtp.gmail.com with ESMTPSA id
+ x19sm3271213qkf.26.2019.10.26.14.52.34
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Sat, 26 Oct 2019 14:52:36 -0700 (PDT)
+Date: Sat, 26 Oct 2019 17:52:32 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [RFC PATCH v2 00/26] Add subcluster allocation to qcow2
-Date: Sun, 27 Oct 2019 00:25:02 +0300
-Message-Id: <cover.1572125022.git.berto@igalia.com>
-X-Mailer: git-send-email 2.20.1
+Subject: [PULL 16/25] libqos: implement VIRTIO 1.0 FEATURES_OK step
+Message-ID: <20191026193824.11926-17-mst@redhat.com>
+References: <20191026193824.11926-1-mst@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x (no
- timestamps) [generic] [fuzzy]
-X-Received-From: 178.60.130.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20191026193824.11926-1-mst@redhat.com>
+X-Mailer: git-send-email 2.22.0.678.g13338e74b8
+X-Mutt-Fcc: =sent
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -68,135 +90,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Anton Nefedov <anton.nefedov@virtuozzo.com>,
- Alberto Garcia <berto@igalia.com>, qemu-block@nongnu.org,
- Max Reitz <mreitz@redhat.com>,
- Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- "Denis V . Lunev" <den@openvz.org>
+Cc: Laurent Vivier <lvivier@redhat.com>,
+ Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi,
+From: Stefan Hajnoczi <stefanha@redhat.com>
 
-here's the new version of the patches to add subcluster allocation
-support to qcow2.
+Device initialization has an extra step in VIRTIO 1.0.  The FEATURES_OK
+status bit is set to indicate that feature negotiation has completed.
+The driver then reads the status register again to check that the device
+agrees with the final features.
 
-Please refer to the cover letter of the first version for a full
-description of the patches:
+Implement this step as part of qvirtio_set_features() instead of
+introducing a separate function.  This way all existing code works
+without modifications.
 
-   https://lists.gnu.org/archive/html/qemu-block/2019-10/msg00983.html
+The check in qvirtio_set_driver_ok() needs to be updated because
+FEATURES_OK will be set for VIRTIO 1.0 devices.
 
-This version includes a few tests, but I'm planning to add more for
-the next revision.
+Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+Message-Id: <20191023100425.12168-9-stefanha@redhat.com>
+Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+Reviewed-by: Thomas Huth" <thuth@redhat.com>
+---
+ tests/libqos/virtio.c | 18 +++++++++++++++++-
+ 1 file changed, 17 insertions(+), 1 deletion(-)
 
-Berto
-
-v2:
-- Patch 12: Update after the changes in 88f468e546.
-- Patch 21 (new): Clear the L2 bitmap when allocating a compressed
-  cluster. Compressed clusters should have the bitmap all set to 0.
-- Patch 24: Document the new fields in the QAPI documentation [Eric].
-- Patch 25: Allow qcow2 preallocation with backing files.
-- Patch 26: Add some tests for qcow2 images with extended L2 entries.
-
-v1: https://lists.gnu.org/archive/html/qemu-block/2019-10/msg00983.html
-
-Output of git backport-diff against v1:
-
-Key:
-[----] : patches are identical
-[####] : number of functional differences between upstream/downstream patch
-[down] : patch is downstream-only
-The flags [FC] indicate (F)unctional and (C)ontextual differences, respectively
-
-001/26:[----] [-C] 'qcow2: Add calculate_l2_meta()'
-002/26:[----] [--] 'qcow2: Split cluster_needs_cow() out of count_cow_clusters()'
-003/26:[----] [--] 'qcow2: Process QCOW2_CLUSTER_ZERO_ALLOC clusters in handle_copied()'
-004/26:[----] [--] 'qcow2: Add get_l2_entry() and set_l2_entry()'
-005/26:[----] [--] 'qcow2: Document the Extended L2 Entries feature'
-006/26:[----] [--] 'qcow2: Add dummy has_subclusters() function'
-007/26:[----] [--] 'qcow2: Add subcluster-related fields to BDRVQcow2State'
-008/26:[----] [--] 'qcow2: Add offset_to_sc_index()'
-009/26:[----] [--] 'qcow2: Add l2_entry_size()'
-010/26:[----] [--] 'qcow2: Update get/set_l2_entry() and add get/set_l2_bitmap()'
-011/26:[----] [--] 'qcow2: Add qcow2_get_subcluster_type()'
-012/26:[0005] [FC] 'qcow2: Handle QCOW2_CLUSTER_UNALLOCATED_SUBCLUSTER'
-013/26:[----] [--] 'qcow2: Add subcluster support to calculate_l2_meta()'
-014/26:[----] [--] 'qcow2: Add subcluster support to qcow2_get_cluster_offset()'
-015/26:[----] [--] 'qcow2: Add subcluster support to zero_in_l2_slice()'
-016/26:[----] [--] 'qcow2: Add subcluster support to discard_in_l2_slice()'
-017/26:[----] [--] 'qcow2: Add subcluster support to check_refcounts_l2()'
-018/26:[----] [--] 'qcow2: Add subcluster support to expand_zero_clusters_in_l1()'
-019/26:[----] [--] 'qcow2: Fix offset calculation in handle_dependencies()'
-020/26:[----] [--] 'qcow2: Update L2 bitmap in qcow2_alloc_cluster_link_l2()'
-021/26:[down] 'qcow2: Clear the L2 bitmap when allocating a compressed cluster'
-022/26:[----] [--] 'qcow2: Add subcluster support to handle_alloc_space()'
-023/26:[----] [--] 'qcow2: Restrict qcow2_co_pwrite_zeroes() to full clusters only'
-024/26:[0007] [FC] 'qcow2: Add the 'extended_l2' option and the QCOW2_INCOMPAT_EXTL2 bit'
-025/26:[down] 'qcow2: Allow preallocation and backing files if extended_l2 is set'
-026/26:[down] 'iotests: Add tests for qcow2 images with extended L2 entries'
-
-Alberto Garcia (26):
-  qcow2: Add calculate_l2_meta()
-  qcow2: Split cluster_needs_cow() out of count_cow_clusters()
-  qcow2: Process QCOW2_CLUSTER_ZERO_ALLOC clusters in handle_copied()
-  qcow2: Add get_l2_entry() and set_l2_entry()
-  qcow2: Document the Extended L2 Entries feature
-  qcow2: Add dummy has_subclusters() function
-  qcow2: Add subcluster-related fields to BDRVQcow2State
-  qcow2: Add offset_to_sc_index()
-  qcow2: Add l2_entry_size()
-  qcow2: Update get/set_l2_entry() and add get/set_l2_bitmap()
-  qcow2: Add qcow2_get_subcluster_type()
-  qcow2: Handle QCOW2_CLUSTER_UNALLOCATED_SUBCLUSTER
-  qcow2: Add subcluster support to calculate_l2_meta()
-  qcow2: Add subcluster support to qcow2_get_cluster_offset()
-  qcow2: Add subcluster support to zero_in_l2_slice()
-  qcow2: Add subcluster support to discard_in_l2_slice()
-  qcow2: Add subcluster support to check_refcounts_l2()
-  qcow2: Add subcluster support to expand_zero_clusters_in_l1()
-  qcow2: Fix offset calculation in handle_dependencies()
-  qcow2: Update L2 bitmap in qcow2_alloc_cluster_link_l2()
-  qcow2: Clear the L2 bitmap when allocating a compressed cluster
-  qcow2: Add subcluster support to handle_alloc_space()
-  qcow2: Restrict qcow2_co_pwrite_zeroes() to full clusters only
-  qcow2: Add the 'extended_l2' option and the QCOW2_INCOMPAT_EXTL2 bit
-  qcow2: Allow preallocation and backing files if extended_l2 is set
-  iotests: Add tests for qcow2 images with extended L2 entries
-
- block/qcow2-cluster.c            | 548 ++++++++++++++++++++-----------
- block/qcow2-refcount.c           |  38 ++-
- block/qcow2.c                    |  92 +++++-
- block/qcow2.h                    | 121 ++++++-
- docs/interop/qcow2.txt           |  68 +++-
- docs/qcow2-cache.txt             |  19 +-
- include/block/block_int.h        |   1 +
- qapi/block-core.json             |   6 +
- tests/qemu-iotests/031.out       |   8 +-
- tests/qemu-iotests/036.out       |   4 +-
- tests/qemu-iotests/049.out       | 102 +++---
- tests/qemu-iotests/060.out       |   1 +
- tests/qemu-iotests/061.out       |  20 +-
- tests/qemu-iotests/065           |  18 +-
- tests/qemu-iotests/082.out       |  48 ++-
- tests/qemu-iotests/085.out       |  38 +--
- tests/qemu-iotests/144.out       |   4 +-
- tests/qemu-iotests/182.out       |   2 +-
- tests/qemu-iotests/185.out       |   8 +-
- tests/qemu-iotests/198.out       |   2 +
- tests/qemu-iotests/206.out       |   6 +-
- tests/qemu-iotests/242.out       |   5 +
- tests/qemu-iotests/255.out       |   8 +-
- tests/qemu-iotests/271           | 235 +++++++++++++
- tests/qemu-iotests/271.out       | 183 +++++++++++
- tests/qemu-iotests/common.filter |   1 +
- tests/qemu-iotests/group         |   1 +
- 27 files changed, 1247 insertions(+), 340 deletions(-)
- create mode 100755 tests/qemu-iotests/271
- create mode 100644 tests/qemu-iotests/271.out
-
+diff --git a/tests/libqos/virtio.c b/tests/libqos/virtio.c
+index 6049ff3b3e..fa597c2481 100644
+--- a/tests/libqos/virtio.c
++++ b/tests/libqos/virtio.c
+@@ -46,6 +46,20 @@ void qvirtio_set_features(QVirtioDevice *d, uint64_t features)
+ {
+     d->features = features;
+     d->bus->set_features(d, features);
++
++    /*
++     * This could be a separate function for drivers that want to access
++     * configuration space before setting FEATURES_OK, but no existing users
++     * need that and it's less code for callers if this is done implicitly.
++    */
++    if (features & (1ull << VIRTIO_F_VERSION_1)) {
++        uint8_t status = d->bus->get_status(d) |
++                         VIRTIO_CONFIG_S_FEATURES_OK;
++
++        d->bus->set_status(d, status);
++        g_assert_cmphex(d->bus->get_status(d), ==, status);
++    }
++
+     d->features_negotiated = true;
+ }
+ 
+@@ -86,7 +100,9 @@ void qvirtio_set_driver_ok(QVirtioDevice *d)
+ {
+     d->bus->set_status(d, d->bus->get_status(d) | VIRTIO_CONFIG_S_DRIVER_OK);
+     g_assert_cmphex(d->bus->get_status(d), ==, VIRTIO_CONFIG_S_DRIVER_OK |
+-                    VIRTIO_CONFIG_S_DRIVER | VIRTIO_CONFIG_S_ACKNOWLEDGE);
++                    VIRTIO_CONFIG_S_DRIVER | VIRTIO_CONFIG_S_ACKNOWLEDGE |
++                    (d->features & (1ull << VIRTIO_F_VERSION_1) ?
++                     VIRTIO_CONFIG_S_FEATURES_OK : 0));
+ }
+ 
+ void qvirtio_wait_queue_isr(QTestState *qts, QVirtioDevice *d,
 -- 
-2.20.1
+MST
 
 
