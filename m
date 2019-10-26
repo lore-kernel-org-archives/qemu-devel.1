@@ -7,74 +7,74 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BD134CA9EB9
-	for <qemu-devel@archiver.kernel.org>; Sat, 26 Oct 2019 18:08:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7FDB1CA9EB9
+	for <qemu-devel@archiver.kernel.org>; Sat, 26 Oct 2019 18:09:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8660420663
-	for <qemu-devel@archiver.kernel.org>; Sat, 26 Oct 2019 18:08:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4F0EB20663
+	for <qemu-devel@archiver.kernel.org>; Sat, 26 Oct 2019 18:09:50 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="H3TOwmWT"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8660420663
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AgiFhlGV"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4F0EB20663
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41280 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41288 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iOQUi-00018u-8f
-	for qemu-devel@archiver.kernel.org; Sat, 26 Oct 2019 14:08:56 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40851)
+	id 1iOQVY-00031C-UG
+	for qemu-devel@archiver.kernel.org; Sat, 26 Oct 2019 14:09:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40475)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1iOQQA-0001q8-HZ
- for qemu-devel@nongnu.org; Sat, 26 Oct 2019 14:04:16 -0400
+ (envelope-from <philmd@redhat.com>) id 1iOQOY-0008Fu-H3
+ for qemu-devel@nongnu.org; Sat, 26 Oct 2019 14:02:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1iOQQ8-0007sy-OC
- for qemu-devel@nongnu.org; Sat, 26 Oct 2019 14:04:14 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:51135
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <philmd@redhat.com>) id 1iOQOX-00075G-1l
+ for qemu-devel@nongnu.org; Sat, 26 Oct 2019 14:02:34 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:60196
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iOQQ8-0007sj-Jm
- for qemu-devel@nongnu.org; Sat, 26 Oct 2019 14:04:12 -0400
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iOQOW-000755-Ty
+ for qemu-devel@nongnu.org; Sat, 26 Oct 2019 14:02:33 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1572113052;
+ s=mimecast20190719; t=1572112952;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=P72P8oJYt+/4WQxh4nVCZd3h2uPcYKTRBPpr6Adz7C0=;
- b=H3TOwmWTt9DARwqbIxJnQFvPBTJViPqa5yFNsV13MSAa4iwk5Zy0zyxZ1qQsSYHPQCo3g6
- kcTUi3ydvJ/pOdnDUNV7V8LNFMPlp1kh18Wm3E4kQ82x1oODaMuxqU7z3HYBxugEEscAzG
- 1M1pF/Bys6UZeMyoG7eSdJMSRCgeRLw=
+ bh=8AOYE7awEwZTX0lZgYcTLInVQ7ppSa/7YXxRI1LZ9DI=;
+ b=AgiFhlGVjmuoiC4FklSCgLcSMQFZuWF8uEy/sPtqRiFp79IGQKM98CGl/iTlGOGQuq8BGL
+ htxD70EVP6GCf8cR0VN9I2ZBBeIfldfutNbvc2ZlULodjNbDQiLTYh9ByIxdUXftSpEM+2
+ 4B9D+eahTQTSEMOwYInr1/yW+F3AQG4=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-322-Wf1yjgEwPvmw7DXlBTwPrA-1; Sat, 26 Oct 2019 14:04:07 -0400
+ us-mta-181-FC2QpnJsMm-UVD5zSnaVRQ-1; Sat, 26 Oct 2019 14:02:30 -0400
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
  [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 89BD3801E6F;
- Sat, 26 Oct 2019 18:04:05 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A8B75107AD25;
+ Sat, 26 Oct 2019 18:02:28 +0000 (UTC)
 Received: from x1w.redhat.com (ovpn-204-39.brq.redhat.com [10.40.204.39])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id A158C60F82;
- Sat, 26 Oct 2019 18:03:58 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 82BAD60F82;
+ Sat, 26 Oct 2019 18:02:20 +0000 (UTC)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v3 12/20] hw/i386: Remove obsolete
- LoadStateHandler::load_state_old handlers
-Date: Sat, 26 Oct 2019 20:01:35 +0200
-Message-Id: <20191026180143.7369-13-philmd@redhat.com>
+Subject: [PATCH v3 03/20] piix4: Add an i8259 Interrupt Controller as
+ specified in datasheet
+Date: Sat, 26 Oct 2019 20:01:26 +0200
+Message-Id: <20191026180143.7369-4-philmd@redhat.com>
 In-Reply-To: <20191026180143.7369-1-philmd@redhat.com>
 References: <20191026180143.7369-1-philmd@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-MC-Unique: Wf1yjgEwPvmw7DXlBTwPrA-1
+X-MC-Unique: FC2QpnJsMm-UVD5zSnaVRQ-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.61
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,8 +86,7 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Stefano Stabellini <sstabellini@kernel.org>,
+Cc: Stefano Stabellini <sstabellini@kernel.org>,
  Eduardo Habkost <ehabkost@redhat.com>, Paul Durrant <paul@xen.org>,
  Aleksandar Markovic <amarkovic@wavecomp.com>,
  "Michael S. Tsirkin" <mst@redhat.com>, xen-devel@lists.xenproject.org,
@@ -102,285 +101,196 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-These devices implemented their load_state_old() handler 10 years
-ago, previous to QEMU v0.12.
-Since commit cc425b5ddf removed the pc-0.10 and pc-0.11 machines,
-we can drop this code.
+From: Herv=C3=A9 Poussineau <hpoussin@reactos.org>
 
-Note: the mips_r4k machine started to use the i8254 device just
-after QEMU v0.5.0, but the MIPS machine types are not versioned,
-so there is no migration compatibility issue removing this handler.
+Add ISA irqs as piix4 gpio in, and CPU interrupt request as piix4 gpio out.
+Remove i8259 instanciated in malta board, to not have it twice.
 
-Suggested-by: Peter Maydell <peter.maydell@linaro.org>
+We can also remove the now unused piix4_init() function.
+
+Acked-by: Michael S. Tsirkin <mst@redhat.com>
+Acked-by: Paolo Bonzini <pbonzini@redhat.com>
+Signed-off-by: Herv=C3=A9 Poussineau <hpoussin@reactos.org>
+Message-Id: <20171216090228.28505-8-hpoussin@reactos.org>
 Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+[PMD: rebased, updated includes, use ISA_NUM_IRQS in for loop]
 Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 ---
- hw/acpi/piix4.c         | 40 ---------------------------------
- hw/intc/apic_common.c   | 49 -----------------------------------------
- hw/pci-host/piix.c      | 25 ---------------------
- hw/timer/i8254_common.c | 40 ---------------------------------
- 4 files changed, 154 deletions(-)
+v3:
+- "Add a i8259 -> Add an i8259" in title (Aleksandar)
+- Changed 16 -> ISA_NUM_IRQS
+---
+ hw/isa/piix4.c       | 43 ++++++++++++++++++++++++++++++++-----------
+ hw/mips/mips_malta.c | 32 +++++++++++++-------------------
+ include/hw/i386/pc.h |  1 -
+ 3 files changed, 45 insertions(+), 31 deletions(-)
 
-diff --git a/hw/acpi/piix4.c b/hw/acpi/piix4.c
-index 2efd1605b8..93aec2dd2c 100644
---- a/hw/acpi/piix4.c
-+++ b/hw/acpi/piix4.c
-@@ -41,7 +41,6 @@
- #include "hw/acpi/memory_hotplug.h"
- #include "hw/acpi/acpi_dev_interface.h"
- #include "hw/xen/xen.h"
--#include "migration/qemu-file-types.h"
- #include "migration/vmstate.h"
- #include "hw/core/cpu.h"
- #include "trace.h"
-@@ -204,43 +203,6 @@ static const VMStateDescription vmstate_pci_status =3D=
- {
+diff --git a/hw/isa/piix4.c b/hw/isa/piix4.c
+index 7a1361a9dd..7cf72e3118 100644
+--- a/hw/isa/piix4.c
++++ b/hw/isa/piix4.c
+@@ -24,6 +24,7 @@
+  */
+=20
+ #include "qemu/osdep.h"
++#include "hw/irq.h"
+ #include "hw/i386/pc.h"
+ #include "hw/pci/pci.h"
+ #include "hw/isa/isa.h"
+@@ -36,6 +37,8 @@ PCIDevice *piix4_dev;
+=20
+ typedef struct PIIX4State {
+     PCIDevice dev;
++    qemu_irq cpu_intr;
++    qemu_irq *isa;
+=20
+     /* Reset Control Register */
+     MemoryRegion rcr_mem;
+@@ -94,6 +97,18 @@ static const VMStateDescription vmstate_piix4 =3D {
      }
  };
 =20
--static int acpi_load_old(QEMUFile *f, void *opaque, int version_id)
--{
--    PIIX4PMState *s =3D opaque;
--    int ret, i;
--    uint16_t temp;
--
--    ret =3D pci_device_load(PCI_DEVICE(s), f);
--    if (ret < 0) {
--        return ret;
--    }
--    qemu_get_be16s(f, &s->ar.pm1.evt.sts);
--    qemu_get_be16s(f, &s->ar.pm1.evt.en);
--    qemu_get_be16s(f, &s->ar.pm1.cnt.cnt);
--
--    ret =3D vmstate_load_state(f, &vmstate_apm, &s->apm, 1);
--    if (ret) {
--        return ret;
--    }
--
--    timer_get(f, s->ar.tmr.timer);
--    qemu_get_sbe64s(f, &s->ar.tmr.overflow_time);
--
--    qemu_get_be16s(f, (uint16_t *)s->ar.gpe.sts);
--    for (i =3D 0; i < 3; i++) {
--        qemu_get_be16s(f, &temp);
--    }
--
--    qemu_get_be16s(f, (uint16_t *)s->ar.gpe.en);
--    for (i =3D 0; i < 3; i++) {
--        qemu_get_be16s(f, &temp);
--    }
--
--    ret =3D vmstate_load_state(f, &vmstate_pci_status,
--        &s->acpi_pci_hotplug.acpi_pcihp_pci_status[ACPI_PCIHP_BSEL_DEFAULT=
-], 1);
--    return ret;
--}
--
- static bool vmstate_test_use_acpi_pci_hotplug(void *opaque, int version_id=
-)
++static void piix4_request_i8259_irq(void *opaque, int irq, int level)
++{
++    PIIX4State *s =3D opaque;
++    qemu_set_irq(s->cpu_intr, level);
++}
++
++static void piix4_set_i8259_irq(void *opaque, int irq, int level)
++{
++    PIIX4State *s =3D opaque;
++    qemu_set_irq(s->isa[irq], level);
++}
++
+ static void piix4_rcr_write(void *opaque, hwaddr addr, uint64_t val,
+                             unsigned int len)
  {
-     PIIX4PMState *s =3D opaque;
-@@ -312,8 +274,6 @@ static const VMStateDescription vmstate_acpi =3D {
-     .name =3D "piix4_pm",
-     .version_id =3D 3,
-     .minimum_version_id =3D 3,
--    .minimum_version_id_old =3D 1,
--    .load_state_old =3D acpi_load_old,
-     .post_load =3D vmstate_acpi_post_load,
-     .fields =3D (VMStateField[]) {
-         VMSTATE_PCI_DEVICE(parent_obj, PIIX4PMState),
-diff --git a/hw/intc/apic_common.c b/hw/intc/apic_common.c
-index aafd8e0e33..375cb6abe9 100644
---- a/hw/intc/apic_common.c
-+++ b/hw/intc/apic_common.c
-@@ -31,7 +31,6 @@
- #include "sysemu/kvm.h"
- #include "hw/qdev-properties.h"
- #include "hw/sysbus.h"
--#include "migration/qemu-file-types.h"
- #include "migration/vmstate.h"
+@@ -127,29 +142,35 @@ static const MemoryRegionOps piix4_rcr_ops =3D {
+ static void piix4_realize(PCIDevice *dev, Error **errp)
+ {
+     PIIX4State *s =3D PIIX4_PCI_DEVICE(dev);
++    ISABus *isa_bus;
++    qemu_irq *i8259_out_irq;
 =20
- static int apic_irq_delivered;
-@@ -262,52 +261,6 @@ static void apic_reset_common(DeviceState *dev)
-     apic_init_reset(dev);
+-    if (!isa_bus_new(DEVICE(dev), pci_address_space(dev),
+-                     pci_address_space_io(dev), errp)) {
++    isa_bus =3D isa_bus_new(DEVICE(dev), pci_address_space(dev),
++                          pci_address_space_io(dev), errp);
++    if (!isa_bus) {
+         return;
+     }
+=20
++    qdev_init_gpio_in_named(DEVICE(dev), piix4_set_i8259_irq,
++                            "isa", ISA_NUM_IRQS);
++    qdev_init_gpio_out_named(DEVICE(dev), &s->cpu_intr,
++                             "intr", 1);
++
+     memory_region_init_io(&s->rcr_mem, OBJECT(dev), &piix4_rcr_ops, s,
+                           "reset-control", 1);
+     memory_region_add_subregion_overlap(pci_address_space_io(dev),
+                                         RCR_IOPORT, &s->rcr_mem, 1);
+=20
++    /* initialize i8259 pic */
++    i8259_out_irq =3D qemu_allocate_irqs(piix4_request_i8259_irq, s, 1);
++    s->isa =3D i8259_init(isa_bus, *i8259_out_irq);
++
++    /* initialize ISA irqs */
++    isa_bus_irqs(isa_bus, s->isa);
++
+     piix4_dev =3D dev;
  }
 =20
--/* This function is only used for old state version 1 and 2 */
--static int apic_load_old(QEMUFile *f, void *opaque, int version_id)
+-int piix4_init(PCIBus *bus, ISABus **isa_bus, int devfn)
 -{
--    APICCommonState *s =3D opaque;
--    APICCommonClass *info =3D APIC_COMMON_GET_CLASS(s);
--    int i;
+-    PCIDevice *d;
 -
--    if (version_id > 2) {
--        return -EINVAL;
--    }
--
--    /* XXX: what if the base changes? (registered memory regions) */
--    qemu_get_be32s(f, &s->apicbase);
--    qemu_get_8s(f, &s->id);
--    qemu_get_8s(f, &s->arb_id);
--    qemu_get_8s(f, &s->tpr);
--    qemu_get_be32s(f, &s->spurious_vec);
--    qemu_get_8s(f, &s->log_dest);
--    qemu_get_8s(f, &s->dest_mode);
--    for (i =3D 0; i < 8; i++) {
--        qemu_get_be32s(f, &s->isr[i]);
--        qemu_get_be32s(f, &s->tmr[i]);
--        qemu_get_be32s(f, &s->irr[i]);
--    }
--    for (i =3D 0; i < APIC_LVT_NB; i++) {
--        qemu_get_be32s(f, &s->lvt[i]);
--    }
--    qemu_get_be32s(f, &s->esr);
--    qemu_get_be32s(f, &s->icr[0]);
--    qemu_get_be32s(f, &s->icr[1]);
--    qemu_get_be32s(f, &s->divide_conf);
--    s->count_shift =3D qemu_get_be32(f);
--    qemu_get_be32s(f, &s->initial_count);
--    s->initial_count_load_time =3D qemu_get_be64(f);
--    s->next_time =3D qemu_get_be64(f);
--
--    if (version_id >=3D 2) {
--        s->timer_expiry =3D qemu_get_be64(f);
--    }
--
--    if (info->post_load) {
--        info->post_load(s);
--    }
--    return 0;
+-    d =3D pci_create_simple_multifunction(bus, devfn, true, "PIIX4");
+-    *isa_bus =3D ISA_BUS(qdev_get_child_bus(DEVICE(d), "isa.0"));
+-    return d->devfn;
 -}
 -
- static const VMStateDescription vmstate_apic_common;
-=20
- static void apic_common_realize(DeviceState *dev, Error **errp)
-@@ -408,8 +361,6 @@ static const VMStateDescription vmstate_apic_common =3D=
+ static void piix4_class_init(ObjectClass *klass, void *data)
  {
-     .name =3D "apic",
-     .version_id =3D 3,
-     .minimum_version_id =3D 3,
--    .minimum_version_id_old =3D 1,
--    .load_state_old =3D apic_load_old,
-     .pre_load =3D apic_pre_load,
-     .pre_save =3D apic_dispatch_pre_save,
-     .post_load =3D apic_dispatch_post_load,
-diff --git a/hw/pci-host/piix.c b/hw/pci-host/piix.c
-index 135c645535..2f4cbcbfe9 100644
---- a/hw/pci-host/piix.c
-+++ b/hw/pci-host/piix.c
-@@ -33,7 +33,6 @@
- #include "qapi/error.h"
- #include "qemu/range.h"
- #include "hw/xen/xen.h"
--#include "migration/qemu-file-types.h"
- #include "migration/vmstate.h"
- #include "hw/pci-host/pam.h"
- #include "sysemu/reset.h"
-@@ -174,28 +173,6 @@ static void i440fx_write_config(PCIDevice *dev,
-     }
- }
+     DeviceClass *dc =3D DEVICE_CLASS(klass);
+diff --git a/hw/mips/mips_malta.c b/hw/mips/mips_malta.c
+index c1c8810e71..6d9b230322 100644
+--- a/hw/mips/mips_malta.c
++++ b/hw/mips/mips_malta.c
+@@ -97,7 +97,7 @@ typedef struct {
+     SysBusDevice parent_obj;
 =20
--static int i440fx_load_old(QEMUFile* f, void *opaque, int version_id)
--{
--    PCII440FXState *d =3D opaque;
--    PCIDevice *pd =3D PCI_DEVICE(d);
--    int ret, i;
--    uint8_t smm_enabled;
--
--    ret =3D pci_device_load(pd, f);
--    if (ret < 0)
--        return ret;
--    i440fx_update_memory_mappings(d);
--    qemu_get_8s(f, &smm_enabled);
--
--    if (version_id =3D=3D 2) {
--        for (i =3D 0; i < PIIX_NUM_PIRQS; i++) {
--            qemu_get_be32(f); /* dummy load for compatibility */
--        }
--    }
--
--    return 0;
--}
--
- static int i440fx_post_load(void *opaque, int version_id)
- {
-     PCII440FXState *d =3D opaque;
-@@ -208,8 +185,6 @@ static const VMStateDescription vmstate_i440fx =3D {
-     .name =3D "I440FX",
-     .version_id =3D 3,
-     .minimum_version_id =3D 3,
--    .minimum_version_id_old =3D 1,
--    .load_state_old =3D i440fx_load_old,
-     .post_load =3D i440fx_post_load,
-     .fields =3D (VMStateField[]) {
-         VMSTATE_PCI_DEVICE(parent_obj, PCII440FXState),
-diff --git a/hw/timer/i8254_common.c b/hw/timer/i8254_common.c
-index 57bf10cc94..050875b497 100644
---- a/hw/timer/i8254_common.c
-+++ b/hw/timer/i8254_common.c
-@@ -29,7 +29,6 @@
- #include "qemu/timer.h"
- #include "hw/timer/i8254.h"
- #include "hw/timer/i8254_internal.h"
--#include "migration/qemu-file-types.h"
- #include "migration/vmstate.h"
+     MIPSCPSState cps;
+-    qemu_irq *i8259;
++    qemu_irq i8259[ISA_NUM_IRQS];
+ } MaltaState;
 =20
- /* val must be 0 or 1 */
-@@ -202,43 +201,6 @@ static const VMStateDescription vmstate_pit_channel =
-=3D {
-     }
- };
+ static ISADevice *pit;
+@@ -1235,8 +1235,8 @@ void mips_malta_init(MachineState *machine)
+     int64_t kernel_entry, bootloader_run_addr;
+     PCIBus *pci_bus;
+     ISABus *isa_bus;
+-    qemu_irq *isa_irq;
+     qemu_irq cbus_irq, i8259_irq;
++    PCIDevice *pci;
+     int piix4_devfn;
+     I2CBus *smbus;
+     DriveInfo *dinfo;
+@@ -1407,30 +1407,24 @@ void mips_malta_init(MachineState *machine)
+     /* Board ID =3D 0x420 (Malta Board with CoreLV) */
+     stl_p(memory_region_get_ram_ptr(bios_copy) + 0x10, 0x00000420);
 =20
--static int pit_load_old(QEMUFile *f, void *opaque, int version_id)
--{
--    PITCommonState *pit =3D opaque;
--    PITCommonClass *c =3D PIT_COMMON_GET_CLASS(pit);
--    PITChannelState *s;
--    int i;
+-    /*
+-     * We have a circular dependency problem: pci_bus depends on isa_irq,
+-     * isa_irq is provided by i8259, i8259 depends on ISA, ISA depends
+-     * on piix4, and piix4 depends on pci_bus.  To stop the cycle we have
+-     * qemu_irq_proxy() adds an extra bit of indirection, allowing us
+-     * to resolve the isa_irq -> i8259 dependency after i8259 is initializ=
+ed.
+-     */
+-    isa_irq =3D qemu_irq_proxy(&s->i8259, 16);
 -
--    if (version_id !=3D 1) {
--        return -EINVAL;
--    }
--
--    for (i =3D 0; i < 3; i++) {
--        s =3D &pit->channels[i];
--        s->count =3D qemu_get_be32(f);
--        qemu_get_be16s(f, &s->latched_count);
--        qemu_get_8s(f, &s->count_latched);
--        qemu_get_8s(f, &s->status_latched);
--        qemu_get_8s(f, &s->status);
--        qemu_get_8s(f, &s->read_state);
--        qemu_get_8s(f, &s->write_state);
--        qemu_get_8s(f, &s->write_latch);
--        qemu_get_8s(f, &s->rw_mode);
--        qemu_get_8s(f, &s->mode);
--        qemu_get_8s(f, &s->bcd);
--        qemu_get_8s(f, &s->gate);
--        s->count_load_time =3D qemu_get_be64(f);
--        s->irq_disabled =3D 0;
--        if (i =3D=3D 0) {
--            s->next_transition_time =3D qemu_get_be64(f);
--        }
--    }
--    if (c->post_load) {
--        c->post_load(pit);
--    }
--    return 0;
--}
--
- static int pit_dispatch_pre_save(void *opaque)
- {
-     PITCommonState *s =3D opaque;
-@@ -266,8 +228,6 @@ static const VMStateDescription vmstate_pit_common =3D =
-{
-     .name =3D "i8254",
-     .version_id =3D 3,
-     .minimum_version_id =3D 2,
--    .minimum_version_id_old =3D 1,
--    .load_state_old =3D pit_load_old,
-     .pre_save =3D pit_dispatch_pre_save,
-     .post_load =3D pit_dispatch_post_load,
-     .fields =3D (VMStateField[]) {
+     /* Northbridge */
+-    pci_bus =3D gt64120_register(isa_irq);
++    pci_bus =3D gt64120_register(s->i8259);
+=20
+     /* Southbridge */
+     ide_drive_get(hd, ARRAY_SIZE(hd));
+=20
+-    piix4_devfn =3D piix4_init(pci_bus, &isa_bus, 80);
++    pci =3D pci_create_simple_multifunction(pci_bus, PCI_DEVFN(10, 0),
++                                          true, "PIIX4");
++    dev =3D DEVICE(pci);
++    isa_bus =3D ISA_BUS(qdev_get_child_bus(dev, "isa.0"));
++    piix4_devfn =3D pci->devfn;
+=20
+-    /*
+-     * Interrupt controller
+-     * The 8259 is attached to the MIPS CPU INT0 pin, ie interrupt 2
+-     */
+-    s->i8259 =3D i8259_init(isa_bus, i8259_irq);
++    /* Interrupt controller */
++    qdev_connect_gpio_out_named(dev, "intr", 0, i8259_irq);
++    for (int i =3D 0; i < ISA_NUM_IRQS; i++) {
++        s->i8259[i] =3D qdev_get_gpio_in_named(dev, "isa", i);
++    }
+=20
+-    isa_bus_irqs(isa_bus, s->i8259);
+     pci_piix4_ide_init(pci_bus, hd, piix4_devfn + 1);
+     pci_create_simple(pci_bus, piix4_devfn + 2, "piix4-usb-uhci");
+     smbus =3D piix4_pm_init(pci_bus, piix4_devfn + 3, 0x1100,
+diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
+index f040a72095..f553b29652 100644
+--- a/include/hw/i386/pc.h
++++ b/include/hw/i386/pc.h
+@@ -266,7 +266,6 @@ PCIBus *i440fx_init(const char *host_type, const char *=
+pci_type,
+ PCIBus *find_i440fx(void);
+ /* piix4.c */
+ extern PCIDevice *piix4_dev;
+-int piix4_init(PCIBus *bus, ISABus **isa_bus, int devfn);
+=20
+ /* pc_sysfw.c */
+ void pc_system_flash_create(PCMachineState *pcms);
 --=20
 2.21.0
 
