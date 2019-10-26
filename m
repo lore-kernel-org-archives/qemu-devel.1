@@ -7,52 +7,52 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CE430CA9EB9
-	for <qemu-devel@archiver.kernel.org>; Sat, 26 Oct 2019 21:37:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8905CCA9EB9
+	for <qemu-devel@archiver.kernel.org>; Sat, 26 Oct 2019 21:40:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 53E6020863
-	for <qemu-devel@archiver.kernel.org>; Sat, 26 Oct 2019 21:37:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4A60020863
+	for <qemu-devel@archiver.kernel.org>; Sat, 26 Oct 2019 21:40:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b="b4zoCeGq"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 53E6020863
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b="r8ldV3R9"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4A60020863
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=igalia.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42564 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42602 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iOTkm-00006S-EJ
-	for qemu-devel@archiver.kernel.org; Sat, 26 Oct 2019 17:37:44 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60312)
+	id 1iOTnp-0005cK-0J
+	for qemu-devel@archiver.kernel.org; Sat, 26 Oct 2019 17:40:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60302)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <berto@igalia.com>) id 1iOTZw-0000Xf-R4
- for qemu-devel@nongnu.org; Sat, 26 Oct 2019 17:26:33 -0400
+ (envelope-from <berto@igalia.com>) id 1iOTZw-0000XQ-Su
+ for qemu-devel@nongnu.org; Sat, 26 Oct 2019 17:26:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <berto@igalia.com>) id 1iOTZv-0005RG-EX
+ (envelope-from <berto@igalia.com>) id 1iOTZv-0005RB-ET
  for qemu-devel@nongnu.org; Sat, 26 Oct 2019 17:26:32 -0400
-Received: from fanzine.igalia.com ([178.60.130.6]:42493)
+Received: from fanzine.igalia.com ([178.60.130.6]:42492)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <berto@igalia.com>)
- id 1iOTZu-0005F1-VI; Sat, 26 Oct 2019 17:26:31 -0400
+ id 1iOTZu-0005Ey-V6; Sat, 26 Oct 2019 17:26:31 -0400
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=igalia.com;
  s=20170329; 
  h=Content-Transfer-Encoding:MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From;
- bh=KNvEic0lP8ruWMnEMEuIGNQ67obFk+Zkwqmzfxp6gz8=; 
- b=b4zoCeGqb9EGw75E5VGfQDTyEJxPhcPYKhrJZMh6Pz8NgnDLfETIa8sAiPmGordt3zcR4mSKsntFlqitpDxllIMrysn1g0UZCVrT/L87feBRMg71Audk+DslWe3JZtYPinOSoEr3LpWoB2UrCbZbBFshYFngpZCsZmgtbD8rUvAfpzkjOeLs00hJjbvmOKD2PmHGTFMGkVEGvPpdMxRf2fgAbmzrISQPDcvDOM2IZbBGlwiY9jFioy06Qm7+aVxFKfOWohnpx0eeYeAKAJ2EPANtVLTIU1npC+zEOUhahZiPKR+j4zjizvN8Jq7wEAiFzYEk2klE2mWgz6oL7GvB5Q==;
+ bh=BvyMuOuieE1su4Zkm7aBIoGAexAAhcDUlQ/YuuwXAHc=; 
+ b=r8ldV3R901F8oaPjneVfFMrNufN3jDghwDOdWsNGSpqOssoPo1nOuU78Dq7QV7G/Aq9Rw7e+RZA8fMDqYwCDGQDArIzcCnXJWZfKryP5hNJA7O1uXTg2Ic2zaJS9TtQ2Soa038zcv+hO6A2vTq5TMLg3U6n1lxbVYb4MVk8lk7BUFmuhafalQj69tdOarf/M9IAOybBUXaCcahxPtUOwPA28Pcb+JCLzuzCx1RxP5hw5PtWjmJmPUDnjm63a4hwDULDPPr6uJvWoL8Nt9fv9gfAYEa6aWTxvpq51H7ODeMuLFqt6P1o9ve3OoK1L6GMesaRgiTJTUma10pwP1PzuPg==;
 Received: from 87-100-137-117.bb.dnainternet.fi ([87.100.137.117]
  helo=perseus.local) by fanzine.igalia.com with esmtpsa 
  (Cipher TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim)
- id 1iOTZJ-000469-7G; Sat, 26 Oct 2019 23:25:53 +0200
+ id 1iOTZI-000462-T0; Sat, 26 Oct 2019 23:25:53 +0200
 Received: from berto by perseus.local with local (Exim 4.92)
  (envelope-from <berto@igalia.com>)
- id 1iOTZ0-0001Pf-Ui; Sun, 27 Oct 2019 00:25:34 +0300
+ id 1iOTZ0-0001PV-Mo; Sun, 27 Oct 2019 00:25:34 +0300
 From: Alberto Garcia <berto@igalia.com>
 To: qemu-devel@nongnu.org
-Subject: [RFC PATCH v2 20/26] qcow2: Update L2 bitmap in
- qcow2_alloc_cluster_link_l2()
-Date: Sun, 27 Oct 2019 00:25:22 +0300
-Message-Id: <289ea5edc3f1530787c8fe905b1a524cc48945a9.1572125022.git.berto@igalia.com>
+Subject: [RFC PATCH v2 15/26] qcow2: Add subcluster support to
+ zero_in_l2_slice()
+Date: Sun, 27 Oct 2019 00:25:17 +0300
+Message-Id: <8f366482d2b273c26ff67cba1de898289f613fc7.1572125022.git.berto@igalia.com>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <cover.1572125022.git.berto@igalia.com>
 References: <cover.1572125022.git.berto@igalia.com>
@@ -81,44 +81,50 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The L2 bitmap needs to be updated after each write to indicate what
-new subclusters are now allocated.
-
-This needs to happen even if the cluster was already allocated and the
-L2 entry was otherwise valid.
+Setting the QCOW_OFLAG_ZERO bit of the L2 entry is forbidden if an
+image has subclusters. Instead, the individual 'all zeroes' bits must
+be used.
 
 Signed-off-by: Alberto Garcia <berto@igalia.com>
 ---
- block/qcow2-cluster.c | 16 ++++++++++++++++
- 1 file changed, 16 insertions(+)
+ block/qcow2-cluster.c | 14 ++++++++++----
+ 1 file changed, 10 insertions(+), 4 deletions(-)
 
 diff --git a/block/qcow2-cluster.c b/block/qcow2-cluster.c
-index fb6cf8df17..acb7226e03 100644
+index e67559152f..3e4ba8d448 100644
 --- a/block/qcow2-cluster.c
 +++ b/block/qcow2-cluster.c
-@@ -980,6 +980,22 @@ int qcow2_alloc_cluster_link_l2(BlockDriverState *bs, QCowL2Meta *m)
+@@ -1852,7 +1852,7 @@ static int zero_in_l2_slice(BlockDriverState *bs, uint64_t offset,
+     assert(nb_clusters <= INT_MAX);
  
-         set_l2_entry(s, l2_slice, l2_index + i, QCOW_OFLAG_COPIED |
-                      (cluster_offset + (i << s->cluster_bits)));
+     for (i = 0; i < nb_clusters; i++) {
+-        uint64_t old_offset;
++        uint64_t old_offset, l2_entry = 0;
+         QCow2ClusterType cluster_type;
+ 
+         old_offset = get_l2_entry(s, l2_slice, l2_index + i);
+@@ -1869,12 +1869,18 @@ static int zero_in_l2_slice(BlockDriverState *bs, uint64_t offset,
+ 
+         qcow2_cache_entry_mark_dirty(s->l2_table_cache, l2_slice);
+         if (cluster_type == QCOW2_CLUSTER_COMPRESSED || unmap) {
+-            set_l2_entry(s, l2_slice, l2_index + i, QCOW_OFLAG_ZERO);
+             qcow2_free_any_clusters(bs, old_offset, 1, QCOW2_DISCARD_REQUEST);
+         } else {
+-            uint64_t entry = get_l2_entry(s, l2_slice, l2_index + i);
+-            set_l2_entry(s, l2_slice, l2_index + i, entry | QCOW_OFLAG_ZERO);
++            l2_entry = get_l2_entry(s, l2_slice, l2_index + i);
+         }
 +
-+        /* Update bitmap with the subclusters that were just written */
 +        if (has_subclusters(s)) {
-+            uint64_t written_from = m->cow_start.offset;
-+            uint64_t written_to = m->cow_end.offset + m->cow_end.nb_bytes;
-+            uint64_t l2_bitmap = get_l2_bitmap(s, l2_slice, l2_index + i);
-+            int sc;
-+            for (sc = 0; sc < s->subclusters_per_cluster; sc++) {
-+                uint64_t sc_off = i * s->cluster_size + sc * s->subcluster_size;
-+                if (sc_off >= written_from && sc_off < written_to) {
-+                    l2_bitmap |= QCOW_OFLAG_SUB_ALLOC(sc);
-+                    l2_bitmap &= ~QCOW_OFLAG_SUB_ZERO(sc);
-+                }
-+            }
-+            set_l2_bitmap(s, l2_slice, l2_index + i, l2_bitmap);
++            set_l2_bitmap(s, l2_slice, l2_index + i, QCOW_L2_BITMAP_ALL_ZEROES);
++        } else {
++            l2_entry |= QCOW_OFLAG_ZERO;
 +        }
-      }
++
++        set_l2_entry(s, l2_slice, l2_index + i, l2_entry);
+     }
  
- 
+     qcow2_cache_put(s->l2_table_cache, (void **) &l2_slice);
 -- 
 2.20.1
 
