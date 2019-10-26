@@ -2,86 +2,90 @@ Return-Path: <SRS0=l02z=YT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ABAD1CA9EB9
-	for <qemu-devel@archiver.kernel.org>; Sat, 26 Oct 2019 13:48:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BC434CA9EB9
+	for <qemu-devel@archiver.kernel.org>; Sat, 26 Oct 2019 14:31:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7937B2084C
-	for <qemu-devel@archiver.kernel.org>; Sat, 26 Oct 2019 13:48:17 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RtpCZKcL"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7937B2084C
+	by mail.kernel.org (Postfix) with ESMTPS id 7F93C20659
+	for <qemu-devel@archiver.kernel.org>; Sat, 26 Oct 2019 14:31:06 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7F93C20659
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40218 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40322 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iOMQS-0006tV-Gv
-	for qemu-devel@archiver.kernel.org; Sat, 26 Oct 2019 09:48:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45194)
+	id 1iON5t-0005NJ-IT
+	for qemu-devel@archiver.kernel.org; Sat, 26 Oct 2019 10:31:05 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49445)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <paolo.bonzini@gmail.com>) id 1iOMO0-0003M8-K1
- for qemu-devel@nongnu.org; Sat, 26 Oct 2019 09:45:46 -0400
+ (envelope-from <philmd@redhat.com>) id 1iON4S-0003to-1c
+ for qemu-devel@nongnu.org; Sat, 26 Oct 2019 10:29:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <paolo.bonzini@gmail.com>) id 1iOMNz-0001aC-7s
- for qemu-devel@nongnu.org; Sat, 26 Oct 2019 09:45:44 -0400
-Received: from mail-wr1-x432.google.com ([2a00:1450:4864:20::432]:38335)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
- id 1iOMNy-0001Zf-VS
- for qemu-devel@nongnu.org; Sat, 26 Oct 2019 09:45:43 -0400
-Received: by mail-wr1-x432.google.com with SMTP id v9so5327571wrq.5
- for <qemu-devel@nongnu.org>; Sat, 26 Oct 2019 06:45:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=E3AmUoGLdZbeu4irARae7Eia10igY2X5S0XEONkmQ4o=;
- b=RtpCZKcL6FFhtjGs6VCd0JXrl+us2dilKz0UuQsNnKooFQKd0cEGNKtmtSIzFMyY+3
- GmRhM+WQzq/Cp7MGBWLOaCIm0UkQd09TMM+BQYxHvDgoUBXl1Bw2H5bIxQ/wqSCvO3iv
- NQSDP3Yd1+sQxa3f7kGk8IGaG7tt8bh3cy5dCU2ftDUsD1eaisoIGQHcr9B/R90rNPHN
- XlN7Eehe/2J3SP3dDMEfsCNehLbC/JMbdyXrgOqNpJpLXDGmuAL7F6k3BdrpMwjh4fSB
- PmDJqRJVRxTIUVjcmWsLuw1FCObJiHoRm4NUpIeULxKKIbr/pmEn8gcaRPX9ghjyBie9
- GKrQ==
+ (envelope-from <philmd@redhat.com>) id 1iON4O-0006Ir-1s
+ for qemu-devel@nongnu.org; Sat, 26 Oct 2019 10:29:34 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53618)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iON4N-0006IH-PP
+ for qemu-devel@nongnu.org; Sat, 26 Oct 2019 10:29:32 -0400
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id CC9734E938
+ for <qemu-devel@nongnu.org>; Sat, 26 Oct 2019 14:29:29 +0000 (UTC)
+Received: by mail-wr1-f69.google.com with SMTP id 4so3031482wrf.19
+ for <qemu-devel@nongnu.org>; Sat, 26 Oct 2019 07:29:29 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:from:to:subject:date:message-id
- :mime-version:content-transfer-encoding;
- bh=E3AmUoGLdZbeu4irARae7Eia10igY2X5S0XEONkmQ4o=;
- b=P+8z0EfnOSgCnmMrSf1Sw9ZEuD2xKF9adnhbdoQQ89xMFtSYH5N+UPoG3Oe2WkQ1Bn
- ekKwwMJiYoAkDrHhV375hRk/wZCteExxUwM3Bzq3QwAzBTN1sf5jBqbtgKNSsCuUP3ty
- XcsxsxUxDhVE9HERX+xhxr/VLuATEF7EQkEAXsQsCU0Wv/gNPrlD4adGu0qpLyAf8+EV
- Vdvpgh+2Q9b1Xb5faHafpgWZtnqyxoN4ASY8s6UimOr1FtJ/1BL9pyrkseq5QO2i6SmU
- s4NdVScKmzcTcUbz4z+u0JeXJjyxU3zXnMHGmmmGmSTQm6m3R880PmT1FlPg4QLl7RFs
- AzvQ==
-X-Gm-Message-State: APjAAAX9SUs1dPiyuMm/hhlZDzaHRV57QZJnp9TkiAkkK1ve1PSs5v4p
- 6Uq4bWMOaJWGa0+80DWzYdWcyXxM
-X-Google-Smtp-Source: APXvYqzx0BH5n6znOTYabgmYoDUjJ+EW+L+E8pfYUJnHM0s/YgRYwIszdvilaONuC+TBBpT7YNfgiw==
-X-Received: by 2002:a05:6000:343:: with SMTP id
- e3mr7861902wre.20.1572097540891; 
- Sat, 26 Oct 2019 06:45:40 -0700 (PDT)
-Received: from 640k.lan ([93.56.166.5])
- by smtp.gmail.com with ESMTPSA id r11sm2834514wrx.67.2019.10.26.06.45.39
- for <qemu-devel@nongnu.org>
- (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Sat, 26 Oct 2019 06:45:40 -0700 (PDT)
-From: Paolo Bonzini <pbonzini@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PULL v2 00/39] Misc (mostly x86) patches for 2019-10-24
-Date: Sat, 26 Oct 2019 15:45:37 +0200
-Message-Id: <1572097538-18898-1-git-send-email-pbonzini@redhat.com>
-X-Mailer: git-send-email 1.8.3.1
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=VST6zQt3Q0bwGF42gd/P6zeRHDzGN8RT2c7GyTzRe6U=;
+ b=CYmrtJUlXADX5kb00nUT2ULxABnd5CIUo0dEFB1IPA36zDgrauzvKHsugINwhJrIWL
+ T7IwRz/+uUwH1esIgxoAVHaU81XoXtkkvkQ6FQjSfMW7ZiACphbcQE9cFZ2DzfTbZmQI
+ nr6jTU01oyyoXK/MimuKJVZAK/wNHzX5Rh777CkuWHJgh18At9JPAcEsvyE0OIO5iAtt
+ BEeoWWkxAQZ7H8/hNRuSaNxs9Uorsi73ogBS7N+33Uabb3Gf0LmhDsDjIsAIXC95srUk
+ gZW93wZ9cjCEj1Muio2zaC1cjcFXW0VPMA0pyzpo32Q3cIYzkAtlLdYmfUkamuez/l6v
+ 69/Q==
+X-Gm-Message-State: APjAAAVPHrFxXNVYs/+uFemU9OQ2IrICHlq42kwM0H2QUBb6WwPhogSV
+ e/75h8K601CQa0aXU2tVEBE4I2CpaHvbQDcokQGV/p5lUbJZO/L7OtKrHcYx7Jjxs/i1r2Om3h+
+ puVNG2M21Od+5A3s=
+X-Received: by 2002:adf:ebcb:: with SMTP id v11mr7122960wrn.24.1572100168329; 
+ Sat, 26 Oct 2019 07:29:28 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqx+llsCxQMGx5J0akgOL10Y0oYU1R+NXjI1UylTeey3YJvCuAqATKAkoCkMD1kqK1lPeepieA==
+X-Received: by 2002:adf:ebcb:: with SMTP id v11mr7122932wrn.24.1572100167959; 
+ Sat, 26 Oct 2019 07:29:27 -0700 (PDT)
+Received: from [192.168.1.33] (62.red-88-21-202.staticip.rima-tde.net.
+ [88.21.202.62])
+ by smtp.gmail.com with ESMTPSA id a17sm7356120wrx.84.2019.10.26.07.29.25
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Sat, 26 Oct 2019 07:29:27 -0700 (PDT)
+Subject: Re: [PATCH v2 03/20] piix4: Add a i8259 Interrupt Controller as
+ specified in datasheet
+To: Li Qiang <liq3ea@gmail.com>, =?UTF-8?Q?Herv=c3=a9_Poussineau?=
+ <hpoussin@reactos.org>, Aleksandar Markovic <amarkovic@wavecomp.com>,
+ Aurelien Jarno <aurelien@aurel32.net>
+References: <20191018134754.16362-1-philmd@redhat.com>
+ <20191018134754.16362-4-philmd@redhat.com>
+ <CAKXe6SJB5cqR7yq-_TDcMzWCq7UoGvq=A9kCh11tNoqYjQgp3g@mail.gmail.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <f2a36567-195e-f1c2-12f6-b2f10c37d933@redhat.com>
+Date: Sat, 26 Oct 2019 16:29:25 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::432
+In-Reply-To: <CAKXe6SJB5cqR7yq-_TDcMzWCq7UoGvq=A9kCh11tNoqYjQgp3g@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -93,182 +97,506 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Stefano Stabellini <sstabellini@kernel.org>, xen-devel@lists.xenproject.org,
+ Paul Durrant <paul@xen.org>, "Michael S. Tsirkin" <mst@redhat.com>,
+ Qemu Developers <qemu-devel@nongnu.org>, Eduardo Habkost <ehabkost@redhat.com>,
+ Igor Mammedov <imammedo@redhat.com>,
+ Anthony Perard <anthony.perard@citrix.com>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The following changes since commit e9d42461920f6f40f4d847a5ba18e90d095ed0b9:
+Hi Li,
 
-  Merge remote-tracking branch 'remotes/kraxel/tags/audio-20191018-pull-request' into staging (2019-10-18 14:13:11 +0100)
+On 10/21/19 4:59 PM, Li Qiang wrote:
+> Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com <mailto:philmd@redhat.co=
+m>> =E4=BA=8E=20
+> 2019=E5=B9=B410=E6=9C=8818=E6=97=A5=E5=91=A8=E4=BA=94 =E4=B8=8B=E5=8D=88=
+9:52=E5=86=99=E9=81=93=EF=BC=9A
+>=20
+>     From: Herv=C3=A9 Poussineau <hpoussin@reactos.org
+>     <mailto:hpoussin@reactos.org>>
+>=20
+>     Add ISA irqs as piix4 gpio in, and CPU interrupt request as piix4
+>     gpio out.
+>     Remove i8259 instanciated in malta board, to not have it twice.
+>=20
+>     We can also remove the now unused piix4_init() function.
+>=20
+>     Acked-by: Michael S. Tsirkin <mst@redhat.com <mailto:mst@redhat.com=
+>>
+>     Acked-by: Paolo Bonzini <pbonzini@redhat.com
+>     <mailto:pbonzini@redhat.com>>
+>     Signed-off-by: Herv=C3=A9 Poussineau <hpoussin@reactos.org
+>     <mailto:hpoussin@reactos.org>>
+>     Message-Id: <20171216090228.28505-8-hpoussin@reactos.org
+>     <mailto:20171216090228.28505-8-hpoussin@reactos.org>>
+>     Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com
+>     <mailto:amarkovic@wavecomp.com>>
+>     [PMD: rebased, updated includes, use ISA_NUM_IRQS in for loop]
+>     Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com
+>     <mailto:philmd@redhat.com>>
+>     ---
+>      =C2=A0hw/isa/piix4.c=C2=A0 =C2=A0 =C2=A0 =C2=A0| 43 ++++++++++++++=
+++++++++++++++++++-----------
+>      =C2=A0hw/mips/mips_malta.c | 32 +++++++++++++-------------------
+>      =C2=A0include/hw/i386/pc.h |=C2=A0 1 -
+>      =C2=A03 files changed, 45 insertions(+), 31 deletions(-)
+>=20
+>     diff --git a/hw/isa/piix4.c b/hw/isa/piix4.c
+>     index d0b18e0586..9c37c85ae2 100644
+>     --- a/hw/isa/piix4.c
+>     +++ b/hw/isa/piix4.c
+>     @@ -24,6 +24,7 @@
+>      =C2=A0 */
+>=20
+>      =C2=A0#include "qemu/osdep.h"
+>     +#include "hw/irq.h"
+>      =C2=A0#include "hw/i386/pc.h"
+>      =C2=A0#include "hw/pci/pci.h"
+>      =C2=A0#include "hw/isa/isa.h"
+>     @@ -36,6 +37,8 @@ PCIDevice *piix4_dev;
+>=20
+>      =C2=A0typedef struct PIIX4State {
+>      =C2=A0 =C2=A0 =C2=A0PCIDevice dev;
+>     +=C2=A0 =C2=A0 qemu_irq cpu_intr;
+>     +=C2=A0 =C2=A0 qemu_irq *isa;
+>=20
+>      =C2=A0 =C2=A0 =C2=A0/* Reset Control Register */
+>      =C2=A0 =C2=A0 =C2=A0MemoryRegion rcr_mem;
+>     @@ -94,6 +97,18 @@ static const VMStateDescription vmstate_piix4 =3D=
+ {
+>      =C2=A0 =C2=A0 =C2=A0}
+>      =C2=A0};
+>=20
+>     +static void piix4_request_i8259_irq(void *opaque, int irq, int lev=
+el)
+>     +{
+>     +=C2=A0 =C2=A0 PIIX4State *s =3D opaque;
+>     +=C2=A0 =C2=A0 qemu_set_irq(s->cpu_intr, level);
+>     +}
+>     +
+>     +static void piix4_set_i8259_irq(void *opaque, int irq, int level)
+>     +{
+>     +=C2=A0 =C2=A0 PIIX4State *s =3D opaque;
+>     +=C2=A0 =C2=A0 qemu_set_irq(s->isa[irq], level);
+>     +}
+>     +
+>      =C2=A0static void piix4_rcr_write(void *opaque, hwaddr addr, uint6=
+4_t val,
+>      =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0unsigned int len)
+>      =C2=A0{
+>     @@ -127,29 +142,35 @@ static const MemoryRegionOps piix4_rcr_ops =3D=
+ {
+>      =C2=A0static void piix4_realize(PCIDevice *dev, Error **errp)
+>      =C2=A0{
+>      =C2=A0 =C2=A0 =C2=A0PIIX4State *s =3D PIIX4_PCI_DEVICE(dev);
+>     +=C2=A0 =C2=A0 ISABus *isa_bus;
+>     +=C2=A0 =C2=A0 qemu_irq *i8259_out_irq;
+>=20
+>     -=C2=A0 =C2=A0 if (!isa_bus_new(DEVICE(dev), pci_address_space(dev)=
+,
+>     -=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0pci_address_space_io(dev), errp)) {
+>     +=C2=A0 =C2=A0 isa_bus =3D isa_bus_new(DEVICE(dev), pci_address_spa=
+ce(dev),
+>     +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 pci_address_space_io(dev), errp);
+>     +=C2=A0 =C2=A0 if (!isa_bus) {
+>      =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0return;
+>      =C2=A0 =C2=A0 =C2=A0}
+>=20
+>     +=C2=A0 =C2=A0 qdev_init_gpio_in_named(DEVICE(dev), piix4_set_i8259=
+_irq,
+>     +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 "isa", ISA_NUM_IRQS);
+>     +=C2=A0 =C2=A0 qdev_init_gpio_out_named(DEVICE(dev), &s->cpu_intr,
+>     +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0"intr", 1);
+>     +
+>=20
+>=20
+>=20
+> Does the piix4 hardware has the GPIO for interrupt? Seems not.
 
-are available in the git repository at:
+Yes it does, you can check in the datasheet:
+https://www.intel.com/Assets/PDF/datasheet/290562.pdf
+
+Page 3 is the 'Simplified Block Diagram' you see the INTR pin.
+
+Page 24 table "2.1.5. INTERRUPT CONTROLLER/APIC SIGNALS"
+
+   INTR: INTERRUPT. See CPU Interface Signals.
+
+Page 26 "2.1.6. CPU INTERFACE SIGNALS"
 
 
-  git://github.com/bonzini/qemu.git tags/for-upstream
+   CPU INTERRUPT. INTR is driven by PIIX4 to signal the CPU that
+   an interrupt request is pending and needs to be serviced. It
+   is asynchronous with respect to SYSCLK or PCICLK and is always
+   an output. The interrupt controller must be programmed following
+   PCIRST# to ensure that INTR is at a known state.
 
-for you to fetch changes up to bf13bfab0840d34a74938ddf567d52e9010dbdc6:
+>=20
+>      =C2=A0 =C2=A0 =C2=A0memory_region_init_io(&s->rcr_mem, OBJECT(dev)=
+, &piix4_rcr_ops, s,
+>      =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0"reset-control", 1);
+>      =C2=A0 =C2=A0 =C2=A0memory_region_add_subregion_overlap(pci_addres=
+s_space_io(dev),
+>     0xcf9,
+>      =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0&s->rcr_mem, 1);
+>=20
+>     +=C2=A0 =C2=A0 /* initialize i8259 pic */
+>     +=C2=A0 =C2=A0 i8259_out_irq =3D qemu_allocate_irqs(piix4_request_i=
+8259_irq, s, 1);
+>     +=C2=A0 =C2=A0 s->isa =3D i8259_init(isa_bus, *i8259_out_irq);
+>=20
+>=20
+> In i8259_init, we also allocate 16 input line and 1 output line.
+> Seems it is duplicated with the GPIO allocation in previous.
 
-  i386: implement IGNNE (2019-10-25 13:18:21 +0200)
+No, this is different, here we don't allocate the 16 i8259
+INPUT lines, we allocate 1 input IRQ and pass it to the
+i8259_init function which uses it as its OUTPUT line.
 
-----------------------------------------------------------------
-* Bulgarian translation update (Alexander)
-* RTC and PC refactorings (Hervé, Philippe, Sergio)
-* RTC fix (Marcelo)
-* More comprehensive MCE logging (Mario)
-* x86 IGNNE implementation (Paolo)
-* Microvm machine type (Sergio)
-* Support for UMONITOR/UMWAIT/TPAUSE (Tao)
-* Do not use %m in common code (Thomas)
-* NoNonArchitecturalCoreSharing Hyper-V enlightenment (Vitaly)
-* getpagesize cleanups (Wei)
+IOW:
 
-----------------------------------------------------------------
-Alexander Shopov (1):
-      Updated Bulgarian translation (19) - 4.1.0
+* i8259
+   - 16 INPUT (from ISA devices)
+   - 1 OUTPUT (to PIIX)
 
-Hervé Poussineau (2):
-      mc146818rtc: move structure to header file
-      mc146818rtc: always register rtc to rtc list
+* PIIX
+   - 1 INPUT (from i8259)
+   - 1 OUTPUT (to CPU, on the Malta board: CPU IRQ2)
 
-Laurent Vivier (1):
-      runstate: ignore exit request in finish migrate state
+> Also
+> Maybe here can uses
+> i8259(isa_bus, qemu_allocate_irq(piix4_request_i8259_irq, s, 0));
+>=20
+>     +
+>     +=C2=A0 =C2=A0 /* initialize ISA irqs */
+>     +=C2=A0 =C2=A0 isa_bus_irqs(isa_bus, s->isa);
+>     +
+>      =C2=A0 =C2=A0 =C2=A0piix4_dev =3D dev;
+>      =C2=A0}
+>=20
+>     -int piix4_init(PCIBus *bus, ISABus **isa_bus, int devfn)
+>     -{
+>     -=C2=A0 =C2=A0 PCIDevice *d;
+>     -
+>     -=C2=A0 =C2=A0 d =3D pci_create_simple_multifunction(bus, devfn, tr=
+ue, "PIIX4");
+>     -=C2=A0 =C2=A0 *isa_bus =3D ISA_BUS(qdev_get_child_bus(DEVICE(d), "=
+isa.0"));
+>     -=C2=A0 =C2=A0 return d->devfn;
+>     -}
+>     -
+>      =C2=A0static void piix4_class_init(ObjectClass *klass, void *data)
+>      =C2=A0{
+>      =C2=A0 =C2=A0 =C2=A0DeviceClass *dc =3D DEVICE_CLASS(klass);
+>     diff --git a/hw/mips/mips_malta.c b/hw/mips/mips_malta.c
+>     index 4d9c64b36a..7d25ab6c23 100644
+>     --- a/hw/mips/mips_malta.c
+>     +++ b/hw/mips/mips_malta.c
+>     @@ -97,7 +97,7 @@ typedef struct {
+>      =C2=A0 =C2=A0 =C2=A0SysBusDevice parent_obj;
+>=20
+>      =C2=A0 =C2=A0 =C2=A0MIPSCPSState cps;
+>     -=C2=A0 =C2=A0 qemu_irq *i8259;
+>     +=C2=A0 =C2=A0 qemu_irq i8259[16];
+>      =C2=A0} MaltaState;
+>=20
+>      =C2=A0static ISADevice *pit;
+>     @@ -1235,8 +1235,8 @@ void mips_malta_init(MachineState *machine)
+>      =C2=A0 =C2=A0 =C2=A0int64_t kernel_entry, bootloader_run_addr;
+>      =C2=A0 =C2=A0 =C2=A0PCIBus *pci_bus;
+>      =C2=A0 =C2=A0 =C2=A0ISABus *isa_bus;
+>     -=C2=A0 =C2=A0 qemu_irq *isa_irq;
+>      =C2=A0 =C2=A0 =C2=A0qemu_irq cbus_irq, i8259_irq;
+>     +=C2=A0 =C2=A0 PCIDevice *pci;
+>      =C2=A0 =C2=A0 =C2=A0int piix4_devfn;
+>      =C2=A0 =C2=A0 =C2=A0I2CBus *smbus;
+>      =C2=A0 =C2=A0 =C2=A0DriveInfo *dinfo;
+>     @@ -1407,30 +1407,24 @@ void mips_malta_init(MachineState *machine)
+>      =C2=A0 =C2=A0 =C2=A0/* Board ID =3D 0x420 (Malta Board with CoreLV=
+) */
+>      =C2=A0 =C2=A0 =C2=A0stl_p(memory_region_get_ram_ptr(bios_copy) + 0=
+x10, 0x00000420);
+>=20
+>     -=C2=A0 =C2=A0 /*
+>     -=C2=A0 =C2=A0 =C2=A0* We have a circular dependency problem: pci_b=
+us depends on
+>     isa_irq,
+>     -=C2=A0 =C2=A0 =C2=A0* isa_irq is provided by i8259, i8259 depends =
+on ISA, ISA depends
+>     -=C2=A0 =C2=A0 =C2=A0* on piix4, and piix4 depends on pci_bus.=C2=A0=
+ To stop the cycle
+>     we have
+>     -=C2=A0 =C2=A0 =C2=A0* qemu_irq_proxy() adds an extra bit of indire=
+ction, allowing us
+>     -=C2=A0 =C2=A0 =C2=A0* to resolve the isa_irq -> i8259 dependency a=
+fter i8259 is
+>     initialized.
+>     -=C2=A0 =C2=A0 =C2=A0*/
+>     -=C2=A0 =C2=A0 isa_irq =3D qemu_irq_proxy(&s->i8259, 16);
+>     -
+>      =C2=A0 =C2=A0 =C2=A0/* Northbridge */
+>     -=C2=A0 =C2=A0 pci_bus =3D gt64120_register(isa_irq);
+>     +=C2=A0 =C2=A0 pci_bus =3D gt64120_register(s->i8259);
+>=20
+>      =C2=A0 =C2=A0 =C2=A0/* Southbridge */
+>      =C2=A0 =C2=A0 =C2=A0ide_drive_get(hd, ARRAY_SIZE(hd));
+>=20
+>     -=C2=A0 =C2=A0 piix4_devfn =3D piix4_init(pci_bus, &isa_bus, 80);
+>     +=C2=A0 =C2=A0 pci =3D pci_create_simple_multifunction(pci_bus, PCI=
+_DEVFN(10, 0),
+>     +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 true, "PIIX4");
+>     +=C2=A0 =C2=A0 dev =3D DEVICE(pci);
+>     +=C2=A0 =C2=A0 isa_bus =3D ISA_BUS(qdev_get_child_bus(dev, "isa.0")=
+);
+>     +=C2=A0 =C2=A0 piix4_devfn =3D pci->devfn;
+>=20
+>     -=C2=A0 =C2=A0 /*
+>     -=C2=A0 =C2=A0 =C2=A0* Interrupt controller
+>     -=C2=A0 =C2=A0 =C2=A0* The 8259 is attached to the MIPS CPU INT0 pi=
+n, ie interrupt 2
+>     -=C2=A0 =C2=A0 =C2=A0*/
+>     -=C2=A0 =C2=A0 s->i8259 =3D i8259_init(isa_bus, i8259_irq);
+>     +=C2=A0 =C2=A0 /* Interrupt controller */
+>     +=C2=A0 =C2=A0 qdev_connect_gpio_out_named(dev, "intr", 0, i8259_ir=
+q);
+>     +=C2=A0 =C2=A0 for (int i =3D 0; i < ISA_NUM_IRQS; i++) {
+>     +=C2=A0 =C2=A0 =C2=A0 =C2=A0 s->i8259[i] =3D qdev_get_gpio_in_named=
+(dev, "isa", i);
+>     +=C2=A0 =C2=A0 }
+>=20
+>=20
+> Also here s->i8259 and the piix4 isa point to the same input line. Seem=
+s=20
+> duplicated.
 
-Marcelo Tosatti (1):
-      mc146818rtc: fix timer interrupt reinjection
+'i8259_irq' might be misnamed, it is initialized as the CPU INPUT IRQ:
 
-Mario Smarduch (1):
-      target/i386: log MCE guest and host addresses
+   mips_create_cpu(machine, s, &cbus_irq, &i8259_irq);
 
-Paolo Bonzini (6):
-      memory-device: simplify Makefile.objs conditions
-      hw/i386: split PCMachineState deriving X86MachineState from it
-      audio: fix missing break
-      target/i386: move FERR handling to target/i386
-      target/i386: introduce cpu_set_fpus
-      i386: implement IGNNE
+Then we connect the ISA PIC OUTPUT IRQ to the CPU INPUT IRQ:
 
-Philippe Mathieu-Daudé (7):
-      hw/timer/mc146818rtc: Only include qapi-commands-misc on I386
-      hw/i386/pc: Extract pc_gsi_create()
-      hw/i386/pc: Move gsi_state creation code
-      hw/i386/pc: Extract pc_i8259_create()
-      hw/i386/pc: Remove kvm_i386.h include
-      mc146818rtc: Move RTC_ISA_IRQ definition
-      mc146818rtc: Include mc146818rtc_regs.h directly in mc146818rtc.c
+   qdev_connect_gpio_out_named(dev, "intr", 0, i8259_irq);
 
-Sergio Lopez (14):
-      hw/virtio: Factorize virtio-mmio headers
-      hw/i386/pc: rename functions shared with non-PC machines
-      hw/i386/pc: fix code style issues on functions that will be moved out
-      hw/i386/pc: replace use of strtol with qemu_strtoui in x86_load_linux()
-      hw/i386/pc: avoid an assignment in if condition in x86_load_linux()
-      hw/i386/pc: remove commented out code from x86_load_linux()
-      hw/i386/pc: move shared x86 functions to x86.c and export them
-      hw/i386: make x86.c independent from PCMachineState
-      fw_cfg: add "modify" functions for all types
-      hw/intc/apic: reject pic ints if isa_pic == NULL
-      roms: add microvm-bios (qboot) as binary and git submodule
-      docs/microvm.rst: document the new microvm machine type
-      hw/i386: Introduce the microvm machine type
-      MAINTAINERS: add microvm related files
+Earlier, we created the GT64120 with an array of OUTPUT IRQs:
 
-Tao Xu (2):
-      x86/cpu: Add support for UMONITOR/UMWAIT/TPAUSE
-      target/i386: Add support for save/load IA32_UMWAIT_CONTROL MSR
+   pci_bus =3D gt64120_register(s->i8259);
 
-Thomas Huth (1):
-      Do not use %m in common code to print error messages
+Here we connect the GT64120 OUTPUT IRQs from the PCI bus to
+be INPUT of the ISA PIC:
 
-Vitaly Kuznetsov (1):
-      i386/kvm: add NoNonArchitecturalCoreSharing Hyper-V enlightenment
+   for (int i =3D 0; i < ISA_NUM_IRQS; i++) {
+       s->i8259[i] =3D qdev_get_gpio_in_named(dev, "isa", i);
+   }
 
-Wei Yang (2):
-      checkpatch: suggest qemu_real_host_page_size instead of getpagesize() or sysconf(_SC_PAGESIZE)
-      core: replace getpagesize() with qemu_real_host_page_size
+There were the previously used 'proxy-irq'. Now the circular
+problem is resolved:
 
- .gitmodules                         |   3 +
- MAINTAINERS                         |   9 +
- accel/kvm/kvm-all.c                 |   6 +-
- audio/paaudio.c                     |   1 +
- backends/hostmem.c                  |   2 +-
- block.c                             |   4 +-
- block/file-posix.c                  |   9 +-
- block/io.c                          |   2 +-
- block/parallels.c                   |   2 +-
- block/qcow2-cache.c                 |   2 +-
- contrib/vhost-user-gpu/vugbm.c      |   2 +-
- default-configs/i386-softmmu.mak    |   1 +
- docs/hyperv.txt                     |  13 +
- docs/microvm.rst                    | 108 +++++
- exec.c                              |   6 +-
- hw/acpi/cpu_hotplug.c               |  10 +-
- hw/i386/Kconfig                     |  10 +
- hw/i386/Makefile.objs               |   2 +
- hw/i386/acpi-build.c                |  29 +-
- hw/i386/amd_iommu.c                 |   3 +-
- hw/i386/intel_iommu.c               |   3 +-
- hw/i386/microvm.c                   | 572 +++++++++++++++++++++++++
- hw/i386/pc.c                        | 832 +++++-------------------------------
- hw/i386/pc_piix.c                   |  67 ++-
- hw/i386/pc_q35.c                    |  64 ++-
- hw/i386/pc_sysfw.c                  |  60 +--
- hw/i386/x86.c                       | 795 ++++++++++++++++++++++++++++++++++
- hw/i386/xen/xen-hvm.c               |  28 +-
- hw/intc/apic.c                      |   2 +-
- hw/intc/ioapic.c                    |   2 +-
- hw/intc/s390_flic_kvm.c             |   2 +-
- hw/mem/Makefile.objs                |   2 +-
- hw/misc/tmp421.c                    |   4 +-
- hw/nvram/fw_cfg.c                   |  29 ++
- hw/ppc/mac_newworld.c               |   2 +-
- hw/ppc/spapr_pci.c                  |   2 +-
- hw/rdma/vmw/pvrdma_main.c           |   2 +-
- hw/timer/mc146818rtc.c              |  94 ++--
- hw/vfio/spapr.c                     |   7 +-
- hw/virtio/virtio-mmio.c             |  48 +--
- include/exec/ram_addr.h             |   2 +-
- include/hw/i386/microvm.h           |  71 +++
- include/hw/i386/pc.h                |  32 +-
- include/hw/i386/x86.h               |  96 +++++
- include/hw/nvram/fw_cfg.h           |  42 ++
- include/hw/timer/mc146818rtc.h      |  36 +-
- include/hw/timer/mc146818rtc_regs.h |   2 -
- include/hw/virtio/virtio-mmio.h     |  73 ++++
- include/qemu/osdep.h                |   4 +-
- migration/migration.c               |   2 +-
- migration/postcopy-ram.c            |   4 +-
- monitor/misc.c                      |   2 +-
- pc-bios/bios-microvm.bin            | Bin 0 -> 65536 bytes
- po/bg.po                            |  10 +-
- roms/Makefile                       |   6 +
- roms/qboot                          |   1 +
- scripts/checkpatch.pl               |   6 +
- target/i386/cpu.c                   |   4 +-
- target/i386/cpu.h                   |  11 +-
- target/i386/fpu_helper.c            |  60 ++-
- target/i386/hyperv-proto.h          |   1 +
- target/i386/kvm.c                   |  74 +++-
- target/i386/machine.c               |  20 +
- target/ppc/kvm.c                    |   2 +-
- tests/rtc-test.c                    |   1 +
- tests/vhost-user-bridge.c           |   8 +-
- util/main-loop.c                    |   3 +-
- util/mmap-alloc.c                   |  10 +-
- util/oslib-posix.c                  |   4 +-
- util/oslib-win32.c                  |   2 +-
- util/systemd.c                      |   4 +-
- util/vfio-helpers.c                 |  12 +-
- vl.c                                |   3 +
- 73 files changed, 2342 insertions(+), 1107 deletions(-)
- create mode 100644 docs/microvm.rst
- create mode 100644 hw/i386/microvm.c
- create mode 100644 hw/i386/x86.c
- create mode 100644 include/hw/i386/microvm.h
- create mode 100644 include/hw/i386/x86.h
- create mode 100644 include/hw/virtio/virtio-mmio.h
- create mode 100644 pc-bios/bios-microvm.bin
- create mode 160000 roms/qboot
--- 
-1.8.3.1
+/*
+  * We have a circular dependency problem: pci_bus depends on isa_irq,
+  * isa_irq is provided by i8259, i8259 depends on ISA, ISA depends
+  * on piix4, and piix4 depends on pci_bus.  To stop the cycle we have
+  * qemu_irq_proxy() adds an extra bit of indirection, allowing us
+  * to resolve the isa_irq -> i8259 dependency after i8259 is
+  * initialized.
+  */
 
+Future plan is to remove the X86 dependency on the i8259 PIC,
+then we'll be able to improve the GT64120 model and simplify
+how IRQs are connected.
+
+> I have come up with a more cleaner patch as following:
+>=20
+> Though 'i8259_init' is called in the mips_malta_init. But is uses the=20
+> isa bus from piix4 device.
+> And seems it's more clean.
+> You can test it with more tests.
+
+You can test with:
+
+$ make mips{,64}{,el}-softmmu/all
+$ make check-venv
+$ AVOCADO_TIMEOUT_EXPECTED=3D1 \
+   tests/venv/bin/avocado \
+     --show=3Dapp,ssh,console \
+     run \
+       -t arch:mips \
+       -t arch:mipsel \
+       -t arch:mips64 \
+       -t arch:mips64el \
+     tests/acceptance/
+
+Regards,
+
+Phil.
+
+> Author: Li Qiang <liq3ea@163.com <mailto:liq3ea@163.com>>
+> Date: =C2=A0 Mon Oct 21 22:41:17 2019 +0800
+>=20
+>  =C2=A0 =C2=A0 piix4
+>=20
+> diff --git a/hw/isa/piix4.c b/hw/isa/piix4.c
+> index d0b18e0586..66a041040a 100644
+> --- a/hw/isa/piix4.c
+> +++ b/hw/isa/piix4.c
+> @@ -24,6 +24,7 @@
+>  =C2=A0 */
+>=20
+>  =C2=A0#include "qemu/osdep.h"
+> +#include "hw/irq.h"
+>  =C2=A0#include "hw/i386/pc.h"
+>  =C2=A0#include "hw/pci/pci.h"
+>  =C2=A0#include "hw/isa/isa.h"
+> @@ -46,6 +47,7 @@ typedef struct PIIX4State {
+>  =C2=A0#define PIIX4_PCI_DEVICE(obj) \
+>  =C2=A0 =C2=A0 =C2=A0OBJECT_CHECK(PIIX4State, (obj), TYPE_PIIX4_PCI_DEV=
+ICE)
+>=20
+> +
+>  =C2=A0static void piix4_isa_reset(DeviceState *dev)
+>  =C2=A0{
+>  =C2=A0 =C2=A0 =C2=A0PIIX4State *d =3D PIIX4_PCI_DEVICE(dev);
+> @@ -141,14 +143,6 @@ static void piix4_realize(PCIDevice *dev, Error **=
+errp)
+>  =C2=A0 =C2=A0 =C2=A0piix4_dev =3D dev;
+>  =C2=A0}
+>=20
+> -int piix4_init(PCIBus *bus, ISABus **isa_bus, int devfn)
+> -{
+> - =C2=A0 =C2=A0PCIDevice *d;
+> -
+> - =C2=A0 =C2=A0d =3D pci_create_simple_multifunction(bus, devfn, true, =
+"PIIX4");
+> - =C2=A0 =C2=A0*isa_bus =3D ISA_BUS(qdev_get_child_bus(DEVICE(d), "isa.=
+0"));
+> - =C2=A0 =C2=A0return d->devfn;
+> -}
+>=20
+>  =C2=A0static void piix4_class_init(ObjectClass *klass, void *data)
+>  =C2=A0{
+> diff --git a/hw/mips/mips_malta.c b/hw/mips/mips_malta.c
+> index 4d9c64b36a..420e0e9e80 100644
+> --- a/hw/mips/mips_malta.c
+> +++ b/hw/mips/mips_malta.c
+> @@ -28,6 +28,7 @@
+>  =C2=A0#include "cpu.h"
+>  =C2=A0#include "hw/i386/pc.h"
+>  =C2=A0#include "hw/isa/superio.h"
+> +//#include "hw/isa/piix4.h"
+>  =C2=A0#include "hw/dma/i8257.h"
+>  =C2=A0#include "hw/char/serial.h"
+>  =C2=A0#include "net/net.h"
+> @@ -97,7 +98,7 @@ typedef struct {
+>  =C2=A0 =C2=A0 =C2=A0SysBusDevice parent_obj;
+>=20
+>  =C2=A0 =C2=A0 =C2=A0MIPSCPSState cps;
+> - =C2=A0 =C2=A0qemu_irq *i8259;
+> + =C2=A0 =C2=A0qemu_irq i8259[ISA_NUM_IRQS];
+>  =C2=A0} MaltaState;
+>=20
+>  =C2=A0static ISADevice *pit;
+> @@ -1235,8 +1236,9 @@ void mips_malta_init(MachineState *machine)
+>  =C2=A0 =C2=A0 =C2=A0int64_t kernel_entry, bootloader_run_addr;
+>  =C2=A0 =C2=A0 =C2=A0PCIBus *pci_bus;
+>  =C2=A0 =C2=A0 =C2=A0ISABus *isa_bus;
+> - =C2=A0 =C2=A0qemu_irq *isa_irq;
+>  =C2=A0 =C2=A0 =C2=A0qemu_irq cbus_irq, i8259_irq;
+> + =C2=A0 =C2=A0qemu_irq *i8259;
+> + =C2=A0 =C2=A0PCIDevice *pci;
+>  =C2=A0 =C2=A0 =C2=A0int piix4_devfn;
+>  =C2=A0 =C2=A0 =C2=A0I2CBus *smbus;
+>  =C2=A0 =C2=A0 =C2=A0DriveInfo *dinfo;
+> @@ -1407,29 +1409,24 @@ void mips_malta_init(MachineState *machine)
+>  =C2=A0 =C2=A0 =C2=A0/* Board ID =3D 0x420 (Malta Board with CoreLV) */
+>  =C2=A0 =C2=A0 =C2=A0stl_p(memory_region_get_ram_ptr(bios_copy) + 0x10,=
+ 0x00000420);
+>=20
+> - =C2=A0 =C2=A0/*
+> - =C2=A0 =C2=A0 * We have a circular dependency problem: pci_bus depend=
+s on isa_irq,
+> - =C2=A0 =C2=A0 * isa_irq is provided by i8259, i8259 depends on ISA, I=
+SA depends
+> - =C2=A0 =C2=A0 * on piix4, and piix4 depends on pci_bus.=C2=A0 To stop=
+ the cycle we have
+> - =C2=A0 =C2=A0 * qemu_irq_proxy() adds an extra bit of indirection, al=
+lowing us
+> - =C2=A0 =C2=A0 * to resolve the isa_irq -> i8259 dependency after i825=
+9 is=20
+> initialized.
+> - =C2=A0 =C2=A0 */
+> - =C2=A0 =C2=A0isa_irq =3D qemu_irq_proxy(&s->i8259, 16);
+> -
+>  =C2=A0 =C2=A0 =C2=A0/* Northbridge */
+> - =C2=A0 =C2=A0pci_bus =3D gt64120_register(isa_irq);
+> + =C2=A0 =C2=A0pci_bus =3D gt64120_register(s->i8259);
+>=20
+>  =C2=A0 =C2=A0 =C2=A0/* Southbridge */
+>  =C2=A0 =C2=A0 =C2=A0ide_drive_get(hd, ARRAY_SIZE(hd));
+>=20
+> - =C2=A0 =C2=A0piix4_devfn =3D piix4_init(pci_bus, &isa_bus, 80);
+> + =C2=A0 =C2=A0pci =3D pci_create_simple_multifunction(pci_bus, PCI_DEV=
+FN(10, 0),
+> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0true, "PIIX4");
+> + =C2=A0 =C2=A0dev =3D DEVICE(pci);
+> + =C2=A0 =C2=A0isa_bus =3D ISA_BUS(qdev_get_child_bus(dev, "isa.0"));
+> + =C2=A0 =C2=A0piix4_devfn =3D pci->devfn;
+>=20
+> - =C2=A0 =C2=A0/*
+> - =C2=A0 =C2=A0 * Interrupt controller
+> - =C2=A0 =C2=A0 * The 8259 is attached to the MIPS CPU INT0 pin, ie int=
+errupt 2
+> - =C2=A0 =C2=A0 */
+> - =C2=A0 =C2=A0s->i8259 =3D i8259_init(isa_bus, i8259_irq);
+>=20
+> + =C2=A0 =C2=A0i8259 =3D i8259_init(isa_bus, i8259_irq);
+> + =C2=A0 =C2=A0for (int i =3D 0; i < ISA_NUM_IRQS; i++) {
+> + =C2=A0 =C2=A0 =C2=A0 =C2=A0s->i8259[i] =3D i8259[i];
+> + =C2=A0 =C2=A0}
+> + =C2=A0 =C2=A0g_free(i8259);
+>  =C2=A0 =C2=A0 =C2=A0isa_bus_irqs(isa_bus, s->i8259);
+>  =C2=A0 =C2=A0 =C2=A0pci_piix4_ide_init(pci_bus, hd, piix4_devfn + 1);
+>  =C2=A0 =C2=A0 =C2=A0pci_create_simple(pci_bus, piix4_devfn + 2, "piix4=
+-usb-uhci");
+>=20
+>     -=C2=A0 =C2=A0 isa_bus_irqs(isa_bus, s->i8259);
+>      =C2=A0 =C2=A0 =C2=A0pci_piix4_ide_init(pci_bus, hd, piix4_devfn + =
+1);
+>      =C2=A0 =C2=A0 =C2=A0pci_create_simple(pci_bus, piix4_devfn + 2, "p=
+iix4-usb-uhci");
+>      =C2=A0 =C2=A0 =C2=A0smbus =3D piix4_pm_init(pci_bus, piix4_devfn +=
+ 3, 0x1100,
+>     diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
+>     index 37bfd95113..374f3e8835 100644
+>     --- a/include/hw/i386/pc.h
+>     +++ b/include/hw/i386/pc.h
+>     @@ -286,7 +286,6 @@ PCIBus *i440fx_init(const char *host_type, cons=
+t
+>     char *pci_type,
+>      =C2=A0PCIBus *find_i440fx(void);
+>      =C2=A0/* piix4.c */
+>      =C2=A0extern PCIDevice *piix4_dev;
+>     -int piix4_init(PCIBus *bus, ISABus **isa_bus, int devfn);
+>=20
+>      =C2=A0/* pc_sysfw.c */
+>      =C2=A0void pc_system_flash_create(PCMachineState *pcms);
+>     --=20
+>     2.21.0
+>=20
+>=20
 
