@@ -7,52 +7,52 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8905CCA9EB9
-	for <qemu-devel@archiver.kernel.org>; Sat, 26 Oct 2019 21:40:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5324CCA9EB9
+	for <qemu-devel@archiver.kernel.org>; Sat, 26 Oct 2019 21:41:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4A60020863
-	for <qemu-devel@archiver.kernel.org>; Sat, 26 Oct 2019 21:40:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1B57E20863
+	for <qemu-devel@archiver.kernel.org>; Sat, 26 Oct 2019 21:41:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b="r8ldV3R9"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4A60020863
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b="ppt3rDNI"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1B57E20863
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=igalia.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42602 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42608 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iOTnp-0005cK-0J
-	for qemu-devel@archiver.kernel.org; Sat, 26 Oct 2019 17:40:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60302)
+	id 1iOTnz-00067b-Rq
+	for qemu-devel@archiver.kernel.org; Sat, 26 Oct 2019 17:41:03 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60472)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <berto@igalia.com>) id 1iOTZw-0000XQ-Su
- for qemu-devel@nongnu.org; Sat, 26 Oct 2019 17:26:35 -0400
+ (envelope-from <berto@igalia.com>) id 1iOTa3-0000cu-Hy
+ for qemu-devel@nongnu.org; Sat, 26 Oct 2019 17:26:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <berto@igalia.com>) id 1iOTZv-0005RB-ET
- for qemu-devel@nongnu.org; Sat, 26 Oct 2019 17:26:32 -0400
-Received: from fanzine.igalia.com ([178.60.130.6]:42492)
+ (envelope-from <berto@igalia.com>) id 1iOTZz-0005Vt-QY
+ for qemu-devel@nongnu.org; Sat, 26 Oct 2019 17:26:39 -0400
+Received: from fanzine.igalia.com ([178.60.130.6]:42546)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <berto@igalia.com>)
- id 1iOTZu-0005Ey-V6; Sat, 26 Oct 2019 17:26:31 -0400
+ id 1iOTZy-0005Hd-T5; Sat, 26 Oct 2019 17:26:35 -0400
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=igalia.com;
  s=20170329; 
  h=Content-Transfer-Encoding:MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From;
- bh=BvyMuOuieE1su4Zkm7aBIoGAexAAhcDUlQ/YuuwXAHc=; 
- b=r8ldV3R901F8oaPjneVfFMrNufN3jDghwDOdWsNGSpqOssoPo1nOuU78Dq7QV7G/Aq9Rw7e+RZA8fMDqYwCDGQDArIzcCnXJWZfKryP5hNJA7O1uXTg2Ic2zaJS9TtQ2Soa038zcv+hO6A2vTq5TMLg3U6n1lxbVYb4MVk8lk7BUFmuhafalQj69tdOarf/M9IAOybBUXaCcahxPtUOwPA28Pcb+JCLzuzCx1RxP5hw5PtWjmJmPUDnjm63a4hwDULDPPr6uJvWoL8Nt9fv9gfAYEa6aWTxvpq51H7ODeMuLFqt6P1o9ve3OoK1L6GMesaRgiTJTUma10pwP1PzuPg==;
+ bh=VdjJhielaO4MmNWcmgLkVdDn9oq6XrZTEwGFqa43dXw=; 
+ b=ppt3rDNIrFMhLVpgrVGehl4AotXMom8ugDQZONE8SNuG+9rKu1Wtep2szKVuEgjeEYinoHn6kDL2Wn/a1sEwytFGg6qElodpEq1LWx0jGo/8mJjYXRyjgCnzZKwO8uZ0kqh2WYkXnILlkJrqlnxT5dxOpw1TO+4Fj+a2lY+ZqNqLsOSgnug0N17heYNYIgQeuxselA2LAq1SeJwklWD1YsxChDFnk+c4qmfNFEyQ5iqFOSNT8G6RVGO6u9Gjmyzo3ekEk1B/c6xpOXb56zhB7AAioiKy3HA/anZ3FtCv/bzn0tuEKdgR2jE+pQGD3xpObqHD1dh3V621dLRn63ektw==;
 Received: from 87-100-137-117.bb.dnainternet.fi ([87.100.137.117]
  helo=perseus.local) by fanzine.igalia.com with esmtpsa 
  (Cipher TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim)
- id 1iOTZI-000462-T0; Sat, 26 Oct 2019 23:25:53 +0200
+ id 1iOTZJ-000466-2Y; Sat, 26 Oct 2019 23:25:53 +0200
 Received: from berto by perseus.local with local (Exim 4.92)
  (envelope-from <berto@igalia.com>)
- id 1iOTZ0-0001PV-Mo; Sun, 27 Oct 2019 00:25:34 +0300
+ id 1iOTZ0-0001Pd-St; Sun, 27 Oct 2019 00:25:34 +0300
 From: Alberto Garcia <berto@igalia.com>
 To: qemu-devel@nongnu.org
-Subject: [RFC PATCH v2 15/26] qcow2: Add subcluster support to
- zero_in_l2_slice()
-Date: Sun, 27 Oct 2019 00:25:17 +0300
-Message-Id: <8f366482d2b273c26ff67cba1de898289f613fc7.1572125022.git.berto@igalia.com>
+Subject: [RFC PATCH v2 19/26] qcow2: Fix offset calculation in
+ handle_dependencies()
+Date: Sun, 27 Oct 2019 00:25:21 +0300
+Message-Id: <299818a13e48bb30ba27bd3afcd3d888c8e053a7.1572125022.git.berto@igalia.com>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <cover.1572125022.git.berto@igalia.com>
 References: <cover.1572125022.git.berto@igalia.com>
@@ -81,50 +81,31 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Setting the QCOW_OFLAG_ZERO bit of the L2 entry is forbidden if an
-image has subclusters. Instead, the individual 'all zeroes' bits must
-be used.
+l2meta_cow_start() and l2meta_cow_end() are not necessarily
+cluster-aligned if the image has subclusters, so update the
+calculation of old_start and old_end to guarantee that no two requests
+try to write on the same cluster.
 
 Signed-off-by: Alberto Garcia <berto@igalia.com>
 ---
- block/qcow2-cluster.c | 14 ++++++++++----
- 1 file changed, 10 insertions(+), 4 deletions(-)
+ block/qcow2-cluster.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/block/qcow2-cluster.c b/block/qcow2-cluster.c
-index e67559152f..3e4ba8d448 100644
+index 62f2a9fcc0..fb6cf8df17 100644
 --- a/block/qcow2-cluster.c
 +++ b/block/qcow2-cluster.c
-@@ -1852,7 +1852,7 @@ static int zero_in_l2_slice(BlockDriverState *bs, uint64_t offset,
-     assert(nb_clusters <= INT_MAX);
+@@ -1262,8 +1262,8 @@ static int handle_dependencies(BlockDriverState *bs, uint64_t guest_offset,
  
-     for (i = 0; i < nb_clusters; i++) {
--        uint64_t old_offset;
-+        uint64_t old_offset, l2_entry = 0;
-         QCow2ClusterType cluster_type;
+         uint64_t start = guest_offset;
+         uint64_t end = start + bytes;
+-        uint64_t old_start = l2meta_cow_start(old_alloc);
+-        uint64_t old_end = l2meta_cow_end(old_alloc);
++        uint64_t old_start = start_of_cluster(s, l2meta_cow_start(old_alloc));
++        uint64_t old_end = ROUND_UP(l2meta_cow_end(old_alloc), s->cluster_size);
  
-         old_offset = get_l2_entry(s, l2_slice, l2_index + i);
-@@ -1869,12 +1869,18 @@ static int zero_in_l2_slice(BlockDriverState *bs, uint64_t offset,
- 
-         qcow2_cache_entry_mark_dirty(s->l2_table_cache, l2_slice);
-         if (cluster_type == QCOW2_CLUSTER_COMPRESSED || unmap) {
--            set_l2_entry(s, l2_slice, l2_index + i, QCOW_OFLAG_ZERO);
-             qcow2_free_any_clusters(bs, old_offset, 1, QCOW2_DISCARD_REQUEST);
-         } else {
--            uint64_t entry = get_l2_entry(s, l2_slice, l2_index + i);
--            set_l2_entry(s, l2_slice, l2_index + i, entry | QCOW_OFLAG_ZERO);
-+            l2_entry = get_l2_entry(s, l2_slice, l2_index + i);
-         }
-+
-+        if (has_subclusters(s)) {
-+            set_l2_bitmap(s, l2_slice, l2_index + i, QCOW_L2_BITMAP_ALL_ZEROES);
-+        } else {
-+            l2_entry |= QCOW_OFLAG_ZERO;
-+        }
-+
-+        set_l2_entry(s, l2_slice, l2_index + i, l2_entry);
-     }
- 
-     qcow2_cache_put(s->l2_table_cache, (void **) &l2_slice);
+         if (end <= old_start || start >= old_end) {
+             /* No intersection */
 -- 
 2.20.1
 
