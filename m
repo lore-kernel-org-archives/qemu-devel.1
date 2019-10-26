@@ -2,83 +2,64 @@ Return-Path: <SRS0=l02z=YT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 933DACA9EB9
-	for <qemu-devel@archiver.kernel.org>; Sat, 26 Oct 2019 22:27:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 726D1CA9EB9
+	for <qemu-devel@archiver.kernel.org>; Sat, 26 Oct 2019 22:28:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 623C321655
-	for <qemu-devel@archiver.kernel.org>; Sat, 26 Oct 2019 22:27:39 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 623C321655
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 3AA6420863
+	for <qemu-devel@archiver.kernel.org>; Sat, 26 Oct 2019 22:28:27 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b="qWUk+kvB"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3AA6420863
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=igalia.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43166 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43176 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iOUX4-0006hW-Fu
-	for qemu-devel@archiver.kernel.org; Sat, 26 Oct 2019 18:27:38 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34238)
+	id 1iOUXq-00019h-Cm
+	for qemu-devel@archiver.kernel.org; Sat, 26 Oct 2019 18:28:26 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60051)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mst@redhat.com>) id 1iOTzP-0006H1-JO
- for qemu-devel@nongnu.org; Sat, 26 Oct 2019 17:52:52 -0400
+ (envelope-from <berto@igalia.com>) id 1iOTZj-00005k-PI
+ for qemu-devel@nongnu.org; Sat, 26 Oct 2019 17:26:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mst@redhat.com>) id 1iOTzO-0003bL-6V
- for qemu-devel@nongnu.org; Sat, 26 Oct 2019 17:52:51 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:49346)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mst@redhat.com>) id 1iOTzN-0003bD-UK
- for qemu-devel@nongnu.org; Sat, 26 Oct 2019 17:52:50 -0400
-Received: from mail-qk1-f198.google.com (mail-qk1-f198.google.com
- [209.85.222.198])
- (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 1E11FC049E12
- for <qemu-devel@nongnu.org>; Sat, 26 Oct 2019 21:52:49 +0000 (UTC)
-Received: by mail-qk1-f198.google.com with SMTP id g65so6336265qkf.19
- for <qemu-devel@nongnu.org>; Sat, 26 Oct 2019 14:52:49 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=KFQvXXlh3AUO8PkJPwkcMnBMnk/jbSrzCNkhQl517ZU=;
- b=mE7LjRH4vBWgFqiqDPEHhkLWiyhh6ZGKXpn5O6cwryvB0gsUCw4N6SPwoKoxZQ4mZq
- K76BWfhl9gBaFIP6Fnw8DU7tuoNxKJX/uqpWlQTjujwdTFiP/XJNFUybOEaC8Yhyz53k
- VgFCkODI9pI43FtQKO41jm+IQWgTA1qc2JRn+Rs0Tt2tq4CvtBXtJj9nt1JVhzCe0a7o
- 3svsJNgtjYHteUYJWRQG1+BqYmZDkH8eVlFAMq3tmPmFWNO8seQFfMHDyjuIv9Gu56cb
- YrxWd7Ib/PiYpXxyYXcQmaOsPyI10Jc3rjqN2WnN34jpoTy3PkgcfjK24ODwhIXP64e9
- q32Q==
-X-Gm-Message-State: APjAAAVVPyGp2V0eYTTcjSj3zbv8HoR9+3w7uWZ2mcTSzNYup4qfghiN
- wYZ2oMZ4DxvfiI6LaaCQCAOsYjEbgvPLErfWUGK7sX5OuUFybLsmLItKLtsvZDWuBw9zBEiBsUa
- pugNLfDRb7ZuD8do=
-X-Received: by 2002:aed:3c67:: with SMTP id u36mr10296162qte.142.1572126768036; 
- Sat, 26 Oct 2019 14:52:48 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqxbYJmyL89+EriRcJtmaK7c0yit0OyMYeO+9vkjvtrWpYZTsVxfCRKk1HZnGhkK9TIxmawGFQ==
-X-Received: by 2002:aed:3c67:: with SMTP id u36mr10296153qte.142.1572126767842; 
- Sat, 26 Oct 2019 14:52:47 -0700 (PDT)
-Received: from redhat.com (bzq-79-176-10-77.red.bezeqint.net. [79.176.10.77])
- by smtp.gmail.com with ESMTPSA id
- x8sm3484675qkx.77.2019.10.26.14.52.45
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sat, 26 Oct 2019 14:52:47 -0700 (PDT)
-Date: Sat, 26 Oct 2019 17:52:43 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
+ (envelope-from <berto@igalia.com>) id 1iOTZi-0005MT-Fo
+ for qemu-devel@nongnu.org; Sat, 26 Oct 2019 17:26:19 -0400
+Received: from fanzine.igalia.com ([178.60.130.6]:42506)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <berto@igalia.com>)
+ id 1iOTZg-0005Ez-9F; Sat, 26 Oct 2019 17:26:17 -0400
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=igalia.com;
+ s=20170329; 
+ h=Content-Transfer-Encoding:MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From;
+ bh=XEHEvrfcsTX6rTQlJxWyEBBrm+2ho4FOc5MlDoGNc74=; 
+ b=qWUk+kvBkREm/977gysMGaD02BlQBPUaPBN3JT1v2rQP2o1y+7H6Ud5GwgIsX56Rr7f+B/sqxyQ/HQBC6/8N/AKm8RwY0MIU4lNefM5cwdA4Yu4bJ4M0LIoilB9NHBduac2FMzmc89SbHIyqHz0okNxAkuAzTCMYC4HEJwGgw0ZBxw7lstM04l00TLADGT6op3NkEaohpYqVxkvSMW0eHw+CrMOuA6Rbfy6j1UXlwbUJN5czqRlScyhC86rwpmTOXZTn8Hx9qdMWSPdINEvvNerTSsj/F3iosJtz+HNTgb8m/JrHLFE0rcSYh3y0IR+a16s+BbX9PmOPWUqIrYwRTQ==;
+Received: from 87-100-137-117.bb.dnainternet.fi ([87.100.137.117]
+ helo=perseus.local) by fanzine.igalia.com with esmtpsa 
+ (Cipher TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim)
+ id 1iOTZI-00045j-Jv; Sat, 26 Oct 2019 23:25:52 +0200
+Received: from berto by perseus.local with local (Exim 4.92)
+ (envelope-from <berto@igalia.com>)
+ id 1iOTZ0-0001P2-12; Sun, 27 Oct 2019 00:25:34 +0300
+From: Alberto Garcia <berto@igalia.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 18/25] libqos: add iteration support to qpci_find_capability()
-Message-ID: <20191026193824.11926-19-mst@redhat.com>
-References: <20191026193824.11926-1-mst@redhat.com>
+Subject: [RFC PATCH v2 01/26] qcow2: Add calculate_l2_meta()
+Date: Sun, 27 Oct 2019 00:25:03 +0300
+Message-Id: <22820af5867124e4fdf3d0cb74b99f31edc1b37f.1572125022.git.berto@igalia.com>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <cover.1572125022.git.berto@igalia.com>
+References: <cover.1572125022.git.berto@igalia.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20191026193824.11926-1-mst@redhat.com>
-X-Mailer: git-send-email 2.22.0.678.g13338e74b8
-X-Mutt-Fcc: =sent
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.132.183.28
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x (no
+ timestamps) [generic] [fuzzy]
+X-Received-From: 178.60.130.6
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,117 +71,126 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>,
- Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>,
- Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, Anton Nefedov <anton.nefedov@virtuozzo.com>,
+ Alberto Garcia <berto@igalia.com>, qemu-block@nongnu.org,
+ Max Reitz <mreitz@redhat.com>,
+ Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ "Denis V . Lunev" <den@openvz.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Stefan Hajnoczi <stefanha@redhat.com>
+handle_alloc() creates a QCowL2Meta structure in order to update the
+image metadata and perform the necessary copy-on-write operations.
 
-VIRTIO 1.0 PCI devices have multiple PCI_CAP_ID_VNDR capabilities so we
-need a way to iterate over them.  Extend qpci_find_capability() to take
-the last address.
+This patch moves that code to a separate function so it can be used
+from other places.
 
-Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
-Reviewed-by: Thomas Huth <thuth@redhat.com>
---
-v3:
- * Document qpci_find_capability()
-Message-Id: <20191023100425.12168-11-stefanha@redhat.com>
-Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
-Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+Signed-off-by: Alberto Garcia <berto@igalia.com>
 ---
- tests/libqos/pci.c | 30 ++++++++++++++++++++++++------
- tests/libqos/pci.h |  2 +-
- 2 files changed, 25 insertions(+), 7 deletions(-)
+ block/qcow2-cluster.c | 76 +++++++++++++++++++++++++++++--------------
+ 1 file changed, 52 insertions(+), 24 deletions(-)
 
-diff --git a/tests/libqos/pci.c b/tests/libqos/pci.c
-index 662ee7a517..2309a724e4 100644
---- a/tests/libqos/pci.c
-+++ b/tests/libqos/pci.c
-@@ -115,10 +115,28 @@ void qpci_device_enable(QPCIDevice *dev)
-     g_assert_cmphex(cmd & PCI_COMMAND_MASTER, ==, PCI_COMMAND_MASTER);
+diff --git a/block/qcow2-cluster.c b/block/qcow2-cluster.c
+index 8982b7b762..6c1dcdc781 100644
+--- a/block/qcow2-cluster.c
++++ b/block/qcow2-cluster.c
+@@ -1019,6 +1019,55 @@ void qcow2_alloc_cluster_abort(BlockDriverState *bs, QCowL2Meta *m)
+                         QCOW2_DISCARD_NEVER);
  }
  
--uint8_t qpci_find_capability(QPCIDevice *dev, uint8_t id)
-+/**
-+ * qpci_find_capability:
-+ * @dev: the PCI device
-+ * @id: the PCI Capability ID (PCI_CAP_ID_*)
-+ * @start_addr: 0 to begin iteration or the last return value to continue
-+ *              iteration
++/*
++ * For a given write request, create a new QCowL2Meta structure and
++ * add it to @m.
 + *
-+ * Iterate over the PCI Capabilities List.
++ * @host_offset points to the beginning of the first cluster.
 + *
-+ * Returns: PCI Configuration Space offset of the capabililty structure or
-+ *          0 if no further matching capability is found
++ * @guest_offset and @bytes indicate the offset and length of the
++ * request.
++ *
++ * If @keep_old is true it means that the clusters were already
++ * allocated and will be overwritten. If false then the clusters are
++ * new and we have to decrease the reference count of the old ones.
 + */
-+uint8_t qpci_find_capability(QPCIDevice *dev, uint8_t id, uint8_t start_addr)
- {
-     uint8_t cap;
--    uint8_t addr = qpci_config_readb(dev, PCI_CAPABILITY_LIST);
-+    uint8_t addr;
++static void calculate_l2_meta(BlockDriverState *bs, uint64_t host_offset,
++                              uint64_t guest_offset, uint64_t bytes,
++                              QCowL2Meta **m, bool keep_old)
++{
++    BDRVQcow2State *s = bs->opaque;
++    unsigned cow_start_from = 0;
++    unsigned cow_start_to = offset_into_cluster(s, guest_offset);
++    unsigned cow_end_from = cow_start_to + bytes;
++    unsigned cow_end_to = ROUND_UP(cow_end_from, s->cluster_size);
++    unsigned nb_clusters = size_to_clusters(s, cow_end_from);
++    QCowL2Meta *old_m = *m;
 +
-+    if (start_addr) {
-+        addr = qpci_config_readb(dev, start_addr + PCI_CAP_LIST_NEXT);
-+    } else {
-+        addr = qpci_config_readb(dev, PCI_CAPABILITY_LIST);
-+    }
++    *m = g_malloc0(sizeof(**m));
++    **m = (QCowL2Meta) {
++        .next           = old_m,
++
++        .alloc_offset   = host_offset,
++        .offset         = start_of_cluster(s, guest_offset),
++        .nb_clusters    = nb_clusters,
++
++        .keep_old_clusters = keep_old,
++
++        .cow_start = {
++            .offset     = cow_start_from,
++            .nb_bytes   = cow_start_to - cow_start_from,
++        },
++        .cow_end = {
++            .offset     = cow_end_from,
++            .nb_bytes   = cow_end_to - cow_end_from,
++        },
++    };
++
++    qemu_co_queue_init(&(*m)->dependent_requests);
++    QLIST_INSERT_HEAD(&s->cluster_allocs, *m, next_in_flight);
++}
++
+ /*
+  * Returns the number of contiguous clusters that can be used for an allocating
+  * write, but require COW to be performed (this includes yet unallocated space,
+@@ -1417,35 +1466,14 @@ static int handle_alloc(BlockDriverState *bs, uint64_t guest_offset,
+     uint64_t requested_bytes = *bytes + offset_into_cluster(s, guest_offset);
+     int avail_bytes = nb_clusters << s->cluster_bits;
+     int nb_bytes = MIN(requested_bytes, avail_bytes);
+-    QCowL2Meta *old_m = *m;
+-
+-    *m = g_malloc0(sizeof(**m));
+-
+-    **m = (QCowL2Meta) {
+-        .next           = old_m,
+-
+-        .alloc_offset   = alloc_cluster_offset,
+-        .offset         = start_of_cluster(s, guest_offset),
+-        .nb_clusters    = nb_clusters,
+-
+-        .keep_old_clusters  = keep_old_clusters,
+-
+-        .cow_start = {
+-            .offset     = 0,
+-            .nb_bytes   = offset_into_cluster(s, guest_offset),
+-        },
+-        .cow_end = {
+-            .offset     = nb_bytes,
+-            .nb_bytes   = avail_bytes - nb_bytes,
+-        },
+-    };
+-    qemu_co_queue_init(&(*m)->dependent_requests);
+-    QLIST_INSERT_HEAD(&s->cluster_allocs, *m, next_in_flight);
  
-     do {
-         cap = qpci_config_readb(dev, addr);
-@@ -138,7 +156,7 @@ void qpci_msix_enable(QPCIDevice *dev)
-     uint8_t bir_table;
-     uint8_t bir_pba;
+     *host_offset = alloc_cluster_offset + offset_into_cluster(s, guest_offset);
+     *bytes = MIN(*bytes, nb_bytes - offset_into_cluster(s, guest_offset));
+     assert(*bytes != 0);
  
--    addr = qpci_find_capability(dev, PCI_CAP_ID_MSIX);
-+    addr = qpci_find_capability(dev, PCI_CAP_ID_MSIX, 0);
-     g_assert_cmphex(addr, !=, 0);
++    calculate_l2_meta(bs, alloc_cluster_offset, guest_offset, *bytes,
++                      m, keep_old_clusters);
++
+     return 1;
  
-     val = qpci_config_readw(dev, addr + PCI_MSIX_FLAGS);
-@@ -167,7 +185,7 @@ void qpci_msix_disable(QPCIDevice *dev)
-     uint16_t val;
- 
-     g_assert(dev->msix_enabled);
--    addr = qpci_find_capability(dev, PCI_CAP_ID_MSIX);
-+    addr = qpci_find_capability(dev, PCI_CAP_ID_MSIX, 0);
-     g_assert_cmphex(addr, !=, 0);
-     val = qpci_config_readw(dev, addr + PCI_MSIX_FLAGS);
-     qpci_config_writew(dev, addr + PCI_MSIX_FLAGS,
-@@ -203,7 +221,7 @@ bool qpci_msix_masked(QPCIDevice *dev, uint16_t entry)
-     uint64_t vector_off = dev->msix_table_off + entry * PCI_MSIX_ENTRY_SIZE;
- 
-     g_assert(dev->msix_enabled);
--    addr = qpci_find_capability(dev, PCI_CAP_ID_MSIX);
-+    addr = qpci_find_capability(dev, PCI_CAP_ID_MSIX, 0);
-     g_assert_cmphex(addr, !=, 0);
-     val = qpci_config_readw(dev, addr + PCI_MSIX_FLAGS);
- 
-@@ -221,7 +239,7 @@ uint16_t qpci_msix_table_size(QPCIDevice *dev)
-     uint8_t addr;
-     uint16_t control;
- 
--    addr = qpci_find_capability(dev, PCI_CAP_ID_MSIX);
-+    addr = qpci_find_capability(dev, PCI_CAP_ID_MSIX, 0);
-     g_assert_cmphex(addr, !=, 0);
- 
-     control = qpci_config_readw(dev, addr + PCI_MSIX_FLAGS);
-diff --git a/tests/libqos/pci.h b/tests/libqos/pci.h
-index a5389a5845..590c175190 100644
---- a/tests/libqos/pci.h
-+++ b/tests/libqos/pci.h
-@@ -86,7 +86,7 @@ bool qpci_has_buggy_msi(QPCIDevice *dev);
- bool qpci_check_buggy_msi(QPCIDevice *dev);
- 
- void qpci_device_enable(QPCIDevice *dev);
--uint8_t qpci_find_capability(QPCIDevice *dev, uint8_t id);
-+uint8_t qpci_find_capability(QPCIDevice *dev, uint8_t id, uint8_t start_addr);
- void qpci_msix_enable(QPCIDevice *dev);
- void qpci_msix_disable(QPCIDevice *dev);
- bool qpci_msix_pending(QPCIDevice *dev, uint16_t entry);
+ fail:
 -- 
-MST
+2.20.1
 
 
