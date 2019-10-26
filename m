@@ -4,56 +4,61 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1D613CA9EA0
-	for <qemu-devel@archiver.kernel.org>; Sat, 26 Oct 2019 01:28:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 38AA8CA9EA0
+	for <qemu-devel@archiver.kernel.org>; Sat, 26 Oct 2019 03:27:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E11CC21D7B
-	for <qemu-devel@archiver.kernel.org>; Sat, 26 Oct 2019 01:28:24 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E11CC21D7B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id 09F9721872
+	for <qemu-devel@archiver.kernel.org>; Sat, 26 Oct 2019 03:27:26 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 09F9721872
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37834 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38136 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iOAsS-00082o-4s
-	for qemu-devel@archiver.kernel.org; Fri, 25 Oct 2019 21:28:24 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55005)
+	id 1iOCjd-0005pK-Fd
+	for qemu-devel@archiver.kernel.org; Fri, 25 Oct 2019 23:27:25 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34234)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richardw.yang@linux.intel.com>) id 1iOADF-0002ez-0C
- for qemu-devel@nongnu.org; Fri, 25 Oct 2019 20:45:49 -0400
+ (envelope-from <zhengxiang9@huawei.com>) id 1iOCho-0002Sb-Hn
+ for qemu-devel@nongnu.org; Fri, 25 Oct 2019 23:25:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richardw.yang@linux.intel.com>) id 1iOADD-0004m0-J6
- for qemu-devel@nongnu.org; Fri, 25 Oct 2019 20:45:48 -0400
-Received: from mga01.intel.com ([192.55.52.88]:5552)
+ (envelope-from <zhengxiang9@huawei.com>) id 1iOChn-0004hp-3v
+ for qemu-devel@nongnu.org; Fri, 25 Oct 2019 23:25:32 -0400
+Received: from szxga06-in.huawei.com ([45.249.212.32]:49870 helo=huawei.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <richardw.yang@linux.intel.com>)
- id 1iOADD-0004k9-BW
- for qemu-devel@nongnu.org; Fri, 25 Oct 2019 20:45:47 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga003.fm.intel.com ([10.253.24.29])
- by fmsmga101.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
- 25 Oct 2019 17:45:47 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.68,230,1569308400"; d="scan'208";a="204705113"
-Received: from richard.sh.intel.com (HELO localhost) ([10.239.159.54])
- by FMSMGA003.fm.intel.com with ESMTP; 25 Oct 2019 17:45:46 -0700
-From: Wei Yang <richardw.yang@linux.intel.com>
-To: quintela@redhat.com,
-	dgilbert@redhat.com
-Subject: [PATCH v2 4/6] migration/multifd: used must not be 0 for a pending job
-Date: Sat, 26 Oct 2019 08:45:18 +0800
-Message-Id: <20191026004520.5515-5-richardw.yang@linux.intel.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20191026004520.5515-1-richardw.yang@linux.intel.com>
-References: <20191026004520.5515-1-richardw.yang@linux.intel.com>
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 192.55.52.88
+ (Exim 4.71) (envelope-from <zhengxiang9@huawei.com>)
+ id 1iOChh-0004cF-CI; Fri, 25 Oct 2019 23:25:25 -0400
+Received: from DGGEMS408-HUB.china.huawei.com (unknown [172.30.72.58])
+ by Forcepoint Email with ESMTP id 6E7ECAA8A3404B96ADC1;
+ Sat, 26 Oct 2019 11:25:22 +0800 (CST)
+Received: from HGHY4Z004218071.china.huawei.com (10.133.224.57) by
+ DGGEMS408-HUB.china.huawei.com (10.3.19.208) with Microsoft SMTP Server id
+ 14.3.439.0; Sat, 26 Oct 2019 11:25:12 +0800
+From: Xiang Zheng <zhengxiang9@huawei.com>
+To: <pbonzini@redhat.com>, <mst@redhat.com>, <imammedo@redhat.com>,
+ <shannon.zhaosl@gmail.com>, <peter.maydell@linaro.org>, <lersek@redhat.com>,
+ <james.morse@arm.com>, <gengdongjiu@huawei.com>, <mtosatti@redhat.com>,
+ <rth@twiddle.net>, <ehabkost@redhat.com>, <jonathan.cameron@huawei.com>,
+ <xuwei5@huawei.com>, <kvm@vger.kernel.org>, <qemu-devel@nongnu.org>,
+ <qemu-arm@nongnu.org>, <linuxarm@huawei.com>
+Subject: [PATCH v20 2/5] docs: APEI GHES generation and CPER record description
+Date: Sat, 26 Oct 2019 11:24:44 +0800
+Message-ID: <20191026032447.20088-3-zhengxiang9@huawei.com>
+X-Mailer: git-send-email 2.15.1.windows.2
+In-Reply-To: <20191026032447.20088-1-zhengxiang9@huawei.com>
+References: <20191026032447.20088-1-zhengxiang9@huawei.com>
+MIME-Version: 1.0
+Content-Type: text/plain
+X-Originating-IP: [10.133.224.57]
+X-CFilter-Loop: Reflected
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 45.249.212.32
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -65,42 +70,135 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org, Wei Yang <richardw.yang@linux.intel.com>
+Cc: wanghaibin.wang@huawei.com, zhengxiang9@huawei.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-After thread synchronization request is handled in another case, this
-means when we only get pending_job when there is used pages.
+From: Dongjiu Geng <gengdongjiu@huawei.com>
 
-Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
+Add APEI/GHES detailed design document
+
+Signed-off-by: Dongjiu Geng <gengdongjiu@huawei.com>
+Signed-off-by: Xiang Zheng <zhengxiang9@huawei.com>
 ---
- migration/ram.c | 11 +++++------
- 1 file changed, 5 insertions(+), 6 deletions(-)
+ docs/specs/acpi_hest_ghes.rst | 95 +++++++++++++++++++++++++++++++++++
+ docs/specs/index.rst          |  1 +
+ 2 files changed, 96 insertions(+)
+ create mode 100644 docs/specs/acpi_hest_ghes.rst
 
-diff --git a/migration/ram.c b/migration/ram.c
-index 62072b7a35..12c270e86d 100644
---- a/migration/ram.c
-+++ b/migration/ram.c
-@@ -1132,12 +1132,11 @@ static void *multifd_send_thread(void *opaque)
-                 break;
-             }
- 
--            if (used) {
--                ret = qio_channel_writev_all(p->c, p->pages->iov,
--                                             used, &local_err);
--                if (ret != 0) {
--                    break;
--                }
-+            assert(used);
-+            ret = qio_channel_writev_all(p->c, p->pages->iov,
-+                                         used, &local_err);
-+            if (ret != 0) {
-+                break;
-             }
- 
-             qemu_mutex_lock(&p->mutex);
+diff --git a/docs/specs/acpi_hest_ghes.rst b/docs/specs/acpi_hest_ghes.rst
+new file mode 100644
+index 0000000000..348825f9d3
+--- /dev/null
++++ b/docs/specs/acpi_hest_ghes.rst
+@@ -0,0 +1,95 @@
++APEI tables generating and CPER record
++======================================
++
++..
++   Copyright (c) 2019 HUAWEI TECHNOLOGIES CO., LTD.
++
++   This work is licensed under the terms of the GNU GPL, version 2 or later.
++   See the COPYING file in the top-level directory.
++
++Design Details
++--------------
++
++::
++
++         etc/acpi/tables                                 etc/hardware_errors
++      ====================                      ==========================================
++  + +--------------------------+            +-----------------------+
++  | | HEST                     |            |    address            |            +--------------+
++  | +--------------------------+            |    registers          |            | Error Status |
++  | | GHES1                    |            | +---------------------+            | Data Block 1 |
++  | +--------------------------+ +--------->| |error_block_address1 |----------->| +------------+
++  | | .................        | |          | +---------------------+            | |  CPER      |
++  | | error_status_address-----+-+ +------->| |error_block_address2 |--------+   | |  CPER      |
++  | | .................        |   |        | +---------------------+        |   | |  ....      |
++  | | read_ack_register--------+-+ |        | |    ..............   |        |   | |  CPER      |
++  | | read_ack_preserve        | | |        +-----------------------+        |   | +------------+
++  | | read_ack_write           | | | +----->| |error_block_addressN |------+ |   | Error Status |
++  + +--------------------------+ | | |      | +---------------------+      | |   | Data Block 2 |
++  | | GHES2                    | +-+-+----->| |read_ack_register1   |      | +-->| +------------+
++  + +--------------------------+   | |      | +---------------------+      |     | |  CPER      |
++  | | .................        |   | | +--->| |read_ack_register2   |      |     | |  CPER      |
++  | | error_status_address-----+---+ | |    | +---------------------+      |     | |  ....      |
++  | | .................        |     | |    | |  .............      |      |     | |  CPER      |
++  | | read_ack_register--------+-----+-+    | +---------------------+      |     +-+------------+
++  | | read_ack_preserve        |     |   +->| |read_ack_registerN   |      |     | |..........  |
++  | | read_ack_write           |     |   |  | +---------------------+      |     | +------------+
++  + +--------------------------|     |   |                                 |     | Error Status |
++  | | ...............          |     |   |                                 |     | Data Block N |
++  + +--------------------------+     |   |                                 +---->| +------------+
++  | | GHESN                    |     |   |                                       | |  CPER      |
++  + +--------------------------+     |   |                                       | |  CPER      |
++  | | .................        |     |   |                                       | |  ....      |
++  | | error_status_address-----+-----+   |                                       | |  CPER      |
++  | | .................        |         |                                       +-+------------+
++  | | read_ack_register--------+---------+
++  | | read_ack_preserve        |
++  | | read_ack_write           |
++  + +--------------------------+
++
++(1) QEMU generates the ACPI HEST table. This table goes in the current
++    "etc/acpi/tables" fw_cfg blob. Each error source has different
++    notification types.
++
++(2) A new fw_cfg blob called "etc/hardware_errors" is introduced. QEMU
++    also needs to populate this blob. The "etc/hardware_errors" fw_cfg blob
++    contains an address registers table and an Error Status Data Block table.
++
++(3) The address registers table contains N Error Block Address entries
++    and N Read Ack Register entries. The size for each entry is 8-byte.
++    The Error Status Data Block table contains N Error Status Data Block
++    entries. The size for each entry is 4096(0x1000) bytes. The total size
++    for the "etc/hardware_errors" fw_cfg blob is (N * 8 * 2 + N * 4096) bytes.
++    N is the number of the kinds of hardware error sources.
++
++(4) QEMU generates the ACPI linker/loader script for the firmware. The
++    firmware pre-allocates memory for "etc/acpi/tables", "etc/hardware_errors"
++    and copies blob contents there.
++
++(5) QEMU generates N ADD_POINTER commands, which patch addresses in the
++    "error_status_address" fields of the HEST table with a pointer to the
++    corresponding "address registers" in the "etc/hardware_errors" blob.
++
++(6) QEMU generates N ADD_POINTER commands, which patch addresses in the
++    "read_ack_register" fields of the HEST table with a pointer to the
++    corresponding "address registers" in the "etc/hardware_errors" blob.
++
++(7) QEMU generates N ADD_POINTER commands for the firmware, which patch
++    addresses in the "error_block_address" fields with a pointer to the
++    respective "Error Status Data Block" in the "etc/hardware_errors" blob.
++
++(8) QEMU defines a third and write-only fw_cfg blob which is called
++    "etc/hardware_errors_addr". Through that blob, the firmware can send back
++    the guest-side allocation addresses to QEMU. The "etc/hardware_errors_addr"
++    blob contains a 8-byte entry. QEMU generates a single WRITE_POINTER command
++    for the firmware. The firmware will write back the start address of
++    "etc/hardware_errors" blob to the fw_cfg file "etc/hardware_errors_addr".
++
++(9) When QEMU gets a SIGBUS from the kernel, QEMU formats the CPER right into
++    guest memory, and then injects platform specific interrupt (in case of
++    arm/virt machine it's Synchronous External Abort) as a notification which
++    is necessary for notifying the guest.
++
++(10) This notification (in virtual hardware) will be handled by the guest
++     kernel, guest APEI driver will read the CPER which is recorded by QEMU and
++     do the recovery.
+diff --git a/docs/specs/index.rst b/docs/specs/index.rst
+index 984ba44029..3019b9c976 100644
+--- a/docs/specs/index.rst
++++ b/docs/specs/index.rst
+@@ -13,3 +13,4 @@ Contents:
+    ppc-xive
+    ppc-spapr-xive
+    acpi_hw_reduced_hotplug
++   acpi_hest_ghes
 -- 
-2.17.1
+2.19.1
+
 
 
