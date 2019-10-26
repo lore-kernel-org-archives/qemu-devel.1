@@ -6,66 +6,67 @@ X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 519B3CA9EB9
-	for <qemu-devel@archiver.kernel.org>; Sat, 26 Oct 2019 16:54:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 73B6BCA9EB9
+	for <qemu-devel@archiver.kernel.org>; Sat, 26 Oct 2019 16:55:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0AC442070B
-	for <qemu-devel@archiver.kernel.org>; Sat, 26 Oct 2019 16:54:42 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0AC442070B
+	by mail.kernel.org (Postfix) with ESMTPS id 371292070B
+	for <qemu-devel@archiver.kernel.org>; Sat, 26 Oct 2019 16:55:01 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 371292070B
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40890 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40894 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iOPKr-00040E-5e
-	for qemu-devel@archiver.kernel.org; Sat, 26 Oct 2019 12:54:41 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:32981)
+	id 1iOPLA-0005Vx-At
+	for qemu-devel@archiver.kernel.org; Sat, 26 Oct 2019 12:55:00 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:32969)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <laurent@vivier.eu>) id 1iOPD2-0003LM-N9
- for qemu-devel@nongnu.org; Sat, 26 Oct 2019 12:46:39 -0400
+ (envelope-from <laurent@vivier.eu>) id 1iOPD1-0003GF-4w
+ for qemu-devel@nongnu.org; Sat, 26 Oct 2019 12:46:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <laurent@vivier.eu>) id 1iOPCz-0001E5-PN
- for qemu-devel@nongnu.org; Sat, 26 Oct 2019 12:46:36 -0400
-Received: from mout.kundenserver.de ([212.227.126.134]:54801)
+ (envelope-from <laurent@vivier.eu>) id 1iOPCy-0001Ck-JW
+ for qemu-devel@nongnu.org; Sat, 26 Oct 2019 12:46:35 -0400
+Received: from mout.kundenserver.de ([212.227.126.135]:40329)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <laurent@vivier.eu>)
- id 1iOPCv-00019M-2f; Sat, 26 Oct 2019 12:46:29 -0400
+ id 1iOPCy-0001Bq-6W; Sat, 26 Oct 2019 12:46:32 -0400
 Received: from localhost.localdomain ([78.238.229.36]) by
  mrelayeu.kundenserver.de (mreue009 [212.227.15.167]) with ESMTPSA (Nemesis)
- id 1MBltM-1iGfRX2Ivc-00C7xi; Sat, 26 Oct 2019 18:45:56 +0200
+ id 1M7sQ6-1iKXaY274E-004zLY; Sat, 26 Oct 2019 18:46:05 +0200
 From: Laurent Vivier <laurent@vivier.eu>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v15 03/11] esp: add pseudo-DMA as used by Macintosh
-Date: Sat, 26 Oct 2019 18:45:38 +0200
-Message-Id: <20191026164546.30020-4-laurent@vivier.eu>
+Subject: [PATCH v15 09/11] hw/m68k: add a dummy SWIM floppy controller
+Date: Sat, 26 Oct 2019 18:45:44 +0200
+Message-Id: <20191026164546.30020-10-laurent@vivier.eu>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20191026164546.30020-1-laurent@vivier.eu>
 References: <20191026164546.30020-1-laurent@vivier.eu>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:un7dwh8lY+wTFT2qZTagINt3GKFGF0NN7767wjC6GaoiALmqx4E
- f9c+9rSIZ6kH+YWdsFsWi9szr4IWpuGb9LIqepG2KzXrXnSkRQiGmTZr4WQPJzRdy5f/8nu
- vSsliZVj2jS6UayWaQ10xAnH8VA88v1+H0s9IsfbmYNPf6neDRfxC+S9DOsyjwyluMD4wI+
- DDrwnRdGMvoOipMSpwNRg==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:IRNgl60KmVI=:PzadbbT4Dz8jgsPcuhwjG6
- s749HEW6CZXyA6MPX+LJNmJQI1g31p6uHggZLSLjTjn1ZHjrqnjm3g8VlIEggq3gW/zzIRFHr
- vyc+vgolWxSCzIijhIdB+SLzXVaOfiQ5RfTLhxWr+XUHpgLuAJaLB5UnoaKVxynpDs9JBKrB7
- AynrF4urgf+VgOjjBVOwLlL/wUWjkGyOmZkLOMD2ThH2WxiTC6j2CAxQKCbZjh8PrMjCvwu/V
- 1N2bvi7eUDO1IOoYUaHa2qR1UaFJEV8GNANn/P0WlL38LqM2yLPCaZ0W1xnQymmJmEHgyYP5U
- OL/YwObv9Piuja7pJHgNyht+vJjSZqoWNTJWqnx9noxgHoNS9mVvFSnpp+JhLGOsqXsA7mEUm
- EPJnbeb9jrnH/IWcnURulb70uaD6m8o+r9ylpFK8Y2OrOyuAhvp+meWtDZ8ukFmR4hAjkAKnf
- D8q8vzjFp2dSPYFR8cwTL1jVAaW5tL+amzenB4lw3cxhcF+42B7PVqonn2K7+ZDnch9ZdLRJE
- d9XnaNqTfFaM+ekWCDMpHYE2STlZmOcM1dMgTcYTxli8frxczVS7KJMYbdmB54QlJ8xod2w+B
- bXon9l8dgEH5T5Zb/+PausG2Z9LdmsPwL8I5OiyuDmI7e3saZbScwNX2y3kWm+xmPg4yTJ4Up
- LdCMd866aUpnHAX/9OhyHiTos5vrK83gjCYgAq2Fj3P0FADmayHCDG3oujKpbwsx/S93h/jQO
- 5ro3UIx7EHvlJlwCqfXY3BKAG4OFWkguqH37HJjOm8rm3PFRvzUKkX878T/hFwVlGzhpgO42J
- GPxNPa3Idi0g9mFkaKflTZ0Ddhht6yWY20CESqzDgSu1LPIPLtM+3FRRJJenqwnlQkdFdb8Is
- dEqkna11jnrkH+VrW4Wg==
+X-Provags-ID: V03:K1:uLo4+5E8VM/AM8R7/BuMPxyJpiZlB8AODcfKICdBuTZwiy3y73Z
+ z0FmVDT9KHEW+qywBUVz7Vph3uwPYaxLU0fsy9QgtBHPDyWrReKJf6g5/hVyRXrjSw+SjmR
+ QAF21h/JBadVSxrortMPJcQDLJ9nuVLz1hi66+WuLDyi2IHgwG8jDILaXAjRese0HctHMKn
+ WxXRMU0A375SXcfn0iNVg==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:adfP/+Ru4hU=:D5b/0fXGEMfoGuvovos/PQ
+ f/xQwziUoWe7oJ3uVmWkz0vVt8MfZGblZyIXYa/Ed2aaan4xE1vAjlShne7BPVpn6XYqJcL8b
+ dw/hVnMmSrIHmpOT7scdmn46Y1otjQmpc8q9odd9knld2DDh8KCkGW9NM8iaTD4til1pMpCP2
+ MqeBmFFmkUk/kCja08AMhh3rZiT3/t/0+NLEvb3iJEd6Qs45g55Gu+bagKCnzkkZDZRg0YAo0
+ 9UD9YTFGXPxKTmmSidB/NrLILHnw699gS7XStjAmANUOGtSrTO7oGukGwvyP0p5AaKM57+Rm/
+ p6Ki/I+dhe1x1YSzjUNHp4CsgT3VaIAz2pz/qDCfcphRP2JJHNlIjmGEyURvJ5QkHXaKYcdi1
+ v/dyXG0MMQ5aFaGjE2SCzxpw5sJhZUsQSsaMuk1sQyviLdRElcLm700VxpWvbWCCFZk2w/mn5
+ DX3rg6FE6x0OkA/kK/JO8sbaq0kLKwX/bLgaZXlUspns2Cwn7o+cwiZgDUR7N8O+wHwfCaWys
+ Hs7mNH9iu8je++WPBHVVGvVKe0baGuUO5FlFoZ/2aNxoflhxWKMB6+GAxmSu3RivZPaOUyzjk
+ ahGK+Jdiu6PJl5mZQBCLe/xTiV9joPaI2uqYQ+kmf5BLHXcjD+fYvNNEhb3R19V7qpnvicDjc
+ rfoXm+gj7DzzA2PJWhhdEdifkwmu5rlGC28w+vYNYDXhEUuY8M2I/kWuoaGtAg4QxIKQhpPuD
+ 07UNlVjOQaV8DeG1JVFabyVp5KfBEL8mhNE8XFEw2stx/DEDW3xwz1CtHfpETnWmBBJE+SlA8
+ JBxjPuc1qQWqIIHyd3pd0wrNAkxjTGwViK3aYU6P3Urwpvt3XHXITvq9yQNZ7e9wjO1C3zAQp
+ XowwTzhPO/d61thMl3VrsFFZpnv2aDAnDSJb2FVZo=
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 212.227.126.134
+X-Received-From: 212.227.126.135
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -93,506 +94,655 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-There is no DMA in Quadra 800, so the CPU reads/writes the data from the
-PDMA register (offset 0x100, ESP_PDMA in hw/m68k/q800.c) and copies them
-to/from the memory.
+SWIM (Sander-Wozniak Integrated Machine) is the floppy controller of
+the 680x0 Macintosh.
 
-There is a nice assembly loop in the kernel to do that, see
-linux/drivers/scsi/mac_esp.c:MAC_ESP_PDMA_LOOP().
+This patch introduces only the basic support: it allows to switch from
+IWM (Integrated WOZ Machine) mode to the SWIM mode and makes the linux
+driver happy.
 
-The start of the transfer is triggered by the DREQ interrupt (see linux
-mac_esp_send_pdma_cmd()), the CPU polls on the IRQ flag to start the
-transfer after a SCSI command has been sent (in Quadra 800 it goes
-through the VIA2, the via2-irq line and the vIFR register)
+It cannot read any floppy image.
 
-The Macintosh hardware includes hardware handshaking to prevent the CPU
-from reading invalid data or writing data faster than the peripheral
-device can accept it.
-
-This is the "blind mode", and from the doc:
-"Approximate maximum SCSI transfer rates within a blocks are 1.4 MB per
-second for blind transfers in the Macintosh II"
-
-Some references can be found in:
-  Apple Macintosh Family Hardware Reference, ISBN 0-201-19255-1
-  Guide to the Macintosh Family Hardware, ISBN-0-201-52405-8
-
-Acked-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 Co-developed-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 Signed-off-by: Laurent Vivier <laurent@vivier.eu>
+Reviewed-by: Hervé Poussineau <hpoussin@reactos.org>
 ---
- include/hw/scsi/esp.h |  15 +++
- hw/scsi/esp.c         | 278 ++++++++++++++++++++++++++++++++++++++++--
- 2 files changed, 284 insertions(+), 9 deletions(-)
+ include/hw/block/swim.h |  76 +++++++
+ hw/block/swim.c         | 489 ++++++++++++++++++++++++++++++++++++++++
+ MAINTAINERS             |   2 +
+ hw/block/Kconfig        |   3 +
+ hw/block/Makefile.objs  |   1 +
+ hw/m68k/Kconfig         |   1 +
+ 6 files changed, 572 insertions(+)
+ create mode 100644 include/hw/block/swim.h
+ create mode 100644 hw/block/swim.c
 
-diff --git a/include/hw/scsi/esp.h b/include/hw/scsi/esp.h
-index adab63d1c9..6ba47dac41 100644
---- a/include/hw/scsi/esp.h
-+++ b/include/hw/scsi/esp.h
-@@ -14,10 +14,18 @@ typedef void (*ESPDMAMemoryReadWriteFunc)(void *opaque, uint8_t *buf, int len);
- 
- typedef struct ESPState ESPState;
- 
-+enum pdma_origin_id {
-+    PDMA,
-+    TI,
-+    CMD,
-+    ASYNC,
+diff --git a/include/hw/block/swim.h b/include/hw/block/swim.h
+new file mode 100644
+index 0000000000..6add3499d0
+--- /dev/null
++++ b/include/hw/block/swim.h
+@@ -0,0 +1,76 @@
++/*
++ * QEMU Macintosh floppy disk controller emulator (SWIM)
++ *
++ * Copyright (c) 2014-2018 Laurent Vivier <laurent@vivier.eu>
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2.  See
++ * the COPYING file in the top-level directory.
++ *
++ */
++
++#ifndef SWIM_H
++#define SWIM_H
++
++#include "qemu/osdep.h"
++#include "hw/sysbus.h"
++
++#define SWIM_MAX_FD            2
++
++typedef struct SWIMDrive SWIMDrive;
++typedef struct SWIMBus SWIMBus;
++typedef struct SWIMCtrl SWIMCtrl;
++
++#define TYPE_SWIM_DRIVE "swim-drive"
++#define SWIM_DRIVE(obj) OBJECT_CHECK(SWIMDrive, (obj), TYPE_SWIM_DRIVE)
++
++struct SWIMDrive {
++    DeviceState qdev;
++    int32_t     unit;
++    BlockConf   conf;
 +};
 +
- struct ESPState {
-     uint8_t rregs[ESP_REGS];
-     uint8_t wregs[ESP_REGS];
-     qemu_irq irq;
-+    qemu_irq irq_data;
-     uint8_t chip_id;
-     bool tchi_written;
-     int32_t ti_size;
-@@ -48,6 +56,12 @@ struct ESPState {
-     ESPDMAMemoryReadWriteFunc dma_memory_write;
-     void *dma_opaque;
-     void (*dma_cb)(ESPState *s);
-+    uint8_t pdma_buf[32];
-+    int pdma_origin;
-+    uint32_t pdma_len;
-+    uint32_t pdma_start;
-+    uint32_t pdma_cur;
-+    void (*pdma_cb)(ESPState *s);
- };
- 
- #define TYPE_ESP "esp"
-@@ -59,6 +73,7 @@ typedef struct {
-     /*< public >*/
- 
-     MemoryRegion iomem;
-+    MemoryRegion pdma;
-     uint32_t it_shift;
-     ESPState esp;
- } SysBusESPState;
-diff --git a/hw/scsi/esp.c b/hw/scsi/esp.c
-index 0230ede21d..f8fc30cccb 100644
---- a/hw/scsi/esp.c
-+++ b/hw/scsi/esp.c
-@@ -38,6 +38,8 @@
-  * http://www.ibiblio.org/pub/historic-linux/early-ports/Sparc/NCR/NCR89C100.txt
-  * and
-  * http://www.ibiblio.org/pub/historic-linux/early-ports/Sparc/NCR/NCR53C9X.txt
++#define TYPE_SWIM_BUS "swim-bus"
++#define SWIM_BUS(obj) OBJECT_CHECK(SWIMBus, (obj), TYPE_SWIM_BUS)
++
++struct SWIMBus {
++    BusState bus;
++    struct SWIMCtrl *ctrl;
++};
++
++typedef struct FDrive {
++    SWIMCtrl *swimctrl;
++    BlockBackend *blk;
++    BlockConf *conf;
++} FDrive;
++
++struct SWIMCtrl {
++    MemoryRegion iomem;
++    FDrive drives[SWIM_MAX_FD];
++    int mode;
++    /* IWM mode */
++    int iwm_switch;
++    uint16_t regs[8];
++#define IWM_PH0   0
++#define IWM_PH1   1
++#define IWM_PH2   2
++#define IWM_PH3   3
++#define IWM_MTR   4
++#define IWM_DRIVE 5
++#define IWM_Q6    6
++#define IWM_Q7    7
++    uint8_t iwm_data;
++    uint8_t iwm_mode;
++    /* SWIM mode */
++    uint8_t swim_phase;
++    uint8_t swim_mode;
++    SWIMBus bus;
++};
++
++#define TYPE_SWIM "swim"
++#define SWIM(obj) OBJECT_CHECK(SWIM, (obj), TYPE_SWIM)
++
++typedef struct SWIM {
++    SysBusDevice parent_obj;
++    SWIMCtrl     ctrl;
++} SWIM;
++#endif
+diff --git a/hw/block/swim.c b/hw/block/swim.c
+new file mode 100644
+index 0000000000..c6d117e89b
+--- /dev/null
++++ b/hw/block/swim.c
+@@ -0,0 +1,489 @@
++/*
++ * QEMU Macintosh floppy disk controller emulator (SWIM)
 + *
-+ * On Macintosh Quadra it is a NCR53C96.
-  */
- 
- static void esp_raise_irq(ESPState *s)
-@@ -58,6 +60,16 @@ static void esp_lower_irq(ESPState *s)
-     }
- }
- 
-+static void esp_raise_drq(ESPState *s)
++ * Copyright (c) 2014-2018 Laurent Vivier <laurent@vivier.eu>
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2.  See
++ * the COPYING file in the top-level directory.
++ *
++ * Only the basic support: it allows to switch from IWM (Integrated WOZ
++ * Machine) mode to the SWIM mode and makes the linux driver happy.
++ */
++
++#include "qemu/osdep.h"
++#include "qemu/main-loop.h"
++#include "qapi/error.h"
++#include "sysemu/block-backend.h"
++#include "hw/sysbus.h"
++#include "migration/vmstate.h"
++#include "hw/block/block.h"
++#include "hw/block/swim.h"
++#include "hw/qdev-properties.h"
++
++/* IWM registers */
++
++#define IWM_PH0L                0
++#define IWM_PH0H                1
++#define IWM_PH1L                2
++#define IWM_PH1H                3
++#define IWM_PH2L                4
++#define IWM_PH2H                5
++#define IWM_PH3L                6
++#define IWM_PH3H                7
++#define IWM_MTROFF              8
++#define IWM_MTRON               9
++#define IWM_INTDRIVE            10
++#define IWM_EXTDRIVE            11
++#define IWM_Q6L                 12
++#define IWM_Q6H                 13
++#define IWM_Q7L                 14
++#define IWM_Q7H                 15
++
++/* SWIM registers */
++
++#define SWIM_WRITE_DATA         0
++#define SWIM_WRITE_MARK         1
++#define SWIM_WRITE_CRC          2
++#define SWIM_WRITE_PARAMETER    3
++#define SWIM_WRITE_PHASE        4
++#define SWIM_WRITE_SETUP        5
++#define SWIM_WRITE_MODE0        6
++#define SWIM_WRITE_MODE1        7
++
++#define SWIM_READ_DATA          8
++#define SWIM_READ_MARK          9
++#define SWIM_READ_ERROR         10
++#define SWIM_READ_PARAMETER     11
++#define SWIM_READ_PHASE         12
++#define SWIM_READ_SETUP         13
++#define SWIM_READ_STATUS        14
++#define SWIM_READ_HANDSHAKE     15
++
++#define REG_SHIFT               9
++
++#define SWIM_MODE_IWM  0
++#define SWIM_MODE_SWIM 1
++
++/* bits in phase register */
++
++#define SWIM_SEEK_NEGATIVE   0x074
++#define SWIM_STEP            0x071
++#define SWIM_MOTOR_ON        0x072
++#define SWIM_MOTOR_OFF       0x076
++#define SWIM_INDEX           0x073
++#define SWIM_EJECT           0x077
++#define SWIM_SETMFM          0x171
++#define SWIM_SETGCR          0x175
++#define SWIM_RELAX           0x033
++#define SWIM_LSTRB           0x008
++#define SWIM_CA_MASK         0x077
++
++/* Select values for swim_select and swim_readbit */
++
++#define SWIM_READ_DATA_0     0x074
++#define SWIM_TWOMEG_DRIVE    0x075
++#define SWIM_SINGLE_SIDED    0x076
++#define SWIM_DRIVE_PRESENT   0x077
++#define SWIM_DISK_IN         0x170
++#define SWIM_WRITE_PROT      0x171
++#define SWIM_TRACK_ZERO      0x172
++#define SWIM_TACHO           0x173
++#define SWIM_READ_DATA_1     0x174
++#define SWIM_MFM_MODE        0x175
++#define SWIM_SEEK_COMPLETE   0x176
++#define SWIM_ONEMEG_MEDIA    0x177
++
++/* Bits in handshake register */
++
++#define SWIM_MARK_BYTE       0x01
++#define SWIM_CRC_ZERO        0x02
++#define SWIM_RDDATA          0x04
++#define SWIM_SENSE           0x08
++#define SWIM_MOTEN           0x10
++#define SWIM_ERROR           0x20
++#define SWIM_DAT2BYTE        0x40
++#define SWIM_DAT1BYTE        0x80
++
++/* bits in setup register */
++
++#define SWIM_S_INV_WDATA     0x01
++#define SWIM_S_3_5_SELECT    0x02
++#define SWIM_S_GCR           0x04
++#define SWIM_S_FCLK_DIV2     0x08
++#define SWIM_S_ERROR_CORR    0x10
++#define SWIM_S_IBM_DRIVE     0x20
++#define SWIM_S_GCR_WRITE     0x40
++#define SWIM_S_TIMEOUT       0x80
++
++/* bits in mode register */
++
++#define SWIM_CLFIFO          0x01
++#define SWIM_ENBL1           0x02
++#define SWIM_ENBL2           0x04
++#define SWIM_ACTION          0x08
++#define SWIM_WRITE_MODE      0x10
++#define SWIM_HEDSEL          0x20
++#define SWIM_MOTON           0x80
++
++static void fd_recalibrate(FDrive *drive)
 +{
-+    qemu_irq_raise(s->irq_data);
 +}
 +
-+static void esp_lower_drq(ESPState *s)
++static void swim_change_cb(void *opaque, bool load, Error **errp)
 +{
-+    qemu_irq_lower(s->irq_data);
-+}
++    FDrive *drive = opaque;
 +
- void esp_dma_enable(ESPState *s, int irq, int level)
- {
-     if (level) {
-@@ -84,6 +96,30 @@ void esp_request_cancelled(SCSIRequest *req)
-     }
- }
- 
-+static void set_pdma(ESPState *s, enum pdma_origin_id origin,
-+                     uint32_t index, uint32_t len)
-+{
-+    s->pdma_origin = origin;
-+    s->pdma_start = index;
-+    s->pdma_cur = index;
-+    s->pdma_len = len;
-+}
-+
-+static uint8_t *get_pdma_buf(ESPState *s)
-+{
-+    switch (s->pdma_origin) {
-+    case PDMA:
-+        return s->pdma_buf;
-+    case TI:
-+        return s->ti_buf;
-+    case CMD:
-+        return s->cmdbuf;
-+    case ASYNC:
-+        return s->async_buf;
-+    }
-+    return NULL;
-+}
-+
- static int get_cmd_cb(ESPState *s)
- {
-     int target;
-@@ -125,7 +161,14 @@ static uint32_t get_cmd(ESPState *s, uint8_t *buf, uint8_t buflen)
-         if (dmalen > buflen) {
-             return 0;
-         }
--        s->dma_memory_read(s->dma_opaque, buf, dmalen);
-+        if (s->dma_memory_read) {
-+            s->dma_memory_read(s->dma_opaque, buf, dmalen);
-+        } else {
-+            memcpy(s->pdma_buf, buf, dmalen);
-+            set_pdma(s, PDMA, 0, dmalen);
-+            esp_raise_drq(s);
-+            return 0;
-+        }
-     } else {
-         dmalen = s->ti_size;
-         if (dmalen > TI_BUFSZ) {
-@@ -177,6 +220,16 @@ static void do_cmd(ESPState *s, uint8_t *buf)
-     do_busid_cmd(s, &buf[1], busid);
- }
- 
-+static void satn_pdma_cb(ESPState *s)
-+{
-+    if (get_cmd_cb(s) < 0) {
-+        return;
-+    }
-+    if (s->pdma_cur != s->pdma_start) {
-+        do_cmd(s, get_pdma_buf(s) + s->pdma_start);
-+    }
-+}
-+
- static void handle_satn(ESPState *s)
- {
-     uint8_t buf[32];
-@@ -186,11 +239,22 @@ static void handle_satn(ESPState *s)
-         s->dma_cb = handle_satn;
-         return;
-     }
-+    s->pdma_cb = satn_pdma_cb;
-     len = get_cmd(s, buf, sizeof(buf));
-     if (len)
-         do_cmd(s, buf);
- }
- 
-+static void s_without_satn_pdma_cb(ESPState *s)
-+{
-+    if (get_cmd_cb(s) < 0) {
-+        return;
-+    }
-+    if (s->pdma_cur != s->pdma_start) {
-+        do_busid_cmd(s, get_pdma_buf(s) + s->pdma_start, 0);
-+    }
-+}
-+
- static void handle_s_without_atn(ESPState *s)
- {
-     uint8_t buf[32];
-@@ -200,18 +264,36 @@ static void handle_s_without_atn(ESPState *s)
-         s->dma_cb = handle_s_without_atn;
-         return;
-     }
-+    s->pdma_cb = s_without_satn_pdma_cb;
-     len = get_cmd(s, buf, sizeof(buf));
-     if (len) {
-         do_busid_cmd(s, buf, 0);
-     }
- }
- 
-+static void satn_stop_pdma_cb(ESPState *s)
-+{
-+    if (get_cmd_cb(s) < 0) {
-+        return;
-+    }
-+    s->cmdlen = s->pdma_cur - s->pdma_start;
-+    if (s->cmdlen) {
-+        trace_esp_handle_satn_stop(s->cmdlen);
-+        s->do_cmd = 1;
-+        s->rregs[ESP_RSTAT] = STAT_TC | STAT_CD;
-+        s->rregs[ESP_RINTR] = INTR_BS | INTR_FC;
-+        s->rregs[ESP_RSEQ] = SEQ_CD;
-+        esp_raise_irq(s);
-+    }
-+}
-+
- static void handle_satn_stop(ESPState *s)
- {
-     if (s->dma && !s->dma_enabled) {
-         s->dma_cb = handle_satn_stop;
-         return;
-     }
-+    s->pdma_cb = satn_stop_pdma_cb;;
-     s->cmdlen = get_cmd(s, s->cmdbuf, sizeof(s->cmdbuf));
-     if (s->cmdlen) {
-         trace_esp_handle_satn_stop(s->cmdlen);
-@@ -223,16 +305,31 @@ static void handle_satn_stop(ESPState *s)
-     }
- }
- 
-+static void write_response_pdma_cb(ESPState *s)
-+{
-+    s->rregs[ESP_RSTAT] = STAT_TC | STAT_ST;
-+    s->rregs[ESP_RINTR] = INTR_BS | INTR_FC;
-+    s->rregs[ESP_RSEQ] = SEQ_CD;
-+    esp_raise_irq(s);
-+}
-+
- static void write_response(ESPState *s)
- {
-     trace_esp_write_response(s->status);
-     s->ti_buf[0] = s->status;
-     s->ti_buf[1] = 0;
-     if (s->dma) {
--        s->dma_memory_write(s->dma_opaque, s->ti_buf, 2);
--        s->rregs[ESP_RSTAT] = STAT_TC | STAT_ST;
--        s->rregs[ESP_RINTR] = INTR_BS | INTR_FC;
--        s->rregs[ESP_RSEQ] = SEQ_CD;
-+        if (s->dma_memory_write) {
-+            s->dma_memory_write(s->dma_opaque, s->ti_buf, 2);
-+            s->rregs[ESP_RSTAT] = STAT_TC | STAT_ST;
-+            s->rregs[ESP_RINTR] = INTR_BS | INTR_FC;
-+            s->rregs[ESP_RSEQ] = SEQ_CD;
-+        } else {
-+            set_pdma(s, TI, 0, 2);
-+            s->pdma_cb = write_response_pdma_cb;
-+            esp_raise_drq(s);
-+            return;
-+        }
-     } else {
-         s->ti_size = 2;
-         s->ti_rptr = 0;
-@@ -254,6 +351,41 @@ static void esp_dma_done(ESPState *s)
-     esp_raise_irq(s);
- }
- 
-+static void do_dma_pdma_cb(ESPState *s)
-+{
-+    int to_device = (s->ti_size < 0);
-+    int len = s->pdma_cur - s->pdma_start;
-+    if (s->do_cmd) {
-+        s->ti_size = 0;
-+        s->cmdlen = 0;
-+        s->do_cmd = 0;
-+        do_cmd(s, s->cmdbuf);
-+        return;
-+    }
-+    s->dma_left -= len;
-+    s->async_buf += len;
-+    s->async_len -= len;
-+    if (to_device) {
-+        s->ti_size += len;
++    if (!load) {
++        blk_set_perm(drive->blk, 0, BLK_PERM_ALL, &error_abort);
 +    } else {
-+        s->ti_size -= len;
-+    }
-+    if (s->async_len == 0) {
-+        scsi_req_continue(s->current_req);
-+        /*
-+         * If there is still data to be read from the device then
-+         * complete the DMA operation immediately.  Otherwise defer
-+         * until the scsi layer has completed.
-+         */
-+        if (to_device || s->dma_left != 0 || s->ti_size == 0) {
++        if (!blkconf_apply_backend_options(drive->conf,
++                                           blk_is_read_only(drive->blk), false,
++                                           errp)) {
 +            return;
 +        }
 +    }
-+
-+    /* Partially filled a scsi buffer. Complete immediately.  */
-+    esp_dma_done(s);
 +}
 +
- static void esp_do_dma(ESPState *s)
- {
-     uint32_t len;
-@@ -268,7 +400,14 @@ static void esp_do_dma(ESPState *s)
-         trace_esp_do_dma(s->cmdlen, len);
-         assert (s->cmdlen <= sizeof(s->cmdbuf) &&
-                 len <= sizeof(s->cmdbuf) - s->cmdlen);
--        s->dma_memory_read(s->dma_opaque, &s->cmdbuf[s->cmdlen], len);
-+        if (s->dma_memory_read) {
-+            s->dma_memory_read(s->dma_opaque, &s->cmdbuf[s->cmdlen], len);
-+        } else {
-+            set_pdma(s, CMD, s->cmdlen, len);
-+            s->pdma_cb = do_dma_pdma_cb;
-+            esp_raise_drq(s);
-+            return;
-+        }
-         trace_esp_handle_ti_cmd(s->cmdlen);
-         s->ti_size = 0;
-         s->cmdlen = 0;
-@@ -285,9 +424,23 @@ static void esp_do_dma(ESPState *s)
-     }
-     to_device = (s->ti_size < 0);
-     if (to_device) {
--        s->dma_memory_read(s->dma_opaque, s->async_buf, len);
-+        if (s->dma_memory_read) {
-+            s->dma_memory_read(s->dma_opaque, s->async_buf, len);
-+        } else {
-+            set_pdma(s, ASYNC, 0, len);
-+            s->pdma_cb = do_dma_pdma_cb;
-+            esp_raise_drq(s);
-+            return;
-+        }
-     } else {
--        s->dma_memory_write(s->dma_opaque, s->async_buf, len);
-+        if (s->dma_memory_write) {
-+            s->dma_memory_write(s->dma_opaque, s->async_buf, len);
-+        } else {
-+            set_pdma(s, ASYNC, 0, len);
-+            s->pdma_cb = do_dma_pdma_cb;
-+            esp_raise_drq(s);
-+            return;
-+        }
-     }
-     s->dma_left -= len;
-     s->async_buf += len;
-@@ -421,6 +574,7 @@ void esp_hard_reset(ESPState *s)
- static void esp_soft_reset(ESPState *s)
- {
-     qemu_irq_lower(s->irq);
-+    qemu_irq_lower(s->irq_data);
-     esp_hard_reset(s);
- }
- 
-@@ -610,6 +764,28 @@ static bool esp_mem_accepts(void *opaque, hwaddr addr,
-     return (size == 1) || (is_write && size == 4);
- }
- 
-+static bool esp_pdma_needed(void *opaque)
++static const BlockDevOps swim_block_ops = {
++    .change_media_cb = swim_change_cb,
++};
++
++static Property swim_drive_properties[] = {
++    DEFINE_PROP_INT32("unit", SWIMDrive, unit, -1),
++    DEFINE_BLOCK_PROPERTIES(SWIMDrive, conf),
++    DEFINE_PROP_END_OF_LIST(),
++};
++
++static void swim_drive_realize(DeviceState *qdev, Error **errp)
 +{
-+    ESPState *s = opaque;
-+    return s->dma_memory_read == NULL && s->dma_memory_write == NULL &&
-+           s->dma_enabled;
++    SWIMDrive *dev = SWIM_DRIVE(qdev);
++    SWIMBus *bus = SWIM_BUS(qdev->parent_bus);
++    FDrive *drive;
++    int ret;
++
++    if (dev->unit == -1) {
++        for (dev->unit = 0; dev->unit < SWIM_MAX_FD; dev->unit++) {
++            drive = &bus->ctrl->drives[dev->unit];
++            if (!drive->blk) {
++                break;
++            }
++        }
++    }
++
++    if (dev->unit >= SWIM_MAX_FD) {
++        error_setg(errp, "Can't create floppy unit %d, bus supports "
++                   "only %d units", dev->unit, SWIM_MAX_FD);
++        return;
++    }
++
++    drive = &bus->ctrl->drives[dev->unit];
++    if (drive->blk) {
++        error_setg(errp, "Floppy unit %d is in use", dev->unit);
++        return;
++    }
++
++    if (!dev->conf.blk) {
++        /* Anonymous BlockBackend for an empty drive */
++        dev->conf.blk = blk_new(qemu_get_aio_context(), 0, BLK_PERM_ALL);
++        ret = blk_attach_dev(dev->conf.blk, qdev);
++        assert(ret == 0);
++    }
++
++    blkconf_blocksizes(&dev->conf);
++    if (dev->conf.logical_block_size != 512 ||
++        dev->conf.physical_block_size != 512)
++    {
++        error_setg(errp, "Physical and logical block size must "
++                   "be 512 for floppy");
++        return;
++    }
++
++    /*
++     * rerror/werror aren't supported by fdc and therefore not even registered
++     * with qdev. So set the defaults manually before they are used in
++     * blkconf_apply_backend_options().
++     */
++    dev->conf.rerror = BLOCKDEV_ON_ERROR_AUTO;
++    dev->conf.werror = BLOCKDEV_ON_ERROR_AUTO;
++
++    if (!blkconf_apply_backend_options(&dev->conf,
++                                       blk_is_read_only(dev->conf.blk),
++                                       false, errp)) {
++        return;
++    }
++
++    /*
++     * 'enospc' is the default for -drive, 'report' is what blk_new() gives us
++     * for empty drives.
++     */
++    if (blk_get_on_error(dev->conf.blk, 0) != BLOCKDEV_ON_ERROR_ENOSPC &&
++        blk_get_on_error(dev->conf.blk, 0) != BLOCKDEV_ON_ERROR_REPORT) {
++        error_setg(errp, "fdc doesn't support drive option werror");
++        return;
++    }
++    if (blk_get_on_error(dev->conf.blk, 1) != BLOCKDEV_ON_ERROR_REPORT) {
++        error_setg(errp, "fdc doesn't support drive option rerror");
++        return;
++    }
++
++    drive->conf = &dev->conf;
++    drive->blk = dev->conf.blk;
++    drive->swimctrl = bus->ctrl;
++
++    blk_set_dev_ops(drive->blk, &swim_block_ops, drive);
 +}
 +
-+static const VMStateDescription vmstate_esp_pdma = {
-+    .name = "esp/pdma",
++static void swim_drive_class_init(ObjectClass *klass, void *data)
++{
++    DeviceClass *k = DEVICE_CLASS(klass);
++    k->realize = swim_drive_realize;
++    set_bit(DEVICE_CATEGORY_STORAGE, k->categories);
++    k->bus_type = TYPE_SWIM_BUS;
++    k->props = swim_drive_properties;
++    k->desc = "virtual SWIM drive";
++}
++
++static const TypeInfo swim_drive_info = {
++    .name = TYPE_SWIM_DRIVE,
++    .parent = TYPE_DEVICE,
++    .instance_size = sizeof(SWIMDrive),
++    .class_init = swim_drive_class_init,
++};
++
++static const TypeInfo swim_bus_info = {
++    .name = TYPE_SWIM_BUS,
++    .parent = TYPE_BUS,
++    .instance_size = sizeof(SWIMBus),
++};
++
++static void iwmctrl_write(void *opaque, hwaddr reg, uint64_t value,
++                          unsigned size)
++{
++    SWIMCtrl *swimctrl = opaque;
++
++    reg >>= REG_SHIFT;
++
++    swimctrl->regs[reg >> 1] = reg & 1;
++
++    if (swimctrl->regs[IWM_Q6] &&
++        swimctrl->regs[IWM_Q7]) {
++        if (swimctrl->regs[IWM_MTR]) {
++            /* data register */
++            swimctrl->iwm_data = value;
++        } else {
++            /* mode register */
++            swimctrl->iwm_mode = value;
++            /* detect sequence to switch from IWM mode to SWIM mode */
++            switch (swimctrl->iwm_switch) {
++            case 0:
++                if (value == 0x57) {
++                    swimctrl->iwm_switch++;
++                }
++                break;
++            case 1:
++                if (value == 0x17) {
++                    swimctrl->iwm_switch++;
++                }
++                break;
++            case 2:
++                if (value == 0x57) {
++                    swimctrl->iwm_switch++;
++                }
++                break;
++            case 3:
++                if (value == 0x57) {
++                    swimctrl->mode = SWIM_MODE_SWIM;
++                    swimctrl->iwm_switch = 0;
++                }
++                break;
++            }
++        }
++    }
++}
++
++static uint64_t iwmctrl_read(void *opaque, hwaddr reg, unsigned size)
++{
++    SWIMCtrl *swimctrl = opaque;
++
++    reg >>= REG_SHIFT;
++
++    swimctrl->regs[reg >> 1] = reg & 1;
++
++    return 0;
++}
++
++static void swimctrl_write(void *opaque, hwaddr reg, uint64_t value,
++                           unsigned size)
++{
++    SWIMCtrl *swimctrl = opaque;
++
++    if (swimctrl->mode == SWIM_MODE_IWM) {
++        iwmctrl_write(opaque, reg, value, size);
++        return;
++    }
++
++    reg >>= REG_SHIFT;
++
++    switch (reg) {
++    case SWIM_WRITE_PHASE:
++        swimctrl->swim_phase = value;
++        break;
++    case SWIM_WRITE_MODE0:
++        swimctrl->swim_mode &= ~value;
++        break;
++    case SWIM_WRITE_MODE1:
++        swimctrl->swim_mode |= value;
++        break;
++    case SWIM_WRITE_DATA:
++    case SWIM_WRITE_MARK:
++    case SWIM_WRITE_CRC:
++    case SWIM_WRITE_PARAMETER:
++    case SWIM_WRITE_SETUP:
++        break;
++    }
++}
++
++static uint64_t swimctrl_read(void *opaque, hwaddr reg, unsigned size)
++{
++    SWIMCtrl *swimctrl = opaque;
++    uint32_t value = 0;
++
++    if (swimctrl->mode == SWIM_MODE_IWM) {
++        return iwmctrl_read(opaque, reg, size);
++    }
++
++    reg >>= REG_SHIFT;
++
++    switch (reg) {
++    case SWIM_READ_PHASE:
++        value = swimctrl->swim_phase;
++        break;
++    case SWIM_READ_HANDSHAKE:
++        if (swimctrl->swim_phase == SWIM_DRIVE_PRESENT) {
++            /* always answer "no drive present" */
++            value = SWIM_SENSE;
++        }
++        break;
++    case SWIM_READ_DATA:
++    case SWIM_READ_MARK:
++    case SWIM_READ_ERROR:
++    case SWIM_READ_PARAMETER:
++    case SWIM_READ_SETUP:
++    case SWIM_READ_STATUS:
++        break;
++    }
++
++    return value;
++}
++
++static const MemoryRegionOps swimctrl_mem_ops = {
++    .write = swimctrl_write,
++    .read = swimctrl_read,
++    .endianness = DEVICE_NATIVE_ENDIAN,
++};
++
++static void sysbus_swim_reset(DeviceState *d)
++{
++    SWIM *sys = SWIM(d);
++    SWIMCtrl *ctrl = &sys->ctrl;
++    int i;
++
++    ctrl->mode = 0;
++    ctrl->iwm_switch = 0;
++    for (i = 0; i < 8; i++) {
++        ctrl->regs[i] = 0;
++    }
++    ctrl->iwm_data = 0;
++    ctrl->iwm_mode = 0;
++    ctrl->swim_phase = 0;
++    ctrl->swim_mode = 0;
++    for (i = 0; i < SWIM_MAX_FD; i++) {
++        fd_recalibrate(&ctrl->drives[i]);
++    }
++}
++
++static void sysbus_swim_init(Object *obj)
++{
++    SysBusDevice *sbd = SYS_BUS_DEVICE(obj);
++    SWIM *sbs = SWIM(obj);
++    SWIMCtrl *swimctrl = &sbs->ctrl;
++
++    memory_region_init_io(&swimctrl->iomem, obj, &swimctrl_mem_ops, swimctrl,
++                          "swim", 0x2000);
++    sysbus_init_mmio(sbd, &swimctrl->iomem);
++}
++
++static void sysbus_swim_realize(DeviceState *dev, Error **errp)
++{
++    SWIM *sys = SWIM(dev);
++    SWIMCtrl *swimctrl = &sys->ctrl;
++
++    qbus_create_inplace(&swimctrl->bus, sizeof(SWIMBus), TYPE_SWIM_BUS, dev,
++                        NULL);
++    swimctrl->bus.ctrl = swimctrl;
++}
++
++static const VMStateDescription vmstate_fdrive = {
++    .name = "fdrive",
 +    .version_id = 1,
 +    .minimum_version_id = 1,
-+    .needed = esp_pdma_needed,
 +    .fields = (VMStateField[]) {
-+        VMSTATE_BUFFER(pdma_buf, ESPState),
-+        VMSTATE_INT32(pdma_origin, ESPState),
-+        VMSTATE_UINT32(pdma_len, ESPState),
-+        VMSTATE_UINT32(pdma_start, ESPState),
-+        VMSTATE_UINT32(pdma_cur, ESPState),
++        VMSTATE_END_OF_LIST()
++    },
++};
++
++static const VMStateDescription vmstate_swim = {
++    .name = "swim",
++    .version_id = 1,
++    .minimum_version_id = 1,
++    .fields = (VMStateField[]) {
++        VMSTATE_INT32(mode, SWIMCtrl),
++        /* IWM mode */
++        VMSTATE_INT32(iwm_switch, SWIMCtrl),
++        VMSTATE_UINT16_ARRAY(regs, SWIMCtrl, 8),
++        VMSTATE_UINT8(iwm_data, SWIMCtrl),
++        VMSTATE_UINT8(iwm_mode, SWIMCtrl),
++        /* SWIM mode */
++        VMSTATE_UINT8(swim_phase, SWIMCtrl),
++        VMSTATE_UINT8(swim_mode, SWIMCtrl),
++        /* Drives */
++        VMSTATE_STRUCT_ARRAY(drives, SWIMCtrl, SWIM_MAX_FD, 1,
++                             vmstate_fdrive, FDrive),
++        VMSTATE_END_OF_LIST()
++    },
++};
++
++static const VMStateDescription vmstate_sysbus_swim = {
++    .name = "SWIM",
++    .version_id = 1,
++    .fields = (VMStateField[]) {
++        VMSTATE_STRUCT(ctrl, SWIM, 0, vmstate_swim, SWIMCtrl),
 +        VMSTATE_END_OF_LIST()
 +    }
 +};
 +
- const VMStateDescription vmstate_esp = {
-     .name ="esp",
-     .version_id = 4,
-@@ -631,6 +807,10 @@ const VMStateDescription vmstate_esp = {
-         VMSTATE_UINT32(do_cmd, ESPState),
-         VMSTATE_UINT32(dma_left, ESPState),
-         VMSTATE_END_OF_LIST()
-+    },
-+    .subsections = (const VMStateDescription * []) {
-+        &vmstate_esp_pdma,
-+        NULL
-     }
- };
- 
-@@ -661,6 +841,82 @@ static const MemoryRegionOps sysbus_esp_mem_ops = {
-     .valid.accepts = esp_mem_accepts,
- };
- 
-+static void sysbus_esp_pdma_write(void *opaque, hwaddr addr,
-+                                  uint64_t val, unsigned int size)
++static void sysbus_swim_class_init(ObjectClass *oc, void *data)
 +{
-+    SysBusESPState *sysbus = opaque;
-+    ESPState *s = &sysbus->esp;
-+    uint32_t dmalen;
-+    uint8_t *buf = get_pdma_buf(s);
++    DeviceClass *dc = DEVICE_CLASS(oc);
 +
-+    dmalen = s->rregs[ESP_TCLO];
-+    dmalen |= s->rregs[ESP_TCMID] << 8;
-+    dmalen |= s->rregs[ESP_TCHI] << 16;
-+    if (dmalen == 0 || s->pdma_len == 0) {
-+        return;
-+    }
-+    switch (size) {
-+    case 1:
-+        buf[s->pdma_cur++] = val;
-+        s->pdma_len--;
-+        dmalen--;
-+        break;
-+    case 2:
-+        buf[s->pdma_cur++] = val >> 8;
-+        buf[s->pdma_cur++] = val;
-+        s->pdma_len -= 2;
-+        dmalen -= 2;
-+        break;
-+    }
-+    s->rregs[ESP_TCLO] = dmalen & 0xff;
-+    s->rregs[ESP_TCMID] = dmalen >> 8;
-+    s->rregs[ESP_TCHI] = dmalen >> 16;
-+    if (s->pdma_len == 0 && s->pdma_cb) {
-+        esp_lower_drq(s);
-+        s->pdma_cb(s);
-+        s->pdma_cb = NULL;
-+    }
++    dc->realize = sysbus_swim_realize;
++    dc->reset = sysbus_swim_reset;
++    dc->vmsd = &vmstate_sysbus_swim;
 +}
 +
-+static uint64_t sysbus_esp_pdma_read(void *opaque, hwaddr addr,
-+                                     unsigned int size)
-+{
-+    SysBusESPState *sysbus = opaque;
-+    ESPState *s = &sysbus->esp;
-+    uint8_t *buf = get_pdma_buf(s);
-+    uint64_t val = 0;
-+
-+    if (s->pdma_len == 0) {
-+        return 0;
-+    }
-+    switch (size) {
-+    case 1:
-+        val = buf[s->pdma_cur++];
-+        s->pdma_len--;
-+        break;
-+    case 2:
-+        val = buf[s->pdma_cur++];
-+        val = (val << 8) | buf[s->pdma_cur++];
-+        s->pdma_len -= 2;
-+        break;
-+    }
-+
-+    if (s->pdma_len == 0 && s->pdma_cb) {
-+        esp_lower_drq(s);
-+        s->pdma_cb(s);
-+        s->pdma_cb = NULL;
-+    }
-+    return val;
-+}
-+
-+static const MemoryRegionOps sysbus_esp_pdma_ops = {
-+    .read = sysbus_esp_pdma_read,
-+    .write = sysbus_esp_pdma_write,
-+    .endianness = DEVICE_NATIVE_ENDIAN,
-+    .valid.min_access_size = 1,
-+    .valid.max_access_size = 2,
++static const TypeInfo sysbus_swim_info = {
++    .name          = TYPE_SWIM,
++    .parent        = TYPE_SYS_BUS_DEVICE,
++    .instance_size = sizeof(SWIM),
++    .instance_init = sysbus_swim_init,
++    .class_init    = sysbus_swim_class_init,
 +};
 +
- static const struct SCSIBusInfo esp_scsi_info = {
-     .tcq = false,
-     .max_target = ESP_MAX_DEVS,
-@@ -693,12 +949,16 @@ static void sysbus_esp_realize(DeviceState *dev, Error **errp)
-     ESPState *s = &sysbus->esp;
++static void swim_register_types(void)
++{
++    type_register_static(&sysbus_swim_info);
++    type_register_static(&swim_bus_info);
++    type_register_static(&swim_drive_info);
++}
++
++type_init(swim_register_types)
+diff --git a/MAINTAINERS b/MAINTAINERS
+index bd0df67e62..7f806eb1b2 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -923,9 +923,11 @@ S: Maintained
+ F: hw/misc/mac_via.c
+ F: hw/nubus/*
+ F: hw/display/macfb.c
++F: hw/block/swim.c
+ F: include/hw/misc/mac_via.h
+ F: include/hw/nubus/*
+ F: include/hw/display/macfb.h
++F: include/hw/block/swim.h
  
-     sysbus_init_irq(sbd, &s->irq);
-+    sysbus_init_irq(sbd, &s->irq_data);
-     assert(sysbus->it_shift != -1);
+ MicroBlaze Machines
+ -------------------
+diff --git a/hw/block/Kconfig b/hw/block/Kconfig
+index df96dc5dcc..2d17f481ad 100644
+--- a/hw/block/Kconfig
++++ b/hw/block/Kconfig
+@@ -37,3 +37,6 @@ config VHOST_USER_BLK
+     # Only PCI devices are provided for now
+     default y if VIRTIO_PCI
+     depends on VIRTIO && VHOST_USER && LINUX
++
++config SWIM
++    bool
+diff --git a/hw/block/Makefile.objs b/hw/block/Makefile.objs
+index f5f643f0cc..28c2495a00 100644
+--- a/hw/block/Makefile.objs
++++ b/hw/block/Makefile.objs
+@@ -8,6 +8,7 @@ common-obj-$(CONFIG_XEN) += xen-block.o
+ common-obj-$(CONFIG_ECC) += ecc.o
+ common-obj-$(CONFIG_ONENAND) += onenand.o
+ common-obj-$(CONFIG_NVME_PCI) += nvme.o
++common-obj-$(CONFIG_SWIM) += swim.o
  
-     s->chip_id = TCHI_FAS100A;
-     memory_region_init_io(&sysbus->iomem, OBJECT(sysbus), &sysbus_esp_mem_ops,
--                          sysbus, "esp", ESP_REGS << sysbus->it_shift);
-+                          sysbus, "esp-regs", ESP_REGS << sysbus->it_shift);
-     sysbus_init_mmio(sbd, &sysbus->iomem);
-+    memory_region_init_io(&sysbus->pdma, OBJECT(sysbus), &sysbus_esp_pdma_ops,
-+                          sysbus, "esp-pdma", 2);
-+    sysbus_init_mmio(sbd, &sysbus->pdma);
+ obj-$(CONFIG_SH4) += tc58128.o
  
-     qdev_init_gpio_in(dev, sysbus_esp_gpio_demux, 2);
- 
+diff --git a/hw/m68k/Kconfig b/hw/m68k/Kconfig
+index ef4917dee6..bab4885ca5 100644
+--- a/hw/m68k/Kconfig
++++ b/hw/m68k/Kconfig
+@@ -18,3 +18,4 @@ config Q800
+     select MAC_VIA
+     select NUBUS
+     select MACFB
++    select SWIM
 -- 
 2.21.0
 
