@@ -4,58 +4,58 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A87ADCA9EBD
-	for <qemu-devel@archiver.kernel.org>; Sun, 27 Oct 2019 17:50:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BFE07CA9EAF
+	for <qemu-devel@archiver.kernel.org>; Sun, 27 Oct 2019 17:54:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 707D720679
-	for <qemu-devel@archiver.kernel.org>; Sun, 27 Oct 2019 17:50:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 453A420717
+	for <qemu-devel@archiver.kernel.org>; Sun, 27 Oct 2019 17:54:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="FgUdiZgz"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 707D720679
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="f6Yc/0V5"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 453A420717
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46308 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46346 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iOmga-0006Vw-Bf
-	for qemu-devel@archiver.kernel.org; Sun, 27 Oct 2019 13:50:41 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60286)
+	id 1iOmkF-0001gA-9Q
+	for qemu-devel@archiver.kernel.org; Sun, 27 Oct 2019 13:54:27 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60322)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgibson@ozlabs.org>) id 1iOme9-00071d-MK
- for qemu-devel@nongnu.org; Sun, 27 Oct 2019 13:48:11 -0400
+ (envelope-from <dgibson@ozlabs.org>) id 1iOmeE-0007ZP-OZ
+ for qemu-devel@nongnu.org; Sun, 27 Oct 2019 13:48:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1iOme6-0002qv-Ry
- for qemu-devel@nongnu.org; Sun, 27 Oct 2019 13:48:08 -0400
-Received: from ozlabs.org ([203.11.71.1]:39355)
+ (envelope-from <dgibson@ozlabs.org>) id 1iOme7-0002rm-U2
+ for qemu-devel@nongnu.org; Sun, 27 Oct 2019 13:48:14 -0400
+Received: from bilbo.ozlabs.org ([203.11.71.1]:53467 helo=ozlabs.org)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgibson@ozlabs.org>) id 1iOme5-0002pM-Pu
- for qemu-devel@nongnu.org; Sun, 27 Oct 2019 13:48:06 -0400
+ (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
+ id 1iOme5-0002po-Q4; Sun, 27 Oct 2019 13:48:07 -0400
 Received: by ozlabs.org (Postfix, from userid 1007)
- id 471QL95K96z9sPL; Mon, 28 Oct 2019 04:48:01 +1100 (AEDT)
+ id 471QLB24sQz9sPV; Mon, 28 Oct 2019 04:48:01 +1100 (AEDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1572198481;
- bh=TDXLHWLNnqSo7qgAsvJM05PMm7+dNRlhU5WtQdoLRbU=;
+ d=gibson.dropbear.id.au; s=201602; t=1572198482;
+ bh=dNXf3fBoSU8nkXmyDhsnjB6etF5a8EvEZCwbmWNPIMw=;
  h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=FgUdiZgzsWlw02NZ9d5SrpKVv9wjpLqTatHxIJMoq3xtNcJuggw7jd3HAL94DvVCs
- YdW7dwloaqXk3QdDPR1lP2T52H3WkZ2rU5ccoyBOmrL2XC8kohwuG0qNfxXboaQM5R
- qA1cNBQYXTGK9aP4zNystvzCKhwDCmvVxms3zMG4=
-Date: Sun, 27 Oct 2019 18:39:29 +0100
+ b=f6Yc/0V5bx8vYV74TGvdsSX9RTGyyMoZDeZQ9/TLVEzLBbYsKDtfH1r0FQCt86vfU
+ Ln4i2I66T4cF8/+/i+4kgy0rPRRCSVcx7laHNRsIqCkRexVxtwxdbNNqLRI4IBLEBP
+ IyCKihQUEcivFs/WV6Syph+yog8ihv5GNGv6VhLM=
+Date: Sun, 27 Oct 2019 18:47:39 +0100
 From: David Gibson <david@gibson.dropbear.id.au>
-To: Liu Yi L <yi.l.liu@intel.com>
-Subject: Re: [RFC v2 04/22] hw/iommu: introduce IOMMUContext
-Message-ID: <20191027173929.GK3552@umbus.metropole.lan>
-References: <1571920483-3382-1-git-send-email-yi.l.liu@intel.com>
- <1571920483-3382-5-git-send-email-yi.l.liu@intel.com>
+To: Corey Minyard <cminyard@mvista.com>
+Subject: Re: [PATCH 2/5] ipmi: Add support to customize OEM functions
+Message-ID: <20191027174739.GN3552@umbus.metropole.lan>
+References: <20191021131215.3693-1-clg@kaod.org>
+ <20191021131215.3693-3-clg@kaod.org> <20191021143017.GH25427@t560>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="M0YLxmUXciMpOLPE"
+ protocol="application/pgp-signature"; boundary="ggdAeHltlv4tpqCr"
 Content-Disposition: inline
-In-Reply-To: <1571920483-3382-5-git-send-email-yi.l.liu@intel.com>
+In-Reply-To: <20191021143017.GH25427@t560>
 User-Agent: Mutt/1.12.1 (2019-06-15)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
@@ -71,261 +71,179 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: tianyu.lan@intel.com, kevin.tian@intel.com, jacob.jun.pan@linux.intel.com,
- Yi Sun <yi.y.sun@linux.intel.com>, kvm@vger.kernel.org, mst@redhat.com,
- jun.j.tian@intel.com, qemu-devel@nongnu.org, peterx@redhat.com,
- eric.auger@redhat.com, alex.williamson@redhat.com, pbonzini@redhat.com,
- yi.y.sun@intel.com
+Cc: Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org,
+ Joel Stanley <joel@jms.id.au>, "Marty E . Plummer" <hanetzer@startmail.com>,
+ =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
---M0YLxmUXciMpOLPE
-Content-Type: text/plain; charset=us-ascii
+--ggdAeHltlv4tpqCr
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Oct 24, 2019 at 08:34:25AM -0400, Liu Yi L wrote:
-> From: Peter Xu <peterx@redhat.com>
+On Mon, Oct 21, 2019 at 09:30:17AM -0500, Corey Minyard wrote:
+> On Mon, Oct 21, 2019 at 03:12:12PM +0200, C=E9dric Le Goater wrote:
+> > The routine ipmi_register_oem_netfn() lets external modules register
+> > command handlers for OEM functions. Required for the PowerNV machine.
 >=20
-> This patch adds IOMMUContext as an abstract layer of IOMMU related
-> operations. The current usage of this abstract layer is setup dual-
-> stage IOMMU translation (vSVA) for vIOMMU.
+> Comments inline.
 >=20
-> To setup dual-stage IOMMU translation, vIOMMU needs to propagate
-> guest changes to host via passthru channels (e.g. VFIO). To have
-> a better abstraction, it is better to avoid direct calling between
-> vIOMMU and VFIO. So we have this new structure to act as abstract
-> layer between VFIO and vIOMMU. So far, it is proposed to provide a
-> notifier mechanism, which registered by VFIO and fired by vIOMMU.
+> >=20
+> > Cc: Corey Minyard <cminyard@mvista.com>
+> > Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
+> > ---
+> >  include/hw/ipmi/ipmi.h | 36 ++++++++++++++++++++++++++++++++++++
+> >  hw/ipmi/ipmi_bmc_sim.c | 41 ++++++-----------------------------------
+> >  2 files changed, 42 insertions(+), 35 deletions(-)
+> >=20
+> > diff --git a/include/hw/ipmi/ipmi.h b/include/hw/ipmi/ipmi.h
+> > index 6f2413b39b4a..cb7203b06767 100644
+> > --- a/include/hw/ipmi/ipmi.h
+> > +++ b/include/hw/ipmi/ipmi.h
+> > @@ -265,4 +265,40 @@ int ipmi_bmc_sdr_find(IPMIBmc *b, uint16_t recid,
+> >                        const struct ipmi_sdr_compact **sdr, uint16_t *n=
+extrec);
+> >  void ipmi_bmc_gen_event(IPMIBmc *b, uint8_t *evt, bool log);
+> > =20
+> > +typedef struct IPMIBmcSim IPMIBmcSim;
 >=20
-> For more background, may refer to the discussion below:
+> This type isn't very useful outside of the simulator, but changes for
+> that can come as they are needed.  I don't see an easy way to avoid
+> putting it here.
 >=20
-> https://lists.gnu.org/archive/html/qemu-devel/2019-07/msg05022.html
+> > +
+> > +typedef struct RspBuffer {
+> > +    uint8_t buffer[MAX_IPMI_MSG_SIZE];
+> > +    unsigned int len;
+> > +} RspBuffer;
+> > +
+> > +static inline void rsp_buffer_set_error(RspBuffer *rsp, uint8_t byte)
+> > +{
+> > +    rsp->buffer[2] =3D byte;
+> > +}
+> > +
+> > +/* Add a byte to the response. */
+> > +static inline void rsp_buffer_push(RspBuffer *rsp, uint8_t byte)
+> > +{
+> > +    if (rsp->len >=3D sizeof(rsp->buffer)) {
+> > +        rsp_buffer_set_error(rsp, IPMI_CC_REQUEST_DATA_TRUNCATED);
+> > +        return;
+> > +    }
+> > +    rsp->buffer[rsp->len++] =3D byte;
+> > +}
+> > +
+> > +typedef struct IPMICmdHandler {
+> > +    void (*cmd_handler)(IPMIBmcSim *s,
+> > +                        uint8_t *cmd, unsigned int cmd_len,
+> > +                        RspBuffer *rsp);
+> > +    unsigned int cmd_len_min;
+> > +} IPMICmdHandler;
+> > +
+> > +typedef struct IPMINetfn {
+> > +    unsigned int cmd_nums;
+> > +    const IPMICmdHandler *cmd_handlers;
+> > +} IPMINetfn;
+> > +
+> > +int ipmi_register_oem_netfn(IPMIBmc *b, const IPMINetfn *netfnd);
+> > +
+> >  #endif
+> > diff --git a/hw/ipmi/ipmi_bmc_sim.c b/hw/ipmi/ipmi_bmc_sim.c
+> > index 71e56f3b13d1..770aace55b08 100644
+> > --- a/hw/ipmi/ipmi_bmc_sim.c
+> > +++ b/hw/ipmi/ipmi_bmc_sim.c
+> > @@ -98,6 +98,7 @@
+> >  #define IPMI_CMD_GET_SEL_TIME             0x48
+> >  #define IPMI_CMD_SET_SEL_TIME             0x49
+> > =20
+> > +#define IPMI_NETFN_OEM                    0x3a
+> > =20
+> >  /* Same as a timespec struct. */
+> >  struct ipmi_time {
+> > @@ -167,23 +168,8 @@ typedef struct IPMISensor {
+> >  #define MAX_SENSORS 20
+> >  #define IPMI_WATCHDOG_SENSOR 0
+> > =20
+> > -typedef struct IPMIBmcSim IPMIBmcSim;
+> > -typedef struct RspBuffer RspBuffer;
+> > -
+> >  #define MAX_NETFNS 64
+> > =20
+> > -typedef struct IPMICmdHandler {
+> > -    void (*cmd_handler)(IPMIBmcSim *s,
+> > -                        uint8_t *cmd, unsigned int cmd_len,
+> > -                        RspBuffer *rsp);
+> > -    unsigned int cmd_len_min;
+> > -} IPMICmdHandler;
+> > -
+> > -typedef struct IPMINetfn {
+> > -    unsigned int cmd_nums;
+> > -    const IPMICmdHandler *cmd_handlers;
+> > -} IPMINetfn;
+> > -
+> >  typedef struct IPMIRcvBufEntry {
+> >      QTAILQ_ENTRY(IPMIRcvBufEntry) entry;
+> >      uint8_t len;
+> > @@ -279,28 +265,8 @@ struct IPMIBmcSim {
+> >  #define IPMI_BMC_WATCHDOG_ACTION_POWER_DOWN      2
+> >  #define IPMI_BMC_WATCHDOG_ACTION_POWER_CYCLE     3
+> > =20
+> > -struct RspBuffer {
+> > -    uint8_t buffer[MAX_IPMI_MSG_SIZE];
+> > -    unsigned int len;
+> > -};
+> > -
+> >  #define RSP_BUFFER_INITIALIZER { }
+> > =20
+> > -static inline void rsp_buffer_set_error(RspBuffer *rsp, uint8_t byte)
+> > -{
+> > -    rsp->buffer[2] =3D byte;
+> > -}
+> > -
+> > -/* Add a byte to the response. */
+> > -static inline void rsp_buffer_push(RspBuffer *rsp, uint8_t byte)
+> > -{
+> > -    if (rsp->len >=3D sizeof(rsp->buffer)) {
+> > -        rsp_buffer_set_error(rsp, IPMI_CC_REQUEST_DATA_TRUNCATED);
+> > -        return;
+> > -    }
+> > -    rsp->buffer[rsp->len++] =3D byte;
+> > -}
+> > -
+> >  static inline void rsp_buffer_pushmore(RspBuffer *rsp, uint8_t *bytes,
+> >                                         unsigned int n)
+> >  {
+> > @@ -640,6 +606,11 @@ static int ipmi_register_netfn(IPMIBmcSim *s, unsi=
+gned int netfn,
+> >      return 0;
+> >  }
+> > =20
+> > +int ipmi_register_oem_netfn(IPMIBmc *b, const IPMINetfn *netfnd)
+> > +{
+> > +    return ipmi_register_netfn(IPMI_BMC_SIMULATOR(b), IPMI_NETFN_OEM, =
+netfnd);
+> > +}
 >=20
-> Cc: Kevin Tian <kevin.tian@intel.com>
-> Cc: Jacob Pan <jacob.jun.pan@linux.intel.com>
-> Cc: Peter Xu <peterx@redhat.com>
-> Cc: Eric Auger <eric.auger@redhat.com>
-> Cc: Yi Sun <yi.y.sun@linux.intel.com>
-> Cc: David Gibson <david@gibson.dropbear.id.au>
-> Signed-off-by: Peter Xu <peterx@redhat.com>
-> Signed-off-by: Liu Yi L <yi.l.liu@intel.com>
-> ---
->  hw/Makefile.objs         |  1 +
->  hw/iommu/Makefile.objs   |  1 +
->  hw/iommu/iommu.c         | 66 ++++++++++++++++++++++++++++++++++++++++
->  include/hw/iommu/iommu.h | 79 ++++++++++++++++++++++++++++++++++++++++++=
-++++++
->  4 files changed, 147 insertions(+)
->  create mode 100644 hw/iommu/Makefile.objs
->  create mode 100644 hw/iommu/iommu.c
->  create mode 100644 include/hw/iommu/iommu.h
+> I think I would prefer just exposing ipmi_register_netfn() and maybe
+> rename it ipmi_sim_register_netfn() or something like that.  There may
+> be other netfns needed in the future.
 >=20
-> diff --git a/hw/Makefile.objs b/hw/Makefile.objs
-> index ece6cc3..ac19f9c 100644
-> --- a/hw/Makefile.objs
-> +++ b/hw/Makefile.objs
-> @@ -39,6 +39,7 @@ devices-dirs-y +=3D xen/
->  devices-dirs-$(CONFIG_MEM_DEVICE) +=3D mem/
->  devices-dirs-y +=3D semihosting/
->  devices-dirs-y +=3D smbios/
-> +devices-dirs-y +=3D iommu/
->  endif
-> =20
->  common-obj-y +=3D $(devices-dirs-y)
-> diff --git a/hw/iommu/Makefile.objs b/hw/iommu/Makefile.objs
-> new file mode 100644
-> index 0000000..0484b79
-> --- /dev/null
-> +++ b/hw/iommu/Makefile.objs
-> @@ -0,0 +1 @@
-> +obj-y +=3D iommu.o
-> diff --git a/hw/iommu/iommu.c b/hw/iommu/iommu.c
-> new file mode 100644
-> index 0000000..2391b0d
-> --- /dev/null
-> +++ b/hw/iommu/iommu.c
-> @@ -0,0 +1,66 @@
-> +/*
-> + * QEMU abstract of IOMMU context
-> + *
-> + * Copyright (C) 2019 Red Hat Inc.
-> + *
-> + * Authors: Peter Xu <peterx@redhat.com>,
-> + *          Liu Yi L <yi.l.liu@intel.com>
-> + *
-> + * This program is free software; you can redistribute it and/or modify
-> + * it under the terms of the GNU General Public License as published by
-> + * the Free Software Foundation; either version 2 of the License, or
-> + * (at your option) any later version.
-> +
-> + * This program is distributed in the hope that it will be useful,
-> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
-> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-> + * GNU General Public License for more details.
-> +
-> + * You should have received a copy of the GNU General Public License alo=
-ng
-> + * with this program; if not, see <http://www.gnu.org/licenses/>.
-> + */
-> +
-> +#include "qemu/osdep.h"
-> +#include "hw/iommu/iommu.h"
-> +
-> +void iommu_ctx_notifier_register(IOMMUContext *iommu_ctx,
-> +                                 IOMMUCTXNotifier *n,
-> +                                 IOMMUCTXNotifyFn fn,
-> +                                 IOMMUCTXEvent event)
-> +{
-> +    n->event =3D event;
-> +    n->iommu_ctx_event_notify =3D fn;
-> +    QLIST_INSERT_HEAD(&iommu_ctx->iommu_ctx_notifiers, n, node);
+> But with that change, this looks good to me:
+>=20
+> Reviewed-by: Corey Minyard <cminyard@mvista.com>
 
-Having this both modify the IOMMUCTXNotifier structure and insert it
-in the list seems confusing to me - and gratuitously different from
-the interface for both IOMMUNotifier and Notifier.
+What's the plan for merging this, once it's ready?  Is there an IPMI
+tree for it to be staged in?  If not I could take it through the ppc
+tree, but I'd need some Acked-bys in that case.
 
-Separating out a iommu_ctx_notifier_init() as a helper and having
-register take a fully initialized structure seems better to me.
-
-> +    return;
-
-Using an explicit return at the end of a function returning void is an
-odd style.
-
-> +}
-> +
-> +void iommu_ctx_notifier_unregister(IOMMUContext *iommu_ctx,
-> +                                   IOMMUCTXNotifier *notifier)
-> +{
-> +    IOMMUCTXNotifier *cur, *next;
-> +
-> +    QLIST_FOREACH_SAFE(cur, &iommu_ctx->iommu_ctx_notifiers, node, next)=
- {
-> +        if (cur =3D=3D notifier) {
-> +            QLIST_REMOVE(cur, node);
-> +            break;
-> +        }
-> +    }
-> +}
-> +
-> +void iommu_ctx_event_notify(IOMMUContext *iommu_ctx,
-> +                            IOMMUCTXEventData *event_data)
-> +{
-> +    IOMMUCTXNotifier *cur;
-> +
-> +    QLIST_FOREACH(cur, &iommu_ctx->iommu_ctx_notifiers, node) {
-> +        if ((cur->event =3D=3D event_data->event) &&
-> +                                 cur->iommu_ctx_event_notify) {
-
-Do you actually need the test on iommu_ctx_event_notify?  I can't see
-any reason to register a notifier with a NULL function pointer.
-
-> +            cur->iommu_ctx_event_notify(cur, event_data);
-> +        }
-> +    }
-> +}
-> +
-> +void iommu_context_init(IOMMUContext *iommu_ctx)
-> +{
-> +    QLIST_INIT(&iommu_ctx->iommu_ctx_notifiers);
-> +}
-> diff --git a/include/hw/iommu/iommu.h b/include/hw/iommu/iommu.h
-> new file mode 100644
-> index 0000000..c22c442
-> --- /dev/null
-> +++ b/include/hw/iommu/iommu.h
-> @@ -0,0 +1,79 @@
-> +/*
-> + * QEMU abstraction of IOMMU Context
-> + *
-> + * Copyright (C) 2019 Red Hat Inc.
-> + *
-> + * Authors: Peter Xu <peterx@redhat.com>,
-> + *          Liu, Yi L <yi.l.liu@intel.com>
-> + *
-> + * This program is free software; you can redistribute it and/or modify
-> + * it under the terms of the GNU General Public License as published by
-> + * the Free Software Foundation; either version 2 of the License, or
-> + * (at your option) any later version.
-> +
-> + * This program is distributed in the hope that it will be useful,
-> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
-> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-> + * GNU General Public License for more details.
-> +
-> + * You should have received a copy of the GNU General Public License alo=
-ng
-> + * with this program; if not, see <http://www.gnu.org/licenses/>.
-> + */
-> +
-> +#ifndef HW_PCI_PASID_H
-> +#define HW_PCI_PASID_H
-
-These guards need to be updated for the new header name.
-
-> +
-> +#include "qemu/queue.h"
-> +#ifndef CONFIG_USER_ONLY
-> +#include "exec/hwaddr.h"
-> +#endif
-> +
-> +typedef struct IOMMUContext IOMMUContext;
-> +
-> +enum IOMMUCTXEvent {
-> +    IOMMU_CTX_EVENT_NUM,
-> +};
-> +typedef enum IOMMUCTXEvent IOMMUCTXEvent;
-> +
-> +struct IOMMUCTXEventData {
-> +    IOMMUCTXEvent event;
-> +    uint64_t length;
-> +    void *data;
-> +};
-> +typedef struct IOMMUCTXEventData IOMMUCTXEventData;
-> +
-> +typedef struct IOMMUCTXNotifier IOMMUCTXNotifier;
-> +
-> +typedef void (*IOMMUCTXNotifyFn)(IOMMUCTXNotifier *notifier,
-> +                                 IOMMUCTXEventData *event_data);
-> +
-> +struct IOMMUCTXNotifier {
-> +    IOMMUCTXNotifyFn iommu_ctx_event_notify;
-> +    /*
-> +     * What events we are listening to. Let's allow multiple event
-> +     * registrations from beginning.
-> +     */
-> +    IOMMUCTXEvent event;
-> +    QLIST_ENTRY(IOMMUCTXNotifier) node;
-> +};
-> +
-> +/*
-> + * This is an abstraction of IOMMU context.
-> + */
-> +struct IOMMUContext {
-> +    uint32_t pasid;
-
-This confuses me a bit.  I thought the idea was that IOMMUContext with
-SVM would represent all the PASIDs in use, but here we have a specific
-pasid stored in the structure.
-
-> +    QLIST_HEAD(, IOMMUCTXNotifier) iommu_ctx_notifiers;
-> +};
-> +
-> +void iommu_ctx_notifier_register(IOMMUContext *iommu_ctx,
-> +                                 IOMMUCTXNotifier *n,
-> +                                 IOMMUCTXNotifyFn fn,
-> +                                 IOMMUCTXEvent event);
-> +void iommu_ctx_notifier_unregister(IOMMUContext *iommu_ctx,
-> +                                   IOMMUCTXNotifier *notifier);
-> +void iommu_ctx_event_notify(IOMMUContext *iommu_ctx,
-> +                            IOMMUCTXEventData *event_data);
-> +
-> +void iommu_context_init(IOMMUContext *iommu_ctx);
-> +
-> +#endif
+>=20
+> > +
+> >  static const IPMICmdHandler *ipmi_get_handler(IPMIBmcSim *ibs,
+> >                                                unsigned int netfn,
+> >                                                unsigned int cmd)
+>=20
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -333,25 +251,25 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---M0YLxmUXciMpOLPE
+--ggdAeHltlv4tpqCr
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl211k4ACgkQbDjKyiDZ
-s5K0Uw//RVP0RainFrEUfLXMu+stD/JRcjmXKoRPGKhAgCYr3NssXyHM6VuNHgaY
-fOSksAMV0TEasmgC0ZQtt1mkutEaF+6u70C67sZS28ymLbA9i6HWcfXpEVBV/jOW
-UDm7v49562cejhf5qUKSrO1E37AaNrcGcbKua91JZqYqHVMdRmKOscPiOTmA4x5e
-0NeHKvk5zj2WVWfrPwYvMe0HmyM/IkElVeG/5xxipc86/SoCf2nzziMY3tDcjIXa
-iWaiPI3B+ucSY9DYwfaWLUzurCTA3giUgO4k1bGFiZiatn+IOX+2U+Zv6WWpKj+D
-u33s9FfAS0lb3SvhN/vuROrlgOj0b51mm3EiITcu8NWk7+zUOzz4BOw+stp/eak7
-/u2/K+06saNVorNbfD6QGEM3NGBS4mMndRIe6N+AxWwX3x6hjVfK+y77oUx8joCM
-jPxWs3693rR+p+kkwOIzAGPgYTQ1GdXevPEWJMcjUlShmZ9AeWMKnH5AU+opiGDu
-TpyT9FPPD2HS7xW1Uedk9QrF2BxBqAT1o5XzKGRyLo176oiACxFqi90rD4ZTSPxU
-h3jLCzIRiK0bmM1Ufa4hOCNZnZO5y8wp8mOXMvo/+zFjvlguzac1y7NiSwY4iFX+
-Kv2J3ErOJDrfZG8eASEqoGB1nQHA+CDOM0PuK64/9hQJ9QJ97VY=
-=SouO
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl212DsACgkQbDjKyiDZ
+s5JSFw/9HK9hbURLyQ9OkHQtvdiQWfRTvSFTFJCjFLIOphuO9JSwZMiNGR6gjS5o
+csnwCtSJUFJAc9oCw75B4iiNvTpQSBsSuyK+ndIVj5DxxotEZ/14x8vRbeuLg/Y9
+XN/L7Uc5hHrdA1XG9KBRNIdQVKnSNdnQRAtqYUYG71RQ1aSroNpP2IDK4PYxAlAK
+GqSiArnbquub4iNMpavG0zTFU54KIJ/qGHQ9+qPIXb0eJdfSprz87soOTXLeg3nd
+iQFw7ySrIkkDt7qeB6pRZFbJgUR1u4k1LbHLazQ001QtXAUNBYui9ZJbq9RP0qOh
+Cfwqg7e+qdMZMPRwnb7XwyJ1sxgGB9hYXvebj4cyxJBcivvZNRZ5j+rfpgIocBeE
+TdL9eF4W5d92+kdejT/Ij78yPrttF9Qm/3CeEdM4SGcnuJJELVSX1ETxveESUQhz
+/KJpZ3xtJjcNcjav+//j3E+0xtKL0BVYtYIIE4+UkyHMoTahI90xqfGKwkR8MP1H
+TgSo4/2pn4bXegchimRtbGCpjNA8Ah5jlGS4zXHDLB1N0YqpnbwHDP1EzNIfTk+f
+wg+rEsh1qND+9PKjnmHZsIBNGD4CQ6YPhD9Gy2ow/4fRrODwfjLrpXtQhHlOfSFd
+0b66KV7TI6uj/av1BorfUJIcPnghzwUMIf0q0XU4qZWxy69Y+os=
+=5h1y
 -----END PGP SIGNATURE-----
 
---M0YLxmUXciMpOLPE--
+--ggdAeHltlv4tpqCr--
 
