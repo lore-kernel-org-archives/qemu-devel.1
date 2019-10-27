@@ -2,66 +2,62 @@ Return-Path: <SRS0=q9Vo=YU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C685CCA9EAF
-	for <qemu-devel@archiver.kernel.org>; Sun, 27 Oct 2019 17:35:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A48F8CA9EAF
+	for <qemu-devel@archiver.kernel.org>; Sun, 27 Oct 2019 17:35:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8081720679
-	for <qemu-devel@archiver.kernel.org>; Sun, 27 Oct 2019 17:35:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6CF4B20679
+	for <qemu-devel@archiver.kernel.org>; Sun, 27 Oct 2019 17:35:57 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="aZRLBAZ9"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8081720679
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="lTiqi/Ue"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6CF4B20679
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46208 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46212 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iOmRQ-00073Q-4m
-	for qemu-devel@archiver.kernel.org; Sun, 27 Oct 2019 13:35:00 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57456)
+	id 1iOmSJ-0005FC-JG
+	for qemu-devel@archiver.kernel.org; Sun, 27 Oct 2019 13:35:55 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57442)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgibson@ozlabs.org>) id 1iOmJt-0004NE-1D
+ (envelope-from <dgibson@ozlabs.org>) id 1iOmJt-0004Mj-BY
  for qemu-devel@nongnu.org; Sun, 27 Oct 2019 13:27:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1iOmJo-0006hw-76
+ (envelope-from <dgibson@ozlabs.org>) id 1iOmJq-0006kl-Pc
  for qemu-devel@nongnu.org; Sun, 27 Oct 2019 13:27:12 -0400
-Received: from bilbo.ozlabs.org ([203.11.71.1]:36807 helo=ozlabs.org)
+Received: from ozlabs.org ([2401:3900:2:1::2]:44333)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1iOmJn-0006aU-Bd; Sun, 27 Oct 2019 13:27:08 -0400
+ id 1iOmJq-0006iS-DU; Sun, 27 Oct 2019 13:27:10 -0400
 Received: by ozlabs.org (Postfix, from userid 1007)
- id 471Psw0pbjz9sPV; Mon, 28 Oct 2019 04:26:59 +1100 (AEDT)
+ id 471Psw5Yyxz9sPh; Mon, 28 Oct 2019 04:27:00 +1100 (AEDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
  d=gibson.dropbear.id.au; s=201602; t=1572197220;
- bh=aE0vFQ/p6WYTNj5cDAiWHO1SMNg8rFZGYc+EVMdE/PY=;
+ bh=0dsz3R0RRWo/ci+oWuYi/xKJ3pFL8rvRme7zLAeXa+s=;
  h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=aZRLBAZ9/5b4538MqndmbdNv5ug9nb2+BzSFJxTNSpPHPofZXCnb08DBAMiCulzTH
- D5CDc6TK8hvO3A6Mlbw2qfVjeO1WQW8PqryivLYY4YHG2Z3Br2ECHZ+y28Vw6DO+ks
- tUoATcBWcHUbivoAfeyN/IQXw9XhTsDz0t8tWd2c=
-Date: Sun, 27 Oct 2019 17:54:36 +0100
+ b=lTiqi/Ue4Lny3dJ5nywgOhoaHLAmVSoH6qZ13WV07UHmJHLJ1XZkxpsg1dKQTczxa
+ V6Hu8GoIEb6eEuP3Kb82Ogg+d3JbkAbpwUbIxX88lNjMDJWoDWFVJMLjzue/+Y23J8
+ wsqKULoS3bFjb3nePRHKsEgp5lN6gO66DVr6kJmI=
+Date: Sun, 27 Oct 2019 18:10:42 +0100
 From: David Gibson <david@gibson.dropbear.id.au>
 To: Greg Kurz <groug@kaod.org>
-Subject: Re: [PATCH v5 4/7] ppc/pnv: Add a PnvChip pointer to PnvCore
-Message-ID: <20191027165436.GD3552@umbus.metropole.lan>
-References: <20191022163812.330-1-clg@kaod.org>
- <20191022163812.330-5-clg@kaod.org>
- <20191024023812.GO6439@umbus.fritz.box>
- <20191024193030.40ee674e@bahia.lan>
+Subject: Re: [PATCH 0/3] ppc: Fix 'info pic' crash
+Message-ID: <20191027171042.GI3552@umbus.metropole.lan>
+References: <157192723646.3146912.1271674896169655201.stgit@bahia.lan>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="DiL7RhKs8rK9YGuF"
+ protocol="application/pgp-signature"; boundary="CD/aTaZybdUisKIc"
 Content-Disposition: inline
-In-Reply-To: <20191024193030.40ee674e@bahia.lan>
+In-Reply-To: <157192723646.3146912.1271674896169655201.stgit@bahia.lan>
 User-Agent: Mutt/1.12.1 (2019-06-15)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 203.11.71.1
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2401:3900:2:1::2
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -73,73 +69,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>,
- qemu-ppc@nongnu.org, =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>,
+Cc: qemu-ppc@nongnu.org, =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>,
  qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
---DiL7RhKs8rK9YGuF
-Content-Type: text/plain; charset=iso-8859-1
+--CD/aTaZybdUisKIc
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Oct 24, 2019 at 07:30:30PM +0200, Greg Kurz wrote:
-> On Thu, 24 Oct 2019 13:38:12 +1100
-> David Gibson <david@gibson.dropbear.id.au> wrote:
+On Thu, Oct 24, 2019 at 04:27:16PM +0200, Greg Kurz wrote:
+> The interrupt presenters are currently parented to their associated
+> VCPU, and we rely on CPU_FOREACH() when we need to perform a specific
+> task with them. Like exposing their state with 'info pic', or finding
+> the target VCPU for an interrupt when using the XIVE controller.
 >=20
-> > On Tue, Oct 22, 2019 at 06:38:09PM +0200, C=E9dric Le Goater wrote:
-> > > We will use it to reset the interrupt presenter from the CPU reset
-> > > handler.
-> > >=20
-> > > Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
-> > > Reviewed-by: Greg Kurz <groug@kaod.org>
-> > > ---
-> > >  include/hw/ppc/pnv_core.h | 3 +++
-> > >  hw/ppc/pnv_core.c         | 3 ++-
-> > >  2 files changed, 5 insertions(+), 1 deletion(-)
-> > >=20
-> > > diff --git a/include/hw/ppc/pnv_core.h b/include/hw/ppc/pnv_core.h
-> > > index bfbd2ec42aa6..55eee95104da 100644
-> > > --- a/include/hw/ppc/pnv_core.h
-> > > +++ b/include/hw/ppc/pnv_core.h
-> > > @@ -31,6 +31,8 @@
-> > >  #define PNV_CORE_GET_CLASS(obj) \
-> > >       OBJECT_GET_CLASS(PnvCoreClass, (obj), TYPE_PNV_CORE)
-> > > =20
-> > > +typedef struct PnvChip PnvChip;
-> > > +
-> > >  typedef struct PnvCore {
-> > >      /*< private >*/
-> > >      CPUCore parent_obj;
-> > > @@ -38,6 +40,7 @@ typedef struct PnvCore {
-> > >      /*< public >*/
-> > >      PowerPCCPU **threads;
-> > >      uint32_t pir;
-> > > +    PnvChip *chip;
-> >=20
-> > I don't love having this as a redundant encoding of the information
-> > already in the property, since it raises the possibility of confusing
-> > bugs if they ever got out of sync.
-> >=20
+> We recently realized that the latter could crash QEMU because CPU_FOREACH=
+()
+> can race with CPU hotplug. This got fixed by checking the presenter point=
+er
+> under the CPU was set (commit 627fa61746f7), but I'm not that sure that
+> this is enough since the presenter pointers also get stale at some point
+> during CPU unplug. And we still have other users of CPU_FOREACH(), namely
+> 'info pic' with both XICS and XIVE, that have the very same problem:
 >=20
-> Ouch, we also have this pattern in xive_tctx_realize(). The XiveTCXT
-> object has both a "cpu" property and a pointer to the vCPU.
+> With XIVE:
 >=20
-> > It's not a huge deal, but it would be nice to at least to at least
-> > consider either a) grabbing the property everywhere you need it (if
-> > there aren't too many places) or b) customizing the property
-> > definition so it's written directly into that field.
-> >=20
+> Thread 1 "qemu-system-ppc" received signal SIGSEGV, Segmentation fault.
+> 0x00000001003d2848 in xive_tctx_pic_print_info (tctx=3D0x101ae5280,=20
+>     mon=3D0x7fffffffe180) at /home/greg/Work/qemu/qemu-spapr/hw/intc/xive=
+=2Ec:526
+> 526         int cpu_index =3D tctx->cs ? tctx->cs->cpu_index : -1;
+> (gdb) p tctx
+> $1 =3D (XiveTCTX *) 0x101ae5280
+> (gdb) p tctx->cs
+> $2 =3D (CPUState *) 0x2057512020203a5d <-- tctx is stale
+> (gdb) p tctx->cs->cpu_index
+> Cannot access memory at address 0x205751202020bead
 >=20
-> The pointer to the vCPU is used among other things to get the
-> value of the PIR, which is needed by the presenting logic to
-> match physical CAM lines. This is a _hot_ path so it's probably
-> better to go for b).
+> With XICS:
+>=20
+> Thread 1 "qemu-system-ppc" received signal SIGSEGV, Segmentation fault.
+> 0x00000001003cc39c in icp_pic_print_info (icp=3D0x10244ccf0, mon=3D0x7fff=
+ffffe940)
+>     at /home/greg/Work/qemu/qemu-spapr/hw/intc/xics.c:47
+> 47          int cpu_index =3D icp->cs ? icp->cs->cpu_index : -1;
+> (gdb) p icp
+> $1 =3D (ICPState *) 0x10244ccf0
+> (gdb) p icp->cs
+> $2 =3D (CPUState *) 0x524958203220 <-- icp is stale
+> (gdb) p icp->cs->cpu_index
+> Cannot access memory at address 0x52495820b670
+>=20
+> It may be worth finding a way to address this globally instead of
+> open-coding the check of the presenter pointer everywhere because
+> this is fragile. I gave a try with this series:
+>=20
+> 	[0/6] ppc: Reparent the interrupt presenter
+>=20
+> 	https://patchwork.ozlabs.org/cover/1182224/
+>=20
+> but it requires some more reflexion. Also, we're about to enter
+> softfreeze, and it seems better to come up with a simpler fix.
+>=20
+> Let's forget the reparenting and check the presenter pointers
+> where needed instead. Patch 1 from the previous series was changed
+> to also NULLify presenter pointers, so that they can be used to
+> filter out unwanted vCPUs in patch 3. I've kept patch 2 because
+> it's a fix in the same area, but it isn't related to the QEMU
+> crashes.
 
-Agreed.
+Applied to ppc-for-4.2, thanks.
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -147,25 +150,25 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---DiL7RhKs8rK9YGuF
+--CD/aTaZybdUisKIc
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl21y8wACgkQbDjKyiDZ
-s5J3RQ/9HoGXIWU8VZ2CSKmllMdSZY6B45jDu7UFuJ0LeE3mLeLve3VgrMYIl4uk
-2e/G6fhqa9xXOHI578k7pe3SGX/9mw6h53SVQb7a5Yl+5eXlFGuNxycLiVXWtjdb
-RNLaHYp22ZIf4f4Iz+E2BtYzdqg7WAT/EENZHx+Ypw0LrrBJnT00cWu+iHhJp6/C
-dGLdUep/BTckpdCtPZQgWjRyh09TTQPhuvplEcLBSF3QzkR1EOkuHrPOELCftNTt
-AnVx/3BH0k5vopAEChoOFbkzATKI9QtJXl9/vTki50IVuYxWx+dVbCRn524Pw2qe
-hhHdFHChJqQB/+EYTttU8tUMf9+6JxZyTpNcafxV0xkM81CH1j9np/onzBB3CROJ
-L1j2qteEsB0OA+oIXYOmnLVYXbCOtIyIFRSzDPug8x1cbfVkj/B9n/UkzAeq8krT
-LyujMwKfnv8HvIda9NhDIZvbWJf3qnqyxyMnMSOUOvCEC4IdkwvR36ZeXvy8MAH0
-e9+3uH/DM33Q76/Xo79CjleT26dic/wLhOY5VCbCs1FEncpWNqU24s3nEB2P6ehM
-z+JeOLsgxIJWRX/OMuf8WOQAalvQaNqWbmF8+TbTOfvEwXP3Hmc0RuR/lQ/PtLu6
-roLn8oBqBbOftqN4BaqtfZfUNMcnHswGzkDK/nBX33+d2j2Lwu0=
-=nInS
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl21z5IACgkQbDjKyiDZ
+s5LhvA/+PpIuDYuISAW4DZLWwTRcQWPNUCSP/b8DupGAZB+RsGrTmClXlFTNhpQf
+m+Fu5Eg8irqEZi2gK8/KV349hZAsQPXWUmQ/DKco2Vp0WxE7JRZrLwYZrFI4ywow
+eTnBWbIZnQgbNxAL40lUcw9gjZAu3NvSLWlmftkLMQrtI08fU6fNK8E33thnTJAR
+oyNqrtbeKhPigNUb/sNW7I/WEW4EwYsR9b8r4Kbl6F2HIEsrhdCYt2QyGgf3J78/
++9spiX41kv3OJWXe9o83xcP2NuG0q1JKKpdVy57H5m23RlqQhjtGTKl+xWcd8cny
+ZMCvoi6fDEd2LLka0nhS2Mcb4s/1ohjK0dOlrsrZjpnqGW8V4x5kKA8ty+DTTwtF
+4ZPK3isIMd/y/Wx4Hha0J3ZUx8PPNoKgNbK/mnXakshjHKBWxHSn30/UARAOvOod
+WUgTtGUFYL73aKOAuuTVSryPjJkpLOJvhyPKT7o05q2nGEQnS/1HiAtvz4xWcmLb
+V2zZ+Tu7H0DVRVtjpL8yS7mnAxOGwN8vHmaRpVeeu9IrEieDOHWizE+blCbkGfkk
+LIbGBenc8/JDZWX9u2LZaD414PKnFxAsw5YF2P1nqcNKA8D9wTonCnJzKWMPMs+v
+l+ZfjgClCO9maba98DnLLMCOR/lzC3A5p3U0iIxJWdl04m+qETk=
+=b+TY
 -----END PGP SIGNATURE-----
 
---DiL7RhKs8rK9YGuF--
+--CD/aTaZybdUisKIc--
 
