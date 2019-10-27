@@ -2,64 +2,64 @@ Return-Path: <SRS0=q9Vo=YU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 187ABCA9EAF
-	for <qemu-devel@archiver.kernel.org>; Sun, 27 Oct 2019 17:50:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 55F00CA9EAF
+	for <qemu-devel@archiver.kernel.org>; Sun, 27 Oct 2019 17:50:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BBE3E20679
-	for <qemu-devel@archiver.kernel.org>; Sun, 27 Oct 2019 17:50:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1D24420679
+	for <qemu-devel@archiver.kernel.org>; Sun, 27 Oct 2019 17:50:42 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="FBoApF2i"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BBE3E20679
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="FYOa76lG"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1D24420679
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46304 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46306 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iOmgV-0005ey-Og
-	for qemu-devel@archiver.kernel.org; Sun, 27 Oct 2019 13:50:35 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60298)
+	id 1iOmgZ-0006QR-W3
+	for qemu-devel@archiver.kernel.org; Sun, 27 Oct 2019 13:50:40 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60288)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgibson@ozlabs.org>) id 1iOme9-00079L-Vr
- for qemu-devel@nongnu.org; Sun, 27 Oct 2019 13:48:12 -0400
+ (envelope-from <dgibson@ozlabs.org>) id 1iOme9-000724-19
+ for qemu-devel@nongnu.org; Sun, 27 Oct 2019 13:48:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1iOme7-0002rX-L3
- for qemu-devel@nongnu.org; Sun, 27 Oct 2019 13:48:09 -0400
-Received: from bilbo.ozlabs.org ([203.11.71.1]:47869 helo=ozlabs.org)
+ (envelope-from <dgibson@ozlabs.org>) id 1iOme7-0002rD-6s
+ for qemu-devel@nongnu.org; Sun, 27 Oct 2019 13:48:08 -0400
+Received: from bilbo.ozlabs.org ([2401:3900:2:1::2]:33981 helo=ozlabs.org)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgibson@ozlabs.org>) id 1iOme6-0002pO-Vj
- for qemu-devel@nongnu.org; Sun, 27 Oct 2019 13:48:07 -0400
+ (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
+ id 1iOme5-0002pn-QP; Sun, 27 Oct 2019 13:48:07 -0400
 Received: by ozlabs.org (Postfix, from userid 1007)
- id 471QL96FJpz9sP3; Mon, 28 Oct 2019 04:48:01 +1100 (AEDT)
+ id 471QL975pdz9sPT; Mon, 28 Oct 2019 04:48:01 +1100 (AEDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1572198481;
- bh=F5bFN2N/frUUnpwcXrQS5wC9FMCSNqJuA9ZWFUZabR0=;
+ d=gibson.dropbear.id.au; s=201602; t=1572198482;
+ bh=48qx/FX595PM6dv7miLCXvevRkJLXG5lUhoMdqolVYU=;
  h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=FBoApF2iUPtM0EcTMfsTvfIV1A6S/MpafNBgI28zoiuMUqo+nJ/1yoHyCWOXFQgs5
- 1jvPyr+UQDyvPD/+Wy9QS9AjJJVBfEbTssW60tASrDxID+g2xQIPi22yzYL2p8sz8f
- Z3CqTLettpu9ySTTo+Klm3oBRQOk6f45dr1pxISU=
-Date: Sun, 27 Oct 2019 18:43:41 +0100
+ b=FYOa76lGoAqYfLcfq+da0i+eA9MojTTOoiTyf50FwPAzXsqFpuJuVyCifsecmf7p6
+ SaE6YoU7QpjO4aj8PC8Z+bizHfWFoZhQ/F42khk3pPE6WfOk7pEG+AIxshuL0NEzXm
+ y+cEZ5FX9UZEyqehZ4yRsjvzMvFkh0OgboFAweLE=
+Date: Sun, 27 Oct 2019 18:46:31 +0100
 From: David Gibson <david@gibson.dropbear.id.au>
-To: Liu Yi L <yi.l.liu@intel.com>
-Subject: Re: [RFC v2 06/22] hw/pci: modify pci_setup_iommu() to set PCIIOMMUOps
-Message-ID: <20191027174341.GL3552@umbus.metropole.lan>
-References: <1571920483-3382-1-git-send-email-yi.l.liu@intel.com>
- <1571920483-3382-7-git-send-email-yi.l.liu@intel.com>
+To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
+Subject: Re: [PATCH 1/5] ppc/pnv: Add a PNOR model
+Message-ID: <20191027174631.GM3552@umbus.metropole.lan>
+References: <20191021131215.3693-1-clg@kaod.org>
+ <20191021131215.3693-2-clg@kaod.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="5VuzLDXibKSJvVYD"
+ protocol="application/pgp-signature"; boundary="oiL9LJXJsdjS5rzq"
 Content-Disposition: inline
-In-Reply-To: <1571920483-3382-7-git-send-email-yi.l.liu@intel.com>
+In-Reply-To: <20191021131215.3693-2-clg@kaod.org>
 User-Agent: Mutt/1.12.1 (2019-06-15)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 203.11.71.1
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2401:3900:2:1::2
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -71,453 +71,290 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: tianyu.lan@intel.com, kevin.tian@intel.com, jacob.jun.pan@linux.intel.com,
- Yi Sun <yi.y.sun@linux.intel.com>, kvm@vger.kernel.org, mst@redhat.com,
- jun.j.tian@intel.com, qemu-devel@nongnu.org, peterx@redhat.com,
- eric.auger@redhat.com, alex.williamson@redhat.com, pbonzini@redhat.com,
- yi.y.sun@intel.com
+Cc: qemu-devel@nongnu.org, Greg Kurz <groug@kaod.org>,
+ =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@fr.ibm.com>, qemu-ppc@nongnu.org,
+ Joel Stanley <joel@jms.id.au>, "Marty E . Plummer" <hanetzer@startmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
---5VuzLDXibKSJvVYD
-Content-Type: text/plain; charset=us-ascii
+--oiL9LJXJsdjS5rzq
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Oct 24, 2019 at 08:34:27AM -0400, Liu Yi L wrote:
-> This patch modifies pci_setup_iommu() to set PCIIOMMUOps instead of only
-> setting PCIIOMMUFunc. PCIIOMMUFunc is previously used to get an address
-> space for a device in vendor specific way. The PCIIOMMUOps still offers
-> this functionality. Use PCIIOMMUOps leaves space to add more iommu related
-> vendor specific operations.
+On Mon, Oct 21, 2019 at 03:12:11PM +0200, C=E9dric Le Goater wrote:
+> From: C=E9dric Le Goater <clg@fr.ibm.com>
 >=20
-> Cc: Kevin Tian <kevin.tian@intel.com>
-> Cc: Jacob Pan <jacob.jun.pan@linux.intel.com>
-> Cc: Peter Xu <peterx@redhat.com>
-> Cc: Eric Auger <eric.auger@redhat.com>
-> Cc: Yi Sun <yi.y.sun@linux.intel.com>
-> Cc: David Gibson <david@gibson.dropbear.id.au>
-> Signed-off-by: Liu Yi L <yi.l.liu@intel.com>
+> On a POWERPC PowerNV system, the host firmware is stored in a PNOR
+> flash chip which contents is mapped on the LPC bus. This model adds a
+> simple dummy device to map the contents of a block device in the host
+> address space.
+>=20
+> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
 
-Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
+Applied to ppc-for-4.2.  The rest of the series will need acks for the
+generic IPMI changes, of course.
 
 > ---
->  hw/alpha/typhoon.c       |  6 +++++-
->  hw/arm/smmu-common.c     |  6 +++++-
->  hw/hppa/dino.c           |  6 +++++-
->  hw/i386/amd_iommu.c      |  6 +++++-
->  hw/i386/intel_iommu.c    |  6 +++++-
->  hw/pci-host/designware.c |  6 +++++-
->  hw/pci-host/ppce500.c    |  6 +++++-
->  hw/pci-host/prep.c       |  6 +++++-
->  hw/pci-host/sabre.c      |  6 +++++-
->  hw/pci/pci.c             | 11 ++++++-----
->  hw/ppc/ppc440_pcix.c     |  6 +++++-
->  hw/ppc/spapr_pci.c       |  6 +++++-
->  hw/s390x/s390-pci-bus.c  |  8 ++++++--
->  include/hw/pci/pci.h     |  8 ++++++--
->  include/hw/pci/pci_bus.h |  2 +-
->  15 files changed, 74 insertions(+), 21 deletions(-)
+>  include/hw/ppc/pnv.h      |   3 +
+>  include/hw/ppc/pnv_pnor.h |  25 +++++++
+>  hw/ppc/pnv.c              |  14 ++++
+>  hw/ppc/pnv_pnor.c         | 135 ++++++++++++++++++++++++++++++++++++++
+>  hw/ppc/Makefile.objs      |   4 +-
+>  5 files changed, 180 insertions(+), 1 deletion(-)
+>  create mode 100644 include/hw/ppc/pnv_pnor.h
+>  create mode 100644 hw/ppc/pnv_pnor.c
 >=20
-> diff --git a/hw/alpha/typhoon.c b/hw/alpha/typhoon.c
-> index 179e1f7..b890771 100644
-> --- a/hw/alpha/typhoon.c
-> +++ b/hw/alpha/typhoon.c
-> @@ -741,6 +741,10 @@ static AddressSpace *typhoon_pci_dma_iommu(PCIBus *b=
-us, void *opaque, int devfn)
->      return &s->pchip.iommu_as;
->  }
+> diff --git a/include/hw/ppc/pnv.h b/include/hw/ppc/pnv.h
+> index 5e01a9f3df95..e2f20f2b0bc4 100644
+> --- a/include/hw/ppc/pnv.h
+> +++ b/include/hw/ppc/pnv.h
+> @@ -24,6 +24,7 @@
+>  #include "hw/sysbus.h"
+>  #include "hw/ipmi/ipmi.h"
+>  #include "hw/ppc/pnv_lpc.h"
+> +#include "hw/ppc/pnv_pnor.h"
+>  #include "hw/ppc/pnv_psi.h"
+>  #include "hw/ppc/pnv_occ.h"
+>  #include "hw/ppc/pnv_homer.h"
+> @@ -173,6 +174,8 @@ typedef struct PnvMachineState {
 > =20
-> +static const PCIIOMMUOps typhoon_iommu_ops =3D {
-> +    .get_address_space =3D typhoon_pci_dma_iommu,
+>      IPMIBmc      *bmc;
+>      Notifier     powerdown_notifier;
+> +
+> +    PnvPnor      *pnor;
+>  } PnvMachineState;
+> =20
+>  static inline bool pnv_chip_is_power9(const PnvChip *chip)
+> diff --git a/include/hw/ppc/pnv_pnor.h b/include/hw/ppc/pnv_pnor.h
+> new file mode 100644
+> index 000000000000..dec811695c8d
+> --- /dev/null
+> +++ b/include/hw/ppc/pnv_pnor.h
+> @@ -0,0 +1,25 @@
+> +/*
+> + * QEMU PowerNV PNOR simple model
+> + *
+> + * Copyright (c) 2019, IBM Corporation.
+> + *
+> + * This code is licensed under the GPL version 2 or later. See the
+> + * COPYING file in the top-level directory.
+> + */
+> +#ifndef _PPC_PNV_PNOR_H
+> +#define _PPC_PNV_PNOR_H
+> +
+> +#define TYPE_PNV_PNOR  "pnv-pnor"
+> +#define PNV_PNOR(obj)  OBJECT_CHECK(PnvPnor, (obj), TYPE_PNV_PNOR)
+> +
+> +typedef struct PnvPnor {
+> +    SysBusDevice   parent_obj;
+> +
+> +    BlockBackend   *blk;
+> +
+> +    uint8_t        *storage;
+> +    uint32_t       size;
+> +    MemoryRegion   mmio;
+> +} PnvPnor;
+> +
+> +#endif /* _PPC_PNV_PNOR_H */
+> diff --git a/hw/ppc/pnv.c b/hw/ppc/pnv.c
+> index 1a22dfd46031..b74528eba42a 100644
+> --- a/hw/ppc/pnv.c
+> +++ b/hw/ppc/pnv.c
+> @@ -44,6 +44,7 @@
+>  #include "hw/ppc/xics.h"
+>  #include "hw/qdev-properties.h"
+>  #include "hw/ppc/pnv_xscom.h"
+> +#include "hw/ppc/pnv_pnor.h"
+> =20
+>  #include "hw/isa/isa.h"
+>  #include "hw/boards.h"
+> @@ -633,6 +634,8 @@ static void pnv_init(MachineState *machine)
+>      long fw_size;
+>      int i;
+>      char *chip_typename;
+> +    DriveInfo *pnor =3D drive_get(IF_MTD, 0, 0);
+> +    DeviceState *dev;
+> =20
+>      /* allocate RAM */
+>      if (machine->ram_size < (1 * GiB)) {
+> @@ -644,6 +647,17 @@ static void pnv_init(MachineState *machine)
+>                                           machine->ram_size);
+>      memory_region_add_subregion(get_system_memory(), 0, ram);
+> =20
+> +    /*
+> +     * Create our simple PNOR device
+> +     */
+> +    dev =3D qdev_create(NULL, TYPE_PNV_PNOR);
+> +    if (pnor) {
+> +        qdev_prop_set_drive(dev, "drive", blk_by_legacy_dinfo(pnor),
+> +                            &error_abort);
+> +    }
+> +    qdev_init_nofail(dev);
+> +    pnv->pnor =3D PNV_PNOR(dev);
+> +
+>      /* load skiboot firmware  */
+>      if (bios_name =3D=3D NULL) {
+>          bios_name =3D FW_FILE_NAME;
+> diff --git a/hw/ppc/pnv_pnor.c b/hw/ppc/pnv_pnor.c
+> new file mode 100644
+> index 000000000000..bfb1e92b0392
+> --- /dev/null
+> +++ b/hw/ppc/pnv_pnor.c
+> @@ -0,0 +1,135 @@
+> +/*
+> + * QEMU PowerNV PNOR simple model
+> + *
+> + * Copyright (c) 2015-2019, IBM Corporation.
+> + *
+> + * This code is licensed under the GPL version 2 or later. See the
+> + * COPYING file in the top-level directory.
+> + */
+> +
+> +#include "qemu/osdep.h"
+> +#include "qapi/error.h"
+> +#include "qemu/error-report.h"
+> +#include "qemu/log.h"
+> +#include "sysemu/block-backend.h"
+> +#include "sysemu/blockdev.h"
+> +#include "hw/loader.h"
+> +#include "hw/ppc/pnv_pnor.h"
+> +#include "hw/qdev-properties.h"
+> +
+> +static uint64_t pnv_pnor_read(void *opaque, hwaddr addr, unsigned size)
+> +{
+> +    PnvPnor *s =3D PNV_PNOR(opaque);
+> +    uint64_t ret =3D 0;
+> +    int i;
+> +
+> +    for (i =3D 0; i < size; i++) {
+> +        ret |=3D (uint64_t) s->storage[addr + i] << (8 * (size - i - 1));
+> +    }
+> +
+> +    return ret;
+> +}
+> +
+> +static void pnv_pnor_update(PnvPnor *s, int offset, int size)
+> +{
+> +    int offset_end;
+> +
+> +    if (s->blk) {
+> +        return;
+> +    }
+> +
+> +    offset_end =3D offset + size;
+> +    offset =3D QEMU_ALIGN_DOWN(offset, BDRV_SECTOR_SIZE);
+> +    offset_end =3D QEMU_ALIGN_UP(offset_end, BDRV_SECTOR_SIZE);
+> +
+> +    blk_pwrite(s->blk, offset, s->storage + offset,
+> +               offset_end - offset, 0);
+> +}
+> +
+> +static void pnv_pnor_write(void *opaque, hwaddr addr, uint64_t data,
+> +                           unsigned size)
+> +{
+> +    PnvPnor *s =3D PNV_PNOR(opaque);
+> +    int i;
+> +
+> +    for (i =3D 0; i < size; i++) {
+> +        s->storage[addr + i] =3D (data >> (8 * (size - i - 1))) & 0xFF;
+> +    }
+> +    pnv_pnor_update(s, addr, size);
+> +}
+> +
+> +/*
+> + * TODO: Check endianness: skiboot is BIG, Aspeed AHB is LITTLE, flash
+> + * is BIG.
+> + */
+> +static const MemoryRegionOps pnv_pnor_ops =3D {
+> +    .read =3D pnv_pnor_read,
+> +    .write =3D pnv_pnor_write,
+> +    .endianness =3D DEVICE_BIG_ENDIAN,
+> +    .valid =3D {
+> +        .min_access_size =3D 1,
+> +        .max_access_size =3D 4,
+> +    },
 > +};
 > +
->  static void typhoon_set_irq(void *opaque, int irq, int level)
->  {
->      TyphoonState *s =3D opaque;
-> @@ -901,7 +905,7 @@ PCIBus *typhoon_init(ram_addr_t ram_size, ISABus **is=
-a_bus,
->                               "iommu-typhoon", UINT64_MAX);
->      address_space_init(&s->pchip.iommu_as, MEMORY_REGION(&s->pchip.iommu=
-),
->                         "pchip0-pci");
-> -    pci_setup_iommu(b, typhoon_pci_dma_iommu, s);
-> +    pci_setup_iommu(b, &typhoon_iommu_ops, s);
-> =20
->      /* Pchip0 PCI special/interrupt acknowledge, 0x801.F800.0000, 64MB. =
- */
->      memory_region_init_io(&s->pchip.reg_iack, OBJECT(s), &alpha_pci_iack=
-_ops,
-> diff --git a/hw/arm/smmu-common.c b/hw/arm/smmu-common.c
-> index 245817d..d668514 100644
-> --- a/hw/arm/smmu-common.c
-> +++ b/hw/arm/smmu-common.c
-> @@ -342,6 +342,10 @@ static AddressSpace *smmu_find_add_as(PCIBus *bus, v=
-oid *opaque, int devfn)
->      return &sdev->as;
->  }
-> =20
-> +static const PCIIOMMUOps smmu_ops =3D {
-> +    .get_address_space =3D smmu_find_add_as,
+> +static void pnv_pnor_realize(DeviceState *dev, Error **errp)
+> +{
+> +    PnvPnor *s =3D PNV_PNOR(dev);
+> +    int ret;
+> +
+> +    if (s->blk) {
+> +        uint64_t perm =3D BLK_PERM_CONSISTENT_READ |
+> +                        (blk_is_read_only(s->blk) ? 0 : BLK_PERM_WRITE);
+> +        ret =3D blk_set_perm(s->blk, perm, BLK_PERM_ALL, errp);
+> +        if (ret < 0) {
+> +            return;
+> +        }
+> +
+> +        s->size =3D blk_getlength(s->blk);
+> +        if (s->size <=3D 0) {
+> +            error_setg(errp, "failed to get flash size");
+> +            return;
+> +        }
+> +
+> +        s->storage =3D blk_blockalign(s->blk, s->size);
+> +
+> +        if (blk_pread(s->blk, 0, s->storage, s->size) !=3D s->size) {
+> +            error_setg(errp, "failed to read the initial flash content");
+> +            return;
+> +        }
+> +    } else {
+> +        s->storage =3D blk_blockalign(NULL, s->size);
+> +        memset(s->storage, 0xFF, s->size);
+> +    }
+> +
+> +    memory_region_init_io(&s->mmio, OBJECT(s), &pnv_pnor_ops, s,
+> +                          TYPE_PNV_PNOR, s->size);
+> +}
+> +
+> +static Property pnv_pnor_properties[] =3D {
+> +    DEFINE_PROP_UINT32("size", PnvPnor, size, 128 << 20),
+> +    DEFINE_PROP_DRIVE("drive", PnvPnor, blk),
+> +    DEFINE_PROP_END_OF_LIST(),
 > +};
 > +
->  IOMMUMemoryRegion *smmu_iommu_mr(SMMUState *s, uint32_t sid)
->  {
->      uint8_t bus_n, devfn;
-> @@ -436,7 +440,7 @@ static void smmu_base_realize(DeviceState *dev, Error=
- **errp)
->      s->smmu_pcibus_by_busptr =3D g_hash_table_new(NULL, NULL);
-> =20
->      if (s->primary_bus) {
-> -        pci_setup_iommu(s->primary_bus, smmu_find_add_as, s);
-> +        pci_setup_iommu(s->primary_bus, &smmu_ops, s);
->      } else {
->          error_setg(errp, "SMMU is not attached to any PCI bus!");
->      }
-> diff --git a/hw/hppa/dino.c b/hw/hppa/dino.c
-> index ab6969b..dbcff03 100644
-> --- a/hw/hppa/dino.c
-> +++ b/hw/hppa/dino.c
-> @@ -389,6 +389,10 @@ static AddressSpace *dino_pcihost_set_iommu(PCIBus *=
-bus, void *opaque,
->      return &s->bm_as;
->  }
-> =20
-> +static const PCIIOMMUOps dino_iommu_ops =3D {
-> +    .get_address_space =3D dino_pcihost_set_iommu,
+> +static void pnv_pnor_class_init(ObjectClass *klass, void *data)
+> +{
+> +    DeviceClass *dc =3D DEVICE_CLASS(klass);
+> +
+> +    dc->realize =3D pnv_pnor_realize;
+> +    dc->props =3D pnv_pnor_properties;
+> +}
+> +
+> +static const TypeInfo pnv_pnor_info =3D {
+> +    .name          =3D TYPE_PNV_PNOR,
+> +    .parent        =3D TYPE_SYS_BUS_DEVICE,
+> +    .instance_size =3D sizeof(PnvPnor),
+> +    .class_init    =3D pnv_pnor_class_init,
 > +};
 > +
->  /*
->   * Dino interrupts are connected as shown on Page 78, Table 23
->   * (Little-endian bit numbers)
-> @@ -508,7 +512,7 @@ PCIBus *dino_init(MemoryRegion *addr_space,
->      memory_region_add_subregion(&s->bm, 0xfff00000,
->                                  &s->bm_cpu_alias);
->      address_space_init(&s->bm_as, &s->bm, "pci-bm");
-> -    pci_setup_iommu(b, dino_pcihost_set_iommu, s);
-> +    pci_setup_iommu(b, &dino_iommu_ops, s);
-> =20
->      *p_rtc_irq =3D qemu_allocate_irq(dino_set_timer_irq, s, 0);
->      *p_ser_irq =3D qemu_allocate_irq(dino_set_serial_irq, s, 0);
-> diff --git a/hw/i386/amd_iommu.c b/hw/i386/amd_iommu.c
-> index d372636..ba6904c 100644
-> --- a/hw/i386/amd_iommu.c
-> +++ b/hw/i386/amd_iommu.c
-> @@ -1451,6 +1451,10 @@ static AddressSpace *amdvi_host_dma_iommu(PCIBus *=
-bus, void *opaque, int devfn)
->      return &iommu_as[devfn]->as;
->  }
-> =20
-> +static const PCIIOMMUOps amdvi_iommu_ops =3D {
-> +    .get_address_space =3D amdvi_host_dma_iommu,
-> +};
+> +static void pnv_pnor_register_types(void)
+> +{
+> +    type_register_static(&pnv_pnor_info);
+> +}
 > +
->  static const MemoryRegionOps mmio_mem_ops =3D {
->      .read =3D amdvi_mmio_read,
->      .write =3D amdvi_mmio_write,
-> @@ -1576,7 +1580,7 @@ static void amdvi_realize(DeviceState *dev, Error *=
-*err)
-> =20
->      sysbus_init_mmio(SYS_BUS_DEVICE(s), &s->mmio);
->      sysbus_mmio_map(SYS_BUS_DEVICE(s), 0, AMDVI_BASE_ADDR);
-> -    pci_setup_iommu(bus, amdvi_host_dma_iommu, s);
-> +    pci_setup_iommu(bus, &amdvi_iommu_ops, s);
->      s->devid =3D object_property_get_int(OBJECT(&s->pci), "addr", err);
->      msi_init(&s->pci.dev, 0, 1, true, false, err);
->      amdvi_init(s);
-> diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
-> index 4a1a07a..67a7836 100644
-> --- a/hw/i386/intel_iommu.c
-> +++ b/hw/i386/intel_iommu.c
-> @@ -3666,6 +3666,10 @@ static AddressSpace *vtd_host_dma_iommu(PCIBus *bu=
-s, void *opaque, int devfn)
->      return &vtd_as->as;
->  }
-> =20
-> +static PCIIOMMUOps vtd_iommu_ops =3D {
-> +    .get_address_space =3D vtd_host_dma_iommu,
-> +};
+> +type_init(pnv_pnor_register_types)
+> diff --git a/hw/ppc/Makefile.objs b/hw/ppc/Makefile.objs
+> index 580bb4f0dd4c..101e9fc59185 100644
+> --- a/hw/ppc/Makefile.objs
+> +++ b/hw/ppc/Makefile.objs
+> @@ -9,7 +9,9 @@ obj-$(CONFIG_PSERIES) +=3D spapr_tpm_proxy.o
+>  obj-$(CONFIG_SPAPR_RNG) +=3D  spapr_rng.o
+>  # IBM PowerNV
+>  obj-$(CONFIG_POWERNV) +=3D pnv.o pnv_xscom.o pnv_core.o pnv_lpc.o pnv_ps=
+i.o pnv_occ.o pnv_bmc.o
+> -obj-$(CONFIG_POWERNV) +=3D pnv_homer.o
+> +obj-$(CONFIG_POWERNV) +=3D pnv_homer.o pnv_pnor.o
 > +
->  static bool vtd_decide_config(IntelIOMMUState *s, Error **errp)
->  {
->      X86IOMMUState *x86_iommu =3D X86_IOMMU_DEVICE(s);
-> @@ -3782,7 +3786,7 @@ static void vtd_realize(DeviceState *dev, Error **e=
-rrp)
->                                                g_free, g_free);
->      vtd_init(s);
->      sysbus_mmio_map(SYS_BUS_DEVICE(s), 0, Q35_HOST_BRIDGE_IOMMU_ADDR);
-> -    pci_setup_iommu(bus, vtd_host_dma_iommu, dev);
-> +    pci_setup_iommu(bus, &vtd_iommu_ops, dev);
->      /* Pseudo address space under root PCI bus. */
->      pcms->ioapic_as =3D vtd_host_dma_iommu(bus, s, Q35_PSEUDO_DEVFN_IOAP=
-IC);
->      qemu_add_machine_init_done_notifier(&vtd_machine_done_notify);
-> diff --git a/hw/pci-host/designware.c b/hw/pci-host/designware.c
-> index 71e9b0d..235d6af 100644
-> --- a/hw/pci-host/designware.c
-> +++ b/hw/pci-host/designware.c
-> @@ -645,6 +645,10 @@ static AddressSpace *designware_pcie_host_set_iommu(=
-PCIBus *bus, void *opaque,
->      return &s->pci.address_space;
->  }
-> =20
-> +static const PCIIOMMUOps designware_iommu_ops =3D {
-> +    .get_address_space =3D designware_pcie_host_set_iommu,
-> +};
 > +
->  static void designware_pcie_host_realize(DeviceState *dev, Error **errp)
->  {
->      PCIHostState *pci =3D PCI_HOST_BRIDGE(dev);
-> @@ -686,7 +690,7 @@ static void designware_pcie_host_realize(DeviceState =
-*dev, Error **errp)
->      address_space_init(&s->pci.address_space,
->                         &s->pci.address_space_root,
->                         "pcie-bus-address-space");
-> -    pci_setup_iommu(pci->bus, designware_pcie_host_set_iommu, s);
-> +    pci_setup_iommu(pci->bus, designware_iommu_ops, s);
-> =20
->      qdev_set_parent_bus(DEVICE(&s->root), BUS(pci->bus));
->      qdev_init_nofail(DEVICE(&s->root));
-> diff --git a/hw/pci-host/ppce500.c b/hw/pci-host/ppce500.c
-> index 8bed8e8..0f907b0 100644
-> --- a/hw/pci-host/ppce500.c
-> +++ b/hw/pci-host/ppce500.c
-> @@ -439,6 +439,10 @@ static AddressSpace *e500_pcihost_set_iommu(PCIBus *=
-bus, void *opaque,
->      return &s->bm_as;
->  }
-> =20
-> +static const PCIIOMMUOps ppce500_iommu_ops =3D {
-> +    .get_address_space =3D e500_pcihost_set_iommu,
-> +};
-> +
->  static void e500_pcihost_realize(DeviceState *dev, Error **errp)
->  {
->      SysBusDevice *sbd =3D SYS_BUS_DEVICE(dev);
-> @@ -473,7 +477,7 @@ static void e500_pcihost_realize(DeviceState *dev, Er=
-ror **errp)
->      memory_region_init(&s->bm, OBJECT(s), "bm-e500", UINT64_MAX);
->      memory_region_add_subregion(&s->bm, 0x0, &s->busmem);
->      address_space_init(&s->bm_as, &s->bm, "pci-bm");
-> -    pci_setup_iommu(b, e500_pcihost_set_iommu, s);
-> +    pci_setup_iommu(b, &ppce500_iommu_ops, s);
-> =20
->      pci_create_simple(b, 0, "e500-host-bridge");
-> =20
-> diff --git a/hw/pci-host/prep.c b/hw/pci-host/prep.c
-> index 85d7ba9..f372524 100644
-> --- a/hw/pci-host/prep.c
-> +++ b/hw/pci-host/prep.c
-> @@ -213,6 +213,10 @@ static AddressSpace *raven_pcihost_set_iommu(PCIBus =
-*bus, void *opaque,
->      return &s->bm_as;
->  }
-> =20
-> +static const PCIIOMMU raven_iommu_ops =3D {
-> +    .get_address_space =3D raven_pcihost_set_iommu,
-> +};
-> +
->  static void raven_change_gpio(void *opaque, int n, int level)
->  {
->      PREPPCIState *s =3D opaque;
-> @@ -303,7 +307,7 @@ static void raven_pcihost_initfn(Object *obj)
->      memory_region_add_subregion(&s->bm, 0         , &s->bm_pci_memory_al=
-ias);
->      memory_region_add_subregion(&s->bm, 0x80000000, &s->bm_ram_alias);
->      address_space_init(&s->bm_as, &s->bm, "raven-bm");
-> -    pci_setup_iommu(&s->pci_bus, raven_pcihost_set_iommu, s);
-> +    pci_setup_iommu(&s->pci_bus, &raven_iommu_ops, s);
-> =20
->      h->bus =3D &s->pci_bus;
-> =20
-> diff --git a/hw/pci-host/sabre.c b/hw/pci-host/sabre.c
-> index fae20ee..79b7565 100644
-> --- a/hw/pci-host/sabre.c
-> +++ b/hw/pci-host/sabre.c
-> @@ -112,6 +112,10 @@ static AddressSpace *sabre_pci_dma_iommu(PCIBus *bus=
-, void *opaque, int devfn)
->      return &is->iommu_as;
->  }
-> =20
-> +static const PCIIOMMUOps sabre_iommu_ops =3D {
-> +    .get_address_space =3D sabre_pci_dma_iommu,
-> +};
-> +
->  static void sabre_config_write(void *opaque, hwaddr addr,
->                                 uint64_t val, unsigned size)
->  {
-> @@ -402,7 +406,7 @@ static void sabre_realize(DeviceState *dev, Error **e=
-rrp)
->      /* IOMMU */
->      memory_region_add_subregion_overlap(&s->sabre_config, 0x200,
->                      sysbus_mmio_get_region(SYS_BUS_DEVICE(s->iommu), 0),=
- 1);
-> -    pci_setup_iommu(phb->bus, sabre_pci_dma_iommu, s->iommu);
-> +    pci_setup_iommu(phb->bus, &sabre_iommu_ops, s->iommu);
-> =20
->      /* APB secondary busses */
->      pci_dev =3D pci_create_multifunction(phb->bus, PCI_DEVFN(1, 0), true,
-> diff --git a/hw/pci/pci.c b/hw/pci/pci.c
-> index aa05c2b..b5ce9ca 100644
-> --- a/hw/pci/pci.c
-> +++ b/hw/pci/pci.c
-> @@ -2615,18 +2615,19 @@ AddressSpace *pci_device_iommu_address_space(PCID=
-evice *dev)
->      PCIBus *bus =3D pci_get_bus(dev);
->      PCIBus *iommu_bus =3D bus;
-> =20
-> -    while(iommu_bus && !iommu_bus->iommu_fn && iommu_bus->parent_dev) {
-> +    while (iommu_bus && !iommu_bus->iommu_ops && iommu_bus->parent_dev) {
->          iommu_bus =3D pci_get_bus(iommu_bus->parent_dev);
->      }
-> -    if (iommu_bus && iommu_bus->iommu_fn) {
-> -        return iommu_bus->iommu_fn(bus, iommu_bus->iommu_opaque, dev->de=
-vfn);
-> +    if (iommu_bus && iommu_bus->iommu_ops) {
-> +        return iommu_bus->iommu_ops->get_address_space(bus,
-> +                           iommu_bus->iommu_opaque, dev->devfn);
->      }
->      return &address_space_memory;
->  }
-> =20
-> -void pci_setup_iommu(PCIBus *bus, PCIIOMMUFunc fn, void *opaque)
-> +void pci_setup_iommu(PCIBus *bus, const PCIIOMMUOps *ops, void *opaque)
->  {
-> -    bus->iommu_fn =3D fn;
-> +    bus->iommu_ops =3D ops;
->      bus->iommu_opaque =3D opaque;
->  }
-> =20
-> diff --git a/hw/ppc/ppc440_pcix.c b/hw/ppc/ppc440_pcix.c
-> index 2ee2d4f..2c8579c 100644
-> --- a/hw/ppc/ppc440_pcix.c
-> +++ b/hw/ppc/ppc440_pcix.c
-> @@ -442,6 +442,10 @@ static AddressSpace *ppc440_pcix_set_iommu(PCIBus *b=
-, void *opaque, int devfn)
->      return &s->bm_as;
->  }
-> =20
-> +static const PCIIOMMUOps ppc440_iommu_ops =3D {
-> +    .get_adress_space =3D ppc440_pcix_set_iommu,
-> +};
-> +
->  /* The default pci_host_data_{read,write} functions in pci/pci_host.c
->   * deny access to registers without bit 31 set but our clients want
->   * this to work so we have to override these here */
-> @@ -487,7 +491,7 @@ static void ppc440_pcix_realize(DeviceState *dev, Err=
-or **errp)
->      memory_region_init(&s->bm, OBJECT(s), "bm-ppc440-pcix", UINT64_MAX);
->      memory_region_add_subregion(&s->bm, 0x0, &s->busmem);
->      address_space_init(&s->bm_as, &s->bm, "pci-bm");
-> -    pci_setup_iommu(h->bus, ppc440_pcix_set_iommu, s);
-> +    pci_setup_iommu(h->bus, &ppc440_iommu_ops, s);
-> =20
->      memory_region_init(&s->container, OBJECT(s), "pci-container", PCI_AL=
-L_SIZE);
->      memory_region_init_io(&h->conf_mem, OBJECT(s), &pci_host_conf_le_ops,
-> diff --git a/hw/ppc/spapr_pci.c b/hw/ppc/spapr_pci.c
-> index 01ff41d..83cd857 100644
-> --- a/hw/ppc/spapr_pci.c
-> +++ b/hw/ppc/spapr_pci.c
-> @@ -771,6 +771,10 @@ static AddressSpace *spapr_pci_dma_iommu(PCIBus *bus=
-, void *opaque, int devfn)
->      return &phb->iommu_as;
->  }
-> =20
-> +static const PCIIOMMUOps spapr_iommu_ops =3D {
-> +    .get_address_space =3D spapr_pci_dma_iommu,
-> +};
-> +
->  static char *spapr_phb_vfio_get_loc_code(SpaprPhbState *sphb,  PCIDevice=
- *pdev)
->  {
->      char *path =3D NULL, *buf =3D NULL, *host =3D NULL;
-> @@ -1950,7 +1954,7 @@ static void spapr_phb_realize(DeviceState *dev, Err=
-or **errp)
->      memory_region_add_subregion(&sphb->iommu_root, SPAPR_PCI_MSI_WINDOW,
->                                  &sphb->msiwindow);
-> =20
-> -    pci_setup_iommu(bus, spapr_pci_dma_iommu, sphb);
-> +    pci_setup_iommu(bus, &spapr_iommu_ops, sphb);
-> =20
->      pci_bus_set_route_irq_fn(bus, spapr_route_intx_pin_to_irq);
-> =20
-> diff --git a/hw/s390x/s390-pci-bus.c b/hw/s390x/s390-pci-bus.c
-> index 2d2f4a7..14684a0 100644
-> --- a/hw/s390x/s390-pci-bus.c
-> +++ b/hw/s390x/s390-pci-bus.c
-> @@ -635,6 +635,10 @@ static AddressSpace *s390_pci_dma_iommu(PCIBus *bus,=
- void *opaque, int devfn)
->      return &iommu->as;
->  }
-> =20
-> +static const PCIIOMMUOps s390_iommu_ops =3D {
-> +    .get_address_space =3D s390_pci_dma_iommu,
-> +};
-> +
->  static uint8_t set_ind_atomic(uint64_t ind_loc, uint8_t to_be_set)
->  {
->      uint8_t ind_old, ind_new;
-> @@ -748,7 +752,7 @@ static void s390_pcihost_realize(DeviceState *dev, Er=
-ror **errp)
->      b =3D pci_register_root_bus(dev, NULL, s390_pci_set_irq, s390_pci_ma=
-p_irq,
->                                NULL, get_system_memory(), get_system_io()=
-, 0,
->                                64, TYPE_PCI_BUS);
-> -    pci_setup_iommu(b, s390_pci_dma_iommu, s);
-> +    pci_setup_iommu(b, &s390_iommu_ops, s);
-> =20
->      bus =3D BUS(b);
->      qbus_set_hotplug_handler(bus, OBJECT(dev), &local_err);
-> @@ -919,7 +923,7 @@ static void s390_pcihost_plug(HotplugHandler *hotplug=
-_dev, DeviceState *dev,
-> =20
->          pdev =3D PCI_DEVICE(dev);
->          pci_bridge_map_irq(pb, dev->id, s390_pci_map_irq);
-> -        pci_setup_iommu(&pb->sec_bus, s390_pci_dma_iommu, s);
-> +        pci_setup_iommu(&pb->sec_bus, &s390_iommu_ops, s);
-> =20
->          qbus_set_hotplug_handler(BUS(&pb->sec_bus), OBJECT(s), errp);
-> =20
-> diff --git a/include/hw/pci/pci.h b/include/hw/pci/pci.h
-> index f3f0ffd..d9fed8d 100644
-> --- a/include/hw/pci/pci.h
-> +++ b/include/hw/pci/pci.h
-> @@ -480,10 +480,14 @@ void pci_bus_get_w64_range(PCIBus *bus, Range *rang=
-e);
-> =20
->  void pci_device_deassert_intx(PCIDevice *dev);
-> =20
-> -typedef AddressSpace *(*PCIIOMMUFunc)(PCIBus *, void *, int);
-> +typedef struct PCIIOMMUOps PCIIOMMUOps;
-> +struct PCIIOMMUOps {
-> +    AddressSpace * (*get_address_space)(PCIBus *bus,
-> +                                void *opaque, int32_t devfn);
-> +};
-> =20
->  AddressSpace *pci_device_iommu_address_space(PCIDevice *dev);
-> -void pci_setup_iommu(PCIBus *bus, PCIIOMMUFunc fn, void *opaque);
-> +void pci_setup_iommu(PCIBus *bus, const PCIIOMMUOps *iommu_ops, void *op=
-aque);
-> =20
->  static inline void
->  pci_set_byte(uint8_t *config, uint8_t val)
-> diff --git a/include/hw/pci/pci_bus.h b/include/hw/pci/pci_bus.h
-> index 0714f57..c281057 100644
-> --- a/include/hw/pci/pci_bus.h
-> +++ b/include/hw/pci/pci_bus.h
-> @@ -29,7 +29,7 @@ enum PCIBusFlags {
->  struct PCIBus {
->      BusState qbus;
->      enum PCIBusFlags flags;
-> -    PCIIOMMUFunc iommu_fn;
-> +    const PCIIOMMUOps *iommu_ops;
->      void *iommu_opaque;
->      uint8_t devfn_min;
->      uint32_t slot_reserved_mask;
+>  ifeq ($(CONFIG_PCI)$(CONFIG_PSERIES)$(CONFIG_LINUX), yyy)
+>  obj-y +=3D spapr_pci_vfio.o spapr_pci_nvlink2.o
+>  endif
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -525,25 +362,25 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---5VuzLDXibKSJvVYD
+--oiL9LJXJsdjS5rzq
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl21100ACgkQbDjKyiDZ
-s5IYHhAAzVnCJGi2fi6Djz9/LI9bRLavUN7BlYj+5lf2OST7+U2dvVvbrGQOiq1M
-If4aK4nu8S0vdOa1SOTjth1sA/MkA3GcdkwjGya3m7vS5v5m8acopC6adYrfAf3Q
-xhnyh9oBxJwMYOvJ3PlnbdVjYika/a6TosF1pTiS4MzRkIqMAhLFSkFA3DAqVASA
-aIctrdLpnfDFZnI6rb4W++DPwZrEOeTSNiNlCcSly8r/LwzlFCdq81Hc9v6/elV4
-b6J3/hNGGAzlVB2MYmHDOy3BKuYHP2O2V12WKyHx+3CxGVJgEct9BCgzxvGBEsmC
-70ni1tvCYCHDU8pQzADs6VelzSbm/rUAheQij/cClc0sNT05d5teEMdOpVoB5tfB
-8SBbiSUr2vrikmXVVjCMvo/UtVptE52N04the2hRnJX55vcOg37E0yuVkPb5y5yO
-Yjq3RWoMvUQYBdDnu5F5inG5sSohWL9dS8EFs1ggmK4Q9uKLPsCwXyxC1e6k+lMX
-tZJA34dkzhk9isJopNVRxXPh9feGZVZEgqqJe7RfsBoAn5L2XbrTpzW3c/r1hHRE
-/K9NH9FEbFr6FZA6BeaTc0LRLjOJJlxN6j6oo7B+F6Ga2Nvz9rjS7jWUd+HN2fe3
-yAk2SXTPZpp2Tp/0OJ57WsduqnWwhAOc7h5d6sLYriDn/ZH8a0Q=
-=4t67
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl211/cACgkQbDjKyiDZ
+s5KRHg/+Pc+S3Xe1dABtxCRmzMhBycjVl67iNjTa3N1WL/ecEK/5U2zczFfhkl77
+LOYaGE6X6vfyC/R2aAeMifCVXWOal9FcW4CAW4jGlvZLWGXP4+Y16rNyDcLtl5ZI
+gYxE4CpPSdWmHjkCy0Hj4FP8SNjghKjjo5uvmEf2fB/fyw6W+8ad7pjkrVidP/4q
+D9tVRBtwe5NT7YqIFEy1ZRpcbUdwWOGT94EL95dwHxgnVMj7wpYI6kv5+iZ3dJ+9
+iVbvDgfuiUCQIkz7BlX6C9Ve/p6VPr5AQeEjXABH6UVPT+yjzdTIENoKjpcOwneO
+7iTcwAv/q+Og+FAyQvhDl9AzHktKBDhSp7ZH3yV7yd7C3JFSz/cibUsIjQBWuasf
++rHjSu8fffDEH/6HVy33Krg4Mw3MjA3vhKS3meoG2Wz/5oCVhKAjYZKQQihMctYz
+khEJOtHjfrSRigYAK+Nu6PorM87MC0BRxwJCwtnHACoF33cmZh3CVaB8gYLm35HT
+tmdtUKI9520dHKjqXzF874wtjqRDcX+53XTzpGWiH7R6DOPRcu3dcBWbOtrr1R8b
+D4UDgSQjvbp62OE8aV22rwBicVLYIFOazcVzRj91QOUB9IVYn2/UpMMqg2nMSq54
+TQ3H/rrSj2E5VafXpnNRgA9sPKF8eKI4JzxCwYeaU6K8TFWErWo=
+=VybM
 -----END PGP SIGNATURE-----
 
---5VuzLDXibKSJvVYD--
+--oiL9LJXJsdjS5rzq--
 
