@@ -2,74 +2,85 @@ Return-Path: <SRS0=q9Vo=YU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5EB5ACA9EAF
-	for <qemu-devel@archiver.kernel.org>; Sun, 27 Oct 2019 06:26:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6AAD6CA9EAF
+	for <qemu-devel@archiver.kernel.org>; Sun, 27 Oct 2019 07:45:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 31A3620873
-	for <qemu-devel@archiver.kernel.org>; Sun, 27 Oct 2019 06:26:41 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 31A3620873
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=voltagex.org
+	by mail.kernel.org (Postfix) with ESMTPS id 2191C20717
+	for <qemu-devel@archiver.kernel.org>; Sun, 27 Oct 2019 07:45:11 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OHeMeX2K"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2191C20717
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44200 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44372 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iOc0e-0002fU-6q
-	for qemu-devel@archiver.kernel.org; Sun, 27 Oct 2019 02:26:40 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33244)
+	id 1iOdEc-00034b-9l
+	for qemu-devel@archiver.kernel.org; Sun, 27 Oct 2019 03:45:10 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36994)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1iObzh-00016j-2w
- for qemu-devel@nongnu.org; Sun, 27 Oct 2019 02:25:42 -0400
+ (envelope-from <aleksandar.m.mail@gmail.com>) id 1iOdDo-0001xZ-8h
+ for qemu-devel@nongnu.org; Sun, 27 Oct 2019 03:44:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1iObzf-0006dx-RB
- for qemu-devel@nongnu.org; Sun, 27 Oct 2019 02:25:40 -0400
-Received: from indium.canonical.com ([91.189.90.7]:49466)
+ (envelope-from <aleksandar.m.mail@gmail.com>) id 1iOdDk-0003db-Qf
+ for qemu-devel@nongnu.org; Sun, 27 Oct 2019 03:44:20 -0400
+Received: from mail-ot1-x329.google.com ([2607:f8b0:4864:20::329]:38019)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1iObzf-0006dl-L1
- for qemu-devel@nongnu.org; Sun, 27 Oct 2019 02:25:39 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1iObze-0001UM-Jo
- for <qemu-devel@nongnu.org>; Sun, 27 Oct 2019 06:25:38 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 86F082E8010
- for <qemu-devel@nongnu.org>; Sun, 27 Oct 2019 06:25:38 +0000 (UTC)
+ (Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
+ id 1iOdDk-0003dO-He
+ for qemu-devel@nongnu.org; Sun, 27 Oct 2019 03:44:16 -0400
+Received: by mail-ot1-x329.google.com with SMTP id r14so43059otn.5
+ for <qemu-devel@nongnu.org>; Sun, 27 Oct 2019 00:44:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:in-reply-to:references:from:date:message-id:subject:to
+ :cc; bh=YOKuiXdfPO3KK/txzpZ/LHVNC8on230B40nga34VpW4=;
+ b=OHeMeX2KMoJ+RqLr2nryXUV4lna1v/SISAEWu6MUvZtfkbzl5krRthanDSklG9Vljj
+ IuMpptEpINoSYQTuTyfnQY6BfbpdvMVfC3joMWZStNfXmyKHmecK5wnHwd2utdRH71aV
+ JGsLuAhO1VcQnZ2OinxSrOWbriEiXCpe3NGaTDrBqAqRF3TuA16KZaIsrdlZ3Dqncqe+
+ m012t2GB0uRagm/J+Ml3LMZmLWq9PSPaJbGJbT/CN7t35r7W4lL2E51qUgVsO3LnnU4A
+ hAewwhJ/JVhfSMBo7v1iAvQExUxa5u69TUwZ7ojqo4G0wmrdn4UnYwin08dHM8YSEgbj
+ VARg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:in-reply-to:references:from:date
+ :message-id:subject:to:cc;
+ bh=YOKuiXdfPO3KK/txzpZ/LHVNC8on230B40nga34VpW4=;
+ b=hktgYpP3TXUw4Py/bWjwlnvtJ9FJMiIGSVoonv4kj8zOh9I5GBqOPXceD0QpjjJphY
+ d/j6u+J6w6CV27jzMSX5ACuNAxEII+rRJyfagsxWoGRZ44AeROyBdbQD9fBULOkemyiR
+ INy9JRMLzKmJ/+puC48o7vdWPtybegH+sgb5iTDC05RbOmlT0gNHYAbuLL0piqaJ7fmp
+ gEqHTfF4fc9XJi/pYNYJBqZIWGrt+wogbdQ/cuPVw2ZltWPZb5hrzf5kdSLo+KuOFlRD
+ n04tp7K7hDTkK/fbX1O3YiskEqeT/gmglQ7eSQLgV5E08XzliNuEA4u5aiOZsqHw4DpX
+ OxvQ==
+X-Gm-Message-State: APjAAAW9pJTZTYoAeEbfNNGl/+5o7cHKbcIwqshc3UVdqn7uYArMrcjn
+ 5SyI1cQmTcPntDDWetTpZyAfzen18xUFElmWczM=
+X-Google-Smtp-Source: APXvYqzXS3djOEZPvpKIoo/YFqcqo1HnoMHVgN1zwBZLu3UwCLet/xiamRKgH+nQEN9RcIqrdAL3jF7oFoEcnpF18rQ=
+X-Received: by 2002:a9d:4f0f:: with SMTP id d15mr3435887otl.64.1572162255112; 
+ Sun, 27 Oct 2019 00:44:15 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Sun, 27 Oct 2019 06:17:41 -0000
-From: Adam Baxter <voltagex@voltagex.org>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Tags: qemu-img
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: the.netadmin voltagex
-X-Launchpad-Bug-Reporter: Zixuan Wang (the.netadmin)
-X-Launchpad-Bug-Modifier: Adam Baxter (voltagex)
-References: <152222836105.21062.2375148895134658603.malonedeb@chaenomeles.canonical.com>
-Message-Id: <157215706185.2702.3460525326125677929.malone@gac.canonical.com>
-Subject: [Bug 1759522] Re: windows qemu-img create vpc/vhdx error
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="469f241f4e73cc0bdffa4e30654052a2af068e06";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 2e1a848a5b712c2767f75115b036c96d876dbab5
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 91.189.90.7
+Received: by 2002:a9d:340a:0:0:0:0:0 with HTTP; Sun, 27 Oct 2019 00:44:14
+ -0700 (PDT)
+In-Reply-To: <20191026180143.7369-1-philmd@redhat.com>
+References: <20191026180143.7369-1-philmd@redhat.com>
+From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+Date: Sun, 27 Oct 2019 08:44:14 +0100
+Message-ID: <CAL1e-=jW0Jmk=Y9o_UpdeOo6vfTm-qXyPVtk4O+RLOUN_5Y_cw@mail.gmail.com>
+Subject: Re: [PATCH v3 00/20] hw/i386/pc: Split PIIX3 southbridge from i440FX
+ northbridge
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
+Content-Type: multipart/alternative; boundary="000000000000becf960595df8c56"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::329
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -78,101 +89,462 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1759522 <1759522@bugs.launchpad.net>
+Cc: Stefano Stabellini <sstabellini@kernel.org>,
+ Eduardo Habkost <ehabkost@redhat.com>, Paul Durrant <paul@xen.org>,
+ "Michael S. Tsirkin" <mst@redhat.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?Q?Herv=C3=A9_Poussineau?= <hpoussin@reactos.org>,
+ Aleksandar Markovic <amarkovic@wavecomp.com>,
+ Igor Mammedov <imammedo@redhat.com>,
+ Anthony Perard <anthony.perard@citrix.com>,
+ "xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>,
+ Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
+ Aurelien Jarno <aurelien@aurel32.net>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Can confirm this is still an issue with 4.1.0.
+--000000000000becf960595df8c56
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-?field.comment=3DCan confirm this is still an issue with 4.1.0.
+On Saturday, October 26, 2019, Philippe Mathieu-Daud=C3=A9 <philmd@redhat.c=
+om>
+wrote:
+
+> Changes since v2 [0]:
+> - Use a #define
+> - Reword one description
+> - Added review tags (thanks all for reviewing!)
+>
+> Changes since v1 [1]:
+> - Removed patch reintroducing DO_UPCAST() use (thuth)
+> - Took various patches out to reduce series (thuth)
+> - Added review tags (thanks all for reviewing!)
+>
+> $ git backport-diff -u pc_split_i440fx_piix-v2
+> Key:
+> [----] : patches are identical
+> [####] : number of functional differences between upstream/downstream pat=
+ch
+> [down] : patch is downstream-only
+> The flags [FC] indicate (F)unctional and (C)ontextual differences,
+> respectively
+>
+> 001/20:[----] [--] 'MAINTAINERS: Keep PIIX4 South Bridge separate from PC
+> Chipsets'
+> 002/20:[0004] [FC] 'piix4: Add the Reset Control Register'
+> 003/20:[0002] [FC] 'piix4: Add an i8259 Interrupt Controller as specified
+> in datasheet'
+> 004/20:[----] [--] 'Revert "irq: introduce qemu_irq_proxy()"'
+> 005/20:[----] [--] 'piix4: Rename PIIX4 object to piix4-isa'
+> 006/20:[----] [--] 'piix4: Add an i8257 DMA Controller as specified in
+> datasheet'
+> 007/20:[----] [-C] 'piix4: Add an i8254 PIT Controller as specified in
+> datasheet'
+> 008/20:[0004] [FC] 'piix4: Add a MC146818 RTC Controller as specified in
+> datasheet'
+> 009/20:[----] [--] 'hw/mips/mips_malta: Create IDE hard drive array
+> dynamically'
+> 010/20:[----] [--] 'hw/mips/mips_malta: Extract the PIIX4 creation code a=
+s
+> piix4_create()'
+> 011/20:[----] [-C] 'hw/isa/piix4: Move piix4_create() to hw/isa/piix4.c'
+> 012/20:[----] [--] 'hw/i386: Remove obsolete LoadStateHandler::load_state=
+_old
+> handlers'
+> 013/20:[----] [--] 'hw/pci-host/piix: Extract piix3_create()'
+> 014/20:[0002] [FC] 'hw/pci-host/piix: Move RCR_IOPORT register definition=
+'
+> 015/20:[----] [--] 'hw/pci-host/piix: Define and use the PIIX IRQ Route
+> Control Registers'
+> 016/20:[----] [-C] 'hw/pci-host/piix: Move i440FX declarations to
+> hw/pci-host/i440fx.h'
+> 017/20:[----] [--] 'hw/pci-host/piix: Fix code style issues'
+> 018/20:[----] [--] 'hw/pci-host/piix: Extract PIIX3 functions to
+> hw/isa/piix3.c'
+> 019/20:[----] [--] 'hw/pci-host: Rename incorrectly named 'piix' as
+> 'i440fx''
+> 020/20:[0004] [FC] 'hw/pci-host/i440fx: Remove the last PIIX3 traces'
+>
+> Previous cover:
+>
+> This series is a rework of "piix4: cleanup and improvements" [2]
+> from Herv=C3=A9, and my "remove i386/pc dependency: PIIX cleanup" [3].
+>
+> Still trying to remove the strong X86/PC dependency 2 years later,
+> one step at a time.
+> Here we split the PIIX3 southbridge from i440FX northbridge.
+> The i440FX northbridge is only used by the PC machine, while the
+> PIIX southbridge is also used by the Malta MIPS machine.
+>
+> This is also a step forward using KConfig with the Malta board.
+> Without this split, it was impossible to compile the Malta without
+> pulling various X86 pieces of code.
+>
+> The overall design cleanup is not yet perfect, but enough to post
+> as a series.
+>
+> Now that the PIIX3 code is extracted, the code duplication with the
+> PIIX4 chipset is obvious. Not worth improving for now because it
+> isn't broken.
+>
+> Based-on: <1572097538-18898-1-git-send-email-pbonzini@redhat.com>
+> to include:
+> mc146818rtc: Allow call object_initialize(MC146818_RTC) instead of
+> rtc_init()
+> https://mid.mail-archive.com/20191018133547.10936-1-philmd@redhat.com
+>
+> Since Aleksandar offered me to send the pull request [4] I plan to do
+> it once Paolo's pull [5] is merged.
+>
+>
+Philippe,
+
+I attempted the other day the integration of v2 of this series into MIPS
+pull request, but couldn't do it - since another series of yours was
+already merged, acting on the same code, making rebasing difficult. Now
+this, v3, series can't be applied since certain patches in some, on
+surface, unrelated series aren't megred, and v3 assumes they are merged.
+
+If you send a series, it should preferably be based on the latest (current)
+code base, not on some imagined future state.
+
+Why did you create this such mess with interdependencies of your own
+multiple series, and just right before softfreeze? :( You should have
+distributed submitting those series over longer time interval, and
+absolutely avoid, if possible, this hectic around-softfreeze period. You
+did the opposite: waited for softfreeze to become close, and sent several
+interdependant series in matter of days - creating stress without any real
+technical reason.
+
+In case you, for any reason, can't complete this by softfreeze, I advice
+you not to rush, and postpone the integration to 5.0.
+
+Thanks,
+Aleksandar
 
 
-** Attachment added: "Files created on Windows and Debian"
-   https://bugs.launchpad.net/qemu/+bug/1759522/+attachment/5300530/+files/=
-vhdx_comparison.7z
 
--- =
+> Thanks,
+>
+> Phil.
+>
+> CI results:
+> https://travis-ci.org/philmd/qemu/builds/603253987
+> https://app.shippable.com/github/philmd/qemu/runs/550/summary/console
+>
+> [0] https://lists.gnu.org/archive/html/qemu-devel/2019-10/msg04662.html
+> [1] https://lists.gnu.org/archive/html/qemu-devel/2019-10/msg03685.html
+> [2] https://www.mail-archive.com/qemu-devel@nongnu.org/msg500737.html
+> [3] https://www.mail-archive.com/qemu-devel@nongnu.org/msg504081.html
+> [4] https://lists.gnu.org/archive/html/qemu-devel/2019-10/msg04959.html
+> [5] https://lists.gnu.org/archive/html/qemu-devel/2019-10/msg07339.html
+>
+> Herv=C3=A9 Poussineau (5):
+>   piix4: Add the Reset Control Register
+>   piix4: Add an i8259 Interrupt Controller as specified in datasheet
+>   piix4: Rename PIIX4 object to piix4-isa
+>   piix4: Add an i8257 DMA Controller as specified in datasheet
+>   piix4: Add an i8254 PIT Controller as specified in datasheet
+>
+> Philippe Mathieu-Daud=C3=A9 (15):
+>   MAINTAINERS: Keep PIIX4 South Bridge separate from PC Chipsets
+>   Revert "irq: introduce qemu_irq_proxy()"
+>   piix4: Add a MC146818 RTC Controller as specified in datasheet
+>   hw/mips/mips_malta: Create IDE hard drive array dynamically
+>   hw/mips/mips_malta: Extract the PIIX4 creation code as piix4_create()
+>   hw/isa/piix4: Move piix4_create() to hw/isa/piix4.c
+>   hw/i386: Remove obsolete LoadStateHandler::load_state_old handlers
+>   hw/pci-host/piix: Extract piix3_create()
+>   hw/pci-host/piix: Move RCR_IOPORT register definition
+>   hw/pci-host/piix: Define and use the PIIX IRQ Route Control Registers
+>   hw/pci-host/piix: Move i440FX declarations to hw/pci-host/i440fx.h
+>   hw/pci-host/piix: Fix code style issues
+>   hw/pci-host/piix: Extract PIIX3 functions to hw/isa/piix3.c
+>   hw/pci-host: Rename incorrectly named 'piix' as 'i440fx'
+>   hw/pci-host/i440fx: Remove the last PIIX3 traces
+>
+>  MAINTAINERS                      |  14 +-
+>  hw/acpi/pcihp.c                  |   2 +-
+>  hw/acpi/piix4.c                  |  42 +--
+>  hw/core/irq.c                    |  14 -
+>  hw/i386/Kconfig                  |   3 +-
+>  hw/i386/acpi-build.c             |   5 +-
+>  hw/i386/pc_piix.c                |  10 +-
+>  hw/i386/xen/xen-hvm.c            |   5 +-
+>  hw/intc/apic_common.c            |  49 ----
+>  hw/isa/Kconfig                   |   4 +
+>  hw/isa/Makefile.objs             |   1 +
+>  hw/isa/piix3.c                   | 399 +++++++++++++++++++++++++++++
+>  hw/isa/piix4.c                   | 151 ++++++++++-
+>  hw/mips/gt64xxx_pci.c            |   5 +-
+>  hw/mips/mips_malta.c             |  46 +---
+>  hw/pci-host/Kconfig              |   3 +-
+>  hw/pci-host/Makefile.objs        |   2 +-
+>  hw/pci-host/{piix.c =3D> i440fx.c} | 424 +------------------------------
+>  hw/timer/i8254_common.c          |  40 ---
+>  include/hw/acpi/piix4.h          |   6 -
+>  include/hw/i386/pc.h             |  37 ---
+>  include/hw/irq.h                 |   5 -
+>  include/hw/isa/isa.h             |   2 +
+>  include/hw/pci-host/i440fx.h     |  36 +++
+>  include/hw/southbridge/piix.h    |  74 ++++++
+>  stubs/pci-host-piix.c            |   3 +-
+>  26 files changed, 699 insertions(+), 683 deletions(-)
+>  create mode 100644 hw/isa/piix3.c
+>  rename hw/pci-host/{piix.c =3D> i440fx.c} (58%)
+>  delete mode 100644 include/hw/acpi/piix4.h
+>  create mode 100644 include/hw/pci-host/i440fx.h
+>  create mode 100644 include/hw/southbridge/piix.h
+>
+> --
+> 2.21.0
+>
+>
+>
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1759522
+--000000000000becf960595df8c56
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Title:
-  windows qemu-img create vpc/vhdx error
+<br><br>On Saturday, October 26, 2019, Philippe Mathieu-Daud=C3=A9 &lt;<a h=
+ref=3D"mailto:philmd@redhat.com">philmd@redhat.com</a>&gt; wrote:<br><block=
+quote class=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;border-left:1px #ccc=
+ solid;padding-left:1ex">Changes since v2 [0]:<br>
+- Use a #define<br>
+- Reword one description<br>
+- Added review tags (thanks all for reviewing!)<br>
+<br>
+Changes since v1 [1]:<br>
+- Removed patch reintroducing DO_UPCAST() use (thuth)<br>
+- Took various patches out to reduce series (thuth)<br>
+- Added review tags (thanks all for reviewing!)<br>
+<br>
+$ git backport-diff -u pc_split_i440fx_piix-v2<br>
+Key:<br>
+[----] : patches are identical<br>
+[####] : number of functional differences between upstream/downstream patch=
+<br>
+[down] : patch is downstream-only<br>
+The flags [FC] indicate (F)unctional and (C)ontextual differences, respecti=
+vely<br>
+<br>
+001/20:[----] [--] &#39;MAINTAINERS: Keep PIIX4 South Bridge separate from =
+PC Chipsets&#39;<br>
+002/20:[0004] [FC] &#39;piix4: Add the Reset Control Register&#39;<br>
+003/20:[0002] [FC] &#39;piix4: Add an i8259 Interrupt Controller as specifi=
+ed in datasheet&#39;<br>
+004/20:[----] [--] &#39;Revert &quot;irq: introduce qemu_irq_proxy()&quot;&=
+#39;<br>
+005/20:[----] [--] &#39;piix4: Rename PIIX4 object to piix4-isa&#39;<br>
+006/20:[----] [--] &#39;piix4: Add an i8257 DMA Controller as specified in =
+datasheet&#39;<br>
+007/20:[----] [-C] &#39;piix4: Add an i8254 PIT Controller as specified in =
+datasheet&#39;<br>
+008/20:[0004] [FC] &#39;piix4: Add a MC146818 RTC Controller as specified i=
+n datasheet&#39;<br>
+009/20:[----] [--] &#39;hw/mips/mips_malta: Create IDE hard drive array dyn=
+amically&#39;<br>
+010/20:[----] [--] &#39;hw/mips/mips_malta: Extract the PIIX4 creation code=
+ as piix4_create()&#39;<br>
+011/20:[----] [-C] &#39;hw/isa/piix4: Move piix4_create() to hw/isa/piix4.c=
+&#39;<br>
+012/20:[----] [--] &#39;hw/i386: Remove obsolete LoadStateHandler::load_sta=
+te_<wbr>old handlers&#39;<br>
+013/20:[----] [--] &#39;hw/pci-host/piix: Extract piix3_create()&#39;<br>
+014/20:[0002] [FC] &#39;hw/pci-host/piix: Move RCR_IOPORT register definiti=
+on&#39;<br>
+015/20:[----] [--] &#39;hw/pci-host/piix: Define and use the PIIX IRQ Route=
+ Control Registers&#39;<br>
+016/20:[----] [-C] &#39;hw/pci-host/piix: Move i440FX declarations to hw/pc=
+i-host/i440fx.h&#39;<br>
+017/20:[----] [--] &#39;hw/pci-host/piix: Fix code style issues&#39;<br>
+018/20:[----] [--] &#39;hw/pci-host/piix: Extract PIIX3 functions to hw/isa=
+/piix3.c&#39;<br>
+019/20:[----] [--] &#39;hw/pci-host: Rename incorrectly named &#39;piix&#39=
+; as &#39;i440fx&#39;&#39;<br>
+020/20:[0004] [FC] &#39;hw/pci-host/i440fx: Remove the last PIIX3 traces&#3=
+9;<br>
+<br>
+Previous cover:<br>
+<br>
+This series is a rework of &quot;piix4: cleanup and improvements&quot; [2]<=
+br>
+from Herv=C3=A9, and my &quot;remove i386/pc dependency: PIIX cleanup&quot;=
+ [3].<br>
+<br>
+Still trying to remove the strong X86/PC dependency 2 years later,<br>
+one step at a time.<br>
+Here we split the PIIX3 southbridge from i440FX northbridge.<br>
+The i440FX northbridge is only used by the PC machine, while the<br>
+PIIX southbridge is also used by the Malta MIPS machine.<br>
+<br>
+This is also a step forward using KConfig with the Malta board.<br>
+Without this split, it was impossible to compile the Malta without<br>
+pulling various X86 pieces of code.<br>
+<br>
+The overall design cleanup is not yet perfect, but enough to post<br>
+as a series.<br>
+<br>
+Now that the PIIX3 code is extracted, the code duplication with the<br>
+PIIX4 chipset is obvious. Not worth improving for now because it<br>
+isn&#39;t broken.<br>
+<br>
+Based-on: &lt;<a href=3D"mailto:1572097538-18898-1-git-send-email-pbonzini@=
+redhat.com">1572097538-18898-1-git-send-email-pbonzini@redhat.com</a>&gt;<b=
+r>
+to include:<br>
+mc146818rtc: Allow call object_initialize(MC146818_<wbr>RTC) instead of rtc=
+_init()<br>
+<a href=3D"https://mid.mail-archive.com/20191018133547.10936-1-philmd@redha=
+t.com" target=3D"_blank">https://mid.mail-archive.com/<wbr>20191018133547.1=
+0936-1-philmd@<wbr>redhat.com</a><br>
+<br>
+Since Aleksandar offered me to send the pull request [4] I plan to do<br>
+it once Paolo&#39;s pull [5] is merged.<br>
+<br></blockquote><div><br></div><div>Philippe,</div><div><br></div><div>I a=
+ttempted the other day the integration of v2 of this series into MIPS pull =
+request, but couldn&#39;t do it - since another series of yours was already=
+ merged, acting on the same code, making rebasing difficult. Now this, v3, =
+series can&#39;t be applied since certain patches in some, on surface, unre=
+lated series aren&#39;t megred, and v3 assumes they are merged.</div><div><=
+br></div><div>If you send a series, it should preferably be based on the la=
+test (current) code base, not on some imagined future state.</div><div><br>=
+</div><div>Why did you create this such mess with interdependencies of your=
+ own multiple series, and just right before softfreeze? :( You should have =
+distributed submitting those series over longer time interval, and absolute=
+ly avoid, if possible, this hectic around-softfreeze period. You did the op=
+posite: waited for softfreeze to become close, and sent several interdepend=
+ant series in matter of days - creating stress without any real technical r=
+eason.</div><div><br></div><div>In case you, for any reason, can&#39;t comp=
+lete this by softfreeze, I advice you not to rush, and postpone the integra=
+tion to 5.0.</div><div><br></div><div>Thanks,</div><div>Aleksandar</div><di=
+v><br></div><div>=C2=A0</div><blockquote class=3D"gmail_quote" style=3D"mar=
+gin:0 0 0 .8ex;border-left:1px #ccc solid;padding-left:1ex">
+Thanks,<br>
+<br>
+Phil.<br>
+<br>
+CI results:<br>
+<a href=3D"https://travis-ci.org/philmd/qemu/builds/603253987" target=3D"_b=
+lank">https://travis-ci.org/philmd/<wbr>qemu/builds/603253987</a><br>
+<a href=3D"https://app.shippable.com/github/philmd/qemu/runs/550/summary/co=
+nsole" target=3D"_blank">https://app.shippable.com/<wbr>github/philmd/qemu/=
+runs/550/<wbr>summary/console</a><br>
+<br>
+[0] <a href=3D"https://lists.gnu.org/archive/html/qemu-devel/2019-10/msg046=
+62.html" target=3D"_blank">https://lists.gnu.org/archive/<wbr>html/qemu-dev=
+el/2019-10/<wbr>msg04662.html</a><br>
+[1] <a href=3D"https://lists.gnu.org/archive/html/qemu-devel/2019-10/msg036=
+85.html" target=3D"_blank">https://lists.gnu.org/archive/<wbr>html/qemu-dev=
+el/2019-10/<wbr>msg03685.html</a><br>
+[2] <a href=3D"https://www.mail-archive.com/qemu-devel@nongnu.org/msg500737=
+.html" target=3D"_blank">https://www.mail-archive.com/<wbr>qemu-devel@nongn=
+u.org/<wbr>msg500737.html</a><br>
+[3] <a href=3D"https://www.mail-archive.com/qemu-devel@nongnu.org/msg504081=
+.html" target=3D"_blank">https://www.mail-archive.com/<wbr>qemu-devel@nongn=
+u.org/<wbr>msg504081.html</a><br>
+[4] <a href=3D"https://lists.gnu.org/archive/html/qemu-devel/2019-10/msg049=
+59.html" target=3D"_blank">https://lists.gnu.org/archive/<wbr>html/qemu-dev=
+el/2019-10/<wbr>msg04959.html</a><br>
+[5] <a href=3D"https://lists.gnu.org/archive/html/qemu-devel/2019-10/msg073=
+39.html" target=3D"_blank">https://lists.gnu.org/archive/<wbr>html/qemu-dev=
+el/2019-10/<wbr>msg07339.html</a><br>
+<br>
+Herv=C3=A9 Poussineau (5):<br>
+=C2=A0 piix4: Add the Reset Control Register<br>
+=C2=A0 piix4: Add an i8259 Interrupt Controller as specified in datasheet<b=
+r>
+=C2=A0 piix4: Rename PIIX4 object to piix4-isa<br>
+=C2=A0 piix4: Add an i8257 DMA Controller as specified in datasheet<br>
+=C2=A0 piix4: Add an i8254 PIT Controller as specified in datasheet<br>
+<br>
+Philippe Mathieu-Daud=C3=A9 (15):<br>
+=C2=A0 MAINTAINERS: Keep PIIX4 South Bridge separate from PC Chipsets<br>
+=C2=A0 Revert &quot;irq: introduce qemu_irq_proxy()&quot;<br>
+=C2=A0 piix4: Add a MC146818 RTC Controller as specified in datasheet<br>
+=C2=A0 hw/mips/mips_malta: Create IDE hard drive array dynamically<br>
+=C2=A0 hw/mips/mips_malta: Extract the PIIX4 creation code as piix4_create(=
+)<br>
+=C2=A0 hw/isa/piix4: Move piix4_create() to hw/isa/piix4.c<br>
+=C2=A0 hw/i386: Remove obsolete LoadStateHandler::load_state_<wbr>old handl=
+ers<br>
+=C2=A0 hw/pci-host/piix: Extract piix3_create()<br>
+=C2=A0 hw/pci-host/piix: Move RCR_IOPORT register definition<br>
+=C2=A0 hw/pci-host/piix: Define and use the PIIX IRQ Route Control Register=
+s<br>
+=C2=A0 hw/pci-host/piix: Move i440FX declarations to hw/pci-host/i440fx.h<b=
+r>
+=C2=A0 hw/pci-host/piix: Fix code style issues<br>
+=C2=A0 hw/pci-host/piix: Extract PIIX3 functions to hw/isa/piix3.c<br>
+=C2=A0 hw/pci-host: Rename incorrectly named &#39;piix&#39; as &#39;i440fx&=
+#39;<br>
+=C2=A0 hw/pci-host/i440fx: Remove the last PIIX3 traces<br>
+<br>
+=C2=A0MAINTAINERS=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 |=C2=A0 14 +-<br>
+=C2=A0hw/acpi/pcihp.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 |=C2=A0 =C2=A02 +-<br>
+=C2=A0hw/acpi/piix4.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 |=C2=A0 42 +--<br>
+=C2=A0hw/core/irq.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 |=C2=A0 14 -<br>
+=C2=A0hw/i386/Kconfig=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 |=C2=A0 =C2=A03 +-<br>
+=C2=A0hw/i386/acpi-build.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0|=
+=C2=A0 =C2=A05 +-<br>
+=C2=A0hw/i386/pc_piix.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 |=C2=A0 10 +-<br>
+=C2=A0hw/i386/xen/xen-hvm.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 |=C2=
+=A0 =C2=A05 +-<br>
+=C2=A0hw/intc/apic_common.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 |=C2=
+=A0 49 ----<br>
+=C2=A0hw/isa/Kconfig=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 =C2=A0|=C2=A0 =C2=A04 +<br>
+=C2=A0hw/isa/Makefile.objs=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0|=
+=C2=A0 =C2=A01 +<br>
+=C2=A0hw/isa/piix3.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 =C2=A0| 399 +++++++++++++++++++++++++++++<br>
+=C2=A0hw/isa/piix4.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 =C2=A0| 151 ++++++++++-<br>
+=C2=A0hw/mips/gt64xxx_pci.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 |=C2=
+=A0 =C2=A05 +-<br>
+=C2=A0hw/mips/mips_malta.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0|=
+=C2=A0 46 +---<br>
+=C2=A0hw/pci-host/Kconfig=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 |=
+=C2=A0 =C2=A03 +-<br>
+=C2=A0hw/pci-host/Makefile.objs=C2=A0 =C2=A0 =C2=A0 =C2=A0 |=C2=A0 =C2=A02 =
++-<br>
+=C2=A0hw/pci-host/{piix.c =3D&gt; i440fx.c} | 424 +------------------------=
+-----<wbr>-<br>
+=C2=A0hw/timer/i8254_common.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 |=C2=A0 40 =
+---<br>
+=C2=A0include/hw/acpi/piix4.h=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 |=C2=A0 =C2=
+=A06 -<br>
+=C2=A0include/hw/i386/pc.h=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0|=
+=C2=A0 37 ---<br>
+=C2=A0include/hw/irq.h=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0|=C2=A0 =C2=A05 -<br>
+=C2=A0include/hw/isa/isa.h=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0|=
+=C2=A0 =C2=A02 +<br>
+=C2=A0include/hw/pci-host/i440fx.h=C2=A0 =C2=A0 =C2=A0|=C2=A0 36 +++<br>
+=C2=A0include/hw/southbridge/piix.h=C2=A0 =C2=A0 |=C2=A0 74 ++++++<br>
+=C2=A0stubs/pci-host-piix.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 |=C2=
+=A0 =C2=A03 +-<br>
+=C2=A026 files changed, 699 insertions(+), 683 deletions(-)<br>
+=C2=A0create mode 100644 hw/isa/piix3.c<br>
+=C2=A0rename hw/pci-host/{piix.c =3D&gt; i440fx.c} (58%)<br>
+=C2=A0delete mode 100644 include/hw/acpi/piix4.h<br>
+=C2=A0create mode 100644 include/hw/pci-host/i440fx.h<br>
+=C2=A0create mode 100644 include/hw/southbridge/piix.h<br>
+<br>
+-- <br>
+2.21.0<br>
+<br>
+<br>
+</blockquote>
 
-Status in QEMU:
-  New
-
-Bug description:
-  On windows, using qemu-img (version 2.11.90) to create vpc/vhdx
-  virtual disk tends to fail. Here's the way to reproduce:
-
-  1. Install qemu-w64-setup-20180321.exe
-
-  2. Use `qemu-img create -f vhdx -o subformat=3Dfixed disk.vhdx 512M` to c=
-reate a vhdx:
-     Formatting 'disk.vhdx', fmt=3Dvhdx size=3D536870912 log_size=3D1048576=
- block_size=3D0 subformat=3Dfixed
-
-  3. Execute `qemu-img info disk.vhdx` gives the result, (note the `disk si=
-ze` is incorrect):
-     image: disk.vhdx
-     file format: vhdx
-     virtual size: 512M (536870912 bytes)
-     disk size: 1.4M
-     cluster_size: 8388608
-
-  4. On Windows 10 (V1709), double click disk.vhdx gives an error:
-     Make sure the file is in an NTFS volume and isn't in a compressed fold=
-er or volume.
-
-     Using Disk Management -> Action -> Attach VHD gives an error:
-     The requested operation could not be completed due to a virtual disk s=
-ystem limitation. Virtual hard disk files must be uncompressed and uneccryp=
-ted and must not be sparse.
-
-  Comparison with Windows 10 created VHDX:
-
-  1. Using Disk Management -> Action -> Create VHD:
-     File name: win.vhdx
-     Virtual hard disk size: 512MB
-     Virtual hard disk format: VHDX
-     Virtual hard disk type: Fixed size
-
-  2. Detach VHDX
-
-  3. Execute `qemu-img info win.vhdx` gives the result:
-     image: win.vhdx
-     file format: vhdx
-     virtual size: 512M (536870912 bytes)
-     disk size: 516M
-     cluster_size: 33554432
-
-  Comparison with qemu-img under Ubuntu:
-
-  1. Version: qemu-img version 2.5.0 (Debian 1:2.5+dfsg-5ubuntu10.16),
-  Copyright (c) 2004-2008 Fabrice Bellard
-
-  2. qemu-img create -f vhdx -o subformat=3Dfixed lin.vhdx 512M
-     Formatting 'lin.vhdx', fmt=3Dvhdx size=3D536870912 log_size=3D1048576 =
-block_size=3D0 subformat=3Dfixed
-
-  3. qemu-img info lin.vhdx
-     image: lin.vhdx
-     file format: vhdx
-     virtual size: 512M (536870912 bytes)
-     disk size: 520M
-     cluster_size: 8388608
-
-  4. Load lin.vhdx under Windows 10 is ok
-
-  The same thing happens on `vpc` format with or without
-  `oformat=3Dfixed`, it seems that windows version of qemu-img has some
-  incorrect operation? My guess is that windows version of qemu-img
-  doesn't handle the description field of vpc/vhdx, which leads to an
-  incorrect `disk size` field.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1759522/+subscriptions
+--000000000000becf960595df8c56--
 
