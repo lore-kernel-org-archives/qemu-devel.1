@@ -2,80 +2,49 @@ Return-Path: <SRS0=q9Vo=YU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 85774CA9EAF
-	for <qemu-devel@archiver.kernel.org>; Sun, 27 Oct 2019 14:50:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C4CDCCA9EAF
+	for <qemu-devel@archiver.kernel.org>; Sun, 27 Oct 2019 14:52:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 53AD9214AF
-	for <qemu-devel@archiver.kernel.org>; Sun, 27 Oct 2019 14:50:13 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KrTNDwCP"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 53AD9214AF
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 939B9214AF
+	for <qemu-devel@archiver.kernel.org>; Sun, 27 Oct 2019 14:52:19 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 939B9214AF
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45532 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45546 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iOjrw-00082M-Ax
-	for qemu-devel@archiver.kernel.org; Sun, 27 Oct 2019 10:50:12 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34717)
+	id 1iOjty-00022T-Pk
+	for qemu-devel@archiver.kernel.org; Sun, 27 Oct 2019 10:52:18 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35047)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <stefanha@redhat.com>) id 1iOjmV-0001yi-4b
- for qemu-devel@nongnu.org; Sun, 27 Oct 2019 10:44:35 -0400
+ (envelope-from <andrey.shinkevich@virtuozzo.com>) id 1iOjqq-0006qM-L6
+ for qemu-devel@nongnu.org; Sun, 27 Oct 2019 10:49:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <stefanha@redhat.com>) id 1iOjmU-0002lJ-2a
- for qemu-devel@nongnu.org; Sun, 27 Oct 2019 10:44:34 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:53577
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <andrey.shinkevich@virtuozzo.com>) id 1iOjqo-0005BL-7z
+ for qemu-devel@nongnu.org; Sun, 27 Oct 2019 10:49:04 -0400
+Received: from relay.sw.ru ([185.231.240.75]:55256)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1iOjmT-0002l4-V4
- for qemu-devel@nongnu.org; Sun, 27 Oct 2019 10:44:34 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1572187473;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=a5P8lZ1ce73cBY/x9uxy7NB3AcS76A8MHVol1yKQH0k=;
- b=KrTNDwCPrB7/lE7CYk3uhvTpAGA564flicBaIw4/YXMe1LKGaJYP29SZl9K0GjAz1BUC6Q
- +U9qyNxxWBTvIiq0dQGBWA5rKbm/s0AZXF824gpp3AWD8zGj29AQcUEHE3oI3bjk1pNylw
- 3xUwCYWHEgZ9qJONLDszQqatSrmEd/Y=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-247-ISkRu73YOmSVTB0wjalYsw-1; Sun, 27 Oct 2019 10:44:26 -0400
-X-MC-Unique: ISkRu73YOmSVTB0wjalYsw-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9A95B1800DCB
- for <qemu-devel@nongnu.org>; Sun, 27 Oct 2019 14:44:25 +0000 (UTC)
-Received: from localhost (ovpn-116-99.ams2.redhat.com [10.36.116.99])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 4DD4854561;
- Sun, 27 Oct 2019 14:44:18 +0000 (UTC)
-Date: Sun, 27 Oct 2019 13:36:23 +0100
-From: Stefan Hajnoczi <stefanha@redhat.com>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Subject: Re: [RFC 1/3] WIP virtiofsd: import Linux <fuse.h> header file
-Message-ID: <20191027123623.GO4472@stefanha-x1.localdomain>
-References: <20191025100152.6638-1-stefanha@redhat.com>
- <20191025100152.6638-2-stefanha@redhat.com>
- <20191026174745-mutt-send-email-mst@kernel.org>
-MIME-Version: 1.0
-In-Reply-To: <20191026174745-mutt-send-email-mst@kernel.org>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Mimecast-Spam-Score: 0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="HFD/Dq8JdnjNvyuv"
-Content-Disposition: inline
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.81
+ (Exim 4.71) (envelope-from <andrey.shinkevich@virtuozzo.com>)
+ id 1iOjqm-00057P-In; Sun, 27 Oct 2019 10:49:00 -0400
+Received: from [172.16.25.136] (helo=dhcp-172-16-25-136.sw.ru)
+ by relay.sw.ru with esmtp (Exim 4.92.2)
+ (envelope-from <andrey.shinkevich@virtuozzo.com>)
+ id 1iOjqh-0000Zq-Rh; Sun, 27 Oct 2019 17:48:55 +0300
+From: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+To: qemu-devel@nongnu.org,
+	qemu-block@nongnu.org
+Subject: [PATCH] iotests: Test nbd client reconnect
+Date: Sun, 27 Oct 2019 17:48:45 +0300
+Message-Id: <1572187725-685325-1-git-send-email-andrey.shinkevich@virtuozzo.com>
+X-Mailer: git-send-email 1.8.3.1
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [fuzzy]
+X-Received-From: 185.231.240.75
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,50 +56,146 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
- Cornelia Huck <cohuck@redhat.com>, qemu-devel@nongnu.org,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>, virtio-fs@redhat.com,
- Paolo Bonzini <pbonzini@redhat.com>, vgoyal@redhat.com
+Cc: kwolf@redhat.com, vsementsov@virtuozzo.com, mreitz@redhat.com,
+ andrey.shinkevich@virtuozzo.com, den@openvz.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---HFD/Dq8JdnjNvyuv
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+The stress test for an NBD client. The NBD server is disconnected after
+a client write operation. The NBD client should reconnect and retry the
+operation.
 
-On Sat, Oct 26, 2019 at 05:49:11PM -0400, Michael S. Tsirkin wrote:
-> On Fri, Oct 25, 2019 at 12:01:50PM +0200, Stefan Hajnoczi wrote:
-> > tests/vhost-user-fs-test.c needs fuse.h.  The private copy that
-> > virtiofsd has can be replaced with a properly imported file using
-> > update-linux-headers.sh.
-> >=20
-> > TODO rerun update-linux-headers.sh with upstream kernel tree!
-> >=20
-> > Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
->=20
-> OK I would just add this with the virtiofsd patchset.
+Suggested-by: Denis V. Lunev <den@openvz.org>
+Signed-off-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+---
+ tests/qemu-iotests/277     | 91 ++++++++++++++++++++++++++++++++++++++++++++++
+ tests/qemu-iotests/277.out |  7 ++++
+ tests/qemu-iotests/group   |  1 +
+ 3 files changed, 99 insertions(+)
+ create mode 100755 tests/qemu-iotests/277
+ create mode 100644 tests/qemu-iotests/277.out
 
-Yes, I'll talk to David.
-
-Stefan
-
---HFD/Dq8JdnjNvyuv
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl21j0cACgkQnKSrs4Gr
-c8j6ugf/SwP+Qyw7qmyQInH0iArUl4QbSR98SvctUVw066Vw109WHPpDr8v3LFbE
-xJ90vnF6s+yaKbvMeFCtJMpJ0nRosEhjc20XjrpfINvvlUQANgkPl4NUpqD3gxeg
-daqXIoOux2Yi5gi5m/VyQdNf71u/Y4VU4mImXN+0WnFUfko4VkH28N+JTwT4Bkng
-NjspBEVSTDMfqS2BPPwT8tvITpOFlVNb2skkR8qngT0Dq3bEp5NelxKVMdGgMA8x
-4D1AvV52BU2pRyiWocCjelJXsXRCKDOX+LYNt15c2GIeVPDOmaCa+1fvzxdHYMOT
-eoC+xLolTWudUHY6b1etEmQGHqwRXg==
-=RCds
------END PGP SIGNATURE-----
-
---HFD/Dq8JdnjNvyuv--
+diff --git a/tests/qemu-iotests/277 b/tests/qemu-iotests/277
+new file mode 100755
+index 0000000..46a29b7
+--- /dev/null
++++ b/tests/qemu-iotests/277
+@@ -0,0 +1,91 @@
++#!/usr/bin/env python
++#
++# Test nbd client reconnect
++#
++# Copyright (c) 2019 Virtuozzo International GmbH
++#
++# This program is free software; you can redistribute it and/or modify
++# it under the terms of the GNU General Public License as published by
++# the Free Software Foundation; either version 2 of the License, or
++# (at your option) any later version.
++#
++# This program is distributed in the hope that it will be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++# GNU General Public License for more details.
++#
++# You should have received a copy of the GNU General Public License
++# along with this program.  If not, see <http://www.gnu.org/licenses/>.
++#
++
++import os
++import sys
++import io
++import subprocess
++import iotests
++from iotests import file_path, log
++
++
++def start_server_NBD(nbd_sock, conf_file):
++    srv = subprocess.Popen(["nbd-fault-injector.py", "--classic-negotiation",
++                           nbd_sock, conf_file], stdout=subprocess.PIPE,
++                           stderr=subprocess.STDOUT, universal_newlines=True)
++    line = srv.stdout.readline()
++    if "Listening on " in line:
++        log('NBD server: started')
++    else:
++        log('NBD server: {}'.format(line.rstrip()))
++
++    return srv
++
++
++def check_server_NBD(srv):
++    exitcode = srv.wait(timeout=10)
++
++    if exitcode < 0:
++        sys.stderr.write('NBD server: ERROR %i\n' % (-exitcode))
++        log(srv.communicate()[0])
++    else:
++        line = srv.stdout.readline()
++        log('NBD server: ' + line.rstrip())
++
++    os.remove(nbd_sock)
++    os.remove(conf_file)
++
++
++def make_conf_file(conf_file, event):
++    if os.path.exists(conf_file):
++        os.remove(conf_file)
++
++    with open(conf_file, "w+") as conff:
++        conff.write("[inject-error]\nevent={}\nwhen=after".format(event))
++
++
++disk, nbd_sock = file_path('disk', 'nbd-sock')
++nbd_uri = 'nbd+unix:///?socket=' + nbd_sock
++if os.path.exists(nbd_sock):
++    os.remove(nbd_sock)
++
++conf_file = os.path.join(iotests.test_dir, "nbd-fault-injector.conf")
++make_conf_file(conf_file, "data")
++srv = start_server_NBD(nbd_sock, conf_file)
++
++log('NBD client: QEMU-IO write')
++args = iotests.qemu_io_args + ['-f', 'raw', '-c', 'write -P 0x7 0 3M', nbd_uri]
++clt = subprocess.Popen(args, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
++
++check_server_NBD(srv)
++
++make_conf_file(conf_file, "reply")
++srv = start_server_NBD(nbd_sock, conf_file)
++
++exitcode = clt.wait(timeout=10)
++if exitcode < 0:
++    sys.stderr.write('qemu-io received signal %i: %s\n' %
++                     (-exitcode, ' '.join(args)))
++
++for line in io.TextIOWrapper(clt.stdout, encoding="utf-8"):
++    if "3 MiB" not in line:
++        log('NBD client: ' + line.rstrip())
++
++check_server_NBD(srv)
+diff --git a/tests/qemu-iotests/277.out b/tests/qemu-iotests/277.out
+new file mode 100644
+index 0000000..07e6e82
+--- /dev/null
++++ b/tests/qemu-iotests/277.out
+@@ -0,0 +1,7 @@
++NBD server: started
++NBD client: QEMU-IO write
++NBD server: Closing connection on rule match inject-error
++NBD server: started
++NBD client: Connection closed
++NBD client: wrote 3145728/3145728 bytes at offset 0
++NBD server: Closing connection on rule match inject-error
+diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
+index af322af..22ef1b8 100644
+--- a/tests/qemu-iotests/group
++++ b/tests/qemu-iotests/group
+@@ -282,3 +282,4 @@
+ 267 rw auto quick snapshot
+ 268 rw auto quick
+ 270 rw backing quick
++277 rw
+-- 
+1.8.3.1
 
 
