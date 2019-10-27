@@ -2,71 +2,73 @@ Return-Path: <SRS0=q9Vo=YU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 54E72CA9EAF
-	for <qemu-devel@archiver.kernel.org>; Sun, 27 Oct 2019 03:48:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 39D58CA9EAF
+	for <qemu-devel@archiver.kernel.org>; Sun, 27 Oct 2019 05:06:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1BCF520717
-	for <qemu-devel@archiver.kernel.org>; Sun, 27 Oct 2019 03:48:51 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1BCF520717
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id 0B83A2070B
+	for <qemu-devel@archiver.kernel.org>; Sun, 27 Oct 2019 05:06:23 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0B83A2070B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43986 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44080 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iOZXv-0002DH-31
-	for qemu-devel@archiver.kernel.org; Sat, 26 Oct 2019 23:48:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54968)
+	id 1iOakx-0006f7-5j
+	for qemu-devel@archiver.kernel.org; Sun, 27 Oct 2019 01:06:23 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58252)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <no-reply@patchew.org>) id 1iOZXE-0000xq-5g
- for qemu-devel@nongnu.org; Sat, 26 Oct 2019 23:48:09 -0400
+ (envelope-from <bounces@canonical.com>) id 1iOakE-0005Pi-2U
+ for qemu-devel@nongnu.org; Sun, 27 Oct 2019 01:05:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <no-reply@patchew.org>) id 1iOZXC-0006DL-EM
- for qemu-devel@nongnu.org; Sat, 26 Oct 2019 23:48:07 -0400
-Resent-Date: Sat, 26 Oct 2019 23:48:07 -0400
-Resent-Message-Id: <E1iOZXC-0006DL-EM@eggs.gnu.org>
-Received: from sender4-of-o54.zoho.com ([136.143.188.54]:21483)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <no-reply@patchew.org>)
- id 1iOZXC-0006Ce-4s; Sat, 26 Oct 2019 23:48:06 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1572148049; cv=none; 
- d=zohomail.com; s=zohoarc; 
- b=BOvceUtwjmmd95QHUWvST1e0/SjU7llfD0kSWZgm6CN629+gdwU1GSz3yjd9uhcfBJY4jOyk5/45613GybBN6g/VNwtyJuZ3oaFVy0viSrYGsqVSbJLKYmM66WXnqdOJpBUKwIrSc+7w81pP9kULH5NaJ17yt0LZPRIjaeu4Kks=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
- s=zohoarc; t=1572148049;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
- bh=h7x9Tk1+6Ur7TWsgnjQVL4jkkEiMQ3Z0Xu6xUlbuumo=; 
- b=IwCWJ/MC7EnLLVM1QtgCnfIWU0p9bddIzsuxQchO2TGISptCqIbu0QtuTrWtWzX5QSasZC2zOmnuv6CkrotPuGZ8e6tUPwet/oJXwMKrINs2NlYn+kI1iZ2qQ8a1eH15Inm6xdjYiGl0IBUnAEzIjS5F7h6l1HLrSwvlFYTwDKk=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
- dkim=pass  header.i=patchew.org;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1572148047542462.07605722344124;
- Sat, 26 Oct 2019 20:47:27 -0700 (PDT)
-In-Reply-To: <20191026164546.30020-1-laurent@vivier.eu>
-Subject: Re: [PATCH v15 00/11] hw/m68k: add Apple Machintosh Quadra 800 machine
-Message-ID: <157214804554.8606.15788168693862921301@37313f22b938>
+ (envelope-from <bounces@canonical.com>) id 1iOakC-0003bE-CB
+ for qemu-devel@nongnu.org; Sun, 27 Oct 2019 01:05:37 -0400
+Received: from indium.canonical.com ([91.189.90.7]:44696)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <bounces@canonical.com>)
+ id 1iOakC-0003ap-6j
+ for qemu-devel@nongnu.org; Sun, 27 Oct 2019 01:05:36 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1iOakA-0004gA-MG
+ for <qemu-devel@nongnu.org>; Sun, 27 Oct 2019 05:05:34 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 92D292E80C9
+ for <qemu-devel@nongnu.org>; Sun, 27 Oct 2019 05:05:34 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: laurent@vivier.eu
-Date: Sat, 26 Oct 2019 20:47:27 -0700 (PDT)
-X-ZohoMailClient: External
+Content-Transfer-Encoding: quoted-printable
+Date: Sun, 27 Oct 2019 04:58:31 -0000
+From: Toolybird <1850000@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: gschafer
+X-Launchpad-Bug-Reporter: Toolybird (gschafer)
+X-Launchpad-Bug-Modifier: Toolybird (gschafer)
+References: <157212805514.19102.17568097209992499457.malonedeb@wampee.canonical.com>
+Message-Id: <157215231134.18979.16782302206432118351.malone@wampee.canonical.com>
+Subject: [Bug 1850000] Re: 4.1.0 bogus QCOW2 corruption reported after compress
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="469f241f4e73cc0bdffa4e30654052a2af068e06";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: d96126121df6e7f093a6ee29a98c340527f942b1
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 136.143.188.54
+X-Received-From: 91.189.90.7
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -75,86 +77,143 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, fam@euphon.net, qemu-block@nongnu.org, huth@tuxfamily.org,
- jasowang@redhat.com, mark.cave-ayland@ilande.co.uk, qemu-devel@nongnu.org,
- laurent@vivier.eu, aurelien@aurel32.net, hpoussin@reactos.org,
- kraxel@redhat.com, marcandre.lureau@redhat.com, pbonzini@redhat.com,
- mreitz@redhat.com, philmd@redhat.com, dgilbert@redhat.com
+Reply-To: Bug 1850000 <1850000@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MTAyNjE2NDU0Ni4zMDAy
-MC0xLWxhdXJlbnRAdml2aWVyLmV1LwoKCgpIaSwKClRoaXMgc2VyaWVzIHNlZW1zIHRvIGhhdmUg
-c29tZSBjb2Rpbmcgc3R5bGUgcHJvYmxlbXMuIFNlZSBvdXRwdXQgYmVsb3cgZm9yCm1vcmUgaW5m
-b3JtYXRpb246CgpTdWJqZWN0OiBbUEFUQ0ggdjE1IDAwLzExXSBody9tNjhrOiBhZGQgQXBwbGUg
-TWFjaGludG9zaCBRdWFkcmEgODAwIG1hY2hpbmUKVHlwZTogc2VyaWVzCk1lc3NhZ2UtaWQ6IDIw
-MTkxMDI2MTY0NTQ2LjMwMDIwLTEtbGF1cmVudEB2aXZpZXIuZXUKCj09PSBURVNUIFNDUklQVCBC
-RUdJTiA9PT0KIyEvYmluL2Jhc2gKZ2l0IHJldi1wYXJzZSBiYXNlID4gL2Rldi9udWxsIHx8IGV4
-aXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1s
-b2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5hbGdvcml0aG0g
-aGlzdG9ncmFtCi4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgYmFzZS4uCj09PSBU
-RVNUIFNDUklQVCBFTkQgPT09CgpTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCjZhMzM3
-MTUgQm9vdExpbnV4Q29uc29sZVRlc3Q6IFRlc3QgdGhlIFF1YWRyYSA4MDAKMDBmY2I1ZSBody9t
-NjhrOiBkZWZpbmUgTWFjaW50b3NoIFF1YWRyYSA4MDAKMGZkMzIwYSBody9tNjhrOiBhZGQgYSBk
-dW1teSBTV0lNIGZsb3BweSBjb250cm9sbGVyCmIyNzY5ZWQgaHcvbTY4azogYWRkIE51YnVzIG1h
-Y2ZiIHZpZGVvIGNhcmQKNGQ0YjYyNCBody9tNjhrOiBhZGQgTnVidXMgc3VwcG9ydAowYWVhMGU2
-IGh3L202OGs6IGltcGxlbWVudCBBREIgYnVzIHN1cHBvcnQgZm9yIHZpYQpiMTdlZDFmIGh3L202
-OGs6IGFkZCBWSUEgc3VwcG9ydApjN2U4MTlmIGRwODM5M3g6IG1hbmFnZSBiaWcgZW5kaWFuIGJ1
-cwo2Y2NhZWJkIGVzcDogYWRkIHBzZXVkby1ETUEgYXMgdXNlZCBieSBNYWNpbnRvc2gKMDFjYjQ5
-MiBlc3A6IG1vdmUgZ2V0X2NtZCgpIHBvc3QtRE1BIGNvZGUgdG8gZ2V0X2NtZF9jYigpCjU1ZTc4
-ZDkgZXNwOiBtb3ZlIGhhbmRsZV90aV9jbWQoKSBjbGVhbnVwIGNvZGUgdG8gZXNwX2RvX2RtYSgp
-LgoKPT09IE9VVFBVVCBCRUdJTiA9PT0KMS8xMSBDaGVja2luZyBjb21taXQgNTVlNzhkOWQ5Y2Rl
-IChlc3A6IG1vdmUgaGFuZGxlX3RpX2NtZCgpIGNsZWFudXAgY29kZSB0byBlc3BfZG9fZG1hKCku
-KQoyLzExIENoZWNraW5nIGNvbW1pdCAwMWNiNDkyYjBlNmIgKGVzcDogbW92ZSBnZXRfY21kKCkg
-cG9zdC1ETUEgY29kZSB0byBnZXRfY21kX2NiKCkpCjMvMTEgQ2hlY2tpbmcgY29tbWl0IDZjY2Fl
-YmQ4ZWVmNyAoZXNwOiBhZGQgcHNldWRvLURNQSBhcyB1c2VkIGJ5IE1hY2ludG9zaCkKNC8xMSBD
-aGVja2luZyBjb21taXQgYzdlODE5ZjZmMjZmIChkcDgzOTN4OiBtYW5hZ2UgYmlnIGVuZGlhbiBi
-dXMpCjUvMTEgQ2hlY2tpbmcgY29tbWl0IGIxN2VkMWZhZjUzMiAoaHcvbTY4azogYWRkIFZJQSBz
-dXBwb3J0KQpXQVJOSU5HOiBhZGRlZCwgbW92ZWQgb3IgZGVsZXRlZCBmaWxlKHMpLCBkb2VzIE1B
-SU5UQUlORVJTIG5lZWQgdXBkYXRpbmc/CiM4MzogCm5ldyBmaWxlIG1vZGUgMTAwNjQ0CgpFUlJP
-Ujogc3BhY2UgcHJvaGliaXRlZCBhZnRlciB0aGF0ICcmJicgKGN0eDpXeFcpCiM0NTU6IEZJTEU6
-IGh3L21pc2MvbWFjX3ZpYS5jOjM2ODoKKyAgICAgICAgaWYgKCEodjFzLT5sYXN0X2IgJiBWSUEx
-Ql92UlRDQ2xrKSAmJiAocy0+YiAmIFZJQTFCX3ZSVENDbGspKSB7CiAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgXgoKdG90YWw6IDEgZXJyb3JzLCAxIHdhcm5pbmdz
-LCA5MTIgbGluZXMgY2hlY2tlZAoKUGF0Y2ggNS8xMSBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFz
-ZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVw
-b3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJT
-LgoKNi8xMSBDaGVja2luZyBjb21taXQgMGFlYTBlNmNjNzg3IChody9tNjhrOiBpbXBsZW1lbnQg
-QURCIGJ1cyBzdXBwb3J0IGZvciB2aWEpCjcvMTEgQ2hlY2tpbmcgY29tbWl0IDRkNGI2MjQ4NWMx
-NCAoaHcvbTY4azogYWRkIE51YnVzIHN1cHBvcnQpCldBUk5JTkc6IGFkZGVkLCBtb3ZlZCBvciBk
-ZWxldGVkIGZpbGUocyksIGRvZXMgTUFJTlRBSU5FUlMgbmVlZCB1cGRhdGluZz8KIzY0OiAKbmV3
-IGZpbGUgbW9kZSAxMDA2NDQKCnRvdGFsOiAwIGVycm9ycywgMSB3YXJuaW5ncywgNTMxIGxpbmVz
-IGNoZWNrZWQKClBhdGNoIDcvMTEgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAg
-SWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRv
-IHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KOC8xMSBDaGVj
-a2luZyBjb21taXQgYjI3NjllZDg4MjRmIChody9tNjhrOiBhZGQgTnVidXMgbWFjZmIgdmlkZW8g
-Y2FyZCkKV0FSTklORzogYWRkZWQsIG1vdmVkIG9yIGRlbGV0ZWQgZmlsZShzKSwgZG9lcyBNQUlO
-VEFJTkVSUyBuZWVkIHVwZGF0aW5nPwojNzU6IApuZXcgZmlsZSBtb2RlIDEwMDY0NAoKdG90YWw6
-IDAgZXJyb3JzLCAxIHdhcm5pbmdzLCA1OTcgbGluZXMgY2hlY2tlZAoKUGF0Y2ggOC8xMSBoYXMg
-c3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFy
-ZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVD
-S1BBVENIIGluIE1BSU5UQUlORVJTLgo5LzExIENoZWNraW5nIGNvbW1pdCAwZmQzMjBhMGI5NmUg
-KGh3L202OGs6IGFkZCBhIGR1bW15IFNXSU0gZmxvcHB5IGNvbnRyb2xsZXIpCldBUk5JTkc6IGFk
-ZGVkLCBtb3ZlZCBvciBkZWxldGVkIGZpbGUocyksIGRvZXMgTUFJTlRBSU5FUlMgbmVlZCB1cGRh
-dGluZz8KIzYyOiAKbmV3IGZpbGUgbW9kZSAxMDA2NDQKCnRvdGFsOiAwIGVycm9ycywgMSB3YXJu
-aW5ncywgNTkzIGxpbmVzIGNoZWNrZWQKClBhdGNoIDkvMTEgaGFzIHN0eWxlIHByb2JsZW1zLCBw
-bGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVz
-IHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJ
-TkVSUy4KMTAvMTEgQ2hlY2tpbmcgY29tbWl0IDAwZmNiNWU2NjE5NiAoaHcvbTY4azogZGVmaW5l
-IE1hY2ludG9zaCBRdWFkcmEgODAwKQpXQVJOSU5HOiBhZGRlZCwgbW92ZWQgb3IgZGVsZXRlZCBm
-aWxlKHMpLCBkb2VzIE1BSU5UQUlORVJTIG5lZWQgdXBkYXRpbmc/CiM3MTogCm5ldyBmaWxlIG1v
-ZGUgMTAwNjQ0Cgp0b3RhbDogMCBlcnJvcnMsIDEgd2FybmluZ3MsIDUzNyBsaW5lcyBjaGVja2Vk
-CgpQYXRjaCAxMC8xMSBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkg
-b2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1h
-aW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoxMS8xMSBDaGVja2luZyBj
-b21taXQgNmEzMzcxNTNkMjcxIChCb290TGludXhDb25zb2xlVGVzdDogVGVzdCB0aGUgUXVhZHJh
-IDgwMCkKPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTog
-MQoKClRoZSBmdWxsIGxvZyBpcyBhdmFpbGFibGUgYXQKaHR0cDovL3BhdGNoZXcub3JnL2xvZ3Mv
-MjAxOTEwMjYxNjQ1NDYuMzAwMjAtMS1sYXVyZW50QHZpdmllci5ldS90ZXN0aW5nLmNoZWNrcGF0
-Y2gvP3R5cGU9bWVzc2FnZS4KLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBh
-dGNoZXcgW2h0dHBzOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0
-byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
+Current trunk still displays the problem.
 
+A git bisection between 4.0.0 and 4.1.0 revealed:
+
+b6c246942b14d3e0dec46a6c5868ed84e7dbea19 is the first bad commit
+commit b6c246942b14d3e0dec46a6c5868ed84e7dbea19
+Author: Alberto Garcia <berto@igalia.com>
+Date:   Fri May 10 19:22:54 2019 +0300
+
+    qcow2: Define and use QCOW2_COMPRESSED_SECTOR_SIZE
+    =
+
+    When an L2 table entry points to a compressed cluster the space used
+    by the data is specified in 512-byte sectors. This size is independent
+    from BDRV_SECTOR_SIZE and is specific to the qcow2 file format.
+    =
+
+    The QCOW2_COMPRESSED_SECTOR_SIZE constant defined in this patch makes
+    this explicit.
+    =
+
+    Signed-off-by: Alberto Garcia <berto@igalia.com>
+    Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+
+ block/qcow2-cluster.c  |  5 +++--
+ block/qcow2-refcount.c | 25 ++++++++++++++-----------
+ block/qcow2.c          |  3 ++-
+ block/qcow2.h          |  4 ++++
+ 4 files changed, 23 insertions(+), 14 deletions(-)
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1850000
+
+Title:
+  4.1.0 bogus QCOW2 corruption reported after compress
+
+Status in QEMU:
+  New
+
+Bug description:
+  Creating a compressed image then running `qemu-img check <..>.qcow2'
+  on said image seems to report bogus corruption in some (but not all)
+  cases:
+
+  Step 1.
+
+  # qemu-img info win7-base.qcow2
+  image: win7-base.qcow2
+  file format: qcow2
+  virtual size: 20 GiB (21474836480 bytes)
+  disk size: 12.2 GiB
+  cluster_size: 65536
+  Format specific information:
+      compat: 1.1
+      lazy refcounts: true
+      refcount bits: 16
+      corrupt: false
+
+  # qemu-img check win7-base.qcow2
+  No errors were found on the image.
+  327680/327680 =3D 100.00% allocated, 0.00% fragmented, 0.00% compressed c=
+lusters
+  Image end offset: 21478375424
+
+  Step 2.
+
+  # qemu-img convert -f qcow2 -O qcow2 -c win7-base.qcow2 test1-z.qcow2
+
+  Step 3.
+
+  # qemu-img info test1-z.qcow2
+  image: test1-z.qcow2
+  file format: qcow2
+  virtual size: 20 GiB (21474836480 bytes)
+  disk size: 5.78 GiB
+  cluster_size: 65536
+  Format specific information:
+      compat: 1.1
+      lazy refcounts: false
+      refcount bits: 16
+      corrupt: false
+
+  # qemu-img check test1-z.qcow2
+  ERROR cluster 1191 refcount=3D1 reference=3D2
+  ERROR cluster 1194 refcount=3D1 reference=3D4
+  ERROR cluster 1195 refcount=3D1 reference=3D7
+  ERROR cluster 1196 refcount=3D1 reference=3D7
+  ERROR cluster 1197 refcount=3D1 reference=3D6
+  ERROR cluster 1198 refcount=3D1 reference=3D4
+  ERROR cluster 1199 refcount=3D1 reference=3D4
+  ERROR cluster 1200 refcount=3D1 reference=3D5
+  ERROR cluster 1201 refcount=3D1 reference=3D3
+  <...> snip many errors
+  Leaked cluster 94847 refcount=3D3 reference=3D0
+  Leaked cluster 94848 refcount=3D3 reference=3D0
+  Leaked cluster 94849 refcount=3D11 reference=3D0
+  Leaked cluster 94850 refcount=3D14 reference=3D0
+
+  20503 errors were found on the image.
+  Data may be corrupted, or further writes to the image may corrupt it.
+
+  20503 leaked clusters were found on the image.
+  This means waste of disk space, but no harm to data.
+  197000/327680 =3D 60.12% allocated, 89.32% fragmented, 88.50% compressed =
+clusters
+  Image end offset: 6216220672
+
+  =
+
+  The resultant image seems to work fine in a VM when used as a backing fil=
+e.
+
+  Interestingly, if I substitute a qemu-img binary from qemu-4.0 then no
+  errors are reported.
+
+  # /tmp/qemu-img check test1-z.qcow2
+  No errors were found on the image.
+  197000/327680 =3D 60.12% allocated, 89.32% fragmented, 88.50% compressed =
+clusters
+  Image end offset: 6216220672
+
+  Is the image corrupted or not? I'm guessing not.
+
+  Just in case it matters, this is ext4 fs on rotational disk. Latest
+  Arch Linux but self compiled 4.1.0 with recent QCOW2 corruption fixes
+  added.
+
+  I haven't tried latest trunk but might do so if time permits.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1850000/+subscriptions
 
