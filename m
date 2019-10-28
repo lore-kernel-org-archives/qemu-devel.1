@@ -2,104 +2,80 @@ Return-Path: <SRS0=Szrt=YV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 838D9CA9EA0
-	for <qemu-devel@archiver.kernel.org>; Mon, 28 Oct 2019 09:58:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 50C01CA9EBC
+	for <qemu-devel@archiver.kernel.org>; Mon, 28 Oct 2019 10:07:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4A8F8208C0
-	for <qemu-devel@archiver.kernel.org>; Mon, 28 Oct 2019 09:58:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1517B20873
+	for <qemu-devel@archiver.kernel.org>; Mon, 28 Oct 2019 10:07:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EyUsM2Vc"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4A8F8208C0
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="H7wNa9Kj"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1517B20873
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52208 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52248 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iP1ms-0003wo-EH
-	for qemu-devel@archiver.kernel.org; Mon, 28 Oct 2019 05:58:10 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35147)
+	id 1iP1wL-0005p2-8O
+	for qemu-devel@archiver.kernel.org; Mon, 28 Oct 2019 06:07:57 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35979)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1iP1lw-0003PQ-Rn
- for qemu-devel@nongnu.org; Mon, 28 Oct 2019 05:57:14 -0400
+ (envelope-from <eblake@redhat.com>) id 1iP1vE-0005IB-Cz
+ for qemu-devel@nongnu.org; Mon, 28 Oct 2019 06:06:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1iP1lu-00007b-Rz
- for qemu-devel@nongnu.org; Mon, 28 Oct 2019 05:57:12 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:25750
+ (envelope-from <eblake@redhat.com>) id 1iP1vC-000437-S8
+ for qemu-devel@nongnu.org; Mon, 28 Oct 2019 06:06:48 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:55098
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1iP1lu-00007C-KG
- for qemu-devel@nongnu.org; Mon, 28 Oct 2019 05:57:10 -0400
+ (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1iP1vC-00041x-Og
+ for qemu-devel@nongnu.org; Mon, 28 Oct 2019 06:06:46 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1572256629;
+ s=mimecast20190719; t=1572257205;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=I9iPgFTp3n3VJPfrqrZW2vK5eaXZIk9/4wPWkEi7z4A=;
- b=EyUsM2VcO7+cH7tKMrs3s8ut+j0Ktjfo24Fau3qhyPatPqEQ2act865AA/49u+58Bd1QJe
- 5NXHsd6AA2eF2vwwcAGN8QAY+GksZwAQiTNjn9fb008Fr6RdPYbgcLBzW7O69IoT8UHr/b
- fmWfMVsf8RaRkXZ1T39YNal8fciUWCs=
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=+uUZMKBW+x5CKLMowSqg75mZzEIfdofCH7sxfPylzTc=;
+ b=H7wNa9KjuN/M1ZNKwzysRifFXh6VR6NW1Pfl/uBGkFQswvqfh3uJMrNtqqgA2TMd+7ThLb
+ /SlrsMBiCuWqbOpuKkpV4yEtlre2x1HYVD3VTbmMbUKZ2tOSQ0q6rXApO9W7u2op1OwQ7J
+ 5f2KSvH1uwS3TTK1yhUbTjPKD+KOgJQ=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-405--OhV-RnIOTmeI43snJHe2w-1; Mon, 28 Oct 2019 05:57:05 -0400
-X-MC-Unique: -OhV-RnIOTmeI43snJHe2w-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
+ us-mta-181-lqm6FnorPdi6F2TqzXY06w-1; Mon, 28 Oct 2019 06:06:41 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C1F8B1800D7E;
- Mon, 28 Oct 2019 09:57:04 +0000 (UTC)
-Received: from dresden.str.redhat.com (ovpn-117-83.ams2.redhat.com
- [10.36.117.83])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 9861160923;
- Mon, 28 Oct 2019 09:57:00 +0000 (UTC)
-Subject: Re: [RFC 0/3] block/file-posix: Work around XFS bug
-From: Max Reitz <mreitz@redhat.com>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-References: <20191025095849.25283-1-mreitz@redhat.com>
- <20191027123555.GN4472@stefanha-x1.localdomain>
- <81bb0f91-2671-c9e5-f791-c7470dfd75ce@redhat.com>
- <c38e000b-a120-2726-65a2-61c63fcc101f@redhat.com>
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <0f81f678-7d0d-56d3-d236-c077e4251f1a@redhat.com>
-Date: Mon, 28 Oct 2019 10:56:58 +0100
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 764D15E8;
+ Mon, 28 Oct 2019 10:06:40 +0000 (UTC)
+Received: from [10.3.116.125] (ovpn-116-125.phx2.redhat.com [10.3.116.125])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 11BD35C1D6;
+ Mon, 28 Oct 2019 10:06:38 +0000 (UTC)
+Subject: Re: [PATCH] iotests: Test nbd client reconnect
+To: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>,
+ qemu-devel@nongnu.org, qemu-block@nongnu.org
+References: <1572187725-685325-1-git-send-email-andrey.shinkevich@virtuozzo.com>
+From: Eric Blake <eblake@redhat.com>
+Organization: Red Hat, Inc.
+Message-ID: <8acd5c43-adcb-eff5-aa87-030d57216a5e@redhat.com>
+Date: Mon, 28 Oct 2019 08:55:42 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.1.1
 MIME-Version: 1.0
-In-Reply-To: <c38e000b-a120-2726-65a2-61c63fcc101f@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+In-Reply-To: <1572187725-685325-1-git-send-email-andrey.shinkevich@virtuozzo.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-MC-Unique: lqm6FnorPdi6F2TqzXY06w-1
 X-Mimecast-Spam-Score: 0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="7XjDDcRSTz63y09OZ0OP6bBU44g6EgQxM"
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 207.211.31.120
@@ -114,106 +90,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Anton Nefedov <anton.nefedov@virtuozzo.com>,
- Alberto Garcia <berto@igalia.com>, qemu-block@nongnu.org,
- qemu-devel@nongnu.org, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Cc: kwolf@redhat.com, den@openvz.org, vsementsov@virtuozzo.com,
+ mreitz@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---7XjDDcRSTz63y09OZ0OP6bBU44g6EgQxM
-Content-Type: multipart/mixed; boundary="VxlxTtBdPKRnUPbeRoyNFtpaQ4QukDrPb"
+On 10/27/19 3:48 PM, Andrey Shinkevich wrote:
+> The stress test for an NBD client. The NBD server is disconnected after
+> a client write operation. The NBD client should reconnect and retry the
+> operation.
+>=20
+> Suggested-by: Denis V. Lunev <den@openvz.org>
+> Signed-off-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+> ---
+>   tests/qemu-iotests/277     | 91 +++++++++++++++++++++++++++++++++++++++=
++++++++
+>   tests/qemu-iotests/277.out |  7 ++++
+>   tests/qemu-iotests/group   |  1 +
+>   3 files changed, 99 insertions(+)
+>   create mode 100755 tests/qemu-iotests/277
+>   create mode 100644 tests/qemu-iotests/277.out
 
---VxlxTtBdPKRnUPbeRoyNFtpaQ4QukDrPb
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+How does this differ from 264?  If it adds anything new, can it be=20
+merged into the existing test?
 
-On 28.10.19 10:30, Max Reitz wrote:
-> On 28.10.19 10:24, Max Reitz wrote:
->> On 27.10.19 13:35, Stefan Hajnoczi wrote:
->>> On Fri, Oct 25, 2019 at 11:58:46AM +0200, Max Reitz wrote:
->>>> As for how we can address the issue, I see three ways:
->>>> (1) The one presented in this series: On XFS with aio=3Dnative, we ext=
-end
->>>>     tracked requests for post-EOF fallocate() calls (i.e., write-zero
->>>>     operations) to reach until infinity (INT64_MAX in practice), mark
->>>>     them serializing and wait for other conflicting requests.
->>>>
->>>>     Advantages:
->>>>     + Limits the impact to very specific cases
->>>>       (And that means it wouldn=E2=80=99t hurt too much to keep this w=
-orkaround
->>>>       even when the XFS driver has been fixed)
->>>>     + Works around the bug where it happens, namely in file-posix
->>>>
->>>>     Disadvantages:
->>>>     - A bit complex
->>>>     - A bit of a layering violation (should file-posix have access to
->>>>       tracked requests?)
->>>
->>> Your patch series is reasonable.  I don't think it's too bad.
->>>
->>> The main question is how to detect the XFS fix once it ships.  XFS
->>> already has a ton of ioctls, so maybe they don't mind adding a
->>> feature/quirk bit map ioctl for publishing information about bug fixes
->>> to userspace.  I didn't see another obvious way of doing it, maybe a
->>> mount option that the kernel automatically sets and that gets reported
->>> to userspace?
->>
->> I=E2=80=99ll add a note to the RH BZ.
->>
->>> If we imagine that XFS will not provide a mechanism to detect the
->>> presence of the fix, then could we ask QEMU package maintainers to
->>> ./configure --disable-xfs-fallocate-beyond-eof-workaround at some point
->>> in the future when their distro has been shipping a fixed kernel for a
->>> while?  It's ugly because it doesn't work if the user installs an older
->>> custom-built kernel on the host.  But at least it will cover 98% of
->>> users...
->>
->> :-/
->>
->> I don=E2=80=99t like it, but I suppose it would work.  We could also
->> automatically enable this disabling option in configure when we detect
->> uname to report a kernel version that must include the fix.  (This
->> wouldn=E2=80=99t work for kernel with backported fixes, but those disapp=
-ear over
->> time...)
-> I just realized that none of this is going to work for the gluster case
-> brought up by Nir.  The affected kernel is the remote one and we have no
-> insight into that.  I don=E2=80=99t think we can do ioctls to XFS over gl=
-uster,
-> can we?
-
-On third thought, we could try to detect whether the file is on a remote
-filesystem, and if so enable the workaround unconditionally.  I suppose
-it wouldn=E2=80=99t hurt performance-wise, given that it=E2=80=99s a remote=
- filesystem
-anyway.
-
-Max
-
-
---VxlxTtBdPKRnUPbeRoyNFtpaQ4QukDrPb--
-
---7XjDDcRSTz63y09OZ0OP6bBU44g6EgQxM
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl22u2sACgkQ9AfbAGHV
-z0DgZQf/W8ZaM+FYgzrriPUeZVP598ObkUJQagCmnyW3ak0XfSOn0s22D2kGu4eY
-/SOsYz3YI2lC4jFFXXn0WWn4aXj63HKBOGC4NlGxRU8DmXG0Z7cQJ4oUaXKKmrwM
-Kp/Jqn4EVD3vk2YLXjT2UJeT1Ob0F8iJ6jT1NRC7qdlK4avosgRnNUWj79JLJ+6A
-Tu3P09p+9BxhhPanMqTj50IkVeg4iThWCLKywaXPv4AYLdDMchqkGIV/s3ONzzes
-7oBDh2nba/ncXEhbJiRMZhOEx7Xsmp/Ke/wHlo1cODYaK0JBVvlENZrKXPcum5W5
-2oTpdOpg/Iv3cLDIDhAU7mPW9A2ejg==
-=geWA
------END PGP SIGNATURE-----
-
---7XjDDcRSTz63y09OZ0OP6bBU44g6EgQxM--
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
 
 
