@@ -2,74 +2,82 @@ Return-Path: <SRS0=Szrt=YV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B5F07CA9EC0
-	for <qemu-devel@archiver.kernel.org>; Mon, 28 Oct 2019 13:41:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7BB27CA9EC0
+	for <qemu-devel@archiver.kernel.org>; Mon, 28 Oct 2019 13:44:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8A168214B2
-	for <qemu-devel@archiver.kernel.org>; Mon, 28 Oct 2019 13:41:20 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8A168214B2
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=cendio.se
+	by mail.kernel.org (Postfix) with ESMTPS id 029FE214B2
+	for <qemu-devel@archiver.kernel.org>; Mon, 28 Oct 2019 13:44:15 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="d3gLT2gn"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 029FE214B2
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53878 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53898 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iP5Gp-0002DZ-Lu
-	for qemu-devel@archiver.kernel.org; Mon, 28 Oct 2019 09:41:19 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55221)
+	id 1iP5Je-0007nL-Tc
+	for qemu-devel@archiver.kernel.org; Mon, 28 Oct 2019 09:44:14 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57575)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1iP4Tq-0000k7-Vl
- for qemu-devel@nongnu.org; Mon, 28 Oct 2019 08:50:44 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1iP4oK-0008Dn-47
+ for qemu-devel@nongnu.org; Mon, 28 Oct 2019 09:11:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1iP4Tp-00045Z-N5
- for qemu-devel@nongnu.org; Mon, 28 Oct 2019 08:50:42 -0400
-Received: from indium.canonical.com ([91.189.90.7]:37304)
+ (envelope-from <peter.maydell@linaro.org>) id 1iP4oI-0005FY-QS
+ for qemu-devel@nongnu.org; Mon, 28 Oct 2019 09:11:51 -0400
+Received: from mail-oi1-x242.google.com ([2607:f8b0:4864:20::242]:34873)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1iP4Tp-000453-HD
- for qemu-devel@nongnu.org; Mon, 28 Oct 2019 08:50:41 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1iP4Tn-0007Ca-I6
- for <qemu-devel@nongnu.org>; Mon, 28 Oct 2019 12:50:39 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 6B6EE2E80C9
- for <qemu-devel@nongnu.org>; Mon, 28 Oct 2019 12:50:39 +0000 (UTC)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1iP4oI-0005F7-MT
+ for qemu-devel@nongnu.org; Mon, 28 Oct 2019 09:11:50 -0400
+Received: by mail-oi1-x242.google.com with SMTP id n16so3548006oig.2
+ for <qemu-devel@nongnu.org>; Mon, 28 Oct 2019 06:11:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=HyBAqeapYuxtXuJfIQdZix/p7r93MkELXxCsBd6FUY0=;
+ b=d3gLT2gnqwgF4vTsJWZG2UcUvIo2shVw4quoZlQ619do68aYEqet/Gkytufd9Y47QW
+ 1OAJLtOmor5P3hloUEhEgf1qewgfieyCwLY/J2el3oBg4D2RpG1SHN8njt5GE6oXY1ZA
+ 5wI0j/gyjN8QMZliHHlHIQJSlw6uUPP87ylJyqDQM7JseBWpS7pexOdBdpYZZSHR8GQ6
+ K3GVtBiJ+tCFru3960DZtJr54RnHX5rOP/DDry7XYs7WfAlcKKiqKTdJiQ22t7BjXqBS
+ awciiSNMtPxFW3ca9QA68yNiRKvLZP2RaDmJJxT9vAIHLKshpAtfvZXNN2bY1QyqDDle
+ ZXAQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=HyBAqeapYuxtXuJfIQdZix/p7r93MkELXxCsBd6FUY0=;
+ b=IWYiI0go/GCBaiueBULMrj2OrnREQugLp3mNP2y52F2O/YmnA5tKo59aSOUzdTKayD
+ AQG6IKGjcbWgALR0GjorwZnN8DJASxow+kWAcdJaLgosw0sd6Dkz3YfSNOmA9zSfapYu
+ yBPOpe75YYTF55MKhBx4tSe6GK7CI+ycRXX12Fdu5fs4ivsQ2NWIJWWxpl7sgIwMaITp
+ ay9khpKd4ZC3Nu2fnYdhKyE0OPiA0rNc3HQbMXOtelRNjJbqn2aOgpKfPJK3tkyvTB17
+ WmRwSyfT6GrdfcujTvck35b5VukZEkZocihHwnGLPfCFVVlVgoNQJpEqH5RhJHvHqRTQ
+ 8EaA==
+X-Gm-Message-State: APjAAAWcK9ZK/wBliZ6F1IDBs60m+lMEP8NFjk2is7qWDvK/zMiT/dBP
+ M/nyZ9UNKBmdiri8EjBTDmwtQ1MlzNUPqMnrBcZupA==
+X-Google-Smtp-Source: APXvYqwVpkGGXygFILUaoGHg5RHvXOv0ZlsxyMz9ioegP3kMBRg6K49wBY1vUSlOnuTspz71c9XrupumfPXIVhI0G60=
+X-Received: by 2002:aca:3b41:: with SMTP id i62mr13367511oia.48.1572268309051; 
+ Mon, 28 Oct 2019 06:11:49 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 28 Oct 2019 12:36:41 -0000
-From: Samuel <samuel@cendio.se>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: berrange samuel-t
-X-Launchpad-Bug-Reporter: Samuel (samuel-t)
-X-Launchpad-Bug-Modifier: Samuel (samuel-t)
-References: <157191258679.29920.9268940625941119092.malonedeb@soybean.canonical.com>
-Message-Id: <157226620175.28827.12115025004366696334.malone@soybean.canonical.com>
-Subject: [Bug 1849644] Re: QEMU VNC websocket proxy requires non-standard
- 'binary' subprotocol
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="469f241f4e73cc0bdffa4e30654052a2af068e06";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 7e089984dcb7b332530910b6b0936267260af078
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 91.189.90.7
+References: <20191026032447.20088-1-zhengxiang9@huawei.com>
+ <20191027061450-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20191027061450-mutt-send-email-mst@kernel.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 28 Oct 2019 13:11:48 +0000
+Message-ID: <CAFEAcA-gkBFgqYfFOPera15x2cK_a54Abw_0Gad1Jq+tGcC8rQ@mail.gmail.com>
+Subject: Re: [PATCH v20 0/5] Add ARMv8 RAS virtualization support in QEMU
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::242
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -78,51 +86,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1849644 <1849644@bugs.launchpad.net>
+Cc: Eduardo Habkost <ehabkost@redhat.com>, kvm-devel <kvm@vger.kernel.org>,
+ wanghaibin.wang@huawei.com, Marcelo Tosatti <mtosatti@redhat.com>,
+ Linuxarm <linuxarm@huawei.com>, QEMU Developers <qemu-devel@nongnu.org>,
+ gengdongjiu <gengdongjiu@huawei.com>, Shannon Zhao <shannon.zhaosl@gmail.com>,
+ Xiang Zheng <zhengxiang9@huawei.com>, qemu-arm <qemu-arm@nongnu.org>,
+ James Morse <james.morse@arm.com>,
+ Jonathan Cameron <jonathan.cameron@huawei.com>,
+ Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ "xuwei \(O\)" <xuwei5@huawei.com>, Laszlo Ersek <lersek@redhat.com>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Thank you for your response, Daniel!
+On Sun, 27 Oct 2019 at 10:17, Michael S. Tsirkin <mst@redhat.com> wrote:
+> This looks mostly OK to me.  I sent some minor style comments but they
+> can be addressed by follow up patches.
+>
+> Maybe it's a good idea to merge this before soft freeze to make sure it
+> gets some testing.  I'll leave this decision to the ARM maintainer.  For
+> ACPI parts:
+>
+> Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 
-Do you think this is something you will have the opportunity to look at
-soon?
+Thanks for the review. Unfortunately this has missed the softfreeze,
+given I'm away for the conference already and not in a position
+to do any more review/merging of arm stuff. It'll have to wait for 5.0.
 
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1849644
-
-Title:
-  QEMU VNC websocket proxy requires non-standard 'binary' subprotocol
-
-Status in QEMU:
-  New
-
-Bug description:
-  When running a machine using "-vnc" and the "websocket" option QEMU
-  seems to require the subprotocol called 'binary'. This subprotocol
-  does not exist in the WebSocket specification. In fact it has never
-  existed in the spec, in one of the very early drafts of WebSockets it
-  was briefly mentioned but it never made it to a final version.
-
-  When the WebSocket server requires a non-standard subprotocol any
-  WebSocket client that works correctly won't be able to connect.
-
-  One example of such a client is noVNC, it tells the server that it
-  doesn't want to use any subprotocol. QEMU's WebSocket proxy doesn't
-  let noVNC connect. If noVNC is modified to ask for 'binary' it will
-  work, this is, however, incorrect behavior.
-
-  Looking at the code in "io/channel-websock.c" it seems it's quite
-  hard-coded to binary:
-
-  Look at line 58 and 433 here:
-  https://git.qemu.org/?p=3Dqemu.git;a=3Dblob;f=3Dio/channel-websock.c
-
-  This code has to be made more dynamic, and shouldn't require binary.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1849644/+subscriptions
+thanks
+-- PMM
 
