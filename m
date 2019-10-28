@@ -2,70 +2,83 @@ Return-Path: <SRS0=Szrt=YV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6CB97CA9EA0
-	for <qemu-devel@archiver.kernel.org>; Mon, 28 Oct 2019 08:38:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 72AC8CA9EA0
+	for <qemu-devel@archiver.kernel.org>; Mon, 28 Oct 2019 08:40:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3F83220717
-	for <qemu-devel@archiver.kernel.org>; Mon, 28 Oct 2019 08:38:03 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3F83220717
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id 4521B20717
+	for <qemu-devel@archiver.kernel.org>; Mon, 28 Oct 2019 08:40:49 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4521B20717
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51870 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51880 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iP0XK-0004Mf-C2
-	for qemu-devel@archiver.kernel.org; Mon, 28 Oct 2019 04:38:02 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53811)
+	id 1iP0a0-0006EB-Fi
+	for qemu-devel@archiver.kernel.org; Mon, 28 Oct 2019 04:40:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54043)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <no-reply@patchew.org>) id 1iP0WS-0003kZ-FJ
- for qemu-devel@nongnu.org; Mon, 28 Oct 2019 04:37:09 -0400
+ (envelope-from <mst@redhat.com>) id 1iP0ZA-0005bT-9B
+ for qemu-devel@nongnu.org; Mon, 28 Oct 2019 04:39:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <no-reply@patchew.org>) id 1iP0WQ-0001Th-PO
- for qemu-devel@nongnu.org; Mon, 28 Oct 2019 04:37:08 -0400
-Resent-Date: Mon, 28 Oct 2019 04:37:08 -0400
-Resent-Message-Id: <E1iP0WQ-0001Th-PO@eggs.gnu.org>
-Received: from sender4-of-o54.zoho.com ([136.143.188.54]:21493)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <no-reply@patchew.org>)
- id 1iP0WQ-0001Sm-Hu
- for qemu-devel@nongnu.org; Mon, 28 Oct 2019 04:37:06 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1572251801; cv=none; 
- d=zohomail.com; s=zohoarc; 
- b=Rh9qQQlpOmRov/S9AQsly9t76RWLkOcXDalb0aTOw+Tzsrbh9JCLG+XNYOVEzgFD7rJDUJXDjST0VjU9uy/MZ7Y9f64ZgpqJvxG2vVPm8BnTyZgO/h3ZF4S8y0CRaXtgAbn0a5VieOP6zyALAPdCu/50AmshMxVMHiVsLNe+zGI=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
- s=zohoarc; t=1572251801;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
- bh=HQN2JeIUb9cgw2Knm4YhaKMRGHvro1S1o1gW++ExNPQ=; 
- b=OIcJMk1U+Txuy0ObuqxTytT0HAIYB3rEPzYpIk0HFezpAbzkN30tB7xKbpSU0qamultLphiQEnSyiiFN41BwGkJVchpvNL02uFtvlSM6LAq9aBpx6tD9tlTiMx+ac95pqyAboKDJmYyJfF05o3oXhJVPMf2CEehU7aGkPAzgimw=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
- dkim=pass  header.i=patchew.org;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 157225179912937.81048479019796;
- Mon, 28 Oct 2019 01:36:39 -0700 (PDT)
-In-Reply-To: <20191028075220.25673-1-tao3.xu@intel.com>
-Subject: Re: [PATCH v14 00/11] Build ACPI Heterogeneous Memory Attribute Table
- (HMAT)
-Message-ID: <157225179716.4191.16158707150788021981@37313f22b938>
+ (envelope-from <mst@redhat.com>) id 1iP0Z8-0002vK-JL
+ for qemu-devel@nongnu.org; Mon, 28 Oct 2019 04:39:55 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:44012)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <mst@redhat.com>) id 1iP0Z8-0002v7-AT
+ for qemu-devel@nongnu.org; Mon, 28 Oct 2019 04:39:54 -0400
+Received: from mail-qk1-f198.google.com (mail-qk1-f198.google.com
+ [209.85.222.198])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 451958535C
+ for <qemu-devel@nongnu.org>; Mon, 28 Oct 2019 08:39:53 +0000 (UTC)
+Received: by mail-qk1-f198.google.com with SMTP id r2so8274997qkb.2
+ for <qemu-devel@nongnu.org>; Mon, 28 Oct 2019 01:39:53 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=B2/I9VN2H/YPukqYzULlfW5wiVJz9mYA12C7O5f8Ne4=;
+ b=WFssqhU+fTBCwWt+xQuloDbinW3QWLcURYcdj84brmiyG1MVFnAxhgMZcExL+NxS+Y
+ n88jlFQ3CArDKatxynXXzoo0QOLwRXVN8VXCxMkfnokKIy89ryyNltUAXBApxUugcnt5
+ MxRGXqEVBO54r+bchE4yhvar0LrFKGTKATYCnZk1gL+ui0bUcnszhRN1The3eMIvNrwt
+ pdMa5Y/VOMexfCHftLxKffgdZhFz+3P8c6b5ffQU7v2IPQ4LmZm8H5gHo+XNjlfTc4+E
+ J1IlxdmBaRc5vnkdSNF7/uCGgJPxScd3fxHAs94SZ2lZ4YysYXAKNHOs+fB8G4UfC0z3
+ nufQ==
+X-Gm-Message-State: APjAAAWpa8gTkWByFq8u3fQ0XH4+/NghNT+i1uDS4FoHStQCjhedDvNy
+ m4dPaEx8wdQ34R87X7lgQXu1D7ejOXulN0WLtpPk0DtvSn5BCDQhyjh/IOlq5StIRBonLl6OARO
+ Od12f1exmkp/TL9M=
+X-Received: by 2002:a37:b8e:: with SMTP id 136mr14453218qkl.306.1572251992526; 
+ Mon, 28 Oct 2019 01:39:52 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqx41fwB2p8omZOaFyGV8N9tdae8HBveiQbCyyr6+PSgFSh75tGPLfAlBGQsmN+h5WC1QBxB4w==
+X-Received: by 2002:a37:b8e:: with SMTP id 136mr14453197qkl.306.1572251992222; 
+ Mon, 28 Oct 2019 01:39:52 -0700 (PDT)
+Received: from redhat.com (bzq-79-176-10-77.red.bezeqint.net. [79.176.10.77])
+ by smtp.gmail.com with ESMTPSA id
+ x26sm5115293qto.21.2019.10.28.01.39.47
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 28 Oct 2019 01:39:51 -0700 (PDT)
+Date: Mon, 28 Oct 2019 04:39:44 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Tao Xu <tao3.xu@intel.com>
+Subject: Re: [PATCH v14 11/11] tests/bios-tables-test: add test cases for
+ ACPI HMAT
+Message-ID: <20191028043831-mutt-send-email-mst@kernel.org>
+References: <20191028075220.25673-1-tao3.xu@intel.com>
+ <20191028075220.25673-12-tao3.xu@intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: tao3.xu@intel.com
-Date: Mon, 28 Oct 2019 01:36:39 -0700 (PDT)
-X-ZohoMailClient: External
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20191028075220.25673-12-tao3.xu@intel.com>
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 136.143.188.54
+X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -77,52 +90,110 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: lvivier@redhat.com, thuth@redhat.com, ehabkost@redhat.com, mst@redhat.com,
- qemu-devel@nongnu.org, jingqi.liu@intel.com, tao3.xu@intel.com,
- fan.du@intel.com, armbru@redhat.com, mdroth@linux.vnet.ibm.com,
- jonathan.cameron@huawei.com, imammedo@redhat.com
+Cc: lvivier@redhat.com, thuth@redhat.com, ehabkost@redhat.com,
+ qemu-devel@nongnu.org, jingqi.liu@intel.com, fan.du@intel.com,
+ mdroth@linux.vnet.ibm.com, Daniel Black <daniel@linux.ibm.com>,
+ armbru@redhat.com, jonathan.cameron@huawei.com, imammedo@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MTAyODA3NTIyMC4yNTY3
-My0xLXRhbzMueHVAaW50ZWwuY29tLwoKCgpIaSwKClRoaXMgc2VyaWVzIGZhaWxlZCB0aGUgZG9j
-a2VyLXF1aWNrQGNlbnRvczcgYnVpbGQgdGVzdC4gUGxlYXNlIGZpbmQgdGhlIHRlc3RpbmcgY29t
-bWFuZHMgYW5kCnRoZWlyIG91dHB1dCBiZWxvdy4gSWYgeW91IGhhdmUgRG9ja2VyIGluc3RhbGxl
-ZCwgeW91IGNhbiBwcm9iYWJseSByZXByb2R1Y2UgaXQKbG9jYWxseS4KCj09PSBURVNUIFNDUklQ
-VCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKbWFrZSBkb2NrZXItaW1hZ2UtY2VudG9zNyBWPTEgTkVU
-V09SSz0xCnRpbWUgbWFrZSBkb2NrZXItdGVzdC1xdWlja0BjZW50b3M3IFNIT1dfRU5WPTEgSj0x
-NCBORVRXT1JLPTEKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KCkxvb2tpbmcgZm9yIGV4cGVjdGVk
-IGZpbGUgJ3Rlc3RzL2RhdGEvYWNwaS9wYy9TUkFULmFjcGlobWF0JwpMb29raW5nIGZvciBleHBl
-Y3RlZCBmaWxlICd0ZXN0cy9kYXRhL2FjcGkvcGMvU1JBVCcKKioKRVJST1I6L3RtcC9xZW11LXRl
-c3Qvc3JjL3Rlc3RzL2Jpb3MtdGFibGVzLXRlc3QuYzozNTQ6bG9hZF9leHBlY3RlZF9hbWw6IGFz
-c2VydGlvbiBmYWlsZWQ6IChleHBfc2R0LmFtbF9maWxlKQpFUlJPUiAtIEJhaWwgb3V0ISBFUlJP
-UjovdG1wL3FlbXUtdGVzdC9zcmMvdGVzdHMvYmlvcy10YWJsZXMtdGVzdC5jOjM1NDpsb2FkX2V4
-cGVjdGVkX2FtbDogYXNzZXJ0aW9uIGZhaWxlZDogKGV4cF9zZHQuYW1sX2ZpbGUpCm1ha2U6ICoq
-KiBbY2hlY2stcXRlc3QteDg2XzY0XSBFcnJvciAxCm1ha2U6ICoqKiBXYWl0aW5nIGZvciB1bmZp
-bmlzaGVkIGpvYnMuLi4uCiAgVEVTVCAgICBpb3Rlc3QtcWNvdzI6IDAzNQogIFRFU1QgICAgaW90
-ZXN0LXFjb3cyOiAwMzYKLS0tCiAgICByYWlzZSBDYWxsZWRQcm9jZXNzRXJyb3IocmV0Y29kZSwg
-Y21kKQpzdWJwcm9jZXNzLkNhbGxlZFByb2Nlc3NFcnJvcjogQ29tbWFuZCAnWydzdWRvJywgJy1u
-JywgJ2RvY2tlcicsICdydW4nLCAnLS1sYWJlbCcsICdjb20ucWVtdS5pbnN0YW5jZS51dWlkPTFh
-NGJmOWM1ODc4NTRmODE5MTg1MzJiNzVkMWU2NWI4JywgJy11JywgJzEwMDEnLCAnLS1zZWN1cml0
-eS1vcHQnLCAnc2VjY29tcD11bmNvbmZpbmVkJywgJy0tcm0nLCAnLWUnLCAnVEFSR0VUX0xJU1Q9
-JywgJy1lJywgJ0VYVFJBX0NPTkZJR1VSRV9PUFRTPScsICctZScsICdWPScsICctZScsICdKPTE0
-JywgJy1lJywgJ0RFQlVHPScsICctZScsICdTSE9XX0VOVj0xJywgJy1lJywgJ0NDQUNIRV9ESVI9
-L3Zhci90bXAvY2NhY2hlJywgJy12JywgJy9ob21lL3BhdGNoZXcvLmNhY2hlL3FlbXUtZG9ja2Vy
-LWNjYWNoZTovdmFyL3RtcC9jY2FjaGU6eicsICctdicsICcvdmFyL3RtcC9wYXRjaGV3LXRlc3Rl
-ci10bXAtM3J1al9ybmkvc3JjL2RvY2tlci1zcmMuMjAxOS0xMC0yOC0wNC4yNS4yNy4xNTkzNDov
-dmFyL3RtcC9xZW11Onoscm8nLCAncWVtdTpjZW50b3M3JywgJy92YXIvdG1wL3FlbXUvcnVuJywg
-J3Rlc3QtcXVpY2snXScgcmV0dXJuZWQgbm9uLXplcm8gZXhpdCBzdGF0dXMgMi4KZmlsdGVyPS0t
-ZmlsdGVyPWxhYmVsPWNvbS5xZW11Lmluc3RhbmNlLnV1aWQ9MWE0YmY5YzU4Nzg1NGY4MTkxODUz
-MmI3NWQxZTY1YjgKbWFrZVsxXTogKioqIFtkb2NrZXItcnVuXSBFcnJvciAxCm1ha2VbMV06IExl
-YXZpbmcgZGlyZWN0b3J5IGAvdmFyL3RtcC9wYXRjaGV3LXRlc3Rlci10bXAtM3J1al9ybmkvc3Jj
-JwptYWtlOiAqKiogW2RvY2tlci1ydW4tdGVzdC1xdWlja0BjZW50b3M3XSBFcnJvciAyCgpyZWFs
-ICAgIDExbTEwLjY4NHMKdXNlciAgICAwbTguMzY5cwoKClRoZSBmdWxsIGxvZyBpcyBhdmFpbGFi
-bGUgYXQKaHR0cDovL3BhdGNoZXcub3JnL2xvZ3MvMjAxOTEwMjgwNzUyMjAuMjU2NzMtMS10YW8z
-Lnh1QGludGVsLmNvbS90ZXN0aW5nLmRvY2tlci1xdWlja0BjZW50b3M3Lz90eXBlPW1lc3NhZ2Uu
-Ci0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwczovL3Bh
-dGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEBy
-ZWRoYXQuY29t
+On Mon, Oct 28, 2019 at 03:52:20PM +0800, Tao Xu wrote:
+> ACPI table HMAT has been introduced, QEMU now builds HMAT tables for
+> Heterogeneous Memory with boot option '-numa node'.
+> 
+> Add test cases on PC and Q35 machines with 2 numa nodes.
+> Because HMAT is generated when system enable numa, the
+> following tables need to be added for this test:
+>   tests/acpi-test-data/pc/*.acpihmat
+>   tests/acpi-test-data/pc/HMAT.*
+>   tests/acpi-test-data/q35/*.acpihmat
+>   tests/acpi-test-data/q35/HMAT.*
+> 
+> Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+> Reviewed-by: Daniel Black <daniel@linux.ibm.com>
+> Reviewed-by: Jingqi Liu <Jingqi.liu@intel.com>
+> Suggested-by: Igor Mammedov <imammedo@redhat.com>
+> Signed-off-by: Tao Xu <tao3.xu@intel.com>
+> ---
+> 
+> No changes in v14.
+> 
+> Changes in v13:
+>     - Use decimal notation with appropriate suffix for cache size
 
+As you have seen adding tests like this breaks CI.
+Pls see the comment at the beginning of tests/bios-tables-test.c
+for how to add tests without breaking CI.
+
+
+
+> ---
+>  tests/bios-tables-test.c | 44 ++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 44 insertions(+)
+> 
+> diff --git a/tests/bios-tables-test.c b/tests/bios-tables-test.c
+> index 0b33fb265f..96803c1f20 100644
+> --- a/tests/bios-tables-test.c
+> +++ b/tests/bios-tables-test.c
+> @@ -947,6 +947,48 @@ static void test_acpi_virt_tcg_numamem(void)
+>  
+>  }
+>  
+> +static void test_acpi_tcg_acpi_hmat(const char *machine)
+> +{
+> +    test_data data;
+> +
+> +    memset(&data, 0, sizeof(data));
+> +    data.machine = machine;
+> +    data.variant = ".acpihmat";
+> +    test_acpi_one(" -machine hmat=on"
+> +                  " -smp 2,sockets=2"
+> +                  " -m 128M,slots=2,maxmem=1G"
+> +                  " -object memory-backend-ram,size=64M,id=m0"
+> +                  " -object memory-backend-ram,size=64M,id=m1"
+> +                  " -numa node,nodeid=0,memdev=m0"
+> +                  " -numa node,nodeid=1,memdev=m1,initiator=0"
+> +                  " -numa cpu,node-id=0,socket-id=0"
+> +                  " -numa cpu,node-id=0,socket-id=1"
+> +                  " -numa hmat-lb,initiator=0,target=0,hierarchy=memory,"
+> +                  "data-type=access-latency,latency=5ns"
+> +                  " -numa hmat-lb,initiator=0,target=0,hierarchy=memory,"
+> +                  "data-type=access-bandwidth,bandwidth=500M"
+> +                  " -numa hmat-lb,initiator=0,target=1,hierarchy=memory,"
+> +                  "data-type=access-latency,latency=10ns"
+> +                  " -numa hmat-lb,initiator=0,target=1,hierarchy=memory,"
+> +                  "data-type=access-bandwidth,bandwidth=100M"
+> +                  " -numa hmat-cache,node-id=0,size=10K,level=1,assoc=direct,"
+> +                  "policy=write-back,line=8"
+> +                  " -numa hmat-cache,node-id=1,size=10K,level=1,assoc=direct,"
+> +                  "policy=write-back,line=8",
+> +                  &data);
+> +    free_test_data(&data);
+> +}
+> +
+> +static void test_acpi_q35_tcg_acpi_hmat(void)
+> +{
+> +    test_acpi_tcg_acpi_hmat(MACHINE_Q35);
+> +}
+> +
+> +static void test_acpi_piix4_tcg_acpi_hmat(void)
+> +{
+> +    test_acpi_tcg_acpi_hmat(MACHINE_PC);
+> +}
+> +
+>  static void test_acpi_virt_tcg(void)
+>  {
+>      test_data data = {
+> @@ -991,6 +1033,8 @@ int main(int argc, char *argv[])
+>          qtest_add_func("acpi/q35/numamem", test_acpi_q35_tcg_numamem);
+>          qtest_add_func("acpi/piix4/dimmpxm", test_acpi_piix4_tcg_dimm_pxm);
+>          qtest_add_func("acpi/q35/dimmpxm", test_acpi_q35_tcg_dimm_pxm);
+> +        qtest_add_func("acpi/piix4/acpihmat", test_acpi_piix4_tcg_acpi_hmat);
+> +        qtest_add_func("acpi/q35/acpihmat", test_acpi_q35_tcg_acpi_hmat);
+>      } else if (strcmp(arch, "aarch64") == 0) {
+>          qtest_add_func("acpi/virt", test_acpi_virt_tcg);
+>          qtest_add_func("acpi/virt/numamem", test_acpi_virt_tcg_numamem);
+> -- 
+> 2.20.1
 
